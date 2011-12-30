@@ -441,7 +441,7 @@ boolean message;
 	occupation = 0; /* do this early, so newuhs() knows we're done */
 	newuhs(FALSE);
 	if (nomovemsg) {
-		if (message) pline(nomovemsg);
+		if (message) pline1(nomovemsg);
 		nomovemsg = 0;
 	} else if (message)
 		You("finish eating %s.", food_xname(context.victual.piece, TRUE));
@@ -1300,7 +1300,7 @@ const char *mesg;
 	goto use_up_tin;
     }
 
-    pline(mesg);	/* "You succeed in opening the tin." */
+    pline1(mesg);	/* "You succeed in opening the tin." */
 
     if (r != SPINACH_TIN) {
 	mnum = tin->corpsenm;
@@ -1527,7 +1527,7 @@ struct obj *obj;
 	} else if(!rn2(4) && !Blind) {
 		pline("Everything suddenly goes dark.");
 		make_blinded((long)d(2,10),FALSE);
-		if (!Blind) Your(vision_clears);
+		if (!Blind) Your1(vision_clears);
 	} else if(!rn2(3)) {
 		const char *what, *where;
 		int duration = rnd(10);

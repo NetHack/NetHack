@@ -725,7 +725,7 @@ init_dungeons()		/* initialize the "dungeon" structs */
 	    interject_assistance(1, INTERJECT_PANIC, (genericptr_t)tbuf,
 				 (genericptr_t)fqn_prefix[DATAPREFIX]);
 #endif
-	    panic(tbuf);
+	    panic1(tbuf);
 	}
 
 	/* validate the data's version against the program's version */
