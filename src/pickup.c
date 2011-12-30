@@ -87,7 +87,7 @@ boolean here;		/* flag for type of obj list linkage */
 	if (!otmp) {
 	    impossible("simple_look(null)");
 	} else if (!(here ? otmp->nexthere : otmp->nobj)) {
-	    pline("%s", doname(otmp));
+	    pline1(doname(otmp));
 	} else {
 	    winid tmpwin = create_nhwindow(NHW_MENU);
 	    putstr(tmpwin, 0, "");
@@ -2321,7 +2321,7 @@ int held;
 	/* out-only or out before in */
 	if (loot_out && !loot_in_first) {
 	    if (!Has_contents(current_container)) {
-		pline("%s", emptymsg);		/* <whatever> is empty. */
+		pline1(emptymsg);		/* <whatever> is empty. */
 		if (!current_container->cknown) used = 1;
 		current_container->cknown = 1;
 	    } else {
@@ -2381,7 +2381,7 @@ int held;
 	/* out after in */
 	if (loot_out && loot_in_first) {
 	    if (!Has_contents(current_container)) {
-		pline("%s", emptymsg);		/* <whatever> is empty. */
+		pline1(emptymsg);		/* <whatever> is empty. */
 		if (!current_container->cknown) used = 1;
 		current_container->cknown = 1;
 	    } else {
@@ -2689,7 +2689,7 @@ dotip()
     else if (cobj->otyp == STATUE)
 	pline("Nothing interesting happens.");
     else
-	pline(nothing_happens);
+	pline1(nothing_happens);
     return 0;
 }
 

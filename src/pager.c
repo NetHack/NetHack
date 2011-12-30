@@ -881,7 +881,7 @@ dowhatdoes()
 #endif
 	reslt = dowhatdoes_core(q, bufr);
 	if (reslt)
-		pline("%s", reslt);
+		pline1(reslt);
 	else
 		pline("I've never heard of such commands.");
 	return 0;
