@@ -471,7 +471,7 @@ still_chewing(x,y)
 
     unblock_point(x, y);	/* vision */
     newsym(x, y);
-    if (digtxt) You(digtxt);	/* after newsym */
+    if (digtxt) You1(digtxt);	/* after newsym */
     if (dmgtxt) pay_for_damage(dmgtxt, FALSE);
     (void) memset((genericptr_t)&context.digging, 0, sizeof(struct dig_info));
     return 0;
@@ -1844,7 +1844,7 @@ boolean pick;
 		};
 		long time_left = spot_time_left(u.ux, u.uy, MELT_ICE_AWAY);
 		if (time_left && time_left < 15L)
-			pline("%s",
+			pline1(
 			    (time_left < 5L)  ? icewarnings[2] :
 			    (time_left < 10L) ? icewarnings[1] : icewarnings[0]);				    
 	}
@@ -2427,7 +2427,7 @@ const char *msg_override;
 	multi = 0;	/* caller will usually have done this already */
 	if (msg_override) nomovemsg = msg_override;
 	else if (!nomovemsg) nomovemsg = You_can_move_again;
-	if (*nomovemsg) pline(nomovemsg);
+	if (*nomovemsg) pline1(nomovemsg);
 	nomovemsg = 0;
 	u.usleep = 0;
 	if (afternmv) (*afternmv)();
@@ -2600,7 +2600,7 @@ const char *str;
 {
     if(near_capacity() >= EXT_ENCUMBER) {
 	if(str)
-	    pline(str);
+	    pline1(str);
 	else
 	    You_cant("do that while carrying so much stuff.");
 	return 1;

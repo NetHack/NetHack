@@ -923,7 +923,7 @@ doengrave()
 		c = yn_function("Do you want to add to the current engraving?",
 				ynqchars, 'y');
 		if (c == 'q') {
-		    pline("%s", Never_mind);
+		    pline1(Never_mind);
 		    return(0);
 		}
 	    }
@@ -1016,7 +1016,7 @@ doengrave()
 			  Tobjnam(otmp, "glow"), otense(otmp, "fade"));
 		return(1);
 	    } else {
-		pline("%s", Never_mind);
+		pline1(Never_mind);
 		return(0);
 	    }
 	}
@@ -1127,12 +1127,12 @@ doengrave()
 
 	make_engr_at(u.ux, u.uy, buf, (moves - multi), type);
 
-	if (post_engr_text[0]) pline(post_engr_text);
+	if (post_engr_text[0]) pline1(post_engr_text);
 
 	if (doblind && !resists_blnd(&youmonst)) {
 	    You("are blinded by the flash!");
 	    make_blinded((long)rnd(50),FALSE);
-	    if (!Blind) Your(vision_clears);
+	    if (!Blind) Your1(vision_clears);
 	}
 
 	return(1);
