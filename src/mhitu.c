@@ -1063,7 +1063,7 @@ hitmu(mtmp, mattk)
 		if (can_blnd(mtmp, &youmonst, mattk->aatyp, (struct obj*)0)) {
 		    if (!Blind) pline("%s blinds you!", Monnam(mtmp));
 		    make_blinded(Blinded+(long)dmg,FALSE);
-		    if (!Blind) Your(vision_clears);
+		    if (!Blind) Your1(vision_clears);
 		}
 		dmg = 0;
 		break;
@@ -1784,7 +1784,7 @@ gulpmu(mtmp, mattk)	/* monster swallows you, or damage if u.uswallow */
 			    long was_blinded = Blinded;
 			    if (!Blinded) You_cant("see in here!");
 			    make_blinded((long)tmp,FALSE);
-			    if (!was_blinded && !Blind) Your(vision_clears);
+			    if (!was_blinded && !Blind) Your1(vision_clears);
 			} else
 			    /* keep him blind until disgorged */
 			    make_blinded(Blinded+1,FALSE);
@@ -1912,7 +1912,7 @@ common:
 		    if (mon_visible(mtmp) || (rnd(tmp /= 2) > u.ulevel)) {
 			You("are blinded by a blast of light!");
 			make_blinded((long)tmp, FALSE);
-			if (!Blind) Your(vision_clears);
+			if (!Blind) Your1(vision_clears);
 		    } else if (flags.verbose)
 			You("get the impression it was not terribly bright.");
 		}
@@ -2078,7 +2078,7 @@ gazemu(mtmp, mattk)	/* monster gazes at you */
 		    /* not blind at this point implies you're wearing
 		       the Eyes of the Overworld; make them block this
 		       particular stun attack too */
-		    if (!Blind) Your(vision_clears);
+		    if (!Blind) Your1(vision_clears);
 		    else make_stunned((long)d(1,3),TRUE);
 		}
 	    }
