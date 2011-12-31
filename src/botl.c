@@ -650,9 +650,9 @@ bot()
 			mbot[k] += 'A' - 'a';
 		    k++;
 		}
-		Sprintf(nb = eos(nb), mbot);
+		Sprintf1(nb = eos(nb), mbot);
 	} else
-		Sprintf(nb = eos(nb), rank());
+		Sprintf1(nb = eos(nb), rank());
 	Sprintf(blstats[idx][BL_TITLE].val, "%-29s", buf);
 	valset[BL_TITLE] = TRUE;		/* indicate val already set */
 

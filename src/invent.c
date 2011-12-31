@@ -1065,7 +1065,7 @@ register const char *let,*word;
 		}
 		if(index(quitchars,ilet)) {
 		    if(flags.verbose)
-			pline(Never_mind);
+			pline1(Never_mind);
 		    return((struct obj *)0);
 		}
 		if(ilet == '-') {
@@ -1120,7 +1120,7 @@ register const char *let,*word;
 		    }
 		    if(ilet == '\033') {
 			if(flags.verbose)
-			    pline(Never_mind);
+			    pline1(Never_mind);
 			return((struct obj *)0);
 		    }
 		    /* they typed a letter (not a space) at the prompt */
@@ -1651,7 +1651,7 @@ int id_limit;
 	    pline("That was all.");
 	    break;
 	} else if (!--tryct) {		/* stop re-prompting */
-	    pline(thats_enough_tries);
+	    pline1(thats_enough_tries);
 	    break;
 	} else {			/* try again */
 	    pline("Choose an item; use ESC to decline.");
@@ -2119,7 +2119,7 @@ dounpaid()
 	otmp = find_unpaid(invent, &marker);
 	cost = unpaid_cost(otmp, FALSE);
 	iflags.suppress_price++;	/* suppress "(unpaid)" suffix */
-	pline("%s", xprname(otmp, distant_name(otmp, doname),
+	pline1(xprname(otmp, distant_name(otmp, doname),
 			    carried(otmp) ? otmp->invlet : CONTAINED_SYM,
 			    TRUE, cost, 0L));
 	iflags.suppress_price--;
@@ -2467,7 +2467,7 @@ boolean picked_some;
 		Sprintf(fbuf, "There is %s here.", an(dfeature));
 
 	if (!otmp || is_lava(u.ux,u.uy) || (is_pool(u.ux,u.uy) && !Underwater)) {
-		if (dfeature) pline(fbuf);
+		if (dfeature) pline1(fbuf);
 		read_engr_at(u.ux, u.uy); /* Eric Backus */
 		if (!skip_objects && (Blind || !dfeature))
 		    You("%s no objects here.", verb);
@@ -2476,7 +2476,7 @@ boolean picked_some;
 	/* we know there is something here */
 
 	if (skip_objects) {
-	    if (dfeature) pline(fbuf);
+	    if (dfeature) pline1(fbuf);
 	    read_engr_at(u.ux, u.uy); /* Eric Backus */
 	    if (obj_cnt == 1 && otmp->quan == 1L)
 		There("is %s object here.", picked_some ? "another" : "an");
@@ -2498,7 +2498,7 @@ boolean picked_some;
 		}
 	} else if (!otmp->nexthere) {
 	    /* only one object */
-	    if (dfeature) pline(fbuf);
+	    if (dfeature) pline1(fbuf);
 	    read_engr_at(u.ux, u.uy); /* Eric Backus */
 #ifdef INVISIBLE_OBJECTS
 	    if (otmp->oinvis && !See_invisible) verb = "feel";
@@ -3047,7 +3047,7 @@ doorganize()	/* inventory organizer by Del Lamb */
 		    (splitting && let == obj->invlet)) {
  noadjust:
 		if (splitting) (void) merged(&splitting, &obj);
-		pline(Never_mind);
+		pline1(Never_mind);
 		return 0;
 	    }
 	    if ((letter(let) && let != '@') || index(buf, let))

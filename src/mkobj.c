@@ -1898,7 +1898,7 @@ boolean tipping;  /* caller emptying entire contents; affects shop handling */
     if (!horn || horn->otyp != HORN_OF_PLENTY) {
 	impossible("bad horn o' plenty");
     } else if (horn->spe < 1) {
-	pline(nothing_happens);
+	pline1(nothing_happens);
     } else {
 	struct obj *obj;
 	const char *what;
