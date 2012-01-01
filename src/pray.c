@@ -1418,7 +1418,7 @@ verbalize("In return for thy service, I grant thee the gift of Immortality!");
     } /* fake Amulet */
 
     if (value == 0) {
-	pline(nothing_happens);
+	pline1(nothing_happens);
 	return (1);
     }
 
