@@ -361,7 +361,7 @@ int psflags;
 	if (!Polymorph_control && !forcecontrol &&
 		!draconian && !iswere && !isvamp) {
 	    if (rn2(20) > ACURR(A_CON)) {
-		You(shudder_for_moment);
+		You1(shudder_for_moment);
 		losehp(rnd(30), "system shock", KILLED_BY_AN);
 		exercise(A_CON, FALSE);
 		return;
@@ -383,7 +383,7 @@ int psflags;
 			if (*buf == '\033') {
 			    /* user is cancelling controlled poly */
 			    if (forcecontrol) {	/* wizard mode #polyself */
-				pline(Never_mind);
+				pline1(Never_mind);
 				return;
 			    }
 			    Strcpy(buf, "*");	/* resort to random */
@@ -437,7 +437,7 @@ int psflags;
 			    You_cant("polymorph into %s.", pm_name);
 			} else break;
 		} while (--tryct > 0);
-		if (!tryct) pline(thats_enough_tries);
+		if (!tryct) pline1(thats_enough_tries);
 		/* allow skin merging, even when polymorph is controlled */
 		if (draconian && (tryct <= 0 ||
 				  mntmp == armor_to_dragon(uarm->otyp)))
