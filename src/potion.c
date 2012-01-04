@@ -160,7 +160,7 @@ const char *msg;
 #endif
 
 	if ((!xtime && old) || (xtime && !old)) {
-	    if (msg) pline("%s", msg);
+	    if (msg) pline1(msg);
 	    context.botl = 1;
 	}
 	set_itimeout(&Slimed, xtime);
@@ -182,7 +182,7 @@ const char *killername;
 #endif
 
 	if ((!xtime && old) || (xtime && !old)) {
-	    if (msg) pline("%s", msg);
+	    if (msg) pline1(msg);
 	 /* context.botl = 1;   --- Stoned is not a status line item */
 	}
 	set_itimeout(&Stoned, xtime);
@@ -1031,7 +1031,7 @@ register const char *txt;
 		You("have a %s feeling for a moment, then it passes.",
 		Hallucination ? "normal" : "strange");
 	else
-		pline(txt);
+		pline1(txt);
 
 	if(!obj)	/* e.g., crystal ball finds no traps */
 		return;
@@ -1516,7 +1516,7 @@ register struct obj *obj;
 		    pline("It suddenly gets dark.");
 		}
 		make_blinded(itimeout_incr(Blinded, rnd(5)), FALSE);
-		if (!Blind && !Unaware) Your(vision_clears);
+		if (!Blind && !Unaware) Your1(vision_clears);
 		break;
 	case POT_WATER:
 		if(u.umonnum == PM_GREMLIN) {
@@ -1813,7 +1813,7 @@ dodip()
 		    obj == uball || obj == uskin ||
 		    obj_resists(obj->otyp == POT_POLYMORPH ?
 				potion : obj, 5, 95)) {
-		pline(nothing_happens);
+		pline1(nothing_happens);
 	    } else {
 	    	boolean was_wep = FALSE, was_swapwep = FALSE, was_quiver = FALSE;
 		short save_otyp = obj->otyp;
