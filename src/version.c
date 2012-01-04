@@ -46,7 +46,7 @@ doversion()
 {
 	char buf[BUFSZ];
 
-	pline("%s", getversionstring(buf));
+	pline1(getversionstring(buf));
 	return 0;
 }
 

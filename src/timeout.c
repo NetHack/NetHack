@@ -29,7 +29,7 @@ stoned_dialogue()
 	register long i = (Stoned & TIMEOUT);
 
 	if (i > 0L && i <= SIZE(stoned_texts))
-		pline(stoned_texts[SIZE(stoned_texts) - i]);
+		pline1(stoned_texts[SIZE(stoned_texts) - i]);
 	switch ((int) i) {
 	case 5:		/* slowing down */
 		HFast = 0L;
@@ -92,7 +92,7 @@ vomiting_dialogue()
 		break;
 	default: break; 
 	}
-	if (txt) You("%s", txt);
+	if (txt) You1(txt);
 	exercise(A_CON, FALSE);
 }
 
@@ -126,7 +126,7 @@ choke_dialogue()
 		if (index(str, '%'))
 		    pline(str, hcolor(NH_BLUE));
 		else
-		    pline(str);
+		    pline1(str);
 	    }
 	}
 	exercise(A_STR, FALSE);
@@ -156,7 +156,7 @@ slime_dialogue()
 		} else
 		    pline(str, an(Hallucination ? rndmonnam() : "green slime"));
 	    } else
-		pline(str);
+		pline1(str);
 	}
 	if (i == 3L) {	/* limbs becoming oozy */
 	    HFast = 0L;	/* lose intrinsic speed */

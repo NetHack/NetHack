@@ -150,7 +150,7 @@ char let;
 int how;
 const char *mesg;
 {
-    pline("%s", mesg);
+    pline1(mesg);
     return 0;
 }
 
@@ -209,7 +209,7 @@ boolean restoring;
 	   intact at the end of each call.
 	 */
 #if 0		/* maybe... */
-	if (!restoring) pline("%s", msg);
+	if (!restoring) pline1(msg);
 #endif
 	return;
 }

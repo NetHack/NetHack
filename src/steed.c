@@ -59,7 +59,7 @@ use_saddle(otmp)
 
 	/* Select an animal */
 	if (u.uswallow || Underwater || !getdir((char *)0)) {
-	    pline(Never_mind);
+	    pline1(Never_mind);
 	    return 0;
 	}
 	if (!u.dx && !u.dy) {

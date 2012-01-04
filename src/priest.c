@@ -417,8 +417,8 @@ int roomno;
 	    msg1 = buf;
 	}
 	if (msg1 && can_speak && !Deaf) {
-	    verbalize(msg1);
-	    if (msg2) verbalize(msg2);
+	    verbalize1(msg1);
+	    if (msg2) verbalize1(msg2);
 	    epri_p->enter_time = moves + (long)d(10, 100);	/* ~505 */
 	}
 	if (!sanctum) {
@@ -525,7 +525,7 @@ register struct monst *priest;
 		priest->mcanmove = 1;
 	    }
 	    priest->mpeaceful = 0;
-	    verbalize(cranky_msg[rn2(3)]);
+	    verbalize1(cranky_msg[rn2(3)]);
 	    return;
 	}
 

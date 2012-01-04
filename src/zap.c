@@ -2027,7 +2027,7 @@ dozap()
 	check_unpaid(obj);
 
 	/* zappable addition done by GAN 11/03/86 */
-	if(!zappable(obj)) pline("%s", nothing_happens);
+	if(!zappable(obj)) pline1(nothing_happens);
 	else if(obj->cursed && !rn2(WAND_BACKFIRE_CHANCE)) {
 		backfire(obj);	/* the wand blows up in your face! */
 		exercise(A_STR, FALSE);
@@ -2419,7 +2419,7 @@ long duration;
 	if (!resists_blnd(&youmonst)) {
 		You(are_blinded_by_the_flash);
 		make_blinded(duration, FALSE);
-		if (!Blind) Your(vision_clears);
+		if (!Blind) Your1(vision_clears);
 		return TRUE;
 	}
 	return FALSE;
@@ -2672,11 +2672,7 @@ struct obj *obj;	/* wand or spell */
 	case SPE_STONE_TO_FLESH:
 	    if (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz) ||
 		     Underwater || (Is_qstart(&u.uz) && u.dz < 0)) {
-#if 1
-		pline("%s", nothing_happens);
-#else
-		pline(nothing_happens);
-#endif
+		pline1(nothing_happens);
 	    } else if (u.dz < 0) {	/* we should do more... */
 		pline("Blood drips on your %s.", body_part(FACE));
 	    } else if (u.dz > 0 && !OBJ_AT(u.ux, u.uy)) {
@@ -2687,7 +2683,7 @@ struct obj *obj;	/* wand or spell */
 		e = engr_at(u.ux, u.uy);
 		if (!(e && e->engr_type == ENGRAVE)) {
 		    if (is_pool(u.ux, u.uy) || is_ice(u.ux, u.uy))
-			pline("%s", nothing_happens);
+			pline1(nothing_happens);
 		    else
 			pline("Blood %ss %s your %s.",
 			      is_lava(u.ux, u.uy) ? "boil" : "pool",
@@ -4252,12 +4248,12 @@ short exploding_wand_typ;
 		    lev->doormask = new_doormask;
 		    unblock_point(x, y);	/* vision */
 		    if (see_it) {
-			pline("%s", see_txt);
+			pline1(see_txt);
 			newsym(x, y);
 		    } else if (sense_txt) {
-			You("%s", sense_txt);
+			You1(sense_txt);
 		    } else if (hear_txt) {
-			if (!Deaf) You_hear("%s", hear_txt);
+			if (!Deaf) You_hear1(hear_txt);
 		    }
 		    if (picking_at(x, y)) {
 			stop_occupation();
@@ -4731,7 +4727,7 @@ retry:
 	if (!otmp) {
 	    pline("Nothing fitting that description exists in the game.");
 	    if (++tries < MAXWISHTRY) goto retry;
-	    pline("%s", thats_enough_tries);
+	    pline1(thats_enough_tries);
 	    otmp = readobjnam((char *)0, (struct obj *)0);
 	    if (!otmp) return;	/* for safety; should never happen */
 	} else if (otmp == &nothing) {

@@ -589,7 +589,7 @@ dotele()
 		else tele();
 		(void) next_to_u();
 	} else {
-		You(shudder_for_moment);
+		You1(shudder_for_moment);
 		return(0);
 	}
 	if (!trap) morehungry(100);
@@ -698,7 +698,7 @@ level_tele()
 	     * we let negative values requests fall into the "heaven" loop.
 	     */
 	    if (Is_knox(&u.uz) && newlev > 0 && !force_dest) {
-		You(shudder_for_moment);
+		You1(shudder_for_moment);
 		return;
 	    }
 	    /* if in Quest, the player sees "Home 1", etc., on the status
@@ -715,7 +715,7 @@ level_tele()
  random_levtport:
 	    newlev = random_teleport_level();
 	    if (newlev == depth(&u.uz)) {
-		You(shudder_for_moment);
+		You1(shudder_for_moment);
 		return;
 	    }
 	}
@@ -724,7 +724,7 @@ level_tele()
 		buried_ball_to_punishment();
 
 	if (!next_to_u() && !force_dest) {
-		You(shudder_for_moment);
+		You1(shudder_for_moment);
 		return;
 	}
 #ifdef WIZARD
@@ -852,7 +852,7 @@ register struct trap *ttmp;
 		buried_ball_to_punishment();
 
 	if (!next_to_u()) {
-		You(shudder_for_moment);
+		You1(shudder_for_moment);
 		return;
 	}
 
@@ -886,7 +886,7 @@ struct trap *trap;
 			shieldeff(u.ux, u.uy);
 		You_feel("a wrenching sensation.");
 	} else if (!next_to_u()) {
-		You(shudder_for_moment);
+		You1(shudder_for_moment);
 	} else if (trap->once) {
 		deltrap(trap);
 		newsym(u.ux,u.uy);	/* get rid of trap symbol */

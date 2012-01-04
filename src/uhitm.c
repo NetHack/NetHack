@@ -1907,7 +1907,7 @@ register struct attack *mattk;
 				if (Slow_digestion) tmp *= 2;
 				nomul(-tmp);
 				nomovemsg = msgbuf;
-			    } else pline("%s", msgbuf);
+			    } else pline1(msgbuf);
 			    if (pd == &mons[PM_GREEN_SLIME]) {
 				Sprintf(msgbuf, "%s isn't sitting well with you.",
 					The(pd->mname));
