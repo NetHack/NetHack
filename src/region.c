@@ -452,7 +452,7 @@ xchar
 		!regions[i]->attach_2_u && !inside_region(regions[i], x, y)) {
 	    clear_hero_inside(regions[i]);
 	    if (regions[i]->leave_msg != (const char *)0)
-		pline(regions[i]->leave_msg);
+		pline1(regions[i]->leave_msg);
 	    if ((f_indx = regions[i]->leave_f) != NO_CALLBACK)
 		(void) (*callbacks[f_indx])(regions[i], (genericptr_t) 0);
 	}
@@ -463,7 +463,7 @@ xchar
 		!regions[i]->attach_2_u && inside_region(regions[i], x, y)) {
 	    set_hero_inside(regions[i]);
 	    if (regions[i]->enter_msg != (const char *)0)
-		pline(regions[i]->enter_msg);
+		pline1(regions[i]->enter_msg);
 	    if ((f_indx = regions[i]->enter_f) != NO_CALLBACK)
 		(void) (*callbacks[f_indx])(regions[i], (genericptr_t) 0);
 	}

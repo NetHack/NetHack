@@ -424,7 +424,7 @@ struct qtmsg *qt_msg;
 	for (size = 0; size < qt_msg->size; size += (long)strlen(in_line)) {
 	    (void) dlb_fgets(in_line, QTEXT_IN_SIZ, msg_file);
 	    convert_line();
-	    pline("%s", out_line);
+	    pline1(out_line);
 	}
 
 }
@@ -547,7 +547,7 @@ deliver_splev_message()
 	       it reads from in_line[] and writes to out_line[] */
 	    (void)xcrypt(in_line, in_line);
 	    convert_line();
-	    pline("%s", out_line);
+	    pline1(out_line);
 
 	    if ((nl = index(str, '\n')) == 0) break; /* done if no newline */
 	}

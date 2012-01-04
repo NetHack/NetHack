@@ -202,7 +202,7 @@ stripspe(obj)
 register struct obj *obj;
 {
 	if (obj->blessed || obj->spe <= 0) {
-	    pline(nothing_happens);
+	    pline1(nothing_happens);
 	} else {
 	    /* order matters: message, shop handling, actual transformation */
 	    pline("%s briefly.", Yobjnam2(obj, "vibrate"));
@@ -372,7 +372,7 @@ int curse_bless;
 		    if (obj->spe < 3)
 			Your("marker seems permanently dried out.");
 		    else
-			pline(nothing_happens);
+			pline1(nothing_happens);
 		} else if (is_blessed) {
 		    n = rn1(16,15);		/* 15..30 */
 		    if (obj->spe + n <= 50)
@@ -430,7 +430,7 @@ int curse_bless;
 		    if (obj->spe < 5) {
 			obj->spe++;
 			p_glow1(obj);
-		    } else pline(nothing_happens);
+		    } else pline1(nothing_happens);
 		}
 		break;
 	    case HORN_OF_PLENTY:
@@ -1462,7 +1462,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 		cc.x = u.ux;
 		cc.y = u.uy;
 		if (getpos(&cc, TRUE, "the desired position") < 0) {
-		    pline(Never_mind);
+		    pline1(Never_mind);
 		    break;
 		}
 		if (!cansee(cc.x, cc.y) || distu(cc.x, cc.y) >= 32) {
@@ -1672,7 +1672,7 @@ do_class_genocide()
 
 	for(j=0; ; j++) {
 		if (j >= 5) {
-			pline(thats_enough_tries);
+			pline1(thats_enough_tries);
 			return;
 		}
 		do {
@@ -1826,7 +1826,7 @@ int how;
 	} else {
 	    for(i = 0; ; i++) {
 		if(i >= 5) {
-		    pline(thats_enough_tries);
+		    pline1(thats_enough_tries);
 		    return;
 		}
 		getlin("What monster do you want to genocide? [type the name]",
@@ -1948,7 +1948,7 @@ int how;
 	    if (cnt)
 		pline("Sent in some %s.", makeplural(buf));
 	    else
-		pline(nothing_happens);
+		pline1(nothing_happens);
 	}
 }
 
@@ -2095,7 +2095,7 @@ create_particular()
 	} while (--tryct > 0);
 
 	if (!tryct) {
-	    pline(thats_enough_tries);
+	    pline1(thats_enough_tries);
 	} else {
 	    if (!randmonst) {
 		firstchoice = which;

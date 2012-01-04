@@ -993,7 +993,7 @@ boolean ghostly;
 	    else
 		Sprintf(trickbuf, "This is level %d, not %d!", dlvl, lev);
 #ifdef WIZARD
-	    if (wizard) pline(trickbuf);
+	    if (wizard) pline1(trickbuf);
 #endif
 	    trickery(trickbuf);
 	}
