@@ -1007,7 +1007,8 @@ register struct obj *obj;
 			obj->oclass != ARMOR_CLASS && !is_weptool(obj)) ||
 			obj->spe <= 0)
 	    return (FALSE);
-	if (obj_resists(obj, 10, 90))
+	if (defends(AD_DRLI, obj) || defends_when_carried(AD_DRLI, obj) ||
+	        obj_resists(obj, 10, 90))
 	    return (FALSE);
 
 	/* Charge for the cost of the object */
