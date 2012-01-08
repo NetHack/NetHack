@@ -1,6 +1,8 @@
                 Instructions for installing NetHack 3.5
                            on a UNIX system
                 =======================================
+NB: We are gradually replacing this process with the process documented in
+the file NewInstall.unx.
 
 0.  Read this entire file before starting, and come back to the Notes
     below if you have any problems.  If you are trying to use X11,
