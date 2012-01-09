@@ -468,6 +468,9 @@ dlb_fopen(name, mode)
 
     if (!dlb_initialized) return (dlb *) 0;
 
+	/* only support reading; ignore possible binary flag */
+    if (!mode || mode[0] != 'r') return (dlb *)0;
+
     dp = (dlb *) alloc(sizeof(dlb));
     if (do_dlb_fopen(dp, name, mode))
     	dp->fp = (FILE *) 0;
