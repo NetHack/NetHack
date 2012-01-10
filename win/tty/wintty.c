@@ -9,6 +9,12 @@
  * h+ 930227
  */
 
+/* It's still not clear I've caught all the cases for H2344.  #undef this
+ * to back out the changes. */
+#define H2344_BROKEN
+
+#include <stdio.h>
+
 #include "hack.h"
 #include "dlb.h"
 #include "date.h"
@@ -1806,7 +1812,7 @@ tty_display_nhwindow(window, blocking)
 */
 	cw->offx = (cw->type==NHW_TEXT)
 		? 0
-		: min(10, ttyDisplay->cols - cw->maxcol - 1);
+		: min( min(82,ttyDisplay->cols/2), ttyDisplay->cols - cw->maxcol - 1);
 #else
 	/* avoid converting to uchar before calculations are finished */
 	cw->offx = (uchar) (int)
@@ -2194,7 +2200,12 @@ tty_putstr_core(window, attr, symstr)
 	break;
     case NHW_MENU:
     case NHW_TEXT:
-	if(cw->type == NHW_TEXT && cw->cury == ttyDisplay->rows-1) {
+#ifdef H2344_BROKEN
+	if(cw->type == NHW_TEXT && (cw->cury+cw->offy) == ttyDisplay->rows-1)
+#else
+	if(cw->type == NHW_TEXT && cw->cury == ttyDisplay->rows-1)
+#endif
+	{
 	    /* not a menu, so save memory and output 1 page at a time */
 	    cw->maxcol = ttyDisplay->cols; /* force full-screen mode */
 	    tty_display_nhwindow(window, TRUE);

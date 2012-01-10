@@ -429,6 +429,7 @@ platforms that support hangup: SAFERHANGUP to avoid losing objects in transit
 	well-timed hangups to stop a long melee
 X11: support dynamic switching of map mode via tiled_map option
 X11: added support for hilite_pet to text map mode
+tty: various bugfixes for very wide and/or tall screens
 
 
 General New Features
