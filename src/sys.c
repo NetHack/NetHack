@@ -1,5 +1,4 @@
 /* NetHack 3.5	sys.c	$Date$  $Revision$ */
-/*    SCCS Id: @(#)sys.c      3.5     2008/01/30      */
 /* Copyright (c) Kenneth Lorber, Kensington, Maryland, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
 

@@ -1,5 +1,4 @@
 # NetHack 3.5	Makefile.GCC	$Date$  $Revision$
-#	SCCS Id: @(#)Makefile.GCC	      3.5     $Date$
 #	Copyright (c) NetHack PC Development Team 1996-2006.
 #	PC NetHack 3.5 Makefile for djgpp V2
 #

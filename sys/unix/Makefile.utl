@@ -1,6 +1,5 @@
 #	Makefile for NetHack's utility programs.
 # NetHack 3.5  Makefile.utl	$Date$  $Revision$
-#	SCCS Id: @(#)Makefile.utl	3.5	2007/12/12
 
 # Root of source tree:
 NHSROOT=..

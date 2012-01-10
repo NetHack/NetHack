@@ -1,5 +1,4 @@
 /* NetHack 3.5	tradstdc.h	$Date$  $Revision$ */
-/*	SCCS Id: @(#)tradstdc.h 3.5	2006/07/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

@@ -1,5 +1,4 @@
 /* NetHack 3.5	thintile.c	$Date$  $Revision$ */
-/*   SCCS Id: @(#)thintile.c   3.5     1995/11/26                     */
 /*   Copyright (c) NetHack Development Team 1995                    */
 /*   NetHack may be freely redistributed.  See license for details. */
 

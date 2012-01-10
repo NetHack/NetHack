@@ -1,5 +1,4 @@
 /* NetHack 3.5	wintty.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)wintty.c	3.5	2007/01/05	*/
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

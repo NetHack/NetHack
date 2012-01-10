@@ -1,5 +1,4 @@
 /* NetHack 3.5	priest.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)priest.c	3.5	2007/06/02	*/
 /* Copyright (c) Izchak Miller, Steve Linhart, 1989.		  */
 /* NetHack may be freely redistributed.  See license for details. */
 

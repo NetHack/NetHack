@@ -1,5 +1,4 @@
 # NetHack 3.5	bootstrp.mak	$Date$  $Revision$
-#       SCCS Id: @(#)bootstrp.mak       3.5     2006/01/05
 #       Copyright (c) Michael Allison
 #
 #       NetHack Windows CE bootstrap file for MS Visual C++ V6.x and 
