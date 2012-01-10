@@ -2058,8 +2058,11 @@ nh_XtPopdown(w)
 }
 
 void
-win_X11_init()
+win_X11_init(dir)
+    int dir;
 {
+    if(dir != WININIT) return;
+
 #ifdef OPENWINBUG
     /* With the OpenWindows 3.0 libraries and the SunOS 4.1.2 ld, these
      * two routines will not be found when linking.  An apparently correct

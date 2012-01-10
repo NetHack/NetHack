@@ -43,10 +43,14 @@ int amii_otherBPen;
 long amii_libvers = LIBRARY_FONT_VERSION;
 
 void
-ami_wininit_data( void )
+ami_wininit_data( dir )
+    int dir;
 {
     extern unsigned short amii_init_map[ AMII_MAXCOLORS ];
     extern unsigned short amiv_init_map[ AMII_MAXCOLORS ];
+
+    if( dir != WININIT) return;
+
     if( !WINVERS_AMIV )
     {
 # ifdef	TEXTCOLOR

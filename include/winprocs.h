@@ -264,4 +264,9 @@ struct wc_Opt {
 #define RS_ALGNMNT	4
 #define RS_menu_arg(x)	(ROLE_RANDOM - ((x) + 1))	/* 0..4 -> -3..-7 */
 
+/* Choose_windows() may be called multiple times; these constants tell the
+ * init function whether the window system is coming or going. */
+#define WININIT		0
+#define WININIT_UNDO	1
+
 #endif /* WINPROCS_H */

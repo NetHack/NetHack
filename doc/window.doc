@@ -862,6 +862,12 @@ Choose_windows() is a common routine, and calling it in main() is necessary
 to initialize the function pointer table to _something_ so that calls to
 raw_print() will not fail.  Choose_windows() should be called almost
 immediately upon entering main().  Look at unixmain.c for an example.
+Choose_windows will call an (optional) ini_routine with a single argument
+of WININIT to allow any needed setup.  Because choose_windows() may be called
+multiple times during argument and option processing, to handle the case where
+ini_routines have side effects that need to be undone, the old ini_routine (if
+any) will be called with an argument of WININIT_UNDO before the new
+ini_routine (if any) is called (with WININIT).
 
 Display_gamewindows() is a common routine that displays the two standard
 game windows (WIN_MESSAGE, WIN_MAP), and the status display.  It is normally 

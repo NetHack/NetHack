@@ -3074,8 +3074,10 @@ tty_nh_poskey(x, y, mod)
 }
 
 void
-win_tty_init()
+win_tty_init(dir)
+int dir;
 {
+    if(dir != WININIT) return;
 # if defined(WIN32CON)
     nttty_open();
 # endif

@@ -10,7 +10,7 @@
 /* cannot just blindly include winX.h without including all of X11 stuff */
 /* and must get the order of include files right.  Don't bother */
 extern struct window_procs X11_procs;
-extern void NDECL(win_X11_init);
+extern void FDECL(win_X11_init, (int));
 #endif
 #ifdef QT_GRAPHICS
 extern struct window_procs Qt_procs;
@@ -23,12 +23,12 @@ extern struct window_procs mac_procs;
 #endif
 #ifdef BEOS_GRAPHICS
 extern struct window_procs beos_procs;
-extern void NDECL(be_win_init);
+extern void FDECL(be_win_init, (int));	FAIL /* be_win_init doesn't exist? */
 #endif
 #ifdef AMIGA_INTUITION
 extern struct window_procs amii_procs;
 extern struct window_procs amiv_procs;
-extern void NDECL(ami_wininit_data);
+extern void FDECL(ami_wininit_data, (int));
 #endif
 #ifdef WIN32_GRAPHICS
 extern struct window_procs win32_procs;
@@ -51,7 +51,7 @@ NEARDATA struct window_procs windowprocs;
 static
 struct win_choices {
     struct window_procs *procs;
-    void NDECL((*ini_routine));		/* optional (can be 0) */
+    void FDECL((*ini_routine), (int));		/* optional (can be 0) */
 } winchoices[] = {
 #ifdef TTY_GRAPHICS
     { &tty_procs, win_tty_init },
@@ -87,6 +87,8 @@ struct win_choices {
     { 0, 0 }		/* must be last */
 };
 
+static struct win_choices *last_winchoice = 0;
+
 boolean
 genl_can_suspend_no(VOID_ARGS){
     return FALSE;
@@ -111,12 +113,18 @@ const char *s;
 {
     register int i;
 
-    for(i=0; winchoices[i].procs; i++)
+    for(i=0; winchoices[i].procs; i++){
 	if (!strcmpi(s, winchoices[i].procs->name)) {
 	    windowprocs = *winchoices[i].procs;
-	    if (winchoices[i].ini_routine) (*winchoices[i].ini_routine)();
+
+	    if (last_winchoice && last_winchoice->ini_routine)
+		(*last_winchoice->ini_routine)(WININIT_UNDO);
+	    if (winchoices[i].ini_routine)
+		(*winchoices[i].ini_routine)(WININIT);
+	    last_winchoice = &winchoices[i];
 	    return;
 	}
+    }
 
     if (!windowprocs.win_raw_print)
 	windowprocs.win_raw_print = def_raw_print;
@@ -130,8 +138,9 @@ const char *s;
 		s, winchoices[0].procs->name);
     } else {
 	raw_printf("Window type %s not recognized.  Choices are:", s);
-	for(i=0; winchoices[i].procs; i++)
+	for(i=0; winchoices[i].procs; i++){
 	    raw_printf("        %s", winchoices[i].procs->name);
+	}
     }
 
     if (windowprocs.win_raw_print == def_raw_print)
@@ -187,9 +196,9 @@ boolean init;
 
 /*ARGSUSED*/
 void
-genl_putmsghistory(msg, restoring)
+genl_putmsghistory(msg, is_restoring)
 const char *msg;
-boolean restoring;
+boolean is_restoring;
 {
 	/* window ports can provide
 	   their own putmsghistory() routine to
@@ -209,7 +218,7 @@ boolean restoring;
 	   intact at the end of each call.
 	 */
 #if 0		/* maybe... */
-	if (!restoring) pline1(msg);
+	if (!is_restoring) pline1("%s", msg);
 #endif
 	return;
 }

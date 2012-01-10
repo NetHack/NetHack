@@ -97,7 +97,7 @@ extern int NDECL(kbhit);
 extern int NDECL(WindowGetchar);
 extern void FDECL(ami_argset, (int *, char *[]));
 extern void FDECL(ami_mkargline, (int *, char **[]));
-extern void ami_wininit_data(void);
+extern void FDECL(ami_wininit_data, (int));
 
 #define FromWBench 0 /* A hint for compiler ... */
 /* extern boolean FromWBench;	/* how were we run? */

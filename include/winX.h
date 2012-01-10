@@ -290,7 +290,7 @@ E char FDECL(key_event_to_char,(XKeyEvent*));
 E void FDECL(msgkey, (Widget, XtPointer, XEvent*));
 E void FDECL(nh_XtPopup, (Widget, int, Widget));
 E void FDECL(nh_XtPopdown, (Widget));
-E void NDECL(win_X11_init);
+E void FDECL(win_X11_init, (int));
 E void FDECL(nh_keyscroll, (Widget, XEvent*, String*, Cardinal*));
 
 /* ### winmesg.c ### */

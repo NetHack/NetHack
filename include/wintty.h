@@ -166,7 +166,7 @@ E void NDECL(setclipped);
 E void FDECL(docorner, (int, int));
 E void NDECL(end_glyphout);
 E void FDECL(g_putch, (int));
-E void NDECL(win_tty_init);
+E void FDECL(win_tty_init, (int));
 #ifdef UNICODE_WIDEWINPORT
 E void FDECL(u_putch, (nhwchar));
 #endif

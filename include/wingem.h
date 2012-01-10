@@ -31,7 +31,7 @@ E void NDECL(setclipped);
 E void FDECL(docorner, (int, int));
 E void NDECL(end_glyphout);
 E void FDECL(g_putch, (int));
-E void NDECL(win_Gem_init);
+E void FDECL(win_Gem_init, (int));
 E int NDECL(mar_gem_init);
 E char NDECL(mar_ask_class);
 E char * NDECL(mar_ask_name);
