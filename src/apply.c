@@ -6,10 +6,6 @@
 
 extern boolean notonhead;	/* for long worms */
 
-static const char tools[] = { TOOL_CLASS, WEAPON_CLASS, WAND_CLASS, 0 };
-static const char tools_too[] = { ALL_CLASSES, TOOL_CLASS, POTION_CLASS,
-				  WEAPON_CLASS, WAND_CLASS, GEM_CLASS, 0 };
-
 #ifdef TOURIST
 STATIC_DCL int FDECL(use_camera, (struct obj *));
 #endif
@@ -38,8 +34,8 @@ STATIC_DCL int FDECL(use_grapple, (struct obj *));
 STATIC_DCL int FDECL(do_break_wand, (struct obj *));
 STATIC_DCL boolean FDECL(figurine_location_checks,
 				(struct obj *, coord *, BOOLEAN_P));
-STATIC_DCL boolean NDECL(uhave_graystone);
 STATIC_DCL void FDECL(add_class, (char *, CHAR_P));
+STATIC_DCL void FDECL(setapplyclasses, (char *));
 
 #ifdef	AMIGA
 void FDECL( amii_speaker, ( struct obj *, char *, int ) );
@@ -3069,26 +3065,54 @@ do_break_wand(obj)
     return 1;
 }
 
-STATIC_OVL boolean
-uhave_graystone()
-{
-	register struct obj *otmp;
-
-	for(otmp = invent; otmp; otmp = otmp->nobj)
-		if(is_graystone(otmp))
-			return TRUE;
-	return FALSE;
-}
-
 STATIC_OVL void
 add_class(cl, class)
 char *cl;
 char class;
 {
 	char tmp[2];
+
 	tmp[0] = class;
 	tmp[1] = '\0';
 	Strcat(cl, tmp);
+}
+
+static const char tools[] = { TOOL_CLASS, WEAPON_CLASS, WAND_CLASS, 0 };
+
+/* augment tools[] if various items are carried */
+STATIC_OVL void
+setapplyclasses(class_list)
+char class_list[];
+{
+	register struct obj *otmp;
+	int otyp;
+	boolean knowoil, knowtouchstone, addpotions, addstones, addfood;
+
+	knowoil = objects[POT_OIL].oc_name_known;
+	knowtouchstone = objects[TOUCHSTONE].oc_name_known;
+	addpotions = addstones = addfood = FALSE;
+	for (otmp = invent; otmp; otmp = otmp->nobj) {
+	    otyp = otmp->otyp;
+	    if (otyp == POT_OIL ||
+		(otmp->oclass == POTION_CLASS &&
+		  (!otmp->dknown ||
+		    (!knowoil && !objects[otyp].oc_name_known))))
+		addpotions = TRUE;
+	    if (otyp == TOUCHSTONE ||
+		(is_graystone(otmp) &&
+		  (!otmp->dknown ||
+		    (!knowtouchstone && !objects[otyp].oc_name_known))))
+		addstones = TRUE;
+	    if (otyp == CREAM_PIE || otyp == EUCALYPTUS_LEAF)
+		addfood = TRUE;
+	}
+
+	class_list[0] = '\0';
+	if (addpotions || addstones) add_class(class_list, ALL_CLASSES);
+	Strcat(class_list, tools);
+	if (addpotions) add_class(class_list, POTION_CLASS);
+	if (addstones) add_class(class_list, GEM_CLASS);
+	if (addfood) add_class(class_list, FOOD_CLASS);
 }
 
 int
@@ -3100,13 +3124,7 @@ doapply()
 
 	if(check_capacity((char *)0)) return (0);
 
-	if (carrying(POT_OIL) || uhave_graystone())
-		Strcpy(class_list, tools_too);
-	else
-		Strcpy(class_list, tools);
-	if (carrying(CREAM_PIE) || carrying(EUCALYPTUS_LEAF))
-		add_class(class_list, FOOD_CLASS);
-
+	setapplyclasses(class_list);       /* tools[] */
 	obj = getobj(class_list, "use or apply");
 	if(!obj) return 0;
 

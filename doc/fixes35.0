@@ -401,6 +401,7 @@ autosearch finds and transforms secret doors and corridors even while blind,
 hangup save made during magic mapping or <foo> detection performed while
 	underwater could put hero on top of the water after restore
 items conferring life drain resistance were affected by drain life spell
+'a'pply command could be used to recogniize undiscovered potions of oil
 
 
 Platform- and/or Interface-Specific Fixes
