@@ -23,7 +23,7 @@ extern struct window_procs mac_procs;
 #endif
 #ifdef BEOS_GRAPHICS
 extern struct window_procs beos_procs;
-extern void FDECL(be_win_init, (int));	FAIL /* be_win_init doesn't exist? */
+extern void FDECL(be_win_init, (int));	FAIL /* be_win_init doesn't exist? XXX*/
 #endif
 #ifdef AMIGA_INTUITION
 extern struct window_procs amii_procs;
@@ -40,6 +40,19 @@ extern struct window_procs Gnome_procs;
 #ifdef MSWIN_GRAPHICS
 extern struct window_procs mswin_procs;
 #endif
+#ifdef WINCHAIN
+extern struct window_procs chainin_procs;
+extern void FDECL(chainin_procs_init, (int));
+extern void *FDECL(chainin_procs_chain, (int, int, void *, void *, void *));
+
+extern struct chain_procs chainout_procs;
+extern void FDECL(chainout_procs_init, (int));
+extern void *FDECL(chainout_procs_chain, (int, int, void *, void *, void *));
+
+extern struct chain_procs trace_procs;
+extern void FDECL(trace_procs_init, (int));
+extern void *FDECL(trace_procs_chain, (int, int, void *, void *, void *));
+#endif
 
 STATIC_DCL void FDECL(def_raw_print, (const char *s));
 
@@ -48,44 +61,86 @@ volatile
 #endif
 NEARDATA struct window_procs windowprocs;
 
+#ifdef WINCHAIN
+# define CHAINR(x) ,x
+#else
+# define CHAINR(x)
+#endif
+
 static
 struct win_choices {
     struct window_procs *procs;
     void FDECL((*ini_routine), (int));		/* optional (can be 0) */
+#ifdef WINCHAIN
+    void *FDECL((*chain_routine),(int, int, void *, void *, void *));
+#endif
 } winchoices[] = {
 #ifdef TTY_GRAPHICS
-    { &tty_procs, win_tty_init },
+    { &tty_procs, win_tty_init CHAINR(0) },
 #endif
 #ifdef X11_GRAPHICS
-    { &X11_procs, win_X11_init },
+    { &X11_procs, win_X11_init CHAINR(0) },
 #endif
 #ifdef QT_GRAPHICS
-    { &Qt_procs, 0 },
+    { &Qt_procs, 0 CHAINR(0) },
 #endif
 #ifdef GEM_GRAPHICS
-    { &Gem_procs, win_Gem_init },
+    { &Gem_procs, win_Gem_init CHAINR(0) },
 #endif
 #ifdef MAC
-    { &mac_procs, 0 },
+    { &mac_procs, 0 CHAINR(0) },
 #endif
 #ifdef BEOS_GRAPHICS
-    { &beos_procs, be_win_init },
+    { &beos_procs, be_win_init CHAINR(0) },
 #endif
 #ifdef AMIGA_INTUITION
-    { &amii_procs, ami_wininit_data },		/* Old font version of the game */
-    { &amiv_procs, ami_wininit_data },		/* Tile version of the game */
+    { &amii_procs, ami_wininit_data CHAINR(0) },		/* Old font version of the game */
+    { &amiv_procs, ami_wininit_data CHAINR(0) },		/* Tile version of the game */
 #endif
 #ifdef WIN32_GRAPHICS
-    { &win32_procs, 0 },
+    { &win32_procs, 0 CHAINR(0) },
 #endif
 #ifdef GNOME_GRAPHICS
-    { &Gnome_procs, 0 },
+    { &Gnome_procs, 0 CHAINR(0) },
 #endif
 #ifdef MSWIN_GRAPHICS
-    { &mswin_procs, 0 },
+    { &mswin_procs, 0 CHAINR(0) },
 #endif
-    { 0, 0 }		/* must be last */
+#ifdef WINCHAIN
+    { &chainin_procs, chainin_procs_init, chainin_procs_chain },
+    { (struct window_procs *)&chainout_procs, chainout_procs_init, chainout_procs_chain },
+
+    { (struct window_procs *)&trace_procs, trace_procs_init, trace_procs_chain },
+#endif
+    { 0, 0 CHAINR(0) }		/* must be last */
 };
+
+#ifdef WINCHAIN
+struct winlink {
+	struct winlink *nextlink;
+	struct win_choices *wincp;
+	void *linkdata;
+};
+/* NB: this chain does not contain the terminal real window system pointer */
+
+static struct winlink *chain = 0;
+
+static struct winlink *wl_new(){
+	return calloc(1, sizeof(struct winlink));
+}
+static void wl_addhead(struct winlink *wl){
+	wl->nextlink = chain;
+	chain = wl;
+}
+static void wl_addtail(struct winlink *wl){
+	struct winlink *p = chain;
+
+	if(!chain){ chain = wl; return; }
+	while(p->nextlink){ p=p->nextlink; }
+	p->nextlink = wl;
+	return;
+}
+#endif
 
 static struct win_choices *last_winchoice = 0;
 
@@ -107,6 +162,24 @@ const char *s;
     puts(s);
 }
 
+#ifdef WINCHAIN
+static struct win_choices *
+win_choices_find(s)
+const char *s;
+{
+    register int i;
+
+    for(i=0; winchoices[i].procs; i++){
+	if(!strcmpi(s, winchoices[i].procs->name)){
+	    return &winchoices[i];
+	}
+    }
+
+    return NULL;
+
+}
+#endif
+
 void
 choose_windows(s)
 const char *s;
@@ -114,6 +187,8 @@ const char *s;
     register int i;
 
     for(i=0; winchoices[i].procs; i++){
+	if ('+' == winchoices[i].procs->name[0]) continue;
+	if ('-' == winchoices[i].procs->name[0]) continue;
 	if (!strcmpi(s, winchoices[i].procs->name)) {
 	    windowprocs = *winchoices[i].procs;
 
@@ -139,6 +214,8 @@ const char *s;
     } else {
 	raw_printf("Window type %s not recognized.  Choices are:", s);
 	for(i=0; winchoices[i].procs; i++){
+	    if ('+' == winchoices[i].procs->name[0]) continue;
+	    if ('-' == winchoices[i].procs->name[0]) continue;
 	    raw_printf("        %s", winchoices[i].procs->name);
 	}
     }
@@ -148,6 +225,112 @@ const char *s;
     wait_synch();
 }
 
+#ifdef WINCHAIN
+void
+addto_windowchain(s)
+const char *s;
+{
+    register int i;
+
+    for(i=0; winchoices[i].procs; i++) {
+	if ('+' != winchoices[i].procs->name[0]) continue;
+	if (!strcmpi(s, winchoices[i].procs->name)) {
+	    struct winlink *p = wl_new();
+	    p->wincp = &winchoices[i];
+	    wl_addtail(p);
+	    /* NB: The ini_routine() will be called during commit. */
+	    return;
+	}
+    }
+
+    windowprocs.win_raw_print = def_raw_print;
+
+    raw_printf("Window processor %s not recognized.  Choices are:", s);
+    for(i=0; winchoices[i].procs; i++) {
+	if ('+' != winchoices[i].procs->name[0]) continue;
+	raw_printf("        %s", winchoices[i].procs->name);
+    }
+
+    exit(EXIT_FAILURE);
+}
+
+void
+commit_windowchain(){
+    struct winlink *p;
+    int n;
+    int wincap, wincap2;
+
+    if(!chain) return;
+
+	/* Save wincap* from the real window system - we'll restore it below. */
+    wincap = windowprocs.wincap;
+    wincap2 = windowprocs.wincap2;
+
+	/* add -chainin at head and -chainout at tail */
+    p=wl_new();
+    p->wincp = win_choices_find("-chainin");
+    if(! p->wincp){
+	raw_printf("Can't locate processor '-chainin'");
+	exit(EXIT_FAILURE);
+    }
+    wl_addhead(p);
+
+    p=wl_new();
+    p->wincp = win_choices_find("-chainout");
+    if(! p->wincp){
+	raw_printf("Can't locate processor '-chainout'");
+	exit(EXIT_FAILURE);
+    }
+    wl_addtail(p);
+
+	/* Now alloc() init() similar to Objective-C. */
+    for(n=1,p=chain;p;n++,p=p->nextlink){
+	p->linkdata = (*p->wincp->chain_routine)(WINCHAIN_ALLOC,n,0,0,0);
+    }
+
+    for(n=1,p=chain;p;n++,p=p->nextlink){
+	if(p->nextlink){
+	    (void)(*p->wincp->chain_routine)(
+			WINCHAIN_INIT,n,
+			p->linkdata,p->nextlink->wincp->procs,
+			p->nextlink->linkdata
+	    );
+	} else {
+	    (void)(*p->wincp->chain_routine)(
+			WINCHAIN_INIT,n,
+			p->linkdata,last_winchoice->procs,
+			0
+	    );
+	}
+    }
+
+	/* Restore the saved wincap* values.  We do it here to give the
+	 * ini_routine()s a chance to change or check them. */
+    chain->wincp->procs->wincap = wincap;
+    chain->wincp->procs->wincap2 = wincap2;
+
+	/* Call the init procs.  Do not re-init the terminal real win. */
+    p=chain;
+    while(p->nextlink){
+	if(p->wincp->ini_routine){
+	    (*p->wincp->ini_routine)(WININIT);
+	}
+	p=p->nextlink;
+    }
+
+	/* Install the chain into window procs very late so ini_routine()s
+	 * can raw_print on error. */
+    windowprocs = *chain->wincp->procs;
+
+    p=chain;
+    while(p){
+	struct winlink *np = p->nextlink;
+	free(p);
+	p = np;		/* assignment, not proof */
+    }
+}
+#endif
+
 /*
  * tty_message_menu() provides a means to get feedback from the
  * --More-- prompt; other interfaces generally don't need that.
@@ -155,8 +338,8 @@ const char *s;
 /*ARGSUSED*/
 char
 genl_message_menu(let, how, mesg)
-char let;
-int how;
+char let UNUSED;
+int how UNUSED;
 const char *mesg;
 {
     pline1(mesg);
@@ -166,7 +349,7 @@ const char *mesg;
 /*ARGSUSED*/
 void
 genl_preference_update(pref)
-const char *pref;
+const char *pref UNUSED;
 {
 	/* window ports are expected to provide
 	   their own preference update routine
@@ -178,7 +361,7 @@ const char *pref;
 
 char *
 genl_getmsghistory(init)
-boolean init;
+boolean init UNUSED;
 {
 	/* window ports can provide
 	   their own getmsghistory() routine to
@@ -197,8 +380,8 @@ boolean init;
 /*ARGSUSED*/
 void
 genl_putmsghistory(msg, is_restoring)
-const char *msg;
-boolean is_restoring;
+const char *msg UNUSED;
+boolean is_restoring UNUSED;
 {
 	/* window ports can provide
 	   their own putmsghistory() routine to
@@ -392,7 +575,7 @@ hup_nhgetch( VOID_ARGS )
 /*ARGSUSED*/
 static char
 hup_yn_function(prompt, resp, deflt)
-const char *prompt, *resp;
+const char *prompt UNUSED, *resp UNUSED;
 char deflt;
 {
     if (!deflt) deflt = '\033';
@@ -402,7 +585,7 @@ char deflt;
 /*ARGSUSED*/
 static int
 hup_nh_poskey(x, y, mod)
-int *x, *y, *mod;
+int *x UNUSED, *y UNUSED, *mod UNUSED;
 {
     return '\033';
 }
@@ -410,7 +593,7 @@ int *x, *y, *mod;
 /*ARGSUSED*/
 static void
 hup_getlin(prompt, outbuf)
-const char *prompt;
+const char *prompt UNUSED;
 char *outbuf;
 {
     Strcpy(outbuf, "\033");
@@ -419,8 +602,8 @@ char *outbuf;
 /*ARGSUSED*/
 static void
 hup_init_nhwindows(argc_p, argv)
-int *argc_p;
-char **argv;
+int *argc_p UNUSED;
+char **argv UNUSED;
 {
     iflags.window_inited = 1;
 }
@@ -428,7 +611,7 @@ char **argv;
 /*ARGUSED*/
 static winid
 hup_create_nhwindow(type)
-int type;
+int type UNUSED;
 {
     return WIN_ERR;
 }
@@ -436,9 +619,9 @@ int type;
 /*ARGSUSED*/
 static int
 hup_select_menu(window, how, menu_list)
-winid window;
-int how;
-struct mi **menu_list;
+winid window UNUSED;
+int how UNUSED;
+struct mi **menu_list UNUSED;
 {
     return -1;
 }
@@ -446,12 +629,12 @@ struct mi **menu_list;
 /*ARGSUSED*/
 static void
 hup_add_menu(window, glyph, identifier, sel, grpsel, attr, txt, preselected)
-winid window;
-int glyph, attr;
-const anything *identifier;
-char sel, grpsel;
-const char *txt;
-boolean preselected;
+winid window UNUSED;
+int glyph UNUSED, attr UNUSED;
+const anything *identifier UNUSED;
+char sel UNUSED, grpsel UNUSED;
+const char *txt UNUSED;
+boolean preselected UNUSED;
 {
     return;
 }
@@ -459,8 +642,8 @@ boolean preselected;
 /*ARGSUSED*/
 static void
 hup_end_menu(window, prompt)
-winid window;
-const char *prompt;
+winid window UNUSED;
+const char *prompt UNUSED;
 {
     return;
 }
@@ -468,9 +651,9 @@ const char *prompt;
 /*ARGSUSED*/
 static void
 hup_putstr(window, attr, text)
-winid window;
-int attr;
-const char *text;
+winid window UNUSED;
+int attr UNUSED;
+const char *text UNUSED;
 {
     return;
 }
@@ -478,9 +661,9 @@ const char *text;
 /*ARGSUSED*/
 static void
 hup_print_glyph(window, x, y, glyph)
-winid window;
-xchar x, y;
-int glyph;
+winid window UNUSED;
+xchar x UNUSED, y UNUSED;
+int glyph UNUSED;
 {
     return;
 }
@@ -488,8 +671,8 @@ int glyph;
 /*ARGSUSED*/
 static void
 hup_outrip(tmpwin, how)
-winid tmpwin;
-int how;
+winid tmpwin UNUSED;
+int how UNUSED;
 {
     return;
 }
@@ -497,8 +680,8 @@ int how;
 /*ARGSUSED*/
 static void
 hup_curs(window, x, y)
-winid window;
-int x, y;
+winid window UNUSED;
+int x UNUSED, y UNUSED;
 {
     return;
 }
@@ -506,8 +689,8 @@ int x, y;
 /*ARGSUSED*/
 static void
 hup_display_nhwindow(window, blocking)
-winid window;
-boolean blocking;
+winid window UNUSED;
+boolean blocking UNUSED;
 {
     return;
 }
@@ -515,8 +698,8 @@ boolean blocking;
 /*ARGSUSED*/
 static void
 hup_display_file(fname, complain)
-const char *fname;
-boolean complain;
+const char *fname UNUSED;
+boolean complain UNUSED;
 {
     return;
 }
@@ -525,7 +708,7 @@ boolean complain;
 /*ARGSUSED*/
 static void
 hup_cliparound(x, y)
-int x, y;
+int x UNUSED, y UNUSED;
 {
     return;
 }
@@ -563,8 +746,8 @@ hup_get_color_string(VOID_ARGS)
 /*ARGSUSED*/
 static void
 hup_status_update(idx, ptr, chg, percent)
-int idx, chg, percent;
-genericptr_t ptr;
+int idx UNUSED, chg UNUSED, percent UNUSED;
+genericptr_t ptr UNUSED;
 {
     return;
 }
@@ -589,7 +772,7 @@ hup_void_ndecl(VOID_ARGS)
 /*ARGUSED*/
 static void
 hup_void_fdecl_int(arg)
-int arg;
+int arg UNUSED;
 {
     return;
 }
@@ -597,7 +780,7 @@ int arg;
 /*ARGUSED*/
 static void
 hup_void_fdecl_winid(window)
-winid window;
+winid window UNUSED;
 {
     return;
 }
@@ -605,7 +788,7 @@ winid window;
 /*ARGUSED*/
 static void
 hup_void_fdecl_constchar_p(string)
-const char *string;
+const char *string UNUSED;
 {
     return;
 }

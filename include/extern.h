@@ -2600,6 +2600,10 @@ E boolean FDECL(mwelded, (struct obj *));
 /* ### windows.c ### */
 
 E void FDECL(choose_windows, (const char *));
+#ifdef WINCHAIN
+void FDECL(addto_windowchain, (const char *s));
+void NDECL(commit_windowchain);
+#endif
 E boolean NDECL(genl_can_suspend_no);
 E boolean NDECL(genl_can_suspend_yes);
 E char FDECL(genl_message_menu, (CHAR_P,int,const char *));

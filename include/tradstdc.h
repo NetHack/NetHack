@@ -334,11 +334,18 @@ typedef genericptr genericptr_t;	/* (void *) or (char *) */
  */
 #ifdef __GNUC__
 # if __GNUC__ >= 2
-#define PRINTF_F(f,v) __attribute__ ((format (printf, f, v)))
+#  define PRINTF_F(f,v) __attribute__ ((format (printf, f, v)))
+# endif
+# if __GNUC__ >= 3
+#  define UNUSED __attribute__ ((unused))
 # endif
 #endif
+
 #ifndef PRINTF_F
-#define PRINTF_F(f,v)
+# define PRINTF_F(f,v)
+#endif
+#ifndef UNUSED
+# define UNUSED
 #endif
 
 #endif /* TRADSTDC_H */

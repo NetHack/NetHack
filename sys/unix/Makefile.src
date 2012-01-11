@@ -349,11 +349,16 @@ WINCSRC = $(WINTTYSRC) $(WINX11SRC) $(WINGNOMESRC) $(WINGEMSRC)
 # all windowing-system-dependent .cpp (for dependencies and such)
 WINCXXSRC = $(WINQTSRC) $(WINBESRC)
 
+# Files for window system chaining.  Requires SYSCF; include via HINTSRC/HINTOBJ
+CHAINSRC=../win/chain/wc_chainin.c ../win/chain/wc_chainout.c \
+	../win/chain/wc_trace.c
+CHAINOBJ=wc_chainin.o wc_chainout.o wc_trace.o
+
 # .c files for this version (for date.h)
 VERSOURCES = $(HACKCSRC) $(SYSSRC) $(WINSRC) $(GENCSRC)
 
 # .c files for all versions using this Makefile (for lint and tags)
-CSOURCES = $(HACKCSRC) $(SYSSRC) $(WINCSRC) $(GENCSRC)
+CSOURCES = $(HACKCSRC) $(SYSSRC) $(WINCSRC) $(GENCSRC) $(HINTSRC)
 
 
 # all .h files except date.h, onames.h, pm.h, and vis_tab.h which would
@@ -392,7 +397,7 @@ HOBJ = $(FIRSTOBJ) allmain.o alloc.o apply.o artifact.o attrib.o ball.o \
 	steal.o steed.o teleport.o timeout.o topten.o track.o trap.o u_init.o \
 	uhitm.o vault.o vision.o vis_tab.o weapon.o were.o wield.o windows.o \
 	wizard.o worm.o worn.o write.o zap.o \
-	$(RANDOBJ) $(SYSOBJ) $(WINOBJ) version.o
+	$(RANDOBJ) $(SYSOBJ) $(WINOBJ) $(HINTOBJ) version.o
 # the .o files from the HACKCSRC, SYSSRC, and WINSRC lists
 
 $(GAME):	$(SYSTEM)
@@ -702,6 +707,12 @@ qt_clust.o: ../win/Qt/qt_clust.cpp ../include/qt_clust.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt/qt_clust.cpp
 qttableview.o: ../win/Qt/qttableview.cpp ../include/qttableview.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt/qttableview.cpp
+wc_chainin.o:	../win/chain/wc_chainin.c $(HACK_H)
+	$(CC) $(CFLAGS) -c ../win/chain/wc_chainin.c
+wc_chainout.o:	../win/chain/wc_chainout.c $(HACK_H)
+	$(CC) $(CFLAGS) -c ../win/chain/wc_chainout.c
+wc_trace.o:	../win/chain/wc_trace.c $(HACK_H) ../include/func_tab.h
+	$(CC) $(CFLAGS) -c ../win/chain/wc_trace.c
 monstr.o: monstr.c $(CONFIG_H)
 vis_tab.o: vis_tab.c $(CONFIG_H) ../include/vis_tab.h
 allmain.o: allmain.c $(HACK_H)

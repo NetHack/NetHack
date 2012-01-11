@@ -7,8 +7,11 @@
 
 #include "botl.h"
 
+/* NB: this MUST match chain_procs below */
 struct window_procs {
-    const char *name;
+    const char *name;		/* Names should start with [a-z].  Names must
+				 * not start with '-'.  Names starting with
+				 * '+' are reserved for processors. */
     unsigned long wincap;	/* window port capability options supported */
     unsigned long wincap2;	/* additional window port capability options supported */
     void FDECL((*win_init_nhwindows), (int *, char **));
@@ -267,5 +270,102 @@ struct wc_Opt {
  * init function whether the window system is coming or going. */
 #define WININIT		0
 #define WININIT_UNDO	1
+
+#ifdef WINCHAIN
+/* Setup phases for window chain elements.
+	void *  rv = X_procs_chain(int,	int, void *, void *, void *);
+		Xprivate*	   ALLOC n	0	0	0
+		-		   INIT	 n   self    next    nextdata
+   where:
+	Xprivate* is anything window chain entry type X wants back
+	n is the link count (starting with 1)
+	self is the Xprivate* returned earlier
+	next is struct winprocs * or struct chainprocs * for the next link
+	nextdata is the Xprivate* for the next link in the chain
+*/
+#define WINCHAIN_ALLOC	0
+#define WINCHAIN_INIT	1
+
+#define CARGS void *
+
+extern FILE *wc_tracelogf;	/* Expose log file for additional debugging. */
+
+struct chain_procs {
+    const char *name;		/* Names should start with [a-z].  Names must
+				 * not start with '-'.  Names starting with
+				 * '+' are reserved for processors. */
+    unsigned long wincap;	/* window port capability options supported */
+    unsigned long wincap2;	/* additional window port capability options supported */
+    void FDECL((*win_init_nhwindows), (CARGS, int *, char **));
+    void FDECL((*win_player_selection), (CARGS));
+    void FDECL((*win_askname), (CARGS));
+    void FDECL((*win_get_nh_event), (CARGS)) ;
+    void FDECL((*win_exit_nhwindows), (CARGS, const char *));
+    void FDECL((*win_suspend_nhwindows), (CARGS, const char *));
+    void FDECL((*win_resume_nhwindows), (CARGS));
+    winid FDECL((*win_create_nhwindow), (CARGS, int));
+    void FDECL((*win_clear_nhwindow), (CARGS, winid));
+    void FDECL((*win_display_nhwindow), (CARGS, winid, BOOLEAN_P));
+    void FDECL((*win_destroy_nhwindow), (CARGS, winid));
+    void FDECL((*win_curs), (CARGS, winid,int,int));
+    void FDECL((*win_putstr), (CARGS, winid, int, const char *));
+    void FDECL((*win_putmixed), (CARGS, winid, int, const char *));
+    void FDECL((*win_display_file), (CARGS, const char *, BOOLEAN_P));
+    void FDECL((*win_start_menu), (CARGS, winid));
+    void FDECL((*win_add_menu), (CARGS, winid,int,const ANY_P *,
+		CHAR_P,CHAR_P,int,const char *, BOOLEAN_P));
+    void FDECL((*win_end_menu), (CARGS, winid, const char *));
+    int FDECL((*win_select_menu), (CARGS, winid, int, MENU_ITEM_P **));
+    char FDECL((*win_message_menu), (CARGS, CHAR_P,int,const char *));
+    void FDECL((*win_update_inventory), (CARGS));
+    void FDECL((*win_mark_synch), (CARGS));
+    void FDECL((*win_wait_synch), (CARGS));
+#ifdef CLIPPING
+    void FDECL((*win_cliparound), (CARGS, int, int));
+#endif
+#ifdef POSITIONBAR
+    void FDECL((*win_update_positionbar), (CARGS, char *));
+#endif
+    void FDECL((*win_print_glyph), (CARGS, winid,XCHAR_P,XCHAR_P,int));
+    void FDECL((*win_raw_print), (CARGS, const char *));
+    void FDECL((*win_raw_print_bold), (CARGS, const char *));
+    int FDECL((*win_nhgetch), (CARGS));
+    int FDECL((*win_nh_poskey), (CARGS, int *, int *, int *));
+    void FDECL((*win_nhbell), (CARGS));
+    int FDECL((*win_doprev_message), (CARGS));
+    char FDECL((*win_yn_function), (CARGS, const char *, const char *, CHAR_P));
+    void FDECL((*win_getlin), (CARGS, const char *,char *));
+    int FDECL((*win_get_ext_cmd), (CARGS));
+    void FDECL((*win_number_pad), (CARGS, int));
+    void FDECL((*win_delay_output), (CARGS));
+#ifdef CHANGE_COLOR
+    void FDECL((*win_change_color), (CARGS, int,long,int));
+#ifdef MAC
+    void FDECL((*win_change_background), (CARGS, int));
+    short FDECL((*win_set_font_name), (CARGS, winid, char *));
+#endif
+    char * FDECL((*win_get_color_string), (CARGS));
+#endif
+
+    /* other defs that really should go away (they're tty specific) */
+    void FDECL((*win_start_screen), (CARGS));
+    void FDECL((*win_end_screen), (CARGS));
+
+    void FDECL((*win_outrip), (CARGS, winid,int));
+    void FDECL((*win_preference_update), (CARGS, const char *));
+    char * FDECL((*win_getmsghistory), (CARGS, BOOLEAN_P));
+    void FDECL((*win_putmsghistory), (CARGS, const char *,BOOLEAN_P));
+#ifdef STATUS_VIA_WINDOWPORT
+    void FDECL((*win_status_init), (CARGS));
+    void FDECL((*win_status_finish), (CARGS));
+    void FDECL((*win_status_enablefield), (CARGS, int,const char *,const char *,BOOLEAN_P));
+    void FDECL((*win_status_update), (CARGS, int,genericptr_t,int,int));
+# ifdef STATUS_HILITES
+    void FDECL((*win_status_threshold), (CARGS, int,int,anything,int,int,int));
+# endif
+#endif
+    boolean FDECL((*win_can_suspend), (CARGS));
+};
+#endif /* WINCHAIN */
 
 #endif /* WINPROCS_H */

@@ -22,6 +22,7 @@ Contents:
 	VII.  Game startup
 	VIII. Conventions
 	IX.   Implementation and Multi-window support
+	X.    WINCHAIN
 
 I.  Window Types and Terminology
 
@@ -994,3 +995,33 @@ One caveat.  Unfortunately, if you incorrectly specify the
 DEFAULT_WINDOW_SYS, NetHack will dump core (or whatever) without
 printing any message, because raw_print() cannot function without first
 setting the window-port.
+
+
+X. WINCHAIN
+
+WINCHAIN is an optional facility that allows the SYSCF_FILE to specify a
+series of processors that will see each call from the core to the window
+port (and the resulting return chain).  Processors are specified one at a
+time from the start of the chain (the core end) towards the window port as:
+    OPTIONS=windowchain:+PROC
+where PROC is the name of the processor to add to the chain.  The '+' is
+required and is part of the name of the processor (this distinguishes
+processors from window ports; in addition the '-' character is reserved for
+WINCHAIN internals).
+
+If WINCHAIN is not compiled into the NetHack binary, there is no overhead.
+
+If WINCHAIN is compiled into the NetHack binary but not used, overhead is
+limited to one function call during game setup and a trivial amount of data.
+
+Note that raw_print* calls will not go through the chain until initialization
+is complete (when *main.c calls commit_windowchain()).
+
+The only processor currently available is '+trace' which is a debugging
+facility for window ports.  See the code in win/chain/wc_trace.c for
+details on where to find the log file and how to write to it from other parts
+of the code.
+
+A processor may be specified more than once; this is expected to be most
+useful for surrounding a processor being developed with before and after
+calls to +trace.

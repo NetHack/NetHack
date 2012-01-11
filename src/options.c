@@ -400,6 +400,9 @@ static struct Comp_Opt
 	{ "windowcolors",  "the foreground/background colors of windows",	/*WC*/
 						80, DISP_IN_GAME },
 	{ "windowtype", "windowing system to use", WINTYPELEN, DISP_IN_GAME },
+#ifdef WINCHAIN
+	{ "windowchain", "window processor to use", WINTYPELEN, SET_IN_SYS },
+#endif
 #ifdef BACKWARD_COMPAT
 	{"DECgraphics", "load DECGraphics display symbols", 70, SET_IN_FILE},
 	{"IBMgraphics", "load IBMGraphics display symbols", 70, SET_IN_FILE},
@@ -2394,6 +2397,20 @@ goodfruit:
 	    }
 	    return;
 	}
+#ifdef WINCHAIN
+	fullname = "windowchain";
+	if (match_optname(opts, fullname, 3, TRUE)) {
+	    if (negated) {
+		bad_negation(fullname, FALSE);
+		return;
+	    } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
+		char buf[WINTYPELEN];
+		nmcpy(buf, op, WINTYPELEN);
+		addto_windowchain(buf);
+	    }
+	    return;
+	}
+#endif
 
 	/* WINCAP
 	 * setting window colors

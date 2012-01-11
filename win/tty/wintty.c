@@ -15,6 +15,12 @@
 #include <stdio.h>
 
 #include "hack.h"
+
+/* Support for logging SIGWINCH. */
+#ifdef WINCHAIN
+# include "winprocs.h"
+#endif
+
 #include "dlb.h"
 #include "date.h"
 #ifdef SHORT_FILENAMES
@@ -247,7 +253,24 @@ winch()
     int oldLI = LI, oldCO = CO, i;
     register struct WinDesc *cw;
 
+# ifdef WINCHAIN
+    {
+#  define WINCH_MESSAGE "(SIGWINCH)"
+if(wc_tracelogf)
+	(void)write(fileno(wc_tracelogf), WINCH_MESSAGE, strlen(WINCH_MESSAGE));
+#  undef WINCH_MESSAGE
+    }
+# endif
     getwindowsz();
+		/* For long running events such as multi-page menus and
+		 * display_file(), we note the signal's occurance and
+		 * hope the code there decides to handle the situation
+		 * and reset the flag. There will be race conditions
+		 * when handling this - code handlers so it doesn't matter.
+		 */
+# ifdef notyet
+    winch_seen = TRUE;
+# endif
     if((oldLI != LI || oldCO != CO) && ttyDisplay) {
 	ttyDisplay->rows = LI;
 	ttyDisplay->cols = CO;
@@ -1805,10 +1828,6 @@ tty_display_nhwindow(window, blocking)
     case NHW_MENU:
 	cw->active = 1;
 #ifdef H2344_BROKEN
-/* XXX this is the block that messes up corner win for player selection
-   (at least when undoing the patch one piece at a time from the start
-   of the file)
-*/
 	cw->offx = (cw->type==NHW_TEXT)
 		? 0
 		: min( min(82,ttyDisplay->cols/2), ttyDisplay->cols - cw->maxcol - 1);
@@ -2356,6 +2375,9 @@ boolean complain;
 	    terminate(EXIT_FAILURE);
 	}
 	(void) close(fd);
+# ifdef notyet
+	winch_seen = 0;
+# endif
     }
 #else	/* DEF_PAGER */
     {
@@ -2517,6 +2539,7 @@ tty_end_menu(window, prompt)
 	tty_add_menu(window, NO_GLYPH, &any, 0, 0, ATR_NONE, prompt, MENU_UNSELECTED);
     }
 
+	/* XXX another magic number? 52 */
     lmax = min(52, (int)ttyDisplay->rows - 1);		/* # lines per page */
     cw->npages = (cw->nitems + (lmax - 1)) / lmax;	/* # of pages */
 

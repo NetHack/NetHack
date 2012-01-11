@@ -182,6 +182,9 @@ char *argv[];
 #endif
 
 	process_options(argc, argv);	/* command line options */
+#ifdef WINCHAIN
+	commit_windowchain();
+#endif
 	init_nhwindows(&argc, argv);	/* now we can set up window system */
 #ifdef _M_UNIX
 	init_sco_cons();
