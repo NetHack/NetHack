@@ -2487,17 +2487,17 @@ static void mswin_color_from_string(char *colorstring, HBRUSH* brushptr, COLORRE
 	if (*colorstring == '#') {
 		if (strlen(++colorstring) != 6) return;
 
-		red_value = index(hexadecimals, tolower(*colorstring++)) - hexadecimals;
+		red_value = (int)(index(hexadecimals, tolower(*colorstring++)) - hexadecimals);
 		red_value *= 16;
-		red_value += index(hexadecimals, tolower(*colorstring++)) - hexadecimals;
+		red_value += (int)(index(hexadecimals, tolower(*colorstring++)) - hexadecimals);
 
-		green_value = index(hexadecimals, tolower(*colorstring++)) - hexadecimals;
+		green_value = (int)(index(hexadecimals, tolower(*colorstring++)) - hexadecimals);
 		green_value *= 16;
-		green_value += index(hexadecimals, tolower(*colorstring++)) - hexadecimals;
+		green_value += (int)(index(hexadecimals, tolower(*colorstring++)) - hexadecimals);
 
-		blue_value = index(hexadecimals, tolower(*colorstring++)) - hexadecimals;
+		blue_value = (int)(index(hexadecimals, tolower(*colorstring++)) - hexadecimals);
 		blue_value *= 16;
-		blue_value += index(hexadecimals, tolower(*colorstring++)) - hexadecimals;
+		blue_value += (int)(index(hexadecimals, tolower(*colorstring++)) - hexadecimals);
 
 		*colorptr = RGB(red_value, green_value, blue_value);
 	} else {

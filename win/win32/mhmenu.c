@@ -1,5 +1,4 @@
 /* NetHack 3.5	mhmenu.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)mhmenu.c	3.5	2002/03/06	*/
 /* Copyright (c) Alex Kompel, 2002                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -75,7 +74,7 @@ static WNDPROC editControlWndProc = NULL;
 #define NHMENU_IS_SELECTED(item) ((item).count!=0)
 #define NHMENU_HAS_GLYPH(item) 	((item).glyph!=NO_GLYPH) 
 
-BOOL	CALLBACK	MenuWndProc(HWND, UINT, WPARAM, LPARAM);
+LRESULT	CALLBACK	MenuWndProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK	NHMenuListWndProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK	NHMenuTextWndProc(HWND, UINT, WPARAM, LPARAM);
 static void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
@@ -124,7 +123,7 @@ HWND mswin_init_menu_window (int type) {
 		DWORD style;
 		style = GetWindowLong(ret, GWL_STYLE);
 		style |= WS_CAPTION;
-		SetWindowLong(ret, GWL_STYLE, style);
+		SetWindowLongPtr(ret, GWL_STYLE, style);
 		SetWindowPos(ret, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 	}
 
@@ -144,7 +143,7 @@ int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected,
 	*_selected = NULL;
 	ret_val = -1;
 
-	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
+	data = (PNHMenuWindow)GetWindowLong(hWnd, GWLP_USERDATA);
 
 	/* force activate for certain menu types */
 	if( data->type == MENU_TYPE_MENU &&
@@ -247,7 +246,7 @@ int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected,
 	return ret_val;
 }
 /*-----------------------------------------------------------------------------*/   
-BOOL CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	PNHMenuWindow data;
 	HWND control;
@@ -255,7 +254,7 @@ BOOL CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     TCHAR title[MAX_LOADSTRING];
 
 
-	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
+	data = (PNHMenuWindow)GetWindowLong(hWnd, GWLP_USERDATA);
 	switch (message) 
 	{
 	case WM_INITDIALOG:
@@ -269,7 +268,7 @@ BOOL CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		data->bmpCheckedCount = LoadBitmap(GetNHApp()->hApp, MAKEINTRESOURCE(IDB_MENU_SEL_COUNT));
 		data->bmpNotChecked = LoadBitmap(GetNHApp()->hApp, MAKEINTRESOURCE(IDB_MENU_UNSEL));
 		data->is_active = FALSE;
-		SetWindowLong(hWnd, GWL_USERDATA, (LONG)data);
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG)data);
 
 		/* set font for the text cotrol */
 		control = GetDlgItem(hWnd, IDC_MENU_TEXT);
@@ -278,8 +277,8 @@ BOOL CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		ReleaseDC(control, hdc);
 
 		/* subclass edit control */
-		editControlWndProc = (WNDPROC)GetWindowLong(control, GWL_WNDPROC);
-		SetWindowLong(control, GWL_WNDPROC, (LONG)NHMenuTextWndProc);
+		editControlWndProc = (WNDPROC)GetWindowLongPtr(control, GWLP_WNDPROC);
+		SetWindowLongPtr(control,GWLP_WNDPROC, (LONG)NHMenuTextWndProc);
 
         /* Even though the dialog has no caption, you can still set the title 
            which shows on Alt-Tab */
@@ -491,7 +490,7 @@ BOOL CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				if( data->text.text ) free(data->text.text);
 			}
 			free(data);
-			SetWindowLong(hWnd, GWL_USERDATA, (LONG)0);
+			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG)0);
 		}
 		return TRUE;
 	}
@@ -502,7 +501,7 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	PNHMenuWindow data;
 
-	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
+	data = (PNHMenuWindow)GetWindowLong(hWnd, GWLP_USERDATA);
 	switch( wParam ) {
 	case MSNH_MSG_PUTSTR: 
 	{
@@ -660,7 +659,7 @@ void LayoutMenu(HWND hWnd)
 	POINT pt_elem, pt_ok, pt_cancel;
 	SIZE  sz_elem, sz_ok, sz_cancel;
 
-	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
+	data = (PNHMenuWindow)GetWindowLong(hWnd, GWLP_USERDATA);
 	menu_ok = GetDlgItem(hWnd, IDOK);
 	menu_cancel = GetDlgItem(hWnd, IDCANCEL);
 
@@ -730,7 +729,7 @@ void SetMenuType(HWND hWnd, int type)
 	PNHMenuWindow data;
 	HWND list, text;
 
-	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
+	data = (PNHMenuWindow)GetWindowLong(hWnd, GWLP_USERDATA);
 
 	data->type = type;
 	
@@ -765,7 +764,7 @@ void SetMenuListType(HWND hWnd, int how)
 	LVCOLUMN lvcol;
 	LRESULT fnt;
 
-	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
+	data = (PNHMenuWindow)GetWindowLong(hWnd, GWLP_USERDATA);
 	if( data->type != MENU_TYPE_MENU ) return;
 
 	data->how = how;
@@ -808,8 +807,8 @@ void SetMenuListType(HWND hWnd, int how)
 	if( !control ) panic( "cannot create menu control" );
 	
 	/* install the hook for the control window procedure */
-	wndProcListViewOrig = (WNDPROC)GetWindowLong(control, GWL_WNDPROC);
-	SetWindowLong(control, GWL_WNDPROC, (LONG)NHMenuListWndProc);
+	wndProcListViewOrig = (WNDPROC)GetWindowLongPtr(control, GWLP_WNDPROC);
+	SetWindowLongPtr(control, GWLP_WNDPROC, (LONG)NHMenuListWndProc);
 
 	/* set control colors */
 	ListView_SetBkColor(control, 
@@ -842,7 +841,7 @@ void SetMenuListType(HWND hWnd, int how)
 		lvitem.state = data->menu.items[i].presel? LVIS_SELECTED : 0;
 		lvitem.pszText = NH_A2W(buf, wbuf, BUFSZ);
 		lvitem.lParam = (LPARAM)&data->menu.items[i];
-		nItem = SendMessage(control, LB_ADDSTRING, (WPARAM)0, (LPARAM) buf); 
+		nItem = (int)SendMessage(control, LB_ADDSTRING, (WPARAM)0, (LPARAM) buf); 
 		if( ListView_InsertItem(control, &lvitem)==-1 ) {
 			panic("cannot insert menu item");
 		}
@@ -854,7 +853,7 @@ HWND GetMenuControl(HWND hWnd)
 {
 	PNHMenuWindow data;
 
-	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
+	data = (PNHMenuWindow)GetWindowLong(hWnd, GWLP_USERDATA);
 
 	if(data->type==MENU_TYPE_TEXT) {
 		return GetDlgItem(hWnd, IDC_MENU_TEXT);
@@ -874,7 +873,7 @@ BOOL onMeasureItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	int i;
 
     lpmis = (LPMEASUREITEMSTRUCT) lParam; 
-	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
+	data = (PNHMenuWindow)GetWindowLong(hWnd, GWLP_USERDATA);
 	GetClientRect(GetMenuControl(hWnd), &list_rect);
 
 	hdc = GetDC(GetMenuControl(hWnd));
@@ -922,7 +921,7 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
     /* If there are no list box items, skip this message. */
     if (lpdis->itemID == -1) return FALSE;
 
-	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
+	data = (PNHMenuWindow)GetWindowLong(hWnd, GWLP_USERDATA);
 
     item = &data->menu.items[lpdis->itemID];
 
@@ -1119,7 +1118,7 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 	int curIndex, topIndex, pageSize;
 	boolean is_accelerator = FALSE;
 
-	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
+	data = (PNHMenuWindow)GetWindowLong(hWnd, GWLP_USERDATA);
 
 	switch( ch ) {
 	case MENU_FIRST_PAGE:
@@ -1436,7 +1435,7 @@ void mswin_menu_window_size (HWND hWnd, LPSIZE sz)
 	RECT rt, wrt;
 	int extra_cx;
 
-	data = (PNHMenuWindow)GetWindowLong(hWnd, GWL_USERDATA);
+	data = (PNHMenuWindow)GetWindowLong(hWnd, GWLP_USERDATA);
 	if(data) {
 		control = GetMenuControl(hWnd);
 
