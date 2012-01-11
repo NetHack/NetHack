@@ -121,7 +121,7 @@ HWND mswin_init_menu_window (int type) {
 
 	if( !GetNHApp()->bWindowsLocked ) {
 		DWORD style;
-		style = GetWindowLong(ret, GWL_STYLE);
+		style = GetWindowLongPtr(ret, GWL_STYLE);
 		style |= WS_CAPTION;
 		SetWindowLongPtr(ret, GWL_STYLE, style);
 		SetWindowPos(ret, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
@@ -143,7 +143,7 @@ int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected,
 	*_selected = NULL;
 	ret_val = -1;
 
-	data = (PNHMenuWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHMenuWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
 	/* force activate for certain menu types */
 	if( data->type == MENU_TYPE_MENU &&
@@ -254,7 +254,7 @@ LRESULT CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
     TCHAR title[MAX_LOADSTRING];
 
 
-	data = (PNHMenuWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHMenuWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	switch (message) 
 	{
 	case WM_INITDIALOG:
@@ -501,7 +501,7 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	PNHMenuWindow data;
 
-	data = (PNHMenuWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHMenuWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	switch( wParam ) {
 	case MSNH_MSG_PUTSTR: 
 	{
@@ -659,7 +659,7 @@ void LayoutMenu(HWND hWnd)
 	POINT pt_elem, pt_ok, pt_cancel;
 	SIZE  sz_elem, sz_ok, sz_cancel;
 
-	data = (PNHMenuWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHMenuWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	menu_ok = GetDlgItem(hWnd, IDOK);
 	menu_cancel = GetDlgItem(hWnd, IDCANCEL);
 
@@ -729,7 +729,7 @@ void SetMenuType(HWND hWnd, int type)
 	PNHMenuWindow data;
 	HWND list, text;
 
-	data = (PNHMenuWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHMenuWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
 	data->type = type;
 	
@@ -764,7 +764,7 @@ void SetMenuListType(HWND hWnd, int how)
 	LVCOLUMN lvcol;
 	LRESULT fnt;
 
-	data = (PNHMenuWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHMenuWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	if( data->type != MENU_TYPE_MENU ) return;
 
 	data->how = how;
@@ -853,7 +853,7 @@ HWND GetMenuControl(HWND hWnd)
 {
 	PNHMenuWindow data;
 
-	data = (PNHMenuWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHMenuWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
 	if(data->type==MENU_TYPE_TEXT) {
 		return GetDlgItem(hWnd, IDC_MENU_TEXT);
@@ -873,7 +873,7 @@ BOOL onMeasureItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	int i;
 
     lpmis = (LPMEASUREITEMSTRUCT) lParam; 
-	data = (PNHMenuWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHMenuWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	GetClientRect(GetMenuControl(hWnd), &list_rect);
 
 	hdc = GetDC(GetMenuControl(hWnd));
@@ -921,7 +921,7 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
     /* If there are no list box items, skip this message. */
     if (lpdis->itemID == -1) return FALSE;
 
-	data = (PNHMenuWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHMenuWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
     item = &data->menu.items[lpdis->itemID];
 
@@ -1118,7 +1118,7 @@ BOOL onListChar(HWND hWnd, HWND hwndList, WORD ch)
 	int curIndex, topIndex, pageSize;
 	boolean is_accelerator = FALSE;
 
-	data = (PNHMenuWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHMenuWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
 	switch( ch ) {
 	case MENU_FIRST_PAGE:
@@ -1435,7 +1435,7 @@ void mswin_menu_window_size (HWND hWnd, LPSIZE sz)
 	RECT rt, wrt;
 	int extra_cx;
 
-	data = (PNHMenuWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHMenuWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	if(data) {
 		control = GetMenuControl(hWnd);
 

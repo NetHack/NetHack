@@ -95,7 +95,7 @@ LRESULT CALLBACK StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 	HDC hdc;
 	PNHStatusWindow data;
 	
-	data = (PNHStatusWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHStatusWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	switch (message) 
 	{
 	case WM_MSNH_COMMAND: {
@@ -197,7 +197,7 @@ void mswin_status_window_size (HWND hWnd, LPSIZE sz)
 	sz->cx = rt.right - rt.left;
 	sz->cy = rt.bottom - rt.top;
 
-	data = (PNHStatusWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHStatusWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	if(data) {
 		hdc = GetDC(hWnd);
 		saveFont = SelectObject(hdc, mswin_get_font(NHW_STATUS, ATR_NONE, hdc, FALSE));

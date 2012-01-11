@@ -53,7 +53,7 @@ HWND mswin_init_text_window () {
 	SetWindowText(ret, "Text");
 	if( !GetNHApp()->bWindowsLocked ) {
 		DWORD style;
-		style = GetWindowLong(ret, GWL_STYLE);
+		style = GetWindowLongPtr(ret, GWL_STYLE);
 		style |= WS_CAPTION;
 		SetWindowLongPtr(ret, GWL_STYLE, style);
 		SetWindowPos(ret, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
@@ -71,7 +71,7 @@ void mswin_display_text_window (HWND hWnd)
 {
 	PNHTextWindow data;
 	
-	data = (PNHTextWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHTextWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	if( data && data->window_text ) {
 		HWND control;
 		control = GetDlgItem(hWnd, IDC_TEXT_CONTROL);
@@ -90,7 +90,7 @@ LRESULT CALLBACK NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 	PNHTextWindow data;
     TCHAR title[MAX_LOADSTRING];
 	
-	data = (PNHTextWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHTextWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	switch (message) 
 	{
 	case WM_INITDIALOG:
@@ -191,7 +191,7 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	PNHTextWindow data;
 	
-	data = (PNHTextWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHTextWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	switch( wParam ) {
 	case MSNH_MSG_PUTSTR: {
 		PMSNHMsgPutstr msg_data = (PMSNHMsgPutstr)lParam;

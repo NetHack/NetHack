@@ -213,7 +213,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, UINT wParam, LPARAM lParam
 
         case WM_KEYDOWN: 
 		{
-			data = (PNHMainWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+			data = (PNHMainWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
 			/* translate arrow keys into nethack commands */
             switch (wParam) 
@@ -524,7 +524,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, UINT wParam, LPARAM lParam
 			   WM_QUIT somehow */  
 
 			/* clean up */
-			free( (PNHMainWindow)GetWindowLong(hWnd, GWLP_USERDATA) );
+			free( (PNHMainWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA) );
 			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG)0);
 
 			// PostQuitMessage(0);
@@ -584,7 +584,7 @@ void mswin_layout_main_window(HWND changed_child)
 
 	if( GetNHApp()->bAutoLayout ) {
 		GetClientRect(GetNHApp()->hMainWnd, &client_rt);
-		data = (PNHMainWindow)GetWindowLong(GetNHApp()->hMainWnd, GWLP_USERDATA);
+		data = (PNHMainWindow)GetWindowLongPtr(GetNHApp()->hMainWnd, GWLP_USERDATA);
 
 		/* get sizes of child windows */
 		wnd_status = mswin_hwnd_from_winid(WIN_STATUS);
@@ -754,7 +754,7 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	int wmId, wmEvent;
 	PNHMainWindow  data;
 
-	data = (PNHMainWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHMainWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	wmId    = LOWORD(wParam); 
 	wmEvent = HIWORD(wParam); 
 
@@ -1039,7 +1039,7 @@ void mswin_select_map_mode(int mode)
 	winid map_id;
 
 	map_id = WIN_MAP;
-	data = (PNHMainWindow)GetWindowLong(GetNHApp()->hMainWnd, GWLP_USERDATA);
+	data = (PNHMainWindow)GetWindowLongPtr(GetNHApp()->hMainWnd, GWLP_USERDATA);
 
 	/* override for Rogue level */
 #ifdef REINCARNATION
@@ -1130,7 +1130,7 @@ void nhlock_windows( BOOL lock )
 	for( i=0; i<MAXWINDOWS; i++ ) {
 		if( IsWindow(GetNHApp()->windowlist[i].win) && !GetNHApp()->windowlist[i].dead) {
 			DWORD style;
-			style = GetWindowLong(GetNHApp()->windowlist[i].win, GWL_STYLE);
+			style = GetWindowLongPtr(GetNHApp()->windowlist[i].win, GWL_STYLE);
 			if( lock )	style &= ~WS_CAPTION;
 			else		style |= WS_CAPTION;
 			SetWindowLongPtr(GetNHApp()->windowlist[i].win, GWL_STYLE, style);

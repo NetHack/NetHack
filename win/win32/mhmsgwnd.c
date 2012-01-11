@@ -160,7 +160,7 @@ LRESULT CALLBACK NHMessageWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
 	case WM_DESTROY: 
 	{
 		PNHMessageWindow data;
-		data = (PNHMessageWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+		data = (PNHMessageWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 		free(data);
 		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG)0);
 	}	break;
@@ -173,7 +173,7 @@ LRESULT CALLBACK NHMessageWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
 		PNHMessageWindow data;
 		RECT	rt;
 	
-		data = (PNHMessageWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+		data = (PNHMessageWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
  
         xNewSize = LOWORD(lParam); 
         yNewSize = HIWORD(lParam); 
@@ -238,7 +238,7 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	PNHMessageWindow data;
 	
-	data = (PNHMessageWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHMessageWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	switch( wParam ) {
 	case MSNH_MSG_PUTSTR: 
 	{
@@ -382,7 +382,7 @@ void onMSNH_VScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	int yInc;
  
 	/* get window data */
-	data = (PNHMessageWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHMessageWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	
 	ZeroMemory(&si, sizeof(si));
 	si.cbSize = sizeof(si);
@@ -459,7 +459,7 @@ void onMSNH_HScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	int xInc;
  
 	/* get window data */
-	data = (PNHMessageWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHMessageWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	
 	ZeroMemory(&si, sizeof(si));
 	si.cbSize = sizeof(si);
@@ -570,7 +570,7 @@ void onPaint(HWND hWnd)
 	OldBg = SetBkColor(hdc, message_bg_brush ? message_bg_color : (COLORREF)GetSysColor(DEFAULT_COLOR_BG_MSG));
     OldFg = setMsgTextColor(hdc, 0);
 
-	data = (PNHMessageWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHMessageWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
 	GetClientRect(hWnd, &client_rt);
 
@@ -673,7 +673,7 @@ void mswin_message_window_size (HWND hWnd, LPSIZE sz)
 	PNHMessageWindow data;
 	RECT rt, client_rt;
 
-	data = (PNHMessageWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHMessageWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	if( !data ) return;
 
 	/* -- Calculate the font size -- */
@@ -714,7 +714,7 @@ BOOL can_append_text(HWND hWnd, int attr, const char* text )
 	RECT draw_rt;
 	BOOL retval = FALSE;
 
-	data = (PNHMessageWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHMessageWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
 	/* cannot append if lines_not_seen is 0 (beginning of the new turn */
 	if( data->lines_not_seen==0 ) return FALSE;
@@ -765,7 +765,7 @@ BOOL more_prompt_check(HWND hWnd)
 	int remaining_height;
 	char tmptext[MAXWINDOWTEXT+1];
 
-	data = (PNHMessageWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHMessageWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
 	if( data->lines_not_seen==0 ) return FALSE;  /* don't bother checking - nothig to "more" */
 	if( data->lines_not_seen>=MSG_LINES ) return TRUE; /* history size exceeded - always more */

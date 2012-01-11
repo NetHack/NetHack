@@ -152,7 +152,7 @@ CALLBACK GetlinDlgProc(HWND hWnd, UINT message, WPARAM wParam, LONG_PTR lParam)
         { 
 			/* OK button was pressed */
 			case IDOK:
-		      data = (struct getlin_data*)GetWindowLong(hWnd, GWLP_USERDATA);
+		      data = (struct getlin_data*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 			  SendDlgItemMessage(hWnd, IDC_GETLIN_EDIT, WM_GETTEXT, (WPARAM)sizeof(wbuf), (LPARAM)wbuf );
 			  NH_W2A(wbuf, data->result, data->result_size);
 
@@ -256,7 +256,7 @@ CALLBACK ExtCmdDlgProc(HWND hWnd, UINT message, WPARAM wParam, LONG_PTR lParam)
 	break;
 
 	case WM_COMMAND:
-        data = (struct extcmd_data*)GetWindowLong(hWnd, GWLP_USERDATA);
+        data = (struct extcmd_data*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 		switch (LOWORD(wParam)) 
         { 
 		  /* OK button ws clicked */
@@ -378,7 +378,7 @@ CALLBACK PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LONG_PTR 
 	break;
 
 	case WM_COMMAND:
-        data = (struct plsel_data*)GetWindowLong(hWnd, GWLP_USERDATA);
+        data = (struct plsel_data*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 		switch (LOWORD(wParam)) { 
 
 		/* OK button was clicked */

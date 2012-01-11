@@ -62,7 +62,7 @@ void mswin_display_RIP_window (HWND hWnd)
 	HDC hdc;
 	HFONT OldFont;
 
-	data = (PNHRIPWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHRIPWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
 	GetNHApp()->hPopupWnd = hWnd;
 	mapWnd = mswin_hwnd_from_winid(WIN_MAP);
@@ -122,7 +122,7 @@ LRESULT CALLBACK NHRIPWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 	HDC hdc;
 	PNHRIPWindow data;
 
-	data = (PNHRIPWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHRIPWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	switch (message)
 	{
 	case WM_INITDIALOG:
@@ -229,7 +229,7 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	PNHRIPWindow data;
 	static int InRipText = 1;
-	data = (PNHRIPWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHRIPWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	switch( wParam ) {
 		case MSNH_MSG_PUTSTR: {
 			PMSNHMsgPutstr msg_data = (PMSNHMsgPutstr)lParam;

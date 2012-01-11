@@ -106,7 +106,7 @@ void mswin_map_stretch(HWND hWnd, LPSIZE lpsz, BOOL redraw)
 	wnd_size.cy = client_rt.bottom - client_rt.top;
 	
 	/* set new screen tile size */
-	data = (PNHMapWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHMapWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	data->xScrTile = 
 		max(1, (data->bFitToScreenMode? wnd_size.cx : lpsz->cx) / COLNO);
 	data->yScrTile = 
@@ -200,7 +200,7 @@ int mswin_map_mode(HWND hWnd, int mode)
 	int oldMode;
 	SIZE mapSize;
 
-	data = (PNHMapWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHMapWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	if( mode == data->mapMode ) return mode;
 	
 	oldMode = data->mapMode;
@@ -333,7 +333,7 @@ LRESULT CALLBACK MapWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 {
 	PNHMapWindow data;
 	
-	data = (PNHMapWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHMapWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	switch (message) 
 	{
 	case WM_CREATE:
@@ -427,7 +427,7 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	PNHMapWindow data;
 	RECT rt;
 
-	data = (PNHMapWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHMapWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	switch(wParam) {
 	case MSNH_MSG_PRINT_GLYPH: 
 	{
@@ -590,7 +590,7 @@ void onPaint(HWND hWnd)
 	int i, j;
 
 	/* get window data */
-	data = (PNHMapWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHMapWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
 	hDC = BeginPaint(hWnd, &ps);
 
@@ -750,7 +750,7 @@ void onMSNH_VScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	int yDelta;
  
 	/* get window data */
-	data = (PNHMapWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHMapWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
     switch(LOWORD (wParam)) 
     { 
@@ -808,7 +808,7 @@ void onMSNH_HScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	int xDelta;
  
 	/* get window data */
-	data = (PNHMapWindow)GetWindowLong(hWnd, GWLP_USERDATA);
+	data = (PNHMapWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	
     switch(LOWORD (wParam)) 
     { 
