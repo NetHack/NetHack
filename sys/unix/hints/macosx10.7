@@ -138,8 +138,8 @@ else	# ! root
 PREFIX:=/Users/$(GAMEUID)
 SHELLDIR=$(PREFIX)/bin
 HACKDIR=$(PREFIX)/nethackdir
-CHOWN=touch
-CHGRP=touch
+CHOWN=/usr/bin/true
+CHGRP=/usr/bin/true
 GAMEPERM = 0500
 endif	# ! root
 VARFILEPERM = 0664
@@ -155,8 +155,8 @@ PREFIX=$(abspath $(NHSROOT))
 # suppress nethack.sh
 #SHELLDIR=
 HACKDIR=$(PREFIX)/playground
-CHOWN=touch
-CHGRP=touch
+CHOWN=/usr/bin/true
+CHGRP=/usr/bin/true
 GAMEPERM = 0700
 VARFILEPERM = 0600
 VARDIRPERM = 0700
@@ -167,8 +167,8 @@ else	# !WANT_SOURCE_INSTALL
 PREFIX:=$(wildcard ~)
 SHELLDIR=$(PREFIX)/bin
 HACKDIR=$(PREFIX)/nethackdir
-CHOWN=true
-CHGRP=true
+CHOWN=/usr/bin/true
+CHGRP=/usr/bin/true
 GAMEPERM = 0700
 VARFILEPERM = 0600
 VARDIRPERM = 0700
