@@ -65,6 +65,7 @@ CC=gcc -Wall -Wextra -Wno-missing-field-initializers -Wimplicit -Wreturn-type -W
 
 # XXX -g vs -O should go here, -I../include goes in the makefile
 CFLAGS=-g -I../include
+# older binaries use NOCLIPPING, but that disable SIGWINCH
 #CFLAGS+=-DNOCLIPPING
 CFLAGS+= -DNOMAIL -DNOTPARMDECL -DHACKDIR=\"$(HACKDIR)\"
 CFLAGS+= -DDEFAULT_WINDOW_SYS=\"$(WANT_DEFAULT)\" -DDLB
