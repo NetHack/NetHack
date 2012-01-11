@@ -1130,7 +1130,7 @@ void nhlock_windows( BOOL lock )
 	for( i=0; i<MAXWINDOWS; i++ ) {
 		if( IsWindow(GetNHApp()->windowlist[i].win) && !GetNHApp()->windowlist[i].dead) {
 			DWORD style;
-			style = GetWindowLongPtr(GetNHApp()->windowlist[i].win, GWL_STYLE);
+			style = (DWORD)GetWindowLongPtr(GetNHApp()->windowlist[i].win, GWL_STYLE);
 			if( lock )	style &= ~WS_CAPTION;
 			else		style |= WS_CAPTION;
 			SetWindowLongPtr(GetNHApp()->windowlist[i].win, GWL_STYLE, style);

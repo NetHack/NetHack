@@ -121,7 +121,7 @@ HWND mswin_init_menu_window (int type) {
 
 	if( !GetNHApp()->bWindowsLocked ) {
 		DWORD style;
-		style = GetWindowLongPtr(ret, GWL_STYLE);
+		style = (DWORD)GetWindowLongPtr(ret, GWL_STYLE);
 		style |= WS_CAPTION;
 		SetWindowLongPtr(ret, GWL_STYLE, style);
 		SetWindowPos(ret, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
