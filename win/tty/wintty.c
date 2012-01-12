@@ -12,14 +12,7 @@
  * to back out the changes. */
 #define H2344_BROKEN
 
-#include <stdio.h>
-
 #include "hack.h"
-
-/* Support for logging SIGWINCH. */
-#ifdef WINCHAIN
-# include "winprocs.h"
-#endif
 
 #include "dlb.h"
 #include "date.h"
