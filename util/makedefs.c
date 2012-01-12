@@ -1817,7 +1817,16 @@ do_oracles()
 #endif
 		if (!(ok = (fpos = ftell(ofp)) >= 0)) break;
 		if (!(ok = (fseek(ofp, fpos, SEEK_SET) >= 0))) break;
-		if (!(ok = (fscanf(ofp, "%5lx", &offset) == 1))) break;
+	      {
+		/* gcc's format checking issues a warning when using
+		   %lx to read into a signed long, so force unsigned;
+		   casting &offset to unsigned long * works but is iffy */
+		unsigned long uloffset;
+		int itmp = fscanf(ofp, "%5lx", &uloffset);
+
+		offset = (long)uloffset;
+		if (!(ok = (itmp == 1))) break;
+	      }
 #ifdef MAC
 # ifdef __MWERKS__
 		/*
