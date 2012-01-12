@@ -61,7 +61,12 @@
 
 #define NewTab(type, size)	(type **) alloc(sizeof(type *) * size)
 #define Free(ptr)		if(ptr) free((genericptr_t) (ptr))
-#define Write(fd, item, size)	if (write(fd, (genericptr_t)(item), size) != size) return FALSE;
+	/* write() returns a signed value but its size argument is unsigned;
+	   types might be int and unsigned or ssize_t and size_t; casting
+	   to long should be safe for all permutations (even if size_t is
+	   bigger, since the values involved won't be too big for long) */
+#define Write(fd, item, size) if ((long)write(fd, (genericptr_t)(item), size) \
+				  != (long)(size)) return FALSE;
 
 #if defined(__BORLANDC__) && !defined(_WIN32)
 extern unsigned _stklen = STKSIZ;
@@ -1171,17 +1176,7 @@ specialmaze *maze;
 	    for(j=0;j<pt->ysize;j++) {
 		if(!maze->init_lev.init_present ||
 		   pt->xsize > 1 || pt->ysize > 1) {
-#if !defined(_MSC_VER) && !defined(__BORLANDC__)
 			Write(fd, pt->map[j], pt->xsize * sizeof *pt->map[j]);
-#else
-			/*
-			 * On MSVC and Borland C compilers the Write macro above caused:
-			 * warning '!=' : signed/unsigned mismatch
-			 */
-			unsigned reslt, sz = pt->xsize * sizeof *pt->map[j];
-			reslt = write(fd, (genericptr_t)(pt->map[j]), sz);
-			if (reslt != sz) return FALSE;
-#endif
 		}
 		Free(pt->map[j]);
 	    }
