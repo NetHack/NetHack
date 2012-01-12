@@ -419,18 +419,18 @@ struct obj *otmp;
 
 /* determine whether an item confers Protection */
 boolean
-protects(otmp, is_worn)
+protects(otmp, being_worn)
 struct obj *otmp;
-boolean is_worn;
+boolean being_worn;
 {
 	const struct artifact *arti;
 
-	if (is_worn && objects[otmp->otyp].oc_oprop == PROTECTION)
+	if (being_worn && objects[otmp->otyp].oc_oprop == PROTECTION)
 	    return TRUE;
 	arti = get_artifact(otmp);
 	if (!arti) return FALSE;
 	return (arti->cspfx & SPFX_PROTECT) != 0 ||
-		(is_worn && (arti->spfx & SPFX_PROTECT) != 0);
+		(being_worn && (arti->spfx & SPFX_PROTECT) != 0);
 }
 
 /*
