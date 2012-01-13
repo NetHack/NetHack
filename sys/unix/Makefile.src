@@ -355,10 +355,10 @@ CHAINSRC=../win/chain/wc_chainin.c ../win/chain/wc_chainout.c \
 CHAINOBJ=wc_chainin.o wc_chainout.o wc_trace.o
 
 # .c files for this version (for date.h)
-VERSOURCES = $(HACKCSRC) $(SYSSRC) $(WINSRC) $(GENCSRC)
+VERSOURCES = $(HACKCSRC) $(SYSSRC) $(WINSRC) $(CHAINSRC) $(GENCSRC)
 
 # .c files for all versions using this Makefile (for lint and tags)
-CSOURCES = $(HACKCSRC) $(SYSSRC) $(WINCSRC) $(GENCSRC) $(HINTSRC)
+CSOURCES = $(HACKCSRC) $(SYSCSRC) $(WINCSRC) $(CHAINSRC) $(GENCSRC)
 
 
 # all .h files except date.h, onames.h, pm.h, and vis_tab.h which would
@@ -543,9 +543,11 @@ spotless: clean
 
 
 depend: ../sys/unix/depend.awk \
-		$(SYSCSRC) $(WINCSRC) $(WINCXXSRC) $(GENCSRC) $(HACKCSRC)
+		$(SYSCSRC) $(WINCSRC) $(WINCXXSRC) $(CHAINSRC) $(GENCSRC) \
+		$(HACKCSRC)
 	$(AWK) -f ../sys/unix/depend.awk ../include/*.h \
-		$(SYSCSRC) $(WINCSRC) $(WINCXXSRC) $(GENCSRC) $(HACKCSRC) >makedep
+		$(SYSCSRC) $(WINCSRC) $(WINCXXSRC) $(CHAINSRC) $(GENCSRC) \
+		$(HACKCSRC) >makedep
 	@echo '/^# DO NOT DELETE THIS LINE OR CHANGE ANYTHING BEYOND IT/+2,$$d' >eddep
 	@echo '$$r makedep' >>eddep
 	@echo 'w' >>eddep
@@ -581,14 +583,14 @@ $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/align.h \
 		../include/onames.h ../include/timeout.h ../include/trap.h \
 		../include/flag.h ../include/rm.h ../include/vision.h \
 		../include/display.h ../include/engrave.h ../include/rect.h \
-		../include/region.h ../include/winprocs.h ../include/wintty.h \
-		../include/trampoli.h ../include/sys.h
+		../include/region.h ../include/winprocs.h ../include/botl.h \
+		../include/sys.h ../include/wintty.h ../include/trampoli.h
 	touch $(HACK_H)
 #
 tos.o: ../sys/atari/tos.c $(HACK_H) ../include/tcap.h
 	$(CC) $(CFLAGS) -c ../sys/atari/tos.c
-pcmain.o: ../sys/share/pcmain.c $(HACK_H) ../include/dlb.h \
-		#../include/win32api.h
+pcmain.o: ../sys/share/pcmain.c $(HACK_H) ../include/dlb.h ../include/date.h \
+		../include/patchlevel.h #../include/win32api.h
 	$(CC) $(CFLAGS) -c ../sys/share/pcmain.c
 pcsys.o: ../sys/share/pcsys.c $(HACK_H)
 	$(CC) $(CFLAGS) -c ../sys/share/pcsys.c
@@ -616,8 +618,8 @@ termcap.o: ../win/tty/termcap.c $(HACK_H) ../include/tcap.h
 	$(CC) $(CFLAGS) -c ../win/tty/termcap.c
 topl.o: ../win/tty/topl.c $(HACK_H) ../include/tcap.h
 	$(CC) $(CFLAGS) -c ../win/tty/topl.c
-wintty.o: ../win/tty/wintty.c $(HACK_H) ../include/dlb.h \
-		../include/date.h ../include/patchlevel.h ../include/tcap.h
+wintty.o: ../win/tty/wintty.c $(HACK_H) ../include/dlb.h ../include/date.h \
+		../include/patchlevel.h ../include/tcap.h
 	$(CC) $(CFLAGS) -c ../win/tty/wintty.c
 Window.o: ../win/X11/Window.c ../include/xwindowp.h ../include/xwindow.h \
 		$(CONFIG_H)
@@ -625,7 +627,7 @@ Window.o: ../win/X11/Window.c ../include/xwindowp.h ../include/xwindow.h \
 dialogs.o: ../win/X11/dialogs.c $(CONFIG_H)
 	$(CC) $(CFLAGS) -c ../win/X11/dialogs.c
 winX.o: ../win/X11/winX.c $(HACK_H) ../include/winX.h ../include/dlb.h \
-		../include/date.h ../include/patchlevel.h ../win/X11/nh72icon \
+		../include/patchlevel.h ../include/date.h ../win/X11/nh72icon \
 		../win/X11/nh56icon ../win/X11/nh32icon
 	$(CC) $(CFLAGS) -c ../win/X11/winX.c
 winmap.o: ../win/X11/winmap.c ../include/xwindow.h $(HACK_H) ../include/dlb.h \
@@ -707,11 +709,11 @@ qt_clust.o: ../win/Qt/qt_clust.cpp ../include/qt_clust.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt/qt_clust.cpp
 qttableview.o: ../win/Qt/qttableview.cpp ../include/qttableview.h
 	$(CXX) $(CXXFLAGS) -c ../win/Qt/qttableview.cpp
-wc_chainin.o:	../win/chain/wc_chainin.c $(HACK_H)
+wc_chainin.o: ../win/chain/wc_chainin.c $(HACK_H)
 	$(CC) $(CFLAGS) -c ../win/chain/wc_chainin.c
-wc_chainout.o:	../win/chain/wc_chainout.c $(HACK_H)
+wc_chainout.o: ../win/chain/wc_chainout.c $(HACK_H)
 	$(CC) $(CFLAGS) -c ../win/chain/wc_chainout.c
-wc_trace.o:	../win/chain/wc_trace.c $(HACK_H) ../include/func_tab.h
+wc_trace.o: ../win/chain/wc_trace.c $(HACK_H) ../include/func_tab.h
 	$(CC) $(CFLAGS) -c ../win/chain/wc_trace.c
 monstr.o: monstr.c $(CONFIG_H)
 vis_tab.o: vis_tab.c $(CONFIG_H) ../include/vis_tab.h
@@ -745,7 +747,7 @@ engrave.o: engrave.c $(HACK_H) ../include/lev.h
 exper.o: exper.c $(HACK_H)
 explode.o: explode.c $(HACK_H)
 extralev.o: extralev.c $(HACK_H)
-files.o: files.c $(HACK_H) ../include/dlb.h
+files.o: files.c $(HACK_H) ../include/dlb.h #zlib.h
 fountain.o: fountain.c $(HACK_H)
 hack.o: hack.c $(HACK_H)
 hacklib.o: hacklib.c $(HACK_H)
@@ -806,7 +808,7 @@ sp_lev.o: sp_lev.c $(HACK_H) ../include/dlb.h ../include/sp_lev.h
 spell.o: spell.c $(HACK_H)
 steal.o: steal.c $(HACK_H)
 steed.o: steed.c $(HACK_H)
-sys.o:	sys.c $(HACK_H)
+sys.o: sys.c $(HACK_H)
 teleport.o: teleport.c $(HACK_H)
 timeout.o: timeout.c $(HACK_H) ../include/lev.h
 topten.o: topten.c $(HACK_H) ../include/dlb.h ../include/patchlevel.h
