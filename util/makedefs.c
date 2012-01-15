@@ -167,6 +167,8 @@ static char *FDECL(version_string, (char *, const char *));
 static char *FDECL(version_id_string, (char *,const char *));
 static char *FDECL(bannerc_string, (char *,const char *));
 static char *FDECL(xcrypt, (const char *));
+static unsigned long FDECL(read_rumors_file,
+			   (const char *,int *,long *,unsigned long));
 static int FDECL(check_control, (char *));
 static char *FDECL(without_control, (char *));
 static boolean FDECL(d_filter, (char *));
@@ -810,20 +812,21 @@ const char *str;
 
 #define PAD_RUMORS_TO 60
 /* common code for do_rumors().  Return 0 on error. */
-static long
-read_rumors_file(
-    const char *file_ext,
-    int *rumor_count,
-    long *rumor_size,
-    long old_rumor_offset
-){
+static unsigned long
+read_rumors_file(file_ext, rumor_count, rumor_size, old_rumor_offset)
+const char *file_ext;
+int *rumor_count;
+long *rumor_size;
+unsigned long old_rumor_offset;
+{
     char infile[600];
-    long rumor_offset;
+    unsigned long rumor_offset;
+
     Sprintf(infile, DATA_IN_TEMPLATE, RUMOR_FILE);
     Strcat(infile, file_ext);
     if (!(ifp = fopen(infile, RDTMODE))) {
 	perror(infile);
-	return 0;
+	return 0L;
     }
 
     /* copy the rumors */
@@ -839,8 +842,7 @@ read_rumors_file(
 	    *base = '\0';
 	}
 #endif
-		
-		(*rumor_count)++;
+	(*rumor_count)++;
 #if 0
 	/*[if we forced binary output, this would be sufficient]*/
 	*rumor_size += strlen(in_line);	/* includes newline */
@@ -848,7 +850,7 @@ read_rumors_file(
 	(void) fputs(xcrypt(in_line), tfp);
     }
     /* record the current position; next rumors section will start here */
-    rumor_offset = ftell(tfp);
+    rumor_offset = (unsigned long)ftell(tfp);
     Fclose(ifp);		/* all done with rumors.file_ext */
 
     /* the calculated value for *_rumor_count assumes that
@@ -856,8 +858,7 @@ read_rumors_file(
        which use two byte CR+LF, we need to override that value
        [it's much simpler to do so unconditionally, rendering
        the loop's accumulation above obsolete] */
-
-    *rumor_size = rumor_offset - old_rumor_offset;
+    *rumor_size = (long)(rumor_offset - old_rumor_offset);
     return rumor_offset;
 }
 
@@ -868,8 +869,8 @@ do_rumors()
 			"%s%04d,%06ld,%06lx;%04d,%06ld,%06lx;0,0,%06lx\n";
 	char	tempfile[600];
 	int	true_rumor_count, false_rumor_count;
-	long	true_rumor_size, false_rumor_size,
-		true_rumor_offset, false_rumor_offset, eof_offset;
+	long	true_rumor_size, false_rumor_size;
+	unsigned long true_rumor_offset, false_rumor_offset, eof_offset;
 
 	Sprintf(tempfile, DATA_TEMPLATE, "rumors.tmp");
 	filename[0]='\0';
@@ -899,14 +900,12 @@ do_rumors()
 	/* record the current position; true rumors will start here */
 	true_rumor_offset = ftell(tfp);
 
-	false_rumor_offset = read_rumors_file(
-		".tru", &true_rumor_count,
-		&true_rumor_size, true_rumor_offset);
+	false_rumor_offset = read_rumors_file(".tru", &true_rumor_count,
+					  &true_rumor_size, true_rumor_offset);
 	if(!false_rumor_offset) goto rumors_failure;
 
-	eof_offset = read_rumors_file(
-		".fal", &false_rumor_count,
-		&false_rumor_size, false_rumor_offset);
+	eof_offset = read_rumors_file(".fal", &false_rumor_count,
+				      &false_rumor_size, false_rumor_offset);
 	if(!eof_offset) goto rumors_failure;
 
 	/* get ready to transfer the contents of temp file to output file */
@@ -1652,7 +1651,8 @@ do_data()
 	ok = (rewind(ofp) == 0);
 	if (ok) {
 	   Sprintf(in_line, "header rewrite of \"%s\"", filename);
-	   ok = (fprintf(ofp, "%s%08lx\n", Dont_Edit_Data, txt_offset) >= 0);
+	   ok = (fprintf(ofp, "%s%08lx\n", Dont_Edit_Data,
+			 (unsigned long)txt_offset) >= 0);
 	}
 	if (!ok) {
 dead_data:  perror(in_line);	/* report the problem */
@@ -1718,7 +1718,8 @@ do_oracles()
 {
 	char	infile[60], tempfile[60];
 	boolean in_oracle, ok;
-	long	txt_offset, offset, fpos;
+	long	fpos;
+	unsigned long txt_offset, offset;
 	int	oracle_cnt;
 	register int i;
 
@@ -1752,7 +1753,8 @@ do_oracles()
 
 	/* handle special oracle; it must come first */
 	(void) fputs("---\n", tfp);
-	Fprintf(ofp, "%05lx\n", ftell(tfp));  /* start pos of special oracle */
+	offset = (unsigned long)ftell(tfp);
+	Fprintf(ofp, "%05lx\n", offset);  /* start pos of special oracle */
 	for (i = 0; i < SIZE(special_oracle); i++) {
 	    (void) fputs(xcrypt(special_oracle[i]), tfp);
 	    (void) fputc('\n', tfp);
@@ -1761,7 +1763,8 @@ do_oracles()
 
 	oracle_cnt = 1;
 	(void) fputs("---\n", tfp);
-	Fprintf(ofp, "%05lx\n", ftell(tfp));	/* start pos of first oracle */
+	offset = (unsigned long)ftell(tfp);
+	Fprintf(ofp, "%05lx\n", offset);  /* start pos of first oracle */
 	in_oracle = FALSE;
 
 	while (fgets(in_line, sizeof in_line, ifp)) {
@@ -1773,8 +1776,8 @@ do_oracles()
 		in_oracle = FALSE;
 		oracle_cnt++;
 		(void) fputs("---\n", tfp);
-		Fprintf(ofp, "%05lx\n", ftell(tfp));
-		/* start pos of this oracle */
+		offset = (unsigned long)ftell(tfp);
+		Fprintf(ofp, "%05lx\n", offset); /* start pos of this oracle */
 	    } else {
 		in_oracle = TRUE;
 		(void) fputs(xcrypt(in_line), tfp);
@@ -1784,11 +1787,12 @@ do_oracles()
 	if (in_oracle) {	/* need to terminate last oracle */
 	    oracle_cnt++;
 	    (void) fputs("---\n", tfp);
-	    Fprintf(ofp, "%05lx\n", ftell(tfp));	/* eof position */
+	    offset = (unsigned long)ftell(tfp);
+	    Fprintf(ofp, "%05lx\n", offset);  /* eof position */
 	}
 
 	/* record the current position */
-	txt_offset = ftell(ofp);
+	txt_offset = (unsigned long)ftell(ofp);
 	Fclose(ifp);		/* all done with original input file */
 
 	/* reprocess the scratch file; 1st format an error msg, just in case */
@@ -1817,16 +1821,7 @@ do_oracles()
 #endif
 		if (!(ok = (fpos = ftell(ofp)) >= 0)) break;
 		if (!(ok = (fseek(ofp, fpos, SEEK_SET) >= 0))) break;
-	      {
-		/* gcc's format checking issues a warning when using
-		   %lx to read into a signed long, so force unsigned;
-		   casting &offset to unsigned long * works but is iffy */
-		unsigned long uloffset;
-		int itmp = fscanf(ofp, "%5lx", &uloffset);
-
-		offset = (long)uloffset;
-		if (!(ok = (itmp == 1))) break;
-	      }
+		if (!(ok = (fscanf(ofp, "%5lx", &offset) == 1))) break;
 #ifdef MAC
 # ifdef __MWERKS__
 		/*
@@ -1839,8 +1834,8 @@ do_oracles()
 # endif
 #endif
 		if (!(ok = (fseek(ofp, fpos, SEEK_SET) >= 0))) break;
-		if (!(ok = (fprintf(ofp, "%05lx\n", offset + txt_offset) >= 0)))
-		    break;
+		offset += txt_offset;
+		if (!(ok = (fprintf(ofp, "%05lx\n", offset) >= 0))) break;
 	    }
 	}
 	if (!ok) {

@@ -219,7 +219,7 @@ lookat(x, y, buf, monbuf)
 	/* there might be a mimic here posing as an object */
 	mtmp = m_at(x, y);
 	if (mtmp && mtmp->m_ap_type == M_AP_OBJECT &&
-	    mtmp->mappearance == glyphotyp) otmp = 0;
+	    mtmp->mappearance == (unsigned)glyphotyp) otmp = 0;
 	else mtmp = 0;
 
 	if (!otmp || otmp->otyp != glyphotyp) {
@@ -300,7 +300,7 @@ checkfile(inp, pm, user_typed_name, without_asking)
     dlb *fp;
     char buf[BUFSZ], newstr[BUFSZ];
     char *ep, *dbase_str;
-    long txt_offset;
+    unsigned long txt_offset;
     int chk_skip;
     boolean found_in_file = FALSE, skipping_entry = FALSE;
 
@@ -370,7 +370,7 @@ checkfile(inp, pm, user_typed_name, without_asking)
 	    impossible("can't read 'data' file");
 	    (void) dlb_fclose(fp);
 	    return;
-	} else if (sscanf(buf, "%8lx\n", &txt_offset) < 1 || txt_offset <= 0)
+	} else if (sscanf(buf, "%8lx\n", &txt_offset) < 1 || txt_offset == 0L)
 	    goto bad_data_file;
 
 	/* look for the appropriate entry */
@@ -417,7 +417,7 @@ bad_data_file:	impossible("'data' file in wrong format");
 	if (user_typed_name || without_asking || yn("More info?") == 'y') {
 	    winid datawin;
 
-	    if (dlb_fseek(fp, txt_offset + entry_offset, SEEK_SET) < 0) {
+	    if (dlb_fseek(fp, (long)txt_offset + entry_offset, SEEK_SET) < 0) {
 		pline("? Seek error on 'data' file!");
 		(void) dlb_fclose(fp);
 		return;
