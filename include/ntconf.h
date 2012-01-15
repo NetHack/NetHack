@@ -109,6 +109,10 @@ extern void FDECL(interject, (int));
 # endif
 #endif
 
+#define RUNTIME_PORT_ID	/* trigger run-time port identification for
+			 * identification of exe CPU architecture
+			 */
+
 /* The following is needed for prototypes of certain functions */
 #if defined(_MSC_VER)
 #include <process.h>	/* Provides prototypes of exit(), spawn()      */

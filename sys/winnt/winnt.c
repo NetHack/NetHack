@@ -313,6 +313,7 @@ genericptr_t ptr2;
 	}
 }
 
+
 void
 interject(interjection_type)
 int interjection_type;
@@ -320,6 +321,36 @@ int interjection_type;
 	if (interjection_type >= 0 && interjection_type < INTERJECTION_TYPES)
 		msmsg(interjection_buf[interjection_type]);
 }
+
+# ifdef RUNTIME_PORT_ID
+/*
+ * _M_IX86 is Defined for x86 processors. This is not defined for x64 processors.
+ * _M_X64  is Defined for x64 processors.
+ * _M_IA64 is Defined for Itanium Processor Family 64-bit processors.
+ * _WIN64  is Defined for applications for Win64.
+ */
+#  ifndef _M_IX86
+#   ifdef _M_X64
+#    define TARGET_PORT "(x64) "
+#   endif
+#   ifdef _M_IA64
+#    define TARGET_PORT "(IA64) "
+#   endif
+#  endif
+
+#  ifndef TARGET_PORT
+#   define TARGET_PORT "(x86) "
+#  endif
+
+void
+append_port_id(buf)
+char *buf;
+{
+	char *portstr = TARGET_PORT;
+	Sprintf(eos(buf), " %s", portstr);
+}
+# endif /* RUNTIME_PORT_ID */
+
 #endif /* WIN32 */
 
 /*winnt.c*/
