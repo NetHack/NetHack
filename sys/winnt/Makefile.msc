@@ -1,12 +1,11 @@
 # NetHack 3.5	Makefile.msc	$Date$  $Revision$
-#       Copyright (c) NetHack PC Development Team 1993-2010
+#       Copyright (c) NetHack PC Development Team 1993-2012
 #
-#       NetHack 3.5.x Makefile for MS Visual C++
+#       NetHack 3.5.x Makefile for MS Visual Studio Visual C++ compiler
 #  
 #       Win32 Compilers Tested:
-#                              - Microsoft Visual C++ 2005 Express, with the Platform SDK
-#                              - Microsoft 32 bit Visual C++ V4.x
-#                              - Microsoft 32 bit Visual C++ V6.0 SP3, SP4
+#            - Microsoft Visual Studio 2010 Express
+#            - Microsoft Visual Studio 2010 Express, with the Platform SDK
 #
 #   This is used for building two versions of NetHack:
 #   A tty port utilizing the Win32 Console I/O subsystem, Console
@@ -25,10 +24,7 @@
 #       If you have any questions read the sys/winnt/Install.nt file included 
 #       with the distribution.
 #==============================================================================
-# Do not delete the following 3 lines.
-#
-TARGETOS=BOTH
-APPVER=4.0
+# Do not delete the following line.
 !include <win32.mak>
 
 # Graphical interface
@@ -214,11 +210,15 @@ cdebug = -Zi -Od
 !ENDIF
 !ENDIF
 
+cflags2 = $(cflags:-W4=-W3)
+#More verbose below
+#cflags2 = $(cflags) -wd4131
+
 #==========================================
 # Util builds
 #==========================================
 
-cflagsUtil = $(cdebug) $(cflags) $(INCLDIR) \
+cflagsUtil = $(cdebug) $(cflags2) $(INCLDIR) \
 	     $(WINPFLAG) $(DLBFLG)
 lflagsUtil = $(ldebug) $(lflags) $(conlibs)
 
@@ -232,14 +232,14 @@ LIBS= user32.lib winmm.lib $(ZLIB)
 
 !IF ("$(GRAPHICAL)"=="Y")
 
-cflagsGame = $(cdebug) $(cflags) $(guiflags) $(INCLDIR) \
-	     $(WINPFLAG) $(DLBFLG) $(GAMEPDBFILE) $(GAMEMAPFILE)
+cflagsGame = $(cdebug) $(cflags2) $(guiflags) $(INCLDIR) \
+	     $(WINPFLAG) $(DLBFLG) $(GAMEPDBFILE) $(GAMEMAPFILE) /W3
 lflagsGame = $(ldebug) $(lflags) $(guilibs)
 
 !ELSE
 
-cflagsGame = $(cdebug) $(cflags) $(conflags) $(INCLDIR) \
-	     $(WINPFLAG) $(DLBFLG) $(GAMEPDBFILE) $(GAMEMAPFILE)
+cflagsGame = $(cdebug) $(cflags2) $(conflags) $(INCLDIR) \
+	     $(WINPFLAG) $(DLBFLG) $(GAMEPDBFILE) $(GAMEMAPFILE) /W3
 lflagsGame = $(ldebug) $(lflags) $(conlibs)
 
 !ENDIF
@@ -682,17 +682,17 @@ $(U)nhsizes.exe: $(O)nhsizes.o
 	$(link) $(lflagsUtil) -out:$@ $(O)nhsizes.o $(O)panic.o $(O)alloc.o
 
 $(O)nhsizes.o: $(CONFIG_H) nhsizes.c
-	$(CC) $(cflagsUtil) -Fo$@ nhsizes.c
+	@$(CC) $(cflagsUtil) -Fo$@ nhsizes.c
 
 $(U)makedefs.exe:	$(MAKEOBJS)
-	$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(MAKEOBJS)
+	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(MAKEOBJS)
 
 $(O)makedefs.o: $(CONFIG_H)	$(INCL)\monattk.h $(INCL)\monflag.h   $(INCL)\objclass.h \
 		 $(INCL)\monsym.h    $(INCL)\qtext.h	$(INCL)\patchlevel.h \
 		 $(U)makedefs.c
 	@if not exist $(OBJ)\*.* echo creating directory $(OBJ)
 	@if not exist $(OBJ)\*.* mkdir $(OBJ)
-	@$(CC) $(cflagsUtil) -Fo$@ $(U)makedefs.c
+	$(CC) $(cflagsUtil) -Fo$@ $(U)makedefs.c
 
 #
 #  date.h should be remade every time any of the source or include
@@ -1091,7 +1091,13 @@ $(O)til2bm32.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(INCL)\win32api.h
 
 spotless: clean
 ! IF ("$(OBJ)"!="")
-	-rmdir $(OBJ) /s /Q
+	if exist $(OBJ)\* rmdir $(OBJ) /s /Q
+	if exist $(GAMEDIR)\nhdefkey.dll del $(GAMEDIR)\nhdefkey.dll
+	if exist $(GAMEDIR)\nh340key.dll del $(GAMEDIR)\nh340key.dll
+	if exist $(GAMEDIR)\nhraykey.dll del $(GAMEDIR)\nhraykey.dll
+	if exist $(GAMEDIR)\NetHack.exe  del $(GAMEDIR)\NetHack.exe
+	if exist $(GAMEDIR)\NetHack.pdb  del $(GAMEDIR)\NetHack.pdb
+	if exist $(GAMEDIR)\nhdat        del $(GAMEDIR)\nhdat
 ! ENDIF
 	if exist $(INCL)\date.h    del $(INCL)\date.h
 	if exist $(INCL)\onames.h  del $(INCL)\onames.h
@@ -1156,6 +1162,36 @@ clean:
 	if exist $(SRC)\*.lnk      del $(SRC)\*.lnk
 	if exist $(SRC)\*.map      del $(SRC)\*.map
 	if exist $(O)install.tag   del $(O)install.tag
+	if exist $(O)console.res  del $(O)console.res
+	if exist $(O)dgncomp.MAP  del $(O)dgncomp.MAP
+	if exist $(O)dgncomp.PDB  del $(O)dgncomp.PDB
+	if exist $(O)dlb_main.MAP del $(O)dlb_main.MAP
+	if exist $(O)dlb_main.PDB del $(O)dlb_main.PDB
+	if exist $(O)gamedir.tag  del $(O)gamedir.tag
+	if exist $(O)levcomp.MAP  del $(O)levcomp.MAP
+	if exist $(O)levcomp.PDB  del $(O)levcomp.PDB
+	if exist $(O)makedefs.MAP del $(O)makedefs.MAP
+	if exist $(O)makedefs.PDB del $(O)makedefs.PDB
+	if exist $(O)nh340key.def del $(O)nh340key.def
+	if exist $(O)nh340key.exp del $(O)nh340key.exp
+	if exist $(O)nh340key.lib del $(O)nh340key.lib
+	if exist $(O)nh340key.map del $(O)nh340key.map
+	if exist $(O)nh340key.PDB del $(O)nh340key.PDB
+	if exist $(O)nhdefkey.def del $(O)nhdefkey.def
+	if exist $(O)nhdefkey.exp del $(O)nhdefkey.exp
+	if exist $(O)nhdefkey.lib del $(O)nhdefkey.lib
+	if exist $(O)nhdefkey.map del $(O)nhdefkey.map
+	if exist $(O)nhdefkey.PDB del $(O)nhdefkey.PDB
+	if exist $(O)nhraykey.def del $(O)nhraykey.def
+	if exist $(O)nhraykey.exp del $(O)nhraykey.exp
+	if exist $(O)nhraykey.lib del $(O)nhraykey.lib
+	if exist $(O)nhraykey.map del $(O)nhraykey.map
+	if exist $(O)nhraykey.PDB del $(O)nhraykey.PDB
+	if exist $(O)obj.tag      del $(O)obj.tag
+	if exist $(O)sp_lev.tag   del $(O)sp_lev.tag
+	if exist $(O)uudecode.MAP del $(O)uudecode.MAP
+	if exist $(O)uudecode.PDB del $(O)uudecode.PDB
+
 ! IF ("$(WINPFLAG)"!="")
 	if exist $(TILEBMP16)        del $(TILEBMP16)
 	if exist $(TILEBMP32)        del $(TILEBMP32)

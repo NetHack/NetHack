@@ -1,8 +1,9 @@
-         Copyright (c) NetHack Development Team 1990-2010
+         Copyright (c) NetHack Development Team 1990-2012
          NetHack may be freely redistributed.  See license for details.
          ==============================================================
-                 Instructions for compiling and installing
-           NetHack 3.5 on a Windows 200x, XP, or Windows 7 system
+                  Instructions for compiling and installing
+                       NetHack 3.5 on a Windows system
+                 (Windows XP and Windows 2003 or later only)
          ==============================================================
                  Last revision: $Date$
 
@@ -21,7 +22,16 @@ You can build either the TTY version of NetHack or the Windows Graphical
 version.  In either case you can use one of the following build
 environments:
 
-  o A copy of Microsoft Visual C++ Express 2010
+  o A copy of Microsoft Visual Studio 2010 Express
+    The current NetHack code has not been tested with earlier versions 
+    of the compiler.
+    
+    64-bit Note: To build a 64-bit target with the Express edition, you  
+                 will also need to download and install the 
+                 Windows Software Development Kit version 7.1 
+                 Visual Studio 2010 Express does not include a 64 bit 
+                 C compiler by default. 
+                 (http://msdn.microsoft.com/en-us/windowsserver/bb980924.aspx)
 	
     OR
 
@@ -97,14 +107,14 @@ I. Dispelling the Myths:
 
     We have provided a Makefile for each of the following compilers:
 
-        o Microsoft Visual C++ 2010 Express Edition
+        o Microsoft Visual Studio 2010 Express Visual C++ Compiler
         o Borland C 5.5.1
         o MinGW 2.0 (with GCC 3.2)
 
-    The Microsoft Visual C Makefile was created for use with MS NMAKE 
-    which is provided with the Microsoft compiler. The supplied Makefile
-    has not been tested with any other versions of the Microsoft 32-bit
-    compiler.
+    The Microsoft Visual Studio 2010 Express Makefile was created for use 
+    with MS NMAKE which is provided with the Microsoft compiler. 
+    The supplied Makefile may work with earlier versions of the Microsoft
+    compiler, but that has not been tested. 
 
     The Borland C Makefile was created for use with Borland MAKE which
     is provided with the Borland compiler.
@@ -126,10 +136,33 @@ Setting Up
     all the necessary environment variables for the compiler environment
     are set correctly. 
 
-    For Visual Studio 2010 Express Edition, the installation will have
-    placed a command prompt option on the menus that is properly configured
-    for building. These instructions assume that you are using that to start
-    your command prompt window for building.
+    For Visual Studio 2010 Express, the installation should have placed 
+    a command prompt option on the Start menus that is properly configured
+    for building: 
+                 From
+                     Start | All Programs | Microsoft Visual Studio 2010 Express
+                 Select
+                     Visual Studio Command Prompt 2010
+
+
+         64-bit Note: The additional installation of Microsoft Windows SDK V7.1 
+                 will have placed a command prompt option on the Start menus 
+                 that is properly configured for building as well, but
+                 supports the Windows SDK tools. That is what should be 
+                 used if you wish to target an x64 build for example.
+                 From
+                     Start | All Programs | Microsoft Windows SDK v7.1
+                 Select
+                     Windows SDK 7.1 Command Prompt
+
+		 Then, for an x86 (32-bit) target run the following at the 
+                 command prompt:
+			SETENV /x86
+
+		 If you prefer to target an x64 (64-bit) build run the 
+                 following at the command prompt:
+			SETENV /x64
+ 
 
     For the GCC Makefile, add <mingw>\bin to your path, where <mingw> 
     is your MinGW root directory.).
@@ -221,16 +254,48 @@ Setting Up
 
 Compiling
 
-5.  Now that everything is set up, change your current directory to src.
+5.  Now that everything is set up...
 
-    For Microsoft compiler: 
-        nmake install
+    For Visual Studio 2010 Express, as mentioned above, the installation should 
+    have placed a command prompt option on the Start menus that is properly configured
+    for building: 
+        From
+               Start | All Programs | Microsoft Visual Studio 2010 Express
+        Select
+               Visual Studio Command Prompt 2010
+	Change your current directory to the NetHack src directory.
+	Issue this command:
+	        nmake install
+
+        64-bit Note: As previously mentioned, you should start your 
+                     command prompt from the Windows SDK v7.1 menu 
+                     which is properly configured for building using
+                     the Windows SDK tools.
+                     From
+                         Start | All Programs | Microsoft Windows SDK v7.1
+                     Select
+                         Windows SDK 7.1 Command Prompt
+		     Change your current directory to the NetHack src directory.
+
+		     Then, for an x86 (32-bit) target run the following at the 
+                     command prompt:
+			SETENV /x86
+			nmake install
+
+		     If you prefer to target an x64 (64-bit) build run the 
+                     following at the command prompt:
+			SETENV /x64
+			nmake install
 
     For Borland compiler:
-        make /f Makefile.bcc install
+	Change your current directory to the NetHack src directory.
+	Issue this command:
+	        make /f Makefile.bcc install
 
     For GCC:
-        mingw32-make -f Makefile.gcc install
+	Change your current directory to the NetHack src directory.
+	Issue this command:
+        	mingw32-make -f Makefile.gcc install
 
     If you get any errors along the way then something has not been set
     up correctly. The time it takes to compile depends on your
@@ -266,22 +331,22 @@ Notes:
     have to delete dgn_flex.c, dgn_yacc.c, lev_flex.c, and lev_yacc.c
     from the util directory to ensure that they are remade.
 
-2.  The executable produced by the TTY build is a 32-bit, flat-address
-    space, non-overlayed .exe file, which should run on any true Win32
-    environment with console I/O support. 
-
-    The executable built by the graphical built is a 32-bit,
-    flat-address space, non-overlayed .exe file, which should run on any
-    true Win32 graphical environment.
+2.  Depending on the build and compiler and tools used above, the 
+    executable produced by the TTY build is either:
+      - a 32-bit (x86), flat-address space, non-overlayed .exe file, 
+        which should run on any true Win32 environment.
+    or
+      - a 64-bit (x64) .exe file, 
+        which should run on any 64-bit Windows O/S.
 
     To run NetHack, proceed to RUNNING NETHACK.
 
-/--------------------------------\
-| BUILDING USING VISUAL C's IDE  |
-\--------------------------------/
+/-------------------------------------------------\
+| BUILDING USING VISUAL STUDIO 2010 EXPRESS IDE   |
+\-------------------------------------------------/
 
-Only the Win32 native port built on the Windows API, or Graphical
-NetHack, can be built using the Visual C IDE.
+Only the native port built on the Windows API, or Graphical
+NetHack, can be built using the Visual Studo 2010 Express IDE.
 
 I. Dispelling the Myths:
 
@@ -294,15 +359,18 @@ I. Dispelling the Myths:
     as described at the top of this document. If you didn't, you must go
     back and do so before proceeding.
 
-II. To compile your copy of NetHack for Windows on a Windows NT/2000/XP
-    machine using the Visual C IDE:
+II. To compile your copy of NetHack for Windows on a Windows machine 
+    using the Visual Studio 2010 Express IDE:
 
 Setting Up
 
 1.  It almost goes without saying that you should make sure that your
-    tools are set up and running correctly. (For the Microsoft Visual C
-    IDE it should correctly fire up when you choose it in your Start |
-    Programs menus.) 
+    tools are set up and running correctly. (For the Microsoft Visual
+    Studio 2010 ExpressIDE it should correctly fire up when you choose 
+    it:
+        Start | All Programs | Microsoft Visual Studio 2010 Express
+    and select 
+        Visual C++ 2010 Express
 
 2.  Make sure all the NetHack files are in the appropriate directory
     structure.  You should have a main directory with subdirectories
@@ -351,11 +419,15 @@ Setting Up
 3.  Ready your tool.
     Note: It's possible to build a graphical version using the Makefile,
     as explained above. However, the IDE build has full game
-    functionality and is the officially released build.
+    functionality.
 
-    Start the Visual C++ 2010 Express Edition IDE. 
-    In the Visual C++ 2010 Express Edition IDE menus, choose:
-        File | Open | Project/Solution
+    Start the Visual Studio 2010 Express IDE:
+        Start | All Programs | Microsoft Visual Studio 2010 Express
+    and select 
+        Visual C++ 2010 Express
+
+    In the Visual C++ 2010 Express IDE menus, choose:
+        File | Open Project/Solution
      
 
 4.  Set up for the build.
@@ -363,31 +435,39 @@ Setting Up
     In the Visual C dialog box, navigate to the top of
     your NetHack source directory.
 
-    In there, highlight "nethack.sln" for Visual C++ 2010
-    Express Edition and click on Open.
+    In there, highlight "nethack.sln" for Visual C++ 2010 Express Edition 
+    and click on Open.
+
     Once the workspace or solution has been opened, you should see 
     the following list in the Visual C selection left pane:
-      + makedefs
       + dgncomp
       + dgnstuff
       + dlb_main
       + levcomp
       + levstuff
+      + makedefs
       + nethackw
       + recover
       + tile2bmp
       + tilemap
       + uudecode
 
-    For Visual C++ 2010 Express Edition, highlight 'nethackw' and
-    select:
-        Project | Set as Startup Project
+    On the Visual C++ 2010 Express IDE menus, NetHackW should be the startup
+    project in bold, but if it isn't make it so by right-clicking and
+    choosing "set as Startup Project."
 
-    In Visual C++ 2010 Express Edition, you can just choose "Debug" or
-    "Release" right on the menu in the "solutions configuration" box.   
+    In Visual C 2010 Express IDE menus right-click on 
+    "Solution NetHack (12 Projects)" and select "Configuration Manager."
 
-    The build of NetHackW which does not contain all the 
-    debugging information is smaller, and runs slightly quicker.  
+    Set the "Active Solution Configuration" to either 
+        Debug
+    or
+        Release
+    and click the "Close" button.
+
+
+    The Release build of NetHackW which does not contain all the 
+    debugging information and is smaller, and runs slightly quicker.  
     The Debug build of NetHackW will spend time writing debug information 
     to the disk as the game is played. Unless you are debugging or 
     enhancing NetHack for Windows, you probably will want to choose the 
@@ -397,15 +477,17 @@ Building
     
 5.  Start your build.
 
-    In the Visual C++ 2010 Express Edition menus once again, highlight 
-    NetHackW, right-click and choose:
-        Build
-    This starts the build.  It is likely that the IDE message window 
+    On the Visual C++ Express IDE menus once again, choose:
+        Debug | Build Solution
+    or press <F7> to accomplish the same thing.
+
+    That starts the build.  It is likely that the IDE message window 
     where you are doing the compiling will be occupied for a while.
 
 6.  If all has gone well to this point, you should now have a NetHack
     executable called NetHackW.exe in the "binary" directory, along with
     all the support files that it needs.
+ 
  
 
 /-----------------\
