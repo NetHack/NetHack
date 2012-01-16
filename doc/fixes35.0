@@ -431,6 +431,7 @@ platforms that support hangup: SAFERHANGUP to avoid losing objects in transit
 X11: support dynamic switching of map mode via tiled_map option
 X11: added support for hilite_pet to text map mode
 tty: various bugfixes for very wide and/or tall screens
+build-from-source: dlb utility can handle arbitrary number of files
 
 
 General New Features

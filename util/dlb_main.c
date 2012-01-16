@@ -1,5 +1,4 @@
 /* NetHack 3.5	dlb_main.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)dlb_main.c 3.5	2007/10/27	*/
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -14,6 +13,7 @@
 #include <string.h>
 #endif
 
+static void FDECL(grow_ld, (libdir **,int *,int));
 static void FDECL(xexit, (int));
 
 #ifdef DLB
@@ -49,7 +49,7 @@ static char origdir[255]="";
 #define O_BINARY 0
 #endif
 
-#define MAX_DLB_FILES 200	/* max # of files we'll handle */
+#define DLB_FILES_ALLOC 200	/* initial # of files we'll handle; can grow */
 #define DLB_VERS 1		/* version of dlb file we will write */
 
 /*
@@ -331,7 +331,8 @@ main(argc, argv)
 
     case 'c':			/* create archive */
 	{
-	libdir ld[MAX_DLB_FILES];
+	libdir *ld = 0;
+	int ldlimit = 0;
 	char buf[BUFSIZ];
 	int fd, out, nfiles = 0;
 	long dir_size, slen, flen, fsiz;
@@ -342,14 +343,13 @@ main(argc, argv)
 	 * list.  This does not do any duplicate checking
 	 */
 
+	grow_ld(&ld, &ldlimit, DLB_FILES_ALLOC);
+
 	/* get file name in argv list */
 	if (argv[ap]) {
 	    for ( ; ap < argc; ap++, nfiles++) {
-		if (nfiles >= MAX_DLB_FILES) {
-		    printf("Too many dlb files!  Stopping at %d.\n",
-								MAX_DLB_FILES);
-		    break;
-		}
+		if (nfiles == ldlimit)
+		    grow_ld(&ld, &ldlimit, DLB_FILES_ALLOC / 5);
 		ld[nfiles].fname = (char *) alloc(strlen(argv[ap]) + 1);
 		Strcpy(ld[nfiles].fname, argv[ap]);
 	    }
@@ -365,11 +365,8 @@ main(argc, argv)
 
 	    /* get file names, one per line */
 	    for ( ; fgets(buf, sizeof(buf), list); nfiles++) {
-		if (nfiles >= MAX_DLB_FILES) {
-		    printf("Too many dlb files!  Stopping at %d.\n",
-								MAX_DLB_FILES);
-		    break;
-		}
+		if (nfiles == ldlimit)
+		    grow_ld(&ld, &ldlimit, DLB_FILES_ALLOC / 5);
 		*(eos(buf)-1) = '\0';	/* strip newline */
 		ld[nfiles].fname = (char *) alloc(strlen(buf) + 1);
 		Strcpy(ld[nfiles].fname, buf);
@@ -454,6 +451,7 @@ main(argc, argv)
 
 	for (i = 0; i < nfiles; i++)
 	    free((genericptr_t) ld[i].fname),  ld[i].fname = 0;
+	free((genericptr_t)ld),  ldlimit = 0;
 
 	(void) close(out);
 	xexit(EXIT_SUCCESS);
@@ -469,6 +467,24 @@ main(argc, argv)
 
 #ifdef DLB
 #ifdef DLBLIB
+
+static void
+grow_ld(ld_p, ldlimit_p, alloc_incr)
+libdir **ld_p;
+int *ldlimit_p;
+int alloc_incr;
+{
+    static libdir zerolibdir;
+    int i = 0, newlimit = *ldlimit_p + alloc_incr;
+    libdir *newld = (libdir *)alloc(newlimit * sizeof *newld);
+
+    if (*ld_p) {
+	for ( ; i < *ldlimit_p; ++i) newld[i] = (*ld_p)[i];
+	free((genericptr_t)*ld_p);
+    }
+    *ld_p = newld,  *ldlimit_p = newlimit;
+    for ( ; i < *ldlimit_p; ++i) (*ld_p)[i] = zerolibdir;
+}
 
 static void
 write_dlb_directory(out, nfiles, ld, slen, dir_size, flen)
