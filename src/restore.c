@@ -523,10 +523,10 @@ unsigned int *stuckid, *steedid;	/* STEED */
 #endif
 	struct obj *otmp, *tmp_bc;
 	char timebuf[15];
-	int uid;
+	unsigned long uid;
 
 	mread(fd, (genericptr_t) &uid, sizeof uid);
-	if (uid != getuid()) {		/* strange ... */
+	if (uid != (unsigned long)getuid()) {		/* strange ... */
 	    /* for wizard mode, issue a reminder; for others, treat it
 	       as an attempt to cheat and refuse to restore this file */
 	    pline("Saved game was not yours.");
@@ -701,7 +701,7 @@ STATIC_OVL int
 restlevelfile(fd, ltmp)
 register int fd;
 xchar ltmp;
-#if defined(macintosh) && (defined(__SC__) || defined(__MRC__))
+#if defined(macintosh) && (defined(__SC__) || defined(__MRC__)) && !defined(MFLOPPY)
 # pragma unused(fd)
 #endif
 {
@@ -901,6 +901,7 @@ register int fd;
 	return(1);
 }
 
+/*ARGSUSED*/
 STATIC_OVL void
 rest_levl(fd, rlecomp)
 int fd;

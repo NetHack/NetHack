@@ -891,7 +891,7 @@ long ttl;
 boolean
 expire_gas_cloud(p1, p2)
 genericptr_t p1;
-genericptr_t p2;	/* unused here */
+genericptr_t p2 UNUSED;
 {
     NhRegion *reg;
     int damage;

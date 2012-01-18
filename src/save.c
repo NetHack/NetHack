@@ -302,11 +302,12 @@ STATIC_OVL void
 savegamestate(fd, mode)
 register int fd, mode;
 {
-	int uid;
+	unsigned long uid;
+
 #ifdef MFLOPPY
 	count_only = (mode & COUNT_SAVE);
 #endif
-	uid = getuid();
+	uid = (unsigned long)getuid();
 	bwrite(fd, (genericptr_t) &uid, sizeof uid);
 	bwrite(fd, (genericptr_t) &context, sizeof(struct context_info));
 	bwrite(fd, (genericptr_t) &flags, sizeof(struct flag));
@@ -725,9 +726,9 @@ register unsigned num;
 	{
 /* lint wants the 3rd arg of write to be an int; lint -p an unsigned */
 #if defined(BSD) || defined(ULTRIX) || defined(WIN32) || defined(_MSC_VER)
-	    failed = (write(fd, loc, (int)num) != (int)num);
+	    failed = ((long)write(fd, loc, (int)num) != (long)num);
 #else /* e.g. SYSV, __TURBOC__ */
-	    failed = (write(fd, loc, num) != num);
+	    failed = ((long)write(fd, loc, num) != (long)num);
 #endif
 	}
 
@@ -1190,33 +1191,31 @@ int fd;
 
 STATIC_OVL void
 save_msghistory(fd, mode)
-register int fd, mode;
+int fd, mode;
 {
-	char *msg, buf[BUFSZ];
-	int msgcount = 0, msglen = 0;
+	char *msg;
+	int msgcount = 0, msglen;
 	int minusone = -1;
 	boolean init = TRUE;
 
-	/* Ask window port for each message in sequence */
-	while ((msg = getmsghistory(init)) != 0) {
+	if (perform_bwrite(mode)) {
+	    /* ask window port for each message in sequence */
+	    while ((msg = getmsghistory(init)) != 0) {
 		init = FALSE;
 		msglen = strlen(msg);
-		if (msglen < (BUFSZ-1))
-			Strcpy(buf, msg);
-		else {
-			/* impossible */
-			(void)strncpy(buf, msg, (BUFSZ - 1));
-			buf[BUFSZ-1] = '\0';
-			msglen = strlen(buf);
-		}
+		/* sanity: truncate if necessary (shouldn't happen);
+		   no need to modify msg[] since terminator isn't written */
+		if (msglen > BUFSZ - 1) msglen = BUFSZ - 1;
 		bwrite(fd, (genericptr_t)&msglen, sizeof(msglen));
 		bwrite(fd, (genericptr_t)msg, msglen);
 		++msgcount;
+	    }
+	    bwrite(fd, (genericptr_t) &minusone, sizeof(int));
 	}
-	bwrite(fd, (genericptr_t) &minusone, sizeof(int));
 #ifdef DEBUG_MSGCOUNT
 	pline("Stored %d messages into savefile.", msgcount);
 #endif
+	/* note: we don't attempt to handle release_data() here */
 }
 
 void
