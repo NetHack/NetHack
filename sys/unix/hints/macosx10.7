@@ -52,8 +52,7 @@ GAMEGRP  = games
 # build to run in the source tree - primarily for development.  Build with "make all"
 #WANT_SOURCE_INSTALL=1
 
-#CC=gcc -W -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wcast-qual -Wwrite-strings -DGCC_WARN
-CC=gcc -Wall -Wextra -Wno-missing-field-initializers -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings -DGCC_WARN -ansi -pedantic
+CC=gcc
 
 # At the moment this is just for debugging, but in the future it could be
 # useful for other things.  Requires SYSCF and an ANSI compiler.
@@ -63,9 +62,15 @@ CC=gcc -Wall -Wextra -Wno-missing-field-initializers -Wimplicit -Wreturn-type -W
 # You shouldn't need to change anything below here.
 #
 
+#CFLAGS+=-W -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wcast-qual -Wwrite-strings -DGCC_WARN
+CFLAGS+=-Wall -Wextra -Wno-missing-field-initializers -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings -DGCC_WARN -ansi -pedantic
+# As of LLVM build 2336.1.00, this gives dozens of spurious messages, so
+# leave it out by default.
+#CFLAGS+=-Wunreachable-code
+
 # XXX -g vs -O should go here, -I../include goes in the makefile
-CFLAGS=-g -I../include
-# older binaries use NOCLIPPING, but that disable SIGWINCH
+CFLAGS+=-g -I../include
+# older binaries use NOCLIPPING, but that disables SIGWINCH
 #CFLAGS+=-DNOCLIPPING
 CFLAGS+= -DNOMAIL -DNOTPARMDECL -DHACKDIR=\"$(HACKDIR)\"
 CFLAGS+= -DDEFAULT_WINDOW_SYS=\"$(WANT_DEFAULT)\" -DDLB
