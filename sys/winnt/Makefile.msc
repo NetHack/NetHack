@@ -1249,11 +1249,15 @@ $(O)panic.o:  $(U)panic.c $(CONFIG_H)
 #   * ../include changed to $(INCL)
 #   * slashes changed to back-slashes 
 #   * -c (which is included in CFLAGS) substituted with -Fo$@
+#   * $(CFLAGS) replaced with $(cFlagsUtil)
+#   * $(CC) replaced with @$(CC)
 #   * targets prefixed with $(O)
+#   * the single win32api.h reference uncommented
 # but otherwise untouched.
 # That means that there is some irrelevant stuff
 # in here, but maintenance should be easier.
 #
+
 $(O)tos.o: ..\sys\atari\tos.c $(HACK_H) $(INCL)\tcap.h
 	@$(CC) $(cflagsUtil) -Fo$@ ..\sys\atari\tos.c
 $(O)pcmain.o: ..\sys\share\pcmain.c $(HACK_H) $(INCL)\dlb.h \
@@ -1285,8 +1289,7 @@ $(O)termcap.o: ..\win\tty\termcap.c $(HACK_H) $(INCL)\tcap.h
 	@$(CC) $(cflagsUtil) -Fo$@ ..\win\tty\termcap.c
 $(O)topl.o: ..\win\tty\topl.c $(HACK_H) $(INCL)\tcap.h
 	@$(CC) $(cflagsUtil) -Fo$@ ..\win\tty\topl.c
-$(O)wintty.o: ..\win\tty\wintty.c $(HACK_H) $(INCL)\dlb.h \
-		$(INCL)\date.h $(INCL)\patchlevel.h $(INCL)\tcap.h
+$(O)wintty.o: ..\win\tty\wintty.c $(HACK_H) $(INCL)\dlb.h $(INCL)\tcap.h
 	@$(CC) $(cflagsUtil) -Fo$@ ..\win\tty\wintty.c
 $(O)Window.o: ..\win\X11\Window.c $(INCL)\xwindowp.h $(INCL)\xwindow.h \
 		$(CONFIG_H)
@@ -1294,8 +1297,7 @@ $(O)Window.o: ..\win\X11\Window.c $(INCL)\xwindowp.h $(INCL)\xwindow.h \
 $(O)dialogs.o: ..\win\X11\dialogs.c $(CONFIG_H)
 	@$(CC) $(cflagsUtil) -Fo$@ ..\win\X11\dialogs.c
 $(O)winX.o: ..\win\X11\winX.c $(HACK_H) $(INCL)\winX.h $(INCL)\dlb.h \
-		$(INCL)\patchlevel.h ..\win\X11\nh72icon \
-		..\win\X11\nh56icon ..\win\X11\nh32icon
+		..\win\X11\nh72icon ..\win\X11\nh56icon ..\win\X11\nh32icon
 	@$(CC) $(cflagsUtil) -Fo$@ ..\win\X11\winX.c
 $(O)winmap.o: ..\win\X11\winmap.c $(INCL)\xwindow.h $(HACK_H) $(INCL)\dlb.h \
 		$(INCL)\winX.h $(INCL)\tile2x11.h
@@ -1313,12 +1315,13 @@ $(O)wintext.o: ..\win\X11\wintext.c $(HACK_H) $(INCL)\winX.h $(INCL)\xwindow.h
 	@$(CC) $(cflagsUtil) -Fo$@ ..\win\X11\wintext.c
 $(O)winval.o: ..\win\X11\winval.c $(HACK_H) $(INCL)\winX.h
 	@$(CC) $(cflagsUtil) -Fo$@ ..\win\X11\winval.c
-$(O)tile.o: $(SRC)\tile.c $(HACK_H)
+$(O)tile.o: tile.c $(HACK_H)
 $(O)gnaskstr.o: ..\win\gnome\gnaskstr.c ..\win\gnome\gnaskstr.h \
 		..\win\gnome\gnmain.h
 	@$(CC) $(cflagsUtil) $(GNOMEINC) -Fo$@ ..\win\gnome\gnaskstr.c
 $(O)gnbind.o: ..\win\gnome\gnbind.c ..\win\gnome\gnbind.h ..\win\gnome\gnmain.h \
-		..\win\gnome\gnaskstr.h ..\win\gnome\gnyesno.h
+		..\win\gnome\gnmenu.h ..\win\gnome\gnaskstr.h \
+		..\win\gnome\gnyesno.h
 	@$(CC) $(cflagsUtil) $(GNOMEINC) -Fo$@ ..\win\gnome\gnbind.c
 $(O)gnglyph.o: ..\win\gnome\gnglyph.c ..\win\gnome\gnglyph.h $(INCL)\tile2x11.h
 	@$(CC) $(cflagsUtil) $(GNOMEINC) -Fo$@ ..\win\gnome\gnglyph.c
@@ -1330,7 +1333,7 @@ $(O)gnmap.o: ..\win\gnome\gnmap.c ..\win\gnome\gnmap.h ..\win\gnome\gnglyph.h \
 		..\win\gnome\gnsignal.h $(HACK_H)
 	@$(CC) $(cflagsUtil) $(GNOMEINC) -Fo$@ ..\win\gnome\gnmap.c
 $(O)gnmenu.o: ..\win\gnome\gnmenu.c ..\win\gnome\gnmenu.h ..\win\gnome\gnmain.h \
-		..\win\gnome\gnbind.h
+		..\win\gnome\gnbind.h $(INCL)\func_tab.h
 	@$(CC) $(cflagsUtil) $(GNOMEINC) -Fo$@ ..\win\gnome\gnmenu.c
 $(O)gnmesg.o: ..\win\gnome\gnmesg.c ..\win\gnome\gnmesg.h ..\win\gnome\gnsignal.h
 	@$(CC) $(cflagsUtil) $(GNOMEINC) -Fo$@ ..\win\gnome\gnmesg.c
@@ -1350,11 +1353,11 @@ $(O)gnstatus.o: ..\win\gnome\gnstatus.c ..\win\gnome\gnstatus.h \
 $(O)gntext.o: ..\win\gnome\gntext.c ..\win\gnome\gntext.h ..\win\gnome\gnmain.h \
 		..\win\gnome\gn_rip.h
 	@$(CC) $(cflagsUtil) $(GNOMEINC) -Fo$@ ..\win\gnome\gntext.c
+$(O)gnyesno.o: ..\win\gnome\gnyesno.c ..\win\gnome\gnbind.h ..\win\gnome\gnyesno.h
+	@$(CC) $(cflagsUtil) $(GNOMEINC) -Fo$@ ..\win\gnome\gnyesno.c
 $(O)gnworn.o: ..\win\gnome\gnworn.c ..\win\gnome\gnworn.h ..\win\gnome\gnglyph.h \
 		..\win\gnome\gnsignal.h ..\win\gnome\gnomeprv.h
 	@$(CC) $(cflagsUtil) $(GNOMEINC) -Fo$@ ..\win\gnome\gnworn.c
-$(O)gnyesno.o: ..\win\gnome\gnyesno.c ..\win\gnome\gnbind.h ..\win\gnome\gnyesno.h
-	@$(CC) $(cflagsUtil) $(GNOMEINC) -Fo$@ ..\win\gnome\gnyesno.c
 $(O)wingem.o: ..\win\gem\wingem.c $(HACK_H) $(INCL)\func_tab.h $(INCL)\dlb.h \
 		$(INCL)\patchlevel.h $(INCL)\wingem.h
 	@$(CC) $(cflagsUtil) -Fo$@ ..\win\gem\wingem.c
@@ -1375,6 +1378,12 @@ $(O)qt_clust.o: ..\win\Qt\qt_clust.cpp $(INCL)\qt_clust.h
 	$(CXX) $(CXXFLAGS) -Fo$@ ..\win\Qt\qt_clust.cpp
 $(O)qttableview.o: ..\win\Qt\qttableview.cpp $(INCL)\qttableview.h
 	$(CXX) $(CXXFLAGS) -Fo$@ ..\win\Qt\qttableview.cpp
+$(O)wc_chainin.o: ..\win\chain\wc_chainin.c $(HACK_H)
+	@$(CC) $(cflagsUtil) -Fo$@ ..\win\chain\wc_chainin.c
+$(O)wc_chainout.o: ..\win\chain\wc_chainout.c $(HACK_H)
+	@$(CC) $(cflagsUtil) -Fo$@ ..\win\chain\wc_chainout.c
+$(O)wc_trace.o: ..\win\chain\wc_trace.c $(HACK_H) $(INCL)\func_tab.h
+	@$(CC) $(cflagsUtil) -Fo$@ ..\win\chain\wc_trace.c
 $(O)monstr.o: monstr.c $(CONFIG_H)
 $(O)vis_tab.o: vis_tab.c $(CONFIG_H) $(INCL)\vis_tab.h
 $(O)allmain.o: allmain.c $(HACK_H)
@@ -1407,7 +1416,7 @@ $(O)engrave.o: engrave.c $(HACK_H) $(INCL)\lev.h
 $(O)exper.o: exper.c $(HACK_H)
 $(O)explode.o: explode.c $(HACK_H)
 $(O)extralev.o: extralev.c $(HACK_H)
-$(O)files.o: files.c $(HACK_H) $(INCL)\dlb.h
+$(O)files.o: files.c $(HACK_H) $(INCL)\dlb.h #zlib.h
 $(O)fountain.o: fountain.c $(HACK_H)
 $(O)hack.o: hack.c $(HACK_H)
 $(O)hacklib.o: hacklib.c $(HACK_H)
@@ -1477,7 +1486,8 @@ $(O)trap.o: trap.c $(HACK_H)
 $(O)u_init.o: u_init.c $(HACK_H)
 $(O)uhitm.o: uhitm.c $(HACK_H)
 $(O)vault.o: vault.c $(HACK_H)
-$(O)version.o: version.c $(HACK_H) $(INCL)\date.h $(INCL)\patchlevel.h
+$(O)version.o: version.c $(HACK_H) $(INCL)\dlb.h $(INCL)\date.h \
+		$(INCL)\patchlevel.h
 $(O)vision.o: vision.c $(HACK_H) $(INCL)\vis_tab.h
 $(O)weapon.o: weapon.c $(HACK_H)
 $(O)were.o: were.c $(HACK_H)
@@ -1490,3 +1500,4 @@ $(O)write.o: write.c $(HACK_H)
 $(O)zap.o: zap.c $(HACK_H)
 
 # end of file
+
