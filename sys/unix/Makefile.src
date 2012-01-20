@@ -365,10 +365,10 @@ CSOURCES = $(HACKCSRC) $(SYSCSRC) $(WINCSRC) $(CHAINSRC) $(GENCSRC)
 # cause dependency loops if run through "make depend"
 # and dgn_comp.h, dgn_file.h, lev_comp.h, special level & dungeon files.
 #
-HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h color.h \
-	config.h config1.h context.h coord.h decl.h def_os2.h display.h dlb.h \
-	dungeon.h engrave.h extern.h flag.h func_tab.h global.h hack.h lev.h \
-	macconf.h mextra.h mfndpos.h micro.h mkroom.h \
+HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h botl.h \
+	color.h config.h config1.h context.h coord.h decl.h def_os2.h \
+	display.h dlb.h dungeon.h engrave.h extern.h flag.h func_tab.h \
+	global.h hack.h lev.h macconf.h mextra.h mfndpos.h micro.h mkroom.h \
 	monattk.h mondata.h monflag.h monst.h monsym.h obj.h objclass.h \
 	os2conf.h patchlevel.h pcconf.h permonst.h prop.h rect.h region.h rm.h \
 	sp_lev.h spell.h sys.h system.h tcap.h timeout.h tosconf.h tradstdc.h \
@@ -589,8 +589,8 @@ $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/align.h \
 #
 tos.o: ../sys/atari/tos.c $(HACK_H) ../include/tcap.h
 	$(CC) $(CFLAGS) -c ../sys/atari/tos.c
-pcmain.o: ../sys/share/pcmain.c $(HACK_H) ../include/dlb.h ../include/date.h \
-		../include/patchlevel.h #../include/win32api.h
+pcmain.o: ../sys/share/pcmain.c $(HACK_H) ../include/dlb.h \
+		#../include/win32api.h
 	$(CC) $(CFLAGS) -c ../sys/share/pcmain.c
 pcsys.o: ../sys/share/pcsys.c $(HACK_H)
 	$(CC) $(CFLAGS) -c ../sys/share/pcsys.c
@@ -618,8 +618,7 @@ termcap.o: ../win/tty/termcap.c $(HACK_H) ../include/tcap.h
 	$(CC) $(CFLAGS) -c ../win/tty/termcap.c
 topl.o: ../win/tty/topl.c $(HACK_H) ../include/tcap.h
 	$(CC) $(CFLAGS) -c ../win/tty/topl.c
-wintty.o: ../win/tty/wintty.c $(HACK_H) ../include/dlb.h ../include/date.h \
-		../include/patchlevel.h ../include/tcap.h
+wintty.o: ../win/tty/wintty.c $(HACK_H) ../include/dlb.h ../include/tcap.h
 	$(CC) $(CFLAGS) -c ../win/tty/wintty.c
 Window.o: ../win/X11/Window.c ../include/xwindowp.h ../include/xwindow.h \
 		$(CONFIG_H)
@@ -627,8 +626,7 @@ Window.o: ../win/X11/Window.c ../include/xwindowp.h ../include/xwindow.h \
 dialogs.o: ../win/X11/dialogs.c $(CONFIG_H)
 	$(CC) $(CFLAGS) -c ../win/X11/dialogs.c
 winX.o: ../win/X11/winX.c $(HACK_H) ../include/winX.h ../include/dlb.h \
-		../include/patchlevel.h ../include/date.h ../win/X11/nh72icon \
-		../win/X11/nh56icon ../win/X11/nh32icon
+		../win/X11/nh72icon ../win/X11/nh56icon ../win/X11/nh32icon
 	$(CC) $(CFLAGS) -c ../win/X11/winX.c
 winmap.o: ../win/X11/winmap.c ../include/xwindow.h $(HACK_H) ../include/dlb.h \
 		../include/winX.h ../include/tile2x11.h

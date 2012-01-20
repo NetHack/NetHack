@@ -6,12 +6,6 @@
 
 #include "hack.h"
 #include "dlb.h"
-#include "date.h"
-#ifdef SHORT_FILENAMES
-#include "patchlev.h"
-#else
-#include "patchlevel.h"
-#endif
 
 #ifndef NO_SIGNAL
 #include <signal.h>
@@ -279,13 +273,14 @@ char *argv[];
 		error("Your clock is incorrectly set!");
 #endif
 	if (!dlb_init()) {
-	    pline("%s\n%s\n%s\n%s\n\nNetHack was unable to open the required file \"%s\".%s",
-		COPYRIGHT_BANNER_A, COPYRIGHT_BANNER_B,
-		COPYRIGHT_BANNER_C, COPYRIGHT_BANNER_D, DLBFILE,
+	    pline(
+    "%s\n%s\n%s\n%s\n\nNetHack was unable to open the required file \"%s\".%s",
+		  copyright_banner_line(1), copyright_banner_line(2),
+		  copyright_banner_line(3), copyright_banner_line(4), DLBFILE,
 #ifdef WIN32
-			"\nAre you perhaps trying to run NetHack within a zip utility?");
+	      "\nAre you perhaps trying to run NetHack within a zip utility?");
 #else
-			"");
+		  "");
 #endif
 		error("dlb_init failure.");
 	}

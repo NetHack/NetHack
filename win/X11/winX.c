@@ -49,12 +49,6 @@
 #include "hack.h"
 #include "winX.h"
 #include "dlb.h"
-#ifdef SHORT_FILENAMES
-#include "patchlev.h"
-#else
-#include "patchlevel.h"
-#endif
-#include "date.h"
 
 #ifndef NO_SIGNAL
 #include <signal.h>
@@ -991,16 +985,6 @@ X11_init_nhwindows(argcp,argv)
 int* argcp;
 char** argv;
 {
-    static const char *banner_text[] = {
-	COPYRIGHT_BANNER_A,
-	COPYRIGHT_BANNER_B,
-	COPYRIGHT_BANNER_C,
-	COPYRIGHT_BANNER_D,
-	"",
-	"",
-	0
-    };
-    register const char **pp;
     int i;
     Cardinal num_args;
     Arg args[4];
@@ -1086,8 +1070,10 @@ char** argv;
     x_inited = TRUE;	/* X is now initialized */
 
     /* Display the startup banner in the message window. */
-    for (pp = banner_text; *pp; pp++)
-	X11_putstr(WIN_MESSAGE, 0, *pp);
+    for (i = 1; i <= 4; ++i)
+	X11_putstr(WIN_MESSAGE, 0, copyright_banner_line(1));
+    X11_putstr(WIN_MESSAGE, 0, "");
+    X11_putstr(WIN_MESSAGE, 0, "");
 }
 
 /*

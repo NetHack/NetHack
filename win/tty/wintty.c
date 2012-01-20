@@ -14,15 +14,8 @@
 
 #include "hack.h"
 
-#include "dlb.h"
-#include "date.h"
-#ifdef SHORT_FILENAMES
-#include "patchlev.h"
-#else
-#include "patchlevel.h"
-#endif
-
 #ifdef TTY_GRAPHICS
+#include "dlb.h"
 
 #ifdef MAC
 # define MICRO /* The Mac is a MICRO only for this file, not in general! */
@@ -319,10 +312,10 @@ if(wc_tracelogf)
 /*ARGSUSED*/
 void
 tty_init_nhwindows(argcp,argv)
-int* argcp;
-char** argv;
+int *argcp UNUSED;
+char **argv UNUSED;
 {
-    int wid, hgt;
+  int wid, hgt, i;
 
     /*
      *  Remember tty modes, to be restored on exit.
@@ -370,10 +363,8 @@ char** argv;
     tty_clear_nhwindow(BASE_WINDOW);
 
     tty_putstr(BASE_WINDOW, 0, "");
-    tty_putstr(BASE_WINDOW, 0, COPYRIGHT_BANNER_A);
-    tty_putstr(BASE_WINDOW, 0, COPYRIGHT_BANNER_B);
-    tty_putstr(BASE_WINDOW, 0, COPYRIGHT_BANNER_C);
-    tty_putstr(BASE_WINDOW, 0, COPYRIGHT_BANNER_D);
+    for (i = 1; i <= 4; ++i)
+        tty_putstr(BASE_WINDOW, 0, copyright_banner_line(i));
     tty_putstr(BASE_WINDOW, 0, "");
     tty_display_nhwindow(BASE_WINDOW, FALSE);
 }
@@ -2435,7 +2426,7 @@ tty_start_menu(window)
 void
 tty_add_menu(window, glyph, identifier, ch, gch, attr, str, preselected)
     winid window;	/* window to use, must be of type NHW_MENU */
-    int glyph;		/* glyph to display with item (unused) */
+    int glyph UNUSED;	/* glyph to display with item (not used) */
     const anything *identifier;	/* what to return if selected */
     char ch;		/* keyboard accelerator (0 = pick our own) */
     char gch;		/* group accelerator (0 = no group) */
