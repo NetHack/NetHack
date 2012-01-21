@@ -273,7 +273,6 @@ pick_lock(pick)
 	if(nohands(youmonst.data)) {
 		You_cant("hold %s -- you have no hands!", doname(pick));
 		return PICKLOCK_DID_NOTHING;
-		return(0);
 	} else if (u.uswallow) {
 		You_cant("%sunlock %s.",
 #ifdef TOURIST
