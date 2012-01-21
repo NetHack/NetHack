@@ -1070,10 +1070,8 @@ char** argv;
     x_inited = TRUE;	/* X is now initialized */
 
     /* Display the startup banner in the message window. */
-    for (i = 1; i <= 4; ++i)
-	X11_putstr(WIN_MESSAGE, 0, copyright_banner_line(1));
-    X11_putstr(WIN_MESSAGE, 0, "");
-    X11_putstr(WIN_MESSAGE, 0, "");
+    for (i = 1; i <= 4 + 2; ++i) /* (values beyond 4 yield blank lines) */
+	X11_putstr(WIN_MESSAGE, 0, copyright_banner_line(i));
 }
 
 /*
