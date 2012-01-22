@@ -838,7 +838,7 @@ boolean polyspot;
 /* bias a monster's preferences towards armor that has special benefits. */
 /* currently only does speed boots, but might be expanded if monsters get to
    use more armor abilities */
-static int
+STATIC_OVL int
 extra_pref(mon, obj)
 struct monst *mon;
 struct obj *obj;

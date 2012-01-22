@@ -196,9 +196,9 @@ STATIC_DCL void FDECL(process_text_window, (winid,struct WinDesc *));
 STATIC_DCL tty_menu_item *FDECL(reverse, (tty_menu_item *));
 STATIC_DCL const char * FDECL(compress_str, (const char *));
 STATIC_DCL void FDECL(tty_putsym, (winid, int, int, NHWCHAR_P));
-static char *FDECL(copy_of, (const char *));
+STATIC_DCL char *FDECL(copy_of, (const char *));
 #ifdef UNICODE_WIDEWINPORT
-static nhwchar *FDECL(nhwchar_copy_of, (const nhwchar *));
+STATIC_DCL nhwchar *FDECL(nhwchar_copy_of, (const nhwchar *));
 #endif
 STATIC_DCL void FDECL(bail, (const char *));	/* __attribute__((noreturn)) */
 
@@ -3118,7 +3118,7 @@ char *posbar;
  *
  * This is an exact duplicate of copy_of() in X11/winmenu.c.
  */
-static char *
+STATIC_OVL char *
 copy_of(s)
     const char *s;
 {
@@ -3127,7 +3127,7 @@ copy_of(s)
 }
 
 # ifdef UNICODE_WIDEWINPORT
-static nhwchar *
+STATIC_OVL nhwchar *
 nhwchar_copy_of(s)
     const nhwchar *s;
 {

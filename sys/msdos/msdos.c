@@ -1,6 +1,5 @@
 /* NetHack 3.5	msdos.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)msdos.c	 3.5	 2000/07/30		          */
-/* Copyright (c) NetHack PC Development Team 1990, 1991, 1992, 1993, 1994 */
+/* Copyright (c) NetHack PC Development Team 1990 */
 /* NetHack may be freely redistributed.  See license for details.         */
 
 /*
@@ -50,12 +49,12 @@ void FDECL(get_cursor,(int *, int *));
 
 /* direct bios calls are used only when iflags.BIOS is set */
 
-static char NDECL(DOSgetch);
-static char NDECL(BIOSgetch);
+STATIC_DCL char NDECL(DOSgetch);
+STATIC_DCL char NDECL(BIOSgetch);
 #ifndef __GO32__
-static char * NDECL(getdta);
+STATIC_DCL char * NDECL(getdta);
 #endif
-static unsigned int FDECL(dos_ioctl, (int,int,unsigned));
+STATIC_DCL unsigned int FDECL(dos_ioctl, (int,int,unsigned));
 #ifdef USE_TILES
 extern boolean FDECL(pckeys,(unsigned char, unsigned char));	/* pckeys.c */
 #endif
@@ -240,7 +239,7 @@ static const char numeric_scanmap[] = { 	/* ... */
 #define ALT		0x8
 #endif /* PC9800 */
 
-static char
+STATIC_OVL char
 BIOSgetch()
 {
       unsigned char scan, shift, ch=0;
@@ -300,7 +299,7 @@ BIOSgetch()
       return ch;
 }
 
-static char
+STATIC_OVL char
 DOSgetch()
 {
 	union REGS regs;
@@ -401,7 +400,7 @@ foundfile_buffer()
 
 
 /* Get disk transfer area */
-static char *
+STATIC_OVL char *
 getdta()
 {
 	union REGS regs;
@@ -498,7 +497,7 @@ enable_ctrlP()
 	return;
 }
 
-static unsigned int
+STATIC_OVL unsigned int
 dos_ioctl(handle, mode, setvalue)
 int handle, mode;
 unsigned setvalue;

@@ -1,5 +1,5 @@
 # NetHack 3.5	Makefile.MSC	$Date$  $Revision$
-#	Copyright (c) NetHack PC Development Team 1997 - 2006.
+#	Copyright (c) NetHack PC Development Team 1997 - 2012.
 #	PC NetHack 3.4x Makefile for MSC V1.52c (16 bit compiler)
 #
 #	For questions or comments: nethack-bugs@nethack.org
@@ -67,12 +67,16 @@ LEXYYC = lexyy.c
 # Note that this code did not get a thorough testing prior to 3.4.x
 #NEWALT=/DNEW_ALT
 
+#
+# Uncomment this line if your shell doesn't support FOR bat syntax (DOSBOX).
+NO_FOR=Y
+
 #############################################################################
 #
 # nothing below this line should have to be changed
 #
 
-LNKOPT = SCHEMA3.DEF
+LNKOPT = SCHEMA35.DEF
 
 #
 # Controls whether MOVE tracing is enabled in the executable
@@ -468,7 +472,7 @@ envchk:
 
 $(GAMEFILE) :  $(LNKOPT) $(ALLOBJ)
 	@echo Linking....
-	$(LINK) $(LFLAGS) /SE:1000 /DYNAMIC:2550 /NOE /ST:6000 @<<$(GAME).lnk
+	$(LINK) $(LFLAGS) /SE:1000 /DYNAMIC:2650 /NOE /ST:6000 @<<$(GAME).lnk
 		$(ALLOBJ:^	=+^
 		)
 		$(GAMEFILE)
@@ -934,7 +938,123 @@ nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(DAT)\options \
 	@echo dungeon >>dlb.lst
 	@echo license >>dlb.lst
 	@echo msdoshlp.txt >>dlb.lst
+! IF ("$(NO_FOR)"=="Y")
+	echo AIR.LEV       >>dlb.lst
+	echo ARC-FILA.LEV  >>dlb.lst
+	echo ARC-FILB.LEV  >>dlb.lst
+	echo ARC-GOAL.LEV  >>dlb.lst
+	echo ARC-LOCA.LEV  >>dlb.lst
+	echo ARC-STRT.LEV  >>dlb.lst
+	echo ASMODEUS.LEV  >>dlb.lst
+	echo ASTRAL.LEV    >>dlb.lst
+	echo BAALZ.LEV     >>dlb.lst
+	echo BAR-FILA.LEV  >>dlb.lst
+	echo BAR-FILB.LEV  >>dlb.lst
+	echo BAR-GOAL.LEV  >>dlb.lst
+	echo BAR-LOCA.LEV  >>dlb.lst
+	echo BAR-STRT.LEV  >>dlb.lst
+	echo BIGRM-1.LEV   >>dlb.lst
+	echo BIGRM-2.LEV   >>dlb.lst
+	echo BIGRM-3.LEV   >>dlb.lst
+	echo BIGRM-4.LEV   >>dlb.lst
+	echo BIGRM-5.LEV   >>dlb.lst
+	echo CASTLE.LEV    >>dlb.lst
+	echo CAV-FILA.LEV  >>dlb.lst
+	echo CAV-FILB.LEV  >>dlb.lst
+	echo CAV-GOAL.LEV  >>dlb.lst
+	echo CAV-LOCA.LEV  >>dlb.lst
+	echo CAV-STRT.LEV  >>dlb.lst
+	echo EARTH.LEV     >>dlb.lst
+	echo FAKEWIZ1.LEV  >>dlb.lst
+	echo FAKEWIZ2.LEV  >>dlb.lst
+	echo FIRE.LEV      >>dlb.lst
+	echo HEA-FILA.LEV  >>dlb.lst
+	echo HEA-FILB.LEV  >>dlb.lst
+	echo HEA-GOAL.LEV  >>dlb.lst
+	echo HEA-LOCA.LEV  >>dlb.lst
+	echo HEA-STRT.LEV  >>dlb.lst
+	echo JUIBLEX.LEV   >>dlb.lst
+	echo KNI-FILA.LEV  >>dlb.lst
+	echo KNI-FILB.LEV  >>dlb.lst
+	echo KNI-GOAL.LEV  >>dlb.lst
+	echo KNI-LOCA.LEV  >>dlb.lst
+	echo KNI-STRT.LEV  >>dlb.lst
+	echo KNOX.LEV      >>dlb.lst
+	echo MEDUSA-1.LEV  >>dlb.lst
+	echo MEDUSA-2.LEV  >>dlb.lst
+	echo MINEFILL.LEV  >>dlb.lst
+	echo MINEND-1.LEV  >>dlb.lst
+	echo MINEND-2.LEV  >>dlb.lst
+	echo MINEND-3.LEV  >>dlb.lst
+	echo MINETN-1.LEV  >>dlb.lst
+	echo MINETN-2.LEV  >>dlb.lst
+	echo MINETN-3.LEV  >>dlb.lst
+	echo MINETN-4.LEV  >>dlb.lst
+	echo MINETN-5.LEV  >>dlb.lst
+	echo MINETN-6.LEV  >>dlb.lst
+	echo MINETN-7.LEV  >>dlb.lst
+	echo MON-FILA.LEV  >>dlb.lst
+	echo MON-FILB.LEV  >>dlb.lst
+	echo MON-GOAL.LEV  >>dlb.lst
+	echo MON-LOCA.LEV  >>dlb.lst
+	echo MON-STRT.LEV  >>dlb.lst
+	echo ORACLE.LEV    >>dlb.lst
+	echo ORCUS.LEV     >>dlb.lst
+	echo PRI-FILA.LEV  >>dlb.lst
+	echo PRI-FILB.LEV  >>dlb.lst
+	echo PRI-GOAL.LEV  >>dlb.lst
+	echo PRI-LOCA.LEV  >>dlb.lst
+	echo PRI-STRT.LEV  >>dlb.lst
+	echo RAN-FILA.LEV  >>dlb.lst
+	echo RAN-FILB.LEV  >>dlb.lst
+	echo RAN-GOAL.LEV  >>dlb.lst
+	echo RAN-LOCA.LEV  >>dlb.lst
+	echo RAN-STRT.LEV  >>dlb.lst
+	echo ROG-FILA.LEV  >>dlb.lst
+	echo ROG-FILB.LEV  >>dlb.lst
+	echo ROG-GOAL.LEV  >>dlb.lst
+	echo ROG-LOCA.LEV  >>dlb.lst
+	echo ROG-STRT.LEV  >>dlb.lst
+	echo SAM-FILA.LEV  >>dlb.lst
+	echo SAM-FILB.LEV  >>dlb.lst
+	echo SAM-GOAL.LEV  >>dlb.lst
+	echo SAM-LOCA.LEV  >>dlb.lst
+	echo SAM-STRT.LEV  >>dlb.lst
+	echo SANCTUM.LEV   >>dlb.lst
+	echo SOKO1-1.LEV   >>dlb.lst
+	echo SOKO1-2.LEV   >>dlb.lst
+	echo SOKO2-1.LEV   >>dlb.lst
+	echo SOKO2-2.LEV   >>dlb.lst
+	echo SOKO3-1.LEV   >>dlb.lst
+	echo SOKO3-2.LEV   >>dlb.lst
+	echo SOKO4-1.LEV   >>dlb.lst
+	echo SOKO4-2.LEV   >>dlb.lst
+	echo TOU-FILA.LEV  >>dlb.lst
+	echo TOU-FILB.LEV  >>dlb.lst
+	echo TOU-GOAL.LEV  >>dlb.lst
+	echo TOU-LOCA.LEV  >>dlb.lst
+	echo TOU-STRT.LEV  >>dlb.lst
+	echo TOWER1.LEV    >>dlb.lst
+	echo TOWER2.LEV    >>dlb.lst
+	echo TOWER3.LEV    >>dlb.lst
+	echo VAL-FILA.LEV  >>dlb.lst
+	echo VAL-FILB.LEV  >>dlb.lst
+	echo VAL-GOAL.LEV  >>dlb.lst
+	echo VAL-LOCA.LEV  >>dlb.lst
+	echo VAL-STRT.LEV  >>dlb.lst
+	echo VALLEY.LEV    >>dlb.lst
+	echo WATER.LEV     >>dlb.lst
+	echo WIZ-FILA.LEV  >>dlb.lst
+	echo WIZ-FILB.LEV  >>dlb.lst
+	echo WIZ-GOAL.LEV  >>dlb.lst
+	echo WIZ-LOCA.LEV  >>dlb.lst
+	echo WIZ-STRT.LEV  >>dlb.lst
+	echo WIZARD1.LEV   >>dlb.lst
+	echo WIZARD2.LEV   >>dlb.lst
+	echo WIZARD3.LEV   >>dlb.lst
+! ELSE
 	@for %%N in (*.lev) do echo %%N >>dlb.lst
+! ENDIF
 	$(U)dlb_main cvIf dlb.lst $(SRC)\nhdat
 	@cd $(SRC)
 
