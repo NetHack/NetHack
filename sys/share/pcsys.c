@@ -34,7 +34,7 @@ void FDECL(nethack_exit,(int));
 #else
 #define nethack_exit exit
 #endif
-static void NDECL(msexit);
+STATIC_DCL void NDECL(msexit);
 
 
 #ifdef MOVERLAY
@@ -501,7 +501,7 @@ int code;
 extern boolean run_from_desktop;	/* set in pcmain.c */
 #endif
 
-static void msexit()
+STATIC_OVL void msexit()
 {
 #ifdef CHDIR
 	extern char orgdir[];
