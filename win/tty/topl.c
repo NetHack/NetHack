@@ -627,14 +627,14 @@ boolean init;
  * message history for ^P recall without having displayed it.
  */
 void
-tty_putmsghistory(msg, restoring)
+tty_putmsghistory(msg, restoring_msghist)
 const char *msg;
-boolean restoring;
+boolean restoring_msghist;
 {
     static boolean initd = FALSE;
     int idx;
 
-    if (restoring && !initd) {
+    if (restoring_msghist && !initd) {
 	/* we're restoring history from the previous session, but new
 	   messages have already been issued this session ("Restoring...",
 	   for instance); collect current history (ie, those new messages),
