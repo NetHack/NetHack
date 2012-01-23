@@ -501,7 +501,7 @@ start_screen()	-- Only used on Unix tty ports, but must be declared for
 end_screen()	-- Only used on Unix tty ports, but must be declared for
 		   completeness.  The complement of start_screen().
 
-outrip(winid, int)
+outrip(winid, int, time_t)
 		-- The tombstone code.  If you want the traditional code use
 		   genl_outrip for the value and check the #if in rip.c.
 

@@ -550,6 +550,7 @@ add "about nethack" to '?' menu as an alternate way to view 'v'+'#version'
 display version and build information at startup
 repeatedly setting the fruit option will check to see if fruits have been
     created, so the user can't easily overflow the maximum this way
+bones files now include extra data to identify dead hero and reason for death
 
 
 Platform- and/or Interface-Specific New Features
