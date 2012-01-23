@@ -1,5 +1,4 @@
 /* NetHack 3.5	unixtty.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)unixtty.c	3.5	1990/22/02 */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -217,22 +216,20 @@ const char *s;
 void
 setftty()
 {
-register int ef = 0;			/* desired value of flags & ECHO */
-#ifdef LINT	/* cf = CBRKON(CBRKMASK); const expr to initialize is ok */
-register int cf = 0;
-#else
-register int cf = CBRKON(CBRKMASK);	/* desired value of flags & CBREAK */
-#endif
-register int change = 0;
+	unsigned ef, cf;
+	int change = 0;
+
+	ef = 0;  /* desired value of flags & ECHO */
+	cf = CBRKON(CBRKMASK);	/* desired value of flags & CBREAK */
 	iflags.cbreak = ON;
 	iflags.echo = OFF;
 	/* Should use (ECHO|CRMOD) here instead of ECHO */
-	if((curttyb.echoflgs & ECHO) != ef){
+	if ((unsigned)(curttyb.echoflgs & ECHO) != ef) {
 		curttyb.echoflgs &= ~ECHO;
 /*		curttyb.echoflgs |= ef;					*/
 		change++;
 	}
-	if((curttyb.cbrkflgs & CBRKMASK) != cf){
+	if ((unsigned)(curttyb.cbrkflgs & CBRKMASK) != cf) {
 		curttyb.cbrkflgs &= ~CBRKMASK;
 		curttyb.cbrkflgs |= cf;
 #ifdef USG
