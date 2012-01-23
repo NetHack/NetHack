@@ -425,7 +425,7 @@ static void FDECL(hup_add_menu, (winid,int,const anything *,CHAR_P,CHAR_P,
 static void FDECL(hup_end_menu, (winid,const char *));
 static void FDECL(hup_putstr, (winid,int,const char *));
 static void FDECL(hup_print_glyph, (winid,XCHAR_P,XCHAR_P,int));
-static void FDECL(hup_outrip, (winid,int));
+static void FDECL(hup_outrip, (winid,int,time_t));
 static void FDECL(hup_curs, (winid,int,int));
 static void FDECL(hup_display_nhwindow, (winid,BOOLEAN_P));
 static void FDECL(hup_display_file, (const char *,BOOLEAN_P));
@@ -670,9 +670,10 @@ int glyph UNUSED;
 
 /*ARGSUSED*/
 static void
-hup_outrip(tmpwin, how)
+hup_outrip(tmpwin, how, when)
 winid tmpwin UNUSED;
 int how UNUSED;
+time_t when UNUSED;
 {
     return;
 }

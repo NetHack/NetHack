@@ -69,7 +69,7 @@ struct window_procs {
     void NDECL((*win_start_screen));
     void NDECL((*win_end_screen));
 
-    void FDECL((*win_outrip), (winid,int));
+    void FDECL((*win_outrip), (winid,int,time_t));
     void FDECL((*win_preference_update), (const char *));
     char * FDECL((*win_getmsghistory), (BOOLEAN_P));
     void FDECL((*win_putmsghistory), (const char *,BOOLEAN_P));
@@ -351,7 +351,7 @@ struct chain_procs {
     void FDECL((*win_start_screen), (CARGS));
     void FDECL((*win_end_screen), (CARGS));
 
-    void FDECL((*win_outrip), (CARGS, winid,int));
+    void FDECL((*win_outrip), (CARGS, winid,int,time_t));
     void FDECL((*win_preference_update), (CARGS, const char *));
     char * FDECL((*win_getmsghistory), (CARGS, BOOLEAN_P));
     void FDECL((*win_putmsghistory), (CARGS, const char *,BOOLEAN_P));

@@ -132,7 +132,7 @@ E void NDECL(drag_down);
 E void FDECL(sanitize_name, (char *));
 E void FDECL(drop_upon_death, (struct monst *,struct obj *,int,int));
 E boolean NDECL(can_make_bones);
-E void FDECL(savebones, (struct obj *));
+E void FDECL(savebones, (int,time_t,struct obj *));
 E int NDECL(getbones);
 
 /* ### botl.c ### */
@@ -1947,7 +1947,7 @@ E void FDECL(put_gold_back, (struct monst *));
 
 /* ### rip.c ### */
 
-E void FDECL(genl_outrip, (winid,int));
+E void FDECL(genl_outrip, (winid,int,time_t));
 
 /* ### rnd.c ### */
 
@@ -2270,7 +2270,8 @@ E void NDECL(timer_sanity_check);
 
 /* ### topten.c ### */
 
-E void FDECL(topten, (int));
+E void FDECL(formatkiller, (char *,unsigned,int));
+E void FDECL(topten, (int,time_t));
 E void FDECL(prscore, (int,char **));
 E struct obj *FDECL(tt_oname, (struct obj *));
 

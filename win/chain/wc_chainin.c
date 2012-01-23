@@ -429,11 +429,12 @@ chainin_end_screen()
 }
 
 void
-chainin_outrip(tmpwin, how)
+chainin_outrip(tmpwin, how, when)
     winid tmpwin;
     int how;
+    time_t when;
 {
-	(*cibase->nprocs->win_outrip)(cibase->ndata, tmpwin, how);
+  (*cibase->nprocs->win_outrip)(cibase->ndata, tmpwin, how, when);
 }
 
 void

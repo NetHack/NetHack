@@ -39,6 +39,7 @@ STATIC_DCL void FDECL(restlevelstate, (unsigned int, unsigned int));
 STATIC_DCL int FDECL(restlevelfile, (int,XCHAR_P));
 STATIC_OVL void FDECL(restore_msghistory, (int));
 STATIC_DCL void FDECL(reset_oattached_mids, (BOOLEAN_P));
+STATIC_DCL void FDECL(restcemetery, (int));
 STATIC_DCL void FDECL(rest_levl, (int,BOOLEAN_P));
 
 static struct restore_procs {
@@ -901,6 +902,27 @@ register int fd;
 	return(1);
 }
 
+STATIC_OVL void
+restcemetery(fd)
+int fd;
+{
+    struct cemetery *bonesinfo, **bonesaddr;
+    int flag;
+
+    mread(fd, (genericptr_t)&flag, sizeof flag);
+    if (flag == 0) {
+	bonesaddr = &level.bonesinfo;
+	do {
+	    bonesinfo = (struct cemetery *)alloc(sizeof *bonesinfo);
+	    mread(fd, (genericptr_t)bonesinfo, sizeof *bonesinfo);
+	    *bonesaddr = bonesinfo;
+	    bonesaddr = &(*bonesaddr)->next;
+	} while (*bonesaddr);
+    } else {
+	level.bonesinfo = 0;
+    }
+}
+
 /*ARGSUSED*/
 STATIC_OVL void
 rest_levl(fd, rlecomp)
@@ -998,6 +1020,7 @@ boolean ghostly;
 #endif
 	    trickery(trickbuf);
 	}
+	restcemetery(fd);
 	rest_levl(fd, (boolean)((sfrestinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
 #ifdef DUNGEON_OVERVIEW
 	mread(fd, (genericptr_t)lastseentyp, sizeof(lastseentyp));

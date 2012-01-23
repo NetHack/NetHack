@@ -541,14 +541,15 @@ chainout_end_screen(vp)
 }
 
 void
-chainout_outrip(vp, tmpwin, how)
+chainout_outrip(vp, tmpwin, how, when)
     void *vp;
     winid tmpwin;
     int how;
+    time_t when;
 {
 	struct chainout_data *tdp = vp;
 
-	(*tdp->nprocs->win_outrip)(tmpwin, how);
+	(*tdp->nprocs->win_outrip)(tmpwin, how, when);
 }
 
 void

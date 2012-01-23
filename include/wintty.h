@@ -226,7 +226,7 @@ E char * NDECL(tty_get_color_string);
 E void NDECL(tty_start_screen);
 E void NDECL(tty_end_screen);
 
-E void FDECL(genl_outrip, (winid,int));
+E void FDECL(genl_outrip, (winid,int,time_t));
 
 E char *FDECL(tty_getmsghistory, (BOOLEAN_P));
 E void FDECL(tty_putmsghistory, (const char *,BOOLEAN_P));

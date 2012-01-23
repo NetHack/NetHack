@@ -82,6 +82,37 @@ NEARDATA const char * const killed_by_prefix[] = {
 
 static winid toptenwin = WIN_ERR;
 
+/* "killed by",&c ["an"] 'killer.name' */
+void
+formatkiller(buf, siz, how)
+char *buf;
+unsigned siz;
+int how;
+{
+    unsigned l;
+    char *kname = killer.name;
+
+    buf[0] = '\0'; /* so strncat() can find the end */
+    switch (killer.format) {
+    default:
+	    impossible("bad killer format? (%d)", killer.format);
+	    /*FALLTHRU*/
+    case NO_KILLER_PREFIX:
+	    break;
+    case KILLED_BY_AN:
+	    kname = an(kname);
+	    /*FALLTHRU*/
+    case KILLED_BY:
+	    (void) strncat(buf, killed_by_prefix[how], siz - 1);
+	    l = strlen(buf);
+	    buf += l, siz -= l;
+	    break;
+    }
+    /* we're writing into buf[0] (after possibly advancing buf) rather than
+       appending, but strncat() appends a terminator and strncpy() doesn't */
+    (void) strncat(buf, kname, siz - 1);
+}
+
 STATIC_OVL void
 topten_print(x)
 const char *x;
@@ -271,8 +302,9 @@ struct toptenentry *tt;
 }
 
 void
-topten(how)
+topten(how, when)
 int how;
+time_t when;
 {
 	int uid = getuid();
 	int rank, rank0 = -1, rank1 = 0;
@@ -339,25 +371,9 @@ int how;
 	copynchars(t0->plgend, genders[flags.female].filecode, ROLESZ);
 	copynchars(t0->plalign, aligns[1 - u.ualign.type].filecode, ROLESZ);
 	copynchars(t0->name, plname, NAMSZ);
-	t0->death[0] = '\0';
-	switch (killer.format) {
-		default: impossible("bad killer format?");
-		case KILLED_BY_AN:
-			Strcat(t0->death, killed_by_prefix[how]);
-			(void) strncat(t0->death, an(killer.name),
-						DTHSZ-strlen(t0->death));
-			break;
-		case KILLED_BY:
-			Strcat(t0->death, killed_by_prefix[how]);
-			(void) strncat(t0->death, killer.name,
-						DTHSZ-strlen(t0->death));
-			break;
-		case NO_KILLER_PREFIX:
-			(void) strncat(t0->death, killer.name, DTHSZ);
-			break;
-	}
+	formatkiller(t0->death, sizeof t0->death, how);
 	t0->birthdate = yyyymmdd(ubirthday);
-	t0->deathdate = yyyymmdd((time_t)0L);
+	t0->deathdate = yyyymmdd(when);
 	t0->tt_next = 0;
 #ifdef UPDATE_RECORD_IN_PLACE
 	t0->fpos = -1L;

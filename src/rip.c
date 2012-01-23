@@ -1,5 +1,4 @@
 /* NetHack 3.5	rip.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)rip.c	3.5	2003/01/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -86,13 +85,15 @@ char *text;
 
 
 void
-genl_outrip(tmpwin, how)
+genl_outrip(tmpwin, how, when)
 winid tmpwin;
 int how;
+time_t when;
 {
 	register char **dp;
 	register char *dpx;
 	char buf[BUFSZ];
+	long year;
 	register int x;
 	int line;
 
@@ -118,20 +119,7 @@ int how;
 	center(GOLD_LINE, buf);
 
 	/* Put together death description */
-	switch (killer.format) {
-		default: impossible("bad killer format?");
-		case KILLED_BY_AN:
-			Strcpy(buf, killed_by_prefix[how]);
-			Strcat(buf, an(killer.name));
-			break;
-		case KILLED_BY:
-			Strcpy(buf, killed_by_prefix[how]);
-			Strcat(buf, killer.name);
-			break;
-		case NO_KILLER_PREFIX:
-			Strcpy(buf, killer.name);
-			break;
-	}
+	formatkiller(buf, sizeof buf, how);
 
 	/* Put death type on stone */
 	for (line=DEATH_LINE, dpx = buf; line<YEAR_LINE; line++) {
@@ -154,7 +142,8 @@ int how;
 	}
 
 	/* Put year on stone */
-	Sprintf(buf, "%4d", getyear());
+	year = yyyymmdd(when) / 10000L;
+	Sprintf(buf, "%4ld", year);
 	center(YEAR_LINE, buf);
 
 	putstr(tmpwin, 0, "");

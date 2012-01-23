@@ -22,6 +22,7 @@ int dotcnt, dotrow;	/* also used in restore */
 #endif
 
 STATIC_DCL void FDECL(savelevchn, (int,int));
+STATIC_DCL void FDECL(savecemetery, (int,int));
 STATIC_DCL void FDECL(savedamage, (int,int));
 STATIC_DCL void FDECL(saveobj, (int,struct obj *));
 STATIC_DCL void FDECL(saveobjchn, (int,struct obj *,int));
@@ -520,6 +521,7 @@ int mode;
 #else
 	bwrite(fd,(genericptr_t) &lev,sizeof(lev));
 #endif
+	savecemetery(fd, mode);
 	savelevl(fd, (boolean)((sfsaveinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
 #ifdef DUNGEON_OVERVIEW
 	bwrite(fd,(genericptr_t) lastseentyp,sizeof(lastseentyp));
@@ -554,6 +556,7 @@ int mode;
 	    fobj = 0;
 	    level.buriedobjlist = 0;
 	    billobjs = 0;
+	    level.bonesinfo = 0;
 	}
 	save_engravings(fd, mode);
 	savedamage(fd, mode);
@@ -916,6 +919,27 @@ register int fd, mode;
 	}
 	if (release_data(mode))
 	    sp_levchn = 0;
+}
+
+STATIC_OVL void
+savecemetery(fd, mode)
+int fd;
+int mode;
+{
+    struct cemetery *thisbones, *nextbones;
+    int flag;
+
+    flag = level.bonesinfo ? 0 : -1;
+    if (perform_bwrite(mode))
+	bwrite(fd, (genericptr_t)&flag, sizeof flag);
+    nextbones = level.bonesinfo;
+    while ((thisbones = nextbones) != 0) {
+	nextbones = thisbones->next;
+	if (perform_bwrite(mode))
+	    bwrite(fd, (genericptr_t)thisbones, sizeof *thisbones);
+	if (release_data(mode))
+	    free((genericptr_t)thisbones);
+    }
 }
 
 STATIC_OVL void

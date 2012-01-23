@@ -273,7 +273,9 @@ can_make_bones()
 
 /* save bones and possessions of a deceased adventurer */
 void
-savebones(corpse)
+savebones(how, when, corpse)
+int how;
+time_t when;
 struct obj *corpse;
 {
 	int fd, x, y;
@@ -281,6 +283,7 @@ struct obj *corpse;
 	struct monst *mtmp;
 	struct permonst *mptr;
 	struct fruit *f;
+	struct cemetery *newbones;
 	char c, *bonesid;
 	char whynot[BUFSZ];
 
@@ -406,6 +409,29 @@ struct obj *corpse;
 	    lastseentyp[x][y] = 0;
 #endif
 	}
+
+	/* Attach bones info to the current level before saving. */
+	newbones = (struct cemetery *)alloc(sizeof *newbones);
+	/* entries are '\0' terminated but have fixed length allocations,
+	   so pre-fill with spaces to initialize any excess room */
+	(void)memset((genericptr_t)newbones, ' ', sizeof *newbones);
+	/* format name+role,&c, death reason, and date+time;
+	   gender and alignment reflect final values rather than what the
+	   character started out as, same as topten and logfile entries */
+	Sprintf(newbones->who, "%s-%.3s-%.3s-%.3s-%.3s",
+		plname, urole.filecode, urace.filecode,
+		genders[flags.female].filecode,
+		aligns[1 - u.ualign.type].filecode);
+	formatkiller(newbones->how, sizeof newbones->how, how);
+	Strcpy(newbones->when, yyyymmddhhmmss(when));
+	/* if current character died on a bones level, the cememtery list
+	   will have multiple entries, most recent (this dead hero) first */
+	newbones->next = level.bonesinfo;
+	level.bonesinfo = newbones;
+	/* flag these bones if they are being created in wizard mode;
+	   they might already be flagged as such, even when we're playing
+	   in normal mode, if this level came from a previous bones file */
+	if (wizard) level.flags.wizard_bones = 1;
 
 	fd = create_bonesfile(&u.uz, &bonesid, whynot);
 	if(fd < 0) {

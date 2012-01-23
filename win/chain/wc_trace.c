@@ -928,17 +928,19 @@ trace_end_screen(vp)
 }
 
 void
-trace_outrip(vp, tmpwin, how)
+trace_outrip(vp, tmpwin, how, when)
     void *vp;
     winid tmpwin;
     int how;
+    time_t when;
 {
 	struct trace_data *tdp = vp;
 
-	fprintf(wc_tracelogf, "%soutrip(%d, %d)\n", INDENT, tmpwin, how);
+	fprintf(wc_tracelogf, "%soutrip(%d, %d, %ld)\n",
+		INDENT, (int)tmpwin, how, (long)when);
 
 	PRE;
-	(*tdp->nprocs->win_outrip)(tdp->ndata, tmpwin, how);
+	(*tdp->nprocs->win_outrip)(tdp->ndata, tmpwin, how, when);
 	POST;
 }
 

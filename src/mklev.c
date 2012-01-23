@@ -572,6 +572,7 @@ clear_level_structures()
 	level.buriedobjlist = (struct obj *)0;
 	level.monlist = (struct monst *)0;
 	level.damagelist = (struct damage *)0;
+	level.bonesinfo = (struct cemetery *)0;
 
 	level.flags.nfountains = 0;
 	level.flags.nsinks = 0;
@@ -593,6 +594,7 @@ clear_level_structures()
 	level.flags.is_maze_lev = 0;
 	level.flags.is_cavernous_lev = 0;
 	level.flags.arboreal = 0;
+	level.flags.wizard_bones = 0;
 
 	nroom = 0;
 	rooms[0].hx = -1;
