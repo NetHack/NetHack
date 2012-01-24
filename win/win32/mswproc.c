@@ -28,7 +28,6 @@
 
 #define LLEN 128
 
-extern const char *killed_by_prefix[];
 extern winid WIN_STATUS;
 
 #ifdef _DEBUG
@@ -1774,16 +1773,17 @@ void mswin_end_screen()
 }
 
 /*
-outrip(winid, int)
+outrip(winid, int, when)
 	    -- The tombstone code.  If you want the traditional code use
 	       genl_outrip for the value and check the #if in rip.c.
 */
 #define STONE_LINE_LEN	16
-void mswin_outrip(winid wid, int how)
+void mswin_outrip(winid wid, int how, time_t when)
 {
 	char buf[BUFSZ];
+	long year;
 
-   	logDebug("mswin_outrip(%d)\n", wid, how);
+   	logDebug("mswin_outrip(%d, %d, %ld)\n", wid, how, (long)when);
     if ((wid >= 0) && (wid < MAXWINDOWS) ) {
 		DestroyWindow(GetNHApp()->windowlist[wid].win);
 		GetNHApp()->windowlist[wid].win = mswin_init_RIP_window();
@@ -1806,26 +1806,14 @@ void mswin_outrip(winid wid, int how)
 	putstr(wid, 0, buf);
 
 	/* Put together death description */
-	switch (killer.format) {
-		default: impossible("bad killer format?");
-		case KILLED_BY_AN:
-			Strcpy(buf, killed_by_prefix[how]);
-			Strcat(buf, an(killer.name));
-			break;
-		case KILLED_BY:
-			Strcpy(buf, killed_by_prefix[how]);
-			Strcat(buf, killer.name);
-			break;
-		case NO_KILLER_PREFIX:
-			Strcpy(buf, killer.name);
-			break;
-	}
+	formatkiller(buf, sizeof buf, how);
 
 	/* Put death type on stone */
 	putstr(wid, 0, buf);
 
 	/* Put year on stone */
-	Sprintf(buf, "%4d", getyear());
+	year = yyyymmdd(when) / 10000L;
+	Sprintf(buf, "%4ld", year);
 	putstr(wid, 0, buf);
 	mswin_finish_rip_text(wid);
 }

@@ -33,7 +33,7 @@ extern void mar_set_tiley(int);
 extern short glyph2tile[MAX_GLYPH];		/* from tile.c */
 extern void mar_display_nhwindow(winid);	/* from wingem1.c */
 
-void Gem_outrip(winid,int);
+void Gem_outrip(winid,int,time_t);
 void Gem_preference_update(const char *);
 /* Interface definition, for windows.c */
 struct window_procs Gem_procs = {
@@ -1063,11 +1063,12 @@ char *posbar;
 /** Gem_outrip **/
 void mar_set_text_to_rip(winid);
 char** rip_line=0;
-extern const char *killed_by_prefix[];
+
 void
-Gem_outrip(w, how)
+Gem_outrip(w, how, when)
 winid w;
 int how;
+time_t when;
 {
 /* Code from X11 windowport */
 #define STONE_LINE_LEN 15    /* # chars that fit on one line */
@@ -1078,6 +1079,8 @@ int how;
 	char buf[BUFSZ];
 	char *dpx;
 	int line;
+	long year;
+
 	if (!rip_line) {
 		int i;
 		rip_line= (char **)malloc((YEAR_LINE+1)*sizeof(char *));
@@ -1096,20 +1099,8 @@ int how;
 		done_money);
 #endif
 	/* Put together death description */
-	switch (killer.format) {
-	default: impossible("bad killer format?");
-	case KILLED_BY_AN:
-		Strcpy(buf, killed_by_prefix[how]);
-		Strcat(buf, an(killer.name));
-		break;
-	case KILLED_BY:
-		Strcpy(buf, killed_by_prefix[how]);
-		Strcat(buf, killer.name);
-		break;
-	case NO_KILLER_PREFIX:
-		Strcpy(buf, killer.name);
-		break;
-	}
+	formatkiller(buf, sizeof buf, how);
+
 	/* Put death type on stone */
 	for (line=DEATH_LINE, dpx = buf; line<YEAR_LINE; line++) {
 		register int i,i0;
@@ -1129,7 +1120,9 @@ int how;
 		} else  dpx= &dpx[i0+1];
 	}
 	/* Put year on stone */
-	Sprintf(rip_line[YEAR_LINE], "%4d", getyear());
+	year = yyyymmdd(when) / 10000L;
+	Sprintf(rip_line[YEAR_LINE], "%4ld", year);
+
 	mar_set_text_to_rip(w);
 	for(line=0;line<13;line++)
 		putstr(w, 0, "");

@@ -73,12 +73,6 @@ STATIC_DCL void FDECL(nsb_mung_line,(char*));
 STATIC_DCL void FDECL(nsb_unmung_line,(char*));
 #endif
 
-/* must fit with end.c; used in rip.c */
-NEARDATA const char * const killed_by_prefix[] = {
-	"killed by ", "choked on ", "poisoned by ", "died of ", "drowned in ",
-	"burned by ", "dissolved in ", "crushed to death by ", "petrified by ",
-	"turned to slime by ", "killed by ", "", "", "", "", ""
-};
 
 static winid toptenwin = WIN_ERR;
 
@@ -89,6 +83,16 @@ char *buf;
 unsigned siz;
 int how;
 {
+    static NEARDATA const char * const killed_by_prefix[] = {
+	/* DIED, CHOKING, POISONING, STARVING, */
+	"killed by ", "choked on ", "poisoned by ", "died of ",
+	/* DROWNING, BURNING, DISSOLVED, CRUSHING, */
+	"drowned in ", "burned by ", "dissolved in ", "crushed to death by ",
+	/* STONING, TURNED_SLIME, GENOCIDED, */
+	"petrified by ", "turned to slime by ", "killed by ",
+	/* PANICKED, TRICKED, QUIT, ESCAPED, ASCENDED */
+	"", "", "", "", ""
+    };
     unsigned l;
     char *kname = killer.name;
 

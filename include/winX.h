@@ -349,7 +349,7 @@ E void FDECL(init_text_buffer,(struct text_buffer*));
 E void FDECL(clear_text_buffer,(struct text_buffer*));
 E void FDECL(free_text_buffer,(struct text_buffer*));
 #ifdef GRAPHIC_TOMBSTONE
-E void FDECL(calculate_rip_text, (int));
+E void FDECL(calculate_rip_text, (int,time_t));
 #endif
 
 
@@ -408,9 +408,9 @@ E void NDECL(X11_start_screen);
 E void NDECL(X11_end_screen);
 
 #ifdef GRAPHIC_TOMBSTONE
-E void FDECL(X11_outrip, (winid,int));
+E void FDECL(X11_outrip, (winid,int,time_t));
 #else
-E void FDECL(genl_outrip, (winid,int));
+E void FDECL(genl_outrip, (winid,int,time_t));
 #endif
 
 E void FDECL(X11_preference_update, (const char *));

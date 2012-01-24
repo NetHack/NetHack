@@ -105,7 +105,7 @@ E char * NDECL(Gem_get_color_string);
 E void NDECL(Gem_start_screen);
 E void NDECL(Gem_end_screen);
 
-E void FDECL(genl_outrip, (winid,int));
+E void FDECL(genl_outrip, (winid,int,time_t));
 
 #undef E
 

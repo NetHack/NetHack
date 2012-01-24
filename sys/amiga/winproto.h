@@ -1,5 +1,4 @@
 /* NetHack 3.5	winproto.h	$Date$  $Revision$ */
-/*	SCCS Id: @(#)winproto.h	3.5	1996/01/15	*/
 /* Copyright (c) Gregg Wonderly, Naperville, Illinois,  1991,1992,1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -140,7 +139,7 @@ void Abort ( long rc );
 #endif
 
 /* amirip.c */
-void FDECL(amii_outrip, ( winid tmpwin, int how ));
+void FDECL(amii_outrip, ( winid tmpwin, int how, time_t when ));
 
 /* winchar.c */
 void SetMazeType(MazeType);

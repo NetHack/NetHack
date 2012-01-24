@@ -453,16 +453,15 @@ static XImage* rip_image=0;
 
 static char rip_line[YEAR_LINE+1][STONE_LINE_LEN+1];
 
-extern const char *killed_by_prefix[];
-
 void
-calculate_rip_text(int how)
+calculate_rip_text(int how, time_t when)
 {
 	/* Follows same algorithm as genl_outrip() */
 
 	char buf[BUFSZ];
 	char *dpx;
 	int line;
+	long year;
 
 	/* Put name on stone */
 	Sprintf(rip_line[NAME_LINE], "%s", plname);
@@ -475,20 +474,7 @@ calculate_rip_text(int how)
 		done_money);
 #endif
 	/* Put together death description */
-	switch (killer.format) {
-		default: impossible("bad killer format?");
-		case KILLED_BY_AN:
-			Strcpy(buf, killed_by_prefix[how]);
-			Strcat(buf, an(killer.name));
-			break;
-		case KILLED_BY:
-			Strcpy(buf, killed_by_prefix[how]);
-			Strcat(buf, killer.name);
-			break;
-		case NO_KILLER_PREFIX:
-			Strcpy(buf, killer.name);
-			break;
-	}
+	formatkiller(buf, sizeof buf, how);
 
 	/* Put death type on stone */
 	for (line=DEATH_LINE, dpx = buf; line<YEAR_LINE; line++) {
@@ -511,7 +497,8 @@ calculate_rip_text(int how)
 	}
 
 	/* Put year on stone */
-	Sprintf(rip_line[YEAR_LINE], "%4d", getyear());
+	year = yyyymmdd(when) / 10000L;
+	Sprintf(rip_line[YEAR_LINE], "%4ld", year);
 }
 
 

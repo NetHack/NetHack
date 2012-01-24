@@ -1,5 +1,4 @@
 // NetHack 3.5	qt_win.h	$Date$  $Revision$
-//	SCCS Id: @(#)qt_win.h	3.5	1999/11/19
 // Copyright (c) Warwick Allison, 1999.
 // NetHack may be freely redistributed.  See license for details.
 //
@@ -256,7 +255,7 @@ public:
 	virtual int SelectMenu(int how, MENU_ITEM_P **menu_list);
 	virtual void ClipAround(int x,int y);
 	virtual void PrintGlyph(int x,int y,int glyph);
-	virtual void UseRIP(int how);
+	virtual void UseRIP(int how, time_t when);
 
 	int nhid;
 };
@@ -621,7 +620,7 @@ public:
 	virtual bool Destroy();
 	virtual void Display(bool block);
 	virtual void PutStr(int attr, const char* text);
-	virtual void UseRIP(int how);
+	virtual void UseRIP(int how, time_t when);
 
 public slots:
 	void Search();
@@ -839,7 +838,7 @@ public:
 	static void qt_start_screen();
 	static void qt_end_screen();
 
-	static void qt_outrip(winid wid, int how);
+	static void qt_outrip(winid wid, int how, time_t when);
 	static int qt_kbhit();
 
 private:

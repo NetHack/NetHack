@@ -1,5 +1,4 @@
 // NetHack 3.5	qt_win.cpp	$Date$  $Revision$
-//	SCCS Id: @(#)qt_win.cpp	3.5	2005/11/19
 // Copyright (c) Warwick Allison, 1999.
 // NetHack may be freely redistributed.  See license for details.
 
@@ -205,7 +204,6 @@ int qt_compact_mode = 0;
 #endif
 extern const char *enc_stat[]; /* from botl.c */
 extern const char *hu_stat[]; /* from eat.c */
-extern const char *killed_by_prefix[];
 extern int total_tiles_used; // from tile.c
 extern short glyph2tile[]; // from tile.c
 }
@@ -1453,7 +1451,7 @@ int NetHackQtWindow::SelectMenu(int how, MENU_ITEM_P **menu_list) { puts("unexpe
 void NetHackQtWindow::ClipAround(int x,int y) { puts("unexpected ClipAround"); }
 void NetHackQtWindow::PrintGlyph(int x,int y,int glyph) { puts("unexpected PrintGlyph"); }
 //void NetHackQtWindow::PrintGlyphCompose(int x,int y,int,int) { puts("unexpected PrintGlyphCompose"); }
-void NetHackQtWindow::UseRIP(int how) { puts("unexpected UseRIP"); }
+void NetHackQtWindow::UseRIP(int how, time_t when) { puts("unexpected UseRIP"); }
 
 
 
@@ -3276,7 +3274,7 @@ bool NetHackQtTextWindow::Destroy()
     return !isVisible();
 }
 
-void NetHackQtTextWindow::UseRIP(int how)
+void NetHackQtTextWindow::UseRIP(int how, time_t when)
 {
 // Code from X11 windowport
 #define STONE_LINE_LEN 16    /* # chars that fit on one line */
@@ -3298,6 +3296,7 @@ static char** rip_line=0;
     char buf[BUFSZ];
     char *dpx;
     int line;
+    long year;
 
     /* Put name on stone */
     Sprintf(rip_line[NAME_LINE], "%s", plname);
@@ -3310,20 +3309,7 @@ static char** rip_line=0;
 #endif
 
     /* Put together death description */
-    switch (killer.format) {
-	default: impossible("bad killer format?");
-	case KILLED_BY_AN:
-	    Strcpy(buf, killed_by_prefix[how]);
-	    Strcat(buf, an(killer.name));
-	    break;
-	case KILLED_BY:
-	    Strcpy(buf, killed_by_prefix[how]);
-	    Strcat(buf, killer.name);
-	    break;
-	case NO_KILLER_PREFIX:
-	    Strcpy(buf, killer.name);
-	    break;
-    }
+    formatkiller(buf, sizeof buf, how);
 
     /* Put death type on stone */
     for (line=DEATH_LINE, dpx = buf; line<YEAR_LINE; line++) {
@@ -3346,7 +3332,8 @@ static char** rip_line=0;
     }
 
     /* Put year on stone */
-    Sprintf(rip_line[YEAR_LINE], "%4d", getyear());
+    year = yyyymmdd(when) / 10000L;
+    Sprintf(rip_line[YEAR_LINE], "%4ld", year);
 
     rip.setLines(rip_line,YEAR_LINE+1);
 
@@ -5156,11 +5143,11 @@ void NetHackQtBind::qt_end_screen()
     // Ignore.
 }
 
-void NetHackQtBind::qt_outrip(winid wid, int how)
+void NetHackQtBind::qt_outrip(winid wid, int how, time_t when)
 {
     NetHackQtWindow* window=id_to_window[wid];
 
-    window->UseRIP(how);
+    window->UseRIP(how, when);
 }
 
 bool NetHackQtBind::notify(QObject *receiver, QEvent *event)

@@ -1564,21 +1564,20 @@ void mswin_end_screen()
 }
 
 /*
-outrip(winid, int)
+outrip(winid, int, when)
 	    -- The tombstone code.  If you want the traditional code use
 	       genl_outrip for the value and check the #if in rip.c.
 */
-void mswin_outrip(winid wid, int how)
+void mswin_outrip(winid wid, int how, time_t when)
 {
-   	logDebug("mswin_outrip(%d)\n", wid, how);
+  logDebug("mswin_outrip(%d, %d, %ld)\n", wid, how, (long)when);
     if ((wid >= 0) && (wid < MAXWINDOWS) ) {
 		DestroyWindow(GetNHApp()->windowlist[wid].win);
 		GetNHApp()->windowlist[wid].win = mswin_init_RIP_window();
 		GetNHApp()->windowlist[wid].type = NHW_RIP;
 		GetNHApp()->windowlist[wid].dead = 0;
 	}
-
-	genl_outrip(wid, how);
+    genl_outrip(wid, how, when);
 }
 
 /* handle options updates here */

@@ -283,8 +283,6 @@ static NEARDATA const char *ends[] = {		/* "when you..." */
 
 static boolean Schroedingers_cat = FALSE;
 
-extern const char * const killed_by_prefix[];	/* from topten.c */
-
 /*ARGSUSED*/
 void
 done1(sig_unused)   /* called as signal() handler, so sent at least one arg */
@@ -956,12 +954,9 @@ die:
 			urace.femalenum : urace.malenum;
 		}
 		corpse = mk_named_object(CORPSE, &mons[mnum],
-				       u.ux, u.uy, plname);
-		Sprintf(pbuf, "%s, %s%s", plname,
-			killer.format == NO_KILLER_PREFIX ? "" :
-			killed_by_prefix[how],
-			killer.format == KILLED_BY_AN ? an(killer.name) :
-			killer.name);
+					 u.ux, u.uy, plname);
+		Sprintf(pbuf, "%s, ", plname);
+		formatkiller(eos(pbuf), sizeof pbuf - strlen(pbuf), how);
 		make_grave(u.ux, u.uy, pbuf);
 	}
 	/* if pets will contribute to score, populate mydogs list now

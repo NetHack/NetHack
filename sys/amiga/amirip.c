@@ -1,5 +1,4 @@
 /* NetHack 3.5	amirip.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)amirip.c	3.5	1996/02/04	*/
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland 1991,1992,1993,1995,1996. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -68,7 +67,6 @@ static xoff, yoff;			/* image centering */
 # endif
 #endif /* AZTEC_C */
 
-extern char *killed_by_prefix[];
 static struct Window *ripwin=0;
 static void tomb_text(char*);
 static void dofade(int,int,int);
@@ -101,9 +99,10 @@ int wh; /* was local in outrip, but needed for SCALE macro */
 int cmap_white, cmap_black;
 
 void
-amii_outrip( tmpwin, how )
+amii_outrip( tmpwin, how, when )
 winid tmpwin;
 int how;
+time_t when;
 {
     int just_return = 0;
     int done, rtxth;
@@ -113,6 +112,7 @@ int how;
     char buf[ 200 ];
     int line, tw, ww;
     char *errstr = NULL;
+    long year;
 
     if(!WINVERS_AMIV || HackScreen->RastPort.BitMap->Depth < 4)goto cleanup;
 
@@ -153,21 +153,7 @@ int how;
     BltBitMap(*tbmp, 0, 0, rp->BitMap, xoff, yoff, tomb_bmhd.w, tomb_bmhd.h, 0xc0, 0xff, NULL);
 
     /* Put together death description */
-    switch (killer.format) {
-    default:
-	impossible("bad killer format?");
-    case KILLED_BY_AN:
-	Strcpy(buf, killed_by_prefix[how]);
-	Strcat(buf, an(killer.name));
-	break;
-    case KILLED_BY:
-	Strcpy(buf, killed_by_prefix[how]);
-	Strcat(buf, killer.name);
-	break;
-    case NO_KILLER_PREFIX:
-	Strcpy(buf, killer.name);
-	break;
-    }
+    formatkiller(buf, sizeof buf, how);
 
     tw = TextLength(rp,buf,STONE_LINE_LEN) + 40;
 
@@ -206,21 +192,7 @@ int how;
     tomb_text(buf);
 
     /* Put together death description */
-    switch (killer.format) {
-    default:
-	impossible("bad killer format?");
-    case KILLED_BY_AN:
-	Strcpy(buf, killed_by_prefix[how]);
-	Strcat(buf, an(killer.name));
-	break;
-    case KILLED_BY:
-	Strcpy(buf, killed_by_prefix[how]);
-	Strcat(buf, killer.name);
-	break;
-    case NO_KILLER_PREFIX:
-	Strcpy(buf, killer.name);
-	break;
-    }
+    formatkiller(buf, sizeof buf, how);
 
     /* Put death type on stone */
     for (line=DEATH_LINE, dpx = buf; line<YEAR_LINE; line++)
@@ -255,7 +227,8 @@ int how;
     }
 
     /* Put year on stone */
-    Sprintf(buf, "%4d", getyear());
+    year = yyyymmdd(when) / 10000L;
+    Sprintf(buf, "%4ld", year);
     tomb_text(buf);
 
 #ifdef NH320_DEDICATION
@@ -316,7 +289,7 @@ cleanup:
     if(tbmp[0])FreeImageFiles(load_list, tbmp);
     if(just_return) return;
 	/* fall back to the straight-ASCII version */
-    genl_outrip(tmpwin, how);
+    genl_outrip(tmpwin, how, when);
 }
 
 static void tomb_text(p)

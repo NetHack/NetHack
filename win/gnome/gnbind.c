@@ -1166,16 +1166,16 @@ void gnome_end_screen()
 }
 
 /*
-outrip(winid, int)
+outrip(winid, int, when)
 	    -- The tombstone code.  If you want the traditional code use
 	       genl_outrip for the value and check the #if in rip.c.
 */
-void gnome_outrip(winid wid, int how)
+void gnome_outrip(winid wid, int how, time_t when)
 {
     /* Follows roughly the same algorithm as genl_outrip() */
     char buf[BUFSZ];
     char ripString[BUFSZ]="\0";
-    extern const char *killed_by_prefix[];
+    long year;
     
     /* Put name on stone */
     Sprintf(buf, "%s\n", plname);
@@ -1191,26 +1191,15 @@ void gnome_outrip(winid wid, int how)
     Strcat(ripString, buf);
 
     /* Put together death description */
-    switch (killer.format) {
-	    default: impossible("bad killer format?");
-	    case KILLED_BY_AN:
-		    Strcpy(buf, killed_by_prefix[how]);
-		    Strcat(buf, an(killer.name));
-		    break;
-	    case KILLED_BY:
-		    Strcpy(buf, killed_by_prefix[how]);
-		    Strcat(buf, killer.name);
-		    break;
-	    case NO_KILLER_PREFIX:
-		    Strcpy(buf, killer.name);
-		    break;
-    }
+    formatkiller(buf, sizeof buf, how);
+
     /* Put death type on stone */
     Strcat(ripString, buf);
     Strcat(ripString, "\n");
 
     /* Put year on stone */
-    Sprintf(buf, "%4d\n", getyear());
+    year = yyyymmdd(when) / 10000L;
+    Sprintf(buf, "%4ld\n", year);
     Strcat(ripString, buf);
 
     ghack_text_window_rip_string( ripString);

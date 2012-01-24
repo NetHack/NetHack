@@ -896,9 +896,10 @@ void X11_start_screen() { return; } /* called from setftty() in unixtty.c */
 void X11_end_screen() { return; }   /* called from settty() in unixtty.c */
 
 #ifdef GRAPHIC_TOMBSTONE
-void X11_outrip(window, how)
+void X11_outrip(window, how, when)
     winid window;
     int how;
+    time_t when;
 {
     struct xwindow *wp;
 
@@ -911,7 +912,7 @@ void X11_outrip(window, how)
 	panic("ripout on non-text window (window type [%d])", wp->type);
     }
 
-    calculate_rip_text(how);
+    calculate_rip_text(how, when);
 }
 #endif
 
