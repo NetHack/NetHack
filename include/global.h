@@ -382,7 +382,10 @@ struct savefile_info {
 #endif
 /* The following are meaningless if PANICTRACE is not defined: */
 #if defined(__linux__) && defined(__GLIBC__) && (__GLIBC__ >= 2)
-# define PANICTRACE_GLIBC
+# define PANICTRACE_LIBC
+#endif
+#if defined(MACOSX)
+# define PANICTRACE_LIBC
 #endif
 #ifdef UNIX
 # define PANICTRACE_GDB

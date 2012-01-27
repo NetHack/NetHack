@@ -25,8 +25,8 @@ struct sysopt {
 	char *gdbpath;
 	char *greppath;
 	int  panictrace_gdb;
-# ifdef PANICTRACE_GLIBC
-	int panictrace_glibc;
+# ifdef PANICTRACE_LIBC
+	int panictrace_libc;
 # endif
 #endif
 	int seduce;

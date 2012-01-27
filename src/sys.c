@@ -4,16 +4,25 @@
 
 #include "hack.h"
 
+/* for KR1ED config, WIZARD is 0 or 1 and WIZARD_NAME is a string;
+   for usual config, WIZARD is the string; forcing WIZARD_NAME to match it
+   eliminates conditional testing for which one to use in string ops */
+#ifndef KR1ED
+# undef WIZARD_NAME
+# define WIZARD_NAME WIZARD
+#endif
+
 struct sysopt sysopt;
 
 void
 sys_early_init(){
 	sysopt.support = NULL;
 	sysopt.recover = NULL;
-#ifdef notyet
-	/* replace use of WIZARD vs WIZARD_NAME vs KR1ED, by filling this in */
-#endif
+#ifdef SYSCF
 	sysopt.wizards = NULL;
+#else
+	sysopt.wizards = WIZARD_NAME;
+#endif
 	sysopt.shellers = NULL;
 	sysopt.maxplayers = 0;	/* XXX eventually replace MAX_NR_OF_PLAYERS */
 
@@ -32,17 +41,17 @@ sys_early_init(){
 
 #ifdef PANICTRACE
 		/* panic options */
-	sysopt.gdbpath = NULL;
-	sysopt.greppath = NULL;
+	sysopt.gdbpath = strdup(GDBPATH);
+	sysopt.greppath = strdup(GREPPATH);
 # ifdef BETA
 	sysopt.panictrace_gdb = 1;
-#  ifdef PANICTRACE_GLIBC
-	sysopt.panictrace_glibc = 2;
+#  ifdef PANICTRACE_LIBC
+	sysopt.panictrace_libc = 2;
 #  endif
 # else
 	sysopt.panictrace_gdb = 0;
-#  ifdef PANICTRACE_GLIBC
-	sysopt.panictrace_glibc = 0;
+#  ifdef PANICTRACE_LIBC
+	sysopt.panictrace_libc = 0;
 #  endif
 # endif
 #endif

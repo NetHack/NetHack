@@ -77,13 +77,13 @@ extern void FDECL(nethack_exit,(int));
 
 #ifdef PANICTRACE
 # include <errno.h>
-# ifdef PANICTRACE_GLIBC
+# ifdef PANICTRACE_LIBC
 #  include <execinfo.h>
 # endif
 
 /* What do we try and in what order?  Tradeoffs:
- * glibc: +no external programs required
- *        -requires newish glibc
+ * libc: +no external programs required
+ *        -requires newish libc/glibc
  *        -requires -rdynamic
  * gdb:   +gives more detailed information
  *        +works on more OS versions
@@ -91,17 +91,17 @@ extern void FDECL(nethack_exit,(int));
  */
 # ifdef SYSCF
 #  define SYSOPT_PANICTRACE_GDB sysopt.panictrace_gdb
-#  ifdef PANICTRACE_GLIBC
-#   define SYSOPT_PANICTRACE_GLIBC sysopt.panictrace_glibc
+#  ifdef PANICTRACE_LIBC
+#   define SYSOPT_PANICTRACE_LIBC sysopt.panictrace_libc
 #  else
-#   define SYSOPT_PANICTRACE_GLIBC 0
+#   define SYSOPT_PANICTRACE_LIBC 0
 #  endif
 # else
 #  define SYSOPT_PANICTRACE_GDB (nh_getenv("NETHACK_USE_GDB")==0?0:2)
-#  ifdef PANICTRACE_GLIBC
-#   define SYSOPT_PANICTRACE_GLIBC 1
+#  ifdef PANICTRACE_LIBC
+#   define SYSOPT_PANICTRACE_LIBC 1
 #  else
-#   define SYSOPT_PANICTRACE_GLIBC 0
+#   define SYSOPT_PANICTRACE_LIBC 0
 #  endif
 # endif
 
@@ -109,7 +109,7 @@ static void NDECL(NH_abort);
 # ifndef NO_SIGNAL
 static void FDECL(panictrace_handler, (int));
 # endif
-static boolean NDECL(NH_panictrace_glibc);
+static boolean NDECL(NH_panictrace_libc);
 static boolean NDECL(NH_panictrace_gdb);
 
 # ifndef NO_SIGNAL
@@ -163,19 +163,19 @@ static void
 NH_abort()
 {
 	int gdb_prio = SYSOPT_PANICTRACE_GDB;
-	int glibc_prio = SYSOPT_PANICTRACE_GLIBC;
+	int libc_prio = SYSOPT_PANICTRACE_LIBC;
 	static boolean aborting = FALSE;
 
 	if(aborting) return;
 	aborting = TRUE;
 
 # ifndef VMS
-	if(gdb_prio == glibc_prio && gdb_prio > 0) gdb_prio++;
+	if(gdb_prio == libc_prio && gdb_prio > 0) gdb_prio++;
 
-	if(gdb_prio > glibc_prio){
-		NH_panictrace_gdb() || (glibc_prio && NH_panictrace_glibc());
+	if(gdb_prio > libc_prio){
+		NH_panictrace_gdb() || (libc_prio && NH_panictrace_libc());
 	} else {
-		NH_panictrace_glibc() || (gdb_prio && NH_panictrace_gdb());
+		NH_panictrace_libc() || (gdb_prio && NH_panictrace_gdb());
 	}
 
 # else /* VMS */
@@ -183,7 +183,7 @@ NH_abort()
 	   traceback and exit; 2 = show traceback and stay in debugger */
      /* if (wizard && gdb_prio == 1) gdb_prio = 2; */
 	vms_traceback(gdb_prio);
-	(void)glibc_prio;	/* half-hearted attempt at lint suppression */
+	(void)libc_prio;	/* half-hearted attempt at lint suppression */
 
 # endif /* ?VMS */
 
@@ -194,9 +194,9 @@ NH_abort()
 }
 
 static boolean
-NH_panictrace_glibc()
+NH_panictrace_libc()
 {
-# ifdef PANICTRACE_GLIBC
+# ifdef PANICTRACE_LIBC
 	void *bt[20];
 	size_t count;
 	char **info;
@@ -212,22 +212,22 @@ NH_panictrace_glibc()
 	return TRUE;
 # else
 	return FALSE;
-# endif  /* !PANICTRACE_GLIBC */
+# endif  /* !PANICTRACE_LIBC */
 }
 
+/*
+ *   fooPATH  file system path for foo
+ *   fooVAR   (possibly const) variable containing fooPATH
+ */
 # ifdef PANICTRACE_GDB
 #  ifdef SYSCF
-#   define GDBPATH sysopt.gdbpath
-#   define GREPPATH sysopt.greppath
-#  else
-#   ifndef GDBPATH
-#    define GDBPATH "/usr/bin/gdb"
-#   endif
-#   ifndef GREPPATH
-#    define GREPPATH "/bin/grep"
-#   endif
-#  endif /* !SYSCF */
-# endif  /* PANICTRACE_GDB */
+#   define GDBVAR sysopt.gdbpath
+#   define GREPVAR sysopt.greppath
+#  else /* SYSCF */
+#   define GDBVAR GDBPATH
+#   define GREPVAR GREPPATH
+#  endif /* SYSCF */
+# endif /* PANICTRACE_GDB */
 
 static boolean
 NH_panictrace_gdb()
@@ -235,8 +235,8 @@ NH_panictrace_gdb()
 # ifdef PANICTRACE_GDB
 	/* A (more) generic method to get a stack trace - invoke
 	 * gdb on ourself. */
-	char *gdbpath = GDBPATH;
-	char *greppath = GREPPATH;
+	char *gdbpath = GDBVAR;
+	char *greppath = GREPVAR;
 	char buf[BUFSZ];
 	FILE *gdb;
 

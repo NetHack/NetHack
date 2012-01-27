@@ -742,7 +742,7 @@ E void FDECL(unlock_file, (const char *));
 #ifdef USER_SOUNDS
 E boolean FDECL(can_read_file, (const char *));
 #endif
-E void FDECL(read_config_file, (const char *, int));
+E boolean FDECL(read_config_file, (const char *, int));
 E void FDECL(check_recordfile, (const char *));
 #if defined(WIZARD)
 E void NDECL(read_wizkit);
@@ -2357,6 +2357,9 @@ E void NDECL(port_help);
 E void FDECL(sethanguphandler, (void (*)(int)));
 E boolean NDECL(authorize_wizard_mode);
 E boolean FDECL(check_user_string, (char *));
+# ifdef SYSCF_FILE
+E void NDECL(assure_syscf_file);
+# endif
 #endif /* UNIX */
 
 /* ### unixtty.c ### */
@@ -2383,6 +2386,9 @@ E int NDECL(dosh);
 # endif /* SHELL */
 # if defined(SHELL) || defined(DEF_PAGER) || defined(DEF_MAILREADER)
 E int FDECL(child, (int));
+# endif
+# ifdef PANICTRACE
+E boolean FDECL(file_exists, (const char *));
 # endif
 #endif /* UNIX */
 

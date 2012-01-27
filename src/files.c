@@ -183,7 +183,7 @@ STATIC_DCL void FDECL(docompress_file, (const char *,BOOLEAN_P));
 STATIC_DCL boolean FDECL(make_compressed_name, (const char *, char *));
 #endif
 STATIC_DCL char *FDECL(make_lockname, (const char *,char *));
-STATIC_DCL FILE *FDECL(fopen_config_file, (const char *));
+STATIC_DCL FILE *FDECL(fopen_config_file, (const char *, int));
 STATIC_DCL int FDECL(get_uchars, (FILE *,char *,char *,uchar *,BOOLEAN_P,int,const char *));
 int FDECL(parse_config_line, (FILE *,char *,char *,char *,int));
 #ifdef LOADSYMSETS
@@ -1772,8 +1772,9 @@ const char *backward_compat_configfile = "nethack.cnf";
 #endif
 
 STATIC_OVL FILE *
-fopen_config_file(filename)
+fopen_config_file(filename, src)
 const char *filename;
+int src;
 {
 	FILE *fp;
 #if defined(UNIX) || defined(VMS)
@@ -1781,16 +1782,18 @@ const char *filename;
 	char *envp;
 #endif
 
-	/* "filename" is an environment variable, so it should hang around */
-	/* if set, it is expected to be a full path name (if relevant) */
+	/* If src != SET_IN_SYS, "filename" is an environment variable, so it
+	 * should hang around. If set, it is expected to be a full path name
+	 * (if relevant) */
 	if (filename) {
 #ifdef UNIX
-		if (access(filename, 4) == -1) {
+		if ((src!=SET_IN_SYS) && access(filename, 4) == -1) {
 			/* 4 is R_OK on newer systems */
 			/* nasty sneaky attempt to read file through
 			 * NetHack's setuid permissions -- this is the only
 			 * place a file name may be wholly under the player's
-			 * control
+			 * control (but SYSCF_FILE is not under the player's
+			 * control so it's OK).
 			 */
 			raw_printf("Access to %s denied (%d).",
 					filename, errno);
@@ -2148,16 +2151,16 @@ int		src;
 	    }
 	    sysopt.pointsmin = temp;
 # ifdef PANICTRACE
-#  ifdef PANICTRACE_GLIBC
+#  ifdef PANICTRACE_LIBC
 	} else if (src == SET_IN_SYS &&
-		match_varname(buf, "PANICTRACE_GLIBC", 16)) {
+		match_varname(buf, "PANICTRACE_LIBC", 15)) {
 	    int temp = atoi(bufp);
 	    if (temp < 0 || temp > 2) {
-		raw_printf("Illegal value in PANICTRACE_GLIBC (not 0,1,2).");
+		raw_printf("Illegal value in PANICTRACE_LIBC (not 0,1,2).");
 		return 0;
 	    }
-	    sysopt.panictrace_glibc = temp;
-#  endif /* PANICTRACE_GLIBC */
+	    sysopt.panictrace_libc = temp;
+#  endif /* PANICTRACE_LIBC */
 	} else if (src == SET_IN_SYS &&
 		match_varname(buf, "PANICTRACE_GDB", 14)) {
 	    int temp = atoi(bufp);
@@ -2167,10 +2170,18 @@ int		src;
 	    }
 	    sysopt.panictrace_gdb = temp;
 	} else if ( (src==SET_IN_SYS) && match_varname(buf, "GDBPATH", 7)) {
+	    if(!file_exists(bufp)){
+		raw_printf("File specified in GDBPATH does not exist.");
+		return 0;
+	    }
 	    if(sysopt.gdbpath) free(sysopt.gdbpath);
 	    sysopt.gdbpath = (char*)alloc(strlen(bufp)+1);
 	    Strcpy(sysopt.gdbpath, bufp);
 	} else if ( (src==SET_IN_SYS) && match_varname(buf, "GREPPATH", 7)) {
+	    if(!file_exists(bufp)){
+		raw_printf("File specified in GREPPATH does not exist.");
+		return 0;
+	    }
 	    if(sysopt.greppath) free(sysopt.greppath);
 	    sysopt.greppath = (char*)alloc(strlen(bufp)+1);
 	    Strcpy(sysopt.greppath, bufp);
@@ -2377,7 +2388,7 @@ const char *filename;
 }
 #endif /* USER_SOUNDS */
 
-void
+boolean
 read_config_file(filename, src)
 const char *filename;
 int src;
@@ -2397,8 +2408,9 @@ int src;
 #endif
 	char	buf[4*BUFSZ];
 	FILE	*fp;
+	boolean rv = TRUE;	/* assume successful parse */
 
-	if (!(fp = fopen_config_file(filename))) return;
+	if (!(fp = fopen_config_file(filename, src))) return FALSE;
 
 #if defined(MICRO) || defined(WIN32)
 # ifdef MFLOPPY
@@ -2422,6 +2434,7 @@ OR: Forbid multiline stuff for alternate config sources.
 		if (!parse_config_line(fp, buf, tmp_ramdisk, tmp_levels, src)) {
 			raw_printf("Bad option line:  \"%.50s\"", buf);
 			wait_synch();
+			rv = FALSE;
 		}
 	}
 	(void) fclose(fp);
@@ -2445,7 +2458,7 @@ OR: Forbid multiline stuff for alternate config sources.
 	Strcpy(bones, levels);
 # endif /* MFLOPPY */
 #endif /* MICRO */
-	return;
+	return rv;
 }
 
 #ifdef WIZARD

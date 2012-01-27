@@ -572,7 +572,13 @@ initoptions()
 #ifdef SYSCF
 	/* someday there may be other SYSCF alternatives besides text file */
 # ifdef SYSCF_FILE
-	read_config_file(SYSCF_FILE, SET_IN_SYS);
+		/* If SYSCF_FILE is specified, it _must_ exist... */
+	assure_syscf_file();
+		/* ... and _must_ parse correctly. */
+	if(!read_config_file(SYSCF_FILE, SET_IN_SYS)){
+		raw_printf("Error(s) found in SYSCF_FILE, quitting.");
+		terminate(EXIT_FAILURE);
+	}
 # endif
 #endif
 	initoptions_finish();

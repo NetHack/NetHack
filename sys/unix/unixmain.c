@@ -555,26 +555,15 @@ port_help()
 }
 #endif
 
-/* for KR1ED config, WIZARD is 0 or 1 and WIZARD_NAME is a string;
-   for usual config, WIZARD is the string; forcing WIZARD_NAME to match it
-   eliminates conditional testing for which one to use in string ops */
-#ifndef KR1ED
-# undef WIZARD_NAME
-# define WIZARD_NAME WIZARD
-#endif
-
 /* validate wizard mode if player has requested access to it */
 boolean
 authorize_wizard_mode()
 {
 #ifdef WIZARD
 	struct passwd *pw = get_unix_pw();
-#ifdef SYSCF
 	if (pw && sysopt.wizards && sysopt.wizards[0]) {
 	    if(check_user_string(sysopt.wizards)) return TRUE;
-	} else
-#endif
-	if (pw && !strcmp(pw->pw_name, WIZARD_NAME)) return TRUE;
+	}
 #endif	/* WIZARD */
 	wiz_error_flag = TRUE;	/* not being allowed into wizard mode */
 	return FALSE;
@@ -585,17 +574,12 @@ wd_message()
 {
 	if (wiz_error_flag) {
 #ifdef WIZARD
-# ifdef SYSCF
 	    if (sysopt.wizards && sysopt.wizards[0]) {
 		char *tmp = build_english_list(sysopt.wizards);
 		pline("Only user%s %s may access debug (wizard) mode.",
 			index(sysopt.wizards, ' ')?"s":"", tmp);
 		free(tmp);
 	    } else
-# else
-		pline("Only user \"%s\" may access debug (wizard) mode.",
-		      WIZARD_NAME);
-# endif
 #else
 		pline("Debug mode is not available.");
 #endif
@@ -675,4 +659,21 @@ get_unix_pw()
 	}
 	return pw;
 }
+
+#ifdef SYSCF_FILE
+void
+assure_syscf_file(){
+	/* All we really care about is the end result - can we read the file?
+	 * So just check that directly. */
+	int fd;
+	fd = open(SYSCF_FILE, O_RDONLY);
+	if(fd >= 0){
+		/* readable */
+		close(fd);
+		return;
+	}
+	raw_printf("Unable to open SYSCF_FILE.\n");
+	exit(EXIT_FAILURE);
+}
+#endif
 /*unixmain.c*/

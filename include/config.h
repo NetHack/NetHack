@@ -150,7 +150,8 @@
  *		If SYSCF is defined, the following configuration info is
  *		available in a global config space, with the compiled-in
  *		entries as defaults:
- *		WIZARDS		( a value of * allows anyone to be wizard)
+ *		WIZARDS		(a value of * allows anyone to be wizard)
+ *                              (this does NOT default to compiled-in value)
  *		MAXPLAYERS	(see MAX_NR_OF_PLAYERS above and nethack.sh)
  *		SUPPORT		(how to get local support)(no default)
  *		RECOVER		(how to recover a game at your site)(no default)
@@ -164,6 +165,10 @@
  *
  *		The following options select how the config space is stored:
  *		SYSCF_FILE	in the named file
+ *
+ *              The following options pertain to crash reporting:
+ *              GREPPATH	(the path to the system grep(1) utility)
+ *              GDBPATH		(the path to the system gdb(1) program)
  */
 
 #ifndef WIZARD		/* allow for compile-time or Makefile changes */
@@ -175,6 +180,13 @@
 #  define WIZARD
 #  define WIZARD_NAME "wizard"
 # endif
+#endif
+
+#ifndef GDBPATH
+# define GDBPATH "/usr/bin/gdb"
+#endif
+#ifndef GREPPATH
+# define GREPPATH "/bin/grep"
 #endif
 
 #define LOGFILE "logfile"	/* larger file for debugging purposes */
