@@ -293,7 +293,6 @@ struct obj *corpse;
 	fd = open_bonesfile(&u.uz, &bonesid);
 	if (fd >= 0) {
 		(void) close(fd);
-		compress_bonesfile();
 #ifdef WIZARD
 		if (wizard) {
 		    if (yn("Bones file already exists.  Replace it?") == 'y') {
@@ -302,6 +301,9 @@ struct obj *corpse;
 		    }
 		}
 #endif
+		/* compression can change the file's name, so must
+		   wait until after any attempt to delete this file */
+		compress_bonesfile();
 		return;
 	}
 

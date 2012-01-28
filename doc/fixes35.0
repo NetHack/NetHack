@@ -402,6 +402,8 @@ hangup save made during magic mapping or <foo> detection performed while
 	underwater could put hero on top of the water after restore
 items conferring life drain resistance were affected by drain life spell
 'a'pply command could be used to recogniize undiscovered potions of oil
+fix replacing an existing bones file in wizard mode [load?y, unlink?n, die?y,
+	save?y, replace?y] for configurations using external file compression
 
 
 Platform- and/or Interface-Specific Fixes
