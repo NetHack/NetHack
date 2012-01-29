@@ -233,13 +233,13 @@ LIBS= user32.lib winmm.lib $(ZLIB)
 !IF ("$(GRAPHICAL)"=="Y")
 
 cflagsGame = $(cdebug) $(cflags2) $(guiflags) $(INCLDIR) \
-	     $(WINPFLAG) $(DLBFLG) $(GAMEPDBFILE) $(GAMEMAPFILE) /W3
+	     $(WINPFLAG) $(DLBFLG) $(GAMEPDBFILE) $(GAMEMAPFILE)
 lflagsGame = $(ldebug) $(lflags) $(guilibs)
 
 !ELSE
 
 cflagsGame = $(cdebug) $(cflags2) $(conflags) $(INCLDIR) \
-	     $(WINPFLAG) $(DLBFLG) $(GAMEPDBFILE) $(GAMEMAPFILE) /W3
+	     $(WINPFLAG) $(DLBFLG) $(GAMEPDBFILE) $(GAMEMAPFILE)
 lflagsGame = $(ldebug) $(lflags) $(conlibs)
 
 !ENDIF
@@ -626,49 +626,22 @@ $(O)gamedir.tag:
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo directory created > $@
 
-$(O)nhdefkey.def:
-	@echo EXPORTS >$@
-	@echo    ProcessKeystroke >>$@
-	@echo    NHkbhit >>$@
-	@echo    CheckInput >>$@
-	@echo    SourceWhere >>$@
-	@echo    SourceAuthor >>$@
-	@echo    KeyHandlerName >>$@
-
-$(GAMEDIR)\nhdefkey.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
+$(GAMEDIR)\nhdefkey.dll : $(O)$(@B).o $(O)gamedir.tag
 	@echo Linking $@
 	@$(link) $(ldebug) /RELEASE /DLL user32.lib \
-		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" /DEF:$(O)$(@B).def \
+		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" \
 		/IMPLIB:$(O)$(@B).lib -out:$@ $(O)$(@B).o
 
-$(O)nh340key.def:
-	@echo EXPORTS >$@
-	@echo    ProcessKeystroke >>$@
-	@echo    NHkbhit >>$@
-	@echo    CheckInput >>$@
-	@echo    SourceWhere >>$@
-	@echo    SourceAuthor >>$@
-	@echo    KeyHandlerName >>$@
-
-$(GAMEDIR)\nh340key.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
+$(GAMEDIR)\nh340key.dll : $(O)$(@B).o $(O)gamedir.tag
 	@echo Linking $@
 	@$(link) $(ldebug) /RELEASE /NOLOGO /DLL user32.lib \
-		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" /DEF:$(O)$(@B).def \
+		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" \
 		/IMPLIB:$(O)$(@B).lib -out:$@ $(O)$(@B).o
 
-$(O)nhraykey.def:
-	@echo EXPORTS >$@
-	@echo    ProcessKeystroke >>$@
-	@echo    NHkbhit >>$@
-	@echo    CheckInput >>$@
-	@echo    SourceWhere >>$@
-	@echo    SourceAuthor >>$@
-	@echo    KeyHandlerName >>$@
-
-$(GAMEDIR)\nhraykey.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
+$(GAMEDIR)\nhraykey.dll : $(O)$(@B).o $(O)gamedir.tag
 	@echo Linking $@
 	@$(link) $(ldebug) /RELEASE /NOLOGO /DLL user32.lib \
-		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" /DEF:$(O)$(@B).def \
+		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" \
 		/IMPLIB:$(O)$(@B).lib -out:$@ $(O)$(@B).o
 
 #
@@ -907,8 +880,8 @@ $(O)obj.tag:
 
 envchk:
 !	IF "$(CL)"!=""
-	   @echo Warning, the CL Environment variable is defined:
-	   @echo CL=$(CL)
+#	   @echo Warning, the CL Environment variable is defined:
+#	   @echo CL=$(CL)
 !	ENDIF
 !   IF "$(GRAPHICAL)"=="Y"
 	   @echo ----
