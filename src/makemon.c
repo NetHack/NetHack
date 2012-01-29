@@ -1126,15 +1126,15 @@ register int	mmflags;
 	   something sensible if caller hasn't specified MM_EPRI|MM_EMIN
 	   (when they're specified, caller intends to handle this itself) */
 	if ((mndx == PM_ALIGNED_PRIEST || mndx == PM_HIGH_PRIEST) ?
-		!(mmflags && (MM_EPRI|MM_EMIN)) :
-		(mndx == PM_ANGEL && !(mmflags && MM_EMIN) && !rn2(3))) {
+		!(mmflags & (MM_EPRI|MM_EMIN)) :
+		(mndx == PM_ANGEL && !(mmflags & MM_EMIN) && !rn2(3))) {
 	    struct emin *eminp;
 	    newemin(mtmp);
 	    eminp = EMIN(mtmp);
 
 	    mtmp->isminion = 1;		/* make priest be a roamer */
 	    eminp->min_align = rn2(3) - 1;	/* no A_NONE */
-	    eminp->renegade = (mmflags & MM_ANGRY) ? 1 : !rn2(3);
+	    eminp->renegade = (boolean)((mmflags & MM_ANGRY) ? 1 : !rn2(3));
 	    mtmp->mpeaceful = (eminp->min_align == u.ualign.type) ?
 				!eminp->renegade : eminp->renegade;
 	}
