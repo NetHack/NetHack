@@ -1,5 +1,4 @@
 /* NetHack 3.5	alloc.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)alloc.c	3.5	2006/07/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -135,6 +134,28 @@ int line;
 	free(ptr);
 }
 
+/* strdup() which uses our alloc() rather than libc's malloc(),
+   with caller tracking */
+char *
+nhdupstr(string, file, line)
+const char *string;
+const char *file;
+int line;
+{
+    return strcpy((char *)nhalloc(strlen(string) + 1, file, line), string);
+}
+#undef dupstr
+
 #endif /* MONITOR_HEAP */
+
+/* strdup() which uses our alloc() rather than libc's malloc();
+   not used when MONITOR_HEAP is enabled, but included unconditionally
+   in case utility programs get built using a different setting for that */
+char *
+dupstr(string)
+const char *string;
+{
+    return strcpy((char *)alloc(strlen(string) + 1), string);
+}
 
 /*alloc.c*/

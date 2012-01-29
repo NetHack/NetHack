@@ -602,7 +602,7 @@ register struct obj *obj;
 		undiscover_object(obj->otyp);
 	    }
 	} else {
-	    *str1 = strcpy((char *) alloc((unsigned)strlen(buf)+1), buf);
+	    *str1 = dupstr(buf);
 	    discover_object(obj->otyp, FALSE, TRUE); /* possibly add to disco[] */
 	}
 }

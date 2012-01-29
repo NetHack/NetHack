@@ -1444,9 +1444,9 @@ const char *pre_msg, *post_msg;
 	assign_level(&u.utolev, tolev);
 
 	if (pre_msg)
-	    dfr_pre_msg = strcpy((char *)alloc(strlen(pre_msg) + 1), pre_msg);
+	    dfr_pre_msg = dupstr(pre_msg);
 	if (post_msg)
-	    dfr_post_msg = strcpy((char *)alloc(strlen(post_msg)+1), post_msg);
+	    dfr_post_msg = dupstr(post_msg);
 }
 
 /* handle something like portal ejection */
@@ -1572,7 +1572,7 @@ struct obj *corpse;
 void
 revive_mon(arg, timeout)
 anything *arg;
-long timeout;
+long timeout UNUSED;
 {
     struct obj *body = arg->a_obj;
     struct permonst *mptr = &mons[body->corpsenm];
