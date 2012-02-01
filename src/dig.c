@@ -202,7 +202,7 @@ dig_check(madeby, verbose, x, y)
 	} else if (madeby == BY_OBJECT &&
 		    /* the block against existing traps is mainly to
 		       prevent broken wands from turning holes into pits */
-		    (ttmp || is_pool(x,y) || is_lava(x,y))) {
+		    (ttmp || is_pool_or_lava(x,y))) {
 	    /* digging by player handles pools separately */
 	    return FALSE;
 	}
@@ -747,7 +747,7 @@ coord *cc;
 				surface(dig_x,dig_y),
 				(dig_x != u.ux || dig_y != u.uy) ? "t" : "");
 
-	} else if (is_pool(dig_x, dig_y) || is_lava(dig_x, dig_y)) {
+	} else if (is_pool_or_lava(dig_x, dig_y)) {
 		pline_The("%s sloshes furiously for a moment, then subsides.",
 			is_lava(dig_x, dig_y) ? "lava" : "water");
 		wake_nearby();	/* splashing */
@@ -1117,7 +1117,7 @@ struct obj *obj;
 		You("swing %s through thin air.", yobjnam(obj, (char *)0));
 	} else if (!can_reach_floor(FALSE)) {
 		cant_reach_floor(u.ux, u.uy, FALSE, FALSE);
-	} else if (is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy)) {
+	} else if (is_pool_or_lava(u.ux, u.uy)) {
 		/* Monsters which swim also happen not to be able to dig */
 		You("cannot stay under%s long enough.",
 				is_pool(u.ux, u.uy) ? "water" : " the lava");

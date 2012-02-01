@@ -223,6 +223,7 @@ E boolean FDECL(paranoid_query, (BOOLEAN_P,const char *));
 
 E boolean FDECL(is_pool, (int,int));
 E boolean FDECL(is_lava, (int,int));
+E boolean FDECL(is_pool_or_lava, (int,int));
 E boolean FDECL(is_ice, (int,int));
 E int FDECL(is_drawbridge_wall, (int,int));
 E boolean FDECL(is_db_wall, (int,int));

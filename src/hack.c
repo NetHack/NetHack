@@ -725,7 +725,7 @@ int mode;
 	if ((t && t->tseen) ||
 	    (!Levitation && !Flying &&
 	     !is_clinger(youmonst.data) &&
-	     (is_pool(x, y) || is_lava(x, y)) && levl[x][y].seenv))
+	     is_pool_or_lava(x, y) && levl[x][y].seenv))
 	    return FALSE;
     }
 
@@ -1222,7 +1222,7 @@ domove()
 		if (((trap = t_at(x, y)) && trap->tseen) ||
 		    (Blind && !Levitation && !Flying &&
 		     !is_clinger(youmonst.data) &&
-		     (is_pool(x, y) || is_lava(x, y)) && levl[x][y].seenv)) {
+		     is_pool_or_lava(x, y) && levl[x][y].seenv)) {
 			if(context.run >= 2) {
 				nomul(0);
 				context.move = 0;
@@ -1718,7 +1718,7 @@ boolean newspot;	/* true if called by spoteffects */
 
     /* check for entering water or lava */
     if (!u.ustuck && !Levitation && !Flying &&
-	    (is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy))) {
+	    is_pool_or_lava(u.ux, u.uy)) {
 #ifdef STEED
 	if (u.usteed && (is_flyer(u.usteed->data) ||
 		is_floater(u.usteed->data) || is_clinger(u.usteed->data))) {
@@ -2309,7 +2309,7 @@ bcorr:
 	    if(context.run == 1) goto bcorr;	/* if you must */
 	    if(x == u.ux+u.dx && y == u.uy+u.dy) goto stop;
 	    continue;
-	} else if (is_pool(x,y) || is_lava(x,y)) {
+	} else if (is_pool_or_lava(x,y)) {
 	    /* water and lava only stop you if directly in front, and stop
 	     * you even if you are running
 	     */

@@ -1843,7 +1843,7 @@ long ocount;
 		cc.x = x; cc.y = y;
 		/* Prevent boulder from being placed on water */
 		if (ttmp->ttyp == ROLLING_BOULDER_TRAP
-				&& is_pool(x+distance*dx,y+distance*dy))
+				&& is_pool_or_lava(x+distance*dx,y+distance*dy))
 			success = FALSE;
 		else success = isclearpath(&cc, distance, dx, dy);
 		if (ttmp->ttyp == ROLLING_BOULDER_TRAP) {

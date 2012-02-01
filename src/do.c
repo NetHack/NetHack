@@ -53,7 +53,7 @@ boolean pushing;
 {
 	if (!otmp || otmp->otyp != BOULDER)
 	    impossible("Not a boulder?");
-	else if (!Is_waterlevel(&u.uz) && (is_pool(rx,ry) || is_lava(rx,ry))) {
+	else if (!Is_waterlevel(&u.uz) && is_pool_or_lava(rx,ry)) {
 	    boolean lava = is_lava(rx,ry), fills_up;
 	    const char *what = waterbody_name(rx,ry);
 	    schar ltyp = levl[rx][ry].typ;

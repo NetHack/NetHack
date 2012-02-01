@@ -65,6 +65,16 @@ int x,y;
 }
 
 boolean
+is_pool_or_lava(x,y)
+int x,y;
+{
+    if (is_pool(x,y) || is_lava(x,y))
+    	return TRUE;
+    else
+    	return FALSE;
+}
+
+boolean
 is_ice(x,y)
 int x,y;
 {

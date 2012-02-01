@@ -199,8 +199,7 @@ const char *fmt, *arg;
 	}
 	check_strangling(TRUE);
 
-	if(!Levitation && !u.ustuck &&
-	   (is_pool(u.ux,u.uy) || is_lava(u.ux,u.uy)))
+	if(!Levitation && !u.ustuck && is_pool_or_lava(u.ux,u.uy))
 		spoteffects(TRUE);
 
 	see_monsters();
@@ -746,7 +745,7 @@ int	mntmp;
 	}
 	find_ac();
 	if((!Levitation && !u.ustuck && !Flying &&
-	    (is_pool(u.ux,u.uy) || is_lava(u.ux,u.uy))) ||
+	    is_pool_or_lava(u.ux,u.uy)) ||
 	   (Underwater && !Swimming))
 	    spoteffects(TRUE);
 	if (Passes_walls && u.utrap &&
