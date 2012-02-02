@@ -374,7 +374,10 @@ convert_line()
 				case 'i':	/* him/her */
 				case 'I':
 				case 'j':	/* his/her */
-				case 'J': qtext_pronoun(*(c - 1), *c);
+				case 'J': if (index("dlno", lowc(*(c - 1))))
+					      qtext_pronoun(*(c - 1), *c);
+					  else
+					      --c;	/* default action */
 				    break;
 
 					/* pluralize */
