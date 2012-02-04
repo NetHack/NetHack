@@ -4665,11 +4665,11 @@ boolean nocorpse;
 boolean
 unconscious()
 {
-	return((boolean)(multi < 0 && (!nomovemsg ||
-		u.usleep ||
-		!strncmp(nomovemsg,"You awake", 9) ||
-		!strncmp(nomovemsg,"You regain con", 14) ||
-		!strncmp(nomovemsg,"You are consci", 14))));
+	return (boolean)(multi < 0 &&
+		  (u.usleep || (nomovemsg &&
+				(!strncmp(nomovemsg, "You awake", 9) ||
+				 !strncmp(nomovemsg, "You regain con", 14) ||
+				 !strncmp(nomovemsg, "You are consci", 14)))));
 }
 
 static const char lava_killer[] = "molten lava";
