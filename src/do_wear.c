@@ -1203,6 +1203,46 @@ cancel_don()
 	context.takeoff.what = 0L;
 }
 
+/* called by steal() during theft from hero; interrupt donning/doffing */
+int
+stop_donning(stolenobj)
+struct obj *stolenobj;	/* no message if stolenobj is already being doffing */
+{
+    char buf[BUFSZ];
+    struct obj *otmp;
+    boolean putting_on;
+    int result;
+
+    for (otmp = invent; otmp; otmp = otmp->nobj)
+	if ((otmp->owornmask & W_ARMOR) && donning(otmp)) break;
+	/* at most one item will pass donning() test at any given time */
+    if (!otmp) return 0;
+
+    result = -multi;	/* remember this before calling unmul() */
+    /* donning() returns True when doffing too */
+    putting_on = !(context.takeoff.mask & otmp->owornmask);
+    /* cancel_don() looks at afternmv; it also serves as cancel_doff() */
+    cancel_don();
+    /* don't want <armor>_on() or <armor>_off() being called
+       by unmul() since the on or off action isn't completing */
+    afternmv = 0;
+    if (putting_on || otmp != stolenobj)
+	Sprintf(buf, "You stop %s %s.",
+		putting_on ? "putting on" : "taking off",
+		thesimpleoname(otmp));
+    else
+	buf[0] = '\0';	/* silently stop doffing stolenobj */
+    unmul(buf);
+    /* while putting on, item becomes worn immediately but side-effects are
+       deferred until the delay expires; when interrupted, make it unworn
+       (while taking off, item stays worn until the delay expires; when
+       interrupted, leave it worn) */
+    if (putting_on)
+	remove_worn_item(otmp, FALSE);
+
+    return result;
+}
+
 static NEARDATA const char clothes[] = {ARMOR_CLASS, 0};
 static NEARDATA const char accessories[] = {RING_CLASS, AMULET_CLASS, TOOL_CLASS, FOOD_CLASS, 0};
 

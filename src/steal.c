@@ -271,7 +271,7 @@ struct monst *mtmp;
 char *objnambuf;
 {
 	struct obj *otmp;
-	int tmp, could_petrify, named = 0, armordelay, retrycnt = 0;
+	int tmp, could_petrify, armordelay, olddelay, named = 0, retrycnt = 0;
 	boolean monkey_business; /* true iff an animal is doing the thievery */
 
 	if (objnambuf) *objnambuf = '\0';
@@ -391,6 +391,9 @@ gotobj:
 	    o_unleash(otmp);
 	}
 
+	/* stop donning/doffing now so that afternmv won't be clobbered
+	   below; stop_occupation doesn't handle donning/doffing */
+	olddelay = stop_donning(otmp);
 	/* you're going to notice the theft... */
 	stop_occupation();
 
@@ -404,14 +407,13 @@ gotobj:
 		    break;
 		case ARMOR_CLASS:
 		    armordelay = objects[otmp->otyp].oc_delay;
-		    /* Stop putting on armor which has been stolen. */
-		    if (donning(otmp)) {
-			remove_worn_item(otmp, TRUE);
-			break;
-		    } else if (monkey_business) {
+		    if (olddelay > 0 && olddelay < armordelay)
+			armordelay = olddelay;
+		    if (monkey_business) {
 			/* animals usually don't have enough patience
 			   to take off items which require extra time */
-			if (armordelay >= 1 && rn2(10)) goto cant_take;
+			if (armordelay >= 1 && !olddelay && rn2(10))
+			    goto cant_take;
 			remove_worn_item(otmp, TRUE);
 			break;
 		    } else {

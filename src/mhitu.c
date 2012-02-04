@@ -2261,6 +2261,9 @@ register struct monst *mon;
 
 	if (Blind) pline("It caresses you...");
 	else You_feel("very attracted to %s.", mon_nam(mon));
+	/* if in the process of putting armor on or taking armor off,
+	   interrupt that activity now */
+	stop_donning((struct obj *)0);
 	/* don't try to take off gloves if cursed weapon blocks them */
 	if (welded(uwep)) tried_gloves = 1;
 
