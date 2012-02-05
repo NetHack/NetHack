@@ -416,6 +416,7 @@ E int NDECL(take_off);
 E void FDECL(off_msg, (struct obj *));
 E void FDECL(set_wear, (struct obj *));
 E boolean FDECL(donning, (struct obj *));
+E boolean FDECL(doffing, (struct obj *));
 E void NDECL(cancel_don);
 E int FDECL(stop_donning, (struct obj *));
 E int NDECL(Armor_off);

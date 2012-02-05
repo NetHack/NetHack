@@ -272,7 +272,8 @@ char *objnambuf;
 {
 	struct obj *otmp;
 	int tmp, could_petrify, armordelay, olddelay, named = 0, retrycnt = 0;
-	boolean monkey_business; /* true iff an animal is doing the thievery */
+	boolean monkey_business, /* true iff an animal is doing the thievery */
+		was_doffing;
 
 	if (objnambuf) *objnambuf = '\0';
 	/* the following is true if successful on first of two attacks. */
@@ -391,6 +392,7 @@ gotobj:
 	    o_unleash(otmp);
 	}
 
+	was_doffing = doffing(otmp);
 	/* stop donning/doffing now so that afternmv won't be clobbered
 	   below; stop_occupation doesn't handle donning/doffing */
 	olddelay = stop_donning(otmp);
@@ -429,13 +431,17 @@ gotobj:
 			    pline("%s charms you.  You gladly %s your %s.",
 				  !seen ? "She" : Monnam(mtmp),
 				  curssv ? "let her take" :
-				  slowly ? "start removing" : "hand over",
+				    !slowly ? "hand over" :
+				      was_doffing ? "continue removing" :
+					"start removing",
 				  equipname(otmp));
 			else
 			    pline("%s seduces you and %s off your %s.",
 				  !seen ? "She" : Adjmonnam(mtmp, "beautiful"),
 				  curssv ? "helps you to take" :
-				  slowly ? "you start taking" : "you take",
+				    !slowly ? "you take" :
+				      was_doffing ? "you continue taking" :
+					"you start taking",
 				  equipname(otmp));
 			named++;
 			/* the following is to set multi for later on */

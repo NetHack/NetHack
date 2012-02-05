@@ -1158,6 +1158,7 @@ register struct obj *otmp;
     long what = context.takeoff.what;	/* if nonzero, occupation is implied */
     boolean result = FALSE;
 
+    /* 'W' and 'T' set afternmv, 'A' sets context.takeoff.what */
     if (otmp == uarm)
 	result = (afternmv == Armor_on || afternmv == Armor_off ||
 		  what == WORN_ARMOR);
@@ -1181,6 +1182,36 @@ register struct obj *otmp;
     else if (otmp == uarms)
 	result = (afternmv == Shield_on || afternmv == Shield_off ||
 		  what == WORN_SHIELD);
+
+    return result;
+}
+
+/* check whether the target object is currently being taken off,
+   so that stop_donning() and steal() can vary messages */
+boolean
+doffing(otmp)
+struct obj *otmp;
+{
+    long what = context.takeoff.what;
+    boolean result = FALSE;
+
+    /* 'T' (also 'W') sets afternmv, 'A' sets context.takeoff.what */
+    if (otmp == uarm)
+	result = (afternmv == Armor_off || what == WORN_ARMOR);
+#ifdef TOURIST
+    else if (otmp == uarmu)
+	result = (afternmv == Shirt_off || what == WORN_SHIRT);
+#endif
+    else if (otmp == uarmc)
+	result = (afternmv == Cloak_off || what == WORN_CLOAK);
+    else if (otmp == uarmf)
+	result = (afternmv == Boots_off || what == WORN_BOOTS);
+    else if (otmp == uarmh)
+	result = (afternmv == Helmet_off || what == WORN_HELMET);
+    else if (otmp == uarmg)
+	result = (afternmv == Gloves_off || what == WORN_GLOVES);
+    else if (otmp == uarms)
+	result = (afternmv == Shield_off || what == WORN_SHIELD);
 
     return result;
 }
@@ -1211,27 +1242,28 @@ struct obj *stolenobj;	/* no message if stolenobj is already being doffing */
     char buf[BUFSZ];
     struct obj *otmp;
     boolean putting_on;
-    int result;
+    int result = 0;
 
     for (otmp = invent; otmp; otmp = otmp->nobj)
 	if ((otmp->owornmask & W_ARMOR) && donning(otmp)) break;
 	/* at most one item will pass donning() test at any given time */
     if (!otmp) return 0;
 
-    result = -multi;	/* remember this before calling unmul() */
-    /* donning() returns True when doffing too */
-    putting_on = !(context.takeoff.mask & otmp->owornmask);
+    /* donning() returns True when doffing too; doffing() is more specific */
+    putting_on = !doffing(otmp);
     /* cancel_don() looks at afternmv; it also serves as cancel_doff() */
     cancel_don();
     /* don't want <armor>_on() or <armor>_off() being called
        by unmul() since the on or off action isn't completing */
     afternmv = 0;
-    if (putting_on || otmp != stolenobj)
+    if (putting_on || otmp != stolenobj) {
 	Sprintf(buf, "You stop %s %s.",
 		putting_on ? "putting on" : "taking off",
 		thesimpleoname(otmp));
-    else
-	buf[0] = '\0';	/* silently stop doffing stolenobj */
+    } else {
+	buf[0] = '\0';		/* silently stop doffing stolenobj */
+	result = -multi;	/* remember this before calling unmul() */
+    }
     unmul(buf);
     /* while putting on, item becomes worn immediately but side-effects are
        deferred until the delay expires; when interrupted, make it unworn
