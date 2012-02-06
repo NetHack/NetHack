@@ -404,6 +404,11 @@ items conferring life drain resistance were affected by drain life spell
 'a'pply command could be used to recogniize undiscovered potions of oil
 fix replacing an existing bones file in wizard mode [load?y, unlink?n, die?y,
 	save?y, replace?y] for configurations using external file compression
+theft of worn armor with wear/unwear delay would interfere with completion of
+	wearing or unwearing some other armor which also imposed a delay
+	(disrupted wear attempt for +N helm of brilliance would result in loss
+	of N points of Int and Wis; gauntlets of dexterity had similar problem)
+#sit while swallowed would give the wrong message
 
 
 Platform- and/or Interface-Specific Fixes

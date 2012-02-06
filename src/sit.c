@@ -42,22 +42,31 @@ dosit()
 	register struct trap *trap = t_at(u.ux,u.uy);
 	register int typ = levl[u.ux][u.uy].typ;
 
-
 #ifdef STEED
 	if (u.usteed) {
 	    You("are already sitting on %s.", mon_nam(u.usteed));
 	    return (0);
 	}
 #endif
-
 	if (u.uundetected && is_hider(youmonst.data) && u.umonnum != PM_TRAPPER)
 	    u.uundetected = 0;		/* no longer on the ceiling */
 
 	if (!can_reach_floor(FALSE)) {
-	    if (Levitation)
+	    if (u.uswallow)
+		There("are no seats in here!");
+	    else if (Levitation)
 		You("tumble in place.");
 	    else
 		You("are sitting on air.");
+	    return 0;
+	} else if (u.ustuck && !sticks(youmonst.data)) {
+	    /* holding monster is next to hero rather than beneath, but
+	       hero is in no condition to actually sit at has/her own spot */
+	    if (humanoid(u.ustuck->data))
+		pline("%s won't offer %s lap.",
+		      Monnam(u.ustuck), mhis(u.ustuck));
+	    else
+		pline("%s has no lap.", Monnam(u.ustuck));
 	    return 0;
 	} else if (is_pool(u.ux, u.uy) && !Underwater) {  /* water walking */
 	    goto in_water;
@@ -72,7 +81,6 @@ dosit()
 	    You("sit on %s.", the(xname(obj)));
 	    if (!(Is_box(obj) || objects[obj->otyp].oc_material == CLOTH))
 		pline("It's not very comfortable...");
-
 	} else if (trap != 0 || (u.utrap && (u.utraptype >= TT_LAVA))) {
 	    if (u.utrap) {
 		exercise(A_WIS, FALSE);	/* you're getting stuck longer */
@@ -121,29 +129,19 @@ dosit()
 		(void) rust_dmg(uarm, "armor", 1, TRUE, &youmonst);
 #ifdef SINKS
 	} else if(IS_SINK(typ)) {
-
 	    You(sit_message, defsyms[S_sink].explanation);
 	    Your("%s gets wet.", humanoid(youmonst.data) ? "rump" : "underside");
 #endif
 	} else if(IS_ALTAR(typ)) {
-
 	    You(sit_message, defsyms[S_altar].explanation);
 	    altar_wrath(u.ux, u.uy);
-
 	} else if(IS_GRAVE(typ)) {
-
 	    You(sit_message, defsyms[S_grave].explanation);
-
 	} else if(typ == STAIRS) {
-
 	    You(sit_message, "stairs");
-
 	} else if(typ == LADDER) {
-
 	    You(sit_message, "ladder");
-
 	} else if (is_lava(u.ux, u.uy)) {
-
 	    /* must be WWalking */
 	    You(sit_message, "lava");
 	    burn_away_slime();
@@ -154,18 +152,12 @@ dosit()
 	    pline_The("lava burns you!");
 	    losehp(d((Fire_resistance ? 2 : 10), 10),	/* lava damage */
 		   "sitting on lava", KILLED_BY);
-
 	} else if (is_ice(u.ux, u.uy)) {
-
 	    You(sit_message, defsyms[S_ice].explanation);
 	    if (!Cold_resistance) pline_The("ice feels cold.");
-
 	} else if (typ == DRAWBRIDGE_DOWN) {
-
 	    You(sit_message, "drawbridge");
-
 	} else if(IS_THRONE(typ)) {
-
 	    You(sit_message, defsyms[S_throne].explanation);
 	    if (rnd(6) > 4)  {
 		switch (rnd(13))  {
@@ -286,7 +278,6 @@ dosit()
 		pline_The("throne vanishes in a puff of logic.");
 		newsym(u.ux,u.uy);
 	    }
-
 	} else if (lays_eggs(youmonst.data)) {
 		struct obj *uegg;
 
@@ -311,10 +302,9 @@ dosit()
 		dropy(uegg);
 		stackobj(uegg);
 		morehungry((int)objects[EGG].oc_nutrition);
-	} else if (u.uswallow)
-		There("are no seats in here!");
-	else
+	} else {
 		pline("Having fun sitting on the %s?", surface(u.ux,u.uy));
+	}
 	return(1);
 }
 
