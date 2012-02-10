@@ -1002,11 +1002,11 @@ static struct qmchoices {
 } qm[] = {
 	/* Things that some pets might be thinking about at the time */
 	{PM_LITTLE_DOG, 0, PM_KITTEN,	  M_AP_MONSTER},
+	{PM_DOG,        0, PM_HOUSECAT,   M_AP_MONSTER},
 	{PM_LARGE_DOG,  0, PM_LARGE_CAT,  M_AP_MONSTER},
 	{PM_KITTEN,     0, PM_LITTLE_DOG, M_AP_MONSTER},
-	{PM_LARGE_CAT,  0, PM_LARGE_DOG,  M_AP_MONSTER},
 	{PM_HOUSECAT,   0, PM_DOG, 	  M_AP_MONSTER},
-	{PM_DOG,        0, PM_HOUSECAT,   M_AP_MONSTER},
+	{PM_LARGE_CAT,  0, PM_LARGE_DOG,  M_AP_MONSTER},
 	{PM_HOUSECAT,   0, PM_GIANT_RAT,  M_AP_MONSTER},
 #ifdef SINKS
 	{0, S_DOG, SINK, M_AP_FURNITURE},	/* sorry, no fire hydrants in NetHack */
@@ -1031,10 +1031,10 @@ STATIC_OVL void
 quickmimic(mtmp)
 struct monst *mtmp;
 {
-	int idx = 0, trycnt = 5;
+	int idx = 0, trycnt = 5, spotted;
 	char buf[BUFSZ];
 
-	if (Protection_from_shape_changers || Blind || !mtmp->meating) return;
+	if (Protection_from_shape_changers || !mtmp->meating) return;
 
 	do {
 		idx = rn2(SIZE(qm));
@@ -1046,15 +1046,22 @@ struct monst *mtmp;
 			break;
 	} while (--trycnt > 0);
 	if (trycnt == 0) idx = SIZE(qm)-1;
-	if (!idx) return;	/* impossible */
 
 	Strcpy(buf, mon_nam(mtmp));
+	spotted = canspotmon(mtmp);
 
 	mtmp->m_ap_type = qm[idx].m_ap_type;
 	mtmp->mappearance = qm[idx].mappearance;
 
-	newsym(mtmp->mx,mtmp->my);
-	You_see("%s appear where %s was!",
+	if (spotted || cansee(mtmp->mx, mtmp->my) || canspotmon(mtmp)) {
+	    /* this isn't quite right; if sensing a monster without being
+	       able to see its location, you really shouldn't be told you
+	       sense it becoming furniture or an object that you can't see
+	       (on the other hand, perhaps you're sensing a brief glimpse
+	       of its mind as it changes form) */
+	    newsym(mtmp->mx, mtmp->my);
+	    You("%s %s appear where %s was!",
+		cansee(mtmp->mx, mtmp->my) ? "see" : "sense",
 		(mtmp->m_ap_type == M_AP_FURNITURE) ?
 			an(defsyms[mtmp->mappearance].explanation) :
 		(mtmp->m_ap_type == M_AP_OBJECT &&
@@ -1064,8 +1071,10 @@ struct monst *mtmp;
 				OBJ_NAME(objects[mtmp->mappearance])) ?
 			an(OBJ_NAME(objects[mtmp->mappearance])) :
 		(mtmp->m_ap_type == M_AP_MONSTER) ?
-			an(mons[mtmp->mappearance].mname) : something, buf);
-	display_nhwindow(WIN_MAP, TRUE);
+			an(mons[mtmp->mappearance].mname) : something,
+		buf);
+	    display_nhwindow(WIN_MAP, TRUE);
+	}
 }
 
 /*dogmove.c*/
