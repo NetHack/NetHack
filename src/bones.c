@@ -13,6 +13,7 @@ extern long bytes_counted;
 STATIC_DCL boolean FDECL(no_bones_level, (d_level *));
 STATIC_DCL void FDECL(goodfruit, (int));
 STATIC_DCL void FDECL(resetobjs,(struct obj *,BOOLEAN_P));
+STATIC_DCL boolean FDECL(fixuporacle, (struct monst *));
 
 STATIC_OVL boolean
 no_bones_level(lev)
@@ -240,6 +241,55 @@ int x, y;
 	if (cont) cont->owt = weight(cont);
 }
 
+/* possibly restore oracle's room and/or put her back inside it; returns
+   False if she's on the wrong level and should be removed, True otherwise */
+STATIC_OVL boolean
+fixuporacle(oracle)
+struct monst *oracle;
+{
+    coord cc;
+    int ridx, o_ridx;
+
+    /* oracle doesn't move, but knight's joust or monk's staggering blow
+       could push her onto a hole in the floor; at present, traps don't
+       activate in such situation hence she won't fall to another level;
+       however, that could change so be prepared to cope with such things */
+    if (!Is_oracle_level(&u.uz))
+	return FALSE;
+
+    oracle->mpeaceful = 1;
+    o_ridx = levl[oracle->mx][oracle->my].roomno - ROOMOFFSET;
+    if (o_ridx >= 0 && rooms[o_ridx].rtype == DELPHI)
+	return TRUE;		/* no fixup needed */
+
+    /*
+     * The Oracle isn't in DELPHI room.  Either hero entered her chamber
+     * and got the one-time welcome message, converting it into an
+     * ordinary room, or she got teleported out, or both.  Try to put
+     * her back inside her room, if necessary, and restore its type.
+     */
+
+    /* find original delphi chamber; should always succeed */
+    for (ridx = 0; ridx < SIZE(rooms); ++ridx)
+	if (rooms[ridx].orig_rtype == DELPHI) break;
+
+    if (o_ridx != ridx && ridx < SIZE(rooms)) {
+	/* room found and she's not not in it, so try to move her there */
+	cc.x = (rooms[ridx].lx + rooms[ridx].hx) / 2;
+	cc.y = (rooms[ridx].ly + rooms[ridx].hy) / 2;
+	if (enexto(&cc, cc.x, cc.y, oracle->data)) {
+	    rloc_to(oracle, cc.x, cc.y);
+	    o_ridx = levl[oracle->mx][oracle->my].roomno - ROOMOFFSET;
+	}
+	/* [if her room is already full, she might end up outside;
+	   that's ok, next hero just won't get any welcome message,
+	   same as used to happen before this fixup was introduced] */
+    }
+    if (ridx == o_ridx)		/* if she's in her room, mark it as such */
+	rooms[ridx].rtype = DELPHI;
+    return TRUE;		/* keep oracle in new bones file */
+}
+
 /* check whether bones are feasible */
 boolean
 can_make_bones()
@@ -317,7 +367,8 @@ struct obj *corpse;
 	    mptr = mtmp->data;
 	    if (mtmp->iswiz || mptr == &mons[PM_MEDUSA] ||
 		    mptr->msound == MS_NEMESIS || mptr->msound == MS_LEADER ||
-		    mptr == &mons[PM_VLAD_THE_IMPALER])
+		    mptr == &mons[PM_VLAD_THE_IMPALER] ||
+		    (mptr == &mons[PM_ORACLE] && !fixuporacle(mtmp)))
 		mongone(mtmp);
 	}
 #ifdef STEED
@@ -403,7 +454,7 @@ struct obj *corpse;
 	u.ux = u.uy = 0;
 
 	/* Clear all memory from the level. */
-	for(x=0; x<COLNO; x++) for(y=0; y<ROWNO; y++) {
+	for (x = 1; x < COLNO; x++) for (y = 0; y<ROWNO; y++) {
 	    levl[x][y].seenv = 0;
 	    levl[x][y].waslit = 0;
 	    levl[x][y].glyph = cmap_to_glyph(S_stone);

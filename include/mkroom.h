@@ -1,5 +1,4 @@
 /* NetHack 3.5	mkroom.h	$Date$  $Revision$ */
-/*	SCCS Id: @(#)mkroom.h	3.5	2005/03/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -11,6 +10,7 @@
 struct mkroom {
 	schar lx,hx,ly,hy;	/* usually xchar, but hx may be -1 */
 	schar rtype;		/* type of room (zoo, throne, etc...) */
+	schar orig_rtype;	/* same as rtype, but not zeroed later */
 	schar rlit;		/* is the room lit ? */
 	schar doorct;		/* door count */
 	schar fdoor;		/* index for the first door of the room */
