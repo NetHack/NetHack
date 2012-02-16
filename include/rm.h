@@ -505,6 +505,11 @@ struct cemetery {
 	char how[100 + 1]; /* [DTHSZ+1] */
 	/* date+time in string of digits rather than binary */
 	char when[4+2+2 + 2+2+2 + 1]; /* "YYYYMMDDhhmmss\0" */
+#ifdef DUNGEON_OVERVIEW
+	/* final resting place spot */
+	schar frpx, frpy;
+	boolean bonesknown;
+#endif
 };
 
 struct levelflags {
