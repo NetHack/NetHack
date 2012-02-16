@@ -263,10 +263,12 @@ lib_dlb_cleanup(VOID_ARGS)
 	close_library(&dlb_libs[i]);
 }
 
+/*ARGSUSED*/
 STATIC_OVL boolean
 lib_dlb_fopen(dp, name, mode)
     dlb *dp;
-    const char *name, *mode;
+    const char *name;
+    const char *mode UNUSED;
 {
     long start, size;
     library *lp;
@@ -278,14 +280,15 @@ lib_dlb_fopen(dp, name, mode)
 	dp->size = size;
 	dp->mark = 0;
 	return TRUE;
-	}
+    }
 
     return FALSE;	/* failed */
 }
 
+/*ARGUSED*/
 STATIC_OVL int
 lib_dlb_fclose(dp)
-    dlb *dp;
+    dlb *dp UNUSED;
 {
     /* nothing needs to be done */
     return 0;

@@ -366,10 +366,10 @@ struct obj *obj;
 }
 
 /* query_objlist callback: return TRUE */
-/*ARGSUSED*/
+/*ARGUSED*/
 boolean
 allow_all(obj)
-struct obj *obj;
+struct obj *obj UNUSED;
 {
     return TRUE;
 }

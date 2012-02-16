@@ -1,10 +1,8 @@
 /* NetHack 3.5	role.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)role.c	3.5	2006/05/24	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-
 
 /*** Table of all roles ***/
 /* According to AD&D, HD for some classes (ex. Wizard) should be smaller
@@ -901,7 +899,8 @@ int rolenum, gendnum, alignnum, pickhow;
 /* gender and alignment are not comparable (and also not constrainable) */
 boolean
 ok_gend(rolenum, racenum, gendnum, alignnum)
-int rolenum, racenum, gendnum, alignnum;
+int rolenum, racenum, gendnum;
+int alignnum UNUSED;
 {
     int i;
     short allow;
@@ -965,7 +964,9 @@ int rolenum, racenum, alignnum, pickhow;
 /* alignment and gender are not comparable (and also not constrainable) */
 boolean
 ok_align(rolenum, racenum, gendnum, alignnum)
-int rolenum, racenum, gendnum, alignnum;
+int rolenum, racenum;
+int gendnum UNUSED;
+int alignnum;
 {
     int i;
     short allow;

@@ -1817,7 +1817,7 @@ int x, y;
 void
 rot_organic(arg, timeout)
 anything *arg;
-long timeout;	/* unused */
+long timeout UNUSED;
 {
 	struct obj *obj = arg->a_obj;
 

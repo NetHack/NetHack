@@ -3990,7 +3990,7 @@ long min_time;	/* <x,y>'s old melt timeout (deleted by time we get here) */
 void
 melt_ice_away(arg, timeout)
 anything *arg;
-long timeout;	/* unused */
+long timeout UNUSED;
 {
 	xchar x,y;
 	long where = arg->a_long;
