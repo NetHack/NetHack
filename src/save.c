@@ -22,7 +22,6 @@ int dotcnt, dotrow;	/* also used in restore */
 #endif
 
 STATIC_DCL void FDECL(savelevchn, (int,int));
-STATIC_DCL void FDECL(savecemetery, (int,int));
 STATIC_DCL void FDECL(savedamage, (int,int));
 STATIC_DCL void FDECL(saveobj, (int,struct obj *));
 STATIC_DCL void FDECL(saveobjchn, (int,struct obj *,int));
@@ -521,7 +520,7 @@ int mode;
 #else
 	bwrite(fd,(genericptr_t) &lev,sizeof(lev));
 #endif
-	savecemetery(fd, mode);
+	savecemetery(fd, mode, &level.bonesinfo);
 	savelevl(fd, (boolean)((sfsaveinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
 #ifdef DUNGEON_OVERVIEW
 	bwrite(fd,(genericptr_t) lastseentyp,sizeof(lastseentyp));
@@ -540,6 +539,8 @@ int mode;
 
 	/* from here on out, saving also involves allocated memory cleanup */
  skip_lots:
+	/* this comes before the map, so need cleanup here if we skipped */
+	if (mode == FREE_SAVE) savecemetery(fd, mode, &level.bonesinfo);
 	/* must be saved before mons, objs, and buried objs */
 	save_timers(fd, mode, RANGE_LEVEL);
 	save_light_sources(fd, mode, RANGE_LEVEL);
@@ -556,7 +557,7 @@ int mode;
 	    fobj = 0;
 	    level.buriedobjlist = 0;
 	    billobjs = 0;
-	    level.bonesinfo = 0;
+	    /* level.bonesinfo = 0; -- handled by savecemetery() */
 	}
 	save_engravings(fd, mode);
 	savedamage(fd, mode);
@@ -921,18 +922,20 @@ register int fd, mode;
 	    sp_levchn = 0;
 }
 
-STATIC_OVL void
-savecemetery(fd, mode)
+/* used when saving a level and also when saving dungeon overview data */
+void
+savecemetery(fd, mode, cemeteryaddr)
 int fd;
 int mode;
+struct cemetery **cemeteryaddr;
 {
     struct cemetery *thisbones, *nextbones;
     int flag;
 
-    flag = level.bonesinfo ? 0 : -1;
+    flag = *cemeteryaddr ? 0 : -1;
     if (perform_bwrite(mode))
 	bwrite(fd, (genericptr_t)&flag, sizeof flag);
-    nextbones = level.bonesinfo;
+    nextbones = *cemeteryaddr;
     while ((thisbones = nextbones) != 0) {
 	nextbones = thisbones->next;
 	if (perform_bwrite(mode))
@@ -940,6 +943,8 @@ int mode;
 	if (release_data(mode))
 	    free((genericptr_t)thisbones);
     }
+    if (release_data(mode))
+	*cemeteryaddr = 0;
 }
 
 STATIC_OVL void

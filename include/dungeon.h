@@ -1,5 +1,4 @@
 /* NetHack 3.5	dungeon.h	$Date$  $Revision$ */
-/*	SCCS Id: @(#)dungeon.h	3.5	2007/06/15	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -191,47 +190,59 @@ struct linfo {
 #define MSA_NEUTRAL 2
 #define MSA_CHAOTIC 3
 
-typedef struct mapseen_feat {
-	/* feature knowledge that must be calculated from levl array */
-	Bitfield(nfount, 2);
-	Bitfield(nsink, 2);
-	Bitfield(naltar, 2);
-	Bitfield(msalign, 2); /* corresponds to MSA_* above */
-	Bitfield(nthrone, 2);
-	Bitfield(ntree, 2);
-	/* water, lava, ice are too verbose so commented out for now */
-	/*
-	Bitfield(water, 1);
-	Bitfield(lava, 1);
-	Bitfield(ice, 1);
-	*/
-
-	/* calculated from rooms array */
-	Bitfield(nshop, 2);
-	Bitfield(ntemple, 2);
-	Bitfield(shoptype, 5);
-
-	Bitfield(forgot, 1); /* player has forgotten about this level? */
-} mapseen_feat;
-
-/* for mapseen->rooms */
-#define MSR_SEEN		1
-
 /* what the player knows about a single dungeon level */
 /* initialized in mklev() */
 typedef struct mapseen  {
 	struct mapseen *next; /* next map in the chain */
 	branch *br; /* knows about branch via taking it in goto_level */
 	d_level lev; /* corresponding dungeon level */
+	struct mapseen_feat {
+	    /* feature knowledge that must be calculated from levl array */
+	    Bitfield(nfount, 2);
+	    Bitfield(nsink, 2);
+	    Bitfield(naltar, 2);
+	    Bitfield(nthrone, 2);
 
-	mapseen_feat feat;
+	    Bitfield(ngrave, 2);
+	    Bitfield(ntree, 2);
+	    Bitfield(water, 2);
+	    Bitfield(lava, 2);
 
+	    Bitfield(ice, 2);
+	    /* calculated from rooms array */
+	    Bitfield(nshop, 2);
+	    Bitfield(ntemple, 2);
+	    /* altar alignment; MSA_NONE if there is more than one and
+	       they aren't all the same */
+	    Bitfield(msalign, 2);
+
+	    Bitfield(shoptype, 5);
+	} feat;
+	struct mapseen_flags {
+	    Bitfield(forgot, 1); /* player has forgotten about this level */
+	    Bitfield(knownbones, 1); /* player aware of bones */
+	    Bitfield(oracle, 1);
+	    Bitfield(sokosolved, 1);
+	    Bitfield(bigroom, 1);
+	    Bitfield(castle, 1);
+	    Bitfield(castletune, 1); /* add tune hint to castle annotation */
+	    Bitfield(valley, 1);
+
+	    Bitfield(msanctum, 1);
+	    Bitfield(ludios, 1);
+# ifdef REINCARNATION
+	    Bitfield(roguelevel, 1);
+# endif
+	} flags;
 	/* custom naming */
 	char *custom;
 	unsigned custom_lth;
-
-	/* maybe this should just be in struct mkroom? */
-	schar rooms[(MAXNROFROOMS+1)*2];
+	struct mapseen_rooms {
+	    Bitfield(seen, 1);
+	    Bitfield(untended, 1);	/* flag for shop without shk */
+	} msrooms[(MAXNROFROOMS+1)*2];	/* same size as rooms[] */
+	/* dead heroes; might not have graves or ghosts */
+	struct cemetery *final_resting_place; /* same as level.bonesinfo */
 } mapseen;
 
 #endif /* DUNGEON_OVERVIEW */

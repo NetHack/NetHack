@@ -5,6 +5,7 @@
 #include "hack.h"
 #include "dgn_file.h"
 #include "dlb.h"
+#include "lev.h"
 
 #define DUNGEON_FILE	"dungeon"
 
@@ -66,6 +67,8 @@ STATIC_DCL void FDECL(print_mapseen, (winid,mapseen *,BOOLEAN_P));
 STATIC_DCL boolean FDECL(interest_mapseen, (mapseen *));
 STATIC_DCL const char *FDECL(seen_string, (XCHAR_P,const char *));
 STATIC_DCL const char *FDECL(br_string2, (branch *));
+STATIC_DCL const char *FDECL(shop_string, (int));
+STATIC_DCL char *FDECL(tunesuffix, (mapseen *,char *));
 #endif /* DUNGEON_OVERVIEW */
 
 #ifdef DEBUG
@@ -170,13 +173,13 @@ save_dungeon(fd, perform_write, free_data)
 	}
 	branches = 0;
 #ifdef DUNGEON_OVERVIEW
-    for (curr_ms = mapseenchn; curr_ms; curr_ms = next_ms) {
-	next_ms = curr_ms->next;
-	if (curr_ms->custom)
-	    free((genericptr_t)curr_ms->custom);
-	free((genericptr_t) curr_ms);
-    }
-    mapseenchn = 0;
+	for (curr_ms = mapseenchn; curr_ms; curr_ms = next_ms) {
+	    next_ms = curr_ms->next;
+	    if (curr_ms->custom)
+		free((genericptr_t)curr_ms->custom);
+	    free((genericptr_t) curr_ms);
+	}
+	mapseenchn = 0;
 #endif /* DUNGEON_OVERVIEW */
     }
 }
@@ -1897,8 +1900,7 @@ donamelevel()
     return 0;
 }
 
-/* find the particular mapseen object in the chain */
-/* may return 0 */
+/* find the particular mapseen object in the chain; may return null */
 STATIC_OVL mapseen *
 find_mapseen(lev)
 d_level *lev;
@@ -1916,6 +1918,7 @@ forget_mapseen(ledger_num)
 int ledger_num;
 {
     mapseen *mptr;
+    struct cemetery *bp;
 
     for (mptr = mapseenchn; mptr; mptr = mptr->next)
 	if (dungeons[mptr->lev.dnum].ledger_start + 
@@ -1923,7 +1926,7 @@ int ledger_num;
 
     /* if not found, then nothing to forget */
     if (mptr) {
-	mptr->feat.forgot = 1;
+	mptr->flags.forgot = 1;
 	mptr->br = (branch *)0;
 
 	/* custom names are erased, not just forgotten until revisted */
@@ -1932,7 +1935,9 @@ int ledger_num;
 	     free((genericptr_t)mptr->custom);
 	     mptr->custom = (char *)0;
 	}
-	(void) memset((genericptr_t) mptr->rooms, 0, sizeof mptr->rooms);
+	(void) memset((genericptr_t) mptr->msrooms, 0, sizeof mptr->msrooms);
+	for (bp = mptr->final_resting_place; bp; bp = bp->next)
+	    bp->bonesknown = FALSE;
     }
 }
 
@@ -1942,51 +1947,50 @@ int fd;
 mapseen *mptr;
 {
     branch *curr;
-    int count;
+    int brindx;
 
-    count = 0;
-    for (curr = branches; curr; curr = curr->next) {
+    for (brindx = 0, curr = branches; curr; curr = curr->next, ++brindx)
 	if (curr == mptr->br) break;
-	count++;
-    }
+    bwrite(fd, (genericptr_t) &brindx, sizeof brindx);
 
-    bwrite(fd, (genericptr_t) &count, sizeof(int));
-    bwrite(fd, (genericptr_t) &mptr->lev, sizeof(d_level));
-    bwrite(fd, (genericptr_t) &mptr->feat, sizeof(mapseen_feat));
-    bwrite(fd, (genericptr_t) &mptr->custom_lth, sizeof(unsigned));
+    bwrite(fd, (genericptr_t) &mptr->lev, sizeof mptr->lev);
+    bwrite(fd, (genericptr_t) &mptr->feat, sizeof mptr->feat);
+    bwrite(fd, (genericptr_t) &mptr->flags, sizeof mptr->flags);
+    bwrite(fd, (genericptr_t) &mptr->custom_lth, sizeof mptr->custom_lth);
     if (mptr->custom_lth)
-	bwrite(fd, (genericptr_t) mptr->custom, 
-	       sizeof(char) * mptr->custom_lth);
-    bwrite(fd, (genericptr_t) &mptr->rooms, sizeof(mptr->rooms));
+	bwrite(fd, (genericptr_t) mptr->custom, mptr->custom_lth);
+    bwrite(fd, (genericptr_t) &mptr->msrooms, sizeof mptr->msrooms);
+    savecemetery(fd, WRITE_SAVE, &mptr->final_resting_place);
 }
 
 STATIC_OVL mapseen *
 load_mapseen(fd)
 int fd;
 {
-    int branchnum, count;
+    int branchnum, brindx;
     mapseen *load;
     branch *curr;
 
-    load = (mapseen *) alloc(sizeof(mapseen));
-    mread(fd, (genericptr_t) &branchnum, sizeof(int));
+    load = (mapseen *) alloc(sizeof *load);
 
-    count = 0;
-    for (curr = branches; curr; curr = curr->next) {
-	if (count == branchnum) break;
-	count++;
-    }
+    mread(fd, (genericptr_t) &branchnum, sizeof branchnum);
+    for (brindx = 0, curr = branches; curr; curr = curr->next, ++brindx)
+	if (brindx == branchnum) break;
     load->br = curr;
 
-    mread(fd, (genericptr_t) &load->lev, sizeof(d_level));
-    mread(fd, (genericptr_t) &load->feat, sizeof(mapseen_feat));
-    mread(fd, (genericptr_t) &load->custom_lth, sizeof(unsigned));
-    if (load->custom_lth > 0) {
-	load->custom = (char *) alloc(sizeof(char) * load->custom_lth);
-	mread(fd, (genericptr_t) load->custom, 
-	      sizeof(char) * load->custom_lth);
-    } else load->custom = (char *) 0;
-    mread(fd, (genericptr_t) &load->rooms, sizeof(load->rooms));
+    mread(fd, (genericptr_t) &load->lev, sizeof load->lev);
+    mread(fd, (genericptr_t) &load->feat, sizeof load->feat);
+    mread(fd, (genericptr_t) &load->flags, sizeof load->flags);
+    mread(fd, (genericptr_t) &load->custom_lth, sizeof load->custom_lth);
+    if (load->custom_lth) {
+	/* length doesn't include terminator (which isn't saved & restored) */
+	load->custom = (char *) alloc(load->custom_lth + 1);
+	mread(fd, (genericptr_t) load->custom, load->custom_lth);
+	load->custom[load->custom_lth] = '\0';
+    } else
+	load->custom = 0;
+    mread(fd, (genericptr_t) &load->msrooms, sizeof load->msrooms);
+    restcemetery(fd, &load->final_resting_place);
 
     return load;
 }
@@ -2006,6 +2010,8 @@ int dnum;
 	    *mptraddr = mptr->next;
 	    if (mptr->custom)
 		free((genericptr_t) mptr->custom);
+	    if (mptr->final_resting_place)
+		savecemetery(-1, FREE_SAVE, &mptr->final_resting_place);
 	    free((genericptr_t) mptr);
 	} else
 	    mptraddr = &mptr->next;
@@ -2023,9 +2029,10 @@ d_level *lev;
 
     init = (mapseen *) alloc(sizeof *init);
     (void) memset((genericptr_t)init, 0, sizeof *init);
-    /* memset is fine for feature bits and rooms array;
+    /* memset is fine for feature bits, flags, and rooms array;
        explicitly initialize pointers to null */
     init->next = 0, init->br = 0, init->custom = 0;
+    init->final_resting_place = 0;
     /* lastseentyp[][] is reused for each level, so get rid of
        previous level's data */
     (void) memset((genericptr_t)lastseentyp, 0, sizeof lastseentyp);
@@ -2059,9 +2066,10 @@ d_level *lev;
 	 (feat).nsink || \
 	 (feat).nthrone || \
 	 (feat).naltar || \
+	 (feat).ngrave || \
+	 (feat).ntree || \
 	 (feat).nshop || \
-	 (feat).ntemple || \
-	 (feat).ntree)
+	 (feat).ntemple)
 	/*
 	|| ((feat).water) || \
 	((feat).ice) || \
@@ -2073,9 +2081,24 @@ STATIC_OVL boolean
 interest_mapseen(mptr)
 mapseen *mptr;
 {
-    return on_level(&u.uz, &mptr->lev) ||
-		(!mptr->feat.forgot &&
-		    (INTEREST(mptr->feat) || (mptr->custom) || (mptr->br)));
+    if (on_level(&u.uz, &mptr->lev)) return TRUE;
+    if (mptr->flags.forgot) return FALSE;
+    if (In_endgame(&u.uz) && !In_endgame(&mptr->lev)) return FALSE;
+    if (mptr->flags.oracle || mptr->flags.bigroom ||
+# ifdef REINCARNATION
+	mptr->flags.roguelevel ||
+# endif
+	mptr->flags.castle || mptr->flags.valley ||
+	mptr->flags.msanctum) return TRUE;
+    /* when in Sokoban, list all sokoban levels visited; when not in it,
+       list any visited Sokoban level which remains unsolved (could only
+       be furthest one reached, unless level teleporting in wizard mode) */
+    if (In_sokoban(&mptr->lev) &&
+	(In_sokoban(&u.uz) || !mptr->flags.sokosolved)) return TRUE;
+    return (INTEREST(mptr->feat) ||
+	    (mptr->final_resting_place &&
+		(mptr->flags.knownbones || wizard)) ||
+	    mptr->custom || mptr->br);
 }
 
 /* recalculate mapseen for the current level */
@@ -2083,8 +2106,10 @@ void
 recalc_mapseen()
 {
     mapseen *mptr;
-    struct monst *shkp;
-    unsigned int x, y, ridx;
+    struct monst *mtmp;
+    struct cemetery *bp, **bonesaddr;
+    unsigned i, ridx;
+    int x, y, count, atmp;
 
     /* Should not happen in general, but possible if in the process
      * of being booted from the quest.  The mapseen object gets
@@ -2092,36 +2117,58 @@ recalc_mapseen()
      */
     if (!(mptr = find_mapseen(&u.uz))) return;
 
-    /* reset all features; mptr->feat.* = 0, mptr->feat.forgot = 0; */
-    memset((genericptr_t) &mptr->feat, 0, sizeof(mapseen_feat));
+    /* reset all features; mptr->feat.* = 0; */
+    (void) memset((genericptr_t) &mptr->feat, 0, sizeof mptr->feat);
+    /* reset most flags; some level-specific ones are left as-is */
+    mptr->flags.knownbones = 0;
+    mptr->flags.sokosolved = In_sokoban(&u.uz) && !Sokoban;
+    /* mptr->flags.bigroom retains previous value when hero can't see */
+    if (!Blind)
+	mptr->flags.bigroom = Is_bigroom(&u.uz);
+    else if (mptr->flags.forgot)
+	mptr->flags.bigroom = 0;
+# ifdef REINCARNATION
+    mptr->flags.roguelevel = Is_rogue_level(&u.uz);
+# endif
+    mptr->flags.oracle = 0;	/* recalculated during room traversal below */
+    mptr->flags.castletune = 0;
+    /* flags.castle, flags.valley, flags.msanctum retain previous value */
+    mptr->flags.forgot = 0;
 
     /* track rooms the hero is in */
-    for (x = 0; x < sizeof(u.urooms); x++) {
-	if (!u.urooms[x]) continue;
+    for (i = 0; i < SIZE(u.urooms); ++i) {
+	if (!u.urooms[i]) continue;
 
-	ridx = u.urooms[x] - ROOMOFFSET;
-	if (rooms[ridx].rtype < SHOPBASE ||
-		((shkp = shop_keeper(u.urooms[x])) && inhishop(shkp)))
-	    mptr->rooms[ridx] |= MSR_SEEN;
-	else
-	    /* shops without shopkeepers are no shops at all */
-	    mptr->rooms[ridx] &= ~MSR_SEEN;
+	ridx = u.urooms[i] - ROOMOFFSET;
+	mptr->msrooms[ridx].seen = 1;
+	mptr->msrooms[ridx].untended = (rooms[ridx].rtype >= SHOPBASE) ?
+		      (!(mtmp = shop_keeper(u.urooms[i])) || !inhishop(mtmp)) :
+					 (rooms[ridx].rtype == TEMPLE) ?
+		    (!(mtmp = findpriest(u.urooms[i])) || !inhistemple(mtmp)) :
+					   0;
     }
 
     /* recalculate room knowledge: for now, just shops and temples
      * this could be extended to an array of 0..SHOPBASE
      */
-    for (x = 0; x < sizeof(mptr->rooms); x++) {
-	if (mptr->rooms[x] & MSR_SEEN) {
-	    if (rooms[x].rtype >= SHOPBASE) {
-		if (!mptr->feat.nshop)
-		    mptr->feat.shoptype = rooms[x].rtype;
-		else if (mptr->feat.shoptype != (unsigned)rooms[x].rtype)
+    for (i = 0; i < SIZE(mptr->msrooms); ++i) {
+	if (mptr->msrooms[i].seen) {
+	    if (rooms[i].rtype >= SHOPBASE) {
+		if (mptr->msrooms[i].untended)
+		    mptr->feat.shoptype = SHOPBASE - 1;
+		else if (!mptr->feat.nshop)
+		    mptr->feat.shoptype = rooms[i].rtype;
+		else if (mptr->feat.shoptype != (unsigned)rooms[i].rtype)
 		    mptr->feat.shoptype = 0;
-		mptr->feat.nshop = min(mptr->feat.nshop + 1, 3);
-	    } else if (rooms[x].rtype == TEMPLE)
+		count = mptr->feat.nshop + 1;
+		if (count <= 3) mptr->feat.nshop = count;
+	    } else if (rooms[i].rtype == TEMPLE) {
 		/* altar and temple alignment handled below */
-		mptr->feat.ntemple = min(mptr->feat.ntemple + 1, 3);
+		count = mptr->feat.ntemple + 1;
+		if (count <= 3) mptr->feat.ntemple = count;
+	    } else if (rooms[i].orig_rtype == DELPHI) {
+		mptr->flags.oracle = 1;
+	    }
 	}
     }
 
@@ -2136,6 +2183,8 @@ recalc_mapseen()
      * we could track "features" and then update them all here, and keep
      * track of when new features are created or destroyed, but this
      * seemed the most elegant, despite adding more data to struct rm.
+     * [3.5.0: we're using lastseentyp[][] rather than level.locations
+     * to track the features seen.]
      *
      * Although no current windowing systems (can) do this, this would add
      * the ability to have non-dungeon glyphs float above the last known
@@ -2144,11 +2193,10 @@ recalc_mapseen()
     if (!Levitation)
 	lastseentyp[u.ux][u.uy] = levl[u.ux][u.uy].typ;
 
-    for (x = 0; x < COLNO; x++) {
+    for (x = 1; x < COLNO; x++) {
 	for (y = 0; y < ROWNO; y++) {
 	    if (cansee(x, y)) {
-		struct monst *mtmp = m_at(x, y);
-
+		mtmp = m_at(x, y);
 		lastseentyp[x][y] =
 	      (mtmp && mtmp->m_ap_type == M_AP_FURNITURE && canseemon(mtmp)) ?
 				    cmap_to_type(mtmp->mappearance) :
@@ -2158,39 +2206,121 @@ recalc_mapseen()
 	    switch (lastseentyp[x][y]) {
 #if 0
 	    case ICE:
-		mptr->feat.ice = 1;
+		count = mptr->feat.ice + 1;
+		if (count <= 3) mptr->feat.ice = count;
 		break;
 	    case POOL:
 	    case MOAT:
 	    case WATER:
-		mptr->feat.water = 1;
+		count = mptr->feat.water + 1;
+		if (count <= 3) mptr->feat.water = count;
 		break;
 	    case LAVAPOOL:
-		mptr->feat.lava = 1;
+		count = mptr->feat.lava + 1;
+		if (count <= 3) mptr->feat.lava = count;
 		break;
 #endif
 	    case TREE:
-		mptr->feat.ntree = min(mptr->feat.ntree + 1, 3);
+		count = mptr->feat.ntree + 1;
+		if (count <= 3) mptr->feat.ntree = count;
 		break;
 	    case FOUNTAIN:
-		mptr->feat.nfount = min(mptr->feat.nfount + 1, 3);
+		count = mptr->feat.nfount + 1;
+		if (count <= 3) mptr->feat.nfount = count;
 		break;
 	    case THRONE:
-		mptr->feat.nthrone = min(mptr->feat.nthrone + 1, 3);
+		count = mptr->feat.nthrone + 1;
+		if (count <= 3) mptr->feat.nthrone = count;
 		break;
 	    case SINK:
-		mptr->feat.nsink = min(mptr->feat.nsink + 1, 3);
+		count = mptr->feat.nsink + 1;
+		if (count <= 3) mptr->feat.nsink = count;
+		break;
+	    case GRAVE:
+		count = mptr->feat.ngrave + 1;
+		if (count <= 3) mptr->feat.ngrave = count;
 		break;
 	    case ALTAR:
+		atmp = Amask2msa(levl[x][y].altarmask);
 		if (!mptr->feat.naltar)
-		    mptr->feat.msalign = Amask2msa(levl[x][y].altarmask);
-		else if (mptr->feat.msalign != Amask2msa(levl[x][y].altarmask))
+		    mptr->feat.msalign = atmp;
+		else if (mptr->feat.msalign != atmp)
 		    mptr->feat.msalign = MSA_NONE;
-		mptr->feat.naltar = min(mptr->feat.naltar + 1, 3);
+		count = mptr->feat.naltar + 1;
+		if (count <= 3) mptr->feat.naltar = count;
+		break;
+	    /*	An automatic annotation is added to the Castle and
+	     *	to Fort Ludios once their struncture's main entrance
+	     *	has been seen (in person or via magic mapping).
+	     * DOOR: possibly a lowered drawbridge's open portcullis;
+	     * DBWALL: a raised drawbridge's "closed door";
+	     * DRAWBRIDGE_DOWN: the span provided by lowered bridge,
+	     *	with moat or other terrain hidden underneath;
+	     * DRAWBRIDGE_UP: moat in front of a raised drawbridge,
+	     *	not recognizable as a bridge location unless/until
+	     *	the adjacent DBWALL has been seen.
+	     */
+	    case DOOR:
+		if (is_drawbridge_wall(x, y) < 0) break;
+		/* else FALLTHRU */
+	    case DBWALL:
+	    case DRAWBRIDGE_DOWN:
+		if (Is_stronghold(&u.uz))
+		    mptr->flags.castle = 1, mptr->flags.castletune = 1;
+		else if (Is_knox(&u.uz))
+		    mptr->flags.ludios = 1;
+		break;
+	    default:
 		break;
 	    }
 	}
     }
+
+    if (level.bonesinfo && !mptr->final_resting_place) {
+	/* clone the bonesinfo so we aren't dependent upon this
+	   level being in memory */
+	bonesaddr = &mptr->final_resting_place;
+	bp = level.bonesinfo;
+	do {
+	    *bonesaddr = (struct cemetery *)alloc(sizeof **bonesaddr);
+	    **bonesaddr = *bp;
+	    bp = bp->next;
+	    bonesaddr = &(*bonesaddr)->next;
+	} while (bp);
+	*bonesaddr = 0;
+    }
+    /* decide which past hero deaths have become known; there's no
+       guarantee of either a grave or a ghost, so we go by whether the
+       current hero has seen the map location where each old one died */
+    for (bp = mptr->final_resting_place; bp; bp = bp->next)
+	if (lastseentyp[bp->frpx][bp->frpy]) {
+	    bp->bonesknown = TRUE;
+	    mptr->flags.knownbones = 1;
+	}
+}
+
+/*ARGUSED*/
+/* valley and sanctum levels get automatic annotation once temple is entered */
+void
+mapseen_temple(priest)
+struct monst *priest UNUSED;	/* currently unused; might be useful someday */
+{
+    mapseen *mptr = find_mapseen(&u.uz);
+
+    if (Is_valley(&u.uz))
+	mptr->flags.valley = 1;
+    else if (Is_sanctum(&u.uz))
+	mptr->flags.msanctum = 1;
+}
+
+/* room entry message has just been delivered so learn room even if blind */
+void
+room_discovered(roomno)
+int roomno;
+{
+    mapseen *mptr = find_mapseen(&u.uz);
+
+    mptr->msrooms[roomno].seen = 1;
 }
 
 int
@@ -2254,40 +2384,49 @@ branch *br;
     return "(unknown)";
 }
 
-STATIC_OVL const char*
+STATIC_OVL const char *
 shop_string(rtype)
 int rtype;
 {
+    const char *str = "shop";	/* catchall */
+
     /* Yuck, redundancy...but shclass.name doesn't cut it as a noun */
     switch (rtype) {
-    case SHOPBASE:
-	return "general store";
-    case ARMORSHOP:
-	return "armor shop";
-    case SCROLLSHOP:
-	return "scroll shop";
-    case POTIONSHOP:
-	return "potion shop";
-    case WEAPONSHOP:
-	return "weapon shop";
-    case FOODSHOP:
-	return "delicatessen";
-    case RINGSHOP:
-	return "jewelers";
-    case WANDSHOP:
-	return "wand shop";
-    case BOOKSHOP:
-	return "bookstore";
-    case FODDERSHOP:
-	return "health food store";
-    case CANDLESHOP:
-	return "lighting shop";
-    default:
-	/* In case another patch adds a shop type that doesn't exist,
-	 * do something reasonable like "a shop".
-	 */
-	return "shop";
+    case SHOPBASE - 1:	str = "untended shop";	break; /* see recalc_mapseen */
+    case SHOPBASE:	str = "general store";	break;
+    case ARMORSHOP:	str = "armor shop";	break;
+    case SCROLLSHOP:	str = "scroll shop";	break;
+    case POTIONSHOP:	str = "potion shop";	break;
+    case WEAPONSHOP:	str = "weapon shop";	break;
+    case FOODSHOP:	str = "delicatessen";	break;
+    case RINGSHOP:	str = "jewelers";	break;
+    case WANDSHOP:	str = "wand shop";	break;
+    case BOOKSHOP:	str = "bookstore";	break;
+    case FODDERSHOP:	str = "health food store"; break;
+    case CANDLESHOP:	str = "lighting shop";	break;
+    default: break;
     }
+    return str;
+}
+
+/* if player knows about the mastermind tune, append it to Castle annotation;
+   if drawbridge has been destroyed, flags.castletune will be zero */
+STATIC_OVL char *
+tunesuffix(mptr, outbuf)
+mapseen *mptr;
+char *outbuf;
+{
+    *outbuf = '\0';
+    if (mptr->flags.castletune && u.uevent.uheard_tune) {
+	char tmp[BUFSZ];
+
+	if (u.uevent.uheard_tune == 2)
+	    Sprintf(tmp, "notes \"%s\"", tune);
+	else
+	    Strcpy(tmp, "5-note tune");
+	Sprintf(outbuf, " (play %s to open or close drawbridge)", tmp);
+    }
+    return outbuf;
 }
 
 /* some utility macros for print_mapseen */
@@ -2360,6 +2499,10 @@ boolean printdun;
 	 */
 	Sprintf(buf, "%sPlane %i:", TAB, -i);
     else
+	/* FIXME: when this branch has only one level (Ft.Ludios),
+	 * listing "Level 1:" for it might confuse inexperienced
+	 * players into thinking there's more than one.
+	 */
 	Sprintf(buf, "%sLevel %d:", TAB, i);
 	
 #ifdef WIZARD
@@ -2371,16 +2514,14 @@ boolean printdun;
 	    Sprintf(eos(buf), " [%s]", slev->proto);
     }
 #endif
-
+    /* [perhaps print custom annotation on its own line when it's long] */
     if (mptr->custom)
 	Sprintf(eos(buf), " (%s)", mptr->custom);
-
-    /* print out glyph or something more interesting? */
-    Sprintf(eos(buf), "%s",
-	    on_level(&u.uz, &mptr->lev) ? " <- You are here" : "");
+    if (on_level(&u.uz, &mptr->lev))
+	Strcat(buf, " <- You are here");
     putstr(win, ATR_BOLD, buf);
 
-    if (mptr->feat.forgot) return;
+    if (mptr->flags.forgot) return;
 
     if (INTEREST(mptr->feat)) {
 	buf[0] = 0;
@@ -2390,25 +2531,28 @@ boolean printdun;
 	/* List interests in an order vaguely corresponding to
 	 * how important they are.
 	 */
-	if (mptr->feat.nshop > 1)
-	    ADDNTOBUF("shop", mptr->feat.nshop);
-	else if (mptr->feat.nshop == 1)
-	    Sprintf(eos(buf), "%s%s", COMMA, 
-		    an(shop_string(mptr->feat.shoptype)));
+	if (mptr->feat.nshop > 0) {
+	    if (mptr->feat.nshop > 1)
+		ADDNTOBUF("shop", mptr->feat.nshop);
+	    else
+		Sprintf(eos(buf), "%s%s", COMMA,
+			an(shop_string(mptr->feat.shoptype)));
+	}
+	if (mptr->feat.naltar > 0) {
+	    /* Temples + non-temple altars get munged into just "altars" */
+	    if (mptr->feat.ntemple != mptr->feat.naltar)
+		ADDNTOBUF("altar", mptr->feat.naltar);
+	    else
+		ADDNTOBUF("temple", mptr->feat.ntemple);
 
-	/* Temples + non-temple altars get munged into just "altars" */
-	if (!mptr->feat.ntemple || mptr->feat.ntemple != mptr->feat.naltar)
-	    ADDNTOBUF("altar", mptr->feat.naltar);
-	else
-	    ADDNTOBUF("temple", mptr->feat.ntemple);
-
-	/* only print out altar's god if they are all to your god */
-	if (Amask2align(Msa2amask(mptr->feat.msalign)) == u.ualign.type)
-	    Sprintf(eos(buf), " to %s", align_gname(u.ualign.type));
-
+	    /* only print out altar's god if they are all to your god */
+	    if (Amask2align(Msa2amask(mptr->feat.msalign)) == u.ualign.type)
+		Sprintf(eos(buf), " to %s", align_gname(u.ualign.type));
+	}
 	ADDNTOBUF("throne", mptr->feat.nthrone);
 	ADDNTOBUF("fountain", mptr->feat.nfount);
 	ADDNTOBUF("sink", mptr->feat.nsink);
+	ADDNTOBUF("grave", mptr->feat.ngrave);
 	ADDNTOBUF("tree", mptr->feat.ntree);
 #if 0
 	ADDTOBUF("water", mptr->feat.water);
@@ -2423,6 +2567,35 @@ boolean printdun;
 	putstr(win, 0, buf);
     }
 
+    /* we assume that these are mutually exclusive */
+    *buf = '\0';
+    if (mptr->flags.oracle) {
+	Sprintf(buf, "%sOracle of Delphi.", PREFIX);
+    } else if (In_sokoban(&mptr->lev)) {
+	Sprintf(buf, "%s%s.", PREFIX,
+		mptr->flags.sokosolved ? "Solved" : "Unsolved");
+    } else if (mptr->flags.bigroom) {
+	Sprintf(buf, "%sA very big room.", PREFIX);
+# ifdef REINCARNATION
+    } else if (mptr->flags.roguelevel) {
+	Sprintf(buf, "%sA primitive area.", PREFIX);
+# endif
+    } else if (mptr->flags.ludios) {
+	/* presence of the ludios branch in #overview output indicates that
+	   the player has made it onto the level; presence of this annotation
+	   indicates that the fort's entrance has been seen (or mapped) */
+	Sprintf(buf, "%sFort Ludios.", PREFIX);
+    } else if (mptr->flags.castle) {
+	char tmpbuf[BUFSZ];
+
+	Sprintf(buf, "%sThe castle%s.", PREFIX, tunesuffix(mptr, tmpbuf));
+    } else if (mptr->flags.valley) {
+	Sprintf(buf, "%sValley of the Dead.", PREFIX);
+    } else if (mptr->flags.msanctum) {
+	Sprintf(buf, "%sMoloch's Sanctum.", PREFIX);
+    }
+    if (*buf) putstr(win, 0, buf);
+
     /* print out branches */
     if (mptr->br) {
 	Sprintf(buf, "%s%s to %s", PREFIX, br_string2(mptr->br), 
@@ -2436,6 +2609,26 @@ boolean printdun;
 	    Sprintf(eos(buf), ", level %d", depth(&(mptr->br->end2)));
 	Strcat(buf, ".");
 	putstr(win, 0, buf);
+    }
+
+    /* maybe print out bones details */
+    if (mptr->final_resting_place) {
+	struct cemetery *bp;
+	int kncnt = 0;
+
+	for (bp = mptr->final_resting_place; bp; bp = bp->next)
+	    if (bp->bonesknown || wizard) ++kncnt;
+	if (kncnt) {
+	    Sprintf(buf, "%s%s", PREFIX, "Final resting place for");
+	    putstr(win, 0, buf);
+	    for (bp = mptr->final_resting_place; bp; bp = bp->next) {
+		if (bp->bonesknown || wizard) {
+		    Sprintf(buf, "%s%s%s, %s%c", PREFIX, TAB,
+			    bp->who, bp->how, --kncnt ? ',' : '.');
+		    putstr(win, 0, buf);
+		}
+	    }
+	}
     }
 }
 #endif /* DUNGEON_OVERVIEW */
