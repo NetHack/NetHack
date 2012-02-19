@@ -1815,14 +1815,14 @@ dodip()
 				potion : obj, 5, 95)) {
 		pline1(nothing_happens);
 	    } else {
-	    	boolean was_wep = FALSE, was_swapwep = FALSE, was_quiver = FALSE;
+	    	boolean was_wep, was_swapwep, was_quiver;
 		short save_otyp = obj->otyp;
 		/* KMH, conduct */
 		u.uconduct.polypiles++;
 
-		if (obj == uwep) was_wep = TRUE;
-		else if (obj == uswapwep) was_swapwep = TRUE;
-		else if (obj == uquiver) was_quiver = TRUE;
+		was_wep = (obj == uwep);
+		was_swapwep = (obj == uswapwep);
+		was_quiver = (obj == uquiver);
 
 		obj = poly_obj(obj, STRANGE_OBJECT);
 
@@ -1842,66 +1842,98 @@ dodip()
 	    }
 	    potion->in_use = FALSE;	/* didn't go poof */
 	    return(1);
-	} else if(obj->oclass == POTION_CLASS && obj->otyp != potion->otyp) {
-		/* Mixing potions is dangerous... */
-		pline_The("potions mix...");
-		/* KMH, balance patch -- acid is particularly unstable */
-		if (obj->cursed || obj->otyp == POT_ACID || !rn2(10)) {
-			pline("BOOM!  They explode!");
-			wake_nearto(u.ux, u.uy, (BOLT_LIM+1)*(BOLT_LIM+1));
-			exercise(A_STR, FALSE);
-			if (!breathless(youmonst.data) || haseyes(youmonst.data))
-				potionbreathe(obj);
-			useup(obj);
-			useup(potion);
-			losehp(rnd(10), "alchemic blast",  /* not physical damage */
-					KILLED_BY_AN);
-			return(1);
+	} else if (obj->oclass == POTION_CLASS && obj->otyp != potion->otyp) {
+	    long amt = obj->quan;
+
+	    Strcpy(qbuf, "The");
+	    if (amt > (objects[potion->otyp].oc_magic ? 2L : 9L)) {
+		/* trying to dip multiple potions will usually affect only a
+		   subset; pick an amount between 2 and min(N,9), inclusive */
+		amt -= 1L;
+		do {
+		    amt = (long)rnd((int)amt);
+		} while (amt >= 9L);
+		amt += 1L;
+		if (amt < obj->quan) {
+		    obj = splitobj(obj, amt);
+		    Sprintf(qbuf, "%ld of the", obj->quan);
 		}
-
-		obj->blessed = obj->cursed = obj->bknown = 0;
-		if (Blind || Hallucination) obj->dknown = 0;
-
-		if ((mixture = mixtype(obj, potion)) != 0) {
-			obj->otyp = mixture;
-		} else {
-		    switch (obj->odiluted ? 1 : rnd(8)) {
-			case 1:
-				obj->otyp = POT_WATER;
-				break;
-			case 2:
-			case 3:
-				obj->otyp = POT_SICKNESS;
-				break;
-			case 4:
-				{
-				  struct obj *otmp;
-				  otmp = mkobj(POTION_CLASS,FALSE);
-				  obj->otyp = otmp->otyp;
-				  obfree(otmp, (struct obj *)0);
-				}
-				break;
-			default:
-				if (!Blind)
-			  pline_The("mixture glows brightly and evaporates.");
-				useup(obj);
-				useup(potion);
-				return(1);
-		    }
-		}
-
-		obj->odiluted = (obj->otyp != POT_WATER);
-
-		if (obj->otyp == POT_WATER && !Hallucination) {
-			pline_The("mixture bubbles%s.",
-				Blind ? "" : ", then clears");
-		} else if (!Blind) {
-			pline_The("mixture looks %s.",
-				hcolor(OBJ_DESCR(objects[obj->otyp])));
-		}
-
+	    }
+	    /* [N of] the {obj(s)} mix(es) with [one of] {the potion}... */
+	    pline("%s %s %s with %s%s...", qbuf,
+		  simpleonames(obj), otense(obj, "mix"),
+		  (potion->quan > 1L) ? "one of " : "",
+		  thesimpleoname(potion));
+	    /* Mixing potions is dangerous...
+	       KMH, balance patch -- acid is particularly unstable */
+	    if (obj->cursed || obj->otyp == POT_ACID || !rn2(10)) {
+		/* it would be better to use up the whole stack in advance
+		   of the message, but we can't because we need to keep it
+		   around for potionbreathe() [and we can't set obj->in_use
+		   to 'amt' because that's not implemented] */
+		obj->in_use = 1;
+		pline("BOOM!  They explode!");
+		wake_nearto(u.ux, u.uy, (BOLT_LIM+1)*(BOLT_LIM+1));
+		exercise(A_STR, FALSE);
+		if (!breathless(youmonst.data) || haseyes(youmonst.data))
+		    potionbreathe(obj);
+		useupall(obj);
 		useup(potion);
-		return(1);
+		losehp((int)(amt + rnd(9)),	/* not physical damage */
+		       "alchemic blast", KILLED_BY_AN);
+		return 1;
+	    }
+
+	    obj->blessed = obj->cursed = obj->bknown = 0;
+	    if (Blind || Hallucination) obj->dknown = 0;
+
+	    if ((mixture = mixtype(obj, potion)) != 0) {
+		obj->otyp = mixture;
+	    } else {
+		switch (obj->odiluted ? 1 : rnd(8)) {
+		case 1:
+		    obj->otyp = POT_WATER;
+		    break;
+		case 2:
+		case 3:
+		    obj->otyp = POT_SICKNESS;
+		    break;
+		case 4:
+		  {
+		    struct obj *otmp = mkobj(POTION_CLASS, FALSE);
+
+		    obj->otyp = otmp->otyp;
+		    obfree(otmp, (struct obj *)0);
+		  }
+		    break;
+		default:
+		    useupall(obj);
+		    useup(potion);
+		    if (!Blind)
+			pline_The("mixture glows brightly and evaporates.");
+		    return 1;
+		}
+	    }
+	    obj->odiluted = (obj->otyp != POT_WATER);
+
+	    if (obj->otyp == POT_WATER && !Hallucination) {
+		pline_The("mixture bubbles%s.",	Blind ? "" : ", then clears");
+	    } else if (!Blind) {
+		pline_The("mixture looks %s.",
+			  hcolor(OBJ_DESCR(objects[obj->otyp])));
+	    }
+
+	    useup(potion);
+	    /* this is required when 'obj' was split off from a bigger stack,
+	       so that 'obj' will now be assigned its own inventory slot;
+	       it has a side-effect of merging 'obj' into another compatible
+	       stack if there is one, so we do it even when no split has
+	       been made in order to get the merge result for both cases;
+	       as a consequence, mixing while Fumbling drops the mixture */
+	    freeinv(obj);
+	    (void) hold_another_object(obj, "You drop %s!", doname(obj),
+				       (const char *)0);
+	    return 1;
 	}
 
 #ifdef INVISIBLE_OBJECTS

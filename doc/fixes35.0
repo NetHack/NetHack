@@ -409,6 +409,8 @@ theft of worn armor with wear/unwear delay would interfere with completion of
 	(disrupted wear attempt for +N helm of brilliance would result in loss
 	of N points of Int and Wis; gauntlets of dexterity had similar problem)
 #sit while swallowed would give the wrong message
+alchemical explosion or evaporation only used up one potion instead of all
+	the potions being dipped
 
 
 Platform- and/or Interface-Specific Fixes
@@ -558,6 +560,7 @@ display version and build information at startup
 repeatedly setting the fruit option will check to see if fruits have been
     created, so the user can't easily overflow the maximum this way
 bones files now include extra data to identify dead hero and reason for death
+dipping multiple potions in another potion may only dip part of their stack
 
 
 Platform- and/or Interface-Specific New Features
