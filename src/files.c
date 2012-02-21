@@ -158,6 +158,10 @@ static int lockptr;
 # define unlink macunlink
 #endif
 
+#if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
+# define PRAGMA_UNUSED
+#endif
+
 #ifdef USER_SOUNDS
 extern char *sounddir;
 #endif
@@ -184,8 +188,9 @@ STATIC_DCL boolean FDECL(make_compressed_name, (const char *, char *));
 #endif
 STATIC_DCL char *FDECL(make_lockname, (const char *,char *));
 STATIC_DCL FILE *FDECL(fopen_config_file, (const char *, int));
-STATIC_DCL int FDECL(get_uchars, (FILE *,char *,char *,uchar *,BOOLEAN_P,int,const char *));
-int FDECL(parse_config_line, (FILE *,char *,char *,char *,int));
+STATIC_DCL int FDECL(get_uchars,
+		    (FILE *,char *,char *,uchar *,BOOLEAN_P,int,const char *));
+int FDECL(parse_config_line, (FILE *,char *,int));
 #ifdef LOADSYMSETS
 STATIC_DCL FILE *NDECL(fopen_sym_file);
 STATIC_DCL void FDECL(set_symhandling, (char *,int));
@@ -306,13 +311,18 @@ int bufsz;
 	return callerbuf;
 }
 
-#ifndef PREFIXES_IN_USE
-/*ARGSUSED*/
+#ifdef PREFIXES_IN_USE
+# define UNUSED_if_not_PREFIXES_IN_USE	/*empty*/
+#else
+# define UNUSED_if_not_PREFIXES_IN_USE	UNUSED
 #endif
+
+/*ARGSUSED*/
 const char *
 fqname(basenam, whichprefix, buffnum)
 const char *basenam;
-int whichprefix, buffnum;
+int whichprefix UNUSED_if_not_PREFIXES_IN_USE;
+int buffnum UNUSED_if_not_PREFIXES_IN_USE;
 {
 #ifndef PREFIXES_IN_USE
 	return basenam;
@@ -337,19 +347,20 @@ int whichprefix, buffnum;
 #endif
 }
 
-/* reasonbuf must be at least BUFSZ, supplied by caller */
-/*ARGSUSED*/
 int
 validate_prefix_locations(reasonbuf)
-char *reasonbuf;
+char *reasonbuf;  /* reasonbuf must be at least BUFSZ, supplied by caller */
 {
 #if defined(NOCWD_ASSUMPTIONS)
 	FILE *fp;
 	const char *filename;
 	int prefcnt, failcount = 0;
-	char panicbuf1[BUFSZ], panicbuf2[BUFSZ], *details;
+	char panicbuf1[BUFSZ], panicbuf2[BUFSZ];
+	const char *details;
+#endif
 
 	if (reasonbuf) reasonbuf[0] = '\0';
+#if defined(NOCWD_ASSUMPTIONS)
 	for (prefcnt = 1; prefcnt < PREFIX_COUNT; prefcnt++) {
 		/* don't test writing to configdir or datadir; they're readonly */
 		if (prefcnt == CONFIGPREFIX || prefcnt == DATAPREFIX) continue;
@@ -1332,15 +1343,21 @@ boolean uncomp;
 }
 #endif	/* COMPRESS */
 
+#if defined(COMPRESS) || defined(ZLIB_COMP)
+# define UNUSED_if_not_COMPRESS	/*empty*/
+#else
+# define UNUSED_if_not_COMPRESS	UNUSED
+#endif
+
 /* compress file */
 void
 nh_compress(filename)
-const char *filename;
+const char *filename UNUSED_if_not_COMPRESS;
 {
 #if !defined(COMPRESS) && !defined(ZLIB_COMP)
-#if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
-# pragma unused(filename)
-#endif
+# ifdef PRAGMA_UNUSED
+#  pragma unused(filename)
+# endif
 #else
 	docompress_file(filename, FALSE);
 #endif
@@ -1350,12 +1367,12 @@ const char *filename;
 /* uncompress file if it exists */
 void
 nh_uncompress(filename)
-const char *filename;
+const char *filename UNUSED_if_not_COMPRESS;
 {
 #if !defined(COMPRESS) && !defined(ZLIB_COMP)
-#if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
-# pragma unused(filename)
-#endif
+# ifdef PRAGMA_UNUSED
+#  pragma unused(filename)
+# endif
 #else
 	docompress_file(filename, TRUE);
 #endif
@@ -1538,35 +1555,32 @@ make_lockname(filename, lockname)
 const char *filename;
 char *lockname;
 {
-#if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
-# pragma unused(filename,lockname)
-	return (char*)0;
-#else
-# if defined(UNIX) || defined(VMS) || defined(AMIGA) || defined(WIN32) || defined(MSDOS)
-#  ifdef NO_FILE_LINKS
+#if defined(UNIX) || defined(VMS) || defined(AMIGA) || defined(WIN32) || defined(MSDOS)
+# ifdef NO_FILE_LINKS
 	Strcpy(lockname, LOCKDIR);
 	Strcat(lockname, "/");
 	Strcat(lockname, filename);
-#  else
+# else
 	Strcpy(lockname, filename);
-#  endif
-#  ifdef VMS
+# endif
+# ifdef VMS
       {
 	char *semi_colon = rindex(lockname, ';');
 	if (semi_colon) *semi_colon = '\0';
       }
 	Strcat(lockname, ".lock;1");
-#  else
-	Strcat(lockname, "_lock");
-#  endif
-	return lockname;
 # else
+	Strcat(lockname, "_lock");
+# endif
+	return lockname;
+#else	/* !(UNIX || VMS || AMIGA || WIN32 || MSDOS) */
+# ifdef PRAGMA_UNUSED
+#  pragma unused(filename)
+# endif
 	lockname[0] = '\0';
 	return (char*)0;
-# endif  /* UNIX || VMS || AMIGA || WIN32 || MSDOS */
 #endif
 }
-
 
 /* lock a file */
 boolean
@@ -1575,8 +1589,8 @@ const char *filename;
 int whichprefix;
 int retryct;
 {
-#if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
-# pragma unused(filename, retryct)
+#if defined(PRAGMA_UNUSED) && !(defined(UNIX) || defined(VMS)) && !(defined(AMIGA) || defined(WIN32) || defined(MSDOS))
+# pragma unused(retryct)
 #endif
 	char locknambuf[BUFSZ];
 	const char *lockname;
@@ -1605,8 +1619,8 @@ int retryct;
 	    case EEXIST:
 		if (retryct--) {
 		    HUP raw_printf(
-			    "Waiting for access to %s.  (%d retries left).",
-			    filename, retryct);
+		  	       "Waiting for access to %s.  (%d retries left).",
+				   filename, retryct);
 # if defined(SYSV) || defined(ULTRIX) || defined(VMS)
 		    (void)
 # endif
@@ -1614,7 +1628,7 @@ int retryct;
 		} else {
 		    HUP (void) raw_print("I give up.  Sorry.");
 		    HUP raw_printf("Perhaps there is an old %s around?",
-					lockname);
+				   lockname);
 		    nesting--;
 		    return FALSE;
 		}
@@ -1641,7 +1655,7 @@ int retryct;
 		HUP perror(lockname);
 		HUP raw_printf("Cannot lock %s.", filename);
 		HUP raw_printf(
-"(Perhaps you are running NetHack from inside the distribution package?)."
+     "(Perhaps you are running NetHack from inside the distribution package?)."
 		);
 		nesting--;
 		return FALSE;
@@ -1703,9 +1717,6 @@ int retryct;
 void
 unlock_file(filename)
 const char *filename;
-#if defined(macintosh) && (defined(__SC__) || defined(__MRC__))
-# pragma unused(filename)
-#endif
 {
 	char locknambuf[BUFSZ];
 	const char *lockname;
@@ -1852,35 +1863,36 @@ int src;
 		Sprintf(tmp_config, "%s/%s", envp, ".nethackrc");
 	if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
 		return(fp);
-# if defined(__APPLE__)
+#  if defined(__APPLE__)
 	/* try an alternative */
 	if (envp) {
-		Sprintf(tmp_config, "%s/%s", envp, "Library/Preferences/NetHack Defaults");
+		Sprintf(tmp_config, "%s/%s", envp,
+			"Library/Preferences/NetHack Defaults");
 		if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
 			return(fp);
-		Sprintf(tmp_config, "%s/%s", envp, "Library/Preferences/NetHack Defaults.txt");
+		Sprintf(tmp_config, "%s/%s", envp,
+			"Library/Preferences/NetHack Defaults.txt");
 		if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
 			return(fp);
 	}
-# endif
+#  endif
 	if (errno != ENOENT) {
-	    char *details;
+	    const char *details;
 
 	    /* e.g., problems when setuid NetHack can't search home
 	     * directory restricted to user */
 
-#if defined (NHSTDC) && !defined(NOTSTDC)
+#  if defined (NHSTDC) && !defined(NOTSTDC)
 	    if ((details = strerror(errno)) == 0)
-#endif
+#  endif
 		details = "";
 	    raw_printf("Couldn't open default config file %s %s(%d).",
 		       tmp_config, details, errno);
 	    wait_synch();
 	}
-# endif
+# endif	/* Unix */
 #endif
 	return (FILE *)0;
-
 }
 
 
@@ -1967,22 +1979,20 @@ int prefixid;
 
 #define match_varname(INP,NAM,LEN) match_optname(INP, NAM, LEN, TRUE)
 
-/*ARGSUSED*/
 int
-parse_config_line(fp, buf, tmp_ramdisk, tmp_levels, src)
+parse_config_line(fp, buf, src)
 FILE		*fp;
 char		*buf;
-char		*tmp_ramdisk;
-char		*tmp_levels;
 int		src;
 {
-#if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
-# pragma unused(tmp_ramdisk,tmp_levels)
+#if defined(MICRO) && !defined(NOCWD_ASSUMPTIONS)
+	static boolean ramdisk_specified = FALSE;
 #endif
 	char		*bufp, *altp;
 	uchar   translate[MAXPCHARS];
-	int   len;
+	int   len, n;
 
+	/* lines beginning with '#' are comments */
 	if (*buf == '#')
 		return 1;
 
@@ -2047,17 +2057,23 @@ int		src;
 				 * place.  For now, we accept and silently
 				 * ignore RAMDISK */
 #   ifndef AMIGA
-		(void) strncpy(tmp_ramdisk, bufp, PATHLEN-1);
+		if (strlen(bufp) >= PATHLEN) bufp[PATHLEN-1] = '\0';
+		Strcpy(levels, bufp);
+		ramdisk = (strcmp(permbones, levels) != 0);
+		ramdisk_specified = TRUE;
 #   endif
 #  endif
 	} else if (match_varname(buf, "LEVELS", 4)) {
-		(void) strncpy(tmp_levels, bufp, PATHLEN-1);
-
+		if (strlen(bufp) >= PATHLEN) bufp[PATHLEN-1] = '\0';
+		Strcpy(permbones, bufp);
+		if (!ramdisk_specified || !*levels) Strcpy(levels, bufp);
+		ramdisk = (strcmp(permbones, levels) != 0);
 	} else if (match_varname(buf, "SAVE", 4)) {
 #  ifdef MFLOPPY
 		extern	int saveprompt;
 #  endif
 		char *ptr;
+
 		if ((ptr = index(bufp, ';')) != 0) {
 			*ptr = '\0';
 #  ifdef MFLOPPY
@@ -2088,103 +2104,96 @@ int		src;
 	} else if (match_varname(buf, "CATNAME", 3)) {
 	    (void) strncpy(catname, bufp, PL_PSIZ-1);
 #ifdef SYSCF
-	} else if ( (src==SET_IN_SYS) && match_varname(buf, "WIZARDS", 7)) {
-	    if(sysopt.wizards) free(sysopt.wizards);
-	    sysopt.wizards = (char*)alloc(strlen(bufp)+1);
-	    Strcpy(sysopt.wizards, bufp);
-	} else if ( (src==SET_IN_SYS) && match_varname(buf, "SHELLERS", 8)) {
-	    if(sysopt.shellers) free(sysopt.shellers);
-	    sysopt.shellers = (char*)alloc(strlen(bufp)+1);
-	    Strcpy(sysopt.shellers, bufp);
-	} else if ( (src==SET_IN_SYS) && match_varname(buf, "SUPPORT", 7)) {
-	    if(sysopt.support) free(sysopt.support);
-	    sysopt.support = (char*)alloc(strlen(bufp)+1);
-	    Strcpy(sysopt.support, bufp);
-	} else if ( (src==SET_IN_SYS) && match_varname(buf, "RECOVER", 7)) {
-	    if(sysopt.recover) free(sysopt.recover);
-	    sysopt.recover = (char*)alloc(strlen(bufp)+1);
-	    Strcpy(sysopt.recover, bufp);
-	} else if ( match_varname(buf, "SEDUCE", 6)) {
-	    int temp = !!atoi(bufp);	/* XXX this could be tighter */
-		/* allow anyone to turn it off, but only sysconf to turn it on*/
-	    if(src!=SET_IN_SYS && temp!=0){
+	} else if (src == SET_IN_SYS && match_varname(buf, "WIZARDS", 7)) {
+	    if (sysopt.wizards) free(sysopt.wizards);
+	    sysopt.wizards = dupstr(bufp);
+	} else if (src == SET_IN_SYS && match_varname(buf, "SHELLERS", 8)) {
+	    if (sysopt.shellers) free(sysopt.shellers);
+	    sysopt.shellers = dupstr(bufp);
+	} else if (src == SET_IN_SYS && match_varname(buf, "SUPPORT", 7)) {
+	    if (sysopt.support) free(sysopt.support);
+	    sysopt.support = dupstr(bufp);
+	} else if (src == SET_IN_SYS && match_varname(buf, "RECOVER", 7)) {
+	    if (sysopt.recover) free(sysopt.recover);
+	    sysopt.recover = dupstr(bufp);
+	} else if (match_varname(buf, "SEDUCE", 6)) {
+	    n = !!atoi(bufp);	/* XXX this could be tighter */
+	    /* allow anyone to turn it off, but only sysconf to turn it on*/
+	    if (src != SET_IN_SYS && n != 0) {
 		raw_printf("Illegal value in SEDUCE");
 		return 0;
 	    }
-	    sysopt.seduce = temp;
-	    sysopt_seduce_set(temp);
-	} else if ( (src==SET_IN_SYS) && match_varname(buf, "MAXPLAYERS", 10)) {
-	    int temp = atoi(bufp);
-		/* XXX to get more than 25, need to rewrite all lock code */
-	    if(temp > 0 && temp <= 25){
-		    sysopt.maxplayers = temp;
-	    } else {
-		raw_printf("Illegal value in MAXPLAYERS.");
+	    sysopt.seduce = n;
+	    sysopt_seduce_set(sysopt.seduce);
+	} else if (src == SET_IN_SYS && match_varname(buf, "MAXPLAYERS", 10)) {
+	    n = atoi(bufp);
+	    /* XXX to get more than 25, need to rewrite all lock code */
+	    if (n < 1 || n > 25) {
+		raw_printf("Illegal value in MAXPLAYERS (maximum is 25).");
 		return 0;
 	    }
-	} else if ( (src==SET_IN_SYS) && match_varname(buf, "PERSMAX", 7)) {
-	    int temp = atoi(bufp);
-	    if(temp < 1){
+	    sysopt.maxplayers = n;
+	} else if (src == SET_IN_SYS && match_varname(buf, "PERSMAX", 7)) {
+	    n = atoi(bufp);
+	    if (n < 1) {
 		raw_printf("Illegal value in PERSMAX (minimum is 1).");
 		return 0;
 	    }
-	    sysopt.persmax = temp;
-	} else if ( (src==SET_IN_SYS) && match_varname(buf, "PERS_IS_UID", 11)) {
-	    int temp = atoi(bufp);
-	    if(temp != 0 && temp != 1){
+	    sysopt.persmax = n;
+	} else if (src == SET_IN_SYS && match_varname(buf, "PERS_IS_UID", 11)) {
+	    n = atoi(bufp);
+	    if (n != 0 && n != 1) {
 		raw_printf("Illegal value in PERS_IS_UID (must be 0 or 1).");
 		return 0;
 	    }
-	    sysopt.pers_is_uid = temp;
-	} else if ( (src==SET_IN_SYS) && match_varname(buf, "ENTRYMAX", 8)) {
-	    int temp = atoi(bufp);
-	    if(temp < 10){
+	    sysopt.pers_is_uid = n;
+	} else if (src == SET_IN_SYS && match_varname(buf, "ENTRYMAX", 8)) {
+	    n = atoi(bufp);
+	    if (n < 10) {
 		raw_printf("Illegal value in ENTRYMAX (minimum is 10).");
 		return 0;
 	    }
-	    sysopt.entrymax = temp;
+	    sysopt.entrymax = n;
 	} else if ( (src==SET_IN_SYS) && match_varname(buf, "POINTSMIN", 9)) {
-	    int temp = atoi(bufp);
-	    if(temp < 1){
+	    n = atoi(bufp);
+	    if (n < 1) {
 		raw_printf("Illegal value in POINTSMIN (minimum is 1).");
 		return 0;
 	    }
-	    sysopt.pointsmin = temp;
+	    sysopt.pointsmin = n;
 # ifdef PANICTRACE
-#  ifdef PANICTRACE_LIBC
 	} else if (src == SET_IN_SYS &&
 		match_varname(buf, "PANICTRACE_LIBC", 15)) {
-	    int temp = atoi(bufp);
-	    if (temp < 0 || temp > 2) {
+#  ifdef PANICTRACE_LIBC
+	    n = atoi(bufp);
+	    if (n < 0 || n > 2) {
 		raw_printf("Illegal value in PANICTRACE_LIBC (not 0,1,2).");
 		return 0;
 	    }
-	    sysopt.panictrace_libc = temp;
+	    sysopt.panictrace_libc = n;
 #  endif /* PANICTRACE_LIBC */
 	} else if (src == SET_IN_SYS &&
 		match_varname(buf, "PANICTRACE_GDB", 14)) {
-	    int temp = atoi(bufp);
-	    if (temp < 0 || temp > 2) {
+	    n = atoi(bufp);
+	    if (n < 0 || n > 2) {
 		raw_printf("Illegal value in PANICTRACE_GDB (not 0,1,2).");
 		return 0;
 	    }
-	    sysopt.panictrace_gdb = temp;
-	} else if ( (src==SET_IN_SYS) && match_varname(buf, "GDBPATH", 7)) {
-	    if(!file_exists(bufp)){
+	    sysopt.panictrace_gdb = n;
+	} else if (src == SET_IN_SYS && match_varname(buf, "GDBPATH", 7)) {
+	    if (!file_exists(bufp)) {
 		raw_printf("File specified in GDBPATH does not exist.");
 		return 0;
 	    }
-	    if(sysopt.gdbpath) free(sysopt.gdbpath);
-	    sysopt.gdbpath = (char*)alloc(strlen(bufp)+1);
-	    Strcpy(sysopt.gdbpath, bufp);
-	} else if ( (src==SET_IN_SYS) && match_varname(buf, "GREPPATH", 7)) {
-	    if(!file_exists(bufp)){
+	    if (sysopt.gdbpath) free(sysopt.gdbpath);
+	    sysopt.gdbpath = dupstr(bufp);
+	} else if (src == SET_IN_SYS && match_varname(buf, "GREPPATH", 7)) {
+	    if (!file_exists(bufp)) {
 		raw_printf("File specified in GREPPATH does not exist.");
 		return 0;
 	    }
-	    if(sysopt.greppath) free(sysopt.greppath);
-	    sysopt.greppath = (char*)alloc(strlen(bufp)+1);
-	    Strcpy(sysopt.greppath, bufp);
+	    if (sysopt.greppath) free(sysopt.greppath);
+	    sysopt.greppath = dupstr(bufp);
 # endif /* PANICTRACE */
 #endif /* SYSCF */
 	} else if (match_varname(buf, "BOULDER", 3)) {
@@ -2393,37 +2402,16 @@ read_config_file(filename, src)
 const char *filename;
 int src;
 {
-#define tmp_levels	(char *)0
-#define tmp_ramdisk	(char *)0
-
-#if defined(MICRO) || defined(WIN32)
-#undef tmp_levels
-	char	tmp_levels[PATHLEN];
-# ifdef MFLOPPY
-#  ifndef AMIGA
-#undef tmp_ramdisk
-	char	tmp_ramdisk[PATHLEN];
-#  endif
-# endif
-#endif
 	char	buf[4*BUFSZ];
 	FILE	*fp;
 	boolean rv = TRUE;	/* assume successful parse */
 
 	if (!(fp = fopen_config_file(filename, src))) return FALSE;
 
-#if defined(MICRO) || defined(WIN32)
-# ifdef MFLOPPY
-#  ifndef AMIGA
-	tmp_ramdisk[0] = 0;
-#  endif
-# endif
-	tmp_levels[0] = 0;
-#endif
 	/* begin detection of duplicate configfile options */
 	set_duplicate_opt_detection(1);
 
-	while (fgets(buf, 4*BUFSZ, fp)) {
+	while (fgets(buf, sizeof buf, fp)) {
 #ifdef notyet
 /*
 XXX Don't call read() in parse_config_line, read as callback or reassemble line
@@ -2431,33 +2419,16 @@ at this level.
 OR: Forbid multiline stuff for alternate config sources.
 */
 #endif
-		if (!parse_config_line(fp, buf, tmp_ramdisk, tmp_levels, src)) {
-			raw_printf("Bad option line:  \"%.50s\"", buf);
-			wait_synch();
-			rv = FALSE;
-		}
+	    if (!parse_config_line(fp, buf, src)) {
+		raw_printf("Bad option line:  \"%.50s\"", buf);
+		wait_synch();
+		rv = FALSE;
+	    }
 	}
 	(void) fclose(fp);
 	
 	/* turn off detection of duplicate configfile options */
 	set_duplicate_opt_detection(0);
-
-#if defined(MICRO) && !defined(NOCWD_ASSUMPTIONS)
-	/* should be superseded by fqn_prefix[] */
-# ifdef MFLOPPY
-	Strcpy(permbones, tmp_levels);
-#  ifndef AMIGA
-	if (tmp_ramdisk[0]) {
-		Strcpy(levels, tmp_ramdisk);
-		if (strcmp(permbones, levels))		/* if not identical */
-			ramdisk = TRUE;
-	} else
-#  endif /* AMIGA */
-		Strcpy(levels, tmp_levels);
-
-	Strcpy(bones, levels);
-# endif /* MFLOPPY */
-#endif /* MICRO */
 	return rv;
 }
 
@@ -2723,8 +2694,7 @@ int which_set;
 		    	symset_list = tmpsp;
 		    }
 		    tmpsp->idx = symset_count;
-		    tmpsp->name = (char *)alloc(strlen(bufp)+1);
-		    Strcpy(tmpsp->name, bufp);
+		    tmpsp->name = dupstr(bufp);
 		    tmpsp->desc = (char *)0;
 		    tmpsp->nocolor = 0;
 		    /* initialize restriction bits */
@@ -2747,10 +2717,8 @@ int which_set;
 		    break;
 		 case 3: /* description:something */
 		    tmpsp = symset_list; /* most recent symset */
-		    if (tmpsp && !tmpsp->desc) {
-			tmpsp->desc = (char *)alloc(strlen(bufp)+1);
-			Strcpy(tmpsp->desc, bufp);
-		    }
+		    if (tmpsp && !tmpsp->desc)
+			tmpsp->desc = dupstr(bufp);
 		    break;
 		 case 5:
 		    /* restrictions: xxxx*/
@@ -2951,12 +2919,19 @@ const char *cp;
 
 /* ----------  BEGIN SCOREBOARD CREATION ----------- */
 
-/* verify that we can write to the scoreboard file; if not, try to create one */
+#ifdef OS2_CODEVIEW
+# define UNUSED_if_not_OS2_CODEVIEW	/*empty*/
+#else
+# define UNUSED_if_not_OS2_CODEVIEW	UNUSED
+#endif
+
+/* verify that we can write to scoreboard file; if not, try to create one */
+/*ARGUSED*/
 void
 check_recordfile(dir)
-const char *dir;
+const char *dir UNUSED_if_not_OS2_CODEVIEW;
 {
-#if (defined(macintosh) && (defined(__SC__) || defined(__MRC__))) || defined(__MWERKS__)
+#if defined(PRAGMA_UNUSED) && !defined(OS2_CODEVIEW)
 # pragma unused(dir)
 #endif
 	const char *fq_record;
@@ -2967,12 +2942,12 @@ const char *dir;
 	fd = open(fq_record, O_RDWR, 0);
 	if (fd >= 0) {
 # ifdef VMS	/* must be stream-lf to use UPDATE_RECORD_IN_PLACE */
-		if (!file_is_stmlf(fd)) {
-		    raw_printf(
-		  "Warning: scoreboard file %s is not in stream_lf format",
-				fq_record);
-		    wait_synch();
-		}
+	    if (!file_is_stmlf(fd)) {
+		raw_printf(
+		      "Warning: scoreboard file %s is not in stream_lf format",
+		           fq_record);
+		wait_synch();
+	    }
 # endif
 	    (void) close(fd);	/* RECORD is accessible */
 	} else if ((fd = open(fq_record, O_CREAT|O_RDWR, FCMASK)) >= 0) {
