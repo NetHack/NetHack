@@ -1990,7 +1990,7 @@ int		src;
 #endif
 	char		*bufp, *altp;
 	uchar   translate[MAXPCHARS];
-	int   len, n;
+	int   len;
 
 	/* lines beginning with '#' are comments */
 	if (*buf == '#')
