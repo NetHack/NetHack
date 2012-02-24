@@ -1988,10 +1988,12 @@ int		src;
 #if defined(MICRO) && !defined(NOCWD_ASSUMPTIONS)
 	static boolean ramdisk_specified = FALSE;
 #endif
+#ifdef SYSCF
+	int n;
+#endif
 	char		*bufp, *altp;
 	uchar   translate[MAXPCHARS];
 	int   len;
-
 	/* lines beginning with '#' are comments */
 	if (*buf == '#')
 		return 1;
