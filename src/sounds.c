@@ -1101,7 +1101,7 @@ const char *mapping;
 		new_map->pattern = (char *)alloc(strlen(text) + 1);
 		Strcpy(new_map->pattern, text);
 #endif
-		new_map->filename = strdup(filespec);
+		new_map->filename = dupstr(filespec);
 		new_map->volume = volume;
 		new_map->next = soundmap;
 

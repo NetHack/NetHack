@@ -1020,7 +1020,7 @@ const char* filename;
 	if (validate(fd, filename)==0) {
 	    char tplname[PL_NSIZ];
 	    get_plname_from_file(fd, tplname);
-	    result = strdup(tplname);
+	    result = dupstr(tplname);
 	}
 	(void) close(fd);
     }
@@ -1047,7 +1047,7 @@ const char* filename;
 	for (k=0; name[k]; k++)
 	    if ( name[k]=='_' )
 		name[k]=' ';
-	return strdup(name);
+	return dupstr(name);
     } else
 #  endif /* UNIX && QT_GRAPHICS */
     {
@@ -2363,7 +2363,7 @@ int		src;
 #endif
 #ifdef USER_SOUNDS
 	} else if (match_varname(buf, "SOUNDDIR", 8)) {
-		sounddir = (char *)strdup(bufp);
+		sounddir = (char *)dupstr(bufp);
 	} else if (match_varname(buf, "SOUND", 5)) {
 		add_sound_mapping(bufp);
 #endif
@@ -2372,15 +2372,15 @@ int		src;
 	} else if (match_varname(buf, "QT_TILEWIDTH", 12)) {
 		extern char *qt_tilewidth;
 		if (qt_tilewidth == NULL)	
-			qt_tilewidth=(char *)strdup(bufp);
+			qt_tilewidth=(char *)dupstr(bufp);
 	} else if (match_varname(buf, "QT_TILEHEIGHT", 13)) {
 		extern char *qt_tileheight;
 		if (qt_tileheight == NULL)	
-			qt_tileheight=(char *)strdup(bufp);
+			qt_tileheight=(char *)dupstr(bufp);
 	} else if (match_varname(buf, "QT_FONTSIZE", 11)) {
 		extern char *qt_fontsize;
 		if (qt_fontsize == NULL)
-			qt_fontsize=(char *)strdup(bufp);
+			qt_fontsize=(char *)dupstr(bufp);
 	} else if (match_varname(buf, "QT_COMPACT", 10)) {
 		extern int qt_compact_mode;
 		qt_compact_mode = atoi(bufp);

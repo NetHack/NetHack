@@ -41,8 +41,8 @@ sys_early_init(){
 
 #ifdef PANICTRACE
 		/* panic options */
-	sysopt.gdbpath = strdup(GDBPATH);
-	sysopt.greppath = strdup(GREPPATH);
+	sysopt.gdbpath = dupstr(GDBPATH);
+	sysopt.greppath = dupstr(GREPPATH);
 # ifdef BETA
 	sysopt.panictrace_gdb = 1;
 #  ifdef PANICTRACE_LIBC
