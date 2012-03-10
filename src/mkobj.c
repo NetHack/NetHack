@@ -172,12 +172,9 @@ new_omailcmd(otmp, response_cmd)
 struct obj *otmp;
 const char *response_cmd;
 {
-	unsigned lth = strlen(response_cmd) + 1;
-
 	if (!otmp->oextra) otmp->oextra = newoextra();
 	if (OMAILCMD(otmp)) free_omailcmd(otmp);
-	OMAILCMD(otmp) = (char *)alloc(lth);
-	Strcpy(OMAILCMD(otmp), response_cmd);
+	OMAILCMD(otmp) = dupstr(response_cmd);
 }
 
 void

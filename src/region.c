@@ -796,14 +796,10 @@ const char *msg_leave;
     NhRect tmprect;
     NhRegion *reg = create_region((NhRect *) 0, 0);
 
-    if (msg_enter) {
-	reg->enter_msg = (const char *) alloc(strlen(msg_enter) + 1);
-	Strcpy(reg->enter_msg, msg_enter);
-    }
-    if (msg_leave) {
-	reg->leave_msg = (const char *) alloc(strlen(msg_leave) + 1);
-	Strcpy(reg->leave_msg, msg_leave);
-    }
+    if (msg_enter)
+	reg->enter_msg = dupstr(msg_enter);
+    if (msg_leave)
+	reg->leave_msg = dupstr(msg_leave);
     tmprect.lx = x;
     tmprect.ly = y;
     tmprect.hx = x + w;

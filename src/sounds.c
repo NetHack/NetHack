@@ -1098,8 +1098,7 @@ const char *mapping;
 		new_map->regex.allocated = 0;
 		new_map->regex.regs_allocated = REGS_FIXED;
 #else
-		new_map->pattern = (char *)alloc(strlen(text) + 1);
-		Strcpy(new_map->pattern, text);
+		new_map->pattern = dupstr(text);
 #endif
 		new_map->filename = dupstr(filespec);
 		new_map->volume = volume;

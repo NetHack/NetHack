@@ -2363,7 +2363,7 @@ int		src;
 #endif
 #ifdef USER_SOUNDS
 	} else if (match_varname(buf, "SOUNDDIR", 8)) {
-		sounddir = (char *)dupstr(bufp);
+		sounddir = dupstr(bufp);
 	} else if (match_varname(buf, "SOUND", 5)) {
 		add_sound_mapping(bufp);
 #endif
@@ -2372,15 +2372,15 @@ int		src;
 	} else if (match_varname(buf, "QT_TILEWIDTH", 12)) {
 		extern char *qt_tilewidth;
 		if (qt_tilewidth == NULL)	
-			qt_tilewidth=(char *)dupstr(bufp);
+			qt_tilewidth = dupstr(bufp);
 	} else if (match_varname(buf, "QT_TILEHEIGHT", 13)) {
 		extern char *qt_tileheight;
 		if (qt_tileheight == NULL)	
-			qt_tileheight=(char *)dupstr(bufp);
+			qt_tileheight = dupstr(bufp);
 	} else if (match_varname(buf, "QT_FONTSIZE", 11)) {
 		extern char *qt_fontsize;
 		if (qt_fontsize == NULL)
-			qt_fontsize=(char *)dupstr(bufp);
+			qt_fontsize = dupstr(bufp);
 	} else if (match_varname(buf, "QT_COMPACT", 10)) {
 		extern int qt_compact_mode;
 		qt_compact_mode = atoi(bufp);

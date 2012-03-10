@@ -1383,11 +1383,8 @@ struct monst *mtmp2, *mtmp1;
 
 	if (!mtmp2->mextra) mtmp2->mextra = newmextra();
 	if (MNAME(mtmp1)) {
-		int lth = strlen(MNAME(mtmp1)) + 1;
-		if (lth) {
-			new_mname(mtmp2, lth);
-			Strcpy(MNAME(mtmp2), MNAME(mtmp1));
-		}
+		new_mname(mtmp2, (int)strlen(MNAME(mtmp1)) + 1);
+		Strcpy(MNAME(mtmp2), MNAME(mtmp1));
 	}
 	if (EGD(mtmp1)) {
 		if (!EGD(mtmp2)) newegd(mtmp2);

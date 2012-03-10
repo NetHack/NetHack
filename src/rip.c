@@ -96,10 +96,8 @@ time_t when;
 	int line;
 
 	rip = dp = (char **) alloc(sizeof(rip_txt));
-	for (x = 0; rip_txt[x]; x++) {
-		dp[x] = (char *) alloc((unsigned int)(strlen(rip_txt[x]) + 1));
-		Strcpy(dp[x], rip_txt[x]);
-	}
+	for (x = 0; rip_txt[x]; ++x)
+	    dp[x] = dupstr(rip_txt[x]);
 	dp[x] = (char *)0;
 
 	/* Put name on stone */
