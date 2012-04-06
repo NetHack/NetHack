@@ -1934,7 +1934,7 @@ int how;
 	    kill_genocided_monsters();
 	    update_inventory();	/* in case identified eggs were affected */
 	} else {
-	    int cnt = 0;
+	    int cnt = 0, census = monster_census(FALSE);
 
 	    if (!(mons[mndx].geno & G_UNIQ) &&
 		    !(mvitals[mndx].mvflags & (G_GENOD | G_EXTINCT)))
@@ -1945,9 +1945,13 @@ int how;
 		    if (mvitals[mndx].mvflags & G_EXTINCT)
 			break;	/* just made last one */
 		}
-	    if (cnt)
-		pline("Sent in some %s.", makeplural(buf));
-	    else
+	    if (cnt) {
+		/* accumulated 'cnt' doesn't take groups into account;
+		   assume bringing in new mon(s) didn't remove any old ones */
+		cnt = monster_census(FALSE) - census;
+		pline("Sent in %s%s.", (cnt > 1) ? "some " : "",
+		      (cnt > 1) ? makeplural(buf) : an(buf));
+	    } else
 		pline1(nothing_happens);
 	}
 }

@@ -411,6 +411,7 @@ theft of worn armor with wear/unwear delay would interfere with completion of
 #sit while swallowed would give the wrong message
 alchemical explosion or evaporation only used up one potion instead of all
 	the potions being dipped
+feedback for reverse-genocide was plural even when just one monster was created
 
 
 Platform- and/or Interface-Specific Fixes
