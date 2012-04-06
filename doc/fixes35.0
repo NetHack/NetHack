@@ -412,6 +412,8 @@ theft of worn armor with wear/unwear delay would interfere with completion of
 alchemical explosion or evaporation only used up one potion instead of all
 	the potions being dipped
 feedback for reverse-genocide was plural even when just one monster was created
+fix message given when part of a stack of items in a monster's inventory is
+	being destroyed
 
 
 Platform- and/or Interface-Specific Fixes

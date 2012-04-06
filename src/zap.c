@@ -4587,7 +4587,10 @@ int osym, dmgtyp;
 		    if(!rn2(3)) cnt++;
 
 		if(!cnt) continue;
-		if (vis) pline("%s %s!", Yname2(obj),
+		if (vis) pline("%s%s %s!",
+			       (cnt == obj->quan) ? "" :
+				 (cnt > 1L) ? "Some of " : "One of ",
+			       (cnt == obj->quan) ? Yname2(obj) : yname(obj),
 			       destroy_strings[dindx][(cnt > 1L)]);
 		for(i = 0; i < cnt; i++) m_useup(mtmp, obj);
 	    }
