@@ -414,6 +414,7 @@ alchemical explosion or evaporation only used up one potion instead of all
 feedback for reverse-genocide was plural even when just one monster was created
 fix message given when part of a stack of items in a monster's inventory is
 	being destroyed
+add "Boing!" message when hero zaps resistant monster with striking/force bolt
 
 
 Platform- and/or Interface-Specific Fixes
