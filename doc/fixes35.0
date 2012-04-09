@@ -55,96 +55,332 @@ grammar fixes for applying stethoscope to corpses and statues
 player polymorphed as a ceiling hider cannot reach the floor, but
 	automatically unhide on #sit
 trappers do not hide on the ceiling
+fix "You hear The food ration tumbles downwards" for blinded pit dropping
+silver arrows weren't causing silver damage on some silver-haters when wielded
+wizard mode: avoid division by 0 crash for level teleport in the endgame if
+	confusion overrides teleport control
+don't #sit on an object in a pit if you're only on the precipice
+fix message when pushing a boulder into a pool while riding
+plural of "Nazgul" is "Nazgul" not "Nazguls"
+trap messages referring to named steed were ackwardly worded when hallucination
+	overrode use of the name
+some actions such as eating corpses off the floor didn't check whether hero
+	could reach the bottom of a pit
+usmellmon() instead of "It turns into it" during monster polymorph
+grammar of messages regarding eating artifacts
+avoid a message about an invisible monster looking much better
+player polymorphed as a xorn could not pick up items in pits
 non-magical whistles do not work underwater
 try to restrict whistles and musical instruments to monsters that can blow
+don't display "turns to flee" message for a mimicing mimic
+don't display "turns to flee" message for a monster who has just died
+dipping acid in a fountain could cause an explosion but not destroy the potion
 thrown potions can sometimes hit a steed's saddle
+if your blindfold glows and you're not otherwise blinded, you can see it
 sync default documentation of "null" option with the code
 tripping over a cockatrice corpse didn't petrify, even when not wearing boots
 do not call swamps on the Juiblex level "moat" when freezing or drowning;
 	likewise for Plane of Water when drowning
 keep score from wrapping around and becoming negative by capping it
 kicked objects do not slide when on the air or water levels
+added strsubst() to hacklib
+be consistent with use of "removing" rather than "lifting" for encumber 
+	messages associated with taking things out of a bag of holding
 when a giant carrying a boulder dies in a pit, ensure that the corpse is
 	buried under the filled pit
+cursed scroll of destroy armor damaging cursed armor didn't adjust attributes
+add passive() flag that indicates uwep was destroyed during the turn
+polymorphed or shapechanged monster sometimes got erroneous hit points
 when blind and levitating > shouldn't say "stairs" if player has not seen them
 a slow-moving monster hidden under a rotting corpse was not immediately
 	displayed when the corpse rotted away
 mimic that ends up on the rogue level should not mimic a closed door
 mimic should not mimic a boulder while on a pit or hole or closed door
+calculate weight of corpses on special levels correctly
+Sting could trigger premature display of orcs during savegame restore
+Sting now glows light blue again
+prevent "offering" or other words with similar ending from matching ring quote
+make cleric cast lightning blind as other lightning does
+change the wording slightly to use "one of " when a monster wielding 
+	multiple daggers thrusts them
+if you didn't see a rolling boulder fall into a pit, you only heard the sound
+	of it doing so if you were blind
+fire trap was triggered twice in the same turn when melting ice was involved
+abandon the specialized djinn and ghost counters used for potion tuning and
+	use the mvitals[].born field instead
+if you were Poison_resistant, only a *blessed* potion of sickness caused
+	loss of hitpoints
 reviving invisible troll could appear visible until it moves
 adjust some of the shop repair messages
+shopkeeper removal of trap from shop doorway yields an open door instead of
+	a closed one if an intact open door is present
+guarantee that hostile djinn released from bottles really are hostile
+handle lava when removing or losing water walking boots
+fix incomplete sentence occuring when unique monster's corpse fell down stairs
+fractured boulders or statues produced inconsistent object settings on the
+	resulting rocks
+really fix rolling boulder bug C340-18, the previous "fix" reversed the test
+monster throwing greased weapon has same chance for slip/misfire as player
+killing a pet by displacing it into a trap now yields experience
+prevent a rolling boulder that is in motion from vanishing in bones files
+ensure that a sleeping steed doesn't answer a #chat
+eliminate two very minor anomalies when using Luck to adjust random numbers
+destroying a worn item via dipping in burning oil would not unwear/unwield
+	the item properly, possibly leading to various strange behaviors
+avoid a panic splitbill when shopkeeper is trapped by the door
+grammar tidbit for message given when eating tainted meat is also cannibalism
+gas spores shouldn't be described as "unable to attack" while hero is praying
+incorrect screen display if engulfer gets turned to stone when trying to
+	swallow while hero is poly'd into cockatrice
+panic on subsequent move if engulfer gets turned to stone and poly'd hero
+	also has attached ball&chain
+give more specific messages when dropping weapons due to slippery fingers
+various helmet messages changed to distinguish between "helm" and "hat"
+helmets don't protect against cockatrice eggs thrown straight up
+breaking container contents in a shop didn't always charge for them
+some types of shop theft of a stack of items only charged for a single one
+some thefts weren't charged at all even though shopkeeper noticed
+wizard mode: WIZKIT wish for own quest artifact triggered crash at startup
+avoid "your steed is still eating" message when going through a magic portal
+cannot drink from fountain, sink or surrounding water while swallowed
+don't hallucinate anything for an exploding black light as it dies
+give blindness feedback when moving into/through stinking cloud
+fix case on monster name when monster reflects floating eye's gaze
+monsters "shrieking in pain" from a potion didn't wake anything up
 charge for reviving a shop owned corpse or reanimating a shop owned statue
 filled trap doors on castle can be re-dug
 message order when swapping places with a pet (e.g. into a trap), also use
 	different term instead of "displace"
 flyers can get out of pits more easily than non-flyers
 allow use of the < command to try to exit a pit
+Master of Thieves as Tourist Nemesis still had STRAT_CLOSE
+co-aligned unicorns in bones could be hostile
+finding "something" posing as a statue while Blind should map_invisible()
+adding more candles than required to total 7 to a candelabrum which 
+	already had between 1 and 6 gave an ungrammatical message
+give correct message when a spellcasting monster summons other monsters
+correct experience calculation for monsters that cause nonphysical damage
 clean up messages when you stop levitation while riding a flying steed
+monsters evading a kick on noteleport levels would cause a "teleports" message
+interrupt current activity during certain stages of petrification or vomiting
+warning about bad food didn't recognize tin of Medusa meat
+eating tainted Medusa corpse caused food poisioning instead of petrification
+avoid potential stale pointer use after magic bag explosion
+nymphs and monkeys can't steal rings worn under gloves
+monkeys can't steal rings worn under cursed weapon
+succubi will remove hero's gloves before taking worn ring; incubi will do
+	so before forcing ring to be put on
+mbodypart should return forehoof, not foreclaw, for horselike monsters
+further digging of an existing hole finishes in a single turn
+only prefix shopkeeper names with "Mr." or "Ms." when not a personal name
 account for all attacks when determining max_passive_dmg
+green slime should not affect noncorporeal monsters
+land mine explosion will destroy a drawbridge at same location
+avoid some more buffer overflows in query buffers containing object names
+avoid giving extra information about things that break out of sight
 dipping in acid can erode the dipped object
+avoid giving away wand type for near misses while blind
+avoid excessive repetition of "monsters are aware of your presence"
+monster's aggravation spell now affects meditating monsters
+handle pets sooner at end-of-game to avoid message delivery anomalies
+busy pet won't miss out upon ascension
+fix various places that "finally finished" could be displayed after the hero
+	stopped doing something other than eating
+fix some cases where movement was disallowed but the hero was still conscious
+after destroying drawbridge, hero could appear to be in the wall
+sometimes shop items which hero is forced to buy could be sold back twice
+non-empty container dropped but not sold in a tended shop and then picked up
+	after that shop became untended could be sold twice in another shop
+vision was not updated when polymorphing a statue into a boulder
 various actions--such as enchanting--performed on an unpaid shop object
 	either force the hero to buy the item (when its value is lowered) or
 	increase the current bill (when its value is raised)
+`I u' when carrying single unpaid item listed its cost twice
+armor which auto-curses when worn by hero should do same if worn by monster
+limit how high accuracy, damage, or protection can become via eating rings
+when blinded hero detects a trap by touch, make sure it shows up on the map
+confused remove curse will cause loss of knowledge of items' curse/bless state
+with astral vision, the ";" command should only display "normal vision"
+	for things that could be seen without astral vision
+reanimating a statue containing gold produced double gold
+probing the resulting double-gold monster caused "static object freed" panic
+cursed wand might explode if used to engrave
+fatal wish from magic lamp left functional magic lamp in bones data
+fatal wish granted by monster left that monster in bones data
+death due to dipping potion of acid into a pool left the potion in bones data
+clear prompt from screen after ESC is used to abort "In what direction?"
+minor interface changes for interactively manipulating autopickup exceptions
+chatting with quest leader who was brought back from the dead gave warnings
+becoming green slime or mimicking gold violates "never changed form" conduct
+when a monster grew into a higher form which had previously been genocided,
+	the message explaining its fate was only given if it was sensed via ESP
+hero could still see for brief period after being blinded by potion vapors
+avoid crash when thrown potion hits bars before a monster
+don't give messages about seeing things happen while asleep
 adjust health threshold where wounded hero will be healed by successful prayer
+protect hero from mind flayer's remote mental blast during successful prayer
+recognize if hero has already entered Gehennom by means other than usual route
+	so that prompt can be skipped if Valley's stairs are subsequently used
+once you've passed the Valley, drawbridge tune is no longer a prayer reward
+fix up grammar and punctuation in variants of shopkeeper's price message
+regression, bug fixed in 3.4.1 reintroduced in 3.4.3:  Sunsword continued to
+	emit light after monster who was wielding got killed
+weaken "farming" strategy
+don't suppress corpse if you kill your own steed
+fix typo in tourist quest leader's greeting
+fix grammar for graveyard sounds when polymorphed
+avoid divide by zero crash if Luck drops below -1 while a prayer is in progress
+make hero inflicted with lycanthropy immune to level drain just like monsters
+describe locomotion method accurately when flyers traverse ladders or holes
+when there were multiple boulders at a location, moving one of them sometimes
+	resulted in line-of-sight anomalies
+unicorn can't catch gems if it is asleep or paralyzed
+fix grammar when choking on gold
 prevent lose-level+regain-level cycle from arbritrarily boosting HP and Pw
 prevent polymorphing into "new man" at low level from magnifying HP and Pw
+some messages which referred to "mirror" ought to have used "looking glass"
+incubi react to mirrors
 losing a level while polymorphed affects hero's current monster HP as well as
 	underlying normal HP
 mind flayer brain eating is subject to certain fatal targets and to cannibalism
 mind flayer can't eat brains of ghost or shade
+alignment of Angels was handled inconsistently
 corpses of unique monsters in bones behaved incorrectly if revived or eaten
+pets capable of digging could pass through walls and stone on the Rogue level
+don't generate mimics pretending to be closed doors when making Rogue level
 fix pluralization for "this tin smells like mother-in-laws" when hallucinating
 force user-specified fruit name to be singular
 avoid false matches when looking up fruit names ("grapefruit" isn't "grape")
 handle pluralization of man-at-arms and singularization of men-at-arms
+avoid inappropriate "the corridor disappears" when vault guard gets killed
+avoid inappropriate "the guard calms down" if vault guard's magic corridor
+	reaches a spot where gold is embedded in the rock
+avoid having vault guard ask hero's name when hero is swallowed
 assigning an artifact name is rejected on objects with similar description to
 	corresponding artifact's type rather than just those of the same type
 adjust feedback for gas spore explosion when hallucinating
+adjust message for gas effect from chest trap if hero resists hallucination
+cancelling non-shop objects in a shop's entrance would upset the shopkeeper
 traps detected by scroll or crystal ball overlooked carried or buried chests
 can't wish for a trapped box/chest/tin by specifying "poisoned"
 grammar bit if killed by stealing a cockatrice corpse from a monster
+identified touchstone can rub on gold like the data.base entry says
+restore the capability of rubbing any object against known touchstone
 being petrified by swallowing a cockatrice violates foodless conduct
 devouring Medusa whole is fatal
+tombstone's reason for death after being killed by mis-returning Mjollnir
+	varied depending upon whether it was fully identified
+tombstone's reason for death from kicking an object could include so much
+	detail about the object that is was too verbose
+several quest messages were worded inappropriately if the hero was blind
+a samurai quest guardian message used "ninja" where "ronin" was intended
+revive from fainting if vault guard or bribe-demanding demon approaches
+tame flaming spheres and shocking spheres shouldn't pick up items
 eating pet won't continue eating after becoming paralyzed or falling asleep
+can hear the opening or closing of an unseen drawbridge
+prevent "object lost" panic caused by accessing freed memory after worn
+	non-fireproof water walking boots are destroyed by lava
+stop multi-turn running, searching, or resting early if levitation ends
 randomize shopkeeper names when hallucinating
 fix wording for "leprechaun steals gold from between your feet" when mounted
+Call command could be used to remotely identify which high priest is which
+large amorphous, whirly, noncorporeal, or slithy creatures can fit through
+	tight diagonal gaps despite their size
+avoid "You summoned it!" for unseen monster produced by same-race offering
 fix monsndx panic which happened after currently moving monster expelled
 	swallowed hero onto magic trap and was made tame by its effect; taming
 	no longer replaces monster
 reduced message verbosity when re-entering a temple
 reduced message verbosity when monster with multiple attacks missed wildly
+recognize "mindflayer" as an alternative spelling for "mind flayer"
 putting on a never seen ring while blinded won't make the ring a discovery
 zapping a never seen wand while blinded won't make the wand a discovery
 zapping an unID'd wand of teleportation at self will discover it (usually)
 zapping unlocking magic at self while punished will remove attached chain
+treat mattock as blunt object when forcing locks
+restore capability to force locks with wielded statue
+only count successful statue creations against the monster limit in sp_lev.c
 don't see objects or read engraving when hero changes location (random
 	teleport) or position (levitation timeout) while asleep or fainted
+unseen wand of striking zapped by unseen monster became known if it hit a door
+tweak knight quest messages
+guidebook grammar bits
+special level loader wasn't able to place random door in 1x1 room; could
+	trigger divide-by-0 crash for user-developed custom levels
 polymorphed spellbooks may turn blank or be too faint to read
+make gender of quest leaders and nemeses consistent with data.base and
+	quest messages
+Orion and Norn should be giant sized
+Orion, Norn, Cyclops and Lord Surtur should be able to tear webs
 avoid inappropriate message when using a cursed lamp while blind
 player polymorphed as a guardian naga spit the wrong kind of venom
-put #define for potion occupant chance and cursed wand zap chance in one place
+ensure monsters cannot teleport to or be created outside nonpassable bounds
+	of special levels
 candles should not be fireproof
+put #define for potion occupant chance and cursed wand zap chance in one place
 recognize most instances where hallucinatory monster name should be treated
 	as a personal name (to avoid "the Barney") instead of a description
 avoid giving misleading or redundant feedback when reading scrolls
+monsters could end up off the left side of the Ranger quest start level
 custom arrival message for special levels could be delivered too soon
 custom arrival message for special levels now supports quest text substitution
 prevent scroll of charging that has already disappeared from showing in the
 	picklist of things to charge
 doors break instead of absorbing the blast of a broken wand of striking
+worms don't have scales, krakens have tentacles, stalkers have a head
+you no longer "fry to a crisp" as a water elemental
+change leather spellbook to leathery; pertains to appearance, not composition
+more precise probing/stethoscope feedback when engulfed
+make baby long worms have lower level than full grown ones
+use "your kraken" instead of "a kraken" when searching reveals a tame
+	hidden monster
+Magicbane should not produce "<something> are confused" message
+handle antholes more sensibly when ants aren't available
 avoid "Something's in the way" message with unidentified wand of locking
+cancelled nurses shouldn't say "Relax, this won't hurt a bit"
+check for hero location in digactualhole() before clearing u.utrap
+clear any pits that the hero digs in the vault guard's temporary corridor
 better handling for Fort Ludios and endgame in wizard mode's `^V ?' menu
 no free lunch for gelatinous cubes eating scrolls of mail
 eating gold in front of the vault guard will make the guard angry
 calculate engulf time differently for non-digestion attacks than for digestion
+shattering a monster's weapon didn't work as intended for stack of N>1
 preform autopickup and/or report on objects at the spot when a failed #untrap
 	attempt causes the hero to move onto a trap's location
+shattering a monster's weapon didn't work as intended for stack of N>1
 thrown silver weapon hitting silver-hating poly'd hero got double silver damage
 wielded silver weapon hitting silver-hating poly'd hero lacked silver message
+don't reveal surface information that you can neither feel or see
+if the hero or a monster is already in a pit don't have them "fall into a chasm" 
+	from drum of earthquake
+monsters who ate lizard corpses to cure confusion would lose intrinsic speed
+monsters couldn't eat lizard corpses to cure being stunned
+code handling a monster's use of potion or food to cure stoning or confusion
+	was accessing freed memory after the object had been used up
+properly handle destruction of equipment carried by monsters hit by
+	disintegration breath; life-saving retained conferred properties of
+	formerly worn items (loss of steed's saddle caused much confusion)
+don't exercize or abuse wisdom when rumors get used for random graffiti
 don't welcome the hero to Delphi if the Oracle was angered before first entry
+create_object() created lizard corpses without timers and troll corpses with
+	their revive timers, then changed the corpsenm field
+when a potion of acid was dropped into water and exploded, nethack would
+	continue to use already freed memory and later might panic or crash
+when jumping over an already seen trap, use an() to get appropriate grammar
+fix bad grammar when putting on not-yet-seen Eyes of the Overworld while blind
+don't "walk quietly" while levitating
 shopkeeper polymorphed into animal form can no longer speak
 don't give attribute adjustment messages ("you feel wise") unless the current
 	value actually changes
+fix message handling when multiple shopkeepers are present at end of game
+'C' command can't name shopkeepers or temple priests and other minions
+when "of <deity>" is intentionally being suppressed, an aligned or high
+	priestess would be described as an aligned or high priest
+specifying role and/or race along with an invalid alignment for it/them in
+	NETHACKOPTIONS or config file would yield a prompt which misleadingly
+	mentioned the rejected alignment when asking player to pick alignment
+temple donation can recover protection previously stolen by attrcurse attack
+	even when protection amount is so big that no increment would be given
 meditating monsters stop meditating when affected by something which wakes
 	sleeping mosnters
 monsters capable of hiding can't do so when trapped or while holding you
@@ -152,64 +388,175 @@ limit recursive calls to spoteffects (poly'd hero fell into water, reverted
 	to human because of it, fell into same water, then crawled out twice)
 ensure that the punishment ball and chain make it into the save file after being
 	temporarily orphaned from the normal chains in the swallowing code
+display the invisible monster glyph ('I') whenever an unseen monster forces
+	poly'd hero out of hiding
 charge for thrown wand that shatters into a thousand pieces in a shop
 wielded light source susceptible to water gets extinguished when weapon rusts
 don't discover unknown bag of tricks when monster it releases is undetected
+escape the deleted trap after performing the invocation while trapped
+use alternate phrasing when life drain attack affects non-living creature
+bypass "wait! there's a creature hidden there" when attacking a hidden monster
+	sensed by ongoing monster detection
+remove makedefs.c dependency that time_t and long are the same size
+terminal window set to 21 lines can cause a crash during player selection 
+	menus; have bot() check for valid youmonst.data
 make region ttl field a long instead of short to get rid of lint warnings
 	about a possible loss of data
+free storage used to hold region messages in free_region()
+honor pushweapon when applying a tool or weapon causes it to become wielded
+in the quest, if the locate level hasn't been reached yet, don't fall or
+	randomly teleport past it
+fix phrasing in monster against monster attack feedback when attacker is
+	wielding stacked weapons
 pushing a boulder onto a level teleporter trap could issue repeat messages
 if shopkeeper or priest gets teleported while inside his shop or temple,
 	give locations inside that room preference when choosing destination
+don't place hero on top of monster when arriving on level which is so full
+	that the monster can't be moved out of the way
 tame/peaceful grabber/engulfer will release hero after conflict ends
 any grabber will release hero if it moves away while confused/stunned/afraid
 make changes in hallucination be reflected by changes in mimickery feedback
+have to see a divine gift in order to have it become a discovery
+honor the never-in-hell flag when selecting random monster type for corpses,
+	eggs, figurines, and statues created in Gehennom
+hero is not subject to light-based blindness while fainted from hunger
 add Unaware pseudo-property to suppress various messages while unconscious
+engraving while underwater should use surface() which handles that case
+prevent obj_is_local panic during bones creation when splattered burning oil
+	from a thrown potion of oil kills the hero
+don't leave lit potion intact when splattered burning oil from broken floor
+	potion kills the hero
+fix region timeout detection, caused strange display of stinking cloud
+	while wearing the Eyes of the Overworld
+try to keep migrating monsters from escaping the wizard tower
+affected monsters should always respect "Elbereth"
+try harder to keep dragged chain between ball and hero
+fireproof containers should not burn in lava
 missile which kills engulfer will now be placed prior to hero's return to map
+fix invalid pointer dereference after applying a wielded cream pie
+avoid drowned in a drowning and burned by burning if life-saving is inadequate
 bugles affect all monsters to some extent
 nurses are affected if player is polymorphed as a cockatrice
 getting a particular rotten food result can't make attempting to eat a
 	corpse of one of the Riders be survivable
 pad shortest rumors to improve distribution of delivered rumors
 wake up sleeping steed when putting on saddle or mounting
+reveal hidden monsters who change levels or are magically summoned
+hero can't carry an unlimited number of boulders when poly'd into a giant
 stop wielding cockatrice corpse which triggered own death followed by life-save
 format various prompts to avoid "Query truncated" entries in paniclog
+prevent very large number of objects in # inventory slot from causing
+	buffer overflow
+!fixinv config was using arbitrary characters instead of # for invent overflow
 for inventory display, include cost info on hero-owned containers holding
 	shop goods
 shops now claim ownership of items created by using an unpaid horn of plenty
 shopkeepers shouldn't refer to non-male character as "cad"
 tweak levitation timeout if trap is being triggered on same turn it is to end
+don't report death by petrification if cockatrice kills hero via HP loss
+Riders are immune to green slime
+Rider corpses can't be engulfed by gelatinous cubes
 if Rider corpse revival fails, usually try again later instead of rotting away
+wielding a cloak of magic resistance or gray dragon scales, or carrying one in
+	alternate weapon or quiver inventory slot, conferred magic resistance
+	to polymorphed hero
+wielding a potion of blindness or carrying one in alternate weapon or quiver
+	slot conferred resistance against light-based blindness to any hero
 worn item transformed by polymorph remains worn if feasible
+zapping closing or breaking magic up or down from beneath an open drawbridge's
+	portcullis failed if bridge orientation was north-to-south (Valk quest)
 can't dip or apply grease to a worn item that's covered by another worn item
+sinking into lava didn't track passage of time properly
+sinking into lava eventually burns away slime; sitting in it always does
+after escaping lava by foot, if hero doesn't move he'll fall back in
+suppress corpse from bones data if death is due to being dissolved in lava
+suppress "you rise from the dead" if game ends due to be turned into slime
 hero poly'd into stone golem and wielding cockatrice corpse casts stone-to-
 	flesh at self to become flesh golem will revert to stone if no gloves
+don't give erroneous "<mon> disppears" message for hero poly'd into quantum
+	mechanic who hits engulfer while swallowed and blinded
 demon lords/princes can't be summoned to the elemental or Astral planes
+feedback from casting spell of protection was wrong in some situations
+can't engrave on floor while inside solid rock, wall, or closed door
 same-race sacrifice can't damage high altars
 allow corpses on floor to be offered at high altars
 allow hero to attempt to offer the Amulet at ordinary altars
 shooting range for crossbow isn't affected by strength; multi-shot volley is
+remove engravings at drawbridge location when it is opened, closed, or wrecked
+monster killed in midst of multi-shot volley throwing/shooting might cause
+	freed memory to be accessed, potentially triggering a crash
 right-handed boomerang throw travels counterclockwise
+can't arm bear traps or land mines on Planes of Air or Water
+statues that "come to life" when trap activates shouldn't start out sleeping
+shopkeepers and priests wouldn't step on graves put in their rooms by bones
+can't throw if poly'd into form which lacks hands
 monsters can use ranged attacks over/around boulders, same as hero
+can't eat an artifact you're unable to touch
+attempting to kick beyond map edge performed an out of array bounds memory
+	access; symptom seen was "show_glyph: bad pos" warning when blind
+attempting to engrave with an empty wand should always use a turn
+don't access freed memory after engraving "wrests one last charnge" from wand
+a magic portal could be rendered inactive for the hero if a successful
+	hangup save took place during level change; leaving the level by any
+	means other than triggering the portal would reactivate it
 can't drop part of a stack of N weapons welded to hero's hand
 pickup still accepts m as command prefix, but now rejects F,g,G,M,numpad 5
 scatter piles of kicked gold rather than move the entire pile at once
+hero wasn't allowed to affix candles to the candelabrum while underwater
+non-unicorn horn healing magic which cures sickness now also cures vomiting
+vomiting/nauseated state is included in enlightenment feedback
+vomiting countdown actually triggered the final vomit code twice
+rats aren't capable of vomiting
+fireproof, non-rustable weapon would be revealed as fireproof by hitting a
+	rust-causing target; ditto for fixed crysknife
+surviving choking while eating various foods (cockatrice egg, fortune cookie,
+	wolfsbane, others) didn't carry through to those foods' side-effects
+shapechangers who take on mimic or hider form will mimic or hide when feasible
+avoid War message if tinning a Rider corpse fails
+prevent long messages from triggering access violation or segmentation fault
+	due to buffer overflow in pline()
+cursed corpse wielded by a monster isn't welded to its hand or paw
+fix grammar errors in samurai quest, wakarimasu ka?
+fix spelling of Dr Dolittle
+hero's sleep resistance shouldn't protect steed from sleeping gas trap
 #jump attempt fails if mounted on sleeping steed; jumping spell still works
+dropped wielded, in use leash should remain in inventory, since it's in-use
+wielded, in use leash can't be snatched by whip-wielding monster
+when using two weapons at once, whip-wielding monster can target either one
 if normal game save file is restored via `nethack -X', restore in normal
 	mode--with save file deletion--and require confirmation ala 'X'
 	command to make deferred switch into explore mode
+can't #force floor item while engulfed, levitating, or unskilled riding
+can't lock or unlock doors while engulfed
+if hero or monster standing on opened drawbridge survives its destruction,
+	fall into water or lava instead of remaining on top
+don't give a speed change message when an immobile monster is seen to be hit
+	by a wand of speed or slow monster
+when shopkeeper "gratefully inherits possessions" of hero who dies in shop
+	doorway without owing the shop, move those items inside shop for bones
+dying in a shop while wielding two weapons could cause "Setworn: mask" warning
+make score file processing more bullet proof to avoid potential security issue
 stethoscope applied to hiding mimic will bring it out of hiding
 rephrase "<artifact> evades your grasp" message if artifact is already held
 artifacts which subsequently evade your grasp/control after already being
 	worn or wielded become unworn/unwielded
+towel equipped in weapon, alternate weapon, or quiver slot can be applied
+lit candle or potion of oil which burned out while equipped would leave stale
+	weapon/alternate-weapon/quiver pointer that could cause panic or crash
+wielded/worn figurine which auto-transformed had same stale pointer bug
+likewise with casting stone-to-flesh on self for figurine of non-veggy monst
+format names of not yet id'd artifacts such that obj type shows for non-weapons
 hero with lycanthropy is vulnerable to silver in both human and beast form
 changing alignment or shape triggers a check for equipment evading hero's grasp
 passive fire effects can damage attackers' weapons
+make quest leader and nemesis be unlikely to be affected by traps
 wielded bow shouldn't affect outcome of kicked arrows
 ranged polearm hit can divide puddings and can use confuse monster effect
 charge for kicked shop-owned food if it gets used up taming a monster
 give better feedback when thrown shop-owned food gets used up taming a monster
 effect of negative AC on damage received was calculated differently than
 	normal when deciding whether hero poly'd into pudding would split
+use a more precise jumping path for far, non-straight line destinations
 unicorn horn produced by revived monster will polymorph as if non-magic
 stone-to-flesh on any golem statue or golem figurine creates flesh golem
 stone-to-flesh which activates shop-owned figurine entails shop charges
@@ -222,7 +569,11 @@ hero undergoing semi-controlled polymorph won't also undergo sex change
 when doppelgangers taking on new shape don't specifically pick nasty monster
 	or role monster, bias the random form towards humanoid
 salamanders can use green slime corpses to cure themselves of petrification
+increase damage bonus applies when kicking while polymorphed into a monster
+	form which has a kicking attack, just like for other kicks
 feedback about summoned monsters may use singular when it should use plural
+if magically removing steed's saddle is fatal, don't leave it saddled in bones
+charging prompt used wrong criteria when deciding whether to list rings
 rogue's backstab bonus doesn't apply for throwing attacks
 hiding monsters who are unhidden when hero leaves a level can hide upon return
 touching a pile of objects while blind affects hero even when the pile is
@@ -231,9 +582,15 @@ explosion while engulfed only affects engulfer and hero, not adjacent monsters
 eliminate case-sensitivity when converting words from singular to plural and
 	vice versa, so some failing wishes like "Gauntlets of Power" now work
 breath attack directed at self by poly'd hero always hits
+an orc (or gnome) will respond to #chat if hero is also an orc (or gnome)
 override non-silver vs shades for artifacts which deal extra damage to undead
 assorted mirror fixes--mainly visibility issues
+kicking at "empty space" has side-effects so should use current turn
+using weapon to kill tame engulfer from inside triggered "placing defunct
+	monster onto map?" warning
 some monsters can't be strangled; self-polymorph can stop/restart strangulation
+nymphs could steal carried boulders
+amnesia of object discoveries would never forget the very last one
 re-adjust gem generation probabilities when revisiting existing dungeon levels
 kick evasion shouldn't move monsters through walls
 kick evasion and jousting/staggering blows shouldn't move grid bugs diagonally
@@ -253,12 +610,20 @@ monster could attack with a polearm even after attempt to wield that failed
 sometimes got "you trip over it" after intervening messages following the
 	one which described "it"
 wizard mode: WIZKIT wishes could overflow inventory's 52 slots
+code controlling item drops by small monsters still used pre-3.1.0 weight
+monsters who want the Amulet won't attack the Wizard to try to get it
 when loading bones files, censor suspect characters from player-supplied
 	strings such as pet and fruit names
+opening or closing the castle drawbridge via music consumes a turn
 can't swap places with tame grid bug when moving diagonally
 can't move diagonally through a long worm's body (can still fight that way)
 require confirmation to read a scroll of mail if doing so will be the first
 	violation of illiteracy conduct
+could get "suddenly you cannot see the <mon>" while invisible mon remained
+	displayed due to telepathy or extended detection
+cutting a long worm in half would trigger segfault/accvio crash if the hit
+	took parent down to 1 hit point or if long worms had become extinct
+cutting a level 0 long worm in half produced a new worm with 0 hit points
 using F to force an attack towards a boulder gave "you attack thin air"
 random "treasure drop" upon monster's death bypassed dropping side-effects
 melted ice on Valkyrie quest should be pool, not moat
@@ -268,26 +633,35 @@ tin contents can now sometimes be accessed on the same turn that the tin
 	starts being opened; when not, the opening feedback is more accurate
 Nth adjustment of feedback when observing a pet eating
 monsters who want the Amulet won't attack temple priests to try to get it
+blinded invisible hero can't see self as invisible via ';' or '/'
 it was possible to generate an object of 0 gold pieces by dropping 2**32 gold
 wizard mode's sanity_check option missed nested containers and migrating mons
 always update map display and use up turn if open or close command attempted
 	while blind reveals change in door state or discloses non-door spot
+a hangup save while picking up gold from shop floor could duplicate that gold
 secret door detection's trap finding is no longer blocked by water or clouds
 	on the Planes of Water and Air
 potion thrown by monster which hit a long worm's tail gave feedback about
 	hitting its head
 implement energy vortex's previously unused energy drain attack
 changing alignment type resets alignment record to 0 (nomimally aligned)
+jellyfish do not technically have a head
 while polymorphed, suppress attribute gain/lose earned by pre-poly exercise
 wizard mode #monpolycontrol prompting asked about "it" when monster was unseen
 reprompt if player fails to make a menu choice during inventory identification
+potion explosion during failed alchemy should awaken nearby monsters
 seen eels who were stuck in isolated pools would never re-hide
 can no longer get both strength and resistance from eating one giant corpse
 aborting key/lock pick usage via ESC at direction prompt no longer uses a move
+lit south wall of C quest leader's room contained dark gap at secret door spot
 when probing from inside an engulfer, "not carrying anything" overlooked hero
+archeologist shouldn't start with sling skill by carrying slingable touchstone
 wearing or removing an amulet of restful sleep clobbered permanent sleepiness
 if attempt to select a co-aligned artifact for first divine gift fails because
 	none is available, choose one from among nonaligned artifacts
+ensure current_fruit gets set to the correct index when setting fruit
+	option to existing entry whose fid is not the highest
+monsters already wearing suits can't put on shirts
 if breaking a wand of polymorph causes hero to drop items, don't transform them
 give "shuddering vibrations" feedback if breaking a poly wand uses up items
 if polymorph causes a monster to drop items, they won't be used up via
@@ -297,6 +671,8 @@ monsters who ate green slime corpses weren't turned into green slime
 hero would "gladly take off <armor>" for nymph or succubus even while asleep
 concealed mimic wasn't revealed if kicking attmpt yielded a clumsy miss
 too accurate feedback given to a blinded hero when a monster summons insects
+if life-saved steed became untame, repeated "placing steed onto map?" warnings
+	would be given as long as the hero remained mounted
 message sequencing for fatal explosions was confusing if feedback was given
 	for carried items being destroyed
 when dipping something in holy/unholy water, only learn its new bless/curse
@@ -306,11 +682,15 @@ prevent poly'd shopkeepers from taking on forms that can't handle objects
 attempting to move direction 'u' as a grid bug performed #untrap command;
 	the other diagonals reported "unknown command" instead of "you can't"
 mimic posing as statue or corpse now picks and maintains particular monst type
+trying to move down while levitating said "you are floating high above floor"
+	even when being stuck in floor or lava blocked full levitation
 when levitating, don't show '>' as a likely direction for digging
 poly'd or mimicking hero who was hidden from monsters would still be treated
 	as a normal target for their ranged attacks
 hero would remain stuck to an adjacent monster after rehumanizing if he had
 	been attacked while hiding via #monster when poly'd into a small mimic
+hero poly'd into mimic and hiding as an object via #monster didn't unhide
+	when polymorphing into non-mimic
 attacking via applied polearm never scuffed engraving underneath hero
 auto-wielding a polearm took no time if ESC was used to cancel target choice
 applying a bullwhip while at very edge of map could target beyond edge,
@@ -325,6 +705,17 @@ spell attack by low-Int hero could inflict negative damage
 some wand/spell/breath zaps that hit a secret door failed to reveal it
 wand explosion feedback about adjacent door was phrased as if for a wand zap
 improve the message sequencing when a thrown poisoned weapon loses is poison
+message "You hit the  with all your might." could be issued if a boulder
+	went away while it was being dug/broken with a pick-axe
+prevent "object lost" panic if/when drinking a wielded potion of polymorph
+	causes hero's new form to drop weapon
+documentation tidbit:  change Guidebook and in-game help for pickup_burden
+	option to match game's 'O' command ("Unencumbered", not "Unburdened")
+writing while blind no longer possible for books, might fail for scrolls
+blanking items in pools while blind shouldn't reveal new obj description
+	for ones which had been seen before becoming blind
+avoid infinite loop in topten output when killed by long-named monster
+grid bug could move diagonally 1 step using travel command
 attempting to open, close, or lock/unlock a door while confused or stunned
 	uses up a move regardless of whether direction choice finds a door
 grammar fixes for vault guard messages given after player assigns guard a name
@@ -343,11 +734,19 @@ when reading an unknown scroll and learning it, discovery of teleporation was
 using an unlocking tool on a closed door which was actually a mimic reported
 	that there was no door to unlock instead of exposing the mimic
 purple worm could end up in wall or solid rock when swallowing ghost or xorn
+unpaid shop items stolen from hero by a monster remained on hero's shop bill
+#untrap toward known trap location containing concealed mimic would yield
+	"{The mimic|It} {is in the way|isn't trapped}." but not reveal mimic
+some actions taken when blind would yield "Wait!  That's a monster!" (for a
+	mimic posing as a door) but not display the unseen monster glyph
 enhance life-saving by preventing subsequent poison from being fatal upon
 	rescue from death due to spiked pit, dart trap, or poisoned missile
 don't create mail daemons when populating special levels with random demons
 teleport control and polymorph control are ineffective while hero is stunned
 don't report "fried to a crisp" for disintegration from divine wrath
+when polymorphed into an opposite sex monster, if you then become a new
+	human while failing to polymorph into something else, you'd be told
+	"you feel like a new man" for female or "a new woman" for male  
 spellcasting monsters' spell selection became less likely to choose harder
 	spells as their level got higher (including Wizard's "double trouble")
 Eye of the Aethiopica, Eyes of the Overworld, and Sceptre of Might must be
@@ -355,8 +754,12 @@ Eye of the Aethiopica, Eyes of the Overworld, and Sceptre of Might must be
 Mitre of Holiness and Tsurugi of Muramasa convey Protection when worn/wielded
 effectiveness of magic cancellation by worn armor has been reduced
 Protection improves the effectiveness of magic cancellation
+the weight of a non-cursed bag of holding was sometimes off by 1 unit
+for number_pad:2 (MSDOS compatibility), M-5 (Alt+5, or Shift+keypad5 using
+	MSDOS/Windows keystroke hackery) didn't function as G movement prefix
 if an angry shopkeeper chased the hero to a different level and then got paid
 	off, he'd dismiss kops on that other level but not on his shop level
+objects inside the Wizard's Tower can't be teleport to outside and vica versa
 dying in lava and being life-saved or leaving bones would destroy ring of
 	fire resistance if it happened to be made of wood, and also burn up
 	scrolls of fire and spellbook of fireball
@@ -364,8 +767,12 @@ surviving in lava boils away carried potions, but dying in lava and being
 	life-saved or leaving bones would keep them intact
 when applicable, give "your body rises from the dead as an <undead>..."
 	even when bones data isn't being saved
+unlit candelabrum would become unlightable if its candles had exactly 1 turn
+	of fuel left and it was applied anywhere other than the invocation spot
 have shk claim ownership of worn saddle dropped by dying pet if hero is
 	not within the same shop at the time of the drop
+temporary loss of Dex from wounded legs will become permanent if it occurs
+	while mounted and hero dismounts before steed's legs have healed
 for poly'd hero hiding on ceiling who gets attacked, make attacker's position
 	be an eligible location for hero when vacating hero's spot for attacker
 	to prevent ending up far away under crowded conditions
@@ -377,6 +784,9 @@ when shop prices are adjusted, handle roundoff (integer truncation) better
 for hero poly'd into a monster form that lacks a weapon attack but has a claw
 	attack, use wielded weapon even when claw attack isn't the very first
 rename the SLEEPING property and Sleeping attribute to SLEEPY and Sleepy, resp.
+character escape sequence handling during options processing was vulernable
+	to malformed escapes and could potentially be abused to clobber the
+	stack and launch a buffer overrun attack
 give alternate message for "<mon> turns to flee" when mon can't move
 all statues in a cockatrice nest were for giant ant if 'record' was empty
 when dying outside all shops on a level with multiple shopkeepers and one takes
@@ -398,8 +808,10 @@ wand/scroll/spell of light now hurts gremlins (lamp/candle light doesn't)
 ditto for hero in gremlin form (camera too)
 autosearch finds and transforms secret doors and corridors even while blind,
 	but it wasn't updating the map to show them unless the hero could see
+fix message typo, "you sold some items inside <container> for N gold piecess"
 hangup save made during magic mapping or <foo> detection performed while
 	underwater could put hero on top of the water after restore
+fix bug preventing stone-resistant monsters w/o gloves from wielding cockatrices
 items conferring life drain resistance were affected by drain life spell
 'a'pply command could be used to recogniize undiscovered potions of oil
 fix replacing an existing bones file in wizard mode [load?y, unlink?n, die?y,
@@ -419,9 +831,46 @@ add "Boing!" message when hero zaps resistant monster with striking/force bolt
 
 Platform- and/or Interface-Specific Fixes
 -----------------------------------------
+FreeBSD: compilation problems on FreeBSD 6.1
+linux: compile support for TIOCGWINSZ by default
+smartphone: do not translate input when command helper is hidden (fixes 
+	Motorola Q keyboard bug)
+smartphone: new keypad layouts
+smartphone: wizard mode command layout
+smartphone: option to feed arbitrary text as a command to nethack core
+tty: when loading user's run-time configuration, explicitly negating one of
+	{DEC,IBM,MAC}graphics options after enabling another of them switched
+	to regular ASCII and left the earlier option inaccurately set to "on"
+tty: various bugfixes for very wide and/or tall screens
+tty+GOLDOBJ: dropping or looting by menu wouldn't honor a count for gold
+unix: remove use of parentheses in nethack man page usage that confused a
+	man page conversion tool
 unix: new -wwindowtype option
 unix: don't clobber old level files if 2nd hangup/disconnect occurs while
 	reconnected user is responding to the "destroy old game?" prompt
+unix/Qt: saved games were not found if nethack was built with prefixes in use
+unix,vms: allow digits after first character in name at "Who are you?" prompt
+vms: the DLB configuration could fail to build if a file without a dot
+	in its name happened to match a logical name
+Windows: starting a game with nethack.exe (tty) and saving, then restoring
+	and finishing with nethackW.exe (win32) would display the high scores
+	output in a series of popup windows, one for each line of text
+Windows, probably MSDOS and OS/2: attempting to use very first false rumor
+	for cookie fortune or random engraving could produce garbled text
+	when rumors.tru had CR+LF line ends instead of Unix-style LF lines
+#if CLIPPING: during teleport or hurtle, re-clip the map immediately instead
+	of waiting until hero's next move
+
+winCE: disable processing of double-click messages if the first click
+	causes map to scroll
+winCE: help text windows close immediately after open (unhandled WM_KEYDOWN in mhtext.c)
+winCE: correct coordinates used by action button
+winCE: wrap/unwrap text option for text windows
+winCE: hardware keyboard detection
+winCE: hide keypad when hardware keyboard is present
+winCE: backport message window highlighting from winnt port
+winCE: new icon with recommended image sizes
+pocketpc: menu window closes on up/down keys from first/last position
 win32gui: better handling of "more" prompt for messages that would have scrolled
 	off the window
 win32gui: set correct checkmark on "Lock Windows" menu item on startup
@@ -438,17 +887,36 @@ win32tty: work around problem where display symbols were wrong or unrecognizable
 	set to "US English" - courtesy Ray Chason
 win32tty: work around problem where some characters did not show up if the
 	console code page was other than 437
+X11: support dynamic switching of map mode via tiled_map option
+X11: added support for hilite_pet to text map mode
+X11: ensure vertical scrollbar shows up in text display windows
+X11: fix typo in mouse click sanity check; result might have pointed to
+	spurious location after window resizing
 platforms that support hangup: SAFERHANGUP to avoid losing objects in transit
 	between lists when hangup occurs, and also avoid cheats due to
 	well-timed hangups to stop a long melee
-X11: support dynamic switching of map mode via tiled_map option
-X11: added support for hilite_pet to text map mode
-tty: various bugfixes for very wide and/or tall screens
 build-from-source: dlb utility can handle arbitrary number of files
 
 
 General New Features
 --------------------
+when you're teetering on the edge of a pit you can use '>' to enter the pit
+when asked for a direction, a response of '?' yields help and then asks again
+when adding an item to inventory, try to stack it with the quiver slot
+	before trying against other carried objects
+#adjust can be used to split an inventory stack
+cockatrice meat has a distinct flavor to some
+wish request for "<something> armor" will match item named "<something> mail"
+Fire Brand and Frost Brand have a chance to avoid taking rust damage
+support ^R (and ^L in numpad mode) to request display repaint during direction
+	choosing and location choosing prompting modes
+intelligent pets will use keys to unlock doors
+destroyed drawbridge leaves some iron chains
+give feedback when a nearby monster grows into a stronger form
+familiars are now created without any starting inventory
+using the 'f' command when quiver is empty will fill quiver with player's
+	response to the "what to throw?" prompt
+breaking a wand with the apply command has a chance to wrest an extra charge
 burying a punishment ball no longer ends your punishment
 #tip command (with M-T shortcut) to empty a container's contents onto floor
 add clicklook option to allow looking at things on the display by clicking 
