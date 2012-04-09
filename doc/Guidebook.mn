@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.5
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "September 14, 2011
+.ds f2 "April 7, 2012
 .\" labeled paragraph start (should be part of tmac.n, but I don't want to
 .\" make changes to that file)
 .\" .PS word
@@ -1935,47 +1935,54 @@ new players if it detects some anticipated mistakes (default on).
 Have user confirm attacks on pets, shopkeepers, and other
 peaceable creatures (default on).
 .lp disclose
-Controls options for disclosing various information when the game ends (defaults
-to all possibilities being disclosed).
+Controls what information the program reveals when the game ends.
+Value is a space separated list of prompting/category pairs
+(default is `\fBni na nv ng nc no\fP',
+prompt with default response of `\fBn\fP' for each candidate).
 The possibilities are:
 .sd
 .si
-i - disclose your inventory.
-a - disclose your attributes.
-v - summarize monsters that have been vanquished.
-g - list monster species that have been genocided.
-c - display your conduct.
+\fBi\fP - disclose your inventory;
+\fBa\fP - disclose your attributes;
+\fBv\fP - summarize monsters that have been vanquished;
+\fBg\fP - list monster species that have been genocided;
+\fBc\fP - display your conduct;
+\fBo\fP - display dungeon overview.
 .ei
 .ed
 Each disclosure possibility can optionally be preceded by a prefix which
-let you refine how it behaves. Here are the valid prefixes:
+lets you refine how it behaves.  Here are the valid prefixes:
 .sd
 .si
-y - prompt you and default to yes on the prompt.
-n - prompt you and default to no on the prompt.
-+ - disclose it without prompting.
-- - do not disclose it and do not prompt.
+\fBy\fP - prompt you and default to yes on the prompt;
+\fBn\fP - prompt you and default to no on the prompt;
+\fB+\fP - disclose it without prompting;
+\fB-\fP - do not disclose it and do not prompt.
 .ei
 .ed
-(ex. ``disclose:yi na +v -g -c'')
-The example sets 
-.op inventory
-to prompt and default to yes,
-.op attributes
-to prompt and default to no,
-.op vanquished
-to disclose without prompting,
-.op genocided
-to not disclose and not to prompt,
-.op conduct
-to not disclose and not to prompt.
+Omitted categories are implicitly added with `n' prefix.
+Specified categories with omitted prefix implicitly use `+' prefix.
+Order of the disclosure categories does not matter, program display for
+end-of-game disclosure follows a set sequence.
+.lp ""
+(ex. ``disclose:yi na +v -g o'')
+The example sets
+\fBinventory\fP to \fIprompt\fP and default to \fIyes\fP,
+\fBattributes\fP to \fIprompt\fP and default to \fIno\fP,
+\fBvanquished\fP to \fIdisclose without prompting\fP,
+\fBgenocided\fP to \fInot disclose\fP and \fInot prompt\fP,
+\fBconduct\fP to implicitly \fIprompt\fP and default to \fIno\fP, and
+\fBoverview\fP to \fIdisclose without prompting\fP.
+.lp ""
 Note that the vanquished monsters list includes all monsters killed by
 traps and each other as well as by you.
+And the dungeon overview shows all levels you had visited but does not
+reveal things about them that you hadn't discovered.
 .lp dogname
 Name your starting dog (ex. ``dogname:Fang'').
 Cannot be set with the `O' command.
 .lp extmenu
-Changes the extended commands interface to pop-up a menu of available commands.  
+Changes the extended commands interface to pop-up a menu of available commands.
 It is keystroke compatible with the traditional interface except that it does
 not require that you hit Enter. It is implemented only by the tty port 
 (default off), when the game has been compiled to support tty graphics.
@@ -2094,10 +2101,10 @@ Allows you to change the way recalled messages are displayed.
 The possible values are:
 .sd
 .si
-s - single message (default; only choice prior to 3.4.0)
-c - combination, two messages as `single', then as `full'
-f - full window, oldest message first
-r - full window reversed, newest message first
+\fBs\fP - single message (default; only choice prior to 3.4.0)
+\fBc\fP - combination, two messages as `single', then as `full'
+\fBf\fP - full window, oldest message first
+\fBr\fP - full window reversed, newest message first
 .ei
 .ed
 For backward compatibility, no value needs to be specified (which
@@ -2511,7 +2518,7 @@ Cannot be set with the `O' command.
 .hn 2
 Configuring autopickup exceptions
 .pg
-There is an experimental compile time option called AUTOPICKUP_EXCEPTIONS.  
+There is a compile time option called AUTOPICKUP_EXCEPTIONS.  
 If your copy of the game was built with that option defined, you can 
 further refine the behavior of the
 .op autopickup
@@ -2533,28 +2540,30 @@ The
 option should be followed by a string of 1-80 characters to be used as a 
 pattern to match against the singular form of the description of an 
 object at your location.
-.pg
+.lp ""
 You may use the following special characters in a pattern:
 .sd
 .si
-  *--- matches 0 or more characters.
-  ?--- matches any single character.
+\fB*\fP - matches zero or more characters;
+\fB?\fP - matches any single character.
 .ei
 .ed
-.pg
 In addition, some characters are treated specially if they occur as the first 
-character in the string pattern, specifically:
+character in the pattern, specifically:
 .sd
 .si
-< - always pickup an object that matches the pattern that follows.
-> - never pickup an object that matches the pattern that follows.
+\fB<\fP - always pickup an object that matches rest of pattern;
+\fB>\fP - never pickup an object that matches rest of pattern.
 .ei
 .ed
-.pg
-Can be set with the `O' command, but the setting is not preserved
-across saves and restores.
-.pg
-Here's a couple of examples of autopickup_exceptions:
+A `never pickup' rule takes precedence over an `always pickup' rule if
+both match.
+.lp ""
+Exceptions can be set with the `\fBO\fP' command, but ones set that way will
+not be preserved across saves and restores.
+.\" end of ``.lp autopickup_exception'' entry; continue enclosing page...
+.\" use .lp "text" to make an unindented paragraph ("text" should be short)
+.lp "Here are some examples:"
 .sd
 .si
 autopickup_exception="<*arrow"
@@ -2562,10 +2571,12 @@ autopickup_exception=">*corpse"
 autopickup_exception=">* cursed*"
 .ei
 .ed
+.\" (this paragraph would look better unindented but can't use .lp hack...)
+.pg
 The first example above will result in autopickup of any type of arrow.
 The second example results in the exclusion of any corpse from autopickup.
-The last example results in the exclusion of items known to be cursed from autopickup.
-A `never pickup' rule takes precedence over an `always pickup' rule if both match.
+The last example results in the exclusion of items known to be cursed from
+autopickup.
 .hn 2
 Configuring User Sounds
 .pg

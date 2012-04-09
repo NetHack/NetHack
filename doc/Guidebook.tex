@@ -33,7 +33,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.119 $ $Date: 2011/12/05 09:35:59 $
+% $Revision: 1.120 $ $Date: 2011/12/05 09:38:58 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -46,7 +46,7 @@
 %.au
 \author{Eric S. Raymond\\
 (Extensively edited and expanded for 3.5)}
-\date{September 14, 2011}
+\date{April 7, 2012}
 
 \maketitle
 
@@ -2363,40 +2363,50 @@ Have user confirm attacks on pets, shopkeepers, and other
 peaceable creatures (default on).
 %.lp
 \item[\ib{disclose}]
-Controls options for disclosing various information when the game ends (defaults
-to all possibilities being disclosed).
+Controls what information the program reveals when the game ends.
+Value is a space separated list of prompting/category pairs
+(default is `{\tt ni na nv ng nc no}',
+prompt with default response of `{\tt n}' for each candidate).
 The possibilities are:
 
 %.sd
 %.si
-{\tt i} --- disclose your inventory.\\
-{\tt a} --- disclose your attributes.\\
-{\tt v} --- summarize monsters that have been vanquished.\\
-{\tt g} --- list monster species that have been genocided.\\
-{\tt c} --- display your conduct.
+{\tt i} --- disclose your inventory;\\
+{\tt a} --- disclose your attributes;\\
+{\tt v} --- summarize monsters that have been vanquished;\\
+{\tt g} --- list monster species that have been genocided;\\
+{\tt c} --- display your conduct;\\
+{\tt o} --- display dungeon overview.
 %.ei
 %.ed
 
 Each disclosure possibility can optionally be preceded by a prefix which
-let you refine how it behaves. Here are the valid prefixes:
+lets you refine how it behaves.  Here are the valid prefixes:
 
 %.sd
 %.si
-{\tt y} --- prompt you and default to yes on the prompt.\\
-{\tt n} --- prompt you and default to no on the prompt.\\
-{\tt +} --- disclose it without prompting.\\
+{\tt y} --- prompt you and default to yes on the prompt;\\
+{\tt n} --- prompt you and default to no on the prompt;\\
+{\tt +} --- disclose it without prompting;\\
 {\tt -} --- do not disclose it and do not prompt.
 %.ei
 %.ed
 
-(ex.\ ``{\tt disclose:yi na +v -g -c}'')
-The example sets {\it inventory\/} to {\it prompt\/} and default to {\it yes\/}, 
-{\it attributes\/} to {\it prompt\/} and default to {\it no\/}, 
-{\it vanquished\/} to {\it disclose without prompting\/}, 
-{\it genocided\/} to {\it not disclose\/} and not to {\it prompt\/}, and 
-{\it conduct\/} to {\it not disclose\/} and not to {\it prompt\/}.
+%.lp ""
+(ex.\ ``{\tt disclose:yi na +v -g o}'')
+The example sets
+{\tt inventory} to {\it prompt\/} and default to {\it yes\/},
+{\tt attributes} to {\it prompt\/} and default to {\it no\/},
+{\tt vanquished} to {\it disclose without prompting\/},
+{\tt genocided} to {\it not disclose\/} and {\it not prompt\/},
+{\tt conduct} to implicitly {\it prompt\/} and default to {\it no\/},
+{\tt overview} to {\it disclose without prompting\/}.
+
+%.lp ""
 Note that the vanquished monsters list includes all monsters killed by
 traps and each other as well as by you. 
+And the dungeon overview shows all levels you had visited but does not
+reveal things about them that you hadn't discovered.
 %.lp
 \item[\ib{dogname}]
 Name your starting dog (ex.\ ``{\tt dogname:Fang}'').
@@ -3064,7 +3074,7 @@ Cannot be set with the `{\tt O}' command.
 \subsection*{Configuring autopickup exceptions}
 
 %.pg
-There is an experimental compile time option called AUTOPICKUP_EXCEPTIONS.  
+There is a compile time option called AUTOPICKUP_EXCEPTIONS.  
 If your copy of the game was built with that option defined, you can 
 further refine the behavior of the ``{\tt autopickup}'' option beyond 
 what is available through the ``{\tt pickup\_types}'' option.
@@ -3082,40 +3092,45 @@ The {\it autopickup\_exception\/} option should be followed by a string of 1--80
 characters to be used as a pattern to match against the singular form
 of the description of an object at your location.
 
-%.pg
+%.lp ""
 You may use the following special characters in a pattern:
 
-\begin{verbatim}
-    *--- matches 0 or more characters.
-    ?--- matches any single character.
-\end{verbatim}
+%.sd .si
+{\tt *} --- matches zero or more characters;\\
+{\tt ?} --- matches any single character.
+%.ei .ed
 
 In addition, some characters are treated specially if they occur as the first 
-character in the specified string pattern, specifically:
+character in the pattern, specifically:
 
 %.sd
 %.si
-{\tt <} --- always pickup an object that matches the pattern that follows.\\
-{\tt >} --- never pickup an object that matches the pattern that follows.
+{\tt <} --- always pickup an object that matches rest of pattern;\\
+{\tt >} --- never pickup an object that matches rest of pattern.
 %.ei
 %.ed
 
-Can be set with the `{\tt O}' command, but the setting is not preserved
-across saves and restores.
+A `never pickup' rule takes precedence over an `always pickup' rule if
+both match.
+
+%.lp ""
+Exceptions can be set with the `{\tt O}' command, but ones set that way will
+not be preserved across saves and restores.
 \elist
 
-%.pg
-Here's a couple of examples of autopickup\_exceptions:
+%.lp "Here are some examples:"
+Here are some examples:
 \begin{verbatim}
     autopickup_exception="<*arrow"
     autopickup_exception=">*corpse"
     autopickup_exception=">* cursed*"
 \end{verbatim}
 
+%.pg
 The first example above will result in autopickup of any type of arrow.
 The second example results in the exclusion of any corpse from autopickup.
-The last example results in the exclusion of items known to be cursed from autopickup.
-A `never pickup' rule takes precedence over an `always pickup' rule if both match.
+The last example results in the exclusion of items known to be cursed from
+autopickup.
 
 %.lp
 %.hn 2

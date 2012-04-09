@@ -116,7 +116,7 @@ static boolean NDECL(NH_panictrace_gdb);
 /*ARGSUSED*/
 void
 panictrace_handler(sig_unused)   /* called as signal() handler, so sent at least one arg */
-int sig_unused;
+int sig_unused UNUSED;
 {
 #  define SIG_MSG "\nSignal received.\n"
 	(void) write(2, SIG_MSG, sizeof(SIG_MSG)-1);
@@ -198,15 +198,14 @@ NH_panictrace_libc()
 {
 # ifdef PANICTRACE_LIBC
 	void *bt[20];
-	size_t count;
+	size_t count, x;
 	char **info;
-	int x;
 
 	raw_print("Generating more information you may report:\n");
 	count = backtrace(bt, SIZE(bt));
 	info = backtrace_symbols(bt, count);
-	for(x=0; x<count; x++){
-		raw_printf("[%d] %s",x,info[x]);
+	for (x = 0; x < count; x++) {
+	    raw_printf("[%lu] %s", (unsigned long)x, info[x]);
 	}
 	/* free(info);	Don't risk it. */
 	return TRUE;
@@ -286,7 +285,7 @@ static boolean Schroedingers_cat = FALSE;
 /*ARGSUSED*/
 void
 done1(sig_unused)   /* called as signal() handler, so sent at least one arg */
-int sig_unused;
+int sig_unused UNUSED;
 {
 #ifndef NO_SIGNAL
 	(void) signal(SIGINT,SIG_IGN);
@@ -356,7 +355,7 @@ done2()
 /*ARGSUSED*/
 STATIC_PTR void
 done_intr(sig_unused) /* called as signal() handler, so sent at least one arg */
-int sig_unused;
+int sig_unused UNUSED;
 {
 	done_stopprint++;
 	(void) signal(SIGINT, SIG_IGN);
@@ -594,7 +593,7 @@ char *defquery;
 	} else if (flags.end_disclose[idx] == DISCLOSE_PROMPT_DEFAULT_YES) {
 	    *defquery = 'y';
 	    return TRUE;
-	} else if (flags.end_disclose[idx] == DISCLOSE_PROMPT_DEFAULT_NO) {
+	} else {
 	    *defquery = 'n';
 	    return TRUE;
 	}
@@ -615,34 +614,32 @@ boolean taken;
 	char	qbuf[QBUFSZ];
 	boolean ask;
 
-	if (invent) {
-	    if(taken)
-		Sprintf(qbuf,"Do you want to see what you had when you %s?",
+	if (invent && !done_stopprint) {
+	    if (taken)
+		Sprintf(qbuf, "Do you want to see what you had when you %s?",
 			(how == QUIT) ? "quit" : "died");
 	    else
-		Strcpy(qbuf,"Do you want your possessions identified?");
+		Strcpy(qbuf, "Do you want your possessions identified?");
 
 	    ask = should_query_disclose_option('i', &defquery);
-	    if (!done_stopprint) {
-		c = ask ? yn_function(qbuf, ynqchars, defquery) : defquery;
-		if (c == 'y') {
-			struct obj *obj;
-
-			for (obj = invent; obj; obj = obj->nobj) {
-			    makeknown(obj->otyp);
-			    obj->known = obj->bknown = obj->dknown = obj->rknown = 1;
-			    if (Is_container(obj) || obj->otyp == STATUE)
-				obj->cknown = obj->lknown = 1;
-			}
-			(void) display_inventory((char *)0, TRUE);
-			container_contents(invent, TRUE, TRUE, FALSE);
+	    c = ask ? yn_function(qbuf, ynqchars, defquery) : defquery;
+	    if (c == 'y') {
+		struct obj *obj;
+		
+		for (obj = invent; obj; obj = obj->nobj) {
+		    makeknown(obj->otyp);
+		    obj->known = obj->bknown = obj->dknown = obj->rknown = 1;
+		    if (Is_container(obj) || obj->otyp == STATUE)
+			obj->cknown = obj->lknown = 1;
 		}
-		if (c == 'q')  done_stopprint++;
+		(void) display_inventory((char *)0, TRUE);
+		container_contents(invent, TRUE, TRUE, FALSE);
 	    }
+	    if (c == 'q')  done_stopprint++;
 	}
 
-	ask = should_query_disclose_option('a', &defquery);
 	if (!done_stopprint) {
+	    ask = should_query_disclose_option('a', &defquery);
 	    c = ask ? yn_function("Do you want to see your attributes?",
 				  ynqchars, defquery) : defquery;
 	    if (c == 'y')
@@ -651,20 +648,31 @@ boolean taken;
 	    if (c == 'q') done_stopprint++;
 	}
 
-	ask = should_query_disclose_option('v', &defquery);
-	if (!done_stopprint)
-	    list_vanquished(defquery, ask);
-
-	ask = should_query_disclose_option('g', &defquery);
-	if (!done_stopprint)
-	    list_genocided(defquery, ask);
-
-	ask = should_query_disclose_option('c', &defquery);
 	if (!done_stopprint) {
+	    ask = should_query_disclose_option('v', &defquery);
+	    list_vanquished(defquery, ask);
+	}
+
+	if (!done_stopprint) {
+	    ask = should_query_disclose_option('g', &defquery);
+	    list_genocided(defquery, ask);
+	}
+
+	if (!done_stopprint) {
+	    ask = should_query_disclose_option('c', &defquery);
 	    c = ask ? yn_function("Do you want to see your conduct?",
 				  ynqchars, defquery) : defquery;
 	    if (c == 'y')
-		show_conduct(how >= PANICKED ? 1 : 2);
+		show_conduct((how >= PANICKED) ? 1 : 2);
+	    if (c == 'q') done_stopprint++;
+	}
+
+	if (!done_stopprint) {
+	    ask = should_query_disclose_option('o', &defquery);
+	    c = ask ? yn_function("Do you want to see the dungeon overview?",
+				  ynqchars, defquery) : defquery;
+	    if (c == 'y')
+		show_overview((how >= PANICKED) ? 1 : 2, how);
 	    if (c == 'q') done_stopprint++;
 	}
 }
@@ -941,24 +949,6 @@ die:
 	else if (how == TURNED_SLIME)
 	    u.ugrave_arise = PM_GREEN_SLIME;
 
-	if (bones_ok && u.ugrave_arise == NON_PM &&
-		    !(mvitals[u.umonnum].mvflags & G_NOCORPSE)) {
-		int mnum = u.umonnum;
-
-		if (!Upolyd) {
-		    /* Base corpse on race when not poly'd since original
-		     * u.umonnum is based on role, and all role monsters
-		     * are human.
-		     */
-		    mnum = (flags.female && urace.femalenum != NON_PM) ?
-			urace.femalenum : urace.malenum;
-		}
-		corpse = mk_named_object(CORPSE, &mons[mnum],
-					 u.ux, u.uy, plname);
-		Sprintf(pbuf, "%s, ", plname);
-		formatkiller(eos(pbuf), sizeof pbuf - strlen(pbuf), how);
-		make_grave(u.ux, u.uy, pbuf);
-	}
 	/* if pets will contribute to score, populate mydogs list now
 	   (bones creation isn't a factor, but pline() messaging is) */
 	if (how == ESCAPED || how == ASCENDED) keepdogs(TRUE);
@@ -972,23 +962,46 @@ die:
 	    }
 	}
 	if (how == ESCAPED || how == PANICKED)
-		killer.format = NO_KILLER_PREFIX;
+	    killer.format = NO_KILLER_PREFIX;
 
 	if (how != PANICKED) {
 	    /* these affect score and/or bones, but avoid them during panic */
 	    taken = paybill((how == ESCAPED) ? -1 : (how != QUIT));
 	    paygd();
 	    clearpriests();
-	} else	taken = FALSE;	/* lint; assert( !bones_ok ); */
+	} else
+	    taken = FALSE;	/* lint; assert( !bones_ok ); */
 
 	clearlocks();
 
 	if (have_windows) display_nhwindow(WIN_MESSAGE, FALSE);
 
 	if (strcmp(flags.end_disclose, "none") && how != PANICKED)
-		disclose(how, taken);
+	    disclose(how, taken);
+
 	/* finish_paybill should be called after disclosure but before bones */
 	if (bones_ok && taken) finish_paybill();
+
+	/* grave creation should be after disclosure so it doesn't have
+	   this grave in the current level's features for #overview */
+	if (bones_ok && u.ugrave_arise == NON_PM &&
+		!(mvitals[u.umonnum].mvflags & G_NOCORPSE)) {
+	    int mnum = u.umonnum;
+
+	    if (!Upolyd) {
+		/* Base corpse on race when not poly'd since original
+		 * u.umonnum is based on role, and all role monsters
+		 * are human.
+		 */
+		mnum = (flags.female && urace.femalenum != NON_PM) ?
+				urace.femalenum : urace.malenum;
+	    }
+	    corpse = mk_named_object(CORPSE, &mons[mnum],
+				     u.ux, u.uy, plname);
+	    Sprintf(pbuf, "%s, ", plname);
+	    formatkiller(eos(pbuf), sizeof pbuf - strlen(pbuf), how);
+	    make_grave(u.ux, u.uy, pbuf);
+	}
 
 	/* calculate score, before creating bones [container gold] */
 	{

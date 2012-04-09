@@ -68,13 +68,13 @@ struct flag {
 	int	 pile_limit; /* controls feedback when walking over objects */
 	char	 inv_order[MAXOCLASSES];
 	char	 pickup_types[MAXOCLASSES];
-#define NUM_DISCLOSURE_OPTIONS		5
+#define NUM_DISCLOSURE_OPTIONS		6	/* i,a,v,g,c,o (decl.c) */
 #define DISCLOSE_PROMPT_DEFAULT_YES	'y'
 #define DISCLOSE_PROMPT_DEFAULT_NO	'n'
 #define DISCLOSE_YES_WITHOUT_PROMPT	'+'
 #define DISCLOSE_NO_WITHOUT_PROMPT	'-'
-	char	 end_disclose[NUM_DISCLOSURE_OPTIONS + 1];  /* disclose various info
-								upon exit */
+	char	 end_disclose[NUM_DISCLOSURE_OPTIONS + 1]; /* disclose various
+							      info upon exit */
 	char	 menu_style;	/* User interface style setting */
 	boolean  made_fruit; /* don't easily let the user overflow the number of fruits */
 

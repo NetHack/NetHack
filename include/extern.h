@@ -587,6 +587,7 @@ E schar FDECL(print_dungeon, (BOOLEAN_P,schar *,xchar *));
 #ifdef DUNGEON_OVERVIEW
 E int NDECL(donamelevel);
 E int NDECL(dooverview);
+E void FDECL(show_overview, (int,int));
 E void FDECL(forget_mapseen, (int));
 E void FDECL(init_mapseen, (d_level *));
 E void NDECL(recalc_mapseen);

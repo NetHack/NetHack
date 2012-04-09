@@ -63,7 +63,7 @@ mapseen *mapseenchn = (struct mapseen *)0;
 STATIC_DCL mapseen *FDECL(load_mapseen, (int));
 STATIC_DCL void FDECL(save_mapseen, (int, mapseen *));
 STATIC_DCL mapseen *FDECL(find_mapseen, (d_level *));
-STATIC_DCL void FDECL(print_mapseen, (winid,mapseen *,BOOLEAN_P));
+STATIC_DCL void FDECL(print_mapseen, (winid,mapseen *,int,int,BOOLEAN_P));
 STATIC_DCL boolean FDECL(interest_mapseen, (mapseen *));
 STATIC_DCL const char *FDECL(seen_string, (XCHAR_P,const char *));
 STATIC_DCL const char *FDECL(br_string2, (branch *));
@@ -2326,6 +2326,16 @@ int roomno;
 int
 dooverview()
 {
+    show_overview(0, 0);
+    return 0;
+}
+
+void
+show_overview(why, reason)
+int why;	/* 0 => #overview command,
+		   1 or 2 => end of game disclosure (1: alive, 2: dead) */
+int reason;	/* how hero died; used when disclosing end-of-game level */
+{
     winid win;
     mapseen *mptr;
     int lastdun = -1;
@@ -2336,15 +2346,14 @@ dooverview()
     win = create_nhwindow(NHW_MENU);
     for (mptr = mapseenchn; mptr; mptr = mptr->next) {
 	/* only print out info for a level or a dungeon if interest */
-	if (interest_mapseen(mptr)) {
-	    print_mapseen(win, mptr, (boolean)(mptr->lev.dnum != lastdun));
+	if (why > 0 || interest_mapseen(mptr)) {
+	    print_mapseen(win, mptr, why, reason,
+			  (boolean)(mptr->lev.dnum != lastdun));
 	    lastdun = mptr->lev.dnum;
 	}
     }
     display_nhwindow(win, TRUE);
     destroy_nhwindow(win);
-
-    return 0;
 }
 
 STATIC_OVL const char *
@@ -2452,13 +2461,16 @@ char *outbuf;
 			    } while (0)
 
 STATIC_OVL void
-print_mapseen(win, mptr, printdun)
+print_mapseen(win, mptr, final, reason, printdun)
 winid win;
 mapseen *mptr;
+int final;	/* 0: not final; 1: game over, alive; 2: game over, dead */
+int reason;	/* cause of death; only used if final==2 and mptr->lev==u.uz */
 boolean printdun;
 {
-    char buf[BUFSZ];
+    char buf[BUFSZ], tmpbuf[BUFSZ];
     int i, depthstart;
+    boolean died_here = (final == 2 && on_level(&u.uz, &mptr->lev));
 
     /* Damnable special cases */
     /* The quest and knox should appear to be level 1 to match
@@ -2518,8 +2530,8 @@ boolean printdun;
     if (mptr->custom)
 	Sprintf(eos(buf), " (%s)", mptr->custom);
     if (on_level(&u.uz, &mptr->lev))
-	Strcat(buf, " <- You are here");
-    putstr(win, ATR_BOLD, buf);
+	Sprintf(eos(buf), " <- You %s here", !final ? "are" : "were");
+    putstr(win, !final ? ATR_BOLD : 0, buf);
 
     if (mptr->flags.forgot) return;
 
@@ -2586,8 +2598,6 @@ boolean printdun;
 	   indicates that the fort's entrance has been seen (or mapped) */
 	Sprintf(buf, "%sFort Ludios.", PREFIX);
     } else if (mptr->flags.castle) {
-	char tmpbuf[BUFSZ];
-
 	Sprintf(buf, "%sThe castle%s.", PREFIX, tunesuffix(mptr, tmpbuf));
     } else if (mptr->flags.valley) {
 	Sprintf(buf, "%sValley of the Dead.", PREFIX);
@@ -2612,17 +2622,30 @@ boolean printdun;
     }
 
     /* maybe print out bones details */
-    if (mptr->final_resting_place) {
+    if (mptr->final_resting_place || final) {
 	struct cemetery *bp;
-	int kncnt = 0;
+	int kncnt = !died_here ? 0 : 1;
 
 	for (bp = mptr->final_resting_place; bp; bp = bp->next)
-	    if (bp->bonesknown || wizard) ++kncnt;
+	    if (bp->bonesknown || wizard || final) ++kncnt;
 	if (kncnt) {
 	    Sprintf(buf, "%s%s", PREFIX, "Final resting place for");
 	    putstr(win, 0, buf);
+	    if (died_here) {
+		/* disclosure occurs before bones creation, so listing dead
+		   hero here doesn't give away whether bones are produced */
+		formatkiller(tmpbuf, sizeof tmpbuf, reason);
+		/* rephrase a few death reasons to work with "you" */
+		(void) strsubst(tmpbuf, " himself", " yourself");
+		(void) strsubst(tmpbuf, " herself", " yourself");
+		(void) strsubst(tmpbuf, " his ", " your ");
+		(void) strsubst(tmpbuf, " her ", " your ");
+		Sprintf(buf, "%s%syou, %s%c", PREFIX, TAB,
+			tmpbuf, --kncnt ? ',' : '.');
+		putstr(win, 0, buf);
+	    }
 	    for (bp = mptr->final_resting_place; bp; bp = bp->next) {
-		if (bp->bonesknown || wizard) {
+		if (bp->bonesknown || wizard || final) {
 		    Sprintf(buf, "%s%s%s, %s%c", PREFIX, TAB,
 			    bp->who, bp->how, --kncnt ? ',' : '.');
 		    putstr(win, 0, buf);
