@@ -86,46 +86,40 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
 
     At the time of this release, NetHack 3.5 is known to run/compile on:
 
-        Apple Macintosh running MacOS 7.5 or higher, LinuxPPC, BeOS 4.0
-        Atari ST/TT/Falcon running TOS (or MultiTOS) with GCC
-        Commodore Amiga running AmigaDOS 3.0 or higher with SAS/C 6.x
-                (but see Makefile.ami about DICE and Manx)
-        DEC Alpha/VMS (aka OpenVMS AXP), running V1.x through V7.1
-        DEC VAX/VMS, running V4.6 through V7.1
-        HP 9000s700 running HP-UX 10.x, 11.x
-        IBM PS/2 and AT compatibles running OS/2 - 2.0 and up with GCC emx
-        Intel 80386 or greater (or clone) boxes running MS-DOS with DPMI.
         Intel 80386 or greater (or clone) boxes running Linux, BSDI, or
-                Windows 95/98/NT/2000/XP
+                Windows NT/XP/2000/2003/2008
         Intel Pentium or better (or clone) running BeOS 4.5
         Sun SPARC based machine running SunOS 4.x, Solaris 2.x, or Solaris 7
 
-    NetHack 3.5 will also run on the following, but a cross-compiler hosted
-    on another platform, such as win32, is required to build from source.
-
-        Pocket PC devices running Windows CE 3.0 and higher
-        H/PC Pro devices running Windows CE 2.11 and higher.
-	Palm Size PC 1.1 devices running Windows CE 2.11
 
     Previous versions of NetHack were tested on the following systems,
-    and we expect that NetHack 3.5 will work on them as well:
+    and with a little work we expect that NetHack 3.5 will work on them 
+    as well:
 
+        Apple Macintosh running MacOS 7.5 or higher, LinuxPPC, BeOS 4.0
+        Atari ST/TT/Falcon running TOS (or MultiTOS) with GCC
         AT&T 3B1 running System V (3.51)
         AT&T 3B2/600 & 3B2/622 running System V R3.2.1
         AT&T 3B2/1000 Model 80 running System V R3.2.2
         AT&T 3B4000 running System V
         AT&T 6386 running System V R3.2
+        Commodore Amiga running AmigaDOS 3.0 or higher with SAS/C 6.x
+                (but see Makefile.ami about DICE and Manx)
         Data General AViiON systems running DG/UX
+        DEC Alpha/VMS (aka OpenVMS AXP), running V1.x through V7.1
+        DEC VAX/VMS, running V4.6 through V7.1
         DEC vaxen running BSD, Ultrix
         Decstations running Ultrix 3.1, 4.x
         Encore Multimax running UMAX 4.2
         Gould NP1 running UTX 3/2
         HP 9000s300 running HP-UX
-        HP 9000s700 running HP-UX 9.x
+        HP 9000s700 running HP-UX 9.x, 10.x, 11.x
         IBM PC/RT and RS/6000 running AIX 3.x
+        IBM PS/2 and AT compatibles running OS/2 - 2.0 and up with GCC emx
         IBM PS/2 and AT compatibles running OS/2 1.1 - 2.0 (and probably
            Warp) with Microsoft 6.0, and OS/2 2.0 and up with IBM CSet++ 2.0.
         Intel 80386 or greater (or clone) running 386BSD
+        Intel 80386 or greater (or clone) boxes running MS-DOS with DPMI.
         Mips M2000 running RiscOS 4.1
         NeXT running Mach (using BSD configuration)
         Pyramid 9820x running OSx 4.4c
@@ -139,20 +133,18 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     Unless otherwise mentioned, the compiler used was the OS-vendor's
     C compiler.
 
-    With the demise of Windows NT on the DEC Alpha, no attempt has been
-    made to build NetHack 3.5 on that platform.
+    NetHack 3.5 may also run on the following, but a cross-compiler hosted
+    on another platform, such as win32, would be required to build from 
+    source.
 
-    No attempt has been made to build or run NetHack 3.5 on Windows Me
-    at this point.  It may work, but then again it may not.
-    
-    A build for Intel 80286 machines and DOS "real mode" overlaid versions 
-    has not been produced for NetHack 3.5.  Nobody on the porting team has
-    the time or the software to attempt the necessary tuning that will allow 
-    it to achieve the balance of having just the right amount of available 
-    memory, and still have acceptable performance.  The sources necessary 
-    to do so are still included in the source distribution, so if someone 
-    has access to a real-mode compiler and lots of spare time on their hands, 
-    you may be able to get things working. Of course you do so at your own risk.
+        Pocket PC devices running Windows CE 3.0 and higher
+        H/PC Pro devices running Windows CE 2.11 and higher.
+	Palm Size PC 1.1 devices running Windows CE 2.11
+
+    The sources necessary to build an 80286 DOS "real mode" overlaid version 
+    are still included in the source distribution, so if someone has access 
+    to a real-mode compiler and lots of spare time on their hands, you may 
+    be able to get things working. Of course you do so at your own risk.
 
                         - - - - - - - - - - -
 
@@ -184,23 +176,8 @@ a patch for the NetHack source code via email directly, you can direct it
 to this address:
     nethack-bugs (at) nethack.org
 
-If you've changed something to get NetHack to run on your system, it's likely
-that others have done it by making slightly different modifications.  By routing 
-your patches through the development team, we should be able to avoid making 
-everyone else choose among variant patches claiming to do the same thing, to keep
-most of the copies of 3.5 synchronized by means of official patches, and to 
-maintain the painfully-created file organization.  (This process has been working
-since the time when everyone just posted their own patches to 2.3.  At that time,
-there were no archived bug-fixes to give to people who got 2.3 after its initial
-release, so the same bugs kept being discovered by new batches of people.)
-We have been successful in preventing this from happening since the 3.0
-release.  Please cooperate to keep this from happening to 3.5.
-
-It is inevitable that we will reject some proposed additions of new features
-either because they do not fit our conception of the game, or because they
-require more code than we consider they're worth.  If we reject your feature,
-you are free, of course, to post the patches to the net yourself and let the
-marketplace decide their worth.
+If a feature is not accepted you are free, of course, to post the patches 
+to the net yourself and let the marketplace decide their worth.
 
 All of this amounts to the following:  If you decide to apply a free-lanced
 patch to your 3.5 code, you are on your own.  In our own patches, we will
