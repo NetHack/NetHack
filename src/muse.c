@@ -2119,7 +2119,7 @@ const char *fmt, *str;
 	    return TRUE;
 	} else if (EReflecting & W_ARM) {
 	    if (fmt && str)
-	    	pline(fmt, str, uskin ? "lustre" : "armor");
+	    	pline(fmt, str, uskin ? "luster" : "armor");
 	    return TRUE;
 	} else if (youmonst.data == &mons[PM_SILVER_DRAGON]) {
 	    if (fmt && str)
