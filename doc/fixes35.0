@@ -827,6 +827,7 @@ feedback for reverse-genocide was plural even when just one monster was created
 fix message given when part of a stack of items in a monster's inventory is
 	being destroyed
 add "Boing!" message when hero zaps resistant monster with striking/force bolt
+adjust gaze reflection message when your scales are embedded in your skin
 
 
 Platform- and/or Interface-Specific Fixes
@@ -860,7 +861,6 @@ Windows, probably MSDOS and OS/2: attempting to use very first false rumor
 	when rumors.tru had CR+LF line ends instead of Unix-style LF lines
 #if CLIPPING: during teleport or hurtle, re-clip the map immediately instead
 	of waiting until hero's next move
-
 winCE: disable processing of double-click messages if the first click
 	causes map to scroll
 winCE: help text windows close immediately after open (unhandled WM_KEYDOWN in mhtext.c)
