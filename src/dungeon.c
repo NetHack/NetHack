@@ -24,8 +24,8 @@ struct proto_dungeon {
 	int	n_brs;	/* number of tmpbranch entries */
 };
 
-int n_dgns;				/* number of dungeons (used here,  */
-					/*   and mklev.c)		   */
+int n_dgns;				/* number of dungeons (also used   */
+					/*   in mklev.c and do.c)	   */
 static branch *branches = (branch *) 0;	/* dungeon branch list		   */
 
 struct lchoice {
@@ -65,8 +65,10 @@ STATIC_DCL void FDECL(save_mapseen, (int, mapseen *));
 STATIC_DCL mapseen *FDECL(find_mapseen, (d_level *));
 STATIC_DCL void FDECL(print_mapseen, (winid,mapseen *,int,int,BOOLEAN_P));
 STATIC_DCL boolean FDECL(interest_mapseen, (mapseen *));
+STATIC_DCL void FDECL(traverse_mapseenchn, (BOOLEAN_P,winid,int,int,int *));
 STATIC_DCL const char *FDECL(seen_string, (XCHAR_P,const char *));
 STATIC_DCL const char *FDECL(br_string2, (branch *));
+STATIC_DCL const char *FDECL(endgamelevelname, (char *,int));
 STATIC_DCL const char *FDECL(shop_string, (int));
 STATIC_DCL char *FDECL(tunesuffix, (mapseen *,char *));
 #endif /* DUNGEON_OVERVIEW */
@@ -1872,18 +1874,16 @@ d_level *dest;
     }
 }
 
-/* add a custom name to the current level */
+/* #annotate command - add a custom name to the current level */
 int
 donamelevel()
 {
     mapseen *mptr;
-    char qbuf[QBUFSZ];		/* Buffer for query text */
     char nbuf[BUFSZ];		/* Buffer for response */
 
     if (!(mptr = find_mapseen(&u.uz))) return 0;
 
-    Sprintf(qbuf,"What do you want to call this dungeon level? ");
-    getlin(qbuf, nbuf);
+    getlin("What do you want to call this dungeon level?", nbuf);
     if (index(nbuf, '\033')) return 0;
 
     /* discard old annotation, if any */
@@ -1997,6 +1997,8 @@ int fd;
 
 /* Remove all mapseen objects for a particular dnum.
  * Useful during quest expulsion to remove quest levels.
+ * [No longer deleted, just marked as unreachable.  #overview will
+ * ignore such levels, end of game disclosure will include them.]
  */
 void
 remdun_mapseen(dnum)
@@ -2007,6 +2009,10 @@ int dnum;
     mptraddr = &mapseenchn;
     while ((mptr = *mptraddr) != 0) {
 	if (mptr->lev.dnum == dnum) {
+#if 1	    /* use this... */
+	    mptr->flags.unreachable = 1;
+	}
+#else	    /* old deletion code */
 	    *mptraddr = mptr->next;
 	    if (mptr->custom)
 		free((genericptr_t) mptr->custom);
@@ -2014,6 +2020,7 @@ int dnum;
 		savecemetery(-1, FREE_SAVE, &mptr->final_resting_place);
 	    free((genericptr_t) mptr);
 	} else
+#endif
 	    mptraddr = &mptr->next;
     }
 }
@@ -2025,7 +2032,7 @@ d_level *lev;
     /* Create a level and insert in "sorted" order.  This is an insertion
      * sort first by dungeon (in order of discovery) and then by level number.
      */
-    mapseen *mptr, *init, *old;
+    mapseen *mptr, *init, *prev;
 
     init = (mapseen *) alloc(sizeof *init);
     (void) memset((genericptr_t)init, 0, sizeof *init);
@@ -2040,25 +2047,20 @@ d_level *lev;
     init->lev.dnum = lev->dnum;
     init->lev.dlevel = lev->dlevel;
 
-    if (!mapseenchn) {
+    /* walk until we get to the place where we should insert init */
+    for (mptr = mapseenchn, prev = 0; mptr; prev = mptr, mptr = mptr->next)
+	if (mptr->lev.dnum > init->lev.dnum ||
+		(mptr->lev.dnum == init->lev.dnum &&
+		    mptr->lev.dlevel > init->lev.dlevel))
+	    break;
+    if (!prev) {
+	init->next = mapseenchn;
 	mapseenchn = init;
-	return;
+    } else {
+	mptr = prev->next;
+	prev->next = init;
+	init->next = mptr;
     }
-
-    /* walk until we get to the place where we should
-     * insert init between mptr and mptr->next
-     */
-    for (mptr = mapseenchn; mptr->next; mptr = mptr->next) {
-	if (mptr->next->lev.dnum == init->lev.dnum) break;
-    }
-    for (; mptr->next; mptr = mptr->next) {
-	if ((mptr->next->lev.dnum != init->lev.dnum) ||
-	    (mptr->next->lev.dlevel > init->lev.dlevel)) break;
-    }
-
-    old = mptr->next;
-    mptr->next = init;
-    init->next = old;
 }
 
 #define INTEREST(feat) \
@@ -2082,8 +2084,8 @@ interest_mapseen(mptr)
 mapseen *mptr;
 {
     if (on_level(&u.uz, &mptr->lev)) return TRUE;
-    if (mptr->flags.forgot) return FALSE;
-    if (In_endgame(&u.uz) && !In_endgame(&mptr->lev)) return FALSE;
+    if (mptr->flags.unreachable || mptr->flags.forgot) return FALSE;
+    /* level is of interest if it has an auto-generated annotation */
     if (mptr->flags.oracle || mptr->flags.bigroom ||
 # ifdef REINCARNATION
 	mptr->flags.roguelevel ||
@@ -2095,6 +2097,12 @@ mapseen *mptr;
        be furthest one reached, unless level teleporting in wizard mode) */
     if (In_sokoban(&mptr->lev) &&
 	(In_sokoban(&u.uz) || !mptr->flags.sokosolved)) return TRUE;
+    /* when in the endgame, list all endgame levels visited, whether they
+       have annotations or not, so that #overview doesn't become extremely
+       sparse once the rest of the dungeon has been flagged as unreachable */
+    if (In_endgame(&u.uz)) return In_endgame(&mptr->lev);
+    /* level is of interest if it has non-zero feature count or known bones
+       or user annotation or known connection to another dungeon brancth */
     return (INTEREST(mptr->feat) ||
 	    (mptr->final_resting_place &&
 		(mptr->flags.knownbones || wizard)) ||
@@ -2109,17 +2117,34 @@ recalc_mapseen()
     struct monst *mtmp;
     struct cemetery *bp, **bonesaddr;
     unsigned i, ridx;
-    int x, y, count, atmp;
+    int x, y, ltyp, count, atmp;
 
     /* Should not happen in general, but possible if in the process
      * of being booted from the quest.  The mapseen object gets
      * removed during the expulsion but prior to leaving the level
+     * [Since quest explusion no longer deletes quest mapseen data,
+     * null return from find_mapseen() should now be impossible.]
      */
     if (!(mptr = find_mapseen(&u.uz))) return;
 
     /* reset all features; mptr->feat.* = 0; */
     (void) memset((genericptr_t) &mptr->feat, 0, sizeof mptr->feat);
     /* reset most flags; some level-specific ones are left as-is */
+    if (mptr->flags.unreachable) {
+	mptr->flags.unreachable = 0; /* reached it; Eye of the Aethiopica? */
+	if (In_quest(&u.uz)) {
+	    mapseen *mptrtmp = mapseenchn;
+
+	    /* when quest was unreachable due to ejection and portal removal,
+	       getting back to it via arti-invoke should revive annotation
+	       data for all quest levels, not just the one we're on now */
+	    do {
+		if (mptrtmp->lev.dnum == mptr->lev.dnum)
+		    mptrtmp->flags.unreachable = 0;
+		mptrtmp = mptrtmp->next;
+	    } while (mptrtmp);
+	}
+    }
     mptr->flags.knownbones = 0;
     mptr->flags.sokosolved = In_sokoban(&u.uz) && !Sokoban;
     /* mptr->flags.bigroom retains previous value when hero can't see */
@@ -2190,17 +2215,21 @@ recalc_mapseen()
      * the ability to have non-dungeon glyphs float above the last known
      * dungeon glyph (i.e. items on fountains).
      */
-    if (!Levitation)
-	lastseentyp[u.ux][u.uy] = levl[u.ux][u.uy].typ;
-
     for (x = 1; x < COLNO; x++) {
 	for (y = 0; y < ROWNO; y++) {
-	    if (cansee(x, y)) {
-		mtmp = m_at(x, y);
-		lastseentyp[x][y] =
-	      (mtmp && mtmp->m_ap_type == M_AP_FURNITURE && canseemon(mtmp)) ?
-				    cmap_to_type(mtmp->mappearance) :
-				    levl[x][y].typ;
+	    if (cansee(x, y) || (x == u.ux && y == u.uy && !Levitation)) {
+		ltyp = levl[x][y].typ;
+		if (ltyp == DRAWBRIDGE_UP)
+		    switch (levl[x][y].drawbridgemask & DB_UNDER) {
+			case DB_ICE:  ltyp = ICE; break;
+			case DB_LAVA: ltyp = LAVAPOOL; break;
+			case DB_MOAT: ltyp = MOAT; break;
+			default:      ltyp = STONE; break;
+		    }
+		if ((mtmp = m_at(x, y)) != 0 &&
+			mtmp->m_ap_type == M_AP_FURNITURE && canseemon(mtmp))
+		    ltyp = cmap_to_type(mtmp->mappearance);
+		lastseentyp[x][y] = ltyp;
 	    }
 
 	    switch (lastseentyp[x][y]) {
@@ -2323,6 +2352,7 @@ int roomno;
     mptr->msrooms[roomno].seen = 1;
 }
 
+/* #overview command */
 int
 dooverview()
 {
@@ -2330,30 +2360,51 @@ dooverview()
     return 0;
 }
 
+/* called for #overview or for end of game disclosure */
 void
 show_overview(why, reason)
 int why;	/* 0 => #overview command,
-		   1 or 2 => end of game disclosure (1: alive, 2: dead) */
+		   1 or 2 => final disclosure (1: hero lived, 2: hero died) */
 int reason;	/* how hero died; used when disclosing end-of-game level */
 {
     winid win;
-    mapseen *mptr;
     int lastdun = -1;
 
     /* lazy intialization */
     (void) recalc_mapseen();
 
     win = create_nhwindow(NHW_MENU);
-    for (mptr = mapseenchn; mptr; mptr = mptr->next) {
-	/* only print out info for a level or a dungeon if interest */
-	if (why > 0 || interest_mapseen(mptr)) {
-	    print_mapseen(win, mptr, why, reason,
-			  (boolean)(mptr->lev.dnum != lastdun));
-	    lastdun = mptr->lev.dnum;
-	}
-    }
+    /* show the endgame levels before the rest of the dungeon,
+       so that the Planes (dnum 5-ish) come out above main dungeon (dnum 0) */
+    if (In_endgame(&u.uz))
+	traverse_mapseenchn(TRUE, win, why, reason, &lastdun);
+    /* if game is over or we're not in the endgame yet, show the dungeon */
+    if (why > 0 || !In_endgame(&u.uz))
+	traverse_mapseenchn(FALSE, win, why, reason, &lastdun);
     display_nhwindow(win, TRUE);
     destroy_nhwindow(win);
+}
+
+/* display endgame levels or non-endgame levels, not both */
+STATIC_OVL void
+traverse_mapseenchn(viewendgame, win, why, reason, lastdun_p)
+boolean viewendgame;
+winid win;
+int why, reason, *lastdun_p;
+{
+    mapseen *mptr;
+    boolean showheader;
+
+    for (mptr = mapseenchn; mptr; mptr = mptr->next) {
+	if (viewendgame ^ In_endgame(&mptr->lev)) continue;
+
+	/* only print out info for a level or a dungeon if interest */
+	if (why > 0 || interest_mapseen(mptr)) {
+	    showheader = (boolean)(mptr->lev.dnum != *lastdun_p);
+	    print_mapseen(win, mptr, why, reason, showheader);
+	    *lastdun_p = mptr->lev.dnum;
+	}
+    }
 }
 
 STATIC_OVL const char *
@@ -2391,6 +2442,29 @@ branch *br;
     }
 
     return "(unknown)";
+}
+
+/* get the name of an endgame level; topten.c does something similar */
+STATIC_OVL const char *
+endgamelevelname(outbuf, indx)
+char *outbuf;
+int indx;
+{
+    const char *planename = 0;
+
+    *outbuf = '\0';
+    switch (indx) {
+    case -5: Strcpy(outbuf, "Astral Plane"); break;
+    case -4: planename = "Water"; break;
+    case -3: planename = "Fire"; break;
+    case -2: planename = "Air"; break;
+    case -1: planename = "Earth"; break;
+    }
+    if (planename)
+	Sprintf(outbuf, "Plane of %s", planename);
+    else if (!*outbuf)
+	Sprintf(outbuf, "unknown plane #%d", indx);
+    return outbuf;
 }
 
 STATIC_OVL const char *
@@ -2461,11 +2535,11 @@ char *outbuf;
 			    } while (0)
 
 STATIC_OVL void
-print_mapseen(win, mptr, final, reason, printdun)
+print_mapseen(win, mptr, final, how, printdun)
 winid win;
 mapseen *mptr;
 int final;	/* 0: not final; 1: game over, alive; 2: game over, dead */
-int reason;	/* cause of death; only used if final==2 and mptr->lev==u.uz */
+int how;	/* cause of death; only used if final==2 and mptr->lev==u.uz */
 boolean printdun;
 {
     char buf[BUFSZ], tmpbuf[BUFSZ];
@@ -2492,24 +2566,13 @@ boolean printdun;
 	    Sprintf(buf, "%s: levels %d to %d", 
 		    dungeons[mptr->lev.dnum].dname, depthstart,
 		    depthstart + dungeons[mptr->lev.dnum].dunlev_ureached - 1);
-	putstr(win, ATR_INVERSE, buf);
+	putstr(win, !final ? ATR_INVERSE : 0, buf);
     }
 
     /* calculate level number */
     i = depthstart + mptr->lev.dlevel - 1;
-    if (Is_astralevel(&mptr->lev))
-	Sprintf(buf, "%sAstral Plane:", TAB);
-    else if (In_endgame(&mptr->lev))
-	/* Negative numbers are mildly confusing, since they are never
-	 * shown to the player, except in wizard mode.  We could show
-	 * "Level -1" for the earth plane, for example.  Instead,
-	 * show "Plane 1" for the earth plane to differentiate from
-	 * level 1.  There's not much to show, but maybe the player
-	 * wants to #annotate them for some reason such as keeping
-	 * track of encounters with the Wizard.
-	 * [TODO: change this to be "Plane of <element-name>:"]
-	 */
-	Sprintf(buf, "%sPlane %i:", TAB, -i);
+    if (In_endgame(&mptr->lev))
+	Sprintf(buf, "%s%s:", TAB, endgamelevelname(tmpbuf, i));
     else
 	/* FIXME: when this branch has only one level (Ft.Ludios),
 	 * listing "Level 1:" for it might confuse inexperienced
@@ -2530,7 +2593,8 @@ boolean printdun;
     if (mptr->custom)
 	Sprintf(eos(buf), " (%s)", mptr->custom);
     if (on_level(&u.uz, &mptr->lev))
-	Sprintf(eos(buf), " <- You %s here", !final ? "are" : "were");
+	Sprintf(eos(buf), " <- You %s here.",
+		(!final || (final == 1 && how == ASCENDED)) ? "are" : "were");
     putstr(win, !final ? ATR_BOLD : 0, buf);
 
     if (mptr->flags.forgot) return;
@@ -2539,7 +2603,6 @@ boolean printdun;
 	buf[0] = 0;
 		
 	i = 0;	/* interest counter */
-
 	/* List interests in an order vaguely corresponding to
 	 * how important they are.
 	 */
@@ -2592,6 +2655,9 @@ boolean printdun;
     } else if (mptr->flags.roguelevel) {
 	Sprintf(buf, "%sA primitive area.", PREFIX);
 # endif
+    } else if (on_level(&mptr->lev, &qstart_level)) {
+	Sprintf(buf, "%sHome%s.", PREFIX,
+		mptr->flags.unreachable ? " (no way back...)" : "");
     } else if (mptr->flags.ludios) {
 	/* presence of the ludios branch in #overview output indicates that
 	   the player has made it onto the level; presence of this annotation
@@ -2634,7 +2700,7 @@ boolean printdun;
 	    if (died_here) {
 		/* disclosure occurs before bones creation, so listing dead
 		   hero here doesn't give away whether bones are produced */
-		formatkiller(tmpbuf, sizeof tmpbuf, reason);
+		formatkiller(tmpbuf, sizeof tmpbuf, how);
 		/* rephrase a few death reasons to work with "you" */
 		(void) strsubst(tmpbuf, " himself", " yourself");
 		(void) strsubst(tmpbuf, " herself", " yourself");

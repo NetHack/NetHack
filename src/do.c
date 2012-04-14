@@ -20,6 +20,8 @@ STATIC_DCL int NDECL(currentlevel_rewrite);
 STATIC_DCL void NDECL(final_level);
 /* static boolean FDECL(badspot, (XCHAR_P,XCHAR_P)); */
 
+extern int n_dgns;		/* number of dungeons, from dungeon.c */
+
 static NEARDATA const char drop_types[] =
 	{ ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, 0 };
 
@@ -1100,6 +1102,11 @@ boolean at_stairs, falling, portal;
 	    /* discard unreachable levels; keep #0 */
 	    for (l_idx = maxledgerno(); l_idx > 0; --l_idx)
 		delete_levelfile(l_idx);
+#ifdef DUNGEON_OVERVIEW
+	    /* mark #overview data for all dungeon branches as uninteresting */
+	    for (l_idx = 0; l_idx < n_dgns; ++l_idx)
+		remdun_mapseen(l_idx);
+#endif
 	}
 
 #ifdef REINCARNATION

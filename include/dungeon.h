@@ -219,6 +219,7 @@ typedef struct mapseen  {
 	    Bitfield(shoptype, 5);
 	} feat;
 	struct mapseen_flags {
+	    Bitfield(unreachable, 1); /* can't get back to this level */
 	    Bitfield(forgot, 1); /* player has forgotten about this level */
 	    Bitfield(knownbones, 1); /* player aware of bones */
 	    Bitfield(oracle, 1);
@@ -226,8 +227,8 @@ typedef struct mapseen  {
 	    Bitfield(bigroom, 1);
 	    Bitfield(castle, 1);
 	    Bitfield(castletune, 1); /* add tune hint to castle annotation */
-	    Bitfield(valley, 1);
 
+	    Bitfield(valley, 1);
 	    Bitfield(msanctum, 1);
 	    Bitfield(ludios, 1);
 # ifdef REINCARNATION
