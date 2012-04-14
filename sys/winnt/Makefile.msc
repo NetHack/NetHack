@@ -213,6 +213,7 @@ cdebug = -Zi -Od
 cflags2 = $(cflags:-W4=-W3)
 #More verbose below
 #cflags2 = $(cflags) -wd4131
+#cflags2 = $(cflags:-W4=-Wall)
 
 #==========================================
 # Util builds
@@ -626,22 +627,61 @@ $(O)gamedir.tag:
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo directory created > $@
 
-$(GAMEDIR)\nhdefkey.dll : $(O)$(@B).o $(O)gamedir.tag
+$(O)nhdefkey.def:
+	@echo LIBRARY $(@B) >$@
+! IF "$(TARGET_CPU)"=="x64" || "$(PROCESSOR_ARCHITECTURE)"=="x64"
+! ELSE
+	@echo EXPORTS >>$@
+	@echo    ProcessKeystroke >>$@
+	@echo    NHkbhit >>$@
+	@echo    CheckInput >>$@
+	@echo    SourceWhere >>$@
+	@echo    SourceAuthor >>$@
+	@echo    KeyHandlerName >>$@
+! ENDIF
+
+$(GAMEDIR)\nhdefkey.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
 	@echo Linking $@
 	@$(link) $(ldebug) /RELEASE /DLL user32.lib \
-		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" \
+		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" /DEF:$(O)$(@B).def \
 		/IMPLIB:$(O)$(@B).lib -out:$@ $(O)$(@B).o
 
-$(GAMEDIR)\nh340key.dll : $(O)$(@B).o $(O)gamedir.tag
+$(O)nh340key.def:
+	@echo LIBRARY $(@B) >$@
+! IF "$(TARGET_CPU)"=="x64" || "$(PROCESSOR_ARCHITECTURE)"=="x64"
+! ELSE
+	@echo EXPORTS >>$@
+	@echo    ProcessKeystroke >>$@
+	@echo    NHkbhit >>$@
+	@echo    CheckInput >>$@
+	@echo    SourceWhere >>$@
+	@echo    SourceAuthor >>$@
+	@echo    KeyHandlerName >>$@
+! ENDIF
+
+$(GAMEDIR)\nh340key.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
 	@echo Linking $@
 	@$(link) $(ldebug) /RELEASE /NOLOGO /DLL user32.lib \
-		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" \
+		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" /DEF:$(O)$(@B).def \
 		/IMPLIB:$(O)$(@B).lib -out:$@ $(O)$(@B).o
 
-$(GAMEDIR)\nhraykey.dll : $(O)$(@B).o $(O)gamedir.tag
+$(O)nhraykey.def:
+	@echo LIBRARY $(AB) >$@
+! IF "$(TARGET_CPU)"=="x64" || "$(PROCESSOR_ARCHITECTURE)"=="x64"
+! ELSE
+	@echo EXPORTS >>$@
+	@echo    ProcessKeystroke >>$@
+	@echo    NHkbhit >>$@
+	@echo    CheckInput >>$@
+	@echo    SourceWhere >>$@
+	@echo    SourceAuthor >>$@
+	@echo    KeyHandlerName >>$@
+! ENDIF
+
+$(GAMEDIR)\nhraykey.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
 	@echo Linking $@
 	@$(link) $(ldebug) /RELEASE /NOLOGO /DLL user32.lib \
-		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" \
+		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" /DEF:$(O)$(@B).def \
 		/IMPLIB:$(O)$(@B).lib -out:$@ $(O)$(@B).o
 
 #
@@ -879,6 +919,13 @@ $(O)obj.tag:
 #==========================================
 
 envchk:
+!	IF "$(TARGET_CPU)"=="x64"
+	@echo Windows x64 64-bit build
+!	ELSEIF "$(TARGET_CPU)"=="IA64"
+	@echo Windows x64 64-bit build
+!	ELSE
+	@echo Windows x86 32-bit build
+!	ENDIF
 !	IF "$(CL)"!=""
 #	   @echo Warning, the CL Environment variable is defined:
 #	   @echo CL=$(CL)
@@ -1145,6 +1192,7 @@ clean:
 	if exist $(O)levcomp.PDB  del $(O)levcomp.PDB
 	if exist $(O)makedefs.MAP del $(O)makedefs.MAP
 	if exist $(O)makedefs.PDB del $(O)makedefs.PDB
+	if exist $(O)NetHack.MAP  del $(O)NetHack.MAP
 	if exist $(O)nh340key.def del $(O)nh340key.def
 	if exist $(O)nh340key.exp del $(O)nh340key.exp
 	if exist $(O)nh340key.lib del $(O)nh340key.lib
