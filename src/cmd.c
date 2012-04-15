@@ -357,7 +357,9 @@ doextlist(VOID_ARGS)	/* here after #? - now list all full-word commands */
 #define MAX_EXT_CMD 50		/* Change if we ever have > 50 ext cmds */
 /*
  * This is currently used only by the tty port and is
- * controlled via runtime option 'extmenu'
+ * controlled via runtime option 'extmenu'.
+ * ``# ?'' is counted towards the limit of the number of commands,
+ * so we actually support MAX_EXT_CMD-1 "real" extended commands.
  */
 int
 extcmd_via_menu() /* here after # - now show pick-list of possible commands */
@@ -366,7 +368,7 @@ extcmd_via_menu() /* here after # - now show pick-list of possible commands */
     menu_item *pick_list = (menu_item *)0;
     winid win;
     anything any;
-    const struct ext_func_tab *choices[MAX_EXT_CMD];
+    const struct ext_func_tab *choices[MAX_EXT_CMD + 1];
     char buf[BUFSZ];
     char cbuf[QBUFSZ], prompt[QBUFSZ], fmtstr[20];
     int i, n, nchoices, acount;
@@ -384,20 +386,20 @@ extcmd_via_menu() /* here after # - now show pick-list of possible commands */
 	/* populate choices */
 	for (efp = extcmdlist; efp->ef_txt; efp++) {
 	    if (!matchlevel || !strncmp(efp->ef_txt, cbuf, matchlevel)) {
-		choices[i++] = efp;
+		choices[i] = efp;
 		if ((int)strlen(efp->ef_desc) > biggest) {
 		    biggest = strlen(efp->ef_desc);
 		    Sprintf(fmtstr, "%%-%ds", biggest + 15);
 		}
+		if (++i > MAX_EXT_CMD) {
 # if defined(DEBUG) || defined(BETA)
-		if (i >= MAX_EXT_CMD - 2) {
 		    impossible(
        "Exceeded %d extended commands in doextcmd() menu; 'extmenu' disabled.",
-			       MAX_EXT_CMD - 2);
+			       MAX_EXT_CMD);
+# endif	/* DEBUG || BETA */
 		    iflags.extmenu = 0;
 		    return -1;
 		}
-# endif	/* DEBUG || BETA */
 	    }
 	}
 	choices[i] = (struct ext_func_tab *)0;
