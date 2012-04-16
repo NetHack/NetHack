@@ -26,13 +26,15 @@ static NEARDATA const char * const stoned_texts[] = {
 STATIC_OVL void
 stoned_dialogue()
 {
-	char buf[BUFSZ];
 	register long i = (Stoned & TIMEOUT);
 
 	if (i > 0L && i <= SIZE(stoned_texts)) {
-		Strcpy(buf,stoned_texts[SIZE(stoned_texts) - i]);
-		pline1(nolimbs(youmonst.data) ?
-			strsubst(buf, "limbs", "extremities") : buf);
+		char buf[BUFSZ];
+
+		Strcpy(buf, stoned_texts[SIZE(stoned_texts) - i]);
+		if (nolimbs(youmonst.data) && strstri(buf, "limbs"))
+			(void) strsubst(buf, "limbs", "extremities");
+		pline1(buf);
 	}
 	switch ((int) i) {
 	case 5:		/* slowing down */
@@ -149,18 +151,21 @@ slime_dialogue()
 {
 	register long i = (Slimed & TIMEOUT) / 2L;
 
-	if (((Slimed & TIMEOUT) % 2L) && i >= 0L
-		&& i < SIZE(slime_texts)) {
-	    const char *str = slime_texts[SIZE(slime_texts) - i - 1L];
+	if (((Slimed & TIMEOUT) % 2L) && i >= 0L && i < SIZE(slime_texts)) {
+	    char buf[BUFSZ];
 
-	    if (index(str, '%')) {
+	    Strcpy(buf, slime_texts[SIZE(slime_texts) - i - 1L]);
+	    if (nolimbs(youmonst.data) && strstri(buf, "limbs"))
+		(void) strsubst(buf, "limbs", "extremities");
+
+	    if (index(buf, '%')) {
 		if (i == 4L) {	/* "you are turning green" */
 		    if (!Blind)	/* [what if you're already green?] */
-			pline(str, hcolor(NH_GREEN));
+			pline(buf, hcolor(NH_GREEN));
 		} else
-		    pline(str, an(Hallucination ? rndmonnam() : "green slime"));
+		    pline(buf, an(Hallucination ? rndmonnam() : "green slime"));
 	    } else
-		pline1(str);
+		pline1(buf);
 	}
 	if (i == 3L) {	/* limbs becoming oozy */
 	    HFast = 0L;	/* lose intrinsic speed */

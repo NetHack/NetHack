@@ -828,6 +828,7 @@ fix message given when part of a stack of items in a monster's inventory is
 	being destroyed
 add "Boing!" message when hero zaps resistant monster with striking/force bolt
 adjust gaze reflection message when your scales are embedded in your skin
+adjust turning-to-stone or -slime messages when you have no limbs
 
 
 Platform- and/or Interface-Specific Fixes
