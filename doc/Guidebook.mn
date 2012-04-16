@@ -15,22 +15,24 @@
 .\" .PE
 .\"	clean up
 .de PS
-.nr PX \\w'\\$1'u
-.nr PY \\w'\\$1\ -\ 'u
-.sn \\n(pdu
-.in +\\n(PYu
-.si
+.nr PY \\w'\\$1\ -\ 'u			\" width of label plus " - " for line 1
+.sn \\n(pdu				\" tmac.n: inter-paragraph space
+.in +\\n(PYu				\" additional indent past label (etc)
+.si					\" tmac.n: start indented section
 ..
 .\" labeled paragraph label (and first line)
 .de PL
-.ti -\\n(PYu
-\\$1\\h'|\\n(PXu'\ -\ \\c
+.br
+\\h'|-\\n(PYu'\\$1\ -\ \\c		\" back up, output the label,
+.					\" then output the " - " and attach
+.					\" the next line (the text) without
+.					\" stopping(\c: nroff section 4.2)
 ..
 .\"labeled paragraph end
 .de PE
-.ei
-.in -\\n(PYu
-.sn \\n(pdu
+.ei					\" tmac.n: end indented section
+.in -\\n(PYu				\" undo indent past label (etc)
+.sn \\n(pdu				\" tmac.n: inter-paragraph space
 ..
 .\" end of labeled paragrah
 .mt
