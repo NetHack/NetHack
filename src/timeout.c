@@ -26,10 +26,14 @@ static NEARDATA const char * const stoned_texts[] = {
 STATIC_OVL void
 stoned_dialogue()
 {
+	char buf[BUFSZ];
 	register long i = (Stoned & TIMEOUT);
 
-	if (i > 0L && i <= SIZE(stoned_texts))
-		pline1(stoned_texts[SIZE(stoned_texts) - i]);
+	if (i > 0L && i <= SIZE(stoned_texts)) {
+		Strcpy(buf,stoned_texts[SIZE(stoned_texts) - i]);
+		pline1(nolimbs(youmonst.data) ?
+			strsubst(buf, "limbs", "extremities") : buf);
+	}
 	switch ((int) i) {
 	case 5:		/* slowing down */
 		HFast = 0L;
