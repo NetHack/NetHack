@@ -829,6 +829,9 @@ fix message given when part of a stack of items in a monster's inventory is
 add "Boing!" message when hero zaps resistant monster with striking/force bolt
 adjust gaze reflection message when your scales are embedded in your skin
 adjust turning-to-stone or -slime messages when you have no limbs
+wizard mode ^F on Plane of Water marked portal as seen but didn't display it
+magic mapping displays furniture in preference to known or remembered traps
+	or objects and known traps in preference to remembered objects
 
 
 Platform- and/or Interface-Specific Fixes

@@ -973,7 +973,9 @@ STATIC_OVL void
 show_map_spot(x, y)
 register int x, y;
 {
-    register struct rm *lev;
+    struct rm *lev;
+    struct trap *t;
+    int oldglyph;
 
     if (Confusion && rn2(7)) return;
     lev = &levl[x][y];
@@ -986,16 +988,26 @@ register int x, y;
 	unblock_point(x,y);
     }
 
-    /* if we don't remember an object or trap there, map it */
-    if (lev->typ == ROOM ?
-	    (glyph_is_cmap(lev->glyph) && !glyph_is_trap(lev->glyph) &&
-		glyph_to_cmap(lev->glyph) != ROOM) :
-	    (!glyph_is_object(lev->glyph) && !glyph_is_trap(lev->glyph))) {
-	if (level.flags.hero_memory) {
-	    magic_map_background(x,y,0);
-	    newsym(x,y);			/* show it, if not blocked */
-	} else {
-	    magic_map_background(x,y,1);	/* display it */
+    /*
+     * Force the real background, then if it's not furniture and there's
+     * a known trap there, display the trap, else if there was an object
+     * shown there, redisplay the object.  So during mapping, furniture
+     * takes precedence over traps, which take precedence over objects,
+     * opposite to how normal vision behaves.
+     */
+    oldglyph = glyph_at(x, y);
+    if (level.flags.hero_memory) {
+	magic_map_background(x, y, 0);
+	newsym(x, y);			/* show it, if not blocked */
+    } else {
+	magic_map_background(x, y, 1);	/* display it */
+    }
+    if (!IS_FURNITURE(lev->typ)) {
+	if ((t = t_at(x, y)) != 0 && t->tseen) {
+	    map_trap(t, 1);
+	} else if (glyph_is_trap(oldglyph) || glyph_is_object(oldglyph)) {
+	    show_glyph(x, y, oldglyph);
+	    if (level.flags.hero_memory) lev->glyph = oldglyph;
 	}
     }
 }
