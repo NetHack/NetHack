@@ -23,8 +23,9 @@
 .\" labeled paragraph label (and first line)
 .de PL
 .br
-\\h'|-\\n(PYu'\\$1\ -\ \\c		\" back up, output the label,
-.					\" then output the " - " and attach
+\\h'|-\\n(PYu'\\$1\ -\ \\h'|0u'\\c	\" back up, output the label, then
+.					\" output the " - " and skip back to
+.					\" a zero indent; then attach
 .					\" the next line (the text) without
 .					\" stopping(\c: nroff section 4.2)
 ..
