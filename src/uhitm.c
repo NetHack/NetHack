@@ -563,8 +563,7 @@ int thrown;		/* HMON_xxx (0 => hand-to-hand, other => ranged) */
 #endif
 	int wtype;
 	struct obj *monwep;
-	char yourbuf[BUFSZ];
-	char unconventional[BUFSZ];	/* substituted for word "attack" in msg */
+	char unconventional[BUFSZ]; /* substituted for word "attack" in msg */
 	char saved_oname[BUFSZ];
 
 	unconventional[0] = '\0';
@@ -744,8 +743,8 @@ int thrown;		/* HMON_xxx (0 => hand-to-hand, other => ranged) */
 			break;
 		    case MIRROR:
 			if (breaktest(obj)) {
-			    You("break %smirror.  That's bad luck!",
-				shk_your(yourbuf, obj));
+			    You("break %s.  That's bad luck!",
+				ysimple_name(obj));
 			    change_luck(-2);
 			    useup(obj);
 			    obj = (struct obj *) 0;
@@ -757,8 +756,8 @@ int thrown;		/* HMON_xxx (0 => hand-to-hand, other => ranged) */
 			break;
 #ifdef TOURIST
 		    case EXPENSIVE_CAMERA:
-			You("succeed in destroying %scamera.  Congratulations!",
-			        shk_your(yourbuf, obj));
+			You("succeed in destroying %s.  Congratulations!",
+			    ysimple_name(obj));
 			useup(obj);
 			return(TRUE);
 			/*NOTREACHED*/
