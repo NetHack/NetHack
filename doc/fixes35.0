@@ -833,6 +833,7 @@ wizard mode ^F on Plane of Water marked portal as seen but didn't display it
 magic mapping now displays furniture in preference to known or remembered traps
 	or objects and known traps in preference to remembered objects
 restrictions on diagonal movement were ignored when crawling out of water
+when using magic whistle, prevent steed from being affected (trap interaction)
 
 
 Platform- and/or Interface-Specific Fixes

@@ -441,6 +441,11 @@ struct obj *obj;
 		for(mtmp = fmon; mtmp; mtmp = nextmon) {
 		    nextmon = mtmp->nmon; /* trap might kill mon */
 		    if (DEADMONSTER(mtmp)) continue;
+#ifdef STEED
+		    /* steed is already at your location, so not affected;
+		       this avoids trap issues if you're on a trap location */
+		    if (mtmp == u.usteed) continue;
+#endif
 		    if (mtmp->mtame) {
 			if (mtmp->mtrapped) {
 			    /* no longer in previous trap (affects mintrap) */
