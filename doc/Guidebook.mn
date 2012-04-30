@@ -38,6 +38,20 @@
 .sn \\n(pdu				\" tmac.n: inter-paragraph space
 ..
 .\" end of labeled paragrah
+.\"
+.\" aligned single character key with SHORT definition (if it overflows one
+.\" line, all bets are off)
+.\" Usage:
+.\"  .CC k "definition here"
+.nr CZ \w'\fBW'		\" width of the key character column
+.nr CW \n(CZ/2		\" half the width of the key character column
+.de CC
+.nr CX \\w'\\fB\\$1'u/2	\" half the width of the key character
+.nr CY \\n(CWu-\\n(CXu	\" difference between the two half widths
+.\" output: move right CR units, print the key letter, move right to
+.\"  the full width of the column, print " - " and the definition
+\\h'|\\n(CYu'\\fB\\$1\\fP\\h'|\\n(CZu'\ -\ \\$2
+..
 .mt
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
@@ -1947,22 +1961,22 @@ prompt with default response of `\fBn\fP' for each candidate).
 The possibilities are:
 .sd
 .si
-\fBi\fP - disclose your inventory;
-\fBa\fP - disclose your attributes;
-\fBv\fP - summarize monsters that have been vanquished;
-\fBg\fP - list monster species that have been genocided;
-\fBc\fP - display your conduct;
-\fBo\fP - display dungeon overview.
+.CC i "disclose your inventory;"
+.CC a "disclose your attributes;"
+.CC v "summarize monsters that have been vanquished;"
+.CC g "list monster species that have been genocided;"
+.CC c "display your conduct;"
+.CC o "display dungeon overview."
 .ei
 .ed
 Each disclosure possibility can optionally be preceded by a prefix which
 lets you refine how it behaves.  Here are the valid prefixes:
 .sd
 .si
-\fBy\fP - prompt you and default to yes on the prompt;
-\fBn\fP - prompt you and default to no on the prompt;
-\fB+\fP - disclose it without prompting;
-\fB-\fP - do not disclose it and do not prompt.
+.CC y "prompt you and default to yes on the prompt;"
+.CC n "prompt you and default to no on the prompt;"
+.CC + "disclose it without prompting;"
+.CC - "do not disclose it and do not prompt."
 .ei
 .ed
 Omitted categories are implicitly added with `n' prefix.
