@@ -810,6 +810,7 @@ E boolean FDECL(in_town, (int,int));
 E void FDECL(check_special_room, (BOOLEAN_P));
 E int NDECL(dopickup);
 E void NDECL(lookaround);
+E boolean FDECL(crawl_destination, (int,int));
 E int NDECL(monster_nearby);
 E void FDECL(nomul, (int));
 E void FDECL(unmul, (const char *));

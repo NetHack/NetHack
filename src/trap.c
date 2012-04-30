@@ -8,8 +8,8 @@ extern const char * const destroy_strings[][3];	/* from zap.c */
 
 STATIC_DCL void FDECL(dofiretrap, (struct obj *));
 STATIC_DCL void NDECL(domagictrap);
-STATIC_DCL boolean FDECL(emergency_disrobe,(boolean *));
-STATIC_DCL int FDECL(untrap_prob, (struct trap *ttmp));
+STATIC_DCL boolean FDECL(emergency_disrobe, (boolean *));
+STATIC_DCL int FDECL(untrap_prob, (struct trap *));
 STATIC_DCL void FDECL(move_into_trap, (struct trap *));
 STATIC_DCL int FDECL(try_disarm, (struct trap *,BOOLEAN_P));
 STATIC_DCL void FDECL(reward_untrap, (struct trap *, struct monst *));
@@ -3376,7 +3376,7 @@ drown()
 	for (i = 0; i < 100; i++) {
 		x = rn1(3,u.ux - 1);
 		y = rn1(3,u.uy - 1);
-		if (goodpos(x, y, &youmonst, 0)) {
+		if (crawl_destination(x, y)) {
 			crawl_ok = TRUE;
 			goto crawl;
 		}
@@ -3384,7 +3384,7 @@ drown()
 	/* one more scan */
 	for (x = u.ux - 1; x <= u.ux + 1; x++)
 		for (y = u.uy - 1; y <= u.uy + 1; y++)
-			if (goodpos(x, y, &youmonst, 0)) {
+			if (crawl_destination(x, y)) {
 				crawl_ok = TRUE;
 				goto crawl;
 			}

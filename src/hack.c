@@ -2390,6 +2390,28 @@ int x, y;
     return !(lev_p->doormask & ~(D_NODOOR|D_BROKEN));
 }
 
+/* used by drown() to check whether hero can crawl from water to <x,y> */
+boolean
+crawl_destination(x, y)
+int x, y;
+{
+    /* is location ok in general? */
+    if (!goodpos(x, y, &youmonst, 0)) return FALSE;
+
+    /* orthogonal movement is unrestricted when destination is ok */
+    if (x == u.ux || y == u.uy) return TRUE;
+
+    /* diagonal movement has some restrictions */
+    if (NODIAG(u.umonnum)) return FALSE;	/* poly'd into a grid bug... */
+    if (Passes_walls) return TRUE;		/* or a xorn... */
+    /* pool could be next to a door, conceivably even inside a shop */
+    if (IS_DOOR(levl[x][y].typ) && (!doorless_door(x, y) || block_door(x, y)))
+	return FALSE;
+    /* finally, are we trying to squeeze through a too-narrow gap? */
+    return !(bad_rock(youmonst.data, u.ux, y) &&
+	     bad_rock(youmonst.data, x, u.uy));
+}
+
 /* something like lookaround, but we are not running */
 /* react only to monsters that might hit us */
 int
