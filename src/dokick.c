@@ -125,6 +125,9 @@ register xchar x, y;
 	bhitpos.x = x;
 	bhitpos.y = y;
 	if (attack_checks(mon, (struct obj *)0)) return;
+	/* burn extra nutrition, same as direct combat;
+	   maybe pass out before making target angry */
+	if (overexertion()) return;
 	/* anger target even if wild miss will occur */
 	setmangry(mon);
 
@@ -805,6 +808,11 @@ dokick()
 	 * ceiling shouldn't be kickable (unless hero is flying?);
 	 * kicking toward them should just target whatever is on
 	 * the floor at that spot.]
+	 * [FIXME too:  kick_monster() calls attack_checks() which gives
+	 * the player a chance to decline to attack a peaceful monster,
+	 * and also calls overexertion() so hero might pass out before
+	 * performing the kick.  We shouldn't call wake_nearby() (and
+	 * u_wipe_engr(), both already done above) in such cases.]
 	 */
 
 	if(MON_AT(x, y)) {

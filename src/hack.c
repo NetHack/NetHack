@@ -1329,20 +1329,6 @@ domove()
 	    if(context.forcefight || !mtmp->mundetected || sensemon(mtmp) ||
 		    ((hides_under(mtmp->data) || mtmp->data->mlet == S_EEL) &&
 			!is_safepet(mtmp))){
-		gethungry();
-		if(wtcap >= HVY_ENCUMBER && moves%3) {
-		    if (Upolyd && u.mh > 1) {
-			u.mh--;
-		    } else if (!Upolyd && u.uhp > 1) {
-			u.uhp--;
-		    } else {
-			You("pass out from exertion!");
-			exercise(A_CON, FALSE);
-			fall_asleep(-10, FALSE);
-		    }
-		}
-		if(multi < 0) return;	/* we just fainted */
-
 		/* try to attack; note that it might evade */
 		/* also, we don't attack tame when _safepet_ */
 		if(attack(mtmp)) return;
@@ -1619,6 +1605,28 @@ domove()
 		}
 	    }
 	}
+}
+
+/* combat increases metabolism */
+boolean
+overexertion()
+{
+    /* this used to be part of domove() when moving to a monster's
+       position, but is now called by attack() so that it doesn't
+       execute if you decline to attack a peaceful monster */
+    gethungry();
+    if ((moves % 3L) != 0L && near_capacity() >= HVY_ENCUMBER) {
+	int *hp = (!Upolyd ? &u.uhp : &u.mh);
+
+	if (*hp > 1) {
+	    *hp -= 1;
+	} else {
+	    You("pass out from exertion!");
+	    exercise(A_CON, FALSE);
+	    fall_asleep(-10, FALSE);
+	}
+    }
+    return (multi < 0);	/* might have fainted (actually gone to sleep) */
 }
 
 void

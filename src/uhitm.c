@@ -366,16 +366,16 @@ register struct monst *mtmp;
 	bhitpos.y = u.uy + u.dy;
 	if (attack_checks(mtmp, uwep)) return(TRUE);
 
-	if (Upolyd) {
-		/* certain "pacifist" monsters don't attack */
-		if(noattacks(youmonst.data)) {
-			You("have no way to attack monsters physically.");
-			mtmp->mstrategy &= ~STRAT_WAITMASK;
-			goto atk_done;
-		}
+	if (Upolyd && noattacks(youmonst.data)) {
+	    /* certain "pacifist" monsters don't attack */
+	    You("have no way to attack monsters physically.");
+	    mtmp->mstrategy &= ~STRAT_WAITMASK;
+	    goto atk_done;
 	}
 
-	if(check_capacity("You cannot fight while so heavily loaded."))
+	if (check_capacity("You cannot fight while so heavily loaded.") ||
+		/* consume extra nutrition during combat; maybe pass out */
+		overexertion())
 	    goto atk_done;
 
 	if (u.twoweap && !can_twoweapon())

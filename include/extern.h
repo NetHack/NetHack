@@ -802,6 +802,7 @@ E int FDECL(cant_squeeze_thru, (struct monst *));
 E boolean FDECL(invocation_pos, (XCHAR_P,XCHAR_P));
 E boolean FDECL(test_move, (int, int, int, int, int));
 E void NDECL(domove);
+E boolean NDECL(overexertion);
 E void NDECL(invocation_message);
 E boolean FDECL(pooleffects, (BOOLEAN_P));
 E void FDECL(spoteffects, (BOOLEAN_P));

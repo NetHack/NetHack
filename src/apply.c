@@ -2649,6 +2649,7 @@ use_pole(obj)
 	bhitpos = cc;
 	if ((mtmp = m_at(bhitpos.x, bhitpos.y)) != (struct monst *)0) {
 	    if (attack_checks(mtmp, uwep)) return res;
+	    if (overexertion()) return 1; /* burn nutrition; maybe pass out */
 	    check_caitiff(mtmp);
 	    notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
 	    (void) thitmonst(mtmp, uwep);
