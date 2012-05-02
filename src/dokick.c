@@ -16,8 +16,9 @@ static NEARDATA const char *gate_str;
 extern boolean notonhead;	/* for long worms */
 
 STATIC_DCL void FDECL(kickdmg, (struct monst *, BOOLEAN_P));
-STATIC_DCL void FDECL(kick_monster, (XCHAR_P, XCHAR_P));
-STATIC_DCL int FDECL(kick_object, (XCHAR_P, XCHAR_P));
+STATIC_DCL boolean FDECL(maybe_kick_monster, (struct monst *,XCHAR_P,XCHAR_P));
+STATIC_DCL void FDECL(kick_monster, (struct monst *,XCHAR_P,XCHAR_P));
+STATIC_DCL int FDECL(kick_object, (XCHAR_P,XCHAR_P));
 STATIC_DCL int FDECL(really_kick_object, (XCHAR_P,XCHAR_P));
 STATIC_DCL char *FDECL(kickstr, (char *));
 STATIC_DCL void FDECL(otransit_msg, (struct obj *, BOOLEAN_P, long));
@@ -114,20 +115,36 @@ register boolean clumsy;
 	    use_skill(kick_skill, 1);
 }
 
-STATIC_OVL void
-kick_monster(x, y)
-register xchar x, y;
+STATIC_OVL boolean
+maybe_kick_monster(mon, x, y)
+struct monst *mon;
+xchar x, y;
 {
-	register boolean clumsy = FALSE;
-	register struct monst *mon = m_at(x, y);
-	register int i, j;
+    if (mon) {
+	boolean save_forcefight = context.forcefight;
 
 	bhitpos.x = x;
 	bhitpos.y = y;
-	if (attack_checks(mon, (struct obj *)0)) return;
-	/* burn extra nutrition, same as direct combat;
-	   maybe pass out before making target angry */
-	if (overexertion()) return;
+	if (!mon->mpeaceful || !canspotmon(mon))
+	    context.forcefight = TRUE;	/* attack even if invisible */
+	/* kicking might be halted by discovery of hidden monster,
+	   by player declining to attack peaceful monster,
+	   or by passing out due to encumbrance */
+	if (attack_checks(mon, (struct obj *)0) || overexertion())
+	    mon = 0;	/* don't kick after all */
+	context.forcefight = save_forcefight;
+    }
+    return (boolean)(mon != 0);
+}
+
+STATIC_OVL void
+kick_monster(mon, x, y)
+struct monst *mon;
+xchar x, y;
+{
+	boolean clumsy = FALSE;
+	int i, j;
+
 	/* anger target even if wild miss will occur */
 	setmangry(mon);
 
@@ -788,6 +805,14 @@ dokick()
 		}
 	}
 
+	mtmp = isok(x, y) ? m_at(x, y) : 0;
+	/* might not kick monster if it is hidden and becomes revealed,
+           if it is peaceful and player declines to attack, or if the
+	   hero passes out due to enbumbrance with low hp; context.move
+	   will be 1 unless player declines to kick peaceful monster */
+	if (mtmp && !maybe_kick_monster(mtmp, x, y))
+	    return context.move;
+
 	wake_nearby();
 	u_wipe_engr(2);
 
@@ -808,22 +833,13 @@ dokick()
 	 * ceiling shouldn't be kickable (unless hero is flying?);
 	 * kicking toward them should just target whatever is on
 	 * the floor at that spot.]
-	 * [FIXME too:  kick_monster() calls attack_checks() which gives
-	 * the player a chance to decline to attack a peaceful monster,
-	 * and also calls overexertion() so hero might pass out before
-	 * performing the kick.  We shouldn't call wake_nearby() (and
-	 * u_wipe_engr(), both already done above) in such cases.]
 	 */
 
-	if(MON_AT(x, y)) {
-		struct permonst *mdat;
+	if (mtmp) {
+		/* save mtmp->data (for recoil) in case mtmp gets killed */
+		struct permonst *mdat = mtmp->data;
 
-		mtmp = m_at(x, y);
-		mdat = mtmp->data;
-		if (!mtmp->mpeaceful || !canspotmon(mtmp))
-		    context.forcefight = TRUE; /* attack even if invisible */
-		kick_monster(x, y);
-		context.forcefight = FALSE;
+		kick_monster(mtmp, x, y);
 		/* see comment in attack_checks() */
 		if (!DEADMONSTER(mtmp) &&
 		    !canspotmon(mtmp) &&
