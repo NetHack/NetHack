@@ -33,7 +33,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.120 $ $Date: 2011/12/05 09:38:58 $
+% $Revision: 1.121 $ $Date: 2012/04/09 02:56:37 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -2547,10 +2547,10 @@ Allows you to change the way recalled messages are displayed.
 
 %.sd
 %.si
-{\tt s} --- single message (default; only choice prior to 3.4.0)\\
-{\tt c} --- combination, two messages as {\it single\/}, then as {\it full\/}\\
-{\tt f} --- full window, oldest message first\\
-{\tt r} --- full window reversed, newest message first
+{\tt s} --- single message (default; only choice prior to 3.4.0);\\
+{\tt c} --- combination, two messages as {\it single\/}, then as {\it full\/};\\
+{\tt f} --- full window, oldest message first;\\
+{\tt r} --- full window reversed, newest message first.
 %.ei
 %.ed
 
@@ -3157,15 +3157,15 @@ Each SOUND entry is broken down into the following parts:
 
 %.sd
 %.si
-{\tt MESG      } --- message window mapping (the only one supported in 3.5).\\
-{\tt pattern   } --- the pattern to match.\\
-{\tt sound file} --- the sound file to play.\\
+{\tt MESG      } --- message window mapping (the only one supported in 3.5);\\
+{\tt pattern   } --- the pattern to match;\\
+{\tt sound file} --- the sound file to play;\\
 {\tt volume    } --- the volume to be set while playing the sound file.
 %.ei
 %.ed
 \elist
 
-%.pg
+%.lp ""
 The exact format for the pattern depends on whether the platform is
 built to use {\it regular expressions \/} or NetHack's own internal pattern 
 matching facility. The {\it regular expressions \/} matching can be much more 
@@ -3175,23 +3175,27 @@ available elsewhere for explaining {\it regular expressions \/}. You can verify
 which pattern matching is used by your port with the 
 \#version command.  
 
-%.pg
+%.lp ""
 NetHack's internal pattern matching routine uses the following
 special characters in its pattern matching:
 
-\begin{verbatim}
-    *--- matches 0 or more characters.
-    ?--- matches any single character.
-\end{verbatim}
+%.sd
+%.si
+{\tt *} --- matches 0 or more characters;
+{\tt ?} --- matches any single character.
+%.ei
+%.ed
 
-%.pg
+%.lp ""
 Here's an example of a sound mapping using NetHack's internal
 pattern matching facility:
-\begin{verbatim}
-    SOUND=MESG "*chime of a cash register*" "gong.wav" 50
-\end{verbatim}
-specifies that any message with "chime of a cash register" contained
-in it will trigger the playing of "gong.wav".  You can have multiple
+
+%.sd.si
+{\tt SOUND=MESG "*chime of a cash register*" "gong.wav" 50}
+%.ei.ed
+
+specifies that any message with ``chime of a cash register'' contained
+in it will trigger the playing of file {\tt gong.wav}.  You can have multiple
 SOUND entries in your config file.
 
 %.lp

@@ -2120,10 +2120,10 @@ Allows you to change the way recalled messages are displayed.
 The possible values are:
 .sd
 .si
-\fBs\fP - single message (default; only choice prior to 3.4.0)
-\fBc\fP - combination, two messages as `single', then as `full'
-\fBf\fP - full window, oldest message first
-\fBr\fP - full window reversed, newest message first
+.CC s "single message (default; only choice prior to 3.4.0);"
+.CC c "combination, two messages as `single', then as `full';"
+.CC f "full window, oldest message first;"
+.CC r "full window reversed, newest message first."
 .ei
 .ed
 For backward compatibility, no value needs to be specified (which
@@ -2286,14 +2286,16 @@ Controls the amount of screen updating for the map window when engaged
 in multi-turn movement (running via shift+direction or control+direction
 and so forth, or via the travel command or mouse click).
 The possible values are:
-.sd
-.si
-teleport - update the map after movement has finished;
-run - update the map after every seven or so steps;
-walk - update the map after each step;
-crawl - like walk, but pause briefly after each step.
-.ei
-.ed
+.PS teleport
+.PL teleport
+update the map after movement has finished;
+.PL run
+update the map after every seven or so steps;
+.PL walk
+update the map after each step;
+.PL crawl
+like walk, but pause briefly after each step.
+.PE
 This option only affects the game's screen display, not the actual
 results of moving.  The default is `run'; versions prior to 3.4.1 
 used `teleport' only.  Whether or not the effect is noticeable will
@@ -2563,16 +2565,16 @@ object at your location.
 You may use the following special characters in a pattern:
 .sd
 .si
-\fB*\fP - matches zero or more characters;
-\fB?\fP - matches any single character.
+.CC * "matches zero or more characters;"
+.CC ? "matches any single character."
 .ei
 .ed
 In addition, some characters are treated specially if they occur as the first 
 character in the pattern, specifically:
 .sd
 .si
-\fB<\fP - always pickup an object that matches rest of pattern;
-\fB>\fP - never pickup an object that matches rest of pattern.
+.CC < "always pickup an object that matches rest of pattern;"
+.CC > "never pickup an object that matches rest of pattern."
 .ei
 .ed
 A `never pickup' rule takes precedence over an `always pickup' rule if
@@ -2611,15 +2613,17 @@ The directory that houses the sound files to be played.
 .lp SOUND
 An entry that maps a sound file to a user-specified message pattern.
 Each SOUND entry is broken down into the following parts:
-.sd
-.si
-MESG       - message window mapping (the only one supported in 3.5).
-pattern    - the pattern to match.
-sound file - the sound file to play.
-volume     - the volume to be set while playing the sound file.
-.ei
-.ed
-.pg
+.PS "sound file"
+.PL MESG
+message window mapping (the only one supported in 3.5);
+.PL pattern
+the pattern to match;
+.PL "sound file"
+the sound file to play;
+.PL volume
+the volume to be set while playing the sound file.
+.PE
+.lp ""
 The exact format for the pattern depends on whether the platform is
 built to use ``regular expressions'' or NetHack's own internal pattern 
 matching facility. The ``regular expressions'' matching can be much more 
@@ -2627,23 +2631,25 @@ sophisticated than the internal NetHack pattern matching, but requires
 3rd party libraries on some platforms.  There are plenty of references 
 available elsewhere for explaining ``regular expressions''. You can verify 
 which pattern matching is used by your port with the #version command.  
-.pg
+.lp ""
 NetHack's internal pattern matching routine uses the following
 special characters in its pattern matching:
 .sd
 .si
-  *--- matches 0 or more characters.
-  ?--- matches any single character.
+.CC * "matches 0 or more characters;"
+.CC ? "matches any single character."
 .ei
 .ed
-.pg
+.lp ""
 Here's an example of a sound mapping using NetHack's internal
 pattern matching facility:
 .sd
-    SOUND=MESG "*chime of a cash register*" "gong.wav" 50
+.si
+SOUND=MESG "*chime of a cash register*" "gong.wav" 50
+.ei
 .ed
 specifies that any message with "chime of a cash register" contained
-in it will trigger the playing of "gong.wav".  You can have multiple
+in it will trigger the playing of file \fBgong.wav\fP.  You can have multiple
 SOUND entries in your config file.
 .pg
 .hn 2
