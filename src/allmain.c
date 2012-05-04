@@ -175,13 +175,14 @@ boolean resuming;
 		    if (u.uinvulnerable) {
 			/* for the moment at least, you're in tiptop shape */
 			wtcap = UNENCUMBERED;
-		    } else if (Upolyd && youmonst.data->mlet == S_EEL && !is_pool(u.ux,u.uy) && !Is_waterlevel(&u.uz)) {
-			if (u.mh > 1) {
-			    if (!Half_physical_damage ||
-				(Half_physical_damage && !(moves % 2))) {
-				u.mh--;
-				context.botl = 1;
-			    }
+		    } else if (Upolyd && youmonst.data->mlet == S_EEL &&
+			       !is_pool(u.ux, u.uy) && !Is_waterlevel(&u.uz)) {
+			/* eel out of water loses hp, same as for monsters;
+			   as hp gets lower, rate of further loss slows down */
+			if (u.mh > 1 && rn2(u.mh) > rn2(8) &&
+				(!Half_physical_damage || !(moves % 2L))) {
+			    u.mh--;
+			    context.botl = 1;
 			} else if (u.mh < 1)
 			    rehumanize();
 		    } else if (Upolyd && u.mh < u.mhmax) {
