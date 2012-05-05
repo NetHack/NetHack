@@ -349,6 +349,7 @@ E void FDECL(doaltarobj, (struct obj *));
 E boolean FDECL(canletgo, (struct obj *,const char *));
 E void FDECL(dropx, (struct obj *));
 E void FDECL(dropy, (struct obj *));
+E void FDECL(dropz, (struct obj *,BOOLEAN_P));
 E void FDECL(obj_no_longer_held, (struct obj *));
 E int NDECL(doddrop);
 E int NDECL(dodown);
@@ -486,7 +487,7 @@ E void FDECL(finish_meating,(struct monst *));
 /* ### dokick.c ### */
 
 E boolean FDECL(ghitm, (struct monst *,struct obj *));
-E void FDECL(container_impact_dmg, (struct obj *));
+E void FDECL(container_impact_dmg, (struct obj *,XCHAR_P,XCHAR_P));
 E int NDECL(dokick);
 E boolean FDECL(ship_object, (struct obj *,XCHAR_P,XCHAR_P,BOOLEAN_P));
 E void FDECL(obj_delivery, (BOOLEAN_P));

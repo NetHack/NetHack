@@ -373,22 +373,24 @@ register struct obj *gold;
 /* container is kicked, dropped, thrown or otherwise impacted by player.
  * Assumes container is on floor.  Checks contents for possible damage. */
 void
-container_impact_dmg(obj)
+container_impact_dmg(obj, x, y)
 struct obj *obj;
+xchar x, y;	/* coordinates where object was before the impact, not after */
 {
 	struct monst *shkp;
 	struct obj *otmp, *otmp2;
 	long loss = 0L;
-	boolean costly, insider;
-	xchar x = obj->ox, y = obj->oy;
+	boolean costly, insider, frominv;
 
 	/* only consider normal containers */
-	if (!Is_container(obj) || Is_mbag(obj)) return;
+	if (!Is_container(obj) || !Has_contents(obj) || Is_mbag(obj)) return;
 
 	costly = ((shkp = shop_keeper(*in_rooms(x, y, SHOPBASE))) &&
 		  costly_spot(x, y));
 	insider = (*u.ushops && inside_shop(u.ux, u.uy) &&
 		   *in_rooms(x, y, SHOPBASE) == *u.ushops);
+	/* if dropped or thrown, shop ownership flags are set on this obj */
+	frominv = (obj != kickedobj);
 
 	for (otmp = obj->cobj; otmp; otmp = otmp2) {
 	    const char *result = (char *)0;
@@ -408,15 +410,19 @@ struct obj *obj;
 		if (otmp->otyp == EGG && otmp->spe && otmp->corpsenm >= LOW_PM)
 		    change_luck(-1);
 		You_hear("a muffled %s.", result);
-		if (costly)
+		if (costly) {
+		    if (frominv && !otmp->unpaid) otmp->no_charge = 1;
 		    loss += stolen_value(otmp, x, y,
 					 (boolean)shkp->mpeaceful, TRUE);
-		if (otmp->quan > 1L)
+		}
+		if (otmp->quan > 1L) {
 		    useup(otmp);
-		else {
+		} else {
 		    obj_extract_self(otmp);
 		    obfree(otmp, (struct obj *) 0);
 		}
+		/* contents of this container are no longer known */
+		obj->cknown = 0;
 	    }
 	}
 	if (costly && loss) {
@@ -559,7 +565,7 @@ xchar x, y;
 		boolean otrp = kickedobj->otrapped;
 
 		if (range < 2) pline("THUD!");
-		container_impact_dmg(kickedobj);
+		container_impact_dmg(kickedobj, x, y);
 		if (kickedobj->olocked) {
 		    if (!rn2(5) || (martial() && !rn2(2))) {
 			You("break open the lock!");

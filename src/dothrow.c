@@ -423,8 +423,7 @@ register struct obj *obj;
 
 	if (hero_breaks(obj, u.ux, u.uy, TRUE)) return;
 	if (ship_object(obj, u.ux, u.uy, FALSE)) return;
-	dropy(obj);
-	if (!u.uswallow) container_impact_dmg(obj);
+	dropz(obj, TRUE);
 }
 
 /*
@@ -1194,6 +1193,14 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 		}
 		thrownobj = (struct obj*)0;
 		place_object(obj, bhitpos.x, bhitpos.y);
+		/* container contents might break;
+		   do so before turning ownership of thrownobj over to shk
+		   (container_impact_dmg handles item already owned by shop) */
+		if (!IS_SOFT(levl[bhitpos.x][bhitpos.y].typ))
+		    /* <x,y> is spot where you initiated throw, not bhitpos */
+		    container_impact_dmg(obj, u.ux, u.uy);
+		/* charge for items thrown out of shop;
+		   shk takes possession for items thrown into one */
 		if ((*u.ushops || obj->unpaid) && obj != uball)
 		    check_shop_obj(obj, bhitpos.x, bhitpos.y, FALSE);
 
@@ -1204,8 +1211,6 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 		    newsym(bhitpos.x,bhitpos.y);
 		if (obj_sheds_light(obj))
 		    vision_full_recalc = 1;
-		if (!IS_SOFT(levl[bhitpos.x][bhitpos.y].typ))
-		    container_impact_dmg(obj);
 	}
 }
 

@@ -511,8 +511,9 @@ register struct obj *obj;
 	return(1);
 }
 
-/* Called in several places - may produce output */
-/* eg ship_object() and dropy() -> sellobj() both produce output */
+/* dropx - take dropped item out of inventory;
+   called in several places - may produce output
+   (eg ship_object() and dropy() -> sellobj() both produce output) */
 void
 dropx(obj)
 register struct obj *obj;
@@ -532,9 +533,19 @@ register struct obj *obj;
 	dropy(obj);
 }
 
+/* dropy - put dropped object at its destination; called from lots of places */
 void
 dropy(obj)
-register struct obj *obj;
+struct obj *obj;
+{
+	dropz(obj, FALSE);
+}
+
+/* dropz - really put dropped object at its destination... */
+void
+dropz(obj, with_impact)
+struct obj *obj;
+boolean with_impact;
 {
 	if (obj == uwep) setuwep((struct obj *)0);
 	if (obj == uquiver) setuqwep((struct obj *)0);
@@ -580,6 +591,8 @@ register struct obj *obj;
 	    }
 	} else  {
 	    place_object(obj, u.ux, u.uy);
+	    if (with_impact)
+		container_impact_dmg(obj, u.ux, u.uy);
 	    if (obj == uball)
 		drop_ball(u.ux,u.uy);
 	    else if (level.flags.has_shop)
