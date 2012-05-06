@@ -160,10 +160,12 @@ xchar x, y;
 	   hidden doesn't affect chance to hit so neither does this reveal) */
 	if (mon->mundetected ||
 		(mon->m_ap_type && mon->m_ap_type != M_AP_MONSTER)) {
-	    /* [revealing the monster should probably give a message...] */
 	    if (mon->m_ap_type) seemimic(mon);
 	    mon->mundetected = 0;
 	    if (!canspotmon(mon)) map_invisible(x, y);
+	    else newsym(x, y);
+	    There("is %s here.",
+		  canspotmon(mon) ? a_monnam(mon) : "something hidden");
 	}
 
 	/* Kick attacks by kicking monsters are normal attacks, not special.
@@ -702,7 +704,7 @@ dokick()
 {
 	int x, y;
 	int avrg_attrib;
-	int dmg = 0;
+	int dmg = 0, glyph, oldglyph = -1;
 	register struct monst *mtmp;
 	boolean no_kick = FALSE;
 	char buf[BUFSZ];
@@ -816,8 +818,11 @@ dokick()
            if it is peaceful and player declines to attack, or if the
 	   hero passes out due to enbumbrance with low hp; context.move
 	   will be 1 unless player declines to kick peaceful monster */
-	if (mtmp && !maybe_kick_monster(mtmp, x, y))
-	    return context.move;
+	if (mtmp) {
+	    oldglyph = glyph_at(x, y);
+	    if (!maybe_kick_monster(mtmp, x, y))
+		return context.move;
+	}
 
 	wake_nearby();
 	u_wipe_engr(2);
@@ -846,21 +851,30 @@ dokick()
 		struct permonst *mdat = mtmp->data;
 
 		kick_monster(mtmp, x, y);
+		glyph = glyph_at(x, y);
 		/* see comment in attack_checks() */
-		if (!DEADMONSTER(mtmp) &&
-		    !canspotmon(mtmp) &&
-		    /* check x and y; a monster that evades your kick by
-		       jumping to an unseen square doesn't leave an I behind */
-		    mtmp->mx == x && mtmp->my == y &&
-		    !glyph_is_invisible(levl[x][y].glyph) &&
-		    !(u.uswallow && mtmp == u.ustuck))
-			map_invisible(x, y);
-		if((Is_airlevel(&u.uz) || Levitation) && context.move) {
+		if (mtmp->mhp <= 0) {	/* DEADMONSTER() */
+		    /* if we mapped an invisible monster and immediately
+		       killed it, we don't want to forget what we thought
+		       was there before the kick */
+		    if (glyph != oldglyph && glyph_is_invisible(glyph))
+			show_glyph(x, y, oldglyph);
+		} else if (!canspotmon(mtmp) &&
+			/* check <x,y>; monster that evades kick by jumping
+			   to an unseen square doesn't leave an I behind */
+			mtmp->mx == x && mtmp->my == y &&
+			!glyph_is_invisible(glyph) &&
+			!(u.uswallow && mtmp == u.ustuck)) {
+		    map_invisible(x, y);
+		}
+		/* recoil if floating */
+		if ((Is_airlevel(&u.uz) || Levitation) && context.move) {
 		    int range;
 
-		    range = ((int)youmonst.data->cwt + (weight_cap() + inv_weight()));
+		    range = ((int)youmonst.data->cwt
+			     + (weight_cap() + inv_weight()));
 		    if (range < 1) range = 1; /* divide by zero avoidance */
-		    range = (3*(int)mdat->cwt) / range;
+		    range = (3 * (int)mdat->cwt) / range;
 
 		    if(range < 1) range = 1;
 		    hurtle(-u.dx, -u.dy, range, TRUE);
