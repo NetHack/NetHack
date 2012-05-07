@@ -838,6 +838,7 @@ declining to attack a peaceful monster via movement used up nutrition even
 	though no action took place
 declining to attack a peaceful monster via kicking woke nearby monsters and
 	scuffed engraving at hero's location even though no action took place
+make hero be immune from stinking cloud damage during successful prayer
 
 
 Platform- and/or Interface-Specific Fixes
@@ -1043,6 +1044,8 @@ repeatedly setting the fruit option will check to see if fruits have been
     created, so the user can't easily overflow the maximum this way
 bones files now include extra data to identify dead hero and reason for death
 dipping multiple potions in another potion may only dip part of their stack
+make being inside a stinking cloud (when not immune or resistant) become a
+	major trouble which is fixable by prayer
 
 
 Platform- and/or Interface-Specific New Features

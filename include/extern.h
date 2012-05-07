@@ -1932,6 +1932,8 @@ E void FDECL(show_region, (NhRegion*, XCHAR_P, XCHAR_P));
 E void FDECL(save_regions, (int,int));
 E void FDECL(rest_regions, (int,BOOLEAN_P));
 E NhRegion* FDECL(create_gas_cloud, (XCHAR_P, XCHAR_P, int, int));
+E boolean NDECL(region_danger);
+E void NDECL(region_safety);
 
 /* ### restore.c ### */
 

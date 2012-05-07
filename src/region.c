@@ -918,7 +918,7 @@ genericptr_t p2;
     reg = (NhRegion *) p1;
     dam = reg->arg.a_int;
     if (p2 == (genericptr_t)0) {		/* This means *YOU* Bozo! */
-	if (nonliving(youmonst.data) || Breathless)
+	if (u.uinvulnerable || nonliving(youmonst.data) || Breathless)
 	    return FALSE;
 	if (!Blind) {
 	    Your("%s sting.", makeplural(body_part(EYE)));
@@ -998,6 +998,61 @@ int damage;
     cloud->glyph = cmap_to_glyph(S_cloud);
     add_region(cloud);
     return cloud;
+}
+
+/* for checking troubles during prayer; is hero at risk? */
+boolean
+region_danger()
+{
+    int i, f_indx, n = 0;
+
+    for (i = 0; i < n_regions; i++) {
+	/* only care about regions that hero is in */
+	if (!hero_inside(regions[i])) continue;
+	f_indx = regions[i]->inside_f;
+	/* the only type of region we understand is gas_cloud */
+	if (f_indx == INSIDE_GAS_CLOUD) {
+	    /* completely harmless if you don't need to breathe */
+	    if (nonliving(youmonst.data) || Breathless) continue;
+	    /* minor inconvenience if you're posion resistant;
+	       not harmful enough to be a prayer-level trouble */
+	    if (Poison_resistance) continue;
+	    ++n;
+	}
+    }
+    return n ? TRUE : FALSE;
+}
+
+/* for fixing trouble at end of prayer;
+   danger detected at start of prayer might have expired by now */
+void
+region_safety()
+{
+    NhRegion *r = 0;
+    int i, f_indx, n = 0;
+
+    for (i = 0; i < n_regions; i++) {
+	/* only care about regions that hero is in */
+	if (!hero_inside(regions[i])) continue;
+	f_indx = regions[i]->inside_f;
+	/* the only type of region we understand is gas_cloud */
+	if (f_indx == INSIDE_GAS_CLOUD) {
+	    if (!n++ && regions[i]->ttl >= 0) r = regions[i];
+	}
+    }
+
+    if (n > 1 || (n == 1 && !r)) {
+	/* multiple overlapping cloud regions or non-expiring one */
+	safe_teleds(FALSE);
+    } else if (r) {
+	remove_region(r);
+	pline_The("gas cloud enveloping you dissipates.");
+    } else {
+	/* cloud dissipated on its own, so nothing needs to be done */
+	pline_The("gas cloud has dissipated.");
+    }
+    /* maybe cure blindness too */
+    if ((Blinded && TIMEOUT) == 1L) make_blinded(0L, TRUE);
 }
 
 /*region.c*/

@@ -69,12 +69,13 @@ static int p_type; /* (-1)-3: (-1)=really naughty, 3=really good */
  * order to have the values be meaningful.
  */
 
-#define TROUBLE_STONED			13
-#define TROUBLE_SLIMED			12
-#define TROUBLE_STRANGLED		11
-#define TROUBLE_LAVA			10
-#define TROUBLE_SICK			 9
-#define TROUBLE_STARVING		 8
+#define TROUBLE_STONED			14
+#define TROUBLE_SLIMED			13
+#define TROUBLE_STRANGLED		12
+#define TROUBLE_LAVA			11
+#define TROUBLE_SICK			10
+#define TROUBLE_STARVING		 9
+#define TROUBLE_REGION			 8	/* stinking cloud */
 #define TROUBLE_HIT			 7
 #define TROUBLE_LYCANTHROPE		 6
 #define TROUBLE_COLLAPSING		 5
@@ -168,6 +169,7 @@ in_trouble()
 	if(u.utrap && u.utraptype == TT_LAVA) return(TROUBLE_LAVA);
 	if(Sick) return(TROUBLE_SICK);
 	if(u.uhs >= WEAK) return(TROUBLE_STARVING);
+	if (region_danger()) return TROUBLE_REGION;
 	if (critically_low_hp(FALSE)) return TROUBLE_HIT;
 	if(u.ulycn >= LOW_PM) return(TROUBLE_LYCANTHROPE);
 	if(near_capacity() >= EXT_ENCUMBER && AMAX(A_STR)-ABASE(A_STR) > 3)
@@ -200,7 +202,7 @@ in_trouble()
 	/*
 	 * minor troubles
 	 */
-	if(Punished || (u.utrap && u.utraptype == TT_BURIEDBALL))
+	if (Punished || (u.utrap && u.utraptype == TT_BURIEDBALL))
 		return(TROUBLE_PUNISHED);
 	if (Cursed_obj(uarmg, GAUNTLETS_OF_FUMBLING) ||
 		Cursed_obj(uarmf, FUMBLE_BOOTS))
@@ -335,6 +337,10 @@ register int trouble;
 	    case TROUBLE_SICK:
 		    You_feel("better.");
 		    make_sick(0L, (char *) 0, FALSE, SICK_ALL);
+		    break;
+	    case TROUBLE_REGION:
+		    /* stinking cloud, with hero vulnerable to HP loss */
+		    region_safety();
 		    break;
 	    case TROUBLE_HIT:
 		    /* "fix all troubles" will keep trying if hero has
