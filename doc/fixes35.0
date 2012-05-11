@@ -361,6 +361,7 @@ properly handle destruction of equipment carried by monsters hit by
 	disintegration breath; life-saving retained conferred properties of
 	formerly worn items (loss of steed's saddle caused much confusion)
 don't exercize or abuse wisdom when rumors get used for random graffiti
+don't exercize wisdom twice for each minor oracle consultation
 don't welcome the hero to Delphi if the Oracle was angered before first entry
 create_object() created lizard corpses without timers and troll corpses with
 	their revive timers, then changed the corpsenm field
