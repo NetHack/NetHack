@@ -97,7 +97,7 @@ boolean resuming;
 		context.mon_moving = TRUE;
 		do {
 		    monscanmove = movemon();
-		    if (youmonst.movement > NORMAL_SPEED)
+		    if (youmonst.movement >= NORMAL_SPEED)
 			break;	/* it's now your turn */
 		} while (monscanmove);
 		context.mon_moving = FALSE;

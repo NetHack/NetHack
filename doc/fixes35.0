@@ -840,6 +840,8 @@ declining to attack a peaceful monster via movement used up nutrition even
 declining to attack a peaceful monster via kicking woke nearby monsters and
 	scuffed engraving at hero's location even though no action took place
 make hero be immune from stinking cloud damage during successful prayer
+very fast hero would sometimes take two consecutive moves with very fast
+	monsters then getting two moves, instead of interleaving the activity
 
 
 Platform- and/or Interface-Specific Fixes
