@@ -454,8 +454,16 @@ struct monst *mon;
 	    /* average movement is 1.50 times normal */
 	    mmove = ((rn2(2) ? 4 : 5) * mmove) / 3;
 	}
-    }
+    } else
 #endif
+    if (mmove) {
+	/* vary movement points allocated to slightly reduce predictability;
+	   random increment (avg +2) exceeds random decrement (avg +1) by
+	   a small amount; normal speed monsters will occasionally get an
+	   extra move and slow ones won't be quite as slow */
+	mmove += rn2(5) - rn2(3);	/* + 0..4 - 0..2, average net +1 */
+	if (mmove < 1) mmove = 1;
+    }
 
     return mmove;
 }

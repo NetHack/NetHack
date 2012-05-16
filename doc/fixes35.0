@@ -1049,6 +1049,7 @@ bones files now include extra data to identify dead hero and reason for death
 dipping multiple potions in another potion may only dip part of their stack
 make being inside a stinking cloud (when not immune or resistant) become a
 	major trouble which is fixable by prayer
+introduce some variation in monster movement rates
 
 
 Platform- and/or Interface-Specific New Features
