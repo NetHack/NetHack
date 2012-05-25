@@ -227,6 +227,11 @@ struct obj *otmp;
 		       it guard against involuntary polymorph attacks too... */
 		    shieldeff(mtmp->mx, mtmp->my);
 		} else if (!resist(mtmp, otmp->oclass, 0, NOTELL)) {
+		    /* dropped inventory (due to death by system shock,
+		       or loss of wielded weapon and/or worn armor due to
+		       limitations of new shape) won't be hit by this zap */
+		    for (obj = mtmp->minvent; obj; obj = obj->nobj)
+			bypass_obj(obj);
 		    /* natural shapechangers aren't affected by system shock
 		       (unless protection from shapechangers is interfering
 		       with their metabolism...) */
@@ -235,9 +240,6 @@ struct obj *otmp;
 			    pline("%s shudders!", Monnam(mtmp));
 			    learn_it = TRUE;
 			}
-			/* dropped inventory shouldn't be hit by this zap */
-			for (obj = mtmp->minvent; obj; obj = obj->nobj)
-			    bypass_obj(obj);
 			/* context.bypasses = TRUE; ## for make_corpse() */
 			/* no corpse after system shock */
 			xkilled(mtmp, 3);

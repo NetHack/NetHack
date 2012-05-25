@@ -842,6 +842,8 @@ declining to attack a peaceful monster via kicking woke nearby monsters and
 make hero be immune from stinking cloud damage during successful prayer
 very fast hero would sometimes take two consecutive moves with very fast
 	monsters then getting two moves, instead of interleaving the activity
+when a monster zapped by polymorph drops inventory because of its new form,
+	don't let that same zap hit the dropped item(s)
 
 
 Platform- and/or Interface-Specific Fixes
