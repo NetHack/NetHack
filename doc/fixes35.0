@@ -844,6 +844,7 @@ very fast hero would sometimes take two consecutive moves with very fast
 	monsters then getting two moves, instead of interleaving the activity
 when a monster zapped by polymorph drops inventory because of its new form,
 	don't let that same zap hit the dropped item(s)
+entering an untended shop while blind gave an inappropriate message
 
 
 Platform- and/or Interface-Specific Fixes

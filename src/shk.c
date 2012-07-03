@@ -69,6 +69,7 @@ STATIC_DCL void FDECL(add_to_billobjs, (struct obj *));
 STATIC_DCL void FDECL(bill_box_content, (struct obj *, BOOLEAN_P, BOOLEAN_P,
 				     struct monst *));
 STATIC_DCL boolean FDECL(rob_shop, (struct monst *));
+STATIC_DCL void FDECL(deserted_shop, (char *));
 STATIC_DCL boolean FDECL(special_stock, (struct obj *, struct monst *, BOOLEAN_P));
 STATIC_DCL const char *FDECL(cad, (BOOLEAN_P));
 
@@ -486,15 +487,44 @@ struct monst *shkp;
 	return TRUE;
 }
 
+/* give a message when entering an untended shop (caller has verified that) */
+STATIC_OVL void
+deserted_shop(enterstring)
+/*const*/ char *enterstring;
+{
+    struct monst *mtmp;
+    struct mkroom *r = &rooms[(int) *enterstring - ROOMOFFSET];
+    int x, y, m = 0, n = 0;
+
+    for (x = r->lx; x <= r->hx; ++x)
+	for (y = r->ly; y <= r->hy; ++y) {
+	    if (x == u.ux && y == u.uy) continue;
+	    if ((mtmp = m_at(x, y)) != 0) {
+		++n;
+		if (sensemon(mtmp) ||
+		    ((mtmp->m_ap_type == M_AP_NOTHING ||
+		      mtmp->m_ap_type == M_AP_MONSTER) &&
+		     canseemon(mtmp)))
+		    ++m;
+	    }
+	}
+
+    if (Blind && !(Blind_telepat || Detect_monsters))
+	++n;	/* force feedback to be less specific */
+
+    pline("This shop %s %s.",
+	  (m < n) ? "seems to be" : "is",
+	  !n ? "deserted" : "untended");
+}
+
 void
 u_entered_shop(enterstring)
-register char *enterstring;
+char *enterstring;
 {
 
 	register int rt;
 	register struct monst *shkp;
 	register struct eshk *eshkp;
-	static const char no_shk[] = "This shop appears to be deserted.";
 	static char empty_shops[5];
 
 	if(!*enterstring)
@@ -504,7 +534,7 @@ register char *enterstring;
 	    if (!index(empty_shops, *enterstring) &&
 		in_rooms(u.ux, u.uy, SHOPBASE) !=
 				  in_rooms(u.ux0, u.uy0, SHOPBASE))
-		pline(no_shk);
+		deserted_shop(enterstring);
 	    Strcpy(empty_shops, u.ushops);
 	    u.ushops[0] = '\0';
 	    return;
@@ -516,7 +546,7 @@ register char *enterstring;
 	    /* dump core when referenced */
 	    eshkp->bill_p = (struct bill_x *) -1000;
 	    if (!index(empty_shops, *enterstring))
-		pline(no_shk);
+		deserted_shop(enterstring);
 	    Strcpy(empty_shops, u.ushops);
 	    u.ushops[0] = '\0';
 	    return;
