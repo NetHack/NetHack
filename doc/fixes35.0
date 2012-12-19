@@ -845,6 +845,8 @@ very fast hero would sometimes take two consecutive moves with very fast
 when a monster zapped by polymorph drops inventory because of its new form,
 	don't let that same zap hit the dropped item(s)
 entering an untended shop while blind gave an inappropriate message
+engraving feedback about partial text when weapon became too dull to finish
+	was lacking sentence-ending period
 
 
 Platform- and/or Interface-Specific Fixes
