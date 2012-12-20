@@ -1115,7 +1115,7 @@ doengrave()
 	    if (!maxelen && *sp) {
 		*sp = (char)0;
 		if (multi) nomovemsg = "You cannot write any more.";
-		You("only are able to write \"%s\".", ebuf);
+		You("are only able to write \"%s\".", ebuf);
 	    }
 	}
 
