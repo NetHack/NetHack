@@ -302,17 +302,17 @@ raw_printf VA_DECL(const char *, line)
 /*VARARGS1*/
 void
 impossible VA_DECL(const char *, s)
+	char pbuf[2*BUFSZ];
 	VA_START(s);
 	VA_INIT(s, const char *);
 	if (program_state.in_impossible)
-		panic("impossible called impossible");
+	    panic("impossible called impossible");
+
 	program_state.in_impossible = 1;
-	{
-	    char pbuf[BUFSZ];
-	    Vsprintf(pbuf,s,VA_ARGS);
-	    paniclog("impossible", pbuf);
-	}
-	vpline(s,VA_ARGS);
+	Vsprintf(pbuf, s, VA_ARGS);
+	pbuf[BUFSZ-1] = '\0';		/* sanity */
+	paniclog("impossible", pbuf);
+	pline("%s", pbuf);
 	pline("Program in disorder - perhaps you'd better #quit.");
 	program_state.in_impossible = 0;
 	VA_END();

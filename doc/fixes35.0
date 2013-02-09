@@ -847,6 +847,7 @@ when a monster zapped by polymorph drops inventory because of its new form,
 entering an untended shop while blind gave an inappropriate message
 engraving feedback about partial text when weapon became too dull to finish
 	was lacking sentence-ending period
+impossible() might display inaccurate feedback after updating paniclog
 
 
 Platform- and/or Interface-Specific Fixes
