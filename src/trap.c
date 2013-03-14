@@ -714,7 +714,7 @@ unsigned trflags;
 		  defsyms[trap_to_defsym(ttype)].explanation);
 	    /* then proceed to normal trap effect */
 	} else if (already_seen && !forcetrap) {
-	    if ((Levitation || Flying) &&
+	    if ((Levitation || (Flying && !plunged)) &&
 		    (ttype == PIT || ttype == SPIKED_PIT || ttype == HOLE ||
 		    ttype == BEAR_TRAP)) {
 		You("%s over %s %s.",
@@ -991,9 +991,9 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 	    case PIT:
 	    case SPIKED_PIT:
 		/* KMH -- You can't escape the Sokoban level traps */
-		if (!Sokoban && (Levitation || Flying)) break;
+		if (!Sokoban && (Levitation || (Flying && !plunged))) break;
 		feeltrap(trap);
-		if (!Sokoban && is_clinger(youmonst.data)) {
+		if (!Sokoban && is_clinger(youmonst.data) && !plunged) {
 		    if(trap->tseen) {
 			You_see("%s %spit below you.", a_your[trap->madeby_u],
 			    ttype == SPIKED_PIT ? "spiked " : "");
@@ -1022,7 +1022,8 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 		    if (adj_pit) {
 		    	You("move into an adjacent pit.");
 		    } else {
-			Strcpy(verbbuf, plunged ? "plunge" : "fall");
+			Strcpy(verbbuf, !plunged ? "fall" :
+						(Flying ? "dive" : "plunge"));
 			You("%s into %s pit!", verbbuf, a_your[trap->madeby_u]);
 		    }
 		}
@@ -1067,7 +1068,9 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 				    poison is limited to attrib loss */
 				 (u.umortality > oldumort) ? 0 : 8, FALSE);
 		} else {
-		    if (!adj_pit)
+		    /* plunging flyers take spike damage but not pit damage */
+		    if (!adj_pit &&
+			  !(plunged && (Flying || is_clinger(youmonst.data))))
 			losehp(Maybe_Half_Phys(rnd(6)),
 				plunged ? "deliberately plunged into a pit" :
 				  	  "fell into a pit",
@@ -2818,9 +2821,10 @@ climb_pit()
 	    display_nhwindow(WIN_MESSAGE, FALSE);
 	    clear_nhwindow(WIN_MESSAGE);
 	    You("free your %s.", body_part(LEG));
-	} else if (Flying && !Sokoban) {
-	    /* eg fell in pit, poly'd to a flying monster */
-	    You("fly from the pit.");
+	} else if ((Flying || is_clinger(youmonst.data)) && !Sokoban) {
+	    /* eg fell in pit, then poly'd to a flying monster;
+	       or used '>' to deliberately enter it */
+	    You("%s from the pit.", Flying ? "fly" : "climb");
 	    u.utrap = 0;
 	    fill_pit(u.ux, u.uy);
 	    vision_full_recalc = 1;	/* vision limits change */
@@ -2834,16 +2838,16 @@ climb_pit()
 		"crawl");
 	    fill_pit(u.ux, u.uy);
 	    vision_full_recalc = 1;	/* vision limits change */
-	} else if (flags.verbose) {
+	} else if (u.dz || flags.verbose) {
 #ifdef STEED
 	    if (u.usteed)
 		Norep("%s is still in a pit.",
 		      upstart(y_monnam(u.usteed)));
 	    else
 #endif
-		Norep( (Hallucination && !rn2(5)) ?
-		       "You've fallen, and you can't get up." :
-		       "You are still in a pit." );
+		Norep((Hallucination && !rn2(5)) ?
+			"You've fallen, and you can't get up." :
+			"You are still in a pit.");
 	}
 }
 

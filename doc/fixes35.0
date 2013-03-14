@@ -344,7 +344,6 @@ better handling for Fort Ludios and endgame in wizard mode's `^V ?' menu
 no free lunch for gelatinous cubes eating scrolls of mail
 eating gold in front of the vault guard will make the guard angry
 calculate engulf time differently for non-digestion attacks than for digestion
-shattering a monster's weapon didn't work as intended for stack of N>1
 preform autopickup and/or report on objects at the spot when a failed #untrap
 	attempt causes the hero to move onto a trap's location
 shattering a monster's weapon didn't work as intended for stack of N>1
@@ -921,6 +920,7 @@ build-from-source: dlb utility can handle arbitrary number of files
 General New Features
 --------------------
 when you're teetering on the edge of a pit you can use '>' to enter the pit
+when you're flying over a pit you can use '>' to enter the pit
 when asked for a direction, a response of '?' yields help and then asks again
 when adding an item to inventory, try to stack it with the quiver slot
 	before trying against other carried objects

@@ -1324,7 +1324,11 @@ dohide()
 {
 	boolean ismimic = youmonst.data->mlet == S_MIMIC;
 
-	if ((u.utrap && u.utraptype != TT_PIT) || u.ustuck) {
+	if (u.ustuck ||
+		(u.utrap &&
+		    /* floor hiders (trapper) can hide while stuck in pits,
+		       ceiling hiders can't (after using '>' to get there) */
+		    (u.utraptype != TT_PIT || is_clinger(youmonst.data)))) {
 		You_cant("hide while you're %s.",
 			 !u.ustuck ? "trapped" :
 			   !sticks(youmonst.data) ? "being held" :
