@@ -1322,38 +1322,69 @@ dogaze()
 int
 dohide()
 {
-	boolean ismimic = youmonst.data->mlet == S_MIMIC;
+	boolean ismimic = youmonst.data->mlet == S_MIMIC,
+		on_ceiling = is_clinger(youmonst.data) || Flying;
 
-	if (u.ustuck ||
-		(u.utrap &&
-		    /* floor hiders (trapper) can hide while stuck in pits,
-		       ceiling hiders can't (after using '>' to get there) */
-		    (u.utraptype != TT_PIT || is_clinger(youmonst.data)))) {
-		You_cant("hide while you're %s.",
-			 !u.ustuck ? "trapped" :
-			   !sticks(youmonst.data) ? "being held" :
-			     humanoid(u.ustuck->data) ? "holding someone" :
-			       "holding that creature");
-		if (u.uundetected ||
-			    (ismimic && youmonst.m_ap_type != M_AP_NOTHING)) {
-			u.uundetected = 0;
-			youmonst.m_ap_type = M_AP_NOTHING;
-			newsym(u.ux, u.uy);
-		}
-		return 0;
+	/* can't hide while being held (or holding) or while trapped
+	   (except for floor hiders [trapper or mimic] in pits) */
+	if (u.ustuck ||	(u.utrap && (u.utraptype != TT_PIT || on_ceiling))) {
+	    You_cant("hide while you're %s.",
+		     !u.ustuck ? "trapped" :
+		       !sticks(youmonst.data) ? "being held" :
+			 humanoid(u.ustuck->data) ? "holding someone" :
+			   "holding that creature");
+	    if (u.uundetected ||
+		    (ismimic && youmonst.m_ap_type != M_AP_NOTHING)) {
+		u.uundetected = 0;
+		youmonst.m_ap_type = M_AP_NOTHING;
+		newsym(u.ux, u.uy);
+	    }
+	    return 0;
 	}
+	/* note: the eel and hides_under cases are hypothetical;
+	   such critters aren't offered the option of hiding via #monster */
+	if (youmonst.data->mlet == S_EEL && !is_pool(u.ux, u.uy)) {
+	    if (IS_FOUNTAIN(levl[u.ux][u.uy].typ))
+		The("fountain is not deep enough to hide in.");
+	    else
+		There("is no water to hide in here.");
+	    u.uundetected = 0;
+	    return 0;
+	}
+	if (hides_under(youmonst.data) && !level.objects[u.ux][u.uy]) {
+	    There("is nothing to hide under here.");
+	    u.uundetected = 0;
+	    return 0;
+	}
+	/* Planes of Air and Water */
+	if (on_ceiling && !has_ceiling(&u.uz)) {
+	    There("is nowhere to hide above you.");
+	    u.uundetected = 0;
+	    return 0;
+	}
+	if ((is_hider(youmonst.data) && !Flying) &&	/* floor hider */
+		(Is_airlevel(&u.uz) || Is_waterlevel(&u.uz))) {
+	    There("is nowhere to hide beneath you.");
+	    u.uundetected = 0;
+	    return 0;
+	}
+	/* TODO? inhibit floor hiding at furniture locations, or
+	   else make youhiding() give smarter messages at such spots */
+
 	if (u.uundetected || (ismimic && youmonst.m_ap_type != M_AP_NOTHING)) {
-		You("are already hiding.");
-		return(0);
+	    youhiding(FALSE, 1);	/* "you are already hiding" */
+	    return 0;
 	}
+
 	if (ismimic) {
-		/* should bring up a dialog "what would you like to imitate?" */
-		youmonst.m_ap_type = M_AP_OBJECT;
-		youmonst.mappearance = STRANGE_OBJECT;
+	    /* should bring up a dialog "what would you like to imitate?" */
+	    youmonst.m_ap_type = M_AP_OBJECT;
+	    youmonst.mappearance = STRANGE_OBJECT;
 	} else
-		u.uundetected = 1;
-	newsym(u.ux,u.uy);
-	return(1);
+	    u.uundetected = 1;
+	newsym(u.ux, u.uy);
+	youhiding(FALSE, 0);		/* "you are now hiding" */
+	return 1;
 }
 
 int

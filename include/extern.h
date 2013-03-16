@@ -197,6 +197,7 @@ E int NDECL(doextlist);
 E int NDECL(extcmd_via_menu);
 E int NDECL(enter_explore_mode);
 E void FDECL(enlightenment, (int,int));
+E void FDECL(youhiding, (BOOLEAN_P,int));
 E void FDECL(show_conduct, (int));
 E int FDECL(xytod, (SCHAR_P,SCHAR_P));
 E void FDECL(dtoxy, (coord *,int));

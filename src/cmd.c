@@ -1582,6 +1582,9 @@ int final;
 		    surface(u.ux, u.uy));	/* catchall; shouldn't happen */
 	    you_are(buf, from_what(WWALKING));
 	}
+	if (Upolyd && (u.uundetected || youmonst.m_ap_type != M_AP_NOTHING))
+	    youhiding(TRUE, final);
+
 	/* internal troubles, mostly in the order that prayer ranks them */
 	if (Stoned) you_are("turning to stone", "");
 	if (Slimed) you_are("turning into slime", "");
@@ -1609,6 +1612,7 @@ int final;
 	if (Hallucination) you_are("hallucinating", "");
 	if (Blind) you_are("blind", from_what(BLINDED));
 	if (Deaf) you_are("deaf", from_what(DEAF));
+
 	/* external troubles, more or less */
 	if (Punished) {
 	    if (uball) {
@@ -2220,6 +2224,65 @@ doattributes(VOID_ARGS)
 
 	enlightenment(mode, ENL_GAMEINPROGRESS);
 	return 0;
+}
+
+void
+youhiding(via_enlghtmt, msgflag)
+boolean via_enlghtmt;	/* englightment line vs topl message */
+int msgflag;		/* for variant message phrasing */
+{
+    char *bp, buf[BUFSZ];
+
+    Strcpy(buf, "hiding");
+    if (youmonst.m_ap_type != M_AP_NOTHING) {
+	/* mimic; hero is only able to mimic a strange object or gold
+	   or hallucinatory alternative to gold, so we skip the details
+	   for the hypothetical furniture and monster cases */
+	bp = eos(strcpy(buf, "mimicking"));
+	if (youmonst.m_ap_type == M_AP_OBJECT) {
+	    Sprintf(bp, " %s", an(simple_typename(youmonst.mappearance)));
+	} else if (youmonst.m_ap_type == M_AP_FURNITURE) {
+	    Strcpy(bp, " something");
+	} else if (youmonst.m_ap_type == M_AP_MONSTER) {
+	    Strcpy(bp, " someone");
+	} else {
+	    ;	/* something unexpected; leave 'buf' as-is */
+	}
+    } else if (u.uundetected) {
+	bp = eos(buf);	/* points past "hiding" */
+	if (youmonst.data->mlet == S_EEL) {
+	    if (is_pool(u.ux, u.uy))
+		Sprintf(bp, " in the %s", waterbody_name(u.ux, u.uy));
+	} else if (hides_under(youmonst.data)) {
+	    struct obj *o = level.objects[u.ux][u.uy];
+
+	    if (o)
+		Sprintf(bp, " underneath %s", ansimpleoname(o));
+	} else if (is_clinger(youmonst.data) || Flying) {
+	    /* Flying: 'lurker above' hides on ceiling but doesn't cling */
+	    Sprintf(bp, " on the %s", ceiling(u.ux, u.uy));
+	} else {
+	    /* on floor; is_hider() but otherwise not special: 'trapper' */
+	    if (u.utrap && u.utraptype == TT_PIT) {
+		struct trap *t = t_at(u.ux, u.uy);
+
+		Sprintf(bp, " in a %spit",
+			(t && t->ttyp == SPIKED_PIT) ? "spiked " : "");
+	    } else
+		Sprintf(bp, " on the %s", surface(u.ux, u.uy));
+	}
+    } else {
+	;   /* shouldn't happen; will result in generic "you are hiding" */
+    }
+
+    if (via_enlghtmt) {
+	int final = msgflag;	/* 'final' is used by you_are() macro */
+
+	you_are(buf, "");
+    } else {
+	/* for dohide(), when player uses '#monster' command */
+	You("are %s %s.", msgflag ? "already" : "now", buf);
+    }
 }
 
 /* KMH, #conduct
