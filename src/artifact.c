@@ -888,11 +888,10 @@ boolean vis;			/* whether the action can be seen */
 char *hittee;			/* target's name: "you" or mon_nam(mdef) */
 {
     struct permonst *old_uasmon;
-    const char *verb;
+    const char *verb, *fakename;
     boolean youattack = (magr == &youmonst),
 	    youdefend = (mdef == &youmonst),
 	    resisted = FALSE, do_stun, do_confuse, result;
-    boolean hitteename = (has_mname(mdef) && !strcmpi(hittee, MNAME(mdef)));
     int attack_indx, scare_dieroll = MB_MAX_DIEROLL / 2;
 
     result = FALSE;		/* no message given yet */
@@ -1028,10 +1027,13 @@ char *hittee;			/* target's name: "you" or mon_nam(mdef) */
 	    mdef->mconf = 1;
     }
 
+    /* now give message(s) describing side-effects;
+       don't let vtense() be fooled by assigned name ending in 's' */
+    fakename = youdefend ? "you" : "mon";
     if (youattack || youdefend || vis) {
 	(void) upstart(hittee);	/* capitalize */
 	if (resisted) {
-	    pline("%s %s!", hittee, vtense(hittee, "resist"));
+	    pline("%s %s!", hittee, vtense(fakename, "resist"));
 	    shieldeff(youdefend ? u.ux : mdef->mx,
 		      youdefend ? u.uy : mdef->my);
 	}
@@ -1042,8 +1044,7 @@ char *hittee;			/* target's name: "you" or mon_nam(mdef) */
 	    if (do_stun) Strcat(buf, "stunned");
 	    if (do_stun && do_confuse) Strcat(buf, " and ");
 	    if (do_confuse) Strcat(buf, "confused");
-	    pline("%s %s %s%c", hittee,
-		  hitteename ? "is" : vtense(hittee, "are"),
+	    pline("%s %s %s%c", hittee, vtense(fakename, "are"),
 		  buf, (do_stun && do_confuse) ? '!' : '.');
 	}
     }
