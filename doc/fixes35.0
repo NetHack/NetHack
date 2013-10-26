@@ -848,6 +848,8 @@ entering an untended shop while blind gave an inappropriate message
 engraving feedback about partial text when weapon became too dull to finish
 	was lacking sentence-ending period
 impossible() might display inaccurate feedback after updating paniclog
+fix crash which occurred if hero was teleported onto a sink while busy putting
+	on or taking off levitation boots
 
 
 Platform- and/or Interface-Specific Fixes
