@@ -1490,7 +1490,7 @@ register int allflag, mx;
 register const char *olets, *word;	/* olets is an Obj Class char array */
 register int FDECL((*fn),(OBJ_P)), FDECL((*ckfn),(OBJ_P));
 {
-	struct obj *otmp, *otmp2, *otmpo;
+	struct obj *otmp, *otmpo;
 	register char sym, ilet;
 	register int cnt = 0, dud = 0, tmp;
 	boolean takeoff, nodot, ident, take_out, put_in, first, ininv;
@@ -1512,9 +1512,21 @@ nextclass:
 	ilet = 'a'-1;
 	if (*objchn && (*objchn)->oclass == COIN_CLASS)
 		ilet--;		/* extra iteration */
-	for (otmp = *objchn; otmp; otmp = otmp2) {
-		if(ilet == 'z') ilet = 'A'; else ilet++;
-		otmp2 = otmp->nobj;
+	/*
+	 * Multiple Drop can change the invent chain while it operates
+	 * (dropping a burning potion of oil while levitating creates
+	 * an explosion which can destroy inventory items), so simple
+	 * list traversal
+	 *	for (otmp = *objchn; otmp; otmp = otmp2) {
+	 *	    otmp2 = otmp->nobj;
+	 *	    ...
+	 *	}
+	 * is inadeqate here.  Use each object's bypass bit to keep
+	 * track of which list elements have already been processed.
+	 */
+	bypass_objlist(*objchn, FALSE);	/* clear chain's bypass bits */
+	while ((otmp = nxt_unbypassed_obj(*objchn)) != 0) {
+		if (ilet == 'z') ilet = 'A'; else ilet++;
 		if (olets && *olets && otmp->oclass != *olets) continue;
 		if (takeoff && !is_worn(otmp)) continue;
 		if (ident && !not_fully_identified(otmp)) continue;
@@ -1589,6 +1601,7 @@ nextclass:
 	if(!takeoff && (dud || cnt)) pline("That was all.");
 	else if(!dud && !cnt) pline("No applicable objects.");
 ret:
+	bypass_objlist(*objchn, FALSE);
 	return(cnt);
 }
 

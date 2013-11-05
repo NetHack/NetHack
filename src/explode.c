@@ -642,4 +642,16 @@ splatter_burning_oil(x, y)
     explode(x, y, ZT_SPELL_O_FIRE, d(4,4), BURNING_OIL, EXPL_FIERY);
 }
 
+/* lit potion of oil is exploding; extinguish it as a light source before
+   possibly killing the hero and attempting to save bones */
+void
+explode_oil(obj, x, y)
+struct obj *obj;
+int x, y;
+{
+    if (!obj->lamplit) impossible("exploding unlit oil");
+    end_burn(obj, TRUE);
+    splatter_burning_oil(x, y);
+}
+
 /*explode.c*/

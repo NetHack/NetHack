@@ -850,6 +850,10 @@ engraving feedback about partial text when weapon became too dull to finish
 impossible() might display inaccurate feedback after updating paniclog
 fix crash which occurred if hero was teleported onto a sink while busy putting
 	on or taking off levitation boots
+fix "object lost" panic (or even crash) when dropping multiple items while
+	levitating and a lit potion of oil explodes and destroys some inventory
+fix "object_is_local" panic when saving bones after hero is killed by explosion
+	produced by dropped or thrown lit potion of oil
 
 
 Platform- and/or Interface-Specific Fixes

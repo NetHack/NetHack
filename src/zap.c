@@ -1710,6 +1710,9 @@ struct obj *obj, *otmp;
 		 *	       meat; prevent those contents from being hit.
 		 * retouch_equipment() - bypass flag is used to track which
 		 *	       items have been handled (bhito isn't involved).
+		 * menu_drop(), askchain() - inventory traversal where multiple
+		 *	       Drop can alter the invent chain while traversal
+		 *	       is in progress (bhito isn't involved).
 		 *
 		 * The bypass bit on all objects is reset each turn, whenever
 		 * context.bypasses is set.

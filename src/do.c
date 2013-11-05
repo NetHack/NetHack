@@ -705,18 +705,51 @@ int retry;
     }
 
     if (drop_everything) {
-	for(otmp = invent; otmp; otmp = otmp2) {
-	    otmp2 = otmp->nobj;
+	/*
+	 * Dropping a burning potion of oil while levitating can cause
+	 * an explosion which might destroy some of hero's inventory,
+	 * so the old code
+	 *	for (otmp = invent; otmp; otmp = otmp2) {
+	 *	    otmp2 = otmp->nobj;
+	 *	    n_dropped += drop(otmp);
+	 *	}
+	 * was unreliable and could lead to an "object lost" panic.
+	 *
+	 * Use the bypass bit to mark items already processed (hence
+	 * not droppable) and rescan inventory until no unbypassed
+	 * items remain.
+	 */
+	bypass_objlist(invent, FALSE);	/* clear bypass bit for invent */
+	while ((otmp = nxt_unbypassed_obj(invent)) != 0)
 	    n_dropped += drop(otmp);
-	}
+	/* we might not have dropped everything (worn armor, welded weapon,
+	   cursed loadstones), so reset any remaining inventory to normal */
+	bypass_objlist(invent, FALSE);
     } else {
 	/* should coordinate with perm invent, maybe not show worn items */
 	n = query_objlist("What would you like to drop?", invent,
 			USE_INVLET|INVORDER_SORT, &pick_list,
 			PICK_ANY, all_categories ? allow_all : allow_category);
 	if (n > 0) {
+	    /*
+	     * picklist[] contains a set of pointers into inventory, but
+	     * as soon as something gets dropped, they might become stale
+	     * (see the drop_everything code above for an explanation).
+	     * Just checking to see whether one is still in the invent
+	     * chain is not sufficient validation since destroyed items
+	     * will be freed and items we've split here might have already
+	     * reused that memory and put the same pointer value back into
+	     * invent.  Ditto for using invlet to validate.  So we start
+	     * by setting bypass on all of invent, then check each pointer
+	     * to verify that it is in invent and has that bit set.
+	     */
+	    bypass_objlist(invent, TRUE);
 	    for (i = 0; i < n; i++) {
 		otmp = pick_list[i].item.a_obj;
+		for (otmp2 = invent; otmp2; otmp2 = otmp2->nobj)
+		    if (otmp2 == otmp) break;
+		if (!otmp2 || !otmp2->bypass) continue;
+		/* found next selected invent item */
 		cnt = pick_list[i].count;
 		if (cnt < otmp->quan) {
 		    if (welded(otmp)) {
@@ -735,6 +768,7 @@ int retry;
 		}
 		n_dropped += drop(otmp);
 	    }
+	    bypass_objlist(invent, FALSE);	/* reset invent to normal */
 	    free((genericptr_t) pick_list);
 	}
     }

@@ -701,6 +701,7 @@ E long FDECL(rndexp, (BOOLEAN_P));
 E void FDECL(explode, (int,int,int,int,CHAR_P,int));
 E long FDECL(scatter, (int, int, int, unsigned int, struct obj *));
 E void FDECL(splatter_burning_oil, (int, int));
+E void FDECL(explode_oil, (struct obj *,int,int));
 
 /* ### extralev.c ### */
 
@@ -2685,6 +2686,8 @@ E struct obj *FDECL(which_armor, (struct monst *,long));
 E void FDECL(mon_break_armor, (struct monst *,BOOLEAN_P));
 E void FDECL(bypass_obj, (struct obj *));
 E void NDECL(clear_bypasses);
+E void FDECL(bypass_objlist, (struct obj *,BOOLEAN_P));
+E struct obj *FDECL(nxt_unbypassed_obj, (struct obj *));
 E int FDECL(racial_exception, (struct monst *, struct obj *));
 
 /* ### write.c ### */

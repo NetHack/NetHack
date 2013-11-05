@@ -673,6 +673,35 @@ struct obj *obj;
 	context.bypasses = TRUE;
 }
 
+/* set or clear the bypass bit in a list of objects */
+void
+bypass_objlist(objchain, on)
+struct obj *objchain;
+boolean on;	/* TRUE => set, FALSE => clear */
+{
+	if (on && objchain) context.bypasses = TRUE;
+	while (objchain) {
+	    objchain->bypass = on ? 1 : 0;
+	    objchain = objchain->nobj;
+	}
+}
+
+/* return the first object without its bypass bit set; set that bit
+   before returning so that successive calls will find further objects */
+struct obj *
+nxt_unbypassed_obj(objchain)
+struct obj *objchain;
+{
+	while (objchain) {
+	    if (!objchain->bypass) {
+		bypass_obj(objchain);
+		break;
+	    }
+	    objchain = objchain->nobj;
+	}
+	return objchain;
+}
+
 void
 mon_break_armor(mon, polyspot)
 struct monst *mon;

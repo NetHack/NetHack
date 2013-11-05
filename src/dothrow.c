@@ -1699,7 +1699,7 @@ boolean from_invent;
 		case POT_WATER:		/* really, all potions */
 			obj->in_use = 1;	/* in case it's fatal */
 			if (obj->otyp == POT_OIL && obj->lamplit) {
-			    splatter_burning_oil(x,y);
+			    explode_oil(obj, x, y);
 			} else if (distu(x,y) <= 2) {
 			    if (!breathless(youmonst.data) || haseyes(youmonst.data)) {
 				if (obj->otyp != POT_WATER) {
