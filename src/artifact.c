@@ -1809,9 +1809,6 @@ boolean drop_untouchable;
     boolean beingworn, carryeffect, invoked;
     long wearmask = ~(W_QUIVER | (u.twoweap ? 0L : W_SWAPWEP) | W_BALL);
 
-    if (obj->bypass) return FALSE;	/* already handled */
-    bypass_obj(obj);	/* mark it as handled now */
-
     beingworn = (obj->owornmask & wearmask) != 0L ||
 		/* some items in use don't have any wornmask setting */
 		(obj->oclass == TOOL_CLASS &&
@@ -1841,16 +1838,27 @@ boolean drop_untouchable;
     return FALSE;
 }
 
-/* check items currently in use (mostly worn) for touchability */
+/* check all items currently in use (mostly worn) for touchability */
 void
 retouch_equipment(dropflag)
 int dropflag;	/* 0==don't drop, 1==drop all, 2==drop weapon */
 {
     static int nesting = 0;	/* recursion control */
     struct obj *obj;
-    boolean scanagain, dropit, had_gloves = (uarmg != 0);
+    boolean dropit, had_gloves = (uarmg != 0);
     int had_rings = (!!uleft + !!uright);
 
+    /*
+     * We can potentially be called recursively if losing/unwearing
+     * an item causes worn helm of opposite alignment to come off or
+     * be destroyed.
+     *
+     * BUG: if the initial call was due to putting on a helm of
+     * opposite alignment and it does come off to trigger recursion,
+     * after the inner call executes, the outer call will finish
+     * using the non-helm alignment rather than the helm alignment
+     * which triggered this in the first place.
+     */
     if (!nesting++) clear_bypasses();	/* init upon initial entry */
 
     dropit = (dropflag > 0);	/* drop all or drop weapon */
@@ -1872,27 +1880,17 @@ int dropflag;	/* 0==don't drop, 1==drop all, 2==drop weapon */
      * TODO?  Force off gloves if either or both rings are going to
      * become unworn; force off cloak [suit] before suit [shirt].
      * The torso handling is hyphothetical; the case for gloves is
-     * not due the possibility of unwearing silver rings.
+     * not, due to the possibility of unwearing silver rings.
      */
 
     dropit = (dropflag == 1);	/* all untouchable items */
-    do {
-	scanagain = FALSE;  
-
-	for (obj = invent; obj; obj = obj->nobj) {
-	    if (obj->bypass) continue;
-
-	    if (untouchable(obj, dropit)) {	/* always sets obj->bypass */
-		/* can't directly continue inventory traversal;
-		   hero might have lost levitation, causing items to
-		   be dropped or destroyed (poly trap, water, lava);
-		   might even have lost helm of opposite alignment
-		   and caused us to be called recursively... */
-		scanagain = TRUE;
-		break;	/* use outer loop to restart inner one */
-	    }
-	}
-    } while (scanagain);
+    /* loss of levitation (silver ring, or Heart of Ahriman invocation)
+       might cause hero to lose inventory items (by dropping into lava,
+       for instance), so inventory traversal needs to rescan the whole
+       invent chain each time it moves on to another object; we use bypass
+       handling to keep track of which items have already been processed */
+    while ((obj = nxt_unbypassed_obj(invent)) != 0)
+	(void) untouchable(obj, dropit);
 
     if (had_rings != (!!uleft + !!uright) && uarmg && uarmg->cursed)
 	uncurse(uarmg); /* temporary? hack for ring removal plausibility */
