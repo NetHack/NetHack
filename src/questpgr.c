@@ -12,8 +12,6 @@
 
 #define QTEXT_FILE	"quest.dat"
 
-/* #define DEBUG */	/* uncomment for debugging */
-
 /* from sp_lev.c, for deliver_splev_message() */
 extern char *lev_message;
 
@@ -46,6 +44,8 @@ dump_qtlist()	/* dump the character msg list to check appearance */
 	struct	qtmsg	*msg;
 	long	size;
 
+	if (!showdebug()) return;
+
 	for (msg = qt_list.chrole; msg->msgnum > 0; msg++) {
 		pline("msgnum %d: delivery %c",
 			msg->msgnum, msg->delivery);
@@ -54,7 +54,10 @@ dump_qtlist()	/* dump the character msg list to check appearance */
 		deliver_by_window(msg, NHW_TEXT);
 	}
 }
-#endif /* DEBUG */
+#else
+static void
+dump_qtlist() { }
+#endif /* !DEBUG */
 
 static void
 Fread(ptr, size, nitems, stream)
@@ -133,9 +136,7 @@ load_qtlist()
 
 	if (!qt_list.common || !qt_list.chrole)
 	    impossible("load_qtlist: cannot load quest text.");
-#ifdef DEBUG
 	dump_qtlist();
-#endif
 	return;	/* no ***DON'T*** close the msg_file */
 }
 

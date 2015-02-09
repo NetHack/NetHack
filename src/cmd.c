@@ -5,7 +5,6 @@
 
 #include "hack.h"
 #include "func_tab.h"
-/* #define DEBUG */	/* uncomment for debugging */
 
 #ifdef ALTMETA
 STATIC_VAR boolean alt_esc = FALSE;
@@ -30,12 +29,8 @@ extern const char *enc_stat[];	/* encumbrance status from botl.c */
 #define CMD_CLICKLOOK	(char)0x8F
 
 #ifdef DEBUG
-/*
- * only one "wiz_debug_cmd" routine should be available (in whatever
- * module you are trying to debug) or things are going to get rather
- * hard to link :-)
- */
-extern int NDECL(wiz_debug_cmd);
+extern int NDECL(wiz_debug_cmd_bury);
+extern int NDECL(wiz_debug_cmd_traveldisplay);
 #endif
 
 #ifdef DUMB	/* stuff commented out in extern.h, but needed here */
@@ -389,11 +384,11 @@ extcmd_via_menu() /* here after # - now show pick-list of possible commands */
 		    Sprintf(fmtstr, "%%-%ds", biggest + 15);
 		}
 		if (++i > MAX_EXT_CMD) {
-# if defined(DEBUG) || defined(BETA)
+# if defined(BETA)
 		    impossible(
        "Exceeded %d extended commands in doextcmd() menu; 'extmenu' disabled.",
 			       MAX_EXT_CMD);
-# endif	/* DEBUG || BETA */
+# endif	/* BETA */
 		    iflags.extmenu = 0;
 		    return -1;
 		}
@@ -454,7 +449,7 @@ extcmd_via_menu() /* here after # - now show pick-list of possible commands */
 	if (n == 1) {
 	    if (matchlevel > (QBUFSZ - 2)) {
 		free((genericptr_t)pick_list);
-# if defined(DEBUG) || defined(BETA)
+# if defined(BETA)
 		impossible("Too many chars (%d) entered in extcmd_via_menu()",
 			   matchlevel);
 # endif
@@ -2507,7 +2502,8 @@ struct ext_func_tab extcmdlist[] = {
 	{(char *)0, (char *)0, donull, TRUE},	/* vision */
 	{(char *)0, (char *)0, donull, TRUE},	/* wizsmell */
 #ifdef DEBUG
-	{(char *)0, (char *)0, donull, TRUE},	/* wizdebug */
+	{(char *)0, (char *)0, donull, TRUE},	/* wizdebug_traveldisplay */
+	{(char *)0, (char *)0, donull, TRUE},	/* wizdebug_bury */
 #endif
 	{(char *)0, (char *)0, donull, TRUE},	/* wizrumorcheck */
 	{(char *)0, (char *)0, donull, TRUE},	/* wmode */
@@ -2534,7 +2530,8 @@ static const struct ext_func_tab debug_extcmdlist[] = {
 	{"vision", "show vision array", wiz_show_vision, TRUE},
 	{"wizsmell", "smell monster", wiz_smell, TRUE},
 #ifdef DEBUG
-	{"wizdebug", "wizard debug command", wiz_debug_cmd, TRUE},
+	{"wizdebug_traveldisplay", "wizard debug: toggle travel display", wiz_debug_cmd_traveldisplay, TRUE},
+	{"wizdebug_bury", "wizard debug: bury objs under and around you", wiz_debug_cmd_bury, TRUE},
 #endif
 	{"wizrumorcheck", "verify rumor boundaries", wiz_rumor_check, TRUE},
 	{"wmode", "show wall modes", wiz_show_wmodes, TRUE},

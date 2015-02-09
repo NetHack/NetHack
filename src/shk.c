@@ -5,8 +5,6 @@
 
 #include "hack.h"
 
-/*#define DEBUG*/
-
 #define PAY_SOME    2
 #define PAY_BUY     1
 #define PAY_CANT    0	/* too poor */
@@ -1207,9 +1205,7 @@ dopay()
 	}
 
 	if(!shkp) {
-#ifdef DEBUG
-		pline("dopay: null shkp.");
-#endif
+		debugpline("dopay: null shkp.");
 		return(0);
 	}
 proceed:

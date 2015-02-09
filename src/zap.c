@@ -1717,9 +1717,7 @@ struct obj *obj, *otmp;
 		if (context.bypasses)
 			return 0;
 		else {
-#ifdef DEBUG
-			pline("%s for a moment.", Tobjnam(obj, "pulsate"));
-#endif
+			debugpline("%s for a moment.", Tobjnam(obj, "pulsate"));
 			obj->bypass = 0;
 		}
 	}
@@ -3418,9 +3416,7 @@ struct obj **ootmp;	/* to return worn armor for caller to disintegrate */
 		resist(mon, type < ZT_SPELL(0) ? WAND_CLASS : '\0', 0, NOTELL))
 	    tmp /= 2;
 	if (tmp < 0) tmp = 0;		/* don't allow negative damage */
-#ifdef WIZ_PATCH_DEBUG
-	pline("zapped monster hp = %d (= %d - %d)", mon->mhp-tmp,mon->mhp,tmp);
-#endif
+	debugpline("zapped monster hp = %d (= %d - %d)", mon->mhp-tmp,mon->mhp,tmp);
 	mon->mhp -= tmp;
 	return(tmp);
 }

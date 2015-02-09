@@ -767,7 +767,7 @@ int mode;
 static boolean trav_debug = FALSE;
 
 int
-wiz_debug_cmd() /* in this case, toggle display of travel debug info */
+wiz_debug_cmd_traveldisplay() /* in this case, toggle display of travel debug info */
 {
 	trav_debug = !trav_debug;
 	return 0;

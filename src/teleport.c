@@ -121,9 +121,7 @@ unsigned entflags;
     struct monst fakemon;	/* dummy monster */
 
     if (!mdat) {
-#ifdef DEBUG
-	pline("enexto() called with mdat==0");
-#endif
+	debugpline("enexto() called with mdat==0");
 	/* default to player's original monster type */
 	mdat = &mons[u.umonster];
     }

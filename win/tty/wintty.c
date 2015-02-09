@@ -1946,7 +1946,7 @@ register int x, y;	/* not xchar: perhaps xchar is unsigned and
 	case NHW_TEXT: s = "[text window]"; break;
 	case NHW_BASE: s = "[base window]"; break;
 	}
-	impossible("bad curs positioning win %d %s (%d,%d)", window, s, x, y);
+	debugpline("bad curs positioning win %d %s (%d,%d)", window, s, x, y);
 	return;
     }
 #endif

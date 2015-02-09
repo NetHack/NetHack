@@ -1278,10 +1278,8 @@ register struct monst *mtmp, *mtmp2;
 
     /* transfer the monster's inventory */
     for (otmp = mtmp2->minvent; otmp; otmp = otmp->nobj) {
-#ifdef DEBUG
 	if (otmp->where != OBJ_MINVENT || otmp->ocarry != mtmp)
-	    panic("replmon: minvent inconsistency");
-#endif
+	    debugpline("replmon: minvent inconsistency");
 	otmp->ocarry = mtmp2;
     }
     mtmp->minvent = 0;

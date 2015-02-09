@@ -424,12 +424,12 @@ register struct monst *mtmp;
 register struct obj *otmp;
 {
     int freed_otmp;
+    boolean snuff_otmp = FALSE;
 
     /* if monster is acquiring a thrown or kicked object, the throwing
        or kicking code shouldn't continue to track and place it */
     if (otmp == thrownobj) thrownobj = 0;
     else if (otmp == kickedobj) kickedobj = 0;
-    boolean snuff_otmp = FALSE;
     /* don't want hidden light source inside the monster; assumes that
        engulfers won't have external inventories; whirly monsters cause
        the light to be extinguished rather than letting it shine thru */

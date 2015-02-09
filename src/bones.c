@@ -581,11 +581,9 @@ getbones()
 			for(mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
 			    if (has_mname(mtmp)) sanitize_name(MNAME(mtmp));
 			    if (mtmp->mhpmax == DEFUNCT_MONSTER) {
-#if defined(DEBUG)
 				if (wizard)
-				    pline("Removing defunct monster %s from bones.",
+				    debugpline("Removing defunct monster %s from bones.",
 					mtmp->data->mname);
-#endif
 				mongone(mtmp);
 			    } else
 				/* to correctly reset named artifacts on the level */

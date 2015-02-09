@@ -8,8 +8,6 @@
 #include "hack.h"
 #include <ctype.h>
 
-/* #define DEBUG */	/* uncomment for debugging info */
-
 	/* part of the output on gain or loss of attribute */
 static
 const char	* const plusattr[] = {
@@ -349,9 +347,7 @@ exercise(i, inc_or_dec)
 int	i;
 boolean	inc_or_dec;
 {
-#ifdef DEBUG
-	pline("Exercise:");
-#endif
+	debugpline("Exercise:");
 	if (i == A_INT || i == A_CHA) return;	/* can't exercise these */
 
 	/* no physical exercise while polymorphed; the body's temporary */
@@ -368,12 +364,10 @@ boolean	inc_or_dec;
 		 *	Note: *YES* ACURR is the right one to use.
 		 */
 		AEXE(i) += (inc_or_dec) ? (rn2(19) > ACURR(i)) : -rn2(2);
-#ifdef DEBUG
-		pline("%s, %s AEXE = %d",
+		debugpline("%s, %s AEXE = %d",
 			(i == A_STR) ? "Str" : (i == A_WIS) ? "Wis" :
 			(i == A_DEX) ? "Dex" : "Con",
 			(inc_or_dec) ? "inc" : "dec", AEXE(i));
-#endif
 	}
 	if (moves > 0 && (i == A_STR || i == A_CON)) (void)encumber_msg();
 }
@@ -398,9 +392,7 @@ exerper()
 			 (u.uhunger > 50) ? HUNGRY :
 			 (u.uhunger > 0) ? WEAK : FAINTING;
 
-#ifdef DEBUG
-		pline("exerper: Hunger checks");
-#endif
+		debugpline("exerper: Hunger checks");
 		switch (hs) {
 		    case SATIATED:	exercise(A_DEX, FALSE);
 					if (Role_if(PM_MONK))
@@ -416,9 +408,7 @@ exerper()
 		}
 
 		/* Encumberance Checks */
-#ifdef DEBUG
-		pline("exerper: Encumber checks");
-#endif
+		debugpline("exerper: Encumber checks");
 		switch (near_capacity()) {
 		    case MOD_ENCUMBER:	exercise(A_STR, TRUE); break;
 		    case HVY_ENCUMBER:	exercise(A_STR, TRUE);
@@ -431,9 +421,7 @@ exerper()
 
 	/* status checks */
 	if(!(moves % 5)) {
-#ifdef DEBUG
-		pline("exerper: Status checks");
-#endif
+		debugpline("exerper: Status checks");
 		if ((HClairvoyant & (INTRINSIC|TIMEOUT)) &&
 			!BClairvoyant)                      exercise(A_WIS, TRUE);
 		if (HRegeneration)			exercise(A_STR, TRUE);
@@ -464,15 +452,11 @@ exerchk()
 	/*	Check out the periodic accumulations */
 	exerper();
 
-#ifdef DEBUG
 	if(moves >= context.next_attrib_check)
-		pline("exerchk: ready to test. multi = %d.", multi);
-#endif
+		debugpline("exerchk: ready to test. multi = %d.", multi);
 	/*	Are we ready for a test?	*/
 	if(moves >= context.next_attrib_check && !multi) {
-#ifdef DEBUG
-	    pline("exerchk: testing.");
-#endif
+	    debugpline("exerchk: testing.");
 	    /*
 	     *	Law of diminishing returns (Part II):
 	     *
@@ -499,13 +483,11 @@ exerchk()
 		   exercise/abuse gradually wears off without impact then */
 		if (Upolyd && i != A_WIS) goto nextattrib;
 
-#ifdef DEBUG
-		pline("exerchk: testing %s (%d).",
+		debugpline("exerchk: testing %s (%d).",
 		      (i == A_STR) ? "Str" : (i == A_INT) ? "Int?" :
 		       (i == A_WIS) ? "Wis" : (i == A_DEX) ? "Dex" :
 			(i == A_CON) ? "Con" : (i == A_CHA) ? "Cha?" : "???",
 		      ax);
-#endif
 		/*
 		 *	Law of diminishing returns (Part III):
 		 *
@@ -515,13 +497,9 @@ exerchk()
 		if (rn2(AVAL) > ((i != A_WIS) ? (abs(ax) * 2 / 3) : abs(ax)))
 		    goto nextattrib;
 
-#ifdef DEBUG
-		pline("exerchk: changing %d.", i);
-#endif
+		debugpline("exerchk: changing %d.", i);
 		if(adjattrib(i, mod_val, -1)) {
-#ifdef DEBUG
-		    pline("exerchk: changed %d.", i);
-#endif
+		    debugpline("exerchk: changed %d.", i);
 		    /* if you actually changed an attrib - zero accumulation */
 		    AEXE(i) = ax = 0;
 		    /* then print an explanation */
@@ -535,9 +513,7 @@ exerchk()
 		AEXE(i) = (abs(ax) / 2) * mod_val;
 	    }
 	    context.next_attrib_check += rn1(200,800);
-#ifdef DEBUG
-	    pline("exerchk: next check at %ld.", context.next_attrib_check);
-#endif
+	    debugpline("exerchk: next check at %ld.", context.next_attrib_check);
 	}
 }
 

@@ -11,9 +11,31 @@
 #include "config.h"
 #endif
 
-/*	For debugging beta code.	*/
-#ifdef BETA
-#define Dpline	pline
+#ifdef DEBUG
+/* due to strstr(), mon.c matches makemon.c */
+# define showdebug() (sysopt.debugfiles &&			\
+	    ((sysopt.debugfiles[0] == '*') ||			\
+	     (strstr( __FILE__ , sysopt.debugfiles))))
+
+/* GCC understands this syntax */
+# ifdef __GNUC__
+/* ... but whines about it anyway without these pragmas. */
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wvariadic-macros"
+#  define debugpline(args...)                       \
+     do { if (showdebug()) pline( args ); } while(0);
+# pragma GCC diagnostic pop
+# endif
+
+/* and Visual Studio understands this one */
+# ifdef _MSC_VER
+#  define debugpline(...)                           \
+     do { if (showdebug()) pline(__VA_ARGS__); } while(0);
+# endif
+
+#else
+# define showdebug() (0)
+# define debugpline(...)
 #endif
 
 #define TELL		1

@@ -17,8 +17,6 @@ STATIC_DCL void FDECL(insane_object,
 		      (struct obj *,const char *,const char *,struct monst *));
 STATIC_DCL void FDECL(check_contained, (struct obj *,const char *));
 
-/*#define DEBUG_EFFECTS*/	/* show some messages for debugging */
-
 struct icp {
     int  iprob;		/* probability of an item type */
     char iclass;	/* item class */
@@ -1526,12 +1524,10 @@ struct obj *otmp;
 	/* Adjust the age; must be same as obj_timer_checks() for off ice*/
 	age = monstermoves - otmp->age;
 	retval += age * (ROT_ICE_ADJUSTMENT-1) / ROT_ICE_ADJUSTMENT;
-#ifdef DEBUG_EFFECTS
-	pline_The("%s age has ice modifications:otmp->age = %ld, returning %ld.",
+	debugpline("The %s age has ice modifications:otmp->age = %ld, returning %ld.",
 		s_suffix(doname(otmp)),otmp->age, retval);
-	pline("Effective age of corpse: %ld.",
+	debugpline("Effective age of corpse: %ld.",
 		monstermoves - retval);
-#endif
     }
     return retval;
 }
@@ -1560,9 +1556,7 @@ int force;	/* 0 = no force so do checks, <0 = force off, >0 force on */
 	    
 	    /* mark the corpse as being on ice */
 	    otmp->on_ice = 1;
-#ifdef DEBUG_EFFECTS
-	    pline("%s is now on ice at %d,%d.", The(xname(otmp)),x,y);
-#endif
+	    debugpline("%s is now on ice at %d,%d.", The(xname(otmp)),x,y);
 	    /* Adjust the time remaining */
 	    tleft *= ROT_ICE_ADJUSTMENT;
 	    restart_timer = TRUE;
@@ -1588,9 +1582,7 @@ int force;	/* 0 = no force so do checks, <0 = force off, >0 force on */
 		long age;
 
 		otmp->on_ice = 0;
-#ifdef DEBUG_EFFECTS
-	    	pline("%s is no longer on ice at %d,%d.", The(xname(otmp)),x,y);
-#endif
+	    	debugpline("%s is no longer on ice at %d,%d.", The(xname(otmp)),x,y);
 		/* Adjust the remaining time */
 		tleft /= ROT_ICE_ADJUSTMENT;
 		restart_timer = TRUE;
