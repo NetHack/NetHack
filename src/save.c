@@ -1210,9 +1210,7 @@ int fd, mode;
 	    }
 	    bwrite(fd, (genericptr_t) &minusone, sizeof(int));
 	}
-#ifdef DEBUG_MSGCOUNT
-	pline("Stored %d messages into savefile.", msgcount);
-#endif
+	debugpline("Stored %d messages into savefile.", msgcount);
 	/* note: we don't attempt to handle release_data() here */
 }
 

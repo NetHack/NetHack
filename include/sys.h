@@ -15,6 +15,7 @@ struct sysopt {
 	char *recover;	/* how to run recover - may be overridden by win port */
 	char *wizards;
 	char *shellers;	/* like wizards, for ! command (-DSHELL) */
+	char *debugfiles; /* files to show debugplines in. '*' is all. */
 	int   maxplayers;
 		/* record file */
 	int persmax;

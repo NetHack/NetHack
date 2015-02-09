@@ -903,9 +903,7 @@ int how;			/* type of query */
 		(*pick_list)->item.a_int = curr->oclass;
 		return 1;
 	    } else {
-#ifdef DEBUG
-		impossible("query_category: no single object match");
-#endif
+		debugpline("query_category: no single object match");
 	    }
 	    return 0;
 	}

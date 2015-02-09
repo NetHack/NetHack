@@ -2107,6 +2107,9 @@ int		src;
 	} else if (src == SET_IN_SYS && match_varname(buf, "SHELLERS", 8)) {
 	    if (sysopt.shellers) free(sysopt.shellers);
 	    sysopt.shellers = dupstr(bufp);
+	} else if (src == SET_IN_SYS && match_varname(buf, "DEBUGFILES", 5)) {
+	    if (sysopt.debugfiles) free(sysopt.debugfiles);
+	    sysopt.debugfiles = dupstr(bufp);
 	} else if (src == SET_IN_SYS && match_varname(buf, "SUPPORT", 7)) {
 	    if (sysopt.support) free(sysopt.support);
 	    sysopt.support = dupstr(bufp);

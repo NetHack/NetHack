@@ -20,6 +20,7 @@ sys_early_init(){
 #else
 	sysopt.wizards = WIZARD_NAME;
 #endif
+	sysopt.debugfiles = NULL;
 	sysopt.shellers = NULL;
 	sysopt.maxplayers = 0;	/* XXX eventually replace MAX_NR_OF_PLAYERS */
 

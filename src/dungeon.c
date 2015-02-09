@@ -81,6 +81,8 @@ dumpit()
 	s_level	*x;
 	branch *br;
 
+	if (!showdebug()) return;
+
 	for(i = 0; i < n_dgns; i++)  {
 	    fprintf(stderr, "\n#%d \"%s\" (%s):\n", i,
 				DD.dname, DD.proto);

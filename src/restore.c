@@ -1153,9 +1153,7 @@ register int fd;
 		++msgcount;
 	}
 	if (msgcount) putmsghistory((char *)0, TRUE);
-#ifdef DEBUG_MSGCOUNT
-	pline("Read %d messages from savefile.", msgcount);
-#endif
+	debugpline("Read %d messages from savefile.", msgcount);
 }
 
 /* Clear all structures for object and monster ID mapping. */

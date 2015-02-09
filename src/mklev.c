@@ -4,11 +4,6 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-/* #define DEBUG */	/* uncomment to enable code debugging */
-
-#ifdef DEBUG
-#define debugpline	if (wizard) pline
-#endif
 
 /* for UNIX, Rand #def'd to (long)lrand48() or (long)random() */
 /* croom->lx etc are schar (width <= int), so % arith ensures that */
@@ -689,9 +684,7 @@ makelevel()
 	/* make a secret treasure vault, not connected to the rest */
 	if(do_vault()) {
 		xchar w,h;
-#ifdef DEBUG
 		debugpline("trying to make a vault...");
-#endif
 		w = 1;
 		h = 1;
 		if (check_room(&vault_x, &w, &vault_y, &h, TRUE)) {
@@ -1567,9 +1560,7 @@ xchar x, y;
 	*source = u.uz;
 	insert_branch(br, TRUE);
 
-#ifdef DEBUG
-	pline("Made knox portal.");
-#endif
+	debugpline("Made knox portal.");
 	place_branch(br, x, y);
 }
 
