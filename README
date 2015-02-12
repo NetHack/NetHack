@@ -12,6 +12,7 @@ doc/fixes35.0 in the source distribution.  The text in there was written
 for the development team's own use and is provided "as is", so please do 
 not ask us to further explain the entries in that file.
 
+If you are a developer, please see the file DEVEL/Developer.txt.
                         - - - - - - - - - - -
 
 Please read items (1), (2) and (3) BEFORE doing anything with your new code.
@@ -56,6 +57,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     A.  A 'win/tty' subdirectory, which contains files specific to ttys.
     B.  A 'win/win32' subdirectory, which contains files specific to the
         Windows Win32 API.
+    C.  A 'DEVEL' directory, which contains files for NetHack developers.
 
     The names of these directories should not be changed unless you are
     ready to go through the makefiles and the makedefs program and change
