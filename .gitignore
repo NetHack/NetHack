@@ -26,3 +26,4 @@ _$*
 *.ln
 core
 # CVS default ignores end
+.*.swp

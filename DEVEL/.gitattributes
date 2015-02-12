@@ -1,0 +1,4 @@
+Developer.txt filter=NHtext merge=NHsubst
+nhgitset.pl filter=NHtext merge=NHsubst
+hookdir/* filter=NHtext merge=NHsubst
+* text=auto
