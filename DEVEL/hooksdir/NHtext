@@ -1,0 +1,145 @@
+#!/usr/bin/perl
+#
+# NHtext
+# $NHDT-Date$
+# clean/smudge filter for handling substitutions
+use strict;
+
+my $debug = 0;
+
+my $sink = ($^O eq "MSWin32")? "NUL" :"/dev/null";
+my $dbgfile = ($^O eq "MSWin32") ? "$ENV{TEMP}.$$" : "/tmp/trace.$$";
+open TRACE, ">>", ($debug==0)? $sink : $dbgfile;
+print TRACE "START CLIENT ARGV:\n";
+print TRACE "[0] $0\n";
+my $x1;
+for(my $x=0;$x<scalar @ARGV;$x++){
+	$x1 = $x+1;
+	print TRACE "[$x1] $ARGV[$x]\n";
+}
+print TRACE "ENV:\n";
+foreach my $k (sort keys %ENV){
+	next unless ($k =~ m/^(GIT_|NH)/);
+	print TRACE " $k => $ENV{$k}\n";
+}
+print TRACE "CWD: " . `pwd`;
+print TRACE "END\n";
+
+# pick up the prefix for substitutions in this repo
+my $PREFIX = `git config --local --get nethack.substprefix`;
+chomp($PREFIX);
+
+my $submode = 0;	# ok to make non-cleaning changes to file
+my $mode;
+
+if($ARGV[0] eq "--clean"){
+	$mode = "c";
+	if(0 == 0+$ENV{NHMODE}){
+		$submode = 1;		# do NOT add extra changes to the file
+		print TRACE "SKIPPING\n";
+	}
+} elsif($ARGV[0] eq "--smudge"){
+	$mode = "s";
+} else {
+	warn "Unknown mode '$ARGV[0]'\n";
+	exit 1;
+}
+
+# XXX for now, there isn't any - if we get called, we subst.  No options for now.
+# get relevent config info
+#XXX
+#git check-attr -a $ARGV[1]
+
+# process stdin to stdout
+
+while(<STDIN>){
+	print TRACE "IN: $_";
+	# $1 - var and value (not including trailing $)
+	# $2 - var
+	# $4 - value or undef
+#	s/\$$PREFIX-(([A-Za-z][A-Za-z0-9_]*)(: ([^\N{DOLLAR SIGN}]+))?)\s*\$/&handlevar($2,$4)/eg;
+	s/\$$PREFIX-(([A-Za-z][A-Za-z0-9_]*)(: ([^\x24]+))?)\s*\$/&handlevar($2,$4)/eg;
+	print;
+	print TRACE "OT: $_";
+}
+
+sub handlevar {
+	my($var, $val) = @_;
+
+	my $subname = "PREFIX::$var";
+	if(defined &$subname){
+		no strict;
+		$val = &$subname($val,$mode,$submode);
+	} else {
+		warn "No handler for \$$PREFIX-$var\n";
+	}
+
+	if(length $val){
+		return "\$$PREFIX-$var: $val \$";
+	} else {
+		return "\$$PREFIX-$var\$";
+	}
+}
+
+package PREFIX;
+use POSIX qw(strftime);
+
+# On push, put in the current date because we changed the file.
+# On pull, keep the current value so we can see the last change date.
+sub Date {
+	my($val, $mode, $submode) = @_;
+	if($mode eq "c"){
+		if($submode==0){
+			# we add this to make merge easier for now XXX
+			my $now = time; # not %s below - may not be portable
+			# YYYY/MM/DD HH:MM:SS
+			$val = "$now " . strftime("%Y/%m/%d %H:%M:%S", gmtime($now));
+		}
+	}
+	if($mode eq "s"){
+		$val =~ s/\s*$//;	# XXX why do I need this?
+	}
+	return $val;
+}
+
+#sub Header {
+#}
+#sub Author {
+#}
+
+# NB: the standard-ish Revision line isn't enough - you need Branch/Revision -
+#     but we split it into 2 so we can use the standard processing code on Revision
+#     and just slip Branch in.
+sub Branch {
+	my($val, $mode, $submode) = @_;
+	if($mode eq "c"){
+		if($submode==0){
+			$val = `git branch --no-color --contains`;
+			chomp($val);	#XXX
+			$val =~ s/^\*\s*//;
+		}
+	}
+	if($mode eq "s"){
+#XXX do we need this now?
+		$val =~ s/\s*$//;	# XXX why do I need this?
+	}
+	return $val;
+}
+
+sub Revision {
+	my($val, $mode, $submode) = @_;
+	if($mode eq "c"){
+		if($submode==0){
+			my $file = $ARGV[1];
+			my @val = `git log --follow --oneline $file`;
+			$val = sprintf("1.%d",0+$#val);
+		}
+	}
+	if($mode eq "s"){
+#XXX do we need this here?
+		$val =~ s/\s*$//;	# XXX why do I need this?
+	}
+	return $val;
+}
+
+__END__

@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+# wrapper for nhadd and nhcommit aliases
+# $NHDT-Date$
+
+%ok = map { $_ => 1 } ('add', 'commit');
+
+die "Bad subcommand '$ARGV[0]'" unless $ok{$ARGV[0]};
+
+if(length $ENV{GIT_PREFIX}){
+        chdir($ENV{GIT_PREFIX}) or die "Can't chdir $ENV{GIT_PREFIX}: $!";
+}
+
+$ENV{NHMODE} = 1;
+exec "git", @ARGV or die "Can't exec git: $!";

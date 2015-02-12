@@ -1,0 +1,164 @@
+ ___              _                   
+ |   \ _____ _____| |___ _ __  ___ _ _ 
+ | |) / -_) V / -_) / _ \ '_ \/ -_) '_|
+ |___/\___|\_/\___|_\___/ .__/\___|_|  
+                        |_|            
+
+$NHDT-Date$
+
+Welcome to the NetHack Infrastructure Developer's Guide.
+
+This is the info you need if you are developing code for NetHack.
+(This information is from DevTeam.  If you are working with a variant please
+check for additional documentation for that variant.)
+
+For information on building NetHack, see README in the top level directory.
+For information on playing NetHack, see the Guidebook in the doc directory.
+
+DANGER!  WORK IN PROGRESS!  Known issues marked XXX.
+
+CONTENTS
+1. email
+2. git repositories
+3. bug reporting
+4. git configuration
+5. variable expansion
+6. reserved names
+------------------------------------------------------------------------------
+1. email
+Email to devteam@nethack.org will usually get a response, but it may take a
+while.  Please do not send save files, binary screen grabs, or other large
+things.
+------------------------------------------------------------------------------
+2. git repositories
+The public NetHack git repository is available (read-only) on SourceForge at:
+  git://git.code.sf.net/p/nethack/NHsource
+------------------------------------------------------------------------------
+3. bug reporting
+Please use the form at http://www.nethack.org/common/contact.html (or send
+us an email if that's more appropriate).
+------------------------------------------------------------------------------
+4. git configuration
+A. If you have never set up git on this machine before:
+   (This assumes you will only be using git for NetHack.  If you are going to
+   use it for other projects as well, think before you type.)
+	Tell git what name (or nicname) and email address to use for you:
+		git config --global user.name "MY NAME"
+		git config --global user.email USER@EXAMPLE.COM
+   You probably want to set up a credential cache.
+	Mac OS X:
+		git config --global credential.helper osxkeychain
+XXX windows
+XXX linux
+B. Specify the prefix for variable substitution:
+   (This assumes you are not a member of DevTeam or any variant's development
+   team.  If you are, this may be wrong.  Look for more specific documentation.)
+	Decide where you want to put this info; it should NOT be inside the
+	tree you cloned from git.  I use ~/nethack/GITADDDIR; for that base,
+	create the needed directories and edit the file:
+		~/nethack/GITADDDIR/DOTGIT/PRE
+	Put this in it (if your OS is not Unix-like you may need to change
+	the first line):
+		#!/bin/sh
+		git config nethack.substprefix MINE
+C. Configure the repository:
+	- cd to the top level of the repository
+	- tell the repository about the directory you created above:
+		git config nethack.gitadddir FULL_PATH_TO_GITADDDIR
+	   so for the example above:
+		git config nethack.gitadddir ~/nethack/GITADDDIR
+	- do the automated setup:
+		perl DEVEL/nhgitset.pl
+	  If it complains, fix what it complains about.  nhgitset.pl accepts
+	  the following options:
+		-v verbose
+		-n dry run
+   You can re-run nhgitset.pl as often as needed; occasionally we will
+   update it and ask you to run it again.
+D. aliases
+   Two aliases are installed by nhgitset.pl:
+	nhadd
+	nhcommit
+   These two commands take the same options as the normal git add and commit
+   commands but perform RCS/CVS-style variable substitution.  Note that the
+   substitutions do not show up in the working directory.
+
+   Note that nothing terrible will happen if you do not use the nh* versions
+   of the commands.
+
+   Supported substitutions:
+	MINE-Date	the commit time and date
+   Experimental substitutions:
+	MINE-Revision	CVS style revision number
+	MINE-Branch	the current git branch
+
+That's it.  If you need to do something more when setting up your repository,
+keep reading.  Otherwise, you are done with this section.
+
+1) to run your own hooks in addition to ours:
+	name your hook
+		WHEN-HOOKNAME
+	where WHEN is
+		PRE	(run your code before the NetHack hook)
+		POST	(run your code after the NetHack hook)
+	and HOOKNAME is the normal git name of the hook.
+   Be sure to test carefully since the composition of two bits of code may or
+   may not do what you want.
+2) to install other bits on setup:
+	Put additional files in the GITADDDIR tree.  Use "DOTGIT" instead of
+	".git".  If a file called PRE, POST, or INSTEAD exists in a
+	subdirectory of GITADDDIR, it is run before the copy, after the copy,
+	or instead of the copy.  No copy operation is attempted in the DOTGIT
+	directory; use a script and standard git commands to change the
+	contents as needed.
+3) NB: In all namespaces, anything that matches m/^nh/i or m/^nethack/i is
+   reserved.
+------------------------------------------------------------------------------
+5. variable expansion
+A. Introduction
+   We have implemented an RCS/CVS/SVN style variable expansion mechanism.
+   References of either of the formats:
+	$PREFIX-VARNAME$
+	$PREFIX-VARNAME: VALUE $
+   will be handled (if enabled).
+
+   The PREFIX is the value in the git config variable nethack.substprefix.
+   VARNAME is one of:
+	Date
+	Branch (experimental)
+	Revision (experimental)
+   other names will give a warning.
+
+B. Enabling variable expansion
+   Variable expansion is controlled by the .gitattributes file.
+
+   To enable variable expansion:
+        pattern filter=NHtext merge=NHsubst
+   To disable variable expansion:
+	pattern -filter
+
+   More information: "git help gitattributes"
+
+C. Oddities
+   To trigger variable expansion, you _must_ use "git nhadd" or "git nhcommit"
+   instead of "git add" or "git commit."  Nothing terrible will happen if you
+   use the wrong one, but the values will not be updated.
+
+   Due to the way this abuses git filters, the updated values are not visible
+   in your working tree.
+
+D. Using your own hooks
+   You can use your own hooks - put them in .git/hooks as usual BUT name them
+   as follows:
+	WHEN-HOOKNAME
+   where WHEN is:
+	PRE	(execute the code before the NetHack hook)
+	POST	(execute the code after the NetHack hook)
+   and HOOKNAME is the normal git name for the hook.
+
+   Test carefully - interactions between hooks can be nasty.
+------------------------------------------------------------------------------
+6. reserved names
+   Anything that matches m/^nh/i or m/^nethack/i is reserved in all
+   namespaces (environment, file names, git config, etc).
+------------------------------------------------------------------------------

@@ -1,0 +1,366 @@
+#!/usr/bin/perl
+#
+# NHsubst
+# $NHDT-Date$
+# git merge driver for substitutions (like RCS/CVS)
+# driver line:   .... %O %A %B %L
+use strict;
+
+my $debug = 0;
+my $rawin = 0;	# feed diff to stdin for testing (do NOT set $debug=1)
+
+# We want TRACE open so we don't need to test $debug everywhere, but we skip
+# this first block because it's expensive and dumpfile() hangs with $rawin.
+my $sink = ($^O eq "MSWin32") ? "NUL" : "/dev/null";
+my $dbgfile = ($^O eq "MSWin32") ? "$ENV{TEMP}.$$" : "/tmp/trace.$$";
+open TRACE, ">>", ($debug==0)? $sink : $dbgfile;
+if($debug){
+	print TRACE "START CLIENT ARGV:\n";
+	print TRACE "[0] $0\n";
+	my $x1;
+	for(my $x=0;$x<scalar @ARGV;$x++){
+		$x1 = $x+1;
+		print TRACE "[$x1] $ARGV[$x]\n";
+	}
+	print TRACE "ENV:\n";
+	foreach my $k (sort keys %ENV){
+		next unless ($k =~ m/^GIT_/);
+		print TRACE " $k => $ENV{$k}\n";
+	}
+	print TRACE "CWD: " . `pwd`;
+	&dumpfile($ARGV[0], "[0O]");
+	&dumpfile($ARGV[1], "[1A]");
+	&dumpfile($ARGV[2], "[2B]");
+	print TRACE "L=$ARGV[3]\n";
+	print TRACE "END\n";
+}
+
+my $mark_len = $ARGV[3];
+$mark_len = 3 if($mark_len==0 && $rawin);
+
+my $mark_start = '<' x $mark_len;
+my $mark_middle = '=' x $mark_len;
+my $mark_end = '>' x $mark_len;
+
+my $PREFIX;
+# pick up the prefix for substitutions in this repo
+if($rawin){
+	$PREFIX = "TEST";
+} else {
+	$PREFIX = `git config --local --get nethack.substprefix`;
+	chomp($PREFIX);
+}
+
+my @out;
+my $cntout;
+if($rawin){
+	@out = <STDIN>;
+} else {
+	#system "git merge-file -p .... > temp
+	my $tags = "-L CURRENT -L ANCESTOR -L OTHER";	# XXX should "CURRENT" be "MINE"?
+	@out = `git merge-file -p $tags $ARGV[1] $ARGV[0] $ARGV[2]`;
+	#NB: we don't check the exit value because it's useless
+	print TRACE "MERGE-FILE START\n".join("",@out)."MERGE-FILE END\n";
+}
+
+($cntout,@out) = &edit_merge(@out);
+
+if($rawin){
+	print "COUNT: $cntout\n";
+	print @out;
+} else {
+	# spit @out to $ARGV[1]  (careful: what about EOL character?)
+	open OUT, ">$ARGV[1]" or die "Can't open $ARGV[1]";
+	print OUT @out;
+	close OUT;
+
+	print TRACE "WRITING START ($ARGV[1])\n".join("",@out)."WRITING END\n";
+	&dumpfile($ARGV[1], "READBACK");
+}
+print TRACE "COUNT: $cntout\n";
+
+exit( ($cntout>0) ? 1 : 0);
+
+#git merge-file [-L <current-name> [-L <base-name> [-L <other-name>]]]
+#               [--ours|--theirs|--union] [-p|--stdout] [-q|--quiet] [--marker-size=<n>]
+#               [--[no-]diff3] <current-file> <base-file> <other-file>
+#The `merge.*.driver` variable's value is used to construct a command to run to merge ancestor's
+#           version (%O), current version (%A) and the other branches' version (%B). These three tokens are
+#           replaced with the names of temporary files that hold the contents of these versions when the
+#           command line is built. Additionally, %L will be replaced with the conflict marker size (see
+#           below).
+
+# keep failing so we don't need to keep changing the setup while building this script
+
+sub dumpfile {
+	my($file, $tag) = @_;
+	print TRACE "FILE $tag START\n";
+	print TRACE `hexdump -C $file`;
+	print TRACE "FILE END\n";
+}
+
+sub edit_merge {
+	my(@input) = @_;
+					# $::count is a bit ugly XXX
+	local $::count = 0;		# we need the number of conflicts for exit()
+	my @out;
+
+	local $_;
+	while($_ = shift @input){
+		if(m/^$mark_start /){
+			print TRACE "FOUND A CONFLICT\n";
+			my @conflict;
+			push(@conflict, $_);
+			while($_ = shift @input){
+				push(@conflict, $_);
+				if(m/^$mark_end /){
+					last;
+				}
+			}
+			push(@out, &edit_conflict(@conflict));
+		} else {
+			push(@out, $_);
+		}
+	}
+	print TRACE "RETURN count=$::count\n";
+	return($::count, @out);
+}
+
+sub edit_conflict {
+	my(@in) = @_;
+
+	print TRACE "EDIT START: " . scalar(@in)."\n";
+	if($debug){
+		foreach my $x (@in){ my $xx = $x; chomp($xx); print TRACE "-$xx-\n"; }
+	}
+	print TRACE "EDIT END INPUT\n";
+
+		# one-line change - use as base case to develop the code
+		#   ours	ARGV[1]	top-of-diff
+		#   theirs	ARGV[2] bottom-of-diff
+		# simple conflict:
+		# [0] <<<<<<< d1
+		# [1] $$PREFIX-Date: 1 ...
+		# [2] =======
+		# [3] $$PREFIX-Date: 3 ...
+		# [4] >>>>>>> d3
+	if(scalar(@in) == 5 && $in[2] =~ m/^$mark_middle/){
+		my $back = &merge_one_line_maybe($in[1],$in[3]);	# (ours, theirs)
+		if(!defined $back){
+			$::count++;	# leave the conflict
+			return @in;
+		} else {
+			return ($back);
+		}
+		# NOTREACHED
+	} else {
+# XXX LATER
+# Start at the top of both sections and work downwards.  As long as the lines can be merged,
+# push them out and keep going.  If there are lines left, we will still have a conflict but
+# we can try to make it smaller.  Push out the start-conflict marker.  Start at the
+# bottom of both section and work upwards.  As long as the lines can be merged, reverse push out
+# the merged line and keep going.  (We know there will be lines left at some point.)  Push out
+# remaining (middle) lines from OURS.  Push out mark_middle.  Push out remaining middle lines
+# from THEIRS.  Push out end-conflict marker.  $::count++; return (@a,$b,@c,$d,@e,$f,@g)
+# @a
+# $b = <<<
+# @c
+# $d = ===
+# @e
+# $f = >>>
+# @g
+	}
+		# not matched - return the unchanged conflict
+	$::count++;
+	return @in;
+}
+
+# XXX This is expensive.  Add a quick check for "anything that looks like a subst var" and just
+#  declare the lines unmergeable if it fails.
+sub merge_one_line_maybe {
+	my($ours, $theirs) = @_;
+
+	my $more = 1;
+	my $fail = 0;
+	my $out = '';
+		# TYPES:
+		# 0 no match
+		# 1 unexpanded var
+		# 2 expanded var
+		# 3 non-var text
+	my($ourstype, $theirtype);
+	my($oursvar, $theirvar);
+	my($oursval, $theirval);
+
+	while($more){
+		($ourstype, $theirtype) = (0,0);
+		($oursvar, $theirvar) = (undef, undef);
+		($oursvar, $theirvar) = (undef, undef);
+			# unexpanded var
+		if($ours =~ m/\G\$$PREFIX-([A-Z][a-z]+)\$/gc){
+			$ourstype = 1;
+			$oursvar = $1;
+		}
+		if($theirs =~ m/\G\$$PREFIX-([A-Z][a-z]+)\$/gc){
+			$theirtype = 1;
+			$theirvar = $1;
+		}
+			# expanded var
+		unless($ourstype){
+			if($ours =~ m/\G\$$PREFIX-([A-Za-z]+):\s+(.*?)\s\$/gc){
+				$ourstype = 2;
+				$oursvar = $1;
+				$oursval = $2;
+			}
+		}
+		unless($theirtype){
+			if($theirs =~ m/\G\$$PREFIX-([A-Za-z]+):\s+(.*?)\s\$/gc){
+				$theirtype = 2;
+				$theirvar = $1;
+				$theirval = $2;
+			}
+		}
+			# non-var text
+		unless($ourstype){
+			if($ours =~ m/\G(\$?[^\x24]*)/gc){
+				$ourstype = 3;
+				$oursval = $1;
+			}
+		}
+		unless($theirtype){
+			if($theirs =~ m/\G(\$?[^\x24]*)/gc){
+				$theirtype = 3;
+				$theirval = $1;
+			}
+		}
+
+		# are we done?
+		if(pos($ours)==length $ours && pos($theirs) == length $theirs){
+			$more = 0;
+		}
+		if($ourstype == 0 && $theirtype == 0){
+			die "NHsubst MERGE FAILED - aborted infinite loop\n";
+		}
+
+		# now see if ours and their match or can be resolved
+			# text
+		if($ourstype == 3 && $theirtype == 3){
+			if($oursval eq $theirval){
+				$out .= $oursval;
+				next;
+			}
+			return undef;
+		}
+		if($ourstype == 3 || $theirtype == 3){
+			return undef;
+		}
+# XXX we could do better: on failure of one field, return 2 lines with the fields we _can_ fix
+#  substituted into those lines, leaving only the fail-to-match bits for the user to
+#  deal with.  Later.
+			# vars (all 4 cases)
+		if($oursvar ne $theirvar){
+			return undef;
+		}
+		my $m = merge_one_var_maybe($oursvar, $oursval, $theirval);
+		if(! defined $m){
+			return undef;
+		}
+		$out .= $m;
+	}
+	return $out;
+}
+
+# return undef if we can't merge the values; $NAME: VALUE $ or $NAME$ (as appropriate) if we can.
+sub merge_one_var_maybe {
+	my($varname, $oursval, $theirval) = @_;
+	my $resolvedas;
+	{
+		no strict;
+		my $fn = "PREFIX::$varname";
+		if(defined &$fn){
+			$resolvedas = &$fn($PREFIX,$varname,$oursval, $theirval);
+		} else {
+			$resolvedas = undef;	# can't resolve
+		}
+	}
+
+	if(!defined $resolvedas){
+		$::count++;	# we have an externally visible conflict
+		return undef;
+	} else {
+		return $resolvedas;
+	}
+	# NOTREACHED
+}
+
+package PREFIX;
+# Resolve the conflict of a single var's 2 values.  Return undef to leave the conflict.
+sub Date {
+	my($PREFIX, $varname, $mine, $theirs) = @_;
+	my $m = ($mine =~ m/(\d+)/)[0];
+	my $t = ($theirs =~ m/(\d+)/)[0];
+	return undef unless ($m>0) && ($t>0);
+
+	return "\$$PREFIX-$varname: " . (($m>$t)?$mine:$theirs) .' $';
+}
+
+#sub Header {
+#sub Author {
+
+sub Branch {
+	my($PREFIX, $varname, $mine, $theirs) = @_;
+	return "\$$PREFIX-$varname: $mine \$";
+}
+
+sub Revision {
+	my($PREFIX, $varname, $mine, $theirs) = @_;
+	return "\$$PREFIX-$varname: $mine \$";
+}
+__END__
+
+TEST 1:
+<<< d1
+$TEST-Date: 1 $
+===
+$TEST-Date: 3 $
+>>> d3
+
+TEST 2:
+nothing
+at all
+
+TEST 3:
+<<< d1
+a line
+===
+one line
+two lines
+>>> d3
+
+TEST 4:
+<<< d1
+$TEST-Date: 1 $ yes
+===
+$TEST-Date: 1 $ no
+>>> d3
+
+TEST 5:
+<<< d1
+$TEST-Date: 3 $ yes
+===
+$TEST-Date: 1 $ yes
+>>> d3
+
+TEST 6:
+<<< d1
+$TEST-Date: 3 $ yes$TEST-Date: 4 $
+===
+$TEST-Date: 1 $ yes$TEST-Date: 5 $
+>>> d3
+
+TEST 7:
+<<< d1
+$TEST-Branch: mine $
+===
+$TEST-Branch: theirs $
+>>> d3
