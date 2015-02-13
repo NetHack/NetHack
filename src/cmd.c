@@ -1276,7 +1276,7 @@ int final;	/* ENL_GAMEINPROGRESS:0, ENL_GAVEOVERALIVE, ENL_GAMEOVERDEAD */
     *tmpbuf = highc(*tmpbuf);	/* same adjustment as bottom line */
     /* as in background_enlighenment, when poly'd we need to use the saved
        gender in u.mfemale rather than the current you-as-monster gender */
-    Sprintf(buf, "%s the %s's atttributes:", tmpbuf,
+    Sprintf(buf, "%s the %s's attributes:", tmpbuf,
 	    ((Upolyd ? u.mfemale : flags.female) && urole.name.f) ?
 		urole.name.f : urole.name.m);
 
