@@ -1785,7 +1785,6 @@ int final;
 	putstr(en_win, 0, "");
 	putstr(en_win, 0, final ? "Final Attributes:" : "Current Attributes:");
 
-#ifdef ELBERETH
 	if (u.uevent.uhand_of_elbereth) {
 	    static const char * const hofe_titles[3] = {
 				"the Hand of Elbereth",
@@ -1794,7 +1793,6 @@ int final;
 	    };
 	    you_are(hofe_titles[u.uevent.uhand_of_elbereth - 1],"");
 	}
-#endif
 
 	/* note: piousness 20 matches MIN_QUEST_ALIGN (quest.h) */
 	if (u.ualign.record >= 20)	you_are("piously aligned","");
