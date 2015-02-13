@@ -244,7 +244,6 @@ xchar x, y;
 	return((struct engr *) 0);
 }
 
-#ifdef ELBERETH
 /* Decide whether a particular string is engraved at a specified
  * location; a case-insensitive substring match used.
  * Ignore headstones, in case the player names herself "Elbereth".
@@ -259,7 +258,6 @@ sengr_at(s, x, y)
 	return (ep && ep->engr_type != HEADSTONE &&
 		ep->engr_time <= moves && strstri(ep->engr_txt, s) != 0);
 }
-#endif /* ELBERETH */
 
 void
 u_wipe_engr(cnt)

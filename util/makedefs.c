@@ -961,8 +961,8 @@ do_rumors()
  */
 #define IGNORED_FEATURES	( 0L \
 				| (1L << 12)	/* GOLDOBJ */ \
-				| (1L << 20)	/* EXP_ON_BOTL */ \
-				| (1L << 21)	/* SCORE_ON_BOTL */ \
+				| (1L << 19)	/* EXP_ON_BOTL */ \
+				| (1L << 20)	/* SCORE_ON_BOTL */ \
 				| (1L << 27)	/* ZEROCOMP */ \
 				| (1L << 28)	/* RLECOMP */ \
 				)
@@ -1018,14 +1018,11 @@ make_version()
 #ifdef INSURANCE
 			| (1L << 18)
 #endif
-#ifdef ELBERETH
+#ifdef EXP_ON_BOTL
 			| (1L << 19)
 #endif
-#ifdef EXP_ON_BOTL
-			| (1L << 20)
-#endif
 #ifdef SCORE_ON_BOTL
-			| (1L << 21)
+			| (1L << 20)
 #endif
 		/* data format (27..31)
 		 * External compression methods such as COMPRESS and ZLIB_COMP
@@ -1256,9 +1253,6 @@ static const char *build_opts[] = {
 #endif
 #ifdef DUNGEON_OVERVIEW
 		"dungeon map overview patch",
-#endif
-#ifdef ELBERETH
-		"Elbereth",
 #endif
 #ifdef EXP_ON_BOTL
 		"experience points on status line",
@@ -1684,9 +1678,6 @@ h_filter(line)
 	skip = FALSE;
 #ifndef SINKS
 	if (!strcmp(tag, "SINKS")) skip = TRUE;
-#endif
-#ifndef ELBERETH
-	if (!strcmp(tag, "ELBERETH")) skip = TRUE;
 #endif
     } else if (skip && !strncmp(line, "-----", 5))
 	skip = FALSE;

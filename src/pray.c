@@ -11,9 +11,7 @@ STATIC_DCL int NDECL(in_trouble);
 STATIC_DCL void FDECL(fix_worst_trouble,(int));
 STATIC_DCL void FDECL(angrygods,(ALIGNTYP_P));
 STATIC_DCL void FDECL(at_your_feet, (const char *));
-#ifdef ELBERETH
 STATIC_DCL void NDECL(gcrownu);
-#endif	/*ELBERETH*/
 STATIC_DCL void FDECL(pleased,(ALIGNTYP_P));
 STATIC_DCL void FDECL(godvoice,(ALIGNTYP_P,const char*));
 STATIC_DCL void FDECL(god_zaps_you,(ALIGNTYP_P));
@@ -678,7 +676,6 @@ at_your_feet(str)
 	}
 }
 
-#ifdef ELBERETH
 STATIC_OVL void
 gcrownu()
 {
@@ -830,7 +827,6 @@ gcrownu()
     add_weapon_skill(1);
     return;
 }
-#endif	/*ELBERETH*/
 
 STATIC_OVL void
 pleased(g_align)
@@ -1052,12 +1048,10 @@ pleased(g_align)
 	}
 	case 7:
 	case 8:
-#ifdef ELBERETH
 	    if (u.ualign.record >= PIOUS && !u.uevent.uhand_of_elbereth) {
 		gcrownu();
 		break;
 	    } /* else FALLTHRU */
-#endif	/*ELBERETH*/
 	case 6:	{
 	    struct obj *otmp;
 	    int sp_no, trycnt = u.ulevel + 1;
@@ -1090,9 +1084,7 @@ pleased(g_align)
 
 	u.ublesscnt = rnz(350);
 	kick_on_butt = u.uevent.udemigod ? 1 : 0;
-#ifdef ELBERETH
 	if (u.uevent.uhand_of_elbereth) kick_on_butt++;
-#endif
 	if (kick_on_butt) u.ublesscnt += kick_on_butt * rnz(1000);
 
 	return;
