@@ -27,3 +27,5 @@ _$*
 core
 # CVS default ignores end
 .*.swp
+# We generate makefiles by shell script
+Makefile
