@@ -61,6 +61,8 @@ B. Specify the prefix for variable substitution:
 	the first line):
 		#!/bin/sh
 		git config nethack.substprefix MINE
+	Now make it executable:
+		chmod +x ~/nethack/GITADDDIR/DOTGIT/PRE
 C. Configure the repository:
 	- cd to the top level of the repository
 	- tell the repository about the directory you created above:
