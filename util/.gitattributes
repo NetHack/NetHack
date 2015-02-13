@@ -1,0 +1,2 @@
+*.pl filter=NHtext merge=NHsubst
+*.[ly] filter=NHtext merge=NHsubst
