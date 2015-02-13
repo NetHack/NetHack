@@ -27,5 +27,19 @@ _$*
 core
 # CVS default ignores end
 .*.swp
+
 # We generate makefiles by shell script
 Makefile
+
+# Win32-specific ignores
+binary/
+build/
+Nethack.sln
+Nethack.sdf
+Nethack.opensdf
+Makefile.bcc
+Makefile.gcc
+*.pdb
+*.ilk
+# Win32-specific ignores end
+

@@ -29,7 +29,7 @@ MAXPLAYERS=10
 # Record (high score) file options.
 # CAUTION: changing these after people have started playing games can
 #  lead to lost high scores!
-# Maximum entries for one persion.
+# Maximum entries for one person.
 #PERSMAX=10
 # Maximum entries in the record file.
 #ENTRYMAX=100
