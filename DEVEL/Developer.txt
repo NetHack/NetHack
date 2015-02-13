@@ -61,6 +61,8 @@ B. Specify the prefix for variable substitution:
 	the first line):
 		#!/bin/sh
 		git config nethack.substprefix MINE
+	Now make it executable:
+		chmod +x ~/nethack/GITADDDIR/DOTGIT/PRE
 C. Configure the repository:
 	- cd to the top level of the repository
 	- tell the repository about the directory you created above:
@@ -102,6 +104,7 @@ keep reading.  Otherwise, you are done with this section.
 		PRE	(run your code before the NetHack hook)
 		POST	(run your code after the NetHack hook)
 	and HOOKNAME is the normal git name of the hook.
+   Make sure the hooks are executable (chmod +x ...).
    Be sure to test carefully since the composition of two bits of code may or
    may not do what you want.
 2) to install other bits on setup:
