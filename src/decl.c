@@ -49,9 +49,7 @@ NEARDATA int doorindex = 0;
 NEARDATA char *save_cm = 0;
 
 NEARDATA struct kinfo killer = DUMMY;
-#ifdef GOLDOBJ
 NEARDATA long done_money = 0;
-#endif
 const char *nomovemsg = 0;
 NEARDATA char plname[PL_NSIZ] = DUMMY;		/* player name */
 NEARDATA char pl_character[PL_CSIZ] = DUMMY;

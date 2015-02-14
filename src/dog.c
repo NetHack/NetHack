@@ -443,15 +443,6 @@ boolean with_you;
 		}
 		corpse = mkcorpstat(CORPSE, (struct monst *)0, mtmp->data,
 				xlocale, ylocale, CORPSTAT_NONE);
-#ifndef GOLDOBJ
-		if (mtmp->mgold) {
-		    if (xlocale == 0 && ylocale == 0 && corpse) {
-			(void) get_obj_location(corpse, &xlocale, &ylocale, 0);
-			(void) mkgold(mtmp->mgold, xlocale, ylocale);
-		    }
-		    mtmp->mgold = 0L;
-		}
-#endif
 		mongone(mtmp);
 	    }
 	}

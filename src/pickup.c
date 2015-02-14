@@ -12,13 +12,8 @@
 #define CONTAINED_SYM	'>'	/* from invent.c */
 
 STATIC_DCL void FDECL(simple_look, (struct obj *,BOOLEAN_P));
-#ifndef GOLDOBJ
-STATIC_DCL boolean FDECL(query_classes, (char *,boolean *,boolean *,
-		const char *,struct obj *,BOOLEAN_P,BOOLEAN_P,int *));
-#else
 STATIC_DCL boolean FDECL(query_classes, (char *,boolean *,boolean *,
 		const char *,struct obj *,BOOLEAN_P,int *));
-#endif
 STATIC_DCL boolean FDECL(fatal_corpse_mistake, (struct obj *,BOOLEAN_P));
 STATIC_DCL void FDECL(check_here, (BOOLEAN_P));
 STATIC_DCL boolean FDECL(n_or_more, (struct obj *));
@@ -101,15 +96,6 @@ boolean here;		/* flag for type of obj list linkage */
 	}
 }
 
-#ifndef GOLDOBJ
-int
-collect_obj_classes(ilets, otmp, here, incl_gold, filter, itemcount)
-char ilets[];
-register struct obj *otmp;
-boolean here, incl_gold;
-boolean FDECL((*filter),(OBJ_P));
-int *itemcount;
-#else
 int
 collect_obj_classes(ilets, otmp, here, filter, itemcount)
 char ilets[];
@@ -117,16 +103,11 @@ register struct obj *otmp;
 boolean here;
 boolean FDECL((*filter),(OBJ_P));
 int *itemcount;
-#endif
 {
 	register int iletct = 0;
 	register char c;
 
 	*itemcount = 0;
-#ifndef GOLDOBJ
-	if (incl_gold)
-	    ilets[iletct++] = def_oc_syms[COIN_CLASS].sym;
-#endif
 	ilets[iletct] = '\0'; /* terminate ilets so that index() will work */
 	while (otmp) {
 	    c = def_oc_syms[(int)otmp->oclass].sym;
@@ -151,17 +132,6 @@ int *itemcount;
  *	"?/a" or "a?/" or "/a?",&c picks all '?' even though no '/'
  *	    (ie, treated as if it had just been "?a").
  */
-#ifndef GOLDOBJ
-STATIC_OVL boolean
-query_classes(oclasses, one_at_a_time, everything, action, objs,
-	      here, incl_gold, menu_on_demand)
-char oclasses[];
-boolean *one_at_a_time, *everything;
-const char *action;
-struct obj *objs;
-boolean here, incl_gold;
-int *menu_on_demand;
-#else
 STATIC_OVL boolean
 query_classes(oclasses, one_at_a_time, everything, action, objs,
 	      here, menu_on_demand)
@@ -171,7 +141,6 @@ const char *action;
 struct obj *objs;
 boolean here;
 int *menu_on_demand;
-#endif
 {
 	char ilets[20], inbuf[BUFSZ];
 	int iletct, oclassct;
@@ -183,9 +152,6 @@ int *menu_on_demand;
 	oclasses[oclassct = 0] = '\0';
 	*one_at_a_time = *everything = m_seen = FALSE;
 	iletct = collect_obj_classes(ilets, objs, here,
-#ifndef GOLDOBJ
-				     incl_gold,
-#endif
 				     (boolean FDECL((*),(OBJ_P))) 0, &itemcount);
 	if (iletct == 0) {
 		return FALSE;
@@ -578,9 +544,6 @@ menu_pickup:
 		if (!query_classes(oclasses, &selective, &all_of_a_type,
 				   "pick up", objchain,
 				   traverse_how == BY_NEXTHERE,
-#ifndef GOLDOBJ
-				   FALSE,
-#endif
 				   &via_menu)) {
 		    if (!via_menu) return (0);
 		    n = query_objlist("Pick up what?",
@@ -1096,11 +1059,7 @@ int *wt_before, *wt_after;
 
     savequan = obj->quan;
     saveowt = obj->owt;
-#ifndef GOLDOBJ
-    umoney = u.ugold;
-#else
     umoney = money_cnt(invent);
-#endif
     iw = max_capacity();
 
     if (count != savequan) {
@@ -1324,53 +1283,6 @@ boolean telekinesis;	/* not picking it up directly by hand */
 	    return 0;
 	} else if (obj->oartifact && !touch_artifact(obj,&youmonst)) {
 	    return 0;
-#ifndef GOLDOBJ
-	} else if (obj->oclass == COIN_CLASS) {
-	    /* Special consideration for gold pieces... */
-	    long iw = (long)max_capacity() - GOLD_WT(u.ugold);
-	    long gold_capacity = GOLD_CAPACITY(iw, u.ugold);
-	    const char *where = (obj->ox == u.ux && obj->oy == u.uy) ?
-				"here" : "there";
-
-	    if (gold_capacity <= 0L) {
-		pline(
-	       "There %s %ld gold piece%s %s, but you cannot carry any more.",
-		      otense(obj, "are"),
-		      obj->quan, plur(obj->quan), where);
-		return 0;
-	    } else if (gold_capacity < count) {
-		You("can only %s %s of the %ld gold pieces lying %s.",
-		    telekinesis ? "acquire" : "carry",
-		    gold_capacity == 1L ? "one" : "some", obj->quan, where);
-		pline("%s %ld gold piece%s.",
-		    nearloadmsg, gold_capacity, plur(gold_capacity));
-		u.ugold += gold_capacity;
-		obj->quan -= gold_capacity;
-		costly_gold(obj->ox, obj->oy, gold_capacity);
-	    } else {
-		u.ugold += count;
-		if (count == obj->quan)
-		    /* costly_gold() can trigger --More-- prompt, so
-		       take gold off map before messages in order to
-		       prevent hangup save there from duplicating it */
-		    obj_extract_self(obj);	/* remove from floor */
-		else
-		    obj->quan -= count;
-		if ((nearload = near_capacity()) != 0)
-		    pline("%s %ld gold piece%s.",
-			  nearload < MOD_ENCUMBER ?
-			  moderateloadmsg : nearloadmsg,
-			  count, plur(count));
-		else
-		    prinv((char *) 0, obj, count);
-		costly_gold(obj->ox, obj->oy, count);
-		if (obj->where == OBJ_FREE)
-		    delobj(obj);
-	    }
-	    context.botl = 1;
-	    if (context.run) nomul(0);
-	    return 1;
-#endif
 	} else if (obj->otyp == CORPSE) {
 	    if (fatal_corpse_mistake(obj, telekinesis) ||
 		    rider_corpse_revival(obj, telekinesis))
@@ -1395,10 +1307,8 @@ boolean telekinesis;	/* not picking it up directly by hand */
 	if ((res = lift_object(obj, (struct obj *)0, &count, telekinesis)) <= 0)
 	    return res;
 
-#ifdef GOLDOBJ
         /* Whats left of the special case for gold :-) */
 	if (obj->oclass == COIN_CLASS) context.botl = 1;
-#endif
 	if (obj->quan != count && obj->otyp != LOADSTONE)
 	    obj = splitobj(obj, count);
 
@@ -1417,8 +1327,6 @@ boolean telekinesis;	/* not picking it up directly by hand */
  * and putting it in the hero's inventory.  Take care of billing.  Return a
  * pointer to the object where otmp ends up.  This may be different
  * from otmp because of merging.
- *
- * Gold never reaches this routine unless GOLDOBJ is defined.
  */
 struct obj *
 pick_obj(otmp)
@@ -1703,12 +1611,6 @@ reverse_loot()
 	return FALSE;
     }
 
-#ifndef GOLDOBJ
-    if (u.ugold) {
-	contribution = ((long)rnd(5) * u.ugold + 4L) / 5L;
-	goldob = mkgoldobj(contribution);
-    }
-#else
     /* find a money object to mess with */
     for (goldob = invent; goldob; goldob = goldob->nobj)
 	if (goldob->oclass == COIN_CLASS) {
@@ -1717,7 +1619,6 @@ reverse_loot()
 		goldob = splitobj(goldob, contribution);
 	    break;
 	}
-#endif
     if (!goldob) return FALSE;
 
     if (!IS_THRONE(levl[x][y].typ)) {
@@ -1738,9 +1639,7 @@ reverse_loot()
 
 	if (coffers) {
 	    verbalize("Thank you for your contribution to reduce the debt.");
-#ifdef GOLDOBJ
 	    freeinv(goldob);
-#endif
 	    (void)add_to_container(coffers, goldob);
 	    coffers->owt = weight(coffers);
 	    coffers->cknown = 0;
@@ -1749,13 +1648,8 @@ reverse_loot()
 		(void)boxlock(coffers, &boxdummy);
 	    }
 	} else if ((mon = makemon(courtmon(), x, y, NO_MM_FLAGS)) != 0) {
-#ifndef GOLDOBJ
-	    mon->mgold += goldob->quan;
-	    delobj(goldob);
-#else
 	    freeinv(goldob);
 	    add_to_minv(mon, goldob);
-#endif
 	    pline("The exchequer accepts your contribution.");
 	} else {
 	    You("drop %s.", doname(goldob));
@@ -2048,9 +1942,6 @@ register struct obj *obj;
 	      otmp, count);
 
 	if (is_gold) {
-#ifndef GOLDOBJ
-		dealloc_obj(obj);
-#endif
 		bot();	/* update character's gold piece count immediately */
 	}
 	return 1;
@@ -2167,9 +2058,6 @@ struct obj **objp;
 int held;
 {
 	struct obj *curr, *otmp, *obj = *objp;
-#ifndef GOLDOBJ
-	struct obj *u_gold = (struct obj *)0;
-#endif
 	boolean quantum_cat, cursed_mbag,
 		loot_out, loot_in, loot_in_first, stash_one,
 		inokay, outokay, outmaybe;
@@ -2233,9 +2121,6 @@ int held;
 	}
 	inokay = (invent != 0 &&
 		  !(invent == current_container && !current_container->nobj));
-#ifndef GOLDOBJ
-	if (u.ugold) inokay = TRUE;
-#endif
 	outokay = Has_contents(current_container);
 	if (!outokay)	/* preformat the empty-container message */
 	    Sprintf(emptymsg, "%s is %sempty.",
@@ -2330,11 +2215,6 @@ int held;
 	    }
 	}
 
-#ifndef GOLDOBJ
-	/* if putting in, place gold where inventory traversal will see it */
-	if ((loot_in || stash_one) && u.ugold)
-	    u_gold = insert_gold_into_invent(TRUE);
-#endif
 	if ((loot_in || stash_one) &&
 		(!invent || (invent == current_container && !invent->nobj))) {
 	    You("don't have anything%s to %s.",
@@ -2369,11 +2249,6 @@ int held;
 	}
 	/* putting something in might have triggered magic bag explosion */
 	if (!current_container) loot_out = FALSE;
-
-#ifndef GOLDOBJ
-	/* if we put gold into inventory above, take it back out now */
-	if (u_gold) remove_gold_from_invent();
-#endif
 
 	/* out after in */
 	if (loot_out && loot_in_first) {
@@ -2432,9 +2307,6 @@ boolean put_in;
 
     if (query_classes(selection, &one_by_one, &allflag,
 		      action, *objlist, FALSE,
-#ifndef GOLDOBJ
-		      put_in ? (boolean)(u.ugold != 0L) : FALSE,
-#endif
 		      &menu_on_request)) {
 	    if (askchain(objlist, (one_by_one ? (char *)0 : selection),
 			 allflag, actionfunc, checkfunc, 0, action))

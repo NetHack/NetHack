@@ -1037,9 +1037,7 @@ register struct obj *otmp;
 {
 	int old_light = 0;
 
-#ifdef GOLDOBJ
 	if (otmp->oclass == COIN_CLASS) return;
-#endif
 	if (otmp->lamplit) old_light = arti_light_radius(otmp);
 	otmp->cursed = 0;
 	otmp->blessed = 1;
@@ -1074,9 +1072,7 @@ register struct obj *otmp;
 {
 	int old_light = 0;
 
-#ifdef GOLDOBJ
 	if (otmp->oclass == COIN_CLASS) return;
-#endif
 	if (otmp->lamplit) old_light = arti_light_radius(otmp);
 	otmp->blessed = 0;
 	otmp->cursed = 1;
@@ -1351,10 +1347,6 @@ struct monst *mtmp;
 		mtmp2->data     = (struct permonst *)0;
 		mtmp2->minvent  = (struct obj *)0;
 		if (mtmp->mextra) copy_mextra(mtmp2, mtmp);
-#ifndef GOLDOBJ
-		/* not a pointer but is discarded along with minvent */
-		mtmp2->mgold	= 0L;
-#endif
 	}
 	return obj;
 }

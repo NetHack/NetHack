@@ -229,16 +229,6 @@ int x, y;
 		else
 			place_object(otmp, x, y);
 	}
-#ifndef GOLDOBJ
-	if(u.ugold) {
-		long ugold = u.ugold;
-
-		if (mtmp) mtmp->mgold = ugold;
-		else if (cont) (void) add_to_container(cont, mkgoldobj(ugold));
-		else (void)mkgold(ugold, x, y);
-		u.ugold = ugold;	/* undo mkgoldobj()'s removal */
-	}
-#endif
 	if (cont) cont->owt = weight(cont);
 }
 

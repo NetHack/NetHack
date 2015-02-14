@@ -180,9 +180,7 @@ E NEARDATA struct kinfo {
     char	name[BUFSZ];		/* actual killer name */
 } killer;
 
-#ifdef GOLDOBJ
 E long done_money;
-#endif
 E const char *configfile;
 E NEARDATA char plname[PL_NSIZ];
 E NEARDATA char dogname[];

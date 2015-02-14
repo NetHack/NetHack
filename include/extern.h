@@ -803,9 +803,7 @@ E int FDECL(calc_capacity, (int));
 E int NDECL(max_capacity);
 E boolean FDECL(check_capacity, (const char *));
 E int FDECL(inv_cnt, (BOOLEAN_P));
-#ifdef GOLDOBJ
 E long FDECL(money_cnt, (struct obj *));
-#endif
 
 /* ### hacklib.c ### */
 
@@ -900,11 +898,6 @@ E boolean FDECL(obj_here, (struct obj *,int,int));
 E boolean NDECL(wearing_armor);
 E boolean FDECL(is_worn, (struct obj *));
 E struct obj *FDECL(g_at, (int,int));
-#ifndef GOLDOBJ
-E struct obj *FDECL(mkgoldobj, (long));
-E struct obj *FDECL(insert_gold_into_invent, (BOOLEAN_P));
-E void NDECL(remove_gold_from_invent);
-#endif
 E struct obj *FDECL(getobj, (const char *,const char *));
 E int FDECL(ggetobj, (const char *,int (*)(OBJ_P),int,BOOLEAN_P,unsigned *));
 E int FDECL(askchain, (struct obj **,const char *,int,int (*)(OBJ_P),
@@ -1076,9 +1069,7 @@ E void FDECL(freemcorpsenm, (struct monst *));
 E void FDECL(set_mimic_sym, (struct monst *));
 E int FDECL(mbirth_limit, (int));
 E void FDECL(mimic_hit_msg, (struct monst *, SHORT_P));
-#ifdef GOLDOBJ
 E void FDECL(mkmonmoney, (struct monst *, long));
-#endif
 E int FDECL(bagotricks, (struct obj *,BOOLEAN_P,int *));
 E boolean FDECL(propagate, (int, BOOLEAN_P,BOOLEAN_P));
 E boolean FDECL(usmellmon, (struct permonst *));
@@ -1679,13 +1670,8 @@ E void NDECL(getlock);
 
 /* ### pickup.c ### */
 
-#ifdef GOLDOBJ
 E int FDECL(collect_obj_classes,
 	(char *,struct obj *,BOOLEAN_P,boolean FDECL((*),(OBJ_P)), int *));
-#else
-E int FDECL(collect_obj_classes,
-	(char *,struct obj *,BOOLEAN_P,BOOLEAN_P,boolean FDECL((*),(OBJ_P)), int *));
-#endif
 E boolean FDECL(rider_corpse_revival, (struct obj *,BOOLEAN_P));
 E void FDECL(add_valid_menu_class, (int));
 E boolean FDECL(allow_all, (struct obj *));
@@ -1926,9 +1912,6 @@ E int FDECL(validate, (int,const char *));
 E void NDECL(reset_restpref);
 E void FDECL(set_restpref, (const char *));
 E void FDECL(set_savepref, (const char *));
-#ifndef GOLDOBJ
-E void FDECL(put_gold_back, (struct monst *));
-#endif
 
 /* ### rip.c ### */
 
@@ -2019,10 +2002,8 @@ E void FDECL(store_savefileinfo, (int));
 
 /* ### shk.c ### */
 
-#ifdef GOLDOBJ
 E long FDECL(money2mon, (struct monst *, long));
 E void FDECL(money2u, (struct monst *, long));
-#endif
 E void FDECL(shkgone, (struct monst *));
 E void FDECL(set_residency, (struct monst *,BOOLEAN_P));
 E void FDECL(replshk, (struct monst *,struct monst *));
@@ -2155,11 +2136,7 @@ E void FDECL(initialspell, (struct obj *));
 #ifdef USE_TRAMPOLI
 E int NDECL(stealarm);
 #endif
-#ifdef GOLDOBJ
 E long FDECL(somegold, (long));
-#else
-E long NDECL(somegold);
-#endif
 E void FDECL(stealgold, (struct monst *));
 E void FDECL(remove_worn_item, (struct obj *,BOOLEAN_P));
 E int FDECL(steal, (struct monst *, char *));
@@ -2169,9 +2146,7 @@ E void FDECL(maybe_absorb_item, (struct monst *,struct obj *,int,int));
 E void FDECL(mdrop_obj, (struct monst *,struct obj *,BOOLEAN_P));
 E void FDECL(mdrop_special_objs, (struct monst *));
 E void FDECL(relobj, (struct monst *,int,BOOLEAN_P));
-#ifdef GOLDOBJ
 E struct obj *FDECL(findgold, (struct obj *));
-#endif
 
 /* ### steed.c ### */
 

@@ -909,12 +909,7 @@ char *op;
     char *sp, buf[BUFSZ];
 
     num = 0;
-#ifndef GOLDOBJ
-    if (!index(op, GOLD_SYM))
-	buf[num++] = COIN_CLASS;
-#else
     /*  !!!! probably unnecessary with gold as normal inventory */
-#endif
 
     for (sp = op; *sp; sp++) {
 	oc_sym = def_char_to_objclass(*sp);

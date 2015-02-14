@@ -436,11 +436,7 @@ struct monst *mtmp;
 	mstatusline(mtmp);
 	if (notonhead) return;	/* don't show minvent for long worm tail */
 
-#ifndef GOLDOBJ
-	if (mtmp->minvent || mtmp->mgold) {
-#else
 	if (mtmp->minvent) {
-#endif
 	    for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj) {
 		otmp->dknown = 1;	/* treat as "seen" */
 		if (Is_container(otmp) || otmp->otyp == STATUE) {
@@ -3661,9 +3657,6 @@ const char *fltxt;
 	    obfree(otmp, (struct obj *)0);
 	}
     }
-#ifndef GOLDOBJ
-    mon->mgold = 0L;
-#endif
 
 #undef oresist_disintegration
 

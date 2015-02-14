@@ -28,11 +28,7 @@ static NEARDATA const char drop_types[] =
 int
 dodrop()
 {
-#ifndef GOLDOBJ
-	int result, i = (invent || u.ugold) ? 0 : (SIZE(drop_types) - 1);
-#else
 	int result, i = (invent) ? 0 : (SIZE(drop_types) - 1);
-#endif
 
 	if (*u.ushops) sellobj_state(SELL_DELIBERATE);
 	result = drop(getobj(&drop_types[i], "drop"));
@@ -484,13 +480,9 @@ register struct obj *obj;
 
 		if (levhack) ELevitation = W_ART; /* other than W_ARTI */
 		if(flags.verbose) You("drop %s.", doname(obj));
-#ifndef GOLDOBJ
-		if (obj->oclass != COIN_CLASS || obj == invent) freeinv(obj);
-#else
 		/* Ensure update when we drop gold objects */
 		if (obj->oclass == COIN_CLASS) context.botl = 1;
 		freeinv(obj);
-#endif
 		hitfloor(obj);
 		if (levhack) float_down(I_SPECIAL|TIMEOUT, W_ARTI|W_ART);
 		return(1);
@@ -509,13 +501,9 @@ void
 dropx(obj)
 register struct obj *obj;
 {
-#ifndef GOLDOBJ
-	if (obj->oclass != COIN_CLASS || obj == invent) freeinv(obj);
-#else
         /* Ensure update when we drop gold objects */
         if (obj->oclass == COIN_CLASS) context.botl = 1;
         freeinv(obj);
-#endif
 	if (!u.uswallow) {
 	    if (ship_object(obj, u.ux, u.uy, FALSE)) return;
 	    if (IS_ALTAR(levl[u.ux][u.uy].typ))
@@ -653,17 +641,10 @@ int retry;
     int n, i, n_dropped = 0;
     long cnt;
     struct obj *otmp, *otmp2;
-#ifndef GOLDOBJ
-    struct obj *u_gold = 0;
-#endif
     menu_item *pick_list;
     boolean all_categories = TRUE;
     boolean drop_everything = FALSE;
 
-#ifndef GOLDOBJ
-    /* put gold where inventory traversal will see it */
-    if (u.ugold) u_gold = insert_gold_into_invent(TRUE);
-#endif
     if (retry) {
 	all_categories = (retry == -2);
     } else if (flags.menu_style == MENU_FULL) {
@@ -749,11 +730,6 @@ int retry;
 			/* same kludge as getobj(), for canletgo()'s use */
 			otmp->corpsenm = (int) cnt;	/* don't split */
 		    } else {
-#ifndef GOLDOBJ
-			if (otmp->oclass == COIN_CLASS)
-			    (void) splitobj(otmp, otmp->quan - cnt);
-			else
-#endif
 			    otmp = splitobj(otmp, cnt);
 		    }
 		}
@@ -765,10 +741,6 @@ int retry;
     }
 
  drop_done:
-#ifndef GOLDOBJ
-    /* if we put gold into inventory above, take it back out now */
-    if (u_gold) remove_gold_from_invent();
-#endif
     return n_dropped;
 }
 

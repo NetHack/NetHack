@@ -874,11 +874,7 @@ register struct monst *mtmp;
 	    else verbl_msg = "Relax, this won't hurt a bit.";
 	    break;
 	case MS_GUARD:
-#ifndef GOLDOBJ
-	    if (u.ugold)
-#else
 	    if (money_cnt(invent))
-#endif
 		verbl_msg = "Please drop that gold and follow me.";
 	    else
 		verbl_msg = "Please follow me.";

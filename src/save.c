@@ -307,9 +307,6 @@ register int fd, mode;
 #ifdef SYSFLAGS
 	bwrite(fd, (genericptr_t) &sysflags, sizeof(struct sysflag));
 #endif
-#ifndef GOLDOBJ		/* GOLDOBJ-compatibility */
-	if (u.ugold) (void)insert_gold_into_invent(FALSE);
-#endif
 	bwrite(fd, (genericptr_t) &u, sizeof(struct you));
 	bwrite(fd, yyyymmddhhmmss(ubirthday), 14);
 	save_killers(fd, mode);
@@ -319,9 +316,6 @@ register int fd, mode;
 	save_light_sources(fd, mode, RANGE_GLOBAL);
 
 	saveobjchn(fd, invent, mode);
-#ifndef GOLDOBJ		/* GOLDOBJ-compatibility */
-	if (!release_data(mode)) remove_gold_from_invent();
-#endif
 	if (BALL_IN_MON) {
 		/* prevent loss of ball & chain when swallowed */
 		uball->nobj = uchain;
@@ -1123,22 +1117,10 @@ register struct monst *mtmp;
 	    if (perform_bwrite(mode)) {
 		mtmp->mnum = monsndx(mtmp->data);
 		if (mtmp->ispriest) forget_temple_entry(mtmp);	/* EPRI() */
-#ifndef GOLDOBJ		/* GOLDOBJ-compatibility */
-		if (mtmp->mgold) {
-			struct obj *goldobj = mksobj(GOLD_PIECE, FALSE, FALSE);
-
-			goldobj->quan = mtmp->mgold;
-			mtmp->mgold = 0L;
-			add_to_minv(mtmp, goldobj);
-		}
-#endif
 		savemon(fd, mtmp);
 	    }
 	    if (mtmp->minvent)
 		saveobjchn(fd,mtmp->minvent,mode);
-#ifndef GOLDOBJ		/* GOLDOBJ-compatibility */
-	    if (!release_data(mode)) put_gold_back(mtmp);
-#endif
 	    if (release_data(mode))
 		dealloc_monst(mtmp);
 	    mtmp = mtmp2;

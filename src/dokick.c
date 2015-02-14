@@ -322,11 +322,7 @@ register struct obj *gold;
 			    verbalize("Thank you for your contribution.");
 			else verbalize("Thanks, scum!");
 		} else if (mtmp->isgd) {
-#ifndef GOLDOBJ
-			umoney = u.ugold;
-#else
 			umoney = money_cnt(invent);
-#endif
 			/* Some of these are iffy, because a hostile guard
 			   won't become peaceful and resume leading hero
 			   out of the vault.  If he did do that, player
@@ -352,11 +348,7 @@ register struct obj *gold;
 			   goldreqd = 750L;
 
 			if (goldreqd) {
-#ifndef GOLDOBJ
-			    umoney = u.ugold;
-#else
 			    umoney = money_cnt(invent);
-#endif
 			    if (value > goldreqd +
 				  (umoney + u.ulevel * rn2(5)) / ACURR(A_CHA))
 				mtmp->mpeaceful = TRUE;

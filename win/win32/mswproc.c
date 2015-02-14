@@ -1796,11 +1796,7 @@ void mswin_outrip(winid wid, int how, time_t when)
 	putstr(wid, 0, buf);
 
 	/* Put $ on stone */
-#ifndef GOLDOBJ
-	Sprintf(buf, "%ld Au", u.ugold);
-#else
 	Sprintf(buf, "%ld Au", done_money);
-#endif
 	buf[STONE_LINE_LEN] = 0; /* It could be a *lot* of gold :-) */
 	putstr(wid, 0, buf);
 
