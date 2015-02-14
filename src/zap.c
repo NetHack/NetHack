@@ -26,9 +26,7 @@ STATIC_DCL int FDECL(stone_to_flesh_obj, (struct obj *));
 STATIC_DCL boolean FDECL(zap_updown, (struct obj *));
 STATIC_DCL void FDECL(zhitu, (int,int,const char *,XCHAR_P,XCHAR_P));
 STATIC_DCL void FDECL(revive_egg, (struct obj *));
-#ifdef STEED
 STATIC_DCL boolean FDECL(zap_steed, (struct obj *));
-#endif
 STATIC_DCL void FDECL(skiprange, (int,int *,int *));
 
 STATIC_DCL int FDECL(zap_hit, (int,int));
@@ -300,7 +298,6 @@ struct obj *otmp;
 		} else if (openfallingtrap(mtmp, TRUE, &learn_it)) {
 			/* mtmp might now be on the migrating monsters list */
 			break;
-#ifdef STEED
 		} else if ((obj = which_armor(mtmp, W_SADDLE)) != 0) {
 			char buf[BUFSZ];
 
@@ -316,7 +313,6 @@ struct obj *otmp;
 			}
 			obj_extract_self(obj);
 			mdrop_obj(mtmp, obj, FALSE);
-#endif /* STEED */
 		}
 		break;
 	case SPE_HEALING:
@@ -2433,7 +2429,6 @@ long duration;
 	return FALSE;
 }
 
-#ifdef STEED
 /* you've zapped a wand downwards while riding
  * Return TRUE if the steed was hit by the wand.
  * Return FALSE if the steed was not hit by the wand.
@@ -2495,7 +2490,6 @@ struct obj *obj;	/* wand or spell */
 	}
 	return steedhit;
 }
-#endif
 
 /*
  * cancel a monster (possibly the hero).  inventory is cancelled only
@@ -2772,13 +2766,10 @@ struct	obj	*obj;
 	boolean disclose = FALSE, was_unkn = !objects[otyp].oc_name_known;
 
 	exercise(A_WIS, TRUE);
-#ifdef STEED
 	if (u.usteed && (objects[otyp].oc_dir != NODIR) &&
 	    !u.dx && !u.dy && (u.dz > 0) && zap_steed(obj)) {
 		disclose = TRUE;
-	} else
-#endif
-	if (objects[otyp].oc_dir == IMMEDIATE) {
+	} else if (objects[otyp].oc_dir == IMMEDIATE) {
 	    zapsetup();		/* reset obj_zapped */
 	    if (u.uswallow) {
 		(void) bhitm(u.ustuck, obj);
@@ -3769,9 +3760,7 @@ register int dx,dy;
 	if (mon) {
 	    if (type == ZT_SPELL(ZT_FIRE)) break;
 	    if (type >= 0) mon->mstrategy &= ~STRAT_WAITMASK;
-#ifdef STEED
 	    buzzmonst:
-#endif
 	    if (zap_hit(find_mac(mon), spell_type)) {
 		if (mon_reflects(mon, (char *)0)) {
 		    if(cansee(mon->mx,mon->my)) {
@@ -3838,13 +3827,10 @@ register int dx,dy;
 	    }
 	} else if (sx == u.ux && sy == u.uy && range >= 0) {
 	    nomul(0);
-#ifdef STEED
 	    if (u.usteed && !rn2(3) && !mon_reflects(u.usteed, (char *)0)) {
 		    mon = u.usteed;
 		    goto buzzmonst;
-	    } else
-#endif
-	    if (zap_hit((int) u.uac, 0)) {
+	    } else if (zap_hit((int) u.uac, 0)) {
 		range -= 2;
 		pline("%s hits you!", The(fltxt));
 		if (Reflecting) {

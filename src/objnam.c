@@ -772,11 +772,7 @@ plus:
 		/* weptools already get this done when we go to the +n code */
 		if (!is_weptool(obj))
 		    add_erosion_words(obj, prefix);
-		if(obj->owornmask & (W_TOOL /* blindfold */
-#ifdef STEED
-				| W_SADDLE
-#endif
-				)) {
+		if(obj->owornmask & (W_TOOL /* blindfold */ | W_SADDLE)) {
 			Strcat(bp, " (being worn)");
 			break;
 		}

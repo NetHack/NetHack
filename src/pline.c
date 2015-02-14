@@ -401,9 +401,7 @@ register struct monst *mtmp;
 					       ", digesting you" :
 		   is_animal(u.ustuck->data) ? ", swallowing you" :
 					       ", engulfing you");
-#ifdef STEED
 	if (mtmp == u.usteed)	  Strcat(info, ", carrying you");
-#endif
 
 	/* avoid "Status of the invisible newt ..., invisible" */
 	/* and unlike a normal mon_nam, use "saddled" even if it has a name */
@@ -451,10 +449,7 @@ ustatusline()
 	    }	/* note: "goop" == "glop"; variation is intentional */
 	}
 	if (Stunned)		Strcat(info, ", stunned");
-#ifdef STEED
-	if (!u.usteed)
-#endif
-	if (Wounded_legs) {
+	if (!u.usteed && Wounded_legs) {
 	    const char *what = body_part(LEG);
 	    if ((Wounded_legs & BOTH_SIDES) == BOTH_SIDES)
 		what = makeplural(what);

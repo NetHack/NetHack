@@ -118,12 +118,10 @@ boolean resuming;
 			(void) makemon((struct permonst *)0, 0, 0, NO_MM_FLAGS);
 
 		    /* calculate how much time passed. */
-#ifdef STEED
 		    if (u.usteed && u.umoved) {
 			/* your speed doesn't augment steed's speed */
 			moveamt = mcalcmove(u.usteed);
 		    } else
-#endif
 		    {
 			moveamt = youmonst.data->mmove;
 

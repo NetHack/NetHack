@@ -236,12 +236,10 @@ nh_timeout()
 	    }
 	}
 
-#ifdef STEED
 	if (u.ugallop) {
 	    if (--u.ugallop == 0L && u.usteed)
 	    	pline("%s stops galloping.", Monnam(u.usteed));
 	}
-#endif
 
 	for(upp = u.uprops; upp < u.uprops+SIZE(u.uprops); upp++)
 	    if((upp->intrinsic & TIMEOUT) && !(--upp->intrinsic & TIMEOUT)) {
@@ -671,9 +669,7 @@ slip_or_trip()
 	const char *what;
 	char buf[BUFSZ];
 	boolean on_foot = TRUE;
-#ifdef STEED
 	if (u.usteed) on_foot = FALSE;
-#endif
 
 	if (otmp && on_foot && !u.uinwater && is_pool(u.ux, u.uy)) otmp = 0;
 
@@ -707,11 +703,9 @@ slip_or_trip()
 	    }
 	} else if (rn2(3) && is_ice(u.ux, u.uy)) {
 	    pline("%s %s%s on the ice.",
-#ifdef STEED
 		u.usteed ? upstart(x_monnam(u.usteed,
 				(has_mname(u.usteed)) ? ARTICLE_NONE : ARTICLE_THE,
 				(char *)0, SUPPRESS_SADDLE, FALSE)) :
-#endif
 		"You", rn2(2) ? "slip" : "slide", on_foot ? "" : "s");
 	} else {
 	    if (on_foot) {
@@ -732,7 +726,6 @@ slip_or_trip()
 			break;
 		}
 	    }
-#ifdef STEED
 	    else {
 		switch (rn2(4)) {
 		  case 1:
@@ -750,7 +743,6 @@ slip_or_trip()
 		}
 		dismount_steed(DISMOUNT_FELL);
 	    }
-#endif
 	}
 }
 

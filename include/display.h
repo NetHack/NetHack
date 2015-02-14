@@ -198,12 +198,8 @@
  * Display the hero.  It is assumed that all checks necessary to determine
  * _if_ the hero can be seen have already been done.
  */
-#ifdef STEED
 #define maybe_display_usteed	(u.usteed && mon_visible(u.usteed)) ? \
 					ridden_mon_to_glyph(u.usteed) :
-#else
-#define maybe_display_usteed	/* empty */
-#endif
 
 #define display_self()							\
     show_glyph(u.ux, u.uy,						\

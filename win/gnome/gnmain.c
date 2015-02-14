@@ -366,14 +366,12 @@ GnomeUIInfo action_menu[] = {
 	       ghack_accelerator_selected, 
 	       GINT_TO_POINTER(M('j')), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'j',GDK_MOD1_MASK
 	   },
-#ifdef STEED
 	   { 
 	       GNOME_APP_UI_ITEM, N_("Ride"), 
 	       N_("Ride (or stop riding) a monster"),
 	       doride, 
 	       GINT_TO_POINTER(M('r')), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'R',GDK_MOD1_MASK
 	   },
-#endif
 	   { 
 	       GNOME_APP_UI_ITEM, N_("Wipe face"), 
 	       N_("wipe off your face"),

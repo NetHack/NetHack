@@ -1516,11 +1516,9 @@ boolean looting;	/* loot vs tip */
 	const char *verb = looting ? "loot" : "tip";
 
 	if (!can_reach_floor(TRUE)) {
-#ifdef STEED
 		if (u.usteed && P_SKILL(P_RIDING) < P_BASIC)
 			rider_cant_reach(); /* not skilled enough to reach */
 		else
-#endif
 			cant_reach_floor(x, y, FALSE, TRUE);
 		return FALSE;
 	} else if ((is_pool(x, y) && (looting || !Underwater)) ||
@@ -1777,7 +1775,6 @@ boolean *prev_loot;
 {
     int c = -1;
     int timepassed = 0;
-#ifdef STEED
     struct obj *otmp;
     char qbuf[QBUFSZ];
 
@@ -1816,7 +1813,6 @@ boolean *prev_loot;
 		return (0);
 	}
     }
-#endif	/* STEED */
     /* 3.4.0 introduced the ability to pick things up from within swallower's stomach */
     if (u.uswallow) {
 	int count = passed_info ? *passed_info : 0;

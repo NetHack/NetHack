@@ -250,13 +250,11 @@ dig(VOID_ARGS)
 		    You("fumble and drop %s.", yname(uwep));
 		    dropx(uwep);
 		} else {
-#ifdef STEED
 		    if (u.usteed)
 			pline("%s and %s %s!",
 			      Yobjnam2(uwep, "bounce"), otense(uwep, "hit"),
 			      mon_nam(u.usteed));
 		    else
-#endif
 			pline("Ouch!  %s and %s you!",
 			      Yobjnam2(uwep, "bounce"), otense(uwep, "hit"));
 		    set_wounded_legs(RIGHT_SIDE, 5 + rnd(5));

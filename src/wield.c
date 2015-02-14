@@ -106,10 +106,7 @@ register struct obj *obj;
 		unweapon = (obj->oclass == WEAPON_CLASS) ?
 				is_launcher(obj) || is_ammo(obj) ||
 				is_missile(obj) || (is_pole(obj)
-#ifdef STEED
-				&& !u.usteed
-#endif
-				) : !is_weptool(obj);
+				&& !u.usteed) : !is_weptool(obj);
 	} else
 		unweapon = TRUE;	/* for "bare hands" message */
 	update_inventory();
@@ -288,11 +285,7 @@ dowield()
 		return (doswapweapon());
 	else if (wep == uquiver)
 		setuqwep((struct obj *) 0);
-	else if (wep->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL
-#ifdef STEED
-			| W_SADDLE
-#endif
-			)) {
+	else if (wep->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL | W_SADDLE)) {
 		You("cannot wield that!");
 		return (0);
 	}
@@ -392,10 +385,7 @@ dowieldquiver()
 		      !is_plural(uwep) ? "That is" : "They are");
 		return(0);
 	} else if (newquiver->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL
-#ifdef STEED
-			| W_SADDLE
-#endif
-			)) {
+			| W_SADDLE)) {
 		You("cannot ready that!");
 		return (0);
 	} else {

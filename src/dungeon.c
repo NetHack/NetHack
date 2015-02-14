@@ -1148,10 +1148,8 @@ int x, y;
 #ifdef CLIPPING
 	cliparound(u.ux, u.uy);
 #endif
-#ifdef STEED
 	/* ridden steed always shares hero's location */
 	if (u.usteed) u.usteed->mx = u.ux, u.usteed->my = u.uy;
-#endif
 	/* when changing levels, don't leave old position set with
 	   stale values from previous level */
 	if (!on_level(&u.uz, &u.uz0)) u.ux0 = u.ux, u.uy0 = u.uy;

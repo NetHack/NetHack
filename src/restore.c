@@ -516,7 +516,7 @@ STATIC_OVL
 boolean
 restgamestate(fd, stuckid, steedid)
 register int fd;
-unsigned int *stuckid, *steedid;	/* STEED */
+unsigned int *stuckid, *steedid;
 {
 	struct flag newgameflags;
 #ifdef SYSFLAGS
@@ -652,10 +652,8 @@ unsigned int *stuckid, *steedid;	/* STEED */
 	restore_oracles(fd);
 	if (u.ustuck)
 		mread(fd, (genericptr_t) stuckid, sizeof (*stuckid));
-#ifdef STEED
 	if (u.usteed)
 		mread(fd, (genericptr_t) steedid, sizeof (*steedid));
-#endif
 	mread(fd, (genericptr_t) pl_character, sizeof pl_character);
 
 	mread(fd, (genericptr_t) pl_fruit, sizeof pl_fruit);
@@ -676,7 +674,7 @@ unsigned int *stuckid, *steedid;	/* STEED */
  */
 STATIC_OVL void
 restlevelstate(stuckid, steedid)
-unsigned int stuckid, steedid;	/* STEED */
+unsigned int stuckid, steedid;
 {
 	register struct monst *mtmp;
 
@@ -686,7 +684,6 @@ unsigned int stuckid, steedid;	/* STEED */
 		if (!mtmp) panic("Cannot find the monster ustuck.");
 		u.ustuck = mtmp;
 	}
-#ifdef STEED
 	if (steedid) {
 		for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
 			if (mtmp->m_id == steedid) break;
@@ -694,7 +691,6 @@ unsigned int stuckid, steedid;	/* STEED */
 		u.usteed = mtmp;
 		remove_monster(mtmp->mx, mtmp->my);
 	}
-#endif
 }
 
 /*ARGSUSED*/	/* fd used in MFLOPPY only */
@@ -793,9 +789,7 @@ register int fd;
 	 * place_monster() on other levels
 	 */
 	u.ustuck = (struct monst *)0;
-#ifdef STEED
 	u.usteed = (struct monst *)0;
-#endif
 
 #ifdef MICRO
 # ifdef AMII_GRAPHICS

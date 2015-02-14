@@ -82,9 +82,6 @@ struct conditionals {
 	{ OBJ_GLYPH, LOCK_PICK, "credit card" },
 	{ OBJ_GLYPH, MAGIC_LAMP, "expensive camera" },
 #endif
-#ifndef STEED
-	{ OBJ_GLYPH, TOWEL, "saddle" },
-#endif
 	/* allow slime mold to look like slice of pizza, since we
 	 * don't know what a slime mold should look like when renamed anyway
 	 */

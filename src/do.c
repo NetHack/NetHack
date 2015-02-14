@@ -80,11 +80,9 @@ boolean pushing;
 		    char whobuf[BUFSZ];
 
 		    Strcpy(whobuf, "you");
-#ifdef STEED
 		    if (u.usteed) Strcpy(whobuf, y_monnam(u.usteed));
-#endif
-		    pline("%s %s %s into the %s.", upstart(whobuf),
-		          vtense(whobuf, "push"), the(xname(otmp)), what);
+		        pline("%s %s %s into the %s.", upstart(whobuf),
+		              vtense(whobuf, "push"), the(xname(otmp)), what);
 		    if (flags.verbose && !Blind)
 			pline("Now you can cross it!");
 		    /* no splashing in this case */
@@ -434,14 +432,12 @@ register const char *word;
 					body_part(HAND));
 		return(FALSE);
 	}
-#ifdef STEED
 	if (obj->owornmask & W_SADDLE) {
 		if (*word)
 			You("cannot %s %s you are sitting on.", word,
 				something);
 		return (FALSE);
 	}
-#endif
 	return(TRUE);
 }
 
@@ -801,11 +797,9 @@ dodown()
 	    return 1;
 	}
 
-#ifdef STEED
 	if (stucksteed(TRUE)) {
 	    return 0;
 	}
-#endif
 	/* Levitation might be blocked, but player can still use '>' to
 	   turn off controlled levitaiton */
 	if (HLevitation || ELevitation) {
@@ -924,11 +918,9 @@ doup()
 		You_cant("go up here.");
 		return(0);
 	}
-#ifdef STEED
 	if (stucksteed(TRUE)) {
 		return(0);
 	}
-#endif
 	if(u.ustuck) {
 		You("are %s, and cannot go up.",
 			!u.uswallow ? "being held" : is_animal(u.ustuck->data) ?
@@ -1267,12 +1259,10 @@ boolean at_stairs, falling, portal;
 			    freeinv(uball);
 			}
 		    }
-#ifdef STEED
 		    /* falling off steed has its own losehp() call */
 		    if (u.usteed)
 			dismount_steed(DISMOUNT_FELL);
 		    else
-#endif
 			losehp(Maybe_Half_Phys(rnd(3)),
 			       at_ladder ? "falling off a ladder" :
 					   "tumbling down a flight of stairs",
@@ -1305,11 +1295,7 @@ boolean at_stairs, falling, portal;
 
 	initrack();
 
-	if ((mtmp = m_at(u.ux, u.uy)) != 0
-#ifdef STEED
-		&& mtmp != u.usteed
-#endif
-		) {
+	if ((mtmp = m_at(u.ux, u.uy)) != 0 && mtmp != u.usteed) {
 	    /* There's a monster at your target destination; it might be one
 	       which accompanied you--see mon_arrive(dogmove.c)--or perhaps
 	       it was already here.  Randomly move you to an adjacent spot
@@ -1746,9 +1732,7 @@ heal_legs()
 			context.botl = 1;
 		}
 
-#ifdef STEED
 		if (!u.usteed)
-#endif
 		{
 		    const char *legs = body_part(LEG);
 
