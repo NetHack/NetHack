@@ -49,30 +49,15 @@ struct conditionals {
 #ifndef MAIL
 	{ MON_GLYPH, PM_FAMINE, "mail daemon" },
 #endif
-#ifndef TOURIST
-	{ MON_GLYPH, PM_SAMURAI, "tourist" },
-#endif
 	/* commented out in monst.c at present */
 	{ MON_GLYPH, PM_SHAMAN_KARNOV, "Earendil" },
 	{ MON_GLYPH, PM_SHAMAN_KARNOV, "Elwing" },
-#ifndef TOURIST
-	{ MON_GLYPH, PM_LORD_SATO, "Twoflower" },
-#endif
 	/* commented out in monst.c at present */
 	{ MON_GLYPH, PM_CHROMATIC_DRAGON, "Goblin King" },
 	{ MON_GLYPH, PM_NEANDERTHAL, "High-elf" },
-#ifndef TOURIST
-	{ MON_GLYPH, PM_ROSHI, "guide" },
-#endif
 	/* objects commented out in objects.c at present */
 	{ OBJ_GLYPH, SILVER_DRAGON_SCALE_MAIL, "shimmering dragon scale mail" },
 	{ OBJ_GLYPH, SILVER_DRAGON_SCALES, "shimmering dragon scales" },
-#ifndef TOURIST
-	{ OBJ_GLYPH, LEATHER_JACKET, "Hawaiian shirt" },
-	{ OBJ_GLYPH, LEATHER_JACKET, "T-shirt" },
-	{ OBJ_GLYPH, LOCK_PICK, "credit card" },
-	{ OBJ_GLYPH, MAGIC_LAMP, "expensive camera" },
-#endif
 	/* allow slime mold to look like slice of pizza, since we
 	 * don't know what a slime mold should look like when renamed anyway
 	 */

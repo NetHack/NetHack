@@ -814,9 +814,7 @@ int whodidit;	/* 1==hero, 0=other, -1==just check whether it'll pass thru */
 	case TOOL_CLASS:
 		hits = (obj_type != SKELETON_KEY &&
 			obj_type != LOCK_PICK &&
-#ifdef TOURIST
 			obj_type != CREDIT_CARD &&
-#endif
 			obj_type != TALLOW_CANDLE &&
 			obj_type != WAX_CANDLE &&
 			obj_type != LENSES &&

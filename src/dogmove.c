@@ -26,10 +26,6 @@ struct monst *mon;
     struct obj *obj, *wep,
 	       dummy, *pickaxe, *unihorn, *key;
 
-#ifndef TOURIST
-#define CREDIT_CARD STRANGE_OBJECT	/* avoids messy conditionalization */
-#endif
-
 #ifndef GOLDOBJ
     if (mon->mgold) return &zeroobj;	/* pet has something to drop */
 #endif
@@ -110,10 +106,6 @@ struct monst *mon;
 
 	if (!obj->owornmask && obj != wep) return obj;
     }
-
-#ifndef TOURIST
-#undef CREDIT_CARD
-#endif
 
     return (struct obj *)0;	/* don't drop anything */
 }

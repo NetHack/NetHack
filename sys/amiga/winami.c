@@ -579,11 +579,7 @@ amii_player_selection()
 		{
 		    flags.initrole = randrole();
 #if 0	/* OBSOLETE */
-#ifdef  TOURIST
 		    strcpy( pl_character, roles[ rnd( 11 ) ] );
-#else
-		    strcpy( pl_character, roles[ rnd( 10 ) ] );
-#endif
 #endif
 		    aredone = 1;
 		    amii_clear_nhwindow( WIN_BASE );
@@ -608,11 +604,7 @@ amii_player_selection()
 		case 1: /* Random Character */
 		    flags.initrole = randrole();
 #if 0	/* OBSOLETE */
-#ifdef  TOURIST
 		    strcpy( pl_character, roles[ rnd( 11 ) ] );
-#else
-		    strcpy( pl_character, roles[ rnd( 10 ) ] );
-#endif
 #endif
 		    amii_clear_nhwindow( WIN_BASE );
 		    CloseShWindow( cwin );

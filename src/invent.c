@@ -1000,12 +1000,8 @@ register const char *let,*word;
 	    } else {
 
 		/* "ugly check" for reading fortune cookies, part 2 */
-		if ((!strcmp(word, "read") &&
-		    (otmp->otyp == FORTUNE_COOKIE
-#ifdef TOURIST
-			|| otmp->otyp == T_SHIRT
-#endif
-		    )))
+		if ((!strcmp(word, "read")
+              && (otmp->otyp == FORTUNE_COOKIE || otmp->otyp == T_SHIRT)))
 			allowall = TRUE;
 	    }
 	}
@@ -1241,10 +1237,7 @@ boolean
 wearing_armor()
 {
 	return((boolean)(uarm || uarmc || uarmf || uarmg || uarmh || uarms
-#ifdef TOURIST
-		|| uarmu
-#endif
-		));
+		|| uarmu));
 }
 
 boolean
@@ -2745,16 +2738,10 @@ doprarm()
 	if (!wearing_armor()) {
 		noarmor(TRUE);
 	} else {
-#ifdef TOURIST
 		char lets[8];
-#else
-		char lets[7];
-#endif
 		register int ct = 0;
 
-#ifdef TOURIST
 		if(uarmu) lets[ct++] = obj_to_let(uarmu);
-#endif
 		if(uarm) lets[ct++] = obj_to_let(uarm);
 		if(uarmc) lets[ct++] = obj_to_let(uarmc);
 		if(uarmh) lets[ct++] = obj_to_let(uarmh);

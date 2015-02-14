@@ -1775,9 +1775,7 @@ struct obj *obj;
 		obj->oclass != GEM_CLASS)
 	    return 1;
 	switch (obj->oclass == POTION_CLASS ? POT_WATER : obj->otyp) {
-#ifdef TOURIST
 		case EXPENSIVE_CAMERA:
-#endif
 		case POT_WATER:		/* really, all potions */
 		case EGG:
 		case CREAM_PIE:
@@ -1806,9 +1804,7 @@ boolean in_view;
 		case LENSES:
 		case MIRROR:
 		case CRYSTAL_BALL:
-#ifdef TOURIST
 		case EXPENSIVE_CAMERA:
-#endif
 			to_pieces = " into a thousand pieces";
 			/*FALLTHRU*/
 		case POT_WATER:		/* really, all potions */

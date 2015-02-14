@@ -423,7 +423,6 @@ typedef unsigned char	uchar;
 #define REINCARNATION	/* Special Rogue-like levels */
 /* monsters & objects */
 #define SEDUCE		/* Succubi/incubi seduction, by KAA, suggested by IM */
-#define TOURIST		/* Tourist players with cameras and Hawaiian shirts */
 /* I/O */
 #define REDO		/* support for redoing last command - DGK */
 #if !defined(MAC)

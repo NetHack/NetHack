@@ -1687,11 +1687,7 @@ long *abil;
 	long wornbits;
 	long wornmask = (W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF |
 			 W_WEP | W_QUIVER | W_SWAPWEP | W_ART | W_ARTI | W_AMUL |
-			 W_RINGL | W_RINGR | W_TOOL | W_BALL | W_CHAIN | W_SADDLE
-#ifdef TOURIST
-			 | W_ARMU
-#endif
-			);
+			 W_RINGL | W_RINGR | W_TOOL | W_BALL | W_CHAIN | W_SADDLE | W_ARMU);
 
 	dtyp = abil_to_adtyp(abil);
 	spfx = abil_to_spfx(abil);

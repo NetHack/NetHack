@@ -78,11 +78,9 @@ struct monst *victim;
 		(void) burn_dmg(item, xname(item));
 		return TRUE;
 	    }
-#ifdef TOURIST
 	    item = (victim == &youmonst) ? uarmu : which_armor(victim, W_ARMU);
 	    if (item)
 		(void) burn_dmg(item, "shirt");
-#endif
 	    return TRUE;
 	case 2:
 	    item = (victim == &youmonst) ? uarms : which_armor(victim, W_ARMS);
@@ -953,10 +951,8 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 						1, TRUE, &youmonst);
 			else if (uarm)
 			    (void) rust_dmg(uarm, "armor", 1, TRUE, &youmonst);
-#ifdef TOURIST
 			else if (uarmu)
 			    (void) rust_dmg(uarmu, "shirt", 1, TRUE, &youmonst);
-#endif
 		}
 		update_inventory();
 		break;
@@ -2090,10 +2086,8 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 						1, TRUE, mtmp);
 			    else if ((target = which_armor(mtmp, W_ARM)) != 0)
 				(void) rust_dmg(target, "armor", 1, TRUE, mtmp);
-#ifdef TOURIST
 			    else if ((target = which_armor(mtmp, W_ARMU)) != 0)
 				(void) rust_dmg(target, "shirt", 1, TRUE, mtmp);
-#endif
 			}
 
 			if (mptr == &mons[PM_IRON_GOLEM]) {
@@ -3172,9 +3166,7 @@ boolean *lostsome;
 			  obj == uamul || obj == uleft || obj == uright ||
 			  obj == ublindf || obj == uarm || obj == uarmc ||
 			  obj == uarmg || obj == uarmf ||
-#ifdef TOURIST
 			  obj == uarmu ||
-#endif
 			  (obj->cursed && (obj == uarmh || obj == uarms)) ||
 			  welded(obj)))
 			otmp = obj;
