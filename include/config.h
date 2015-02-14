@@ -418,7 +418,6 @@ typedef unsigned char	uchar;
 /* display features */
 #define LOADSYMSETS	/* loadable symbol sets; only default symbols w/o this  */
 /* dungeon features */
-#define SINKS		/* Kitchen sinks - Janet Walz */
 /* dungeon levels */
 #define WALLIFIED_MAZE	/* Fancy mazes - Jean-Christophe Collet */
 #define REINCARNATION	/* Special Rogue-like levels */

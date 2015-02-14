@@ -3160,10 +3160,8 @@ struct obj **pobj;			/* object tossed/used, set to NULL
 		   (is_pool(bhitpos.x, bhitpos.y) ||
 		   is_lava(bhitpos.x, bhitpos.y)))
 		    break;
-#ifdef SINKS
 		if(IS_SINK(typ) && weapon != FLASHED_LIGHT)
 		    break;	/* physical objects fall onto sink */
-#endif
 	    }
 	    /* limit range of ball so hero won't make an invalid move */
 	    if (weapon == THROWN_WEAPON && range > 0 &&
@@ -3273,10 +3271,8 @@ int dx, dy;
 		}
 		tmp_at(bhitpos.x, bhitpos.y);
 		delay_output();
-#ifdef SINKS
 		if(IS_SINK(levl[bhitpos.x][bhitpos.y].typ))
 			break;	/* boomerang falls on sink */
-#endif
 		/* ct==0, initial position, we want next delta to be same;
 		   ct==5, opposite position, repeat delta undoes first one */
 		if (ct % 5 != 0) i += (counterclockwise ? -1 : 1);

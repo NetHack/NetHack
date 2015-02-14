@@ -2913,7 +2913,6 @@ wiztrap:
 			newsym(x, y);
 			return(&zeroobj);
 		}
-# ifdef SINKS
 		if (!BSTRCMPI(bp, p-4, "sink")) {
 			lev->typ = SINK;
 			level.flags.nsinks++;
@@ -2921,7 +2920,6 @@ wiztrap:
 			newsym(x, y);
 			return &zeroobj;
 		}
-# endif
 		/* ("water" matches "potion of water" rather than terrain) */
 		if (!BSTRCMPI(bp, p-4, "pool") || !BSTRCMPI(bp, p-4, "moat")) {
 			lev->typ = !BSTRCMPI(bp, p-4, "pool") ? POOL : MOAT;

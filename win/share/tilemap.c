@@ -1,4 +1,4 @@
-/* NetHack 3.5	tilemap.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	tilemap.c	$NHDT-Date: 1425082379 2015/02/28 00:12:59 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.12 $ */
 /* NetHack 3.5	tilemap.c	$Date: 2009/05/06 10:59:02 $  $Revision: 1.7 $ */
 /*	SCCS Id: @(#)tilemap.c	3.5	2000/06/04	*/
 /* NetHack may be freely redistributed.  See license for details. */
@@ -172,23 +172,10 @@ int set, entry;
 	tilenum = 0;	/* set-relative number */
 	for (i = 0; i < (MAXPCHARS - MAXEXPCHARS); i++) {
 		if (set == OTH_GLYPH && tilenum == entry) {
-			if (*defsyms[i].explanation)
+			if (*defsyms[i].explanation) {
 				return defsyms[i].explanation;
-			else {
-				/* if SINKS are turned off, this
-				 * string won't be there (and can't be there
-				 * to prevent symbol-identification and
-				 * special-level mimic appearances from
-				 * thinking the items exist)
-				 */
-				switch (i) {
-				    case S_sink:
-					    Sprintf(buf, "sink");
-					    break;
-				    default:
-					    Sprintf(buf, "cmap %d", tilenum);
-					    break;
-				}
+            } else {
+                Sprintf(buf, "cmap %d", tilenum);
 				return buf;
 			}
 		}
