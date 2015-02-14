@@ -1,5 +1,5 @@
 #!perl
-# NetHack 3.5  mdgrep.pl  $NHDT-Date$  $NHDT-Revision$
+# NetHack 3.5  mdgrep.pl  $NHDT-Date: 1423877528 2015/02/14 01:32:08 $  $NHDT-Revision: 1.7 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -54,9 +54,9 @@
 
 $outfile = "mdgrep.h";
 sub start_file {
-	($rev) = ('$NHDT-Revision$') =~ m/: (.*) .$/;
-	my $date = '$NHDT-Date$';
-	my $revision = '$NHDT-Revision$';
+	($rev) = ('$NHDT-Revision: 1.7 $') =~ m/: (.*) .$/;
+	my $date = '$NHDT-Date: 1423877529 2015/02/14 01:32:09 $';
+	my $revision = '$NHDT-Revision: 1.7 $';
 	open(OUT, ">$outfile") || die "open $outfile: $!";
 # NB: Date and Revision below will be modified when mdgrep.h is written to
 # git - this is correct (but it means you must commit changes to mdgrep.pl
