@@ -1462,9 +1462,7 @@ struct monst *mtmp;
 		    typ != LUMP_OF_ROYAL_JELLY &&
 		    obj->oclass != AMULET_CLASS &&
 		    obj->oclass != RING_CLASS &&
-#ifdef WIZARD
 		    obj->oclass != VENOM_CLASS &&
-#endif
 		    typ != SACK && typ != BAG_OF_HOLDING &&
 		    typ != BAG_OF_TRICKS && !Is_candle(obj) &&
 		    typ != OILSKIN_SACK && typ != LEASH &&

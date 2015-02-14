@@ -821,9 +821,7 @@ boolean speedy;
 {
     return !P_RESTRICTED(skill)
 	    && P_SKILL(skill) < P_MAX_SKILL(skill) && (
-#ifdef WIZARD
 	    (wizard && speedy) ||
-#endif
 	    (P_ADVANCE(skill) >=
 		(unsigned) practice_needed_to_advance(P_SKILL(skill))
 	    && u.skills_advanced < P_SKILL_LIMIT
@@ -896,10 +894,8 @@ enhance_weapon_skill()
     winid win;
     boolean speedy = FALSE;
 
-#ifdef WIZARD
 	if (wizard && yn("Advance skills without practice?") == 'y')
 	    speedy = TRUE;
-#endif
 
 	do {
 	    /* find longest available skill name, count those that can advance */
@@ -972,7 +968,6 @@ enhance_weapon_skill()
 		    prefix = (to_advance + eventually_advance +
 				maxxed_cnt > 0) ? "    " : "";
 		(void) skill_level_name(i, sklnambuf);
-#ifdef WIZARD
 		if (wizard) {
 		    if (!iflags.menu_tab_sep)
 			Sprintf(buf, " %s%-*s %-12s %5d(%4d)",
@@ -984,9 +979,7 @@ enhance_weapon_skill()
 			    prefix, P_NAME(i), sklnambuf,
 			    P_ADVANCE(i),
 			    practice_needed_to_advance(P_SKILL(i)));
-		 } else
-#endif
-		{
+		 } else {
 		    if (!iflags.menu_tab_sep)
 			Sprintf(buf, " %s %-*s [%s]",
 			    prefix, longest, P_NAME(i), sklnambuf);
@@ -1001,11 +994,9 @@ enhance_weapon_skill()
 
 	    Strcpy(buf, (to_advance > 0) ? "Pick a skill to advance:" :
 					   "Current skills:");
-#ifdef WIZARD
 	    if (wizard && !speedy)
 		Sprintf(eos(buf), "  (%d slot%s available)",
 			u.weapon_slots, plur(u.weapon_slots));
-#endif
 	    end_menu(win, buf);
 	    n = select_menu(win, to_advance ? PICK_ONE : PICK_NONE, &selected);
 	    destroy_nhwindow(win);

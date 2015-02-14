@@ -23,9 +23,7 @@ STATIC_DCL void FDECL(dealloc_mextra, (struct mextra *));
 STATIC_DCL int FDECL(pickvampshape, (struct monst *));
 STATIC_DCL boolean FDECL(isspecmon, (struct monst *));
 STATIC_DCL boolean FDECL(validspecmon, (struct monst *,int));
-#ifdef WIZARD
 STATIC_DCL boolean FDECL(validvamp, (struct monst *,int *,int));
-#endif
 STATIC_DCL struct permonst *FDECL(accept_newcham_form, (int));
 
 #define LEVEL_SPECIFIC_NOCORPSE(mdat) \
@@ -2599,7 +2597,6 @@ int mndx;
 	return TRUE;	/* potential new form is ok */
 }
 
-#ifdef WIZARD
 /* prevent wizard mode user from specifying invalid vampshifter shape */
 STATIC_OVL boolean
 validvamp(mon, mndx_p, monclass)
@@ -2638,7 +2635,6 @@ int *mndx_p, monclass;
 	}
 	return (*mndx_p != NON_PM);
 }
-#endif /*WIZARD*/
 
 int
 select_newcham_form(mon)
@@ -2689,7 +2685,6 @@ struct monst *mon;
 	      }
 		break;
 	}
-#ifdef WIZARD
 	/* for debugging: allow control of polymorphed monster */
 	if (wizard && iflags.mon_polycontrol) {
 	    char pprompt[BUFSZ], buf[BUFSZ];
@@ -2731,7 +2726,6 @@ struct monst *mon;
 	    if (is_vampshifter(mon) && !validvamp(mon, &mndx, monclass))
 		mndx = pickvampshape(mon);	/* don't resort to arbitrary */
 	}
-#endif /*WIZARD*/
 
 	/* if no form was specified above, pick one at random now */
 	if (mndx == NON_PM) {

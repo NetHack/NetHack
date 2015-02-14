@@ -633,8 +633,6 @@ struct obj *obj;
     return "strangely";
 }
 
-#ifdef WIZARD
-
 int
 wiz_light_sources()
 {
@@ -673,7 +671,5 @@ wiz_light_sources()
 
     return 0;
 }
-
-#endif /* WIZARD */
 
 /*light.c*/

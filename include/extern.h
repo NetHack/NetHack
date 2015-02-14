@@ -172,7 +172,6 @@ E int NDECL(domonability);
 E int NDECL(doprev_message);
 E int NDECL(timed_occupation);
 E int NDECL(doattributes);
-# ifdef WIZARD
 E int NDECL(wiz_detect);
 E int NDECL(wiz_genesis);
 E int NDECL(wiz_identify);
@@ -180,7 +179,6 @@ E int NDECL(wiz_level_tele);
 E int NDECL(wiz_map);
 E int NDECL(wiz_where);
 E int NDECL(wiz_wish);
-# endif /* WIZARD */
 #endif /* USE_TRAMPOLI */
 E void NDECL(reset_occupations);
 E void FDECL(set_occupation, (int (*)(void),const char *,int));
@@ -189,9 +187,7 @@ E char NDECL(pgetchar);
 E void FDECL(pushch, (CHAR_P));
 E void FDECL(savech, (CHAR_P));
 #endif
-#ifdef WIZARD
 E void NDECL(add_debug_extended_commands);
-#endif /* WIZARD */
 E void FDECL(reset_commands, (BOOLEAN_P));
 E void FDECL(rhack, (char *));
 E int NDECL(doextlist);
@@ -215,9 +211,7 @@ E void FDECL(hangup, (int));
 E void NDECL(end_of_input);
 #endif
 E char NDECL(readchar);
-#ifdef WIZARD
 E void NDECL(sanity_check);
-#endif
 E char FDECL(yn_function, (const char *, const char *, CHAR_P));
 E boolean FDECL(paranoid_query, (BOOLEAN_P,const char *));
 
@@ -578,9 +572,7 @@ E int FDECL(induced_align, (int));
 E boolean FDECL(Invocation_lev, (d_level *));
 E xchar NDECL(level_difficulty);
 E schar FDECL(lev_by_name, (const char *));
-#ifdef WIZARD
 E schar FDECL(print_dungeon, (BOOLEAN_P,schar *,xchar *));
-#endif
 E int NDECL(donamelevel);
 E int NDECL(dooverview);
 E void FDECL(show_overview, (int,int));
@@ -726,7 +718,7 @@ E void FDECL(set_savefile_name, (BOOLEAN_P));
 #ifdef INSURANCE
 E void FDECL(save_savefile_name, (int));
 #endif
-#if defined(WIZARD) && !defined(MICRO)
+#ifndef MICRO
 E void NDECL(set_error_savefile);
 #endif
 E int NDECL(create_savefile);
@@ -742,9 +734,7 @@ E boolean FDECL(can_read_file, (const char *));
 #endif
 E boolean FDECL(read_config_file, (const char *, int));
 E void FDECL(check_recordfile, (const char *));
-#if defined(WIZARD)
 E void NDECL(read_wizkit);
-#endif
 #ifdef LOADSYMSETS
 E int FDECL(read_sym_file, (int));
 E int FDECL(parse_sym_line, (char *,int));
@@ -987,9 +977,7 @@ E void FDECL(obj_adjust_light_radius, (struct obj *,int));
 E int FDECL(candle_light_range, (struct obj *));
 E int FDECL(arti_light_radius, (struct obj *));
 E const char *FDECL(arti_light_description, (struct obj *));
-#ifdef WIZARD
 E int NDECL(wiz_light_sources);
-#endif
 
 /* ### lock.c ### */
 
@@ -1260,9 +1248,7 @@ E void FDECL(dealloc_obj, (struct obj *));
 E void FDECL(obj_ice_effects, (int, int, BOOLEAN_P));
 E long FDECL(peek_at_iced_corpse_age, (struct obj *));
 E int FDECL(hornoplenty, (struct obj *,BOOLEAN_P));
-#ifdef WIZARD
 E void NDECL(obj_sanity_check);
-#endif
 
 /* ### mkroom.c ### */
 
@@ -1896,9 +1882,7 @@ E void FDECL(do_genocide, (int));
 E void FDECL(punish, (struct obj *));
 E void NDECL(unpunish);
 E boolean FDECL(cant_revive, (int *,BOOLEAN_P,struct obj *));
-#ifdef WIZARD
 E boolean NDECL(create_particular);
-#endif
 
 /* ### rect.c ### */
 
@@ -2000,9 +1984,7 @@ E void FDECL(outoracle, (BOOLEAN_P, BOOLEAN_P));
 E void FDECL(save_oracles, (int,int));
 E void FDECL(restore_oracles, (int));
 E int FDECL(doconsult, (struct monst *));
-#ifdef WIZARD
 E void NDECL(rumor_check);
-#endif
 
 /* ### save.c ### */
 
@@ -2263,10 +2245,8 @@ E boolean FDECL(obj_is_local, (struct obj *));
 E void FDECL(save_timers, (int,int,int));
 E void FDECL(restore_timers, (int,int,BOOLEAN_P,long));
 E void FDECL(relink_timers, (BOOLEAN_P));
-#ifdef WIZARD
 E int NDECL(wiz_timeout_queue);
 E void NDECL(timer_sanity_check);
-#endif
 
 /* ### topten.c ### */
 

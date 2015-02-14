@@ -8,11 +8,7 @@
 /* #define DEBUG */	/* uncomment to enable new eat code debugging */
 
 #ifdef DEBUG
-# ifdef WIZARD
 #define debugpline	if (wizard) pline
-# else
-#define debugpline	pline
-# endif
 #endif
 
 STATIC_PTR int NDECL(eatmdone);

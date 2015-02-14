@@ -257,11 +257,7 @@ static struct grep_var grep_vars[]={
 #else
 	{"WIN_CE_SMARTPHONE", 0},
 #endif
-#if defined(WIZARD)
 	{"WIZARD", 1},
-#else
-	{"WIZARD", 0},
-#endif
 #if defined(X11_GRAPHICS)
 	{"X11_GRAPHICS", 1},
 #else

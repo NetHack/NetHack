@@ -836,12 +836,10 @@ doengrave()
 		break;
 
 	    case VENOM_CLASS:
-#ifdef WIZARD
 		if (wizard) {
 		    pline("Writing a poison pen letter??");
 		    break;
 		}
-#endif
 	    case ILLOBJ_CLASS:
 		impossible("You're engraving with an illegal object!");
 		break;

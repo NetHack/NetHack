@@ -1687,7 +1687,6 @@ do_class_genocide()
 			else if (immunecnt || class == S_invisible)
 	You("aren't permitted to genocide such monsters.");
 			else
-#ifdef WIZARD	/* to aid in topology testing; remove pesky monsters */
 			  if (wizard && buf[0] == '*') {
 			    register struct monst *mtmp, *mtmp2;
 
@@ -1701,7 +1700,6 @@ do_class_genocide()
 	pline("Eliminated %d monster%s.", gonecnt, plur(gonecnt));
 			    return;
 			} else
-#endif
 			    pline("That %s does not represent any monster.",
 				  strlen(buf) == 1 ? "symbol" : "response");
 			continue;
@@ -2023,7 +2021,6 @@ struct obj *from_obj;
 	return FALSE;
 }
 
-#ifdef WIZARD
 /*
  * Make a new monster with the type controlled by the user.
  *
@@ -2063,12 +2060,10 @@ create_particular()
 		makehostile = TRUE;
 	    }
 	    /* decide whether a valid monster was chosen */
-#ifdef WIZARD
 	    if (wizard && (!strcmp(bufp, "*") || !strcmp(bufp, "random"))) {
 		randmonst = TRUE;
 		break;
 	    }
-#endif
 	    which = name_to_mon(bufp);
 	    if (which >= LOW_PM) break;		/* got one */
 	    monclass = name_to_monclass(bufp, &which);
@@ -2089,12 +2084,10 @@ create_particular()
 	    if (!randmonst) {
 		firstchoice = which;
 		if (cant_revive(&which, FALSE, (struct obj *)0)) {
-#ifdef WIZARD	/* intentionally redundant... */
 		    /* wizard mode can override handling of special monsters */
 		    Sprintf(buf, "Creating %s instead; force %s?",
 			    mons[which].mname, mons[firstchoice].mname);
 		    if (yn(buf) == 'y') which = firstchoice;
-#endif
 		}
 		whichpm = &mons[which];
 	    }
@@ -2127,6 +2120,5 @@ create_particular()
 	}
 	return madeany;
 }
-#endif /* WIZARD */
 
 /*read.c*/

@@ -418,14 +418,10 @@ struct obj *scroll;
 
 	/* Disable teleportation in stronghold && Vlad's Tower */
 	if (level.flags.noteleport) {
-#ifdef WIZARD
 		if (!wizard) {
-#endif
 		    pline("A mysterious force prevents you from teleporting!");
 		    return TRUE;
-#ifdef WIZARD
 		}
-#endif
 	}
 
 	/* don't show trap if "Sorry..." */
@@ -433,15 +429,11 @@ struct obj *scroll;
 
 	if ((u.uhave.amulet || On_W_tower_level(&u.uz)) && !rn2(3)) {
 	    You_feel("disoriented for a moment.");
-#ifdef WIZARD
 	    if (wizard && yn("Override?") != 'y')
-#endif
 	    return FALSE;
 	}
 	if ((Teleport_control && !Stunned)
-#ifdef WIZARD
 			    || wizard
-#endif
 					) {
 	    if (unconscious()) {
 		pline("Being unconscious, you cannot control your teleport.");
@@ -519,40 +511,29 @@ dotele()
 				castit = TRUE;
 				break;
 			}
-#ifdef WIZARD
 		if (!wizard) {
-#endif
 		    if (!castit) {
 			if (!Teleportation)
 			    You("don't know that spell.");
 			else You("are not able to teleport at will.");
 			return(0);
 		    }
-#ifdef WIZARD
 		}
-#endif
 	    }
 
 	    if (u.uhunger <= 100 || ACURR(A_STR) < 6) {
-#ifdef WIZARD
 		if (!wizard) {
-#endif
 			You("lack the strength %s.",
 			    castit ? "for a teleport spell" : "to teleport");
 			return 1;
-#ifdef WIZARD
 		}
-#endif
 	    }
 
 	    energy = objects[SPE_TELEPORT_AWAY].oc_level * 7 / 2 - 2;
 	    if (u.uen <= energy) {
-#ifdef WIZARD
 		if (wizard)
 			energy = u.uen;
-		else
-#endif
-		{
+		else {
 			You("lack the energy %s.",
 			    castit ? "for a teleport spell" : "to teleport");
 			return 1;
@@ -567,10 +548,7 @@ dotele()
 		exercise(A_WIS, TRUE);
 		if (spelleffects(sp_no, TRUE))
 			return(1);
-		else
-#ifdef WIZARD
-		    if (!wizard)
-#endif
+		else if (!wizard)
 			return(0);
 	    } else {
 		u.uen -= energy;
@@ -601,29 +579,19 @@ level_tele()
 	boolean force_dest = FALSE;
 
 	if ((u.uhave.amulet || In_endgame(&u.uz) || In_sokoban(&u.uz))
-#ifdef WIZARD
-						&& !wizard
-#endif
-							) {
+	    && !wizard) {
 	    You_feel("very disoriented for a moment.");
 	    return;
 	}
-	if ((Teleport_control && !Stunned)
-#ifdef WIZARD
-	   || wizard
-#endif
-		) {
+	if ((Teleport_control && !Stunned) || wizard) {
 	    char qbuf[BUFSZ];
 	    int trycnt = 0;
 
 	    Strcpy(qbuf, "To what level do you want to teleport?");
 	    do {
 		if (++trycnt == 2) {
-#ifdef WIZARD
 			if (wizard) Strcat(qbuf, " [type a number or ? for a menu]");
-			else
-#endif
-			Strcat(qbuf, " [type a number]");
+			else Strcat(qbuf, " [type a number]");
 		}
 		getlin(qbuf, buf);
 		if (!strcmp(buf,"\033")) {	/* cancelled */
@@ -638,7 +606,6 @@ level_tele()
 		    pline("Oops...");
 		    goto random_levtport;
 		}
-#ifdef WIZARD
 		if (wizard && !strcmp(buf,"?")) {
 		    schar destlev = 0;
 		    xchar destdnum = 0;
@@ -661,9 +628,7 @@ level_tele()
 			}
 		    }
 		    force_dest = TRUE;
-		} else
-#endif /*WIZARD*/
-		if ((newlev = lev_by_name(buf)) == 0) newlev = atoi(buf);
+		} else if ((newlev = lev_by_name(buf)) == 0) newlev = atoi(buf);
 	    } while (!newlev && !digit(buf[0]) &&
 		     (buf[0] != '-' || !digit(buf[1])) &&
 		     trycnt < 10);
@@ -721,7 +686,6 @@ level_tele()
 		You1(shudder_for_moment);
 		return;
 	}
-#ifdef WIZARD
 	if (In_endgame(&u.uz)) {	/* must already be wizard */
 	    int llimit = dunlevs_in_dungeon(&u.uz);
 
@@ -734,7 +698,6 @@ level_tele()
 	    schedule_goto(&newlevel, FALSE, FALSE, 0, (char *)0, (char *)0);
 	    return;
 	}
-#endif
 
 	killer.name[0] = 0;		/* still alive, so far... */
 
@@ -800,18 +763,13 @@ level_tele()
 	} else if (u.uz.dnum == medusa_level.dnum &&
 	    newlev >= dungeons[u.uz.dnum].depth_start +
 						dunlevs_in_dungeon(&u.uz)) {
-#ifdef WIZARD
 	    if (!(wizard && force_dest))
-#endif
 	    find_hell(&newlevel);
 	} else {
 	    /* if invocation did not yet occur, teleporting into
 	     * the last level of Gehennom is forbidden.
 	     */
-#ifdef WIZARD
-		if (!wizard)
-#endif
-	    if (Inhell && !u.uevent.invoked &&
+	    if (!wizard && Inhell && !u.uevent.invoked &&
 			newlev >= (dungeons[u.uz.dnum].depth_start +
 					dunlevs_in_dungeon(&u.uz) - 1)) {
 		newlev = dungeons[u.uz.dnum].depth_start +
@@ -825,9 +783,7 @@ level_tele()
 	     * we must translate newlev to a number relative to the
 	     * current dungeon.
 	     */
-#ifdef WIZARD
 	    if (!(wizard && force_dest))
-#endif
 	    get_level(&newlevel, newlev);
 	}
 	schedule_goto(&newlevel, FALSE, FALSE, 0, (char *)0, (char *)0);

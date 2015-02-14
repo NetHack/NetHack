@@ -35,9 +35,7 @@ boolean resuming;
     monstr_init();	/* monster strengths */
     objects_init();
 
-#ifdef WIZARD
     if (wizard) add_debug_extended_commands();
-#endif
 
     /* if a save file created in normal mode is now being restored in
        explore mode, treat it as normal restore followed by 'X' command
@@ -384,10 +382,8 @@ boolean resuming;
 	    continue;
 	}
 
-#ifdef WIZARD
 	if (iflags.sanity_check)
 	    sanity_check();
-#endif
 
 #ifdef CLIPPING
 	/* just before rhack */
@@ -525,9 +521,7 @@ newgame()
 
 	mklev();
 	u_on_upstairs();
-#ifdef WIZARD
 	if (wizard) obj_delivery(FALSE);	/* finish wizkit */
-#endif
 	vision_reset();		/* set up internals for level (after mklev) */
 	check_special_room(FALSE);
 

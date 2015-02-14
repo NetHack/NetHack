@@ -15,11 +15,7 @@
 /* #define DEBUG */	/* uncomment to enable code debugging */
 
 #ifdef DEBUG
-# ifdef WIZARD
 #define debugpline	if (wizard) pline
-# else
-#define debugpline	pline
-# endif
 #endif
 
 #include "sp_lev.h"

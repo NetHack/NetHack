@@ -33,7 +33,6 @@ STATIC_DCL char FDECL(obj_to_let,(struct obj *));
 
 static int lastinvnr = 51;	/* 0 ... 51 (never saved&restored) */
 
-#ifdef WIZARD
 /* wizards can wish for venom, which will become an invisible inventory
  * item without this.  putting it in inv_order would mean venom would
  * suddenly become a choice for all the inventory-class commands, which
@@ -42,7 +41,6 @@ static int lastinvnr = 51;	/* 0 ... 51 (never saved&restored) */
  * around on a bones level for normal players to find.
  */
 static char venom_inv[] = { VENOM_CLASS, 0 };	/* (constant) */
-#endif
 
 void
 assigninvlet(otmp)
@@ -1916,7 +1914,6 @@ long* out_cnt;
 	}
 
 	start_menu(win);
-#ifdef WIZARD
 	if (wizard && iflags.override_ID) {
 		char prompt[BUFSZ];
 		any.a_char = -1;
@@ -1927,7 +1924,6 @@ long* out_cnt;
 		add_menu(win, NO_GLYPH, &any,' ', iflags.override_ID, ATR_NONE,
 				prompt, MENU_UNSELECTED);
 	}
-#endif
 nextclass:
 	classcount = 0;
 	any = zeroany;		/* set all bits to zero */
@@ -1950,12 +1946,10 @@ nextclass:
 	}
 	if (flags.sortpack) {
 		if (*++invlet) goto nextclass;
-#ifdef WIZARD
 		if (--invlet != venom_inv) {
 			invlet = venom_inv;
 			goto nextclass;
 		}
-#endif
 	}
 	end_menu(win, (char *) 0);
 

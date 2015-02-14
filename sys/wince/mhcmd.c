@@ -296,7 +296,6 @@ NHCmdPadCell cells_layout_lookup[NH_CMDPAD_CELLNUM] =
 	{ -1, "X", "X", 13, NH_CELL_LAYOUT_MENU, 1 , 0 }
 };
 
-#ifdef WIZARD
 /* wizard mode layout */
 NHCmdPadCell cells_layout_wizard[NH_CMDPAD_CELLNUM] = 
 { 
@@ -313,7 +312,6 @@ NHCmdPadCell cells_layout_wizard[NH_CMDPAD_CELLNUM] =
 	{ -1, "", "", -NH_CMDPAD_FONT_NORMAL, NH_CELL_REG, 1, (void*)-1 },
 	{ -1, "X", "X", 13, NH_CELL_LAYOUT_MENU, 1 , 0 }
 };
-#endif
 
 #else /* !WIN_CE_SMARTPHONE */
 
@@ -557,13 +555,11 @@ void register_command_window_class()
 	nhcmdlayout_init(plt, cells_layout_lookup);
 	nhcmdset_add(nhcmdset_current, plt);
 
-#ifdef WIZARD
 	if( wizard ) {
 		plt = nhcmdlayout_create("Wizard Mode", NH_CMDPAD_ROWS, NH_CMDPAD_COLS);
 		nhcmdlayout_init(plt, cells_layout_wizard);
 		nhcmdset_add(nhcmdset_current, plt);
 	}
-#endif
 
 #else /* ! WIN_CE_SMARTPHONE */
 	plt = nhcmdlayout_create("lowercase", NH_CMDPAD_ROWS, NH_CMDPAD_COLS);

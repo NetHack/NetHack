@@ -172,16 +172,12 @@
  *              GDBPATH		(the path to the system gdb(1) program)
  */
 
-#ifndef WIZARD		/* allow for compile-time or Makefile changes */
-# ifndef KR1ED
-#  define WIZARD  "wizard" /* the person allowed to use the -D option */
+#ifndef WIZARD_NAME		/* allow for compile-time or Makefile changes */
+# define WIZARD_NAME "wizard"
+#endif
+
 /* #define SYSCF */	/* use a global configuration */
 /* #define SYSCF_FILE "sysconf" */ /* global configuration is in a file */
-# else
-#  define WIZARD
-#  define WIZARD_NAME "wizard"
-# endif
-#endif
 
 #ifndef GDBPATH
 # define GDBPATH "/usr/bin/gdb"

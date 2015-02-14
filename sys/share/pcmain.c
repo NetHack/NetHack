@@ -702,21 +702,11 @@ port_help()
 # endif /* MSDOS || WIN32 */
 #endif /* PORT_HELP */
 
-/* for KR1ED config, WIZARD is 0 or 1 and WIZARD_NAME is a string;
-   for usual config, WIZARD is the string; forcing WIZARD_NAME to match it
-   eliminates conditional testing for which one to use in string ops */
-#ifndef KR1ED
-# undef WIZARD_NAME
-# define WIZARD_NAME WIZARD
-#endif
-
 /* validate wizard mode if player has requested access to it */
 boolean
 authorize_wizard_mode()
 {
-#ifdef WIZARD
 	if (!strcmp(plname, WIZARD_NAME)) return TRUE;
-#endif
 	return FALSE;
 }
 

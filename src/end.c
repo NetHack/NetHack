@@ -323,7 +323,7 @@ done2()
 		}
 		return 0;
 	}
-#if defined(WIZARD) && (defined(UNIX) || defined(VMS) || defined(LATTICE))
+#if (defined(UNIX) || defined(VMS) || defined(LATTICE))
 	if(wizard) {
 	    int c;
 # ifdef VMS
@@ -510,7 +510,7 @@ panic VA_DECL(const char *, str)
 		  !program_state.something_worth_saving ?
 		  "Program initialization has failed." :
 		  "Suddenly, the dungeon collapses.");
-#if defined(WIZARD) && !defined(MICRO)
+#ifndef MICRO
 # if defined(NOTIFY_NETHACK_BUGS)
 	if (!wizard)
 	    raw_printf("Report the following error to \"%s\" or at \"%s\".",
@@ -531,11 +531,7 @@ panic VA_DECL(const char *, str)
 		free(tmp);
 	    } else
 		raw_printf("Report error to \"%s\"%s.",
-#  ifdef WIZARD_NAME	/*(KR1ED)*/
 			WIZARD_NAME,
-#  else
-			WIZARD,
-#  endif
 			!program_state.something_worth_saving ? "" :
 			" and it may be possible to rebuild.");
 	}
@@ -560,7 +556,7 @@ panic VA_DECL(const char *, str)
 #ifdef WIN32
 	interject(INTERJECT_PANIC);
 #endif
-#if defined(WIZARD) && (defined(UNIX) || defined(VMS) || defined(LATTICE) || defined(WIN32))
+#if defined(UNIX) || defined(VMS) || defined(LATTICE) || defined(WIN32)
 	if (wizard)
 	    NH_abort();	/* generate core dump */
 #endif
@@ -846,12 +842,10 @@ int how;
 		paniclog("trickery", killer.name);
 		killer.name[0] = 0;
 	    }
-#ifdef WIZARD
 	    if (wizard) {
 		You("are a very tricky wizard, it seems.");
 		return;
 	    }
-#endif
 	}
 
 	/* pbuf: holds Sprintf'd output for raw_print and putstr
@@ -885,11 +879,7 @@ int how;
 			return;
 		}
 	}
-	if ((
-#ifdef WIZARD
-			wizard ||
-#endif
-			discover) && (how <= GENOCIDED)) {
+	if ((wizard || discover) && (how <= GENOCIDED)) {
 		if (paranoid_query(ParanoidDie, "Die?")) goto die;
 		pline("OK, so you don't %s.",
 			(how == CHOKING) ? "choke" : "die");
@@ -1047,9 +1037,7 @@ die:
 	}
 
 	if (bones_ok) {
-#ifdef WIZARD
 	    if (!wizard || paranoid_query(ParanoidBones, "Save bones?"))
-#endif
 		savebones(how, endtime, corpse);
 	    /* corpse may be invalid pointer now so
 		ensure that it isn't used again */

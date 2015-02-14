@@ -1391,12 +1391,10 @@ int lev;
 			if (!swapout_oldest())
 				return FALSE;
 	}
-# ifdef WIZARD
 	if (wizard) {
 		pline("Swapping in `%s'.", from);
 		wait_synch();
 	}
-# endif
 	copyfile(from, to);
 	(void) unlink(from);
 	level_info[lev].where = ACTIVE;
@@ -1423,12 +1421,10 @@ swapout_oldest() {
 	Sprintf(to, "%s%s", permbones, alllevels);
 	set_levelfile_name(from, oldest);
 	set_levelfile_name(to, oldest);
-# ifdef WIZARD
 	if (wizard) {
 		pline("Swapping out `%s'.", from);
 		wait_synch();
 	}
-# endif
 	copyfile(from, to);
 	(void) unlink(from);
 	level_info[oldest].where = SWAPPED;

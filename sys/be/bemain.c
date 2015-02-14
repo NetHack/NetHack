@@ -161,10 +161,8 @@ static void process_options(int argc, char **argv)
 		argc--;
 		switch (argv[0][1]) {
 		case 'D':
-#ifdef WIZARD
 			wizard = TRUE, discover = FALSE;
 			break;
-#endif
 			/* otherwise fall thru to discover */
 		case 'X':
 			discover = TRUE, wizard = FALSE;
@@ -253,12 +251,8 @@ void getlock(void)
 boolean
 authorize_wizard_mode()
 {
-#ifdef WIZARD
 	/* other ports validate user name or character name here */
 	return TRUE;
-#else
-	return FALSE;
-#endif
 }
 
 #ifndef __begui__

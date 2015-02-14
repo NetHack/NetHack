@@ -698,7 +698,6 @@ int propidx;	/* special cases can have negative values */
     /*
      * Restrict the source of the attributes just to debug mode for now
      */
-#ifdef WIZARD
     if (wizard) {
 	static NEARDATA const char because_of[] = " because of %s";
 
@@ -745,7 +744,6 @@ int propidx;	/* special cases can have negative values */
 	}
 
     } /*wizard*/
-#endif
     return buf;
 }
 
