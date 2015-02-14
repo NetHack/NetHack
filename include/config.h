@@ -420,7 +420,6 @@ typedef unsigned char	uchar;
 /* dungeon features */
 /* dungeon levels */
 #define WALLIFIED_MAZE	/* Fancy mazes - Jean-Christophe Collet */
-#define REINCARNATION	/* Special Rogue-like levels */
 /* monsters & objects */
 #define SEDUCE		/* Succubi/incubi seduction, by KAA, suggested by IM */
 /* I/O */

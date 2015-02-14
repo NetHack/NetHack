@@ -28,14 +28,9 @@ STATIC_DCL boolean FDECL(validvamp, (struct monst *,int *,int));
 #endif
 STATIC_DCL struct permonst *FDECL(accept_newcham_form, (int));
 
-#ifdef REINCARNATION
 #define LEVEL_SPECIFIC_NOCORPSE(mdat) \
 	 (Is_rogue_level(&u.uz) || \
 	   (level.flags.graveyard && is_undead(mdat) && rn2(3)))
-#else
-#define LEVEL_SPECIFIC_NOCORPSE(mdat) \
-	   (level.flags.graveyard && is_undead(mdat) && rn2(3))
-#endif
 
 #if 0
 /* part of the original warning code which was replaced in 3.3.1 */
@@ -1048,9 +1043,7 @@ nexttry:	/* eels prefer the water, but if there is no water nearby,
 	    if (nx != x && ny != y && (nodiag ||
 		(IS_DOOR(nowtyp) && (levl[x][y].doormask & ~D_BROKEN)) ||
 		(IS_DOOR(ntyp) && (levl[nx][ny].doormask & ~D_BROKEN)) ||
-#ifdef REINCARNATION
 		((IS_DOOR(nowtyp) || IS_DOOR(ntyp)) && Is_rogue_level(&u.uz)) ||
-#endif
 		/* mustn't pass between adjacent long worm segments,
 		   but can attack that way */
 		(m_at(x, ny) && m_at(nx, y) && worm_cross(x, y, nx, ny) &&

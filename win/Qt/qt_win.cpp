@@ -1644,12 +1644,7 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 
     painter.begin(this);
 
-    if (
-#ifdef REINCARNATION
-	Is_rogue_level(&u.uz) ||
-#endif
-	iflags.wc_ascii_map
-    )
+    if (Is_rogue_level(&u.uz) || iflags.wc_ascii_map)
     {
 	// You enter a VERY primitive world!
 
@@ -1730,7 +1725,6 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
     }
 
     if (garea.contains(cursor)) {
-#ifdef REINCARNATION
 	if (Is_rogue_level(&u.uz)) {
 #ifdef TEXTCOLOR
 	    painter.setPen( white );
@@ -1738,7 +1732,6 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 	    painter.setPen( green ); // REALLY primitive
 #endif
 	} else
-#endif
 	{
 	    int hp100;
 	    if (u.mtimedone) {

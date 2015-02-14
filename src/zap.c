@@ -4162,10 +4162,8 @@ short exploding_wand_typ;
 		if (see_it)
 		    pline("%s %s reveals a secret door.",
 			  yourzap ? "Your" : "The", zapverb);
-#ifdef REINCARNATION
 		else if (Is_rogue_level(&u.uz))
 		    You_feel("a draft.");	/* new open doorway */
-#endif
 	}
 
 	/* regular door absorbs remaining zap range, possibly gets destroyed */

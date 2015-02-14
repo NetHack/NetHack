@@ -793,14 +793,12 @@ void mswin_clear_nhwindow(winid wid)
         (wid < MAXWINDOWS) &&
         (GetNHApp()->windowlist[wid].win != NULL))
     {
-#ifdef REINCARNATION
 		if( GetNHApp()->windowlist[wid].type == NHW_MAP ) {
 			if( Is_rogue_level(&u.uz) ) 
 				mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP), ROGUE_LEVEL_MAP_MODE);
 			else 
 				mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP), iflags.wc_map_mode);
 		}
-#endif
 
          SendMessage( 
 			 GetNHApp()->windowlist[wid].win, 

@@ -988,9 +988,6 @@ make_version()
 	 */
 	version.feature_set = (unsigned long)(0L
 		/* levels and/or topology (0..4) */
-#ifdef REINCARNATION
-			| (1L <<  1)
-#endif
 		/* monsters (5..9) */
 #ifdef MAIL
 			| (1L <<  6)
@@ -1288,9 +1285,6 @@ static const char *build_opts[] = {
 #endif
 #ifdef SELECTSAVED
 		"restore saved games via menu",
-#endif
-#ifdef REINCARNATION
-		"rogue level",
 #endif
 #ifdef SCORE_ON_BOTL
 		"score on status line",
@@ -1823,12 +1817,9 @@ static	struct deflist {
 	const char	*defname;
 	boolean	true_or_false;
 } deflist[] = {
-#ifdef REINCARNATION
 	      {	"REINCARNATION", TRUE },
-#else
-	      {	"REINCARNATION", FALSE },
-#endif
-	      { 0, 0 } };
+	      { 0, 0 }
+};
 
 static int
 check_control(s)

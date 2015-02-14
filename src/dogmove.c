@@ -673,9 +673,7 @@ register int after;	/* this is extra fast monster movement */
 	}
 	if (is_giant(mtmp->data)) allowflags |= BUSTDOOR;
 	if (tunnels(mtmp->data)
-#ifdef REINCARNATION
 	    && !Is_rogue_level(&u.uz)	/* same restriction as m_move() */
-#endif
 	    ) allowflags |= ALLOW_DIG;
 	cnt = mfndpos(mtmp, poss, info, allowflags);
 

@@ -1053,9 +1053,7 @@ void mswin_select_map_mode(int mode)
 #endif
 
 	/* override for Rogue level */
-#ifdef REINCARNATION
     if( Is_rogue_level(&u.uz) && !IS_MAP_ASCII(mode) ) return;
-#endif
 
 	/* set map mode menu mark */
 	if( IS_MAP_ASCII(mode) ) {

@@ -1057,7 +1057,6 @@ const char *mname;
 	return FALSE;
 }
 
-#ifdef REINCARNATION
 const char *
 roguename() /* Name of a Rogue player */
 {
@@ -1075,7 +1074,6 @@ roguename() /* Name of a Rogue player */
 	return rn2(3) ? (rn2(2) ? "Michael Toy" : "Kenneth Arnold")
 		: "Glenn Wichman";
 }
-#endif /* REINCARNATION */
 
 static NEARDATA const char * const hcolors[] = {
 	"ultraviolet", "infrared", "bluish-orange",

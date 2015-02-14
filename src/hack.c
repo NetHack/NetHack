@@ -2356,11 +2356,9 @@ int x, y;
     struct rm *lev_p = &levl[x][y];
 
     if (!IS_DOOR(lev_p->typ)) return FALSE;
-#ifdef REINCARNATION
     /* all rogue level doors are doorless but disallow diagonal access, so
        we treat them as if their non-existant doors were actually present */
     if (Is_rogue_level(&u.uz)) return FALSE;
-#endif
     return !(lev_p->doormask & ~(D_NODOOR|D_BROKEN));
 }
 

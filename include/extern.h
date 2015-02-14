@@ -399,9 +399,7 @@ E char *FDECL(distant_monnam, (struct monst *,int,char *));
 E const char *NDECL(rndmonnam);
 E const char *FDECL(hcolor, (const char *));
 E const char *NDECL(rndcolor);
-#ifdef REINCARNATION
 E const char *NDECL(roguename);
-#endif
 E struct obj *FDECL(realloc_obj,
 		(struct obj *, int, genericptr_t, int, const char *));
 E char *FDECL(coyotename, (struct monst *,char *));
@@ -519,9 +517,7 @@ E int FDECL(def_char_to_monclass, (CHAR_P));
 #if !defined(MAKEDEFS_C) && !defined(LEV_LEX_C)
 E void FDECL(switch_symbols, (int));
 E void FDECL(assign_graphics, (int));
-#ifdef REINCARNATION
 E void NDECL(init_r_symbols);
-#endif
 E void NDECL(init_symbols);
 E void NDECL(init_showsyms);
 E void NDECL(init_l_symbols);
@@ -702,11 +698,9 @@ E void FDECL(explode_oil, (struct obj *,int,int));
 
 /* ### extralev.c ### */
 
-#ifdef REINCARNATION
 E void NDECL(makeroguerooms);
 E void FDECL(corr, (int,int));
 E void NDECL(makerogueghost);
-#endif
 
 /* ### files.c ### */
 

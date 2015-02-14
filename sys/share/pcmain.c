@@ -309,11 +309,9 @@ char *argv[];
 	if (!symset[PRIMARY].name) {
 		load_symset("IBMGraphics_2", PRIMARY);
 	}
-#  ifdef REINCARNATION
 	if (!symset[ROGUESET].name) {
 		load_symset("RogueEpyx", ROGUESET);
 	}
-#  endif
 # endif
 #endif /*LOADSYMSETS*/
 
