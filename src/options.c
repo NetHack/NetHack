@@ -350,17 +350,9 @@ static struct Comp_Opt
 	{ "soundcard", "type of sound card to use", 20, SET_IN_FILE },
 #endif
 	{ "symset", "load a set of display symbols from the symbols file", 70,
-#ifdef LOADSYMSETS
 				SET_IN_GAME },
-#else
-				DISP_IN_GAME},
-#endif
 	{ "roguesymset", "load a set of rogue display symbols from the symbols file", 70,
-#ifdef LOADSYMSETS
 				 SET_IN_GAME },
-#else
-				 DISP_IN_GAME},
-#endif
 	{ "suppress_alert", "suppress alerts about version-specific features",
 						8, SET_IN_GAME },
 	{ "tile_width", "width of tiles", 20, DISP_IN_GAME},	/*WC*/
@@ -654,11 +646,9 @@ initoptions_init()
 	 */
 	/* this detects the IBM-compatible console on most 386 boxes */
 	if ((opts = nh_getenv("TERM")) && !strncmp(opts, "AT", 2)) {
-#ifdef LOADSYMSETS
 		if (!symset[PRIMARY].name) load_symset("IBMGraphics", PRIMARY);
 		if (!symset[ROGUESET].name) load_symset("RogueIBM", ROGUESET);
 		switch_symbols(TRUE);
-#endif
 # ifdef TEXTCOLOR
 		iflags.use_color = TRUE;
 # endif
@@ -670,10 +660,8 @@ initoptions_init()
 	if ((opts = nh_getenv("TERM")) &&
 	    !strncmpi(opts, "vt", 2) && AS && AE &&
 	    index(AS, '\016') && index(AE, '\017')) {
-#  ifdef LOADSYMSETS
 		if (!symset[PRIMARY].name) load_symset("DECGraphics", PRIMARY);
 		switch_symbols(TRUE);
-#  endif /*LOADSYMSETS*/
 	}
 # endif
 #endif /* UNIX || VMS */
@@ -1406,7 +1394,6 @@ boolean tinitial, tfrom_file;
 
 	fullname = "symset";
 	if (match_optname(opts, fullname, 6, TRUE)) {
-#ifdef LOADSYMSETS
 		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) bad_negation(fullname, FALSE);
 		else if ((op = string_for_opt(opts, FALSE)) != 0) {
@@ -1422,7 +1409,6 @@ boolean tinitial, tfrom_file;
 			need_redraw = TRUE;
 		    }
 		}
-#endif
 		return;
 	}
 
@@ -2505,7 +2491,6 @@ goodfruit:
 	fullname = "DECgraphics";
 	if (match_optname(opts, fullname, 10, TRUE)) {
 		boolean badflag = FALSE;
-# ifdef LOADSYMSETS
 		if (duplicate) complain_about_duplicate(opts,1);
 		if (!negated) {
 		    /* There is no rogue level DECgraphics-specific set */
@@ -2525,14 +2510,12 @@ goodfruit:
 			wait_synch();
 		    }
 		}
-# endif	/*LOADSYMSETS*/
 		return;
 	}
 	fullname = "IBMgraphics";
 	if (match_optname(opts, fullname, 10, TRUE)) {
 		const char *sym_name = fullname;
 		boolean badflag = FALSE;
-# ifdef LOADSYMSETS
 		if (duplicate) complain_about_duplicate(opts,1);
 		if (!negated) {
 		    for (i = PRIMARY; i <= ROGUESET; ++i) { 
@@ -2559,7 +2542,6 @@ goodfruit:
 				assign_graphics(ROGUESET);
 		    }
 		}
-# endif /*LOADSYMSETS*/
 		return;
 	}
 #endif
@@ -2567,7 +2549,6 @@ goodfruit:
 	fullname = "MACgraphics";
 	if (match_optname(opts, fullname, 11, TRUE)) {
 		boolean badflag = FALSE;
-# ifdef LOADSYMSETS
 		if (duplicate) complain_about_duplicate(opts,1);
 		if (!negated) {
 		    if (symset[PRIMARY]).name badflag = TRUE;
@@ -2589,7 +2570,6 @@ goodfruit:
 				assign_graphics(ROGUESET);
 		    }
 		}
-# endif /*LOADSYMSETS*/
 		return;
 	}
 #endif
@@ -2997,10 +2977,8 @@ doset()
 	return 0;
 }
 
-#ifdef LOADSYMSETS
 struct symsetentry *symset_list = 0;	/* files.c will populate this with
 						 list of available sets */
-#endif
 
 STATIC_OVL boolean
 special_handling(optname, setinitial, setfromfile)
@@ -3390,19 +3368,16 @@ boolean setinitial,setfromfile;
 		  rogueflag = (*optname == 'r'),
 		ready_to_switch = FALSE,
 		nothing_to_do = FALSE;
-#ifdef LOADSYMSETS
 	int res;
 	char *symset_name, fmtstr[20];
 	struct symsetentry *sl;
 	int setcount = 0;
-#endif
 	int chosen = -2, which_set;
  
 	if (rogueflag) which_set = ROGUESET;
 	else
 	which_set = PRIMARY;
 
-#ifdef LOADSYMSETS
 	/* clear symset[].name as a flag to read_sym_file() to build list */
 	symset_name = symset[which_set].name;
 	symset[which_set].name = (char *)0;
@@ -3551,7 +3526,6 @@ boolean setinitial,setfromfile;
 		    assign_graphics(ROGUESET);
 	} else if (!rogueflag) assign_graphics(PRIMARY);
 	need_redraw = TRUE;
-#endif /*LOADSYMSETS*/
 	return TRUE;
 
     } else {
@@ -3772,10 +3746,8 @@ char *buf;
 		Sprintf(buf, "%s", rolestring(flags.initrace, races, noun));
 	else if (!strcmp(optname, "roguesymset")) {
 		Sprintf(buf, "%s",
-#ifdef LOADSYMSETS
 			symset[ROGUESET].name ?
 			symset[ROGUESET].name :
-#endif
 			"default");
 		if (currentgraphics == ROGUESET && symset[ROGUESET].name)
 			Strcat(buf, ", active");
@@ -3813,10 +3785,8 @@ char *buf;
 	}
 	else if (!strcmp(optname, "symset")) {
 		Sprintf(buf, "%s",
-#ifdef LOADSYMSETS
 			symset[PRIMARY].name ?
 			symset[PRIMARY].name :
-#endif
 			"default");
 		if (currentgraphics == PRIMARY && symset[PRIMARY].name)
 			Strcat(buf, ", active");
@@ -3992,7 +3962,6 @@ free_autopickup_exceptions()
 	}
 }
 
-#ifdef LOADSYMSETS
 /* bundle some common usage into one easy-to-use routine */
 int
 load_symset(s, which_set)
@@ -4070,7 +4039,6 @@ char *buf;
 	}
 	return (struct symparse *)0;
 }
-#endif /*LOADSYMSETS*/
 
 /* data for option_help() */
 static const char *opt_intro[] = {
