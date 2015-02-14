@@ -515,11 +515,9 @@ E void NDECL(init_r_symbols);
 E void NDECL(init_symbols);
 E void NDECL(init_showsyms);
 E void NDECL(init_l_symbols);
-#ifdef LOADSYMSETS
 E void FDECL(clear_symsetentry, (int,BOOLEAN_P));
 E void FDECL(update_l_symset, (struct symparse *,int));
 E void FDECL(update_r_symset, (struct symparse *,int));
-#endif
 E boolean FDECL(cursed_object_at, (int, int));
 
 /* ### dungeon.c ### */
@@ -733,11 +731,9 @@ E boolean FDECL(can_read_file, (const char *));
 E boolean FDECL(read_config_file, (const char *, int));
 E void FDECL(check_recordfile, (const char *));
 E void NDECL(read_wizkit);
-#ifdef LOADSYMSETS
 E int FDECL(read_sym_file, (int));
 E int FDECL(parse_sym_line, (char *,int));
 E int FDECL(sym_val, (const char *));
-#endif
 E void FDECL(paniclog, (const char *, const char *));
 E int FDECL(validate_prefix_locations, (char *));
 #ifdef SELECTSAVED
@@ -1589,11 +1585,9 @@ E void FDECL(set_wc2_option_mod_status, (unsigned long, int));
 E void FDECL(set_option_mod_status, (const char *,int));
 E int FDECL(add_autopickup_exception, (const char *));
 E void NDECL(free_autopickup_exceptions);
-#ifdef LOADSYMSETS
 E int FDECL(load_symset, (const char *,int));
 E void FDECL(parsesymbols, (char *));
 E struct symparse *FDECL(match_sym, (char *));
-#endif
 E void NDECL(set_playmode);
 
 /* ### pager.c ### */

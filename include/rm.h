@@ -278,12 +278,8 @@ extern const struct symdef def_warnsyms[WARNCOUNT];
 extern int currentgraphics;				  /* from drawing.c */
 extern nhsym showsyms[];
 
-#ifdef LOADSYMSETS
 extern struct symsetentry symset[NUM_GRAPHICS];		  /* from drawing.c */
 #define SYMHANDLING(ht) (symset[currentgraphics].handling == (ht))
-#else
-#define SYMHANDLING(ht) ((ht) == H_UNK)
-#endif
 
 /*
  * The 5 possible states of doors

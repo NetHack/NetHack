@@ -19,9 +19,7 @@
 #define C(n)
 #endif
 
-#ifdef LOADSYMSETS
 struct symsetentry symset[NUM_GRAPHICS];
-#endif
 
 int currentgraphics = 0;
 
@@ -399,9 +397,7 @@ init_l_symbols()
 	    	l_syms[i + SYM_OFF_X] = DEF_INVISIBLE;
 	}
 
-#ifdef LOADSYMSETS
 	clear_symsetentry(PRIMARY, FALSE);
-#endif
 }
 
 void
@@ -433,13 +429,11 @@ init_r_symbols()
 	    	r_syms[i + SYM_OFF_X] = DEF_INVISIBLE;
 	}
 
-# ifdef LOADSYMSETS
 	clear_symsetentry(ROGUESET, FALSE);
 	symset[ROGUESET].nocolor = 1;	 /* default on Rogue level is no color
 					  * but some symbol sets can
 					  * override that
 					  */
-# endif
 }
 
 void
@@ -499,7 +493,6 @@ int nondefault;
 	init_symbols();
 }
 
-#ifdef LOADSYMSETS
 void
 update_l_symset(symp, val)
 struct symparse *symp;
@@ -755,7 +748,6 @@ struct symparse loadsyms[] = {
 	{SYM_OTH, SYM_INVISIBLE + SYM_OFF_X, "S_invisible"},
 	{0,0,(const char *)0}	/* fence post */
 };
-#endif /*LOADSYMSETS*/
 
 /*drawing.c*/
 

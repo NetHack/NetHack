@@ -364,11 +364,9 @@ init_sco_cons()
 	if (!strcmp(windowprocs.name, "tty") && sco_flag_console) {
 		atexit(sco_mapon);
 		sco_mapoff();
-#  ifdef LOADSYMSETS
 		load_symset("IBMGraphics", PRIMARY);
 		load_symset("RogueIBM", ROGUESET);
 		switch_symbols(TRUE);
-#  endif
 #  ifdef TEXTCOLOR
 		if (has_colors())
 			iflags.use_color = TRUE;

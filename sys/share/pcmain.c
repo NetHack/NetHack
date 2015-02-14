@@ -303,8 +303,7 @@ char *argv[];
 	process_options(argc, argv);
 #endif
 
-#ifdef LOADSYMSETS
-# if defined(MSDOS) || defined(WIN32)
+#if defined(MSDOS) || defined(WIN32)
 	/* Player didn't specify any symbol set so use IBM defaults */
 	if (!symset[PRIMARY].name) {
 		load_symset("IBMGraphics_2", PRIMARY);
@@ -312,8 +311,7 @@ char *argv[];
 	if (!symset[ROGUESET].name) {
 		load_symset("RogueEpyx", ROGUESET);
 	}
-# endif
-#endif /*LOADSYMSETS*/
+#endif
 
 #ifdef MSDOS
 	init_nhwindows(&argc,argv);
@@ -536,20 +534,16 @@ char *argv[];
 		case 'I':
 		case 'i':
 			if (!strncmpi(argv[0]+1, "IBM", 3)) {
-# ifdef LOADSYMSETS
 				load_symset("IBMGraphics", PRIMARY);
 				load_symset("RogueIBM", ROGUESET);
 				switch_symbols(TRUE);
-# endif
 			}
 			break;
 	    /*	case 'D': */
 		case 'd':
 			if (!strncmpi(argv[0]+1, "DEC", 3)) {
-# ifdef LOADSYMSETS
 				load_symset("DECGraphics", PRIMARY);
 				switch_symbols(TRUE);
-# endif
 			}
 			break;
 #endif

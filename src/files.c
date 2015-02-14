@@ -190,10 +190,8 @@ STATIC_DCL FILE *FDECL(fopen_config_file, (const char *, int));
 STATIC_DCL int FDECL(get_uchars,
 		    (FILE *,char *,char *,uchar *,BOOLEAN_P,int,const char *));
 int FDECL(parse_config_line, (FILE *,char *,int));
-#ifdef LOADSYMSETS
 STATIC_DCL FILE *NDECL(fopen_sym_file);
 STATIC_DCL void FDECL(set_symhandling, (char *,int));
-#endif
 #ifdef NOCWD_ASSUMPTIONS
 STATIC_DCL void FDECL(adjust_prefix, (char *, int));
 #endif
@@ -2202,10 +2200,6 @@ int		src;
 					WARNCOUNT, "WARNINGS");
 	    assign_warnings(translate);
 	} else if (match_varname(buf, "SYMBOLS", 4)) {
-	/* This part is not ifdef LOADSYMSETS because we want to be able
-	 * to silently ignore its presence in a config file if that is
-	 * not defined.
-	 */
 		char *op, symbuf[BUFSZ];
 		boolean morelines;
 		do {
@@ -2224,10 +2218,8 @@ int		src;
 			    /* strip trailing space now that '\' is gone */
 			    while (--op >= bufp && isspace(*op)) *op = '\0';
 			}
-#ifdef LOADSYMSETS
 			/* parse here */
 			parsesymbols(bufp);	
-#endif
 			if (morelines)
 			  do  {
 			    *symbuf = '\0';
@@ -2238,9 +2230,7 @@ int		src;
 			    bufp = symbuf;
 			} while (*bufp == '#');
 		} while (morelines);
-#ifdef LOADSYMSETS
 		switch_symbols(TRUE);
-#endif
 	} else if (match_varname(buf, "WIZKIT", 6)) {
 	    (void) strncpy(wizkit, bufp, WIZKIT_MAX-1);
 #ifdef AMIGA
@@ -2561,7 +2551,6 @@ read_wizkit()
 	return;
 }
 
-#ifdef LOADSYMSETS
 extern struct symsetentry *symset_list;		/* options.c */
 extern struct symparse loadsyms[];		/* drawing.c */
 extern const char *known_handling[];		/* drawing.c */
@@ -2897,7 +2886,6 @@ const char *cp;
     }
     return cval;
 }
-#endif /*LOADSYMSETS*/
 
 /* ----------  END CONFIG FILE HANDLING ----------- */
 

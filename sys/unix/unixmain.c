@@ -357,20 +357,16 @@ char *argv[];
 		case 'I':
 		case 'i':
 			if (!strncmpi(argv[0]+1, "IBM", 3)) {
-#ifdef LOADSYMSETS
 				load_symset("IBMGraphics", PRIMARY);
 				load_symset("RogueIBM", ROGUESET);
 				switch_symbols(TRUE);
-#endif
 			}
 			break;
 	    /*  case 'D': */
 		case 'd':
 			if (!strncmpi(argv[0]+1, "DEC", 3)) {
-#ifdef LOADSYMSETS
 				load_symset("DECGraphics", PRIMARY);
 				switch_symbols(TRUE);
-#endif
 			}
 			break;
 		case 'p': /* profession (role) */
