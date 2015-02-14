@@ -340,10 +340,8 @@ register char *s;
 void win32_abort()
 {
 
-#ifdef WIZARD
    	if (wizard)
 		DebugBreak();
-#endif
 	abort();
 }
 

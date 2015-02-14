@@ -1690,9 +1690,7 @@ static const char *const as_is[] = {
 	"boots", "shoes",
 	"gloves", "lenses", "scales",
 	"gauntlets",
-#ifdef WIZARD
 	"iron bars",
-#endif
 	/* both singular and plural are spelled the same */
 	"deer", "fish", "tuna", "yaki", "-hai",
 	"krill", "manes", "ninja", "sheep", "ronin", "roshi", "shito", "tengu",
@@ -2188,9 +2186,7 @@ STATIC_OVL NEARDATA const struct o_range o_ranges[] = {
 	{ "dragon scale mail",
 			ARMOR_CLASS,  GRAY_DRAGON_SCALE_MAIL, YELLOW_DRAGON_SCALE_MAIL },
 	{ "sword",	WEAPON_CLASS, SHORT_SWORD,    KATANA },
-#ifdef WIZARD
 	{ "venom",	VENOM_CLASS,  BLINDING_VENOM, ACID_VENOM },
-#endif
 	{ "gray stone",	GEM_CLASS,    LUCKSTONE,      FLINT },
 	{ "grey stone",	GEM_CLASS,    LUCKSTONE,      FLINT },
 };
@@ -2652,7 +2648,6 @@ struct obj *no_wish;
 		}
 	}
 
-#ifdef WIZARD
 	/* Wishing in wizard mode can create traps and furniture.
 	 * Part I:  distinguish between trap and object for the two
 	 * types of traps which have corresponding objects:  bear trap
@@ -2692,7 +2687,6 @@ struct obj *no_wish;
 		   the object name and getting a disarmed trap object] */
 	    }
 	}
-#endif
 
 retry:
 	/* "grey stone" check must be before general "stone" */
@@ -2862,7 +2856,6 @@ srch:
 		goto typfnd;
 	    }
 	}
-#ifdef WIZARD
 	/* Let wizards wish for traps and furniture.
 	 * Must come after objects check so wizards can still wish for
 	 * trap objects like beartraps.
@@ -2979,7 +2972,6 @@ wiztrap:
 		    return &zeroobj;
 		}
 	}
-#endif 	/* WIZARD */
 
 	if(!oclass) return((struct obj *)0);
 any:
@@ -3035,16 +3027,12 @@ typfnd:
 				|| typ == ROCK || is_missile(otmp)))))
 	    otmp->quan = (long) cnt;
 
-#ifdef WIZARD
 	if (oclass == VENOM_CLASS) otmp->spe = 1;
-#endif
 
 	if (spesgn == 0) {
 		spe = otmp->spe;
-#ifdef WIZARD
 	} else if (wizard) {
 		;	/* no alteration to spe */
-#endif
 	} else if (oclass == ARMOR_CLASS || oclass == WEAPON_CLASS ||
 		 is_weptool(otmp) ||
 			(oclass==RING_CLASS && objects[typ].oc_charged)) {

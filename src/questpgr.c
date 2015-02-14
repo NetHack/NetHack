@@ -461,10 +461,8 @@ boolean
 skip_pager(common)
 boolean common;
 {
-#ifdef WIZARD
 	/* WIZKIT: suppress plot feedback if starting with quest artifact */
 	if (program_state.wizkit_wishing) return TRUE;
-#endif
 	if (!(common ? qt_list.common : qt_list.chrole)) {
 	    panic("%s: no %s quest text data available",
 		  common ? "com_pager" : "qt_pager",

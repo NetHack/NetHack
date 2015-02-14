@@ -284,12 +284,8 @@ finder_file_request(void)
 boolean
 authorize_wizard_mode()
 {
-#ifdef WIZARD
 	/* other ports validate user name or character name here */
 	return TRUE;
-#else
-	return FALSE;
-#endif
 }
 
 /*macmain.c*/

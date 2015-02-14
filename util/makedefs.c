@@ -1233,9 +1233,6 @@ static const char *build_opts[] = {
 #ifdef DLB
 		"data librarian",
 #endif
-#ifdef WIZARD
-		"debug mode",
-#endif
 #ifdef EXP_ON_BOTL
 		"experience points on status line",
 #endif

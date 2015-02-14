@@ -138,12 +138,8 @@ static struct Bool_Opt
 #else
 	{"mail", (boolean *)0, TRUE, SET_IN_FILE},
 #endif
-#ifdef WIZARD
 	/* for menu debugging only*/
 	{"menu_tab_sep", &iflags.menu_tab_sep, FALSE, SET_IN_GAME},
-#else
-	{"menu_tab_sep", (boolean *)0, FALSE, SET_IN_FILE},
-#endif
 	{"mouse_support", &iflags.wc_mouse_support, TRUE, DISP_IN_GAME},	/*WC*/
 #ifdef NEWS
 	{"news", &iflags.news, TRUE, DISP_IN_GAME},
@@ -177,11 +173,7 @@ static struct Bool_Opt
 		DISP_IN_GAME},
 #endif
 	{"safe_pet", &flags.safe_dog, TRUE, SET_IN_GAME},
-#ifdef WIZARD
 	{"sanity_check", &iflags.sanity_check, FALSE, SET_IN_GAME},
-#else
-	{"sanity_check", (boolean *)0, FALSE, SET_IN_FILE},
-#endif
 	{"selectsaved", &iflags.wc2_selectsaved, TRUE, DISP_IN_GAME},		/*WC*/
 #ifdef EXP_ON_BOTL
 	{"showexp", &flags.showexp, FALSE, SET_IN_GAME},
@@ -339,12 +331,7 @@ static struct Comp_Opt
 						MAXOCLASSES, SET_IN_GAME },
 	{ "pile_limit", "threshold for \"there are many objects here\"",
 						24, SET_IN_GAME },
-	{ "playmode",
-#ifdef WIZARD
-		      "normal play, non-scoring explore mode, or debug mode",
-#else
-		      "normal play or non-scoring explore mode",
-#endif
+	{ "playmode", "normal play, non-scoring explore mode, or debug mode",
 						 8, DISP_IN_GAME },
 	{ "player_selection", "choose character via dialog or prompts",
 						12, DISP_IN_GAME },
@@ -1112,17 +1099,9 @@ STATIC_VAR const struct paranoia_opts {
 	{ PARANOID_QUIT,    "quit", 1,    "explore", 1,
 		"yes vs y to quit or to enter explore mode" },
 	{ PARANOID_DIE,     "die", 1,     "death", 2,
-#ifdef WIZARD
 		"yes vs y to die (explore mode or debug mode)" },
-#else
-		"yes vs y to die (explore mode only)" },
-#endif
 	{ PARANOID_BONES,   "bones", 1,   0, 0,
-#ifdef WIZARD
 		"yes vs y to save bones data when dying in debug mode" },
-#else
-		"(only applicable for debug mode)" },
-#endif
 	{ PARANOID_HIT,     "attack", 1,  "hit", 1,
 		"yes vs y to attack a peaceful monster" },
 	{ PARANOID_PRAY,    "pray", 1,    0, 0,
@@ -2045,12 +2024,7 @@ goodfruit:
 		wizard = FALSE, discover = TRUE;
 	    } else if (!strncmpi(op, "debug", 5) ||
 		    !strncmpi(op, "wizard", 6)) {
-#ifdef WIZARD
 		wizard = TRUE, discover = FALSE;
-#else
-		raw_printf("\"%s\":%s -- debug mode not available.",
-			   fullname, op);
-#endif
 	    } else {
 		raw_printf("Invalid value for \"%s\":%s.", fullname, op);
 	    }
@@ -2868,10 +2842,8 @@ doset()
 			((boolopt[i].optflags == DISP_IN_GAME && pass == 0) ||
 			 (boolopt[i].optflags == SET_IN_GAME && pass == 1))) {
 		    if (bool_p == &flags.female) continue;  /* obsolete */
-#ifdef WIZARD
 		    if (bool_p == &iflags.sanity_check && !wizard) continue;
 		    if (bool_p == &iflags.menu_tab_sep && !wizard) continue;
-#endif
 		    if (is_wc_option(boolopt[i].name) &&
 			!wc_supported(boolopt[i].name)) continue;
 		    if (is_wc2_option(boolopt[i].name) &&
@@ -4162,10 +4134,8 @@ option_help()
     /* Boolean options */
     for (i = 0; boolopt[i].name; i++) {
 	if (boolopt[i].addr) {
-#ifdef WIZARD
 	    if (boolopt[i].addr == &iflags.sanity_check && !wizard) continue;
 	    if (boolopt[i].addr == &iflags.menu_tab_sep && !wizard) continue;
-#endif
 	    next_opt(datawin, boolopt[i].name);
 	}
     }
@@ -4756,11 +4726,9 @@ void
 set_playmode()
 {
     if (wizard) {
-#ifdef WIZARD
 	if (authorize_wizard_mode())
 	    Strcpy(plname, "wizard");
 	else
-#endif
 	    wizard = FALSE;	/* not allowed or not available */
 	/* force explore mode if we didn't make it into wizard mode */
 	discover = !wizard;

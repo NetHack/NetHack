@@ -619,9 +619,7 @@ void mac_askname ()
 	    fatal("\pCannot create mode menu");
 	AppendMenu(askmenu[RSRC_ASK_MODE], "\pNormal");
 	AppendMenu(askmenu[RSRC_ASK_MODE], "\pExplore");
-#ifdef WIZARD
 	AppendMenu(askmenu[RSRC_ASK_MODE], "\pDebug");
-#endif
 	InsertMenu(askmenu[RSRC_ASK_MODE], hierMenu);
 	currmode = 0;
 
@@ -708,9 +706,7 @@ void mac_askname ()
 	    /* Adjust the mode popup menu */
 	    CheckMenuItem(askmenu[RSRC_ASK_MODE], 1, currmode == 0);
 	    CheckMenuItem(askmenu[RSRC_ASK_MODE], 2, currmode == 1);
-#ifdef WIZARD
 	    CheckMenuItem(askmenu[RSRC_ASK_MODE], 3, currmode == 2);
-#endif
 
 	    /* Wait for an action on an item */
 	    ModalDialog(filter, &item);
@@ -773,22 +769,17 @@ void mac_askname ()
 	DisposeUserItemUPP(redraw);
 
 	/* Process the mode */
-#ifdef WIZARD
-	wizard =
-#endif
-	discover = 0;
+	wizard = discover = 0;
 	switch (currmode) {
 	case 0:		/* Normal */
 	    break;
 	case 1:		/* Explore */
 	    discover = 1;
 	    break;
-#ifdef WIZARD
 	case 2:		/* Debug */
 	    wizard = 1;
-	    strcpy(plname, WIZARD);
+	    strcpy(plname, WIZARD_NAME);
 	    break;
-#endif
 	default:	/* Quit */
 	    ExitToShell();
 	}
@@ -935,7 +926,6 @@ AdjustMenus(short dimMenubar)
 
 	if (newMenubar != mbarRegular)
 		;							/* we've already found its state */
-#ifdef WIZARD
 	else if (wizard)
 	{
 		newMenubar = mbarSpecial;
@@ -947,7 +937,6 @@ AdjustMenus(short dimMenubar)
 			SetMenuItemText(MHND_FILE, menuFilePlayMode, "\pDebug");
 		}
 	}
-#endif
 
 	else if (discover)
 	{

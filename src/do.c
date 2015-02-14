@@ -1029,9 +1029,7 @@ boolean at_stairs, falling, portal;
 		newlevel->dlevel = dunlevs_in_dungeon(newlevel);
 	if (newdungeon && In_endgame(newlevel)) { /* 1st Endgame Level !!! */
 		if (!u.uhave.amulet) return;	/* must have the Amulet */
-#ifdef WIZARD
 		if (!wizard)	/* wizard ^V can bypass Earth level */
-#endif
 		assign_level(newlevel, &earth_level);	/* (redundant) */
 	}
 	new_ledger = ledger_no(newlevel);
@@ -1297,12 +1295,10 @@ boolean at_stairs, falling, portal;
 		mnexto(mtmp);
 
 	    if ((mtmp = m_at(u.ux, u.uy)) != 0) {
-#ifdef WIZARD
 		/* there was an unconditional impossible("mnearto failed")
 		   here, but it's not impossible and we're prepared to cope
 		   with the situation, so only say something when debugging */
 		if (wizard) pline("(monster in hero's way)");
-#endif
 		if (!rloc(mtmp, TRUE))
 		    /* no room to move it; send it away, to return later */
 		    migrate_to_level(mtmp, ledger_no(&u.uz),

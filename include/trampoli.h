@@ -28,7 +28,6 @@
 #define doprev_message() doprev_message_()
 #define timed_occupation() timed_occupation_()
 #define wiz_attributes()   wiz_attributes_()
-#ifdef WIZARD
 #define wiz_detect()	   wiz_detect_()
 #define wiz_genesis()	   wiz_genesis_()
 #define wiz_identify()	   wiz_identify_()
@@ -36,7 +35,6 @@
 #define wiz_map()	   wiz_map_()
 #define wiz_where()	   wiz_where_()
 #define wiz_wish()	   wiz_wish_()
-#endif
 
 /* ### display.c ### */
 #define doredraw() doredraw_()

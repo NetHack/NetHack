@@ -311,9 +311,7 @@ int wt;
 #endif
 #ifndef NO_SIGNAL
 	(void) signal(SIGINT, (SIG_RET_TYPE) done1);
-# ifdef WIZARD
 	if(wizard) (void) signal(SIGQUIT,SIG_DFL);
-# endif
 #endif
 	if(wt) {
 		raw_print("");

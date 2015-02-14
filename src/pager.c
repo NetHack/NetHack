@@ -936,9 +936,7 @@ static const char *help_menu_items[] = {
 #else
 #define WIZHLP_SLOT 11
 #endif
-#ifdef WIZARD
 	"List of wizard-mode commands.",
-#endif
 	"",
 	(char *)0
 };
@@ -957,10 +955,8 @@ help_menu(sel)
 
 	any = zeroany;		/* zero all bits */
 	start_menu(tmpwin);
-#ifdef WIZARD
 	if (!wizard) help_menu_items[WIZHLP_SLOT] = "",
 		     help_menu_items[WIZHLP_SLOT+1] = (char *)0;
-#endif
 	for (i = 0; help_menu_items[i]; i++)
 #ifdef PORT_HELP
 	    /* port-specific line has a %s in it for the PORT_ID */
@@ -1010,10 +1006,8 @@ dohelp()
 			case PORT_HELP_ID:  port_help();  break;
 #endif
 			default:
-#ifdef WIZARD
 			/* handle slot 11 or 12 */
 				display_file(DEBUGHELP, TRUE);
-#endif
 				break;
 		}
 	}

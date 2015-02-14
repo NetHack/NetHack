@@ -50,9 +50,7 @@ pline VA_DECL(const char *, line)
 #ifdef HANGUPHANDLING
 	if (program_state.done_hup) return;
 #endif
-#ifdef WIZARD
 	if (program_state.wizkit_wishing) return;
-#endif
 
 	if (index(line, '%')) {
 	    Vsprintf(pbuf,line,VA_ARGS);
@@ -341,7 +339,6 @@ register struct monst *mtmp;
 
 	info[0] = 0;
 	if (mtmp->mtame) {	  Strcat(info, ", tame");
-#ifdef WIZARD
 	    if (wizard) {
 		Sprintf(eos(info), " (%d", mtmp->mtame);
 		if (!mtmp->isminion)
@@ -349,7 +346,6 @@ register struct monst *mtmp;
 			EDOG(mtmp)->hungrytime, EDOG(mtmp)->apport);
 		Strcat(info, ")");
 	    }
-#endif
 	}
 	else if (mtmp->mpeaceful) Strcat(info, ", peaceful");
 	if (mtmp->cham >= LOW_PM && mtmp->data != &mons[mtmp->cham])

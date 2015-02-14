@@ -531,9 +531,7 @@ unsigned int *stuckid, *steedid;
 	    /* for wizard mode, issue a reminder; for others, treat it
 	       as an attempt to cheat and refuse to restore this file */
 	    pline("Saved game was not yours.");
-#ifdef WIZARD
 	    if (!wizard)
-#endif
 		return FALSE;
 	}
 	mread(fd, (genericptr_t) &context, sizeof(struct context_info));
@@ -1008,9 +1006,7 @@ boolean ghostly;
 			hpid, pid);
 	    else
 		Sprintf(trickbuf, "This is level %d, not %d!", dlvl, lev);
-#ifdef WIZARD
 	    if (wizard) pline1(trickbuf);
-#endif
 	    trickery(trickbuf);
 	}
 	restcemetery(fd, &level.bonesinfo);

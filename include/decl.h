@@ -151,9 +151,7 @@ E NEARDATA struct sinfo {
 #ifdef PANICLOG
 	int in_paniclog;
 #endif
-#ifdef WIZARD
 	int wizkit_wishing;
-#endif
 } program_state;
 
 E boolean restoring;

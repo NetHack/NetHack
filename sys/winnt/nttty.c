@@ -417,7 +417,7 @@ int *x, *y, *mod;
 static void
 really_move_cursor()
 {
-#if defined(PORT_DEBUG) && defined(WIZARD)
+#ifdef PORT_DEBUG
 	char oldtitle[BUFSZ], newtitle[BUFSZ];
 	if (display_cursor_info && wizard) {
 		oldtitle[0] = '\0';

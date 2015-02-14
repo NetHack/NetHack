@@ -10,14 +10,12 @@ STATIC_DCL void FDECL(maybe_adjust_light, (struct obj *,int));
 STATIC_DCL void FDECL(obj_timer_checks,(struct obj *, XCHAR_P, XCHAR_P, int));
 STATIC_DCL void FDECL(container_weight, (struct obj *));
 STATIC_DCL struct obj *FDECL(save_mtraits, (struct obj *, struct monst *));
-#ifdef WIZARD
 STATIC_DCL void FDECL(objlist_sanity, (struct obj *,int,const char *));
 STATIC_DCL void FDECL(mon_obj_sanity, (struct monst *,const char *));
 STATIC_DCL const char *FDECL(where_name, (struct obj *));
 STATIC_DCL void FDECL(insane_object,
 		      (struct obj *,const char *,const char *,struct monst *));
 STATIC_DCL void FDECL(check_contained, (struct obj *,const char *));
-#endif
 
 /*#define DEBUG_EFFECTS*/	/* show some messages for debugging */
 
@@ -1950,7 +1948,6 @@ boolean tipping;  /* caller emptying entire contents; affects shop handling */
     return objcount;
 }
 
-#ifdef WIZARD
 /* support for wizard-mode's `sanity_check' option */
 
 static const char NEARDATA	/* pline formats for insane_object() */
@@ -2144,6 +2141,5 @@ check_contained(container, mesg)
 	}
     }
 }
-#endif /* WIZARD */
 
 /*mkobj.c*/

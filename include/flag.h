@@ -174,10 +174,8 @@ struct instance_flags {
 	coord	travelcc;	/* coordinates for travel_cache */
 	boolean  window_inited; /* true if init_nhwindows() completed */
 	boolean  vision_inited; /* true if vision is ready */
-#ifdef WIZARD
 	boolean  sanity_check;	/* run sanity checks */
 	boolean  mon_polycontrol;	/* debug: control monster polymorphs */
-#endif
 	/* stuff that is related to options and/or user or platform preferences */
 	unsigned msg_history;	/* hint: # of top lines to save */
 	int	 menu_headings;	/* ATR for menu headings */

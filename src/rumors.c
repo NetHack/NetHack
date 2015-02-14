@@ -172,7 +172,6 @@ boolean exclude_cookie;
 	return rumor_buf;
 }
 
-#ifdef WIZARD
 /*
  * test that the true/false rumor boundaries are valid.
  */
@@ -266,7 +265,6 @@ rumor_check()
 		true_rumor_size = -1;	/* don't try to open it again */
 	}
 }
-#endif
 
 void
 outrumor(truth, mechanism)

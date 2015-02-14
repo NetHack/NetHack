@@ -8,10 +8,6 @@
 /* for KR1ED config, WIZARD is 0 or 1 and WIZARD_NAME is a string;
    for usual config, WIZARD is the string; forcing WIZARD_NAME to match it
    eliminates conditional testing for which one to use in string ops */
-#ifndef KR1ED
-# undef WIZARD_NAME
-# define WIZARD_NAME WIZARD
-#endif
 
 struct sysopt sysopt;
 

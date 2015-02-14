@@ -50,14 +50,12 @@ STATIC_DCL void FDECL(init_level, (int,int,struct proto_dungeon *));
 STATIC_DCL int FDECL(possible_places, (int, boolean *, struct proto_dungeon *));
 STATIC_DCL xchar FDECL(pick_level, (boolean *, int));
 STATIC_DCL boolean FDECL(place_level, (int, struct proto_dungeon *));
-#ifdef WIZARD
 STATIC_DCL boolean FDECL(unplaced_floater, (struct dungeon *));
 STATIC_DCL boolean FDECL(unreachable_level, (d_level *,BOOLEAN_P));
 STATIC_DCL void FDECL(tport_menu, (winid,char *,struct lchoice *,
 				   d_level *,BOOLEAN_P));
 STATIC_DCL const char *FDECL(br_string, (int));
 STATIC_DCL void FDECL(print_branch, (winid, int, int, int, BOOLEAN_P, struct lchoice *));
-#endif
 
 mapseen *mapseenchn = (struct mapseen *)0;
 STATIC_DCL mapseen *FDECL(load_mapseen, (int));
@@ -521,10 +519,7 @@ init_level(dgn, proto_index, pd)
 	struct tmplevel *tlevel = &pd->tmplevel[proto_index];
 
 	pd->final_lev[proto_index] = (s_level *) 0; /* no "real" level */
-#ifdef WIZARD
-	if (!wizard)
-#endif
-	    if (tlevel->chance <= rn2(100)) return;
+	if (!wizard && tlevel->chance <= rn2(100)) return;
 
 	pd->final_lev[proto_index] = new_level =
 					(s_level *) alloc(sizeof(s_level));
@@ -742,10 +737,8 @@ init_dungeons()		/* initialize the "dungeon" structs */
 	for (i = 0; i < n_dgns; i++) {
 	    Fread((genericptr_t)&pd.tmpdungeon[i],
 				    sizeof(struct tmpdungeon), 1, dgn_file);
-#ifdef WIZARD
-	    if(!wizard)
-#endif
-	      if(pd.tmpdungeon[i].chance && (pd.tmpdungeon[i].chance <= rn2(100))) {
+	    if(!wizard && pd.tmpdungeon[i].chance
+                && (pd.tmpdungeon[i].chance <= rn2(100))) {
 		int j;
 
 		/* skip over any levels or branches */
@@ -1542,9 +1535,7 @@ const char *nam;
 		(u.uz.dnum == medusa_level.dnum &&
 			dlev.dnum == valley_level.dnum)) &&
 	    (	/* either wizard mode or else seen and not forgotten */
-#ifdef WIZARD
 	     wizard ||
-#endif
 		(level_info[idx].flags & (FORGOTTEN|VISITED)) == VISITED)) {
 	    lev = depth(&slev->dlevel);
 	}
@@ -1558,9 +1549,7 @@ const char *nam;
 	    idxtoo = (idx >> 8) & 0x00FF;
 	    idx &= 0x00FF;
 	    if (  /* either wizard mode, or else _both_ sides of branch seen */
-#ifdef WIZARD
 		wizard ||
-#endif
 		((level_info[idx].flags & (FORGOTTEN|VISITED)) == VISITED &&
 		 (level_info[idxtoo].flags & (FORGOTTEN|VISITED)) == VISITED)) {
 		if (ledger_to_dnum(idxtoo) == u.uz.dnum) idx = idxtoo;
@@ -1572,8 +1561,6 @@ const char *nam;
     }
     return lev;
 }
-
-#ifdef WIZARD
 
 STATIC_OVL boolean
 unplaced_floater(dptr)
@@ -1821,7 +1808,6 @@ xchar *rdgn;
     destroy_nhwindow(win);
     return 0;
 }
-#endif /* WIZARD */
 
 /* Record that the player knows about a branch from a level. This function
  * will determine whether or not it was a "real" branch that was taken.
@@ -2560,7 +2546,6 @@ boolean printdun;
 	 */
 	Sprintf(buf, "%sLevel %d:", TAB, i);
 	
-#ifdef WIZARD
     /* wizmode prints out proto dungeon names for clarity */
     if (wizard) {
 	s_level *slev;
@@ -2568,7 +2553,6 @@ boolean printdun;
 	if ((slev = Is_special(&mptr->lev)) != 0)
 	    Sprintf(eos(buf), " [%s]", slev->proto);
     }
-#endif
     /* [perhaps print custom annotation on its own line when it's long] */
     if (mptr->custom)
 	Sprintf(eos(buf), " (%s)", mptr->custom);

@@ -124,12 +124,10 @@ boolean nethack_thinks_it_is_open;	/* Does NetHack think it's open?       */
 # endif
 #endif /*HOLD_LOCKFILE_OPEN*/
 
-#ifdef WIZARD
 #define WIZKIT_MAX 128
 static char wizkit[WIZKIT_MAX];
 STATIC_DCL FILE *NDECL(fopen_wizkit_file);
 STATIC_DCL void FDECL(wizkit_addinv, (struct obj *));
-#endif
 
 #ifdef AMIGA
 extern char PATH[];	/* see sys/amiga/amidos.c */
@@ -790,10 +788,8 @@ d_level *lev;
 #else
 	ret = rename(tempname, fq_bones);
 #endif
-#ifdef WIZARD
 	if (wizard && ret != 0)
 		pline("couldn't rename %s to %s.", tempname, fq_bones);
-#endif
 }
 
 
@@ -899,7 +895,7 @@ int fd;
 #endif
 
 
-#if defined(WIZARD) && !defined(MICRO)
+#ifndef MICRO
 /* change pre-existing savefile name to indicate an error savefile */
 void
 set_error_savefile()
@@ -1298,9 +1294,7 @@ boolean uncomp;
 	(void) signal(SIGQUIT, SIG_IGN);
 	(void) wait((int *)&i);
 	(void) signal(SIGINT, (SIG_RET_TYPE) done1);
-#  ifdef WIZARD
 	if (wizard) (void) signal(SIGQUIT, SIG_DFL);
-#  endif
 #else
 	/* I don't think we can really cope with external compression
 	 * without signals, so we'll declare that compress failed and
@@ -2246,10 +2240,8 @@ int		src;
 #ifdef LOADSYMSETS
 		switch_symbols(TRUE);
 #endif
-#ifdef WIZARD
 	} else if (match_varname(buf, "WIZKIT", 6)) {
 	    (void) strncpy(wizkit, bufp, WIZKIT_MAX-1);
-#endif
 #ifdef AMIGA
 	} else if (match_varname(buf, "FONT", 4)) {
 		char *t;
@@ -2435,7 +2427,6 @@ OR: Forbid multiline stuff for alternate config sources.
 	return rv;
 }
 
-#ifdef WIZARD
 STATIC_OVL FILE *
 fopen_wizkit_file()
 {
@@ -2568,8 +2559,6 @@ read_wizkit()
 	(void) fclose(fp);
 	return;
 }
-
-#endif /*WIZARD*/
 
 #ifdef LOADSYMSETS
 extern struct symsetentry *symset_list;		/* options.c */

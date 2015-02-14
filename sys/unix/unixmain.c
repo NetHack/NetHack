@@ -224,13 +224,10 @@ char *argv[];
 	   or holds a generic user name like "player" or "games" */
 	plnamesuffix();
 
-#ifdef WIZARD
 	if (wizard) {
 		/* use character name rather than lock letter for file names */
 		locknum = 0;
-	} else
-#endif
-	    {
+	} else {
 		/* suppress interrupts while processing lock file */
 		(void) signal(SIGQUIT,SIG_IGN);
 		(void) signal(SIGINT,SIG_IGN);
@@ -560,12 +557,10 @@ port_help()
 boolean
 authorize_wizard_mode()
 {
-#ifdef WIZARD
 	struct passwd *pw = get_unix_pw();
 	if (pw && sysopt.wizards && sysopt.wizards[0]) {
 	    if(check_user_string(sysopt.wizards)) return TRUE;
 	}
-#endif	/* WIZARD */
 	wiz_error_flag = TRUE;	/* not being allowed into wizard mode */
 	return FALSE;
 }
@@ -574,16 +569,12 @@ static void
 wd_message()
 {
 	if (wiz_error_flag) {
-#ifdef WIZARD
 	    if (sysopt.wizards && sysopt.wizards[0]) {
 		char *tmp = build_english_list(sysopt.wizards);
 		pline("Only user%s %s may access debug (wizard) mode.",
 			index(sysopt.wizards, ' ')?"s":"", tmp);
 		free(tmp);
 	    } else
-#else
-		pline("Debug mode is not available.");
-#endif
 		pline("Entering explore/discovery mode instead.");
 		wizard = 0, discover = 1;		/* (paranoia) */
 	} else if (discover)
