@@ -227,13 +227,6 @@ struct symdef {
 #endif
 };
 
-/*
- * Graphics sets for display symbols
- */
-#define PRIMARY		0	/* primary graphics         */
-#define ROGUESET	1	/* rogue graphics           */
-#define NUM_GRAPHICS	2
-
 struct symparse {
 	unsigned range;
 #define SYM_CONTROL	1	/* start/finish markers */
@@ -260,18 +253,25 @@ struct symsetentry {
 	Bitfield(nocolor,1);	     /* don't use color if set               */
 	Bitfield(primary,1);	     /* restricted for use as primary set    */
 	Bitfield(rogue,1);	     /* restricted for use as rogue lev set  */
-	Bitfield(unicode,1);	     /* restricted for use as a unicode set  */
 	/* 5 free bits */
 };
+
+/*
+ * Graphics sets for display symbols
+ */
+#define DEFAULT_GRAPHICS 0	/* regular characters: '-', '+', &c */
+#define PRIMARY		0	/* primary graphics set        */
+#define ROGUESET	1	/* rogue graphics set          */
+#define NUM_GRAPHICS	2
 
 /*
  * special symbol set handling types ( for invoking callbacks, etc.)
  * Must match the order of the known_handlers strings
  * in drawing.c
  */
-#define H_UNK		0
-#define H_IBM		1
-#define H_DEC		2
+#define H_UNK	0
+#define H_IBM	1
+#define H_DEC	2
 
 extern const struct symdef defsyms[MAXPCHARS];	/* defaults */
 extern const struct symdef def_warnsyms[WARNCOUNT];

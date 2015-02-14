@@ -193,11 +193,6 @@ extern void NDECL(toggle_mouse_support);
 extern void FDECL(map_subkeyvalue, (char *));
 extern void NDECL(load_keyboard_handler);
 extern void NDECL(raw_clear_screen);
-# ifdef UNICODE_WIDEWINPORT
-extern void FDECL(xputc, (NHWCHAR_P));
-# else
-extern void FDECL(xputc, (int));
-# endif
 #endif
 
 #include <fcntl.h>

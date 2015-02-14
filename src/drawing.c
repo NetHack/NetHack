@@ -24,8 +24,8 @@ struct symsetentry symset[NUM_GRAPHICS];
 int currentgraphics = 0;
 
 nhsym showsyms[SYM_MAX] = DUMMY;	/* symbols to be displayed */
-nhsym l_syms[SYM_MAX]   = DUMMY;	/* loaded symbols          */
-nhsym r_syms[SYM_MAX]   = DUMMY;	/* rogue symbols           */
+nhsym l_syms[SYM_MAX] = DUMMY;		/* loaded symbols          */
+nhsym r_syms[SYM_MAX] = DUMMY;		/* rogue symbols           */
 
 nhsym warnsyms[WARNCOUNT]  = DUMMY;  /* the current warning display symbols */
 const char invisexplain[] = "remembered, unseen, creature";
@@ -525,7 +525,6 @@ boolean name_too;
 	/* initialize restriction bits */
 	symset[which_set].primary = 0;
 	symset[which_set].rogue   = 0;
-	symset[which_set].unicode = 0;
 
 	if (name_too) {
 	    if (symset[which_set].name)
@@ -563,7 +562,6 @@ const char *known_handling[] = {
 const char *known_restrictions[] = {
 	"primary",
 	"rogue",
-	"unicode",
 	(const char *)0,
 };
 

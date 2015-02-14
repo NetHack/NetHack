@@ -731,7 +731,6 @@ E void FDECL(check_recordfile, (const char *));
 E void NDECL(read_wizkit);
 E int FDECL(read_sym_file, (int));
 E int FDECL(parse_sym_line, (char *,int));
-E int FDECL(sym_val, (const char *));
 E void FDECL(paniclog, (const char *, const char *));
 E int FDECL(validate_prefix_locations, (char *));
 #ifdef SELECTSAVED
@@ -846,20 +845,6 @@ E int NDECL(phase_of_the_moon);
 E boolean NDECL(friday_13th);
 E int NDECL(night);
 E int NDECL(midnight);
-#ifdef UNICODE_WIDEWINPORT
-E nhwchar *FDECL(nhwstrncpy, (nhwchar *,const char *,size_t));
-E nhwchar *FDECL(nhwncpy, (nhwchar *,const nhwchar *,size_t));
-E nhwchar *FDECL(nhwcpy, (nhwchar *,const nhwchar *));
-E nhwchar *FDECL(nhwstrcpy, (nhwchar *,const char *));
-E char *FDECL(strnhwcpy, (char *,const nhwchar *));
-E nhwchar *FDECL(nhwstrcat, (nhwchar *,const char *));
-E nhwchar *FDECL(nhwcat, (nhwchar *,const nhwchar *));
-E nhwchar *FDECL(nhwindex, (const nhwchar *,int));
-E size_t FDECL(nhwlen, (const nhwchar *));
-E int FDECL(nhwcmp, (const nhwchar *,const nhwchar *));
-E int FDECL(nhwncmp, (const nhwchar *,const nhwchar *,int));
-E int FDECL(nhwstrcmp, (const nhwchar *,const char *));
-#endif
 
 /* ### invent.c ### */
 
@@ -1587,6 +1572,7 @@ E int FDECL(load_symset, (const char *,int));
 E void FDECL(parsesymbols, (char *));
 E struct symparse *FDECL(match_sym, (char *));
 E void NDECL(set_playmode);
+E int FDECL(sym_val, (char *));
 
 /* ### pager.c ### */
 
