@@ -65,10 +65,8 @@ char *outbuf;
 		/* being blinded may hide invisibility from self */
 		(Invis && (senseself() || !Blind)) ? "invisible " : "",
 		race, mons[u.umonnum].mname, plname);
-#ifdef STEED
 	if (u.usteed)
 	    Sprintf(eos(outbuf), ", mounted on %s", y_monnam(u.usteed));
-#endif
 	return outbuf;
 }
 

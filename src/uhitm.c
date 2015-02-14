@@ -11,9 +11,7 @@ STATIC_DCL boolean FDECL(theft_petrifies, (struct obj *));
 STATIC_DCL void FDECL(steal_it, (struct monst *, struct attack *));
 STATIC_DCL boolean FDECL(hitum, (struct monst *,struct attack *));
 STATIC_DCL boolean FDECL(hmon_hitmon, (struct monst *,struct obj *,int));
-#ifdef STEED
 STATIC_DCL int FDECL(joust, (struct monst *,struct obj *));
-#endif
 STATIC_DCL void NDECL(demonpet);
 STATIC_DCL boolean FDECL(m_slips_free, (struct monst *mtmp,struct attack *mattk));
 STATIC_DCL int FDECL(explum, (struct monst *,struct attack *));
@@ -559,9 +557,7 @@ int thrown;		/* HMON_xxx (0 => hand-to-hand, other => ranged) */
 	boolean hand_to_hand = (thrown == HMON_MELEE ||
 				/* not grapnels; applied implies uwep */
 				(thrown == HMON_APPLIED && is_pole(uwep)));
-#ifdef STEED
 	int jousting = 0;
-#endif
 	int wtype;
 	struct obj *monwep;
 	char unconventional[BUFSZ]; /* substituted for word "attack" in msg */
@@ -607,11 +603,7 @@ int thrown;		/* HMON_xxx (0 => hand-to-hand, other => ranged) */
 		    /* or strike with a missile in your hand... */
 		    (!thrown && (is_missile(obj) || is_ammo(obj))) ||
 		    /* or use a pole at short range and not mounted... */
-		    (!thrown &&
-#ifdef STEED
-		     !u.usteed &&
-#endif
-		     is_pole(obj)) ||
+		    (!thrown && !u.usteed && is_pole(obj)) ||
 		    /* or throw a missile without the proper bow... */
 		    (is_ammo(obj) && (thrown != HMON_THROWN ||
 				      !ammo_and_launcher(obj, uwep)))) {
@@ -693,14 +685,12 @@ int thrown;		/* HMON_xxx (0 => hand-to-hand, other => ranged) */
 				&& mon_hates_silver(mon)) {
 			silvermsg = TRUE; silverobj = TRUE;
 		    }
-#ifdef STEED
 		    if (u.usteed && !thrown && tmp > 0 &&
 			    weapon_type(obj) == P_LANCE && mon != u.ustuck) {
 			jousting = joust(mon, obj);
 			/* exercise skill even for minimal damage hits */
 			if (jousting) valid_weapon_attack = TRUE;
 		    }
-#endif
 		    if (thrown == HMON_THROWN &&
 			    (is_ammo(obj) || is_missile(obj))) {
 			if (ammo_and_launcher(obj, uwep)) {
@@ -991,7 +981,6 @@ int thrown;		/* HMON_xxx (0 => hand-to-hand, other => ranged) */
 	    }
 	}
 
-#ifdef STEED
 	if (jousting) {
 	    tmp += d(2, (obj == uwep) ? 10 : 2);	/* [was in dmgval()] */
 	    You("joust %s%s",
@@ -1012,11 +1001,8 @@ int thrown;		/* HMON_xxx (0 => hand-to-hand, other => ranged) */
 		if (DEADMONSTER(mon)) already_killed = TRUE;
 	    }
 	    hittxt = TRUE;
-	} else
-#endif
-
-	/* VERY small chance of stunning opponent if unarmed. */
-	if (unarmed && tmp > 1 && !thrown && !obj && !Upolyd) {
+	} else if (unarmed && tmp > 1 && !thrown && !obj && !Upolyd) {
+        /* VERY small chance of stunning opponent if unarmed. */
 	    if (rnd(100) < P_SKILL(P_BARE_HANDED_COMBAT) &&
 			!bigmonst(mdat) && !thick_skinned(mdat)) {
 		if (canspotmon(mon))

@@ -1002,13 +1002,11 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 		u.twoweap = twoweap;
 	    } else if (u.dz < 0) {
 		(void) toss_up(obj, rn2(5) && !Underwater);
-#ifdef STEED
 	    } else if (u.dz > 0 && u.usteed &&
 		obj->oclass == POTION_CLASS && rn2(6)) {
 		/* alternative to prayer or wand of opening/spell of knock
 		   for dealing with cursed saddle:  throw holy water > */
 		potionhit(u.usteed, obj, TRUE);
-#endif
 	    } else {
 		hitfloor(obj);
 	    }

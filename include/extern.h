@@ -2205,7 +2205,6 @@ E struct obj *FDECL(findgold, (struct obj *));
 
 /* ### steed.c ### */
 
-#ifdef STEED
 E void NDECL(rider_cant_reach);
 E boolean FDECL(can_saddle, (struct monst *));
 E int FDECL(use_saddle, (struct obj *));
@@ -2217,7 +2216,6 @@ E void NDECL(kick_steed);
 E void FDECL(dismount_steed, (int));
 E void FDECL(place_monster, (struct monst *,int,int));
 E boolean FDECL(stucksteed, (BOOLEAN_P));
-#endif
 
 /* ### teleport.c ### */
 

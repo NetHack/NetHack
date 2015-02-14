@@ -302,7 +302,6 @@ use_stethoscope(obj)
 	context.stethoscope_move = moves;
 	context.stethoscope_movement = youmonst.movement;
 
-#ifdef STEED
 	if (u.usteed && u.dz > 0) {
 		if (interference) {
 			pline("%s interferes.", Monnam(u.ustuck));
@@ -311,7 +310,6 @@ use_stethoscope(obj)
 			mstatusline(u.usteed);
 		return res;
 	} else
-#endif
 	if (u.uswallow && (u.dx || u.dy || u.dz)) {
 		mstatusline(u.ustuck);
 		return res;
@@ -442,11 +440,9 @@ struct obj *obj;
 		for(mtmp = fmon; mtmp; mtmp = nextmon) {
 		    nextmon = mtmp->nmon; /* trap might kill mon */
 		    if (DEADMONSTER(mtmp)) continue;
-#ifdef STEED
 		    /* steed is already at your location, so not affected;
 		       this avoids trap issues if you're on a trap location */
 		    if (mtmp == u.usteed) continue;
-#endif
 		    if (mtmp->mtame) {
 			if (mtmp->mtrapped) {
 			    /* no longer in previous trap (affects mintrap) */
@@ -550,13 +546,11 @@ struct obj *obj;
 	if(!get_adjacent_loc((char *)0, (char *)0, u.ux, u.uy, &cc)) return;
 
 	if((cc.x == u.ux) && (cc.y == u.uy)) {
-#ifdef STEED
 		if (u.usteed && u.dz > 0) {
 		    mtmp = u.usteed;
 		    spotmon = 1;
 		    goto got_target;
 		}
-#endif
 		pline("Leash yourself?  Very funny...");
 		return;
 	}
@@ -567,9 +561,7 @@ struct obj *obj;
 	}
 
 	spotmon = canspotmon(mtmp);
-#ifdef STEED
  got_target:
-#endif
 
 	if(!mtmp->mtame) {
 	    if(!spotmon)
@@ -648,10 +640,8 @@ next_to_u()
 			}
 		}
 	}
-#ifdef STEED
 	/* no pack mules for the Amulet */
 	if (u.usteed && mon_has_amulet(u.usteed)) return FALSE;
-#endif
 	return(TRUE);
 }
 
@@ -1388,12 +1378,10 @@ int magic; /* 0=Physical, otherwise skill level */
 	} else if (!magic && !Jumping) {
 		You_cant("jump very far.");
 		return 0;
-#ifdef STEED
 	/* if steed is immobile, can't do physical jump but can do spell one */
 	} else if (!magic && u.usteed && stucksteed(FALSE)) {
 		/* stucksteed gave "<steed> won't move" message */
 		return 0;
-#endif
 	} else if (u.uswallow) {
 		if (magic) {
 			You("bounce around a little.");
@@ -1438,23 +1426,19 @@ int magic; /* 0=Physical, otherwise skill level */
 		const char *bp = body_part(LEG);
 
 		if (wl == BOTH_SIDES) bp = makeplural(bp);
-#ifdef STEED
 		if (u.usteed)
 		    pline("%s is in no shape for jumping.", Monnam(u.usteed));
 		else
-#endif
-		Your("%s%s %s in no shape for jumping.",
-		     (wl == LEFT_SIDE) ? "left " :
-			(wl == RIGHT_SIDE) ? "right " : "",
-		     bp, (wl == BOTH_SIDES) ? "are" : "is");
+		    Your("%s%s %s in no shape for jumping.",
+		         (wl == LEFT_SIDE) ? "left " :
+			    (wl == RIGHT_SIDE) ? "right " : "",
+		         bp, (wl == BOTH_SIDES) ? "are" : "is");
 		return 0;
 	}
-#ifdef STEED
 	else if (u.usteed && u.utrap) {
 		pline("%s is stuck in a trap.", Monnam(u.usteed));
 		return (0);
 	}
-#endif
 
 	pline("Where do you want to jump?");
 	cc.x = u.ux;
@@ -2237,7 +2221,6 @@ struct obj *otmp;
 	    trapinfo.time_needed += (tmp > 12) ? 1 : (tmp > 7) ? 2 : 4;
 	/*[fumbling and/or confusion and/or cursed object check(s)
 	   should be incorporated here instead of in set_trap]*/
-#ifdef STEED
 	if (u.usteed && P_SKILL(P_RIDING) < P_BASIC) {
 	    boolean chance;
 
@@ -2267,7 +2250,6 @@ struct obj *otmp;
 		return;
 	    }
 	}
-#endif
 	You("begin setting %s%s.",
 	    shk_your(buf, otmp),
 	    defsyms[trap_to_defsym(what_trap(ttyp))].explanation);
@@ -2369,19 +2351,13 @@ struct obj *obj;
     } else if ((!u.dx && !u.dy) || (u.dz > 0)) {
 	int dam;
 
-#ifdef STEED
 	/* Sometimes you hit your steed by mistake */
 	if (u.usteed && !rn2(proficient + 2)) {
 	    You("whip %s!", mon_nam(u.usteed));
 	    kick_steed();
 	    return 1;
 	}
-#endif
-	if (Levitation
-#ifdef STEED
-			|| u.usteed
-#endif
-		) {
+	if (Levitation || u.usteed) {
 	    /* Have a shot at snaring something on the floor */
 	    otmp = level.objects[u.ux][u.uy];
 	    if (otmp && otmp->otyp == CORPSE && otmp->corpsenm == PM_HORSE) {
@@ -3194,11 +3170,9 @@ doapply()
 	case LEASH:
 		use_leash(obj);
 		break;
-#ifdef STEED
 	case SADDLE:
 		res = use_saddle(obj);
 		break;
-#endif
 	case MAGIC_WHISTLE:
 		use_magic_whistle(obj);
 		break;
@@ -3336,11 +3310,7 @@ unfixable_trouble_count(is_horn)
 
 	if (Stoned) unfixable_trbl++;
 	if (Strangled) unfixable_trbl++;
-	if (Wounded_legs
-#ifdef STEED
-		    && !u.usteed
-#endif
-				) unfixable_trbl++;
+	if (Wounded_legs && !u.usteed) unfixable_trbl++;
 	if (Slimed) unfixable_trbl++;
 	/* lycanthropy is not desirable, but it doesn't actually make you feel
 	   bad */

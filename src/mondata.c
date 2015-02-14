@@ -791,9 +791,7 @@ boolean
 levl_follower(mtmp)
 struct monst *mtmp;
 {
-#ifdef STEED
 	if (mtmp == u.usteed) return TRUE;
-#endif
 
 	/* Wizard with Amulet won't bother trying to follow across levels */
 	if (mtmp->iswiz && mon_has_amulet(mtmp)) return FALSE;

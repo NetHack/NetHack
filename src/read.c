@@ -1126,10 +1126,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 		    for (i = -bd; i <= bd; i++) for(j = -bd; j <= bd; j++) {
 			if (!isok(u.ux + i, u.uy + j)) continue;
 			if ((mtmp = m_at(u.ux + i, u.uy + j)) != 0
-#ifdef STEED
-			    || (!i && !j && (mtmp = u.usteed) != 0)
-#endif
-			   ) {
+			    || (!i && !j && (mtmp = u.usteed) != 0)) {
 			    ++candidates;
 			    res = maybe_tame(mtmp, sobj);
 			    results += res;

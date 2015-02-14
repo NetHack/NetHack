@@ -39,10 +39,7 @@ unsigned gpflags;
 	 * oh well.
 	 */
 	if (mtmp != &youmonst && x == u.ux && y == u.uy
-#ifdef STEED
-			&& (!u.usteed || mtmp != u.usteed)
-#endif
-			)
+            && (!u.usteed || mtmp != u.usteed))
 		return FALSE;
 
 	if (mtmp) {
@@ -379,10 +376,8 @@ boolean force_it;
 {
 	register struct obj *otmp;
 
-#ifdef STEED
 	if (mtmp == u.usteed)
 		return (FALSE);
-#endif
 
 	if (mtmp->mleashed) {
 	    otmp = get_mleash(mtmp);
@@ -454,10 +449,8 @@ struct obj *scroll;
 		    char whobuf[BUFSZ];
 
 		    Strcpy(whobuf, "you");
-#ifdef STEED
 		    if (u.usteed)
 			Sprintf(eos(whobuf), " and %s", mon_nam(u.usteed));
-#endif
 		    pline("To what position do %s want to be teleported?",
 			  whobuf);
 		    cc.x = u.ux;
@@ -1032,12 +1025,10 @@ boolean suppress_impossible;
 {
 	register int x, y, trycount;
 
-#ifdef STEED
 	if (mtmp == u.usteed) {
 	    tele();
 	    return TRUE;
 	}
-#endif
 
 	if (mtmp->iswiz && mtmp->mx) {	/* Wizard, not just arriving */
 	    if (!In_W_tower(u.ux, u.uy, &u.uz))

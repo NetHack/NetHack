@@ -140,10 +140,8 @@ boolean check_pit;
 	struct trap *t;
 
 	if (u.uswallow) return FALSE;
-#ifdef STEED
 	/* Restricted/unskilled riders can't reach the floor */
 	if (u.usteed && P_SKILL(P_RIDING) < P_BASIC) return FALSE;
-#endif
 	if (check_pit && (t = t_at(u.ux, u.uy)) != 0 &&
 		uteetering_at_seen_pit(t) && !Flying)
 	    return FALSE;

@@ -1005,11 +1005,8 @@ make_version()
 #ifdef TOURIST
 			| (1L << 10)
 #endif
-#ifdef STEED
-			| (1L << 11)
-#endif
 #ifdef GOLDOBJ
-			| (1L << 12)
+			| (1L << 11)
 #endif
 		/* flag bits and/or other global variables (15..26) */
 #ifdef TEXTCOLOR
@@ -1306,9 +1303,6 @@ static const char *build_opts[] = {
 #endif
 #ifdef REINCARNATION
 		"rogue level",
-#endif
-#ifdef STEED
-		"saddles and riding",
 #endif
 #ifdef SCORE_ON_BOTL
 		"score on status line",

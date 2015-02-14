@@ -50,16 +50,15 @@ register struct monst *mtmp;
 	    mtmp->mgold += gold->quan;
 	    delobj(gold);
 	    newsym(u.ux, u.uy);
-#ifdef STEED
-	    if (u.usteed)
-		who = u.usteed,
-		  whose = s_suffix(y_monnam(who)),
-		    what = makeplural(mbodypart(who, FOOT));
-	    else
-#endif
-		who = &youmonst,
-		  whose = "your",
-		    what = makeplural(body_part(FOOT));
+	    if (u.usteed) {
+		who = u.usteed;
+		whose = s_suffix(y_monnam(who));
+		what = makeplural(mbodypart(who, FOOT));
+            } else {
+		who = &youmonst;
+		whose = "your";
+		what = makeplural(body_part(FOOT));
+            }
 	    /* [ avoid "between your rear regions" :-] */
 	    if (slithy(who->data)) what = "coils";
 	    /* reduce "rear hooves/claws" to "hooves/claws" */
@@ -137,16 +136,15 @@ register struct monst *mtmp;
 	    obj_extract_self(fgold);
 	    add_to_minv(mtmp, fgold);
 	    newsym(u.ux, u.uy);
-#ifdef STEED
-	    if (u.usteed)
-		who = u.usteed,
-		  whose = s_suffix(y_monnam(who)),
-		    what = makeplural(mbodypart(who, FOOT));
-	    else
-#endif
-		who = &youmonst,
-		  whose = "your",
-		    what = makeplural(body_part(FOOT));
+	    if (u.usteed) {
+		who = u.usteed;
+		whose = s_suffix(y_monnam(who));
+		what = makeplural(mbodypart(who, FOOT));
+            } else {
+		who = &youmonst;
+		whose = "your";
+		what = makeplural(body_part(FOOT));
+            }
 	    /* [ avoid "between your rear regions" :-] */
 	    if (slithy(who->data)) what = "coils";
 	    /* reduce "rear hooves/claws" to "hooves/claws" */
@@ -639,7 +637,6 @@ boolean verbosely;
 	if (mon->mhp > 0) {
 	    mon->misc_worn_check &= ~obj->owornmask;
 	    update_mon = TRUE;
-#ifdef STEED
 	/* don't charge for an owned saddle on dead steed (provided
 	   that the hero is within the same shop at the time) */
 	} else if (mon->mtame && (obj->owornmask & W_SADDLE) && 
@@ -647,7 +644,6 @@ boolean verbosely;
 		/* being at a costly_spot guarantees lev->roomno is not 0 */
 		index(in_rooms(u.ux, u.uy, SHOPBASE), levl[omx][omy].roomno)) {
 	    obj->no_charge = 1;
-#endif
 	}
 	/* this should be done even if the monster has died */
 	if (obj->owornmask & W_WEP) setmnotwielded(mon, obj);

@@ -231,9 +231,7 @@ dosave0()
 	store_savefileinfo(fd);
 	store_plname_in_file(fd);
 	ustuck_id = (u.ustuck ? u.ustuck->m_id : 0);
-#ifdef STEED
 	usteed_id = (u.usteed ? u.usteed->m_id : 0);
-#endif
 	savelev(fd, ledger_no(&u.uz), WRITE_SAVE | FREE_SAVE);
 	savegamestate(fd, WRITE_SAVE | FREE_SAVE);
 
@@ -248,9 +246,7 @@ dosave0()
 	 * may mislead place_monster() on other levels
 	 */
 	u.ustuck = (struct monst *)0;
-#ifdef STEED
 	u.usteed = (struct monst *)0;
-#endif
 
 	for(ltmp = (xchar)1; ltmp <= maxledgerno(); ltmp++) {
 		if (ltmp == ledger_no(&uz_save)) continue;
@@ -356,10 +352,8 @@ register int fd, mode;
 	save_oracles(fd, mode);
 	if(ustuck_id)
 	    bwrite(fd, (genericptr_t) &ustuck_id, sizeof ustuck_id);
-#ifdef STEED
 	if(usteed_id)
 	    bwrite(fd, (genericptr_t) &usteed_id, sizeof usteed_id);
-#endif
 	bwrite(fd, (genericptr_t) pl_character, sizeof pl_character);
 	bwrite(fd, (genericptr_t) pl_fruit, sizeof pl_fruit);
 	savefruitchn(fd, mode);
@@ -433,9 +427,7 @@ savestateinlock()
 		    store_plname_in_file(fd);
 
 		    ustuck_id = (u.ustuck ? u.ustuck->m_id : 0);
-#ifdef STEED
 		    usteed_id = (u.usteed ? u.usteed->m_id : 0);
-#endif
 		    savegamestate(fd, WRITE_SAVE);
 		}
 		bclose(fd);

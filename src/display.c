@@ -1126,11 +1126,9 @@ see_monsters()
 	warn_obj_cnt = new_warn_obj_cnt;
     }
 
-#ifdef STEED
     /* when mounted, hero's location gets caught by monster loop */
     if (!u.usteed)
-#endif
-    newsym(u.ux, u.uy);
+        newsym(u.ux, u.uy);
 }
 
 /*

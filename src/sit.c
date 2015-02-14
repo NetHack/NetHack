@@ -363,7 +363,6 @@ rndcurse()			/* curse a few inventory items at random! */
 	    update_inventory();
 	}
 
-#ifdef STEED
 	/* treat steed's saddle as extended part of hero's inventory */
 	if (u.usteed && !rn2(4) &&
 		(otmp = which_armor(u.usteed, W_SADDLE)) != 0 &&
@@ -379,7 +378,6 @@ rndcurse()			/* curse a few inventory items at random! */
 		otmp->bknown = TRUE;
 	    }
 	}
-#endif	/*STEED*/
 }
 
 void

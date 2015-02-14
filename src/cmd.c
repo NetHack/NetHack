@@ -1528,7 +1528,6 @@ int final;
 	boolean magic = (mode & MAGICENLIGHTENMENT) ? TRUE : FALSE;
 	int cap;
 	char buf[BUFSZ], youtoo[BUFSZ];
-#ifdef STEED
 	boolean Riding = (u.usteed &&
 			/* if hero dies while dismounting, u.usteed will still
 			   be set; we want to ignore steed in that situation */
@@ -1540,7 +1539,6 @@ int final;
 				(char *)0, 
 				(SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION),
 				FALSE);
-#endif
 
 	/*\
 	 * Status (many are abbreviated on bottom line; others are or   
@@ -1553,7 +1551,6 @@ int final;
 	/* not a traditional status but inherently obvious to player; more
 	   detail given below (attributes section) for magic enlightenment */
 	if (Upolyd) you_are("transformed", "");
-#ifdef STEED
 	/* not a trouble, but we want to display riding status before maybe
 	   reporting steed as trapped or hero stuck to cursed saddle */
 	if (Riding) {
@@ -1561,7 +1558,6 @@ int final;
 	    you_are(buf, "");
 	    Sprintf(eos(youtoo), "and %s ", steedname);
 	}
-#endif	/*STEED*/
 	/* other movement situations that hero should always know */
 	if (Levitation) {
 	    if (Lev_at_will && magic)
@@ -1639,14 +1635,12 @@ int final;
 		    Sprintf(eos(predicament), " in %s",
 			    an(defsyms[trap_to_defsym(t->ttyp)].explanation));
 	    }
-#ifdef STEED
 	    if (u.usteed) { /* not `Riding' here */
 		Sprintf(buf, "%s%s ", anchored ? "you and " : "", steedname);
 		*buf = highc(*buf);
 		enl_msg(buf, (anchored ? "are " : "is "),
 			(anchored ? "were " : "was "), predicament, "");
 	    } else
-#endif	/*STEED*/
 		you_are(predicament, "");
 	} /* (u.utrap) */
 	if (u.uswallow) {
@@ -1661,7 +1655,6 @@ int final;
 		    a_monnam(u.ustuck));
 	    you_are(buf, "");
 	}
-#ifdef STEED
 	if (Riding) {
 	    struct obj *saddle = which_armor(u.usteed, W_SADDLE);
 
@@ -1671,9 +1664,7 @@ int final;
 		you_are(buf, "");
 	    }
 	}
-#endif	/*STEED*/
 	if (Wounded_legs) {
-#ifdef STEED
 	    /* when mounted, Wounded_legs applies to steed rather than to
 	       hero; we only report steed's wounded legs in wizard mode */
 	    if (u.usteed) { /* not `Riding' here */
@@ -1684,9 +1675,7 @@ int final;
 		    enl_msg(buf, " has", " had", " wounded legs", "");
 		}
 # endif
-	    } else
-#endif	/*STEED*/
-	    {
+	    } else {
 		Sprintf(buf, "wounded %s", makeplural(body_part(LEG)));
 		you_have(buf, "");
 	    }
@@ -2474,9 +2463,7 @@ static const struct func_tab cmdlist[] = {
 	{'r', FALSE, doread},
 	{'R', FALSE, doremring},
 	{M('r'), FALSE, dorub},
-#ifdef STEED
 	{M('R'), FALSE, doride},	/* #ride */
-#endif
 	{'s', TRUE, dosearch, "searching"},
 	{'S', TRUE, dosave},
 	{M('s'), FALSE, dosit},
@@ -2553,9 +2540,7 @@ struct ext_func_tab extcmdlist[] = {
 #endif /* DUNGEON_OVERVIEW */
 	{"pray", "pray to the gods for help", dopray, TRUE},
 	{"quit", "exit without saving current game", done2, TRUE},
-#ifdef STEED
 	{"ride", "ride (or stop riding) a monster", doride, FALSE},
-#endif
 	{"rub", "rub a lamp or a stone", dorub, FALSE},
 	{"sit", "sit down", dosit, FALSE},
 	{"terrain", "show map without obstructions", doterrain, TRUE},

@@ -348,11 +348,9 @@ struct you {
 	long	usleep;		/* sleeping; monstermove you last started */
 	int uinvault;
 	struct monst *ustuck;
-#ifdef STEED
 	struct monst *usteed;
 	long ugallop;
 	int urideturns;
-#endif
 	int	umortality;		/* how many times you died */
 	int ugrave_arise; /* you die and become something aside from a ghost */
 	int	weapon_slots;		/* unused skill slots */
