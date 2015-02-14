@@ -61,10 +61,8 @@ lock_action()
 	/* otherwise we're trying to unlock it */
 	else if (xlock.picktyp == LOCK_PICK)
 		return actions[3];	/* "picking the lock" */
-#ifdef TOURIST
 	else if (xlock.picktyp == CREDIT_CARD)
 		return actions[3];	/* same as lock_pick */
-#endif
 	else if (xlock.door)
 		return actions[0];	/* "unlocking the door" */
 	else
@@ -253,9 +251,7 @@ pick_lock(pick)
 
 	    if (nohands(youmonst.data)) {
 		const char *what = (picktyp == LOCK_PICK) ? "pick" : "key";
-#ifdef TOURIST
 		if (picktyp == CREDIT_CARD) what = "card";
-#endif
 		pline(no_longer, "hold the", what);
 		reset_pick();
 		return PICKLOCK_LEARNED_SOMETHING;
@@ -276,18 +272,13 @@ pick_lock(pick)
 		return PICKLOCK_DID_NOTHING;
 	} else if (u.uswallow) {
 		You_cant("%sunlock %s.",
-#ifdef TOURIST
 			  (picktyp == CREDIT_CARD) ? "" :
-#endif
 			  "lock or ", mon_nam(u.ustuck));
 		return PICKLOCK_DID_NOTHING;
 	}
 
-	if((picktyp != LOCK_PICK &&
-#ifdef TOURIST
-	    picktyp != CREDIT_CARD &&
-#endif
-	    picktyp != SKELETON_KEY)) {
+	if((picktyp != LOCK_PICK && picktyp != CREDIT_CARD
+          && picktyp != SKELETON_KEY)) {
 		impossible("picking lock with object %d?", picktyp);
 		return PICKLOCK_DID_NOTHING;
 	}
@@ -344,20 +335,16 @@ pick_lock(pick)
 			You_cant("fix its broken lock with %s.", doname(pick));
 			return PICKLOCK_LEARNED_SOMETHING;
 		    }
-#ifdef TOURIST
 		    else if (picktyp == CREDIT_CARD && !otmp->olocked) {
 			/* credit cards are only good for unlocking */
 			You_cant("do that with %s.",
 				 an(simple_typename(picktyp)));
 			return PICKLOCK_LEARNED_SOMETHING;
 		    }
-#endif
 		    switch(picktyp) {
-#ifdef TOURIST
 			case CREDIT_CARD:
 			    ch = ACURR(A_DEX) + 20*Role_if(PM_ROGUE);
 			    break;
-#endif
 			case LOCK_PICK:
 			    ch = 4*ACURR(A_DEX) + 25*Role_if(PM_ROGUE);
 			    break;
@@ -391,12 +378,10 @@ pick_lock(pick)
 	    if (mtmp && canseemon(mtmp) &&
 			mtmp->m_ap_type != M_AP_FURNITURE &&
 			mtmp->m_ap_type != M_AP_OBJECT) {
-#ifdef TOURIST
 		if (picktyp == CREDIT_CARD &&
 		    (mtmp->isshk || mtmp->data == &mons[PM_ORACLE]))
 		    verbalize("No checks, no credit, no problem.");
 		else
-#endif
 		    pline("I don't think %s would appreciate that.", mon_nam(mtmp));
 		return PICKLOCK_LEARNED_SOMETHING;
 	    } else if (mtmp && mtmp->m_ap_type == M_AP_FURNITURE &&
@@ -430,13 +415,11 @@ pick_lock(pick)
 		    pline("This door is broken.");
 		    return PICKLOCK_LEARNED_SOMETHING;
 		default:
-#ifdef TOURIST
 		    /* credit cards are only good for unlocking */
 		    if(picktyp == CREDIT_CARD && !(door->doormask & D_LOCKED)) {
 			You_cant("lock a door with a credit card.");
 			return PICKLOCK_LEARNED_SOMETHING;
 		    }
-#endif
 
 		    Sprintf(qbuf,"%s it?",
 			    (door->doormask & D_LOCKED) ? "Unlock" : "Lock");
@@ -445,11 +428,9 @@ pick_lock(pick)
 		    if(c == 'n') return(0);
 
 		    switch(picktyp) {
-#ifdef TOURIST
 			case CREDIT_CARD:
 			    ch = 2*ACURR(A_DEX) + 20*Role_if(PM_ROGUE);
 			    break;
-#endif
 			case LOCK_PICK:
 			    ch = 3*ACURR(A_DEX) + 30*Role_if(PM_ROGUE);
 			    break;

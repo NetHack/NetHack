@@ -46,9 +46,7 @@ monhaskey(mon, for_unlocking)
 struct monst *mon;
 boolean for_unlocking;	/* true => credit card ok, false => not ok */
 {
-#ifdef TOURIST
     if (for_unlocking && m_carrying(mon, CREDIT_CARD)) return TRUE;
-#endif
     return m_carrying(mon, SKELETON_KEY) || m_carrying(mon, LOCK_PICK);
 }
 
@@ -1463,9 +1461,7 @@ struct monst *mtmp;
 		    typ != SLING &&
 		    !is_cloak(obj) && typ != FEDORA &&
 		    !is_gloves(obj) && typ != LEATHER_JACKET &&
-#ifdef TOURIST
 		    typ != CREDIT_CARD && !is_shirt(obj) &&
-#endif
 		    !(typ == CORPSE && verysmall(&mons[obj->corpsenm])) &&
 		    typ != FORTUNE_COOKIE && typ != CANDY_BAR &&
 		    typ != PANCAKE && typ != LEMBAS_WAFER &&

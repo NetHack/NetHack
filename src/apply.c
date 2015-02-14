@@ -7,9 +7,7 @@
 
 extern boolean notonhead;	/* for long worms */
 
-#ifdef TOURIST
 STATIC_DCL int FDECL(use_camera, (struct obj *));
-#endif
 STATIC_DCL int FDECL(use_towel, (struct obj *));
 STATIC_DCL boolean FDECL(its_dead, (int,int,int *));
 STATIC_DCL int FDECL(use_stethoscope, (struct obj *));
@@ -44,7 +42,6 @@ void FDECL( amii_speaker, ( struct obj *, char *, int ) );
 
 static const char no_elbow_room[] = "don't have enough elbow-room to maneuver.";
 
-#ifdef TOURIST
 STATIC_OVL int
 use_camera(obj)
 	struct obj *obj;
@@ -82,7 +79,6 @@ use_camera(obj)
 	}
 	return 1;
 }
-#endif
 
 STATIC_OVL int
 use_towel(obj)
@@ -3154,9 +3150,7 @@ doapply()
 		use_grease(obj);
 		break;
 	case LOCK_PICK:
-#ifdef TOURIST
 	case CREDIT_CARD:
-#endif
 	case SKELETON_KEY:
 		res = (pick_lock(obj) != 0);
 		break;
@@ -3223,11 +3217,9 @@ doapply()
 	case POT_OIL:
 		light_cocktail(obj);
 		break;
-#ifdef TOURIST
 	case EXPENSIVE_CAMERA:
 		res = use_camera(obj);
 		break;
-#endif
 	case TOWEL:
 		res = use_towel(obj);
 		break;

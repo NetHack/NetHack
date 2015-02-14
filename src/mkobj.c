@@ -726,9 +726,7 @@ boolean artif;
 					break;
 		case LEASH:		otmp->leashmon = 0;
 					break;
-#ifdef TOURIST
 		case EXPENSIVE_CAMERA:
-#endif
 		case TINNING_KIT:
 		case MAGIC_MARKER:	otmp->spe = rn1(70,30);
 					break;

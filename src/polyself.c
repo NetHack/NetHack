@@ -821,12 +821,10 @@ break_armor()
 		useup(otmp);
 	    }
 	}
-#ifdef TOURIST
 	if (uarmu) {
 		Your("shirt rips to shreds!");
 		useup(uarmu);
 	}
-#endif
     } else if (sliparm(youmonst.data)) {
 	if (((otmp = uarm) != 0) && (racial_exception(&youmonst, otmp) < 1)) {
 		if (donning(otmp)) cancel_don();
@@ -841,7 +839,6 @@ break_armor()
 		(void) Cloak_off();
 		dropx(otmp);
 	}
-#ifdef TOURIST
 	if ((otmp = uarmu) != 0) {
 		if (is_whirly(youmonst.data))
 			You("seep right through your shirt!");
@@ -849,7 +846,6 @@ break_armor()
 		setworn((struct obj *)0, otmp->owornmask & W_ARMU);
 		dropx(otmp);
 	}
-#endif
     }
     if (has_horns(youmonst.data)) {
 	if ((otmp = uarmh) != 0) {

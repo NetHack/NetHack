@@ -3498,13 +3498,8 @@ void NetHackQtInvUsageWindow::paintEvent(QPaintEvent*)
     drawWorn(painter,uarms,0,1); // Shield
     drawWorn(painter,uarmg,0,2); // Gloves - repeated
     drawWorn(painter,uarmg,2,2); // Gloves - repeated
-#ifdef TOURIST
     drawWorn(painter,uarmf,1,5); // Shoes (feet)
     drawWorn(painter,uarmu,1,4); // Undershirt
-#else
-    drawWorn(painter,0    ,1,5,FALSE);
-    drawWorn(painter,uarmf,1,4); // Shoes (feet)
-#endif
     drawWorn(painter,uleft,0,3); // RingL
     drawWorn(painter,uright,2,3); // RingR
 

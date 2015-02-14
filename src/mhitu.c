@@ -759,10 +759,8 @@ int attk;
 		 */
 		if (uarm)
 		    (void)rust_dmg(uarm, xname(uarm), hurt, TRUE, &youmonst);
-#ifdef TOURIST
 		else if (uarmu)
 		    (void)rust_dmg(uarmu, xname(uarmu), hurt, TRUE, &youmonst);
-#endif
 		break;
 	    case 2:
 		if (!uarms || !rust_dmg(uarms, xname(uarms), hurt, FALSE, &youmonst))
@@ -803,9 +801,7 @@ struct attack *mattk;
 {
 	struct obj *obj = (uarmc ? uarmc : uarm);
 
-#ifdef TOURIST
 	if (!obj) obj = uarmu;
-#endif
 	if (mattk->adtyp == AD_DRIN) obj = uarmh;
 
 	/* if your cloak/armor is greased, monster slips off; this
@@ -1375,11 +1371,8 @@ dopois:
 		    hitmsg(mtmp, mattk);
 		    break;
 		}
-		if(!uwep
-#ifdef TOURIST
-		   && !uarmu
-#endif
-		   && !uarm && !uarmh && !uarms && !uarmg && !uarmc && !uarmf) {
+		if(!uwep && !uarmu && !uarm && !uarmh && !uarms && !uarmg && !uarmc
+            && !uarmf) {
 		    boolean goaway = FALSE;
 		    pline("%s hits!  (I hope you don't mind.)", Monnam(mtmp));
 		    if (Upolyd) {
@@ -2331,10 +2324,7 @@ register struct monst *mon;
 	}
 
 	if (!uarmc && !uarmf && !uarmg && !uarms && !uarmh
-#ifdef TOURIST
-								&& !uarmu
-#endif
-									)
+        && !uarmu)
 		pline("%s murmurs sweet nothings into your ear.",
 			Blind ? (fem ? "She" : "He") : Monnam(mon));
 	else
@@ -2348,10 +2338,8 @@ register struct monst *mon;
 		mayberem(uarmg, "gloves");
 	mayberem(uarms, "shield");
 	mayberem(uarmh, helm_simple_name(uarmh));
-#ifdef TOURIST
 	if(!uarmc && !uarm)
 		mayberem(uarmu, "shirt");
-#endif
 
 	if (uarm || uarmc) {
 		verbalize("You're such a %s; I wish...",
@@ -2515,9 +2503,7 @@ const char *str;
 			(obj == uarmc || obj == uarms) ? "it's in the way" :
 			(obj == uarmf) ? "let me rub your feet" :
 			(obj == uarmg) ? "they're too clumsy" :
-#ifdef TOURIST
 			(obj == uarmu) ? "let me massage you" :
-#endif
 			/* obj == uarmh */
 			hairbuf);
 	}
