@@ -561,16 +561,12 @@ doopen()		/* try to open a door */
 	portcullis = (is_drawbridge_wall(cc.x, cc.y) >= 0);
 	if (Blind) {
 	    int oldglyph = door->glyph;
-#ifdef DUNGEON_OVERVIEW
 	    schar oldlastseentyp = lastseentyp[cc.x][cc.y];
-#endif
 
 	    feel_location(cc.x, cc.y);
 	    if (door->glyph != oldglyph
-#ifdef DUNGEON_OVERVIEW
-		|| lastseentyp[cc.x][cc.y] != oldlastseentyp
-#endif
-	    ) res = 1;		/* learned something */
+            || lastseentyp[cc.x][cc.y] != oldlastseentyp)
+          res = 1;		/* learned something */
 	}
 
 	if (portcullis || !IS_DOOR(door->typ)) {
@@ -693,16 +689,11 @@ doclose()		/* try to close a door */
 	portcullis = (is_drawbridge_wall(x, y) >= 0);
 	if (Blind) {
 	    int oldglyph = door->glyph;
-#ifdef DUNGEON_OVERVIEW
 	    schar oldlastseentyp = lastseentyp[x][y];
-#endif
 
 	    feel_location(x, y);
-	    if (door->glyph != oldglyph
-#ifdef DUNGEON_OVERVIEW
-		|| lastseentyp[x][y] != oldlastseentyp
-#endif
-	    ) res = 1;		/* learned something */
+	    if (door->glyph != oldglyph || lastseentyp[x][y] != oldlastseentyp)
+            res = 1;		/* learned something */
 	}
 
 	if (portcullis || !IS_DOOR(door->typ)) {

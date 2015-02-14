@@ -2115,9 +2115,7 @@ register boolean newlev;
 		    rt = 0;
 		    break;
 	    }
-#ifdef DUNGEON_OVERVIEW
 	    if (msg_given) room_discovered(roomno);
-#endif
 
 	    if (rt != 0) {
 		rooms[roomno].rtype = OROOM;

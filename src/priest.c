@@ -445,11 +445,9 @@ int roomno;
 		if (*this_time <= *other_time) *other_time = *this_time - 1L;
 	    }
 	}
-#ifdef DUNGEON_OVERVIEW
 	/* recognize the Valley of the Dead and Moloch's Sanctum
 	   once hero has encountered the temple priest on those levels */
 	mapseen_temple(priest);
-#endif
     } else {
 	/* untended */
 

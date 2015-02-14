@@ -169,7 +169,6 @@ struct linfo {
 #endif /* MFLOPPY */
 };
 
-#ifdef DUNGEON_OVERVIEW
 /* types and structures for dungeon map recording
  *
  * It is designed to eliminate the need for an external notes file for some of
@@ -245,5 +244,4 @@ typedef struct mapseen  {
 	struct cemetery *final_resting_place; /* same as level.bonesinfo */
 } mapseen;
 
-#endif /* DUNGEON_OVERVIEW */
 #endif /* DUNGEON_H */

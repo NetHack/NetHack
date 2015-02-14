@@ -137,11 +137,7 @@ STATIC_DCL void FDECL(set_seenv, (struct rm *, int, int, int, int));
 STATIC_DCL void FDECL(t_warn, (struct rm *));
 STATIC_DCL int FDECL(wall_angle, (struct rm *));
 
-#ifdef DUNGEON_OVERVIEW
-# define remember_topology(x,y)		(lastseentyp[x][y] = levl[x][y].typ)
-#else
-# define remember_topology(x,y)		/*empty*/
-#endif
+#define remember_topology(x,y)		(lastseentyp[x][y] = levl[x][y].typ)
 
 #ifdef INVISIBLE_OBJECTS
 /*
@@ -420,10 +416,8 @@ display_monster(x, y, mon, sightflags, worm_tail)
 		levl[x][y].glyph = glyph;
 		if (!sensed) {
 		    show_glyph(x,y, glyph);
-#ifdef DUNGEON_OVERVIEW
 		    /* override real topology with mimic's fake one */
 		    lastseentyp[x][y] = cmap_to_type(sym);
-#endif
 		}
 		break;
 	    }
