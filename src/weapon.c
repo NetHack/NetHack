@@ -370,7 +370,6 @@ static NEARDATA const int rwep[] =
 	ORCISH_ARROW, CROSSBOW_BOLT, SILVER_DAGGER, ELVEN_DAGGER, DAGGER,
 	ORCISH_DAGGER, KNIFE, FLINT, ROCK, LOADSTONE, LUCKSTONE, DART,
 	/* BOOMERANG, */ CREAM_PIE
-	/* note: CREAM_PIE should NOT be #ifdef KOPS */
 };
 
 static NEARDATA const int pwep[] =
@@ -389,16 +388,12 @@ register struct monst *mtmp;
 	boolean mweponly;
 	int i;
 
-#ifdef KOPS
 	char mlet = mtmp->data->mlet;
-#endif
 
 	propellor = &zeroobj;
 	Oselect(EGG); /* cockatrice egg */
-#ifdef KOPS
 	if(mlet == S_KOP)	/* pies are first choice for Kops */
 	    Oselect(CREAM_PIE);
-#endif
 	if(throws_rocks(mtmp->data))	/* ...boulders for giants */
 	    Oselect(BOULDER);
 
@@ -508,12 +503,8 @@ static const NEARDATA short hwep[] = {
 	  MORNING_STAR, ELVEN_SHORT_SWORD, DWARVISH_SHORT_SWORD, SHORT_SWORD,
 	  ORCISH_SHORT_SWORD, MACE, AXE, DWARVISH_SPEAR, SILVER_SPEAR,
 	  ELVEN_SPEAR, SPEAR, ORCISH_SPEAR, FLAIL, BULLWHIP, QUARTERSTAFF,
-	  JAVELIN, AKLYS, CLUB, PICK_AXE,
-#ifdef KOPS
-	  RUBBER_HOSE,
-#endif /* KOPS */
-	  WAR_HAMMER, SILVER_DAGGER, ELVEN_DAGGER, DAGGER, ORCISH_DAGGER,
-	  ATHAME, SCALPEL, KNIFE, WORM_TOOTH
+      JAVELIN, AKLYS, CLUB, PICK_AXE, RUBBER_HOSE, WAR_HAMMER, SILVER_DAGGER,
+      ELVEN_DAGGER, DAGGER, ORCISH_DAGGER, ATHAME, SCALPEL, KNIFE, WORM_TOOTH
 	};
 
 struct obj *

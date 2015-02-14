@@ -43,12 +43,10 @@ dosit()
 	register struct trap *trap = t_at(u.ux,u.uy);
 	register int typ = levl[u.ux][u.uy].typ;
 
-#ifdef STEED
 	if (u.usteed) {
 	    You("are already sitting on %s.", mon_nam(u.usteed));
 	    return (0);
 	}
-#endif
 	if (u.uundetected && is_hider(youmonst.data) && u.umonnum != PM_TRAPPER)
 	    u.uundetected = 0;		/* no longer on the ceiling */
 

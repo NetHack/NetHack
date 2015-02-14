@@ -1595,7 +1595,6 @@ struct permonst _mons2[] = {
 	M1_ANIMAL|M1_FLY|M1_CARNIVORE,
 	M2_HOSTILE|M2_STRONG|M2_NASTY|M2_COLLECT, M3_INFRAVISIBLE, HI_LORD),
 #endif
-#ifdef KOPS
 /*
  * Kops
  */
@@ -1627,7 +1626,6 @@ struct permonst _mons2[] = {
 	SIZ(WT_HUMAN, 200, MS_ARREST, MZ_HUMAN), 0, 0, M1_HUMANOID,
 	M2_HUMAN|M2_WANDER|M2_HOSTILE|M2_STRONG|M2_MALE|M2_COLLECT,
 	M3_INFRAVISIBLE, HI_LORD),
-#endif
 /*
  * Liches
  */

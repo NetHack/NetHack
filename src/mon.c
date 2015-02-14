@@ -1626,7 +1626,6 @@ register struct monst *mtmp;
 	if (tmp == PM_MAIL_DAEMON) mvitals[tmp].mvflags |= G_GENOD;
 #endif
 
-#ifdef KOPS
 	if (mtmp->data->mlet == S_KOP) {
 	    /* Dead Kops may come back. */
 	    switch(rnd(5)) {
@@ -1640,7 +1639,6 @@ register struct monst *mtmp;
 			break;
 	    }
 	}
-#endif
 	if(mtmp->iswiz) wizdead();
 	if(mtmp->data->msound == MS_NEMESIS) nemdead();
 	if(glyph_is_invisible(levl[mtmp->mx][mtmp->my].glyph))
@@ -1992,10 +1990,8 @@ int dest;
 	    if (!rn2(6) && !(mvitals[mndx].mvflags & G_NOCORPSE) &&
 		    /* no extra item from swallower or steed */
 		    (x != u.ux || y != u.uy) &&
-#ifdef KOPS
 		    /* no extra item from kops--too easy to abuse */
 		    mdat->mlet != S_KOP &&
-#endif
 		    /* reduced chance of item from cloned monster */
 		    (!mtmp->mcloned || !rn2(mvitals[mndx].died / 5 + 1))) {
 		otmp = mkobj(RANDOM_CLASS, TRUE);
