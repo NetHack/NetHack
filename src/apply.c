@@ -2026,9 +2026,6 @@ struct obj *tstone;
     static const char scritch[] = "\"scritch, scritch\"";
     static const char allowall[3] = { COIN_CLASS, ALL_CLASSES, 0 };
     static const char coins_gems[3] = { COIN_CLASS, GEM_CLASS, 0 };
-#ifndef GOLDOBJ
-    struct obj goldobj;
-#endif
 
     /* in case it was acquired while blinded */
     if (!Blind) tstone->dknown = 1;
@@ -2039,17 +2036,6 @@ struct obj *tstone;
     Sprintf(stonebuf, "rub on the stone%s", plur(tstone->quan));
     if ((obj = getobj(choices, stonebuf)) == 0)
 	return;
-#ifndef GOLDOBJ
-    if (obj->oclass == COIN_CLASS) {
-	u.ugold += obj->quan;	/* keep botl up to date */
-	goldobj = *obj;
-	goldobj.oextra = (struct oextra *)0; /* dealloc_obj(obj) will invalidate
-					        the target of this copied ptr
-						here, so clear it out */
-	dealloc_obj(obj);
-	obj = &goldobj;
-    }
-#endif
 
     if (obj == tstone && obj->quan == 1L) {
 	You_cant("rub %s on itself.", the(xname(obj)));
@@ -2066,9 +2052,6 @@ struct obj *tstone;
 	else
 	    pline("A sharp crack shatters %s%s.",
 		  (obj->quan > 1L) ? "one of " : "", the(xname(obj)));
-#ifndef GOLDOBJ
-     /* assert(obj != &goldobj); */
-#endif
 	useup(obj);
 	return;
     }

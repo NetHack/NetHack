@@ -960,7 +960,6 @@ do_rumors()
  * 
  */
 #define IGNORED_FEATURES	( 0L \
-				| (1L << 12)	/* GOLDOBJ */ \
 				| (1L << 19)	/* EXP_ON_BOTL */ \
 				| (1L << 20)	/* SCORE_ON_BOTL */ \
 				| (1L << 27)	/* ZEROCOMP */ \
@@ -993,9 +992,6 @@ make_version()
 			| (1L <<  6)
 #endif
 		/* objects (10..14) */
-#ifdef GOLDOBJ
-			| (1L << 10)
-#endif
 		/* flag bits and/or other global variables (15..26) */
 #ifdef TEXTCOLOR
 			| (1L << 17)
@@ -1238,9 +1234,6 @@ static const char *build_opts[] = {
 #endif
 #ifdef MFLOPPY
 		"floppy drive support",
-#endif
-#ifdef GOLDOBJ
-		"gold object in inventories",
 #endif
 #ifdef INSURANCE
 		"insurance files for recovering from crashes",

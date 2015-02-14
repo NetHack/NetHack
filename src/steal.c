@@ -22,66 +22,6 @@ register struct obj *otmp;
 		    "armor");
 }
 
-#ifndef GOLDOBJ
-long		/* actually returns something that fits in an int */
-somegold()
-{
-#ifdef LINT	/* long conv. ok */
-	return(0L);
-#else
-	return (long)( (u.ugold < 100) ? u.ugold :
-		(u.ugold > 10000) ? rnd(10000) : rnd((int) u.ugold) );
-#endif
-}
-
-void
-stealgold(mtmp)
-register struct monst *mtmp;
-{
-	register struct obj *gold = g_at(u.ux, u.uy);
-	register long tmp;
-	struct monst *who;
-	const char *whose, *what;
-
-	if (gold && (!u.ugold || gold->quan > u.ugold || !rn2(5))) {
-	    mtmp->mgold += gold->quan;
-	    delobj(gold);
-	    newsym(u.ux, u.uy);
-	    if (u.usteed) {
-		who = u.usteed;
-		whose = s_suffix(y_monnam(who));
-		what = makeplural(mbodypart(who, FOOT));
-            } else {
-		who = &youmonst;
-		whose = "your";
-		what = makeplural(body_part(FOOT));
-            }
-	    /* [ avoid "between your rear regions" :-] */
-	    if (slithy(who->data)) what = "coils";
-	    /* reduce "rear hooves/claws" to "hooves/claws" */
-	    if (!strncmp(what, "rear ", 5)) what += 5;
-	    pline("%s quickly snatches some gold from %s %s %s!",
-		  Monnam(mtmp),
-		  (Levitation || Flying) ? "beneath" : "between",
-		  whose, what);
-	    if(!u.ugold || !rn2(5)) {
-		if (!tele_restrict(mtmp)) (void) rloc(mtmp, FALSE);
-		/* do not set mtmp->mavenge here; gold on the floor is fair game */
-		monflee(mtmp, 0, FALSE, FALSE);
-	    }
-	} else if(u.ugold) {
-	    u.ugold -= (tmp = somegold());
-	    Your("purse feels lighter.");
-	    mtmp->mgold += tmp;
-	if (!tele_restrict(mtmp)) (void) rloc(mtmp, FALSE);
-	    mtmp->mavenge = 1;
-	    monflee(mtmp, 0, FALSE, FALSE);
-	    context.botl = 1;
-	}
-}
-
-#else /* !GOLDOBJ */
-
 long		/* actually returns something that fits in an int */
 somegold(umoney)
 long umoney;
@@ -167,7 +107,6 @@ register struct monst *mtmp;
 	    context.botl = 1;
 	}
 }
-#endif /* GOLDOBJ */
 
 /* steal armor after you finish taking it off */
 unsigned int stealoid;		/* object to be stolen */
@@ -257,7 +196,7 @@ boolean unchain_ball;	/* whether to unpunish or just unwield */
 /* Returns 1 when something was stolen (or at least, when N should flee now)
  * Returns -1 if the monster died in the attempt
  * Avoid stealing the object stealoid
- * GOLDOBJ: nymphs and monkeys won't steal coins
+ * Nymphs and monkeys won't steal coins
  */
 int
 steal(mtmp, objnambuf)
@@ -304,9 +243,7 @@ nothing_to_steal:
 	tmp = 0;
 	for(otmp = invent; otmp; otmp = otmp->nobj)
 	    if ((!uarm || otmp != uarmc) && otmp != uskin
-#ifdef GOLDOBJ
 				&& otmp->oclass != COIN_CLASS
-#endif
 #ifdef INVISIBLE_OBJECTS
 				&& (!otmp->oinvis || perceives(mtmp->data))
 #endif
@@ -317,9 +254,7 @@ nothing_to_steal:
 	tmp = rn2(tmp);
 	for(otmp = invent; otmp; otmp = otmp->nobj)
 	    if ((!uarm || otmp != uarmc) && otmp != uskin
-#ifdef GOLDOBJ
 				&& otmp->oclass != COIN_CLASS
-#endif
 #ifdef INVISIBLE_OBJECTS
 				&& (!otmp->oinvis || perceives(mtmp->data))
 #endif
@@ -494,13 +429,6 @@ register struct obj *otmp;
        or kicking code shouldn't continue to track and place it */
     if (otmp == thrownobj) thrownobj = 0;
     else if (otmp == kickedobj) kickedobj = 0;
-#ifndef GOLDOBJ
-    if (otmp->oclass == COIN_CLASS) {
-	mtmp->mgold += otmp->quan;
-	obfree(otmp, (struct obj *)0);
-	freed_otmp = 1;
-    } else {
-#endif
     boolean snuff_otmp = FALSE;
     /* don't want hidden light source inside the monster; assumes that
        engulfers won't have external inventories; whirly monsters cause
@@ -523,9 +451,6 @@ register struct obj *otmp;
     freed_otmp = add_to_minv(mtmp, otmp);
     /* and we had to defer this until object is in mtmp's inventory */
     if (snuff_otmp) snuff_light_source(mtmp->mx, mtmp->my);
-#ifndef GOLDOBJ
-    }
-#endif
     return freed_otmp;
 }
 
@@ -686,34 +611,13 @@ boolean is_pet;		/* If true, pet should keep wielded/worn items */
 
 	/* vault guard's gold goes away rather than be dropped... */
 	if (mtmp->isgd &&
-#ifdef GOLDOBJ
 		    (otmp = findgold(mtmp->minvent)) != 0
-#else
-		    mtmp->mgold != 0L
-#endif
 	    ) {
 		if (canspotmon(mtmp))
 		    pline("%s gold %s.", s_suffix(Monnam(mtmp)),
 			  canseemon(mtmp) ? "vanishes" : "seems to vanish");
-#ifdef GOLDOBJ
 		obfree(otmp, (struct obj *)0);
-#else
-		mtmp->mgold = 0L;
-#endif
 	} /* isgd && has gold */
-
-#ifndef GOLDOBJ
-	/* handle gold first since droppables() would get stuck on it */
-	if (mtmp->mgold) {
-		long g = mtmp->mgold;
-
-		(void) mkgold(g, omx, omy);
-		if (is_pet && cansee(omx, omy) && flags.verbose)
-		    pline("%s drops %ld gold piece%s.", Monnam(mtmp),
-			  g, plur(g));
-		mtmp->mgold = 0L;
-	}
-#endif
 
 	while ((otmp = (is_pet ? droppables(mtmp) : mtmp->minvent)) != 0) {
 		obj_extract_self(otmp);

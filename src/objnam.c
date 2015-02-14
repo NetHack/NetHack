@@ -930,10 +930,8 @@ boolean
 not_fully_identified(otmp)
 register struct obj *otmp;
 {
-#ifdef GOLDOBJ
     /* gold doesn't have any interesting attributes [yet?] */
     if (otmp->oclass == COIN_CLASS) return FALSE;	/* always fully ID'd */
-#endif
     /* check fundamental ID hallmarks first */
     if (!otmp->known || !otmp->dknown ||
 #ifdef MAIL
@@ -2592,15 +2590,9 @@ struct obj *no_wish;
 	   !strcmpi(bp, "coin") || *bp == GOLD_SYM) {
 		if (cnt > 5000 && !wizard) cnt = 5000;
 		else if (cnt < 1) cnt = 1;
-#ifndef GOLDOBJ
-		pline("%d gold piece%s.", cnt, plur(cnt));
-		u.ugold += (long) cnt;
-		otmp = &zeroobj; /* readobjnam()'s return value for gold */
-#else
 		otmp = mksobj(GOLD_PIECE, FALSE, FALSE);
 		otmp->quan = (long) cnt;
 		otmp->owt = weight(otmp);
-#endif
 		context.botl = 1;
 		return otmp;
 	}

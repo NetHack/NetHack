@@ -1088,11 +1088,7 @@ time_t when;
 	Sprintf(rip_line[NAME_LINE], "%s", plname);
 	/* Put $ on stone */
 	Sprintf(rip_line[GOLD_LINE], "%ld Au",
-#ifndef GOLDOBJ
-		u.ugold);
-#else
 		done_money);
-#endif
 	/* Put together death description */
 	formatkiller(buf, sizeof buf, how);
 

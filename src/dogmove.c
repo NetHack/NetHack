@@ -26,9 +26,6 @@ struct monst *mon;
     struct obj *obj, *wep,
 	       dummy, *pickaxe, *unihorn, *key;
 
-#ifndef GOLDOBJ
-    if (mon->mgold) return &zeroobj;	/* pet has something to drop */
-#endif
     dummy = zeroobj;
     dummy.otyp = GOLD_PIECE;	/* not STRANGE_OBJECT or tools of interest */
     dummy.oartifact = 1; /* so real artifact won't override "don't keep it" */

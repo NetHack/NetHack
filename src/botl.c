@@ -159,13 +159,8 @@ botl_score()
     long deepest = deepest_lev_reached(FALSE);
     long utotal;
 
-#ifndef GOLDOBJ
-    utotal = u.ugold + hidden_gold();
-    if ((utotal -= u.ugold0) < 0L) utotal = 0L;
-#else
     utotal = money_cnt(invent) + hidden_gold();
     if ((utotal -= u.umoney0) < 0L) utotal = 0L;
-#endif
     utotal += u.urexp + (50 * (deepest - 1)) +
 	      (deepest > 30 ? 10000 : deepest > 20 ? 1000*(deepest - 20) : 0);
     if (utotal < u.urexp) utotal = LONG_MAX; /* wrap around */
@@ -268,11 +263,7 @@ bot2()
 	Sprintf(nb = eos(newbot2),
 		"%s:%-2ld HP:%d(%d) Pw:%d(%d) AC:%-2d",
 		encglyph(objnum_to_glyph(GOLD_PIECE)),
-#ifndef GOLDOBJ
-		u.ugold,
-#else
 		money_cnt(invent),
-#endif
 		hp, hpmax, u.uen, u.uenmax, u.uac);
 
 	if (Upolyd)
@@ -709,12 +700,7 @@ bot()
 
 	/* Gold */
 
-	blstats[idx][BL_GOLD].a.a_long =
-#ifndef GOLDOBJ
-		   u.ugold;
-#else
-		   money_cnt(invent);
-#endif
+	blstats[idx][BL_GOLD].a.a_long = money_cnt(invent);
 	/*
 	 * The tty port needs to display the current symbol for gold
 	 * as a field header, so to accomodate that we pass gold with

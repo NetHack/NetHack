@@ -339,10 +339,6 @@ struct you {
 	int ublessed, ublesscnt;	/* blessing/duration from #pray */
 	long	umoney0;
 	long	uspare1;
-#ifndef GOLDOBJ
-#define ugold uspare1
-#define ugold0 umoney0
-#endif
 	long	uexp, urexp;
 	long	ucleansed;	/* to record moves when player was cleansed */
 	long	usleep;		/* sleeping; monstermove you last started */

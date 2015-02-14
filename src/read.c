@@ -992,10 +992,8 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 		} else {
 		    for (obj = invent; obj; obj = obj->nobj) {
 			long wornmask;
-#ifdef GOLDOBJ
 			/* gold isn't subject to cursing and blessing */
 			if (obj->oclass == COIN_CLASS) continue;
-#endif
 			wornmask = (obj->owornmask & ~(W_BALL|W_ART|W_ARTI));
 			if (wornmask && !sblessed) {
 			    /* handle a couple of special cases; we don't

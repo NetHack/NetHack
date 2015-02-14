@@ -434,9 +434,7 @@ void ghack_status_window_update_stats()
     const char* hung;
     const char* enc;
     static int firstTime=TRUE;
-#ifdef GOLDOBJ
     long umoney;
-#endif
 
     /* First, fill in the player name and the dungeon level */
     strcpy(buf, plname);
@@ -565,30 +563,17 @@ void ghack_status_window_update_stats()
     gtk_label_set( GTK_LABEL( chaLabel), buf);
     
     /* Now do the non-pixmaped stats (gold and such) */
-#ifndef GOLDOBJ
-    sprintf(buf,"Au:%ld", u.ugold);
-    if (lastAu < u.ugold && firstTime==FALSE) {
-#else
     umoney = money_cnt(invent);
     sprintf(buf,"Au:%ld", umoney);
     if (lastAu < umoney && firstTime==FALSE) {
-#endif
 	/* Ok, this changed so add it to the highlighing list */
 	ghack_highlight_widget( goldLabel, normalStyle, greenStyle);
     }
-#ifndef GOLDOBJ
-    else if (lastAu > u.ugold && firstTime==FALSE) {
-#else
     else if (lastAu > umoney && firstTime==FALSE) {
-#endif
 	/* Ok, this changed so add it to the highlighing list */
 	ghack_highlight_widget( goldLabel, normalStyle, redStyle);
     }
-#ifndef GOLDOBJ
-    lastAu = u.ugold;
-#else
     lastAu = umoney;
-#endif
     gtk_label_set( GTK_LABEL( goldLabel), buf);
     
     if (u.mtimedone) {

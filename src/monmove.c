@@ -477,13 +477,8 @@ toofar:
 
 	if(!nearby || mtmp->mflee || scared ||
 	   mtmp->mconf || mtmp->mstun || (mtmp->minvis && !rn2(3)) ||
-#ifndef GOLDOBJ
-	   (mdat->mlet == S_LEPRECHAUN &&
-		   !u.ugold && (mtmp->mgold || rn2(2))) ||
-#else
 	   (mdat->mlet == S_LEPRECHAUN &&
 		   !findgold(invent) && (findgold(mtmp->minvent) || rn2(2))) ||
-#endif
 	   (is_wanderer(mdat) && !rn2(4)) || (Conflict && !mtmp->iswiz) ||
 	   (!mtmp->mcansee && !rn2(4)) || mtmp->mpeaceful) {
 		/* Possibly cast an undirected spell if not attacking you */
@@ -765,9 +760,7 @@ not_special:
 	if (mtmp->mconf || (u.uswallow && mtmp == u.ustuck))
 		appr = 0;
 	else {
-#ifdef GOLDOBJ
 		struct obj *lepgold, *ygold;
-#endif
 		boolean should_see = (couldsee(omx, omy) &&
 				      (levl[gx][gy].lit ||
 				       !levl[omx][omy].lit) &&
@@ -783,12 +776,8 @@ not_special:
 			appr = 0;
 
 		if(monsndx(ptr) == PM_LEPRECHAUN && (appr == 1) &&
-#ifndef GOLDOBJ
-		   (mtmp->mgold > u.ugold))
-#else
 		   ( (lepgold = findgold(mtmp->minvent)) && 
                    (lepgold->quan > ((ygold = findgold(invent)) ? ygold->quan : 0L)) ))
-#endif
 			appr = -1;
 
 		if (!should_see && can_track(ptr)) {
@@ -1320,9 +1309,7 @@ register struct monst *mtmp;
 {
 	boolean notseen, gotu;
 	register int disp, mx = mtmp->mux, my = mtmp->muy;
-#ifdef GOLDOBJ
 	long umoney = money_cnt(invent);
-#endif
 
 	/*
 	 * do cheapest and/or most likely tests first
@@ -1340,13 +1327,7 @@ register struct monst *mtmp;
 	if (notseen || Underwater) {
 	    /* Xorns can smell quantities of valuable metal
 		like that in solid gold coins, treat as seen */
-	    if ((mtmp->data == &mons[PM_XORN]) &&
-#ifndef GOLDOBJ
-			u.ugold
-#else
-			umoney
-#endif
-			&& !Underwater)
+	    if ((mtmp->data == &mons[PM_XORN]) && umoney && !Underwater)
 		disp = 0;
 	    else
 		disp = 1;
@@ -1433,22 +1414,14 @@ struct monst *mtmp;
 	struct obj *chain, *obj;
 
 	if (mtmp == &youmonst) {
-#ifndef GOLDOBJ
-		if (u.ugold > 100L) return TRUE;
-#endif
 		chain = invent;
 	} else {
-#ifndef GOLDOBJ
-		if (mtmp->mgold > 100L) return TRUE;
-#endif
 		chain = mtmp->minvent;
 	}
 	for (obj = chain; obj; obj = obj->nobj) {
 		int typ = obj->otyp;
 
-#ifdef GOLDOBJ
                 if (typ == COIN_CLASS && obj->quan > 100L) return TRUE;
-#endif
 		if (obj->oclass != GEM_CLASS &&
 		    !(typ >= ARROW && typ <= BOOMERANG) &&
 		    !(typ >= DAGGER && typ <= CRYSKNIFE) &&

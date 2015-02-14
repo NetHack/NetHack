@@ -552,11 +552,7 @@ struct mkroom	*sroom;
 	eshkp->billct = eshkp->visitct = 0;
 	eshkp->bill_p = (struct bill_x *)0;
 	eshkp->customer[0] = '\0';
-#ifndef GOLDOBJ
-	shk->mgold = 1000L + 30L*(long)rnd(100);	/* initial capital */
-#else
         mkmonmoney(shk, 1000L + 30L*(long)rnd(100));	/* initial capital */
-#endif
 	if (shp->shknms == shkrings)
 	    (void) mongets(shk, TOUCHSTONE);
 	nameshk(shk, shp->shknms);

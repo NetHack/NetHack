@@ -2550,11 +2550,7 @@ void NetHackQtStatusWindow::updateStats()
 	dlevel.setLabel(buf,(long)depth(&u.uz));
     }
 
-#ifndef GOLDOBJ
-    gold.setLabel("Au:", u.ugold);
-#else
     gold.setLabel("Au:", money_cnt(invent));
-#endif
     if (u.mtimedone) {
 	// You're a monster!
 
@@ -3296,11 +3292,7 @@ static char** rip_line=0;
     Sprintf(rip_line[NAME_LINE], "%s", plname);
 
     /* Put $ on stone */
-#ifndef GOLDOBJ
-    Sprintf(rip_line[GOLD_LINE], "%ld Au", u.ugold);
-#else
     Sprintf(rip_line[GOLD_LINE], "%ld Au", done_money);
-#endif
 
     /* Put together death description */
     formatkiller(buf, sizeof buf, how);

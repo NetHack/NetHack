@@ -469,11 +469,7 @@ calculate_rip_text(int how, time_t when)
 
 	/* Put $ on stone */
 	Sprintf(rip_line[GOLD_LINE], "%ld Au",
-#ifndef GOLDOBJ
-		u.ugold);
-#else
 		done_money);
-#endif
 	/* Put together death description */
 	formatkiller(buf, sizeof buf, how);
 

@@ -454,7 +454,6 @@ register struct monst *mtmp;
 		(void) mongets(mtmp, rnd_offensive_item(mtmp));
 }
 
-#ifdef GOLDOBJ
 /*
  *   Makes up money for monster's inventory.
  *   This will change with silver & copper coins
@@ -468,7 +467,6 @@ long amount;
     gold->quan = amount;
     add_to_minv(mtmp, gold);
 }
-#endif
 
 STATIC_OVL void
 m_initinv(mtmp)
@@ -555,11 +553,7 @@ register struct	monst	*mtmp;
 					     rn2(3) ? CLOAK_OF_PROTECTION :
 						 CLOAK_OF_MAGIC_RESISTANCE);
 		    (void) mongets(mtmp, SMALL_SHIELD);
-#ifndef GOLDOBJ
-		    mtmp->mgold = (long)rn1(10,20);
-#else
 		    mkmonmoney(mtmp,(long)rn1(10,20));
-#endif
 		} else if (quest_mon_represents_role(ptr,PM_MONK)) {
 		    (void) mongets(mtmp, rn2(11) ? ROBE :
 					     CLOAK_OF_MAGIC_RESISTANCE);
@@ -613,11 +607,7 @@ register struct	monst	*mtmp;
 		}
 		break;
 	    case S_LEPRECHAUN:
-#ifndef GOLDOBJ
-		mtmp->mgold = (long) d(level_difficulty(), 30);
-#else
 		mkmonmoney(mtmp, (long) d(level_difficulty(), 30));
-#endif
 		break;
 	    case S_DEMON:
 	    	/* moved here from m_initweap() because these don't
@@ -640,14 +630,8 @@ register struct	monst	*mtmp;
 		(void) mongets(mtmp, rnd_defensive_item(mtmp));
 	if ((int) mtmp->m_lev > rn2(100))
 		(void) mongets(mtmp, rnd_misc_item(mtmp));
-#ifndef GOLDOBJ
-	if (likes_gold(ptr) && !mtmp->mgold && !rn2(5))
-		mtmp->mgold =
-		      (long) d(level_difficulty(), mtmp->minvent ? 5 : 10);
-#else
 	if (likes_gold(ptr) && !findgold(mtmp->minvent) && !rn2(5))
 		mkmonmoney(mtmp, (long) d(level_difficulty(), mtmp->minvent ? 5 : 10));
-#endif
 }
 
 /* Note: for long worms, always call cutworm (cutworm calls clone_mon) */
@@ -691,9 +675,6 @@ xchar x, y;	/* clone's preferred location or 0 (near mon) */
 	m2->mcloned = 1;
 	m2->minvent = (struct obj *) 0; /* objects don't clone */
 	m2->mleashed = FALSE;
-#ifndef GOLDOBJ
-	m2->mgold = 0L;
-#endif
 	/* Max HP the same, but current HP halved for both.  The caller
 	 * might want to override this by halving the max HP also.
 	 * When current HP is odd, the original keeps the extra point.

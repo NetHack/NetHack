@@ -238,17 +238,10 @@ register struct obj *obj;
 
 static NEARDATA const char wield_objs[] =
 	{ ALL_CLASSES, ALLOW_NONE, WEAPON_CLASS, TOOL_CLASS, 0 };
-#ifdef GOLDOBJ
 static NEARDATA const char ready_objs[] =
 	{ COIN_CLASS, ALL_CLASSES, ALLOW_NONE, WEAPON_CLASS, 0 };
 static NEARDATA const char bullets[] =	/* (note: different from dothrow.c) */
 	{ COIN_CLASS, ALL_CLASSES, ALLOW_NONE, GEM_CLASS, WEAPON_CLASS, 0 };
-#else
-static NEARDATA const char ready_objs[] =
-	{ ALL_CLASSES, ALLOW_NONE, WEAPON_CLASS, 0 };
-static NEARDATA const char bullets[] =	/* (note: different from dothrow.c) */
-	{ ALL_CLASSES, ALLOW_NONE, GEM_CLASS, WEAPON_CLASS, 0 };
-#endif
 
 int
 dowield()

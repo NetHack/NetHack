@@ -452,14 +452,6 @@ register struct obj *obj;
 			break;
 		case 28: /* Strange feeling */
 			pline("An urge to take a bath overwhelms you.");
-#ifndef GOLDOBJ
-			if (u.ugold > 10) {
-			    u.ugold -= somegold() / 10;
-			    You("lost some of your gold in the fountain!");
-			    CLEAR_FOUNTAIN_LOOTED(u.ux,u.uy);
-			    exercise(A_WIS, FALSE);
-			}
-#else
 			{
 			    long money = money_cnt(invent);
 			    struct obj *otmp;
@@ -479,7 +471,6 @@ register struct obj *obj;
 			        exercise(A_WIS, FALSE);
                             }
 			}
-#endif
 			break;
 		case 29: /* You see coins */
 

@@ -427,11 +427,7 @@ register struct monst *oracl;
 	char qbuf[QBUFSZ];
 
 	multi = 0;
-#ifndef GOLDOBJ
-	umoney = u.ugold;
-#else
 	umoney = money_cnt(invent);
-#endif
 
 	if (!oracl) {
 		There("is no one here to consult.");
@@ -468,12 +464,7 @@ register struct monst *oracl;
 		u_pay = (umoney < (long)major_cost) ? (int)umoney : major_cost;
 		break;
 	}
-#ifndef GOLDOBJ
-	u.ugold -= (long)u_pay;
-	oracl->mgold += (long)u_pay;
-#else
 	money2mon(oracl, (long)u_pay);
-#endif
 	context.botl = 1;
 	add_xpts = 0;	/* first oracle of each type gives experience points */
 	if (u_pay == minor_cost) {

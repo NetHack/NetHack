@@ -1461,13 +1461,6 @@ register struct attack *mattk;
 		tmp = 0;
 		break;
 	    case AD_SGLD:
-#ifndef GOLDOBJ
-		if (mdef->mgold) {
-		    u.ugold += mdef->mgold;
-		    mdef->mgold = 0;
-		    Your("purse feels heavier.");
-		}
-#else
                 /* This you as a leprechaun, so steal
                    real gold only, no lesser coins */
 	        {
@@ -1484,7 +1477,6 @@ register struct attack *mattk;
 		        }
 		    }
 	        }
-#endif
 		exercise(A_DEX, TRUE);
 		tmp = 0;
 		break;

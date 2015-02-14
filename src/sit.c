@@ -9,15 +9,6 @@
 void
 take_gold()
 {
-#ifndef GOLDOBJ
-	if (u.ugold <= 0)  {
-		You_feel("a strange sensation.");
-	} else {
-		You("notice you have no gold!");
-		u.ugold = 0;
-		context.botl = 1;
-	}
-#else
         struct obj *otmp, *nobj;
 	int lost_money = 0;
 	for (otmp = invent; otmp; otmp = nobj) {
@@ -33,7 +24,6 @@ take_gold()
 		You("notice you have no money!");
 		context.botl = 1;
 	}
-#endif
 }
 
 int
@@ -324,10 +314,8 @@ rndcurse()			/* curse a few inventory items at random! */
 	}
 
 	for (otmp = invent; otmp; otmp = otmp->nobj) {
-#ifdef GOLDOBJ
 	    /* gold isn't subject to being cursed or blessed */
 	    if (otmp->oclass == COIN_CLASS) continue;
-#endif
 	    nobj++;
 	}
 	if (nobj) {
@@ -335,10 +323,8 @@ rndcurse()			/* curse a few inventory items at random! */
 		 cnt > 0; cnt--)  {
 		onum = rnd(nobj);
 		for (otmp = invent; otmp; otmp = otmp->nobj) {
-#ifdef GOLDOBJ
 		    /* as above */
 		    if (otmp->oclass == COIN_CLASS) continue;
-#endif
 		    if (--onum == 0) break;	/* found the target */
 		}
 		/* the !otmp case should never happen; picking an already
