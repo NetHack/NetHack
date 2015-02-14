@@ -198,9 +198,6 @@ static struct Bool_Opt
 	{"tombstone",&flags.tombstone, TRUE, SET_IN_GAME},
 	{"toptenwin",&iflags.toptenwin, FALSE, SET_IN_GAME},
 	{"travel", &flags.travelcmd, TRUE, SET_IN_GAME},
-#ifdef UNICODE_SUPPORT
-	{"unicode", &iflags.unicodedisp, FALSE, SET_IN_GAME},
-#endif
 #ifdef WIN32CON
 	{"use_inverse",   &iflags.wc_inverse, TRUE, SET_IN_GAME},		/*WC*/
 #else
@@ -605,9 +602,6 @@ initoptions_init()
 	iflags.msg_history = 20;
 #ifdef TTY_GRAPHICS
 	iflags.prevmsg_window = 's';
-#  if defined(UNIX) && defined(UNICODE_WIDEWINPORT)
-	iflags.unicodecapable = TRUE;
-#  endif
 #endif
 	iflags.menu_headings = ATR_INVERSE;
 
@@ -2514,7 +2508,7 @@ goodfruit:
 		boolean badflag = FALSE;
 		if (duplicate) complain_about_duplicate(opts,1);
 		if (!negated) {
-		    for (i = PRIMARY; i <= ROGUESET; ++i) { 
+		    for (i = 0; i < NUM_GRAPHICS; ++i) { 
 			if (symset[i].name)
 			    badflag = TRUE;
 			else {
@@ -3359,7 +3353,7 @@ boolean setinitial,setfromfile;
  	    || !strcmp("roguesymset", optname)) {
 	menu_item *symset_pick = (menu_item *)0;
 	boolean primaryflag = (*optname == 's'),
-		  rogueflag = (*optname == 'r'),
+		rogueflag = (*optname == 'r'),
 		ready_to_switch = FALSE,
 		nothing_to_do = FALSE;
 	int res;
@@ -3384,8 +3378,7 @@ boolean setinitial,setfromfile;
 		sl = symset_list;
 		while (sl) {
 		    /* check restrictions */
-		    if ((!rogueflag && sl->rogue)     ||
-		        (!iflags.unicodedisp && sl->unicode) ||
+		    if ((!rogueflag && sl->rogue)  ||
 			(!primaryflag && sl->primary)) {
 		    	sl = sl->next;
 		    	continue;
@@ -3398,8 +3391,8 @@ boolean setinitial,setfromfile;
 		}
 		if (!setcount) {
 			pline("There are no appropriate %ssymbol sets available.",
-				  (rogueflag) ? "rogue level " :
-				(primaryflag) ? "primary "     :
+				(rogueflag)   ? "rogue level " :
+				(primaryflag) ? "primary " :
 				"");
 			return TRUE;
 		}
@@ -3415,7 +3408,6 @@ boolean setinitial,setfromfile;
 		while (sl) {
 		    /* check restrictions */
 		    if ((!rogueflag && sl->rogue) ||
-		        (!iflags.unicodedisp && sl->unicode) ||
 			(!primaryflag && sl->primary)) {
 		    	sl = sl->next;
 		    	continue;
@@ -3502,7 +3494,7 @@ boolean setinitial,setfromfile;
 	if(rogueflag)
 	    init_r_symbols();
 	else
-            init_l_symbols();
+	    init_l_symbols();
 
 	if (symset[which_set].name) {
 	    if (read_sym_file(which_set))
@@ -3568,14 +3560,9 @@ char *buf;
 #endif
 #ifdef BACKWARD_COMPAT
 	else if (!strcmp(optname, "boulder"))
-		Sprintf(buf,
-# ifdef UNICODE_DRAWING
-			    "\\x%04X",
-# else
-			    "%c",
-# endif
-			iflags.bouldersym ? iflags.bouldersym :
-			 showsyms[(int)objects[BOULDER].oc_class + SYM_OFF_O]);
+		Sprintf(buf, "%c", iflags.bouldersym ?
+			iflags.bouldersym :
+			showsyms[(int)objects[BOULDER].oc_class + SYM_OFF_O]);
 #endif
 	else if (!strcmp(optname, "catname"))
 		Sprintf(buf, "%s", catname[0] ? catname : none);
@@ -4032,6 +4019,15 @@ char *buf;
 	    sp++;
 	}
 	return (struct symparse *)0;
+}
+
+int sym_val(strval)
+char *strval;
+{
+	char buf[QBUFSZ];
+	buf[0] = '\0';
+	escapes(strval, buf);
+	return (int)*buf;
 }
 
 /* data for option_help() */

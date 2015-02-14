@@ -315,10 +315,6 @@
  */
 #endif /* CHDIR */
 
-/*
- * Enable some UNICODE support.
- */
-/*#define UNICODE_SUPPORT */		/* master on/off for any unicode support    */
 
 
 /*

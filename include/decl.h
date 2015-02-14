@@ -320,7 +320,6 @@ E NEARDATA winid WIN_MESSAGE;
 E NEARDATA winid WIN_STATUS;
 #endif
 E NEARDATA winid WIN_MAP, WIN_INVEN;
-E nhwchar toplines[];
 
 /* pline (et al) for a single string argument (suppress compiler warning) */
 #define pline1(cstr) pline("%s", cstr)
@@ -331,6 +330,7 @@ E nhwchar toplines[];
 #define Sprintf1(buf, cstr) Sprintf(buf, "%s", cstr)
 #define panic1(cstr) panic("%s", cstr)
 
+E char toplines[];
 #ifndef TCAP_H
 E struct tc_gbl_data {	/* also declared in tcap.h */
     char *tc_AS, *tc_AE;	/* graphics start and end (tty font swapping) */

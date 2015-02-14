@@ -571,7 +571,7 @@ do_look(mode, click_cc)
 	for (i = 0; i < MAXMCLASSES; i++) {
 	    if (sym == ((from_screen || clicklook) ?
 			showsyms[i + SYM_OFF_M] : def_monsyms[i].sym) &&
-			def_monsyms[i].explain) {
+		def_monsyms[i].explain) {
 		need_to_look = TRUE;
 		if (!found) {
 		    Sprintf(out_str, "%s        %s",

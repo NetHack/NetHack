@@ -76,11 +76,7 @@ pline VA_DECL(const char *, line)
 	    return;
 	}
 #ifndef MAC
-# ifdef UNICODE_WIDEWINPORT
-	if (no_repeat && !nhwstrcmp(toplines, line))
-# else
-	if (no_repeat && !strcmp(toplines, line))
-# endif
+	if (no_repeat && !strcmp(line, toplines))
 	    return;
 #endif /* MAC */
 	if (vision_full_recalc) vision_recalc(0);

@@ -2607,7 +2607,7 @@ parse_sym_line(buf, which_set)
 char *buf;
 int which_set;
 {
-	int val;
+	int val, i;
 	struct symparse *symp = (struct symparse *)0;
 	char *bufp, *commentp, *altp;
 
@@ -2657,7 +2657,6 @@ int which_set;
 		return 0;
 
 	if (!symset[which_set].name) {
-	    int i;
 	    /* A null symset name indicates that we're just
 	       building a pick-list of possible symset
 	       values from the file, so only do that */
@@ -2682,7 +2681,6 @@ int which_set;
 		    /* initialize restriction bits */
 		    tmpsp->primary = 0;
 		    tmpsp->rogue   = 0;
-		    tmpsp->unicode = 0;
 		    break;
 		 case 2:
 		    /* handler type identified */
@@ -2705,17 +2703,14 @@ int which_set;
 		 case 5:
 		    /* restrictions: xxxx*/
 		    tmpsp = symset_list; /* most recent symset */
-		    i = 0;
-		    while (known_restrictions[i]) {
+                    for (i = 0; known_restrictions[i]; ++i) {
 			if (!strcmpi(known_restrictions[i], bufp)) {
 			    switch(i) {
 			    	case  0: tmpsp->primary = 1; break;
 				case  1: tmpsp->rogue   = 1; break;
-				case  2: tmpsp->unicode = 1; break;
 			    }
 			    break;	/* while loop */
 	    	        }
-			i++;
 		    }
 		    break;
 	        }
@@ -2732,7 +2727,7 @@ int which_set;
 				chosen_symset_start = TRUE;
 				/* these init_*() functions clear symset fields too */
 				if (which_set == ROGUESET) init_r_symbols();
-				else if (which_set == PRIMARY)  init_l_symbols();
+                                else if (which_set == PRIMARY)  init_l_symbols();
 			    }
 			    break;
 		    case 1:
@@ -2771,23 +2766,12 @@ int which_set;
 						 break;
 					case  1: symset[which_set].rogue   = 1;
 						 break;
-					case  2: symset[which_set].unicode = 1;
-						 break;
 				    }
 				    break;	/* while loop */
 	    	        	    }
 				    n++;
 		    	        }
-			        /* Don't allow unicode set if code can't handle it */
-			        if (symset[which_set].unicode &&
-						!iflags.unicodedisp) {
-				    if (chosen_symset_start)
-					chosen_symset_end = FALSE;
-				    chosen_symset_start = FALSE;
-				    if (which_set == ROGUESET) init_r_symbols();
-				    else if (which_set == PRIMARY)  init_l_symbols();
-			        }
-		    	    }
+			    }
 		   	    break;
 		}
 	    } else {		/* !SYM_CONTROL */
@@ -2819,72 +2803,6 @@ int which_set;
 	    }
 	    i++;
 	}
-}
-
-/*
- *  Produces a single integer value.
- */
-int
-sym_val(cp)
-const char *cp;
-{
-    unsigned int cval = 0;
-    int	meta = 0, dcount = 0;
-    const char *dp, *hex = "00112233445566778899aAbBcCdDeEfF";
-
-    while (*cp)
-    {
-	if (*cp == '\\' && index("mM", cp[1])) {
-		meta = 1;
-		cp += 2;
-	}
-	if ((*cp == 'U' || *cp == 'u') && cp[1] == '+' && index(hex, cp[2]))
-	{
-	    dcount = 0;
-	    cp++;
-	    for (++cp; *cp && (dp = index(hex, *cp)) && (dcount++ < 4); cp++)
-		cval = (unsigned int)((cval * 16) +
-			((unsigned int)(dp - hex) / 2));
-	}
-	else if (*cp == '\\' && index("0123456789xXoO", cp[1]))
-	{
-	    dcount = 0;
-	    cp++;
-	    if (*cp == 'x' || *cp == 'X')
-		for (++cp; *cp && (dp = index(hex, *cp)) && (dcount++ < 4); cp++)
-		    cval = (unsigned int)((cval * 16) +
-			    ((unsigned int)(dp - hex) / 2));
-	    else if (*cp == 'o' || *cp == 'O')
-		for (++cp; *cp && (index("01234567",*cp)) && (dcount++ < 5); cp++)
-		    cval = (cval * 8) + (unsigned int)(*cp - '0');
-	    else
-		for (; *cp && (index("0123456789",*cp)) && (dcount++ < 5); cp++)
-		    cval = (cval * 10) + (unsigned int)(*cp - '0');
-	}
-	else if (*cp == '\\')		/* C-style character escapes */
-	{
-	    switch (*++cp)
-	    {
-	    case '\\': cval = '\\'; break;
-	    case 'n': cval = '\n'; break;
-	    case 't': cval = '\t'; break;
-	    case 'b': cval = '\b'; break;
-	    case 'r': cval = '\r'; break;
-	    default: cval = (unsigned int)*cp;
-	    }
-	    cp++;
-	}
-	else if (*cp == '^')		/* expand control-character syntax */
-	{
-	    cval = (unsigned int)(*++cp & 0x1f);
-	    cp++;
-	}
-	else
-	    cval = (unsigned int)*cp++;
-	if (meta)
-	    cval |= 0x80;
-    }
-    return cval;
 }
 
 /* ----------  END CONFIG FILE HANDLING ----------- */
