@@ -126,11 +126,9 @@ dosit()
 		(void) rust_dmg(uarm, "armor", 1, TRUE, &youmonst);
 	    if (!rn2(10) && uarmf && uarmf->otyp != WATER_WALKING_BOOTS)
 		(void) rust_dmg(uarm, "armor", 1, TRUE, &youmonst);
-#ifdef SINKS
 	} else if(IS_SINK(typ)) {
 	    You(sit_message, defsyms[S_sink].explanation);
 	    Your("%s gets wet.", humanoid(youmonst.data) ? "rump" : "underside");
-#endif
 	} else if(IS_ALTAR(typ)) {
 	    You(sit_message, defsyms[S_altar].explanation);
 	    altar_wrath(u.ux, u.uy);

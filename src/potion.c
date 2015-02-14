@@ -399,7 +399,6 @@ dodrink()
 			return 1;
 		}
 	}
-#ifdef SINKS
 	/* Or a kitchen sink? */
 	if (IS_SINK(levl[u.ux][u.uy].typ) &&
 		/* not as low as floor level but similar restrictions apply */
@@ -409,7 +408,6 @@ dodrink()
 			return 1;
 		}
 	}
-#endif
 
 	/* Or are you surrounded by water? */
 	if (Underwater && !u.uswallow) {

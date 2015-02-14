@@ -51,7 +51,6 @@ dosounds()
 	};
 	You_hear1(fountain_msg[rn2(3)+hallu]);
     }
-#ifdef SINK
     if (level.flags.nsinks && !rn2(300)) {
 	static const char * const sink_msg[3] = {
 		"a slow drip.",
@@ -60,7 +59,6 @@ dosounds()
 	};
 	You_hear1(sink_msg[rn2(2)+hallu]);
     }
-#endif
     if (level.flags.has_court && !rn2(200)) {
 	static const char * const throne_msg[4] = {
 		"the tones of courtly conversation.",

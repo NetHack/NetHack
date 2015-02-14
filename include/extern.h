@@ -784,10 +784,8 @@ E void FDECL(gush, (int,int,genericptr_t));
 E void FDECL(dryup, (XCHAR_P,XCHAR_P, BOOLEAN_P));
 E void NDECL(drinkfountain);
 E void FDECL(dipfountain, (struct obj *));
-#ifdef SINKS
 E void FDECL(breaksink, (int,int));
 E void NDECL(drinksink);
-#endif
 
 /* ### hack.c ### */
 

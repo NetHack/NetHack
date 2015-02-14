@@ -542,11 +542,9 @@ int ttyp;
 	    SET_FOUNTAIN_WARNED(x,y);		/* force dryup */
 	    dryup(x, y, madeby_u);
 	    return;
-#ifdef SINKS
 	} else if (IS_SINK(lev->typ)) {
 	    breaksink(x, y);
 	    return;
-#endif
 	} else if (lev->typ == DRAWBRIDGE_DOWN ||
 		   (is_drawbridge_wall(x, y) >= 0)) {
 	    int bx = x, by = y;
@@ -1533,11 +1531,9 @@ char *msg;
 	} else if (is_pool(cc->x,cc->y)) {
 	} else if (IS_GRAVE(ltyp)) {
 #endif
-#ifdef SINKS
 	} else if (IS_SINK(ltyp)) {
 		Strcpy(msg, "A tangled mass of plumbing remains below the sink.");
 		return FALSE;		
-#endif
 	} else if ((cc->x == xupladder && cc->y == yupladder) || /* "ladder up" */
 		   (cc->x == xdnladder && cc->y == ydnladder)) { /* "ladder down" */
 		Strcpy(msg, "The ladder is unaffected.");

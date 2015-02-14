@@ -1001,9 +1001,7 @@ static struct qmchoices {
 	{PM_HOUSECAT,   0, PM_DOG, 	  M_AP_MONSTER},
 	{PM_LARGE_CAT,  0, PM_LARGE_DOG,  M_AP_MONSTER},
 	{PM_HOUSECAT,   0, PM_GIANT_RAT,  M_AP_MONSTER},
-#ifdef SINKS
 	{0, S_DOG, SINK, M_AP_FURNITURE},	/* sorry, no fire hydrants in NetHack */
-#endif
 	{0, 0, TRIPE_RATION, M_AP_OBJECT},	/* leave this at end */
 };
 
