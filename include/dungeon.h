@@ -232,9 +232,7 @@ typedef struct mapseen  {
 	    Bitfield(valley, 1);
 	    Bitfield(msanctum, 1);
 	    Bitfield(ludios, 1);
-# ifdef REINCARNATION
 	    Bitfield(roguelevel, 1);
-# endif
 	} flags;
 	/* custom naming */
 	char *custom;

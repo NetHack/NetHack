@@ -1059,12 +1059,10 @@ struct rm *lev;
 {
 	int newmask = lev->doormask & ~WM_MASK;
 
-#ifdef REINCARNATION
 	if (Is_rogue_level(&u.uz))
 	    /* rogue didn't have doors, only doorways */
 	    newmask = D_NODOOR;
 	else
-#endif
 	    /* newly exposed door is closed */
 	    if (!(newmask & D_LOCKED)) newmask |= D_CLOSED;
 

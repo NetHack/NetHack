@@ -2752,11 +2752,8 @@ int which_set;
 				/* matches desired one */
 				chosen_symset_start = TRUE;
 				/* these init_*() functions clear symset fields too */
-# ifdef REINCARNATION
 				if (which_set == ROGUESET) init_r_symbols();
-				else
-# endif
-				if (which_set == PRIMARY)  init_l_symbols();
+				else if (which_set == PRIMARY)  init_l_symbols();
 			    }
 			    break;
 		    case 1:
@@ -2808,11 +2805,8 @@ int which_set;
 				    if (chosen_symset_start)
 					chosen_symset_end = FALSE;
 				    chosen_symset_start = FALSE;
-# ifdef REINCARNATION
 				    if (which_set == ROGUESET) init_r_symbols();
-				    else
-# endif
-				    if (which_set == PRIMARY)  init_l_symbols();
+				    else if (which_set == PRIMARY)  init_l_symbols();
 			        }
 		    	    }
 		   	    break;
@@ -2822,12 +2816,9 @@ int which_set;
 		if (chosen_symset_start) {
 			if (which_set == PRIMARY) {
 				update_l_symset(symp, val);
-			}
-# ifdef REINCARNATION
-			else if (which_set == ROGUESET) {
+			} else if (which_set == ROGUESET) {
 				update_r_symset(symp, val);
 			}
-# endif
 		}
 	    }
 	}

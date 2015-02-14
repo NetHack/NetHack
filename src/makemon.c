@@ -5,9 +5,7 @@
 
 #include "hack.h"
 
-#ifdef REINCARNATION
 #include <ctype.h>
-#endif
 
 STATIC_VAR NEARDATA struct monst zeromonst;
 
@@ -160,9 +158,7 @@ register struct monst *mtmp;
 	register int mm = monsndx(ptr);
 	struct obj *otmp;
 
-#ifdef REINCARNATION
 	if (Is_rogue_level(&u.uz)) return;
-#endif
 /*
  *	first a few special cases:
  *
@@ -481,9 +477,7 @@ register struct	monst	*mtmp;
 	register int cnt;
 	register struct obj *otmp;
 	register struct permonst *ptr = mtmp->data;
-#ifdef REINCARNATION
 	if (Is_rogue_level(&u.uz)) return;
-#endif
 /*
  *	Soldiers get armour & rations - armour approximates their ac.
  *	Nymphs may get mirror or potion of object detection.
@@ -1279,9 +1273,7 @@ rndmonst()
 	if (rndmonst_state.choice_count < 0) {	/* need to recalculate */
 	    int zlevel, minmlev, maxmlev;
 	    boolean elemlevel;
-#ifdef REINCARNATION
 	    boolean upper;
-#endif
 
 	    rndmonst_state.choice_count = 0;
 	    /* look for first common monster */
@@ -1301,9 +1293,7 @@ rndmonst()
 	    minmlev = zlevel / 6;
 	    /* determine the level of the strongest monster to make. */
 	    maxmlev = (zlevel + u.ulevel) / 2;
-#ifdef REINCARNATION
 	    upper = Is_rogue_level(&u.uz);
-#endif
 	    elemlevel = In_endgame(&u.uz) && !Is_astralevel(&u.uz);
 
 /*
@@ -1315,9 +1305,7 @@ rndmonst()
 		rndmonst_state.mchoices[mndx] = 0;
 		if (tooweak(mndx, minmlev) || toostrong(mndx, maxmlev))
 		    continue;
-#ifdef REINCARNATION
 		if (upper && !isupper(def_monsyms[(int)(ptr->mlet)].sym)) continue;
-#endif
 		if (elemlevel && wrong_elem_type(ptr)) continue;
 		if (uncommon(mndx)) continue;
 		if (Inhell && (ptr->geno & G_NOHELL)) continue;
@@ -1825,15 +1813,9 @@ register struct monst *mtmp;
 			 levl[mx-1][my].typ == TDWALL   ||
 			 levl[mx-1][my].typ == CROSSWALL||
 			 levl[mx-1][my].typ == TUWALL    ))
-#ifdef REINCARNATION
 		    appear = Is_rogue_level(&u.uz) ? S_hwall : S_hcdoor;
 		else
 		    appear = Is_rogue_level(&u.uz) ? S_vwall : S_vcdoor;
-#else
-		    appear = S_hcdoor;
-		else
-		    appear = S_vcdoor;
-#endif
 		if(!mtmp->minvis || See_invisible)
 		    block_point(mx,my);	/* vision */
 	} else if (level.flags.is_maze_lev && !In_sokoban(&u.uz) && rn2(2)) {

@@ -369,14 +369,10 @@ static struct Comp_Opt
 				DISP_IN_GAME},
 #endif
 	{ "roguesymset", "load a set of rogue display symbols from the symbols file", 70,
-#ifdef REINCARNATION
-# ifdef LOADSYMSETS
+#ifdef LOADSYMSETS
 				 SET_IN_GAME },
-# else
-				 DISP_IN_GAME},
-# endif
 #else
-				 SET_IN_FILE},
+				 DISP_IN_GAME},
 #endif
 	{ "suppress_alert", "suppress alerts about version-specific features",
 						8, SET_IN_GAME },
@@ -1417,7 +1413,6 @@ boolean tinitial, tfrom_file;
 
 	fullname = "roguesymset";
 	if (match_optname(opts, fullname, 7, TRUE)) {
-#if defined(REINCARNATION) && defined(LOADSYMSETS)
 		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) bad_negation(fullname, FALSE);
 		else if ((op = string_for_opt(opts, FALSE)) != 0) {
@@ -1434,7 +1429,6 @@ boolean tinitial, tfrom_file;
 				need_redraw = TRUE;
 		    }
 		}
-#endif
 		return;
 	}
 
@@ -2594,10 +2588,8 @@ goodfruit:
 			wait_synch();
 		    } else {
 			switch_symbols(TRUE);
-#  ifdef REINCARNATION
 			if (!initial && Is_rogue_level(&u.uz))
 				assign_graphics(ROGUESET);
-#  endif
 		    }
 		}
 # endif /*LOADSYMSETS*/
@@ -3449,15 +3441,9 @@ boolean setinitial,setfromfile;
 #endif
 	int chosen = -2, which_set;
  
-#ifdef REINCARNATION
 	if (rogueflag) which_set = ROGUESET;
 	else
-#endif
 	which_set = PRIMARY;
-
-#ifndef REINCARNATION
-	if (rogueflag) return TRUE;
-#endif
 
 #ifdef LOADSYMSETS
 	/* clear symset[].name as a flag to read_sym_file() to build list */
@@ -3587,12 +3573,10 @@ boolean setinitial,setfromfile;
 	    symset[which_set].name = symset_name;
 
 	/* Set default symbols and clear the handling value */
-# ifdef REINCARNATION
 	if(rogueflag)
 	    init_r_symbols();
 	else
-# endif
-	init_l_symbols();
+            init_l_symbols();
 
 	if (symset[which_set].name) {
 	    if (read_sym_file(which_set))
@@ -3605,13 +3589,10 @@ boolean setinitial,setfromfile;
 
 	if (ready_to_switch) switch_symbols(TRUE);
 
-# ifdef REINCARNATION
 	if (Is_rogue_level(&u.uz)) {
 		if (rogueflag)
 		    assign_graphics(ROGUESET);
-	} else
-# endif
-	if (!rogueflag) assign_graphics(PRIMARY);
+	} else if (!rogueflag) assign_graphics(PRIMARY);
 	need_redraw = TRUE;
 #endif /*LOADSYMSETS*/
 	return TRUE;
@@ -3832,17 +3813,15 @@ char *buf;
 	}
 	else if (!strcmp(optname, "race"))
 		Sprintf(buf, "%s", rolestring(flags.initrace, races, noun));
-#ifdef REINCARNATION
 	else if (!strcmp(optname, "roguesymset")) {
 		Sprintf(buf, "%s",
-# ifdef LOADSYMSETS
+#ifdef LOADSYMSETS
 			symset[ROGUESET].name ?
 			symset[ROGUESET].name :
-# endif
+#endif
 			"default");
 		if (currentgraphics == ROGUESET && symset[ROGUESET].name)
 			Strcat(buf, ", active");
-#endif
 	}
 	else if (!strcmp(optname, "role"))
 		Sprintf(buf, "%s", rolestring(flags.initrole, roles, name.m));

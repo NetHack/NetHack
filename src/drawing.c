@@ -27,9 +27,7 @@ int currentgraphics = 0;
 
 nhsym showsyms[SYM_MAX] = DUMMY;	/* symbols to be displayed */
 nhsym l_syms[SYM_MAX]   = DUMMY;	/* loaded symbols          */
-#ifdef REINCARNATION
 nhsym r_syms[SYM_MAX]   = DUMMY;	/* rogue symbols           */
-#endif
 
 nhsym warnsyms[WARNCOUNT]  = DUMMY;  /* the current warning display symbols */
 const char invisexplain[] = "remembered, unseen, creature";
@@ -234,7 +232,6 @@ const struct symdef defsyms[MAXPCHARS] = {
 	{'/', "",		C(CLR_ORANGE)},	/* explosion bottom right */
 };
 
-#ifdef REINCARNATION
 /* default rogue level symbols */
 static const uchar def_r_oc_syms[MAXOCLASSES] = {
 /* 0*/	'\0',
@@ -256,7 +253,6 @@ static const uchar def_r_oc_syms[MAXOCLASSES] = {
 	CHAIN_SYM,
 	VENOM_SYM
 };
-#endif
 
 #undef C
 
@@ -306,10 +302,10 @@ def_char_to_monclass(ch)
  *                     Sets the current display symbols, the
  *                     loadable symbols to the default NetHack
  *                     symbols, including the r_syms rogue level
- *                     symbols if REINCARNATION is defined.
- *                     This would typically be done immediately
- *                     after execution begins. Any previously
- *                     loaded external symbol sets are discarded.
+ *                     symbols. This would typically be done
+ *                     immediately after execution begins. Any
+ *                     previously loaded external symbol sets are
+ *                     discarded.
  *
  * switch_symbols(arg)
  *                     Called to swap in new current display symbols
@@ -350,9 +346,7 @@ init_symbols()
 {
 	init_l_symbols();
 	init_showsyms();
-#ifdef REINCARNATION
 	init_r_symbols();
-#endif
 }
 
 void
@@ -410,7 +404,6 @@ init_l_symbols()
 #endif
 }
 
-#ifdef REINCARNATION
 void
 init_r_symbols()
 {
@@ -448,7 +441,6 @@ init_r_symbols()
 					  */
 # endif
 }
-#endif /*REINCARNATION*/
 
 void
 assign_graphics(whichset)
@@ -457,7 +449,6 @@ int whichset;
     register int i;
 
     switch(whichset) {
-# ifdef REINCARNATION
     case ROGUESET:
 	/* Adjust graphics display characters on Rogue levels */
 
@@ -469,7 +460,6 @@ int whichset;
 #  endif
 	currentgraphics = ROGUESET;
 	break;
-# endif
 
     case PRIMARY:
     default:
@@ -518,7 +508,6 @@ int val;
 	l_syms[symp->idx] = val;
 }
 
-# ifdef REINCARNATION
 void
 update_r_symset(symp, val)
 struct symparse *symp;
@@ -526,7 +515,6 @@ int val;
 {
 	r_syms[symp->idx] = val;
 }
-# endif /* REINCARNATION */
 
 void
 clear_symsetentry(which_set, name_too)

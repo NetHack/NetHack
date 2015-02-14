@@ -19,8 +19,8 @@
 DUNGEON:	"The Dungeons of Doom" "D" (25, 5)
 ALIGNMENT:	unaligned
 BRANCH:		"The Gnomish Mines" @ (2, 3)
-%REINCARNATION LEVEL:		"rogue" "R" @ (15, 4)
-%REINCARNATION LEVELDESC:	roguelike
+LEVEL:		"rogue" "R" @ (15, 4)
+LEVELDESC:	roguelike
 LEVEL:		"oracle" "O" @ (5, 5)
 LEVALIGN:	neutral
 CHAINBRANCH:	"Sokoban" "oracle" + (1, 0) up

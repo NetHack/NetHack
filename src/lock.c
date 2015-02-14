@@ -831,7 +831,6 @@ int x, y;
 	switch(otmp->otyp) {
 	case WAN_LOCKING:
 	case SPE_WIZARD_LOCK:
-#ifdef REINCARNATION
 	    if (Is_rogue_level(&u.uz)) {
 	    	boolean vis = cansee(x,y);
 		/* Can't have real locking in Rogue, so just hide doorway */
@@ -849,7 +848,6 @@ int x, y;
 		newsym(x,y);
 		return TRUE;
 	    }
-#endif
 	    if (obstructed(x,y,mysterywand)) return FALSE;
 	    /* Don't allow doors to close over traps.  This is for pits */
 	    /* & trap doors, but is it ever OK for anything else? */

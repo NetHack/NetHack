@@ -56,24 +56,16 @@ unsigned char shift;
 			vga_userpan(0);
 		break;
 	case 0x3E:	/* F4 = toggle overview mode */
-		if (iflags.tile_view && 
-		    !opening_dialog
-#ifdef REINCARNATION
-				&& !Is_rogue_level(&u.uz)
-#endif
-							) {
+		if (iflags.tile_view && !opening_dialog
+                    && !Is_rogue_level(&u.uz)) {
 			iflags.traditional_view = FALSE;
 			vga_overview(iflags.over_view ? FALSE : TRUE);
 			vga_refresh();
 		}
 		break;
 	case 0x3F:	/* F5 = toggle traditional mode */
-		if (iflags.tile_view &&
-		    !opening_dialog
-#ifdef REINCARNATION
-				&& !Is_rogue_level(&u.uz)
-#endif
-							) {
+		if (iflags.tile_view && !opening_dialog
+                        && !Is_rogue_level(&u.uz)) {
 			iflags.over_view = FALSE;
 			vga_traditional(iflags.traditional_view ? FALSE : TRUE);
 			vga_refresh();

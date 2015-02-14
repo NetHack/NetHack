@@ -34,9 +34,9 @@ int explcolors[] = {
 #define pet_color(n)  color = iflags.use_color ? mons[n].mcolor : NO_COLOR
 #define warn_color(n) color = iflags.use_color ? def_warnsyms[n].color : NO_COLOR
 #define explode_color(n) color = iflags.use_color ? explcolors[n] : NO_COLOR
-# if defined(REINCARNATION) && defined(LOADSYMSETS)
-#  define ROGUE_COLOR
-# endif
+#ifdef LOADSYMSETS
+# define ROGUE_COLOR
+#endif
 
 #else	/* no text color */
 
@@ -236,14 +236,10 @@ unsigned *ospecial;
     ch = showsyms[idx];
 #ifdef TEXTCOLOR
     /* Turn off color if no color defined, or rogue level w/o PC graphics. */
-# ifdef REINCARNATION
-#  ifdef ROGUE_COLOR
+# ifdef ROGUE_COLOR
     if (!has_color(color) || (Is_rogue_level(&u.uz) && !has_rogue_color))
-#  else
-    if (!has_color(color) || Is_rogue_level(&u.uz))
-#  endif
 # else
-    if (!has_color(color))
+    if (!has_color(color) || Is_rogue_level(&u.uz))
 # endif
 	color = NO_COLOR;
 #endif

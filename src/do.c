@@ -1143,10 +1143,8 @@ boolean at_stairs, falling, portal;
 #endif
 	}
 
-#ifdef REINCARNATION
 	if (Is_rogue_level(newlevel) || Is_rogue_level(&u.uz))
 		assign_graphics(Is_rogue_level(newlevel) ? ROGUESET : PRIMARY);
-#endif
 #ifdef USE_TILES
 	substitute_tiles(newlevel);
 #endif
@@ -1411,10 +1409,8 @@ boolean at_stairs, falling, portal;
 		}
 	    }
 	} else {
-#ifdef REINCARNATION
 	    if (new && Is_rogue_level(&u.uz))
 		You("enter what seems to be an older, more primitive world.");
-#endif
 	    /* main dungeon message from your quest leader */
 	    if (!In_quest(&u.uz0) && at_dgn_entrance("The Quest") &&
 		    !(u.uevent.qcompleted || u.uevent.qexpelled ||

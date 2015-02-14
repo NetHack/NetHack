@@ -680,9 +680,7 @@ register int after;
 	/* Not necessary if m_move called from this file, but necessary in
 	 * other calls of m_move (ex. leprechauns dodging)
 	 */
-#ifdef REINCARNATION
 	if (!Is_rogue_level(&u.uz))
-#endif
 	    can_tunnel = tunnels(ptr);
 	can_open = !(nohands(ptr) || verysmall(ptr));
 	can_unlock = ((can_open && monhaskey(mtmp, TRUE)) ||
@@ -804,11 +802,7 @@ not_special:
 		}
 	}
 
-	if ((!mtmp->mpeaceful || !rn2(10))
-#ifdef REINCARNATION
-				    && (!Is_rogue_level(&u.uz))
-#endif
-							    ) {
+	if ((!mtmp->mpeaceful || !rn2(10)) && (!Is_rogue_level(&u.uz))) {
 	    boolean in_line = lined_up(mtmp) &&
 		(distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) <=
 		    (throws_rocks(youmonst.data) ? 20 : ACURRSTR/2+1)

@@ -680,9 +680,7 @@ struct level_map {
 	{ "medusa",	&medusa_level },
 	{ "oracle",	&oracle_level },
 	{ "orcus",	&orcus_level },
-#ifdef REINCARNATION
 	{ "rogue",	&rogue_level },
-#endif
 	{ "sanctum",	&sanctum_level },
 	{ "valley",	&valley_level },
 	{ "water",	&water_level },
@@ -2086,9 +2084,7 @@ mapseen *mptr;
     if (mptr->flags.unreachable || mptr->flags.forgot) return FALSE;
     /* level is of interest if it has an auto-generated annotation */
     if (mptr->flags.oracle || mptr->flags.bigroom ||
-# ifdef REINCARNATION
 	mptr->flags.roguelevel ||
-# endif
 	mptr->flags.castle || mptr->flags.valley ||
 	mptr->flags.msanctum) return TRUE;
     /* when in Sokoban, list all sokoban levels visited; when not in it,
@@ -2151,9 +2147,7 @@ recalc_mapseen()
 	mptr->flags.bigroom = Is_bigroom(&u.uz);
     else if (mptr->flags.forgot)
 	mptr->flags.bigroom = 0;
-# ifdef REINCARNATION
     mptr->flags.roguelevel = Is_rogue_level(&u.uz);
-# endif
     mptr->flags.oracle = 0;	/* recalculated during room traversal below */
     mptr->flags.castletune = 0;
     /* flags.castle, flags.valley, flags.msanctum retain previous value */
@@ -2650,10 +2644,8 @@ boolean printdun;
 		mptr->flags.sokosolved ? "Solved" : "Unsolved");
     } else if (mptr->flags.bigroom) {
 	Sprintf(buf, "%sA very big room.", PREFIX);
-# ifdef REINCARNATION
     } else if (mptr->flags.roguelevel) {
 	Sprintf(buf, "%sA primitive area.", PREFIX);
-# endif
     } else if (on_level(&mptr->lev, &qstart_level)) {
 	Sprintf(buf, "%sHome%s.", PREFIX,
 		mptr->flags.unreachable ? " (no way back...)" : "");
