@@ -1015,9 +1015,7 @@ boolean ghostly;
 	}
 	restcemetery(fd, &level.bonesinfo);
 	rest_levl(fd, (boolean)((sfrestinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
-#ifdef DUNGEON_OVERVIEW
 	mread(fd, (genericptr_t)lastseentyp, sizeof(lastseentyp));
-#endif
 	mread(fd, (genericptr_t)&omoves, sizeof(omoves));
 	elapsed = monstermoves - omoves;
 	mread(fd, (genericptr_t)&upstair, sizeof(stairway));

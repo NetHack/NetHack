@@ -450,7 +450,6 @@ typedef unsigned char	uchar;
 /*#define GOLDOBJ */	/* Gold is kept on obj chains - Helge Hafting */
 #define STATUS_VIA_WINDOWPORT	/* re-work of the status line updating process */
 #define STATUS_HILITES		/* support hilites of status fields */
-#define DUNGEON_OVERVIEW	/* dungeon overview by Hojita Discordia */
 /* #define WINCHAIN*/		/* stacked window systems */
 /* End of Section 5 */
 

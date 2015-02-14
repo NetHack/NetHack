@@ -511,9 +511,7 @@ int mode;
 #endif
 	savecemetery(fd, mode, &level.bonesinfo);
 	savelevl(fd, (boolean)((sfsaveinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
-#ifdef DUNGEON_OVERVIEW
 	bwrite(fd,(genericptr_t) lastseentyp,sizeof(lastseentyp));
-#endif
 	bwrite(fd,(genericptr_t) &monstermoves,sizeof(monstermoves));
 	bwrite(fd,(genericptr_t) &upstair,sizeof(stairway));
 	bwrite(fd,(genericptr_t) &dnstair,sizeof(stairway));

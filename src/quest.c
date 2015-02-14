@@ -174,9 +174,7 @@ boolean seal;
     if (seal) {	/* remove the portal to the quest - sealing it off */
 	int reexpelled = u.uevent.qexpelled;
 	u.uevent.qexpelled = 1;
-#ifdef DUNGEON_OVERVIEW
 	remdun_mapseen(quest_dnum);
-#endif
 	/* Delete the near portal now; the far (main dungeon side)
 	   portal will be deleted as part of arrival on that level.
 	   If monster movement is in progress, any who haven't moved

@@ -1236,9 +1236,6 @@ static const char *build_opts[] = {
 #ifdef WIZARD
 		"debug mode",
 #endif
-#ifdef DUNGEON_OVERVIEW
-		"dungeon map overview patch",
-#endif
 #ifdef EXP_ON_BOTL
 		"experience points on status line",
 #endif

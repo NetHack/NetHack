@@ -581,7 +581,6 @@ E schar FDECL(lev_by_name, (const char *));
 #ifdef WIZARD
 E schar FDECL(print_dungeon, (BOOLEAN_P,schar *,xchar *));
 #endif
-#ifdef DUNGEON_OVERVIEW
 E int NDECL(donamelevel);
 E int NDECL(dooverview);
 E void FDECL(show_overview, (int,int));
@@ -592,7 +591,6 @@ E void FDECL(mapseen_temple, (struct monst *));
 E void FDECL(room_discovered, (int));
 E void FDECL(recbranch_mapseen, (d_level *, d_level *));
 E void FDECL(remdun_mapseen, (int));
-#endif /* DUNGEON_OVERVIEW */
 
 /* ### eat.c ### */
 

@@ -457,9 +457,7 @@ struct obj *corpse;
 	    levl[x][y].seenv = 0;
 	    levl[x][y].waslit = 0;
 	    levl[x][y].glyph = cmap_to_glyph(S_stone);
-#ifdef DUNGEON_OVERVIEW
 	    lastseentyp[x][y] = 0;
-#endif
 	}
 
 	/* Attach bones info to the current level before saving. */
@@ -476,11 +474,9 @@ struct obj *corpse;
 		aligns[1 - u.ualign.type].filecode);
 	formatkiller(newbones->how, sizeof newbones->how, how);
 	Strcpy(newbones->when, yyyymmddhhmmss(when));
-#ifdef DUNGEON_OVERVIEW
 	/* final resting place, used to decide when bones are discovered */
 	newbones->frpx = u.ux, newbones->frpy = u.uy;
 	newbones->bonesknown = FALSE;
-#endif
 	/* if current character died on a bones level, the cememtery list
 	   will have multiple entries, most recent (this dead hero) first */
 	newbones->next = level.bonesinfo;

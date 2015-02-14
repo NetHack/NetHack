@@ -123,9 +123,7 @@ STATIC_PTR int NDECL(doprev_message);
 STATIC_PTR int NDECL(timed_occupation);
 STATIC_PTR int NDECL(doextcmd);
 STATIC_PTR int NDECL(domonability);
-#ifdef DUNGEON_OVERVIEW
 STATIC_PTR int NDECL(dooverview_or_wiz_where);
-#endif /* DUNGEON_OVERVIEW */
 STATIC_PTR int NDECL(dotravel);
 STATIC_PTR int NDECL(doterrain);
 # ifdef WIZARD
@@ -537,7 +535,6 @@ enter_explore_mode(VOID_ARGS)
     return 0;
 }
 
-#ifdef DUNGEON_OVERVIEW
 STATIC_PTR int
 dooverview_or_wiz_where(VOID_ARGS)
 {
@@ -549,7 +546,6 @@ dooverview_or_wiz_where(VOID_ARGS)
 	return 0;
 }
 
-#endif /* DUNGEON_OVERVIEW */
 #ifdef WIZARD
 
 /* ^W command - wish for something */
@@ -2392,14 +2388,8 @@ static const struct func_tab cmdlist[] = {
 	{C('i'), TRUE, wiz_identify},
 #endif
 	{C('l'), TRUE, doredraw}, /* if number_pad is set */
-#ifndef DUNGEON_OVERVIEW
-#ifdef WIZARD
-	{C('o'), TRUE, wiz_where},
-#endif
-#else
 	{C('n'), TRUE, donamelevel}, /* if number_pad is set */
 	{C('o'), TRUE, dooverview_or_wiz_where}, /* depending on wizard status */
-#endif /* DUNGEON_OVERVIEW */
 	{C('p'), TRUE, doprev_message},
 	{C('r'), TRUE, doredraw},
 	{C('t'), TRUE, dotele},
@@ -2412,9 +2402,7 @@ static const struct func_tab cmdlist[] = {
 	{'a', FALSE, doapply},
 	{'A', FALSE, doddoremarm},
 	{M('a'), TRUE, doorganize},
-#ifdef DUNGEON_OVERVIEW
 	{M('A'), TRUE, donamelevel},	/* #annotate */
-#endif
 /*	'b', 'B' : go sw */
 	{'c', FALSE, doclose},
 	{'C', TRUE, docallcmd},
@@ -2449,9 +2437,7 @@ static const struct func_tab cmdlist[] = {
 	{'o', FALSE, doopen},
 	{'O', TRUE, doset},
 	{M('o'), FALSE, dosacrifice},
-#ifdef DUNGEON_OVERVIEW
 	{M('O'), TRUE, dooverview},	/* #overview */
-#endif
 	{'p', FALSE, dopay},
 	{'P', FALSE, doputon},
 	{M('p'), TRUE, dopray},
@@ -2517,9 +2503,7 @@ static const struct func_tab cmdlist[] = {
 
 struct ext_func_tab extcmdlist[] = {
 	{"adjust", "adjust inventory letters", doorganize, TRUE},
-#ifdef DUNGEON_OVERVIEW
 	{"annotate", "name current level", donamelevel, TRUE},
-#endif /* DUNGEON_OVERVIEW */
 	{"chat", "talk to someone", dotalk, TRUE},	/* converse? */
 	{"conduct", "list voluntary challenges you have maintained",
 						doconduct, TRUE},
@@ -2533,9 +2517,7 @@ struct ext_func_tab extcmdlist[] = {
 	{"monster", "use a monster's special ability", domonability, TRUE},
 	{"name", "name a monster or an object", docallcmd, TRUE},
 	{"offer", "offer a sacrifice to the gods", dosacrifice, FALSE},
-#ifdef DUNGEON_OVERVIEW
 	{"overview", "show an overview of the dungeon", dooverview, TRUE},
-#endif /* DUNGEON_OVERVIEW */
 	{"pray", "pray to the gods for help", dopray, TRUE},
 	{"quit", "exit without saving current game", done2, TRUE},
 	{"ride", "ride (or stop riding) a monster", doride, FALSE},

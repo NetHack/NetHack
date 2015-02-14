@@ -506,11 +506,9 @@ struct cemetery {
 	char how[100 + 1]; /* [DTHSZ+1] */
 	/* date+time in string of digits rather than binary */
 	char when[4+2+2 + 2+2+2 + 1]; /* "YYYYMMDDhhmmss\0" */
-#ifdef DUNGEON_OVERVIEW
 	/* final resting place spot */
 	schar frpx, frpy;
 	boolean bonesknown;
-#endif
 };
 
 struct levelflags {
@@ -564,9 +562,7 @@ typedef struct
 }
 dlevel_t;
 
-#ifdef DUNGEON_OVERVIEW
 extern schar lastseentyp[COLNO][ROWNO];	/* last seen/touched dungeon typ */
-#endif /* DUNGEON_OVERVIEW */
 
 extern dlevel_t level;	/* structure describing the current level */
 

@@ -59,7 +59,6 @@ STATIC_DCL const char *FDECL(br_string, (int));
 STATIC_DCL void FDECL(print_branch, (winid, int, int, int, BOOLEAN_P, struct lchoice *));
 #endif
 
-#ifdef DUNGEON_OVERVIEW
 mapseen *mapseenchn = (struct mapseen *)0;
 STATIC_DCL mapseen *FDECL(load_mapseen, (int));
 STATIC_DCL void FDECL(save_mapseen, (int, mapseen *));
@@ -72,7 +71,6 @@ STATIC_DCL const char *FDECL(br_string2, (branch *));
 STATIC_DCL const char *FDECL(endgamelevelname, (char *,int));
 STATIC_DCL const char *FDECL(shop_string, (int));
 STATIC_DCL char *FDECL(tunesuffix, (mapseen *,char *));
-#endif /* DUNGEON_OVERVIEW */
 
 #ifdef DEBUG
 #define DD	dungeons[i]
@@ -135,9 +133,7 @@ save_dungeon(fd, perform_write, free_data)
     boolean perform_write, free_data;
 {
     branch *curr, *next;
-#ifdef DUNGEON_OVERVIEW
     mapseen *curr_ms, *next_ms;
-#endif
     int    count;
 
     if (perform_write) {
@@ -159,14 +155,12 @@ save_dungeon(fd, perform_write, free_data)
 			(unsigned)count * sizeof (struct linfo));
 	bwrite(fd, (genericptr_t) &inv_pos, sizeof inv_pos);
 
-#ifdef DUNGEON_OVERVIEW
 	for (count = 0, curr_ms = mapseenchn; curr_ms; curr_ms = curr_ms->next)
 	    count++;
 	bwrite(fd, (genericptr_t) &count, sizeof(count));
 
 	for (curr_ms = mapseenchn; curr_ms; curr_ms = curr_ms->next)
 	    save_mapseen(fd, curr_ms);
-#endif /* DUNGEON_OVERVIEW */
     }
 
     if (free_data) {
@@ -175,7 +169,6 @@ save_dungeon(fd, perform_write, free_data)
 	    free((genericptr_t) curr);
 	}
 	branches = 0;
-#ifdef DUNGEON_OVERVIEW
 	for (curr_ms = mapseenchn; curr_ms; curr_ms = next_ms) {
 	    next_ms = curr_ms->next;
 	    if (curr_ms->custom)
@@ -183,7 +176,6 @@ save_dungeon(fd, perform_write, free_data)
 	    free((genericptr_t) curr_ms);
 	}
 	mapseenchn = 0;
-#endif /* DUNGEON_OVERVIEW */
     }
 }
 
@@ -194,9 +186,7 @@ restore_dungeon(fd)
 {
     branch *curr, *last;
     int    count, i;
-#ifdef DUNGEON_OVERVIEW
     mapseen *curr_ms, *last_ms;
-#endif
 
     mread(fd, (genericptr_t) &n_dgns, sizeof(n_dgns));
     mread(fd, (genericptr_t) dungeons, sizeof(dungeon) * (unsigned)n_dgns);
@@ -223,7 +213,6 @@ restore_dungeon(fd)
     mread(fd, (genericptr_t) level_info, (unsigned)count*sizeof(struct linfo));
     mread(fd, (genericptr_t) &inv_pos, sizeof inv_pos);
 
-#ifdef DUNGEON_OVERVIEW
     mread(fd, (genericptr_t) &count, sizeof(count));
     last_ms = (mapseen *) 0;
     for (i = 0; i < count; i++) {
@@ -235,7 +224,6 @@ restore_dungeon(fd)
 	    mapseenchn = curr_ms;
 	last_ms = curr_ms;
     }
-#endif /* DUNGEON_OVERVIEW */
 }
 
 static void
@@ -1835,7 +1823,6 @@ xchar *rdgn;
 }
 #endif /* WIZARD */
 
-#ifdef DUNGEON_OVERVIEW
 /* Record that the player knows about a branch from a level. This function
  * will determine whether or not it was a "real" branch that was taken.
  * This function should not be called for a transition done via level
@@ -2711,6 +2698,5 @@ boolean printdun;
 	}
     }
 }
-#endif /* DUNGEON_OVERVIEW */
 
 /*dungeon.c*/
