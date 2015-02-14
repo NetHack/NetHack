@@ -29,9 +29,7 @@
 #define MS_IMITATE	19	/* imitates others (leocrotta) */
 #define MS_ORC		MS_GRUNT	/* intelligent brutes */
 #define MS_HUMANOID	20	/* generic traveling companion */
-#ifdef KOPS
 #define MS_ARREST	21	/* "Stop in the name of the law!" (Kops) */
-#endif
 #define MS_SOLDIER	22	/* army and watchmen expressions */
 #define MS_GUARD	23	/* "Please drop that gold and follow me." */
 #define MS_DJINNI	24	/* "Thank you for freeing me!" */

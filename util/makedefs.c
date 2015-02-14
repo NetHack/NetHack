@@ -995,11 +995,8 @@ make_version()
 			| (1L <<  2)
 #endif
 		/* monsters (5..9) */
-#ifdef KOPS
-			| (1L <<  6)
-#endif
 #ifdef MAIL
-			| (1L <<  7)
+			| (1L <<  6)
 #endif
 		/* objects (10..14) */
 #ifdef TOURIST
@@ -1262,9 +1259,6 @@ static const char *build_opts[] = {
 #endif
 #ifdef INSURANCE
 		"insurance files for recovering from crashes",
-#endif
-#ifdef KOPS
-		"Keystone Kops",
 #endif
 #ifdef HOLD_LOCKFILE_OPEN
 		"exclusive lock on level 0 file",

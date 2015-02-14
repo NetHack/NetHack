@@ -834,7 +834,6 @@ register struct monst *mtmp;
 	    }
 	    }
 	    break;
-#ifdef KOPS
 	case MS_ARREST:
 	    if (mtmp->mpeaceful)
 		verbalize("Just the facts, %s.",
@@ -848,7 +847,6 @@ register struct monst *mtmp;
 		verbl_msg = arrest_msg[rn2(3)];
 	    }
 	    break;
-#endif
 	case MS_BRIBE:
 	    if (mtmp->mpeaceful && !mtmp->mtame) {
 		(void) demon_talk(mtmp);

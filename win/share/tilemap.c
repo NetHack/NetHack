@@ -42,12 +42,6 @@ struct conditionals {
 	{ MON_GLYPH, PM_BABY_SILVER_DRAGON, "baby shimmering dragon" },
 	{ MON_GLYPH, PM_SILVER_DRAGON, "shimmering dragon" },
 	{ MON_GLYPH, PM_JABBERWOCK, "vorpal jabberwock" },
-#ifndef KOPS
-	{ MON_GLYPH, PM_JABBERWOCK, "Keystone Kop" },
-	{ MON_GLYPH, PM_JABBERWOCK, "Kop Sergeant" },
-	{ MON_GLYPH, PM_JABBERWOCK, "Kop Lieutenant" },
-	{ MON_GLYPH, PM_JABBERWOCK, "Kop Kaptain" },
-#endif
 	{ MON_GLYPH, PM_VAMPIRE_LORD, "vampire mage" },
 #ifndef CHARON /* not supported yet */
 	{ MON_GLYPH, PM_CROESUS, "Charon" },
@@ -69,9 +63,6 @@ struct conditionals {
 	{ MON_GLYPH, PM_NEANDERTHAL, "High-elf" },
 #ifndef TOURIST
 	{ MON_GLYPH, PM_ROSHI, "guide" },
-#endif
-#ifndef KOPS
-	{ OBJ_GLYPH, CLUB, "rubber hose" },
 #endif
 	/* objects commented out in objects.c at present */
 	{ OBJ_GLYPH, SILVER_DRAGON_SCALE_MAIL, "shimmering dragon scale mail" },

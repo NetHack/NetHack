@@ -312,12 +312,8 @@ struct obj {
 				 (obj)->otyp == TOUCHSTONE)
 
 /* misc */
-#ifdef KOPS
 #define is_flimsy(otmp)		(objects[(otmp)->otyp].oc_material <= LEATHER || \
 				 (otmp)->otyp == RUBBER_HOSE)
-#else
-#define is_flimsy(otmp)		(objects[(otmp)->otyp].oc_material <= LEATHER)
-#endif
 
 /* helpers, simple enough to be macros */
 #define is_plural(o)	((o)->quan > 1 || \
