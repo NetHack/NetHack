@@ -5,7 +5,8 @@
 # clean/smudge filter for handling substitutions
 use strict;
 
-my $debug = 0;
+my $debug = 0;		# save trace to file
+my $debug2 = 0;		# annotate output when running from command line
 
 my $sink = ($^O eq "MSWin32")? "NUL" :"/dev/null";
 my $dbgfile = ($^O eq "MSWin32") ? "$ENV{TEMP}.$$" : "/tmp/trace.$$";
@@ -54,21 +55,28 @@ if($ARGV[0] eq "--clean"){
 
 while(<STDIN>){
 	print TRACE "IN: $_";
-	# $1 - var and value (not including trailing $)
+	# $1 - var and value (including trailing space but not $)
 	# $2 - var
 	# $4 - value or undef
-#	s/\$$PREFIX-(([A-Za-z][A-Za-z0-9_]*)(: ([^\N{DOLLAR SIGN}]+))?)\s*\$/&handlevar($2,$4)/eg;
-	s/\$$PREFIX-(([A-Za-z][A-Za-z0-9_]*)(: ([^\x24]+))?)\s*\$/&handlevar($2,$4)/eg;
-	print;
-	print TRACE "OT: $_";
+#	s/\$$PREFIX-(([A-Za-z][A-Za-z0-9_]*)(: ([^\N{DOLLAR SIGN}]+))?)\$/&handlevar($2,$4)/eg;
+	s/\$$PREFIX-(([A-Za-z][A-Za-z0-9_]*)(: ([^\x24]+))?)\$/&handlevar($2,$4)/eg;
+	if($debug2){
+		chomp;
+		print "XX: |$_|\n";
+	} else {
+		print;
+	}
+	print TRACE "OT: X${_}X\n";
 }
 
 sub handlevar {
 	my($var, $val) = @_;
+	print "HIT '$var' '$val'\n" if($debug2);
 
 	my $subname = "PREFIX::$var";
 	if(defined &$subname){
 		no strict;
+		$val =~ s/\s+$//;
 		$val = &$subname($val,$mode,$submode);
 	} else {
 		warn "No handler for \$$PREFIX-$var\n";
@@ -96,9 +104,8 @@ sub Date {
 			$val = "$now " . strftime("%Y/%m/%d %H:%M:%S", gmtime($now));
 		}
 	}
-	if($mode eq "s"){
-		$val =~ s/\s*$//;	# XXX why do I need this?
-	}
+#	if($mode eq "s"){
+#	}
 	return $val;
 }
 
@@ -115,14 +122,12 @@ sub Branch {
 	if($mode eq "c"){
 		if($submode==0){
 			$val = `git branch --no-color --contains`;
-			chomp($val);	#XXX
+			$val =~ s/[\n\r]*$//;
 			$val =~ s/^\*\s*//;
 		}
 	}
-	if($mode eq "s"){
-#XXX do we need this now?
-		$val =~ s/\s*$//;	# XXX why do I need this?
-	}
+#	if($mode eq "s"){
+#	}
 	return $val;
 }
 
@@ -132,13 +137,13 @@ sub Revision {
 		if($submode==0){
 			my $file = $ARGV[1];
 			my @val = `git log --follow --oneline $file`;
-			$val = sprintf("1.%d",0+$#val);
+			my $ver = 0+$#val;
+			$ver = 0 if($ver < 0);
+			$val = "1.$ver";
 		}
 	}
-	if($mode eq "s"){
-#XXX do we need this here?
-		$val =~ s/\s*$//;	# XXX why do I need this?
-	}
+#	if($mode eq "s"){
+#	}
 	return $val;
 }
 
