@@ -1353,7 +1353,7 @@ genl_status_init()
 		vals[i] = (char *)alloc(MAXCO);
 		*vals[i] = '\0';
 		activefields[i] = FALSE;
-		fieldfmt[i] = FALSE;
+		fieldfmt[i] = (const char *)0;
 	}
 	/* Use a window for the genl version; backward port compatibility */
 	WIN_STATUS = create_nhwindow(NHW_STATUS);

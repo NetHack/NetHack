@@ -39,6 +39,10 @@ Nethack.sdf
 Nethack.opensdf
 Makefile.bcc
 Makefile.gcc
+Makefile-orig
+Makefile.bcc-orig
+Makefile.gcc-orig
+*.suo
 *.pdb
 *.ilk
 # Win32-specific ignores end

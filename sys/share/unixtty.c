@@ -380,6 +380,7 @@ init_sco_cons()
 
 #ifdef __linux__		/* via Jesse Thilo and Ben Gertzfield */
 # include <sys/vt.h>
+# include <sys/ioctl.h>
 
 int linux_flag_console = 0;
 
