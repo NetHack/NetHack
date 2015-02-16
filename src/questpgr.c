@@ -12,6 +12,10 @@
 
 #define QTEXT_FILE	"quest.dat"
 
+#ifdef TTY_GRAPHICS
+#include "wintty.h"
+#endif
+
 /* from sp_lev.c, for deliver_splev_message() */
 extern char *lev_message;
 
@@ -49,7 +53,9 @@ dump_qtlist()	/* dump the character msg list to check appearance */
 	for (msg = qt_list.chrole; msg->msgnum > 0; msg++) {
 		pline("msgnum %d: delivery %c",
 			msg->msgnum, msg->delivery);
+#ifdef TTY_GRAPHICS
 		more();
+#endif
 		(void) dlb_fseek(msg_file, msg->offset, SEEK_SET);
 		deliver_by_window(msg, NHW_TEXT);
 	}

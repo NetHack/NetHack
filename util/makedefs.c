@@ -2256,7 +2256,7 @@ put_qt_hdrs()
 							qt_hdr.n_hdr, ofp);
 #ifdef DEBUG
 	for(i = 0; i < qt_hdr.n_hdr; i++)
-		Fprintf(stderr, "%c @ %ld, ", qt_hdr.id[i], qt_hdr.offset[i]);
+		Fprintf(stderr, "%s @ %ld, ", qt_hdr.id[i], qt_hdr.offset[i]);
 
 	Fprintf(stderr, "\n");
 #endif
@@ -2267,7 +2267,7 @@ put_qt_hdrs()
 	for(i = 0; i < qt_hdr.n_hdr; i++) {
 
 #ifdef DEBUG
-	    Fprintf(stderr, "%ld: %c header info.\n", ftell(ofp),
+	    Fprintf(stderr, "%ld: %s header info.\n", ftell(ofp),
 		    qt_hdr.id[i]);
 #endif
 	    (void) fwrite((genericptr_t)&(msg_hdr[i].n_msg), sizeof(int),
