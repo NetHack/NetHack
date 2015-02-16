@@ -1597,7 +1597,7 @@ start_eating(otmp)		/* called as you start to eat */
 {
 	const char *old_nomovemsg, *save_nomovemsg;
 
-	debugpline("start_eating: %lx (victual = %lx)", otmp, context.victual.piece);
+	debugpline("start_eating: %p (victual = %p)", otmp, context.victual.piece);
 	debugpline("reqtime = %d", context.victual.reqtime);
 	debugpline("(original reqtime = %d)", objects[otmp->otyp].oc_delay);
 	debugpline("nmod = %d", context.victual.nmod);
