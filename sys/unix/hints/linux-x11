@@ -9,10 +9,10 @@
 # for Ubuntu dapper.
 
 
-HACKDIR=$(PREFIX)/games/lib/$(GAME)dir
-SHELLDIR = $(PREFIX)/games
 #PREFIX=/usr
 PREFIX=$(wildcard ~)/nh/install
+HACKDIR=$(PREFIX)/games/lib/$(GAME)dir
+SHELLDIR = $(PREFIX)/games
 
 CFLAGS=-O -I../include -DNOTPARMDECL $(CFLAGS1) $(CFLAGS3)
 CFLAGS1=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
@@ -31,6 +31,8 @@ VARDATND = x11tiles NetHack.ad pet_mark.xbm
 CHOWN=true
 CHGRP=true
 VARDIRPERM = 0755
+VARFILEPERM = 0600
+GAMEPERM = 0755
 
 POSTINSTALL= bdftopcf win/X11/nh10.bdf > $(HACKDIR)/nh10.pcf; (cd $(HACKDIR); mkfontdir)
 
