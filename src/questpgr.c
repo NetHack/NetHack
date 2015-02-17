@@ -46,7 +46,6 @@ static void
 dump_qtlist()	/* dump the character msg list to check appearance */
 {
 	struct	qtmsg	*msg;
-	long	size;
 
 	if (!showdebug()) return;
 
