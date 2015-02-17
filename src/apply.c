@@ -715,9 +715,6 @@ struct obj *obj;
 
 	if(!getdir((char *)0)) return 0;
 	invis_mirror = Invis;
-#ifdef INVISIBLE_OBJECTS
-	if (obj->oinvis) invis_mirror = TRUE;
-#endif
 	useeit = !Blind && (!invis_mirror || See_invisible);
 	uvisage = (ACURR(A_CHA) > 14) ?
 		    (poly_gender() == 1 ? "beautiful" : "handsome") : "ugly";

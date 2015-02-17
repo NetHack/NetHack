@@ -2315,9 +2315,6 @@ boolean picked_some;
 	    /* only one object */
 	    if (dfeature) pline1(fbuf);
 	    read_engr_at(u.ux, u.uy); /* Eric Backus */
-#ifdef INVISIBLE_OBJECTS
-	    if (otmp->oinvis && !See_invisible) verb = "feel";
-#endif
 	    You("%s here %s.", verb, doname(otmp));
 	    iflags.last_msg = PLNMSG_ONE_ITEM_HERE;
 	    if (otmp->otyp == CORPSE) feel_cockatrice(otmp, FALSE);
@@ -2421,9 +2418,6 @@ mergable(otmp, obj)	/* returns TRUE if obj  & otmp can be merged */
 	    obj->obroken != otmp->obroken ||
 	    obj->otrapped != otmp->otrapped ||
 	    obj->lamplit != otmp->lamplit ||
-#ifdef INVISIBLE_OBJECTS
-		obj->oinvis != otmp->oinvis ||
-#endif
 	    obj->greased != otmp->greased ||
 	    obj->oeroded != otmp->oeroded ||
 	    obj->oeroded2 != otmp->oeroded2 ||
