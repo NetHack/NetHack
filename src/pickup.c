@@ -1266,9 +1266,6 @@ boolean telekinesis;	/* not picking it up directly by hand */
 	/* In case of auto-pickup, where we haven't had a chance
 	   to look at it yet; affects docall(SCR_SCARE_MONSTER). */
 	if (!Blind)
-#ifdef INVISIBLE_OBJECTS
-		if (!obj->oinvis || See_invisible)
-#endif
 		obj->dknown = 1;
 
 	if (obj == uchain) {    /* do not pick up attached chain */

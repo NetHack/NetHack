@@ -683,10 +683,6 @@ register struct obj *obj;
 	} else
 		Strcpy(prefix, "a ");
 
-#ifdef INVISIBLE_OBJECTS
-	if (obj->oinvis) Strcat(prefix,"invisible ");
-#endif
-
 	/* "empty" goes at the beginning, but item count goes at the end */
 	if (cknown &&
 	    (Is_container(obj) || obj->otyp == STATUE) && !Has_contents(obj))
@@ -2241,9 +2237,6 @@ struct obj *no_wish;
 	int cnt, spe, spesgn, typ, very, rechrg;
 	int blessed, uncursed, iscursed, ispoisoned, isgreased;
 	int eroded, eroded2, erodeproof;
-#ifdef INVISIBLE_OBJECTS
-	int isinvisible;
-#endif
 	int halfeaten, mntmp, contents;
 	int islit, unlabeled, ishistoric, isdiluted, trapped;
 	int tmp, tinv, tvariety;
@@ -2271,9 +2264,6 @@ struct obj *no_wish;
 
 	cnt = spe = spesgn = typ = very = rechrg =
 		blessed = uncursed = iscursed =
-#ifdef INVISIBLE_OBJECTS
-		isinvisible =
-#endif
 		ispoisoned = isgreased = eroded = eroded2 = erodeproof =
 		halfeaten = islit = unlabeled = ishistoric = isdiluted =
 		trapped = 0;
@@ -2324,10 +2314,6 @@ struct obj *no_wish;
 			iscursed = 1;
 		} else if (!strncmpi(bp, "uncursed ", l=9)) {
 			uncursed = 1;
-#ifdef INVISIBLE_OBJECTS
-		} else if (!strncmpi(bp, "invisible ", l=10)) {
-			isinvisible = 1;
-#endif
 		} else if (!strncmpi(bp, "rustproof ", l=10) ||
 			   !strncmpi(bp, "erodeproof ", l=11) ||
 			   !strncmpi(bp, "corrodeproof ", l=13) ||
@@ -3136,10 +3122,6 @@ typfnd:
 	} else if (spesgn < 0) {
 		curse(otmp);
 	}
-
-#ifdef INVISIBLE_OBJECTS
-	if (isinvisible) otmp->oinvis = 1;
-#endif
 
 	/* set eroded */
 	if (is_damageable(otmp) || otmp->otyp == CRYSKNIFE) {

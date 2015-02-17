@@ -242,26 +242,14 @@ nothing_to_steal:
  retry:
 	tmp = 0;
 	for(otmp = invent; otmp; otmp = otmp->nobj)
-	    if ((!uarm || otmp != uarmc) && otmp != uskin
-				&& otmp->oclass != COIN_CLASS
-#ifdef INVISIBLE_OBJECTS
-				&& (!otmp->oinvis || perceives(mtmp->data))
-#endif
-				)
-		tmp += ((otmp->owornmask &
-			(W_ARMOR | W_RING | W_AMUL | W_TOOL)) ? 5 : 1);
+	    if ((!uarm || otmp != uarmc) && otmp != uskin && otmp->oclass != COIN_CLASS)
+            tmp += ((otmp->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL)) ? 5 : 1);
 	if (!tmp) goto nothing_to_steal;
 	tmp = rn2(tmp);
 	for(otmp = invent; otmp; otmp = otmp->nobj)
-	    if ((!uarm || otmp != uarmc) && otmp != uskin
-				&& otmp->oclass != COIN_CLASS
-#ifdef INVISIBLE_OBJECTS
-				&& (!otmp->oinvis || perceives(mtmp->data))
-#endif
-			)
-		if((tmp -= ((otmp->owornmask &
-			(W_ARMOR | W_RING | W_AMUL | W_TOOL)) ? 5 : 1)) < 0)
-			break;
+	    if ((!uarm || otmp != uarmc) && otmp != uskin && otmp->oclass != COIN_CLASS)
+            if((tmp -= ((otmp->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL)) ? 5 : 1)) < 0)
+                break;
 	if(!otmp) {
 		impossible("Steal fails!");
 		return(0);

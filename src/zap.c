@@ -979,10 +979,6 @@ register struct obj *obj;
 	}
 	unbless(obj);
 	uncurse(obj);
-#ifdef INVISIBLE_OBJECTS
-	/*[this will be insufficient if it ever reduces obj's shop value]*/
-	if (obj->oinvis) obj->oinvis = 0;
-#endif
 	return;
 }
 
@@ -1833,10 +1829,6 @@ struct obj *obj, *otmp;
 		(void) rloco(obj);
 		break;
 	case WAN_MAKE_INVISIBLE:
-#ifdef INVISIBLE_OBJECTS
-		obj->oinvis = TRUE;
-		newsym(obj->ox,obj->oy);	/* make object disappear */
-#endif
 		break;
 	case WAN_UNDEAD_TURNING:
 	case SPE_TURN_UNDEAD:

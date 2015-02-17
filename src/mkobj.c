@@ -606,9 +606,6 @@ boolean artif;
 		otmp->known = 1;
 	otmp->lknown = 0;
 	otmp->cknown = 0;
-#ifdef INVISIBLE_OBJECTS
-	otmp->oinvis = !rn2(1250);
-#endif
 	otmp->corpsenm = NON_PM;
 
 	if (init) switch (let) {
