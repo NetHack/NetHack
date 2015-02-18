@@ -57,18 +57,18 @@ DOOR:closed,(47,08)
 DOOR:closed,(48,12)
 DOOR:locked,(50,10)
 # Hippocrates
-MONSTER:'@',"Hippocrates",(37,10)
+MONSTER:('@',"Hippocrates"),(37,10)
 # The treasure of Hippocrates
-OBJECT:'(',"chest",(37,10)
+OBJECT:('(',"chest"),(37,10)
 # intern guards for the audience chamber
-MONSTER:'@',"attendant",(29,08)
-MONSTER:'@',"attendant",(29,09)
-MONSTER:'@',"attendant",(29,10)
-MONSTER:'@',"attendant",(29,11)
-MONSTER:'@',"attendant",(40,09)
-MONSTER:'@',"attendant",(40,10)
-MONSTER:'@',"attendant",(40,11)
-MONSTER:'@',"attendant",(40,13)
+MONSTER:('@',"attendant"),(29,08)
+MONSTER:('@',"attendant"),(29,09)
+MONSTER:('@',"attendant"),(29,10)
+MONSTER:('@',"attendant"),(29,11)
+MONSTER:('@',"attendant"),(40,09)
+MONSTER:('@',"attendant"),(40,10)
+MONSTER:('@',"attendant"),(40,11)
+MONSTER:('@',"attendant"),(40,13)
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,19)
 # Random traps
@@ -79,29 +79,29 @@ TRAP:random,random
 TRAP:random,random
 TRAP:random,random
 # Monsters on siege duty.
-MONSTER: 'r',"rabid rat",random
-MONSTER: 'r',"rabid rat",random
-MONSTER: 'r',"rabid rat",random
-MONSTER: 'r',"rabid rat",random
-MONSTER: 'r',"rabid rat",random
-MONSTER: 'r',"rabid rat",random
-MONSTER: 'r',"rabid rat",random
-MONSTER: 'r',"rabid rat",random
-MONSTER: 'r',"rabid rat",random
-MONSTER: 'r',"rabid rat",random
-MONSTER: ';',"giant eel",random
-MONSTER: ';',"shark",random
-MONSTER: ';', random, random
-MONSTER: 'D',random,random,hostile
-MONSTER: 'D',random,random,hostile
-MONSTER: 'D',random,random,hostile
-MONSTER: 'D',random,random,hostile
-MONSTER: 'D',random,random,hostile
-MONSTER: 'S',random,random,hostile
-MONSTER: 'S',random,random,hostile
-MONSTER: 'S',random,random,hostile
-MONSTER: 'S',random,random,hostile
-MONSTER: 'S',random,random,hostile
+MONSTER: ('r',"rabid rat"),random
+MONSTER: ('r',"rabid rat"),random
+MONSTER: ('r',"rabid rat"),random
+MONSTER: ('r',"rabid rat"),random
+MONSTER: ('r',"rabid rat"),random
+MONSTER: ('r',"rabid rat"),random
+MONSTER: ('r',"rabid rat"),random
+MONSTER: ('r',"rabid rat"),random
+MONSTER: ('r',"rabid rat"),random
+MONSTER: ('r',"rabid rat"),random
+MONSTER: (';',"giant eel"),random
+MONSTER: (';',"shark"),random
+MONSTER: ';', random
+MONSTER: 'D',random,hostile
+MONSTER: 'D',random,hostile
+MONSTER: 'D',random,hostile
+MONSTER: 'D',random,hostile
+MONSTER: 'D',random,hostile
+MONSTER: 'S',random,hostile
+MONSTER: 'S',random,hostile
+MONSTER: 'S',random,hostile
+MONSTER: 'S',random,hostile
+MONSTER: 'S',random,hostile
 #
 #	The "locate" level for the quest.
 #
@@ -112,7 +112,7 @@ MONSTER: 'S',random,random,hostile
 MAZE: "Hea-loca",' '
 FLAGS: hardfloor
 #
-INIT_MAP: '.' , 'P', true , true , lit , false
+INIT_MAP: mines, '.' , 'P', true , true , lit , false
 GEOMETRY:center,center
 MAP
 PPPPPPPPPPPPP.......PPPPPPPPPPP
@@ -142,21 +142,21 @@ NON_DIGGABLE:(11,02,21,07)
 # Altar in the temple.
 ALTAR:(13,05), chaos, shrine
 # Objects
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
 # Random traps
 TRAP:random,random
 TRAP:random,random
@@ -165,41 +165,41 @@ TRAP:random,random
 TRAP:random,random
 TRAP:random,random
 # Random monsters.
-MONSTER:'r',"rabid rat",random
-MONSTER:'r',"rabid rat",random
-MONSTER:'r',"rabid rat",random
-MONSTER:'r',"rabid rat",random
-MONSTER:'r',"rabid rat",random
-MONSTER:'r',"rabid rat",random
-MONSTER:'r',"rabid rat",random
-MONSTER:'r',"rabid rat",random
-MONSTER:'r',random,random,hostile
-MONSTER:';',"giant eel",random
-MONSTER:';',"giant eel",random
-MONSTER:';',"giant eel",random
-MONSTER:';',"giant eel",random
-MONSTER:';',"giant eel",random
-MONSTER:';',"electric eel",random
-MONSTER:';',"electric eel",random
-MONSTER:';',"kraken",random
-MONSTER:';',"shark",random
-MONSTER:';',"shark",random
-MONSTER:';',random, random,hostile
-MONSTER:';',random, random,hostile
-MONSTER: 'D',random,random,hostile
-MONSTER: 'D',random,random,hostile
-MONSTER: 'D',random,random,hostile
-MONSTER: 'D',random,random,hostile
-MONSTER: 'D',random,random,hostile
-MONSTER: 'S',random,random,hostile
-MONSTER: 'S',random,random,hostile
-MONSTER: 'S',random,random,hostile
-MONSTER: 'S',random,random,hostile
-MONSTER: 'S',random,random,hostile
-MONSTER: 'S',random,random,hostile
-MONSTER: 'S',random,random,hostile
-MONSTER: 'S',random,random,hostile
-MONSTER: 'S',random,random,hostile
+MONSTER:('r',"rabid rat"),random
+MONSTER:('r',"rabid rat"),random
+MONSTER:('r',"rabid rat"),random
+MONSTER:('r',"rabid rat"),random
+MONSTER:('r',"rabid rat"),random
+MONSTER:('r',"rabid rat"),random
+MONSTER:('r',"rabid rat"),random
+MONSTER:('r',"rabid rat"),random
+MONSTER:'r',random,hostile
+MONSTER:(';',"giant eel"),random
+MONSTER:(';',"giant eel"),random
+MONSTER:(';',"giant eel"),random
+MONSTER:(';',"giant eel"),random
+MONSTER:(';',"giant eel"),random
+MONSTER:(';',"electric eel"),random
+MONSTER:(';',"electric eel"),random
+MONSTER:(';',"kraken"),random
+MONSTER:(';',"shark"),random
+MONSTER:(';',"shark"),random
+MONSTER:';', random,hostile
+MONSTER:';', random,hostile
+MONSTER: 'D',random,hostile
+MONSTER: 'D',random,hostile
+MONSTER: 'D',random,hostile
+MONSTER: 'D',random,hostile
+MONSTER: 'D',random,hostile
+MONSTER: 'S',random,hostile
+MONSTER: 'S',random,hostile
+MONSTER: 'S',random,hostile
+MONSTER: 'S',random,hostile
+MONSTER: 'S',random,hostile
+MONSTER: 'S',random,hostile
+MONSTER: 'S',random,hostile
+MONSTER: 'S',random,hostile
+MONSTER: 'S',random,hostile
 
 #
 #	The "goal" level for the quest.
@@ -211,7 +211,7 @@ MONSTER: 'S',random,random,hostile
 
 MAZE: "Hea-goal", 'P'
 #
-INIT_MAP: '.' , 'P' , false , true , lit , false
+INIT_MAP: mines, '.' , 'P' , false , true , lit , false
 GEOMETRY:center,center
 MAP
 .P....................................PP.
@@ -234,22 +234,22 @@ STAIR:(39,10),up
 # Non diggable walls
 NON_DIGGABLE:(00,00,40,11)
 # Objects
-OBJECT:')',"quarterstaff",(20,06),blessed,0,"The Staff of Aesculapius"
-OBJECT:'/',"lightning",(20,06)
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:(')',"quarterstaff"),(20,06),blessed,0,name:"The Staff of Aesculapius"
+OBJECT:('/',"lightning"),(20,06)
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
 # Random traps
 TRAP:random,random
 TRAP:random,random
@@ -258,38 +258,38 @@ TRAP:random,random
 TRAP:random,random
 TRAP:random,random
 # Random monsters.
-MONSTER:'H',"Cyclops",(20,06),hostile
-MONSTER:'r',"rabid rat",random
-MONSTER:'r',"rabid rat",random
-MONSTER:'r',"rabid rat",random
-MONSTER:'r',random,random,hostile
-MONSTER:'r',random,random,hostile
-MONSTER:';',"giant eel",random
-MONSTER:';',"giant eel",random
-MONSTER:';',"giant eel",random
-MONSTER:';',"giant eel",random
-MONSTER:';',"giant eel",random
-MONSTER:';',"giant eel",random
-MONSTER:';',"electric eel",random
-MONSTER:';',"electric eel",random
-MONSTER:';',"shark",random
-MONSTER:';',"shark",random
-MONSTER:';',random,random,hostile
-MONSTER: 'D',random,random,hostile
-MONSTER: 'D',random,random,hostile
-MONSTER: 'D',random,random,hostile
-MONSTER: 'D',random,random,hostile
-MONSTER: 'D',random,random,hostile
-MONSTER: 'S',random,random,hostile
-MONSTER: 'S',random,random,hostile
-MONSTER: 'S',random,random,hostile
-MONSTER: 'S',random,random,hostile
-MONSTER: 'S',random,random,hostile
-MONSTER: 'S',random,random,hostile
-MONSTER: 'S',random,random,hostile
-MONSTER: 'S',random,random,hostile
-MONSTER: 'S',random,random,hostile
-MONSTER: 'S',random,random,hostile
+MONSTER:('H',"Cyclops"),(20,06),hostile
+MONSTER:('r',"rabid rat"),random
+MONSTER:('r',"rabid rat"),random
+MONSTER:('r',"rabid rat"),random
+MONSTER:'r',random,hostile
+MONSTER:'r',random,hostile
+MONSTER:(';',"giant eel"),random
+MONSTER:(';',"giant eel"),random
+MONSTER:(';',"giant eel"),random
+MONSTER:(';',"giant eel"),random
+MONSTER:(';',"giant eel"),random
+MONSTER:(';',"giant eel"),random
+MONSTER:(';',"electric eel"),random
+MONSTER:(';',"electric eel"),random
+MONSTER:(';',"shark"),random
+MONSTER:(';',"shark"),random
+MONSTER:';',random,hostile
+MONSTER: 'D',random,hostile
+MONSTER: 'D',random,hostile
+MONSTER: 'D',random,hostile
+MONSTER: 'D',random,hostile
+MONSTER: 'D',random,hostile
+MONSTER: 'S',random,hostile
+MONSTER: 'S',random,hostile
+MONSTER: 'S',random,hostile
+MONSTER: 'S',random,hostile
+MONSTER: 'S',random,hostile
+MONSTER: 'S',random,hostile
+MONSTER: 'S',random,hostile
+MONSTER: 'S',random,hostile
+MONSTER: 'S',random,hostile
+MONSTER: 'S',random,hostile
 
 #
 #	The "fill" levels for the quest.
@@ -301,34 +301,34 @@ MONSTER: 'S',random,random,hostile
 #
 
 MAZE: "Hea-fila" , 'P'
-INIT_MAP: '.' , 'P' , false , true , lit , false
+INIT_MAP: mines, '.' , 'P' , false , true , lit , false
 NOMAP
 #
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
 #
-MONSTER: 'r', "rabid rat", random
-MONSTER: 'r', random, random,hostile
-MONSTER: 'r', random, random,hostile
-MONSTER: ';', "giant eel", random
-MONSTER: ';', "giant eel", random
-MONSTER: ';', "electric eel", random
-MONSTER: 'D',random,random,hostile
-MONSTER: 'D',random,random,hostile
-MONSTER: 'D',random,random,hostile
-MONSTER: 'D',random,random,hostile
-MONSTER: 'S',random,random,hostile
-MONSTER: 'S',random,random,hostile
-MONSTER: 'S',random,random,hostile
+MONSTER: ('r', "rabid rat"), random
+MONSTER: 'r', random,hostile
+MONSTER: 'r', random,hostile
+MONSTER: (';', "giant eel"), random
+MONSTER: (';', "giant eel"), random
+MONSTER: (';', "electric eel"), random
+MONSTER: 'D',random,hostile
+MONSTER: 'D',random,hostile
+MONSTER: 'D',random,hostile
+MONSTER: 'D',random,hostile
+MONSTER: 'S',random,hostile
+MONSTER: 'S',random,hostile
+MONSTER: 'S',random,hostile
 #
 TRAP: random, random
 TRAP: random, random
@@ -336,42 +336,42 @@ TRAP: random, random
 TRAP: random, random
 
 MAZE: "Hea-filb" , 'P'
-INIT_MAP: '.' , 'P' , false , true , lit , false
+INIT_MAP: mines, '.' , 'P' , false , true , lit , false
 NOMAP
 #
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
 #
-MONSTER: 'r', "rabid rat", random
-MONSTER: 'r', "rabid rat", random
-MONSTER: 'r', random, random,hostile
-MONSTER: 'r', random, random,hostile
-MONSTER: ';', "giant eel", random
-MONSTER: ';', "giant eel", random
-MONSTER: ';', "giant eel", random
-MONSTER: ';', "giant eel", random
-MONSTER: ';', "giant eel", random
-MONSTER: ';', "electric eel", random
-MONSTER: ';', "electric eel", random
-MONSTER: 'D',random,random,hostile
-MONSTER: 'D',random,random,hostile
-MONSTER: 'D',random,random,hostile
-MONSTER: 'D',random,random,hostile
-MONSTER: 'S',random,random,hostile
-MONSTER: 'S',random,random,hostile
-MONSTER: 'S',random,random,hostile
+MONSTER: ('r', "rabid rat"), random
+MONSTER: ('r', "rabid rat"), random
+MONSTER: 'r', random,hostile
+MONSTER: 'r', random,hostile
+MONSTER: (';', "giant eel"), random
+MONSTER: (';', "giant eel"), random
+MONSTER: (';', "giant eel"), random
+MONSTER: (';', "giant eel"), random
+MONSTER: (';', "giant eel"), random
+MONSTER: (';', "electric eel"), random
+MONSTER: (';', "electric eel"), random
+MONSTER: 'D',random,hostile
+MONSTER: 'D',random,hostile
+MONSTER: 'D',random,hostile
+MONSTER: 'D',random,hostile
+MONSTER: 'S',random,hostile
+MONSTER: 'S',random,hostile
+MONSTER: 'S',random,hostile
 #
 TRAP: random, random
 TRAP: random, random
