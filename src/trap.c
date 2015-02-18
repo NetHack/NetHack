@@ -3535,7 +3535,7 @@ boolean bury_it;
 	place_object(otmp, ttmp->tx, ttmp->ty);
 	if (bury_it) {
 	    /* magical digging first disarms this trap, then will unearth it */
-	    (void) bury_an_obj(otmp);
+	    (void) bury_an_obj(otmp, NULL);
 	} else {
 	    /* Sell your own traps only... */
 	    if (ttmp->madeby_u) sellobj(otmp, ttmp->tx, ttmp->ty);

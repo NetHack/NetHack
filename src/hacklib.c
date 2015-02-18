@@ -398,6 +398,20 @@ dist2(x0, y0, x1, y1)	/* square of euclidean distance between pair of pts */
     return dx * dx + dy * dy;
 }
 
+int
+isqrt(val)
+int val;
+{
+    int rt = 0;
+    int odd = 1;
+    while(val >= odd) {
+        val = val-odd;
+        odd = odd+2;
+        rt = rt + 1;
+    }
+    return rt;
+}
+
 boolean
 online2(x0, y0, x1, y1) /* are two points lined up (on a straight line)? */
     int x0, y0, x1, y1;

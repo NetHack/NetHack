@@ -1683,13 +1683,15 @@ buried_ball_to_freedom()
 /* move objects from fobj/nexthere lists to buriedobjlist, keeping position */
 /* information */
 struct obj *
-bury_an_obj(otmp)
+bury_an_obj(otmp, dealloced)
 	struct obj *otmp;
+	boolean *dealloced;
 {
 	struct obj *otmp2;
 	boolean under_ice;
 
 	debugpline1("bury_an_obj: %s", xname(otmp));
+	if (dealloced) *dealloced = FALSE;
 	if (otmp == uball) {
 		unpunish();
 		u.utrap = rn1(50,20);
@@ -1720,6 +1722,7 @@ bury_an_obj(otmp)
 	under_ice = is_ice(otmp->ox, otmp->oy);
 	if (otmp->otyp == ROCK && !under_ice) {
 		/* merges into burying material */
+		if (dealloced) *dealloced = TRUE;
 		obfree(otmp, (struct obj *)0);
 		return(otmp2);
 	}
@@ -1754,7 +1757,7 @@ int x, y;
 	if(level.objects[x][y] != (struct obj *)0)
 	    debugpline2("bury_objs: at <%d,%d>", x, y);
 	for (otmp = level.objects[x][y]; otmp; otmp = otmp2)
-		otmp2 = bury_an_obj(otmp);
+	    otmp2 = bury_an_obj(otmp, NULL);
 
 	/* don't expect any engravings here, but just in case */
 	del_engr_at(x, y);
@@ -1814,7 +1817,7 @@ long timeout UNUSED;
 	    /* Everything which can be held in a container can also be
 	       buried, so bury_an_obj's use of obj_extract_self insures
 	       that Has_contents(obj) will eventually become false. */
-	    (void)bury_an_obj(obj->cobj);
+	    (void)bury_an_obj(obj->cobj, NULL);
 	}
 	obj_extract_self(obj);
 	obfree(obj, (struct obj *) 0);

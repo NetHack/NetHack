@@ -275,7 +275,7 @@ E int FDECL(use_pick_axe2, (struct obj *));
 E boolean FDECL(mdig_tunnel, (struct monst *));
 E void FDECL(watch_dig, (struct monst *,XCHAR_P,XCHAR_P,BOOLEAN_P));
 E void NDECL(zap_dig);
-E struct obj *FDECL(bury_an_obj, (struct obj *));
+E struct obj *FDECL(bury_an_obj, (struct obj *, boolean *));
 E void FDECL(bury_objs, (int,int));
 E void FDECL(unearth_objs, (int,int));
 E void FDECL(rot_organic, (ANY_P *, long));
@@ -1132,6 +1132,7 @@ E void FDECL(dodoor, (int,int,struct mkroom *));
 E void FDECL(mktrap, (int,int,struct mkroom *,coord*));
 E void FDECL(mkstairs, (XCHAR_P,XCHAR_P,CHAR_P,struct mkroom *));
 E void NDECL(mkinvokearea);
+E void FDECL(mineralize, (int, int, int, int, boolean));
 
 /* ### mkmap.c ### */
 
@@ -1141,7 +1142,7 @@ void FDECL(remove_rooms, (int,int,int,int));
 /* ### mkmaze.c ### */
 
 E void FDECL(wallification, (int,int,int,int));
-E void FDECL(walkfrom, (int,int));
+E void FDECL(walkfrom, (int,int,SCHAR_P));
 E void FDECL(makemaz, (const char *));
 E void FDECL(mazexy, (coord *));
 E void NDECL(bound_digging);
