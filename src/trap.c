@@ -4708,14 +4708,24 @@ lava_effects()
 		    !obj_resists(obj, 0, 0))	/* for invocation items */
 		obj->in_use = TRUE;
 
+    /* Check whether we should burn away boots *first* so we know whether to
+     * make the player sink into the lava. Assumption: water walking only comes
+     * from boots. */
+    if (Wwalking && uarmf && is_organic(uarmf) && !uarmf->oerodeproof) {
+        obj = uarmf;
+        pline("Your %s into flame!", aobjnam(obj, "burst"));
+        setequip(os_armf, NULL, em_silent);
+        useupall(obj);
+    }
+
     if (!Fire_resistance) {
-	if(Wwalking) {
+        if(Wwalking) {
 	    pline_The("lava here burns you!");
 	    if (usurvive) {
 		losehp(dmg, lava_killer, KILLED_BY);	/* lava damage */
 		goto burn_stuff;
 	    }
-	} else
+        } else
 	    You("fall into the lava!");
 
 	usurvive = Lifesaved || discover;
