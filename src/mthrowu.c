@@ -412,7 +412,7 @@ struct obj *obj;		/* missile (or stack providing it) */
 			if (!Stoned && !Stone_resistance
 			    && !(poly_when_stoned(youmonst.data) &&
 				 polymon(PM_STONE_GOLEM))) {
-			    make_stoned(5L, (char *)0, KILLED_BY, nul);
+			    make_stoned(5L, (char *)0, KILLED_BY, "");
 			}
 		    }
 		    stop_occupation();
