@@ -4713,9 +4713,11 @@ lava_effects()
      * from boots. */
     if (Wwalking && uarmf && is_organic(uarmf) && !uarmf->oerodeproof) {
         obj = uarmf;
-        pline("Your %s into flame!", aobjnam(obj, "burst"));
-        setequip(os_armf, NULL, em_silent);
-        useupall(obj);
+        pline("%s into flame!", Yobjnam2(obj, "burst"));
+        iflags.in_lava_effects++;       /* (see above) */
+        (void) Boots_off();
+        useup(obj);
+        iflags.in_lava_effects--;
     }
 
     if (!Fire_resistance) {
@@ -4773,22 +4775,7 @@ lava_effects()
 	}
 	You("find yourself back on solid %s.", surface(u.ux, u.uy));
 	return(TRUE);
-    }	/* !Fire_resistance */
-
-    /* just want to burn boots, not all armor; destroy_item doesn't work on
-       armor anyway */
-burn_stuff:
-    if (uarmf && !uarmf->oerodeproof && is_organic(uarmf) &&
-	    objects[uarmf->otyp].oc_oprop != FIRE_RES) {
-	/* save uarmf value because Boots_off() sets uarmf to null */
-	obj = uarmf;
-	pline("%s into flame!", Yobjnam2(obj, "burst"));
-	iflags.in_lava_effects++;	/* (see above) */
-	(void) Boots_off();
-	useup(obj);
-	iflags.in_lava_effects--;
-    }
-    if (!Wwalking) {
+    } else if (!Wwalking && (!u.utrap || u.utraptype != TT_LAVA)) {
 	boil_away = !Fire_resistance;
 	/* if not fire resistant, sink_into_lava() will quickly be fatal;
 	   hero needs to escape immediately */
@@ -4801,6 +4788,8 @@ burn_stuff:
 	    losehp(!boil_away ? 1 : (u.uhp / 2),
 	           lava_killer, KILLED_BY);	/* lava damage */
     }
+
+burn_stuff:
     destroy_item(SCROLL_CLASS, AD_FIRE);
     destroy_item(SPBOOK_CLASS, AD_FIRE);
     destroy_item(POTION_CLASS, AD_FIRE);
