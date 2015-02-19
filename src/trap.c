@@ -4730,11 +4730,6 @@ lava_effects()
         } else
 	    You("fall into the lava!");
 
-	usurvive = Lifesaved || discover;
-#ifdef WIZARD
-	if (wizard) usurvive = TRUE;
-#endif
-
 	/* prevent remove_worn_item() -> Boots_off(WATER_WALKING_BOOTS) ->
 	   spoteffects() -> lava_effects() recursion which would
 	   successfully delete (via useupall) the no-longer-worn boots;
@@ -4745,15 +4740,17 @@ lava_effects()
 	for(obj = invent; obj; obj = obj2) {
 	    obj2 = obj->nobj;
 	    /* above, we set in_use for objects which are to be destroyed */
-	    if (obj->in_use) {
+            if (obj->otyp == SPE_BOOK_OF_THE_DEAD && !Blind) {
+                pline("%s glows a strange %s, but remains intact.",
+                      The(xname(obj)), hcolor("dark red"));
+            } else if (obj->in_use) {
 		if (obj->owornmask) {
-		    if (usurvive)
-			pline("%s into flame!", Yobjnam2(obj, "burst"));
+		    pline("%s into flame!", Yobjnam2(obj, "burst"));
 		    remove_worn_item(obj, TRUE);
 		}
 		useupall(obj);
 	    }
-	}
+        }
 
 	iflags.in_lava_effects--;
 
