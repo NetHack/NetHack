@@ -73,11 +73,7 @@ static struct save_procs {
 #endif
 };
 
-#ifdef GCC_WARN
-static long nulls[10];
-#else
-#define nulls nul
-#endif
+static long nulls[sizeof(struct trap) + sizeof(struct fruit)];
 
 #if defined(UNIX) || defined(VMS) || defined(__EMX__) || defined(WIN32)
 #define HUP	if (!program_state.done_hup)

@@ -207,7 +207,7 @@ moverock()
 			pline("%s%s and %s a %s in the %s!",
 			  Tobjnam(otmp,
 			   (ttmp->ttyp == TRAPDOOR) ? "trigger" : "fall"),
-			  (ttmp->ttyp == TRAPDOOR) ? nul : " into",
+			  (ttmp->ttyp == TRAPDOOR) ? "" : " into",
 			  otense(otmp, "plug"),
 			  (ttmp->ttyp == TRAPDOOR) ? "trap door" : "hole",
 			  surface(rx, ry));

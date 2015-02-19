@@ -52,7 +52,6 @@ NEARDATA struct kinfo killer = DUMMY;
 NEARDATA long done_money = 0;
 #endif
 const char *nomovemsg = 0;
-const char nul[40] = DUMMY;			/* contains zeros */
 NEARDATA char plname[PL_NSIZ] = DUMMY;		/* player name */
 NEARDATA char pl_character[PL_CSIZ] = DUMMY;
 NEARDATA char pl_race = '\0';

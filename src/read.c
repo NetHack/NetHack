@@ -228,7 +228,7 @@ register const char *color;
 	pline("%s%s%s for a moment.",
 		Yobjnam2(otmp, Blind ? "vibrate" : "glow"),
 		Blind ? "" : " ",
-		Blind ? nul : hcolor(color));
+		Blind ? "" : hcolor(color));
 }
 
 /* Is the object chargeable?  For purposes of inventory display; it is */
@@ -806,8 +806,8 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 			pline("%s violently %s%s%s for a while, then %s.",
 			      Yname2(otmp),
 			      otense(otmp, Blind ? "vibrate" : "glow"),
-			      (!Blind && !same_color) ? " " : nul,
-			      (Blind || same_color) ? nul :
+			      (!Blind && !same_color) ? " " : "",
+			      (Blind || same_color) ? "" :
 				hcolor(scursed ? NH_BLACK : NH_SILVER),
 			      otense(otmp, "evaporate"));
 			remove_worn_item(otmp, FALSE);
@@ -836,10 +836,10 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 		}
 		pline("%s %s%s%s%s for a %s.",
 		      Yname2(otmp),
-		      s == 0 ? "violently " : nul,
+		      s == 0 ? "violently " : "",
 		      otense(otmp, Blind ? "vibrate" : "glow"),
-		      (!Blind && !same_color) ? " " : nul,
-		      (Blind || same_color) ? nul :
+		      (!Blind && !same_color) ? " " : "",
+		      (Blind || same_color) ? "" :
 			  hcolor(scursed ? NH_BLACK : NH_SILVER),
 		      (s * s > 1) ? "while" : "moment");
 		/* [this cost handling will need updating if shop pricing is
@@ -914,11 +914,11 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 			Your("%s begin to %s%s.",
 			    makeplural(body_part(HAND)),
 			    Blind ? "tingle" : "glow ",
-			    Blind ? nul : hcolor(NH_PURPLE));
+			    Blind ? "" : hcolor(NH_PURPLE));
 			make_confused(HConfusion + rnd(100),FALSE);
 		    } else {
 			pline("A %s%s surrounds your %s.",
-			    Blind ? nul : hcolor(NH_RED),
+			    Blind ? "" : hcolor(NH_RED),
 			    Blind ? "faint buzz" : " glow",
 			    body_part(HEAD));
 			make_confused(0L,TRUE);

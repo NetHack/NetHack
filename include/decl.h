@@ -196,7 +196,6 @@ E NEARDATA char horsename[];
 E char preferred_pet;
 E const char *occtxt;			/* defined when occupation != NULL */
 E const char *nomovemsg;
-E const char nul[];
 E char lock[];
 
 E const schar xdir[], ydir[], zdir[];

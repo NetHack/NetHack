@@ -691,7 +691,7 @@ register int pm;
 		if (!Slimed && !Unchanging && !slimeproof(youmonst.data)) {
 		    You("don't feel very well.");
 		    make_slimed(10L, (char*) 0);
-		    delayed_killer(SLIMED, KILLED_BY_AN, nul);
+		    delayed_killer(SLIMED, KILLED_BY_AN, "");
 		}
 		/* Fall through */
 	    default:
