@@ -2792,17 +2792,10 @@ spo_level_flags(coder)
     if (flags & NOMMAP)       level.flags.nommap = 1;
     if (flags & SHORTSIGHTED) level.flags.shortsighted = 1;
     if (flags & ARBOREAL)     level.flags.arboreal = 1;
-    /*
-    if (flags & NOFLIPX)      coder->allow_flips &= ~1;
-    if (flags & NOFLIPY)      coder->allow_flips &= ~2;
     if (flags & MAZELEVEL)    level.flags.is_maze_lev = 1;
     if (flags & PREMAPPED)    coder->premapped = TRUE;
     if (flags & SHROUD)       level.flags.hero_memory = 0;
-    if (flags & STORMY)       level.flags.stormy = 1;
     if (flags & GRAVEYARD)    level.flags.graveyard = 1;
-    if (flags & SKYMAP)       level.flags.sky = 1;
-    if (flags & FLAG_RNDVAULT) coder->allow_flips = 0;
-    */
 
     opvar_free(flagdata);
 }
@@ -5047,8 +5040,6 @@ next_opcode:
     fill_rooms();
     remove_boundary_syms();
     wallification(1, 0, COLNO-1, ROWNO-1);
-
-    /*flip_level_rnd(coder->allow_flips);*/
 
     count_features();
 

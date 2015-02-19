@@ -406,10 +406,6 @@ fixup_special()
 	place_lregion(0,0,0,0,0,0,0,0,LR_BRANCH,(d_level *)0);
     }
 
-	/* KMH -- Sokoban levels */
-	if(In_sokoban(&u.uz))
-		sokoban_detect();
-
     /* Still need to add some stuff to level file */
     if (Is_medusa_level(&u.uz)) {
 	struct obj *otmp;

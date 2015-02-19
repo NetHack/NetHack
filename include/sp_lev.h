@@ -25,10 +25,9 @@
 #define SHORTSIGHTED	0x00000008L
 #define ARBOREAL	0x00000010L
 #define MAZELEVEL	0x00000020L
-#define PREMAPPED       0x00000040L
+#define PREMAPPED       0x00000040L  /* premapped level & sokoban rules */
 #define SHROUD          0x00000080L
-#define STORMY          0x00000100L
-#define GRAVEYARD       0x00000200L
+#define GRAVEYARD       0x00000100L
 
 
 /* different level layout initializers */
