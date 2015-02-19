@@ -310,7 +310,7 @@ md_rush(md,tx,ty)
 	if (fx == tx && fy == ty) break;
 
 	if ((mon = m_at(fx,fy)) != 0)	/* save monster at this position */
-	    verbalize(md_exclamations());
+	    verbalize1(md_exclamations());
 	else if (fx == u.ux && fy == u.uy)
 	    verbalize("Excuse me.");
 
