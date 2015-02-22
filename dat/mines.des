@@ -48,99 +48,132 @@ TRAP: random, random
 TRAP: random, random
 
 
+# A tragic accident has occurred in Frontier Town....
+# 
 # Minetown variant 1
-# "Frontier Town"
+# Orcish Town - a variant of Frontier Town that has been
+# overrun by orcs.  Note the barricades (iron bars).
 #
 LEVEL: "minetn-1"
+FLAGS:mazelevel
+INIT_MAP:mines,'.',' ',true,true,random,true
+GEOMETRY:center,center
+MAP
+.....................................
+.----------------F------------------.
+.|.................................|.
+.|.-------------......------------.|.
+.|.|...|...|...|......|..|...|...|.|.
+.F.|...|...|...|......|..|...|...|.|.
+.|.|...|...|...|......|..|...|...|.F.
+.|.|...|...|----......------------.|.
+.|.---------.......................|.
+.|.................................|.
+.|.---------.....--...--...........|.
+.|.|...|...|----.|.....|.---------.|.
+.|.|...|...|...|.|.....|.|..|....|.|.
+.|.|...|...|...|.|.....|.|..|....|.|.
+.|.|...|...|...|.|.....|.|..|....|.|.
+.|.-------------.-------.---------.|.
+.|.................................F.
+.-----------F------------F----------.
+.....................................
+ENDMAP
 
-ROOM: "ordinary" , lit, (3,3), (center,center), (31,15) {
-FOUNTAIN: (13, 7)
-FOUNTAIN: (20, 7)
+# Don't let the player fall into his likely death
+TELEPORT_REGION:levregion(01,01,20,19),levregion(20,00,70,19)
+REGION:(00,00,36,16),lit,"ordinary"
+STAIR:levregion(01,03,20,19),(00,00,36,15),up
+STAIR:levregion(61,03,75,19),(00,00,36,15),down
 
-# The Town Watch
-MONSTER: ('@', "watchman"), random, peaceful
-MONSTER: ('@', "watchman"), random, peaceful
-MONSTER: ('@', "watchman"), random, peaceful
-MONSTER: ('@', "watchman"), random, peaceful
-MONSTER: ('@', "watch captain"), random, peaceful
+# shame we can't make polluted fountains
+FOUNTAIN:(16,09)
+FOUNTAIN:(25,09)
 
-SUBROOM: "shop" [90%] , lit, (2,2), (3,4) {
-  ROOMDOOR: false, closed, south, random
+# the altar's defiled; useful for BUC but never coaligned
+ALTAR:(20,13),noalign,shrine
+
+# set up the shop doors; could be broken down
+DOOR:random,(5,8)
+DOOR:random,(9,8)
+DOOR:random,(13,7)
+DOOR:random,(22,5)
+DOOR:random,(27,7)
+DOOR:random,(31,7)
+DOOR:random,(5,10)
+DOOR:random,(9,10)
+DOOR:random,(15,13)
+DOOR:random,(25,13)
+DOOR:random,(31,11)
+
+# knock a few holes in the shop interior walls
+REPLACE_TERRAIN:(07,04,11,06),'|','.',18%
+REPLACE_TERRAIN:(25,04,29,06),'|','.',18%
+REPLACE_TERRAIN:(07,12,11,14),'|','.',18%
+REPLACE_TERRAIN:(28,12,28,14),'|','.',33%
+
+# One spot each in most shops...
+$place = { (05,04),(09,05),(13,04),(26,04),(31,05),(30,14),(05,14),(10,13),(26,14),(27,13) }
+SHUFFLE:$place
+
+# scatter some bodies
+OBJECT:('%',"corpse"),(20,12),montype:"aligned priest"
+OBJECT:('%',"corpse"),$place[0],montype:"shopkeeper"
+OBJECT:('%',"corpse"),$place[1],montype:"shopkeeper"
+OBJECT:('%',"corpse"),$place[2],montype:"shopkeeper"
+OBJECT:('%',"corpse"),$place[3],montype:"shopkeeper"
+OBJECT:('%',"corpse"),$place[4],montype:"shopkeeper"
+OBJECT:('%',"corpse"),random,montype:"watchman"
+OBJECT:('%',"corpse"),random,montype:"watchman"
+OBJECT:('%',"corpse"),random,montype:"watchman"
+OBJECT:('%',"corpse"),random,montype:"watchman"
+OBJECT:('%',"corpse"),random,montype:"watch captain"
+
+# Rubble!
+LOOP [9 + 2d5] {
+  OBJECT[90%]:('`',"boulder"),random
+  OBJECT:('*',"rock"),random
 }
 
-SUBROOM: "tool shop" [90%], lit, (2,9), (3,4) {
-  ROOMDOOR: false, closed, north, random
+# Guarantee 7 candles since we won't have Izchak available
+OBJECT:('(',"wax candle"),$place[0],quantity:1d2
+OBJECT:('(',"wax candle"),$place[1],quantity:2d2
+OBJECT:('(',"wax candle"),$place[2],quantity:1d2
+OBJECT:('(',"tallow candle"),$place[3],quantity:1d3
+OBJECT:('(',"tallow candle"),$place[2],quantity:1d2
+OBJECT:('(',"tallow candle"),$place[0],quantity:1d2
+
+# go ahead and leave a lamp next to one corpse to be suggestive
+# and some empty wands...
+OBJECT:('(',"oil lamp"),$place[2]
+OBJECT:('/',"striking"),$place[1],uncursed,0
+OBJECT:('/',"striking"),$place[3],uncursed,0
+OBJECT:('/',"striking"),$place[4],uncursed,0
+OBJECT:('/',"magic missile"),$place[4],uncursed,0
+OBJECT:('/',"magic missile"),$place[0],uncursed,0
+
+# the Orcish Army
+
+$inside = selection: floodfill(18,8)
+$near_temple = selection: filter(fillrect(17,8, 23,14), $inside)
+
+LOOP [5 + 1d10] {
+  MONSTER[50%]: ('o', "orc-captain"), rndcoord($inside), hostile
+  MONSTER[80%]: ('o', "Uruk-hai"), rndcoord($inside), hostile
+  MONSTER: ('o', "Mordor orc"), rndcoord($inside), hostile
+}
+# shamans can be hanging out in/near the temple
+LOOP [2d3] {
+  MONSTER: ('o', "orc shaman"), rndcoord($near_temple), hostile
+}
+# these are not such a big deal
+# to run into outside the bars
+LOOP [9 + 2d5] {
+  MONSTER[90%]: ('o', "hill orc"), random, hostile
+  MONSTER: ('o', "goblin"), random, hostile
 }
 
-SUBROOM: "ordinary", unlit, (6,2), (3,4) {
-  ROOMDOOR: false, closed, south, random
-}
-
-SUBROOM: "ordinary", lit, (6,9), (3,4) {
-  ROOMDOOR: false, closed, north, random
-}
-
-SUBROOM: "food shop" [90%], lit, (10,2), (2,3) {
-  ROOMDOOR: false, closed, south, random
-}
-
-SUBROOM: "candle shop", lit, (22,2), (3,3) {
-  ROOMDOOR: false, closed, south, random
-}
-
-SUBROOM: "ordinary", unlit, (10,10), (2,3) {
-  ROOMDOOR: false, locked, east, random
-  MONSTER: ('G', "gnome"), random
-}
-
-SUBROOM: "ordinary", lit, (19,2),  (2,3) {
-  ROOMDOOR: false, locked, west, random
-  MONSTER: ('G', "gnome"), random
-}
-
-SUBROOM: "temple", lit, (15,9), (4,4) {
-  ROOMDOOR: false, closed, north, random
-  ALTAR:(02,02),align[0],shrine
-  MONSTER: ('G', "gnomish wizard"), random
-  MONSTER: ('G', "gnomish wizard"), random
-}
-
-SUBROOM: "ordinary", lit, (22,10), (2,3) {
-  ROOMDOOR: false, locked, west, random
-}
-
-SUBROOM: "ordinary", lit, (26,2), (3,3) {
-  ROOMDOOR: false, closed, south, random
-  MONSTER: ('G', "gnome lord"), random
-}
-
-SUBROOM: "ordinary", unlit, (25,10), (4,3) {
-  ROOMDOOR: false, closed, north, random
-}
-
-}
-
-ROOM: "ordinary" , random, random, random, random {
-  STAIR: random, up
-}
-
-ROOM: "ordinary" , random, random, random, random {
-  STAIR: random, down
-  TRAP: random, random
-  MONSTER: ('G', "gnome"), random
-  MONSTER: ('G', "gnome"), random
-}
-
-ROOM: "ordinary" , random, random, random, random {
-  MONSTER: ('h', "dwarf"), random
-}
-
-ROOM: "ordinary" , random, random, random, random {
-  TRAP: random, random
-  MONSTER: ('G', "gnome"), random
-}
-
-RANDOM_CORRIDORS
+WALLIFY:(1,0, 70,20)
 
 
 # Minetown variant 2
