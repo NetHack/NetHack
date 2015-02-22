@@ -131,7 +131,7 @@ OBJECT:('%',"corpse"),random,montype:"watch captain"
 
 # Rubble!
 LOOP [9 + 2d5] {
-  OBJECT[90%]:('`',"boulder"),random
+  [90%]: OBJECT:('`',"boulder"),random
   OBJECT:('*',"rock"),random
 }
 
@@ -158,9 +158,15 @@ $inside = selection: floodfill(18,8)
 $near_temple = selection: filter(fillrect(17,8, 23,14), $inside)
 
 LOOP [5 + 1d10] {
-  MONSTER[50%]: ('o', "orc-captain"), rndcoord($inside), hostile
-  MONSTER[80%]: ('o', "Uruk-hai"), rndcoord($inside), hostile
-  MONSTER: ('o', "Mordor orc"), rndcoord($inside), hostile
+    IF [50%] {
+        MONSTER: ('o', "orc-captain"), rndcoord($inside), hostile
+    } ELSE {
+        IF [80%] {
+            MONSTER: ('o', "Uruk-hai"), rndcoord($inside), hostile
+        } ELSE {
+            MONSTER: ('o', "Mordor orc"), rndcoord($inside), hostile
+        }
+    }
 }
 # shamans can be hanging out in/near the temple
 LOOP [2d3] {
@@ -169,11 +175,14 @@ LOOP [2d3] {
 # these are not such a big deal
 # to run into outside the bars
 LOOP [9 + 2d5] {
-  MONSTER[90%]: ('o', "hill orc"), random, hostile
-  MONSTER: ('o', "goblin"), random, hostile
+    IF [90%] {
+        MONSTER: ('o', "hill orc"), random, hostile
+    } ELSE {
+        MONSTER: ('o', "goblin"), random, hostile
+    }
 }
 
-WALLIFY:(1,0, 70,20)
+WALLIFY
 
 
 # Minetown variant 2

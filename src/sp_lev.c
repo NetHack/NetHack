@@ -3440,20 +3440,21 @@ line_dist_coord(x1,y1, x2,y2, x3,y3)
 {
     long px = x2-x1;
     long py = y2-y1;
+    long s = px*px + py*py;
+    long x, y, dx, dy, dist = 0;
+    float u = 0;
 
     if (x1 == x2 && y1 == y2) return isqrt(dist2(x1,y1, x3,y3));
 
-    long s = px*px + py*py;
-    float u = ((x3 - x1) * px + (y3 - y1) * py) / (float)s;
-
+    u = ((x3 - x1) * px + (y3 - y1) * py) / (float)s;
     if (u > 1) u = 1;
     else if (u < 0) u = 0;
 
-    long x = x1 + u * px;
-    long y = y1 + u * py;
-    long dx = x - x3;
-    long dy = y - y3;
-    long dist = isqrt(dx*dx + dy*dy);
+    x = x1 + u * px;
+    y = y1 + u * py;
+    dx = x - x3;
+    dy = y - y3;
+    dist = isqrt(dx*dx + dy*dy);
 
     return dist;
 }

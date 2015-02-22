@@ -1,26 +1,20 @@
-# $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
-# $Date:2002/01/22 22:54:54 $  $Revision: 1.2 $
-#YACC   = byacc.exe
-#LEX	= flex.exe
-#YTABC   = y_tab.c
-#YTABH   = y_tab.h
-#LEXYYC  = lexyy.c
+# Uncomment as appropriate for your form of YACC/LEX.
+#
+#YACC = yacc.exe
+#YACC = byacc.exe
+YACC = bison.exe -y
+#
+#LEX = lex.exe
+LEX = flex.exe
 
-!IF "$(YACC)"!=""
-@echo Yacc-alike set to $(YACC)
-@echo YTABC set to $(YTABC)
-@echo YTABH set to $(YTABH)
-!ENDIF
-
-!IF "$(LEX)"!=""
-@echo Lex-alike set to $(LEX)
-@echo LEXYYC set to $(LEXYYC)
-!ENDIF
-
+# these won't have an impact unless YACC/LEX are defined
+YTABC = y.tab.c
+YTABH = y.tab.h
+LEXYYC = lex.yy.c
 
 default: all
 
-all: ..\util\lev_yacc.c ..\util\lev_lex.c
+all: tools ..\util\lev_yacc.c ..\util\lev_lex.c
 
 rebuild: clean all
 
@@ -29,15 +23,29 @@ clean:
 	-del ..\util\lev_yacc.c
 	-del ..\include\lev_comp.h
 
+tools:
+!IFDEF YACC
+	@echo Yacc-alike set to $(YACC)
+	@echo YTABC set to $(YTABC)
+	@echo YTABH set to $(YTABH)
+!ENDIF
+
+!IFDEF LEX
+	@echo Lex-alike set to $(LEX)
+	@echo LEXYYC set to $(LEXYYC)
+!ENDIF
+
 #==========================================
 # Level Compiler Stuff
 #==========================================
+
 ..\util\lev_yacc.c ..\include\lev_comp.h: ..\util\lev_comp.y
-!IF "$(YACC)"==""
+!IFNDEF YACC
 	   @echo Using pre-built lev_yacc.c and lev_comp.h
 	   @copy ..\sys\share\lev_yacc.c ..\util\lev_yacc.c
 	   @copy ..\sys\share\lev_comp.h ..\include\lev_comp.h
 !ELSE
+	   @echo Generating lev_yacc.c and lev_comp.h
 	   chdir ..\util
 	   $(YACC) -d lev_comp.y
 	   copy $(YTABC) $@
@@ -48,10 +56,11 @@ clean:
 !ENDIF
 
 ..\util\lev_lex.c: ..\util\lev_comp.l
-!IF "$(LEX)"==""
+!IFNDEF LEX
 	   @echo Using pre-built lev_lex.c
 	   @copy ..\sys\share\lev_lex.c $@
 !ELSE
+	   @echo Generating lev_lex.c
 	   chdir ..\util
 	   $(LEX) lev_comp.l
 	   copy $(LEXYYC) $@
