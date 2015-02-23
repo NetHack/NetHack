@@ -740,12 +740,12 @@ int attk;
 	while (1) {
 	    switch(rn2(5)) {
 	    case 0:
-		if (!uarmh || !rust_dmg(uarmh, xname(uarmh), hurt, FALSE, &youmonst))
+		if (!uarmh || !rust_dmg(uarmh, xname(uarmh), hurt, FALSE))
 			continue;
 		break;
 	    case 1:
 		if (uarmc) {
-		    (void)rust_dmg(uarmc, xname(uarmc), hurt, TRUE, &youmonst);
+		    (void)rust_dmg(uarmc, xname(uarmc), hurt, TRUE);
 		    break;
 		}
 		/* Note the difference between break and continue;
@@ -754,20 +754,20 @@ int attk;
 		 * something else did.
 		 */
 		if (uarm)
-		    (void)rust_dmg(uarm, xname(uarm), hurt, TRUE, &youmonst);
+		    (void)rust_dmg(uarm, xname(uarm), hurt, TRUE);
 		else if (uarmu)
-		    (void)rust_dmg(uarmu, xname(uarmu), hurt, TRUE, &youmonst);
+		    (void)rust_dmg(uarmu, xname(uarmu), hurt, TRUE);
 		break;
 	    case 2:
-		if (!uarms || !rust_dmg(uarms, xname(uarms), hurt, FALSE, &youmonst))
+		if (!uarms || !rust_dmg(uarms, xname(uarms), hurt, FALSE))
 		    continue;
 		break;
 	    case 3:
-		if (!uarmg || !rust_dmg(uarmg, xname(uarmg), hurt, FALSE, &youmonst))
+		if (!uarmg || !rust_dmg(uarmg, xname(uarmg), hurt, FALSE))
 		    continue;
 		break;
 	    case 4:
-		if (!uarmf || !rust_dmg(uarmf, xname(uarmf), hurt, FALSE, &youmonst))
+		if (!uarmf || !rust_dmg(uarmf, xname(uarmf), hurt, FALSE))
 		    continue;
 		break;
 	    }
