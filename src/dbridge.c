@@ -42,9 +42,11 @@ int x,y;
 
     if (!isok(x,y)) return FALSE;
     ltyp = levl[x][y].typ;
-    if (ltyp == POOL || ltyp == MOAT || ltyp == WATER) return TRUE;
-    if (ltyp == DRAWBRIDGE_UP &&
-	(levl[x][y].drawbridgemask & DB_UNDER) == DB_MOAT) return TRUE;
+    /* The ltyp == MOAT is not redundant with is_moat, because the
+     * Juiblex level does not have moats, although it has MOATs. There
+     * is probably a better way to express this. */
+    if (ltyp == POOL || ltyp == MOAT || ltyp == WATER || is_moat(x, y))
+        return TRUE;
     return FALSE;
 }
 
@@ -83,6 +85,21 @@ int x,y;
     if (ltyp == ICE
 	|| (ltyp == DRAWBRIDGE_UP
 	    && (levl[x][y].drawbridgemask & DB_UNDER) == DB_ICE)) return TRUE;
+    return FALSE;
+}
+
+boolean
+is_moat(x,y)
+int x, y;
+{
+    schar ltyp;
+
+    if (!isok(x, y)) return FALSE;
+    ltyp = levl[x][y].typ;
+    if (!Is_juiblex_level(&u.uz) &&
+        (ltyp == MOAT || (ltyp == DRAWBRIDGE_UP &&
+         (levl[x][y].drawbridgemask & DB_UNDER) == DB_MOAT)))
+        return TRUE;
     return FALSE;
 }
 

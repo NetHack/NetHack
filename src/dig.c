@@ -486,16 +486,15 @@ boolean fill_if_any;	/* force filling if it exists at all */
 
     for (x1 = lo_x; x1 <= hi_x; x1++)
 	for (y1 = lo_y; y1 <= hi_y; y1++)
-	    if (levl[x1][y1].typ == POOL)
-		pool_cnt++;
-	    else if (levl[x1][y1].typ == MOAT ||
-		    (levl[x1][y1].typ == DRAWBRIDGE_UP &&
-			(levl[x1][y1].drawbridgemask & DB_UNDER) == DB_MOAT))
-		moat_cnt++;
-	    else if (levl[x1][y1].typ == LAVAPOOL ||
-		    (levl[x1][y1].typ == DRAWBRIDGE_UP &&
-			(levl[x1][y1].drawbridgemask & DB_UNDER) == DB_LAVA))
-		lava_cnt++;
+            if (is_moat(x1, y1))
+                moat_cnt++;
+            else if (is_pool(x1, y1))
+                /* This must come after is_moat since moats are pools
+                 * but not vice-versa. */
+                pool_cnt++;
+            else if (is_lava(x1, y1))
+                lava_cnt++;
+
     if (!fill_if_any) pool_cnt /= 3;		/* not as much liquid as the others */
 
     if ((lava_cnt > moat_cnt + pool_cnt && rn2(lava_cnt + 1)) ||
