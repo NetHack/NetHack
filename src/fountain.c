@@ -136,7 +136,7 @@ genericptr_t poolcnt;
 	levl[x][y].typ = POOL;
 	/* No kelp! */
 	del_engr_at(x, y);
-	water_damage(&level.objects[x][y], FALSE, TRUE);
+	water_damage_chain(level.objects[x][y], TRUE);
 
 	if ((mtmp = m_at(x, y)) != 0)
 		(void) minliquid(mtmp);

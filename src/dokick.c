@@ -983,7 +983,7 @@ dokick()
 		    if(!rn2(3)) goto ouch;
 		    /* make metal boots rust */
 		    if(uarmf && rn2(3))
-			if (!rust_dmg(uarmf, "metal boots", 1, FALSE)) {
+			if (!water_damage(uarmf, "metal boots", TRUE)) {
 				Your("boots get wet.");
 				/* could cause short-lived fumbling here */
 			}

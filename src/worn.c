@@ -583,11 +583,28 @@ which_armor(mon, flag)
 struct monst *mon;
 long flag;
 {
-	register struct obj *obj;
+        if (mon == &youmonst) {
+            switch (flag) {
+                case W_ARM: return uarm;
+                case W_ARMC: return uarmc;
+                case W_ARMH: return uarmh;
+                case W_ARMS: return uarms;
+                case W_ARMG: return uarmg;
+                case W_ARMF: return uarmf;
+#ifdef TOURIST
+                case W_ARMU: return uarmu;
+#endif
+                default:
+                             impossible("bad flag in which_armor");
+                             return 0;
+            }
+        } else {
+            register struct obj *obj;
 
-	for(obj = mon->minvent; obj; obj = obj->nobj)
-		if (obj->owornmask & flag) return obj;
-	return((struct obj *)0);
+            for(obj = mon->minvent; obj; obj = obj->nobj)
+                    if (obj->owornmask & flag) return obj;
+            return((struct obj *)0);
+        }
 }
 
 /* remove an item of armor and then drop it */

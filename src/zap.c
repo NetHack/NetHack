@@ -3396,7 +3396,7 @@ struct obj **ootmp;	/* to return worn armor for caller to disintegrate */
 		}
 		tmp = d(nd,6);
 		if (!rn2(6)) (void) erode_obj(MON_WEP(mon), 3, TRUE, FALSE);
-		if (!rn2(6)) erode_armor(mon, TRUE);
+		if (!rn2(6)) erode_armor(mon, ERODE_CORRODE);
 		break;
 	}
 	if (sho_shieldeff) shieldeff(mon->mx, mon->my);
@@ -3525,7 +3525,7 @@ xchar sx, sy;
 		(void) erode_obj(uwep, 3, TRUE, FALSE);
 	    if (u.twoweap && !rn2(3))
 		(void) erode_obj(uswapwep, 3, TRUE, FALSE);
-	    if (!rn2(6)) erode_armor(&youmonst, TRUE);
+	    if (!rn2(6)) erode_armor(&youmonst, ERODE_CORRODE);
 	    break;
 	}
 
