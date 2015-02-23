@@ -861,6 +861,7 @@ fix used-up magic trap trying to hit steed.
 messages are now printed when objects on the ground are eroded
 object erosion now always identifies rust/rot/fire/corrodeproof objects
 grease protects from all types of erosion
+all sources of erosion now affect objects the same way
 
 
 Platform- and/or Interface-Specific Fixes

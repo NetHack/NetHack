@@ -1937,20 +1937,6 @@ struct monst *victim;
 	return(otmph);
 }
 
-/* erode some arbitrary armor worn by the victim */
-void
-erode_armor(victim, acid_dmg)
-struct monst *victim;
-boolean acid_dmg;
-{
-	struct obj *otmph = some_armor(victim);
-
-	if (otmph && (otmph != uarmf)) {
-	    (void) erode_obj(otmph, acid_dmg ? 3 : 1, FALSE, FALSE);
-	    if (carried(otmph)) update_inventory();
-	}
-}
-
 /* used for praying to check and fix levitation trouble */
 struct obj *
 stuck_ring(ring, otyp)

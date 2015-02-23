@@ -434,7 +434,6 @@ E int NDECL(doputon);
 E void NDECL(find_ac);
 E void NDECL(glibr);
 E struct obj *FDECL(some_armor,(struct monst *));
-E void FDECL(erode_armor, (struct monst *,BOOLEAN_P));
 E struct obj *FDECL(stuck_ring, (struct obj *,int));
 E struct obj *NDECL(unchanger);
 E void NDECL(reset_remarm);
@@ -2203,7 +2202,7 @@ E coord *FDECL(gettrack, (int,int));
 /* ### trap.c ### */
 
 E boolean FDECL(burnarmor,(struct monst *));
-E boolean FDECL(rust_dmg, (struct obj *,const char *,int,BOOLEAN_P));
+E boolean FDECL(rust_dmg, (struct obj *,const char *,int,BOOLEAN_P,BOOLEAN_P));
 E boolean FDECL(grease_protect, (struct obj *,const char *,struct monst *));
 E struct trap *FDECL(maketrap, (int,int,int));
 E void FDECL(fall_through, (BOOLEAN_P));
@@ -2223,7 +2222,8 @@ E void FDECL(fill_pit, (int,int));
 E int FDECL(float_down, (long, long));
 E void NDECL(climb_pit);
 E int FDECL(fire_damage, (struct obj *,BOOLEAN_P,BOOLEAN_P,XCHAR_P,XCHAR_P));
-E void FDECL(water_damage, (struct obj **,BOOLEAN_P,BOOLEAN_P));
+E int FDECL(water_damage, (struct obj *,const char*,BOOLEAN_P));
+E void FDECL(water_damage_chain, (struct obj *,BOOLEAN_P));
 E boolean NDECL(drown);
 E void FDECL(drain_en, (int));
 E int NDECL(dountrap);
@@ -2253,7 +2253,7 @@ E void NDECL(u_init);
 
 /* ### uhitm.c ### */
 
-E void FDECL(hurtmarmor,(struct monst *,int));
+E void FDECL(erode_armor,(struct monst *,int));
 E boolean FDECL(attack_checks, (struct monst *,struct obj *));
 E void FDECL(check_caitiff, (struct monst *));
 E int FDECL(find_roll_to_hit, (struct monst *,UCHAR_P,struct obj *,int *,int *));

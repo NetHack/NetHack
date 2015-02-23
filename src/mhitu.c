@@ -22,7 +22,6 @@ STATIC_DCL void FDECL(missmu,(struct monst *,BOOLEAN_P,struct attack *));
 STATIC_DCL void FDECL(mswings,(struct monst *,struct obj *));
 STATIC_DCL void FDECL(wildmiss, (struct monst *,struct attack *));
 
-STATIC_DCL void FDECL(hurtarmor,(int));
 STATIC_DCL void FDECL(hitmsg,(struct monst *,struct attack *));
 
 /* See comment in mhitm.c.  If we use this a lot it probably should be */
@@ -714,67 +713,6 @@ mattacku(mtmp)
 	return(0);
 }
 
-/*
- * helper function for some compilers that have trouble with hitmu
- */
-
-STATIC_OVL void
-hurtarmor(attk)
-int attk;
-{
-	int	hurt;
-
-	switch(attk) {
-	    /* 0 is burning, which we should never be called with */
-	    case AD_RUST: hurt = 1; break;
-	    case AD_CORR: hurt = 3; break;
-	    default: hurt = 2; break;
-	}
-
-	/* What the following code does: it keeps looping until it
-	 * finds a target for the rust monster.
-	 * Head, feet, etc... not covered by metal, or covered by
-	 * rusty metal, are not targets.  However, your body always
-	 * is, no matter what covers it.
-	 */
-	while (1) {
-	    switch(rn2(5)) {
-	    case 0:
-		if (!uarmh || !rust_dmg(uarmh, xname(uarmh), hurt, FALSE))
-			continue;
-		break;
-	    case 1:
-		if (uarmc) {
-		    (void)rust_dmg(uarmc, xname(uarmc), hurt, TRUE);
-		    break;
-		}
-		/* Note the difference between break and continue;
-		 * break means it was hit and didn't rust; continue
-		 * means it wasn't a target and though it didn't rust
-		 * something else did.
-		 */
-		if (uarm)
-		    (void)rust_dmg(uarm, xname(uarm), hurt, TRUE);
-		else if (uarmu)
-		    (void)rust_dmg(uarmu, xname(uarmu), hurt, TRUE);
-		break;
-	    case 2:
-		if (!uarms || !rust_dmg(uarms, xname(uarms), hurt, FALSE))
-		    continue;
-		break;
-	    case 3:
-		if (!uarmg || !rust_dmg(uarmg, xname(uarmg), hurt, FALSE))
-		    continue;
-		break;
-	    case 4:
-		if (!uarmf || !rust_dmg(uarmf, xname(uarmf), hurt, FALSE))
-		    continue;
-		break;
-	    }
-	    break; /* Out of while loop */
-	}
-}
-
 STATIC_OVL boolean
 diseasemu(mdat)
 struct permonst *mdat;
@@ -1336,12 +1274,12 @@ dopois:
 			rehumanize();
 			break;
 		}
-		hurtarmor(AD_RUST);
+		erode_armor(&youmonst, ERODE_RUST);
 		break;
 	    case AD_CORR:
 		hitmsg(mtmp, mattk);
 		if (mtmp->mcan) break;
-		hurtarmor(AD_CORR);
+		erode_armor(&youmonst, ERODE_CORRODE);
 		break;
 	    case AD_DCAY:
 		hitmsg(mtmp, mattk);
@@ -1353,7 +1291,7 @@ dopois:
 			rehumanize();
 			break;
 		}
-		hurtarmor(AD_DCAY);
+		erode_armor(&youmonst, ERODE_ROT);
 		break;
 	    case AD_HEAL:
 		/* a cancelled nurse is just an ordinary monster,
@@ -2503,7 +2441,7 @@ register struct attack *mattk;
 			tmp = 0;
 		    }
 		} else tmp = 0;
-		if (!rn2(30)) erode_armor(mtmp, TRUE);
+		if (!rn2(30)) erode_armor(mtmp, ERODE_CORRODE);
 		if (!rn2(6)) (void)erode_obj(MON_WEP(mtmp), 3, TRUE, FALSE);
 		goto assess_dmg;
 	    case AD_STON: /* cockatrice */

@@ -883,7 +883,7 @@ mdamagem(magr, mdef, mattk)
 		    pline("%s is covered in acid!", Monnam(mdef));
 		    pline("It burns %s!", mon_nam(mdef));
 		}
-		if (!rn2(30)) erode_armor(mdef, TRUE);
+		if (!rn2(30)) erode_armor(mdef, ERODE_CORRODE);
 		if (!rn2(6)) (void) erode_obj(MON_WEP(mdef), 3, TRUE, FALSE);
 		break;
 	    case AD_RUST:
@@ -897,13 +897,13 @@ mdamagem(magr, mdef, mattk)
 			return (MM_DEF_DIED | (grow_up(magr,mdef) ?
 							0 : MM_AGR_DIED));
 		}
-		hurtmarmor(mdef, AD_RUST);
+		erode_armor(mdef, ERODE_RUST);
 		mdef->mstrategy &= ~STRAT_WAITFORU;
 		tmp = 0;
 		break;
 	    case AD_CORR:
 		if (magr->mcan) break;
-		hurtmarmor(mdef, AD_CORR);
+		erode_armor(mdef, ERODE_CORRODE);
 		mdef->mstrategy &= ~STRAT_WAITFORU;
 		tmp = 0;
 		break;
@@ -919,7 +919,7 @@ mdamagem(magr, mdef, mattk)
 			return (MM_DEF_DIED | (grow_up(magr,mdef) ?
 							0 : MM_AGR_DIED));
 		}
-		hurtmarmor(mdef, AD_DCAY);
+		erode_armor(mdef, ERODE_CORRODE);
 		mdef->mstrategy &= ~STRAT_WAITFORU;
 		tmp = 0;
 		break;
@@ -1361,7 +1361,7 @@ int mdead;
 			tmp = 0;
 		    }
 		} else tmp = 0;
-		if (!rn2(30)) erode_armor(magr, TRUE);
+		if (!rn2(30)) erode_armor(magr, ERODE_CORRODE);
 		if (!rn2(6)) (void)erode_obj(MON_WEP(magr), 3, TRUE, FALSE);
 		goto assess_dmg;
 	    case AD_ENCH:	/* KMH -- remove enchantment (disenchanter) */

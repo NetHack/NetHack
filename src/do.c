@@ -201,8 +201,7 @@ const char *verb;
 		    map_background(x, y, 0);
 		    newsym(x, y);
 		}
-		water_damage(&obj, FALSE, FALSE);
-		if (!obj) return TRUE;
+		return water_damage(obj, NULL, FALSE) == 3;
 	} else if (u.ux == x && u.uy == y &&
 		(t = t_at(x,y)) != 0 && uteetering_at_seen_pit(t)) {
 		if (Blind && !Deaf)
