@@ -4017,7 +4017,7 @@ short exploding_wand_typ;
 	case ZT_COLD:
 	    if (is_pool(x,y) || is_lava(x,y)) {
 		boolean lava = is_lava(x,y);
-		const char *moat = waterbody_name(x, y);
+		boolean moat = is_moat(x,y);
 
 		if (lev->typ == WATER) {
 		    /* For now, don't let WATER freeze. */
@@ -4041,8 +4041,9 @@ short exploding_wand_typ;
 		    if (see_it) {
 			if(lava)
 			    Norep("The lava cools and solidifies.");
-			else if(strcmp(moat, "moat") == 0)
-			    Norep("The %s is bridged with ice!", moat);
+			else if(moat)
+			    Norep("The %s is bridged with ice!",
+                                    waterbody_name(x,y));
 			else
 			    Norep("The water freezes.");
 			newsym(x,y);
