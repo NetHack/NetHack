@@ -55,7 +55,7 @@ struct monst *victim;
     int mat_idx;
     
     if (!victim) return 0;
-#define burn_dmg(obj,descr) rust_dmg(obj, descr, 0, FALSE, victim)
+#define burn_dmg(obj,descr) rust_dmg(obj, descr, 0, FALSE)
     while (1) {
 	switch (rn2(5)) {
 	case 0:
@@ -107,20 +107,21 @@ struct monst *victim;
  * returned only for rustable items.
  */
 boolean
-rust_dmg(otmp, ostr, type, print, victim)
+rust_dmg(otmp, ostr, type, print)
 register struct obj *otmp;
 register const char *ostr;
 int type;
 boolean print;
-struct monst *victim;
 {
 	static NEARDATA const char * const action[] = { "smoulder", "rust", "rot", "corrode" };
 	static NEARDATA const char * const msg[] =  { "burnt", "rusted", "rotten", "corroded" };
 	boolean vulnerable = FALSE;
 	boolean grprot = FALSE;
 	boolean is_primary = TRUE;
-	boolean vismon = (victim != &youmonst) && canseemon(victim);
 	int erosion;
+        struct monst *victim =
+            carried(otmp) ? &youmonst : mcarried(otmp) ? otmp->ocarry : NULL;
+	boolean vismon = (victim != &youmonst) && canseemon(victim);
 
 	if (!otmp) return(FALSE);
 	switch(type) {
@@ -920,17 +921,17 @@ unsigned trflags;
 			pline("%s you on the %s!", A_gush_of_water_hits,
 				    body_part(HEAD));
 			(void) rust_dmg(uarmh, helm_simple_name(uarmh),
-					1, TRUE, &youmonst);
+					1, TRUE);
 			break;
 		    case 1:
 			pline("%s your left %s!", A_gush_of_water_hits,
 				    body_part(ARM));
-			if (rust_dmg(uarms, "shield", 1, TRUE, &youmonst))
+			if (rust_dmg(uarms, "shield", 1, TRUE))
 			    break;
 			if (u.twoweap || (uwep && bimanual(uwep)))
 			    (void) erode_obj(u.twoweap ? uswapwep : uwep,
 					     1, TRUE, FALSE);
-glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
+glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE);
 			/* Not "metal gauntlets" since it gets called
 			 * even if it's leather for the message
 			 */
@@ -948,11 +949,11 @@ glovecheck:		(void) rust_dmg(uarmg, "gauntlets", 1, TRUE, &youmonst);
 				(void) snuff_lit(otmp);
 			if (uarmc)
 			    (void) rust_dmg(uarmc, cloak_simple_name(uarmc),
-						1, TRUE, &youmonst);
+						1, TRUE);
 			else if (uarm)
-			    (void) rust_dmg(uarm, "armor", 1, TRUE, &youmonst);
+			    (void) rust_dmg(uarm, "armor", 1, TRUE);
 			else if (uarmu)
-			    (void) rust_dmg(uarmu, "shirt", 1, TRUE, &youmonst);
+			    (void) rust_dmg(uarmu, "shirt", 1, TRUE);
 		}
 		update_inventory();
 		break;
@@ -2051,20 +2052,20 @@ register struct monst *mtmp;
 				    mon_nam(mtmp), mbodypart(mtmp, HEAD));
 			    target = which_armor(mtmp, W_ARMH);
 			    (void) rust_dmg(target, helm_simple_name(target),
-					    1, TRUE, mtmp);
+					    1, TRUE);
 			    break;
 			case 1:
 			    if (in_sight)
 				pline("%s %s's left %s!", A_gush_of_water_hits,
 				    mon_nam(mtmp), mbodypart(mtmp, ARM));
 			    target = which_armor(mtmp, W_ARMS);
-			    if (rust_dmg(target, "shield", 1, TRUE, mtmp))
+			    if (rust_dmg(target, "shield", 1, TRUE))
 				break;
 			    target = MON_WEP(mtmp);
 			    if (target && bimanual(target))
 				(void) erode_obj(target, 1, TRUE, FALSE);
 glovecheck:		    target = which_armor(mtmp, W_ARMG);
-			    (void) rust_dmg(target, "gauntlets", 1, TRUE, mtmp);
+			    (void) rust_dmg(target, "gauntlets", 1, TRUE);
 			    break;
 			case 2:
 			    if (in_sight)
@@ -2083,11 +2084,11 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 			    if ((target = which_armor(mtmp, W_ARMC)) != 0)
 				(void) rust_dmg(target,
 						cloak_simple_name(target),
-						1, TRUE, mtmp);
+						1, TRUE);
 			    else if ((target = which_armor(mtmp, W_ARM)) != 0)
-				(void) rust_dmg(target, "armor", 1, TRUE, mtmp);
+				(void) rust_dmg(target, "armor", 1, TRUE);
 			    else if ((target = which_armor(mtmp, W_ARMU)) != 0)
-				(void) rust_dmg(target, "shirt", 1, TRUE, mtmp);
+				(void) rust_dmg(target, "shirt", 1, TRUE);
 			}
 
 			if (mptr == &mons[PM_IRON_GOLEM]) {
