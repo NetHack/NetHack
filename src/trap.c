@@ -3118,7 +3118,8 @@ boolean force;
 {
 	boolean loose_obj = (obj && obj->where == OBJ_FREE), exploded = FALSE;
 
-        (void) snuff_lit(obj);
+        if (snuff_lit(obj))
+            return 2;
 
         if(obj->otyp == CAN_OF_GREASE && obj->spe > 0) {
                 return 0;
