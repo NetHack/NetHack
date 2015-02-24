@@ -2446,22 +2446,22 @@ struct attack *mattk;		/* null means we find one internally */
 
 	case AD_FIRE:
 	    if(!rn2(6) && !mon->mcan) {
-		(void) erode_obj(obj, 0, FALSE, FALSE);
+		(void) rust_dmg(obj, 0, ERODE_BURN, FALSE, FALSE);
 	    }
 	    break;
 	case AD_ACID:
 	    if(!rn2(6)) {
-		(void) erode_obj(obj, 3, FALSE, FALSE);
+		(void) rust_dmg(obj, 0, ERODE_CORRODE, FALSE, FALSE);
 	    }
 	    break;
 	case AD_RUST:
 	    if(!mon->mcan) {
-		(void) erode_obj(obj, 1, FALSE, FALSE);
+		(void) rust_dmg(obj, 0, ERODE_RUST, FALSE, FALSE);
 	    }
 	    break;
 	case AD_CORR:
 	    if(!mon->mcan) {
-		(void) erode_obj(obj, 3, FALSE, FALSE);
+		(void) rust_dmg(obj, 0, ERODE_CORRODE, FALSE, FALSE);
 	    }
 	    break;
 	case AD_ENCH:

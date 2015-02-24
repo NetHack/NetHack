@@ -8,7 +8,6 @@
 
 STATIC_VAR NEARDATA struct obj *otmp;
 
-STATIC_DCL void FDECL(urustm, (struct monst *, struct obj *));
 STATIC_DCL boolean FDECL(u_slip_free, (struct monst *,struct attack *));
 STATIC_DCL int FDECL(passiveum, (struct permonst *,struct monst *,struct attack *));
 
@@ -920,7 +919,7 @@ hitmu(mtmp, mattk)
 			    if (cloneu())
 				You("divide as %s hits you!", mon_nam(mtmp));
 			}
-			urustm(mtmp, otmp);
+			rustm(&youmonst, otmp);
 		    } else if (mattk->aatyp != AT_TUCH || dmg != 0 ||
 				mtmp != u.ustuck)
 			hitmsg(mtmp, mattk);
@@ -2079,26 +2078,6 @@ register int n;
 	}
 }
 
-STATIC_OVL void
-urustm(mon, obj)
-register struct monst *mon;
-register struct obj *obj;
-{
-	int dmgtyp;
-
-	if (!mon || !obj) return; /* just in case */
-	/* AD_ACID is handled in passiveum */
-	if (dmgtype(youmonst.data, AD_CORR))
-	    dmgtyp = 3;
-	else if (dmgtype(youmonst.data, AD_RUST))
-	    dmgtyp = 1;
-	else if (dmgtype(youmonst.data, AD_FIRE))
-	    dmgtyp = 0;
-	else
-	    return;
-	(void) erode_obj(obj, dmgtyp, FALSE, FALSE);
-}
-
 int
 could_seduce(magr,mdef,mattk)
 struct monst *magr, *mdef;
@@ -2442,7 +2421,7 @@ register struct attack *mattk;
 		    }
 		} else tmp = 0;
 		if (!rn2(30)) erode_armor(mtmp, ERODE_CORRODE);
-		if (!rn2(6)) (void)erode_obj(MON_WEP(mtmp), 3, TRUE, FALSE);
+		if (!rn2(6)) acid_damage(MON_WEP(mtmp));
 		goto assess_dmg;
 	    case AD_STON: /* cockatrice */
 	    {

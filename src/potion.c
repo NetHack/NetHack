@@ -1931,7 +1931,7 @@ dodip()
 	}
 
 	if (potion->otyp == POT_ACID) {
-	    if (erode_obj(obj, 3, FALSE, TRUE))
+	    if (rust_dmg(obj, 0, ERODE_CORRODE, TRUE, FALSE))
 		goto poof;
 	}
 

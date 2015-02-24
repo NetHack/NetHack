@@ -859,9 +859,11 @@ if lava burns up the player's water walking boots, the player falls in
 the messages for lava burning items up are always printed
 fix used-up magic trap trying to hit steed.
 messages are now printed when objects on the ground are eroded
-object erosion now always identifies rust/rot/fire/corrodeproof objects
+object erosion now always identifies fooproof objects
 grease protects from all types of erosion
 all sources of erosion now affect objects the same way
+passive attacks no longer erode armor covered by other armor
+dipping a fooproof item into acid no longer forgets that it's fooproof
 
 
 Platform- and/or Interface-Specific Fixes

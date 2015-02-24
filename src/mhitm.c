@@ -16,7 +16,6 @@ static const char brief_feeling[] =
 	"have a %s feeling for a moment, then it passes.";
 
 STATIC_DCL char *FDECL(mon_nam_too, (char *,struct monst *,struct monst *));
-STATIC_DCL void FDECL(mrustm, (struct monst *, struct monst *, struct obj *));
 STATIC_DCL int FDECL(hitmm, (struct monst *,struct monst *,struct attack *));
 STATIC_DCL int FDECL(gazemm, (struct monst *,struct monst *,struct attack *));
 STATIC_DCL int FDECL(gulpmm, (struct monst *,struct monst *,struct attack *));
@@ -796,7 +795,7 @@ mdamagem(magr, mdef, mattk)
 					(grow_up(magr,mdef) ? 0 : MM_AGR_DIED));
 			}
 			if (tmp)
-				mrustm(magr, mdef, otmp);
+				rustm(mdef, otmp);
 		    }
 		} else if (pa == &mons[PM_PURPLE_WORM] &&
 			    pd == &mons[PM_SHRIEKER]) {
@@ -884,7 +883,7 @@ mdamagem(magr, mdef, mattk)
 		    pline("It burns %s!", mon_nam(mdef));
 		}
 		if (!rn2(30)) erode_armor(mdef, ERODE_CORRODE);
-		if (!rn2(6)) (void) erode_obj(MON_WEP(mdef), 3, TRUE, FALSE);
+		if (!rn2(6)) acid_damage(MON_WEP(mdef));
 		break;
 	    case AD_RUST:
 		if (magr->mcan) break;
@@ -1287,24 +1286,24 @@ struct monst *mon;
 	}
 }
 
-STATIC_OVL void
-mrustm(magr, mdef, obj)
-register struct monst *magr, *mdef;
+void
+rustm(mdef, obj)
+register struct monst *mdef;
 register struct obj *obj;
 {
 	int dmgtyp;
 
-	if (!magr || !mdef || !obj) return; /* just in case */
+	if (!mdef || !obj) return; /* just in case */
 	/* AD_ACID is handled in passivemm */
 	if (dmgtype(mdef->data, AD_CORR))
-	    dmgtyp = 3;
+	    dmgtyp = ERODE_CORRODE;
 	else if (dmgtype(mdef->data, AD_RUST))
-	    dmgtyp = 1;
+	    dmgtyp = ERODE_RUST;
 	else if (dmgtype(mdef->data, AD_FIRE))
-	    dmgtyp = 0;
+	    dmgtyp = ERODE_BURN;
 	else
 	    return;
-	(void) erode_obj(obj, dmgtyp, FALSE, FALSE);
+	(void) rust_dmg(obj, 0, dmgtyp, TRUE, TRUE);
 }
 
 STATIC_OVL void
@@ -1362,7 +1361,7 @@ int mdead;
 		    }
 		} else tmp = 0;
 		if (!rn2(30)) erode_armor(magr, ERODE_CORRODE);
-		if (!rn2(6)) (void)erode_obj(MON_WEP(magr), 3, TRUE, FALSE);
+		if (!rn2(6)) acid_damage(MON_WEP(magr));
 		goto assess_dmg;
 	    case AD_ENCH:	/* KMH -- remove enchantment (disenchanter) */
 		if (mhit && !mdef->mcan && otmp) {

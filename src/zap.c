@@ -3395,7 +3395,7 @@ struct obj **ootmp;	/* to return worn armor for caller to disintegrate */
 		    break;
 		}
 		tmp = d(nd,6);
-		if (!rn2(6)) (void) erode_obj(MON_WEP(mon), 3, TRUE, FALSE);
+		if (!rn2(6)) acid_damage(MON_WEP(mon));
 		if (!rn2(6)) erode_armor(mon, ERODE_CORRODE);
 		break;
 	}
@@ -3522,9 +3522,9 @@ xchar sx, sy;
 	    }
 	    /* using two weapons at once makes both of them more vulnerable */
 	    if (!rn2(u.twoweap ? 3 : 6))
-		(void) erode_obj(uwep, 3, TRUE, FALSE);
+		acid_damage(uwep);
 	    if (u.twoweap && !rn2(3))
-		(void) erode_obj(uswapwep, 3, TRUE, FALSE);
+		acid_damage(uswapwep);
 	    if (!rn2(6)) erode_armor(&youmonst, ERODE_CORRODE);
 	    break;
 	}
