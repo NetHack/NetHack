@@ -1303,7 +1303,7 @@ register struct obj *obj;
 	    dmgtyp = ERODE_BURN;
 	else
 	    return;
-	(void) rust_dmg(obj, 0, dmgtyp, TRUE, TRUE);
+	(void) erode_obj(obj, 0, dmgtyp, TRUE, TRUE);
 }
 
 STATIC_OVL void
