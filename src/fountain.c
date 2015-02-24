@@ -402,7 +402,7 @@ register struct obj *obj;
 		if(in_town(u.ux, u.uy))
 		    (void) angry_guards(FALSE);
 		return;
-	} else if (get_wet(obj)) {
+	} else if (water_damage(obj, NULL, TRUE)) {
 	    if (obj->otyp == POT_ACID) { /* Acid and water don't mix */
 		useup(obj);
 		return;

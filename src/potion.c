@@ -1088,7 +1088,7 @@ const char *objphrase;	/* "Your widget glows" or "Steed's saddle glows" */
     } else {
 	/* dipping into uncursed water; carried() check skips steed saddle */
 	if (carried(targobj)) {
-	    if (get_wet(targobj))
+	    if (water_damage(targobj, 0, TRUE))
 		res = TRUE;
 	}
     }
@@ -1626,98 +1626,6 @@ register struct obj *o1, *o2;
 	return 0;
 }
 
-
-boolean
-get_wet(obj)
-register struct obj *obj;
-/* returns TRUE if something happened (potion should be used up) */
-{
-	if (snuff_lit(obj)) return(TRUE);
-
-	if (obj->greased) {
-		grease_protect(obj,(char *)0,&youmonst);
-		return(FALSE);
-	}
-
-	/* (Rusting shop goods ought to be charged for.) */
-	switch (obj->oclass) {
-	    case POTION_CLASS:
-		if (obj->otyp == POT_WATER) return FALSE;
-		/* KMH -- Water into acid causes an explosion */
-		if (obj->otyp == POT_ACID) {
-			pline("It boils vigorously!");
-			You("are caught in the explosion!");
-			losehp(Maybe_Half_Phys(rnd(10)), "elementary chemistry",
-				KILLED_BY);
-			makeknown(obj->otyp);
-			update_inventory();
-			return (TRUE);
-		}
-		pline("%s%s.", Yobjnam2(obj,"dilute"),
-		      obj->odiluted ? " further" : "");
-		costly_alteration(obj, COST_DILUTE);
-		if (obj->odiluted) {
-			obj->odiluted = 0;
-			obj->blessed = FALSE;
-			obj->cursed = FALSE;
-			obj->otyp = POT_WATER;
-		} else
-			obj->odiluted++;
-		update_inventory();
-		return TRUE;
-	    case SCROLL_CLASS:
-		if (obj->otyp != SCR_BLANK_PAPER
-#ifdef MAIL
-		    && obj->otyp != SCR_MAIL
-#endif
-		    ) {
-			if (!Blind)
-			    pline_The("scroll%s %s.",
-				      plur(obj->quan), otense(obj, "fade"));
-			costly_alteration(obj, COST_ERASE);
-			obj->otyp = SCR_BLANK_PAPER;
-			obj->spe = 0;
-			update_inventory();
-			return TRUE;
-		} else break;
-	    case SPBOOK_CLASS:
-		if (obj->otyp != SPE_BLANK_PAPER) {
-
-			if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
-			    pline(
-		       "%s suddenly heats up; steam rises and it remains dry.",
-				  The(xname(obj)));
-			} else {
-			    if (!Blind)
-				pline_The("spellbook%s %s.",
-					  plur(obj->quan),
-					  otense(obj, "fade"));
-			    costly_alteration(obj, COST_ERASE);
-			    obj->otyp = SPE_BLANK_PAPER;
-			    update_inventory();
-			}
-			return TRUE;
-		}
-		break;
-	    case WEAPON_CLASS:
-	    /* Just "fall through" to generic rustprone check for now. */
-	    /* fall through */
-	    default:
-		if (!obj->oerodeproof && is_rustprone(obj) &&
-		    (obj->oeroded < MAX_ERODE) && !rn2(2)) {
-			pline("%s some%s.",
-			      Yobjnam2(obj, "rust"),
-			      obj->oeroded ? " more" : "what");
-			obj->oeroded++;
-			update_inventory();
-			return TRUE;
-		}
-		break;
-	}
-	pline("%s wet.", Yobjnam2(obj, "get"));
-	return FALSE;
-}
-
 int
 dodip()
 {
@@ -1756,7 +1664,7 @@ dodip()
 			rider_cant_reach(); /* not skilled enough to reach */
 		    } else {
 			if (obj->otyp == POT_ACID) obj->in_use = 1;
-			(void) get_wet(obj);
+			(void) water_damage(obj, 0, TRUE);
 			if (obj->in_use) useup(obj);
 		    }
 		    return 1;
