@@ -55,7 +55,7 @@ struct monst *victim;
     int mat_idx;
     
     if (!victim) return 0;
-#define burn_dmg(obj,descr) rust_dmg(obj, descr, ERODE_BURN, TRUE, FALSE)
+#define burn_dmg(obj,descr) erode_obj(obj, descr, ERODE_BURN, TRUE, FALSE)
     while (1) {
 	switch (rn2(5)) {
 	case 0:
@@ -109,7 +109,7 @@ struct monst *victim;
  * "print", if set, means to print a message even if no change occurs.
  */
 boolean
-rust_dmg(otmp, ostr, type, check_grease, print)
+erode_obj(otmp, ostr, type, check_grease, print)
 register struct obj *otmp;
 register const char *ostr;
 int type;
@@ -151,7 +151,7 @@ boolean print;
 		    is_primary = FALSE;
 		    break;
                 default:
-                    impossible("Invalid erosion type in rust_dmg");
+                    impossible("Invalid erosion type in erode_obj");
                     return FALSE;
 	}
 	erosion = is_primary ? otmp->oeroded : otmp->oeroded2;
@@ -3101,7 +3101,7 @@ struct obj *obj;
         obj->spe = 0;
         obj->dknown = 0;
     } else
-        rust_dmg(obj, NULL, ERODE_CORRODE, TRUE, TRUE);
+        erode_obj(obj, NULL, ERODE_CORRODE, TRUE, TRUE);
 }
 
 /* returns:
@@ -3195,7 +3195,7 @@ boolean force;
                         return 2;
                 }
         } else {
-                return rust_dmg(obj, ostr, ERODE_RUST, FALSE, FALSE) ? 2 : 0;
+                return erode_obj(obj, ostr, ERODE_RUST, FALSE, FALSE) ? 2 : 0;
         }
         return 0;
 }

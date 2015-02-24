@@ -47,34 +47,34 @@ int hurt;
 	    switch(rn2(5)) {
 	    case 0:
 		target = which_armor(mdef, W_ARMH);
-		if (!target || !rust_dmg(target, xname(target), hurt, TRUE, FALSE))
+		if (!target || !erode_obj(target, xname(target), hurt, TRUE, FALSE))
 		    continue;
 		break;
 	    case 1:
 		target = which_armor(mdef, W_ARMC);
 		if (target) {
-		    (void)rust_dmg(target, xname(target), hurt, TRUE, TRUE);
+		    (void)erode_obj(target, xname(target), hurt, TRUE, TRUE);
 		    break;
 		}
 		if ((target = which_armor(mdef, W_ARM)) != (struct obj *)0) {
-		    (void)rust_dmg(target, xname(target), hurt, TRUE, TRUE);
+		    (void)erode_obj(target, xname(target), hurt, TRUE, TRUE);
 		} else if ((target = which_armor(mdef, W_ARMU)) != (struct obj *)0) {
-		    (void)rust_dmg(target, xname(target), hurt, TRUE, TRUE);
+		    (void)erode_obj(target, xname(target), hurt, TRUE, TRUE);
 		}
 		break;
 	    case 2:
 		target = which_armor(mdef, W_ARMS);
-		if (!target || !rust_dmg(target, xname(target), hurt, TRUE, FALSE))
+		if (!target || !erode_obj(target, xname(target), hurt, TRUE, FALSE))
 		    continue;
 		break;
 	    case 3:
 		target = which_armor(mdef, W_ARMG);
-		if (!target || !rust_dmg(target, xname(target), hurt, TRUE, FALSE))
+		if (!target || !erode_obj(target, xname(target), hurt, TRUE, FALSE))
 		    continue;
 		break;
 	    case 4:
 		target = which_armor(mdef, W_ARMF);
-		if (!target || !rust_dmg(target, xname(target), hurt, TRUE, FALSE))
+		if (!target || !erode_obj(target, xname(target), hurt, TRUE, FALSE))
 		    continue;
 		break;
 	    }
@@ -2222,7 +2222,7 @@ boolean wep_was_destroyed;
 	    if(mhit && !mon->mcan) {
 		if (aatyp == AT_KICK) {
 		    if (uarmf && !rn2(6))
-			(void)rust_dmg(uarmf, xname(uarmf), ERODE_BURN, TRUE, TRUE);
+			(void)erode_obj(uarmf, xname(uarmf), ERODE_BURN, TRUE, TRUE);
 		} else if (aatyp == AT_WEAP || aatyp == AT_CLAW ||
 			   aatyp == AT_MAGC || aatyp == AT_TUCH)
 		    passive_obj(mon, (struct obj*)0, &(ptr->mattk[i]));
@@ -2242,7 +2242,7 @@ boolean wep_was_destroyed;
 	    if (mhit) {
 		if (aatyp == AT_KICK) {
 		    if (uarmf && !rn2(6))
-			(void)rust_dmg(uarmf, xname(uarmf), ERODE_CORRODE, TRUE, TRUE);
+			(void)erode_obj(uarmf, xname(uarmf), ERODE_CORRODE, TRUE, TRUE);
 		} else if (aatyp == AT_WEAP || aatyp == AT_CLAW ||
 			   aatyp == AT_MAGC || aatyp == AT_TUCH)
 		    passive_obj(mon, (struct obj*)0, &(ptr->mattk[i]));
@@ -2275,7 +2275,7 @@ boolean wep_was_destroyed;
 	    if(mhit && !mon->mcan) {
 		if (aatyp == AT_KICK) {
 		    if (uarmf)
-			(void)rust_dmg(uarmf, xname(uarmf), ERODE_RUST, TRUE, TRUE);
+			(void)erode_obj(uarmf, xname(uarmf), ERODE_RUST, TRUE, TRUE);
 		} else if (aatyp == AT_WEAP || aatyp == AT_CLAW ||
 			   aatyp == AT_MAGC || aatyp == AT_TUCH)
 		    passive_obj(mon, (struct obj*)0, &(ptr->mattk[i]));
@@ -2285,7 +2285,7 @@ boolean wep_was_destroyed;
 	    if(mhit && !mon->mcan) {
 		if (aatyp == AT_KICK) {
 		    if (uarmf)
-			(void)rust_dmg(uarmf, xname(uarmf), ERODE_CORRODE, TRUE, TRUE);
+			(void)erode_obj(uarmf, xname(uarmf), ERODE_CORRODE, TRUE, TRUE);
 		} else if (aatyp == AT_WEAP || aatyp == AT_CLAW ||
 			   aatyp == AT_MAGC || aatyp == AT_TUCH)
 		    passive_obj(mon, (struct obj*)0, &(ptr->mattk[i]));
@@ -2446,22 +2446,22 @@ struct attack *mattk;		/* null means we find one internally */
 
 	case AD_FIRE:
 	    if(!rn2(6) && !mon->mcan) {
-		(void) rust_dmg(obj, 0, ERODE_BURN, FALSE, FALSE);
+		(void) erode_obj(obj, 0, ERODE_BURN, FALSE, FALSE);
 	    }
 	    break;
 	case AD_ACID:
 	    if(!rn2(6)) {
-		(void) rust_dmg(obj, 0, ERODE_CORRODE, FALSE, FALSE);
+		(void) erode_obj(obj, 0, ERODE_CORRODE, FALSE, FALSE);
 	    }
 	    break;
 	case AD_RUST:
 	    if(!mon->mcan) {
-		(void) rust_dmg(obj, 0, ERODE_RUST, FALSE, FALSE);
+		(void) erode_obj(obj, 0, ERODE_RUST, FALSE, FALSE);
 	    }
 	    break;
 	case AD_CORR:
 	    if(!mon->mcan) {
-		(void) rust_dmg(obj, 0, ERODE_CORRODE, FALSE, FALSE);
+		(void) erode_obj(obj, 0, ERODE_CORRODE, FALSE, FALSE);
 	    }
 	    break;
 	case AD_ENCH:
