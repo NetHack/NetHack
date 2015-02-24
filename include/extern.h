@@ -1070,6 +1070,7 @@ E int FDECL(sleep_monst, (struct monst *,int,int));
 E void FDECL(slept_monst, (struct monst *));
 E void FDECL(xdrainenergym, (struct monst *,BOOLEAN_P));
 E long FDECL(attk_protection, (int));
+E void FDECL(rustm, (struct monst *,struct obj *));
 
 /* ### mhitu.c ### */
 
@@ -2222,6 +2223,7 @@ E void FDECL(fill_pit, (int,int));
 E int FDECL(float_down, (long, long));
 E void NDECL(climb_pit);
 E int FDECL(fire_damage, (struct obj *,BOOLEAN_P,BOOLEAN_P,XCHAR_P,XCHAR_P));
+E void acid_damage(struct obj *);
 E int FDECL(water_damage, (struct obj *,const char*,BOOLEAN_P));
 E void FDECL(water_damage_chain, (struct obj *,BOOLEAN_P));
 E boolean NDECL(drown);
@@ -2516,7 +2518,6 @@ E void NDECL(uwepgone);
 E void NDECL(uswapwepgone);
 E void NDECL(uqwepgone);
 E void NDECL(untwoweapon);
-E boolean FDECL(erode_obj, (struct obj *,int,BOOLEAN_P,BOOLEAN_P));
 E int FDECL(chwepon, (struct obj *,int));
 E int FDECL(welded, (struct obj *));
 E void FDECL(weldmsg, (struct obj *));

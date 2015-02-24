@@ -103,6 +103,8 @@ struct monst *victim;
 
 /* Generic erode-item function.  Returns TRUE if any change in state
  * occurred, or if grease protected the item.
+ * "ostr", if non-null, is an alternate string to print instead of the
+ *   object's name.
  * "check_grease", if FALSE, means that grease is not checked for
  * "print", if set, means to print a message even if no change occurs.
  */
@@ -165,8 +167,8 @@ boolean print;
 		if (victim == &youmonst)
 		    Your("%s %s not affected.", ostr, vtense(ostr, "are"));
 		else if (vismon)
-		    pline("%s's %s %s not affected.", Monnam(victim), ostr,
-			  vtense(ostr, "are"));
+		    pline("%s %s %s not affected.", s_suffix(Monnam(victim)),
+                          ostr, vtense(ostr, "are"));
 	    }
             return FALSE;
         } else if (otmp->oerodeproof || (otmp->blessed && !rnl(4))) {
@@ -175,8 +177,9 @@ boolean print;
 		    pline("Somehow, your %s %s not affected.",
 		          ostr, vtense(ostr, "are"));
 		else if (vismon)
-		    pline("Somehow, %s's %s %s not affected.",
-		          mon_nam(victim), ostr, vtense(ostr, "are"));
+		    pline("Somehow, %s %s %s not affected.",
+		          s_suffix(mon_nam(victim)), ostr,
+                          vtense(ostr, "are"));
                 else if (visobj)
                     pline("Somehow, the %s %s not affected.", ostr,
                           vtense(ostr, "are"));
@@ -214,8 +217,8 @@ boolean print;
 			 vtense(ostr, Blind ? "feel" : "look"),
 			 msg[type]);
 		else if (vismon)
-		    pline("%s's %s %s completely %s.",
-			  Monnam(victim), ostr,
+		    pline("%s %s %s completely %s.",
+			  s_suffix(Monnam(victim)), ostr,
 			  vtense(ostr, "look"), msg[type]);
                 else if (visobj)
                     pline("The %s %s completely %s.", ostr,
@@ -952,8 +955,8 @@ unsigned trflags;
 			if (water_damage(uarms, "shield", TRUE))
 			    break;
 			if (u.twoweap || (uwep && bimanual(uwep)))
-			    (void) erode_obj(u.twoweap ? uswapwep : uwep,
-					     1, TRUE, FALSE);
+			    (void) water_damage(u.twoweap ? uswapwep : uwep, 0,
+					        TRUE);
 glovecheck:		(void) water_damage(uarmg, "gauntlets", TRUE);
 			/* Not "metal gauntlets" since it gets called
 			 * even if it's leather for the message
@@ -962,7 +965,7 @@ glovecheck:		(void) water_damage(uarmg, "gauntlets", TRUE);
 		    case 2:
 			pline("%s your right %s!", A_gush_of_water_hits,
 				    body_part(ARM));
-			(void) erode_obj(uwep, 1, TRUE, FALSE);
+			(void) water_damage(uwep, 0, TRUE);
 			goto glovecheck;
 		    default:
 			pline("%s you!", A_gush_of_water_hits);
@@ -2098,7 +2101,7 @@ register struct monst *mtmp;
 				break;
 			    target = MON_WEP(mtmp);
 			    if (target && bimanual(target))
-				(void) erode_obj(target, 1, TRUE, FALSE);
+				(void) water_damage(target, 0, TRUE);
 glovecheck:		    target = which_armor(mtmp, W_ARMG);
 			    (void) water_damage(target, "gauntlets", TRUE);
 			    break;
@@ -2106,7 +2109,7 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 			    if (in_sight)
 				pline("%s %s's right %s!", A_gush_of_water_hits,
 				    mon_nam(mtmp), mbodypart(mtmp, ARM));
-			    (void) erode_obj(MON_WEP(mtmp), 1, TRUE, FALSE);
+			    (void) water_damage(MON_WEP(mtmp), 0, TRUE);
 			    goto glovecheck;
 			default:
 			    if (in_sight)
@@ -3067,6 +3070,38 @@ xchar x, y;
     if (retval && !in_sight)
 	You("smell smoke.");
     return retval;
+}
+
+void
+acid_damage(obj)
+struct obj *obj;
+{
+    /* Scrolls but not spellbooks can be erased by acid. */
+    struct monst *victim =
+        carried(obj) ? &youmonst : mcarried(obj) ? obj->ocarry : NULL;
+    boolean vismon = victim && (victim != &youmonst) && canseemon(victim);
+
+    if (obj->greased)
+        grease_protect(obj, NULL, victim);
+    else if (obj->oclass == SCROLL_CLASS && obj->otyp != SCR_BLANK_PAPER) {
+        if (obj->otyp != SCR_BLANK_PAPER
+#ifdef MAIL
+                && obj->otyp != SCR_MAIL
+#endif
+           ) {
+            if (!Blind) {
+                if (victim == &youmonst)
+                    pline("Your %s.", aobjnam(obj, "fade"));
+                else if (vismon)
+                    pline("%s %s.", s_suffix(Monnam(victim)),
+                          aobjnam(obj, "fade"));
+            }
+        }
+        obj->otyp = SCR_BLANK_PAPER;
+        obj->spe = 0;
+        obj->dknown = 0;
+    } else
+        rust_dmg(obj, NULL, ERODE_CORRODE, TRUE, TRUE);
 }
 
 /* returns:
