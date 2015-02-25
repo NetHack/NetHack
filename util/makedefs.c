@@ -6,7 +6,6 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #define MAKEDEFS_C	/* use to conditionally include file sections */
-/* #define DEBUG */	/* uncomment for debugging info */
 
 #include "config.h"
 #include "permonst.h"
@@ -385,6 +384,7 @@ getfp(template, tag, mode)
 	return rv;
 }
 
+static boolean debug = FALSE;
 
 static FILE *inputfp;
 static FILE *outputfp;
@@ -430,6 +430,15 @@ do_ext_makedefs(int argc, char **argv){
 			if(argv[0]) strcpy(delim, argv[0]);
 			Fprintf(stdout, "%s", version_string(buf, delim));
 			exit(EXIT_SUCCESS);
+		}
+		IS_OPTION("debug"){
+		    debug = TRUE;
+		    CONTINUE;
+		}
+		IS_OPTION("make"){
+		    CONSUME;
+		    do_makedefs(argv[0]);
+		    exit(EXIT_SUCCESS);
 		}
 		IS_OPTION("input"){
 			CONSUME;
@@ -2246,36 +2255,30 @@ put_qt_hdrs()
 	/*
 	 *	The main header record.
 	 */
-#ifdef DEBUG
-	Fprintf(stderr, "%ld: header info.\n", ftell(ofp));
-#endif
+	if (debug) Fprintf(stderr, "%ld: header info.\n", ftell(ofp));
 	(void) fwrite((genericptr_t)&(qt_hdr.n_hdr), sizeof(int), 1, ofp);
 	(void) fwrite((genericptr_t)&(qt_hdr.id[0][0]), sizeof(char)*LEN_HDR,
 							qt_hdr.n_hdr, ofp);
 	(void) fwrite((genericptr_t)&(qt_hdr.offset[0]), sizeof(long),
 							qt_hdr.n_hdr, ofp);
-#ifdef DEBUG
-	for(i = 0; i < qt_hdr.n_hdr; i++)
+	if (debug) {
+	    for(i = 0; i < qt_hdr.n_hdr; i++)
 		Fprintf(stderr, "%s @ %ld, ", qt_hdr.id[i], qt_hdr.offset[i]);
-
-	Fprintf(stderr, "\n");
-#endif
+	    Fprintf(stderr, "\n");
+	}
 
 	/*
 	 *	The individual class headers.
 	 */
 	for(i = 0; i < qt_hdr.n_hdr; i++) {
 
-#ifdef DEBUG
-	    Fprintf(stderr, "%ld: %s header info.\n", ftell(ofp),
-		    qt_hdr.id[i]);
-#endif
+	    if (debug) Fprintf(stderr, "%ld: %s header info.\n", ftell(ofp),
+			       qt_hdr.id[i]);
 	    (void) fwrite((genericptr_t)&(msg_hdr[i].n_msg), sizeof(int),
 							1, ofp);
 	    (void) fwrite((genericptr_t)&(msg_hdr[i].qt_msg[0]),
 			    sizeof(struct qtmsg), msg_hdr[i].n_msg, ofp);
-#ifdef DEBUG
-	    { int j;
+	    if (debug) { int j;
 	      for(j = 0; j < msg_hdr[i].n_msg; j++) {
 		Fprintf(stderr, "msg %d @ %ld (%ld)",
 			msg_hdr[i].qt_msg[j].msgnum,
@@ -2287,7 +2290,6 @@ put_qt_hdrs()
 		Fprintf(stderr, "\n");
 	      }
 	    }
-#endif
 	}
 }
 
@@ -2340,9 +2342,7 @@ do_questtxt()
 		    /* we have summary text; replace raw %E record with it */
 		    Strcpy(in_line, summary_p);	/* (guaranteed to fit) */
 		} else if(qt_comment(in_line)) continue;
-#ifdef DEBUG
-		Fprintf(stderr, "%ld: %s", ftell(stdout), in_line);
-#endif
+		if (debug) Fprintf(stderr, "%ld: %s", ftell(stdout), in_line);
 		(void) fputs(xcrypt(in_line), ofp);
 	}
 	Fclose(ifp);
