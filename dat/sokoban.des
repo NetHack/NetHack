@@ -35,7 +35,7 @@
 
 ### Bottom (first) level of Sokoban ###
 MAZE:"soko4-1",' '
-FLAGS:noteleport,hardfloor,premapped
+FLAGS:noteleport,hardfloor,premapped,solidify
 GEOMETRY:center,center
 #12345678901234567890123456789012345678901234567890
 MAP
@@ -98,7 +98,7 @@ OBJECT:'/',random
 
 
 MAZE:"soko4-2",' '
-FLAGS:noteleport,hardfloor,premapped
+FLAGS:noteleport,hardfloor,premapped,solidify
 GEOMETRY:center,center
 #12345678901234567890123456789012345678901234567890
 MAP
@@ -163,7 +163,7 @@ OBJECT:'/',random
 
 ### Second level ###
 MAZE:"soko3-1",' '
-FLAGS:noteleport,premapped
+FLAGS:noteleport,premapped,solidify
 GEOMETRY:center,center
 #12345678901234567890123456789012345678901234567890
 MAP
@@ -239,7 +239,7 @@ OBJECT:'/',random
 
 
 MAZE:"soko3-2",' '
-FLAGS:noteleport,premapped
+FLAGS:noteleport,premapped,solidify
 GEOMETRY:center,center
 #12345678901234567890123456789012345678901234567890
 MAP
@@ -308,7 +308,7 @@ OBJECT:'/',random
 
 ### Third level ###
 MAZE:"soko2-1",' '
-FLAGS:noteleport,premapped
+FLAGS:noteleport,premapped,solidify
 GEOMETRY:center,center
 #12345678901234567890123456789012345678901234567890
 MAP
@@ -373,7 +373,7 @@ OBJECT:'/',random
 
 
 MAZE:"soko2-2",' '
-FLAGS:noteleport,premapped
+FLAGS:noteleport,premapped,solidify
 GEOMETRY:center,center
 #12345678901234567890123456789012345678901234567890
 MAP
@@ -440,7 +440,7 @@ OBJECT:'/',random
 
 ### Top (last) level of Sokoban ###
 MAZE:"soko1-1",' '
-FLAGS:noteleport,premapped
+FLAGS:noteleport,premapped,solidify
 GEOMETRY:center,center
 #12345678901234567890123456789012345678901234567890
 MAP
@@ -538,7 +538,7 @@ ENGRAVING:$place[0],burn,"Elbereth"
 
 
 MAZE:"soko1-2",' '
-FLAGS:noteleport,premapped
+FLAGS:noteleport,premapped,solidify
 GEOMETRY:center,center
 #12345678901234567890123456789012345678901234567890
 MAP

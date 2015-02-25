@@ -11,7 +11,7 @@
 #	and receive your quest assignment.
 #
 MAZE: "Val-strt",' '
-FLAGS: noteleport,hardfloor
+FLAGS: noteleport,hardfloor,icedpools
 GEOMETRY:center,center
 MAP
 IIIIIIPPPIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
@@ -90,7 +90,7 @@ MONSTER: ('H',"fire giant"),(10,16),hostile
 #
 
 MAZE: "Val-loca",' '
-FLAGS: hardfloor
+FLAGS: hardfloor,icedpools
 INIT_MAP: mines, '.', 'I', true, true, lit, false
 GEOMETRY:center,center
 MAP
@@ -176,6 +176,7 @@ MONSTER:'H',random,hostile
 #
 
 MAZE: "Val-goal", 'L'
+FLAGS: icedpools
 INIT_MAP: mines, '.', 'L', true, true, lit, false
 GEOMETRY:center,center
 MAP
@@ -266,6 +267,7 @@ MONSTER:'H',random,hostile
 #
 
 MAZE: "Val-fila" , 'I'
+FLAGS: icedpools
 INIT_MAP: mines, '.', 'I', true, true, lit, false
 NOMAP
 #
@@ -299,6 +301,7 @@ TRAP: random, random
 TRAP: random, random
 
 MAZE: "Val-filb" , 'L'
+FLAGS: icedpools
 INIT_MAP: mines, '.', 'L', true, true, lit, false
 NOMAP
 #

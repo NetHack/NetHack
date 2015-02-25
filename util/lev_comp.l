@@ -293,6 +293,8 @@ mazelevel	{ savetoken(yytext); yylval.i=MAZELEVEL; return FLAG_TYPE; }
 premapped	{ savetoken(yytext); yylval.i=PREMAPPED; return FLAG_TYPE; }
 shroud		{ savetoken(yytext); yylval.i=SHROUD; return FLAG_TYPE; }
 graveyard	{ savetoken(yytext); yylval.i=GRAVEYARD; return FLAG_TYPE; }
+icedpools	{ savetoken(yytext); yylval.i=ICEDPOOLS; return FLAG_TYPE; }
+solidify	{ savetoken(yytext); yylval.i=SOLIDIFY; return FLAG_TYPE; }
 [0-9]+d[0-9]+	{ char *p = strchr(yytext, 'd');
 		  savetoken(yytext);
 		  if (p) {

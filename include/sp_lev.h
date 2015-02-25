@@ -28,7 +28,8 @@
 #define PREMAPPED       0x00000040L  /* premapped level & sokoban rules */
 #define SHROUD          0x00000080L
 #define GRAVEYARD       0x00000100L
-
+#define ICEDPOOLS       0x00000200L  /* for ice locations: ICED_POOL vs ICED_MOAT */
+#define SOLIDIFY	0x00000400L  /* outer areas are nondiggable & nonpasswall */
 
 /* different level layout initializers */
 #define LVLINIT_NONE		0
@@ -278,8 +279,8 @@ struct sp_frame {
 struct sp_coder {
     struct splevstack *stack;
     struct sp_frame *frame;
-    /*int allow_flips;*/
     int premapped;
+    boolean solidify;
     struct mkroom *croom;
     struct mkroom *tmproomlist[MAX_NESTED_ROOMS+1];
     boolean failed_room[MAX_NESTED_ROOMS+1];
@@ -331,7 +332,7 @@ typedef struct {
 	char	fg, bg;
 	boolean smoothed, joined;
 	xchar	lit, walled;
-	boolean icedpools;	/* for ice locations: ICED_POOL vs ICED_MOAT */
+	boolean icedpools;
 } lev_init;
 
 typedef struct {

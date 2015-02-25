@@ -60,7 +60,9 @@ extern struct engr *head_engr;
 
 extern int min_rx, max_rx, min_ry, max_ry; /* from mkmap.c */
 
+/* positions touched by level elements explicitly defined in the des-file */
 static char SpLev_Map[COLNO][ROWNO];
+
 static aligntyp	ralign[3] = { AM_CHAOTIC, AM_NEUTRAL, AM_LAWFUL };
 static NEARDATA xchar xstart, ystart;
 static NEARDATA char xsize, ysize;
@@ -78,6 +80,8 @@ struct mkroom * FDECL(build_room, (room *, struct mkroom *));
 char *lev_message = 0;
 lev_region *lregions = 0;
 int num_lregions = 0;
+boolean splev_init_present = FALSE;
+boolean icedpools = FALSE;
 
 struct obj *container_obj[MAX_CONTAINMENT];
 int container_idx = 0;
@@ -85,6 +89,16 @@ int container_idx = 0;
 struct monst *invent_carrying_monster = NULL;
 
 #define SPLEV_STACK_RESERVE 128
+
+void
+solidify_map()
+{
+    xchar x, y;
+    for (x = 0; x < COLNO; x++)
+	for (y = 0; y < ROWNO; y++)
+	    if (IS_STWALL(levl[x][y].typ) && !SpLev_Map[x][y])
+		levl[x][y].wall_info |= (W_NONDIGGABLE|W_NONPASSWALL);
+}
 
 void
 splev_stack_init(st)
@@ -502,7 +516,7 @@ remove_boundary_syms()
     if (has_bounds) {
 	for(x = 0; x < x_maze_max; x++)
 	    for(y = 0; y < y_maze_max; y++)
-		if ((levl[x][y].typ == CROSSWALL) && !SpLev_Map[x][y])
+		if ((levl[x][y].typ == CROSSWALL) && SpLev_Map[x][y])
 		    levl[x][y].typ = ROOM;
     }
 }
@@ -1504,7 +1518,7 @@ struct mkroom	*croom;
 	if (o->corpsenm != NON_PM) {
 	    if (o->corpsenm == NON_PM - 1)
 		set_corpsenm(otmp, rndmonnum());
-	    else set_corpsenm(otmp, o->corpsenm); 
+	    else set_corpsenm(otmp, o->corpsenm);
 	}
 	/* set_corpsenm() took care of egg hatch and corpse timers */
 
@@ -1603,11 +1617,14 @@ struct mkroom	*croom;
 	    for (wastyp = otmp->corpsenm; i < 1000 ; i++, wastyp = rndmonnum()) {
 		/* makemon without rndmonst() might create a group */
 		was = makemon(&mons[wastyp], 0, 0, MM_NOCOUNTBIRTH);
-		if (was && !resists_ston(was)) {
+		if (was) {
+		    if (!resists_ston(was)) {
 	    		(void) propagate(wastyp, TRUE, FALSE);
 			break;
+		    }
+		    mongone(was);
+		    was = NULL;
 		}
-		mongone(was);
 	    }
 	    if (was) {
 		set_corpsenm(otmp, wastyp);
@@ -2166,7 +2183,7 @@ fill_empty_maze()
 
     for(x = 2; x < x_maze_max; x++)
 	for(y = 0; y < y_maze_max; y++)
-	    if(!SpLev_Map[x][y]) mapcount--;
+	    if(SpLev_Map[x][y]) mapcount--;
 
     if ((mapcount > (int) (mapcountmax / 10))) {
 	    mapfact = (int) ((mapcount * 100L) / mapcountmax);
@@ -2321,6 +2338,7 @@ lev_init *linit;
     case LVLINIT_MINES:
 	if (linit->lit == -1) linit->lit = rn2(2);
 	if (linit->filling > -1) lvlfill_solid(linit->filling, 0);
+	linit->icedpools = icedpools;
 	mkmap(linit);
 	break;
     }
@@ -2796,6 +2814,8 @@ spo_level_flags(coder)
     if (flags & PREMAPPED)    coder->premapped = TRUE;
     if (flags & SHROUD)       level.flags.hero_memory = 0;
     if (flags & GRAVEYARD)    level.flags.graveyard = 1;
+    if (flags & ICEDPOOLS)    icedpools = TRUE;
+    if (flags & SOLIDIFY)     coder->solidify = TRUE;
 
     opvar_free(flagdata);
 }
@@ -2815,6 +2835,8 @@ spo_initlevel(coder)
 	!OV_pop_i(walled) ||
 	!OV_pop_i(filling) ||
 	!OV_pop_i(init_style)) return;
+
+    splev_init_present = TRUE;
 
     init_lev.init_style = OV_i(init_style);
     init_lev.fg = OV_i(fg);
@@ -2978,16 +3000,10 @@ spo_stair(coder)
     if (!OV_pop_i(up) ||
 	!OV_pop_c(coord)) return;
 
-    if (coder->croom) {
-	get_location_coord(&x, &y, DRY, coder->croom, OV_i(coord));
-	mkstairs(x,y,(char)OV_i(up), coder->croom);
-	SpLev_Map[x][y] = 1;
-    } else {
-	get_location_coord(&x, &y, DRY, coder->croom, OV_i(coord));
-	if ((badtrap = t_at(x,y)) != 0) deltrap(badtrap);
-	mkstairs(x, y, (char)OV_i(up), coder->croom);
-	SpLev_Map[x][y] = 1;
-    }
+    get_location_coord(&x, &y, DRY, coder->croom, OV_i(coord));
+    if ((badtrap = t_at(x,y)) != 0) deltrap(badtrap);
+    mkstairs(x, y, (char)OV_i(up), coder->croom);
+    SpLev_Map[x][y] = 1;
 
     opvar_free(coord);
     opvar_free(up);
@@ -3647,7 +3663,7 @@ sel_set_door(dx,dy,arg)
 	    typ = D_CLOSED;
     }
     levl[x][y].doormask = typ;
-    /*SpLev_Map[x][y] = 1;*/
+    SpLev_Map[x][y] = 1;
 
     /* Now the complicated part, list it with each subroom */
     /* The dog move and mail daemon routines use this */
@@ -4166,7 +4182,7 @@ redo_maploc:
 	break;
     case 1:
 	switch((int) halign) {
-	case LEFT:	    xstart = 3;					break;
+	case LEFT:      xstart = splev_init_present ? 1 : 3;	break;
 	case H_LEFT:    xstart = 2+((x_maze_max-2-xsize)/4);	break;
 	case CENTER:    xstart = 2+((x_maze_max-2-xsize)/2);	break;
 	case H_RIGHT:   xstart = 2+((x_maze_max-2-xsize)*3/4);	break;
@@ -4220,6 +4236,7 @@ redo_maploc:
 		levl[x][y].horizontal = 0;
 		levl[x][y].roomno = 0;
 		levl[x][y].edge = 0;
+		SpLev_Map[x][y] = 1;
 		/*
 		 *  Set secret doors to closed (why not trapped too?).  Set
 		 *  the horizontal bit.
@@ -4240,6 +4257,8 @@ redo_maploc:
 		    levl[x][y].horizontal = 1;
 		else if(levl[x][y].typ == LAVAPOOL)
 		    levl[x][y].lit = 1;
+		else if (splev_init_present && levl[x][y].typ == ICE)
+		    levl[x][y].icedpool = icedpools ? ICED_POOL : ICED_MOAT;
 	    }
 	if (coder->lvl_is_joined)
 	    remove_rooms(xstart, ystart, xstart+xsize, ystart+ysize);
@@ -4488,11 +4507,14 @@ sp_lev *lvl;
     coder->frame = frame_new(0);
     coder->stack = NULL;
     coder->premapped = FALSE;
-    /*coder->allow_flips = 3;*/
+    coder->solidify = FALSE;
     coder->croom = NULL;
     coder->n_subroom = 1;
     coder->exit_script = FALSE;
     coder->lvl_is_joined = 0;
+
+    splev_init_present = FALSE;
+    icedpools = FALSE;
 
     if (wizard) {
 	char *met = nh_getenv("SPCODER_MAX_RUNTIME");
@@ -5044,6 +5066,7 @@ next_opcode:
     count_features();
 
     if (coder->premapped) sokoban_detect();
+    if (coder->solidify) solidify_map();
 
     if (coder->frame) {
 	struct sp_frame *tmpframe;
