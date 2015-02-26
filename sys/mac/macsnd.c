@@ -1,4 +1,5 @@
-/* NetHack 3.5	macsnd.c	$Date$  $Revision$ */
+/* NetHack 3.5	macsnd.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	macsnd.c	$Date: 2009/05/06 10:49:14 $  $Revision: 1.6 $ */
 /*	SCCS Id: @(#)macsnd.c	3.5	1992/11/28	*/
 /* 	Copyright (c) 1992 by Jon Watte */
 /* NetHack may be freely redistributed.  See license for details. */

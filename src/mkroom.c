@@ -1,4 +1,5 @@
-/* NetHack 3.5	mkroom.c	$Date$  $Revision$ */
+/* NetHack 3.5	mkroom.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mkroom.c	$Date: 2012/01/10 17:47:19 $  $Revision: 1.15 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

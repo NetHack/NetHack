@@ -1,4 +1,5 @@
-/* NetHack 3.5	pray.c	$Date$  $Revision$ */
+/* NetHack 3.5	pray.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	pray.c	$Date: 2012/05/07 01:44:38 $  $Revision: 1.62 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 

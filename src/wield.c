@@ -1,4 +1,5 @@
-/* NetHack 3.5	wield.c	$Date$  $Revision$ */
+/* NetHack 3.5	wield.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	wield.c	$Date: 2009/05/06 10:48:14 $  $Revision: 1.31 $ */
 /*	SCCS Id: @(#)wield.c	3.5	2009/01/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */

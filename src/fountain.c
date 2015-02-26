@@ -1,4 +1,5 @@
-/* NetHack 3.5	fountain.c	$Date$  $Revision$ */
+/* NetHack 3.5	fountain.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	fountain.c	$Date: 2011/08/20 00:22:20 $  $Revision: 1.32 $ */
 /*	Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
 

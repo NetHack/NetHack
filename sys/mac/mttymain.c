@@ -1,4 +1,5 @@
-/* NetHack 3.5	mttymain.c	$Date$  $Revision$ */
+/* NetHack 3.5	mttymain.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mttymain.c	$Date: 2009/05/06 10:49:20 $  $Revision: 1.8 $ */
 /*	SCCS Id: @(#)mttymain.c	3.5	1993/02/26			*/
 /* Copyright (c) Jon W{tte, 1993					*/
 /* NetHack may be freely redistributed.  See license for details.	*/

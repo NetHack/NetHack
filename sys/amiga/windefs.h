@@ -1,4 +1,5 @@
-/* NetHack 3.5	windefs.h	$Date$  $Revision$ */
+/* NetHack 3.5	windefs.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	windefs.h	$Date: 2009/05/06 10:48:34 $  $Revision: 1.3 $ */
 /*    SCCS Id: @(#)windefs.h    3.5    1993/04/02 */
 /* Copyright (c) Gregg Wonderly, Naperville, Illinois,  1991,1992,1993. */
 /* NetHack may be freely redistributed.  See license for details. */

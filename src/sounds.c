@@ -1,4 +1,5 @@
-/* NetHack 3.5	sounds.c	$Date$  $Revision$ */
+/* NetHack 3.5	sounds.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	sounds.c	$Date: 2012/03/10 02:49:08 $  $Revision: 1.39 $ */
 /*	Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 

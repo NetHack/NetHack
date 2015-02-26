@@ -1,4 +1,5 @@
-/* NetHack 3.5	engrave.c	$Date$  $Revision$ */
+/* NetHack 3.5	engrave.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	engrave.c	$Date: 2012/12/20 01:48:36 $  $Revision: 1.39 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

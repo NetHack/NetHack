@@ -1,4 +1,5 @@
-/* NetHack 3.5	pctiles.h	$Date$  $Revision$ */
+/* NetHack 3.5	pctiles.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	pctiles.h	$Date: 2009/05/06 10:49:40 $  $Revision: 1.4 $ */
 /*   SCCS Id: @(#)pctiles.h   3.5     1994/04/04                        */
 /*   Copyright (c) NetHack PC Development Team 1993, 1994             */
 /*   NetHack may be freely redistributed.  See license for details.   */

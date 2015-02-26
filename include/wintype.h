@@ -1,4 +1,5 @@
-/* NetHack 3.5	wintype.h	$Date$  $Revision$ */
+/* NetHack 3.5	wintype.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	wintype.h	$Date: 2009/05/06 10:45:19 $  $Revision: 1.10 $ */
 /*	SCCS Id: @(#)wintype.h	3.5	2006/07/08	*/
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */

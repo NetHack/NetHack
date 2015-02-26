@@ -1,4 +1,5 @@
-/* NetHack 3.5	worm.c	$Date$  $Revision$ */
+/* NetHack 3.5	worm.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	worm.c	$Date: 2009/05/06 10:48:17 $  $Revision: 1.12 $ */
 /*	SCCS Id: @(#)worm.c	3.5	2009/03/05	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */

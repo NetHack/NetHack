@@ -1,4 +1,5 @@
-/* NetHack 3.5	monmove.c	$Date$  $Revision$ */
+/* NetHack 3.5	monmove.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	monmove.c	$Date: 2011/08/30 22:13:27 $  $Revision: 1.46 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

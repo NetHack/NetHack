@@ -1,4 +1,5 @@
-# NetHack 3.5	bootstrp.mak	$Date$  $Revision$
+# NetHack 3.5	bootstrp.mak	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+# NetHack 3.5	bootstrp.mak	$Date: 2012/01/10 17:47:33 $  $Revision: 1.10 $
 #       Copyright (c) Michael Allison
 #
 #       NetHack Windows CE bootstrap file for MS Visual C++ V6.x and 

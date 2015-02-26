@@ -1,4 +1,5 @@
-/* NetHack 3.5	getline.c	$Date$  $Revision$ */
+/* NetHack 3.5	getline.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	getline.c	$Date: 2011/12/11 01:54:56 $  $Revision: 1.18 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

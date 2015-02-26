@@ -1,4 +1,5 @@
-/* NetHack 3.5	amisnd.c	$Date$  $Revision$ */
+/* NetHack 3.5	amisnd.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	amisnd.c	$Date: 2009/05/06 10:48:30 $  $Revision: 1.3 $ */
 /*	SCCS Id: @(#)amisnd.c	3.5	2000/01/12*/
 /* 	Copyright (c) 1992, 1993, 1995 by Gregg Wonderly */
 /* NetHack may be freely redistributed.  See license for details. */

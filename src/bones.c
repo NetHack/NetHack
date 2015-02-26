@@ -1,4 +1,5 @@
-/* NetHack 3.5	bones.c	$Date$  $Revision$ */
+/* NetHack 3.5	bones.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	bones.c	$Date: 2012/02/16 02:40:24 $  $Revision: 1.39 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985,1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 

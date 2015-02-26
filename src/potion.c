@@ -1,4 +1,5 @@
-/* NetHack 3.5	potion.c	$Date$  $Revision$ */
+/* NetHack 3.5	potion.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	potion.c	$Date: 2013/11/05 00:57:55 $  $Revision: 1.91 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

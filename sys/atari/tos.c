@@ -1,4 +1,5 @@
-/* NetHack 3.5	tos.c	$Date$  $Revision$ */
+/* NetHack 3.5	tos.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	tos.c	$Date: 2009/05/06 10:48:51 $  $Revision: 1.3 $ */
 /*	SCCS Id: @(#)tos.c	3.5	1990/14/08
 /* NetHack may be freely redistributed.  See license for details. */
 

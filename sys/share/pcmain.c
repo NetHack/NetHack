@@ -1,4 +1,5 @@
-/* NetHack 3.5	pcmain.c	$Date$  $Revision$ */
+/* NetHack 3.5	pcmain.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	pcmain.c	$Date: 2012/01/20 03:41:31 $  $Revision: 1.48 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

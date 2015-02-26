@@ -1,4 +1,5 @@
-/* NetHack 3.5	amiwind.c	$Date$  $Revision$ */
+/* NetHack 3.5	amiwind.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	amiwind.c	$Date: 2009/05/06 10:48:30 $  $Revision: 1.5 $ */
 /*    SCCS Id: @(#)amiwind.c     3.5    2000/01/12
 /*    Copyright (c) Olaf Seibert (KosmoSoft), 1989, 1992	  */
 /*    Copyright (c) Kenneth Lorber, Bethesda, Maryland 1993,1996  */

@@ -1,4 +1,5 @@
-/* NetHack 3.5	extern.h	$Date$  $Revision$ */
+/* NetHack 3.5	extern.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	extern.h	$Date: 2013/11/05 00:57:53 $  $Revision: 1.380 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

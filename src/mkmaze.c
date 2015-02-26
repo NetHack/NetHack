@@ -1,4 +1,5 @@
-/* NetHack 3.5	mkmaze.c	$Date$  $Revision$ */
+/* NetHack 3.5	mkmaze.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mkmaze.c	$Date: 2009/05/06 10:46:56 $  $Revision: 1.18 $ */
 /*	SCCS Id: @(#)mkmaze.c	3.5	2007/06/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */

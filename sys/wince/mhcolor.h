@@ -1,4 +1,5 @@
-/* NetHack 3.5	mhcolor.h	$Date$  $Revision$ */
+/* NetHack 3.5	mhcolor.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mhcolor.h	$Date: 2009/05/06 10:52:04 $  $Revision: 1.3 $ */
 /*	SCCS Id: @(#)mhcolor.h	3.5	2005/01/23	*/
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */

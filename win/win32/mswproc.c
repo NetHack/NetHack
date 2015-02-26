@@ -1,4 +1,5 @@
-/* NetHack 3.5	mswproc.c	$Date$  $Revision$ */
+/* NetHack 3.5	mswproc.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mswproc.c	$Date: 2012/01/24 04:26:33 $  $Revision: 1.71 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 

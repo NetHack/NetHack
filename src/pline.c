@@ -1,4 +1,5 @@
-/* NetHack 3.5	pline.c	$Date$  $Revision$ */
+/* NetHack 3.5	pline.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	pline.c	$Date: 2013/02/09 01:33:37 $  $Revision: 1.30 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

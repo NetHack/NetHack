@@ -1,5 +1,6 @@
 #	NetHack Makefile (VMS) - top level for making & installing everything.
-#	NetHack 3.5	Makefile.top	$Date$	$Revision$
+#	NetHack 3.5	Makefile.top	$NHDT-Date$	$NHDT-Branch$:$NHDT-Revision$
+#	NetHack 3.5	Makefile.top	$Date: 2011/05/23 03:27:10 $	$Revision: 1.6 $
 
 #  Copy this file to <top>Makefile.; edit the appropriate values for
 #  GAMEDIR ("playground" location) and GAMEOWNER (UIC or identifier

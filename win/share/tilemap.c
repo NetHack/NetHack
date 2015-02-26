@@ -1,4 +1,5 @@
-/* NetHack 3.5	tilemap.c	$Date$  $Revision$ */
+/* NetHack 3.5	tilemap.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	tilemap.c	$Date: 2009/05/06 10:59:02 $  $Revision: 1.7 $ */
 /*	SCCS Id: @(#)tilemap.c	3.5	2000/06/04	*/
 /* NetHack may be freely redistributed.  See license for details. */
 

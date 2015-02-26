@@ -1,4 +1,5 @@
-/* NetHack 3.5	winmap.c	$Date$  $Revision$ */
+/* NetHack 3.5	winmap.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	winmap.c	$Date: 2009/05/06 10:55:49 $  $Revision: 1.14 $ */
 /*	SCCS Id: @(#)winmap.c	3.5	2005/11/12	*/
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */

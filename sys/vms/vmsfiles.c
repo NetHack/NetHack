@@ -1,4 +1,5 @@
-/* NetHack 3.5	vmsfiles.c	$Date$  $Revision$ */
+/* NetHack 3.5	vmsfiles.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	vmsfiles.c	$Date: 2009/05/06 10:51:25 $  $Revision: 1.5 $ */
 /*	SCCS Id: @(#)vmsfiles.c 3.5	2007/10/27	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */

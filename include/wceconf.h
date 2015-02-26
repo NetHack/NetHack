@@ -1,4 +1,5 @@
-/* NetHack 3.5	wceconf.h	$Date$  $Revision$ */
+/* NetHack 3.5	wceconf.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	wceconf.h	$Date: 2009/10/22 02:59:14 $  $Revision: 1.12 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 

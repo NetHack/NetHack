@@ -1,4 +1,5 @@
-/* NetHack 3.5	spell.h	$Date$  $Revision$ */
+/* NetHack 3.5	spell.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	spell.h	$Date: 2009/05/06 10:45:09 $  $Revision: 1.5 $ */
 /*	SCCS Id: @(#)spell.h	3.5	2006/02/11	*/
 /* Copyright 1986, M. Stephenson				  */
 /* NetHack may be freely redistributed.  See license for details. */

@@ -1,4 +1,5 @@
-/* NetHack 3.5	skills.h	$Date$  $Revision$ */
+/* NetHack 3.5	skills.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	skills.h	$Date: 2009/05/06 10:45:05 $  $Revision: 1.5 $ */
 /*	SCCS Id: @(#)skills.h	3.5	2006/12/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
