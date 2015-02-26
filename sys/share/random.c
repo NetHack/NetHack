@@ -32,6 +32,9 @@
  *	- remove useless variable `j' from srandom()
  *	- cast result of pointer subtraction to long since ptrdiff_t could
  *	be bigger than that and trigger warnings when assigning to long
+ *
+ * $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+ * $Date: 2007/12/23 00:59:25 $  $Revision: 1.2 $
  */
 
 #include "hack.h"

@@ -1,5 +1,8 @@
 $ ! vms/install.com -- set up nethack 'playground'
 $ !
+$ ! $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+$ ! $Date: 2006/09/23 04:45:56 $  $Revision: 1.4 $
+$ !
 $ ! Use vmsbuild.com to create nethack.exe, makedefs, and lev_comp *first*.
 $ !
 $ ! Edit this file to define gamedir & gameuic, or else invoke it with two

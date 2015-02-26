@@ -7,6 +7,10 @@
 * Bieber, Dez. 1994					 *
 * -> Programmcode						 *
 \****************************/
+/*
+ * $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+ * $Date: 2002/01/05 21:06:00 $  $Revision: 1.1 $
+ */
 
 #include <errno.h>
 #include <stdlib.h>
