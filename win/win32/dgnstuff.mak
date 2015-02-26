@@ -1,3 +1,6 @@
+# $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+# $Date: 2002/01/22 22:54:54 $  $Revision: 1.3 $
+
 #Set all of these or none of them
 #YACC   = byacc.exe
 #LEX	= flex.exe
