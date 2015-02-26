@@ -1,3 +1,5 @@
+# $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+# $Date:2002/01/22 22:54:54 $  $Revision: 1.2 $
 #YACC   = byacc.exe
 #LEX	= flex.exe
 #YTABC   = y_tab.c

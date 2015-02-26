@@ -1,5 +1,7 @@
 #
 # Nethack configuration file.
+# $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+# $Date: 2007/12/13 20:17:11 $  $Revision: 1.2 $
 #
 # Naming this file $(HOME)/.nethackrc (for UNIX) or setting the environment
 # variable NETHACKOPTIONS to point to its full path name elsewhere tells
