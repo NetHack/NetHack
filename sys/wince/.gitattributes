@@ -1,0 +1,3 @@
+*.ce filter=NHtext merge=NHsubst
+*.mak filter=NHtext merge=NHsubst
+*.bat filter=NHtext merge=NHsubst

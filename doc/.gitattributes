@@ -1,0 +1,5 @@
+*.mn	filter=NHtext merge=NHsubst
+*.6	filter=NHtext merge=NHsubst
+fixes.*	filter=NHtext merge=NHsubst
+window.doc filter=NHtext merge=NHsubst
+

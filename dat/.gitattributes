@@ -1,0 +1,3 @@
+*.def	filter=NHtext merge=NHsubst
+*.des	filter=NHtext merge=NHsubst
+*.txt	filter=NHtext merge=NHsubst
