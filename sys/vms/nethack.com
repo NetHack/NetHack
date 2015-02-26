@@ -1,6 +1,9 @@
 $! NetHack.Com -- sample command procedure for invoking NetHack  9-JAN-1993
 $ v = 'f$verify(0)'
 $!
+$! $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+$! $Date: 2002/01/05 21:06:00 $  $Revision: 1.1 $
+$!
 $!    Possible command line arguments include
 $!	"-uConan-B"	!play a barbarian named Conan
 $!	"-u" "Merlin-W" !play a wizard named Merlin (slight variant of above)

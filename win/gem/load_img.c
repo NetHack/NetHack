@@ -1,3 +1,7 @@
+/*
+ * $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+ * $Date: 2002/03/20 03:45:03 $  $Revision: 1.2 $
+ */
 #define __TCC_COMPAT__
 #include <stdio.h>
 #include <string.h>

@@ -1,4 +1,8 @@
 /* gr_rect.h */
+/*
+ * $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+ * $Date: 2002/03/20 03:50:49 $  $Revision: 1.1 $
+ */
 #include <e_gem.h>
 /********** structs **********/
 typedef struct {
