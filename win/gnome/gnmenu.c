@@ -1,4 +1,5 @@
-/* NetHack 3.5	gnmenu.c	$Date$  $Revision$ */
+/* NetHack 3.5	gnmenu.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	gnmenu.c	$Date: 2009/05/06 10:57:36 $  $Revision: 1.6 $ */
 /*	SCCS Id: @(#)gnmenu.c	3.5	2000/07/16	*/
 /* Copyright (C) 1998 by Erik Andersen <andersee@debian.org> */
 /* NetHack may be freely redistributed.  See license for details. */

@@ -1,4 +1,5 @@
-/* NetHack 3.5	light.c	$Date$  $Revision$ */
+/* NetHack 3.5	light.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	light.c	$Date: 2009/05/06 10:46:38 $  $Revision: 1.15 $ */
 /*	SCCS Id: @(#)light.c	3.5	2009/01/20	*/
 /* Copyright (c) Dean Luick, 1994					*/
 /* NetHack may be freely redistributed.  See license for details.	*/

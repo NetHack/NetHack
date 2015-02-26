@@ -1,5 +1,7 @@
-/* NetHack 3.5	nttty.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)nttty.c	3.5	$Date$   */
+/* NetHack 3.5	nttty.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	nttty.c	$Date: 2009/05/06 10:53:34 $  $Revision: 1.54 $ */
+/*	SCCS Id: @(#)nttty.c	3.5	$NHDT-Date$   */
+/*	SCCS Id: @(#)nttty.c	3.5	$Date: 2009/05/06 10:53:34 $   */
 /* Copyright (c) NetHack PC Development Team 1993    */
 /* NetHack may be freely redistributed.  See license for details. */
 

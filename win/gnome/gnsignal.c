@@ -1,4 +1,5 @@
-/* NetHack 3.5	gnsignal.c	$Date$  $Revision$ */
+/* NetHack 3.5	gnsignal.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	gnsignal.c	$Date: 2009/05/06 10:57:45 $  $Revision: 1.7 $ */
 /*	SCCS Id: @(#)gnsignal.c	3.5	2005/11/19	*/
 /* Copyright (C) 1998 by Anthony Taylor <tonyt@ptialaska.net> */
 /* NetHack may be freely redistributed.  See license for details. */

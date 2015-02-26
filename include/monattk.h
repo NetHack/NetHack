@@ -1,4 +1,5 @@
-/* NetHack 3.5	monattk.h	$Date$  $Revision$ */
+/* NetHack 3.5	monattk.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	monattk.h	$Date: 2009/05/06 10:44:54 $  $Revision: 1.5 $ */
 /*	SCCS Id: @(#)monattk.h	3.5	2002/03/24	*/
 /* NetHack may be freely redistributed.  See license for details. */
 /* Copyright 1988, M. Stephenson */

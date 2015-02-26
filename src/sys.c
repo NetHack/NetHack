@@ -1,4 +1,5 @@
-/* NetHack 3.5	sys.c	$Date$  $Revision$ */
+/* NetHack 3.5	sys.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	sys.c	$Date: 2012/03/10 02:22:07 $  $Revision: 1.12 $ */
 /* Copyright (c) Kenneth Lorber, Kensington, Maryland, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
 

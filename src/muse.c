@@ -1,4 +1,5 @@
-/* NetHack 3.5	muse.c	$Date$  $Revision$ */
+/* NetHack 3.5	muse.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	muse.c	$Date: 2012/04/12 23:26:47 $  $Revision: 1.49 $ */
 /*	Copyright (C) 1990 by Ken Arromdee			   */
 /* NetHack may be freely redistributed.  See license for details.  */
 

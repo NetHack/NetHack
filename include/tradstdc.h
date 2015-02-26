@@ -1,4 +1,5 @@
-/* NetHack 3.5	tradstdc.h	$Date$  $Revision$ */
+/* NetHack 3.5	tradstdc.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	tradstdc.h	$Date: 2012/01/11 18:23:26 $  $Revision: 1.15 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

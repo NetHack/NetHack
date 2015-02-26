@@ -1,4 +1,5 @@
-/* NetHack 3.5	rect.c	$Date$  $Revision$ */
+/* NetHack 3.5	rect.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	rect.c	$Date: 2009/05/06 10:47:37 $  $Revision: 1.5 $ */
 /*	SCCS Id: @(#)rect.c	3.5	1990/02/22	*/
 /* Copyright (c) 1990 by Jean-Christophe Collet	 */
 /* NetHack may be freely redistributed.  See license for details. */

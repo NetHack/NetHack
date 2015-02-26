@@ -1,4 +1,5 @@
-/* NetHack 3.5	vmsunix.c	$Date$  $Revision$ */
+/* NetHack 3.5	vmsunix.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	vmsunix.c	$Date: 2011/09/01 01:47:00 $  $Revision: 1.8 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

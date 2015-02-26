@@ -1,4 +1,5 @@
-/* NetHack 3.5	timeout.c	$Date$  $Revision$ */
+/* NetHack 3.5	timeout.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	timeout.c	$Date: 2012/04/16 00:57:37 $  $Revision: 1.48 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

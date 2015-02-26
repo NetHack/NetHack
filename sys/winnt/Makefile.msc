@@ -1,4 +1,5 @@
-# NetHack 3.5	Makefile.msc	$Date$  $Revision$
+# NetHack 3.5	Makefile.msc	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+# NetHack 3.5	Makefile.msc	$Date: 2012/04/14 00:38:09 $  $Revision: 1.54 $
 #       Copyright (c) NetHack PC Development Team 1993-2012
 #
 #       NetHack 3.5.x Makefile for MS Visual Studio Visual C++ compiler

@@ -1,4 +1,5 @@
-/* NetHack 3.5	gn_xpms.h	$Date$  $Revision$ */
+/* NetHack 3.5	gn_xpms.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	gn_xpms.h	$Date: 2009/05/06 10:57:19 $  $Revision: 1.4 $ */
 /*	SCCS Id: @(#)gnxpms.h	3.5	2000/07/16	*/
 /* Copyright (C) 1998 by Erik Andersen <andersee@debian.org> */
 /* NetHack may be freely redistributed.  See license for details. */

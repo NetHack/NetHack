@@ -1,4 +1,5 @@
-/* NetHack 3.5	wingem1.c	$Date$  $Revision$ */
+/* NetHack 3.5	wingem1.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	wingem1.c	$Date: 2009/05/06 10:56:42 $  $Revision: 1.8 $ */
 /*	SCCS Id: @(#)wingem1.c	3.5	1999/12/10	*/
 /* Copyright (c) Christian Bressler 1999 	  */
 /* NetHack may be freely redistributed.  See license for details. */

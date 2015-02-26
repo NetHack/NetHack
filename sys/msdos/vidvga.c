@@ -1,4 +1,5 @@
-/* NetHack 3.5	vidvga.c	$Date$  $Revision$ */
+/* NetHack 3.5	vidvga.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	vidvga.c	$Date: 2009/05/06 10:49:50 $  $Revision: 1.9 $ */
 /*   SCCS Id: @(#)vidvga.c   3.5     2006/07/08			  */
 /*   Copyright (c) NetHack PC Development Team 1995                 */
 /*   NetHack may be freely redistributed.  See license for details. */

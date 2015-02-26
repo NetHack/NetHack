@@ -1,4 +1,5 @@
-/* NetHack 3.5	dprintf.c	$Date$  $Revision$ */
+/* NetHack 3.5	dprintf.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	dprintf.c	$Date: 2009/05/06 10:49:10 $  $Revision: 1.3 $ */
 /*	SCCS Id: @(#)dprintf.c	3.5	1994/01/29		  */
 /* Copyright (c) Jon W{tte, 1993.				  */
 /* NetHack may be freely redistributed.  See license for details. */

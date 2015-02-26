@@ -1,5 +1,6 @@
 /**********************************************************************
-** $Id$
+** $NHDT-Branch$:$NHDT-Revision$ $NHDT-Date$
+** $Id: qttableview.h,v 1.2 2002/03/09 03:13:13 jwalz Exp $
 **
 ** Definition of QtTableView class
 **

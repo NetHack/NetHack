@@ -1,4 +1,5 @@
-/* NetHack 3.5	sound.c	$Date$  $Revision$ */
+/* NetHack 3.5	sound.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	sound.c	$Date: 2009/05/06 10:49:43 $  $Revision: 1.4 $ */
 /*   SCCS Id: @(#)sound.c   3.5     1996/02/19                        */
 /*   Copyright (c) NetHack PC Development Team 1993,1995            */
 /*   NetHack may be freely redistributed.  See license for details. */

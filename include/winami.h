@@ -1,4 +1,5 @@
-/* NetHack 3.5	winami.h	$Date$  $Revision$ */
+/* NetHack 3.5	winami.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	winami.h	$Date: 2009/05/06 10:45:17 $  $Revision: 1.4 $ */
 /*	SCCS Id: @(#)winami.h	3.5	1993/01/17	*/
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1991. */
 /* Copyright (c) Gregg Wonderly, Naperville, Illinois, 1992, 1993. */

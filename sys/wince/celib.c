@@ -1,4 +1,5 @@
-/* NetHack 3.5	celib.c	$Date$  $Revision$ */
+/* NetHack 3.5	celib.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	celib.c	$Date: 2009/10/22 02:59:30 $  $Revision: 1.6 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 

@@ -1,4 +1,5 @@
-/* NetHack 3.5	mklev.c	$Date$  $Revision$ */
+/* NetHack 3.5	mklev.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mklev.c	$Date: 2012/02/15 01:55:33 $  $Revision: 1.20 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

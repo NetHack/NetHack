@@ -1,4 +1,5 @@
-/* NetHack 3.5	objects.c	$Date$  $Revision$ */
+/* NetHack 3.5	objects.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	objects.c	$Date: 2011/07/28 04:00:20 $  $Revision: 1.23 $ */
 /* Copyright (c) Mike Threepoint, 1989.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

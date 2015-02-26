@@ -1,4 +1,5 @@
-/* NetHack 3.5	tiletext.c	$Date$  $Revision$ */
+/* NetHack 3.5	tiletext.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	tiletext.c	$Date: 2009/05/06 10:59:03 $  $Revision: 1.4 $ */
 /*	SCCS Id: @(#)tiletext.c	3.5	1999/10/24	*/
 /* NetHack may be freely redistributed.  See license for details. */
 

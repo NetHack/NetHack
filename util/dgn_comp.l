@@ -1,5 +1,6 @@
 %{
-/* NetHack 3.5  dgn_comp.l	$Date$  $Revision$ */
+/* NetHack 3.5  dgn_comp.l	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5  dgn_comp.l	$Date: 2009/05/06 10:54:26 $  $Revision: 1.7 $ */
 /*	SCCS Id: @(#)dgn_lex.c	3.5	2002/03/27	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /*	Copyright (c) 1990 by M. Stephenson	     */

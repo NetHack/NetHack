@@ -1,4 +1,5 @@
-/* NetHack 3.5	explode.c	$Date$  $Revision$ */
+/* NetHack 3.5	explode.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	explode.c	$Date: 2013/11/05 00:57:55 $  $Revision: 1.34 $ */
 /*	Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 

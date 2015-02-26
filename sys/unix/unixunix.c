@@ -1,4 +1,5 @@
-/* NetHack 3.5	unixunix.c	$Date$  $Revision$ */
+/* NetHack 3.5	unixunix.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	unixunix.c	$Date: 2012/01/27 20:15:31 $  $Revision: 1.16 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

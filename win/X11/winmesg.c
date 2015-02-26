@@ -1,4 +1,5 @@
-/* NetHack 3.5	winmesg.c	$Date$  $Revision$ */
+/* NetHack 3.5	winmesg.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	winmesg.c	$Date: 2009/05/06 10:55:57 $  $Revision: 1.4 $ */
 /*	SCCS Id: @(#)winmesg.c	3.5	1996/04/05	*/
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */

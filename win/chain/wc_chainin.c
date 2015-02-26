@@ -1,4 +1,5 @@
-/* NetHack 3.5	wc_chainin.c	$Date$  $Revision$ */
+/* NetHack 3.5	wc_chainin.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	wc_chainin.c	$Date: 2012/01/23 10:45:31 $  $Revision: 1.2 $ */
 /* Copyright (c) Kenneth Lorber, 2012				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

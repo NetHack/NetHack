@@ -1,4 +1,5 @@
-/* NetHack 3.5	patchlevel.h	$Date$  $Revision$ */
+/* NetHack 3.5	patchlevel.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	patchlevel.h	$Date: 2012/04/14 08:31:03 $  $Revision: 1.93 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

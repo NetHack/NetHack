@@ -1,4 +1,5 @@
-/* NetHack 3.5	panic.c	$Date$  $Revision$ */
+/* NetHack 3.5	panic.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	panic.c	$Date: 2009/05/06 10:54:39 $  $Revision: 1.4 $ */
 /*	SCCS Id: @(#)panic.c	3.5	1994/03/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */

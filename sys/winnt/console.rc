@@ -1,5 +1,7 @@
-/* NetHack 3.5	console.rc	$Date$  $Revision$ */
-/*	SCCS Id: @(#)console.rc	3.5	$Date$			*/
+/* NetHack 3.5	console.rc	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	console.rc	$Date: 2009/05/06 10:53:27 $  $Revision: 1.7 $ */
+/*	SCCS Id: @(#)console.rc	3.5	$NHDT-Date$			*/
+/*	SCCS Id: @(#)console.rc	3.5	$Date: 2009/05/06 10:53:27 $			*/
 /* Copyright (c) Yitzhak Sapir, 2002. 					*/
 /* NetHack may be freely redistributed.  See license for details. 	*/
 

@@ -1,4 +1,5 @@
-/* NetHack 3.5	sp_lev.h	$Date$  $Revision$ */
+/* NetHack 3.5	sp_lev.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	sp_lev.h	$Date: 2009/05/06 10:45:06 $  $Revision: 1.5 $ */
 /*	SCCS Id: @(#)sp_lev.h	3.5	2007/08/01	*/
 /* Copyright (c) 1989 by Jean-Christophe Collet			  */
 /* NetHack may be freely redistributed.  See license for details. */

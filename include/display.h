@@ -1,4 +1,5 @@
-/* NetHack 3.5	display.h	$Date$  $Revision$ */
+/* NetHack 3.5	display.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	display.h	$Date: 2009/05/06 10:44:38 $  $Revision: 1.14 $ */
 /*	SCCS Id: @(#)display.h	3.5	2005/06/21	*/
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
