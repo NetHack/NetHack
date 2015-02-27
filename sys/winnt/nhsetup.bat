@@ -6,6 +6,11 @@
 @echo off
 
 set _pause=
+set MSVCVERSION=2013
+set WIN32PATH=..\..\win\win32
+set BUILDPATH=..\..\build
+set BINPATH=..\..\binary
+set SRCPATH=%WIN32PATH%\vs%MSVCVERSION%
 
 :nxtcheck
 echo Checking to see if directories are set up properly
@@ -17,8 +22,8 @@ if not exist ..\..\sys\winnt\winnt.c goto :err_dir
 echo Directories look ok.
 
 :do_tty
-if NOT exist ..\..\binary\*.* mkdir ..\..\binary
-if NOT exist ..\..\binary\license copy ..\..\dat\license ..\..\binary\license >nul
+if NOT exist %BINPATH%\*.* mkdir %BINPATH%
+if NOT exist %BINPATH%\license copy ..\..\dat\license %BINPATH%\license >nul
 echo Copying Microsoft Makefile - Makefile.msc to ..\..\src\Makefile.
 if NOT exist ..\..\src\Makefile goto :domsc
 copy ..\..\src\Makefile ..\..\src\Makefile-orig >nul
@@ -53,61 +58,60 @@ copy Makefile.gcc ..\..\src\Makefile.gcc >nul
 echo MinGW Makefile copied ok.
 
 :do_win
-if not exist ..\..\win\win32\nethack.sln goto :err_win
+if not exist %SRCPATH%\nethack.sln goto :err_win
 
 echo.
-if exist ..\..\build\*.* goto projectcopy
+if exist %BUILDPATH%\*.* goto projectcopy
 
-echo Creating ..\..\build directory
-mkdir ..\..\build
+echo Creating %BUILDPATH% directory
+mkdir %BUILDPATH%
 
 :projectcopy
 
 @REM Visual Studio Express solution file
-if NOT exist ..\..\win\win32\nethack.sln goto skipsoln
-echo Copying ..\..\win\win32\nethack.sln  ..\..\nethack.sln
-copy ..\..\win\win32\nethack.sln  ..\.. >nul
+if NOT exist %SRCPATH%\nethack.sln goto skipsoln
+echo Copying %SRCPATH%\nethack.sln  ..\..\nethack.sln
+copy %SRCPATH%\nethack.sln  ..\.. >nul
 :skipsoln
 
-if NOT exist ..\..\binary\*.* echo Creating ..\..\binary directory
-if NOT exist ..\..\binary\*.* mkdir ..\..\binary
-if NOT exist ..\..\binary\license copy ..\..\dat\license ..\..\binary\license >nul
+if NOT exist %BINPATH%\*.* echo Creating %BINPATH% directory
+if NOT exist %BINPATH%\*.* mkdir %BINPATH%
+if NOT exist %BINPATH%\license copy ..\..\dat\license %BINPATH%\license >nul
 
-echo Copying Visual C project files to ..\..\build directory
+echo Copying Visual C project files to %BUILDPATH% directory
 
-copy ..\..\win\win32\dgnstuff.mak  ..\..\build >nul
-copy ..\..\win\win32\levstuff.mak  ..\..\build >nul
-copy ..\..\win\win32\tiles.mak     ..\..\build >nul
+copy %WIN32PATH%\dgnstuff.mak  %BUILDPATH% >nul
+copy %WIN32PATH%\levstuff.mak  %BUILDPATH% >nul
+copy %WIN32PATH%\tiles.mak     %BUILDPATH% >nul
 
+@REM Visual C++ 201X Express project files
+:vcexpress
+if NOT exist %SRCPATH%\makedefs.vcxproj goto skipvcexpress
+if NOT exist %SRCPATH%\tile2bmp.vcxproj goto skipvcexpress
+if NOT exist %SRCPATH%\tilemap.vcxproj goto skipvcexpress
+if NOT exist %SRCPATH%\uudecode.vcxproj goto skipvcexpress
+if NOT exist %SRCPATH%\NetHackW.vcxproj goto skipvcexpress
+if NOT exist %SRCPATH%\dgncomp.vcxproj goto skipvcexpress
+if NOT exist %SRCPATH%\dgnstuff.vcxproj goto skipvcexpress
+if NOT exist %SRCPATH%\dlb_main.vcxproj goto skipvcexpress
+if NOT exist %SRCPATH%\levcomp.vcxproj goto skipvcexpress
+if NOT exist %SRCPATH%\levstuff.vcxproj goto skipvcexpress
+if NOT exist %SRCPATH%\recover.vcxproj goto skipvcexpress
+if NOT exist %SRCPATH%\tiles.vcxproj goto skipvcexpress
 
-@REM Visual C++ 2010 Express project files
-:VC2010
-if NOT exist ..\..\win\win32\makedefs.vcxproj goto skipVC2010
-if NOT exist ..\..\win\win32\tile2bmp.vcxproj goto skipVC2010
-if NOT exist ..\..\win\win32\tilemap.vcxproj goto skipVC2010
-if NOT exist ..\..\win\win32\uudecode.vcxproj goto skipVC2010
-if NOT exist ..\..\win\win32\NetHackW.vcxproj goto skipVC2010
-if NOT exist ..\..\win\win32\dgncomp.vcxproj goto skipVC2010
-if NOT exist ..\..\win\win32\dgnstuff.vcxproj goto skipVC2010
-if NOT exist ..\..\win\win32\dlb_main.vcxproj goto skipVC2010
-if NOT exist ..\..\win\win32\levcomp.vcxproj goto skipVC2010
-if NOT exist ..\..\win\win32\levstuff.vcxproj goto skipVC2010
-if NOT exist ..\..\win\win32\recover.vcxproj goto skipVC2010
-if NOT exist ..\..\win\win32\tiles.vcxproj goto skipVC2010
-
-copy ..\..\win\win32\makedefs.vcxproj ..\..\build >nul
-copy ..\..\win\win32\tile2bmp.vcxproj ..\..\build >nul
-copy ..\..\win\win32\tilemap.vcxproj ..\..\build >nul
-copy ..\..\win\win32\uudecode.vcxproj ..\..\build >nul
-copy ..\..\win\win32\NetHackW.vcxproj ..\..\build >nul
-copy ..\..\win\win32\dgncomp.vcxproj ..\..\build >nul
-copy ..\..\win\win32\dgnstuff.vcxproj ..\..\build >nul
-copy ..\..\win\win32\dlb_main.vcxproj ..\..\build >nul
-copy ..\..\win\win32\levcomp.vcxproj ..\..\build >nul
-copy ..\..\win\win32\levstuff.vcxproj ..\..\build >nul
-copy ..\..\win\win32\recover.vcxproj ..\..\build >nul
-copy ..\..\win\win32\tiles.vcxproj ..\..\build >nul
-:skipVC2010
+copy %SRCPATH%\makedefs.vcxproj %BUILDPATH% >nul
+copy %SRCPATH%\tile2bmp.vcxproj %BUILDPATH% >nul
+copy %SRCPATH%\tilemap.vcxproj %BUILDPATH% >nul
+copy %SRCPATH%\uudecode.vcxproj %BUILDPATH% >nul
+copy %SRCPATH%\NetHackW.vcxproj %BUILDPATH% >nul
+copy %SRCPATH%\dgncomp.vcxproj %BUILDPATH% >nul
+copy %SRCPATH%\dgnstuff.vcxproj %BUILDPATH% >nul
+copy %SRCPATH%\dlb_main.vcxproj %BUILDPATH% >nul
+copy %SRCPATH%\levcomp.vcxproj %BUILDPATH% >nul
+copy %SRCPATH%\levstuff.vcxproj %BUILDPATH% >nul
+copy %SRCPATH%\recover.vcxproj %BUILDPATH% >nul
+copy %SRCPATH%\tiles.vcxproj %BUILDPATH% >nul
+:skipvcexpress
 
 goto :done
 
