@@ -28,7 +28,6 @@
 
 #define LLEN 128
 
-extern const char *killed_by_prefix[];
 extern winid WIN_STATUS;
 
 #ifdef _DEBUG
@@ -135,6 +134,7 @@ struct window_procs mswin_procs = {
     genl_status_threshold,
 # endif
 #endif
+    genl_can_suspend_yes,
 };
 
 
@@ -216,7 +216,7 @@ void mswin_init_nhwindows(int* argc, char** argv)
 	 * write output to a window or stdout.  stdout doesn't make sense on Windows
 	 * non-console applications
 	 */
-	flags.toptenwin = 1;
+	iflags.toptenwin = 1;
 	set_option_mod_status("toptenwin", SET_IN_FILE);
 	set_option_mod_status("perm_invent", SET_IN_FILE);
 
@@ -1773,16 +1773,17 @@ void mswin_end_screen()
 }
 
 /*
-outrip(winid, int)
+outrip(winid, int, when)
 	    -- The tombstone code.  If you want the traditional code use
 	       genl_outrip for the value and check the #if in rip.c.
 */
 #define STONE_LINE_LEN	16
-void mswin_outrip(winid wid, int how)
+void mswin_outrip(winid wid, int how, time_t when)
 {
 	char buf[BUFSZ];
+	long year;
 
-   	logDebug("mswin_outrip(%d)\n", wid, how);
+   	logDebug("mswin_outrip(%d, %d, %ld)\n", wid, how, (long)when);
     if ((wid >= 0) && (wid < MAXWINDOWS) ) {
 		DestroyWindow(GetNHApp()->windowlist[wid].win);
 		GetNHApp()->windowlist[wid].win = mswin_init_RIP_window();
@@ -1805,26 +1806,14 @@ void mswin_outrip(winid wid, int how)
 	putstr(wid, 0, buf);
 
 	/* Put together death description */
-	switch (killer.format) {
-		default: impossible("bad killer format?");
-		case KILLED_BY_AN:
-			Strcpy(buf, killed_by_prefix[how]);
-			Strcat(buf, an(killer.name));
-			break;
-		case KILLED_BY:
-			Strcpy(buf, killed_by_prefix[how]);
-			Strcat(buf, killer.name);
-			break;
-		case NO_KILLER_PREFIX:
-			Strcpy(buf, killer.name);
-			break;
-	}
+	formatkiller(buf, sizeof buf, how);
 
 	/* Put death type on stone */
 	putstr(wid, 0, buf);
 
 	/* Put year on stone */
-	Sprintf(buf, "%4d", getyear());
+	year = yyyymmdd(when) / 10000L;
+	Sprintf(buf, "%4ld", year);
 	putstr(wid, 0, buf);
 	mswin_finish_rip_text(wid);
 }
@@ -2486,17 +2475,17 @@ static void mswin_color_from_string(char *colorstring, HBRUSH* brushptr, COLORRE
 	if (*colorstring == '#') {
 		if (strlen(++colorstring) != 6) return;
 
-		red_value = index(hexadecimals, tolower(*colorstring++)) - hexadecimals;
+		red_value = (int)(index(hexadecimals, tolower(*colorstring++)) - hexadecimals);
 		red_value *= 16;
-		red_value += index(hexadecimals, tolower(*colorstring++)) - hexadecimals;
+		red_value += (int)(index(hexadecimals, tolower(*colorstring++)) - hexadecimals);
 
-		green_value = index(hexadecimals, tolower(*colorstring++)) - hexadecimals;
+		green_value = (int)(index(hexadecimals, tolower(*colorstring++)) - hexadecimals);
 		green_value *= 16;
-		green_value += index(hexadecimals, tolower(*colorstring++)) - hexadecimals;
+		green_value += (int)(index(hexadecimals, tolower(*colorstring++)) - hexadecimals);
 
-		blue_value = index(hexadecimals, tolower(*colorstring++)) - hexadecimals;
+		blue_value = (int)(index(hexadecimals, tolower(*colorstring++)) - hexadecimals);
 		blue_value *= 16;
-		blue_value += index(hexadecimals, tolower(*colorstring++)) - hexadecimals;
+		blue_value += (int)(index(hexadecimals, tolower(*colorstring++)) - hexadecimals);
 
 		*colorptr = RGB(red_value, green_value, blue_value);
 	} else {
