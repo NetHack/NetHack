@@ -6,14 +6,40 @@
 @echo off
 
 set _pause=
-set MSVCVERSION=2013
 set WIN32PATH=..\..\win\win32
 set BUILDPATH=..\..\build
 set BINPATH=..\..\binary
+set VCDir=
+
+:studiocheck
+@REM Set fallbacks here for 32-bit VS2010
+SET REGTREE=HKLM\Software\Microsoft\VCExpress\12.0\Setup\VC
+SET MSVCVERSION=2010
+
+@REM if we're in a 64-bit cmd prompt, gotta include Wow6432Node
+echo Checking for 64-bit environment...
+if "%ProgramFiles%" NEQ "%ProgramFiles(x86)%" SET REGTREE=HKLM\Software\Wow6432Node\Microsoft\VCExpress\12.0\Setup\VC
+
+@REM i can see your house from here... or at least your VC++ folder
+echo Checking version of VC++ installed...
+echo Checking for VC2013 Express...
+for /f "usebackq skip=2 tokens=1-2*" %%a IN (`reg query %REGTREE% /v ProductDir`) do @set VCDir="%%c"
+if not defined VCDir goto :othereditions
+if not exist %VCDir% goto :othereditions
+
+set MSVCVERSION=2013
+goto :fallback
+
+:othereditions
+@REM TODO: teach ourselves to detect full versions of Studio, which are under a different registry hive
+echo VC2013 Express not found; dropping back.
+
+:fallback
+echo Using VS%MSVCVERSION%.
 set SRCPATH=%WIN32PATH%\vs%MSVCVERSION%
 
 :nxtcheck
-echo Checking to see if directories are set up properly
+echo Checking to see if directories are set up properly...
 if not exist ..\..\include\hack.h goto :err_dir
 if not exist ..\..\src\hack.c goto :err_dir
 if not exist ..\..\dat\wizard.des goto :err_dir
@@ -24,7 +50,7 @@ echo Directories look ok.
 :do_tty
 if NOT exist %BINPATH%\*.* mkdir %BINPATH%
 if NOT exist %BINPATH%\license copy ..\..\dat\license %BINPATH%\license >nul
-echo Copying Microsoft Makefile - Makefile.msc to ..\..\src\Makefile.
+echo Copying Microsoft Makefile - Makefile.msc to ..\..\src\Makefile...
 if NOT exist ..\..\src\Makefile goto :domsc
 copy ..\..\src\Makefile ..\..\src\Makefile-orig >nul
 echo      Your existing
@@ -35,7 +61,7 @@ echo           ..\..\src\Makefile-orig
 copy Makefile.msc ..\..\src\Makefile >nul
 echo Microsoft Makefile copied ok.
 
-echo Copying Borland Makefile - Makefile.bcc to ..\..\src\Makefile.bcc
+echo Copying Borland Makefile - Makefile.bcc to ..\..\src\Makefile.bcc...
 if NOT exist ..\..\src\Makefile.bcc goto :dobor
 copy ..\..\src\Makefile.bcc ..\..\src\Makefile.bcc-orig >nul
 echo      Your existing 
@@ -46,7 +72,7 @@ echo           ..\..\src\Makefile.bcc-orig
 copy Makefile.bcc ..\..\src\Makefile.bcc >nul
 echo Borland Makefile copied ok.
 
-echo Copying MinGW Makefile - Makefile.gcc to ..\..\src\Makefile.gcc
+echo Copying MinGW Makefile - Makefile.gcc to ..\..\src\Makefile.gcc...
 if NOT exist ..\..\src\Makefile.gcc goto :dogcc
 copy ..\..\src\Makefile.gcc ..\..\src\Makefile.gcc-orig >nul
 echo      Your existing
@@ -63,22 +89,22 @@ if not exist %SRCPATH%\nethack.sln goto :err_win
 echo.
 if exist %BUILDPATH%\*.* goto projectcopy
 
-echo Creating %BUILDPATH% directory
+echo Creating %BUILDPATH% directory...
 mkdir %BUILDPATH%
 
 :projectcopy
 
 @REM Visual Studio Express solution file
 if NOT exist %SRCPATH%\nethack.sln goto skipsoln
-echo Copying %SRCPATH%\nethack.sln  ..\..\nethack.sln
+echo Copying %SRCPATH%\nethack.sln to ..\..\nethack.sln...
 copy %SRCPATH%\nethack.sln  ..\.. >nul
 :skipsoln
 
-if NOT exist %BINPATH%\*.* echo Creating %BINPATH% directory
+if NOT exist %BINPATH%\*.* echo Creating %BINPATH% directory...
 if NOT exist %BINPATH%\*.* mkdir %BINPATH%
 if NOT exist %BINPATH%\license copy ..\..\dat\license %BINPATH%\license >nul
 
-echo Copying Visual C project files to %BUILDPATH% directory
+echo Copying Visual C project files to %BUILDPATH% directory...
 
 copy %WIN32PATH%\dgnstuff.mak  %BUILDPATH% >nul
 copy %WIN32PATH%\levstuff.mak  %BUILDPATH% >nul
@@ -111,6 +137,7 @@ copy %SRCPATH%\levcomp.vcxproj %BUILDPATH% >nul
 copy %SRCPATH%\levstuff.vcxproj %BUILDPATH% >nul
 copy %SRCPATH%\recover.vcxproj %BUILDPATH% >nul
 copy %SRCPATH%\tiles.vcxproj %BUILDPATH% >nul
+echo Done copying files.
 :skipvcexpress
 
 goto :done
@@ -142,7 +169,6 @@ echo.
 :fini
 :end
 set _pause=Y
-if "%0"=="nhsetup" set _pause=N
-if "%0"=="NHSETUP" set _pause=N
+if /i "%0"=="nhsetup" set _pause=N
 if "%_pause%"=="Y" pause
 set _pause=
