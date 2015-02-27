@@ -25,7 +25,7 @@ static TCHAR szMainWindowClass[] = TEXT("MSNHMainWndClass");
 static TCHAR szTitle[MAX_LOADSTRING];
 extern void mswin_display_splash_window(BOOL);
 
-LRESULT CALLBACK	MainWndProc(HWND, UINT, UINT, LPARAM);
+LRESULT CALLBACK	MainWndProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
 static LRESULT  onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void		onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
@@ -175,7 +175,7 @@ static const char scanmap[] = { 	/* ... */
 //
 //  PURPOSE:  Processes messages for the main window.
 */
-LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, UINT wParam, LPARAM lParam)
+LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	PNHMainWindow data;
 
@@ -187,7 +187,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, UINT wParam, LPARAM lParam
 			if( !data ) panic("out of memory");
 			ZeroMemory(data, sizeof(NHMainWindow));
 			data->mapAcsiiModeSave = MAP_MODE_ASCII12x16;
-			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG)data);
+			SetWindowLong(hWnd, GWL_USERDATA, (LONG)data);
 
 			/* update menu items */
 			CheckMenuItem(
@@ -213,7 +213,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, UINT wParam, LPARAM lParam
 
         case WM_KEYDOWN: 
 		{
-			data = (PNHMainWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+			data = (PNHMainWindow)GetWindowLong(hWnd, GWL_USERDATA);
 
 			/* translate arrow keys into nethack commands */
             switch (wParam) 
@@ -524,8 +524,8 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, UINT wParam, LPARAM lParam
 			   WM_QUIT somehow */  
 
 			/* clean up */
-			free( (PNHMainWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA) );
-			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG)0);
+			free( (PNHMainWindow)GetWindowLong(hWnd, GWL_USERDATA) );
+			SetWindowLong(hWnd, GWL_USERDATA, (LONG)0);
 
 			// PostQuitMessage(0);
 			exit(1); 
@@ -584,7 +584,7 @@ void mswin_layout_main_window(HWND changed_child)
 
 	if( GetNHApp()->bAutoLayout ) {
 		GetClientRect(GetNHApp()->hMainWnd, &client_rt);
-		data = (PNHMainWindow)GetWindowLongPtr(GetNHApp()->hMainWnd, GWLP_USERDATA);
+		data = (PNHMainWindow)GetWindowLong(GetNHApp()->hMainWnd, GWL_USERDATA);
 
 		/* get sizes of child windows */
 		wnd_status = mswin_hwnd_from_winid(WIN_STATUS);
@@ -754,7 +754,7 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	int wmId, wmEvent;
 	PNHMainWindow  data;
 
-	data = (PNHMainWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+	data = (PNHMainWindow)GetWindowLong(hWnd, GWL_USERDATA);
 	wmId    = LOWORD(wParam); 
 	wmEvent = HIWORD(wParam); 
 
@@ -986,8 +986,7 @@ LRESULT CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 							NH_A2W(
 								COPYRIGHT_BANNER_A "\n"
 								COPYRIGHT_BANNER_B "\n"
-								COPYRIGHT_BANNER_C "\n"
-								COPYRIGHT_BANNER_D,
+								COPYRIGHT_BANNER_C,
 								wbuf,
 								BUFSZ
 							) );
@@ -1039,7 +1038,7 @@ void mswin_select_map_mode(int mode)
 	winid map_id;
 
 	map_id = WIN_MAP;
-	data = (PNHMainWindow)GetWindowLongPtr(GetNHApp()->hMainWnd, GWLP_USERDATA);
+	data = (PNHMainWindow)GetWindowLong(GetNHApp()->hMainWnd, GWL_USERDATA);
 
 	/* override for Rogue level */
 #ifdef REINCARNATION
@@ -1130,10 +1129,10 @@ void nhlock_windows( BOOL lock )
 	for( i=0; i<MAXWINDOWS; i++ ) {
 		if( IsWindow(GetNHApp()->windowlist[i].win) && !GetNHApp()->windowlist[i].dead) {
 			DWORD style;
-			style = (DWORD)GetWindowLongPtr(GetNHApp()->windowlist[i].win, GWL_STYLE);
+			style = GetWindowLong(GetNHApp()->windowlist[i].win, GWL_STYLE);
 			if( lock )	style &= ~WS_CAPTION;
 			else		style |= WS_CAPTION;
-			SetWindowLongPtr(GetNHApp()->windowlist[i].win, GWL_STYLE, style);
+			SetWindowLong(GetNHApp()->windowlist[i].win, GWL_STYLE, style);
 			SetWindowPos(
 				GetNHApp()->windowlist[i].win, 
 				NULL, 

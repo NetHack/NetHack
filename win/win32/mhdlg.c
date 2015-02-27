@@ -18,20 +18,15 @@ struct getlin_data {
 	size_t		result_size;
 };
 
-#ifdef _M_X64
-INT_PTR
-#else
-BOOL
-#endif
-CALLBACK	GetlinDlgProc(HWND, UINT, WPARAM, LPARAM);
+BOOL CALLBACK	GetlinDlgProc(HWND, UINT, WPARAM, LPARAM);
 
-INT_PTR mswin_getlin_window (
+int mswin_getlin_window (
 	const char *question, 
 	char *result, 
 	size_t result_size
 )
 {
-	INT_PTR ret;
+	int ret;
 	struct getlin_data data;
 
 	/* initilize dialog data */
@@ -53,12 +48,7 @@ INT_PTR mswin_getlin_window (
 	return ret;
 }
     
-#ifdef _M_X64
-INT_PTR
-#else
-BOOL
-#endif
-CALLBACK GetlinDlgProc(HWND hWnd, UINT message, WPARAM wParam, LONG_PTR lParam)
+BOOL CALLBACK GetlinDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	struct getlin_data* data;
 	RECT   main_rt, dlg_rt;
@@ -78,7 +68,7 @@ CALLBACK GetlinDlgProc(HWND hWnd, UINT message, WPARAM wParam, LONG_PTR lParam)
 	case WM_INITDIALOG:
 		data = (struct getlin_data*)lParam;
 		SetWindowText(hWnd, NH_A2W(data->question, wbuf, sizeof(wbuf)));
-		SetWindowLongPtr(hWnd, GWLP_USERDATA, lParam);
+		SetWindowLong(hWnd, GWL_USERDATA, lParam);
 
 		/* center dialog in the main window */
 		GetWindowRect(hWnd, &dlg_rt);
@@ -152,7 +142,7 @@ CALLBACK GetlinDlgProc(HWND hWnd, UINT message, WPARAM wParam, LONG_PTR lParam)
         { 
 			/* OK button was pressed */
 			case IDOK:
-		      data = (struct getlin_data*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+		      data = (struct getlin_data*)GetWindowLong(hWnd, GWL_USERDATA);
 			  SendDlgItemMessage(hWnd, IDC_GETLIN_EDIT, WM_GETTEXT, (WPARAM)sizeof(wbuf), (LPARAM)wbuf );
 			  NH_W2A(wbuf, data->result, data->result_size);
 
@@ -176,16 +166,11 @@ struct extcmd_data {
 	int*		selection;
 };
 
-#ifdef _M_X64
-INT_PTR
-#else
-BOOL
-#endif
-CALLBACK	ExtCmdDlgProc(HWND, UINT, WPARAM, LPARAM);
+BOOL CALLBACK	ExtCmdDlgProc(HWND, UINT, WPARAM, LPARAM);
 
-INT_PTR mswin_ext_cmd_window (int* selection)
+int mswin_ext_cmd_window (int* selection)
 {
-	INT_PTR ret;
+	int ret;
 	struct extcmd_data data;
 	
 	/* init dialog data */
@@ -205,13 +190,7 @@ INT_PTR mswin_ext_cmd_window (int* selection)
 	return ret;
 }
     
-
-#ifdef _M_X64
-INT_PTR
-#else
-BOOL
-#endif
-CALLBACK ExtCmdDlgProc(HWND hWnd, UINT message, WPARAM wParam, LONG_PTR lParam)
+BOOL CALLBACK ExtCmdDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	struct extcmd_data* data;
 	RECT   main_rt, dlg_rt;
@@ -224,7 +203,7 @@ CALLBACK ExtCmdDlgProc(HWND hWnd, UINT message, WPARAM wParam, LONG_PTR lParam)
 	{
 	case WM_INITDIALOG:
 		data = (struct extcmd_data*)lParam;
-		SetWindowLongPtr(hWnd, GWLP_USERDATA, lParam);
+		SetWindowLong(hWnd, GWL_USERDATA, lParam);
 
 		/* center dialog in the main window */
 		GetWindowRect(GetNHApp()->hMainWnd, &main_rt);
@@ -256,12 +235,12 @@ CALLBACK ExtCmdDlgProc(HWND hWnd, UINT message, WPARAM wParam, LONG_PTR lParam)
 	break;
 
 	case WM_COMMAND:
-        data = (struct extcmd_data*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+        data = (struct extcmd_data*)GetWindowLong(hWnd, GWL_USERDATA);
 		switch (LOWORD(wParam)) 
         { 
 		  /* OK button ws clicked */
           case IDOK:
-			  *data->selection = (int)SendDlgItemMessage(hWnd, IDC_EXTCMD_LIST, LB_GETCURSEL, (WPARAM)0, (LPARAM)0 );
+			  *data->selection = SendDlgItemMessage(hWnd, IDC_EXTCMD_LIST, LB_GETCURSEL, (WPARAM)0, (LPARAM)0 );
 			  if( *data->selection==LB_ERR )
 				  *data->selection = -1;
 			  /* Fall through. */
@@ -283,7 +262,7 @@ CALLBACK ExtCmdDlgProc(HWND hWnd, UINT message, WPARAM wParam, LONG_PTR lParam)
 					 lParam 
 					   Handle to the list box
 					*/
-				   *data->selection = (int)SendMessage((HWND)lParam, LB_GETCURSEL, (WPARAM)0, (LPARAM)0);
+				   *data->selection = SendMessage((HWND)lParam, LB_GETCURSEL, (WPARAM)0, (LPARAM)0);
 				   if( *data->selection==LB_ERR )
 					   *data->selection = -1;
 				   EndDialog(hWnd, IDOK); 
@@ -301,19 +280,14 @@ struct plsel_data {
 	int*	selection;
 };
 
-#ifdef _M_X64
-INT_PTR
-#else
-BOOL
-#endif
-CALLBACK	PlayerSelectorDlgProc(HWND, UINT, WPARAM, LONG_PTR);
+BOOL CALLBACK	PlayerSelectorDlgProc(HWND, UINT, WPARAM, LPARAM);
 static void 		plselInitDialog(HWND hWnd);
 static void			plselAdjustLists(HWND hWnd, int changed_opt);
 static int			plselFinalSelection(HWND hWnd, int* selection);
 
- INT_PTR mswin_player_selection_window ( int* selection )
+int mswin_player_selection_window ( int* selection )
 {
-	INT_PTR ret;
+	int ret;
 	struct plsel_data data;
 
 	/* init dialog data */
@@ -333,12 +307,7 @@ static int			plselFinalSelection(HWND hWnd, int* selection);
 	return ret;
 }
 
-#ifdef _M_X64
-INT_PTR
-#else
-BOOL
-#endif
-CALLBACK PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LONG_PTR lParam)
+BOOL CALLBACK PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	struct plsel_data* data;
 	RECT   main_rt, dlg_rt;
@@ -348,7 +317,7 @@ CALLBACK PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LONG_PTR 
 	{
 	case WM_INITDIALOG:
 		data = (struct plsel_data*)lParam;
-		SetWindowLongPtr(hWnd, GWLP_USERDATA, lParam);
+		SetWindowLong(hWnd, GWL_USERDATA, lParam);
 
 		/* center dialog in the main window */
 		GetWindowRect(GetNHApp()->hMainWnd, &main_rt);
@@ -378,7 +347,7 @@ CALLBACK PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LONG_PTR 
 	break;
 
 	case WM_COMMAND:
-        data = (struct plsel_data*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+        data = (struct plsel_data*)GetWindowLong(hWnd, GWL_USERDATA);
 		switch (LOWORD(wParam)) { 
 
 		/* OK button was clicked */
@@ -472,7 +441,7 @@ CALLBACK PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LONG_PTR 
 
 void setComboBoxValue(HWND hWnd, int combo_box, int value)
 {
-	int index_max = (int)SendDlgItemMessage(hWnd, combo_box, CB_GETCOUNT, 0, 0);
+	int index_max = SendDlgItemMessage(hWnd, combo_box, CB_GETCOUNT, 0, 0);
 	int index;
 	int value_to_set = LB_ERR;
 	for (index = 0; index < index_max; index++) {
@@ -561,7 +530,7 @@ void  plselAdjustLists(HWND hWnd, int changed_sel)
 	HWND control_role, control_race, control_gender, control_align;
 	int  initrole, initrace, initgend, initalign;
 	int i;
-	LRESULT ind;
+	int ind;
 	int valid_opt;
 	TCHAR wbuf[255];
 
@@ -573,16 +542,16 @@ void  plselAdjustLists(HWND hWnd, int changed_sel)
 
 	/* get current selections */	
 	ind = SendMessage(control_role, CB_GETCURSEL, 0, 0);
-	initrole = (ind==LB_ERR)? flags.initrole : (int)SendMessage(control_role, CB_GETITEMDATA, ind, 0);
+	initrole = (ind==LB_ERR)? flags.initrole : SendMessage(control_role, CB_GETITEMDATA, ind, 0);
 
 	ind = SendMessage(control_race, CB_GETCURSEL, 0, 0);
-	initrace = (ind==LB_ERR)? flags.initrace : (int)SendMessage(control_race, CB_GETITEMDATA, ind, 0);
+	initrace = (ind==LB_ERR)? flags.initrace : SendMessage(control_race, CB_GETITEMDATA, ind, 0);
 
 	ind = SendMessage(control_gender, CB_GETCURSEL, 0, 0);
-	initgend = (ind==LB_ERR)? flags.initgend : (int)SendMessage(control_gender, CB_GETITEMDATA, ind, 0);
+	initgend = (ind==LB_ERR)? flags.initgend : SendMessage(control_gender, CB_GETITEMDATA, ind, 0);
 
 	ind = SendMessage(control_align, CB_GETCURSEL, 0, 0);
-	initalign = (ind==LB_ERR)? flags.initalign : (int)SendMessage(control_align, CB_GETITEMDATA, ind, 0);
+	initalign = (ind==LB_ERR)? flags.initalign : SendMessage(control_align, CB_GETITEMDATA, ind, 0);
 
 	/* intialize roles list */
 	if( changed_sel==-1 ) {
@@ -702,35 +671,35 @@ void  plselAdjustLists(HWND hWnd, int changed_sel)
 /* player made up his mind - get final selection here */ 
 int	plselFinalSelection(HWND hWnd, int* selection)
 {
-	LRESULT ind;
+	int ind;
 
 	/* get current selections */
 	if( SendDlgItemMessage(hWnd, IDC_PLSEL_ROLE_RANDOM, BM_GETCHECK, 0, 0)==BST_CHECKED ) {
 		flags.initrole = ROLE_RANDOM;
 	} else {
 		ind = SendDlgItemMessage(hWnd, IDC_PLSEL_ROLE_LIST, CB_GETCURSEL, 0, 0);
-		flags.initrole = (ind==LB_ERR)? ROLE_RANDOM : (int)SendDlgItemMessage(hWnd, IDC_PLSEL_ROLE_LIST, CB_GETITEMDATA, ind, 0);
+		flags.initrole = (ind==LB_ERR)? ROLE_RANDOM : SendDlgItemMessage(hWnd, IDC_PLSEL_ROLE_LIST, CB_GETITEMDATA, ind, 0);
 	}
 
 	if( SendDlgItemMessage(hWnd, IDC_PLSEL_RACE_RANDOM, BM_GETCHECK, 0, 0)==BST_CHECKED ) {
 		flags.initrace = ROLE_RANDOM;
 	} else {
 		ind = SendDlgItemMessage(hWnd, IDC_PLSEL_RACE_LIST, CB_GETCURSEL, 0, 0);
-		flags.initrace = (ind==LB_ERR)? ROLE_RANDOM : (int)SendDlgItemMessage(hWnd, IDC_PLSEL_RACE_LIST, CB_GETITEMDATA, ind, 0);
+		flags.initrace = (ind==LB_ERR)? ROLE_RANDOM : SendDlgItemMessage(hWnd, IDC_PLSEL_RACE_LIST, CB_GETITEMDATA, ind, 0);
 	}
 
 	if( SendDlgItemMessage(hWnd, IDC_PLSEL_GENDER_RANDOM, BM_GETCHECK, 0, 0)==BST_CHECKED ) {
 		flags.initgend = ROLE_RANDOM;
 	} else {
 		ind = SendDlgItemMessage(hWnd, IDC_PLSEL_GENDER_LIST, CB_GETCURSEL, 0, 0);
-		flags.initgend = (ind==LB_ERR)? ROLE_RANDOM : (int)SendDlgItemMessage(hWnd, IDC_PLSEL_GENDER_LIST, CB_GETITEMDATA, ind, 0);
+		flags.initgend = (ind==LB_ERR)? ROLE_RANDOM : SendDlgItemMessage(hWnd, IDC_PLSEL_GENDER_LIST, CB_GETITEMDATA, ind, 0);
 	}
 
 	if( SendDlgItemMessage(hWnd, IDC_PLSEL_ALIGN_RANDOM, BM_GETCHECK, 0, 0)==BST_CHECKED ) {
 		flags.initalign = ROLE_RANDOM;
 	} else {
 		ind = SendDlgItemMessage(hWnd, IDC_PLSEL_ALIGN_LIST, CB_GETCURSEL, 0, 0);
-		flags.initalign = (ind==LB_ERR)? ROLE_RANDOM : (int)SendDlgItemMessage(hWnd, IDC_PLSEL_ALIGN_LIST, CB_GETITEMDATA, ind, 0);
+		flags.initalign = (ind==LB_ERR)? ROLE_RANDOM : SendDlgItemMessage(hWnd, IDC_PLSEL_ALIGN_LIST, CB_GETITEMDATA, ind, 0);
 	}
 	
 

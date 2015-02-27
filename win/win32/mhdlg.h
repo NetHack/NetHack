@@ -9,9 +9,9 @@
 #include "config.h"
 #include "global.h"
 
-INT_PTR mswin_getlin_window (const char *question, char *result, size_t result_size);
-INT_PTR mswin_ext_cmd_window (int* selection);
-INT_PTR  mswin_player_selection_window(int* selection);
+int mswin_getlin_window (const char *question, char *result, size_t result_size);
+int mswin_ext_cmd_window (int* selection);
+int  mswin_player_selection_window(int* selection);
 
 #endif /* MSWINDlgWindow_h */
 

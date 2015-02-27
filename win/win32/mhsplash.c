@@ -7,7 +7,6 @@
 #include "mhsplash.h"
 #include "mhmsg.h"
 #include "mhfont.h"
-#include "date.h"
 #include "patchlevel.h"
 #include "dlb.h"
 
@@ -15,7 +14,7 @@
 
 PNHWinApp GetNHApp(void);
 
-LRESULT CALLBACK NHSplashWndProc(HWND, UINT, WPARAM, LPARAM);
+BOOL CALLBACK NHSplashWndProc(HWND, UINT, WPARAM, LPARAM);
 
 #define SPLASH_WIDTH		440
 #define SPLASH_HEIGHT  322
@@ -85,8 +84,8 @@ void mswin_display_splash_window (BOOL show_ver)
 	    clientrt.right - 2 * SPLASH_OFFSET_X, controlrt.bottom, TRUE);
 
 	/* Fill the text control */
-	Sprintf (buf, "%s\r\n%s\r\n%s\r\n%s\r\n\r\n", COPYRIGHT_BANNER_A, COPYRIGHT_BANNER_B,
-             COPYRIGHT_BANNER_C, COPYRIGHT_BANNER_D);
+	Sprintf (buf, "%s\r\n%s\r\n%s\r\n\r\n", COPYRIGHT_BANNER_A, COPYRIGHT_BANNER_B,
+             COPYRIGHT_BANNER_C);
 	strsize = strlen(buf);
 
 	if (show_ver) {
@@ -176,7 +175,7 @@ void mswin_display_splash_window (BOOL show_ver)
 	mswin_destroy_splashfonts();
 }
 
-LRESULT CALLBACK NHSplashWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK NHSplashWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	HDC hdc;
 	switch (message)

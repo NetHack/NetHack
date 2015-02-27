@@ -18,7 +18,7 @@ static WNDPROC  editControlWndProc = 0;
 #define DEFAULT_COLOR_BG_TEXT	COLOR_WINDOW
 #define DEFAULT_COLOR_FG_TEXT	COLOR_WINDOWTEXT
 
-LRESULT	CALLBACK	NHTextWndProc(HWND, UINT, WPARAM, LPARAM);
+BOOL	CALLBACK	NHTextWndProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK	NHEditHookWndProc(HWND, UINT, WPARAM, LPARAM);
 static void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void LayoutText(HWND hwnd);
@@ -53,9 +53,9 @@ HWND mswin_init_text_window () {
 	SetWindowText(ret, "Text");
 	if( !GetNHApp()->bWindowsLocked ) {
 		DWORD style;
-		style = (DWORD)GetWindowLongPtr(ret, GWL_STYLE);
+		style = GetWindowLong(ret, GWL_STYLE);
 		style |= WS_CAPTION;
-		SetWindowLongPtr(ret, GWL_STYLE, style);
+		SetWindowLong(ret, GWL_STYLE, style);
 		SetWindowPos(ret, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 	}
 
@@ -63,7 +63,7 @@ HWND mswin_init_text_window () {
 	data = (PNHTextWindow)malloc(sizeof(NHTextWindow));
 	if( !data ) panic("out of memory");
 	ZeroMemory(data, sizeof(NHTextWindow));
-	SetWindowLongPtr(ret, GWLP_USERDATA, (LONG)data);
+	SetWindowLong(ret, GWL_USERDATA, (LONG)data);
 	return ret;
 }
 
@@ -71,7 +71,7 @@ void mswin_display_text_window (HWND hWnd)
 {
 	PNHTextWindow data;
 	
-	data = (PNHTextWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+	data = (PNHTextWindow)GetWindowLong(hWnd, GWL_USERDATA);
 	if( data && data->window_text ) {
 		HWND control;
 		control = GetDlgItem(hWnd, IDC_TEXT_CONTROL);
@@ -83,14 +83,14 @@ void mswin_display_text_window (HWND hWnd)
 	mswin_popup_destroy(hWnd);
 }
     
-LRESULT CALLBACK NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	HWND control;
 	HDC hdc;
 	PNHTextWindow data;
     TCHAR title[MAX_LOADSTRING];
 	
-	data = (PNHTextWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+	data = (PNHTextWindow)GetWindowLong(hWnd, GWL_USERDATA);
 	switch (message) 
 	{
 	case WM_INITDIALOG:
@@ -105,8 +105,8 @@ LRESULT CALLBACK NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 		ReleaseDC(control, hdc);
 
 		/* subclass edit control */
-		editControlWndProc = (WNDPROC)GetWindowLongPtr(control, GWLP_WNDPROC);
-		SetWindowLongPtr(control, GWLP_WNDPROC, (LONG)NHEditHookWndProc);
+		editControlWndProc = (WNDPROC)GetWindowLong(control, GWL_WNDPROC);
+		SetWindowLong(control, GWL_WNDPROC, (LONG)NHEditHookWndProc);
 
 		SetFocus(control);
 
@@ -179,7 +179,7 @@ LRESULT CALLBACK NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 		if( data ) {
 			if( data->window_text ) free(data->window_text);
 			free(data);
-			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG)0);
+			SetWindowLong(hWnd, GWL_USERDATA, (LONG)0);
 		}
 	break;
 
@@ -191,7 +191,7 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	PNHTextWindow data;
 	
-	data = (PNHTextWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+	data = (PNHTextWindow)GetWindowLong(hWnd, GWL_USERDATA);
 	switch( wParam ) {
 	case MSNH_MSG_PUTSTR: {
 		PMSNHMsgPutstr msg_data = (PMSNHMsgPutstr)lParam;
