@@ -568,9 +568,7 @@ doclassdisco()
 	}
 	/* get the class (via its symbol character) */
 	c = yn_function(prompt, discosyms, '\0');
-#ifdef REDO
 	savech(c);
-#endif
 	if (!c)
 	    clear_nhwindow(WIN_MESSAGE);
     } else {

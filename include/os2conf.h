@@ -100,11 +100,6 @@
 #define sethanguphandler(foo) (void)signal(SIGHUP, (SIG_RET_TYPE)foo)
 #endif
 
-#ifndef REDO
-# undef	Getchar
-# define Getchar nhgetch
-#endif
-
 void hangup(int i);
 #endif /* OS2CONF_H */
 #endif /* OS2 */

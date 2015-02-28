@@ -417,16 +417,13 @@ typedef unsigned char	uchar;
 #define WALLIFIED_MAZE	/* Fancy mazes - Jean-Christophe Collet */
 /* monsters & objects */
 /* I/O */
-#define REDO		/* support for redoing last command - DGK */
 #if !defined(MAC)
 # if !defined(NOCLIPPING)
 # define CLIPPING	/* allow smaller screens -- ERS */
 # endif
 #endif
 
-#ifdef REDO
-# define DOAGAIN '\001' /* ^A, the "redo" key used in cmd.c and getline.c */
-#endif
+#define DOAGAIN '\001' /* ^A, the "redo" key used in cmd.c and getline.c */
 
 #define EXP_ON_BOTL	/* Show experience on bottom line */
 /* #define SCORE_ON_BOTL */	/* added by Gary Erickson (erickson@ucivax) */

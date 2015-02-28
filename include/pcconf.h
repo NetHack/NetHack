@@ -249,11 +249,6 @@
 
 #include <fcntl.h>
 
-#ifndef REDO
-# undef Getchar
-# define Getchar nhgetch
-#endif
-
 #ifdef MSDOS
 # define TEXTCOLOR /* */
 # define PORT_HELP "msdoshlp.txt" /* msdos port specific help file */

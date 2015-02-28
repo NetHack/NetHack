@@ -82,7 +82,7 @@ getlin_hook_proc hook;
 #else
 		Strcat(strcat(strcpy(toplines, query), " "), obufp);
 #endif
-		c = Getchar();
+		c = pgetchar();
 		if (c == '\033' || c == EOF) {
 		    obufp[0] = '\033';
 		    obufp[1] = '\0';
@@ -271,26 +271,20 @@ tty_get_ext_cmd()
 	if (iflags.extmenu) return extcmd_via_menu();
 	/* maybe a runtime option? */
 	/* hooked_tty_getlin("#", buf, flags.cmd_comp ? ext_cmd_getlin_hook : (getlin_hook_proc) 0); */
-#ifdef REDO
 	hooked_tty_getlin("#", buf, in_doagain ? (getlin_hook_proc)0
 		: ext_cmd_getlin_hook);
-#else
-	hooked_tty_getlin("#", buf, ext_cmd_getlin_hook);
-#endif
 	(void) mungspaces(buf);
 	if (buf[0] == 0 || buf[0] == '\033') return -1;
 
 	for (i = 0; extcmdlist[i].ef_txt != (char *)0; i++)
 		if (!strcmpi(buf, extcmdlist[i].ef_txt)) break;
 
-#ifdef REDO
 	if (!in_doagain) {
 	    int j;
 	    for (j = 0; buf[j]; j++)
 		savech(buf[j]);
 	    savech('\n');
 	}
-#endif
 
 	if (extcmdlist[i].ef_txt == (char *)0) {
 		pline("%s: unknown extended command.", buf);
