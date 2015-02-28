@@ -1,4 +1,4 @@
-/* NetHack 3.5  makedefs.c  $NHDT-Date: 1425081977 2015/02/28 00:06:17 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.61 $ */
+/* NetHack 3.5  makedefs.c  $NHDT-Date: 1425083082 2015/02/28 00:24:42 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.63 $ */
 /* NetHack 3.5  makedefs.c  $Date: 2012/01/15 09:27:03 $  $Revision: 1.50 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) M. Stephenson, 1990, 1991.			  */
@@ -960,8 +960,7 @@ do_rumors()
  * 
  */
 #define IGNORED_FEATURES	( 0L \
-				| (1L << 19)	/* EXP_ON_BOTL */ \
-				| (1L << 20)	/* SCORE_ON_BOTL */ \
+				| (1L << 19)	/* SCORE_ON_BOTL */ \
 				| (1L << 27)	/* ZEROCOMP */ \
 				| (1L << 28)	/* RLECOMP */ \
 				)
@@ -999,11 +998,8 @@ make_version()
 #ifdef INSURANCE
 			| (1L << 18)
 #endif
-#ifdef EXP_ON_BOTL
-			| (1L << 19)
-#endif
 #ifdef SCORE_ON_BOTL
-			| (1L << 20)
+			| (1L << 19)
 #endif
 		/* data format (27..31)
 		 * External compression methods such as COMPRESS and ZLIB_COMP
@@ -1225,9 +1221,6 @@ static const char *build_opts[] = {
 #endif
 #ifdef DLB
 		"data librarian",
-#endif
-#ifdef EXP_ON_BOTL
-		"experience points on status line",
 #endif
 #ifdef MFLOPPY
 		"floppy drive support",

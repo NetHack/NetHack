@@ -1,4 +1,4 @@
-/* NetHack 3.5	options.c	$NHDT-Date: 1425081976 2015/02/28 00:06:16 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.156 $ */
+/* NetHack 3.5	options.c	$NHDT-Date: 1425083082 2015/02/28 00:24:42 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.158 $ */
 /* NetHack 3.5	options.c	$Date: 2012/04/09 02:56:30 $  $Revision: 1.153 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -175,11 +175,7 @@ static struct Bool_Opt
 	{"safe_pet", &flags.safe_dog, TRUE, SET_IN_GAME},
 	{"sanity_check", &iflags.sanity_check, FALSE, SET_IN_GAME},
 	{"selectsaved", &iflags.wc2_selectsaved, TRUE, DISP_IN_GAME},		/*WC*/
-#ifdef EXP_ON_BOTL
 	{"showexp", &flags.showexp, FALSE, SET_IN_GAME},
-#else
-	{"showexp", (boolean *)0, FALSE, SET_IN_FILE},
-#endif
 	{"showrace", &flags.showrace, FALSE, SET_IN_GAME},
 #ifdef SCORE_ON_BOTL
 	{"showscore", &flags.showscore, FALSE, SET_IN_GAME},
@@ -2618,9 +2614,7 @@ goodfruit:
 			if (initial) return;
 
 			if ((boolopt[i].addr) == &flags.time
-#ifdef EXP_ON_BOTL
 			 || (boolopt[i].addr) == &flags.showexp
-#endif
 #ifdef SCORE_ON_BOTL
 			 || (boolopt[i].addr) == &flags.showscore
 #endif

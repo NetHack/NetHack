@@ -1,4 +1,4 @@
-/* NetHack 3.5	mhstatus.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mhstatus.c	$NHDT-Date: 1425083082 2015/02/28 00:24:42 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.8 $ */
 /* NetHack 3.5	mhstatus.c	$Date: 2009/05/06 10:52:28 $  $Revision: 1.7 $ */
 /*	SCCS Id: @(#)mhstatus.c	3.5	2005/01/23	*/
 /* Copyright (C) 2001 by Alex Kompel 	 */
@@ -238,10 +238,8 @@ void FormatStatusString(char* text, int format)
 
 	if (Upolyd)
 		Sprintf(nb = eos(nb), " HD:%d", mons[u.umonnum].mlevel);
-#ifdef EXP_ON_BOTL
 	else if(flags.showexp)
 		Sprintf(nb = eos(nb), " Xp:%u/%-1ld", u.ulevel,u.uexp);
-#endif
 	else
 		Sprintf(nb = eos(nb), " Exp:%u", u.ulevel);
 	if( format==NHSTAT_LINES_4 ) strcat(text, "\r\n");

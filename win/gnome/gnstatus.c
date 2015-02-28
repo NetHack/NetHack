@@ -1,4 +1,4 @@
-/* NetHack 3.5	gnstatus.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	gnstatus.c	$NHDT-Date: 1425083083 2015/02/28 00:24:43 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.6 $ */
 /* NetHack 3.5	gnstatus.c	$Date: 2009/05/06 10:57:54 $  $Revision: 1.5 $ */
 /*	SCCS Id: @(#)gnstatus.c	3.5	2000/07/16	*/
 /* Copyright (C) 1998 by Erik Andersen <andersee@debian.org> */
@@ -655,7 +655,6 @@ void ghack_status_window_update_stats()
     lastAC = u.uac;
     gtk_label_set( GTK_LABEL( acLabel), buf);
     
-#ifdef EXP_ON_BOTL
     if (flags.showexp) {
 	sprintf(buf,"Exp:%ld", u.uexp);
 	if (lastExp < u.uexp && firstTime==FALSE) {
@@ -669,7 +668,6 @@ void ghack_status_window_update_stats()
 	lastExp = u.uexp;
 	gtk_label_set( GTK_LABEL( expLabel), buf);
    } else
-#endif
     {
 	gtk_label_set( GTK_LABEL( expLabel), "");
     }
