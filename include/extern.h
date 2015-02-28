@@ -738,6 +738,7 @@ E void FDECL(free_saved_games, (char**));
 #ifdef SELF_RECOVER
 E boolean NDECL(recover_savefile);
 #endif
+E int FDECL(nhclose, (int));
 #ifdef HOLD_LOCKFILE_OPEN
 E void NDECL(really_close);
 #endif

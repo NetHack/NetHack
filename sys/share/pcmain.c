@@ -402,7 +402,7 @@ char *argv[];
 		hackpid = 1;
 #endif
 		write(fd, (genericptr_t) &hackpid, sizeof(hackpid));
-		close(fd);
+		nhclose(fd);
 	}
 #ifdef MFLOPPY
 	level_info[0].where = ACTIVE;

@@ -1,5 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Express 2013 for Windows Desktop
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NetHackW", "build\NetHackW.vcxproj", "{CEC5D360-8804-454F-8591-002184C23499}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dgncomp", "build\dgncomp.vcxproj", "{8A3F81C7-2968-49A8-86BF-2669412AD7DE}"
@@ -44,6 +47,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "uudecode", "build\uudecode.
 	ProjectSection(ProjectDependencies) = postProject
 		{BA3DD34C-04B7-40D0-B373-9329AA9E8945} = {BA3DD34C-04B7-40D0-B373-9329AA9E8945}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NetHack", "build\NetHack.vcxproj", "{609BC774-C6F8-4B2B-AA7D-5B3D0EA95751}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -149,6 +154,12 @@ Global
 		{63F9B82B-F589-4082-ABE5-D4F0682050AB}.Release|Win32.Build.0 = Release|Win32
 		{63F9B82B-F589-4082-ABE5-D4F0682050AB}.Release|x64.ActiveCfg = Release|x64
 		{63F9B82B-F589-4082-ABE5-D4F0682050AB}.Release|x64.Build.0 = Release|x64
+		{609BC774-C6F8-4B2B-AA7D-5B3D0EA95751}.Debug|Win32.ActiveCfg = Debug|Win32
+		{609BC774-C6F8-4B2B-AA7D-5B3D0EA95751}.Debug|Win32.Build.0 = Debug|Win32
+		{609BC774-C6F8-4B2B-AA7D-5B3D0EA95751}.Debug|x64.ActiveCfg = Debug|Win32
+		{609BC774-C6F8-4B2B-AA7D-5B3D0EA95751}.Release|Win32.ActiveCfg = Release|Win32
+		{609BC774-C6F8-4B2B-AA7D-5B3D0EA95751}.Release|Win32.Build.0 = Release|Win32
+		{609BC774-C6F8-4B2B-AA7D-5B3D0EA95751}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

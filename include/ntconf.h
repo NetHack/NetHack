@@ -99,6 +99,9 @@ extern void FDECL(interject, (int));
 #pragma warning(disable:4996)	/* VC8 deprecation warnings */
 #pragma warning(disable:4142)	/* benign redefinition */
 #pragma warning(disable:4267)	/* conversion from 'size_t' to XX */
+#  if (_MSC_VER > 1600)
+#pragma warning(disable:4459)	/* hide global declaration */
+#  endif /* _MSC_VER > 1600 */
 # endif /* _MSC_VER > 1000 */
 #pragma warning(disable:4761)	/* integral size mismatch in arg; conv supp*/
 # ifdef YYPREFIX

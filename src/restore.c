@@ -703,7 +703,7 @@ xchar ltmp;
 
 		/* Remove levels and bones that may have been created.
 		 */
-		(void) close(nfd);
+		(void) nhclose(nfd);
 # ifdef AMIGA
 		clearlocks();
 # else
@@ -752,7 +752,7 @@ register int fd;
 	if (!restgamestate(fd, &stuckid, &steedid)) {
 		display_nhwindow(WIN_MESSAGE, TRUE);
 		savelev(-1, 0, FREE_SAVE);	/* discard current level */
-		(void) close(fd);
+		(void) nhclose(fd);
 		(void) delete_savefile();
 		restoring = FALSE;
 		return(0);
@@ -826,7 +826,7 @@ register int fd;
 	get_plname_from_file(fd, plname);
 
 	getlev(fd, 0, (xchar)0, FALSE);
-	(void) close(fd);
+	(void) nhclose(fd);
 
 	/* Now set the restore settings to match the
 	 * settings used by the save file output routines
@@ -1543,7 +1543,7 @@ register unsigned int len;
 	    } else {
 		pline("Read %d instead of %u bytes.", rlen, len);
 		if(restoring) {
-			(void) close(fd);
+			(void) nhclose(fd);
 			(void) delete_savefile();
 			error("Error restoring old game.");
 		}

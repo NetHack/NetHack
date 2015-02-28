@@ -1,6 +1,6 @@
 @REM  NetHack 3.5	nhsetup.bat	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
 @REM  NetHack 3.5	nhsetup.bat	$Date: 2010/09/05 14:22:16 $  $Revision: 1.21 $ */
-@REM  Copyright (c) NetHack PC Development Team 1993-2010
+@REM  Copyright (c) NetHack PC Development Team 1993-2015
 @REM  NetHack may be freely redistributed.  See license for details. 
 @REM  Win32 setup batch file, see Install.nt for details
 @REM
@@ -118,6 +118,7 @@ if NOT exist %SRCPATH%\tile2bmp.vcxproj goto skipvcexpress
 if NOT exist %SRCPATH%\tilemap.vcxproj goto skipvcexpress
 if NOT exist %SRCPATH%\uudecode.vcxproj goto skipvcexpress
 if NOT exist %SRCPATH%\NetHackW.vcxproj goto skipvcexpress
+if NOT exist %SRCPATH%\NetHack.vcxproj goto skipvcexpress
 if NOT exist %SRCPATH%\dgncomp.vcxproj goto skipvcexpress
 if NOT exist %SRCPATH%\dgnstuff.vcxproj goto skipvcexpress
 if NOT exist %SRCPATH%\dlb_main.vcxproj goto skipvcexpress
@@ -131,6 +132,7 @@ copy %SRCPATH%\tile2bmp.vcxproj %BUILDPATH% >nul
 copy %SRCPATH%\tilemap.vcxproj %BUILDPATH% >nul
 copy %SRCPATH%\uudecode.vcxproj %BUILDPATH% >nul
 copy %SRCPATH%\NetHackW.vcxproj %BUILDPATH% >nul
+copy %SRCPATH%\NetHack.vcxproj %BUILDPATH% >nul
 copy %SRCPATH%\dgncomp.vcxproj %BUILDPATH% >nul
 copy %SRCPATH%\dgnstuff.vcxproj %BUILDPATH% >nul
 copy %SRCPATH%\dlb_main.vcxproj %BUILDPATH% >nul

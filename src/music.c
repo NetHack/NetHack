@@ -753,7 +753,7 @@ char	*buf;
 	    break;
 	}
 	(void) write(fd, buf, strlen(buf));
-	(void) close(fd);
+	(void) nhclose(fd);
     }
 }
 #endif /* UNIX386MUSIC */
