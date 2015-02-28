@@ -7,9 +7,7 @@
 #ifndef MFNDPOS_H
 #define MFNDPOS_H
 
-#ifdef BARGETHROUGH
 #define ALLOW_MDISP	0x00001000L	/* can displace a monster out of its way */
-#endif
 #define ALLOW_TRAPS	0x00020000L	/* can enter traps */
 #define ALLOW_U		0x00040000L	/* can attack you */
 #define ALLOW_M		0x00080000L	/* can attack other monsters */

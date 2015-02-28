@@ -168,7 +168,6 @@ fightm(mtmp)		/* have monsters fight each other */
 	return 0;
 }
 
-#ifdef BARGETHROUGH
 /*
  * mdisplacem() -- attacker moves defender out of the way;
  *		   returns same results as mattackm().
@@ -244,7 +243,6 @@ boolean quietly;
 
 	return MM_HIT;
 }
-#endif /* BARGETHROUGH */
 
 /*
  * mattackm() -- a monster attacks another monster.
