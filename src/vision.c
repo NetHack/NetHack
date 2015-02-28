@@ -513,7 +513,7 @@ vision_recalc(control)
     vision_full_recalc = 0;			/* reset flag */
     if (in_mklev || !iflags.vision_inited) return;
 
-#ifdef GCC_WARN
+#if defined(GCC_WARN) || defined(_MSC_VER)
     row = 0;
 #endif
 
@@ -1664,7 +1664,7 @@ right_side(row, cb_row, cb_col, fb_row, fb_col, left, right_mark, limits)
     char *row_max;		/* right most */
     int		  lim_max;	/* right most limit of circle */
 
-#ifdef GCC_WARN
+#if defined(GCC_WARN) || defined(_MSC_VER)
     rowp = 0;
 #endif
     nrow    = row + step;
@@ -1919,7 +1919,7 @@ left_side(row, cb_row, cb_col, fb_row, fb_col, left_mark, right, limits)
     char *row_max;		/* right most */
     int		  lim_min;
 
-#ifdef GCC_WARN
+#if defined(GCC_WARN) || defined(_MSC_VER)
     rowp = 0;
 #endif
     nrow    = row + step;
@@ -2203,7 +2203,7 @@ right_side(row, left, right_mark, limits)
     char	  *row_max;	/* right most [used by macro set_max()] */
     int		  lim_max;	/* right most limit of circle */
 
-#ifdef GCC_WARN
+#if defined(GCC_WARN) || defined(_MSC_VER)
     rowp = row_min = row_max = 0;
 #endif
     nrow    = row + step;
@@ -2378,7 +2378,7 @@ left_side(row, left_mark, right, limits)
     char	  *row_min, *row_max;
     int		  lim_min;
 
-#ifdef GCC_WARN
+#if defined(GCC_WARN) || defined(_MSC_VER)
     rowp = row_min = row_max = 0;
 #endif
     nrow    = row+step;
