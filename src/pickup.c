@@ -1,4 +1,4 @@
-/* NetHack 3.5	pickup.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	pickup.c	$NHDT-Date: 1425081977 2015/02/28 00:06:17 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.126 $ */
 /* NetHack 3.5	pickup.c	$Date: 2012/02/16 03:01:38 $  $Revision: 1.123 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -612,7 +612,6 @@ end_query:
 	return (n_tried > 0);
 }
 
-#ifdef AUTOPICKUP_EXCEPTIONS
 boolean
 is_autopickup_exception(obj, grab)
 struct obj *obj;
@@ -631,7 +630,6 @@ boolean grab;	 /* forced pickup, rather than forced leave behind? */
 	}
 	return FALSE;
 }
-#endif /* AUTOPICKUP_EXCEPTIONS */
 
 /*
  * Pick from the given list using flags.pickup_types.  Return the number
@@ -655,12 +653,10 @@ menu_item **pick_list;	/* list of objects and counts to pick up */
 	/* first count the number of eligible items */
 	for (n = 0, curr = olist; curr; curr = FOLLOW(curr, follow)) {
 	    pickit = (!*otypes || index(otypes, curr->oclass));
-#ifdef AUTOPICKUP_EXCEPTIONS
 	    /* check for "always pick up */
 	    if (!pickit) pickit = is_autopickup_exception(curr, TRUE);
 	    /* then for "never pick up */
 	    if (pickit) pickit = !is_autopickup_exception(curr, FALSE);
-#endif
 	    /* pickup_thrown overrides pickup_types and exceptions */
 	    if (!pickit) pickit = (flags.pickup_thrown && curr->was_thrown);
 	    /* finally, do we count this object? */
@@ -671,10 +667,8 @@ menu_item **pick_list;	/* list of objects and counts to pick up */
 	    *pick_list = pi = (menu_item *) alloc(sizeof(menu_item) * n);
 	    for (n = 0, curr = olist; curr; curr = FOLLOW(curr, follow)) {
 		pickit = (!*otypes || index(otypes, curr->oclass));
-#ifdef AUTOPICKUP_EXCEPTIONS
 		if (!pickit) pickit = is_autopickup_exception(curr, TRUE);
 		if (pickit) pickit = !is_autopickup_exception(curr, FALSE);
-#endif
 		if (!pickit) pickit = (flags.pickup_thrown && curr->was_thrown);
 		if (pickit) {
 		    pi[n].item.a_obj = curr;

@@ -1,4 +1,4 @@
-/* NetHack 3.5	config.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	config.h	$NHDT-Date: 1425081976 2015/02/28 00:06:16 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.48 $ */
 /* NetHack 3.5	config.h	$Date: 2012/01/27 20:15:26 $  $Revision: 1.37 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -424,7 +424,6 @@ typedef unsigned char	uchar;
 # define CLIPPING	/* allow smaller screens -- ERS */
 # endif
 #endif
-#define AUTOPICKUP_EXCEPTIONS	/* exceptions to autopickup */
 
 #ifdef REDO
 # define DOAGAIN '\001' /* ^A, the "redo" key used in cmd.c and getline.c */

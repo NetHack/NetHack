@@ -1,4 +1,4 @@
-/* NetHack 3.5	save.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	save.c	$NHDT-Date: 1425081977 2015/02/28 00:06:17 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.59 $ */
 /* NetHack 3.5	save.c	$Date: 2012/02/16 02:40:24 $  $Revision: 1.53 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1345,9 +1345,7 @@ freedynamicdata()
 	if (iflags.wc_font_menu) free(iflags.wc_font_menu);
 	if (iflags.wc_font_status) free(iflags.wc_font_status);
 	if (iflags.wc_tile_file) free(iflags.wc_tile_file);
-#ifdef AUTOPICKUP_EXCEPTIONS
 	free_autopickup_exceptions();
-#endif
 #endif	/* FREE_ALL_MEMORY */
 #ifdef STATUS_VIA_WINDOWPORT
 	status_finish();

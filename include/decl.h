@@ -1,4 +1,4 @@
-/* NetHack 3.5	decl.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	decl.h	$NHDT-Date: 1425081976 2015/02/28 00:06:16 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.50 $ */
 /* NetHack 3.5	decl.h	$Date: 2011/12/29 20:06:27 $  $Revision: 1.44 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -381,13 +381,11 @@ E char *fqn_prefix_names[PREFIX_COUNT];
 
 E NEARDATA struct savefile_info sfcap, sfrestinfo, sfsaveinfo;
 
-#ifdef AUTOPICKUP_EXCEPTIONS
 struct autopickup_exception {
 	char *pattern;
 	boolean grab;
 	struct autopickup_exception *next;
 };
-#endif /* AUTOPICKUP_EXCEPTIONS */
 
 #ifdef PANICTRACE
 E char *ARGV0;

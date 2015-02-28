@@ -1,4 +1,4 @@
-/* NetHack 3.5  makedefs.c  $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5  makedefs.c  $NHDT-Date: 1425081977 2015/02/28 00:06:17 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.61 $ */
 /* NetHack 3.5  makedefs.c  $Date: 2012/01/15 09:27:03 $  $Revision: 1.50 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) M. Stephenson, 1990, 1991.			  */
@@ -1207,9 +1207,6 @@ static const char *build_opts[] = {
 #endif
 #ifdef ANSI_DEFAULT
 		"ANSI default terminal",
-#endif
-#ifdef AUTOPICKUP_EXCEPTIONS
-		"autopickup exceptions",
 #endif
 #ifdef TEXTCOLOR
 		"color",

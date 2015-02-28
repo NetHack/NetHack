@@ -1,4 +1,4 @@
-/* NetHack 3.5	extern.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	extern.h	$NHDT-Date: 1425081976 2015/02/28 00:06:16 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.390 $ */
 /* NetHack 3.5	extern.h	$Date: 2013/11/05 00:57:53 $  $Revision: 1.380 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1587,10 +1587,8 @@ E void FDECL(set_duplicate_opt_detection, (int));
 E void FDECL(set_wc_option_mod_status, (unsigned long, int));
 E void FDECL(set_wc2_option_mod_status, (unsigned long, int));
 E void FDECL(set_option_mod_status, (const char *,int));
-#ifdef AUTOPICKUP_EXCEPTIONS
 E int FDECL(add_autopickup_exception, (const char *));
 E void NDECL(free_autopickup_exceptions);
-#endif /* AUTOPICKUP_EXCEPTIONS */
 #ifdef LOADSYMSETS
 E int FDECL(load_symset, (const char *,int));
 E void FDECL(parsesymbols, (char *));
@@ -1687,9 +1685,7 @@ E boolean FDECL(container_gone, (int (*)(OBJ_P)));
 E int FDECL(use_container, (struct obj **,int));
 E int FDECL(loot_mon, (struct monst *,int *,boolean *));
 E int NDECL(dotip);
-#ifdef AUTOPICKUP_EXCEPTIONS
 E boolean FDECL(is_autopickup_exception, (struct obj *, BOOLEAN_P));
-#endif /* AUTOPICKUP_EXCEPTIONS */
 
 /* ### pline.c ### */
 

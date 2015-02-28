@@ -1,4 +1,4 @@
-/* NetHack 3.5	options.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	options.c	$NHDT-Date: 1425081976 2015/02/28 00:06:16 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.156 $ */
 /* NetHack 3.5	options.c	$Date: 2012/04/09 02:56:30 $  $Revision: 1.153 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -501,10 +501,8 @@ STATIC_OVL boolean FDECL(is_wc_option, (const char *));
 STATIC_OVL boolean FDECL(wc_supported, (const char *));
 STATIC_OVL boolean FDECL(is_wc2_option, (const char *));
 STATIC_OVL boolean FDECL(wc2_supported, (const char *));
-#ifdef AUTOPICKUP_EXCEPTIONS
 STATIC_DCL void FDECL(remove_autopickup_exception, (struct autopickup_exception *));
 STATIC_OVL int FDECL(count_ape_maps, (int *, int *));
-#endif
 
 /* check whether a user-supplied option string is a proper leading
    substring of a particular option name; option string might have
@@ -2923,12 +2921,10 @@ doset()
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
 # endif
 #endif
-#ifdef AUTOPICKUP_EXCEPTIONS
 	any.a_int = -1;
 	Sprintf(buf, "autopickup exceptions (%d currently set)",
 		count_ape_maps((int *)0, (int *)0));
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
-#endif /* AUTOPICKUP_EXCEPTIONS */
 #ifdef PREFIXES_IN_USE
 	any = zeroany;
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
@@ -2948,12 +2944,10 @@ doset()
 	     */
 	    for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx) {
 		opt_indx = pick_list[pick_idx].item.a_int - 1;
-#ifdef AUTOPICKUP_EXCEPTIONS
 		if (opt_indx == -2) {	/* -3 due to -1 offset for select_menu() */
 		    (void)special_handling("autopickup_exception",
 					   setinitial, fromfile);
 		} else
-#endif
 #ifdef STATUS_VIA_WINDOWPORT
 # ifdef STATUS_HILITES
 		if (opt_indx == -3) {	/* -3 due to -1 offset for select_menu() */
@@ -3020,9 +3014,7 @@ boolean setinitial,setfromfile;
 
     /* Special handling of menustyle, pickup_burden, pickup_types,
      * disclose, runmode, msg_window, menu_headings, and number_pad options.
-#ifdef AUTOPICKUP_EXCEPTIONS
      * Also takes care of interactive autopickup_exception_handling changes.
-#endif
      */
     if (!strcmp("menustyle", optname)) {
 	const char *style_name;
@@ -3296,7 +3288,6 @@ boolean setinitial,setfromfile;
 	}
 	destroy_nhwindow(tmpwin);
     } else if (!strcmp("autopickup_exception", optname)) {
-#ifdef AUTOPICKUP_EXCEPTIONS
 	int pick_cnt, pick_idx, opt_idx, pass;
 	int totalapes = 0, numapes[2] = {0,0};
 	menu_item *pick_list = (menu_item *)0;
@@ -3392,7 +3383,6 @@ boolean setinitial,setfromfile;
 		destroy_nhwindow(tmpwin);
 		if (pick_cnt >= 0) goto ape_again;
 	}
-#endif /* AUTOPICKUP_EXCEPTIONS */
     } else if (!strcmp("symset", optname)
  	    || !strcmp("roguesymset", optname)) {
 	menu_item *symset_pick = (menu_item *)0;
@@ -3897,12 +3887,10 @@ dotogglepickup()
 	if (flags.pickup) {
 	    oc_to_str(flags.pickup_types, ocl);
 	    Sprintf(buf, "ON, for %s objects%s", ocl[0] ? ocl : "all",
-#ifdef AUTOPICKUP_EXCEPTIONS
 			(iflags.autopickup_exceptions[AP_LEAVE] ||
 			 iflags.autopickup_exceptions[AP_GRAB]) ?
 			 ((count_ape_maps((int *)0, (int *)0) == 1) ?
 			    ", with one exception" : ", with some exceptions") :
-#endif
 			"");
 	} else {
 	    Strcpy(buf, "OFF");
@@ -3911,7 +3899,6 @@ dotogglepickup()
 	return 0;
 }
 
-#ifdef AUTOPICKUP_EXCEPTIONS
 int
 add_autopickup_exception(mapping)
 const char *mapping;
@@ -4004,7 +3991,6 @@ free_autopickup_exceptions()
 		}
 	}
 }
-#endif /* AUTOPICKUP_EXCEPTIONS */
 
 #ifdef LOADSYMSETS
 /* bundle some common usage into one easy-to-use routine */
