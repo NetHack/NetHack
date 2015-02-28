@@ -1,4 +1,5 @@
-/* NetHack 3.5	vmsunix.c	$Date$  $Revision$ */
+/* NetHack 3.5	vmsunix.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	vmsunix.c	$Date: 2011/09/01 01:47:00 $  $Revision: 1.8 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -366,9 +367,7 @@ hack_resume(screen_manip)
 boolean screen_manip;
 {
 	(void) signal(SIGINT, (SIG_RET_TYPE) done1);
-# ifdef WIZARD
 	if (wizard) (void) signal(SIGQUIT,SIG_DFL);
-# endif
 	if (screen_manip)
 	    resume_nhwindows();	/* setup terminal modes, redraw screen, &c */
 }

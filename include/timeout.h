@@ -1,4 +1,5 @@
-/* NetHack 3.5	timeout.h	$Date$  $Revision$ */
+/* NetHack 3.5	timeout.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	timeout.h	$Date: 2009/05/06 10:45:12 $  $Revision: 1.6 $ */
 /*	SCCS Id: @(#)timeout.h	3.5	1999/02/13	*/
 /* Copyright 1994, Dean Luick					  */
 /* NetHack may be freely redistributed.  See license for details. */

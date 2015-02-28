@@ -1,6 +1,9 @@
 /*
  * Convert the given input files into an output file that is expected
  * by nethack.
+ *
+ * $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+ * $Date: 2002/03/17 20:02:47 $  $Revision: 1.2 $
  * 
  * Assumptions:
  * 	+ Two dimensional byte arrays are in row order and are not padded

@@ -1,4 +1,5 @@
-/* NetHack 3.5	mondata.c	$Date$  $Revision$ */
+/* NetHack 3.5	mondata.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mondata.c	$Date: 2011/10/02 02:18:54 $  $Revision: 1.44 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -790,9 +791,7 @@ boolean
 levl_follower(mtmp)
 struct monst *mtmp;
 {
-#ifdef STEED
 	if (mtmp == u.usteed) return TRUE;
-#endif
 
 	/* Wizard with Amulet won't bother trying to follow across levels */
 	if (mtmp->iswiz && mon_has_amulet(mtmp)) return FALSE;
@@ -859,11 +858,9 @@ static const short grownups[][2] = {
 	{PM_ACOLYTE, PM_PRIEST},
 	{PM_APPRENTICE, PM_WIZARD},
 	{PM_MANES,PM_LEMURE},
-#ifdef KOPS
 	{PM_KEYSTONE_KOP, PM_KOP_SERGEANT},
 	{PM_KOP_SERGEANT, PM_KOP_LIEUTENANT},
 	{PM_KOP_LIEUTENANT, PM_KOP_KAPTAIN},
-#endif
 	{NON_PM,NON_PM}
 };
 

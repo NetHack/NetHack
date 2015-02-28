@@ -1,5 +1,5 @@
 #!perl
-# NetHack 3.5  mdgrep.pl  $NHDT-Date: 1423877528 2015/02/14 01:32:08 $  $NHDT-Revision: 1.7 $
+# NetHack 3.5  mdgrep.pl  $NHDT-Date: 1423877528 2015/02/14 01:32:08 $  $NHDT-Branch$:$NHDT-Revision: 1.7 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -18,7 +18,7 @@
 
 # Game Features:
 @feature = qw/ZEROCOMP USE_TILES ASCIIGRAPH CLIPPING TEXTCOLOR
-	COMPRESS ZLIB_COMP RANDOM SECURE USER_SOUNDS WIZARD
+	COMPRESS ZLIB_COMP RANDOM SECURE USER_SOUNDS
 	SAFERHANGUP MFLOPPY NOCWD_ASSUMPTIONS
 	VAR_PLAYGROUND DLB SHELL SUSPEND NOSAVEONHANGUP HANGUPHANDLING
 	BSD_JOB_CONTROL MAIL POSIX_JOB_CONTROL INSURANCE
@@ -56,6 +56,7 @@ $outfile = "mdgrep.h";
 sub start_file {
 	($rev) = ('$NHDT-Revision: 1.7 $') =~ m/: (.*) .$/;
 	my $date = '$NHDT-Date: 1423877529 2015/02/14 01:32:09 $';
+	my $branch = '$NHDT-Branch$';
 	my $revision = '$NHDT-Revision: 1.7 $';
 	open(OUT, ">$outfile") || die "open $outfile: $!";
 # NB: Date and Revision below will be modified when mdgrep.h is written to
@@ -63,7 +64,7 @@ sub start_file {
 # before generating mdgrep.h and committing that file).
 	print OUT <<E_O_M;
 /*
- * NetHack 3.5  $outfile  $date $revision
+ * NetHack 3.5  $outfile  $date $branch:$revision
  * Copyright (c) Kenneth Lorber, Kensington, Maryland, 2008
  * NetHack may be freely redistributed.  See license for details.
  *

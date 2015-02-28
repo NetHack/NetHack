@@ -1,12 +1,11 @@
-/* NetHack 3.5	makemon.c	$Date$  $Revision$ */
+/* NetHack 3.5	makemon.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	makemon.c	$Date: 2012/01/29 00:34:33 $  $Revision: 1.69 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
-#ifdef REINCARNATION
 #include <ctype.h>
-#endif
 
 STATIC_VAR NEARDATA struct monst zeromonst;
 
@@ -94,9 +93,7 @@ register int x, y, n;
 	int cnttmp,cntdiv;
 
 	cnttmp = cnt;
-# ifdef DEBUG
-	pline("init group call x=%d,y=%d,n=%d,cnt=%d.", x, y, n, cnt);
-# endif
+	debugpline("init group call x=%d,y=%d,n=%d,cnt=%d.", x, y, n, cnt);
 	cntdiv = ((u.ulevel < 3) ? 4 : (u.ulevel < 5) ? 2 : 1);
 #endif
 	/* Tuning: cut down on swarming at low character levels [mrs] */
@@ -159,9 +156,7 @@ register struct monst *mtmp;
 	register int mm = monsndx(ptr);
 	struct obj *otmp;
 
-#ifdef REINCARNATION
 	if (Is_rogue_level(&u.uz)) return;
-#endif
 /*
  *	first a few special cases:
  *
@@ -312,14 +307,12 @@ register struct monst *mtmp;
 		    }
 		}
 		break;
-# ifdef KOPS
 	    case S_KOP:		/* create Keystone Kops with cream pies to
 				 * throw. As suggested by KAA.	   [MRS]
 				 */
 		if (!rn2(4)) m_initthrow(mtmp, CREAM_PIE, 2);
 		if (!rn2(3)) (void)mongets(mtmp,(rn2(2)) ? CLUB : RUBBER_HOSE);
 		break;
-# endif
 	    case S_ORC:
 		if(rn2(2)) (void)mongets(mtmp, ORCISH_HELM);
 		switch (mm != PM_ORC_CAPTAIN ? mm :
@@ -459,7 +452,6 @@ register struct monst *mtmp;
 		(void) mongets(mtmp, rnd_offensive_item(mtmp));
 }
 
-#ifdef GOLDOBJ
 /*
  *   Makes up money for monster's inventory.
  *   This will change with silver & copper coins
@@ -473,7 +465,6 @@ long amount;
     gold->quan = amount;
     add_to_minv(mtmp, gold);
 }
-#endif
 
 STATIC_OVL void
 m_initinv(mtmp)
@@ -482,9 +473,7 @@ register struct	monst	*mtmp;
 	register int cnt;
 	register struct obj *otmp;
 	register struct permonst *ptr = mtmp->data;
-#ifdef REINCARNATION
 	if (Is_rogue_level(&u.uz)) return;
-#endif
 /*
  *	Soldiers get armour & rations - armour approximates their ac.
  *	Nymphs may get mirror or potion of object detection.
@@ -562,11 +551,7 @@ register struct	monst	*mtmp;
 					     rn2(3) ? CLOAK_OF_PROTECTION :
 						 CLOAK_OF_MAGIC_RESISTANCE);
 		    (void) mongets(mtmp, SMALL_SHIELD);
-#ifndef GOLDOBJ
-		    mtmp->mgold = (long)rn1(10,20);
-#else
 		    mkmonmoney(mtmp,(long)rn1(10,20));
-#endif
 		} else if (quest_mon_represents_role(ptr,PM_MONK)) {
 		    (void) mongets(mtmp, rn2(11) ? ROBE :
 					     CLOAK_OF_MAGIC_RESISTANCE);
@@ -620,11 +605,7 @@ register struct	monst	*mtmp;
 		}
 		break;
 	    case S_LEPRECHAUN:
-#ifndef GOLDOBJ
-		mtmp->mgold = (long) d(level_difficulty(), 30);
-#else
 		mkmonmoney(mtmp, (long) d(level_difficulty(), 30));
-#endif
 		break;
 	    case S_DEMON:
 	    	/* moved here from m_initweap() because these don't
@@ -647,14 +628,8 @@ register struct	monst	*mtmp;
 		(void) mongets(mtmp, rnd_defensive_item(mtmp));
 	if ((int) mtmp->m_lev > rn2(100))
 		(void) mongets(mtmp, rnd_misc_item(mtmp));
-#ifndef GOLDOBJ
-	if (likes_gold(ptr) && !mtmp->mgold && !rn2(5))
-		mtmp->mgold =
-		      (long) d(level_difficulty(), mtmp->minvent ? 5 : 10);
-#else
 	if (likes_gold(ptr) && !findgold(mtmp->minvent) && !rn2(5))
 		mkmonmoney(mtmp, (long) d(level_difficulty(), mtmp->minvent ? 5 : 10));
-#endif
 }
 
 /* Note: for long worms, always call cutworm (cutworm calls clone_mon) */
@@ -698,9 +673,6 @@ xchar x, y;	/* clone's preferred location or 0 (near mon) */
 	m2->mcloned = 1;
 	m2->minvent = (struct obj *) 0; /* objects don't clone */
 	m2->mleashed = FALSE;
-#ifndef GOLDOBJ
-	m2->mgold = 0L;
-#endif
 	/* Max HP the same, but current HP halved for both.  The caller
 	 * might want to override this by halving the max HP also.
 	 * When current HP is odd, the original keeps the extra point.
@@ -786,10 +758,8 @@ boolean ghostly;
 		 mvitals[mndx].born++;
 	if ((int) mvitals[mndx].born >= lim && !(mons[mndx].geno & G_NOGEN) &&
 		!(mvitals[mndx].mvflags & G_EXTINCT)) {
-#if defined(DEBUG) && defined(WIZARD)
-		if (wizard) pline("Automatically extinguished %s.",
+		if (wizard) debugpline("Automatically extinguished %s.",
 					makeplural(mons[mndx].mname));
-#endif
 		mvitals[mndx].mvflags |= G_EXTINCT;
 		reset_rndmonst(mndx);
 	}
@@ -932,11 +902,9 @@ register int	mmflags;
 		/* if you are to make a specific monster and it has
 		   already been genocided, return */
 		if (mvitals[mndx].mvflags & G_GENOD) return((struct monst *) 0);
-#if defined(WIZARD) && defined(DEBUG)
 		if (wizard && (mvitals[mndx].mvflags & G_EXTINCT))
-		    pline("Explicitly creating extinct monster %s.",
+		    debugpline("Explicitly creating extinct monster %s.",
 			mons[mndx].mname);
-#endif
 	} else {
 		/* make a random (common) monster that can survive here.
 		 * (the special levels ask for random monsters at specific
@@ -948,9 +916,7 @@ register int	mmflags;
 
 		do {
 			if(!(ptr = rndmonst())) {
-#ifdef DEBUG
-			    pline("Warning: no monster.");
-#endif
+			    debugpline("Warning: no monster.");
 			    return((struct monst *) 0);	/* no more monsters! */
 			}
 			fakemon.data = ptr;	/* set up for goodpos */
@@ -1193,12 +1159,9 @@ boolean neverask;
 	int x, y;
 	struct monst *mon;
 	boolean known = FALSE;
-#ifdef WIZARD
 	boolean ask = (wizard && !neverask);
-#endif
 
 	while (cnt--) {
-#ifdef WIZARD
 	    if (ask) {
 		if (create_particular()) {
 		    known = TRUE;
@@ -1206,7 +1169,6 @@ boolean neverask;
 		}
 		else ask = FALSE;	/* ESC will shut off prompting */
 	    }
-#endif
 	    x = u.ux,  y = u.uy;
 	    /* if in water, try to encourage an aquatic monster
 	       by finding and then specifying another wet location */
@@ -1280,9 +1242,7 @@ rndmonst()
 	if (rndmonst_state.choice_count < 0) {	/* need to recalculate */
 	    int zlevel, minmlev, maxmlev;
 	    boolean elemlevel;
-#ifdef REINCARNATION
 	    boolean upper;
-#endif
 
 	    rndmonst_state.choice_count = 0;
 	    /* look for first common monster */
@@ -1292,9 +1252,7 @@ rndmonst()
 	    }		
 	    if (mndx == SPECIAL_PM) {
 		/* evidently they've all been exterminated */
-#ifdef DEBUG
-		pline("rndmonst: no common mons!");
-#endif
+		debugpline("rndmonst: no common mons!");
 		return (struct permonst *)0;
 	    } /* else `mndx' now ready for use below */
 	    zlevel = level_difficulty();
@@ -1302,9 +1260,7 @@ rndmonst()
 	    minmlev = zlevel / 6;
 	    /* determine the level of the strongest monster to make. */
 	    maxmlev = (zlevel + u.ulevel) / 2;
-#ifdef REINCARNATION
 	    upper = Is_rogue_level(&u.uz);
-#endif
 	    elemlevel = In_endgame(&u.uz) && !Is_astralevel(&u.uz);
 
 /*
@@ -1316,9 +1272,7 @@ rndmonst()
 		rndmonst_state.mchoices[mndx] = 0;
 		if (tooweak(mndx, minmlev) || toostrong(mndx, maxmlev))
 		    continue;
-#ifdef REINCARNATION
 		if (upper && !isupper(def_monsyms[(int)(ptr->mlet)].sym)) continue;
-#endif
 		if (elemlevel && wrong_elem_type(ptr)) continue;
 		if (uncommon(mndx)) continue;
 		if (Inhell && (ptr->geno & G_NOHELL)) continue;
@@ -1336,9 +1290,7 @@ rndmonst()
 
 	if (rndmonst_state.choice_count <= 0) {
 	    /* maybe no common mons left, or all are too weak or too strong */
-#ifdef DEBUG
-	    Norep("rndmonst: choice_count=%d", rndmonst_state.choice_count);
-#endif
+	    debugpline("rndmonst: choice_count=%d", rndmonst_state.choice_count);
 	    return (struct permonst *)0;
 	}
 
@@ -1826,15 +1778,9 @@ register struct monst *mtmp;
 			 levl[mx-1][my].typ == TDWALL   ||
 			 levl[mx-1][my].typ == CROSSWALL||
 			 levl[mx-1][my].typ == TUWALL    ))
-#ifdef REINCARNATION
 		    appear = Is_rogue_level(&u.uz) ? S_hwall : S_hcdoor;
 		else
 		    appear = Is_rogue_level(&u.uz) ? S_vwall : S_vcdoor;
-#else
-		    appear = S_hcdoor;
-		else
-		    appear = S_vcdoor;
-#endif
 		if(!mtmp->minvis || See_invisible)
 		    block_point(mx,my);	/* vision */
 	} else if (level.flags.is_maze_lev && !In_sokoban(&u.uz) && rn2(2)) {

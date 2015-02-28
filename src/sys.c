@@ -1,4 +1,5 @@
-/* NetHack 3.5	sys.c	$Date$  $Revision$ */
+/* NetHack 3.5	sys.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	sys.c	$Date: 2012/03/10 02:22:07 $  $Revision: 1.12 $ */
 /* Copyright (c) Kenneth Lorber, Kensington, Maryland, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -7,10 +8,6 @@
 /* for KR1ED config, WIZARD is 0 or 1 and WIZARD_NAME is a string;
    for usual config, WIZARD is the string; forcing WIZARD_NAME to match it
    eliminates conditional testing for which one to use in string ops */
-#ifndef KR1ED
-# undef WIZARD_NAME
-# define WIZARD_NAME WIZARD
-#endif
 
 struct sysopt sysopt;
 
@@ -23,6 +20,7 @@ sys_early_init(){
 #else
 	sysopt.wizards = WIZARD_NAME;
 #endif
+	sysopt.debugfiles = NULL;
 	sysopt.shellers = NULL;
 	sysopt.maxplayers = 0;	/* XXX eventually replace MAX_NR_OF_PLAYERS */
 
@@ -56,10 +54,8 @@ sys_early_init(){
 # endif
 #endif
 
-#ifdef SEDUCE
 	sysopt.seduce = 1;	/* if it's compiled in, default to on */
 	sysopt_seduce_set(sysopt.seduce);
-#endif
 }
 
 

@@ -1,4 +1,5 @@
-/* NetHack 3.5	mkobj.c	$Date$  $Revision$ */
+/* NetHack 3.5	mkobj.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mkobj.c	$Date: 2012/03/10 02:49:08 $  $Revision: 1.70 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,16 +10,12 @@ STATIC_DCL void FDECL(maybe_adjust_light, (struct obj *,int));
 STATIC_DCL void FDECL(obj_timer_checks,(struct obj *, XCHAR_P, XCHAR_P, int));
 STATIC_DCL void FDECL(container_weight, (struct obj *));
 STATIC_DCL struct obj *FDECL(save_mtraits, (struct obj *, struct monst *));
-#ifdef WIZARD
 STATIC_DCL void FDECL(objlist_sanity, (struct obj *,int,const char *));
 STATIC_DCL void FDECL(mon_obj_sanity, (struct monst *,const char *));
 STATIC_DCL const char *FDECL(where_name, (struct obj *));
 STATIC_DCL void FDECL(insane_object,
 		      (struct obj *,const char *,const char *,struct monst *));
 STATIC_DCL void FDECL(check_contained, (struct obj *,const char *));
-#endif
-
-/*#define DEBUG_EFFECTS*/	/* show some messages for debugging */
 
 struct icp {
     int  iprob;		/* probability of an item type */
@@ -51,7 +48,6 @@ const struct icp boxiprobs[] = {
 { 1, AMULET_CLASS}
 };
 
-#ifdef REINCARNATION
 const struct icp rogueprobs[] = {
 {12, WEAPON_CLASS},
 {12, ARMOR_CLASS},
@@ -61,7 +57,6 @@ const struct icp rogueprobs[] = {
 { 5, WAND_CLASS},
 { 5, RING_CLASS}
 };
-#endif
 
 const struct icp hellprobs[] = {
 {20, WEAPON_CLASS},
@@ -221,10 +216,8 @@ boolean artif;
 
 	if(oclass == RANDOM_CLASS) {
 		const struct icp *iprobs =
-#ifdef REINCARNATION
 				    (Is_rogue_level(&u.uz)) ?
 				    (const struct icp *)rogueprobs :
-#endif
 				    Inhell ? (const struct icp *)hellprobs :
 				    (const struct icp *)mkobjprobs;
 
@@ -613,9 +606,6 @@ boolean artif;
 		otmp->known = 1;
 	otmp->lknown = 0;
 	otmp->cknown = 0;
-#ifdef INVISIBLE_OBJECTS
-	otmp->oinvis = !rn2(1250);
-#endif
 	otmp->corpsenm = NON_PM;
 
 	if (init) switch (let) {
@@ -725,9 +715,7 @@ boolean artif;
 					break;
 		case LEASH:		otmp->leashmon = 0;
 					break;
-#ifdef TOURIST
 		case EXPENSIVE_CAMERA:
-#endif
 		case TINNING_KIT:
 		case MAGIC_MARKER:	otmp->spe = rn1(70,30);
 					break;
@@ -1044,9 +1032,7 @@ register struct obj *otmp;
 {
 	int old_light = 0;
 
-#ifdef GOLDOBJ
 	if (otmp->oclass == COIN_CLASS) return;
-#endif
 	if (otmp->lamplit) old_light = arti_light_radius(otmp);
 	otmp->cursed = 0;
 	otmp->blessed = 1;
@@ -1081,9 +1067,7 @@ register struct obj *otmp;
 {
 	int old_light = 0;
 
-#ifdef GOLDOBJ
 	if (otmp->oclass == COIN_CLASS) return;
-#endif
 	if (otmp->lamplit) old_light = arti_light_radius(otmp);
 	otmp->blessed = 0;
 	otmp->cursed = 1;
@@ -1358,10 +1342,6 @@ struct monst *mtmp;
 		mtmp2->data     = (struct permonst *)0;
 		mtmp2->minvent  = (struct obj *)0;
 		if (mtmp->mextra) copy_mextra(mtmp2, mtmp);
-#ifndef GOLDOBJ
-		/* not a pointer but is discarded along with minvent */
-		mtmp2->mgold	= 0L;
-#endif
 	}
 	return obj;
 }
@@ -1541,12 +1521,10 @@ struct obj *otmp;
 	/* Adjust the age; must be same as obj_timer_checks() for off ice*/
 	age = monstermoves - otmp->age;
 	retval += age * (ROT_ICE_ADJUSTMENT-1) / ROT_ICE_ADJUSTMENT;
-#ifdef DEBUG_EFFECTS
-	pline_The("%s age has ice modifications:otmp->age = %ld, returning %ld.",
+	debugpline("The %s age has ice modifications:otmp->age = %ld, returning %ld.",
 		s_suffix(doname(otmp)),otmp->age, retval);
-	pline("Effective age of corpse: %ld.",
+	debugpline("Effective age of corpse: %ld.",
 		monstermoves - retval);
-#endif
     }
     return retval;
 }
@@ -1575,9 +1553,7 @@ int force;	/* 0 = no force so do checks, <0 = force off, >0 force on */
 	    
 	    /* mark the corpse as being on ice */
 	    otmp->on_ice = 1;
-#ifdef DEBUG_EFFECTS
-	    pline("%s is now on ice at %d,%d.", The(xname(otmp)),x,y);
-#endif
+	    debugpline("%s is now on ice at %d,%d.", The(xname(otmp)),x,y);
 	    /* Adjust the time remaining */
 	    tleft *= ROT_ICE_ADJUSTMENT;
 	    restart_timer = TRUE;
@@ -1603,9 +1579,7 @@ int force;	/* 0 = no force so do checks, <0 = force off, >0 force on */
 		long age;
 
 		otmp->on_ice = 0;
-#ifdef DEBUG_EFFECTS
-	    	pline("%s is no longer on ice at %d,%d.", The(xname(otmp)),x,y);
-#endif
+	    	debugpline("%s is no longer on ice at %d,%d.", The(xname(otmp)),x,y);
 		/* Adjust the remaining time */
 		tleft /= ROT_ICE_ADJUSTMENT;
 		restart_timer = TRUE;
@@ -1955,7 +1929,6 @@ boolean tipping;  /* caller emptying entire contents; affects shop handling */
     return objcount;
 }
 
-#ifdef WIZARD
 /* support for wizard-mode's `sanity_check' option */
 
 static const char NEARDATA	/* pline formats for insane_object() */
@@ -2149,6 +2122,5 @@ check_contained(container, mesg)
 	}
     }
 }
-#endif /* WIZARD */
 
 /*mkobj.c*/

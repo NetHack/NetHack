@@ -1,4 +1,5 @@
-/* NetHack 3.5	mactopl.c	$Date$  $Revision$ */
+/* NetHack 3.5	mactopl.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mactopl.c	$Date: 2009/05/06 10:49:14 $  $Revision: 1.5 $ */
 /*	SCCS Id: @(#)mactopl.c	3.5	1991/07/23 */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */

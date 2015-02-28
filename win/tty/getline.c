@@ -1,4 +1,5 @@
-/* NetHack 3.5	getline.c	$Date$  $Revision$ */
+/* NetHack 3.5	getline.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	getline.c	$Date: 2011/12/11 01:54:56 $  $Revision: 1.18 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -22,25 +23,6 @@ STATIC_DCL void FDECL(hooked_tty_getlin, (const char*,char*,getlin_hook_proc));
 extern int NDECL(extcmd_via_menu);	/* cmd.c */
 
 extern char erase_char, kill_char;	/* from appropriate tty.c file */
-
-/* cloned from topl.c, but not identical
- */
-#ifdef UNICODE_WIDEWINPORT
-    /* nhwchar is wchar; data from core needs narrow-to-wide conversion;
-       data going back to core needs wide-to-narrow conversion; data
-       used within tty routines typically needs wide-to-wide awareness */
-STATIC_VAR nhwchar	getl_wbuf[BUFSZ];
-STATIC_VAR char		getl_nbuf[BUFSZ];
-#define T(x) L##x
-#define Waddtopl(str)		addtopl(nhwstrcpy(getl_wbuf,str))
-#define Wputsyms(str)		putsyms(nhwstrcpy(getl_wbuf,str))
-#define NWstrcpy(wdst,src)	nhwstrcpy(wdst,src)	/* narrow-to-wide */
-#else	/*!UNICODE_WIDEWINPORT*/
-    /* nhwchar is char; no conversions needed */
-#define T(x) x
-#define Waddtopl(str)		addtopl(str)
-#define Wputsyms(str)		putsyms(str)
-#endif	/*?UNICODE_WIDEWINPORT*/
 
 /*
  * Read a line closed with '\n' into the array char bufp[BUFSZ].
@@ -75,13 +57,8 @@ getlin_hook_proc hook;
 	*obufp = 0;
 	for(;;) {
 		(void) fflush(stdout);
-#ifdef UNICODE_WIDEWINPORT
-		Strcat(strcat(strcpy(getl_nbuf, query), " "), obufp);
-		(void)NWstrcpy(toplines, getl_nbuf);
-#else
 		Strcat(strcat(strcpy(toplines, query), " "), obufp);
-#endif
-		c = Getchar();
+		c = pgetchar();
 		if (c == '\033' || c == EOF) {
 		    obufp[0] = '\033';
 		    obufp[1] = '\0';
@@ -99,10 +76,10 @@ getlin_hook_proc hook;
 			ttyDisplay->inread = sav;
 			tty_clear_nhwindow(WIN_MESSAGE);
 			cw->maxcol = cw->maxrow;
-			Waddtopl(query);
-			Waddtopl(T(" "));
+			addtopl(query);
+			addtopl(" ");
 			*bufp = 0;
-			Waddtopl(obufp);
+			addtopl(obufp);
 		    } else {
 			if (!doprev)
 			    (void) tty_doprev_message();/* need two initially */
@@ -114,10 +91,10 @@ getlin_hook_proc hook;
 		    tty_clear_nhwindow(WIN_MESSAGE);
 		    cw->maxcol = cw->maxrow;
 		    doprev = 0;
-		    Waddtopl(query);
-		    Waddtopl(T(" "));
+		    addtopl(query);
+		    addtopl(" ");
 		    *bufp = 0;
-		    Waddtopl(obufp);
+		    addtopl(obufp);
 		}
 		if(c == erase_char || c == '\b') {
 			if(bufp != obufp) {
@@ -127,11 +104,11 @@ getlin_hook_proc hook;
 #endif /* NEWAUTOCOMP */
 				bufp--;
 #ifndef NEWAUTOCOMP
-				putsyms(T("\b \b"));/* putsym converts \b */
+				putsyms("\b \b");/* putsym converts \b */
 #else /* NEWAUTOCOMP */
-				putsyms(T("\b"));
-				for (i = bufp; *i; ++i) putsyms(T(" "));
-				for (; i > bufp; --i) putsyms(T("\b"));
+				putsyms("\b");
+				for (i = bufp; *i; ++i) putsyms(" ");
+				for (; i > bufp; --i) putsyms("\b");
 				*bufp = 0;
 #endif /* NEWAUTOCOMP */
 			} else	tty_nhbell();
@@ -154,21 +131,21 @@ getlin_hook_proc hook;
 #endif /* NEWAUTOCOMP */
 			*bufp = c;
 			bufp[1] = 0;
-			Wputsyms(bufp);
+			putsyms(bufp);
 			bufp++;
 			if (hook && (*hook)(obufp)) {
-			    Wputsyms(bufp);
+			    putsyms(bufp);
 #ifndef NEWAUTOCOMP
 			    bufp = eos(bufp);
 #else /* NEWAUTOCOMP */
 			    /* pointer and cursor left where they were */
-			    for (i = bufp; *i; ++i) putsyms(T("\b"));
+			    for (i = bufp; *i; ++i) putsyms("\b");
 			} else if (i > bufp) {
 			    char *s = i;
 
 			    /* erase rest of prior guess */
-			    for (; i > bufp; --i) putsyms(T(" "));
-			    for (; s > bufp; --s) putsyms(T("\b"));
+			    for (; i > bufp; --i) putsyms(" ");
+			    for (; s > bufp; --s) putsyms("\b");
 #endif /* NEWAUTOCOMP */
 			}
 		} else if(c == kill_char || c == '\177') { /* Robert Viduya */
@@ -176,11 +153,11 @@ getlin_hook_proc hook;
 #ifndef NEWAUTOCOMP
 			while(bufp != obufp) {
 				bufp--;
-				putsyms(T("\b \b"));
+				putsyms("\b \b");
 			}
 #else /* NEWAUTOCOMP */
-			for (; *bufp; ++bufp) putsyms(T(" "));
-			for (; bufp != obufp; --bufp) putsyms(T("\b \b"));
+			for (; *bufp; ++bufp) putsyms(" ");
+			for (; bufp != obufp; --bufp) putsyms("\b \b");
 			*bufp = 0;
 #endif /* NEWAUTOCOMP */
 		} else
@@ -190,8 +167,6 @@ getlin_hook_proc hook;
 	ttyDisplay->inread--;
 	clear_nhwindow(WIN_MESSAGE);	/* clean up after ourselves */
 }
-
-#undef T
 
 void
 xwaitforspace(s)
@@ -270,26 +245,20 @@ tty_get_ext_cmd()
 	if (iflags.extmenu) return extcmd_via_menu();
 	/* maybe a runtime option? */
 	/* hooked_tty_getlin("#", buf, flags.cmd_comp ? ext_cmd_getlin_hook : (getlin_hook_proc) 0); */
-#ifdef REDO
 	hooked_tty_getlin("#", buf, in_doagain ? (getlin_hook_proc)0
 		: ext_cmd_getlin_hook);
-#else
-	hooked_tty_getlin("#", buf, ext_cmd_getlin_hook);
-#endif
 	(void) mungspaces(buf);
 	if (buf[0] == 0 || buf[0] == '\033') return -1;
 
 	for (i = 0; extcmdlist[i].ef_txt != (char *)0; i++)
 		if (!strcmpi(buf, extcmdlist[i].ef_txt)) break;
 
-#ifdef REDO
 	if (!in_doagain) {
 	    int j;
 	    for (j = 0; buf[j]; j++)
 		savech(buf[j]);
 	    savech('\n');
 	}
-#endif
 
 	if (extcmdlist[i].ef_txt == (char *)0) {
 		pline("%s: unknown extended command.", buf);

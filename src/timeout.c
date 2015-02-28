@@ -1,4 +1,5 @@
-/* NetHack 3.5	timeout.c	$Date$  $Revision$ */
+/* NetHack 3.5	timeout.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	timeout.c	$Date: 2012/04/16 00:57:37 $  $Revision: 1.48 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -235,12 +236,10 @@ nh_timeout()
 	    }
 	}
 
-#ifdef STEED
 	if (u.ugallop) {
 	    if (--u.ugallop == 0L && u.usteed)
 	    	pline("%s stops galloping.", Monnam(u.usteed));
 	}
-#endif
 
 	for(upp = u.uprops; upp < u.uprops+SIZE(u.uprops); upp++)
 	    if((upp->intrinsic & TIMEOUT) && !(--upp->intrinsic & TIMEOUT)) {
@@ -670,9 +669,7 @@ slip_or_trip()
 	const char *what;
 	char buf[BUFSZ];
 	boolean on_foot = TRUE;
-#ifdef STEED
 	if (u.usteed) on_foot = FALSE;
-#endif
 
 	if (otmp && on_foot && !u.uinwater && is_pool(u.ux, u.uy)) otmp = 0;
 
@@ -706,11 +703,9 @@ slip_or_trip()
 	    }
 	} else if (rn2(3) && is_ice(u.ux, u.uy)) {
 	    pline("%s %s%s on the ice.",
-#ifdef STEED
 		u.usteed ? upstart(x_monnam(u.usteed,
 				(has_mname(u.usteed)) ? ARTICLE_NONE : ARTICLE_THE,
 				(char *)0, SUPPRESS_SADDLE, FALSE)) :
-#endif
 		"You", rn2(2) ? "slip" : "slide", on_foot ? "" : "s");
 	} else {
 	    if (on_foot) {
@@ -731,7 +726,6 @@ slip_or_trip()
 			break;
 		}
 	    }
-#ifdef STEED
 	    else {
 		switch (rn2(4)) {
 		  case 1:
@@ -749,7 +743,6 @@ slip_or_trip()
 		}
 		dismount_steed(DISMOUNT_FELL);
 	    }
-#endif
 	}
 }
 
@@ -1343,10 +1336,8 @@ do_storms()
  *		Check whether object has a timer of type timer_type.
  */
 
-#ifdef WIZARD
 STATIC_DCL const char *FDECL(kind_name, (SHORT_P));
 STATIC_DCL void FDECL(print_queue, (winid, timer_element *));
-#endif
 STATIC_DCL void FDECL(insert_timer, (timer_element *));
 STATIC_DCL timer_element *FDECL(remove_timer, (timer_element **, SHORT_P,
 								ANY_P *));
@@ -1383,9 +1374,6 @@ static const ttable timeout_funcs[NUM_TIME_FUNCS] = {
     TTAB(melt_ice_away,	(timeout_proc)0,	"melt_ice_away")
 };
 #undef TTAB
-
-
-#if defined(WIZARD)
 
 STATIC_OVL const char *
 kind_name(kind)
@@ -1466,9 +1454,6 @@ timer_sanity_check()
 	    }
 	}
 }
-
-#endif /* WIZARD */
-
 
 /*
  * Pick off timeout elements from the global queue and call their functions.

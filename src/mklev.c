@@ -1,17 +1,9 @@
-/* NetHack 3.5	mklev.c	$Date$  $Revision$ */
+/* NetHack 3.5	mklev.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mklev.c	$Date: 2012/02/15 01:55:33 $  $Revision: 1.20 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-/* #define DEBUG */	/* uncomment to enable code debugging */
-
-#ifdef DEBUG
-# ifdef WIZARD
-#define debugpline	if (wizard) pline
-# else
-#define debugpline	pline
-# endif
-#endif
 
 /* for UNIX, Rand #def'd to (long)lrand48() or (long)random() */
 /* croom->lx etc are schar (width <= int), so % arith ensures that */
@@ -19,9 +11,7 @@
 
 
 STATIC_DCL void FDECL(mkfount,(int,struct mkroom *));
-#ifdef SINKS
 STATIC_DCL void FDECL(mksink,(struct mkroom *));
-#endif
 STATIC_DCL void FDECL(mkaltar,(struct mkroom *));
 STATIC_DCL void FDECL(mkgrave,(struct mkroom *));
 STATIC_DCL void NDECL(makevtele);
@@ -401,11 +391,9 @@ register int type;
 		levl[x][y].doormask = (shdoor ? D_ISOPEN : D_NODOOR);
 #endif
 
-#ifdef REINCARNATION
 	    /* also done in roguecorr(); doing it here first prevents
 	       making mimics in place of trapped doors on rogue level */
 	    if (Is_rogue_level(&u.uz)) levl[x][y].doormask = D_NODOOR;
-#endif
 
 	    if(levl[x][y].doormask & D_TRAPPED) {
 		struct monst *mtmp;
@@ -628,11 +616,7 @@ makelevel()
 	    register s_level *slev = Is_special(&u.uz);
 
 	    /* check for special levels */
-#ifdef REINCARNATION
 	    if (slev && !Is_rogue_level(&u.uz))
-#else
-	    if (slev)
-#endif
 	    {
 		    makemaz(slev->proto);
 		    return;
@@ -664,12 +648,10 @@ makelevel()
 
 	/* otherwise, fall through - it's a "regular" level. */
 
-#ifdef REINCARNATION
 	if (Is_rogue_level(&u.uz)) {
 		makeroguerooms();
 		makerogueghost();
 	} else
-#endif
 		makerooms();
 	sort_rooms();
 
@@ -695,18 +677,14 @@ makelevel()
 	branchp = Is_branchlev(&u.uz);	/* possible dungeon branch */
 	room_threshold = branchp ? 4 : 3; /* minimum number of rooms needed
 					     to allow a random special room */
-#ifdef REINCARNATION
 	if (Is_rogue_level(&u.uz)) goto skip0;
-#endif
 	makecorridors();
 	make_niches();
 
 	/* make a secret treasure vault, not connected to the rest */
 	if(do_vault()) {
 		xchar w,h;
-#ifdef DEBUG
 		debugpline("trying to make a vault...");
-#endif
 		w = 1;
 		h = 1;
 		if (check_room(&vault_x, &w, &vault_y, &h, TRUE)) {
@@ -731,9 +709,7 @@ makelevel()
     {
 	register int u_depth = depth(&u.uz);
 
-#ifdef WIZARD
 	if(wizard && nh_getenv("SHOPTYPE")) mkroom(SHOPBASE); else
-#endif
 	if (u_depth > 1 &&
 	    u_depth < depth(&medusa_level) &&
 	    nroom >= room_threshold &&
@@ -754,9 +730,7 @@ makelevel()
 	   !(mvitals[PM_COCKATRICE].mvflags & G_GONE)) mkroom(COCKNEST);
     }
 
-#ifdef REINCARNATION
 skip0:
-#endif
 	/* Place multi-dungeon branch. */
 	place_branch(branchp, 0, 0);
 
@@ -785,13 +759,9 @@ skip0:
 		    mktrap(0,0,croom,(coord*)0);
 		if (!goldseen && !rn2(3))
 		    (void) mkgold(0L, somex(croom), somey(croom));
-#ifdef REINCARNATION
 		if(Is_rogue_level(&u.uz)) goto skip_nonrogue;
-#endif
 		if(!rn2(10)) mkfount(0,croom);
-#ifdef SINKS
 		if(!rn2(60)) mksink(croom);
-#endif
 		if(!rn2(60)) mkaltar(croom);
 		x = 80 - (depth(&u.uz) * 2);
 		if (x < 2) x = 2;
@@ -825,9 +795,7 @@ skip0:
 		    }
 		}
 
-#ifdef REINCARNATION
 	skip_nonrogue:
-#endif
 		if(!rn2(3)) {
 		    (void) mkobj_at(0, somex(croom), somey(croom), TRUE);
 		    tryct = 0;
@@ -866,9 +834,7 @@ mineralize()
 	/* determine if it is even allowed;
 	   almost all special levels are excluded */
 	if (In_hell(&u.uz) || In_V_tower(&u.uz) ||
-#ifdef REINCARNATION
 		Is_rogue_level(&u.uz) ||
-#endif
 		level.flags.arboreal ||
 		((sp = Is_special(&u.uz)) != 0 && !Is_oracle_level(&u.uz)
 					&& (!In_mines(&u.uz) || sp->flags.town)
@@ -933,9 +899,7 @@ mklev()
 	struct mkroom *croom;
 	int ridx;
 
-#ifdef DUNGEON_OVERVIEW
 	init_mapseen(&u.uz);
-#endif
 	if(getbones()) return;
 
 	in_mklev = TRUE;
@@ -986,10 +950,8 @@ register struct mkroom *croom;
 	if ((int) levl[lowx][lowy].roomno == roomno || croom->irregular)
 	    return;
 #ifdef SPECIALIZATION
-# ifdef REINCARNATION
 	if (Is_rogue_level(&u.uz))
 	    do_ordinary = TRUE;		/* vision routine helper */
-# endif
 	if ((rtype != OROOM) || do_ordinary)
 #endif
 	{
@@ -1210,7 +1172,6 @@ coord *tm;
 
 	if (num > 0 && num < TRAPNUM) {
 	    kind = num;
-#ifdef REINCARNATION
 	} else if (Is_rogue_level(&u.uz)) {
 	    switch (rn2(7)) {
 		default: kind = BEAR_TRAP; break; /* 0 */
@@ -1221,7 +1182,6 @@ coord *tm;
 		case 5: kind = SLP_GAS_TRAP; break;
 		case 6: kind = RUST_TRAP; break;
 	    }
-#endif
 	} else if (Inhell && !rn2(5)) {
 	    /* bias the frequency of fire traps in Gehennom */
 	    kind = FIRE_TRAP;
@@ -1346,7 +1306,6 @@ register struct mkroom *croom;
 	level.flags.nfountains++;
 }
 
-#ifdef SINKS
 STATIC_OVL void
 mksink(croom)
 register struct mkroom *croom;
@@ -1365,8 +1324,6 @@ register struct mkroom *croom;
 
 	level.flags.nsinks++;
 }
-#endif /* SINKS */
-
 
 STATIC_OVL void
 mkaltar(croom)
@@ -1591,11 +1548,7 @@ xchar x, y;
 	}
 
 	/* Already set or 2/3 chance of deferring until a later level. */
-	if (source->dnum < n_dgns || (rn2(3)
-#ifdef WIZARD
-				      && !wizard
-#endif
-				      )) return;
+	if (source->dnum < n_dgns || (rn2(3) && !wizard)) return;
 
 	if (! (u.uz.dnum == oracle_level.dnum	    /* in main dungeon */
 		&& !at_dgn_entrance("The Quest")    /* but not Quest's entry */
@@ -1607,9 +1560,7 @@ xchar x, y;
 	*source = u.uz;
 	insert_branch(br, TRUE);
 
-#ifdef DEBUG
-	pline("Made knox portal.");
-#endif
+	debugpline("Made knox portal.");
 	place_branch(br, x, y);
 }
 

@@ -1,4 +1,5 @@
-/* NetHack 3.5	vmsmain.c	$Date$  $Revision$ */
+/* NetHack 3.5	vmsmain.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	vmsmain.c	$Date: 2011/04/23 01:51:01 $  $Revision: 1.22 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 /* main.c - VMS NetHack */
@@ -135,13 +136,10 @@ char *argv[];
 	   or holds a generic user name like "player" or "games" */
 	plnamesuffix();
 
-#ifdef WIZARD
 	if (wizard) {
 		/* use character name rather than lock letter for file names */
 		locknum = 0;
-	} else
-#endif
-	    {
+	} else {
 		/* suppress interrupts while processing lock file */
 		(void) signal(SIGQUIT, SIG_IGN);
 		(void) signal(SIGINT, SIG_IGN);
@@ -268,20 +266,16 @@ char *argv[];
 		case 'I':
 		case 'i':
 			if (!strncmpi(argv[0]+1, "IBM", 3)) {
-#ifdef LOADSYMSETS
 				load_symset("IBMGraphics", PRIMARY);
 				load_symset("RogueIBM", ROGUESET);
 				switch_symbols(TRUE);
-#endif
 			}
 			break;
 	    /*  case 'D': */
 		case 'd':
 			if (!strncmpi(argv[0]+1, "DEC", 3)) {
-#ifdef LOADSYMSETS
 				load_symset("DECGraphics", PRIMARY);
 				switch_symbols(TRUE);
-#endif
 			}
 			break;
 		case 'p': /* profession (role) */
@@ -415,12 +409,10 @@ genericptr_t sigargs, mechargs;	/* [0] is argc, [1..argc] are the real args */
      || (condition >= SS$_ASTFLT && condition <= SS$_TBIT)
      || (condition >= SS$_ARTRES && condition <= SS$_INHCHME)) {
 	program_state.done_hup = TRUE;	/* pretend hangup has been attempted */
-# if defined(WIZARD) && !defined(BETA)
+# ifndef BETA
 	if (wizard)
-# endif /*WIZARD && !BETA*/
-# if defined(WIZARD) ||  defined(BETA)
+# endif /* !BETA */
 	    abort();	/* enter the debugger */
-# endif /*WIZARD || BETA*/
     }
     return SS$_RESIGNAL;
 }
@@ -453,9 +445,7 @@ port_help()
 boolean
 authorize_wizard_mode()
 {
-#ifdef WIZARD
 	if (!strcmpi(nh_getenv("USER"), WIZARD_NAME)) return TRUE;
-#endif
 	wiz_error_flag = TRUE;	/* not being allowed into wizard mode */
 	return FALSE;
 }
@@ -464,12 +454,8 @@ static void
 wd_message()
 {
 	if (wiz_error_flag) {
-#ifdef WIZARD
 		pline("Only user \"%s\" may access debug (wizard) mode.",
 		      WIZARD_NAME);
-#else
-		pline("Debug mode is not available.");
-#endif
 		pline("Entering explore/discovery mode instead.");
 		wizard = 0, discover = 1;		/* (paranoia) */
 	} else if (discover)

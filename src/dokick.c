@@ -1,4 +1,5 @@
-/* NetHack 3.5	dokick.c	$Date$  $Revision$ */
+/* NetHack 3.5	dokick.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	dokick.c	$Date: 2012/05/06 02:29:33 $  $Revision: 1.78 $ */
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -321,11 +322,7 @@ register struct obj *gold;
 			    verbalize("Thank you for your contribution.");
 			else verbalize("Thanks, scum!");
 		} else if (mtmp->isgd) {
-#ifndef GOLDOBJ
-			umoney = u.ugold;
-#else
 			umoney = money_cnt(invent);
-#endif
 			/* Some of these are iffy, because a hostile guard
 			   won't become peaceful and resume leading hero
 			   out of the vault.  If he did do that, player
@@ -351,11 +348,7 @@ register struct obj *gold;
 			   goldreqd = 750L;
 
 			if (goldreqd) {
-#ifndef GOLDOBJ
-			    umoney = u.ugold;
-#else
 			    umoney = money_cnt(invent);
-#endif
 			    if (value > goldreqd +
 				  (umoney + u.ulevel * rn2(5)) / ACURR(A_CHA))
 				mtmp->mpeaceful = TRUE;
@@ -687,9 +680,7 @@ char *buf;
 	else if (IS_THRONE(maploc->typ)) what = "a throne";
 	else if (IS_FOUNTAIN(maploc->typ)) what = "a fountain";
 	else if (IS_GRAVE(maploc->typ)) what = "a headstone";
-#ifdef SINKS
 	else if (IS_SINK(maploc->typ)) what = "a sink";
-#endif
 	else if (IS_ALTAR(maploc->typ)) what = "an altar";
 	else if (IS_DRAWBRIDGE(maploc->typ)) what = "a drawbridge";
 	else if (maploc->typ == STAIRS) what = "the stairs";
@@ -715,7 +706,6 @@ dokick()
 	} else if (verysmall(youmonst.data)) {
 		You("are too small to do any kicking.");
 		no_kick = TRUE;
-#ifdef STEED
 	} else if (u.usteed) {
 		if (yn_function("Kick your steed?", ynchars, 'y') == 'y') {
 		    You("kick %s.", mon_nam(u.usteed));
@@ -724,7 +714,6 @@ dokick()
 		} else {
 		    return 0;
 		}
-#endif
 	} else if (Wounded_legs) {
 		/* note: jump() has similar code */
 		long wl = (EWounded_legs & BOTH_SIDES);
@@ -1055,7 +1044,6 @@ dokick()
 		    }
 		    goto ouch;
 		}
-#ifdef SINKS
 		if(IS_SINK(maploc->typ)) {
 		    int gend = poly_gender();
 		    short washerndx = (gend == 1 || (gend == 2 && rn2(2))) ?
@@ -1108,7 +1096,6 @@ dokick()
 		    }
 		    goto ouch;
 		}
-#endif
 		if (maploc->typ == STAIRS || maploc->typ == LADDER ||
 						    IS_STWALL(maploc->typ)) {
 		    if(!IS_STWALL(maploc->typ) && maploc->ladder == LA_DOWN)
@@ -1461,10 +1448,7 @@ boolean shop_floor_obj;
 	    const char *result;
 
 	    if (objects[otmp->otyp].oc_material == GLASS
-#ifdef TOURIST
-		|| otmp->otyp == EXPENSIVE_CAMERA
-#endif
-		) {
+            || otmp->otyp == EXPENSIVE_CAMERA) {
 		if (otmp->otyp == MIRROR)
 		    change_luck(-2);
 		result = "crash";

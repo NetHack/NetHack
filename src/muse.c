@@ -1,4 +1,5 @@
-/* NetHack 3.5	muse.c	$Date$  $Revision$ */
+/* NetHack 3.5	muse.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	muse.c	$Date: 2012/04/12 23:26:47 $  $Revision: 1.49 $ */
 /*	Copyright (C) 1990 by Ken Arromdee			   */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -919,11 +920,8 @@ struct monst *mtmp;
 	int trycnt = 0;
 
 	if(is_animal(pm) || attacktype(pm, AT_EXPL) || mindless(mtmp->data)
-			|| pm->mlet == S_GHOST
-# ifdef KOPS
-			|| pm->mlet == S_KOP
-# endif
-		) return 0;
+			|| pm->mlet == S_GHOST || pm->mlet == S_KOP)
+            return 0;
     try_again:
 	switch (rn2(8 + (difficulty > 3) + (difficulty > 6) +
 				(difficulty > 8))) {
@@ -990,11 +988,8 @@ struct monst *mtmp;
 		return FALSE;
 	if (u.uswallow) return FALSE;
 	if (in_your_sanctuary(mtmp, 0, 0)) return FALSE;
-	if (dmgtype(mtmp->data, AD_HEAL) && !uwep
-#ifdef TOURIST
-	    && !uarmu
-#endif
-	    && !uarm && !uarmh && !uarms && !uarmg && !uarmc && !uarmf)
+	if (dmgtype(mtmp->data, AD_HEAL) && !uwep && !uarmu && !uarm && !uarmh
+                && !uarms && !uarmg && !uarmc && !uarmf)
 		return FALSE;
 
 	if (!ranged_stuff) return FALSE;
@@ -1085,9 +1080,7 @@ struct monst *mtmp;
 				unsolid(mtmp->data) || !rn2(10))
 		       && dist2(mtmp->mx,mtmp->my,mtmp->mux,mtmp->muy) <= 2
 		       && mtmp->mcansee && haseyes(mtmp->data)
-#ifdef REINCARNATION
 		       && !Is_rogue_level(&u.uz)
-#endif
 		       && (!In_endgame(&u.uz) || Is_earthlevel(&u.uz))) {
 		    m.offensive = obj;
 		    m.has_offense = MUSE_SCR_EARTH;
@@ -1534,11 +1527,8 @@ struct monst *mtmp;
 	int difficulty = monstr[(monsndx(pm))];
 
 	if(is_animal(pm) || attacktype(pm, AT_EXPL) || mindless(mtmp->data)
-			|| pm->mlet == S_GHOST
-# ifdef KOPS
-			|| pm->mlet == S_KOP
-# endif
-		) return 0;
+			|| pm->mlet == S_GHOST || pm->mlet == S_KOP)
+            return 0;
 	if (difficulty > 7 && !rn2(35)) return WAN_DEATH;
 	switch (rn2(9 - (difficulty < 4) + 4 * (difficulty > 6))) {
 		case 0: {
@@ -1942,11 +1932,8 @@ struct monst *mtmp;
 	int difficulty = monstr[(monsndx(pm))];
 
 	if(is_animal(pm) || attacktype(pm, AT_EXPL) || mindless(mtmp->data)
-			|| pm->mlet == S_GHOST
-# ifdef KOPS
-			|| pm->mlet == S_KOP
-# endif
-		) return 0;
+			|| pm->mlet == S_GHOST || pm->mlet == S_KOP)
+            return 0;
 	/* Unlike other rnd_item functions, we only allow _weak_ monsters
 	 * to have this item; after all, the item will be used to strengthen
 	 * the monster and strong monsters won't use it at all...

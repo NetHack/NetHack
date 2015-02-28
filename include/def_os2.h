@@ -1,4 +1,5 @@
-/* NetHack 3.5	def_os2.h	$Date$  $Revision$ */
+/* NetHack 3.5	def_os2.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	def_os2.h	$Date: 2009/05/06 10:44:37 $  $Revision: 1.4 $ */
 /*	SCCS Id: @(#)def_os2.h	3.5	1993/01/19	*/
 /* Copyright (c) Timo Hakulinen, 1990, 1991, 1992, 1993.	  */
 /* NetHack may be freely redistributed.  See license for details. */

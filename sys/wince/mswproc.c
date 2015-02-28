@@ -1,4 +1,5 @@
-/* NetHack 3.5	mswproc.c	$Date$  $Revision$ */
+/* NetHack 3.5	mswproc.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mswproc.c	$Date: 2012/01/24 04:26:22 $  $Revision: 1.19 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -792,14 +793,12 @@ void mswin_clear_nhwindow(winid wid)
         (wid < MAXWINDOWS) &&
         (GetNHApp()->windowlist[wid].win != NULL))
     {
-#ifdef REINCARNATION
 		if( GetNHApp()->windowlist[wid].type == NHW_MAP ) {
 			if( Is_rogue_level(&u.uz) ) 
 				mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP), ROGUE_LEVEL_MAP_MODE);
 			else 
 				mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP), iflags.wc_map_mode);
 		}
-#endif
 
          SendMessage( 
 			 GetNHApp()->windowlist[wid].win, 

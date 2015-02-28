@@ -1,4 +1,5 @@
-/* NetHack 3.5	mhrip.c	$Date$  $Revision$ */
+/* NetHack 3.5	mhrip.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mhrip.c	$Date: 2009/05/06 10:52:26 $  $Revision: 1.5 $ */
 /*	SCCS Id: @(#)mhrip.c	3.5	2005/01/23	*/
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */

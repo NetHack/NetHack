@@ -1,4 +1,5 @@
-/* NetHack 3.5	options.c	$Date$  $Revision$ */
+/* NetHack 3.5	options.c	$NHDT-Date: 1425083082 2015/02/28 00:24:42 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.158 $ */
+/* NetHack 3.5	options.c	$Date: 2012/04/09 02:56:30 $  $Revision: 1.153 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -137,12 +138,8 @@ static struct Bool_Opt
 #else
 	{"mail", (boolean *)0, TRUE, SET_IN_FILE},
 #endif
-#ifdef WIZARD
 	/* for menu debugging only*/
 	{"menu_tab_sep", &iflags.menu_tab_sep, FALSE, SET_IN_GAME},
-#else
-	{"menu_tab_sep", (boolean *)0, FALSE, SET_IN_FILE},
-#endif
 	{"mouse_support", &iflags.wc_mouse_support, TRUE, DISP_IN_GAME},	/*WC*/
 #ifdef NEWS
 	{"news", &iflags.news, TRUE, DISP_IN_GAME},
@@ -176,17 +173,9 @@ static struct Bool_Opt
 		DISP_IN_GAME},
 #endif
 	{"safe_pet", &flags.safe_dog, TRUE, SET_IN_GAME},
-#ifdef WIZARD
 	{"sanity_check", &iflags.sanity_check, FALSE, SET_IN_GAME},
-#else
-	{"sanity_check", (boolean *)0, FALSE, SET_IN_FILE},
-#endif
 	{"selectsaved", &iflags.wc2_selectsaved, TRUE, DISP_IN_GAME},		/*WC*/
-#ifdef EXP_ON_BOTL
 	{"showexp", &flags.showexp, FALSE, SET_IN_GAME},
-#else
-	{"showexp", (boolean *)0, FALSE, SET_IN_FILE},
-#endif
 	{"showrace", &flags.showrace, FALSE, SET_IN_GAME},
 #ifdef SCORE_ON_BOTL
 	{"showscore", &flags.showscore, FALSE, SET_IN_GAME},
@@ -209,9 +198,6 @@ static struct Bool_Opt
 	{"tombstone",&flags.tombstone, TRUE, SET_IN_GAME},
 	{"toptenwin",&iflags.toptenwin, FALSE, SET_IN_GAME},
 	{"travel", &flags.travelcmd, TRUE, SET_IN_GAME},
-#ifdef UNICODE_SUPPORT
-	{"unicode", &iflags.unicodedisp, FALSE, SET_IN_GAME},
-#endif
 #ifdef WIN32CON
 	{"use_inverse",   &iflags.wc_inverse, TRUE, SET_IN_GAME},		/*WC*/
 #else
@@ -338,12 +324,7 @@ static struct Comp_Opt
 						MAXOCLASSES, SET_IN_GAME },
 	{ "pile_limit", "threshold for \"there are many objects here\"",
 						24, SET_IN_GAME },
-	{ "playmode",
-#ifdef WIZARD
-		      "normal play, non-scoring explore mode, or debug mode",
-#else
-		      "normal play or non-scoring explore mode",
-#endif
+	{ "playmode", "normal play, non-scoring explore mode, or debug mode",
 						 8, DISP_IN_GAME },
 	{ "player_selection", "choose character via dialog or prompts",
 						12, DISP_IN_GAME },
@@ -362,21 +343,9 @@ static struct Comp_Opt
 	{ "soundcard", "type of sound card to use", 20, SET_IN_FILE },
 #endif
 	{ "symset", "load a set of display symbols from the symbols file", 70,
-#ifdef LOADSYMSETS
 				SET_IN_GAME },
-#else
-				DISP_IN_GAME},
-#endif
 	{ "roguesymset", "load a set of rogue display symbols from the symbols file", 70,
-#ifdef REINCARNATION
-# ifdef LOADSYMSETS
 				 SET_IN_GAME },
-# else
-				 DISP_IN_GAME},
-# endif
-#else
-				 SET_IN_FILE},
-#endif
 	{ "suppress_alert", "suppress alerts about version-specific features",
 						8, SET_IN_GAME },
 	{ "tile_width", "width of tiles", 20, DISP_IN_GAME},	/*WC*/
@@ -517,10 +486,8 @@ STATIC_OVL boolean FDECL(is_wc_option, (const char *));
 STATIC_OVL boolean FDECL(wc_supported, (const char *));
 STATIC_OVL boolean FDECL(is_wc2_option, (const char *));
 STATIC_OVL boolean FDECL(wc2_supported, (const char *));
-#ifdef AUTOPICKUP_EXCEPTIONS
 STATIC_DCL void FDECL(remove_autopickup_exception, (struct autopickup_exception *));
 STATIC_OVL int FDECL(count_ape_maps, (int *, int *));
-#endif
 
 /* check whether a user-supplied option string is a proper leading
    substring of a particular option name; option string might have
@@ -635,9 +602,6 @@ initoptions_init()
 	iflags.msg_history = 20;
 #ifdef TTY_GRAPHICS
 	iflags.prevmsg_window = 's';
-#  if defined(UNIX) && defined(UNICODE_WIDEWINPORT)
-	iflags.unicodecapable = TRUE;
-#  endif
 #endif
 	iflags.menu_headings = ATR_INVERSE;
 
@@ -672,11 +636,9 @@ initoptions_init()
 	 */
 	/* this detects the IBM-compatible console on most 386 boxes */
 	if ((opts = nh_getenv("TERM")) && !strncmp(opts, "AT", 2)) {
-#ifdef LOADSYMSETS
 		if (!symset[PRIMARY].name) load_symset("IBMGraphics", PRIMARY);
 		if (!symset[ROGUESET].name) load_symset("RogueIBM", ROGUESET);
 		switch_symbols(TRUE);
-#endif
 # ifdef TEXTCOLOR
 		iflags.use_color = TRUE;
 # endif
@@ -688,10 +650,8 @@ initoptions_init()
 	if ((opts = nh_getenv("TERM")) &&
 	    !strncmpi(opts, "vt", 2) && AS && AE &&
 	    index(AS, '\016') && index(AE, '\017')) {
-#  ifdef LOADSYMSETS
 		if (!symset[PRIMARY].name) load_symset("DECGraphics", PRIMARY);
 		switch_symbols(TRUE);
-#  endif /*LOADSYMSETS*/
 	}
 # endif
 #endif /* UNIX || VMS */
@@ -925,12 +885,7 @@ char *op;
     char *sp, buf[BUFSZ];
 
     num = 0;
-#ifndef GOLDOBJ
-    if (!index(op, GOLD_SYM))
-	buf[num++] = COIN_CLASS;
-#else
     /*  !!!! probably unnecessary with gold as normal inventory */
-#endif
 
     for (sp = op; *sp; sp++) {
 	oc_sym = def_char_to_objclass(*sp);
@@ -1115,17 +1070,9 @@ STATIC_VAR const struct paranoia_opts {
 	{ PARANOID_QUIT,    "quit", 1,    "explore", 1,
 		"yes vs y to quit or to enter explore mode" },
 	{ PARANOID_DIE,     "die", 1,     "death", 2,
-#ifdef WIZARD
 		"yes vs y to die (explore mode or debug mode)" },
-#else
-		"yes vs y to die (explore mode only)" },
-#endif
 	{ PARANOID_BONES,   "bones", 1,   0, 0,
-#ifdef WIZARD
 		"yes vs y to save bones data when dying in debug mode" },
-#else
-		"(only applicable for debug mode)" },
-#endif
 	{ PARANOID_HIT,     "attack", 1,  "hit", 1,
 		"yes vs y to attack a peaceful monster" },
 	{ PARANOID_PRAY,    "pray", 1,    0, 0,
@@ -1416,7 +1363,6 @@ boolean tinitial, tfrom_file;
 
 	fullname = "roguesymset";
 	if (match_optname(opts, fullname, 7, TRUE)) {
-#if defined(REINCARNATION) && defined(LOADSYMSETS)
 		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) bad_negation(fullname, FALSE);
 		else if ((op = string_for_opt(opts, FALSE)) != 0) {
@@ -1433,13 +1379,11 @@ boolean tinitial, tfrom_file;
 				need_redraw = TRUE;
 		    }
 		}
-#endif
 		return;
 	}
 
 	fullname = "symset";
 	if (match_optname(opts, fullname, 6, TRUE)) {
-#ifdef LOADSYMSETS
 		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) bad_negation(fullname, FALSE);
 		else if ((op = string_for_opt(opts, FALSE)) != 0) {
@@ -1455,7 +1399,6 @@ boolean tinitial, tfrom_file;
 			need_redraw = TRUE;
 		    }
 		}
-#endif
 		return;
 	}
 
@@ -2050,12 +1993,7 @@ goodfruit:
 		wizard = FALSE, discover = TRUE;
 	    } else if (!strncmpi(op, "debug", 5) ||
 		    !strncmpi(op, "wizard", 6)) {
-#ifdef WIZARD
 		wizard = TRUE, discover = FALSE;
-#else
-		raw_printf("\"%s\":%s -- debug mode not available.",
-			   fullname, op);
-#endif
 	    } else {
 		raw_printf("Invalid value for \"%s\":%s.", fullname, op);
 	    }
@@ -2543,7 +2481,6 @@ goodfruit:
 	fullname = "DECgraphics";
 	if (match_optname(opts, fullname, 10, TRUE)) {
 		boolean badflag = FALSE;
-# ifdef LOADSYMSETS
 		if (duplicate) complain_about_duplicate(opts,1);
 		if (!negated) {
 		    /* There is no rogue level DECgraphics-specific set */
@@ -2563,17 +2500,15 @@ goodfruit:
 			wait_synch();
 		    }
 		}
-# endif	/*LOADSYMSETS*/
 		return;
 	}
 	fullname = "IBMgraphics";
 	if (match_optname(opts, fullname, 10, TRUE)) {
 		const char *sym_name = fullname;
 		boolean badflag = FALSE;
-# ifdef LOADSYMSETS
 		if (duplicate) complain_about_duplicate(opts,1);
 		if (!negated) {
-		    for (i = PRIMARY; i <= ROGUESET; ++i) { 
+		    for (i = 0; i < NUM_GRAPHICS; ++i) { 
 			if (symset[i].name)
 			    badflag = TRUE;
 			else {
@@ -2593,13 +2528,10 @@ goodfruit:
 			wait_synch();
 		    } else {
 			switch_symbols(TRUE);
-#  ifdef REINCARNATION
 			if (!initial && Is_rogue_level(&u.uz))
 				assign_graphics(ROGUESET);
-#  endif
 		    }
 		}
-# endif /*LOADSYMSETS*/
 		return;
 	}
 #endif
@@ -2607,7 +2539,6 @@ goodfruit:
 	fullname = "MACgraphics";
 	if (match_optname(opts, fullname, 11, TRUE)) {
 		boolean badflag = FALSE;
-# ifdef LOADSYMSETS
 		if (duplicate) complain_about_duplicate(opts,1);
 		if (!negated) {
 		    if (symset[PRIMARY]).name badflag = TRUE;
@@ -2629,7 +2560,6 @@ goodfruit:
 				assign_graphics(ROGUESET);
 		    }
 		}
-# endif /*LOADSYMSETS*/
 		return;
 	}
 #endif
@@ -2678,9 +2608,7 @@ goodfruit:
 			if (initial) return;
 
 			if ((boolopt[i].addr) == &flags.time
-#ifdef EXP_ON_BOTL
 			 || (boolopt[i].addr) == &flags.showexp
-#endif
 #ifdef SCORE_ON_BOTL
 			 || (boolopt[i].addr) == &flags.showscore
 #endif
@@ -2875,10 +2803,8 @@ doset()
 			((boolopt[i].optflags == DISP_IN_GAME && pass == 0) ||
 			 (boolopt[i].optflags == SET_IN_GAME && pass == 1))) {
 		    if (bool_p == &flags.female) continue;  /* obsolete */
-#ifdef WIZARD
 		    if (bool_p == &iflags.sanity_check && !wizard) continue;
 		    if (bool_p == &iflags.menu_tab_sep && !wizard) continue;
-#endif
 		    if (is_wc_option(boolopt[i].name) &&
 			!wc_supported(boolopt[i].name)) continue;
 		    if (is_wc2_option(boolopt[i].name) &&
@@ -2963,12 +2889,10 @@ doset()
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
 # endif
 #endif
-#ifdef AUTOPICKUP_EXCEPTIONS
 	any.a_int = -1;
 	Sprintf(buf, "autopickup exceptions (%d currently set)",
 		count_ape_maps((int *)0, (int *)0));
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
-#endif /* AUTOPICKUP_EXCEPTIONS */
 #ifdef PREFIXES_IN_USE
 	any = zeroany;
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
@@ -2988,12 +2912,10 @@ doset()
 	     */
 	    for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx) {
 		opt_indx = pick_list[pick_idx].item.a_int - 1;
-#ifdef AUTOPICKUP_EXCEPTIONS
 		if (opt_indx == -2) {	/* -3 due to -1 offset for select_menu() */
 		    (void)special_handling("autopickup_exception",
 					   setinitial, fromfile);
 		} else
-#endif
 #ifdef STATUS_VIA_WINDOWPORT
 # ifdef STATUS_HILITES
 		if (opt_indx == -3) {	/* -3 due to -1 offset for select_menu() */
@@ -3043,10 +2965,8 @@ doset()
 	return 0;
 }
 
-#ifdef LOADSYMSETS
 struct symsetentry *symset_list = 0;	/* files.c will populate this with
 						 list of available sets */
-#endif
 
 STATIC_OVL boolean
 special_handling(optname, setinitial, setfromfile)
@@ -3060,9 +2980,7 @@ boolean setinitial,setfromfile;
 
     /* Special handling of menustyle, pickup_burden, pickup_types,
      * disclose, runmode, msg_window, menu_headings, and number_pad options.
-#ifdef AUTOPICKUP_EXCEPTIONS
      * Also takes care of interactive autopickup_exception_handling changes.
-#endif
      */
     if (!strcmp("menustyle", optname)) {
 	const char *style_name;
@@ -3336,7 +3254,6 @@ boolean setinitial,setfromfile;
 	}
 	destroy_nhwindow(tmpwin);
     } else if (!strcmp("autopickup_exception", optname)) {
-#ifdef AUTOPICKUP_EXCEPTIONS
 	int pick_cnt, pick_idx, opt_idx, pass;
 	int totalapes = 0, numapes[2] = {0,0};
 	menu_item *pick_list = (menu_item *)0;
@@ -3432,33 +3349,23 @@ boolean setinitial,setfromfile;
 		destroy_nhwindow(tmpwin);
 		if (pick_cnt >= 0) goto ape_again;
 	}
-#endif /* AUTOPICKUP_EXCEPTIONS */
     } else if (!strcmp("symset", optname)
  	    || !strcmp("roguesymset", optname)) {
 	menu_item *symset_pick = (menu_item *)0;
 	boolean primaryflag = (*optname == 's'),
-		  rogueflag = (*optname == 'r'),
+		rogueflag = (*optname == 'r'),
 		ready_to_switch = FALSE,
 		nothing_to_do = FALSE;
-#ifdef LOADSYMSETS
 	int res;
 	char *symset_name, fmtstr[20];
 	struct symsetentry *sl;
 	int setcount = 0;
-#endif
 	int chosen = -2, which_set;
  
-#ifdef REINCARNATION
 	if (rogueflag) which_set = ROGUESET;
 	else
-#endif
 	which_set = PRIMARY;
 
-#ifndef REINCARNATION
-	if (rogueflag) return TRUE;
-#endif
-
-#ifdef LOADSYMSETS
 	/* clear symset[].name as a flag to read_sym_file() to build list */
 	symset_name = symset[which_set].name;
 	symset[which_set].name = (char *)0;
@@ -3471,8 +3378,7 @@ boolean setinitial,setfromfile;
 		sl = symset_list;
 		while (sl) {
 		    /* check restrictions */
-		    if ((!rogueflag && sl->rogue)     ||
-		        (!iflags.unicodedisp && sl->unicode) ||
+		    if ((!rogueflag && sl->rogue)  ||
 			(!primaryflag && sl->primary)) {
 		    	sl = sl->next;
 		    	continue;
@@ -3485,8 +3391,8 @@ boolean setinitial,setfromfile;
 		}
 		if (!setcount) {
 			pline("There are no appropriate %ssymbol sets available.",
-				  (rogueflag) ? "rogue level " :
-				(primaryflag) ? "primary "     :
+				(rogueflag)   ? "rogue level " :
+				(primaryflag) ? "primary " :
 				"");
 			return TRUE;
 		}
@@ -3502,7 +3408,6 @@ boolean setinitial,setfromfile;
 		while (sl) {
 		    /* check restrictions */
 		    if ((!rogueflag && sl->rogue) ||
-		        (!iflags.unicodedisp && sl->unicode) ||
 			(!primaryflag && sl->primary)) {
 		    	sl = sl->next;
 		    	continue;
@@ -3586,12 +3491,10 @@ boolean setinitial,setfromfile;
 	    symset[which_set].name = symset_name;
 
 	/* Set default symbols and clear the handling value */
-# ifdef REINCARNATION
 	if(rogueflag)
 	    init_r_symbols();
 	else
-# endif
-	init_l_symbols();
+	    init_l_symbols();
 
 	if (symset[which_set].name) {
 	    if (read_sym_file(which_set))
@@ -3604,15 +3507,11 @@ boolean setinitial,setfromfile;
 
 	if (ready_to_switch) switch_symbols(TRUE);
 
-# ifdef REINCARNATION
 	if (Is_rogue_level(&u.uz)) {
 		if (rogueflag)
 		    assign_graphics(ROGUESET);
-	} else
-# endif
-	if (!rogueflag) assign_graphics(PRIMARY);
+	} else if (!rogueflag) assign_graphics(PRIMARY);
 	need_redraw = TRUE;
-#endif /*LOADSYMSETS*/
 	return TRUE;
 
     } else {
@@ -3661,14 +3560,9 @@ char *buf;
 #endif
 #ifdef BACKWARD_COMPAT
 	else if (!strcmp(optname, "boulder"))
-		Sprintf(buf,
-# ifdef UNICODE_DRAWING
-			    "\\x%04X",
-# else
-			    "%c",
-# endif
-			iflags.bouldersym ? iflags.bouldersym :
-			 showsyms[(int)objects[BOULDER].oc_class + SYM_OFF_O]);
+		Sprintf(buf, "%c", iflags.bouldersym ?
+			iflags.bouldersym :
+			showsyms[(int)objects[BOULDER].oc_class + SYM_OFF_O]);
 #endif
 	else if (!strcmp(optname, "catname"))
 		Sprintf(buf, "%s", catname[0] ? catname : none);
@@ -3831,17 +3725,13 @@ char *buf;
 	}
 	else if (!strcmp(optname, "race"))
 		Sprintf(buf, "%s", rolestring(flags.initrace, races, noun));
-#ifdef REINCARNATION
 	else if (!strcmp(optname, "roguesymset")) {
 		Sprintf(buf, "%s",
-# ifdef LOADSYMSETS
 			symset[ROGUESET].name ?
 			symset[ROGUESET].name :
-# endif
 			"default");
 		if (currentgraphics == ROGUESET && symset[ROGUESET].name)
 			Strcat(buf, ", active");
-#endif
 	}
 	else if (!strcmp(optname, "role"))
 		Sprintf(buf, "%s", rolestring(flags.initrole, roles, name.m));
@@ -3876,10 +3766,8 @@ char *buf;
 	}
 	else if (!strcmp(optname, "symset")) {
 		Sprintf(buf, "%s",
-#ifdef LOADSYMSETS
 			symset[PRIMARY].name ?
 			symset[PRIMARY].name :
-#endif
 			"default");
 		if (currentgraphics == PRIMARY && symset[PRIMARY].name)
 			Strcat(buf, ", active");
@@ -3950,12 +3838,10 @@ dotogglepickup()
 	if (flags.pickup) {
 	    oc_to_str(flags.pickup_types, ocl);
 	    Sprintf(buf, "ON, for %s objects%s", ocl[0] ? ocl : "all",
-#ifdef AUTOPICKUP_EXCEPTIONS
 			(iflags.autopickup_exceptions[AP_LEAVE] ||
 			 iflags.autopickup_exceptions[AP_GRAB]) ?
 			 ((count_ape_maps((int *)0, (int *)0) == 1) ?
 			    ", with one exception" : ", with some exceptions") :
-#endif
 			"");
 	} else {
 	    Strcpy(buf, "OFF");
@@ -3964,7 +3850,6 @@ dotogglepickup()
 	return 0;
 }
 
-#ifdef AUTOPICKUP_EXCEPTIONS
 int
 add_autopickup_exception(mapping)
 const char *mapping;
@@ -4057,9 +3942,7 @@ free_autopickup_exceptions()
 		}
 	}
 }
-#endif /* AUTOPICKUP_EXCEPTIONS */
 
-#ifdef LOADSYMSETS
 /* bundle some common usage into one easy-to-use routine */
 int
 load_symset(s, which_set)
@@ -4137,7 +4020,15 @@ char *buf;
 	}
 	return (struct symparse *)0;
 }
-#endif /*LOADSYMSETS*/
+
+int sym_val(strval)
+char *strval;
+{
+	char buf[QBUFSZ];
+	buf[0] = '\0';
+	escapes(strval, buf);
+	return (int)*buf;
+}
 
 /* data for option_help() */
 static const char *opt_intro[] = {
@@ -4182,10 +4073,8 @@ option_help()
     /* Boolean options */
     for (i = 0; boolopt[i].name; i++) {
 	if (boolopt[i].addr) {
-#ifdef WIZARD
 	    if (boolopt[i].addr == &iflags.sanity_check && !wizard) continue;
 	    if (boolopt[i].addr == &iflags.menu_tab_sep && !wizard) continue;
-#endif
 	    next_opt(datawin, boolopt[i].name);
 	}
     }
@@ -4776,11 +4665,9 @@ void
 set_playmode()
 {
     if (wizard) {
-#ifdef WIZARD
 	if (authorize_wizard_mode())
 	    Strcpy(plname, "wizard");
 	else
-#endif
 	    wizard = FALSE;	/* not allowed or not available */
 	/* force explore mode if we didn't make it into wizard mode */
 	discover = !wizard;

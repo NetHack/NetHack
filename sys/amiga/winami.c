@@ -1,4 +1,5 @@
-/* NetHack 3.5	winami.c	$Date$  $Revision$ */
+/* NetHack 3.5	winami.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	winami.c	$Date: 2012/01/10 17:47:21 $  $Revision: 1.13 $ */
 /* Copyright (c) Gregg Wonderly, Naperville, Illinois,  1991,1992,1993,1996. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -578,11 +579,7 @@ amii_player_selection()
 		{
 		    flags.initrole = randrole();
 #if 0	/* OBSOLETE */
-#ifdef  TOURIST
 		    strcpy( pl_character, roles[ rnd( 11 ) ] );
-#else
-		    strcpy( pl_character, roles[ rnd( 10 ) ] );
-#endif
 #endif
 		    aredone = 1;
 		    amii_clear_nhwindow( WIN_BASE );
@@ -607,11 +604,7 @@ amii_player_selection()
 		case 1: /* Random Character */
 		    flags.initrole = randrole();
 #if 0	/* OBSOLETE */
-#ifdef  TOURIST
 		    strcpy( pl_character, roles[ rnd( 11 ) ] );
-#else
-		    strcpy( pl_character, roles[ rnd( 10 ) ] );
-#endif
 #endif
 		    amii_clear_nhwindow( WIN_BASE );
 		    CloseShWindow( cwin );

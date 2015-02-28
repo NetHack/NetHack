@@ -1,4 +1,5 @@
-/* NetHack 3.5	role.c	$Date$  $Revision$ */
+/* NetHack 3.5	role.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	role.c	$Date: 2012/02/16 03:01:38 $  $Revision: 1.18 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -298,7 +299,6 @@ const struct Role roles[] = {
 	{  1, 0,  0, 1,  0, 1 },11,	/* Energy */
 	10, 10, 0, 0,  8, A_INT, SPE_CLAIRVOYANCE,    -4
 },
-#ifdef TOURIST
 {	{"Tourist", 0}, {
 	{"Rambler",     0},
 	{"Sightseer",   0},
@@ -324,7 +324,6 @@ const struct Role roles[] = {
 	{  1, 0,  0, 1,  0, 1 },14,	/* Energy */
 	0, 5, 1, 2, 10, A_INT, SPE_CHARM_MONSTER,   -4
 },
-#endif
 {	{"Valkyrie", 0}, {
 	{"Stripling",   0},
 	{"Skirmisher",  0},
@@ -1704,10 +1703,8 @@ struct monst *mtmp;
 	case PM_SAMURAI:
 	    return (mtmp && mtmp->data == &mons[PM_SHOPKEEPER] ?
 	    		"Irasshaimase" : "Konnichi wa"); /* Japanese */
-#ifdef TOURIST
 	case PM_TOURIST:
 	    return ("Aloha");       /* Hawaiian */
-#endif
 	case PM_VALKYRIE:
 	    return (
 #ifdef MAIL
@@ -1727,10 +1724,8 @@ Goodbye()
 	    return ("Fare thee well");  /* Olde English */
 	case PM_SAMURAI:
 	    return ("Sayonara");        /* Japanese */
-#ifdef TOURIST
 	case PM_TOURIST:
 	    return ("Aloha");           /* Hawaiian */
-#endif
 	case PM_VALKYRIE:
 	    return ("Farvel");          /* Norse */
 	default:

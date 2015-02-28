@@ -1,4 +1,5 @@
-/* NetHack 3.5	monflag.h	$Date$  $Revision$ */
+/* NetHack 3.5	monflag.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	monflag.h	$Date: 2009/05/06 10:44:54 $  $Revision: 1.6 $ */
 /*	SCCS Id: @(#)monflag.h	3.5	1996/05/04	*/
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -28,9 +29,7 @@
 #define MS_IMITATE	19	/* imitates others (leocrotta) */
 #define MS_ORC		MS_GRUNT	/* intelligent brutes */
 #define MS_HUMANOID	20	/* generic traveling companion */
-#ifdef KOPS
 #define MS_ARREST	21	/* "Stop in the name of the law!" (Kops) */
-#endif
 #define MS_SOLDIER	22	/* army and watchmen expressions */
 #define MS_GUARD	23	/* "Please drop that gold and follow me." */
 #define MS_DJINNI	24	/* "Thank you for freeing me!" */
@@ -162,7 +161,6 @@
 #define M3_INFRAVISION	0x0100		/* has infravision */
 #define M3_INFRAVISIBLE 0x0200		/* visible by infravision */
 
-/* define the bit even if BARGETHROUGH is not defined for savefile compat. */
 #define M3_DISPLACES	0x0400		/* moves monsters out of its way */
 
 #define MZ_TINY		0		/* < 2' */

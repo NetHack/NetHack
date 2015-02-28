@@ -1,4 +1,5 @@
-/* NetHack 3.5	sounds.c	$Date$  $Revision$ */
+/* NetHack 3.5	sounds.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	sounds.c	$Date: 2012/03/10 02:49:08 $  $Revision: 1.39 $ */
 /*	Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -50,7 +51,6 @@ dosounds()
 	};
 	You_hear1(fountain_msg[rn2(3)+hallu]);
     }
-#ifdef SINK
     if (level.flags.nsinks && !rn2(300)) {
 	static const char * const sink_msg[3] = {
 		"a slow drip.",
@@ -59,7 +59,6 @@ dosounds()
 	};
 	You_hear1(sink_msg[rn2(2)+hallu]);
     }
-#endif
     if (level.flags.has_court && !rn2(200)) {
 	static const char * const throne_msg[4] = {
 		"the tones of courtly conversation.",
@@ -797,11 +796,9 @@ register struct monst *mtmp;
 		case PM_ARCHEOLOGIST:
     pline_msg = "describes a recent article in \"Spelunker Today\" magazine.";
 		    break;
-#ifdef TOURIST
 		case PM_TOURIST:
 		    verbl_msg = "Aloha.";
 		    break;
-#endif
 		default:
 		    pline_msg = "discusses dungeon exploration.";
 		    break;
@@ -810,7 +807,6 @@ register struct monst *mtmp;
 	case MS_SEDUCE:
 	    {
 	    int swval;
-#ifdef SEDUCE
 	    if (SYSOPT_SEDUCE) {
 	      if (ptr->mlet != S_NYMPH &&
 		could_seduce(mtmp, &youmonst, (struct attack *)0) == 1) {
@@ -819,7 +815,6 @@ register struct monst *mtmp;
 	      }
 	      swval = ((poly_gender() != (int) mtmp->female) ? rn2(3) : 0);
 	    } else
-#endif
 	      swval = ((poly_gender() == 0) ? rn2(3) : 0);
 	    switch(swval){
 		case 2:
@@ -833,7 +828,6 @@ register struct monst *mtmp;
 	    }
 	    }
 	    break;
-#ifdef KOPS
 	case MS_ARREST:
 	    if (mtmp->mpeaceful)
 		verbalize("Just the facts, %s.",
@@ -847,7 +841,6 @@ register struct monst *mtmp;
 		verbl_msg = arrest_msg[rn2(3)];
 	    }
 	    break;
-#endif
 	case MS_BRIBE:
 	    if (mtmp->mpeaceful && !mtmp->mtame) {
 		(void) demon_talk(mtmp);
@@ -874,18 +867,12 @@ register struct monst *mtmp;
 		verbl_msg = Role_if(PM_HEALER) ?
 			  "Doc, I can't help you unless you cooperate." :
 			  "Please undress so I can examine you.";
-#ifdef TOURIST
 	    else if (uarmu)
 		verbl_msg = "Take off your shirt, please.";
-#endif
 	    else verbl_msg = "Relax, this won't hurt a bit.";
 	    break;
 	case MS_GUARD:
-#ifndef GOLDOBJ
-	    if (u.ugold)
-#else
 	    if (money_cnt(invent))
-#endif
 		verbl_msg = "Please drop that gold and follow me.";
 	    else
 		verbl_msg = "Please follow me.";
@@ -973,15 +960,13 @@ dochat()
 	return(0);
     }
 
-#ifdef STEED
     if (u.usteed && u.dz > 0) {
-	if (!u.usteed->mcanmove || u.usteed->msleeping) {
-		pline("%s seems not to notice you.", Monnam(u.usteed));
-		return(1);
-	} else
-		return (domonnoise(u.usteed));
+        if (!u.usteed->mcanmove || u.usteed->msleeping) {
+            pline("%s seems not to notice you.", Monnam(u.usteed));
+            return(1);
+        } else
+            return (domonnoise(u.usteed));
     }
-#endif
 
     if (u.dz) {
 	pline("They won't hear you %s there.", u.dz < 0 ? "up" : "down");

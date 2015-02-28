@@ -1,4 +1,5 @@
-/* NetHack 3.5	global.h	$Date$  $Revision$ */
+/* NetHack 3.5	global.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	global.h	$Date: 2012/01/29 03:00:14 $  $Revision: 1.31 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,6 +10,8 @@
 
 
 #define BETA		/* development or beta testing [MRS] */
+
+#define DEBUG
 
 /*
  * Files expected to exist in the playground directory.
@@ -62,41 +65,10 @@ typedef xchar	boolean;		/* 0 or 1 */
 #endif
 
 /*
- * UNICODE_SUPPORT
- * Unicode/wide character related support.
+ * type nhsym: loadable symbols go into this type
  */
-#ifdef UNICODE_SUPPORT
-# define UNICODE_DRAWING	/* store drawing symbols in wchar_t data type     */
-# define UNICODE_WIDEWINPORT	/* store and render wide chars in window port     */
-/*# define UNICODE_PLAYERTEXT*/	/* not implemented - player input in wide chars */
-#include <limits.h>
-#include <wchar.h>
-#else
-# undef UNICODE_DRAWING
-# undef UNICODE_WIDEWINPORT
-# undef UNICODE_PLAYERTEXT	
-#endif
-
-#if defined(UNICODE_DRAWING)
-typedef wchar_t nhsym;		/* nhsym is wide char */
-#else
 typedef uchar nhsym;
-#endif
 
-#if defined(UNICODE_WIDEWINPORT)
-typedef wchar_t nhwchar;	/* nhwchar (window port char) is wide char */
-#else
-typedef char nhwchar;
-#endif
-
-#if 0
-/* Not Implemented presently */
-#if defined(UNICODE_PLAYERTEXT)
-typedef wchar_t nhptext;	/* player input is wide char */
-#else
-typedef char nhptext;
-#endif
-#endif
 
 #ifndef STRNCMPI
 # ifndef __SASC_60		/* SAS/C already shifts to stricmp */
@@ -130,12 +102,6 @@ typedef char nhptext;
  * signed integer for C (2^15 -1).
  */
 #define LARGEST_INT	32767
-
-
-#ifdef REDO
-#define Getchar pgetchar
-#endif
-
 
 #include "coord.h"
 /*

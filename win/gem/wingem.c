@@ -1,4 +1,5 @@
-/* NetHack 3.5	wingem.c	$Date$  $Revision$ */
+/* NetHack 3.5	wingem.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	wingem.c	$Date: 2012/01/24 04:26:29 $  $Revision: 1.16 $ */
 /* Copyright (c) Christian Bressler, 1999					*/
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -910,9 +911,7 @@ int x, y;
 
 void mar_print_gl_char(winid,xchar,xchar,int);
 
-#ifdef REINCARNATION
 extern int mar_set_rogue(int);
-#endif
 
 extern void mar_add_pet_sign(winid,int,int);
 
@@ -925,9 +924,7 @@ Gem_print_glyph(window, x, y, glyph)
     /* Move the cursor. */
     Gem_curs(window, x,y);
 
-# ifdef REINCARNATION
-		mar_set_rogue(Is_rogue_level(&u.uz) ? TRUE : FALSE);
-# endif
+	mar_set_rogue(Is_rogue_level(&u.uz) ? TRUE : FALSE);
 
 	x--;	/* MAR -- because x ranges from 1 to COLNO */
 	if(mar_set_tile_mode(-1)){
@@ -959,9 +956,7 @@ void mar_print_gl_char(window, x, y, glyph)
 
 #ifdef TEXTCOLOR
     /* Turn off color if rogue level. */
-# ifdef REINCARNATION
     if (Is_rogue_level(&u.uz)) color = NO_COLOR;
-# endif
 #endif /* TEXTCOLOR */
 
 	mar_print_char(window,x,y,ch,color);
@@ -1093,11 +1088,7 @@ time_t when;
 	Sprintf(rip_line[NAME_LINE], "%s", plname);
 	/* Put $ on stone */
 	Sprintf(rip_line[GOLD_LINE], "%ld Au",
-#ifndef GOLDOBJ
-		u.ugold);
-#else
 		done_money);
-#endif
 	/* Put together death description */
 	formatkiller(buf, sizeof buf, how);
 

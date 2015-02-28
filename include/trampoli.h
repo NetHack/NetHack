@@ -1,4 +1,5 @@
-/* NetHack 3.5	trampoli.h	$Date$  $Revision$ */
+/* NetHack 3.5	trampoli.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	trampoli.h	$Date: 2009/05/06 10:45:13 $  $Revision: 1.4 $ */
 /*	SCCS Id: @(#)trampoli.h 3.5	1995/06/01	*/
 /* Copyright (c) 1989, by Norm Meluch and Stephen Spackman	  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -27,7 +28,6 @@
 #define doprev_message() doprev_message_()
 #define timed_occupation() timed_occupation_()
 #define wiz_attributes()   wiz_attributes_()
-#ifdef WIZARD
 #define wiz_detect()	   wiz_detect_()
 #define wiz_genesis()	   wiz_genesis_()
 #define wiz_identify()	   wiz_identify_()
@@ -35,7 +35,6 @@
 #define wiz_map()	   wiz_map_()
 #define wiz_where()	   wiz_where_()
 #define wiz_wish()	   wiz_wish_()
-#endif
 
 /* ### display.c ### */
 #define doredraw() doredraw_()

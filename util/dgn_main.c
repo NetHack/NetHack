@@ -1,4 +1,5 @@
-/* NetHack 3.5	dgn_main.c	$Date$  $Revision$ */
+/* NetHack 3.5	dgn_main.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	dgn_main.c	$Date: 2009/05/06 10:54:27 $  $Revision: 1.7 $ */
 /*	SCCS Id: @(#)dgn_main.c 3.5	1994/09/23	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet	*/
 /*	Copyright (c) 1990 by M. Stephenson		*/

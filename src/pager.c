@@ -1,4 +1,5 @@
-/* NetHack 3.5	pager.c	$Date$  $Revision$ */
+/* NetHack 3.5	pager.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	pager.c	$Date: 2012/01/15 09:27:06 $  $Revision: 1.41 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -64,10 +65,8 @@ char *outbuf;
 		/* being blinded may hide invisibility from self */
 		(Invis && (senseself() || !Blind)) ? "invisible " : "",
 		race, mons[u.umonnum].mname, plname);
-#ifdef STEED
 	if (u.usteed)
 	    Sprintf(eos(outbuf), ", mounted on %s", y_monnam(u.usteed));
-#endif
 	return outbuf;
 }
 
@@ -572,7 +571,7 @@ do_look(mode, click_cc)
 	for (i = 0; i < MAXMCLASSES; i++) {
 	    if (sym == ((from_screen || clicklook) ?
 			showsyms[i + SYM_OFF_M] : def_monsyms[i].sym) &&
-			def_monsyms[i].explain) {
+		def_monsyms[i].explain) {
 		need_to_look = TRUE;
 		if (!found) {
 		    Sprintf(out_str, "%s        %s",
@@ -937,9 +936,7 @@ static const char *help_menu_items[] = {
 #else
 #define WIZHLP_SLOT 11
 #endif
-#ifdef WIZARD
 	"List of wizard-mode commands.",
-#endif
 	"",
 	(char *)0
 };
@@ -958,10 +955,8 @@ help_menu(sel)
 
 	any = zeroany;		/* zero all bits */
 	start_menu(tmpwin);
-#ifdef WIZARD
 	if (!wizard) help_menu_items[WIZHLP_SLOT] = "",
 		     help_menu_items[WIZHLP_SLOT+1] = (char *)0;
-#endif
 	for (i = 0; help_menu_items[i]; i++)
 #ifdef PORT_HELP
 	    /* port-specific line has a %s in it for the PORT_ID */
@@ -1011,10 +1006,8 @@ dohelp()
 			case PORT_HELP_ID:  port_help();  break;
 #endif
 			default:
-#ifdef WIZARD
 			/* handle slot 11 or 12 */
 				display_file(DEBUGHELP, TRUE);
-#endif
 				break;
 		}
 	}

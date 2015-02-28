@@ -1,4 +1,5 @@
-/* NetHack 3.5	restore.c	$Date$  $Revision$ */
+/* NetHack 3.5	restore.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	restore.c	$Date: 2012/02/16 02:40:24 $  $Revision: 1.71 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -145,17 +146,6 @@ boolean quietly;
 
 	for (otmp = invent; otmp; otmp = otmp2) {
 	    otmp2 = otmp->nobj;
-#ifndef GOLDOBJ
-	    if (otmp->oclass == COIN_CLASS) {
-		/* in_use gold is created by some menu operations */
-		if (!otmp->in_use) {
-		    impossible("inven_inuse: !in_use gold in inventory");
-		}
-		extract_nobj(otmp, &invent);
-		otmp->in_use = FALSE;
-		dealloc_obj(otmp);
-	    } else
-#endif /* GOLDOBJ */
 	    if (otmp->in_use) {
 		if (!quietly) pline("Finishing off %s...", xname(otmp));
 		useup(otmp);
@@ -440,9 +430,6 @@ boolean ghostly;
 			/* restore monster back pointer */
 			for (obj = mtmp->minvent; obj; obj = obj->nobj)
 				obj->ocarry = mtmp;
-#ifndef GOLDOBJ		/* GOLDOBJ-compatibility */
-			put_gold_back(mtmp);
-#endif
 		}
 		if (mtmp->mw) {
 			struct obj *obj;
@@ -515,7 +502,7 @@ STATIC_OVL
 boolean
 restgamestate(fd, stuckid, steedid)
 register int fd;
-unsigned int *stuckid, *steedid;	/* STEED */
+unsigned int *stuckid, *steedid;
 {
 	struct flag newgameflags;
 #ifdef SYSFLAGS
@@ -530,9 +517,7 @@ unsigned int *stuckid, *steedid;	/* STEED */
 	    /* for wizard mode, issue a reminder; for others, treat it
 	       as an attempt to cheat and refuse to restore this file */
 	    pline("Saved game was not yours.");
-#ifdef WIZARD
 	    if (!wizard)
-#endif
 		return FALSE;
 	}
 	mread(fd, (genericptr_t) &context, sizeof(struct context_info));
@@ -599,9 +584,6 @@ unsigned int *stuckid, *steedid;	/* STEED */
 	restore_timers(fd, RANGE_GLOBAL, FALSE, 0L);
 	restore_light_sources(fd);
 	invent = restobjchn(fd, FALSE, FALSE);
-#ifndef GOLDOBJ		/* GOLDOBJ-compatibility */
-	put_gold_back(&youmonst);
-#endif
 	/* tmp_bc only gets set here if the ball & chain were orphaned
 	   because you were swallowed; otherwise they will be on the floor
 	   or in your inventory */
@@ -651,10 +633,8 @@ unsigned int *stuckid, *steedid;	/* STEED */
 	restore_oracles(fd);
 	if (u.ustuck)
 		mread(fd, (genericptr_t) stuckid, sizeof (*stuckid));
-#ifdef STEED
 	if (u.usteed)
 		mread(fd, (genericptr_t) steedid, sizeof (*steedid));
-#endif
 	mread(fd, (genericptr_t) pl_character, sizeof pl_character);
 
 	mread(fd, (genericptr_t) pl_fruit, sizeof pl_fruit);
@@ -675,7 +655,7 @@ unsigned int *stuckid, *steedid;	/* STEED */
  */
 STATIC_OVL void
 restlevelstate(stuckid, steedid)
-unsigned int stuckid, steedid;	/* STEED */
+unsigned int stuckid, steedid;
 {
 	register struct monst *mtmp;
 
@@ -685,7 +665,6 @@ unsigned int stuckid, steedid;	/* STEED */
 		if (!mtmp) panic("Cannot find the monster ustuck.");
 		u.ustuck = mtmp;
 	}
-#ifdef STEED
 	if (steedid) {
 		for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
 			if (mtmp->m_id == steedid) break;
@@ -693,7 +672,6 @@ unsigned int stuckid, steedid;	/* STEED */
 		u.usteed = mtmp;
 		remove_monster(mtmp->mx, mtmp->my);
 	}
-#endif
 }
 
 /*ARGSUSED*/	/* fd used in MFLOPPY only */
@@ -792,9 +770,7 @@ register int fd;
 	 * place_monster() on other levels
 	 */
 	u.ustuck = (struct monst *)0;
-#ifdef STEED
 	u.usteed = (struct monst *)0;
-#endif
 
 #ifdef MICRO
 # ifdef AMII_GRAPHICS
@@ -862,9 +838,7 @@ register int fd;
 
 	if (!wizard && !discover)
 		(void) delete_savefile();
-#ifdef REINCARNATION
 	if (Is_rogue_level(&u.uz)) assign_graphics(ROGUESET);
-#endif
 #ifdef USE_TILES
 	substitute_tiles(&u.uz);
 #endif
@@ -1015,16 +989,12 @@ boolean ghostly;
 			hpid, pid);
 	    else
 		Sprintf(trickbuf, "This is level %d, not %d!", dlvl, lev);
-#ifdef WIZARD
 	    if (wizard) pline1(trickbuf);
-#endif
 	    trickery(trickbuf);
 	}
 	restcemetery(fd, &level.bonesinfo);
 	rest_levl(fd, (boolean)((sfrestinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
-#ifdef DUNGEON_OVERVIEW
 	mread(fd, (genericptr_t)lastseentyp, sizeof(lastseentyp));
-#endif
 	mread(fd, (genericptr_t)&omoves, sizeof(omoves));
 	elapsed = monstermoves - omoves;
 	mread(fd, (genericptr_t)&upstair, sizeof(stairway));
@@ -1183,9 +1153,7 @@ register int fd;
 		++msgcount;
 	}
 	if (msgcount) putmsghistory((char *)0, TRUE);
-#ifdef DEBUG_MSGCOUNT
-	pline("Read %d messages from savefile.", msgcount);
-#endif
+	debugpline("Read %d messages from savefile.", msgcount);
 }
 
 /* Clear all structures for object and monster ID mapping. */
@@ -1583,30 +1551,5 @@ register unsigned int len;
 	    }
 	}
 }
-
-#ifndef GOLDOBJ		/* GOLDOBJ-compatibility */
-/* used to make save & bones files be compatible with GOLDOBJ config;
-   takes all of the gold objects out of the invent or mtmp->minvent
-   chain and puts it into either u.ugold or mtmp->mgold */
-void
-put_gold_back(mon)
-struct monst *mon;
-{
-	struct obj *goldobj;
-	boolean is_hero = (mon == &youmonst);
-
-	/* there could be two gold objects in invent if a hangup save was
-	   performed while gold was in invent for Drop or container access */
-	while ((goldobj = (is_hero ? carrying(GOLD_PIECE) :
-				     m_carrying(mon, GOLD_PIECE))) != 0) {
-	    extract_nobj(goldobj, is_hero ? &invent : &mon->minvent);
-	    if (!goldobj->in_use) {
-		if (is_hero) u.ugold += goldobj->quan;
-		else mon->mgold += goldobj->quan;
-	    }
-	    dealloc_obj(goldobj);
-	}
-}
-#endif /*GOLDOBJ*/
 
 /*restore.c*/

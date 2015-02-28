@@ -1,4 +1,5 @@
-# NetHack 3.5	dungeon.def	$Date$  $Revision$
+# NetHack 3.5	dungeon.def	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+# NetHack 3.5	dungeon.def	$Date: 2009/05/06 10:44:21 $  $Revision: 1.6 $
 #	SCCS Id: @(#)dungeon.def	3.5	2006/03/18
 #	Copyright (c) 1990-95 by M. Stephenson
 # NetHack may be freely redistributed.  See license for details.
@@ -18,8 +19,8 @@
 DUNGEON:	"The Dungeons of Doom" "D" (25, 5)
 ALIGNMENT:	unaligned
 BRANCH:		"The Gnomish Mines" @ (2, 3)
-%REINCARNATION LEVEL:		"rogue" "R" @ (15, 4)
-%REINCARNATION LEVELDESC:	roguelike
+LEVEL:		"rogue" "R" @ (15, 4)
+LEVELDESC:	roguelike
 LEVEL:		"oracle" "O" @ (5, 5)
 LEVALIGN:	neutral
 CHAINBRANCH:	"Sokoban" "oracle" + (1, 0) up

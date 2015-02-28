@@ -1,4 +1,5 @@
-/* NetHack 3.5	drawing.c	$Date$  $Revision$ */
+/* NetHack 3.5	drawing.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	drawing.c	$Date: 2009/05/06 10:46:09 $  $Revision: 1.28 $ */
 /*	SCCS Id: @(#)drawing.c	3.5	2007/07/30	*/
 /* Copyright (c) NetHack Development Team 1992.			  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -18,17 +19,13 @@
 #define C(n)
 #endif
 
-#ifdef LOADSYMSETS
 struct symsetentry symset[NUM_GRAPHICS];
-#endif
 
 int currentgraphics = 0;
 
 nhsym showsyms[SYM_MAX] = DUMMY;	/* symbols to be displayed */
-nhsym l_syms[SYM_MAX]   = DUMMY;	/* loaded symbols          */
-#ifdef REINCARNATION
-nhsym r_syms[SYM_MAX]   = DUMMY;	/* rogue symbols           */
-#endif
+nhsym l_syms[SYM_MAX] = DUMMY;		/* loaded symbols          */
+nhsym r_syms[SYM_MAX] = DUMMY;		/* rogue symbols           */
 
 nhsym warnsyms[WARNCOUNT]  = DUMMY;  /* the current warning display symbols */
 const char invisexplain[] = "remembered, unseen, creature";
@@ -168,11 +165,7 @@ const struct symdef defsyms[MAXPCHARS] = {
 	{'_', "altar",		C(CLR_GRAY)},	/* altar */
 	{'|', "grave",      C(CLR_GRAY)},   	/* grave */
 	{'\\', "opulent throne",C(HI_GOLD)},	/* throne */
-#ifdef SINKS
 	{'#', "sink",		C(CLR_GRAY)},	/* sink */
-#else
-	{'#', "",		C(CLR_GRAY)},	/* sink */
-#endif
 /*30*/	{'{', "fountain",	C(CLR_BLUE)},	/* fountain */
 	{'}', "water",		C(CLR_BLUE)},	/* pool */
 	{'.', "ice",		C(CLR_CYAN)},	/* ice */
@@ -237,7 +230,6 @@ const struct symdef defsyms[MAXPCHARS] = {
 	{'/', "",		C(CLR_ORANGE)},	/* explosion bottom right */
 };
 
-#ifdef REINCARNATION
 /* default rogue level symbols */
 static const uchar def_r_oc_syms[MAXOCLASSES] = {
 /* 0*/	'\0',
@@ -259,7 +251,6 @@ static const uchar def_r_oc_syms[MAXOCLASSES] = {
 	CHAIN_SYM,
 	VENOM_SYM
 };
-#endif
 
 #undef C
 
@@ -309,10 +300,10 @@ def_char_to_monclass(ch)
  *                     Sets the current display symbols, the
  *                     loadable symbols to the default NetHack
  *                     symbols, including the r_syms rogue level
- *                     symbols if REINCARNATION is defined.
- *                     This would typically be done immediately
- *                     after execution begins. Any previously
- *                     loaded external symbol sets are discarded.
+ *                     symbols. This would typically be done
+ *                     immediately after execution begins. Any
+ *                     previously loaded external symbol sets are
+ *                     discarded.
  *
  * switch_symbols(arg)
  *                     Called to swap in new current display symbols
@@ -353,9 +344,7 @@ init_symbols()
 {
 	init_l_symbols();
 	init_showsyms();
-#ifdef REINCARNATION
 	init_r_symbols();
-#endif
 }
 
 void
@@ -408,12 +397,9 @@ init_l_symbols()
 	    	l_syms[i + SYM_OFF_X] = DEF_INVISIBLE;
 	}
 
-#ifdef LOADSYMSETS
 	clear_symsetentry(PRIMARY, FALSE);
-#endif
 }
 
-#ifdef REINCARNATION
 void
 init_r_symbols()
 {
@@ -443,15 +429,12 @@ init_r_symbols()
 	    	r_syms[i + SYM_OFF_X] = DEF_INVISIBLE;
 	}
 
-# ifdef LOADSYMSETS
 	clear_symsetentry(ROGUESET, FALSE);
 	symset[ROGUESET].nocolor = 1;	 /* default on Rogue level is no color
 					  * but some symbol sets can
 					  * override that
 					  */
-# endif
 }
-#endif /*REINCARNATION*/
 
 void
 assign_graphics(whichset)
@@ -460,7 +443,6 @@ int whichset;
     register int i;
 
     switch(whichset) {
-# ifdef REINCARNATION
     case ROGUESET:
 	/* Adjust graphics display characters on Rogue levels */
 
@@ -472,7 +454,6 @@ int whichset;
 #  endif
 	currentgraphics = ROGUESET;
 	break;
-# endif
 
     case PRIMARY:
     default:
@@ -512,7 +493,6 @@ int nondefault;
 	init_symbols();
 }
 
-#ifdef LOADSYMSETS
 void
 update_l_symset(symp, val)
 struct symparse *symp;
@@ -521,7 +501,6 @@ int val;
 	l_syms[symp->idx] = val;
 }
 
-# ifdef REINCARNATION
 void
 update_r_symset(symp, val)
 struct symparse *symp;
@@ -529,7 +508,6 @@ int val;
 {
 	r_syms[symp->idx] = val;
 }
-# endif /* REINCARNATION */
 
 void
 clear_symsetentry(which_set, name_too)
@@ -547,7 +525,6 @@ boolean name_too;
 	/* initialize restriction bits */
 	symset[which_set].primary = 0;
 	symset[which_set].rogue   = 0;
-	symset[which_set].unicode = 0;
 
 	if (name_too) {
 	    if (symset[which_set].name)
@@ -585,7 +562,6 @@ const char *known_handling[] = {
 const char *known_restrictions[] = {
 	"primary",
 	"rogue",
-	"unicode",
 	(const char *)0,
 };
 
@@ -770,7 +746,6 @@ struct symparse loadsyms[] = {
 	{SYM_OTH, SYM_INVISIBLE + SYM_OFF_X, "S_invisible"},
 	{0,0,(const char *)0}	/* fence post */
 };
-#endif /*LOADSYMSETS*/
 
 /*drawing.c*/
 

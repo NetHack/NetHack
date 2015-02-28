@@ -1,4 +1,5 @@
-/* NetHack 3.5	mhitm.c	$Date$  $Revision$ */
+/* NetHack 3.5	mhitm.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mhitm.c	$Date: 2011/04/07 20:59:40 $  $Revision: 1.57 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -167,7 +168,6 @@ fightm(mtmp)		/* have monsters fight each other */
 	return 0;
 }
 
-#ifdef BARGETHROUGH
 /*
  * mdisplacem() -- attacker moves defender out of the way;
  *		   returns same results as mattackm().
@@ -243,7 +243,6 @@ boolean quietly;
 
 	return MM_HIT;
 }
-#endif /* BARGETHROUGH */
 
 /*
  * mattackm() -- a monster attacks another monster.
@@ -404,12 +403,10 @@ mattackm(magr, mdef)
 		break;
 
 	    case AT_ENGL:
-#ifdef STEED
 		if (u.usteed && (mdef == u.usteed)) {
 		    strike = 0;
 		    break;
 		} 
-#endif
 		/* Engulfing attacks are directed at the hero if
 		 * possible. -dlc
 		 */
@@ -955,11 +952,7 @@ mdamagem(magr, mdef, mattk)
 		    if (vis) Strcpy(mdef_Monnam, Monnam(mdef));
 		    mdef->mstrategy &= ~STRAT_WAITFORU;
 		    (void) rloc(mdef, FALSE);
-		    if (vis && !canspotmon(mdef)
-#ifdef STEED
-		    	&& mdef != u.usteed
-#endif
-		    	)
+		    if (vis && !canspotmon(mdef) && mdef != u.usteed)
 			pline("%s suddenly disappears!", mdef_Monnam);
 		}
 		break;
@@ -1055,14 +1048,6 @@ mdamagem(magr, mdef, mattk)
 		break;
 	    case AD_SGLD:
 		tmp = 0;
-#ifndef GOLDOBJ
-		if (magr->mcan || !mdef->mgold) break;
-		/* technically incorrect; no check for stealing gold from
-		 * between mdef's feet...
-		 */
-		magr->mgold += mdef->mgold;
-		mdef->mgold = 0;
-#else
                 if (magr->mcan) break;
 		/* technically incorrect; no check for stealing gold from
 		 * between mdef's feet...
@@ -1073,7 +1058,6 @@ mdamagem(magr, mdef, mattk)
                     obj_extract_self(gold);
 		    add_to_minv(magr, gold);
                 }
-#endif
 		mdef->mstrategy &= ~STRAT_WAITFORU;
 		if (vis) {
 		    Strcpy(buf, Monnam(magr));
@@ -1097,9 +1081,7 @@ mdamagem(magr, mdef, mattk)
 			/* Automatic kill if drained past level 0 */
 		}
 		break;
-#ifdef SEDUCE
 	    case AD_SSEX:
-#endif
 	    case AD_SITM:	/* for now these are the same */
 	    case AD_SEDU:
 		if (magr->mcan) break;
@@ -1116,12 +1098,10 @@ mdamagem(magr, mdef, mattk)
 			Strcpy(mdefnambuf, x_monnam(mdef, ARTICLE_THE, (char *)0, 0, FALSE));
 
 			otmp = obj;
-#ifdef STEED
 			if (u.usteed == mdef &&
 					otmp == which_armor(mdef, W_SADDLE))
 				/* "You can no longer ride <steed>." */
 				dismount_steed(DISMOUNT_POLY);
-#endif
 			obj_extract_self(otmp);
 			if (otmp->owornmask) {
 				mdef->misc_worn_check &= ~otmp->owornmask;

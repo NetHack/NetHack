@@ -1,4 +1,5 @@
-/* NetHack 3.5	ball.c	$Date$  $Revision$ */
+/* NetHack 3.5	ball.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	ball.c	$Date: 2011/08/30 22:13:26 $  $Revision: 1.17 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -691,10 +692,7 @@ xchar x, y;
 		register long side = rn2(3) ? LEFT_SIDE : RIGHT_SIDE;
 		pline(pullmsg, "bear trap");
 		set_wounded_legs(side, rn1(1000, 500));
-#ifdef STEED
-		if (!u.usteed)
-#endif
-		{
+		if (!u.usteed) {
 		    Your("%s %s is severely damaged.",
 					(side == LEFT_SIDE) ? "left" : "right",
 					body_part(LEG));

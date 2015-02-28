@@ -1,4 +1,5 @@
-/* NetHack 3.5	minion.c	$Date$  $Revision$ */
+/* NetHack 3.5	minion.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	minion.c	$Date: 2009/05/06 10:46:52 $  $Revision: 1.26 $ */
 /*	SCCS Id: @(#)minion.c	3.5	2008/11/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -235,11 +236,7 @@ register struct monst *mtmp;
 	    if (!tele_restrict(mtmp)) (void) rloc(mtmp, FALSE);
 	    return(1);
 	}
-#ifndef GOLDOBJ
-	cash = u.ugold;
-#else
 	cash = money_cnt(invent);
-#endif
 	demand = (cash * (rnd(80) + 20 * Athome)) /
 	    (100 * (1 + (sgn(u.ualign.type) == sgn(mtmp->data->maligntyp))));
 
@@ -280,9 +277,7 @@ struct monst *mtmp;
 {
 	char buf[BUFSZ];
 	long offer;
-#ifdef GOLDOBJ
 	long umoney = money_cnt(invent);
-#endif
 
 	getlin("How much will you offer?", buf);
 	if (sscanf(buf, "%ld", &offer) != 1) offer = 0L;
@@ -296,16 +291,6 @@ struct monst *mtmp;
 	} else if (offer == 0L) {
 		You("refuse.");
 		return 0L;
-#ifndef GOLDOBJ
-	} else if (offer >= u.ugold) {
-		You("give %s all your gold.", mon_nam(mtmp));
-		offer = u.ugold;
-	} else {
-		You("give %s %ld %s.", mon_nam(mtmp), offer, currency(offer));
-	}
-	u.ugold -= offer;
-	mtmp->mgold += offer;
-#else
 	} else if (offer >= umoney) {
 		You("give %s all your gold.", mon_nam(mtmp));
 		offer = umoney;
@@ -313,7 +298,6 @@ struct monst *mtmp;
 		You("give %s %ld %s.", mon_nam(mtmp), offer, currency(offer));
 	}
 	(void) money2mon(mtmp, offer);
-#endif
 	context.botl = 1;
 	return(offer);
 }

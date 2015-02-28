@@ -1,4 +1,5 @@
-/* NetHack 3.5	youprop.h	$Date$  $Revision$ */
+/* NetHack 3.5	youprop.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	youprop.h	$Date: 2011/10/15 03:00:42 $  $Revision: 1.13 $ */
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -228,13 +229,9 @@
 #define HFlying			u.uprops[FLYING].intrinsic
 #define EFlying			u.uprops[FLYING].extrinsic
 #define BFlying			u.uprops[FLYING].blocked
-#ifdef STEED
 # define Flying			((HFlying || EFlying || \
 				  (u.usteed && is_flyer(u.usteed->data))) && \
 				 !BFlying)
-#else
-# define Flying			((HFlying || EFlying) && !BFlying)
-#endif
 	/* May touch surface; does not override any others */
 
 #define Wwalking		(u.uprops[WWALKING].extrinsic && \
@@ -244,12 +241,8 @@
 
 #define HSwimming		u.uprops[SWIMMING].intrinsic
 #define ESwimming		u.uprops[SWIMMING].extrinsic	/* [Tom] */
-#ifdef STEED
 # define Swimming		(HSwimming || ESwimming || \
 				 (u.usteed && is_swimmer(u.usteed->data)))
-#else
-# define Swimming		(HSwimming || ESwimming)
-#endif
 	/* Get wet, don't go under water unless if amphibious */
 
 #define HMagical_breathing	u.uprops[MAGICAL_BREATHING].intrinsic

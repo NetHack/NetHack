@@ -1,4 +1,5 @@
-// NetHack 3.5	qt_win.cpp	$Date$  $Revision$
+// NetHack 3.5	qt_win.cpp	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+// NetHack 3.5	qt_win.cpp	$Date: 2012/01/24 04:26:24 $  $Revision: 1.59 $
 // Copyright (c) Warwick Allison, 1999.
 // NetHack may be freely redistributed.  See license for details.
 
@@ -1643,12 +1644,7 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 
     painter.begin(this);
 
-    if (
-#ifdef REINCARNATION
-	Is_rogue_level(&u.uz) ||
-#endif
-	iflags.wc_ascii_map
-    )
+    if (Is_rogue_level(&u.uz) || iflags.wc_ascii_map)
     {
 	// You enter a VERY primitive world!
 
@@ -1729,7 +1725,6 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
     }
 
     if (garea.contains(cursor)) {
-#ifdef REINCARNATION
 	if (Is_rogue_level(&u.uz)) {
 #ifdef TEXTCOLOR
 	    painter.setPen( white );
@@ -1737,7 +1732,6 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 	    painter.setPen( green ); // REALLY primitive
 #endif
 	} else
-#endif
 	{
 	    int hp100;
 	    if (u.mtimedone) {
@@ -2556,11 +2550,7 @@ void NetHackQtStatusWindow::updateStats()
 	dlevel.setLabel(buf,(long)depth(&u.uz));
     }
 
-#ifndef GOLDOBJ
-    gold.setLabel("Au:", u.ugold);
-#else
     gold.setLabel("Au:", money_cnt(invent));
-#endif
     if (u.mtimedone) {
 	// You're a monster!
 
@@ -3302,11 +3292,7 @@ static char** rip_line=0;
     Sprintf(rip_line[NAME_LINE], "%s", plname);
 
     /* Put $ on stone */
-#ifndef GOLDOBJ
-    Sprintf(rip_line[GOLD_LINE], "%ld Au", u.ugold);
-#else
     Sprintf(rip_line[GOLD_LINE], "%ld Au", done_money);
-#endif
 
     /* Put together death description */
     formatkiller(buf, sizeof buf, how);
@@ -3497,13 +3483,8 @@ void NetHackQtInvUsageWindow::paintEvent(QPaintEvent*)
     drawWorn(painter,uarms,0,1); // Shield
     drawWorn(painter,uarmg,0,2); // Gloves - repeated
     drawWorn(painter,uarmg,2,2); // Gloves - repeated
-#ifdef TOURIST
     drawWorn(painter,uarmf,1,5); // Shoes (feet)
     drawWorn(painter,uarmu,1,4); // Undershirt
-#else
-    drawWorn(painter,0    ,1,5,FALSE);
-    drawWorn(painter,uarmf,1,4); // Shoes (feet)
-#endif
     drawWorn(painter,uleft,0,3); // RingL
     drawWorn(painter,uright,2,3); // RingR
 

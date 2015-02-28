@@ -1,4 +1,5 @@
-/* NetHack 3.5	winfuncs.c	$Date$  $Revision$ */
+/* NetHack 3.5	winfuncs.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	winfuncs.c	$Date: 2012/01/10 17:47:21 $  $Revision: 1.8 $ */
 /* Copyright (c) Gregg Wonderly, Naperville, Illinois,  1991,1992,1993,1996. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2080,12 +2081,7 @@ if(u.uz.dlevel != x){
 }
 }
 #endif
-    if(
-	WINVERS_AMIV
-#ifdef REINCARNATION
-	&& !Is_rogue_level(&u.uz)
-#endif
-    )
+    if(WINVERS_AMIV && !Is_rogue_level(&u.uz))
     {
 	amii_curs(win,x,y);
 	amiga_print_glyph(win,0,glyph);
@@ -2094,7 +2090,6 @@ if(u.uz.dlevel != x){
     {
 	/* map glyph to character and color */
     	(void) mapglyph(glyph, &och, &color, &special, x, y);
-				/* XXX next if should be ifdef REINCARNATION */
 	ch = (uchar)och;
 	if( WINVERS_AMIV ){			/* implies Rogue level here */
 	    amii_curs(win,x,y);
@@ -2105,10 +2100,8 @@ if(u.uz.dlevel != x){
 
 #ifdef TEXTCOLOR
 		/* Turn off color if rogue level. */
-# ifdef REINCARNATION
 	    if (Is_rogue_level(&u.uz))
 		color = NO_COLOR;
-#  endif
 
 	    amiga_print_glyph(win,color,ch);
 #else

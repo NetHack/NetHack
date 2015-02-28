@@ -1,4 +1,5 @@
-/* NetHack 3.5	allmain.c	$Date$  $Revision$ */
+/* NetHack 3.5	allmain.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	allmain.c	$Date: 2012/05/16 01:47:18 $  $Revision: 1.43 $ */
 /*	SCCS Id: @(#)allmain.c	3.5	2007/03/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -34,9 +35,7 @@ boolean resuming;
     monstr_init();	/* monster strengths */
     objects_init();
 
-#ifdef WIZARD
     if (wizard) add_debug_extended_commands();
-#endif
 
     /* if a save file created in normal mode is now being restored in
        explore mode, treat it as normal restore followed by 'X' command
@@ -117,12 +116,10 @@ boolean resuming;
 			(void) makemon((struct permonst *)0, 0, 0, NO_MM_FLAGS);
 
 		    /* calculate how much time passed. */
-#ifdef STEED
 		    if (u.usteed && u.umoved) {
 			/* your speed doesn't augment steed's speed */
 			moveamt = mcalcmove(u.usteed);
 		    } else
-#endif
 		    {
 			moveamt = youmonst.data->mmove;
 
@@ -249,11 +246,9 @@ boolean resuming;
 				if (!next_to_u()) {
 				    check_leash(old_ux, old_uy);
 				}
-#ifdef REDO
 				/* clear doagain keystrokes */
 				pushch(0);
 				savech(0);
-#endif
 			    }
 			}
 			/* delayed change may not be valid anymore */
@@ -358,12 +353,10 @@ boolean resuming;
 #if defined(MICRO) || defined(WIN32)
 	    abort_lev = 0;
 	    if (kbhit()) {
-		if ((ch = Getchar()) == ABORT)
+		if ((ch = pgetchar()) == ABORT)
 		    abort_lev++;
-# ifdef REDO
 		else
 		    pushch(ch);
-# endif /* REDO */
 	    }
 	    if (!abort_lev && (*occupation)() == 0)
 #else
@@ -385,10 +378,8 @@ boolean resuming;
 	    continue;
 	}
 
-#ifdef WIZARD
 	if (iflags.sanity_check)
 	    sanity_check();
-#endif
 
 #ifdef CLIPPING
 	/* just before rhack */
@@ -444,10 +435,8 @@ stop_occupation()
 		    You("stop %s.", occtxt);
 		occupation = 0;
 		context.botl = 1; /* in case u.uhs changed */
-#ifdef REDO
 		nomul(0);
 		pushch(0);
-#endif
 	}
 }
 
@@ -526,9 +515,7 @@ newgame()
 
 	mklev();
 	u_on_upstairs();
-#ifdef WIZARD
 	if (wizard) obj_delivery(FALSE);	/* finish wizkit */
-#endif
 	vision_reset();		/* set up internals for level (after mklev) */
 	check_special_room(FALSE);
 

@@ -1,4 +1,5 @@
-/* NetHack 3.5	display.c	$Date$  $Revision$ */
+/* NetHack 3.5	display.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	display.c	$Date: 2011/12/05 03:17:36 $  $Revision: 1.34 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -136,35 +137,7 @@ STATIC_DCL void FDECL(set_seenv, (struct rm *, int, int, int, int));
 STATIC_DCL void FDECL(t_warn, (struct rm *));
 STATIC_DCL int FDECL(wall_angle, (struct rm *));
 
-#ifdef DUNGEON_OVERVIEW
-# define remember_topology(x,y)		(lastseentyp[x][y] = levl[x][y].typ)
-#else
-# define remember_topology(x,y)		/*empty*/
-#endif
-
-#ifdef INVISIBLE_OBJECTS
-/*
- * vobj_at()
- *
- * Returns a pointer to an object if the hero can see an object at the
- * given location.  This takes care of invisible objects.  NOTE, this
- * assumes that the hero is not blind and on top of the object pile.
- * It does NOT take into account that the location is out of sight, or,
- * say, one can see blessed, etc.
- */
-struct obj *
-vobj_at(x,y)
-    xchar x,y;
-{
-    register struct obj *obj = level.objects[x][y];
-
-    while (obj) {
-	if (!obj->oinvis || See_invisible) return obj;
-	obj = obj->nexthere;
-    }
-    return ((struct obj *) 0);
-}
-#endif	/* else vobj_at() is defined in display.h */
+#define remember_topology(x,y)		(lastseentyp[x][y] = levl[x][y].typ)
 
 /*
  * magic_map_background()
@@ -419,10 +392,8 @@ display_monster(x, y, mon, sightflags, worm_tail)
 		levl[x][y].glyph = glyph;
 		if (!sensed) {
 		    show_glyph(x,y, glyph);
-#ifdef DUNGEON_OVERVIEW
 		    /* override real topology with mimic's fake one */
 		    lastseentyp[x][y] = cmap_to_type(sym);
-#endif
 		}
 		break;
 	    }
@@ -1125,11 +1096,9 @@ see_monsters()
 	warn_obj_cnt = new_warn_obj_cnt;
     }
 
-#ifdef STEED
     /* when mounted, hero's location gets caught by monster loop */
     if (!u.usteed)
-#endif
-    newsym(u.ux, u.uy);
+        newsym(u.ux, u.uy);
 }
 
 /*

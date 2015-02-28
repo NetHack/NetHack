@@ -1,4 +1,5 @@
-/* NetHack 3.5	pray.c	$Date$  $Revision$ */
+/* NetHack 3.5	pray.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	pray.c	$Date: 2012/05/07 01:44:38 $  $Revision: 1.62 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -10,9 +11,7 @@ STATIC_DCL int NDECL(in_trouble);
 STATIC_DCL void FDECL(fix_worst_trouble,(int));
 STATIC_DCL void FDECL(angrygods,(ALIGNTYP_P));
 STATIC_DCL void FDECL(at_your_feet, (const char *));
-#ifdef ELBERETH
 STATIC_DCL void NDECL(gcrownu);
-#endif	/*ELBERETH*/
 STATIC_DCL void FDECL(pleased,(ALIGNTYP_P));
 STATIC_DCL void FDECL(godvoice,(ALIGNTYP_P,const char*));
 STATIC_DCL void FDECL(god_zaps_you,(ALIGNTYP_P));
@@ -208,12 +207,10 @@ in_trouble()
 		Cursed_obj(uarmf, FUMBLE_BOOTS))
 	    return TROUBLE_FUMBLING;
 	if (worst_cursed_item()) return TROUBLE_CURSED_ITEMS;
-#ifdef STEED
 	if (u.usteed) {	/* can't voluntarily dismount from a cursed saddle */
 	    otmp = which_armor(u.usteed, W_SADDLE);
 	    if (Cursed_obj(otmp, SADDLE)) return TROUBLE_SADDLE;
 	}
-#endif
 
 	if (Blinded > 1 && haseyes(youmonst.data) &&
 	    (!u.uswallow ||
@@ -221,11 +218,7 @@ in_trouble()
 	    return(TROUBLE_BLIND);
 	for(i=0; i<A_MAX; i++)
 	    if(ABASE(i) < AMAX(i)) return(TROUBLE_POISONED);
-	if(Wounded_legs
-#ifdef STEED
-		    && !u.usteed
-#endif
-				) return (TROUBLE_WOUNDED_LEGS);
+	if(Wounded_legs && !u.usteed) return (TROUBLE_WOUNDED_LEGS);
 	if (u.uhs >= HUNGRY) return TROUBLE_HUNGRY;
 	if (HStun & TIMEOUT) return TROUBLE_STUNNED;
 	if (HConfusion & TIMEOUT) return TROUBLE_CONFUSED;
@@ -263,10 +256,8 @@ worst_cursed_item()
 	otmp = uarmh;
     } else if (uarmf && uarmf->cursed) {		/* boots */
 	otmp = uarmf;
-#ifdef TOURIST
     } else if (uarmu && uarmu->cursed) {		/* shirt */
 	otmp = uarmu;
-#endif
     } else if (uamul && uamul->cursed) {		/* amulet */
 	otmp = uamul;
     } else if (uleft && uleft->cursed) {		/* left ring */
@@ -484,7 +475,6 @@ decurse:
 		    pline ("Looks like you are back in Kansas.");
 		    (void) make_hallucinated(0L,FALSE,0L);
 		    break;
-#ifdef STEED
 	    case TROUBLE_SADDLE:
 		    otmp = which_armor(u.usteed, W_SADDLE);
 		    if (!Blind) {
@@ -494,7 +484,6 @@ decurse:
 		    }
 		    uncurse(otmp);
 		    break;
-#endif
 	}
 }
 
@@ -560,9 +549,7 @@ aligntyp resp_god;
 	    if (uarm && !(EReflecting & W_ARM) &&
 	    		!(EDisint_resistance & W_ARM) && !uarmc)
 		(void) destroy_arm(uarm);
-#ifdef TOURIST
 	    if (uarmu && !uarm && !uarmc) (void) destroy_arm(uarmu);
-#endif
 	    if (!Disint_resistance)
 		fry_by_god(resp_god, TRUE);
 	    else {
@@ -677,7 +664,6 @@ at_your_feet(str)
 	}
 }
 
-#ifdef ELBERETH
 STATIC_OVL void
 gcrownu()
 {
@@ -829,7 +815,6 @@ gcrownu()
     add_weapon_skill(1);
     return;
 }
-#endif	/*ELBERETH*/
 
 STATIC_OVL void
 pleased(g_align)
@@ -1051,12 +1036,10 @@ pleased(g_align)
 	}
 	case 7:
 	case 8:
-#ifdef ELBERETH
 	    if (u.ualign.record >= PIOUS && !u.uevent.uhand_of_elbereth) {
 		gcrownu();
 		break;
 	    } /* else FALLTHRU */
-#endif	/*ELBERETH*/
 	case 6:	{
 	    struct obj *otmp;
 	    int sp_no, trycnt = u.ulevel + 1;
@@ -1089,9 +1072,7 @@ pleased(g_align)
 
 	u.ublesscnt = rnz(350);
 	kick_on_butt = u.uevent.udemigod ? 1 : 0;
-#ifdef ELBERETH
 	if (u.uevent.uhand_of_elbereth) kick_on_butt++;
-#endif
 	if (kick_on_butt) u.ublesscnt += kick_on_butt * rnz(1000);
 
 	return;
@@ -1664,7 +1645,6 @@ dopray()
     /* set up p_type and p_alignment */
     if (!can_pray(TRUE)) return 0;
 
-#ifdef WIZARD
     if (wizard && p_type >= 0) {
 	if (yn("Force the gods to be pleased?") == 'y') {
 	    u.ublesscnt = 0;
@@ -1674,7 +1654,6 @@ dopray()
 	    if(p_type < 2) p_type = 3;
 	}
     }
-#endif
     nomul(-3);
     nomovemsg = "You finish your prayer.";
     afternmv = prayer_done;

@@ -1,4 +1,5 @@
-/* NetHack 3.5	mkroom.c	$Date$  $Revision$ */
+/* NetHack 3.5	mkroom.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mkroom.c	$Date: 2012/01/10 17:47:19 $  $Revision: 1.15 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -66,7 +67,6 @@ mkshop()
 {
 	register struct mkroom *sroom;
 	int i = -1;
-#ifdef WIZARD
 	char *ep = (char *)0;	/* (init == lint suppression) */
 
 	/* first determine shoptype */
@@ -129,7 +129,6 @@ mkshop()
 #ifndef MAC
 gottype:
 #endif
-#endif
 	for(sroom = &rooms[0]; ; sroom++){
 		if(sroom->hx < 0) return;
 		if(sroom - rooms >= nroom) {
@@ -139,11 +138,8 @@ gottype:
 		if(sroom->rtype != OROOM) continue;
 		if(has_dnstairs(sroom) || has_upstairs(sroom))
 			continue;
-		if(
-#ifdef WIZARD
-		   (wizard && ep && sroom->doorct != 0) ||
-#endif
-			sroom->doorct == 1) break;
+		if( (wizard && ep && sroom->doorct != 0) || sroom->doorct == 1)
+                    break;
 	}
 	if (!sroom->rlit) {
 		int x, y;
@@ -199,11 +195,7 @@ register boolean strict;
 			continue;
 		} else if(has_upstairs(sroom) || has_dnstairs(sroom))
 			continue;
-		if(sroom->doorct == 1 || !rn2(5)
-#ifdef WIZARD
-						|| wizard
-#endif
-							)
+		if(sroom->doorct == 1 || !rn2(5) || wizard)
 			return sroom;
 	}
 	return (struct mkroom *)0;

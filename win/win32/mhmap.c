@@ -1,4 +1,5 @@
-/* NetHack 3.5	mhmap.c	$Date$  $Revision$ */
+/* NetHack 3.5	mhmap.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mhmap.c	$Date: 2012/01/11 01:45:02 $  $Revision: 1.37 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -602,12 +603,8 @@ void onPaint(HWND hWnd)
 		paint_rt.right = min(data->xPos + (ps.rcPaint.right - data->map_orig.x)/data->xScrTile+1, COLNO);
 		paint_rt.bottom = min(data->yPos + (ps.rcPaint.bottom - data->map_orig.y)/data->yScrTile+1, ROWNO);
 
-		if( data->bAsciiMode
-#ifdef REINCARNATION
-		    || Is_rogue_level(&u.uz) 
+		if( data->bAsciiMode || Is_rogue_level(&u.uz) ) {
 			/* You enter a VERY primitive world! */
-#endif
-			) {
 			HGDIOBJ oldFont;
 
 			oldFont = SelectObject(hDC, data->hMapFont);

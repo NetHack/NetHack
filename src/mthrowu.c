@@ -1,4 +1,5 @@
-/* NetHack 3.5	mthrowu.c	$Date$  $Revision$ */
+/* NetHack 3.5	mthrowu.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mthrowu.c	$Date: 2011/12/30 23:47:06 $  $Revision: 1.43 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -430,11 +431,8 @@ struct obj *obj;		/* missile (or stack providing it) */
 			/* missile might hit iron bars */
 			|| (levl[bhitpos.x+dx][bhitpos.y+dy].typ == IRONBARS &&
 			hits_bars(&singleobj, bhitpos.x, bhitpos.y, !rn2(5), 0))
-#ifdef SINKS
 			/* Thrown objects "sink" */
-			|| IS_SINK(levl[bhitpos.x][bhitpos.y].typ)
-#endif
-								) {
+			|| IS_SINK(levl[bhitpos.x][bhitpos.y].typ)) {
 		    if (singleobj) /* hits_bars might have destroyed it */
 			(void) drop_throw(singleobj, 0, bhitpos.x, bhitpos.y);
 		    break;
@@ -816,9 +814,7 @@ int whodidit;	/* 1==hero, 0=other, -1==just check whether it'll pass thru */
 	case TOOL_CLASS:
 		hits = (obj_type != SKELETON_KEY &&
 			obj_type != LOCK_PICK &&
-#ifdef TOURIST
 			obj_type != CREDIT_CARD &&
-#endif
 			obj_type != TALLOW_CANDLE &&
 			obj_type != WAX_CANDLE &&
 			obj_type != LENSES &&

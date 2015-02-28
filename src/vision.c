@@ -1,4 +1,5 @@
-/* NetHack 3.5	vision.c	$Date$  $Revision$ */
+/* NetHack 3.5	vision.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	vision.c	$Date: 2009/05/06 10:48:10 $  $Revision: 1.12 $ */
 /*	SCCS Id: @(#)vision.c	3.5	2007/11/05	*/
 /* Copyright (c) Dean Luick, with acknowledgements to Dave Cohrs, 1990.	*/
 /* NetHack may be freely redistributed.  See license for details.	*/
@@ -102,9 +103,7 @@ STATIC_DCL void NDECL(view_init);
 STATIC_DCL void FDECL(view_from,(int,int,char **,char *,char *,int,
 			     void (*)(int,int,genericptr_t),genericptr_t));
 STATIC_DCL void FDECL(get_unused_cs, (char ***,char **,char **));
-#ifdef REINCARNATION
 STATIC_DCL void FDECL(rogue_vision, (char **,char *,char *));
-#endif
 
 /* Macro definitions that I can't find anywhere. */
 #define sign(z) ((z) < 0 ? -1 : ((z) ? 1 : 0 ))
@@ -284,7 +283,6 @@ get_unused_cs(rows, rmin, rmax)
 }
 
 
-#ifdef REINCARNATION
 /*
  * rogue_vision()
  *
@@ -348,7 +346,6 @@ rogue_vision(next, rmin, rmax)
 	}
     }
 }
-#endif /* REINCARNATION */
 
 /*#define EXTEND_SPINE*/	/* possibly better looking wall-angle */
 
@@ -567,13 +564,9 @@ vision_recalc(control)
 
 	/* skip the normal update loop */
 	goto skip;
-    }
-#ifdef REINCARNATION
-    else if (Is_rogue_level(&u.uz)) {
+    } else if (Is_rogue_level(&u.uz)) {
 	rogue_vision(next_array,next_rmin,next_rmax);
-    }
-#endif
-    else {
+    } else {
 	int has_night_vision = 1;	/* hero has night vision */
 
 	if (Underwater && !Is_waterlevel(&u.uz)) {
@@ -810,9 +803,7 @@ skip:
     viz_rmin  = next_rmin;
     viz_rmax = next_rmax;
 
-#ifdef DUNGEON_OVERVIEW
     recalc_mapseen();
-#endif
 }
 
 

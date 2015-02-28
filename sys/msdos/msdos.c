@@ -1,4 +1,5 @@
-/* NetHack 3.5	msdos.c	$Date$  $Revision$ */
+/* NetHack 3.5	msdos.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	msdos.c	$Date: 2012/01/22 06:27:07 $  $Revision: 1.7 $ */
 /* Copyright (c) NetHack PC Development Team 1990 */
 /* NetHack may be freely redistributed.  See license for details.         */
 

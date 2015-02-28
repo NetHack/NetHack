@@ -1,4 +1,5 @@
-/* NetHack 3.5	mhmain.c	$Date$  $Revision$ */
+/* NetHack 3.5	mhmain.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mhmain.c	$Date: 2012/01/11 01:53:44 $  $Revision: 1.49 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1042,9 +1043,7 @@ void mswin_select_map_mode(int mode)
 	data = (PNHMainWindow)GetWindowLong(GetNHApp()->hMainWnd, GWL_USERDATA);
 
 	/* override for Rogue level */
-#ifdef REINCARNATION
     if( Is_rogue_level(&u.uz) && !IS_MAP_ASCII(mode) ) return;
-#endif
 
 	/* set map mode menu mark */
 	if( IS_MAP_ASCII(mode) ) {

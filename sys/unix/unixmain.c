@@ -1,4 +1,5 @@
-/* NetHack 3.5	unixmain.c	$Date$  $Revision$ */
+/* NetHack 3.5	unixmain.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	unixmain.c	$Date: 2012/01/27 20:15:31 $  $Revision: 1.42 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -223,13 +224,10 @@ char *argv[];
 	   or holds a generic user name like "player" or "games" */
 	plnamesuffix();
 
-#ifdef WIZARD
 	if (wizard) {
 		/* use character name rather than lock letter for file names */
 		locknum = 0;
-	} else
-#endif
-	    {
+	} else {
 		/* suppress interrupts while processing lock file */
 		(void) signal(SIGQUIT,SIG_IGN);
 		(void) signal(SIGINT,SIG_IGN);
@@ -359,20 +357,16 @@ char *argv[];
 		case 'I':
 		case 'i':
 			if (!strncmpi(argv[0]+1, "IBM", 3)) {
-#ifdef LOADSYMSETS
 				load_symset("IBMGraphics", PRIMARY);
 				load_symset("RogueIBM", ROGUESET);
 				switch_symbols(TRUE);
-#endif
 			}
 			break;
 	    /*  case 'D': */
 		case 'd':
 			if (!strncmpi(argv[0]+1, "DEC", 3)) {
-#ifdef LOADSYMSETS
 				load_symset("DECGraphics", PRIMARY);
 				switch_symbols(TRUE);
-#endif
 			}
 			break;
 		case 'p': /* profession (role) */
@@ -559,12 +553,10 @@ port_help()
 boolean
 authorize_wizard_mode()
 {
-#ifdef WIZARD
 	struct passwd *pw = get_unix_pw();
 	if (pw && sysopt.wizards && sysopt.wizards[0]) {
 	    if(check_user_string(sysopt.wizards)) return TRUE;
 	}
-#endif	/* WIZARD */
 	wiz_error_flag = TRUE;	/* not being allowed into wizard mode */
 	return FALSE;
 }
@@ -573,16 +565,12 @@ static void
 wd_message()
 {
 	if (wiz_error_flag) {
-#ifdef WIZARD
 	    if (sysopt.wizards && sysopt.wizards[0]) {
 		char *tmp = build_english_list(sysopt.wizards);
 		pline("Only user%s %s may access debug (wizard) mode.",
 			index(sysopt.wizards, ' ')?"s":"", tmp);
 		free(tmp);
 	    } else
-#else
-		pline("Debug mode is not available.");
-#endif
 		pline("Entering explore/discovery mode instead.");
 		wizard = 0, discover = 1;		/* (paranoia) */
 	} else if (discover)

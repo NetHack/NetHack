@@ -1,4 +1,5 @@
-/* NetHack 3.5	obj.h	$Date$  $Revision$ */
+/* NetHack 3.5	obj.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	obj.h	$Date: 2012/01/10 17:47:16 $  $Revision: 1.31 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -93,11 +94,7 @@ struct obj {
 	Bitfield(recharged,3);	/* number of times it's been recharged */
 #define on_ice recharged	/* corpse on ice */
 	Bitfield(lamplit,1);	/* a light-source -- can be lit */
-#ifdef INVISIBLE_OBJECTS
-	Bitfield(oinvis,1);	/* invisible */
-#else
-	Bitfield(oreserved1,1);	
-#endif
+	Bitfield(oreserved1,1);	/* was the placeholder for invisible objects, free for use */
 	Bitfield(greased,1);	/* covered with grease */
 	Bitfield(nomerge,1);	/* set temporarily to prevent merging */
 	Bitfield(was_thrown,1);	/* thrown by hero since last picked up */
@@ -311,12 +308,8 @@ struct obj {
 				 (obj)->otyp == TOUCHSTONE)
 
 /* misc */
-#ifdef KOPS
 #define is_flimsy(otmp)		(objects[(otmp)->otyp].oc_material <= LEATHER || \
 				 (otmp)->otyp == RUBBER_HOSE)
-#else
-#define is_flimsy(otmp)		(objects[(otmp)->otyp].oc_material <= LEATHER)
-#endif
 
 /* helpers, simple enough to be macros */
 #define is_plural(o)	((o)->quan > 1 || \

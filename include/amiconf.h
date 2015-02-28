@@ -1,4 +1,5 @@
-/* NetHack 3.5	amiconf.h	$Date$  $Revision$ */
+/* NetHack 3.5	amiconf.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	amiconf.h	$Date: 2012/01/10 17:47:16 $  $Revision: 1.8 $ */
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1990, 1991, 1992, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 

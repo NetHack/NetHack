@@ -1,4 +1,5 @@
-/* NetHack 3.5	dogmove.c	$Date$  $Revision$ */
+/* NetHack 3.5	dogmove.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	dogmove.c	$Date: 2012/02/10 09:29:28 $  $Revision: 1.35 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -25,13 +26,6 @@ struct monst *mon;
     struct obj *obj, *wep,
 	       dummy, *pickaxe, *unihorn, *key;
 
-#ifndef TOURIST
-#define CREDIT_CARD STRANGE_OBJECT	/* avoids messy conditionalization */
-#endif
-
-#ifndef GOLDOBJ
-    if (mon->mgold) return &zeroobj;	/* pet has something to drop */
-#endif
     dummy = zeroobj;
     dummy.otyp = GOLD_PIECE;	/* not STRANGE_OBJECT or tools of interest */
     dummy.oartifact = 1; /* so real artifact won't override "don't keep it" */
@@ -110,28 +104,16 @@ struct monst *mon;
 	if (!obj->owornmask && obj != wep) return obj;
     }
 
-#ifndef TOURIST
-#undef CREDIT_CARD
-#endif
-
     return (struct obj *)0;	/* don't drop anything */
 }
 
 static NEARDATA const char nofetch[] = { BALL_CLASS, CHAIN_CLASS, ROCK_CLASS, 0 };
 
-#ifndef BARGETHROUGH
-STATIC_OVL boolean FDECL(cursed_object_at, (int, int));
-#endif /* not BARGETHROUGH */
-
 STATIC_VAR xchar gtyp, gx, gy;	/* type and position of dog's current goal */
 
 STATIC_PTR void FDECL(wantdoor, (int, int, genericptr_t));
 
-#ifdef BARGETHROUGH
 boolean
-#else
-STATIC_OVL boolean
-#endif
 cursed_object_at(x, y)
 int x, y;
 {
@@ -353,11 +335,7 @@ register struct edog *edog;
 		stop_occupation();
 	    } else if (monstermoves > edog->hungrytime + 750 || mtmp->mhp < 1) {
  dog_died:
-		if (mtmp->mleashed
-#ifdef STEED
-		    && mtmp != u.usteed
-#endif
-		    )
+		if (mtmp->mleashed && mtmp != u.usteed)
 		    Your("leash goes slack.");
 		else if (cansee(mtmp->mx, mtmp->my))
 		    pline("%s starves.", Monnam(mtmp));
@@ -452,11 +430,9 @@ int after, udist, whappr;
 	xchar otyp;
 	int appr;
 
-#ifdef STEED
 	/* Steeds don't move on their own will */
 	if (mtmp == u.usteed)
 		return (-2);
-#endif
 
 	omx = mtmp->mx;
 	omy = mtmp->my;
@@ -600,9 +576,7 @@ register int after;	/* this is extra fast monster movement */
 	struct obj *obj = (struct obj *) 0;
 	xchar otyp;
 	boolean has_edog, cursemsg[9], do_eat = FALSE;
-#ifdef BARGETHROUGH
 	boolean better_with_displacing = FALSE;
-#endif
 	xchar nix, niy;		/* position mtmp is (considering) moving to */
 	register int nx, ny;	/* temporary coordinates */
 	xchar cnt, uncursedcnt, chcnt;
@@ -625,7 +599,6 @@ register int after;	/* this is extra fast monster movement */
 	if (has_edog && dog_hunger(mtmp, edog)) return(2);	/* starved */
 
 	udist = distu(omx,omy);
-#ifdef STEED
 	/* Let steeds eat and maybe throw rider during Conflict */
 	if (mtmp == u.usteed) {
 	    if (Conflict && !resist(mtmp, RING_CLASS, 0, 0)) {
@@ -633,10 +606,9 @@ register int after;	/* this is extra fast monster movement */
 		return (1);
 	    }
 	    udist = 1;
-	} else
-#endif
-	/* maybe we tamed him while being swallowed --jgm */
-	if (!udist) return(0);
+	} else if (!udist)
+	    /* maybe we tamed him while being swallowed --jgm */
+        return(0);
 
 	nix = omx;	/* set before newdogpos */
 	niy = omy;
@@ -660,9 +632,7 @@ register int after;	/* this is extra fast monster movement */
 	if (passes_walls(mtmp->data)) allowflags |= (ALLOW_ROCK | ALLOW_WALL);
 	if (passes_bars(mtmp->data)) allowflags |= ALLOW_BARS;
 	if (throws_rocks(mtmp->data)) allowflags |= ALLOW_ROCK;
-#ifdef BARGETHROUGH
 	if (is_displacer(mtmp->data)) allowflags |= ALLOW_MDISP;
-#endif
 	if (Conflict && !resist(mtmp, RING_CLASS, 0, 0)) {
 	    allowflags |= ALLOW_U;
 	    if (!has_edog) {
@@ -688,9 +658,7 @@ register int after;	/* this is extra fast monster movement */
 	}
 	if (is_giant(mtmp->data)) allowflags |= BUSTDOOR;
 	if (tunnels(mtmp->data)
-#ifdef REINCARNATION
 	    && !Is_rogue_level(&u.uz)	/* same restriction as m_move() */
-#endif
 	    ) allowflags |= ALLOW_DIG;
 	cnt = mfndpos(mtmp, poss, info, allowflags);
 
@@ -701,19 +669,13 @@ register int after;	/* this is extra fast monster movement */
 	uncursedcnt = 0;
 	for (i = 0; i < cnt; i++) {
 		nx = poss[i].x; ny = poss[i].y;
-#ifdef BARGETHROUGH
 		if (MON_AT(nx,ny) && !((info[i] & ALLOW_M) || info[i] & ALLOW_MDISP))
 			continue;
-#else
-		if (MON_AT(nx,ny) && !(info[i] & ALLOW_M)) continue;
-#endif
 		if (cursed_object_at(nx, ny)) continue;
 		uncursedcnt++;
 	}
 
-#ifdef BARGETHROUGH
 	better_with_displacing = should_displace(mtmp,poss,info,cnt,gx,gy);
-#endif
 
 	chcnt = 0;
 	chi = -1;
@@ -767,7 +729,6 @@ register int after;	/* this is extra fast monster movement */
 		    }
 		    return 0;
 		}
-#ifdef BARGETHROUGH
 		if ((info[i] & ALLOW_MDISP) && MON_AT(nx, ny) &&
 			better_with_displacing &&
 			!undesirable_disp(mtmp,nx,ny)) {
@@ -777,7 +738,6 @@ register int after;	/* this is extra fast monster movement */
 		    if (mstatus & MM_DEF_DIED) return 2;
   		    return 0;
   		}
-#endif /* BARGETHROUGH */
 
 		{   /* Dog avoids harmful traps, but perhaps it has to pass one
 		     * in order to follow player.  (Non-harmful traps do not
@@ -1008,9 +968,7 @@ static struct qmchoices {
 	{PM_HOUSECAT,   0, PM_DOG, 	  M_AP_MONSTER},
 	{PM_LARGE_CAT,  0, PM_LARGE_DOG,  M_AP_MONSTER},
 	{PM_HOUSECAT,   0, PM_GIANT_RAT,  M_AP_MONSTER},
-#ifdef SINKS
 	{0, S_DOG, SINK, M_AP_FURNITURE},	/* sorry, no fire hydrants in NetHack */
-#endif
 	{0, 0, TRIPE_RATION, M_AP_OBJECT},	/* leave this at end */
 };
 

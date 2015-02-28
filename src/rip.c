@@ -1,4 +1,5 @@
-/* NetHack 3.5	rip.c	$Date$  $Revision$ */
+/* NetHack 3.5	rip.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	rip.c	$Date: 2012/03/10 02:49:08 $  $Revision: 1.11 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -106,11 +107,7 @@ time_t when;
 	center(NAME_LINE, buf);
 
 	/* Put $ on stone */
-#ifndef GOLDOBJ
-	Sprintf(buf, "%ld Au", u.ugold);
-#else
 	Sprintf(buf, "%ld Au", done_money);
-#endif
 	buf[STONE_LINE_LEN] = 0; /* It could be a *lot* of gold :-) */
 	center(GOLD_LINE, buf);
 

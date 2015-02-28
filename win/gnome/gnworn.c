@@ -1,4 +1,8 @@
 /* NetHack 3.5	gnworn.c	2009/05/06 10:58:06  1.3 */
+/*
+ * $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+ * $Date: 2012/01/10 17:47:38 $  $Revision: 1.4 $
+ */
 /* Copyright (C) 2002, Dylan Alex Simon			*/
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -10,7 +14,6 @@
 #define WORN_WIDTH	3
 #define WORN_HEIGHT	6
 
-#ifdef TOURIST
 #define WORN_OBJECT_LIST /* struct obj *[WORN_HEIGHT][WORN_WIDTH] = */ { \
     { uquiver,	uarmh,	    u.twoweap ? NULL : uswapwep }, \
     { u.twoweap ? uswapwep : NULL,  ublindf,	uwep	    }, \
@@ -19,16 +22,6 @@
     { uarmu,	uarm,	    uskin	}, \
     { uball,	uarmf,	    uchain	} \
 }
-#else
-#define WORN_OBJECT_LIST /* struct obj *[WORN_HEIGHT][WORN_WIDTH] = */ { \
-    { uquiver,	uarmh,	    u.twoweap ? NULL : uswapwep }, \
-    { u.twoweap ? uswapwep : NULL,	ublindf,    uwep    }, \
-    { uleft,	uamul,	    uright	}, \
-    { uarms,	uarmc,	    uarmg	}, \
-    { NULL,	uarm,	    uskin	}, \
-    { uball,	uarmf,	    uchain	} \
-}
-#endif
 
 static GtkWidget *worn_contents[WORN_HEIGHT][WORN_WIDTH];
 static struct obj *last_worn_objects[WORN_HEIGHT][WORN_WIDTH];

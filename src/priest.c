@@ -1,4 +1,5 @@
-/* NetHack 3.5	priest.c	$Date$  $Revision$ */
+/* NetHack 3.5	priest.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	priest.c	$Date: 2012/02/16 02:40:24 $  $Revision: 1.27 $ */
 /* Copyright (c) Izchak Miller, Steve Linhart, 1989.		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -444,11 +445,9 @@ int roomno;
 		if (*this_time <= *other_time) *other_time = *this_time - 1L;
 	    }
 	}
-#ifdef DUNGEON_OVERVIEW
 	/* recognize the Valley of the Dead and Moloch's Sanctum
 	   once hero has encountered the temple priest on those levels */
 	mapseen_temple(priest);
-#endif
     } else {
 	/* untended */
 
@@ -540,20 +539,6 @@ register struct monst *priest;
 	    priest->mpeaceful = 0;
 	    return;
 	}
-#ifndef GOLDOBJ
-	if(!u.ugold) {
-	    if(coaligned && !strayed) {
-		if (priest->mgold > 0L) {
-		    /* Note: two bits is actually 25 cents.  Hmm. */
-		    pline("%s gives you %s for an ale.", Monnam(priest),
-			(priest->mgold == 1L) ? "one bit" : "two bits");
-		    if (priest->mgold > 1L)
-			u.ugold = 2L;
-		    else
-			u.ugold = 1L;
-		    priest->mgold -= u.ugold;
-		    context.botl = 1;
-#else
 	if(!money_cnt(invent)) {
 	    if(coaligned && !strayed) {
                 long pmoney = money_cnt(priest->minvent);
@@ -562,7 +547,6 @@ register struct monst *priest;
 		    pline("%s gives you %s for an ale.", Monnam(priest),
 			(pmoney == 1L) ? "one bit" : "two bits");
 		     money2u(priest, pmoney > 1L ? 2 : 1);
-#endif
 		} else
 		    pline("%s preaches the virtues of poverty.", Monnam(priest));
 		exercise(A_WIS, TRUE);
@@ -578,11 +562,7 @@ register struct monst *priest;
 		verbalize("Thou shalt regret thine action!");
 		if(coaligned) adjalign(-1);
 	    } else if(offer < (u.ulevel * 200)) {
-#ifndef GOLDOBJ
-		if(u.ugold > (offer * 2L)) verbalize("Cheapskate.");
-#else
 		if(money_cnt(invent) > (offer * 2L)) verbalize("Cheapskate.");
-#endif
 		else {
 		    verbalize("I thank thee for thy contribution.");
 		    /*  give player some token  */
@@ -590,11 +570,7 @@ register struct monst *priest;
 		}
 	    } else if(offer < (u.ulevel * 400)) {
 		verbalize("Thou art indeed a pious individual.");
-#ifndef GOLDOBJ
-		if(u.ugold < (offer * 2L)) {
-#else
 		if(money_cnt(invent) < (offer * 2L)) {
-#endif
 		    if (coaligned && u.ualign.record <= ALGN_SINNED)
 			adjalign(1);
 		    verbalize("I bestow upon thee a blessing.");
@@ -615,11 +591,7 @@ register struct monst *priest;
 		} else u.ublessed++;
 	    } else {
 		verbalize("Thy selfless generosity is deeply appreciated.");
-#ifndef GOLDOBJ
-		if(u.ugold < (offer * 2L) && coaligned) {
-#else
 		if(money_cnt(invent) < (offer * 2L) && coaligned) {
-#endif
 		    if(strayed && (moves - u.ucleansed) > 5000L) {
 			u.ualign.record = 0; /* cleanse thee */
 			u.ucleansed = moves;

@@ -1,4 +1,5 @@
-/* NetHack 3.5	u_init.c	$Date$  $Revision$ */
+/* NetHack 3.5	u_init.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	u_init.c	$Date: 2011/10/01 00:25:56 $  $Revision: 1.18 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -137,7 +138,6 @@ static struct trobj Samurai[] = {
 	{ SPLINT_MAIL, 0, ARMOR_CLASS, 1, UNDEF_BLESS },
 	{ 0, 0, 0, 0, 0 }
 };
-#ifdef TOURIST
 static struct trobj Tourist[] = {
 #define T_DARTS		0
 	{ DART, 2, WEAPON_CLASS, 25, UNDEF_BLESS },	/* quan is variable */
@@ -149,7 +149,6 @@ static struct trobj Tourist[] = {
 	{ CREDIT_CARD, 0, TOOL_CLASS, 1, 0 },
 	{ 0, 0, 0, 0, 0 }
 };
-#endif
 static struct trobj Valkyrie[] = {
 	{ LONG_SWORD, 1, WEAPON_CLASS, 1, UNDEF_BLESS },
 	{ DAGGER, 0, WEAPON_CLASS, 1, UNDEF_BLESS },
@@ -199,7 +198,6 @@ static struct trobj Xtra_food[] = {
 	{ UNDEF_TYP, UNDEF_SPE, FOOD_CLASS, 2, 0 },
 	{ 0, 0, 0, 0, 0 }
 };
-#ifdef TOURIST
 static struct trobj Leash[] = {
 	{ LEASH, 0, TOOL_CLASS, 1, 0 },
 	{ 0, 0, 0, 0, 0 }
@@ -208,17 +206,14 @@ static struct trobj Towel[] = {
 	{ TOWEL, 0, TOOL_CLASS, 1, 0 },
 	{ 0, 0, 0, 0, 0 }
 };
-#endif	/* TOURIST */
 static struct trobj Wishing[] = {
 	{ WAN_WISHING, 3, WAND_CLASS, 1, 0 },
 	{ 0, 0, 0, 0, 0 }
 };
-#ifdef GOLDOBJ
 static struct trobj Money[] = {
 	{ GOLD_PIECE, 0 , COIN_CLASS, 1, 0 },
 	{ 0, 0, 0, 0, 0 }
 };
-#endif
 
 /* race-based substitutions for initial inventory;
    the weaker cloak for elven rangers is intentional--they shoot better */
@@ -261,9 +256,7 @@ static const struct def_skill Skill_A[] = {
     { P_UNICORN_HORN, P_SKILLED },
     { P_ATTACK_SPELL, P_BASIC },	{ P_HEALING_SPELL, P_BASIC },
     { P_DIVINATION_SPELL, P_EXPERT},	{ P_MATTER_SPELL, P_BASIC},
-#ifdef STEED
     { P_RIDING, P_BASIC },
-#endif
     { P_TWO_WEAPON_COMBAT, P_BASIC },
     { P_BARE_HANDED_COMBAT, P_EXPERT },
     { P_NONE, 0 }
@@ -280,9 +273,7 @@ static const struct def_skill Skill_B[] = {
     { P_QUARTERSTAFF, P_BASIC },	{ P_SPEAR, P_SKILLED },
     { P_TRIDENT, P_SKILLED },		{ P_BOW, P_BASIC },
     { P_ATTACK_SPELL, P_SKILLED },
-#ifdef STEED
     { P_RIDING, P_BASIC },
-#endif
     { P_TWO_WEAPON_COMBAT, P_BASIC },
     { P_BARE_HANDED_COMBAT, P_MASTER },
     { P_NONE, 0 }
@@ -331,9 +322,7 @@ static const struct def_skill Skill_K[] = {
     { P_BOW, P_BASIC },			{ P_CROSSBOW, P_SKILLED },
     { P_ATTACK_SPELL, P_SKILLED },	{ P_HEALING_SPELL, P_SKILLED },
     { P_CLERIC_SPELL, P_SKILLED },
-#ifdef STEED
     { P_RIDING, P_EXPERT },
-#endif
     { P_TWO_WEAPON_COMBAT, P_SKILLED },
     { P_BARE_HANDED_COMBAT, P_EXPERT },
     { P_NONE, 0 }
@@ -378,9 +367,7 @@ static const struct def_skill Skill_R[] = {
     { P_DART, P_EXPERT },		{ P_SHURIKEN, P_SKILLED },
     { P_DIVINATION_SPELL, P_SKILLED },	{ P_ESCAPE_SPELL, P_SKILLED },
     { P_MATTER_SPELL, P_SKILLED },
-#ifdef STEED
     { P_RIDING, P_BASIC },
-#endif
     { P_TWO_WEAPON_COMBAT, P_EXPERT },
     { P_BARE_HANDED_COMBAT, P_EXPERT },
     { P_NONE, 0 }
@@ -400,9 +387,7 @@ static const struct def_skill Skill_Ran[] = {
     { P_HEALING_SPELL, P_BASIC },
     { P_DIVINATION_SPELL, P_EXPERT },
     { P_ESCAPE_SPELL, P_BASIC },
-#ifdef STEED
     { P_RIDING, P_BASIC },
-#endif
     { P_BARE_HANDED_COMBAT, P_BASIC },
     { P_NONE, 0 }
 };
@@ -417,15 +402,12 @@ static const struct def_skill Skill_S[] = {
     { P_LANCE, P_SKILLED },
     { P_BOW, P_EXPERT },		{ P_SHURIKEN, P_EXPERT },
     { P_ATTACK_SPELL, P_SKILLED },	{ P_CLERIC_SPELL, P_SKILLED },
-#ifdef STEED
     { P_RIDING, P_SKILLED },
-#endif
     { P_TWO_WEAPON_COMBAT, P_EXPERT },
     { P_MARTIAL_ARTS, P_MASTER },
     { P_NONE, 0 }
 };
 
-#ifdef TOURIST
 static const struct def_skill Skill_T[] = {
     { P_DAGGER, P_EXPERT },		{ P_KNIFE,  P_SKILLED },
     { P_AXE, P_BASIC },			{ P_PICK_AXE, P_BASIC },
@@ -443,14 +425,11 @@ static const struct def_skill Skill_T[] = {
     { P_WHIP, P_BASIC },		{ P_UNICORN_HORN, P_SKILLED },
     { P_DIVINATION_SPELL, P_BASIC },	{ P_ENCHANTMENT_SPELL, P_BASIC },
     { P_ESCAPE_SPELL, P_SKILLED },
-#ifdef STEED
     { P_RIDING, P_BASIC },
-#endif
     { P_TWO_WEAPON_COMBAT, P_SKILLED },
     { P_BARE_HANDED_COMBAT, P_SKILLED },
     { P_NONE, 0 }
 };
-#endif /* TOURIST */
 
 static const struct def_skill Skill_V[] = {
     { P_DAGGER, P_EXPERT },		{ P_AXE, P_EXPERT },
@@ -463,9 +442,7 @@ static const struct def_skill Skill_V[] = {
     { P_TRIDENT, P_BASIC },		{ P_LANCE, P_SKILLED },
     { P_SLING, P_BASIC },
     { P_ATTACK_SPELL, P_BASIC },	{ P_ESCAPE_SPELL, P_BASIC },
-#ifdef STEED
     { P_RIDING, P_SKILLED },
-#endif
     { P_TWO_WEAPON_COMBAT, P_SKILLED },
     { P_BARE_HANDED_COMBAT, P_EXPERT },
     { P_NONE, 0 }
@@ -483,9 +460,7 @@ static const struct def_skill Skill_W[] = {
     { P_DIVINATION_SPELL, P_EXPERT },	{ P_ENCHANTMENT_SPELL, P_SKILLED },
     { P_CLERIC_SPELL, P_SKILLED },	{ P_ESCAPE_SPELL, P_EXPERT },
     { P_MATTER_SPELL, P_EXPERT },
-#ifdef STEED
     { P_RIDING, P_BASIC },
-#endif
     { P_BARE_HANDED_COMBAT, P_BASIC },
     { P_NONE, 0 }
 };
@@ -529,9 +504,7 @@ u_init()
 #if 0	/* documentation of more zero values as desirable */
 	u.usick_cause[0] = 0;
 	u.uluck  = u.moreluck = 0;
-# ifdef TOURIST
 	uarmu = 0;
-# endif
 	uarm = uarmc = uarmh = uarms = uarmg = uarmf = 0;
 	uwep = uball = uchain = uleft = uright = 0;
 	uswapwep = uquiver = 0;
@@ -539,9 +512,7 @@ u_init()
 	u.ublessed = 0;				/* not worthy yet */
 	u.ugangr   = 0;				/* gods not angry */
 	u.ugifts   = 0;				/* no divine gifts bestowed */
-# ifdef ELBERETH
 	u.uevent.uhand_of_elbereth = 0;
-# endif
 	u.uevent.uheard_tune = 0;
 	u.uevent.uopened_dbridge = 0;
 	u.uevent.udemigod = 0;		/* not a demi-god yet... */
@@ -624,11 +595,7 @@ u_init()
 		skill_init(Skill_C);
 		break;
 	case PM_HEALER:
-#ifndef GOLDOBJ
-		u.ugold = u.ugold0 = rn1(1000, 1001);
-#else
 		u.umoney0 = rn1(1000, 1001);
-#endif
 		ini_inv(Healer);
 		if(!rn2(25)) ini_inv(Lamp);
 		knows_object(POT_FULL_HEALING);
@@ -677,11 +644,7 @@ u_init()
 		break;
 	case PM_ROGUE:
 		Rogue[R_DAGGERS].trquan = rn1(10, 6);
-#ifndef GOLDOBJ
-		u.ugold = u.ugold0 = 0;
-#else
 		u.umoney0 = 0;
-#endif
 		ini_inv(Rogue);
 		if(!rn2(5)) ini_inv(Blindfold);
 		knows_object(SACK);
@@ -695,14 +658,9 @@ u_init()
 		knows_class(ARMOR_CLASS);
 		skill_init(Skill_S);
 		break;
-#ifdef TOURIST
 	case PM_TOURIST:
 		Tourist[T_DARTS].trquan = rn1(20, 21);
-#ifndef GOLDOBJ
-		u.ugold = u.ugold0 = rnd(1000);
-#else
 		u.umoney0 = rnd(1000);
-#endif
 		ini_inv(Tourist);
 		if(!rn2(25)) ini_inv(Tinopener);
 		else if(!rn2(25)) ini_inv(Leash);
@@ -710,7 +668,6 @@ u_init()
 		else if(!rn2(25)) ini_inv(Magicmarker);
 		skill_init(Skill_T);
 		break;
-#endif
 	case PM_VALKYRIE:
 		ini_inv(Valkyrie);
 		if(!rn2(6)) ini_inv(Lamp);
@@ -804,17 +761,11 @@ u_init()
 	if (discover)
 		ini_inv(Wishing);
 
-#ifdef WIZARD
 	if (wizard)
 		read_wizkit();
-#endif
 
-#ifndef GOLDOBJ
-	u.ugold0 += hidden_gold();	/* in case sack has gold in it */
-#else
 	if (u.umoney0) ini_inv(Money);
 	u.umoney0 += hidden_gold();	/* in case sack has gold in it */
-#endif
 
 	find_ac();			/* get initial ac value */
 	init_attr(75);			/* init attribute values */
@@ -859,9 +810,7 @@ int otyp;
      case PM_RANGER:		skills = Skill_Ran; break;
      case PM_ROGUE:		skills = Skill_R; break;
      case PM_SAMURAI:		skills = Skill_S; break;
-#ifdef TOURIST
      case PM_TOURIST:		skills = Skill_T; break;
-#endif
      case PM_VALKYRIE:		skills = Skill_V; break;
      case PM_WIZARD:		skills = Skill_W; break;
      default:			skills = 0; break;	/* lint suppression */
@@ -916,9 +865,7 @@ register struct trobj *trop;
 				|| otyp == nocreate2
 				|| otyp == nocreate3
 				|| otyp == nocreate4
-#ifdef ELBERETH
 				|| otyp == RIN_LEVITATION
-#endif
 				/* 'useless' items */
 				|| otyp == POT_HALLUCINATION
 				|| otyp == POT_ACID
@@ -974,12 +921,10 @@ register struct trobj *trop;
 				nocreate4 = otyp;
 		}
 
-#ifdef GOLDOBJ
 		if (trop->trclass == COIN_CLASS) {
 			/* no "blessed" or "identified" money */
 			obj->quan = u.umoney0;
 		} else {
-#endif
 			if (objects[otyp].oc_uses_known) obj->known = 1;
 			obj->dknown = obj->bknown = obj->rknown = 1;
 			if (Is_container(obj) || obj->otyp == STATUE) {
@@ -1001,9 +946,7 @@ register struct trobj *trop;
 			    obj->spe = trop->trspe;
 			if (trop->trbless != UNDEF_BLESS)
 			    obj->blessed = trop->trbless;
-#ifdef GOLDOBJ
 		}
-#endif
 		/* defined after setting otyp+quan + blessedness */
 		obj->owt = weight(obj);
 		obj = addinv(obj);
@@ -1022,10 +965,8 @@ register struct trobj *trop;
 				setworn(obj, W_ARMH);
 			else if (is_gloves(obj) && !uarmg)
 				setworn(obj, W_ARMG);
-#ifdef TOURIST
 			else if (is_shirt(obj) && !uarmu)
 				setworn(obj, W_ARMU);
-#endif
 			else if (is_cloak(obj) && !uarmc)
 				setworn(obj, W_ARMC);
 			else if (is_boots(obj) && !uarmf)

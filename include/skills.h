@@ -1,4 +1,5 @@
-/* NetHack 3.5	skills.h	$Date$  $Revision$ */
+/* NetHack 3.5	skills.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	skills.h	$Date: 2009/05/06 10:45:05 $  $Revision: 1.5 $ */
 /*	SCCS Id: @(#)skills.h	3.5	2006/12/14	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -67,12 +68,8 @@
 #define P_BARE_HANDED_COMBAT	36  /* actually weaponless; gloves are ok */
 #define P_MARTIAL_ARTS		P_BARE_HANDED_COMBAT	/* Role distinguishes */
 #define P_TWO_WEAPON_COMBAT	37	/* Finally implemented */
-#ifdef STEED
 #define P_RIDING		38	/* How well you control your steed */
 #define P_LAST_H_TO_H		P_RIDING
-#else
-#define P_LAST_H_TO_H		P_TWO_WEAPON_COMBAT
-#endif
 #define P_FIRST_H_TO_H		P_BARE_HANDED_COMBAT
 
 #define P_NUM_SKILLS		(P_LAST_H_TO_H+1)

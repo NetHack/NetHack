@@ -1,4 +1,5 @@
-/* NetHack 3.5	o_init.c	$Date$  $Revision$ */
+/* NetHack 3.5	o_init.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	o_init.c	$Date: 2011/10/02 21:27:24 $  $Revision: 1.11 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -567,9 +568,7 @@ doclassdisco()
 	}
 	/* get the class (via its symbol character) */
 	c = yn_function(prompt, discosyms, '\0');
-#ifdef REDO
 	savech(c);
-#endif
 	if (!c)
 	    clear_nhwindow(WIN_MESSAGE);
     } else {

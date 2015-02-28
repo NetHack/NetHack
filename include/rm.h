@@ -1,4 +1,5 @@
-/* NetHack 3.5	rm.h	$Date$  $Revision$ */
+/* NetHack 3.5	rm.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	rm.h	$Date: 2012/02/16 23:06:00 $  $Revision: 1.23 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -226,13 +227,6 @@ struct symdef {
 #endif
 };
 
-/*
- * Graphics sets for display symbols
- */
-#define PRIMARY		0	/* primary graphics         */
-#define ROGUESET	1	/* rogue graphics           */
-#define NUM_GRAPHICS	2
-
 struct symparse {
 	unsigned range;
 #define SYM_CONTROL	1	/* start/finish markers */
@@ -259,30 +253,33 @@ struct symsetentry {
 	Bitfield(nocolor,1);	     /* don't use color if set               */
 	Bitfield(primary,1);	     /* restricted for use as primary set    */
 	Bitfield(rogue,1);	     /* restricted for use as rogue lev set  */
-	Bitfield(unicode,1);	     /* restricted for use as a unicode set  */
 	/* 5 free bits */
 };
+
+/*
+ * Graphics sets for display symbols
+ */
+#define DEFAULT_GRAPHICS 0	/* regular characters: '-', '+', &c */
+#define PRIMARY		0	/* primary graphics set        */
+#define ROGUESET	1	/* rogue graphics set          */
+#define NUM_GRAPHICS	2
 
 /*
  * special symbol set handling types ( for invoking callbacks, etc.)
  * Must match the order of the known_handlers strings
  * in drawing.c
  */
-#define H_UNK		0
-#define H_IBM		1
-#define H_DEC		2
+#define H_UNK	0
+#define H_IBM	1
+#define H_DEC	2
 
 extern const struct symdef defsyms[MAXPCHARS];	/* defaults */
 extern const struct symdef def_warnsyms[WARNCOUNT];
 extern int currentgraphics;				  /* from drawing.c */
 extern nhsym showsyms[];
 
-#ifdef LOADSYMSETS
 extern struct symsetentry symset[NUM_GRAPHICS];		  /* from drawing.c */
 #define SYMHANDLING(ht) (symset[currentgraphics].handling == (ht))
-#else
-#define SYMHANDLING(ht) ((ht) == H_UNK)
-#endif
 
 /*
  * The 5 possible states of doors
@@ -505,11 +502,9 @@ struct cemetery {
 	char how[100 + 1]; /* [DTHSZ+1] */
 	/* date+time in string of digits rather than binary */
 	char when[4+2+2 + 2+2+2 + 1]; /* "YYYYMMDDhhmmss\0" */
-#ifdef DUNGEON_OVERVIEW
 	/* final resting place spot */
 	schar frpx, frpy;
 	boolean bonesknown;
-#endif
 };
 
 struct levelflags {
@@ -563,9 +558,7 @@ typedef struct
 }
 dlevel_t;
 
-#ifdef DUNGEON_OVERVIEW
 extern schar lastseentyp[COLNO][ROWNO];	/* last seen/touched dungeon typ */
-#endif /* DUNGEON_OVERVIEW */
 
 extern dlevel_t level;	/* structure describing the current level */
 
@@ -592,10 +585,6 @@ extern dlevel_t level;	/* structure describing the current level */
 			 !(level.monsters[x][y])->mburied)
 #define MON_BURIED_AT(x,y)	(level.monsters[x][y] != (struct monst *)0 && \
 				(level.monsters[x][y])->mburied)
-#ifndef STEED
-#define place_monster(m,x,y)	((m)->mx=(x),(m)->my=(y),\
-				 level.monsters[(m)->mx][(m)->my]=(m))
-#endif
 #define place_worm_seg(m,x,y)	level.monsters[x][y] = m
 #define remove_monster(x,y)	level.monsters[x][y] = (struct monst *)0
 #define m_at(x,y)		(MON_AT(x,y) ? level.monsters[x][y] : \

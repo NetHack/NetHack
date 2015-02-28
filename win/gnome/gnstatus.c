@@ -1,4 +1,5 @@
-/* NetHack 3.5	gnstatus.c	$Date$  $Revision$ */
+/* NetHack 3.5	gnstatus.c	$NHDT-Date: 1425083083 2015/02/28 00:24:43 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.6 $ */
+/* NetHack 3.5	gnstatus.c	$Date: 2009/05/06 10:57:54 $  $Revision: 1.5 $ */
 /*	SCCS Id: @(#)gnstatus.c	3.5	2000/07/16	*/
 /* Copyright (C) 1998 by Erik Andersen <andersee@debian.org> */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -433,9 +434,7 @@ void ghack_status_window_update_stats()
     const char* hung;
     const char* enc;
     static int firstTime=TRUE;
-#ifdef GOLDOBJ
     long umoney;
-#endif
 
     /* First, fill in the player name and the dungeon level */
     strcpy(buf, plname);
@@ -564,30 +563,17 @@ void ghack_status_window_update_stats()
     gtk_label_set( GTK_LABEL( chaLabel), buf);
     
     /* Now do the non-pixmaped stats (gold and such) */
-#ifndef GOLDOBJ
-    sprintf(buf,"Au:%ld", u.ugold);
-    if (lastAu < u.ugold && firstTime==FALSE) {
-#else
     umoney = money_cnt(invent);
     sprintf(buf,"Au:%ld", umoney);
     if (lastAu < umoney && firstTime==FALSE) {
-#endif
 	/* Ok, this changed so add it to the highlighing list */
 	ghack_highlight_widget( goldLabel, normalStyle, greenStyle);
     }
-#ifndef GOLDOBJ
-    else if (lastAu > u.ugold && firstTime==FALSE) {
-#else
     else if (lastAu > umoney && firstTime==FALSE) {
-#endif
 	/* Ok, this changed so add it to the highlighing list */
 	ghack_highlight_widget( goldLabel, normalStyle, redStyle);
     }
-#ifndef GOLDOBJ
-    lastAu = u.ugold;
-#else
     lastAu = umoney;
-#endif
     gtk_label_set( GTK_LABEL( goldLabel), buf);
     
     if (u.mtimedone) {
@@ -669,7 +655,6 @@ void ghack_status_window_update_stats()
     lastAC = u.uac;
     gtk_label_set( GTK_LABEL( acLabel), buf);
     
-#ifdef EXP_ON_BOTL
     if (flags.showexp) {
 	sprintf(buf,"Exp:%ld", u.uexp);
 	if (lastExp < u.uexp && firstTime==FALSE) {
@@ -683,7 +668,6 @@ void ghack_status_window_update_stats()
 	lastExp = u.uexp;
 	gtk_label_set( GTK_LABEL( expLabel), buf);
    } else
-#endif
     {
 	gtk_label_set( GTK_LABEL( expLabel), "");
     }

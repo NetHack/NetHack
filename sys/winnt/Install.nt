@@ -5,7 +5,8 @@
                        NetHack 3.5 on a Windows system
                  (Windows XP and Windows 2003 or later only)
          ==============================================================
-                 Last revision: $Date$
+                 Last revision: $NHDT-Date$
+                 Last revision: $Date: 2012/01/15 17:43:54 $
 
 Credit for the porting of NetHack to the Win32 Console Subsystem goes to 
 the NT Porting Team started by Michael Allison.

@@ -1,10 +1,9 @@
-/* NetHack 3.5	dig.c	$Date$  $Revision$ */
+/* NetHack 3.5	dig.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	dig.c	$Date: 2012/02/16 03:01:37 $  $Revision: 1.67 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-
-/* #define DEBUG */	/* turn on for diagnostics */
 
 static NEARDATA boolean did_dig_msg;
 
@@ -249,13 +248,11 @@ dig(VOID_ARGS)
 		    You("fumble and drop %s.", yname(uwep));
 		    dropx(uwep);
 		} else {
-#ifdef STEED
 		    if (u.usteed)
 			pline("%s and %s %s!",
 			      Yobjnam2(uwep, "bounce"), otense(uwep, "hit"),
 			      mon_nam(u.usteed));
 		    else
-#endif
 			pline("Ouch!  %s and %s you!",
 			      Yobjnam2(uwep, "bounce"), otense(uwep, "hit"));
 		    set_wounded_legs(RIGHT_SIDE, 5 + rnd(5));
@@ -543,11 +540,9 @@ int ttyp;
 	    SET_FOUNTAIN_WARNED(x,y);		/* force dryup */
 	    dryup(x, y, madeby_u);
 	    return;
-#ifdef SINKS
 	} else if (IS_SINK(lev->typ)) {
 	    breaksink(x, y);
 	    return;
-#endif
 	} else if (lev->typ == DRAWBRIDGE_DOWN ||
 		   (is_drawbridge_wall(x, y) >= 0)) {
 	    int bx = x, by = y;
@@ -1534,11 +1529,9 @@ char *msg;
 	} else if (is_pool(cc->x,cc->y)) {
 	} else if (IS_GRAVE(ltyp)) {
 #endif
-#ifdef SINKS
 	} else if (IS_SINK(ltyp)) {
 		Strcpy(msg, "A tangled mass of plumbing remains below the sink.");
 		return FALSE;		
-#endif
 	} else if ((cc->x == xupladder && cc->y == yupladder) || /* "ladder up" */
 		   (cc->x == xdnladder && cc->y == ydnladder)) { /* "ladder down" */
 		Strcpy(msg, "The ladder is unaffected.");
@@ -1697,9 +1690,7 @@ bury_an_obj(otmp)
 	struct obj *otmp2;
 	boolean under_ice;
 
-#ifdef DEBUG
-	pline("bury_an_obj: %s", xname(otmp));
-#endif
+	debugpline("bury_an_obj: %s", xname(otmp));
 	if (otmp == uball) {
 		unpunish();
 		u.utrap = rn1(50,20);
@@ -1761,10 +1752,8 @@ int x, y;
 {
 	struct obj *otmp, *otmp2;
 
-#ifdef DEBUG
 	if(level.objects[x][y] != (struct obj *)0)
-		pline("bury_objs: at %d, %d", x, y);
-#endif
+	    debugpline("bury_objs: at %d, %d", x, y);
 	for (otmp = level.objects[x][y]; otmp; otmp = otmp2)
 		otmp2 = bury_an_obj(otmp);
 
@@ -1781,9 +1770,7 @@ int x, y;
 	struct obj *otmp, *otmp2, *bball;
 	coord cc;
 
-#ifdef DEBUG
-	pline("unearth_objs: at %d, %d", x, y);
-#endif
+	debugpline("unearth_objs: at %d, %d", x, y);
 	cc.x = x; cc.y = y;
 	bball = buried_ball(&cc);
 	for (otmp = level.buriedobjlist; otmp; otmp = otmp2) {
@@ -1892,9 +1879,7 @@ void
 bury_monst(mtmp)
 struct monst *mtmp;
 {
-#ifdef DEBUG
-	pline("bury_monst: %s", mon_nam(mtmp));
-#endif
+	debugpline("bury_monst: %s", mon_nam(mtmp));
 	if(canseemon(mtmp)) {
 	    if(is_flyer(mtmp->data) || is_floater(mtmp->data)) {
 		pline_The("%s opens up, but %s is not swallowed!",
@@ -1913,9 +1898,7 @@ struct monst *mtmp;
 void
 bury_you()
 {
-#ifdef DEBUG
-	pline("bury_you");
-#endif
+    debugpline("bury_you");
     if (!Levitation && !Flying) {
 	if(u.uswallow)
 	    You_feel("a sensation like falling into a trap!");
@@ -1932,9 +1915,7 @@ bury_you()
 void
 unearth_you()
 {
-#ifdef DEBUG
-	pline("unearth_you");
-#endif
+	debugpline("unearth_you");
 	u.uburied = FALSE;
 	under_ground(0);
 	if(!uamul || uamul->otyp != AMULET_OF_STRANGULATION)
@@ -1945,9 +1926,7 @@ unearth_you()
 void
 escape_tomb()
 {
-#ifdef DEBUG
-	pline("escape_tomb");
-#endif
+	debugpline("escape_tomb");
 	if ((Teleportation || can_teleport(youmonst.data)) &&
 	    (Teleport_control || rn2(3) < Luck+2)) {
 		You("attempt a teleport spell.");
@@ -1979,9 +1958,7 @@ bury_obj(otmp)
 struct obj *otmp;
 {
 
-#ifdef DEBUG
-	pline("bury_obj");
-#endif
+	debugpline("bury_obj");
 	if(cansee(otmp->ox, otmp->oy))
 	   pline_The("objects on the %s tumble into a hole!",
 		surface(otmp->ox, otmp->oy));
@@ -1992,7 +1969,7 @@ struct obj *otmp;
 
 #ifdef DEBUG
 int
-wiz_debug_cmd() /* in this case, bury everything at your loc and around */
+wiz_debug_cmd_bury() /* in this case, bury everything at your loc and around */
 {
 	int x, y;
 

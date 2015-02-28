@@ -39,6 +39,9 @@
  *    + Added workaround for SYSV include problem.
  *    + Changed the default width response text widget to be as wide as the
  *	window itself.  Suggestion from David E. Wexelblat, dwex@goblin.org.
+ *
+ * $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+ * $Date: 2002/03/31 17:11:23 $  $Revision: 1.2 $
  */
 
 #ifndef SYSV

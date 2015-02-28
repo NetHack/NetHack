@@ -1,4 +1,5 @@
-/* NetHack 3.5	artilist.h	$Date$  $Revision$ */
+/* NetHack 3.5	artilist.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	artilist.h	$Date: 2011/04/07 18:10:44 $  $Revision: 1.8 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -214,13 +215,11 @@ A("The Tsurugi of Muramasa",	TSURUGI,
 	PHYS(0,8),	NO_DFNS,	NO_CARY,
 	0,		A_LAWFUL, PM_SAMURAI, NON_PM, 4500L ),
 
-#ifdef TOURIST
 A("The Platinum Yendorian Express Card", CREDIT_CARD,
 	(SPFX_NOGEN|SPFX_RESTR|SPFX_INTEL|SPFX_DEFN),
 		(SPFX_ESP|SPFX_HSPDAM), 0,
 	NO_ATTK,	NO_DFNS,	CARY(AD_MAGM),
 	CHARGE_OBJ,	A_NEUTRAL, PM_TOURIST, NON_PM, 7000L ),
-#endif
 
 A("The Orb of Fate",		CRYSTAL_BALL,
 	(SPFX_NOGEN|SPFX_RESTR|SPFX_INTEL|SPFX_LUCK),

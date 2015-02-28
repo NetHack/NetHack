@@ -1,4 +1,5 @@
-/* NetHack 3.5	do.c	$Date$  $Revision$ */
+/* NetHack 3.5	do.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	do.c	$Date: 2014/11/18 03:10:39 $  $Revision: 1.101 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -7,10 +8,8 @@
 #include "hack.h"
 #include "lev.h"
 
-#ifdef SINKS
 STATIC_DCL void FDECL(trycall, (struct obj *));
 STATIC_DCL void FDECL(dosinkring, (struct obj *));
-#endif /* SINKS */
 
 STATIC_PTR int FDECL(drop, (struct obj *));
 STATIC_PTR int NDECL(wipeoff);
@@ -29,11 +28,7 @@ static NEARDATA const char drop_types[] =
 int
 dodrop()
 {
-#ifndef GOLDOBJ
-	int result, i = (invent || u.ugold) ? 0 : (SIZE(drop_types) - 1);
-#else
 	int result, i = (invent) ? 0 : (SIZE(drop_types) - 1);
-#endif
 
 	if (*u.ushops) sellobj_state(SELL_DELIBERATE);
 	result = drop(getobj(&drop_types[i], "drop"));
@@ -79,11 +74,9 @@ boolean pushing;
 		    char whobuf[BUFSZ];
 
 		    Strcpy(whobuf, "you");
-#ifdef STEED
 		    if (u.usteed) Strcpy(whobuf, y_monnam(u.usteed));
-#endif
-		    pline("%s %s %s into the %s.", upstart(whobuf),
-		          vtense(whobuf, "push"), the(xname(otmp)), what);
+		        pline("%s %s %s into the %s.", upstart(whobuf),
+		              vtense(whobuf, "push"), the(xname(otmp)), what);
 		    if (flags.verbose && !Blind)
 			pline("Now you can cross it!");
 		    /* no splashing in this case */
@@ -245,7 +238,6 @@ doaltarobj(obj)  /* obj is an object dropped on an altar */
 	}
 }
 
-#ifdef SINKS
 STATIC_OVL
 void
 trycall(obj)
@@ -397,7 +389,6 @@ giveback:
 	} else
 		useup(obj);
 }
-#endif
 
 /* some common tests when trying to drop or throw items */
 boolean
@@ -433,14 +424,12 @@ register const char *word;
 					body_part(HAND));
 		return(FALSE);
 	}
-#ifdef STEED
 	if (obj->owornmask & W_SADDLE) {
 		if (*word)
 			You("cannot %s %s you are sitting on.", word,
 				something);
 		return (FALSE);
 	}
-#endif
 	return(TRUE);
 }
 
@@ -478,13 +467,11 @@ register struct obj *obj;
 				mbodypart(u.ustuck, STOMACH));
 		}
 	} else {
-#ifdef SINKS
 	    if((obj->oclass == RING_CLASS || obj->otyp == MEAT_RING) &&
 			IS_SINK(levl[u.ux][u.uy].typ)) {
 		dosinkring(obj);
 		return(1);
 	    }
-#endif
 	    if (!can_reach_floor(TRUE)) {
 		/* we might be levitating due to #invoke Heart of Ahriman;
 		   if so, levitation would end during call to freeinv()
@@ -493,13 +480,9 @@ register struct obj *obj;
 
 		if (levhack) ELevitation = W_ART; /* other than W_ARTI */
 		if(flags.verbose) You("drop %s.", doname(obj));
-#ifndef GOLDOBJ
-		if (obj->oclass != COIN_CLASS || obj == invent) freeinv(obj);
-#else
 		/* Ensure update when we drop gold objects */
 		if (obj->oclass == COIN_CLASS) context.botl = 1;
 		freeinv(obj);
-#endif
 		hitfloor(obj);
 		if (levhack) float_down(I_SPECIAL|TIMEOUT, W_ARTI|W_ART);
 		return(1);
@@ -518,13 +501,9 @@ void
 dropx(obj)
 register struct obj *obj;
 {
-#ifndef GOLDOBJ
-	if (obj->oclass != COIN_CLASS || obj == invent) freeinv(obj);
-#else
         /* Ensure update when we drop gold objects */
         if (obj->oclass == COIN_CLASS) context.botl = 1;
         freeinv(obj);
-#endif
 	if (!u.uswallow) {
 	    if (ship_object(obj, u.ux, u.uy, FALSE)) return;
 	    if (IS_ALTAR(levl[u.ux][u.uy].typ))
@@ -662,17 +641,10 @@ int retry;
     int n, i, n_dropped = 0;
     long cnt;
     struct obj *otmp, *otmp2;
-#ifndef GOLDOBJ
-    struct obj *u_gold = 0;
-#endif
     menu_item *pick_list;
     boolean all_categories = TRUE;
     boolean drop_everything = FALSE;
 
-#ifndef GOLDOBJ
-    /* put gold where inventory traversal will see it */
-    if (u.ugold) u_gold = insert_gold_into_invent(TRUE);
-#endif
     if (retry) {
 	all_categories = (retry == -2);
     } else if (flags.menu_style == MENU_FULL) {
@@ -758,11 +730,6 @@ int retry;
 			/* same kludge as getobj(), for canletgo()'s use */
 			otmp->corpsenm = (int) cnt;	/* don't split */
 		    } else {
-#ifndef GOLDOBJ
-			if (otmp->oclass == COIN_CLASS)
-			    (void) splitobj(otmp, otmp->quan - cnt);
-			else
-#endif
 			    otmp = splitobj(otmp, cnt);
 		    }
 		}
@@ -774,10 +741,6 @@ int retry;
     }
 
  drop_done:
-#ifndef GOLDOBJ
-    /* if we put gold into inventory above, take it back out now */
-    if (u_gold) remove_gold_from_invent();
-#endif
     return n_dropped;
 }
 
@@ -800,11 +763,9 @@ dodown()
 	    return 1;
 	}
 
-#ifdef STEED
 	if (stucksteed(TRUE)) {
 	    return 0;
 	}
-#endif
 	/* Levitation might be blocked, but player can still use '>' to
 	   turn off controlled levitaiton */
 	if (HLevitation || ELevitation) {
@@ -923,11 +884,9 @@ doup()
 		You_cant("go up here.");
 		return(0);
 	}
-#ifdef STEED
 	if (stucksteed(TRUE)) {
 		return(0);
 	}
-#endif
 	if(u.ustuck) {
 		You("are %s, and cannot go up.",
 			!u.uswallow ? "being held" : is_animal(u.ustuck->data) ?
@@ -1042,9 +1001,7 @@ boolean at_stairs, falling, portal;
 		newlevel->dlevel = dunlevs_in_dungeon(newlevel);
 	if (newdungeon && In_endgame(newlevel)) { /* 1st Endgame Level !!! */
 		if (!u.uhave.amulet) return;	/* must have the Amulet */
-#ifdef WIZARD
 		if (!wizard)	/* wizard ^V can bypass Earth level */
-#endif
 		assign_level(newlevel, &earth_level);	/* (redundant) */
 	}
 	new_ledger = ledger_no(newlevel);
@@ -1120,9 +1077,7 @@ boolean at_stairs, falling, portal;
 	keepdogs(FALSE);
 	if (u.uswallow)				/* idem */
 		u.uswldtim = u.uswallow = 0;
-#ifdef DUNGEON_OVERVIEW
 	recalc_mapseen(); /* recalculate map overview before we leave the level */
-#endif /* DUNGEON_OVERVIEW */
 	/*
 	 *  We no longer see anything on the level.  Make sure that this
 	 *  follows u.uswallow set to null since uswallow overrides all
@@ -1149,27 +1104,21 @@ boolean at_stairs, falling, portal;
 	    /* discard unreachable levels; keep #0 */
 	    for (l_idx = maxledgerno(); l_idx > 0; --l_idx)
 		delete_levelfile(l_idx);
-#ifdef DUNGEON_OVERVIEW
 	    /* mark #overview data for all dungeon branches as uninteresting */
 	    for (l_idx = 0; l_idx < n_dgns; ++l_idx)
 		remdun_mapseen(l_idx);
-#endif
 	}
 
-#ifdef REINCARNATION
 	if (Is_rogue_level(newlevel) || Is_rogue_level(&u.uz))
 		assign_graphics(Is_rogue_level(newlevel) ? ROGUESET : PRIMARY);
-#endif
 #ifdef USE_TILES
 	substitute_tiles(newlevel);
 #endif
-#ifdef DUNGEON_OVERVIEW
 	/* record this level transition as a potential seen branch unless using
 	 * some non-standard means of transportation (level teleport).
 	 */
 	if ((at_stairs || falling || portal) && (u.uz.dnum != newlevel->dnum))
 		recbranch_mapseen(&u.uz, newlevel);
-#endif /* DUNGEON_OVERVIEW */
 	assign_level(&u.uz0, &u.uz);
 	assign_level(&u.uz, newlevel);
 	assign_level(&u.utolev, newlevel);
@@ -1266,12 +1215,10 @@ boolean at_stairs, falling, portal;
 			    freeinv(uball);
 			}
 		    }
-#ifdef STEED
 		    /* falling off steed has its own losehp() call */
 		    if (u.usteed)
 			dismount_steed(DISMOUNT_FELL);
 		    else
-#endif
 			losehp(Maybe_Half_Phys(rnd(3)),
 			       at_ladder ? "falling off a ladder" :
 					   "tumbling down a flight of stairs",
@@ -1304,11 +1251,7 @@ boolean at_stairs, falling, portal;
 
 	initrack();
 
-	if ((mtmp = m_at(u.ux, u.uy)) != 0
-#ifdef STEED
-		&& mtmp != u.usteed
-#endif
-		) {
+	if ((mtmp = m_at(u.ux, u.uy)) != 0 && mtmp != u.usteed) {
 	    /* There's a monster at your target destination; it might be one
 	       which accompanied you--see mon_arrive(dogmove.c)--or perhaps
 	       it was already here.  Randomly move you to an adjacent spot
@@ -1324,12 +1267,10 @@ boolean at_stairs, falling, portal;
 		mnexto(mtmp);
 
 	    if ((mtmp = m_at(u.ux, u.uy)) != 0) {
-#ifdef WIZARD
 		/* there was an unconditional impossible("mnearto failed")
 		   here, but it's not impossible and we're prepared to cope
 		   with the situation, so only say something when debugging */
 		if (wizard) pline("(monster in hero's way)");
-#endif
 		if (!rloc(mtmp, TRUE))
 		    /* no room to move it; send it away, to return later */
 		    migrate_to_level(mtmp, ledger_no(&u.uz),
@@ -1430,10 +1371,8 @@ boolean at_stairs, falling, portal;
 		}
 	    }
 	} else {
-#ifdef REINCARNATION
 	    if (new && Is_rogue_level(&u.uz))
 		You("enter what seems to be an older, more primitive world.");
-#endif
 	    /* main dungeon message from your quest leader */
 	    if (!In_quest(&u.uz0) && at_dgn_entrance("The Quest") &&
 		    !(u.uevent.qcompleted || u.uevent.qexpelled ||
@@ -1745,9 +1684,7 @@ heal_legs()
 			context.botl = 1;
 		}
 
-#ifdef STEED
 		if (!u.usteed)
-#endif
 		{
 		    const char *legs = body_part(LEG);
 

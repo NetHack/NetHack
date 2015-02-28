@@ -1,4 +1,5 @@
-/* NetHack 3.5	fountain.c	$Date$  $Revision$ */
+/* NetHack 3.5	fountain.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	fountain.c	$Date: 2011/08/20 00:22:20 $  $Revision: 1.32 $ */
 /*	Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -181,12 +182,10 @@ boolean isyou;
 			if(!mtmp) pline_The("flow reduces to a trickle.");
 			return;
 		}
-#ifdef WIZARD
 		if (isyou && wizard) {
 			if (yn("Dry up fountain?") == 'n')
 				return;
 		}
-#endif
 		/* replace the fountain with ordinary floor */
 		levl[x][y].typ = ROOM;
 		levl[x][y].looted = 0;
@@ -453,14 +452,6 @@ register struct obj *obj;
 			break;
 		case 28: /* Strange feeling */
 			pline("An urge to take a bath overwhelms you.");
-#ifndef GOLDOBJ
-			if (u.ugold > 10) {
-			    u.ugold -= somegold() / 10;
-			    You("lost some of your gold in the fountain!");
-			    CLEAR_FOUNTAIN_LOOTED(u.ux,u.uy);
-			    exercise(A_WIS, FALSE);
-			}
-#else
 			{
 			    long money = money_cnt(invent);
 			    struct obj *otmp;
@@ -480,7 +471,6 @@ register struct obj *obj;
 			        exercise(A_WIS, FALSE);
                             }
 			}
-#endif
 			break;
 		case 29: /* You see coins */
 
@@ -503,7 +493,6 @@ register struct obj *obj;
 	dryup(u.ux, u.uy, TRUE);
 }
 
-#ifdef SINKS
 void
 breaksink(x,y)
 int x, y;
@@ -609,6 +598,5 @@ drinksink()
 			rn2(3) ? (rn2(2) ? "cold" : "warm") : "hot");
 	}
 }
-#endif /* SINKS */
 
 /*fountain.c*/

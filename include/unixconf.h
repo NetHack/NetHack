@@ -1,4 +1,5 @@
-/* NetHack 3.5	unixconf.h	$Date$  $Revision$ */
+/* NetHack 3.5	unixconf.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	unixconf.h	$Date: 2011/04/19 02:02:06 $  $Revision: 1.15 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -280,9 +281,6 @@
 
 #define HLOCK	"perm"	/* an empty file used for locking purposes */
 
-#ifndef REDO
-#define Getchar nhgetch
-#endif
 #define tgetch getchar
 
 #ifndef NOSHELL

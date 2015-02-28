@@ -1,4 +1,5 @@
-/* NetHack 3.5	lock.c	$Date$  $Revision$ */
+/* NetHack 3.5	lock.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	lock.c	$Date: 2014/09/20 00:32:01 $  $Revision: 1.39 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -60,10 +61,8 @@ lock_action()
 	/* otherwise we're trying to unlock it */
 	else if (xlock.picktyp == LOCK_PICK)
 		return actions[3];	/* "picking the lock" */
-#ifdef TOURIST
 	else if (xlock.picktyp == CREDIT_CARD)
 		return actions[3];	/* same as lock_pick */
-#endif
 	else if (xlock.door)
 		return actions[0];	/* "unlocking the door" */
 	else
@@ -252,9 +251,7 @@ pick_lock(pick)
 
 	    if (nohands(youmonst.data)) {
 		const char *what = (picktyp == LOCK_PICK) ? "pick" : "key";
-#ifdef TOURIST
 		if (picktyp == CREDIT_CARD) what = "card";
-#endif
 		pline(no_longer, "hold the", what);
 		reset_pick();
 		return PICKLOCK_LEARNED_SOMETHING;
@@ -275,18 +272,13 @@ pick_lock(pick)
 		return PICKLOCK_DID_NOTHING;
 	} else if (u.uswallow) {
 		You_cant("%sunlock %s.",
-#ifdef TOURIST
 			  (picktyp == CREDIT_CARD) ? "" :
-#endif
 			  "lock or ", mon_nam(u.ustuck));
 		return PICKLOCK_DID_NOTHING;
 	}
 
-	if((picktyp != LOCK_PICK &&
-#ifdef TOURIST
-	    picktyp != CREDIT_CARD &&
-#endif
-	    picktyp != SKELETON_KEY)) {
+	if((picktyp != LOCK_PICK && picktyp != CREDIT_CARD
+          && picktyp != SKELETON_KEY)) {
 		impossible("picking lock with object %d?", picktyp);
 		return PICKLOCK_DID_NOTHING;
 	}
@@ -343,20 +335,16 @@ pick_lock(pick)
 			You_cant("fix its broken lock with %s.", doname(pick));
 			return PICKLOCK_LEARNED_SOMETHING;
 		    }
-#ifdef TOURIST
 		    else if (picktyp == CREDIT_CARD && !otmp->olocked) {
 			/* credit cards are only good for unlocking */
 			You_cant("do that with %s.",
 				 an(simple_typename(picktyp)));
 			return PICKLOCK_LEARNED_SOMETHING;
 		    }
-#endif
 		    switch(picktyp) {
-#ifdef TOURIST
 			case CREDIT_CARD:
 			    ch = ACURR(A_DEX) + 20*Role_if(PM_ROGUE);
 			    break;
-#endif
 			case LOCK_PICK:
 			    ch = 4*ACURR(A_DEX) + 25*Role_if(PM_ROGUE);
 			    break;
@@ -390,12 +378,10 @@ pick_lock(pick)
 	    if (mtmp && canseemon(mtmp) &&
 			mtmp->m_ap_type != M_AP_FURNITURE &&
 			mtmp->m_ap_type != M_AP_OBJECT) {
-#ifdef TOURIST
 		if (picktyp == CREDIT_CARD &&
 		    (mtmp->isshk || mtmp->data == &mons[PM_ORACLE]))
 		    verbalize("No checks, no credit, no problem.");
 		else
-#endif
 		    pline("I don't think %s would appreciate that.", mon_nam(mtmp));
 		return PICKLOCK_LEARNED_SOMETHING;
 	    } else if (mtmp && mtmp->m_ap_type == M_AP_FURNITURE &&
@@ -429,13 +415,11 @@ pick_lock(pick)
 		    pline("This door is broken.");
 		    return PICKLOCK_LEARNED_SOMETHING;
 		default:
-#ifdef TOURIST
 		    /* credit cards are only good for unlocking */
 		    if(picktyp == CREDIT_CARD && !(door->doormask & D_LOCKED)) {
 			You_cant("lock a door with a credit card.");
 			return PICKLOCK_LEARNED_SOMETHING;
 		    }
-#endif
 
 		    Sprintf(qbuf,"%s it?",
 			    (door->doormask & D_LOCKED) ? "Unlock" : "Lock");
@@ -444,11 +428,9 @@ pick_lock(pick)
 		    if(c == 'n') return(0);
 
 		    switch(picktyp) {
-#ifdef TOURIST
 			case CREDIT_CARD:
 			    ch = 2*ACURR(A_DEX) + 20*Role_if(PM_ROGUE);
 			    break;
-#endif
 			case LOCK_PICK:
 			    ch = 3*ACURR(A_DEX) + 30*Role_if(PM_ROGUE);
 			    break;
@@ -579,16 +561,12 @@ doopen()		/* try to open a door */
 	portcullis = (is_drawbridge_wall(cc.x, cc.y) >= 0);
 	if (Blind) {
 	    int oldglyph = door->glyph;
-#ifdef DUNGEON_OVERVIEW
 	    schar oldlastseentyp = lastseentyp[cc.x][cc.y];
-#endif
 
 	    feel_location(cc.x, cc.y);
 	    if (door->glyph != oldglyph
-#ifdef DUNGEON_OVERVIEW
-		|| lastseentyp[cc.x][cc.y] != oldlastseentyp
-#endif
-	    ) res = 1;		/* learned something */
+            || lastseentyp[cc.x][cc.y] != oldlastseentyp)
+          res = 1;		/* learned something */
 	}
 
 	if (portcullis || !IS_DOOR(door->typ)) {
@@ -711,16 +689,11 @@ doclose()		/* try to close a door */
 	portcullis = (is_drawbridge_wall(x, y) >= 0);
 	if (Blind) {
 	    int oldglyph = door->glyph;
-#ifdef DUNGEON_OVERVIEW
 	    schar oldlastseentyp = lastseentyp[x][y];
-#endif
 
 	    feel_location(x, y);
-	    if (door->glyph != oldglyph
-#ifdef DUNGEON_OVERVIEW
-		|| lastseentyp[x][y] != oldlastseentyp
-#endif
-	    ) res = 1;		/* learned something */
+	    if (door->glyph != oldglyph || lastseentyp[x][y] != oldlastseentyp)
+            res = 1;		/* learned something */
 	}
 
 	if (portcullis || !IS_DOOR(door->typ)) {
@@ -748,19 +721,11 @@ doclose()		/* try to close a door */
 	}
 
 	if(door->doormask == D_ISOPEN) {
-	    if(verysmall(youmonst.data)
-#ifdef STEED
-		&& !u.usteed
-#endif
-		) {
+	    if(verysmall(youmonst.data) && !u.usteed) {
 		 pline("You're too small to push the door closed.");
 		 return res;
 	    }
-	    if (
-#ifdef STEED
-		 u.usteed ||
-#endif
-		rn2(25) < (ACURRSTR+ACURR(A_DEX)+ACURR(A_CON))/3) {
+	    if ( u.usteed || rn2(25) < (ACURRSTR+ACURR(A_DEX)+ACURR(A_CON))/3) {
 		pline_The("door closes.");
 		door->doormask = D_CLOSED;
 		if (Blind)
@@ -857,7 +822,6 @@ int x, y;
 	switch(otmp->otyp) {
 	case WAN_LOCKING:
 	case SPE_WIZARD_LOCK:
-#ifdef REINCARNATION
 	    if (Is_rogue_level(&u.uz)) {
 	    	boolean vis = cansee(x,y);
 		/* Can't have real locking in Rogue, so just hide doorway */
@@ -875,7 +839,6 @@ int x, y;
 		newsym(x,y);
 		return TRUE;
 	    }
-#endif
 	    if (obstructed(x,y,mysterywand)) return FALSE;
 	    /* Don't allow doors to close over traps.  This is for pits */
 	    /* & trap doors, but is it ever OK for anything else? */

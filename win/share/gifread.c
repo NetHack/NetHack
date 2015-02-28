@@ -12,6 +12,10 @@
 /* |   provided "as is" without express or implied warranty.           | */
 /* +-------------------------------------------------------------------+ */
 
+/*
+ * $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+ * $Date: 2002/01/05 21:06:02 $  $Revision: 1.1 $
+ */
 
 #include "config.h"
 #include "tile.h"

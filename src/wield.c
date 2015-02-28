@@ -1,4 +1,5 @@
-/* NetHack 3.5	wield.c	$Date$  $Revision$ */
+/* NetHack 3.5	wield.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	wield.c	$Date: 2009/05/06 10:48:14 $  $Revision: 1.31 $ */
 /*	SCCS Id: @(#)wield.c	3.5	2009/01/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -105,10 +106,7 @@ register struct obj *obj;
 		unweapon = (obj->oclass == WEAPON_CLASS) ?
 				is_launcher(obj) || is_ammo(obj) ||
 				is_missile(obj) || (is_pole(obj)
-#ifdef STEED
-				&& !u.usteed
-#endif
-				) : !is_weptool(obj);
+				&& !u.usteed) : !is_weptool(obj);
 	} else
 		unweapon = TRUE;	/* for "bare hands" message */
 	update_inventory();
@@ -240,17 +238,10 @@ register struct obj *obj;
 
 static NEARDATA const char wield_objs[] =
 	{ ALL_CLASSES, ALLOW_NONE, WEAPON_CLASS, TOOL_CLASS, 0 };
-#ifdef GOLDOBJ
 static NEARDATA const char ready_objs[] =
 	{ COIN_CLASS, ALL_CLASSES, ALLOW_NONE, WEAPON_CLASS, 0 };
 static NEARDATA const char bullets[] =	/* (note: different from dothrow.c) */
 	{ COIN_CLASS, ALL_CLASSES, ALLOW_NONE, GEM_CLASS, WEAPON_CLASS, 0 };
-#else
-static NEARDATA const char ready_objs[] =
-	{ ALL_CLASSES, ALLOW_NONE, WEAPON_CLASS, 0 };
-static NEARDATA const char bullets[] =	/* (note: different from dothrow.c) */
-	{ ALL_CLASSES, ALLOW_NONE, GEM_CLASS, WEAPON_CLASS, 0 };
-#endif
 
 int
 dowield()
@@ -287,11 +278,7 @@ dowield()
 		return (doswapweapon());
 	else if (wep == uquiver)
 		setuqwep((struct obj *) 0);
-	else if (wep->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL
-#ifdef STEED
-			| W_SADDLE
-#endif
-			)) {
+	else if (wep->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL | W_SADDLE)) {
 		You("cannot wield that!");
 		return (0);
 	}
@@ -391,10 +378,7 @@ dowieldquiver()
 		      !is_plural(uwep) ? "That is" : "They are");
 		return(0);
 	} else if (newquiver->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL
-#ifdef STEED
-			| W_SADDLE
-#endif
-			)) {
+			| W_SADDLE)) {
 		You("cannot ready that!");
 		return (0);
 	} else {

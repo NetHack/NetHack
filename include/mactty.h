@@ -1,4 +1,5 @@
-/* NetHack 3.5	mactty.h	$Date$  $Revision$ */
+/* NetHack 3.5	mactty.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mactty.h	$Date: 2009/05/06 10:44:51 $  $Revision: 1.6 $ */
 /*	SCCS Id: @(#)mactty.h	3.5	1993/03/01	*/
 /* Copyright (c) Jon W{tte 1993.					*/
 /* NetHack may be freely redistributed.  See license for details.	*/

@@ -1,4 +1,5 @@
-/* NetHack 3.5	unixtty.c	$Date$  $Revision$ */
+/* NetHack 3.5	unixtty.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	unixtty.c	$Date: 2012/01/23 07:11:09 $  $Revision: 1.10 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -363,11 +364,9 @@ init_sco_cons()
 	if (!strcmp(windowprocs.name, "tty") && sco_flag_console) {
 		atexit(sco_mapon);
 		sco_mapoff();
-#  ifdef LOADSYMSETS
 		load_symset("IBMGraphics", PRIMARY);
 		load_symset("RogueIBM", ROGUESET);
 		switch_symbols(TRUE);
-#  endif
 #  ifdef TEXTCOLOR
 		if (has_colors())
 			iflags.use_color = TRUE;

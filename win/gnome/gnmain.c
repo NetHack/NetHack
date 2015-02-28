@@ -1,4 +1,5 @@
-/* NetHack 3.5	gnmain.c	$Date$  $Revision$ */
+/* NetHack 3.5	gnmain.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	gnmain.c	$Date: 2009/05/06 10:57:32 $  $Revision: 1.9 $ */
 /*	SCCS Id: @(#)gnmain.c	3.5	2008/01/30	*/
 /* Copyright (C) 1998 by Erik Andersen <andersee@debian.org> */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -365,14 +366,12 @@ GnomeUIInfo action_menu[] = {
 	       ghack_accelerator_selected, 
 	       GINT_TO_POINTER(M('j')), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'j',GDK_MOD1_MASK
 	   },
-#ifdef STEED
 	   { 
 	       GNOME_APP_UI_ITEM, N_("Ride"), 
 	       N_("Ride (or stop riding) a monster"),
 	       doride, 
 	       GINT_TO_POINTER(M('r')), NULL, GNOME_APP_PIXMAP_NONE, NULL, 'R',GDK_MOD1_MASK
 	   },
-#endif
 	   { 
 	       GNOME_APP_UI_ITEM, N_("Wipe face"), 
 	       N_("wipe off your face"),

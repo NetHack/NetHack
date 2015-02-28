@@ -1,11 +1,11 @@
-/* NetHack 3.5  makedefs.c  $Date$  $Revision$ */
+/* NetHack 3.5  makedefs.c  $NHDT-Date: 1425083082 2015/02/28 00:24:42 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.63 $ */
+/* NetHack 3.5  makedefs.c  $Date: 2012/01/15 09:27:03 $  $Revision: 1.50 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) M. Stephenson, 1990, 1991.			  */
 /* Copyright (c) Dean Luick, 1990.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #define MAKEDEFS_C	/* use to conditionally include file sections */
-/* #define DEBUG */	/* uncomment for debugging info */
 
 #include "config.h"
 #include "permonst.h"
@@ -384,6 +384,7 @@ getfp(template, tag, mode)
 	return rv;
 }
 
+static boolean debug = FALSE;
 
 static FILE *inputfp;
 static FILE *outputfp;
@@ -429,6 +430,15 @@ do_ext_makedefs(int argc, char **argv){
 			if(argv[0]) strcpy(delim, argv[0]);
 			Fprintf(stdout, "%s", version_string(buf, delim));
 			exit(EXIT_SUCCESS);
+		}
+		IS_OPTION("debug"){
+		    debug = TRUE;
+		    CONTINUE;
+		}
+		IS_OPTION("make"){
+		    CONSUME;
+		    do_makedefs(argv[0]);
+		    exit(EXIT_SUCCESS);
 		}
 		IS_OPTION("input"){
 			CONSUME;
@@ -959,9 +969,7 @@ do_rumors()
  * 
  */
 #define IGNORED_FEATURES	( 0L \
-				| (1L << 12)	/* GOLDOBJ */ \
-				| (1L << 20)	/* EXP_ON_BOTL */ \
-				| (1L << 21)	/* SCORE_ON_BOTL */ \
+				| (1L << 19)	/* SCORE_ON_BOTL */ \
 				| (1L << 27)	/* ZEROCOMP */ \
 				| (1L << 28)	/* RLECOMP */ \
 				)
@@ -987,29 +995,11 @@ make_version()
 	 */
 	version.feature_set = (unsigned long)(0L
 		/* levels and/or topology (0..4) */
-#ifdef REINCARNATION
-			| (1L <<  1)
-#endif
-#ifdef SINKS
-			| (1L <<  2)
-#endif
 		/* monsters (5..9) */
-#ifdef KOPS
+#ifdef MAIL
 			| (1L <<  6)
 #endif
-#ifdef MAIL
-			| (1L <<  7)
-#endif
 		/* objects (10..14) */
-#ifdef TOURIST
-			| (1L << 10)
-#endif
-#ifdef STEED
-			| (1L << 11)
-#endif
-#ifdef GOLDOBJ
-			| (1L << 12)
-#endif
 		/* flag bits and/or other global variables (15..26) */
 #ifdef TEXTCOLOR
 			| (1L << 17)
@@ -1017,14 +1007,8 @@ make_version()
 #ifdef INSURANCE
 			| (1L << 18)
 #endif
-#ifdef ELBERETH
-			| (1L << 19)
-#endif
-#ifdef EXP_ON_BOTL
-			| (1L << 20)
-#endif
 #ifdef SCORE_ON_BOTL
-			| (1L << 21)
+			| (1L << 19)
 #endif
 		/* data format (27..31)
 		 * External compression methods such as COMPRESS and ZLIB_COMP
@@ -1229,9 +1213,6 @@ static const char *build_opts[] = {
 #ifdef ANSI_DEFAULT
 		"ANSI default terminal",
 #endif
-#ifdef AUTOPICKUP_EXCEPTIONS
-		"autopickup exceptions",
-#endif
 #ifdef TEXTCOLOR
 		"color",
 #endif
@@ -1250,29 +1231,11 @@ static const char *build_opts[] = {
 #ifdef DLB
 		"data librarian",
 #endif
-#ifdef WIZARD
-		"debug mode",
-#endif
-#ifdef DUNGEON_OVERVIEW
-		"dungeon map overview patch",
-#endif
-#ifdef ELBERETH
-		"Elbereth",
-#endif
-#ifdef EXP_ON_BOTL
-		"experience points on status line",
-#endif
 #ifdef MFLOPPY
 		"floppy drive support",
 #endif
-#ifdef GOLDOBJ
-		"gold object in inventories",
-#endif
 #ifdef INSURANCE
 		"insurance files for recovering from crashes",
-#endif
-#ifdef KOPS
-		"Keystone Kops",
 #endif
 #ifdef HOLD_LOCKFILE_OPEN
 		"exclusive lock on level 0 file",
@@ -1282,9 +1245,6 @@ static const char *build_opts[] = {
 #endif
 #ifdef MAIL
 		"mail daemon",
-#endif
-#ifdef BARGETHROUGH
-		"monsters moving monsters",
 #endif
 #ifdef GNUDOS
 		"MSDOS protected mode",
@@ -1303,17 +1263,8 @@ static const char *build_opts[] = {
 #  endif
 # endif
 #endif
-#ifdef REDO
-		"redo command",
-#endif
 #ifdef SELECTSAVED
 		"restore saved games via menu",
-#endif
-#ifdef REINCARNATION
-		"rogue level",
-#endif
-#ifdef STEED
-		"saddles and riding",
 #endif
 #ifdef SCORE_ON_BOTL
 		"score on status line",
@@ -1340,14 +1291,8 @@ static const char *build_opts[] = {
 #  endif
 # endif
 #endif
-#ifdef SEDUCE
-		"seduction",
-#endif
 #ifdef SHELL
 		"shell command",
-#endif
-#ifdef SINKS
-		"sinks",
 #endif
 #ifdef SUSPEND
 		"suspend command",
@@ -1361,9 +1306,6 @@ static const char *build_opts[] = {
 #endif
 #ifdef TIMED_DELAY
 		"timed wait for display effects",
-#endif
-#ifdef TOURIST
-		"tourists",
 #endif
 #ifdef USER_SOUNDS
 # ifdef USER_SOUNDS_REGEX
@@ -1681,12 +1623,6 @@ h_filter(line)
     if (*line == '#') return TRUE;	/* ignore comment lines */
     if (sscanf(line, "----- %s", tag) == 1) {
 	skip = FALSE;
-#ifndef SINKS
-	if (!strcmp(tag, "SINKS")) skip = TRUE;
-#endif
-#ifndef ELBERETH
-	if (!strcmp(tag, "ELBERETH")) skip = TRUE;
-#endif
     } else if (skip && !strncmp(line, "-----", 5))
 	skip = FALSE;
     return skip;
@@ -1858,12 +1794,9 @@ static	struct deflist {
 	const char	*defname;
 	boolean	true_or_false;
 } deflist[] = {
-#ifdef REINCARNATION
 	      {	"REINCARNATION", TRUE },
-#else
-	      {	"REINCARNATION", FALSE },
-#endif
-	      { 0, 0 } };
+	      { 0, 0 }
+};
 
 static int
 check_control(s)
@@ -2322,36 +2255,30 @@ put_qt_hdrs()
 	/*
 	 *	The main header record.
 	 */
-#ifdef DEBUG
-	Fprintf(stderr, "%ld: header info.\n", ftell(ofp));
-#endif
+	if (debug) Fprintf(stderr, "%ld: header info.\n", ftell(ofp));
 	(void) fwrite((genericptr_t)&(qt_hdr.n_hdr), sizeof(int), 1, ofp);
 	(void) fwrite((genericptr_t)&(qt_hdr.id[0][0]), sizeof(char)*LEN_HDR,
 							qt_hdr.n_hdr, ofp);
 	(void) fwrite((genericptr_t)&(qt_hdr.offset[0]), sizeof(long),
 							qt_hdr.n_hdr, ofp);
-#ifdef DEBUG
-	for(i = 0; i < qt_hdr.n_hdr; i++)
-		Fprintf(stderr, "%c @ %ld, ", qt_hdr.id[i], qt_hdr.offset[i]);
-
-	Fprintf(stderr, "\n");
-#endif
+	if (debug) {
+	    for(i = 0; i < qt_hdr.n_hdr; i++)
+		Fprintf(stderr, "%s @ %ld, ", qt_hdr.id[i], qt_hdr.offset[i]);
+	    Fprintf(stderr, "\n");
+	}
 
 	/*
 	 *	The individual class headers.
 	 */
 	for(i = 0; i < qt_hdr.n_hdr; i++) {
 
-#ifdef DEBUG
-	    Fprintf(stderr, "%ld: %c header info.\n", ftell(ofp),
-		    qt_hdr.id[i]);
-#endif
+	    if (debug) Fprintf(stderr, "%ld: %s header info.\n", ftell(ofp),
+			       qt_hdr.id[i]);
 	    (void) fwrite((genericptr_t)&(msg_hdr[i].n_msg), sizeof(int),
 							1, ofp);
 	    (void) fwrite((genericptr_t)&(msg_hdr[i].qt_msg[0]),
 			    sizeof(struct qtmsg), msg_hdr[i].n_msg, ofp);
-#ifdef DEBUG
-	    { int j;
+	    if (debug) { int j;
 	      for(j = 0; j < msg_hdr[i].n_msg; j++) {
 		Fprintf(stderr, "msg %d @ %ld (%ld)",
 			msg_hdr[i].qt_msg[j].msgnum,
@@ -2363,7 +2290,6 @@ put_qt_hdrs()
 		Fprintf(stderr, "\n");
 	      }
 	    }
-#endif
 	}
 }
 
@@ -2416,9 +2342,7 @@ do_questtxt()
 		    /* we have summary text; replace raw %E record with it */
 		    Strcpy(in_line, summary_p);	/* (guaranteed to fit) */
 		} else if(qt_comment(in_line)) continue;
-#ifdef DEBUG
-		Fprintf(stderr, "%ld: %s", ftell(stdout), in_line);
-#endif
+		if (debug) Fprintf(stderr, "%ld: %s", ftell(stdout), in_line);
 		(void) fputs(xcrypt(in_line), ofp);
 	}
 	Fclose(ifp);
@@ -2544,11 +2468,9 @@ do_objs()
 
 		if (!strncmp(objnam, "THE_", 4))
 			objnam += 4;
-#ifdef TOURIST
 		/* fudge _platinum_ YENDORIAN EXPRESS CARD */
 		if (!strncmp(objnam, "PLATINUM_", 9))
 			objnam += 9;
-#endif
 		Fprintf(ofp,"#define\tART_%s\t%d\n", limit(objnam, 1), i);
 	}
 

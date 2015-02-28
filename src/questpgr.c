@@ -1,4 +1,5 @@
-/* NetHack 3.5	questpgr.c	$Date$  $Revision$ */
+/* NetHack 3.5	questpgr.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	questpgr.c	$Date: 2012/02/02 09:18:14 $  $Revision: 1.14 $ */
 /*	Copyright 1991, M. Stephenson		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -11,7 +12,9 @@
 
 #define QTEXT_FILE	"quest.dat"
 
-/* #define DEBUG */	/* uncomment for debugging */
+#ifdef TTY_GRAPHICS
+#include "wintty.h"
+#endif
 
 /* from sp_lev.c, for deliver_splev_message() */
 extern char *lev_message;
@@ -43,17 +46,23 @@ static void
 dump_qtlist()	/* dump the character msg list to check appearance */
 {
 	struct	qtmsg	*msg;
-	long	size;
+
+	if (!showdebug()) return;
 
 	for (msg = qt_list.chrole; msg->msgnum > 0; msg++) {
 		pline("msgnum %d: delivery %c",
 			msg->msgnum, msg->delivery);
+#ifdef TTY_GRAPHICS
 		more();
+#endif
 		(void) dlb_fseek(msg_file, msg->offset, SEEK_SET);
 		deliver_by_window(msg, NHW_TEXT);
 	}
 }
-#endif /* DEBUG */
+#else
+static void
+dump_qtlist() { }
+#endif /* !DEBUG */
 
 static void
 Fread(ptr, size, nitems, stream)
@@ -132,9 +141,7 @@ load_qtlist()
 
 	if (!qt_list.common || !qt_list.chrole)
 	    impossible("load_qtlist: cannot load quest text.");
-#ifdef DEBUG
 	dump_qtlist();
-#endif
 	return;	/* no ***DON'T*** close the msg_file */
 }
 
@@ -460,10 +467,8 @@ boolean
 skip_pager(common)
 boolean common;
 {
-#ifdef WIZARD
 	/* WIZKIT: suppress plot feedback if starting with quest artifact */
 	if (program_state.wizkit_wishing) return TRUE;
-#endif
 	if (!(common ? qt_list.common : qt_list.chrole)) {
 	    panic("%s: no %s quest text data available",
 		  common ? "com_pager" : "qt_pager",

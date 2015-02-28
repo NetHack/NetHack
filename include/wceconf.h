@@ -1,4 +1,5 @@
-/* NetHack 3.5	wceconf.h	$Date$  $Revision$ */
+/* NetHack 3.5	wceconf.h	$NHDT-Date: 1425081976 2015/02/28 00:06:16 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.12 $ */
+/* NetHack 3.5	wceconf.h	$Date: 2009/10/22 02:59:14 $  $Revision: 1.12 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -42,8 +43,6 @@
 #define NOTSTDC		/* no strerror() */
 
 #define USER_SOUNDS
-
-#define AUTOPICKUP_EXCEPTIONS
 
 /*
  * -----------------------------------------------------------------
@@ -184,11 +183,6 @@ extern void NDECL(toggle_mouse_support);
 
 #ifndef alloca
 #define ALLOCA_HACK	/* used in util/panic.c */
-#endif
-
-#ifndef REDO
-#undef	Getchar
-#define Getchar nhgetch
 #endif
 
 #ifdef _MSC_VER

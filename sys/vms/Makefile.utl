@@ -1,5 +1,6 @@
 #	NetHack Makefile (VMS) - for utility programs.
-#	NetHack 3.5	Makefile.utl	$Date$	$Revision$
+#	NetHack 3.5	Makefile.utl	$NHDT-Date$	$NHDT-Branch$:$NHDT-Revision$
+#	NetHack 3.5	Makefile.utl	$Date: 2011/05/23 03:27:10 $	$Revision: 1.10 $
 
 #  Copy this file to [.util]Makefile. and then edit it as needed.
 #  The default configuration is for building with DEC C (aka Compaq C).

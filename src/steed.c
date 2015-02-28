@@ -1,11 +1,9 @@
-/* NetHack 3.5	steed.c	$Date$  $Revision$ */
+/* NetHack 3.5	steed.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	steed.c	$Date: 2012/01/04 18:52:36 $  $Revision: 1.36 $ */
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-
-
-#ifdef STEED
 
 /* Monsters that might be ridden */
 static NEARDATA const char steeds[] = {
@@ -179,10 +177,8 @@ doride()
 	if (u.usteed) {
 	    dismount_steed(DISMOUNT_BYCHOICE);
 	} else if (getdir((char *)0) && isok(u.ux+u.dx, u.uy+u.dy)) {
-#ifdef WIZARD
 	    if (wizard && yn("Force the mount to succeed?") == 'y')
 		forcemount = TRUE;
-#endif
 	    return (mount_steed(m_at(u.ux+u.dx, u.uy+u.dy), forcemount));
 	} else {
 	    return 0;
@@ -227,11 +223,9 @@ mount_steed(mtmp, force)
 	 */
 	if (Wounded_legs) {
 	    Your("%s are in no shape for riding.", makeplural(body_part(LEG)));
-#ifdef WIZARD
 	    if (force && wizard && yn("Heal your legs?") == 'y')
 		HWounded_legs = EWounded_legs = 0;
 	    else
-#endif
 	    return (FALSE);
 	}
 
@@ -696,7 +690,5 @@ int x, y;
     mon->mx = x, mon->my = y;
     level.monsters[x][y] = mon;
 }
-
-#endif /* STEED */
 
 /*steed.c*/

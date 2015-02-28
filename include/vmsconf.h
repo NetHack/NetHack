@@ -1,4 +1,5 @@
-/* NetHack 3.5	vmsconf.h	$Date$  $Revision$ */
+/* NetHack 3.5	vmsconf.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	vmsconf.h	$Date: 2011/09/01 01:46:55 $  $Revision: 1.14 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -29,20 +30,11 @@
 #ifdef HACKDIR
 # undef HACKDIR
 #endif
-#ifdef WIZARD
-# undef WIZARD
-#endif
 #ifdef WIZARD_NAME
 # undef WIZARD_NAME
 #endif
 #define HACKDIR Local_HACKDIR
-#ifndef KR1ED
-# define WIZARD Local_WIZARD
-# define WIZARD_NAME WIZARD
-#else
-# define WIZARD 1
-# define WIZARD_NAME Local_WIZARD
-#endif
+#define WIZARD_NAME Local_WIZARD
 #ifndef SYSCF
 # define SYSCF
 #endif
@@ -242,9 +234,6 @@ typedef __mode_t mode_t;
 # define O_TRUNC 0x400
 #endif
 
-#ifndef REDO
-# define Getchar nhgetch
-#endif
 #define tgetch vms_getchar
 
 #include "system.h"

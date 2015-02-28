@@ -1,4 +1,5 @@
-/* NetHack 3.5  tile.h       $Date$  $Revision$ */
+/* NetHack 3.5  tile.h       $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5  tile.h       $Date: 2009/05/06 21:59:39 $  $Revision: 1.6 $ */
 typedef unsigned char pixval;
 
 typedef struct pixel_s {

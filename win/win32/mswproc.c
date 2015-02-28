@@ -1,4 +1,5 @@
-/* NetHack 3.5	mswproc.c	$Date$  $Revision$ */
+/* NetHack 3.5	mswproc.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mswproc.c	$Date: 2012/01/24 04:26:33 $  $Revision: 1.71 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -801,14 +802,12 @@ void mswin_clear_nhwindow(winid wid)
         (wid < MAXWINDOWS) &&
         (GetNHApp()->windowlist[wid].win != NULL))
     {
-#ifdef REINCARNATION
 		if( GetNHApp()->windowlist[wid].type == NHW_MAP ) {
 			if( Is_rogue_level(&u.uz) ) 
 				mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP), ROGUE_LEVEL_MAP_MODE);
 			else 
 				mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP), iflags.wc_map_mode);
 		}
-#endif
 
 		SendMessage( 
 			 GetNHApp()->windowlist[wid].win, 
@@ -1797,11 +1796,7 @@ void mswin_outrip(winid wid, int how, time_t when)
 	putstr(wid, 0, buf);
 
 	/* Put $ on stone */
-#ifndef GOLDOBJ
-	Sprintf(buf, "%ld Au", u.ugold);
-#else
 	Sprintf(buf, "%ld Au", done_money);
-#endif
 	buf[STONE_LINE_LEN] = 0; /* It could be a *lot* of gold :-) */
 	putstr(wid, 0, buf);
 

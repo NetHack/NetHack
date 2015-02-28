@@ -1,4 +1,5 @@
-/* NetHack 3.5	weapon.c	$Date$  $Revision$ */
+/* NetHack 3.5	weapon.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	weapon.c	$Date: 2011/12/18 05:16:28 $  $Revision: 1.38 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -42,9 +43,7 @@ STATIC_VAR NEARDATA const short skill_names_indices[P_NUM_SKILLS] = {
 	PN_CLERIC_SPELL,     PN_ESCAPE_SPELL,
 	PN_MATTER_SPELL,
 	PN_BARE_HANDED,   PN_TWO_WEAPONS,
-#ifdef STEED
 	PN_RIDING
-#endif
 };
 
 /* note: entry [0] isn't used */
@@ -183,11 +182,6 @@ struct monst *mon;
 	/* Picks used against xorns and earth elementals */
 	if (is_pick(otmp) &&
 	   (passes_walls(ptr) && thick_skinned(ptr))) tmp += 2;
-
-#ifdef INVISIBLE_OBJECTS
-	/* Invisible weapons against monsters who can't see invisible */
-	if (otmp->oinvis && !perceives(ptr)) tmp += 3;
-#endif
 
 	/* Check specially named weapon "to hit" bonuses */
 	if (otmp->oartifact) tmp += spec_abon(otmp, mon);
@@ -371,7 +365,6 @@ static NEARDATA const int rwep[] =
 	ORCISH_ARROW, CROSSBOW_BOLT, SILVER_DAGGER, ELVEN_DAGGER, DAGGER,
 	ORCISH_DAGGER, KNIFE, FLINT, ROCK, LOADSTONE, LUCKSTONE, DART,
 	/* BOOMERANG, */ CREAM_PIE
-	/* note: CREAM_PIE should NOT be #ifdef KOPS */
 };
 
 static NEARDATA const int pwep[] =
@@ -390,16 +383,12 @@ register struct monst *mtmp;
 	boolean mweponly;
 	int i;
 
-#ifdef KOPS
 	char mlet = mtmp->data->mlet;
-#endif
 
 	propellor = &zeroobj;
 	Oselect(EGG); /* cockatrice egg */
-#ifdef KOPS
 	if(mlet == S_KOP)	/* pies are first choice for Kops */
 	    Oselect(CREAM_PIE);
-#endif
 	if(throws_rocks(mtmp->data))	/* ...boulders for giants */
 	    Oselect(BOULDER);
 
@@ -509,12 +498,8 @@ static const NEARDATA short hwep[] = {
 	  MORNING_STAR, ELVEN_SHORT_SWORD, DWARVISH_SHORT_SWORD, SHORT_SWORD,
 	  ORCISH_SHORT_SWORD, MACE, AXE, DWARVISH_SPEAR, SILVER_SPEAR,
 	  ELVEN_SPEAR, SPEAR, ORCISH_SPEAR, FLAIL, BULLWHIP, QUARTERSTAFF,
-	  JAVELIN, AKLYS, CLUB, PICK_AXE,
-#ifdef KOPS
-	  RUBBER_HOSE,
-#endif /* KOPS */
-	  WAR_HAMMER, SILVER_DAGGER, ELVEN_DAGGER, DAGGER, ORCISH_DAGGER,
-	  ATHAME, SCALPEL, KNIFE, WORM_TOOTH
+      JAVELIN, AKLYS, CLUB, PICK_AXE, RUBBER_HOSE, WAR_HAMMER, SILVER_DAGGER,
+      ELVEN_DAGGER, DAGGER, ORCISH_DAGGER, ATHAME, SCALPEL, KNIFE, WORM_TOOTH
 	};
 
 struct obj *
@@ -831,9 +816,7 @@ boolean speedy;
 {
     return !P_RESTRICTED(skill)
 	    && P_SKILL(skill) < P_MAX_SKILL(skill) && (
-#ifdef WIZARD
 	    (wizard && speedy) ||
-#endif
 	    (P_ADVANCE(skill) >=
 		(unsigned) practice_needed_to_advance(P_SKILL(skill))
 	    && u.skills_advanced < P_SKILL_LIMIT
@@ -906,10 +889,8 @@ enhance_weapon_skill()
     winid win;
     boolean speedy = FALSE;
 
-#ifdef WIZARD
 	if (wizard && yn("Advance skills without practice?") == 'y')
 	    speedy = TRUE;
-#endif
 
 	do {
 	    /* find longest available skill name, count those that can advance */
@@ -982,7 +963,6 @@ enhance_weapon_skill()
 		    prefix = (to_advance + eventually_advance +
 				maxxed_cnt > 0) ? "    " : "";
 		(void) skill_level_name(i, sklnambuf);
-#ifdef WIZARD
 		if (wizard) {
 		    if (!iflags.menu_tab_sep)
 			Sprintf(buf, " %s%-*s %-12s %5d(%4d)",
@@ -994,9 +974,7 @@ enhance_weapon_skill()
 			    prefix, P_NAME(i), sklnambuf,
 			    P_ADVANCE(i),
 			    practice_needed_to_advance(P_SKILL(i)));
-		 } else
-#endif
-		{
+		 } else {
 		    if (!iflags.menu_tab_sep)
 			Sprintf(buf, " %s %-*s [%s]",
 			    prefix, longest, P_NAME(i), sklnambuf);
@@ -1011,11 +989,9 @@ enhance_weapon_skill()
 
 	    Strcpy(buf, (to_advance > 0) ? "Pick a skill to advance:" :
 					   "Current skills:");
-#ifdef WIZARD
 	    if (wizard && !speedy)
 		Sprintf(eos(buf), "  (%d slot%s available)",
 			u.weapon_slots, plur(u.weapon_slots));
-#endif
 	    end_menu(win, buf);
 	    n = select_menu(win, to_advance ? PICK_ONE : PICK_NONE, &selected);
 	    destroy_nhwindow(win);
@@ -1183,7 +1159,6 @@ struct obj *weapon;
 	bonus = ((bonus + 2) * (martial_bonus() ? 2 : 1)) / 2;
     }
 
-#ifdef STEED
 	/* KMH -- It's harder to hit while you are riding */
 	if (u.usteed) {
 		switch (P_SKILL(P_RIDING)) {
@@ -1195,7 +1170,6 @@ struct obj *weapon;
 		}
 		if (u.twoweap) bonus -= 2;
 	}
-#endif
 
     return bonus;
 }
@@ -1252,7 +1226,6 @@ struct obj *weapon;
 	bonus = ((bonus + 1) * (martial_bonus() ? 3 : 1)) / 2;
     }
 
-#ifdef STEED
 	/* KMH -- Riding gives some thrusting damage */
 	if (u.usteed && type != P_TWO_WEAPON_COMBAT) {
 		switch (P_SKILL(P_RIDING)) {
@@ -1263,7 +1236,6 @@ struct obj *weapon;
 		    case P_EXPERT:      bonus += 2; break;
 		}
 	}
-#endif
 
     return bonus;
 }
@@ -1325,10 +1297,8 @@ const struct def_skill *class_skill;
 	    P_SKILL(P_BARE_HANDED_COMBAT) = P_BASIC;
 
 	/* Roles that start with a horse know how to ride it */
-#ifdef STEED
 	if (urole.petnum == PM_PONY)
 	    P_SKILL(P_RIDING) = P_BASIC;
-#endif
 
 	/*
 	 * Make sure we haven't missed setting the max on a skill

@@ -1,5 +1,7 @@
-/* NetHack 3.5	winnt.c	$Date$  $Revision$ */
-/*	SCCS Id: @(#)winnt.c	 3.5	 $Date$		  */
+/* NetHack 3.5	winnt.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	winnt.c	$Date: 2012/01/15 19:11:41 $  $Revision: 1.18 $ */
+/*	SCCS Id: @(#)winnt.c	 3.5	 $NHDT-Date$		  */
+/*	SCCS Id: @(#)winnt.c	 3.5	 $Date: 2012/01/15 19:11:41 $		  */
 /* Copyright (c) NetHack PC Development Team 1993, 1994 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -234,7 +236,6 @@ extern void NDECL(backsp);
 
 void win32_abort()
 {
-#ifdef WIZARD
    	if (wizard) {
 # ifdef WIN32CON
 	    int c, ci, ct;
@@ -261,7 +262,6 @@ void win32_abort()
 			DebugBreak();
 # endif
 	}
-#endif
 	abort();
 }
 

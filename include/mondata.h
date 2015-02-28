@@ -1,4 +1,5 @@
-/* NetHack 3.5	mondata.h	$Date$  $Revision$ */
+/* NetHack 3.5	mondata.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mondata.h	$Date: 2009/05/06 10:44:54 $  $Revision: 1.18 $ */
 /*	SCCS Id: @(#)mondata.h	3.5	2007/04/27	*/
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -130,9 +131,7 @@
 #define is_covetous(ptr)	((ptr->mflags3 & M3_COVETOUS))
 #define infravision(ptr)	((ptr->mflags3 & M3_INFRAVISION))
 #define infravisible(ptr)	((ptr->mflags3 & M3_INFRAVISIBLE))
-#ifdef BARGETHROUGH
 #define is_displacer(ptr)	(((ptr)->mflags3 & M3_DISPLACES) != 0L) 
-#endif
 #define is_mplayer(ptr)		(((ptr) >= &mons[PM_ARCHEOLOGIST]) && \
 				 ((ptr) <= &mons[PM_WIZARD]))
 #define is_rider(ptr)		((ptr) == &mons[PM_DEATH] || \

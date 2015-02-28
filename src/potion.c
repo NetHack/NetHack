@@ -1,4 +1,5 @@
-/* NetHack 3.5	potion.c	$Date$  $Revision$ */
+/* NetHack 3.5	potion.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	potion.c	$Date: 2013/11/05 00:57:55 $  $Revision: 1.91 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -89,11 +90,9 @@ boolean talk;
 	}
 	if (xtime && !old) {
 		if (talk) {
-#ifdef STEED
 			if (u.usteed)
 				You("wobble in the saddle.");
 			else
-#endif
 			You("%s...", stagger(youmonst.data, "stagger"));
 		}
 	}
@@ -400,7 +399,6 @@ dodrink()
 			return 1;
 		}
 	}
-#ifdef SINKS
 	/* Or a kitchen sink? */
 	if (IS_SINK(levl[u.ux][u.uy].typ) &&
 		/* not as low as floor level but similar restrictions apply */
@@ -410,7 +408,6 @@ dodrink()
 			return 1;
 		}
 	}
-#endif
 
 	/* Or are you surrounded by water? */
 	if (Underwater && !u.uswallow) {
@@ -675,10 +672,8 @@ peffects(otmp)
 		else {
 		    if (Levitation || Is_airlevel(&u.uz)||Is_waterlevel(&u.uz))
 			You("are motionlessly suspended.");
-#ifdef STEED
 		    else if (u.usteed)
 			You("are frozen in place!");
-#endif
 		    else
 			Your("%s are frozen to the %s!",
 			     makeplural(body_part(FOOT)), surface(u.ux, u.uy));
@@ -813,11 +808,8 @@ peffects(otmp)
 		}
 		break;
 	case POT_SPEED:
-		if(Wounded_legs && !otmp->cursed
-#ifdef STEED
-		   && !u.usteed	/* heal_legs() would heal steeds legs */
-#endif
-						) {
+		if(Wounded_legs && !otmp->cursed && !u.usteed) {
+                        /* heal_legs() would heal steeds legs */
 			heal_legs();
 			unkn++;
 			break;
@@ -1142,10 +1134,8 @@ boolean your_fault;
 	register const char *botlnam = bottlename();
 	boolean isyou = (mon == &youmonst);
 	int distance;
-#ifdef STEED
 	struct obj *saddle = (struct obj *)0;
 	boolean hit_saddle = FALSE;
-#endif
 
 	if(isyou) {
 		distance = 0;
@@ -1153,7 +1143,6 @@ boolean your_fault;
 			botlnam, body_part(HEAD));
 		losehp(Maybe_Half_Phys(rnd(2)), "thrown potion", KILLED_BY_AN);
 	} else {
-#ifdef STEED
 		/* sometimes it hits the saddle */
 		if(((mon->misc_worn_check & W_SADDLE) &&
 		    (saddle = which_armor(mon, W_SADDLE))) &&
@@ -1162,21 +1151,17 @@ boolean your_fault;
 		     ((rnl(10) > 7 && obj->cursed) ||
 		      (rnl(10) < 4 && obj->blessed) || !rn2(3)))))
 			hit_saddle = TRUE;
-#endif
 		distance = distu(mon->mx,mon->my);
 		if (!cansee(mon->mx,mon->my)) pline("Crash!");
 		else {
 		    char *mnam = mon_nam(mon);
 		    char buf[BUFSZ];
 
-#ifdef STEED
 		    if(hit_saddle && saddle) {
 			Sprintf(buf, "%s saddle", s_suffix(x_monnam(mon,
 					ARTICLE_THE, (char *)0,
 		    			(SUPPRESS_IT|SUPPRESS_SADDLE), FALSE)));
-		    } else
-#endif
-		    if(has_head(mon->data)) {
+		    } else if(has_head(mon->data)) {
 			Sprintf(buf, "%s %s",
 				s_suffix(mnam),
 				(notonhead ? "body" : "head"));
@@ -1186,20 +1171,12 @@ boolean your_fault;
 		    pline_The("%s crashes on %s and breaks into shards.",
 			   botlnam, buf);
 		}
-		if(rn2(5) && mon->mhp > 1
-#ifdef STEED
-		   && !hit_saddle
-#endif
-					 )
+		if(rn2(5) && mon->mhp > 1 && !hit_saddle)
 			mon->mhp--;
 	}
 
 	/* oil doesn't instantly evaporate; Neither does a saddle hit */
-	if (obj->otyp != POT_OIL &&
-#ifdef STEED
-	    !hit_saddle &&
-#endif
-	    cansee(mon->mx,mon->my))
+	if (obj->otyp != POT_OIL && !hit_saddle && cansee(mon->mx,mon->my))
 		pline("%s.", Tobjnam(obj, "evaporate"));
 
     if (isyou) {
@@ -1223,7 +1200,6 @@ boolean your_fault;
 		}
 		break;
 	}
-#ifdef STEED
     } else if (hit_saddle && saddle) {
 	char *mnam, buf[BUFSZ], saddle_glows[BUFSZ];
 	boolean affected = FALSE;
@@ -1244,7 +1220,6 @@ boolean your_fault;
 	}
 	if (useeit && !affected)
 	    pline("%s %s wet.", buf, aobjnam(saddle, "get"));
-#endif
     } else {
 	boolean angermon = TRUE;
 
@@ -1776,11 +1751,9 @@ dodip()
 		if (yn(upstart(qtoo)) == 'y') {
 		    if (Levitation) {
 			floating_above(pooltype);
-#ifdef STEED
 		    } else if (u.usteed && !is_swimmer(u.usteed->data) &&
 			    P_SKILL(P_RIDING) < P_BASIC) {
 			rider_cant_reach(); /* not skilled enough to reach */
-#endif
 		    } else {
 			if (obj->otyp == POT_ACID) obj->in_use = 1;
 			(void) get_wet(obj);
@@ -1935,28 +1908,6 @@ dodip()
 				       (const char *)0);
 	    return 1;
 	}
-
-#ifdef INVISIBLE_OBJECTS
-	if (potion->otyp == POT_INVISIBILITY && !obj->oinvis) {
-		obj->oinvis = TRUE;
-		if (!Blind) {
-		    if (!See_invisible) pline("Where did %s go?",
-		    		the(xname(obj)));
-		    else You("notice a little haziness around %s.",
-		    		the(xname(obj)));
-		}
-		goto poof;
-	} else if (potion->otyp == POT_SEE_INVISIBLE && obj->oinvis) {
-		obj->oinvis = FALSE;
-		if (!Blind) {
-		    if (!See_invisible) pline("So that's where %s went!",
-		    		the(xname(obj)));
-		    else pline_The("haziness around %s disappears.",
-		    		the(xname(obj)));
-		}
-		goto poof;
-	}
-#endif
 
 	if(is_poisonable(obj)) {
 	    if(potion->otyp == POT_SICKNESS && !obj->opoisoned) {

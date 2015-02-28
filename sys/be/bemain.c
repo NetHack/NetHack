@@ -1,4 +1,5 @@
-/* NetHack 3.5	bemain.c	$Date$  $Revision$ */
+/* NetHack 3.5	bemain.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	bemain.c	$Date: 2009/05/06 10:48:59 $  $Revision: 1.11 $ */
 /*	SCCS Id: @(#)bemain.c	3.5	2008/01/30	*/
 /* Copyright (c) Dean Luick, 1996. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -160,10 +161,8 @@ static void process_options(int argc, char **argv)
 		argc--;
 		switch (argv[0][1]) {
 		case 'D':
-#ifdef WIZARD
 			wizard = TRUE, discover = FALSE;
 			break;
-#endif
 			/* otherwise fall thru to discover */
 		case 'X':
 			discover = TRUE, wizard = FALSE;
@@ -252,12 +251,8 @@ void getlock(void)
 boolean
 authorize_wizard_mode()
 {
-#ifdef WIZARD
 	/* other ports validate user name or character name here */
 	return TRUE;
-#else
-	return FALSE;
-#endif
 }
 
 #ifndef __begui__

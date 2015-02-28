@@ -1,4 +1,7 @@
 // winmain.cpp : Defines the entry point for the application.
+//
+// $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+// $Date: 2002/12/18 03:51:34 $  $Revision: 1.2 $
 
 #include "winMS.h"
 #include <string.h>

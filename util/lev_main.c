@@ -1,4 +1,5 @@
-/* NetHack 3.5	lev_main.c	$Date$  $Revision$ */
+/* NetHack 3.5	lev_main.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	lev_main.c	$Date: 2012/01/12 04:48:12 $  $Revision: 1.20 $ */
 /*	SCCS Id: @(#)lev_main.c	3.5	2007/01/17	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -493,12 +494,7 @@ char c;
 		  case '{'  : return(FOUNTAIN);
 		  case '\\' : return(THRONE);
 		  case 'K'  :
-#ifdef SINKS
 		      return(SINK);
-#else
-		      yywarning("Sinks are not allowed in this version!  Ignoring...");
-		      return(ROOM);
-#endif
 		  case '}'  : return(MOAT);
 		  case 'P'  : return(POOL);
 		  case 'L'  : return(LAVAPOOL);

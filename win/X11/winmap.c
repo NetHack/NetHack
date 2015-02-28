@@ -1,4 +1,5 @@
-/* NetHack 3.5	winmap.c	$Date$  $Revision$ */
+/* NetHack 3.5	winmap.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	winmap.c	$Date: 2009/05/06 10:55:49 $  $Revision: 1.14 $ */
 /*	SCCS Id: @(#)winmap.c	3.5	2005/11/12	*/
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -838,10 +839,7 @@ display_map_window(wp)
     register int row;
     struct map_info_t *map_info = wp->map_information;
 
-    if ((
-#ifdef REINCARNATION
-	 Is_rogue_level(&u.uz) ? map_info->is_tile :
-#endif
+    if ((Is_rogue_level(&u.uz) ? map_info->is_tile :
 	 (map_info->is_tile != iflags.wc_tiled_map)) &&
 	map_info->tile_map.image_width) {
 	/* changed map display mode, re-display the full map */
@@ -849,11 +847,7 @@ display_map_window(wp)
 		      sizeof(map_info->t_start));
 	(void) memset((genericptr_t) map_info->t_stop, (char) COLNO-1,
 		      sizeof(map_info->t_stop));
-	map_info->is_tile = iflags.wc_tiled_map
-#ifdef REINCARNATION
-	    && !Is_rogue_level(&u.uz)
-#endif
-	    ;
+	map_info->is_tile = iflags.wc_tiled_map && !Is_rogue_level(&u.uz);
 	XClearWindow(XtDisplay(wp->w), XtWindow(wp->w));
 	set_map_size(wp, COLNO, ROWNO);
 	check_cursor_visibility(wp);

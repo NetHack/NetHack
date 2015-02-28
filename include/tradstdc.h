@@ -1,4 +1,5 @@
-/* NetHack 3.5	tradstdc.h	$Date$  $Revision$ */
+/* NetHack 3.5	tradstdc.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	tradstdc.h	$Date: 2012/01/11 18:23:26 $  $Revision: 1.15 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -256,7 +257,6 @@ typedef genericptr genericptr_t;	/* (void *) or (char *) */
 #  define BOOLEAN_P boolean
 # endif
 # define ALIGNTYP_P aligntyp
-# define NHWCHAR_P nhwchar
 #else
 # ifdef WIDENED_PROTOTYPES
 #  define CHAR_P int
@@ -266,14 +266,6 @@ typedef genericptr genericptr_t;	/* (void *) or (char *) */
 #  define SHORT_P int
 #  define BOOLEAN_P int
 #  define ALIGNTYP_P int
-#  if defined(UNICODE_WIDEWINPORT) && defined(WCHAR_MAX)
-#   if WCHAR_MAX >= INT_MAX
-#    define NHWCHAR_P nhwchar
-#   endif
-#  endif
-#  ifndef NHWCHAR_P
-#   define NHWCHAR_P int
-#  endif
 # else
    /* Neither widened nor unwidened prototypes.  Argument list expansion
     * by FDECL/VDECL always empty; all xxx_P vanish so defs aren't needed. */

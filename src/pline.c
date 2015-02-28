@@ -1,4 +1,5 @@
-/* NetHack 3.5	pline.c	$Date$  $Revision$ */
+/* NetHack 3.5	pline.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	pline.c	$Date: 2013/02/09 01:33:37 $  $Revision: 1.30 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -49,9 +50,7 @@ pline VA_DECL(const char *, line)
 #ifdef HANGUPHANDLING
 	if (program_state.done_hup) return;
 #endif
-#ifdef WIZARD
 	if (program_state.wizkit_wishing) return;
-#endif
 
 	if (index(line, '%')) {
 	    Vsprintf(pbuf,line,VA_ARGS);
@@ -77,11 +76,7 @@ pline VA_DECL(const char *, line)
 	    return;
 	}
 #ifndef MAC
-# ifdef UNICODE_WIDEWINPORT
-	if (no_repeat && !nhwstrcmp(toplines, line))
-# else
-	if (no_repeat && !strcmp(toplines, line))
-# endif
+	if (no_repeat && !strcmp(line, toplines))
 	    return;
 #endif /* MAC */
 	if (vision_full_recalc) vision_recalc(0);
@@ -340,7 +335,6 @@ register struct monst *mtmp;
 
 	info[0] = 0;
 	if (mtmp->mtame) {	  Strcat(info, ", tame");
-#ifdef WIZARD
 	    if (wizard) {
 		Sprintf(eos(info), " (%d", mtmp->mtame);
 		if (!mtmp->isminion)
@@ -348,7 +342,6 @@ register struct monst *mtmp;
 			EDOG(mtmp)->hungrytime, EDOG(mtmp)->apport);
 		Strcat(info, ")");
 	    }
-#endif
 	}
 	else if (mtmp->mpeaceful) Strcat(info, ", peaceful");
 	if (mtmp->cham >= LOW_PM && mtmp->data != &mons[mtmp->cham])
@@ -400,9 +393,7 @@ register struct monst *mtmp;
 					       ", digesting you" :
 		   is_animal(u.ustuck->data) ? ", swallowing you" :
 					       ", engulfing you");
-#ifdef STEED
 	if (mtmp == u.usteed)	  Strcat(info, ", carrying you");
-#endif
 
 	/* avoid "Status of the invisible newt ..., invisible" */
 	/* and unlike a normal mon_nam, use "saddled" even if it has a name */
@@ -450,10 +441,7 @@ ustatusline()
 	    }	/* note: "goop" == "glop"; variation is intentional */
 	}
 	if (Stunned)		Strcat(info, ", stunned");
-#ifdef STEED
-	if (!u.usteed)
-#endif
-	if (Wounded_legs) {
+	if (!u.usteed && Wounded_legs) {
 	    const char *what = body_part(LEG);
 	    if ((Wounded_legs & BOTH_SIDES) == BOTH_SIDES)
 		what = makeplural(what);

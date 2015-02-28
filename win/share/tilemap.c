@@ -1,4 +1,5 @@
-/* NetHack 3.5	tilemap.c	$Date$  $Revision$ */
+/* NetHack 3.5	tilemap.c	$NHDT-Date: 1425082379 2015/02/28 00:12:59 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.12 $ */
+/* NetHack 3.5	tilemap.c	$Date: 2009/05/06 10:59:02 $  $Revision: 1.7 $ */
 /*	SCCS Id: @(#)tilemap.c	3.5	2000/06/04	*/
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -41,12 +42,6 @@ struct conditionals {
 	{ MON_GLYPH, PM_BABY_SILVER_DRAGON, "baby shimmering dragon" },
 	{ MON_GLYPH, PM_SILVER_DRAGON, "shimmering dragon" },
 	{ MON_GLYPH, PM_JABBERWOCK, "vorpal jabberwock" },
-#ifndef KOPS
-	{ MON_GLYPH, PM_JABBERWOCK, "Keystone Kop" },
-	{ MON_GLYPH, PM_JABBERWOCK, "Kop Sergeant" },
-	{ MON_GLYPH, PM_JABBERWOCK, "Kop Lieutenant" },
-	{ MON_GLYPH, PM_JABBERWOCK, "Kop Kaptain" },
-#endif
 	{ MON_GLYPH, PM_VAMPIRE_LORD, "vampire mage" },
 #ifndef CHARON /* not supported yet */
 	{ MON_GLYPH, PM_CROESUS, "Charon" },
@@ -54,36 +49,15 @@ struct conditionals {
 #ifndef MAIL
 	{ MON_GLYPH, PM_FAMINE, "mail daemon" },
 #endif
-#ifndef TOURIST
-	{ MON_GLYPH, PM_SAMURAI, "tourist" },
-#endif
 	/* commented out in monst.c at present */
 	{ MON_GLYPH, PM_SHAMAN_KARNOV, "Earendil" },
 	{ MON_GLYPH, PM_SHAMAN_KARNOV, "Elwing" },
-#ifndef TOURIST
-	{ MON_GLYPH, PM_LORD_SATO, "Twoflower" },
-#endif
 	/* commented out in monst.c at present */
 	{ MON_GLYPH, PM_CHROMATIC_DRAGON, "Goblin King" },
 	{ MON_GLYPH, PM_NEANDERTHAL, "High-elf" },
-#ifndef TOURIST
-	{ MON_GLYPH, PM_ROSHI, "guide" },
-#endif
-#ifndef KOPS
-	{ OBJ_GLYPH, CLUB, "rubber hose" },
-#endif
 	/* objects commented out in objects.c at present */
 	{ OBJ_GLYPH, SILVER_DRAGON_SCALE_MAIL, "shimmering dragon scale mail" },
 	{ OBJ_GLYPH, SILVER_DRAGON_SCALES, "shimmering dragon scales" },
-#ifndef TOURIST
-	{ OBJ_GLYPH, LEATHER_JACKET, "Hawaiian shirt" },
-	{ OBJ_GLYPH, LEATHER_JACKET, "T-shirt" },
-	{ OBJ_GLYPH, LOCK_PICK, "credit card" },
-	{ OBJ_GLYPH, MAGIC_LAMP, "expensive camera" },
-#endif
-#ifndef STEED
-	{ OBJ_GLYPH, TOWEL, "saddle" },
-#endif
 	/* allow slime mold to look like slice of pizza, since we
 	 * don't know what a slime mold should look like when renamed anyway
 	 */
@@ -183,23 +157,10 @@ int set, entry;
 	tilenum = 0;	/* set-relative number */
 	for (i = 0; i < (MAXPCHARS - MAXEXPCHARS); i++) {
 		if (set == OTH_GLYPH && tilenum == entry) {
-			if (*defsyms[i].explanation)
+			if (*defsyms[i].explanation) {
 				return defsyms[i].explanation;
-			else {
-				/* if SINKS are turned off, this
-				 * string won't be there (and can't be there
-				 * to prevent symbol-identification and
-				 * special-level mimic appearances from
-				 * thinking the items exist)
-				 */
-				switch (i) {
-				    case S_sink:
-					    Sprintf(buf, "sink");
-					    break;
-				    default:
-					    Sprintf(buf, "cmap %d", tilenum);
-					    break;
-				}
+            } else {
+                Sprintf(buf, "cmap %d", tilenum);
 				return buf;
 			}
 		}

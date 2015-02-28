@@ -1,4 +1,5 @@
-/* NetHack 3.5	dog.c	$Date$  $Revision$ */
+/* NetHack 3.5	dog.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	dog.c	$Date: 2011/04/15 01:55:42 $  $Revision: 1.37 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -147,9 +148,7 @@ struct monst *
 makedog()
 {
 	register struct monst *mtmp;
-#ifdef STEED
 	register struct obj *otmp;
-#endif
 	const char *petname;
 	int   pettype;
 	static int petname_used = 0;
@@ -178,7 +177,6 @@ makedog()
 	if(!mtmp) return((struct monst *) 0); /* pets were genocided */
 
 	context.startingpet_mid = mtmp->m_id;
-#ifdef STEED
 	/* Horses already wear a saddle */
 	if (pettype == PM_PONY && !!(otmp = mksobj(SADDLE, TRUE, FALSE))) {
 	    if (mpickobj(mtmp, otmp))
@@ -189,7 +187,6 @@ makedog()
 	    otmp->leashmon = mtmp->m_id;
 	    update_mon_intrinsics(mtmp, otmp, TRUE, TRUE);
 	}
-#endif
 
 	if (!petname_used++ && *petname)
 		mtmp = christen_monst(mtmp, petname);
@@ -322,10 +319,8 @@ boolean with_you;
 	mtmp->mtrack[0].x = mtmp->mtrack[0].y = 0;
 	mtmp->mtrack[1].x = mtmp->mtrack[1].y = 0;
 
-#ifdef STEED
 	if (mtmp == u.usteed)
 	    return;	/* don't place steed on the map */
-#endif
 	if (with_you) {
 	    /* When a monster accompanies you, sometimes it will arrive
 	       at your intended destination and you'll end up next to
@@ -448,15 +443,6 @@ boolean with_you;
 		}
 		corpse = mkcorpstat(CORPSE, (struct monst *)0, mtmp->data,
 				xlocale, ylocale, CORPSTAT_NONE);
-#ifndef GOLDOBJ
-		if (mtmp->mgold) {
-		    if (xlocale == 0 && ylocale == 0 && corpse) {
-			(void) get_obj_location(corpse, &xlocale, &ylocale, 0);
-			(void) mkgold(mtmp->mgold, xlocale, ylocale);
-		    }
-		    mtmp->mgold = 0L;
-		}
-#endif
 		mongone(mtmp);
 	    }
 	}
@@ -574,24 +560,20 @@ boolean pets_only;	/* true for ascension or final escape */
 		   only if in range. -3. */
 			(u.uhave.amulet && mtmp->iswiz))
 		&& ((!mtmp->msleeping && mtmp->mcanmove)
-#ifdef STEED
 		    /* eg if level teleport or new trap, steed has no control
 		       to avoid following */
 		    || (mtmp == u.usteed)
-#endif
 		    )
 		/* monster won't follow if it hasn't noticed you yet */
 		&& !(mtmp->mstrategy & STRAT_WAITFORU)) {
 		stay_behind = FALSE;
 		if (mtmp->mtrapped) (void)mintrap(mtmp); /* try to escape */
-#ifdef STEED
 		if (mtmp == u.usteed) {
 		    /* make sure steed is eligible to accompany hero */
 		    mtmp->mtrapped = 0;		/* escape trap */
 		    mtmp->meating = 0;		/* terminate eating */
 		    mdrop_special_objs(mtmp);	/* drop Amulet */
 		} else
-#endif
 		if (mtmp->meating || mtmp->mtrapped) {
 			if (canseemon(mtmp))
 			    pline("%s is still %s.", Monnam(mtmp),
@@ -611,14 +593,12 @@ boolean pets_only;	/* true for ascension or final escape */
 					    : "Its");
 				m_unleash(mtmp, FALSE);
 			}
-#ifdef STEED
 			if (mtmp == u.usteed) {
 			    /* can't happen unless someone makes a change
 			       which scrambles the stay_behind logic above */
 			    impossible("steed left behind?");
 			    dismount_steed(DISMOUNT_GENERIC);
 			}
-#endif
 			continue;
 		}
 		if (mtmp->isshk)
@@ -979,9 +959,7 @@ boolean was_dead;
 	/* a life-saved monster might be leashed;
 	   don't leave it that way if it's no longer tame */
 	if (mtmp->mleashed) m_unleash(mtmp, TRUE);
-#ifdef STEED
 	if (mtmp == u.usteed) dismount_steed(DISMOUNT_THROWN);
-#endif
     } else if (edog) {
 	/* it's still a pet; start a clean pet-slate now */
 	edog->revivals++;

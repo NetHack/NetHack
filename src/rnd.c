@@ -1,12 +1,9 @@
-/* NetHack 3.5	rnd.c	$Date$  $Revision$ */
+/* NetHack 3.5	rnd.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	rnd.c	$Date: 2009/05/06 10:47:41 $  $Revision: 1.7 $ */
 /*	SCCS Id: @(#)rnd.c	3.5	2004/08/27	*/
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-
-#if defined(BETA) && !defined(DEBUG) && !defined(NODEBUG)
-#define DEBUG
-#endif
 
 /* "Rand()"s definition is determined by [OS]conf.h */
 #if defined(LINT) && defined(UNIX)	/* rand() is long... */
@@ -25,9 +22,9 @@ int
 rn2(x)		/* 0 <= rn2(x) < x */
 register int x;
 {
-#ifdef DEBUG
+#ifdef BETA
 	if (x <= 0) {
-		impossible("rn2(%d) attempted", x);
+		debugpline("rn2(%d) attempted", x);
 		return(0);
 	}
 	x = RND(x);
@@ -43,9 +40,9 @@ register int x;	/* good luck approaches 0, bad luck approaches (x-1) */
 {
 	register int i, adjustment;
 
-#ifdef DEBUG
+#ifdef BETA
 	if (x <= 0) {
-		impossible("rnl(%d) attempted", x);
+		debugpline("rnl(%d) attempted", x);
 		return(0);
 	}
 #endif
@@ -82,9 +79,9 @@ int
 rnd(x)		/* 1 <= rnd(x) <= x */
 register int x;
 {
-#ifdef DEBUG
+#ifdef BETA
 	if (x <= 0) {
-		impossible("rnd(%d) attempted", x);
+		debugpline("rnd(%d) attempted", x);
 		return(1);
 	}
 	x = RND(x)+1;
@@ -100,9 +97,9 @@ register int n, x;
 {
 	register int tmp = n;
 
-#ifdef DEBUG
+#ifdef BETA
 	if (x < 0 || n < 0 || (x == 0 && n != 0)) {
-		impossible("d(%d,%d) attempted", n, x);
+		debugpline("d(%d,%d) attempted", n, x);
 		return(1);
 	}
 #endif

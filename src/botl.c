@@ -1,4 +1,5 @@
-/* NetHack 3.5	botl.c	$Date$  $Revision$ */
+/* NetHack 3.5	botl.c	$NHDT-Date: 1425083082 2015/02/28 00:24:42 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.38 $ */
+/* NetHack 3.5	botl.c	$Date: 2012/01/10 17:47:19 $  $Revision: 1.36 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -158,13 +159,8 @@ botl_score()
     long deepest = deepest_lev_reached(FALSE);
     long utotal;
 
-#ifndef GOLDOBJ
-    utotal = u.ugold + hidden_gold();
-    if ((utotal -= u.ugold0) < 0L) utotal = 0L;
-#else
     utotal = money_cnt(invent) + hidden_gold();
     if ((utotal -= u.umoney0) < 0L) utotal = 0L;
-#endif
     utotal += u.urexp + (50 * (deepest - 1)) +
 	      (deepest > 30 ? 10000 : deepest > 20 ? 1000*(deepest - 20) : 0);
     if (utotal < u.urexp) utotal = LONG_MAX; /* wrap around */
@@ -267,19 +263,13 @@ bot2()
 	Sprintf(nb = eos(newbot2),
 		"%s:%-2ld HP:%d(%d) Pw:%d(%d) AC:%-2d",
 		encglyph(objnum_to_glyph(GOLD_PIECE)),
-#ifndef GOLDOBJ
-		u.ugold,
-#else
 		money_cnt(invent),
-#endif
 		hp, hpmax, u.uen, u.uenmax, u.uac);
 
 	if (Upolyd)
 		Sprintf(nb = eos(nb), " HD:%d", mons[u.umonnum].mlevel);
-#ifdef EXP_ON_BOTL
 	else if(flags.showexp)
 		Sprintf(nb = eos(nb), " Xp:%u/%-1ld", u.ulevel,u.uexp);
-#endif
 	else
 		Sprintf(nb = eos(nb), " Exp:%u", u.ulevel);
 
@@ -708,12 +698,7 @@ bot()
 
 	/* Gold */
 
-	blstats[idx][BL_GOLD].a.a_long =
-#ifndef GOLDOBJ
-		   u.ugold;
-#else
-		   money_cnt(invent);
-#endif
+	blstats[idx][BL_GOLD].a.a_long = money_cnt(invent);
 	/*
 	 * The tty port needs to display the current symbol for gold
 	 * as a field header, so to accomodate that we pass gold with

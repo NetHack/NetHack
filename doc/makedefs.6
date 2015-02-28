@@ -1,5 +1,6 @@
 .TH MAKEDEFS 6 "29 Apr 2010"
-.\" NetHack 3.5  makedefs.6	$Date$  $Revision$
+.\" NetHack 3.5  makedefs.6	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+.\" NetHack 3.5  makedefs.6	$Date: 2010/05/01 20:57:12 $  $Revision: 1.1 $
 .UC 4
 .SH NAME
 makedefs \- NetHack miscellaneous build-time functions
@@ -116,6 +117,14 @@ Generate
 and
 .IR vis_tab.h .
 .SH LONG COMMANDS
+.TP
+.BI --debug
+Show debugging output.
+.br
+.TP
+.B --make \fR[\fIcommand\fR]
+Execute a short command.  Command is given without preceding dash.
+.br
 .TP
 .BI --input " file"
 Specify the input

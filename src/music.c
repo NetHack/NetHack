@@ -1,4 +1,5 @@
-/* NetHack 3.5	music.c	$Date$  $Revision$ */
+/* NetHack 3.5	music.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	music.c	$Date: 2011/12/30 23:47:06 $  $Revision: 1.27 $ */
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -274,12 +275,10 @@ int force;
 			if (cansee(x,y))
 				pline_The("fountain falls into a chasm.");
 			goto do_pit;
-#ifdef SINKS
 		  case SINK :
 			if (cansee(x,y))
 				pline_The("kitchen sink falls into a chasm.");
 			goto do_pit;
-#endif
 		  case ALTAR :
 			if (Is_astralevel(&u.uz) || Is_sanctum(&u.uz)) break;
 

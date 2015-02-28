@@ -1,4 +1,5 @@
-/* NetHack 3.5	dothrow.c	$Date$  $Revision$ */
+/* NetHack 3.5	dothrow.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	dothrow.c	$Date: 2013/11/05 00:57:55 $  $Revision: 1.89 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -44,18 +45,6 @@ int shotlimit;
 	boolean twoweap, weakmultishot;
 
 	/* ask "in what direction?" */
-#ifndef GOLDOBJ
-	if (!getdir((char *)0)) {
-		if (obj->oclass == COIN_CLASS) {
-		    u.ugold += obj->quan;
-		    context.botl = 1;
-		    dealloc_obj(obj);
-		}
-		return(0);
-	}
-
-	if(obj->oclass == COIN_CLASS) return(throw_gold(obj));
-#else
 	if (!getdir((char *)0)) {
 	    /* obj might need to be merged back into the singular gold object */
 	    freeinv(obj);
@@ -72,7 +61,6 @@ int shotlimit;
           possibly using a sling.
         */
 	if(obj->oclass == COIN_CLASS && obj != uquiver) return(throw_gold(obj));
-#endif
 
 	if(!canletgo(obj,"throw"))
 		return(0);
@@ -1001,13 +989,11 @@ boolean twoweap; /* used to restore twoweapon mode if wielded weapon returns */
 		u.twoweap = twoweap;
 	    } else if (u.dz < 0) {
 		(void) toss_up(obj, rn2(5) && !Underwater);
-#ifdef STEED
 	    } else if (u.dz > 0 && u.usteed &&
 		obj->oclass == POTION_CLASS && rn2(6)) {
 		/* alternative to prayer or wand of opening/spell of knock
 		   for dealing with cursed saddle:  throw holy water > */
 		potionhit(u.usteed, obj, TRUE);
-#endif
 	    } else {
 		hitfloor(obj);
 	    }
@@ -1776,9 +1762,7 @@ struct obj *obj;
 		obj->oclass != GEM_CLASS)
 	    return 1;
 	switch (obj->oclass == POTION_CLASS ? POT_WATER : obj->otyp) {
-#ifdef TOURIST
 		case EXPENSIVE_CAMERA:
-#endif
 		case POT_WATER:		/* really, all potions */
 		case EGG:
 		case CREAM_PIE:
@@ -1807,9 +1791,7 @@ boolean in_view;
 		case LENSES:
 		case MIRROR:
 		case CRYSTAL_BALL:
-#ifdef TOURIST
 		case EXPENSIVE_CAMERA:
-#endif
 			to_pieces = " into a thousand pieces";
 			/*FALLTHRU*/
 		case POT_WATER:		/* really, all potions */
@@ -1838,34 +1820,18 @@ throw_gold(obj)
 struct obj *obj;
 {
 	int range, odx, ody;
-#ifndef GOLDOBJ
-	long zorks = obj->quan;
-#endif
 	register struct monst *mon;
 
 	if(!u.dx && !u.dy && !u.dz) {
-#ifndef GOLDOBJ
-		u.ugold += obj->quan;
-		context.botl = 1;
-		dealloc_obj(obj);
-#endif
 		You("cannot throw gold at yourself.");
 		return(0);
 	}
-#ifdef GOLDOBJ
         freeinv(obj);
-#endif
 	if(u.uswallow) {
 		pline(is_animal(u.ustuck->data) ?
 			"%s in the %s's entrails." : "%s into %s.",
-#ifndef GOLDOBJ
-			"The gold disappears", mon_nam(u.ustuck));
-		u.ustuck->mgold += zorks;
-		dealloc_obj(obj);
-#else
 			"The money disappears", mon_nam(u.ustuck));
 		add_to_minv(u.ustuck, obj);
-#endif
 		return(1);
 	}
 

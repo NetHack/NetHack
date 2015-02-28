@@ -1,4 +1,5 @@
-/* NetHack 3.5	amirip.c	$Date$  $Revision$ */
+/* NetHack 3.5	amirip.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	amirip.c	$Date: 2012/01/24 04:26:20 $  $Revision: 1.7 $ */
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland 1991,1992,1993,1995,1996. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -182,12 +183,7 @@ time_t when;
     tomb_text(buf);
 
     /* Put $ on stone */
-    Sprintf(buf, "%ld Au",
-#ifndef GOLDOBJ
-		u.ugold);
-#else
-		done_money);
-#endif
+    Sprintf(buf, "%ld Au", done_money);
     buf[STONE_LINE_LEN] = 0; /* It could be a *lot* of gold :-) */
     tomb_text(buf);
 

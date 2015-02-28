@@ -1,4 +1,5 @@
-/* NetHack 3.5	display.h	$Date$  $Revision$ */
+/* NetHack 3.5	display.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	display.h	$Date: 2009/05/06 10:44:38 $  $Revision: 1.14 $ */
 /*	SCCS Id: @(#)display.h	3.5	2005/06/21	*/
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
@@ -15,9 +16,13 @@
 #include "mondata.h"	/* for mindless() */
 #endif
 
-#ifndef INVISIBLE_OBJECTS
+/*
+ * vobj_at()
+ *
+ * Returns the head of the list of objects that the player can see
+ * at location (x,y).
+ */
 #define vobj_at(x,y) (level.objects[x][y])
-#endif
 
 /*
  * sensemon()
@@ -197,12 +202,8 @@
  * Display the hero.  It is assumed that all checks necessary to determine
  * _if_ the hero can be seen have already been done.
  */
-#ifdef STEED
 #define maybe_display_usteed	(u.usteed && mon_visible(u.usteed)) ? \
 					ridden_mon_to_glyph(u.usteed) :
-#else
-#define maybe_display_usteed	/* empty */
-#endif
 
 #define display_self()							\
     show_glyph(u.ux, u.uy,						\

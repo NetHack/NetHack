@@ -1,4 +1,5 @@
-/* NetHack 3.5	exper.c	$Date$  $Revision$ */
+/* NetHack 3.5	exper.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	exper.c	$Date: 2009/05/06 10:46:24 $  $Revision: 1.19 $ */
 /*	SCCS Id: @(#)exper.c	3.5	2005/09/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -170,13 +171,11 @@ const char *drainer;	/* cause of death, if drain should be fatal */
 {
 	register int num;
 
-#ifdef WIZARD
 	/* override life-drain resistance when handling an explicit
 	   wizard mode request to reduce level; never fatal though */
 	if (drainer && !strcmp(drainer, "#levelchange"))
 	    drainer = 0;
 	else
-#endif
 	    if (resists_drli(&youmonst)) return;
 
 	if (u.ulevel > 1) {

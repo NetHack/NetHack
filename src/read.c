@@ -1,4 +1,5 @@
-/* NetHack 3.5	read.c	$Date$  $Revision$ */
+/* NetHack 3.5	read.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	read.c	$Date: 2012/04/06 08:35:00 $  $Revision: 1.78 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -71,7 +72,6 @@ doread()
 	    if (!Blind) u.uconduct.literate++;
 	    useup(scroll);
 	    return(1);
-#ifdef TOURIST
 	} else if (scroll->otyp == T_SHIRT) {
 	    static const char *shirt_msgs[] = { /* Scott Bigham */
     "I explored the Dungeons of Doom and all I got was this lousy T-shirt!",
@@ -116,7 +116,6 @@ doread()
 			     scroll->o_id ^ (unsigned)ubirthday);
 	    pline("\"%s\"", buf);
 	    return 1;
-#endif	/* TOURIST */
 	} else if (scroll->oclass != SCROLL_CLASS
 		&& scroll->oclass != SPBOOK_CLASS) {
 	    pline(silly_thing_to, "read");
@@ -363,9 +362,7 @@ int curse_bless;
 		break;
 	    case MAGIC_MARKER:
 	    case TINNING_KIT:
-#ifdef TOURIST
 	    case EXPENSIVE_CAMERA:
-#endif
 		if (is_cursed) stripspe(obj);
 		else if (rechrg && obj->otyp == MAGIC_MARKER) {	/* previously recharged */
 		    obj->recharged = 1;	/* override increment done above */
@@ -573,9 +570,7 @@ forget_map(howmuch)
 		levl[zx][zy].seenv = 0;
 		levl[zx][zy].waslit = 0;
 		levl[zx][zy].glyph = cmap_to_glyph(S_stone);
-#ifdef DUNGEON_OVERVIEW
 		lastseentyp[zx][zy] = STONE;
-#endif
 	    }
 }
 
@@ -636,9 +631,7 @@ forget_levels(percent)
 	count = ((count * percent) + 50) / 100;
 	for (i = 0; i < count; i++) {
 	    level_info[indices[i]].flags |= FORGOTTEN;
-#ifdef DUNGEON_OVERVIEW
 	    forget_mapseen(indices[i]);
-#endif
 	}
 }
 
@@ -999,10 +992,8 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 		} else {
 		    for (obj = invent; obj; obj = obj->nobj) {
 			long wornmask;
-#ifdef GOLDOBJ
 			/* gold isn't subject to cursing and blessing */
 			if (obj->oclass == COIN_CLASS) continue;
-#endif
 			wornmask = (obj->owornmask & ~(W_BALL|W_ART|W_ARTI));
 			if (wornmask && !sblessed) {
 			    /* handle a couple of special cases; we don't
@@ -1125,10 +1116,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 		    for (i = -bd; i <= bd; i++) for(j = -bd; j <= bd; j++) {
 			if (!isok(u.ux + i, u.uy + j)) continue;
 			if ((mtmp = m_at(u.ux + i, u.uy + j)) != 0
-#ifdef STEED
-			    || (!i && !j && (mtmp = u.usteed) != 0)
-#endif
-			   ) {
+			    || (!i && !j && (mtmp = u.usteed) != 0)) {
 			    ++candidates;
 			    res = maybe_tame(mtmp, sobj);
 			    results += res;
@@ -1328,11 +1316,8 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 		break;
 	case SCR_EARTH:
 	    /* TODO: handle steeds */
-	    if (
-#ifdef REINCARNATION
-		!Is_rogue_level(&u.uz) && 
-#endif
-		 (!In_endgame(&u.uz) || Is_earthlevel(&u.uz))) {
+	    if (!Is_rogue_level(&u.uz)
+            && (!In_endgame(&u.uz) || Is_earthlevel(&u.uz))) {
 		register int x, y;
 
 		/* Identify the scroll */
@@ -1612,7 +1597,6 @@ do_it:
 	if (Punished && !on && !Blind)
 	    move_bc(1, 0, uball->ox, uball->oy, uchain->ox, uchain->oy);
 
-#ifdef REINCARNATION
 	if (Is_rogue_level(&u.uz)) {
 	    /* Can't use do_clear_area because MAX_RADIUS is too small */
 	    /* rogue lighting must light the entire room */
@@ -1627,7 +1611,6 @@ do_it:
 	    }
 	    /* hallways remain dark on the rogue level */
 	} else
-#endif
 	    do_clear_area(u.ux,u.uy,
 		(obj && obj->oclass==SCROLL_CLASS && obj->blessed) ? 9 : 5,
 		set_lit, (genericptr_t)(on ? &is_lit : (char *)0));
@@ -1702,7 +1685,6 @@ do_class_genocide()
 			else if (immunecnt || class == S_invisible)
 	You("aren't permitted to genocide such monsters.");
 			else
-#ifdef WIZARD	/* to aid in topology testing; remove pesky monsters */
 			  if (wizard && buf[0] == '*') {
 			    register struct monst *mtmp, *mtmp2;
 
@@ -1716,7 +1698,6 @@ do_class_genocide()
 	pline("Eliminated %d monster%s.", gonecnt, plur(gonecnt));
 			    return;
 			} else
-#endif
 			    pline("That %s does not represent any monster.",
 				  strlen(buf) == 1 ? "symbol" : "response");
 			continue;
@@ -2038,7 +2019,6 @@ struct obj *from_obj;
 	return FALSE;
 }
 
-#ifdef WIZARD
 /*
  * Make a new monster with the type controlled by the user.
  *
@@ -2078,12 +2058,10 @@ create_particular()
 		makehostile = TRUE;
 	    }
 	    /* decide whether a valid monster was chosen */
-#ifdef WIZARD
 	    if (wizard && (!strcmp(bufp, "*") || !strcmp(bufp, "random"))) {
 		randmonst = TRUE;
 		break;
 	    }
-#endif
 	    which = name_to_mon(bufp);
 	    if (which >= LOW_PM) break;		/* got one */
 	    monclass = name_to_monclass(bufp, &which);
@@ -2104,12 +2082,10 @@ create_particular()
 	    if (!randmonst) {
 		firstchoice = which;
 		if (cant_revive(&which, FALSE, (struct obj *)0)) {
-#ifdef WIZARD	/* intentionally redundant... */
 		    /* wizard mode can override handling of special monsters */
 		    Sprintf(buf, "Creating %s instead; force %s?",
 			    mons[which].mname, mons[firstchoice].mname);
 		    if (yn(buf) == 'y') which = firstchoice;
-#endif
 		}
 		whichpm = &mons[which];
 	    }
@@ -2142,6 +2118,5 @@ create_particular()
 	}
 	return madeany;
 }
-#endif /* WIZARD */
 
 /*read.c*/

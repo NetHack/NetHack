@@ -1,4 +1,5 @@
-/* NetHack 3.5	config.h	$Date$  $Revision$ */
+/* NetHack 3.5	config.h	$NHDT-Date: 1425083082 2015/02/28 00:24:42 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.51 $ */
+/* NetHack 3.5	config.h	$Date: 2012/01/27 20:15:26 $  $Revision: 1.37 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -171,16 +172,12 @@
  *              GDBPATH		(the path to the system gdb(1) program)
  */
 
-#ifndef WIZARD		/* allow for compile-time or Makefile changes */
-# ifndef KR1ED
-#  define WIZARD  "wizard" /* the person allowed to use the -D option */
+#ifndef WIZARD_NAME		/* allow for compile-time or Makefile changes */
+# define WIZARD_NAME "wizard"
+#endif
+
 /* #define SYSCF */	/* use a global configuration */
 /* #define SYSCF_FILE "sysconf" */ /* global configuration is in a file */
-# else
-#  define WIZARD
-#  define WIZARD_NAME "wizard"
-# endif
-#endif
 
 #ifndef GDBPATH
 # define GDBPATH "/usr/bin/gdb"
@@ -318,10 +315,6 @@
  */
 #endif /* CHDIR */
 
-/*
- * Enable some UNICODE support.
- */
-/*#define UNICODE_SUPPORT */		/* master on/off for any unicode support    */
 
 
 /*
@@ -415,34 +408,19 @@ typedef unsigned char	uchar;
  */
 
 /* display features */
-#define LOADSYMSETS	/* loadable symbol sets; only default symbols w/o this  */
 /* dungeon features */
-#define SINKS		/* Kitchen sinks - Janet Walz */
 /* dungeon levels */
 #define WALLIFIED_MAZE	/* Fancy mazes - Jean-Christophe Collet */
-#define REINCARNATION	/* Special Rogue-like levels */
 /* monsters & objects */
-#define KOPS		/* Keystone Kops by Scott R. Turner */
-#define SEDUCE		/* Succubi/incubi seduction, by KAA, suggested by IM */
-#define STEED		/* Riding steeds */
-#define TOURIST		/* Tourist players with cameras and Hawaiian shirts */
-/* difficulty */
-#define ELBERETH	/* Engraving the E-word repels monsters */
 /* I/O */
-#define REDO		/* support for redoing last command - DGK */
 #if !defined(MAC)
 # if !defined(NOCLIPPING)
 # define CLIPPING	/* allow smaller screens -- ERS */
 # endif
 #endif
-#define AUTOPICKUP_EXCEPTIONS	/* exceptions to autopickup */
-#define BARGETHROUGH	/* allow some monsters to move others out of their way */
 
-#ifdef REDO
-# define DOAGAIN '\001' /* ^A, the "redo" key used in cmd.c and getline.c */
-#endif
+#define DOAGAIN '\001' /* ^A, the "redo" key used in cmd.c and getline.c */
 
-#define EXP_ON_BOTL	/* Show experience on bottom line */
 /* #define SCORE_ON_BOTL */	/* added by Gary Erickson (erickson@ucivax) */
 
 /*
@@ -453,10 +431,8 @@ typedef unsigned char	uchar;
  * bugs left here.
  */
 
-/*#define GOLDOBJ */	/* Gold is kept on obj chains - Helge Hafting */
 #define STATUS_VIA_WINDOWPORT	/* re-work of the status line updating process */
 #define STATUS_HILITES		/* support hilites of status fields */
-#define DUNGEON_OVERVIEW	/* dungeon overview by Hojita Discordia */
 /* #define WINCHAIN*/		/* stacked window systems */
 /* End of Section 5 */
 

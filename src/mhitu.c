@@ -1,4 +1,5 @@
-/* NetHack 3.5	mhitu.c	$Date$  $Revision$ */
+/* NetHack 3.5	mhitu.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mhitu.c	$Date: 2012/02/05 04:26:48 $  $Revision: 1.104 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -11,9 +12,7 @@ STATIC_DCL void FDECL(urustm, (struct monst *, struct obj *));
 STATIC_DCL boolean FDECL(u_slip_free, (struct monst *,struct attack *));
 STATIC_DCL int FDECL(passiveum, (struct permonst *,struct monst *,struct attack *));
 
-#ifdef SEDUCE
 STATIC_DCL void FDECL(mayberem, (struct obj *, const char *));
-#endif
 
 STATIC_DCL boolean FDECL(diseasemu, (struct permonst *));
 STATIC_DCL int FDECL(hitmu, (struct monst *,struct attack *));
@@ -322,7 +321,6 @@ mattacku(mtmp)
 	    if(u.uinvulnerable) return (0); /* stomachs can't hurt you! */
 	}
 
-#ifdef STEED
 	else if (u.usteed) {
 		if (mtmp == u.usteed)
 			/* Your steed won't attack you */
@@ -342,7 +340,6 @@ mattacku(mtmp)
 			return (!!(mattackm(u.usteed, mtmp) & MM_DEF_DIED));
 		}
 	}
-#endif
 
 	if (u.uundetected && !range2 && foundyou && !u.uswallow) {
 		if (!canspotmon(mtmp)) map_invisible(mtmp->mx, mtmp->my);
@@ -655,9 +652,7 @@ mattacku(mtmp)
 			break;
 		case AT_WEAP:
 			if(range2) {
-#ifdef REINCARNATION
 				if (!Is_rogue_level(&u.uz))
-#endif
 					thrwmu(mtmp);
 			} else {
 			    int hittmp = 0;
@@ -760,10 +755,8 @@ int attk;
 		 */
 		if (uarm)
 		    (void)rust_dmg(uarm, xname(uarm), hurt, TRUE, &youmonst);
-#ifdef TOURIST
 		else if (uarmu)
 		    (void)rust_dmg(uarmu, xname(uarmu), hurt, TRUE, &youmonst);
-#endif
 		break;
 	    case 2:
 		if (!uarms || !rust_dmg(uarms, xname(uarms), hurt, FALSE, &youmonst))
@@ -804,9 +797,7 @@ struct attack *mattk;
 {
 	struct obj *obj = (uarmc ? uarmc : uarm);
 
-#ifdef TOURIST
 	if (!obj) obj = uarmu;
-#endif
 	if (mattk->adtyp == AD_DRIN) obj = uarmh;
 
 	/* if your cloak/armor is greased, monster slips off; this
@@ -1144,11 +1135,7 @@ dopois:
 		 * still _can_ attack you when you're flying or mounted.
 		 * [FIXME: why can't a flying attacker overcome this?]
 		 */
-		  if (
-#ifdef STEED
-			u.usteed ||
-#endif
-				    Levitation || Flying) {
+		  if (u.usteed || Levitation || Flying) {
 		    pline("%s tries to reach your %s %s!", Monnam(mtmp),
 			  sidestr, body_part(LEG));
 		    dmg = 0;
@@ -1267,7 +1254,6 @@ dopois:
 		if(!mtmp->mcan) stealgold(mtmp);
 		break;
 
-#ifdef SEDUCE
 	    case AD_SSEX:
 		if(SYSOPT_SEDUCE){
 		if(could_seduce(mtmp, &youmonst, mattk) == 1
@@ -1277,7 +1263,6 @@ dopois:
 		break;
 		}
 		/* else FALLTHRU */
-#endif
 	    case AD_SITM:	/* for now these are the same */
 	    case AD_SEDU:
 		if (is_animal(mtmp->data)) {
@@ -1285,10 +1270,7 @@ dopois:
 			if (mtmp->mcan) break;
 			/* Continue below */
 		} else if (dmgtype(youmonst.data, AD_SEDU)
-#ifdef SEDUCE
-			|| (SYSOPT_SEDUCE && dmgtype(youmonst.data, AD_SSEX))
-#endif
-						) {
+			|| (SYSOPT_SEDUCE && dmgtype(youmonst.data, AD_SSEX))) {
 			pline("%s %s.", Monnam(mtmp), mtmp->minvent ?
 		    "brags about the goods some dungeon explorer provided" :
 		    "makes some remarks about how difficult theft is lately");
@@ -1380,11 +1362,8 @@ dopois:
 		    hitmsg(mtmp, mattk);
 		    break;
 		}
-		if(!uwep
-#ifdef TOURIST
-		   && !uarmu
-#endif
-		   && !uarm && !uarmh && !uarms && !uarmg && !uarmc && !uarmf) {
+		if(!uwep && !uarmu && !uarm && !uarmh && !uarms && !uarmg && !uarmc
+            && !uarmf) {
 		    boolean goaway = FALSE;
 		    pline("%s hits!  (I hope you don't mind.)", Monnam(mtmp));
 		    if (Upolyd) {
@@ -1663,7 +1642,6 @@ gulpmu(mtmp, mattk)	/* monster swallows you, or damage if u.uswallow */
 		place_monster(mtmp, u.ux, u.uy);
 		u.ustuck = mtmp;
 		newsym(mtmp->mx,mtmp->my);
-#ifdef STEED
 		if (is_animal(mtmp->data) && u.usteed) {
 			char buf[BUFSZ];
 			/* Too many quirks presently if hero and steed
@@ -1675,8 +1653,7 @@ gulpmu(mtmp, mattk)	/* monster swallows you, or damage if u.uswallow */
 				Monnam(mtmp), buf);
 			dismount_steed(DISMOUNT_ENGULFED);
 		} else
-#endif
-		pline("%s engulfs you!", Monnam(mtmp));
+		    pline("%s engulfs you!", Monnam(mtmp));
 		stop_occupation();
 		reset_occupations();	/* behave as if you had moved */
 
@@ -2214,19 +2191,13 @@ struct attack *mattk;
 		gendef = gender(mdef);
 	}
 
-	if(agrinvis && !defperc
-#ifdef SEDUCE
-		&& (!SYSOPT_SEDUCE || ( mattk && mattk->adtyp != AD_SSEX))
-#endif
-		)
+	if(agrinvis && !defperc &&
+            (!SYSOPT_SEDUCE || ( mattk && mattk->adtyp != AD_SSEX)))
 		return 0;
 
 	if(pagr->mlet != S_NYMPH
 		&& ((pagr != &mons[PM_INCUBUS] && pagr != &mons[PM_SUCCUBUS])
-#ifdef SEDUCE
-		    || (SYSOPT_SEDUCE && mattk && mattk->adtyp != AD_SSEX)
-#endif
-		   ))
+		    || (SYSOPT_SEDUCE && mattk && mattk->adtyp != AD_SSEX)))
 		return 0;
 	
 	if(genagr == 1 - gendef)
@@ -2235,7 +2206,6 @@ struct attack *mattk;
 		return (pagr->mlet == S_NYMPH) ? 2 : 0;
 }
 
-#ifdef SEDUCE
 /* Returns 1 if monster teleported */
 int
 doseduce(mon)
@@ -2338,10 +2308,7 @@ register struct monst *mon;
 	}
 
 	if (!uarmc && !uarmf && !uarmg && !uarms && !uarmh
-#ifdef TOURIST
-								&& !uarmu
-#endif
-									)
+        && !uarmu)
 		pline("%s murmurs sweet nothings into your ear.",
 			Blind ? (fem ? "She" : "He") : Monnam(mon));
 	else
@@ -2355,10 +2322,8 @@ register struct monst *mon;
 		mayberem(uarmg, "gloves");
 	mayberem(uarms, "shield");
 	mayberem(uarmh, helm_simple_name(uarmh));
-#ifdef TOURIST
 	if(!uarmc && !uarm)
 		mayberem(uarmu, "shirt");
-#endif
 
 	if (uarm || uarmc) {
 		verbalize("You're such a %s; I wish...",
@@ -2451,27 +2416,6 @@ register struct monst *mon;
 		pline("%s tries to take your money, but fails...",
 				noit_Monnam(mon));
 	else {
-#ifndef GOLDOBJ
-		long cost;
-
-		if (u.ugold > (long)LARGEST_INT - 10L)
-			cost = (long) rnd(LARGEST_INT) + 500L;
-		else
-			cost = (long) rnd((int)u.ugold + 10) + 500L;
-		if (mon->mpeaceful) {
-			cost /= 5L;
-			if (!cost) cost = 1L;
-		}
-		if (cost > u.ugold) cost = u.ugold;
-		if (!cost) verbalize("It's on the house!");
-		else {
-		    pline("%s takes %ld %s for services rendered!",
-			    noit_Monnam(mon), cost, currency(cost));
-		    u.ugold -= cost;
-		    mon->mgold += cost;
-		    context.botl = 1;
-		}
-#else
 		long cost;
                 long umoney = money_cnt(invent);
 
@@ -2491,7 +2435,6 @@ register struct monst *mon;
                     money2mon(mon, cost);
 		    context.botl = 1;
 		}
-#endif
 	}
 	if (!rn2(25)) mon->mcan = 1; /* monster is worn out */
 	if (!tele_restrict(mon)) (void) rloc(mon, FALSE);
@@ -2522,15 +2465,12 @@ const char *str;
 			(obj == uarmc || obj == uarms) ? "it's in the way" :
 			(obj == uarmf) ? "let me rub your feet" :
 			(obj == uarmg) ? "they're too clumsy" :
-#ifdef TOURIST
 			(obj == uarmu) ? "let me massage you" :
-#endif
 			/* obj == uarmh */
 			hairbuf);
 	}
 	remove_worn_item(obj, TRUE);
 }
-#endif  /* SEDUCE */
 
 STATIC_OVL int
 passiveum(olduasmon,mtmp,mattk)

@@ -1,4 +1,5 @@
-/* NetHack 3.5	artifact.c	$Date$  $Revision$ */
+/* NetHack 3.5	artifact.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	artifact.c	$Date: 2013/11/07 01:03:16 $  $Revision: 1.77 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1686,14 +1687,7 @@ long *abil;
 	long wornbits;
 	long wornmask = (W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF |
 			 W_WEP | W_QUIVER | W_SWAPWEP | W_ART | W_ARTI | W_AMUL |
-			 W_RINGL | W_RINGR | W_TOOL | W_BALL | W_CHAIN
-#ifdef STEED
-			 | W_SADDLE
-#endif
-#ifdef TOURIST
-			 | W_ARMU
-#endif
-			);
+			 W_RINGL | W_RINGR | W_TOOL | W_BALL | W_CHAIN | W_SADDLE | W_ARMU);
 
 	dtyp = abil_to_adtyp(abil);
 	spfx = abil_to_spfx(abil);
@@ -1867,7 +1861,6 @@ int dropflag;	/* 0==don't drop, 1==drop all, 2==drop weapon */
     /* check primary weapon next so that they're handled together */
     if (uwep) (void)untouchable(uwep, dropit);
 
-#ifdef STEED
     /* in case someone is daft enough to add artifact or silver saddle */
     if (u.usteed && (obj = which_armor(u.usteed, W_SADDLE)) != 0) {
 	/* untouchable() calls retouch_object() which expects an object in
@@ -1875,7 +1868,6 @@ int dropflag;	/* 0==don't drop, 1==drop all, 2==drop weapon */
 	   saddle and we're suppressing drop, so this works as intended */
 	if (untouchable(obj, FALSE)) dismount_steed(DISMOUNT_THROWN);
     }
-#endif
     /*
      * TODO?  Force off gloves if either or both rings are going to
      * become unworn; force off cloak [suit] before suit [shirt].

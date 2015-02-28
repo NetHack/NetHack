@@ -1,6 +1,9 @@
 #	NetHack Copyright (c) NetHack PC Development Team 1993 - 2006
 #	NetHack may be freely redistributed.  See license for details.
 #
+# $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+# $Date: 2006/09/23 04:40:09 $  $Revision: 1.7 $
+#
 # A '#' at the beginning of a line means the rest of the line is a comment.
 #
 # Some options MUST be set in this file, other options can be toggled while

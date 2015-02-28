@@ -1,4 +1,5 @@
-/* NetHack 3.5	shknam.c	$Date$  $Revision$ */
+/* NetHack 3.5	shknam.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	shknam.c	$Date: 2011/04/15 01:55:42 $  $Revision: 1.24 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -509,7 +510,6 @@ struct mkroom	*sroom;
 	else if(sy == sroom->hy+1) sy--; else {
 	shk_failed:
 #ifdef DEBUG
-# ifdef WIZARD
 	    /* Said to happen sometimes, but I have never seen it. */
 	    /* Supposedly fixed by fdoor change in mklev.c */
 	    if(wizard) {
@@ -526,7 +526,6 @@ struct mkroom	*sroom;
 		}
 		display_nhwindow(WIN_MESSAGE, FALSE);
 	    }
-# endif
 #endif
 	    return(-1);
 	}
@@ -553,11 +552,7 @@ struct mkroom	*sroom;
 	eshkp->billct = eshkp->visitct = 0;
 	eshkp->bill_p = (struct bill_x *)0;
 	eshkp->customer[0] = '\0';
-#ifndef GOLDOBJ
-	shk->mgold = 1000L + 30L*(long)rnd(100);	/* initial capital */
-#else
         mkmonmoney(shk, 1000L + 30L*(long)rnd(100));	/* initial capital */
-#endif
 	if (shp->shknms == shkrings)
 	    (void) mongets(shk, TOUCHSTONE);
 	nameshk(shk, shp->shknms);

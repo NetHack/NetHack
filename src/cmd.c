@@ -1,10 +1,10 @@
-/* NetHack 3.5	cmd.c	$Date$  $Revision$ */
+/* NetHack 3.5	cmd.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	cmd.c	$Date: 2013/03/16 01:44:28 $  $Revision: 1.162 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 #include "func_tab.h"
-/* #define DEBUG */	/* uncomment for debugging */
 
 #ifdef ALTMETA
 STATIC_VAR boolean alt_esc = FALSE;
@@ -29,12 +29,8 @@ extern const char *enc_stat[];	/* encumbrance status from botl.c */
 #define CMD_CLICKLOOK	(char)0x8F
 
 #ifdef DEBUG
-/*
- * only one "wiz_debug_cmd" routine should be available (in whatever
- * module you are trying to debug) or things are going to get rather
- * hard to link :-)
- */
-extern int NDECL(wiz_debug_cmd);
+extern int NDECL(wiz_debug_cmd_bury);
+extern int NDECL(wiz_debug_cmd_traveldisplay);
 #endif
 
 #ifdef DUMB	/* stuff commented out in extern.h, but needed here */
@@ -122,12 +118,9 @@ STATIC_PTR int NDECL(doprev_message);
 STATIC_PTR int NDECL(timed_occupation);
 STATIC_PTR int NDECL(doextcmd);
 STATIC_PTR int NDECL(domonability);
-#ifdef DUNGEON_OVERVIEW
 STATIC_PTR int NDECL(dooverview_or_wiz_where);
-#endif /* DUNGEON_OVERVIEW */
 STATIC_PTR int NDECL(dotravel);
 STATIC_PTR int NDECL(doterrain);
-# ifdef WIZARD
 STATIC_PTR int NDECL(wiz_wish);
 STATIC_PTR int NDECL(wiz_identify);
 STATIC_PTR int NDECL(wiz_map);
@@ -165,7 +158,6 @@ STATIC_DCL int NDECL(wiz_port_debug);
 #  endif
 STATIC_PTR int NDECL(wiz_rumor_check);
 STATIC_DCL char FDECL(cmd_from_func, (int NDECL((*))));
-# endif /* WIZARD */
 STATIC_PTR int NDECL(doattributes);
 STATIC_PTR int NDECL(doconduct); /**/
 
@@ -244,7 +236,6 @@ int xtime;
 	return;
 }
 
-#ifdef REDO
 
 STATIC_DCL char NDECL(popch);
 
@@ -306,7 +297,6 @@ char ch;
 	}
 	return;
 }
-#endif /* REDO */
 
 STATIC_PTR int
 doextcmd(VOID_ARGS)	/* here after # - now read a full-word command */
@@ -392,11 +382,11 @@ extcmd_via_menu() /* here after # - now show pick-list of possible commands */
 		    Sprintf(fmtstr, "%%-%ds", biggest + 15);
 		}
 		if (++i > MAX_EXT_CMD) {
-# if defined(DEBUG) || defined(BETA)
+# if defined(BETA)
 		    impossible(
        "Exceeded %d extended commands in doextcmd() menu; 'extmenu' disabled.",
 			       MAX_EXT_CMD);
-# endif	/* DEBUG || BETA */
+# endif	/* BETA */
 		    iflags.extmenu = 0;
 		    return -1;
 		}
@@ -457,7 +447,7 @@ extcmd_via_menu() /* here after # - now show pick-list of possible commands */
 	if (n == 1) {
 	    if (matchlevel > (QBUFSZ - 2)) {
 		free((genericptr_t)pick_list);
-# if defined(DEBUG) || defined(BETA)
+# if defined(BETA)
 		impossible("Too many chars (%d) entered in extcmd_via_menu()",
 			   matchlevel);
 # endif
@@ -515,9 +505,7 @@ int
 enter_explore_mode(VOID_ARGS)
 {
     if (wizard) {
-#ifdef WIZARD
 	You("are in debug mode.");
-#endif
     } else if (discover) {
 	You("are already in explore mode.");
     } else {
@@ -536,20 +524,13 @@ enter_explore_mode(VOID_ARGS)
     return 0;
 }
 
-#ifdef DUNGEON_OVERVIEW
 STATIC_PTR int
 dooverview_or_wiz_where(VOID_ARGS)
 {
-#ifdef WIZARD
 	if (wizard) return wiz_where();
-	else
-#endif
-	dooverview();
+	else dooverview();
 	return 0;
 }
-
-#endif /* DUNGEON_OVERVIEW */
-#ifdef WIZARD
 
 /* ^W command - wish for something */
 STATIC_PTR int
@@ -875,11 +856,9 @@ wiz_map_levltyp(VOID_ARGS)
 	if (level.flags.nfountains) Sprintf(eos(dsc), " %c:%d",
 					    defsyms[S_fountain].sym,
 					    (int)level.flags.nfountains);
-#ifdef SINKS
 	if (level.flags.nsinks) Sprintf(eos(dsc), " %c:%d",
 					defsyms[S_sink].sym,
 					(int)level.flags.nsinks);
-#endif
 	if (level.flags.has_vault)	Strcat(dsc, " vault");
 	if (level.flags.has_shop)	Strcat(dsc, " shop");
 	if (level.flags.has_temple)	Strcat(dsc, " temple");
@@ -1068,7 +1047,6 @@ wiz_rumor_check(VOID_ARGS)
 	rumor_check();
 	return 0;
 }
-#endif /* WIZARD */
 
 /* #terrain command */
 STATIC_PTR int
@@ -1096,7 +1074,6 @@ doterrain(VOID_ARGS)
 	add_menu(men, NO_GLYPH, &any, 0, 0, ATR_NONE,
 		 "full map without monsters, objects, and traps",
 		 MENU_UNSELECTED);
-#ifdef WIZARD
 	if (wizard) {
 	    any.a_int = 3;
 	    add_menu(men, NO_GLYPH, &any, 0, 0, ATR_NONE,
@@ -1107,7 +1084,6 @@ doterrain(VOID_ARGS)
 		     "legend of base-36 levl[][].typ codes",
 		     MENU_UNSELECTED);
 	}
-#endif
 	end_menu(men, "View which?");
 
 	n = select_menu(men, PICK_ONE, &sel);
@@ -1126,10 +1102,8 @@ doterrain(VOID_ARGS)
     switch (which) {
     case 1: reveal_terrain(FALSE); break;		/* known map */
     case 2: reveal_terrain(TRUE); break;		/* full map */
-#ifdef WIZARD
     case 3: wiz_map_levltyp(); break;		/* map internals */
     case 4: wiz_levltyp_legend(); break;	/* internal details */
-#endif
     default: break;
     }
     return 0;	/* no time elapses */
@@ -1527,7 +1501,6 @@ int final;
 	boolean magic = (mode & MAGICENLIGHTENMENT) ? TRUE : FALSE;
 	int cap;
 	char buf[BUFSZ], youtoo[BUFSZ];
-#ifdef STEED
 	boolean Riding = (u.usteed &&
 			/* if hero dies while dismounting, u.usteed will still
 			   be set; we want to ignore steed in that situation */
@@ -1539,7 +1512,6 @@ int final;
 				(char *)0, 
 				(SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION),
 				FALSE);
-#endif
 
 	/*\
 	 * Status (many are abbreviated on bottom line; others are or   
@@ -1552,7 +1524,6 @@ int final;
 	/* not a traditional status but inherently obvious to player; more
 	   detail given below (attributes section) for magic enlightenment */
 	if (Upolyd) you_are("transformed", "");
-#ifdef STEED
 	/* not a trouble, but we want to display riding status before maybe
 	   reporting steed as trapped or hero stuck to cursed saddle */
 	if (Riding) {
@@ -1560,7 +1531,6 @@ int final;
 	    you_are(buf, "");
 	    Sprintf(eos(youtoo), "and %s ", steedname);
 	}
-#endif	/*STEED*/
 	/* other movement situations that hero should always know */
 	if (Levitation) {
 	    if (Lev_at_will && magic)
@@ -1593,9 +1563,7 @@ int final;
 		you_are("buried", "");
 	    } else {
 		Strcpy(buf, "being strangled");
-#ifdef WIZARD
 		if (wizard) Sprintf(eos(buf), " (%ld)", (Strangled & TIMEOUT));
-#endif
 		you_are(buf, from_what(STRANGLED));
 	    }
 	}
@@ -1638,21 +1606,17 @@ int final;
 		    Sprintf(eos(predicament), " in %s",
 			    an(defsyms[trap_to_defsym(t->ttyp)].explanation));
 	    }
-#ifdef STEED
 	    if (u.usteed) { /* not `Riding' here */
 		Sprintf(buf, "%s%s ", anchored ? "you and " : "", steedname);
 		*buf = highc(*buf);
 		enl_msg(buf, (anchored ? "are " : "is "),
 			(anchored ? "were " : "was "), predicament, "");
 	    } else
-#endif	/*STEED*/
 		you_are(predicament, "");
 	} /* (u.utrap) */
 	if (u.uswallow) {
 	    Sprintf(buf, "swallowed by %s", a_monnam(u.ustuck));
-#ifdef WIZARD
 	    if (wizard) Sprintf(eos(buf), " (%u)", u.uswldtim);
-#endif
 	    you_are(buf, "");
 	} else if (u.ustuck) {
 	    Sprintf(buf, "%s %s",
@@ -1660,7 +1624,6 @@ int final;
 		    a_monnam(u.ustuck));
 	    you_are(buf, "");
 	}
-#ifdef STEED
 	if (Riding) {
 	    struct obj *saddle = which_armor(u.usteed, W_SADDLE);
 
@@ -1670,22 +1633,16 @@ int final;
 		you_are(buf, "");
 	    }
 	}
-#endif	/*STEED*/
 	if (Wounded_legs) {
-#ifdef STEED
 	    /* when mounted, Wounded_legs applies to steed rather than to
 	       hero; we only report steed's wounded legs in wizard mode */
 	    if (u.usteed) { /* not `Riding' here */
-# ifdef WIZARD
 		if (wizard) {
 		    Strcpy(buf, steedname);
 		    *buf = highc(*buf);
 		    enl_msg(buf, " has", " had", " wounded legs", "");
 		}
-# endif
-	    } else
-#endif	/*STEED*/
-	    {
+	    } else {
 		Sprintf(buf, "wounded %s", makeplural(body_part(LEG)));
 		you_have(buf, "");
 	    }
@@ -1701,9 +1658,7 @@ int final;
 	if (Sleepy) {
 	    if (magic || cause_known(SLEEPY)) {
 		Strcpy(buf, from_what(SLEEPY));
-#ifdef WIZARD
 		if (wizard) Sprintf(eos(buf), " (%ld)", (HSleepy & TIMEOUT));
-#endif
 		enl_msg("You ", "fall", "fell", " asleep uncontrollably", buf);
 	    }
 	}
@@ -1784,7 +1739,6 @@ int final;
 	putstr(en_win, 0, "");
 	putstr(en_win, 0, final ? "Final Attributes:" : "Current Attributes:");
 
-#ifdef ELBERETH
 	if (u.uevent.uhand_of_elbereth) {
 	    static const char * const hofe_titles[3] = {
 				"the Hand of Elbereth",
@@ -1793,7 +1747,6 @@ int final;
 	    };
 	    you_are(hofe_titles[u.uevent.uhand_of_elbereth - 1],"");
 	}
-#endif
 
 	/* note: piousness 20 matches MIN_QUEST_ALIGN (quest.h) */
 	if (u.ualign.record >= 20)	you_are("piously aligned","");
@@ -1806,12 +1759,10 @@ int final;
 	else if (u.ualign.record >= -3)	you_have("strayed","");
 	else if (u.ualign.record >= -8)	you_have("sinned","");
 	else you_have("transgressed","");
-#ifdef WIZARD
 	if (wizard) {
 		Sprintf(buf, " %d", u.ualign.record);
 		enl_msg("Your alignment ", "is", "was", buf, "");
 	}
-#endif
 
 	/*** Resistances to troubles ***/
 	if (Invulnerable) you_are("invulnerable",from_what(INVULNERABLE));
@@ -1995,9 +1946,7 @@ int final;
 	if (Upolyd) {
 	    if (u.umonnum == u.ulycn) Strcpy(buf, "in beast form");
 	    else Sprintf(buf, "polymorphed into %s", an(youmonst.data->mname));
-#ifdef WIZARD
 	    if (wizard) Sprintf(eos(buf), " (%d)", u.mtimedone);
-#endif
 	    you_are(buf,"");
 	    if (lays_eggs(youmonst.data) && flags.female)
 		you_can("lay eggs", "");
@@ -2018,14 +1967,9 @@ int final;
 	    Sprintf(buf, "%s%slucky",
 		    ltmp >= 10 ? "extremely " : ltmp >= 5 ? "very " : "",
 		    Luck < 0 ? "un" : "");
-#ifdef WIZARD
 	    if (wizard) Sprintf(eos(buf), " (%d)", Luck);
-#endif
 	    you_are(buf,"");
-	}
-#ifdef WIZARD
-	 else if (wizard) enl_msg("Your luck ", "is", "was", " zero","");
-#endif
+	} else if (wizard) enl_msg("Your luck ", "is", "was", " zero","");
 	if (u.moreluck > 0) you_have("extra luck","");
 	else if (u.moreluck < 0) you_have("reduced luck","");
 	if (carrying(LUCKSTONE) || stone_luck(TRUE)) {
@@ -2039,9 +1983,7 @@ int final;
 	if (u.ugangr) {
 	    Sprintf(buf, " %sangry with you",
 		    u.ugangr > 6 ? "extremely " : u.ugangr > 3 ? "very " : "");
-#ifdef WIZARD
 	    if (wizard) Sprintf(eos(buf), " (%d)", u.ugangr);
-#endif
 	    enl_msg(u_gname(), " is", " was", buf,"");
 	} else
 	    /*
@@ -2057,9 +1999,7 @@ int final;
 #else
 	    Sprintf(buf, "%ssafely pray", can_pray(FALSE) ? "" : "not ");
 #endif
-#ifdef WIZARD
 	    if (wizard) Sprintf(eos(buf), " (%d)", u.ublesscnt);
-#endif
 	    you_can(buf,"");
 	}
 	if (wizard) {
@@ -2319,25 +2259,21 @@ int final;
 
 	if (!u.uconduct.weaphit)
 	    you_have_never("hit with a wielded weapon");
-#ifdef WIZARD
 	else if (wizard) {
 	    Sprintf(buf, "used a wielded weapon %ld time%s",
 		    u.uconduct.weaphit, plur(u.uconduct.weaphit));
 	    you_have_X(buf);
 	}
-#endif
 	if (!u.uconduct.killer)
 	    you_have_been("a pacifist");
 
 	if (!u.uconduct.literate)
 	    you_have_been("illiterate");
-#ifdef WIZARD
 	else if (wizard) {
 	    Sprintf(buf, "read items or engraved %ld time%s",
 		    u.uconduct.literate, plur(u.uconduct.literate));
 	    you_have_X(buf);
 	}
-#endif
 
 	ngenocided = num_genocides();
 	if (ngenocided == 0) {
@@ -2350,23 +2286,19 @@ int final;
 
 	if (!u.uconduct.polypiles)
 	    you_have_never("polymorphed an object");
-#ifdef WIZARD
 	else if (wizard) {
 	    Sprintf(buf, "polymorphed %ld item%s",
 		    u.uconduct.polypiles, plur(u.uconduct.polypiles));
 	    you_have_X(buf);
 	}
-#endif
 
 	if (!u.uconduct.polyselfs)
 	    you_have_never("changed form");
-#ifdef WIZARD
 	else if (wizard) {
 	    Sprintf(buf, "changed form %ld time%s",
 		    u.uconduct.polyselfs, plur(u.uconduct.polyselfs));
 	    you_have_X(buf);
 	}
-#endif
 
 	if (!u.uconduct.wishes)
 	    you_have_X("used no wishes");
@@ -2399,36 +2331,24 @@ int final;
 
 static const struct func_tab cmdlist[] = {
 	{C('d'), FALSE, dokick}, /* "D" is for door!...?  Msg is in dokick.c */
-#ifdef WIZARD
 	{C('e'), TRUE, wiz_detect},
 	{C('f'), TRUE, wiz_map},
 	{C('g'), TRUE, wiz_genesis},
 	{C('i'), TRUE, wiz_identify},
-#endif
 	{C('l'), TRUE, doredraw}, /* if number_pad is set */
-#ifndef DUNGEON_OVERVIEW
-#ifdef WIZARD
-	{C('o'), TRUE, wiz_where},
-#endif
-#else
 	{C('n'), TRUE, donamelevel}, /* if number_pad is set */
 	{C('o'), TRUE, dooverview_or_wiz_where}, /* depending on wizard status */
-#endif /* DUNGEON_OVERVIEW */
 	{C('p'), TRUE, doprev_message},
 	{C('r'), TRUE, doredraw},
 	{C('t'), TRUE, dotele},
-#ifdef WIZARD
 	{C('v'), TRUE, wiz_level_tele},
 	{C('w'), TRUE, wiz_wish},
-#endif
 	{C('x'), TRUE, doattributes},
 	{C('z'), TRUE, dosuspend_core},
 	{'a', FALSE, doapply},
 	{'A', FALSE, doddoremarm},
 	{M('a'), TRUE, doorganize},
-#ifdef DUNGEON_OVERVIEW
 	{M('A'), TRUE, donamelevel},	/* #annotate */
-#endif
 /*	'b', 'B' : go sw */
 	{'c', FALSE, doclose},
 	{'C', TRUE, docallcmd},
@@ -2463,9 +2383,7 @@ static const struct func_tab cmdlist[] = {
 	{'o', FALSE, doopen},
 	{'O', TRUE, doset},
 	{M('o'), FALSE, dosacrifice},
-#ifdef DUNGEON_OVERVIEW
 	{M('O'), TRUE, dooverview},	/* #overview */
-#endif
 	{'p', FALSE, dopay},
 	{'P', FALSE, doputon},
 	{M('p'), TRUE, dopray},
@@ -2475,9 +2393,7 @@ static const struct func_tab cmdlist[] = {
 	{'r', FALSE, doread},
 	{'R', FALSE, doremring},
 	{M('r'), FALSE, dorub},
-#ifdef STEED
 	{M('R'), FALSE, doride},	/* #ride */
-#endif
 	{'s', TRUE, dosearch, "searching"},
 	{'S', TRUE, dosave},
 	{M('s'), FALSE, dosit},
@@ -2533,9 +2449,7 @@ static const struct func_tab cmdlist[] = {
 
 struct ext_func_tab extcmdlist[] = {
 	{"adjust", "adjust inventory letters", doorganize, TRUE},
-#ifdef DUNGEON_OVERVIEW
 	{"annotate", "name current level", donamelevel, TRUE},
-#endif /* DUNGEON_OVERVIEW */
 	{"chat", "talk to someone", dotalk, TRUE},	/* converse? */
 	{"conduct", "list voluntary challenges you have maintained",
 						doconduct, TRUE},
@@ -2549,14 +2463,10 @@ struct ext_func_tab extcmdlist[] = {
 	{"monster", "use a monster's special ability", domonability, TRUE},
 	{"name", "name a monster or an object", docallcmd, TRUE},
 	{"offer", "offer a sacrifice to the gods", dosacrifice, FALSE},
-#ifdef DUNGEON_OVERVIEW
 	{"overview", "show an overview of the dungeon", dooverview, TRUE},
-#endif /* DUNGEON_OVERVIEW */
 	{"pray", "pray to the gods for help", dopray, TRUE},
 	{"quit", "exit without saving current game", done2, TRUE},
-#ifdef STEED
 	{"ride", "ride (or stop riding) a monster", doride, FALSE},
-#endif
 	{"rub", "rub a lamp or a stone", dorub, FALSE},
 	{"sit", "sit down", dosit, FALSE},
 	{"terrain", "show map without obstructions", doterrain, TRUE},
@@ -2568,7 +2478,6 @@ struct ext_func_tab extcmdlist[] = {
 		doextversion, TRUE},
 	{"wipe", "wipe off your face", dowipe, FALSE},
 	{"?", "get this list of extended commands", doextlist, TRUE},
-#if defined(WIZARD)
 	/*
 	 * There must be a blank entry here for every entry in the table
 	 * below.
@@ -2591,15 +2500,14 @@ struct ext_func_tab extcmdlist[] = {
 	{(char *)0, (char *)0, donull, TRUE},	/* vision */
 	{(char *)0, (char *)0, donull, TRUE},	/* wizsmell */
 #ifdef DEBUG
-	{(char *)0, (char *)0, donull, TRUE},	/* wizdebug */
+	{(char *)0, (char *)0, donull, TRUE},	/* wizdebug_traveldisplay */
+	{(char *)0, (char *)0, donull, TRUE},	/* wizdebug_bury */
 #endif
 	{(char *)0, (char *)0, donull, TRUE},	/* wizrumorcheck */
 	{(char *)0, (char *)0, donull, TRUE},	/* wmode */
-#endif
 	{(char *)0, (char *)0, donull, TRUE}	/* sentinel */
 };
 
-#ifdef WIZARD
 /* there must be a placeholder in the table above for every entry here */
 static const struct ext_func_tab debug_extcmdlist[] = {
 	{"levelchange", "change experience level", wiz_level_change, TRUE},
@@ -2620,7 +2528,8 @@ static const struct ext_func_tab debug_extcmdlist[] = {
 	{"vision", "show vision array", wiz_show_vision, TRUE},
 	{"wizsmell", "smell monster", wiz_smell, TRUE},
 #ifdef DEBUG
-	{"wizdebug", "wizard debug command", wiz_debug_cmd, TRUE},
+	{"wizdebug_traveldisplay", "wizard debug: toggle travel display", wiz_debug_cmd_traveldisplay, TRUE},
+	{"wizdebug_bury", "wizard debug: bury objs under and around you", wiz_debug_cmd_bury, TRUE},
 #endif
 	{"wizrumorcheck", "verify rumor boundaries", wiz_rumor_check, TRUE},
 	{"wmode", "show wall modes", wiz_show_wmodes, TRUE},
@@ -2918,8 +2827,6 @@ wiz_migrate_mons()
 }
 #endif
 
-#endif /* WIZARD */
-
 #define unctrl(c)	((c) <= C('z') ? (0x60 | (c)) : (c))
 #define unmeta(c)	(0x7f & (c))
 
@@ -3041,7 +2948,6 @@ register char *cmd;
 		context.move = FALSE;
 		return;
 	}
-#ifdef REDO
 	if (*cmd == DOAGAIN && !in_doagain && saveq[0]) {
 		in_doagain = TRUE;
 		stail = 0;
@@ -3051,9 +2957,6 @@ register char *cmd;
 	}
 	/* Special case of *cmd == ' ' handled better below */
 	if(!*cmd || *cmd == (char)0377)
-#else
-	if(!*cmd || *cmd == (char)0377 || (!flags.rest_on_space && *cmd == ' '))
-#endif
 	{
 		nhbell();
 		context.move = FALSE;
@@ -3344,11 +3247,9 @@ const char *s;
 	int is_mov;
 
  retry:
-#ifdef REDO
 	if (in_doagain || *readchar_queue)
 	    dirsym = readchar();
 	else
-#endif
 	    dirsym = yn_function((s && *s != '^') ? s : "In what direction?",
 					(char *)0, '\0');
 	/* remove the prompt string so caller won't have to */
@@ -3358,9 +3259,7 @@ const char *s;
 	    docrt();		/* redraw */
 	    goto retry;
 	}
-#ifdef REDO
 	savech(dirsym);
-#endif
 
 	if (dirsym == '.' || dirsym == 's') {
 	    u.dx = u.dy = u.dz = 0;
@@ -3407,11 +3306,7 @@ const char *msg;
 	    sym = highc(sym);
 	    ctrl = (sym - 'A') + 1;
 	    if ((explain = dowhatdoes_core(ctrl, buf2))
-		&& (!index(wiz_only_list, sym)
-#ifdef WIZARD
-		    || wizard
-#endif
-	                     )) {
+		&& (!index(wiz_only_list, sym) || wizard)) {
 		Sprintf(buf, "Are you trying to use ^%c%s?", sym,
 			index(wiz_only_list, sym) ? "" :
 			" as specified in the Guidebook");
@@ -3649,14 +3544,12 @@ parse()
 	if (foo == '\033') {   /* esc cancels count (TH) */
 	    clear_nhwindow(WIN_MESSAGE);
 	    multi = last_multi = 0;
-# ifdef REDO
 	} else if (foo == DOAGAIN || in_doagain) {
 	    multi = last_multi;
 	} else {
 	    last_multi = multi;
 	    savech(0);	/* reset input queue */
 	    savech((char)foo);
-# endif
 	}
 
 	if (multi) {
@@ -3684,9 +3577,7 @@ parse()
 	if (foo == 'g' || foo == 'G' || foo == 'm' || foo == 'M' ||
 	    foo == 'F' || (Cmd.num_pad && (foo == '5' || foo == '-'))) {
 	    foo = readchar();
-#ifdef REDO
 	    savech((char)foo);
-#endif
 	    in_line[1] = foo;
 	    in_line[2] = 0;
 	}
@@ -3753,11 +3644,7 @@ readchar()
 	if ( *readchar_queue )
 	    sym = *readchar_queue++;
 	else
-#ifdef REDO
-	    sym = in_doagain ? Getchar() : nh_poskey(&x, &y, &mod);
-#else
-	    sym = Getchar();
-#endif
+	    sym = in_doagain ? pgetchar() : nh_poskey(&x, &y, &mod);
 
 #ifdef NR_OF_EOFS
 	if (sym == EOF) {
@@ -3769,7 +3656,7 @@ readchar()
 	   */
 	    do {
 		clearerr(stdin);	/* omit if clearerr is undefined */
-		sym = Getchar();
+		sym = pgetchar();
 	    } while (--cnt && sym == EOF);
 	}
 #endif /* NR_OF_EOFS */
@@ -3782,7 +3669,7 @@ readchar()
 #ifdef ALTMETA
 	} else if (sym == '\033' && alt_esc) {
 	    /* iflags.altmeta: treat two character ``ESC c'' as single `M-c' */
-	    sym = *readchar_queue ? *readchar_queue++ : Getchar();
+	    sym = *readchar_queue ? *readchar_queue++ : pgetchar();
 	    if (sym == EOF || sym == 0)
 		sym = '\033';
 	    else if (sym != '\033')

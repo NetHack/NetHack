@@ -1,4 +1,5 @@
-/* NetHack 3.5	pckeys.c	$Date$  $Revision$ */
+/* NetHack 3.5	pckeys.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	pckeys.c	$Date: 2009/05/06 10:49:39 $  $Revision: 1.4 $ */
 /*	SCCS Id: @(#)pckeys.c	 3.5	 1996/05/11		  */
 /* Copyright (c) NetHack PC Development Team 1996                 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -55,24 +56,16 @@ unsigned char shift;
 			vga_userpan(0);
 		break;
 	case 0x3E:	/* F4 = toggle overview mode */
-		if (iflags.tile_view && 
-		    !opening_dialog
-#ifdef REINCARNATION
-				&& !Is_rogue_level(&u.uz)
-#endif
-							) {
+		if (iflags.tile_view && !opening_dialog
+                    && !Is_rogue_level(&u.uz)) {
 			iflags.traditional_view = FALSE;
 			vga_overview(iflags.over_view ? FALSE : TRUE);
 			vga_refresh();
 		}
 		break;
 	case 0x3F:	/* F5 = toggle traditional mode */
-		if (iflags.tile_view &&
-		    !opening_dialog
-#ifdef REINCARNATION
-				&& !Is_rogue_level(&u.uz)
-#endif
-							) {
+		if (iflags.tile_view && !opening_dialog
+                        && !Is_rogue_level(&u.uz)) {
 			iflags.over_view = FALSE;
 			vga_traditional(iflags.traditional_view ? FALSE : TRUE);
 			vga_refresh();

@@ -1,4 +1,5 @@
-/* NetHack 3.5	wingem.h	$Date$  $Revision$ */
+/* NetHack 3.5	wingem.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	wingem.h	$Date: 2012/01/24 04:26:18 $  $Revision: 1.7 $ */
 /* Copyright (c) Christian Bressler, 1999				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

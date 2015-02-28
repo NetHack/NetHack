@@ -1,4 +1,5 @@
-@REM  NetHack 3.5 cesetup.bat	$Date$ $Revision$ */
+@REM  NetHack 3.5 cesetup.bat	$NHDT-Date$ $NHDT-Branch$:$NHDT-Revision$ */
+@REM  NetHack 3.5 cesetup.bat	$Date: 2009/10/22 02:59:30 $ $Revision: 1.9 $ */
 @REM  Copyright (c) Alex Kompel, 2002
 @REM  NetHack may be freely redistributed.  See license for details. 
 @REM  Win32 nhsetup batch file, see Install.ce for details

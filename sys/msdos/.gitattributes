@@ -1,0 +1,4 @@
+*.BC filter=NHtext merge=NHsubst
+*.bat filter=NHtext merge=NHsubst
+Makefile.* filter=NHtext merge=NHsubst
+Install.* filter=NHtext merge=NHsubst

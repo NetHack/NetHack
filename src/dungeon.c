@@ -1,4 +1,5 @@
-/* NetHack 3.5	dungeon.c	$Date$  $Revision$ */
+/* NetHack 3.5	dungeon.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	dungeon.c	$Date: 2012/04/14 08:31:05 $  $Revision: 1.34 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -49,16 +50,13 @@ STATIC_DCL void FDECL(init_level, (int,int,struct proto_dungeon *));
 STATIC_DCL int FDECL(possible_places, (int, boolean *, struct proto_dungeon *));
 STATIC_DCL xchar FDECL(pick_level, (boolean *, int));
 STATIC_DCL boolean FDECL(place_level, (int, struct proto_dungeon *));
-#ifdef WIZARD
 STATIC_DCL boolean FDECL(unplaced_floater, (struct dungeon *));
 STATIC_DCL boolean FDECL(unreachable_level, (d_level *,BOOLEAN_P));
 STATIC_DCL void FDECL(tport_menu, (winid,char *,struct lchoice *,
 				   d_level *,BOOLEAN_P));
 STATIC_DCL const char *FDECL(br_string, (int));
 STATIC_DCL void FDECL(print_branch, (winid, int, int, int, BOOLEAN_P, struct lchoice *));
-#endif
 
-#ifdef DUNGEON_OVERVIEW
 mapseen *mapseenchn = (struct mapseen *)0;
 STATIC_DCL mapseen *FDECL(load_mapseen, (int));
 STATIC_DCL void FDECL(save_mapseen, (int, mapseen *));
@@ -71,7 +69,6 @@ STATIC_DCL const char *FDECL(br_string2, (branch *));
 STATIC_DCL const char *FDECL(endgamelevelname, (char *,int));
 STATIC_DCL const char *FDECL(shop_string, (int));
 STATIC_DCL char *FDECL(tunesuffix, (mapseen *,char *));
-#endif /* DUNGEON_OVERVIEW */
 
 #ifdef DEBUG
 #define DD	dungeons[i]
@@ -83,6 +80,8 @@ dumpit()
 	int	i;
 	s_level	*x;
 	branch *br;
+
+	if (!showdebug()) return;
 
 	for(i = 0; i < n_dgns; i++)  {
 	    fprintf(stderr, "\n#%d \"%s\" (%s):\n", i,
@@ -134,9 +133,7 @@ save_dungeon(fd, perform_write, free_data)
     boolean perform_write, free_data;
 {
     branch *curr, *next;
-#ifdef DUNGEON_OVERVIEW
     mapseen *curr_ms, *next_ms;
-#endif
     int    count;
 
     if (perform_write) {
@@ -158,14 +155,12 @@ save_dungeon(fd, perform_write, free_data)
 			(unsigned)count * sizeof (struct linfo));
 	bwrite(fd, (genericptr_t) &inv_pos, sizeof inv_pos);
 
-#ifdef DUNGEON_OVERVIEW
 	for (count = 0, curr_ms = mapseenchn; curr_ms; curr_ms = curr_ms->next)
 	    count++;
 	bwrite(fd, (genericptr_t) &count, sizeof(count));
 
 	for (curr_ms = mapseenchn; curr_ms; curr_ms = curr_ms->next)
 	    save_mapseen(fd, curr_ms);
-#endif /* DUNGEON_OVERVIEW */
     }
 
     if (free_data) {
@@ -174,7 +169,6 @@ save_dungeon(fd, perform_write, free_data)
 	    free((genericptr_t) curr);
 	}
 	branches = 0;
-#ifdef DUNGEON_OVERVIEW
 	for (curr_ms = mapseenchn; curr_ms; curr_ms = next_ms) {
 	    next_ms = curr_ms->next;
 	    if (curr_ms->custom)
@@ -182,7 +176,6 @@ save_dungeon(fd, perform_write, free_data)
 	    free((genericptr_t) curr_ms);
 	}
 	mapseenchn = 0;
-#endif /* DUNGEON_OVERVIEW */
     }
 }
 
@@ -193,9 +186,7 @@ restore_dungeon(fd)
 {
     branch *curr, *last;
     int    count, i;
-#ifdef DUNGEON_OVERVIEW
     mapseen *curr_ms, *last_ms;
-#endif
 
     mread(fd, (genericptr_t) &n_dgns, sizeof(n_dgns));
     mread(fd, (genericptr_t) dungeons, sizeof(dungeon) * (unsigned)n_dgns);
@@ -222,7 +213,6 @@ restore_dungeon(fd)
     mread(fd, (genericptr_t) level_info, (unsigned)count*sizeof(struct linfo));
     mread(fd, (genericptr_t) &inv_pos, sizeof inv_pos);
 
-#ifdef DUNGEON_OVERVIEW
     mread(fd, (genericptr_t) &count, sizeof(count));
     last_ms = (mapseen *) 0;
     for (i = 0; i < count; i++) {
@@ -234,7 +224,6 @@ restore_dungeon(fd)
 	    mapseenchn = curr_ms;
 	last_ms = curr_ms;
     }
-#endif /* DUNGEON_OVERVIEW */
 }
 
 static void
@@ -532,10 +521,7 @@ init_level(dgn, proto_index, pd)
 	struct tmplevel *tlevel = &pd->tmplevel[proto_index];
 
 	pd->final_lev[proto_index] = (s_level *) 0; /* no "real" level */
-#ifdef WIZARD
-	if (!wizard)
-#endif
-	    if (tlevel->chance <= rn2(100)) return;
+	if (!wizard && tlevel->chance <= rn2(100)) return;
 
 	pd->final_lev[proto_index] = new_level =
 					(s_level *) alloc(sizeof(s_level));
@@ -679,9 +665,7 @@ struct level_map {
 	{ "medusa",	&medusa_level },
 	{ "oracle",	&oracle_level },
 	{ "orcus",	&orcus_level },
-#ifdef REINCARNATION
 	{ "rogue",	&rogue_level },
-#endif
 	{ "sanctum",	&sanctum_level },
 	{ "valley",	&valley_level },
 	{ "water",	&water_level },
@@ -755,10 +739,8 @@ init_dungeons()		/* initialize the "dungeon" structs */
 	for (i = 0; i < n_dgns; i++) {
 	    Fread((genericptr_t)&pd.tmpdungeon[i],
 				    sizeof(struct tmpdungeon), 1, dgn_file);
-#ifdef WIZARD
-	    if(!wizard)
-#endif
-	      if(pd.tmpdungeon[i].chance && (pd.tmpdungeon[i].chance <= rn2(100))) {
+	    if(!wizard && pd.tmpdungeon[i].chance
+                && (pd.tmpdungeon[i].chance <= rn2(100))) {
 		int j;
 
 		/* skip over any levels or branches */
@@ -1147,10 +1129,8 @@ int x, y;
 #ifdef CLIPPING
 	cliparound(u.ux, u.uy);
 #endif
-#ifdef STEED
 	/* ridden steed always shares hero's location */
 	if (u.usteed) u.usteed->mx = u.ux, u.usteed->my = u.uy;
-#endif
 	/* when changing levels, don't leave old position set with
 	   stale values from previous level */
 	if (!on_level(&u.uz, &u.uz0)) u.ux0 = u.ux, u.uy0 = u.uy;
@@ -1557,9 +1537,7 @@ const char *nam;
 		(u.uz.dnum == medusa_level.dnum &&
 			dlev.dnum == valley_level.dnum)) &&
 	    (	/* either wizard mode or else seen and not forgotten */
-#ifdef WIZARD
 	     wizard ||
-#endif
 		(level_info[idx].flags & (FORGOTTEN|VISITED)) == VISITED)) {
 	    lev = depth(&slev->dlevel);
 	}
@@ -1573,9 +1551,7 @@ const char *nam;
 	    idxtoo = (idx >> 8) & 0x00FF;
 	    idx &= 0x00FF;
 	    if (  /* either wizard mode, or else _both_ sides of branch seen */
-#ifdef WIZARD
 		wizard ||
-#endif
 		((level_info[idx].flags & (FORGOTTEN|VISITED)) == VISITED &&
 		 (level_info[idxtoo].flags & (FORGOTTEN|VISITED)) == VISITED)) {
 		if (ledger_to_dnum(idxtoo) == u.uz.dnum) idx = idxtoo;
@@ -1587,8 +1563,6 @@ const char *nam;
     }
     return lev;
 }
-
-#ifdef WIZARD
 
 STATIC_OVL boolean
 unplaced_floater(dptr)
@@ -1836,9 +1810,7 @@ xchar *rdgn;
     destroy_nhwindow(win);
     return 0;
 }
-#endif /* WIZARD */
 
-#ifdef DUNGEON_OVERVIEW
 /* Record that the player knows about a branch from a level. This function
  * will determine whether or not it was a "real" branch that was taken.
  * This function should not be called for a transition done via level
@@ -2087,9 +2059,7 @@ mapseen *mptr;
     if (mptr->flags.unreachable || mptr->flags.forgot) return FALSE;
     /* level is of interest if it has an auto-generated annotation */
     if (mptr->flags.oracle || mptr->flags.bigroom ||
-# ifdef REINCARNATION
 	mptr->flags.roguelevel ||
-# endif
 	mptr->flags.castle || mptr->flags.valley ||
 	mptr->flags.msanctum) return TRUE;
     /* when in Sokoban, list all sokoban levels visited; when not in it,
@@ -2152,9 +2122,7 @@ recalc_mapseen()
 	mptr->flags.bigroom = Is_bigroom(&u.uz);
     else if (mptr->flags.forgot)
 	mptr->flags.bigroom = 0;
-# ifdef REINCARNATION
     mptr->flags.roguelevel = Is_rogue_level(&u.uz);
-# endif
     mptr->flags.oracle = 0;	/* recalculated during room traversal below */
     mptr->flags.castletune = 0;
     /* flags.castle, flags.valley, flags.msanctum retain previous value */
@@ -2580,7 +2548,6 @@ boolean printdun;
 	 */
 	Sprintf(buf, "%sLevel %d:", TAB, i);
 	
-#ifdef WIZARD
     /* wizmode prints out proto dungeon names for clarity */
     if (wizard) {
 	s_level *slev;
@@ -2588,7 +2555,6 @@ boolean printdun;
 	if ((slev = Is_special(&mptr->lev)) != 0)
 	    Sprintf(eos(buf), " [%s]", slev->proto);
     }
-#endif
     /* [perhaps print custom annotation on its own line when it's long] */
     if (mptr->custom)
 	Sprintf(eos(buf), " (%s)", mptr->custom);
@@ -2651,10 +2617,8 @@ boolean printdun;
 		mptr->flags.sokosolved ? "Solved" : "Unsolved");
     } else if (mptr->flags.bigroom) {
 	Sprintf(buf, "%sA very big room.", PREFIX);
-# ifdef REINCARNATION
     } else if (mptr->flags.roguelevel) {
 	Sprintf(buf, "%sA primitive area.", PREFIX);
-# endif
     } else if (on_level(&mptr->lev, &qstart_level)) {
 	Sprintf(buf, "%sHome%s.", PREFIX,
 		mptr->flags.unreachable ? " (no way back...)" : "");
@@ -2720,6 +2684,5 @@ boolean printdun;
 	}
     }
 }
-#endif /* DUNGEON_OVERVIEW */
 
 /*dungeon.c*/

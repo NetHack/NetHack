@@ -1,4 +1,5 @@
-/* NetHack 3.5	uhitm.c	$Date$  $Revision$ */
+/* NetHack 3.5	uhitm.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	uhitm.c	$Date: 2012/05/01 02:22:33 $  $Revision: 1.116 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -10,9 +11,7 @@ STATIC_DCL boolean FDECL(theft_petrifies, (struct obj *));
 STATIC_DCL void FDECL(steal_it, (struct monst *, struct attack *));
 STATIC_DCL boolean FDECL(hitum, (struct monst *,struct attack *));
 STATIC_DCL boolean FDECL(hmon_hitmon, (struct monst *,struct obj *,int));
-#ifdef STEED
 STATIC_DCL int FDECL(joust, (struct monst *,struct obj *));
-#endif
 STATIC_DCL void NDECL(demonpet);
 STATIC_DCL boolean FDECL(m_slips_free, (struct monst *mtmp,struct attack *mattk));
 STATIC_DCL int FDECL(explum, (struct monst *,struct attack *));
@@ -68,10 +67,8 @@ int attk;
 		}
 		if ((target = which_armor(mdef, W_ARM)) != (struct obj *)0) {
 		    (void)rust_dmg(target, xname(target), hurt, TRUE, mdef);
-#ifdef TOURIST
 		} else if ((target = which_armor(mdef, W_ARMU)) != (struct obj *)0) {
 		    (void)rust_dmg(target, xname(target), hurt, TRUE, mdef);
-#endif
 		}
 		break;
 	    case 2:
@@ -558,9 +555,7 @@ int thrown;		/* HMON_xxx (0 => hand-to-hand, other => ranged) */
 	boolean hand_to_hand = (thrown == HMON_MELEE ||
 				/* not grapnels; applied implies uwep */
 				(thrown == HMON_APPLIED && is_pole(uwep)));
-#ifdef STEED
 	int jousting = 0;
-#endif
 	int wtype;
 	struct obj *monwep;
 	char unconventional[BUFSZ]; /* substituted for word "attack" in msg */
@@ -606,11 +601,7 @@ int thrown;		/* HMON_xxx (0 => hand-to-hand, other => ranged) */
 		    /* or strike with a missile in your hand... */
 		    (!thrown && (is_missile(obj) || is_ammo(obj))) ||
 		    /* or use a pole at short range and not mounted... */
-		    (!thrown &&
-#ifdef STEED
-		     !u.usteed &&
-#endif
-		     is_pole(obj)) ||
+		    (!thrown && !u.usteed && is_pole(obj)) ||
 		    /* or throw a missile without the proper bow... */
 		    (is_ammo(obj) && (thrown != HMON_THROWN ||
 				      !ammo_and_launcher(obj, uwep)))) {
@@ -692,14 +683,12 @@ int thrown;		/* HMON_xxx (0 => hand-to-hand, other => ranged) */
 				&& mon_hates_silver(mon)) {
 			silvermsg = TRUE; silverobj = TRUE;
 		    }
-#ifdef STEED
 		    if (u.usteed && !thrown && tmp > 0 &&
 			    weapon_type(obj) == P_LANCE && mon != u.ustuck) {
 			jousting = joust(mon, obj);
 			/* exercise skill even for minimal damage hits */
 			if (jousting) valid_weapon_attack = TRUE;
 		    }
-#endif
 		    if (thrown == HMON_THROWN &&
 			    (is_ammo(obj) || is_missile(obj))) {
 			if (ammo_and_launcher(obj, uwep)) {
@@ -754,7 +743,6 @@ int thrown;		/* HMON_xxx (0 => hand-to-hand, other => ranged) */
 			}
 			tmp = 1;
 			break;
-#ifdef TOURIST
 		    case EXPENSIVE_CAMERA:
 			You("succeed in destroying %s.  Congratulations!",
 			    ysimple_name(obj));
@@ -762,7 +750,6 @@ int thrown;		/* HMON_xxx (0 => hand-to-hand, other => ranged) */
 			return(TRUE);
 			/*NOTREACHED*/
 			break;
-#endif
 		    case CORPSE:		/* fixed by polder@cs.vu.nl */
 			if (touch_petrifies(&mons[obj->corpsenm])) {
 			    tmp = 1;
@@ -990,7 +977,6 @@ int thrown;		/* HMON_xxx (0 => hand-to-hand, other => ranged) */
 	    }
 	}
 
-#ifdef STEED
 	if (jousting) {
 	    tmp += d(2, (obj == uwep) ? 10 : 2);	/* [was in dmgval()] */
 	    You("joust %s%s",
@@ -1011,11 +997,8 @@ int thrown;		/* HMON_xxx (0 => hand-to-hand, other => ranged) */
 		if (DEADMONSTER(mon)) already_killed = TRUE;
 	    }
 	    hittxt = TRUE;
-	} else
-#endif
-
-	/* VERY small chance of stunning opponent if unarmed. */
-	if (unarmed && tmp > 1 && !thrown && !obj && !Upolyd) {
+	} else if (unarmed && tmp > 1 && !thrown && !obj && !Upolyd) {
+        /* VERY small chance of stunning opponent if unarmed. */
 	    if (rnd(100) < P_SKILL(P_BARE_HANDED_COMBAT) &&
 			!bigmonst(mdat) && !thick_skinned(mdat)) {
 		if (canspotmon(mon))
@@ -1165,9 +1148,7 @@ struct attack *mattk;
 	    /* grabbing attacks the body */
 	    obj = which_armor(mdef, W_ARMC);		/* cloak */
 	    if (!obj) obj = which_armor(mdef, W_ARM);	/* suit */
-#ifdef TOURIST
 	    if (!obj) obj = which_armor(mdef, W_ARMU);	/* shirt */
-#endif
 	}
 
 	/* if monster's cloak/armor is greased, your grab slips off; this
@@ -1471,22 +1452,13 @@ register struct attack *mattk;
 		    minstapetrify(mdef, TRUE);
 		tmp = 0;
 		break;
-#ifdef SEDUCE
 	    case AD_SSEX:
-#endif
 	    case AD_SEDU:
 	    case AD_SITM:
 		steal_it(mdef, mattk);
 		tmp = 0;
 		break;
 	    case AD_SGLD:
-#ifndef GOLDOBJ
-		if (mdef->mgold) {
-		    u.ugold += mdef->mgold;
-		    mdef->mgold = 0;
-		    Your("purse feels heavier.");
-		}
-#else
                 /* This you as a leprechaun, so steal
                    real gold only, no lesser coins */
 	        {
@@ -1503,7 +1475,6 @@ register struct attack *mattk;
 		        }
 		    }
 	        }
-#endif
 		exercise(A_DEX, TRUE);
 		tmp = 0;
 		break;

@@ -1,5 +1,6 @@
 #
-# NetHack 3.5 sysconf $Date$ $Revision$
+# NetHack 3.5 sysconf $NHDT-Date$ $NHDT-Branch$:$NHDT-Revision$
+# NetHack 3.5 sysconf $Date: 2012/01/27 20:15:31 $ $Revision: 1.6 $
 #
 # Sample sysconf file.
 # The sysconf file is only used if NetHack is compiled with SYSCF defined.
@@ -12,6 +13,11 @@ WIZARDS=root games
 # Users allowed to use the ! (shell escape) command or to suspend the game.
 # Uses the same syntax as the WIZARDS option above.
 #SHELLERS=
+
+# Show debugging information originating from these source files.
+# Use '*' for all, or list source files separated by spaces.
+# Only available if game has been compiled with DEBUG.
+#DEBUGFILES=*
 
 # Limit the number of simultaneous games (see also nethack.sh).
 MAXPLAYERS=10

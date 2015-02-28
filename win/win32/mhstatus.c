@@ -1,4 +1,5 @@
-/* NetHack 3.5	mhstatus.c	$Date$  $Revision$ */
+/* NetHack 3.5	mhstatus.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mhstatus.c	$Date: 2012/01/11 01:45:02 $  $Revision: 1.14 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 

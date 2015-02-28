@@ -1,10 +1,9 @@
-/* NetHack 3.5	shk.c	$Date$  $Revision$ */
+/* NetHack 3.5	shk.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	shk.c	$Date: 2012/07/03 22:54:49 $  $Revision: 1.91 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-
-/*#define DEBUG*/
 
 #define PAY_SOME    2
 #define PAY_BUY     1
@@ -12,11 +11,9 @@
 #define PAY_SKIP  (-1)
 #define PAY_BROKE (-2)
 
-#ifdef KOPS
 STATIC_DCL void FDECL(makekops, (coord *));
 STATIC_DCL void FDECL(call_kops, (struct monst *,BOOLEAN_P));
 STATIC_DCL void FDECL(kops_gone, (BOOLEAN_P));
-#endif /* KOPS */
 
 #define NOTANGRY(mon)	((mon)->mpeaceful)
 #define ANGRY(mon)	(!NOTANGRY(mon))
@@ -79,7 +76,6 @@ STATIC_DCL const char *FDECL(cad, (BOOLEAN_P));
  */
 
 
-#ifdef GOLDOBJ
 /*
     Transfer money from inventory to monster when paying
     shopkeepers, priests, oracle, succubus, & other demons.
@@ -153,8 +149,6 @@ long amount;
 	context.botl = 1;
     }
 }
-
-#endif /* GOLDOBJ */
 
 STATIC_OVL struct monst *
 next_shkp(shkp, withbill)
@@ -312,7 +306,6 @@ register struct monst *shkp;
 	return(total);
 }
 
-#ifdef KOPS
 STATIC_OVL void
 call_kops(shkp, nearshop)
 register struct monst *shkp;
@@ -363,7 +356,6 @@ register boolean nearshop;
 	    makekops(&mm);
 	}
 }
-#endif	/* KOPS */
 
 /* x,y is strictly inside shop */
 char
@@ -419,11 +411,7 @@ boolean newlev;
 	}
 
 	if (rob_shop(shkp)) {
-#ifdef KOPS
 	    call_kops(shkp, (!newlev && levl[u.ux0][u.uy0].edge));
-#else
-	    (void) angry_guards(FALSE);
-#endif
 	}
 }
 
@@ -444,12 +432,8 @@ xchar x, y;
 	    return;
 
 	if (rob_shop(shkp)) {
-#ifdef KOPS
 	    /*[might want to set 2nd arg based on distance from shop doorway]*/
 	    call_kops(shkp, FALSE);
-#else
-	    (void) angry_guards(FALSE);
-#endif
 	}
 }
 
@@ -618,13 +602,11 @@ char *enterstring;
 			  "Leave the %s%s outside.",
 			  tool, plur(cnt));
 		should_block = TRUE;
-#ifdef STEED
 	    } else if (u.usteed) {
-		verbalize(NOTANGRY(shkp) ?
-			  "Will you please leave %s outside?" :
-			  "Leave %s outside.", y_monnam(u.usteed));
-		should_block = TRUE;
-#endif
+            verbalize(NOTANGRY(shkp) ?
+                  "Will you please leave %s outside?" :
+                  "Leave %s outside.", y_monnam(u.usteed));
+            should_block = TRUE;
 	    } else {
 		should_block = (Fast && (sobj_at(PICK_AXE, u.ux, u.uy) ||
 				      sobj_at(DWARVISH_MATTOCK, u.ux, u.uy)));
@@ -916,13 +898,8 @@ register struct monst *shkp;
 	long robbed = ESHK(shkp)->robbed;
 	long balance = ((tmp <= 0L) ? tmp : check_credit(tmp, shkp));
 
-#ifndef GOLDOBJ
-	u.ugold -= balance;
-	shkp->mgold += balance;
-#else
 	if (balance > 0) money2mon(shkp, balance);
 	else if (balance < 0) money2u(shkp, -balance);
-#endif
 	context.botl = 1;
 	if(robbed) {
 		robbed -= tmp;
@@ -942,11 +919,7 @@ register boolean killkops;
 	(void) mnearto(shkp, x, y, TRUE);
 	level.flags.has_shop = 1;
 	if (killkops) {
-#ifdef KOPS
 		kops_gone(TRUE);
-#else
-		You_feel("vaguely apprehensive.");
-#endif
 		pacify_guards();
 	}
 	after_shk_move(shkp);
@@ -1066,9 +1039,7 @@ make_happy_shoppers(silentkops)
 boolean silentkops;
 {
 	if (!angry_shk_exists()) {
-#ifdef KOPS
 		kops_gone(silentkops);
-#endif
 		pacify_guards();
 	}
 }
@@ -1234,9 +1205,7 @@ dopay()
 	}
 
 	if(!shkp) {
-#ifdef DEBUG
-		pline("dopay: null shkp.");
-#endif
+		debugpline("dopay: null shkp.");
 		return(0);
 	}
 proceed:
@@ -1254,11 +1223,7 @@ proceed:
 	}
 
 	if(shkp != resident && NOTANGRY(shkp)) {
-#ifdef GOLDOBJ
 		umoney = money_cnt(invent);
-#else
-		umoney = u.ugold;
-#endif
 		if(!ltmp)
 		    You("do not owe %s anything.", mon_nam(shkp));
 		else if(!umoney) {
@@ -1287,11 +1252,7 @@ proceed:
 
 	/* ltmp is still eshkp->robbed here */
 	if (!eshkp->billct && !eshkp->debit) {
-#ifdef GOLDOBJ
 		umoney = money_cnt(invent);
-#else
-		umoney = u.ugold;
-#endif
 		if(!ltmp && NOTANGRY(shkp)) {
 		    You("do not owe %s anything.", shkname(shkp));
 		    if (!umoney)
@@ -1344,9 +1305,7 @@ proceed:
 		long dtmp = eshkp->debit;
 		long loan = eshkp->loan;
 		char sbuf[BUFSZ];
-#ifdef GOLDOBJ
                 umoney = money_cnt(invent);
-#endif
 		Sprintf(sbuf, "You owe %s %ld %s ",
 					   shkname(shkp), dtmp, currency(dtmp));
 		if(loan) {
@@ -1356,11 +1315,7 @@ proceed:
 			   "for gold picked up and the use of merchandise.");
 		} else Strcat(sbuf, "for the use of merchandise.");
 		pline1(sbuf);
-#ifndef GOLDOBJ
-		if (u.ugold + eshkp->credit < dtmp) {
-#else
 		if (umoney + eshkp->credit < dtmp) {
-#endif
 		    pline("But you don't%s have enough gold%s.",
 			stashed_gold ? " seem to" : "",
 			eshkp->credit ? " or credit" : "");
@@ -1372,12 +1327,7 @@ proceed:
 			eshkp->loan = 0L;
 			Your("debt is covered by your credit.");
 		    } else if (!eshkp->credit) {
-#ifndef GOLDOBJ
-			u.ugold -= dtmp;
- 			shkp->mgold += dtmp;
-#else
                         money2mon(shkp, dtmp);
-#endif
 			eshkp->debit = 0L;
 			eshkp->loan = 0L;
 			You("pay that debt.");
@@ -1385,12 +1335,7 @@ proceed:
 		    } else {
 			dtmp -= eshkp->credit;
 			eshkp->credit = 0L;
-#ifndef GOLDOBJ
-			u.ugold -= dtmp;
-			shkp->mgold += dtmp;
-#else
                         money2mon(shkp, dtmp);
-#endif
 			eshkp->debit = 0L;
 			eshkp->loan = 0L;
 			pline("That debt is partially offset by your credit.");
@@ -1403,22 +1348,14 @@ proceed:
 	/* now check items on bill */
 	if (eshkp->billct) {
 	    register boolean itemize;
-#ifndef GOLDOBJ
-	    if (!u.ugold && !eshkp->credit) {
-#else
             umoney = money_cnt(invent);
 	    if (!umoney && !eshkp->credit) {
-#endif
 		You("%shave no money or credit%s.",
 				    stashed_gold ? "seem to " : "",
 				    paid ? " left" : "");
 		return(0);
 	    }
-#ifndef GOLDOBJ
-	    if ((u.ugold + eshkp->credit) < cheapest_item(shkp)) {
-#else
 	    if ((umoney + eshkp->credit) < cheapest_item(shkp)) {
-#endif
 		You("don't have enough money to buy%s the item%s you picked.",
 		    eshkp->billct > 1 ? " any of" : "", plur(eshkp->billct));
 		if(stashed_gold)
@@ -1502,11 +1439,7 @@ boolean itemize;
 {
 	register struct obj *obj = *obj_p;
 	long ltmp, quan, save_quan;
-#ifdef GOLDOBJ
 	long umoney = money_cnt(invent);
-#else
-	long umoney = u.ugold;
-#endif
 	int buy;
 	boolean stashed_gold = (hidden_gold() > 0L),
 		consumed = (which == 0);
@@ -1691,9 +1624,7 @@ int numsk;
 int croaked;
 {
 	long loss = 0L;
-#ifdef GOLDOBJ
 	long umoney;
-#endif
 	struct eshk *eshkp = ESHK(shkp);
 	boolean take = FALSE, taken = FALSE;
 	unsigned save_minvis = shkp->minvis;
@@ -1740,12 +1671,8 @@ int croaked;
 	}
 
 	if (eshkp->following || ANGRY(shkp) || take) {
-#ifndef GOLDOBJ
-		if (!invent && !u.ugold) goto skip;
-#else
 		if (!invent) goto skip;
                 umoney = money_cnt(invent);
-#endif
 		takes[0] = '\0';
 		if (!shkp->mcanmove || shkp->msleeping)
 			Strcat(takes, "wakes up and ");
@@ -1753,18 +1680,10 @@ int croaked;
 			Strcat(takes, "comes and ");
 		Strcat(takes, "takes");
 
-#ifndef GOLDOBJ
-		if (loss > u.ugold || !loss || roomno == eshkp->shoproom) {
-			eshkp->robbed -= u.ugold;
-			if (eshkp->robbed < 0L) eshkp->robbed = 0L;
-			shkp->mgold += u.ugold;
-			u.ugold = 0L;
-#else
 		if (loss > umoney || !loss || roomno == eshkp->shoproom) {
 			eshkp->robbed -= umoney;
 			if (eshkp->robbed < 0L) eshkp->robbed = 0L;
                         if (umoney > 0) money2mon(shkp, umoney);
-#endif
 			context.botl = 1;
 			pline("%s %s all your possessions.",
 			      shkname(shkp), takes);
@@ -1772,12 +1691,7 @@ int croaked;
 			/* where to put player's invent (after disclosure) */
 			set_repo_loc(shkp);
 		} else {
-#ifndef GOLDOBJ
-			shkp->mgold += loss;
-			u.ugold -= loss;
-#else
                         money2mon(shkp, loss);
-#endif
 			context.botl = 1;
 			pline("%s %s the %ld %s %sowed %s.",
 			      Monnam(shkp), takes,
@@ -1846,14 +1760,9 @@ finish_paybill()
 	unleash_all();
 	/* if hero has any gold left, take it into shopkeeper's possession */
 	if (shkp) {
-#ifdef GOLDOBJ
 	    long umoney = money_cnt(invent);
 
 	    if (umoney) money2mon(shkp, umoney);
-#else
-	    shkp->mgold += u.ugold;
-	    u.ugold = 0L;
-#endif
 	}
 	/* transfer rest of the character's inventory to the shop floor */
 	drop_upon_death((struct monst *)0, (struct obj *)0, ox, oy);
@@ -1970,11 +1879,9 @@ register struct monst *shkp;	/* if angry, impose a surcharge */
 	}
 	if (uarmh && uarmh->otyp == DUNCE_CAP)
 		multiplier *= 4L, divisor *= 3L;
-#ifdef TOURIST
 	else if ((Role_if(PM_TOURIST) && u.ulevel < (MAXULEV/2)) ||
 		    (uarmu && !uarm && !uarmc)) /* touristy shirt visible */
 		multiplier *= 4L, divisor *= 3L;
-#endif
 
 	if	(ACURR(A_CHA) > 18)  divisor *= 2L;
 	else if (ACURR(A_CHA) == 18) multiplier *= 2L, divisor *= 3L;
@@ -2135,11 +2042,9 @@ register struct monst *shkp;
 
 	if (uarmh && uarmh->otyp == DUNCE_CAP)
 		divisor *= 3L;
-#ifdef TOURIST
 	else if ((Role_if(PM_TOURIST) && u.ulevel < (MAXULEV/2)) ||
 		    (uarmu && !uarm && !uarmc)) /* touristy shirt visible */
 		divisor *= 3L;
-#endif
 	else
 		divisor *= 2L;
 
@@ -2860,11 +2765,7 @@ xchar x, y;
 		return;
 	}
         
-#ifndef GOLDOBJ
-	shkmoney = shkp->mgold;
-#else
 	shkmoney = money_cnt(shkp->minvent);
-#endif
 	if (!shkmoney) {
 		char c, qbuf[BUFSZ];
 		long tmpcr = ((offer * 9L) / 10L) + (offer <= 1L);
@@ -3511,11 +3412,7 @@ register struct monst *shkp;
 		avoid = FALSE;
 	} else {
 #define	GDIST(x,y)	(dist2(x,y,gx,gy))
-		if (Invis
-#ifdef STEED
-			|| u.usteed
-#endif
-			) {
+		if (Invis || u.usteed) {
 		    avoid = FALSE;
 		} else {
 		    uondoor = (u.ux == eshkp->shd.x && u.uy == eshkp->shd.y);
@@ -3660,7 +3557,6 @@ register int fall;
     }
 }
 
-#ifdef KOPS
 STATIC_OVL void
 makekops(mm)
 coord *mm;
@@ -3685,7 +3581,6 @@ coord *mm;
 		    (void) makemon(&mons[mndx], mm->x, mm->y, NO_MM_FLAGS);
 	}
 }
-#endif	/* KOPS */
 
 void
 pay_for_damage(dmgstr, cant_mollify)
@@ -3808,11 +3703,7 @@ boolean cant_mollify;
 	}
 
 	if((um_dist(x, y, 1) && !uinshp) || cant_mollify ||
-#ifndef GOLDOBJ
-	   (u.ugold + ESHK(shkp)->credit) < cost_of_damage
-#else
 	   (money_cnt(invent) + ESHK(shkp)->credit) < cost_of_damage
-#endif
 				|| !rn2(50)) {
  getcad:
 		if (muteshk(shkp)) {
@@ -3836,12 +3727,7 @@ boolean cant_mollify;
 		currency(cost_of_damage), !animal ? "\"" : "");
 	if(yn(qbuf) != 'n') {
 		cost_of_damage = check_credit(cost_of_damage, shkp);
-#ifndef GOLDOBJ
-		u.ugold -= cost_of_damage;
-		shkp->mgold += cost_of_damage;
-#else
                 money2mon(shkp, cost_of_damage);
-#endif
 		context.botl = 1;
 		pline("Mollified, %s accepts your restitution.",
 			shkname(shkp));
@@ -3996,9 +3882,7 @@ shk_chat(shkp)
 struct monst *shkp;
 {
 	struct eshk *eshk;
-#ifdef GOLDOBJ
 	long shkmoney;
-#endif
 	if (!shkp->isshk) {
 		/* The monster type is shopkeeper, but this monster is
 		   not actually a shk, which could happen if someone
@@ -4039,17 +3923,9 @@ struct monst *shkp;
 		      shkname(shkp), eshk->credit, currency(eshk->credit));
 	else if (eshk->robbed)
 		pline("%s complains about a recent robbery.", shkname(shkp));
-#ifndef GOLDOBJ
-	else if (shkp->mgold < 50)
-#else
 	else if ((shkmoney = money_cnt(shkp->minvent)) < 50)
-#endif
 		pline("%s complains that business is bad.", shkname(shkp));
-#ifndef GOLDOBJ
-	else if (shkp->mgold > 4000)
-#else
 	else if (shkmoney > 4000)
-#endif
 		pline("%s says that business is good.", shkname(shkp));
 	else if (is_izchak(shkp, FALSE))
 		pline(Izchak_speaks[rn2(SIZE(Izchak_speaks))],shkname(shkp));
@@ -4057,7 +3933,6 @@ struct monst *shkp;
 		pline("%s talks about the problem of shoplifters.",shkname(shkp));
 }
 
-#ifdef KOPS
 STATIC_OVL void
 kops_gone(silent)
 register boolean silent;
@@ -4076,7 +3951,6 @@ register boolean silent;
 	    pline_The("Kop%s (disappointed) vanish%s into thin air.",
 		      plur(cnt), cnt == 1 ? "es" : "");
 }
-#endif	/* KOPS */
 
 STATIC_OVL long
 cost_per_charge(shkp, otmp, altusage)
@@ -4119,11 +3993,9 @@ boolean altusage; /* some items have an "alternate" use with different cost */
 		if (otmp->spe > 1) tmp /= 4L;
 	} else if (otmp->oclass == SPBOOK_CLASS) {
 		tmp -= tmp / 5L;
-	} else if (otmp->otyp == CAN_OF_GREASE ||
-		   otmp->otyp == TINNING_KIT
-#ifdef TOURIST
+	} else if (otmp->otyp == CAN_OF_GREASE
+		   || otmp->otyp == TINNING_KIT
 		   || otmp->otyp == EXPENSIVE_CAMERA
-#endif
 		   ) {
 		tmp /= 10L;
 	} else if (otmp->otyp == POT_OIL) {
@@ -4284,9 +4156,7 @@ register xchar x, y;
 		&& shkp->mcanmove && !shkp->msleeping
 		&& (x == sx-1 || x == sx+1 || y == sy-1 || y == sy+1)
 		&& (Invis || carrying(PICK_AXE) || carrying(DWARVISH_MATTOCK)
-#ifdef STEED
 			|| u.usteed
-#endif
 	  )) {
 		pline("%s%s blocks your way!", shkname(shkp),
 				Invis ? " senses your motion and" : "");

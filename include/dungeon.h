@@ -1,4 +1,5 @@
-/* NetHack 3.5	dungeon.h	$Date$  $Revision$ */
+/* NetHack 3.5	dungeon.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	dungeon.h	$Date: 2012/04/14 08:31:03 $  $Revision: 1.11 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -168,7 +169,6 @@ struct linfo {
 #endif /* MFLOPPY */
 };
 
-#ifdef DUNGEON_OVERVIEW
 /* types and structures for dungeon map recording
  *
  * It is designed to eliminate the need for an external notes file for some of
@@ -231,9 +231,7 @@ typedef struct mapseen  {
 	    Bitfield(valley, 1);
 	    Bitfield(msanctum, 1);
 	    Bitfield(ludios, 1);
-# ifdef REINCARNATION
 	    Bitfield(roguelevel, 1);
-# endif
 	} flags;
 	/* custom naming */
 	char *custom;
@@ -246,5 +244,4 @@ typedef struct mapseen  {
 	struct cemetery *final_resting_place; /* same as level.bonesinfo */
 } mapseen;
 
-#endif /* DUNGEON_OVERVIEW */
 #endif /* DUNGEON_H */

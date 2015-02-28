@@ -1,4 +1,5 @@
-/* NetHack 3.5	objnam.c	$Date$  $Revision$ */
+/* NetHack 3.5	objnam.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	objnam.c	$Date: 2011/10/27 02:24:54 $  $Revision: 1.101 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -682,10 +683,6 @@ register struct obj *obj;
 	} else
 		Strcpy(prefix, "a ");
 
-#ifdef INVISIBLE_OBJECTS
-	if (obj->oinvis) Strcat(prefix,"invisible ");
-#endif
-
 	/* "empty" goes at the beginning, but item count goes at the end */
 	if (cknown &&
 	    (Is_container(obj) || obj->otyp == STATUE) && !Has_contents(obj))
@@ -771,11 +768,7 @@ plus:
 		/* weptools already get this done when we go to the +n code */
 		if (!is_weptool(obj))
 		    add_erosion_words(obj, prefix);
-		if(obj->owornmask & (W_TOOL /* blindfold */
-#ifdef STEED
-				| W_SADDLE
-#endif
-				)) {
+		if(obj->owornmask & (W_TOOL /* blindfold */ | W_SADDLE)) {
 			Strcat(bp, " (being worn)");
 			break;
 		}
@@ -933,10 +926,8 @@ boolean
 not_fully_identified(otmp)
 register struct obj *otmp;
 {
-#ifdef GOLDOBJ
     /* gold doesn't have any interesting attributes [yet?] */
     if (otmp->oclass == COIN_CLASS) return FALSE;	/* always fully ID'd */
-#endif
     /* check fundamental ID hallmarks first */
     if (!otmp->known || !otmp->dknown ||
 #ifdef MAIL
@@ -1693,9 +1684,7 @@ static const char *const as_is[] = {
 	"boots", "shoes",
 	"gloves", "lenses", "scales",
 	"gauntlets",
-#ifdef WIZARD
 	"iron bars",
-#endif
 	/* both singular and plural are spelled the same */
 	"deer", "fish", "tuna", "yaki", "-hai",
 	"krill", "manes", "ninja", "sheep", "ronin", "roshi", "shito", "tengu",
@@ -2185,17 +2174,13 @@ STATIC_OVL NEARDATA const struct o_range o_ranges[] = {
 	{ "boots",	ARMOR_CLASS,  LOW_BOOTS,      LEVITATION_BOOTS },
 	{ "shoes",	ARMOR_CLASS,  LOW_BOOTS,      IRON_SHOES },
 	{ "cloak",	ARMOR_CLASS,  MUMMY_WRAPPING, CLOAK_OF_DISPLACEMENT },
-#ifdef TOURIST
 	{ "shirt",	ARMOR_CLASS,  HAWAIIAN_SHIRT, T_SHIRT },
-#endif
 	{ "dragon scales",
 			ARMOR_CLASS,  GRAY_DRAGON_SCALES, YELLOW_DRAGON_SCALES },
 	{ "dragon scale mail",
 			ARMOR_CLASS,  GRAY_DRAGON_SCALE_MAIL, YELLOW_DRAGON_SCALE_MAIL },
 	{ "sword",	WEAPON_CLASS, SHORT_SWORD,    KATANA },
-#ifdef WIZARD
 	{ "venom",	VENOM_CLASS,  BLINDING_VENOM, ACID_VENOM },
-#endif
 	{ "gray stone",	GEM_CLASS,    LUCKSTONE,      FLINT },
 	{ "grey stone",	GEM_CLASS,    LUCKSTONE,      FLINT },
 };
@@ -2221,10 +2206,8 @@ struct alt_spellings {
 	{ "amulet of poison resistance", AMULET_VERSUS_POISON },
 	{ "potion of sleep", POT_SLEEPING },
 	{ "stone", ROCK },
-#ifdef TOURIST
 	{ "camera", EXPENSIVE_CAMERA },
 	{ "tee shirt", T_SHIRT },
-#endif
 	{ "can", TIN },
 	{ "can opener", TIN_OPENER },
 	{ "kelp", KELP_FROND },
@@ -2254,9 +2237,6 @@ struct obj *no_wish;
 	int cnt, spe, spesgn, typ, very, rechrg;
 	int blessed, uncursed, iscursed, ispoisoned, isgreased;
 	int eroded, eroded2, erodeproof;
-#ifdef INVISIBLE_OBJECTS
-	int isinvisible;
-#endif
 	int halfeaten, mntmp, contents;
 	int islit, unlabeled, ishistoric, isdiluted, trapped;
 	int tmp, tinv, tvariety;
@@ -2284,9 +2264,6 @@ struct obj *no_wish;
 
 	cnt = spe = spesgn = typ = very = rechrg =
 		blessed = uncursed = iscursed =
-#ifdef INVISIBLE_OBJECTS
-		isinvisible =
-#endif
 		ispoisoned = isgreased = eroded = eroded2 = erodeproof =
 		halfeaten = islit = unlabeled = ishistoric = isdiluted =
 		trapped = 0;
@@ -2337,10 +2314,6 @@ struct obj *no_wish;
 			iscursed = 1;
 		} else if (!strncmpi(bp, "uncursed ", l=9)) {
 			uncursed = 1;
-#ifdef INVISIBLE_OBJECTS
-		} else if (!strncmpi(bp, "invisible ", l=10)) {
-			isinvisible = 1;
-#endif
 		} else if (!strncmpi(bp, "rustproof ", l=10) ||
 			   !strncmpi(bp, "erodeproof ", l=11) ||
 			   !strncmpi(bp, "corrodeproof ", l=13) ||
@@ -2603,15 +2576,9 @@ struct obj *no_wish;
 	   !strcmpi(bp, "coin") || *bp == GOLD_SYM) {
 		if (cnt > 5000 && !wizard) cnt = 5000;
 		else if (cnt < 1) cnt = 1;
-#ifndef GOLDOBJ
-		pline("%d gold piece%s.", cnt, plur(cnt));
-		u.ugold += (long) cnt;
-		otmp = &zeroobj; /* readobjnam()'s return value for gold */
-#else
 		otmp = mksobj(GOLD_PIECE, FALSE, FALSE);
 		otmp->quan = (long) cnt;
 		otmp->owt = weight(otmp);
-#endif
 		context.botl = 1;
 		return otmp;
 	}
@@ -2659,7 +2626,6 @@ struct obj *no_wish;
 		}
 	}
 
-#ifdef WIZARD
 	/* Wishing in wizard mode can create traps and furniture.
 	 * Part I:  distinguish between trap and object for the two
 	 * types of traps which have corresponding objects:  bear trap
@@ -2699,7 +2665,6 @@ struct obj *no_wish;
 		   the object name and getting a disarmed trap object] */
 	    }
 	}
-#endif
 
 retry:
 	/* "grey stone" check must be before general "stone" */
@@ -2869,7 +2834,6 @@ srch:
 		goto typfnd;
 	    }
 	}
-#ifdef WIZARD
 	/* Let wizards wish for traps and furniture.
 	 * Must come after objects check so wizards can still wish for
 	 * trap objects like beartraps.
@@ -2916,7 +2880,6 @@ wiztrap:
 			newsym(x, y);
 			return(&zeroobj);
 		}
-# ifdef SINKS
 		if (!BSTRCMPI(bp, p-4, "sink")) {
 			lev->typ = SINK;
 			level.flags.nsinks++;
@@ -2924,7 +2887,6 @@ wiztrap:
 			newsym(x, y);
 			return &zeroobj;
 		}
-# endif
 		/* ("water" matches "potion of water" rather than terrain) */
 		if (!BSTRCMPI(bp, p-4, "pool") || !BSTRCMPI(bp, p-4, "moat")) {
 			lev->typ = !BSTRCMPI(bp, p-4, "pool") ? POOL : MOAT;
@@ -2988,7 +2950,6 @@ wiztrap:
 		    return &zeroobj;
 		}
 	}
-#endif 	/* WIZARD */
 
 	if(!oclass) return((struct obj *)0);
 any:
@@ -3044,16 +3005,12 @@ typfnd:
 				|| typ == ROCK || is_missile(otmp)))))
 	    otmp->quan = (long) cnt;
 
-#ifdef WIZARD
 	if (oclass == VENOM_CLASS) otmp->spe = 1;
-#endif
 
 	if (spesgn == 0) {
 		spe = otmp->spe;
-#ifdef WIZARD
 	} else if (wizard) {
 		;	/* no alteration to spe */
-#endif
 	} else if (oclass == ARMOR_CLASS || oclass == WEAPON_CLASS ||
 		 is_weptool(otmp) ||
 			(oclass==RING_CLASS && objects[typ].oc_charged)) {
@@ -3165,10 +3122,6 @@ typfnd:
 	} else if (spesgn < 0) {
 		curse(otmp);
 	}
-
-#ifdef INVISIBLE_OBJECTS
-	if (isinvisible) otmp->oinvis = 1;
-#endif
 
 	/* set eroded */
 	if (is_damageable(otmp) || otmp->otyp == CRYSKNIFE) {

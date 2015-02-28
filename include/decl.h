@@ -1,4 +1,5 @@
-/* NetHack 3.5	decl.h	$Date$  $Revision$ */
+/* NetHack 3.5	decl.h	$NHDT-Date: 1425081976 2015/02/28 00:06:16 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.50 $ */
+/* NetHack 3.5	decl.h	$Date: 2011/12/29 20:06:27 $  $Revision: 1.44 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -38,16 +39,12 @@ E NEARDATA int warn_obj_cnt;		/* count of monsters meeting criteria */
 E int x_maze_max, y_maze_max;
 E int otg_temp;
 
-#ifdef REDO
 E NEARDATA int in_doagain;
-#endif
 
 E struct dgn_topology {		/* special dungeon levels for speed */
     d_level	d_oracle_level;
     d_level	d_bigroom_level;	/* unused */
-#ifdef REINCARNATION
     d_level	d_rogue_level;
-#endif
     d_level	d_medusa_level;
     d_level	d_stronghold_level;
     d_level	d_valley_level;
@@ -74,9 +71,7 @@ E struct dgn_topology {		/* special dungeon levels for speed */
 /* macros for accesing the dungeon levels by their old names */
 #define oracle_level		(dungeon_topology.d_oracle_level)
 #define bigroom_level		(dungeon_topology.d_bigroom_level)
-#ifdef REINCARNATION
 #define rogue_level		(dungeon_topology.d_rogue_level)
-#endif
 #define medusa_level		(dungeon_topology.d_medusa_level)
 #define stronghold_level	(dungeon_topology.d_stronghold_level)
 #define valley_level		(dungeon_topology.d_valley_level)
@@ -154,9 +149,7 @@ E NEARDATA struct sinfo {
 #ifdef PANICLOG
 	int in_paniclog;
 #endif
-#ifdef WIZARD
 	int wizkit_wishing;
-#endif
 } program_state;
 
 E boolean restoring;
@@ -185,9 +178,7 @@ E NEARDATA struct kinfo {
     char	name[BUFSZ];		/* actual killer name */
 } killer;
 
-#ifdef GOLDOBJ
 E long done_money;
-#endif
 E const char *configfile;
 E NEARDATA char plname[PL_NSIZ];
 E NEARDATA char dogname[];
@@ -233,9 +224,7 @@ E uchar monsyms[MAXMCLASSES];		/* current class symbols */
 #include "obj.h"
 E NEARDATA struct obj *invent,
 	*uarm, *uarmc, *uarmh, *uarms, *uarmg, *uarmf,
-#ifdef TOURIST
 	*uarmu,				/* under-wear, so to speak */
-#endif
 	*uskin, *uamul, *uleft, *uright, *ublindf,
 	*uwep, *uswapwep, *uquiver;
 
@@ -331,7 +320,6 @@ E NEARDATA winid WIN_MESSAGE;
 E NEARDATA winid WIN_STATUS;
 #endif
 E NEARDATA winid WIN_MAP, WIN_INVEN;
-E nhwchar toplines[];
 
 /* pline (et al) for a single string argument (suppress compiler warning) */
 #define pline1(cstr) pline("%s", cstr)
@@ -342,6 +330,7 @@ E nhwchar toplines[];
 #define Sprintf1(buf, cstr) Sprintf(buf, "%s", cstr)
 #define panic1(cstr) panic("%s", cstr)
 
+E char toplines[];
 #ifndef TCAP_H
 E struct tc_gbl_data {	/* also declared in tcap.h */
     char *tc_AS, *tc_AE;	/* graphics start and end (tty font swapping) */
@@ -390,13 +379,11 @@ E char *fqn_prefix_names[PREFIX_COUNT];
 
 E NEARDATA struct savefile_info sfcap, sfrestinfo, sfsaveinfo;
 
-#ifdef AUTOPICKUP_EXCEPTIONS
 struct autopickup_exception {
 	char *pattern;
 	boolean grab;
 	struct autopickup_exception *next;
 };
-#endif /* AUTOPICKUP_EXCEPTIONS */
 
 #ifdef PANICTRACE
 E char *ARGV0;

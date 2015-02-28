@@ -1,5 +1,6 @@
 /*
- * NetHack 3.5  mdgrep.h  $Date$ $Revision$
+ * NetHack 3.5  mdgrep.h  $NHDT-Date$ $NHDT-Branch$:$NHDT-Revision$
+ * NetHack 3.5  mdgrep.h  $Date: 2010/05/01 20:57:17 $ $Revision: 1.5 $
  * Copyright (c) Kenneth Lorber, Kensington, Maryland, 2008
  * NetHack may be freely redistributed.  See license for details.
  *
@@ -256,11 +257,7 @@ static struct grep_var grep_vars[]={
 #else
 	{"WIN_CE_SMARTPHONE", 0},
 #endif
-#if defined(WIZARD)
 	{"WIZARD", 1},
-#else
-	{"WIZARD", 0},
-#endif
 #if defined(X11_GRAPHICS)
 	{"X11_GRAPHICS", 1},
 #else

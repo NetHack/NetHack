@@ -1,4 +1,5 @@
-/* NetHack 3.5	monst.c	$Date$  $Revision$ */
+/* NetHack 3.5	monst.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	monst.c	$Date: 2011/09/02 21:44:09 $  $Revision: 1.38 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1594,7 +1595,6 @@ struct permonst _mons2[] = {
 	M1_ANIMAL|M1_FLY|M1_CARNIVORE,
 	M2_HOSTILE|M2_STRONG|M2_NASTY|M2_COLLECT, M3_INFRAVISIBLE, HI_LORD),
 #endif
-#ifdef KOPS
 /*
  * Kops
  */
@@ -1626,7 +1626,6 @@ struct permonst _mons2[] = {
 	SIZ(WT_HUMAN, 200, MS_ARREST, MZ_HUMAN), 0, 0, M1_HUMANOID,
 	M2_HUMAN|M2_WANDER|M2_HOSTILE|M2_STRONG|M2_MALE|M2_COLLECT,
 	M3_INFRAVISIBLE, HI_LORD),
-#endif
 /*
  * Liches
  */
@@ -2555,14 +2554,9 @@ struct permonst _mons2[] = {
 #define SEDUCTION_ATTACKS_NO \
 	A(ATTK(AT_CLAW, AD_PHYS, 1, 3), ATTK(AT_CLAW, AD_PHYS, 1, 3), \
 	  ATTK(AT_BITE, AD_DRLI, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK)
-#ifdef SEDUCE
-# define SEDUCTION_ATTACKS SEDUCTION_ATTACKS_YES
-#else
-# define SEDUCTION_ATTACKS SEDUCTION_ATTACKS_NO
-#endif
     MON("succubus", S_DEMON,
 	LVL(6, 12, 0, 70, -9), (G_NOCORPSE|1),
-	SEDUCTION_ATTACKS,
+	SEDUCTION_ATTACKS_YES,
 	SIZ(WT_HUMAN, 400, MS_SEDUCE, MZ_HUMAN), MR_FIRE|MR_POISON, 0,
 	M1_HUMANOID|M1_FLY|M1_POIS,
 	M2_DEMON|M2_STALK|M2_HOSTILE|M2_NASTY|M2_FEMALE,
@@ -2578,12 +2572,11 @@ struct permonst _mons2[] = {
 	CLR_BROWN),
     MON("incubus", S_DEMON,
 	LVL(6, 12, 0, 70, -9), (G_NOCORPSE|1),
-	SEDUCTION_ATTACKS,
+	SEDUCTION_ATTACKS_YES,
 	SIZ(WT_HUMAN, 400, MS_SEDUCE, MZ_HUMAN), MR_FIRE|MR_POISON, 0,
 	M1_HUMANOID|M1_FLY|M1_POIS,
 	M2_DEMON|M2_STALK|M2_HOSTILE|M2_NASTY|M2_MALE,
 	M3_INFRAVISIBLE|M3_INFRAVISION, CLR_GRAY),
-#undef SEDUCTION_ATTACKS
     /* Used by AD&D for a type of demon, originally one of the Furies */
     /* and spelled this way */
     MON("erinys", S_DEMON,
@@ -3022,7 +3015,6 @@ struct permonst _mons2[] = {
 	SIZ(WT_HUMAN, 400, MS_HUMANOID, MZ_HUMAN), 0, 0,
 	M1_HUMANOID|M1_OMNIVORE,
 	M2_NOPOLY|M2_HUMAN|M2_STRONG|M2_COLLECT, M3_INFRAVISIBLE, HI_DOMESTIC),
-#ifdef TOURIST
     MON("tourist", S_HUMAN,
 	LVL(10, 12, 10, 1, 0), G_NOGEN,
 	A(ATTK(AT_WEAP, AD_PHYS, 1, 6), ATTK(AT_WEAP, AD_PHYS, 1, 6),
@@ -3030,7 +3022,6 @@ struct permonst _mons2[] = {
 	SIZ(WT_HUMAN, 400, MS_HUMANOID, MZ_HUMAN), 0, 0,
 	M1_HUMANOID|M1_OMNIVORE,
 	M2_NOPOLY|M2_HUMAN|M2_STRONG|M2_COLLECT, M3_INFRAVISIBLE, HI_DOMESTIC),
-#endif
     MON("valkyrie", S_HUMAN,
 	LVL(10, 12, 10, 1, -1), G_NOGEN,
 	A(ATTK(AT_WEAP, AD_PHYS, 1, 8), ATTK(AT_WEAP, AD_PHYS, 1, 8),
@@ -3166,7 +3157,6 @@ struct permonst _mons2[] = {
 	M2_NOPOLY|M2_HUMAN|M2_PNAME|M2_PEACEFUL|M2_STRONG|M2_MALE|
 	  M2_COLLECT|M2_MAGIC,
 	M3_CLOSE|M3_INFRAVISIBLE, HI_LORD),
-#ifdef TOURIST
     MON("Twoflower", S_HUMAN,
 	LVL(20, 12, 10, 20, 0), (G_NOGEN|G_UNIQ),
 	A(ATTK(AT_WEAP, AD_PHYS, 1, 6), ATTK(AT_WEAP, AD_PHYS, 1, 6),
@@ -3176,7 +3166,6 @@ struct permonst _mons2[] = {
 	M2_NOPOLY|M2_HUMAN|M2_PNAME|M2_PEACEFUL|M2_STRONG|M2_MALE|
 	  M2_COLLECT|M2_MAGIC,
 	M3_CLOSE|M3_INFRAVISIBLE, HI_DOMESTIC),
-#endif
     MON("Norn", S_HUMAN,
 	LVL(20, 12, 0, 80, 0), (G_NOGEN|G_UNIQ),
 	A(ATTK(AT_WEAP, AD_PHYS, 1, 8), ATTK(AT_WEAP, AD_PHYS, 1, 6),
@@ -3314,11 +3303,9 @@ struct permonst _mons2[] = {
 	M2_NOPOLY|M2_HUMAN|M2_PNAME|M2_HOSTILE|M2_STRONG|M2_STALK|
 	  M2_NASTY|M2_MALE|M2_COLLECT|M2_MAGIC,
 	M3_WANTSARTI|M3_WAITFORU|M3_INFRAVISIBLE, HI_LORD),
-#ifdef TOURIST
 	/*
 	 * Note: the Master of Thieves was defined above.
 	 */
-#endif
     MON("Lord Surtur", S_GIANT,
 	LVL(15, 12, 2, 50, 12), (G_NOGEN|G_UNIQ),
 	A(ATTK(AT_WEAP, AD_PHYS, 2,10), ATTK(AT_WEAP, AD_PHYS, 2,10),
@@ -3439,7 +3426,6 @@ struct permonst _mons2[] = {
 	M1_HUMANOID|M1_OMNIVORE,
 	M2_NOPOLY|M2_HUMAN|M2_PEACEFUL|M2_STRONG|M2_COLLECT, M3_INFRAVISIBLE,
 	HI_DOMESTIC),
-#ifdef TOURIST
     MON("guide", S_HUMAN,
 	LVL(5, 12, 10, 20, 0), G_NOGEN,
 	A(ATTK(AT_WEAP, AD_PHYS, 1, 6), ATTK(AT_MAGC, AD_SPEL, 0, 0),
@@ -3448,7 +3434,6 @@ struct permonst _mons2[] = {
 	M1_HUMANOID|M1_OMNIVORE,
 	M2_NOPOLY|M2_HUMAN|M2_PEACEFUL | M2_STRONG|M2_COLLECT|M2_MAGIC,
 	M3_INFRAVISIBLE, HI_DOMESTIC),
-#endif
     MON("warrior", S_HUMAN,
 	LVL(5, 12, 10, 10, -1), G_NOGEN,
 	A(ATTK(AT_WEAP, AD_PHYS, 1, 8), ATTK(AT_WEAP, AD_PHYS, 1, 8),

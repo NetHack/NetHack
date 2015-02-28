@@ -1,4 +1,5 @@
-/* NetHack 3.5	save.c	$Date$  $Revision$ */
+/* NetHack 3.5	save.c	$NHDT-Date: 1425081977 2015/02/28 00:06:17 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.59 $ */
+/* NetHack 3.5	save.c	$Date: 2012/02/16 02:40:24 $  $Revision: 1.53 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -230,9 +231,7 @@ dosave0()
 	store_savefileinfo(fd);
 	store_plname_in_file(fd);
 	ustuck_id = (u.ustuck ? u.ustuck->m_id : 0);
-#ifdef STEED
 	usteed_id = (u.usteed ? u.usteed->m_id : 0);
-#endif
 	savelev(fd, ledger_no(&u.uz), WRITE_SAVE | FREE_SAVE);
 	savegamestate(fd, WRITE_SAVE | FREE_SAVE);
 
@@ -247,9 +246,7 @@ dosave0()
 	 * may mislead place_monster() on other levels
 	 */
 	u.ustuck = (struct monst *)0;
-#ifdef STEED
 	u.usteed = (struct monst *)0;
-#endif
 
 	for(ltmp = (xchar)1; ltmp <= maxledgerno(); ltmp++) {
 		if (ltmp == ledger_no(&uz_save)) continue;
@@ -310,9 +307,6 @@ register int fd, mode;
 #ifdef SYSFLAGS
 	bwrite(fd, (genericptr_t) &sysflags, sizeof(struct sysflag));
 #endif
-#ifndef GOLDOBJ		/* GOLDOBJ-compatibility */
-	if (u.ugold) (void)insert_gold_into_invent(FALSE);
-#endif
 	bwrite(fd, (genericptr_t) &u, sizeof(struct you));
 	bwrite(fd, yyyymmddhhmmss(ubirthday), 14);
 	save_killers(fd, mode);
@@ -322,9 +316,6 @@ register int fd, mode;
 	save_light_sources(fd, mode, RANGE_GLOBAL);
 
 	saveobjchn(fd, invent, mode);
-#ifndef GOLDOBJ		/* GOLDOBJ-compatibility */
-	if (!release_data(mode)) remove_gold_from_invent();
-#endif
 	if (BALL_IN_MON) {
 		/* prevent loss of ball & chain when swallowed */
 		uball->nobj = uchain;
@@ -355,10 +346,8 @@ register int fd, mode;
 	save_oracles(fd, mode);
 	if(ustuck_id)
 	    bwrite(fd, (genericptr_t) &ustuck_id, sizeof ustuck_id);
-#ifdef STEED
 	if(usteed_id)
 	    bwrite(fd, (genericptr_t) &usteed_id, sizeof usteed_id);
-#endif
 	bwrite(fd, (genericptr_t) pl_character, sizeof pl_character);
 	bwrite(fd, (genericptr_t) pl_fruit, sizeof pl_fruit);
 	savefruitchn(fd, mode);
@@ -432,9 +421,7 @@ savestateinlock()
 		    store_plname_in_file(fd);
 
 		    ustuck_id = (u.ustuck ? u.ustuck->m_id : 0);
-#ifdef STEED
 		    usteed_id = (u.usteed ? u.usteed->m_id : 0);
-#endif
 		    savegamestate(fd, WRITE_SAVE);
 		}
 		bclose(fd);
@@ -518,9 +505,7 @@ int mode;
 #endif
 	savecemetery(fd, mode, &level.bonesinfo);
 	savelevl(fd, (boolean)((sfsaveinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
-#ifdef DUNGEON_OVERVIEW
 	bwrite(fd,(genericptr_t) lastseentyp,sizeof(lastseentyp));
-#endif
 	bwrite(fd,(genericptr_t) &monstermoves,sizeof(monstermoves));
 	bwrite(fd,(genericptr_t) &upstair,sizeof(stairway));
 	bwrite(fd,(genericptr_t) &dnstair,sizeof(stairway));
@@ -1132,22 +1117,10 @@ register struct monst *mtmp;
 	    if (perform_bwrite(mode)) {
 		mtmp->mnum = monsndx(mtmp->data);
 		if (mtmp->ispriest) forget_temple_entry(mtmp);	/* EPRI() */
-#ifndef GOLDOBJ		/* GOLDOBJ-compatibility */
-		if (mtmp->mgold) {
-			struct obj *goldobj = mksobj(GOLD_PIECE, FALSE, FALSE);
-
-			goldobj->quan = mtmp->mgold;
-			mtmp->mgold = 0L;
-			add_to_minv(mtmp, goldobj);
-		}
-#endif
 		savemon(fd, mtmp);
 	    }
 	    if (mtmp->minvent)
 		saveobjchn(fd,mtmp->minvent,mode);
-#ifndef GOLDOBJ		/* GOLDOBJ-compatibility */
-	    if (!release_data(mode)) put_gold_back(mtmp);
-#endif
 	    if (release_data(mode))
 		dealloc_monst(mtmp);
 	    mtmp = mtmp2;
@@ -1237,9 +1210,7 @@ int fd, mode;
 	    }
 	    bwrite(fd, (genericptr_t) &minusone, sizeof(int));
 	}
-#ifdef DEBUG_MSGCOUNT
-	pline("Stored %d messages into savefile.", msgcount);
-#endif
+	debugpline("Stored %d messages into savefile.", msgcount);
 	/* note: we don't attempt to handle release_data() here */
 }
 
@@ -1374,9 +1345,7 @@ freedynamicdata()
 	if (iflags.wc_font_menu) free(iflags.wc_font_menu);
 	if (iflags.wc_font_status) free(iflags.wc_font_status);
 	if (iflags.wc_tile_file) free(iflags.wc_tile_file);
-#ifdef AUTOPICKUP_EXCEPTIONS
 	free_autopickup_exceptions();
-#endif
 #endif	/* FREE_ALL_MEMORY */
 #ifdef STATUS_VIA_WINDOWPORT
 	status_finish();
@@ -1400,12 +1369,10 @@ int lev;
 			if (!swapout_oldest())
 				return FALSE;
 	}
-# ifdef WIZARD
 	if (wizard) {
 		pline("Swapping in `%s'.", from);
 		wait_synch();
 	}
-# endif
 	copyfile(from, to);
 	(void) unlink(from);
 	level_info[lev].where = ACTIVE;
@@ -1432,12 +1399,10 @@ swapout_oldest() {
 	Sprintf(to, "%s%s", permbones, alllevels);
 	set_levelfile_name(from, oldest);
 	set_levelfile_name(to, oldest);
-# ifdef WIZARD
 	if (wizard) {
 		pline("Swapping out `%s'.", from);
 		wait_synch();
 	}
-# endif
 	copyfile(from, to);
 	(void) unlink(from);
 	level_info[oldest].where = SWAPPED;

@@ -1,4 +1,5 @@
-/* NetHack 3.5	explode.c	$Date$  $Revision$ */
+/* NetHack 3.5	explode.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	explode.c	$Date: 2013/11/05 00:57:55 $  $Revision: 1.34 $ */
 /*	Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -166,10 +167,8 @@ int expltype;
 		}
 		/* can be both you and mtmp if you're swallowed */
 		mtmp = m_at(i+x-1, j+y-1);
-#ifdef STEED
 		if (!mtmp && i+x-1 == u.ux && j+y-1 == u.uy)
 			mtmp = u.usteed;
-#endif
 		if (mtmp) {
 		    if (mtmp->mhp < 1) explmask[i][j] = 2;
 		    else switch(adtyp) {
@@ -274,10 +273,8 @@ int expltype;
 				type, &shopdamage, exploding_wand_typ);
 
 		mtmp = m_at(i+x-1, j+y-1);
-#ifdef STEED
 		if (!mtmp && i+x-1 == u.ux && j+y-1 == u.uy)
 			mtmp = u.usteed;
-#endif
 		if (!mtmp) continue;
 		if (do_hallu) {
 		    /* replace "gas spore" with a different description

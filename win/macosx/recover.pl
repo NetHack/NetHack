@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
-# NetHack 3.5  recover.pl $Date$  $Revision$
+# NetHack 3.5  recover.pl $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+# NetHack 3.5  recover.pl $Date: 2011/10/17 01:29:20 $  $Revision: 1.3 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2009
 # NetHack may be freely redistributed.  See license for details.
 

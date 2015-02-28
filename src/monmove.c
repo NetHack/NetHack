@@ -1,4 +1,5 @@
-/* NetHack 3.5	monmove.c	$Date$  $Revision$ */
+/* NetHack 3.5	monmove.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	monmove.c	$Date: 2011/08/30 22:13:27 $  $Revision: 1.46 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -45,9 +46,7 @@ monhaskey(mon, for_unlocking)
 struct monst *mon;
 boolean for_unlocking;	/* true => credit card ok, false => not ok */
 {
-#ifdef TOURIST
     if (for_unlocking && m_carrying(mon, CREDIT_CARD)) return TRUE;
-#endif
     return m_carrying(mon, SKELETON_KEY) || m_carrying(mon, LOCK_PICK);
 }
 
@@ -121,9 +120,7 @@ struct monst *mtmp;
 		return(FALSE);
 
 	return (boolean)(sobj_at(SCR_SCARE_MONSTER, x, y) ||
-#ifdef ELBERETH
 			 sengr_at("Elbereth", x, y) ||
-#endif
 			 (IS_ALTAR(levl[x][y].typ) &&
 			    (mtmp->data->mlet == S_VAMPIRE ||
 			     is_vampshifter(mtmp))));
@@ -480,13 +477,8 @@ toofar:
 
 	if(!nearby || mtmp->mflee || scared ||
 	   mtmp->mconf || mtmp->mstun || (mtmp->minvis && !rn2(3)) ||
-#ifndef GOLDOBJ
-	   (mdat->mlet == S_LEPRECHAUN &&
-		   !u.ugold && (mtmp->mgold || rn2(2))) ||
-#else
 	   (mdat->mlet == S_LEPRECHAUN &&
 		   !findgold(invent) && (findgold(mtmp->minvent) || rn2(2))) ||
-#endif
 	   (is_wanderer(mdat) && !rn2(4)) || (Conflict && !mtmp->iswiz) ||
 	   (!mtmp->mcansee && !rn2(4)) || mtmp->mpeaceful) {
 		/* Possibly cast an undirected spell if not attacking you */
@@ -587,7 +579,6 @@ register struct monst *mtmp;
 	return(FALSE);
 }
 
-#ifdef BARGETHROUGH
 /*
  * should_displace()
  *
@@ -631,7 +622,6 @@ xchar gx, gy;
 		return TRUE;
 	return FALSE;
 }
-#endif /* BARGETHROUGH */
 
 /* Return values:
  * 0: did not move, but can still attack and do other stuff.
@@ -652,9 +642,7 @@ register int after;
 	boolean can_open=0, can_unlock=0, doorbuster=0;
 	boolean uses_items=0, setlikes=0;
 	boolean avoid=FALSE;
-#ifdef BARGETHROUGH
 	boolean better_with_displacing = FALSE;
-#endif
 	struct permonst *ptr;
 	struct monst *mtoo;
 	schar mmoved = 0;	/* not strictly nec.: chi >= 0 will do */
@@ -683,9 +671,7 @@ register int after;
 	/* Not necessary if m_move called from this file, but necessary in
 	 * other calls of m_move (ex. leprechauns dodging)
 	 */
-#ifdef REINCARNATION
 	if (!Is_rogue_level(&u.uz))
-#endif
 	    can_tunnel = tunnels(ptr);
 	can_open = !(nohands(ptr) || verysmall(ptr));
 	can_unlock = ((can_open && monhaskey(mtmp, TRUE)) ||
@@ -770,9 +756,7 @@ not_special:
 	if (mtmp->mconf || (u.uswallow && mtmp == u.ustuck))
 		appr = 0;
 	else {
-#ifdef GOLDOBJ
 		struct obj *lepgold, *ygold;
-#endif
 		boolean should_see = (couldsee(omx, omy) &&
 				      (levl[gx][gy].lit ||
 				       !levl[omx][omy].lit) &&
@@ -788,12 +772,8 @@ not_special:
 			appr = 0;
 
 		if(monsndx(ptr) == PM_LEPRECHAUN && (appr == 1) &&
-#ifndef GOLDOBJ
-		   (mtmp->mgold > u.ugold))
-#else
 		   ( (lepgold = findgold(mtmp->minvent)) && 
                    (lepgold->quan > ((ygold = findgold(invent)) ? ygold->quan : 0L)) ))
-#endif
 			appr = -1;
 
 		if (!should_see && can_track(ptr)) {
@@ -807,11 +787,7 @@ not_special:
 		}
 	}
 
-	if ((!mtmp->mpeaceful || !rn2(10))
-#ifdef REINCARNATION
-				    && (!Is_rogue_level(&u.uz))
-#endif
-							    ) {
+	if ((!mtmp->mpeaceful || !rn2(10)) && (!Is_rogue_level(&u.uz))) {
 	    boolean in_line = lined_up(mtmp) &&
 		(distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) <=
 		    (throws_rocks(youmonst.data) ? 20 : ACURRSTR/2+1)
@@ -976,19 +952,15 @@ not_special:
 		for(i = 0; i < cnt; i++)
 		    if(!(info[i] & NOTONL)) avoid=TRUE;
 	    }
-#ifdef BARGETHROUGH
 	    better_with_displacing = should_displace(mtmp,poss,info,cnt,gx,gy);
-#endif
 	    for(i=0; i < cnt; i++) {
 		if (avoid && (info[i] & NOTONL)) continue;
 		nx = poss[i].x;
 		ny = poss[i].y;
 
-#ifdef BARGETHROUGH
 		if (MON_AT(nx,ny) &&
 			(info[i] & ALLOW_MDISP) && !(info[i] & ALLOW_M) &&
 			!better_with_displacing) continue;
-#endif
 		if (appr != 0) {
 		    mtrk = &mtmp->mtrack[0];
 		    for(j=0; j < jcnt; mtrk++, j++)
@@ -1084,7 +1056,6 @@ not_special:
 		return 3;
 	    }
 
-#ifdef BARGETHROUGH
 	    if((info[chi] & ALLOW_MDISP)) {
 		struct monst *mtmp2;
 		int mstatus;
@@ -1095,7 +1066,6 @@ not_special:
 		if (mstatus & MM_HIT) return 1;
 		return 3;
 	    }
-#endif /* BARGETHROUGH */
 
 	    if (!m_in_out_region(mtmp,nix,niy))
 	        return 3;
@@ -1329,9 +1299,7 @@ register struct monst *mtmp;
 {
 	boolean notseen, gotu;
 	register int disp, mx = mtmp->mux, my = mtmp->muy;
-#ifdef GOLDOBJ
 	long umoney = money_cnt(invent);
-#endif
 
 	/*
 	 * do cheapest and/or most likely tests first
@@ -1349,13 +1317,7 @@ register struct monst *mtmp;
 	if (notseen || Underwater) {
 	    /* Xorns can smell quantities of valuable metal
 		like that in solid gold coins, treat as seen */
-	    if ((mtmp->data == &mons[PM_XORN]) &&
-#ifndef GOLDOBJ
-			u.ugold
-#else
-			umoney
-#endif
-			&& !Underwater)
+	    if ((mtmp->data == &mons[PM_XORN]) && umoney && !Underwater)
 		disp = 0;
 	    else
 		disp = 1;
@@ -1397,7 +1359,6 @@ found_you:
 	mtmp->muy = my;
 }
 
-#ifdef BARGETHROUGH
 /*
  * mon-to-mon displacement is a deliberate "get out of my way" act,
  * not an accidental bump, so we don't consider mstun or mconf in
@@ -1429,7 +1390,6 @@ xchar x,y;
 
 	 return FALSE;
 }
-#endif /* BARGETHROUGH */
 
 /*
  * Inventory prevents passage under door.
@@ -1442,40 +1402,28 @@ struct monst *mtmp;
 	struct obj *chain, *obj;
 
 	if (mtmp == &youmonst) {
-#ifndef GOLDOBJ
-		if (u.ugold > 100L) return TRUE;
-#endif
 		chain = invent;
 	} else {
-#ifndef GOLDOBJ
-		if (mtmp->mgold > 100L) return TRUE;
-#endif
 		chain = mtmp->minvent;
 	}
 	for (obj = chain; obj; obj = obj->nobj) {
 		int typ = obj->otyp;
 
-#ifdef GOLDOBJ
                 if (typ == COIN_CLASS && obj->quan > 100L) return TRUE;
-#endif
 		if (obj->oclass != GEM_CLASS &&
 		    !(typ >= ARROW && typ <= BOOMERANG) &&
 		    !(typ >= DAGGER && typ <= CRYSKNIFE) &&
 		    typ != SLING &&
 		    !is_cloak(obj) && typ != FEDORA &&
 		    !is_gloves(obj) && typ != LEATHER_JACKET &&
-#ifdef TOURIST
 		    typ != CREDIT_CARD && !is_shirt(obj) &&
-#endif
 		    !(typ == CORPSE && verysmall(&mons[obj->corpsenm])) &&
 		    typ != FORTUNE_COOKIE && typ != CANDY_BAR &&
 		    typ != PANCAKE && typ != LEMBAS_WAFER &&
 		    typ != LUMP_OF_ROYAL_JELLY &&
 		    obj->oclass != AMULET_CLASS &&
 		    obj->oclass != RING_CLASS &&
-#ifdef WIZARD
 		    obj->oclass != VENOM_CLASS &&
-#endif
 		    typ != SACK && typ != BAG_OF_HOLDING &&
 		    typ != BAG_OF_TRICKS && !Is_candle(obj) &&
 		    typ != OILSKIN_SACK && typ != LEASH &&

@@ -1,4 +1,5 @@
-/* NetHack 3.5	mkmaze.c	$Date$  $Revision$ */
+/* NetHack 3.5	mkmaze.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mkmaze.c	$Date: 2009/05/06 10:46:56 $  $Revision: 1.18 $ */
 /*	SCCS Id: @(#)mkmaze.c	3.5	2007/06/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -508,7 +509,6 @@ register const char *s;
 
 	} else Strcpy(protofile, "");
 
-#ifdef WIZARD
 	/* SPLEVTYPE format is "level-choice,level-choice"... */
 	if (wizard && *protofile && sp && sp->rndlevs) {
 	    char *ep = getenv("SPLEVTYPE");	/* not nh_getenv */
@@ -530,7 +530,6 @@ register const char *s;
 		}
 	    }
 	}
-#endif
 
 	if(*protofile) {
 	    Strcat(protofile, LEV_EXT);
@@ -588,12 +587,10 @@ register const char *s;
 	    int x_range = x_maze_max - x_maze_min - 2*INVPOS_X_MARGIN - 1,
 		y_range = y_maze_max - y_maze_min - 2*INVPOS_Y_MARGIN - 1;
 
-#ifdef DEBUG
 	    if (x_range <= INVPOS_X_MARGIN || y_range <= INVPOS_Y_MARGIN ||
 		   (x_range * y_range) <= (INVPOS_DISTANCE * INVPOS_DISTANCE))
-		panic("inv_pos: maze is too small! (%d x %d)",
+		debugpline("inv_pos: maze is too small! (%d x %d)",
 		      x_maze_max, y_maze_max);
-#endif
 	    inv_pos.x = inv_pos.y = 0; /*{occupied() => invocation_pos()}*/
 	    do {
 		x = rn1(x_range, x_maze_min + INVPOS_X_MARGIN + 1);
@@ -880,10 +877,8 @@ register xchar x, y, todnum, todlevel;
 		impossible("portal on top of portal??");
 		return;
 	}
-#ifdef DEBUG
-	pline("mkportal: at (%d,%d), to %s, level %d",
+	debugpline("mkportal: at (%d,%d), to %s, level %d",
 		x, y, dungeons[todnum].dname, todlevel);
-#endif
 	ttmp->dst.dnum = todnum;
 	ttmp->dst.dlevel = todlevel;
 	return;

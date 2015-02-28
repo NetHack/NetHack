@@ -1,4 +1,5 @@
-/* NetHack 3.5	decl.c	$Date$  $Revision$ */
+/* NetHack 3.5	decl.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	decl.c	$Date: 2012/04/09 02:56:30 $  $Revision: 1.37 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -30,9 +31,7 @@ int x_maze_max = (COLNO-1) & ~1,
 
 int otg_temp;			/* used by object_to_glyph() [otg] */
 
-#ifdef REDO
 NEARDATA int in_doagain = 0;
-#endif
 
 /*
  *	The following structure will be initialized at startup time with
@@ -48,9 +47,7 @@ NEARDATA int doorindex = 0;
 NEARDATA char *save_cm = 0;
 
 NEARDATA struct kinfo killer = DUMMY;
-#ifdef GOLDOBJ
 NEARDATA long done_money = 0;
-#endif
 const char *nomovemsg = 0;
 NEARDATA char plname[PL_NSIZ] = DUMMY;		/* player name */
 NEARDATA char pl_character[PL_CSIZ] = DUMMY;
@@ -141,17 +138,13 @@ NEARDATA struct you u = DUMMY;
 NEARDATA time_t ubirthday = DUMMY;
 
 
-#ifdef DUNGEON_OVERVIEW
 schar lastseentyp[COLNO][ROWNO] = {DUMMY}; /* last seen/touched dungeon typ */
-#endif /* DUNGEON_OVERVIEW */
 
 NEARDATA struct obj *invent = (struct obj *)0,
 	*uwep = (struct obj *)0, *uarm = (struct obj *)0,
 	*uswapwep = (struct obj *)0,
 	*uquiver = (struct obj *)0, /* quiver */
-#ifdef TOURIST
 	*uarmu = (struct obj *)0, /* under-wear, so to speak */
-#endif
 	*uskin = (struct obj *)0, /* dragon armor, if a dragon */
 	*uarmc = (struct obj *)0, *uarmh = (struct obj *)0,
 	*uarms = (struct obj *)0, *uarmg = (struct obj *)0,
@@ -269,8 +262,7 @@ NEARDATA winid WIN_MESSAGE = WIN_ERR;
 NEARDATA winid WIN_STATUS = WIN_ERR;
 #endif
 NEARDATA winid WIN_MAP = WIN_ERR, WIN_INVEN = WIN_ERR;
-nhwchar toplines[TBUFSZ];
-
+char toplines[TBUFSZ];
 /* Windowing stuff that's really tty oriented, but present for all ports */
 struct tc_gbl_data tc_gbl_data = { 0,0, 0,0 };	/* AS,AE, LI,CO */
 

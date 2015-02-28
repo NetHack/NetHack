@@ -1,4 +1,5 @@
-/* NetHack 3.5	rumors.c	$Date$  $Revision$ */
+/* NetHack 3.5	rumors.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	rumors.c	$Date: 2012/05/11 22:36:33 $  $Revision: 1.17 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -171,7 +172,6 @@ boolean exclude_cookie;
 	return rumor_buf;
 }
 
-#ifdef WIZARD
 /*
  * test that the true/false rumor boundaries are valid.
  */
@@ -265,7 +265,6 @@ rumor_check()
 		true_rumor_size = -1;	/* don't try to open it again */
 	}
 }
-#endif
 
 void
 outrumor(truth, mechanism)
@@ -428,11 +427,7 @@ register struct monst *oracl;
 	char qbuf[QBUFSZ];
 
 	multi = 0;
-#ifndef GOLDOBJ
-	umoney = u.ugold;
-#else
 	umoney = money_cnt(invent);
-#endif
 
 	if (!oracl) {
 		There("is no one here to consult.");
@@ -469,12 +464,7 @@ register struct monst *oracl;
 		u_pay = (umoney < (long)major_cost) ? (int)umoney : major_cost;
 		break;
 	}
-#ifndef GOLDOBJ
-	u.ugold -= (long)u_pay;
-	oracl->mgold += (long)u_pay;
-#else
 	money2mon(oracl, (long)u_pay);
-#endif
 	context.botl = 1;
 	add_xpts = 0;	/* first oracle of each type gives experience points */
 	if (u_pay == minor_cost) {

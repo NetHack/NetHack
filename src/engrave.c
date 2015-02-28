@@ -1,4 +1,5 @@
-/* NetHack 3.5	engrave.c	$Date$  $Revision$ */
+/* NetHack 3.5	engrave.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	engrave.c	$Date: 2012/12/20 01:48:36 $  $Revision: 1.39 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -139,10 +140,8 @@ boolean check_pit;
 	struct trap *t;
 
 	if (u.uswallow) return FALSE;
-#ifdef STEED
 	/* Restricted/unskilled riders can't reach the floor */
 	if (u.usteed && P_SKILL(P_RIDING) < P_BASIC) return FALSE;
-#endif
 	if (check_pit && (t = t_at(u.ux, u.uy)) != 0 &&
 		uteetering_at_seen_pit(t) && !Flying)
 	    return FALSE;
@@ -243,7 +242,6 @@ xchar x, y;
 	return((struct engr *) 0);
 }
 
-#ifdef ELBERETH
 /* Decide whether a particular string is engraved at a specified
  * location; a case-insensitive substring match used.
  * Ignore headstones, in case the player names herself "Elbereth".
@@ -258,7 +256,6 @@ sengr_at(s, x, y)
 	return (ep && ep->engr_type != HEADSTONE &&
 		ep->engr_time <= moves && strstri(ep->engr_txt, s) != 0);
 }
-#endif /* ELBERETH */
 
 void
 u_wipe_engr(cnt)
@@ -839,12 +836,10 @@ doengrave()
 		break;
 
 	    case VENOM_CLASS:
-#ifdef WIZARD
 		if (wizard) {
 		    pline("Writing a poison pen letter??");
 		    break;
 		}
-#endif
 	    case ILLOBJ_CLASS:
 		impossible("You're engraving with an illegal object!");
 		break;

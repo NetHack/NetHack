@@ -1,4 +1,5 @@
-/* NetHack 3.5	files.c	$Date$  $Revision$ */
+/* NetHack 3.5	files.c	$NHDT-Date: 1425081976 2015/02/28 00:06:16 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.127 $ */
+/* NetHack 3.5	files.c	$Date: 2012/03/10 02:49:08 $  $Revision: 1.124 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -123,12 +124,10 @@ boolean nethack_thinks_it_is_open;	/* Does NetHack think it's open?       */
 # endif
 #endif /*HOLD_LOCKFILE_OPEN*/
 
-#ifdef WIZARD
 #define WIZKIT_MAX 128
 static char wizkit[WIZKIT_MAX];
 STATIC_DCL FILE *NDECL(fopen_wizkit_file);
 STATIC_DCL void FDECL(wizkit_addinv, (struct obj *));
-#endif
 
 #ifdef AMIGA
 extern char PATH[];	/* see sys/amiga/amidos.c */
@@ -191,10 +190,8 @@ STATIC_DCL FILE *FDECL(fopen_config_file, (const char *, int));
 STATIC_DCL int FDECL(get_uchars,
 		    (FILE *,char *,char *,uchar *,BOOLEAN_P,int,const char *));
 int FDECL(parse_config_line, (FILE *,char *,int));
-#ifdef LOADSYMSETS
 STATIC_DCL FILE *NDECL(fopen_sym_file);
 STATIC_DCL void FDECL(set_symhandling, (char *,int));
-#endif
 #ifdef NOCWD_ASSUMPTIONS
 STATIC_DCL void FDECL(adjust_prefix, (char *, int));
 #endif
@@ -789,10 +786,8 @@ d_level *lev;
 #else
 	ret = rename(tempname, fq_bones);
 #endif
-#ifdef WIZARD
 	if (wizard && ret != 0)
 		pline("couldn't rename %s to %s.", tempname, fq_bones);
-#endif
 }
 
 
@@ -898,7 +893,7 @@ int fd;
 #endif
 
 
-#if defined(WIZARD) && !defined(MICRO)
+#ifndef MICRO
 /* change pre-existing savefile name to indicate an error savefile */
 void
 set_error_savefile()
@@ -1297,9 +1292,7 @@ boolean uncomp;
 	(void) signal(SIGQUIT, SIG_IGN);
 	(void) wait((int *)&i);
 	(void) signal(SIGINT, (SIG_RET_TYPE) done1);
-#  ifdef WIZARD
 	if (wizard) (void) signal(SIGQUIT, SIG_DFL);
-#  endif
 #else
 	/* I don't think we can really cope with external compression
 	 * without signals, so we'll declare that compress failed and
@@ -2025,10 +2018,8 @@ int		src;
 		parseoptions(bufp, TRUE, TRUE);
 		if (plname[0])		/* If a name was given */
 			plnamesuffix();	/* set the character class */
-#ifdef AUTOPICKUP_EXCEPTIONS
 	} else if (match_varname(buf, "AUTOPICKUP_EXCEPTION", 5)) {
 		add_autopickup_exception(bufp);
-#endif
 #ifdef NOCWD_ASSUMPTIONS
 	} else if (match_varname(buf, "HACKDIR", 4)) {
 		adjust_prefix(bufp, HACKPREFIX);
@@ -2112,6 +2103,9 @@ int		src;
 	} else if (src == SET_IN_SYS && match_varname(buf, "SHELLERS", 8)) {
 	    if (sysopt.shellers) free(sysopt.shellers);
 	    sysopt.shellers = dupstr(bufp);
+	} else if (src == SET_IN_SYS && match_varname(buf, "DEBUGFILES", 5)) {
+	    if (sysopt.debugfiles) free(sysopt.debugfiles);
+	    sysopt.debugfiles = dupstr(bufp);
 	} else if (src == SET_IN_SYS && match_varname(buf, "SUPPORT", 7)) {
 	    if (sysopt.support) free(sysopt.support);
 	    sysopt.support = dupstr(bufp);
@@ -2206,10 +2200,6 @@ int		src;
 					WARNCOUNT, "WARNINGS");
 	    assign_warnings(translate);
 	} else if (match_varname(buf, "SYMBOLS", 4)) {
-	/* This part is not ifdef LOADSYMSETS because we want to be able
-	 * to silently ignore its presence in a config file if that is
-	 * not defined.
-	 */
 		char *op, symbuf[BUFSZ];
 		boolean morelines;
 		do {
@@ -2228,10 +2218,8 @@ int		src;
 			    /* strip trailing space now that '\' is gone */
 			    while (--op >= bufp && isspace(*op)) *op = '\0';
 			}
-#ifdef LOADSYMSETS
 			/* parse here */
 			parsesymbols(bufp);	
-#endif
 			if (morelines)
 			  do  {
 			    *symbuf = '\0';
@@ -2242,13 +2230,9 @@ int		src;
 			    bufp = symbuf;
 			} while (*bufp == '#');
 		} while (morelines);
-#ifdef LOADSYMSETS
 		switch_symbols(TRUE);
-#endif
-#ifdef WIZARD
 	} else if (match_varname(buf, "WIZKIT", 6)) {
 	    (void) strncpy(wizkit, bufp, WIZKIT_MAX-1);
-#endif
 #ifdef AMIGA
 	} else if (match_varname(buf, "FONT", 4)) {
 		char *t;
@@ -2434,7 +2418,6 @@ OR: Forbid multiline stuff for alternate config sources.
 	return rv;
 }
 
-#ifdef WIZARD
 STATIC_OVL FILE *
 fopen_wizkit_file()
 {
@@ -2568,9 +2551,6 @@ read_wizkit()
 	return;
 }
 
-#endif /*WIZARD*/
-
-#ifdef LOADSYMSETS
 extern struct symsetentry *symset_list;		/* options.c */
 extern struct symparse loadsyms[];		/* drawing.c */
 extern const char *known_handling[];		/* drawing.c */
@@ -2627,7 +2607,7 @@ parse_sym_line(buf, which_set)
 char *buf;
 int which_set;
 {
-	int val;
+	int val, i;
 	struct symparse *symp = (struct symparse *)0;
 	char *bufp, *commentp, *altp;
 
@@ -2677,7 +2657,6 @@ int which_set;
 		return 0;
 
 	if (!symset[which_set].name) {
-	    int i;
 	    /* A null symset name indicates that we're just
 	       building a pick-list of possible symset
 	       values from the file, so only do that */
@@ -2702,7 +2681,6 @@ int which_set;
 		    /* initialize restriction bits */
 		    tmpsp->primary = 0;
 		    tmpsp->rogue   = 0;
-		    tmpsp->unicode = 0;
 		    break;
 		 case 2:
 		    /* handler type identified */
@@ -2725,17 +2703,14 @@ int which_set;
 		 case 5:
 		    /* restrictions: xxxx*/
 		    tmpsp = symset_list; /* most recent symset */
-		    i = 0;
-		    while (known_restrictions[i]) {
+                    for (i = 0; known_restrictions[i]; ++i) {
 			if (!strcmpi(known_restrictions[i], bufp)) {
 			    switch(i) {
 			    	case  0: tmpsp->primary = 1; break;
 				case  1: tmpsp->rogue   = 1; break;
-				case  2: tmpsp->unicode = 1; break;
 			    }
 			    break;	/* while loop */
 	    	        }
-			i++;
 		    }
 		    break;
 	        }
@@ -2751,11 +2726,8 @@ int which_set;
 				/* matches desired one */
 				chosen_symset_start = TRUE;
 				/* these init_*() functions clear symset fields too */
-# ifdef REINCARNATION
 				if (which_set == ROGUESET) init_r_symbols();
-				else
-# endif
-				if (which_set == PRIMARY)  init_l_symbols();
+                                else if (which_set == PRIMARY)  init_l_symbols();
 			    }
 			    break;
 		    case 1:
@@ -2794,26 +2766,12 @@ int which_set;
 						 break;
 					case  1: symset[which_set].rogue   = 1;
 						 break;
-					case  2: symset[which_set].unicode = 1;
-						 break;
 				    }
 				    break;	/* while loop */
 	    	        	    }
 				    n++;
 		    	        }
-			        /* Don't allow unicode set if code can't handle it */
-			        if (symset[which_set].unicode &&
-						!iflags.unicodedisp) {
-				    if (chosen_symset_start)
-					chosen_symset_end = FALSE;
-				    chosen_symset_start = FALSE;
-# ifdef REINCARNATION
-				    if (which_set == ROGUESET) init_r_symbols();
-				    else
-# endif
-				    if (which_set == PRIMARY)  init_l_symbols();
-			        }
-		    	    }
+			    }
 		   	    break;
 		}
 	    } else {		/* !SYM_CONTROL */
@@ -2821,12 +2779,9 @@ int which_set;
 		if (chosen_symset_start) {
 			if (which_set == PRIMARY) {
 				update_l_symset(symp, val);
-			}
-# ifdef REINCARNATION
-			else if (which_set == ROGUESET) {
+			} else if (which_set == ROGUESET) {
 				update_r_symset(symp, val);
 			}
-# endif
 		}
 	    }
 	}
@@ -2849,73 +2804,6 @@ int which_set;
 	    i++;
 	}
 }
-
-/*
- *  Produces a single integer value.
- */
-int
-sym_val(cp)
-const char *cp;
-{
-    unsigned int cval = 0;
-    int	meta = 0, dcount = 0;
-    const char *dp, *hex = "00112233445566778899aAbBcCdDeEfF";
-
-    while (*cp)
-    {
-	if (*cp == '\\' && index("mM", cp[1])) {
-		meta = 1;
-		cp += 2;
-	}
-	if ((*cp == 'U' || *cp == 'u') && cp[1] == '+' && index(hex, cp[2]))
-	{
-	    dcount = 0;
-	    cp++;
-	    for (++cp; *cp && (dp = index(hex, *cp)) && (dcount++ < 4); cp++)
-		cval = (unsigned int)((cval * 16) +
-			((unsigned int)(dp - hex) / 2));
-	}
-	else if (*cp == '\\' && index("0123456789xXoO", cp[1]))
-	{
-	    dcount = 0;
-	    cp++;
-	    if (*cp == 'x' || *cp == 'X')
-		for (++cp; *cp && (dp = index(hex, *cp)) && (dcount++ < 4); cp++)
-		    cval = (unsigned int)((cval * 16) +
-			    ((unsigned int)(dp - hex) / 2));
-	    else if (*cp == 'o' || *cp == 'O')
-		for (++cp; *cp && (index("01234567",*cp)) && (dcount++ < 5); cp++)
-		    cval = (cval * 8) + (unsigned int)(*cp - '0');
-	    else
-		for (; *cp && (index("0123456789",*cp)) && (dcount++ < 5); cp++)
-		    cval = (cval * 10) + (unsigned int)(*cp - '0');
-	}
-	else if (*cp == '\\')		/* C-style character escapes */
-	{
-	    switch (*++cp)
-	    {
-	    case '\\': cval = '\\'; break;
-	    case 'n': cval = '\n'; break;
-	    case 't': cval = '\t'; break;
-	    case 'b': cval = '\b'; break;
-	    case 'r': cval = '\r'; break;
-	    default: cval = (unsigned int)*cp;
-	    }
-	    cp++;
-	}
-	else if (*cp == '^')		/* expand control-character syntax */
-	{
-	    cval = (unsigned int)(*++cp & 0x1f);
-	    cp++;
-	}
-	else
-	    cval = (unsigned int)*cp++;
-	if (meta)
-	    cval |= 0x80;
-    }
-    return cval;
-}
-#endif /*LOADSYMSETS*/
 
 /* ----------  END CONFIG FILE HANDLING ----------- */
 

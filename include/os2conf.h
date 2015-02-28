@@ -1,4 +1,5 @@
-/* NetHack 3.5	os2conf.h	$Date$  $Revision$ */
+/* NetHack 3.5	os2conf.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	os2conf.h	$Date: 2009/05/06 10:44:58 $  $Revision: 1.6 $ */
 /*	SCCS Id: @(#)os2conf.h	3.5	2007/01/08	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) Timo Hakulinen, 1990, 1991, 1992, 1993, 1996. */
@@ -97,11 +98,6 @@
 #ifdef __EMX__
 #include <unistd.h>
 #define sethanguphandler(foo) (void)signal(SIGHUP, (SIG_RET_TYPE)foo)
-#endif
-
-#ifndef REDO
-# undef	Getchar
-# define Getchar nhgetch
 #endif
 
 void hangup(int i);

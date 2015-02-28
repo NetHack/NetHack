@@ -1,4 +1,5 @@
-/* NetHack 3.5	mfndpos.h	$Date$  $Revision$ */
+/* NetHack 3.5	mfndpos.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mfndpos.h	$Date: 2009/05/06 10:44:53 $  $Revision: 1.6 $ */
 /*	SCCS Id: @(#)mfndpos.h	3.5	2002/04/06	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6,9 +7,7 @@
 #ifndef MFNDPOS_H
 #define MFNDPOS_H
 
-#ifdef BARGETHROUGH
 #define ALLOW_MDISP	0x00001000L	/* can displace a monster out of its way */
-#endif
 #define ALLOW_TRAPS	0x00020000L	/* can enter traps */
 #define ALLOW_U		0x00040000L	/* can attack you */
 #define ALLOW_M		0x00080000L	/* can attack other monsters */

@@ -1,4 +1,5 @@
-/* NetHack 3.5	you.h	$Date$  $Revision$ */
+/* NetHack 3.5	you.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	you.h	$Date: 2012/04/14 08:31:03 $  $Revision: 1.13 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -46,9 +47,7 @@ struct u_event {
 
 	Bitfield(invoked,1);		/* invoked Gate to the Sanctum level */
 	Bitfield(gehennom_entered,1);	/* entered Gehennom via Valley */
-#ifdef ELBERETH
 	Bitfield(uhand_of_elbereth,2);	/* became Hand of Elbereth */
-#endif
 	Bitfield(udemigod,1);		/* killed the wiz */
 	Bitfield(uvibrated,1);		/* stepped on "vibrating square" */
 	Bitfield(ascended,1);		/* has offered the Amulet */
@@ -340,20 +339,14 @@ struct you {
 	int ublessed, ublesscnt;	/* blessing/duration from #pray */
 	long	umoney0;
 	long	uspare1;
-#ifndef GOLDOBJ
-#define ugold uspare1
-#define ugold0 umoney0
-#endif
 	long	uexp, urexp;
 	long	ucleansed;	/* to record moves when player was cleansed */
 	long	usleep;		/* sleeping; monstermove you last started */
 	int uinvault;
 	struct monst *ustuck;
-#ifdef STEED
 	struct monst *usteed;
 	long ugallop;
 	int urideturns;
-#endif
 	int	umortality;		/* how many times you died */
 	int ugrave_arise; /* you die and become something aside from a ghost */
 	int	weapon_slots;		/* unused skill slots */

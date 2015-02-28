@@ -1,4 +1,5 @@
-/* NetHack 3.5	sit.c	$Date$  $Revision$ */
+/* NetHack 3.5	sit.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	sit.c	$Date: 2012/02/06 04:17:25 $  $Revision: 1.31 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -8,15 +9,6 @@
 void
 take_gold()
 {
-#ifndef GOLDOBJ
-	if (u.ugold <= 0)  {
-		You_feel("a strange sensation.");
-	} else {
-		You("notice you have no gold!");
-		u.ugold = 0;
-		context.botl = 1;
-	}
-#else
         struct obj *otmp, *nobj;
 	int lost_money = 0;
 	for (otmp = invent; otmp; otmp = nobj) {
@@ -32,7 +24,6 @@ take_gold()
 		You("notice you have no money!");
 		context.botl = 1;
 	}
-#endif
 }
 
 int
@@ -42,12 +33,10 @@ dosit()
 	register struct trap *trap = t_at(u.ux,u.uy);
 	register int typ = levl[u.ux][u.uy].typ;
 
-#ifdef STEED
 	if (u.usteed) {
 	    You("are already sitting on %s.", mon_nam(u.usteed));
 	    return (0);
 	}
-#endif
 	if (u.uundetected && is_hider(youmonst.data) && u.umonnum != PM_TRAPPER)
 	    u.uundetected = 0;		/* no longer on the ceiling */
 
@@ -127,11 +116,9 @@ dosit()
 		(void) rust_dmg(uarm, "armor", 1, TRUE, &youmonst);
 	    if (!rn2(10) && uarmf && uarmf->otyp != WATER_WALKING_BOOTS)
 		(void) rust_dmg(uarm, "armor", 1, TRUE, &youmonst);
-#ifdef SINKS
 	} else if(IS_SINK(typ)) {
 	    You(sit_message, defsyms[S_sink].explanation);
 	    Your("%s gets wet.", humanoid(youmonst.data) ? "rump" : "underside");
-#endif
 	} else if(IS_ALTAR(typ)) {
 	    You(sit_message, defsyms[S_altar].explanation);
 	    altar_wrath(u.ux, u.uy);
@@ -327,10 +314,8 @@ rndcurse()			/* curse a few inventory items at random! */
 	}
 
 	for (otmp = invent; otmp; otmp = otmp->nobj) {
-#ifdef GOLDOBJ
 	    /* gold isn't subject to being cursed or blessed */
 	    if (otmp->oclass == COIN_CLASS) continue;
-#endif
 	    nobj++;
 	}
 	if (nobj) {
@@ -338,10 +323,8 @@ rndcurse()			/* curse a few inventory items at random! */
 		 cnt > 0; cnt--)  {
 		onum = rnd(nobj);
 		for (otmp = invent; otmp; otmp = otmp->nobj) {
-#ifdef GOLDOBJ
 		    /* as above */
 		    if (otmp->oclass == COIN_CLASS) continue;
-#endif
 		    if (--onum == 0) break;	/* found the target */
 		}
 		/* the !otmp case should never happen; picking an already
@@ -362,7 +345,6 @@ rndcurse()			/* curse a few inventory items at random! */
 	    update_inventory();
 	}
 
-#ifdef STEED
 	/* treat steed's saddle as extended part of hero's inventory */
 	if (u.usteed && !rn2(4) &&
 		(otmp = which_armor(u.usteed, W_SADDLE)) != 0 &&
@@ -378,7 +360,6 @@ rndcurse()			/* curse a few inventory items at random! */
 		otmp->bknown = TRUE;
 	    }
 	}
-#endif	/*STEED*/
 }
 
 void

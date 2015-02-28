@@ -1,4 +1,5 @@
-/* NetHack 3.5	wintext.c	$Date$  $Revision$ */
+/* NetHack 3.5	wintext.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	wintext.c	$Date: 2012/01/24 04:26:27 $  $Revision: 1.7 $ */
 /*	SCCS Id: @(#)wintext.c	3.5	1996/04/05	*/
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -468,11 +469,7 @@ calculate_rip_text(int how, time_t when)
 
 	/* Put $ on stone */
 	Sprintf(rip_line[GOLD_LINE], "%ld Au",
-#ifndef GOLDOBJ
-		u.ugold);
-#else
 		done_money);
-#endif
 	/* Put together death description */
 	formatkiller(buf, sizeof buf, how);
 

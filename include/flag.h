@@ -1,4 +1,5 @@
-/* NetHack 3.5	flag.h	$Date$  $Revision$ */
+/* NetHack 3.5	flag.h	$NHDT-Date: 1425081976 2015/02/28 00:06:16 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.5	flag.h	$Date: 2012/04/09 02:56:32 $  $Revision: 1.59 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -173,10 +174,8 @@ struct instance_flags {
 	coord	travelcc;	/* coordinates for travel_cache */
 	boolean  window_inited; /* true if init_nhwindows() completed */
 	boolean  vision_inited; /* true if vision is ready */
-#ifdef WIZARD
 	boolean  sanity_check;	/* run sanity checks */
 	boolean  mon_polycontrol;	/* debug: control monster polymorphs */
-#endif
 	/* stuff that is related to options and/or user or platform preferences */
 	unsigned msg_history;	/* hint: # of top lines to save */
 	int	 menu_headings;	/* ATR for menu headings */
@@ -199,8 +198,6 @@ struct instance_flags {
 	boolean  rlecomp;	/* run-length comp of levels when writing savefile */
 	uchar	 num_pad_mode;
 	boolean  echo;		/* 1 to echo characters */
-	boolean  unicodecapable;	/* unicode support is possible on platform */
-	boolean  unicodedisp;	/* unicode support is turned on */
 #if 0
 	boolean  DECgraphics;	/* use DEC VT-xxx extended character set */
 	boolean  IBMgraphics;	/* use IBM extended character set */
@@ -298,11 +295,9 @@ struct instance_flags {
 	boolean  cmdassist;	/* provide detailed assistance for some commands */
 	boolean	 clicklook;	/* allow right-clicking for look */
 	boolean	 obsolete;	/* obsolete options can point at this, it isn't used */
-#ifdef AUTOPICKUP_EXCEPTIONS
 	struct autopickup_exception *autopickup_exceptions[2];
 #define AP_LEAVE 0
 #define AP_GRAB	 1
-#endif
 #ifdef WIN32CON
 #define MAX_ALTKEYHANDLER 25
 	char	 altkeyhandler[MAX_ALTKEYHANDLER];

@@ -1,4 +1,5 @@
-/* NetHack 3.5	ntconf.h	$Date$  $Revision$ */
+/* NetHack 3.5	ntconf.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	ntconf.h	$Date: 2012/01/15 19:11:38 $  $Revision: 1.35 $ */
 /*	SCCS Id: @(#)ntconf.h	3.5	2002/03/10	*/
 /* Copyright (c) NetHack PC Development Team 1993, 1994.  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -192,11 +193,6 @@ extern void NDECL(toggle_mouse_support);
 extern void FDECL(map_subkeyvalue, (char *));
 extern void NDECL(load_keyboard_handler);
 extern void NDECL(raw_clear_screen);
-# ifdef UNICODE_WIDEWINPORT
-extern void FDECL(xputc, (NHWCHAR_P));
-# else
-extern void FDECL(xputc, (int));
-# endif
 #endif
 
 #include <fcntl.h>
@@ -226,11 +222,6 @@ int  _RTLENTRY _EXPFUNC read  (int __handle, void _FAR *__buf, unsigned __len);
 
 #ifndef alloca
 #define ALLOCA_HACK	/* used in util/panic.c */
-#endif
-
-#ifndef REDO
-#undef	Getchar
-#define Getchar nhgetch
 #endif
 
 extern int FDECL(set_win32_option, (const char *, const char *));

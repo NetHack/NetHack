@@ -1,4 +1,5 @@
-/* NetHack 3.5	quest.c	$Date$  $Revision$ */
+/* NetHack 3.5	quest.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	quest.c	$Date: 2009/05/06 10:47:33 $  $Revision: 1.10 $ */
 /*	SCCS Id: @(#)quest.c	3.5	2006/08/05	*/
 /*	Copyright 1991, M. Stephenson		  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -128,7 +129,6 @@ boolean talk;
     int purity;
     aligntyp original_alignment = u.ualignbase[A_ORIGINAL];
 
-#ifdef WIZARD
     if (wizard && talk) {
 	if (u.ualign.type != original_alignment) {
 	    You("are currently %s instead of %s.",
@@ -142,7 +142,6 @@ boolean talk;
 		u.ualign.record = MIN_QUEST_ALIGN;
 	}
     }
-#endif
     purity = (u.ualign.record >= MIN_QUEST_ALIGN &&
 	      u.ualign.type == original_alignment &&
 	      u.ualignbase[A_CURRENT] == original_alignment) ?  1 :
@@ -173,9 +172,7 @@ boolean seal;
     if (seal) {	/* remove the portal to the quest - sealing it off */
 	int reexpelled = u.uevent.qexpelled;
 	u.uevent.qexpelled = 1;
-#ifdef DUNGEON_OVERVIEW
 	remdun_mapseen(quest_dnum);
-#endif
 	/* Delete the near portal now; the far (main dungeon side)
 	   portal will be deleted as part of arrival on that level.
 	   If monster movement is in progress, any who haven't moved
