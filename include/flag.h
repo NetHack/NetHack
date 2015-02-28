@@ -1,4 +1,4 @@
-/* NetHack 3.5	flag.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	flag.h	$NHDT-Date: 1425081976 2015/02/28 00:06:16 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.60 $ */
 /* NetHack 3.5	flag.h	$Date: 2012/04/09 02:56:32 $  $Revision: 1.59 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -297,11 +297,9 @@ struct instance_flags {
 	boolean  cmdassist;	/* provide detailed assistance for some commands */
 	boolean	 clicklook;	/* allow right-clicking for look */
 	boolean	 obsolete;	/* obsolete options can point at this, it isn't used */
-#ifdef AUTOPICKUP_EXCEPTIONS
 	struct autopickup_exception *autopickup_exceptions[2];
 #define AP_LEAVE 0
 #define AP_GRAB	 1
-#endif
 #ifdef WIN32CON
 #define MAX_ALTKEYHANDLER 25
 	char	 altkeyhandler[MAX_ALTKEYHANDLER];
