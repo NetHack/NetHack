@@ -57,6 +57,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NetHack", "build\NetHack.vc
 		{8A3F81C7-2968-49A8-86BF-2669412AD7DE} = {8A3F81C7-2968-49A8-86BF-2669412AD7DE}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nhdefkey", "build\nhdefkey.vcxproj", "{6813477F-64B6-4B97-B230-438D0D233385}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -167,6 +169,14 @@ Global
 		{609BC774-C6F8-4B2B-AA7D-5B3D0EA95751}.Release|Win32.ActiveCfg = Release|Win32
 		{609BC774-C6F8-4B2B-AA7D-5B3D0EA95751}.Release|Win32.Build.0 = Release|Win32
 		{609BC774-C6F8-4B2B-AA7D-5B3D0EA95751}.Release|x64.ActiveCfg = Release|Win32
+		{6813477F-64B6-4B97-B230-438D0D233385}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6813477F-64B6-4B97-B230-438D0D233385}.Debug|Win32.Build.0 = Debug|Win32
+		{6813477F-64B6-4B97-B230-438D0D233385}.Debug|x64.ActiveCfg = Debug|x64
+		{6813477F-64B6-4B97-B230-438D0D233385}.Debug|x64.Build.0 = Debug|x64
+		{6813477F-64B6-4B97-B230-438D0D233385}.Release|Win32.ActiveCfg = Release|Win32
+		{6813477F-64B6-4B97-B230-438D0D233385}.Release|Win32.Build.0 = Release|Win32
+		{6813477F-64B6-4B97-B230-438D0D233385}.Release|x64.ActiveCfg = Release|x64
+		{6813477F-64B6-4B97-B230-438D0D233385}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

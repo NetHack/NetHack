@@ -140,6 +140,16 @@ copy %SRCPATH%\levcomp.vcxproj %BUILDPATH% >nul
 copy %SRCPATH%\levstuff.vcxproj %BUILDPATH% >nul
 copy %SRCPATH%\recover.vcxproj %BUILDPATH% >nul
 copy %SRCPATH%\tiles.vcxproj %BUILDPATH% >nul
+echo LIBRARY nhdefkey >%BUILDPATH%\nhdefkey64.def
+echo LIBRARY nhdefkey >%BUILDPATH%\nhdefkey.def
+echo EXPORTS >>%BUILDPATH%\nhdefkey.def
+echo ProcessKeystroke >>%BUILDPATH%\nhdefkey.def
+echo NHkbhit >>%BUILDPATH%\nhdefkey.def
+echo CheckInput >>%BUILDPATH%\nhdefkey.def 
+echo SourceWhere >>%BUILDPATH%\nhdefkey.def
+echo SourceAuthor >>%BUILDPATH%\nhdefkey.def
+echo KeyHandlerName >>%BUILDPATH%\nhdefkey.def
+
 echo Done copying files.
 :skipvcexpress
 
