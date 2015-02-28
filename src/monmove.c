@@ -579,7 +579,6 @@ register struct monst *mtmp;
 	return(FALSE);
 }
 
-#ifdef BARGETHROUGH
 /*
  * should_displace()
  *
@@ -623,7 +622,6 @@ xchar gx, gy;
 		return TRUE;
 	return FALSE;
 }
-#endif /* BARGETHROUGH */
 
 /* Return values:
  * 0: did not move, but can still attack and do other stuff.
@@ -644,9 +642,7 @@ register int after;
 	boolean can_open=0, can_unlock=0, doorbuster=0;
 	boolean uses_items=0, setlikes=0;
 	boolean avoid=FALSE;
-#ifdef BARGETHROUGH
 	boolean better_with_displacing = FALSE;
-#endif
 	struct permonst *ptr;
 	struct monst *mtoo;
 	schar mmoved = 0;	/* not strictly nec.: chi >= 0 will do */
@@ -956,19 +952,15 @@ not_special:
 		for(i = 0; i < cnt; i++)
 		    if(!(info[i] & NOTONL)) avoid=TRUE;
 	    }
-#ifdef BARGETHROUGH
 	    better_with_displacing = should_displace(mtmp,poss,info,cnt,gx,gy);
-#endif
 	    for(i=0; i < cnt; i++) {
 		if (avoid && (info[i] & NOTONL)) continue;
 		nx = poss[i].x;
 		ny = poss[i].y;
 
-#ifdef BARGETHROUGH
 		if (MON_AT(nx,ny) &&
 			(info[i] & ALLOW_MDISP) && !(info[i] & ALLOW_M) &&
 			!better_with_displacing) continue;
-#endif
 		if (appr != 0) {
 		    mtrk = &mtmp->mtrack[0];
 		    for(j=0; j < jcnt; mtrk++, j++)
@@ -1064,7 +1056,6 @@ not_special:
 		return 3;
 	    }
 
-#ifdef BARGETHROUGH
 	    if((info[chi] & ALLOW_MDISP)) {
 		struct monst *mtmp2;
 		int mstatus;
@@ -1075,7 +1066,6 @@ not_special:
 		if (mstatus & MM_HIT) return 1;
 		return 3;
 	    }
-#endif /* BARGETHROUGH */
 
 	    if (!m_in_out_region(mtmp,nix,niy))
 	        return 3;
@@ -1369,7 +1359,6 @@ found_you:
 	mtmp->muy = my;
 }
 
-#ifdef BARGETHROUGH
 /*
  * mon-to-mon displacement is a deliberate "get out of my way" act,
  * not an accidental bump, so we don't consider mstun or mconf in
@@ -1401,7 +1390,6 @@ xchar x,y;
 
 	 return FALSE;
 }
-#endif /* BARGETHROUGH */
 
 /*
  * Inventory prevents passage under door.

@@ -520,9 +520,7 @@ E void FDECL(clear_symsetentry, (int,BOOLEAN_P));
 E void FDECL(update_l_symset, (struct symparse *,int));
 E void FDECL(update_r_symset, (struct symparse *,int));
 #endif
-#ifdef BARGETHROUGH
 E boolean FDECL(cursed_object_at, (int, int));
-#endif
 
 /* ### dungeon.c ### */
 
@@ -1090,9 +1088,7 @@ E int FDECL(buzzmu, (struct monst *,struct attack *));
 E int FDECL(fightm, (struct monst *));
 E int FDECL(mattackm, (struct monst *,struct monst *));
 E boolean FDECL(engulf_target, (struct monst *,struct monst *));
-#ifdef BARGETHROUGH
 E int FDECL(mdisplacem, (struct monst *,struct monst *,BOOLEAN_P));
-#endif
 E void FDECL(paralyze_monst, (struct monst *,int));
 E int FDECL(sleep_monst, (struct monst *,int,int));
 E void FDECL(slept_monst, (struct monst *));
@@ -1374,11 +1370,9 @@ E boolean FDECL(accessible, (int,int));
 E void FDECL(set_apparxy, (struct monst *));
 E boolean FDECL(can_ooze, (struct monst *));
 E boolean FDECL(can_fog, (struct monst *));
-#ifdef BARGETHROUGH
 E boolean FDECL(should_displace, (struct monst *,coord *,long *,int,
 					XCHAR_P,XCHAR_P));
 E boolean FDECL(undesirable_disp, (struct monst *,XCHAR_P,XCHAR_P));
-#endif
 
 /* ### monst.c ### */
 

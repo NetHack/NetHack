@@ -131,9 +131,7 @@
 #define is_covetous(ptr)	((ptr->mflags3 & M3_COVETOUS))
 #define infravision(ptr)	((ptr->mflags3 & M3_INFRAVISION))
 #define infravisible(ptr)	((ptr->mflags3 & M3_INFRAVISIBLE))
-#ifdef BARGETHROUGH
 #define is_displacer(ptr)	(((ptr)->mflags3 & M3_DISPLACES) != 0L) 
-#endif
 #define is_mplayer(ptr)		(((ptr) >= &mons[PM_ARCHEOLOGIST]) && \
 				 ((ptr) <= &mons[PM_WIZARD]))
 #define is_rider(ptr)		((ptr) == &mons[PM_DEATH] || \

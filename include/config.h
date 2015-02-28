@@ -425,7 +425,6 @@ typedef unsigned char	uchar;
 # endif
 #endif
 #define AUTOPICKUP_EXCEPTIONS	/* exceptions to autopickup */
-#define BARGETHROUGH	/* allow some monsters to move others out of their way */
 
 #ifdef REDO
 # define DOAGAIN '\001' /* ^A, the "redo" key used in cmd.c and getline.c */
