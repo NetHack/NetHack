@@ -54,10 +54,8 @@ sys_early_init(){
 # endif
 #endif
 
-#ifdef SEDUCE
 	sysopt.seduce = 1;	/* if it's compiled in, default to on */
 	sysopt_seduce_set(sysopt.seduce);
-#endif
 }
 
 

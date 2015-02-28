@@ -807,7 +807,6 @@ register struct monst *mtmp;
 	case MS_SEDUCE:
 	    {
 	    int swval;
-#ifdef SEDUCE
 	    if (SYSOPT_SEDUCE) {
 	      if (ptr->mlet != S_NYMPH &&
 		could_seduce(mtmp, &youmonst, (struct attack *)0) == 1) {
@@ -816,7 +815,6 @@ register struct monst *mtmp;
 	      }
 	      swval = ((poly_gender() != (int) mtmp->female) ? rn2(3) : 0);
 	    } else
-#endif
 	      swval = ((poly_gender() == 0) ? rn2(3) : 0);
 	    switch(swval){
 		case 2:

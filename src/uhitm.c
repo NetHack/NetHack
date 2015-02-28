@@ -1452,9 +1452,7 @@ register struct attack *mattk;
 		    minstapetrify(mdef, TRUE);
 		tmp = 0;
 		break;
-#ifdef SEDUCE
 	    case AD_SSEX:
-#endif
 	    case AD_SEDU:
 	    case AD_SITM:
 		steal_it(mdef, mattk);

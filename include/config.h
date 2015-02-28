@@ -417,7 +417,6 @@ typedef unsigned char	uchar;
 /* dungeon levels */
 #define WALLIFIED_MAZE	/* Fancy mazes - Jean-Christophe Collet */
 /* monsters & objects */
-#define SEDUCE		/* Succubi/incubi seduction, by KAA, suggested by IM */
 /* I/O */
 #define REDO		/* support for redoing last command - DGK */
 #if !defined(MAC)
