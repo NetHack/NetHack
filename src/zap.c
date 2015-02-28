@@ -584,9 +584,7 @@ coord *cc;
 		/* most cancelled monsters return to normal,
 		   but some need to stay cancelled */
 		if (!dmgtype(mtmp2->data, AD_SEDU)
-#ifdef SEDUCE
 				&& (!SYSOPT_SEDUCE || !dmgtype(mtmp2->data, AD_SSEX))
-#endif
 		    ) mtmp2->mcan = 0;
 		mtmp2->mcansee = 1;	/* set like in makemon */
 		mtmp2->mblinded = 0;

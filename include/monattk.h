@@ -72,7 +72,6 @@
 #define AD_DISE		33	/* confers diseases */
 #define AD_DCAY		34	/* decays organics (brown Pudding) */
 #define AD_SSEX		35	/* Succubus seduction (extended) */
-				/* If no SEDUCE then same as AD_SEDU */
 #define AD_HALU		36	/* causes hallucination */
 #define AD_DETH		37	/* for Death only */
 #define AD_PEST		38	/* for Pestilence only */

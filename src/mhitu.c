@@ -12,9 +12,7 @@ STATIC_DCL void FDECL(urustm, (struct monst *, struct obj *));
 STATIC_DCL boolean FDECL(u_slip_free, (struct monst *,struct attack *));
 STATIC_DCL int FDECL(passiveum, (struct permonst *,struct monst *,struct attack *));
 
-#ifdef SEDUCE
 STATIC_DCL void FDECL(mayberem, (struct obj *, const char *));
-#endif
 
 STATIC_DCL boolean FDECL(diseasemu, (struct permonst *));
 STATIC_DCL int FDECL(hitmu, (struct monst *,struct attack *));
@@ -1256,7 +1254,6 @@ dopois:
 		if(!mtmp->mcan) stealgold(mtmp);
 		break;
 
-#ifdef SEDUCE
 	    case AD_SSEX:
 		if(SYSOPT_SEDUCE){
 		if(could_seduce(mtmp, &youmonst, mattk) == 1
@@ -1266,7 +1263,6 @@ dopois:
 		break;
 		}
 		/* else FALLTHRU */
-#endif
 	    case AD_SITM:	/* for now these are the same */
 	    case AD_SEDU:
 		if (is_animal(mtmp->data)) {
@@ -1274,10 +1270,7 @@ dopois:
 			if (mtmp->mcan) break;
 			/* Continue below */
 		} else if (dmgtype(youmonst.data, AD_SEDU)
-#ifdef SEDUCE
-			|| (SYSOPT_SEDUCE && dmgtype(youmonst.data, AD_SSEX))
-#endif
-						) {
+			|| (SYSOPT_SEDUCE && dmgtype(youmonst.data, AD_SSEX))) {
 			pline("%s %s.", Monnam(mtmp), mtmp->minvent ?
 		    "brags about the goods some dungeon explorer provided" :
 		    "makes some remarks about how difficult theft is lately");
@@ -2198,19 +2191,13 @@ struct attack *mattk;
 		gendef = gender(mdef);
 	}
 
-	if(agrinvis && !defperc
-#ifdef SEDUCE
-		&& (!SYSOPT_SEDUCE || ( mattk && mattk->adtyp != AD_SSEX))
-#endif
-		)
+	if(agrinvis && !defperc &&
+            (!SYSOPT_SEDUCE || ( mattk && mattk->adtyp != AD_SSEX)))
 		return 0;
 
 	if(pagr->mlet != S_NYMPH
 		&& ((pagr != &mons[PM_INCUBUS] && pagr != &mons[PM_SUCCUBUS])
-#ifdef SEDUCE
-		    || (SYSOPT_SEDUCE && mattk && mattk->adtyp != AD_SSEX)
-#endif
-		   ))
+		    || (SYSOPT_SEDUCE && mattk && mattk->adtyp != AD_SSEX)))
 		return 0;
 	
 	if(genagr == 1 - gendef)
@@ -2219,7 +2206,6 @@ struct attack *mattk;
 		return (pagr->mlet == S_NYMPH) ? 2 : 0;
 }
 
-#ifdef SEDUCE
 /* Returns 1 if monster teleported */
 int
 doseduce(mon)
@@ -2485,7 +2471,6 @@ const char *str;
 	}
 	remove_worn_item(obj, TRUE);
 }
-#endif  /* SEDUCE */
 
 STATIC_OVL int
 passiveum(olduasmon,mtmp,mattk)
