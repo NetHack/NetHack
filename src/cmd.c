@@ -236,7 +236,6 @@ int xtime;
 	return;
 }
 
-#ifdef REDO
 
 STATIC_DCL char NDECL(popch);
 
@@ -298,7 +297,6 @@ char ch;
 	}
 	return;
 }
-#endif /* REDO */
 
 STATIC_PTR int
 doextcmd(VOID_ARGS)	/* here after # - now read a full-word command */
@@ -2950,7 +2948,6 @@ register char *cmd;
 		context.move = FALSE;
 		return;
 	}
-#ifdef REDO
 	if (*cmd == DOAGAIN && !in_doagain && saveq[0]) {
 		in_doagain = TRUE;
 		stail = 0;
@@ -2960,9 +2957,6 @@ register char *cmd;
 	}
 	/* Special case of *cmd == ' ' handled better below */
 	if(!*cmd || *cmd == (char)0377)
-#else
-	if(!*cmd || *cmd == (char)0377 || (!flags.rest_on_space && *cmd == ' '))
-#endif
 	{
 		nhbell();
 		context.move = FALSE;
@@ -3253,11 +3247,9 @@ const char *s;
 	int is_mov;
 
  retry:
-#ifdef REDO
 	if (in_doagain || *readchar_queue)
 	    dirsym = readchar();
 	else
-#endif
 	    dirsym = yn_function((s && *s != '^') ? s : "In what direction?",
 					(char *)0, '\0');
 	/* remove the prompt string so caller won't have to */
@@ -3267,9 +3259,7 @@ const char *s;
 	    docrt();		/* redraw */
 	    goto retry;
 	}
-#ifdef REDO
 	savech(dirsym);
-#endif
 
 	if (dirsym == '.' || dirsym == 's') {
 	    u.dx = u.dy = u.dz = 0;
@@ -3554,14 +3544,12 @@ parse()
 	if (foo == '\033') {   /* esc cancels count (TH) */
 	    clear_nhwindow(WIN_MESSAGE);
 	    multi = last_multi = 0;
-# ifdef REDO
 	} else if (foo == DOAGAIN || in_doagain) {
 	    multi = last_multi;
 	} else {
 	    last_multi = multi;
 	    savech(0);	/* reset input queue */
 	    savech((char)foo);
-# endif
 	}
 
 	if (multi) {
@@ -3589,9 +3577,7 @@ parse()
 	if (foo == 'g' || foo == 'G' || foo == 'm' || foo == 'M' ||
 	    foo == 'F' || (Cmd.num_pad && (foo == '5' || foo == '-'))) {
 	    foo = readchar();
-#ifdef REDO
 	    savech((char)foo);
-#endif
 	    in_line[1] = foo;
 	    in_line[2] = 0;
 	}
@@ -3658,11 +3644,7 @@ readchar()
 	if ( *readchar_queue )
 	    sym = *readchar_queue++;
 	else
-#ifdef REDO
-	    sym = in_doagain ? Getchar() : nh_poskey(&x, &y, &mod);
-#else
-	    sym = Getchar();
-#endif
+	    sym = in_doagain ? pgetchar() : nh_poskey(&x, &y, &mod);
 
 #ifdef NR_OF_EOFS
 	if (sym == EOF) {
@@ -3674,7 +3656,7 @@ readchar()
 	   */
 	    do {
 		clearerr(stdin);	/* omit if clearerr is undefined */
-		sym = Getchar();
+		sym = pgetchar();
 	    } while (--cnt && sym == EOF);
 	}
 #endif /* NR_OF_EOFS */
@@ -3687,7 +3669,7 @@ readchar()
 #ifdef ALTMETA
 	} else if (sym == '\033' && alt_esc) {
 	    /* iflags.altmeta: treat two character ``ESC c'' as single `M-c' */
-	    sym = *readchar_queue ? *readchar_queue++ : Getchar();
+	    sym = *readchar_queue ? *readchar_queue++ : pgetchar();
 	    if (sym == EOF || sym == 0)
 		sym = '\033';
 	    else if (sym != '\033')

@@ -134,12 +134,6 @@ typedef char nhptext;
  */
 #define LARGEST_INT	32767
 
-
-#ifdef REDO
-#define Getchar pgetchar
-#endif
-
-
 #include "coord.h"
 /*
  * Automatic inclusions for the subsidiary files.

@@ -281,9 +281,6 @@
 
 #define HLOCK	"perm"	/* an empty file used for locking purposes */
 
-#ifndef REDO
-#define Getchar nhgetch
-#endif
 #define tgetch getchar
 
 #ifndef NOSHELL

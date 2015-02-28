@@ -1261,9 +1261,6 @@ static const char *build_opts[] = {
 #  endif
 # endif
 #endif
-#ifdef REDO
-		"redo command",
-#endif
 #ifdef SELECTSAVED
 		"restore saved games via menu",
 #endif

@@ -246,11 +246,9 @@ boolean resuming;
 				if (!next_to_u()) {
 				    check_leash(old_ux, old_uy);
 				}
-#ifdef REDO
 				/* clear doagain keystrokes */
 				pushch(0);
 				savech(0);
-#endif
 			    }
 			}
 			/* delayed change may not be valid anymore */
@@ -355,12 +353,10 @@ boolean resuming;
 #if defined(MICRO) || defined(WIN32)
 	    abort_lev = 0;
 	    if (kbhit()) {
-		if ((ch = Getchar()) == ABORT)
+		if ((ch = pgetchar()) == ABORT)
 		    abort_lev++;
-# ifdef REDO
 		else
 		    pushch(ch);
-# endif /* REDO */
 	    }
 	    if (!abort_lev && (*occupation)() == 0)
 #else
@@ -439,10 +435,8 @@ stop_occupation()
 		    You("stop %s.", occtxt);
 		occupation = 0;
 		context.botl = 1; /* in case u.uhs changed */
-#ifdef REDO
 		nomul(0);
 		pushch(0);
-#endif
 	}
 }
 

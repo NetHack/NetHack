@@ -407,7 +407,7 @@ const char *str;
 #else
 	msmsg("Hit <Enter> %s.", str);
 #endif
-	while (Getchar() != '\n') ;
+	while (pgetchar() != '\n') ;
 	return;
 }
 

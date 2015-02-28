@@ -31,9 +31,7 @@ int x_maze_max = (COLNO-1) & ~1,
 
 int otg_temp;			/* used by object_to_glyph() [otg] */
 
-#ifdef REDO
 NEARDATA int in_doagain = 0;
-#endif
 
 /*
  *	The following structure will be initialized at startup time with

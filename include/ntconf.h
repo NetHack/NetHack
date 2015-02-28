@@ -229,11 +229,6 @@ int  _RTLENTRY _EXPFUNC read  (int __handle, void _FAR *__buf, unsigned __len);
 #define ALLOCA_HACK	/* used in util/panic.c */
 #endif
 
-#ifndef REDO
-#undef	Getchar
-#define Getchar nhgetch
-#endif
-
 extern int FDECL(set_win32_option, (const char *, const char *));
 #ifdef WIN32CON
 #define LEFTBUTTON  FROM_LEFT_1ST_BUTTON_PRESSED
