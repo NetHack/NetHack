@@ -987,7 +987,6 @@ allow digging an adjacent pit with wand of digging while trapped in a pit
 #terrain command to show unobstructed view of map (w/o mons, objs, traps)
 digging can activate or disarm some types of traps
 some monsters can eat tins in addition to corpses to cure some ailments
-add Roderick Schertler's pickup_thrown patch
 add ability to sort the list when viewing known spells with '+' command
 describe magic cancellation from worn armor in enlightment/end-of-game feedback
 disclose half physical and/or spell damage in enlightment/end-of-game feedback
@@ -1001,7 +1000,6 @@ new config file keyword: SYMBOLS for overriding character symbol values by name
 opening magic frees from bear traps and webs, activates trap doors
 closing magic activates bear traps and webs
 locking converts a hole into a trap door; striking does the opposite
-add Malcolm Ryan's Statue Glyphs patch
 lembas and cram never rot unless cursed
 multiple squeaks for squeaky boards
 include time, user ID, and play mode in paniclog entries
@@ -1045,15 +1043,6 @@ chatting to a gecko or shopkeeper while hallucinating gives alternate message
 mimic posing as door might steal hero's key when [un]locking is attempted
 polymorphing into a dragon while wearing dragon scale mail will cause that
 	mail to revert to dragon scales
-adopt/adapt/improve the Paranoid_Quit patch; default is paranoid_confirm:pray
-	paranoid_confirm:Confirm when requiring "yes" instead of y to confirm,
-				 also require explicit "no" to reject
-	paranoid_confirm:quit    yes vs y to quit or to enter explore mode
-	paranoid_confirm:die     yes vs y to die in explore or wizard mode
-	paranoid_confirm:bones   yes vs y to save bones when dying in wizard mode
-	paranoid_confirm:attack  yes vs y to attack a peaceful monster
-	paranoid_confirm:pray    y to confirm #pray; supersedes prayconfirm
-	paranoid_confirm:Remove  always pick from inventory for 'R' and 'T'
 flexibility for specifying "detect <foo>" vs "<foo> detection" when wishing
 when a sokoban puzzle has been completed (last pit or hole filled in),
 	stop assessing luck penalties and lift most movement restrictions
@@ -1088,6 +1077,22 @@ smartphone: fixed F command to prompt for direction
 unix,vms: altmeta option to handle terminals which send "ESC c" for Alt+c
 
 
+NetHack Community Patches (or Variation) Included
+-------------------------------------------------
+Roderick Schertler's pickup_thrown patch
+Malcolm Ryan's Statue Glyphs patch
+adopt/adapt/improve the Paranoid_Quit patch; default is paranoid_confirm:pray
+	paranoid_confirm:Confirm when requiring "yes" instead of y to confirm,
+				 also require explicit "no" to reject
+	paranoid_confirm:quit    yes vs y to quit or to enter explore mode
+	paranoid_confirm:die     yes vs y to die in explore or wizard mode
+	paranoid_confirm:bones   yes vs y to save bones when dying in wizard mode
+	paranoid_confirm:attack  yes vs y to attack a peaceful monster
+	paranoid_confirm:pray    y to confirm #pray; supersedes prayconfirm
+	paranoid_confirm:Remove  always pick from inventory for 'R' and 'T'
+adopt/adapt/improve Dungeon Overview
+
+
 Code Cleanup and Reorganization
 -------------------------------
 removed OVLx section dividers previously  used for TRAMPOLINE overlay system
@@ -1106,3 +1111,17 @@ drawing symbols for DECGraphics, IBMGraphics, MACgraphics are now stored in an
 new hints-based configuration system
 allow documentation to be specialized to the options in the game binary
 add param to winsys ini routines to allow cleaner shifting during startup
+make STEED unconditional
+make EXP_ON_BOTL unconditional
+make REDO unconditional
+make AUTOPICKUP_EXCEPTIONS unconditional
+make SEDUCE compile-time unconditional but still removable through SYSCF
+clean up some DEBUG conditional code
+make GOLDOBJ unconditional
+make WIZARD unconditional
+make SINKS 
+make REINCARNATION
+make TOURIST unconditional
+make KOPS unconditional
+make ELBERETH unconditional
+
