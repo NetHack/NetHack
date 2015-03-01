@@ -502,7 +502,7 @@ static const char * const alteration_verbs[] = {
 			"cancel", "drain", "uncharge", "unbless", "uncurse",
 			"disenchant", "degrade", "dilute", "erase", "burn",
 			"neutralize", "destroy", "splatter", "bite", "open",
-			"break the lock on",
+			"break the lock on", "rust", "rot", "tarnish"
 };
 
 /* possibly bill for an object which the player has just modified */

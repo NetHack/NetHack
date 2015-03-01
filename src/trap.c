@@ -55,7 +55,7 @@ struct monst *victim;
     int mat_idx;
     
     if (!victim) return 0;
-#define burn_dmg(obj,descr) erode_obj(obj, descr, ERODE_BURN, TRUE, FALSE)
+#define burn_dmg(obj,descr) erode_obj(obj, descr, ERODE_BURN, EF_GREASE)
     while (1) {
 	switch (rn2(5)) {
 	case 0:
@@ -101,31 +101,34 @@ struct monst *victim;
 #undef burn_dmg
 }
 
-/* Generic erode-item function.  Returns TRUE if any change in state
- * occurred, or if grease protected the item.
+/* Generic erode-item function.
  * "ostr", if non-null, is an alternate string to print instead of the
  *   object's name.
- * "check_grease", if FALSE, means that grease is not checked for
- * "print", if set, means to print a message even if no change occurs.
+ * "type" is an ERODE_* value for the erosion type
+ * "flags" is an or-ed list of EF_* flags
+ *
+ * Returns an erosion return value (ER_*)
  */
-boolean
-erode_obj(otmp, ostr, type, check_grease, print)
+int
+erode_obj(otmp, ostr, type, ef_flags)
 register struct obj *otmp;
 register const char *ostr;
 int type;
-boolean check_grease;
-boolean print;
+int ef_flags;
 {
 	static NEARDATA const char * const action[] = { "smoulder", "rust", "rot", "corrode" };
 	static NEARDATA const char * const msg[] =  { "burnt", "rusted", "rotten", "corroded" };
 	boolean vulnerable = FALSE;
 	boolean is_primary = TRUE;
+        boolean check_grease = ef_flags & EF_GREASE;
+        boolean print = ef_flags & EF_VERBOSE;
 	int erosion;
         struct monst *victim;
 	boolean vismon;
         boolean visobj;
+        int cost_type;
 
-	if (!otmp) return(FALSE);
+	if (!otmp) return ER_NOTHING;
 
         victim = carried(otmp) ? &youmonst : mcarried(otmp) ?
             otmp->ocarry : NULL;
@@ -137,22 +140,26 @@ boolean print;
 		case ERODE_BURN:
                     vulnerable = is_flammable(otmp);
                     check_grease = FALSE;
+                    cost_type = COST_BURN;
 		    break;
 		case ERODE_RUST:
                     vulnerable = is_rustprone(otmp);
+                    cost_type = COST_RUST;
 		    break;
 		case ERODE_ROT:
                     vulnerable = is_rottable(otmp);
                     check_grease = FALSE;
 		    is_primary = FALSE;
+                    cost_type = COST_ROT;
 		    break;
 		case ERODE_CORRODE:
                     vulnerable = is_corrodeable(otmp);
 		    is_primary = FALSE;
+                    cost_type = COST_CORRODE;
 		    break;
                 default:
                     impossible("Invalid erosion type in erode_obj");
-                    return FALSE;
+                    return ER_NOTHING;
 	}
 	erosion = is_primary ? otmp->oeroded : otmp->oeroded2;
 
@@ -161,7 +168,7 @@ boolean print;
 
         if (check_grease && otmp->greased) {
             grease_protect(otmp, ostr, victim);
-            return TRUE;
+            return ER_GREASED;
         } else if (!vulnerable || (otmp->oerodeproof && otmp->rknown)) {
 	    if (print && flags.verbose) {
 		if (victim == &youmonst)
@@ -170,7 +177,7 @@ boolean print;
 		    pline("%s %s %s not affected.", s_suffix(Monnam(victim)),
                           ostr, vtense(ostr, "are"));
 	    }
-            return FALSE;
+            return ER_NOTHING;
         } else if (otmp->oerodeproof || (otmp->blessed && !rnl(4))) {
             if (flags.verbose && (print || otmp->oerodeproof)) {
 		if (victim == &youmonst)
@@ -188,9 +195,13 @@ boolean print;
              * is blessed, it still shows some minor signs of wear, and
              * the hero can distinguish this from an object that is
              * actually proof against damage. */
-            if (otmp->oerodeproof)
+            if (otmp->oerodeproof) {
                 otmp->rknown = TRUE;
-            return FALSE;
+                if (victim == &youmonst)
+                    update_inventory();
+            }
+
+            return ER_NOTHING;
 	} else if (erosion < MAX_ERODE) {
             const char *adverb = (erosion + 1 == MAX_ERODE) ?
                 " completely" : erosion ? " further" : "";
@@ -198,19 +209,39 @@ boolean print;
             if (victim == &youmonst)
                 Your("%s %s%s!", ostr, vtense(ostr, action[type]), adverb);
             else if (vismon)
-                pline("%s's %s %s%s!", Monnam(victim), ostr,
+                pline("%s %s %s%s!", s_suffix(Monnam(victim)), ostr,
                       vtense(ostr, action[type]), adverb);
             else if (visobj)
                 pline("The %s %s%s!", ostr, vtense(ostr, action[type]), adverb);
+
+            if (ef_flags & EF_PAY)
+                costly_alteration(otmp, cost_type);
 
             if (is_primary)
                 otmp->oeroded++;
             else
                 otmp->oeroded2++;
 
-            update_inventory();
-            return TRUE;
-	} else {
+            if (victim == &youmonst)
+                update_inventory();
+
+            return ER_DAMAGED;
+	} else if (ef_flags & EF_DESTROY) {
+            if (victim == &youmonst)
+                Your("%s %s away!", ostr, vtense(ostr, action[type]));
+            else if (vismon)
+                pline("%s %s %s away!", s_suffix(Monnam(victim)), ostr,
+                      vtense(ostr, action[type]));
+            else if (visobj)
+                pline("The %s %s away!", ostr, vtense(ostr, action[type]));
+
+            if (ef_flags & EF_PAY)
+                costly_alteration(otmp, cost_type);
+
+            setnotworn(otmp);
+            delobj(otmp);
+            return ER_DESTROYED;
+        } else {
 	    if (flags.verbose && print) {
 		if (victim == &youmonst)
 		    Your("%s %s completely %s.", ostr,
@@ -224,7 +255,7 @@ boolean print;
                     pline("The %s %s completely %s.", ostr,
                           vtense(ostr, "look"), msg[type]);
 	    }
-            return FALSE;
+            return ER_NOTHING;
 	}
 }
 
@@ -952,7 +983,7 @@ unsigned trflags;
 		    case 1:
 			pline("%s your left %s!", A_gush_of_water_hits,
 				    body_part(ARM));
-			if (water_damage(uarms, "shield", TRUE))
+			if (water_damage(uarms, "shield", TRUE) != ER_NOTHING)
 			    break;
 			if (u.twoweap || (uwep && bimanual(uwep)))
 			    (void) water_damage(u.twoweap ? uswapwep : uwep, 0,
@@ -2097,7 +2128,7 @@ register struct monst *mtmp;
 				pline("%s %s's left %s!", A_gush_of_water_hits,
 				    mon_nam(mtmp), mbodypart(mtmp, ARM));
 			    target = which_armor(mtmp, W_ARMS);
-			    if (water_damage(target, "shield", TRUE))
+			    if (water_damage(target, "shield", TRUE) != ER_NOTHING)
 				break;
 			    target = MON_WEP(mtmp);
 			    if (target && bimanual(target))
@@ -2972,104 +3003,118 @@ domagictrap()
 	  }
 }
 
-/*
- * Scrolls, spellbooks, potions, and flammable items
- * may get affected by the fire.
+/* Set an item on fire.
+ *   "force" means not to roll a luck-based protection check for the
+ *     item.
+ *   "x" and "y" are the coordinates to dump the contents of a
+ *     container, if it burns up.
  *
- * Return number of objects destroyed. --ALI
+ * Return whether the object was destroyed.
  */
-int
-fire_damage(chain, force, here, x, y)
-struct obj *chain;
-boolean force, here;
+boolean
+fire_damage(obj, force, x, y)
+struct obj *obj;
+boolean force;
 xchar x, y;
 {
     int chance;
-    struct obj *obj, *otmp, *nobj, *ncobj;
+    struct obj *otmp, *ncobj;
     int retval = 0;
     int in_sight = !Blind && couldsee(x, y);	/* Don't care if it's lit */
     int dindx;
 
+    /* object might light in a controlled manner */
+    if (catch_lit(obj))
+        return FALSE;
+
+    if (Is_container(obj)) {
+        switch (obj->otyp) {
+        case ICE_BOX:
+            return FALSE;		/* Immune */
+        case CHEST:
+            chance = 40;
+            break;
+        case LARGE_BOX:
+            chance = 30;
+            break;
+        default:
+            chance = 20;
+            break;
+        }
+        if ((!force && (Luck + 5) > rn2(chance)) ||
+            (is_flammable(obj) && obj->oerodeproof))
+            return FALSE;
+        /* Container is burnt up - dump contents out */
+        if (in_sight) pline("%s catches fire and burns.", Yname2(obj));
+        if (Has_contents(obj)) {
+            if (in_sight) pline("Its contents fall out.");
+            for (otmp = obj->cobj; otmp; otmp = ncobj) {
+                ncobj = otmp->nobj;
+                obj_extract_self(otmp);
+                if (!flooreffects(otmp, x, y, ""))
+                    place_object(otmp, x, y);
+            }
+        }
+        setnotworn(obj);
+        delobj(obj);
+        return TRUE;
+    } else if (!force && (Luck + 5) > rn2(20)) {
+        /*  chance per item of sustaining damage:
+          *	max luck (Luck==13):	10%
+          *	avg luck (Luck==0):	75%
+          *	awful luck (Luck<-4):  100%
+          */
+        return FALSE;
+    } else if (obj->oclass == SCROLL_CLASS || obj->oclass == SPBOOK_CLASS) {
+        if (obj->otyp == SCR_FIRE || obj->otyp == SPE_FIREBALL)
+            return FALSE;
+        if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
+            if (in_sight) pline("Smoke rises from %s.", the(xname(obj)));
+              return FALSE;
+        }
+        dindx = (obj->oclass == SCROLL_CLASS) ? 3 : 4;
+        if (in_sight)
+            pline("%s %s.", Yname2(obj),
+                  destroy_strings[dindx][(obj->quan > 1L)]);
+        setnotworn(obj);
+        delobj(obj);
+        return TRUE;
+    } else if (obj->oclass == POTION_CLASS) {
+        dindx = (obj->otyp != POT_OIL) ? 1 : 2;
+        if (in_sight)
+            pline("%s %s.", Yname2(obj),
+                  destroy_strings[dindx][(obj->quan > 1L)]);
+        setnotworn(obj);
+        delobj(obj);
+        return TRUE;
+    } else if (erode_obj(obj, NULL, ERODE_BURN, EF_DESTROY) == ER_DESTROYED) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+/*
+ * Apply fire_damage() to an entire chain.
+ *
+ * Return number of objects destroyed. --ALI
+ */
+int
+fire_damage_chain(chain, force, here, x, y)
+struct obj *chain;
+boolean force, here;
+xchar x, y;
+{
+    struct obj *obj, *nobj;
+    int num = 0;
     for (obj = chain; obj; obj = nobj) {
 	nobj = here ? obj->nexthere : obj->nobj;
-
-	/* object might light in a controlled manner */
-	if (catch_lit(obj))
-	    continue;
-
-	if (Is_container(obj)) {
-	    switch (obj->otyp) {
-	    case ICE_BOX:
-		continue;		/* Immune */
-		/*NOTREACHED*/
-		break;
-	    case CHEST:
-		chance = 40;
-		break;
-	    case LARGE_BOX:
-		chance = 30;
-		break;
-	    default:
-		chance = 20;
-		break;
-	    }
-	    if ((!force && (Luck + 5) > rn2(chance)) ||
-		(is_flammable(obj) && obj->oerodeproof))
-		continue;
-	    /* Container is burnt up - dump contents out */
-	    if (in_sight) pline("%s catches fire and burns.", Yname2(obj));
-	    if (Has_contents(obj)) {
-		if (in_sight) pline("Its contents fall out.");
-		for (otmp = obj->cobj; otmp; otmp = ncobj) {
-		    ncobj = otmp->nobj;
-		    obj_extract_self(otmp);
-		    if (!flooreffects(otmp, x, y, ""))
-			place_object(otmp, x, y);
-		}
-	    }
-	    delobj(obj);
-	    retval++;
-	} else if (!force && (Luck + 5) > rn2(20)) {
-	    /*  chance per item of sustaining damage:
-	     *	max luck (Luck==13):	10%
-	     *	avg luck (Luck==0):	75%
-	     *	awful luck (Luck<-4):  100%
-	     */
-	    continue;
-	} else if (obj->oclass == SCROLL_CLASS || obj->oclass == SPBOOK_CLASS) {
-	    if (obj->otyp == SCR_FIRE || obj->otyp == SPE_FIREBALL)
-		continue;
-	    if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
-		if (in_sight) pline("Smoke rises from %s.", the(xname(obj)));
-		continue;
-	    }
-	    dindx = (obj->oclass == SCROLL_CLASS) ? 3 : 4;
-	    if (in_sight)
-		pline("%s %s.", Yname2(obj),
-		      destroy_strings[dindx][(obj->quan > 1L)]);
-	    delobj(obj);
-	    retval++;
-	} else if (obj->oclass == POTION_CLASS) {
-	    dindx = (obj->otyp != POT_OIL) ? 1 : 2;
-	    if (in_sight)
-		pline("%s %s.", Yname2(obj),
-		      destroy_strings[dindx][(obj->quan > 1L)]);
-	    delobj(obj);
-	    retval++;
-	} else if (is_flammable(obj) && obj->oeroded < MAX_ERODE &&
-		   !(obj->oerodeproof || (obj->blessed && !rnl(4)))) {
-	    if (in_sight) {
-		pline("%s %s%s.", Yname2(obj), otense(obj, "burn"),
-		      obj->oeroded+1 == MAX_ERODE ? " completely" :
-		      obj->oeroded ? " further" : "");
-	    }
-	    obj->oeroded++;
-	}
+        if (fire_damage(obj, force, x, y))
+            ++num;
     }
 
-    if (retval && !in_sight)
+    if (num && (Blind && !couldsee(x, y)))
 	You("smell smoke.");
-    return retval;
+    return num;
 }
 
 void
@@ -3101,14 +3146,14 @@ struct obj *obj;
         obj->spe = 0;
         obj->dknown = 0;
     } else
-        erode_obj(obj, NULL, ERODE_CORRODE, TRUE, TRUE);
+        erode_obj(obj, NULL, ERODE_CORRODE, EF_GREASE | EF_VERBOSE);
 }
 
-/* returns:
- *  0 if obj is unaffected
- *  1 if obj is protected by grease
- *  2 if obj is changed but survived
- *  3 if obj is destroyed
+/* Get an object wet and damage it appropriately.
+ *   "ostr", if present, is used instead of the object name in some
+ *     messages.
+ *   "force" means not to roll luck to protect some objects.
+ * Returns an erosion return value (ER_*)
  */
 int
 water_damage(obj, ostr, force)
@@ -3119,25 +3164,25 @@ boolean force;
 	boolean loose_obj = (obj && obj->where == OBJ_FREE), exploded = FALSE;
 
         if (snuff_lit(obj))
-            return 2;
+            return ER_DAMAGED;
 
         if(obj->otyp == CAN_OF_GREASE && obj->spe > 0) {
-                return 0;
+                return ER_NOTHING;
         } else if(obj->greased) {
                 if (!rn2(2)) obj->greased = 0;
                 if (carried(obj)) update_inventory();
-                return 1;
+                return ER_GREASED;
         } else if(Is_container(obj) && !Is_box(obj) &&
                 (obj->otyp != OILSKIN_SACK || (obj->cursed && !rn2(3)))) {
                 water_damage_chain(obj->cobj, FALSE);
-                return 0;
+                return ER_NOTHING;
         } else if (!force && (Luck + 5) > rn2(20)) {
                 /*  chance per item of sustaining damage:
                     *	max luck:		10%
                     *	avg luck (Luck==0):	75%
                     *	awful luck (Luck<-4):  100%
                     */
-                return 0;
+                return ER_NOTHING;
         } else if (obj->oclass == SCROLL_CLASS) {
 #ifdef MAIL
                 if (obj->otyp == SCR_MAIL) return 0;
@@ -3147,7 +3192,7 @@ boolean force;
                 obj->spe = 0;
                 if (carried(obj))
                     update_inventory();
-                return 2;
+                return ER_DAMAGED;
         } else if (obj->oclass == SPBOOK_CLASS) {
                 if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
                         pline("Steam rises from %s.", the(xname(obj)));
@@ -3157,7 +3202,7 @@ boolean force;
                 obj->dknown = 0;
                 if (carried(obj))
                     update_inventory();
-                return 2;
+                return ER_DAMAGED;
         } else if (obj->oclass == POTION_CLASS) {
                 if (obj->otyp == POT_ACID) {
                         char *bufp, buf[BUFSZ];
@@ -3177,10 +3222,11 @@ boolean force;
                             obj_extract_self() takes care of this;
                             for loose_obj, obj should always equal
                             *objp and otmp should always be null] */
+                        setnotworn(obj);
                         delobj(obj);
                         if (update)
                             update_inventory();
-                        return 3;
+                        return ER_DESTROYED;
                 } else if (obj->odiluted) {
                         obj->otyp = POT_WATER;
                         obj->dknown = 0;
@@ -3188,17 +3234,17 @@ boolean force;
                         obj->odiluted = 0;
                         if (carried(obj))
                             update_inventory();
-                        return 2;
+                        return ER_DAMAGED;
                 } else if (obj->otyp != POT_WATER) {
                         obj->odiluted++;
                         if (carried(obj))
                             update_inventory();
-                        return 2;
+                        return ER_DAMAGED;
                 }
         } else {
-                return erode_obj(obj, ostr, ERODE_RUST, FALSE, FALSE) ? 2 : 0;
+                return erode_obj(obj, ostr, ERODE_RUST, EF_NONE);
         }
-        return 0;
+        return ER_NOTHING;
 }
 
 void

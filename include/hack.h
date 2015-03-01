@@ -99,6 +99,9 @@
 #define COST_BITE   13	/* start eating food */
 #define COST_OPEN   14	/* open tin */
 #define COST_BRKLCK 15	/* break box/chest's lock */
+#define COST_RUST   16  /* rust damage */
+#define COST_ROT    17  /* rotting attack */
+#define COST_CORRODE 18 /* acid damage */
 
 /* bitmask flags for corpse_xname();
    PFX_THE takes precedence over ARTICLE, NO_PFX takes precedence over both */

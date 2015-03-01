@@ -1303,7 +1303,7 @@ register struct obj *obj;
 	    dmgtyp = ERODE_BURN;
 	else
 	    return;
-	(void) erode_obj(obj, 0, dmgtyp, TRUE, TRUE);
+	(void) erode_obj(obj, NULL, dmgtyp, EF_GREASE | EF_VERBOSE);
 }
 
 STATIC_OVL void

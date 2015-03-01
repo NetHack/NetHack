@@ -1088,7 +1088,7 @@ const char *objphrase;	/* "Your widget glows" or "Steed's saddle glows" */
     } else {
 	/* dipping into uncursed water; carried() check skips steed saddle */
 	if (carried(targobj)) {
-	    if (water_damage(targobj, 0, TRUE))
+	    if (water_damage(targobj, 0, TRUE) != ER_NOTHING)
 		res = TRUE;
 	}
     }
@@ -1839,38 +1839,14 @@ dodip()
 	}
 
 	if (potion->otyp == POT_ACID) {
-	    if (erode_obj(obj, 0, ERODE_CORRODE, TRUE, FALSE))
+	    if (erode_obj(obj, 0, ERODE_CORRODE, EF_GREASE) != ER_NOTHING)
 		goto poof;
 	}
 
 	if (potion->otyp == POT_OIL) {
 	    boolean wisx = FALSE;
 	    if (potion->lamplit) {	/* burning */
-		int omat = objects[obj->otyp].oc_material;
-		/* the code here should be merged with fire_damage */
-		if (catch_lit(obj)) {
-		    /* catch_lit does all the work if true */
-		} else if (obj->oerodeproof || obj_resists(obj, 5, 95) ||
-			   !is_flammable(obj) || obj->oclass == FOOD_CLASS) {
-		    pline("%s %s to burn for a moment but %s unharmed.",
-			  Yname2(obj), otense(obj, "seem"), otense(obj, "are"));
-		} else {
-		    if ((omat == PLASTIC || omat == PAPER) && !obj->oartifact)
-			obj->oeroded = MAX_ERODE;
-		    pline_The("burning oil %s %s%c",
-			    obj->oeroded == MAX_ERODE ? "destroys" : "damages",
-			    yname(obj),
-			    obj->oeroded == MAX_ERODE ? '!' : '.');
-		    costly_alteration(obj, COST_BURN);
-		    if (obj->oeroded == MAX_ERODE) {
-			if (obj->owornmask) remove_worn_item(obj, TRUE);
-			obj_extract_self(obj);
-			obfree(obj, (struct obj *)0);
-			obj = (struct obj *) 0;
-		    } else {
-			obj->oeroded++;
-		    }
-		}
+                fire_damage(obj, TRUE, u.ux, u.uy);
 	    } else if (potion->cursed) {
 		pline_The("potion spills and covers your %s with oil.",
 			  makeplural(body_part(FINGER)));
