@@ -144,7 +144,8 @@ cursed_book(bp)
 	case 5:
 		pline_The("book was coated with contact poison!");
 		if (uarmg) {
-                    erode_obj(uarmg, "gloves", ERODE_CORRODE, TRUE, TRUE);
+                    erode_obj(uarmg, "gloves", ERODE_CORRODE,
+                              EF_GREASE | EF_VERBOSE);
 		    break;
 		}
 		/* temp disable in_use; death should not destroy the book */

@@ -2202,7 +2202,7 @@ E coord *FDECL(gettrack, (int,int));
 /* ### trap.c ### */
 
 E boolean FDECL(burnarmor,(struct monst *));
-E boolean FDECL(erode_obj, (struct obj *,const char *,int,BOOLEAN_P,BOOLEAN_P));
+E int FDECL(erode_obj, (struct obj *,const char *,int,int));
 E boolean FDECL(grease_protect, (struct obj *,const char *,struct monst *));
 E struct trap *FDECL(maketrap, (int,int,int));
 E void FDECL(fall_through, (BOOLEAN_P));
@@ -2221,7 +2221,8 @@ E void NDECL(float_up);
 E void FDECL(fill_pit, (int,int));
 E int FDECL(float_down, (long, long));
 E void NDECL(climb_pit);
-E int FDECL(fire_damage, (struct obj *,BOOLEAN_P,BOOLEAN_P,XCHAR_P,XCHAR_P));
+E boolean FDECL(fire_damage, (struct obj *,BOOLEAN_P,XCHAR_P,XCHAR_P));
+E int FDECL(fire_damage_chain, (struct obj *,BOOLEAN_P,BOOLEAN_P,XCHAR_P,XCHAR_P));
 E void acid_damage(struct obj *);
 E int FDECL(water_damage, (struct obj *,const char*,BOOLEAN_P));
 E void FDECL(water_damage_chain, (struct obj *,BOOLEAN_P));

@@ -184,7 +184,7 @@ const char *verb;
 		newsym(x,y);
 		return TRUE;
 	} else if (is_lava(x, y)) {
-		return fire_damage(obj, FALSE, FALSE, x, y);
+		return fire_damage(obj, FALSE, x, y);
 	} else if (is_pool(x, y)) {
 		/* Reasonably bulky objects (arbitrary) splash when dropped.
 		 * If you're floating above the water even small things make
@@ -201,7 +201,7 @@ const char *verb;
 		    map_background(x, y, 0);
 		    newsym(x, y);
 		}
-		return water_damage(obj, NULL, FALSE) == 3;
+		return water_damage(obj, NULL, FALSE) == ER_DESTROYED;
 	} else if (u.ux == x && u.uy == y &&
 		(t = t_at(x,y)) != 0 && uteetering_at_seen_pit(t)) {
 		if (Blind && !Deaf)

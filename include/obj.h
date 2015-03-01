@@ -325,6 +325,19 @@ struct obj {
 #define ERODE_ROT 2
 #define ERODE_CORRODE 3
 
+/* erosion flags for erode_obj() */
+#define EF_NONE    0
+#define EF_GREASE  0x1 /* check for a greased object */
+#define EF_DESTROY 0x2 /* potentially destroy the object */
+#define EF_VERBOSE 0x4 /* print extra messages */
+#define EF_PAY     0x8 /* it's the player's fault */
+
+/* erosion return values for erode_obj(), water_damage() */
+#define ER_NOTHING   0 /* nothing happened */
+#define ER_GREASED   1 /* protected by grease */
+#define ER_DAMAGED   2 /* object was damaged in some way */
+#define ER_DESTROYED 3 /* object was destroyed */
+
 /*
  *  Notes for adding new oextra structures:
  *
