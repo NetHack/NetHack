@@ -168,7 +168,7 @@ magic_map_background(x, y, show)
 	lev->glyph = glyph;
     if (show) show_glyph(x,y, glyph);
 
-    remember_topology(x,y);	/* DUNGEON_OVERVIEW */
+    remember_topology(x,y);
 }
 
 /*
@@ -325,7 +325,7 @@ unmap_object(x, y)
     else								\
 	map_background(x,y,show);					\
 									\
-    remember_topology(x,y);	/* DUNGEON_OVERVIEW */			\
+    remember_topology(x,y);						\
 }
 
 void
