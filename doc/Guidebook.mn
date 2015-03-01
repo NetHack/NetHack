@@ -1882,8 +1882,7 @@ the character position in the current font to be used in displaying
 each entry. Such a sequence can be continued to multiple lines by putting a `\e'
 at the end of each line to be continued.
 .pg
-If your copy of the game included the compile time AUTOPICKUP_EXCEPTIONS
-option, then any line starting with ``AUTOPICKUP_EXCEPTION='' is taken
+Any line starting with ``AUTOPICKUP_EXCEPTION='' is taken
 as defining an exception to the 
 .op pickup_types
 option. 
@@ -2234,8 +2233,7 @@ or match an autopickup exception.  Default is on.
 .lp pickup_types
 Specify the object types to be picked up when
 .op autopickup
-is on.  Default is all types.  If your copy of the game has the 
-compile time option AUTOPICKUP_EXCEPTIONS included, you may be able to use 
+is on.  Default is all types.  You can use 
 .op autopickup_exception
 configuration file lines to further refine
 .op autopickup
@@ -2540,9 +2538,7 @@ Cannot be set with the `O' command.
 .hn 2
 Configuring autopickup exceptions
 .pg
-There is a compile time option called AUTOPICKUP_EXCEPTIONS.  
-If your copy of the game was built with that option defined, you can 
-further refine the behavior of the
+You can further refine the behavior of the
 .op autopickup
 option beyond what is available through the 
 .op pickup_types
