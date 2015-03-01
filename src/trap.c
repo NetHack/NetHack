@@ -1,4 +1,4 @@
-/* NetHack 3.5	trap.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	trap.c	$NHDT-Date: 1425318721 2015/03/02 17:52:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.194 $ */
 /* NetHack 3.5	trap.c	$Date: 2013/03/14 01:58:21 $  $Revision: 1.179 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4737,6 +4737,9 @@ lava_effects()
         } else
 	    You("fall into the lava!");
 
+	usurvive = Lifesaved || discover;
+	if (wizard) usurvive = TRUE;
+
 	/* prevent remove_worn_item() -> Boots_off(WATER_WALKING_BOOTS) ->
 	   spoteffects() -> lava_effects() recursion which would
 	   successfully delete (via useupall) the no-longer-worn boots;
@@ -4748,16 +4751,18 @@ lava_effects()
 	    obj2 = obj->nobj;
 	    /* above, we set in_use for objects which are to be destroyed */
             if (obj->otyp == SPE_BOOK_OF_THE_DEAD && !Blind) {
-                pline("%s glows a strange %s, but remains intact.",
-                      The(xname(obj)), hcolor("dark red"));
+                if (usurvive)
+                    pline("%s glows a strange %s, but remains intact.",
+                          The(xname(obj)), hcolor("dark red"));
             } else if (obj->in_use) {
 		if (obj->owornmask) {
-		    pline("%s into flame!", Yobjnam2(obj, "burst"));
+		    if (usurvive)
+			pline("%s into flame!", Yobjnam2(obj, "burst"));
 		    remove_worn_item(obj, TRUE);
 		}
 		useupall(obj);
 	    }
-        }
+	}
 
 	iflags.in_lava_effects--;
 
