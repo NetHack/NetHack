@@ -126,6 +126,7 @@ if NOT exist %SRCPATH%\levcomp.vcxproj goto skipvcexpress
 if NOT exist %SRCPATH%\levstuff.vcxproj goto skipvcexpress
 if NOT exist %SRCPATH%\recover.vcxproj goto skipvcexpress
 if NOT exist %SRCPATH%\tiles.vcxproj goto skipvcexpress
+if NOT exist %SRCPATH%\nhdefkey.vcxproj goto skipvcexpress
 
 copy %SRCPATH%\makedefs.vcxproj %BUILDPATH% >nul
 copy %SRCPATH%\tile2bmp.vcxproj %BUILDPATH% >nul
@@ -140,6 +141,7 @@ copy %SRCPATH%\levcomp.vcxproj %BUILDPATH% >nul
 copy %SRCPATH%\levstuff.vcxproj %BUILDPATH% >nul
 copy %SRCPATH%\recover.vcxproj %BUILDPATH% >nul
 copy %SRCPATH%\tiles.vcxproj %BUILDPATH% >nul
+copy %SRCPATH%\nhdefkey.vcxproj %BUILDPATH% >nul
 echo LIBRARY nhdefkey >%BUILDPATH%\nhdefkey64.def
 echo LIBRARY nhdefkey >%BUILDPATH%\nhdefkey.def
 echo EXPORTS >>%BUILDPATH%\nhdefkey.def

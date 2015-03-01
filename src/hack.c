@@ -1099,7 +1099,7 @@ domove()
 	register struct monst *mtmp;
 	register struct rm *tmpr;
 	register xchar x,y;
-	struct trap *trap;
+	struct trap *trap = NULL;
 	int wtcap;
 	boolean on_ice;
 	xchar chainx, chainy, ballx, bally;	/* ball&chain new positions */

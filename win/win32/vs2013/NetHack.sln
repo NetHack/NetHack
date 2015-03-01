@@ -58,6 +58,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NetHack", "build\NetHack.vc
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nhdefkey", "build\nhdefkey.vcxproj", "{6813477F-64B6-4B97-B230-438D0D233385}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BA3DD34C-04B7-40D0-B373-9329AA9E8945} = {BA3DD34C-04B7-40D0-B373-9329AA9E8945}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
