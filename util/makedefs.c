@@ -169,8 +169,6 @@ static char *FDECL(bannerc_string, (char *,const char *));
 static char *FDECL(xcrypt, (const char *));
 static unsigned long FDECL(read_rumors_file,
 			   (const char *,int *,long *,unsigned long));
-static int FDECL(check_control, (char *));
-static char *FDECL(without_control, (char *));
 static boolean FDECL(d_filter, (char *));
 static boolean FDECL(h_filter, (char *));
 static boolean FDECL(ranged_attk,(struct permonst*));
@@ -1788,38 +1786,6 @@ dead_data:  perror(in_line);	/* report the problem */
 	return;
 }
 
-
-static	struct deflist {
-
-	const char	*defname;
-	boolean	true_or_false;
-} deflist[] = {
-	      {	"REINCARNATION", TRUE },
-	      { 0, 0 }
-};
-
-static int
-check_control(s)
-	char	*s;
-{
-	int	i;
-
-	if(s[0] != '%') return(-1);
-
-	for(i = 0; deflist[i].defname; i++)
-	    if(!strncmp(deflist[i].defname, s+1, strlen(deflist[i].defname)))
-		return(i);
-
-	return(-1);
-}
-
-static char *
-without_control(s)
-	char *s;
-{
-	return(s + 1 + strlen(deflist[check_control(in_line)].defname));
-}
-
 void
 do_dungeon()
 {
@@ -1850,22 +1816,7 @@ do_dungeon()
 
 	    rcnt++;
 	    if(in_line[0] == '#') continue;	/* discard comments */
-recheck:
-	    if(in_line[0] == '%') {
-		int i = check_control(in_line);
-		if(i >= 0) {
-		    if(!deflist[i].true_or_false)  {
-			while (fgets(in_line, sizeof in_line, ifp) != 0)
-			    if(check_control(in_line) != i) goto recheck;
-		    } else
-			(void) fputs(without_control(in_line),ofp);
-		} else {
-		    Fprintf(stderr, "Unknown control option '%s' in file %s at line %d.\n",
-			    in_line, DGN_I_FILE, rcnt);
-		    exit(EXIT_FAILURE);
-		}
-	    } else
-		(void) fputs(in_line,ofp);
+	    (void) fputs(in_line,ofp);
 	}
 	Fclose(ifp);
 	Fclose(ofp);
