@@ -2567,11 +2567,9 @@ void NetHackQtStatusWindow::updateStats()
     Sprintf(buf, "/%d", u.uenmax);
     power.setLabel("Pow:",u.uen,buf);
     ac.setLabel("AC:",(long)u.uac);
-#ifdef EXP_ON_BOTL
     if (::flags.showexp) {
 	exp.setLabel("Exp:",(long)u.uexp);
     } else
-#endif
     {
 	exp.setLabel("");
     }
