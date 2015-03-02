@@ -12,9 +12,6 @@ use strict;
 #my $dbgfile = ($^O eq "MSWin32") ? "$ENV{TEMP}.$$" : "/tmp/trace.$$";
 #open TRACE, ">>", ($debug==0)? $sink : $dbgfile;
 
-# pick up the prefix for substitutions in this repo
-#my $PREFIX = `git config --local --get nethack.substprefix`;
-#chomp($PREFIX);
 sub git_config {
 	my($section, $var) = @_;
 	local($_);
@@ -30,6 +27,7 @@ sub git_config {
 	}
 	die "Missing config var: [$section] $var\n";
 }
+# pick up the prefix for substitutions in this repo
 my $PREFIX = &git_config('nethack','substprefix');
 
 my $submode = 0;	# ok to make non-cleaning changes to file
@@ -119,16 +117,17 @@ sub Date {
 #sub Author {
 #}
 
-# NB: the standard-ish Revision line isn't enough - you need Branch/Revision -
+# NB: the standard-ish Revision line isn't enough - you need Branch:Revision -
 #     but we split it into 2 so we can use the standard processing code on Revision
 #     and just slip Branch in.
 sub Branch {
 	my($val, $mode, $submode) = @_;
 	if($mode eq "c"){
 		if($submode==0){
-			$val = `git branch --no-color --contains`;
+			$val = `git symbolic-ref -q --short HEAD`;
 			$val =~ s/[\n\r]*$//;
 			$val =~ s/^\*\s*//;
+			$val = "(unknown)" unless($val =~ m/^[[:print:]]+$/);
 		}
 	}
 #	if($mode eq "s"){
