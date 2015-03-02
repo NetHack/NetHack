@@ -319,6 +319,12 @@ struct obj {
 #define CONTAINED_TOO	0x1
 #define BURIED_TOO	0x2
 
+/* object erosion types */
+#define ERODE_BURN 0
+#define ERODE_RUST 1
+#define ERODE_ROT 2
+#define ERODE_CORRODE 3
+
 /*
  *  Notes for adding new oextra structures:
  *

@@ -101,10 +101,9 @@ struct monst *victim;
 #undef burn_dmg
 }
 
-/* Generic rust-armor function.  Returns TRUE if a message was printed;
- * "print", if set, means to print a message (and thus to return TRUE) even
- * if the item could not be rusted; otherwise a message is printed and TRUE is
- * returned only for rustable items.
+/* Generic erode-item function.  Returns TRUE if any change in state
+ * occurred. "print", if set, means to print a message even if no change
+ * occurs.
  */
 boolean
 rust_dmg(otmp, ostr, type, print)
@@ -119,69 +118,95 @@ boolean print;
 	boolean grprot = FALSE;
 	boolean is_primary = TRUE;
 	int erosion;
-        struct monst *victim =
-            carried(otmp) ? &youmonst : mcarried(otmp) ? otmp->ocarry : NULL;
-	boolean vismon = (victim != &youmonst) && canseemon(victim);
+        struct monst *victim;
+	boolean vismon;
+        boolean visobj;
 
 	if (!otmp) return(FALSE);
+
+        victim = carried(otmp) ? &youmonst : mcarried(otmp) ?
+            otmp->ocarry : NULL;
+        vismon = victim && (victim != &youmonst) && canseemon(victim);
+        /* Is bhitpos correct here? Ugh. */
+        visobj = !victim && cansee(bhitpos.x, bhitpos.y);
+
 	switch(type) {
-		case 0: vulnerable = is_flammable(otmp);
-			break;
-		case 1: vulnerable = is_rustprone(otmp);
-			grprot = TRUE;
-			break;
-		case 2: vulnerable = is_rottable(otmp);
-			is_primary = FALSE;
-			break;
-		case 3: vulnerable = is_corrodeable(otmp);
-			grprot = TRUE;
-			is_primary = FALSE;
-			break;
+		case ERODE_BURN:
+                    vulnerable = is_flammable(otmp);
+		    break;
+		case ERODE_RUST:
+                    vulnerable = is_rustprone(otmp);
+		    grprot = TRUE;
+		    break;
+		case ERODE_ROT:
+                    vulnerable = is_rottable(otmp);
+		    is_primary = FALSE;
+		    break;
+		case ERODE_CORRODE:
+                    vulnerable = is_corrodeable(otmp);
+		    grprot = TRUE;
+		    is_primary = FALSE;
+		    break;
+                default:
+                    impossible("Invalid erosion type in rust_dmg");
+                    return FALSE;
 	}
 	erosion = is_primary ? otmp->oeroded : otmp->oeroded2;
 
-	if (!print && (!vulnerable || otmp->oerodeproof || erosion == MAX_ERODE))
-		return FALSE;
+        if (!ostr)
+            ostr = cxname(otmp);
 
-	if (!vulnerable) {
-	    if (flags.verbose) {
+        if (grprot && otmp->greased) {
+            return grease_protect(otmp, ostr, victim);
+        } else if (!vulnerable || (otmp->oerodeproof && otmp->rknown)) {
+	    if (print && flags.verbose) {
 		if (victim == &youmonst)
 		    Your("%s %s not affected.", ostr, vtense(ostr, "are"));
 		else if (vismon)
 		    pline("%s's %s %s not affected.", Monnam(victim), ostr,
 			  vtense(ostr, "are"));
 	    }
-	} else if (erosion < MAX_ERODE) {
-	    if (grprot && otmp->greased) {
-		grease_protect(otmp,ostr,victim);
-	    } else if (otmp->oerodeproof || (otmp->blessed && !rnl(4))) {
-		if (flags.verbose) {
-		    if (victim == &youmonst)
-			pline("Somehow, your %s %s not affected.",
-			      ostr, vtense(ostr, "are"));
-		    else if (vismon)
-			pline("Somehow, %s's %s %s not affected.",
-			      mon_nam(victim), ostr, vtense(ostr, "are"));
-		}
-	    } else {
+            return FALSE;
+        } else if (otmp->oerodeproof || otmp->blessed && !rnl(4)) {
+            if (flags.verbose && (print || otmp->oerodeproof)) {
 		if (victim == &youmonst)
-		    Your("%s %s%s!", ostr,
-			 vtense(ostr, action[type]),
-			 erosion+1 == MAX_ERODE ? " completely" :
-			    erosion ? " further" : "");
+		    pline("Somehow, your %s %s not affected.",
+		          ostr, vtense(ostr, "are"));
 		else if (vismon)
-		    pline("%s's %s %s%s!", Monnam(victim), ostr,
-			vtense(ostr, action[type]),
-			erosion+1 == MAX_ERODE ? " completely" :
-			  erosion ? " further" : "");
-		if (is_primary)
-		    otmp->oeroded++;
-		else
-		    otmp->oeroded2++;
-		update_inventory();
-	    }
+		    pline("Somehow, %s's %s %s not affected.",
+		          mon_nam(victim), ostr, vtense(ostr, "are"));
+                else if (visobj)
+                    pline("Somehow, the %s %s not affected." ostr,
+                          vtense(ostr, "are"));
+            }
+            /* We assume here that if the object is protected because it
+             * is blessed, it still shows some minor signs of wear, and
+             * the hero can distinguish this from an object that is
+             * actually proof against damage. */
+            if (otmp->oerodeproof)
+                otmp->rknown = TRUE;
+            return FALSE;
+	} else if (erosion < MAX_ERODE) {
+            const char *adverb = (erosion + 1 == MAX_ERODE) ?
+                " complete" : erosion ? " further" : "";
+
+            if (victim == &youmonst)
+                Your("%s %s%s!", ostr, vtense(ostr, action[type]), adverb);
+            else if (vismon)
+                pline("%s's %s %s%s!", Monnam(victim), ostr,
+                      vtense(ostr, action[type]), adverb);
+            else if (visobj)
+                pline("The %s %s%s!", ostr, vtense(ostr, action[type]), adverb);
+
+            if (is_primary)
+                otmp->oeroded++;
+            else
+                otmp->oeroded2++;
+
+            update_inventory();
+            return TRUE;
 	} else {
-	    if (flags.verbose) {
+	    if (flags.verbose && print) {
 		if (victim == &youmonst)
 		    Your("%s %s completely %s.", ostr,
 			 vtense(ostr, Blind ? "feel" : "look"),
@@ -190,12 +215,18 @@ boolean print;
 		    pline("%s's %s %s completely %s.",
 			  Monnam(victim), ostr,
 			  vtense(ostr, "look"), msg[type]);
+                else if (visobj)
+                    pline("The %s %s completely %s.", ostr,
+                          vtense(ostr, "look"), msg[type]);
 	    }
+            return FALSE;
 	}
-	return(TRUE);
 }
 
-void
+/* Protect an item from erosion with grease. Returns TRUE if the grease
+ * wears off.
+ */
+boolean
 grease_protect(otmp,ostr,victim)
 register struct obj *otmp;
 register const char *ostr;
@@ -219,7 +250,9 @@ struct monst *victim;
 		pline_The("grease dissolves.");
 		update_inventory();
 	    }
+            return TRUE;
 	}
+        return FALSE;
 }
 
 struct trap *
