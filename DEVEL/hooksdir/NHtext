@@ -15,6 +15,13 @@ use strict;
 sub git_config {
 	my($section, $var) = @_;
 	local($_);
+		# Sigh.  Without GIT_DIR we have to do it the slow way, and sometimes we don't
+		# have GIT_DIR.
+	if(0 == length($ENV{GIT_DIR})){
+		my $raw = `git config --local --get $section.$var`;
+		chomp($raw);
+		return $raw
+	}
 	open(CONFIG, "<", "$ENV{GIT_DIR}/config") or die "Missing .git/config: $!";
 	while(<CONFIG>){
 		m/^\[$section]/ && do {
