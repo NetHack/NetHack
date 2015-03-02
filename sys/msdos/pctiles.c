@@ -1,4 +1,4 @@
-/* NetHack 3.5	pctiles.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	pctiles.c	$NHDT-Date: 1425319883 2015/03/02 18:11:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.5 $ */
 /* NetHack 3.5	pctiles.c	$Date: 2009/05/06 10:49:39 $  $Revision: 1.5 $ */
 /*   SCCS Id: @(#)pctiles.c   3.5     1995/07/31		     */
 /*   Copyright (c) NetHack PC Development Team 1993, 1994           */
@@ -241,7 +241,7 @@ char (*pta)[TILE_X];
 	long fpos;
 	
 	fpos = ((long)(tilenum) * (long)(TILE_Y * TILE_X) +
-		(long)TIBHEADER_SIZE;
+		(long)TIBHEADER_SIZE);
 	if (fseek(tilefile,fpos,SEEK_SET)) {
 		return 1;
 	} else {
