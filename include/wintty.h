@@ -29,9 +29,9 @@ struct WinDesc {
     xchar type;			/* type of window */
     boolean active;		/* true if window is active */
     short offx, offy;		/* offset from topleft of display */
-    short rows, cols;		/* dimensions */
-    short curx, cury;		/* current cursor position */
-    short maxrow, maxcol;	/* the maximum size used -- for MENU wins */
+    long rows, cols;		/* dimensions */
+    long curx, cury;		/* current cursor position */
+    long maxrow, maxcol;	/* the maximum size used -- for MENU wins */
 				/* maxcol is also used by WIN_MESSAGE for */
 				/* tracking the ^P command */
     short *datlen;		/* allocation size for *data */
@@ -39,9 +39,9 @@ struct WinDesc {
     char *morestr;		/* string to display instead of default */
     tty_menu_item *mlist;	/* menu information (MENU) */
     tty_menu_item **plist;	/* menu page pointers (MENU) */
-    short plist_size;		/* size of allocated plist (MENU) */
-    short npages;		/* number of pages in menu (MENU) */
-    short nitems;		/* total number of items (MENU) */
+    long plist_size;		/* size of allocated plist (MENU) */
+    long npages;		/* number of pages in menu (MENU) */
+    long nitems;		/* total number of items (MENU) */
     short how;			/* menu mode - pick 1 or N (MENU) */
     char menu_ch;		/* menu char (MENU) */
 };

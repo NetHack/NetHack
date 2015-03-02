@@ -1997,7 +1997,7 @@ tty_putstr(window, attr, str)
     register struct WinDesc *cw = 0;
     register char *ob;
     register const char *nb;
-    register int i, j, n0;
+    register long i, j, n0;
 
     /* Assume there's a real problem if the window is missing --
      * probably a panic message
@@ -2375,7 +2375,7 @@ tty_end_menu(window, prompt)
     if (cw->npages > 1) {
 	char buf[QBUFSZ];
 	/* produce the largest demo string */
-	Sprintf(buf, "(%d of %d) ", cw->npages, cw->npages);
+	Sprintf(buf, "(%ld of %ld) ", cw->npages, cw->npages);
 	len = strlen(buf);
 	cw->morestr = copy_of("");
     } else {
