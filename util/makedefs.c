@@ -1,4 +1,4 @@
-/* NetHack 3.5  makedefs.c  $NHDT-Date: 1425083082 2015/02/28 00:24:42 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.63 $ */
+/* NetHack 3.5  makedefs.c  $NHDT-Date: 1425083082 2015/02/28 00:24:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.63 $ */
 /* NetHack 3.5  makedefs.c  $Date: 2012/01/15 09:27:03 $  $Revision: 1.50 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) M. Stephenson, 1990, 1991.			  */

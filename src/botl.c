@@ -1,4 +1,4 @@
-/* NetHack 3.5	botl.c	$NHDT-Date: 1425083082 2015/02/28 00:24:42 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.38 $ */
+/* NetHack 3.5	botl.c	$NHDT-Date: 1425083082 2015/02/28 00:24:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.38 $ */
 /* NetHack 3.5	botl.c	$Date: 2012/01/10 17:47:19 $  $Revision: 1.36 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
