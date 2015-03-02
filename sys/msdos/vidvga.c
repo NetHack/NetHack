@@ -1,4 +1,4 @@
-/* NetHack 3.5	vidvga.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	vidvga.c	$NHDT-Date: 1425319884 2015/03/02 18:11:24 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
 /* NetHack 3.5	vidvga.c	$Date: 2009/05/06 10:49:50 $  $Revision: 1.9 $ */
 /*   SCCS Id: @(#)vidvga.c   3.5     2006/07/08			  */
 /*   Copyright (c) NetHack PC Development Team 1995                 */
@@ -627,12 +627,13 @@ boolean left;
 	for (y = 0; y < ROWNO; ++y) {
 	    for (x = i; x < j; x += 2) {
 		t = map[y][x].glyph;
-		if (!ReadPlanarTileFile(glyph2tile[t], &planecell))
+		if (!ReadPlanarTileFile(glyph2tile[t], &planecell)) {
 			if (map[y][x].special) decal_planar(planecell, map[y][x].special);
 			vga_DisplayCell(planecell, x - clipx, y + TOP_MAP_ROW);
-		else
+		} else {
 			pline("vga_shiftmap: Error reading tile (%d,%d)",
-				t, glyph2tile[t]);		
+				t, glyph2tile[t]);
+                }
 	    }
 	}
 }

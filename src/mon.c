@@ -1,4 +1,4 @@
-/* NetHack 3.5	mon.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mon.c	$NHDT-Date: 1425319883 2015/03/02 18:11:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.137 $ */
 /* NetHack 3.5	mon.c	$Date: 2012/05/16 02:15:10 $  $Revision: 1.126 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -32,6 +32,7 @@ STATIC_DCL struct permonst *FDECL(accept_newcham_form, (int));
 /* part of the original warning code which was replaced in 3.3.1 */
 const char *warnings[] = {
 	"white", "pink", "red", "ruby", "purple", "black"
+};
 #endif /* 0 */
 
 STATIC_DCL struct obj *FDECL(make_corpse,(struct monst *, unsigned));

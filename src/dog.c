@@ -1,4 +1,4 @@
-/* NetHack 3.5	dog.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	dog.c	$NHDT-Date: 1425319883 2015/03/02 18:11:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.39 $ */
 /* NetHack 3.5	dog.c	$Date: 2011/04/15 01:55:42 $  $Revision: 1.37 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -295,16 +295,12 @@ boolean with_you;
 
 	num_segs = mtmp->wormno;
 	/* baby long worms have no tail so don't use is_longworm() */
-	if ((mtmp->data == &mons[PM_LONG_WORM]) &&
-#ifdef DCC30_BUG
-	    (mtmp->wormno = get_wormno(), mtmp->wormno != 0))
-#else
-	    (mtmp->wormno = get_wormno()) != 0)
-#endif
-	{
-	    initworm(mtmp, num_segs);
-	    /* tail segs are not yet initialized or displayed */
-	} else mtmp->wormno = 0;
+	if (mtmp->data == &mons[PM_LONG_WORM]) {
+            mtmp->wormno = get_wormno();
+            if (mtmp->wormno)
+                initworm(mtmp, num_segs);
+        } else
+            mtmp->wormno = 0;
 
 	/* some monsters might need to do something special upon arrival
 	   _after_ the current level has been fully set up; see dochug() */
