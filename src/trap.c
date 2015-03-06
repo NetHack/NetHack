@@ -2062,10 +2062,9 @@ register struct monst *mtmp;
 				pline("%s stops momentarily and appears to cringe.",
 					Monnam(mtmp));
 			    }
-			} else if (!Deaf) {
+			} else
 			   You_hear("a distant %s squeak.",
 				trapnote(trap,1));
-			}
 			/* wake up nearby monsters */
 			wake_nearto(mtmp->mx, mtmp->my, 40);
 			break;
@@ -2080,9 +2079,8 @@ register struct monst *mtmp;
 				      Monnam(mtmp), a_your[trap->madeby_u]);
 				seetrap(trap);
 			    } else {
-				if((mptr == &mons[PM_OWLBEAR]
+				if(mptr == &mons[PM_OWLBEAR]
 				    || mptr == &mons[PM_BUGBEAR])
-				   && !Deaf)
 				    You_hear("the roaring of an angry bear!");
 			    }
 			} else if (force_mintrap) {
@@ -2923,9 +2921,8 @@ domagictrap()
 		if (!Blind) Your1(vision_clears);
 	  } else if (!Blind) {
 		You_see("a flash of light!");
-	  } else if (!Deaf) {
+	  } else
 		You_hear("a deafening roar!");
-	  }
 	  incr_itimeout(&HDeaf, rn1(20,30));
 	  while(cnt--)
 		(void) makemon((struct permonst *) 0, u.ux, u.uy, NO_MM_FLAGS);

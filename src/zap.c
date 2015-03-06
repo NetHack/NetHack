@@ -1790,7 +1790,7 @@ struct obj *obj, *otmp;
 		if (obj->otyp == BOULDER) {
 			if (cansee(obj->ox, obj->oy))
 				pline_The("boulder falls apart.");
-			else if (!Deaf)
+			else
 				You_hear("a crumbling sound.");
   			fracture_rock(obj);
 		}
@@ -1801,9 +1801,8 @@ struct obj *obj, *otmp;
 				pline_The("%s shatters.", rndmonnam());
 			    else 
 				pline_The("statue shatters.");
-			} else if (!Deaf) {
+			} else
 			    You_hear("a crumbling sound.");
-			}
 		    }
 		} else {
 		    if (context.mon_moving ?
@@ -3025,7 +3024,7 @@ struct obj **pobj;			/* object tossed/used, set to NULL
 			if (!Blind) pline("%s %s%s.", Yname2(obj),
 					  otense(obj, "skip"),
 					  skipcount ? " again" : "");
-			else if (!Deaf) You_hear("%s skip.", yname(obj));
+			else You_hear("%s skip.", yname(obj));
 			skipcount++;
 		} else if (skiprange_start > skiprange_end + 1) {
 			--skiprange_start;
@@ -4047,7 +4046,7 @@ short exploding_wand_typ;
 			else
 			    Norep("The water freezes.");
 			newsym(x,y);
-		    } else if(!Deaf && !lava)
+		    } else if(!lava)
 			You_hear("a crackling sound.");
 
 		    if (x == u.ux && y == u.uy) {
@@ -4214,9 +4213,8 @@ short exploding_wand_typ;
 			newsym(x, y);
 		    } else if (sense_txt) {
 			You1(sense_txt);
-		    } else if (hear_txt) {
-			if (!Deaf) You_hear1(hear_txt);
-		    }
+		    } else if (hear_txt)
+			You_hear1(hear_txt);
 		    if (picking_at(x, y)) {
 			stop_occupation();
 			reset_pick();

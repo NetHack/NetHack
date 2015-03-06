@@ -334,7 +334,7 @@ do_pit:		    chasm = maketrap(x,y,PIT);
 			    if (!m_already_trapped) { /* suppress messages */
 			    	if(cansee(x,y))
 				    pline("%s falls into a chasm!", Monnam(mtmp));
-				else if (!Deaf && humanoid(mtmp->data))
+				else if (humanoid(mtmp->data))
 				    You_hear("a scream!");
 			    }
 			    /* Falling is okay for falling down
