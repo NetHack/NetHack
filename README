@@ -7,7 +7,7 @@ that was posted online in 2014 by others, there is no NetHack 3.5 release.
 
 NetHack 3.6.0 contains some code reorganization, new features, and bugfixes.
 
-The file doc/fixes36.0 in the source disribution has a full list of each. 
+The file doc/fixes36.0 in the source distribution has a full list of each. 
 The text in there was written for the development team's own use and is 
 provided "as is", so please do not ask us to further explain the entries 
 in that file. Some entries might be considered "spoilers", particularly
@@ -17,7 +17,7 @@ Here are some additional general notes that are not considered spoilers:
  * Some code paths and long-established game features have been made 
    part of the base build and no longer conditional on compile settings.
  * Save files and bones files should be compatible across platforms and 
-   machine architectures.
+   machine architectures <FIXME>.
  * The following treasured NetHack community patches, or a variation of 
    them, have been rolled in to the base NetHack source tree: menucolors,
    pickup thrown, statue glyphs, <FIXME>.
@@ -64,8 +64,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
         Intel Pentium or better (or clone) running Linux, BSDI, or 
                 Windows (XP through 8.1)
         Intel 80386 or greater (or clone) boxes running Linux, or BSDI
-        Sun SPARC based machine running SunOS 4.x, Solaris 2.x, or Solaris 7
-	Mac OS X 10.9 should be added to the list.
+	Mac OS X 10.9
 
     Previous versions of NetHack were tested and known to run on the 
     following systems, but it is unknown if they can still build and 
@@ -73,7 +72,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
 
         Apple Macintosh running MacOS 7.5 or higher, LinuxPPC, BeOS 4.0
         Atari ST/TT/Falcon running TOS (or MultiTOS) with GCC
-        AT&T 3B1 running System V (3.61)
+        AT&T 3B1 running System V (3.51)
         AT&T 3B2/600 & 3B2/622 running System V R3.2.1
         AT&T 3B2/1000 Model 80 running System V R3.2.2
         AT&T 3B4000 running System V
@@ -96,7 +95,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
            Warp) with Microsoft 6.0, and OS/2 2.0 and up with IBM CSet++ 2.0.
         Intel 80386 or greater (or clone) running 386BSD
         Intel 80386 or greater (or clone) boxes running MS-DOS with DPMI.
-	Intel x86 running version of Windows prior to XP.
+        Intel x86 running a version of Windows prior to XP.
         Mips M2000 running RiscOS 4.1
         NeXT running Mach (using BSD configuration)
 	Palm Size PC 1.1 devices running Windows CE 2.11
@@ -107,7 +106,14 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
         Stride 460 running UniStride 2.1
         Sun-3s, -4s, and -386is running SunOS 3.x
         Sun-3s and -386is running SunOS 4.x
+        Sun SPARC based machine running SunOS 4.x, Solaris 2.x, or Solaris 7
         Valid Logic Systems SCALD-System
+
+    Previous versions, using a cross-compiler hosted on another platform, such as 
+    win32, could also build the following from source:
+        Pocket PC devices running Windows CE 3.0 and higher
+        H/PC Pro devices running Windows CE 2.11 and higher
+        Palm Size PC 1.1 devices running Windows CE 2.11
 
     Unless otherwise mentioned, the compiler used was the OS-vendor's
     C compiler.
@@ -135,8 +141,8 @@ o Though we make an effort to reply to each bug report, it may take some
   time before you receive feedback.  This is especially true during the
   period immediately after a new release, when we get the most bug reports.
 o We don't give hints for playing the game.
-o Don't bother to ask when the next version will be out, or expect a 
-  stock answer.
+o Don't bother to ask when the next version will be out or you can expect
+  to receive a stock answer.
 
 If you want to submit a patch for the NetHack source code via email directly, 
 you can direct it to this address:
