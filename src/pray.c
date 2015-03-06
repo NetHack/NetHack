@@ -1386,8 +1386,7 @@ verbalize("In return for thy service, I grant thee the gift of Immortality!");
 
     if (otmp->otyp == FAKE_AMULET_OF_YENDOR) {
 	    if (!highaltar && !otmp->known) goto too_soon;
-	    if (!Deaf)
-		You_hear("a nearby thunderclap.");
+	    You_hear("a nearby thunderclap.");
 	    if (!otmp->known) {
 		You("realize you have made a %s.",
 		    Hallucination ? "boo-boo" : "mistake");

@@ -638,7 +638,7 @@ meatmetal(mtmp)
 		    if (cansee(mtmp->mx,mtmp->my) && flags.verbose)
 			pline("%s eats %s!", Monnam(mtmp),
 				distant_name(otmp,doname));
-		    else if (!Deaf && flags.verbose)
+		    else if (flags.verbose)
 			You_hear("a crunching sound.");
 		    mtmp->meating = otmp->owt/2 + 1;
 		    /* Heal up to the object's weight in hp */
@@ -758,7 +758,7 @@ meatobj(mtmp)		/* for gelatinous cubes */
 		if (cansee(mtmp->mx,mtmp->my) && flags.verbose)
 		    pline("%s eats %s!", Monnam(mtmp),
 			    distant_name(otmp, doname));
-		else if (!Deaf && flags.verbose)
+		else if (flags.verbose)
 		    You_hear("a slurping sound.");
 		/* Heal up to the object's weight in hp */
 		if (mtmp->mhp < mtmp->mhpmax) {
@@ -803,7 +803,7 @@ meatobj(mtmp)		/* for gelatinous cubes */
 	if (ecount > 0) {
 	    if (cansee(mtmp->mx, mtmp->my) && flags.verbose && buf[0])
 		pline1(buf);
-	    else if (!Deaf && flags.verbose)
+	    else if (flags.verbose)
 		You_hear("%s slurping sound%s.",
 			ecount == 1 ? "a" : "several",
 			ecount == 1 ? "" : "s");
@@ -1642,7 +1642,7 @@ boolean was_swallowed;			/* digestion */
 				s_suffix(mdat->mname));
 			losehp(Maybe_Half_Phys(tmp), killer.name, KILLED_BY_AN);
 		    } else {
-			if (!Deaf) You_hear("an explosion.");
+			You_hear("an explosion.");
 			magr->mhp -= tmp;
 			if (magr->mhp < 1) mondied(magr);
 			if (magr->mhp < 1) { /* maybe lifesaved */
@@ -3106,7 +3106,7 @@ register boolean silent;
 			else if(!Blind)
 				You_see("%sangry guard%s approaching!",
 				  sct == 1 ? "an " : "", sct > 1 ? "s" : "");
-		} else if(!Deaf)
+		} else
 			You_hear("the shrill sound of a guard's whistle.");
 	    }
 	    return(TRUE);

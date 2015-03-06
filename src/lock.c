@@ -888,7 +888,7 @@ int x, y;
 		    else if (flags.verbose) {
 			if (cansee(x,y))
 			    pline("KABOOM!!  You see a door explode.");
-			else if (!Deaf)
+			else
 			    You_hear("a distant explosion.");
 		    }
 		    door->doormask = D_NODOOR;
@@ -901,7 +901,7 @@ int x, y;
 		if (flags.verbose) {
 		    if (cansee(x,y))
 			pline_The("door crashes open!");
-		    else if (!Deaf)
+		    else
 			You_hear("a crashing sound.");
 		}
 		unblock_point(x,y);
