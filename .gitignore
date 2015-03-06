@@ -48,5 +48,7 @@ Makefile.gcc-orig
 *.suo
 *.pdb
 *.ilk
+# VS2013 extension to auto-whine about questionable code generates these
+*.lastcodeanalysissucceeded
 # Win32-specific ignores end
 
