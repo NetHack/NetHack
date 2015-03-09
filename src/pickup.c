@@ -1452,6 +1452,36 @@ int x, y;
 }
 
 int
+do_loot_cont(cobjp)
+struct obj **cobjp;
+{
+    struct obj *cobj = *cobjp;
+    if (!cobj) return 0;
+    if (cobj->olocked) {
+	pline("%s locked.", cobj->lknown ? "It is" :
+	      "Hmmm, it turns out to be");
+	cobj->lknown = 1;
+	return 0;
+    }
+    cobj->lknown = 1;
+
+    if (cobj->otyp == BAG_OF_TRICKS) {
+	int tmp;
+	You("carefully open the bag...");
+	pline("It develops a huge set of teeth and bites you!");
+	tmp = rnd(10);
+	losehp(Maybe_Half_Phys(tmp), "carnivorous bag", KILLED_BY_AN);
+	makeknown(BAG_OF_TRICKS);
+	return 1;
+    }
+
+    You("%sopen %s...",
+	(!cobj->cknown || !cobj->lknown) ? "carefully " : "",
+	the(xname(cobj)));
+    return use_container(cobjp, 0);
+}
+
+int
 doloot()	/* loot a container on the floor or loot saddle from mon. */
 {
     struct obj *cobj, *nobj;
@@ -1486,46 +1516,62 @@ lootcont:
 
     if (container_at(cc.x, cc.y, FALSE)) {
 	boolean any = FALSE;
+	int num_conts = 0;
 
 	if (!able_to_loot(cc.x, cc.y, TRUE)) return 0;
-	for (cobj = level.objects[cc.x][cc.y]; cobj; cobj = nobj) {
-	    nobj = cobj->nexthere;
 
-	    if (Is_container(cobj)) {
-		c = ynq(safe_qbuf(qbuf, "There is ", " here, loot it?",
-				  cobj, doname, ansimpleoname, "a container"));
-		if (c == 'q') return (timepassed);
-		if (c == 'n') continue;
-		any = TRUE;
+	for (cobj = level.objects[cc.x][cc.y]; cobj; cobj = cobj->nexthere)
+	    if (Is_container(cobj)) num_conts++;
 
-		if (cobj->olocked) {
-		    pline("%s locked.", cobj->lknown ? "It is" :
-			  "Hmmm, it turns out to be");
-		    cobj->lknown = 1;
-		    continue;
+	if (num_conts > 1) {
+	    /* use a menu to loot many containers */
+	    int n, i;
+	    winid win;
+	    anything any;
+	    menu_item *pick_list = NULL;
+
+	    any.a_void = 0;
+	    win = create_nhwindow(NHW_MENU);
+	    start_menu(win);
+
+	    for (cobj = level.objects[cc.x][cc.y]; cobj; cobj = cobj->nexthere)
+		if (Is_container(cobj)) {
+		    any.a_obj = cobj;
+		    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, doname(cobj), MENU_UNSELECTED);
 		}
-		cobj->lknown = 1;
+	    end_menu(win, "Loot which containers?");
+	    n = select_menu(win, PICK_ANY, &pick_list);
+	    destroy_nhwindow(win);
 
-		if (cobj->otyp == BAG_OF_TRICKS) {
-		    int tmp;
-		    You("carefully open the bag...");
-		    pline("It develops a huge set of teeth and bites you!");
-		    tmp = rnd(10);
-		    losehp(Maybe_Half_Phys(tmp), "carnivorous bag", KILLED_BY_AN);
-		    makeknown(BAG_OF_TRICKS);
-		    timepassed = 1;
-		    continue;
+	    if (n > 0) {
+		for (i = 0; i < n; i++) {
+		    timepassed |= do_loot_cont(&pick_list[i].item.a_obj);
+		    if (multi < 0 || !pick_list[i].item.a_obj) {
+			free((genericptr_t) pick_list);
+			return 1;
+		    }
 		}
-
-		You("%sopen %s...",
-		    (!cobj->cknown || !cobj->lknown) ? "carefully " : "",
-		    the(xname(cobj)));
-		timepassed |= use_container(&cobj, 0);
-		/* might have triggered chest trap or magic bag explosion */
-		if (multi < 0 || !cobj) return 1;
 	    }
+	    if (pick_list) free((genericptr_t) pick_list);
+	    if (n != 0) c = 'y';
+	} else {
+	    for (cobj = level.objects[cc.x][cc.y]; cobj; cobj = nobj) {
+		nobj = cobj->nexthere;
+
+		if (Is_container(cobj)) {
+		    c = ynq(safe_qbuf(qbuf, "There is ", " here, loot it?",
+				      cobj, doname, ansimpleoname, "a container"));
+		    if (c == 'q') return (timepassed);
+		    if (c == 'n') continue;
+		    any = TRUE;
+
+		    timepassed |= do_loot_cont(&cobj);
+		    /* might have triggered chest trap or magic bag explosion */
+		    if (multi < 0 || !cobj) return 1;
+		}
+	    }
+	    if (any) c = 'y';
 	}
-	if (any) c = 'y';
     } else if (IS_GRAVE(levl[cc.x][cc.y].typ)) {
 	You("need to dig up the grave to effectively loot it...");
     }
