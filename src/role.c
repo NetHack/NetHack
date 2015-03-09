@@ -1332,12 +1332,15 @@ plnamesuffix()
     char *sptr, *eptr;
     int i;
 
+#ifdef GENERIC_USERNAMES
     /* some generic user names will be ignored in favor of prompting */
     i = (int)strlen(plname);
-    if ((i >= 4 && !strncmpi(plname, "player", i)) ||	    /* play[er] */
-	    (i >= 4 && !strncmpi(plname, "games", i)) ||	   /* game[s] */
-	    (i >= 7 && !strncmpi(plname, "nethacker", i)))  /* nethack[er] */
+    eptr = GENERIC_USERNAMES;
+    sptr = strstri(eptr, plname);
+    if (sptr && ((sptr == eptr && (sptr[i] == ' ' || sptr[i] == '\0'))
+		 || sptr[i] == ' ' || sptr[i] == '\0'))
 	*plname = '\0'; /* call askname() */
+#endif
 
     do {
 	if (!*plname) askname();	/* fill plname[] if necessary */
