@@ -316,6 +316,11 @@
 #endif /* CHDIR */
 
 
+/* If GENERIC_USERNAMES is defined, and the user name is found
+ * in that list, prompt for username instead.
+ * A public server should probably disable this. */
+#define GENERIC_USERNAMES "play player game games nethack nethacker"
+
 
 /*
  * Section 3:	Definitions that may vary with system type.
