@@ -69,7 +69,7 @@ V       Show long version and game history
 w       Wield (put in use) a weapon
 W       Wear a piece of armor
 x       Swap wielded and secondary weapons
-X       Enter explore (discovery) mode (only if defined)
+X       Toggle two-weapon combat
 y       Go northwest 1 space
 Y       Go northwest until you are on top of something
 ^Y      Go northwest until you are near something

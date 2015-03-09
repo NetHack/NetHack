@@ -708,7 +708,8 @@ The latter is used as your secondary weapon when engaging in
 two-weapon combat.  Note that if one of these slots is empty,
 the exchange still takes place.
 .lp X
-Enter explore (discovery) mode, explained in its own section later.
+Toggle two-weapon combat, if your character can do it.  Also available
+via the ``#twoweapon'' extended command
 .lp ""
 Since using this command by accident would be troublesome, you are asked
 to confirm your intent before switching to explore mode.  By default
@@ -2980,8 +2981,8 @@ with the
 .op -X
 command-line switch or with the
 .op playmode:explore
-option.  The other is to issue the `X' command while already
-playing the game.  Starting a new game in explore mode provides your
+option.  The other is to issue the ``#exploremode'' extended command while
+already playing the game.  Starting a new game in explore mode provides your
 character with a wand of wishing in initial inventory; switching via `X'
 during play does not.  The other benefits of explore mode are left for
 the trepid reader to discover.
