@@ -287,6 +287,7 @@ can_make_bones()
 {
 	register struct trap *ttmp;
 
+	if (!flags.bones) return FALSE;
 	if (ledger_no(&u.uz) <= 0 || ledger_no(&u.uz) > maxledgerno())
 	    return FALSE;
 	if (no_bones_level(&u.uz))
@@ -533,6 +534,7 @@ getbones()
 	if(discover)		/* save bones files for real games */
 		return(0);
 
+	if (!flags.bones) return (0);
 	/* wizard check added by GAN 02/05/87 */
 	if(rn2(3)	/* only once in three times do we find bones */
 		&& !wizard
