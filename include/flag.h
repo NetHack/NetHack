@@ -21,6 +21,7 @@ struct flag {
 	boolean  autoquiver;	/* Automatically fill quiver */
 	boolean  beginner;
 	boolean  biff;		/* enable checking for mail */
+	boolean  bones;		/* allow saving/loading bones */
 	boolean  confirm;	/* confirm before hitting tame monsters */
 	boolean  debug;		/* in debugging mode */
 #define wizard	 flags.debug
