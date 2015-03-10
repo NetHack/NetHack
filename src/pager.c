@@ -453,7 +453,7 @@ do_look(mode, click_cc)
 {
     boolean quick = (mode == 1); /* use cursor && don't search for "more info" */
     boolean clicklook = (mode == 2); /* right mouse-click method */
-    char    out_str[BUFSZ], look_buf[BUFSZ];
+    char    out_str[BUFSZ], look_buf[BUFSZ], prefix[BUFSZ];
     const char *x_str, *firstmatch = 0;
     struct permonst *pm = 0;
     int glyph;			/* glyph at selected position */
@@ -532,35 +532,13 @@ do_look(mode, click_cc)
 	    glyph = glyph_at(cc.x,cc.y);
 
 	    /* Convert the glyph at the selected position to a symbol. */
-#if 0
-	    if (glyph_is_cmap(glyph)) {
-		sym = showsyms[glyph_to_cmap(glyph)];
-	    } else if (glyph_is_trap(glyph)) {
-		sym = showsyms[trap_to_defsym(glyph_to_trap(glyph))];
-	    } else if (glyph_is_statue(glyph)) {
-	        sym = showsyms[(int)mons[glyph_to_mon(glyph)].mlet + SYM_OFF_M];
-	    } else if (glyph_is_object(glyph)) {
-		sym = showsyms[(int)objects[glyph_to_obj(glyph)].oc_class + SYM_OFF_O];
-		if (sym == '`' && iflags.bouldersym && (int)glyph_to_obj(glyph) == BOULDER)
-			sym = iflags.bouldersym;
-	    } else if (glyph_is_monster(glyph)) {
-		/* takes care of pets, detected, ridden, and regular mons */
-		sym = showsyms[(int)mons[glyph_to_mon(glyph)].mlet + SYM_OFF_M];
-	    } else if (glyph_is_swallow(glyph)) {
-		sym = showsyms[glyph_to_swallow(glyph)+S_sw_tl];
-	    } else if (glyph_is_invisible(glyph)) {
-		sym = DEF_INVISIBLE;
-	    } else if (glyph_is_warning(glyph)) {
-		sym = glyph_to_warning(glyph);
-	    	sym = showsyms[sym + SYM_OFF_W];
-	    } else {
-		impossible("do_look:  bad glyph %d at (%d,%d)",
-						glyph, (int)cc.x, (int)cc.y);
-		sym = ' ';
-	    }
-#endif
 	    so = mapglyph(glyph, &sym, &oc, &os, cc.x, cc.y);
 	}
+
+	if (from_screen || clicklook)
+	    Sprintf(prefix, "%s        ", encglyph(glyph));
+	else
+	    Sprintf(prefix, "%s        ", sym);	
 
 	/*
 	 * Check all the possibilities, saving all explanations in a buffer.
@@ -574,14 +552,8 @@ do_look(mode, click_cc)
 		def_monsyms[i].explain) {
 		need_to_look = TRUE;
 		if (!found) {
-		    if (from_screen || clicklook)
-		    	Sprintf(out_str, "%s        %s",
-				encglyph(glyph),
-			    	an(def_monsyms[i].explain));
-		    else
-		        Sprintf(out_str, "%c        %s",
-		        	sym,
-			    	an(def_monsyms[i].explain));
+		    Sprintf(out_str, "%s%s",
+				prefix, an(def_monsyms[i].explain));
 		    firstmatch = def_monsyms[i].explain;
 		    found++;
 		} else {
@@ -605,8 +577,8 @@ do_look(mode, click_cc)
 	 */
 	if (u.uswallow && (from_screen || clicklook) && is_swallow_sym(sym)) {
 	    if (!found) {
-		Sprintf(out_str, "%s        %s",
-			encglyph(glyph), mon_interior);
+		Sprintf(out_str, "%s%s",
+			prefix, mon_interior);
 		firstmatch = mon_interior;
 	    } else {
 		found += append_str(out_str, mon_interior);
@@ -624,9 +596,8 @@ do_look(mode, click_cc)
 		    continue;
 		}
 		if (!found) {
-		    Sprintf(out_str, "%s        %s",
-				encglyph(glyph),
-		    		an(def_oc_syms[i].explain));
+		    Sprintf(out_str, "%s%s",
+				prefix,	an(def_oc_syms[i].explain));
 		    firstmatch = def_oc_syms[i].explain;
 		    found++;
 		} else {
@@ -637,8 +608,8 @@ do_look(mode, click_cc)
 
 	if (sym == DEF_INVISIBLE) {
 	    if (!found) {
-		Sprintf(out_str, "%s        %s",
-			encglyph(glyph),
+		Sprintf(out_str, "%s%s",
+			prefix,
 			an(invisexplain));
 		firstmatch = invisexplain;
 		found++;
@@ -662,12 +633,11 @@ do_look(mode, click_cc)
 
 		if (!found) {
 		    if (is_cmap_trap(i)) {
-			Sprintf(out_str, "%s        a trap",
-				encglyph(glyph));
+			Sprintf(out_str, "%sa trap", prefix);
 			hit_trap = TRUE;
 		    } else {
-			Sprintf(out_str, "%s        %s",
-				encglyph(glyph),
+			Sprintf(out_str, "%s%s",
+				prefix,
 				article == 2 ? the(x_str) :
 				article == 1 ? an(x_str) : x_str);
 		    }
@@ -692,8 +662,8 @@ do_look(mode, click_cc)
 	    if (sym == ((from_screen || clicklook) ?
 		warnsyms[i] : def_warnsyms[i].sym)) {
 		if (!found) {
-			Sprintf(out_str, "%s        %s",
-				encglyph(glyph), def_warnsyms[i].explanation);
+			Sprintf(out_str, "%s%s",
+				prefix, def_warnsyms[i].explanation);
 			firstmatch = def_warnsyms[i].explanation;
 			found++;
 		} else {
@@ -711,8 +681,8 @@ do_look(mode, click_cc)
 	if (skipped_venom && found < 2) {
 	    x_str = def_oc_syms[VENOM_CLASS].explain;
 	    if (!found) {
-		Sprintf(out_str, "%s        %s",
-			encglyph(glyph), an(x_str));
+		Sprintf(out_str, "%s%s",
+			prefix, an(x_str));
 		firstmatch = x_str;
 		found++;
 	    } else {
@@ -724,8 +694,8 @@ do_look(mode, click_cc)
 	if (iflags.bouldersym && sym == iflags.bouldersym) {
 	    if (!found) {
 		firstmatch = "boulder";
-		Sprintf(out_str, "%s        %s",
-			encglyph(glyph), an(firstmatch));
+		Sprintf(out_str, "%s%s",
+			prefix, an(firstmatch));
 		found++;
 	    } else {
 		found += append_str(out_str, "boulder");
