@@ -866,6 +866,12 @@ passive attacks no longer erode armor covered by other armor
 dipping a fooproof item into acid no longer forgets that it's fooproof
 dipping a container into uncursed water now gets its contents wet
 sanitize petnames and fruit to prevent escape codes
+data.base "bat" overrode later "combat" entry
+data.base "gelatinous cube" and "jack boot" have their own entries
+data.base "vampire bat" matched twice; use the bat entry
+data.base dagger attribution started with spaces instead of tabs
+remove 'if (Deaf)' guards preceding You_hear which already checks deafness
+tse a menu to loot multiple containers
 do_look() in post-3.4.3 used glyph prior to setting it in pager.c
 
 
@@ -883,6 +889,10 @@ tty: when loading user's run-time configuration, explicitly negating one of
 	to regular ASCII and left the earlier option inaccurately set to "on"
 tty: various bugfixes for very wide and/or tall screens
 tty+GOLDOBJ: dropping or looting by menu wouldn't honor a count for gold
+tty: fix crashing when a location has more than 32k items
+tty: fix segfault when MD termcap is not defined
+tty: do not cut off statuslines at 80 characters for wider term
+tty: prevent accidental escapes from string entries
 unix: remove use of parentheses in nethack man page usage that confused a
 	man page conversion tool
 unix: new -wwindowtype option
@@ -890,6 +900,7 @@ unix: don't clobber old level files if 2nd hangup/disconnect occurs while
 	reconnected user is responding to the "destroy old game?" prompt
 unix/Qt: saved games were not found if nethack was built with prefixes in use
 unix,vms: allow digits after first character in name at "Who are you?" prompt
+unix: implement fcntl(2) locking on systems that can handle it
 vms: the DLB configuration could fail to build if a file without a dot
 	in its name happened to match a logical name
 Windows: starting a game with nethack.exe (tty) and saving, then restoring
@@ -1065,6 +1076,10 @@ dipping multiple potions in another potion may only dip part of their stack
 make being inside a stinking cloud (when not immune or resistant) become a
 	major trouble which is fixable by prayer
 introduce some variation in monster movement rates
+Add database entry for shuriken and make it match throwing star
+Add database entry for fedora
+Add database entry for land mine
+change command X to twoweapon toggle
 
 
 Platform- and/or Interface-Specific New Features
@@ -1133,4 +1148,5 @@ make REINCARNATION
 make TOURIST unconditional
 make KOPS unconditional
 make ELBERETH unconditional
+allow defining of generic usernames in config.h instead of hard-coding in role.c
 
