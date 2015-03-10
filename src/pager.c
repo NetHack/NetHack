@@ -538,7 +538,7 @@ do_look(mode, click_cc)
 	if (from_screen || clicklook)
 	    Sprintf(prefix, "%s        ", encglyph(glyph));
 	else
-	    Sprintf(prefix, "%s        ", sym);	
+	    Sprintf(prefix, "%c        ", sym);	
 
 	/*
 	 * Check all the possibilities, saving all explanations in a buffer.
