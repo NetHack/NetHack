@@ -866,6 +866,8 @@ passive attacks no longer erode armor covered by other armor
 dipping a fooproof item into acid no longer forgets that it's fooproof
 dipping a container into uncursed water now gets its contents wet
 sanitize petnames and fruit to prevent escape codes
+do_look() in post-3.4.3 used glyph prior to setting it in pager.c
+
 
 Platform- and/or Interface-Specific Fixes
 -----------------------------------------
