@@ -574,9 +574,14 @@ do_look(mode, click_cc)
 		def_monsyms[i].explain) {
 		need_to_look = TRUE;
 		if (!found) {
-		    Sprintf(out_str, "%s        %s",
+		    if (from_screen || clicklook)
+		    	Sprintf(out_str, "%s        %s",
 				encglyph(glyph),
-		    		an(def_monsyms[i].explain));
+			    	an(def_monsyms[i].explain));
+		    else
+		        Sprintf(out_str, "%c        %s",
+		        	sym,
+			    	an(def_monsyms[i].explain));
 		    firstmatch = def_monsyms[i].explain;
 		    found++;
 		} else {
