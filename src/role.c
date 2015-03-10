@@ -1337,8 +1337,9 @@ plnamesuffix()
     i = (int)strlen(plname);
     eptr = GENERIC_USERNAMES;
     sptr = strstri(eptr, plname);
-    if (sptr && ((sptr == eptr && (sptr[i] == ' ' || sptr[i] == '\0'))
-		 || sptr[i] == ' ' || sptr[i] == '\0'))
+    if (sptr
+	&& (sptr == eptr || sptr[-1] == ' ')
+	&& (sptr[i] == ' ' || sptr[i] == '\0'))
 	*plname = '\0'; /* call askname() */
 #endif
 
