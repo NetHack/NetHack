@@ -1080,6 +1080,9 @@ Add database entry for shuriken and make it match throwing star
 Add database entry for fedora
 Add database entry for land mine
 change command X to twoweapon toggle
+pressing @ when cursor positioning moves cursor on top of hero
+pressing # when cursor positioning toggles automatic description of features
+	under the cursor
 
 
 Platform- and/or Interface-Specific New Features
