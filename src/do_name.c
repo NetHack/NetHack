@@ -40,6 +40,8 @@ const char *goal;
     putstr(tmpwin, 0, sbuf);
     putstr(tmpwin, 0, "Use [HJKL] to move the cursor 8 units at a time.");
     putstr(tmpwin, 0, "Or enter a background symbol (ex. <).");
+    putstr(tmpwin, 0, "Use @ to move the cursor on yourself.");
+    putstr(tmpwin, 0, "Use # to toggle automatic description.");
     /* disgusting hack; the alternate selection characters work for any
        getpos call, but they only matter for dowhatis (and doquickwhatis) */
     doing_what_is = (goal == what_is_an_unknown_object);
@@ -63,6 +65,8 @@ const char *goal;
     int cx, cy, i, c;
     int sidx, tx, ty;
     boolean msg_given = TRUE;	/* clear message window by default */
+    boolean auto_msg = FALSE;
+    boolean show_goal_msg = FALSE;
     static const char pick_chars[] = ".,;:";
     const char *cp;
 
@@ -82,7 +86,32 @@ const char *goal;
     lock_mouse_cursor(TRUE);
 #endif
     for (;;) {
+
+	if (show_goal_msg) {
+	    pline("Move cursor to %s:", goal);
+	    curs(WIN_MAP, cx, cy);
+	    flush_screen(0);
+	    show_goal_msg = FALSE;
+	} else if (auto_msg && !msg_given) {
+	    coord cc;
+	    int sym = 0;
+	    char tmpbuf[BUFSZ];
+	    char *firstmatch = NULL;
+	    cc.x = cx;
+	    cc.y = cy;
+	    if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch)) {
+		/* there may be an encoded glyph */
+		putmixed(WIN_MESSAGE, 0, tmpbuf);
+		curs(WIN_MAP, cx, cy);
+		flush_screen(0);
+	    }
+	}
+
 	c = nh_poskey(&tx, &ty, &sidx);
+
+	if (auto_msg)
+	    msg_given = FALSE;
+
 	if (c == '\033') {
 	    cx = cy = -10;
 	    msg_given = TRUE;	/* force clear */
@@ -142,8 +171,20 @@ const char *goal;
 	    else		/* ^R */
 		docrt();	/* redraw */
 	    /* update message window to reflect that we're still targetting */
-	    pline("Move cursor to %s:", goal);
+	    show_goal_msg = TRUE;
 	    msg_given = TRUE;
+	} else if (c == '#') {
+	    auto_msg = !auto_msg;
+	    pline("Automatic description %sis %s.",
+		  flags.verbose ? "of features under cursor " : "",
+		  auto_msg ? "on" : "off");
+	    if (!auto_msg) show_goal_msg = TRUE;
+	    msg_given = TRUE;
+	    goto nxtc;
+	} else if (c == '@') {
+	    cx = u.ux;
+	    cy = u.uy;
+	    goto nxtc;
 	} else {
 	    if (!index(quitchars, c)) {
 		char matching[MAXPCHARS];
