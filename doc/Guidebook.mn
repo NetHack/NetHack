@@ -2104,7 +2104,7 @@ Implemented by the Amiga, Gem and tty ports.
 Default '<'.
 .lp menu_search
 Menu character accelerator to search for a menu item.
-Implemented by the Amiga, Gem and X11 ports.
+Implemented by the Amiga, Gem, X11 and tty ports.
 Default ':'.
 .lp menu_select_all
 Menu character accelerator to select all items in a menu.
