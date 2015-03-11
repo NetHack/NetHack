@@ -1,13 +1,17 @@
-# NetHack 3.5	Makefile.msc	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
-# NetHack 3.5	Makefile.msc	$Date: 2012/04/14 00:38:09 $  $Revision: 1.54 $
-#       Copyright (c) NetHack PC Development Team 1993-2012
+# NetHack 3.5	Makefile.msc	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+#       Copyright (c) NetHack PC Development Team 1993-2015
 #
-#       NetHack 3.5.x Makefile for MS Visual Studio Visual C++ compiler
+#==============================================================================
+# Build Tools Environment
+#
+#       NetHack 3.6.x Makefile for MS Visual Studio Visual C++ compiler
 #  
-#       Win32 Compilers Tested:
-#            - Microsoft Visual Studio 2010 Express
+#       Visual Studio Compilers Tested:
 #            - Microsoft Visual Studio 2010 Express, with the Platform SDK
+#            - Microsoft Visual Studio 2013 Express
+#            - Microsoft Visual Studio 2015 Express (pre-release)
 #
+#==============================================================================
 #   This is used for building two versions of NetHack:
 #   A tty port utilizing the Win32 Console I/O subsystem, Console
 #       NetHack;
@@ -21,17 +25,70 @@
 #              .y                           yacc   (such as bison)
 #              .l                           lex    (such as flex)
 #
-#
-#       If you have any questions read the sys/winnt/Install.nt file included 
-#       with the distribution.
+#   If you have any questions read the sys/winnt/Install.nt file included 
+#   with the distribution.
 #==============================================================================
-# Do not delete the following line.
+#==============================================================================
+# This section is used to determine the version of Visual Studio we are using.
+# We set VSVER to 0000 to flag any version that is too old or untested.
+#
+!IF "$(_NMAKE_VER)" == "14.00.22310.1"
+VSVER=2015
+!ELSEIF "$(_NMAKE_VER)" == "12.00.21005.1"
+VSVER=2013
+!ELSEIF "$(_NMAKE_VER)" == "10.00.40219.01"
+VSVER=2010
+!ELSE
+VSVER=0000		#untested version
+!ENDIF
+#
+#==============================================================================
+# BUILD DECISIONS SECTION
+#
+# 1. 32-bit or 64-bit?
+#
+!IF ($(VSVER) >= 2013)
+# Set your desired target to x86 (32-bit) or x64 (64-bit) here by
+# uncommenting the appropriate target size.
+#
+# 64 bit
+#TARGET_CPU=x64
+#
+# 32 bit
+TARGET_CPU=x86
+!ELSE
+# For VS2010 use "setenv /x86" or "setenv /x64" before invoking make process
+# DO NOT DELETE THE FOLLOWING LINE
 !include <win32.mak>
-
+!ENDIF
+#
+#---------------------------------------------------------------
+# 2. Graphical version or command line version?
+#
 # Graphical interface
-# Set to Y for a graphical version
+# Uncomment below to set to Y for a graphical version
 
 #GRAPHICAL = Y
+
+#
+#---------------------------------------------------------------
+# 3. Where do you want the game to be built (which folder)?
+#
+
+GAMEDIR = ..\binary               # Game directory
+
+# This marks the end of the BUILD DECISIONS section.
+#==============================================================================
+#
+#===============================================
+#======= End of Modification Section ===========
+#===============================================
+#
+################################################
+#                                              #
+# Nothing below here should have to be changed.#
+#                                              #
+################################################
 
 #  Set the gamedir according to your preference.  
 #  If not present prior to compilation it gets created.
@@ -41,8 +98,6 @@ GAME    = NetHackW                # Game Name
 !ELSE
 GAME    = NetHack                 # Game Name
 !ENDIF
-
-GAMEDIR = ..\binary               # Game directory
 
 #
 #  Source directories.    Makedefs hardcodes these, don't change them.
@@ -65,6 +120,66 @@ WSHR  = ..\win\share # Tile support files
 
 OBJ     = o
 
+cc=cl
+link=link
+rc=Rc
+
+#
+#=============================================
+# Visual Studio versions >= 2013 specific stuff
+#=============================================
+
+!IF "$(TARGET_CPU)" == ""
+TARGET_CPU=x86
+!ENDIF
+
+# Common compiler flags:
+#   -c   - compile without linking
+#   -W3  - Set warning level to level 3    (-W4 for 64-bit compilations)
+#   -Zi  - generate debugging information
+#   -Od  - disable all optimizations
+#   -Ox  - use maximum optimizations
+#   -Zd  - generate only public symbols and line numbers for debugging
+#   -GS  - enable security checks
+#
+ccommon=-c -DCRTAPI1=_cdecl -DCRTAPI2=_cdecl -nologo -GS -c
+lflags=/INCREMENTAL:NO /NOLOGO
+
+!IF "$(TARGET_CPU)" == "x86"
+cflags = $(ccommon) -D_X86_=1  -DWIN32 -D_WIN32 -W3
+scall  = -Gz
+
+!ELSEIF "$(TARGET_CPU)" == "x64"
+cflags = $(ccommon) -D_AMD64_=1 -DWIN64 -D_WIN64  -DWIN32 -D_WIN32
+cflags = $(cflags) -W4
+scall  =
+!ENDIF
+
+# declarations for use on Intel x86 systems
+!IF "$(TARGET_CPU)" == "x86"
+DLLENTRY = @12
+!ENDIF
+
+# declarations for use on AMD64 systems
+!IF "$(TARGET_CPU)" == "x64"
+DLLENTRY =
+!ENDIF
+
+# for Windows applications
+conlflags = $(lflags) -subsystem:console,$(EXEVER)
+guilflags = $(lflags) -subsystem:windows,$(EXEVER)
+dlllflags = $(lflags) -entry:_DllMainCRTStartup$(DLLENTRY) -dll
+
+# basic subsystem specific libraries, less the C Run-Time
+baselibs    = kernel32.lib $(optlibs) $(winsocklibs) advapi32.lib
+winlibs     = $(baselibs) user32.lib gdi32.lib comdlg32.lib winspool.lib
+
+# for Windows applications that use the C Run-Time libraries
+conlibs     = $(baselibs)
+guilibs     = $(winlibs)
+#
+# End of VS2013 and greater stuff
+#=============================================
 
 #
 #==========================================
@@ -133,15 +248,6 @@ PRECOMPHEAD = N			# set to Y if you want to use precomp. headers
 #
 
 #ZLIB = zlib.lib
-
-#===============================================
-#======= End of Modification Section ===========
-#===============================================
-################################################
-#                                              #
-# Nothing below here should have to be changed.#
-#                                              #
-################################################
 
 !IF "$(GRAPHICAL)" == "Y"
 WINPORT	= $(O)tile.o $(O)mhaskyn.o $(O)mhdlg.o \
@@ -420,7 +526,7 @@ OBJS   = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
          $(VOBJ11) $(VOBJ12) $(VOBJ13) $(VOBJ14) $(VOBJ15) \
          $(VOBJ16) $(VOBJ17) $(VOBJ18) $(VOBJ19) $(VOBJ20) \
          $(VOBJ21) $(VOBJ22) $(VOBJ23) $(VOBJ24) $(VOBJ25) \
-         $(VOBJ26) $(VOBJ27)
+         $(VOBJ26) $(VOBJ27) $(VOBJ28) $(VOBJ29)
 
 WINPOBJ = $(WINPORT)
 
@@ -483,10 +589,10 @@ GAMEFILE = $(GAMEDIR)\$(GAME).exe
 #
 #  The default make target (so just typing 'nmake' is useful).
 #
-default : $(GAMEFILE)
+default : install
 
 #
-#  The main target.
+#  The game target.
 #
 
 $(GAME): $(O)obj.tag $(O)utility.tag envchk $(GAMEFILE)
@@ -920,9 +1026,11 @@ $(O)obj.tag:
 #==========================================
 
 envchk:
+!	IF ($(VSVER) < 2010)
+	@echo Your Visual Studio version is too old or untested ($(_NMAKE_VER))
+!ERROR Your Visual Studio version is too old or untested ($(_NMAKE_VER))
+!	ENDIF
 !	IF "$(TARGET_CPU)"=="x64"
-	@echo Windows x64 64-bit build
-!	ELSEIF "$(TARGET_CPU)"=="IA64"
 	@echo Windows x64 64-bit build
 !	ELSE
 	@echo Windows x86 32-bit build
