@@ -975,7 +975,7 @@ struct obj *otmp;
 	}
 
 	tt = &tt_buf;
-	rank = rnd(10);
+	rank = rnd(sysopt.tt_oname_maxrank);
 pickentry:
 	for(i = rank; i; i--) {
 	    readentry(rfile, tt);

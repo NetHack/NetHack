@@ -2209,6 +2209,13 @@ int		src;
 		return 0;
 	    }
 	    sysopt.pointsmin = n;
+	} else if (src == SET_IN_SYS && match_varname(buf, "MAX_STATUENAME_RANK", 10)) {
+	    n = atoi(bufp);
+	    if (n < 1) {
+		raw_printf("Illegal value in MAX_STATUENAME_RANK (minimum is 1).");
+		return 0;
+	    }
+	    sysopt.tt_oname_maxrank = n;
 # ifdef PANICTRACE
 	} else if (src == SET_IN_SYS &&
 		match_varname(buf, "PANICTRACE_LIBC", 15)) {

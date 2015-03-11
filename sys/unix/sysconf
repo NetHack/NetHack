@@ -45,6 +45,9 @@ MAXPLAYERS=10
 # numeric (1) user id.
 #PERS_IS_UID=1
 
+# Maximum number of score file entries to use for random statue names
+#MAX_STATUENAME_RANK=10
+
 # Try to get more info in case of a program bug or crash.  Using GDB can
 # get more information and works on more systems but requires gdb be available;
 # using LIBC only works if NetHack is linked with a libc that supports the
