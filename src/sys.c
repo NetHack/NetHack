@@ -29,6 +29,7 @@ sys_early_init(){
 	sysopt.entrymax = ENTRYMAX;
 	sysopt.pointsmin = POINTSMIN;
 	sysopt.pers_is_uid = PERS_IS_UID;
+	sysopt.tt_oname_maxrank = 10;
 
 		/* sanity checks */
 	if(PERSMAX<1) sysopt.persmax = 1;

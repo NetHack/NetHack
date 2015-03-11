@@ -2945,6 +2945,10 @@ Minimum number of points to get an entry in the score file.
 PERS_IS_UID
 0 or 1 to use user names or numeric userids, respectively, to identify
 unique people for the score file.
+.lp
+MAX_STATUENAME_RANK
+Maximum number of score file entries to use for random statue names
+(default is 10).
 .hn 1
 Scoring
 .pg

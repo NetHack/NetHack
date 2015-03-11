@@ -22,6 +22,7 @@ struct sysopt {
 	int pers_is_uid;
 	int entrymax;
 	int pointsmin;
+	int tt_oname_maxrank;
 #ifdef PANICTRACE
 		/* panic options */
 	char *gdbpath;
