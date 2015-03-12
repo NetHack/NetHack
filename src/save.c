@@ -307,6 +307,7 @@ register int fd, mode;
 #ifdef SYSFLAGS
 	bwrite(fd, (genericptr_t) &sysflags, sizeof(struct sysflag));
 #endif
+	u.urealtime.realtime += (getnow() - u.urealtime.restored);
 	bwrite(fd, (genericptr_t) &u, sizeof(struct you));
 	bwrite(fd, yyyymmddhhmmss(ubirthday), 14);
 	save_killers(fd, mode);

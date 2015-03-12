@@ -26,6 +26,7 @@ E void NDECL(stop_occupation);
 E void NDECL(display_gamewindows);
 E void NDECL(newgame);
 E void FDECL(welcome, (BOOLEAN_P));
+E time_t NDECL(get_realtime);
 
 /* ### apply.c ### */
 

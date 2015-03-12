@@ -65,6 +65,9 @@ STATIC_DCL void FDECL(outentry, (int,struct toptenentry *,BOOLEAN_P));
 STATIC_DCL void FDECL(discardexcess, (FILE *));
 STATIC_DCL void FDECL(readentry, (FILE *,struct toptenentry *));
 STATIC_DCL void FDECL(writeentry, (FILE *,struct toptenentry *));
+STATIC_DCL void FDECL(writexlentry, (FILE*, struct toptenentry *));
+STATIC_DCL long FDECL(encodeconduct, (void));
+STATIC_DCL long FDECL(encodeachieve, (void));
 STATIC_DCL void FDECL(free_ttlist, (struct toptenentry *));
 STATIC_DCL int FDECL(classmon, (char *,BOOLEAN_P));
 STATIC_DCL int FDECL(score_wanted,
@@ -292,6 +295,95 @@ struct toptenentry *tt;
 #endif
 }
 
+#define XLOG_SEP "\t"  /* xlogfile field separator. */
+/* as tab is never used in eg. plname or death, no need to mangle those. */
+STATIC_OVL void
+writexlentry(rfile,tt)
+FILE *rfile;
+struct toptenentry *tt;
+{
+    char buf[DTHSZ+1];
+    (void)fprintf(rfile,
+		  "version=%d.%d.%d"
+		  XLOG_SEP "points=%ld"
+		  XLOG_SEP "deathdnum=%d"
+		  XLOG_SEP "deathlev=%d"
+		  XLOG_SEP "maxlvl=%d"
+		  XLOG_SEP "hp=%d"
+		  XLOG_SEP "maxhp=%d"
+		  XLOG_SEP "deaths=%d"
+		  XLOG_SEP "deathdate=%d"
+		  XLOG_SEP "birthdate=%d"
+		  XLOG_SEP "uid=%d",
+		  tt->ver_major, tt->ver_minor, tt->patchlevel,
+		  tt->points, tt->deathdnum, tt->deathlev,
+		  tt->maxlvl, tt->hp, tt->maxhp, tt->deaths,
+		  tt->deathdate, tt->birthdate, tt->uid);
+    (void)fprintf(rfile,
+		  XLOG_SEP "role=%s"
+		  XLOG_SEP "race=%s"
+		  XLOG_SEP "gender=%s"
+		  XLOG_SEP "align=%s",
+		  tt->plrole, tt->plrace, tt->plgend, tt->plalign);
+    (void)fprintf(rfile, XLOG_SEP "name=%s", plname);
+    (void)fprintf(rfile, XLOG_SEP "death=%s", tt->death);
+    (void)fprintf(rfile, XLOG_SEP "conduct=0x%lx", encodeconduct());
+    (void)fprintf(rfile, XLOG_SEP "turns=%ld", moves);
+    (void)fprintf(rfile, XLOG_SEP "achieve=0x%lx", encodeachieve());
+    (void)fprintf(rfile, XLOG_SEP "realtime=%ld", (long)u.urealtime.realtime);
+    (void)fprintf(rfile, XLOG_SEP "starttime=%ld", (long)ubirthday);
+    (void)fprintf(rfile, XLOG_SEP "endtime=%ld", (long)u.urealtime.endtime);
+    (void)fprintf(rfile, XLOG_SEP "gender0=%s", genders[flags.initgend].filecode);
+    (void)fprintf(rfile, XLOG_SEP "align0=%s",
+		  aligns[1 - u.ualignbase[A_ORIGINAL]].filecode);
+    fprintf(rfile, "\n");
+}
+#undef XLOG_SEP
+
+long
+encodeconduct(void)
+{
+    long e = 0L;
+
+    if(!u.uconduct.food)         e |= 1L << 0;
+    if(!u.uconduct.unvegan)      e |= 1L << 1;
+    if(!u.uconduct.unvegetarian) e |= 1L << 2;
+    if(!u.uconduct.gnostic)      e |= 1L << 3;
+    if(!u.uconduct.weaphit)      e |= 1L << 4;
+    if(!u.uconduct.killer)       e |= 1L << 5;
+    if(!u.uconduct.literate)     e |= 1L << 6;
+    if(!u.uconduct.polypiles)    e |= 1L << 7;
+    if(!u.uconduct.polyselfs)    e |= 1L << 8;
+    if(!u.uconduct.wishes)       e |= 1L << 9;
+    if(!u.uconduct.wisharti)     e |= 1L << 10;
+    if(!num_genocides())         e |= 1L << 11;
+
+    return e;
+}
+
+long
+encodeachieve(void)
+{
+    long r = 0L;
+
+    if(u.uachieve.bell)            r |= 1L << 0;
+    if(u.uachieve.enter_gehennom)  r |= 1L << 1;
+    if(u.uachieve.menorah)         r |= 1L << 2;
+    if(u.uachieve.book)            r |= 1L << 3;
+    if(u.uevent.invoked)           r |= 1L << 4;
+    if(u.uachieve.amulet)          r |= 1L << 5;
+    if(In_endgame(&u.uz))          r |= 1L << 6;
+    if(Is_astralevel(&u.uz))       r |= 1L << 7;
+    if(u.uachieve.ascended)        r |= 1L << 8;
+    if(u.uachieve.mines_luckstone) r |= 1L << 9;
+    if(u.uachieve.finish_sokoban)  r |= 1L << 10;
+    if(u.uachieve.killed_medusa)   r |= 1L << 11;
+
+    return r;
+}
+
+
+
 STATIC_OVL void
 free_ttlist(tt)
 struct toptenentry *tt;
@@ -322,6 +414,9 @@ time_t when;
 #ifdef LOGFILE
 	FILE *lfile;
 #endif /* LOGFILE */
+#ifdef XLOGFILE
+	FILE *xlfile;
+#endif /* XLOGFILE */
 
 /* Under DICE 3.0, this crashes the system consistently, apparently due to
  * corruption of *rfile somewhere.  Until I figure this out, just cut out
@@ -380,6 +475,7 @@ time_t when;
 	t0->birthdate = yyyymmdd(ubirthday);
 	t0->deathdate = yyyymmdd(when);
 	t0->tt_next = 0;
+	u.urealtime.endtime = when;
 #ifdef UPDATE_RECORD_IN_PLACE
 	t0->fpos = -1L;
 #endif
@@ -395,6 +491,17 @@ time_t when;
 	    unlock_file(LOGFILE);
 	}
 #endif /* LOGFILE */
+#ifdef XLOGFILE
+	if (lock_file(XLOGFILE, SCOREPREFIX, 10)) {
+	    if(!(xlfile = fopen_datafile(XLOGFILE, "a", SCOREPREFIX))) {
+		HUP raw_print("Cannot open extended log file!");
+	    } else {
+		writexlentry(xlfile, t0);
+		(void) fclose(xlfile);
+	    }
+	    unlock_file(XLOGFILE);
+	}
+#endif /* XLOGFILE */
 
 	if (wizard || discover) {
 	    if (how != PANICKED) HUP {

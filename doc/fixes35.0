@@ -1120,6 +1120,7 @@ adopt/adapt/improve the Paranoid_Quit patch; default is paranoid_confirm:pray
 	paranoid_confirm:pray    y to confirm #pray; supersedes prayconfirm
 	paranoid_confirm:Remove  always pick from inventory for 'R' and 'T'
 adopt/adapt/improve Dungeon Overview
+Aardvark Joe's Extended Logfile
 
 
 Code Cleanup and Reorganization
