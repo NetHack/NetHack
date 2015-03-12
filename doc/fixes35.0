@@ -873,6 +873,7 @@ data.base dagger attribution started with spaces instead of tabs
 remove 'if (Deaf)' guards preceding You_hear which already checks deafness
 tse a menu to loot multiple containers
 do_look() in post-3.4.3 used glyph prior to setting it in pager.c
+charge for a boulder that fills a pit in shop
 
 
 Platform- and/or Interface-Specific Fixes
