@@ -179,7 +179,7 @@ const char *verb;
 			}
 		}
 		deltrap(t);
-		obfree(obj, (struct obj *)0);
+		useupf(obj, 1L);
 		bury_objs(x, y);
 		newsym(x,y);
 		return TRUE;
