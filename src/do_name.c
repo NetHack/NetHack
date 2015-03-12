@@ -96,7 +96,7 @@ const char *goal;
 	    coord cc;
 	    int sym = 0;
 	    char tmpbuf[BUFSZ];
-	    char *firstmatch = NULL;
+	    const char *firstmatch = NULL;
 	    cc.x = cx;
 	    cc.y = cy;
 	    if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch)) {

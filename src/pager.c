@@ -454,16 +454,15 @@ const char **firstmatch;
     boolean hit_trap;
     const char *x_str;
     static const char *mon_interior = "the interior of a monster";
-    struct permonst *pm = NULL;
 
     if (looked) {
-	int oc, so;
+	int oc;
 	unsigned os;
 
 	glyph = glyph_at(cc.x,cc.y);
 
 	/* Convert the glyph at the selected position to a symbol. */
-	so = mapglyph(glyph, &sym, &oc, &os, cc.x, cc.y);
+	(void) mapglyph(glyph, &sym, &oc, &os, cc.x, cc.y);
     }
 
     if (looked)
@@ -642,7 +641,7 @@ const char **firstmatch;
 	    char monbuf[BUFSZ];
 	    char temp_buf[BUFSZ];
 
-	    pm = lookat(cc.x, cc.y, look_buf, monbuf);
+	    (void) lookat(cc.x, cc.y, look_buf, monbuf);
 	    *firstmatch = look_buf;
 	    if (*(*firstmatch)) {
 		Sprintf(temp_buf, " (%s)", *firstmatch);
@@ -685,7 +684,6 @@ do_look(mode, click_cc)
     coord   cc;			/* screen pos of unknown glyph */
     boolean save_verbose;	/* saved value of flags.verbose */
     boolean from_screen;	/* question from the screen */
-    static const char *mon_interior = "the interior of a monster";
 
     if (!clicklook) {
 	if (quick) {
@@ -730,8 +728,6 @@ do_look(mode, click_cc)
 	out_str[0] = '\0';
 
 	if (from_screen || clicklook) {
-	    int oc, so;
-	    unsigned os;
 	    if (from_screen) {
 		if (flags.verbose)
 			pline("Please move the cursor to %s.",
