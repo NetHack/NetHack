@@ -1822,7 +1822,7 @@ register struct attack *mattk;
 		const char *mname = pd->mname;
 
 		if (!type_is_pname(pd)) mname = an(mname);
-		You("bite into %s.", mon_nam(mdef));
+		You("englut %s.", mon_nam(mdef));
 		Sprintf(kbuf, "swallowing %s whole", mname);
 		instapetrify(kbuf);
 	    } else {
