@@ -659,6 +659,8 @@ register int pm;
 			    mons[pm].mname);
 		    killer.format = NO_KILLER_PREFIX;
 		    done(DIED);
+		    /* life-saving needed to reach here */
+		    exercise(A_WIS, FALSE);
 		    /* It so happens that since we know these monsters */
 		    /* cannot appear in tins, context.victual.piece will always */
 		    /* be what we want, which is not generally true. */
