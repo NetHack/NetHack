@@ -627,14 +627,21 @@ register int x, y;
 boolean quietly;
 {
 	register struct monst *mtmp = m_at(x, y);
-	boolean is_worm_tail = ((mtmp->mx != x) || (mtmp->my != y));
 
 	if(mtmp && mtmp->m_ap_type != M_AP_FURNITURE) {
 		if (mtmp->m_ap_type == M_AP_OBJECT) goto objhere;
-		if (!quietly) pline("%s %s in the way!",
-			is_worm_tail ? "Something" :
-			   !canspotmon(mtmp) ? "Some creature" : Monnam(mtmp),
-			slithy(mtmp->data) ? "is situated" : "stands");
+		if (!quietly) {
+		    if ((mtmp->mx != x) || (mtmp->my != y)) {
+		    	/* worm tail */
+			pline("%s%s blocks the way!",
+				!canspotmon(mtmp) ? Something :
+					s_suffix(Monnam(mtmp)),
+				!canspotmon(mtmp) ? "" : " tail");
+		    } else {
+			pline("%s blocks the way!",
+			   !canspotmon(mtmp) ? "Some creature" : Monnam(mtmp));
+		    }
+		}
 		if (!canspotmon(mtmp))
 			map_invisible(x, y);
 		return(TRUE);
