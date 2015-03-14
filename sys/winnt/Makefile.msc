@@ -142,7 +142,7 @@ TARGET_CPU=x86
 #   -Zd  - generate only public symbols and line numbers for debugging
 #   -GS  - enable security checks
 #
-ccommon=-c -DCRTAPI1=_cdecl -DCRTAPI2=_cdecl -nologo -GS -c
+ccommon=-c -Zi -DCRTAPI1=_cdecl -DCRTAPI2=_cdecl -nologo -GS -c
 lflags=/INCREMENTAL:NO /NOLOGO
 
 !IF "$(TARGET_CPU)" == "x86"
@@ -334,21 +334,21 @@ lflagsUtil = $(ldebug) $(lflags) $(conlibs)
 # - Game build
 #==========================================
 
-GAMEPDBFILE= /PDB:"$(O)$(GAME).PDB"
+GAMEPDBFILE= /DEBUG /PDB:"$(O)$(GAME).PDB"
 GAMEMAPFILE= /MAP:"$(O)$(GAME).MAP"
 LIBS= user32.lib winmm.lib $(ZLIB)
 
 !IF ("$(GRAPHICAL)"=="Y")
 
 cflagsGame = $(cdebug) $(cflags2) $(guiflags) $(INCLDIR) \
-	     $(WINPFLAG) $(DLBFLG) $(GAMEPDBFILE) $(GAMEMAPFILE)
-lflagsGame = $(ldebug) $(lflags) $(guilibs)
+	     $(WINPFLAG) $(DLBFLG)
+lflagsGame = $(ldebug) $(lflags) $(guilibs) $(GAMEPDBFILE) $(GAMEMAPFILE)
 
 !ELSE
 
 cflagsGame = $(cdebug) $(cflags2) $(conflags) $(INCLDIR) \
-	     $(WINPFLAG) $(DLBFLG) $(GAMEPDBFILE) $(GAMEMAPFILE)
-lflagsGame = $(ldebug) $(lflags) $(conlibs)
+	     $(WINPFLAG) $(DLBFLG)
+lflagsGame = $(ldebug) $(lflags) $(conlibs) $(GAMEPDBFILE) $(GAMEMAPFILE)
 
 !ENDIF
 
