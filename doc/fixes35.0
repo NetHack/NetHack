@@ -4,8 +4,6 @@ $rcsfile: fixes35.0,v $ $Revision: 1.445 $ $Date: 2014/11/18 03:10:36 $
 General Fixes and Modified Features
 -----------------------------------
 change the dreaded "Stop eating?" to "Continue eating?" with default "no"
-fix half-physical damage intrinsic protection from a number of 
-	events and circumstances
 setmangry should not be called when a monster enters a bones region
 bad capitalization of msg when charging for something that catches light
 missing opthelp for use_inverse
