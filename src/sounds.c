@@ -901,7 +901,15 @@ register struct monst *mtmp;
 
     if (pline_msg) pline("%s %s", Monnam(mtmp), pline_msg);
     else if (mtmp->mcan && verbl_msg_mcan) verbalize1(verbl_msg_mcan);
-    else if (verbl_msg) verbalize1(verbl_msg);
+    else if (verbl_msg) {
+	if (ptr == &mons[PM_DEATH]) { /* Death talks in CAPITAL LETTERS */
+	    char tmpbuf[BUFSZ];
+	    Sprintf(tmpbuf, "%s", verbl_msg);
+	    verbalize1(ucase(tmpbuf));
+	} else {
+	    verbalize1(verbl_msg);
+	}
+    }
     return(1);
 }
 
