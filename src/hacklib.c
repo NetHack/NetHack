@@ -17,6 +17,7 @@ NetHack, except that rounddiv may call panic().
 	char		highc		(char)
 	char		lowc		(char)
 	char *		lcase		(char *)
+	char *		ucase		(char *)
 	char *		upstart		(char *)
 	char *		mungspaces	(char *)
 	char *		eos		(char *)
@@ -96,6 +97,17 @@ lcase(s)		/* convert a string into all lowercase */
 
     for (p = s; *p; p++)
 	if ('A' <= *p && *p <= 'Z') *p |= 040;
+    return s;
+}
+
+char *
+ucase(s)		/* convert a string into all uppercase */
+    char *s;
+{
+    register char *p;
+
+    for (p = s; *p; p++)
+	if ('a' <= *p && *p <= 'z') *p &= ~040;
     return s;
 }
 

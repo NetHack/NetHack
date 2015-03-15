@@ -800,6 +800,7 @@ E boolean FDECL(letter, (CHAR_P));
 E char FDECL(highc, (CHAR_P));
 E char FDECL(lowc, (CHAR_P));
 E char *FDECL(lcase, (char *));
+E char *FDECL(ucase, (char *));
 E char *FDECL(upstart, (char *));
 E char *FDECL(mungspaces, (char *));
 E char *FDECL(eos, (char *));
