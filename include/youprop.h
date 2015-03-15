@@ -286,7 +286,35 @@
  * 2. it doesn't leave a mark. Marks include destruction of, or 
  *    damage to, an internal organ (including the brain), 
  *    lacerations, bruises, crushed body parts, bleeding.
+ *
+ * The following were evaluated and determined _NOT_ to be
+ * susceptable to Half_physical_damage protection:
+ *   Being caught in a fireball                      [fire damage] 
+ *   Sitting in lava                                 [lava damage] 
+ *   Thrown potion (acid)                            [acid damage] 
+ *   Splattered burning oil from thrown potion       [fire damage] 
+ *   Mixing water and acid                           [acid damage] 
+ *   Molten lava (entering or being splashed)        [lava damage] 
+ *   boiling water from a sink                       [fire damage] 
+ *   Fire traps                                      [fire damage] 
+ *   Scrolls of fire (confused and otherwise)        [fire damage] 
+ *   Alchemical explosion                            [not physical] 
+ *   System shock                                    [shock damage] 
+ *   Bag of holding explosion                        [magical] 
+ *   Being undead-turned by your god                 [magical] 
+ *   Level-drain                                     [magical] 
+ *   Magical explosion of a magic trap               [magical] 
+ *   Sitting on a throne with a bad effect           [magical] 
+ *   Contaminated water from a sink                  [poison/sickness] 
+ *   Contact-poisoned spellbooks                     [poison/sickness] 
+ *   Eating acidic/poisonous/mildly-old corpses      [poison/sickness] 
+ *   Eating a poisoned weapon while polyselfed       [poison/sickness] 
+ *   Engulfing a zombie or mummy (AT_ENGL in hmonas) [poison/sickness] 
+ *   Quaffed potions of sickness, lit oil, acid      [poison/sickness] 
+ *   Pyrolisks' fiery gaze                           [fire damage] 
+ *   Any passive attack                              [most don't qualify] 
  */
+
 #define HHalf_physical_damage	u.uprops[HALF_PHDAM].intrinsic
 #define EHalf_physical_damage	u.uprops[HALF_PHDAM].extrinsic
 #define Half_physical_damage	(HHalf_physical_damage || EHalf_physical_damage)
