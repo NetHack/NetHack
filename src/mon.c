@@ -1,4 +1,4 @@
-/* NetHack 3.5	mon.c	$NHDT-Date: 1425319883 2015/03/02 18:11:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.137 $ */
+/* NetHack 3.5	mon.c	$NHDT-Date: 1426458561 2015/03/15 22:29:21 $  $NHDT-Branch: derek-farming $:$NHDT-Revision: 1.139 $ */
 /* NetHack 3.5	mon.c	$Date: 2012/05/16 02:15:10 $  $Revision: 1.126 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -268,6 +268,14 @@ unsigned corpseflags;
 			obj = mksobj_at(SCR_BLANK_PAPER, x, y, TRUE, FALSE);
 		free_mname(mtmp);
 		break;
+        case PM_BLACK_PUDDING:
+        case PM_GREEN_SLIME:
+        case PM_BROWN_PUDDING:
+        case PM_GRAY_OOZE:
+        /* expired puddings will congeal into a large blob */
+            obj = mksobj_at(BLOB_OF_PUDDING, x, y, TRUE, FALSE);
+            free_mname(mtmp);
+        break;
 	    default_1:
 	    default:
 		if (mvitals[mndx].mvflags & G_NOCORPSE)
@@ -1673,7 +1681,6 @@ boolean was_swallowed;			/* digestion */
 	    is_golem(mdat) || is_mplayer(mdat) || is_rider(mdat))
 		return TRUE;
 	tmp = 2 + ((mdat->geno & G_FREQ) < 2) + verysmall(mdat);
-	if (mon->mcloned) tmp += mvitals[monsndx(mdat)].died / 25;
 	return (boolean) !rn2(tmp);
 }
 
@@ -1937,13 +1944,13 @@ int dest;
 	    int otyp;
 
 	    /* illogical but traditional "treasure drop" */
-	    if (!rn2(6) && !(mvitals[mndx].mvflags & G_NOCORPSE) &&
+	    if (!rn2(6) && !(mvitals[mndx].mvflags & G_NOCORPSE)
 		    /* no extra item from swallower or steed */
-		    (x != u.ux || y != u.uy) &&
+		    && (x != u.ux || y != u.uy)
 		    /* no extra item from kops--too easy to abuse */
-		    mdat->mlet != S_KOP &&
-		    /* reduced chance of item from cloned monster */
-		    (!mtmp->mcloned || !rn2(mvitals[mndx].died / 5 + 1))) {
+		    && mdat->mlet != S_KOP
+            /* no items from cloned monsters */
+		    && !mtmp->mcloned) {
 		otmp = mkobj(RANDOM_CLASS, TRUE);
 		/* don't create large objects from small monsters */
 		otyp = otmp->otyp;

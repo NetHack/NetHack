@@ -1,4 +1,4 @@
-/* NetHack 3.5	objects.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	objects.c	$NHDT-Date: 1426458573 2015/03/15 22:29:33 $  $NHDT-Branch: derek-farming $:$NHDT-Revision: 1.26 $ */
 /* NetHack 3.5	objects.c	$Date: 2011/07/28 04:00:20 $  $Revision: 1.23 $ */
 /* Copyright (c) Mike Threepoint, 1989.				  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -670,6 +670,10 @@ FOOD("egg",                 85, 1,  1, 1, FLESH,  80, CLR_WHITE),
 FOOD("meatball",             0, 1,  1, 0, FLESH,   5, CLR_BROWN),
 FOOD("meat stick",           0, 1,  1, 0, FLESH,   5, CLR_BROWN),
 FOOD("huge chunk of meat",   0,20,400, 0, FLESH,2000, CLR_BROWN),
+
+/* pudding 'corpses' will turn into this */
+FOOD("blob of pudding",      0, 1,  1, 0, FLESH,   0, CLR_BROWN),
+
 /* special case because it's not mergable */
 OBJECT(OBJ("meat ring", (char *)0),
     BITS(1,0,0,0,0,0,0,0,0,0,0,0,FLESH),
