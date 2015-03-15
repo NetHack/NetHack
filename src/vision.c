@@ -1,4 +1,4 @@
-/* NetHack 3.5	vision.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	vision.c	$NHDT-Date: 1426449474 2015/03/15 19:57:54 $  $NHDT-Branch: derek-farming $:$NHDT-Revision: 1.14 $ */
 /* NetHack 3.5	vision.c	$Date: 2009/05/06 10:48:10 $  $Revision: 1.12 $ */
 /*	SCCS Id: @(#)vision.c	3.5	2007/11/05	*/
 /* Copyright (c) Dean Luick, with acknowledgements to Dave Cohrs, 1990.	*/
@@ -499,7 +499,7 @@ vision_recalc(control)
     char *next_rmin;	/* min pointer for the new array */
     char *next_rmax;	/* max pointer for the new array */
     char *ranges;	/* circle ranges -- used for xray & night vision */
-    int row;		/* row counter (outer loop)  */
+    int row = 0;		/* row counter (outer loop)  */
     int start, stop;	/* inner loop starting/stopping index */
     int dx, dy;		/* one step from a lit door or lit wall (see below) */
     register int col;	/* inner loop counter */
@@ -512,10 +512,6 @@ vision_recalc(control)
 
     vision_full_recalc = 0;			/* reset flag */
     if (in_mklev || !iflags.vision_inited) return;
-
-#ifdef GCC_WARN
-    row = 0;
-#endif
 
     /*
      * Either the light sources have been taken care of, or we must
@@ -1655,18 +1651,15 @@ right_side(row, cb_row, cb_col, fb_row, fb_col, left, right_mark, limits)
     char *limits;	/* points at range limit for current row, or NULL */
 {
     register int  i;
-    register char *rowp;
+    register char *rowp = NULL;
     int  hit_stone = 0;
     int  left_shadow, right_shadow, loc_right;
     int  lblock_col;		/* local block column (current row) */
     int  nrow, deeper;
-    char *row_min;		/* left most */
-    char *row_max;		/* right most */
+    char *row_min = NULL;		/* left most */
+    char *row_max = NULL;		/* right most */
     int		  lim_max;	/* right most limit of circle */
 
-#ifdef GCC_WARN
-    rowp = 0;
-#endif
     nrow    = row + step;
     deeper  = good_row(nrow) && (!limits || (*limits >= *(limits+1)));
     if(!vis_func) {
@@ -1910,18 +1903,15 @@ left_side(row, cb_row, cb_col, fb_row, fb_col, left_mark, right, limits)
     char *limits;
 {
     register int  i;
-    register char *rowp;
+    register char *rowp = NULL;
     int  hit_stone = 0;
     int  left_shadow, right_shadow, loc_left;
     int  lblock_col;		/* local block column (current row) */
     int  nrow, deeper;
-    char *row_min;		/* left most */
-    char *row_max;		/* right most */
+    char *row_min = NULL;		/* left most */
+    char *row_max = NULL;		/* right most */
     int		  lim_min;
 
-#ifdef GCC_WARN
-    rowp = 0;
-#endif
     nrow    = row + step;
     deeper  = good_row(nrow) && (!limits || (*limits >= *(limits+1)));
     if(!vis_func) {
@@ -2192,20 +2182,17 @@ right_side(row, left, right_mark, limits)
     int right_mark;	/* last (right side) visible spot on prev row */
     char *limits;	/* points at range limit for current row, or NULL */
 {
-    int		  right;	/* right limit of "could see" */
-    int		  right_edge;	/* right edge of an opening */
-    int		  nrow;		/* new row (calculate once) */
-    int		  deeper;	/* if TRUE, call self as needed */
-    int		  result;	/* set by q?_path() */
-    register int  i;		/* loop counter */
-    register char *rowp;	/* row optimization */
-    char	  *row_min;	/* left most  [used by macro set_min()] */
-    char	  *row_max;	/* right most [used by macro set_max()] */
-    int		  lim_max;	/* right most limit of circle */
+    int		  right;	        /* right limit of "could see" */
+    int		  right_edge;	    /* right edge of an opening */
+    int		  nrow;		        /* new row (calculate once) */
+    int		  deeper;	        /* if TRUE, call self as needed */
+    int		  result;	        /* set by q?_path() */
+    register int  i;		    /* loop counter */
+    register char *rowp = NULL;	/* row optimization */
+    char	  *row_min = NULL;	/* left most  [used by macro set_min()] */
+    char	  *row_max = NULL;	/* right most [used by macro set_max()] */
+    int		  lim_max;	        /* right most limit of circle */
 
-#ifdef GCC_WARN
-    rowp = row_min = row_max = 0;
-#endif
     nrow    = row + step;
     /*
      * Can go deeper if the row is in bounds and the next row is within
@@ -2372,15 +2359,13 @@ left_side(row, left_mark, right, limits)
     int row, left_mark, right;
     char *limits;
 {
-    int		  left, left_edge, nrow, deeper, result;
-    register int  i;
-    register char *rowp;
-    char	  *row_min, *row_max;
-    int		  lim_min;
+    int left, left_edge, nrow, deeper, result;
+    register int i;
+    register char *rowp = NULL;
+    char *row_min = NULL;
+    char *row_max = NULL;
+    int lim_min;
 
-#ifdef GCC_WARN
-    rowp = row_min = row_max = 0;
-#endif
     nrow    = row+step;
     deeper  = good_row(nrow) && (!limits || (*limits >= *(limits+1)));
     if(!vis_func) {
