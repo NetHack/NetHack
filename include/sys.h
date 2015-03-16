@@ -1,14 +1,10 @@
-/* NetHack 3.5	sys.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	sys.h	$NHDT-Date: 1426496454 2015/03/16 09:00:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
 /* NetHack 3.5	sys.h	$Date: 2012/01/27 20:15:26 $  $Revision: 1.9 $ */
 /* Copyright (c) Kenneth Lorber, Kensington, Maryland, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef SYS_H
 #define SYS_H
-
-#define E extern
-
-E void NDECL(sys_early_init);
 
 struct sysopt {
 	char *support;	/* local support contact */
@@ -34,7 +30,8 @@ struct sysopt {
 #endif
 	int seduce;
 };
-E struct sysopt sysopt;
+
+extern  struct sysopt sysopt;
 
 #define SYSOPT_SEDUCE sysopt.seduce
 

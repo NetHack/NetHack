@@ -1,4 +1,4 @@
-/* NetHack 3.5	save.c	$NHDT-Date: 1426465440 2015/03/16 00:24:00 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.61 $ */
+/* NetHack 3.5	save.c	$NHDT-Date: 1426496455 2015/03/16 09:00:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.62 $ */
 /* NetHack 3.5	save.c	$Date: 2012/02/16 02:40:24 $  $Revision: 1.53 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1350,6 +1350,7 @@ freedynamicdata()
 #ifdef STATUS_VIA_WINDOWPORT
 	status_finish();
 #endif
+	sysopt_release();	/* SYSCF strings */
 	return;
 }
 
