@@ -1,4 +1,4 @@
-/* NetHack 3.5	do.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	do.c	$NHDT-Date: 1426497723 2015/03/16 09:22:03 $  $NHDT-Branch: H3724 $:$NHDT-Revision: 1.109 $ */
 /* NetHack 3.5	do.c	$Date: 2014/11/18 03:10:39 $  $Revision: 1.101 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -222,10 +222,15 @@ doaltarobj(obj)  /* obj is an object dropped on an altar */
 	if (Blind)
 		return;
 
-	/* KMH, conduct */
-	u.uconduct.gnostic++;
+	if (obj->oclass != COIN_CLASS) {
+	    /* KMH, conduct */
+	    u.uconduct.gnostic++;
+	} else {
+	    /* coins don't have bless/curse status */
+	    obj->blessed = obj->cursed = 0;
+	}
 
-	if ((obj->blessed || obj->cursed) && obj->oclass != COIN_CLASS) {
+	if (obj->blessed || obj->cursed) {
 		There("is %s flash as %s %s the altar.",
 			an(hcolor(obj->blessed ? NH_AMBER : NH_BLACK)),
 			doname(obj), otense(obj, "hit"));
@@ -233,7 +238,7 @@ doaltarobj(obj)  /* obj is an object dropped on an altar */
 	} else {
 		pline("%s %s on the altar.", Doname2(obj),
 			otense(obj, "land"));
-		obj->bknown = 1;
+		if (obj->oclass != COIN_CLASS) obj->bknown = 1;
 	}
 }
 
