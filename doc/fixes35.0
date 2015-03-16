@@ -855,6 +855,7 @@ fix "object lost" panic (or even crash) when dropping multiple items while
 	levitating and a lit potion of oil explodes and destroys some inventory
 fix "object_is_local" panic when saving bones after hero is killed by explosion
 	produced by dropped or thrown lit potion of oil
+gold dropped on altar by hero wouldn't stack with gold dropped there by monster
 if lava burns up the player's water walking boots, the player falls in
 the messages for lava burning items up are always printed
 fix used-up magic trap trying to hit steed.
