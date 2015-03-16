@@ -1,4 +1,4 @@
-/* NetHack 3.5	files.c	$NHDT-Date: 1426465435 2015/03/16 00:23:55 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.133 $ */
+/* NetHack 3.5	files.c	$NHDT-Date: 1426544796 2015/03/16 22:26:36 $  $NHDT-Branch: master $:$NHDT-Revision: 1.134 $ */
 /* NetHack 3.5	files.c	$Date: 2012/03/10 02:49:08 $  $Revision: 1.124 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2157,7 +2157,11 @@ int		src;
 	    sysopt.shellers = dupstr(bufp);
 	} else if (src == SET_IN_SYS && match_varname(buf, "DEBUGFILES", 5)) {
 	    if (sysopt.debugfiles) free(sysopt.debugfiles);
-	    sysopt.debugfiles = dupstr(bufp);
+	    /* if showdebug() has already been called (perhaps we've added
+	       some debugpline() calls to option processing) and has found
+	       a value for getenv("DEBUGFILES"), don't override that */
+	    if (sysopt.env_dbgfl == 0)
+		sysopt.debugfiles = dupstr(bufp);
 	} else if (src == SET_IN_SYS && match_varname(buf, "SUPPORT", 7)) {
 	    if (sysopt.support) free(sysopt.support);
 	    sysopt.support = dupstr(bufp);
@@ -3206,6 +3210,19 @@ const char *filename;
     const char *debugfiles, *p;
 
     if (!filename || !*filename) return FALSE;	/* sanity precaution */
+
+    if (sysopt.env_dbgfl == 0) {
+	/* check once for DEBUGFILES in the environment;
+	   if found, it supersedes the sysconf value
+	   [note: getenv() rather than nh_getenv() since a long value
+	   is valid and doesn't pose any sort of overflow risk here] */
+	if ((p = getenv("DEBUGFILES")) != 0) {
+	    if (sysopt.debugfiles) free(sysopt.debugfiles);
+	    sysopt.debugfiles = dupstr(p);
+	    sysopt.env_dbgfl = 1;
+	} else
+	    sysopt.env_dbgfl = -1;
+    }
 
     debugfiles = sysopt.debugfiles;
     /* usual case: sysopt.debugfiles will be empty */
