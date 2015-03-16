@@ -1,4 +1,4 @@
-/* NetHack 3.5	pickup.c	$NHDT-Date: 1425081977 2015/02/28 00:06:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.126 $ */
+/* NetHack 3.5	pickup.c	$NHDT-Date: 1426465438 2015/03/16 00:23:58 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.130 $ */
 /* NetHack 3.5	pickup.c	$Date: 2012/02/16 03:01:38 $  $Revision: 1.123 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -897,7 +897,7 @@ int how;			/* type of query */
 		(*pick_list)->item.a_int = curr->oclass;
 		return 1;
 	    } else {
-		debugpline("query_category: no single object match");
+		debugpline0("query_category: no single object match");
 	    }
 	    return 0;
 	}

@@ -1,4 +1,4 @@
-/* NetHack 3.5	makemon.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	makemon.c	$NHDT-Date: 1426465436 2015/03/16 00:23:56 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.74 $ */
 /* NetHack 3.5	makemon.c	$Date: 2012/01/29 00:34:33 $  $Revision: 1.69 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -93,7 +93,7 @@ register int x, y, n;
 	int cnttmp,cntdiv;
 
 	cnttmp = cnt;
-	debugpline("init group call x=%d,y=%d,n=%d,cnt=%d.", x, y, n, cnt);
+	debugpline4("init group call <%d,%d>, n=%d, cnt=%d.", x, y, n, cnt);
 	cntdiv = ((u.ulevel < 3) ? 4 : (u.ulevel < 5) ? 2 : 1);
 #endif
 	/* Tuning: cut down on swarming at low character levels [mrs] */
@@ -758,7 +758,7 @@ boolean ghostly;
 		 mvitals[mndx].born++;
 	if ((int) mvitals[mndx].born >= lim && !(mons[mndx].geno & G_NOGEN) &&
 		!(mvitals[mndx].mvflags & G_EXTINCT)) {
-		if (wizard) debugpline("Automatically extinguished %s.",
+		if (wizard) debugpline1("Automatically extinguished %s.",
 					makeplural(mons[mndx].mname));
 		mvitals[mndx].mvflags |= G_EXTINCT;
 		reset_rndmonst(mndx);
@@ -903,8 +903,8 @@ register int	mmflags;
 		   already been genocided, return */
 		if (mvitals[mndx].mvflags & G_GENOD) return((struct monst *) 0);
 		if (wizard && (mvitals[mndx].mvflags & G_EXTINCT))
-		    debugpline("Explicitly creating extinct monster %s.",
-			mons[mndx].mname);
+		    debugpline1("Explicitly creating extinct monster %s.",
+				mons[mndx].mname);
 	} else {
 		/* make a random (common) monster that can survive here.
 		 * (the special levels ask for random monsters at specific
@@ -916,7 +916,7 @@ register int	mmflags;
 
 		do {
 			if(!(ptr = rndmonst())) {
-			    debugpline("Warning: no monster.");
+			    debugpline0("Warning: no monster.");
 			    return((struct monst *) 0);	/* no more monsters! */
 			}
 			fakemon.data = ptr;	/* set up for goodpos */
@@ -1252,7 +1252,7 @@ rndmonst()
 	    }		
 	    if (mndx == SPECIAL_PM) {
 		/* evidently they've all been exterminated */
-		debugpline("rndmonst: no common mons!");
+		debugpline0("rndmonst: no common mons!");
 		return (struct permonst *)0;
 	    } /* else `mndx' now ready for use below */
 	    zlevel = level_difficulty();
@@ -1290,7 +1290,8 @@ rndmonst()
 
 	if (rndmonst_state.choice_count <= 0) {
 	    /* maybe no common mons left, or all are too weak or too strong */
-	    debugpline("rndmonst: choice_count=%d", rndmonst_state.choice_count);
+	    debugpline1("rndmonst: choice_count=%d",
+			rndmonst_state.choice_count);
 	    return (struct permonst *)0;
 	}
 

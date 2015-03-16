@@ -1,4 +1,4 @@
-/* NetHack 3.5	dig.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	dig.c	$NHDT-Date: 1426465434 2015/03/16 00:23:54 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.73 $ */
 /* NetHack 3.5	dig.c	$Date: 2012/02/16 03:01:37 $  $Revision: 1.67 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1689,7 +1689,7 @@ bury_an_obj(otmp)
 	struct obj *otmp2;
 	boolean under_ice;
 
-	debugpline("bury_an_obj: %s", xname(otmp));
+	debugpline1("bury_an_obj: %s", xname(otmp));
 	if (otmp == uball) {
 		unpunish();
 		u.utrap = rn1(50,20);
@@ -1752,7 +1752,7 @@ int x, y;
 	struct obj *otmp, *otmp2;
 
 	if(level.objects[x][y] != (struct obj *)0)
-	    debugpline("bury_objs: at %d, %d", x, y);
+	    debugpline2("bury_objs: at <%d,%d>", x, y);
 	for (otmp = level.objects[x][y]; otmp; otmp = otmp2)
 		otmp2 = bury_an_obj(otmp);
 
@@ -1769,7 +1769,7 @@ int x, y;
 	struct obj *otmp, *otmp2, *bball;
 	coord cc;
 
-	debugpline("unearth_objs: at %d, %d", x, y);
+	debugpline2("unearth_objs: at <%d,%d>", x, y);
 	cc.x = x; cc.y = y;
 	bball = buried_ball(&cc);
 	for (otmp = level.buriedobjlist; otmp; otmp = otmp2) {
@@ -1878,7 +1878,7 @@ void
 bury_monst(mtmp)
 struct monst *mtmp;
 {
-	debugpline("bury_monst: %s", mon_nam(mtmp));
+	debugpline1("bury_monst: %s", mon_nam(mtmp));
 	if(canseemon(mtmp)) {
 	    if(is_flyer(mtmp->data) || is_floater(mtmp->data)) {
 		pline_The("%s opens up, but %s is not swallowed!",
@@ -1897,7 +1897,7 @@ struct monst *mtmp;
 void
 bury_you()
 {
-    debugpline("bury_you");
+    debugpline0("bury_you");
     if (!Levitation && !Flying) {
 	if(u.uswallow)
 	    You_feel("a sensation like falling into a trap!");
@@ -1914,7 +1914,7 @@ bury_you()
 void
 unearth_you()
 {
-	debugpline("unearth_you");
+	debugpline0("unearth_you");
 	u.uburied = FALSE;
 	under_ground(0);
 	if(!uamul || uamul->otyp != AMULET_OF_STRANGULATION)
@@ -1925,7 +1925,7 @@ unearth_you()
 void
 escape_tomb()
 {
-	debugpline("escape_tomb");
+	debugpline0("escape_tomb");
 	if ((Teleportation || can_teleport(youmonst.data)) &&
 	    (Teleport_control || rn2(3) < Luck+2)) {
 		You("attempt a teleport spell.");
@@ -1957,7 +1957,7 @@ bury_obj(otmp)
 struct obj *otmp;
 {
 
-	debugpline("bury_obj");
+	debugpline0("bury_obj");
 	if(cansee(otmp->ox, otmp->oy))
 	   pline_The("objects on the %s tumble into a hole!",
 		surface(otmp->ox, otmp->oy));

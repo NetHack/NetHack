@@ -1,4 +1,4 @@
-/* NetHack 3.5	restore.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	restore.c	$NHDT-Date: 1426465439 2015/03/16 00:23:59 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.77 $ */
 /* NetHack 3.5	restore.c	$Date: 2012/02/16 02:40:24 $  $Revision: 1.71 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1153,7 +1153,7 @@ register int fd;
 		++msgcount;
 	}
 	if (msgcount) putmsghistory((char *)0, TRUE);
-	debugpline("Read %d messages from savefile.", msgcount);
+	debugpline1("Read %d messages from savefile.", msgcount);
 }
 
 /* Clear all structures for object and monster ID mapping. */

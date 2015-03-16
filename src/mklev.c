@@ -1,4 +1,4 @@
-/* NetHack 3.5	mklev.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mklev.c	$NHDT-Date: 1426465436 2015/03/16 00:23:56 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.25 $ */
 /* NetHack 3.5	mklev.c	$Date: 2012/02/15 01:55:33 $  $Revision: 1.20 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -684,7 +684,7 @@ makelevel()
 	/* make a secret treasure vault, not connected to the rest */
 	if(do_vault()) {
 		xchar w,h;
-		debugpline("trying to make a vault...");
+		debugpline0("trying to make a vault...");
 		w = 1;
 		h = 1;
 		if (check_room(&vault_x, &w, &vault_y, &h, TRUE)) {
@@ -1560,7 +1560,7 @@ xchar x, y;
 	*source = u.uz;
 	insert_branch(br, TRUE);
 
-	debugpline("Made knox portal.");
+	debugpline0("Made knox portal.");
 	place_branch(br, x, y);
 }
 

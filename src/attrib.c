@@ -1,4 +1,4 @@
-/* NetHack 3.5	attrib.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	attrib.c	$NHDT-Date: 1426465433 2015/03/16 00:23:53 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.34 $ */
 /* NetHack 3.5	attrib.c	$Date: 2011/10/01 00:25:55 $  $Revision: 1.30 $ */
 /*	Copyright 1988, 1989, 1990, 1992, M. Stephenson		  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -347,7 +347,7 @@ exercise(i, inc_or_dec)
 int	i;
 boolean	inc_or_dec;
 {
-	debugpline("Exercise:");
+	debugpline0("Exercise:");
 	if (i == A_INT || i == A_CHA) return;	/* can't exercise these */
 
 	/* no physical exercise while polymorphed; the body's temporary */
@@ -364,7 +364,7 @@ boolean	inc_or_dec;
 		 *	Note: *YES* ACURR is the right one to use.
 		 */
 		AEXE(i) += (inc_or_dec) ? (rn2(19) > ACURR(i)) : -rn2(2);
-		debugpline("%s, %s AEXE = %d",
+		debugpline3("%s, %s AEXE = %d",
 			(i == A_STR) ? "Str" : (i == A_WIS) ? "Wis" :
 			(i == A_DEX) ? "Dex" : "Con",
 			(inc_or_dec) ? "inc" : "dec", AEXE(i));
@@ -392,7 +392,7 @@ exerper()
 			 (u.uhunger > 50) ? HUNGRY :
 			 (u.uhunger > 0) ? WEAK : FAINTING;
 
-		debugpline("exerper: Hunger checks");
+		debugpline0("exerper: Hunger checks");
 		switch (hs) {
 		    case SATIATED:	exercise(A_DEX, FALSE);
 					if (Role_if(PM_MONK))
@@ -408,7 +408,7 @@ exerper()
 		}
 
 		/* Encumberance Checks */
-		debugpline("exerper: Encumber checks");
+		debugpline0("exerper: Encumber checks");
 		switch (near_capacity()) {
 		    case MOD_ENCUMBER:	exercise(A_STR, TRUE); break;
 		    case HVY_ENCUMBER:	exercise(A_STR, TRUE);
@@ -421,7 +421,7 @@ exerper()
 
 	/* status checks */
 	if(!(moves % 5)) {
-		debugpline("exerper: Status checks");
+		debugpline0("exerper: Status checks");
 		if ((HClairvoyant & (INTRINSIC|TIMEOUT)) &&
 			!BClairvoyant)                      exercise(A_WIS, TRUE);
 		if (HRegeneration)			exercise(A_STR, TRUE);
@@ -453,10 +453,10 @@ exerchk()
 	exerper();
 
 	if(moves >= context.next_attrib_check)
-		debugpline("exerchk: ready to test. multi = %d.", multi);
+		debugpline1("exerchk: ready to test. multi = %d.", multi);
 	/*	Are we ready for a test?	*/
 	if(moves >= context.next_attrib_check && !multi) {
-	    debugpline("exerchk: testing.");
+	    debugpline0("exerchk: testing.");
 	    /*
 	     *	Law of diminishing returns (Part II):
 	     *
@@ -483,7 +483,7 @@ exerchk()
 		   exercise/abuse gradually wears off without impact then */
 		if (Upolyd && i != A_WIS) goto nextattrib;
 
-		debugpline("exerchk: testing %s (%d).",
+		debugpline2("exerchk: testing %s (%d).",
 		      (i == A_STR) ? "Str" : (i == A_INT) ? "Int?" :
 		       (i == A_WIS) ? "Wis" : (i == A_DEX) ? "Dex" :
 			(i == A_CON) ? "Con" : (i == A_CHA) ? "Cha?" : "???",
@@ -497,9 +497,9 @@ exerchk()
 		if (rn2(AVAL) > ((i != A_WIS) ? (abs(ax) * 2 / 3) : abs(ax)))
 		    goto nextattrib;
 
-		debugpline("exerchk: changing %d.", i);
+		debugpline1("exerchk: changing %d.", i);
 		if(adjattrib(i, mod_val, -1)) {
-		    debugpline("exerchk: changed %d.", i);
+		    debugpline1("exerchk: changed %d.", i);
 		    /* if you actually changed an attrib - zero accumulation */
 		    AEXE(i) = ax = 0;
 		    /* then print an explanation */
@@ -513,7 +513,8 @@ exerchk()
 		AEXE(i) = (abs(ax) / 2) * mod_val;
 	    }
 	    context.next_attrib_check += rn1(200,800);
-	    debugpline("exerchk: next check at %ld.", context.next_attrib_check);
+	    debugpline1("exerchk: next check at %ld.",
+			context.next_attrib_check);
 	}
 }
 
