@@ -34,18 +34,26 @@ you specify:
 
 
 [*] git add (filename)
+[*] git nhadd (filename)
 
 Adds the changes you've made in (filename) to the pre-commit staging area.
 (also referred to as the 'index')
 
+"nhadd" is the preferred syntax and will automatically update the source file
+headers with the latest date, branch, and version.
+
 
 [*] git commit [-a] [-m "text"]
+[*] git nhcommit [-a] [-m "text"]
 
 Commits all staged changes (in the index) to this branch in your local repo
 from your current position.
 Including -a will 'git add' all eligible files before doing so.
 Including -m will use "text" as the commit message instead of opening an
 editor window for you to create one.
+
+"nhcommit" is the preferred syntax and will automatically update the source file
+headers with the latest date, branch, and version.
 
 
 [*] git push [--all] [-u origin (branch)]
@@ -61,7 +69,7 @@ branch.
 
 Without any parameters, unstages the changes for (filename) from the index;
 does not change the working tree. This is the equivalent of the command 
-[*] git reset --mixed (filename); git reset --soft (filename) has no effect.
+git reset --mixed (filename); git reset --soft (filename) has no effect.
 
 With --hard, unstages (filename) from the index and reverts (filename) in
 the working tree to the most recent commit.
@@ -158,6 +166,20 @@ With --no-commit, does not automatically create a merge entry in the log but
 leaves all the merged files in your working directory; to complete the merge
 you must commit them manually later (likely after you have edited them). This
 more accurately mimics the merge behavior of svn [and cvs?]
+
+
+[*] git stash [save | apply | list] <stashname>
+
+save: Takes all changes in your working directory and 'stashes' them in a temporary
+holding area. Convenient if the command you're trying to run won't go unless
+you have a clean working dir; also convenient to move experimental changes
+between branches without needing to commit them.
+
+apply: Replays the named stash onto your current working directory as though
+it were a patch. Does not delete the stash from the list.
+
+list: Lists all of your stashed code blobs.
+
 
 
 =======================================
