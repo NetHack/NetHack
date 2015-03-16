@@ -1,4 +1,4 @@
-/* NetHack 3.5	sys.c	$NHDT-Date: 1426465442 2015/03/16 00:24:02 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.16 $ */
+/* NetHack 3.5	sys.c	$NHDT-Date: 1426496455 2015/03/16 09:00:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.17 $ */
 /* NetHack 3.5	sys.c	$Date: 2012/03/10 02:22:07 $  $Revision: 1.12 $ */
 /* Copyright (c) Kenneth Lorber, Kensington, Maryland, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -67,6 +67,24 @@ sys_early_init()
 	sysopt_seduce_set(sysopt.seduce);
 }
 
+void
+sysopt_release()
+{
+	if (sysopt.support)
+	    free(sysopt.support), sysopt.support = NULL;
+	if (sysopt.recover)
+	    free(sysopt.recover), sysopt.recover = NULL;
+	if (sysopt.wizards)
+	    free(sysopt.wizards), sysopt.wizards = NULL;
+	if (sysopt.debugfiles)
+	    free(sysopt.debugfiles), sysopt.debugfiles = NULL;
+#ifdef PANICTRACE
+	if (sysopt.gdbpath)
+	    free(sysopt.gdbpath), sysopt.gdbpath = NULL;
+	if (sysopt.greppath)
+	    free (sysopt.greppath), sysopt.greppath = NULL;
+#endif
+}
 
 extern struct attack sa_yes[NATTK];
 extern struct attack sa_no[NATTK];

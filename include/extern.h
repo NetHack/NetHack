@@ -1,4 +1,4 @@
-/* NetHack 3.5	extern.h	$NHDT-Date: 1426465429 2015/03/16 00:23:49 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.406 $ */
+/* NetHack 3.5	extern.h	$NHDT-Date: 1426496453 2015/03/16 09:00:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.407 $ */
 /* NetHack 3.5	extern.h	$Date: 2013/11/05 00:57:53 $  $Revision: 1.380 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2065,6 +2065,8 @@ E void FDECL(play_sound_for_message, (const char *));
 
 /* ### sys.c ### */
 
+E void NDECL(sys_early_init);
+E void NDECL(sysopt_release);
 E void FDECL(sysopt_seduce_set,(int));
 
 /* ### sys/msdos/sound.c ### */
