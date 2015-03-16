@@ -1,4 +1,4 @@
-/* NetHack 3.5	files.c	$NHDT-Date: 1425081976 2015/02/28 00:06:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.127 $ */
+/* NetHack 3.5	files.c	$NHDT-Date: 1426545233 2015/03/16 22:33:53 $  $NHDT-Branch: derek-farming $:$NHDT-Revision: 1.133 $ */
 /* NetHack 3.5	files.c	$Date: 2012/03/10 02:49:08 $  $Revision: 1.124 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1833,7 +1833,7 @@ const char *filename;
 int src;
 {
 	FILE *fp;
-#if defined(UNIX) || defined(VMS)
+#if defined(UNIX) || defined(VMS) || defined(WIN32) || defined(MSDOS)
 	char	tmp_config[BUFSZ];
 	char *envp;
 #endif
@@ -1872,13 +1872,38 @@ int src;
 	}
 
 #if defined(MICRO) || defined(MAC) || defined(__BEOS__) || defined(WIN32)
-	if ((fp = fopenp(fqname(configfile, CONFIGPREFIX, 0), "r"))
-								!= (FILE *)0)
+# if defined(WIN32) || defined(MSDOS)
+    /* user's home directory should be where we look first here, too */
+    envp = nh_getenv("USERPROFILE");
+# endif
+# ifdef WIN32
+    if (!envp) {
+        Strcpy(tmp_config, configfile);
+    } else {
+        Sprintf(tmp_config, "%s\\%s", envp, configfile);
+    }
+    /* try the home directory first, then the output of fqname() will
+     * pick up the current dir */
+    if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
+        return(fp);
+    if ((fp = fopenp(fqname(configfile, CONFIGPREFIX, 0), "r")) != (FILE *)0)
 		return(fp);
+# else
+    if ((fp = fopenp(fqname(configfile, CONFIGPREFIX, 0), "r")) != (FILE *)0)
+        return(fp);
+# endif
 # ifdef MSDOS
-	else if ((fp = fopenp(fqname(backward_compat_configfile,
-					CONFIGPREFIX, 0), "r")) != (FILE *)0)
+    else {
+        if (!envp) {
+            Strcpy(tmp_config, backward_compat_configfile);
+        } else {
+            Sprintf(tmp_config, "%s\\%s", envp, backward_compat_configfile);
+        }
+        if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
 		return(fp);
+        if ((fp = fopenp(fqname(configfile, CONFIGPREFIX, 0), "r")) != (FILE *)0)
+            return(fp);
+    }
 # endif
 #else
 	/* constructed full path names don't need fqname() */
