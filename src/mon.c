@@ -1,4 +1,4 @@
-/* NetHack 3.5	mon.c	$NHDT-Date: 1425319883 2015/03/02 18:11:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.137 $ */
+/* NetHack 3.5	mon.c	$NHDT-Date: 1426465438 2015/03/16 00:23:58 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.139 $ */
 /* NetHack 3.5	mon.c	$Date: 2012/05/16 02:15:10 $  $Revision: 1.126 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1260,7 +1260,7 @@ register struct monst *mtmp, *mtmp2;
     /* transfer the monster's inventory */
     for (otmp = mtmp2->minvent; otmp; otmp = otmp->nobj) {
 	if (otmp->where != OBJ_MINVENT || otmp->ocarry != mtmp)
-	    debugpline("replmon: minvent inconsistency");
+	    debugpline0("replmon: minvent inconsistency");
 	otmp->ocarry = mtmp2;
     }
     mtmp->minvent = 0;

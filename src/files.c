@@ -1,4 +1,4 @@
-/* NetHack 3.5	files.c	$NHDT-Date: 1425081976 2015/02/28 00:06:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.127 $ */
+/* NetHack 3.5	files.c	$NHDT-Date: 1426465435 2015/03/16 00:23:55 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.133 $ */
 /* NetHack 3.5	files.c	$Date: 2012/03/10 02:49:08 $  $Revision: 1.124 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3194,5 +3194,56 @@ int ifd, ofd;
 
 /* ----------  END INTERNAL RECOVER ----------- */
 #endif /*SELF_RECOVER*/
+
+#ifdef DEBUG
+/* used by debugpline() to decide whether to issue a message
+   from a partiular source file; caller passes __FILE__ and we check
+   whether it is in the source file list supplied by SYSCF's DEBUGFILES */ 
+boolean
+showdebug(filename)
+const char *filename;
+{
+    const char *debugfiles, *p;
+
+    if (!filename || !*filename) return FALSE;	/* sanity precaution */
+
+    debugfiles = sysopt.debugfiles;
+    /* usual case: sysopt.debugfiles will be empty */
+    if (!debugfiles || !*debugfiles) return FALSE;
+
+    /* strip filename's path if present */
+# ifdef UNIX
+    if ((p = rindex(filename, '/')) != 0) filename = p + 1;
+# endif
+# ifdef VMS
+    filename = vms_basename(filename);
+    /* vms_basename strips off 'type' suffix as well as path and version;
+       we want to put suffix back (".c" assumed); since it always returns
+       a pointer to a static buffer, we can safely modify its result */
+    Strcat((char *)filename, ".c");
+# endif
+
+    /*
+     * Wildcard match will only work if there's a single pattern (which
+     * might be a single file name without any wildcarding) rather than
+     * a space-separated list.
+     * [to NOT do: We could step through the space-separated list and
+     * attempt a wildcard match against each element, but that would be
+     * overkill for the intended usage.]
+     */
+    if (pmatch(debugfiles, filename))
+	return TRUE;
+
+    /* check whether filename is an element of the list */
+    if ((p = strstr(debugfiles, filename)) != 0) {
+	int l = (int)strlen(filename);
+
+	if ((p == debugfiles || p[-1] == ' ' || p[-1] == '/')
+	    && (p[l] == ' ' || p[l] == '\0'))
+	    return TRUE;
+    }
+    return FALSE;
+}
+#endif	/*DEBUG*/
 
 /*files.c*/

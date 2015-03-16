@@ -1,4 +1,4 @@
-/* NetHack 3.5	mkmaze.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mkmaze.c	$NHDT-Date: 1426465437 2015/03/16 00:23:57 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.20 $ */
 /* NetHack 3.5	mkmaze.c	$Date: 2009/05/06 10:46:56 $  $Revision: 1.18 $ */
 /*	SCCS Id: @(#)mkmaze.c	3.5	2007/06/18	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
@@ -589,7 +589,7 @@ register const char *s;
 
 	    if (x_range <= INVPOS_X_MARGIN || y_range <= INVPOS_Y_MARGIN ||
 		   (x_range * y_range) <= (INVPOS_DISTANCE * INVPOS_DISTANCE))
-		debugpline("inv_pos: maze is too small! (%d x %d)",
+		debugpline2("inv_pos: maze is too small! (%d x %d)",
 		      x_maze_max, y_maze_max);
 	    inv_pos.x = inv_pos.y = 0; /*{occupied() => invocation_pos()}*/
 	    do {
@@ -877,7 +877,7 @@ register xchar x, y, todnum, todlevel;
 		impossible("portal on top of portal??");
 		return;
 	}
-	debugpline("mkportal: at (%d,%d), to %s, level %d",
+	debugpline4("mkportal: at <%d,%d>, to %s, level %d",
 		x, y, dungeons[todnum].dname, todlevel);
 	ttmp->dst.dnum = todnum;
 	ttmp->dst.dlevel = todlevel;

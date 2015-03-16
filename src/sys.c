@@ -1,26 +1,34 @@
-/* NetHack 3.5	sys.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	sys.c	$NHDT-Date: 1426465442 2015/03/16 00:24:02 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.16 $ */
 /* NetHack 3.5	sys.c	$Date: 2012/03/10 02:22:07 $  $Revision: 1.12 $ */
 /* Copyright (c) Kenneth Lorber, Kensington, Maryland, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
-/* for KR1ED config, WIZARD is 0 or 1 and WIZARD_NAME is a string;
-   for usual config, WIZARD is the string; forcing WIZARD_NAME to match it
-   eliminates conditional testing for which one to use in string ops */
+#ifndef SYSCF
+/* !SYSCF configurations need '#define DEBUGFILES "foo.c bar.c"'
+   to enable debugging feedback for source files foo.c and bar.c;
+   to activate debugpline(), set an appropriate value and uncomment */
+/* # define DEBUGFILES "*" */
+#endif
 
 struct sysopt sysopt;
 
 void
-sys_early_init(){
+sys_early_init()
+{
 	sysopt.support = NULL;
 	sysopt.recover = NULL;
 #ifdef SYSCF
 	sysopt.wizards = NULL;
 #else
-	sysopt.wizards = WIZARD_NAME;
+	sysopt.wizards = dupstr(WIZARD_NAME);
 #endif
+#if defined(SYSCF) || !defined(DEBUGFILES)
 	sysopt.debugfiles = NULL;
+#else
+	sysopt.debugfiles = dupstr(DEBUGFILES);
+#endif
 	sysopt.shellers = NULL;
 	sysopt.maxplayers = 0;	/* XXX eventually replace MAX_NR_OF_PLAYERS */
 

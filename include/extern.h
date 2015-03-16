@@ -1,4 +1,4 @@
-/* NetHack 3.5	extern.h	$NHDT-Date: 1425081976 2015/02/28 00:06:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.390 $ */
+/* NetHack 3.5	extern.h	$NHDT-Date: 1426465429 2015/03/16 00:23:49 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.406 $ */
 /* NetHack 3.5	extern.h	$Date: 2013/11/05 00:57:53 $  $Revision: 1.380 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -740,6 +740,9 @@ E boolean NDECL(recover_savefile);
 #endif
 #ifdef HOLD_LOCKFILE_OPEN
 E void NDECL(really_close);
+#endif
+#ifdef DEBUG
+E boolean FDECL(showdebug, (const char *));
 #endif
 
 /* ### fountain.c ### */
