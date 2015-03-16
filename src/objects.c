@@ -1,5 +1,4 @@
-/* NetHack 3.5	objects.c	$NHDT-Date: 1426458573 2015/03/15 22:29:33 $  $NHDT-Branch: derek-farming $:$NHDT-Revision: 1.26 $ */
-/* NetHack 3.5	objects.c	$Date: 2011/07/28 04:00:20 $  $Revision: 1.23 $ */
+/* NetHack 3.5	objects.c	$NHDT-Date: 1426470348 2015/03/16 01:45:48 $  $NHDT-Branch: derek-farming $:$NHDT-Revision: 1.27 $ */
 /* Copyright (c) Mike Threepoint, 1989.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -671,8 +670,11 @@ FOOD("meatball",             0, 1,  1, 0, FLESH,   5, CLR_BROWN),
 FOOD("meat stick",           0, 1,  1, 0, FLESH,   5, CLR_BROWN),
 FOOD("huge chunk of meat",   0,20,400, 0, FLESH,2000, CLR_BROWN),
 
-/* pudding 'corpses' will turn into this */
-FOOD("blob of pudding",      0, 1,  1, 0, FLESH,   0, CLR_BROWN),
+/* pudding 'corpses' will turn into these and combine */
+FOOD("glob of gray ooze",      0, 1,  1, 0, FLESH,   0, CLR_GRAY),
+FOOD("glob of brown pudding",  0, 1,  1, 0, FLESH,   0, CLR_BROWN),
+FOOD("glob of green slime",    0, 1,  1, 0, FLESH,   0, CLR_GREEN),
+FOOD("glob of black pudding",  0, 1,  1, 0, FLESH,   0, CLR_BLACK),
 
 /* special case because it's not mergable */
 OBJECT(OBJ("meat ring", (char *)0),

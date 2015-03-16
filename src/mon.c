@@ -1,4 +1,4 @@
-/* NetHack 3.5	mon.c	$NHDT-Date: 1426458561 2015/03/15 22:29:21 $  $NHDT-Branch: derek-farming $:$NHDT-Revision: 1.139 $ */
+/* NetHack 3.5	mon.c	$NHDT-Date: 1426470347 2015/03/16 01:45:47 $  $NHDT-Branch: derek-farming $:$NHDT-Revision: 1.140 $ */
 /* NetHack 3.5	mon.c	$Date: 2012/05/16 02:15:10 $  $Revision: 1.126 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -268,29 +268,31 @@ unsigned corpseflags;
 			obj = mksobj_at(SCR_BLANK_PAPER, x, y, TRUE, FALSE);
 		free_mname(mtmp);
 		break;
-        case PM_BLACK_PUDDING:
-        case PM_GREEN_SLIME:
-        case PM_BROWN_PUDDING:
+        /* expired puddings will congeal into a large blob 
+           like dragons, relies on the order remaining consistent */ 
         case PM_GRAY_OOZE:
-        /* expired puddings will congeal into a large blob */
-            obj = mksobj_at(BLOB_OF_PUDDING, x, y, TRUE, FALSE);
+        case PM_BROWN_PUDDING:
+        case PM_GREEN_SLIME:
+        case PM_BLACK_PUDDING:
+            obj = mksobj_at(GLOB_OF_BLACK_PUDDING - (PM_BLACK_PUDDING - mndx), 
+                    x, y, TRUE, FALSE);
             free_mname(mtmp);
-        break;
+            break;
 	    default_1:
 	    default:
-		if (mvitals[mndx].mvflags & G_NOCORPSE)
-		    return (struct obj *)0;
-		else {
-		    corpstatflags |= CORPSTAT_INIT;
-		    /* preserve the unique traits of some creatures */
-		    obj = mkcorpstat(CORPSE, KEEPTRAITS(mtmp) ? mtmp : 0,
-				     mdat, x, y, corpstatflags);
-		    if (burythem) {
-			(void) bury_an_obj(obj);
-			newsym(x, y);
-			return obj;
-		    }
-		}
+            if (mvitals[mndx].mvflags & G_NOCORPSE)
+                return (struct obj *)0;
+            else {
+                corpstatflags |= CORPSTAT_INIT;
+                /* preserve the unique traits of some creatures */
+                obj = mkcorpstat(CORPSE, KEEPTRAITS(mtmp) ? mtmp : 0,
+                        mdat, x, y, corpstatflags);
+                if (burythem) {
+                (void) bury_an_obj(obj);
+                newsym(x, y);
+                return obj;
+                }
+            }
 		break;
 	}
 	/* All special cases should precede the G_NOCORPSE check */

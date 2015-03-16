@@ -1,4 +1,4 @@
-/* NetHack 3.5	objnam.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	objnam.c	$NHDT-Date: 1426470349 2015/03/16 01:45:49 $  $NHDT-Branch: derek-farming $:$NHDT-Revision: 1.108 $ */
 /* NetHack 3.5	objnam.c	$Date: 2011/10/27 02:24:54 $  $Revision: 1.101 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -373,6 +373,14 @@ register struct obj *obj;
 			}
 			break;
 		}
+        if (Is_pudding(obj)) {
+            Sprintf(buf, "%s%s",
+                        obj->owt < 100 ? "small " 
+                          : obj->owt > 500 ? "very large "
+                            : obj->owt > 300 ? "large "
+                              : "", actualn);
+            break;
+        }
 
 		Strcpy(buf, actualn);
 		if (typ == TIN && known)

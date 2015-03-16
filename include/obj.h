@@ -1,4 +1,4 @@
-/* NetHack 3.5	obj.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	obj.h	$NHDT-Date: 1426470329 2015/03/16 01:45:29 $  $NHDT-Branch: derek-farming $:$NHDT-Revision: 1.35 $ */
 /* NetHack 3.5	obj.h	$Date: 2012/01/10 17:47:16 $  $Revision: 1.31 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -94,7 +94,7 @@ struct obj {
 	Bitfield(recharged,3);	/* number of times it's been recharged */
 #define on_ice recharged	/* corpse on ice */
 	Bitfield(lamplit,1);	/* a light-source -- can be lit */
-	Bitfield(oreserved1,1);	/* was the placeholder for invisible objects, free for use */
+    Bitfield(oglobby,1);	/* globby; will combine with like types on adjacent squares */
 	Bitfield(greased,1);	/* covered with grease */
 	Bitfield(nomerge,1);	/* set temporarily to prevent merging */
 	Bitfield(was_thrown,1);	/* thrown by hero since last picked up */
@@ -230,6 +230,11 @@ struct obj {
 #define polyfodder(obj) (ofood(obj) && pm_to_cham((obj)->corpsenm) != NON_PM)
 #define mlevelgain(obj) (ofood(obj) && (obj)->corpsenm == PM_WRAITH)
 #define mhealup(obj)	(ofood(obj) && (obj)->corpsenm == PM_NURSE)
+#define Is_pudding(o) (o->otyp == GLOB_OF_GRAY_OOZE \
+                        || o->otyp == GLOB_OF_BROWN_PUDDING \
+                        || o->otyp == GLOB_OF_GREEN_SLIME \
+                        || o->otyp == GLOB_OF_BLACK_PUDDING)
+                        
 
 /* Containers */
 #define carried(o)	((o)->where == OBJ_INVENT)

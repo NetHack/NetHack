@@ -45,6 +45,8 @@ while (my $line = <INFILE>)
 close(INFILE);
 close(OUTFILE);
 
+unless ($debug) { unlink $infile; }
+
 exit;
 
 sub main::HELP_MESSAGE()

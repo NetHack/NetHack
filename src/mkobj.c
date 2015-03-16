@@ -1,4 +1,4 @@
-/* NetHack 3.5	mkobj.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mkobj.c	$NHDT-Date: 1426470337 2015/03/16 01:45:37 $  $NHDT-Branch: derek-farming $:$NHDT-Revision: 1.77 $ */
 /* NetHack 3.5	mkobj.c	$Date: 2012/03/10 02:49:08 $  $Revision: 1.70 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -626,56 +626,59 @@ boolean artif;
 		break;
 	case FOOD_CLASS:
 	    otmp->oeaten = 0;
-	    switch(otmp->otyp) {
-	    case CORPSE:
-		/* possibly overridden by mkcorpstat() */
-		tryct = 50;
-		do otmp->corpsenm = undead_to_corpse(rndmonnum());
-		while ((mvitals[otmp->corpsenm].mvflags & G_NOCORPSE) && (--tryct > 0));
-		if (tryct == 0) {
-		/* perhaps rndmonnum() only wants to make G_NOCORPSE monsters on
-		   this level; let's create an adventurer's corpse instead, then */
-			otmp->corpsenm = PM_HUMAN;
-		}
-		/* timer set below */
-		break;
-	    case EGG:
-		otmp->corpsenm = NON_PM;	/* generic egg */
-		if (!rn2(3)) for (tryct = 200; tryct > 0; --tryct) {
-		    mndx = can_be_hatched(rndmonnum());
-		    if (mndx != NON_PM && !dead_species(mndx, TRUE)) {
-			otmp->corpsenm = mndx;		/* typed egg */
-			break;
-		    }
-		}
-		/* timer set below */
-		break;
-	    case TIN:
-		otmp->corpsenm = NON_PM;	/* empty (so far) */
-		if (!rn2(6))
-		    set_tin_variety(otmp, SPINACH_TIN);
-		else for (tryct = 200; tryct > 0; --tryct) {
-		    mndx = undead_to_corpse(rndmonnum());
-		    if (mons[mndx].cnutrit &&
-			    !(mvitals[mndx].mvflags & G_NOCORPSE)) {
-			otmp->corpsenm = mndx;
-			set_tin_variety(otmp, RANDOM_TIN);
-			break;
-		    }
-		}
-		blessorcurse(otmp, 10);
-		break;
-	    case SLIME_MOLD:
-		otmp->spe = context.current_fruit;
-		flags.made_fruit = TRUE;
-		break;
-	    case KELP_FROND:
-		otmp->quan = (long) rnd(2);
-		break;
-	    }
-	    if (otmp->otyp != CORPSE && otmp->otyp != MEAT_RING &&
-		    otmp->otyp != KELP_FROND && !rn2(6))
-		otmp->quan = 2L;
+        switch(otmp->otyp) {
+            case CORPSE:
+                /* possibly overridden by mkcorpstat() */
+                tryct = 50;
+                do otmp->corpsenm = undead_to_corpse(rndmonnum());
+                while ((mvitals[otmp->corpsenm].mvflags & G_NOCORPSE) && (--tryct > 0));
+                if (tryct == 0) {
+                    /* perhaps rndmonnum() only wants to make G_NOCORPSE monsters on
+                       this level; let's create an adventurer's corpse instead, then */
+                    otmp->corpsenm = PM_HUMAN;
+                }
+                /* timer set below */
+                break;
+            case EGG:
+                otmp->corpsenm = NON_PM;	/* generic egg */
+                if (!rn2(3)) for (tryct = 200; tryct > 0; --tryct) {
+                    mndx = can_be_hatched(rndmonnum());
+                    if (mndx != NON_PM && !dead_species(mndx, TRUE)) {
+                        otmp->corpsenm = mndx;		/* typed egg */
+                        break;
+                    }
+                }
+                /* timer set below */
+                break;
+            case TIN:
+                otmp->corpsenm = NON_PM;	/* empty (so far) */
+                if (!rn2(6))
+                    set_tin_variety(otmp, SPINACH_TIN);
+                else for (tryct = 200; tryct > 0; --tryct) {
+                    mndx = undead_to_corpse(rndmonnum());
+                    if (mons[mndx].cnutrit &&
+                            !(mvitals[mndx].mvflags & G_NOCORPSE)) {
+                        otmp->corpsenm = mndx;
+                        set_tin_variety(otmp, RANDOM_TIN);
+                        break;
+                    }
+                }
+                blessorcurse(otmp, 10);
+                break;
+            case SLIME_MOLD:
+                otmp->spe = context.current_fruit;
+                flags.made_fruit = TRUE;
+                break;
+            case KELP_FROND:
+                otmp->quan = (long) rnd(2);
+                break;
+        }
+        if (Is_pudding(otmp)) { 
+            otmp->oglobby = 1;
+        } else if (otmp->otyp != CORPSE && otmp->otyp != MEAT_RING 
+                    && otmp->otyp != KELP_FROND && !rn2(6)) {
+            otmp->quan = 2L;
+        }
 	    break;
 	case GEM_CLASS:
 		otmp->corpsenm = 0;	/* LOADSTONE hack */
