@@ -1296,6 +1296,7 @@ void
 freedynamicdata()
 {
 	unload_qtlist();
+	free_menu_coloring();
 	free_invbuf();	/* let_to_name (invent.c) */
 	free_youbuf();	/* You_buf,&c (pline.c) */
 	tmp_at(DISP_FREEMEM, 0);	/* temporary display effects */

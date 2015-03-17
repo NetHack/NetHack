@@ -1132,6 +1132,7 @@ smartphone: added "Type Cmd" command that allows to type arbitrary commands
 smartphone: added Q(quiver) command to "Attack" layout
 smartphone: fixed F command to prompt for direction
 unix,vms: altmeta option to handle terminals which send "ESC c" for Alt+c
+tty,win32gui,win32tty: add menucolors
 
 
 NetHack Community Patches (or Variation) Included

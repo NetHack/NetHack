@@ -1294,6 +1294,11 @@ static const char *build_opts[] = {
 #ifdef NEWS
 		"news file",
 #endif
+#ifdef MENU_COLOR_REGEX
+		"menu colors via regular expressions",
+#else
+		"menu colors via pmatch",
+#endif
 #ifdef OVERLAY
 # ifdef MOVERLAY
 		"MOVE overlays",

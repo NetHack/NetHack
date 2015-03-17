@@ -219,6 +219,8 @@ NEARDATA struct c_color_names c_color_names = {
 	"white"
 };
 
+struct menucoloring *menu_colorings = NULL;
+
 const char *c_obj_colors[] = {
 	"black",		/* CLR_BLACK */
 	"red",			/* CLR_RED */
