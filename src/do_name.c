@@ -204,9 +204,25 @@ const char *goal;
 			    lo_x = (pass == 0 && ty == lo_y) ? cx + 1 : 1;
 			    hi_x = (pass == 1 && ty == hi_y) ? cx : COLNO - 1;
 			    for (tx = lo_x; tx <= hi_x; tx++) {
-				k = levl[tx][ty].glyph;
+				/* look at dungeon feature, not at user-visible glyph */
+				k = back_to_glyph(tx,ty);
+				/* uninteresting background glyph */
 				if (glyph_is_cmap(k) &&
-					matching[glyph_to_cmap(k)]) {
+				    (IS_DOOR(levl[tx][ty].typ) ||
+				     glyph_to_cmap(k) == S_room ||
+				     glyph_to_cmap(k) == S_corr ||
+				     glyph_to_cmap(k) == S_litcorr)) {
+				    /* what the hero remembers to be at tx,ty */
+				    k = glyph_at(tx, ty);
+				}
+				if (glyph_is_cmap(k) &&
+					matching[glyph_to_cmap(k)] &&
+					levl[tx][ty].seenv &&
+					(!IS_WALL(levl[tx][ty].typ)) &&
+					(levl[tx][ty].typ != SDOOR) &&
+					glyph_to_cmap(k) != S_room &&
+					glyph_to_cmap(k) != S_corr &&
+					glyph_to_cmap(k) != S_litcorr) {
 				    cx = tx,  cy = ty;
 				    if (msg_given) {
 					clear_nhwindow(WIN_MESSAGE);

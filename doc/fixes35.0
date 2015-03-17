@@ -1089,6 +1089,7 @@ change command X to twoweapon toggle
 pressing @ when cursor positioning moves cursor on top of hero
 pressing # when cursor positioning toggles automatic description of features
 	under the cursor
+cursor positioning ignores uninteresting dungeon features
 
 
 Platform- and/or Interface-Specific New Features
