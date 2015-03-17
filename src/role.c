@@ -1,4 +1,4 @@
-/* NetHack 3.5	role.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	role.c	$NHDT-Date: 1426558928 2015/03/17 02:22:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.21 $ */
 /* NetHack 3.5	role.c	$Date: 2012/02/16 03:01:38 $  $Revision: 1.18 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1333,14 +1333,16 @@ plnamesuffix()
     int i;
 
 #ifdef GENERIC_USERNAMES
-    /* some generic user names will be ignored in favor of prompting */
-    i = (int)strlen(plname);
-    eptr = GENERIC_USERNAMES;
-    sptr = strstri(eptr, plname);
-    if (sptr
-	&& (sptr == eptr || sptr[-1] == ' ')
-	&& (sptr[i] == ' ' || sptr[i] == '\0'))
-	*plname = '\0'; /* call askname() */
+    {
+	/* some generic user names will be ignored in favor of prompting */
+	const char *uptr = GENERIC_USERNAMES;
+
+	i = (int)strlen(plname);
+	if ((sptr = strstri(uptr, plname)) != 0
+	    && (sptr == uptr || sptr[-1] == ' ')
+	    && (sptr[i] == ' ' || sptr[i] == '\0'))
+	    *plname = '\0'; /* call askname() */
+    }
 #endif
 
     do {

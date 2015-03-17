@@ -1,4 +1,4 @@
-/* NetHack 3.5	trap.c	$NHDT-Date: 1425318721 2015/03/02 17:52:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.194 $ */
+/* NetHack 3.5	trap.c	$NHDT-Date: 1426558928 2015/03/17 02:22:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.195 $ */
 /* NetHack 3.5	trap.c	$Date: 2013/03/14 01:58:21 $  $Revision: 1.179 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3016,7 +3016,6 @@ xchar x, y;
 {
     int chance;
     struct obj *otmp, *ncobj;
-    int retval = 0;
     int in_sight = !Blind && couldsee(x, y);	/* Don't care if it's lit */
     int dindx;
 
@@ -3158,7 +3157,7 @@ struct obj *obj;
 const char *ostr;
 boolean force;
 {
-	boolean loose_obj = (obj && obj->where == OBJ_FREE), exploded = FALSE;
+	boolean exploded = FALSE;
 
         if (snuff_lit(obj))
             return ER_DAMAGED;
@@ -3214,11 +3213,6 @@ boolean force;
                                             (one ? "Another" : "More"),
                                 bufp, vtense(bufp, "explode"));
                         exploded = TRUE;
-                        /* let caller know that obj has gone away
-                            [when obj is part of a list, delobj()'s
-                            obj_extract_self() takes care of this;
-                            for loose_obj, obj should always equal
-                            *objp and otmp should always be null] */
                         setnotworn(obj);
                         delobj(obj);
                         if (update)

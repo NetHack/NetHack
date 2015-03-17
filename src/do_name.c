@@ -1,4 +1,4 @@
-/* NetHack 3.5	do_name.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	do_name.c	$NHDT-Date: 1426558927 2015/03/17 02:22:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.53 $ */
 /* NetHack 3.5	do_name.c	$Date: 2012/01/29 03:00:17 $  $Revision: 1.49 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -56,8 +56,8 @@ const char *goal;
 }
 
 int
-getpos(cc, force, goal)
-coord *cc;
+getpos(ccp, force, goal)
+coord *ccp;
 boolean force;
 const char *goal;
 {
@@ -75,8 +75,8 @@ const char *goal;
 	pline("(For instructions type a ?)");
 	msg_given = TRUE;
     }
-    cx = cc->x;
-    cy = cc->y;
+    cx = ccp->x;
+    cy = ccp->y;
 #ifdef CLIPPING
     cliparound(cx, cy);
 #endif
@@ -97,6 +97,7 @@ const char *goal;
 	    int sym = 0;
 	    char tmpbuf[BUFSZ];
 	    const char *firstmatch = NULL;
+
 	    cc.x = cx;
 	    cc.y = cy;
 	    if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch)) {
@@ -250,8 +251,8 @@ const char *goal;
     lock_mouse_cursor(FALSE);
 #endif
     if (msg_given) clear_nhwindow(WIN_MESSAGE);
-    cc->x = cx;
-    cc->y = cy;
+    ccp->x = cx;
+    ccp->y = cy;
     return result;
 }
 

@@ -1,4 +1,4 @@
-/* NetHack 3.5	pickup.c	$NHDT-Date: 1426465438 2015/03/16 00:23:58 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.130 $ */
+/* NetHack 3.5	pickup.c	$NHDT-Date: 1426558927 2015/03/17 02:22:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.131 $ */
 /* NetHack 3.5	pickup.c	$Date: 2012/02/16 03:01:38 $  $Revision: 1.123 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1515,7 +1515,7 @@ doloot()	/* loot a container on the floor or loot saddle from mon. */
 lootcont:
 
     if (container_at(cc.x, cc.y, FALSE)) {
-	boolean any = FALSE;
+	boolean anyfound = FALSE;
 	int num_conts = 0;
 
 	if (!able_to_loot(cc.x, cc.y, TRUE)) return 0;
@@ -1563,14 +1563,14 @@ lootcont:
 				      cobj, doname, ansimpleoname, "a container"));
 		    if (c == 'q') return (timepassed);
 		    if (c == 'n') continue;
-		    any = TRUE;
+		    anyfound = TRUE;
 
 		    timepassed |= do_loot_cont(&cobj);
 		    /* might have triggered chest trap or magic bag explosion */
 		    if (multi < 0 || !cobj) return 1;
 		}
 	    }
-	    if (any) c = 'y';
+	    if (anyfound) c = 'y';
 	}
     } else if (IS_GRAVE(levl[cc.x][cc.y].typ)) {
 	You("need to dig up the grave to effectively loot it...");
