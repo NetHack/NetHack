@@ -554,6 +554,12 @@ unsigned int *stuckid, *steedid;
 	mread(fd, (genericptr_t) timebuf, 14);
 	timebuf[14] = '\0';
 	ubirthday = time_from_yyyymmddhhmmss(timebuf);
+#if defined(BSD) && !defined(POSIX_TYPES)
+	(void) time((long *)&u.urealtime.restored);
+#else
+	(void) time(&u.urealtime.restored);
+#endif
+
 
 	set_uasmon();
 #ifdef CLIPPING

@@ -1062,6 +1062,18 @@ struct mkroom	*croom;
 	    mongone(was);
 	}
 
+	/* Nasty hack here: try to determine if this is the Mines or Sokoban
+	 * "prize" and then set record_achieve_special (maps to corpsenm)
+	 * for the object.  That field will later be checked to find out if
+	 * the player obtained the prize. */
+	if(otmp->otyp == LUCKSTONE && Is_mineend_level(&u.uz)) {
+	    otmp->record_achieve_special = 1;
+	} else if((otmp->otyp == AMULET_OF_REFLECTION ||
+		   otmp->otyp == BAG_OF_HOLDING) &&
+			Is_sokoend_level(&u.uz)) {
+	    otmp->record_achieve_special = 1;
+        }
+
 	stackobj(otmp);
 
     }		/* if (rn2(100) < o->chance) */
