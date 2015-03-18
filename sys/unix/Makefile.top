@@ -56,7 +56,7 @@ VARDIR  = $(HACKDIR)
 # for Gnome
 # VARDATND = x11tiles pet_mark.xbm rip.xpm mapbg.xpm
 
-VARDATD = data oracles options quest.dat rumors
+VARDATD = bogusmon data engrave epitaph oracles options quest.dat rumors
 VARDAT = $(VARDATD) $(VARDATND)
 
 # Some versions of make use the SHELL environment variable as the shell
@@ -108,6 +108,15 @@ manpages:
 
 data: $(GAME)
 	( cd dat ; $(MAKE) data )
+
+engrave: $(GAME)
+	( cd dat ; $(MAKE) engrave )
+
+bogusmon: $(GAME)
+	( cd dat ; $(MAKE) bogusmon )
+
+epitaph: $(GAME)
+	( cd dat ; $(MAKE) epitaph )
 
 rumors: $(GAME)
 	( cd dat ; $(MAKE) rumors )

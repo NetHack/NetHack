@@ -283,7 +283,7 @@ int expltype;
 		       so avoid any which begins with a capital letter) */
 		    do {
 			Sprintf(hallu_buf, "%s explosion",
-				s_suffix(rndmonnam())); 
+				s_suffix(rndmonnam(NULL)));
 		    } while (*hallu_buf != lowc(*hallu_buf));
 		    str = hallu_buf;
 		}
@@ -365,7 +365,7 @@ int expltype;
 		    if (do_hallu) {	/* (see explanation above) */
 			do {
 			    Sprintf(hallu_buf, "%s explosion",
-				    s_suffix(rndmonnam())); 
+				    s_suffix(rndmonnam(NULL)));
 			} while (*hallu_buf != lowc(*hallu_buf));
 			str = hallu_buf;
 		    }

@@ -621,7 +621,7 @@ int *fail_reason;
 			    "statue");
 	    pline("%s %s!", upstart(statuename), comes_to_life);
 	} else if (Hallucination) {    /* They don't know it's a statue */
-	    pline_The("%s suddenly seems more animated.", rndmonnam());
+	    pline_The("%s suddenly seems more animated.", rndmonnam(NULL));
 	} else if (cause == ANIMATE_SHATTER) {
 	    if (cansee(x, y))
 		Sprintf(statuename, "%s%s", shk_your(tmpbuf, statue),

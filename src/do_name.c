@@ -809,10 +809,10 @@ boolean called;
 	/* Put the actual monster name or type into the buffer now */
 	/* Be sure to remember whether the buffer starts with a name */
 	if (do_hallu) {
-	    const char *rname = rndmonnam();
-
+	    char rnamecode;
+	    char *rname = rndmonnam(&rnamecode);
 	    Strcat(buf, rname);
-	    name_at_start = bogon_is_pname(rname);
+	    name_at_start = bogon_is_pname(rnamecode);
 	} else if (has_mname(mtmp)) {
 	    char *name = MNAME(mtmp);
 
@@ -1006,113 +1006,44 @@ char *outbuf;
     return outbuf;
 }
 
-/*
- *  Name prefix codes (same as shknam.c):
- *	dash          -  female, personal name
- *	underscore    _  female, general name
- *	plus          +  male, personal name
- *	vertical bar  |  male, general name
- *	equals        =  gender not specified, personal name
- */
-
-static const char * const bogusmons[] = {
-	"jumbo shrimp", "giant pigmy", "gnu", "killer penguin",
-	"giant cockroach", "giant slug", "maggot", "pterodactyl",
-	"tyrannosaurus rex", "basilisk", "beholder", "nightmare",
-	"efreeti", "marid", "rot grub", "bookworm", "master lichen",
-	"shadow", "hologram", "jester", "attorney", "sleazoid",
-	"killer tomato", "amazon", "robot", "battlemech",
-	"rhinovirus", "harpy", "lion-dog", "rat-ant", "Y2K bug",
-						/* misc. */
-	"grue", "Christmas-tree monster", "luck sucker", "paskald",
-	"brogmoid", "dornbeast",		/* Quendor (Zork, &c.) */
-	"Ancient Multi-Hued Dragon", "+Evil Iggy",
-						/* Moria */
-	"emu", "kestrel", "xeroc", "venus flytrap",
-						/* Rogue */
-	"creeping coins",			/* Wizardry */
-	"hydra", "siren",			/* Greek legend */
-	"killer bunny",				/* Monty Python */
-	"rodent of unusual size",		/* The Princess Bride */
-	"were-rabbit",				/* Wallace & Gromit */
-	"+Smokey Bear",		/* "Only you can prevent forest fires!" */
-	"Luggage",				/* Discworld */
-	"Ent",					/* Lord of the Rings */
-	"tangle tree", "nickelpede", "wiggle",	/* Xanth */
-	"white rabbit", "snark",		/* Lewis Carroll */
-	"pushmi-pullyu",			/* Dr. Dolittle */
-	"smurf",				/* The Smurfs */
-	"tribble", "Klingon", "Borg",		/* Star Trek */
-	"Ewok",					/* Star Wars */
-	"Totoro",				/* Tonari no Totoro */
-	"ohmu",					/* Nausicaa */
-	"youma",				/* Sailor Moon */
-	"nyaasu",				/* Pokemon (Meowth) */
-	"-Godzilla", "+King Kong",		/* monster movies */
-	"earthquake beast",			/* old L of SH */
-	"Invid",				/* Robotech */
-	"Terminator",				/* The Terminator */
-	"boomer",				/* Bubblegum Crisis */
-	"Dalek",				/* Dr. Who ("Exterminate!") */
-	"microscopic space fleet", "Ravenous Bugblatter Beast of Traal",
-						/* HGttG */
-	"teenage mutant ninja turtle",		/* TMNT */
-	"samurai rabbit",			/* Usagi Yojimbo */
-	"aardvark",				/* Cerebus */
-	"=Audrey II",				/* Little Shop of Horrors */
-	"witch doctor", "one-eyed one-horned flying purple people eater",
-						/* 50's rock 'n' roll */
-	"+Barney the dinosaur",			/* saccharine kiddy TV */
-	"+Morgoth",				/* Angband */
-	"Vorlon",				/* Babylon 5 */
-	"questing beast",			/* King Arthur */
-	"Predator",				/* Movie */
-	"mother-in-law"				/* common pest */
-};
-
-
+#define BOGUSMONSIZE 100  /* arbitrary */
 /* return a random monster name, for hallucination */
-const char *
-rndmonnam()
+char *
+rndmonnam(code)
+char *code;
 {
-	const char *mname;
+	static char buf[BUFSZ];
+	char *mname = buf;
 	int name;
 
+	if (code) *code = '\0';
+
 	do {
-	    name = rn1(SPECIAL_PM + SIZE(bogusmons) - LOW_PM, LOW_PM);
+	    name = rn1(SPECIAL_PM + BOGUSMONSIZE - LOW_PM, LOW_PM);
 	} while (name < SPECIAL_PM &&
 	    (type_is_pname(&mons[name]) || (mons[name].geno & G_NOGEN)));
 
 	if (name >= SPECIAL_PM) {
-	    mname = bogusmons[name - SPECIAL_PM];
+	    get_rnd_text(BOGUSMONFILE, buf);
 	    /* strip prefix if present */
-	    if (!letter(*mname)) ++mname;
+	    if (!letter(*mname)) {
+		if (code) *code = *mname;
+		++mname;
+	    }
 	} else {
-	    mname = mons[name].mname;
+	    Strcpy(buf, mons[name].mname);
 	}
 	return mname;
 }
+#undef BOGUSMONSIZE
 
 /* scan bogusmons to check whether this name is in the list and has a prefix */
 boolean
-bogon_is_pname(mname)
-const char *mname;
+bogon_is_pname(code)
+char code;
 {
-	const char *bname;
-	int name;
-
-	if (!mname || !*mname) return FALSE;
-	if (!strncmpi(mname, "the ", 4)) mname += 4;
-	/* scan the bogusmons[] list; case sensitive here */
-	for (name = 0; name < SIZE(bogusmons); name++) {
-	    bname = bogusmons[name];
-	    /* we can skip all ordinary entries */
-	    if (letter(*bname)) continue;
-	    /* starts with a classification code; does rest of name match? */
-	    if (!strcmp(mname, bname + 1))
-		return index("-+=", *bname) ? TRUE : FALSE;
-	}
-	return FALSE;
+    if (!code) return FALSE;
+    return index("-+=", code) ? TRUE : FALSE;
 }
 
 const char *

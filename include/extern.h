@@ -387,7 +387,7 @@ E char *FDECL(Adjmonnam, (struct monst *,const char *));
 E char *FDECL(Amonnam, (struct monst *));
 E char *FDECL(a_monnam, (struct monst *));
 E char *FDECL(distant_monnam, (struct monst *,int,char *));
-E const char *NDECL(rndmonnam);
+E char *FDECL(rndmonnam, (char *));
 E const char *FDECL(hcolor, (const char *));
 E const char *NDECL(rndcolor);
 E const char *NDECL(roguename);
@@ -1174,7 +1174,7 @@ E struct obj *FDECL(mkobj_at, (CHAR_P,int,int,BOOLEAN_P));
 E struct obj *FDECL(mksobj_at, (int,int,int,BOOLEAN_P,BOOLEAN_P));
 E struct obj *FDECL(mkobj, (CHAR_P,BOOLEAN_P));
 E int NDECL(rndmonnum);
-E boolean FDECL(bogon_is_pname, (const char *));
+E boolean FDECL(bogon_is_pname, (CHAR_P));
 E struct obj *FDECL(splitobj, (struct obj *,long));
 E void FDECL(replace_object, (struct obj *,struct obj *));
 E void FDECL(bill_dummy_object, (struct obj *));
@@ -1931,6 +1931,7 @@ E const char *NDECL(Goodbye);
 /* ### rumors.c ### */
 
 E char *FDECL(getrumor, (int,char *, BOOLEAN_P));
+E char *FDECL(get_rnd_text, (const char *, char *));
 E void FDECL(outrumor, (int,int));
 E void FDECL(outoracle, (BOOLEAN_P, BOOLEAN_P));
 E void FDECL(save_oracles, (int,int));

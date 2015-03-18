@@ -1252,7 +1252,7 @@ const char *mesg;
 	    what = "chicken";
 	    which = 1;	/* suppress pluralization */
 	} else if (Hallucination) {
-	    what = rndmonnam();
+	    what = rndmonnam(NULL);
 	} else {
 	    what = mons[mnum].mname;
 	    if (the_unique_pm(&mons[mnum])) which = 2;

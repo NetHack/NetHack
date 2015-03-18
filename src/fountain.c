@@ -39,7 +39,7 @@ dowatersnakes() /* Fountain of snakes! */
     if (!(mvitals[PM_WATER_MOCCASIN].mvflags & G_GONE)) {
 	if (!Blind)
 	    pline("An endless stream of %s pours forth!",
-		  Hallucination ? makeplural(rndmonnam()) : "snakes");
+		  Hallucination ? makeplural(rndmonnam(NULL)) : "snakes");
 	else
 	    You_hear("%s hissing!", something);
 	while(num-- > 0)

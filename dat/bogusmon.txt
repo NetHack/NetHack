@@ -1,0 +1,177 @@
+# Hallucinatory monsters
+#
+#
+# prefix codes:
+# dash          -  female, personal name
+# underscore    _  female, general name
+# plus          +  male, personal name
+# vertical bar  |  male, general name
+# equals        =  gender not specified, personal name
+
+# misc.
+jumbo shrimp
+giant pigmy
+gnu
+killer penguin
+giant cockroach
+giant slug
+maggot
+pterodactyl
+tyrannosaurus rex
+basilisk
+beholder
+nightmare
+efreeti
+marid
+rot grub
+bookworm
+master lichen
+shadow
+hologram
+jester
+attorney
+sleazoid
+killer tomato
+amazon
+robot
+battlemech
+rhinovirus
+harpy
+lion-dog
+rat-ant
+Y2K bug
+
+# Quendor (Zork, &c.)
+grue
+Christmas-tree monster
+luck sucker
+paskald
+brogmoid
+dornbeast
+
+# Moria
+Ancient Multi-Hued Dragon
++Evil Iggy
+
+# Rogue
+emu
+kestrel
+xeroc
+venus flytrap
+
+# Wizardry
+creeping coins
+
+# Greek legend
+hydra
+siren
+
+# Monty Python
+killer bunny
+
+# The Princess Bride
+rodent of unusual size
+
+# Wallace & Gromit
+were-rabbit
+
+# "Only you can prevent forest fires!
++Smokey Bear
+
+# Discworld
+Luggage
+
+# Lord of the Rings
+Ent
+
+# Xanth
+tangle tree
+nickelpede
+wiggle
+
+# Lewis Carroll
+white rabbit
+snark
+
+# Dr. Dolittle
+pushmi-pullyu
+
+# The Smurfs
+smurf
+
+# Star Trek
+tribble
+Klingon
+Borg
+
+# Star Wars
+Ewok
+
+# Tonari no Totoro
+Totoro
+
+# Nausicaa
+ohmu
+
+# Sailor Moon
+youma
+
+# Pokemon (Meowth)
+nyaasu
+
+# monster movies
+-Godzilla
++King Kong
+
+# old L of SH
+earthquake beast
+
+# Robotech
+Invid
+
+# The Terminator
+Terminator
+
+# Bubblegum Crisis
+boomer
+
+# Dr. Who ("Exterminate!")
+Dalek
+
+# HGttG
+microscopic space fleet
+Ravenous Bugblatter Beast of Traal
+
+# TMNT
+teenage mutant ninja turtle
+
+# Usagi Yojimbo
+samurai rabbit
+
+# Cerebus
+aardvark
+
+# Little Shop of Horrors
+=Audrey II
+
+# 50's rock 'n' roll
+witch doctor
+one-eyed one-horned flying purple people eater
+
+# saccharine kiddy TV
++Barney the dinosaur
+
+# Angband
++Morgoth
+
+# Babylon 5
+Vorlon
+
+# King Arthur
+questing beast
+
+# Movie
+Predator
+
+# common pest
+mother-in-law
