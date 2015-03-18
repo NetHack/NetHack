@@ -3159,6 +3159,8 @@ boolean force;
 {
 	boolean exploded = FALSE;
 
+	if (!obj) return ER_NOTHING;
+
         if (snuff_lit(obj))
             return ER_DAMAGED;
 
