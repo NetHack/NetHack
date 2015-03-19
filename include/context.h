@@ -73,6 +73,16 @@ struct warntype_info {
 	short speciesidx;	/* index of above in mons[] (for save/restore) */
 };
 
+struct tribute_info {
+	size_t tributesz;	/* make it possible to skip this in future */
+	char *name;		/* what is this tribute for */
+	boolean  enabled;	/* Do we have tributes turned on? */
+	Bitfield(book,1);	/* Have we completed the book tribute? */
+				/* Markers for other tributes can go here */
+	/* 31 free bits */
+	int bookidx;
+};
+	
 struct context_info {
 	unsigned ident;		/* social security number for each monster */
 	unsigned no_of_wizards; /* 0, 1 or 2 (wizard and his shadow) */
@@ -103,6 +113,7 @@ struct context_info {
 	struct book_info spbook;
 	struct takeoff_info takeoff;
 	struct warntype_info warntype;
+	struct tribute_info tribute;
 };
 
 extern NEARDATA struct context_info context;

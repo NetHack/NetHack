@@ -861,6 +861,8 @@ boolean artif;
 	 /* case TIN: */
 		set_corpsenm(otmp, otmp->corpsenm);
 		break;
+	    case SPE_NOVEL:
+	    	break;
 	}
 
 	/* unique objects may have an associated artifact entry */

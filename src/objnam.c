@@ -448,6 +448,18 @@ register struct obj *obj;
 			Sprintf(buf, "%s wand", dn);
 		break;
 	case SPBOOK_CLASS:
+		if (typ == SPE_NOVEL) {		/* 3.6 tribute */
+		    if (!dknown) {
+			Strcpy(buf, "book");
+		    } else if (nn) {
+		    	Strcpy(buf, actualn);
+		    } else if (un) {
+		    	Sprintf(buf, "novel called %s", un);
+		    } else
+		        Sprintf(buf, "%s book", dn);
+		    break;
+		} else
+						/* end of tribute */
 		if (!dknown) {
 			Strcpy(buf, "spellbook");
 		} else if (nn) {

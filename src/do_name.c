@@ -1123,4 +1123,35 @@ char *buf;
     return buf;
 }
 
+static const char * const sir_Terry_novels[] = {
+	"The Colour of Magic", "The Light Fantastic", "Equal Rites",
+	"Mort", "Sourcery", "Wyrd Sisters", "Pyramids", "Guards! Guards!",
+	"Eric",	"Moving Pictures", "Reaper Man", "Witches Abroad",
+	"Small Gods", "Lords and Ladies", "Men at Arms", "Soul Music",
+	"Interesting Times", "Maskerade", "Feet of Clay", "Hogfather",
+	"Jingo", "The Last Continent", "Carpe Jugulum", "The Fifth Elephant",
+	"The Truth", "Thief of Time", "The Last Hero",
+	"The Amazing Maurice and his Educated Rodents", "Night Watch",
+	"The Wee Free Men", "Monstrous Regiment", "A Hat Full of Sky",
+	"Going Postal", "Thud!", "Wintersmith", "Making Money",
+	"Unseen Academicals", "I Shall Wear Midnight", "Snuff",
+	"Raising Steam", "The Shepherd's Crown"
+};
+
+const char *
+noveltitle(novidx)
+int *novidx;
+{
+    int j, k = SIZE(sir_Terry_novels)-1;
+
+    j = rn2(k);
+    if (novidx) {
+	if (*novidx == -1) *novidx = j;
+	else if ((*novidx >= 0) && (*novidx <= k)) j = *novidx;
+    }
+    return sir_Terry_novels[j];
+}    
+
+
+
 /*do_name.c*/
