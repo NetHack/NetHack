@@ -1,4 +1,4 @@
-/* NetHack 3.5	topten.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	topten.c	$NHDT-Date: 1426731079 2015/03/19 02:11:19 $  $NHDT-Branch: harder_d8 $:$NHDT-Revision: 1.25 $ */
 /* NetHack 3.5	topten.c	$Date: 2012/01/24 04:26:15 $  $Revision: 1.23 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -66,8 +66,8 @@ STATIC_DCL void FDECL(discardexcess, (FILE *));
 STATIC_DCL void FDECL(readentry, (FILE *,struct toptenentry *));
 STATIC_DCL void FDECL(writeentry, (FILE *,struct toptenentry *));
 STATIC_DCL void FDECL(writexlentry, (FILE*, struct toptenentry *));
-STATIC_DCL long FDECL(encodeconduct, (void));
-STATIC_DCL long FDECL(encodeachieve, (void));
+STATIC_DCL long NDECL(encodeconduct);
+STATIC_DCL long NDECL(encodeachieve);
 STATIC_DCL void FDECL(free_ttlist, (struct toptenentry *));
 STATIC_DCL int FDECL(classmon, (char *,BOOLEAN_P));
 STATIC_DCL int FDECL(score_wanted,
@@ -295,53 +295,58 @@ struct toptenentry *tt;
 #endif
 }
 
-#define XLOG_SEP "\t"  /* xlogfile field separator. */
 /* as tab is never used in eg. plname or death, no need to mangle those. */
 STATIC_OVL void
 writexlentry(rfile,tt)
 FILE *rfile;
 struct toptenentry *tt;
 {
-    char buf[DTHSZ+1];
-    (void)fprintf(rfile,
-		  "version=%d.%d.%d"
-		  XLOG_SEP "points=%ld"
-		  XLOG_SEP "deathdnum=%d"
-		  XLOG_SEP "deathlev=%d"
-		  XLOG_SEP "maxlvl=%d"
-		  XLOG_SEP "hp=%d"
-		  XLOG_SEP "maxhp=%d"
-		  XLOG_SEP "deaths=%d"
-		  XLOG_SEP "deathdate=%d"
-		  XLOG_SEP "birthdate=%d"
-		  XLOG_SEP "uid=%d",
-		  tt->ver_major, tt->ver_minor, tt->patchlevel,
-		  tt->points, tt->deathdnum, tt->deathlev,
-		  tt->maxlvl, tt->hp, tt->maxhp, tt->deaths,
-		  tt->deathdate, tt->birthdate, tt->uid);
-    (void)fprintf(rfile,
-		  XLOG_SEP "role=%s"
-		  XLOG_SEP "race=%s"
-		  XLOG_SEP "gender=%s"
-		  XLOG_SEP "align=%s",
-		  tt->plrole, tt->plrace, tt->plgend, tt->plalign);
-    (void)fprintf(rfile, XLOG_SEP "name=%s", plname);
-    (void)fprintf(rfile, XLOG_SEP "death=%s", tt->death);
-    (void)fprintf(rfile, XLOG_SEP "conduct=0x%lx", encodeconduct());
-    (void)fprintf(rfile, XLOG_SEP "turns=%ld", moves);
-    (void)fprintf(rfile, XLOG_SEP "achieve=0x%lx", encodeachieve());
-    (void)fprintf(rfile, XLOG_SEP "realtime=%ld", (long)u.urealtime.realtime);
-    (void)fprintf(rfile, XLOG_SEP "starttime=%ld", (long)ubirthday);
-    (void)fprintf(rfile, XLOG_SEP "endtime=%ld", (long)u.urealtime.endtime);
-    (void)fprintf(rfile, XLOG_SEP "gender0=%s", genders[flags.initgend].filecode);
-    (void)fprintf(rfile, XLOG_SEP "align0=%s",
-		  aligns[1 - u.ualignbase[A_ORIGINAL]].filecode);
-    fprintf(rfile, "\n");
-}
-#undef XLOG_SEP
+#define Fprintf (void)fprintf
+#define XLOG_SEP '\t'	/* xlogfile field separator. */
+    char buf[BUFSZ];
 
-long
-encodeconduct(void)
+    Sprintf(buf, "version=%d.%d.%d",
+	    tt->ver_major, tt->ver_minor, tt->patchlevel);
+    Sprintf(eos(buf), "%cpoints=%ld%cdeathdnum=%d%cdeathlev=%d",
+	    XLOG_SEP, tt->points,
+	    XLOG_SEP, tt->deathdnum,
+	    XLOG_SEP, tt->deathlev);
+    Sprintf(eos(buf), "%cmaxlvl=%d%chp=%d%cmaxhp=%d",
+	    XLOG_SEP, tt->maxlvl,
+	    XLOG_SEP, tt->hp,
+	    XLOG_SEP, tt->maxhp);
+    Sprintf(eos(buf), "%cdeaths=%d%cdeathdate=%ld%cbirthdate=%ld%cuid=%d",
+	    XLOG_SEP, tt->deaths,
+	    XLOG_SEP, tt->deathdate,
+	    XLOG_SEP, tt->birthdate,
+	    XLOG_SEP, tt->uid);
+    Fprintf(rfile, "%s", buf);
+    Sprintf(buf, "%crole=%s%crace=%s%cgender=%s%calign=%s",
+	    XLOG_SEP, tt->plrole,
+	    XLOG_SEP, tt->plrace,
+	    XLOG_SEP, tt->plgend,
+	    XLOG_SEP, tt->plalign);
+    Fprintf(rfile, "%s%cname=%s%cdeath=%s",
+	    buf,	/* (already includes separator) */
+	    XLOG_SEP, plname,
+	    XLOG_SEP, tt->death);
+    Fprintf(rfile, "%cconduct=0x%lx%cturns=%ld%cachieve=0x%lx",
+	    XLOG_SEP, encodeconduct(),
+	    XLOG_SEP, moves,
+	    XLOG_SEP, encodeachieve());
+    Fprintf(rfile, "%crealtime=%ld%cstarttime=%ld%cendtime%ld",
+	    XLOG_SEP, (long)u.urealtime.realtime,
+	    XLOG_SEP, (long)ubirthday,
+	    XLOG_SEP, (long)u.urealtime.endtime);
+    Fprintf(rfile, "%cgender0=%s%calign0=%s",
+	    XLOG_SEP, genders[flags.initgend].filecode,
+	    XLOG_SEP, aligns[1 - u.ualignbase[A_ORIGINAL]].filecode);
+    Fprintf(rfile, "\n");
+#undef XLOG_SEP
+}
+
+STATIC_OVL long
+encodeconduct()
 {
     long e = 0L;
 
@@ -361,8 +366,8 @@ encodeconduct(void)
     return e;
 }
 
-long
-encodeachieve(void)
+STATIC_OVL long
+encodeachieve()
 {
     long r = 0L;
 
