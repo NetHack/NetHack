@@ -244,6 +244,7 @@ E NEARDATA anything zeroany;		/* init'd and defined in decl.c */
 #include "you.h"
 E NEARDATA struct you u;
 E NEARDATA time_t ubirthday;
+E NEARDATA struct u_realtime urealtime;
 
 #include "onames.h"
 #ifndef PM_H		/* (pm.h has already been included via youprop.h) */

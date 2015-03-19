@@ -334,10 +334,10 @@ struct toptenentry *tt;
 	    XLOG_SEP, encodeconduct(),
 	    XLOG_SEP, moves,
 	    XLOG_SEP, encodeachieve());
-    Fprintf(rfile, "%crealtime=%ld%cstarttime=%ld%cendtime%ld",
-	    XLOG_SEP, (long)u.urealtime.realtime,
+    Fprintf(rfile, "%crealtime=%ld%cstarttime=%ld%cendtime=%ld",
+	    XLOG_SEP, (long)urealtime.realtime,
 	    XLOG_SEP, (long)ubirthday,
-	    XLOG_SEP, (long)u.urealtime.endtime);
+	    XLOG_SEP, (long)urealtime.endtime);
     Fprintf(rfile, "%cgender0=%s%calign0=%s",
 	    XLOG_SEP, genders[flags.initgend].filecode,
 	    XLOG_SEP, aligns[1 - u.ualignbase[A_ORIGINAL]].filecode);
@@ -480,7 +480,7 @@ time_t when;
 	t0->birthdate = yyyymmdd(ubirthday);
 	t0->deathdate = yyyymmdd(when);
 	t0->tt_next = 0;
-	u.urealtime.endtime = when;
+	urealtime.endtime = when;
 #ifdef UPDATE_RECORD_IN_PLACE
 	t0->fpos = -1L;
 #endif

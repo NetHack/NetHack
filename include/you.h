@@ -327,7 +327,6 @@ struct you {
 
 	unsigned udg_cnt;		/* how long you have been demigod */
 	struct u_achieve uachieve;	/* achievements */
-	struct u_realtime urealtime;
 	struct u_event	uevent;		/* certain events have happened */
 	struct u_have	uhave;		/* you're carrying special objects */
 	struct u_conduct uconduct;	/* KMH, conduct */
