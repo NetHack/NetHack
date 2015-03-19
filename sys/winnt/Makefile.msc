@@ -305,6 +305,9 @@ PDBFILE= /PDB:"$(O)$(GAME).PDB"
 MAPFILE= /MAP:"$(O)$(GAME).MAP"
 INCLDIR= /I..\include
 
+ldebug=/DEBUG
+cdebug = -Zi -Od
+
 !IF ("$(ldebug)" != "")
 !IF ("$(ldebug)" != "/RELEASE")
 ldebug = /DEBUG
@@ -341,14 +344,14 @@ LIBS= user32.lib winmm.lib $(ZLIB)
 !IF ("$(GRAPHICAL)"=="Y")
 
 cflagsGame = $(cdebug) $(cflags2) $(guiflags) $(INCLDIR) \
-	     $(WINPFLAG) $(DLBFLG) $(GAMEPDBFILE) $(GAMEMAPFILE)
-lflagsGame = $(ldebug) $(lflags) $(guilibs)
+	     $(WINPFLAG) $(DLBFLG)
+lflagsGame = $(ldebug) $(lflags) $(guilibs) $(GAMEPDBFILE) $(GAMEMAPFILE)
 
 !ELSE
 
 cflagsGame = $(cdebug) $(cflags2) $(conflags) $(INCLDIR) \
-	     $(WINPFLAG) $(DLBFLG) $(GAMEPDBFILE) $(GAMEMAPFILE)
-lflagsGame = $(ldebug) $(lflags) $(conlibs)
+	     $(WINPFLAG) $(DLBFLG)
+lflagsGame = $(ldebug) $(lflags) $(conlibs) $(GAMEPDBFILE) $(GAMEMAPFILE)
 
 !ENDIF
 
@@ -607,6 +610,7 @@ all :	install
 install: envchk $(GAME) $(O)install.tag
 	 @echo Done.
 
+
 $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
 	 	$(DAT)\oracles	$(DAT)\quest.dat $(O)sp_lev.tag $(DLB)
 ! IF ("$(USE_DLB)"=="Y")
@@ -839,6 +843,14 @@ $(INCL)\vis_tab.h: $(U)makedefs.exe
 
 $(SRC)\vis_tab.c: $(U)makedefs.exe
 	$(U)makedefs -z
+
+$(DAT)\engrave: $(DAT)\engrave.txt $(U)makedefs.exe
+	../util/makedefs -s
+$(DAT)\epitaph: $(DAT)\epitaph.txt $(U)makedefs.exe
+	../util/makedefs -s
+$(DAT)\bogusmon: $(DAT)\bogusmon.txt $(U)makedefs.exe
+	../util/makedefs -s
+
 
 #==========================================
 # uudecode utility and uuencoded targets
@@ -1081,7 +1093,7 @@ $(DAT)\porthelp: $(NTSYS)\porthelp
 nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 	$(DAT)\quest.dat $(DAT)\rumors $(DAT)\help $(DAT)\hh $(DAT)\cmdhelp \
 	$(DAT)\history $(DAT)\opthelp $(DAT)\wizhelp $(DAT)\dungeon $(DAT)\porthelp \
-	$(DAT)\license $(O)sp_lev.tag
+	$(DAT)\license $(DAT)\engrave $(DAT)\epitaph $(DAT)\bogusmon $(O)sp_lev.tag
 	cd $(DAT)
 	echo data >dlb.lst
 	echo oracles >>dlb.lst
@@ -1091,6 +1103,9 @@ nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 	if exist porthelp echo porthelp >>dlb.lst
 	echo quest.dat >>dlb.lst
 	echo rumors >>dlb.lst
+	echo engrave >>dlb.lst
+	echo epitaph >>dlb.lst
+	echo bogusmon >>dlb.lst
 	echo help >>dlb.lst
 	echo hh >>dlb.lst
 	echo cmdhelp >>dlb.lst
@@ -1238,6 +1253,9 @@ spotless: clean
 	if exist $(U)*.map         del $(U)*.map
 	if exist $(DAT)\data       del $(DAT)\data
 	if exist $(DAT)\rumors     del $(DAT)\rumors
+	if exist $(DAT)\engrave    del $(DAT)\engrave
+	if exist $(DAT)\epitaph    del $(DAT)\epitaph
+	if exist $(DAT)\bogusmon   del $(DAT)\bogusmon
 	if exist $(DAT)\???-fil?.lev	del $(DAT)\???-fil?.lev
 	if exist $(DAT)\???-goal.lev	del $(DAT)\???-goal.lev
 	if exist $(DAT)\???-loca.lev	del $(DAT)\???-loca.lev
