@@ -43,3 +43,40 @@ You've got mail!
 As if!
 # 200x incarnation of Dr.Who
 BAD WOLF
+
+# Gang tag
+Arooo!  Werewolves of Yendor!
+
+# Strategy and pun
+Dig for Victory here
+
+# Pompeii
+Gaius Julius Primigenius was here.  Why are you late?
+
+# Helpful guiding
+Don't go this way
+Go left --->
+<--- Go right
+X marks the spot
+X <--- You are here.
+Here be dragons
+Save now, and do your homework!
+There was a hole here.  It's gone now.
+The Vibrating Square
+This is a pit!
+This is not the dungeon you are looking for.
+Watch out, there's a gnome with a wand of death behind that door!
+
+# Misc fun
+This square deliberately left blank.
+
+# Viking graffiti
+Haermund Hardaxe carved these runes
+
+# Advertising
+Need a light?  Come visit the Minetown branch of Izchak's Lighting Store!
+Snakes on the Astral Plane - Soon in a dungeon near you
+You are the one millionth visitor to this place!  Please wait 200 turns for your wand of wishing.
+
+# DnD
+Warning, Exploding runes!
