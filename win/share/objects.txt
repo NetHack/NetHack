@@ -6930,7 +6930,7 @@ P = (108, 145, 182)
   MMMMMMMJJJAAMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 363 (printed / novel)
+# tile 363 (paperback / novel)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
