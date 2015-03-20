@@ -670,16 +670,16 @@ FOOD("meatball",             0, 1,  1, 0, FLESH,   5, CLR_BROWN),
 FOOD("meat stick",           0, 1,  1, 0, FLESH,   5, CLR_BROWN),
 FOOD("huge chunk of meat",   0,20,400, 0, FLESH,2000, CLR_BROWN),
 
-/* pudding 'corpses' will turn into these and combine */
-FOOD("glob of gray ooze",      0, 1,  1, 0, FLESH,   0, CLR_GRAY),
-FOOD("glob of brown pudding",  0, 1,  1, 0, FLESH,   0, CLR_BROWN),
-FOOD("glob of green slime",    0, 1,  1, 0, FLESH,   0, CLR_GREEN),
-FOOD("glob of black pudding",  0, 1,  1, 0, FLESH,   0, CLR_BLACK),
-
 /* special case because it's not mergable */
 OBJECT(OBJ("meat ring", (char *)0),
     BITS(1,0,0,0,0,0,0,0,0,0,0,0,FLESH),
     0, FOOD_CLASS, 0, 1, 5, 1, 0, 0, 0, 0, 5, CLR_BROWN),
+
+/* pudding 'corpses' will turn into these and combine */
+FOOD("glob of gray ooze",      0, 2, 10, 0, FLESH,   0, CLR_GRAY),
+FOOD("glob of brown pudding",  0, 2, 10, 0, FLESH,   0, CLR_BROWN),
+FOOD("glob of green slime",    0, 2, 10, 0, FLESH,   0, CLR_GREEN),
+FOOD("glob of black pudding",  0, 2, 10, 0, FLESH,   0, CLR_BLACK),
 
 /* fruits & veggies */
 FOOD("kelp frond",           0, 1,  1, 0, VEGGY,  30, CLR_GREEN),

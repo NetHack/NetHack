@@ -8,6 +8,7 @@ sub bail($);
 
 use Getopt::Std;
 
+# TODO: switch to Getopt::Long so we can parse normal arguments too
 $Getopt::Std::STANDARD_HELP_VERSION = TRUE;
 $main::VERSION = 1.0;
 
@@ -52,7 +53,7 @@ exit;
 sub main::HELP_MESSAGE()
 {
     print <<"STARTHELP";
-Usage: renumtiles.pl [OPTIONS]
+Usage: renumtiles.pl [OPTIONS] <textfile>
 
 STARTHELP
     foreach $cmd (keys(%commands)) {
