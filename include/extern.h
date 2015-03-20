@@ -813,6 +813,7 @@ E void FDECL(copynchars, (char *,const char *,int));
 E char FDECL(chrcasecpy, (int,int));
 E char *FDECL(strcasecpy, (char *,const char *));
 E char *FDECL(s_suffix, (const char *));
+E char *FDECL(ing_suffix, (const char *));
 E char *FDECL(xcrypt, (const char *,char *));
 E boolean FDECL(onlyspace, (const char *));
 E char *FDECL(tabexpand, (char *));

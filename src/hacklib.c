@@ -236,6 +236,39 @@ s_suffix(s)		/* return a name converted to possessive */
 }
 
 char *
+ing_suffix(s)
+     const char *s;
+{
+    const char *vowel = "aeiouy";
+    static char buf[BUFSZ];
+    char onoff[10];
+    char *p;
+    Strcpy(buf, s);
+    p = eos(buf);
+    onoff[0] = *p = *(p+1) = '\0';
+    if ((strlen(buf) > 4) &&
+	(!strcmpi(p-3, " on") ||
+	 !strcmpi(p-4, " off") ||
+	 !strcmpi(p-5, " with"))) {
+	p = strrchr(buf, ' ');
+	Strcpy(onoff, p);
+    }
+    if (!index(vowel, *(p-1)) && index(vowel, *(p-2)) && !index(vowel, *(p-3))) {
+	/* tip -> tipp + ing */
+	*p = *(p-1);
+	*(p+1) = '\0';
+    } else if (!strcmpi(p-2, "ie")) {	/* vie -> vy + ing */
+	*(p-2) = 'y';
+	*(p-1) = '\0';
+    } else if (*(p-1) == 'e')	/* grease -> greas + ing */
+	*(p-1) = '\0';
+    Strcat(buf, "ing");
+    if (onoff[0]) Strcat(buf, onoff);
+    return buf;
+}
+
+
+char *
 xcrypt(str, buf)	/* trivial text encryption routine (see makedefs) */
 const char *str;
 char *buf;

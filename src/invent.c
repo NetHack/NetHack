@@ -972,7 +972,15 @@ register const char *let,*word;
 		    return((struct obj *)0);
 		}
 		if(ilet == '-') {
-			return(allownone ? &zeroobj : (struct obj *) 0);
+		    if (!allownone) {
+			strcpy(buf, word);
+			if ((bp = strstr(buf, " or ")) != NULL) {
+			    *bp = '\0';
+			    bp = (rn2(2) ? buf : (bp + 4));
+			} else bp = buf;
+			You("mime %s something.", ing_suffix(bp));
+		    }
+		    return(allownone ? &zeroobj : (struct obj *) 0);
 		}
 		if(ilet == def_oc_syms[COIN_CLASS].sym) {
 			if (!usegold) {
