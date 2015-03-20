@@ -75,12 +75,13 @@ struct warntype_info {
 
 struct tribute_info {
 	size_t tributesz;	/* make it possible to skip this in future */
-	char *name;		/* what is this tribute for */
 	boolean  enabled;	/* Do we have tributes turned on? */
-	Bitfield(book,1);	/* Have we completed the book tribute? */
+	Bitfield(bookstock,1);	/* Have we stocked the book? */
 				/* Markers for other tributes can go here */
 	/* 31 free bits */
-	int bookidx;
+	int bookidx;		/* Index of book in list of book titles */
+	int passagecnt;		/* Number of passages for this book avail */
+	int passagenum;		/* Passage last read */
 };
 	
 struct context_info {

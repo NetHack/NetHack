@@ -413,7 +413,6 @@ register struct obj *spellbook;
 {
 	int	 booktype = spellbook->otyp;
 	boolean confused = (Confusion != 0);
-	const char *whatchadoin = "memorize the spell";
 	boolean too_hard = FALSE;
 
 	/* attempting to read dull book may make hero fall asleep */
@@ -454,15 +453,9 @@ register struct obj *spellbook;
 		/* 3.6 tribute */
 		if (booktype == SPE_NOVEL) {
 		    /* Obtain current Terry Pratchett book
-		       title for the current game. */
+			title for the current game. */
 		    const char *tribtitle = noveltitle(&context.tribute.bookidx);
-
-		    /*
-		     * Place code here to pull desireable
-		     * random passages from somewhere (data.base?)
-		     * using tribtitle as the key?
-		     */
-		    pline("Reading \"%s.\"", tribtitle); /* debug confirmation */
+		    read_tribbook(tribtitle, spellbook);
 		    return(1);
 		}
 
