@@ -79,9 +79,6 @@ struct tribute_info {
 	Bitfield(bookstock,1);	/* Have we stocked the book? */
 				/* Markers for other tributes can go here */
 	/* 31 free bits */
-	int bookidx;		/* Index of book in list of book titles */
-	int passagecnt;		/* Number of passages for this book avail */
-	int passagenum;		/* Passage last read */
 };
 	
 struct context_info {

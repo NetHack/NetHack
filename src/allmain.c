@@ -489,7 +489,6 @@ newgame()
 	context.next_attrib_check = 600L; /* arbitrary first setting */
 	context.tribute.enabled = TRUE;   /* turn on 3.6 tributes    */
 	context.tribute.tributesz = sizeof(struct tribute_info);
-	context.tribute.bookidx = 0;
 
 	for (i = 0; i < NUMMONS; i++)
 		mvitals[i].mvflags = mons[i].geno & G_NOCORPSE;

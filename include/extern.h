@@ -746,6 +746,7 @@ E void NDECL(really_close);
 #ifdef DEBUG
 E boolean FDECL(showdebug, (const char *));
 #endif
+E void FDECL(read_tribute, (const char *,const char *,int));
 
 /* ### fountain.c ### */
 
@@ -1839,7 +1840,6 @@ E void FDECL(punish, (struct obj *));
 E void NDECL(unpunish);
 E boolean FDECL(cant_revive, (int *,BOOLEAN_P,struct obj *));
 E boolean NDECL(create_particular);
-E void FDECL(read_tribbook, (const char *, struct obj *));
 
 /* ### rect.c ### */
 

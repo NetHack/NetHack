@@ -1,8 +1,15 @@
+# NetHack 3.6.0 tribute to:
+#
+#         Sir Terence David John "Terry" Pratchett
+#              April 28, 1948 - March 12, 2015          
+# ("or until the ripples he caused in the world die away...")
+#
+#
 %section books
 #
 #
 #
-%book The Colour of Magic(1)
+%title The Colour of Magic  (1)
 %passage 1
 The Colour of Magic, by Terry Pratchett
 
@@ -11,395 +18,412 @@ bbbbbbbbbbb bbbbbbbbbbbbbbbbb bbbbbbbbbbbbbbbbbbbbbbb
 CC cc	ddd eee ff
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book The Light Fantastic(1)
+%title The Light Fantastic (1)
 %passage 1
 The Light Fantastic, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Equal Rites(1)
+%title Equal Rites (1)
 %passage 1
 Equal Rites, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Mort(1)
+%title Mort (1)
 %passage 1
 Mort, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Sourcery(1)
+%title Sourcery (1)
 %passage 1
 Sourcery, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Wyrd Sisters(1)
+%title Wyrd Sisters (1)
 %passage 1
 Wyrd Sisters, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Pyramids(1)
+%title Pyramids (1)
 %passage 1
 Pyramids, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Guards! Guards!(1)
+%title Guards! Guards! (1)
 %passage 1
 Guards! Guards!, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Eric(1)
+%title Eric (1)
 %passage 1
 Eric, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Moving Pictures(1)
+%title Moving Pictures (1)
 %passage 1
 Moving Pictures, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Reaper Man(1)
+%title Reaper Man (1)
 %passage 1
 Reaper Man, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Witches Abroad(1)
+%title Witches Abroad (1)
 %passage 1
 Witches Abroad, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Small Gods(1)
+%title Small Gods (1)
 %passage 1
 Small Gods, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Lords and Ladies(1)
+%title Lords and Ladies (1)
 %passage 1
 Lords and Ladies, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Men at Arms(1)
+%title Men at Arms (1)
 %passage 1
 Men at Arms, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Soul Music(1)
+%title Soul Music (1)
 %passage 1
 Soul Music, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Interesting Times(1)
+%title Interesting Times (1)
 %passage 1
 Interesting Times, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Maskerade(1)
+%title Maskerade (1)
 %passage 1
 Maskerade, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Feet of Clay(1)
+%title Feet of Clay (1)
 %passage 1
 Feet of Clay, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Hogfather(1)
+%title Hogfather (1)
 %passage 1
 Hogfather, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Jingo(1)
+%title Jingo (1)
 %passage 1
 Jingo, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book The Last Continent(1)
+%title The Last Continent (1)
 %passage 1
 The Last Continent, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Carpe Jugulum(1)
+%title Carpe Jugulum (1)
 %passage 1
 Carpe Jugulum, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book The Fifth Elephant(1)
+%title The Fifth Elephant (1)
 %passage 1
 The Fifth Elephant, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book The Truth(1)
+%title The Truth (1)
 %passage 1
 The Truth, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Thief of Time(1)
+%title Thief of Time (1)
 %passage 1
 Thief of Time, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book The Last Hero(1)
+%title The Last Hero (1)
 %passage 1
 The Last Hero, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book The Amazing Maurice and his Educated Rodents(1)
+%title The Amazing Maurice and his Educated Rodents (1)
 %passage 1
 The Amazing Maurice and his Educated Rodents, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Night Watch(1)
+%title Night Watch (1)
 %passage 1
 Night Watch, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book The Wee Free Men(1)
+%title The Wee Free Men (1)
 %passage 1
 The Wee Free Men, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Monstrous Regiment(1)
+%title Monstrous Regiment (1)
 %passage 1
 Monstrous Regiment, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book A Hat Full of Sky(1)
+%title A Hat Full of Sky (1)
 %passage 1
 A Hat Full of Sky, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Going Postal(1)
+%title Going Postal (1)
 %passage 1
 Going Postal, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Thud!(1)
+%title Thud! (1)
 %passage 1
 Thud!, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Wintersmith(1)
+%title Wintersmith (1)
 %passage 1
 Wintersmith, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Making Money(1)
+%title Making Money (1)
 %passage 1
 Making Money, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Unseen Academicals(1)
+%title Unseen Academicals (1)
 %passage 1
 Unseen Academicals, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book I Shall Wear Midnight(1)
+%title I Shall Wear Midnight (1)
 %passage 1
 I Shall Wear Midnight, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Snuff(1)
+%title Snuff (1)
 %passage 1
 Snuff, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 #
 #
 #
-%book Raising Steam(1)
+%title Raising Steam (1)
 %passage 1
 Raising Steam, by Terry Pratchett
 
 
 %e passage
-%e book
+%e title
 %e section
+#-----------------------------------------------------
+# Currently this section is not used. It is added
+# to illustrate how these could be added and adapted
+# should they be useful for something
+#
+%section Death
+%title Death Quotes (2)
+%passage 1
+WHERE THE FIRST PRIMAL CELL WAS, THERE WAS I ALSO. WHERE MAN IS, THERE AM I.
+WHEN THE LAST LIFE CRAWLS UNDER FREEZING STARS, THERE WILL I BE.
+%e passage
+%passage 2
+I AM DEATH, NOT TAXES. *I* TURN UP ONLY ONCE.
+%e passage
+%e title
+%e section
+

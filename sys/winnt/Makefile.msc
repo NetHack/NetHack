@@ -1093,8 +1093,7 @@ $(DAT)\porthelp: $(NTSYS)\porthelp
 nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 	$(DAT)\quest.dat $(DAT)\rumors $(DAT)\help $(DAT)\hh $(DAT)\cmdhelp \
 	$(DAT)\history $(DAT)\opthelp $(DAT)\wizhelp $(DAT)\dungeon $(DAT)\porthelp \
-	$(DAT)\license $(DAT)\engrave $(DAT)\epitaph $(DAT)\bogusmon \
-	$(DAT)\tribute $(O)sp_lev.tag
+	$(DAT)\license $(DAT)\engrave $(DAT)\epitaph $(DAT)\bogusmon $(DAT)\tribute $(O)sp_lev.tag
 	cd $(DAT)
 	echo data >dlb.lst
 	echo oracles >>dlb.lst
@@ -1107,7 +1106,6 @@ nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 	echo engrave >>dlb.lst
 	echo epitaph >>dlb.lst
 	echo bogusmon >>dlb.lst
-	echo tribute >>dlb.lst
 	echo help >>dlb.lst
 	echo hh >>dlb.lst
 	echo cmdhelp >>dlb.lst

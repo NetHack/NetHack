@@ -367,18 +367,13 @@ boolean mkspecl;
 	int atype;
 	struct permonst *ptr;
 
-	/* 3.6 tribute */
+	/* 3.6.0 tribute */
 	if (mkspecl && !strcmp(shp->name, "rare books")) {
-	    int novidx = -1; /* -1 triggers random noveltitle() */
 	    struct obj *novel=mksobj_at(SPE_NOVEL, sx, sy, FALSE, FALSE);
-	    if (novel) novel = oname(novel, noveltitle(&novidx));
-	    context.tribute.bookidx = novidx;
-	    context.tribute.passagecnt = 0;
-	    context.tribute.passagenum = 0; 
-	    context.tribute.bookstock = TRUE;
+	    if (novel) context.tribute.bookstock = TRUE;
 	    return;
 	}
-
+	
 	if (rn2(100) < depth(&u.uz) &&
 		!MON_AT(sx, sy) && (ptr = mkclass(S_MIMIC,0)) &&
 		(mtmp = makemon(ptr,sx,sy,NO_MM_FLAGS)) != 0) {

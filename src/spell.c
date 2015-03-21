@@ -450,12 +450,12 @@ register struct obj *spellbook;
 			return(1);
 		}
 
-		/* 3.6 tribute */
+		/* 3.6.0 tribute */
 		if (booktype == SPE_NOVEL) {
 		    /* Obtain current Terry Pratchett book
 			title for the current game. */
-		    const char *tribtitle = noveltitle(&context.tribute.bookidx);
-		    read_tribbook(tribtitle, spellbook);
+		    const char *tribtitle = noveltitle(&spellbook->novelidx);
+		    read_tribute("books", tribtitle, 0);
 		    return(1);
 		}
 
