@@ -1,4 +1,4 @@
-/* NetHack 3.5	files.c	$NHDT-Date: 1426544796 2015/03/16 22:26:36 $  $NHDT-Branch: master $:$NHDT-Revision: 1.134 $ */
+/* NetHack 3.5	files.c	$NHDT-Date: 1426966692 2015/03/21 19:38:12 $  $NHDT-Branch: master $:$NHDT-Revision: 1.135 $ */
 /* NetHack 3.5	files.c	$Date: 2012/03/10 02:49:08 $  $Revision: 1.124 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3198,6 +3198,29 @@ int ifd, ofd;
 
 /* ----------  END INTERNAL RECOVER ----------- */
 #endif /*SELF_RECOVER*/
+
+/* ----------  OTHER ----------- */
+
+#ifdef SYSCF
+# ifdef SYSCF_FILE
+void
+assure_syscf_file() {
+	/* All we really care about is the end result - can we read the file?
+	 * So just check that directly. */
+	int fd;
+	fd = open(SYSCF_FILE, O_RDONLY);
+	if(fd >= 0){
+		/* readable */
+		close(fd);
+		return;
+	}
+	raw_printf("Unable to open SYSCF_FILE.\n");
+	exit(EXIT_FAILURE);
+}
+
+# endif /* SYSCF_FILE */
+#endif /* SYSCF */
+
 
 #ifdef DEBUG
 /* used by debugpline() to decide whether to issue a message

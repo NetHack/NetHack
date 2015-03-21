@@ -1,4 +1,4 @@
-/* NetHack 3.5	extern.h	$NHDT-Date: 1426496453 2015/03/16 09:00:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.407 $ */
+/* NetHack 3.5	extern.h	$NHDT-Date: 1426966688 2015/03/21 19:38:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.411 $ */
 /* NetHack 3.5	extern.h	$Date: 2013/11/05 00:57:53 $  $Revision: 1.380 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -738,6 +738,9 @@ E char** NDECL(get_saved_games);
 E void FDECL(free_saved_games, (char**));
 #ifdef SELF_RECOVER
 E boolean NDECL(recover_savefile);
+#endif
+#ifdef SYSCF_FILE
+E void NDECL(assure_syscf_file);
 #endif
 #ifdef HOLD_LOCKFILE_OPEN
 E void NDECL(really_close);
@@ -2288,9 +2291,6 @@ E void NDECL(port_help);
 E void FDECL(sethanguphandler, (void (*)(int)));
 E boolean NDECL(authorize_wizard_mode);
 E boolean FDECL(check_user_string, (char *));
-# ifdef SYSCF_FILE
-E void NDECL(assure_syscf_file);
-# endif
 #endif /* UNIX */
 
 /* ### unixtty.c ### */

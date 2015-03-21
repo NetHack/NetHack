@@ -1,4 +1,4 @@
-/* NetHack 3.5	unixmain.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	unixmain.c	$NHDT-Date: 1426966705 2015/03/21 19:38:25 $  $NHDT-Branch: master $:$NHDT-Revision: 1.44 $ */
 /* NetHack 3.5	unixmain.c	$Date: 2012/01/27 20:15:31 $  $Revision: 1.42 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -648,20 +648,4 @@ get_unix_pw()
 	return pw;
 }
 
-#ifdef SYSCF_FILE
-void
-assure_syscf_file(){
-	/* All we really care about is the end result - can we read the file?
-	 * So just check that directly. */
-	int fd;
-	fd = open(SYSCF_FILE, O_RDONLY);
-	if(fd >= 0){
-		/* readable */
-		close(fd);
-		return;
-	}
-	raw_printf("Unable to open SYSCF_FILE.\n");
-	exit(EXIT_FAILURE);
-}
-#endif
 /*unixmain.c*/
