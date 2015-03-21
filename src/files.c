@@ -1,4 +1,4 @@
-/* NetHack 3.5	files.c	$NHDT-Date: 1426968058 2015/03/21 20:00:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.136 $ */
+/* NetHack 3.5	files.c	$NHDT-Date: 1426969026 2015/03/21 20:17:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.137 $ */
 /* NetHack 3.5	files.c	$Date: 2012/03/10 02:49:08 $  $Revision: 1.124 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1858,6 +1858,9 @@ int src;
 		} else
 #endif
 		if ((fp = fopenp(filename, "r")) != (FILE *)0) {
+#ifndef WIN32
+		    configfile = filename;
+#endif
 		    return(fp);
 #if defined(UNIX) || defined(VMS)
 		} else {
