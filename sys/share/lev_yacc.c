@@ -1,21 +1,19 @@
+/* A Bison parser, made by GNU Bison 3.0.2.  */
 
-/* A Bison parser, made by GNU Bison 2.4.1.  */
+/* Bison implementation for Yacc-like parsers in C
 
-/* Skeleton implementation for Bison's Yacc-like parsers in C
-   
-      Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
-   Free Software Foundation, Inc.
-   
+   Copyright (C) 1984, 1989-1990, 2000-2013 Free Software Foundation, Inc.
+
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
@@ -28,7 +26,7 @@
    special exception, which will cause the skeleton and the resulting
    Bison output files to be licensed under the GNU General Public
    License without this special exception.
-   
+
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
@@ -46,7 +44,7 @@
 #define YYBISON 1
 
 /* Bison version.  */
-#define YYBISON_VERSION "2.4.1"
+#define YYBISON_VERSION "3.0.2"
 
 /* Skeleton name.  */
 #define YYSKELETON_NAME "yacc.c"
@@ -60,17 +58,15 @@
 /* Pull parsers.  */
 #define YYPULL 1
 
-/* Using locations.  */
-#define YYLSP_NEEDED 0
 
 
 
 /* Copy the first part of user declarations.  */
+#line 1 "lev_comp.y" /* yacc.c:339  */
 
-/* Line 189 of yacc.c  */
-#line 1 "lev_comp.y"
-
-/*	SCCS Id: @(#)lev_yacc.c	3.4	2000/01/17	*/
+/* NetHack 3.5  lev_comp.y	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5  lev_comp.y	$Date: 2009/05/06 10:54:31 $  $Revision: 1.8 $ */
+/*	SCCS Id: @(#)lev_yacc.c	3.5	2007/08/01	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -212,14 +208,15 @@ extern const char *fname;
 extern char curr_token[512];
 
 
+#line 212 "y.tab.c" /* yacc.c:339  */
 
-/* Line 189 of yacc.c  */
-#line 218 "y.tab.c"
-
-/* Enabling traces.  */
-#ifndef YYDEBUG
-# define YYDEBUG 0
-#endif
+# ifndef YY_NULLPTR
+#  if defined __cplusplus && 201103L <= __cplusplus
+#   define YY_NULLPTR nullptr
+#  else
+#   define YY_NULLPTR 0
+#  endif
+# endif
 
 /* Enabling verbose error messages.  */
 #ifdef YYERROR_VERBOSE
@@ -229,193 +226,198 @@ extern char curr_token[512];
 # define YYERROR_VERBOSE 0
 #endif
 
-/* Enabling the token table.  */
-#ifndef YYTOKEN_TABLE
-# define YYTOKEN_TABLE 0
+/* In a future release of Bison, this section will be replaced
+   by #include "y.tab.h".  */
+#ifndef YY_YY_Y_TAB_H_INCLUDED
+# define YY_YY_Y_TAB_H_INCLUDED
+/* Debug traces.  */
+#ifndef YYDEBUG
+# define YYDEBUG 0
+#endif
+#if YYDEBUG
+extern int yydebug;
 #endif
 
-
-/* Tokens.  */
+/* Token type.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
-   /* Put the tokens into the symbol table, so that GDB and other debuggers
-      know about them.  */
-   enum yytokentype {
-     CHAR = 258,
-     INTEGER = 259,
-     BOOLEAN = 260,
-     PERCENT = 261,
-     SPERCENT = 262,
-     MINUS_INTEGER = 263,
-     PLUS_INTEGER = 264,
-     MAZE_GRID_ID = 265,
-     SOLID_FILL_ID = 266,
-     MINES_ID = 267,
-     ROGUELEV_ID = 268,
-     MESSAGE_ID = 269,
-     MAZE_ID = 270,
-     LEVEL_ID = 271,
-     LEV_INIT_ID = 272,
-     GEOMETRY_ID = 273,
-     NOMAP_ID = 274,
-     OBJECT_ID = 275,
-     COBJECT_ID = 276,
-     MONSTER_ID = 277,
-     TRAP_ID = 278,
-     DOOR_ID = 279,
-     DRAWBRIDGE_ID = 280,
-     object_ID = 281,
-     monster_ID = 282,
-     terrain_ID = 283,
-     MAZEWALK_ID = 284,
-     WALLIFY_ID = 285,
-     REGION_ID = 286,
-     FILLING = 287,
-     IRREGULAR = 288,
-     JOINED = 289,
-     ALTAR_ID = 290,
-     LADDER_ID = 291,
-     STAIR_ID = 292,
-     NON_DIGGABLE_ID = 293,
-     NON_PASSWALL_ID = 294,
-     ROOM_ID = 295,
-     PORTAL_ID = 296,
-     TELEPRT_ID = 297,
-     BRANCH_ID = 298,
-     LEV = 299,
-     MINERALIZE_ID = 300,
-     CORRIDOR_ID = 301,
-     GOLD_ID = 302,
-     ENGRAVING_ID = 303,
-     FOUNTAIN_ID = 304,
-     POOL_ID = 305,
-     SINK_ID = 306,
-     NONE = 307,
-     RAND_CORRIDOR_ID = 308,
-     DOOR_STATE = 309,
-     LIGHT_STATE = 310,
-     CURSE_TYPE = 311,
-     ENGRAVING_TYPE = 312,
-     DIRECTION = 313,
-     RANDOM_TYPE = 314,
-     RANDOM_TYPE_BRACKET = 315,
-     A_REGISTER = 316,
-     ALIGNMENT = 317,
-     LEFT_OR_RIGHT = 318,
-     CENTER = 319,
-     TOP_OR_BOT = 320,
-     ALTAR_TYPE = 321,
-     UP_OR_DOWN = 322,
-     SUBROOM_ID = 323,
-     NAME_ID = 324,
-     FLAGS_ID = 325,
-     FLAG_TYPE = 326,
-     MON_ATTITUDE = 327,
-     MON_ALERTNESS = 328,
-     MON_APPEARANCE = 329,
-     ROOMDOOR_ID = 330,
-     IF_ID = 331,
-     ELSE_ID = 332,
-     TERRAIN_ID = 333,
-     HORIZ_OR_VERT = 334,
-     REPLACE_TERRAIN_ID = 335,
-     EXIT_ID = 336,
-     SHUFFLE_ID = 337,
-     QUANTITY_ID = 338,
-     BURIED_ID = 339,
-     LOOP_ID = 340,
-     FOR_ID = 341,
-     TO_ID = 342,
-     SWITCH_ID = 343,
-     CASE_ID = 344,
-     BREAK_ID = 345,
-     DEFAULT_ID = 346,
-     ERODED_ID = 347,
-     TRAPPED_ID = 348,
-     RECHARGED_ID = 349,
-     INVIS_ID = 350,
-     GREASED_ID = 351,
-     FEMALE_ID = 352,
-     CANCELLED_ID = 353,
-     REVIVED_ID = 354,
-     AVENGE_ID = 355,
-     FLEEING_ID = 356,
-     BLINDED_ID = 357,
-     PARALYZED_ID = 358,
-     STUNNED_ID = 359,
-     CONFUSED_ID = 360,
-     SEENTRAPS_ID = 361,
-     ALL_ID = 362,
-     MONTYPE_ID = 363,
-     GRAVE_ID = 364,
-     ERODEPROOF_ID = 365,
-     FUNCTION_ID = 366,
-     MSG_OUTPUT_TYPE = 367,
-     COMPARE_TYPE = 368,
-     UNKNOWN_TYPE = 369,
-     rect_ID = 370,
-     fillrect_ID = 371,
-     line_ID = 372,
-     randline_ID = 373,
-     grow_ID = 374,
-     selection_ID = 375,
-     flood_ID = 376,
-     rndcoord_ID = 377,
-     circle_ID = 378,
-     ellipse_ID = 379,
-     filter_ID = 380,
-     complement_ID = 381,
-     gradient_ID = 382,
-     GRADIENT_TYPE = 383,
-     LIMITED = 384,
-     HUMIDITY_TYPE = 385,
-     STRING = 386,
-     MAP_ID = 387,
-     NQSTRING = 388,
-     VARSTRING = 389,
-     CFUNC = 390,
-     CFUNC_INT = 391,
-     CFUNC_STR = 392,
-     CFUNC_COORD = 393,
-     CFUNC_REGION = 394,
-     VARSTRING_INT = 395,
-     VARSTRING_INT_ARRAY = 396,
-     VARSTRING_STRING = 397,
-     VARSTRING_STRING_ARRAY = 398,
-     VARSTRING_VAR = 399,
-     VARSTRING_VAR_ARRAY = 400,
-     VARSTRING_COORD = 401,
-     VARSTRING_COORD_ARRAY = 402,
-     VARSTRING_REGION = 403,
-     VARSTRING_REGION_ARRAY = 404,
-     VARSTRING_MAPCHAR = 405,
-     VARSTRING_MAPCHAR_ARRAY = 406,
-     VARSTRING_MONST = 407,
-     VARSTRING_MONST_ARRAY = 408,
-     VARSTRING_OBJ = 409,
-     VARSTRING_OBJ_ARRAY = 410,
-     VARSTRING_SEL = 411,
-     VARSTRING_SEL_ARRAY = 412,
-     METHOD_INT = 413,
-     METHOD_INT_ARRAY = 414,
-     METHOD_STRING = 415,
-     METHOD_STRING_ARRAY = 416,
-     METHOD_VAR = 417,
-     METHOD_VAR_ARRAY = 418,
-     METHOD_COORD = 419,
-     METHOD_COORD_ARRAY = 420,
-     METHOD_REGION = 421,
-     METHOD_REGION_ARRAY = 422,
-     METHOD_MAPCHAR = 423,
-     METHOD_MAPCHAR_ARRAY = 424,
-     METHOD_MONST = 425,
-     METHOD_MONST_ARRAY = 426,
-     METHOD_OBJ = 427,
-     METHOD_OBJ_ARRAY = 428,
-     METHOD_SEL = 429,
-     METHOD_SEL_ARRAY = 430,
-     DICE = 431
-   };
+  enum yytokentype
+  {
+    CHAR = 258,
+    INTEGER = 259,
+    BOOLEAN = 260,
+    PERCENT = 261,
+    SPERCENT = 262,
+    MINUS_INTEGER = 263,
+    PLUS_INTEGER = 264,
+    MAZE_GRID_ID = 265,
+    SOLID_FILL_ID = 266,
+    MINES_ID = 267,
+    ROGUELEV_ID = 268,
+    MESSAGE_ID = 269,
+    MAZE_ID = 270,
+    LEVEL_ID = 271,
+    LEV_INIT_ID = 272,
+    GEOMETRY_ID = 273,
+    NOMAP_ID = 274,
+    OBJECT_ID = 275,
+    COBJECT_ID = 276,
+    MONSTER_ID = 277,
+    TRAP_ID = 278,
+    DOOR_ID = 279,
+    DRAWBRIDGE_ID = 280,
+    object_ID = 281,
+    monster_ID = 282,
+    terrain_ID = 283,
+    MAZEWALK_ID = 284,
+    WALLIFY_ID = 285,
+    REGION_ID = 286,
+    FILLING = 287,
+    IRREGULAR = 288,
+    JOINED = 289,
+    ALTAR_ID = 290,
+    LADDER_ID = 291,
+    STAIR_ID = 292,
+    NON_DIGGABLE_ID = 293,
+    NON_PASSWALL_ID = 294,
+    ROOM_ID = 295,
+    PORTAL_ID = 296,
+    TELEPRT_ID = 297,
+    BRANCH_ID = 298,
+    LEV = 299,
+    MINERALIZE_ID = 300,
+    CORRIDOR_ID = 301,
+    GOLD_ID = 302,
+    ENGRAVING_ID = 303,
+    FOUNTAIN_ID = 304,
+    POOL_ID = 305,
+    SINK_ID = 306,
+    NONE = 307,
+    RAND_CORRIDOR_ID = 308,
+    DOOR_STATE = 309,
+    LIGHT_STATE = 310,
+    CURSE_TYPE = 311,
+    ENGRAVING_TYPE = 312,
+    DIRECTION = 313,
+    RANDOM_TYPE = 314,
+    RANDOM_TYPE_BRACKET = 315,
+    A_REGISTER = 316,
+    ALIGNMENT = 317,
+    LEFT_OR_RIGHT = 318,
+    CENTER = 319,
+    TOP_OR_BOT = 320,
+    ALTAR_TYPE = 321,
+    UP_OR_DOWN = 322,
+    SUBROOM_ID = 323,
+    NAME_ID = 324,
+    FLAGS_ID = 325,
+    FLAG_TYPE = 326,
+    MON_ATTITUDE = 327,
+    MON_ALERTNESS = 328,
+    MON_APPEARANCE = 329,
+    ROOMDOOR_ID = 330,
+    IF_ID = 331,
+    ELSE_ID = 332,
+    TERRAIN_ID = 333,
+    HORIZ_OR_VERT = 334,
+    REPLACE_TERRAIN_ID = 335,
+    EXIT_ID = 336,
+    SHUFFLE_ID = 337,
+    QUANTITY_ID = 338,
+    BURIED_ID = 339,
+    LOOP_ID = 340,
+    FOR_ID = 341,
+    TO_ID = 342,
+    SWITCH_ID = 343,
+    CASE_ID = 344,
+    BREAK_ID = 345,
+    DEFAULT_ID = 346,
+    ERODED_ID = 347,
+    TRAPPED_ID = 348,
+    RECHARGED_ID = 349,
+    INVIS_ID = 350,
+    GREASED_ID = 351,
+    FEMALE_ID = 352,
+    CANCELLED_ID = 353,
+    REVIVED_ID = 354,
+    AVENGE_ID = 355,
+    FLEEING_ID = 356,
+    BLINDED_ID = 357,
+    PARALYZED_ID = 358,
+    STUNNED_ID = 359,
+    CONFUSED_ID = 360,
+    SEENTRAPS_ID = 361,
+    ALL_ID = 362,
+    MONTYPE_ID = 363,
+    GRAVE_ID = 364,
+    ERODEPROOF_ID = 365,
+    FUNCTION_ID = 366,
+    MSG_OUTPUT_TYPE = 367,
+    COMPARE_TYPE = 368,
+    UNKNOWN_TYPE = 369,
+    rect_ID = 370,
+    fillrect_ID = 371,
+    line_ID = 372,
+    randline_ID = 373,
+    grow_ID = 374,
+    selection_ID = 375,
+    flood_ID = 376,
+    rndcoord_ID = 377,
+    circle_ID = 378,
+    ellipse_ID = 379,
+    filter_ID = 380,
+    complement_ID = 381,
+    gradient_ID = 382,
+    GRADIENT_TYPE = 383,
+    LIMITED = 384,
+    HUMIDITY_TYPE = 385,
+    STRING = 386,
+    MAP_ID = 387,
+    NQSTRING = 388,
+    VARSTRING = 389,
+    CFUNC = 390,
+    CFUNC_INT = 391,
+    CFUNC_STR = 392,
+    CFUNC_COORD = 393,
+    CFUNC_REGION = 394,
+    VARSTRING_INT = 395,
+    VARSTRING_INT_ARRAY = 396,
+    VARSTRING_STRING = 397,
+    VARSTRING_STRING_ARRAY = 398,
+    VARSTRING_VAR = 399,
+    VARSTRING_VAR_ARRAY = 400,
+    VARSTRING_COORD = 401,
+    VARSTRING_COORD_ARRAY = 402,
+    VARSTRING_REGION = 403,
+    VARSTRING_REGION_ARRAY = 404,
+    VARSTRING_MAPCHAR = 405,
+    VARSTRING_MAPCHAR_ARRAY = 406,
+    VARSTRING_MONST = 407,
+    VARSTRING_MONST_ARRAY = 408,
+    VARSTRING_OBJ = 409,
+    VARSTRING_OBJ_ARRAY = 410,
+    VARSTRING_SEL = 411,
+    VARSTRING_SEL_ARRAY = 412,
+    METHOD_INT = 413,
+    METHOD_INT_ARRAY = 414,
+    METHOD_STRING = 415,
+    METHOD_STRING_ARRAY = 416,
+    METHOD_VAR = 417,
+    METHOD_VAR_ARRAY = 418,
+    METHOD_COORD = 419,
+    METHOD_COORD_ARRAY = 420,
+    METHOD_REGION = 421,
+    METHOD_REGION_ARRAY = 422,
+    METHOD_MAPCHAR = 423,
+    METHOD_MAPCHAR_ARRAY = 424,
+    METHOD_MONST = 425,
+    METHOD_MONST_ARRAY = 426,
+    METHOD_OBJ = 427,
+    METHOD_OBJ_ARRAY = 428,
+    METHOD_SEL = 429,
+    METHOD_SEL_ARRAY = 430,
+    DICE = 431
+  };
 #endif
 /* Tokens.  */
 #define CHAR 258
@@ -593,15 +595,12 @@ extern char curr_token[512];
 #define METHOD_SEL_ARRAY 430
 #define DICE 431
 
-
-
-
+/* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef union YYSTYPE
+typedef union YYSTYPE YYSTYPE;
+union YYSTYPE
 {
-
-/* Line 214 of yacc.c  */
-#line 146 "lev_comp.y"
+#line 148 "lev_comp.y" /* yacc.c:355  */
 
 	long	i;
 	char*	map;
@@ -638,22 +637,22 @@ typedef union YYSTYPE
 	char *varstr;
     } meth;
 
-
-
-/* Line 214 of yacc.c  */
-#line 645 "y.tab.c"
-} YYSTYPE;
+#line 641 "y.tab.c" /* yacc.c:355  */
+};
 # define YYSTYPE_IS_TRIVIAL 1
-# define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 #endif
 
 
+extern YYSTYPE yylval;
+
+int yyparse (void);
+
+#endif /* !YY_YY_Y_TAB_H_INCLUDED  */
+
 /* Copy the second part of user declarations.  */
 
-
-/* Line 264 of yacc.c  */
-#line 657 "y.tab.c"
+#line 656 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -667,11 +666,8 @@ typedef unsigned char yytype_uint8;
 
 #ifdef YYTYPE_INT8
 typedef YYTYPE_INT8 yytype_int8;
-#elif (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
-typedef signed char yytype_int8;
 #else
-typedef short int yytype_int8;
+typedef signed char yytype_int8;
 #endif
 
 #ifdef YYTYPE_UINT16
@@ -691,8 +687,7 @@ typedef short int yytype_int16;
 #  define YYSIZE_T __SIZE_TYPE__
 # elif defined size_t
 #  define YYSIZE_T size_t
-# elif ! defined YYSIZE_T && (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
+# elif ! defined YYSIZE_T
 #  include <stddef.h> /* INFRINGES ON USER NAME SPACE */
 #  define YYSIZE_T size_t
 # else
@@ -703,41 +698,70 @@ typedef short int yytype_int16;
 #define YYSIZE_MAXIMUM ((YYSIZE_T) -1)
 
 #ifndef YY_
-# if YYENABLE_NLS
+# if defined YYENABLE_NLS && YYENABLE_NLS
 #  if ENABLE_NLS
 #   include <libintl.h> /* INFRINGES ON USER NAME SPACE */
-#   define YY_(msgid) dgettext ("bison-runtime", msgid)
+#   define YY_(Msgid) dgettext ("bison-runtime", Msgid)
 #  endif
 # endif
 # ifndef YY_
-#  define YY_(msgid) msgid
+#  define YY_(Msgid) Msgid
+# endif
+#endif
+
+#ifndef YY_ATTRIBUTE
+# if (defined __GNUC__                                               \
+      && (2 < __GNUC__ || (__GNUC__ == 2 && 96 <= __GNUC_MINOR__)))  \
+     || defined __SUNPRO_C && 0x5110 <= __SUNPRO_C
+#  define YY_ATTRIBUTE(Spec) __attribute__(Spec)
+# else
+#  define YY_ATTRIBUTE(Spec) /* empty */
+# endif
+#endif
+
+#ifndef YY_ATTRIBUTE_PURE
+# define YY_ATTRIBUTE_PURE   YY_ATTRIBUTE ((__pure__))
+#endif
+
+#ifndef YY_ATTRIBUTE_UNUSED
+# define YY_ATTRIBUTE_UNUSED YY_ATTRIBUTE ((__unused__))
+#endif
+
+#if !defined _Noreturn \
+     && (!defined __STDC_VERSION__ || __STDC_VERSION__ < 201112)
+# if defined _MSC_VER && 1200 <= _MSC_VER
+#  define _Noreturn __declspec (noreturn)
+# else
+#  define _Noreturn YY_ATTRIBUTE ((__noreturn__))
 # endif
 #endif
 
 /* Suppress unused-variable warnings by "using" E.  */
 #if ! defined lint || defined __GNUC__
-# define YYUSE(e) ((void) (e))
+# define YYUSE(E) ((void) (E))
 #else
-# define YYUSE(e) /* empty */
+# define YYUSE(E) /* empty */
 #endif
 
-/* Identity function, used to suppress warnings about constant conditions.  */
-#ifndef lint
-# define YYID(n) (n)
+#if defined __GNUC__ && 407 <= __GNUC__ * 100 + __GNUC_MINOR__
+/* Suppress an incorrect diagnostic about yylval being uninitialized.  */
+# define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN \
+    _Pragma ("GCC diagnostic push") \
+    _Pragma ("GCC diagnostic ignored \"-Wuninitialized\"")\
+    _Pragma ("GCC diagnostic ignored \"-Wmaybe-uninitialized\"")
+# define YY_IGNORE_MAYBE_UNINITIALIZED_END \
+    _Pragma ("GCC diagnostic pop")
 #else
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
-static int
-YYID (int yyi)
-#else
-static int
-YYID (yyi)
-    int yyi;
+# define YY_INITIAL_VALUE(Value) Value
 #endif
-{
-  return yyi;
-}
+#ifndef YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
+# define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
+# define YY_IGNORE_MAYBE_UNINITIALIZED_END
 #endif
+#ifndef YY_INITIAL_VALUE
+# define YY_INITIAL_VALUE(Value) /* Nothing. */
+#endif
+
 
 #if ! defined yyoverflow || YYERROR_VERBOSE
 
@@ -756,11 +780,11 @@ YYID (yyi)
 #    define alloca _alloca
 #   else
 #    define YYSTACK_ALLOC alloca
-#    if ! defined _ALLOCA_H && ! defined _STDLIB_H && (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
+#    if ! defined _ALLOCA_H && ! defined EXIT_SUCCESS
 #     include <stdlib.h> /* INFRINGES ON USER NAME SPACE */
-#     ifndef _STDLIB_H
-#      define _STDLIB_H 1
+      /* Use EXIT_SUCCESS as a witness for stdlib.h.  */
+#     ifndef EXIT_SUCCESS
+#      define EXIT_SUCCESS 0
 #     endif
 #    endif
 #   endif
@@ -768,8 +792,8 @@ YYID (yyi)
 # endif
 
 # ifdef YYSTACK_ALLOC
-   /* Pacify GCC's `empty if-body' warning.  */
-#  define YYSTACK_FREE(Ptr) do { /* empty */; } while (YYID (0))
+   /* Pacify GCC's 'empty if-body' warning.  */
+#  define YYSTACK_FREE(Ptr) do { /* empty */; } while (0)
 #  ifndef YYSTACK_ALLOC_MAXIMUM
     /* The OS might guarantee only one guard page at the bottom of the stack,
        and a page size can be as small as 4096 bytes.  So we cannot safely
@@ -783,25 +807,23 @@ YYID (yyi)
 #  ifndef YYSTACK_ALLOC_MAXIMUM
 #   define YYSTACK_ALLOC_MAXIMUM YYSIZE_MAXIMUM
 #  endif
-#  if (defined __cplusplus && ! defined _STDLIB_H \
+#  if (defined __cplusplus && ! defined EXIT_SUCCESS \
        && ! ((defined YYMALLOC || defined malloc) \
-	     && (defined YYFREE || defined free)))
+             && (defined YYFREE || defined free)))
 #   include <stdlib.h> /* INFRINGES ON USER NAME SPACE */
-#   ifndef _STDLIB_H
-#    define _STDLIB_H 1
+#   ifndef EXIT_SUCCESS
+#    define EXIT_SUCCESS 0
 #   endif
 #  endif
 #  ifndef YYMALLOC
 #   define YYMALLOC malloc
-#   if ! defined malloc && ! defined _STDLIB_H && (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
+#   if ! defined malloc && ! defined EXIT_SUCCESS
 void *malloc (YYSIZE_T); /* INFRINGES ON USER NAME SPACE */
 #   endif
 #  endif
 #  ifndef YYFREE
 #   define YYFREE free
-#   if ! defined free && ! defined _STDLIB_H && (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
+#   if ! defined free && ! defined EXIT_SUCCESS
 void free (void *); /* INFRINGES ON USER NAME SPACE */
 #   endif
 #  endif
@@ -811,7 +833,7 @@ void free (void *); /* INFRINGES ON USER NAME SPACE */
 
 #if (! defined yyoverflow \
      && (! defined __cplusplus \
-	 || (defined YYSTYPE_IS_TRIVIAL && YYSTYPE_IS_TRIVIAL)))
+         || (defined YYSTYPE_IS_TRIVIAL && YYSTYPE_IS_TRIVIAL)))
 
 /* A type that is properly aligned for any stack member.  */
 union yyalloc
@@ -829,41 +851,45 @@ union yyalloc
      ((N) * (sizeof (yytype_int16) + sizeof (YYSTYPE)) \
       + YYSTACK_GAP_MAXIMUM)
 
-/* Copy COUNT objects from FROM to TO.  The source and destination do
-   not overlap.  */
-# ifndef YYCOPY
-#  if defined __GNUC__ && 1 < __GNUC__
-#   define YYCOPY(To, From, Count) \
-      __builtin_memcpy (To, From, (Count) * sizeof (*(From)))
-#  else
-#   define YYCOPY(To, From, Count)		\
-      do					\
-	{					\
-	  YYSIZE_T yyi;				\
-	  for (yyi = 0; yyi < (Count); yyi++)	\
-	    (To)[yyi] = (From)[yyi];		\
-	}					\
-      while (YYID (0))
-#  endif
-# endif
+# define YYCOPY_NEEDED 1
 
 /* Relocate STACK from its old location to the new one.  The
    local variables YYSIZE and YYSTACKSIZE give the old and new number of
    elements in the stack, and YYPTR gives the new location of the
    stack.  Advance YYPTR to a properly aligned location for the next
    stack.  */
-# define YYSTACK_RELOCATE(Stack_alloc, Stack)				\
-    do									\
-      {									\
-	YYSIZE_T yynewbytes;						\
-	YYCOPY (&yyptr->Stack_alloc, Stack, yysize);			\
-	Stack = &yyptr->Stack_alloc;					\
-	yynewbytes = yystacksize * sizeof (*Stack) + YYSTACK_GAP_MAXIMUM; \
-	yyptr += yynewbytes / sizeof (*yyptr);				\
-      }									\
-    while (YYID (0))
+# define YYSTACK_RELOCATE(Stack_alloc, Stack)                           \
+    do                                                                  \
+      {                                                                 \
+        YYSIZE_T yynewbytes;                                            \
+        YYCOPY (&yyptr->Stack_alloc, Stack, yysize);                    \
+        Stack = &yyptr->Stack_alloc;                                    \
+        yynewbytes = yystacksize * sizeof (*Stack) + YYSTACK_GAP_MAXIMUM; \
+        yyptr += yynewbytes / sizeof (*yyptr);                          \
+      }                                                                 \
+    while (0)
 
 #endif
+
+#if defined YYCOPY_NEEDED && YYCOPY_NEEDED
+/* Copy COUNT objects from SRC to DST.  The source and destination do
+   not overlap.  */
+# ifndef YYCOPY
+#  if defined __GNUC__ && 1 < __GNUC__
+#   define YYCOPY(Dst, Src, Count) \
+      __builtin_memcpy (Dst, Src, (Count) * sizeof (*(Src)))
+#  else
+#   define YYCOPY(Dst, Src, Count)              \
+      do                                        \
+        {                                       \
+          YYSIZE_T yyi;                         \
+          for (yyi = 0; yyi < (Count); yyi++)   \
+            (Dst)[yyi] = (Src)[yyi];            \
+        }                                       \
+      while (0)
+#  endif
+# endif
+#endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  9
@@ -876,17 +902,19 @@ union yyalloc
 #define YYNNTS  160
 /* YYNRULES -- Number of rules.  */
 #define YYNRULES  406
-/* YYNRULES -- Number of states.  */
+/* YYNSTATES -- Number of states.  */
 #define YYNSTATES  866
 
-/* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
+/* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
+   by yylex, with out-of-bounds checking.  */
 #define YYUNDEFTOK  2
 #define YYMAXUTOK   431
 
-#define YYTRANSLATE(YYX)						\
+#define YYTRANSLATE(YYX)                                                \
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
 
-/* YYTRANSLATE[YYLEX] -- Bison symbol number corresponding to YYLEX.  */
+/* YYTRANSLATE[TOKEN-NUM] -- Symbol number corresponding to TOKEN-NUM
+   as returned by yylex, without out-of-bounds checking.  */
 static const yytype_uint8 yytranslate[] =
 {
        0,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -936,244 +964,54 @@ static const yytype_uint8 yytranslate[] =
 };
 
 #if YYDEBUG
-/* YYPRHS[YYN] -- Index of the first RHS symbol of rule number YYN in
-   YYRHS.  */
-static const yytype_uint16 yyprhs[] =
-{
-       0,     0,     3,     4,     6,     8,    11,    15,    19,    25,
-      27,    29,    35,    41,    45,    62,    63,    66,    67,    70,
-      71,    74,    76,    78,    79,    83,    87,    89,    90,    93,
-      97,    99,   101,   103,   105,   107,   109,   111,   113,   115,
-     117,   119,   121,   123,   125,   127,   129,   131,   133,   135,
-     137,   139,   141,   143,   145,   147,   149,   151,   153,   155,
-     157,   159,   161,   163,   165,   167,   169,   171,   173,   175,
-     177,   179,   181,   183,   185,   187,   189,   191,   193,   195,
-     197,   199,   201,   203,   205,   207,   209,   211,   213,   215,
-     217,   219,   221,   223,   225,   227,   229,   231,   235,   239,
-     245,   249,   255,   261,   267,   271,   275,   281,   287,   293,
-     301,   309,   317,   323,   325,   329,   331,   335,   337,   341,
-     343,   347,   349,   353,   355,   359,   361,   365,   366,   367,
-     376,   381,   383,   384,   386,   388,   394,   398,   399,   400,
-     410,   411,   414,   415,   421,   422,   427,   429,   432,   434,
-     441,   442,   446,   447,   454,   455,   460,   461,   466,   468,
-     469,   474,   478,   480,   484,   488,   494,   500,   508,   513,
-     514,   525,   526,   539,   540,   543,   549,   551,   557,   559,
-     565,   567,   573,   575,   585,   591,   593,   595,   597,   599,
-     601,   605,   607,   609,   611,   619,   625,   627,   629,   631,
-     633,   637,   638,   644,   649,   650,   654,   656,   658,   660,
-     662,   665,   667,   669,   671,   673,   675,   679,   683,   687,
-     689,   691,   695,   697,   699,   703,   707,   708,   714,   717,
-     718,   722,   724,   728,   730,   734,   738,   740,   742,   746,
-     748,   750,   752,   756,   758,   760,   762,   768,   776,   782,
-     791,   793,   797,   803,   809,   817,   825,   832,   838,   839,
-     842,   846,   850,   854,   856,   862,   872,   878,   882,   886,
-     887,   898,   899,   901,   909,   915,   921,   925,   931,   939,
-     949,   951,   953,   955,   957,   959,   960,   963,   965,   969,
-     971,   973,   975,   977,   979,   981,   983,   985,   987,   989,
-     991,   993,   997,   999,  1001,  1006,  1008,  1010,  1015,  1017,
-    1019,  1024,  1026,  1031,  1037,  1039,  1043,  1045,  1049,  1051,
-    1053,  1058,  1068,  1070,  1072,  1077,  1079,  1085,  1087,  1089,
-    1094,  1096,  1098,  1104,  1106,  1108,  1110,  1115,  1117,  1119,
-    1125,  1127,  1129,  1133,  1135,  1137,  1141,  1143,  1148,  1152,
-    1156,  1160,  1164,  1168,  1172,  1174,  1176,  1180,  1182,  1186,
-    1187,  1189,  1191,  1193,  1195,  1199,  1200,  1202,  1204,  1207,
-    1210,  1215,  1222,  1227,  1234,  1241,  1248,  1255,  1258,  1265,
-    1274,  1283,  1294,  1309,  1312,  1314,  1318,  1320,  1324,  1326,
-    1328,  1330,  1332,  1334,  1336,  1338,  1340,  1342,  1344,  1346,
-    1348,  1350,  1352,  1354,  1356,  1358,  1369
-};
-
-/* YYRHS -- A `-1'-separated list of the rules' RHS.  */
-static const yytype_int16 yyrhs[] =
-{
-     195,     0,    -1,    -1,   196,    -1,   197,    -1,   197,   196,
-      -1,   198,   205,   207,    -1,    16,   132,   139,    -1,    15,
-     132,   139,   131,   199,    -1,    59,    -1,     3,    -1,    17,
-     132,    11,   131,   297,    -1,    17,   132,    10,   131,     3,
-      -1,    17,   132,    13,    -1,    17,   132,    12,   131,     3,
-     131,     3,   131,     5,   131,     5,   131,   316,   131,   204,
-     203,    -1,    -1,   131,   129,    -1,    -1,   131,   323,    -1,
-      -1,   131,     3,    -1,     5,    -1,    59,    -1,    -1,    70,
-     132,   206,    -1,    71,   131,   206,    -1,    71,    -1,    -1,
-     209,   207,    -1,   137,   207,   138,    -1,   250,    -1,   200,
-      -1,   305,    -1,   306,    -1,   292,    -1,   252,    -1,   215,
-      -1,   214,    -1,   300,    -1,   264,    -1,   284,    -1,   308,
-      -1,   309,    -1,   294,    -1,   307,    -1,   230,    -1,   240,
-      -1,   242,    -1,   246,    -1,   244,    -1,   227,    -1,   237,
-      -1,   223,    -1,   226,    -1,   287,    -1,   269,    -1,   285,
-      -1,   272,    -1,   278,    -1,   301,    -1,   296,    -1,   290,
-      -1,   251,    -1,   302,    -1,   257,    -1,   255,    -1,   295,
-      -1,   299,    -1,   298,    -1,   288,    -1,   289,    -1,   291,
-      -1,   283,    -1,   286,    -1,   149,    -1,   151,    -1,   153,
-      -1,   155,    -1,   157,    -1,   159,    -1,   161,    -1,   163,
-      -1,   165,    -1,   148,    -1,   150,    -1,   152,    -1,   154,
-      -1,   156,    -1,   158,    -1,   160,    -1,   162,    -1,   164,
-      -1,   210,    -1,   211,    -1,   142,    -1,   142,    -1,   211,
-      -1,    82,   132,   210,    -1,   212,   190,   335,    -1,   212,
-     190,   120,   132,   344,    -1,   212,   190,   334,    -1,   212,
-     190,   350,   132,   328,    -1,   212,   190,   349,   132,   330,
-      -1,   212,   190,   348,   132,   332,    -1,   212,   190,   323,
-      -1,   212,   190,   326,    -1,   212,   190,   137,   221,   138,
-      -1,   212,   190,   137,   220,   138,    -1,   212,   190,   137,
-     219,   138,    -1,   212,   190,   350,   132,   137,   218,   138,
-      -1,   212,   190,   349,   132,   137,   217,   138,    -1,   212,
-     190,   348,   132,   137,   216,   138,    -1,   212,   190,   137,
-     222,   138,    -1,   333,    -1,   216,   131,   333,    -1,   331,
-      -1,   217,   131,   331,    -1,   329,    -1,   218,   131,   329,
-      -1,   327,    -1,   219,   131,   327,    -1,   324,    -1,   220,
-     131,   324,    -1,   335,    -1,   221,   131,   335,    -1,   334,
-      -1,   222,   131,   334,    -1,    -1,    -1,   111,   141,   133,
-     224,   339,   134,   225,   208,    -1,   141,   133,   342,   134,
-      -1,    81,    -1,    -1,     6,    -1,     6,    -1,   135,   335,
-     113,   335,   136,    -1,   135,   335,   136,    -1,    -1,    -1,
-      88,   231,   135,   322,   136,   232,   137,   233,   138,    -1,
-      -1,   234,   233,    -1,    -1,    89,   346,   132,   235,   207,
-      -1,    -1,    91,   132,   236,   207,    -1,    90,    -1,   191,
-     191,    -1,    87,    -1,    86,   213,   190,   335,   238,   335,
-      -1,    -1,   239,   241,   208,    -1,    -1,    85,   135,   322,
-     136,   243,   208,    -1,    -1,   229,   132,   245,   209,    -1,
-      -1,    76,   229,   247,   248,    -1,   208,    -1,    -1,   208,
-     249,    77,   208,    -1,    14,   132,   334,    -1,    53,    -1,
-      53,   132,   346,    -1,    53,   132,    59,    -1,    46,   132,
-     253,   131,   253,    -1,    46,   132,   253,   131,   346,    -1,
-     133,     4,   131,    58,   131,   268,   134,    -1,   311,   228,
-     131,   316,    -1,    -1,    68,   132,   254,   131,   261,   131,
-     263,   312,   256,   208,    -1,    -1,    40,   132,   254,   131,
-     260,   131,   262,   131,   263,   312,   258,   208,    -1,    -1,
-     131,     5,    -1,   133,     4,   131,     4,   134,    -1,    59,
-      -1,   133,     4,   131,     4,   134,    -1,    59,    -1,   133,
-     270,   131,   271,   134,    -1,    59,    -1,   133,     4,   131,
-       4,   134,    -1,    59,    -1,    75,   132,   265,   131,   315,
-     131,   266,   131,   268,    -1,    24,   132,   315,   131,   344,
-      -1,     5,    -1,    59,    -1,   267,    -1,    59,    -1,    58,
-      -1,    58,   192,   267,    -1,     4,    -1,    59,    -1,    19,
-      -1,    18,   132,   270,   131,   271,   259,   140,    -1,    18,
-     132,   323,   259,   140,    -1,    63,    -1,    64,    -1,    65,
-      -1,    64,    -1,    22,   132,   274,    -1,    -1,    22,   132,
-     274,   273,   208,    -1,   330,   131,   323,   275,    -1,    -1,
-     275,   131,   276,    -1,   334,    -1,    72,    -1,    73,    -1,
-     318,    -1,    74,   334,    -1,    97,    -1,    95,    -1,    98,
-      -1,    99,    -1,   100,    -1,   101,   132,   322,    -1,   102,
-     132,   322,    -1,   103,   132,   322,    -1,   104,    -1,   105,
-      -1,   106,   132,   277,    -1,   139,    -1,   107,    -1,   139,
-     192,   277,    -1,    20,   132,   280,    -1,    -1,    21,   132,
-     280,   279,   208,    -1,   332,   281,    -1,    -1,   281,   131,
-     282,    -1,    56,    -1,   108,   132,   330,    -1,   347,    -1,
-      69,   132,   334,    -1,    83,   132,   322,    -1,    84,    -1,
-      55,    -1,    92,   132,   322,    -1,   110,    -1,    54,    -1,
-      93,    -1,    94,   132,   322,    -1,    95,    -1,    96,    -1,
-     323,    -1,    23,   132,   310,   131,   323,    -1,    25,   132,
-     323,   131,    58,   131,   315,    -1,    29,   132,   323,   131,
-      58,    -1,    29,   132,   323,   131,    58,   131,     5,   203,
-      -1,    30,    -1,    30,   132,   344,    -1,    36,   132,   323,
-     131,    67,    -1,    37,   132,   323,   131,    67,    -1,    37,
-     132,   352,   131,   352,   131,    67,    -1,    41,   132,   352,
-     131,   352,   131,   139,    -1,    42,   132,   352,   131,   352,
-     293,    -1,    43,   132,   352,   131,   352,    -1,    -1,   131,
-      67,    -1,    49,   132,   344,    -1,    51,   132,   344,    -1,
-      50,   132,   344,    -1,     3,    -1,   133,     3,   131,   316,
-     134,    -1,    80,   132,   326,   131,   328,   131,   328,   131,
-       7,    -1,    78,   132,   344,   131,   328,    -1,    38,   132,
-     326,    -1,    39,   132,   326,    -1,    -1,    31,   132,   326,
-     131,   316,   131,   311,   312,   303,   304,    -1,    -1,   208,
-      -1,    35,   132,   323,   131,   317,   131,   319,    -1,   109,
-     132,   323,   131,   334,    -1,   109,   132,   323,   131,    59,
-      -1,   109,   132,   323,    -1,    47,   132,   335,   131,   323,
-      -1,    48,   132,   323,   131,   351,   131,   334,    -1,    45,
-     132,   322,   131,   322,   131,   322,   131,   322,    -1,    45,
-      -1,   139,    -1,    59,    -1,   139,    -1,    59,    -1,    -1,
-     131,   313,    -1,   314,    -1,   314,   131,   313,    -1,    32,
-      -1,    33,    -1,    34,    -1,    54,    -1,    59,    -1,    55,
-      -1,    59,    -1,    62,    -1,   320,    -1,    59,    -1,    62,
-      -1,   320,    -1,    61,   132,    59,    -1,    66,    -1,    59,
-      -1,    61,   135,     4,   136,    -1,   139,    -1,   150,    -1,
-     151,   135,   335,   136,    -1,   335,    -1,   324,    -1,   122,
-     133,   344,   134,    -1,   154,    -1,   155,   135,   335,   136,
-      -1,   133,     4,   131,     4,   134,    -1,    59,    -1,    60,
-     325,   136,    -1,   130,    -1,   130,   131,   325,    -1,   327,
-      -1,   156,    -1,   157,   135,   335,   136,    -1,   133,     4,
-     131,     4,   131,     4,   131,     4,   134,    -1,   329,    -1,
-     158,    -1,   159,   135,   335,   136,    -1,     3,    -1,   133,
-       3,   131,   316,   134,    -1,   331,    -1,   160,    -1,   161,
-     135,   335,   136,    -1,   139,    -1,     3,    -1,   133,     3,
-     131,   139,   134,    -1,    59,    -1,   333,    -1,   162,    -1,
-     163,   135,   335,   136,    -1,   139,    -1,     3,    -1,   133,
-       3,   131,   139,   134,    -1,    59,    -1,   321,    -1,   334,
-     191,   321,    -1,     4,    -1,   345,    -1,   133,     8,   134,
-      -1,   148,    -1,   149,   135,   335,   136,    -1,   335,   185,
-     335,    -1,   335,   186,   335,    -1,   335,   187,   335,    -1,
-     335,   188,   335,    -1,   335,   189,   335,    -1,   133,   335,
-     134,    -1,   144,    -1,   145,    -1,   212,   132,   336,    -1,
-     337,    -1,   338,   131,   337,    -1,    -1,   338,    -1,   335,
-      -1,   334,    -1,   340,    -1,   341,   131,   340,    -1,    -1,
-     341,    -1,   323,    -1,   115,   326,    -1,   116,   326,    -1,
-     117,   323,   186,   323,    -1,   118,   323,   186,   323,   131,
-     335,    -1,   119,   133,   344,   134,    -1,   119,   133,   267,
-     131,   344,   134,    -1,   125,   133,     7,   131,   344,   134,
-      -1,   125,   133,   344,   131,   344,   134,    -1,   125,   133,
-     328,   131,   344,   134,    -1,   121,   323,    -1,   123,   133,
-     323,   131,   335,   134,    -1,   123,   133,   323,   131,   335,
-     131,    32,   134,    -1,   124,   133,   323,   131,   335,   131,
-     335,   134,    -1,   124,   133,   323,   131,   335,   131,   335,
-     131,    32,   134,    -1,   127,   133,   128,   131,   133,   335,
-     186,   335,   201,   134,   131,   323,   202,   134,    -1,   126,
-     343,    -1,   164,    -1,   133,   344,   134,    -1,   343,    -1,
-     343,   193,   344,    -1,   184,    -1,     8,    -1,     9,    -1,
-       4,    -1,     8,    -1,     9,    -1,     4,    -1,   345,    -1,
-      26,    -1,    20,    -1,    27,    -1,    22,    -1,    28,    -1,
-      78,    -1,    57,    -1,    59,    -1,   353,    -1,    44,   133,
-       4,   131,     4,   131,     4,   131,     4,   134,    -1,   133,
-       4,   131,     4,   131,     4,   131,     4,   134,    -1
-};
-
-/* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
+  /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   273,   273,   274,   277,   278,   281,   303,   308,   324,
-     328,   334,   343,   352,   356,   382,   385,   392,   396,   403,
-     406,   413,   414,   418,   421,   427,   431,   438,   441,   447,
-     453,   454,   455,   456,   457,   458,   459,   460,   461,   462,
-     463,   464,   465,   466,   467,   468,   469,   470,   471,   472,
-     473,   474,   475,   476,   477,   478,   479,   480,   481,   482,
-     483,   484,   485,   486,   487,   488,   489,   490,   491,   492,
-     493,   494,   495,   496,   499,   500,   501,   502,   503,   504,
-     505,   506,   507,   510,   511,   512,   513,   514,   515,   516,
-     517,   518,   521,   522,   523,   526,   527,   530,   542,   548,
-     554,   560,   566,   572,   578,   584,   590,   597,   604,   611,
-     618,   625,   632,   641,   646,   653,   658,   665,   670,   677,
-     681,   687,   692,   699,   703,   709,   713,   720,   742,   719,
-     756,   801,   808,   811,   817,   823,   827,   836,   840,   835,
-     897,   898,   902,   901,   914,   913,   928,   938,   939,   942,
-     975,   974,  1000,   999,  1029,  1028,  1059,  1058,  1084,  1093,
-    1092,  1119,  1125,  1129,  1133,  1139,  1146,  1155,  1163,  1174,
-    1173,  1189,  1188,  1205,  1208,  1214,  1224,  1230,  1239,  1245,
-    1250,  1256,  1261,  1267,  1276,  1282,  1283,  1286,  1287,  1290,
-    1294,  1300,  1301,  1304,  1310,  1316,  1324,  1325,  1328,  1329,
-    1332,  1337,  1336,  1350,  1357,  1363,  1371,  1376,  1381,  1386,
-    1391,  1396,  1401,  1406,  1411,  1416,  1421,  1426,  1431,  1436,
-    1441,  1446,  1453,  1460,  1464,  1477,  1484,  1483,  1499,  1507,
-    1513,  1521,  1526,  1531,  1536,  1541,  1546,  1551,  1556,  1561,
-    1566,  1577,  1582,  1587,  1592,  1597,  1604,  1610,  1637,  1642,
-    1649,  1653,  1659,  1665,  1671,  1681,  1691,  1706,  1716,  1719,
-    1725,  1731,  1737,  1743,  1748,  1755,  1761,  1767,  1773,  1780,
-    1779,  1803,  1806,  1812,  1818,  1822,  1827,  1834,  1840,  1847,
-    1851,  1857,  1865,  1868,  1878,  1882,  1885,  1891,  1895,  1902,
-    1906,  1910,  1916,  1917,  1920,  1921,  1924,  1925,  1926,  1932,
-    1933,  1934,  1940,  1941,  1944,  1953,  1958,  1965,  1975,  1981,
-    1985,  1989,  1996,  2005,  2011,  2015,  2021,  2025,  2033,  2037,
-    2044,  2053,  2064,  2068,  2075,  2084,  2093,  2104,  2108,  2115,
-    2124,  2133,  2142,  2151,  2157,  2161,  2168,  2177,  2187,  2196,
-    2205,  2212,  2213,  2219,  2220,  2221,  2222,  2230,  2238,  2239,
-    2240,  2241,  2242,  2243,  2246,  2252,  2260,  2289,  2290,  2293,
-    2294,  2297,  2301,  2308,  2315,  2326,  2329,  2337,  2341,  2345,
-    2349,  2353,  2358,  2362,  2366,  2370,  2374,  2378,  2382,  2386,
-    2390,  2394,  2398,  2402,  2406,  2413,  2419,  2423,  2429,  2435,
-    2436,  2437,  2440,  2444,  2448,  2452,  2458,  2459,  2462,  2463,
-    2466,  2467,  2470,  2471,  2474,  2478,  2496
+       0,   275,   275,   276,   279,   280,   283,   305,   310,   326,
+     330,   336,   345,   354,   358,   384,   387,   394,   398,   405,
+     408,   415,   416,   420,   423,   429,   433,   440,   443,   449,
+     455,   456,   457,   458,   459,   460,   461,   462,   463,   464,
+     465,   466,   467,   468,   469,   470,   471,   472,   473,   474,
+     475,   476,   477,   478,   479,   480,   481,   482,   483,   484,
+     485,   486,   487,   488,   489,   490,   491,   492,   493,   494,
+     495,   496,   497,   498,   501,   502,   503,   504,   505,   506,
+     507,   508,   509,   512,   513,   514,   515,   516,   517,   518,
+     519,   520,   523,   524,   525,   528,   529,   532,   544,   550,
+     556,   562,   568,   574,   580,   586,   592,   599,   606,   613,
+     620,   627,   634,   643,   648,   655,   660,   667,   672,   679,
+     683,   689,   694,   701,   705,   711,   715,   722,   744,   721,
+     758,   803,   810,   813,   819,   825,   829,   838,   842,   837,
+     899,   900,   904,   903,   916,   915,   930,   940,   941,   944,
+     977,   976,  1002,  1001,  1031,  1030,  1061,  1060,  1086,  1095,
+    1094,  1121,  1127,  1131,  1135,  1141,  1148,  1157,  1165,  1176,
+    1175,  1191,  1190,  1207,  1210,  1216,  1226,  1232,  1241,  1247,
+    1252,  1258,  1263,  1269,  1278,  1284,  1285,  1288,  1289,  1292,
+    1296,  1302,  1303,  1306,  1312,  1318,  1326,  1327,  1330,  1331,
+    1334,  1339,  1338,  1352,  1359,  1365,  1373,  1378,  1383,  1388,
+    1393,  1398,  1403,  1408,  1413,  1418,  1423,  1428,  1433,  1438,
+    1443,  1448,  1455,  1462,  1466,  1479,  1486,  1485,  1501,  1509,
+    1515,  1523,  1528,  1533,  1538,  1543,  1548,  1553,  1558,  1563,
+    1568,  1579,  1584,  1589,  1594,  1599,  1606,  1612,  1639,  1644,
+    1651,  1655,  1661,  1667,  1673,  1683,  1693,  1708,  1718,  1721,
+    1727,  1733,  1739,  1745,  1750,  1757,  1763,  1769,  1775,  1782,
+    1781,  1805,  1808,  1814,  1820,  1824,  1829,  1836,  1842,  1849,
+    1853,  1859,  1867,  1870,  1880,  1884,  1887,  1893,  1897,  1904,
+    1908,  1912,  1918,  1919,  1922,  1923,  1926,  1927,  1928,  1934,
+    1935,  1936,  1942,  1943,  1946,  1955,  1960,  1967,  1977,  1983,
+    1987,  1991,  1998,  2007,  2013,  2017,  2023,  2027,  2035,  2039,
+    2046,  2055,  2066,  2070,  2077,  2086,  2095,  2106,  2110,  2117,
+    2126,  2135,  2144,  2153,  2159,  2163,  2170,  2179,  2189,  2198,
+    2207,  2214,  2215,  2221,  2222,  2223,  2224,  2232,  2240,  2241,
+    2242,  2243,  2244,  2245,  2248,  2254,  2262,  2291,  2292,  2295,
+    2296,  2299,  2303,  2310,  2317,  2328,  2331,  2339,  2343,  2347,
+    2351,  2355,  2360,  2364,  2368,  2372,  2376,  2380,  2384,  2388,
+    2392,  2396,  2400,  2404,  2408,  2415,  2421,  2425,  2431,  2437,
+    2438,  2439,  2442,  2446,  2450,  2454,  2460,  2461,  2464,  2465,
+    2468,  2469,  2472,  2473,  2476,  2480,  2498
 };
 #endif
 
-#if YYDEBUG || YYERROR_VERBOSE || YYTOKEN_TABLE
+#if YYDEBUG || YYERROR_VERBOSE || 0
 /* YYTNAME[SYMBOL-NUM] -- String name of the symbol SYMBOL-NUM.
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
@@ -1255,13 +1093,13 @@ static const char *const yytname[] =
   "func_call_param_part", "func_call_param_list", "func_call_params_list",
   "ter_selection_x", "ter_selection", "dice", "all_integers",
   "all_ints_push", "objectid", "monsterid", "terrainid", "engraving_type",
-  "lev_region", "region", 0
+  "lev_region", "region", YY_NULLPTR
 };
 #endif
 
 # ifdef YYPRINT
-/* YYTOKNUM[YYLEX-NUM] -- Internal token number corresponding to
-   token YYLEX-NUM.  */
+/* YYTOKNUM[NUM] -- (External) token number corresponding to the
+   (internal) symbol number NUM (which must be that of a token).  */
 static const yytype_uint16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
@@ -1287,216 +1125,18 @@ static const yytype_uint16 yytoknum[] =
 };
 # endif
 
-/* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
-static const yytype_uint16 yyr1[] =
-{
-       0,   194,   195,   195,   196,   196,   197,   198,   198,   199,
-     199,   200,   200,   200,   200,   201,   201,   202,   202,   203,
-     203,   204,   204,   205,   205,   206,   206,   207,   207,   208,
-     209,   209,   209,   209,   209,   209,   209,   209,   209,   209,
-     209,   209,   209,   209,   209,   209,   209,   209,   209,   209,
-     209,   209,   209,   209,   209,   209,   209,   209,   209,   209,
-     209,   209,   209,   209,   209,   209,   209,   209,   209,   209,
-     209,   209,   209,   209,   210,   210,   210,   210,   210,   210,
-     210,   210,   210,   211,   211,   211,   211,   211,   211,   211,
-     211,   211,   212,   212,   212,   213,   213,   214,   215,   215,
-     215,   215,   215,   215,   215,   215,   215,   215,   215,   215,
-     215,   215,   215,   216,   216,   217,   217,   218,   218,   219,
-     219,   220,   220,   221,   221,   222,   222,   224,   225,   223,
-     226,   227,   228,   228,   229,   229,   229,   231,   232,   230,
-     233,   233,   235,   234,   236,   234,   237,   238,   238,   239,
-     241,   240,   243,   242,   245,   244,   247,   246,   248,   249,
-     248,   250,   251,   251,   251,   252,   252,   253,   254,   256,
-     255,   258,   257,   259,   259,   260,   260,   261,   261,   262,
-     262,   263,   263,   264,   264,   265,   265,   266,   266,   267,
-     267,   268,   268,   269,   269,   269,   270,   270,   271,   271,
-     272,   273,   272,   274,   275,   275,   276,   276,   276,   276,
-     276,   276,   276,   276,   276,   276,   276,   276,   276,   276,
-     276,   276,   277,   277,   277,   278,   279,   278,   280,   281,
-     281,   282,   282,   282,   282,   282,   282,   282,   282,   282,
-     282,   282,   282,   282,   282,   282,   283,   284,   285,   285,
-     286,   286,   287,   288,   289,   290,   291,   292,   293,   293,
-     294,   295,   296,   297,   297,   298,   299,   300,   301,   303,
-     302,   304,   304,   305,   306,   306,   306,   307,   308,   309,
-     309,   310,   310,   311,   311,   312,   312,   313,   313,   314,
-     314,   314,   315,   315,   316,   316,   317,   317,   317,   318,
-     318,   318,   319,   319,   320,   321,   321,   321,   322,   323,
-     323,   323,   323,   324,   324,   324,   325,   325,   326,   326,
-     326,   327,   328,   328,   328,   329,   329,   330,   330,   330,
-     331,   331,   331,   331,   332,   332,   332,   333,   333,   333,
-     333,   334,   334,   335,   335,   335,   335,   335,   335,   335,
-     335,   335,   335,   335,   336,   336,   337,   338,   338,   339,
-     339,   340,   340,   341,   341,   342,   342,   343,   343,   343,
-     343,   343,   343,   343,   343,   343,   343,   343,   343,   343,
-     343,   343,   343,   343,   343,   343,   344,   344,   345,   346,
-     346,   346,   347,   347,   347,   347,   348,   348,   349,   349,
-     350,   350,   351,   351,   352,   352,   353
-};
-
-/* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
-static const yytype_uint8 yyr2[] =
-{
-       0,     2,     0,     1,     1,     2,     3,     3,     5,     1,
-       1,     5,     5,     3,    16,     0,     2,     0,     2,     0,
-       2,     1,     1,     0,     3,     3,     1,     0,     2,     3,
-       1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
-       1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
-       1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
-       1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
-       1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
-       1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
-       1,     1,     1,     1,     1,     1,     1,     3,     3,     5,
-       3,     5,     5,     5,     3,     3,     5,     5,     5,     7,
-       7,     7,     5,     1,     3,     1,     3,     1,     3,     1,
-       3,     1,     3,     1,     3,     1,     3,     0,     0,     8,
-       4,     1,     0,     1,     1,     5,     3,     0,     0,     9,
-       0,     2,     0,     5,     0,     4,     1,     2,     1,     6,
-       0,     3,     0,     6,     0,     4,     0,     4,     1,     0,
-       4,     3,     1,     3,     3,     5,     5,     7,     4,     0,
-      10,     0,    12,     0,     2,     5,     1,     5,     1,     5,
-       1,     5,     1,     9,     5,     1,     1,     1,     1,     1,
-       3,     1,     1,     1,     7,     5,     1,     1,     1,     1,
-       3,     0,     5,     4,     0,     3,     1,     1,     1,     1,
-       2,     1,     1,     1,     1,     1,     3,     3,     3,     1,
-       1,     3,     1,     1,     3,     3,     0,     5,     2,     0,
-       3,     1,     3,     1,     3,     3,     1,     1,     3,     1,
-       1,     1,     3,     1,     1,     1,     5,     7,     5,     8,
-       1,     3,     5,     5,     7,     7,     6,     5,     0,     2,
-       3,     3,     3,     1,     5,     9,     5,     3,     3,     0,
-      10,     0,     1,     7,     5,     5,     3,     5,     7,     9,
-       1,     1,     1,     1,     1,     0,     2,     1,     3,     1,
-       1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
-       1,     3,     1,     1,     4,     1,     1,     4,     1,     1,
-       4,     1,     4,     5,     1,     3,     1,     3,     1,     1,
-       4,     9,     1,     1,     4,     1,     5,     1,     1,     4,
-       1,     1,     5,     1,     1,     1,     4,     1,     1,     5,
-       1,     1,     3,     1,     1,     3,     1,     4,     3,     3,
-       3,     3,     3,     3,     1,     1,     3,     1,     3,     0,
-       1,     1,     1,     1,     3,     0,     1,     1,     2,     2,
-       4,     6,     4,     6,     6,     6,     6,     2,     6,     8,
-       8,    10,    14,     2,     1,     3,     1,     3,     1,     1,
-       1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
-       1,     1,     1,     1,     1,    10,     9
-};
-
-/* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
-   STATE-NUM when YYTABLE doesn't specify something else to do.  Zero
-   means the default is an error.  */
-static const yytype_uint16 yydefact[] =
-{
-       2,     0,     0,     0,     3,     4,    23,     0,     0,     1,
-       5,     0,    27,     0,     7,     0,   134,     0,     0,     0,
-     193,     0,     0,     0,     0,     0,     0,     0,   250,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,   280,
-       0,     0,     0,     0,     0,     0,   162,     0,     0,     0,
-       0,     0,   131,     0,     0,     0,   137,   146,     0,     0,
-       0,     0,    94,    83,    74,    84,    75,    85,    76,    86,
-      77,    87,    78,    88,    79,    89,    80,    90,    81,    91,
-      82,    31,     6,    27,    92,    93,     0,    37,    36,    52,
-      53,    50,     0,    45,    51,   150,    46,    47,    49,    48,
-      30,    62,    35,    65,    64,    39,    55,    57,    58,    72,
-      40,    56,    73,    54,    69,    70,    61,    71,    34,    43,
-      66,    60,    68,    67,    38,    59,    63,    32,    33,    44,
-      41,    42,     0,    26,    24,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,   156,     0,     0,     0,
-       0,    95,    96,     0,     0,     0,     0,   343,     0,   346,
-       0,   388,     0,   344,   365,    28,     0,   154,     0,    10,
-       9,     8,     0,   305,   306,     0,   341,   161,     0,     0,
-       0,    13,   314,     0,   196,   197,     0,     0,   311,     0,
-       0,   173,   309,   338,   340,     0,   337,   335,     0,   225,
-     229,   334,   226,   331,   333,     0,   330,   328,     0,   200,
-       0,   327,   282,   281,     0,   292,   293,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,   384,   367,   386,   251,     0,   319,     0,     0,
-     318,     0,     0,     0,     0,     0,     0,   404,   267,   268,
-     284,   283,     0,   132,     0,     0,     0,     0,     0,   308,
-       0,     0,     0,     0,   260,   262,   261,   391,   389,   390,
-     164,   163,     0,   185,   186,     0,     0,     0,     0,    97,
-       0,     0,     0,   276,   127,     0,     0,     0,     0,   136,
-       0,     0,     0,     0,     0,   362,   361,   363,   366,     0,
-     397,   399,   396,   398,   400,   401,     0,     0,     0,   104,
-     105,   100,    98,     0,     0,     0,     0,    27,   151,    25,
-       0,     0,     0,     0,     0,   316,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,   228,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,   368,   369,     0,     0,     0,
-     377,     0,     0,     0,   383,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,   133,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,   158,   157,     0,     0,   152,     0,     0,     0,   359,
-     345,   353,     0,     0,   348,   349,   350,   351,   352,     0,
-     130,     0,   343,     0,     0,     0,     0,   121,   119,   125,
-     123,     0,     0,     0,   155,     0,     0,   342,    12,   263,
-       0,    11,     0,     0,   315,     0,     0,     0,   199,   198,
-     173,   174,   195,     0,     0,     0,   227,     0,     0,   202,
-     204,   246,   184,     0,   248,     0,     0,   189,     0,     0,
-       0,     0,   325,     0,     0,   323,     0,     0,   322,     0,
-       0,   385,   387,     0,     0,   294,   295,     0,   298,     0,
-     296,     0,   297,   252,     0,     0,   253,     0,   176,     0,
-       0,     0,     0,     0,   258,   257,     0,     0,   165,   166,
-     277,   402,   403,     0,   178,     0,     0,     0,     0,     0,
-     266,     0,     0,   148,     0,     0,   138,   275,   274,     0,
-     357,   360,     0,   347,   135,   364,    99,     0,     0,   108,
-       0,   107,     0,   106,     0,   112,     0,   103,     0,   102,
-       0,   101,    29,   307,     0,     0,   317,   310,     0,   312,
-       0,     0,   336,   394,   392,   393,   240,   237,   231,     0,
-       0,   236,     0,   241,     0,   243,   244,     0,   239,   230,
-     245,   395,   233,     0,   329,   203,     0,     0,   370,     0,
-       0,     0,   372,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,   320,     0,     0,     0,     0,     0,     0,     0,
-       0,   168,     0,     0,     0,   256,     0,     0,     0,     0,
-       0,     0,     0,     0,   153,   147,   149,     0,     0,     0,
-     128,     0,   120,   122,   124,   126,     0,   113,     0,   115,
-       0,   117,     0,     0,   313,   194,   339,     0,     0,     0,
-       0,     0,   332,     0,   247,    19,     0,   190,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,   285,     0,
-     303,   302,   273,     0,     0,   254,     0,   180,     0,     0,
-     255,   259,     0,     0,   278,     0,   182,     0,   285,   188,
-       0,   187,   160,     0,   140,   354,   355,   356,   358,     0,
-       0,   111,     0,   110,     0,   109,     0,     0,   234,   235,
-     238,   242,   232,     0,   299,   207,   208,     0,   212,   211,
-     213,   214,   215,     0,     0,     0,   219,   220,     0,   205,
-     209,   300,   206,     0,   249,   371,   373,     0,   378,     0,
-     374,     0,   324,   376,   375,     0,     0,     0,   269,   304,
-       0,     0,     0,     0,     0,     0,   191,   192,     0,     0,
-       0,   169,     0,     0,     0,     0,     0,   140,   129,   114,
-     116,   118,   264,     0,     0,   210,     0,     0,     0,     0,
-      20,     0,     0,   326,     0,     0,   289,   290,   291,   286,
-     287,   271,     0,     0,   175,     0,   285,   279,   167,   177,
-       0,     0,   183,   265,     0,   144,   139,   141,     0,   301,
-     216,   217,   218,   223,   222,   221,   379,     0,   380,   349,
-       0,     0,   272,   270,     0,     0,     0,   171,     0,   170,
-     142,    27,     0,     0,     0,     0,     0,   321,   288,     0,
-     406,   179,     0,   181,    27,   145,     0,   224,   381,    16,
-       0,   405,   172,   143,     0,     0,     0,    17,    21,    22,
-      19,     0,     0,    14,    18,   382
-};
-
-/* YYDEFGOTO[NTERM-NUM].  */
-static const yytype_int16 yydefgoto[] =
-{
-      -1,     3,     4,     5,     6,   191,    81,   836,   862,   734,
-     860,    12,   134,    82,   338,    83,    84,    85,    86,   173,
-      87,    88,   636,   638,   640,   423,   424,   425,   426,    89,
-     409,   699,    90,    91,   389,    92,    93,   174,   627,   766,
-     767,   844,   831,    94,   525,    95,    96,   188,    97,   522,
-      98,   336,    99,   296,   402,   518,   100,   101,   102,   281,
-     272,   103,   801,   104,   842,   352,   500,   516,   679,   688,
-     105,   295,   690,   468,   758,   106,   210,   450,   107,   359,
-     229,   585,   729,   815,   108,   356,   219,   355,   579,   109,
-     110,   111,   112,   113,   114,   115,   116,   117,   118,   615,
-     119,   120,   121,   441,   122,   123,   124,   125,   126,   791,
-     823,   127,   128,   129,   130,   131,   234,   273,   748,   789,
-     790,   237,   487,   491,   730,   672,   492,   196,   278,   253,
-     212,   346,   259,   260,   477,   478,   230,   231,   220,   221,
-     315,   279,   697,   530,   531,   532,   317,   318,   319,   254,
-     376,   183,   291,   582,   333,   334,   335,   513,   266,   267
-};
-
-/* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
-   STATE-NUM.  */
 #define YYPACT_NINF -654
+
+#define yypact_value_is_default(Yystate) \
+  (!!((Yystate) == (-654)))
+
+#define YYTABLE_NINF -202
+
+#define yytable_value_is_error(Yytable_value) \
+  0
+
+  /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
+     STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
      137,     7,    27,    83,  -654,   137,    24,   -15,    37,  -654,
@@ -1588,7 +1228,101 @@ static const yytype_int16 yypact[] =
      809,   -18,   875,  -654,  -654,  -654
 };
 
-/* YYPGOTO[NTERM-NUM].  */
+  /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
+     Performed when YYTABLE does not specify something else to do.  Zero
+     means the default is an error.  */
+static const yytype_uint16 yydefact[] =
+{
+       2,     0,     0,     0,     3,     4,    23,     0,     0,     1,
+       5,     0,    27,     0,     7,     0,   134,     0,     0,     0,
+     193,     0,     0,     0,     0,     0,     0,     0,   250,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,   280,
+       0,     0,     0,     0,     0,     0,   162,     0,     0,     0,
+       0,     0,   131,     0,     0,     0,   137,   146,     0,     0,
+       0,     0,    94,    83,    74,    84,    75,    85,    76,    86,
+      77,    87,    78,    88,    79,    89,    80,    90,    81,    91,
+      82,    31,     6,    27,    92,    93,     0,    37,    36,    52,
+      53,    50,     0,    45,    51,   150,    46,    47,    49,    48,
+      30,    62,    35,    65,    64,    39,    55,    57,    58,    72,
+      40,    56,    73,    54,    69,    70,    61,    71,    34,    43,
+      66,    60,    68,    67,    38,    59,    63,    32,    33,    44,
+      41,    42,     0,    26,    24,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,   156,     0,     0,     0,
+       0,    95,    96,     0,     0,     0,     0,   343,     0,   346,
+       0,   388,     0,   344,   365,    28,     0,   154,     0,    10,
+       9,     8,     0,   305,   306,     0,   341,   161,     0,     0,
+       0,    13,   314,     0,   196,   197,     0,     0,   311,     0,
+       0,   173,   309,   338,   340,     0,   337,   335,     0,   225,
+     229,   334,   226,   331,   333,     0,   330,   328,     0,   200,
+       0,   327,   282,   281,     0,   292,   293,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,   384,   367,   386,   251,     0,   319,     0,     0,
+     318,     0,     0,     0,     0,     0,     0,   404,   267,   268,
+     284,   283,     0,   132,     0,     0,     0,     0,     0,   308,
+       0,     0,     0,     0,   260,   262,   261,   391,   389,   390,
+     164,   163,     0,   185,   186,     0,     0,     0,     0,    97,
+       0,     0,     0,   276,   127,     0,     0,     0,     0,   136,
+       0,     0,     0,     0,     0,   362,   361,   363,   366,     0,
+     397,   399,   396,   398,   400,   401,     0,     0,     0,   104,
+     105,   100,    98,     0,     0,     0,     0,    27,   151,    25,
+       0,     0,     0,     0,     0,   316,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,   228,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,   368,   369,     0,     0,     0,
+     377,     0,     0,     0,   383,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,   133,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,   158,   157,     0,     0,   152,     0,     0,     0,   359,
+     345,   353,     0,     0,   348,   349,   350,   351,   352,     0,
+     130,     0,   343,     0,     0,     0,     0,   121,   119,   125,
+     123,     0,     0,     0,   155,     0,     0,   342,    12,   263,
+       0,    11,     0,     0,   315,     0,     0,     0,   199,   198,
+     173,   174,   195,     0,     0,     0,   227,     0,     0,   202,
+     204,   246,   184,     0,   248,     0,     0,   189,     0,     0,
+       0,     0,   325,     0,     0,   323,     0,     0,   322,     0,
+       0,   385,   387,     0,     0,   294,   295,     0,   298,     0,
+     296,     0,   297,   252,     0,     0,   253,     0,   176,     0,
+       0,     0,     0,     0,   258,   257,     0,     0,   165,   166,
+     277,   402,   403,     0,   178,     0,     0,     0,     0,     0,
+     266,     0,     0,   148,     0,     0,   138,   275,   274,     0,
+     357,   360,     0,   347,   135,   364,    99,     0,     0,   108,
+       0,   107,     0,   106,     0,   112,     0,   103,     0,   102,
+       0,   101,    29,   307,     0,     0,   317,   310,     0,   312,
+       0,     0,   336,   394,   392,   393,   240,   237,   231,     0,
+       0,   236,     0,   241,     0,   243,   244,     0,   239,   230,
+     245,   395,   233,     0,   329,   203,     0,     0,   370,     0,
+       0,     0,   372,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,   320,     0,     0,     0,     0,     0,     0,     0,
+       0,   168,     0,     0,     0,   256,     0,     0,     0,     0,
+       0,     0,     0,     0,   153,   147,   149,     0,     0,     0,
+     128,     0,   120,   122,   124,   126,     0,   113,     0,   115,
+       0,   117,     0,     0,   313,   194,   339,     0,     0,     0,
+       0,     0,   332,     0,   247,    19,     0,   190,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,   285,     0,
+     303,   302,   273,     0,     0,   254,     0,   180,     0,     0,
+     255,   259,     0,     0,   278,     0,   182,     0,   285,   188,
+       0,   187,   160,     0,   140,   354,   355,   356,   358,     0,
+       0,   111,     0,   110,     0,   109,     0,     0,   234,   235,
+     238,   242,   232,     0,   299,   207,   208,     0,   212,   211,
+     213,   214,   215,     0,     0,     0,   219,   220,     0,   205,
+     209,   300,   206,     0,   249,   371,   373,     0,   378,     0,
+     374,     0,   324,   376,   375,     0,     0,     0,   269,   304,
+       0,     0,     0,     0,     0,     0,   191,   192,     0,     0,
+       0,   169,     0,     0,     0,     0,     0,   140,   129,   114,
+     116,   118,   264,     0,     0,   210,     0,     0,     0,     0,
+      20,     0,     0,   326,     0,     0,   289,   290,   291,   286,
+     287,   271,     0,     0,   175,     0,   285,   279,   167,   177,
+       0,     0,   183,   265,     0,   144,   139,   141,     0,   301,
+     216,   217,   218,   223,   222,   221,   379,     0,   380,   349,
+       0,     0,   272,   270,     0,     0,     0,   171,     0,   170,
+     142,    27,     0,     0,     0,     0,     0,   321,   288,     0,
+     406,   179,     0,   181,    27,   145,     0,   224,   381,    16,
+       0,   405,   172,   143,     0,     0,     0,    17,    21,    22,
+      19,     0,     0,    14,    18,   382
+};
+
+  /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int16 yypgoto[] =
 {
     -654,  -654,   994,  -654,  -654,  -654,  -654,  -654,  -654,   146,
@@ -1609,11 +1343,30 @@ static const yytype_int16 yypgoto[] =
     -135,   576,  -392,  -654,  -654,  -654,  -654,  -654,  -124,  -654
 };
 
-/* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
-   positive, shift that token.  If negative, reduce the rule which
-   number is the opposite.  If zero, do what YYDEFACT says.
-   If YYTABLE_NINF, syntax error.  */
-#define YYTABLE_NINF -202
+  /* YYDEFGOTO[NTERM-NUM].  */
+static const yytype_int16 yydefgoto[] =
+{
+      -1,     3,     4,     5,     6,   191,    81,   836,   862,   734,
+     860,    12,   134,    82,   338,    83,    84,    85,    86,   173,
+      87,    88,   636,   638,   640,   423,   424,   425,   426,    89,
+     409,   699,    90,    91,   389,    92,    93,   174,   627,   766,
+     767,   844,   831,    94,   525,    95,    96,   188,    97,   522,
+      98,   336,    99,   296,   402,   518,   100,   101,   102,   281,
+     272,   103,   801,   104,   842,   352,   500,   516,   679,   688,
+     105,   295,   690,   468,   758,   106,   210,   450,   107,   359,
+     229,   585,   729,   815,   108,   356,   219,   355,   579,   109,
+     110,   111,   112,   113,   114,   115,   116,   117,   118,   615,
+     119,   120,   121,   441,   122,   123,   124,   125,   126,   791,
+     823,   127,   128,   129,   130,   131,   234,   273,   748,   789,
+     790,   237,   487,   491,   730,   672,   492,   196,   278,   253,
+     212,   346,   259,   260,   477,   478,   230,   231,   220,   221,
+     315,   279,   697,   530,   531,   532,   317,   318,   319,   254,
+     376,   183,   291,   582,   333,   334,   335,   513,   266,   267
+};
+
+  /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
+     positive, shift that token.  If negative, reduce the rule whose
+     number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int16 yytable[] =
 {
      185,   211,   300,   197,   509,   182,   401,   238,   239,   611,
@@ -1830,8 +1583,8 @@ static const yytype_int16 yycheck[] =
      249,   455
 };
 
-/* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
-   symbol of state STATE-NUM.  */
+  /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
+     symbol of state STATE-NUM.  */
 static const yytype_uint16 yystos[] =
 {
        0,    15,    16,   195,   196,   197,   198,   132,   132,     0,
@@ -1923,95 +1676,133 @@ static const yytype_uint16 yystos[] =
      204,   131,   202,   203,   323,   134
 };
 
-#define yyerrok		(yyerrstatus = 0)
-#define yyclearin	(yychar = YYEMPTY)
-#define YYEMPTY		(-2)
-#define YYEOF		0
+  /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
+static const yytype_uint16 yyr1[] =
+{
+       0,   194,   195,   195,   196,   196,   197,   198,   198,   199,
+     199,   200,   200,   200,   200,   201,   201,   202,   202,   203,
+     203,   204,   204,   205,   205,   206,   206,   207,   207,   208,
+     209,   209,   209,   209,   209,   209,   209,   209,   209,   209,
+     209,   209,   209,   209,   209,   209,   209,   209,   209,   209,
+     209,   209,   209,   209,   209,   209,   209,   209,   209,   209,
+     209,   209,   209,   209,   209,   209,   209,   209,   209,   209,
+     209,   209,   209,   209,   210,   210,   210,   210,   210,   210,
+     210,   210,   210,   211,   211,   211,   211,   211,   211,   211,
+     211,   211,   212,   212,   212,   213,   213,   214,   215,   215,
+     215,   215,   215,   215,   215,   215,   215,   215,   215,   215,
+     215,   215,   215,   216,   216,   217,   217,   218,   218,   219,
+     219,   220,   220,   221,   221,   222,   222,   224,   225,   223,
+     226,   227,   228,   228,   229,   229,   229,   231,   232,   230,
+     233,   233,   235,   234,   236,   234,   237,   238,   238,   239,
+     241,   240,   243,   242,   245,   244,   247,   246,   248,   249,
+     248,   250,   251,   251,   251,   252,   252,   253,   254,   256,
+     255,   258,   257,   259,   259,   260,   260,   261,   261,   262,
+     262,   263,   263,   264,   264,   265,   265,   266,   266,   267,
+     267,   268,   268,   269,   269,   269,   270,   270,   271,   271,
+     272,   273,   272,   274,   275,   275,   276,   276,   276,   276,
+     276,   276,   276,   276,   276,   276,   276,   276,   276,   276,
+     276,   276,   277,   277,   277,   278,   279,   278,   280,   281,
+     281,   282,   282,   282,   282,   282,   282,   282,   282,   282,
+     282,   282,   282,   282,   282,   282,   283,   284,   285,   285,
+     286,   286,   287,   288,   289,   290,   291,   292,   293,   293,
+     294,   295,   296,   297,   297,   298,   299,   300,   301,   303,
+     302,   304,   304,   305,   306,   306,   306,   307,   308,   309,
+     309,   310,   310,   311,   311,   312,   312,   313,   313,   314,
+     314,   314,   315,   315,   316,   316,   317,   317,   317,   318,
+     318,   318,   319,   319,   320,   321,   321,   321,   322,   323,
+     323,   323,   323,   324,   324,   324,   325,   325,   326,   326,
+     326,   327,   328,   328,   328,   329,   329,   330,   330,   330,
+     331,   331,   331,   331,   332,   332,   332,   333,   333,   333,
+     333,   334,   334,   335,   335,   335,   335,   335,   335,   335,
+     335,   335,   335,   335,   336,   336,   337,   338,   338,   339,
+     339,   340,   340,   341,   341,   342,   342,   343,   343,   343,
+     343,   343,   343,   343,   343,   343,   343,   343,   343,   343,
+     343,   343,   343,   343,   343,   343,   344,   344,   345,   346,
+     346,   346,   347,   347,   347,   347,   348,   348,   349,   349,
+     350,   350,   351,   351,   352,   352,   353
+};
 
-#define YYACCEPT	goto yyacceptlab
-#define YYABORT		goto yyabortlab
-#define YYERROR		goto yyerrorlab
+  /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
+static const yytype_uint8 yyr2[] =
+{
+       0,     2,     0,     1,     1,     2,     3,     3,     5,     1,
+       1,     5,     5,     3,    16,     0,     2,     0,     2,     0,
+       2,     1,     1,     0,     3,     3,     1,     0,     2,     3,
+       1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
+       1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
+       1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
+       1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
+       1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
+       1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
+       1,     1,     1,     1,     1,     1,     1,     3,     3,     5,
+       3,     5,     5,     5,     3,     3,     5,     5,     5,     7,
+       7,     7,     5,     1,     3,     1,     3,     1,     3,     1,
+       3,     1,     3,     1,     3,     1,     3,     0,     0,     8,
+       4,     1,     0,     1,     1,     5,     3,     0,     0,     9,
+       0,     2,     0,     5,     0,     4,     1,     2,     1,     6,
+       0,     3,     0,     6,     0,     4,     0,     4,     1,     0,
+       4,     3,     1,     3,     3,     5,     5,     7,     4,     0,
+      10,     0,    12,     0,     2,     5,     1,     5,     1,     5,
+       1,     5,     1,     9,     5,     1,     1,     1,     1,     1,
+       3,     1,     1,     1,     7,     5,     1,     1,     1,     1,
+       3,     0,     5,     4,     0,     3,     1,     1,     1,     1,
+       2,     1,     1,     1,     1,     1,     3,     3,     3,     1,
+       1,     3,     1,     1,     3,     3,     0,     5,     2,     0,
+       3,     1,     3,     1,     3,     3,     1,     1,     3,     1,
+       1,     1,     3,     1,     1,     1,     5,     7,     5,     8,
+       1,     3,     5,     5,     7,     7,     6,     5,     0,     2,
+       3,     3,     3,     1,     5,     9,     5,     3,     3,     0,
+      10,     0,     1,     7,     5,     5,     3,     5,     7,     9,
+       1,     1,     1,     1,     1,     0,     2,     1,     3,     1,
+       1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
+       1,     3,     1,     1,     4,     1,     1,     4,     1,     1,
+       4,     1,     4,     5,     1,     3,     1,     3,     1,     1,
+       4,     9,     1,     1,     4,     1,     5,     1,     1,     4,
+       1,     1,     5,     1,     1,     1,     4,     1,     1,     5,
+       1,     1,     3,     1,     1,     3,     1,     4,     3,     3,
+       3,     3,     3,     3,     1,     1,     3,     1,     3,     0,
+       1,     1,     1,     1,     3,     0,     1,     1,     2,     2,
+       4,     6,     4,     6,     6,     6,     6,     2,     6,     8,
+       8,    10,    14,     2,     1,     3,     1,     3,     1,     1,
+       1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
+       1,     1,     1,     1,     1,    10,     9
+};
 
 
-/* Like YYERROR except do call yyerror.  This remains here temporarily
-   to ease the transition to the new meaning of YYERROR, for GCC.
-   Once GCC version 2 has supplanted version 1, this can go.  */
+#define yyerrok         (yyerrstatus = 0)
+#define yyclearin       (yychar = YYEMPTY)
+#define YYEMPTY         (-2)
+#define YYEOF           0
 
-#define YYFAIL		goto yyerrlab
+#define YYACCEPT        goto yyacceptlab
+#define YYABORT         goto yyabortlab
+#define YYERROR         goto yyerrorlab
+
 
 #define YYRECOVERING()  (!!yyerrstatus)
 
-#define YYBACKUP(Token, Value)					\
-do								\
-  if (yychar == YYEMPTY && yylen == 1)				\
-    {								\
-      yychar = (Token);						\
-      yylval = (Value);						\
-      yytoken = YYTRANSLATE (yychar);				\
-      YYPOPSTACK (1);						\
-      goto yybackup;						\
-    }								\
-  else								\
-    {								\
+#define YYBACKUP(Token, Value)                                  \
+do                                                              \
+  if (yychar == YYEMPTY)                                        \
+    {                                                           \
+      yychar = (Token);                                         \
+      yylval = (Value);                                         \
+      YYPOPSTACK (yylen);                                       \
+      yystate = *yyssp;                                         \
+      goto yybackup;                                            \
+    }                                                           \
+  else                                                          \
+    {                                                           \
       yyerror (YY_("syntax error: cannot back up")); \
-      YYERROR;							\
-    }								\
-while (YYID (0))
+      YYERROR;                                                  \
+    }                                                           \
+while (0)
+
+/* Error token number */
+#define YYTERROR        1
+#define YYERRCODE       256
 
 
-#define YYTERROR	1
-#define YYERRCODE	256
-
-
-/* YYLLOC_DEFAULT -- Set CURRENT to span from RHS[1] to RHS[N].
-   If N is 0, then set CURRENT to the empty location which ends
-   the previous symbol: RHS[0] (always defined).  */
-
-#define YYRHSLOC(Rhs, K) ((Rhs)[K])
-#ifndef YYLLOC_DEFAULT
-# define YYLLOC_DEFAULT(Current, Rhs, N)				\
-    do									\
-      if (YYID (N))                                                    \
-	{								\
-	  (Current).first_line   = YYRHSLOC (Rhs, 1).first_line;	\
-	  (Current).first_column = YYRHSLOC (Rhs, 1).first_column;	\
-	  (Current).last_line    = YYRHSLOC (Rhs, N).last_line;		\
-	  (Current).last_column  = YYRHSLOC (Rhs, N).last_column;	\
-	}								\
-      else								\
-	{								\
-	  (Current).first_line   = (Current).last_line   =		\
-	    YYRHSLOC (Rhs, 0).last_line;				\
-	  (Current).first_column = (Current).last_column =		\
-	    YYRHSLOC (Rhs, 0).last_column;				\
-	}								\
-    while (YYID (0))
-#endif
-
-
-/* YY_LOCATION_PRINT -- Print the location on the stream.
-   This macro was not mandated originally: define only if we know
-   we won't break user code: when these are the locations we know.  */
-
-#ifndef YY_LOCATION_PRINT
-# if YYLTYPE_IS_TRIVIAL
-#  define YY_LOCATION_PRINT(File, Loc)			\
-     fprintf (File, "%d.%d-%d.%d",			\
-	      (Loc).first_line, (Loc).first_column,	\
-	      (Loc).last_line,  (Loc).last_column)
-# else
-#  define YY_LOCATION_PRINT(File, Loc) ((void) 0)
-# endif
-#endif
-
-
-/* YYLEX -- calling `yylex' with the right arguments.  */
-
-#ifdef YYLEX_PARAM
-# define YYLEX yylex (YYLEX_PARAM)
-#else
-# define YYLEX yylex ()
-#endif
 
 /* Enable debugging if requested.  */
 #if YYDEBUG
@@ -2021,54 +1812,46 @@ while (YYID (0))
 #  define YYFPRINTF fprintf
 # endif
 
-# define YYDPRINTF(Args)			\
-do {						\
-  if (yydebug)					\
-    YYFPRINTF Args;				\
-} while (YYID (0))
+# define YYDPRINTF(Args)                        \
+do {                                            \
+  if (yydebug)                                  \
+    YYFPRINTF Args;                             \
+} while (0)
 
-# define YY_SYMBOL_PRINT(Title, Type, Value, Location)			  \
-do {									  \
-  if (yydebug)								  \
-    {									  \
-      YYFPRINTF (stderr, "%s ", Title);					  \
-      yy_symbol_print (stderr,						  \
-		  Type, Value); \
-      YYFPRINTF (stderr, "\n");						  \
-    }									  \
-} while (YYID (0))
+/* This macro is provided for backward compatibility. */
+#ifndef YY_LOCATION_PRINT
+# define YY_LOCATION_PRINT(File, Loc) ((void) 0)
+#endif
 
 
-/*--------------------------------.
-| Print this symbol on YYOUTPUT.  |
-`--------------------------------*/
+# define YY_SYMBOL_PRINT(Title, Type, Value, Location)                    \
+do {                                                                      \
+  if (yydebug)                                                            \
+    {                                                                     \
+      YYFPRINTF (stderr, "%s ", Title);                                   \
+      yy_symbol_print (stderr,                                            \
+                  Type, Value); \
+      YYFPRINTF (stderr, "\n");                                           \
+    }                                                                     \
+} while (0)
 
-/*ARGSUSED*/
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
+
+/*----------------------------------------.
+| Print this symbol's value on YYOUTPUT.  |
+`----------------------------------------*/
+
 static void
 yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep)
-#else
-static void
-yy_symbol_value_print (yyoutput, yytype, yyvaluep)
-    FILE *yyoutput;
-    int yytype;
-    YYSTYPE const * const yyvaluep;
-#endif
 {
+  FILE *yyo = yyoutput;
+  YYUSE (yyo);
   if (!yyvaluep)
     return;
 # ifdef YYPRINT
   if (yytype < YYNTOKENS)
     YYPRINT (yyoutput, yytoknum[yytype], *yyvaluep);
-# else
-  YYUSE (yyoutput);
 # endif
-  switch (yytype)
-    {
-      default:
-	break;
-    }
+  YYUSE (yytype);
 }
 
 
@@ -2076,22 +1859,11 @@ yy_symbol_value_print (yyoutput, yytype, yyvaluep)
 | Print this symbol on YYOUTPUT.  |
 `--------------------------------*/
 
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
 static void
 yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep)
-#else
-static void
-yy_symbol_print (yyoutput, yytype, yyvaluep)
-    FILE *yyoutput;
-    int yytype;
-    YYSTYPE const * const yyvaluep;
-#endif
 {
-  if (yytype < YYNTOKENS)
-    YYFPRINTF (yyoutput, "token %s (", yytname[yytype]);
-  else
-    YYFPRINTF (yyoutput, "nterm %s (", yytname[yytype]);
+  YYFPRINTF (yyoutput, "%s %s (",
+             yytype < YYNTOKENS ? "token" : "nterm", yytname[yytype]);
 
   yy_symbol_value_print (yyoutput, yytype, yyvaluep);
   YYFPRINTF (yyoutput, ")");
@@ -2102,16 +1874,8 @@ yy_symbol_print (yyoutput, yytype, yyvaluep)
 | TOP (included).                                                   |
 `------------------------------------------------------------------*/
 
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
 static void
 yy_stack_print (yytype_int16 *yybottom, yytype_int16 *yytop)
-#else
-static void
-yy_stack_print (yybottom, yytop)
-    yytype_int16 *yybottom;
-    yytype_int16 *yytop;
-#endif
 {
   YYFPRINTF (stderr, "Stack now");
   for (; yybottom <= yytop; yybottom++)
@@ -2122,49 +1886,42 @@ yy_stack_print (yybottom, yytop)
   YYFPRINTF (stderr, "\n");
 }
 
-# define YY_STACK_PRINT(Bottom, Top)				\
-do {								\
-  if (yydebug)							\
-    yy_stack_print ((Bottom), (Top));				\
-} while (YYID (0))
+# define YY_STACK_PRINT(Bottom, Top)                            \
+do {                                                            \
+  if (yydebug)                                                  \
+    yy_stack_print ((Bottom), (Top));                           \
+} while (0)
 
 
 /*------------------------------------------------.
 | Report that the YYRULE is going to be reduced.  |
 `------------------------------------------------*/
 
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
 static void
-yy_reduce_print (YYSTYPE *yyvsp, int yyrule)
-#else
-static void
-yy_reduce_print (yyvsp, yyrule)
-    YYSTYPE *yyvsp;
-    int yyrule;
-#endif
+yy_reduce_print (yytype_int16 *yyssp, YYSTYPE *yyvsp, int yyrule)
 {
+  unsigned long int yylno = yyrline[yyrule];
   int yynrhs = yyr2[yyrule];
   int yyi;
-  unsigned long int yylno = yyrline[yyrule];
   YYFPRINTF (stderr, "Reducing stack by rule %d (line %lu):\n",
-	     yyrule - 1, yylno);
+             yyrule - 1, yylno);
   /* The symbols being reduced.  */
   for (yyi = 0; yyi < yynrhs; yyi++)
     {
       YYFPRINTF (stderr, "   $%d = ", yyi + 1);
-      yy_symbol_print (stderr, yyrhs[yyprhs[yyrule] + yyi],
-		       &(yyvsp[(yyi + 1) - (yynrhs)])
-		       		       );
+      yy_symbol_print (stderr,
+                       yystos[yyssp[yyi + 1 - yynrhs]],
+                       &(yyvsp[(yyi + 1) - (yynrhs)])
+                                              );
       YYFPRINTF (stderr, "\n");
     }
 }
 
-# define YY_REDUCE_PRINT(Rule)		\
-do {					\
-  if (yydebug)				\
-    yy_reduce_print (yyvsp, Rule); \
-} while (YYID (0))
+# define YY_REDUCE_PRINT(Rule)          \
+do {                                    \
+  if (yydebug)                          \
+    yy_reduce_print (yyssp, yyvsp, Rule); \
+} while (0)
 
 /* Nonzero means print parse trace.  It is left uninitialized so that
    multiple parsers can coexist.  */
@@ -2178,7 +1935,7 @@ int yydebug;
 
 
 /* YYINITDEPTH -- initial size of the parser's stacks.  */
-#ifndef	YYINITDEPTH
+#ifndef YYINITDEPTH
 # define YYINITDEPTH 200
 #endif
 
@@ -2193,7 +1950,6 @@ int yydebug;
 # define YYMAXDEPTH 10000
 #endif
 
-
 
 #if YYERROR_VERBOSE
 
@@ -2202,15 +1958,8 @@ int yydebug;
 #   define yystrlen strlen
 #  else
 /* Return the length of YYSTR.  */
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
 static YYSIZE_T
 yystrlen (const char *yystr)
-#else
-static YYSIZE_T
-yystrlen (yystr)
-    const char *yystr;
-#endif
 {
   YYSIZE_T yylen;
   for (yylen = 0; yystr[yylen]; yylen++)
@@ -2226,16 +1975,8 @@ yystrlen (yystr)
 #  else
 /* Copy YYSRC to YYDEST, returning the address of the terminating '\0' in
    YYDEST.  */
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
 static char *
 yystpcpy (char *yydest, const char *yysrc)
-#else
-static char *
-yystpcpy (yydest, yysrc)
-    char *yydest;
-    const char *yysrc;
-#endif
 {
   char *yyd = yydest;
   const char *yys = yysrc;
@@ -2265,27 +2006,27 @@ yytnamerr (char *yyres, const char *yystr)
       char const *yyp = yystr;
 
       for (;;)
-	switch (*++yyp)
-	  {
-	  case '\'':
-	  case ',':
-	    goto do_not_strip_quotes;
+        switch (*++yyp)
+          {
+          case '\'':
+          case ',':
+            goto do_not_strip_quotes;
 
-	  case '\\':
-	    if (*++yyp != '\\')
-	      goto do_not_strip_quotes;
-	    /* Fall through.  */
-	  default:
-	    if (yyres)
-	      yyres[yyn] = *yyp;
-	    yyn++;
-	    break;
+          case '\\':
+            if (*++yyp != '\\')
+              goto do_not_strip_quotes;
+            /* Fall through.  */
+          default:
+            if (yyres)
+              yyres[yyn] = *yyp;
+            yyn++;
+            break;
 
-	  case '"':
-	    if (yyres)
-	      yyres[yyn] = '\0';
-	    return yyn;
-	  }
+          case '"':
+            if (yyres)
+              yyres[yyn] = '\0';
+            return yyn;
+          }
     do_not_strip_quotes: ;
     }
 
@@ -2296,161 +2037,160 @@ yytnamerr (char *yyres, const char *yystr)
 }
 # endif
 
-/* Copy into YYRESULT an error message about the unexpected token
-   YYCHAR while in state YYSTATE.  Return the number of bytes copied,
-   including the terminating null byte.  If YYRESULT is null, do not
-   copy anything; just return the number of bytes that would be
-   copied.  As a special case, return 0 if an ordinary "syntax error"
-   message will do.  Return YYSIZE_MAXIMUM if overflow occurs during
-   size calculation.  */
-static YYSIZE_T
-yysyntax_error (char *yyresult, int yystate, int yychar)
+/* Copy into *YYMSG, which is of size *YYMSG_ALLOC, an error message
+   about the unexpected token YYTOKEN for the state stack whose top is
+   YYSSP.
+
+   Return 0 if *YYMSG was successfully written.  Return 1 if *YYMSG is
+   not large enough to hold the message.  In that case, also set
+   *YYMSG_ALLOC to the required number of bytes.  Return 2 if the
+   required number of bytes is too large to store.  */
+static int
+yysyntax_error (YYSIZE_T *yymsg_alloc, char **yymsg,
+                yytype_int16 *yyssp, int yytoken)
 {
-  int yyn = yypact[yystate];
+  YYSIZE_T yysize0 = yytnamerr (YY_NULLPTR, yytname[yytoken]);
+  YYSIZE_T yysize = yysize0;
+  enum { YYERROR_VERBOSE_ARGS_MAXIMUM = 5 };
+  /* Internationalized format string. */
+  const char *yyformat = YY_NULLPTR;
+  /* Arguments of yyformat. */
+  char const *yyarg[YYERROR_VERBOSE_ARGS_MAXIMUM];
+  /* Number of reported tokens (one for the "unexpected", one per
+     "expected"). */
+  int yycount = 0;
 
-  if (! (YYPACT_NINF < yyn && yyn <= YYLAST))
-    return 0;
-  else
+  /* There are many possibilities here to consider:
+     - If this state is a consistent state with a default action, then
+       the only way this function was invoked is if the default action
+       is an error action.  In that case, don't check for expected
+       tokens because there are none.
+     - The only way there can be no lookahead present (in yychar) is if
+       this state is a consistent state with a default action.  Thus,
+       detecting the absence of a lookahead is sufficient to determine
+       that there is no unexpected or expected token to report.  In that
+       case, just report a simple "syntax error".
+     - Don't assume there isn't a lookahead just because this state is a
+       consistent state with a default action.  There might have been a
+       previous inconsistent state, consistent state with a non-default
+       action, or user semantic action that manipulated yychar.
+     - Of course, the expected token list depends on states to have
+       correct lookahead information, and it depends on the parser not
+       to perform extra reductions after fetching a lookahead from the
+       scanner and before detecting a syntax error.  Thus, state merging
+       (from LALR or IELR) and default reductions corrupt the expected
+       token list.  However, the list is correct for canonical LR with
+       one exception: it will still contain any token that will not be
+       accepted due to an error action in a later state.
+  */
+  if (yytoken != YYEMPTY)
     {
-      int yytype = YYTRANSLATE (yychar);
-      YYSIZE_T yysize0 = yytnamerr (0, yytname[yytype]);
-      YYSIZE_T yysize = yysize0;
-      YYSIZE_T yysize1;
-      int yysize_overflow = 0;
-      enum { YYERROR_VERBOSE_ARGS_MAXIMUM = 5 };
-      char const *yyarg[YYERROR_VERBOSE_ARGS_MAXIMUM];
-      int yyx;
+      int yyn = yypact[*yyssp];
+      yyarg[yycount++] = yytname[yytoken];
+      if (!yypact_value_is_default (yyn))
+        {
+          /* Start YYX at -YYN if negative to avoid negative indexes in
+             YYCHECK.  In other words, skip the first -YYN actions for
+             this state because they are default actions.  */
+          int yyxbegin = yyn < 0 ? -yyn : 0;
+          /* Stay within bounds of both yycheck and yytname.  */
+          int yychecklim = YYLAST - yyn + 1;
+          int yyxend = yychecklim < YYNTOKENS ? yychecklim : YYNTOKENS;
+          int yyx;
 
-# if 0
-      /* This is so xgettext sees the translatable formats that are
-	 constructed on the fly.  */
-      YY_("syntax error, unexpected %s");
-      YY_("syntax error, unexpected %s, expecting %s");
-      YY_("syntax error, unexpected %s, expecting %s or %s");
-      YY_("syntax error, unexpected %s, expecting %s or %s or %s");
-      YY_("syntax error, unexpected %s, expecting %s or %s or %s or %s");
-# endif
-      char *yyfmt;
-      char const *yyf;
-      static char const yyunexpected[] = "syntax error, unexpected %s";
-      static char const yyexpecting[] = ", expecting %s";
-      static char const yyor[] = " or %s";
-      char yyformat[sizeof yyunexpected
-		    + sizeof yyexpecting - 1
-		    + ((YYERROR_VERBOSE_ARGS_MAXIMUM - 2)
-		       * (sizeof yyor - 1))];
-      char const *yyprefix = yyexpecting;
-
-      /* Start YYX at -YYN if negative to avoid negative indexes in
-	 YYCHECK.  */
-      int yyxbegin = yyn < 0 ? -yyn : 0;
-
-      /* Stay within bounds of both yycheck and yytname.  */
-      int yychecklim = YYLAST - yyn + 1;
-      int yyxend = yychecklim < YYNTOKENS ? yychecklim : YYNTOKENS;
-      int yycount = 1;
-
-      yyarg[0] = yytname[yytype];
-      yyfmt = yystpcpy (yyformat, yyunexpected);
-
-      for (yyx = yyxbegin; yyx < yyxend; ++yyx)
-	if (yycheck[yyx + yyn] == yyx && yyx != YYTERROR)
-	  {
-	    if (yycount == YYERROR_VERBOSE_ARGS_MAXIMUM)
-	      {
-		yycount = 1;
-		yysize = yysize0;
-		yyformat[sizeof yyunexpected - 1] = '\0';
-		break;
-	      }
-	    yyarg[yycount++] = yytname[yyx];
-	    yysize1 = yysize + yytnamerr (0, yytname[yyx]);
-	    yysize_overflow |= (yysize1 < yysize);
-	    yysize = yysize1;
-	    yyfmt = yystpcpy (yyfmt, yyprefix);
-	    yyprefix = yyor;
-	  }
-
-      yyf = YY_(yyformat);
-      yysize1 = yysize + yystrlen (yyf);
-      yysize_overflow |= (yysize1 < yysize);
-      yysize = yysize1;
-
-      if (yysize_overflow)
-	return YYSIZE_MAXIMUM;
-
-      if (yyresult)
-	{
-	  /* Avoid sprintf, as that infringes on the user's name space.
-	     Don't have undefined behavior even if the translation
-	     produced a string with the wrong number of "%s"s.  */
-	  char *yyp = yyresult;
-	  int yyi = 0;
-	  while ((*yyp = *yyf) != '\0')
-	    {
-	      if (*yyp == '%' && yyf[1] == 's' && yyi < yycount)
-		{
-		  yyp += yytnamerr (yyp, yyarg[yyi++]);
-		  yyf += 2;
-		}
-	      else
-		{
-		  yyp++;
-		  yyf++;
-		}
-	    }
-	}
-      return yysize;
+          for (yyx = yyxbegin; yyx < yyxend; ++yyx)
+            if (yycheck[yyx + yyn] == yyx && yyx != YYTERROR
+                && !yytable_value_is_error (yytable[yyx + yyn]))
+              {
+                if (yycount == YYERROR_VERBOSE_ARGS_MAXIMUM)
+                  {
+                    yycount = 1;
+                    yysize = yysize0;
+                    break;
+                  }
+                yyarg[yycount++] = yytname[yyx];
+                {
+                  YYSIZE_T yysize1 = yysize + yytnamerr (YY_NULLPTR, yytname[yyx]);
+                  if (! (yysize <= yysize1
+                         && yysize1 <= YYSTACK_ALLOC_MAXIMUM))
+                    return 2;
+                  yysize = yysize1;
+                }
+              }
+        }
     }
+
+  switch (yycount)
+    {
+# define YYCASE_(N, S)                      \
+      case N:                               \
+        yyformat = S;                       \
+      break
+      YYCASE_(0, YY_("syntax error"));
+      YYCASE_(1, YY_("syntax error, unexpected %s"));
+      YYCASE_(2, YY_("syntax error, unexpected %s, expecting %s"));
+      YYCASE_(3, YY_("syntax error, unexpected %s, expecting %s or %s"));
+      YYCASE_(4, YY_("syntax error, unexpected %s, expecting %s or %s or %s"));
+      YYCASE_(5, YY_("syntax error, unexpected %s, expecting %s or %s or %s or %s"));
+# undef YYCASE_
+    }
+
+  {
+    YYSIZE_T yysize1 = yysize + yystrlen (yyformat);
+    if (! (yysize <= yysize1 && yysize1 <= YYSTACK_ALLOC_MAXIMUM))
+      return 2;
+    yysize = yysize1;
+  }
+
+  if (*yymsg_alloc < yysize)
+    {
+      *yymsg_alloc = 2 * yysize;
+      if (! (yysize <= *yymsg_alloc
+             && *yymsg_alloc <= YYSTACK_ALLOC_MAXIMUM))
+        *yymsg_alloc = YYSTACK_ALLOC_MAXIMUM;
+      return 1;
+    }
+
+  /* Avoid sprintf, as that infringes on the user's name space.
+     Don't have undefined behavior even if the translation
+     produced a string with the wrong number of "%s"s.  */
+  {
+    char *yyp = *yymsg;
+    int yyi = 0;
+    while ((*yyp = *yyformat) != '\0')
+      if (*yyp == '%' && yyformat[1] == 's' && yyi < yycount)
+        {
+          yyp += yytnamerr (yyp, yyarg[yyi++]);
+          yyformat += 2;
+        }
+      else
+        {
+          yyp++;
+          yyformat++;
+        }
+  }
+  return 0;
 }
 #endif /* YYERROR_VERBOSE */
-
 
 /*-----------------------------------------------.
 | Release the memory associated to this symbol.  |
 `-----------------------------------------------*/
 
-/*ARGSUSED*/
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
 static void
 yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep)
-#else
-static void
-yydestruct (yymsg, yytype, yyvaluep)
-    const char *yymsg;
-    int yytype;
-    YYSTYPE *yyvaluep;
-#endif
 {
   YYUSE (yyvaluep);
-
   if (!yymsg)
     yymsg = "Deleting";
   YY_SYMBOL_PRINT (yymsg, yytype, yyvaluep, yylocationp);
 
-  switch (yytype)
-    {
-
-      default:
-	break;
-    }
+  YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
+  YYUSE (yytype);
+  YY_IGNORE_MAYBE_UNINITIALIZED_END
 }
 
-/* Prevent warnings from -Wmissing-prototypes.  */
-#ifdef YYPARSE_PARAM
-#if defined __STDC__ || defined __cplusplus
-int yyparse (void *YYPARSE_PARAM);
-#else
-int yyparse ();
-#endif
-#else /* ! YYPARSE_PARAM */
-#if defined __STDC__ || defined __cplusplus
-int yyparse (void);
-#else
-int yyparse ();
-#endif
-#endif /* ! YYPARSE_PARAM */
+
 
 
 /* The lookahead symbol.  */
@@ -2458,49 +2198,26 @@ int yychar;
 
 /* The semantic value of the lookahead symbol.  */
 YYSTYPE yylval;
-
 /* Number of syntax errors so far.  */
 int yynerrs;
 
 
+/*----------.
+| yyparse.  |
+`----------*/
 
-/*-------------------------.
-| yyparse or yypush_parse.  |
-`-------------------------*/
-
-#ifdef YYPARSE_PARAM
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
-int
-yyparse (void *YYPARSE_PARAM)
-#else
-int
-yyparse (YYPARSE_PARAM)
-    void *YYPARSE_PARAM;
-#endif
-#else /* ! YYPARSE_PARAM */
-#if (defined __STDC__ || defined __C99__FUNC__ \
-     || defined __cplusplus || defined _MSC_VER)
 int
 yyparse (void)
-#else
-int
-yyparse ()
-
-#endif
-#endif
 {
-
-
     int yystate;
     /* Number of tokens to shift before error messages enabled.  */
     int yyerrstatus;
 
     /* The stacks and their tools:
-       `yyss': related to states.
-       `yyvs': related to semantic values.
+       'yyss': related to states.
+       'yyvs': related to semantic values.
 
-       Refer to the stacks thru separate pointers, to allow yyoverflow
+       Refer to the stacks through separate pointers, to allow yyoverflow
        to reallocate them elsewhere.  */
 
     /* The state stack.  */
@@ -2518,7 +2235,7 @@ yyparse ()
   int yyn;
   int yyresult;
   /* Lookahead token as an internal (translated) token number.  */
-  int yytoken;
+  int yytoken = 0;
   /* The variables used to return semantic value and location from the
      action routines.  */
   YYSTYPE yyval;
@@ -2536,9 +2253,8 @@ yyparse ()
      Keep to zero when no symbol should be popped.  */
   int yylen = 0;
 
-  yytoken = 0;
-  yyss = yyssa;
-  yyvs = yyvsa;
+  yyssp = yyss = yyssa;
+  yyvsp = yyvs = yyvsa;
   yystacksize = YYINITDEPTH;
 
   YYDPRINTF ((stderr, "Starting parse\n"));
@@ -2547,14 +2263,6 @@ yyparse ()
   yyerrstatus = 0;
   yynerrs = 0;
   yychar = YYEMPTY; /* Cause a token to be read.  */
-
-  /* Initialize stack pointers.
-     Waste one element of value and location stack
-     so that they stay on the same level as the state stack.
-     The wasted elements are never initialized.  */
-  yyssp = yyss;
-  yyvsp = yyvs;
-
   goto yysetstate;
 
 /*------------------------------------------------------------.
@@ -2575,23 +2283,23 @@ yyparse ()
 
 #ifdef yyoverflow
       {
-	/* Give user a chance to reallocate the stack.  Use copies of
-	   these so that the &'s don't force the real ones into
-	   memory.  */
-	YYSTYPE *yyvs1 = yyvs;
-	yytype_int16 *yyss1 = yyss;
+        /* Give user a chance to reallocate the stack.  Use copies of
+           these so that the &'s don't force the real ones into
+           memory.  */
+        YYSTYPE *yyvs1 = yyvs;
+        yytype_int16 *yyss1 = yyss;
 
-	/* Each stack pointer address is followed by the size of the
-	   data in use in that stack, in bytes.  This used to be a
-	   conditional around just the two extra args, but that might
-	   be undefined if yyoverflow is a macro.  */
-	yyoverflow (YY_("memory exhausted"),
-		    &yyss1, yysize * sizeof (*yyssp),
-		    &yyvs1, yysize * sizeof (*yyvsp),
-		    &yystacksize);
+        /* Each stack pointer address is followed by the size of the
+           data in use in that stack, in bytes.  This used to be a
+           conditional around just the two extra args, but that might
+           be undefined if yyoverflow is a macro.  */
+        yyoverflow (YY_("memory exhausted"),
+                    &yyss1, yysize * sizeof (*yyssp),
+                    &yyvs1, yysize * sizeof (*yyvsp),
+                    &yystacksize);
 
-	yyss = yyss1;
-	yyvs = yyvs1;
+        yyss = yyss1;
+        yyvs = yyvs1;
       }
 #else /* no yyoverflow */
 # ifndef YYSTACK_RELOCATE
@@ -2599,22 +2307,22 @@ yyparse ()
 # else
       /* Extend the stack our own way.  */
       if (YYMAXDEPTH <= yystacksize)
-	goto yyexhaustedlab;
+        goto yyexhaustedlab;
       yystacksize *= 2;
       if (YYMAXDEPTH < yystacksize)
-	yystacksize = YYMAXDEPTH;
+        yystacksize = YYMAXDEPTH;
 
       {
-	yytype_int16 *yyss1 = yyss;
-	union yyalloc *yyptr =
-	  (union yyalloc *) YYSTACK_ALLOC (YYSTACK_BYTES (yystacksize));
-	if (! yyptr)
-	  goto yyexhaustedlab;
-	YYSTACK_RELOCATE (yyss_alloc, yyss);
-	YYSTACK_RELOCATE (yyvs_alloc, yyvs);
+        yytype_int16 *yyss1 = yyss;
+        union yyalloc *yyptr =
+          (union yyalloc *) YYSTACK_ALLOC (YYSTACK_BYTES (yystacksize));
+        if (! yyptr)
+          goto yyexhaustedlab;
+        YYSTACK_RELOCATE (yyss_alloc, yyss);
+        YYSTACK_RELOCATE (yyvs_alloc, yyvs);
 #  undef YYSTACK_RELOCATE
-	if (yyss1 != yyssa)
-	  YYSTACK_FREE (yyss1);
+        if (yyss1 != yyssa)
+          YYSTACK_FREE (yyss1);
       }
 # endif
 #endif /* no yyoverflow */
@@ -2623,10 +2331,10 @@ yyparse ()
       yyvsp = yyvs + yysize - 1;
 
       YYDPRINTF ((stderr, "Stack size increased to %lu\n",
-		  (unsigned long int) yystacksize));
+                  (unsigned long int) yystacksize));
 
       if (yyss + yystacksize - 1 <= yyssp)
-	YYABORT;
+        YYABORT;
     }
 
   YYDPRINTF ((stderr, "Entering state %d\n", yystate));
@@ -2646,7 +2354,7 @@ yybackup:
 
   /* First try to decide what to do without reference to lookahead token.  */
   yyn = yypact[yystate];
-  if (yyn == YYPACT_NINF)
+  if (yypact_value_is_default (yyn))
     goto yydefault;
 
   /* Not known => get a lookahead token if don't already have one.  */
@@ -2655,7 +2363,7 @@ yybackup:
   if (yychar == YYEMPTY)
     {
       YYDPRINTF ((stderr, "Reading a token: "));
-      yychar = YYLEX;
+      yychar = yylex ();
     }
 
   if (yychar <= YYEOF)
@@ -2677,8 +2385,8 @@ yybackup:
   yyn = yytable[yyn];
   if (yyn <= 0)
     {
-      if (yyn == 0 || yyn == YYTABLE_NINF)
-	goto yyerrlab;
+      if (yytable_value_is_error (yyn))
+        goto yyerrlab;
       yyn = -yyn;
       goto yyreduce;
     }
@@ -2695,7 +2403,9 @@ yybackup:
   yychar = YYEMPTY;
 
   yystate = yyn;
+  YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
   *++yyvsp = yylval;
+  YY_IGNORE_MAYBE_UNINITIALIZED_END
 
   goto yynewstate;
 
@@ -2718,7 +2428,7 @@ yyreduce:
   yylen = yyr2[yyn];
 
   /* If YYLEN is nonzero, implement the default value of the action:
-     `$$ = $1'.
+     '$$ = $1'.
 
      Otherwise, the following line sets YYVAL to garbage.
      This behavior is undocumented and Bison
@@ -2732,126 +2442,116 @@ yyreduce:
   switch (yyn)
     {
         case 6:
-
-/* Line 1455 of yacc.c  */
-#line 282 "lev_comp.y"
+#line 284 "lev_comp.y" /* yacc.c:1646  */
     {
 			if (fatal_error > 0) {
 				(void) fprintf(stderr,
 				"%s: %d errors detected for level \"%s\". No output created!\n",
-					       fname, fatal_error, (yyvsp[(1) - (3)].map));
+					       fname, fatal_error, (yyvsp[-2].map));
 				fatal_error = 0;
 				got_errors++;
 			} else if (!got_errors) {
-				if (!write_level_file((yyvsp[(1) - (3)].map), splev)) {
-				    lc_error("Can't write output file for '%s'!", (yyvsp[(1) - (3)].map));
+				if (!write_level_file((yyvsp[-2].map), splev)) {
+				    lc_error("Can't write output file for '%s'!", (yyvsp[-2].map));
 				    exit(EXIT_FAILURE);
 				}
 			}
-			Free((yyvsp[(1) - (3)].map));
+			Free((yyvsp[-2].map));
 			Free(splev);
 			splev = NULL;
 			vardef_free_all(variable_definitions);
 			variable_definitions = NULL;
 		  }
+#line 2466 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-
-/* Line 1455 of yacc.c  */
-#line 304 "lev_comp.y"
+#line 306 "lev_comp.y" /* yacc.c:1646  */
     {
-		      start_level_def(&splev, (yyvsp[(3) - (3)].map));
-		      (yyval.map) = (yyvsp[(3) - (3)].map);
+		      start_level_def(&splev, (yyvsp[0].map));
+		      (yyval.map) = (yyvsp[0].map);
 		  }
+#line 2475 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-
-/* Line 1455 of yacc.c  */
-#line 309 "lev_comp.y"
+#line 311 "lev_comp.y" /* yacc.c:1646  */
     {
-		      start_level_def(&splev, (yyvsp[(3) - (5)].map));
-		      if ((yyvsp[(5) - (5)].i) == -1) {
+		      start_level_def(&splev, (yyvsp[-2].map));
+		      if ((yyvsp[0].i) == -1) {
 			  add_opvars(splev, "iiiiiiiio", LVLINIT_MAZEGRID,HWALL,0,0, 0,0,0,0, SPO_INITLEVEL);
 		      } else {
-			  long bg = what_map_char((char) (yyvsp[(5) - (5)].i));
+			  long bg = what_map_char((char) (yyvsp[0].i));
 			  add_opvars(splev, "iiiiiiiio", LVLINIT_SOLIDFILL, bg, 0,0, 0,0,0,0, SPO_INITLEVEL);
 		      }
 		      add_opvars(splev, "io", MAZELEVEL, SPO_LEVEL_FLAGS);
 		      max_x_map = COLNO-1;
 		      max_y_map = ROWNO;
-		      (yyval.map) = (yyvsp[(3) - (5)].map);
+		      (yyval.map) = (yyvsp[-2].map);
 		  }
+#line 2493 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-
-/* Line 1455 of yacc.c  */
-#line 325 "lev_comp.y"
+#line 327 "lev_comp.y" /* yacc.c:1646  */
     {
 		      (yyval.i) = -1;
 		  }
+#line 2501 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-
-/* Line 1455 of yacc.c  */
-#line 329 "lev_comp.y"
+#line 331 "lev_comp.y" /* yacc.c:1646  */
     {
-		      (yyval.i) = what_map_char((char) (yyvsp[(1) - (1)].i));
+		      (yyval.i) = what_map_char((char) (yyvsp[0].i));
 		  }
+#line 2509 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-
-/* Line 1455 of yacc.c  */
-#line 335 "lev_comp.y"
+#line 337 "lev_comp.y" /* yacc.c:1646  */
     {
-		      long filling = (yyvsp[(5) - (5)].terr).ter;
+		      long filling = (yyvsp[0].terr).ter;
 		      if (filling == INVALID_TYPE || filling >= MAX_TYPE)
 			  lc_error("INIT_MAP: Invalid fill char type.");
-		      add_opvars(splev, "iiiiiiiio", LVLINIT_SOLIDFILL,filling,0,(long)(yyvsp[(5) - (5)].terr).lit, 0,0,0,0, SPO_INITLEVEL);
+		      add_opvars(splev, "iiiiiiiio", LVLINIT_SOLIDFILL,filling,0,(long)(yyvsp[0].terr).lit, 0,0,0,0, SPO_INITLEVEL);
 		      max_x_map = COLNO-1;
 		      max_y_map = ROWNO;
 		  }
+#line 2522 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-
-/* Line 1455 of yacc.c  */
-#line 344 "lev_comp.y"
+#line 346 "lev_comp.y" /* yacc.c:1646  */
     {
-		      long filling = what_map_char((char) (yyvsp[(5) - (5)].i));
+		      long filling = what_map_char((char) (yyvsp[0].i));
 		      if (filling == INVALID_TYPE || filling >= MAX_TYPE)
 			  lc_error("INIT_MAP: Invalid fill char type.");
 		      add_opvars(splev, "iiiiiiiio", LVLINIT_MAZEGRID,filling,0,0, 0,0,0,0, SPO_INITLEVEL);
 		      max_x_map = COLNO-1;
 		      max_y_map = ROWNO;
 		  }
+#line 2535 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-
-/* Line 1455 of yacc.c  */
-#line 353 "lev_comp.y"
+#line 355 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "iiiiiiiio", LVLINIT_ROGUE,0,0,0,0,0,0,0, SPO_INITLEVEL);
 		  }
+#line 2543 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-
-/* Line 1455 of yacc.c  */
-#line 357 "lev_comp.y"
+#line 359 "lev_comp.y" /* yacc.c:1646  */
     {
-		      long fg = what_map_char((char) (yyvsp[(5) - (16)].i));
-		      long bg = what_map_char((char) (yyvsp[(7) - (16)].i));
-		      long smoothed = (yyvsp[(9) - (16)].i);
-		      long joined = (yyvsp[(11) - (16)].i);
-		      long lit = (yyvsp[(13) - (16)].i);
-		      long walled = (yyvsp[(15) - (16)].i);
-		      long filling = (yyvsp[(16) - (16)].i);
+		      long fg = what_map_char((char) (yyvsp[-11].i));
+		      long bg = what_map_char((char) (yyvsp[-9].i));
+		      long smoothed = (yyvsp[-7].i);
+		      long joined = (yyvsp[-5].i);
+		      long lit = (yyvsp[-3].i);
+		      long walled = (yyvsp[-1].i);
+		      long filling = (yyvsp[0].i);
 		      if (fg == INVALID_TYPE || fg >= MAX_TYPE)
 			  lc_error("INIT_MAP: Invalid foreground type.");
 		      if (bg == INVALID_TYPE || bg >= MAX_TYPE)
@@ -2866,487 +2566,441 @@ yyreduce:
 			max_x_map = COLNO-1;
 			max_y_map = ROWNO;
 		  }
+#line 2570 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-
-/* Line 1455 of yacc.c  */
-#line 382 "lev_comp.y"
+#line 384 "lev_comp.y" /* yacc.c:1646  */
     {
 		      (yyval.i) = 0;
 		  }
+#line 2578 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
-
-/* Line 1455 of yacc.c  */
-#line 386 "lev_comp.y"
+#line 388 "lev_comp.y" /* yacc.c:1646  */
     {
-		      (yyval.i) = (yyvsp[(2) - (2)].i);
+		      (yyval.i) = (yyvsp[0].i);
 		  }
+#line 2586 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-
-/* Line 1455 of yacc.c  */
-#line 392 "lev_comp.y"
+#line 394 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "o", SPO_COPY);
 		      (yyval.i) = 0;
 		  }
+#line 2595 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-
-/* Line 1455 of yacc.c  */
-#line 397 "lev_comp.y"
+#line 399 "lev_comp.y" /* yacc.c:1646  */
     {
 		      (yyval.i) = 1;
 		  }
+#line 2603 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
-
-/* Line 1455 of yacc.c  */
-#line 403 "lev_comp.y"
+#line 405 "lev_comp.y" /* yacc.c:1646  */
     {
 		      (yyval.i) = -1;
 		  }
+#line 2611 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-
-/* Line 1455 of yacc.c  */
-#line 407 "lev_comp.y"
+#line 409 "lev_comp.y" /* yacc.c:1646  */
     {
-		      (yyval.i) = what_map_char((char) (yyvsp[(2) - (2)].i));
+		      (yyval.i) = what_map_char((char) (yyvsp[0].i));
 		  }
+#line 2619 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-
-/* Line 1455 of yacc.c  */
-#line 418 "lev_comp.y"
+#line 420 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "io", 0, SPO_LEVEL_FLAGS);
 		  }
+#line 2627 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
-
-/* Line 1455 of yacc.c  */
-#line 422 "lev_comp.y"
+#line 424 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "io", (yyvsp[(3) - (3)].i), SPO_LEVEL_FLAGS);
+		      add_opvars(splev, "io", (yyvsp[0].i), SPO_LEVEL_FLAGS);
 		  }
+#line 2635 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
-
-/* Line 1455 of yacc.c  */
-#line 428 "lev_comp.y"
+#line 430 "lev_comp.y" /* yacc.c:1646  */
     {
-		      (yyval.i) = ((yyvsp[(1) - (3)].i) | (yyvsp[(3) - (3)].i));
+		      (yyval.i) = ((yyvsp[-2].i) | (yyvsp[0].i));
 		  }
+#line 2643 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
-
-/* Line 1455 of yacc.c  */
-#line 432 "lev_comp.y"
+#line 434 "lev_comp.y" /* yacc.c:1646  */
     {
-		      (yyval.i) = (yyvsp[(1) - (1)].i);
+		      (yyval.i) = (yyvsp[0].i);
 		  }
+#line 2651 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
-
-/* Line 1455 of yacc.c  */
-#line 438 "lev_comp.y"
+#line 440 "lev_comp.y" /* yacc.c:1646  */
     {
 		      (yyval.i) = 0;
 		  }
+#line 2659 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
-
-/* Line 1455 of yacc.c  */
-#line 442 "lev_comp.y"
+#line 444 "lev_comp.y" /* yacc.c:1646  */
     {
-		      (yyval.i) = 1 + (yyvsp[(2) - (2)].i);
+		      (yyval.i) = 1 + (yyvsp[0].i);
 		  }
+#line 2667 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-
-/* Line 1455 of yacc.c  */
-#line 448 "lev_comp.y"
+#line 450 "lev_comp.y" /* yacc.c:1646  */
     {
-		      (yyval.i) = (yyvsp[(2) - (3)].i);
+		      (yyval.i) = (yyvsp[-1].i);
 		  }
+#line 2675 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 97:
-
-/* Line 1455 of yacc.c  */
-#line 531 "lev_comp.y"
+#line 533 "lev_comp.y" /* yacc.c:1646  */
     {
 		      struct lc_vardefs *vd;
-		      if ((vd = vardef_defined(variable_definitions, (yyvsp[(3) - (3)].map), 1))) {
+		      if ((vd = vardef_defined(variable_definitions, (yyvsp[0].map), 1))) {
 			  if (!(vd->var_type & SPOVAR_ARRAY))
-			      lc_error("Trying to shuffle non-array variable '%s'", (yyvsp[(3) - (3)].map));
-		      } else lc_error("Trying to shuffle undefined variable '%s'", (yyvsp[(3) - (3)].map));
-		      add_opvars(splev, "so", (yyvsp[(3) - (3)].map), SPO_SHUFFLE_ARRAY);
-		      Free((yyvsp[(3) - (3)].map));
+			      lc_error("Trying to shuffle non-array variable '%s'", (yyvsp[0].map));
+		      } else lc_error("Trying to shuffle undefined variable '%s'", (yyvsp[0].map));
+		      add_opvars(splev, "so", (yyvsp[0].map), SPO_SHUFFLE_ARRAY);
+		      Free((yyvsp[0].map));
 		  }
+#line 2689 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 98:
-
-/* Line 1455 of yacc.c  */
-#line 543 "lev_comp.y"
+#line 545 "lev_comp.y" /* yacc.c:1646  */
     {
-		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[(1) - (3)].map), SPOVAR_INT);
-		      add_opvars(splev, "iso", 0, (yyvsp[(1) - (3)].map), SPO_VAR_INIT);
-		      Free((yyvsp[(1) - (3)].map));
+		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[-2].map), SPOVAR_INT);
+		      add_opvars(splev, "iso", 0, (yyvsp[-2].map), SPO_VAR_INIT);
+		      Free((yyvsp[-2].map));
 		  }
+#line 2699 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 99:
-
-/* Line 1455 of yacc.c  */
-#line 549 "lev_comp.y"
+#line 551 "lev_comp.y" /* yacc.c:1646  */
     {
-		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[(1) - (5)].map), SPOVAR_SEL);
-		      add_opvars(splev, "iso", 0, (yyvsp[(1) - (5)].map), SPO_VAR_INIT);
-		      Free((yyvsp[(1) - (5)].map));
+		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[-4].map), SPOVAR_SEL);
+		      add_opvars(splev, "iso", 0, (yyvsp[-4].map), SPO_VAR_INIT);
+		      Free((yyvsp[-4].map));
 		  }
+#line 2709 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 100:
-
-/* Line 1455 of yacc.c  */
-#line 555 "lev_comp.y"
+#line 557 "lev_comp.y" /* yacc.c:1646  */
     {
-		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[(1) - (3)].map), SPOVAR_STRING);
-		      add_opvars(splev, "iso", 0, (yyvsp[(1) - (3)].map), SPO_VAR_INIT);
-		      Free((yyvsp[(1) - (3)].map));
+		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[-2].map), SPOVAR_STRING);
+		      add_opvars(splev, "iso", 0, (yyvsp[-2].map), SPO_VAR_INIT);
+		      Free((yyvsp[-2].map));
 		  }
+#line 2719 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 101:
-
-/* Line 1455 of yacc.c  */
-#line 561 "lev_comp.y"
+#line 563 "lev_comp.y" /* yacc.c:1646  */
     {
-		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[(1) - (5)].map), SPOVAR_MAPCHAR);
-		      add_opvars(splev, "iso", 0, (yyvsp[(1) - (5)].map), SPO_VAR_INIT);
-		      Free((yyvsp[(1) - (5)].map));
+		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[-4].map), SPOVAR_MAPCHAR);
+		      add_opvars(splev, "iso", 0, (yyvsp[-4].map), SPO_VAR_INIT);
+		      Free((yyvsp[-4].map));
 		  }
+#line 2729 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 102:
-
-/* Line 1455 of yacc.c  */
-#line 567 "lev_comp.y"
+#line 569 "lev_comp.y" /* yacc.c:1646  */
     {
-		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[(1) - (5)].map), SPOVAR_MONST);
-		      add_opvars(splev, "iso", 0, (yyvsp[(1) - (5)].map), SPO_VAR_INIT);
-		      Free((yyvsp[(1) - (5)].map));
+		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[-4].map), SPOVAR_MONST);
+		      add_opvars(splev, "iso", 0, (yyvsp[-4].map), SPO_VAR_INIT);
+		      Free((yyvsp[-4].map));
 		  }
+#line 2739 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 103:
-
-/* Line 1455 of yacc.c  */
-#line 573 "lev_comp.y"
+#line 575 "lev_comp.y" /* yacc.c:1646  */
     {
-		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[(1) - (5)].map), SPOVAR_OBJ);
-		      add_opvars(splev, "iso", 0, (yyvsp[(1) - (5)].map), SPO_VAR_INIT);
-		      Free((yyvsp[(1) - (5)].map));
+		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[-4].map), SPOVAR_OBJ);
+		      add_opvars(splev, "iso", 0, (yyvsp[-4].map), SPO_VAR_INIT);
+		      Free((yyvsp[-4].map));
 		  }
+#line 2749 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 104:
-
-/* Line 1455 of yacc.c  */
-#line 579 "lev_comp.y"
+#line 581 "lev_comp.y" /* yacc.c:1646  */
     {
-		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[(1) - (3)].map), SPOVAR_COORD);
-		      add_opvars(splev, "iso", 0, (yyvsp[(1) - (3)].map), SPO_VAR_INIT);
-		      Free((yyvsp[(1) - (3)].map));
+		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[-2].map), SPOVAR_COORD);
+		      add_opvars(splev, "iso", 0, (yyvsp[-2].map), SPO_VAR_INIT);
+		      Free((yyvsp[-2].map));
 		  }
+#line 2759 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 105:
-
-/* Line 1455 of yacc.c  */
-#line 585 "lev_comp.y"
+#line 587 "lev_comp.y" /* yacc.c:1646  */
     {
-		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[(1) - (3)].map), SPOVAR_REGION);
-		      add_opvars(splev, "iso", 0, (yyvsp[(1) - (3)].map), SPO_VAR_INIT);
-		      Free((yyvsp[(1) - (3)].map));
+		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[-2].map), SPOVAR_REGION);
+		      add_opvars(splev, "iso", 0, (yyvsp[-2].map), SPO_VAR_INIT);
+		      Free((yyvsp[-2].map));
 		  }
+#line 2769 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 106:
-
-/* Line 1455 of yacc.c  */
-#line 591 "lev_comp.y"
+#line 593 "lev_comp.y" /* yacc.c:1646  */
     {
-		      long n_items = (yyvsp[(4) - (5)].i);
-		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[(1) - (5)].map), SPOVAR_INT|SPOVAR_ARRAY);
-		      add_opvars(splev, "iso", n_items, (yyvsp[(1) - (5)].map), SPO_VAR_INIT);
-		      Free((yyvsp[(1) - (5)].map));
+		      long n_items = (yyvsp[-1].i);
+		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[-4].map), SPOVAR_INT|SPOVAR_ARRAY);
+		      add_opvars(splev, "iso", n_items, (yyvsp[-4].map), SPO_VAR_INIT);
+		      Free((yyvsp[-4].map));
 		  }
+#line 2780 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 107:
-
-/* Line 1455 of yacc.c  */
-#line 598 "lev_comp.y"
+#line 600 "lev_comp.y" /* yacc.c:1646  */
     {
-		      long n_items = (yyvsp[(4) - (5)].i);
-		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[(1) - (5)].map), SPOVAR_COORD|SPOVAR_ARRAY);
-		      add_opvars(splev, "iso", n_items, (yyvsp[(1) - (5)].map), SPO_VAR_INIT);
-		      Free((yyvsp[(1) - (5)].map));
+		      long n_items = (yyvsp[-1].i);
+		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[-4].map), SPOVAR_COORD|SPOVAR_ARRAY);
+		      add_opvars(splev, "iso", n_items, (yyvsp[-4].map), SPO_VAR_INIT);
+		      Free((yyvsp[-4].map));
 		  }
+#line 2791 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 108:
-
-/* Line 1455 of yacc.c  */
-#line 605 "lev_comp.y"
+#line 607 "lev_comp.y" /* yacc.c:1646  */
     {
-		      long n_items = (yyvsp[(4) - (5)].i);
-		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[(1) - (5)].map), SPOVAR_REGION|SPOVAR_ARRAY);
-		      add_opvars(splev, "iso", n_items, (yyvsp[(1) - (5)].map), SPO_VAR_INIT);
-		      Free((yyvsp[(1) - (5)].map));
+		      long n_items = (yyvsp[-1].i);
+		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[-4].map), SPOVAR_REGION|SPOVAR_ARRAY);
+		      add_opvars(splev, "iso", n_items, (yyvsp[-4].map), SPO_VAR_INIT);
+		      Free((yyvsp[-4].map));
 		  }
+#line 2802 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 109:
-
-/* Line 1455 of yacc.c  */
-#line 612 "lev_comp.y"
+#line 614 "lev_comp.y" /* yacc.c:1646  */
     {
-		      long n_items = (yyvsp[(6) - (7)].i);
-		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[(1) - (7)].map), SPOVAR_MAPCHAR|SPOVAR_ARRAY);
-		      add_opvars(splev, "iso", n_items, (yyvsp[(1) - (7)].map), SPO_VAR_INIT);
-		      Free((yyvsp[(1) - (7)].map));
+		      long n_items = (yyvsp[-1].i);
+		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[-6].map), SPOVAR_MAPCHAR|SPOVAR_ARRAY);
+		      add_opvars(splev, "iso", n_items, (yyvsp[-6].map), SPO_VAR_INIT);
+		      Free((yyvsp[-6].map));
 		  }
+#line 2813 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 110:
-
-/* Line 1455 of yacc.c  */
-#line 619 "lev_comp.y"
+#line 621 "lev_comp.y" /* yacc.c:1646  */
     {
-		      long n_items = (yyvsp[(6) - (7)].i);
-		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[(1) - (7)].map), SPOVAR_MONST|SPOVAR_ARRAY);
-		      add_opvars(splev, "iso", n_items, (yyvsp[(1) - (7)].map), SPO_VAR_INIT);
-		      Free((yyvsp[(1) - (7)].map));
+		      long n_items = (yyvsp[-1].i);
+		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[-6].map), SPOVAR_MONST|SPOVAR_ARRAY);
+		      add_opvars(splev, "iso", n_items, (yyvsp[-6].map), SPO_VAR_INIT);
+		      Free((yyvsp[-6].map));
 		  }
+#line 2824 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 111:
-
-/* Line 1455 of yacc.c  */
-#line 626 "lev_comp.y"
+#line 628 "lev_comp.y" /* yacc.c:1646  */
     {
-		      long n_items = (yyvsp[(6) - (7)].i);
-		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[(1) - (7)].map), SPOVAR_OBJ|SPOVAR_ARRAY);
-		      add_opvars(splev, "iso", n_items, (yyvsp[(1) - (7)].map), SPO_VAR_INIT);
-		      Free((yyvsp[(1) - (7)].map));
+		      long n_items = (yyvsp[-1].i);
+		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[-6].map), SPOVAR_OBJ|SPOVAR_ARRAY);
+		      add_opvars(splev, "iso", n_items, (yyvsp[-6].map), SPO_VAR_INIT);
+		      Free((yyvsp[-6].map));
 		  }
+#line 2835 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 112:
-
-/* Line 1455 of yacc.c  */
-#line 633 "lev_comp.y"
+#line 635 "lev_comp.y" /* yacc.c:1646  */
     {
-		      long n_items = (yyvsp[(4) - (5)].i);
-		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[(1) - (5)].map), SPOVAR_STRING|SPOVAR_ARRAY);
-		      add_opvars(splev, "iso", n_items, (yyvsp[(1) - (5)].map), SPO_VAR_INIT);
-		      Free((yyvsp[(1) - (5)].map));
+		      long n_items = (yyvsp[-1].i);
+		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[-4].map), SPOVAR_STRING|SPOVAR_ARRAY);
+		      add_opvars(splev, "iso", n_items, (yyvsp[-4].map), SPO_VAR_INIT);
+		      Free((yyvsp[-4].map));
 		  }
+#line 2846 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 113:
-
-/* Line 1455 of yacc.c  */
-#line 642 "lev_comp.y"
+#line 644 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "O", (yyvsp[(1) - (1)].i));
+		      add_opvars(splev, "O", (yyvsp[0].i));
 		      (yyval.i) = 1;
 		  }
+#line 2855 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 114:
-
-/* Line 1455 of yacc.c  */
-#line 647 "lev_comp.y"
+#line 649 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "O", (yyvsp[(3) - (3)].i));
-		      (yyval.i) = 1 + (yyvsp[(1) - (3)].i);
+		      add_opvars(splev, "O", (yyvsp[0].i));
+		      (yyval.i) = 1 + (yyvsp[-2].i);
 		  }
+#line 2864 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 115:
-
-/* Line 1455 of yacc.c  */
-#line 654 "lev_comp.y"
+#line 656 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "M", (yyvsp[(1) - (1)].i));
+		      add_opvars(splev, "M", (yyvsp[0].i));
 		      (yyval.i) = 1;
 		  }
+#line 2873 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 116:
-
-/* Line 1455 of yacc.c  */
-#line 659 "lev_comp.y"
+#line 661 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "M", (yyvsp[(3) - (3)].i));
-		      (yyval.i) = 1 + (yyvsp[(1) - (3)].i);
+		      add_opvars(splev, "M", (yyvsp[0].i));
+		      (yyval.i) = 1 + (yyvsp[-2].i);
 		  }
+#line 2882 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 117:
-
-/* Line 1455 of yacc.c  */
-#line 666 "lev_comp.y"
+#line 668 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "m", (yyvsp[(1) - (1)].i));
+		      add_opvars(splev, "m", (yyvsp[0].i));
 		      (yyval.i) = 1;
 		  }
+#line 2891 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 118:
-
-/* Line 1455 of yacc.c  */
-#line 671 "lev_comp.y"
+#line 673 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "m", (yyvsp[(3) - (3)].i));
-		      (yyval.i) = 1 + (yyvsp[(1) - (3)].i);
+		      add_opvars(splev, "m", (yyvsp[0].i));
+		      (yyval.i) = 1 + (yyvsp[-2].i);
 		  }
+#line 2900 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 119:
-
-/* Line 1455 of yacc.c  */
-#line 678 "lev_comp.y"
+#line 680 "lev_comp.y" /* yacc.c:1646  */
     {
 		      (yyval.i) = 1;
 		  }
+#line 2908 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 120:
-
-/* Line 1455 of yacc.c  */
-#line 682 "lev_comp.y"
+#line 684 "lev_comp.y" /* yacc.c:1646  */
     {
-		      (yyval.i) = 1 + (yyvsp[(1) - (3)].i);
+		      (yyval.i) = 1 + (yyvsp[-2].i);
 		  }
+#line 2916 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 121:
-
-/* Line 1455 of yacc.c  */
-#line 688 "lev_comp.y"
+#line 690 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "c", (yyvsp[(1) - (1)].i));
+		      add_opvars(splev, "c", (yyvsp[0].i));
 		      (yyval.i) = 1;
 		  }
+#line 2925 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 122:
-
-/* Line 1455 of yacc.c  */
-#line 693 "lev_comp.y"
+#line 695 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "c", (yyvsp[(3) - (3)].i));
-		      (yyval.i) = 1 + (yyvsp[(1) - (3)].i);
+		      add_opvars(splev, "c", (yyvsp[0].i));
+		      (yyval.i) = 1 + (yyvsp[-2].i);
 		  }
+#line 2934 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 123:
-
-/* Line 1455 of yacc.c  */
-#line 700 "lev_comp.y"
+#line 702 "lev_comp.y" /* yacc.c:1646  */
     {
 		      (yyval.i) = 1;
 		  }
+#line 2942 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 124:
-
-/* Line 1455 of yacc.c  */
-#line 704 "lev_comp.y"
+#line 706 "lev_comp.y" /* yacc.c:1646  */
     {
-		      (yyval.i) = 1 + (yyvsp[(1) - (3)].i);
+		      (yyval.i) = 1 + (yyvsp[-2].i);
 		  }
+#line 2950 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 125:
-
-/* Line 1455 of yacc.c  */
-#line 710 "lev_comp.y"
+#line 712 "lev_comp.y" /* yacc.c:1646  */
     {
 		      (yyval.i) = 1;
 		  }
+#line 2958 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 126:
-
-/* Line 1455 of yacc.c  */
-#line 714 "lev_comp.y"
+#line 716 "lev_comp.y" /* yacc.c:1646  */
     {
-		      (yyval.i) = 1 + (yyvsp[(1) - (3)].i);
+		      (yyval.i) = 1 + (yyvsp[-2].i);
 		  }
+#line 2966 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 127:
-
-/* Line 1455 of yacc.c  */
-#line 720 "lev_comp.y"
+#line 722 "lev_comp.y" /* yacc.c:1646  */
     {
 		      struct lc_funcdefs *funcdef;
 
 		      if (in_function_definition)
-			  lc_error("Recursively defined functions not allowed (function %s).", (yyvsp[(2) - (3)].map));
+			  lc_error("Recursively defined functions not allowed (function %s).", (yyvsp[-1].map));
 
 		      in_function_definition++;
 
-		      if (funcdef_defined(function_definitions, (yyvsp[(2) - (3)].map), 1))
-			  lc_error("Function '%s' already defined once.", (yyvsp[(2) - (3)].map));
+		      if (funcdef_defined(function_definitions, (yyvsp[-1].map), 1))
+			  lc_error("Function '%s' already defined once.", (yyvsp[-1].map));
 
-		      funcdef = funcdef_new(-1, (yyvsp[(2) - (3)].map));
+		      funcdef = funcdef_new(-1, (yyvsp[-1].map));
 		      funcdef->next = function_definitions;
 		      function_definitions = funcdef;
 		      function_splev_backup = splev;
 		      splev = &(funcdef->code);
-		      Free((yyvsp[(2) - (3)].map));
+		      Free((yyvsp[-1].map));
 		      curr_function = funcdef;
 		      function_tmp_var_defs = variable_definitions;
 		      variable_definitions = NULL;
 		  }
+#line 2992 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 128:
-
-/* Line 1455 of yacc.c  */
-#line 742 "lev_comp.y"
+#line 744 "lev_comp.y" /* yacc.c:1646  */
     {
 		      /* nothing */
 		  }
+#line 3000 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 129:
-
-/* Line 1455 of yacc.c  */
-#line 746 "lev_comp.y"
+#line 748 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "io", 0, SPO_RETURN);
 		      splev = function_splev_backup;
@@ -3355,26 +3009,25 @@ yyreduce:
 		      vardef_free_all(variable_definitions);
 		      variable_definitions = function_tmp_var_defs;
 		  }
+#line 3013 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 130:
-
-/* Line 1455 of yacc.c  */
-#line 757 "lev_comp.y"
+#line 759 "lev_comp.y" /* yacc.c:1646  */
     {
 		      struct lc_funcdefs *tmpfunc;
-		      tmpfunc = funcdef_defined(function_definitions, (yyvsp[(1) - (4)].map), 1);
+		      tmpfunc = funcdef_defined(function_definitions, (yyvsp[-3].map), 1);
 		      if (tmpfunc) {
 			  long l;
-			  long nparams = strlen( (yyvsp[(3) - (4)].map) );
+			  long nparams = strlen( (yyvsp[-1].map) );
 			  char *fparamstr = funcdef_paramtypes(tmpfunc);
-			  if (strcmp((yyvsp[(3) - (4)].map), fparamstr)) {
+			  if (strcmp((yyvsp[-1].map), fparamstr)) {
 			      char *tmps = strdup(decode_parm_str(fparamstr));
-			      lc_error("Function '%s' requires params '%s', got '%s' instead.", (yyvsp[(1) - (4)].map), tmps, decode_parm_str((yyvsp[(3) - (4)].map)));
+			      lc_error("Function '%s' requires params '%s', got '%s' instead.", (yyvsp[-3].map), tmps, decode_parm_str((yyvsp[-1].map)));
 			      Free(tmps);
 			  }
 			  Free(fparamstr);
-			  Free((yyvsp[(3) - (4)].map));
+			  Free((yyvsp[-1].map));
 			  if (!(tmpfunc->n_called)) {
 			      /* we haven't called the function yet, so insert it in the code */
 			      struct opvar *jmp = New(struct opvar);
@@ -3399,83 +3052,75 @@ yyreduce:
 			  add_opvars(splev, "iio", nparams, l, SPO_CALL);
 			  tmpfunc->n_called++;
 		      } else {
-			  lc_error("Function '%s' not defined.", (yyvsp[(1) - (4)].map));
+			  lc_error("Function '%s' not defined.", (yyvsp[-3].map));
 		      }
-		      Free((yyvsp[(1) - (4)].map));
+		      Free((yyvsp[-3].map));
 		  }
+#line 3060 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 131:
-
-/* Line 1455 of yacc.c  */
-#line 802 "lev_comp.y"
+#line 804 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opcode(splev, SPO_EXIT, NULL);
 		  }
+#line 3068 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 132:
-
-/* Line 1455 of yacc.c  */
-#line 808 "lev_comp.y"
+#line 810 "lev_comp.y" /* yacc.c:1646  */
     {
 		      (yyval.i) = 100;
 		  }
+#line 3076 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 133:
-
-/* Line 1455 of yacc.c  */
-#line 812 "lev_comp.y"
+#line 814 "lev_comp.y" /* yacc.c:1646  */
     {
-		      (yyval.i) = (yyvsp[(1) - (1)].i);
+		      (yyval.i) = (yyvsp[0].i);
 		  }
+#line 3084 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 134:
-
-/* Line 1455 of yacc.c  */
-#line 818 "lev_comp.y"
+#line 820 "lev_comp.y" /* yacc.c:1646  */
     {
 		      /* val > rn2(100) */
-		      add_opvars(splev, "iio", (long)(yyvsp[(1) - (1)].i), 100, SPO_RN2);
+		      add_opvars(splev, "iio", (long)(yyvsp[0].i), 100, SPO_RN2);
 		      (yyval.i) = SPO_JG;
                   }
+#line 3094 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 135:
-
-/* Line 1455 of yacc.c  */
-#line 824 "lev_comp.y"
+#line 826 "lev_comp.y" /* yacc.c:1646  */
     {
-		      (yyval.i) = (yyvsp[(3) - (5)].i);
+		      (yyval.i) = (yyvsp[-2].i);
                   }
+#line 3102 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 136:
-
-/* Line 1455 of yacc.c  */
-#line 828 "lev_comp.y"
+#line 830 "lev_comp.y" /* yacc.c:1646  */
     {
 		      /* boolean, explicit foo != 0 */
 		      add_opvars(splev, "i", 0);
 		      (yyval.i) = SPO_JNE;
                   }
+#line 3112 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 137:
-
-/* Line 1455 of yacc.c  */
-#line 836 "lev_comp.y"
+#line 838 "lev_comp.y" /* yacc.c:1646  */
     {
 		      is_inconstant_number = 0;
 		  }
+#line 3120 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 138:
-
-/* Line 1455 of yacc.c  */
-#line 840 "lev_comp.y"
+#line 842 "lev_comp.y" /* yacc.c:1646  */
     {
 		      struct opvar *chkjmp;
 		      if (in_switch_statement > 0)
@@ -3497,12 +3142,11 @@ yyreduce:
 		      add_opcode(splev, SPO_JMP, NULL);
 		      break_stmt_start();
 		  }
+#line 3146 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 139:
-
-/* Line 1455 of yacc.c  */
-#line 862 "lev_comp.y"
+#line 864 "lev_comp.y" /* yacc.c:1646  */
     {
 		      struct opvar *endjump = New(struct opvar);
 		      int i;
@@ -3536,34 +3180,31 @@ yyreduce:
 
 
 		  }
+#line 3184 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 142:
-
-/* Line 1455 of yacc.c  */
-#line 902 "lev_comp.y"
+#line 904 "lev_comp.y" /* yacc.c:1646  */
     {
 		      if (n_switch_case_list < MAX_SWITCH_CASES) {
 			  struct opvar *tmppush = New(struct opvar);
 			  set_opvar_int(tmppush, splev->n_opcodes);
-			  switch_case_value[n_switch_case_list] = (yyvsp[(2) - (3)].i);
+			  switch_case_value[n_switch_case_list] = (yyvsp[-1].i);
 			  switch_case_list[n_switch_case_list++] = tmppush;
 		      } else lc_error("Too many cases in a switch.");
 		  }
+#line 3197 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 143:
-
-/* Line 1455 of yacc.c  */
-#line 911 "lev_comp.y"
+#line 913 "lev_comp.y" /* yacc.c:1646  */
     {
 		  }
+#line 3204 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 144:
-
-/* Line 1455 of yacc.c  */
-#line 914 "lev_comp.y"
+#line 916 "lev_comp.y" /* yacc.c:1646  */
     {
 		      struct opvar *tmppush = New(struct opvar);
 
@@ -3573,20 +3214,18 @@ yyreduce:
 		      set_opvar_int(tmppush, splev->n_opcodes);
 		      switch_default_case = tmppush;
 		  }
+#line 3218 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 145:
-
-/* Line 1455 of yacc.c  */
-#line 924 "lev_comp.y"
+#line 926 "lev_comp.y" /* yacc.c:1646  */
     {
 		  }
+#line 3225 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 146:
-
-/* Line 1455 of yacc.c  */
-#line 929 "lev_comp.y"
+#line 931 "lev_comp.y" /* yacc.c:1646  */
     {
 		      if (!allow_break_statements)
 			  lc_error("Cannot use BREAK outside a statement block.");
@@ -3594,12 +3233,11 @@ yyreduce:
 			  break_stmt_new(splev, splev->n_opcodes);
 		      }
 		  }
+#line 3237 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 149:
-
-/* Line 1455 of yacc.c  */
-#line 943 "lev_comp.y"
+#line 945 "lev_comp.y" /* yacc.c:1646  */
     {
 		      char buf[256], buf2[256];
 
@@ -3609,42 +3247,40 @@ yyreduce:
 		      }
 
 		      /* first, define a variable for the for-loop end value */
-		      snprintf(buf, 255, "%s end", (yyvsp[(2) - (6)].map));
+		      snprintf(buf, 255, "%s end", (yyvsp[-4].map));
 		      /* the value of which is already in stack (the 2nd math_expr) */
 		      add_opvars(splev, "iso", 0, buf, SPO_VAR_INIT);
 
-		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[(2) - (6)].map), SPOVAR_INT);
+		      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[-4].map), SPOVAR_INT);
 		      /* define the for-loop variable. value is in stack (1st math_expr) */
-		      add_opvars(splev, "iso", 0, (yyvsp[(2) - (6)].map), SPO_VAR_INIT);
+		      add_opvars(splev, "iso", 0, (yyvsp[-4].map), SPO_VAR_INIT);
 
 		      /* calculate value for the loop "step" variable */
-		      snprintf(buf2, 255, "%s step", (yyvsp[(2) - (6)].map));
-		      add_opvars(splev, "vvo", buf, (yyvsp[(2) - (6)].map), SPO_MATH_SUB); /* end - start */
+		      snprintf(buf2, 255, "%s step", (yyvsp[-4].map));
+		      add_opvars(splev, "vvo", buf, (yyvsp[-4].map), SPO_MATH_SUB); /* end - start */
 		      add_opvars(splev, "o", SPO_MATH_SIGN); /* sign of that */
 		      add_opvars(splev, "iso", 0, buf2, SPO_VAR_INIT); /* save the sign into the step var */
 
-		      forloop_list[n_forloops].varname = strdup((yyvsp[(2) - (6)].map));
+		      forloop_list[n_forloops].varname = strdup((yyvsp[-4].map));
 		      forloop_list[n_forloops].jmp_point = splev->n_opcodes;
 
 		      n_forloops++;
-		      Free((yyvsp[(2) - (6)].map));
+		      Free((yyvsp[-4].map));
 		  }
+#line 3271 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 150:
-
-/* Line 1455 of yacc.c  */
-#line 975 "lev_comp.y"
+#line 977 "lev_comp.y" /* yacc.c:1646  */
     {
 		      /* nothing */
 		      break_stmt_start();
 		  }
+#line 3280 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 151:
-
-/* Line 1455 of yacc.c  */
-#line 980 "lev_comp.y"
+#line 982 "lev_comp.y" /* yacc.c:1646  */
     {
 		      char buf[256], buf2[256];
 		      n_forloops--;
@@ -3662,12 +3298,11 @@ yyreduce:
 		      Free(forloop_list[n_forloops].varname);
 		      break_stmt_end(splev);
 		  }
+#line 3302 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 152:
-
-/* Line 1455 of yacc.c  */
-#line 1000 "lev_comp.y"
+#line 1002 "lev_comp.y" /* yacc.c:1646  */
     {
 		      struct opvar *tmppush = New(struct opvar);
 
@@ -3681,12 +3316,11 @@ yyreduce:
 		      add_opvars(splev, "o", SPO_DEC);
 		      break_stmt_start();
 		  }
+#line 3320 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 153:
-
-/* Line 1455 of yacc.c  */
-#line 1014 "lev_comp.y"
+#line 1016 "lev_comp.y" /* yacc.c:1646  */
     {
 		      struct opvar *tmppush;
 
@@ -3699,12 +3333,11 @@ yyreduce:
 		      add_opcode(splev, SPO_POP, NULL); /* get rid of the count value in stack */
 		      break_stmt_end(splev);
 		  }
+#line 3337 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 154:
-
-/* Line 1455 of yacc.c  */
-#line 1029 "lev_comp.y"
+#line 1031 "lev_comp.y" /* yacc.c:1646  */
     {
 		      struct opvar *tmppush2 = New(struct opvar);
 
@@ -3721,15 +3354,14 @@ yyreduce:
 
 		      add_opcode(splev, SPO_PUSH, tmppush2);
 
-		      add_opcode(splev, reverse_jmp_opcode( (yyvsp[(1) - (2)].i) ), NULL);
+		      add_opcode(splev, reverse_jmp_opcode( (yyvsp[-1].i) ), NULL);
 
 		  }
+#line 3361 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 155:
-
-/* Line 1455 of yacc.c  */
-#line 1049 "lev_comp.y"
+#line 1051 "lev_comp.y" /* yacc.c:1646  */
     {
 		      if (n_if_list > 0) {
 			  struct opvar *tmppush;
@@ -3737,12 +3369,11 @@ yyreduce:
 			  set_opvar_int(tmppush, splev->n_opcodes - tmppush->vardata.l);
 		      } else lc_error("IF: Huh?!  No start address?");
 		  }
+#line 3373 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 156:
-
-/* Line 1455 of yacc.c  */
-#line 1059 "lev_comp.y"
+#line 1061 "lev_comp.y" /* yacc.c:1646  */
     {
 		      struct opvar *tmppush2 = New(struct opvar);
 
@@ -3759,24 +3390,22 @@ yyreduce:
 
 		      add_opcode(splev, SPO_PUSH, tmppush2);
 
-		      add_opcode(splev, reverse_jmp_opcode( (yyvsp[(2) - (2)].i) ), NULL);
+		      add_opcode(splev, reverse_jmp_opcode( (yyvsp[0].i) ), NULL);
 
 		  }
+#line 3397 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 157:
-
-/* Line 1455 of yacc.c  */
-#line 1079 "lev_comp.y"
+#line 1081 "lev_comp.y" /* yacc.c:1646  */
     {
 		     /* do nothing */
 		  }
+#line 3405 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 158:
-
-/* Line 1455 of yacc.c  */
-#line 1085 "lev_comp.y"
+#line 1087 "lev_comp.y" /* yacc.c:1646  */
     {
 		      if (n_if_list > 0) {
 			  struct opvar *tmppush;
@@ -3784,12 +3413,11 @@ yyreduce:
 			  set_opvar_int(tmppush, splev->n_opcodes - tmppush->vardata.l);
 		      } else lc_error("IF: Huh?!  No start address?");
 		  }
+#line 3417 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 159:
-
-/* Line 1455 of yacc.c  */
-#line 1093 "lev_comp.y"
+#line 1095 "lev_comp.y" /* yacc.c:1646  */
     {
 		      if (n_if_list > 0) {
 			  struct opvar *tmppush = New(struct opvar);
@@ -3806,12 +3434,11 @@ yyreduce:
 			  if_list[n_if_list++] = tmppush;
 		      } else lc_error("IF: Huh?!  No else-part address?");
 		  }
+#line 3438 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 160:
-
-/* Line 1455 of yacc.c  */
-#line 1110 "lev_comp.y"
+#line 1112 "lev_comp.y" /* yacc.c:1646  */
     {
 		      if (n_if_list > 0) {
 			  struct opvar *tmppush;
@@ -3819,591 +3446,535 @@ yyreduce:
 			  set_opvar_int(tmppush, splev->n_opcodes - tmppush->vardata.l);
 		      } else lc_error("IF: Huh?! No end address?");
 		  }
+#line 3450 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 161:
-
-/* Line 1455 of yacc.c  */
-#line 1120 "lev_comp.y"
+#line 1122 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "o", SPO_MESSAGE);
 		  }
+#line 3458 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 162:
-
-/* Line 1455 of yacc.c  */
-#line 1126 "lev_comp.y"
+#line 1128 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "iiiiiio", -1,  0, -1, -1, -1, -1, SPO_CORRIDOR);
 		  }
+#line 3466 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 163:
-
-/* Line 1455 of yacc.c  */
-#line 1130 "lev_comp.y"
+#line 1132 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "iiiiiio", -1, (yyvsp[(3) - (3)].i), -1, -1, -1, -1, SPO_CORRIDOR);
+		      add_opvars(splev, "iiiiiio", -1, (yyvsp[0].i), -1, -1, -1, -1, SPO_CORRIDOR);
 		  }
+#line 3474 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 164:
-
-/* Line 1455 of yacc.c  */
-#line 1134 "lev_comp.y"
+#line 1136 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "iiiiiio", -1, -1, -1, -1, -1, -1, SPO_CORRIDOR);
 		  }
+#line 3482 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 165:
-
-/* Line 1455 of yacc.c  */
-#line 1140 "lev_comp.y"
+#line 1142 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "iiiiiio",
-				 (yyvsp[(3) - (5)].corpos).room, (yyvsp[(3) - (5)].corpos).door, (yyvsp[(3) - (5)].corpos).wall,
-				 (yyvsp[(5) - (5)].corpos).room, (yyvsp[(5) - (5)].corpos).door, (yyvsp[(5) - (5)].corpos).wall,
+				 (yyvsp[-2].corpos).room, (yyvsp[-2].corpos).door, (yyvsp[-2].corpos).wall,
+				 (yyvsp[0].corpos).room, (yyvsp[0].corpos).door, (yyvsp[0].corpos).wall,
 				 SPO_CORRIDOR);
 		  }
+#line 3493 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 166:
-
-/* Line 1455 of yacc.c  */
-#line 1147 "lev_comp.y"
+#line 1149 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "iiiiiio",
-				 (yyvsp[(3) - (5)].corpos).room, (yyvsp[(3) - (5)].corpos).door, (yyvsp[(3) - (5)].corpos).wall,
-				 -1, -1, (long)(yyvsp[(5) - (5)].i),
+				 (yyvsp[-2].corpos).room, (yyvsp[-2].corpos).door, (yyvsp[-2].corpos).wall,
+				 -1, -1, (long)(yyvsp[0].i),
 				 SPO_CORRIDOR);
 		  }
+#line 3504 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 167:
-
-/* Line 1455 of yacc.c  */
-#line 1156 "lev_comp.y"
+#line 1158 "lev_comp.y" /* yacc.c:1646  */
     {
-			(yyval.corpos).room = (yyvsp[(2) - (7)].i);
-			(yyval.corpos).wall = (yyvsp[(4) - (7)].i);
-			(yyval.corpos).door = (yyvsp[(6) - (7)].i);
+			(yyval.corpos).room = (yyvsp[-5].i);
+			(yyval.corpos).wall = (yyvsp[-3].i);
+			(yyval.corpos).door = (yyvsp[-1].i);
 		  }
+#line 3514 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 168:
-
-/* Line 1455 of yacc.c  */
-#line 1164 "lev_comp.y"
+#line 1166 "lev_comp.y" /* yacc.c:1646  */
     {
-		      if (((yyvsp[(2) - (4)].i) < 100) && ((yyvsp[(1) - (4)].i) == OROOM))
+		      if (((yyvsp[-2].i) < 100) && ((yyvsp[-3].i) == OROOM))
 			  lc_error("Only typed rooms can have a chance.");
 		      else {
-			  add_opvars(splev, "iii", (long)(yyvsp[(1) - (4)].i), (long)(yyvsp[(2) - (4)].i), (long)(yyvsp[(4) - (4)].i));
+			  add_opvars(splev, "iii", (long)(yyvsp[-3].i), (long)(yyvsp[-2].i), (long)(yyvsp[0].i));
 		      }
                   }
+#line 3526 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 169:
-
-/* Line 1455 of yacc.c  */
-#line 1174 "lev_comp.y"
+#line 1176 "lev_comp.y" /* yacc.c:1646  */
     {
-		      long flags = (yyvsp[(8) - (8)].i);
+		      long flags = (yyvsp[0].i);
 		      if (flags == -1) flags = (1 << 0);
 		      add_opvars(splev, "iiiiiiio", flags, ERR, ERR,
-				 (yyvsp[(5) - (8)].crd).x, (yyvsp[(5) - (8)].crd).y, (yyvsp[(7) - (8)].sze).width, (yyvsp[(7) - (8)].sze).height, SPO_SUBROOM);
+				 (yyvsp[-3].crd).x, (yyvsp[-3].crd).y, (yyvsp[-1].sze).width, (yyvsp[-1].sze).height, SPO_SUBROOM);
 		      break_stmt_start();
 		  }
+#line 3538 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 170:
-
-/* Line 1455 of yacc.c  */
-#line 1182 "lev_comp.y"
+#line 1184 "lev_comp.y" /* yacc.c:1646  */
     {
 		      break_stmt_end(splev);
 		      add_opcode(splev, SPO_ENDROOM, NULL);
 		  }
+#line 3547 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 171:
-
-/* Line 1455 of yacc.c  */
-#line 1189 "lev_comp.y"
+#line 1191 "lev_comp.y" /* yacc.c:1646  */
     {
-		      long flags = (yyvsp[(8) - (10)].i);
+		      long flags = (yyvsp[-2].i);
 		      if (flags == -1) flags = (1 << 0);
 		      add_opvars(splev, "iiiiiiio", flags,
-				 (yyvsp[(7) - (10)].crd).x, (yyvsp[(7) - (10)].crd).y, (yyvsp[(5) - (10)].crd).x, (yyvsp[(5) - (10)].crd).y,
-				 (yyvsp[(9) - (10)].sze).width, (yyvsp[(9) - (10)].sze).height, SPO_ROOM);
+				 (yyvsp[-3].crd).x, (yyvsp[-3].crd).y, (yyvsp[-5].crd).x, (yyvsp[-5].crd).y,
+				 (yyvsp[-1].sze).width, (yyvsp[-1].sze).height, SPO_ROOM);
 		      break_stmt_start();
 		  }
+#line 3560 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 172:
-
-/* Line 1455 of yacc.c  */
-#line 1198 "lev_comp.y"
+#line 1200 "lev_comp.y" /* yacc.c:1646  */
     {
 		      break_stmt_end(splev);
 		      add_opcode(splev, SPO_ENDROOM, NULL);
 		  }
+#line 3569 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 173:
-
-/* Line 1455 of yacc.c  */
-#line 1205 "lev_comp.y"
+#line 1207 "lev_comp.y" /* yacc.c:1646  */
     {
 			(yyval.i) = 1;
 		  }
+#line 3577 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 174:
-
-/* Line 1455 of yacc.c  */
-#line 1209 "lev_comp.y"
+#line 1211 "lev_comp.y" /* yacc.c:1646  */
     {
-			(yyval.i) = (yyvsp[(2) - (2)].i);
+			(yyval.i) = (yyvsp[0].i);
 		  }
+#line 3585 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 175:
-
-/* Line 1455 of yacc.c  */
-#line 1215 "lev_comp.y"
+#line 1217 "lev_comp.y" /* yacc.c:1646  */
     {
-			if ( (yyvsp[(2) - (5)].i) < 1 || (yyvsp[(2) - (5)].i) > 5 ||
-			    (yyvsp[(4) - (5)].i) < 1 || (yyvsp[(4) - (5)].i) > 5 ) {
-			    lc_error("Room positions should be between 1-5: (%li,%li)!", (yyvsp[(2) - (5)].i), (yyvsp[(4) - (5)].i));
+			if ( (yyvsp[-3].i) < 1 || (yyvsp[-3].i) > 5 ||
+			    (yyvsp[-1].i) < 1 || (yyvsp[-1].i) > 5 ) {
+			    lc_error("Room positions should be between 1-5: (%li,%li)!", (yyvsp[-3].i), (yyvsp[-1].i));
 			} else {
-			    (yyval.crd).x = (yyvsp[(2) - (5)].i);
-			    (yyval.crd).y = (yyvsp[(4) - (5)].i);
+			    (yyval.crd).x = (yyvsp[-3].i);
+			    (yyval.crd).y = (yyvsp[-1].i);
 			}
 		  }
+#line 3599 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 176:
-
-/* Line 1455 of yacc.c  */
-#line 1225 "lev_comp.y"
+#line 1227 "lev_comp.y" /* yacc.c:1646  */
     {
 			(yyval.crd).x = (yyval.crd).y = ERR;
 		  }
+#line 3607 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 177:
-
-/* Line 1455 of yacc.c  */
-#line 1231 "lev_comp.y"
+#line 1233 "lev_comp.y" /* yacc.c:1646  */
     {
-			if ( (yyvsp[(2) - (5)].i) < 0 || (yyvsp[(4) - (5)].i) < 0) {
-			    lc_error("Invalid subroom position (%li,%li)!", (yyvsp[(2) - (5)].i), (yyvsp[(4) - (5)].i));
+			if ( (yyvsp[-3].i) < 0 || (yyvsp[-1].i) < 0) {
+			    lc_error("Invalid subroom position (%li,%li)!", (yyvsp[-3].i), (yyvsp[-1].i));
 			} else {
-			    (yyval.crd).x = (yyvsp[(2) - (5)].i);
-			    (yyval.crd).y = (yyvsp[(4) - (5)].i);
+			    (yyval.crd).x = (yyvsp[-3].i);
+			    (yyval.crd).y = (yyvsp[-1].i);
 			}
 		  }
+#line 3620 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 178:
-
-/* Line 1455 of yacc.c  */
-#line 1240 "lev_comp.y"
+#line 1242 "lev_comp.y" /* yacc.c:1646  */
     {
 			(yyval.crd).x = (yyval.crd).y = ERR;
 		  }
+#line 3628 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 179:
-
-/* Line 1455 of yacc.c  */
-#line 1246 "lev_comp.y"
+#line 1248 "lev_comp.y" /* yacc.c:1646  */
     {
-		      (yyval.crd).x = (yyvsp[(2) - (5)].i);
-		      (yyval.crd).y = (yyvsp[(4) - (5)].i);
+		      (yyval.crd).x = (yyvsp[-3].i);
+		      (yyval.crd).y = (yyvsp[-1].i);
 		  }
+#line 3637 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 180:
-
-/* Line 1455 of yacc.c  */
-#line 1251 "lev_comp.y"
+#line 1253 "lev_comp.y" /* yacc.c:1646  */
     {
 		      (yyval.crd).x = (yyval.crd).y = ERR;
 		  }
+#line 3645 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 181:
-
-/* Line 1455 of yacc.c  */
-#line 1257 "lev_comp.y"
+#line 1259 "lev_comp.y" /* yacc.c:1646  */
     {
-			(yyval.sze).width = (yyvsp[(2) - (5)].i);
-			(yyval.sze).height = (yyvsp[(4) - (5)].i);
+			(yyval.sze).width = (yyvsp[-3].i);
+			(yyval.sze).height = (yyvsp[-1].i);
 		  }
+#line 3654 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 182:
-
-/* Line 1455 of yacc.c  */
-#line 1262 "lev_comp.y"
+#line 1264 "lev_comp.y" /* yacc.c:1646  */
     {
 			(yyval.sze).height = (yyval.sze).width = ERR;
 		  }
+#line 3662 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 183:
-
-/* Line 1455 of yacc.c  */
-#line 1268 "lev_comp.y"
+#line 1270 "lev_comp.y" /* yacc.c:1646  */
     {
 			/* ERR means random here */
-			if ((yyvsp[(7) - (9)].i) == ERR && (yyvsp[(9) - (9)].i) != ERR) {
+			if ((yyvsp[-2].i) == ERR && (yyvsp[0].i) != ERR) {
 			    lc_error("If the door wall is random, so must be its pos!");
 			} else {
-			    add_opvars(splev, "iiiio", (long)(yyvsp[(9) - (9)].i), (long)(yyvsp[(5) - (9)].i), (long)(yyvsp[(3) - (9)].i), (long)(yyvsp[(7) - (9)].i), SPO_ROOM_DOOR);
+			    add_opvars(splev, "iiiio", (long)(yyvsp[0].i), (long)(yyvsp[-4].i), (long)(yyvsp[-6].i), (long)(yyvsp[-2].i), SPO_ROOM_DOOR);
 			}
 		  }
+#line 3675 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 184:
-
-/* Line 1455 of yacc.c  */
-#line 1277 "lev_comp.y"
+#line 1279 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "io", (long)(yyvsp[(3) - (5)].i), SPO_DOOR);
+		      add_opvars(splev, "io", (long)(yyvsp[-2].i), SPO_DOOR);
 		  }
+#line 3683 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 189:
-
-/* Line 1455 of yacc.c  */
-#line 1291 "lev_comp.y"
+#line 1293 "lev_comp.y" /* yacc.c:1646  */
     {
-		      (yyval.i) = (yyvsp[(1) - (1)].i);
+		      (yyval.i) = (yyvsp[0].i);
 		  }
+#line 3691 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 190:
-
-/* Line 1455 of yacc.c  */
-#line 1295 "lev_comp.y"
+#line 1297 "lev_comp.y" /* yacc.c:1646  */
     {
-		      (yyval.i) = ((yyvsp[(1) - (3)].i) | (yyvsp[(3) - (3)].i));
+		      (yyval.i) = ((yyvsp[-2].i) | (yyvsp[0].i));
 		  }
+#line 3699 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 193:
-
-/* Line 1455 of yacc.c  */
-#line 1305 "lev_comp.y"
+#line 1307 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "ciisiio", 0, 0, 1, (char *)0, 0, 0, SPO_MAP);
 		      max_x_map = COLNO-1;
 		      max_y_map = ROWNO;
 		  }
+#line 3709 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 194:
-
-/* Line 1455 of yacc.c  */
-#line 1311 "lev_comp.y"
+#line 1313 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "cii", SP_COORD_PACK(((yyvsp[(3) - (7)].i)),((yyvsp[(5) - (7)].i))), 1, (long)(yyvsp[(6) - (7)].i));
-		      scan_map((yyvsp[(7) - (7)].map), splev);
-		      Free((yyvsp[(7) - (7)].map));
+		      add_opvars(splev, "cii", SP_COORD_PACK(((yyvsp[-4].i)),((yyvsp[-2].i))), 1, (long)(yyvsp[-1].i));
+		      scan_map((yyvsp[0].map), splev);
+		      Free((yyvsp[0].map));
 		  }
+#line 3719 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 195:
-
-/* Line 1455 of yacc.c  */
-#line 1317 "lev_comp.y"
+#line 1319 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "ii", 2, (long)(yyvsp[(4) - (5)].i));
-		      scan_map((yyvsp[(5) - (5)].map), splev);
-		      Free((yyvsp[(5) - (5)].map));
+		      add_opvars(splev, "ii", 2, (long)(yyvsp[-1].i));
+		      scan_map((yyvsp[0].map), splev);
+		      Free((yyvsp[0].map));
 		  }
+#line 3729 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 200:
-
-/* Line 1455 of yacc.c  */
-#line 1333 "lev_comp.y"
+#line 1335 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "io", 0, SPO_MONSTER);
 		  }
+#line 3737 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 201:
-
-/* Line 1455 of yacc.c  */
-#line 1337 "lev_comp.y"
+#line 1339 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "io", 1, SPO_MONSTER);
 		      in_container_obj++;
 		      break_stmt_start();
 		  }
+#line 3747 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 202:
-
-/* Line 1455 of yacc.c  */
-#line 1343 "lev_comp.y"
+#line 1345 "lev_comp.y" /* yacc.c:1646  */
     {
 		     break_stmt_end(splev);
 		     in_container_obj--;
 		     add_opvars(splev, "o", SPO_END_MONINVENT);
 		 }
+#line 3757 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 203:
-
-/* Line 1455 of yacc.c  */
-#line 1351 "lev_comp.y"
+#line 1353 "lev_comp.y" /* yacc.c:1646  */
     {
 		      /* nothing */
 		  }
+#line 3765 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 204:
-
-/* Line 1455 of yacc.c  */
-#line 1357 "lev_comp.y"
+#line 1359 "lev_comp.y" /* yacc.c:1646  */
     {
 		      struct opvar *stopit = New(struct opvar);
 		      set_opvar_int(stopit, SP_M_V_END);
 		      add_opcode(splev, SPO_PUSH, stopit);
 		      (yyval.i) = 0x0000;
 		  }
+#line 3776 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 205:
-
-/* Line 1455 of yacc.c  */
-#line 1364 "lev_comp.y"
+#line 1366 "lev_comp.y" /* yacc.c:1646  */
     {
-		      if (( (yyvsp[(1) - (3)].i) & (yyvsp[(3) - (3)].i) ))
+		      if (( (yyvsp[-2].i) & (yyvsp[0].i) ))
 			  lc_error("MONSTER extra info defined twice.");
-		      (yyval.i) = ( (yyvsp[(1) - (3)].i) | (yyvsp[(3) - (3)].i) );
+		      (yyval.i) = ( (yyvsp[-2].i) | (yyvsp[0].i) );
 		  }
+#line 3786 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 206:
-
-/* Line 1455 of yacc.c  */
-#line 1372 "lev_comp.y"
+#line 1374 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "i", SP_M_V_NAME);
 		      (yyval.i) = 0x0001;
 		  }
+#line 3795 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 207:
-
-/* Line 1455 of yacc.c  */
-#line 1377 "lev_comp.y"
+#line 1379 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "ii", (long)(yyvsp[(1) - (1)].i), SP_M_V_PEACEFUL);
+		      add_opvars(splev, "ii", (long)(yyvsp[0].i), SP_M_V_PEACEFUL);
 		      (yyval.i) = 0x0002;
 		  }
+#line 3804 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 208:
-
-/* Line 1455 of yacc.c  */
-#line 1382 "lev_comp.y"
+#line 1384 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "ii", (long)(yyvsp[(1) - (1)].i), SP_M_V_ASLEEP);
+		      add_opvars(splev, "ii", (long)(yyvsp[0].i), SP_M_V_ASLEEP);
 		      (yyval.i) = 0x0004;
 		  }
+#line 3813 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 209:
-
-/* Line 1455 of yacc.c  */
-#line 1387 "lev_comp.y"
+#line 1389 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "ii", (long)(yyvsp[(1) - (1)].i), SP_M_V_ALIGN);
+		      add_opvars(splev, "ii", (long)(yyvsp[0].i), SP_M_V_ALIGN);
 		      (yyval.i) = 0x0008;
 		  }
+#line 3822 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 210:
-
-/* Line 1455 of yacc.c  */
-#line 1392 "lev_comp.y"
+#line 1394 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "ii", (long)(yyvsp[(1) - (2)].i), SP_M_V_APPEAR);
+		      add_opvars(splev, "ii", (long)(yyvsp[-1].i), SP_M_V_APPEAR);
 		      (yyval.i) = 0x0010;
 		  }
+#line 3831 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 211:
-
-/* Line 1455 of yacc.c  */
-#line 1397 "lev_comp.y"
+#line 1399 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "ii", 1, SP_M_V_FEMALE);
 		      (yyval.i) = 0x0020;
 		  }
+#line 3840 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 212:
-
-/* Line 1455 of yacc.c  */
-#line 1402 "lev_comp.y"
+#line 1404 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "ii", 1, SP_M_V_INVIS);
 		      (yyval.i) = 0x0040;
 		  }
+#line 3849 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 213:
-
-/* Line 1455 of yacc.c  */
-#line 1407 "lev_comp.y"
+#line 1409 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "ii", 1, SP_M_V_CANCELLED);
 		      (yyval.i) = 0x0080;
 		  }
+#line 3858 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 214:
-
-/* Line 1455 of yacc.c  */
-#line 1412 "lev_comp.y"
+#line 1414 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "ii", 1, SP_M_V_REVIVED);
 		      (yyval.i) = 0x0100;
 		  }
+#line 3867 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 215:
-
-/* Line 1455 of yacc.c  */
-#line 1417 "lev_comp.y"
+#line 1419 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "ii", 1, SP_M_V_AVENGE);
 		      (yyval.i) = 0x0200;
 		  }
+#line 3876 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 216:
-
-/* Line 1455 of yacc.c  */
-#line 1422 "lev_comp.y"
+#line 1424 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "i", SP_M_V_FLEEING);
 		      (yyval.i) = 0x0400;
 		  }
+#line 3885 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 217:
-
-/* Line 1455 of yacc.c  */
-#line 1427 "lev_comp.y"
+#line 1429 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "i", SP_M_V_BLINDED);
 		      (yyval.i) = 0x0800;
 		  }
+#line 3894 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 218:
-
-/* Line 1455 of yacc.c  */
-#line 1432 "lev_comp.y"
+#line 1434 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "i", SP_M_V_PARALYZED);
 		      (yyval.i) = 0x1000;
 		  }
+#line 3903 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 219:
-
-/* Line 1455 of yacc.c  */
-#line 1437 "lev_comp.y"
+#line 1439 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "ii", 1, SP_M_V_STUNNED);
 		      (yyval.i) = 0x2000;
 		  }
+#line 3912 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 220:
-
-/* Line 1455 of yacc.c  */
-#line 1442 "lev_comp.y"
+#line 1444 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "ii", 1, SP_M_V_CONFUSED);
 		      (yyval.i) = 0x4000;
 		  }
+#line 3921 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 221:
-
-/* Line 1455 of yacc.c  */
-#line 1447 "lev_comp.y"
+#line 1449 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "ii", (long)(yyvsp[(3) - (3)].i), SP_M_V_SEENTRAPS);
+		      add_opvars(splev, "ii", (long)(yyvsp[0].i), SP_M_V_SEENTRAPS);
 		      (yyval.i) = 0x8000;
 		  }
+#line 3930 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 222:
-
-/* Line 1455 of yacc.c  */
-#line 1454 "lev_comp.y"
+#line 1456 "lev_comp.y" /* yacc.c:1646  */
     {
-		      int token = get_trap_type((yyvsp[(1) - (1)].map));
+		      int token = get_trap_type((yyvsp[0].map));
 		      if (token == ERR || token == 0)
-			  lc_error("Unknown trap type '%s'!", (yyvsp[(1) - (1)].map));
+			  lc_error("Unknown trap type '%s'!", (yyvsp[0].map));
 		      (yyval.i) = (1L << (token - 1));
 		  }
+#line 3941 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 223:
-
-/* Line 1455 of yacc.c  */
-#line 1461 "lev_comp.y"
+#line 1463 "lev_comp.y" /* yacc.c:1646  */
     {
 		      (yyval.i) = (long) ~0;
 		  }
+#line 3949 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 224:
-
-/* Line 1455 of yacc.c  */
-#line 1465 "lev_comp.y"
+#line 1467 "lev_comp.y" /* yacc.c:1646  */
     {
-		      int token = get_trap_type((yyvsp[(1) - (3)].map));
+		      int token = get_trap_type((yyvsp[-2].map));
 		      if (token == ERR || token == 0)
-			  lc_error("Unknown trap type '%s'!", (yyvsp[(1) - (3)].map));
+			  lc_error("Unknown trap type '%s'!", (yyvsp[-2].map));
 
-		      if ((1L << (token - 1)) & (yyvsp[(3) - (3)].i))
-			  lc_error("Monster seen_traps, trap '%s' listed twice.", (yyvsp[(1) - (3)].map));
+		      if ((1L << (token - 1)) & (yyvsp[0].i))
+			  lc_error("Monster seen_traps, trap '%s' listed twice.", (yyvsp[-2].map));
 
-		      (yyval.i) = ((1L << (token - 1)) | (yyvsp[(3) - (3)].i));
+		      (yyval.i) = ((1L << (token - 1)) | (yyvsp[0].i));
 		  }
+#line 3964 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 225:
-
-/* Line 1455 of yacc.c  */
-#line 1478 "lev_comp.y"
+#line 1480 "lev_comp.y" /* yacc.c:1646  */
     {
 		      long cnt = 0;
 		      if (in_container_obj) cnt |= SP_OBJ_CONTENT;
 		      add_opvars(splev, "io", cnt, SPO_OBJECT);
 		  }
+#line 3974 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 226:
-
-/* Line 1455 of yacc.c  */
-#line 1484 "lev_comp.y"
+#line 1486 "lev_comp.y" /* yacc.c:1646  */
     {
 		      long cnt = SP_OBJ_CONTAINER;
 		      if (in_container_obj) cnt |= SP_OBJ_CONTENT;
@@ -4411,225 +3982,204 @@ yyreduce:
 		      in_container_obj++;
 		      break_stmt_start();
 		  }
+#line 3986 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 227:
-
-/* Line 1455 of yacc.c  */
-#line 1492 "lev_comp.y"
+#line 1494 "lev_comp.y" /* yacc.c:1646  */
     {
 		     break_stmt_end(splev);
 		     in_container_obj--;
 		     add_opcode(splev, SPO_POP_CONTAINER, NULL);
 		 }
+#line 3996 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 228:
-
-/* Line 1455 of yacc.c  */
-#line 1500 "lev_comp.y"
+#line 1502 "lev_comp.y" /* yacc.c:1646  */
     {
-		      if (( (yyvsp[(2) - (2)].i) & 0x4000) && in_container_obj) lc_error("Object cannot have a coord when contained.");
-		      else if (!( (yyvsp[(2) - (2)].i) & 0x4000) && !in_container_obj) lc_error("Object needs a coord when not contained.");
+		      if (( (yyvsp[0].i) & 0x4000) && in_container_obj) lc_error("Object cannot have a coord when contained.");
+		      else if (!( (yyvsp[0].i) & 0x4000) && !in_container_obj) lc_error("Object needs a coord when not contained.");
 		  }
+#line 4005 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 229:
-
-/* Line 1455 of yacc.c  */
-#line 1507 "lev_comp.y"
+#line 1509 "lev_comp.y" /* yacc.c:1646  */
     {
 		      struct opvar *stopit = New(struct opvar);
 		      set_opvar_int(stopit, SP_O_V_END);
 		      add_opcode(splev, SPO_PUSH, stopit);
 		      (yyval.i) = 0x00;
 		  }
+#line 4016 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 230:
-
-/* Line 1455 of yacc.c  */
-#line 1514 "lev_comp.y"
+#line 1516 "lev_comp.y" /* yacc.c:1646  */
     {
-		      if (( (yyvsp[(1) - (3)].i) & (yyvsp[(3) - (3)].i) ))
+		      if (( (yyvsp[-2].i) & (yyvsp[0].i) ))
 			  lc_error("OBJECT extra info '%s' defined twice.", curr_token);
-		      (yyval.i) = ( (yyvsp[(1) - (3)].i) | (yyvsp[(3) - (3)].i) );
+		      (yyval.i) = ( (yyvsp[-2].i) | (yyvsp[0].i) );
 		  }
+#line 4026 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 231:
-
-/* Line 1455 of yacc.c  */
-#line 1522 "lev_comp.y"
+#line 1524 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "ii", (long)(yyvsp[(1) - (1)].i), SP_O_V_CURSE);
+		      add_opvars(splev, "ii", (long)(yyvsp[0].i), SP_O_V_CURSE);
 		      (yyval.i) = 0x0001;
 		  }
+#line 4035 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 232:
-
-/* Line 1455 of yacc.c  */
-#line 1527 "lev_comp.y"
+#line 1529 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "i", SP_O_V_CORPSENM);
 		      (yyval.i) = 0x0002;
 		  }
+#line 4044 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 233:
-
-/* Line 1455 of yacc.c  */
-#line 1532 "lev_comp.y"
+#line 1534 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "i", SP_O_V_SPE);
 		      (yyval.i) = 0x0004;
 		  }
+#line 4053 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 234:
-
-/* Line 1455 of yacc.c  */
-#line 1537 "lev_comp.y"
+#line 1539 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "i", SP_O_V_NAME);
 		      (yyval.i) = 0x0008;
 		  }
+#line 4062 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 235:
-
-/* Line 1455 of yacc.c  */
-#line 1542 "lev_comp.y"
+#line 1544 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "i", SP_O_V_QUAN);
 		      (yyval.i) = 0x0010;
 		  }
+#line 4071 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 236:
-
-/* Line 1455 of yacc.c  */
-#line 1547 "lev_comp.y"
+#line 1549 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "ii", 1, SP_O_V_BURIED);
 		      (yyval.i) = 0x0020;
 		  }
+#line 4080 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 237:
-
-/* Line 1455 of yacc.c  */
-#line 1552 "lev_comp.y"
+#line 1554 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "ii", (long)(yyvsp[(1) - (1)].i), SP_O_V_LIT);
+		      add_opvars(splev, "ii", (long)(yyvsp[0].i), SP_O_V_LIT);
 		      (yyval.i) = 0x0040;
 		  }
+#line 4089 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 238:
-
-/* Line 1455 of yacc.c  */
-#line 1557 "lev_comp.y"
+#line 1559 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "i", SP_O_V_ERODED);
 		      (yyval.i) = 0x0080;
 		  }
+#line 4098 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 239:
-
-/* Line 1455 of yacc.c  */
-#line 1562 "lev_comp.y"
+#line 1564 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "ii", -1, SP_O_V_ERODED);
 		      (yyval.i) = 0x0080;
 		  }
+#line 4107 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 240:
-
-/* Line 1455 of yacc.c  */
-#line 1567 "lev_comp.y"
+#line 1569 "lev_comp.y" /* yacc.c:1646  */
     {
-		      if ((yyvsp[(1) - (1)].i) == D_LOCKED) {
+		      if ((yyvsp[0].i) == D_LOCKED) {
 			  add_opvars(splev, "ii", 1, SP_O_V_LOCKED);
 			  (yyval.i) = 0x0100;
-		      } else if ((yyvsp[(1) - (1)].i) == D_BROKEN) {
+		      } else if ((yyvsp[0].i) == D_BROKEN) {
 			  add_opvars(splev, "ii", 1, SP_O_V_BROKEN);
 			  (yyval.i) = 0x0200;
 		      } else
 			  lc_error("OBJECT state can only be locked or broken.");
 		  }
+#line 4122 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 241:
-
-/* Line 1455 of yacc.c  */
-#line 1578 "lev_comp.y"
+#line 1580 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "ii", 1, SP_O_V_TRAPPED);
 		      (yyval.i) = 0x0400;
 		  }
+#line 4131 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 242:
-
-/* Line 1455 of yacc.c  */
-#line 1583 "lev_comp.y"
+#line 1585 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "i", SP_O_V_RECHARGED);
 		      (yyval.i) = 0x0800;
 		  }
+#line 4140 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 243:
-
-/* Line 1455 of yacc.c  */
-#line 1588 "lev_comp.y"
+#line 1590 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "ii", 1, SP_O_V_INVIS);
 		      (yyval.i) = 0x1000;
 		  }
+#line 4149 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 244:
-
-/* Line 1455 of yacc.c  */
-#line 1593 "lev_comp.y"
+#line 1595 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "ii", 1, SP_O_V_GREASED);
 		      (yyval.i) = 0x2000;
 		  }
+#line 4158 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 245:
-
-/* Line 1455 of yacc.c  */
-#line 1598 "lev_comp.y"
+#line 1600 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "i", SP_O_V_COORD);
 		      (yyval.i) = 0x4000;
 		  }
+#line 4167 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 246:
-
-/* Line 1455 of yacc.c  */
-#line 1605 "lev_comp.y"
+#line 1607 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "io", (long)(yyvsp[(3) - (5)].i), SPO_TRAP);
+		      add_opvars(splev, "io", (long)(yyvsp[-2].i), SPO_TRAP);
 		  }
+#line 4175 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 247:
-
-/* Line 1455 of yacc.c  */
-#line 1611 "lev_comp.y"
+#line 1613 "lev_comp.y" /* yacc.c:1646  */
     {
 		       long d, state = 0;
 		       /* convert dir from a DIRECTION to a DB_DIR */
-		       d = (yyvsp[(5) - (7)].i);
+		       d = (yyvsp[-2].i);
 		       switch(d) {
 		       case W_NORTH: d = DB_NORTH; break;
 		       case W_SOUTH: d = DB_SOUTH; break;
@@ -4640,1018 +4190,921 @@ yyreduce:
 			   break;
 		       }
 
-		       if ( (yyvsp[(7) - (7)].i) == D_ISOPEN )
+		       if ( (yyvsp[0].i) == D_ISOPEN )
 			   state = 1;
-		       else if ( (yyvsp[(7) - (7)].i) == D_CLOSED )
+		       else if ( (yyvsp[0].i) == D_CLOSED )
 			   state = 0;
-		       else if ( (yyvsp[(7) - (7)].i) == -1 )
+		       else if ( (yyvsp[0].i) == -1 )
 			   state = -1;
 		       else
 			   lc_error("A drawbridge can only be open, closed or random!");
 		       add_opvars(splev, "iio", state, d, SPO_DRAWBRIDGE);
 		   }
+#line 4204 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 248:
-
-/* Line 1455 of yacc.c  */
-#line 1638 "lev_comp.y"
+#line 1640 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "iiio",
-				 (long)(yyvsp[(5) - (5)].i), 1, 0, SPO_MAZEWALK);
+				 (long)(yyvsp[0].i), 1, 0, SPO_MAZEWALK);
 		  }
+#line 4213 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 249:
-
-/* Line 1455 of yacc.c  */
-#line 1643 "lev_comp.y"
+#line 1645 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "iiio",
-				 (long)(yyvsp[(5) - (8)].i), (long)(yyvsp[(7) - (8)].i), (long)(yyvsp[(8) - (8)].i), SPO_MAZEWALK);
+				 (long)(yyvsp[-3].i), (long)(yyvsp[-1].i), (long)(yyvsp[0].i), SPO_MAZEWALK);
 		  }
+#line 4222 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 250:
-
-/* Line 1455 of yacc.c  */
-#line 1650 "lev_comp.y"
+#line 1652 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "rio", SP_REGION_PACK(-1,-1,-1,-1), 0, SPO_WALLIFY);
 		  }
+#line 4230 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 251:
-
-/* Line 1455 of yacc.c  */
-#line 1654 "lev_comp.y"
+#line 1656 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "io", 1, SPO_WALLIFY);
 		  }
+#line 4238 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 252:
-
-/* Line 1455 of yacc.c  */
-#line 1660 "lev_comp.y"
+#line 1662 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "io", (long)(yyvsp[(5) - (5)].i), SPO_LADDER);
+		      add_opvars(splev, "io", (long)(yyvsp[0].i), SPO_LADDER);
 		  }
+#line 4246 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 253:
-
-/* Line 1455 of yacc.c  */
-#line 1666 "lev_comp.y"
+#line 1668 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "io", (long)(yyvsp[(5) - (5)].i), SPO_STAIR);
+		      add_opvars(splev, "io", (long)(yyvsp[0].i), SPO_STAIR);
 		  }
+#line 4254 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 254:
-
-/* Line 1455 of yacc.c  */
-#line 1672 "lev_comp.y"
+#line 1674 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "iiiii iiiii iiso",
-				 (yyvsp[(3) - (7)].lregn).x1, (yyvsp[(3) - (7)].lregn).y1, (yyvsp[(3) - (7)].lregn).x2, (yyvsp[(3) - (7)].lregn).y2, (yyvsp[(3) - (7)].lregn).area,
-				 (yyvsp[(5) - (7)].lregn).x1, (yyvsp[(5) - (7)].lregn).y1, (yyvsp[(5) - (7)].lregn).x2, (yyvsp[(5) - (7)].lregn).y2, (yyvsp[(5) - (7)].lregn).area,
-				 (long)(((yyvsp[(7) - (7)].i)) ? LR_UPSTAIR : LR_DOWNSTAIR),
+				 (yyvsp[-4].lregn).x1, (yyvsp[-4].lregn).y1, (yyvsp[-4].lregn).x2, (yyvsp[-4].lregn).y2, (yyvsp[-4].lregn).area,
+				 (yyvsp[-2].lregn).x1, (yyvsp[-2].lregn).y1, (yyvsp[-2].lregn).x2, (yyvsp[-2].lregn).y2, (yyvsp[-2].lregn).area,
+				 (long)(((yyvsp[0].i)) ? LR_UPSTAIR : LR_DOWNSTAIR),
 				 0, (char *)0, SPO_LEVREGION);
 		  }
+#line 4266 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 255:
-
-/* Line 1455 of yacc.c  */
-#line 1682 "lev_comp.y"
+#line 1684 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "iiiii iiiii iiso",
-				 (yyvsp[(3) - (7)].lregn).x1, (yyvsp[(3) - (7)].lregn).y1, (yyvsp[(3) - (7)].lregn).x2, (yyvsp[(3) - (7)].lregn).y2, (yyvsp[(3) - (7)].lregn).area,
-				 (yyvsp[(5) - (7)].lregn).x1, (yyvsp[(5) - (7)].lregn).y1, (yyvsp[(5) - (7)].lregn).x2, (yyvsp[(5) - (7)].lregn).y2, (yyvsp[(5) - (7)].lregn).area,
-				 LR_PORTAL, 0, (yyvsp[(7) - (7)].map), SPO_LEVREGION);
-		      Free((yyvsp[(7) - (7)].map));
+				 (yyvsp[-4].lregn).x1, (yyvsp[-4].lregn).y1, (yyvsp[-4].lregn).x2, (yyvsp[-4].lregn).y2, (yyvsp[-4].lregn).area,
+				 (yyvsp[-2].lregn).x1, (yyvsp[-2].lregn).y1, (yyvsp[-2].lregn).x2, (yyvsp[-2].lregn).y2, (yyvsp[-2].lregn).area,
+				 LR_PORTAL, 0, (yyvsp[0].map), SPO_LEVREGION);
+		      Free((yyvsp[0].map));
 		  }
+#line 4278 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 256:
-
-/* Line 1455 of yacc.c  */
-#line 1692 "lev_comp.y"
+#line 1694 "lev_comp.y" /* yacc.c:1646  */
     {
 		      long rtype = 0;
-		      switch((yyvsp[(6) - (6)].i)) {
+		      switch((yyvsp[0].i)) {
 		      case -1: rtype = LR_TELE; break;
 		      case  0: rtype = LR_DOWNTELE; break;
 		      case  1: rtype = LR_UPTELE; break;
 		      }
 		      add_opvars(splev, "iiiii iiiii iiso",
-				 (yyvsp[(3) - (6)].lregn).x1, (yyvsp[(3) - (6)].lregn).y1, (yyvsp[(3) - (6)].lregn).x2, (yyvsp[(3) - (6)].lregn).y2, (yyvsp[(3) - (6)].lregn).area,
-				 (yyvsp[(5) - (6)].lregn).x1, (yyvsp[(5) - (6)].lregn).y1, (yyvsp[(5) - (6)].lregn).x2, (yyvsp[(5) - (6)].lregn).y2, (yyvsp[(5) - (6)].lregn).area,
+				 (yyvsp[-3].lregn).x1, (yyvsp[-3].lregn).y1, (yyvsp[-3].lregn).x2, (yyvsp[-3].lregn).y2, (yyvsp[-3].lregn).area,
+				 (yyvsp[-1].lregn).x1, (yyvsp[-1].lregn).y1, (yyvsp[-1].lregn).x2, (yyvsp[-1].lregn).y2, (yyvsp[-1].lregn).area,
 				 rtype, 0, (char *)0, SPO_LEVREGION);
 		  }
+#line 4295 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 257:
-
-/* Line 1455 of yacc.c  */
-#line 1707 "lev_comp.y"
+#line 1709 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "iiiii iiiii iiso",
-				 (yyvsp[(3) - (5)].lregn).x1, (yyvsp[(3) - (5)].lregn).y1, (yyvsp[(3) - (5)].lregn).x2, (yyvsp[(3) - (5)].lregn).y2, (yyvsp[(3) - (5)].lregn).area,
-				 (yyvsp[(5) - (5)].lregn).x1, (yyvsp[(5) - (5)].lregn).y1, (yyvsp[(5) - (5)].lregn).x2, (yyvsp[(5) - (5)].lregn).y2, (yyvsp[(5) - (5)].lregn).area,
+				 (yyvsp[-2].lregn).x1, (yyvsp[-2].lregn).y1, (yyvsp[-2].lregn).x2, (yyvsp[-2].lregn).y2, (yyvsp[-2].lregn).area,
+				 (yyvsp[0].lregn).x1, (yyvsp[0].lregn).y1, (yyvsp[0].lregn).x2, (yyvsp[0].lregn).y2, (yyvsp[0].lregn).area,
 				 (long)LR_BRANCH, 0, (char *)0, SPO_LEVREGION);
 		  }
+#line 4306 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 258:
-
-/* Line 1455 of yacc.c  */
-#line 1716 "lev_comp.y"
+#line 1718 "lev_comp.y" /* yacc.c:1646  */
     {
 			(yyval.i) = -1;
 		  }
+#line 4314 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 259:
-
-/* Line 1455 of yacc.c  */
-#line 1720 "lev_comp.y"
+#line 1722 "lev_comp.y" /* yacc.c:1646  */
     {
-			(yyval.i) = (yyvsp[(2) - (2)].i);
+			(yyval.i) = (yyvsp[0].i);
 		  }
+#line 4322 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 260:
-
-/* Line 1455 of yacc.c  */
-#line 1726 "lev_comp.y"
+#line 1728 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "o", SPO_FOUNTAIN);
 		  }
+#line 4330 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 261:
-
-/* Line 1455 of yacc.c  */
-#line 1732 "lev_comp.y"
+#line 1734 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "o", SPO_SINK);
 		  }
+#line 4338 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 262:
-
-/* Line 1455 of yacc.c  */
-#line 1738 "lev_comp.y"
+#line 1740 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "o", SPO_POOL);
 		  }
+#line 4346 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 263:
-
-/* Line 1455 of yacc.c  */
-#line 1744 "lev_comp.y"
+#line 1746 "lev_comp.y" /* yacc.c:1646  */
     {
 		      (yyval.terr).lit = -2;
-		      (yyval.terr).ter = what_map_char((char) (yyvsp[(1) - (1)].i));
+		      (yyval.terr).ter = what_map_char((char) (yyvsp[0].i));
 		  }
+#line 4355 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 264:
-
-/* Line 1455 of yacc.c  */
-#line 1749 "lev_comp.y"
+#line 1751 "lev_comp.y" /* yacc.c:1646  */
     {
-		      (yyval.terr).lit = (yyvsp[(4) - (5)].i);
-		      (yyval.terr).ter = what_map_char((char) (yyvsp[(2) - (5)].i));
+		      (yyval.terr).lit = (yyvsp[-1].i);
+		      (yyval.terr).ter = what_map_char((char) (yyvsp[-3].i));
 		  }
+#line 4364 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 265:
-
-/* Line 1455 of yacc.c  */
-#line 1756 "lev_comp.y"
+#line 1758 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "io", (yyvsp[(9) - (9)].i), SPO_REPLACETERRAIN);
+		      add_opvars(splev, "io", (yyvsp[0].i), SPO_REPLACETERRAIN);
 		  }
+#line 4372 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 266:
-
-/* Line 1455 of yacc.c  */
-#line 1762 "lev_comp.y"
+#line 1764 "lev_comp.y" /* yacc.c:1646  */
     {
 		     add_opvars(splev, "o", SPO_TERRAIN);
 		 }
+#line 4380 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 267:
-
-/* Line 1455 of yacc.c  */
-#line 1768 "lev_comp.y"
+#line 1770 "lev_comp.y" /* yacc.c:1646  */
     {
 		     add_opvars(splev, "o", SPO_NON_DIGGABLE);
 		  }
+#line 4388 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 268:
-
-/* Line 1455 of yacc.c  */
-#line 1774 "lev_comp.y"
+#line 1776 "lev_comp.y" /* yacc.c:1646  */
     {
 		     add_opvars(splev, "o", SPO_NON_PASSWALL);
 		  }
+#line 4396 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 269:
-
-/* Line 1455 of yacc.c  */
-#line 1780 "lev_comp.y"
+#line 1782 "lev_comp.y" /* yacc.c:1646  */
     {
 		      long irr;
-		      long rt = (yyvsp[(7) - (8)].i);
-		      long flags = (yyvsp[(8) - (8)].i);
+		      long rt = (yyvsp[-1].i);
+		      long flags = (yyvsp[0].i);
 		      if (flags == -1) flags = (1 << 0);
 		      if (!(( flags ) & 1)) rt += MAXRTYPE+1;
 		      irr = ((( flags ) & 2) != 0);
 		      add_opvars(splev, "iiio",
-				 (long)(yyvsp[(5) - (8)].i), rt, flags, SPO_REGION);
+				 (long)(yyvsp[-3].i), rt, flags, SPO_REGION);
 		      (yyval.i) = (irr || (flags & 1) || rt != OROOM);
 		      break_stmt_start();
 		  }
+#line 4413 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 270:
-
-/* Line 1455 of yacc.c  */
-#line 1793 "lev_comp.y"
+#line 1795 "lev_comp.y" /* yacc.c:1646  */
     {
 		      break_stmt_end(splev);
-		      if ( (yyvsp[(9) - (10)].i) ) {
+		      if ( (yyvsp[-1].i) ) {
 			  add_opcode(splev, SPO_ENDROOM, NULL);
-		      } else if ( (yyvsp[(10) - (10)].i) )
+		      } else if ( (yyvsp[0].i) )
 			  lc_error("Cannot use lev statements in non-permanent REGION");
 		  }
+#line 4425 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 271:
-
-/* Line 1455 of yacc.c  */
-#line 1803 "lev_comp.y"
+#line 1805 "lev_comp.y" /* yacc.c:1646  */
     {
 		      (yyval.i) = 0;
 		  }
+#line 4433 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 272:
-
-/* Line 1455 of yacc.c  */
-#line 1807 "lev_comp.y"
+#line 1809 "lev_comp.y" /* yacc.c:1646  */
     {
-		      (yyval.i) = (yyvsp[(1) - (1)].i);
+		      (yyval.i) = (yyvsp[0].i);
 		  }
+#line 4441 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 273:
-
-/* Line 1455 of yacc.c  */
-#line 1813 "lev_comp.y"
+#line 1815 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "iio", (long)(yyvsp[(7) - (7)].i), (long)(yyvsp[(5) - (7)].i), SPO_ALTAR);
+		      add_opvars(splev, "iio", (long)(yyvsp[0].i), (long)(yyvsp[-2].i), SPO_ALTAR);
 		  }
+#line 4449 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 274:
-
-/* Line 1455 of yacc.c  */
-#line 1819 "lev_comp.y"
+#line 1821 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "io", 2, SPO_GRAVE);
 		  }
+#line 4457 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 275:
-
-/* Line 1455 of yacc.c  */
-#line 1823 "lev_comp.y"
+#line 1825 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "sio",
 				 (char *)0, 1, SPO_GRAVE);
 		  }
+#line 4466 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 276:
-
-/* Line 1455 of yacc.c  */
-#line 1828 "lev_comp.y"
+#line 1830 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "sio",
 				 (char *)0, 0, SPO_GRAVE);
 		  }
+#line 4475 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 277:
-
-/* Line 1455 of yacc.c  */
-#line 1835 "lev_comp.y"
+#line 1837 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "o", SPO_GOLD);
 		  }
+#line 4483 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 278:
-
-/* Line 1455 of yacc.c  */
-#line 1841 "lev_comp.y"
+#line 1843 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "io",
-				 (long)(yyvsp[(5) - (7)].i), SPO_ENGRAVING);
+				 (long)(yyvsp[-2].i), SPO_ENGRAVING);
 		  }
+#line 4492 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 279:
-
-/* Line 1455 of yacc.c  */
-#line 1848 "lev_comp.y"
+#line 1850 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "o", SPO_MINERALIZE);
 		  }
+#line 4500 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 280:
-
-/* Line 1455 of yacc.c  */
-#line 1852 "lev_comp.y"
+#line 1854 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "iiiio", -1L, -1L, -1L, -1L, SPO_MINERALIZE);
 		  }
+#line 4508 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 281:
-
-/* Line 1455 of yacc.c  */
-#line 1858 "lev_comp.y"
+#line 1860 "lev_comp.y" /* yacc.c:1646  */
     {
-			int token = get_trap_type((yyvsp[(1) - (1)].map));
+			int token = get_trap_type((yyvsp[0].map));
 			if (token == ERR)
-			    lc_error("Unknown trap type '%s'!", (yyvsp[(1) - (1)].map));
+			    lc_error("Unknown trap type '%s'!", (yyvsp[0].map));
 			(yyval.i) = token;
-			Free((yyvsp[(1) - (1)].map));
+			Free((yyvsp[0].map));
 		  }
+#line 4520 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 283:
-
-/* Line 1455 of yacc.c  */
-#line 1869 "lev_comp.y"
+#line 1871 "lev_comp.y" /* yacc.c:1646  */
     {
-			int token = get_room_type((yyvsp[(1) - (1)].map));
+			int token = get_room_type((yyvsp[0].map));
 			if (token == ERR) {
-			    lc_warning("Unknown room type \"%s\"!  Making ordinary room...", (yyvsp[(1) - (1)].map));
+			    lc_warning("Unknown room type \"%s\"!  Making ordinary room...", (yyvsp[0].map));
 				(yyval.i) = OROOM;
 			} else
 				(yyval.i) = token;
-			Free((yyvsp[(1) - (1)].map));
+			Free((yyvsp[0].map));
 		  }
+#line 4534 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 285:
-
-/* Line 1455 of yacc.c  */
-#line 1882 "lev_comp.y"
+#line 1884 "lev_comp.y" /* yacc.c:1646  */
     {
 			(yyval.i) = -1;
 		  }
+#line 4542 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 286:
-
-/* Line 1455 of yacc.c  */
-#line 1886 "lev_comp.y"
+#line 1888 "lev_comp.y" /* yacc.c:1646  */
     {
-			(yyval.i) = (yyvsp[(2) - (2)].i);
+			(yyval.i) = (yyvsp[0].i);
 		  }
+#line 4550 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 287:
-
-/* Line 1455 of yacc.c  */
-#line 1892 "lev_comp.y"
+#line 1894 "lev_comp.y" /* yacc.c:1646  */
     {
-			(yyval.i) = (yyvsp[(1) - (1)].i);
+			(yyval.i) = (yyvsp[0].i);
 		  }
+#line 4558 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 288:
-
-/* Line 1455 of yacc.c  */
-#line 1896 "lev_comp.y"
+#line 1898 "lev_comp.y" /* yacc.c:1646  */
     {
-			(yyval.i) = (yyvsp[(1) - (3)].i) | (yyvsp[(3) - (3)].i);
+			(yyval.i) = (yyvsp[-2].i) | (yyvsp[0].i);
 		  }
+#line 4566 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 289:
-
-/* Line 1455 of yacc.c  */
-#line 1903 "lev_comp.y"
+#line 1905 "lev_comp.y" /* yacc.c:1646  */
     {
-		      (yyval.i) = ((yyvsp[(1) - (1)].i) << 0);
+		      (yyval.i) = ((yyvsp[0].i) << 0);
 		  }
+#line 4574 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 290:
-
-/* Line 1455 of yacc.c  */
-#line 1907 "lev_comp.y"
+#line 1909 "lev_comp.y" /* yacc.c:1646  */
     {
-		      (yyval.i) = ((yyvsp[(1) - (1)].i) << 1);
+		      (yyval.i) = ((yyvsp[0].i) << 1);
 		  }
+#line 4582 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 291:
-
-/* Line 1455 of yacc.c  */
-#line 1911 "lev_comp.y"
+#line 1913 "lev_comp.y" /* yacc.c:1646  */
     {
-		      (yyval.i) = ((yyvsp[(1) - (1)].i) << 2);
+		      (yyval.i) = ((yyvsp[0].i) << 2);
 		  }
+#line 4590 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 298:
-
-/* Line 1455 of yacc.c  */
-#line 1927 "lev_comp.y"
+#line 1929 "lev_comp.y" /* yacc.c:1646  */
     {
 			(yyval.i) = - MAX_REGISTERS - 1;
 		  }
+#line 4598 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 301:
-
-/* Line 1455 of yacc.c  */
-#line 1935 "lev_comp.y"
+#line 1937 "lev_comp.y" /* yacc.c:1646  */
     {
 			(yyval.i) = - MAX_REGISTERS - 1;
 		  }
+#line 4606 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 304:
-
-/* Line 1455 of yacc.c  */
-#line 1945 "lev_comp.y"
+#line 1947 "lev_comp.y" /* yacc.c:1646  */
     {
-			if ( (yyvsp[(3) - (4)].i) >= 3 )
+			if ( (yyvsp[-1].i) >= 3 )
 				lc_error("Register Index overflow!");
 			else
-				(yyval.i) = - (yyvsp[(3) - (4)].i) - 1;
+				(yyval.i) = - (yyvsp[-1].i) - 1;
 		  }
+#line 4617 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 305:
-
-/* Line 1455 of yacc.c  */
-#line 1954 "lev_comp.y"
+#line 1956 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "s", (yyvsp[(1) - (1)].map));
-		      Free((yyvsp[(1) - (1)].map));
+		      add_opvars(splev, "s", (yyvsp[0].map));
+		      Free((yyvsp[0].map));
 		  }
+#line 4626 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 306:
-
-/* Line 1455 of yacc.c  */
-#line 1959 "lev_comp.y"
+#line 1961 "lev_comp.y" /* yacc.c:1646  */
     {
-		      check_vardef_type(variable_definitions, (yyvsp[(1) - (1)].map), SPOVAR_STRING);
-		      vardef_used(variable_definitions, (yyvsp[(1) - (1)].map));
-		      add_opvars(splev, "v", (yyvsp[(1) - (1)].map));
-		      Free((yyvsp[(1) - (1)].map));
+		      check_vardef_type(variable_definitions, (yyvsp[0].map), SPOVAR_STRING);
+		      vardef_used(variable_definitions, (yyvsp[0].map));
+		      add_opvars(splev, "v", (yyvsp[0].map));
+		      Free((yyvsp[0].map));
 		  }
+#line 4637 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 307:
-
-/* Line 1455 of yacc.c  */
-#line 1966 "lev_comp.y"
+#line 1968 "lev_comp.y" /* yacc.c:1646  */
     {
-		      check_vardef_type(variable_definitions, (yyvsp[(1) - (4)].map), SPOVAR_STRING|SPOVAR_ARRAY);
-		      vardef_used(variable_definitions, (yyvsp[(1) - (4)].map));
-		      add_opvars(splev, "v", (yyvsp[(1) - (4)].map));
-		      Free((yyvsp[(1) - (4)].map));
+		      check_vardef_type(variable_definitions, (yyvsp[-3].map), SPOVAR_STRING|SPOVAR_ARRAY);
+		      vardef_used(variable_definitions, (yyvsp[-3].map));
+		      add_opvars(splev, "v", (yyvsp[-3].map));
+		      Free((yyvsp[-3].map));
 		  }
+#line 4648 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 308:
-
-/* Line 1455 of yacc.c  */
-#line 1976 "lev_comp.y"
+#line 1978 "lev_comp.y" /* yacc.c:1646  */
     {
 		      /* nothing */
 		  }
+#line 4656 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 309:
-
-/* Line 1455 of yacc.c  */
-#line 1982 "lev_comp.y"
+#line 1984 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "c", (yyvsp[(1) - (1)].i));
+		      add_opvars(splev, "c", (yyvsp[0].i));
 		  }
+#line 4664 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 310:
-
-/* Line 1455 of yacc.c  */
-#line 1986 "lev_comp.y"
+#line 1988 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "o", SPO_SEL_RNDCOORD);
 		  }
+#line 4672 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 311:
-
-/* Line 1455 of yacc.c  */
-#line 1990 "lev_comp.y"
+#line 1992 "lev_comp.y" /* yacc.c:1646  */
     {
-		      check_vardef_type(variable_definitions, (yyvsp[(1) - (1)].map), SPOVAR_COORD);
-		      vardef_used(variable_definitions, (yyvsp[(1) - (1)].map));
-		      add_opvars(splev, "v", (yyvsp[(1) - (1)].map));
-		      Free((yyvsp[(1) - (1)].map));
+		      check_vardef_type(variable_definitions, (yyvsp[0].map), SPOVAR_COORD);
+		      vardef_used(variable_definitions, (yyvsp[0].map));
+		      add_opvars(splev, "v", (yyvsp[0].map));
+		      Free((yyvsp[0].map));
 		  }
+#line 4683 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 312:
-
-/* Line 1455 of yacc.c  */
-#line 1997 "lev_comp.y"
+#line 1999 "lev_comp.y" /* yacc.c:1646  */
     {
-		      check_vardef_type(variable_definitions, (yyvsp[(1) - (4)].map), SPOVAR_COORD|SPOVAR_ARRAY);
-		      vardef_used(variable_definitions, (yyvsp[(1) - (4)].map));
-		      add_opvars(splev, "v", (yyvsp[(1) - (4)].map));
-		      Free((yyvsp[(1) - (4)].map));
+		      check_vardef_type(variable_definitions, (yyvsp[-3].map), SPOVAR_COORD|SPOVAR_ARRAY);
+		      vardef_used(variable_definitions, (yyvsp[-3].map));
+		      add_opvars(splev, "v", (yyvsp[-3].map));
+		      Free((yyvsp[-3].map));
 		  }
+#line 4694 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 313:
-
-/* Line 1455 of yacc.c  */
-#line 2006 "lev_comp.y"
+#line 2008 "lev_comp.y" /* yacc.c:1646  */
     {
-		      if ((yyvsp[(2) - (5)].i) < 0 || (yyvsp[(4) - (5)].i) < 0 || (yyvsp[(2) - (5)].i) >= COLNO || (yyvsp[(4) - (5)].i) >= ROWNO)
-			  lc_error("Coordinates (%li,%li) out of map range!", (yyvsp[(2) - (5)].i), (yyvsp[(4) - (5)].i));
-		      (yyval.i) = SP_COORD_PACK((yyvsp[(2) - (5)].i), (yyvsp[(4) - (5)].i));
+		      if ((yyvsp[-3].i) < 0 || (yyvsp[-1].i) < 0 || (yyvsp[-3].i) >= COLNO || (yyvsp[-1].i) >= ROWNO)
+			  lc_error("Coordinates (%li,%li) out of map range!", (yyvsp[-3].i), (yyvsp[-1].i));
+		      (yyval.i) = SP_COORD_PACK((yyvsp[-3].i), (yyvsp[-1].i));
 		  }
+#line 4704 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 314:
-
-/* Line 1455 of yacc.c  */
-#line 2012 "lev_comp.y"
+#line 2014 "lev_comp.y" /* yacc.c:1646  */
     {
 		      (yyval.i) = SP_COORD_PACK_RANDOM(0);
 		  }
+#line 4712 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 315:
-
-/* Line 1455 of yacc.c  */
-#line 2016 "lev_comp.y"
+#line 2018 "lev_comp.y" /* yacc.c:1646  */
     {
-		      (yyval.i) = SP_COORD_PACK_RANDOM( (yyvsp[(2) - (3)].i) );
+		      (yyval.i) = SP_COORD_PACK_RANDOM( (yyvsp[-1].i) );
 		  }
+#line 4720 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 316:
-
-/* Line 1455 of yacc.c  */
-#line 2022 "lev_comp.y"
+#line 2024 "lev_comp.y" /* yacc.c:1646  */
     {
-		      (yyval.i) = (yyvsp[(1) - (1)].i);
+		      (yyval.i) = (yyvsp[0].i);
 		  }
+#line 4728 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 317:
-
-/* Line 1455 of yacc.c  */
-#line 2026 "lev_comp.y"
+#line 2028 "lev_comp.y" /* yacc.c:1646  */
     {
-		      if (((yyvsp[(1) - (3)].i) & (yyvsp[(3) - (3)].i)))
+		      if (((yyvsp[-2].i) & (yyvsp[0].i)))
 			  lc_warning("Humidity flag used twice.");
-		      (yyval.i) = ((yyvsp[(1) - (3)].i) | (yyvsp[(3) - (3)].i));
+		      (yyval.i) = ((yyvsp[-2].i) | (yyvsp[0].i));
 		  }
+#line 4738 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 318:
-
-/* Line 1455 of yacc.c  */
-#line 2034 "lev_comp.y"
+#line 2036 "lev_comp.y" /* yacc.c:1646  */
     {
 		      /* nothing */
 		  }
+#line 4746 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 319:
-
-/* Line 1455 of yacc.c  */
-#line 2038 "lev_comp.y"
+#line 2040 "lev_comp.y" /* yacc.c:1646  */
     {
-		      check_vardef_type(variable_definitions, (yyvsp[(1) - (1)].map), SPOVAR_REGION);
-		      vardef_used(variable_definitions, (yyvsp[(1) - (1)].map));
-		      add_opvars(splev, "v", (yyvsp[(1) - (1)].map));
-		      Free((yyvsp[(1) - (1)].map));
+		      check_vardef_type(variable_definitions, (yyvsp[0].map), SPOVAR_REGION);
+		      vardef_used(variable_definitions, (yyvsp[0].map));
+		      add_opvars(splev, "v", (yyvsp[0].map));
+		      Free((yyvsp[0].map));
 		  }
+#line 4757 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 320:
-
-/* Line 1455 of yacc.c  */
-#line 2045 "lev_comp.y"
+#line 2047 "lev_comp.y" /* yacc.c:1646  */
     {
-		      check_vardef_type(variable_definitions, (yyvsp[(1) - (4)].map), SPOVAR_REGION|SPOVAR_ARRAY);
-		      vardef_used(variable_definitions, (yyvsp[(1) - (4)].map));
-		      add_opvars(splev, "v", (yyvsp[(1) - (4)].map));
-		      Free((yyvsp[(1) - (4)].map));
+		      check_vardef_type(variable_definitions, (yyvsp[-3].map), SPOVAR_REGION|SPOVAR_ARRAY);
+		      vardef_used(variable_definitions, (yyvsp[-3].map));
+		      add_opvars(splev, "v", (yyvsp[-3].map));
+		      Free((yyvsp[-3].map));
 		  }
+#line 4768 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 321:
-
-/* Line 1455 of yacc.c  */
-#line 2054 "lev_comp.y"
+#line 2056 "lev_comp.y" /* yacc.c:1646  */
     {
-		      long r = SP_REGION_PACK((yyvsp[(2) - (9)].i), (yyvsp[(4) - (9)].i), (yyvsp[(6) - (9)].i), (yyvsp[(8) - (9)].i));
-		      if ( (yyvsp[(2) - (9)].i) > (yyvsp[(6) - (9)].i) || (yyvsp[(4) - (9)].i) > (yyvsp[(8) - (9)].i) )
-			  lc_error("Region start > end: (%li,%li,%li,%li)!", (yyvsp[(2) - (9)].i), (yyvsp[(4) - (9)].i), (yyvsp[(6) - (9)].i), (yyvsp[(8) - (9)].i));
+		      long r = SP_REGION_PACK((yyvsp[-7].i), (yyvsp[-5].i), (yyvsp[-3].i), (yyvsp[-1].i));
+		      if ( (yyvsp[-7].i) > (yyvsp[-3].i) || (yyvsp[-5].i) > (yyvsp[-1].i) )
+			  lc_error("Region start > end: (%li,%li,%li,%li)!", (yyvsp[-7].i), (yyvsp[-5].i), (yyvsp[-3].i), (yyvsp[-1].i));
 
 		      add_opvars(splev, "r", r);
 		      (yyval.i) = r;
 		  }
+#line 4781 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 322:
-
-/* Line 1455 of yacc.c  */
-#line 2065 "lev_comp.y"
+#line 2067 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "m", (yyvsp[(1) - (1)].i));
+		      add_opvars(splev, "m", (yyvsp[0].i));
 		  }
+#line 4789 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 323:
-
-/* Line 1455 of yacc.c  */
-#line 2069 "lev_comp.y"
+#line 2071 "lev_comp.y" /* yacc.c:1646  */
     {
-		      check_vardef_type(variable_definitions, (yyvsp[(1) - (1)].map), SPOVAR_MAPCHAR);
-		      vardef_used(variable_definitions, (yyvsp[(1) - (1)].map));
-		      add_opvars(splev, "v", (yyvsp[(1) - (1)].map));
-		      Free((yyvsp[(1) - (1)].map));
+		      check_vardef_type(variable_definitions, (yyvsp[0].map), SPOVAR_MAPCHAR);
+		      vardef_used(variable_definitions, (yyvsp[0].map));
+		      add_opvars(splev, "v", (yyvsp[0].map));
+		      Free((yyvsp[0].map));
 		  }
+#line 4800 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 324:
-
-/* Line 1455 of yacc.c  */
-#line 2076 "lev_comp.y"
+#line 2078 "lev_comp.y" /* yacc.c:1646  */
     {
-		      check_vardef_type(variable_definitions, (yyvsp[(1) - (4)].map), SPOVAR_MAPCHAR|SPOVAR_ARRAY);
-		      vardef_used(variable_definitions, (yyvsp[(1) - (4)].map));
-		      add_opvars(splev, "v", (yyvsp[(1) - (4)].map));
-		      Free((yyvsp[(1) - (4)].map));
+		      check_vardef_type(variable_definitions, (yyvsp[-3].map), SPOVAR_MAPCHAR|SPOVAR_ARRAY);
+		      vardef_used(variable_definitions, (yyvsp[-3].map));
+		      add_opvars(splev, "v", (yyvsp[-3].map));
+		      Free((yyvsp[-3].map));
 		  }
+#line 4811 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 325:
-
-/* Line 1455 of yacc.c  */
-#line 2085 "lev_comp.y"
+#line 2087 "lev_comp.y" /* yacc.c:1646  */
     {
-		      if (what_map_char((char) (yyvsp[(1) - (1)].i)) != INVALID_TYPE)
-			  (yyval.i) = SP_MAPCHAR_PACK(what_map_char((char) (yyvsp[(1) - (1)].i)), -2);
+		      if (what_map_char((char) (yyvsp[0].i)) != INVALID_TYPE)
+			  (yyval.i) = SP_MAPCHAR_PACK(what_map_char((char) (yyvsp[0].i)), -2);
 		      else {
-			  lc_error("Unknown map char type '%c'!", (yyvsp[(1) - (1)].i));
+			  lc_error("Unknown map char type '%c'!", (yyvsp[0].i));
 			  (yyval.i) = SP_MAPCHAR_PACK(STONE, -2);
 		      }
 		  }
+#line 4824 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 326:
-
-/* Line 1455 of yacc.c  */
-#line 2094 "lev_comp.y"
+#line 2096 "lev_comp.y" /* yacc.c:1646  */
     {
-		      if (what_map_char((char) (yyvsp[(2) - (5)].i)) != INVALID_TYPE)
-			  (yyval.i) = SP_MAPCHAR_PACK(what_map_char((char) (yyvsp[(2) - (5)].i)), (yyvsp[(4) - (5)].i));
+		      if (what_map_char((char) (yyvsp[-3].i)) != INVALID_TYPE)
+			  (yyval.i) = SP_MAPCHAR_PACK(what_map_char((char) (yyvsp[-3].i)), (yyvsp[-1].i));
 		      else {
-			  lc_error("Unknown map char type '%c'!", (yyvsp[(2) - (5)].i));
-			  (yyval.i) = SP_MAPCHAR_PACK(STONE, (yyvsp[(4) - (5)].i));
+			  lc_error("Unknown map char type '%c'!", (yyvsp[-3].i));
+			  (yyval.i) = SP_MAPCHAR_PACK(STONE, (yyvsp[-1].i));
 		      }
 		  }
+#line 4837 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 327:
-
-/* Line 1455 of yacc.c  */
-#line 2105 "lev_comp.y"
+#line 2107 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "M", (yyvsp[(1) - (1)].i));
+		      add_opvars(splev, "M", (yyvsp[0].i));
 		  }
+#line 4845 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 328:
-
-/* Line 1455 of yacc.c  */
-#line 2109 "lev_comp.y"
+#line 2111 "lev_comp.y" /* yacc.c:1646  */
     {
-		      check_vardef_type(variable_definitions, (yyvsp[(1) - (1)].map), SPOVAR_MONST);
-		      vardef_used(variable_definitions, (yyvsp[(1) - (1)].map));
-		      add_opvars(splev, "v", (yyvsp[(1) - (1)].map));
-		      Free((yyvsp[(1) - (1)].map));
+		      check_vardef_type(variable_definitions, (yyvsp[0].map), SPOVAR_MONST);
+		      vardef_used(variable_definitions, (yyvsp[0].map));
+		      add_opvars(splev, "v", (yyvsp[0].map));
+		      Free((yyvsp[0].map));
 		  }
+#line 4856 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 329:
-
-/* Line 1455 of yacc.c  */
-#line 2116 "lev_comp.y"
+#line 2118 "lev_comp.y" /* yacc.c:1646  */
     {
-		      check_vardef_type(variable_definitions, (yyvsp[(1) - (4)].map), SPOVAR_MONST|SPOVAR_ARRAY);
-		      vardef_used(variable_definitions, (yyvsp[(1) - (4)].map));
-		      add_opvars(splev, "v", (yyvsp[(1) - (4)].map));
-		      Free((yyvsp[(1) - (4)].map));
+		      check_vardef_type(variable_definitions, (yyvsp[-3].map), SPOVAR_MONST|SPOVAR_ARRAY);
+		      vardef_used(variable_definitions, (yyvsp[-3].map));
+		      add_opvars(splev, "v", (yyvsp[-3].map));
+		      Free((yyvsp[-3].map));
 		  }
+#line 4867 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 330:
-
-/* Line 1455 of yacc.c  */
-#line 2125 "lev_comp.y"
+#line 2127 "lev_comp.y" /* yacc.c:1646  */
     {
-                      long m = get_monster_id((yyvsp[(1) - (1)].map), (char)0);
+                      long m = get_monster_id((yyvsp[0].map), (char)0);
                       if (m == ERR) {
-                          lc_error("Unknown monster \"%s\"!", (yyvsp[(1) - (1)].map));
+                          lc_error("Unknown monster \"%s\"!", (yyvsp[0].map));
                           (yyval.i) = -1;
                       } else
                           (yyval.i) = SP_MONST_PACK(m, def_monsyms[(int)mons[m].mlet].sym);
                   }
+#line 4880 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 331:
-
-/* Line 1455 of yacc.c  */
-#line 2134 "lev_comp.y"
+#line 2136 "lev_comp.y" /* yacc.c:1646  */
     {
-                        if (check_monster_char((char) (yyvsp[(1) - (1)].i)))
-                            (yyval.i) = SP_MONST_PACK(-1, (yyvsp[(1) - (1)].i));
+                        if (check_monster_char((char) (yyvsp[0].i)))
+                            (yyval.i) = SP_MONST_PACK(-1, (yyvsp[0].i));
                         else {
-                            lc_error("Unknown monster class '%c'!", (yyvsp[(1) - (1)].i));
+                            lc_error("Unknown monster class '%c'!", (yyvsp[0].i));
                             (yyval.i) = -1;
                         }
                   }
+#line 4893 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 332:
-
-/* Line 1455 of yacc.c  */
-#line 2143 "lev_comp.y"
+#line 2145 "lev_comp.y" /* yacc.c:1646  */
     {
-                      long m = get_monster_id((yyvsp[(4) - (5)].map), (char) (yyvsp[(2) - (5)].i));
+                      long m = get_monster_id((yyvsp[-1].map), (char) (yyvsp[-3].i));
                       if (m == ERR) {
-                          lc_error("Unknown monster ('%c', \"%s\")!", (yyvsp[(2) - (5)].i), (yyvsp[(4) - (5)].map));
+                          lc_error("Unknown monster ('%c', \"%s\")!", (yyvsp[-3].i), (yyvsp[-1].map));
                           (yyval.i) = -1;
                       } else
-                          (yyval.i) = SP_MONST_PACK(m, (yyvsp[(2) - (5)].i));
+                          (yyval.i) = SP_MONST_PACK(m, (yyvsp[-3].i));
                   }
+#line 4906 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 333:
-
-/* Line 1455 of yacc.c  */
-#line 2152 "lev_comp.y"
+#line 2154 "lev_comp.y" /* yacc.c:1646  */
     {
                       (yyval.i) = -1;
                   }
+#line 4914 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 334:
-
-/* Line 1455 of yacc.c  */
-#line 2158 "lev_comp.y"
+#line 2160 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "O", (yyvsp[(1) - (1)].i));
+		      add_opvars(splev, "O", (yyvsp[0].i));
 		  }
+#line 4922 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 335:
-
-/* Line 1455 of yacc.c  */
-#line 2162 "lev_comp.y"
+#line 2164 "lev_comp.y" /* yacc.c:1646  */
     {
-		      check_vardef_type(variable_definitions, (yyvsp[(1) - (1)].map), SPOVAR_OBJ);
-		      vardef_used(variable_definitions, (yyvsp[(1) - (1)].map));
-		      add_opvars(splev, "v", (yyvsp[(1) - (1)].map));
-		      Free((yyvsp[(1) - (1)].map));
+		      check_vardef_type(variable_definitions, (yyvsp[0].map), SPOVAR_OBJ);
+		      vardef_used(variable_definitions, (yyvsp[0].map));
+		      add_opvars(splev, "v", (yyvsp[0].map));
+		      Free((yyvsp[0].map));
 		  }
+#line 4933 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 336:
-
-/* Line 1455 of yacc.c  */
-#line 2169 "lev_comp.y"
+#line 2171 "lev_comp.y" /* yacc.c:1646  */
     {
-		      check_vardef_type(variable_definitions, (yyvsp[(1) - (4)].map), SPOVAR_OBJ|SPOVAR_ARRAY);
-		      vardef_used(variable_definitions, (yyvsp[(1) - (4)].map));
-		      add_opvars(splev, "v", (yyvsp[(1) - (4)].map));
-		      Free((yyvsp[(1) - (4)].map));
+		      check_vardef_type(variable_definitions, (yyvsp[-3].map), SPOVAR_OBJ|SPOVAR_ARRAY);
+		      vardef_used(variable_definitions, (yyvsp[-3].map));
+		      add_opvars(splev, "v", (yyvsp[-3].map));
+		      Free((yyvsp[-3].map));
 		  }
+#line 4944 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 337:
-
-/* Line 1455 of yacc.c  */
-#line 2178 "lev_comp.y"
+#line 2180 "lev_comp.y" /* yacc.c:1646  */
     {
-		      long m = get_object_id((yyvsp[(1) - (1)].map), (char)0);
+		      long m = get_object_id((yyvsp[0].map), (char)0);
 		      if (m == ERR) {
-			  lc_error("Unknown object \"%s\"!", (yyvsp[(1) - (1)].map));
+			  lc_error("Unknown object \"%s\"!", (yyvsp[0].map));
 			  (yyval.i) = -1;
 		      } else
 			  (yyval.i) = SP_OBJ_PACK(m, 1); /* obj class != 0 to force generation of a specific item */
 
 		  }
+#line 4958 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 338:
-
-/* Line 1455 of yacc.c  */
-#line 2188 "lev_comp.y"
+#line 2190 "lev_comp.y" /* yacc.c:1646  */
     {
-			if (check_object_char((char) (yyvsp[(1) - (1)].i)))
-			    (yyval.i) = SP_OBJ_PACK(-1, (yyvsp[(1) - (1)].i));
+			if (check_object_char((char) (yyvsp[0].i)))
+			    (yyval.i) = SP_OBJ_PACK(-1, (yyvsp[0].i));
 			else {
-			    lc_error("Unknown object class '%c'!", (yyvsp[(1) - (1)].i));
+			    lc_error("Unknown object class '%c'!", (yyvsp[0].i));
 			    (yyval.i) = -1;
 			}
 		  }
+#line 4971 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 339:
-
-/* Line 1455 of yacc.c  */
-#line 2197 "lev_comp.y"
+#line 2199 "lev_comp.y" /* yacc.c:1646  */
     {
-		      long m = get_object_id((yyvsp[(4) - (5)].map), (char) (yyvsp[(2) - (5)].i));
+		      long m = get_object_id((yyvsp[-1].map), (char) (yyvsp[-3].i));
 		      if (m == ERR) {
-			  lc_error("Unknown object ('%c', \"%s\")!", (yyvsp[(2) - (5)].i), (yyvsp[(4) - (5)].map));
+			  lc_error("Unknown object ('%c', \"%s\")!", (yyvsp[-3].i), (yyvsp[-1].map));
 			  (yyval.i) = -1;
 		      } else
-			  (yyval.i) = SP_OBJ_PACK(m, (yyvsp[(2) - (5)].i));
+			  (yyval.i) = SP_OBJ_PACK(m, (yyvsp[-3].i));
 		  }
+#line 4984 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 340:
-
-/* Line 1455 of yacc.c  */
-#line 2206 "lev_comp.y"
+#line 2208 "lev_comp.y" /* yacc.c:1646  */
     {
 		      (yyval.i) = -1;
 		  }
+#line 4992 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 341:
-
-/* Line 1455 of yacc.c  */
-#line 2212 "lev_comp.y"
+#line 2214 "lev_comp.y" /* yacc.c:1646  */
     { }
+#line 4998 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 342:
-
-/* Line 1455 of yacc.c  */
-#line 2214 "lev_comp.y"
+#line 2216 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "o", SPO_MATH_ADD);
 		  }
+#line 5006 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 343:
-
-/* Line 1455 of yacc.c  */
-#line 2219 "lev_comp.y"
-    { add_opvars(splev, "i", (yyvsp[(1) - (1)].i) ); }
+#line 2221 "lev_comp.y" /* yacc.c:1646  */
+    { add_opvars(splev, "i", (yyvsp[0].i) ); }
+#line 5012 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 344:
-
-/* Line 1455 of yacc.c  */
-#line 2220 "lev_comp.y"
+#line 2222 "lev_comp.y" /* yacc.c:1646  */
     { is_inconstant_number = 1; }
+#line 5018 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 345:
-
-/* Line 1455 of yacc.c  */
-#line 2221 "lev_comp.y"
-    { add_opvars(splev, "i", (yyvsp[(2) - (3)].i) ); }
+#line 2223 "lev_comp.y" /* yacc.c:1646  */
+    { add_opvars(splev, "i", (yyvsp[-1].i) ); }
+#line 5024 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 346:
-
-/* Line 1455 of yacc.c  */
-#line 2223 "lev_comp.y"
+#line 2225 "lev_comp.y" /* yacc.c:1646  */
     {
-		      check_vardef_type(variable_definitions, (yyvsp[(1) - (1)].map), SPOVAR_INT);
-		      vardef_used(variable_definitions, (yyvsp[(1) - (1)].map));
-		      add_opvars(splev, "v", (yyvsp[(1) - (1)].map));
-		      Free((yyvsp[(1) - (1)].map));
+		      check_vardef_type(variable_definitions, (yyvsp[0].map), SPOVAR_INT);
+		      vardef_used(variable_definitions, (yyvsp[0].map));
+		      add_opvars(splev, "v", (yyvsp[0].map));
+		      Free((yyvsp[0].map));
 		      is_inconstant_number = 1;
 		  }
+#line 5036 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 347:
-
-/* Line 1455 of yacc.c  */
-#line 2231 "lev_comp.y"
+#line 2233 "lev_comp.y" /* yacc.c:1646  */
     {
-		      check_vardef_type(variable_definitions, (yyvsp[(1) - (4)].map), SPOVAR_INT|SPOVAR_ARRAY);
-		      vardef_used(variable_definitions, (yyvsp[(1) - (4)].map));
-		      add_opvars(splev, "v", (yyvsp[(1) - (4)].map));
-		      Free((yyvsp[(1) - (4)].map));
+		      check_vardef_type(variable_definitions, (yyvsp[-3].map), SPOVAR_INT|SPOVAR_ARRAY);
+		      vardef_used(variable_definitions, (yyvsp[-3].map));
+		      add_opvars(splev, "v", (yyvsp[-3].map));
+		      Free((yyvsp[-3].map));
 		      is_inconstant_number = 1;
 		  }
+#line 5048 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 348:
-
-/* Line 1455 of yacc.c  */
-#line 2238 "lev_comp.y"
+#line 2240 "lev_comp.y" /* yacc.c:1646  */
     { add_opvars(splev, "o", SPO_MATH_ADD); }
+#line 5054 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 349:
-
-/* Line 1455 of yacc.c  */
-#line 2239 "lev_comp.y"
+#line 2241 "lev_comp.y" /* yacc.c:1646  */
     { add_opvars(splev, "o", SPO_MATH_SUB); }
+#line 5060 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 350:
-
-/* Line 1455 of yacc.c  */
-#line 2240 "lev_comp.y"
+#line 2242 "lev_comp.y" /* yacc.c:1646  */
     { add_opvars(splev, "o", SPO_MATH_MUL); }
+#line 5066 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 351:
-
-/* Line 1455 of yacc.c  */
-#line 2241 "lev_comp.y"
+#line 2243 "lev_comp.y" /* yacc.c:1646  */
     { add_opvars(splev, "o", SPO_MATH_DIV); }
+#line 5072 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 352:
-
-/* Line 1455 of yacc.c  */
-#line 2242 "lev_comp.y"
+#line 2244 "lev_comp.y" /* yacc.c:1646  */
     { add_opvars(splev, "o", SPO_MATH_MOD); }
+#line 5078 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 353:
-
-/* Line 1455 of yacc.c  */
-#line 2243 "lev_comp.y"
+#line 2245 "lev_comp.y" /* yacc.c:1646  */
     { }
+#line 5084 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 354:
-
-/* Line 1455 of yacc.c  */
-#line 2247 "lev_comp.y"
+#line 2249 "lev_comp.y" /* yacc.c:1646  */
     {
-			      if (!strcmp("int", (yyvsp[(1) - (1)].map)) || !strcmp("integer", (yyvsp[(1) - (1)].map))) {
+			      if (!strcmp("int", (yyvsp[0].map)) || !strcmp("integer", (yyvsp[0].map))) {
 				  (yyval.i) = (int)'i';
-			      } else lc_error("Unknown function parameter type '%s'", (yyvsp[(1) - (1)].map));
+			      } else lc_error("Unknown function parameter type '%s'", (yyvsp[0].map));
 			  }
+#line 5094 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 355:
-
-/* Line 1455 of yacc.c  */
-#line 2253 "lev_comp.y"
+#line 2255 "lev_comp.y" /* yacc.c:1646  */
     {
-			      if (!strcmp("str", (yyvsp[(1) - (1)].map)) || !strcmp("string", (yyvsp[(1) - (1)].map))) {
+			      if (!strcmp("str", (yyvsp[0].map)) || !strcmp("string", (yyvsp[0].map))) {
 				  (yyval.i) = (int)'s';
-			      } else lc_error("Unknown function parameter type '%s'", (yyvsp[(1) - (1)].map));
+			      } else lc_error("Unknown function parameter type '%s'", (yyvsp[0].map));
 			  }
+#line 5104 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 356:
-
-/* Line 1455 of yacc.c  */
-#line 2261 "lev_comp.y"
+#line 2263 "lev_comp.y" /* yacc.c:1646  */
     {
 			      struct lc_funcdefs_parm *tmp = New(struct lc_funcdefs_parm);
 
@@ -5660,8 +5113,8 @@ yyreduce:
 			      else if (!tmp)
 				  lc_error("Could not alloc function params.");
 			      else {
-				  tmp->name = strdup((yyvsp[(1) - (3)].map));
-				  tmp->parmtype = (char) (yyvsp[(3) - (3)].i);
+				  tmp->name = strdup((yyvsp[-2].map));
+				  tmp->parmtype = (char) (yyvsp[0].i);
 				  tmp->next = curr_function->params;
 				  curr_function->params = tmp;
 				  curr_function->n_params++;
@@ -5672,373 +5125,348 @@ yyreduce:
 				      case 's': vt = SPOVAR_STRING; break;
 				      default: lc_error("Unknown func param conversion."); break;
 				      }
-				      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[(1) - (3)].map), vt);
+				      variable_definitions = add_vardef_type(variable_definitions, (yyvsp[-2].map), vt);
 				  }
 			      }
-			      Free((yyvsp[(1) - (3)].map));
+			      Free((yyvsp[-2].map));
 			  }
+#line 5134 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 361:
-
-/* Line 1455 of yacc.c  */
-#line 2298 "lev_comp.y"
+#line 2300 "lev_comp.y" /* yacc.c:1646  */
     {
 			      (yyval.i) = (int)'i';
 			  }
+#line 5142 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 362:
-
-/* Line 1455 of yacc.c  */
-#line 2302 "lev_comp.y"
+#line 2304 "lev_comp.y" /* yacc.c:1646  */
     {
 			      (yyval.i) = (int)'s';
 			  }
+#line 5150 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 363:
-
-/* Line 1455 of yacc.c  */
-#line 2309 "lev_comp.y"
+#line 2311 "lev_comp.y" /* yacc.c:1646  */
     {
 			      char tmpbuf[2];
-			      tmpbuf[0] = (char) (yyvsp[(1) - (1)].i);
+			      tmpbuf[0] = (char) (yyvsp[0].i);
 			      tmpbuf[1] = '\0';
 			      (yyval.map) = strdup(tmpbuf);
 			  }
+#line 5161 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 364:
-
-/* Line 1455 of yacc.c  */
-#line 2316 "lev_comp.y"
+#line 2318 "lev_comp.y" /* yacc.c:1646  */
     {
-			      long len = strlen( (yyvsp[(1) - (3)].map) );
+			      long len = strlen( (yyvsp[-2].map) );
 			      char *tmp = (char *)alloc(len + 2);
-			      sprintf(tmp, "%c%s", (char) (yyvsp[(3) - (3)].i), (yyvsp[(1) - (3)].map) );
-			      Free( (yyvsp[(1) - (3)].map) );
+			      sprintf(tmp, "%c%s", (char) (yyvsp[0].i), (yyvsp[-2].map) );
+			      Free( (yyvsp[-2].map) );
 			      (yyval.map) = tmp;
 			  }
+#line 5173 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 365:
-
-/* Line 1455 of yacc.c  */
-#line 2326 "lev_comp.y"
+#line 2328 "lev_comp.y" /* yacc.c:1646  */
     {
 			      (yyval.map) = strdup("");
 			  }
+#line 5181 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 366:
-
-/* Line 1455 of yacc.c  */
-#line 2330 "lev_comp.y"
+#line 2332 "lev_comp.y" /* yacc.c:1646  */
     {
-			      char *tmp = strdup( (yyvsp[(1) - (1)].map) );
-			      Free( (yyvsp[(1) - (1)].map) );
+			      char *tmp = strdup( (yyvsp[0].map) );
+			      Free( (yyvsp[0].map) );
 			      (yyval.map) = tmp;
 			  }
+#line 5191 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 367:
-
-/* Line 1455 of yacc.c  */
-#line 2338 "lev_comp.y"
+#line 2340 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "o", SPO_SEL_POINT);
 		  }
+#line 5199 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 368:
-
-/* Line 1455 of yacc.c  */
-#line 2342 "lev_comp.y"
+#line 2344 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "o", SPO_SEL_RECT);
 		  }
+#line 5207 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 369:
-
-/* Line 1455 of yacc.c  */
-#line 2346 "lev_comp.y"
+#line 2348 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "o", SPO_SEL_FILLRECT);
 		  }
+#line 5215 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 370:
-
-/* Line 1455 of yacc.c  */
-#line 2350 "lev_comp.y"
+#line 2352 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "o", SPO_SEL_LINE);
 		  }
+#line 5223 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 371:
-
-/* Line 1455 of yacc.c  */
-#line 2354 "lev_comp.y"
+#line 2356 "lev_comp.y" /* yacc.c:1646  */
     {
 		      /* randline (x1,y1),(x2,y2), roughness */
 		      add_opvars(splev, "o", SPO_SEL_RNDLINE);
 		  }
+#line 5232 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 372:
-
-/* Line 1455 of yacc.c  */
-#line 2359 "lev_comp.y"
+#line 2361 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "io", W_ANY, SPO_SEL_GROW);
 		  }
+#line 5240 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 373:
-
-/* Line 1455 of yacc.c  */
-#line 2363 "lev_comp.y"
+#line 2365 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "io", (yyvsp[(3) - (6)].i), SPO_SEL_GROW);
+		      add_opvars(splev, "io", (yyvsp[-3].i), SPO_SEL_GROW);
 		  }
+#line 5248 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 374:
-
-/* Line 1455 of yacc.c  */
-#line 2367 "lev_comp.y"
+#line 2369 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "iio", (yyvsp[(3) - (6)].i), SPOFILTER_PERCENT, SPO_SEL_FILTER);
+		      add_opvars(splev, "iio", (yyvsp[-3].i), SPOFILTER_PERCENT, SPO_SEL_FILTER);
 		  }
+#line 5256 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 375:
-
-/* Line 1455 of yacc.c  */
-#line 2371 "lev_comp.y"
+#line 2373 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "io", SPOFILTER_SELECTION, SPO_SEL_FILTER);
 		  }
+#line 5264 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 376:
-
-/* Line 1455 of yacc.c  */
-#line 2375 "lev_comp.y"
+#line 2377 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "io", SPOFILTER_MAPCHAR, SPO_SEL_FILTER);
 		  }
+#line 5272 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 377:
-
-/* Line 1455 of yacc.c  */
-#line 2379 "lev_comp.y"
+#line 2381 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "o", SPO_SEL_FLOOD);
 		  }
+#line 5280 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 378:
-
-/* Line 1455 of yacc.c  */
-#line 2383 "lev_comp.y"
+#line 2385 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "oio", SPO_COPY, 1, SPO_SEL_ELLIPSE);
 		  }
+#line 5288 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 379:
-
-/* Line 1455 of yacc.c  */
-#line 2387 "lev_comp.y"
+#line 2389 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "oio", SPO_COPY, (yyvsp[(7) - (8)].i), SPO_SEL_ELLIPSE);
+		      add_opvars(splev, "oio", SPO_COPY, (yyvsp[-1].i), SPO_SEL_ELLIPSE);
 		  }
+#line 5296 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 380:
-
-/* Line 1455 of yacc.c  */
-#line 2391 "lev_comp.y"
+#line 2393 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "io", 1, SPO_SEL_ELLIPSE);
 		  }
+#line 5304 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 381:
-
-/* Line 1455 of yacc.c  */
-#line 2395 "lev_comp.y"
+#line 2397 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "io", (yyvsp[(9) - (10)].i), SPO_SEL_ELLIPSE);
+		      add_opvars(splev, "io", (yyvsp[-1].i), SPO_SEL_ELLIPSE);
 		  }
+#line 5312 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 382:
-
-/* Line 1455 of yacc.c  */
-#line 2399 "lev_comp.y"
+#line 2401 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "iio", (yyvsp[(9) - (14)].i), (yyvsp[(3) - (14)].i), SPO_SEL_GRADIENT);
+		      add_opvars(splev, "iio", (yyvsp[-5].i), (yyvsp[-11].i), SPO_SEL_GRADIENT);
 		  }
+#line 5320 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 383:
-
-/* Line 1455 of yacc.c  */
-#line 2403 "lev_comp.y"
+#line 2405 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "o", SPO_SEL_COMPLEMENT);
 		  }
+#line 5328 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 384:
-
-/* Line 1455 of yacc.c  */
-#line 2407 "lev_comp.y"
+#line 2409 "lev_comp.y" /* yacc.c:1646  */
     {
-		      check_vardef_type(variable_definitions, (yyvsp[(1) - (1)].map), SPOVAR_SEL);
-		      vardef_used(variable_definitions, (yyvsp[(1) - (1)].map));
-		      add_opvars(splev, "v", (yyvsp[(1) - (1)].map));
-		      Free((yyvsp[(1) - (1)].map));
+		      check_vardef_type(variable_definitions, (yyvsp[0].map), SPOVAR_SEL);
+		      vardef_used(variable_definitions, (yyvsp[0].map));
+		      add_opvars(splev, "v", (yyvsp[0].map));
+		      Free((yyvsp[0].map));
 		  }
+#line 5339 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 385:
-
-/* Line 1455 of yacc.c  */
-#line 2414 "lev_comp.y"
+#line 2416 "lev_comp.y" /* yacc.c:1646  */
     {
 		      /* nothing */
 		  }
+#line 5347 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 386:
-
-/* Line 1455 of yacc.c  */
-#line 2420 "lev_comp.y"
+#line 2422 "lev_comp.y" /* yacc.c:1646  */
     {
 		      /* nothing */
 		  }
+#line 5355 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 387:
-
-/* Line 1455 of yacc.c  */
-#line 2424 "lev_comp.y"
+#line 2426 "lev_comp.y" /* yacc.c:1646  */
     {
 		      add_opvars(splev, "o", SPO_SEL_ADD);
 		  }
+#line 5363 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 388:
-
-/* Line 1455 of yacc.c  */
-#line 2430 "lev_comp.y"
+#line 2432 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "iio", (yyvsp[(1) - (1)].dice).num, (yyvsp[(1) - (1)].dice).die, SPO_DICE);
+		      add_opvars(splev, "iio", (yyvsp[0].dice).num, (yyvsp[0].dice).die, SPO_DICE);
 		  }
+#line 5371 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 392:
-
-/* Line 1455 of yacc.c  */
-#line 2441 "lev_comp.y"
+#line 2443 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "i", (yyvsp[(1) - (1)].i) );
+		      add_opvars(splev, "i", (yyvsp[0].i) );
 		  }
+#line 5379 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 393:
-
-/* Line 1455 of yacc.c  */
-#line 2445 "lev_comp.y"
+#line 2447 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "i", (yyvsp[(1) - (1)].i) );
+		      add_opvars(splev, "i", (yyvsp[0].i) );
 		  }
+#line 5387 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 394:
-
-/* Line 1455 of yacc.c  */
-#line 2449 "lev_comp.y"
+#line 2451 "lev_comp.y" /* yacc.c:1646  */
     {
-		      add_opvars(splev, "i", (yyvsp[(1) - (1)].i) );
+		      add_opvars(splev, "i", (yyvsp[0].i) );
 		  }
+#line 5395 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 395:
-
-/* Line 1455 of yacc.c  */
-#line 2453 "lev_comp.y"
+#line 2455 "lev_comp.y" /* yacc.c:1646  */
     {
 		      /* nothing */
 		  }
+#line 5403 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 404:
-
-/* Line 1455 of yacc.c  */
-#line 2475 "lev_comp.y"
+#line 2477 "lev_comp.y" /* yacc.c:1646  */
     {
-			(yyval.lregn) = (yyvsp[(1) - (1)].lregn);
+			(yyval.lregn) = (yyvsp[0].lregn);
 		  }
+#line 5411 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 405:
-
-/* Line 1455 of yacc.c  */
-#line 2479 "lev_comp.y"
+#line 2481 "lev_comp.y" /* yacc.c:1646  */
     {
-			if ((yyvsp[(3) - (10)].i) <= 0 || (yyvsp[(3) - (10)].i) >= COLNO)
-			    lc_error("Region (%li,%li,%li,%li) out of level range (x1)!", (yyvsp[(3) - (10)].i), (yyvsp[(5) - (10)].i), (yyvsp[(7) - (10)].i), (yyvsp[(9) - (10)].i));
-			else if ((yyvsp[(5) - (10)].i) < 0 || (yyvsp[(5) - (10)].i) >= ROWNO)
-			    lc_error("Region (%li,%li,%li,%li) out of level range (y1)!", (yyvsp[(3) - (10)].i), (yyvsp[(5) - (10)].i), (yyvsp[(7) - (10)].i), (yyvsp[(9) - (10)].i));
-			else if ((yyvsp[(7) - (10)].i) <= 0 || (yyvsp[(7) - (10)].i) >= COLNO)
-			    lc_error("Region (%li,%li,%li,%li) out of level range (x2)!", (yyvsp[(3) - (10)].i), (yyvsp[(5) - (10)].i), (yyvsp[(7) - (10)].i), (yyvsp[(9) - (10)].i));
-			else if ((yyvsp[(9) - (10)].i) < 0 || (yyvsp[(9) - (10)].i) >= ROWNO)
-			    lc_error("Region (%li,%li,%li,%li) out of level range (y2)!", (yyvsp[(3) - (10)].i), (yyvsp[(5) - (10)].i), (yyvsp[(7) - (10)].i), (yyvsp[(9) - (10)].i));
-			(yyval.lregn).x1 = (yyvsp[(3) - (10)].i);
-			(yyval.lregn).y1 = (yyvsp[(5) - (10)].i);
-			(yyval.lregn).x2 = (yyvsp[(7) - (10)].i);
-			(yyval.lregn).y2 = (yyvsp[(9) - (10)].i);
+			if ((yyvsp[-7].i) <= 0 || (yyvsp[-7].i) >= COLNO)
+			    lc_error("Region (%li,%li,%li,%li) out of level range (x1)!", (yyvsp[-7].i), (yyvsp[-5].i), (yyvsp[-3].i), (yyvsp[-1].i));
+			else if ((yyvsp[-5].i) < 0 || (yyvsp[-5].i) >= ROWNO)
+			    lc_error("Region (%li,%li,%li,%li) out of level range (y1)!", (yyvsp[-7].i), (yyvsp[-5].i), (yyvsp[-3].i), (yyvsp[-1].i));
+			else if ((yyvsp[-3].i) <= 0 || (yyvsp[-3].i) >= COLNO)
+			    lc_error("Region (%li,%li,%li,%li) out of level range (x2)!", (yyvsp[-7].i), (yyvsp[-5].i), (yyvsp[-3].i), (yyvsp[-1].i));
+			else if ((yyvsp[-1].i) < 0 || (yyvsp[-1].i) >= ROWNO)
+			    lc_error("Region (%li,%li,%li,%li) out of level range (y2)!", (yyvsp[-7].i), (yyvsp[-5].i), (yyvsp[-3].i), (yyvsp[-1].i));
+			(yyval.lregn).x1 = (yyvsp[-7].i);
+			(yyval.lregn).y1 = (yyvsp[-5].i);
+			(yyval.lregn).x2 = (yyvsp[-3].i);
+			(yyval.lregn).y2 = (yyvsp[-1].i);
 			(yyval.lregn).area = 1;
 		  }
+#line 5431 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 406:
-
-/* Line 1455 of yacc.c  */
-#line 2497 "lev_comp.y"
+#line 2499 "lev_comp.y" /* yacc.c:1646  */
     {
 /* This series of if statements is a hack for MSC 5.1.  It seems that its
    tiny little brain cannot compile if these are all one big if statement. */
-			if ((yyvsp[(2) - (9)].i) < 0 || (yyvsp[(2) - (9)].i) > (int)max_x_map)
-			    lc_error("Region (%li,%li,%li,%li) out of map range (x1)!", (yyvsp[(2) - (9)].i), (yyvsp[(4) - (9)].i), (yyvsp[(6) - (9)].i), (yyvsp[(8) - (9)].i));
-			else if ((yyvsp[(4) - (9)].i) < 0 || (yyvsp[(4) - (9)].i) > (int)max_y_map)
-			    lc_error("Region (%li,%li,%li,%li) out of map range (y1)!", (yyvsp[(2) - (9)].i), (yyvsp[(4) - (9)].i), (yyvsp[(6) - (9)].i), (yyvsp[(8) - (9)].i));
-			else if ((yyvsp[(6) - (9)].i) < 0 || (yyvsp[(6) - (9)].i) > (int)max_x_map)
-			    lc_error("Region (%li,%li,%li,%li) out of map range (x2)!", (yyvsp[(2) - (9)].i), (yyvsp[(4) - (9)].i), (yyvsp[(6) - (9)].i), (yyvsp[(8) - (9)].i));
-			else if ((yyvsp[(8) - (9)].i) < 0 || (yyvsp[(8) - (9)].i) > (int)max_y_map)
-			    lc_error("Region (%li,%li,%li,%li) out of map range (y2)!", (yyvsp[(2) - (9)].i), (yyvsp[(4) - (9)].i), (yyvsp[(6) - (9)].i), (yyvsp[(8) - (9)].i));
+			if ((yyvsp[-7].i) < 0 || (yyvsp[-7].i) > (int)max_x_map)
+			    lc_error("Region (%li,%li,%li,%li) out of map range (x1)!", (yyvsp[-7].i), (yyvsp[-5].i), (yyvsp[-3].i), (yyvsp[-1].i));
+			else if ((yyvsp[-5].i) < 0 || (yyvsp[-5].i) > (int)max_y_map)
+			    lc_error("Region (%li,%li,%li,%li) out of map range (y1)!", (yyvsp[-7].i), (yyvsp[-5].i), (yyvsp[-3].i), (yyvsp[-1].i));
+			else if ((yyvsp[-3].i) < 0 || (yyvsp[-3].i) > (int)max_x_map)
+			    lc_error("Region (%li,%li,%li,%li) out of map range (x2)!", (yyvsp[-7].i), (yyvsp[-5].i), (yyvsp[-3].i), (yyvsp[-1].i));
+			else if ((yyvsp[-1].i) < 0 || (yyvsp[-1].i) > (int)max_y_map)
+			    lc_error("Region (%li,%li,%li,%li) out of map range (y2)!", (yyvsp[-7].i), (yyvsp[-5].i), (yyvsp[-3].i), (yyvsp[-1].i));
 			(yyval.lregn).area = 0;
-			(yyval.lregn).x1 = (yyvsp[(2) - (9)].i);
-			(yyval.lregn).y1 = (yyvsp[(4) - (9)].i);
-			(yyval.lregn).x2 = (yyvsp[(6) - (9)].i);
-			(yyval.lregn).y2 = (yyvsp[(8) - (9)].i);
+			(yyval.lregn).x1 = (yyvsp[-7].i);
+			(yyval.lregn).y1 = (yyvsp[-5].i);
+			(yyval.lregn).x2 = (yyvsp[-3].i);
+			(yyval.lregn).y2 = (yyvsp[-1].i);
 		  }
+#line 5453 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-
-/* Line 1455 of yacc.c  */
-#line 6040 "y.tab.c"
+#line 5457 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
+  /* User semantic actions sometimes alter yychar, and that requires
+     that yytoken be updated with the new translation.  We take the
+     approach of translating immediately before every use of yytoken.
+     One alternative is translating here after every semantic action,
+     but that translation would be missed if the semantic action invokes
+     YYABORT, YYACCEPT, or YYERROR immediately after altering yychar or
+     if it invokes YYBACKUP.  In the case of YYABORT or YYACCEPT, an
+     incorrect destructor might then be invoked immediately.  In the
+     case of YYERROR or YYBACKUP, subsequent parser actions might lead
+     to an incorrect destructor call or verbose syntax error message
+     before the lookahead is translated.  */
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
 
   YYPOPSTACK (yylen);
@@ -6047,7 +5475,7 @@ yyreduce:
 
   *++yyvsp = yyval;
 
-  /* Now `shift' the result of the reduction.  Determine what state
+  /* Now 'shift' the result of the reduction.  Determine what state
      that goes to, based on the state we popped back to and the rule
      number reduced by.  */
 
@@ -6062,10 +5490,14 @@ yyreduce:
   goto yynewstate;
 
 
-/*------------------------------------.
-| yyerrlab -- here on detecting error |
-`------------------------------------*/
+/*--------------------------------------.
+| yyerrlab -- here on detecting error.  |
+`--------------------------------------*/
 yyerrlab:
+  /* Make sure we have latest lookahead translation.  See comments at
+     user semantic actions for why this is necessary.  */
+  yytoken = yychar == YYEMPTY ? YYEMPTY : YYTRANSLATE (yychar);
+
   /* If not already recovering from an error, report this error.  */
   if (!yyerrstatus)
     {
@@ -6073,37 +5505,36 @@ yyerrlab:
 #if ! YYERROR_VERBOSE
       yyerror (YY_("syntax error"));
 #else
+# define YYSYNTAX_ERROR yysyntax_error (&yymsg_alloc, &yymsg, \
+                                        yyssp, yytoken)
       {
-	YYSIZE_T yysize = yysyntax_error (0, yystate, yychar);
-	if (yymsg_alloc < yysize && yymsg_alloc < YYSTACK_ALLOC_MAXIMUM)
-	  {
-	    YYSIZE_T yyalloc = 2 * yysize;
-	    if (! (yysize <= yyalloc && yyalloc <= YYSTACK_ALLOC_MAXIMUM))
-	      yyalloc = YYSTACK_ALLOC_MAXIMUM;
-	    if (yymsg != yymsgbuf)
-	      YYSTACK_FREE (yymsg);
-	    yymsg = (char *) YYSTACK_ALLOC (yyalloc);
-	    if (yymsg)
-	      yymsg_alloc = yyalloc;
-	    else
-	      {
-		yymsg = yymsgbuf;
-		yymsg_alloc = sizeof yymsgbuf;
-	      }
-	  }
-
-	if (0 < yysize && yysize <= yymsg_alloc)
-	  {
-	    (void) yysyntax_error (yymsg, yystate, yychar);
-	    yyerror (yymsg);
-	  }
-	else
-	  {
-	    yyerror (YY_("syntax error"));
-	    if (yysize != 0)
-	      goto yyexhaustedlab;
-	  }
+        char const *yymsgp = YY_("syntax error");
+        int yysyntax_error_status;
+        yysyntax_error_status = YYSYNTAX_ERROR;
+        if (yysyntax_error_status == 0)
+          yymsgp = yymsg;
+        else if (yysyntax_error_status == 1)
+          {
+            if (yymsg != yymsgbuf)
+              YYSTACK_FREE (yymsg);
+            yymsg = (char *) YYSTACK_ALLOC (yymsg_alloc);
+            if (!yymsg)
+              {
+                yymsg = yymsgbuf;
+                yymsg_alloc = sizeof yymsgbuf;
+                yysyntax_error_status = 2;
+              }
+            else
+              {
+                yysyntax_error_status = YYSYNTAX_ERROR;
+                yymsgp = yymsg;
+              }
+          }
+        yyerror (yymsgp);
+        if (yysyntax_error_status == 2)
+          goto yyexhaustedlab;
       }
+# undef YYSYNTAX_ERROR
 #endif
     }
 
@@ -6112,20 +5543,20 @@ yyerrlab:
   if (yyerrstatus == 3)
     {
       /* If just tried and failed to reuse lookahead token after an
-	 error, discard it.  */
+         error, discard it.  */
 
       if (yychar <= YYEOF)
-	{
-	  /* Return failure if at end of input.  */
-	  if (yychar == YYEOF)
-	    YYABORT;
-	}
+        {
+          /* Return failure if at end of input.  */
+          if (yychar == YYEOF)
+            YYABORT;
+        }
       else
-	{
-	  yydestruct ("Error: discarding",
-		      yytoken, &yylval);
-	  yychar = YYEMPTY;
-	}
+        {
+          yydestruct ("Error: discarding",
+                      yytoken, &yylval);
+          yychar = YYEMPTY;
+        }
     }
 
   /* Else will try to reuse lookahead token after shifting the error
@@ -6144,7 +5575,7 @@ yyerrorlab:
   if (/*CONSTCOND*/ 0)
      goto yyerrorlab;
 
-  /* Do not reclaim the symbols of the rule which action triggered
+  /* Do not reclaim the symbols of the rule whose action triggered
      this YYERROR.  */
   YYPOPSTACK (yylen);
   yylen = 0;
@@ -6157,35 +5588,37 @@ yyerrorlab:
 | yyerrlab1 -- common code for both syntax error and YYERROR.  |
 `-------------------------------------------------------------*/
 yyerrlab1:
-  yyerrstatus = 3;	/* Each real token shifted decrements this.  */
+  yyerrstatus = 3;      /* Each real token shifted decrements this.  */
 
   for (;;)
     {
       yyn = yypact[yystate];
-      if (yyn != YYPACT_NINF)
-	{
-	  yyn += YYTERROR;
-	  if (0 <= yyn && yyn <= YYLAST && yycheck[yyn] == YYTERROR)
-	    {
-	      yyn = yytable[yyn];
-	      if (0 < yyn)
-		break;
-	    }
-	}
+      if (!yypact_value_is_default (yyn))
+        {
+          yyn += YYTERROR;
+          if (0 <= yyn && yyn <= YYLAST && yycheck[yyn] == YYTERROR)
+            {
+              yyn = yytable[yyn];
+              if (0 < yyn)
+                break;
+            }
+        }
 
       /* Pop the current state because it cannot handle the error token.  */
       if (yyssp == yyss)
-	YYABORT;
+        YYABORT;
 
 
       yydestruct ("Error: popping",
-		  yystos[yystate], yyvsp);
+                  yystos[yystate], yyvsp);
       YYPOPSTACK (1);
       yystate = *yyssp;
       YY_STACK_PRINT (yyss, yyssp);
     }
 
+  YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
   *++yyvsp = yylval;
+  YY_IGNORE_MAYBE_UNINITIALIZED_END
 
 
   /* Shift the error token.  */
@@ -6209,7 +5642,7 @@ yyabortlab:
   yyresult = 1;
   goto yyreturn;
 
-#if !defined(yyoverflow) || YYERROR_VERBOSE
+#if !defined yyoverflow || YYERROR_VERBOSE
 /*-------------------------------------------------.
 | yyexhaustedlab -- memory exhaustion comes here.  |
 `-------------------------------------------------*/
@@ -6221,16 +5654,21 @@ yyexhaustedlab:
 
 yyreturn:
   if (yychar != YYEMPTY)
-     yydestruct ("Cleanup: discarding lookahead",
-		 yytoken, &yylval);
-  /* Do not reclaim the symbols of the rule which action triggered
+    {
+      /* Make sure we have latest lookahead translation.  See comments at
+         user semantic actions for why this is necessary.  */
+      yytoken = YYTRANSLATE (yychar);
+      yydestruct ("Cleanup: discarding lookahead",
+                  yytoken, &yylval);
+    }
+  /* Do not reclaim the symbols of the rule whose action triggered
      this YYABORT or YYACCEPT.  */
   YYPOPSTACK (yylen);
   YY_STACK_PRINT (yyss, yyssp);
   while (yyssp != yyss)
     {
       yydestruct ("Cleanup: popping",
-		  yystos[*yyssp], yyvsp);
+                  yystos[*yyssp], yyvsp);
       YYPOPSTACK (1);
     }
 #ifndef yyoverflow
@@ -6241,15 +5679,9 @@ yyreturn:
   if (yymsg != yymsgbuf)
     YYSTACK_FREE (yymsg);
 #endif
-  /* Make sure YYID is used.  */
-  return YYID (yyresult);
+  return yyresult;
 }
-
-
-
-/* Line 1675 of yacc.c  */
-#line 2517 "lev_comp.y"
+#line 2519 "lev_comp.y" /* yacc.c:1906  */
 
 
 /*lev_comp.y*/
-
