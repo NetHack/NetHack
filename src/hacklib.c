@@ -26,6 +26,7 @@ NetHack, except that rounddiv may call panic().
 	char		chrcasecpy	(int,int)
 	char *		strcasecpy	(char *,const char *)
 	char *		s_suffix	(const char *)
+	char *		ing_suffix	(const char *)
 	char *		xcrypt		(const char *, char *)
 	boolean		onlyspace	(const char *)
 	char *		tabexpand	(char *)
