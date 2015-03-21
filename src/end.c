@@ -911,7 +911,7 @@ die:
 	   topten figure it out separately and possibly getting different
            time or even day if player is slow responding to --More-- */
 	endtime = getnow();
-	u.urealtime.realtime += (endtime - u.urealtime.restored);
+	urealtime.realtime += (endtime - urealtime.restored);
 
 	/* Sometimes you die on the first move.  Life's not fair.
 	 * On those rare occasions you get hosed immediately, go out

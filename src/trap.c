@@ -1,4 +1,4 @@
-/* NetHack 3.5	trap.c	$NHDT-Date: 1426558928 2015/03/17 02:22:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.195 $ */
+/* NetHack 3.5	trap.c	$NHDT-Date: 1426805491 2015/03/19 22:51:31 $  $NHDT-Branch: water_damage $:$NHDT-Revision: 1.198 $ */
 /* NetHack 3.5	trap.c	$Date: 2013/03/14 01:58:21 $  $Revision: 1.179 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3145,6 +3145,14 @@ struct obj *obj;
         erode_obj(obj, NULL, ERODE_CORRODE, EF_GREASE | EF_VERBOSE);
 }
 
+/* context for water_damage(), managed by water_damage_chain();
+   when more than one stack of potions of acid explode while processing
+   a chain of objects, use alternate phrasing after the first message */
+static struct h2o_ctx {
+    int dkn_boom, unk_boom;	/* track dknown, !dknown separately */
+    boolean ctx_valid;
+} acid_ctx = { 0, 0, FALSE };
+
 /* Get an object wet and damage it appropriately.
  *   "ostr", if present, is used instead of the object name in some
  *     messages.
@@ -3157,8 +3165,6 @@ struct obj *obj;
 const char *ostr;
 boolean force;
 {
-	boolean exploded = FALSE;
-
 	if (!obj) return ER_NOTHING;
 
         if (snuff_lit(obj))
@@ -3203,18 +3209,36 @@ boolean force;
                 return ER_DAMAGED;
         } else if (obj->oclass == POTION_CLASS) {
                 if (obj->otyp == POT_ACID) {
-                        char *bufp, buf[BUFSZ];
-                        boolean one = (obj->quan == 1L);
-                        boolean update = carried(obj);
+			char *bufp;
+                        boolean one = (obj->quan == 1L),
+				update = carried(obj),
+				exploded = FALSE;
 
-                        bufp = strcpy(buf, "potion");
-                        if (!one) bufp = makeplural(bufp);
-                        /* [should we damage player/monster?] */
+			if (Blind && !carried(obj)) obj->dknown = 0;
+			if (acid_ctx.ctx_valid)
+			    exploded = ((obj->dknown ? acid_ctx.dkn_boom
+						     : acid_ctx.unk_boom) > 0);
+			/* First message is
+			 * "a [potion|<color> potion|potion of acid] explodes"
+			 * depending on obj->dknown (potion has been seen) and
+			 * objects[POT_ACID].oc_name_known (fully discovered),
+			 * or "some {plural version} explode" when relevant.
+			 * Second and subsequent messages for same chain and
+			 * matching dknown status are
+			 * "another [potion|<color> &c] explodes" or plural
+			 * variant.
+			 */
+                        bufp = simpleonames(obj);
                         pline("%s %s %s!",  /* "A potion explodes!" */
                                 !exploded ? (one ? "A" : "Some") :
-                                            (one ? "Another" : "More"),
+					    (one ? "Another" : "More"),
                                 bufp, vtense(bufp, "explode"));
-                        exploded = TRUE;
+                        if (acid_ctx.ctx_valid) {
+			    if (obj->dknown)
+				acid_ctx.dkn_boom++;
+			    else
+				acid_ctx.unk_boom++;
+			}
                         setnotworn(obj);
                         delobj(obj);
                         if (update)
@@ -3246,10 +3270,20 @@ struct obj *obj;
 boolean here;
 {
         struct obj *otmp;
+
+	/* initialize acid context: so far, neither seen (dknown) potions of
+	   acid nor unseen have exploded during this water damage sequence */
+	acid_ctx.dkn_boom = acid_ctx.unk_boom = 0;
+	acid_ctx.ctx_valid = TRUE;
+
         for (; obj; obj = otmp) {
             otmp = here ? obj->nexthere : obj->nobj;
             water_damage(obj, NULL, FALSE);
         }
+
+	/* reset acid context */
+	acid_ctx.dkn_boom = acid_ctx.unk_boom = 0;
+	acid_ctx.ctx_valid = FALSE;
 }
 
 /*

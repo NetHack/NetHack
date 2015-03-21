@@ -1,4 +1,4 @@
-/* NetHack 3.5	obj.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	obj.h	$NHDT-Date: 1426949157 2015/03/21 14:45:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.36 $ */
 /* NetHack 3.5	obj.h	$Date: 2012/01/10 17:47:16 $  $Revision: 1.31 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -107,9 +107,10 @@ struct obj {
 
 	int	corpsenm;	/* type of corpse is mons[corpsenm] */
 #define leashmon  corpsenm	/* gets m_id of attached pet */
-#define spestudied corpsenm	/* # of times a spellbook has been studied */
 #define fromsink  corpsenm	/* a potion from a sink */
 #define record_achieve_special corpsenm
+	int usecount;		/* overloaded for various things that tally */
+#define spestudied usecount	/* # of times a spellbook has been studied */
 	unsigned oeaten;	/* nutrition left in food, if partly eaten */
 	long age;		/* creation date */
 	long owornmask;

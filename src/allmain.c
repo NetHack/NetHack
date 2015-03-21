@@ -535,11 +535,11 @@ newgame()
 #endif
 	program_state.something_worth_saving++;	/* useful data now exists */
 
-	u.urealtime.realtime = (time_t)0L;
+	urealtime.realtime = (time_t)0L;
 #if defined(BSD) && !defined(POSIX_TYPES)
-        (void) time((long *)&u.urealtime.restored);
+        (void) time((long *)&urealtime.restored);
 #else
-        (void) time(&u.urealtime.restored);
+        (void) time(&urealtime.restored);
 #endif
 
 	/* Success! */

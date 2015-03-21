@@ -500,6 +500,7 @@ u_init()
 	(void) memset((genericptr_t)&u, 0, sizeof(u));
 	u.ustuck = (struct monst *)0;
 	(void) memset((genericptr_t)&ubirthday, 0, sizeof(ubirthday));
+	(void) memset((genericptr_t)&urealtime, 0, sizeof(urealtime));
 
 #if 0	/* documentation of more zero values as desirable */
 	u.usick_cause[0] = 0;
