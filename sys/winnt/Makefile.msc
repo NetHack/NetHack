@@ -13,8 +13,10 @@
 #
 #==============================================================================
 #   This is used for building two versions of NetHack:
+#
 #   A tty port utilizing the Win32 Console I/O subsystem, Console
 #       NetHack;
+#
 #   A Win32 native port built on the Windows API, Graphical NetHack or
 #       NetHackW.
 #
@@ -186,38 +188,11 @@ guilibs     = $(winlibs)
 # Exe File Info.
 #==========================================
  
-# Yacc/Lex ... if you got 'em.
 #
-# If you have yacc and lex programs (or work-alike such as bison 
-# and flex), comment out the upper two macros and uncomment 
-# the lower two.
-#
-
-DO_YACC = YACC_MSG
-DO_LEX  = LEX_MSG
-#DO_YACC  = YACC_ACT
-#DO_LEX   = LEX_ACT
-
-# - Specify your yacc and lex programs (or work-alikes) here.
-
-#YACC	= bison -y
-YACC   = byacc
-#YACC	= yacc
-
-#LEX	= lex
-LEX	= flex
-
-#
-# - Specify your flex skeleton file (if needed).
-#
-
-FLEXSKEL =
-#FLEXSKEL = -S../tools/flex.ske
-
-YTABC   = y_tab.c
-YTABH   = y_tab.h
-LEXYYC  = lexyy.c
-
+# For the level compiler bits,
+# we just defer to win\win32\dgnstuff.mak
+# and win\win32\levstuff.mak
+#        
 #
 # Optional high-quality BSD random number generation routines
 # (see pcconf.h). Set to nothing if not used.
@@ -305,9 +280,6 @@ PDBFILE= /PDB:"$(O)$(GAME).PDB"
 MAPFILE= /MAP:"$(O)$(GAME).MAP"
 INCLDIR= /I..\include
 
-ldebug=/DEBUG
-cdebug = -Zi -Od
-
 !IF ("$(ldebug)" != "")
 !IF ("$(ldebug)" != "/RELEASE")
 ldebug = /DEBUG
@@ -344,14 +316,14 @@ LIBS= user32.lib winmm.lib $(ZLIB)
 !IF ("$(GRAPHICAL)"=="Y")
 
 cflagsGame = $(cdebug) $(cflags2) $(guiflags) $(INCLDIR) \
-	     $(WINPFLAG) $(DLBFLG)
-lflagsGame = $(ldebug) $(lflags) $(guilibs) $(GAMEPDBFILE) $(GAMEMAPFILE)
+	     $(WINPFLAG) $(DLBFLG) $(GAMEPDBFILE) $(GAMEMAPFILE)
+lflagsGame = $(ldebug) $(lflags) $(guilibs)
 
 !ELSE
 
 cflagsGame = $(cdebug) $(cflags2) $(conflags) $(INCLDIR) \
-	     $(WINPFLAG) $(DLBFLG)
-lflagsGame = $(ldebug) $(lflags) $(conlibs) $(GAMEPDBFILE) $(GAMEMAPFILE)
+	     $(WINPFLAG) $(DLBFLG) $(GAMEPDBFILE) $(GAMEMAPFILE)
+lflagsGame = $(ldebug) $(lflags) $(conlibs)
 
 !ENDIF
 
@@ -454,18 +426,19 @@ U  = $(UTIL)^\
 
 MAKESRC        = $(U)makedefs.c
 
-SPLEVSRC       = $(U)lev_yacc.c	$(U)lev_$(LEX).c $(U)lev_main.c  $(U)panic.c
-
-DGNCOMPSRC     = $(U)dgn_yacc.c	$(U)dgn_$(LEX).c $(U)dgn_main.c
-
 MAKEOBJS       = $(O)makedefs.o $(O)monst.o $(O)objects.o
 
-SPLEVOBJS      = $(O)lev_yacc.o	$(O)lev_$(LEX).o $(O)lev_main.o \
+#SPLEVOBJS      = $(O)lev_yacc.o	$(O)lev_lex.o	$(O)lev_main.o \
+#		 $(O)alloc.o	$(O)decl.o	$(O)drawing.o  \
+#		 $(O)monst.o	$(O)objects.o	$(O)panic.o
+
+SPLEVOBJS      = $(O)lev_yacc.o	$(O)lev_lex.o	$(O)lev_main.o \
 		 $(O)alloc.o	$(O)decl.o	$(O)drawing.o \
 		 $(O)monst.o	$(O)objects.o	$(O)panic.o
 
-DGNCOMPOBJS    = $(O)dgn_yacc.o	$(O)dgn_$(LEX).o $(O)dgn_main.o \
+DGNCOMPOBJS    = $(O)dgn_yacc.o	$(O)dgn_lex.o	$(O)dgn_main.o \
 		 $(O)alloc.o	$(O)panic.o
+
 
 RECOVOBJS      = $(O)recover.o
 
@@ -609,7 +582,6 @@ all :	install
 
 install: envchk $(GAME) $(O)install.tag
 	 @echo Done.
-
 
 $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
 	 	$(DAT)\oracles	$(DAT)\quest.dat $(O)sp_lev.tag $(DLB)
@@ -845,11 +817,11 @@ $(SRC)\vis_tab.c: $(U)makedefs.exe
 	$(U)makedefs -z
 
 $(DAT)\engrave: $(DAT)\engrave.txt $(U)makedefs.exe
-	../util/makedefs -s
+	..\util\makedefs -s
 $(DAT)\epitaph: $(DAT)\epitaph.txt $(U)makedefs.exe
-	../util/makedefs -s
+	..\util\makedefs -s
 $(DAT)\bogusmon: $(DAT)\bogusmon.txt $(U)makedefs.exe
-	../util/makedefs -s
+	..\util\makedefs -s
 
 
 #==========================================
@@ -902,71 +874,55 @@ $(WIN32)\splash.bmp: $(U)uudecode.exe $(WIN32)\splash.uu
 	..\..\util\uudecode.exe splash.uu
 	chdir ..\..\src
 
-#==========================================
+#=================================================
 # Level Compiler Stuff
-#==========================================
+#=================================================
+#
+# defer to the steps in ..\win\win32\levstuff.mak
+#
 
-LEVCFLAGS=-c -nologo -DWINVER=0x0400 -DWIN32 -D_WIN32 \
-	   -D_MT -MT -I..\include -nologo -Z7 -Od -DDLB
+$(U)lev_yacc.c $(INCL)\lev_comp.h: $(U)lev_comp.y
+	nmake -nologo -f ..\win\win32\levstuff.mak default
+
+LEVCFLAGS=-c -nologo -DWIN32 -D_WIN32 -I$(INCL) -nologo -Z7 -Od -DDLB
+
+$(O)lev_yacc.o: $(HACK_H)   $(SP_LEV_H) $(INCL)\lev_comp.h $(U)lev_yacc.c
+	$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)lev_yacc.c
+
+$(O)lev_lex.o: $(HACK_H)   $(INCL)\lev_comp.h $(SP_LEV_H) \
+               $(U)lev_lex.c
+	$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)lev_lex.c
+
+$(O)lev_main.o:	$(U)lev_main.c $(HACK_H)   $(SP_LEV_H)
+	$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)lev_main.c
 
 $(U)levcomp.exe: $(SPLEVOBJS)
 	@echo Linking $@...
-	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
+	echo $(link)
+	echo $(lflagsUtil)
+	$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
  		$(SPLEVOBJS:^	=^
 		)
 <<
 
-$(O)lev_yacc.o: $(HACK_H)   $(SP_LEV_H) $(INCL)\lev_comp.h $(U)lev_yacc.c
-	@$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)lev_yacc.c
-
-$(O)lev_$(LEX).o: $(HACK_H)   $(INCL)\lev_comp.h $(SP_LEV_H) \
-               $(U)lev_$(LEX).c
-	@$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)lev_$(LEX).c
-
-$(O)lev_main.o:	$(U)lev_main.c $(HACK_H)   $(SP_LEV_H)
-	@$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)lev_main.c
-
-
-$(U)lev_yacc.c $(INCL)\lev_comp.h : $(U)lev_comp.y
-!	IF "$(DO_YACC)"=="YACC_ACT"
-	   chdir $(UTIL)
-	   $(YACC) -d lev_comp.y
-	   copy $(YTABC) lev_yacc.c
-	   copy $(YTABH) $(INCL)\lev_comp.h
-	   @del $(YTABC)
-	   @del $(YTABH)
-	   chdir $(SRC)
-!	ELSE
-	   @echo $(U)lev_comp.y has changed.
-	   @echo To update $(U)lev_yacc.c and $(INCL)\lev_comp.h run $(YACC).
-	   @echo ---
-	   @echo For now, we will copy the prebuilt lev_yacc.c and 
-	   @echo lev_comp.h from $(SSYS) into $(UTIL) and use them.
-	   @copy $(SSYS)\lev_yacc.c $(U)lev_yacc.c >nul
-	   @copy $(SSYS)\lev_comp.h $(INCL)\lev_comp.h >nul
-	   @echo /**/ >>$(U)lev_yacc.c
-	   @echo /**/ >>$(INCL)\lev_comp.h
-!	ENDIF
-
-$(U)lev_$(LEX).c: $(U)lev_comp.l
-!	IF "$(DO_LEX)"=="LEX_ACT"
-	   chdir $(UTIL)
-	   $(LEX) $(FLEXSKEL) lev_comp.l
-	   copy $(LEXYYC) $@
-	   @del $(LEXYYC)
-	   chdir $(SRC)
-!	ELSE
-	   @echo $(U)lev_comp.l has changed. To update $@ run $(LEX).
-	   @echo ---
-	   @echo For now, we will copy the prebuilt lev_lex.c 
-	   @echo from $(SSYS) into $(UTIL) and use it.
-	   @copy $(SSYS)\lev_lex.c $@ >nul
-	   @echo /**/ >>$@
-!	ENDIF
-
-#==========================================
+#=================================================
 # Dungeon Compiler Stuff
-#==========================================
+#=================================================
+#
+# defer to the steps in ..\win\win32\dgnstuff.mak
+#
+$(U)dgn_yacc.c $(INCL)\dgn_comp.h : $(U)dgn_comp.y
+	nmake -nologo -f ..\win\win32\dgnstuff.mak default
+
+$(O)dgn_yacc.o:	$(HACK_H)   $(DGN_FILE_H) $(INCL)\dgn_comp.h $(U)dgn_yacc.c
+	@$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)dgn_yacc.c
+
+$(O)dgn_lex.o: $(HACK_H)   $(DGN_FILE_H)  $(INCL)\dgn_comp.h \
+	$(U)dgn_lex.c
+	@$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)dgn_lex.c
+
+$(O)dgn_main.o:	$(HACK_H) $(U)dgn_main.c
+	@$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)dgn_main.c
 
 $(U)dgncomp.exe: $(DGNCOMPOBJS)
     @echo Linking $@...
@@ -975,56 +931,9 @@ $(U)dgncomp.exe: $(DGNCOMPOBJS)
 		)
 <<
 
-$(O)dgn_yacc.o:	$(HACK_H)   $(DGN_FILE_H) $(INCL)\dgn_comp.h $(U)dgn_yacc.c
-	@$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)dgn_yacc.c
-
-$(O)dgn_$(LEX).o: $(HACK_H)   $(DGN_FILE_H)  $(INCL)\dgn_comp.h \
-	$(U)dgn_$(LEX).c
-	@$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)dgn_$(LEX).c
-
-$(O)dgn_main.o:	$(HACK_H) $(U)dgn_main.c
-	@$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)dgn_main.c
-
-$(U)dgn_yacc.c $(INCL)\dgn_comp.h : $(U)dgn_comp.y
-!	IF "$(DO_YACC)"=="YACC_ACT"
-	   chdir $(UTIL)
-	   $(YACC) -d dgn_comp.y
-	   copy $(YTABC) dgn_yacc.c
-	   copy $(YTABH) $(INCL)\dgn_comp.h
-	   @del $(YTABC)
-	   @del $(YTABH)
-	   chdir $(SRC)
-!	ELSE
-	   @echo $(U)dgn_comp.y has changed. To update dgn_yacc.c and 
-	   @echo $(INCL)\dgn_comp.h run $(YACC).
-	   @echo ---
-	   @echo For now, we will copy the prebuilt $(U)dgn_yacc.c and 
-	   @echo dgn_comp.h from $(SSYS) into $(UTIL) and use them.
-	   @copy $(SSYS)\dgn_yacc.c $(U)dgn_yacc.c >nul
-	   @copy $(SSYS)\dgn_comp.h $(INCL)\dgn_comp.h >nul
-	   @echo /**/ >>$(U)dgn_yacc.c
-	   @echo /**/ >>$(INCL)\dgn_comp.h
-!	ENDIF
-
-$(U)dgn_$(LEX).c: $(U)dgn_comp.l
-!	IF "$(DO_LEX)"=="LEX_ACT"
-	   chdir $(UTIL)
-	   $(LEX) $(FLEXSKEL)  dgn_comp.l
-	   copy $(LEXYYC) $@
-	   @del $(LEXYYC)
-	   chdir $(SRC)
-!	ELSE
-	   @echo $(U)dgn_comp.l has changed. To update $@ run $(LEX).
-	   @echo ---
-	   @echo For now, we will copy the prebuilt dgn_lex.c 
-	   @echo from $(SSYS) into $(UTIL) and use it.
-	   @copy $(SSYS)\dgn_lex.c $@ >nul
-	   @echo /**/ >>$@
-!	ENDIF
-
-#==========================================
+#=================================================
 # Create directory for holding object files
-#==========================================
+#=================================================
 
 $(O)obj.tag:
 	@if not exist $(OBJ)\*.* echo creating directory $(OBJ)
@@ -1062,7 +971,7 @@ envchk:
 #==========================================
 
 #===========================================
-# Header files NOT distributed in ..\include
+# Header files NOT distributed in $(INCL)
 #===========================================
 
 $(INCL)\win32api.h: $(NTSYS)\win32api.h
@@ -1339,6 +1248,14 @@ clean:
 	if exist $(O)sp_lev.tag   del $(O)sp_lev.tag
 	if exist $(O)uudecode.MAP del $(O)uudecode.MAP
 	if exist $(O)uudecode.PDB del $(O)uudecode.PDB
+	rem
+	rem defer to the steps in ..\win\win32\levstuff.mak
+	rem 
+	nmake -nologo -f ..\win\win32\levstuff.mak clean
+	rem
+	rem defer to the steps in ..\win\win32\dgnstuff.mak
+	rem
+	nmake -nologo -f ..\win\win32\dgnstuff.mak clean
 
 ! IF ("$(WINPFLAG)"!="")
 	if exist $(TILEBMP16)        del $(TILEBMP16)
