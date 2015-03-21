@@ -108,6 +108,7 @@ struct obj {
 	int	corpsenm;	/* type of corpse is mons[corpsenm] */
 #define leashmon  corpsenm	/* gets m_id of attached pet */
 #define fromsink  corpsenm	/* a potion from a sink */
+#define novelidx corpsenm	/* 3.6.0 tribute - the index of the novel title */
 #define record_achieve_special corpsenm
 	int usecount;		/* overloaded for various things that tally */
 #define spestudied usecount	/* # of times a spellbook has been studied */
