@@ -371,7 +371,7 @@ ghost_from_bottle()
 		return;
 	}
 	pline("As you open the bottle, an enormous %s emerges!",
-		Hallucination ? rndmonnam() : (const char *)"ghost");
+		Hallucination ? rndmonnam(NULL) : (const char *)"ghost");
 	if(flags.verbose)
 	    You("are frightened to death, and unable to move.");
 	nomul(-3);

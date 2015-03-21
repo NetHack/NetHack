@@ -107,8 +107,10 @@ struct obj {
 
 	int	corpsenm;	/* type of corpse is mons[corpsenm] */
 #define leashmon  corpsenm	/* gets m_id of attached pet */
-#define spestudied corpsenm	/* # of times a spellbook has been studied */
 #define fromsink  corpsenm	/* a potion from a sink */
+#define record_achieve_special corpsenm
+	int usecount;		/* overloaded for various things that tally */
+#define spestudied usecount	/* # of times a spellbook has been studied */
 	unsigned oeaten;	/* nutrition left in food, if partly eaten */
 	long age;		/* creation date */
 	long owornmask;

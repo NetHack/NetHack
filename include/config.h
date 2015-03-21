@@ -187,6 +187,7 @@
 #endif
 
 #define LOGFILE "logfile"	/* larger file for debugging purposes */
+#define XLOGFILE "xlogfile"	/* even larger logfile */
 #define NEWS "news"		/* the file containing the latest hack news */
 #define PANICLOG "paniclog"	/* log of panic and impossible events */
 

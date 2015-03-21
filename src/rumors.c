@@ -266,6 +266,46 @@ rumor_check()
 	}
 }
 
+
+/* Gets a random line of text from file 'fname', and returns it. */
+char *
+get_rnd_text(fname, buf)
+const char *fname;
+char *buf;
+{
+    dlb *fh;
+
+    buf[0] = '\0';
+
+    fh = dlb_fopen(fname, "r");
+
+    if (fh) {
+	/* TODO: cache sizetxt, starttxt, endtxt. maybe cache file contents? */
+       long sizetxt = 0, starttxt = 0, endtxt = 0, tidbit = 0;
+       char *endp, line[BUFSZ], xbuf[BUFSZ];
+       (void) dlb_fgets(line, sizeof line, fh); /* skip "don't edit" comment */
+
+       (void) dlb_fseek(fh, 0L, SEEK_CUR);
+       starttxt = dlb_ftell(fh);
+       (void) dlb_fseek(fh, 0L, SEEK_END);
+       endtxt = dlb_ftell(fh);
+       sizetxt = endtxt - starttxt;
+       tidbit = Rand() % sizetxt;
+
+       (void) dlb_fseek(fh, starttxt + tidbit, SEEK_SET);
+       (void) dlb_fgets(line, sizeof line, fh);
+       if (!dlb_fgets(line, sizeof line, fh)) {
+	   (void) dlb_fseek(fh, starttxt, SEEK_SET);
+	   (void) dlb_fgets(line, sizeof line, fh);
+       }
+       if ((endp = index(line, '\n')) != 0) *endp = 0;
+       Strcat(buf, xcrypt(line, xbuf));
+       (void) dlb_fclose(fh);
+    } else impossible("Can't open file %s!", fname);
+    return buf;
+}
+
+
 void
 outrumor(truth, mechanism)
 int truth; /* 1=true, -1=false, 0=either */

@@ -240,15 +240,19 @@ struct obj *obj;
 	} else if (obj->otyp == AMULET_OF_YENDOR) {
 		if (u.uhave.amulet) impossible("already have amulet?");
 		u.uhave.amulet = 1;
+		u.uachieve.amulet = 1;
 	} else if (obj->otyp == CANDELABRUM_OF_INVOCATION) {
 		if (u.uhave.menorah) impossible("already have candelabrum?");
 		u.uhave.menorah = 1;
+		u.uachieve.menorah = 1;
 	} else if (obj->otyp == BELL_OF_OPENING) {
 		if (u.uhave.bell) impossible("already have silver bell?");
 		u.uhave.bell = 1;
+		u.uachieve.bell = 1;
 	} else if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
 		if (u.uhave.book) impossible("already have the book?");
 		u.uhave.book = 1;
+		u.uachieve.book = 1;
 	} else if (obj->oartifact) {
 		if (is_quest_artifact(obj)) {
 		    if (u.uhave.questart)
@@ -258,6 +262,15 @@ struct obj *obj;
 		}
 		set_artifact_intrinsic(obj, 1, W_ART);
 	}
+        if(obj->otyp == LUCKSTONE && obj->record_achieve_special) {
+	    u.uachieve.mines_luckstone = 1;
+	    obj->record_achieve_special = 0;
+        } else if((obj->otyp == AMULET_OF_REFLECTION ||
+                   obj->otyp == BAG_OF_HOLDING) &&
+                  obj->record_achieve_special) {
+	    u.uachieve.finish_sokoban = 1;
+	    obj->record_achieve_special = 0;
+        }
 }
 
 /*
@@ -959,7 +972,21 @@ register const char *let,*word;
 		    return((struct obj *)0);
 		}
 		if(ilet == '-') {
-			return(allownone ? &zeroobj : (struct obj *) 0);
+		    if (!allownone) {
+			char *suf = NULL;
+			strcpy(buf, word);
+			if ((bp = strstr(buf, " on the ")) != NULL) { /* rub on the stone[s] */
+			    *bp = '\0';
+			    suf = (bp + 1);
+			}
+			if ((bp = strstr(buf, " or ")) != NULL) {
+			    *bp = '\0';
+			    bp = (rn2(2) ? buf : (bp + 4));
+			} else bp = buf;
+			You("mime %s something%s%s.", ing_suffix(bp),
+			    suf ? " " : "", suf ? suf : "");
+		    }
+		    return(allownone ? &zeroobj : (struct obj *) 0);
 		}
 		if(ilet == def_oc_syms[COIN_CLASS].sym) {
 			if (!usegold) {

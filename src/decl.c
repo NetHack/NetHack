@@ -136,6 +136,7 @@ NEARDATA struct sysflag sysflags = DUMMY;
 NEARDATA struct instance_flags iflags = DUMMY;
 NEARDATA struct you u = DUMMY;
 NEARDATA time_t ubirthday = DUMMY;
+NEARDATA struct u_realtime urealtime = DUMMY;
 
 
 schar lastseentyp[COLNO][ROWNO] = {DUMMY}; /* last seen/touched dungeon typ */

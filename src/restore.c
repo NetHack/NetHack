@@ -551,9 +551,20 @@ unsigned int *stuckid, *steedid;
 	amii_setpens(amii_numcolors);	/* use colors from save file */
 #endif
 	mread(fd, (genericptr_t) &u, sizeof(struct you));
-	mread(fd, (genericptr_t) timebuf, 14);
-	timebuf[14] = '\0';
-	ubirthday = time_from_yyyymmddhhmmss(timebuf);
+
+#define ReadTimebuf(foo)	mread(fd, (genericptr_t) timebuf, 14);	\
+    timebuf[14] = '\0';							\
+    foo = time_from_yyyymmddhhmmss(timebuf);
+
+	ReadTimebuf(ubirthday);
+	ReadTimebuf(urealtime.realtime);
+	ReadTimebuf(urealtime.restored);
+#if defined(BSD) && !defined(POSIX_TYPES)
+	(void) time((long *)&urealtime.restored);
+#else
+	(void) time(&urealtime.restored);
+#endif
+
 
 	set_uasmon();
 #ifdef CLIPPING

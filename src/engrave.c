@@ -9,33 +9,6 @@
 
 STATIC_VAR NEARDATA struct engr *head_engr;
 
-/* random engravings */
-static const char *random_mesg[] = {
-	"Elbereth",
-	/* trap engravings */
-	"Vlad was here", "ad aerarium",
-	/* take-offs and other famous engravings */
-	"Owlbreath", "Galadriel",
-	"Kilroy was here",
-	"A.S. ->", "<- A.S.", /* Journey to the Center of the Earth */
-	"You won't get it up the steps", /* Adventure */
-	"Lasciate ogni speranza o voi ch'entrate.", /* Inferno */
-	"Well Come", /* Prisoner */
-	"We apologize for the inconvenience.", /* So Long... */
-	"See you next Wednesday", /* Thriller */
-	"notary sojak", /* Smokey Stover */
-	"For a good time call 8?7-5309",
-	"Please don't feed the animals.", /* Various zoos around the world */
-	"Madam, in Eden, I'm Adam.", /* A palindrome */
-	"Two thumbs up!", /* Siskel & Ebert */
-	"Hello, World!", /* The First C Program */
-#ifdef MAIL
-	"You've got mail!", /* AOL */
-#endif
-	"As if!", /* Clueless */
-	"BAD WOLF", /* 200x incarnation of Dr.Who */
-};
-
 char *
 random_engraving(outbuf)
 char *outbuf;
@@ -44,8 +17,10 @@ char *outbuf;
 
 	/* a random engraving may come from the "rumors" file,
 	   or from the list above */
-	if (!rn2(4) || !(rumor = getrumor(0, outbuf, TRUE)) || !*rumor)
-	    Strcpy(outbuf, random_mesg[rn2(SIZE(random_mesg))]);
+	if (!rn2(4) || !(rumor = getrumor(0, outbuf, TRUE)) || !*rumor) {
+	    char buf[BUFSZ];
+	    Strcpy(outbuf, get_rnd_text(ENGRAVEFILE, buf));
+	}
 
 	wipeout_text(outbuf, (int)(strlen(outbuf) / 4), 0);
 	return outbuf;
@@ -1232,39 +1207,6 @@ struct engr *ep;
 }
 
 
-/* Epitaphs for random headstones */
-static const char *epitaphs[] = {
-	"Rest in peace",
-	"R.I.P.",
-	"Rest In Pieces",
-	"Note -- there are NO valuable items in this grave",
-	"1994-1995. The Longest-Lived Hacker Ever",
-	"The Grave of the Unknown Hacker",
-	"We weren't sure who this was, but we buried him here anyway",
-	"Sparky -- he was a very good dog",
-	"Beware of Electric Third Rail",
-	"Made in Taiwan",
-	"Og friend. Og good dude. Og died. Og now food",
-	"Beetlejuice Beetlejuice Beetlejuice",
-	"Look out below!",
-	"Please don't dig me up. I'm perfectly happy down here. -- Resident",
-	"Postman, please note forwarding address: Gehennom, Asmodeus's Fortress, fifth lemure on the left",
-	"Mary had a little lamb/Its fleece was white as snow/When Mary was in trouble/The lamb was first to go",
-	"Be careful, or this could happen to you!",
-	"Soon you'll join this fellow in hell! -- the Wizard of Yendor",
-	"Caution! This grave contains toxic waste",
-	"Sum quod eris",
-	"Here lies an Atheist, all dressed up and no place to go",
-	"Here lies Ezekiel, age 102.  The good die young.",
-	"Here lies my wife: Here let her lie! Now she's at rest and so am I.",
-	"Here lies Johnny Yeast. Pardon me for not rising.",
-	"He always lied while on the earth and now he's lying in it",
-	"I made an ash of myself",
-	"Soon ripe. Soon rotten. Soon gone. But not forgotten.",
-	"Here lies the body of Jonathan Blake. Stepped on the gas instead of the brake.",
-	"Go away!"
-};
-
 /* Create a headstone at the given location.
  * The caller is responsible for newsym(x, y).
  */
@@ -1280,9 +1222,12 @@ const char *str;
 	levl[x][y].typ = GRAVE;
 
 	/* Engrave the headstone */
-	if (!str) str = epitaphs[rn2(SIZE(epitaphs))];
 	del_engr_at(x, y);
-	make_engr_at(x, y, str, 0L, HEADSTONE);
+	if (str) make_engr_at(x, y, str, 0L, HEADSTONE);
+	else {
+	    char buf[BUFSZ];
+	    make_engr_at(x, y, get_rnd_text(EPITAPHFILE, buf), 0L, HEADSTONE);
+	}
 	return;
 }
 

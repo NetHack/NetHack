@@ -1006,7 +1006,7 @@ dochat()
       if (!Blind) {
 	if (Hallucination) {
 	  /* if you're hallucinating, you can't tell it's a statue */
-	  pline_The("%s seems not to notice you.", rndmonnam());
+	  pline_The("%s seems not to notice you.", rndmonnam(NULL));
 	}
 	else {
 	  pline_The("statue seems not to notice you.");

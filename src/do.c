@@ -1321,6 +1321,7 @@ boolean at_stairs, falling, portal;
 #endif
 		You_hear("groans and moans everywhere.");
 	    } else pline("It is hot here.  You smell smoke...");
+	    u.uachieve.enter_gehennom = 1;
 	}
 	/* in case we've managed to bypass the Valley's stairway down */
 	if (Inhell && !Is_valley(&u.uz)) u.uevent.gehennom_entered = 1;

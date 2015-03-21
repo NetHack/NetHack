@@ -1,11 +1,21 @@
-# Uncomment as appropriate for your form of YACC/LEX.
-#
-#YACC = yacc.exe
-#YACC = byacc.exe
-YACC = bison.exe -y
-#
-#LEX = lex.exe
-LEX = flex.exe
+# $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+# $Date:2002/01/22 22:54:54 $  $Revision: 1.2 $
+#YACC   = byacc.exe
+#LEX	= flex.exe
+#YTABC   = y_tab.c
+#YTABH   = y_tab.h
+#LEXYYC  = lexyy.c
+
+!IF "$(YACC)"!=""
+@echo Yacc-alike set to $(YACC)
+@echo YTABC set to $(YTABC)
+@echo YTABH set to $(YTABH)
+!ENDIF
+
+!IF "$(LEX)"!=""
+@echo Lex-alike set to $(LEX)
+@echo LEXYYC set to $(LEXYYC)
+!ENDIF
 
 # these won't have an impact unless YACC/LEX are defined
 YTABC = y.tab.c
