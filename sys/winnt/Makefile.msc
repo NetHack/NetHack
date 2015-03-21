@@ -1,4 +1,4 @@
-# NetHack 3.5	Makefile.msc	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+# NetHack 3.5	Makefile.msc	$NHDT-Date: 1426967393 2015/03/21 19:49:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.72 $ */
 #       Copyright (c) NetHack PC Development Team 1993-2015
 #
 #==============================================================================
@@ -79,6 +79,13 @@ TARGET_CPU=x86
 
 GAMEDIR = ..\binary               # Game directory
 
+#
+#---------------------------------------------------------------
+# 4. Do you want debug information in the executable?
+#
+
+DEBUGINFO = Y
+
 # This marks the end of the BUILD DECISIONS section.
 #==============================================================================
 #
@@ -111,7 +118,7 @@ DOC   = ..\doc       # NetHack documentation files
 UTIL  = ..\util      # Utility source
 SRC   = ..\src       # Main source
 SSYS  = ..\sys\share # Shared system files
-NTSYS = ..\sys\winnt # NT Win32 specific files
+MSWSYS= ..\sys\winnt # mswin specific files
 TTY   = ..\win\tty   # window port files (tty)
 WIN32 = ..\win\win32 # window port files (Win32)
 WSHR  = ..\win\share # Tile support files 
@@ -144,7 +151,7 @@ TARGET_CPU=x86
 #   -Zd  - generate only public symbols and line numbers for debugging
 #   -GS  - enable security checks
 #
-ccommon=-c -DCRTAPI1=_cdecl -DCRTAPI2=_cdecl -nologo -GS -c
+ccommon=-c $(CDBFLAG) -DCRTAPI1=_cdecl -DCRTAPI2=_cdecl -nologo -GS -c
 lflags=/INCREMENTAL:NO /NOLOGO
 
 !IF "$(TARGET_CPU)" == "x86"
@@ -200,18 +207,6 @@ guilibs     = $(winlibs)
 
 RANDOM	= $(OBJ)\random.o
 #RANDOM	=
-
-#
-#  Uncomment the next 2 lines _ONLY_ if you DO NOT want any
-#  debug capability in the object files, or in the NetHack executable.
-#  Comment them if you want debug capability.
-
-#ldebug =
-#cdebug =
-
-#
-# Compiler and Linker flags
-#
 
 PRECOMPHEAD = N			# set to Y if you want to use precomp. headers
 
@@ -276,9 +271,19 @@ DLBFLG =
 #==========================================
 #==========================================
 
-PDBFILE= /PDB:"$(O)$(GAME).PDB"
-MAPFILE= /MAP:"$(O)$(GAME).MAP"
 INCLDIR= /I..\include
+
+!IF "$(DEBUGINFO)" == "Y"
+CDBGFLAG=-Zi
+LDBGFLAG=/debug
+cdebug = -Zi -Od
+ldebug = /DEBUG
+!ELSE
+CDBGFLAG=
+LDBGFLAG=
+ldebug =
+cdebug =
+!ENDIF
 
 !IF ("$(ldebug)" != "")
 !IF ("$(ldebug)" != "/RELEASE")
@@ -316,14 +321,14 @@ LIBS= user32.lib winmm.lib $(ZLIB)
 !IF ("$(GRAPHICAL)"=="Y")
 
 cflagsGame = $(cdebug) $(cflags2) $(guiflags) $(INCLDIR) \
-	     $(WINPFLAG) $(DLBFLG) $(GAMEPDBFILE) $(GAMEMAPFILE)
-lflagsGame = $(ldebug) $(lflags) $(guilibs)
+	     $(WINPFLAG) $(DLBFLG)
+lflagsGame = $(ldebug) $(lflags) $(guilibs) $(GAMEPDBFILE) $(GAMEMAPFILE)
 
 !ELSE
 
 cflagsGame = $(cdebug) $(cflags2) $(conflags) $(INCLDIR) \
-	     $(WINPFLAG) $(DLBFLG) $(GAMEPDBFILE) $(GAMEMAPFILE)
-lflagsGame = $(ldebug) $(lflags) $(conlibs)
+	     $(WINPFLAG) $(DLBFLG)
+lflagsGame = $(ldebug) $(lflags) $(conlibs) $(GAMEPDBFILE) $(GAMEMAPFILE)
 
 !ENDIF
 
@@ -362,10 +367,10 @@ DLB =
 # Rules for files in sys\winnt
 #==========================================
 
-{$(NTSYS)}.c{$(OBJ)}.o:
+{$(MSWSYS)}.c{$(OBJ)}.o:
 	@$(CC) $(cflagsUtil)  -Fo$@  $<
 
-{$(NTSYS)}.h{$(INCL)}.h:
+{$(MSWSYS)}.h{$(INCL)}.h:
 	@copy $< $@
 
 #==========================================
@@ -410,7 +415,7 @@ DLB =
 # referenced later on in the Makefile.
 #
 
-DEFFILE = $(NTSYS)\$(GAME).def
+DEFFILE = $(MSWSYS)\$(GAME).def
 
 #
 # Shorten up the location for some files
@@ -595,15 +600,16 @@ $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
 	copy $(DAT)\*.lev         $(GAMEDIR)
 	if exist $(GAMEDIR)\makefile del $(GAMEDIR)\makefile
 ! ENDIF
+	if not exist $(GAMEDIR)\sysconf copy $(MSWSYS)\sysconf $(GAMEDIR)
 	if exist $(DAT)\symbols copy $(DAT)\symbols $(GAMEDIR)
 	if exist $(DOC)\guidebook.txt copy $(DOC)\guidebook.txt $(GAMEDIR)\Guidebook.txt
 	if exist $(DOC)\nethack.txt copy $(DOC)\nethack.txt $(GAMEDIR)\NetHack.txt
 	@if exist $(O)$(GAME).PDB copy $(O)$(GAME).pdb $(GAMEDIR)\$(GAME).pdb
 	@if exist $(GAMEDIR)\$(GAME).PDB echo NOTE: You may want to remove $(GAMEDIR)\$(GAME).pdb to conserve space
-	-copy $(NTSYS)\defaults.nh   $(GAMEDIR)\defaults.nh
+	-copy $(MSWSYS)\defaults.nh   $(GAMEDIR)\defaults.nh
 	echo install done > $@
 
-#	copy $(NTSYS)\winnt.hlp    $(GAMEDIR)
+#	copy $(MSWSYS)\winnt.hlp    $(GAMEDIR)
 
 recover: $(U)recover.exe
 	if exist $(U)recover.exe copy $(U)recover.exe  $(GAMEDIR)
@@ -662,8 +668,8 @@ $(NHRES): $(TILEBMP16) $(WIN32)\winhack.rc $(WIN32)\mnsel.bmp \
 	$(WIN32)\splash.bmp
 	@$(rc) -r -fo$@ -i$(WIN32) -dNDEBUG $(WIN32)\winhack.rc
 !ELSE
-$(NHRES): $(NTSYS)\console.rc $(NTSYS)\NetHack.ico
-	@$(rc) -r -fo$@ -i$(NTSYS) -dNDEBUG $(NTSYS)\console.rc
+$(NHRES): $(MSWSYS)\console.rc $(MSWSYS)\NetHack.ico
+	@$(rc) -r -fo$@ -i$(MSWSYS) -dNDEBUG $(MSWSYS)\console.rc
 !ENDIF
 
 #==========================================
@@ -834,12 +840,12 @@ $(U)uudecode.exe: $(O)uudecode.o
 $(O)uudecode.o: $(SSYS)\uudecode.c
 	@$(CC) $(cflagsUtil) /D_CRT_SECURE_NO_DEPRECATE -Fo$@ $(SSYS)\uudecode.c
 
-$(NTSYS)\NetHack.ico : $(U)uudecode.exe $(NTSYS)\nhico.uu 
-	chdir $(NTSYS)
+$(MSWSYS)\NetHack.ico : $(U)uudecode.exe $(MSWSYS)\nhico.uu 
+	chdir $(MSWSYS)
 	..\..\util\uudecode.exe nhico.uu
 	chdir ..\..\src
 
-$(WIN32)\NetHack.ico : $(U)uudecode.exe $(NTSYS)\nhico.uu 
+$(WIN32)\NetHack.ico : $(U)uudecode.exe $(MSWSYS)\nhico.uu 
 	chdir $(WIN32)
 	..\..\util\uudecode.exe ../../sys/winnt/nhico.uu
 	chdir ..\..\src
@@ -974,8 +980,8 @@ envchk:
 # Header files NOT distributed in $(INCL)
 #===========================================
 
-$(INCL)\win32api.h: $(NTSYS)\win32api.h
-	copy $(NTSYS)\win32api.h $@
+$(INCL)\win32api.h: $(MSWSYS)\win32api.h
+	copy $(MSWSYS)\win32api.h $@
 
 
 #==========================================
@@ -996,8 +1002,8 @@ $(O)dlb.o:	$(O)dlb_main.o $(O)alloc.o $(O)panic.o $(INCL)\dlb.h
 $(O)dlb_main.o: $(UTIL)\dlb_main.c $(INCL)\config.h $(INCL)\dlb.h
 	@$(CC) $(cflagsUtil) /Fo$@ $(UTIL)\dlb_main.c
 
-$(DAT)\porthelp: $(NTSYS)\porthelp
-	@copy $(NTSYS)\porthelp $@ >nul
+$(DAT)\porthelp: $(MSWSYS)\porthelp
+	@copy $(MSWSYS)\porthelp $@ >nul
 
 nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 	$(DAT)\quest.dat $(DAT)\rumors $(DAT)\help $(DAT)\hh $(DAT)\cmdhelp \
@@ -1292,14 +1298,14 @@ $(DAT)\dungeon: $(O)utility.tag  $(DAT)\dungeon.def
 # NT dependencies
 #
 
-$(O)nttty.o:   $(HACK_H) $(TILE_H) $(INCL)\win32api.h $(NTSYS)\nttty.c
-	@$(CC) $(cflagsUtil) -I$(WSHR) -Fo$@  $(NTSYS)\nttty.c
-$(O)nhkeys.o:   $(HACK_H) $(TILE_H) $(INCL)\win32api.h $(NTSYS)\nhkeys.c
-	@$(CC) $(cflagsUtil) -I$(WSHR) -Fo$@  $(NTSYS)\nhkeys.c
-$(O)winnt.o: $(HACK_H) $(INCL)\win32api.h $(NTSYS)\winnt.c
-	@$(CC) $(cflagsUtil) -Fo$@  $(NTSYS)\winnt.c
-$(O)ntsound.o: $(HACK_H) $(NTSYS)\ntsound.c
-	@$(CC) $(cflagsUtil)  -Fo$@ $(NTSYS)\ntsound.c
+$(O)nttty.o:   $(HACK_H) $(TILE_H) $(INCL)\win32api.h $(MSWSYS)\nttty.c
+	@$(CC) $(cflagsUtil) -I$(WSHR) -Fo$@  $(MSWSYS)\nttty.c
+$(O)nhkeys.o:   $(HACK_H) $(TILE_H) $(INCL)\win32api.h $(MSWSYS)\nhkeys.c
+	@$(CC) $(cflagsUtil) -I$(WSHR) -Fo$@  $(MSWSYS)\nhkeys.c
+$(O)winnt.o: $(HACK_H) $(INCL)\win32api.h $(MSWSYS)\winnt.c
+	@$(CC) $(cflagsUtil) -Fo$@  $(MSWSYS)\winnt.c
+$(O)ntsound.o: $(HACK_H) $(MSWSYS)\ntsound.c
+	@$(CC) $(cflagsUtil)  -Fo$@ $(MSWSYS)\ntsound.c
 
 # 
 # util dependencies
