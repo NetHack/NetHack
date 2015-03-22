@@ -1,4 +1,4 @@
-/* NetHack 3.5	options.c	$NHDT-Date: 1425083082 2015/02/28 00:24:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.158 $ */
+/* NetHack 3.5	options.c	$NHDT-Date: 1427035440 2015/03/22 14:44:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.163 $ */
 /* NetHack 3.5	options.c	$Date: 2012/04/09 02:56:30 $  $Revision: 1.153 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -798,10 +798,10 @@ rejectoption(optname)
 const char *optname;
 {
 #ifdef MICRO
-	pline("\"%s\" settable only from %s.", optname, configfile);
+	pline("\"%s\" settable only from %s.", optname, lastconfigfile);
 #else
 	pline("%s can be set only from NETHACKOPTIONS or %s.", optname,
-			configfile);
+			lastconfigfile);
 #endif
 }
 
@@ -821,7 +821,7 @@ const char *opts;
 #endif
 
 	if(from_file)
-	    raw_printf("Bad syntax in OPTIONS in %s: %s.", configfile, opts);
+	    raw_printf("Bad syntax in OPTIONS in %s: %s.", lastconfigfile, opts);
 	else
 	    raw_printf("Bad syntax in NETHACKOPTIONS: %s.", opts);
 
@@ -4070,7 +4070,7 @@ option_help()
     winid datawin;
 
     datawin = create_nhwindow(NHW_TEXT);
-    Sprintf(buf, "Set options as OPTIONS=<options> in %s", configfile);
+    Sprintf(buf, "Set options as OPTIONS=<options> in %s", lastconfigfile);
     opt_intro[CONFIG_SLOT] = (const char *) buf;
     for (i = 0; opt_intro[i]; i++)
 	putstr(datawin, 0, opt_intro[i]);

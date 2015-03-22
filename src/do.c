@@ -1,4 +1,4 @@
-/* NetHack 3.5	do.c	$NHDT-Date: 1426497723 2015/03/16 09:22:03 $  $NHDT-Branch: H3724 $:$NHDT-Revision: 1.109 $ */
+/* NetHack 3.5	do.c	$NHDT-Date: 1426991040 2015/03/22 02:24:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.111 $ */
 /* NetHack 3.5	do.c	$Date: 2014/11/18 03:10:39 $  $Revision: 1.101 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1014,15 +1014,18 @@ boolean at_stairs, falling, portal;
 
 	/* If you have the amulet and are trying to get out of Gehennom, going
 	 * up a set of stairs sometimes does some very strange things!
-	 * Biased against law and towards chaos, but not nearly as strongly
-	 * as it used to be (prior to 3.2.0).
-	 * Odds:	    old				    new
-	 *	"up"    L      N      C		"up"    L      N      C
-	 *	 +1   75.0   75.0   75.0	 +1   75.0   75.0   75.0
-	 *	  0    0.0   12.5   25.0	  0    6.25   8.33  12.5
-	 *	 -1    8.33   4.17   0.0	 -1    6.25   8.33  12.5
-	 *	 -2    8.33   4.17   0.0	 -2    6.25   8.33   0.0
-	 *	 -3    8.33   4.17   0.0	 -3    6.25   0.0    0.0
+	 * Biased against law and towards chaos. (The chance to be sent
+	 * down multiple levels when attempting to go up are significantly
+	 * less than the corresponding comment in older versions indicated
+	 * due to overlooking the effect of the call to assign_rnd_lvl().)
+	 *
+	 * Odds for making it to the next level up, or of being sent down:
+	 *	"up"    L      N      C
+	 *	 +1   75.0   75.0   75.0
+	 *	  0    6.25   8.33  12.5
+	 *	 -1   11.46  12.50  12.5
+	 *	 -2    5.21   4.17   0.0
+	 *	 -3    2.08   0.0    0.0
 	 */
 	if (Inhell && up && u.uhave.amulet && !newdungeon && !portal &&
 				(dunlev(&u.uz) < dunlevs_in_dungeon(&u.uz)-3)) {

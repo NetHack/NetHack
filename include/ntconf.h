@@ -1,4 +1,4 @@
-/* NetHack 3.5	ntconf.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	ntconf.h	$NHDT-Date: 1426966690 2015/03/21 19:38:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.37 $ */
 /* NetHack 3.5	ntconf.h	$Date: 2012/01/15 19:11:38 $  $Revision: 1.35 $ */
 /*	SCCS Id: @(#)ntconf.h	3.5	2002/03/10	*/
 /* Copyright (c) NetHack PC Development Team 1993, 1994.  */
@@ -24,6 +24,9 @@
 #define HOLD_LOCKFILE_OPEN	/* Keep an exclusive lock on the .0 file */
 
 #define SELF_RECOVER		/* Allow the game itself to recover from an aborted game */
+
+#define SYSCF			/* Use a global configuration */
+#define SYSCF_FILE "sysconf"	/* Use a file to hold the SYSCF configuration */
 
 #define USER_SOUNDS
 

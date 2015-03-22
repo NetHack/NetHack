@@ -184,6 +184,7 @@ E NEARDATA struct kinfo {
 
 E long done_money;
 E const char *configfile;
+E char lastconfigfile[BUFSZ];		/* used for messaging */
 E NEARDATA char plname[PL_NSIZ];
 E NEARDATA char dogname[];
 E NEARDATA char catname[];
@@ -362,9 +363,10 @@ E const char * const monexplain[], invisexplain[], * const oclass_names[];
 #define DATAPREFIX	4	/* this one must match hardcoded value in dlb.c */
 #define SCOREPREFIX	5
 #define LOCKPREFIX	6
-#define CONFIGPREFIX	7
-#define TROUBLEPREFIX	8
-#define PREFIX_COUNT	9
+#define SYSCONFPREFIX	7
+#define CONFIGPREFIX	8
+#define TROUBLEPREFIX	9
+#define PREFIX_COUNT	10
 /* used in files.c; xxconf.h can override if needed */
 # ifndef FQN_MAX_FILENAME
 #define FQN_MAX_FILENAME 512

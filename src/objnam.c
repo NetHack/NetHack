@@ -1,4 +1,4 @@
-/* NetHack 3.5	objnam.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	objnam.c	$NHDT-Date: 1426977394 2015/03/21 22:36:34 $  $NHDT-Branch: master $:$NHDT-Revision: 1.108 $ */
 /* NetHack 3.5	objnam.c	$Date: 2011/10/27 02:24:54 $  $Revision: 1.101 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1694,7 +1694,7 @@ static struct sing_plur one_off[] = {
 static const char *const as_is[] = {
 	/* makesingular() leaves these plural due to how they're used */
 	"boots", "shoes",
-	"gloves", "lenses", "scales",
+	"gloves", "lenses", "scales", "eyes",
 	"gauntlets",
 	"iron bars",
 	/* both singular and plural are spelled the same */
