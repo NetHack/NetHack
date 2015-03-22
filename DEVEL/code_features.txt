@@ -1,0 +1,55 @@
+$NHDT-Date: 1426969026 2015/03/21 20:17:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.137 $
+code_features.txt
+
+Developer-useful info about code features, assumptions, purpose,
+rationale, etc.
+
+==============================================
+PREFIXES_IN_USE and NOCWD_ASSUMPTIONS
+
+Those provide a storage mechanism for holding the paths to various different
+types of files. Those paths are stored in the fqn_prefix[] array. They are a
+mechanism for enabling separation of the different files that NetHack needs. 
+
+The prefixes are added to the beginning of file names  by various routines in
+files.c immediately prior to opening one of the types of files that the game
+uses.
+
+They aren't about config file options (although config file options would be
+one way to set non-default values for some of the paths in the fqn_prefix[]
+array). Obviously the very first path needed (now sysconfdir, previously
+configdir) isn't viable for setting via config file options, but the game
+still needs to hunt it down "someplace."  When the "someplace" is figured
+out, that place (path) would be stored in fqn_prefix[SYSCONPREFIX].  How it
+gets stored in fqn_prefix[SYSCONPREFIX] is up to us as developers.
+
+Any of the fqn_prefix[] entries can be set somehow. It could be done in port
+startup code; in options processing; in config file processing; by 
+translating a system environment variable such as USERPROFILE; whatever 
+you/we want.  The point is that NOCWD_ASSUMPTIONS and PREFIXES_IN_USE are
+there to ensure that there is a place to store that path information.  The
+code to *utilize* the information is already in files.c (see fqname()).
+
+There is a fqn_prefix[] entry for holding the path to each of the following:
+    PREFIX        NAME
+0 HACKPREFIX     hackdir
+1 LEVELPREFIX    leveldir    location to create level files
+2 SAVEPREFIX     savedir location to create/read saved games
+3 BONESPREFIX    bonesir location to create/read bones
+4 DATAPREFIX     datadir location to read data.base etc.
+5 SCOREPREFIX    scoredir    location to read/write scorefile
+6 LOCKPREFIX     lockdir     location to create/read lock files
+7 SYSCONFPREFIX  sysconfdir  location to read SYSCF_FILE
+8 CONFIGPREFIX   configdir   location to read user configuration file
+9 TROUBLEPREFIX  troubledir  location to place panic files etc.
+
+To recap, they are about enabling "different paths for different things", and
+separation of:
+- read-only stuff from read-write stuff.
+- sysadmin stuff from user-writeable stuff.
+etc.
+
+=================== NEXT FEATURE ==========================
+
+
+
