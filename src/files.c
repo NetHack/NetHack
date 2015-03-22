@@ -1,4 +1,4 @@
-/* NetHack 3.5	files.c	$NHDT-Date: 1427035432 2015/03/22 14:43:52 $  $NHDT-Branch: master $:$NHDT-Revision: 1.138 $ */
+/* NetHack 3.5	files.c	$NHDT-Date: 1426969026 2015/03/21 20:17:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.137 $ */
 /* NetHack 3.5	files.c	$Date: 2012/03/10 02:49:08 $  $Revision: 1.124 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -362,7 +362,9 @@ char *reasonbuf;  /* reasonbuf must be at least BUFSZ, supplied by caller */
 #if defined(NOCWD_ASSUMPTIONS)
 	for (prefcnt = 1; prefcnt < PREFIX_COUNT; prefcnt++) {
 		/* don't test writing to configdir or datadir; they're readonly */
-		if (prefcnt == CONFIGPREFIX || prefcnt == DATAPREFIX) continue;
+		if (prefcnt == SYSCONFPREFIX ||
+		    prefcnt == CONFIGPREFIX ||
+		    prefcnt == DATAPREFIX) continue;
 		filename = fqname("validate", prefcnt, 3);
 		if ((fp = fopen(filename, "w"))) {
 			fclose(fp);
@@ -1859,6 +1861,12 @@ int src;
 			/* fall through to standard names */
 		} else
 #endif
+#ifdef PREFIXES_IN_USE
+		if (src == SET_IN_SYS) {
+			(void) strncpy(lastconfigfile,
+				fqname(filename, SYSCONFPREFIX, 0), BUFSZ-1);
+		} else
+#endif
 		(void) strncpy(lastconfigfile, filename, BUFSZ-1);
 		lastconfigfile[BUFSZ-1] = '\0';
 		if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0) {
@@ -1886,7 +1894,7 @@ int src;
 			fqname(backward_compat_configfile, CONFIGPREFIX, 0),
 			BUFSZ-1);
 	lastconfigfile[BUFSZ-1] = '\0';
-	else if ((fp = fopenp(fqname(lastconfigfile, "r")) != (FILE *)0)
+	else if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0)
 		return(fp);
 # endif
 #else

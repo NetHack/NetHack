@@ -1,4 +1,4 @@
-/* NetHack 3.5	decl.h	$NHDT-Date: 1427035422 2015/03/22 14:43:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.56 $ */
+/* NetHack 3.5	decl.h	$NHDT-Date: 1425081976 2015/02/28 00:06:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.50 $ */
 /* NetHack 3.5	decl.h	$Date: 2011/12/29 20:06:27 $  $Revision: 1.44 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -363,9 +363,10 @@ E const char * const monexplain[], invisexplain[], * const oclass_names[];
 #define DATAPREFIX	4	/* this one must match hardcoded value in dlb.c */
 #define SCOREPREFIX	5
 #define LOCKPREFIX	6
-#define CONFIGPREFIX	7
-#define TROUBLEPREFIX	8
-#define PREFIX_COUNT	9
+#define SYSCONFPREFIX	7
+#define CONFIGPREFIX	8
+#define TROUBLEPREFIX	9
+#define PREFIX_COUNT	10
 /* used in files.c; xxconf.h can override if needed */
 # ifndef FQN_MAX_FILENAME
 #define FQN_MAX_FILENAME 512
