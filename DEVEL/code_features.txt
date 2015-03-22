@@ -5,6 +5,34 @@ Developer-useful info about code features, assumptions, purpose,
 rationale, etc.
 
 ==============================================
+FEATURE_NOTICE Alerts for a Release
+
+There is a code mechanism for alterting players to a change in behavior
+over prior versions of the game.
+
+Here's how to do it:
+   o Where the change in behavior needs to alert the player,
+     - Add an 'if statement' to invoke the alert behavior
+       if the condition is met, for example
+          if (flags.suppress_alert < FEATURE_NOTICE_VER(3.6.0))
+             pline("Note: and explain the change here.");
+     - The example above will alert the users for a new feature
+       added in 3.6.0 via a one-liner via pline(), but you
+       could get more elaborate (just make sure it is all done
+       in the 'if' code block..
+
+Once the user finds the alert no longer useful, or becoming 
+annoying, they can set the "suppress_alert" option.
+      - The user can only set the suppress_alert to the current 
+        version, not future versions. That restriction is done
+        so that the feature can be used for new things in new
+        releases.
+      - The suppression can be done interactively mid game with
+        the 'O' command, or via 
+           OPTIONS=suppress_alert:3.6.0
+        in the user's config file.
+
+==============================================
 PREFIXES_IN_USE and NOCWD_ASSUMPTIONS
 
 Those provide a storage mechanism for holding the paths to various different
