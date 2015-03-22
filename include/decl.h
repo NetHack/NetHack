@@ -1,4 +1,4 @@
-/* NetHack 3.5	decl.h	$NHDT-Date: 1425081976 2015/02/28 00:06:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.50 $ */
+/* NetHack 3.5	decl.h	$NHDT-Date: 1427035422 2015/03/22 14:43:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.56 $ */
 /* NetHack 3.5	decl.h	$Date: 2011/12/29 20:06:27 $  $Revision: 1.44 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -184,6 +184,7 @@ E NEARDATA struct kinfo {
 
 E long done_money;
 E const char *configfile;
+E char lastconfigfile[BUFSZ];		/* used for messaging */
 E NEARDATA char plname[PL_NSIZ];
 E NEARDATA char dogname[];
 E NEARDATA char catname[];

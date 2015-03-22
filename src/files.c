@@ -1,4 +1,4 @@
-/* NetHack 3.5	files.c	$NHDT-Date: 1426969026 2015/03/21 20:17:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.137 $ */
+/* NetHack 3.5	files.c	$NHDT-Date: 1427035432 2015/03/22 14:43:52 $  $NHDT-Branch: master $:$NHDT-Revision: 1.138 $ */
 /* NetHack 3.5	files.c	$Date: 2012/03/10 02:49:08 $  $Revision: 1.124 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1811,6 +1811,8 @@ const char *configfile =
 # endif
 #endif
 
+/* used for messaging */
+char lastconfigfile[BUFSZ];
 
 #ifdef MSDOS
 /* conflict with speed-dial under windows
@@ -1857,10 +1859,9 @@ int src;
 			/* fall through to standard names */
 		} else
 #endif
-		if ((fp = fopenp(filename, "r")) != (FILE *)0) {
-#ifndef WIN32
-		    configfile = filename;
-#endif
+		(void) strncpy(lastconfigfile, filename, BUFSZ-1);
+		lastconfigfile[BUFSZ-1] = '\0';
+		if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0) {
 		    return(fp);
 #if defined(UNIX) || defined(VMS)
 		} else {
@@ -1874,24 +1875,32 @@ int src;
 	}
 
 #if defined(MICRO) || defined(MAC) || defined(__BEOS__) || defined(WIN32)
-	if ((fp = fopenp(fqname(configfile, CONFIGPREFIX, 0), "r"))
-								!= (FILE *)0)
+	(void) strncpy(lastconfigfile,
+			fqname(configfile, CONFIGPREFIX, 0), BUFSZ-1);
+	lastconfigfile[BUFSZ-1] = '\0';
+	if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0) {
 		return(fp);
+	}
 # ifdef MSDOS
-	else if ((fp = fopenp(fqname(backward_compat_configfile,
-					CONFIGPREFIX, 0), "r")) != (FILE *)0)
+	(void) strncpy(lastconfigfile,
+			fqname(backward_compat_configfile, CONFIGPREFIX, 0),
+			BUFSZ-1);
+	lastconfigfile[BUFSZ-1] = '\0';
+	else if ((fp = fopenp(fqname(lastconfigfile, "r")) != (FILE *)0)
 		return(fp);
 # endif
 #else
 	/* constructed full path names don't need fqname() */
 # ifdef VMS
-	if ((fp = fopenp(fqname("nethackini", CONFIGPREFIX, 0), "r"))
-								!= (FILE *)0) {
-		configfile = "nethackini";
+	(void) strncpy(lastconfigfile, fqname("nethackini", CONFIGPREFIX, 0),
+			BUFSZ-1);
+	lastconfigfile[BUFSZ-1] = '\0';
+	if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0) {
 		return(fp);
 	}
-	if ((fp = fopenp("sys$login:nethack.ini", "r")) != (FILE *)0) {
-		configfile = "nethack.ini";
+	(void) strncpy(lastconfigfile,"sys$login:nethack.ini", BUFSZ-1);
+	lastconfigfile[BUFSZ-1] = '\0';
+	if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0) {
 		return(fp);
 	}
 
@@ -1900,6 +1909,9 @@ int src;
 		Strcpy(tmp_config, "NetHack.cnf");
 	else
 		Sprintf(tmp_config, "%s%s", envp, "NetHack.cnf");
+
+	(void) strncpy(lastconfigfile, tmp_config, BUFSZ-1);
+	lastconfigfile[BUFSZ-1] = '\0';
 	if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
 		return(fp);
 # else	/* should be only UNIX left */
@@ -1908,18 +1920,25 @@ int src;
 		Strcpy(tmp_config, ".nethackrc");
 	else
 		Sprintf(tmp_config, "%s/%s", envp, ".nethackrc");
-	if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
+
+	(void) strncpy(lastconfigfile, tmp_config, BUFSZ-1);
+	lastconfigfile[BUFSZ-1] = '\0';
+	if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0)
 		return(fp);
 #  if defined(__APPLE__)
 	/* try an alternative */
 	if (envp) {
 		Sprintf(tmp_config, "%s/%s", envp,
 			"Library/Preferences/NetHack Defaults");
-		if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
+		(void) strncpy(lastconfigfile, tmp_config, BUFSZ-1);
+		lastconfigfile[BUFSZ-1] = '\0';
+		if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0)
 			return(fp);
 		Sprintf(tmp_config, "%s/%s", envp,
 			"Library/Preferences/NetHack Defaults.txt");
-		if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
+		(void) strncpy(lastconfigfile, tmp_config, BUFSZ-1);
+		lastconfigfile[BUFSZ-1] = '\0';
+		if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0)
 			return(fp);
 	}
 #  endif
@@ -1934,7 +1953,7 @@ int src;
 #  endif
 		details = "";
 	    raw_printf("Couldn't open default config file %s %s(%d).",
-		       tmp_config, details, errno);
+		       lastconfigfile, details, errno);
 	    wait_synch();
 	}
 # endif	/* Unix */
