@@ -1,4 +1,4 @@
-/* NetHack 3.5	lev_main.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	lev_main.c	$NHDT-Date: 1427154631 2015/03/23 23:50:31 $  $NHDT-Branch: paxed-new_lev_comp-B $:$NHDT-Revision: 1.27 $ */
 /* NetHack 3.5	lev_main.c	$Date: 2012/01/12 04:48:12 $  $Revision: 1.20 $ */
 /*	SCCS Id: @(#)lev_main.c	3.5	2007/01/17	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
@@ -1382,6 +1382,13 @@ struct window_procs windowprocs;
 short ospeed;
 # endif
 # ifndef STRNCMPI
+char
+lowc(c)			/* force 'c' into lowercase */
+    char c;
+{
+    return((char)(('A' <= c && c <= 'Z') ? (c | 040) : c));
+}
+
 int
 strncmpi(s1, s2, n)	/* case insensitive counted string comparison */
     register const char *s1, *s2;
