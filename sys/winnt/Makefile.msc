@@ -1,4 +1,4 @@
-# NetHack 3.5	Makefile.msc	$NHDT-Date: 1426967393 2015/03/21 19:49:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.72 $ */
+# NetHack 3.5	Makefile.msc	$NHDT-Date: 1427076358 2015/03/23 02:05:58 $  $NHDT-Branch: nhmall-booktribute $:$NHDT-Revision: 1.75 $ */
 #       Copyright (c) NetHack PC Development Team 1993-2015
 #
 #==============================================================================
@@ -1022,6 +1022,7 @@ nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 	echo engrave >>dlb.lst
 	echo epitaph >>dlb.lst
 	echo bogusmon >>dlb.lst
+	echo tribute >>dlb.lst
 	echo help >>dlb.lst
 	echo hh >>dlb.lst
 	echo cmdhelp >>dlb.lst
