@@ -1,4 +1,4 @@
-/* NetHack 3.5	unixmain.c	$NHDT-Date: 1426966705 2015/03/21 19:38:25 $  $NHDT-Branch: master $:$NHDT-Revision: 1.44 $ */
+/* NetHack 3.5	unixmain.c	$NHDT-Date: 1427074144 2015/03/23 01:29:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.45 $ */
 /* NetHack 3.5	unixmain.c	$Date: 2012/01/27 20:15:31 $  $Revision: 1.42 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -324,7 +324,7 @@ process_options(argc, argv)
 int argc;
 char *argv[];
 {
-	int i;
+	int i, l;
 
 	/*
 	 * Process options.
@@ -332,11 +332,25 @@ char *argv[];
 	while(argc > 1 && argv[1][0] == '-'){
 		argv++;
 		argc--;
+		l = (int)strlen(*argv);
+		/* must supply at least 4 chars to match "-XXXgraphics" */
+		if (l < 4) l = 4;
+
 		switch(argv[0][1]){
 		case 'D':
-			wizard = TRUE, discover = FALSE;
+		case 'd':
+			if ((argv[0][1] == 'D' && !argv[0][2])
+			    || !strcmpi(*argv, "-debug")) {
+				wizard = TRUE, discover = FALSE;
+			} else if (!strncmpi(*argv, "-DECgraphics", l)) {
+				load_symset("DECGraphics", PRIMARY);
+				switch_symbols(TRUE);
+			} else {
+				raw_printf("Unknown option: %s", *argv);
+			}
 			break;
 		case 'X':
+
 			discover = TRUE, wizard = FALSE;
 			break;
 #ifdef NEWS
@@ -356,17 +370,12 @@ char *argv[];
 			break;
 		case 'I':
 		case 'i':
-			if (!strncmpi(argv[0]+1, "IBM", 3)) {
+			if (!strncmpi(*argv, "-IBMgraphics", l)) {
 				load_symset("IBMGraphics", PRIMARY);
 				load_symset("RogueIBM", ROGUESET);
 				switch_symbols(TRUE);
-			}
-			break;
-	    /*  case 'D': */
-		case 'd':
-			if (!strncmpi(argv[0]+1, "DEC", 3)) {
-				load_symset("DECGraphics", PRIMARY);
-				switch_symbols(TRUE);
+			} else {
+				raw_printf("Unknown option: %s", *argv);
 			}
 			break;
 		case 'p': /* profession (role) */
