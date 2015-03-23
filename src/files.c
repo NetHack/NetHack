@@ -3336,13 +3336,14 @@ int  tribpassage;
     int scope = 0, section = 0, passage = 0, book = 0;
     int linect = 0, passagecnt = 0, targetpassage = 0, textcnt = 0;
     char *sectionnm = "", *booknm = "";
+    const char *badtranslation = "an incomprehensible foreign translation";
     boolean matchedsection = FALSE, matchedtitle = FALSE;
     winid tribwin = WIN_ERR;
 
     /* check for mandatories */
     if (!tribsection || !tribtitle) {
-	pline("It's an incomprehensible foreign translation of \"%s\"!",
-		tribtitle);
+	pline("It's %s of \"%s\"!",
+		badtranslation, tribtitle);
 	return;
     }	
 
@@ -3452,7 +3453,12 @@ cleanup:
 		display_nhwindow(tribwin, FALSE);
 	destroy_nhwindow(tribwin);
 	tribwin = WIN_ERR;
+	u.uconduct.literate++;
+    } else {
+    	pline("It seems to be %s of \"%s\"!",
+		badtranslation, tribtitle);
     }
+
     return;
 }
 /* ----------  END TRIBUTE ----------- */
