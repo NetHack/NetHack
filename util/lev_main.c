@@ -697,7 +697,7 @@ funcdef_defined(f, name, casesense)
 	if (casesense) {
 	    if (!strcmp(name, f->name)) return f;
 	} else {
-	    if (!strcasecmp(name, f->name)) return f;
+	    if (!strcmpi(name, f->name)) return f;
 	}
 	f = f->next;
     }
@@ -748,7 +748,7 @@ vardef_defined(f, name, casesense)
 	if (casesense) {
 	    if (!strcmp(name, f->name)) return f;
 	} else {
-	    if (!strcasecmp(name, f->name)) return f;
+	    if (!strcmpi(name, f->name)) return f;
 	}
 	f = f->next;
     }
@@ -988,7 +988,7 @@ char c;
 	/* didn't find it; lets try case insensitive search */
 	for (i = LOW_PM; i < NUMMONS; i++)
 	    if (!class || class == mons[i].mlet)
-		if (!strcasecmp(s, mons[i].mname)) {
+		if (!strcmpi(s, mons[i].mname)) {
 		    if (be_verbose)
 			lc_warning("Monster type \"%s\" matches \"%s\".", s, mons[i].mname);
 		    return i;
@@ -1020,7 +1020,7 @@ char c;		/* class */
 	for (i = class ? bases[class] : 0; i < NUM_OBJECTS; i++) {
 	    if (class && objects[i].oc_class != class) break;
 	    objname = obj_descr[i].oc_name;
-	    if (objname && !strcasecmp(s, objname)) {
+	    if (objname && !strcmpi(s, objname)) {
 		if (be_verbose)
 		    lc_warning("Object type \"%s\" matches \"%s\".", s, objname);
 		return i;
@@ -1381,6 +1381,24 @@ struct window_procs windowprocs;
 # ifdef DEFINE_OSPEED
 short ospeed;
 # endif
+# ifndef STRNCMPI
+int
+strncmpi(s1, s2, n)	/* case insensitive counted string comparison */
+    register const char *s1, *s2;
+    register int n; /*(should probably be size_t, which is usually unsigned)*/
+{					/*{ aka strncasecmp }*/
+    register char t1, t2;
+
+    while (n--) {
+	if (!*s2) return (*s1 != 0);	/* s1 >= s2 */
+	else if (!*s1) return -1;	/* s1  < s2 */
+	t1 = lowc(*s1++);
+	t2 = lowc(*s2++);
+	if (t1 != t2) return (t1 > t2) ? 1 : -1;
+    }
+    return 0;				/* s1 == s2 */
+}
+# endif	/* STRNCMPI */
 #endif	/* STRICT_REF_DEF */
 
 /*lev_main.c*/
