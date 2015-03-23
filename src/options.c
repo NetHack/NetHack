@@ -1,4 +1,4 @@
-/* NetHack 3.5	options.c	$NHDT-Date: 1427035440 2015/03/22 14:44:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.163 $ */
+/* NetHack 3.5	options.c	$NHDT-Date: 1427073746 2015/03/23 01:22:26 $  $NHDT-Branch: master $:$NHDT-Revision: 1.164 $ */
 /* NetHack 3.5	options.c	$Date: 2012/04/09 02:56:30 $  $Revision: 1.153 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2484,7 +2484,7 @@ goodfruit:
 
 #if defined(BACKWARD_COMPAT)
 	fullname = "DECgraphics";
-	if (match_optname(opts, fullname, 10, TRUE)) {
+	if (match_optname(opts, fullname, 3, TRUE)) {
 		boolean badflag = FALSE;
 		if (duplicate) complain_about_duplicate(opts,1);
 		if (!negated) {
@@ -2508,7 +2508,7 @@ goodfruit:
 		return;
 	}
 	fullname = "IBMgraphics";
-	if (match_optname(opts, fullname, 10, TRUE)) {
+	if (match_optname(opts, fullname, 3, TRUE)) {
 		const char *sym_name = fullname;
 		boolean badflag = FALSE;
 		if (duplicate) complain_about_duplicate(opts,1);
@@ -2542,7 +2542,7 @@ goodfruit:
 #endif
 #ifdef MAC_GRAPHICS_ENV
 	fullname = "MACgraphics";
-	if (match_optname(opts, fullname, 11, TRUE)) {
+	if (match_optname(opts, fullname, 3, TRUE)) {
 		boolean badflag = FALSE;
 		if (duplicate) complain_about_duplicate(opts,1);
 		if (!negated) {
