@@ -1,4 +1,4 @@
-/* NetHack 3.5	lev_main.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	lev_main.c	$NHDT-Date: 1427161270 2015/03/24 01:41:10 $  $NHDT-Branch: paxed-new_lev_comp-B $:$NHDT-Revision: 1.30 $ */
 /* NetHack 3.5	lev_main.c	$Date: 2012/01/12 04:48:12 $  $Revision: 1.20 $ */
 /*	SCCS Id: @(#)lev_main.c	3.5	2007/01/17	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
@@ -19,6 +19,7 @@
 #ifdef STRICT_REF_DEF
 #include "tcap.h"
 #endif
+#include <ctype.h>
 
 #ifdef MAC
 # if defined(__SC__) || defined(__MRC__)
