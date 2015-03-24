@@ -151,7 +151,7 @@ TARGET_CPU=x86
 #   -Zd  - generate only public symbols and line numbers for debugging
 #   -GS  - enable security checks
 #
-ccommon=-c $(CDBFLAG) -DCRTAPI1=_cdecl -DCRTAPI2=_cdecl -nologo -GS -c
+ccommon=-c -DCRTAPI1=_cdecl -DCRTAPI2=_cdecl -nologo -GS -c
 lflags=/INCREMENTAL:NO /NOLOGO
 
 !IF "$(TARGET_CPU)" == "x86"
