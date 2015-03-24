@@ -94,7 +94,7 @@ struct obj {
 	Bitfield(recharged,3);	/* number of times it's been recharged */
 #define on_ice recharged	/* corpse on ice */
 	Bitfield(lamplit,1);	/* a light-source -- can be lit */
-    Bitfield(oglobby,1);	/* globby; will combine with like types on adjacent squares */
+    Bitfield(globby,1);	    /* globby; will combine with like types on adjacent squares */
 	Bitfield(greased,1);	/* covered with grease */
 	Bitfield(nomerge,1);	/* set temporarily to prevent merging */
 	Bitfield(was_thrown,1);	/* thrown by hero since last picked up */

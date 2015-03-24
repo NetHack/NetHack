@@ -1212,6 +1212,9 @@ E void FDECL(obj_ice_effects, (int, int, BOOLEAN_P));
 E long FDECL(peek_at_iced_corpse_age, (struct obj *));
 E int FDECL(hornoplenty, (struct obj *,BOOLEAN_P));
 E void NDECL(obj_sanity_check);
+E struct obj* FDECL(obj_nexto, (struct obj*));
+E struct obj* FDECL(obj_nexto_xy, (int, int, int, int));
+E struct obj* FDECL(obj_meld, (struct obj**, struct obj**));
 
 /* ### mkroom.c ### */
 

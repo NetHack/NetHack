@@ -2031,7 +2031,7 @@ create_particular()
 {
 	char buf[BUFSZ], *bufp, monclass;
 	int which, tryct, i, firstchoice = NON_PM;
-	struct permonst *whichpm;
+	struct permonst *whichpm = NULL;
 	struct monst *mtmp;
 	boolean madeany = FALSE;
 	boolean maketame, makepeaceful, makehostile;
