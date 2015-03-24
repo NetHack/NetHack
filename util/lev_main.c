@@ -698,7 +698,7 @@ funcdef_defined(f, name, casesense)
 	if (casesense) {
 	    if (!strcmp(name, f->name)) return f;
 	} else {
-	    if (!strcmpi(name, f->name)) return f;
+	    if (!case_insensitive_comp(name, f->name)) return f;
 	}
 	f = f->next;
     }
@@ -749,7 +749,7 @@ vardef_defined(f, name, casesense)
 	if (casesense) {
 	    if (!strcmp(name, f->name)) return f;
 	} else {
-	    if (!strcmpi(name, f->name)) return f;
+	    if (!case_insensitive_comp(name, f->name)) return f;
 	}
 	f = f->next;
     }
@@ -989,7 +989,7 @@ char c;
 	/* didn't find it; lets try case insensitive search */
 	for (i = LOW_PM; i < NUMMONS; i++)
 	    if (!class || class == mons[i].mlet)
-		if (!strcmpi(s, mons[i].mname)) {
+		if (!case_insensitive_comp(s, mons[i].mname)) {
 		    if (be_verbose)
 			lc_warning("Monster type \"%s\" matches \"%s\".", s, mons[i].mname);
 		    return i;
@@ -1021,7 +1021,7 @@ char c;		/* class */
 	for (i = class ? bases[class] : 0; i < NUM_OBJECTS; i++) {
 	    if (class && objects[i].oc_class != class) break;
 	    objname = obj_descr[i].oc_name;
-	    if (objname && !strcmpi(s, objname)) {
+	    if (objname && !case_insensitive_comp(s, objname)) {
 		if (be_verbose)
 		    lc_warning("Object type \"%s\" matches \"%s\".", s, objname);
 		return i;
