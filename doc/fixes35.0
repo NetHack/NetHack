@@ -1089,6 +1089,7 @@ change command X to twoweapon toggle
 pressing @ when cursor positioning moves cursor on top of hero
 pressing # when cursor positioning toggles automatic description of features
 	under the cursor
+cursor positioning ignores uninteresting dungeon features
 
 
 Platform- and/or Interface-Specific New Features
@@ -1125,6 +1126,7 @@ adopt/adapt/improve the Paranoid_Quit patch; default is paranoid_confirm:pray
 	paranoid_confirm:pray    y to confirm #pray; supersedes prayconfirm
 	paranoid_confirm:Remove  always pick from inventory for 'R' and 'T'
 adopt/adapt/improve Dungeon Overview
+Aardvark Joe's Extended Logfile
 
 
 Code Cleanup and Reorganization

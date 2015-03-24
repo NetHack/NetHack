@@ -1,4 +1,4 @@
-/* NetHack 3.5	files.c	$NHDT-Date: 1426544796 2015/03/16 22:26:36 $  $NHDT-Branch: master $:$NHDT-Revision: 1.134 $ */
+/* NetHack 3.5	files.c	$NHDT-Date: 1426969026 2015/03/21 20:17:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.137 $ */
 /* NetHack 3.5	files.c	$Date: 2012/03/10 02:49:08 $  $Revision: 1.124 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -362,7 +362,9 @@ char *reasonbuf;  /* reasonbuf must be at least BUFSZ, supplied by caller */
 #if defined(NOCWD_ASSUMPTIONS)
 	for (prefcnt = 1; prefcnt < PREFIX_COUNT; prefcnt++) {
 		/* don't test writing to configdir or datadir; they're readonly */
-		if (prefcnt == CONFIGPREFIX || prefcnt == DATAPREFIX) continue;
+		if (prefcnt == SYSCONFPREFIX ||
+		    prefcnt == CONFIGPREFIX ||
+		    prefcnt == DATAPREFIX) continue;
 		filename = fqname("validate", prefcnt, 3);
 		if ((fp = fopen(filename, "w"))) {
 			fclose(fp);
@@ -1811,6 +1813,8 @@ const char *configfile =
 # endif
 #endif
 
+/* used for messaging */
+char lastconfigfile[BUFSZ];
 
 #ifdef MSDOS
 /* conflict with speed-dial under windows
@@ -1857,8 +1861,15 @@ int src;
 			/* fall through to standard names */
 		} else
 #endif
-		if ((fp = fopenp(filename, "r")) != (FILE *)0) {
-		    configfile = filename;
+#ifdef PREFIXES_IN_USE
+		if (src == SET_IN_SYS) {
+			(void) strncpy(lastconfigfile,
+				fqname(filename, SYSCONFPREFIX, 0), BUFSZ-1);
+		} else
+#endif
+		(void) strncpy(lastconfigfile, filename, BUFSZ-1);
+		lastconfigfile[BUFSZ-1] = '\0';
+		if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0) {
 		    return(fp);
 #if defined(UNIX) || defined(VMS)
 		} else {
@@ -1872,24 +1883,32 @@ int src;
 	}
 
 #if defined(MICRO) || defined(MAC) || defined(__BEOS__) || defined(WIN32)
-	if ((fp = fopenp(fqname(configfile, CONFIGPREFIX, 0), "r"))
-								!= (FILE *)0)
+	(void) strncpy(lastconfigfile,
+			fqname(configfile, CONFIGPREFIX, 0), BUFSZ-1);
+	lastconfigfile[BUFSZ-1] = '\0';
+	if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0) {
 		return(fp);
+	}
 # ifdef MSDOS
-	else if ((fp = fopenp(fqname(backward_compat_configfile,
-					CONFIGPREFIX, 0), "r")) != (FILE *)0)
+	(void) strncpy(lastconfigfile,
+			fqname(backward_compat_configfile, CONFIGPREFIX, 0),
+			BUFSZ-1);
+	lastconfigfile[BUFSZ-1] = '\0';
+	else if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0)
 		return(fp);
 # endif
 #else
 	/* constructed full path names don't need fqname() */
 # ifdef VMS
-	if ((fp = fopenp(fqname("nethackini", CONFIGPREFIX, 0), "r"))
-								!= (FILE *)0) {
-		configfile = "nethackini";
+	(void) strncpy(lastconfigfile, fqname("nethackini", CONFIGPREFIX, 0),
+			BUFSZ-1);
+	lastconfigfile[BUFSZ-1] = '\0';
+	if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0) {
 		return(fp);
 	}
-	if ((fp = fopenp("sys$login:nethack.ini", "r")) != (FILE *)0) {
-		configfile = "nethack.ini";
+	(void) strncpy(lastconfigfile,"sys$login:nethack.ini", BUFSZ-1);
+	lastconfigfile[BUFSZ-1] = '\0';
+	if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0) {
 		return(fp);
 	}
 
@@ -1898,6 +1917,9 @@ int src;
 		Strcpy(tmp_config, "NetHack.cnf");
 	else
 		Sprintf(tmp_config, "%s%s", envp, "NetHack.cnf");
+
+	(void) strncpy(lastconfigfile, tmp_config, BUFSZ-1);
+	lastconfigfile[BUFSZ-1] = '\0';
 	if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
 		return(fp);
 # else	/* should be only UNIX left */
@@ -1906,18 +1928,25 @@ int src;
 		Strcpy(tmp_config, ".nethackrc");
 	else
 		Sprintf(tmp_config, "%s/%s", envp, ".nethackrc");
-	if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
+
+	(void) strncpy(lastconfigfile, tmp_config, BUFSZ-1);
+	lastconfigfile[BUFSZ-1] = '\0';
+	if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0)
 		return(fp);
 #  if defined(__APPLE__)
 	/* try an alternative */
 	if (envp) {
 		Sprintf(tmp_config, "%s/%s", envp,
 			"Library/Preferences/NetHack Defaults");
-		if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
+		(void) strncpy(lastconfigfile, tmp_config, BUFSZ-1);
+		lastconfigfile[BUFSZ-1] = '\0';
+		if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0)
 			return(fp);
 		Sprintf(tmp_config, "%s/%s", envp,
 			"Library/Preferences/NetHack Defaults.txt");
-		if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
+		(void) strncpy(lastconfigfile, tmp_config, BUFSZ-1);
+		lastconfigfile[BUFSZ-1] = '\0';
+		if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0)
 			return(fp);
 	}
 #  endif
@@ -1932,7 +1961,7 @@ int src;
 #  endif
 		details = "";
 	    raw_printf("Couldn't open default config file %s %s(%d).",
-		       tmp_config, details, errno);
+		       lastconfigfile, details, errno);
 	    wait_synch();
 	}
 # endif	/* Unix */
@@ -3198,6 +3227,29 @@ int ifd, ofd;
 
 /* ----------  END INTERNAL RECOVER ----------- */
 #endif /*SELF_RECOVER*/
+
+/* ----------  OTHER ----------- */
+
+#ifdef SYSCF
+# ifdef SYSCF_FILE
+void
+assure_syscf_file() {
+	/* All we really care about is the end result - can we read the file?
+	 * So just check that directly. */
+	int fd;
+	fd = open(SYSCF_FILE, O_RDONLY);
+	if(fd >= 0){
+		/* readable */
+		close(fd);
+		return;
+	}
+	raw_printf("Unable to open SYSCF_FILE.\n");
+	exit(EXIT_FAILURE);
+}
+
+# endif /* SYSCF_FILE */
+#endif /* SYSCF */
+
 
 #ifdef DEBUG
 /* used by debugpline() to decide whether to issue a message

@@ -1373,6 +1373,7 @@ dosacrifice()
 		done(ESCAPED);
 	    } else { /* super big win */
 		adjalign(10);
+		u.uachieve.ascended = 1;
 pline("An invisible choir sings, and you are bathed in radiance...");
 		godvoice(altaralign, "Congratulations, mortal!");
 		display_nhwindow(WIN_MESSAGE, FALSE);

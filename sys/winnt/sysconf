@@ -1,0 +1,78 @@
+#
+# NetHack 3.5 sysconf $NHDT-Date$ $NHDT-Branch$:$NHDT-Revision$
+# NetHack 3.5 sysconf $Date: 2012/01/27 20:15:31 $ $Revision: 1.6 $
+#
+# Sample sysconf file.
+# The sysconf file is only used if NetHack is compiled with SYSCF defined.
+# This file uses the same syntax as nethack.cf.
+
+# Which users can use WIZARD (debugging) mode (the -D flag).
+# A value of * allows anyone to enter debugging mode.
+WIZARDS=*
+
+# Users allowed to use the ! (shell escape) command or to suspend the game.
+# Uses the same syntax as the WIZARDS option above.
+#SHELLERS=
+
+# Show debugging information originating from these source files.
+# Use '*' for all, or list source files separated by spaces.
+# Only available if game has been compiled with DEBUG.
+#DEBUGFILES=*
+
+# Limit the number of simultaneous games (see also nethack.sh).
+#MAXPLAYERS=10
+
+# If not null, added to string "To get local support, " in the support
+# information help.
+#SUPPORT=call Izchak at extension 42.
+
+# Uncomment the next line to disable the SEDUCE option.
+#SEDUCE=0
+
+# Record (high score) file options.
+# CAUTION: changing these after people have started playing games can
+#  lead to lost high scores!
+# Maximum entries for one person.
+#PERSMAX=10
+# Maximum entries in the record file.
+#ENTRYMAX=100
+# Minimum points to get an entry.
+#POINTSMIN=1
+# Determine identity of "person" in the score file with name (0) or
+# numeric (1) user id.
+#PERS_IS_UID=1
+
+# Maximum number of score file entries to use for random statue names
+#MAX_STATUENAME_RANK=10
+
+# *** LOCATIONS ***
+# IMPORTANT: If you change any of these locations, the directories they
+# point at must exist.  NetHack will not create them for you.
+#
+# HACKDIR is the default location for everything.
+# Note: On Windows HACKDIR defaults to the location 
+#       of the NetHack.exe or NetHackw.exe file so
+#       setting HACKDIR below to override that is 
+#       not usually necessary or recommended.
+#HACKDIR=c:\games\nethack
+#
+# The location that users can adjust their config file startup options
+#CONFIGDIR=c:\games\nethack
+#
+# The location that level files in progress are stored (default=HACKDIR, writeable)
+#LEVELDIR=c:\nethack\levels
+#
+# The location where saved games are kept (default=HACKDIR, writeable)
+#SAVEDIR=c:\nethack\save
+#
+# The location that bones files are kept (default=HACKDIR, writeable)
+#BONESDIR=c:\nethack\save
+#
+# The location that file synchronization locks are stored (default=HACKDIR, writeable)
+#LOCKDIR=c:\nethack\levels
+#
+# The location that a record of game aborts and self-diagnosed game problems
+# is kept (default=HACKDIR, writeable)
+#TROUBLEDIR=c:\nethack\trouble
+
+

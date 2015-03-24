@@ -1799,7 +1799,7 @@ struct obj *obj, *otmp;
 		    if (break_statue(obj)) {
 			if (cansee(obj->ox, obj->oy)) {
 			    if (Hallucination)
-				pline_The("%s shatters.", rndmonnam());
+				pline_The("%s shatters.", rndmonnam(NULL));
 			    else 
 				pline_The("statue shatters.");
 			} else
