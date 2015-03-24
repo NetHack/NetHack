@@ -13,7 +13,8 @@ my $rawin = 0;	# feed diff to stdin for testing (do NOT set $debug=1)
 # this first block because it's expensive and dumpfile() hangs with $rawin.
 my $sink = ($^O eq "MSWin32") ? "NUL" : "/dev/null";
 my $dbgfile = ($^O eq "MSWin32") ? "$ENV{TEMP}.$$" : "/tmp/trace.$$";
-open TRACE, ">>", ($debug==0)? $sink : $dbgfile;
+open TRACE, ">>", $rawin?"/dev/tty":(($debug==0)? $sink : $dbgfile);
+print TRACE "TEST TRACE\n";
 if($debug){
 	print TRACE "START CLIENT ARGV:\n";
 	print TRACE "[0] $0\n";
@@ -233,7 +234,7 @@ sub merge_one_line_maybe {
 				$theirval = $1;
 			}
 		}
-
+print TRACE "MID: $ourstype/$oursval $theirtype/$theirval\n";
 		# are we done?
 		if(pos($ours)==length $ours && pos($theirs) == length $theirs){
 			$more = 0;
@@ -245,6 +246,12 @@ sub merge_one_line_maybe {
 		# now see if ours and their match or can be resolved
 			# text
 		if($ourstype == 3 && $theirtype == 3){
+#mismatch is \s vs \s\s - where is this coming from?
+			# HACK - hopefully temporary
+			if($oursval =~ m/^\s+$/ && $theirval =~ m/^\s+$/){
+				$out .= $oursval;
+				next;
+			}
 			if($oursval eq $theirval){
 				$out .= $oursval;
 				next;
@@ -273,6 +280,7 @@ sub merge_one_line_maybe {
 # return undef if we can't merge the values; $NAME: VALUE $ or $NAME$ (as appropriate) if we can.
 sub merge_one_var_maybe {
 	my($varname, $oursval, $theirval) = @_;
+print TRACE "MVM: -$varname-$oursval-$theirval-\n";
 	my $resolvedas;
 	{
 		no strict;
@@ -309,12 +317,28 @@ sub Date {
 
 sub Branch {
 	my($PREFIX, $varname, $mine, $theirs) = @_;
-	return "\$$PREFIX-$varname: $mine \$";
+	$mine =~ s/^\s+//;	$mine =~ s/\s+$//;
+	$theirs =~ s/^\s+//;	$theirs =~ s/\s+$//;
+	return "\$$PREFIX-$varname: $mine \$" if(length $mine);
+	return "\$$PREFIX-$varname: $theirs \$" if(length $theirs);
+	return "\$$PREFIX-$varname\$" if(length $theirs);
 }
 
 sub Revision {
 	my($PREFIX, $varname, $mine, $theirs) = @_;
-	return "\$$PREFIX-$varname: $mine \$";
+	my($m) = ($mine =~ m/1.(\d+)/);
+	my($t) = ($theirs =~ m/1.(\d+)/);
+	if($m > 0 && $t > 0){
+		my $q = ($m > $t) ? $m : $t;
+		return "\$$PREFIX-$varname: 1.$q \$";
+	}
+	if($m > 0){
+		return "\$$PREFIX-$varname: 1.$m \$";
+	}
+	if($t > 0){
+		return "\$$PREFIX-$varname: 1.$t \$";
+	}
+	return "\$$PREFIX-$varname\$";
 }
 __END__
 
@@ -363,4 +387,11 @@ TEST 7:
 $TEST-Branch: mine $
 ===
 $TEST-Branch: theirs $
+>>> d3
+
+TEST 8:
+<<< d1
+/* NetHack 3.5        objnam.c        $TEST-Date$ $TEST-Branch$:$TEST-Revision$ */
+===
+/* NetHack 3.5        objnam.c        $TEST-Date: 1426977394 2015/03/21 22:36:34 $  $TEST-Branch: master $:$TEST-Revision: 1.108 $ */
 >>> d3
