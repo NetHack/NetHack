@@ -116,7 +116,7 @@ void FDECL(add_opcode, (sp_lev *, int, genericptr_t));
 static boolean FDECL(write_common_data, (int,sp_lev *));
 static boolean FDECL(write_maze, (int,sp_lev *));
 static void NDECL(init_obj_classes);
-static int NDECL(case_insensitive_comp, (const char *, const char *));
+static int FDECL(case_insensitive_comp, (const char *, const char *));
 
 void VDECL(lc_error, (const char *, ...));
 void VDECL(add_opvars, (sp_lev *, const char *, ...));
