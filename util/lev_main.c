@@ -1,4 +1,4 @@
-/* NetHack 3.5	lev_main.c	$NHDT-Date: 1427154631 2015/03/23 23:50:31 $  $NHDT-Branch: paxed-new_lev_comp-B $:$NHDT-Revision: 1.27 $ */
+/* NetHack 3.5	lev_main.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
 /* NetHack 3.5	lev_main.c	$Date: 2012/01/12 04:48:12 $  $Revision: 1.20 $ */
 /*	SCCS Id: @(#)lev_main.c	3.5	2007/01/17	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
@@ -115,6 +115,7 @@ void FDECL(add_opcode, (sp_lev *, int, genericptr_t));
 static boolean FDECL(write_common_data, (int,sp_lev *));
 static boolean FDECL(write_maze, (int,sp_lev *));
 static void NDECL(init_obj_classes);
+static int NDECL(case_insensitive_comp, (const char *, const char *));
 
 void VDECL(lc_error, (const char *, ...));
 void VDECL(add_opvars, (sp_lev *, const char *, ...));
@@ -1341,6 +1342,23 @@ sp_lev *lvl;
 	(void) close(fout);
 
 	return TRUE;
+}
+
+static int
+case_insensitive_comp(s1, s2)
+const char *s1;
+const char *s2;
+{
+    unsigned char u1, u2;
+
+    for ( ; ; s1++, s2++) {
+	u1 = tolower((unsigned char) *s1);
+	u2 = tolower((unsigned char) *s2);
+	if ((u1 == '\0') || (u1 != u2)) {
+	    break;
+	}
+    }
+    return u1-u2;
 }
 
 
