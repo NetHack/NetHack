@@ -2053,6 +2053,8 @@ Enable mail delivery during the game (default on).
 .lp "male    "
 An obsolete synonym for ``gender:male''.
 Cannot be set with the `O' command.
+.lp mention_walls
+Give feedback when walking against a wall (default off).
 .lp menustyle
 Controls the interface used when you need to choose various objects (in
 response to the Drop command, for instance).  The value specified should

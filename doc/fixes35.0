@@ -879,7 +879,7 @@ abuse wisdom in keeping with Rider eating message
 message inconsistency: death message "swallowed <mon> whole" was preceded 
 	by "You bite into"
 improve the messaging when a monster you can't see is causing an obstruction
-
+add option mention_walls, which gives feedback when bumping against a wall
 
 Platform- and/or Interface-Specific Fixes
 -----------------------------------------
