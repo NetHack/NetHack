@@ -880,6 +880,8 @@ message inconsistency: death message "swallowed <mon> whole" was preceded
 	by "You bite into"
 improve the messaging when a monster you can't see is causing an obstruction
 add option mention_walls, which gives feedback when bumping against a wall
+fix invalid pointer dereference in morguemon if ndemon returns NON_PM
+
 
 Platform- and/or Interface-Specific Fixes
 -----------------------------------------

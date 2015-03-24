@@ -1,4 +1,4 @@
-/* NetHack 3.5	mkroom.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	mkroom.c	$NHDT-Date: 1427239202 2015/03/24 23:20:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.16 $ */
 /* NetHack 3.5	mkroom.c	$Date: 2012/01/10 17:47:19 $  $Revision: 1.15 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -408,9 +408,17 @@ morguemon()
 {
 	register int i = rn2(100), hd = rn2(level_difficulty());
 
-	if(hd > 10 && i < 10)
-		return((Inhell || In_endgame(&u.uz)) ? mkclass(S_DEMON,0) :
-						       &mons[ndemon(A_NONE)]);
+	if(hd > 10 && i < 10) {
+	    if (Inhell || In_endgame(&u.uz)) {
+	    	return(mkclass(S_DEMON,0));
+	    } else {
+		int ndemon_res = ndemon(A_NONE);
+		if (ndemon_res != NON_PM)
+		    return(&mons[ndemon_res]);
+		/* else do what? As is, it will drop to ghost/wraith/zombie */
+	    }
+	}
+
 	if(hd > 8 && i > 85)
 		return(mkclass(S_VAMPIRE,0));
 
