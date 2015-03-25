@@ -32,6 +32,10 @@ you specify:
 -pretty=one: format output as a single line for each entry
 (branch): show the commits from (branch) instead of the current one
 
+[*] git log --pretty=one --decorate --graph --all
+
+(This is best explained by executing and looking at the output.)
+
 
 [*] git add (filename)
 [*] git nhadd (filename)
@@ -101,10 +105,10 @@ the prior commit.
 [/end area-of-concern]
 
 
-[*] git fetch [-a]
+[*] git fetch [--all]
 
 Retrieve commits from the remote repository to your machine.
-Including -a will get commits for all branches.
+Including --all will get commits for all branches.
 Does NOT merge them into your local repository.
 
 
