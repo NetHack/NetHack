@@ -304,7 +304,11 @@ dosounds()
 
 static const char * const h_sounds[] = {
     "beep", "boing", "sing", "belche", "creak", "cough", "rattle",
-    "ululate", "pop", "jingle", "sniffle", "tinkle", "eep"
+    "ululate", "pop", "jingle", "sniffle", "tinkle", "eep",
+    "clatter", "hum", "sizzle", "twitter", "wheeze", "rustle",
+    "honk", "lisp", "yodel", "coo", "burp", "moo", "boom",
+    "murmur", "oink", "quack", "rumble", "twang", "bellow",
+    "toot", "gargle", "hoot", "warble"
 };
 
 const char *
@@ -1006,7 +1010,7 @@ dochat()
       if (!Blind) {
 	if (Hallucination) {
 	  /* if you're hallucinating, you can't tell it's a statue */
-	  pline_The("%s seems not to notice you.", rndmonnam());
+	  pline_The("%s seems not to notice you.", rndmonnam(NULL));
 	}
 	else {
 	  pline_The("statue seems not to notice you.");

@@ -1,4 +1,4 @@
-NetHack History file for release 3.4
+NetHack History file for release 3.6
 
 Behold, mortal, the origins of NetHack...
 
@@ -120,7 +120,6 @@ publicly available web-site listing all the bugs that had been discovered.
 Despite that constantly growing bug list, 3.3 proved stable enough to last
 for more than a year and a half.
 
-
 The 3.4 development team initially consisted of Michael Allison, Ken Arromdee,
 David Cohrs, Jessie Collet, Kevin Hugo, Ken Lorber, Dean Luick, Pat Rankin,
 Mike Stephenson, Janet Walz, and Paul Winner, with Warwick Allison joining
@@ -150,7 +149,69 @@ Amiga port of 3.5 after Janne Salmijarvi resurrected it for 3.3.1.
 Christian `Marvin' Bressler maintained 3.5 for the Atari after he
 resurrected it for 3.3.1.
 
-There is a NetHack web site maintained by Ken Lorber at http://www.nethack.org/.
+The release of NetHack 3.4.3 in December 2003 marked the beginning of a 
+long release hiatus. 3.4.3 proved to be a remarkably stable version that
+provided continued enjoyment by the community for more than a decade. The 
+devteam slowly and quietly continued to work on the game behind the scenes 
+during the tenure of 3.4.3. It was during that same period that several new 
+variants emerged within the NetHack community. Notably sporkhack by 
+Derek S. Ray, unnethack by Patric Mueller, nitrohack and its successors 
+originally by Daniel Thaler and then by Alex Smith, and 
+Dynahack by Tung Nguyen. Some of those variants continue to be developed, 
+maintained, and enjoyed by the community to this day.
+
+In September 2014, an interim snapshot of the code under development was 
+released publicly by other parties. Since that code was a work-in-progress 
+and had not gone through a period of debugging, it was decided that the 
+version numbers present on that code snapshot would be retired and never 
+used in an official NetHack release. An announcement was posted on the 
+devteam's official nethack.org website to that effect, stating that there 
+would never be a 3.4.4, 3.5, or 3.5.0 official release version.
+
+In January 2015, preparation began for the release of NetHack 3.6. 
+
+At the beginning of development for what would eventually get released
+as 3.6.0, the development team consisted of Michael Allison, 
+Warwick Allison, Ken Arromdee, David Cohrs, Jessie Collet, Ken Lorber, 
+Dean Luick, Pat Rankin, Mike Stephenson, Janet Walz, and Paul Winner.
+
+Leading up to the release of 3.6.0 in early 2015, new members Sean Hunt, 
+Pasi Kallinen, and Derek S. Ray joined the NetHack development team.
+
+3.6.0 <FIXME> - insert apprpriate description of 3.6.0 here
+
+The development team, as well as Steve VanDevender and Kevin Smolkowski
+ensured that NetHack 3.6.0 continued to operate on various Unix flavors
+as well as maintaining the X11 interface. 
+
+Ken Lorber, Haoyang Wang, Pat Rankin, and Dean Luick maintained the port
+of NetHack 3.6.0 for Mac.
+
+Michael Allison, Derek S. Ray, Yitzhak Sapir, Alex Kompel, and David Cohrs 
+maintained the port of NetHack 3.6.0 for Microsoft Windows.
+
+Jeff Bailey created and maintained a port of NetHack 3.6.0 for Chrome.
+
+Alex Kompel maintained a port of NetHack 3.6.0 to Windows Phone. <FIXME>?
+
+This version of the game is special in a particular way.  Near the end of 
+the development of 3.6, one of the significant inspirations for many of the 
+humorous and fun features found in the game, author Terry Pratchett, 
+passed away.  This version of the game is dedicated to <FIXME>
+
+
+An official NetHack web site continues to be maintained by Ken Lorber at 
+http://www.nethack.org/.
+
+--
+SHOUT-OUTS
+
+The devteam would like to give a special "shout-out" to thank the generous 
+people primarily responsible for the public NetHack servers available for 
+playing the game at nethack.alt.org and devnull.net. In addition to providing 
+a way for the public to play a game of NetHack from almost anywhere, they 
+have hosted annual NetHack tournaments for many, many years. 
+<FIXME> write up something for Robin, M. Drew Streib, Pasi Kallinen
 
 			   - - - - - - - - - -
 
@@ -159,41 +220,42 @@ particularly intriguing modification to help out with the game.  The Gods of
 the Dungeon sometimes make note of the names of the worst of these miscreants
 in this, the list of Dungeoneers:
 
-    Adam Aronow               Izchak Miller             Mike Passaretti
-    Alex Kompel               J. Ali Harlow             Mike Stephenson
-    Andreas Dorn              Janet Walz                Norm Meluch
-    Andy Church               Janne Salmijarvi          Olaf Seibert
-    Andy Swanson              Jean-Christophe Collet    Pasi Kallinen
-    Ari Huttunen              Jochen Erwied             Pat Rankin
-    Barton House              John Kallen               Paul Winner
-    Benson I. Margulies       John Rupley               Pierre Martineau
-    Bill Dyer                 John S. Bien              Ralf Brown
-    Boudewijn Waijers         Johnny Lee                Ray Chason
-    Bruce Cox                 Jon W{tte                 Richard Addison
-    Bruce Holloway            Jonathan Handler          Richard Beigel
-    Bruce Mewborne            Joshua Delahunty          Richard P. Hughey
-    Carl Schelin              Keizo Yamamoto            Rob Menke
-    Chris Russo               Ken Arnold                Robin Johnson
-    David Cohrs               Ken Arromdee              Roderick Schertler
-    David Damerell            Ken Lorber                Roland McGrath
-    David Gentzel             Ken Washikita             Ron Van Iwaarden
-    David Hairston            Kevin Darcy               Ronnen Miller
-    Dean Luick                Kevin Hugo                Ross Brown
-    Del Lamb                  Kevin Sitze               Sascha Wostmann
-    Deron Meranda             Kevin Smolkowski          Scott Bigham
-    Dion Nicolaas             Kevin Sweet               Scott R. Turner
-    Dylan O'Donnell           Lars Huttar               Stephen Spackman
-    Eric Backus               Leon Arnott               Stephen White
-    Eric Hendrickson          Malcolm Ryan              Steve Creps
-    Eric R. Smith             Mark Gooderum             Steve Linhart
-    Eric S. Raymond           Mark Modrall              Steve VanDevender
-    Erik Andersen             Marvin Bressler           Teemu Suikki
-    Frederick Roeber          Matthew Day               Tim Lennan
-    Gil Neiger                Merlyn LeRoy              Timo Hakulinen
-    Greg Laskin               Michael Allison           Tom Almy
-    Greg Olson                Michael Feir              Tom West
-    Gregg Wonderly            Michael Hamel             Warren Cheung
-    Hao-yang Wang             Michael Sokolov           Warwick Allison
-    Helge Hafting             Mike Engber               Yitzhak Sapir
-    Irina Rempt-Drijfhout     Mike Gallop               
+    Adam Aronow               Izchak Miller             Mike Stephenson
+    Alex Kompel               J. Ali Harlow             Norm Meluch
+    Andreas Dorn              Janet Walz                Olaf Seibert
+    Andy Church               Janne Salmijarvi          Pasi Kallinen
+    Andy Swanson              Jean-Christophe Collet    Pat Rankin
+    Ari Huttunen              Jochen Erwied             Paul Winner
+    Barton House              John Kallen               Pierre Martineau
+    Benson I. Margulies       John Rupley               Ralf Brown
+    Bill Dyer                 John S. Bien              Ray Chason
+    Boudewijn Waijers         Johnny Lee                Richard Addison
+    Bruce Cox                 Jon W{tte                 Richard Beigel
+    Bruce Holloway            Jonathan Handler          Richard P. Hughey
+    Bruce Mewborne            Joshua Delahunty          Rob Menke
+    Carl Schelin              Keizo Yamamoto            Robin Johnson
+    Chris Russo               Ken Arnold                Roderick Schertler
+    David Cohrs               Ken Arromdee              Roland McGrath
+    David Damerell            Ken Lorber                Ron Van Iwaarden
+    David Gentzel             Ken Washikita             Ronnen Miller
+    David Hairston            Kevin Darcy               Ross Brown
+    Dean Luick                Kevin Hugo                Sascha Wostmann
+    Del Lamb                  Kevin Sitze               Scott Bigham
+    Derek S. Ray              Kevin Smolkowski          Scott R. Turner
+    Deron Meranda             Kevin Sweet               Sean Hunt
+    Dion Nicolaas             Lars Huttar               Stephen Spackman
+    Dylan O'Donnell           Leon Arnott               Stephen White
+    Eric Backus               Malcolm Ryan              Steve Creps
+    Eric Hendrickson          Mark Gooderum             Steve Linhart
+    Eric R. Smith             Mark Modrall              Steve VanDevender
+    Eric S. Raymond           Marvin Bressler           Teemu Suikki
+    Erik Andersen             Matthew Day               Tim Lennan
+    Frederick Roeber          Merlyn LeRoy              Timo Hakulinen
+    Gil Neiger                Michael Allison           Tom Almy
+    Greg Laskin               Michael Feir              Tom West
+    Greg Olson                Michael Hamel             Warren Cheung
+    Gregg Wonderly            Michael Sokolov           Warwick Allison
+    Hao-yang Wang             Mike Engber               Yitzhak Sapir
+    Helge Hafting             Mike Gallop               
+    Irina Rempt-Drijfhout     Mike Passaretti           
 

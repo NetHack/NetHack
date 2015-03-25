@@ -1,4 +1,4 @@
-/* NetHack 3.5	sp_lev.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	sp_lev.c	$NHDT-Date: 1426465441 2015/03/16 00:24:01 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.25 $ */
 /* NetHack 3.5	sp_lev.c	$Date: 2011/01/05 01:28:36 $  $Revision: 1.23 $ */
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -324,8 +324,8 @@ chk:
 		lev = &levl[x][y];
 		for (; y <= ymax; y++) {
 			if (lev++->typ) {
-				if(!vault)
-				    debugpline("strange area [%d,%d] in check_room.",x,y);
+				if (!vault)
+				    debugpline2("strange area [%d,%d] in check_room.", x, y);
 				if (!rn2(3))	return FALSE;
 				if (x < *lowx)
 				    *lowx = x + xlim + 1;
@@ -398,7 +398,7 @@ xchar	rtype, rlit;
 			r1 = rnd_rect(); /* Get a random rectangle */
 
 			if (!r1) { /* No more free rectangles ! */
-				debugpline("No more rects...");
+				debugpline0("No more rects...");
 				return FALSE;
 			}
 			hx = r1->hx;
@@ -1062,6 +1062,18 @@ struct mkroom	*croom;
 	    mongone(was);
 	}
 
+	/* Nasty hack here: try to determine if this is the Mines or Sokoban
+	 * "prize" and then set record_achieve_special (maps to corpsenm)
+	 * for the object.  That field will later be checked to find out if
+	 * the player obtained the prize. */
+	if(otmp->otyp == LUCKSTONE && Is_mineend_level(&u.uz)) {
+	    otmp->record_achieve_special = 1;
+	} else if((otmp->otyp == AMULET_OF_REFLECTION ||
+		   otmp->otyp == BAG_OF_HOLDING) &&
+			Is_sokoend_level(&u.uz)) {
+	    otmp->record_achieve_special = 1;
+        }
+
 	stackobj(otmp);
 
     }		/* if (rn2(100) < o->chance) */
@@ -1311,8 +1323,8 @@ schar ftyp, btyp;
 	if (xx <= 0 || yy <= 0 || tx <= 0 || ty <= 0 ||
 	    xx > COLNO-1 || tx > COLNO-1 ||
 	    yy > ROWNO-1 || ty > ROWNO-1) {
-		debugpline("dig_corridor: bad coords : (%d,%d) (%d,%d).",
-			   xx,yy,tx,ty);
+		debugpline4("dig_corridor: bad coords <%d,%d> <%d,%d>.",
+			    xx, yy, tx, ty);
 		return FALSE;
 	}
 	if (tx > xx)		dx = 1;

@@ -1,4 +1,4 @@
-/* NetHack 3.5	do.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	do.c	$NHDT-Date: 1426991040 2015/03/22 02:24:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.111 $ */
 /* NetHack 3.5	do.c	$Date: 2014/11/18 03:10:39 $  $Revision: 1.101 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -230,10 +230,15 @@ doaltarobj(obj)  /* obj is an object dropped on an altar */
     if (Blind)
         return;
 
-    /* KMH, conduct */
-    u.uconduct.gnostic++;
+	if (obj->oclass != COIN_CLASS) {
+	    /* KMH, conduct */
+	    u.uconduct.gnostic++;
+	} else {
+	    /* coins don't have bless/curse status */
+	    obj->blessed = obj->cursed = 0;
+	}
 
-    if ((obj->blessed || obj->cursed) && obj->oclass != COIN_CLASS) {
+	if (obj->blessed || obj->cursed) {
         There("is %s flash as %s %s the altar.",
             an(hcolor(obj->blessed ? NH_AMBER : NH_BLACK)),
             doname(obj), otense(obj, "hit"));
@@ -241,7 +246,7 @@ doaltarobj(obj)  /* obj is an object dropped on an altar */
     } else {
         pline("%s %s on the altar.", Doname2(obj),
             otense(obj, "land"));
-        obj->bknown = 1;
+		if (obj->oclass != COIN_CLASS) obj->bknown = 1;
     }
 }
 
@@ -1017,15 +1022,18 @@ boolean at_stairs, falling, portal;
 
     /* If you have the amulet and are trying to get out of Gehennom, going
      * up a set of stairs sometimes does some very strange things!
-     * Biased against law and towards chaos, but not nearly as strongly
-     * as it used to be (prior to 3.2.0).
-     * Odds:	    old				    new
-     *	"up"    L      N      C		"up"    L      N      C
-     *	 +1   75.0   75.0   75.0	 +1   75.0   75.0   75.0
-     *	  0    0.0   12.5   25.0	  0    6.25   8.33  12.5
-     *	 -1    8.33   4.17   0.0	 -1    6.25   8.33  12.5
-     *	 -2    8.33   4.17   0.0	 -2    6.25   8.33   0.0
-     *	 -3    8.33   4.17   0.0	 -3    6.25   0.0    0.0
+	 * Biased against law and towards chaos. (The chance to be sent
+	 * down multiple levels when attempting to go up are significantly
+	 * less than the corresponding comment in older versions indicated
+	 * due to overlooking the effect of the call to assign_rnd_lvl().)
+	 *
+	 * Odds for making it to the next level up, or of being sent down:
+	 *	"up"    L      N      C
+	 *	 +1   75.0   75.0   75.0
+	 *	  0    6.25   8.33  12.5
+	 *	 -1   11.46  12.50  12.5
+	 *	 -2    5.21   4.17   0.0
+	 *	 -3    2.08   0.0    0.0
      */
     if (Inhell && up && u.uhave.amulet && !newdungeon && !portal &&
                 (dunlev(&u.uz) < dunlevs_in_dungeon(&u.uz)-3)) {
@@ -1324,6 +1332,7 @@ boolean at_stairs, falling, portal;
 #endif
         You_hear("groans and moans everywhere.");
         } else pline("It is hot here.  You smell smoke...");
+	    u.uachieve.enter_gehennom = 1;
     }
     /* in case we've managed to bypass the Valley's stairway down */
     if (Inhell && !Is_valley(&u.uz)) u.uevent.gehennom_entered = 1;

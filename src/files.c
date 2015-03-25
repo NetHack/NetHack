@@ -1,4 +1,4 @@
-/* NetHack 3.5	files.c	$NHDT-Date: 1426545233 2015/03/16 22:33:53 $  $NHDT-Branch: derek-farming $:$NHDT-Revision: 1.133 $ */
+/* NetHack 3.5	files.c	$NHDT-Date: 1426969026 2015/03/21 20:17:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.137 $ */
 /* NetHack 3.5	files.c	$Date: 2012/03/10 02:49:08 $  $Revision: 1.124 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -362,7 +362,9 @@ char *reasonbuf;  /* reasonbuf must be at least BUFSZ, supplied by caller */
 #if defined(NOCWD_ASSUMPTIONS)
 	for (prefcnt = 1; prefcnt < PREFIX_COUNT; prefcnt++) {
 		/* don't test writing to configdir or datadir; they're readonly */
-		if (prefcnt == CONFIGPREFIX || prefcnt == DATAPREFIX) continue;
+		if (prefcnt == SYSCONFPREFIX ||
+		    prefcnt == CONFIGPREFIX ||
+		    prefcnt == DATAPREFIX) continue;
 		filename = fqname("validate", prefcnt, 3);
 		if ((fp = fopen(filename, "w"))) {
 			fclose(fp);
@@ -1811,6 +1813,8 @@ const char *configfile =
 # endif
 #endif
 
+/* used for messaging */
+char lastconfigfile[BUFSZ];
 
 #ifdef MSDOS
 /* conflict with speed-dial under windows
@@ -1857,8 +1861,15 @@ int src;
 			/* fall through to standard names */
 		} else
 #endif
-		if ((fp = fopenp(filename, "r")) != (FILE *)0) {
-		    configfile = filename;
+#ifdef PREFIXES_IN_USE
+		if (src == SET_IN_SYS) {
+			(void) strncpy(lastconfigfile,
+				fqname(filename, SYSCONFPREFIX, 0), BUFSZ-1);
+		} else
+#endif
+		(void) strncpy(lastconfigfile, filename, BUFSZ-1);
+		lastconfigfile[BUFSZ-1] = '\0';
+		if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0) {
 		    return(fp);
 #if defined(UNIX) || defined(VMS)
 		} else {
@@ -1876,6 +1887,13 @@ int src;
     /* user's home directory should be where we look first here, too */
     envp = nh_getenv("USERPROFILE");
 # endif
+/*
+ * TODO: uncomment this when you figure out where to put it
+	(void) strncpy(lastconfigfile,
+			fqname(configfile, CONFIGPREFIX, 0), BUFSZ-1);
+	lastconfigfile[BUFSZ-1] = '\0';	
+	if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0) {
+*/
 # ifdef WIN32
     if (!envp) {
         Strcpy(tmp_config, configfile);
@@ -1908,13 +1926,15 @@ int src;
 #else
 	/* constructed full path names don't need fqname() */
 # ifdef VMS
-	if ((fp = fopenp(fqname("nethackini", CONFIGPREFIX, 0), "r"))
-								!= (FILE *)0) {
-		configfile = "nethackini";
+	(void) strncpy(lastconfigfile, fqname("nethackini", CONFIGPREFIX, 0),
+			BUFSZ-1);
+	lastconfigfile[BUFSZ-1] = '\0';
+	if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0) {
 		return(fp);
 	}
-	if ((fp = fopenp("sys$login:nethack.ini", "r")) != (FILE *)0) {
-		configfile = "nethack.ini";
+	(void) strncpy(lastconfigfile,"sys$login:nethack.ini", BUFSZ-1);
+	lastconfigfile[BUFSZ-1] = '\0';
+	if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0) {
 		return(fp);
 	}
 
@@ -1923,6 +1943,9 @@ int src;
 		Strcpy(tmp_config, "NetHack.cnf");
 	else
 		Sprintf(tmp_config, "%s%s", envp, "NetHack.cnf");
+
+	(void) strncpy(lastconfigfile, tmp_config, BUFSZ-1);
+	lastconfigfile[BUFSZ-1] = '\0';
 	if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
 		return(fp);
 # else	/* should be only UNIX left */
@@ -1931,18 +1954,25 @@ int src;
 		Strcpy(tmp_config, ".nethackrc");
 	else
 		Sprintf(tmp_config, "%s/%s", envp, ".nethackrc");
-	if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
+
+	(void) strncpy(lastconfigfile, tmp_config, BUFSZ-1);
+	lastconfigfile[BUFSZ-1] = '\0';
+	if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0)
 		return(fp);
 #  if defined(__APPLE__)
 	/* try an alternative */
 	if (envp) {
 		Sprintf(tmp_config, "%s/%s", envp,
 			"Library/Preferences/NetHack Defaults");
-		if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
+		(void) strncpy(lastconfigfile, tmp_config, BUFSZ-1);
+		lastconfigfile[BUFSZ-1] = '\0';
+		if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0)
 			return(fp);
 		Sprintf(tmp_config, "%s/%s", envp,
 			"Library/Preferences/NetHack Defaults.txt");
-		if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
+		(void) strncpy(lastconfigfile, tmp_config, BUFSZ-1);
+		lastconfigfile[BUFSZ-1] = '\0';
+		if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0)
 			return(fp);
 	}
 #  endif
@@ -1957,7 +1987,7 @@ int src;
 #  endif
 		details = "";
 	    raw_printf("Couldn't open default config file %s %s(%d).",
-		       tmp_config, details, errno);
+		       lastconfigfile, details, errno);
 	    wait_synch();
 	}
 # endif	/* Unix */
@@ -2182,7 +2212,11 @@ int		src;
 	    sysopt.shellers = dupstr(bufp);
 	} else if (src == SET_IN_SYS && match_varname(buf, "DEBUGFILES", 5)) {
 	    if (sysopt.debugfiles) free(sysopt.debugfiles);
-	    sysopt.debugfiles = dupstr(bufp);
+	    /* if showdebug() has already been called (perhaps we've added
+	       some debugpline() calls to option processing) and has found
+	       a value for getenv("DEBUGFILES"), don't override that */
+	    if (sysopt.env_dbgfl == 0)
+		sysopt.debugfiles = dupstr(bufp);
 	} else if (src == SET_IN_SYS && match_varname(buf, "SUPPORT", 7)) {
 	    if (sysopt.support) free(sysopt.support);
 	    sysopt.support = dupstr(bufp);
@@ -3219,5 +3253,92 @@ int ifd, ofd;
 
 /* ----------  END INTERNAL RECOVER ----------- */
 #endif /*SELF_RECOVER*/
+
+/* ----------  OTHER ----------- */
+
+#ifdef SYSCF
+# ifdef SYSCF_FILE
+void
+assure_syscf_file() {
+	/* All we really care about is the end result - can we read the file?
+	 * So just check that directly. */
+	int fd;
+	fd = open(SYSCF_FILE, O_RDONLY);
+	if(fd >= 0){
+		/* readable */
+		close(fd);
+		return;
+	}
+	raw_printf("Unable to open SYSCF_FILE.\n");
+	exit(EXIT_FAILURE);
+}
+
+# endif /* SYSCF_FILE */
+#endif /* SYSCF */
+
+
+#ifdef DEBUG
+/* used by debugpline() to decide whether to issue a message
+   from a partiular source file; caller passes __FILE__ and we check
+   whether it is in the source file list supplied by SYSCF's DEBUGFILES */ 
+boolean
+showdebug(filename)
+const char *filename;
+{
+    const char *debugfiles, *p;
+
+    if (!filename || !*filename) return FALSE;	/* sanity precaution */
+
+    if (sysopt.env_dbgfl == 0) {
+	/* check once for DEBUGFILES in the environment;
+	   if found, it supersedes the sysconf value
+	   [note: getenv() rather than nh_getenv() since a long value
+	   is valid and doesn't pose any sort of overflow risk here] */
+	if ((p = getenv("DEBUGFILES")) != 0) {
+	    if (sysopt.debugfiles) free(sysopt.debugfiles);
+	    sysopt.debugfiles = dupstr(p);
+	    sysopt.env_dbgfl = 1;
+	} else
+	    sysopt.env_dbgfl = -1;
+    }
+
+    debugfiles = sysopt.debugfiles;
+    /* usual case: sysopt.debugfiles will be empty */
+    if (!debugfiles || !*debugfiles) return FALSE;
+
+    /* strip filename's path if present */
+# ifdef UNIX
+    if ((p = rindex(filename, '/')) != 0) filename = p + 1;
+# endif
+# ifdef VMS
+    filename = vms_basename(filename);
+    /* vms_basename strips off 'type' suffix as well as path and version;
+       we want to put suffix back (".c" assumed); since it always returns
+       a pointer to a static buffer, we can safely modify its result */
+    Strcat((char *)filename, ".c");
+# endif
+
+    /*
+     * Wildcard match will only work if there's a single pattern (which
+     * might be a single file name without any wildcarding) rather than
+     * a space-separated list.
+     * [to NOT do: We could step through the space-separated list and
+     * attempt a wildcard match against each element, but that would be
+     * overkill for the intended usage.]
+     */
+    if (pmatch(debugfiles, filename))
+	return TRUE;
+
+    /* check whether filename is an element of the list */
+    if ((p = strstr(debugfiles, filename)) != 0) {
+	int l = (int)strlen(filename);
+
+	if ((p == debugfiles || p[-1] == ' ' || p[-1] == '/')
+	    && (p[l] == ' ' || p[l] == '\0'))
+	    return TRUE;
+    }
+    return FALSE;
+}
+#endif	/*DEBUG*/
 
 /*files.c*/

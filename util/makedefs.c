@@ -169,6 +169,7 @@ static char *FDECL(bannerc_string, (char *,const char *));
 static char *FDECL(xcrypt, (const char *));
 static unsigned long FDECL(read_rumors_file,
 			   (const char *,int *,long *,unsigned long));
+static void FDECL(do_rnd_access_file, (const char *));
 static boolean FDECL(d_filter, (char *));
 static boolean FDECL(h_filter, (char *));
 static boolean FDECL(ranged_attk,(struct permonst*));
@@ -213,7 +214,7 @@ extern unsigned _stklen = STKSIZ;
 int
 main(void)
 {
-    const char *def_options = "odemvpqrhz";
+    const char *def_options = "odemvpqrshz";
     char buf[100];
     int len;
 
@@ -328,6 +329,11 @@ char	*options;
 				break;
 		case 'r':
 		case 'R':	do_rumors();
+				break;
+		case 's':
+		case 'S':	do_rnd_access_file(EPITAPHFILE);
+				do_rnd_access_file(ENGRAVEFILE);
+				do_rnd_access_file(BOGUSMONFILE);
 				break;
 		case 'h':
 		case 'H':	do_oracles();
@@ -868,6 +874,44 @@ unsigned long old_rumor_offset;
        the loop's accumulation above obsolete] */
     *rumor_size = (long)(rumor_offset - old_rumor_offset);
     return rumor_offset;
+}
+
+
+void
+do_rnd_access_file(fname)
+const char *fname;
+{
+    Sprintf(filename, DATA_IN_TEMPLATE, fname);
+    Strcat(filename, ".txt");
+    if (!(ifp = fopen(filename, RDTMODE))) {
+	perror(filename);
+	exit(EXIT_FAILURE);
+    }
+    filename[0]='\0';
+#ifdef FILE_PREFIX
+    Strcat(filename, file_prefix);
+#endif
+    Sprintf(eos(filename), DATA_TEMPLATE, fname);
+    if (!(ofp = fopen(filename, WRTMODE))) {
+	perror(filename);
+	exit(EXIT_FAILURE);
+    }
+    Fprintf(ofp,"%s",Dont_Edit_Data);
+
+    tfp = getfp(DATA_TEMPLATE, "grep.tmp", WRTMODE);
+    grep0(ifp, tfp);
+    ifp = getfp(DATA_TEMPLATE, "grep.tmp", RDTMODE);
+
+    while (fgets(in_line, sizeof in_line, ifp) != 0) {
+	if (in_line[0] == '#') continue; /* discard comments */
+	if (in_line[0] == '\n') continue; /* and empty lines */
+	(void) fputs(xcrypt(in_line), ofp);
+    }
+    Fclose(ifp);
+    Fclose(ofp);
+
+    delete_file(DATA_TEMPLATE, "grep.tmp");
+    return;
 }
 
 void

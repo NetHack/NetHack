@@ -855,6 +855,7 @@ fix "object lost" panic (or even crash) when dropping multiple items while
 	levitating and a lit potion of oil explodes and destroys some inventory
 fix "object_is_local" panic when saving bones after hero is killed by explosion
 	produced by dropped or thrown lit potion of oil
+gold dropped on altar by hero wouldn't stack with gold dropped there by monster
 if lava burns up the player's water walking boots, the player falls in
 the messages for lava burning items up are always printed
 fix used-up magic trap trying to hit steed.
@@ -878,6 +879,12 @@ abuse wisdom in keeping with Rider eating message
 message inconsistency: death message "swallowed <mon> whole" was preceded 
 	by "You bite into"
 improve the messaging when a monster you can't see is causing an obstruction
+add option mention_walls, which gives feedback when bumping against a wall
+fix invalid pointer dereference in morguemon if ndemon returns NON_PM
+after object loss through polyshudder don't get left hiding under nothing 
+	if you're polymorphed into a hider
+show object symbols in menu headings in menus where those object symbols
+	act as menu accelerators, toggleable via "menu_objsyms" option
 
 
 Platform- and/or Interface-Specific Fixes
@@ -1088,6 +1095,7 @@ change command X to twoweapon toggle
 pressing @ when cursor positioning moves cursor on top of hero
 pressing # when cursor positioning toggles automatic description of features
 	under the cursor
+cursor positioning ignores uninteresting dungeon features
 
 
 Platform- and/or Interface-Specific New Features
@@ -1124,6 +1132,7 @@ adopt/adapt/improve the Paranoid_Quit patch; default is paranoid_confirm:pray
 	paranoid_confirm:pray    y to confirm #pray; supersedes prayconfirm
 	paranoid_confirm:Remove  always pick from inventory for 'R' and 'T'
 adopt/adapt/improve Dungeon Overview
+Aardvark Joe's Extended Logfile
 
 
 Code Cleanup and Reorganization

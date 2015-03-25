@@ -136,6 +136,7 @@ NEARDATA struct sysflag sysflags = DUMMY;
 NEARDATA struct instance_flags iflags = DUMMY;
 NEARDATA struct you u = DUMMY;
 NEARDATA time_t ubirthday = DUMMY;
+NEARDATA struct u_realtime urealtime = DUMMY;
 
 
 schar lastseentyp[COLNO][ROWNO] = {DUMMY}; /* last seen/touched dungeon typ */
@@ -267,12 +268,14 @@ char toplines[TBUFSZ];
 struct tc_gbl_data tc_gbl_data = { 0,0, 0,0 };	/* AS,AE, LI,CO */
 
 char *fqn_prefix[PREFIX_COUNT] = { (char *)0, (char *)0, (char *)0, (char *)0,
-				(char *)0, (char *)0, (char *)0, (char *)0, (char *)0 };
+				(char *)0, (char *)0, (char *)0, (char *)0,
+				(char *)0 , (char *)0 };
 
 #ifdef PREFIXES_IN_USE
 char *fqn_prefix_names[PREFIX_COUNT] = { "hackdir", "leveldir", "savedir",
 					"bonesdir", "datadir", "scoredir",
-					"lockdir", "configdir", "troubledir" };
+					"lockdir", "sysconfdir", "configdir",
+					"troubledir" };
 #endif
 
 NEARDATA struct savefile_info sfcap = {

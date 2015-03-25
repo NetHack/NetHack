@@ -1,4 +1,4 @@
-/* NetHack 3.5	wintty.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	wintty.c	$NHDT-Date: 1426465444 2015/03/16 00:24:04 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.71 $ */
 /* NetHack 3.5	wintty.c	$Date: 2012/01/22 06:27:09 $  $Revision: 1.66 $ */
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1934,7 +1934,7 @@ register int x, y;	/* not xchar: perhaps xchar is unsigned and
 	case NHW_TEXT: s = "[text window]"; break;
 	case NHW_BASE: s = "[base window]"; break;
 	}
-	debugpline("bad curs positioning win %d %s (%d,%d)", window, s, x, y);
+	debugpline4("bad curs positioning win %d %s (%d,%d)", window, s, x, y);
 	return;
     }
 #endif

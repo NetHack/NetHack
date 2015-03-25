@@ -1,4 +1,4 @@
-/* NetHack 3.5	potion.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	potion.c	$NHDT-Date: 1426953330 2015/03/21 15:55:30 $  $NHDT-Branch: master $:$NHDT-Revision: 1.99 $ */
 /* NetHack 3.5	potion.c	$Date: 2013/11/05 00:57:55 $  $Revision: 1.91 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -371,7 +371,7 @@ ghost_from_bottle()
 		return;
 	}
 	pline("As you open the bottle, an enormous %s emerges!",
-		Hallucination ? rndmonnam() : (const char *)"ghost");
+		Hallucination ? rndmonnam(NULL) : (const char *)"ghost");
 	if(flags.verbose)
 	    You("are frightened to death, and unable to move.");
 	nomul(-3);
@@ -1664,8 +1664,8 @@ dodip()
 			rider_cant_reach(); /* not skilled enough to reach */
 		    } else {
 			if (obj->otyp == POT_ACID) obj->in_use = 1;
-			(void) water_damage(obj, 0, TRUE);
-			if (obj->in_use) useup(obj);
+			if (water_damage(obj, 0, TRUE) != ER_DESTROYED && obj->in_use)
+			    useup(obj);
 		    }
 		    return 1;
 		}

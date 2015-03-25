@@ -1529,10 +1529,9 @@ struct obj *otmp;
     /* Adjust the age; must be same as obj_timer_checks() for off ice*/
     age = monstermoves - otmp->age;
     retval += age * (ROT_ICE_ADJUSTMENT-1) / ROT_ICE_ADJUSTMENT;
-    debugpline("The %s age has ice modifications:otmp->age = %ld, returning %ld.",
-        s_suffix(doname(otmp)),otmp->age, retval);
-    debugpline("Effective age of corpse: %ld.",
-        monstermoves - retval);
+	debugpline3("The %s age has ice modifications: otmp->age = %ld, returning %ld.",
+		s_suffix(doname(otmp)), otmp->age, retval);
+	debugpline1("Effective age of corpse: %ld.", monstermoves - retval);
     }
     return retval;
 }
@@ -1561,7 +1560,8 @@ int force;	/* 0 = no force so do checks, <0 = force off, >0 force on */
         
         /* mark the corpse as being on ice */
         otmp->on_ice = 1;
-        debugpline("%s is now on ice at %d,%d.", The(xname(otmp)),x,y);
+	    debugpline3("%s is now on ice at <%d,%d>.",
+			The(xname(otmp)), x, y);
         /* Adjust the time remaining */
         tleft *= ROT_ICE_ADJUSTMENT;
         restart_timer = TRUE;
@@ -1587,7 +1587,8 @@ int force;	/* 0 = no force so do checks, <0 = force off, >0 force on */
         long age;
 
         otmp->on_ice = 0;
-            debugpline("%s is no longer on ice at %d,%d.", The(xname(otmp)),x,y);
+	    	debugpline3("%s is no longer on ice at <%d,%d>.",
+			    The(xname(otmp)), x, y);
         /* Adjust the remaining time */
         tleft /= ROT_ICE_ADJUSTMENT;
         restart_timer = TRUE;

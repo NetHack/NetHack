@@ -1,4 +1,4 @@
-/* NetHack 3.5	wield.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	wield.c	$NHDT-Date: 1427062304 2015/03/22 22:11:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.34 $ */
 /* NetHack 3.5	wield.c	$Date: 2009/05/06 10:48:14 $  $Revision: 1.31 $ */
 /*	SCCS Id: @(#)wield.c	3.5	2009/01/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
@@ -348,10 +348,6 @@ dowieldquiver()
 	/* Since the quiver isn't in your hands, don't check cantwield(), */
 	/* will_weld(), touch_petrifies(), etc. */
 	multi = 0;
-
-	/* Because 'Q' used to be quit... */
-	if (flags.suppress_alert < FEATURE_NOTICE_VER(3,3,0))
-		pline("Note: Please use #quit if you wish to exit the game.");
 
 	/* Prompt for a new quiver */
 	if (!(newquiver = getobj(quivee_types, "ready")))

@@ -1693,7 +1693,7 @@ static struct sing_plur one_off[] = {
 static const char *const as_is[] = {
     /* makesingular() leaves these plural due to how they're used */
     "boots", "shoes",
-    "gloves", "lenses", "scales",
+	"gloves", "lenses", "scales", "eyes",
     "gauntlets",
     "iron bars",
     /* both singular and plural are spelled the same */

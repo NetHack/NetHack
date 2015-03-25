@@ -1,4 +1,4 @@
-/* NetHack 3.5	extern.h	$NHDT-Date: 1425081976 2015/02/28 00:06:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.390 $ */
+/* NetHack 3.5	extern.h	$NHDT-Date: 1426966688 2015/03/21 19:38:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.411 $ */
 /* NetHack 3.5	extern.h	$Date: 2013/11/05 00:57:53 $  $Revision: 1.380 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -26,6 +26,7 @@ E void NDECL(stop_occupation);
 E void NDECL(display_gamewindows);
 E void NDECL(newgame);
 E void FDECL(welcome, (BOOLEAN_P));
+E time_t NDECL(get_realtime);
 
 /* ### apply.c ### */
 
@@ -386,7 +387,7 @@ E char *FDECL(Adjmonnam, (struct monst *,const char *));
 E char *FDECL(Amonnam, (struct monst *));
 E char *FDECL(a_monnam, (struct monst *));
 E char *FDECL(distant_monnam, (struct monst *,int,char *));
-E const char *NDECL(rndmonnam);
+E char *FDECL(rndmonnam, (char *));
 E const char *FDECL(hcolor, (const char *));
 E const char *NDECL(rndcolor);
 E const char *NDECL(roguename);
@@ -738,8 +739,14 @@ E void FDECL(free_saved_games, (char**));
 #ifdef SELF_RECOVER
 E boolean NDECL(recover_savefile);
 #endif
+#ifdef SYSCF_FILE
+E void NDECL(assure_syscf_file);
+#endif
 #ifdef HOLD_LOCKFILE_OPEN
 E void NDECL(really_close);
+#endif
+#ifdef DEBUG
+E boolean FDECL(showdebug, (const char *));
 #endif
 
 /* ### fountain.c ### */
@@ -809,6 +816,7 @@ E void FDECL(copynchars, (char *,const char *,int));
 E char FDECL(chrcasecpy, (int,int));
 E char *FDECL(strcasecpy, (char *,const char *));
 E char *FDECL(s_suffix, (const char *));
+E char *FDECL(ing_suffix, (const char *));
 E char *FDECL(xcrypt, (const char *,char *));
 E boolean FDECL(onlyspace, (const char *));
 E char *FDECL(tabexpand, (char *));
@@ -903,7 +911,7 @@ E int NDECL(dopramulet);
 E int NDECL(doprtool);
 E int NDECL(doprinuse);
 E void FDECL(useupf, (struct obj *,long));
-E char *FDECL(let_to_name, (CHAR_P,BOOLEAN_P));
+E char *FDECL(let_to_name, (CHAR_P,BOOLEAN_P,BOOLEAN_P));
 E void NDECL(free_invbuf);
 E void NDECL(reassign);
 E int NDECL(doorganize);
@@ -1170,7 +1178,7 @@ E struct obj *FDECL(mkobj_at, (CHAR_P,int,int,BOOLEAN_P));
 E struct obj *FDECL(mksobj_at, (int,int,int,BOOLEAN_P,BOOLEAN_P));
 E struct obj *FDECL(mkobj, (CHAR_P,BOOLEAN_P));
 E int NDECL(rndmonnum);
-E boolean FDECL(bogon_is_pname, (const char *));
+E boolean FDECL(bogon_is_pname, (CHAR_P));
 E struct obj *FDECL(splitobj, (struct obj *,long));
 E void FDECL(replace_object, (struct obj *,struct obj *));
 E void FDECL(bill_dummy_object, (struct obj *));
@@ -1930,6 +1938,7 @@ E const char *NDECL(Goodbye);
 /* ### rumors.c ### */
 
 E char *FDECL(getrumor, (int,char *, BOOLEAN_P));
+E char *FDECL(get_rnd_text, (const char *, char *));
 E void FDECL(outrumor, (int,int));
 E void FDECL(outoracle, (BOOLEAN_P, BOOLEAN_P));
 E void FDECL(save_oracles, (int,int));
@@ -2065,6 +2074,8 @@ E void FDECL(play_sound_for_message, (const char *));
 
 /* ### sys.c ### */
 
+E void NDECL(sys_early_init);
+E void NDECL(sysopt_release);
 E void FDECL(sysopt_seduce_set,(int));
 
 /* ### sys/msdos/sound.c ### */
@@ -2283,9 +2294,6 @@ E void NDECL(port_help);
 E void FDECL(sethanguphandler, (void (*)(int)));
 E boolean NDECL(authorize_wizard_mode);
 E boolean FDECL(check_user_string, (char *));
-# ifdef SYSCF_FILE
-E void NDECL(assure_syscf_file);
-# endif
 #endif /* UNIX */
 
 /* ### unixtty.c ### */

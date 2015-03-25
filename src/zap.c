@@ -1,4 +1,4 @@
-/* NetHack 3.5	zap.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	zap.c	$NHDT-Date: 1427249230 2015/03/25 02:07:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.197 $ */
 /* NetHack 3.5	zap.c	$Date: 2013/11/05 00:57:56 $  $Revision: 1.183 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1708,10 +1708,11 @@ struct obj *obj, *otmp;
 		 * as a safeguard against any stray occurrence left in an obj
 		 * struct someplace, although that should never happen.
 		 */
-		if (context.bypasses)
+		if (context.bypasses) {
 			return 0;
-		else {
-			debugpline("%s for a moment.", Tobjnam(obj, "pulsate"));
+		} else {
+			debugpline1("%s for a moment.",
+				    Tobjnam(obj, "pulsate"));
 			obj->bypass = 0;
 		}
 	}
@@ -1749,8 +1750,14 @@ struct obj *obj, *otmp;
 		if (Is_box(obj)) (void) boxlock(obj, otmp);
 
 		if (obj_shudders(obj)) {
+		    boolean cover = ((obj->ox == u.ux && obj->oy == u.uy) &&
+				   	u.uundetected &&
+					hides_under(youmonst.data));
+
 		    if (cansee(obj->ox, obj->oy)) learn_it = TRUE;
 		    do_osshock(obj);
+		    /* eek - your cover might have been blown */
+		    if (cover) (void) hideunder(&youmonst);
 		    break;
 		}
 		obj = poly_obj(obj, STRANGE_OBJECT);
@@ -1798,7 +1805,7 @@ struct obj *obj, *otmp;
 		    if (break_statue(obj)) {
 			if (cansee(obj->ox, obj->oy)) {
 			    if (Hallucination)
-				pline_The("%s shatters.", rndmonnam());
+				pline_The("%s shatters.", rndmonnam(NULL));
 			    else 
 				pline_The("statue shatters.");
 			} else
@@ -3405,7 +3412,8 @@ struct obj **ootmp;	/* to return worn armor for caller to disintegrate */
 		resist(mon, type < ZT_SPELL(0) ? WAND_CLASS : '\0', 0, NOTELL))
 	    tmp /= 2;
 	if (tmp < 0) tmp = 0;		/* don't allow negative damage */
-	debugpline("zapped monster hp = %d (= %d - %d)", mon->mhp-tmp,mon->mhp,tmp);
+	debugpline3("zapped monster hp = %d (= %d - %d)",
+		    mon->mhp-tmp, mon->mhp, tmp);
 	mon->mhp -= tmp;
 	return(tmp);
 }

@@ -30,6 +30,9 @@
 #define OPTIONFILE    "opthelp" /* file explaining runtime options */
 #define OPTIONS_USED  "options" /* compile-time options, for #version */
 #define SYMBOLS       "symbols" /* replacement symbol sets */
+#define EPITAPHFILE   "epitaph"	/* random epitaphs on graves */
+#define ENGRAVEFILE   "engrave" /* random engravings on the floor */
+#define BOGUSMONFILE  "bogusmon" /* hallucinatory monsters */
 #define LEV_EXT ".lev"		/* extension for special level files */
 
 

@@ -1,4 +1,4 @@
-/* NetHack 3.5	options.c	$NHDT-Date: 1425083082 2015/02/28 00:24:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.158 $ */
+/* NetHack 3.5	options.c	$NHDT-Date: 1427073746 2015/03/23 01:22:26 $  $NHDT-Branch: master $:$NHDT-Revision: 1.164 $ */
 /* NetHack 3.5	options.c	$Date: 2012/04/09 02:56:30 $  $Revision: 1.153 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -139,8 +139,10 @@ static struct Bool_Opt
 #else
 	{"mail", (boolean *)0, TRUE, SET_IN_FILE},
 #endif
+	{"mention_walls", &iflags.mention_walls, FALSE, SET_IN_GAME},
 	/* for menu debugging only*/
 	{"menu_tab_sep", &iflags.menu_tab_sep, FALSE, SET_IN_GAME},
+	{"menu_objsyms", &iflags.menu_head_objsym, FALSE, SET_IN_GAME},
 	{"mouse_support", &iflags.wc_mouse_support, TRUE, DISP_IN_GAME},	/*WC*/
 #ifdef NEWS
 	{"news", &iflags.news, TRUE, DISP_IN_GAME},
@@ -798,10 +800,10 @@ rejectoption(optname)
 const char *optname;
 {
 #ifdef MICRO
-	pline("\"%s\" settable only from %s.", optname, configfile);
+	pline("\"%s\" settable only from %s.", optname, lastconfigfile);
 #else
 	pline("%s can be set only from NETHACKOPTIONS or %s.", optname,
-			configfile);
+			lastconfigfile);
 #endif
 }
 
@@ -821,7 +823,7 @@ const char *opts;
 #endif
 
 	if(from_file)
-	    raw_printf("Bad syntax in OPTIONS in %s: %s.", configfile, opts);
+	    raw_printf("Bad syntax in OPTIONS in %s: %s.", lastconfigfile, opts);
 	else
 	    raw_printf("Bad syntax in NETHACKOPTIONS: %s.", opts);
 
@@ -2484,7 +2486,7 @@ goodfruit:
 
 #if defined(BACKWARD_COMPAT)
 	fullname = "DECgraphics";
-	if (match_optname(opts, fullname, 10, TRUE)) {
+	if (match_optname(opts, fullname, 3, TRUE)) {
 		boolean badflag = FALSE;
 		if (duplicate) complain_about_duplicate(opts,1);
 		if (!negated) {
@@ -2508,7 +2510,7 @@ goodfruit:
 		return;
 	}
 	fullname = "IBMgraphics";
-	if (match_optname(opts, fullname, 10, TRUE)) {
+	if (match_optname(opts, fullname, 3, TRUE)) {
 		const char *sym_name = fullname;
 		boolean badflag = FALSE;
 		if (duplicate) complain_about_duplicate(opts,1);
@@ -2542,7 +2544,7 @@ goodfruit:
 #endif
 #ifdef MAC_GRAPHICS_ENV
 	fullname = "MACgraphics";
-	if (match_optname(opts, fullname, 11, TRUE)) {
+	if (match_optname(opts, fullname, 3, TRUE)) {
 		boolean badflag = FALSE;
 		if (duplicate) complain_about_duplicate(opts,1);
 		if (!negated) {
@@ -4070,7 +4072,7 @@ option_help()
     winid datawin;
 
     datawin = create_nhwindow(NHW_TEXT);
-    Sprintf(buf, "Set options as OPTIONS=<options> in %s", configfile);
+    Sprintf(buf, "Set options as OPTIONS=<options> in %s", lastconfigfile);
     opt_intro[CONFIG_SLOT] = (const char *) buf;
     for (i = 0; opt_intro[i]; i++)
 	putstr(datawin, 0, opt_intro[i]);

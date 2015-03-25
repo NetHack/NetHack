@@ -1,4 +1,4 @@
-/* NetHack 3.5	pickup.c	$NHDT-Date: 1425081977 2015/02/28 00:06:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.126 $ */
+/* NetHack 3.5	pickup.c	$NHDT-Date: 1426558927 2015/03/17 02:22:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.131 $ */
 /* NetHack 3.5	pickup.c	$Date: 2012/02/16 03:01:38 $  $Revision: 1.123 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -769,7 +769,9 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 		    if (sorted && !printed_type_name) {
 			any = zeroany;
 			add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
-					let_to_name(*pack, FALSE), MENU_UNSELECTED);
+				 let_to_name(*pack, FALSE,
+					     (how != PICK_NONE) && iflags.menu_head_objsym),
+				 MENU_UNSELECTED);
 			printed_type_name = TRUE;
 		    }
 
@@ -897,7 +899,7 @@ int how;			/* type of query */
 		(*pick_list)->item.a_int = curr->oclass;
 		return 1;
 	    } else {
-		debugpline("query_category: no single object match");
+		debugpline0("query_category: no single object match");
 	    }
 	    return 0;
 	}
@@ -928,8 +930,10 @@ int how;			/* type of query */
 			any.a_int = curr->oclass;
 			add_menu(win, NO_GLYPH, &any, invlet++,
 				def_oc_syms[(int)objects[curr->otyp].oc_class].sym,
-				ATR_NONE, let_to_name(*pack, FALSE),
-				MENU_UNSELECTED);
+				 ATR_NONE,
+				 let_to_name(*pack, FALSE,
+					     (how != PICK_NONE) && iflags.menu_head_objsym),
+				 MENU_UNSELECTED);
 			collected_type_name = TRUE;
 		   }
 		}
@@ -1515,7 +1519,7 @@ doloot()	/* loot a container on the floor or loot saddle from mon. */
 lootcont:
 
     if (container_at(cc.x, cc.y, FALSE)) {
-	boolean any = FALSE;
+	boolean anyfound = FALSE;
 	int num_conts = 0;
 
 	if (!able_to_loot(cc.x, cc.y, TRUE)) return 0;
@@ -1563,14 +1567,14 @@ lootcont:
 				      cobj, doname, ansimpleoname, "a container"));
 		    if (c == 'q') return (timepassed);
 		    if (c == 'n') continue;
-		    any = TRUE;
+		    anyfound = TRUE;
 
 		    timepassed |= do_loot_cont(&cobj);
 		    /* might have triggered chest trap or magic bag explosion */
 		    if (multi < 0 || !cobj) return 1;
 		}
 	    }
-	    if (any) c = 'y';
+	    if (anyfound) c = 'y';
 	}
     } else if (IS_GRAVE(levl[cc.x][cc.y].typ)) {
 	You("need to dig up the grave to effectively loot it...");
@@ -2040,7 +2044,7 @@ struct obj *box;
 	    (void) add_to_container(box, deadcat);
 	}
 	pline_The("%s inside the box is dead!",
-	    Hallucination ? rndmonnam() : "housecat");
+	    Hallucination ? rndmonnam(NULL) : "housecat");
     }
     box->owt = weight(box);
     return;

@@ -1279,7 +1279,7 @@ register struct monst *mtmp, *mtmp2;
     /* transfer the monster's inventory */
     for (otmp = mtmp2->minvent; otmp; otmp = otmp->nobj) {
     if (otmp->where != OBJ_MINVENT || otmp->ocarry != mtmp)
-        debugpline("replmon: minvent inconsistency");
+	    debugpline0("replmon: minvent inconsistency");
     otmp->ocarry = mtmp2;
     }
     mtmp->minvent = 0;
@@ -1623,6 +1623,8 @@ register struct monst *mtmp;
     }
     if(mtmp->iswiz) wizdead();
     if(mtmp->data->msound == MS_NEMESIS) nemdead();
+        if(mtmp->data == &mons[PM_MEDUSA])
+            u.uachieve.killed_medusa = 1;
     if(glyph_is_invisible(levl[mtmp->mx][mtmp->my].glyph))
         unmap_object(mtmp->mx, mtmp->my);
     m_detach(mtmp, mptr);

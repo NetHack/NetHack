@@ -1,4 +1,4 @@
-/* NetHack 3.5	restore.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	restore.c	$NHDT-Date: 1426465439 2015/03/16 00:23:59 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.77 $ */
 /* NetHack 3.5	restore.c	$Date: 2012/02/16 02:40:24 $  $Revision: 1.71 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -551,9 +551,20 @@ unsigned int *stuckid, *steedid;
 	amii_setpens(amii_numcolors);	/* use colors from save file */
 #endif
 	mread(fd, (genericptr_t) &u, sizeof(struct you));
-	mread(fd, (genericptr_t) timebuf, 14);
-	timebuf[14] = '\0';
-	ubirthday = time_from_yyyymmddhhmmss(timebuf);
+
+#define ReadTimebuf(foo)	mread(fd, (genericptr_t) timebuf, 14);	\
+    timebuf[14] = '\0';							\
+    foo = time_from_yyyymmddhhmmss(timebuf);
+
+	ReadTimebuf(ubirthday);
+	ReadTimebuf(urealtime.realtime);
+	ReadTimebuf(urealtime.restored);
+#if defined(BSD) && !defined(POSIX_TYPES)
+	(void) time((long *)&urealtime.restored);
+#else
+	(void) time(&urealtime.restored);
+#endif
+
 
 	set_uasmon();
 #ifdef CLIPPING
@@ -1153,7 +1164,7 @@ register int fd;
 		++msgcount;
 	}
 	if (msgcount) putmsghistory((char *)0, TRUE);
-	debugpline("Read %d messages from savefile.", msgcount);
+	debugpline1("Read %d messages from savefile.", msgcount);
 }
 
 /* Clear all structures for object and monster ID mapping. */

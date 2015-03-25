@@ -630,8 +630,11 @@ int mode;
     if (Passes_walls && may_passwall(x,y)) {
         ;	/* do nothing */
     } else if (tmpr->typ == IRONBARS) {
-        if (!(Passes_walls || passes_bars(youmonst.data)))
+	    if (!(Passes_walls || passes_bars(youmonst.data))) {
+		if (iflags.mention_walls)
+		    You("cannot pass through the bars.");
         return FALSE;
+	    }
     } else if (tunnels(youmonst.data) && !needspick(youmonst.data)) {
         /* Eat the rock. */
         if (mode == DO_MOVE && still_chewing(x,y)) return FALSE;
@@ -646,8 +649,10 @@ int mode;
         if (Is_stronghold(&u.uz) && is_db_wall(x,y))
             pline_The("drawbridge is up!");
         /* sokoban restriction stays even after puzzle is solved */
-        if (Passes_walls && !may_passwall(x,y) && In_sokoban(&u.uz))
+		else if (Passes_walls && !may_passwall(x,y) && In_sokoban(&u.uz))
             pline_The("Sokoban walls resist your ability.");
+		else if (iflags.mention_walls)
+		    pline("It's a wall.");
         }
         return FALSE;
     }

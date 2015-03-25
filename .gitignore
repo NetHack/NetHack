@@ -32,6 +32,8 @@ core
 Makefile
 
 # Win32-specific ignores
+Debug/
+Release/
 binary/
 build/
 Nethack.sln

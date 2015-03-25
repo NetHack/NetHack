@@ -1,4 +1,4 @@
-/* NetHack 3.5	topten.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	topten.c	$NHDT-Date: 1426731079 2015/03/19 02:11:19 $  $NHDT-Branch: harder_d8 $:$NHDT-Revision: 1.25 $ */
 /* NetHack 3.5	topten.c	$Date: 2012/01/24 04:26:15 $  $Revision: 1.23 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -65,6 +65,9 @@ STATIC_DCL void FDECL(outentry, (int,struct toptenentry *,BOOLEAN_P));
 STATIC_DCL void FDECL(discardexcess, (FILE *));
 STATIC_DCL void FDECL(readentry, (FILE *,struct toptenentry *));
 STATIC_DCL void FDECL(writeentry, (FILE *,struct toptenentry *));
+STATIC_DCL void FDECL(writexlentry, (FILE*, struct toptenentry *));
+STATIC_DCL long NDECL(encodeconduct);
+STATIC_DCL long NDECL(encodeachieve);
 STATIC_DCL void FDECL(free_ttlist, (struct toptenentry *));
 STATIC_DCL int FDECL(classmon, (char *,BOOLEAN_P));
 STATIC_DCL int FDECL(score_wanted,
@@ -292,6 +295,100 @@ struct toptenentry *tt;
 #endif
 }
 
+/* as tab is never used in eg. plname or death, no need to mangle those. */
+STATIC_OVL void
+writexlentry(rfile,tt)
+FILE *rfile;
+struct toptenentry *tt;
+{
+#define Fprintf (void)fprintf
+#define XLOG_SEP '\t'	/* xlogfile field separator. */
+    char buf[BUFSZ];
+
+    Sprintf(buf, "version=%d.%d.%d",
+	    tt->ver_major, tt->ver_minor, tt->patchlevel);
+    Sprintf(eos(buf), "%cpoints=%ld%cdeathdnum=%d%cdeathlev=%d",
+	    XLOG_SEP, tt->points,
+	    XLOG_SEP, tt->deathdnum,
+	    XLOG_SEP, tt->deathlev);
+    Sprintf(eos(buf), "%cmaxlvl=%d%chp=%d%cmaxhp=%d",
+	    XLOG_SEP, tt->maxlvl,
+	    XLOG_SEP, tt->hp,
+	    XLOG_SEP, tt->maxhp);
+    Sprintf(eos(buf), "%cdeaths=%d%cdeathdate=%ld%cbirthdate=%ld%cuid=%d",
+	    XLOG_SEP, tt->deaths,
+	    XLOG_SEP, tt->deathdate,
+	    XLOG_SEP, tt->birthdate,
+	    XLOG_SEP, tt->uid);
+    Fprintf(rfile, "%s", buf);
+    Sprintf(buf, "%crole=%s%crace=%s%cgender=%s%calign=%s",
+	    XLOG_SEP, tt->plrole,
+	    XLOG_SEP, tt->plrace,
+	    XLOG_SEP, tt->plgend,
+	    XLOG_SEP, tt->plalign);
+    Fprintf(rfile, "%s%cname=%s%cdeath=%s",
+	    buf,	/* (already includes separator) */
+	    XLOG_SEP, plname,
+	    XLOG_SEP, tt->death);
+    Fprintf(rfile, "%cconduct=0x%lx%cturns=%ld%cachieve=0x%lx",
+	    XLOG_SEP, encodeconduct(),
+	    XLOG_SEP, moves,
+	    XLOG_SEP, encodeachieve());
+    Fprintf(rfile, "%crealtime=%ld%cstarttime=%ld%cendtime=%ld",
+	    XLOG_SEP, (long)urealtime.realtime,
+	    XLOG_SEP, (long)ubirthday,
+	    XLOG_SEP, (long)urealtime.endtime);
+    Fprintf(rfile, "%cgender0=%s%calign0=%s",
+	    XLOG_SEP, genders[flags.initgend].filecode,
+	    XLOG_SEP, aligns[1 - u.ualignbase[A_ORIGINAL]].filecode);
+    Fprintf(rfile, "\n");
+#undef XLOG_SEP
+}
+
+STATIC_OVL long
+encodeconduct()
+{
+    long e = 0L;
+
+    if(!u.uconduct.food)         e |= 1L << 0;
+    if(!u.uconduct.unvegan)      e |= 1L << 1;
+    if(!u.uconduct.unvegetarian) e |= 1L << 2;
+    if(!u.uconduct.gnostic)      e |= 1L << 3;
+    if(!u.uconduct.weaphit)      e |= 1L << 4;
+    if(!u.uconduct.killer)       e |= 1L << 5;
+    if(!u.uconduct.literate)     e |= 1L << 6;
+    if(!u.uconduct.polypiles)    e |= 1L << 7;
+    if(!u.uconduct.polyselfs)    e |= 1L << 8;
+    if(!u.uconduct.wishes)       e |= 1L << 9;
+    if(!u.uconduct.wisharti)     e |= 1L << 10;
+    if(!num_genocides())         e |= 1L << 11;
+
+    return e;
+}
+
+STATIC_OVL long
+encodeachieve()
+{
+    long r = 0L;
+
+    if(u.uachieve.bell)            r |= 1L << 0;
+    if(u.uachieve.enter_gehennom)  r |= 1L << 1;
+    if(u.uachieve.menorah)         r |= 1L << 2;
+    if(u.uachieve.book)            r |= 1L << 3;
+    if(u.uevent.invoked)           r |= 1L << 4;
+    if(u.uachieve.amulet)          r |= 1L << 5;
+    if(In_endgame(&u.uz))          r |= 1L << 6;
+    if(Is_astralevel(&u.uz))       r |= 1L << 7;
+    if(u.uachieve.ascended)        r |= 1L << 8;
+    if(u.uachieve.mines_luckstone) r |= 1L << 9;
+    if(u.uachieve.finish_sokoban)  r |= 1L << 10;
+    if(u.uachieve.killed_medusa)   r |= 1L << 11;
+
+    return r;
+}
+
+
+
 STATIC_OVL void
 free_ttlist(tt)
 struct toptenentry *tt;
@@ -322,6 +419,9 @@ time_t when;
 #ifdef LOGFILE
 	FILE *lfile;
 #endif /* LOGFILE */
+#ifdef XLOGFILE
+	FILE *xlfile;
+#endif /* XLOGFILE */
 
 /* Under DICE 3.0, this crashes the system consistently, apparently due to
  * corruption of *rfile somewhere.  Until I figure this out, just cut out
@@ -380,6 +480,7 @@ time_t when;
 	t0->birthdate = yyyymmdd(ubirthday);
 	t0->deathdate = yyyymmdd(when);
 	t0->tt_next = 0;
+	urealtime.endtime = when;
 #ifdef UPDATE_RECORD_IN_PLACE
 	t0->fpos = -1L;
 #endif
@@ -395,6 +496,17 @@ time_t when;
 	    unlock_file(LOGFILE);
 	}
 #endif /* LOGFILE */
+#ifdef XLOGFILE
+	if (lock_file(XLOGFILE, SCOREPREFIX, 10)) {
+	    if(!(xlfile = fopen_datafile(XLOGFILE, "a", SCOREPREFIX))) {
+		HUP raw_print("Cannot open extended log file!");
+	    } else {
+		writexlentry(xlfile, t0);
+		(void) fclose(xlfile);
+	    }
+	    unlock_file(XLOGFILE);
+	}
+#endif /* XLOGFILE */
 
 	if (wizard || discover) {
 	    if (how != PANICKED) HUP {
