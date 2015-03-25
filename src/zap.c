@@ -1,4 +1,4 @@
-/* NetHack 3.5	zap.c	$NHDT-Date: 1426465444 2015/03/16 00:24:04 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.195 $ */
+/* NetHack 3.5	zap.c	$NHDT-Date: 1427249230 2015/03/25 02:07:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.197 $ */
 /* NetHack 3.5	zap.c	$Date: 2013/11/05 00:57:56 $  $Revision: 1.183 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1750,8 +1750,14 @@ struct obj *obj, *otmp;
 		if (Is_box(obj)) (void) boxlock(obj, otmp);
 
 		if (obj_shudders(obj)) {
+		    boolean cover = ((obj->ox == u.ux && obj->oy == u.uy) &&
+				   	u.uundetected &&
+					hides_under(youmonst.data));
+
 		    if (cansee(obj->ox, obj->oy)) learn_it = TRUE;
 		    do_osshock(obj);
+		    /* eek - your cover might have been blown */
+		    if (cover) (void) hideunder(&youmonst);
 		    break;
 		}
 		obj = poly_obj(obj, STRANGE_OBJECT);

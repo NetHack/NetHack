@@ -881,6 +881,8 @@ message inconsistency: death message "swallowed <mon> whole" was preceded
 improve the messaging when a monster you can't see is causing an obstruction
 add option mention_walls, which gives feedback when bumping against a wall
 fix invalid pointer dereference in morguemon if ndemon returns NON_PM
+after object loss through polyshudder don't get left hiding under nothing 
+	if you're polymorphed into a hider
 
 
 Platform- and/or Interface-Specific Fixes
