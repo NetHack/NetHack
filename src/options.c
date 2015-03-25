@@ -142,6 +142,7 @@ static struct Bool_Opt
 	{"mention_walls", &iflags.mention_walls, FALSE, SET_IN_GAME},
 	/* for menu debugging only*/
 	{"menu_tab_sep", &iflags.menu_tab_sep, FALSE, SET_IN_GAME},
+	{"menu_objsyms", &iflags.menu_head_objsym, FALSE, SET_IN_GAME},
 	{"mouse_support", &iflags.wc_mouse_support, TRUE, DISP_IN_GAME},	/*WC*/
 #ifdef NEWS
 	{"news", &iflags.news, TRUE, DISP_IN_GAME},

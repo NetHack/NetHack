@@ -2100,6 +2100,9 @@ Default '|'.
 Menu character accelerator to goto the next menu page.
 Implemented by the Amiga, Gem and tty ports.
 Default '>'.
+.lp menu_objsyms
+Show object symbols in menu headings in menus where
+the object symbols act as menu accelerators (default off).
 .lp menu_previous_page 
 Menu character accelerator to goto the previous menu page.
 Implemented by the Amiga, Gem and tty ports.

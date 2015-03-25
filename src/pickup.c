@@ -769,7 +769,9 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 		    if (sorted && !printed_type_name) {
 			any = zeroany;
 			add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
-					let_to_name(*pack, FALSE), MENU_UNSELECTED);
+				 let_to_name(*pack, FALSE,
+					     (how != PICK_NONE) && iflags.menu_head_objsym),
+				 MENU_UNSELECTED);
 			printed_type_name = TRUE;
 		    }
 
@@ -928,8 +930,10 @@ int how;			/* type of query */
 			any.a_int = curr->oclass;
 			add_menu(win, NO_GLYPH, &any, invlet++,
 				def_oc_syms[(int)objects[curr->otyp].oc_class].sym,
-				ATR_NONE, let_to_name(*pack, FALSE),
-				MENU_UNSELECTED);
+				 ATR_NONE,
+				 let_to_name(*pack, FALSE,
+					     (how != PICK_NONE) && iflags.menu_head_objsym),
+				 MENU_UNSELECTED);
 			collected_type_name = TRUE;
 		   }
 		}

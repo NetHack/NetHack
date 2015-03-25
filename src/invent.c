@@ -1789,7 +1789,7 @@ nextclass:
 			if (!flags.sortpack || otmp->oclass == *invlet) {
 			    if (flags.sortpack && !classcount) {
 				add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
-				    let_to_name(*invlet, FALSE), MENU_UNSELECTED);
+					 let_to_name(*invlet, FALSE, (want_reply && iflags.menu_head_objsym)), MENU_UNSELECTED);
 				classcount++;
 			    }
 			    any.a_char = ilet;
@@ -1863,7 +1863,7 @@ char avoidlet;
 			if (flags.sortpack && !classcount) {
 				any = zeroany;		/* zero */
 				add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
-				    let_to_name(*invlet, FALSE), MENU_UNSELECTED);
+					 let_to_name(*invlet, FALSE, FALSE), MENU_UNSELECTED);
 				classcount++;
 			}
 			any.a_char = ilet;
@@ -1991,7 +1991,7 @@ dounpaid()
 	    if (otmp->unpaid) {
 		if (!flags.sortpack || otmp->oclass == *invlet) {
 		    if (flags.sortpack && !classcount) {
-			putstr(win, 0, let_to_name(*invlet, TRUE));
+			putstr(win, 0, let_to_name(*invlet, TRUE, FALSE));
 			classcount++;
 		    }
 
@@ -2009,7 +2009,7 @@ dounpaid()
     if (count > num_so_far) {
 	/* something unpaid is contained */
 	if (flags.sortpack)
-	    putstr(win, 0, let_to_name(CONTAINED_SYM, TRUE));
+	    putstr(win, 0, let_to_name(CONTAINED_SYM, TRUE, FALSE));
 	/*
 	 * Search through the container objects in the inventory for
 	 * unpaid items.  The top level inventory items have already
@@ -2701,10 +2701,12 @@ static NEARDATA char *invbuf = (char *)0;
 static NEARDATA unsigned invbufsiz = 0;
 
 char *
-let_to_name(let,unpaid)
+let_to_name(let,unpaid,showsym)
 char let;
-boolean unpaid;
+boolean unpaid,showsym;
 {
+	const char *ocsymfmt = "  ('%c')";
+	const int invbuf_sympadding = 8; /* arbitrary */
 	const char *class_name;
 	const char *pos;
 	int oclass = (let >= 1 && let < MAXOCLASSES) ? let : 0;
@@ -2717,7 +2719,8 @@ boolean unpaid;
 	else
 	    class_name = names[0];
 
-	len = strlen(class_name) + (unpaid ? sizeof "unpaid_" : sizeof "");
+	len = strlen(class_name) + (unpaid ? sizeof "unpaid_" : sizeof "") +
+	    (oclass ? (strlen(ocsymfmt)+invbuf_sympadding) : 0);
 	if (len > invbufsiz) {
 	    if (invbuf) free((genericptr_t)invbuf);
 	    invbufsiz = len + 10; /* add slop to reduce incremental realloc */
@@ -2727,6 +2730,15 @@ boolean unpaid;
 	    Strcat(strcpy(invbuf, "Unpaid "), class_name);
 	else
 	    Strcpy(invbuf, class_name);
+	if ((oclass != 0) && showsym) {
+	    char *bp = eos(invbuf);
+	    int mlen = invbuf_sympadding - strlen(class_name);
+	    while (--mlen > 0) {
+		*bp = ' '; bp++;
+	    }
+	    *bp = '\0';
+	    Sprintf(eos(invbuf), ocsymfmt, def_oc_syms[oclass].sym);
+	}
 	return invbuf;
 }
 

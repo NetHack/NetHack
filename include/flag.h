@@ -191,6 +191,7 @@ struct instance_flags {
 	boolean  news;		/* print news */
 	boolean  mention_walls;	/* give feedback when bumping walls */
 	boolean  menu_tab_sep;	/* Use tabs to separate option menu fields */
+	boolean  menu_head_objsym; /* Show obj symbol in menu headings */
 	boolean  menu_requested; /* Flag for overloaded use of 'm' prefix
 				  * on some non-move commands */
 	boolean  renameallowed; /* can change hero name during role selection */

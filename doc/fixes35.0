@@ -883,6 +883,8 @@ add option mention_walls, which gives feedback when bumping against a wall
 fix invalid pointer dereference in morguemon if ndemon returns NON_PM
 after object loss through polyshudder don't get left hiding under nothing 
 	if you're polymorphed into a hider
+show object symbols in menu headings in menus where those object symbols
+	act as menu accelerators, toggleable via "menu_objsyms" option
 
 
 Platform- and/or Interface-Specific Fixes
