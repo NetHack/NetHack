@@ -1316,6 +1316,7 @@ freedynamicdata()
 	/* level-specific data */
 	free_timers(RANGE_LEVEL);
 	free_light_sources(RANGE_LEVEL);
+    clear_regions();
 	freemonchn(fmon);
 	free_worm();		/* release worm segment information */
 	freetrapchn(ftrap);
