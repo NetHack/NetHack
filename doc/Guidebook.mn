@@ -710,12 +710,6 @@ the exchange still takes place.
 .lp X
 Toggle two-weapon combat, if your character can do it.  Also available
 via the ``#twoweapon'' extended command
-.lp ""
-Since using this command by accident would be troublesome, you are asked
-to confirm your intent before switching to explore mode.  By default
-the response 'y' acknowledges that intent.  You can set the
-.op paranoid_confirmation
-option to require a response of "yes" instead.
 .lp ^X
 Display basic information about your character.
 .lp ""
@@ -2994,7 +2988,7 @@ command-line switch or with the
 .op playmode:explore
 option.  The other is to issue the ``#exploremode'' extended command while
 already playing the game.  Starting a new game in explore mode provides your
-character with a wand of wishing in initial inventory; switching via `X'
+character with a wand of wishing in initial inventory; switching
 during play does not.  The other benefits of explore mode are left for
 the trepid reader to discover.
 .pg

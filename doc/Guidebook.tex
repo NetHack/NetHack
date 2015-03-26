@@ -862,13 +862,8 @@ two-weapon combat.  Note that if one of these slots is empty,
 the exchange still takes place.
 %.lp
 \item[\tb{X}]
-Enter explore (discovery) mode, explained in its own section later.\\
-%.lp ""
-Since using this command by accident would be troublesome, you are asked
-to confirm your intent before switching to explore mode.  By default
-the response `{\tt y}' acknowledges that intent.  You can set the
-{\it paranoid\_confirmation\/}
-option to require a response of ``yes'' instead.
+Toggle two-weapon combat, if your character can do it.  Also available
+via the ``#twoweapon'' extended command
 %.lp
 \item[\tb{\^{}X}]
 Display basic information about your character.\\
@@ -2275,8 +2270,7 @@ each entry. Such a sequence can be continued to multiple lines by putting a
 `{\tt \verb+\+}' at the end of each line to be continued.
 
 %.pg
-If your copy of the game included the compile time AUTOPICKUP\_EXCEPTIONS 
-option, then any line starting with ``{\tt AUTOPICKUP\_EXCEPTION=}'' 
+Any line starting with ``{\tt AUTOPICKUP\_EXCEPTION=}'' 
 is taken as defining an exception to the ``{\tt pickup\_types}'' option.
 There is a section of this Guidebook that discusses that.
 
@@ -2326,6 +2320,9 @@ quality of the weapon; you are free to manually fill your quiver or quiver sack
 or make ready
 with the `Q' command instead.  If no weapon is found or the option is
 false, the `t' (throw) command is executed instead.  (default false)
+%.lp
+\item[\ib{bones}]
+Allow saving and loading bones files.  (default true)
 %.lp
 \item[\ib{boulder}]
 Set the character used to display boulders (default is rock class symbol).
@@ -2475,6 +2472,9 @@ Enable mail delivery during the game (default on).
 An obsolete synonym for ``{\tt gender:male}''.  Cannot be set with the
 `{\tt O}' command.
 %.lp
+\item[\ib{mention\_walls}]
+Give feedback when walking against a wall (default off).
+%.lp
 \item[\ib{menustyle}]
 Controls the interface used when you need to choose various objects (in
 response to the Drop command, for instance).  The value specified should
@@ -2520,13 +2520,16 @@ Default `\verb+|+'.
 Menu character accelerator to goto the next menu page.
 Implemented by the Amiga, Gem and tty ports.
 Default `\verb+>+'.
+\item[\ib{menu\_objsyms}]
+Show object symbols in menu headings in menus where
+the object symbols act as menu accelerators (default off).
 \item[\ib{menu\_previous\_page}]
 Menu character accelerator to goto the previous menu page.
 Implemented by the Amiga, Gem and tty ports.
 Default `\verb+<+'.
 \item[\ib{menu\_search}]
 Menu character accelerator to search for a menu item.
-Implemented by the Amiga, Gem and X11 ports.
+Implemented by the Amiga, Gem, X11 and tty ports.
 Default `:'.
 \item[\ib{menu\_select\_all}]
 Menu character accelerator to select all items in a menu.
@@ -2678,10 +2681,8 @@ match an autopickup exception.  Default is on.
 %.lp
 \item[\ib{pickup\_types}]
 Specify the object types to be picked up when ``{\it autopickup\/}'' 
-is on.  Default is all types.  If your copy of the game has the 
-compile time option AUTOPICKUP\_EXCEPTIONS included,
-you may be able to use ``{\it autopickup\_exception\/}'' configuration
-file lines to further refine ``{\it autopickup\/}'' behavior.
+is on.  Default is all types.  You can use ``{\it autopickup\_exception\/}''
+configuration file lines to further refine ``{\it autopickup\/}'' behavior.
 %.lp
 \item[\ib{pile\_limit}]
 When walking across a pile of objects on the floor, threshold at which
@@ -3074,10 +3075,8 @@ Cannot be set with the `{\tt O}' command.
 \subsection*{Configuring autopickup exceptions}
 
 %.pg
-There is a compile time option called AUTOPICKUP_EXCEPTIONS.  
-If your copy of the game was built with that option defined, you can 
-further refine the behavior of the ``{\tt autopickup}'' option beyond 
-what is available through the ``{\tt pickup\_types}'' option.
+You can further refine the behavior of the ``{\tt autopickup}'' option
+beyond what is available through the ``{\tt pickup\_types}'' option.
 
 %.pg
 By placing ``{\tt autopickup\_exception}'' lines in your configuration
@@ -3505,9 +3504,9 @@ There are two ways of enabling explore mode.  One is to start the game
 with the {\tt -X}
 command-line switch or with the
 {\it playmode:explore\/}
-option.  The other is to issue the `{\tt X}' command while already
-playing the game.  Starting a new game in explore mode provides your
-character with a wand of wishing in initial inventory; switching via `X'
+option.  The other is to issue the `{\tt #exploremode}' extended command while
+already playing the game.  Starting a new game in explore mode provides your
+character with a wand of wishing in initial inventory; switching
 during play does not.  The other benefits of explore mode are left for
 the trepid reader to discover.
 
