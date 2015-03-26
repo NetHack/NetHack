@@ -710,12 +710,6 @@ the exchange still takes place.
 .lp X
 Toggle two-weapon combat, if your character can do it.  Also available
 via the ``#twoweapon'' extended command
-.lp ""
-Since using this command by accident would be troublesome, you are asked
-to confirm your intent before switching to explore mode.  By default
-the response 'y' acknowledges that intent.  You can set the
-.op paraniod_confirmation
-option to require a response of "yes" instead.
 .lp ^X
 Display basic information about your character.
 .lp ""
@@ -848,7 +842,7 @@ You probably shouldn't start off a new game by praying right away.)
 Since using this command by accident can cause trouble, there is an
 option to make you confirm your intent before praying.  It is enabled
 by default, and you can reset the
-.op paraniod_confirmation
+.op paranoid_confirmation
 option to disable it.
 .lp #quit
 Quit the program without saving your game.
@@ -856,7 +850,7 @@ Quit the program without saving your game.
 Since using this command by accident would throw away the current game,
 you are asked to confirm your intent before quitting.  By default a
 response of 'y' acknowledges that intent.  You can set the
-.op paraniod_confirmation
+.op paranoid_confirmation
 option to require a response of "yes" instead.
 .lp #ride
 Ride (or stop riding) a monster.
@@ -1138,7 +1132,7 @@ In most circumstances, if you attempt to attack a peaceful monster by
 moving into its location, you'll be asked to confirm your intent.  By 
 default an answer of 'y' acknowledges that intent,
 which can be error prone if you're using 'y' to move.  You can set the
-.op paraniod_confirmation
+.op paranoid_confirmation
 option to require a response of "yes" instead.
 .pg
 If you can't see a monster (if it is invisible, or if you are blinded),
@@ -2175,7 +2169,7 @@ is the same as specifying 0.
 (Settings 2 and 4 are for compatibility with MSDOS or old PC Hack;
 in addition to the different behavior for `5', `Alt-5' acts as `G'
 and `Alt-0' acts as `I'.
-Setting -1 is to accomodate some German keyboards which have the
+Setting -1 is to accommodate some German keyboards which have the
 location of the `y' and `z' keys swapped.)
 When moving by numbers, to enter a count prefix for those commands
 which accept one (such as ``12s'' to search twelve times), precede it
@@ -2994,7 +2988,7 @@ command-line switch or with the
 .op playmode:explore
 option.  The other is to issue the ``#exploremode'' extended command while
 already playing the game.  Starting a new game in explore mode provides your
-character with a wand of wishing in initial inventory; switching via `X'
+character with a wand of wishing in initial inventory; switching
 during play does not.  The other benefits of explore mode are left for
 the trepid reader to discover.
 .pg
