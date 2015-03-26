@@ -1,4 +1,4 @@
-/* NetHack 3.5	trap.c	$NHDT-Date: 1426805491 2015/03/19 22:51:31 $  $NHDT-Branch: water_damage $:$NHDT-Revision: 1.198 $ */
+/* NetHack 3.5	trap.c	$NHDT-Date: 1427331767 2015/03/26 01:02:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.199 $ */
 /* NetHack 3.5	trap.c	$Date: 2013/03/14 01:58:21 $  $Revision: 1.179 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3118,13 +3118,17 @@ acid_damage(obj)
 struct obj *obj;
 {
     /* Scrolls but not spellbooks can be erased by acid. */
-    struct monst *victim =
-        carried(obj) ? &youmonst : mcarried(obj) ? obj->ocarry : NULL;
-    boolean vismon = victim && (victim != &youmonst) && canseemon(victim);
+    struct monst *victim;
+    boolean vismon;
 
-    if (obj->greased)
+    if (!obj) return;
+
+    victim = carried(obj) ? &youmonst : mcarried(obj) ? obj->ocarry : NULL;
+    vismon = victim && (victim != &youmonst) && canseemon(victim);
+
+    if (obj->greased) {
         grease_protect(obj, NULL, victim);
-    else if (obj->oclass == SCROLL_CLASS && obj->otyp != SCR_BLANK_PAPER) {
+    } else if (obj->oclass == SCROLL_CLASS && obj->otyp != SCR_BLANK_PAPER) {
         if (obj->otyp != SCR_BLANK_PAPER
 #ifdef MAIL
                 && obj->otyp != SCR_MAIL
