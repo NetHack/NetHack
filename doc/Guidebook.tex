@@ -2224,7 +2224,8 @@ command allows you to view all options and change most of them.
 You can also set options automatically by placing them in the
 ``NETHACKOPTIONS'' environment variable or in a configuration file.
 Some versions of {\it NetHack\/} also have front-end programs that allow
-you to set options before starting the game.
+you to set options before starting the game or a global configuration 
+for system administrators.
 
 %.hn 2
 \subsection*{Using the NETHACKOPTIONS environment variable}
@@ -3459,6 +3460,65 @@ If this is the case, disable the number\_pad option and use the traditional
 Rogue-like commands.
 \elist
 
+%.hn2
+\subsection*{Global Configuration for System Administrators}
+
+%.pg
+If NetHack is compiled with teh SYSCF option, a system administrator
+should set up a global configuration; this is a file in the 
+same format as the traditional per-user configuration file (see above).
+
+This file should be named sysconf and placed in the same directory as
+the other NetHack support files.
+The options recognized in this file are listed below. Any option not
+set uses a compiled-in default (which may not be appropriate for your
+system).
+
+%.pg
+\blist{}
+%.lp
+\item[\ib{WIZARDS}]
+A space-separated list of user name who are allowed to play in wizard
+mode (the debugging mode, not the magic-useing role). A value of a single
+asterisk (*) allows anyone to start a game in wizard mode.
+%.lp
+\item[\ib{SHELLERS}]
+A list of users who are allowed to use the shell escape command (!).
+The syntax is the same as WIZARDS.
+%.lp
+\item[\ib{MAXPLAYERS}]
+Limit the maximum number of games taht can be running at the same time.
+%.lp
+\item[\ib{SUPPORT}]
+A string explainign how to get local support (no default value).
+%.lp
+\item[\ib{RECOVER}]
+A string explaining how to recover a game on this system (no default value).
+%.lp
+\item[\ib{SEDUCE}]
+0 or 1 to disable or enable, respectively, the SEDUCE option (see the source)
+for details on this function.
+\elist
+
+%.pg
+The following options affect the score file:
+\blist {}
+%.pg
+%.lp
+\item[\ib{PERSMAX}]
+Maximum number of entries for one person
+%.lp
+\item[\ib{ENTRYMAX}]
+Maximum number of entries in the score file
+%.lp
+\item[\ib{POINTSMIN}]
+Minimum number of points to get an entry in the score file.
+%.lp
+\item[\ib{PERS_IS_UID}]
+0 or 1 to use user names or numeric userids, respectively, to identify
+unique people for the score file
+\elist
+
 %.hn 1
 \section{Scoring}
 
@@ -3782,7 +3842,7 @@ resurrected it for 3.3.1.
 
 %.pg
 \medskip
-\nd There is a NetHack web site maintained by {\it Ken Lorber} at 
+\nd The official NetHack web site is maintained by {\it Ken Lorber} at 
 {\catcode`\#=11
 \special{html:<a href="http://www.nethack.org/">}}
 http:{\tt /}{\tt /}www.nethack.org{\tt /}.
