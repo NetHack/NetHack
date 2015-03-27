@@ -446,6 +446,10 @@ boolean ghostly;
 		if (mtmp->isshk) restshk(mtmp, ghostly);
 		if (mtmp->ispriest) restpriest(mtmp, ghostly);
 
+		if (!ghostly) {
+		    if (mtmp->m_id == context.polearm.m_id)
+			context.polearm.hitmon = mtmp;
+		}
 		mtmp2 = mtmp;
 	}
 	if(first && mtmp2->nmon){

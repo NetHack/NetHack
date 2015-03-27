@@ -73,6 +73,11 @@ struct warntype_info {
 	short speciesidx;	/* index of above in mons[] (for save/restore) */
 };
 
+struct polearm_info {
+	struct monst *hitmon;	/* the monster we tried to hit last */
+	unsigned m_id;		/* monster id of hitmon, in save file */
+};
+
 struct context_info {
 	unsigned ident;		/* social security number for each monster */
 	unsigned no_of_wizards; /* 0, 1 or 2 (wizard and his shadow) */
@@ -103,6 +108,7 @@ struct context_info {
 	struct book_info spbook;
 	struct takeoff_info takeoff;
 	struct warntype_info warntype;
+	struct polearm_info polearm;
 };
 
 extern NEARDATA struct context_info context;

@@ -886,6 +886,7 @@ after object loss through polyshudder don't get left hiding under nothing
 show object symbols in menu headings in menus where those object symbols
 	act as menu accelerators, toggleable via "menu_objsyms" option
 show t-shirt text at end of game inventory disclose
+hitting with a polearm remembers the position of the last monster you hit
 
 
 Platform- and/or Interface-Specific Fixes

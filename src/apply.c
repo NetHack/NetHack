@@ -2539,6 +2539,7 @@ use_pole(obj)
 	int res = 0, typ, max_range, min_range, glyph;
 	coord cc;
 	struct monst *mtmp;
+	struct monst *hitm = context.polearm.hitmon;
 
 	/* Are you allowed to use the pole? */
 	if (u.uswallow) {
@@ -2553,8 +2554,13 @@ use_pole(obj)
 
 	/* Prompt for a location */
 	pline(where_to_hit);
-	cc.x = u.ux;
-	cc.y = u.uy;
+	if (hitm && !DEADMONSTER(hitm) && cansee(hitm->mx, hitm->my)) {
+	    cc.x = hitm->mx;
+	    cc.y = hitm->my;
+	} else {
+	    cc.x = u.ux;
+	    cc.y = u.uy;
+	}
 	if (getpos(&cc, TRUE, "the spot to hit") < 0)
 	    return res;	/* ESC; uses turn iff polearm became wielded */
 
@@ -2596,11 +2602,13 @@ use_pole(obj)
 	    return res;
 	}
 
+	context.polearm.hitmon = NULL;
 	/* Attack the monster there */
 	bhitpos = cc;
 	if ((mtmp = m_at(bhitpos.x, bhitpos.y)) != (struct monst *)0) {
 	    if (attack_checks(mtmp, uwep)) return res;
 	    if (overexertion()) return 1; /* burn nutrition; maybe pass out */
+	    context.polearm.hitmon = mtmp;
 	    check_caitiff(mtmp);
 	    notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
 	    (void) thitmonst(mtmp, uwep);

@@ -1237,6 +1237,8 @@ dmonsfree()
     for (mtmp = &fmon; *mtmp;) {
 	freetmp = *mtmp;
 	if (freetmp->mhp <= 0 && !freetmp->isgd) {
+	    if (freetmp == context.polearm.hitmon)
+		context.polearm.hitmon = NULL;
 	    *mtmp = freetmp->nmon;
 	    dealloc_monst(freetmp);
 	    count++;
