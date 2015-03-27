@@ -1,4 +1,4 @@
-/* NetHack 3.5	makemon.c	$NHDT-Date: 1426465436 2015/03/16 00:23:56 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.74 $ */
+/* NetHack 3.5	makemon.c	$NHDT-Date: 1427440865 2015/03/27 07:21:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.75 $ */
 /* NetHack 3.5	makemon.c	$Date: 2012/01/29 00:34:33 $  $Revision: 1.69 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1884,10 +1884,6 @@ int *seencount;   /* secondary output */
 	} while (--creatcnt > 0);
 	if (seecount) {
 	    if (seencount) *seencount += seecount;
-	    /* don't set contents-known flag if we just used last charge 
-	       (such suppression doesn't actually gain us much since
-	       player can now deduce that the bag has become empty) */
-	    if (bag->spe > 0) bag->cknown = 1;
 	    if (bag->dknown) makeknown(BAG_OF_TRICKS);
 	} else if (!tipping) {
 	    pline1(!moncount ? nothing_happens : "Nothing seems to happen.");

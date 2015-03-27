@@ -1,4 +1,4 @@
-/* NetHack 3.5	objnam.c	$NHDT-Date: 1426977394 2015/03/21 22:36:34 $  $NHDT-Branch: master $:$NHDT-Revision: 1.108 $ */
+/* NetHack 3.5	objnam.c	$NHDT-Date: 1427440866 2015/03/27 07:21:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.109 $ */
 /* NetHack 3.5	objnam.c	$Date: 2011/10/27 02:24:54 $  $Revision: 1.101 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -651,8 +651,9 @@ register struct obj *obj;
 	 */
 	register char *bp = xname(obj);
 
-	if (iflags.override_ID) known = cknown = bknown = lknown = TRUE;
-	else {
+	if (iflags.override_ID) {
+		known = cknown = bknown = lknown = TRUE;
+	} else {
 		known = obj->known;
 		cknown = obj->cknown;
 		bknown = obj->bknown;
@@ -685,7 +686,15 @@ register struct obj *obj;
 
 	/* "empty" goes at the beginning, but item count goes at the end */
 	if (cknown &&
-	    (Is_container(obj) || obj->otyp == STATUE) && !Has_contents(obj))
+	    /* bag of tricks: include "empty" prefix if it's known to
+	       be empty but its precise number of charges isn't known
+	       (when that is known, suffix of "(n:0)" will be appended,
+	       making the prefix be redundant; note that 'known' flag
+	       isn't set when emptiness gets discovered because then
+	       charging magic would yield known number of new charges) */
+	    (obj->otyp == BAG_OF_TRICKS ? (obj->spe == 0 && !obj->known) :
+	     /* not bag of tricks: empty if container which has no contents */
+	     (Is_container(obj) || obj->otyp == STATUE) && !Has_contents(obj)))
 		Strcat(prefix, "empty ");
 
 	if (bknown &&
