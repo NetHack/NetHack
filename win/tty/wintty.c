@@ -1809,6 +1809,7 @@ tty_display_nhwindow(window, blocking)
 	cw->offx = (uchar) (int)
 	    max((int) 10, (int) (ttyDisplay->cols - cw->maxcol - 1));
 #endif
+	if(cw->offx < 0) cw->offx = 0;
 	if(cw->type == NHW_MENU)
 	    cw->offy = 0;
 	if(ttyDisplay->toplin == 1)
