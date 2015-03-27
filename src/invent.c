@@ -915,8 +915,8 @@ register const char *let,*word;
 
 		/* "ugly check" for reading fortune cookies, part 2 */
 		if ((!strcmp(word, "read")
-              && (otmp->otyp == FORTUNE_COOKIE || otmp->otyp == T_SHIRT)))
-			allowall = TRUE;
+		     && is_readable(otmp)))
+			allowall = usegold = TRUE;
 	    }
 	}
 	bp[foo] = 0;
