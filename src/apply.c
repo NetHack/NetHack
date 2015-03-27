@@ -2531,6 +2531,28 @@ static const char
 	cant_see_spot[] = "won't hit anything if you can't see that spot.",
 	cant_reach[] = "can't reach that spot from here.";
 
+/* find pos of monster in range, if only one monster */
+boolean
+find_poleable_mon(pos, min_range, max_range)
+coord *pos;
+int min_range, max_range;
+{
+    struct monst *mtmp;
+    struct monst *selmon = NULL;
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+	if (mtmp && !DEADMONSTER(mtmp) && !mtmp->mtame &&
+	    cansee(mtmp->mx, mtmp->my) &&
+	    distu(mtmp->mx, mtmp->my) <= max_range &&
+	    distu(mtmp->mx, mtmp->my) >= min_range) {
+	    if (selmon) return FALSE;
+	    selmon = mtmp;
+	}
+    if (!selmon) return FALSE;
+    pos->x = selmon->mx;
+    pos->y = selmon->my;
+    return TRUE;
+}
+
 /* Distance attacks by pole-weapons */
 STATIC_OVL int
 use_pole(obj)
@@ -2552,20 +2574,7 @@ use_pole(obj)
 	}
      /* assert(obj == uwep); */
 
-	/* Prompt for a location */
-	pline(where_to_hit);
-	if (hitm && !DEADMONSTER(hitm) && cansee(hitm->mx, hitm->my)) {
-	    cc.x = hitm->mx;
-	    cc.y = hitm->my;
-	} else {
-	    cc.x = u.ux;
-	    cc.y = u.uy;
-	}
-	if (getpos(&cc, TRUE, "the spot to hit") < 0)
-	    return res;	/* ESC; uses turn iff polearm became wielded */
-
-	glyph = glyph_at(cc.x, cc.y);
-	/*
+		/*
 	 * Calculate allowable range (pole's reach is always 2 steps):
 	 *	unskilled and basic: orthogonal direction, 4..4;
 	 *	skilled: as basic, plus knight's jump position, 4..5;
@@ -2585,6 +2594,20 @@ use_pole(obj)
 	if (typ == P_NONE || P_SKILL(typ) <= P_BASIC) max_range = 4;
 	else if (P_SKILL(typ) == P_SKILLED) max_range = 5;
 	else max_range = 8;	/* (P_SKILL(typ) >= P_EXPERT) */
+
+	/* Prompt for a location */
+	pline(where_to_hit);
+	if (hitm && !DEADMONSTER(hitm) && cansee(hitm->mx, hitm->my)) {
+	    cc.x = hitm->mx;
+	    cc.y = hitm->my;
+	} else if (!find_poleable_mon(&cc, min_range, max_range)) {
+	    cc.x = u.ux;
+	    cc.y = u.uy;
+	}
+	if (getpos(&cc, TRUE, "the spot to hit") < 0)
+	    return res;	/* ESC; uses turn iff polearm became wielded */
+
+	glyph = glyph_at(cc.x, cc.y);
 	if (distu(cc.x, cc.y) > max_range) {
 	    pline("Too far!");
 	    return (res);
