@@ -53,6 +53,39 @@ struct obj *sobj;
 	(void) learnscrolltyp(sobj->otyp);
 }
 
+char *
+tshirt_text(tshirt, buf)
+struct obj *tshirt;
+char *buf;
+{
+    static const char *shirt_msgs[] = { /* Scott Bigham */
+    "I explored the Dungeons of Doom and all I got was this lousy T-shirt!",
+    "Is that Mjollnir in your pocket or are you just happy to see me?",
+    "It's not the size of your sword, it's how #enhance'd you are with it.",
+    "Madame Elvira's House O' Succubi Lifetime Customer",
+    "Madame Elvira's House O' Succubi Employee of the Month",
+    "Ludios Vault Guards Do It In Small, Dark Rooms",
+    "Yendor Military Soldiers Do It In Large Groups",
+    "I survived Yendor Military Boot Camp",
+    "Ludios Accounting School Intra-Mural Lacrosse Team",
+    "Oracle(TM) Fountains 10th Annual Wet T-Shirt Contest",
+    "Hey, black dragon!  Disintegrate THIS!",
+    "I'm With Stupid -->",
+    "Don't blame me, I voted for Izchak!",
+    "Don't Panic",				/* HHGTTG */
+    "Furinkan High School Athletic Dept.",	/* Ranma 1/2 */
+    "Hel-LOOO, Nurse!",			/* Animaniacs */
+    };
+    int erosion;
+    Strcpy(buf, shirt_msgs[tshirt->o_id % SIZE(shirt_msgs)]);
+    erosion = greatest_erosion(tshirt);
+    if (erosion)
+	wipeout_text(buf,
+		     (int)(strlen(buf) * erosion / (2*MAX_ERODE)),
+		     tshirt->o_id ^ (unsigned)ubirthday);
+    return buf;
+}
+
 int
 doread()
 {
@@ -73,27 +106,7 @@ doread()
 	    useup(scroll);
 	    return(1);
 	} else if (scroll->otyp == T_SHIRT) {
-	    static const char *shirt_msgs[] = { /* Scott Bigham */
-    "I explored the Dungeons of Doom and all I got was this lousy T-shirt!",
-    "Is that Mjollnir in your pocket or are you just happy to see me?",
-    "It's not the size of your sword, it's how #enhance'd you are with it.",
-    "Madame Elvira's House O' Succubi Lifetime Customer",
-    "Madame Elvira's House O' Succubi Employee of the Month",
-    "Ludios Vault Guards Do It In Small, Dark Rooms",
-    "Yendor Military Soldiers Do It In Large Groups",
-    "I survived Yendor Military Boot Camp",
-    "Ludios Accounting School Intra-Mural Lacrosse Team",
-    "Oracle(TM) Fountains 10th Annual Wet T-Shirt Contest",
-    "Hey, black dragon!  Disintegrate THIS!",
-    "I'm With Stupid -->",
-    "Don't blame me, I voted for Izchak!",
-    "Don't Panic",				/* HHGTTG */
-    "Furinkan High School Athletic Dept.",	/* Ranma 1/2 */
-    "Hel-LOOO, Nurse!",			/* Animaniacs */
-	    };
 	    char buf[BUFSZ];
-	    int erosion;
-
 	    if (Blind) {
 		You_cant("feel any Braille writing.");
 		return 0;
@@ -108,13 +121,7 @@ doread()
 	    u.uconduct.literate++;
 	    if(flags.verbose)
 		pline("It reads:");
-	    Strcpy(buf, shirt_msgs[scroll->o_id % SIZE(shirt_msgs)]);
-	    erosion = greatest_erosion(scroll);
-	    if (erosion)
-		wipeout_text(buf,
-			(int)(strlen(buf) * erosion / (2*MAX_ERODE)),
-			     scroll->o_id ^ (unsigned)ubirthday);
-	    pline("\"%s\"", buf);
+	    pline("\"%s\"", tshirt_text(scroll, buf));
 	    return 1;
 	} else if (scroll->oclass != SCROLL_CLASS
 		&& scroll->oclass != SPBOOK_CLASS) {

@@ -489,6 +489,11 @@ register struct obj *obj;
 	}
 	if (pluralize) Strcpy(buf, makeplural(buf));
 
+	if (obj->otyp == T_SHIRT && program_state.gameover) {
+	    char tmpbuf[BUFSZ];
+	    Sprintf(eos(buf), " with text \"%s\"", tshirt_text(obj, tmpbuf));
+	}
+
 	if (has_oname(obj) && dknown) {
 		Strcat(buf, " named ");
 nameit:
