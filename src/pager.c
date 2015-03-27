@@ -447,7 +447,8 @@ const char **firstmatch;
 {
     boolean need_to_look = FALSE;
     int glyph;
-    char    look_buf[BUFSZ], prefix[BUFSZ];
+    static char    look_buf[BUFSZ];
+    char prefix[BUFSZ];
     int	    found = 0;		/* count of matching syms found */
     int i;
     int skipped_venom = 0;
