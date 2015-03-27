@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: master $:$NHDT-Revision: 1.140 $ $NHDT-Date: 1427500010 2015/03/27 23:46:50 $
+.\" $NHDT-Branch$:$NHDT-Revision$ $NHDT-Date$
 .\" $Revision: 1.130 $ $Date: 2015/03/27 00:38:30 $
 .ds h0 "NetHack Guidebook
 .ds h1
@@ -3228,16 +3228,16 @@ joined the NetHack development team,
 \fBKevin Smolkowski\fP ensured that NetHack 3.6.0 continued to operate on 
 various Unix flavors as well as maintaining the X11 interface. 
 .pg
-\fB\fBKen Lorber\fP, \fBHaoyang Wang\fP, \fBPat Rankin\fP, and \fBDean Luick\fP 
+\fBKen Lorber\fP, \fBHaoyang Wang\fP, \fBPat Rankin\fP, and \fBDean Luick\fP 
 maintained the port of NetHack 3.6.0 for Mac.
 .pg
-\fB\fBMichael Allison\fP, \fBDerek S. Ray\fP, \fBYitzhak Sapir\fP, 
+\fBMichael Allison\fP, \fBDerek S. Ray\fP, \fBYitzhak Sapir\fP, 
 \fBAlex Kompel\fP, and \fBDavid Cohrs\fP maintained the port of 
 NetHack 3.6.0 for Microsoft Windows.
 .pg
-\fB\fBJeff Bailey\fP created and maintained a port of NetHack 3.6.0 for Chrome.
+\fBJeff Bailey\fP created and maintained a port of NetHack 3.6.0 for Chrome.
 .pg
-\fBTODO\fBAlex Kompel\fP maintained a port of NetHack 3.6.0 to Windows Phone.
+TODO \fBAlex Kompel\fP maintained a port of NetHack 3.6.0 to Windows Phone.
 .pg
 \fBThis version of the game is special in a particular way.  Near the end of 
 the development of 3.6, one of the significant inspirations for many of the 
