@@ -33,7 +33,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.122 $ $Date: 2015/03/16 06:00:00 $
+% $Revision: 1.122 $ $Date: 2015/03/27 06:00:00 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -46,7 +46,7 @@
 %.au
 \author{Eric S. Raymond\\
 (Edited and expanded for 3.6)}
-\date{March 16, 2015}
+\date{March 27, 2015}
 
 \maketitle
 
@@ -3787,7 +3787,7 @@ more than a year and a half.
 
 %.pg
 \medskip
-The 3.5 development team initially consisted of 
+The 3.4 development team initially consisted of 
 {\it Michael Allison}, {\it Ken Arromdee},
 {\it David Cohrs}, {\it Jessie Collet}, {\it Kevin Hugo}, {\it Ken Lorber},
 {\it Dean Luick}, {\it Pat Rankin}, {\it Mike Stephenson}, 
@@ -3802,11 +3802,11 @@ runs on:
 
 %.pg
 \medskip
-\nd{\it Pat Rankin} maintained 3.5 for VMS.
+\nd{\it Pat Rankin} maintained 3.4 for VMS.
 
 %.pg
 \medskip
-\nd {\it Michael Allison} maintained NetHack 3.5 for the MS-DOS platform.
+\nd {\it Michael Allison} maintained NetHack 3.4 for the MS-DOS platform.
 {\it Paul Winner} and {\it Yitzhak Sapir} provided encouragement.
 
 %.pg
@@ -3836,8 +3836,81 @@ it for 3.3.1.
 
 %.pg
 \medskip
-\nd {\it Christian ``Marvin'' Bressler} maintained 3.5 for the Atari after he
+\nd {\it Christian ``Marvin'' Bressler} maintained 3.4 for the Atari after he
 resurrected it for 3.3.1.
+
+%.pg
+\medskip
+The release of NetHack 3.4.3 in December 2003 marked the beginning of a 
+long release hiatus. 3.4.3 proved to be a remarkably stable version that
+provided continued enjoyment by the community for more than a decade. The 
+devteam slowly and quietly continued to work on the game behind the scenes 
+during the tenure of 3.4.3. It was during that same period that several new 
+variants emerged within the NetHack community. Notably sporkhack by 
+Derek S. Ray, unnethack by Patric Mueller, nitrohack and its successors 
+originally by Daniel Thaler and then by Alex Smith, and 
+Dynahack by Tung Nguyen. Some of those variants continue to be developed, 
+maintained, and enjoyed by the community to this day.
+
+%.pg
+\medskip
+In September 2014, an interim snapshot of the code under development was 
+released publicly by other parties. Since that code was a work-in-progress 
+and had not gone through a period of debugging, it was decided that the 
+version numbers present on that code snapshot would be retired and never 
+used in an official NetHack release. An announcement was posted on the 
+devteam's official nethack.org website to that effect, stating that there 
+would never be a 3.4.4, 3.5, or 3.5.0 official release version.
+
+%.pg
+\medskip
+In January 2015, preparation began for the release of NetHack 3.6
+
+%.pg
+\medskip
+At the beginning of development for what would eventually get released
+as 3.6.0, the development team consisted of {\it Warwick Allison}, 
+{\it Michael Allison}, {\it Ken Arromdee},
+{\it David Cohrs}, {\it Jessie Collet}, 
+{\it Ken Lorber}, {\it Dean Luick}, {\it Pat Rankin}, 
+{\it Mike Stephenson}, {\it Janet Walz}, and {\it Paul Winner}.
+Leading up to the release of 3.6.0 in early 2015, new members
+{\it Sean Hunt}, {\it Pasi Kallinen}, and {\it Derek S. Ray}
+joined the NetHack development team, 
+
+%.pg
+\medskip
+3.6.0 TODO insert apprpriate description of 3.6.0 here
+
+%.pg
+\medskip
+The development team, as well as {\it Steve VanDevender} and 
+{\it Kevin Smolkowski} ensured that NetHack 3.6.0 continued to operate on 
+various Unix flavors as well as maintaining the X11 interface. 
+
+{\it Ken Lorber}, {\it Haoyang Wang}, {\it Pat Rankin}, and {\it Dean Luick} 
+maintained the port of NetHack 3.6.0 for Mac.
+
+%.pg
+\medskip
+{\it Michael Allison}, {\it Derek S. Ray}, {\it Yitzhak Sapir}, 
+{\it Alex Kompel}, and {\it David Cohrs} maintained the port of 
+NetHack 3.6.0 for Microsoft Windows.
+
+%.pg
+\medskip
+{\it Jeff Bailey} created and maintained a port of NetHack 3.6.0 for Chrome.
+
+%.pg
+\medskip
+{\it Alex Kompel} maintained a port of NetHack 3.6.0 to Windows Phone. <FIXME>?
+
+%.pg
+\medskip
+This version of the game is special in a particular way.  Near the end of 
+the development of 3.6, one of the significant inspirations for many of the 
+humorous and fun features found in the game, author {\it Terry Pratchett}, 
+passed away.  This version of the game is dedicated to him.
 
 %.pg
 \medskip
@@ -3848,6 +3921,20 @@ http:{\tt /}{\tt /}www.nethack.org{\tt /}.
 {\catcode`\#=11
 \special{html:</a>}}
 
+%.pg
+%.hn 2
+\subsection*{Shout Outs}
+\nd The devteam would like to give a special "shout-out" to thank the generous 
+people primarily responsible for the public NetHack servers available for 
+playing the game at nethack.alt.org and devnull.net. In addition to providing 
+a way for the public to play a game of NetHack from almost anywhere, they 
+have hosted annual NetHack tournaments for many, many years. 
+%pg 
+\medskip
+\nd On behalf of the NetHack community, thank you very much to 
+{\it M. Drew Streib}, {\it Pasi Kallinen} and {\it Robin Bandy}.
+
+.pg
 %.hn 3
 \subsection*{Dungeoneers}
 \bigskip
@@ -3860,11 +3947,11 @@ in this, the list of Dungeoneers:
 \begin{center}
 \begin{tabular}{lll}
 %TABLE_START
-Adam Aronow & Izchak Miller & Mike Stephenson\\
-Alex Kompel & J. Ali Harlow & Norm Meluch\\
-Andreas Dorn & Janet Walz & Olaf Seibert\\
-Andy Church & Janne Salmij\"{a}rvi & Pasi Kallinen\\
-Andy Swanson & Jean-Christophe Collet & Pat Rankin\\
+Adam Aronow & J. Ali Harlow & Mike Stephenson\\
+Alex Kompel & Janet Walz & Norm Meluch\\
+Andreas Dorn & Janne Salmij\"{a}rvi & Olaf Seibert\\
+Andy Church & Jean-Christophe Collet & Pasi Kallinen\\
+Andy Swanson & Jeff Bailey & Pat Rankin\\
 Ari Huttunen & Jochen Erwied & Paul Winner\\
 Barton House & John Kallen & Pierre Martineau\\
 Benson I. Margulies & John Rupley & Ralf Brown\\
@@ -3873,31 +3960,32 @@ Boudewijn Waijers & Johnny Lee & Richard Addison\\
 Bruce Cox & Jon W\{tte & Richard Beigel\\
 Bruce Holloway & Jonathan Handler & Richard P. Hughey\\
 Bruce Mewborne & Joshua Delahunty & Rob Menke\\
-Carl Schelin & Keizo Yamamoto & Robin Johnson\\
-Chris Russo & Ken Arnold & Roderick Schertler\\
-David Cohrs & Ken Arromdee & Roland McGrath\\
-David Damerell & Ken Lorber & Ron Van Iwaarden\\
-David Gentzel & Ken Washikita & Ronnen Miller\\
-David Hairston & Kevin Darcy & Ross Brown\\
-Dean Luick & Kevin Hugo & Sascha Wostmann\\
-Del Lamb & Kevin Sitze & Scott Bigham\\
-Derek S. Ray & Kevin Smolkowski & Scott R. Turner\\
-Deron Meranda & Kevin Sweet & Sean Hunt\\
-Dion Nicolaas & Lars Huttar & Stephen Spackman\\
-Dylan O'Donnell & Leon Arnott & Stephen White\\
-Eric Backus & Malcolm Ryan & Steve Creps\\
-Eric Hendrickson & Mark Gooderum & Steve Linhart\\
-Eric R. Smith & Mark Modrall & Steve VanDevender\\
-Eric S. Raymond & Marvin Bressler & Teemu Suikki\\
-Erik Andersen & Matthew Day & Tim Lennan\\
-Frederick Roeber & Merlyn LeRoy & Timo Hakulinen\\
-Gil Neiger & Michael Allison & Tom Almy\\
-Greg Laskin & Michael Feir & Tom West\\
-Greg Olson & Michael Hamel & Warren Cheung\\
-Gregg Wonderly & Michael Sokolov & Warwick Allison\\
-Hao-yang Wang & Mike Engber & Yitzhak Sapir\\
-Helge Hafting & Mike Gallop\\
-Irina Rempt-Drijfhout & Mike Passaretti
+Carl Schelin & Keizo Yamamoto & Robin Bandy\\
+Chris Russo & Ken Arnold & Robin Johnson\\
+David Cohrs & Ken Arromdee & Roderick Schertler\\
+David Damerell & Ken Lorber & Roland McGrath\\
+David Gentzel & Ken Washikita & Ron Van Iwaarden\\
+David Hairston & Kevin Darcy & Ronnen Miller\\
+Dean Luick & Kevin Hugo & Ross Brown\\
+Del Lamb & Kevin Sitze & Sascha Wostmann\\
+Derek S. Ray & Kevin Smolkowski & Scott Bigham\\
+Deron Meranda & Kevin Sweet & Scott R. Turner\\
+Dion Nicolaas & Lars Huttar & Sean Hunt\\
+Dylan O'Donnell & Leon Arnott & Stephen Spackman\\
+Eric Backus & M. Drew Streib & Stephen White\\
+Eric Hendrickson & Malcolm Ryan & Steve Creps\\
+Eric R. Smith & Mark Gooderum & Steve Linhart\\
+Eric S. Raymond & Mark Modrall & Steve VanDevender\\
+Erik Andersen & Marvin Bressler & Teemu Suikki\\
+Frederick Roeber & Matthew Day & Tim Lennan\\
+Gil Neiger & Merlyn LeRoy & Timo Hakulinen\\
+Greg Laskin & Michael Allison & Tom Almy\\
+Greg Olson & Michael Feir & Tom West\\
+Gregg Wonderly & Michael Hamel & Warren Cheung\\
+Hao-yang Wang & Michael Sokolov & Warwick Allison\\
+Helge Hafting & Mike Engber & Yitzhak Sapir\\
+Irina Rempt-Drijfhout & Mike Gallop\\
+Izchak Miller & Mike Passaretti
 %TABLE_END  Do not delete this line.
 \end{tabular}
 \end{center}
