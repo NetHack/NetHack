@@ -1096,6 +1096,7 @@ pressing @ when cursor positioning moves cursor on top of hero
 pressing # when cursor positioning toggles automatic description of features
 	under the cursor
 cursor positioning ignores uninteresting dungeon features
+allow reading many more items
 
 
 Platform- and/or Interface-Specific New Features
