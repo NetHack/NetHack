@@ -2553,6 +2553,32 @@ int min_range, max_range;
     return TRUE;
 }
 
+int polearm_range_min = -1;
+int polearm_range_max = -1;
+
+void
+display_polearm_positions(state)
+int state;
+{
+    if (state == 0) {
+	tmp_at(DISP_BEAM, cmap_to_glyph(S_flashbeam));
+    } else if (state == 1) {
+	int x,y, dx,dy;
+	for (dx = -4; dx <= 4; dx++)
+	    for (dy = -4; dy <= 4; dy++) {
+		x = dx + (int)u.ux;
+		y = dy + (int)u.uy;
+		if (isok(x, y) &&
+		    distu(x, y) >= polearm_range_min &&
+		    distu(x, y) <= polearm_range_max) {
+		    tmp_at(x, y);
+		}
+	    }
+    } else {
+	tmp_at(DISP_END, 0);
+    }
+}
+
 /* Distance attacks by pole-weapons */
 STATIC_OVL int
 use_pole(obj)
@@ -2595,15 +2621,21 @@ use_pole(obj)
 	else if (P_SKILL(typ) == P_SKILLED) max_range = 5;
 	else max_range = 8;	/* (P_SKILL(typ) >= P_EXPERT) */
 
+	polearm_range_min = min_range;
+	polearm_range_max = max_range;
+
 	/* Prompt for a location */
 	pline(where_to_hit);
-	if (hitm && !DEADMONSTER(hitm) && cansee(hitm->mx, hitm->my)) {
+	cc.x = u.ux;
+	cc.y = u.uy;
+	if (!find_poleable_mon(&cc, min_range, max_range) &&
+	    hitm && !DEADMONSTER(hitm) && cansee(hitm->mx, hitm->my) &&
+	    distu(hitm->mx,hitm->my) <= max_range &&
+	    distu(hitm->mx,hitm->my) >= min_range) {
 	    cc.x = hitm->mx;
 	    cc.y = hitm->my;
-	} else if (!find_poleable_mon(&cc, min_range, max_range)) {
-	    cc.x = u.ux;
-	    cc.y = u.uy;
 	}
+	getpos_sethilite(display_polearm_positions);
 	if (getpos(&cc, TRUE, "the spot to hit") < 0)
 	    return res;	/* ESC; uses turn iff polearm became wielded */
 

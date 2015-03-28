@@ -364,6 +364,7 @@ E void NDECL(heal_legs);
 /* ### do_name.c ### */
 
 E int FDECL(getpos, (coord *,BOOLEAN_P,const char *));
+E void FDECL(getpos_sethilite, (void (*f)(int) ));
 E void FDECL(new_mname, (struct monst *,int));
 E void FDECL(free_mname, (struct monst *));
 E void FDECL(new_oname, (struct obj *,int));
