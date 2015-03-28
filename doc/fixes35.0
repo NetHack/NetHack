@@ -888,6 +888,7 @@ show object symbols in menu headings in menus where those object symbols
 show t-shirt text at end of game inventory disclose
 hitting with a polearm remembers the position of the last monster you hit
 allow showing legal polearm positions when asked for location to hit
+add messages for trying to pick up some terrain features
 
 
 Platform- and/or Interface-Specific Fixes
