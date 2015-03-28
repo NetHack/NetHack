@@ -2891,6 +2891,7 @@ do_break_wand(obj)
     boolean fillmsg = FALSE;
     int expltype = EXPL_MAGICAL;
     char confirm[QBUFSZ], buf[BUFSZ];
+    boolean is_fragile = (!strcmp(OBJ_DESCR(objects[obj->otyp]), "balsa"));
 
     if (yn(safe_qbuf(confirm, "Are you really sure you want to break ", "?",
 		     obj, yname, ysimple_name, "the wand")) == 'n')
@@ -2899,7 +2900,7 @@ do_break_wand(obj)
     if (nohands(youmonst.data)) {
 	You_cant("break %s without hands!", yname(obj));
 	return 0;
-    } else if (ACURR(A_STR) < 10) {
+    } else if (ACURR(A_STR) < (is_fragile ? 5 : 10)) {
 	You("don't have the strength to break %s!", yname(obj));
 	return 0;
     }

@@ -1498,6 +1498,7 @@ doloot()	/* loot a container on the floor or loot saddle from mon. */
     char qbuf[BUFSZ];
     int prev_inquiry = 0;
     boolean prev_loot = FALSE;
+    int num_conts;
 
     if (check_capacity((char *)0)) {
 	/* "Can't do that while carrying so much stuff." */
@@ -1518,14 +1519,10 @@ doloot()	/* loot a container on the floor or loot saddle from mon. */
 
 lootcont:
 
-    if (container_at(cc.x, cc.y, FALSE)) {
+    if ((num_conts = container_at(cc.x, cc.y, TRUE)) > 0) {
 	boolean anyfound = FALSE;
-	int num_conts = 0;
 
 	if (!able_to_loot(cc.x, cc.y, TRUE)) return 0;
-
-	for (cobj = level.objects[cc.x][cc.y]; cobj; cobj = cobj->nexthere)
-	    if (Is_container(cobj)) num_conts++;
 
 	if (num_conts > 1) {
 	    /* use a menu to loot many containers */
