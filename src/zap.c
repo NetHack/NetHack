@@ -3283,8 +3283,10 @@ int dx, dy;
 		}
 		tmp_at(bhitpos.x, bhitpos.y);
 		delay_output();
-		if(IS_SINK(levl[bhitpos.x][bhitpos.y].typ))
+		if(IS_SINK(levl[bhitpos.x][bhitpos.y].typ)) {
+			if (!Deaf) pline("Klonk!");
 			break;	/* boomerang falls on sink */
+		}
 		/* ct==0, initial position, we want next delta to be same;
 		   ct==5, opposite position, repeat delta undoes first one */
 		if (ct % 5 != 0) i += (counterclockwise ? -1 : 1);
