@@ -3037,7 +3037,7 @@ do_break_wand(obj)
 	     /* if (context.botl) bot(); */
 	    }
 	    if (affects_objects && level.objects[x][y]) {
-		(void) bhitpile(obj, bhito, x, y);
+		(void) bhitpile(obj, bhito, x, y, 0);
 		if (context.botl) bot();		/* potion effects */
 	    }
 	} else {
@@ -3054,7 +3054,7 @@ do_break_wand(obj)
 	     * since it's also used by retouch_equipment() for polyself.)
 	     */
 	    if (affects_objects && level.objects[x][y]) {
-		(void) bhitpile(obj, bhito, x, y);
+		(void) bhitpile(obj, bhito, x, y, 0);
 		if (context.botl) bot();		/* potion effects */
 	    }
 	    damage = zapyourself(obj, FALSE);
