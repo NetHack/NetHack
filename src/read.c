@@ -225,7 +225,7 @@ doread()
 		"Choco Nummer",
 		"Om-nom",	/* Cat Macro */
 		"Fruity Oaty",	/* Serenity */
-		"Wonka"		/* Charlie and the Chocolate Factory */
+		"Wonka Bar"	/* Charlie and the Chocolate Factory */
 	    };
 	    if (Blind) {
 		You_cant("feel any Braille writing.");
