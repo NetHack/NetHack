@@ -890,6 +890,8 @@ hitting with a polearm remembers the position of the last monster you hit
 allow showing legal polearm positions when asked for location to hit
 add messages for trying to pick up some terrain features
 boomerang makes noise when hitting a sink
+non-pet rust monsters would eat rust-proofed non-digestibles but ignore
+	those non-digestibles otherwise
 
 
 Platform- and/or Interface-Specific Fixes
