@@ -27,6 +27,7 @@ STATIC_DCL void FDECL(use_trap, (struct obj *));
 STATIC_DCL void FDECL(use_stone, (struct obj *));
 STATIC_PTR int NDECL(set_trap);		/* occupation callback */
 STATIC_DCL int FDECL(use_whip, (struct obj *));
+STATIC_PTR void FDECL(display_polearm_positions, (int));
 STATIC_DCL int FDECL(use_pole, (struct obj *));
 STATIC_DCL int FDECL(use_cream_pie, (struct obj *));
 STATIC_DCL int FDECL(use_grapple, (struct obj *));
