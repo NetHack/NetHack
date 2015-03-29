@@ -2453,6 +2453,8 @@ Specify the name of an alternative tile file to override the default.
 Specify the preferred height of each tile in a tile capable port.
 .lp tile_width
 Specify the preferred width of each tile in a tile capable port
+.lp use_darkgray
+Use bold black instead of blue for black glyphs (TTY only).
 .lp use_inverse
 NetHack should display inverse when the game specifies it.
 .lp vary_msgcount

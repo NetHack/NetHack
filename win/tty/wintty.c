@@ -56,7 +56,7 @@ struct window_procs tty_procs = {
 #if defined(SELECTSAVED)
     WC2_SELECTSAVED|
 #endif
-    0L,
+    WC2_DARKGRAY,
     tty_init_nhwindows,
     tty_player_selection,
     tty_askname,

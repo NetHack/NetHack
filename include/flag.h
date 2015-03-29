@@ -295,6 +295,7 @@ struct instance_flags {
 	boolean wc2_softkeyboard;	/* use software keyboard */
 	boolean wc2_wraptext;		/* wrap text */
 	boolean wc2_selectsaved;	/* display a menu of user's saved games */
+	boolean wc2_darkgray;		/* try to use dark-gray color for black glyphs */
 	boolean  cmdassist;	/* provide detailed assistance for some commands */
 	boolean	 clicklook;	/* allow right-clicking for look */
 	boolean	 obsolete;	/* obsolete options can point at this, it isn't used */
