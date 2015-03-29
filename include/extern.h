@@ -364,6 +364,7 @@ E void NDECL(heal_legs);
 /* ### do_name.c ### */
 
 E int FDECL(getpos, (coord *,BOOLEAN_P,const char *));
+E void FDECL(getpos_sethilite, (void (*f)(int) ));
 E void FDECL(new_mname, (struct monst *,int));
 E void FDECL(free_mname, (struct monst *));
 E void FDECL(new_oname, (struct obj *,int));
@@ -1827,6 +1828,7 @@ E long NDECL(random);
 /* ### read.c ### */
 
 E void FDECL(learnscroll, (struct obj *));
+E char *FDECL(tshirt_text, (struct obj *, char *));
 E int NDECL(doread);
 E boolean FDECL(is_chargeable, (struct obj *));
 E void FDECL(recharge, (struct obj *,int));
@@ -2630,7 +2632,7 @@ E boolean FDECL(obj_resists, (struct obj *,int,int));
 E boolean FDECL(obj_shudders, (struct obj *));
 E void FDECL(do_osshock, (struct obj *));
 E int FDECL(bhito, (struct obj *,struct obj *));
-E int FDECL(bhitpile, (struct obj *,int (*)(OBJ_P,OBJ_P),int,int));
+E int FDECL(bhitpile, (struct obj *,int (*)(OBJ_P,OBJ_P),int,int,SCHAR_P));
 E int FDECL(zappable, (struct obj *));
 E void FDECL(zapnodir, (struct obj *));
 E int NDECL(dozap);

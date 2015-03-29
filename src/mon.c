@@ -634,7 +634,10 @@ meatmetal(mtmp)
     /* Eats topmost metal object if it is there */
     for (otmp = level.objects[mtmp->mx][mtmp->my];
                         otmp; otmp = otmp->nexthere) {
-        if (mtmp->data == &mons[PM_RUST_MONSTER] && !is_rustprone(otmp))
+	    /* Don't eat indigestible/choking/inappropriate objects */
+	    if ((mtmp->data == &mons[PM_RUST_MONSTER] && !is_rustprone(otmp)) ||
+		(otmp->otyp == AMULET_OF_STRANGULATION) ||
+		(otmp->otyp == RIN_SLOW_DIGESTION))
         continue;
         if (is_metallic(otmp) && !obj_resists(otmp, 5, 95) &&
         touch_artifact(otmp,mtmp)) {
@@ -651,9 +654,7 @@ meatmetal(mtmp)
             pline("%s spits %s out in disgust!",
                   Monnam(mtmp), distant_name(otmp,doname));
             }
-        /* KMH -- Don't eat indigestible/choking objects */
-        } else if (otmp->otyp != AMULET_OF_STRANGULATION &&
-                otmp->otyp != RIN_SLOW_DIGESTION) {
+		} else {
             if (cansee(mtmp->mx,mtmp->my) && flags.verbose)
             pline("%s eats %s!", Monnam(mtmp),
                 distant_name(otmp,doname));
@@ -1256,6 +1257,8 @@ dmonsfree()
     for (mtmp = &fmon; *mtmp;) {
     freetmp = *mtmp;
     if (freetmp->mhp <= 0 && !freetmp->isgd) {
+	    if (freetmp == context.polearm.hitmon)
+		context.polearm.hitmon = NULL;
         *mtmp = freetmp->nmon;
         dealloc_monst(freetmp);
         count++;

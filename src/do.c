@@ -1410,6 +1410,7 @@ boolean at_stairs, falling, portal;
     /* assume this will always return TRUE when changing level */
     (void) in_out_region(u.ux, u.uy);
     (void) pickup(1);
+	context.polearm.hitmon = NULL;
 }
 
 STATIC_OVL void

@@ -1,4 +1,4 @@
-/* NetHack 3.5	worn.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	worn.c	$NHDT-Date: 1427580338 2015/03/28 22:05:38 $  $NHDT-Branch: master $:$NHDT-Revision: 1.35 $ */
 /* NetHack 3.5	worn.c	$Date: 2013/11/05 00:57:56 $  $Revision: 1.32 $ */
 /*	SCCS Id: @(#)worn.c	3.5	2009/02/28	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
@@ -591,9 +591,7 @@ long flag;
                 case W_ARMS: return uarms;
                 case W_ARMG: return uarmg;
                 case W_ARMF: return uarmf;
-#ifdef TOURIST
                 case W_ARMU: return uarmu;
-#endif
                 default:
                              impossible("bad flag in which_armor");
                              return 0;

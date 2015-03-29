@@ -685,6 +685,7 @@ migrate_to_level(mtmp, tolev, xyloc, cc)
 	mtmp->mux = new_lev.dnum;
 	mtmp->muy = new_lev.dlevel;
 	mtmp->mx = mtmp->my = 0;	/* this implies migration */
+	if (mtmp == context.polearm.hitmon) context.polearm.hitmon = NULL;
 }
 
 /* return quality of food; the lower the better */

@@ -1568,6 +1568,7 @@ domove()
     /* must come after we finished picking up, in spoteffects() */
     if (cause_delay) {
         nomul(-2);
+	    multi_reason = "dragging an iron ball";
         nomovemsg = "";
     }
 
@@ -2207,7 +2208,19 @@ dopickup()
         }
     }
     if (!OBJ_AT(u.ux, u.uy)) {
-        There("is nothing here to pick up.");
+	    register struct rm *lev = &levl[u.ux][u.uy];
+	    if (IS_THRONE(lev->typ))
+		pline("It must weigh%s a ton!",
+		      lev->looted ? " almost" : "");
+	    else if (IS_SINK(lev->typ))
+		pline_The("plumbing connects it to the floor.");
+	    else if (IS_GRAVE(lev->typ))
+		You("don't need a gravestone.  Yet.");
+	    else if (IS_FOUNTAIN(lev->typ))
+		You("could drink the water...");
+	    else if (IS_DOOR(lev->typ) && (lev->doormask & D_ISOPEN))
+		pline("It won't come off the hinges.");
+	    else There("is nothing here to pick up.");
         return 0;
     }
     if (!can_reach_floor(TRUE)) {
@@ -2422,6 +2435,7 @@ nomul(nval)
     u.uinvulnerable = FALSE;	/* Kludge to avoid ctrl-C bug -dlc */
     u.usleep = 0;
     multi = nval;
+	if (nval == 0) multi_reason = NULL;
     context.travel = context.travel1 = context.mv = context.run = 0;
 }
 
@@ -2436,6 +2450,7 @@ const char *msg_override;
     if (*nomovemsg) pline1(nomovemsg);
     nomovemsg = 0;
     u.usleep = 0;
+	multi_reason = NULL;
     if (afternmv) (*afternmv)();
     afternmv = 0;
 }

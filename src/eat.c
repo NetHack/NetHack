@@ -962,6 +962,7 @@ register int pm;
 		    /* A pile of gold can't ride. */
 		    if (u.usteed) dismount_steed(DISMOUNT_FELL);
 		    nomul(-tmp);
+		    multi_reason = "pretending to be a pile of gold";
 		    Sprintf(buf, Hallucination ?
 			"You suddenly dread being peeled and mimic %s again!" :
 			"You now prefer mimicking %s again.",
@@ -1479,6 +1480,7 @@ struct obj *obj;
 		pline_The("world spins and %s %s.", what, where);
 		incr_itimeout(&HDeaf, duration);
 		nomul(-duration);
+		multi_reason = "unconscious from rotten food";
 		nomovemsg = "You are conscious again.";
 		afternmv = Hear_again;
 		return(1);
@@ -2677,6 +2679,7 @@ boolean incr;
 				if (!Levitation) selftouch("Falling, you");
 				incr_itimeout(&HDeaf, duration);
 				nomul(-duration);
+				multi_reason = "fainted from lack of food";
 				nomovemsg = "You regain consciousness.";
 				afternmv = unfaint;
 				newhs = FAINTED;
@@ -2853,6 +2856,7 @@ vomit()		/* A good idea from David Neves */
 	else
 	    make_sick(0L, (char *)0, TRUE, SICK_VOMITABLE);
 	nomul(-2);
+	multi_reason = "vomiting";
 	nomovemsg = You_can_move_again;
 }
 

@@ -201,6 +201,7 @@ static struct Bool_Opt
 	{"tombstone",&flags.tombstone, TRUE, SET_IN_GAME},
 	{"toptenwin",&iflags.toptenwin, FALSE, SET_IN_GAME},
 	{"travel", &flags.travelcmd, TRUE, SET_IN_GAME},
+	{"use_darkgray", &iflags.wc2_darkgray, TRUE, SET_IN_FILE},
 #ifdef WIN32CON
 	{"use_inverse",   &iflags.wc_inverse, TRUE, SET_IN_GAME},		/*WC*/
 #else
@@ -4398,6 +4399,7 @@ struct wc_Opt wc2_options[] = {
 	{"fullscreen", WC2_FULLSCREEN},
 	{"softkeyboard", WC2_SOFTKEYBOARD},
 	{"wraptext", WC2_WRAPTEXT},
+	{"use_darkgray", WC2_DARKGRAY},
 #ifdef STATUS_VIA_WINDOWPORT
 	{"hilite_status", WC2_HILITE_STATUS},
 #endif

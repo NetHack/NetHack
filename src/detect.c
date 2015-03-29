@@ -890,6 +890,7 @@ struct obj *obj;
     }
     You("peer into %s...", the(xname(obj)));
     nomul(-rnd(10));
+    multi_reason = "gazing into a crystal ball";
     nomovemsg = "";
     if (obj->spe <= 0)
 	pline_The("vision is unclear.");

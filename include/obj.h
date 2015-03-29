@@ -308,6 +308,17 @@ struct obj {
 				|| (otmp)->otyp == WAX_CANDLE\
 				|| (otmp)->otyp == POT_OIL)
 
+/* things that can be read */
+#define is_readable(otmp) ((otmp)->otyp == FORTUNE_COOKIE\
+			   || (otmp)->otyp == T_SHIRT\
+			   || (otmp)->otyp == ALCHEMY_SMOCK\
+			   || (otmp)->otyp == CREDIT_CARD\
+			   || (otmp)->otyp == CAN_OF_GREASE\
+			   || (otmp)->otyp == MAGIC_MARKER\
+			   || (otmp)->oclass == COIN_CLASS\
+			   || (otmp)->oartifact == ART_ORB_OF_FATE\
+			   || (otmp)->otyp == CANDY_BAR)
+
 /* special stones */
 #define is_graystone(obj)	((obj)->otyp == LUCKSTONE || \
 				 (obj)->otyp == LOADSTONE || \

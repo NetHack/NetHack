@@ -28,6 +28,7 @@ E char SAVEP[];
 E NEARDATA int bases[MAXOCLASSES];
 
 E NEARDATA int multi;
+E const char *multi_reason;
 E NEARDATA int nroom;
 E NEARDATA int nsubroom;
 E NEARDATA int occtime;
