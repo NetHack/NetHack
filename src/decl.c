@@ -21,6 +21,7 @@ char *catmore = 0;		/* default pager */
 NEARDATA int bases[MAXOCLASSES] = DUMMY;
 
 NEARDATA int multi = 0;
+const char *multi_reason = NULL;
 NEARDATA int nroom = 0;
 NEARDATA int nsubroom = 0;
 NEARDATA int occtime = 0;

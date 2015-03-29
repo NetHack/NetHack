@@ -375,6 +375,7 @@ ghost_from_bottle()
 	if(flags.verbose)
 	    You("are frightened to death, and unable to move.");
 	nomul(-3);
+	multi_reason = "being frightened to death";
 	nomovemsg = "You regain your composure.";
 }
 
@@ -678,6 +679,7 @@ peffects(otmp)
 			Your("%s are frozen to the %s!",
 			     makeplural(body_part(FOOT)), surface(u.ux, u.uy));
 		    nomul(-(rn1(10, 25 - 12*bcsign(otmp))));
+		    multi_reason = "frozen by a potion";
 		    nomovemsg = You_can_move_again;
 		    exercise(A_DEX, FALSE);
 		}
@@ -1467,6 +1469,7 @@ register struct obj *obj;
 		if (!Free_action) {
 		    pline("%s seems to be holding you.", Something);
 		    nomul(-rnd(5));
+		    multi_reason = "frozen by a potion";
 		    nomovemsg = You_can_move_again;
 		    exercise(A_DEX, FALSE);
 		} else You("stiffen momentarily.");
@@ -1476,6 +1479,7 @@ register struct obj *obj;
 		if (!Free_action && !Sleep_resistance) {
 		    You_feel("rather tired.");
 		    nomul(-rnd(5));
+		    multi_reason = "sleeping off a magical draught";
 		    nomovemsg = You_can_move_again;
 		    exercise(A_DEX, FALSE);
 		} else You("yawn.");

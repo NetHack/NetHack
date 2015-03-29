@@ -2121,6 +2121,7 @@ int held;
 	    /* even if the trap fails, you've used up this turn */
 	    if (multi >= 0) {	/* in case we didn't become paralyzed */
 		nomul(-1);
+		multi_reason = "opening a container";
 		nomovemsg = "";
 	    }
 	    return 1;
@@ -2630,6 +2631,7 @@ struct obj *box;	/* or bag */
 	/* even if the trap fails, you've used up this turn */
 	if (multi >= 0) {	/* in case we didn't become paralyzed */
 	    nomul(-1);
+	    multi_reason = "tipping a container";
 	    nomovemsg = "";
 	}
     } else if (box->otyp == BAG_OF_TRICKS || box->otyp == HORN_OF_PLENTY) {

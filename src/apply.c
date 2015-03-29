@@ -737,8 +737,10 @@ struct obj *obj;
 				pline("Yow!  The %s stares back!", mirror);
 			    else
 				pline("Yikes!  You've frozen yourself!");
-			    if (!Hallucination || !rn2(4))
+			    if (!Hallucination || !rn2(4)) {
 				nomul(-rnd(MAXULEV + 6 - u.ulevel));
+				multi_reason = "gazing into a mirror";
+			    }
 			    nomovemsg = 0;  /* default, "you can move again" */
 			}
 		    } else if (youmonst.data->mlet == S_VAMPIRE)
@@ -916,6 +918,7 @@ struct obj **optr;
 				break;
 			case 2: /* no explanation; it just happens... */
 				nomovemsg = "";
+				multi_reason = NULL;
 				nomul(-rnd(2));
 				break;
 		}
@@ -1509,6 +1512,7 @@ int magic; /* 0=Physical, otherwise skill level */
 	    teleds(cc.x, cc.y, TRUE);
 	    sokoban_guilt();
 	    nomul(-1);
+	    multi_reason = "jumping around";
 	    nomovemsg = "";
 	    morehungry(rnd(25));
 	    return 1;

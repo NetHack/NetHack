@@ -1568,6 +1568,7 @@ domove()
 	/* must come after we finished picking up, in spoteffects() */
 	if (cause_delay) {
 	    nomul(-2);
+	    multi_reason = "dragging an iron ball";
 	    nomovemsg = "";
 	}
 
@@ -2434,6 +2435,7 @@ nomul(nval)
 	u.uinvulnerable = FALSE;	/* Kludge to avoid ctrl-C bug -dlc */
 	u.usleep = 0;
 	multi = nval;
+	if (nval == 0) multi_reason = NULL;
 	context.travel = context.travel1 = context.mv = context.run = 0;
 }
 
@@ -2448,6 +2450,7 @@ const char *msg_override;
 	if (*nomovemsg) pline1(nomovemsg);
 	nomovemsg = 0;
 	u.usleep = 0;
+	multi_reason = NULL;
 	if (afternmv) (*afternmv)();
 	afternmv = 0;
 }

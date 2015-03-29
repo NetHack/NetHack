@@ -1269,6 +1269,7 @@ dosacrifice()
 			dmon->mpeaceful = TRUE;
 		    You("are terrified, and unable to move.");
 		    nomul(-3);
+		    multi_reason = "being terrified of a demon";
 		    nomovemsg = 0;
 		} else pline_The("%s.", demonless_msg);
 	    }
@@ -1655,6 +1656,7 @@ dopray()
 	}
     }
     nomul(-3);
+    multi_reason = "praying";
     nomovemsg = "You finish your prayer.";
     afternmv = prayer_done;
 
@@ -1817,6 +1819,7 @@ doturn()
 	    }
 	}
 	nomul(-5);
+	multi_reason = "trying to turn the monsters";
 	nomovemsg = You_can_move_again;
 	return(1);
 }

@@ -1407,6 +1407,7 @@ register struct obj *otmp;
 	if(cursed(otmp)) return(0);
 	if(delay) {
 		nomul(delay);
+		multi_reason = "disrobing";
 		if (is_helmet(otmp)) {
 			/* ick... */
 			nomovemsg = !strcmp(helm_simple_name(otmp), "hat") ?
@@ -1664,6 +1665,7 @@ dowear()
 	delay = -objects[otmp->otyp].oc_delay;
 	if(delay){
 		nomul(delay);
+		multi_reason = "dressing up";
 		if(is_boots(otmp)) afternmv = Boots_on;
 		if(is_helmet(otmp)) afternmv = Helmet_on;
 		if(is_gloves(otmp)) afternmv = Gloves_on;

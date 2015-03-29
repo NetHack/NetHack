@@ -1053,6 +1053,7 @@ dopois:
 			else You("are frozen by %s!", mon_nam(mtmp));
 			nomovemsg = You_can_move_again;
 			nomul(-rnd(10));
+			multi_reason = "paralyzed by a monster";
 			exercise(A_DEX, FALSE);
 		    }
 		}
