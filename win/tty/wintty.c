@@ -1,4 +1,4 @@
-/* NetHack 3.5	wintty.c	$NHDT-Date: 1427505884 2015/03/28 01:24:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.73 $ */
+/* NetHack 3.5	wintty.c	$NHDT-Date: 1427667623 2015/03/29 22:20:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.75 $ */
 /* NetHack 3.5	wintty.c	$Date: 2012/01/22 06:27:09 $  $Revision: 1.66 $ */
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1657,7 +1657,7 @@ struct WinDesc *cw;
 		    boolean on_curr_page = FALSE;
 		    int lineno = 0;
 		    tty_getlin("Search for:", tmpbuf);
-		    if (!tmpbuf || tmpbuf[0] == '\033') break;
+		    if (!tmpbuf[0] || tmpbuf[0] == '\033') break;
 		    Sprintf(searchbuf, "*%s*", tmpbuf);
 		    for (curr = cw->mlist; curr; curr = curr->next) {
 			if (on_curr_page) lineno++;
