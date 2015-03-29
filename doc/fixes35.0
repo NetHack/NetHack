@@ -1108,6 +1108,7 @@ allow reading many more items
 when you're hiding under something a zap downward should not hit that
 	something, while a zap upward should
 show more explicit reason why player was helpless at death
+added new hallucinatory-only gods
 
 
 Platform- and/or Interface-Specific New Features
