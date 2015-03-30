@@ -1,4 +1,4 @@
-# NetHack 3.5	Makefile.msc	$NHDT-Date: 1426967393 2015/03/21 19:49:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.72 $ */
+# NetHack 3.5	Makefile.msc	$NHDT-Date: 1427675315 2015/03/30 00:28:35 $  $NHDT-Branch: master $:$NHDT-Revision: 1.73 $ */
 #       Copyright (c) NetHack PC Development Team 1993-2015
 #
 #==============================================================================
@@ -134,71 +134,10 @@ link=link
 rc=Rc
 
 #
-#=============================================
-# Visual Studio versions >= 2013 specific stuff
-#=============================================
-
-!IF "$(TARGET_CPU)" == ""
-TARGET_CPU=x86
-!ENDIF
-
-# Common compiler flags:
-#   -c   - compile without linking
-#   -W3  - Set warning level to level 3    (-W4 for 64-bit compilations)
-#   -Zi  - generate debugging information
-#   -Od  - disable all optimizations
-#   -Ox  - use maximum optimizations
-#   -Zd  - generate only public symbols and line numbers for debugging
-#   -GS  - enable security checks
-#
-ccommon=-c $(CDBFLAG) -DCRTAPI1=_cdecl -DCRTAPI2=_cdecl -nologo -GS -c
-lflags=/INCREMENTAL:NO /NOLOGO
-
-!IF "$(TARGET_CPU)" == "x86"
-cflags = $(ccommon) -D_X86_=1  -DWIN32 -D_WIN32 -W3
-scall  = -Gz
-
-!ELSEIF "$(TARGET_CPU)" == "x64"
-cflags = $(ccommon) -D_AMD64_=1 -DWIN64 -D_WIN64  -DWIN32 -D_WIN32
-cflags = $(cflags) -W4
-scall  =
-!ENDIF
-
-# declarations for use on Intel x86 systems
-!IF "$(TARGET_CPU)" == "x86"
-DLLENTRY = @12
-!ENDIF
-
-# declarations for use on AMD64 systems
-!IF "$(TARGET_CPU)" == "x64"
-DLLENTRY =
-!ENDIF
-
-# for Windows applications
-conlflags = $(lflags) -subsystem:console,$(EXEVER)
-guilflags = $(lflags) -subsystem:windows,$(EXEVER)
-dlllflags = $(lflags) -entry:_DllMainCRTStartup$(DLLENTRY) -dll
-
-# basic subsystem specific libraries, less the C Run-Time
-baselibs    = kernel32.lib $(optlibs) $(winsocklibs) advapi32.lib
-winlibs     = $(baselibs) user32.lib gdi32.lib comdlg32.lib winspool.lib
-
-# for Windows applications that use the C Run-Time libraries
-conlibs     = $(baselibs)
-guilibs     = $(winlibs)
-#
-# End of VS2013 and greater stuff
-#=============================================
-
-#
 #==========================================
 # Exe File Info.
 #==========================================
  
-#
-# For the level compiler bits,
-# we just defer to win\win32\dgnstuff.mak
-# and win\win32\levstuff.mak
 #        
 #
 # Optional high-quality BSD random number generation routines
@@ -271,44 +210,90 @@ DLBFLG =
 #==========================================
 #==========================================
 
-INCLDIR= /I..\include
+!IF "$(TARGET_CPU)" == ""
+TARGET_CPU=x86
+!ENDIF
+
+!IF "$(_NMAKE_VER)" == "10.00.40219.01"
+CL2013=
+!ELSE
+! IF ($(VSVER) > 2010)
+CL2013=-sdl
+! ENDIF
+!ENDIF
+
+ccommon= -c -nologo -D"_CONSOLE" -D"_CRT_NONSTDC_NO_DEPRECATE" -D"_CRT_SECURE_NO_DEPRECATE" \
+	-D"_LIB" -D"_SCL_SECURE_NO_DEPRECATE" -D"_VC80_UPGRADE=0x0600" -D"DLB" -D"_MBCS" \
+	-DCRTAPI1=_cdecl -DCRTAPI2=_cdecl -D"NDEBUG" -D"YY_NO_UNISTD_H" -EHsc -fp:precise -Gd -GF -GS -Gy \
+	$(CL2013) -WX- -Zc:forScope -Zc:wchar_t -Zi
+cdebug= -analyze- -D"_DEBUG" -Gm -MTd -RTC1 -Od
+crelease= -analyze- -D"_MBCS" -errorReport:prompt -GL -Gm- -MT -O2 -Ot -Ox -Oy
+
+lcommon= /NOLOGO /INCREMENTAL:NO
 
 !IF "$(DEBUGINFO)" == "Y"
-CDBGFLAG=-Zi
-LDBGFLAG=/debug
-cdebug = -Zi -Od
 ldebug = /DEBUG
+cflags1=$(ccommon) $(cdebug)
+lflags1=$(lcommon) $(ldebug)
 !ELSE
-CDBGFLAG=
-LDBGFLAG=
-ldebug =
-cdebug =
+ldebug=
+cflags1=$(ccomon) $(crelease)
+lflags1=$(lcommon) $(ldebug)
 !ENDIF
 
-!IF ("$(ldebug)" != "")
-!IF ("$(ldebug)" != "/RELEASE")
-ldebug = /DEBUG
-!ENDIF
+lflags= $(lflags1)
+
+!IF "$(TARGET_CPU)" == "x86"
+cflags = $(cflags1) -D_X86_=1  -DWIN32 -D_WIN32 -W3
+scall  = -Gz
+
+!ELSEIF "$(TARGET_CPU)" == "x64"
+cflags = $(cflags1) -D_AMD64_=1 -DWIN64 -D_WIN64  -DWIN32 -D_WIN32 -W4
+scall  =
 !ENDIF
 
-!IF ("$(cdebug)" != "")
-!IF ("$(cdebug)" != "-Ox -DNDEBUG")
-cdebug = -Zi -Od
-!ENDIF
+!IF "$(_NMAKE_VER)" == "10.00.40219.01"
+cflags = $(cflags:-W4=-W3)
 !ENDIF
 
-cflags2 = $(cflags:-W4=-W3)
-#More verbose below
-#cflags2 = $(cflags) -wd4131
-#cflags2 = $(cflags:-W4=-Wall)
+#More verbose warning output options below
+#cflags = $(cflags:-W4=-wd4131
+#cflags = $(cflags:-W4=-Wall)
+#cflags = $(cflags:-W3=-wd4131
+#cflags = $(cflags:-W3=-Wall)
+
+# declarations for use on Intel x86 systems
+!IF "$(TARGET_CPU)" == "x86"
+DLLENTRY = @12
+!ENDIF
+
+# declarations for use on AMD64 systems
+!IF "$(TARGET_CPU)" == "x64"
+DLLENTRY =
+!ENDIF
+
+# for Windows applications
+conlflags = $(lflags) -subsystem:console,$(EXEVER)
+guilflags = $(lflags) -subsystem:windows,$(EXEVER)
+dlllflags = $(lflags) -entry:_DllMainCRTStartup$(DLLENTRY) -dll
+
+# basic subsystem specific libraries, less the C Run-Time
+baselibs    = kernel32.lib $(optlibs) $(winsocklibs) advapi32.lib
+winlibs     = $(baselibs) user32.lib gdi32.lib comdlg32.lib winspool.lib
+
+# for Windows applications that use the C Run-Time libraries
+conlibs     = $(baselibs)
+guilibs     = $(winlibs)
+#
+
+INCLDIR= /I..\include
 
 #==========================================
 # Util builds
 #==========================================
 
-cflagsUtil = $(cdebug) $(cflags2) $(INCLDIR) \
-	     $(WINPFLAG) $(DLBFLG)
-lflagsUtil = $(ldebug) $(lflags) $(conlibs)
+cflagsUtil = $(cflags) $(INCLDIR) $(WINPFLAG) $(DLBFLG)
+lflagsUtil = $(lflags) $(conlibs)
 
 #==========================================
 # - Game build
@@ -320,15 +305,13 @@ LIBS= user32.lib winmm.lib $(ZLIB)
 
 !IF ("$(GRAPHICAL)"=="Y")
 
-cflagsGame = $(cdebug) $(cflags2) $(guiflags) $(INCLDIR) \
-	     $(WINPFLAG) $(DLBFLG)
-lflagsGame = $(ldebug) $(lflags) $(guilibs) $(GAMEPDBFILE) $(GAMEMAPFILE)
+cflagsGame = $(cflags) $(guiflags) $(INCLDIR) $(WINPFLAG) $(DLBFLG)
+lflagsGame = $(lflags) $(guilibs) $(GAMEPDBFILE) $(GAMEMAPFILE)
 
 !ELSE
 
-cflagsGame = $(cdebug) $(cflags2) $(conflags) $(INCLDIR) \
-	     $(WINPFLAG) $(DLBFLG)
-lflagsGame = $(ldebug) $(lflags) $(conlibs) $(GAMEPDBFILE) $(GAMEMAPFILE)
+cflagsGame = $(cflags) $(conflags) $(INCLDIR) $(WINPFLAG) $(DLBFLG)
+lflagsGame = $(lflags) $(conlibs) $(GAMEPDBFILE) $(GAMEMAPFILE)
 
 !ENDIF
 
@@ -429,21 +412,15 @@ U  = $(UTIL)^\
 # Utility Objects.
 #
 
-MAKESRC        = $(U)makedefs.c
+MAKESRC       = $(U)makedefs.c
 
-MAKEOBJS       = $(O)makedefs.o $(O)monst.o $(O)objects.o
+MAKEOBJS      = $(O)makedefs.o $(O)monst.o $(O)objects.o
 
-#SPLEVOBJS      = $(O)lev_yacc.o	$(O)lev_lex.o	$(O)lev_main.o \
-#		 $(O)alloc.o	$(O)decl.o	$(O)drawing.o  \
-#		 $(O)monst.o	$(O)objects.o	$(O)panic.o
+LEVCOMPOBJS   = $(O)lev_yacc.o	$(O)lev_lex.o	$(O)lev_main.o	\
+		$(O)alloc.o $(O)decl.o	$(O)drawing.o	$(O)monst.o	$(O)objects.o	$(O)panic.o
 
-SPLEVOBJS      = $(O)lev_yacc.o	$(O)lev_lex.o	$(O)lev_main.o \
-		 $(O)alloc.o	$(O)decl.o	$(O)drawing.o \
-		 $(O)monst.o	$(O)objects.o	$(O)panic.o
-
-DGNCOMPOBJS    = $(O)dgn_yacc.o	$(O)dgn_lex.o	$(O)dgn_main.o \
-		 $(O)alloc.o	$(O)panic.o
-
+DGNCOMPOBJS   = $(O)dgn_yacc.o	$(O)dgn_lex.o	$(O)dgn_main.o	\
+		$(O)alloc.o	$(O)panic.o
 
 RECOVOBJS      = $(O)recover.o
 
@@ -703,7 +680,7 @@ $(NHRES): $(MSWSYS)\console.rc $(MSWSYS)\NetHack.ico
 
 $(GAMEFILE) : $(ALLOBJ) $(NHRES) $(O)gamedir.tag $(WINDLLS)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
-	@echo Linking....
+	@echo Linking $@
 	$(link) $(lflagsGame) /STACK:2048 $(LIBS) $(COMCTRL) -out:$@ @<<$(GAME).lnk
 		$(ALLOBJ:^	=^
 		) $(NHRES)
@@ -781,12 +758,14 @@ $(GAMEDIR)\nhraykey.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
 # Makedefs Stuff
 #==========================================
 $(U)nhsizes.exe: $(O)nhsizes.o
+	@echo Linking $@
 	$(link) $(lflagsUtil) -out:$@ $(O)nhsizes.o $(O)panic.o $(O)alloc.o
 
 $(O)nhsizes.o: $(CONFIG_H) nhsizes.c
 	@$(CC) $(cflagsUtil) -Fo$@ nhsizes.c
 
 $(U)makedefs.exe:	$(MAKEOBJS)
+	@echo Linking $@
 	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(MAKEOBJS)
 
 $(O)makedefs.o: $(CONFIG_H)	$(INCL)\monattk.h $(INCL)\monflag.h   $(INCL)\objclass.h \
@@ -794,7 +773,7 @@ $(O)makedefs.o: $(CONFIG_H)	$(INCL)\monattk.h $(INCL)\monflag.h   $(INCL)\objcla
 		 $(U)makedefs.c
 	@if not exist $(OBJ)\*.* echo creating directory $(OBJ)
 	@if not exist $(OBJ)\*.* mkdir $(OBJ)
-	$(CC) $(cflagsUtil) -Fo$@ $(U)makedefs.c
+	@$(CC) $(cflagsUtil) -Fo$@ $(U)makedefs.c
 
 #
 #  date.h should be remade every time any of the source or include
@@ -835,6 +814,7 @@ $(DAT)\bogusmon: $(DAT)\bogusmon.txt $(U)makedefs.exe
 #==========================================
 
 $(U)uudecode.exe: $(O)uudecode.o
+	@echo Linking $@
 	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)uudecode.o
 
 $(O)uudecode.o: $(SSYS)\uudecode.c
@@ -890,24 +870,20 @@ $(WIN32)\splash.bmp: $(U)uudecode.exe $(WIN32)\splash.uu
 $(U)lev_yacc.c $(INCL)\lev_comp.h: $(U)lev_comp.y
 	nmake -nologo -f ..\win\win32\levstuff.mak default
 
-LEVCFLAGS=-c -nologo -DWIN32 -D_WIN32 -I$(INCL) -nologo -Z7 -Od -DDLB
-
 $(O)lev_yacc.o: $(HACK_H)   $(SP_LEV_H) $(INCL)\lev_comp.h $(U)lev_yacc.c
-	$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)lev_yacc.c
+	@$(CC) $(cflagsUtil) -Fo$@ $(U)lev_yacc.c
 
-$(O)lev_lex.o: $(HACK_H)   $(INCL)\lev_comp.h $(SP_LEV_H) \
+$(O)lev_lex.o: $(HACK_H) $(INCL)\lev_comp.h $(SP_LEV_H) \
                $(U)lev_lex.c
-	$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)lev_lex.c
+	@$(CC) $(cflagsUtil) -Fo$@ $(U)lev_lex.c
 
-$(O)lev_main.o:	$(U)lev_main.c $(HACK_H)   $(SP_LEV_H)
-	$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)lev_main.c
+$(O)lev_main.o:	$(U)lev_main.c $(HACK_H) $(SP_LEV_H)
+	@$(CC) $(cflagsUtil) -Fo$@ $(U)lev_main.c
 
-$(U)levcomp.exe: $(SPLEVOBJS)
-	@echo Linking $@...
-	echo $(link)
-	echo $(lflagsUtil)
-	$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
- 		$(SPLEVOBJS:^	=^
+$(U)levcomp.exe: $(LEVCOMPOBJS)
+	@echo Linking $@
+	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
+ 		$(LEVCOMPOBJS:^	=^
 		)
 <<
 
@@ -921,17 +897,17 @@ $(U)dgn_yacc.c $(INCL)\dgn_comp.h : $(U)dgn_comp.y
 	nmake -nologo -f ..\win\win32\dgnstuff.mak default
 
 $(O)dgn_yacc.o:	$(HACK_H)   $(DGN_FILE_H) $(INCL)\dgn_comp.h $(U)dgn_yacc.c
-	@$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)dgn_yacc.c
+	@$(CC) $(cflagsUtil) -Fo$@ $(U)dgn_yacc.c
 
 $(O)dgn_lex.o: $(HACK_H)   $(DGN_FILE_H)  $(INCL)\dgn_comp.h \
 	$(U)dgn_lex.c
-	@$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)dgn_lex.c
+	@$(CC) $(cflagsUtil) -Fo$@ $(U)dgn_lex.c
 
 $(O)dgn_main.o:	$(HACK_H) $(U)dgn_main.c
-	@$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)dgn_main.c
+	@$(CC) $(cflagsUtil) -Fo$@ $(U)dgn_main.c
 
 $(U)dgncomp.exe: $(DGNCOMPOBJS)
-    @echo Linking $@...
+    	@echo Linking $@
 	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(DGNCOMPOBJS:^	=^
 		)
@@ -989,6 +965,7 @@ $(INCL)\win32api.h: $(MSWSYS)\win32api.h
 #==========================================
 
 $(U)dlb_main.exe: $(DLBOBJ) $(O)dlb.o
+	@echo Linking $@
 	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(O)dlb_main.o
 		$(O)dlb.o
@@ -1038,10 +1015,11 @@ nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 #==========================================
 
 $(U)recover.exe: $(RECOVOBJS)
+	@echo Linking $@
 	$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(RECOVOBJS)
 
 $(O)recover.o: $(CONFIG_H) $(U)recover.c $(INCL)\win32api.h
-	$(CC) $(cflagsUtil) -Fo$@ $(U)recover.c
+	@$(CC) $(cflagsUtil) -Fo$@ $(U)recover.c
 
 #==========================================
 #  Tile Mapping
@@ -1052,6 +1030,7 @@ $(SRC)\tile.c: $(U)tilemap.exe
 	@$(U)tilemap
 
 $(U)tilemap.exe: $(O)tilemap.o
+	@echo Linking $@
 	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)tilemap.o
 
 $(O)tilemap.o: $(WSHR)\tilemap.c $(HACK_H)
@@ -1083,7 +1062,7 @@ $(O)tilete32.o: $(WSHR)\tiletext.c  $(CONFIG_H) $(TILE_H)
 #==========================================
 
 $(U)gif2txt.exe: $(GIFREADERS) $(TEXT_IO)
-    @echo Linking $@...
+    	@echo Linking $@
 	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(GIFREADERS:^	=^
 		)
@@ -1092,7 +1071,7 @@ $(U)gif2txt.exe: $(GIFREADERS) $(TEXT_IO)
 <<
 
 $(U)gif2tx32.exe: $(GIFREADERS32) $(TEXT_IO32)
-    @echo Linking $@...
+    	@echo Linking $@
 	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(GIFREADERS32:^	=^
 		)
@@ -1101,7 +1080,7 @@ $(U)gif2tx32.exe: $(GIFREADERS32) $(TEXT_IO32)
 <<
 
 $(U)txt2ppm.exe: $(PPMWRITERS) $(TEXT_IO)
-    @echo Linking $@...
+    	@echo Linking $@
 	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(PPMWRITERS:^	=^
 		)
@@ -1123,7 +1102,7 @@ $(TILEBMP32):
 !ENDIF
 
 $(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXT_IO)
-    @echo Linking $@...
+    	@echo Linking $@
 	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(O)tile2bmp.o
 		$(TEXT_IO:^  =^
@@ -1131,7 +1110,7 @@ $(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXT_IO)
 <<
 
 $(U)til2bm32.exe: $(O)til2bm32.o $(TEXT_IO32)
-    @echo Linking $@...
+    	@echo Linking $@
 	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(O)til2bm32.o
 		$(TEXT_IO32:^  =^
