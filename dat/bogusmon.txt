@@ -245,6 +245,9 @@ flying pig
 hippocampus
 hippogriff
 kelpie
+catoblepas
+phoenix
+amphisbaena
 
 # Unusually animate body parts
 bouncing eye
