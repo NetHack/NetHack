@@ -397,6 +397,8 @@ encodeachieve()
     if(u.uachieve.mines_luckstone) r |= 1L << 9;
     if(u.uachieve.finish_sokoban)  r |= 1L << 10;
     if(u.uachieve.killed_medusa)   r |= 1L << 11;
+    if(u.uroleplay.blind)          r |= 1L << 12;
+    if(u.uroleplay.nudist)         r |= 1L << 13;
 
     return r;
 }

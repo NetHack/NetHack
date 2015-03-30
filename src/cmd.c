@@ -2246,6 +2246,9 @@ int final;
 	en_win = create_nhwindow(NHW_MENU);
 	putstr(en_win, 0, "Voluntary challenges:");
 
+	if (u.uroleplay.blind) you_have_been("blind from birth");
+	if (u.uroleplay.nudist) you_have_been("faithfully nudist");
+
 	if (!u.uconduct.food)
 	    enl_msg(You_, "have gone", "went", " without food", "");
 	    /* But beverages are okay */

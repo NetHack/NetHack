@@ -287,7 +287,7 @@ doread()
 		&& scroll->oclass != SPBOOK_CLASS) {
 	    pline(silly_thing_to, "read");
 	    return(0);
-	} else if (Blind) {
+	} else if (Blind && (scroll->otyp != SPE_BOOK_OF_THE_DEAD)) {
 	    const char *what = 0;
 	    if (scroll->oclass == SPBOOK_CLASS)
 		what = "mystic runes";

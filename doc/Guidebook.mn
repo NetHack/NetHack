@@ -1921,6 +1921,8 @@ quality of the weapon; you are free to manually fill your quiver or quiver sack
 or make ready
 with the `Q' command instead.  If no weapon is found or the option is
 false, the `t' (throw) command is executed instead.  (default false)
+.lp blind
+Start the character permanently blind. (default false)
 .lp bones
 Allow saving and loading bones files.  (default true)
 .lp boulder
@@ -2143,6 +2145,8 @@ Cannot be set with the `O' command.
 Read the NetHack news file, if present (default on).
 Since the news is shown at the beginning of the game, there's no point
 in setting this with the `O' command.
+.lp nudist
+Start the character with no armor (default false).
 .lp "null    "
 Send padding nulls to the terminal (default on).
 .lp number_pad

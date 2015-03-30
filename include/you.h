@@ -92,6 +92,11 @@ struct u_conduct {		/* number of times... */
 				/* genocides already listed at end of game */
 };
 
+struct u_roleplay {
+    boolean  blind;   /* permanently blind */
+    boolean  nudist;  /* has not worn any armor, ever */
+};
+
 /*** Unified structure containing role information ***/
 struct Role {
 	/*** Strings that name various things ***/
@@ -330,6 +335,7 @@ struct you {
 	struct u_event	uevent;		/* certain events have happened */
 	struct u_have	uhave;		/* you're carrying special objects */
 	struct u_conduct uconduct;	/* KMH, conduct */
+	struct u_roleplay uroleplay;
 	struct attribs	acurr,		/* your current attributes (eg. str)*/
 			aexe,		/* for gain/loss via "exercise" */
 			abon,		/* your bonus attributes (eg. str) */
