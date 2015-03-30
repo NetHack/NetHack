@@ -1,4 +1,4 @@
-/* NetHack 3.5	termcap.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	termcap.c	$NHDT-Date: 1427756993 2015/03/30 23:09:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
 /* NetHack 3.5	termcap.c	$Date: 2009/05/06 10:59:19 $  $Revision: 1.13 $ */
 /*	SCCS Id: @(#)termcap.c	3.5	2007/12/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
@@ -844,6 +844,7 @@ const struct {int ti_color, nh_color, nh_bright_color;} ti_map[6] =
 	{COLOR_CYAN,CLR_CYAN,CLR_BRIGHT_CYAN}
 };
 
+static char nilstring[] = "";
 
 static void
 init_hilite()
@@ -868,8 +869,8 @@ init_hilite()
 		hilites[CLR_BLUE] = nh_HI;
 		hilites[CLR_MAGENTA] = nh_HI;
 		hilites[CLR_CYAN] = nh_HI;
-		hilites[CLR_GRAY] = "";
-		hilites[NO_COLOR] = "";
+		hilites[CLR_GRAY] = nilstring;
+		hilites[NO_COLOR] = nilstring;
 		hilites[CLR_ORANGE] = nh_HI;
 		hilites[CLR_BRIGHT_GREEN] = nh_HI;
 		hilites[CLR_YELLOW] = nh_HI;
@@ -899,8 +900,8 @@ init_hilite()
 	Strcpy(hilites[CLR_WHITE],MD);
 	Strcat(hilites[CLR_WHITE],scratch);
 
-	hilites[CLR_GRAY] = "";
-	hilites[NO_COLOR] = "";
+	hilites[CLR_GRAY] = nilstring;
+	hilites[NO_COLOR] = nilstring;
 
 	if (iflags.wc2_darkgray) {
 	    /* On many terminals, esp. those using classic PC CGA/EGA/VGA
@@ -937,8 +938,8 @@ kill_hilite()
 	/* CLR_RED overlaps CLR_ORANGE, do not free */
 	/* CLR_MAGENTA overlaps CLR_BRIGHT_MAGENTA, do not free */
 	/* CLR_BROWN overlaps CLR_YELLOW, do not free */
-	/* CLR_GRAY is a constant "", do not free */
-	/* NO_COLOR is a constant "", do not free */
+	/* CLR_GRAY is static 'nilstring', do not free */
+	/* NO_COLOR is static 'nilstring', do not free */
 	free(hilites[CLR_BRIGHT_BLUE]);
 	free(hilites[CLR_BRIGHT_GREEN]);
 	free(hilites[CLR_BRIGHT_CYAN]);
