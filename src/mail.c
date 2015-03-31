@@ -437,6 +437,11 @@ struct obj *otmp;
     "Only Amiga makes it possible.",
     "CATS have all the answers.",
 #endif
+    "This mail complies with the Yendorian Anti-Spam Act (YASA)",
+    "Please find enclosed a small token to represent your Owlbear",
+    "**FR33 P0T10N 0F FULL H34L1NG**",
+    "Please return to sender (Asmodeus)",
+    "Buy a potion of gain level for only $19.99! Guaranteed to be blessed!",
     "Invitation: Visit the NetHack web site at http://www.nethack.org!"
     };
 
