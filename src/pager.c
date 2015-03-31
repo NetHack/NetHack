@@ -679,7 +679,7 @@ do_look(mode, click_cc)
     char    out_str[BUFSZ];
     const char *firstmatch = 0;
     struct permonst *pm = 0;
-    int     i, ans = 0;
+    int     i = '\0', ans = 0;
     int     sym;		/* typed symbol or converted glyph */
     int	    found;		/* count of matching syms found */
     coord   cc;			/* screen pos of unknown glyph */
@@ -689,25 +689,68 @@ do_look(mode, click_cc)
     if (!clicklook) {
 	if (quick) {
 		from_screen = TRUE;	/* yes, we want to use the cursor */
-        } else {
-		i = ynq("Specify unknown object by cursor?");
-		if (i == 'q') return 0;
-		from_screen = (i == 'y');
+		i = 'y';
+        }
+
+	if (i != 'y') {
+	    menu_item *pick_list = (menu_item *)0;
+	    winid win;
+	    anything any;
+	    win = create_nhwindow(NHW_MENU);
+	    start_menu(win);
+	    any.a_void = 0; any.a_char ='a';
+	    /* 'y' and 'n' to keep backwards compat with previous versions */
+	    add_menu(win, NO_GLYPH, &any, 'a', 'y', ATR_NONE, "something on the map", MENU_UNSELECTED);
+	    any.a_void = 0; any.a_char ='b';
+	    add_menu(win, NO_GLYPH, &any, 'b', 0, ATR_NONE, "something you're carrying", MENU_UNSELECTED);
+	    any.a_void = 0; any.a_char ='c';
+	    add_menu(win, NO_GLYPH, &any, 'c', 'n', ATR_NONE, "something else", MENU_UNSELECTED);
+	    end_menu(win, "What do you want to look at:");
+	    if (select_menu(win, PICK_ONE, &pick_list) > 0) {
+		i = pick_list->item.a_char;
+		free((genericptr_t)pick_list);
+	    }
+	    destroy_nhwindow(win);
 	}
 
-	if (from_screen) {
-		cc.x = u.ux;
-		cc.y = u.uy;
-		sym = 0;		/* gcc -Wall lint */
-	} else {
-		getlin("Specify what? (type the word)", out_str);
-		if (out_str[0] == '\0' || out_str[0] == '\033')
-		    return 0;
-		if (out_str[1]) {	/* user typed in a complete string */
-		    checkfile(out_str, pm, TRUE, TRUE);
-		    return 0;
-		}
-		sym = out_str[0];
+	switch (i) {
+	default:
+	case 'q': return 0;
+	case 'y':
+	case 'a':
+	    from_screen = TRUE;
+	    sym = 0;
+	    cc.x = u.ux;
+	    cc.y = u.uy;
+	    break;
+	case 'b':
+	    {
+		char invlet;
+		struct obj *invobj;
+		invlet = display_inventory(NULL, TRUE);
+		if (!invlet) return 0;
+		for (invobj = invent; invobj; invobj = invobj->nobj)
+		    if (invobj->invlet == invlet) {
+			strcpy(out_str, singular(invobj, xname));
+			break;
+		    }
+		if (!out_str[1]) return 0;
+		checkfile(out_str, pm, TRUE, TRUE);
+		return 0;
+	    }
+	    break;
+	case 'c':
+	    from_screen = FALSE;
+	    getlin("Specify what? (type the word)", out_str);
+	    if (out_str[0] == '\0' || out_str[0] == '\033')
+		return 0;
+
+	    if (out_str[1]) {	/* user typed in a complete string */
+		checkfile(out_str, pm, TRUE, TRUE);
+		return 0;
+	    }
+	    sym = out_str[0];
+	    break;
 	}
     } else {	/* clicklook */
 	cc.x = click_cc->x;
