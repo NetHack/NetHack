@@ -1,5 +1,5 @@
-*.[ch] filter=NHtext merge=NHsubst
-*.sh filter=NHtext merge=NHsubst
+*.[ch] NHSUBST
+*.sh NHSUBST
 * text=auto
 *.hqx -text
 *.sln -text

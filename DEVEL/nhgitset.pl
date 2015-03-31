@@ -3,7 +3,7 @@
 
 # value of nethack.setupversion we will end up with when this is done
 # version 1 is reserved for repos checked out before versioning was added
-my $version_new = 2;
+my $version_new = 3;
 my $version_old = 0;	# current version, if any (0 is no entry ergo new repo)
 
 use Cwd;
@@ -100,16 +100,29 @@ print STDERR "Installing aliases\n" if($opt_v);
 $addpath = catfile(curdir(),'.git','hooks','NHadd');
 &add_alias('nhadd', "!$addpath add");
 &add_alias('nhcommit', "!$addpath commit");
+my $nhsub = catfile(curdir(),'.git','hooks','nhsub');
+&add_alias('nhsub', "!$nhsub");
 
 print STDERR "Installing filter/merge\n" if($opt_v);
 
-if($^O eq "MSWin32"){
-	$cmd = '.git\\\\hooks\\\\NHtext';
-} else {
-	$cmd = catfile(curdir(),'.git','hooks','NHtext');
+# XXXX need it in NHadd to find nhsub???
+# removed at version 3
+#if($^O eq "MSWin32"){
+#	$cmd = '.git\\\\hooks\\\\NHtext';
+#} else {
+#	$cmd = catfile(curdir(),'.git','hooks','NHtext');
+#}
+#&add_config('filter.NHtext.clean', "$cmd --clean %f");
+#&add_config('filter.NHtext.smudge', "$cmd --smudge %f");
+if($version_old == 1 or $version_old == 2){
+	print STDERR "Removing filter.NHtext\n" if($opt_v);
+	system('git','config','--unset','filter.NHtext.clean') unless($opt_n);
+	system('git','config','--unset','filter.NHtext.smudge') unless($opt_n);
+	system('git','config','--remove-section','filter.NHtext') unless($opt_n);
+
+	print STDERR "Removing NHtext\n" if($opt_v);
+	unlink catfile(curdir(),'.git','hooks','NHtext') unless($opt_n);
 }
-&add_config('filter.NHtext.clean', "$cmd --clean %f");
-&add_config('filter.NHtext.smudge', "$cmd --smudge %f");
 
 $cmd = catfile(curdir(),'.git','hooks','NHsubst');
 &add_config('merge.NHsubst.name', 'NetHack Keyword Substitution');
