@@ -946,6 +946,7 @@ unsigned trflags;
 		} else {
 		    pline("%s bear trap closes on your %s!",
 			    A_Your[trap->madeby_u], body_part(FOOT));
+		    set_wounded_legs(rn2(2) ? RIGHT_SIDE : LEFT_SIDE, rn1(10,10));
 		    if(u.umonnum == PM_OWLBEAR || u.umonnum == PM_BUGBEAR)
 			You("howl in anger!");
 		    losehp(Maybe_Half_Phys(dmg), "bear trap", KILLED_BY_AN);
