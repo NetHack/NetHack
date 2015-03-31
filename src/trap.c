@@ -4266,7 +4266,7 @@ boolean trapdoor_only;
 boolean *noticed;	/* set to true iff hero notices the effect; */
 {			/* otherwise left with its previous value intact */
     struct trap *t;
-    boolean ishero = (mon == &youmonst);
+    boolean ishero = (mon == &youmonst), result;
 
     if (mon == u.usteed) ishero = TRUE;
     t = t_at(ishero ? u.ux : mon->mx, ishero ? u.uy : mon->my);
@@ -4281,6 +4281,7 @@ boolean *noticed;	/* set to true iff hero notices the effect; */
 	if (u.utrap) return FALSE;	/* already trapped */
 	*noticed = TRUE;
 	dotrap(t, FORCETRAP);
+	result = (u.utrap != 0);
     } else {
 	if (mon->mtrapped) return FALSE;	/* already trapped */
 	/* you notice it if you see the trap close/tremble/whatever
@@ -4289,6 +4290,7 @@ boolean *noticed;	/* set to true iff hero notices the effect; */
 	/* monster will be angered; mintrap doesn't handle that */
 	wakeup(mon);
 	++force_mintrap;
+	result = (mintrap(mon) != 0);
 	--force_mintrap;
 	/* mon might now be on the migrating monsters list */
     }
