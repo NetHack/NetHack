@@ -997,11 +997,8 @@ wiz_levltyp_legend(VOID_ARGS)
 STATIC_PTR int
 wiz_smell(VOID_ARGS)
 {
-	char	out_str[BUFSZ];
-	struct permonst *pm = 0;
 	int     ans = 0;
 	int     mndx;		/* monster index */
-	int	found;		/* count of matching mndxs found */
 	coord   cc;		/* screen pos of unknown glyph */
 	int glyph;		/* glyph at selected position */
 
@@ -1015,11 +1012,6 @@ wiz_smell(VOID_ARGS)
 
 	pline("You can move the cursor to a monster that you want to smell.");
 	do {
-		/* Reset some variables. */
-		pm = (struct permonst *)0;
-		found = 0;
-		out_str[0] = '\0';
-	
 		pline("Pick a monster to smell.");
 		ans = getpos(&cc, TRUE, "a monster");
 		if (ans < 0 || cc.x < 0) {

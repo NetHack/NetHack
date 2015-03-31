@@ -1284,7 +1284,7 @@ zap_dig()
 	struct monst *mtmp;
 	struct obj *otmp;
 	struct trap *trap_with_u = (struct trap *)0;
-	int zx, zy, diridx, digdepth, flow_x, flow_y;
+	int zx, zy, diridx = 8, digdepth, flow_x = -1, flow_y = -1;
 	boolean shopdoor, shopwall, maze_dig, pitdig = FALSE, pitflow = FALSE;
 
 	/*
@@ -1462,7 +1462,7 @@ zap_dig()
 	} /* while */
 	tmp_at(DISP_END,0);	/* closing call */
 
-	if (pitflow) {
+	if (pitflow && isok(flow_x, flow_y)) {
 		struct trap *ttmp  = t_at(flow_x, flow_y);
 		if (ttmp && (ttmp->ttyp == PIT || ttmp->ttyp == SPIKED_PIT)) {
 			schar filltyp = fillholetyp(ttmp->tx, ttmp->ty, TRUE);
