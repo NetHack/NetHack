@@ -2922,6 +2922,10 @@ SHELLERS
 A list of users who are allowed to use the shell escape command (!).  The
 syntax is the same as WIZARDS.
 .lp
+EXPLORERS
+A list of users who are allowed to use the explore mode.  The
+syntax is the same as WIZARDS.
+.lp
 MAXPLAYERS
 Limit the maximum number of games that can be running at the same time.
 .lp
