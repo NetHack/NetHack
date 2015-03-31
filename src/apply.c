@@ -20,6 +20,7 @@ STATIC_DCL void FDECL(use_candelabrum, (struct obj *));
 STATIC_DCL void FDECL(use_candle, (struct obj **));
 STATIC_DCL void FDECL(use_lamp, (struct obj *));
 STATIC_DCL void FDECL(light_cocktail, (struct obj *));
+STATIC_PTR void FDECL(display_jump_positions, (int));
 STATIC_DCL void FDECL(use_tinning_kit, (struct obj *));
 STATIC_DCL void FDECL(use_figurine, (struct obj **));
 STATIC_DCL void FDECL(use_grease, (struct obj *));
@@ -1361,6 +1362,53 @@ dojump()
 	return jump(0);
 }
 
+boolean
+is_valid_jump_pos(x,y, magic, showmsg)
+int x,y, magic;
+boolean showmsg;
+{
+    if (!magic && !(HJumping & ~INTRINSIC) && !EJumping &&
+	distu(x, y) != 5) {
+	/* The Knight jumping restriction still applies when riding a
+	 * horse.  After all, what shape is the knight piece in chess?
+	 */
+	if (showmsg) pline("Illegal move!");
+	return FALSE;
+    } else if (distu(x, y) > (magic ? 6+magic*3 : 9)) {
+	if (showmsg) pline("Too far!");
+	return FALSE;
+    } else if (!cansee(x, y)) {
+	if (showmsg) You("cannot see where to land!");
+	return FALSE;
+    } else if (!isok(x, y)) {
+	if (showmsg) You("cannot jump there!");
+	return FALSE;
+    }
+    return TRUE;
+}
+
+int jumping_is_magic;
+
+void
+display_jump_positions(state)
+int state;
+{
+    if (state == 0) {
+	tmp_at(DISP_BEAM, cmap_to_glyph(S_flashbeam));
+    } else if (state == 1) {
+	int x,y, dx, dy;
+	for (dx = -4; dx <= 4; dx++)
+	    for (dy = -4; dy <= 4; dy++) {
+		x = dx + (int)u.ux;
+		y = dy + (int)u.uy;
+		if (isok(x,y) && is_valid_jump_pos(x,y, jumping_is_magic, FALSE))
+		    tmp_at(x,y);
+	    }
+    } else {
+	tmp_at(DISP_END, 0);
+    }
+}
+
 int
 jump(magic)
 int magic; /* 0=Physical, otherwise skill level */
@@ -1440,24 +1488,12 @@ int magic; /* 0=Physical, otherwise skill level */
 	pline("Where do you want to jump?");
 	cc.x = u.ux;
 	cc.y = u.uy;
+	jumping_is_magic = magic;
+	getpos_sethilite(display_jump_positions);
 	if (getpos(&cc, TRUE, "the desired position") < 0)
 		return 0;	/* user pressed ESC */
-	if (!magic && !(HJumping & ~INTRINSIC) && !EJumping &&
-			distu(cc.x, cc.y) != 5) {
-		/* The Knight jumping restriction still applies when riding a
-		 * horse.  After all, what shape is the knight piece in chess?
-		 */
-		pline("Illegal move!");
-		return 0;
-	} else if (distu(cc.x, cc.y) > (magic ? 6+magic*3 : 9)) {
-		pline("Too far!");
-		return 0;
-	} else if (!cansee(cc.x, cc.y)) {
-		You("cannot see where to land!");
-		return 0;
-	} else if (!isok(cc.x, cc.y)) {
-		You("cannot jump there!");
-		return 0;
+	if (!is_valid_jump_pos(cc.x, cc.y, magic, TRUE)) {
+	    return 0;
 	} else {
 	    coord uc;
 	    int range, temp;

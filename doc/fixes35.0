@@ -893,6 +893,7 @@ boomerang makes noise when hitting a sink
 non-pet rust monsters would eat rust-proofed non-digestibles but ignore
 	those non-digestibles otherwise
 kicking a grave may topple the gravestone
+allow showing legal jumping positions when asked for location to jump to
 
 
 Platform- and/or Interface-Specific Fixes
