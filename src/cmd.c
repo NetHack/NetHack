@@ -509,6 +509,14 @@ enter_explore_mode(VOID_ARGS)
     } else if (discover) {
 	You("are already in explore mode.");
     } else {
+#ifdef SYSCF
+	if (!sysopt.explorers ||
+	    !sysopt.explorers[0] ||
+	    !check_user_string(sysopt.explorers)) {
+	    You("cannot access explore mode.");
+	    return 0;
+	}
+#endif
 	pline(
 	 "Beware!  From explore mode there will be no return to normal game.");
 	if (paranoid_query(ParanoidQuit,
