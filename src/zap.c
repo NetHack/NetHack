@@ -1,4 +1,4 @@
-/* NetHack 3.5	zap.c	$NHDT-Date: 1427249230 2015/03/25 02:07:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.197 $ */
+/* NetHack 3.5	zap.c	$NHDT-Date: 1427782839 2015/03/31 06:20:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.200 $ */
 /* NetHack 3.5	zap.c	$Date: 2013/11/05 00:57:56 $  $Revision: 1.183 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1892,11 +1892,11 @@ struct obj *obj, *otmp;
 
 /* returns nonzero if something was hit */
 int
-bhitpile(obj,fhito,tx,ty,zdir)
+bhitpile(obj, fhito, tx, ty, zz)
     struct obj *obj;
     int FDECL((*fhito), (OBJ_P,OBJ_P));
     int tx, ty;
-    schar zdir;
+    schar zz;
 {
     int hitanything = 0;
     register struct obj *otmp, *next_obj;
@@ -1916,16 +1916,12 @@ bhitpile(obj,fhito,tx,ty,zdir)
 
     poly_zapped = -1;
     for(otmp = level.objects[tx][ty]; otmp; otmp = next_obj) {
-	/* Fix for polymorph bug, Tim Wright */
 	next_obj = otmp->nexthere;
-	/*
-	 * game flavor: if you are hiding under something, 
-	 * a zap downwards shouldn't hit that obj, so honor that.
-	 */
-	if (!(u.uundetected && (zdir > 0) &&
-	      (otmp == level.objects[u.ux][u.uy]) &&
-	      hides_under(youmonst.data)))
-	    hitanything += (*fhito)(otmp, obj);
+	/* for zap downwards, don't hit object poly'd hero is hiding under */
+	if (zz > 0 && u.uundetected && otmp == level.objects[u.ux][u.uy]
+	    && hides_under(youmonst.data)) continue;
+
+	hitanything += (*fhito)(otmp, obj);
     }
     if(poly_zapped >= 0)
 	create_polymon(level.objects[tx][ty], poly_zapped);
