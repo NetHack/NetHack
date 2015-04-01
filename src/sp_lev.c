@@ -4810,15 +4810,6 @@ sp_lev *lvl;
 		opvar_free(tmpv);
 	    }
          break;
-	 /*
-	case SPO_COREFUNC:
-	    {
-		struct opvar *a;
-		if (!OV_pop_i(a)) break;
-		spo_corefunc(coder, OV_i(a));
-	    }
-	    break;
-	 */
 	case SPO_DICE:
 	    {
 		struct opvar *a, *b, *t;
