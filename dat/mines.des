@@ -193,13 +193,6 @@ ROOM: "ordinary" , lit, (3,3), (center,center), (31,15) {
 FOUNTAIN: (17, 5)
 FOUNTAIN: (13, 8)
 
-# The Town Watch
-MONSTER: ('@', "watchman"), random, peaceful
-MONSTER: ('@', "watchman"), random, peaceful
-MONSTER: ('@', "watchman"), random, peaceful
-MONSTER: ('@', "watchman"), random, peaceful
-MONSTER: ('@', "watch captain"), random, peaceful
-
 SUBROOM: "ordinary", random, (2,0), (2,2) {
   ROOMDOOR: false, closed, west, random
 }
@@ -275,6 +268,13 @@ SUBROOM: "ordinary", lit, (18,10), (4,3) {
   MONSTER: ('G', "gnome lord"), random
 }
 
+# The Town Watch
+MONSTER: ('@', "watchman"), random, peaceful
+MONSTER: ('@', "watchman"), random, peaceful
+MONSTER: ('@', "watchman"), random, peaceful
+MONSTER: ('@', "watchman"), random, peaceful
+MONSTER: ('@', "watch captain"), random, peaceful
+
 }
 
 ROOM: "ordinary" , random, random, random, random {
@@ -307,11 +307,6 @@ LEVEL: "minetn-3"
 ROOM: "ordinary",lit,(3,3),(center,center),(31,15) {
 FOUNTAIN:(01,06)
 FOUNTAIN:(29,13)
-MONSTER: ('@', "watchman"), random, peaceful
-MONSTER: ('@', "watchman"), random, peaceful
-MONSTER: ('@', "watchman"), random, peaceful
-MONSTER: ('@', "watchman"), random, peaceful
-MONSTER: ('@', "watch captain"), random, peaceful
 
 SUBROOM:"ordinary",random,(2,2),(2,2) {
   ROOMDOOR: false,closed,south,random
@@ -383,6 +378,12 @@ SUBROOM: "candle shop",lit,(25,2),(3,3) {
   ROOMDOOR:false,closed,south,random
 }
 
+MONSTER: ('@', "watchman"), random, peaceful
+MONSTER: ('@', "watchman"), random, peaceful
+MONSTER: ('@', "watchman"), random, peaceful
+MONSTER: ('@', "watchman"), random, peaceful
+MONSTER: ('@', "watch captain"), random, peaceful
+
 }
 
 ROOM: "ordinary", random, random, random, random {
@@ -415,11 +416,6 @@ LEVEL: "minetn-4"
 ROOM: "ordinary",lit,(3,3),(center,center),(30,15) {
 FOUNTAIN:(08,07)
 FOUNTAIN:(18,07)
-MONSTER: ('@', "watchman"), random, peaceful
-MONSTER: ('@', "watchman"), random, peaceful
-MONSTER: ('@', "watchman"), random, peaceful
-MONSTER: ('@', "watchman"), random, peaceful
-MONSTER: ('@', "watch captain"), random, peaceful
 
 SUBROOM:"book shop",lit,(4,2),(3,3) {
   ROOMDOOR: false,closed,south,random
@@ -478,6 +474,12 @@ SUBROOM:"ordinary",random,(20,10),(2,2) {
 SUBROOM:"shop" [90%],lit,(23,10),(3,3) {
   ROOMDOOR:false,closed,north,random
 }
+
+MONSTER: ('@', "watchman"), random, peaceful
+MONSTER: ('@', "watchman"), random, peaceful
+MONSTER: ('@', "watchman"), random, peaceful
+MONSTER: ('@', "watchman"), random, peaceful
+MONSTER: ('@', "watch captain"), random, peaceful
 
 }
 
@@ -691,18 +693,6 @@ ROOM: "ordinary" , lit, (3,3), (center,center), (30,15) {
 FOUNTAIN: (12, 07)
 FOUNTAIN: (11, 13)
 
-MONSTER: ('@', "watchman"), random, peaceful
-MONSTER: ('@', "watchman"), random, peaceful
-MONSTER: ('@', "watchman"), random, peaceful
-MONSTER: ('@', "watchman"), random, peaceful
-MONSTER: ('@', "watch captain"), random, peaceful
-MONSTER:('G',"gnome"),random
-MONSTER:('G',"gnome"),random
-MONSTER:('G',"gnome"),random
-MONSTER:('G',"gnome lord"),random
-MONSTER:('Y',"monkey"),random
-MONSTER:('Y',"monkey"),random
-
 SUBROOM: "ordinary", random, (2,2), (4,2) {
   ROOMDOOR: false, closed, south, random
 }
@@ -785,6 +775,18 @@ SUBROOM: "temple", lit, (24,6), (4,4) {
   MONSTER: ('G', "gnomish wizard"), random
   MONSTER: ('G', "gnomish wizard"), random
 }
+
+MONSTER: ('@', "watchman"), random, peaceful
+MONSTER: ('@', "watchman"), random, peaceful
+MONSTER: ('@', "watchman"), random, peaceful
+MONSTER: ('@', "watchman"), random, peaceful
+MONSTER: ('@', "watch captain"), random, peaceful
+MONSTER:('G',"gnome"),random
+MONSTER:('G',"gnome"),random
+MONSTER:('G',"gnome"),random
+MONSTER:('G',"gnome lord"),random
+MONSTER:('Y',"monkey"),random
+MONSTER:('Y',"monkey"),random
 
 }
 
