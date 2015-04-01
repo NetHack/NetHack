@@ -521,23 +521,30 @@ remove_boundary_syms()
     }
 }
 
+
+void
+maybe_add_door(x,y, droom, i,s)
+int x,y;
+struct mkroom *droom;
+int i,s;
+{
+    if (droom->hx >= 0 && doorindex < DOORMAX && inside_room(droom, x,y))
+	add_door(x, y, droom);
+}
+
 void
 link_doors_rooms()
 {
-    xchar x,y;
+    int x,y;
+    int tmpi, m;
     for (y = 0; y < ROWNO; y++)
 	for (x = 0; x < COLNO; x++)
 	    if (IS_DOOR(levl[x][y].typ) || levl[x][y].typ == SDOOR) {
-		struct mkroom *droom = rooms;
-		/* Now the complicated part, list it with each subroom */
-		/* The dog move and mail daemon routines use this */
-		while(droom->hx >= 0 && doorindex < DOORMAX) {
-		    if(droom->hx >= x-1 && droom->lx <= x+1 &&
-		       droom->hy >= y-1 && droom->ly <= y+1) {
-			/* Found it */
-			add_door(x, y, droom);
+		for (tmpi = 0; tmpi < nroom; tmpi++) {
+		    maybe_add_door(x,y, &rooms[tmpi], tmpi,-1);
+		    for (m = 0; m < rooms[tmpi].nsubrooms; m++) {
+			maybe_add_door(x,y, rooms[tmpi].sbrooms[m], tmpi,m);
 		    }
-		    droom++;
 		}
 	    }
 }
@@ -1983,7 +1990,6 @@ corridor	*c;
 	coord org, dest;
 
 	if (c->src.room == -1) {
-	    /*sort_rooms();*/
 		fix_stair_rooms();
 		makecorridors(); /*makecorridors(c->src.door);*/
 		return;
@@ -2101,9 +2107,9 @@ struct mkroom *mkr;
 
 	if (okroom) {
 #ifdef SPECIALIZATION
-		topologize(aroom,FALSE);		/* set roomno */
+		topologize(aroom,FALSE);                /* set roomno */
 #else
-		topologize(aroom);			/* set roomno */
+		topologize(aroom);                      /* set roomno */
 #endif
 		aroom->needfill = r->filled;
 		aroom->needjoining = r->joined;
@@ -3681,7 +3687,6 @@ sel_set_door(dx,dy,arg)
     xchar typ = (*(xchar *)arg);
     xchar x = dx;
     xchar y = dy;
-    /*get_location(&x, &y, DRY, (struct mkroom *)0);*/
     if (!IS_DOOR(levl[x][y].typ) && levl[x][y].typ != SDOOR)
 	levl[x][y].typ = (typ & D_SECRET) ? SDOOR : DOOR;
     if (typ & D_SECRET) {
@@ -3951,9 +3956,9 @@ spo_region(coder)
 	add_room(dx1, dy1, dx2, dy2,
 		 OV_i(rlit), OV_i(rtype), TRUE);
 #ifdef SPECIALIZATION
-	topologize(troom,FALSE);              /* set roomno */
+	topologize(troom,FALSE);                /* set roomno */
 #else
-	topologize(troom);                    /* set roomno */
+	topologize(troom);                      /* set roomno */
 #endif
     }
 
@@ -4592,8 +4597,6 @@ sp_lev *lvl;
 	case SPO_OBJECT:         spo_object(coder);         break;
 	case SPO_LEVEL_FLAGS:    spo_level_flags(coder);    break;
 	case SPO_INITLEVEL:      spo_initlevel(coder);      break;
-	    /*case SPO_MON_GENERATION: spo_mon_generation(coder); break;*/
-	    /*case SPO_LEVEL_SOUNDS:   spo_level_sounds(coder);   break;*/
 	case SPO_ENGRAVING:      spo_engraving(coder);      break;
 	case SPO_MINERALIZE:     spo_mineralize(coder);     break;
 	case SPO_SUBROOM:
@@ -4620,13 +4623,11 @@ sp_lev *lvl;
 	case SPO_SINK:
 	case SPO_POOL:
 	case SPO_FOUNTAIN:       spo_feature(coder);        break;
-	    /*case SPO_WALLWALK:       spo_wallwalk(coder);        break;*/
 	case SPO_TRAP:           spo_trap(coder);           break;
 	case SPO_GOLD:           spo_gold(coder);           break;
 	case SPO_CORRIDOR:       spo_corridor(coder);       break;
 	case SPO_TERRAIN:        spo_terrain(coder);        break;
 	case SPO_REPLACETERRAIN: spo_replace_terrain(coder); break;
-	    /*case SPO_SPILL:          spo_spill(coder);    break;*/
 	case SPO_LEVREGION:      spo_levregion(coder); break;
 	case SPO_REGION:         spo_region(coder);    break;
 	case SPO_DRAWBRIDGE:      spo_drawbridge(coder);  break;
@@ -5004,7 +5005,6 @@ sp_lev *lvl;
 		    x -= xstart;
 		    y -= ystart;
 		}
-		/*get_location(&x, &y, DRY|WET, coder->croom);*/
 		splev_stack_push(coder->stack, opvar_new_coord(x,y));
 		opvar_free(pt);
 	    }
