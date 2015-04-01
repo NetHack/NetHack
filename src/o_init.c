@@ -446,7 +446,7 @@ dodiscovered()				/* free after Robert Viduya */
 	    if ((dis = disco[i]) != 0 && interesting_to_discover(dis)) {
 		ct++;
 		if (oclass != prev_class) {
-		    putstr(tmpwin, iflags.menu_headings, let_to_name(oclass, FALSE));
+		    putstr(tmpwin, iflags.menu_headings, let_to_name(oclass, FALSE, FALSE));
 		    prev_class = oclass;
 		}
 		Sprintf(buf, "%s %s",(objects[dis].oc_pre_discovered ? "*" : " "),
@@ -472,7 +472,7 @@ char *buf;
 {
     char *s;
 
-    Strcpy(buf, let_to_name(oclass, FALSE));
+    Strcpy(buf, let_to_name(oclass, FALSE, FALSE));
     for (s = buf; *s; ++s) *s = lowc(*s);
     return buf;
 }
@@ -615,7 +615,7 @@ doclassdisco()
 	break;
     default:
 	oclass = def_char_to_objclass(c);
-	Sprintf(buf, "Discovered %s", let_to_name(oclass, FALSE));
+	Sprintf(buf, "Discovered %s", let_to_name(oclass, FALSE, FALSE));
 	putstr(tmpwin, iflags.menu_headings, buf);
 	for (i = bases[(int)oclass];
 		i < NUM_OBJECTS && objects[i].oc_class == oclass; ++i) {
@@ -672,7 +672,7 @@ rename_disco()
 	    if (oclass != prev_class) {
 		any.a_int = 0;
 		add_menu(tmpwin, NO_GLYPH, &any, ' ', iflags.menu_headings,
-			ATR_NONE, let_to_name(oclass, FALSE), MENU_UNSELECTED);
+			 ATR_NONE, let_to_name(oclass, FALSE, FALSE), MENU_UNSELECTED);
 		prev_class = oclass;
 	    }
 	    any.a_int = dis;

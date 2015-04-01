@@ -769,7 +769,9 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 		    if (sorted && !printed_type_name) {
 			any = zeroany;
 			add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
-					let_to_name(*pack, FALSE), MENU_UNSELECTED);
+				 let_to_name(*pack, FALSE,
+					     (how != PICK_NONE) && iflags.menu_head_objsym),
+				 MENU_UNSELECTED);
 			printed_type_name = TRUE;
 		    }
 
@@ -928,8 +930,10 @@ int how;			/* type of query */
 			any.a_int = curr->oclass;
 			add_menu(win, NO_GLYPH, &any, invlet++,
 				def_oc_syms[(int)objects[curr->otyp].oc_class].sym,
-				ATR_NONE, let_to_name(*pack, FALSE),
-				MENU_UNSELECTED);
+				 ATR_NONE,
+				 let_to_name(*pack, FALSE,
+					     (how != PICK_NONE) && iflags.menu_head_objsym),
+				 MENU_UNSELECTED);
 			collected_type_name = TRUE;
 		   }
 		}
@@ -1494,6 +1498,7 @@ doloot()	/* loot a container on the floor or loot saddle from mon. */
     char qbuf[BUFSZ];
     int prev_inquiry = 0;
     boolean prev_loot = FALSE;
+    int num_conts;
 
     if (check_capacity((char *)0)) {
 	/* "Can't do that while carrying so much stuff." */
@@ -1514,14 +1519,10 @@ doloot()	/* loot a container on the floor or loot saddle from mon. */
 
 lootcont:
 
-    if (container_at(cc.x, cc.y, FALSE)) {
+    if ((num_conts = container_at(cc.x, cc.y, TRUE)) > 0) {
 	boolean anyfound = FALSE;
-	int num_conts = 0;
 
 	if (!able_to_loot(cc.x, cc.y, TRUE)) return 0;
-
-	for (cobj = level.objects[cc.x][cc.y]; cobj; cobj = cobj->nexthere)
-	    if (Is_container(cobj)) num_conts++;
 
 	if (num_conts > 1) {
 	    /* use a menu to loot many containers */
@@ -2120,6 +2121,7 @@ int held;
 	    /* even if the trap fails, you've used up this turn */
 	    if (multi >= 0) {	/* in case we didn't become paralyzed */
 		nomul(-1);
+		multi_reason = "opening a container";
 		nomovemsg = "";
 	    }
 	    return 1;
@@ -2629,6 +2631,7 @@ struct obj *box;	/* or bag */
 	/* even if the trap fails, you've used up this turn */
 	if (multi >= 0) {	/* in case we didn't become paralyzed */
 	    nomul(-1);
+	    multi_reason = "tipping a container";
 	    nomovemsg = "";
 	}
     } else if (box->otyp == BAG_OF_TRICKS || box->otyp == HORN_OF_PLENTY) {

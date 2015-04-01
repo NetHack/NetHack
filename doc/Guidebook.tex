@@ -33,7 +33,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.122 $ $Date: 2015/03/16 06:00:00 $
+% $Revision: 1.122 $ $Date: 2015/03/27 06:00:00 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -46,7 +46,7 @@
 %.au
 \author{Eric S. Raymond\\
 (Edited and expanded for 3.6)}
-\date{March 16, 2015}
+\date{March 27, 2015}
 
 \maketitle
 
@@ -862,13 +862,8 @@ two-weapon combat.  Note that if one of these slots is empty,
 the exchange still takes place.
 %.lp
 \item[\tb{X}]
-Enter explore (discovery) mode, explained in its own section later.\\
-%.lp ""
-Since using this command by accident would be troublesome, you are asked
-to confirm your intent before switching to explore mode.  By default
-the response `{\tt y}' acknowledges that intent.  You can set the
-{\it paranoid\_confirmation\/}
-option to require a response of ``yes'' instead.
+Toggle two-weapon combat, if your character can do it.  Also available
+via the ``{\tt \#twoweapon}'' extended command
 %.lp
 \item[\tb{\^{}X}]
 Display basic information about your character.\\
@@ -2224,7 +2219,8 @@ command allows you to view all options and change most of them.
 You can also set options automatically by placing them in the
 ``NETHACKOPTIONS'' environment variable or in a configuration file.
 Some versions of {\it NetHack\/} also have front-end programs that allow
-you to set options before starting the game.
+you to set options before starting the game or a global configuration 
+for system administrators.
 
 %.hn 2
 \subsection*{Using the NETHACKOPTIONS environment variable}
@@ -2275,8 +2271,7 @@ each entry. Such a sequence can be continued to multiple lines by putting a
 `{\tt \verb+\+}' at the end of each line to be continued.
 
 %.pg
-If your copy of the game included the compile time AUTOPICKUP\_EXCEPTIONS 
-option, then any line starting with ``{\tt AUTOPICKUP\_EXCEPTION=}'' 
+Any line starting with ``{\tt AUTOPICKUP\_EXCEPTION=}'' 
 is taken as defining an exception to the ``{\tt pickup\_types}'' option.
 There is a section of this Guidebook that discusses that.
 
@@ -2326,6 +2321,12 @@ quality of the weapon; you are free to manually fill your quiver or quiver sack
 or make ready
 with the `Q' command instead.  If no weapon is found or the option is
 false, the `t' (throw) command is executed instead.  (default false)
+%.lp
+\item[\ib{blind}]
+Start the character permanently blind. (default false)
+%.lp
+\item[\ib{bones}]
+Allow saving and loading bones files.  (default true)
 %.lp
 \item[\ib{boulder}]
 Set the character used to display boulders (default is rock class symbol).
@@ -2475,6 +2476,9 @@ Enable mail delivery during the game (default on).
 An obsolete synonym for ``{\tt gender:male}''.  Cannot be set with the
 `{\tt O}' command.
 %.lp
+\item[\ib{mention\_walls}]
+Give feedback when walking against a wall (default off).
+%.lp
 \item[\ib{menustyle}]
 Controls the interface used when you need to choose various objects (in
 response to the Drop command, for instance).  The value specified should
@@ -2520,13 +2524,16 @@ Default `\verb+|+'.
 Menu character accelerator to goto the next menu page.
 Implemented by the Amiga, Gem and tty ports.
 Default `\verb+>+'.
+\item[\ib{menu\_objsyms}]
+Show object symbols in menu headings in menus where
+the object symbols act as menu accelerators (default off).
 \item[\ib{menu\_previous\_page}]
 Menu character accelerator to goto the previous menu page.
 Implemented by the Amiga, Gem and tty ports.
 Default `\verb+<+'.
 \item[\ib{menu\_search}]
 Menu character accelerator to search for a menu item.
-Implemented by the Amiga, Gem and X11 ports.
+Implemented by the Amiga, Gem, X11 and tty ports.
 Default `:'.
 \item[\ib{menu\_select\_all}]
 Menu character accelerator to select all items in a menu.
@@ -2572,6 +2579,9 @@ Read the {\it NetHack\/} news file, if present (default on).
 Since the news is shown at the beginning of the game, there's no point
 in setting this with the `{\tt O}' command.
 %.lp
+\item[\ib{nudist}]
+Start the character with no armor (default false).
+%.lp
 \item[\ib{null}]
 Send padding nulls to the terminal (default on).
 %.lp
@@ -2600,7 +2610,7 @@ is the same as specifying {\tt 0}.
 (Settings {\tt 2} and {\tt 4} are for compatibility with MSDOS or old PC Hack;
 in addition to the different behavior for `{\tt 5}', `{\tt Alt-5}' acts as `{\tt G}'
 and `{\tt Alt-0}' acts as `{\tt I}'.
-Setting {\tt -1} is to accomodate some German keyboards which have the
+Setting {\tt -1} is to accommodate some German keyboards which have the
 location of the `{\tt y}' and `{\tt z}' keys swapped.)
 When moving by numbers, to enter a count prefix for those commands
 which accept one (such as ``{\tt 12s}'' to search twelve times), precede it
@@ -2678,10 +2688,8 @@ match an autopickup exception.  Default is on.
 %.lp
 \item[\ib{pickup\_types}]
 Specify the object types to be picked up when ``{\it autopickup\/}'' 
-is on.  Default is all types.  If your copy of the game has the 
-compile time option AUTOPICKUP\_EXCEPTIONS included,
-you may be able to use ``{\it autopickup\_exception\/}'' configuration
-file lines to further refine ``{\it autopickup\/}'' behavior.
+is on.  Default is all types.  You can use ``{\it autopickup\_exception\/}''
+configuration file lines to further refine ``{\it autopickup\/}'' behavior.
 %.lp
 \item[\ib{pile\_limit}]
 When walking across a pile of objects on the floor, threshold at which
@@ -2962,6 +2970,9 @@ Specify the preferred height of each tile in a tile capable port.
 \item[\ib{tile\_width}]
 Specify the preferred width of each tile in a tile capable port
 %.lp
+\item[\ib{use\_darkgray}]
+Use bold black instead of blue for black glyphs (TTY only).
+%.lp
 \item[\ib{use\_inverse}]
 NetHack should display inverse when the game specifies it.
 %.lp
@@ -3074,10 +3085,8 @@ Cannot be set with the `{\tt O}' command.
 \subsection*{Configuring autopickup exceptions}
 
 %.pg
-There is a compile time option called AUTOPICKUP_EXCEPTIONS.  
-If your copy of the game was built with that option defined, you can 
-further refine the behavior of the ``{\tt autopickup}'' option beyond 
-what is available through the ``{\tt pickup\_types}'' option.
+You can further refine the behavior of the ``{\tt autopickup}'' option
+beyond what is available through the ``{\tt pickup\_types}'' option.
 
 %.pg
 By placing ``{\tt autopickup\_exception}'' lines in your configuration
@@ -3459,6 +3468,69 @@ If this is the case, disable the number\_pad option and use the traditional
 Rogue-like commands.
 \elist
 
+%.hn2
+\subsection*{Global Configuration for System Administrators}
+
+%.pg
+If NetHack is compiled with the SYSCF option, a system administrator
+should set up a global configuration; this is a file in the 
+same format as the traditional per-user configuration file (see above).
+
+This file should be named sysconf and placed in the same directory as
+the other NetHack support files.
+The options recognized in this file are listed below. Any option not
+set uses a compiled-in default (which may not be appropriate for your
+system).
+
+%.pg
+\blist{}
+%.lp
+\item[\ib{WIZARDS}]
+A space-separated list of user name who are allowed to play in wizard
+mode (the debugging mode, not the magic-useing role). A value of a single
+asterisk (*) allows anyone to start a game in wizard mode.
+%.lp
+\item[\ib{SHELLERS}]
+A list of users who are allowed to use the shell escape command (!).
+The syntax is the same as WIZARDS.
+%.lp
+\item[\ib{EXPLORERS}]
+A list of users who are allowed to use the explore mode.
+The syntax is the same as WIZARDS.
+%.lp
+\item[\ib{MAXPLAYERS}]
+Limit the maximum number of games taht can be running at the same time.
+%.lp
+\item[\ib{SUPPORT}]
+A string explainign how to get local support (no default value).
+%.lp
+\item[\ib{RECOVER}]
+A string explaining how to recover a game on this system (no default value).
+%.lp
+\item[\ib{SEDUCE}]
+0 or 1 to disable or enable, respectively, the SEDUCE option (see the source)
+for details on this function.
+\elist
+
+%.pg
+The following options affect the score file:
+\blist {}
+%.pg
+%.lp
+\item[\ib{PERSMAX}]
+Maximum number of entries for one person
+%.lp
+\item[\ib{ENTRYMAX}]
+Maximum number of entries in the score file
+%.lp
+\item[\ib{POINTSMIN}]
+Minimum number of points to get an entry in the score file.
+%.lp
+\item[\ib{PERS_IS_UID}]
+0 or 1 to use user names or numeric userids, respectively, to identify
+unique people for the score file
+\elist
+
 %.hn 1
 \section{Scoring}
 
@@ -3505,9 +3577,9 @@ There are two ways of enabling explore mode.  One is to start the game
 with the {\tt -X}
 command-line switch or with the
 {\it playmode:explore\/}
-option.  The other is to issue the `{\tt X}' command while already
-playing the game.  Starting a new game in explore mode provides your
-character with a wand of wishing in initial inventory; switching via `X'
+option.  The other is to issue the `{\tt \#exploremode}' extended command while
+already playing the game.  Starting a new game in explore mode provides your
+character with a wand of wishing in initial inventory; switching
 during play does not.  The other benefits of explore mode are left for
 the trepid reader to discover.
 
@@ -3728,7 +3800,7 @@ more than a year and a half.
 
 %.pg
 \medskip
-The 3.5 development team initially consisted of 
+The 3.4 development team initially consisted of 
 {\it Michael Allison}, {\it Ken Arromdee},
 {\it David Cohrs}, {\it Jessie Collet}, {\it Kevin Hugo}, {\it Ken Lorber},
 {\it Dean Luick}, {\it Pat Rankin}, {\it Mike Stephenson}, 
@@ -3743,11 +3815,11 @@ runs on:
 
 %.pg
 \medskip
-\nd{\it Pat Rankin} maintained 3.5 for VMS.
+\nd{\it Pat Rankin} maintained 3.4 for VMS.
 
 %.pg
 \medskip
-\nd {\it Michael Allison} maintained NetHack 3.5 for the MS-DOS platform.
+\nd {\it Michael Allison} maintained NetHack 3.4 for the MS-DOS platform.
 {\it Paul Winner} and {\it Yitzhak Sapir} provided encouragement.
 
 %.pg
@@ -3758,7 +3830,7 @@ enhanced the Macintosh port of 3.4.
 %.pg
 \medskip
 \nd {\it Michael Allison}, {\it David Cohrs}, {\it Alex Kompel}, {\it Dion Nicolaas}, and 
-{\it Yitzhak Sapir} maintained and enhanced 3.5 for the Microsoft Windows platform.
+{\it Yitzhak Sapir} maintained and enhanced 3.4 for the Microsoft Windows platform.
 {\it Alex Kompel} contributed a new graphical interface for the Windows port. 
 {\it Alex Kompel} also contributed a Windows CE port for 3.4.1.
 
@@ -3772,23 +3844,109 @@ all these years.
 %.pg
 \medskip
 \nd {\it Janne Salmij\"{a}rvi} and {\it Teemu Suikki} maintained
-and enhanced the Amiga port of 3.5 after {\it Janne Salmij\"{a}rvi} resurrected
+and enhanced the Amiga port of 3.4 after {\it Janne Salmij\"{a}rvi} resurrected
 it for 3.3.1.
 
 %.pg
 \medskip
-\nd {\it Christian ``Marvin'' Bressler} maintained 3.5 for the Atari after he
+\nd {\it Christian ``Marvin'' Bressler} maintained 3.4 for the Atari after he
 resurrected it for 3.3.1.
 
 %.pg
 \medskip
-\nd There is a NetHack web site maintained by {\it Ken Lorber} at 
+The release of NetHack 3.4.3 in December 2003 marked the beginning of a 
+long release hiatus. 3.4.3 proved to be a remarkably stable version that
+provided continued enjoyment by the community for more than a decade. The 
+devteam slowly and quietly continued to work on the game behind the scenes 
+during the tenure of 3.4.3. It was during that same period that several new 
+variants emerged within the NetHack community. Notably sporkhack by 
+Derek S. Ray, unnethack by Patric Mueller, nitrohack and its successors 
+originally by Daniel Thaler and then by Alex Smith, and 
+Dynahack by Tung Nguyen. Some of those variants continue to be developed, 
+maintained, and enjoyed by the community to this day.
+
+%.pg
+\medskip
+In September 2014, an interim snapshot of the code under development was 
+released publicly by other parties. Since that code was a work-in-progress 
+and had not gone through a period of debugging, it was decided that the 
+version numbers present on that code snapshot would be retired and never 
+used in an official NetHack release. An announcement was posted on the 
+devteam's official nethack.org website to that effect, stating that there 
+would never be a 3.4.4, 3.5, or 3.5.0 official release version.
+
+%.pg
+\medskip
+In January 2015, preparation began for the release of NetHack 3.6
+
+%.pg
+\medskip
+At the beginning of development for what would eventually get released
+as 3.6.0, the development team consisted of {\it Warwick Allison}, 
+{\it Michael Allison}, {\it Ken Arromdee},
+{\it David Cohrs}, {\it Jessie Collet}, 
+{\it Ken Lorber}, {\it Dean Luick}, {\it Pat Rankin}, 
+{\it Mike Stephenson}, {\it Janet Walz}, and {\it Paul Winner}.
+Leading up to the release of 3.6.0 in early 2015, new members
+{\it Sean Hunt}, {\it Pasi Kallinen}, and {\it Derek S. Ray}
+joined the NetHack development team, 
+
+%.pg
+\medskip
+3.6.0 TODO insert apprpriate description of 3.6.0 here
+
+%.pg
+\medskip
+The development team, as well as {\it Steve VanDevender} and 
+{\it Kevin Smolkowski} ensured that NetHack 3.6.0 continued to operate on 
+various Unix flavors as well as maintaining the X11 interface. 
+
+{\it Ken Lorber}, {\it Haoyang Wang}, {\it Pat Rankin}, and {\it Dean Luick} 
+maintained the port of NetHack 3.6.0 for Mac.
+
+%.pg
+\medskip
+{\it Michael Allison}, {\it Derek S. Ray}, {\it Yitzhak Sapir}, 
+{\it Alex Kompel}, and {\it David Cohrs} maintained the port of 
+NetHack 3.6.0 for Microsoft Windows.
+
+%.pg
+\medskip
+{\it Jeff Bailey} created and maintained a port of NetHack 3.6.0 for Chrome.
+
+%.pg
+\medskip
+{\it Alex Kompel} maintained a port of NetHack 3.6.0 to Windows Phone. <FIXME>?
+
+%.pg
+\medskip
+This version of the game is special in a particular way.  Near the end of 
+the development of 3.6, one of the significant inspirations for many of the 
+humorous and fun features found in the game, author {\it Terry Pratchett}, 
+passed away.  This version of the game is dedicated to him.
+
+%.pg
+\medskip
+\nd The official NetHack web site is maintained by {\it Ken Lorber} at 
 {\catcode`\#=11
 \special{html:<a href="http://www.nethack.org/">}}
 http:{\tt /}{\tt /}www.nethack.org{\tt /}.
 {\catcode`\#=11
 \special{html:</a>}}
 
+%.pg
+%.hn 2
+\subsection*{Shout Outs}
+\nd The devteam would like to give a special "shout-out" to thank the generous 
+people primarily responsible for the public NetHack servers available for 
+playing the game at nethack.alt.org and devnull.net. In addition to providing 
+a way for the public to play a game of NetHack from almost anywhere, they 
+have hosted annual NetHack tournaments for many, many years. 
+%.pg 
+\nd On behalf of the NetHack community, thank you very much to 
+{\it M. Drew Streib}, {\it Pasi Kallinen} and {\it Robin Bandy}.
+
+%.pg
 %.hn 3
 \subsection*{Dungeoneers}
 \bigskip
@@ -3801,11 +3959,11 @@ in this, the list of Dungeoneers:
 \begin{center}
 \begin{tabular}{lll}
 %TABLE_START
-Adam Aronow & Izchak Miller & Mike Stephenson\\
-Alex Kompel & J. Ali Harlow & Norm Meluch\\
-Andreas Dorn & Janet Walz & Olaf Seibert\\
-Andy Church & Janne Salmij\"{a}rvi & Pasi Kallinen\\
-Andy Swanson & Jean-Christophe Collet & Pat Rankin\\
+Adam Aronow & J. Ali Harlow & Mike Stephenson\\
+Alex Kompel & Janet Walz & Norm Meluch\\
+Andreas Dorn & Janne Salmij\"{a}rvi & Olaf Seibert\\
+Andy Church & Jean-Christophe Collet & Pasi Kallinen\\
+Andy Swanson & Jeff Bailey & Pat Rankin\\
 Ari Huttunen & Jochen Erwied & Paul Winner\\
 Barton House & John Kallen & Pierre Martineau\\
 Benson I. Margulies & John Rupley & Ralf Brown\\
@@ -3814,31 +3972,32 @@ Boudewijn Waijers & Johnny Lee & Richard Addison\\
 Bruce Cox & Jon W\{tte & Richard Beigel\\
 Bruce Holloway & Jonathan Handler & Richard P. Hughey\\
 Bruce Mewborne & Joshua Delahunty & Rob Menke\\
-Carl Schelin & Keizo Yamamoto & Robin Johnson\\
-Chris Russo & Ken Arnold & Roderick Schertler\\
-David Cohrs & Ken Arromdee & Roland McGrath\\
-David Damerell & Ken Lorber & Ron Van Iwaarden\\
-David Gentzel & Ken Washikita & Ronnen Miller\\
-David Hairston & Kevin Darcy & Ross Brown\\
-Dean Luick & Kevin Hugo & Sascha Wostmann\\
-Del Lamb & Kevin Sitze & Scott Bigham\\
-Derek S. Ray & Kevin Smolkowski & Scott R. Turner\\
-Deron Meranda & Kevin Sweet & Sean Hunt\\
-Dion Nicolaas & Lars Huttar & Stephen Spackman\\
-Dylan O'Donnell & Leon Arnott & Stephen White\\
-Eric Backus & Malcolm Ryan & Steve Creps\\
-Eric Hendrickson & Mark Gooderum & Steve Linhart\\
-Eric R. Smith & Mark Modrall & Steve VanDevender\\
-Eric S. Raymond & Marvin Bressler & Teemu Suikki\\
-Erik Andersen & Matthew Day & Tim Lennan\\
-Frederick Roeber & Merlyn LeRoy & Timo Hakulinen\\
-Gil Neiger & Michael Allison & Tom Almy\\
-Greg Laskin & Michael Feir & Tom West\\
-Greg Olson & Michael Hamel & Warren Cheung\\
-Gregg Wonderly & Michael Sokolov & Warwick Allison\\
-Hao-yang Wang & Mike Engber & Yitzhak Sapir\\
-Helge Hafting & Mike Gallop\\
-Irina Rempt-Drijfhout & Mike Passaretti
+Carl Schelin & Keizo Yamamoto & Robin Bandy\\
+Chris Russo & Ken Arnold & Robin Johnson\\
+David Cohrs & Ken Arromdee & Roderick Schertler\\
+David Damerell & Ken Lorber & Roland McGrath\\
+David Gentzel & Ken Washikita & Ron Van Iwaarden\\
+David Hairston & Kevin Darcy & Ronnen Miller\\
+Dean Luick & Kevin Hugo & Ross Brown\\
+Del Lamb & Kevin Sitze & Sascha Wostmann\\
+Derek S. Ray & Kevin Smolkowski & Scott Bigham\\
+Deron Meranda & Kevin Sweet & Scott R. Turner\\
+Dion Nicolaas & Lars Huttar & Sean Hunt\\
+Dylan O'Donnell & Leon Arnott & Stephen Spackman\\
+Eric Backus & M. Drew Streib & Stephen White\\
+Eric Hendrickson & Malcolm Ryan & Steve Creps\\
+Eric R. Smith & Mark Gooderum & Steve Linhart\\
+Eric S. Raymond & Mark Modrall & Steve VanDevender\\
+Erik Andersen & Marvin Bressler & Teemu Suikki\\
+Frederick Roeber & Matthew Day & Tim Lennan\\
+Gil Neiger & Merlyn LeRoy & Timo Hakulinen\\
+Greg Laskin & Michael Allison & Tom Almy\\
+Greg Olson & Michael Feir & Tom West\\
+Gregg Wonderly & Michael Hamel & Warren Cheung\\
+Hao-yang Wang & Michael Sokolov & Warwick Allison\\
+Helge Hafting & Mike Engber & Yitzhak Sapir\\
+Irina Rempt-Drijfhout & Mike Gallop\\
+Izchak Miller & Mike Passaretti
 %TABLE_END  Do not delete this line.
 \end{tabular}
 \end{center}

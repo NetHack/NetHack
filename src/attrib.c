@@ -691,6 +691,8 @@ int propidx;	/* special cases can have negative values */
 		Sprintf(buf, because_of,
 			obj->oartifact ? bare_artifactname(obj) :
 				ysimple_name(obj));
+	    else if (propidx == BLINDED && u.uroleplay.blind)
+		Sprintf(buf, " from birth");
 	    else if (propidx == BLINDED && Blindfolded_only)
 		Sprintf(buf, because_of, ysimple_name(ublindf));
 

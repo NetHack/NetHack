@@ -1871,6 +1871,7 @@ register struct attack *mattk;
 				You("digest %s.", mon_nam(mdef));
 				if (Slow_digestion) tmp *= 2;
 				nomul(-tmp);
+				multi_reason = "digesting something";
 				nomovemsg = msgbuf;
 			    } else pline1(msgbuf);
 			    if (pd == &mons[PM_GREEN_SLIME]) {
@@ -2353,6 +2354,7 @@ boolean wep_was_destroyed;
 			    You("are frozen by %s gaze!",
 				  s_suffix(mon_nam(mon)));
 			    nomul((ACURR(A_WIS) > 12 || rn2(4)) ? -tmp : -127);
+			    multi_reason = "frozen by a monster's gaze";
 			    nomovemsg = 0;
 			}
 		    } else {
@@ -2366,6 +2368,7 @@ boolean wep_was_destroyed;
 		    You("are frozen by %s!", mon_nam(mon));
 	    	    nomovemsg = You_can_move_again;
 		    nomul(-tmp);
+		    multi_reason = "frozen by a monster";
 		    exercise(A_DEX, FALSE);
 		}
 		break;

@@ -344,7 +344,8 @@ fixup_special()
 	was_waterlevel = FALSE;
 	u.uinwater = 0;
 	unsetup_waterlevel();
-    } else if (Is_waterlevel(&u.uz)) {
+    }
+    if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz)) {
 	level.flags.hero_memory = 0;
 	was_waterlevel = TRUE;
 	/* water level is an odd beast - it has to be set up
@@ -916,98 +917,110 @@ movebubbles()
 	struct trap *btrap;
 	static const struct rm water_pos =
 		{ cmap_to_glyph(S_water), WATER, 0, 0, 0, 0, 0, 0, 0 };
+	static const struct rm air_pos =
+		{ cmap_to_glyph(S_cloud), AIR,   0, 0, 0, 1, 0, 0, 0 };
 
 	/* set up the portal the first time bubbles are moved */
 	if (!wportal) set_wportal();
 
 	vision_recalc(2);
-	/* keep attached ball&chain separate from bubble objects */
-	if (Punished) unplacebc();
 
-	/*
-	 * Pick up everything inside of a bubble then fill all bubble
-	 * locations.
-	 */
+	if (Is_waterlevel(&u.uz)) {
 
-	for (b = up ? bbubbles : ebubbles; b; b = up ? b->next : b->prev) {
-	    if (b->cons) panic("movebubbles: cons != null");
-	    for (i = 0, x = b->x; i < (int) b->bm[0]; i++, x++)
-		for (j = 0, y = b->y; j < (int) b->bm[1]; j++, y++)
-		    if (b->bm[j + 2] & (1 << i)) {
-			if (!isok(x,y)) {
-			    impossible("movebubbles: bad pos (%d,%d)", x,y);
-			    continue;
-			}
+	    /* keep attached ball&chain separate from bubble objects */
+	    if (Punished) unplacebc();
 
-			/* pick up objects, monsters, hero, and traps */
-			if (OBJ_AT(x,y)) {
-			    struct obj *olist = (struct obj *) 0, *otmp;
-			    struct container *cons = (struct container *)
-				alloc(sizeof(struct container));
+	    /*
+	     * Pick up everything inside of a bubble then fill all bubble
+	     * locations.
+	     */
 
-			    while ((otmp = level.objects[x][y]) != 0) {
-				remove_object(otmp);
-				otmp->ox = otmp->oy = 0;
-				otmp->nexthere = olist;
-				olist = otmp;
+	    for (b = up ? bbubbles : ebubbles; b; b = up ? b->next : b->prev) {
+		if (b->cons) panic("movebubbles: cons != null");
+		for (i = 0, x = b->x; i < (int) b->bm[0]; i++, x++)
+		    for (j = 0, y = b->y; j < (int) b->bm[1]; j++, y++)
+			if (b->bm[j + 2] & (1 << i)) {
+			    if (!isok(x,y)) {
+				impossible("movebubbles: bad pos (%d,%d)", x,y);
+				continue;
 			    }
 
-			    cons->x = x;
-			    cons->y = y;
-			    cons->what = CONS_OBJ;
-			    cons->list = (genericptr_t) olist;
-			    cons->next = b->cons;
-			    b->cons = cons;
+			    /* pick up objects, monsters, hero, and traps */
+			    if (OBJ_AT(x,y)) {
+				struct obj *olist = (struct obj *) 0, *otmp;
+				struct container *cons = (struct container *)
+				    alloc(sizeof(struct container));
+
+				while ((otmp = level.objects[x][y]) != 0) {
+				    remove_object(otmp);
+				    otmp->ox = otmp->oy = 0;
+				    otmp->nexthere = olist;
+				    olist = otmp;
+				}
+
+				cons->x = x;
+				cons->y = y;
+				cons->what = CONS_OBJ;
+				cons->list = (genericptr_t) olist;
+				cons->next = b->cons;
+				b->cons = cons;
+			    }
+			    if (MON_AT(x,y)) {
+				struct monst *mon = m_at(x,y);
+				struct container *cons = (struct container *)
+				    alloc(sizeof(struct container));
+
+				cons->x = x;
+				cons->y = y;
+				cons->what = CONS_MON;
+				cons->list = (genericptr_t) mon;
+
+				cons->next = b->cons;
+				b->cons = cons;
+
+				if(mon->wormno)
+				    remove_worm(mon);
+				else
+				    remove_monster(x, y);
+
+				newsym(x,y);	/* clean up old position */
+				mon->mx = mon->my = 0;
+			    }
+			    if (!u.uswallow && x == u.ux && y == u.uy) {
+				struct container *cons = (struct container *)
+				    alloc(sizeof(struct container));
+
+				cons->x = x;
+				cons->y = y;
+				cons->what = CONS_HERO;
+				cons->list = (genericptr_t) 0;
+
+				cons->next = b->cons;
+				b->cons = cons;
+			    }
+			    if ((btrap = t_at(x,y)) != 0) {
+				struct container *cons = (struct container *)
+				    alloc(sizeof(struct container));
+
+				cons->x = x;
+				cons->y = y;
+				cons->what = CONS_TRAP;
+				cons->list = (genericptr_t) btrap;
+
+				cons->next = b->cons;
+				b->cons = cons;
+			    }
+
+			    levl[x][y] = water_pos;
+			    block_point(x,y);
 			}
-			if (MON_AT(x,y)) {
-			    struct monst *mon = m_at(x,y);
-			    struct container *cons = (struct container *)
-				alloc(sizeof(struct container));
-
-			    cons->x = x;
-			    cons->y = y;
-			    cons->what = CONS_MON;
-			    cons->list = (genericptr_t) mon;
-
-			    cons->next = b->cons;
-			    b->cons = cons;
-
-			    if(mon->wormno)
-				remove_worm(mon);
-			    else
-				remove_monster(x, y);
-
-			    newsym(x,y);	/* clean up old position */
-			    mon->mx = mon->my = 0;
-			}
-			if (!u.uswallow && x == u.ux && y == u.uy) {
-			    struct container *cons = (struct container *)
-				alloc(sizeof(struct container));
-
-			    cons->x = x;
-			    cons->y = y;
-			    cons->what = CONS_HERO;
-			    cons->list = (genericptr_t) 0;
-
-			    cons->next = b->cons;
-			    b->cons = cons;
-			}
-			if ((btrap = t_at(x,y)) != 0) {
-			    struct container *cons = (struct container *)
-				alloc(sizeof(struct container));
-
-			    cons->x = x;
-			    cons->y = y;
-			    cons->what = CONS_TRAP;
-			    cons->list = (genericptr_t) btrap;
-
-			    cons->next = b->cons;
-			    b->cons = cons;
-			}
-
-			levl[x][y] = water_pos;
-			block_point(x,y);
-		    }
+	    }
+	} else if (Is_airlevel(&u.uz)) {
+	    for (x = 0; x < COLNO; x++)
+		for (y = 0; y < ROWNO; y++) {
+		    levl[x][y] = air_pos;
+		    unblock_point(x,y);
+		}
 	}
 
 	/*
@@ -1026,7 +1039,7 @@ movebubbles()
 	}
 
 	/* put attached ball&chain back */
-	if (Punished) placebc();
+	if (Is_waterlevel(&u.uz) && Punished) placebc();
 	vision_full_recalc = 1;
 }
 
@@ -1070,7 +1083,7 @@ int fd, mode;
 {
 	register struct bubble *b;
 
-	if (!Is_waterlevel(&u.uz)) return;
+	if (!Is_waterlevel(&u.uz) && !Is_airlevel(&u.uz)) return;
 
 	if (perform_bwrite(mode)) {
 	    int n = 0;
@@ -1095,7 +1108,7 @@ register int fd;
 	register int i;
 	int n;
 
-	if (!Is_waterlevel(&u.uz)) return;
+	if (!Is_waterlevel(&u.uz) && !Is_airlevel(&u.uz)) return;
 
 	set_wportal();
 	mread(fd,(genericptr_t)&n,sizeof(int));
@@ -1171,6 +1184,7 @@ setup_waterlevel()
 	register int x, y;
 	register int xskip, yskip;
 	register int water_glyph = cmap_to_glyph(S_water);
+	register int air_glyph = cmap_to_glyph(S_air);
 
 	/* ouch, hardcoded... */
 
@@ -1183,12 +1197,18 @@ setup_waterlevel()
 
 	for (x = xmin; x <= xmax; x++)
 		for (y = ymin; y <= ymax; y++)
-			levl[x][y].glyph = water_glyph;
+		  levl[x][y].glyph = Is_waterlevel(&u.uz) ? water_glyph : air_glyph;
 
 	/* make bubbles */
 
-	xskip = 10 + rn2(10);
-	yskip = 4 + rn2(4);
+	if (Is_waterlevel(&u.uz)) {
+	  xskip = 10 + rn2(10);
+	  yskip = 4 + rn2(4);
+	} else {
+	  xskip = 6 + rn2(4);
+	  yskip = 3 + rn2(3);
+	}
+
 	for (x = bxmin; x <= bxmax; x += xskip)
 		for (y = bymin; y <= bymax; y += yskip)
 			mk_bubble(x,y,rn2(7));
@@ -1274,67 +1294,76 @@ register boolean ini;
 	register int x, y, i, j, colli = 0;
 	struct container *cons, *ctemp;
 
-	/* move bubble */
-	if (dx < -1 || dx > 1 || dy < -1 || dy > 1) {
-	    /* pline("mv_bubble: dx = %d, dy = %d", dx, dy); */
-	    dx = sgn(dx);
-	    dy = sgn(dy);
+	/* clouds move slowly */
+	if (!Is_airlevel(&u.uz) || !rn2(6)) {
+	    /* move bubble */
+	    if (dx < -1 || dx > 1 || dy < -1 || dy > 1) {
+		/* pline("mv_bubble: dx = %d, dy = %d", dx, dy); */
+		dx = sgn(dx);
+		dy = sgn(dy);
+	    }
+
+	    /*
+	     * collision with level borders?
+	     *	1 = horizontal border, 2 = vertical, 3 = corner
+	     */
+	    if (b->x <= bxmin) colli |= 2;
+	    if (b->y <= bymin) colli |= 1;
+	    if ((int) (b->x + b->bm[0] - 1) >= bxmax) colli |= 2;
+	    if ((int) (b->y + b->bm[1] - 1) >= bymax) colli |= 1;
+
+	    if (b->x < bxmin) {
+		pline("bubble xmin: x = %d, xmin = %d", b->x, bxmin);
+		b->x = bxmin;
+	    }
+	    if (b->y < bymin) {
+		pline("bubble ymin: y = %d, ymin = %d", b->y, bymin);
+		b->y = bymin;
+	    }
+	    if ((int) (b->x + b->bm[0] - 1) > bxmax) {
+		pline("bubble xmax: x = %d, xmax = %d",
+		      b->x + b->bm[0] - 1, bxmax);
+		b->x = bxmax - b->bm[0] + 1;
+	    }
+	    if ((int) (b->y + b->bm[1] - 1) > bymax) {
+		pline("bubble ymax: y = %d, ymax = %d",
+		      b->y + b->bm[1] - 1, bymax);
+		b->y = bymax - b->bm[1] + 1;
+	    }
+
+	    /* bounce if we're trying to move off the border */
+	    if (b->x == bxmin && dx < 0) dx = -dx;
+	    if (b->x + b->bm[0] - 1 == bxmax && dx > 0) dx = -dx;
+	    if (b->y == bymin && dy < 0) dy = -dy;
+	    if (b->y + b->bm[1] - 1 == bymax && dy > 0) dy = -dy;
+
+	    b->x += dx;
+	    b->y += dy;
 	}
 
-	/*
-	 * collision with level borders?
-	 *	1 = horizontal border, 2 = vertical, 3 = corner
-	 */
-	if (b->x <= bxmin) colli |= 2;
-	if (b->y <= bymin) colli |= 1;
-	if ((int) (b->x + b->bm[0] - 1) >= bxmax) colli |= 2;
-	if ((int) (b->y + b->bm[1] - 1) >= bymax) colli |= 1;
-
-	if (b->x < bxmin) {
-	    pline("bubble xmin: x = %d, xmin = %d", b->x, bxmin);
-	    b->x = bxmin;
-	}
-	if (b->y < bymin) {
-	    pline("bubble ymin: y = %d, ymin = %d", b->y, bymin);
-	    b->y = bymin;
-	}
-	if ((int) (b->x + b->bm[0] - 1) > bxmax) {
-	    pline("bubble xmax: x = %d, xmax = %d",
-			b->x + b->bm[0] - 1, bxmax);
-	    b->x = bxmax - b->bm[0] + 1;
-	}
-	if ((int) (b->y + b->bm[1] - 1) > bymax) {
-	    pline("bubble ymax: y = %d, ymax = %d",
-			b->y + b->bm[1] - 1, bymax);
-	    b->y = bymax - b->bm[1] + 1;
-	}
-
-	/* bounce if we're trying to move off the border */
-	if (b->x == bxmin && dx < 0) dx = -dx;
-	if (b->x + b->bm[0] - 1 == bxmax && dx > 0) dx = -dx;
-	if (b->y == bymin && dy < 0) dy = -dy;
-	if (b->y + b->bm[1] - 1 == bymax && dy > 0) dy = -dy;
-
-	b->x += dx;
-	b->y += dy;
-
-	/* void positions inside bubble */
-
+	/* draw the bubbles */
 	for (i = 0, x = b->x; i < (int) b->bm[0]; i++, x++)
 	    for (j = 0, y = b->y; j < (int) b->bm[1]; j++, y++)
 		if (b->bm[j + 2] & (1 << i)) {
+		  if (Is_waterlevel(&u.uz)) {
 		    levl[x][y].typ = AIR;
 		    levl[x][y].lit = 1;
 		    unblock_point(x,y);
+		  } else if (Is_airlevel(&u.uz)) {
+		    levl[x][y].typ = CLOUD;
+		    levl[x][y].lit = 1;
+		    block_point(x,y);
+		  }
 		}
 
-	/* replace contents of bubble */
-	for (cons = b->cons; cons; cons = ctemp) {
-	    ctemp = cons->next;
-	    cons->x += dx;
-	    cons->y += dy;
+	if (Is_waterlevel(&u.uz)) {
+	    /* replace contents of bubble */
+	    for (cons = b->cons; cons; cons = ctemp) {
+		ctemp = cons->next;
+		cons->x += dx;
+		cons->y += dy;
 
-	    switch(cons->what) {
+		switch(cons->what) {
 		case CONS_OBJ: {
 		    struct obj *olist, *otmp;
 
@@ -1375,13 +1404,13 @@ register boolean ini;
 		default:
 		    impossible("mv_bubble: unknown bubble contents");
 		    break;
+		}
+		free((genericptr_t)cons);
 	    }
-	    free((genericptr_t)cons);
+	    b->cons = 0;
 	}
-	b->cons = 0;
 
 	/* boing? */
-
 	switch (colli) {
 	    case 1: b->dy = -b->dy;	break;
 	    case 3: b->dy = -b->dy;	/* fall through */

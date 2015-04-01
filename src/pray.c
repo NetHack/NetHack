@@ -1,4 +1,4 @@
-/* NetHack 3.5	pray.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	pray.c	$NHDT-Date: 1427670643 2015/03/29 23:10:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.69 $ */
 /* NetHack 3.5	pray.c	$Date: 2012/05/07 01:44:38 $  $Revision: 1.62 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1269,6 +1269,7 @@ dosacrifice()
 			dmon->mpeaceful = TRUE;
 		    You("are terrified, and unable to move.");
 		    nomul(-3);
+		    multi_reason = "being terrified of a demon";
 		    nomovemsg = 0;
 		} else pline_The("%s.", demonless_msg);
 	    }
@@ -1655,6 +1656,7 @@ dopray()
 	}
     }
     nomul(-3);
+    multi_reason = "praying";
     nomovemsg = "You finish your prayer.";
     afternmv = prayer_done;
 
@@ -1817,6 +1819,7 @@ doturn()
 	    }
 	}
 	nomul(-5);
+	multi_reason = "trying to turn the monsters";
 	nomovemsg = You_can_move_again;
 	return(1);
 }
@@ -1860,26 +1863,70 @@ aligntyp alignment;
     return gnam;
 }
 
+static const char *hallu_gods[] = {
+    "the Flying Spaghetti Monster",     /* Church of the FSM */
+    "Eris",     /* Discordianism */
+    "the Martians",     /* every science fiction ever */
+    "Xom",      /* Crawl */
+    "AnDoR dRaKoN",     /* ADOM */
+    "the Central Bank of Yendor",       /* economics */
+    "Tooth Fairy",      /* real world(?) */
+    "Om",       /* Discworld */
+    "Yawgmoth", /* Magic: the Gathering */
+    "Morgoth", /* LoTR */
+    "Cthulhu", /* Lovecraft */
+    "the Ori", /* Stargate */
+    "destiny", /* why not? */
+    "your Friend the Computer", /* Paranoia */
+};
+
 /* hallucination handling for priest/minion names: select a random god
    iff character is hallucinating */
 const char *
 halu_gname(alignment)
 aligntyp alignment;
 {
-    const char *gnam;
+    const char *gnam = NULL;
     int which;
 
-    if (!Hallucination) return align_gname(alignment);
+    if (!Hallucination)
+        return align_gname(alignment);
 
-    which = randrole();
-    switch (rn2(3)) {
-     case 0:	gnam = roles[which].lgod; break;
-     case 1:	gnam = roles[which].ngod; break;
-     case 2:	gnam = roles[which].cgod; break;
-     default:	gnam = 0; break;		/* lint suppression */
+    /* The priest may not have initialized god names. If this is the
+     * case, and we roll priest, we need to try again. */
+    do
+        which = randrole();
+    while (!roles[which].lgod);
+
+    switch (rn2(9)) {
+    case 0:
+    case 1:
+        gnam = roles[which].lgod;
+        break;
+    case 2:
+    case 3:
+        gnam = roles[which].ngod;
+        break;
+    case 4:
+    case 5:
+        gnam = roles[which].cgod;
+        break;
+    case 6:
+    case 7:
+        gnam = hallu_gods[rn2(sizeof hallu_gods / sizeof *hallu_gods)];
+        break;
+    case 8:
+        gnam = Moloch;
+        break;
+    default:
+        impossible("rn2 broken in halu_gname?!?");
     }
-    if (!gnam) gnam = Moloch;
-    if (*gnam == '_') ++gnam;
+    if (!gnam) {
+        impossible("No random god name?");
+        gnam = "your Friend the Computer"; /* Paranoia */
+    }
+    if (*gnam == '_')
+        ++gnam;
     return gnam;
 }
 

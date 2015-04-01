@@ -1,1 +1,1 @@
-*.p filter=NHtext merge=NHsubst
+*.p NHSUBST

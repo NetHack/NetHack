@@ -1,4 +1,4 @@
-Developer.txt filter=NHtext merge=NHsubst
-nhgitset.pl filter=NHtext merge=NHsubst
-hookdir/* filter=NHtext merge=NHsubst
+Developer.txt NHSUBST
+nhgitset.pl NHSUBST
+hooksdir/* NHSUBST
 * text=auto

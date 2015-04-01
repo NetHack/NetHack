@@ -85,6 +85,7 @@ static struct Bool_Opt
 #else
 	{"BIOS", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
+	{"blind", &u.uroleplay.blind, FALSE, DISP_IN_GAME},
 	{"bones", &flags.bones, TRUE, SET_IN_FILE},
 #ifdef INSURANCE
 	{"checkpoint", &flags.ins_chkpt, TRUE, SET_IN_GAME},
@@ -139,14 +140,17 @@ static struct Bool_Opt
 #else
 	{"mail", (boolean *)0, TRUE, SET_IN_FILE},
 #endif
+	{"mention_walls", &iflags.mention_walls, FALSE, SET_IN_GAME},
 	/* for menu debugging only*/
 	{"menu_tab_sep", &iflags.menu_tab_sep, FALSE, SET_IN_GAME},
+	{"menu_objsyms", &iflags.menu_head_objsym, FALSE, SET_IN_GAME},
 	{"mouse_support", &iflags.wc_mouse_support, TRUE, DISP_IN_GAME},	/*WC*/
 #ifdef NEWS
 	{"news", &iflags.news, TRUE, DISP_IN_GAME},
 #else
 	{"news", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
+	{"nudist", &u.uroleplay.nudist, FALSE, DISP_IN_GAME},
 	{"null", &flags.null, TRUE, SET_IN_GAME},
 #if defined(SYSFLAGS) && defined(MAC)
 	{"page_wait", &sysflags.page_wait, TRUE, SET_IN_GAME},
@@ -199,6 +203,7 @@ static struct Bool_Opt
 	{"tombstone",&flags.tombstone, TRUE, SET_IN_GAME},
 	{"toptenwin",&iflags.toptenwin, FALSE, SET_IN_GAME},
 	{"travel", &flags.travelcmd, TRUE, SET_IN_GAME},
+	{"use_darkgray", &iflags.wc2_darkgray, TRUE, SET_IN_FILE},
 #ifdef WIN32CON
 	{"use_inverse",   &iflags.wc_inverse, TRUE, SET_IN_GAME},		/*WC*/
 #else
@@ -4396,6 +4401,7 @@ struct wc_Opt wc2_options[] = {
 	{"fullscreen", WC2_FULLSCREEN},
 	{"softkeyboard", WC2_SOFTKEYBOARD},
 	{"wraptext", WC2_WRAPTEXT},
+	{"use_darkgray", WC2_DARKGRAY},
 #ifdef STATUS_VIA_WINDOWPORT
 	{"hilite_status", WC2_HILITE_STATUS},
 #endif

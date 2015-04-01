@@ -1,4 +1,4 @@
-/* NetHack 3.5	trap.c	$NHDT-Date: 1426558928 2015/03/17 02:22:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.195 $ */
+/* NetHack 3.5	trap.c	$NHDT-Date: 1427331767 2015/03/26 01:02:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.199 $ */
 /* NetHack 3.5	trap.c	$Date: 2013/03/14 01:58:21 $  $Revision: 1.179 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -946,6 +946,7 @@ unsigned trflags;
 		} else {
 		    pline("%s bear trap closes on your %s!",
 			    A_Your[trap->madeby_u], body_part(FOOT));
+		    set_wounded_legs(rn2(2) ? RIGHT_SIDE : LEFT_SIDE, rn1(10,10));
 		    if(u.umonnum == PM_OWLBEAR || u.umonnum == PM_BUGBEAR)
 			You("howl in anger!");
 		    losehp(Maybe_Half_Phys(dmg), "bear trap", KILLED_BY_AN);
@@ -1406,13 +1407,12 @@ struct obj *otmp;
 {
 	struct monst *steed = u.usteed;
 	int tt;
-	boolean in_sight, trapkilled, steedhit;
+	boolean trapkilled, steedhit;
 
 	if (!steed || !trap) return 0;
 	tt = trap->ttyp;
 	steed->mx = u.ux;
 	steed->my = u.uy;
-	in_sight = !Blind;
 	trapkilled = steedhit = FALSE;
 
 	switch (tt) {
@@ -3118,13 +3118,17 @@ acid_damage(obj)
 struct obj *obj;
 {
     /* Scrolls but not spellbooks can be erased by acid. */
-    struct monst *victim =
-        carried(obj) ? &youmonst : mcarried(obj) ? obj->ocarry : NULL;
-    boolean vismon = victim && (victim != &youmonst) && canseemon(victim);
+    struct monst *victim;
+    boolean vismon;
 
-    if (obj->greased)
+    if (!obj) return;
+
+    victim = carried(obj) ? &youmonst : mcarried(obj) ? obj->ocarry : NULL;
+    vismon = victim && (victim != &youmonst) && canseemon(victim);
+
+    if (obj->greased) {
         grease_protect(obj, NULL, victim);
-    else if (obj->oclass == SCROLL_CLASS && obj->otyp != SCR_BLANK_PAPER) {
+    } else if (obj->oclass == SCROLL_CLASS && obj->otyp != SCR_BLANK_PAPER) {
         if (obj->otyp != SCR_BLANK_PAPER
 #ifdef MAIL
                 && obj->otyp != SCR_MAIL
@@ -4444,6 +4448,7 @@ boolean disarm;
 			if (!Free_action) {                        
 			pline("Suddenly you are frozen in place!");
 			nomul(-d(5, 6));
+			multi_reason = "frozen by a trap";
 			exercise(A_DEX, FALSE);
 			nomovemsg = You_can_move_again;
 			} else You("momentarily stiffen.");

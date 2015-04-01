@@ -32,15 +32,22 @@ you specify:
 -pretty=one: format output as a single line for each entry
 (branch): show the commits from (branch) instead of the current one
 
+[*] git log --pretty=one --decorate --graph --all
+
+(This is best explained by executing and looking at the output.)
+
 
 [*] git add (filename)
 [*] git nhadd (filename)
 
 Adds the changes you've made in (filename) to the pre-commit staging area.
 (also referred to as the 'index')
+ OR
+Make a new file be tracked by git.
 
 "nhadd" is the preferred syntax and will automatically update the source file
-headers with the latest date, branch, and version.
+headers with the latest date, branch, and version.  See Developer.txt for
+details.
 
 
 [*] git commit [-a] [-m "text"]
@@ -53,7 +60,8 @@ Including -m will use "text" as the commit message instead of opening an
 editor window for you to create one.
 
 "nhcommit" is the preferred syntax and will automatically update the source file
-headers with the latest date, branch, and version.
+headers with the latest date, branch, and version.  See Developer.txt for
+details.
 
 
 [*] git push [--all] [-u origin (branch)]
@@ -101,10 +109,10 @@ the prior commit.
 [/end area-of-concern]
 
 
-[*] git fetch [-a]
+[*] git fetch [--all]
 
 Retrieve commits from the remote repository to your machine.
-Including -a will get commits for all branches.
+Including --all will get commits for all branches.
 Does NOT merge them into your local repository.
 
 

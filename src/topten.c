@@ -66,6 +66,7 @@ STATIC_DCL void FDECL(discardexcess, (FILE *));
 STATIC_DCL void FDECL(readentry, (FILE *,struct toptenentry *));
 STATIC_DCL void FDECL(writeentry, (FILE *,struct toptenentry *));
 STATIC_DCL void FDECL(writexlentry, (FILE*, struct toptenentry *));
+STATIC_DCL long NDECL(encodexlogflags);
 STATIC_DCL long NDECL(encodeconduct);
 STATIC_DCL long NDECL(encodeachieve);
 STATIC_DCL void FDECL(free_ttlist, (struct toptenentry *));
@@ -341,8 +342,21 @@ struct toptenentry *tt;
     Fprintf(rfile, "%cgender0=%s%calign0=%s",
 	    XLOG_SEP, genders[flags.initgend].filecode,
 	    XLOG_SEP, aligns[1 - u.ualignbase[A_ORIGINAL]].filecode);
+    Fprintf(rfile, "%cflags=0x%lx",
+	    XLOG_SEP, encodexlogflags());
     Fprintf(rfile, "\n");
 #undef XLOG_SEP
+}
+
+STATIC_OVL long
+encodexlogflags()
+{
+    long e = 0L;
+
+    if (wizard)   e |= 1L << 0;
+    if (discover) e |= 1L << 1;
+
+    return e;
 }
 
 STATIC_OVL long
@@ -383,6 +397,8 @@ encodeachieve()
     if(u.uachieve.mines_luckstone) r |= 1L << 9;
     if(u.uachieve.finish_sokoban)  r |= 1L << 10;
     if(u.uachieve.killed_medusa)   r |= 1L << 11;
+    if(u.uroleplay.blind)          r |= 1L << 12;
+    if(u.uroleplay.nudist)         r |= 1L << 13;
 
     return r;
 }

@@ -136,9 +136,9 @@ B. Enabling variable expansion
    Variable expansion is controlled by the .gitattributes file.
 
    To enable variable expansion:
-        pattern filter=NHtext merge=NHsubst
+        pattern NHSUBST
    To disable variable expansion:
-	pattern -filter
+	pattern -NHSUBST
 
    More information: "git help gitattributes"
 
@@ -147,8 +147,8 @@ C. Oddities
    instead of "git add" or "git commit."  Nothing terrible will happen if you
    use the wrong one, but the values will not be updated.
 
-   Due to the way this abuses git filters, the updated values are not visible
-   in your working tree.
+   Variable expansion modifies the files in the work tree - your editor or
+   IDE may or may not be happy with this.
 
 D. Using your own hooks
    You can use your own hooks - put them in .git/hooks as usual BUT name them

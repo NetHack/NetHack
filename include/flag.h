@@ -189,7 +189,9 @@ struct instance_flags {
 	boolean  deferred_X;	/* deferred entry into explore mode */
 	boolean  num_pad;	/* use numbers for movement commands */
 	boolean  news;		/* print news */
+	boolean  mention_walls;	/* give feedback when bumping walls */
 	boolean  menu_tab_sep;	/* Use tabs to separate option menu fields */
+	boolean  menu_head_objsym; /* Show obj symbol in menu headings */
 	boolean  menu_requested; /* Flag for overloaded use of 'm' prefix
 				  * on some non-move commands */
 	boolean  renameallowed; /* can change hero name during role selection */
@@ -293,6 +295,7 @@ struct instance_flags {
 	boolean wc2_softkeyboard;	/* use software keyboard */
 	boolean wc2_wraptext;		/* wrap text */
 	boolean wc2_selectsaved;	/* display a menu of user's saved games */
+	boolean wc2_darkgray;		/* try to use dark-gray color for black glyphs */
 	boolean  cmdassist;	/* provide detailed assistance for some commands */
 	boolean	 clicklook;	/* allow right-clicking for look */
 	boolean	 obsolete;	/* obsolete options can point at this, it isn't used */
