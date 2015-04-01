@@ -522,6 +522,27 @@ remove_boundary_syms()
 }
 
 void
+link_doors_rooms()
+{
+    xchar x,y;
+    for (y = 0; y < ROWNO; y++)
+	for (x = 0; x < COLNO; x++)
+	    if (IS_DOOR(levl[x][y].typ) || levl[x][y].typ == SDOOR) {
+		struct mkroom *droom = rooms;
+		/* Now the complicated part, list it with each subroom */
+		/* The dog move and mail daemon routines use this */
+		while(droom->hx >= 0 && doorindex < DOORMAX) {
+		    if(droom->hx >= x-1 && droom->lx <= x+1 &&
+		       droom->hy >= y-1 && droom->ly <= y+1) {
+			/* Found it */
+			add_door(x, y, droom);
+		    }
+		    droom++;
+		}
+	    }
+}
+
+void
 fill_rooms()
 {
     int tmpi;
@@ -1118,7 +1139,6 @@ redoloop: ;
 		impossible("create_door: Can't find a proper place!");
 		return;
 	}
-	add_door(x,y,broom);
 	levl[x][y].typ = (dd->secret ? SDOOR : DOOR);
 	levl[x][y].doormask = dd->mask;
 }
@@ -1156,7 +1176,6 @@ create_secret_door(croom, walls)
 	if(okdoor(sx,sy)) {
 	    levl[sx][sy].typ = SDOOR;
 	    levl[sx][sy].doormask = D_CLOSED;
-	    add_door(sx,sy,croom);
 	    return;
 	}
     }
@@ -3662,8 +3681,6 @@ sel_set_door(dx,dy,arg)
     xchar typ = (*(xchar *)arg);
     xchar x = dx;
     xchar y = dy;
-    struct mkroom *droom;
-    droom = &rooms[0];
     /*get_location(&x, &y, DRY, (struct mkroom *)0);*/
     if (!IS_DOOR(levl[x][y].typ) && levl[x][y].typ != SDOOR)
 	levl[x][y].typ = (typ & D_SECRET) ? SDOOR : DOOR;
@@ -3674,18 +3691,6 @@ sel_set_door(dx,dy,arg)
     }
     levl[x][y].doormask = typ;
     SpLev_Map[x][y] = 1;
-
-    /* Now the complicated part, list it with each subroom */
-    /* The dog move and mail daemon routines use this */
-    while(droom->hx >= 0 && doorindex < DOORMAX) {
-	if(droom->hx >= x-1 && droom->lx <= x+1 &&
-	   droom->hy >= y-1 && droom->ly <= y+1) {
-	    /* Found it */
-	    add_door(x, y, droom);
-	}
-	droom++;
-    }
-
 }
 
 
@@ -5065,6 +5070,7 @@ next_opcode:
 	coder->frame->n_opcode++;
     } /*while*/
 
+    link_doors_rooms();
     fill_rooms();
     remove_boundary_syms();
     wallification(1, 0, COLNO-1, ROWNO-1);
