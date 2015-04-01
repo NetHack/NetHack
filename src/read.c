@@ -88,6 +88,55 @@ char *buf;
     "Don't Panic",				/* HHGTTG */
     "Furinkan High School Athletic Dept.",	/* Ranma 1/2 */
     "Hel-LOOO, Nurse!",			/* Animaniacs */
+    "=^.^=",
+    "100% goblin hair - do not wash",
+    "Aberzombie and Fitch",
+    "cK -- Cockatrice touches the Kop",
+    "Don't ask me, I only adventure here",
+    "Down with pants!",
+    "d, your dog or a killer?",
+    "FREE PUG AND NEWT!",
+    "Go team ant!",
+    "Got newt?",
+    "Hello, my darlings!", /* Charlie Drake */
+    "Hey! Nymphs! Steal This T-Shirt!",
+    "I <3 Dungeon of Doom",
+    "I <3 Maud",
+    "I am a Valkyrie. If you see me running, try to keep up.",
+    "I am not a pack rat - I am a collector",
+    "I bounced off a rubber tree",  /* Monkey Island */
+    "Plunder Island Brimstone Beach Club", /* Monkey Island */
+    "If you can read this, I can hit you with my polearm",
+    "I'm confused!",
+    "I scored with the princess",
+    "I want to live forever or die in the attempt.",
+    "Lichen Park",
+    "LOST IN THOUGHT - please send search party",
+    "Meat is Mordor",
+    "Minetown Better Business Bureau",
+    "Minetown Watch",
+    "Ms. Palm's House of Negotiable Affection -- A Very Reputable House Of Disrepute",
+    "Protection Racketeer",
+    "Real men love Crom",
+    "Somebody stole my Mojo!",
+    "The Hellhound Gang",
+    "The Werewolves",
+    "They Might Be Storm Giants",
+    "Weapons don't kill people, I kill people",
+    "White Zombie",
+    "You're killing me!",
+    "Anhur State University - Home of the Fighting Fire Ants!",
+    "FREE HUGS",
+    "Serial Ascender",
+    "Real men are valkyries",
+    "Young Men's Cavedigging Association",
+    "Occupy Fort Ludios",
+    "I couldn't afford this T-shirt so I stole it!",
+    "Mind flayers suck",
+    "I'm not wearing any pants",
+    "Down with the living!",
+    "Pudding farmer",
+    "Vegetarian",
     };
     Strcpy(buf, shirt_msgs[tshirt->o_id % SIZE(shirt_msgs)]);
     return erode_obj_text(tshirt, buf);
@@ -238,7 +287,7 @@ doread()
 		&& scroll->oclass != SPBOOK_CLASS) {
 	    pline(silly_thing_to, "read");
 	    return(0);
-	} else if (Blind) {
+	} else if (Blind && (scroll->otyp != SPE_BOOK_OF_THE_DEAD)) {
 	    const char *what = 0;
 	    if (scroll->oclass == SPBOOK_CLASS)
 		what = "mystic runes";

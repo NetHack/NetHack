@@ -1144,9 +1144,9 @@ get_plname_from_file(fd, plbuf)
 int fd;
 char *plbuf;
 {
-	int rlen, pltmpsiz = 0;
-	rlen = read(fd, (genericptr_t) &pltmpsiz, sizeof(pltmpsiz));
-	rlen = read(fd, (genericptr_t) plbuf, pltmpsiz);
+	int pltmpsiz = 0;
+	(void) read(fd, (genericptr_t) &pltmpsiz, sizeof(pltmpsiz));
+	(void) read(fd, (genericptr_t) plbuf, pltmpsiz);
 	return;
 }
 

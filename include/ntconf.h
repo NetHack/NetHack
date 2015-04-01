@@ -127,8 +127,15 @@ extern void FDECL(interject, (int));
 #define strncmpi(a,b,c) strnicmp(a,b,c)
 #endif
 
+/* Visual Studio defines this in their own headers, which we don't use */
+#ifndef snprintf
+#define snprintf _snprintf
+#pragma warning(disable:4996)   /* deprecation warning suggesting snprintf_s */
+#endif
+
 #include <sys/types.h>
 #include <stdlib.h>
+#include <stdio.h>
 #ifdef __BORLANDC__
 #undef randomize
 #undef random

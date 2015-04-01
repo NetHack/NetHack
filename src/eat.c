@@ -1574,6 +1574,8 @@ eatcorpse(otmp)		/* called when a corpse is selected as food */
 	} else if ((mnum == PM_COCKATRICE || mnum == PM_CHICKATRICE) &&
 		(Stone_resistance || Hallucination)) {
 	    pline("This tastes just like chicken!");
+	} else if (mnum == PM_FLOATING_EYE && u.umonnum == PM_RAVEN) {
+	    You("peck the eyeball with delight.");
 	} else {
 	    /* [is this right?  omnivores end up always disliking the taste] */
 	    boolean yummy = (vegan(&mons[mnum]) ?

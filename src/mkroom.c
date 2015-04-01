@@ -219,13 +219,9 @@ struct mkroom *sroom;
 {
 	struct monst *mon;
 	register int sx,sy,i;
-	int sh, tx, ty, goldlim, type = sroom->rtype;
+	int sh, tx = 0, ty = 0, goldlim = 0, type = sroom->rtype;
 	int rmno = (int)((sroom - rooms) + ROOMOFFSET);
 	coord mm;
-
-#ifdef GCC_WARN
-	tx = ty = goldlim = 0;
-#endif
 
 	sh = sroom->fdoor;
 	switch(type) {

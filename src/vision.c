@@ -2366,6 +2366,9 @@ left_side(row, left_mark, right, limits)
     char *row_max = NULL;
     int lim_min;
 
+#ifdef GCC_WARN
+    rowp = row_min = row_max = 0;
+#endif
     nrow    = row+step;
     deeper  = good_row(nrow) && (!limits || (*limits >= *(limits+1)));
     if(!vis_func) {

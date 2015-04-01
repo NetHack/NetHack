@@ -85,6 +85,7 @@ static struct Bool_Opt
 #else
 	{"BIOS", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
+	{"blind", &u.uroleplay.blind, FALSE, DISP_IN_GAME},
 	{"bones", &flags.bones, TRUE, SET_IN_FILE},
 #ifdef INSURANCE
 	{"checkpoint", &flags.ins_chkpt, TRUE, SET_IN_GAME},
@@ -149,6 +150,7 @@ static struct Bool_Opt
 #else
 	{"news", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
+	{"nudist", &u.uroleplay.nudist, FALSE, DISP_IN_GAME},
 	{"null", &flags.null, TRUE, SET_IN_GAME},
 #if defined(SYSFLAGS) && defined(MAC)
 	{"page_wait", &sysflags.page_wait, TRUE, SET_IN_GAME},

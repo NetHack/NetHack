@@ -946,6 +946,7 @@ unsigned trflags;
 		} else {
 		    pline("%s bear trap closes on your %s!",
 			    A_Your[trap->madeby_u], body_part(FOOT));
+		    set_wounded_legs(rn2(2) ? RIGHT_SIDE : LEFT_SIDE, rn1(10,10));
 		    if(u.umonnum == PM_OWLBEAR || u.umonnum == PM_BUGBEAR)
 			You("howl in anger!");
 		    losehp(Maybe_Half_Phys(dmg), "bear trap", KILLED_BY_AN);
@@ -1406,13 +1407,12 @@ struct obj *otmp;
 {
 	struct monst *steed = u.usteed;
 	int tt;
-	boolean in_sight, trapkilled, steedhit;
+	boolean trapkilled, steedhit;
 
 	if (!steed || !trap) return 0;
 	tt = trap->ttyp;
 	steed->mx = u.ux;
 	steed->my = u.uy;
-	in_sight = !Blind;
 	trapkilled = steedhit = FALSE;
 
 	switch (tt) {
@@ -3169,6 +3169,7 @@ struct obj *obj;
 const char *ostr;
 boolean force;
 {
+	boolean exploded = FALSE;
 	if (!obj) return ER_NOTHING;
 
         if (snuff_lit(obj))
@@ -3575,7 +3576,7 @@ boolean bury_it;
 	place_object(otmp, ttmp->tx, ttmp->ty);
 	if (bury_it) {
 	    /* magical digging first disarms this trap, then will unearth it */
-	    (void) bury_an_obj(otmp);
+	    (void) bury_an_obj(otmp, NULL);
 	} else {
 	    /* Sell your own traps only... */
 	    if (ttmp->madeby_u) sellobj(otmp, ttmp->tx, ttmp->ty);

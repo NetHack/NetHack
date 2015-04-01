@@ -42,9 +42,12 @@ you specify:
 
 Adds the changes you've made in (filename) to the pre-commit staging area.
 (also referred to as the 'index')
+ OR
+Make a new file be tracked by git.
 
 "nhadd" is the preferred syntax and will automatically update the source file
-headers with the latest date, branch, and version.
+headers with the latest date, branch, and version.  See Developer.txt for
+details.
 
 
 [*] git commit [-a] [-m "text"]
@@ -57,7 +60,8 @@ Including -m will use "text" as the commit message instead of opening an
 editor window for you to create one.
 
 "nhcommit" is the preferred syntax and will automatically update the source file
-headers with the latest date, branch, and version.
+headers with the latest date, branch, and version.  See Developer.txt for
+details.
 
 
 [*] git push [--all] [-u origin (branch)]

@@ -1055,7 +1055,7 @@ boolean useeit;
 const char *objphrase;	/* "Your widget glows" or "Steed's saddle glows" */
 {
     void FDECL((*func), (OBJ_P)) = 0;
-    const char *how = 0, *glowcolor = 0;
+    const char *glowcolor = 0;
 #define COST_alter (-2)
 #define COST_none  (-1)
     int costchange = COST_none;
@@ -1064,7 +1064,6 @@ const char *objphrase;	/* "Your widget glows" or "Steed's saddle glows" */
     if (!potion || potion->otyp != POT_WATER) return FALSE;
 
     if (potion->blessed) {
-	how = "softly glow";
 	if (targobj->cursed) {
 	    func = uncurse;
 	    glowcolor = NH_AMBER;
@@ -1076,7 +1075,6 @@ const char *objphrase;	/* "Your widget glows" or "Steed's saddle glows" */
 	    altfmt = TRUE;	/* "with a <color> aura" */
 	}
     } else if (potion->cursed) {
-	how = "glow";
 	if (targobj->blessed) {
 	    func = unbless;
 	    glowcolor = "brown";

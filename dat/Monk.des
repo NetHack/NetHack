@@ -64,17 +64,17 @@ DOOR:closed,(52,14)
 # Unattended Altar - unaligned due to conflict - player must align it.
 ALTAR:(28,09),noalign,altar
 # The Grand Master
-MONSTER:'@',"Grand Master",(28,10)
+MONSTER:('@',"Grand Master"),(28,10)
 # No treasure chest!
 # guards for the audience chamber
-MONSTER:'@',"abbot",(32,07)
-MONSTER:'@',"abbot",(32,08)
-MONSTER:'@',"abbot",(32,11)
-MONSTER:'@',"abbot",(32,12)
-MONSTER:'@',"abbot",(33,07)
-MONSTER:'@',"abbot",(33,08)
-MONSTER:'@',"abbot",(33,11)
-MONSTER:'@',"abbot",(33,12)
+MONSTER:('@',"abbot"),(32,07)
+MONSTER:('@',"abbot"),(32,08)
+MONSTER:('@',"abbot"),(32,11)
+MONSTER:('@',"abbot"),(32,12)
+MONSTER:('@',"abbot"),(33,07)
+MONSTER:('@',"abbot"),(33,08)
+MONSTER:('@',"abbot"),(33,11)
+MONSTER:('@',"abbot"),(33,12)
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,19)
 # Random traps
@@ -85,18 +85,18 @@ TRAP:random,random
 TRAP:random,random
 TRAP:random,random
 # Monsters on siege duty.
-MONSTER: 'E',"earth elemental",(37,01)
-MONSTER: 'E',"earth elemental",(37,18)
-MONSTER: 'E',"earth elemental",(03,03)
-MONSTER: 'E',"earth elemental",(65,04)
-MONSTER: 'E',"earth elemental",(12,11)
-MONSTER: 'E',"earth elemental",(60,12)
-MONSTER: 'E',"earth elemental",(14,08)
-MONSTER: 'E',"earth elemental",(55,00)
-MONSTER: 'X',"xorn",(18,18)
-MONSTER: 'X',"xorn",(59,10)
-MONSTER: 'X',"xorn",(13,09)
-MONSTER: 'X',"xorn",(01,17)
+MONSTER: ('E',"earth elemental"),(37,01)
+MONSTER: ('E',"earth elemental"),(37,18)
+MONSTER: ('E',"earth elemental"),(03,03)
+MONSTER: ('E',"earth elemental"),(65,04)
+MONSTER: ('E',"earth elemental"),(12,11)
+MONSTER: ('E',"earth elemental"),(60,12)
+MONSTER: ('E',"earth elemental"),(14,08)
+MONSTER: ('E',"earth elemental"),(55,00)
+MONSTER: ('X',"xorn"),(18,18)
+MONSTER: ('X',"xorn"),(59,10)
+MONSTER: ('X',"xorn"),(13,09)
+MONSTER: ('X',"xorn"),(01,17)
 
 #
 #	The "locate" level for the quest.
@@ -133,7 +133,9 @@ MAP
 ------------------------------------------                    ------
 ENDMAP
 # Random Monsters
-RANDOM_MONSTERS: 'E', 'X'
+$monster = monster: { 'E', 'X' }
+SHUFFLE: $monster
+
 # Dungeon Description
 REGION:(00,00,75,20),lit,"ordinary"
 # Stairs
@@ -142,21 +144,21 @@ STAIR:random,down
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,20)
 # Objects
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
 # Random traps
 TRAP:random,random
 TRAP:random,random
@@ -165,29 +167,29 @@ TRAP:random,random
 TRAP:random,random
 TRAP:random,random
 # Random monsters.
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
 
 #
 #	The "goal" level for the quest.
@@ -198,7 +200,7 @@ MONSTER: 'X',"xorn",random
 #
 
 MAZE: "Mon-goal", ' '
-INIT_MAP: 'L' , '.' , false , false , unlit , false
+INIT_MAP: mines, 'L' , '.' , false , false , unlit , false
 GEOMETRY:center,center
 MAP
 .L......L.LLL.......LL....
@@ -214,26 +216,28 @@ LL........................
 .........LLL.........L....
 ENDMAP
 # Dungeon Description
-RANDOM_PLACES:(14,04),(13,07)
+$place = { (14,04),(13,07) }
+SHUFFLE: $place
+
 REGION:(00,00,25,10),unlit,"ordinary"
 # Stairs
 STAIR:(20,05),up
 # Objects
-OBJECT:'(',"lenses",place[0],blessed,0,"The Eyes of the Overworld"
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:('(',"lenses"),$place[0],blessed,0,name:"The Eyes of the Overworld"
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
 # Random traps
 TRAP:"fire",random
 TRAP:"fire",random
@@ -242,26 +246,26 @@ TRAP:"fire",random
 TRAP:random,random
 TRAP:random,random
 # Random monsters.
-MONSTER:'@',"Master Kaen",place[0]
-ALTAR:place[0],noalign,altar
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'E',"earth elemental",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
-MONSTER: 'X',"xorn",random
+MONSTER:('@',"Master Kaen"),$place[0]
+ALTAR:$place[0],noalign,altar
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('E',"earth elemental"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
+MONSTER: ('X',"xorn"),random
 
 #
 #	The "fill" levels for the quest.
@@ -274,82 +278,98 @@ MONSTER: 'X',"xorn",random
 
 LEVEL: "Mon-fila"
 # Random Monsters
-RANDOM_MONSTERS: 'E', 'X'
+$monster = monster: { 'E', 'X' }
+SHUFFLE: $monster
+
 #
-ROOM: "ordinary" , random, random, random, random
-STAIR: random, up
-OBJECT: random,random,random
-MONSTER: 'E', random, random, hostile
+ROOM: "ordinary" , random, random, random, random {
+  STAIR: random, up
+  OBJECT: random,random
+  MONSTER: 'E', random, hostile
+}
 
-ROOM: "ordinary" , random, random, random, random
-OBJECT: random, random, random
-OBJECT: random,random,random
-MONSTER: 'E', random, random, hostile
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  OBJECT: random,random
+  MONSTER: 'E', random, hostile
+}
 
-ROOM: "ordinary" , random, random, random, random
-OBJECT: random, random, random
-TRAP: random, random
-OBJECT: random,random,random
-MONSTER: 'X', "xorn", random
-MONSTER: 'E', "earth elemental", random
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  TRAP: random, random
+  OBJECT: random,random
+  MONSTER: ('X', "xorn"), random
+  MONSTER: ('E', "earth elemental"), random
+}
 
-ROOM: "ordinary" , random, random, random, random
-STAIR: random, down
-OBJECT: random, random, random
-TRAP: random, random
-MONSTER: 'E', random, random, hostile
-MONSTER: 'E', "earth elemental", random
+ROOM: "ordinary" , random, random, random, random {
+  STAIR: random, down
+  OBJECT: random, random
+  TRAP: random, random
+  MONSTER: 'E', random, hostile
+  MONSTER: ('E', "earth elemental"), random
+}
 
-ROOM: "ordinary" , random, random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-TRAP: random, random
-MONSTER: 'X', random, random, hostile
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  OBJECT: random, random
+  TRAP: random, random
+  MONSTER: 'X', random, hostile
+}
 
-ROOM: "ordinary" , random, random, random, random
-OBJECT: random, random, random
-TRAP: random, random
-MONSTER: 'E', "earth elemental", random
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  TRAP: random, random
+  MONSTER: ('E', "earth elemental"), random
+}
 
 RANDOM_CORRIDORS
 
 LEVEL: "Mon-filb"
 # Random Monsters
-RANDOM_MONSTERS: 'E', 'X'
+$monster = monster: { 'E', 'X' }
+SHUFFLE: $monster
+
 #
-ROOM: "ordinary" , random, random, random, random
-STAIR: random, up
-OBJECT: random,random,random
-MONSTER: 'X', random, random, hostile
+ROOM: "ordinary" , random, random, random, random {
+  STAIR: random, up
+  OBJECT: random,random
+  MONSTER: 'X', random, hostile
+}
 
-ROOM: "ordinary" , random, random, random, random
-OBJECT: random, random, random
-OBJECT: random,random,random
-MONSTER: 'X', random, random, hostile
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  OBJECT: random,random
+  MONSTER: 'X', random, hostile
+}
 
-ROOM: "ordinary" , random, random, random, random
-OBJECT: random, random, random
-TRAP: random, random
-OBJECT: random,random,random
-MONSTER: 'E', random, random, hostile
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  TRAP: random, random
+  OBJECT: random,random
+  MONSTER: 'E', random, hostile
+}
 
-ROOM: "ordinary" , random, random, random, random
-STAIR: random, down
-OBJECT: random, random, random
-TRAP: random, random
-MONSTER: 'E', random, random, hostile
-MONSTER: 'E', "earth elemental", random
+ROOM: "ordinary" , random, random, random, random {
+  STAIR: random, down
+  OBJECT: random, random
+  TRAP: random, random
+  MONSTER: 'E', random, hostile
+  MONSTER: ('E', "earth elemental"), random
+}
 
-ROOM: "ordinary" , random, random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-TRAP: random, random
-MONSTER: 'X', random, random, hostile
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  OBJECT: random, random
+  TRAP: random, random
+  MONSTER: 'X', random, hostile
+}
 
-ROOM: "ordinary" , random, random, random, random
-OBJECT: random, random, random
-TRAP: random, random
-MONSTER: 'E', "earth elemental", random
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  TRAP: random, random
+  MONSTER: ('E', "earth elemental"), random
+}
 
 RANDOM_CORRIDORS
 

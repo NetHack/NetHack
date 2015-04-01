@@ -297,9 +297,10 @@ unsigned corpseflags;
                 obj = mkcorpstat(CORPSE, KEEPTRAITS(mtmp) ? mtmp : 0,
                         mdat, x, y, corpstatflags);
                 if (burythem) {
-                (void) bury_an_obj(obj);
+			boolean dealloc;
+			(void) bury_an_obj(obj, &dealloc);
                 newsym(x, y);
-                return obj;
+			return (dealloc ? NULL : obj);
                 }
             }
         break;

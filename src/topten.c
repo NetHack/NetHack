@@ -1,4 +1,4 @@
-/* NetHack 3.5	topten.c	$NHDT-Date: 1426731079 2015/03/19 02:11:19 $  $NHDT-Branch: harder_d8 $:$NHDT-Revision: 1.25 $ */
+/* NetHack 3.5	topten.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
 /* NetHack 3.5	topten.c	$Date: 2012/01/24 04:26:15 $  $Revision: 1.23 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -397,6 +397,8 @@ encodeachieve()
     if(u.uachieve.mines_luckstone) r |= 1L << 9;
     if(u.uachieve.finish_sokoban)  r |= 1L << 10;
     if(u.uachieve.killed_medusa)   r |= 1L << 11;
+    if(u.uroleplay.blind)          r |= 1L << 12;
+    if(u.uroleplay.nudist)         r |= 1L << 13;
 
     return r;
 }

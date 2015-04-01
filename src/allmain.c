@@ -292,7 +292,7 @@ boolean resuming;
 		    }
 		    restore_attrib();
 		    /* underwater and waterlevel vision are done here */
-		    if (Is_waterlevel(&u.uz))
+		    if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
 			movebubbles();
 		    else if (Underwater)
 			under_water(0);
