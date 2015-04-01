@@ -1,12 +1,16 @@
 #!/usr/bin/perl
 # nhsub
-# $NHDT-Date: 1427408239 2015/03/26 22:17:19 $
+# $NHDT-Date: 1427913635 2015/04/01 18:40:35 $
 
 # Note: was originally called nhdate; the rename is not reflected in the code.
 
 use strict;
 my %opt;	#cmd v n f F (other single char, but we don't care)
 my $mode;	# a c d f (add, commit, date, date -f)
+
+if(length $ENV{GIT_PREFIX}){
+        chdir($ENV{GIT_PREFIX}) or die "Can't chdir $ENV{GIT_PREFIX}: $!";
+}
 
 #SO how do we know if a file has changed?
 #(git status: git status --porcelain --ignored -- FILES.
@@ -70,7 +74,10 @@ my %codes = (
 	'd??'=>0, 'c??'=>0,
 
 	'f!!'=>1,			# !!    ignored
-	'a!!'=>0, 'd!!'=>0, 'c!!'=>0
+	'a!!'=>0, 'd!!'=>0, 'c!!'=>0,
+
+	'f@@'=>1,			# @@    internal ignored
+	'a@@'=>0, 'd@@'=>0, 'c@@'=>0
 );
 
 # OS hackery
@@ -111,6 +118,9 @@ while(@rawlist){
 		closedir RDIR;
 	}
 	# ignore other file types
+	if(! -e $raw){
+		print "warning: missing file $raw\n";
+	}
 }
 
 # XXX could batch things up - later
@@ -122,8 +132,8 @@ sub schedule_work {
 	my $key = $mode . join('',(m/^(.)(.)/));
 	if(length $key == 1){
 		# Hack.  An unmodified, tracked file produces no output from
-		# git status.  Treat as ignored.
-		$key .= '!!';
+		# git status.  Treat as another version of 'ignored'.
+		$key .= '@@';
 	}
 	$key =~ s/-/ /g;	# for Keni's locally mod'ed git
 	if(!exists $codes{$key}){
