@@ -432,6 +432,14 @@ dist2(x0, y0, x1, y1)	/* square of euclidean distance between pair of pts */
     return dx * dx + dy * dy;
 }
 
+/* Integer square root function without using floating point.
+ * This could be replaced by a faster algorithm, but has not been because:
+ * + the simple algorithm is easy to read
+ * + this algorithm does not require 64-bit support
+ * + in current usage, the values passed to isqrt() are not really that
+ *   large, so the performance difference is negligible
+ * + isqrt() is used in only few places, which are not bottle-necks
+ */
 int
 isqrt(val)
 int val;

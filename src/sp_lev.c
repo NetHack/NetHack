@@ -1303,6 +1303,7 @@ struct mkroom	*croom;
 
 	if (mtmp) {
 	    x = mtmp->mx,  y = mtmp->my;	/* sanity precaution */
+	    m->x = x, m->y = y;
 	    /* handle specific attributes for some special monsters */
 	    if (m->name.str) mtmp = christen_monst(mtmp, m->name.str);
 
@@ -2067,7 +2068,6 @@ struct mkroom *mkr;
 {
 	boolean okroom;
 	struct mkroom	*aroom;
-	short i;
 	xchar rtype = (!r->chance || rn2(100) < r->chance) ? r->rtype : OROOM;
 
 	if(mkr) {
@@ -2915,7 +2915,6 @@ void
 spo_room(coder)
      struct sp_coder *coder;
 {
-    int isbigrm = FALSE;
     if (coder->n_subroom > MAX_NESTED_ROOMS)
 	panic("Too deeply nested rooms?!");
     else {
@@ -2949,8 +2948,6 @@ spo_room(coder)
 	tmproom.filled = (OV_i(flags) & (1 << 0));
 	/*tmproom.irregular = (OV_i(flags) & (1 << 1));*/
 	tmproom.joined = !(OV_i(flags) & (1 << 2));
-
-	isbigrm = ((tmproom.w * tmproom.h) > 20);
 
 	opvar_free(x);
 	opvar_free(y);
@@ -4162,7 +4159,6 @@ spo_map(coder)
     struct opvar *mpxs, *mpys, *mpmap, *mpa, *mpkeepr, *mpzalign;
     xchar halign, valign;
     xchar tmpxstart, tmpystart, tmpxsize, tmpysize;
-    int tryct = 0;
     unpacked_coord upc;
 
     if (!OV_pop_i(mpxs) ||
@@ -4171,8 +4167,6 @@ spo_map(coder)
 	!OV_pop_i(mpkeepr) ||
 	!OV_pop_i(mpzalign) ||
 	!OV_pop_c(mpa)) return;
-
-redo_maploc:
 
     tmpmazepart.xsize = OV_i(mpxs);
     tmpmazepart.ysize = OV_i(mpys);
@@ -4281,7 +4275,6 @@ redo_maploc:
 	xsize = tmpxsize; ysize = tmpysize;
     }
 
-skipmap:
     opvar_free(mpxs);
     opvar_free(mpys);
     opvar_free(mpmap);
