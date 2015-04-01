@@ -2189,7 +2189,7 @@ int humidity;
 	    x = rn1(x_maze_max - 3, 3);
 	    y = rn1(y_maze_max - 3, 3);
 	    if (--tryct < 0) break;	/* give up */
-	} while (!(x % 2) || !(y % 2) || !SpLev_Map[x][y] ||
+	} while (!(x % 2) || !(y % 2) || SpLev_Map[x][y] ||
 		 !is_ok_location((schar)x, (schar)y, humidity));
 
 	m->x = (xchar)x,  m->y = (xchar)y;
