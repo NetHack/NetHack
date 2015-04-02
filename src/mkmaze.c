@@ -916,9 +916,9 @@ movebubbles()
 	register int x, y, i, j;
 	struct trap *btrap;
 	static const struct rm water_pos =
-		{ cmap_to_glyph(S_water), WATER, 0, 0, 0, 0, 0, 0, 0 };
+		{ cmap_to_glyph(S_water), WATER, 0, 0, 0, 0, 0, 0, 0, 0 };
 	static const struct rm air_pos =
-		{ cmap_to_glyph(S_cloud), AIR,   0, 0, 0, 1, 0, 0, 0 };
+		{ cmap_to_glyph(S_cloud), AIR,   0, 0, 0, 1, 0, 0, 0, 0 };
 
 	/* set up the portal the first time bubbles are moved */
 	if (!wportal) set_wportal();

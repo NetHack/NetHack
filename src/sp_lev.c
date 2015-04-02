@@ -523,10 +523,9 @@ remove_boundary_syms()
 
 
 void
-maybe_add_door(x,y, droom, i,s)
+maybe_add_door(x,y, droom)
 int x,y;
 struct mkroom *droom;
-int i,s;
 {
     if (droom->hx >= 0 && doorindex < DOORMAX && inside_room(droom, x,y))
 	add_door(x, y, droom);
@@ -541,9 +540,9 @@ link_doors_rooms()
 	for (x = 0; x < COLNO; x++)
 	    if (IS_DOOR(levl[x][y].typ) || levl[x][y].typ == SDOOR) {
 		for (tmpi = 0; tmpi < nroom; tmpi++) {
-		    maybe_add_door(x,y, &rooms[tmpi], tmpi,-1);
+		    maybe_add_door(x,y, &rooms[tmpi]);
 		    for (m = 0; m < rooms[tmpi].nsubrooms; m++) {
-			maybe_add_door(x,y, rooms[tmpi].sbrooms[m], tmpi,m);
+			maybe_add_door(x,y, rooms[tmpi].sbrooms[m]);
 		    }
 		}
 	    }
