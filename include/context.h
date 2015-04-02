@@ -116,11 +116,8 @@ struct context_info {
 	struct book_info spbook;
 	struct takeoff_info takeoff;
 	struct warntype_info warntype;
-<<<<<<< HEAD
-	struct tribute_info tribute;
-=======
 	struct polearm_info polearm;
->>>>>>> master
+	struct tribute_info tribute;
 };
 
 extern NEARDATA struct context_info context;
