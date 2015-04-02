@@ -4840,7 +4840,7 @@ sp_lev *lvl;
 	    {
 		struct opvar *sel1, *sel2, *pt;
 		if (!OV_pop_typ(sel1, SPOVAR_SEL)) panic("no sel1 for add");
-		if (!OV_pop_typ(sel2, SPOVAR_SEL)) panic("no sel1 for add");
+		if (!OV_pop_typ(sel2, SPOVAR_SEL)) panic("no sel2 for add");
 		pt = selection_logical_oper(sel1, sel2, '|');
 		opvar_free(sel1);
 		opvar_free(sel2);
@@ -4948,7 +4948,8 @@ sp_lev *lvl;
 	    {
 		struct opvar *tmp, *tmp2, *pt = selection_opvar(NULL);
 		schar x1,y1,x2,y2;
-		if (!OV_pop_c(tmp) || !OV_pop_c(tmp2)) panic("no ter sel linecoord");
+		if (!OV_pop_c(tmp)) panic("no ter sel linecoord1");
+		if (!OV_pop_c(tmp2)) panic("no ter sel linecoord2");
 		get_location_coord(&x1, &y1, ANY_LOC, coder->croom, OV_i(tmp));
 		get_location_coord(&x2, &y2, ANY_LOC, coder->croom, OV_i(tmp2));
 		x1 = (x1 < 0) ? 0 : x1;
@@ -4965,7 +4966,9 @@ sp_lev *lvl;
 	    {
 		struct opvar *tmp, *tmp2, *tmp3, *pt = selection_opvar(NULL);
 		schar x1,y1,x2,y2;
-		if (!OV_pop_i(tmp3) || !OV_pop_c(tmp) || !OV_pop_c(tmp2)) panic("no ter sel randline");
+		if (!OV_pop_i(tmp3)) panic("no ter sel randline1");
+		if (!OV_pop_c(tmp)) panic("no ter sel randline2");
+		if (!OV_pop_c(tmp2)) panic("no ter sel randline3");
 		get_location_coord(&x1, &y1, ANY_LOC, coder->croom, OV_i(tmp));
 		get_location_coord(&x2, &y2, ANY_LOC, coder->croom, OV_i(tmp2));
 		x1 = (x1 < 0) ? 0 : x1;
