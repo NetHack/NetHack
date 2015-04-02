@@ -1,4 +1,4 @@
-/* NetHack 3.5	mon.c	$NHDT-Date: 1426465438 2015/03/16 00:23:58 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.139 $ */
+/* NetHack 3.5	mon.c	$NHDT-Date: 1427580482 2015/03/28 22:08:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.142 $ */
 /* NetHack 3.5	mon.c	$Date: 2012/05/16 02:15:10 $  $Revision: 1.126 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -278,9 +278,10 @@ unsigned corpseflags;
 		    obj = mkcorpstat(CORPSE, KEEPTRAITS(mtmp) ? mtmp : 0,
 				     mdat, x, y, corpstatflags);
 		    if (burythem) {
-			(void) bury_an_obj(obj);
+			boolean dealloc;
+			(void) bury_an_obj(obj, &dealloc);
 			newsym(x, y);
-			return obj;
+			return (dealloc ? NULL : obj);
 		    }
 		}
 		break;
@@ -615,7 +616,10 @@ meatmetal(mtmp)
 	/* Eats topmost metal object if it is there */
 	for (otmp = level.objects[mtmp->mx][mtmp->my];
 						otmp; otmp = otmp->nexthere) {
-	    if (mtmp->data == &mons[PM_RUST_MONSTER] && !is_rustprone(otmp))
+	    /* Don't eat indigestible/choking/inappropriate objects */
+	    if ((mtmp->data == &mons[PM_RUST_MONSTER] && !is_rustprone(otmp)) ||
+		(otmp->otyp == AMULET_OF_STRANGULATION) ||
+		(otmp->otyp == RIN_SLOW_DIGESTION))
 		continue;
 	    if (is_metallic(otmp) && !obj_resists(otmp, 5, 95) &&
 		touch_artifact(otmp,mtmp)) {
@@ -632,9 +636,7 @@ meatmetal(mtmp)
 			pline("%s spits %s out in disgust!",
 			      Monnam(mtmp), distant_name(otmp,doname));
 		    }
-		/* KMH -- Don't eat indigestible/choking objects */
-		} else if (otmp->otyp != AMULET_OF_STRANGULATION &&
-				otmp->otyp != RIN_SLOW_DIGESTION) {
+		} else {
 		    if (cansee(mtmp->mx,mtmp->my) && flags.verbose)
 			pline("%s eats %s!", Monnam(mtmp),
 				distant_name(otmp,doname));
@@ -1237,6 +1239,8 @@ dmonsfree()
     for (mtmp = &fmon; *mtmp;) {
 	freetmp = *mtmp;
 	if (freetmp->mhp <= 0 && !freetmp->isgd) {
+	    if (freetmp == context.polearm.hitmon)
+		context.polearm.hitmon = NULL;
 	    *mtmp = freetmp->nmon;
 	    dealloc_monst(freetmp);
 	    count++;

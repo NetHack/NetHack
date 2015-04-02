@@ -1,4 +1,4 @@
-/* NetHack 3.5	topten.c	$NHDT-Date: 1426731079 2015/03/19 02:11:19 $  $NHDT-Branch: harder_d8 $:$NHDT-Revision: 1.25 $ */
+/* NetHack 3.5	topten.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
 /* NetHack 3.5	topten.c	$Date: 2012/01/24 04:26:15 $  $Revision: 1.23 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -66,6 +66,7 @@ STATIC_DCL void FDECL(discardexcess, (FILE *));
 STATIC_DCL void FDECL(readentry, (FILE *,struct toptenentry *));
 STATIC_DCL void FDECL(writeentry, (FILE *,struct toptenentry *));
 STATIC_DCL void FDECL(writexlentry, (FILE*, struct toptenentry *));
+STATIC_DCL long NDECL(encodexlogflags);
 STATIC_DCL long NDECL(encodeconduct);
 STATIC_DCL long NDECL(encodeachieve);
 STATIC_DCL void FDECL(free_ttlist, (struct toptenentry *));
@@ -341,8 +342,22 @@ struct toptenentry *tt;
     Fprintf(rfile, "%cgender0=%s%calign0=%s",
 	    XLOG_SEP, genders[flags.initgend].filecode,
 	    XLOG_SEP, aligns[1 - u.ualignbase[A_ORIGINAL]].filecode);
+    Fprintf(rfile, "%cflags=0x%lx",
+	    XLOG_SEP, encodexlogflags());
     Fprintf(rfile, "\n");
 #undef XLOG_SEP
+}
+
+STATIC_OVL long
+encodexlogflags()
+{
+    long e = 0L;
+
+    if (wizard)                e |= 1L << 0;
+    if (discover)              e |= 1L << 1;
+    if (!u.uroleplay.numbones) e |= 1L << 2;
+
+    return e;
 }
 
 STATIC_OVL long
@@ -383,6 +398,8 @@ encodeachieve()
     if(u.uachieve.mines_luckstone) r |= 1L << 9;
     if(u.uachieve.finish_sokoban)  r |= 1L << 10;
     if(u.uachieve.killed_medusa)   r |= 1L << 11;
+    if(u.uroleplay.blind)          r |= 1L << 12;
+    if(u.uroleplay.nudist)         r |= 1L << 13;
 
     return r;
 }

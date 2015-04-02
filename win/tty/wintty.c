@@ -1,4 +1,4 @@
-/* NetHack 3.5	wintty.c	$NHDT-Date: 1426465444 2015/03/16 00:24:04 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.71 $ */
+/* NetHack 3.5	wintty.c	$NHDT-Date: 1427667623 2015/03/29 22:20:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.75 $ */
 /* NetHack 3.5	wintty.c	$Date: 2012/01/22 06:27:09 $  $Revision: 1.66 $ */
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -56,7 +56,7 @@ struct window_procs tty_procs = {
 #if defined(SELECTSAVED)
     WC2_SELECTSAVED|
 #endif
-    0L,
+    WC2_DARKGRAY,
     tty_init_nhwindows,
     tty_player_selection,
     tty_askname,
@@ -1391,10 +1391,11 @@ struct WinDesc *cw;
 {
     tty_menu_item *page_start, *page_end, *curr;
     long count;
-    int n, curr_page, page_lines;
+    int n, curr_page, page_lines, resp_len;
     boolean finished, counting, reset_count;
     char *cp, *rp, resp[QBUFSZ], gacc[QBUFSZ],
-	 *msave, *morestr;
+	 *msave, *morestr, really_morc;
+#define MENU_EXPLICIT_CHOICE 0x7f	/* pseudo menu manipulation char */
 
     curr_page = page_lines = 0;
     page_start = page_end = 0;
@@ -1461,6 +1462,8 @@ struct WinDesc *cw;
 		for (page_lines = 0, curr = page_start;
 			curr != page_end;
 			page_lines++, curr = curr->next) {
+		    int color = NO_COLOR, attr = ATR_NONE;
+		    boolean menucolr = FALSE;
 		    if (curr->selector)
 			*rp++ = curr->selector;
 
@@ -1476,6 +1479,11 @@ struct WinDesc *cw;
 		     * actually output the character.  We're faster doing
 		     * this.
 		     */
+		    if (iflags.use_menu_color &&
+			(menucolr = get_menu_coloring(curr->str, &color,&attr))) {
+			term_start_attr(attr);
+			if (color != NO_COLOR) term_start_color(color);
+		    } else
 		    term_start_attr(curr->attr);
 		    for (n = 0, cp = curr->str;
 #ifndef WIN32CON
@@ -1493,6 +1501,10 @@ struct WinDesc *cw;
 				(void) putchar('#'); /* count selected */
 			} else
 			    (void) putchar(*cp);
+		   if (iflags.use_menu_color && menucolr) {
+		       if (color != NO_COLOR) term_end_color();
+		       term_end_attr(attr);
+		   } else
 		    term_end_attr(curr->attr);
 		}
 	    } else {
@@ -1501,6 +1513,8 @@ struct WinDesc *cw;
 		page_lines = 0;
 	    }
 	    *rp = 0;
+	    /* remember how many explicit menu choices there are */
+	    resp_len = (int)strlen(resp);
 
 	    /* corner window - clear extra lines from last page */
 	    if (cw->offx) {
@@ -1533,7 +1547,15 @@ struct WinDesc *cw;
 	    xwaitforspace(resp);
 	}
 
-	morc = map_menu_cmd(morc);
+	really_morc = morc;	/* (only used with MENU_EXPLICIT_CHOICE */
+	if ((rp = index(resp, morc)) != 0 && rp < resp + resp_len)
+	    /* explicit menu selection; don't override it if it also
+	       happens to match a mapped menu command (such as ':' to
+	       look inside a container vs ':' to search) */
+	    morc = MENU_EXPLICIT_CHOICE;
+	else
+	    morc = map_menu_cmd(morc);
+
 	switch (morc) {
 	    case '0':
 		/* special case: '0' is also the default ball class */
@@ -1646,7 +1668,7 @@ struct WinDesc *cw;
 		    boolean on_curr_page = FALSE;
 		    int lineno = 0;
 		    tty_getlin("Search for:", tmpbuf);
-		    if (!tmpbuf || tmpbuf[0] == '\033') break;
+		    if (!tmpbuf[0] || tmpbuf[0] == '\033') break;
 		    Sprintf(searchbuf, "*%s*", tmpbuf);
 		    for (curr = cw->mlist; curr; curr = curr->next) {
 			if (on_curr_page) lineno++;
@@ -1664,6 +1686,9 @@ struct WinDesc *cw;
 		    }
 		}
 		break;
+	    case MENU_EXPLICIT_CHOICE:
+		morc = really_morc;
+		/*FALLTHRU*/
 	    default:
 		if (cw->how == PICK_NONE || !index(resp, morc)) {
 		    /* unacceptable input received */
@@ -1809,6 +1834,7 @@ tty_display_nhwindow(window, blocking)
 	cw->offx = (uchar) (int)
 	    max((int) 10, (int) (ttyDisplay->cols - cw->maxcol - 1));
 #endif
+	if(cw->offx < 0) cw->offx = 0;
 	if(cw->type == NHW_MENU)
 	    cw->offy = 0;
 	if(ttyDisplay->toplin == 1)

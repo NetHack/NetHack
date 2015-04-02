@@ -304,7 +304,11 @@ dosounds()
 
 static const char * const h_sounds[] = {
     "beep", "boing", "sing", "belche", "creak", "cough", "rattle",
-    "ululate", "pop", "jingle", "sniffle", "tinkle", "eep"
+    "ululate", "pop", "jingle", "sniffle", "tinkle", "eep",
+    "clatter", "hum", "sizzle", "twitter", "wheeze", "rustle",
+    "honk", "lisp", "yodel", "coo", "burp", "moo", "boom",
+    "murmur", "oink", "quack", "rumble", "twang", "bellow",
+    "toot", "gargle", "hoot", "warble"
 };
 
 const char *
@@ -706,6 +710,7 @@ register struct monst *mtmp;
 	    pline("%s rattles noisily.", Monnam(mtmp));
 	    You("freeze for a moment.");
 	    nomul(-2);
+	    multi_reason = "scared by rattling";
 	    nomovemsg = 0;
 	    break;
 	case MS_LAUGH:

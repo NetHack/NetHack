@@ -1,0 +1,386 @@
+#!/usr/bin/perl
+# nhsub
+# $NHDT-Date: 1427913635 2015/04/01 18:40:35 $
+
+# Note: was originally called nhdate; the rename is not reflected in the code.
+
+use strict;
+my %opt;	#cmd v n f F (other single char, but we don't care)
+my $mode;	# a c d f (add, commit, date, date -f)
+
+if(length $ENV{GIT_PREFIX}){
+        chdir($ENV{GIT_PREFIX}) or die "Can't chdir $ENV{GIT_PREFIX}: $!";
+}
+
+#SO how do we know if a file has changed?
+#(git status: git status --porcelain --ignored -- FILES.
+#maybe + -z but it's a question of rename operations - probably doesn't
+# matter, but need to experiment.
+
+# key:  [dacf] first character of opt{cmd} (f if nhsub -f or add -f)
+#	first 2 chars of "git status --porcelain --ignored"
+# (see "git help status" for table)
+# No default.  Undef means something unexpected happened.
+my %codes = (
+	'f M'=>1, 'f D'=>1,		#           [MD]   not updated
+	'a M'=>0, 'a D'=>0,
+	'd M'=>0, 'd D'=>0,
+	'c M'=>0, 'c D'=>0,
+
+#           M        [ MD]   updated in index
+
+	'dA '=>1, 'dAM'=>1, 'dAD'=>1,
+	'aA '=>1, 'aAM'=>1, 'aAD'=>1,
+	'cA '=>1, 'cAM'=>1, 'cAD'=>1,
+	'fA '=>1, 'fAM'=>1, 'fAD'=>1,
+				   # A        [ MD]   added to index
+
+	'dD '=>0, 'dDM'=>0,
+	'aD '=>1, 'aDM'=>1,
+	'cD '=>0, 'cDM'=>0,
+	'fD '=>1, 'fDM'=>1,
+				   # D         [ M]   deleted from index
+
+#           R        [ MD]   renamed in index
+
+#           C        [ MD]   copied in index
+
+	'aM '=>1, 'aA '=>1, 'aR '=>1, 'aC '=>1,
+	'fM '=>1, 'fA '=>1, 'fR '=>1, 'fC '=>1,
+				   # [MARC]          index and work tree matches
+
+	'd M'=>1, 'dMM'=>1, 'dAM'=>1, 'dRM'=>1, 'dCM'=>1,
+	'a M'=>1, 'aMM'=>1, 'aAM'=>1, 'aRM'=>1, 'aCM'=>1,
+	'c M'=>1, 'cMM'=>1, 'cAM'=>1, 'cRM'=>1, 'cCM'=>1,
+	'f M'=>1, 'fMM'=>1, 'fAM'=>1, 'fRM'=>1, 'fCM'=>1,
+				   # [ MARC]     M work tree changed since index
+
+	'd D'=>0, 'dMD'=>0, 'dAD'=>0, 'dRD'=>0, 'dCD'=>0,
+	'a D'=>0, 'aMD'=>0, 'aAD'=>0, 'aRD'=>0, 'aCD'=>0,
+	'c D'=>0, 'cMD'=>0, 'cAD'=>0, 'cRD'=>0, 'cCD'=>0,
+	'f D'=>0, 'fMD'=>0, 'fAD'=>0, 'fRD'=>0, 'fCD'=>0,
+				   # [ MARC]     D    deleted in work tree
+
+           # -------------------------------------------------
+           # DD    unmerged, both deleted
+           # AU    unmerged, added by us
+           # UD    unmerged, deleted by them
+           # UA    unmerged, added by them
+           # DU    unmerged, deleted by us
+           # AA    unmerged, both added
+           # UU    unmerged, both modified
+           # -------------------------------------------------
+        'a??'=>1, 'f??'=>1,		# ??    untracked
+	'd??'=>0, 'c??'=>0,
+
+	'f!!'=>1,			# !!    ignored
+	'a!!'=>0, 'd!!'=>0, 'c!!'=>0,
+
+	'f@@'=>1,			# @@    internal ignored
+	'a@@'=>0, 'd@@'=>0, 'c@@'=>0
+);
+
+# OS hackery
+my $PDS = '/';
+if ($^O eq "MSWin32")
+{
+    $PDS = '\\';
+}
+
+# pick up the prefix for substitutions in this repo
+my $PREFIX = &git_config('nethack','substprefix');
+print "PREFIX: '$PREFIX'\n" if($opt{v});
+
+my @rawlist = &cmdparse(@ARGV);
+push(@rawlist,'.') if($#rawlist == -1);
+
+while(@rawlist){
+	my $raw = shift @rawlist;
+	if(-f $raw){
+		&schedule_work($raw);
+		next;
+	}
+	if(-d $raw){
+		if($raw =~ m!$PDS.git$!o){
+			print "SKIP $raw\n" if($opt{v}>=2);
+			next;
+		}
+		opendir RDIR,$raw or die "Can't opendir: $raw";
+		local($_);	# needed until perl 5.11.2
+		while($_ = readdir RDIR){
+			next if(m/^\.\.?$/);
+			if(m/^\./ && $opt{f}){
+				print "       IGNORE-f: $raw$PDS$_\n" if($opt{v}>=2);
+				next;
+			}
+			push(@rawlist, $raw.$PDS.$_);
+		}
+		closedir RDIR;
+	}
+	# ignore other file types
+	if(! -e $raw){
+		print "warning: missing file $raw\n";
+	}
+}
+
+# XXX could batch things up - later
+
+sub schedule_work {
+	my($file) = @_;
+	print "CHECK: '$file'\n" if($opt{v}>=2);
+	local($_) = `git status --porcelain --ignored -- $file`;
+	my $key = $mode . join('',(m/^(.)(.)/));
+	if(length $key == 1){
+		# Hack.  An unmodified, tracked file produces no output from
+		# git status.  Treat as another version of 'ignored'.
+		$key .= '@@';
+	}
+	$key =~ s/-/ /g;	# for Keni's locally mod'ed git
+	if(!exists $codes{$key}){
+		die "I'm lost.\nK='$key' F=$file\nST=$_";
+	}
+	if($codes{$key}==0){
+		if($opt{v}>=2){
+			print "       IGNORE: $_" if(length);
+			print "       IGNORE: !! $file\n" if(!length);
+		}
+		return;
+	}
+	if($opt{F}){
+		my $ign = `git check-ignore $file`;
+		if($ign !~ m/^\s*$/){
+			print "       IGNORE-F: $ign" if($opt{v}>=2);
+			return;
+		}
+	}
+# FALLTHROUGH and continue
+#print     "ACCEPT TEST\n";	# XXXXXXXXXX TEST
+#return;
+
+	my $attr = `git check-attr NHSUBST -- $file`;
+	if($attr =~ m/NHSUBST:\s+(.*)/){
+# XXX this is a bug in git.  What if the value of an attribute is the
+# string "unset"?  Sigh.
+		if(! $opt{F}){
+			if($1 eq "unset" || $1 eq "unspecified"){
+				print "       NOATTR: $attr" if($opt{v}>=2);
+				return;
+			}
+		}
+		&process_file($file);
+		return;
+	}
+	die "Can't parse check-attr return: $attr\n";
+}
+
+sub process_file {
+	my($file) = @_;
+	print "DOFIL: $file\n" if($opt{v}>=1);
+
+	# For speed we read in the entire file then do the substitutions.
+	local($_) = '';
+	my $len;
+	open INFILE, "<", $file or die "Can't open $file: $!";
+	while(1){
+			# On at least some systems we only get 64K.
+		my $len = sysread(INFILE, $_, 999999, length($_));
+		last if($len == 0);
+		die "read failed: $!" unless defined($len);
+	}
+	close INFILE;
+
+	local $::current_file = $file;	# used under handlevar
+	# $1 - var and value (including trailing space but not $)
+	# $2 - var
+	# $4 - value or undef
+#s/\$$PREFIX-(([A-Za-z][A-Za-z0-9_]*)(: ([^\N{DOLLAR SIGN}]+))?)\$/&handlevar($2,$4)/eg;
+my $count = s/\$$PREFIX-(([A-Za-z][A-Za-z0-9_]*)(: ([^\x24]+))?)\$/&handlevar($2,$4)/eg;
+# XXX had o modifier, why?
+	return unless($count>0);
+	return if($opt{n});
+
+	my $ofile = $file . ".nht";
+	open(TOUT, ">", $ofile) or die "Can't open $ofile";
+	die "write failed: $!" unless defined syswrite(TOUT, $_);
+	close TOUT or die "Can't close $ofile";
+	rename $ofile, $file or die "Can't rename $ofile to $file";
+}
+
+sub cmdparse {
+	my(@in) = @_;
+
+		# What are we doing?
+	$opt{cmd} = 'date';	# really nhsub
+	if($in[0] eq '--add'){
+		$opt{cmd} = 'add';
+		shift @in;
+	}
+	if($in[0] eq '--commit'){
+		$opt{cmd} = 'commit';
+		shift @in;
+	}
+
+# add: -n -v
+# commit: --dry-run -v
+# nhsub: -n -v
+	while($in[0] =~ m/^-/){
+		local($_) = $in[0];
+		if($_ eq '--'){
+			shift @in;
+			last;
+		}
+		if(m/^--/){
+			if($opt{cmd} eq 'commit' && $_ eq '--dry-run'){
+				$opt{'n'} = 1;
+			}
+			shift @in;
+			next;
+		}
+		if(m/^-(.*)/){
+			foreach my $single ( split(//,$1) ){
+					# don't do -v here from add/commit
+				if($single ne 'v'){
+					$opt{$single}++;
+				} elsif($opt{cmd} eq 'date'){
+					$opt{$single}++;
+				}
+			}
+		}
+		shift @in;
+	}
+
+	($mode) = ($opt{cmd} =~ m/^(.)/);
+	$mode = 'f' if($opt{cmd} eq 'date' && ($opt{f}||$opt{F}));
+	$mode = 'f' if($opt{cmd} eq 'add' && $opt{f});
+
+	return @in;	# this is our file list
+}
+
+sub git_config {
+	my($section, $var) = @_;
+	my $raw = `git config --local --get $section.$var`;
+	$raw =~ s/[\r\n]*$//g;
+	return $raw if(length $raw);
+	die "Missing config var: [$section] $var\n";
+}
+
+sub handlevar {
+	my($var, $val) = @_;
+#	print "HIT '$var' '$val'\n" if($debug2);
+
+	my $subname = "PREFIX::$var";
+	if(defined &$subname){
+		no strict;
+		print "   SUBIN: $var '$val'\n" if($opt{v}>=3);
+		$val =~ s/\s+$//;
+		$val = &$subname($val);
+		print "   SUBOT: $var '$val'\n" if($opt{v}>=3);
+	} else {
+		warn "No handler for \$$PREFIX-$var\n";
+	}
+
+	if(length $val){
+		return "\$$PREFIX-$var: $val \$";
+	} else {
+		return "\$$PREFIX-$var\$";
+	}
+}
+
+package PREFIX;
+use POSIX qw(strftime);
+
+# On push, put in the current date because we changed the file.
+# On pull, keep the current value so we can see the last change date.
+sub Date {
+	my($val) = @_;
+	# we add this to make merge easier for now XXX
+	my $now = time; # not %s below - may not be portable
+	# YYYY/MM/DD HH:MM:SS
+	$val = "$now " . strftime("%Y/%m/%d %H:%M:%S", gmtime($now));
+	return $val;
+}
+
+#sub Header {
+#}
+#sub Author {
+#}
+
+# NB: the standard-ish Revision line isn't enough - you need Branch:Revision -
+#     but we split it into 2 so we can use the standard processing code on Revision
+#     and just slip Branch in.
+sub Branch {
+	my($val) = @_;
+	$val = `git symbolic-ref -q --short HEAD`;
+	$val =~ s/[\n\r]*$//;
+	$val =~ s/^\*\s*//;
+	$val = "(unknown)" unless($val =~ m/^[[:print:]]+$/);
+	return $val;
+}
+
+sub Revision {
+	my($val) = @_;
+	my @val = `git log --follow --oneline $::current_file`;
+	my $ver = 0+$#val;
+	$ver = 0 if($ver < 0);
+	$val = "1.$ver";
+	return $val;
+}
+__END__
+
+=head1 NAME
+
+C<nhsub> - NetHack git command for substitution variables
+
+=head1 SYNOPSIS
+
+C<git nhsub [-v[v[v]] [-n] [-f|-F] [--] [file...]>
+
+=head1 DESCRIPTION
+
+C<nhsub> rewrites the specified files by doing variable substitution for
+variables starting with the prefix specified in the repository's
+C<nethack.substprefix> configuration variable.  C<nhsub> is also invoked
+internally from the implementation of the C<nhadd> and C<nhcommit>
+commands.
+
+The program re-writes those files listed on the command line; if the file
+is actually a directory, the program recurses into that directory tree.
+Not all files found are re-written; some are ignored and those with no
+substitution variables are not re-written.  Unless changed by the options,
+files that have not changed are not affected.
+
+If no files are listed on the command line, the current directory is
+checked as if specified as C<.>.
+Files listed directly on the command line are always checked.
+The C<.git> directory is never processed.
+
+The following command line options are available:
+
+=over
+
+=item C<-v[v[v]]>
+
+Verbose output; may be (usefully) specified up to 3 times.  Not available
+when invoked as part of C<nhadd> or C<nhcommit>.
+
+=item C<-n>
+
+Do not write any files.
+
+=item C<-f>
+
+Force, version 1:  
+Perform substitution even if the file has not changed,
+except no dot files are processed unless listed directly on the command line.
+This prevents accidents with editor temprorary files while recursing.  Note
+that this overloads the C<-f> option of C<git add> and C<git commit>.
+
+=item C<-F>
+
+Force, version 2:
+Perform substitution even if the file has not changed,
+even if the NHSUBST attribute is not set for the
+file, and only if the file is not ignored by git.  Not available
+when invoked as part of C<nhadd> or C<nhcommit>.
+
+=back

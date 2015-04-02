@@ -45,6 +45,7 @@ tombstone      print tombstone when you die                       [TRUE]
 toptenwin      print topten in a window rather than stdout        [FALSE]
 travel         enable the command to travel to a map location via [TRUE]
                a shortest-path algorithm, usually invoked by '_'.
+use_darkgray   use bold black instead of blue for black glyphs.   [TRUE]
 use_inverse    display detected monsters in highlighted manner    [FALSE]
 verbose        print more commentary during the game              [TRUE]
 

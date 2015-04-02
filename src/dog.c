@@ -423,7 +423,7 @@ boolean with_you;
 		 * probably because the level is full.
 		 * Dump the monster's cargo and leave the monster dead.
 		 */
-	    	struct obj *obj, *corpse;
+	    	struct obj *obj;
 		while ((obj = mtmp->minvent) != 0) {
 		    obj_extract_self(obj);
 		    obj_no_longer_held(obj);
@@ -437,7 +437,7 @@ boolean with_you;
 			    impossible("Can't find relocated object.");
 		    }
 		}
-		corpse = mkcorpstat(CORPSE, (struct monst *)0, mtmp->data,
+		(void) mkcorpstat(CORPSE, (struct monst *)0, mtmp->data,
 				xlocale, ylocale, CORPSTAT_NONE);
 		mongone(mtmp);
 	    }
@@ -685,6 +685,7 @@ migrate_to_level(mtmp, tolev, xyloc, cc)
 	mtmp->mux = new_lev.dnum;
 	mtmp->muy = new_lev.dlevel;
 	mtmp->mx = mtmp->my = 0;	/* this implies migration */
+	if (mtmp == context.polearm.hitmon) context.polearm.hitmon = NULL;
 }
 
 /* return quality of food; the lower the better */

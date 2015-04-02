@@ -465,7 +465,12 @@ int how;
 		    Sprintf(eos(buf), " called %s", MNAME(mtmp));
 	}
 
-	if (multi) Strcat(buf, ", while helpless");
+	if (multi) {
+	    if (multi_reason)
+		Sprintf(eos(buf), ", while %s", multi_reason);
+	    else
+		Strcat(buf, ", while helpless");
+	}
 	Strcpy(killer.name, buf);
 	if (mptr->mlet == S_WRAITH)
 		u.ugrave_arise = PM_WRAITH;

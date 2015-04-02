@@ -10,6 +10,7 @@ struct sysopt {
 	char *support;	/* local support contact */
 	char *recover;	/* how to run recover - may be overridden by win port */
 	char *wizards;
+	char *explorers;
 	char *shellers;	/* like wizards, for ! command (-DSHELL) */
 	char *debugfiles; /* files to show debugplines in. '*' is all. */
 	int env_dbgfl;	/*  1: debugfiles comes from getenv("DEBUGFILES")

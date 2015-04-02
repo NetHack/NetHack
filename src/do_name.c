@@ -25,6 +25,17 @@ nextmbuf()
 	return bufs[bufidx];
 }
 
+/* function for getpos() to highlight desired map locations.
+ * parameter value 0 = initialize, 1 = highlight, 2 = done
+ */
+void (*getpos_hilitefunc)(int) = NULL;
+void
+getpos_sethilite(f)
+void (*f)(int);
+{
+    getpos_hilitefunc = f;
+}
+
 /* the response for '?' help request in getpos() */
 STATIC_OVL void
 getpos_help(force, goal)
@@ -41,6 +52,8 @@ const char *goal;
     putstr(tmpwin, 0, "Use [HJKL] to move the cursor 8 units at a time.");
     putstr(tmpwin, 0, "Or enter a background symbol (ex. <).");
     putstr(tmpwin, 0, "Use @ to move the cursor on yourself.");
+    if (getpos_hilitefunc != NULL)
+	putstr(tmpwin, 0, "Use $ to display valid locations.");
     putstr(tmpwin, 0, "Use # to toggle automatic description.");
     /* disgusting hack; the alternate selection characters work for any
        getpos call, but they only matter for dowhatis (and doquickwhatis) */
@@ -69,6 +82,7 @@ const char *goal;
     boolean show_goal_msg = FALSE;
     static const char pick_chars[] = ".,;:";
     const char *cp;
+    boolean hilite_state = FALSE;
 
     if (!goal) goal = "desired location";
     if (flags.verbose) {
@@ -92,7 +106,7 @@ const char *goal;
 	    curs(WIN_MAP, cx, cy);
 	    flush_screen(0);
 	    show_goal_msg = FALSE;
-	} else if (auto_msg && !msg_given) {
+	} else if (auto_msg && !msg_given && !hilite_state) {
 	    coord cc;
 	    int sym = 0;
 	    char tmpbuf[BUFSZ];
@@ -109,6 +123,13 @@ const char *goal;
 	}
 
 	c = nh_poskey(&tx, &ty, &sidx);
+
+	if (hilite_state) {
+	    (*getpos_hilitefunc)(2);
+	    hilite_state = FALSE;
+	    curs(WIN_MAP, cx, cy);
+	    flush_screen(0);
+	}
 
 	if (auto_msg)
 	    msg_given = FALSE;
@@ -174,6 +195,13 @@ const char *goal;
 	    /* update message window to reflect that we're still targetting */
 	    show_goal_msg = TRUE;
 	    msg_given = TRUE;
+	} else if ((c == '$') && (getpos_hilitefunc != NULL)) {
+	    if (!hilite_state) {
+		(*getpos_hilitefunc)(0);
+		(*getpos_hilitefunc)(1);
+		hilite_state = TRUE;
+	    }
+	    goto nxtc;
 	} else if (c == '#') {
 	    auto_msg = !auto_msg;
 	    pline("Automatic description %sis %s.",
@@ -269,6 +297,7 @@ const char *goal;
     if (msg_given) clear_nhwindow(WIN_MESSAGE);
     ccp->x = cx;
     ccp->y = cy;
+    getpos_hilitefunc = NULL;
     return result;
 }
 

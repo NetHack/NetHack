@@ -1,4 +1,4 @@
-/* NetHack 3.5	obj.h	$NHDT-Date: 1426949157 2015/03/21 14:45:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.36 $ */
+/* NetHack 3.5	obj.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
 /* NetHack 3.5	obj.h	$Date: 2012/01/10 17:47:16 $  $Revision: 1.31 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -303,6 +303,17 @@ struct obj {
 				|| (otmp)->otyp == TALLOW_CANDLE\
 				|| (otmp)->otyp == WAX_CANDLE\
 				|| (otmp)->otyp == POT_OIL)
+
+/* things that can be read */
+#define is_readable(otmp) ((otmp)->otyp == FORTUNE_COOKIE\
+			   || (otmp)->otyp == T_SHIRT\
+			   || (otmp)->otyp == ALCHEMY_SMOCK\
+			   || (otmp)->otyp == CREDIT_CARD\
+			   || (otmp)->otyp == CAN_OF_GREASE\
+			   || (otmp)->otyp == MAGIC_MARKER\
+			   || (otmp)->oclass == COIN_CLASS\
+			   || (otmp)->oartifact == ART_ORB_OF_FATE\
+			   || (otmp)->otyp == CANDY_BAR)
 
 /* special stones */
 #define is_graystone(obj)	((obj)->otyp == LUCKSTONE || \

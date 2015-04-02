@@ -33,6 +33,7 @@ sys_early_init()
 #endif
 	sysopt.env_dbgfl = 0;	/* haven't checked getenv("DEBUGFILES") yet */
 	sysopt.shellers = NULL;
+	sysopt.explorers = NULL;
 	sysopt.maxplayers = 0;	/* XXX eventually replace MAX_NR_OF_PLAYERS */
 
 		/* record file */

@@ -73,6 +73,11 @@ struct warntype_info {
 	short speciesidx;	/* index of above in mons[] (for save/restore) */
 };
 
+struct polearm_info {
+	struct monst *hitmon;	/* the monster we tried to hit last */
+	unsigned m_id;		/* monster id of hitmon, in save file */
+};
+
 struct tribute_info {
 	size_t tributesz;	/* make it possible to skip this in future */
 	boolean  enabled;	/* Do we have tributes turned on? */
@@ -111,7 +116,11 @@ struct context_info {
 	struct book_info spbook;
 	struct takeoff_info takeoff;
 	struct warntype_info warntype;
+<<<<<<< HEAD
 	struct tribute_info tribute;
+=======
+	struct polearm_info polearm;
+>>>>>>> master
 };
 
 extern NEARDATA struct context_info context;

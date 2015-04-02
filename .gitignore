@@ -32,8 +32,11 @@ core
 Makefile
 
 # Win32-specific ignores
+Debug/
+Release/
 binary/
 build/
+ipch/
 Nethack.sln
 Nethack.sdf
 Nethack.opensdf

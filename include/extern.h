@@ -276,7 +276,7 @@ E int FDECL(use_pick_axe2, (struct obj *));
 E boolean FDECL(mdig_tunnel, (struct monst *));
 E void FDECL(watch_dig, (struct monst *,XCHAR_P,XCHAR_P,BOOLEAN_P));
 E void NDECL(zap_dig);
-E struct obj *FDECL(bury_an_obj, (struct obj *));
+E struct obj *FDECL(bury_an_obj, (struct obj *, boolean *));
 E void FDECL(bury_objs, (int,int));
 E void FDECL(unearth_objs, (int,int));
 E void FDECL(rot_organic, (ANY_P *, long));
@@ -364,6 +364,7 @@ E void NDECL(heal_legs);
 /* ### do_name.c ### */
 
 E int FDECL(getpos, (coord *,BOOLEAN_P,const char *));
+E void FDECL(getpos_sethilite, (void (*f)(int) ));
 E void FDECL(new_mname, (struct monst *,int));
 E void FDECL(free_mname, (struct monst *));
 E void FDECL(new_oname, (struct obj *,int));
@@ -829,6 +830,7 @@ E char *FDECL(sitoa, (int));
 E int FDECL(sgn, (int));
 E int FDECL(rounddiv, (long,int));
 E int FDECL(dist2, (int,int,int,int));
+E int FDECL(isqrt, (int));
 E int FDECL(distmin, (int,int,int,int));
 E boolean FDECL(online2, (int,int,int,int));
 E boolean FDECL(pmatch, (const char *,const char *));
@@ -913,7 +915,7 @@ E int NDECL(dopramulet);
 E int NDECL(doprtool);
 E int NDECL(doprinuse);
 E void FDECL(useupf, (struct obj *,long));
-E char *FDECL(let_to_name, (CHAR_P,BOOLEAN_P));
+E char *FDECL(let_to_name, (CHAR_P,BOOLEAN_P,BOOLEAN_P));
 E void NDECL(free_invbuf);
 E void NDECL(reassign);
 E int NDECL(doorganize);
@@ -1139,6 +1141,7 @@ E void FDECL(dodoor, (int,int,struct mkroom *));
 E void FDECL(mktrap, (int,int,struct mkroom *,coord*));
 E void FDECL(mkstairs, (XCHAR_P,XCHAR_P,CHAR_P,struct mkroom *));
 E void NDECL(mkinvokearea);
+E void FDECL(mineralize, (int, int, int, int, BOOLEAN_P));
 
 /* ### mkmap.c ### */
 
@@ -1148,7 +1151,7 @@ void FDECL(remove_rooms, (int,int,int,int));
 /* ### mkmaze.c ### */
 
 E void FDECL(wallification, (int,int,int,int));
-E void FDECL(walkfrom, (int,int));
+E void FDECL(walkfrom, (int,int,SCHAR_P));
 E void FDECL(makemaz, (const char *));
 E void FDECL(mazexy, (coord *));
 E void NDECL(bound_digging);
@@ -1582,6 +1585,9 @@ E void FDECL(parsesymbols, (char *));
 E struct symparse *FDECL(match_sym, (char *));
 E void NDECL(set_playmode);
 E int FDECL(sym_val, (char *));
+E boolean FDECL(add_menu_coloring, (char *));
+E boolean FDECL(get_menu_coloring, (char *, int *, int *));
+E void NDECL(free_menu_coloring);
 
 /* ### pager.c ### */
 
@@ -1826,6 +1832,7 @@ E long NDECL(random);
 /* ### read.c ### */
 
 E void FDECL(learnscroll, (struct obj *));
+E char *FDECL(tshirt_text, (struct obj *, char *));
 E int NDECL(doread);
 E boolean FDECL(is_chargeable, (struct obj *));
 E void FDECL(recharge, (struct obj *,int));
@@ -2629,7 +2636,7 @@ E boolean FDECL(obj_resists, (struct obj *,int,int));
 E boolean FDECL(obj_shudders, (struct obj *));
 E void FDECL(do_osshock, (struct obj *));
 E int FDECL(bhito, (struct obj *,struct obj *));
-E int FDECL(bhitpile, (struct obj *,int (*)(OBJ_P,OBJ_P),int,int));
+E int FDECL(bhitpile, (struct obj *,int (*)(OBJ_P,OBJ_P),int,int,SCHAR_P));
 E int FDECL(zappable, (struct obj *));
 E void FDECL(zapnodir, (struct obj *));
 E int NDECL(dozap);

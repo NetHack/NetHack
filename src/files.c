@@ -2184,6 +2184,9 @@ int		src;
 	} else if (src == SET_IN_SYS && match_varname(buf, "SHELLERS", 8)) {
 	    if (sysopt.shellers) free(sysopt.shellers);
 	    sysopt.shellers = dupstr(bufp);
+	} else if (src == SET_IN_SYS && match_varname(buf, "EXPLORERS", 7)) {
+	    if (sysopt.explorers) free(sysopt.explorers);
+	    sysopt.explorers = dupstr(bufp);
 	} else if (src == SET_IN_SYS && match_varname(buf, "DEBUGFILES", 5)) {
 	    if (sysopt.debugfiles) free(sysopt.debugfiles);
 	    /* if showdebug() has already been called (perhaps we've added
@@ -2287,6 +2290,8 @@ int		src;
 	} else if (match_varname(buf, "BOULDER", 3)) {
 	    (void) get_uchars(fp, buf, bufp, &iflags.bouldersym, TRUE,
 			      1, "BOULDER");
+	} else if (match_varname(buf, "MENUCOLOR", 9)) {
+	    (void) add_menu_coloring(bufp);
 	} else if (match_varname(buf, "WARNINGS", 5)) {
 	    (void) get_uchars(fp, buf, bufp, translate, FALSE,
 					WARNCOUNT, "WARNINGS");

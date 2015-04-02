@@ -13,6 +13,8 @@ struct mkroom {
 	schar rtype;		/* type of room (zoo, throne, etc...) */
 	schar orig_rtype;	/* same as rtype, but not zeroed later */
 	schar rlit;		/* is the room lit ? */
+	schar needfill;		/* sp_lev: does the room need filling? */
+	schar needjoining;	/* sp_lev */
 	schar doorct;		/* door count */
 	schar fdoor;		/* index for the first door of the room */
 	schar nsubrooms;	/* number of subrooms */

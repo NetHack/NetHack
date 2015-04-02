@@ -20,6 +20,7 @@ STATIC_DCL void FDECL(use_candelabrum, (struct obj *));
 STATIC_DCL void FDECL(use_candle, (struct obj **));
 STATIC_DCL void FDECL(use_lamp, (struct obj *));
 STATIC_DCL void FDECL(light_cocktail, (struct obj *));
+STATIC_PTR void FDECL(display_jump_positions, (int));
 STATIC_DCL void FDECL(use_tinning_kit, (struct obj *));
 STATIC_DCL void FDECL(use_figurine, (struct obj **));
 STATIC_DCL void FDECL(use_grease, (struct obj *));
@@ -27,6 +28,7 @@ STATIC_DCL void FDECL(use_trap, (struct obj *));
 STATIC_DCL void FDECL(use_stone, (struct obj *));
 STATIC_PTR int NDECL(set_trap);		/* occupation callback */
 STATIC_DCL int FDECL(use_whip, (struct obj *));
+STATIC_PTR void FDECL(display_polearm_positions, (int));
 STATIC_DCL int FDECL(use_pole, (struct obj *));
 STATIC_DCL int FDECL(use_cream_pie, (struct obj *));
 STATIC_DCL int FDECL(use_grapple, (struct obj *));
@@ -736,8 +738,10 @@ struct obj *obj;
 				pline("Yow!  The %s stares back!", mirror);
 			    else
 				pline("Yikes!  You've frozen yourself!");
-			    if (!Hallucination || !rn2(4))
+			    if (!Hallucination || !rn2(4)) {
 				nomul(-rnd(MAXULEV + 6 - u.ulevel));
+				multi_reason = "gazing into a mirror";
+			    }
 			    nomovemsg = 0;  /* default, "you can move again" */
 			}
 		    } else if (youmonst.data->mlet == S_VAMPIRE)
@@ -915,6 +919,7 @@ struct obj **optr;
 				break;
 			case 2: /* no explanation; it just happens... */
 				nomovemsg = "";
+				multi_reason = NULL;
 				nomul(-rnd(2));
 				break;
 		}
@@ -1357,6 +1362,53 @@ dojump()
 	return jump(0);
 }
 
+boolean
+is_valid_jump_pos(x,y, magic, showmsg)
+int x,y, magic;
+boolean showmsg;
+{
+    if (!magic && !(HJumping & ~INTRINSIC) && !EJumping &&
+	distu(x, y) != 5) {
+	/* The Knight jumping restriction still applies when riding a
+	 * horse.  After all, what shape is the knight piece in chess?
+	 */
+	if (showmsg) pline("Illegal move!");
+	return FALSE;
+    } else if (distu(x, y) > (magic ? 6+magic*3 : 9)) {
+	if (showmsg) pline("Too far!");
+	return FALSE;
+    } else if (!cansee(x, y)) {
+	if (showmsg) You("cannot see where to land!");
+	return FALSE;
+    } else if (!isok(x, y)) {
+	if (showmsg) You("cannot jump there!");
+	return FALSE;
+    }
+    return TRUE;
+}
+
+int jumping_is_magic;
+
+void
+display_jump_positions(state)
+int state;
+{
+    if (state == 0) {
+	tmp_at(DISP_BEAM, cmap_to_glyph(S_flashbeam));
+    } else if (state == 1) {
+	int x,y, dx, dy;
+	for (dx = -4; dx <= 4; dx++)
+	    for (dy = -4; dy <= 4; dy++) {
+		x = dx + (int)u.ux;
+		y = dy + (int)u.uy;
+		if (isok(x,y) && is_valid_jump_pos(x,y, jumping_is_magic, FALSE))
+		    tmp_at(x,y);
+	    }
+    } else {
+	tmp_at(DISP_END, 0);
+    }
+}
+
 int
 jump(magic)
 int magic; /* 0=Physical, otherwise skill level */
@@ -1436,24 +1488,12 @@ int magic; /* 0=Physical, otherwise skill level */
 	pline("Where do you want to jump?");
 	cc.x = u.ux;
 	cc.y = u.uy;
+	jumping_is_magic = magic;
+	getpos_sethilite(display_jump_positions);
 	if (getpos(&cc, TRUE, "the desired position") < 0)
 		return 0;	/* user pressed ESC */
-	if (!magic && !(HJumping & ~INTRINSIC) && !EJumping &&
-			distu(cc.x, cc.y) != 5) {
-		/* The Knight jumping restriction still applies when riding a
-		 * horse.  After all, what shape is the knight piece in chess?
-		 */
-		pline("Illegal move!");
-		return 0;
-	} else if (distu(cc.x, cc.y) > (magic ? 6+magic*3 : 9)) {
-		pline("Too far!");
-		return 0;
-	} else if (!cansee(cc.x, cc.y)) {
-		You("cannot see where to land!");
-		return 0;
-	} else if (!isok(cc.x, cc.y)) {
-		You("cannot jump there!");
-		return 0;
+	if (!is_valid_jump_pos(cc.x, cc.y, magic, TRUE)) {
+	    return 0;
 	} else {
 	    coord uc;
 	    int range, temp;
@@ -1508,6 +1548,7 @@ int magic; /* 0=Physical, otherwise skill level */
 	    teleds(cc.x, cc.y, TRUE);
 	    sokoban_guilt();
 	    nomul(-1);
+	    multi_reason = "jumping around";
 	    nomovemsg = "";
 	    morehungry(rnd(25));
 	    return 1;
@@ -2531,6 +2572,54 @@ static const char
 	cant_see_spot[] = "won't hit anything if you can't see that spot.",
 	cant_reach[] = "can't reach that spot from here.";
 
+/* find pos of monster in range, if only one monster */
+boolean
+find_poleable_mon(pos, min_range, max_range)
+coord *pos;
+int min_range, max_range;
+{
+    struct monst *mtmp;
+    struct monst *selmon = NULL;
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+	if (mtmp && !DEADMONSTER(mtmp) && !mtmp->mtame &&
+	    cansee(mtmp->mx, mtmp->my) &&
+	    distu(mtmp->mx, mtmp->my) <= max_range &&
+	    distu(mtmp->mx, mtmp->my) >= min_range) {
+	    if (selmon) return FALSE;
+	    selmon = mtmp;
+	}
+    if (!selmon) return FALSE;
+    pos->x = selmon->mx;
+    pos->y = selmon->my;
+    return TRUE;
+}
+
+int polearm_range_min = -1;
+int polearm_range_max = -1;
+
+void
+display_polearm_positions(state)
+int state;
+{
+    if (state == 0) {
+	tmp_at(DISP_BEAM, cmap_to_glyph(S_flashbeam));
+    } else if (state == 1) {
+	int x,y, dx,dy;
+	for (dx = -4; dx <= 4; dx++)
+	    for (dy = -4; dy <= 4; dy++) {
+		x = dx + (int)u.ux;
+		y = dy + (int)u.uy;
+		if (isok(x, y) &&
+		    distu(x, y) >= polearm_range_min &&
+		    distu(x, y) <= polearm_range_max) {
+		    tmp_at(x, y);
+		}
+	    }
+    } else {
+	tmp_at(DISP_END, 0);
+    }
+}
+
 /* Distance attacks by pole-weapons */
 STATIC_OVL int
 use_pole(obj)
@@ -2539,6 +2628,7 @@ use_pole(obj)
 	int res = 0, typ, max_range, min_range, glyph;
 	coord cc;
 	struct monst *mtmp;
+	struct monst *hitm = context.polearm.hitmon;
 
 	/* Are you allowed to use the pole? */
 	if (u.uswallow) {
@@ -2551,15 +2641,7 @@ use_pole(obj)
 	}
      /* assert(obj == uwep); */
 
-	/* Prompt for a location */
-	pline(where_to_hit);
-	cc.x = u.ux;
-	cc.y = u.uy;
-	if (getpos(&cc, TRUE, "the spot to hit") < 0)
-	    return res;	/* ESC; uses turn iff polearm became wielded */
-
-	glyph = glyph_at(cc.x, cc.y);
-	/*
+		/*
 	 * Calculate allowable range (pole's reach is always 2 steps):
 	 *	unskilled and basic: orthogonal direction, 4..4;
 	 *	skilled: as basic, plus knight's jump position, 4..5;
@@ -2579,6 +2661,26 @@ use_pole(obj)
 	if (typ == P_NONE || P_SKILL(typ) <= P_BASIC) max_range = 4;
 	else if (P_SKILL(typ) == P_SKILLED) max_range = 5;
 	else max_range = 8;	/* (P_SKILL(typ) >= P_EXPERT) */
+
+	polearm_range_min = min_range;
+	polearm_range_max = max_range;
+
+	/* Prompt for a location */
+	pline(where_to_hit);
+	cc.x = u.ux;
+	cc.y = u.uy;
+	if (!find_poleable_mon(&cc, min_range, max_range) &&
+	    hitm && !DEADMONSTER(hitm) && cansee(hitm->mx, hitm->my) &&
+	    distu(hitm->mx,hitm->my) <= max_range &&
+	    distu(hitm->mx,hitm->my) >= min_range) {
+	    cc.x = hitm->mx;
+	    cc.y = hitm->my;
+	}
+	getpos_sethilite(display_polearm_positions);
+	if (getpos(&cc, TRUE, "the spot to hit") < 0)
+	    return res;	/* ESC; uses turn iff polearm became wielded */
+
+	glyph = glyph_at(cc.x, cc.y);
 	if (distu(cc.x, cc.y) > max_range) {
 	    pline("Too far!");
 	    return (res);
@@ -2596,11 +2698,13 @@ use_pole(obj)
 	    return res;
 	}
 
+	context.polearm.hitmon = NULL;
 	/* Attack the monster there */
 	bhitpos = cc;
 	if ((mtmp = m_at(bhitpos.x, bhitpos.y)) != (struct monst *)0) {
 	    if (attack_checks(mtmp, uwep)) return res;
 	    if (overexertion()) return 1; /* burn nutrition; maybe pass out */
+	    context.polearm.hitmon = mtmp;
 	    check_caitiff(mtmp);
 	    notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
 	    (void) thitmonst(mtmp, uwep);
@@ -2828,6 +2932,7 @@ do_break_wand(obj)
     boolean fillmsg = FALSE;
     int expltype = EXPL_MAGICAL;
     char confirm[QBUFSZ], buf[BUFSZ];
+    boolean is_fragile = (!strcmp(OBJ_DESCR(objects[obj->otyp]), "balsa"));
 
     if (yn(safe_qbuf(confirm, "Are you really sure you want to break ", "?",
 		     obj, yname, ysimple_name, "the wand")) == 'n')
@@ -2836,7 +2941,7 @@ do_break_wand(obj)
     if (nohands(youmonst.data)) {
 	You_cant("break %s without hands!", yname(obj));
 	return 0;
-    } else if (ACURR(A_STR) < 10) {
+    } else if (ACURR(A_STR) < (is_fragile ? 5 : 10)) {
 	You("don't have the strength to break %s!", yname(obj));
 	return 0;
     }
@@ -2974,7 +3079,7 @@ do_break_wand(obj)
 	     /* if (context.botl) bot(); */
 	    }
 	    if (affects_objects && level.objects[x][y]) {
-		(void) bhitpile(obj, bhito, x, y);
+		(void) bhitpile(obj, bhito, x, y, 0);
 		if (context.botl) bot();		/* potion effects */
 	    }
 	} else {
@@ -2991,7 +3096,7 @@ do_break_wand(obj)
 	     * since it's also used by retouch_equipment() for polyself.)
 	     */
 	    if (affects_objects && level.objects[x][y]) {
-		(void) bhitpile(obj, bhito, x, y);
+		(void) bhitpile(obj, bhito, x, y, 0);
 		if (context.botl) bot();		/* potion effects */
 	    }
 	    damage = zapyourself(obj, FALSE);

@@ -597,6 +597,7 @@ getbones()
 	}
 	(void) close(fd);
 	sanitize_engravings();
+	u.uroleplay.numbones++;
 
 	if(wizard) {
 		if(yn("Unlink bones?") == 'n') {

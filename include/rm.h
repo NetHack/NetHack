@@ -291,6 +291,7 @@ extern struct symsetentry symset[NUM_GRAPHICS];		  /* from drawing.c */
 #define D_CLOSED	4
 #define D_LOCKED	8
 #define D_TRAPPED	16
+#define D_SECRET        32 /* only used by sp_lev.c, NOT in rm-struct */
 
 /*
  * Some altars are considered as shrines, so we need a flag.
@@ -392,6 +393,19 @@ struct rm {
 	Bitfield(edge,1);	/* marks boundaries for special rooms*/
 	Bitfield(candig,1);	/* Exception to Can_dig_down; was a trapdoor */
 };
+
+
+#define SET_TYPLIT(x,y,ttyp,llit)				\
+{								\
+  if ((x) >= 0 && (y) >= 0 && (x) < COLNO && (y) < ROWNO) {	\
+    if ((ttyp) < MAX_TYPE) levl[(x)][(y)].typ = (ttyp);		\
+    if ((ttyp) == LAVAPOOL) levl[(x)][(y)].lit = 1;		\
+    else if ((schar)(llit) != -2) {				\
+	if ((schar)(llit) == -1) levl[(x)][(y)].lit = rn2(2);	\
+	else levl[(x)][(y)].lit = (llit);			\
+    }								\
+  }								\
+}
 
 /*
  * Add wall angle viewing by defining "modes" for each wall type.  Each

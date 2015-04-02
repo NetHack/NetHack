@@ -21,6 +21,7 @@ char *catmore = 0;		/* default pager */
 NEARDATA int bases[MAXOCLASSES] = DUMMY;
 
 NEARDATA int multi = 0;
+const char *multi_reason = NULL;
 NEARDATA int nroom = 0;
 NEARDATA int nsubroom = 0;
 NEARDATA int occtime = 0;
@@ -102,9 +103,9 @@ NEARDATA struct multishot m_shot = { 0, 0, STRANGE_OBJECT, FALSE };
 
 NEARDATA dungeon dungeons[MAXDUNGEON];	/* ini'ed by init_dungeon() */
 NEARDATA s_level *sp_levchn;
-NEARDATA stairway upstair = { 0, 0 }, dnstair = { 0, 0 };
-NEARDATA stairway upladder = { 0, 0 }, dnladder = { 0, 0 };
-NEARDATA stairway sstairs = { 0, 0 };
+NEARDATA stairway upstair = { 0, 0, { 0,0 }, 0 }, dnstair = { 0, 0, { 0,0 }, 0  };
+NEARDATA stairway upladder = { 0, 0, { 0,0 }, 0  }, dnladder = { 0, 0, { 0,0 }, 0  };
+NEARDATA stairway sstairs = { 0, 0, { 0,0 }, 0  };
 NEARDATA dest_area updest = { 0, 0, 0, 0, 0, 0, 0, 0 };
 NEARDATA dest_area dndest = { 0, 0, 0, 0, 0, 0, 0, 0 };
 NEARDATA coord inv_pos = { 0, 0 };
@@ -217,6 +218,8 @@ NEARDATA struct c_color_names c_color_names = {
 	"silver", "blue", "purple",
 	"white"
 };
+
+struct menucoloring *menu_colorings = NULL;
 
 const char *c_obj_colors[] = {
 	"black",		/* CLR_BLACK */

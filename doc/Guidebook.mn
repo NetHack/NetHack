@@ -1,12 +1,12 @@
 .\" $NHDT-Branch$:$NHDT-Revision$ $NHDT-Date$
-.\" $Revision: 1.130 $ $Date: 2012/05/02 00:38:30 $
+.\" $Revision: 1.130 $ $Date: 2015/03/27 00:38:30 $
 .ds h0 "NetHack Guidebook
 .ds h1
 .ds h2 %
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "March 16, 2015
+.ds f2 "March 27, 2015
 .\" labeled paragraph start (should be part of tmac.n, but I don't want to
 .\" make changes to that file)
 .\" .PS word
@@ -710,12 +710,6 @@ the exchange still takes place.
 .lp X
 Toggle two-weapon combat, if your character can do it.  Also available
 via the ``#twoweapon'' extended command
-.lp ""
-Since using this command by accident would be troublesome, you are asked
-to confirm your intent before switching to explore mode.  By default
-the response 'y' acknowledges that intent.  You can set the
-.op paraniod_confirmation
-option to require a response of "yes" instead.
 .lp ^X
 Display basic information about your character.
 .lp ""
@@ -848,7 +842,7 @@ You probably shouldn't start off a new game by praying right away.)
 Since using this command by accident can cause trouble, there is an
 option to make you confirm your intent before praying.  It is enabled
 by default, and you can reset the
-.op paraniod_confirmation
+.op paranoid_confirmation
 option to disable it.
 .lp #quit
 Quit the program without saving your game.
@@ -856,7 +850,7 @@ Quit the program without saving your game.
 Since using this command by accident would throw away the current game,
 you are asked to confirm your intent before quitting.  By default a
 response of 'y' acknowledges that intent.  You can set the
-.op paraniod_confirmation
+.op paranoid_confirmation
 option to require a response of "yes" instead.
 .lp #ride
 Ride (or stop riding) a monster.
@@ -1138,7 +1132,7 @@ In most circumstances, if you attempt to attack a peaceful monster by
 moving into its location, you'll be asked to confirm your intent.  By 
 default an answer of 'y' acknowledges that intent,
 which can be error prone if you're using 'y' to move.  You can set the
-.op paraniod_confirmation
+.op paranoid_confirmation
 option to require a response of "yes" instead.
 .pg
 If you can't see a monster (if it is invisible, or if you are blinded),
@@ -1927,6 +1921,8 @@ quality of the weapon; you are free to manually fill your quiver or quiver sack
 or make ready
 with the `Q' command instead.  If no weapon is found or the option is
 false, the `t' (throw) command is executed instead.  (default false)
+.lp blind
+Start the character permanently blind. (default false)
 .lp bones
 Allow saving and loading bones files.  (default true)
 .lp boulder
@@ -2053,6 +2049,11 @@ Enable mail delivery during the game (default on).
 .lp "male    "
 An obsolete synonym for ``gender:male''.
 Cannot be set with the `O' command.
+.lp mention_walls
+Give feedback when walking against a wall (default off).
+.lp menucolors
+Enable coloring menu lines (default off).
+See ``Configuring Menu Colors'' on how to configure the colors.
 .lp menustyle
 Controls the interface used when you need to choose various objects (in
 response to the Drop command, for instance).  The value specified should
@@ -2098,6 +2099,9 @@ Default '|'.
 Menu character accelerator to goto the next menu page.
 Implemented by the Amiga, Gem and tty ports.
 Default '>'.
+.lp menu_objsyms
+Show object symbols in menu headings in menus where
+the object symbols act as menu accelerators (default off).
 .lp menu_previous_page 
 Menu character accelerator to goto the previous menu page.
 Implemented by the Amiga, Gem and tty ports.
@@ -2144,6 +2148,8 @@ Cannot be set with the `O' command.
 Read the NetHack news file, if present (default on).
 Since the news is shown at the beginning of the game, there's no point
 in setting this with the `O' command.
+.lp nudist
+Start the character with no armor (default false).
 .lp "null    "
 Send padding nulls to the terminal (default on).
 .lp number_pad
@@ -2170,7 +2176,7 @@ is the same as specifying 0.
 (Settings 2 and 4 are for compatibility with MSDOS or old PC Hack;
 in addition to the different behavior for `5', `Alt-5' acts as `G'
 and `Alt-0' acts as `I'.
-Setting -1 is to accomodate some German keyboards which have the
+Setting -1 is to accommodate some German keyboards which have the
 location of the `y' and `z' keys swapped.)
 When moving by numbers, to enter a count prefix for those commands
 which accept one (such as ``12s'' to search twelve times), precede it
@@ -2454,6 +2460,8 @@ Specify the name of an alternative tile file to override the default.
 Specify the preferred height of each tile in a tile capable port.
 .lp tile_width
 Specify the preferred width of each tile in a tile capable port
+.lp use_darkgray
+Use bold black instead of blue for black glyphs (TTY only).
 .lp use_inverse
 NetHack should display inverse when the game specifies it.
 .lp vary_msgcount
@@ -2598,6 +2606,56 @@ The first example above will result in autopickup of any type of arrow.
 The second example results in the exclusion of any corpse from autopickup.
 The last example results in the exclusion of items known to be cursed from
 autopickup.
+.hn 2
+Configuring Menu Colors
+.pg
+Some platforms allow you to define colors used in menu lines when the
+line matches a user-defined pattern. At this time the tty, win32tty and
+win32gui support this.
+.pg
+In general, the config file entries to configure the menu color mappings
+look like this:
+.si
+.lp MENUCOLOR="pattern"=color&attribute
+.ei
+.PS "menu color"
+.PL pattern
+the pattern to match;
+.PL color
+the color to use for lines matching the pattern;
+.PL attribute
+the attribute to use for lines matching the pattern. The attribute is
+optional, and if left out, you must also leave out the preceding ampersand.
+If no attribute is defined, no attribute is used.
+.PE
+.lp ""
+For explanation on pattern format and the matching routines, see
+the pattern in the ``Configuring User Sounds'' -section.
+.lp ""
+Allowed colors are black, red, green, brown, blue, magenta, cyan, gray,
+orange, lightgreen, yellow, lightblue, lightmagenta, lightcyan, and white.
+.lp ""
+Allowed attributes are none, bold, dim, underline, blink, and inverse.
+Note that the platform used may interpret the attributes any way it
+wants.
+.lp ""
+Here's an example of menu colors using NetHack's internal
+pattern matching facility:
+.sd
+.si
+MENUCOLOR="* blessed *"=green
+MENUCOLOR="* cursed *"=red
+MENUCOLOR="* cursed *(being worn)"=red&underline
+.ei
+.ed
+specifies that any menu line with " blessed " contained
+in it will be shown in green color, lines with " cursed " will be
+shown in red, and lines with " cursed " followed by "(being worn)"
+on the same line will be shown in red color and underlined.
+You can have multiple MENUCOLOR entries in your config file,
+and the last MENUCOLOR-line in your config file that matches
+a menu line will be used for the line.
+.pg
 .hn 2
 Configuring User Sounds
 .pg
@@ -2917,6 +2975,10 @@ SHELLERS
 A list of users who are allowed to use the shell escape command (!).  The
 syntax is the same as WIZARDS.
 .lp
+EXPLORERS
+A list of users who are allowed to use the explore mode.  The
+syntax is the same as WIZARDS.
+.lp
 MAXPLAYERS
 Limit the maximum number of games that can be running at the same time.
 .lp
@@ -2989,7 +3051,7 @@ command-line switch or with the
 .op playmode:explore
 option.  The other is to issue the ``#exploremode'' extended command while
 already playing the game.  Starting a new game in explore mode provides your
-character with a wand of wishing in initial inventory; switching via `X'
+character with a wand of wishing in initial inventory; switching
 during play does not.  The other benefits of explore mode are left for
 the trepid reader to discover.
 .pg
@@ -3157,7 +3219,7 @@ available web-site listing all the bugs that had been discovered.  Despite
 that constantly growing bug list, 3.3 proved stable enough to last for
 more than a year and a half.
 .pg
-The 3.5 development team initially consisted of
+The 3.4 development team initially consisted of
 \fBMichael Allison\fP, \fBKen Arromdee\fP,
 \fBDavid Cohrs\fP, \fBJessie Collet\fP, \fBKevin Hugo\fP, \fBKen Lorber\fP,
 \fBDean Luick\fP, \fBPat Rankin\fP, \fBMike Stephenson\fP, 
@@ -3167,16 +3229,16 @@ just before the release of NetHack 3.4.0 in March 2002.
 As with version 3.3, various people contributed to the game as a whole as
 well as supporting ports on the different platforms that NetHack runs on:
 .pg
-\fBPat Rankin\fP maintained 3.5 for VMS.
+\fBPat Rankin\fP maintained 3.4 for VMS.
 .pg
-\fBMichael Allison\fP maintained NetHack 3.5 for the MS-DOS platform.  \fBPaul Winner\fP
+\fBMichael Allison\fP maintained NetHack 3.4 for the MS-DOS platform.  \fBPaul Winner\fP
 and \fBYitzhak Sapir\fP provided encouragement.
 .pg
 \fBDean Luick\fP, \fBMark Modrall\fP, and \fBKevin Hugo\fP maintained and enhanced the
 Macintosh port of 3.4.
 .pg
 \fBMichael Allison\fP, \fBDavid Cohrs\fP, \fBAlex Kompel\fP, \fBDion Nicolaas\fP, and 
-\fBYitzhak Sapir\fP maintained and enhanced 3.5 for the Microsoft Windows platform.
+\fBYitzhak Sapir\fP maintained and enhanced 3.4 for the Microsoft Windows platform.
 \fBAlex Kompel\fP contributed a new graphical interface for the Windows port. 
 \fBAlex Kompel\fP also contributed a Windows CE port for 3.4.1.
 .pg
@@ -3186,13 +3248,77 @@ early 2006. A great many thanks to Ron for keeping NetHack alive on OS/2
 all these years.
 .pg
 \fBJanne Salmijarvi\fP and \fBTeemu Suikki\fP maintained and 
-enhanced the Amiga port of 3.5 after \fBJanne Salmijarvi\fP resurrected 
+enhanced the Amiga port of 3.4 after \fBJanne Salmijarvi\fP resurrected 
 it for 3.3.1.
 .pg
-\fBChristian ``Marvin'' Bressler\fP maintained 3.5 for the Atari after he 
+\fBChristian ``Marvin'' Bressler\fP maintained 3.4 for the Atari after he 
 resurrected it for 3.3.1.
 .pg
+The release of NetHack 3.4.3 in December 2003 marked the beginning of a 
+long release hiatus. 3.4.3 proved to be a remarkably stable version that
+provided continued enjoyment by the community for more than a decade. The 
+devteam slowly and quietly continued to work on the game behind the scenes 
+during the tenure of 3.4.3. It was during that same period that several new 
+variants emerged within the NetHack community. Notably sporkhack by 
+\fBDerek S. Ray\fP, unnethack by \fBPatric Mueller\fP, nitrohack and its 
+successors originally by \fBDaniel Thaler\fP and then by \fBAlex Smith\fP, 
+and Dynahack by \fBTung Nguyen\fP. Some of those variants continue to be 
+developed, maintained, and enjoyed by the community to this day.
+.pg
+In September 2014, an interim snapshot of the code under development was 
+released publicly by other parties. Since that code was a work-in-progress 
+and had not gone through a period of debugging, it was decided that the 
+version numbers present on that code snapshot would be retired and never 
+used in an official NetHack release. An announcement was posted on the 
+devteam's official nethack.org website to that effect, stating that there 
+would never be a 3.4.4, 3.5, or 3.5.0 official release version.
+.pg
+In January 2015, preparation began for the release of NetHack 3.6
+.pg
+At the beginning of development for what would eventually get released
+as 3.6.0, the development team consisted of \fBWarwick Allison\fP, 
+\fBMichael Allison\fP, \fBKen Arromdee\fP,
+\fBDavid Cohrs\fP, \fBJessie Collet\fP, 
+\fBKen Lorber\fP, \fBDean Luick\fP, \fBPat Rankin\fP, 
+\fBMike Stephenson\fP, \fBJanet Walz\fP, and \fBPaul Winner\fP.
+Leading up to the release of 3.6.0 in early 2015, new members
+\fBSean Hunt\fP, \fBPasi Kallinen\fP, and \fBDerek S. Ray\fP
+joined the NetHack development team, 
+.pg
+\fB3.6.0 TODO insert apprpriate description of 3.6.0 here
+.pg
+\fBThe development team, as well as \fBSteve VanDevender\fP and 
+\fBKevin Smolkowski\fP ensured that NetHack 3.6.0 continued to operate on 
+various Unix flavors as well as maintaining the X11 interface. 
+.pg
+\fBKen Lorber\fP, \fBHaoyang Wang\fP, \fBPat Rankin\fP, and \fBDean Luick\fP 
+maintained the port of NetHack 3.6.0 for Mac.
+.pg
+\fBMichael Allison\fP, \fBDerek S. Ray\fP, \fBYitzhak Sapir\fP, 
+\fBAlex Kompel\fP, and \fBDavid Cohrs\fP maintained the port of 
+NetHack 3.6.0 for Microsoft Windows.
+.pg
+\fBJeff Bailey\fP created and maintained a port of NetHack 3.6.0 for Chrome.
+.pg
+TODO \fBAlex Kompel\fP maintained a port of NetHack 3.6.0 to Windows Phone.
+.pg
+\fBThis version of the game is special in a particular way.  Near the end of 
+the development of 3.6, one of the significant inspirations for many of the 
+humorous and fun features found in the game, author \fBTerry Pratchett\fP, 
+passed away.  This version of the game is dedicated to him.
+.pg
 The official NetHack web site is maintained by \fBKen Lorber\fP at http://www.nethack.org/.
+.pg
+SHOUT-OUTS
+.pg
+The devteam would like to give a special "shout-out" to thank the generous 
+people primarily responsible for the public NetHack servers available for 
+playing the game at nethack.alt.org and devnull.net. In addition to providing 
+a way for the public to play a game of NetHack from almost anywhere, they 
+have hosted annual NetHack tournaments for many, many years. 
+.pg 
+On behalf of the NetHack community, thank you very much to 
+\fBM. Drew Streib\fP, \fBPasi Kallinen\fP and \fBRobin Bandy\fP.
 .pg
 			   - - - - - - - - - -
 .pg
@@ -3205,11 +3331,11 @@ in this, the list of Dungeoneers:
 center;
 c c c.
 .\"TABLE_START
-Adam Aronow	Izchak Miller	Mike Stephenson
-Alex Kompel	J. Ali Harlow	Norm Meluch
-Andreas Dorn	Janet Walz	Olaf Seibert
-Andy Church	Janne Salmijarvi	Pasi Kallinen
-Andy Swanson	Jean-Christophe Collet	Pat Rankin
+Adam Aronow	J. Ali Harlow	Mike Stephenson
+Alex Kompel	Janet Walz	Norm Meluch
+Andreas Dorn	Janne Salmijarvi	Olaf Seibert
+Andy Church	Jean-Christophe Collet	Pasi Kallinen
+Andy Swanson	Jeff Bailey	Pat Rankin
 Ari Huttunen	Jochen Erwied	Paul Winner
 Barton House	John Kallen	Pierre Martineau
 Benson I. Margulies	John Rupley	Ralf Brown
@@ -3218,31 +3344,32 @@ Boudewijn Waijers	Johnny Lee	Richard Addison
 Bruce Cox	Jon W{tte	Richard Beigel
 Bruce Holloway	Jonathan Handler	Richard P. Hughey
 Bruce Mewborne	Joshua Delahunty	Rob Menke
-Carl Schelin	Keizo Yamamoto	Robin Johnson
-Chris Russo	Ken Arnold	Roderick Schertler
-David Cohrs	Ken Arromdee	Roland McGrath
-David Damerell	Ken Lorber	Ron Van Iwaarden
-David Gentzel	Ken Washikita	Ronnen Miller
-David Hairston	Kevin Darcy	Ross Brown
-Dean Luick	Kevin Hugo	Sascha Wostmann
-Del Lamb	Kevin Sitze	Scott Bigham
-Derek S. Ray	Kevin Smolkowski	Scott R. Turner
-Deron Meranda	Kevin Sweet	Sean Hunt
-Dion Nicolaas	Lars Huttar	Stephen Spackman
-Dylan O'Donnell	Leon Arnott	Stephen White
-Eric Backus	Malcolm Ryan	Steve Creps
-Eric Hendrickson	Mark Gooderum	Steve Linhart
-Eric R. Smith	Mark Modrall	Steve VanDevender
-Eric S. Raymond	Marvin Bressler	Teemu Suikki
-Erik Andersen	Matthew Day	Tim Lennan
-Frederick Roeber	Merlyn LeRoy	Timo Hakulinen
-Gil Neiger	Michael Allison	Tom Almy
-Greg Laskin	Michael Feir	Tom West
-Greg Olson	Michael Hamel	Warren Cheung
-Gregg Wonderly	Michael Sokolov	Warwick Allison
-Hao-yang Wang	Mike Engber	Yitzhak Sapir
-Helge Hafting	Mike Gallop
-Irina Rempt-Drijfhout	Mike Passaretti
+Carl Schelin	Keizo Yamamoto	Robin Bandy
+Chris Russo	Ken Arnold	Robin Johnson
+David Cohrs	Ken Arromdee	Roderick Schertler
+David Damerell	Ken Lorber	Roland McGrath
+David Gentzel	Ken Washikita	Ron Van Iwaarden
+David Hairston	Kevin Darcy	Ronnen Miller
+Dean Luick	Kevin Hugo	Ross Brown
+Del Lamb	Kevin Sitze	Sascha Wostmann
+Derek S. Ray	Kevin Smolkowski	Scott Bigham
+Deron Meranda	Kevin Sweet	Scott R. Turner
+Dion Nicolaas	Lars Huttar	Sean Hunt
+Dylan O'Donnell	Leon Arnott	Stephen Spackman
+Eric Backus	M. Drew Streib	Stephen White
+Eric Hendrickson	Malcolm Ryan	Steve Creps
+Eric R. Smith	Mark Gooderum	Steve Linhart
+Eric S. Raymond	Mark Modrall	Steve VanDevender
+Erik Andersen	Marvin Bressler	Teemu Suikki
+Frederick Roeber	Matthew Day	Tim Lennan
+Gil Neiger	Merlyn LeRoy	Timo Hakulinen
+Greg Laskin	Michael Allison	Tom Almy
+Greg Olson	Michael Feir	Tom West
+Gregg Wonderly	Michael Hamel	Warren Cheung
+Hao-yang Wang	Michael Sokolov	Warwick Allison
+Helge Hafting	Mike Engber	Yitzhak Sapir
+Irina Rempt-Drijfhout	Mike Gallop
+Izchak Miller	Mike Passaretti
 .\"TABLE_END  Do not delete this line.
 .TE
 

@@ -1,4 +1,4 @@
-/* NetHack 3.5	fountain.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	fountain.c	$NHDT-Date: 1426953330 2015/03/21 15:55:30 $  $NHDT-Branch: master $:$NHDT-Revision: 1.40 $ */
 /* NetHack 3.5	fountain.c	$Date: 2011/08/20 00:22:20 $  $Revision: 1.32 $ */
 /*	Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -402,12 +402,14 @@ register struct obj *obj;
 		if(in_town(u.ux, u.uy))
 		    (void) angry_guards(FALSE);
 		return;
-	} else if (water_damage(obj, NULL, TRUE) != ER_NOTHING) {
-	    if (obj->otyp == POT_ACID) { /* Acid and water don't mix */
-		useup(obj);
-		return;
-	    } else if (!rn2(2))		/* no further effect */
-		return;
+	} else {
+        int er = water_damage(obj, NULL, TRUE);
+	    if (obj->otyp == POT_ACID && er != ER_DESTROYED) { /* Acid and water don't mix */
+		    useup(obj);
+		    return;
+	    } else if (er != ER_NOTHING && !rn2(2)) {		/* no further effect */
+		    return;
+        }
 	}
 
 	switch (rnd(30)) {

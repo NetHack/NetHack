@@ -1124,8 +1124,13 @@ register struct monst *mtmp;
 	    }
 	    if (mtmp->minvent)
 		saveobjchn(fd,mtmp->minvent,mode);
-	    if (release_data(mode))
+	    if (release_data(mode)) {
+		if (mtmp == context.polearm.hitmon) {
+		    context.polearm.m_id = mtmp->m_id;
+		    context.polearm.hitmon = NULL;
+		}
 		dealloc_monst(mtmp);
+	    }
 	    mtmp = mtmp2;
 	}
 	if (perform_bwrite(mode))
@@ -1291,6 +1296,7 @@ void
 freedynamicdata()
 {
 	unload_qtlist();
+	free_menu_coloring();
 	free_invbuf();	/* let_to_name (invent.c) */
 	free_youbuf();	/* You_buf,&c (pline.c) */
 	tmp_at(DISP_FREEMEM, 0);	/* temporary display effects */
@@ -1316,6 +1322,7 @@ freedynamicdata()
 	/* level-specific data */
 	free_timers(RANGE_LEVEL);
 	free_light_sources(RANGE_LEVEL);
+    clear_regions();
 	freemonchn(fmon);
 	free_worm();		/* release worm segment information */
 	freetrapchn(ftrap);

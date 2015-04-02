@@ -12,7 +12,7 @@
 #
 MAZE: "Ran-strt",'.'
 FLAGS: noteleport,hardfloor,arboreal
-INIT_MAP:'.','.',true,true,lit,false
+INIT_MAP:mines,'.','.',true,true,lit,false
 GEOMETRY:left,center
 #1234567890123456789012345678901234567890123456789012345678901234567890
 MAP
@@ -45,18 +45,18 @@ STAIR:(10,10),down
 # Portal arrival point; just about anywhere on the right hand side of the map
 BRANCH:levregion(51,2,77,18),(0,0,40,20)
 # Orion
-MONSTER:'@',"Orion",(20,10)
+MONSTER:('@',"Orion"),(20,10)
 # The treasure of Orion
-OBJECT:'(',"chest",(20,10)
+OBJECT:('(',"chest"),(20,10)
 # Guards for the audience chamber
-MONSTER:'@',"hunter",(19,09)
-MONSTER:'@',"hunter",(20,09)
-MONSTER:'@',"hunter",(21,09)
-MONSTER:'@',"hunter",(19,10)
-MONSTER:'@',"hunter",(21,10)
-MONSTER:'@',"hunter",(19,11)
-MONSTER:'@',"hunter",(20,11)
-MONSTER:'@',"hunter",(21,11)
+MONSTER:('@',"hunter"),(19,09)
+MONSTER:('@',"hunter"),(20,09)
+MONSTER:('@',"hunter"),(21,09)
+MONSTER:('@',"hunter"),(19,10)
+MONSTER:('@',"hunter"),(21,10)
+MONSTER:('@',"hunter"),(19,11)
+MONSTER:('@',"hunter"),(20,11)
+MONSTER:('@',"hunter"),(21,11)
 # Non diggable walls
 NON_DIGGABLE:(00,00,40,20)
 # Traps
@@ -67,33 +67,33 @@ TRAP:"spiked pit",random
 TRAP:"bear",random
 TRAP:"bear",random
 # Monsters on siege duty.
-MONSTER: 'H',"minotaur",(33,09),hostile,asleep
-MONSTER: 'C',"forest centaur",(19,03),hostile
-MONSTER: 'C',"forest centaur",(19,04),hostile
-MONSTER: 'C',"forest centaur",(19,05),hostile
-MONSTER: 'C',"forest centaur",(21,03),hostile
-MONSTER: 'C',"forest centaur",(21,04),hostile
-MONSTER: 'C',"forest centaur",(21,05),hostile
-MONSTER: 'C',"forest centaur",(01,09),hostile
-MONSTER: 'C',"forest centaur",(02,09),hostile
-MONSTER: 'C',"forest centaur",(03,09),hostile
-MONSTER: 'C',"forest centaur",(01,11),hostile
-MONSTER: 'C',"forest centaur",(02,11),hostile
-MONSTER: 'C',"forest centaur",(03,11),hostile
-MONSTER: 'C',"forest centaur",(19,15),hostile
-MONSTER: 'C',"forest centaur",(19,16),hostile
-MONSTER: 'C',"forest centaur",(19,17),hostile
-MONSTER: 'C',"forest centaur",(21,15),hostile
-MONSTER: 'C',"forest centaur",(21,16),hostile
-MONSTER: 'C',"forest centaur",(21,17),hostile
-MONSTER: 'C',"plains centaur",random,hostile
-MONSTER: 'C',"plains centaur",random,hostile
-MONSTER: 'C',"plains centaur",random,hostile
-MONSTER: 'C',"plains centaur",random,hostile
-MONSTER: 'C',"plains centaur",random,hostile
-MONSTER: 'C',"plains centaur",random,hostile
-MONSTER: 's',"scorpion",random,hostile
-MONSTER: 's',"scorpion",random,hostile
+MONSTER: ('H',"minotaur"),(33,09),hostile,asleep
+MONSTER: ('C',"forest centaur"),(19,03),hostile
+MONSTER: ('C',"forest centaur"),(19,04),hostile
+MONSTER: ('C',"forest centaur"),(19,05),hostile
+MONSTER: ('C',"forest centaur"),(21,03),hostile
+MONSTER: ('C',"forest centaur"),(21,04),hostile
+MONSTER: ('C',"forest centaur"),(21,05),hostile
+MONSTER: ('C',"forest centaur"),(01,09),hostile
+MONSTER: ('C',"forest centaur"),(02,09),hostile
+MONSTER: ('C',"forest centaur"),(03,09),hostile
+MONSTER: ('C',"forest centaur"),(01,11),hostile
+MONSTER: ('C',"forest centaur"),(02,11),hostile
+MONSTER: ('C',"forest centaur"),(03,11),hostile
+MONSTER: ('C',"forest centaur"),(19,15),hostile
+MONSTER: ('C',"forest centaur"),(19,16),hostile
+MONSTER: ('C',"forest centaur"),(19,17),hostile
+MONSTER: ('C',"forest centaur"),(21,15),hostile
+MONSTER: ('C',"forest centaur"),(21,16),hostile
+MONSTER: ('C',"forest centaur"),(21,17),hostile
+MONSTER: ('C',"plains centaur"),random,hostile
+MONSTER: ('C',"plains centaur"),random,hostile
+MONSTER: ('C',"plains centaur"),random,hostile
+MONSTER: ('C',"plains centaur"),random,hostile
+MONSTER: ('C',"plains centaur"),random,hostile
+MONSTER: ('C',"plains centaur"),random,hostile
+MONSTER: ('s',"scorpion"),random,hostile
+MONSTER: ('s',"scorpion"),random,hostile
 
 
 #
@@ -137,14 +137,14 @@ STAIR:(27,18),down
 # Non diggable walls
 NON_DIGGABLE:(00,00,54,19)
 # Objects
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
 # Random traps
 TRAP:"spiked pit",random
 TRAP:"spiked pit",random
@@ -153,29 +153,29 @@ TRAP:"teleport",random
 TRAP:"arrow",random
 TRAP:"arrow",random
 # Random monsters.
-MONSTER:'q',"wumpus",(27,18),hostile,asleep
-MONSTER:'B',"giant bat",random,hostile
-MONSTER:'B',"giant bat",random,hostile
-MONSTER:'B',"giant bat",random,hostile
-MONSTER:'B',"giant bat",random,hostile
-MONSTER:'C',"forest centaur",random,hostile
-MONSTER:'C',"forest centaur",random,hostile
-MONSTER:'C',"forest centaur",random,hostile
-MONSTER:'C',"forest centaur",random,hostile
-MONSTER:'C',"mountain centaur",random,hostile
-MONSTER:'C',"mountain centaur",random,hostile
-MONSTER:'C',"mountain centaur",random,hostile
-MONSTER:'C',"mountain centaur",random,hostile
-MONSTER:'C',"mountain centaur",random,hostile
-MONSTER:'C',"mountain centaur",random,hostile
-MONSTER:'C',"mountain centaur",random,hostile
-MONSTER:'C',"mountain centaur",random,hostile
-MONSTER:'s',"scorpion",random,hostile
-MONSTER:'s',"scorpion",random,hostile
-MONSTER:'s',"scorpion",random,hostile
-MONSTER:'s',"scorpion",random,hostile
-MONSTER:'s',random,random,hostile
-MONSTER:'s',random,random,hostile
+MONSTER:('q',"wumpus"),(27,18),hostile,asleep
+MONSTER:('B',"giant bat"),random,hostile
+MONSTER:('B',"giant bat"),random,hostile
+MONSTER:('B',"giant bat"),random,hostile
+MONSTER:('B',"giant bat"),random,hostile
+MONSTER:('C',"forest centaur"),random,hostile
+MONSTER:('C',"forest centaur"),random,hostile
+MONSTER:('C',"forest centaur"),random,hostile
+MONSTER:('C',"forest centaur"),random,hostile
+MONSTER:('C',"mountain centaur"),random,hostile
+MONSTER:('C',"mountain centaur"),random,hostile
+MONSTER:('C',"mountain centaur"),random,hostile
+MONSTER:('C',"mountain centaur"),random,hostile
+MONSTER:('C',"mountain centaur"),random,hostile
+MONSTER:('C',"mountain centaur"),random,hostile
+MONSTER:('C',"mountain centaur"),random,hostile
+MONSTER:('C',"mountain centaur"),random,hostile
+MONSTER:('s',"scorpion"),random,hostile
+MONSTER:('s',"scorpion"),random,hostile
+MONSTER:('s',"scorpion"),random,hostile
+MONSTER:('s',"scorpion"),random,hostile
+MONSTER:'s',random,hostile
+MONSTER:'s',random,hostile
 
 
 #
@@ -217,21 +217,21 @@ STAIR:(19,10),up
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,19)
 # Objects
-OBJECT:')',"bow",(37,10),blessed,0,"The Longbow of Diana"
-OBJECT:'(',"chest",(37,10)
-OBJECT:random,random,(36,09)
-OBJECT:random,random,(36,10)
-OBJECT:random,random,(36,11)
-OBJECT:random,random,(37,09)
-OBJECT:random,random,(37,11)
-OBJECT:random,random,(38,09)
-OBJECT:random,random,(38,10)
-OBJECT:random,random,(38,11)
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:(')',"bow"),(37,10),blessed,0,name:"The Longbow of Diana"
+OBJECT:('(',"chest"),(37,10)
+OBJECT:random,(36,09)
+OBJECT:random,(36,10)
+OBJECT:random,(36,11)
+OBJECT:random,(37,09)
+OBJECT:random,(37,11)
+OBJECT:random,(38,09)
+OBJECT:random,(38,10)
+OBJECT:random,(38,11)
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
 # Random traps
 TRAP:random,random
 TRAP:random,random
@@ -255,34 +255,34 @@ DOOR:closed,(51,10)
 DOOR:locked,(53,08)
 DOOR:closed,(65,05)
 # Random monsters.
-MONSTER:'s',"Scorpius",(37,10),hostile
-MONSTER:'C',"forest centaur",(36,09),hostile
-MONSTER:'C',"forest centaur",(36,10),hostile
-MONSTER:'C',"forest centaur",(36,11),hostile
-MONSTER:'C',"forest centaur",(37,09),hostile
-MONSTER:'C',"forest centaur",(37,11),hostile
-MONSTER:'C',"forest centaur",(38,09),hostile
-MONSTER:'C',"mountain centaur",(38,10),hostile
-MONSTER:'C',"mountain centaur",(38,11),hostile
-MONSTER:'C',"mountain centaur",(02,02),hostile
-MONSTER:'C',"mountain centaur",(71,02),hostile
-MONSTER:'C',"mountain centaur",(02,16),hostile
-MONSTER:'C',"mountain centaur",(71,16),hostile
-MONSTER:'C',"forest centaur",random,hostile
-MONSTER:'C',"forest centaur",random,hostile
-MONSTER:'C',"mountain centaur",random,hostile
-MONSTER:'C',"mountain centaur",random,hostile
-MONSTER:'C',random,random,hostile
-MONSTER:'C',random,random,hostile
-MONSTER:'s',"scorpion",(03,02),hostile
-MONSTER:'s',"scorpion",(72,02),hostile
-MONSTER:'s',"scorpion",(03,17),hostile
-MONSTER:'s',"scorpion",(72,17),hostile
-MONSTER:'s',"scorpion",(41,10),hostile
-MONSTER:'s',"scorpion",(33,09),hostile
-MONSTER:'s',"scorpion",random,hostile
-MONSTER:'s',"scorpion",random,hostile
-MONSTER:'s',random,random,hostile
+MONSTER:('s',"Scorpius"),(37,10),hostile
+MONSTER:('C',"forest centaur"),(36,09),hostile
+MONSTER:('C',"forest centaur"),(36,10),hostile
+MONSTER:('C',"forest centaur"),(36,11),hostile
+MONSTER:('C',"forest centaur"),(37,09),hostile
+MONSTER:('C',"forest centaur"),(37,11),hostile
+MONSTER:('C',"forest centaur"),(38,09),hostile
+MONSTER:('C',"mountain centaur"),(38,10),hostile
+MONSTER:('C',"mountain centaur"),(38,11),hostile
+MONSTER:('C',"mountain centaur"),(02,02),hostile
+MONSTER:('C',"mountain centaur"),(71,02),hostile
+MONSTER:('C',"mountain centaur"),(02,16),hostile
+MONSTER:('C',"mountain centaur"),(71,16),hostile
+MONSTER:('C',"forest centaur"),random,hostile
+MONSTER:('C',"forest centaur"),random,hostile
+MONSTER:('C',"mountain centaur"),random,hostile
+MONSTER:('C',"mountain centaur"),random,hostile
+MONSTER:'C',random,hostile
+MONSTER:'C',random,hostile
+MONSTER:('s',"scorpion"),(03,02),hostile
+MONSTER:('s',"scorpion"),(72,02),hostile
+MONSTER:('s',"scorpion"),(03,17),hostile
+MONSTER:('s',"scorpion"),(72,17),hostile
+MONSTER:('s',"scorpion"),(41,10),hostile
+MONSTER:('s',"scorpion"),(33,09),hostile
+MONSTER:('s',"scorpion"),random,hostile
+MONSTER:('s',"scorpion"),random,hostile
+MONSTER:'s',random,hostile
 
 WALLIFY
 
@@ -296,62 +296,62 @@ WALLIFY
 #
 
 MAZE: "Ran-fila" , ' '
-INIT_MAP: '.' , 'T', true, true, random, true
+INIT_MAP: mines, '.' , 'T', true, true, random, true
 NOMAP
 #
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
 #
 TRAP: random, random
 TRAP: random, random
 TRAP: random, random
 TRAP: random, random
 #
-MONSTER: 'C', "mountain centaur", random, hostile
-MONSTER: 'C', "mountain centaur", random, hostile
-MONSTER: 'C', "forest centaur", random, hostile
-MONSTER: 'C', "forest centaur", random, hostile
-MONSTER: 'C', "forest centaur", random, hostile
-MONSTER: 'C', random, random, hostile
-MONSTER: 's', "scorpion", random, hostile
+MONSTER: ('C', "mountain centaur"), random, hostile
+MONSTER: ('C', "mountain centaur"), random, hostile
+MONSTER: ('C', "forest centaur"), random, hostile
+MONSTER: ('C', "forest centaur"), random, hostile
+MONSTER: ('C', "forest centaur"), random, hostile
+MONSTER: 'C', random, hostile
+MONSTER: ('s', "scorpion"), random, hostile
 
 MAZE: "Ran-filb" , ' '
-INIT_MAP: '.' , ' ', true, true, random, true
+INIT_MAP: mines, '.' , ' ', true, true, random, true
 NOMAP
 #
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
 #
 TRAP: random, random
 TRAP: random, random
 TRAP: random, random
 TRAP: random, random
 #
-MONSTER: 'C', "mountain centaur", random, hostile
-MONSTER: 'C', "mountain centaur", random, hostile
-MONSTER: 'C', "mountain centaur", random, hostile
-MONSTER: 'C', "mountain centaur", random, hostile
-MONSTER: 'C', random, random, hostile
-MONSTER: 's', "scorpion", random, hostile
-MONSTER: 's', "scorpion", random, hostile
+MONSTER: ('C', "mountain centaur"), random, hostile
+MONSTER: ('C', "mountain centaur"), random, hostile
+MONSTER: ('C', "mountain centaur"), random, hostile
+MONSTER: ('C', "mountain centaur"), random, hostile
+MONSTER: 'C', random, hostile
+MONSTER: ('s', "scorpion"), random, hostile
+MONSTER: ('s', "scorpion"), random, hostile
 

@@ -917,6 +917,9 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	int column;
 	int spacing = 0;
 
+	int color = NO_COLOR, attr;
+	boolean menucolr = FALSE;
+
 	lpdis = (LPDRAWITEMSTRUCT) lParam; 
 
     /* If there are no list box items, skip this message. */
@@ -966,6 +969,13 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		if(item->accelerator!=0) {
 			buf[0] = item->accelerator;
 			buf[1] = '\x0';
+
+			if (iflags.use_menu_color &&
+			    (menucolr = get_menu_coloring(item->str, &color,&attr))) {
+			    /* TODO: use attr too */
+			    if (color != NO_COLOR)
+				SetTextColor(lpdis->hDC, nhcolor_to_RGB(color));
+			}
 
 			SetRect( &drawRect, x, lpdis->rcItem.top, lpdis->rcItem.right, lpdis->rcItem.bottom );
 			DrawText(lpdis->hDC, NH_A2W(buf, wbuf, 2), 1, &drawRect, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);

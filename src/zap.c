@@ -1,4 +1,4 @@
-/* NetHack 3.5	zap.c	$NHDT-Date: 1426465444 2015/03/16 00:24:04 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.195 $ */
+/* NetHack 3.5	zap.c	$NHDT-Date: 1427782839 2015/03/31 06:20:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.200 $ */
 /* NetHack 3.5	zap.c	$Date: 2013/11/05 00:57:56 $  $Revision: 1.183 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1750,8 +1750,14 @@ struct obj *obj, *otmp;
 		if (Is_box(obj)) (void) boxlock(obj, otmp);
 
 		if (obj_shudders(obj)) {
+		    boolean cover = ((obj == level.objects[u.ux][u.uy]) &&
+				     u.uundetected &&
+				     hides_under(youmonst.data));
+
 		    if (cansee(obj->ox, obj->oy)) learn_it = TRUE;
 		    do_osshock(obj);
+		    /* eek - your cover might have been blown */
+		    if (cover) (void) hideunder(&youmonst);
 		    break;
 		}
 		obj = poly_obj(obj, STRANGE_OBJECT);
@@ -1886,10 +1892,11 @@ struct obj *obj, *otmp;
 
 /* returns nonzero if something was hit */
 int
-bhitpile(obj,fhito,tx,ty)
+bhitpile(obj, fhito, tx, ty, zz)
     struct obj *obj;
     int FDECL((*fhito), (OBJ_P,OBJ_P));
     int tx, ty;
+    schar zz;
 {
     int hitanything = 0;
     register struct obj *otmp, *next_obj;
@@ -1909,8 +1916,11 @@ bhitpile(obj,fhito,tx,ty)
 
     poly_zapped = -1;
     for(otmp = level.objects[tx][ty]; otmp; otmp = next_obj) {
-	/* Fix for polymorph bug, Tim Wright */
 	next_obj = otmp->nexthere;
+	/* for zap downwards, don't hit object poly'd hero is hiding under */
+	if (zz > 0 && u.uundetected && otmp == level.objects[u.ux][u.uy]
+	    && hides_under(youmonst.data)) continue;
+
 	hitanything += (*fhito)(otmp, obj);
     }
     if(poly_zapped >= 0)
@@ -2562,7 +2572,7 @@ struct obj *obj;	/* wand or spell */
 	    if (u.dz < 0) {
 		You("probe towards the %s.", ceiling(x,y));
 	    } else {
-		ptmp += bhitpile(obj, bhito, x, y);
+		ptmp += bhitpile(obj, bhito, x, y, u.dz);
 		You("probe beneath the %s.", surface(x,y));
 		ptmp += display_binventory(x, y, TRUE);
 	    }
@@ -2682,7 +2692,7 @@ struct obj *obj;	/* wand or spell */
 
 	if (u.dz > 0) {
 	    /* zapping downward */
-	    (void) bhitpile(obj, bhito, x, y);
+	    (void) bhitpile(obj, bhito, x, y, u.dz);
 
 	    /* subset of engraving effects; none sets `disclose' */
 	    if ((e = engr_at(x, y)) != 0 && e->engr_type != HEADSTONE) {
@@ -2716,6 +2726,22 @@ struct obj *obj;	/* wand or spell */
 		    break;
 		default:
 		    break;
+		}
+	    }
+	} else if (u.dz < 0) {
+	    /* zapping upward */
+
+	    /* game flavor: if you're hiding under "something"
+	     * a zap upward should hit that "something".
+	     */
+	    if (u.uundetected && hides_under(youmonst.data)) {
+		int hitit = 0;
+		otmp = level.objects[u.ux][u.uy];
+
+		if (otmp) hitit = bhito(otmp, obj);
+		if (hitit) {
+		    (void) hideunder(&youmonst);
+		    disclose = TRUE;
 		}
 	    }
 	}
@@ -3089,7 +3115,7 @@ struct obj **pobj;			/* object tossed/used, set to NULL
 		}
 	    }
 	    if(fhito) {
-		if(bhitpile(obj,fhito,bhitpos.x,bhitpos.y))
+		if(bhitpile(obj,fhito,bhitpos.x,bhitpos.y,0))
 		    range--;
 	    } else {
 		if(weapon == KICKED_WEAPON &&
@@ -3253,8 +3279,10 @@ int dx, dy;
 		}
 		tmp_at(bhitpos.x, bhitpos.y);
 		delay_output();
-		if(IS_SINK(levl[bhitpos.x][bhitpos.y].typ))
+		if(IS_SINK(levl[bhitpos.x][bhitpos.y].typ)) {
+			if (!Deaf) pline("Klonk!");
 			break;	/* boomerang falls on sink */
+		}
 		/* ct==0, initial position, we want next delta to be same;
 		   ct==5, opposite position, repeat delta undoes first one */
 		if (ct % 5 != 0) i += (counterclockwise ? -1 : 1);

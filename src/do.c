@@ -1286,7 +1286,7 @@ boolean at_stairs, falling, portal;
 	}
 
 	/* initial movement of bubbles just before vision_recalc */
-	if (Is_waterlevel(&u.uz))
+	if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
 		movebubbles();
 
 	if (level_info[new_ledger].flags & FORGOTTEN) {
@@ -1402,6 +1402,7 @@ boolean at_stairs, falling, portal;
 	/* assume this will always return TRUE when changing level */
 	(void) in_out_region(u.ux, u.uy);
 	(void) pickup(1);
+	context.polearm.hitmon = NULL;
 }
 
 STATIC_OVL void
