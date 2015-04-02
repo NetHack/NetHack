@@ -4939,7 +4939,7 @@ sp_lev *lvl;
 	    break;
 	case SPO_SEL_LINE:
 	    {
-		struct opvar *tmp, *tmp2, *pt = selection_opvar(NULL);
+		struct opvar *tmp = NULL, *tmp2 = NULL, *pt = selection_opvar(NULL);
 		schar x1,y1,x2,y2;
 		if (!OV_pop_c(tmp) || !OV_pop_c(tmp2)) panic("no ter sel linecoord");
 		get_location_coord(&x1, &y1, ANY_LOC, coder->croom, OV_i(tmp));
@@ -4956,7 +4956,7 @@ sp_lev *lvl;
 	    break;
 	case SPO_SEL_RNDLINE:
 	    {
-		struct opvar *tmp, *tmp2, *tmp3, *pt = selection_opvar(NULL);
+		struct opvar *tmp = NULL, *tmp2 = NULL, *tmp3, *pt = selection_opvar(NULL);
 		schar x1,y1,x2,y2;
 		if (!OV_pop_i(tmp3) || !OV_pop_c(tmp) || !OV_pop_c(tmp2)) panic("no ter sel randline");
 		get_location_coord(&x1, &y1, ANY_LOC, coder->croom, OV_i(tmp));
