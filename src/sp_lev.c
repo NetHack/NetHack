@@ -1,4 +1,4 @@
-/* NetHack 3.5	sp_lev.c	$NHDT-Date: 1426465441 2015/03/16 00:24:01 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.25 $ */
+/* NetHack 3.5	sp_lev.c	$NHDT-Date: 1427934549 2015/04/02 00:29:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.40 $ */
 /* NetHack 3.5	sp_lev.c	$Date: 2011/01/05 01:28:36 $  $Revision: 1.23 $ */
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1581,24 +1581,28 @@ struct mkroom	*croom;
 	    if (!container_idx) {
 		if (!invent_carrying_monster) {
 		    /*impossible("create_object: no container");*/
-		    /* don't complain, the monster may be gone legally (eg. unique demon already generated)
-		       TODO: In the case of unique demon lords, they should get their inventories even when
-		       they get generated outside the des-file. Maybe another data file that determines what
-		       inventories monsters get by default?
+		    /* don't complain, the monster may be gone legally
+		       (eg. unique demon already generated)
+		       TODO: In the case of unique demon lords, they should
+		       get their inventories even when they get generated
+		       outside the des-file.  Maybe another data file that
+		       determines what inventories monsters get by default?
 		     */
 		} else {
-		    int c;
+		    int ci;
 		    struct obj *objcheck = otmp;
 		    int inuse = -1;
-		    for (c = 0; c < container_idx; c++)
-			if (container_obj[c] == objcheck)
-			    inuse = c;
+
+		    for (ci = 0; ci < container_idx; ci++)
+			if (container_obj[ci] == objcheck)
+			    inuse = ci;
 		    remove_object(otmp);
 		    if (mpickobj(invent_carrying_monster, otmp)) {
 			if (inuse > -1) {
-			    impossible("container given to monster was merged or deallocated.");
-			    for (c = inuse; c < container_idx-1; c++)
-				container_obj[c] = container_obj[c+1];
+			    impossible(
+		      "container given to monster was merged or deallocated.");
+			    for (ci = inuse; ci < container_idx - 1; ci++)
+				container_obj[ci] = container_obj[ci + 1];
 			    container_obj[container_idx] = NULL;
 			    container_idx--;
 			}
@@ -2490,6 +2494,7 @@ spo_return(coder)
     opvar_free(params);
 }
 
+/*ARGUSED*/
 void
 spo_end_moninvent(coder)
      struct sp_coder *coder;
@@ -2499,6 +2504,7 @@ spo_end_moninvent(coder)
     invent_carrying_monster = NULL;
 }
 
+/*ARGUSED*/
 void
 spo_pop_container(coder)
      struct sp_coder *coder;
@@ -2543,7 +2549,7 @@ spo_monster(coder)
     int nparams = 0;
 
     struct opvar *varparam;
-    struct opvar *id, *coord, *has_inv;
+    struct opvar *id, *mcoord, *has_inv;
     monster tmpmons;
 
     tmpmons.peaceful = -1;
@@ -2660,13 +2666,13 @@ spo_monster(coder)
 	}
     }
 
-    if (!OV_pop_c(coord)) panic("no monster coord?");
+    if (!OV_pop_c(mcoord)) panic("no monster coord?");
 
     if (!OV_pop_typ(id, SPOVAR_MONST)) panic("no mon type");
 
     tmpmons.id = SP_MONST_PM(OV_i(id));
     tmpmons.class = SP_MONST_CLASS(OV_i(id));
-    tmpmons.coord = OV_i(coord);
+    tmpmons.coord = OV_i(mcoord);
     tmpmons.has_invent = OV_i(has_inv);
 
     create_monster(&tmpmons, coder->croom);
@@ -2675,7 +2681,7 @@ spo_monster(coder)
     Free(tmpmons.appear_as.str);
 
     opvar_free(id);
-    opvar_free(coord);
+    opvar_free(mcoord);
     opvar_free(has_inv);
     opvar_free(varparam);
 }
@@ -2837,22 +2843,22 @@ spo_level_flags(coder)
      struct sp_coder *coder;
 {
     struct opvar *flagdata;
-    long flags;
+    long lflags;
 
     if (!OV_pop_i(flagdata)) return;
-    flags = OV_i(flagdata);
+    lflags = OV_i(flagdata);
 
-    if (flags & NOTELEPORT)   level.flags.noteleport = 1;
-    if (flags & HARDFLOOR)    level.flags.hardfloor = 1;
-    if (flags & NOMMAP)       level.flags.nommap = 1;
-    if (flags & SHORTSIGHTED) level.flags.shortsighted = 1;
-    if (flags & ARBOREAL)     level.flags.arboreal = 1;
-    if (flags & MAZELEVEL)    level.flags.is_maze_lev = 1;
-    if (flags & PREMAPPED)    coder->premapped = TRUE;
-    if (flags & SHROUD)       level.flags.hero_memory = 0;
-    if (flags & GRAVEYARD)    level.flags.graveyard = 1;
-    if (flags & ICEDPOOLS)    icedpools = TRUE;
-    if (flags & SOLIDIFY)     coder->solidify = TRUE;
+    if (lflags & NOTELEPORT)   level.flags.noteleport = 1;
+    if (lflags & HARDFLOOR)    level.flags.hardfloor = 1;
+    if (lflags & NOMMAP)       level.flags.nommap = 1;
+    if (lflags & SHORTSIGHTED) level.flags.shortsighted = 1;
+    if (lflags & ARBOREAL)     level.flags.arboreal = 1;
+    if (lflags & MAZELEVEL)    level.flags.is_maze_lev = 1;
+    if (lflags & PREMAPPED)    coder->premapped = TRUE;
+    if (lflags & SHROUD)       level.flags.hero_memory = 0;
+    if (lflags & GRAVEYARD)    level.flags.graveyard = 1;
+    if (lflags & ICEDPOOLS)    icedpools = TRUE;
+    if (lflags & SOLIDIFY)     coder->solidify = TRUE;
 
     opvar_free(flagdata);
 }
@@ -2902,19 +2908,19 @@ void
 spo_engraving(coder)
      struct sp_coder *coder;
 {
-    struct opvar *etyp, *txt, *coord;
+    struct opvar *etyp, *txt, *ecoord;
     xchar x,y;
 
     if (!OV_pop_i(etyp) ||
 	!OV_pop_s(txt) ||
-	!OV_pop_c(coord)) return;
+	!OV_pop_c(ecoord)) return;
 
-    get_location_coord(&x, &y, DRY, coder->croom, OV_i(coord));
+    get_location_coord(&x, &y, DRY, coder->croom, OV_i(ecoord));
     make_engr_at(x, y, OV_s(txt), 0L, OV_i(etyp));
 
     opvar_free(etyp);
     opvar_free(txt);
-    opvar_free(coord);
+    opvar_free(ecoord);
 }
 
 void
@@ -2940,10 +2946,10 @@ void
 spo_room(coder)
      struct sp_coder *coder;
 {
-    if (coder->n_subroom > MAX_NESTED_ROOMS)
+    if (coder->n_subroom > MAX_NESTED_ROOMS) {
 	panic("Too deeply nested rooms?!");
-    else {
-	struct opvar *flags, *h, *w, *yalign, *xalign,
+    } else {
+	struct opvar *rflags, *h, *w, *yalign, *xalign,
 	    *y, *x, *rlit, *chance, *rtype;
 
 	room tmproom;
@@ -2955,7 +2961,7 @@ spo_room(coder)
 	    !OV_pop_i(x) ||
 	    !OV_pop_i(yalign) ||
 	    !OV_pop_i(xalign) ||
-	    !OV_pop_i(flags) ||
+	    !OV_pop_i(rflags) ||
 	    !OV_pop_i(rlit) ||
 	    !OV_pop_i(chance) ||
 	    !OV_pop_i(rtype)) return;
@@ -2970,9 +2976,9 @@ spo_room(coder)
 	tmproom.rtype = OV_i(rtype);
 	tmproom.chance = OV_i(chance);
 	tmproom.rlit = OV_i(rlit);
-	tmproom.filled = (OV_i(flags) & (1 << 0));
-	/*tmproom.irregular = (OV_i(flags) & (1 << 1));*/
-	tmproom.joined = !(OV_i(flags) & (1 << 2));
+	tmproom.filled = (OV_i(rflags) & (1 << 0));
+	/*tmproom.irregular = (OV_i(rflags) & (1 << 1));*/
+	tmproom.joined = !(OV_i(rflags) & (1 << 2));
 
 	opvar_free(x);
 	opvar_free(y);
@@ -2983,7 +2989,7 @@ spo_room(coder)
 	opvar_free(rtype);
 	opvar_free(chance);
 	opvar_free(rlit);
-	opvar_free(flags);
+	opvar_free(rflags);
 
 	if (!coder->failed_room[coder->n_subroom-1]) {
 	    tmpcr = build_room(&tmproom, coder->croom);
@@ -3028,18 +3034,18 @@ spo_stair(coder)
      struct sp_coder *coder;
 {
     xchar x,y;
-    struct opvar *up, *coord;
+    struct opvar *up, *scoord;
     struct trap *badtrap;
 
     if (!OV_pop_i(up) ||
-	!OV_pop_c(coord)) return;
+	!OV_pop_c(scoord)) return;
 
-    get_location_coord(&x, &y, DRY, coder->croom, OV_i(coord));
+    get_location_coord(&x, &y, DRY, coder->croom, OV_i(scoord));
     if ((badtrap = t_at(x,y)) != 0) deltrap(badtrap);
     mkstairs(x, y, (char)OV_i(up), coder->croom);
     SpLev_Map[x][y] = 1;
 
-    opvar_free(coord);
+    opvar_free(scoord);
     opvar_free(up);
 }
 
@@ -3048,12 +3054,12 @@ spo_ladder(coder)
      struct sp_coder *coder;
 {
     xchar x,y;
-    struct opvar *up, *coord;
+    struct opvar *up, *lcoord;
 
     if (!OV_pop_i(up) ||
-	!OV_pop_c(coord)) return;
+	!OV_pop_c(lcoord)) return;
 
-    get_location_coord(&x, &y, DRY, coder->croom, OV_i(coord));
+    get_location_coord(&x, &y, DRY, coder->croom, OV_i(lcoord));
 
     levl[x][y].typ = LADDER;
     SpLev_Map[x][y] = 1;
@@ -3064,7 +3070,7 @@ spo_ladder(coder)
 	xdnladder = x; ydnladder = y;
 	levl[x][y].ladder = LA_DOWN;
     }
-    opvar_free(coord);
+    opvar_free(lcoord);
     opvar_free(up);
 }
 
@@ -3072,13 +3078,13 @@ void
 spo_grave(coder)
      struct sp_coder *coder;
 {
-    struct opvar *coord, *typ, *txt;
+    struct opvar *gcoord, *typ, *txt;
     schar x,y;
     if (!OV_pop_i(typ) ||
 	!OV_pop_s(txt) ||
-	!OV_pop_c(coord)) return;
+	!OV_pop_c(gcoord)) return;
 
-    get_location_coord(&x, &y, DRY, coder->croom, OV_i(coord));
+    get_location_coord(&x, &y, DRY, coder->croom, OV_i(gcoord));
 
     if (isok(x, y) && !t_at(x, y)) {
 	levl[x][y].typ = GRAVE;
@@ -3089,7 +3095,7 @@ spo_grave(coder)
 	}
     }
 
-    opvar_free(coord);
+    opvar_free(gcoord);
     opvar_free(typ);
     opvar_free(txt);
 }
@@ -3098,20 +3104,20 @@ void
 spo_altar(coder)
      struct sp_coder *coder;
 {
-    struct opvar *al, *shrine, *coord;
+    struct opvar *al, *shrine, *acoord;
     altar tmpaltar;
 
     if (!OV_pop_i(al) ||
 	!OV_pop_i(shrine) ||
-	!OV_pop_c(coord)) return;
+	!OV_pop_c(acoord)) return;
 
-    tmpaltar.coord = OV_i(coord);
+    tmpaltar.coord = OV_i(acoord);
     tmpaltar.align = OV_i(al);
     tmpaltar.shrine = OV_i(shrine);
 
     create_altar(&tmpaltar, coder->croom);
 
-    opvar_free(coord);
+    opvar_free(acoord);
     opvar_free(shrine);
     opvar_free(al);
 }
@@ -3121,17 +3127,17 @@ spo_trap(coder)
      struct sp_coder *coder;
 {
     struct opvar *type;
-    struct opvar *coord;
+    struct opvar *tcoord;
     trap tmptrap;
 
     if (!OV_pop_i(type) ||
-	!OV_pop_c(coord)) return;
+	!OV_pop_c(tcoord)) return;
 
-    tmptrap.coord = OV_i(coord);
+    tmptrap.coord = OV_i(tcoord);
     tmptrap.type = OV_i(type);
 
     create_trap(&tmptrap, coder->croom);
-    opvar_free(coord);
+    opvar_free(tcoord);
     opvar_free(type);
 }
 
@@ -3139,15 +3145,16 @@ void
 spo_gold(coder)
      struct sp_coder *coder;
 {
-    struct opvar *coord, *amt;
+    struct opvar *gcoord, *amt;
     schar x,y;
     long amount;
-    if (!OV_pop_c(coord) || !OV_pop_i(amt)) return;
+
+    if (!OV_pop_c(gcoord) || !OV_pop_i(amt)) return;
     amount = OV_i(amt);
-    get_location_coord(&x, &y, DRY, coder->croom, OV_i(coord));
+    get_location_coord(&x, &y, DRY, coder->croom, OV_i(gcoord));
     if (amount == -1) amount = rnd(200);
     mkgold(amount, x,y);
-    opvar_free(coord);
+    opvar_free(gcoord);
     opvar_free(amt);
 }
 
@@ -3878,19 +3885,19 @@ void
 spo_region(coder)
      struct sp_coder *coder;
 {
-    struct opvar *rtype, *rlit, *flags, *area;
+    struct opvar *rtype, *rlit, *rflags, *area;
     xchar dx1,dy1,dx2,dy2;
     register struct mkroom *troom;
     boolean prefilled, room_not_needed, irregular, joined;
 
-    if (!OV_pop_i(flags) ||
+    if (!OV_pop_i(rflags) ||
 	!OV_pop_i(rtype) ||
 	!OV_pop_i(rlit) ||
 	!OV_pop_r(area)) return;
 
-    prefilled = !(OV_i(flags) & (1 << 0));
-    irregular = (OV_i(flags) & (1 << 1));
-    joined = !(OV_i(flags) & (1 << 2));
+    prefilled = !(OV_i(rflags) & (1 << 0));
+    irregular = (OV_i(rflags) & (1 << 1));
+    joined = !(OV_i(rflags) & (1 << 2));
 
     if(OV_i(rtype) > MAXRTYPE) {
 	OV_i(rtype) -= MAXRTYPE+1;
@@ -3927,7 +3934,7 @@ spo_region(coder)
 	light_region(&tmpregion);
 
 	opvar_free(area);
-	opvar_free(flags);
+	opvar_free(rflags);
 	opvar_free(rlit);
 	opvar_free(rtype);
 
@@ -3973,7 +3980,7 @@ spo_region(coder)
     }
 
     opvar_free(area);
-    opvar_free(flags);
+    opvar_free(rflags);
     opvar_free(rlit);
     opvar_free(rtype);
 }
@@ -3983,18 +3990,18 @@ spo_drawbridge(coder)
      struct sp_coder *coder;
 {
     xchar x,y;
-    struct opvar *dir, *db_open, *coord;
+    struct opvar *dir, *db_open, *dcoord;
 
     if (!OV_pop_i(dir) ||
 	!OV_pop_i(db_open) ||
-	!OV_pop_c(coord)) return;
+	!OV_pop_c(dcoord)) return;
 
-    get_location_coord(&x, &y, DRY|WET|HOT, coder->croom, OV_i(coord));
+    get_location_coord(&x, &y, DRY|WET|HOT, coder->croom, OV_i(dcoord));
     if (!create_drawbridge(x, y, OV_i(dir), OV_i(db_open)))
 	impossible("Cannot create drawbridge.");
     SpLev_Map[x][y] = 1;
 
-    opvar_free(coord);
+    opvar_free(dcoord);
     opvar_free(db_open);
     opvar_free(dir);
 }
@@ -4004,17 +4011,17 @@ spo_mazewalk(coder)
      struct sp_coder *coder;
 {
     xchar x,y;
-    struct opvar *ftyp, *fstocked,*fdir, *coord;
+    struct opvar *ftyp, *fstocked,*fdir, *mcoord;
     int dir;
 
     if (!OV_pop_i(ftyp) ||
 	!OV_pop_i(fstocked) ||
 	!OV_pop_i(fdir) ||
-	!OV_pop_c(coord)) return;
+	!OV_pop_c(mcoord)) return;
 
     dir = OV_i(fdir);
 
-    get_location_coord(&x, &y, ANY_LOC, coder->croom, OV_i(coord));
+    get_location_coord(&x, &y, ANY_LOC, coder->croom, OV_i(mcoord));
     if (!isok(x,y)) return;
 
     if (OV_i(ftyp) < 1) {
@@ -4066,7 +4073,7 @@ spo_mazewalk(coder)
     walkfrom(x, y, OV_i(ftyp));
     if (OV_i(fstocked)) fill_empty_maze();
 
-    opvar_free(coord);
+    opvar_free(mcoord);
     opvar_free(fdir);
     opvar_free(fstocked);
     opvar_free(ftyp);
@@ -4121,6 +4128,7 @@ spo_room_door(coder)
     opvar_free(pos);
 }
 
+/*ARGSUSED*/
 void
 sel_set_wallify(x,y,arg)
      int x, y;
@@ -5029,25 +5037,28 @@ sp_lev *lvl;
 	    break;
 	case SPO_SEL_GRADIENT:
 	    {
-		struct opvar *gtyp, *glim, *mind, *maxd, *coord, *coord2;
+		struct opvar *gtyp, *glim, *mind, *maxd, *gcoord, *coord2;
 		struct opvar *sel;
 		schar x,y, x2,y2;
 		if (!OV_pop_i(gtyp)) panic("no gtyp for grad");
 		if (!OV_pop_i(glim)) panic("no glim for grad");
 		if (!OV_pop_c(coord2)) panic("no coord2 for grad");
-		if (!OV_pop_c(coord)) panic("no coord for grad");
+		if (!OV_pop_c(gcoord)) panic("no coord for grad");
 		if (!OV_pop_i(maxd)) panic("no maxd for grad");
 		if (!OV_pop_i(mind)) panic("no mind for grad");
-		get_location_coord(&x, &y, ANY_LOC, coder->croom, OV_i(coord));
-		get_location_coord(&x2, &y2, ANY_LOC, coder->croom, OV_i(coord2));
+		get_location_coord(&x, &y, ANY_LOC, coder->croom,
+				   OV_i(gcoord));
+		get_location_coord(&x2, &y2, ANY_LOC, coder->croom,
+				   OV_i(coord2));
 
 		sel = selection_opvar(NULL);
-		selection_do_gradient(sel, x,y, x2,y2, OV_i(gtyp), OV_i(mind), OV_i(maxd), OV_i(glim));
+		selection_do_gradient(sel, x,y, x2,y2, OV_i(gtyp),
+				      OV_i(mind), OV_i(maxd), OV_i(glim));
 		splev_stack_push(coder->stack, sel);
 
 		opvar_free(gtyp);
 		opvar_free(glim);
-		opvar_free(coord);
+		opvar_free(gcoord);
 		opvar_free(coord2);
 		opvar_free(maxd);
 		opvar_free(mind);

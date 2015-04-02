@@ -1,4 +1,4 @@
-/* NetHack 3.5	trap.c	$NHDT-Date: 1427331767 2015/03/26 01:02:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.199 $ */
+/* NetHack 3.5	trap.c	$NHDT-Date: 1427934551 2015/04/02 00:29:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.223 $ */
 /* NetHack 3.5	trap.c	$Date: 2013/03/14 01:58:21 $  $Revision: 1.179 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3169,7 +3169,6 @@ struct obj *obj;
 const char *ostr;
 boolean force;
 {
-	boolean exploded = FALSE;
 	if (!obj) return ER_NOTHING;
 
         if (snuff_lit(obj))
