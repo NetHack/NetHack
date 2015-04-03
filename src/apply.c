@@ -37,6 +37,8 @@ STATIC_DCL boolean FDECL(figurine_location_checks,
 				(struct obj *, coord *, BOOLEAN_P));
 STATIC_DCL void FDECL(add_class, (char *, CHAR_P));
 STATIC_DCL void FDECL(setapplyclasses, (char *));
+STATIC_DCL boolean FDECL(is_valid_jump_pos, (int, int, int, BOOLEAN_P));
+STATIC_DCL boolean FDECL(find_poleable_mon, (coord *, int, int));
 
 #ifdef	AMIGA
 void FDECL( amii_speaker, ( struct obj *, char *, int ) );
