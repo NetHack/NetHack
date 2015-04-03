@@ -1,4 +1,4 @@
-/* NetHack 3.5	options.c	$NHDT-Date: 1427073746 2015/03/23 01:22:26 $  $NHDT-Branch: master $:$NHDT-Revision: 1.164 $ */
+/* NetHack 3.5	options.c	$NHDT-Date: 1428084467 2015/04/03 18:07:47 $  $NHDT-Branch: scshunt-regex $:$NHDT-Revision: 1.181 $ */
 /* NetHack 3.5	options.c	$Date: 2012/04/09 02:56:30 $  $Revision: 1.153 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -15,6 +15,7 @@ NEARDATA struct instance_flags iflags;	/* provide linkage */
 #define static
 #else
 #include "hack.h"
+#include "nhregex.h"
 #include "tcap.h"
 #include <ctype.h>
 #endif
@@ -1170,11 +1171,6 @@ char *str;
     int i, c = NO_COLOR, a = ATR_NONE;
     struct menucoloring *tmp;
     char *tmps, *cs = strchr(str, '=');
-#ifdef MENU_COLOR_REGEX_POSIX
-    int errnum;
-    char errbuf[80];
-#endif
-    const char *err = (char *)0;
 
     if (!cs || !str) return FALSE;
 
@@ -1217,28 +1213,9 @@ char *str;
     }
 
     tmp = (struct menucoloring *)alloc(sizeof(struct menucoloring));
-#ifdef MENU_COLOR_REGEX
-#ifdef MENU_COLOR_REGEX_POSIX
-    errnum = regcomp(&tmp->match, tmps, REG_EXTENDED | REG_NOSUB);
-    if (errnum != 0)
-    {
-	regerror(errnum, &tmp->match, errbuf, sizeof(errbuf));
-	err = errbuf;
-    }
-#else
-    tmp->match.translate = 0;
-    tmp->match.fastmap = 0;
-    tmp->match.buffer = 0;
-    tmp->match.allocated = 0;
-    tmp->match.regs_allocated = REGS_FIXED;
-    err = re_compile_pattern(tmps, strlen(tmps), &tmp->match);
-#endif
-#else
-    tmp->match = (char *)alloc(strlen(tmps)+1);
-    (void) memcpy((genericptr_t)tmp->match, (genericptr_t)tmps, strlen(tmps)+1);
-#endif
-    if (err) {
-	raw_printf("\nMenucolor regex error: %s\n", err);
+    tmp->match = regex_init();
+    if (!regex_compile(tmps, tmp->match)) {
+	raw_printf("\nMenucolor regex error: %s\n", regex_error_desc(tmp->match));
 	wait_synch();
 	free(tmp);
 	return FALSE;
@@ -1259,15 +1236,7 @@ int *color, *attr;
     struct menucoloring *tmpmc;
     if (iflags.use_menu_color)
 	for (tmpmc = menu_colorings; tmpmc; tmpmc = tmpmc->next)
-#ifdef MENU_COLOR_REGEX
-# ifdef MENU_COLOR_REGEX_POSIX
-	    if (regexec(&tmpmc->match, str, 0, NULL, 0) == 0) {
-# else
-	    if (re_search(&tmpmc->match, str, strlen(str), 0, 9999, 0) >= 0) {
-# endif
-#else
-	    if (pmatch(tmpmc->match, str)) {
-#endif
+            if (regex_match(str, tmpmc->match)) {
 		*color = tmpmc->color;
 		*attr = tmpmc->attr;
 		return TRUE;
@@ -1282,11 +1251,7 @@ free_menu_coloring()
 
     while (tmp) {
 	struct menucoloring *tmp2 = tmp->next;
-#ifdef MENU_COLOR_REGEX
-	(void) regfree(&tmp->match);
-#else
-	free(tmp->match);
-#endif
+        regex_free(tmp->match);
 	free(tmp);
 	tmp = tmp2;
     }

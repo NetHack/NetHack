@@ -1,4 +1,4 @@
-/* NetHack 3.5	config.h	$NHDT-Date: 1425083082 2015/02/28 00:24:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.51 $ */
+/* NetHack 3.5	config.h	$NHDT-Date: 1428084467 2015/04/03 18:07:47 $  $NHDT-Branch: scshunt-regex $:$NHDT-Revision: 1.76 $ */
 /* NetHack 3.5	config.h	$Date: 2012/01/27 20:15:26 $  $Revision: 1.37 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -435,18 +435,6 @@ typedef unsigned char	uchar;
  * Enable any of these at your own risk -- there are almost certainly
  * bugs left here.
  */
-
-/* Menucolors */
-/* HACK: this is being added to fix the builds temporarily.
- * Remove it whenever we finally get a real regex for Win32 */
-#ifdef UNIX
-# define MENU_COLOR_REGEX  /* use GNU regex */
-/*# define MENU_COLOR_REGEX_POSIX*/ /* use POSIX regex */
-#endif
-/* if neither is defined, uses pmatch()
- * pmatch() provides basic globbing: '*' and '?' wildcards.
- */
-
 
 #define STATUS_VIA_WINDOWPORT	/* re-work of the status line updating process */
 #define STATUS_HILITES		/* support hilites of status fields */
