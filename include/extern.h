@@ -1,5 +1,4 @@
 /* NetHack 3.5	extern.h	$NHDT-Date: 1428806395 2015/04/12 02:39:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.455 $ */
-/* NetHack 3.5	extern.h	$Date: 2013/11/05 00:57:53 $  $Revision: 1.380 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1487,6 +1486,13 @@ E int FDECL(do_play_instrument, (struct obj *));
 E void NDECL(init_lan_features);
 E char *NDECL(lan_username);
 #endif
+
+/* ### nhregex.c ### */
+E struct nhregex * NDECL(regex_init);
+E boolean FDECL(regex_compile, (const char *, struct nhregex *));
+E const char *FDECL(regex_error_desc, (struct nhregex *));
+E boolean FDECL(regex_match, (const char *, struct nhregex*));
+E void FDECL(regex_free, (struct nhregex *));
 
 /* ### nttty.c ### */
 

@@ -1,4 +1,4 @@
-/* NetHack 3.5	options.c	$NHDT-Date: 1428084467 2015/04/03 18:07:47 $  $NHDT-Branch: scshunt-regex $:$NHDT-Revision: 1.181 $ */
+/* NetHack 3.5	options.c	$NHDT-Date: 1428088105 2015/04/03 19:08:25 $  $NHDT-Branch: scshunt-regex $:$NHDT-Revision: 1.182 $ */
 /* NetHack 3.5	options.c	$Date: 2012/04/09 02:56:30 $  $Revision: 1.153 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -15,7 +15,6 @@ NEARDATA struct instance_flags iflags;	/* provide linkage */
 #define static
 #else
 #include "hack.h"
-#include "nhregex.h"
 #include "tcap.h"
 #include <ctype.h>
 #endif

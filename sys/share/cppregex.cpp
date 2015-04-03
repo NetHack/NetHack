@@ -7,7 +7,7 @@
 #include <memory>
 
 extern "C" {
-  #include <nhregex.h>
+  #include <hack.h>
 
   struct nhregex {
     std::unique_ptr<std::regex> re;

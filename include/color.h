@@ -1,4 +1,4 @@
-/* NetHack 3.5	color.h	$NHDT-Date: 1428084467 2015/04/03 18:07:47 $  $NHDT-Branch: scshunt-regex $:$NHDT-Revision: 1.7 $ */
+/* NetHack 3.5	color.h	$NHDT-Date: 1428088106 2015/04/03 19:08:26 $  $NHDT-Branch: scshunt-regex $:$NHDT-Revision: 1.8 $ */
 /* NetHack 3.5	color.h	$Date: 2009/05/06 10:44:34 $  $Revision: 1.5 $ */
 /*	SCCS Id: @(#)color.h	3.5	1992/02/02	*/
 /* Copyright (c) Steve Linhart, Eric Raymond, 1989. */
@@ -6,8 +6,6 @@
 
 #ifndef COLOR_H
 #define COLOR_H
-
-#include <nhregex.h>
 
 /*
  * The color scheme used is tailored for an IBM PC.  It consists of the
