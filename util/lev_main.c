@@ -119,7 +119,29 @@ static void NDECL(init_obj_classes);
 static int FDECL(case_insensitive_comp, (const char *, const char *));
 
 void VDECL(lc_error, (const char *, ...));
+void VDECL(lc_warning, (const char *, ...));
+char * FDECL(decode_parm_chr, (CHAR_P));
+char * FDECL(decode_parm_str, (char *));
+struct opvar * FDECL(set_opvar_int, (struct opvar *, long));
+struct opvar * FDECL(set_opvar_coord, (struct opvar *, long));
+struct opvar * FDECL(set_opvar_region, (struct opvar *, long));
+struct opvar * FDECL(set_opvar_mapchar, (struct opvar *, long));
+struct opvar * FDECL(set_opvar_monst, (struct opvar *, long));
+struct opvar * FDECL(set_opvar_obj, (struct opvar *, long));
+struct opvar * FDECL(set_opvar_str, (struct opvar *, char *));
+struct opvar * FDECL(set_opvar_var, (struct opvar *, char *));
 void VDECL(add_opvars, (sp_lev *, const char *, ...));
+void NDECL(break_stmt_start);
+void FDECL(break_stmt_end, (sp_lev *));
+void FDECL(break_stmt_new, (sp_lev *, long));
+char *FDECL(funcdef_paramtypes, (struct lc_funcdefs *));
+const char *FDECL(spovar2str, (long));
+void FDECL(vardef_used, (struct lc_vardefs *, char *));
+void FDECL(check_vardef_type, (struct lc_vardefs *, char *, long));
+struct lc_vardefs * FDECL(add_vardef_type, (struct lc_vardefs *, char *, long));
+int FDECL(reverse_jmp_opcode, (int));
+struct opvar * FDECL(opvar_clone, (struct opvar *));
+void FDECL(start_level_def, (sp_lev **, char *));
 
 
 static struct {
@@ -897,15 +919,15 @@ splev_add_from(splev, from_splev)
 
 
 void
-start_level_def(splev, fname)
+start_level_def(splev, ldfname)
 sp_lev **splev;
-char *fname;
+char *ldfname;
 {
     struct lc_funcdefs *f;
-    if (index(fname, '.'))
-	lc_error("Invalid dot ('.') in level name '%s'.", fname);
-    if ((int) strlen(fname) > 14)
-	lc_error("Level names limited to 14 characters ('%s').", fname);
+    if (index(ldfname, '.'))
+	lc_error("Invalid dot ('.') in level name '%s'.", ldfname);
+    if ((int) strlen(ldfname) > 14)
+	lc_error("Level names limited to 14 characters ('%s').", ldfname);
     f = function_definitions;
     while (f) {
 	f->n_called = 0;
