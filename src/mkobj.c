@@ -2198,40 +2198,61 @@ obj_nexto_xy(otyp, x, y, oid)
 
 
 /*
- * Causes one object to absorb another, smaller one of 
- * its own type, increasing weight accordingly.
- * Returns the object that remains; frees the other.
+ * Causes one object to absorb another, increasing 
+ * weight accordingly. Frees obj2; obj1 remains and
+ * is returned.
+ */
+struct obj*
+obj_absorb(obj1, obj2)
+    struct obj **obj1, **obj2;
+{
+    struct obj *otmp1 = NULL, *otmp2 = NULL;
+    int extrawt = 0;
+
+    /* don't let people dumb it up */
+    if (obj1 && obj2) {
+        otmp1 = *obj1;
+        otmp2 = *obj2;
+        if (otmp1 && otmp2) {
+            extrawt = otmp2->oeaten ? otmp2->oeaten : otmp2->owt;
+            otmp1->owt += extrawt;
+            otmp1->oeaten += otmp1->oeaten ? extrawt : 0;
+            otmp1->quan = 1;
+            obj_extract_self(otmp2);
+            dealloc_obj(otmp2);
+            return otmp1;
+        }
+    }
+
+    impossible("obj_absorb: not called with two actual objects");
+    return NULL;
+}
+
+
+/*
+ * Causes the heavier object to absorb the lighter object;
+ * wrapper for obj_absorb so that floor_effects works more
+ * cleanly (since we don't know which we want to stay around)
  */
 struct obj*
 obj_meld(obj1, obj2)
     struct obj **obj1, **obj2;
 {
     struct obj *otmp1 = NULL, *otmp2 = NULL;
-    int extrawt = 0;
-    boolean reversed = FALSE;
 
-    if (obj1 && obj2 && *obj1 && *obj2) {
-        otmp1 = *obj1; 
+    if (obj1 && obj2) {
+        otmp1 = *obj1;
         otmp2 = *obj2;
-
-        if ((otmp1->owt == otmp2->owt && rn2(2))
-                || (otmp1->owt < otmp2->owt)) {
-            otmp2 = *obj1; otmp1 = *obj2;
-            reversed = TRUE;
-        } 
-
-        extrawt = otmp2->oeaten ? otmp2->oeaten : otmp2->owt;
-        otmp1->owt += extrawt;
-        otmp1->oeaten += otmp1->oeaten ? extrawt : 0;
-        obj_extract_self(otmp2);
-        dealloc_obj(otmp2);
-        if (reversed) { *obj1 = NULL; } else { *obj2 = NULL; }
-        return otmp1;
+        if (otmp1 && otmp2) {
+            if (otmp1->owt > otmp2->owt || rn2(2)) {
+                return obj_absorb(obj1, obj2);
+            }
+            return obj_absorb(obj2, obj1);
+        }
     }
 
     impossible("obj_meld: not called with two actual objects");
     return NULL;
 }
-
 
 /*mkobj.c*/

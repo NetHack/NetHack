@@ -1,5 +1,4 @@
 /* NetHack 3.5	objnam.c	$NHDT-Date: 1426470349 2015/03/16 01:45:49 $  $NHDT-Branch: derek-farming $:$NHDT-Revision: 1.108 $ */
-/* NetHack 3.5	objnam.c	$Date: 2011/10/27 02:24:54 $  $Revision: 1.101 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -865,9 +864,6 @@ ring:
                 Strcat(bp, " (laid by you)");
             }
         }
-        if (wizard) {
-            Sprintf(eos(bp), " (%d aum)", obj->owt);
-        }
         if (obj->otyp == MEAT_RING) goto ring;
         break;
     case BALL_CLASS:
@@ -941,6 +937,12 @@ ring:
         Strcpy(tmpbuf, prefix);
         Strcpy(prefix, "an ");
         Strcpy(prefix+3, tmpbuf+2);
+    }
+
+    /* show weight for items (debug tourist info)
+     * aum is stolen from Crawl's "Arbitrary Unit of Measure" */
+    if (wizard) {
+        Sprintf(eos(bp), " (%d aum)", obj->owt);
     }
     bp = strprepend(bp, prefix);
     return(bp);
@@ -2496,22 +2498,30 @@ struct obj *no_wish;
         bp += 8;
     }
 
-    /*
-     * Find corpse type using "of" (figurine of an orc, tin of orc meat)
-     * Don't check if it's a wand or spellbook.
-     * (avoid "wand/finger of death" confusion).
-     */
-    if (!strstri(bp, "wand ")
-     && !strstri(bp, "spellbook ")
-     && !strstri(bp, "finger ")) {
-        if (((p = strstri(bp, "tin of ")) != 0) &&
-            (tmp = tin_variety_txt(p+7, &tinv)) &&
-        (mntmp = name_to_mon(p+7+tmp)) >= LOW_PM) {
-        *(p+3) = 0;
-        tvariety = tinv;
-        } else if ((p = strstri(bp, " of ")) != 0
-        && (mntmp = name_to_mon(p+4)) >= LOW_PM)
-        *p = 0;
+    /* intercept pudding globs here; they're a valid wish target,
+     * but we need them to not get treated like a corpse */
+    if (((p = strstri(bp, "glob of ")) != 0) 
+        && (mntmp = name_to_mon(p+8)) >= PM_GRAY_OOZE
+        && mntmp <= PM_BLACK_PUDDING) {
+        mntmp = NON_PM;    /* lie to ourselves */
+    } else {
+        /*
+         * Find corpse type using "of" (figurine of an orc, tin of orc meat)
+         * Don't check if it's a wand or spellbook.
+         * (avoid "wand/finger of death" confusion).
+         */
+        if (!strstri(bp, "wand ")
+            && !strstri(bp, "spellbook ")
+            && !strstri(bp, "finger ")) {
+            if (((p = strstri(bp, "tin of ")) != 0) &&
+                (tmp = tin_variety_txt(p + 7, &tinv)) &&
+                (mntmp = name_to_mon(p + 7 + tmp)) >= LOW_PM) {
+                *(p + 3) = 0;
+                tvariety = tinv;
+            } else if ((p = strstri(bp, " of ")) != 0
+                       && (mntmp = name_to_mon(p + 4)) >= LOW_PM)
+                       *p = 0;
+        }
     }
     /* Find corpse type w/o "of" (red dragon scale mail, yeti corpse) */
     if (strncmpi(bp, "samurai sword", 13)) /* not the "samurai" monster! */

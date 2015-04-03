@@ -1225,6 +1225,7 @@ E int FDECL(hornoplenty, (struct obj *,BOOLEAN_P));
 E void NDECL(obj_sanity_check);
 E struct obj* FDECL(obj_nexto, (struct obj*));
 E struct obj* FDECL(obj_nexto_xy, (int, int, int, int));
+E struct obj* FDECL(obj_absorb, (struct obj**, struct obj**));
 E struct obj* FDECL(obj_meld, (struct obj**, struct obj**));
 
 /* ### mkroom.c ### */

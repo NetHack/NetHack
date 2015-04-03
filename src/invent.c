@@ -1,4 +1,3 @@
-/* NetHack 3.5	invent.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
 /* NetHack 3.5	invent.c	$Date: 2013/11/05 00:57:55 $  $Revision: 1.125 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -168,9 +167,10 @@ struct obj **potmp, **pobj;
                 / (otmp->quan + obj->quan);
 
         otmp->quan += obj->quan;
-                /* temporary special case for gold objects!!!! */
+        /* temporary special case for gold objects!!!! */
         if (otmp->oclass == COIN_CLASS) otmp->owt = weight(otmp);
-        else otmp->owt += obj->owt;
+        /* and puddings!!!1!!one! */
+        else if (!Is_pudding(otmp)) otmp->owt += obj->owt;
         if(!has_oname(otmp) && has_oname(obj))
             otmp = *potmp = oname(otmp, ONAME(obj));
         obj_extract_self(obj);
@@ -213,6 +213,15 @@ struct obj **potmp, **pobj;
             }
         }
 #endif /*0*/
+
+        /* handle puddings a bit differently; absorption will
+         * free the other object automatically so we can just 
+         * return out from here.  */
+        if (Is_pudding(obj)) {
+            pline("The %s coalesce.", makeplural(obj_typename(obj->otyp)));
+            obj_absorb(potmp, pobj);
+            return(1);
+        }
 
         obfree(obj,otmp);	/* free(obj), bill->otmp */
         return(1);
@@ -312,18 +321,6 @@ struct obj *obj;
     obj->was_thrown = 0;	/* not meaningful for invent */
 
     addinv_core1(obj);
-
-    /* we want globby things to become one big glob whereever possible
-       so we need to trigger this before merged() is called */
-    if (obj->globby && merge_choice(invent, obj)) {
-        for (prev = 0, otmp = invent; otmp; prev = otmp, otmp = otmp->nobj) {
-            if (otmp->otyp == obj->otyp) {
-                pline("The %s coalesce.", makeplural(obj_typename(obj->otyp)));
-                obj = obj_meld(&otmp, &obj);
-                goto added;
-            }
-        }
-    }
 
     /* merge with quiver in preference to any other inventory slot
        in case quiver and wielded weapon are both eligible; adding
