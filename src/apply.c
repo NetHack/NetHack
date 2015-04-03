@@ -1403,7 +1403,8 @@ int state;
 	    for (dy = -4; dy <= 4; dy++) {
 		x = dx + (int)u.ux;
 		y = dy + (int)u.uy;
-		if (isok(x,y) && is_valid_jump_pos(x,y, jumping_is_magic, FALSE))
+		if (isok(x,y) && ACCESSIBLE(levl[x][y].typ) &&
+		    is_valid_jump_pos(x,y, jumping_is_magic, FALSE))
 		    tmp_at(x,y);
 	    }
     } else {
@@ -2611,7 +2612,7 @@ int state;
 	    for (dy = -4; dy <= 4; dy++) {
 		x = dx + (int)u.ux;
 		y = dy + (int)u.uy;
-		if (isok(x, y) &&
+		if (isok(x, y) && ACCESSIBLE(levl[x][y].typ) &&
 		    distu(x, y) >= polearm_range_min &&
 		    distu(x, y) <= polearm_range_max) {
 		    tmp_at(x, y);
