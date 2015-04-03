@@ -42,7 +42,11 @@ extern "C" {
   boolean regex_match(const char *s, struct nhregex *re) {
     if (!re->re)
       return false;
-    return regex_search(s, *re->re, std::regex_constants::match_any);
+    try {
+      return regex_search(s, *re->re, std::regex_constants::match_any);
+    } catch (const std::regex_error& err) {
+      return false;
+    }
   }
 
   void regex_free(struct nhregex *re) {
