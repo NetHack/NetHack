@@ -3324,7 +3324,7 @@ const char *filename;
 #define PASSAGESCOPE 3
 
 void
-read_tribute(tribsection, tribtitle, tribpassage, text, maxtextlines)
+read_tribute(tribsection, tribtitle, tribpassage)
 char *tribsection, *tribtitle;
 int  tribpassage;
 {
