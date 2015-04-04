@@ -15,6 +15,8 @@
 
 #include "sp_lev.h"
 
+typedef void (*select_iter_func)(int, int, genericptr_t);
+
 extern void FDECL(mkmap, (lev_init *));
 
 STATIC_DCL void FDECL(get_room_loc, (schar *, schar *, struct mkroom *));
@@ -35,6 +37,94 @@ STATIC_DCL boolean FDECL(create_subroom, (struct mkroom *, XCHAR_P, XCHAR_P,
 					XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P));
 
 long FDECL(opvar_array_length, (struct sp_coder *));
+STATIC_DCL void NDECL(solidify_map);
+STATIC_DCL void FDECL(splev_stack_init, (struct splevstack *));
+STATIC_DCL void FDECL(splev_stack_done, (struct splevstack *));
+STATIC_DCL void FDECL(splev_stack_push, (struct splevstack *, struct opvar *));
+STATIC_DCL struct opvar * FDECL(splev_stack_pop, (struct splevstack *));
+STATIC_DCL struct splevstack * FDECL(splev_stack_reverse, (struct splevstack *));
+STATIC_DCL struct opvar * FDECL(opvar_new_str, (char *));
+STATIC_DCL struct opvar * FDECL(opvar_new_int, (long));
+STATIC_DCL struct opvar * FDECL(opvar_new_coord, (int, int));
+STATIC_DCL struct opvar * FDECL(opvar_new_region, (int,int, int,int));
+STATIC_DCL void FDECL(opvar_free_x, (struct opvar *));
+STATIC_DCL struct opvar * FDECL(opvar_clone, (struct opvar *));
+STATIC_DCL struct opvar * FDECL(opvar_var_conversion, (struct sp_coder *, struct opvar *));
+STATIC_DCL struct splev_var * FDECL(opvar_var_defined, (struct sp_coder *, char *));
+STATIC_DCL struct opvar * FDECL(splev_stack_getdat, (struct sp_coder *, XCHAR_P));
+STATIC_DCL struct opvar * FDECL(splev_stack_getdat_any, (struct sp_coder *));
+STATIC_DCL void FDECL(variable_list_del, (struct splev_var *));
+STATIC_DCL void FDECL(lvlfill_maze_grid, (int,int, int,int, SCHAR_P));
+STATIC_DCL void FDECL(lvlfill_solid, (SCHAR_P, SCHAR_P));
+STATIC_DCL void NDECL(remove_boundary_syms);
+STATIC_DCL void FDECL(maybe_add_door, (int,int, struct mkroom *));
+STATIC_DCL void NDECL(link_doors_rooms);
+STATIC_DCL void NDECL(fill_rooms);
+STATIC_DCL unpacked_coord FDECL(get_unpacked_coord, (long, int));
+STATIC_DCL void FDECL(replace_terrain, (replaceterrain *, struct mkroom *));
+STATIC_DCL void FDECL(wallify_map, (int,int, int,int));
+STATIC_DCL void FDECL(splev_initlev, (lev_init *));
+STATIC_DCL struct sp_frame * FDECL(frame_new, (long));
+STATIC_DCL void FDECL(frame_del, (struct sp_frame *));
+STATIC_DCL void FDECL(spo_frame_push, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_frame_pop, (struct sp_coder *));
+STATIC_DCL long FDECL(sp_code_jmpaddr, (long, long));
+STATIC_DCL void FDECL(spo_call, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_return, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_end_moninvent, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_pop_container, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_message, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_monster, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_object, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_level_flags, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_initlevel, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_engraving, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_mineralize, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_room, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_endroom, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_stair, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_ladder, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_grave, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_altar, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_trap, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_gold, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_corridor, (struct sp_coder *));
+STATIC_DCL struct opvar * FDECL(selection_opvar, (char *));
+STATIC_DCL xchar FDECL(selection_getpoint, (int,int, struct opvar *));
+STATIC_DCL void FDECL(selection_setpoint, (int,int, struct opvar *, XCHAR_P));
+STATIC_DCL struct opvar * FDECL(selection_not, (struct opvar *));
+STATIC_DCL struct opvar * FDECL(selection_logical_oper, (struct opvar *, struct opvar *, CHAR_P));
+STATIC_DCL struct opvar * FDECL(selection_filter_mapchar, (struct opvar *, struct opvar *));
+STATIC_DCL void FDECL(selection_filter_percent, (struct opvar *, int));
+STATIC_DCL int FDECL(selection_rndcoord, (struct opvar *, schar *, schar *));
+STATIC_DCL void FDECL(selection_do_grow, (struct opvar *, int));
+STATIC_DCL void FDECL(selection_floodfill, (struct opvar *, int,int));
+STATIC_DCL void FDECL(selection_do_ellipse, (struct opvar *, int,int, int,int, int));
+STATIC_DCL long FDECL(line_dist_coord, (long,long, long,long, long,long));
+STATIC_DCL void FDECL(selection_do_gradient, (struct opvar *, long,long, long,long, long,long,long,long));
+STATIC_DCL void FDECL(selection_do_line, (SCHAR_P,SCHAR_P, SCHAR_P,SCHAR_P, struct opvar *));
+STATIC_DCL void FDECL(selection_do_randline, (SCHAR_P,SCHAR_P, SCHAR_P,SCHAR_P, SCHAR_P,SCHAR_P, struct opvar *));
+STATIC_DCL void FDECL(selection_iterate, (struct opvar *, select_iter_func, genericptr_t));
+STATIC_DCL void FDECL(sel_set_ter, (int,int, genericptr_t));
+STATIC_DCL void FDECL(sel_set_feature, (int,int, genericptr_t));
+STATIC_DCL void FDECL(sel_set_door, (int,int, genericptr_t));
+STATIC_DCL void FDECL(spo_door, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_feature, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_terrain, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_replace_terrain, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_levregion, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_region, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_drawbridge, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_mazewalk, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_wall_property, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_room_door, (struct sp_coder *));
+STATIC_DCL void FDECL(sel_set_wallify, (int,int, genericptr_t));
+STATIC_DCL void FDECL(spo_wallify, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_map, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_jmp, (struct sp_coder *, sp_lev *));
+STATIC_DCL void FDECL(spo_conditional_jump, (struct sp_coder *, sp_lev *));
+STATIC_DCL void FDECL(spo_var_init, (struct sp_coder *));
+STATIC_DCL void FDECL(spo_shuffle_array, (struct sp_coder *));
 
 #define LEFT	1
 #define H_LEFT	2
@@ -3208,7 +3298,7 @@ selection_opvar(nbuf)
     return ov;
 }
 
-char
+xchar
 selection_getpoint(x,y,ov)
      int x,y;
      struct opvar *ov;
@@ -3223,12 +3313,12 @@ void
 selection_setpoint(x,y,ov, c)
      int x,y;
      struct opvar *ov;
-     char c;
+     xchar c;
 {
     if (!ov || ov->spovartyp != SPOVAR_SEL) return;
     if (x < 0 || y < 0 || x >= COLNO || y >= ROWNO) return;
 
-    ov->vardata.str[COLNO*y + x] = (c + 1);
+    ov->vardata.str[COLNO*y + x] = (char)(c + 1);
 }
 
 struct opvar *
@@ -3482,16 +3572,16 @@ line_dist_coord(x1,y1, x2,y2, x3,y3)
     long py = y2-y1;
     long s = px*px + py*py;
     long x, y, dx, dy, dist = 0;
-    float u = 0;
+    float lu = 0;
 
     if (x1 == x2 && y1 == y2) return isqrt(dist2(x1,y1, x3,y3));
 
-    u = ((x3 - x1) * px + (y3 - y1) * py) / (float)s;
-    if (u > 1) u = 1;
-    else if (u < 0) u = 0;
+    lu = ((x3 - x1) * px + (y3 - y1) * py) / (float)s;
+    if (lu > 1) lu = 1;
+    else if (lu < 0) lu = 0;
 
-    x = x1 + u * px;
-    y = y1 + u * py;
+    x = x1 + lu * px;
+    y = y1 + lu * py;
     dx = x - x3;
     dy = y - y3;
     dist = isqrt(dx*dx + dy*dy);
@@ -3648,7 +3738,7 @@ selection_do_randline(x1,y1,x2,y2,rough, rec, ov)
 void
 selection_iterate(ov, func, arg)
      struct opvar *ov;
-     void FDECL((*func), (int,int,genericptr_t));
+     select_iter_func func;
      genericptr_t arg;
 {
     int x,y;
