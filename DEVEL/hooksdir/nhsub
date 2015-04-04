@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # nhsub
-# $NHDT-Date: 1427913635 2015/04/01 18:40:35 $
+# $NHDT-Date: 1427408239 2015/03/26 22:17:19 $
 
 # Note: was originally called nhdate; the rename is not reflected in the code.
 
@@ -87,12 +87,12 @@ if ($^O eq "MSWin32")
     $PDS = '\\';
 }
 
+my @rawlist = &cmdparse(@ARGV);
+push(@rawlist,'.') if($#rawlist == -1);
+
 # pick up the prefix for substitutions in this repo
 my $PREFIX = &git_config('nethack','substprefix');
 print "PREFIX: '$PREFIX'\n" if($opt{v});
-
-my @rawlist = &cmdparse(@ARGV);
-push(@rawlist,'.') if($#rawlist == -1);
 
 while(@rawlist){
 	my $raw = shift @rawlist;
@@ -201,7 +201,21 @@ my $count = s/\$$PREFIX-(([A-Za-z][A-Za-z0-9_]*)(: ([^\x24]+))?)\$/&handlevar($2
 
 	my $ofile = $file . ".nht";
 	open(TOUT, ">", $ofile) or die "Can't open $ofile";
-	die "write failed: $!" unless defined syswrite(TOUT, $_);
+
+#XXX MUST add a loop here
+#	die "write failed: $!" unless defined syswrite(TOUT, $_);
+	my $offset = 0;
+	my $sent;
+#print STDERR "L=",length,"\n";
+	while($offset < length){
+		$sent = syswrite(TOUT, $_, (length($_) - $offset), $offset);
+		die "write failed: $!" unless defined($sent);
+#print STDERR "rv=$sent\n";
+		last if($sent == (length($_) - $offset));
+		$offset += $sent;
+#print STDERR "loop: O=$offset\n";
+	}
+
 	close TOUT or die "Can't close $ofile";
 	rename $ofile, $file or die "Can't rename $ofile to $file";
 }
