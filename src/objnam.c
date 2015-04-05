@@ -2499,11 +2499,18 @@ struct obj *no_wish;
     }
 
     /* intercept pudding globs here; they're a valid wish target,
-     * but we need them to not get treated like a corpse */
-    if (((p = strstri(bp, "glob of ")) != 0) 
-        && (mntmp = name_to_mon(p+8)) >= PM_GRAY_OOZE
-        && mntmp <= PM_BLACK_PUDDING) {
-        mntmp = NON_PM;    /* lie to ourselves */
+     * but we need them to not get treated like a corpse.
+     * 
+     * also don't let player wish for multiple globs. 
+     */
+    if ((p = strstri(bp, "glob of ")) != 0 
+          || (p = strstri(bp, "globs of ")) != 0) {
+        int globoffset = (*(p+4) == 's') ? 9 : 8;
+        if ((mntmp = name_to_mon(p + globoffset)) >= PM_GRAY_OOZE
+                && mntmp <= PM_BLACK_PUDDING) {
+            mntmp = NON_PM;     /* lie to ourselves */
+            cnt = 0;            /* force only one */
+        }
     } else {
         /*
          * Find corpse type using "of" (figurine of an orc, tin of orc meat)

@@ -676,6 +676,7 @@ boolean artif;
         if (Is_pudding(otmp)) {
             otmp->globby = 1;
             otmp->known = otmp->bknown = otmp->rknown = otmp->dknown = 1;
+            otmp->corpsenm = PM_GRAY_OOZE + (otmp->otyp - GLOB_OF_GRAY_OOZE);
             /* this ensures that they don't fail merging because of
              * BUC status or other irrelevancies */
         } else {
@@ -2219,7 +2220,9 @@ obj_absorb(obj1, obj2)
             otmp1->oeaten += otmp1->oeaten ? extrawt : 0;
             otmp1->quan = 1;
             obj_extract_self(otmp2);
+            newsym(otmp2->ox, otmp2->oy); /* in case of floor */
             dealloc_obj(otmp2);
+            *obj2 = NULL;
             return otmp1;
         }
     }

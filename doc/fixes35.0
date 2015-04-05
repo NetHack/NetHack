@@ -894,6 +894,8 @@ non-pet rust monsters would eat rust-proofed non-digestibles but ignore
 	those non-digestibles otherwise
 kicking a grave may topple the gravestone
 allow showing legal jumping positions when asked for location to jump to
+cloned creatures (of any type) don't deathdrop items
+pudding corpses behave somewhat differently than before
 
 
 Platform- and/or Interface-Specific Fixes
