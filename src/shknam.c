@@ -1,4 +1,4 @@
-/* NetHack 3.5	shknam.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	shknam.c	$NHDT-Date: 1428207608 2015/04/05 04:20:08 $  $NHDT-Branch: nhmall-booktribute $:$NHDT-Revision: 1.32 $ */
 /* NetHack 3.5	shknam.c	$Date: 2011/04/15 01:55:42 $  $Revision: 1.24 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -368,7 +368,8 @@ boolean mkspecl;
 	struct permonst *ptr;
 
 	/* 3.6.0 tribute */
-	if (mkspecl && !strcmp(shp->name, "rare books")) {
+	if (mkspecl && (!strcmp(shp->name, "rare books") ||
+			!strcmp(shp->name, "second-hand bookstore"))) {
 	    struct obj *novel=mksobj_at(SPE_NOVEL, sx, sy, FALSE, FALSE);
 	    if (novel) context.tribute.bookstock = TRUE;
 	    return;

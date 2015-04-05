@@ -1,4 +1,4 @@
-/* NetHack 3.5	zap.c	$NHDT-Date: 1427782839 2015/03/31 06:20:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.200 $ */
+/* NetHack 3.5	zap.c	$NHDT-Date: 1428207622 2015/04/05 04:20:22 $  $NHDT-Branch: nhmall-booktribute $:$NHDT-Revision: 1.215 $ */
 /* NetHack 3.5	zap.c	$Date: 2013/11/05 00:57:56 $  $Revision: 1.183 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -956,7 +956,9 @@ register struct obj *obj;
 		obj->spe = 0;
 		break;
 	      case SPBOOK_CLASS:
-		if (otyp != SPE_CANCELLATION && otyp != SPE_BOOK_OF_THE_DEAD) {
+		if (otyp != SPE_CANCELLATION &&
+			otyp != SPE_NOVEL &&
+			otyp != SPE_BOOK_OF_THE_DEAD) {
 		    costly_alteration(obj, COST_CANCEL);
 		    obj->otyp = SPE_BLANK_PAPER;
 		}
