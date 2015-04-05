@@ -887,13 +887,13 @@ show object symbols in menu headings in menus where those object symbols
 	act as menu accelerators, toggleable via "menu_objsyms" option
 show t-shirt text at end of game inventory disclose
 hitting with a polearm remembers the position of the last monster you hit
-allow showing legal polearm positions when asked for location to hit
 add messages for trying to pick up some terrain features
 boomerang makes noise when hitting a sink
 non-pet rust monsters would eat rust-proofed non-digestibles but ignore
 	those non-digestibles otherwise
 kicking a grave may topple the gravestone
-allow showing legal jumping positions when asked for location to jump to
+allow showing legal positions for stinking cloud, jumping and polearms
+	when asked for a location
 
 
 Platform- and/or Interface-Specific Fixes
