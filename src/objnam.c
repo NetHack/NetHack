@@ -3010,7 +3010,7 @@ typfnd:
 
 	if (typ && wizard) {
 	    if (typ == SPE_NOVEL) {
-		if (name && !lookup_novel((char *)name, (int *)0)) {
+		if (name && !lookup_novel(name, (int *)0)) {
 		    pline("There's no novel by that name.");
 		    return ((struct obj *)0);
 		}
