@@ -27,7 +27,8 @@ STATIC_DCL void FDECL(randomize,(int *, int));
 STATIC_DCL void FDECL(forget_single_object, (int));
 STATIC_DCL void FDECL(forget, (int));
 STATIC_DCL int FDECL(maybe_tame, (struct monst *,struct obj *));
-
+STATIC_DCL boolean FDECL(is_valid_stinking_cloud_pos, (int, int, BOOLEAN_P));
+STATIC_DCL void FDECL(display_stinking_cloud_positions, (int));
 STATIC_PTR void FDECL(set_lit, (int,int,genericptr_t));
 
 STATIC_OVL boolean
