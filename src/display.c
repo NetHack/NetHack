@@ -674,7 +674,12 @@ newsym(x,y)
 	 */
 	lev->waslit = (lev->lit!=0);	/* remember lit condition */
 
-	if (reg != NULL && ACCESSIBLE(lev->typ)) {
+	/* normal region shown only on accessible positions, but poison clouds
+	 * also shown above lava, pools and moats.
+	 */
+	if (reg != NULL && (ACCESSIBLE(lev->typ) ||
+		(reg->glyph == cmap_to_glyph(S_poisoncloud) &&
+		 (lev->typ == LAVAPOOL || lev->typ == POOL || lev->typ == MOAT)))) {
 	    show_region(reg,x,y);
 	    return;
 	}

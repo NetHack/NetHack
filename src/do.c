@@ -1288,6 +1288,8 @@ boolean at_stairs, falling, portal;
 	/* initial movement of bubbles just before vision_recalc */
 	if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
 		movebubbles();
+	else if (Is_firelevel(&u.uz))
+	    fumaroles();
 
 	if (level_info[new_ledger].flags & FORGOTTEN) {
 	    forget_map(ALL_MAP);	/* forget the map */
