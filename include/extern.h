@@ -1,4 +1,4 @@
-/* NetHack 3.5	extern.h	$NHDT-Date: 1426966688 2015/03/21 19:38:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.411 $ */
+/* NetHack 3.5	extern.h	$NHDT-Date: 1428196810 2015/04/05 01:20:10 $  $NHDT-Branch: nhmall-booktribute $:$NHDT-Revision: 1.451 $ */
 /* NetHack 3.5	extern.h	$Date: 2013/11/05 00:57:53 $  $Revision: 1.380 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -396,6 +396,7 @@ E struct obj *FDECL(realloc_obj,
 		(struct obj *, int, genericptr_t, int, const char *));
 E char *FDECL(coyotename, (struct monst *,char *));
 E const char *FDECL(noveltitle, (int *));
+E const char *FDECL(lookup_novel, (const char *, int *));
 
 /* ### do_wear.c ### */
 

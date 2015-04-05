@@ -1,4 +1,4 @@
-/* NetHack 3.5	objnam.c	$NHDT-Date: 1427440866 2015/03/27 07:21:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.109 $ */
+/* NetHack 3.5	objnam.c	$NHDT-Date: 1428196817 2015/04/05 01:20:17 $  $NHDT-Branch: nhmall-booktribute $:$NHDT-Revision: 1.120 $ */
 /* NetHack 3.5	objnam.c	$Date: 2011/10/27 02:24:54 $  $Revision: 1.101 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3008,6 +3008,15 @@ typfnd:
 	    }
 	}
 
+	if (typ && wizard) {
+	    if (typ == SPE_NOVEL) {
+		if (name && !lookup_novel((char *)name, (int *)0)) {
+		    pline("There's no novel by that name.");
+		    return ((struct obj *)0);
+		}
+	    }
+	}
+
 	/*
 	 * Create the object, then fine-tune it.
 	 */
@@ -3200,10 +3209,22 @@ typfnd:
 		aname = artifact_name(name, &objtyp);
 		if (aname && objtyp == otmp->otyp) name = aname;
 
+		/* 3.6.0 tribute - fix up novel */
+		if (otmp->otyp == SPE_NOVEL) {
+		    int novidx = 0;
+		    const char *novelname;
+
+		    novelname = lookup_novel(name, &novidx);
+		    if (novelname) {
+			otmp->novelidx = novidx;
+			name = novelname;
+		    }
+		}		    	
+
 		otmp = oname(otmp, name);
 		if (otmp->oartifact) {
 			otmp->quan = 1L;
-			u.uconduct.wisharti++;	/* KMH, conduct */
+			u.uconduct.wisharti++;
 		}
 	}
 
