@@ -2670,7 +2670,7 @@ long numused;
     register struct obj *otmp;
     boolean at_u = (obj->ox == u.ux && obj->oy == u.uy);
 
-    /* burn_floor_paper() keeps an object pointer that it tries to
+    /* burn_floor_objects() keeps an object pointer that it tries to
      * useupf() multiple times, so obj must survive if plural */
     if (obj->quan > numused)
         otmp = splitobj(obj, numused);

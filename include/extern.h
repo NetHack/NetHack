@@ -2656,7 +2656,7 @@ E struct monst *FDECL(bhit, (int,int,int,int,int (*)(MONST_P,OBJ_P),
 			     int (*)(OBJ_P,OBJ_P),struct obj **));
 E struct monst *FDECL(boomhit, (struct obj *,int,int));
 E int FDECL(zhitm, (struct monst *,int,int,struct obj **));
-E int FDECL(burn_floor_paper, (int,int,BOOLEAN_P,BOOLEAN_P));
+E int FDECL(burn_floor_objects, (int,int,BOOLEAN_P,BOOLEAN_P));
 E void FDECL(buzz, (int,int,XCHAR_P,XCHAR_P,int,int));
 E void FDECL(melt_ice, (XCHAR_P,XCHAR_P,const char *));
 E void FDECL(start_melt_ice_timeout, (XCHAR_P,XCHAR_P,long));
