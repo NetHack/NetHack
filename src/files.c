@@ -1,5 +1,5 @@
-/* NetHack 3.5	files.c	$NHDT-Date: 1425081976 2015/02/28 00:06:16 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.127 $ */
-/* NetHack 3.5	files.c	$Date: 2012/03/10 02:49:08 $  $Revision: 1.124 $ */
+/* NetHack 3.5	files.c	$NHDT-Date: 1426969026 2015/03/21 20:17:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.137 $ */
+
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -12,7 +12,7 @@
 
 #include <ctype.h>
 
-#if !defined(MAC) && !defined(O_WRONLY) && !defined(AZTEC_C)
+#if (!defined(MAC) && !defined(O_WRONLY) && !defined(AZTEC_C)) || defined(USE_FCNTL)
 #include <fcntl.h>
 #endif
 
@@ -185,7 +185,9 @@ STATIC_DCL void FDECL(docompress_file, (const char *,BOOLEAN_P));
 #if defined(ZLIB_COMP)
 STATIC_DCL boolean FDECL(make_compressed_name, (const char *, char *));
 #endif
+#ifndef USE_FCNTL
 STATIC_DCL char *FDECL(make_lockname, (const char *,char *));
+#endif
 STATIC_DCL FILE *FDECL(fopen_config_file, (const char *, int));
 STATIC_DCL int FDECL(get_uchars,
 		    (FILE *,char *,char *,uchar *,BOOLEAN_P,int,const char *));
@@ -360,7 +362,9 @@ char *reasonbuf;  /* reasonbuf must be at least BUFSZ, supplied by caller */
 #if defined(NOCWD_ASSUMPTIONS)
 	for (prefcnt = 1; prefcnt < PREFIX_COUNT; prefcnt++) {
 		/* don't test writing to configdir or datadir; they're readonly */
-		if (prefcnt == CONFIGPREFIX || prefcnt == DATAPREFIX) continue;
+		if (prefcnt == SYSCONFPREFIX ||
+		    prefcnt == CONFIGPREFIX ||
+		    prefcnt == DATAPREFIX) continue;
 		filename = fqname("validate", prefcnt, 3);
 		if ((fp = fopen(filename, "w"))) {
 			fclose(fp);
@@ -1544,12 +1548,16 @@ boolean uncomp;
 
 static int nesting = 0;
 
-#ifdef NO_FILE_LINKS	/* implies UNIX */
+#if defined(NO_FILE_LINKS) || defined(USE_FCNTL) 	/* implies UNIX */
 static int lockfd;	/* for lock_file() to pass to unlock_file() */
+#endif
+#ifdef USE_FCNTL
+struct flock sflock; /* for unlocking, same as above */
 #endif
 
 #define HUP	if (!program_state.done_hup)
 
+#ifndef USE_FCNTL
 STATIC_OVL char *
 make_lockname(filename, lockname)
 const char *filename;
@@ -1581,6 +1589,7 @@ char *lockname;
 	return (char*)0;
 #endif
 }
+#endif /* !USE_FCNTL */
 
 /* lock a file */
 boolean
@@ -1592,8 +1601,10 @@ int retryct;
 #if defined(PRAGMA_UNUSED) && !(defined(UNIX) || defined(VMS)) && !(defined(AMIGA) || defined(WIN32) || defined(MSDOS))
 # pragma unused(retryct)
 #endif
+#ifndef USE_FCNTL
 	char locknambuf[BUFSZ];
 	const char *lockname;
+#endif
 
 	nesting++;
 	if (nesting > 1) {
@@ -1601,18 +1612,50 @@ int retryct;
 	    return TRUE;
 	}
 
+#ifndef USE_FCNTL
 	lockname = make_lockname(filename, locknambuf);
-	filename = fqname(filename, whichprefix, 0);
 #ifndef NO_FILE_LINKS	/* LOCKDIR should be subsumed by LOCKPREFIX */
 	lockname = fqname(lockname, LOCKPREFIX, 2);
 #endif
+#endif
+	filename = fqname(filename, whichprefix, 0);
+#ifdef USE_FCNTL
+	lockfd = open(filename,O_RDWR);
+	if (lockfd == -1) {
+		HUP raw_printf("Cannot open file %s. This is a program bug.",
+			filename);
+	}
+	sflock.l_type = F_WRLCK;
+	sflock.l_whence = SEEK_SET;
+	sflock.l_start = 0;
+	sflock.l_len = 0;
+#endif
 
 #if defined(UNIX) || defined(VMS)
+# ifdef USE_FCNTL
+	while (fcntl(lockfd,F_SETLK,&sflock) == -1) {
+# else
 # ifdef NO_FILE_LINKS
 	while ((lockfd = open(lockname, O_RDWR|O_CREAT|O_EXCL, 0666)) == -1) {
 # else
 	while (link(filename, lockname) == -1) {
 # endif
+# endif
+
+#ifdef USE_FCNTL
+	    if (retryct--) {
+		HUP raw_printf(
+			       "Waiting for release of fcntl lock on %s. (%d retries left).",
+			       filename, retryct);
+		sleep(1);
+	    } else {
+		HUP (void) raw_print("I give up.  Sorry.");
+		HUP raw_printf("Some other process has an unnatural grip on %s.",
+			       filename);
+		nesting--;
+		return FALSE;
+	    }
+#else
 	    register int errnosv = errno;
 
 	    switch (errnosv) {	/* George Barbanis */
@@ -1667,11 +1710,12 @@ int retryct;
 		nesting--;
 		return FALSE;
 	    }
+#endif /* USE_FCNTL */
 
 	}
 #endif  /* UNIX || VMS */
 
-#if defined(AMIGA) || defined(WIN32) || defined(MSDOS)
+#if (defined(AMIGA) || defined(WIN32) || defined(MSDOS)) && !defined(USE_FCNTL)
 # ifdef AMIGA
 #define OPENFAILURE(fd) (!fd)
     lockptr = 0;
@@ -1718,10 +1762,19 @@ void
 unlock_file(filename)
 const char *filename;
 {
+#ifndef USE_FCNTL
 	char locknambuf[BUFSZ];
 	const char *lockname;
+#endif
 
 	if (nesting == 1) {
+#ifdef USE_FCNTL
+		sflock.l_type = F_UNLCK;
+		if (fcntl(lockfd,F_SETLK,&sflock) == -1) {
+			HUP raw_printf("Can't remove fcntl lock on %s.", filename);
+			(void) close(lockfd);
+		}
+#else
 		lockname = make_lockname(filename, locknambuf);
 #ifndef NO_FILE_LINKS	/* LOCKDIR should be subsumed by LOCKPREFIX */
 		lockname = fqname(lockname, LOCKPREFIX, 2);
@@ -1741,6 +1794,7 @@ const char *filename;
 		DeleteFile(lockname);
 		lockptr = 0;
 #endif /* AMIGA || WIN32 || MSDOS */
+#endif /* USE_FCNTL */
 	}
 
 	nesting--;
@@ -1766,6 +1820,8 @@ const char *configfile =
 # endif
 #endif
 
+/* used for messaging */
+char lastconfigfile[BUFSZ];
 
 #ifdef MSDOS
 /* conflict with speed-dial under windows
@@ -1812,8 +1868,15 @@ int src;
 			/* fall through to standard names */
 		} else
 #endif
-		if ((fp = fopenp(filename, "r")) != (FILE *)0) {
-		    configfile = filename;
+#ifdef PREFIXES_IN_USE
+		if (src == SET_IN_SYS) {
+			(void) strncpy(lastconfigfile,
+				fqname(filename, SYSCONFPREFIX, 0), BUFSZ-1);
+		} else
+#endif
+		(void) strncpy(lastconfigfile, filename, BUFSZ-1);
+		lastconfigfile[BUFSZ-1] = '\0';
+		if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0) {
 		    return(fp);
 #if defined(UNIX) || defined(VMS)
 		} else {
@@ -1827,24 +1890,32 @@ int src;
 	}
 
 #if defined(MICRO) || defined(MAC) || defined(__BEOS__) || defined(WIN32)
-	if ((fp = fopenp(fqname(configfile, CONFIGPREFIX, 0), "r"))
-								!= (FILE *)0)
+	(void) strncpy(lastconfigfile,
+			fqname(configfile, CONFIGPREFIX, 0), BUFSZ-1);
+	lastconfigfile[BUFSZ-1] = '\0';
+	if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0) {
 		return(fp);
+	}
 # ifdef MSDOS
-	else if ((fp = fopenp(fqname(backward_compat_configfile,
-					CONFIGPREFIX, 0), "r")) != (FILE *)0)
+	(void) strncpy(lastconfigfile,
+			fqname(backward_compat_configfile, CONFIGPREFIX, 0),
+			BUFSZ-1);
+	lastconfigfile[BUFSZ-1] = '\0';
+	else if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0)
 		return(fp);
 # endif
 #else
 	/* constructed full path names don't need fqname() */
 # ifdef VMS
-	if ((fp = fopenp(fqname("nethackini", CONFIGPREFIX, 0), "r"))
-								!= (FILE *)0) {
-		configfile = "nethackini";
+	(void) strncpy(lastconfigfile, fqname("nethackini", CONFIGPREFIX, 0),
+			BUFSZ-1);
+	lastconfigfile[BUFSZ-1] = '\0';
+	if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0) {
 		return(fp);
 	}
-	if ((fp = fopenp("sys$login:nethack.ini", "r")) != (FILE *)0) {
-		configfile = "nethack.ini";
+	(void) strncpy(lastconfigfile,"sys$login:nethack.ini", BUFSZ-1);
+	lastconfigfile[BUFSZ-1] = '\0';
+	if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0) {
 		return(fp);
 	}
 
@@ -1853,6 +1924,9 @@ int src;
 		Strcpy(tmp_config, "NetHack.cnf");
 	else
 		Sprintf(tmp_config, "%s%s", envp, "NetHack.cnf");
+
+	(void) strncpy(lastconfigfile, tmp_config, BUFSZ-1);
+	lastconfigfile[BUFSZ-1] = '\0';
 	if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
 		return(fp);
 # else	/* should be only UNIX left */
@@ -1861,18 +1935,25 @@ int src;
 		Strcpy(tmp_config, ".nethackrc");
 	else
 		Sprintf(tmp_config, "%s/%s", envp, ".nethackrc");
-	if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
+
+	(void) strncpy(lastconfigfile, tmp_config, BUFSZ-1);
+	lastconfigfile[BUFSZ-1] = '\0';
+	if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0)
 		return(fp);
 #  if defined(__APPLE__)
 	/* try an alternative */
 	if (envp) {
 		Sprintf(tmp_config, "%s/%s", envp,
 			"Library/Preferences/NetHack Defaults");
-		if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
+		(void) strncpy(lastconfigfile, tmp_config, BUFSZ-1);
+		lastconfigfile[BUFSZ-1] = '\0';
+		if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0)
 			return(fp);
 		Sprintf(tmp_config, "%s/%s", envp,
 			"Library/Preferences/NetHack Defaults.txt");
-		if ((fp = fopenp(tmp_config, "r")) != (FILE *)0)
+		(void) strncpy(lastconfigfile, tmp_config, BUFSZ-1);
+		lastconfigfile[BUFSZ-1] = '\0';
+		if ((fp = fopenp(lastconfigfile, "r")) != (FILE *)0)
 			return(fp);
 	}
 #  endif
@@ -1887,7 +1968,7 @@ int src;
 #  endif
 		details = "";
 	    raw_printf("Couldn't open default config file %s %s(%d).",
-		       tmp_config, details, errno);
+		       lastconfigfile, details, errno);
 	    wait_synch();
 	}
 # endif	/* Unix */
@@ -2110,9 +2191,16 @@ int		src;
 	} else if (src == SET_IN_SYS && match_varname(buf, "SHELLERS", 8)) {
 	    if (sysopt.shellers) free(sysopt.shellers);
 	    sysopt.shellers = dupstr(bufp);
+	} else if (src == SET_IN_SYS && match_varname(buf, "EXPLORERS", 7)) {
+	    if (sysopt.explorers) free(sysopt.explorers);
+	    sysopt.explorers = dupstr(bufp);
 	} else if (src == SET_IN_SYS && match_varname(buf, "DEBUGFILES", 5)) {
 	    if (sysopt.debugfiles) free(sysopt.debugfiles);
-	    sysopt.debugfiles = dupstr(bufp);
+	    /* if showdebug() has already been called (perhaps we've added
+	       some debugpline() calls to option processing) and has found
+	       a value for getenv("DEBUGFILES"), don't override that */
+	    if (sysopt.env_dbgfl == 0)
+		sysopt.debugfiles = dupstr(bufp);
 	} else if (src == SET_IN_SYS && match_varname(buf, "SUPPORT", 7)) {
 	    if (sysopt.support) free(sysopt.support);
 	    sysopt.support = dupstr(bufp);
@@ -2164,6 +2252,13 @@ int		src;
 		return 0;
 	    }
 	    sysopt.pointsmin = n;
+	} else if (src == SET_IN_SYS && match_varname(buf, "MAX_STATUENAME_RANK", 10)) {
+	    n = atoi(bufp);
+	    if (n < 1) {
+		raw_printf("Illegal value in MAX_STATUENAME_RANK (minimum is 1).");
+		return 0;
+	    }
+	    sysopt.tt_oname_maxrank = n;
 # ifdef PANICTRACE
 	} else if (src == SET_IN_SYS &&
 		match_varname(buf, "PANICTRACE_LIBC", 15)) {
@@ -2202,6 +2297,8 @@ int		src;
 	} else if (match_varname(buf, "BOULDER", 3)) {
 	    (void) get_uchars(fp, buf, bufp, &iflags.bouldersym, TRUE,
 			      1, "BOULDER");
+	} else if (match_varname(buf, "MENUCOLOR", 9)) {
+	    (void) add_menu_coloring(bufp);
 	} else if (match_varname(buf, "WARNINGS", 5)) {
 	    (void) get_uchars(fp, buf, bufp, translate, FALSE,
 					WARNCOUNT, "WARNINGS");
@@ -3142,5 +3239,92 @@ int ifd, ofd;
 
 /* ----------  END INTERNAL RECOVER ----------- */
 #endif /*SELF_RECOVER*/
+
+/* ----------  OTHER ----------- */
+
+#ifdef SYSCF
+# ifdef SYSCF_FILE
+void
+assure_syscf_file() {
+	/* All we really care about is the end result - can we read the file?
+	 * So just check that directly. */
+	int fd;
+	fd = open(SYSCF_FILE, O_RDONLY);
+	if(fd >= 0){
+		/* readable */
+		close(fd);
+		return;
+	}
+	raw_printf("Unable to open SYSCF_FILE.\n");
+	exit(EXIT_FAILURE);
+}
+
+# endif /* SYSCF_FILE */
+#endif /* SYSCF */
+
+
+#ifdef DEBUG
+/* used by debugpline() to decide whether to issue a message
+   from a partiular source file; caller passes __FILE__ and we check
+   whether it is in the source file list supplied by SYSCF's DEBUGFILES */ 
+boolean
+showdebug(filename)
+const char *filename;
+{
+    const char *debugfiles, *p;
+
+    if (!filename || !*filename) return FALSE;	/* sanity precaution */
+
+    if (sysopt.env_dbgfl == 0) {
+	/* check once for DEBUGFILES in the environment;
+	   if found, it supersedes the sysconf value
+	   [note: getenv() rather than nh_getenv() since a long value
+	   is valid and doesn't pose any sort of overflow risk here] */
+	if ((p = getenv("DEBUGFILES")) != 0) {
+	    if (sysopt.debugfiles) free(sysopt.debugfiles);
+	    sysopt.debugfiles = dupstr(p);
+	    sysopt.env_dbgfl = 1;
+	} else
+	    sysopt.env_dbgfl = -1;
+    }
+
+    debugfiles = sysopt.debugfiles;
+    /* usual case: sysopt.debugfiles will be empty */
+    if (!debugfiles || !*debugfiles) return FALSE;
+
+    /* strip filename's path if present */
+# ifdef UNIX
+    if ((p = rindex(filename, '/')) != 0) filename = p + 1;
+# endif
+# ifdef VMS
+    filename = vms_basename(filename);
+    /* vms_basename strips off 'type' suffix as well as path and version;
+       we want to put suffix back (".c" assumed); since it always returns
+       a pointer to a static buffer, we can safely modify its result */
+    Strcat((char *)filename, ".c");
+# endif
+
+    /*
+     * Wildcard match will only work if there's a single pattern (which
+     * might be a single file name without any wildcarding) rather than
+     * a space-separated list.
+     * [to NOT do: We could step through the space-separated list and
+     * attempt a wildcard match against each element, but that would be
+     * overkill for the intended usage.]
+     */
+    if (pmatch(debugfiles, filename))
+	return TRUE;
+
+    /* check whether filename is an element of the list */
+    if ((p = strstr(debugfiles, filename)) != 0) {
+	int l = (int)strlen(filename);
+
+	if ((p == debugfiles || p[-1] == ' ' || p[-1] == '/')
+	    && (p[l] == ' ' || p[l] == '\0'))
+	    return TRUE;
+    }
+    return FALSE;
+}
+#endif	/*DEBUG*/
 
 /*files.c*/

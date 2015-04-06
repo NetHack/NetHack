@@ -17,6 +17,7 @@ NetHack, except that rounddiv may call panic().
 	char		highc		(char)
 	char		lowc		(char)
 	char *		lcase		(char *)
+	char *		ucase		(char *)
 	char *		upstart		(char *)
 	char *		mungspaces	(char *)
 	char *		eos		(char *)
@@ -25,6 +26,7 @@ NetHack, except that rounddiv may call panic().
 	char		chrcasecpy	(int,int)
 	char *		strcasecpy	(char *,const char *)
 	char *		s_suffix	(const char *)
+	char *		ing_suffix	(const char *)
 	char *		xcrypt		(const char *, char *)
 	boolean		onlyspace	(const char *)
 	char *		tabexpand	(char *)
@@ -96,6 +98,17 @@ lcase(s)		/* convert a string into all lowercase */
 
     for (p = s; *p; p++)
 	if ('A' <= *p && *p <= 'Z') *p |= 040;
+    return s;
+}
+
+char *
+ucase(s)		/* convert a string into all uppercase */
+    char *s;
+{
+    register char *p;
+
+    for (p = s; *p; p++)
+	if ('a' <= *p && *p <= 'z') *p &= ~040;
     return s;
 }
 
@@ -222,6 +235,39 @@ s_suffix(s)		/* return a name converted to possessive */
 	Strcat(buf, "'s");
     return buf;
 }
+
+char *
+ing_suffix(s)
+     const char *s;
+{
+    const char *vowel = "aeiouy";
+    static char buf[BUFSZ];
+    char onoff[10];
+    char *p;
+    Strcpy(buf, s);
+    p = eos(buf);
+    onoff[0] = *p = *(p+1) = '\0';
+    if ((strlen(buf) > 4) &&
+	(!strcmpi(p-3, " on") ||
+	 !strcmpi(p-4, " off") ||
+	 !strcmpi(p-5, " with"))) {
+	p = strrchr(buf, ' ');
+	Strcpy(onoff, p);
+    }
+    if (!index(vowel, *(p-1)) && index(vowel, *(p-2)) && !index(vowel, *(p-3))) {
+	/* tip -> tipp + ing */
+	*p = *(p-1);
+	*(p+1) = '\0';
+    } else if (!strcmpi(p-2, "ie")) {	/* vie -> vy + ing */
+	*(p-2) = 'y';
+	*(p-1) = '\0';
+    } else if (*(p-1) == 'e')	/* grease -> greas + ing */
+	*(p-1) = '\0';
+    Strcat(buf, "ing");
+    if (onoff[0]) Strcat(buf, onoff);
+    return buf;
+}
+
 
 char *
 xcrypt(str, buf)	/* trivial text encryption routine (see makedefs) */
@@ -384,6 +430,28 @@ dist2(x0, y0, x1, y1)	/* square of euclidean distance between pair of pts */
 {
     register int dx = x0 - x1, dy = y0 - y1;
     return dx * dx + dy * dy;
+}
+
+/* Integer square root function without using floating point.
+ * This could be replaced by a faster algorithm, but has not been because:
+ * + the simple algorithm is easy to read
+ * + this algorithm does not require 64-bit support
+ * + in current usage, the values passed to isqrt() are not really that
+ *   large, so the performance difference is negligible
+ * + isqrt() is used in only few places, which are not bottle-necks
+ */
+int
+isqrt(val)
+int val;
+{
+    int rt = 0;
+    int odd = 1;
+    while(val >= odd) {
+        val = val-odd;
+        odd = odd+2;
+        rt = rt + 1;
+    }
+    return rt;
 }
 
 boolean

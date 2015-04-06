@@ -1,5 +1,4 @@
-/* NetHack 3.5	mkobj.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	mkobj.c	$Date: 2012/03/10 02:49:08 $  $Revision: 1.70 $ */
+/* NetHack 3.5	mkobj.c	$NHDT-Date: 1426465437 2015/03/16 00:23:57 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.77 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -502,7 +501,7 @@ static const char * const alteration_verbs[] = {
 			"cancel", "drain", "uncharge", "unbless", "uncurse",
 			"disenchant", "degrade", "dilute", "erase", "burn",
 			"neutralize", "destroy", "splatter", "bite", "open",
-			"break the lock on",
+			"break the lock on", "rust", "rot", "tarnish"
 };
 
 /* possibly bill for an object which the player has just modified */
@@ -1521,10 +1520,9 @@ struct obj *otmp;
 	/* Adjust the age; must be same as obj_timer_checks() for off ice*/
 	age = monstermoves - otmp->age;
 	retval += age * (ROT_ICE_ADJUSTMENT-1) / ROT_ICE_ADJUSTMENT;
-	debugpline("The %s age has ice modifications:otmp->age = %ld, returning %ld.",
-		s_suffix(doname(otmp)),otmp->age, retval);
-	debugpline("Effective age of corpse: %ld.",
-		monstermoves - retval);
+	debugpline3("The %s age has ice modifications: otmp->age = %ld, returning %ld.",
+		s_suffix(doname(otmp)), otmp->age, retval);
+	debugpline1("Effective age of corpse: %ld.", monstermoves - retval);
     }
     return retval;
 }
@@ -1553,7 +1551,8 @@ int force;	/* 0 = no force so do checks, <0 = force off, >0 force on */
 	    
 	    /* mark the corpse as being on ice */
 	    otmp->on_ice = 1;
-	    debugpline("%s is now on ice at %d,%d.", The(xname(otmp)),x,y);
+	    debugpline3("%s is now on ice at <%d,%d>.",
+			The(xname(otmp)), x, y);
 	    /* Adjust the time remaining */
 	    tleft *= ROT_ICE_ADJUSTMENT;
 	    restart_timer = TRUE;
@@ -1579,7 +1578,8 @@ int force;	/* 0 = no force so do checks, <0 = force off, >0 force on */
 		long age;
 
 		otmp->on_ice = 0;
-	    	debugpline("%s is no longer on ice at %d,%d.", The(xname(otmp)),x,y);
+	    	debugpline3("%s is no longer on ice at <%d,%d>.",
+			    The(xname(otmp)), x, y);
 		/* Adjust the remaining time */
 		tleft /= ROT_ICE_ADJUSTMENT;
 		restart_timer = TRUE;

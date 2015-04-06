@@ -1,9 +1,8 @@
-/* NetHack 3.5	pcmain.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	pcmain.c	$Date: 2012/01/20 03:41:31 $  $Revision: 1.48 $ */
+/* NetHack 3.5	pcmain.c	$NHDT-Date: 1426966701 2015/03/21 19:38:21 $  $NHDT-Branch: master $:$NHDT-Revision: 1.51 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* main.c - MSDOS, OS/2, ST, Amiga, and NT NetHack */
+/* main.c - MSDOS, OS/2, ST, Amiga, and Windows NetHack */
 
 #include "hack.h"
 #include "dlb.h"
@@ -244,6 +243,9 @@ char *argv[];
 
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
 			chdirx(hackdir,0);
+#endif
+#ifdef SYSCF
+			initoptions();
 #endif
 			prscore(argc, argv);
 			nethack_exit(EXIT_SUCCESS);

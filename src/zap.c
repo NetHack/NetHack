@@ -1,5 +1,4 @@
-/* NetHack 3.5	zap.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	zap.c	$Date: 2013/11/05 00:57:56 $  $Revision: 1.183 $ */
+/* NetHack 3.5	zap.c	$NHDT-Date: 1427782839 2015/03/31 06:20:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.200 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1708,10 +1707,11 @@ struct obj *obj, *otmp;
 		 * as a safeguard against any stray occurrence left in an obj
 		 * struct someplace, although that should never happen.
 		 */
-		if (context.bypasses)
+		if (context.bypasses) {
 			return 0;
-		else {
-			debugpline("%s for a moment.", Tobjnam(obj, "pulsate"));
+		} else {
+			debugpline1("%s for a moment.",
+				    Tobjnam(obj, "pulsate"));
 			obj->bypass = 0;
 		}
 	}
@@ -1749,8 +1749,14 @@ struct obj *obj, *otmp;
 		if (Is_box(obj)) (void) boxlock(obj, otmp);
 
 		if (obj_shudders(obj)) {
+		    boolean cover = ((obj == level.objects[u.ux][u.uy]) &&
+				     u.uundetected &&
+				     hides_under(youmonst.data));
+
 		    if (cansee(obj->ox, obj->oy)) learn_it = TRUE;
 		    do_osshock(obj);
+		    /* eek - your cover might have been blown */
+		    if (cover) (void) hideunder(&youmonst);
 		    break;
 		}
 		obj = poly_obj(obj, STRANGE_OBJECT);
@@ -1790,7 +1796,7 @@ struct obj *obj, *otmp;
 		if (obj->otyp == BOULDER) {
 			if (cansee(obj->ox, obj->oy))
 				pline_The("boulder falls apart.");
-			else if (!Deaf)
+			else
 				You_hear("a crumbling sound.");
   			fracture_rock(obj);
 		}
@@ -1798,12 +1804,11 @@ struct obj *obj, *otmp;
 		    if (break_statue(obj)) {
 			if (cansee(obj->ox, obj->oy)) {
 			    if (Hallucination)
-				pline_The("%s shatters.", rndmonnam());
+				pline_The("%s shatters.", rndmonnam(NULL));
 			    else 
 				pline_The("statue shatters.");
-			} else if (!Deaf) {
+			} else
 			    You_hear("a crumbling sound.");
-			}
 		    }
 		} else {
 		    if (context.mon_moving ?
@@ -1886,10 +1891,11 @@ struct obj *obj, *otmp;
 
 /* returns nonzero if something was hit */
 int
-bhitpile(obj,fhito,tx,ty)
+bhitpile(obj, fhito, tx, ty, zz)
     struct obj *obj;
     int FDECL((*fhito), (OBJ_P,OBJ_P));
     int tx, ty;
+    schar zz;
 {
     int hitanything = 0;
     register struct obj *otmp, *next_obj;
@@ -1909,8 +1915,11 @@ bhitpile(obj,fhito,tx,ty)
 
     poly_zapped = -1;
     for(otmp = level.objects[tx][ty]; otmp; otmp = next_obj) {
-	/* Fix for polymorph bug, Tim Wright */
 	next_obj = otmp->nexthere;
+	/* for zap downwards, don't hit object poly'd hero is hiding under */
+	if (zz > 0 && u.uundetected && otmp == level.objects[u.ux][u.uy]
+	    && hides_under(youmonst.data)) continue;
+
 	hitanything += (*fhito)(otmp, obj);
     }
     if(poly_zapped >= 0)
@@ -2562,7 +2571,7 @@ struct obj *obj;	/* wand or spell */
 	    if (u.dz < 0) {
 		You("probe towards the %s.", ceiling(x,y));
 	    } else {
-		ptmp += bhitpile(obj, bhito, x, y);
+		ptmp += bhitpile(obj, bhito, x, y, u.dz);
 		You("probe beneath the %s.", surface(x,y));
 		ptmp += display_binventory(x, y, TRUE);
 	    }
@@ -2682,7 +2691,7 @@ struct obj *obj;	/* wand or spell */
 
 	if (u.dz > 0) {
 	    /* zapping downward */
-	    (void) bhitpile(obj, bhito, x, y);
+	    (void) bhitpile(obj, bhito, x, y, u.dz);
 
 	    /* subset of engraving effects; none sets `disclose' */
 	    if ((e = engr_at(x, y)) != 0 && e->engr_type != HEADSTONE) {
@@ -2716,6 +2725,22 @@ struct obj *obj;	/* wand or spell */
 		    break;
 		default:
 		    break;
+		}
+	    }
+	} else if (u.dz < 0) {
+	    /* zapping upward */
+
+	    /* game flavor: if you're hiding under "something"
+	     * a zap upward should hit that "something".
+	     */
+	    if (u.uundetected && hides_under(youmonst.data)) {
+		int hitit = 0;
+		otmp = level.objects[u.ux][u.uy];
+
+		if (otmp) hitit = bhito(otmp, obj);
+		if (hitit) {
+		    (void) hideunder(&youmonst);
+		    disclose = TRUE;
 		}
 	    }
 	}
@@ -3025,7 +3050,7 @@ struct obj **pobj;			/* object tossed/used, set to NULL
 			if (!Blind) pline("%s %s%s.", Yname2(obj),
 					  otense(obj, "skip"),
 					  skipcount ? " again" : "");
-			else if (!Deaf) You_hear("%s skip.", yname(obj));
+			else You_hear("%s skip.", yname(obj));
 			skipcount++;
 		} else if (skiprange_start > skiprange_end + 1) {
 			--skiprange_start;
@@ -3089,7 +3114,7 @@ struct obj **pobj;			/* object tossed/used, set to NULL
 		}
 	    }
 	    if(fhito) {
-		if(bhitpile(obj,fhito,bhitpos.x,bhitpos.y))
+		if(bhitpile(obj,fhito,bhitpos.x,bhitpos.y,0))
 		    range--;
 	    } else {
 		if(weapon == KICKED_WEAPON &&
@@ -3253,8 +3278,10 @@ int dx, dy;
 		}
 		tmp_at(bhitpos.x, bhitpos.y);
 		delay_output();
-		if(IS_SINK(levl[bhitpos.x][bhitpos.y].typ))
+		if(IS_SINK(levl[bhitpos.x][bhitpos.y].typ)) {
+			if (!Deaf) pline("Klonk!");
 			break;	/* boomerang falls on sink */
+		}
 		/* ct==0, initial position, we want next delta to be same;
 		   ct==5, opposite position, repeat delta undoes first one */
 		if (ct % 5 != 0) i += (counterclockwise ? -1 : 1);
@@ -3395,8 +3422,8 @@ struct obj **ootmp;	/* to return worn armor for caller to disintegrate */
 		    break;
 		}
 		tmp = d(nd,6);
-		if (!rn2(6)) (void) erode_obj(MON_WEP(mon), 3, TRUE, FALSE);
-		if (!rn2(6)) erode_armor(mon, TRUE);
+		if (!rn2(6)) acid_damage(MON_WEP(mon));
+		if (!rn2(6)) erode_armor(mon, ERODE_CORRODE);
 		break;
 	}
 	if (sho_shieldeff) shieldeff(mon->mx, mon->my);
@@ -3406,7 +3433,8 @@ struct obj **ootmp;	/* to return worn armor for caller to disintegrate */
 		resist(mon, type < ZT_SPELL(0) ? WAND_CLASS : '\0', 0, NOTELL))
 	    tmp /= 2;
 	if (tmp < 0) tmp = 0;		/* don't allow negative damage */
-	debugpline("zapped monster hp = %d (= %d - %d)", mon->mhp-tmp,mon->mhp,tmp);
+	debugpline3("zapped monster hp = %d (= %d - %d)",
+		    mon->mhp-tmp, mon->mhp, tmp);
 	mon->mhp -= tmp;
 	return(tmp);
 }
@@ -3522,10 +3550,10 @@ xchar sx, sy;
 	    }
 	    /* using two weapons at once makes both of them more vulnerable */
 	    if (!rn2(u.twoweap ? 3 : 6))
-		(void) erode_obj(uwep, 3, TRUE, FALSE);
+		acid_damage(uwep);
 	    if (u.twoweap && !rn2(3))
-		(void) erode_obj(uswapwep, 3, TRUE, FALSE);
-	    if (!rn2(6)) erode_armor(&youmonst, TRUE);
+		acid_damage(uswapwep);
+	    if (!rn2(6)) erode_armor(&youmonst, ERODE_CORRODE);
 	    break;
 	}
 
@@ -4017,7 +4045,7 @@ short exploding_wand_typ;
 	case ZT_COLD:
 	    if (is_pool(x,y) || is_lava(x,y)) {
 		boolean lava = is_lava(x,y);
-		const char *moat = waterbody_name(x, y);
+		boolean moat = is_moat(x,y);
 
 		if (lev->typ == WATER) {
 		    /* For now, don't let WATER freeze. */
@@ -4041,12 +4069,13 @@ short exploding_wand_typ;
 		    if (see_it) {
 			if(lava)
 			    Norep("The lava cools and solidifies.");
-			else if(strcmp(moat, "moat") == 0)
-			    Norep("The %s is bridged with ice!", moat);
+			else if(moat)
+			    Norep("The %s is bridged with ice!",
+                                    waterbody_name(x,y));
 			else
 			    Norep("The water freezes.");
 			newsym(x,y);
-		    } else if(!Deaf && !lava)
+		    } else if(!lava)
 			You_hear("a crackling sound.");
 
 		    if (x == u.ux && y == u.uy) {
@@ -4213,9 +4242,8 @@ short exploding_wand_typ;
 			newsym(x, y);
 		    } else if (sense_txt) {
 			You1(sense_txt);
-		    } else if (hear_txt) {
-			if (!Deaf) You_hear1(hear_txt);
-		    }
+		    } else if (hear_txt)
+			You_hear1(hear_txt);
 		    if (picking_at(x, y)) {
 			stop_occupation();
 			reset_pick();

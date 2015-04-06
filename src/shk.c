@@ -1,5 +1,4 @@
-/* NetHack 3.5	shk.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	shk.c	$Date: 2012/07/03 22:54:49 $  $Revision: 1.91 $ */
+/* NetHack 3.5	shk.c	$NHDT-Date: 1426465441 2015/03/16 00:24:01 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.96 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1205,7 +1204,7 @@ dopay()
 	}
 
 	if(!shkp) {
-		debugpline("dopay: null shkp.");
+		debugpline0("dopay: null shkp.");
 		return(0);
 	}
 proceed:

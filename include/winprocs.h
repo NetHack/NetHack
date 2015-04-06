@@ -219,7 +219,8 @@ NEARDATA struct window_procs windowprocs;
 #define WC2_WRAPTEXT		0x04L	/* 03 wrap long lines of text                */
 #define WC2_HILITE_STATUS	0x08L	/* 04 hilite fields in status                */ 
 #define WC2_SELECTSAVED		0x10L	/* 05 saved game selection menu              */
-					/* 27 free bits */
+#define WC2_DARKGRAY		0x20L	/* 06 use bold black for black glyphs        */
+					/* 26 free bits */
 
 #define ALIGN_LEFT	1
 #define ALIGN_RIGHT	2

@@ -1,5 +1,4 @@
-/* NetHack 3.5	mon.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	mon.c	$Date: 2012/05/16 02:15:10 $  $Revision: 1.126 $ */
+/* NetHack 3.5	mon.c	$NHDT-Date: 1427580482 2015/03/28 22:08:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.142 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -32,6 +31,7 @@ STATIC_DCL struct permonst *FDECL(accept_newcham_form, (int));
 /* part of the original warning code which was replaced in 3.3.1 */
 const char *warnings[] = {
 	"white", "pink", "red", "ruby", "purple", "black"
+};
 #endif /* 0 */
 
 STATIC_DCL struct obj *FDECL(make_corpse,(struct monst *, unsigned));
@@ -277,9 +277,10 @@ unsigned corpseflags;
 		    obj = mkcorpstat(CORPSE, KEEPTRAITS(mtmp) ? mtmp : 0,
 				     mdat, x, y, corpstatflags);
 		    if (burythem) {
-			(void) bury_an_obj(obj);
+			boolean dealloc;
+			(void) bury_an_obj(obj, &dealloc);
 			newsym(x, y);
-			return obj;
+			return (dealloc ? NULL : obj);
 		    }
 		}
 		break;
@@ -333,7 +334,7 @@ register struct monst *mtmp;
     if (mtmp->data == &mons[PM_GREMLIN] && (inpool || infountain) && rn2(3)) {
 	if (split_mon(mtmp, (struct monst *)0))
 	    dryup(mtmp->mx, mtmp->my, FALSE);
-	if (inpool) water_damage(&mtmp->minvent, FALSE, FALSE);
+	if (inpool) water_damage_chain(mtmp->minvent, FALSE);
 	return (0);
     } else if (mtmp->data == &mons[PM_IRON_GOLEM] && inpool && !rn2(5)) {
 	int dam = d(2,6);
@@ -345,7 +346,7 @@ register struct monst *mtmp;
 	    mondead(mtmp);
 	    if (mtmp->mhp < 1) return (1);
 	}
-	water_damage(&mtmp->minvent, FALSE, FALSE);
+	water_damage_chain(mtmp->minvent, FALSE);
 	return (0);
     }
 
@@ -373,8 +374,8 @@ register struct monst *mtmp;
 		    pline("%s burns slightly.", Monnam(mtmp));
 	    }
 	    if (mtmp->mhp > 0) {
-		(void) fire_damage(mtmp->minvent, FALSE, FALSE,
-						mtmp->mx, mtmp->my);
+                (void) fire_damage_chain(mtmp->minvent, FALSE, FALSE, mtmp->mx,
+                                         mtmp->my);
 		(void) rloc(mtmp, FALSE);
 		return 0;
 	    }
@@ -398,7 +399,7 @@ register struct monst *mtmp;
 	    }
 	    mondead(mtmp);
 	    if (mtmp->mhp > 0) {
-		water_damage(&mtmp->minvent, FALSE, FALSE);
+		water_damage_chain(mtmp->minvent, FALSE);
 		(void) rloc(mtmp, FALSE);
 		return 0;
 	    }
@@ -614,7 +615,10 @@ meatmetal(mtmp)
 	/* Eats topmost metal object if it is there */
 	for (otmp = level.objects[mtmp->mx][mtmp->my];
 						otmp; otmp = otmp->nexthere) {
-	    if (mtmp->data == &mons[PM_RUST_MONSTER] && !is_rustprone(otmp))
+	    /* Don't eat indigestible/choking/inappropriate objects */
+	    if ((mtmp->data == &mons[PM_RUST_MONSTER] && !is_rustprone(otmp)) ||
+		(otmp->otyp == AMULET_OF_STRANGULATION) ||
+		(otmp->otyp == RIN_SLOW_DIGESTION))
 		continue;
 	    if (is_metallic(otmp) && !obj_resists(otmp, 5, 95) &&
 		touch_artifact(otmp,mtmp)) {
@@ -631,13 +635,11 @@ meatmetal(mtmp)
 			pline("%s spits %s out in disgust!",
 			      Monnam(mtmp), distant_name(otmp,doname));
 		    }
-		/* KMH -- Don't eat indigestible/choking objects */
-		} else if (otmp->otyp != AMULET_OF_STRANGULATION &&
-				otmp->otyp != RIN_SLOW_DIGESTION) {
+		} else {
 		    if (cansee(mtmp->mx,mtmp->my) && flags.verbose)
 			pline("%s eats %s!", Monnam(mtmp),
 				distant_name(otmp,doname));
-		    else if (!Deaf && flags.verbose)
+		    else if (flags.verbose)
 			You_hear("a crunching sound.");
 		    mtmp->meating = otmp->owt/2 + 1;
 		    /* Heal up to the object's weight in hp */
@@ -757,7 +759,7 @@ meatobj(mtmp)		/* for gelatinous cubes */
 		if (cansee(mtmp->mx,mtmp->my) && flags.verbose)
 		    pline("%s eats %s!", Monnam(mtmp),
 			    distant_name(otmp, doname));
-		else if (!Deaf && flags.verbose)
+		else if (flags.verbose)
 		    You_hear("a slurping sound.");
 		/* Heal up to the object's weight in hp */
 		if (mtmp->mhp < mtmp->mhpmax) {
@@ -802,7 +804,7 @@ meatobj(mtmp)		/* for gelatinous cubes */
 	if (ecount > 0) {
 	    if (cansee(mtmp->mx, mtmp->my) && flags.verbose && buf[0])
 		pline1(buf);
-	    else if (!Deaf && flags.verbose)
+	    else if (flags.verbose)
 		You_hear("%s slurping sound%s.",
 			ecount == 1 ? "a" : "several",
 			ecount == 1 ? "" : "s");
@@ -1236,6 +1238,8 @@ dmonsfree()
     for (mtmp = &fmon; *mtmp;) {
 	freetmp = *mtmp;
 	if (freetmp->mhp <= 0 && !freetmp->isgd) {
+	    if (freetmp == context.polearm.hitmon)
+		context.polearm.hitmon = NULL;
 	    *mtmp = freetmp->nmon;
 	    dealloc_monst(freetmp);
 	    count++;
@@ -1259,7 +1263,7 @@ register struct monst *mtmp, *mtmp2;
     /* transfer the monster's inventory */
     for (otmp = mtmp2->minvent; otmp; otmp = otmp->nobj) {
 	if (otmp->where != OBJ_MINVENT || otmp->ocarry != mtmp)
-	    debugpline("replmon: minvent inconsistency");
+	    debugpline0("replmon: minvent inconsistency");
 	otmp->ocarry = mtmp2;
     }
     mtmp->minvent = 0;
@@ -1603,6 +1607,8 @@ register struct monst *mtmp;
 	}
 	if(mtmp->iswiz) wizdead();
 	if(mtmp->data->msound == MS_NEMESIS) nemdead();
+        if(mtmp->data == &mons[PM_MEDUSA])
+            u.uachieve.killed_medusa = 1;
 	if(glyph_is_invisible(levl[mtmp->mx][mtmp->my].glyph))
 	    unmap_object(mtmp->mx, mtmp->my);
 	m_detach(mtmp, mptr);
@@ -1641,7 +1647,7 @@ boolean was_swallowed;			/* digestion */
 				s_suffix(mdat->mname));
 			losehp(Maybe_Half_Phys(tmp), killer.name, KILLED_BY_AN);
 		    } else {
-			if (!Deaf) You_hear("an explosion.");
+			You_hear("an explosion.");
 			magr->mhp -= tmp;
 			if (magr->mhp < 1) mondied(magr);
 			if (magr->mhp < 1) { /* maybe lifesaved */
@@ -3105,7 +3111,7 @@ register boolean silent;
 			else if(!Blind)
 				You_see("%sangry guard%s approaching!",
 				  sct == 1 ? "an " : "", sct > 1 ? "s" : "");
-		} else if(!Deaf)
+		} else
 			You_hear("the shrill sound of a guard's whistle.");
 	    }
 	    return(TRUE);

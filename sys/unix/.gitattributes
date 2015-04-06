@@ -1,1 +1,1 @@
-Makefile.* filter=NHtext merge=NHsubst
+Makefile.* NHSUBST

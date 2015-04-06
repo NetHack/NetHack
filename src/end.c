@@ -1,5 +1,4 @@
-/* NetHack 3.5	end.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	end.c	$Date: 2012/04/09 02:56:30 $  $Revision: 1.79 $ */
+/* NetHack 3.5	end.c	$NHDT-Date: 1425319883 2015/03/02 18:11:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.81 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -465,7 +464,12 @@ int how;
 		    Sprintf(eos(buf), " called %s", MNAME(mtmp));
 	}
 
-	if (multi) Strcat(buf, ", while helpless");
+	if (multi) {
+	    if (multi_reason)
+		Sprintf(eos(buf), ", while %s", multi_reason);
+	    else
+		Strcat(buf, ", while helpless");
+	}
 	Strcpy(killer.name, buf);
 	if (mptr->mlet == S_WRAITH)
 		u.ugrave_arise = PM_WRAITH;
@@ -911,6 +915,7 @@ die:
 	   topten figure it out separately and possibly getting different
            time or even day if player is slow responding to --More-- */
 	endtime = getnow();
+	urealtime.realtime += (endtime - urealtime.restored);
 
 	/* Sometimes you die on the first move.  Life's not fair.
 	 * On those rare occasions you get hosed immediately, go out

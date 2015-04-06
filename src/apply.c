@@ -1,5 +1,4 @@
-/* NetHack 3.5	apply.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	apply.c	$Date: 2012/05/01 02:22:32 $  $Revision: 1.168 $ */
+/* NetHack 3.5	apply.c	$NHDT-Date: 1426465431 2015/03/16 00:23:51 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.173 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -20,6 +19,7 @@ STATIC_DCL void FDECL(use_candelabrum, (struct obj *));
 STATIC_DCL void FDECL(use_candle, (struct obj **));
 STATIC_DCL void FDECL(use_lamp, (struct obj *));
 STATIC_DCL void FDECL(light_cocktail, (struct obj *));
+STATIC_PTR void FDECL(display_jump_positions, (int));
 STATIC_DCL void FDECL(use_tinning_kit, (struct obj *));
 STATIC_DCL void FDECL(use_figurine, (struct obj **));
 STATIC_DCL void FDECL(use_grease, (struct obj *));
@@ -27,6 +27,7 @@ STATIC_DCL void FDECL(use_trap, (struct obj *));
 STATIC_DCL void FDECL(use_stone, (struct obj *));
 STATIC_PTR int NDECL(set_trap);		/* occupation callback */
 STATIC_DCL int FDECL(use_whip, (struct obj *));
+STATIC_PTR void FDECL(display_polearm_positions, (int));
 STATIC_DCL int FDECL(use_pole, (struct obj *));
 STATIC_DCL int FDECL(use_cream_pie, (struct obj *));
 STATIC_DCL int FDECL(use_grapple, (struct obj *));
@@ -35,6 +36,8 @@ STATIC_DCL boolean FDECL(figurine_location_checks,
 				(struct obj *, coord *, BOOLEAN_P));
 STATIC_DCL void FDECL(add_class, (char *, CHAR_P));
 STATIC_DCL void FDECL(setapplyclasses, (char *));
+STATIC_DCL boolean FDECL(is_valid_jump_pos, (int, int, int, BOOLEAN_P));
+STATIC_DCL boolean FDECL(find_poleable_mon, (coord *, int, int));
 
 #ifdef	AMIGA
 void FDECL( amii_speaker, ( struct obj *, char *, int ) );
@@ -736,8 +739,10 @@ struct obj *obj;
 				pline("Yow!  The %s stares back!", mirror);
 			    else
 				pline("Yikes!  You've frozen yourself!");
-			    if (!Hallucination || !rn2(4))
+			    if (!Hallucination || !rn2(4)) {
 				nomul(-rnd(MAXULEV + 6 - u.ulevel));
+				multi_reason = "gazing into a mirror";
+			    }
 			    nomovemsg = 0;  /* default, "you can move again" */
 			}
 		    } else if (youmonst.data->mlet == S_VAMPIRE)
@@ -915,6 +920,7 @@ struct obj **optr;
 				break;
 			case 2: /* no explanation; it just happens... */
 				nomovemsg = "";
+				multi_reason = NULL;
 				nomul(-rnd(2));
 				break;
 		}
@@ -1357,6 +1363,54 @@ dojump()
 	return jump(0);
 }
 
+boolean
+is_valid_jump_pos(x,y, magic, showmsg)
+int x,y, magic;
+boolean showmsg;
+{
+    if (!magic && !(HJumping & ~INTRINSIC) && !EJumping &&
+	distu(x, y) != 5) {
+	/* The Knight jumping restriction still applies when riding a
+	 * horse.  After all, what shape is the knight piece in chess?
+	 */
+	if (showmsg) pline("Illegal move!");
+	return FALSE;
+    } else if (distu(x, y) > (magic ? 6+magic*3 : 9)) {
+	if (showmsg) pline("Too far!");
+	return FALSE;
+    } else if (!cansee(x, y)) {
+	if (showmsg) You("cannot see where to land!");
+	return FALSE;
+    } else if (!isok(x, y)) {
+	if (showmsg) You("cannot jump there!");
+	return FALSE;
+    }
+    return TRUE;
+}
+
+int jumping_is_magic;
+
+void
+display_jump_positions(state)
+int state;
+{
+    if (state == 0) {
+	tmp_at(DISP_BEAM, cmap_to_glyph(S_flashbeam));
+    } else if (state == 1) {
+	int x,y, dx, dy;
+	for (dx = -4; dx <= 4; dx++)
+	    for (dy = -4; dy <= 4; dy++) {
+		x = dx + (int)u.ux;
+		y = dy + (int)u.uy;
+		if (isok(x,y) && ACCESSIBLE(levl[x][y].typ) &&
+		    is_valid_jump_pos(x,y, jumping_is_magic, FALSE))
+		    tmp_at(x,y);
+	    }
+    } else {
+	tmp_at(DISP_END, 0);
+    }
+}
+
 int
 jump(magic)
 int magic; /* 0=Physical, otherwise skill level */
@@ -1436,24 +1490,12 @@ int magic; /* 0=Physical, otherwise skill level */
 	pline("Where do you want to jump?");
 	cc.x = u.ux;
 	cc.y = u.uy;
+	jumping_is_magic = magic;
+	getpos_sethilite(display_jump_positions);
 	if (getpos(&cc, TRUE, "the desired position") < 0)
 		return 0;	/* user pressed ESC */
-	if (!magic && !(HJumping & ~INTRINSIC) && !EJumping &&
-			distu(cc.x, cc.y) != 5) {
-		/* The Knight jumping restriction still applies when riding a
-		 * horse.  After all, what shape is the knight piece in chess?
-		 */
-		pline("Illegal move!");
-		return 0;
-	} else if (distu(cc.x, cc.y) > (magic ? 6+magic*3 : 9)) {
-		pline("Too far!");
-		return 0;
-	} else if (!cansee(cc.x, cc.y)) {
-		You("cannot see where to land!");
-		return 0;
-	} else if (!isok(cc.x, cc.y)) {
-		You("cannot jump there!");
-		return 0;
+	if (!is_valid_jump_pos(cc.x, cc.y, magic, TRUE)) {
+	    return 0;
 	} else {
 	    coord uc;
 	    int range, temp;
@@ -1508,6 +1550,7 @@ int magic; /* 0=Physical, otherwise skill level */
 	    teleds(cc.x, cc.y, TRUE);
 	    sokoban_guilt();
 	    nomul(-1);
+	    multi_reason = "jumping around";
 	    nomovemsg = "";
 	    morehungry(rnd(25));
 	    return 1;
@@ -1770,7 +1813,269 @@ long timeout;
 	char monnambuf[BUFSZ], carriedby[BUFSZ];
 
 	if (!figurine) {
-	    debugpline("null figurine in fig_transform()");
+	    nomovemsg = "";
+	    morehungry(rnd(25));
+	    return 1;
+	}
+}
+
+boolean
+tinnable(corpse)
+struct obj *corpse;
+{
+	if (corpse->oeaten) return 0;
+	if (!mons[corpse->corpsenm].cnutrit) return 0;
+	return 1;
+}
+
+STATIC_OVL void
+use_tinning_kit(obj)
+register struct obj *obj;
+{
+	register struct obj *corpse, *can;
+
+	/* This takes only 1 move.  If this is to be changed to take many
+	 * moves, we've got to deal with decaying corpses...
+	 */
+	if (obj->spe <= 0) {
+		You("seem to be out of tins.");
+		return;
+	}
+	if (!(corpse = floorfood("tin", 2))) return;
+	if (corpse->oeaten) {
+		You("cannot tin %s which is partly eaten.",something);
+		return;
+	}
+	if (touch_petrifies(&mons[corpse->corpsenm])
+		&& !Stone_resistance && !uarmg) {
+	    char kbuf[BUFSZ];
+
+	    if (poly_when_stoned(youmonst.data))
+		You("tin %s without wearing gloves.",
+			an(mons[corpse->corpsenm].mname));
+	    else {
+		pline("Tinning %s without wearing gloves is a fatal mistake...",
+			an(mons[corpse->corpsenm].mname));
+		Sprintf(kbuf, "trying to tin %s without gloves",
+			an(mons[corpse->corpsenm].mname));
+	    }
+	    instapetrify(kbuf);
+	}
+	if (is_rider(&mons[corpse->corpsenm])) {
+	    if (revive_corpse(corpse))
+		verbalize("Yes...  But War does not preserve its enemies...");
+	    else
+		pline_The("corpse evades your grasp.");
+	    return;
+	}
+	if (mons[corpse->corpsenm].cnutrit == 0) {
+		pline("That's too insubstantial to tin.");
+		return;
+	}
+	consume_obj_charge(obj, TRUE);
+
+	if ((can = mksobj(TIN, FALSE, FALSE)) != 0) {
+	    static const char you_buy_it[] = "You tin it, you bought it!";
+
+	    can->corpsenm = corpse->corpsenm;
+	    can->cursed = obj->cursed;
+	    can->blessed = obj->blessed;
+	    can->owt = weight(can);
+	    can->known = 1;
+	    /* Mark tinned tins. No spinach allowed... */
+	    set_tin_variety(can, HOMEMADE_TIN);
+	    if (carried(corpse)) {
+		if (corpse->unpaid)
+		    verbalize(you_buy_it);
+		useup(corpse);
+	    } else {
+		if (costly_spot(corpse->ox, corpse->oy) && !corpse->no_charge)
+		    verbalize(you_buy_it);
+		useupf(corpse, 1L);
+	    }
+	    can = hold_another_object(can, "You make, but cannot pick up, %s.",
+				      doname(can), (const char *)0);
+	} else impossible("Tinning failed.");
+}
+
+void
+use_unicorn_horn(obj)
+struct obj *obj;
+{
+#define PROP_COUNT 6		/* number of properties we're dealing with */
+#define ATTR_COUNT (A_MAX*3)	/* number of attribute points we might fix */
+	int idx, val, val_limit,
+	    trouble_count, unfixable_trbl, did_prop, did_attr;
+	int trouble_list[PROP_COUNT + ATTR_COUNT];
+
+	if (obj && obj->cursed) {
+	    long lcount = (long) rnd(100);
+
+	    switch (rn2(6)) {
+	    case 0: make_sick((Sick & TIMEOUT) ? (Sick & TIMEOUT) / 3L + 1L :
+				(long)rn1(ACURR(A_CON),20),
+			      xname(obj), TRUE, SICK_NONVOMITABLE);
+		    break;
+	    case 1: make_blinded((Blinded & TIMEOUT) + lcount, TRUE);
+		    break;
+	    case 2: if (!Confusion)
+			You("suddenly feel %s.",
+			    Hallucination ? "trippy" : "confused");
+		    make_confused((HConfusion & TIMEOUT) + lcount, TRUE);
+		    break;
+	    case 3: make_stunned((HStun & TIMEOUT) + lcount, TRUE);
+		    break;
+	    case 4: (void) adjattrib(rn2(A_MAX), -1, FALSE);
+		    break;
+	    case 5: (void) make_hallucinated((HHallucination & TIMEOUT)
+					     + lcount, TRUE, 0L);
+		    break;
+	    }
+	    return;
+	}
+
+/*
+ * Entries in the trouble list use a very simple encoding scheme.
+ */
+#define prop2trbl(X)	((X) + A_MAX)
+#define attr2trbl(Y)	(Y)
+#define prop_trouble(X) trouble_list[trouble_count++] = prop2trbl(X)
+#define attr_trouble(Y) trouble_list[trouble_count++] = attr2trbl(Y)
+#define TimedTrouble(P) (((P) && !((P) & ~TIMEOUT)) ? ((P) & TIMEOUT) : 0L)
+
+	trouble_count = unfixable_trbl = did_prop = did_attr = 0;
+
+	/* collect property troubles */
+	if (TimedTrouble(Sick)) prop_trouble(SICK);
+	if (TimedTrouble(Blinded) > (long)u.ucreamed &&
+	    !(u.uswallow &&
+	      attacktype_fordmg(u.ustuck->data, AT_ENGL, AD_BLND)))
+	    prop_trouble(BLINDED);
+	if (TimedTrouble(HHallucination)) prop_trouble(HALLUC);
+	if (TimedTrouble(Vomiting)) prop_trouble(VOMITING);
+	if (TimedTrouble(HConfusion)) prop_trouble(CONFUSION);
+	if (TimedTrouble(HStun)) prop_trouble(STUNNED);
+
+	unfixable_trbl = unfixable_trouble_count(TRUE);
+
+	/* collect attribute troubles */
+	for (idx = 0; idx < A_MAX; idx++) {
+	    if (ABASE(idx) >= AMAX(idx)) continue;
+	    val_limit = AMAX(idx);
+	    /* don't recover strength lost from hunger */
+	    if (idx == A_STR && u.uhs >= WEAK) val_limit--;
+	    if (Fixed_abil) {
+		/* potion/spell of restore ability override sustain ability
+		   intrinsic but unicorn horn usage doesn't */
+		unfixable_trbl += val_limit - ABASE(idx);
+		continue;
+	    }
+	    /* don't recover more than 3 points worth of any attribute */
+	    if (val_limit > ABASE(idx) + 3) val_limit = ABASE(idx) + 3;
+
+	    for (val = ABASE(idx); val < val_limit; val++)
+		attr_trouble(idx);
+	    /* keep track of unfixed trouble, for message adjustment below */
+	    unfixable_trbl += (AMAX(idx) - val_limit);
+	}
+
+	if (trouble_count == 0) {
+	    pline1(nothing_happens);
+	    return;
+	} else if (trouble_count > 1) {		/* shuffle */
+	    int i, j, k;
+
+	    for (i = trouble_count - 1; i > 0; i--)
+		if ((j = rn2(i + 1)) != i) {
+		    k = trouble_list[j];
+		    trouble_list[j] = trouble_list[i];
+		    trouble_list[i] = k;
+		}
+	}
+
+	/*
+	 *		Chances for number of troubles to be fixed
+	 *		 0	1      2      3      4	    5	   6	  7
+	 *   blessed:  22.7%  22.7%  19.5%  15.4%  10.7%   5.7%   2.6%	 0.8%
+	 *  uncursed:  35.4%  35.4%  22.9%   6.3%    0	    0	   0	  0
+	 */
+	val_limit = rn2( d(2, (obj && obj->blessed) ? 4 : 2) );
+	if (val_limit > trouble_count) val_limit = trouble_count;
+
+	/* fix [some of] the troubles */
+	for (val = 0; val < val_limit; val++) {
+	    idx = trouble_list[val];
+
+	    switch (idx) {
+	    case prop2trbl(SICK):
+		make_sick(0L, (char *) 0, TRUE, SICK_ALL);
+		did_prop++;
+		break;
+	    case prop2trbl(BLINDED):
+		make_blinded((long)u.ucreamed, TRUE);
+		did_prop++;
+		break;
+	    case prop2trbl(HALLUC):
+		(void) make_hallucinated(0L, TRUE, 0L);
+		did_prop++;
+		break;
+	    case prop2trbl(VOMITING):
+		make_vomiting(0L, TRUE);
+		did_prop++;
+		break;
+	    case prop2trbl(CONFUSION):
+		make_confused(0L, TRUE);
+		did_prop++;
+		break;
+	    case prop2trbl(STUNNED):
+		make_stunned(0L, TRUE);
+		did_prop++;
+		break;
+	    default:
+		if (idx >= 0 && idx < A_MAX) {
+		    ABASE(idx) += 1;
+		    did_attr++;
+		} else
+		    panic("use_unicorn_horn: bad trouble? (%d)", idx);
+		break;
+	    }
+	}
+
+	if (did_attr)
+	    pline("This makes you feel %s!",
+		  (did_prop + did_attr) == (trouble_count + unfixable_trbl) ?
+		  "great" : "better");
+	else if (!did_prop)
+	    pline("Nothing seems to happen.");
+
+	context.botl = (did_attr || did_prop);
+#undef PROP_COUNT
+#undef ATTR_COUNT
+#undef prop2trbl
+#undef attr2trbl
+#undef prop_trouble
+#undef attr_trouble
+#undef TimedTrouble
+}
+
+/*
+ * Timer callback routine: turn figurine into monster
+ */
+void
+fig_transform(arg, timeout)
+anything *arg;
+long timeout;
+{
+	struct obj *figurine = arg->a_obj;
+	struct monst *mtmp;
+	coord cc;
+	boolean cansee_spot, silent, okay_spot;
+	boolean redraw = FALSE;
+	boolean suppress_see = FALSE;
+	char monnambuf[BUFSZ], carriedby[BUFSZ];
+
+	if (!figurine) {
+	    debugpline0("null figurine in fig_transform()");
 	    return;
 	}
 	silent = (timeout != monstermoves); /* happened while away */
@@ -2531,6 +2836,54 @@ static const char
 	cant_see_spot[] = "won't hit anything if you can't see that spot.",
 	cant_reach[] = "can't reach that spot from here.";
 
+/* find pos of monster in range, if only one monster */
+boolean
+find_poleable_mon(pos, min_range, max_range)
+coord *pos;
+int min_range, max_range;
+{
+    struct monst *mtmp;
+    struct monst *selmon = NULL;
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+	if (mtmp && !DEADMONSTER(mtmp) && !mtmp->mtame &&
+	    cansee(mtmp->mx, mtmp->my) &&
+	    distu(mtmp->mx, mtmp->my) <= max_range &&
+	    distu(mtmp->mx, mtmp->my) >= min_range) {
+	    if (selmon) return FALSE;
+	    selmon = mtmp;
+	}
+    if (!selmon) return FALSE;
+    pos->x = selmon->mx;
+    pos->y = selmon->my;
+    return TRUE;
+}
+
+int polearm_range_min = -1;
+int polearm_range_max = -1;
+
+void
+display_polearm_positions(state)
+int state;
+{
+    if (state == 0) {
+	tmp_at(DISP_BEAM, cmap_to_glyph(S_flashbeam));
+    } else if (state == 1) {
+	int x,y, dx,dy;
+	for (dx = -4; dx <= 4; dx++)
+	    for (dy = -4; dy <= 4; dy++) {
+		x = dx + (int)u.ux;
+		y = dy + (int)u.uy;
+		if (isok(x, y) && ACCESSIBLE(levl[x][y].typ) &&
+		    distu(x, y) >= polearm_range_min &&
+		    distu(x, y) <= polearm_range_max) {
+		    tmp_at(x, y);
+		}
+	    }
+    } else {
+	tmp_at(DISP_END, 0);
+    }
+}
+
 /* Distance attacks by pole-weapons */
 STATIC_OVL int
 use_pole(obj)
@@ -2539,6 +2892,7 @@ use_pole(obj)
 	int res = 0, typ, max_range, min_range, glyph;
 	coord cc;
 	struct monst *mtmp;
+	struct monst *hitm = context.polearm.hitmon;
 
 	/* Are you allowed to use the pole? */
 	if (u.uswallow) {
@@ -2551,15 +2905,7 @@ use_pole(obj)
 	}
      /* assert(obj == uwep); */
 
-	/* Prompt for a location */
-	pline(where_to_hit);
-	cc.x = u.ux;
-	cc.y = u.uy;
-	if (getpos(&cc, TRUE, "the spot to hit") < 0)
-	    return res;	/* ESC; uses turn iff polearm became wielded */
-
-	glyph = glyph_at(cc.x, cc.y);
-	/*
+		/*
 	 * Calculate allowable range (pole's reach is always 2 steps):
 	 *	unskilled and basic: orthogonal direction, 4..4;
 	 *	skilled: as basic, plus knight's jump position, 4..5;
@@ -2579,6 +2925,26 @@ use_pole(obj)
 	if (typ == P_NONE || P_SKILL(typ) <= P_BASIC) max_range = 4;
 	else if (P_SKILL(typ) == P_SKILLED) max_range = 5;
 	else max_range = 8;	/* (P_SKILL(typ) >= P_EXPERT) */
+
+	polearm_range_min = min_range;
+	polearm_range_max = max_range;
+
+	/* Prompt for a location */
+	pline(where_to_hit);
+	cc.x = u.ux;
+	cc.y = u.uy;
+	if (!find_poleable_mon(&cc, min_range, max_range) &&
+	    hitm && !DEADMONSTER(hitm) && cansee(hitm->mx, hitm->my) &&
+	    distu(hitm->mx,hitm->my) <= max_range &&
+	    distu(hitm->mx,hitm->my) >= min_range) {
+	    cc.x = hitm->mx;
+	    cc.y = hitm->my;
+	}
+	getpos_sethilite(display_polearm_positions);
+	if (getpos(&cc, TRUE, "the spot to hit") < 0)
+	    return res;	/* ESC; uses turn iff polearm became wielded */
+
+	glyph = glyph_at(cc.x, cc.y);
 	if (distu(cc.x, cc.y) > max_range) {
 	    pline("Too far!");
 	    return (res);
@@ -2596,11 +2962,13 @@ use_pole(obj)
 	    return res;
 	}
 
+	context.polearm.hitmon = NULL;
 	/* Attack the monster there */
 	bhitpos = cc;
 	if ((mtmp = m_at(bhitpos.x, bhitpos.y)) != (struct monst *)0) {
 	    if (attack_checks(mtmp, uwep)) return res;
 	    if (overexertion()) return 1; /* burn nutrition; maybe pass out */
+	    context.polearm.hitmon = mtmp;
 	    check_caitiff(mtmp);
 	    notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
 	    (void) thitmonst(mtmp, uwep);
@@ -2828,6 +3196,7 @@ do_break_wand(obj)
     boolean fillmsg = FALSE;
     int expltype = EXPL_MAGICAL;
     char confirm[QBUFSZ], buf[BUFSZ];
+    boolean is_fragile = (!strcmp(OBJ_DESCR(objects[obj->otyp]), "balsa"));
 
     if (yn(safe_qbuf(confirm, "Are you really sure you want to break ", "?",
 		     obj, yname, ysimple_name, "the wand")) == 'n')
@@ -2836,7 +3205,7 @@ do_break_wand(obj)
     if (nohands(youmonst.data)) {
 	You_cant("break %s without hands!", yname(obj));
 	return 0;
-    } else if (ACURR(A_STR) < 10) {
+    } else if (ACURR(A_STR) < (is_fragile ? 5 : 10)) {
 	You("don't have the strength to break %s!", yname(obj));
 	return 0;
     }
@@ -2974,7 +3343,7 @@ do_break_wand(obj)
 	     /* if (context.botl) bot(); */
 	    }
 	    if (affects_objects && level.objects[x][y]) {
-		(void) bhitpile(obj, bhito, x, y);
+		(void) bhitpile(obj, bhito, x, y, 0);
 		if (context.botl) bot();		/* potion effects */
 	    }
 	} else {
@@ -2991,7 +3360,7 @@ do_break_wand(obj)
 	     * since it's also used by retouch_equipment() for polyself.)
 	     */
 	    if (affects_objects && level.objects[x][y]) {
-		(void) bhitpile(obj, bhito, x, y);
+		(void) bhitpile(obj, bhito, x, y, 0);
 		if (context.botl) bot();		/* potion effects */
 	    }
 	    damage = zapyourself(obj, FALSE);

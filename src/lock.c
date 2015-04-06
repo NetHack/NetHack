@@ -630,10 +630,20 @@ boolean quietly;
 
 	if(mtmp && mtmp->m_ap_type != M_AP_FURNITURE) {
 		if (mtmp->m_ap_type == M_AP_OBJECT) goto objhere;
-		if (!quietly) pline("%s stands in the way!", !canspotmon(mtmp) ?
-			"Some creature" : Monnam(mtmp));
+		if (!quietly) {
+		    if ((mtmp->mx != x) || (mtmp->my != y)) {
+		    	/* worm tail */
+			pline("%s%s blocks the way!",
+				!canspotmon(mtmp) ? Something :
+					s_suffix(Monnam(mtmp)),
+				!canspotmon(mtmp) ? "" : " tail");
+		    } else {
+			pline("%s blocks the way!",
+			   !canspotmon(mtmp) ? "Some creature" : Monnam(mtmp));
+		    }
+		}
 		if (!canspotmon(mtmp))
-		    map_invisible(mtmp->mx, mtmp->my);
+			map_invisible(x, y);
 		return(TRUE);
 	}
 	if (OBJ_AT(x, y)) {
@@ -888,7 +898,7 @@ int x, y;
 		    else if (flags.verbose) {
 			if (cansee(x,y))
 			    pline("KABOOM!!  You see a door explode.");
-			else if (!Deaf)
+			else
 			    You_hear("a distant explosion.");
 		    }
 		    door->doormask = D_NODOOR;
@@ -901,7 +911,7 @@ int x, y;
 		if (flags.verbose) {
 		    if (cansee(x,y))
 			pline_The("door crashes open!");
-		    else if (!Deaf)
+		    else
 			You_hear("a crashing sound.");
 		}
 		unblock_point(x,y);

@@ -240,15 +240,19 @@ struct obj *obj;
 	} else if (obj->otyp == AMULET_OF_YENDOR) {
 		if (u.uhave.amulet) impossible("already have amulet?");
 		u.uhave.amulet = 1;
+		u.uachieve.amulet = 1;
 	} else if (obj->otyp == CANDELABRUM_OF_INVOCATION) {
 		if (u.uhave.menorah) impossible("already have candelabrum?");
 		u.uhave.menorah = 1;
+		u.uachieve.menorah = 1;
 	} else if (obj->otyp == BELL_OF_OPENING) {
 		if (u.uhave.bell) impossible("already have silver bell?");
 		u.uhave.bell = 1;
+		u.uachieve.bell = 1;
 	} else if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
 		if (u.uhave.book) impossible("already have the book?");
 		u.uhave.book = 1;
+		u.uachieve.book = 1;
 	} else if (obj->oartifact) {
 		if (is_quest_artifact(obj)) {
 		    if (u.uhave.questart)
@@ -258,6 +262,15 @@ struct obj *obj;
 		}
 		set_artifact_intrinsic(obj, 1, W_ART);
 	}
+        if(obj->otyp == LUCKSTONE && obj->record_achieve_special) {
+	    u.uachieve.mines_luckstone = 1;
+	    obj->record_achieve_special = 0;
+        } else if((obj->otyp == AMULET_OF_REFLECTION ||
+                   obj->otyp == BAG_OF_HOLDING) &&
+                  obj->record_achieve_special) {
+	    u.uachieve.finish_sokoban = 1;
+	    obj->record_achieve_special = 0;
+        }
 }
 
 /*
@@ -902,8 +915,8 @@ register const char *let,*word;
 
 		/* "ugly check" for reading fortune cookies, part 2 */
 		if ((!strcmp(word, "read")
-              && (otmp->otyp == FORTUNE_COOKIE || otmp->otyp == T_SHIRT)))
-			allowall = TRUE;
+		     && is_readable(otmp)))
+			allowall = usegold = TRUE;
 	    }
 	}
 	bp[foo] = 0;
@@ -959,7 +972,21 @@ register const char *let,*word;
 		    return((struct obj *)0);
 		}
 		if(ilet == '-') {
-			return(allownone ? &zeroobj : (struct obj *) 0);
+		    if (!allownone) {
+			char *suf = NULL;
+			strcpy(buf, word);
+			if ((bp = strstr(buf, " on the ")) != NULL) { /* rub on the stone[s] */
+			    *bp = '\0';
+			    suf = (bp + 1);
+			}
+			if ((bp = strstr(buf, " or ")) != NULL) {
+			    *bp = '\0';
+			    bp = (rn2(2) ? buf : (bp + 4));
+			} else bp = buf;
+			You("mime %s something%s%s.", ing_suffix(bp),
+			    suf ? " " : "", suf ? suf : "");
+		    }
+		    return(allownone ? &zeroobj : (struct obj *) 0);
 		}
 		if(ilet == def_oc_syms[COIN_CLASS].sym) {
 			if (!usegold) {
@@ -1762,7 +1789,7 @@ nextclass:
 			if (!flags.sortpack || otmp->oclass == *invlet) {
 			    if (flags.sortpack && !classcount) {
 				add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
-				    let_to_name(*invlet, FALSE), MENU_UNSELECTED);
+					 let_to_name(*invlet, FALSE, (want_reply && iflags.menu_head_objsym)), MENU_UNSELECTED);
 				classcount++;
 			    }
 			    any.a_char = ilet;
@@ -1836,7 +1863,7 @@ char avoidlet;
 			if (flags.sortpack && !classcount) {
 				any = zeroany;		/* zero */
 				add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
-				    let_to_name(*invlet, FALSE), MENU_UNSELECTED);
+					 let_to_name(*invlet, FALSE, FALSE), MENU_UNSELECTED);
 				classcount++;
 			}
 			any.a_char = ilet;
@@ -1964,7 +1991,7 @@ dounpaid()
 	    if (otmp->unpaid) {
 		if (!flags.sortpack || otmp->oclass == *invlet) {
 		    if (flags.sortpack && !classcount) {
-			putstr(win, 0, let_to_name(*invlet, TRUE));
+			putstr(win, 0, let_to_name(*invlet, TRUE, FALSE));
 			classcount++;
 		    }
 
@@ -1982,7 +2009,7 @@ dounpaid()
     if (count > num_so_far) {
 	/* something unpaid is contained */
 	if (flags.sortpack)
-	    putstr(win, 0, let_to_name(CONTAINED_SYM, TRUE));
+	    putstr(win, 0, let_to_name(CONTAINED_SYM, TRUE, FALSE));
 	/*
 	 * Search through the container objects in the inventory for
 	 * unpaid items.  The top level inventory items have already
@@ -2674,10 +2701,12 @@ static NEARDATA char *invbuf = (char *)0;
 static NEARDATA unsigned invbufsiz = 0;
 
 char *
-let_to_name(let,unpaid)
+let_to_name(let,unpaid,showsym)
 char let;
-boolean unpaid;
+boolean unpaid,showsym;
 {
+	const char *ocsymfmt = "  ('%c')";
+	const int invbuf_sympadding = 8; /* arbitrary */
 	const char *class_name;
 	const char *pos;
 	int oclass = (let >= 1 && let < MAXOCLASSES) ? let : 0;
@@ -2690,7 +2719,8 @@ boolean unpaid;
 	else
 	    class_name = names[0];
 
-	len = strlen(class_name) + (unpaid ? sizeof "unpaid_" : sizeof "");
+	len = strlen(class_name) + (unpaid ? sizeof "unpaid_" : sizeof "") +
+	    (oclass ? (strlen(ocsymfmt)+invbuf_sympadding) : 0);
 	if (len > invbufsiz) {
 	    if (invbuf) free((genericptr_t)invbuf);
 	    invbufsiz = len + 10; /* add slop to reduce incremental realloc */
@@ -2700,6 +2730,15 @@ boolean unpaid;
 	    Strcat(strcpy(invbuf, "Unpaid "), class_name);
 	else
 	    Strcpy(invbuf, class_name);
+	if ((oclass != 0) && showsym) {
+	    char *bp = eos(invbuf);
+	    int mlen = invbuf_sympadding - strlen(class_name);
+	    while (--mlen > 0) {
+		*bp = ' '; bp++;
+	    }
+	    *bp = '\0';
+	    Sprintf(eos(invbuf), ocsymfmt, def_oc_syms[oclass].sym);
+	}
 	return invbuf;
 }
 

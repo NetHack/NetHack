@@ -491,6 +491,7 @@ void
 u_init()
 {
 	register int i;
+	struct u_roleplay tmpuroleplay = u.uroleplay; /* these set by rcfile options */
 
 	flags.female = flags.initgend;
 	flags.beginner = 1;
@@ -500,6 +501,9 @@ u_init()
 	(void) memset((genericptr_t)&u, 0, sizeof(u));
 	u.ustuck = (struct monst *)0;
 	(void) memset((genericptr_t)&ubirthday, 0, sizeof(ubirthday));
+	(void) memset((genericptr_t)&urealtime, 0, sizeof(urealtime));
+
+	u.uroleplay = tmpuroleplay; /* restore options set via rcfile */
 
 #if 0	/* documentation of more zero values as desirable */
 	u.usick_cause[0] = 0;
@@ -919,6 +923,13 @@ register struct trobj *trop;
 			if (obj->oclass == RING_CLASS ||
 			    obj->oclass == SPBOOK_CLASS)
 				nocreate4 = otyp;
+		}
+
+		/* nudist gets no armor */
+		if (u.uroleplay.nudist && obj->oclass == ARMOR_CLASS) {
+		    dealloc_obj(obj);
+		    trop++;
+		    continue;
 		}
 
 		if (trop->trclass == COIN_CLASS) {

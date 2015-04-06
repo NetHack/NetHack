@@ -2198,9 +2198,9 @@ right_side(row, left, right_mark, limits)
     int		  deeper;	/* if TRUE, call self as needed */
     int		  result;	/* set by q?_path() */
     register int  i;		/* loop counter */
-    register char *rowp;	/* row optimization */
-    char	  *row_min;	/* left most  [used by macro set_min()] */
-    char	  *row_max;	/* right most [used by macro set_max()] */
+    register char *rowp = NULL;	/* row optimization */
+    char	  *row_min = NULL;	/* left most  [used by macro set_min()] */
+    char	  *row_max = NULL;	/* right most [used by macro set_max()] */
     int		  lim_max;	/* right most limit of circle */
 
 #if defined(GCC_WARN) || defined(_MSC_VER)
@@ -2374,8 +2374,8 @@ left_side(row, left_mark, right, limits)
 {
     int		  left, left_edge, nrow, deeper, result;
     register int  i;
-    register char *rowp;
-    char	  *row_min, *row_max;
+    register char *rowp = NULL;
+    char	  *row_min = NULL, *row_max = NULL;
     int		  lim_min;
 
 #if defined(GCC_WARN) || defined(_MSC_VER)

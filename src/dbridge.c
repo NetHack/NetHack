@@ -1,5 +1,4 @@
-/* NetHack 3.5	dbridge.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	dbridge.c	$Date: 2012/02/01 00:49:16 $  $Revision: 1.21 $ */
+/* NetHack 3.5	dbridge.c	$NHDT-Date: 1426465433 2015/03/16 00:23:53 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.23 $ */
 /*	Copyright (c) 1989 by Jean-Christophe Collet		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -42,9 +41,11 @@ int x,y;
 
     if (!isok(x,y)) return FALSE;
     ltyp = levl[x][y].typ;
-    if (ltyp == POOL || ltyp == MOAT || ltyp == WATER) return TRUE;
-    if (ltyp == DRAWBRIDGE_UP &&
-	(levl[x][y].drawbridgemask & DB_UNDER) == DB_MOAT) return TRUE;
+    /* The ltyp == MOAT is not redundant with is_moat, because the
+     * Juiblex level does not have moats, although it has MOATs. There
+     * is probably a better way to express this. */
+    if (ltyp == POOL || ltyp == MOAT || ltyp == WATER || is_moat(x, y))
+        return TRUE;
     return FALSE;
 }
 
@@ -83,6 +84,21 @@ int x,y;
     if (ltyp == ICE
 	|| (ltyp == DRAWBRIDGE_UP
 	    && (levl[x][y].drawbridgemask & DB_UNDER) == DB_ICE)) return TRUE;
+    return FALSE;
+}
+
+boolean
+is_moat(x,y)
+int x, y;
+{
+    schar ltyp;
+
+    if (!isok(x, y)) return FALSE;
+    ltyp = levl[x][y].typ;
+    if (!Is_juiblex_level(&u.uz) &&
+        (ltyp == MOAT || (ltyp == DRAWBRIDGE_UP &&
+         (levl[x][y].drawbridgemask & DB_UNDER) == DB_MOAT)))
+        return TRUE;
     return FALSE;
 }
 
@@ -250,7 +266,7 @@ int x, y;
 		    (occupants[entitycnt].ex == x) &&
 		    (occupants[entitycnt].ey == y))
 			break;
-	debugpline("entitycnt = %d", entitycnt);
+	debugpline1("entitycnt = %d", entitycnt);
 #ifdef D_DEBUG
 	wait_synch();
 #endif
@@ -450,7 +466,7 @@ boolean chunks;
 	int misses;
 
 	if (chunks)
-		debugpline("Do chunks miss?");
+		debugpline0("Do chunks miss?");
 	if (automiss(etmp))
 		return(TRUE);
 
@@ -470,7 +486,7 @@ boolean chunks;
 	if (is_db_wall(etmp->ex, etmp->ey))
 		misses -= 3;				    /* less airspace */
 
-	debugpline("Miss chance = %d (out of 8)", misses);
+	debugpline1("Miss chance = %d (out of 8)", misses);
 
 	return((boolean)((misses >= rnd(8))? TRUE : FALSE));
 }
@@ -499,7 +515,8 @@ struct entity *etmp;
 	if (is_db_wall(etmp->ex, etmp->ey))
 		tmp -= 2;			    /* less room to maneuver */
 
-	debugpline("%s to jump (%d chances in 10)", E_phrase(etmp, "try"), tmp);
+	debugpline2("%s to jump (%d chances in 10)",
+		    E_phrase(etmp, "try"), tmp);
 	return((boolean)((tmp >= rnd(10))? TRUE : FALSE));
 }
 
@@ -533,12 +550,11 @@ struct entity *etmp;
 			pline_The("portcullis misses %s!",
 			      e_nam(etmp));
 		else
-			debugpline("The drawbridge misses %s!",
-			      e_nam(etmp));
+			debugpline1("The drawbridge misses %s!", e_nam(etmp));
 		if (e_survives_at(etmp, oldx, oldy))
 			return;
 		else {
-			debugpline("Mon can't survive here");
+			debugpline0("Mon can't survive here");
 			if (at_portcullis)
 				must_jump = TRUE;
 			else
@@ -557,7 +573,7 @@ struct entity *etmp;
 	    if (at_portcullis) {
 		if (e_jumps(etmp)) {
 		    relocates = TRUE;
-		    debugpline("Jump succeeds!");
+		    debugpline0("Jump succeeds!");
 		} else {
 		    if (e_inview)
 			pline("%s crushed by the falling portcullis!",
@@ -570,7 +586,7 @@ struct entity *etmp;
 		}
 	    } else { /* tries to jump off bridge to original square */
 		relocates = !e_jumps(etmp);
-		debugpline("Jump %s!", (relocates)? "fails" : "succeeds");
+		debugpline1("Jump %s!", (relocates)? "fails" : "succeeds");
 	    }
 	}
 
@@ -580,13 +596,13 @@ struct entity *etmp;
  * would be inaccessible (i.e. etmp started on drawbridge square) or
  * unnecessary (i.e. etmp started here) in such a situation.
  */
-	debugpline("Doing relocation.");
+	debugpline0("Doing relocation.");
 	newx = oldx;
 	newy = oldy;
 	(void)find_drawbridge(&newx, &newy);
 	if ((newx == oldx) && (newy == oldy))
 		get_wall_for_db(&newx, &newy);
-	debugpline("Checking new square for occupancy.");
+	debugpline0("Checking new square for occupancy.");
 	if (relocates && (e_at(newx, newy))) {
 
 /*
@@ -597,22 +613,22 @@ struct entity *etmp;
 		struct entity *other;
 
 		other = e_at(newx, newy);
-		debugpline("New square is occupied by %s", e_nam(other));
+		debugpline1("New square is occupied by %s", e_nam(other));
 		if (e_survives_at(other, newx, newy) && automiss(other)) {
 			relocates = FALSE;	      /* "other" won't budge */
-			debugpline("%s suicide.", E_phrase(etmp, "commit"));
+			debugpline1("%s suicide.", E_phrase(etmp, "commit"));
 		} else {
 
-			debugpline("Handling %s", e_nam(other));
+			debugpline1("Handling %s", e_nam(other));
 			while ((e_at(newx, newy) != 0) &&
 			       (e_at(newx, newy) != etmp))
 				do_entity(other);
-			debugpline("Checking existence of %s", e_nam(etmp));
+			debugpline1("Checking existence of %s", e_nam(etmp));
 #ifdef D_DEBUG
 			wait_synch();
 #endif
 			if (e_at(oldx, oldy) != etmp) {
-			    debugpline("%s moved or died in recursion somewhere",
+			    debugpline1("%s moved or died in recursion somewhere",
 				  E_phrase(etmp, "have"));
 #ifdef D_DEBUG
 			    wait_synch();
@@ -622,7 +638,7 @@ struct entity *etmp;
 		}
 	}
 	if (relocates && !e_at(newx, newy)) {/* if e_at() entity = worm tail */
-		debugpline("Moving %s", e_nam(etmp));
+		debugpline1("Moving %s", e_nam(etmp));
 		if (!is_u(etmp)) {
 			remove_monster(etmp->ex, etmp->ey);
 			place_monster(etmp->emon, newx, newy);
@@ -635,12 +651,12 @@ struct entity *etmp;
 		etmp->ey = newy;
 		e_inview = e_canseemon(etmp);
 	}
-	debugpline("Final disposition of %s", e_nam(etmp));
+	debugpline1("Final disposition of %s", e_nam(etmp));
 #ifdef D_DEBUG
 	wait_synch();
 #endif
 	if (is_db_wall(etmp->ex, etmp->ey)) {
-		debugpline("%s in portcullis chamber", E_phrase(etmp, "are"));
+		debugpline1("%s in portcullis chamber", E_phrase(etmp, "are"));
 #ifdef D_DEBUG
 		wait_synch();
 #endif
@@ -661,9 +677,9 @@ struct entity *etmp;
 			e_died(etmp, 0, CRUSHING);	       /* no message */
 			return;
 		}
-		debugpline("%s in here", E_phrase(etmp, "survive"));
+		debugpline1("%s in here", E_phrase(etmp, "survive"));
 	} else {
-		debugpline("%s on drawbridge square", E_phrase(etmp, "are"));
+		debugpline1("%s on drawbridge square", E_phrase(etmp, "are"));
 		if (is_pool(etmp->ex, etmp->ey) && !e_inview)
 			if (!Deaf)
 				You_hear("a splash.");
@@ -674,7 +690,8 @@ struct entity *etmp;
 				      E_phrase(etmp, "fall"));
 			return;
 		}
-		debugpline("%s cannot survive on the drawbridge square",E_phrase(etmp, NULL));
+		debugpline1("%s cannot survive on the drawbridge square",
+			    E_phrase(etmp, NULL));
 		if (is_pool(etmp->ex, etmp->ey) || is_lava(etmp->ex, etmp->ey))
 		    if (e_inview && !is_u(etmp)) {
 			/* drown() will supply msgs if nec. */
@@ -890,7 +907,7 @@ int x,y;
 	if (etmp1->edata) {
 		e_inview = e_canseemon(etmp1);
 		if (e_missed(etmp1, TRUE)) {
-			debugpline("%s spared!", E_phrase(etmp1, "are"));
+			debugpline1("%s spared!", E_phrase(etmp1, "are"));
 			/* if there is water or lava here, fall in now */
 			if (is_u(etmp1))
 			    spoteffects(FALSE);
@@ -908,7 +925,7 @@ int x,y;
 			    if (!Deaf && !is_u(etmp1) && !is_pool(x,y))
 				You_hear("a crushing sound.");
 			    else
-				debugpline("%s from shrapnel",
+				debugpline1("%s from shrapnel",
 				      E_phrase(etmp1, "die"));
 			}
 			killer.format = KILLED_BY_AN;

@@ -1,5 +1,4 @@
-/* NetHack 3.5	teleport.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	teleport.c	$Date: 2012/01/04 18:52:36 $  $Revision: 1.45 $ */
+/* NetHack 3.5	teleport.c	$NHDT-Date: 1426465443 2015/03/16 00:24:03 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.48 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -121,7 +120,7 @@ unsigned entflags;
     struct monst fakemon;	/* dummy monster */
 
     if (!mdat) {
-	debugpline("enexto() called with mdat==0");
+	debugpline0("enexto() called with null mdat");
 	/* default to player's original monster type */
 	mdat = &mons[u.umonster];
     }

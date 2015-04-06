@@ -1,5 +1,4 @@
-/* NetHack 3.5	light.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	light.c	$Date: 2009/05/06 10:46:38 $  $Revision: 1.15 $ */
+/* NetHack 3.5	light.c	$NHDT-Date: 1426465436 2015/03/16 00:23:56 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.17 $ */
 /*	SCCS Id: @(#)light.c	3.5	2009/01/20	*/
 /* Copyright (c) Dean Luick, 1994					*/
 /* NetHack may be freely redistributed.  See license for details.	*/
@@ -394,13 +393,13 @@ write_ls(fd, ls)
 		ls->id = zeroany;
 		ls->id.a_uint = otmp->o_id;
 		if (find_oid((unsigned)ls->id.a_uint) != otmp)
-		    debugpline("write_ls: can't find obj #%u!", ls->id.a_uint);
+		    impossible("write_ls: can't find obj #%u!", ls->id.a_uint);
 	    } else { /* ls->type == LS_MONSTER */
 		mtmp = (struct monst *)ls->id.a_monst;
 		ls->id = zeroany;
 		ls->id.a_uint = mtmp->m_id;
 		if (find_mid((unsigned)ls->id.a_uint, FM_EVERYWHERE) != mtmp)
-		    debugpline("write_ls: can't find mon #%u!", ls->id.a_uint);
+		    impossible("write_ls: can't find mon #%u!", ls->id.a_uint);
 	    }
 	    ls->flags |= LSF_NEEDS_FIXUP;
 	    bwrite(fd, (genericptr_t)ls, sizeof(light_source));

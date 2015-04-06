@@ -1,0 +1,198 @@
+Git has a messy learning curve. This file is an attempt to serve as a quick
+reference for basic tasks while you get up to speed.
+
+------------------------
+
+[*] git checkout [-f] (branch)
+
+Switch your local repository to be at the most recent commit of (branch). 
+Including -f will discard changes made in the working directory.
+
+
+[*] git status [-uall | -uno]
+
+Shows all changed files in your local repository and also a list of the ones
+you have staged for commit.
+Including -uall will also show you all untracked files in all subdirectories.
+Including -uno will show you _no_ untracked files.
+
+
+[*] git log [-NUM]
+[*] git log <commit1> <commit2>
+[*] git log [--pretty=one]
+[*] git log (branch)
+
+For a full explanation of all the arguments you can pass to 'log', please see
+the manual; there are a lot and these are just a few of the common ones. For 
+our purposes, git log will show you all the commits according to criteria 
+you specify:
+
+-NUM: The last NUM commits in this branch
+<commit1> <commit2>: all commits between commit1 and commit2
+-pretty=one: format output as a single line for each entry
+(branch): show the commits from (branch) instead of the current one
+
+[*] git log --pretty=one --decorate --graph --all
+
+(This is best explained by executing and looking at the output.)
+
+
+[*] git add (filename)
+[*] git nhadd (filename)
+
+Adds the changes you've made in (filename) to the pre-commit staging area.
+(also referred to as the 'index')
+ OR
+Make a new file be tracked by git.
+
+"nhadd" is the preferred syntax and will automatically update the source file
+headers with the latest date, branch, and version.  See Developer.txt for
+details.
+
+
+[*] git commit [-a] [-m "text"]
+[*] git nhcommit [-a] [-m "text"]
+
+Commits all staged changes (in the index) to this branch in your local repo
+from your current position.
+Including -a will 'git add' all eligible files before doing so.
+Including -m will use "text" as the commit message instead of opening an
+editor window for you to create one.
+
+"nhcommit" is the preferred syntax and will automatically update the source file
+headers with the latest date, branch, and version.  See Developer.txt for
+details.
+
+
+[*] git push [--all] [-u origin (branch)]
+
+Sends all your commits for the current branch to the centralized repo.
+Including --all will send the commits for _all_ branches.
+Specifying -u is only needed the first time you push (branch) that you
+created; it establishes the connection between local and remote for that
+branch.
+
+
+[*] git reset [--hard] (filename)
+
+Without any parameters, unstages the changes for (filename) from the index;
+does not change the working tree. This is the equivalent of the command 
+git reset --mixed (filename); git reset --soft (filename) has no effect.
+
+With --hard, unstages (filename) from the index and reverts (filename) in
+the working tree to the most recent commit.
+
+*** WARNING *** --hard _will_ throw away your changes.
+
+
+[DSR: I'm hesitant about including this command because you can trash stuff
+with it. But at the same time, for people who are adapting to a commit not
+also automatically being a send, it's nice for them to know how to undo one in
+case they do something wrong. thoughts?]
+
+[*] git reset [--soft | --mixed | --hard] HEAD~1
+
+*** WARNING *** Never, EVER do this to a commit that you have already pushed;
+you will be rewriting history on other people's machines and this will
+generally turn out very poorly.
+
+With --soft, undoes the most recent 'git commit' action, but leaves the 
+changes in the index and in the working directory.
+
+With --mixed, does everything --soft does but also unstages the changes from
+the index. If you don't specify one of the three, reset will assume this.
+
+With --hard, does everything --mixed does but also reverts the working tree to
+the prior commit. 
+
+*** WARNING *** --hard will effectively delete a commit and "lose" the changes.
+[/end area-of-concern]
+
+
+[*] git fetch [--all]
+
+Retrieve commits from the remote repository to your machine.
+Including --all will get commits for all branches.
+Does NOT merge them into your local repository.
+
+
+[*] git pull
+
+Incorporate any fetched commits for the current branch into your repository
+and update your position accordingly. This will create a merge commit (noting
+that you merged a branch into itself).
+
+
+[*] git rebase [no-arguments version ONLY]
+
+Incorporate fetched commits for the current branch into your repository, and
+replay any local commits and changes afterwards on top.
+
+Quality picture-pages ASCII art:
+
+                                  E---F---G---H (remote changes)
+                                 /
+                                /
+(branch 'frog')    A---B---C---D---E'---F' (your local changes)
+
+After 'git fetch' and 'git rebase', it will look like this:
+
+                                               --- (remote HEAD)
+                                               |
+                                               V
+(branch 'frog')    A---B---C---D---E---F---G---H---E'---F'
+                                                   ^    ^
+                                                   |    |
+                                                   -------- (to be pushed)
+
+
+[*] git branch (branch)
+
+Creates a new branch from the current commit you're pointed to.
+Does not automatically checkout (switch to) the branch.
+
+
+[*] git checkout -b (branch)
+
+Creates a new branch from the current commit you're pointed to, and
+automatically checks out that branch.
+
+
+[*] git branch <pattern> --list | [--all | -a] | [--remotes | -r]
+
+Lists all branches matching <pattern>.
+With --all instead, lists all branches (including remotely tracked ones).
+With --remotes instead, lists only remote branches.
+
+
+[*] git merge (branch) [--no-commit]
+
+Merges all the changes from (branch) since it last diverged from a common
+ancestor into your current branch.
+
+With --no-commit, does not automatically create a merge entry in the log but
+leaves all the merged files in your working directory; to complete the merge
+you must commit them manually later (likely after you have edited them). This
+more accurately mimics the merge behavior of svn [and cvs?]
+
+
+[*] git stash [save | apply | list] <stashname>
+
+save: Takes all changes in your working directory and 'stashes' them in a temporary
+holding area. Convenient if the command you're trying to run won't go unless
+you have a clean working dir; also convenient to move experimental changes
+between branches without needing to commit them.
+
+apply: Replays the named stash onto your current working directory as though
+it were a patch. Does not delete the stash from the list.
+
+list: Lists all of your stashed code blobs.
+
+
+
+=======================================
+Typical workflows for common activities
+=======================================
+
+{To be added in near future: DSR 3/15}
+

@@ -1,5 +1,4 @@
-/* NetHack 3.5	save.c	$NHDT-Date: 1425081977 2015/02/28 00:06:17 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.59 $ */
-/* NetHack 3.5	save.c	$Date: 2012/02/16 02:40:24 $  $Revision: 1.53 $ */
+/* NetHack 3.5	save.c	$NHDT-Date: 1426496455 2015/03/16 09:00:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.62 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -307,8 +306,11 @@ register int fd, mode;
 #ifdef SYSFLAGS
 	bwrite(fd, (genericptr_t) &sysflags, sizeof(struct sysflag));
 #endif
+	urealtime.realtime += (getnow() - urealtime.restored);
 	bwrite(fd, (genericptr_t) &u, sizeof(struct you));
 	bwrite(fd, yyyymmddhhmmss(ubirthday), 14);
+	bwrite(fd, yyyymmddhhmmss(urealtime.realtime), 14);
+	bwrite(fd, yyyymmddhhmmss(urealtime.restored), 14);
 	save_killers(fd, mode);
 
 	/* must come before migrating_objs and migrating_mons are freed */
@@ -1121,8 +1123,13 @@ register struct monst *mtmp;
 	    }
 	    if (mtmp->minvent)
 		saveobjchn(fd,mtmp->minvent,mode);
-	    if (release_data(mode))
+	    if (release_data(mode)) {
+		if (mtmp == context.polearm.hitmon) {
+		    context.polearm.m_id = mtmp->m_id;
+		    context.polearm.hitmon = NULL;
+		}
 		dealloc_monst(mtmp);
+	    }
 	    mtmp = mtmp2;
 	}
 	if (perform_bwrite(mode))
@@ -1210,7 +1217,7 @@ int fd, mode;
 	    }
 	    bwrite(fd, (genericptr_t) &minusone, sizeof(int));
 	}
-	debugpline("Stored %d messages into savefile.", msgcount);
+	debugpline1("Stored %d messages into savefile.", msgcount);
 	/* note: we don't attempt to handle release_data() here */
 }
 
@@ -1288,6 +1295,7 @@ void
 freedynamicdata()
 {
 	unload_qtlist();
+	free_menu_coloring();
 	free_invbuf();	/* let_to_name (invent.c) */
 	free_youbuf();	/* You_buf,&c (pline.c) */
 	tmp_at(DISP_FREEMEM, 0);	/* temporary display effects */
@@ -1313,6 +1321,7 @@ freedynamicdata()
 	/* level-specific data */
 	free_timers(RANGE_LEVEL);
 	free_light_sources(RANGE_LEVEL);
+    clear_regions();
 	freemonchn(fmon);
 	free_worm();		/* release worm segment information */
 	freetrapchn(ftrap);
@@ -1350,6 +1359,7 @@ freedynamicdata()
 #ifdef STATUS_VIA_WINDOWPORT
 	status_finish();
 #endif
+	sysopt_release();	/* SYSCF strings */
 	return;
 }
 

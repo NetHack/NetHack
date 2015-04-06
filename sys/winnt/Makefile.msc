@@ -1,4 +1,4 @@
-# NetHack 3.5	Makefile.msc	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+# NetHack 3.5	Makefile.msc	$NHDT-Date: 1426967393 2015/03/21 19:49:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.72 $ */
 #       Copyright (c) NetHack PC Development Team 1993-2015
 #
 #==============================================================================
@@ -13,8 +13,10 @@
 #
 #==============================================================================
 #   This is used for building two versions of NetHack:
+#
 #   A tty port utilizing the Win32 Console I/O subsystem, Console
 #       NetHack;
+#
 #   A Win32 native port built on the Windows API, Graphical NetHack or
 #       NetHackW.
 #
@@ -77,6 +79,13 @@ TARGET_CPU=x86
 
 GAMEDIR = ..\binary               # Game directory
 
+#
+#---------------------------------------------------------------
+# 4. Do you want debug information in the executable?
+#
+
+DEBUGINFO = Y
+
 # This marks the end of the BUILD DECISIONS section.
 #==============================================================================
 #
@@ -109,7 +118,7 @@ DOC   = ..\doc       # NetHack documentation files
 UTIL  = ..\util      # Utility source
 SRC   = ..\src       # Main source
 SSYS  = ..\sys\share # Shared system files
-NTSYS = ..\sys\winnt # NT Win32 specific files
+MSWSYS= ..\sys\winnt # mswin specific files
 TTY   = ..\win\tty   # window port files (tty)
 WIN32 = ..\win\win32 # window port files (Win32)
 WSHR  = ..\win\share # Tile support files 
@@ -182,42 +191,68 @@ guilibs     = $(winlibs)
 #=============================================
 
 #
+#=============================================
+# Visual Studio versions >= 2013 specific stuff
+#=============================================
+
+!IF "$(TARGET_CPU)" == ""
+TARGET_CPU=x86
+!ENDIF
+
+# Common compiler flags:
+#   -c   - compile without linking
+#   -W3  - Set warning level to level 3    (-W4 for 64-bit compilations)
+#   -Zi  - generate debugging information
+#   -Od  - disable all optimizations
+#   -Ox  - use maximum optimizations
+#   -Zd  - generate only public symbols and line numbers for debugging
+#   -GS  - enable security checks
+#
+ccommon=-c -DCRTAPI1=_cdecl -DCRTAPI2=_cdecl -nologo -GS -c
+lflags=/INCREMENTAL:NO /NOLOGO
+
+!IF "$(TARGET_CPU)" == "x86"
+cflags = $(ccommon) -D_X86_=1  -DWIN32 -D_WIN32 -W3
+scall  = -Gz
+
+!ELSEIF "$(TARGET_CPU)" == "x64"
+cflags = $(ccommon) -D_AMD64_=1 -DWIN64 -D_WIN64  -DWIN32 -D_WIN32
+cflags = $(cflags) -W4
+scall  =
+!ENDIF
+
+# declarations for use on Intel x86 systems
+!IF "$(TARGET_CPU)" == "x86"
+DLLENTRY = @12
+!ENDIF
+
+# declarations for use on AMD64 systems
+!IF "$(TARGET_CPU)" == "x64"
+DLLENTRY =
+!ENDIF
+
+# for Windows applications
+conlflags = $(lflags) -subsystem:console,$(EXEVER)
+guilflags = $(lflags) -subsystem:windows,$(EXEVER)
+dlllflags = $(lflags) -entry:_DllMainCRTStartup$(DLLENTRY) -dll
+
+# basic subsystem specific libraries, less the C Run-Time
+baselibs    = kernel32.lib $(optlibs) $(winsocklibs) advapi32.lib
+winlibs     = $(baselibs) user32.lib gdi32.lib comdlg32.lib winspool.lib
+
+# for Windows applications that use the C Run-Time libraries
+conlibs     = $(baselibs)
+guilibs     = $(winlibs)
+#
+# End of VS2013 and greater stuff
+#=============================================
+
+#
 #==========================================
 # Exe File Info.
 #==========================================
  
-# Yacc/Lex ... if you got 'em.
-#
-# If you have yacc and lex programs (or work-alike such as bison 
-# and flex), comment out the upper two macros and uncomment 
-# the lower two.
-#
-
-DO_YACC = YACC_MSG
-DO_LEX  = LEX_MSG
-#DO_YACC  = YACC_ACT
-#DO_LEX   = LEX_ACT
-
-# - Specify your yacc and lex programs (or work-alikes) here.
-
-#YACC	= bison -y
-YACC   = byacc
-#YACC	= yacc
-
-#LEX	= lex
-LEX	= flex
-
-#
-# - Specify your flex skeleton file (if needed).
-#
-
-FLEXSKEL =
-#FLEXSKEL = -S../tools/flex.ske
-
-YTABC   = y_tab.c
-YTABH   = y_tab.h
-LEXYYC  = lexyy.c
-
+#        
 #
 # Optional high-quality BSD random number generation routines
 # (see pcconf.h). Set to nothing if not used.
@@ -225,18 +260,6 @@ LEXYYC  = lexyy.c
 
 RANDOM	= $(OBJ)\random.o
 #RANDOM	=
-
-#
-#  Uncomment the next 2 lines _ONLY_ if you DO NOT want any
-#  debug capability in the object files, or in the NetHack executable.
-#  Comment them if you want debug capability.
-
-#ldebug =
-#cdebug =
-
-#
-# Compiler and Linker flags
-#
 
 PRECOMPHEAD = N			# set to Y if you want to use precomp. headers
 
@@ -301,34 +324,90 @@ DLBFLG =
 #==========================================
 #==========================================
 
-PDBFILE= /PDB:"$(O)$(GAME).PDB"
-MAPFILE= /MAP:"$(O)$(GAME).MAP"
-INCLDIR= /I..\include
+!IF "$(TARGET_CPU)" == ""
+TARGET_CPU=x86
+!ENDIF
 
-!IF ("$(ldebug)" != "")
-!IF ("$(ldebug)" != "/RELEASE")
+!IF "$(_NMAKE_VER)" == "10.00.40219.01"
+CL2013=
+!ELSE
+! IF ($(VSVER) > 2010)
+CL2013=-sdl
+! ENDIF
+!ENDIF
+
+ccommon= -c -nologo -D"_CONSOLE" -D"_CRT_NONSTDC_NO_DEPRECATE" -D"_CRT_SECURE_NO_DEPRECATE" \
+	-D"_LIB" -D"_SCL_SECURE_NO_DEPRECATE" -D"_VC80_UPGRADE=0x0600" -D"DLB" -D"_MBCS" \
+	-DCRTAPI1=_cdecl -DCRTAPI2=_cdecl -D"NDEBUG" -D"YY_NO_UNISTD_H" -EHsc -fp:precise -Gd -GF -GS -Gy \
+	$(CL2013) -WX- -Zc:forScope -Zc:wchar_t -Zi
+cdebug= -analyze- -D"_DEBUG" -Gm -MTd -RTC1 -Od
+crelease= -analyze- -D"_MBCS" -errorReport:prompt -GL -Gm- -MT -O2 -Ot -Ox -Oy
+
+lcommon= /NOLOGO /INCREMENTAL:NO
+
+!IF "$(DEBUGINFO)" == "Y"
 ldebug = /DEBUG
-!ENDIF
+cflags1=$(ccommon) $(cdebug)
+lflags1=$(lcommon) $(ldebug)
+!ELSE
+ldebug=
+cflags1=$(ccomon) $(crelease)
+lflags1=$(lcommon) $(ldebug)
 !ENDIF
 
-!IF ("$(cdebug)" != "")
-!IF ("$(cdebug)" != "-Ox -DNDEBUG")
-cdebug = -Zi -Od
-!ENDIF
+lflags= $(lflags1)
+
+!IF "$(TARGET_CPU)" == "x86"
+cflags = $(cflags1) -D_X86_=1  -DWIN32 -D_WIN32 -W3
+scall  = -Gz
+
+!ELSEIF "$(TARGET_CPU)" == "x64"
+cflags = $(cflags1) -D_AMD64_=1 -DWIN64 -D_WIN64  -DWIN32 -D_WIN32 -W4
+scall  =
 !ENDIF
 
-cflags2 = $(cflags:-W4=-W3)
-#More verbose below
-#cflags2 = $(cflags) -wd4131
-#cflags2 = $(cflags:-W4=-Wall)
+!IF "$(_NMAKE_VER)" == "10.00.40219.01"
+cflags = $(cflags:-W4=-W3)
+!ENDIF
+
+#More verbose warning output options below
+#cflags = $(cflags:-W4=-wd4131
+#cflags = $(cflags:-W4=-Wall)
+#cflags = $(cflags:-W3=-wd4131
+#cflags = $(cflags:-W3=-Wall)
+
+# declarations for use on Intel x86 systems
+!IF "$(TARGET_CPU)" == "x86"
+DLLENTRY = @12
+!ENDIF
+
+# declarations for use on AMD64 systems
+!IF "$(TARGET_CPU)" == "x64"
+DLLENTRY =
+!ENDIF
+
+# for Windows applications
+conlflags = $(lflags) -subsystem:console,$(EXEVER)
+guilflags = $(lflags) -subsystem:windows,$(EXEVER)
+dlllflags = $(lflags) -entry:_DllMainCRTStartup$(DLLENTRY) -dll
+
+# basic subsystem specific libraries, less the C Run-Time
+baselibs    = kernel32.lib $(optlibs) $(winsocklibs) advapi32.lib
+winlibs     = $(baselibs) user32.lib gdi32.lib comdlg32.lib winspool.lib
+
+# for Windows applications that use the C Run-Time libraries
+conlibs     = $(baselibs)
+guilibs     = $(winlibs)
+#
+
+INCLDIR= /I..\include
 
 #==========================================
 # Util builds
 #==========================================
 
-cflagsUtil = $(cdebug) $(cflags2) $(INCLDIR) \
-	     $(WINPFLAG) $(DLBFLG)
-lflagsUtil = $(ldebug) $(lflags) $(conlibs)
+cflagsUtil = $(cflags) $(INCLDIR) $(WINPFLAG) $(DLBFLG)
+lflagsUtil = $(lflags) $(conlibs)
 
 #==========================================
 # - Game build
@@ -340,15 +419,13 @@ LIBS= user32.lib winmm.lib $(ZLIB)
 
 !IF ("$(GRAPHICAL)"=="Y")
 
-cflagsGame = $(cdebug) $(cflags2) $(guiflags) $(INCLDIR) \
-	     $(WINPFLAG) $(DLBFLG)
-lflagsGame = $(ldebug) $(lflags) $(guilibs) $(GAMEPDBFILE) $(GAMEMAPFILE)
+cflagsGame = $(cflags) $(guiflags) $(INCLDIR) $(WINPFLAG) $(DLBFLG)
+lflagsGame = $(lflags) $(guilibs) $(GAMEPDBFILE) $(GAMEMAPFILE)
 
 !ELSE
 
-cflagsGame = $(cdebug) $(cflags2) $(conflags) $(INCLDIR) \
-	     $(WINPFLAG) $(DLBFLG)
-lflagsGame = $(ldebug) $(lflags) $(conlibs) $(GAMEPDBFILE) $(GAMEMAPFILE)
+cflagsGame = $(cflags) $(conflags) $(INCLDIR) $(WINPFLAG) $(DLBFLG)
+lflagsGame = $(lflags) $(conlibs) $(GAMEPDBFILE) $(GAMEMAPFILE)
 
 !ENDIF
 
@@ -387,10 +464,10 @@ DLB =
 # Rules for files in sys\winnt
 #==========================================
 
-{$(NTSYS)}.c{$(OBJ)}.o:
+{$(MSWSYS)}.c{$(OBJ)}.o:
 	@$(CC) $(cflagsUtil)  -Fo$@  $<
 
-{$(NTSYS)}.h{$(INCL)}.h:
+{$(MSWSYS)}.h{$(INCL)}.h:
 	@copy $< $@
 
 #==========================================
@@ -435,7 +512,7 @@ DLB =
 # referenced later on in the Makefile.
 #
 
-DEFFILE = $(NTSYS)\$(GAME).def
+DEFFILE = $(MSWSYS)\$(GAME).def
 
 #
 # Shorten up the location for some files
@@ -449,20 +526,15 @@ U  = $(UTIL)^\
 # Utility Objects.
 #
 
-MAKESRC        = $(U)makedefs.c
+MAKESRC       = $(U)makedefs.c
 
-SPLEVSRC       = $(U)lev_yacc.c	$(U)lev_$(LEX).c $(U)lev_main.c  $(U)panic.c
+MAKEOBJS      = $(O)makedefs.o $(O)monst.o $(O)objects.o
 
-DGNCOMPSRC     = $(U)dgn_yacc.c	$(U)dgn_$(LEX).c $(U)dgn_main.c
+LEVCOMPOBJS   = $(O)lev_yacc.o	$(O)lev_lex.o	$(O)lev_main.o	\
+		$(O)alloc.o $(O)decl.o	$(O)drawing.o	$(O)monst.o	$(O)objects.o	$(O)panic.o
 
-MAKEOBJS       = $(O)makedefs.o $(O)monst.o $(O)objects.o
-
-SPLEVOBJS      = $(O)lev_yacc.o	$(O)lev_$(LEX).o $(O)lev_main.o \
-		 $(O)alloc.o	$(O)decl.o	$(O)drawing.o \
-		 $(O)monst.o	$(O)objects.o	$(O)panic.o
-
-DGNCOMPOBJS    = $(O)dgn_yacc.o	$(O)dgn_$(LEX).o $(O)dgn_main.o \
-		 $(O)alloc.o	$(O)panic.o
+DGNCOMPOBJS   = $(O)dgn_yacc.o	$(O)dgn_lex.o	$(O)dgn_main.o	\
+		$(O)alloc.o	$(O)panic.o
 
 RECOVOBJS      = $(O)recover.o
 
@@ -619,15 +691,16 @@ $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
 	copy $(DAT)\*.lev         $(GAMEDIR)
 	if exist $(GAMEDIR)\makefile del $(GAMEDIR)\makefile
 ! ENDIF
+	if not exist $(GAMEDIR)\sysconf copy $(MSWSYS)\sysconf $(GAMEDIR)
 	if exist $(DAT)\symbols copy $(DAT)\symbols $(GAMEDIR)
 	if exist $(DOC)\guidebook.txt copy $(DOC)\guidebook.txt $(GAMEDIR)\Guidebook.txt
 	if exist $(DOC)\nethack.txt copy $(DOC)\nethack.txt $(GAMEDIR)\NetHack.txt
 	@if exist $(O)$(GAME).PDB copy $(O)$(GAME).pdb $(GAMEDIR)\$(GAME).pdb
 	@if exist $(GAMEDIR)\$(GAME).PDB echo NOTE: You may want to remove $(GAMEDIR)\$(GAME).pdb to conserve space
-	-copy $(NTSYS)\defaults.nh   $(GAMEDIR)\defaults.nh
+	-copy $(MSWSYS)\defaults.nh   $(GAMEDIR)\defaults.nh
 	echo install done > $@
 
-#	copy $(NTSYS)\winnt.hlp    $(GAMEDIR)
+#	copy $(MSWSYS)\winnt.hlp    $(GAMEDIR)
 
 recover: $(U)recover.exe
 	if exist $(U)recover.exe copy $(U)recover.exe  $(GAMEDIR)
@@ -686,8 +759,8 @@ $(NHRES): $(TILEBMP16) $(WIN32)\winhack.rc $(WIN32)\mnsel.bmp \
 	$(WIN32)\splash.bmp
 	@$(rc) -r -fo$@ -i$(WIN32) -dNDEBUG $(WIN32)\winhack.rc
 !ELSE
-$(NHRES): $(NTSYS)\console.rc $(NTSYS)\NetHack.ico
-	@$(rc) -r -fo$@ -i$(NTSYS) -dNDEBUG $(NTSYS)\console.rc
+$(NHRES): $(MSWSYS)\console.rc $(MSWSYS)\NetHack.ico
+	@$(rc) -r -fo$@ -i$(MSWSYS) -dNDEBUG $(MSWSYS)\console.rc
 !ENDIF
 
 #==========================================
@@ -721,7 +794,7 @@ $(NHRES): $(NTSYS)\console.rc $(NTSYS)\NetHack.ico
 
 $(GAMEFILE) : $(ALLOBJ) $(NHRES) $(O)gamedir.tag $(WINDLLS)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
-	@echo Linking....
+	@echo Linking $@
 	$(link) $(lflagsGame) /STACK:2048 $(LIBS) $(COMCTRL) -out:$@ @<<$(GAME).lnk
 		$(ALLOBJ:^	=^
 		) $(NHRES)
@@ -799,12 +872,14 @@ $(GAMEDIR)\nhraykey.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
 # Makedefs Stuff
 #==========================================
 $(U)nhsizes.exe: $(O)nhsizes.o
+	@echo Linking $@
 	$(link) $(lflagsUtil) -out:$@ $(O)nhsizes.o $(O)panic.o $(O)alloc.o
 
 $(O)nhsizes.o: $(CONFIG_H) nhsizes.c
 	@$(CC) $(cflagsUtil) -Fo$@ nhsizes.c
 
 $(U)makedefs.exe:	$(MAKEOBJS)
+	@echo Linking $@
 	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(MAKEOBJS)
 
 $(O)makedefs.o: $(CONFIG_H)	$(INCL)\monattk.h $(INCL)\monflag.h   $(INCL)\objclass.h \
@@ -812,7 +887,7 @@ $(O)makedefs.o: $(CONFIG_H)	$(INCL)\monattk.h $(INCL)\monflag.h   $(INCL)\objcla
 		 $(U)makedefs.c
 	@if not exist $(OBJ)\*.* echo creating directory $(OBJ)
 	@if not exist $(OBJ)\*.* mkdir $(OBJ)
-	$(CC) $(cflagsUtil) -Fo$@ $(U)makedefs.c
+	@$(CC) $(cflagsUtil) -Fo$@ $(U)makedefs.c
 
 #
 #  date.h should be remade every time any of the source or include
@@ -840,22 +915,31 @@ $(INCL)\vis_tab.h: $(U)makedefs.exe
 $(SRC)\vis_tab.c: $(U)makedefs.exe
 	$(U)makedefs -z
 
+$(DAT)\engrave: $(DAT)\engrave.txt $(U)makedefs.exe
+	..\util\makedefs -s
+$(DAT)\epitaph: $(DAT)\epitaph.txt $(U)makedefs.exe
+	..\util\makedefs -s
+$(DAT)\bogusmon: $(DAT)\bogusmon.txt $(U)makedefs.exe
+	..\util\makedefs -s
+
+
 #==========================================
 # uudecode utility and uuencoded targets
 #==========================================
 
 $(U)uudecode.exe: $(O)uudecode.o
+	@echo Linking $@
 	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)uudecode.o
 
 $(O)uudecode.o: $(SSYS)\uudecode.c
 	@$(CC) $(cflagsUtil) /D_CRT_SECURE_NO_DEPRECATE -Fo$@ $(SSYS)\uudecode.c
 
-$(NTSYS)\NetHack.ico : $(U)uudecode.exe $(NTSYS)\nhico.uu 
-	chdir $(NTSYS)
+$(MSWSYS)\NetHack.ico : $(U)uudecode.exe $(MSWSYS)\nhico.uu 
+	chdir $(MSWSYS)
 	..\..\util\uudecode.exe nhico.uu
 	chdir ..\..\src
 
-$(WIN32)\NetHack.ico : $(U)uudecode.exe $(NTSYS)\nhico.uu 
+$(WIN32)\NetHack.ico : $(U)uudecode.exe $(MSWSYS)\nhico.uu 
 	chdir $(WIN32)
 	..\..\util\uudecode.exe ../../sys/winnt/nhico.uu
 	chdir ..\..\src
@@ -890,129 +974,62 @@ $(WIN32)\splash.bmp: $(U)uudecode.exe $(WIN32)\splash.uu
 	..\..\util\uudecode.exe splash.uu
 	chdir ..\..\src
 
-#==========================================
+#=================================================
 # Level Compiler Stuff
-#==========================================
+#=================================================
+#
+# defer to the steps in ..\win\win32\levstuff.mak
+#
 
-LEVCFLAGS=-c -nologo -DWINVER=0x0400 -DWIN32 -D_WIN32 \
-	   -D_MT -MT -I..\include -nologo -Z7 -Od -DDLB
+$(U)lev_yacc.c $(INCL)\lev_comp.h: $(U)lev_comp.y
+	nmake -nologo -f ..\win\win32\levstuff.mak default
 
-$(U)levcomp.exe: $(SPLEVOBJS)
-	@echo Linking $@...
+$(O)lev_yacc.o: $(HACK_H)   $(SP_LEV_H) $(INCL)\lev_comp.h $(U)lev_yacc.c
+	@$(CC) $(cflagsUtil) -Fo$@ $(U)lev_yacc.c
+
+$(O)lev_lex.o: $(HACK_H) $(INCL)\lev_comp.h $(SP_LEV_H) \
+               $(U)lev_lex.c
+	@$(CC) $(cflagsUtil) -Fo$@ $(U)lev_lex.c
+
+$(O)lev_main.o:	$(U)lev_main.c $(HACK_H) $(SP_LEV_H)
+	@$(CC) $(cflagsUtil) -Fo$@ $(U)lev_main.c
+
+$(U)levcomp.exe: $(LEVCOMPOBJS)
+	@echo Linking $@
 	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
- 		$(SPLEVOBJS:^	=^
+ 		$(LEVCOMPOBJS:^	=^
 		)
 <<
 
-$(O)lev_yacc.o: $(HACK_H)   $(SP_LEV_H) $(INCL)\lev_comp.h $(U)lev_yacc.c
-	@$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)lev_yacc.c
-
-$(O)lev_$(LEX).o: $(HACK_H)   $(INCL)\lev_comp.h $(SP_LEV_H) \
-               $(U)lev_$(LEX).c
-	@$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)lev_$(LEX).c
-
-$(O)lev_main.o:	$(U)lev_main.c $(HACK_H)   $(SP_LEV_H)
-	@$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)lev_main.c
-
-
-$(U)lev_yacc.c $(INCL)\lev_comp.h : $(U)lev_comp.y
-!	IF "$(DO_YACC)"=="YACC_ACT"
-	   chdir $(UTIL)
-	   $(YACC) -d lev_comp.y
-	   copy $(YTABC) lev_yacc.c
-	   copy $(YTABH) $(INCL)\lev_comp.h
-	   @del $(YTABC)
-	   @del $(YTABH)
-	   chdir $(SRC)
-!	ELSE
-	   @echo $(U)lev_comp.y has changed.
-	   @echo To update $(U)lev_yacc.c and $(INCL)\lev_comp.h run $(YACC).
-	   @echo ---
-	   @echo For now, we will copy the prebuilt lev_yacc.c and 
-	   @echo lev_comp.h from $(SSYS) into $(UTIL) and use them.
-	   @copy $(SSYS)\lev_yacc.c $(U)lev_yacc.c >nul
-	   @copy $(SSYS)\lev_comp.h $(INCL)\lev_comp.h >nul
-	   @echo /**/ >>$(U)lev_yacc.c
-	   @echo /**/ >>$(INCL)\lev_comp.h
-!	ENDIF
-
-$(U)lev_$(LEX).c: $(U)lev_comp.l
-!	IF "$(DO_LEX)"=="LEX_ACT"
-	   chdir $(UTIL)
-	   $(LEX) $(FLEXSKEL) lev_comp.l
-	   copy $(LEXYYC) $@
-	   @del $(LEXYYC)
-	   chdir $(SRC)
-!	ELSE
-	   @echo $(U)lev_comp.l has changed. To update $@ run $(LEX).
-	   @echo ---
-	   @echo For now, we will copy the prebuilt lev_lex.c 
-	   @echo from $(SSYS) into $(UTIL) and use it.
-	   @copy $(SSYS)\lev_lex.c $@ >nul
-	   @echo /**/ >>$@
-!	ENDIF
-
-#==========================================
+#=================================================
 # Dungeon Compiler Stuff
-#==========================================
+#=================================================
+#
+# defer to the steps in ..\win\win32\dgnstuff.mak
+#
+$(U)dgn_yacc.c $(INCL)\dgn_comp.h : $(U)dgn_comp.y
+	nmake -nologo -f ..\win\win32\dgnstuff.mak default
+
+$(O)dgn_yacc.o:	$(HACK_H)   $(DGN_FILE_H) $(INCL)\dgn_comp.h $(U)dgn_yacc.c
+	@$(CC) $(cflagsUtil) -Fo$@ $(U)dgn_yacc.c
+
+$(O)dgn_lex.o: $(HACK_H)   $(DGN_FILE_H)  $(INCL)\dgn_comp.h \
+	$(U)dgn_lex.c
+	@$(CC) $(cflagsUtil) -Fo$@ $(U)dgn_lex.c
+
+$(O)dgn_main.o:	$(HACK_H) $(U)dgn_main.c
+	@$(CC) $(cflagsUtil) -Fo$@ $(U)dgn_main.c
 
 $(U)dgncomp.exe: $(DGNCOMPOBJS)
-    @echo Linking $@...
+    	@echo Linking $@
 	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(DGNCOMPOBJS:^	=^
 		)
 <<
 
-$(O)dgn_yacc.o:	$(HACK_H)   $(DGN_FILE_H) $(INCL)\dgn_comp.h $(U)dgn_yacc.c
-	@$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)dgn_yacc.c
-
-$(O)dgn_$(LEX).o: $(HACK_H)   $(DGN_FILE_H)  $(INCL)\dgn_comp.h \
-	$(U)dgn_$(LEX).c
-	@$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)dgn_$(LEX).c
-
-$(O)dgn_main.o:	$(HACK_H) $(U)dgn_main.c
-	@$(CC) $(LEVCFLAGS) -W0 -Fo$@ $(U)dgn_main.c
-
-$(U)dgn_yacc.c $(INCL)\dgn_comp.h : $(U)dgn_comp.y
-!	IF "$(DO_YACC)"=="YACC_ACT"
-	   chdir $(UTIL)
-	   $(YACC) -d dgn_comp.y
-	   copy $(YTABC) dgn_yacc.c
-	   copy $(YTABH) $(INCL)\dgn_comp.h
-	   @del $(YTABC)
-	   @del $(YTABH)
-	   chdir $(SRC)
-!	ELSE
-	   @echo $(U)dgn_comp.y has changed. To update dgn_yacc.c and 
-	   @echo $(INCL)\dgn_comp.h run $(YACC).
-	   @echo ---
-	   @echo For now, we will copy the prebuilt $(U)dgn_yacc.c and 
-	   @echo dgn_comp.h from $(SSYS) into $(UTIL) and use them.
-	   @copy $(SSYS)\dgn_yacc.c $(U)dgn_yacc.c >nul
-	   @copy $(SSYS)\dgn_comp.h $(INCL)\dgn_comp.h >nul
-	   @echo /**/ >>$(U)dgn_yacc.c
-	   @echo /**/ >>$(INCL)\dgn_comp.h
-!	ENDIF
-
-$(U)dgn_$(LEX).c: $(U)dgn_comp.l
-!	IF "$(DO_LEX)"=="LEX_ACT"
-	   chdir $(UTIL)
-	   $(LEX) $(FLEXSKEL)  dgn_comp.l
-	   copy $(LEXYYC) $@
-	   @del $(LEXYYC)
-	   chdir $(SRC)
-!	ELSE
-	   @echo $(U)dgn_comp.l has changed. To update $@ run $(LEX).
-	   @echo ---
-	   @echo For now, we will copy the prebuilt dgn_lex.c 
-	   @echo from $(SSYS) into $(UTIL) and use it.
-	   @copy $(SSYS)\dgn_lex.c $@ >nul
-	   @echo /**/ >>$@
-!	ENDIF
-
-#==========================================
+#=================================================
 # Create directory for holding object files
-#==========================================
+#=================================================
 
 $(O)obj.tag:
 	@if not exist $(OBJ)\*.* echo creating directory $(OBJ)
@@ -1050,11 +1067,11 @@ envchk:
 #==========================================
 
 #===========================================
-# Header files NOT distributed in ..\include
+# Header files NOT distributed in $(INCL)
 #===========================================
 
-$(INCL)\win32api.h: $(NTSYS)\win32api.h
-	copy $(NTSYS)\win32api.h $@
+$(INCL)\win32api.h: $(MSWSYS)\win32api.h
+	copy $(MSWSYS)\win32api.h $@
 
 
 #==========================================
@@ -1062,6 +1079,7 @@ $(INCL)\win32api.h: $(NTSYS)\win32api.h
 #==========================================
 
 $(U)dlb_main.exe: $(DLBOBJ) $(O)dlb.o
+	@echo Linking $@
 	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(O)dlb_main.o
 		$(O)dlb.o
@@ -1075,13 +1093,13 @@ $(O)dlb.o:	$(O)dlb_main.o $(O)alloc.o $(O)panic.o $(INCL)\dlb.h
 $(O)dlb_main.o: $(UTIL)\dlb_main.c $(INCL)\config.h $(INCL)\dlb.h
 	@$(CC) $(cflagsUtil) /Fo$@ $(UTIL)\dlb_main.c
 
-$(DAT)\porthelp: $(NTSYS)\porthelp
-	@copy $(NTSYS)\porthelp $@ >nul
+$(DAT)\porthelp: $(MSWSYS)\porthelp
+	@copy $(MSWSYS)\porthelp $@ >nul
 
 nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 	$(DAT)\quest.dat $(DAT)\rumors $(DAT)\help $(DAT)\hh $(DAT)\cmdhelp \
 	$(DAT)\history $(DAT)\opthelp $(DAT)\wizhelp $(DAT)\dungeon $(DAT)\porthelp \
-	$(DAT)\license $(O)sp_lev.tag
+	$(DAT)\license $(DAT)\engrave $(DAT)\epitaph $(DAT)\bogusmon $(O)sp_lev.tag
 	cd $(DAT)
 	echo data >dlb.lst
 	echo oracles >>dlb.lst
@@ -1091,6 +1109,9 @@ nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 	if exist porthelp echo porthelp >>dlb.lst
 	echo quest.dat >>dlb.lst
 	echo rumors >>dlb.lst
+	echo engrave >>dlb.lst
+	echo epitaph >>dlb.lst
+	echo bogusmon >>dlb.lst
 	echo help >>dlb.lst
 	echo hh >>dlb.lst
 	echo cmdhelp >>dlb.lst
@@ -1108,10 +1129,11 @@ nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 #==========================================
 
 $(U)recover.exe: $(RECOVOBJS)
+	@echo Linking $@
 	$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(RECOVOBJS)
 
 $(O)recover.o: $(CONFIG_H) $(U)recover.c $(INCL)\win32api.h
-	$(CC) $(cflagsUtil) -Fo$@ $(U)recover.c
+	@$(CC) $(cflagsUtil) -Fo$@ $(U)recover.c
 
 #==========================================
 #  Tile Mapping
@@ -1122,6 +1144,7 @@ $(SRC)\tile.c: $(U)tilemap.exe
 	@$(U)tilemap
 
 $(U)tilemap.exe: $(O)tilemap.o
+	@echo Linking $@
 	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)tilemap.o
 
 $(O)tilemap.o: $(WSHR)\tilemap.c $(HACK_H)
@@ -1153,7 +1176,7 @@ $(O)tilete32.o: $(WSHR)\tiletext.c  $(CONFIG_H) $(TILE_H)
 #==========================================
 
 $(U)gif2txt.exe: $(GIFREADERS) $(TEXT_IO)
-    @echo Linking $@...
+    	@echo Linking $@
 	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(GIFREADERS:^	=^
 		)
@@ -1162,7 +1185,7 @@ $(U)gif2txt.exe: $(GIFREADERS) $(TEXT_IO)
 <<
 
 $(U)gif2tx32.exe: $(GIFREADERS32) $(TEXT_IO32)
-    @echo Linking $@...
+    	@echo Linking $@
 	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(GIFREADERS32:^	=^
 		)
@@ -1171,7 +1194,7 @@ $(U)gif2tx32.exe: $(GIFREADERS32) $(TEXT_IO32)
 <<
 
 $(U)txt2ppm.exe: $(PPMWRITERS) $(TEXT_IO)
-    @echo Linking $@...
+    	@echo Linking $@
 	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(PPMWRITERS:^	=^
 		)
@@ -1193,7 +1216,7 @@ $(TILEBMP32):
 !ENDIF
 
 $(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXT_IO)
-    @echo Linking $@...
+    	@echo Linking $@
 	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(O)tile2bmp.o
 		$(TEXT_IO:^  =^
@@ -1201,7 +1224,7 @@ $(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXT_IO)
 <<
 
 $(U)til2bm32.exe: $(O)til2bm32.o $(TEXT_IO32)
-    @echo Linking $@...
+    	@echo Linking $@
 	@$(link) $(lflagsUtil) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(O)til2bm32.o
 		$(TEXT_IO32:^  =^
@@ -1238,6 +1261,9 @@ spotless: clean
 	if exist $(U)*.map         del $(U)*.map
 	if exist $(DAT)\data       del $(DAT)\data
 	if exist $(DAT)\rumors     del $(DAT)\rumors
+	if exist $(DAT)\engrave    del $(DAT)\engrave
+	if exist $(DAT)\epitaph    del $(DAT)\epitaph
+	if exist $(DAT)\bogusmon   del $(DAT)\bogusmon
 	if exist $(DAT)\???-fil?.lev	del $(DAT)\???-fil?.lev
 	if exist $(DAT)\???-goal.lev	del $(DAT)\???-goal.lev
 	if exist $(DAT)\???-loca.lev	del $(DAT)\???-loca.lev
@@ -1321,6 +1347,14 @@ clean:
 	if exist $(O)sp_lev.tag   del $(O)sp_lev.tag
 	if exist $(O)uudecode.MAP del $(O)uudecode.MAP
 	if exist $(O)uudecode.PDB del $(O)uudecode.PDB
+	rem
+	rem defer to the steps in ..\win\win32\levstuff.mak
+	rem 
+	nmake -nologo -f ..\win\win32\levstuff.mak clean
+	rem
+	rem defer to the steps in ..\win\win32\dgnstuff.mak
+	rem
+	nmake -nologo -f ..\win\win32\dgnstuff.mak clean
 
 ! IF ("$(WINPFLAG)"!="")
 	if exist $(TILEBMP16)        del $(TILEBMP16)
@@ -1357,14 +1391,14 @@ $(DAT)\dungeon: $(O)utility.tag  $(DAT)\dungeon.def
 # NT dependencies
 #
 
-$(O)nttty.o:   $(HACK_H) $(TILE_H) $(INCL)\win32api.h $(NTSYS)\nttty.c
-	@$(CC) $(cflagsUtil) -I$(WSHR) -Fo$@  $(NTSYS)\nttty.c
-$(O)nhkeys.o:   $(HACK_H) $(TILE_H) $(INCL)\win32api.h $(NTSYS)\nhkeys.c
-	@$(CC) $(cflagsUtil) -I$(WSHR) -Fo$@  $(NTSYS)\nhkeys.c
-$(O)winnt.o: $(HACK_H) $(INCL)\win32api.h $(NTSYS)\winnt.c
-	@$(CC) $(cflagsUtil) -Fo$@  $(NTSYS)\winnt.c
-$(O)ntsound.o: $(HACK_H) $(NTSYS)\ntsound.c
-	@$(CC) $(cflagsUtil)  -Fo$@ $(NTSYS)\ntsound.c
+$(O)nttty.o:   $(HACK_H) $(TILE_H) $(INCL)\win32api.h $(MSWSYS)\nttty.c
+	@$(CC) $(cflagsUtil) -I$(WSHR) -Fo$@  $(MSWSYS)\nttty.c
+$(O)nhkeys.o:   $(HACK_H) $(TILE_H) $(INCL)\win32api.h $(MSWSYS)\nhkeys.c
+	@$(CC) $(cflagsUtil) -I$(WSHR) -Fo$@  $(MSWSYS)\nhkeys.c
+$(O)winnt.o: $(HACK_H) $(INCL)\win32api.h $(MSWSYS)\winnt.c
+	@$(CC) $(cflagsUtil) -Fo$@  $(MSWSYS)\winnt.c
+$(O)ntsound.o: $(HACK_H) $(MSWSYS)\ntsound.c
+	@$(CC) $(cflagsUtil)  -Fo$@ $(MSWSYS)\ntsound.c
 
 # 
 # util dependencies

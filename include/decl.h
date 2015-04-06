@@ -1,5 +1,4 @@
-/* NetHack 3.5	decl.h	$NHDT-Date: 1425081976 2015/02/28 00:06:16 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.50 $ */
-/* NetHack 3.5	decl.h	$Date: 2011/12/29 20:06:27 $  $Revision: 1.44 $ */
+/* NetHack 3.5	decl.h	$NHDT-Date: 1425081976 2015/02/28 00:06:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.50 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -28,6 +27,7 @@ E char SAVEP[];
 E NEARDATA int bases[MAXOCLASSES];
 
 E NEARDATA int multi;
+E const char *multi_reason;
 E NEARDATA int nroom;
 E NEARDATA int nsubroom;
 E NEARDATA int occtime;
@@ -67,6 +67,8 @@ E struct dgn_topology {		/* special dungeon levels for speed */
     xchar	d_mines_dnum, d_quest_dnum;
     d_level	d_qstart_level, d_qlocate_level, d_nemesis_level;
     d_level	d_knox_level;
+    d_level	d_mineend_level;
+    d_level	d_sokoend_level;
 } dungeon_topology;
 /* macros for accesing the dungeon levels by their old names */
 #define oracle_level		(dungeon_topology.d_oracle_level)
@@ -97,6 +99,8 @@ E struct dgn_topology {		/* special dungeon levels for speed */
 #define qlocate_level		(dungeon_topology.d_qlocate_level)
 #define nemesis_level		(dungeon_topology.d_nemesis_level)
 #define knox_level		(dungeon_topology.d_knox_level)
+#define mineend_level		(dungeon_topology.d_mineend_level)
+#define sokoend_level		(dungeon_topology.d_sokoend_level)
 
 E NEARDATA stairway dnstair, upstair;		/* stairs up and down */
 #define xdnstair	(dnstair.sx)
@@ -180,6 +184,7 @@ E NEARDATA struct kinfo {
 
 E long done_money;
 E const char *configfile;
+E char lastconfigfile[BUFSZ];		/* used for messaging */
 E NEARDATA char plname[PL_NSIZ];
 E NEARDATA char dogname[];
 E NEARDATA char catname[];
@@ -240,6 +245,7 @@ E NEARDATA anything zeroany;		/* init'd and defined in decl.c */
 #include "you.h"
 E NEARDATA struct you u;
 E NEARDATA time_t ubirthday;
+E NEARDATA struct u_realtime urealtime;
 
 #include "onames.h"
 #ifndef PM_H		/* (pm.h has already been included via youprop.h) */
@@ -357,9 +363,10 @@ E const char * const monexplain[], invisexplain[], * const oclass_names[];
 #define DATAPREFIX	4	/* this one must match hardcoded value in dlb.c */
 #define SCOREPREFIX	5
 #define LOCKPREFIX	6
-#define CONFIGPREFIX	7
-#define TROUBLEPREFIX	8
-#define PREFIX_COUNT	9
+#define SYSCONFPREFIX	7
+#define CONFIGPREFIX	8
+#define TROUBLEPREFIX	9
+#define PREFIX_COUNT	10
 /* used in files.c; xxconf.h can override if needed */
 # ifndef FQN_MAX_FILENAME
 #define FQN_MAX_FILENAME 512

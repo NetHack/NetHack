@@ -8,7 +8,6 @@
 
 STATIC_VAR NEARDATA struct obj *otmp;
 
-STATIC_DCL void FDECL(urustm, (struct monst *, struct obj *));
 STATIC_DCL boolean FDECL(u_slip_free, (struct monst *,struct attack *));
 STATIC_DCL int FDECL(passiveum, (struct permonst *,struct monst *,struct attack *));
 
@@ -22,7 +21,6 @@ STATIC_DCL void FDECL(missmu,(struct monst *,BOOLEAN_P,struct attack *));
 STATIC_DCL void FDECL(mswings,(struct monst *,struct obj *));
 STATIC_DCL void FDECL(wildmiss, (struct monst *,struct attack *));
 
-STATIC_DCL void FDECL(hurtarmor,(int));
 STATIC_DCL void FDECL(hitmsg,(struct monst *,struct attack *));
 
 /* See comment in mhitm.c.  If we use this a lot it probably should be */
@@ -714,67 +712,6 @@ mattacku(mtmp)
 	return(0);
 }
 
-/*
- * helper function for some compilers that have trouble with hitmu
- */
-
-STATIC_OVL void
-hurtarmor(attk)
-int attk;
-{
-	int	hurt;
-
-	switch(attk) {
-	    /* 0 is burning, which we should never be called with */
-	    case AD_RUST: hurt = 1; break;
-	    case AD_CORR: hurt = 3; break;
-	    default: hurt = 2; break;
-	}
-
-	/* What the following code does: it keeps looping until it
-	 * finds a target for the rust monster.
-	 * Head, feet, etc... not covered by metal, or covered by
-	 * rusty metal, are not targets.  However, your body always
-	 * is, no matter what covers it.
-	 */
-	while (1) {
-	    switch(rn2(5)) {
-	    case 0:
-		if (!uarmh || !rust_dmg(uarmh, xname(uarmh), hurt, FALSE, &youmonst))
-			continue;
-		break;
-	    case 1:
-		if (uarmc) {
-		    (void)rust_dmg(uarmc, xname(uarmc), hurt, TRUE, &youmonst);
-		    break;
-		}
-		/* Note the difference between break and continue;
-		 * break means it was hit and didn't rust; continue
-		 * means it wasn't a target and though it didn't rust
-		 * something else did.
-		 */
-		if (uarm)
-		    (void)rust_dmg(uarm, xname(uarm), hurt, TRUE, &youmonst);
-		else if (uarmu)
-		    (void)rust_dmg(uarmu, xname(uarmu), hurt, TRUE, &youmonst);
-		break;
-	    case 2:
-		if (!uarms || !rust_dmg(uarms, xname(uarms), hurt, FALSE, &youmonst))
-		    continue;
-		break;
-	    case 3:
-		if (!uarmg || !rust_dmg(uarmg, xname(uarmg), hurt, FALSE, &youmonst))
-		    continue;
-		break;
-	    case 4:
-		if (!uarmf || !rust_dmg(uarmf, xname(uarmf), hurt, FALSE, &youmonst))
-		    continue;
-		break;
-	    }
-	    break; /* Out of while loop */
-	}
-}
-
 STATIC_OVL boolean
 diseasemu(mdat)
 struct permonst *mdat;
@@ -982,7 +919,7 @@ hitmu(mtmp, mattk)
 			    if (cloneu())
 				You("divide as %s hits you!", mon_nam(mtmp));
 			}
-			urustm(mtmp, otmp);
+			rustm(&youmonst, otmp);
 		    } else if (mattk->aatyp != AT_TUCH || dmg != 0 ||
 				mtmp != u.ustuck)
 			hitmsg(mtmp, mattk);
@@ -1116,6 +1053,7 @@ dopois:
 			else You("are frozen by %s!", mon_nam(mtmp));
 			nomovemsg = You_can_move_again;
 			nomul(-rnd(10));
+			multi_reason = "paralyzed by a monster";
 			exercise(A_DEX, FALSE);
 		    }
 		}
@@ -1336,12 +1274,12 @@ dopois:
 			rehumanize();
 			break;
 		}
-		hurtarmor(AD_RUST);
+		erode_armor(&youmonst, ERODE_RUST);
 		break;
 	    case AD_CORR:
 		hitmsg(mtmp, mattk);
 		if (mtmp->mcan) break;
-		hurtarmor(AD_CORR);
+		erode_armor(&youmonst, ERODE_CORRODE);
 		break;
 	    case AD_DCAY:
 		hitmsg(mtmp, mattk);
@@ -1353,7 +1291,7 @@ dopois:
 			rehumanize();
 			break;
 		}
-		hurtarmor(AD_DCAY);
+		erode_armor(&youmonst, ERODE_ROT);
 		break;
 	    case AD_HEAL:
 		/* a cancelled nurse is just an ordinary monster,
@@ -2141,26 +2079,6 @@ register int n;
 	}
 }
 
-STATIC_OVL void
-urustm(mon, obj)
-register struct monst *mon;
-register struct obj *obj;
-{
-	int dmgtyp;
-
-	if (!mon || !obj) return; /* just in case */
-	/* AD_ACID is handled in passiveum */
-	if (dmgtype(youmonst.data, AD_CORR))
-	    dmgtyp = 3;
-	else if (dmgtype(youmonst.data, AD_RUST))
-	    dmgtyp = 1;
-	else if (dmgtype(youmonst.data, AD_FIRE))
-	    dmgtyp = 0;
-	else
-	    return;
-	(void) erode_obj(obj, dmgtyp, FALSE, FALSE);
-}
-
 int
 could_seduce(magr,mdef,mattk)
 struct monst *magr, *mdef;
@@ -2503,8 +2421,8 @@ register struct attack *mattk;
 			tmp = 0;
 		    }
 		} else tmp = 0;
-		if (!rn2(30)) erode_armor(mtmp, TRUE);
-		if (!rn2(6)) (void)erode_obj(MON_WEP(mtmp), 3, TRUE, FALSE);
+		if (!rn2(30)) erode_armor(mtmp, ERODE_CORRODE);
+		if (!rn2(6)) acid_damage(MON_WEP(mtmp));
 		goto assess_dmg;
 	    case AD_STON: /* cockatrice */
 	    {
@@ -2640,6 +2558,7 @@ cloneu()
 	if (u.mh <= 1) return(struct monst *)0;
 	if (mvitals[mndx].mvflags & G_EXTINCT) return(struct monst *)0;
 	mon = makemon(youmonst.data, u.ux, u.uy, NO_MINVENT|MM_EDOG);
+	if (!mon) return NULL;
 	mon->mcloned = 1;
 	mon = christen_monst(mon, plname);
 	initedog(mon);

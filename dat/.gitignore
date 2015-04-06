@@ -5,6 +5,9 @@ rip.xpm
 pet_mark.xbm
 quest.dat
 rumors
+bogusmon
+engrave
+epitaph
 x11tiles
 *.lev
 spec_levs
@@ -17,3 +20,4 @@ nhdat
 dlb.lst
 guioptions
 porthelp
+NetHack.ad

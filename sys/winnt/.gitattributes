@@ -1,4 +1,4 @@
-Install.nt filter=NHtext merge=NHsubst
-Makefile.* filter=NHtext merge=NHsubst
-*.rc filter=NHtext merge=NHsubst
-*.bat filter=NHtext merge=NHsubst
+Install.nt NHSUBST
+Makefile.* NHSUBST
+*.rc NHSUBST
+*.bat NHSUBST

@@ -1,27 +1,37 @@
-/* NetHack 3.5	sys.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	sys.c	$Date: 2012/03/10 02:22:07 $  $Revision: 1.12 $ */
+/* NetHack 3.5	sys.c	$NHDT-Date: 1426544797 2015/03/16 22:26:37 $  $NHDT-Branch: master $:$NHDT-Revision: 1.18 $ */
 /* Copyright (c) Kenneth Lorber, Kensington, Maryland, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
-/* for KR1ED config, WIZARD is 0 or 1 and WIZARD_NAME is a string;
-   for usual config, WIZARD is the string; forcing WIZARD_NAME to match it
-   eliminates conditional testing for which one to use in string ops */
+#ifndef SYSCF
+/* !SYSCF configurations need '#define DEBUGFILES "foo.c bar.c"'
+   to enable debugging feedback for source files foo.c and bar.c;
+   to activate debugpline(), set an appropriate value and uncomment */
+/* # define DEBUGFILES "*" */
+/* note: DEBUGFILES value here or in sysconf.DEBUGFILES can be overridden
+   at runtime by setting up a value for "DEBUGFILES" in the environment */
 
 struct sysopt sysopt;
 
 void
-sys_early_init(){
+sys_early_init()
+{
 	sysopt.support = NULL;
 	sysopt.recover = NULL;
 #ifdef SYSCF
 	sysopt.wizards = NULL;
 #else
-	sysopt.wizards = WIZARD_NAME;
+	sysopt.wizards = dupstr(WIZARD_NAME);
 #endif
+#if defined(SYSCF) || !defined(DEBUGFILES)
 	sysopt.debugfiles = NULL;
+#else
+	sysopt.debugfiles = dupstr(DEBUGFILES);
+#endif
+	sysopt.env_dbgfl = 0;	/* haven't checked getenv("DEBUGFILES") yet */
 	sysopt.shellers = NULL;
+	sysopt.explorers = NULL;
 	sysopt.maxplayers = 0;	/* XXX eventually replace MAX_NR_OF_PLAYERS */
 
 		/* record file */
@@ -29,6 +39,7 @@ sys_early_init(){
 	sysopt.entrymax = ENTRYMAX;
 	sysopt.pointsmin = POINTSMIN;
 	sysopt.pers_is_uid = PERS_IS_UID;
+	sysopt.tt_oname_maxrank = 10;
 
 		/* sanity checks */
 	if(PERSMAX<1) sysopt.persmax = 1;
@@ -58,6 +69,24 @@ sys_early_init(){
 	sysopt_seduce_set(sysopt.seduce);
 }
 
+void
+sysopt_release()
+{
+	if (sysopt.support)
+	    free(sysopt.support), sysopt.support = NULL;
+	if (sysopt.recover)
+	    free(sysopt.recover), sysopt.recover = NULL;
+	if (sysopt.wizards)
+	    free(sysopt.wizards), sysopt.wizards = NULL;
+	if (sysopt.debugfiles)
+	    free(sysopt.debugfiles), sysopt.debugfiles = NULL;
+#ifdef PANICTRACE
+	if (sysopt.gdbpath)
+	    free(sysopt.gdbpath), sysopt.gdbpath = NULL;
+	if (sysopt.greppath)
+	    free (sysopt.greppath), sysopt.greppath = NULL;
+#endif
+}
 
 extern struct attack sa_yes[NATTK];
 extern struct attack sa_no[NATTK];

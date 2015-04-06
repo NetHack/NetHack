@@ -1,5 +1,4 @@
-/* NetHack 3.5	worn.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	worn.c	$Date: 2013/11/05 00:57:56 $  $Revision: 1.32 $ */
+/* NetHack 3.5	worn.c	$NHDT-Date: 1427580338 2015/03/28 22:05:38 $  $NHDT-Branch: master $:$NHDT-Revision: 1.35 $ */
 /*	SCCS Id: @(#)worn.c	3.5	2009/02/28	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -57,6 +56,7 @@ long mask;
 	    uskin = obj;
 	 /* assert( !uarm ); */
 	} else {
+	    if ((mask & W_ARMOR)) u.uroleplay.nudist = FALSE;
 	    for(wp = worn; wp->w_mask; wp++) if(wp->w_mask & mask) {
 		oobj = *(wp->w_obj);
 		if(oobj && !(oobj->owornmask & wp->w_mask))
@@ -583,11 +583,26 @@ which_armor(mon, flag)
 struct monst *mon;
 long flag;
 {
-	register struct obj *obj;
+        if (mon == &youmonst) {
+            switch (flag) {
+                case W_ARM: return uarm;
+                case W_ARMC: return uarmc;
+                case W_ARMH: return uarmh;
+                case W_ARMS: return uarms;
+                case W_ARMG: return uarmg;
+                case W_ARMF: return uarmf;
+                case W_ARMU: return uarmu;
+                default:
+                             impossible("bad flag in which_armor");
+                             return 0;
+            }
+        } else {
+            register struct obj *obj;
 
-	for(obj = mon->minvent; obj; obj = obj->nobj)
-		if (obj->owornmask & flag) return obj;
-	return((struct obj *)0);
+            for(obj = mon->minvent; obj; obj = obj->nobj)
+                    if (obj->owornmask & flag) return obj;
+            return((struct obj *)0);
+        }
 }
 
 /* remove an item of armor and then drop it */

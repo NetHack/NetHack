@@ -38,7 +38,7 @@ ENDMAP
 REGION:(00,00,75,19),lit,"ordinary"
 REGION:(35,00,49,03),unlit,"ordinary"
 REGION:(43,12,49,16),unlit,"ordinary"
-REGION:(19,11,33,15),unlit,"ordinary",unfilled,true
+REGION:(19,11,33,15),unlit,"ordinary",unfilled,irregular
 REGION:(30,10,31,10),unlit,"ordinary"
 # Stairs
 STAIR:(30,10),down
@@ -54,22 +54,22 @@ DOOR:closed,(15,10)
 DOOR:locked,(19,10)
 DOOR:locked,(20,10)
 # Neferet the Green, the quest leader
-MONSTER:'@',"Neferet the Green",(23,05)
+MONSTER:('@',"Neferet the Green"),(23,05)
 # The treasure of the quest leader
-OBJECT:'(',"chest",(24,05)
+OBJECT:('(',"chest"),(24,05)
 # apprentice guards for the audience chamber
-MONSTER:'@',"apprentice",(30,07)
-MONSTER:'@',"apprentice",(24,06)
-MONSTER:'@',"apprentice",(15,06)
-MONSTER:'@',"apprentice",(15,12)
-MONSTER:'@',"apprentice",(26,11)
-MONSTER:'@',"apprentice",(27,11)
-MONSTER:'@',"apprentice",(19,09)
-MONSTER:'@',"apprentice",(20,09)
+MONSTER:('@',"apprentice"),(30,07)
+MONSTER:('@',"apprentice"),(24,06)
+MONSTER:('@',"apprentice"),(15,06)
+MONSTER:('@',"apprentice"),(15,12)
+MONSTER:('@',"apprentice"),(26,11)
+MONSTER:('@',"apprentice"),(27,11)
+MONSTER:('@',"apprentice"),(19,09)
+MONSTER:('@',"apprentice"),(20,09)
 # Eels in the pond
-MONSTER:';',"giant eel",(62,14)
-MONSTER:';',"giant eel",(69,15)
-MONSTER:';',"giant eel",(67,17)
+MONSTER:(';',"giant eel"),(62,14)
+MONSTER:(';',"giant eel"),(69,15)
+MONSTER:(';',"giant eel"),(67,17)
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,19)
 # Random traps
@@ -80,21 +80,21 @@ TRAP:random,random
 TRAP:random,random
 TRAP:random,random
 # Monsters on siege duty.
-MONSTER: 'B',random,(60,09),hostile
-MONSTER: 'W',random,(60,10),hostile
-MONSTER: 'B',random,(60,11),hostile
-MONSTER: 'B',random,(60,12),hostile
-MONSTER: 'i',random,(60,13),hostile
-MONSTER: 'B',random,(61,10),hostile
-MONSTER: 'B',random,(61,11),hostile
-MONSTER: 'B',random,(61,12),hostile
-MONSTER: 'B',random,(35,03),hostile
-MONSTER: 'i',random,(35,17),hostile
-MONSTER: 'B',random,(36,17),hostile
-MONSTER: 'B',random,(34,16),hostile
-MONSTER: 'i',random,(34,17),hostile
-MONSTER: 'W',random,(67,02),hostile
-MONSTER: 'B',random,(10,19),hostile
+MONSTER: 'B',(60,09),hostile
+MONSTER: 'W',(60,10),hostile
+MONSTER: 'B',(60,11),hostile
+MONSTER: 'B',(60,12),hostile
+MONSTER: 'i',(60,13),hostile
+MONSTER: 'B',(61,10),hostile
+MONSTER: 'B',(61,11),hostile
+MONSTER: 'B',(61,12),hostile
+MONSTER: 'B',(35,03),hostile
+MONSTER: 'i',(35,17),hostile
+MONSTER: 'B',(36,17),hostile
+MONSTER: 'B',(34,16),hostile
+MONSTER: 'i',(34,17),hostile
+MONSTER: 'W',(67,02),hostile
+MONSTER: 'B',(10,19),hostile
 
 #
 #	The "locate" level for the quest.
@@ -153,21 +153,21 @@ STAIR:(48,10),down
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,20)
 # Objects
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
 # Random traps
 TRAP:"spiked pit",(24,02)
 TRAP:"spiked pit",(07,10)
@@ -191,33 +191,33 @@ TRAP:"dart",random
 TRAP:"dart",random
 TRAP:"dart",random
 # Random monsters.
-MONSTER:'B',random,random,hostile
-MONSTER:'B',random,random,hostile
-MONSTER:'B',random,random,hostile
-MONSTER:'B',random,random,hostile
-MONSTER:'B',random,random,hostile
-MONSTER:'B',random,random,hostile
-MONSTER:'B',random,random,hostile
-MONSTER:'B',random,random,hostile
-MONSTER:'B',random,random,hostile
-MONSTER:'B',random,random,hostile
-MONSTER:'B',random,random,hostile
-MONSTER:'B',random,random,hostile
-MONSTER:'i',random,random,hostile
-MONSTER:'i',random,random,hostile
-MONSTER:'i',random,random,hostile
-MONSTER:'i',random,random,hostile
-MONSTER:'i',random,random,hostile
-MONSTER:'i',random,random,hostile
-MONSTER:'i',random,random,hostile
-MONSTER:'B',"vampire bat",random
-MONSTER:'B',"vampire bat",random
-MONSTER:'B',"vampire bat",random
-MONSTER:'B',"vampire bat",random
-MONSTER:'B',"vampire bat",random
-MONSTER:'B',"vampire bat",random
-MONSTER:'B',"vampire bat",random
-MONSTER:'i',random,random,hostile
+MONSTER:'B',random,hostile
+MONSTER:'B',random,hostile
+MONSTER:'B',random,hostile
+MONSTER:'B',random,hostile
+MONSTER:'B',random,hostile
+MONSTER:'B',random,hostile
+MONSTER:'B',random,hostile
+MONSTER:'B',random,hostile
+MONSTER:'B',random,hostile
+MONSTER:'B',random,hostile
+MONSTER:'B',random,hostile
+MONSTER:'B',random,hostile
+MONSTER:'i',random,hostile
+MONSTER:'i',random,hostile
+MONSTER:'i',random,hostile
+MONSTER:'i',random,hostile
+MONSTER:'i',random,hostile
+MONSTER:'i',random,hostile
+MONSTER:'i',random,hostile
+MONSTER:('B',"vampire bat"),random
+MONSTER:('B',"vampire bat"),random
+MONSTER:('B',"vampire bat"),random
+MONSTER:('B',"vampire bat"),random
+MONSTER:('B',"vampire bat"),random
+MONSTER:('B',"vampire bat"),random
+MONSTER:('B',"vampire bat"),random
+MONSTER:'i',random,hostile
 
 #
 #	The "goal" level for the quest.
@@ -293,21 +293,21 @@ NON_DIGGABLE:(00,00,75,19)
 # The altar.  This is not a shrine.
 ALTAR:(16,11),noncoaligned,altar
 # Objects
-OBJECT:'"',"amulet of ESP",(16,11),blessed,0,"The Eye of the Aethiopica"
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:('"',"amulet of ESP"),(16,11),blessed,0,name:"The Eye of the Aethiopica"
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
 # Random traps
 TRAP:random,random
 TRAP:random,random
@@ -316,43 +316,43 @@ TRAP:random,random
 TRAP:random,random
 TRAP:random,random
 # Random monsters.
-MONSTER:'@',"Dark One",(16,11)
-MONSTER:'B',random,random,hostile
-MONSTER:'B',random,random,hostile
-MONSTER:'B',random,random,hostile
-MONSTER:'B',random,random,hostile
-MONSTER:'B',random,random,hostile
-MONSTER:'B',random,random,hostile
-MONSTER:'B',random,random,hostile
-MONSTER:'B',random,random,hostile
-MONSTER:'B',random,random,hostile
-MONSTER:'B',random,random,hostile
-MONSTER:'B',random,random,hostile
-MONSTER:'i',random,random,hostile
-MONSTER:'i',random,random,hostile
-MONSTER:'i',random,random,hostile
-MONSTER:'i',random,random,hostile
-MONSTER:'i',random,random,hostile
-MONSTER:'i',random,random,hostile
-MONSTER:'i',random,random,hostile
-MONSTER:'B',"vampire bat",random
-MONSTER:'B',"vampire bat",random
-MONSTER:'B',"vampire bat",random
-MONSTER:'B',"vampire bat",random
-MONSTER:'B',"vampire bat",random
-MONSTER:'B',"vampire bat",random
-MONSTER:'B',"vampire bat",random
-MONSTER:'B',"vampire bat",random
-MONSTER:'i',random,random,hostile
+MONSTER:('@',"Dark One"),(16,11)
+MONSTER:'B',random,hostile
+MONSTER:'B',random,hostile
+MONSTER:'B',random,hostile
+MONSTER:'B',random,hostile
+MONSTER:'B',random,hostile
+MONSTER:'B',random,hostile
+MONSTER:'B',random,hostile
+MONSTER:'B',random,hostile
+MONSTER:'B',random,hostile
+MONSTER:'B',random,hostile
+MONSTER:'B',random,hostile
+MONSTER:'i',random,hostile
+MONSTER:'i',random,hostile
+MONSTER:'i',random,hostile
+MONSTER:'i',random,hostile
+MONSTER:'i',random,hostile
+MONSTER:'i',random,hostile
+MONSTER:'i',random,hostile
+MONSTER:('B',"vampire bat"),random
+MONSTER:('B',"vampire bat"),random
+MONSTER:('B',"vampire bat"),random
+MONSTER:('B',"vampire bat"),random
+MONSTER:('B',"vampire bat"),random
+MONSTER:('B',"vampire bat"),random
+MONSTER:('B',"vampire bat"),random
+MONSTER:('B',"vampire bat"),random
+MONSTER:'i',random,hostile
 # Captive Monsters in the dungeon
-MONSTER:'@',"rogue",(35,06),peaceful,"Pug"
-MONSTER:'Y',"owlbear",(47,06),peaceful,asleep
-MONSTER:'@',"wizard",(32,11),peaceful,asleep,"Newt"
-MONSTER:'@',"Grey-elf",(44,11),peaceful
-MONSTER:'H',"hill giant",(47,11),peaceful,asleep
-MONSTER:'G',"gnomish wizard",(38,06),peaceful
-MONSTER:'@',"prisoner",(35,11),peaceful
-MONSTER:'@',"prisoner",(41,11),peaceful,asleep
+MONSTER:('@',"rogue"),(35,06),peaceful,"Pug"
+MONSTER:('Y',"owlbear"),(47,06),peaceful,asleep
+MONSTER:('@',"wizard"),(32,11),peaceful,asleep,"Newt"
+MONSTER:('@',"Grey-elf"),(44,11),peaceful
+MONSTER:('H',"hill giant"),(47,11),peaceful,asleep
+MONSTER:('G',"gnomish wizard"),(38,06),peaceful
+MONSTER:('@',"prisoner"),(35,11),peaceful
+MONSTER:('@',"prisoner"),(41,11),peaceful,asleep
 
 #
 #	The "fill" levels for the quest.
@@ -365,77 +365,89 @@ MONSTER:'@',"prisoner",(41,11),peaceful,asleep
 
 LEVEL: "Wiz-fila"
 #
-ROOM: "ordinary" , random, random, random, random
-STAIR: random, up
-OBJECT: random,random,random
-MONSTER: 'i', random, random, hostile
+ROOM: "ordinary" , random, random, random, random {
+  STAIR: random, up
+  OBJECT: random,random
+  MONSTER: 'i', random, hostile
+}
 
-ROOM: "ordinary" , random, random, random, random
-OBJECT: random, random, random
-OBJECT: random,random,random
-MONSTER: 'i', random, random, hostile
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  OBJECT: random,random
+  MONSTER: 'i', random, hostile
+}
 
-ROOM: "ordinary" , random, random, random, random
-OBJECT: random, random, random
-TRAP: random, random
-OBJECT: random,random,random
-MONSTER: 'B', "vampire bat", random
-MONSTER: 'B', "vampire bat", random
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  TRAP: random, random
+  OBJECT: random,random
+  MONSTER: ('B', "vampire bat"), random
+  MONSTER: ('B', "vampire bat"), random
+}
 
-ROOM: "ordinary" , random, random, random, random
-STAIR: random, down
-OBJECT: random, random, random
-TRAP: random, random
-MONSTER: 'i', random, random, hostile
-MONSTER: 'B', "vampire bat", random
+ROOM: "ordinary" , random, random, random, random {
+  STAIR: random, down
+  OBJECT: random, random
+  TRAP: random, random
+  MONSTER: 'i', random, hostile
+  MONSTER: ('B', "vampire bat"), random
+}
 
-ROOM: "ordinary" , random, random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-TRAP: random, random
-MONSTER: 'i', random, random, hostile
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  OBJECT: random, random
+  TRAP: random, random
+  MONSTER: 'i', random, hostile
+}
 
-ROOM: "ordinary" , random, random, random, random
-OBJECT: random, random, random
-TRAP: random, random
-MONSTER: 'B', "vampire bat", random
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  TRAP: random, random
+  MONSTER: ('B', "vampire bat"), random
+}
 
 RANDOM_CORRIDORS
 
 LEVEL: "Wiz-filb"
 #
-ROOM: "ordinary" , random, random, random, random
-STAIR: random, up
-OBJECT: random,random,random
-MONSTER: 'X', random, random, hostile
+ROOM: "ordinary" , random, random, random, random {
+  STAIR: random, up
+  OBJECT: random,random
+  MONSTER: 'X', random, hostile
+}
 
-ROOM: "ordinary" , random, random, random, random
-OBJECT: random, random, random
-OBJECT: random,random,random
-MONSTER: 'i', random, random, hostile
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  OBJECT: random,random
+  MONSTER: 'i', random, hostile
+}
 
-ROOM: "ordinary" , random, random, random, random
-OBJECT: random, random, random
-TRAP: random, random
-OBJECT: random,random,random
-MONSTER: 'X', random, random, hostile
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  TRAP: random, random
+  OBJECT: random,random
+  MONSTER: 'X', random, hostile
+}
 
-ROOM: "ordinary" , random, random, random, random
-STAIR: random, down
-OBJECT: random, random, random
-TRAP: random, random
-MONSTER: 'i', random, random, hostile
-MONSTER: 'B', "vampire bat", random
+ROOM: "ordinary" , random, random, random, random {
+  STAIR: random, down
+  OBJECT: random, random
+  TRAP: random, random
+  MONSTER: 'i', random, hostile
+  MONSTER: ('B', "vampire bat"), random
+}
 
-ROOM: "ordinary" , random, random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-TRAP: random, random
-MONSTER: 'i', random, random, hostile
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  OBJECT: random, random
+  TRAP: random, random
+  MONSTER: 'i', random, hostile
+}
 
-ROOM: "ordinary" , random, random, random, random
-OBJECT: random, random, random
-TRAP: random, random
-MONSTER: 'B', "vampire bat", random
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  TRAP: random, random
+  MONSTER: ('B', "vampire bat"), random
+}
 
 RANDOM_CORRIDORS

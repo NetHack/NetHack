@@ -983,14 +983,36 @@ dokick()
 		    if(!rn2(3)) goto ouch;
 		    /* make metal boots rust */
 		    if(uarmf && rn2(3))
-			if (!rust_dmg(uarmf, "metal boots", 1, FALSE, &youmonst)) {
+                        if (water_damage(uarmf, "metal boots", TRUE) ==
+                            ER_NOTHING) {
 				Your("boots get wet.");
 				/* could cause short-lived fumbling here */
 			}
 		    exercise(A_DEX, TRUE);
 		    return(1);
 		}
-		if(IS_GRAVE(maploc->typ) || maploc->typ == IRONBARS)
+		if (IS_GRAVE(maploc->typ)) {
+		    if(Levitation) goto dumb;
+		    if (rn2(4)) goto ouch;
+		    exercise(A_WIS, FALSE);
+		    if (Role_if(PM_ARCHEOLOGIST) ||
+			Role_if(PM_SAMURAI) ||
+			((u.ualign.type == A_LAWFUL) && (u.ualign.record > -10))) {
+			adjalign(-sgn(u.ualign.type));
+		    }
+		    maploc->typ = ROOM;
+		    maploc->doormask = 0;
+		    (void) mksobj_at(ROCK, x,y, TRUE, FALSE);
+		    del_engr_at(x,y);
+		    if (Blind)
+			pline("Crack!  %s broke!", Something);
+		    else {
+			pline_The("headstone topples over and breaks!");
+			newsym(x,y);
+		    }
+		    return 1;
+		}
+		if(maploc->typ == IRONBARS)
 		    goto ouch;
 		if(IS_TREE(maploc->typ)) {
 		    struct obj *treefruit;

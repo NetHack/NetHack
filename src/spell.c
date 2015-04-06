@@ -42,7 +42,6 @@ STATIC_DCL int NDECL(throwspell);
 STATIC_DCL void NDECL(cast_protection);
 STATIC_DCL void FDECL(spell_backfire, (int));
 STATIC_DCL const char *FDECL(spelltypemnemonic, (int));
-STATIC_DCL int FDECL(isqrt, (int));
 
 /* The roles[] table lists the role-specific values for tuning
  * percent_success().
@@ -144,21 +143,8 @@ cursed_book(bp)
 	case 5:
 		pline_The("book was coated with contact poison!");
 		if (uarmg) {
-		    if (uarmg->oerodeproof || !is_corrodeable(uarmg)) {
-			Your("gloves seem unaffected.");
-		    } else if (uarmg->oeroded2 < MAX_ERODE) {
-			if (uarmg->greased) {
-			    grease_protect(uarmg, "gloves", &youmonst);
-			} else {
-			    Your("gloves corrode%s!",
-				 uarmg->oeroded2+1 == MAX_ERODE ?
-				 " completely" : uarmg->oeroded2 ?
-				 " further" : "");
-			    uarmg->oeroded2++;
-			}
-		    } else
-			Your("gloves %s completely corroded.",
-			     Blind ? "feel" : "look");
+                    erode_obj(uarmg, "gloves", ERODE_CORRODE,
+                              EF_GREASE | EF_VERBOSE);
 		    break;
 		}
 		/* temp disable in_use; death should not destroy the book */
@@ -342,6 +328,7 @@ learn(VOID_ARGS)
 	    context.spbook.book = 0;			/* no longer studying */
 	    context.spbook.o_id = 0;
 	    nomul(context.spbook.delay); /* remaining delay is uninterrupted */
+	    multi_reason = "reading a book";
 	    nomovemsg = 0;
 	    context.spbook.delay = 0;
 	    return(0);
@@ -519,6 +506,7 @@ register struct obj *spellbook;
 		    boolean gone = cursed_book(spellbook);
 
 		    nomul(context.spbook.delay);	/* study time */
+		    multi_reason = "reading a book";
 		    nomovemsg = 0;
 		    context.spbook.delay = 0;
 		    if(gone || !rn2(3)) {
@@ -535,6 +523,7 @@ register struct obj *spellbook;
 			spellbook->in_use = FALSE;
 		    }
 		    nomul(context.spbook.delay);
+		    multi_reason = "reading a book";
 		    nomovemsg = 0;
 		    context.spbook.delay = 0;
 		    return(1);
@@ -1441,29 +1430,6 @@ int *spell_no;
 	    return TRUE;
 	}
 	return FALSE;
-}
-
-/* Integer square root function without using floating point.
- * This could be replaced by a faster algorithm, but has not been because:
- * + the simple algorithm is easy to read
- * + this algorithm does not require 64-bit support
- * + in current usage, the values passed to isqrt() are not really that
- *   large, so the performance difference is negligible
- * + isqrt() is used in only one place
- * + that one place is not a bottle-neck
- */
-STATIC_OVL int
-isqrt(val)
-int val;
-{
-    int rt = 0;
-    int odd = 1;
-    while(val >= odd) {
-	val = val-odd;
-	odd = odd+2;
-	rt = rt + 1;
-    }
-    return rt;
 }
 
 STATIC_OVL int

@@ -1,5 +1,4 @@
-/* NetHack 3.5	objnam.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	objnam.c	$Date: 2011/10/27 02:24:54 $  $Revision: 1.101 $ */
+/* NetHack 3.5	objnam.c	$NHDT-Date: 1427440866 2015/03/27 07:21:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.109 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -489,6 +488,11 @@ register struct obj *obj;
 	}
 	if (pluralize) Strcpy(buf, makeplural(buf));
 
+	if (obj->otyp == T_SHIRT && program_state.gameover) {
+	    char tmpbuf[BUFSZ];
+	    Sprintf(eos(buf), " with text \"%s\"", tshirt_text(obj, tmpbuf));
+	}
+
 	if (has_oname(obj) && dknown) {
 		Strcat(buf, " named ");
 nameit:
@@ -651,8 +655,9 @@ register struct obj *obj;
 	 */
 	register char *bp = xname(obj);
 
-	if (iflags.override_ID) known = cknown = bknown = lknown = TRUE;
-	else {
+	if (iflags.override_ID) {
+		known = cknown = bknown = lknown = TRUE;
+	} else {
 		known = obj->known;
 		cknown = obj->cknown;
 		bknown = obj->bknown;
@@ -685,7 +690,15 @@ register struct obj *obj;
 
 	/* "empty" goes at the beginning, but item count goes at the end */
 	if (cknown &&
-	    (Is_container(obj) || obj->otyp == STATUE) && !Has_contents(obj))
+	    /* bag of tricks: include "empty" prefix if it's known to
+	       be empty but its precise number of charges isn't known
+	       (when that is known, suffix of "(n:0)" will be appended,
+	       making the prefix be redundant; note that 'known' flag
+	       isn't set when emptiness gets discovered because then
+	       charging magic would yield known number of new charges) */
+	    (obj->otyp == BAG_OF_TRICKS ? (obj->spe == 0 && !obj->known) :
+	     /* not bag of tricks: empty if container which has no contents */
+	     (Is_container(obj) || obj->otyp == STATUE) && !Has_contents(obj)))
 		Strcat(prefix, "empty ");
 
 	if (bknown &&
@@ -1682,7 +1695,7 @@ static struct sing_plur one_off[] = {
 static const char *const as_is[] = {
 	/* makesingular() leaves these plural due to how they're used */
 	"boots", "shoes",
-	"gloves", "lenses", "scales",
+	"gloves", "lenses", "scales", "eyes",
 	"gauntlets",
 	"iron bars",
 	/* both singular and plural are spelled the same */
@@ -2893,7 +2906,7 @@ wiztrap:
 			del_engr_at(x, y);
 			pline("A %s.", (lev->typ == POOL) ? "pool" : "moat");
 			/* Must manually make kelp! */
-			water_damage(&level.objects[x][y], FALSE, TRUE);
+			water_damage_chain(level.objects[x][y], TRUE);
 			newsym(x, y);
 			return &zeroobj;
 		}

@@ -63,7 +63,7 @@ wizard mode: avoid division by 0 crash for level teleport in the endgame if
 don't #sit on an object in a pit if you're only on the precipice
 fix message when pushing a boulder into a pool while riding
 plural of "Nazgul" is "Nazgul" not "Nazguls"
-trap messages referring to named steed were ackwardly worded when hallucination
+trap messages referring to named steed were awkwardly worded when hallucination
 	overrode use of the name
 some actions such as eating corpses off the floor didn't check whether hero
 	could reach the bottom of a pit
@@ -117,7 +117,7 @@ shopkeeper removal of trap from shop doorway yields an open door instead of
 	a closed one if an intact open door is present
 guarantee that hostile djinn released from bottles really are hostile
 handle lava when removing or losing water walking boots
-fix incomplete sentence occuring when unique monster's corpse fell down stairs
+fix incomplete sentence occurring when unique monster's corpse fell down stairs
 fractured boulders or statues produced inconsistent object settings on the
 	resulting rocks
 really fix rolling boulder bug C340-18, the previous "fix" reversed the test
@@ -165,7 +165,7 @@ clean up messages when you stop levitation while riding a flying steed
 monsters evading a kick on noteleport levels would cause a "teleports" message
 interrupt current activity during certain stages of petrification or vomiting
 warning about bad food didn't recognize tin of Medusa meat
-eating tainted Medusa corpse caused food poisioning instead of petrification
+eating tainted Medusa corpse caused food poisoning instead of petrification
 avoid potential stale pointer use after magic bag explosion
 nymphs and monkeys can't steal rings worn under gloves
 monkeys can't steal rings worn under cursed weapon
@@ -237,7 +237,7 @@ when there were multiple boulders at a location, moving one of them sometimes
 	resulted in line-of-sight anomalies
 unicorn can't catch gems if it is asleep or paralyzed
 fix grammar when choking on gold
-prevent lose-level+regain-level cycle from arbritrarily boosting HP and Pw
+prevent lose-level+regain-level cycle from arbitrarily boosting HP and Pw
 prevent polymorphing into "new man" at low level from magnifying HP and Pw
 some messages which referred to "mirror" ought to have used "looking glass"
 incubi react to mirrors
@@ -360,8 +360,8 @@ code handling a monster's use of potion or food to cure stoning or confusion
 properly handle destruction of equipment carried by monsters hit by
 	disintegration breath; life-saving retained conferred properties of
 	formerly worn items (loss of steed's saddle caused much confusion)
-don't exercize or abuse wisdom when rumors get used for random graffiti
-don't exercize wisdom twice for each minor oracle consultation
+don't exercise or abuse wisdom when rumors get used for random graffiti
+don't exercise wisdom twice for each minor oracle consultation
 don't welcome the hero to Delphi if the Oracle was angered before first entry
 create_object() created lizard corpses without timers and troll corpses with
 	their revive timers, then changed the corpsenm field
@@ -383,7 +383,7 @@ specifying role and/or race along with an invalid alignment for it/them in
 temple donation can recover protection previously stolen by attrcurse attack
 	even when protection amount is so big that no increment would be given
 meditating monsters stop meditating when affected by something which wakes
-	sleeping mosnters
+	sleeping monsters
 monsters capable of hiding can't do so when trapped or while holding you
 limit recursive calls to spoteffects (poly'd hero fell into water, reverted
 	to human because of it, fell into same water, then crawled out twice)
@@ -474,7 +474,7 @@ suppress corpse from bones data if death is due to being dissolved in lava
 suppress "you rise from the dead" if game ends due to be turned into slime
 hero poly'd into stone golem and wielding cockatrice corpse casts stone-to-
 	flesh at self to become flesh golem will revert to stone if no gloves
-don't give erroneous "<mon> disppears" message for hero poly'd into quantum
+don't give erroneous "<mon> disappears" message for hero poly'd into quantum
 	mechanic who hits engulfer while swallowed and blinded
 demon lords/princes can't be summoned to the elemental or Astral planes
 feedback from casting spell of protection was wrong in some situations
@@ -496,7 +496,7 @@ can't eat an artifact you're unable to touch
 attempting to kick beyond map edge performed an out of array bounds memory
 	access; symptom seen was "show_glyph: bad pos" warning when blind
 attempting to engrave with an empty wand should always use a turn
-don't access freed memory after engraving "wrests one last charnge" from wand
+don't access freed memory after engraving "wrests one last charge" from wand
 a magic portal could be rendered inactive for the hero if a successful
 	hangup save took place during level change; leaving the level by any
 	means other than triggering the portal would reactivate it
@@ -645,7 +645,7 @@ secret door detection's trap finding is no longer blocked by water or clouds
 potion thrown by monster which hit a long worm's tail gave feedback about
 	hitting its head
 implement energy vortex's previously unused energy drain attack
-changing alignment type resets alignment record to 0 (nomimally aligned)
+changing alignment type resets alignment record to 0 (nominally aligned)
 jellyfish do not technically have a head
 while polymorphed, suppress attribute gain/lose earned by pre-poly exercise
 wizard mode #monpolycontrol prompting asked about "it" when monster was unseen
@@ -670,7 +670,7 @@ if polymorph causes a monster to drop items, they won't be used up via
 monsters who ate green slime corpses weren't turned into green slime
 "hand slip" while naming an object would never pick 'z' as a substitute letter
 hero would "gladly take off <armor>" for nymph or succubus even while asleep
-concealed mimic wasn't revealed if kicking attmpt yielded a clumsy miss
+concealed mimic wasn't revealed if kicking attempt yielded a clumsy miss
 too accurate feedback given to a blinded hero when a monster summons insects
 if life-saved steed became untame, repeated "placing steed onto map?" warnings
 	would be given as long as the hero remained mounted
@@ -730,7 +730,7 @@ shouldn't have been able write scrolls by guessing type name when they're
 scrolls given names can be written by assigned name as well as by description
 fix writing feedback "the spellbook warps strangely, then turns parchment"
 make stone artifacts usually resist stone-to-flesh
-when reading an unknown scroll and learning it, discovery of teleporation was
+when reading an unknown scroll and learning it, discovery of teleportation was
 	too late if hero happened to land on another scroll of teleportation
 using an unlocking tool on a closed door which was actually a mimic reported
 	that there was no door to unlock instead of exposing the mimic
@@ -760,7 +760,7 @@ for number_pad:2 (MSDOS compatibility), M-5 (Alt+5, or Shift+keypad5 using
 	MSDOS/Windows keystroke hackery) didn't function as G movement prefix
 if an angry shopkeeper chased the hero to a different level and then got paid
 	off, he'd dismiss kops on that other level but not on his shop level
-objects inside the Wizard's Tower can't be teleport to outside and vica versa
+objects inside the Wizard's Tower can't be teleport to outside and vice versa
 dying in lava and being life-saved or leaving bones would destroy ring of
 	fire resistance if it happened to be made of wood, and also burn up
 	scrolls of fire and spellbook of fireball
@@ -786,7 +786,7 @@ when shop prices are adjusted, handle roundoff (integer truncation) better
 for hero poly'd into a monster form that lacks a weapon attack but has a claw
 	attack, use wielded weapon even when claw attack isn't the very first
 rename the SLEEPING property and Sleeping attribute to SLEEPY and Sleepy, resp.
-character escape sequence handling during options processing was vulernable
+character escape sequence handling during options processing was vulnerable
 	to malformed escapes and could potentially be abused to clobber the
 	stack and launch a buffer overrun attack
 give alternate message for "<mon> turns to flee" when mon can't move
@@ -815,7 +815,7 @@ hangup save made during magic mapping or <foo> detection performed while
 	underwater could put hero on top of the water after restore
 fix bug preventing stone-resistant monsters w/o gloves from wielding cockatrices
 items conferring life drain resistance were affected by drain life spell
-'a'pply command could be used to recogniize undiscovered potions of oil
+'a'pply command could be used to recognize undiscovered potions of oil
 fix replacing an existing bones file in wizard mode [load?y, unlink?n, die?y,
 	save?y, replace?y] for configurations using external file compression
 theft of worn armor with wear/unwear delay would interfere with completion of
@@ -855,9 +855,45 @@ fix "object lost" panic (or even crash) when dropping multiple items while
 	levitating and a lit potion of oil explodes and destroys some inventory
 fix "object_is_local" panic when saving bones after hero is killed by explosion
 	produced by dropped or thrown lit potion of oil
+gold dropped on altar by hero wouldn't stack with gold dropped there by monster
 if lava burns up the player's water walking boots, the player falls in
 the messages for lava burning items up are always printed
 fix used-up magic trap trying to hit steed.
+messages are now printed when objects on the ground are eroded
+object erosion now always identifies fooproof objects
+grease protects from all types of erosion
+all sources of erosion now affect objects the same way
+passive attacks no longer erode armor covered by other armor
+dipping a fooproof item into acid no longer forgets that it's fooproof
+dipping a container into uncursed water now gets its contents wet
+sanitize petnames and fruit to prevent escape codes
+data.base "bat" overrode later "combat" entry
+data.base "gelatinous cube" and "jack boot" have their own entries
+data.base "vampire bat" matched twice; use the bat entry
+data.base dagger attribution started with spaces instead of tabs
+remove 'if (Deaf)' guards preceding You_hear which already checks deafness
+use a menu to loot multiple containers
+do_look() in post-3.4.3 used glyph prior to setting it in pager.c
+charge for a boulder that fills a pit in shop
+abuse wisdom in keeping with Rider eating message
+message inconsistency: death message "swallowed <mon> whole" was preceded 
+	by "You bite into"
+improve the messaging when a monster you can't see is causing an obstruction
+add option mention_walls, which gives feedback when bumping against a wall
+fix invalid pointer dereference in morguemon if ndemon returns NON_PM
+after object loss through polyshudder don't get left hiding under nothing 
+	if you're polymorphed into a hider
+show object symbols in menu headings in menus where those object symbols
+	act as menu accelerators, toggleable via "menu_objsyms" option
+show t-shirt text at end of game inventory disclose
+hitting with a polearm remembers the position of the last monster you hit
+add messages for trying to pick up some terrain features
+boomerang makes noise when hitting a sink
+non-pet rust monsters would eat rust-proofed non-digestibles but ignore
+	those non-digestibles otherwise
+kicking a grave may topple the gravestone
+allow showing legal positions for stinking cloud, jumping and polearms
+	when asked for a location
 
 
 Platform- and/or Interface-Specific Fixes
@@ -874,6 +910,10 @@ tty: when loading user's run-time configuration, explicitly negating one of
 	to regular ASCII and left the earlier option inaccurately set to "on"
 tty: various bugfixes for very wide and/or tall screens
 tty+GOLDOBJ: dropping or looting by menu wouldn't honor a count for gold
+tty: fix crashing when a location has more than 32k items
+tty: fix segfault when MD termcap is not defined
+tty: do not cut off statuslines at 80 characters for wider term
+tty: prevent accidental escapes from string entries
 unix: remove use of parentheses in nethack man page usage that confused a
 	man page conversion tool
 unix: new -wwindowtype option
@@ -881,6 +921,7 @@ unix: don't clobber old level files if 2nd hangup/disconnect occurs while
 	reconnected user is responding to the "destroy old game?" prompt
 unix/Qt: saved games were not found if nethack was built with prefixes in use
 unix,vms: allow digits after first character in name at "Who are you?" prompt
+unix: implement fcntl(2) locking on systems that can handle it
 vms: the DLB configuration could fail to build if a file without a dot
 	in its name happened to match a logical name
 Windows: starting a game with nethack.exe (tty) and saving, then restoring
@@ -953,7 +994,7 @@ burying a punishment ball no longer ends your punishment
 add clicklook option to allow looking at things on the display by clicking 
 	right mouse button when floating mouse pointer over them
 Izchak's lighting store is now able to stock oil for your lamp
-provide core support for saving of messsage history in save file
+provide core support for saving of message history in save file
 the following actions can now be continued after save/restore: digging, 
 	eating, studying, removing armor
 hero-created and monster-created ice will eventually melt away
@@ -987,7 +1028,6 @@ allow digging an adjacent pit with wand of digging while trapped in a pit
 #terrain command to show unobstructed view of map (w/o mons, objs, traps)
 digging can activate or disarm some types of traps
 some monsters can eat tins in addition to corpses to cure some ailments
-add Roderick Schertler's pickup_thrown patch
 add ability to sort the list when viewing known spells with '+' command
 describe magic cancellation from worn armor in enlightment/end-of-game feedback
 disclose half physical and/or spell damage in enlightment/end-of-game feedback
@@ -1001,7 +1041,6 @@ new config file keyword: SYMBOLS for overriding character symbol values by name
 opening magic frees from bear traps and webs, activates trap doors
 closing magic activates bear traps and webs
 locking converts a hole into a trap door; striking does the opposite
-add Malcolm Ryan's Statue Glyphs patch
 lembas and cram never rot unless cursed
 multiple squeaks for squeaky boards
 include time, user ID, and play mode in paniclog entries
@@ -1045,15 +1084,6 @@ chatting to a gecko or shopkeeper while hallucinating gives alternate message
 mimic posing as door might steal hero's key when [un]locking is attempted
 polymorphing into a dragon while wearing dragon scale mail will cause that
 	mail to revert to dragon scales
-adopt/adapt/improve the Paranoid_Quit patch; default is paranoid_confirm:pray
-	paranoid_confirm:Confirm when requiring "yes" instead of y to confirm,
-				 also require explicit "no" to reject
-	paranoid_confirm:quit    yes vs y to quit or to enter explore mode
-	paranoid_confirm:die     yes vs y to die in explore or wizard mode
-	paranoid_confirm:bones   yes vs y to save bones when dying in wizard mode
-	paranoid_confirm:attack  yes vs y to attack a peaceful monster
-	paranoid_confirm:pray    y to confirm #pray; supersedes prayconfirm
-	paranoid_confirm:Remove  always pick from inventory for 'R' and 'T'
 flexibility for specifying "detect <foo>" vs "<foo> detection" when wishing
 when a sokoban puzzle has been completed (last pit or hole filled in),
 	stop assessing luck penalties and lift most movement restrictions
@@ -1067,6 +1097,21 @@ dipping multiple potions in another potion may only dip part of their stack
 make being inside a stinking cloud (when not immune or resistant) become a
 	major trouble which is fixable by prayer
 introduce some variation in monster movement rates
+Add database entry for shuriken and make it match throwing star
+Add database entry for fedora
+Add database entry for land mine
+change command X to twoweapon toggle
+pressing @ when cursor positioning moves cursor on top of hero
+pressing # when cursor positioning toggles automatic description of features
+	under the cursor
+cursor positioning ignores uninteresting dungeon features
+allow reading many more items
+when you're hiding under something a zap downward should not hit that
+	something, while a zap upward should
+show more explicit reason why player was helpless at death
+added new hallucinatory-only gods
+options to create the character blind or nudist
+moving clouds on the plane of air
 
 
 Platform- and/or Interface-Specific New Features
@@ -1081,11 +1126,31 @@ win32tty: support for 'selectsaved' option for menu of existing save files
 	to choose from at game startup
 tty: add window port routines for saving/restoring message history
 tty: enhanced role, race, &c selection at start of new game
+tty: implement : (menu_search) command
 smartphone: added "Type Cmd" command that allows to type arbitrary commands 
 	using phone keypad
 smartphone: added Q(quiver) command to "Attack" layout
 smartphone: fixed F command to prompt for direction
 unix,vms: altmeta option to handle terminals which send "ESC c" for Alt+c
+tty,win32gui,win32tty: add menucolors
+
+
+NetHack Community Patches (or Variation) Included
+-------------------------------------------------
+Roderick Schertler's pickup_thrown patch
+Malcolm Ryan's Statue Glyphs patch
+adopt/adapt/improve the Paranoid_Quit patch; default is paranoid_confirm:pray
+	paranoid_confirm:Confirm when requiring "yes" instead of y to confirm,
+				 also require explicit "no" to reject
+	paranoid_confirm:quit    yes vs y to quit or to enter explore mode
+	paranoid_confirm:die     yes vs y to die in explore or wizard mode
+	paranoid_confirm:bones   yes vs y to save bones when dying in wizard mode
+	paranoid_confirm:attack  yes vs y to attack a peaceful monster
+	paranoid_confirm:pray    y to confirm #pray; supersedes prayconfirm
+	paranoid_confirm:Remove  always pick from inventory for 'R' and 'T'
+adopt/adapt/improve Dungeon Overview
+Aardvark Joe's Extended Logfile
+Michael Deutschmann's use_darkgray
 
 
 Code Cleanup and Reorganization
@@ -1106,3 +1171,18 @@ drawing symbols for DECGraphics, IBMGraphics, MACgraphics are now stored in an
 new hints-based configuration system
 allow documentation to be specialized to the options in the game binary
 add param to winsys ini routines to allow cleaner shifting during startup
+make STEED unconditional
+make EXP_ON_BOTL unconditional
+make REDO unconditional
+make AUTOPICKUP_EXCEPTIONS unconditional
+make SEDUCE compile-time unconditional but still removable through SYSCF
+clean up some DEBUG conditional code
+make GOLDOBJ unconditional
+make WIZARD unconditional
+make SINKS 
+make REINCARNATION
+make TOURIST unconditional
+make KOPS unconditional
+make ELBERETH unconditional
+allow defining of generic usernames in config.h instead of hard-coding in role.c
+

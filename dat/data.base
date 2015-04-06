@@ -429,6 +429,7 @@ barbed devil
 	Barbed devils lack any real special abilities, though they
 	are quite difficult to kill.
 # takes "bat or bird" when specifying 'B'
+~combat
 *bat
 bat or bird
 	A bat, flitting in the darkness outside, took the wrong turn
@@ -511,7 +512,6 @@ blind io
 	own.  Several were currently hovering above the table.
 	    [ The Colour of Magic, by Terry Pratchett ]
 * blob
-gelatinous cube
 ooze
 * ooze
 *pudding
@@ -548,6 +548,7 @@ candelabrum*
 	Because it is Saint Peter's holy day.
 	(Enter all the Friars to sing the dirge)
 		[ Doctor Faustus and Other Plays, by Christopher Marlowe ]
+~*jack*boot*
 *boot*
 	In Fantasyland these are remarkable in that they seldom or
 	never wear out and are suitable for riding or walking in
@@ -1101,7 +1102,7 @@ cyclops
 	Proceeding from the heat-oppressed brain?
 	I see thee yet, in form as palpable
 	As this which now I draw.
-                [ Macbeth, by William Shakespeare ]
+		[ Macbeth, by William Shakespeare ]
 dark one
 	... But he ruled rather by force and fear, if they might
 	avail; and those who perceived his shadow spreading over the
@@ -1570,6 +1571,12 @@ eyes of the overworld
 	Usually, there is nothing to be seen.  However, the wearer
 	is also able to look back and see the area around herself,
 	much like looking on a map.  Why anyone would want to ...
+fedora
+	Some hats can only be worn if you're willing to be jaunty, to set
+	them at an angle and to walk beneath them with a spring in your
+	stride as if you're only a step away from dancing.  They demand a
+	lot of you.
+		[ Anansi Boys, by Neil Gaiman ]
 figurine*
 	Then it appeared in Paris at just about the time that Paris
 	was full of Carlists who had to get out of Spain.  One of
@@ -2767,6 +2774,12 @@ lance
 	evil plight.
 		[ Don Quixote of La Mancha, by Miquel de
 		  Cervantes Saavedra ]
+land mine
+	Your heart is intact, your brain is not badly damaged, but the rest
+	of your injuries are comparable to stepping on a land mine.  You'd
+	never walk again, and you'd be in great pain.  You would come to
+	wish you had not survived.
+		[ Steel Beach, by John Varley ]
 *lantern
 	While pretending to be a fancy safety lamp, it is in fact
 	battery powered.  A discreet little switch is marked "on/off"
@@ -4502,6 +4515,15 @@ shrieker
 	its fetid bulk looming overhead... The monster was some kind of
 	great dark worm, but that was about all they were sure of.
 		[ The Adventurers, Epic IV, by Thomas A. Miller ]
+throwing star
+shuriken
+	You know, that's what I hate most about fighting against magic:
+	you never know what they're trying to do to you until it hits.
+	The sorceress knew what hit her, however.  Two of the shuriken
+	got past whatever defenses she had.  One caught her just below
+	the throat, the other in the middle of her chest.  It wouldn't
+	kill her, but she wouldn't be fighting anyone for a while.
+		[ Jhereg, by Steven Brust ]
 skeleton
 	A skeleton is a magically animated undead creature.  Unlike
 	shades, only a humanoid creature can be used to create a
@@ -5157,7 +5179,7 @@ valkyrie
 			Nations, by Herbert Robinson and Knox
 			Wilson ]
 vampire
-vampire bat
+~vampire bat
 vampire lord
 	The Oxford English Dictionary is quite unequivocal:
 	_vampire_ - "a preternatural being of a malignant nature (in
@@ -5299,6 +5321,22 @@ web
 	Oh what a tangled web we weave,
 	When first we practise to deceive!
 		[ Marmion, by Sir Walter Scott ]
+whistle
+	There were legends both on the front and on the back of the 
+	whistle. The one read thus:
+
+	FLA FUR BIS FLE The other: QUIS EST ISTE QUI VENIT 
+	'I ought to be able to make it out,' he thought; 
+	'but I suppose I am a little rusty in my Latin. 
+	When I come to think of it, I don't believe I even 
+	know the word for a whistle. The long one does seem 
+	simple enough. It ought to mean, "Who is this who is coming?" 
+
+	Well, the best way to find out is evidently to whistle 
+	for him.'
+
+		[Ghost Stories of an Antiquary, by Montague Rhodes James
+		 'Oh, Whistle, and I'll Come to You My Lad']
 # werecritter -- see "lycanthrope"
 *wight
 	When he came to himself again, for a moment he could recall

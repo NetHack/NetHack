@@ -51,6 +51,7 @@ stoned_dialogue()
 	case 3:		/* limbs turned to stone */
 		stop_occupation();
 		nomul(-3);	/* can't move anymore */
+		multi_reason = "getting stoned";
 		nomovemsg = You_can_move_again; /* not unconscious */
 		break;
 	default:
@@ -164,7 +165,7 @@ slime_dialogue()
 		    if (!Blind)	/* [what if you're already green?] */
 			pline(buf, hcolor(NH_GREEN));
 		} else
-		    pline(buf, an(Hallucination ? rndmonnam() : "green slime"));
+		    pline(buf, an(Hallucination ? rndmonnam(NULL) : "green slime"));
 	    } else
 		pline1(buf);
 	}
@@ -377,6 +378,7 @@ nh_timeout()
 			if (u.umoved && !Levitation) {
 			    slip_or_trip();
 			    nomul(-2);
+			    multi_reason = "fumbling";
 			    nomovemsg = "";
 			    /* The more you are carrying the more likely you
 			     * are to make noise when you fumble.  Adjustments
@@ -409,6 +411,7 @@ boolean wakeup_msg;
 {
 	stop_occupation();
 	nomul(how_long);
+	multi_reason = "sleeping";
 	/* generally don't notice sounds while sleeping */
 	if (wakeup_msg && multi == how_long) {
 	    /* caller can follow with a direct call to Hear_again() if
@@ -1271,6 +1274,7 @@ do_storms()
 	if(!u.uinvulnerable) {
 	    stop_occupation();
 	    nomul(-3);
+	    multi_reason = "hiding from thunderstorm";
 	    nomovemsg = 0;
 	}
     } else

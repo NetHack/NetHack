@@ -1,5 +1,4 @@
-/* NetHack 3.5	potion.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	potion.c	$Date: 2013/11/05 00:57:55 $  $Revision: 1.91 $ */
+/* NetHack 3.5	potion.c	$NHDT-Date: 1426953330 2015/03/21 15:55:30 $  $NHDT-Branch: master $:$NHDT-Revision: 1.99 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -371,10 +370,11 @@ ghost_from_bottle()
 		return;
 	}
 	pline("As you open the bottle, an enormous %s emerges!",
-		Hallucination ? rndmonnam() : (const char *)"ghost");
+		Hallucination ? rndmonnam(NULL) : (const char *)"ghost");
 	if(flags.verbose)
 	    You("are frightened to death, and unable to move.");
 	nomul(-3);
+	multi_reason = "being frightened to death";
 	nomovemsg = "You regain your composure.";
 }
 
@@ -678,6 +678,7 @@ peffects(otmp)
 			Your("%s are frozen to the %s!",
 			     makeplural(body_part(FOOT)), surface(u.ux, u.uy));
 		    nomul(-(rn1(10, 25 - 12*bcsign(otmp))));
+		    multi_reason = "frozen by a potion";
 		    nomovemsg = You_can_move_again;
 		    exercise(A_DEX, FALSE);
 		}
@@ -1053,7 +1054,7 @@ boolean useeit;
 const char *objphrase;	/* "Your widget glows" or "Steed's saddle glows" */
 {
     void FDECL((*func), (OBJ_P)) = 0;
-    const char *how = 0, *glowcolor = 0;
+    const char *glowcolor = 0;
 #define COST_alter (-2)
 #define COST_none  (-1)
     int costchange = COST_none;
@@ -1062,7 +1063,6 @@ const char *objphrase;	/* "Your widget glows" or "Steed's saddle glows" */
     if (!potion || potion->otyp != POT_WATER) return FALSE;
 
     if (potion->blessed) {
-	how = "softly glow";
 	if (targobj->cursed) {
 	    func = uncurse;
 	    glowcolor = NH_AMBER;
@@ -1074,7 +1074,6 @@ const char *objphrase;	/* "Your widget glows" or "Steed's saddle glows" */
 	    altfmt = TRUE;	/* "with a <color> aura" */
 	}
     } else if (potion->cursed) {
-	how = "glow";
 	if (targobj->blessed) {
 	    func = unbless;
 	    glowcolor = "brown";
@@ -1088,7 +1087,7 @@ const char *objphrase;	/* "Your widget glows" or "Steed's saddle glows" */
     } else {
 	/* dipping into uncursed water; carried() check skips steed saddle */
 	if (carried(targobj)) {
-	    if (get_wet(targobj))
+	    if (water_damage(targobj, 0, TRUE) != ER_NOTHING)
 		res = TRUE;
 	}
     }
@@ -1467,6 +1466,7 @@ register struct obj *obj;
 		if (!Free_action) {
 		    pline("%s seems to be holding you.", Something);
 		    nomul(-rnd(5));
+		    multi_reason = "frozen by a potion";
 		    nomovemsg = You_can_move_again;
 		    exercise(A_DEX, FALSE);
 		} else You("stiffen momentarily.");
@@ -1476,6 +1476,7 @@ register struct obj *obj;
 		if (!Free_action && !Sleep_resistance) {
 		    You_feel("rather tired.");
 		    nomul(-rnd(5));
+		    multi_reason = "sleeping off a magical draught";
 		    nomovemsg = You_can_move_again;
 		    exercise(A_DEX, FALSE);
 		} else You("yawn.");
@@ -1626,98 +1627,6 @@ register struct obj *o1, *o2;
 	return 0;
 }
 
-
-boolean
-get_wet(obj)
-register struct obj *obj;
-/* returns TRUE if something happened (potion should be used up) */
-{
-	if (snuff_lit(obj)) return(TRUE);
-
-	if (obj->greased) {
-		grease_protect(obj,(char *)0,&youmonst);
-		return(FALSE);
-	}
-
-	/* (Rusting shop goods ought to be charged for.) */
-	switch (obj->oclass) {
-	    case POTION_CLASS:
-		if (obj->otyp == POT_WATER) return FALSE;
-		/* KMH -- Water into acid causes an explosion */
-		if (obj->otyp == POT_ACID) {
-			pline("It boils vigorously!");
-			You("are caught in the explosion!");
-			losehp(Maybe_Half_Phys(rnd(10)), "elementary chemistry",
-				KILLED_BY);
-			makeknown(obj->otyp);
-			update_inventory();
-			return (TRUE);
-		}
-		pline("%s%s.", Yobjnam2(obj,"dilute"),
-		      obj->odiluted ? " further" : "");
-		costly_alteration(obj, COST_DILUTE);
-		if (obj->odiluted) {
-			obj->odiluted = 0;
-			obj->blessed = FALSE;
-			obj->cursed = FALSE;
-			obj->otyp = POT_WATER;
-		} else
-			obj->odiluted++;
-		update_inventory();
-		return TRUE;
-	    case SCROLL_CLASS:
-		if (obj->otyp != SCR_BLANK_PAPER
-#ifdef MAIL
-		    && obj->otyp != SCR_MAIL
-#endif
-		    ) {
-			if (!Blind)
-			    pline_The("scroll%s %s.",
-				      plur(obj->quan), otense(obj, "fade"));
-			costly_alteration(obj, COST_ERASE);
-			obj->otyp = SCR_BLANK_PAPER;
-			obj->spe = 0;
-			update_inventory();
-			return TRUE;
-		} else break;
-	    case SPBOOK_CLASS:
-		if (obj->otyp != SPE_BLANK_PAPER) {
-
-			if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
-			    pline(
-		       "%s suddenly heats up; steam rises and it remains dry.",
-				  The(xname(obj)));
-			} else {
-			    if (!Blind)
-				pline_The("spellbook%s %s.",
-					  plur(obj->quan),
-					  otense(obj, "fade"));
-			    costly_alteration(obj, COST_ERASE);
-			    obj->otyp = SPE_BLANK_PAPER;
-			    update_inventory();
-			}
-			return TRUE;
-		}
-		break;
-	    case WEAPON_CLASS:
-	    /* Just "fall through" to generic rustprone check for now. */
-	    /* fall through */
-	    default:
-		if (!obj->oerodeproof && is_rustprone(obj) &&
-		    (obj->oeroded < MAX_ERODE) && !rn2(2)) {
-			pline("%s some%s.",
-			      Yobjnam2(obj, "rust"),
-			      obj->oeroded ? " more" : "what");
-			obj->oeroded++;
-			update_inventory();
-			return TRUE;
-		}
-		break;
-	}
-	pline("%s wet.", Yobjnam2(obj, "get"));
-	return FALSE;
-}
-
 int
 dodip()
 {
@@ -1756,8 +1665,8 @@ dodip()
 			rider_cant_reach(); /* not skilled enough to reach */
 		    } else {
 			if (obj->otyp == POT_ACID) obj->in_use = 1;
-			(void) get_wet(obj);
-			if (obj->in_use) useup(obj);
+			if (water_damage(obj, 0, TRUE) != ER_DESTROYED && obj->in_use)
+			    useup(obj);
 		    }
 		    return 1;
 		}
@@ -1931,38 +1840,14 @@ dodip()
 	}
 
 	if (potion->otyp == POT_ACID) {
-	    if (erode_obj(obj, 3, FALSE, TRUE))
+	    if (erode_obj(obj, 0, ERODE_CORRODE, EF_GREASE) != ER_NOTHING)
 		goto poof;
 	}
 
 	if (potion->otyp == POT_OIL) {
 	    boolean wisx = FALSE;
 	    if (potion->lamplit) {	/* burning */
-		int omat = objects[obj->otyp].oc_material;
-		/* the code here should be merged with fire_damage */
-		if (catch_lit(obj)) {
-		    /* catch_lit does all the work if true */
-		} else if (obj->oerodeproof || obj_resists(obj, 5, 95) ||
-			   !is_flammable(obj) || obj->oclass == FOOD_CLASS) {
-		    pline("%s %s to burn for a moment but %s unharmed.",
-			  Yname2(obj), otense(obj, "seem"), otense(obj, "are"));
-		} else {
-		    if ((omat == PLASTIC || omat == PAPER) && !obj->oartifact)
-			obj->oeroded = MAX_ERODE;
-		    pline_The("burning oil %s %s%c",
-			    obj->oeroded == MAX_ERODE ? "destroys" : "damages",
-			    yname(obj),
-			    obj->oeroded == MAX_ERODE ? '!' : '.');
-		    costly_alteration(obj, COST_BURN);
-		    if (obj->oeroded == MAX_ERODE) {
-			if (obj->owornmask) remove_worn_item(obj, TRUE);
-			obj_extract_self(obj);
-			obfree(obj, (struct obj *)0);
-			obj = (struct obj *) 0;
-		    } else {
-			obj->oeroded++;
-		    }
-		}
+                fire_damage(obj, TRUE, u.ux, u.uy);
 	    } else if (potion->cursed) {
 		pline_The("potion spills and covers your %s with oil.",
 			  makeplural(body_part(FINGER)));

@@ -1,5 +1,4 @@
-/* NetHack 3.5	mhstatus.c	$NHDT-Date: 1425083082 2015/02/28 00:24:42 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.8 $ */
-/* NetHack 3.5	mhstatus.c	$Date: 2009/05/06 10:52:28 $  $Revision: 1.7 $ */
+/* NetHack 3.5	mhstatus.c	$NHDT-Date: 1425083082 2015/02/28 00:24:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
 /*	SCCS Id: @(#)mhstatus.c	3.5	2005/01/23	*/
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */

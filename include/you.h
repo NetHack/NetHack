@@ -53,6 +53,26 @@ struct u_event {
 	Bitfield(ascended,1);		/* has offered the Amulet */
 };
 
+struct u_achieve {
+	Bitfield(amulet,1);		/* touched Amulet */
+	Bitfield(bell,1);		/* touched Bell */
+	Bitfield(book,1);		/* touched Book */
+	Bitfield(menorah,1);		/* touched Candelabrum */
+	Bitfield(enter_gehennom,1);	/* entered Gehennom (or Valley) by any means */
+	Bitfield(ascended,1);		/* not quite the same as u.uevent.ascended */
+	Bitfield(mines_luckstone,1);	/* got a luckstone at end of mines */
+	Bitfield(finish_sokoban,1);	/* obtained the sokoban prize */
+
+	Bitfield(killed_medusa,1);
+};
+
+struct u_realtime {
+	time_t realtime;		/* actual playing time up until the last restore */
+	time_t restored;		/* time the game was started or restored */
+	time_t endtime;
+};
+
+
 /* KMH, conduct --
  * These are voluntary challenges.  Each field denotes the number of
  * times a challenge has been violated.
@@ -70,6 +90,12 @@ struct u_conduct {		/* number of times... */
 	long	wishes;		/* used a wish */
 	long	wisharti;	/* wished for an artifact */
 				/* genocides already listed at end of game */
+};
+
+struct u_roleplay {
+    boolean  blind;   /* permanently blind */
+    boolean  nudist;  /* has not worn any armor, ever */
+    long numbones;    /* # of bones files loaded  */
 };
 
 /*** Unified structure containing role information ***/
@@ -306,9 +332,11 @@ struct you {
 	/* 1 free bit! */
 
 	unsigned udg_cnt;		/* how long you have been demigod */
+	struct u_achieve uachieve;	/* achievements */
 	struct u_event	uevent;		/* certain events have happened */
 	struct u_have	uhave;		/* you're carrying special objects */
 	struct u_conduct uconduct;	/* KMH, conduct */
+	struct u_roleplay uroleplay;
 	struct attribs	acurr,		/* your current attributes (eg. str)*/
 			aexe,		/* for gain/loss via "exercise" */
 			abon,		/* your bonus attributes (eg. str) */

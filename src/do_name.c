@@ -1,5 +1,4 @@
-/* NetHack 3.5	do_name.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	do_name.c	$Date: 2012/01/29 03:00:17 $  $Revision: 1.49 $ */
+/* NetHack 3.5	do_name.c	$NHDT-Date: 1426558927 2015/03/17 02:22:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.53 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -25,6 +24,17 @@ nextmbuf()
 	return bufs[bufidx];
 }
 
+/* function for getpos() to highlight desired map locations.
+ * parameter value 0 = initialize, 1 = highlight, 2 = done
+ */
+void (*getpos_hilitefunc)(int) = NULL;
+void
+getpos_sethilite(f)
+void (*f)(int);
+{
+    getpos_hilitefunc = f;
+}
+
 /* the response for '?' help request in getpos() */
 STATIC_OVL void
 getpos_help(force, goal)
@@ -40,6 +50,10 @@ const char *goal;
     putstr(tmpwin, 0, sbuf);
     putstr(tmpwin, 0, "Use [HJKL] to move the cursor 8 units at a time.");
     putstr(tmpwin, 0, "Or enter a background symbol (ex. <).");
+    putstr(tmpwin, 0, "Use @ to move the cursor on yourself.");
+    if (getpos_hilitefunc != NULL)
+	putstr(tmpwin, 0, "Use $ to display valid locations.");
+    putstr(tmpwin, 0, "Use # to toggle automatic description.");
     /* disgusting hack; the alternate selection characters work for any
        getpos call, but they only matter for dowhatis (and doquickwhatis) */
     doing_what_is = (goal == what_is_an_unknown_object);
@@ -54,8 +68,8 @@ const char *goal;
 }
 
 int
-getpos(cc, force, goal)
-coord *cc;
+getpos(ccp, force, goal)
+coord *ccp;
 boolean force;
 const char *goal;
 {
@@ -63,16 +77,19 @@ const char *goal;
     int cx, cy, i, c;
     int sidx, tx, ty;
     boolean msg_given = TRUE;	/* clear message window by default */
+    boolean auto_msg = FALSE;
+    boolean show_goal_msg = FALSE;
     static const char pick_chars[] = ".,;:";
     const char *cp;
+    boolean hilite_state = FALSE;
 
     if (!goal) goal = "desired location";
     if (flags.verbose) {
 	pline("(For instructions type a ?)");
 	msg_given = TRUE;
     }
-    cx = cc->x;
-    cy = cc->y;
+    cx = ccp->x;
+    cy = ccp->y;
 #ifdef CLIPPING
     cliparound(cx, cy);
 #endif
@@ -82,7 +99,40 @@ const char *goal;
     lock_mouse_cursor(TRUE);
 #endif
     for (;;) {
+
+	if (show_goal_msg) {
+	    pline("Move cursor to %s:", goal);
+	    curs(WIN_MAP, cx, cy);
+	    flush_screen(0);
+	    show_goal_msg = FALSE;
+	} else if (auto_msg && !msg_given && !hilite_state) {
+	    coord cc;
+	    int sym = 0;
+	    char tmpbuf[BUFSZ];
+	    const char *firstmatch = NULL;
+
+	    cc.x = cx;
+	    cc.y = cy;
+	    if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch)) {
+		/* there may be an encoded glyph */
+		putmixed(WIN_MESSAGE, 0, tmpbuf);
+		curs(WIN_MAP, cx, cy);
+		flush_screen(0);
+	    }
+	}
+
 	c = nh_poskey(&tx, &ty, &sidx);
+
+	if (hilite_state) {
+	    (*getpos_hilitefunc)(2);
+	    hilite_state = FALSE;
+	    curs(WIN_MAP, cx, cy);
+	    flush_screen(0);
+	}
+
+	if (auto_msg)
+	    msg_given = FALSE;
+
 	if (c == '\033') {
 	    cx = cy = -10;
 	    msg_given = TRUE;	/* force clear */
@@ -142,8 +192,27 @@ const char *goal;
 	    else		/* ^R */
 		docrt();	/* redraw */
 	    /* update message window to reflect that we're still targetting */
-	    pline("Move cursor to %s:", goal);
+	    show_goal_msg = TRUE;
 	    msg_given = TRUE;
+	} else if ((c == '$') && (getpos_hilitefunc != NULL)) {
+	    if (!hilite_state) {
+		(*getpos_hilitefunc)(0);
+		(*getpos_hilitefunc)(1);
+		hilite_state = TRUE;
+	    }
+	    goto nxtc;
+	} else if (c == '#') {
+	    auto_msg = !auto_msg;
+	    pline("Automatic description %sis %s.",
+		  flags.verbose ? "of features under cursor " : "",
+		  auto_msg ? "on" : "off");
+	    if (!auto_msg) show_goal_msg = TRUE;
+	    msg_given = TRUE;
+	    goto nxtc;
+	} else if (c == '@') {
+	    cx = u.ux;
+	    cy = u.uy;
+	    goto nxtc;
 	} else {
 	    if (!index(quitchars, c)) {
 		char matching[MAXPCHARS];
@@ -162,9 +231,25 @@ const char *goal;
 			    lo_x = (pass == 0 && ty == lo_y) ? cx + 1 : 1;
 			    hi_x = (pass == 1 && ty == hi_y) ? cx : COLNO - 1;
 			    for (tx = lo_x; tx <= hi_x; tx++) {
-				k = levl[tx][ty].glyph;
+				/* look at dungeon feature, not at user-visible glyph */
+				k = back_to_glyph(tx,ty);
+				/* uninteresting background glyph */
 				if (glyph_is_cmap(k) &&
-					matching[glyph_to_cmap(k)]) {
+				    (IS_DOOR(levl[tx][ty].typ) ||
+				     glyph_to_cmap(k) == S_room ||
+				     glyph_to_cmap(k) == S_corr ||
+				     glyph_to_cmap(k) == S_litcorr)) {
+				    /* what the hero remembers to be at tx,ty */
+				    k = glyph_at(tx, ty);
+				}
+				if (glyph_is_cmap(k) &&
+					matching[glyph_to_cmap(k)] &&
+					levl[tx][ty].seenv &&
+					(!IS_WALL(levl[tx][ty].typ)) &&
+					(levl[tx][ty].typ != SDOOR) &&
+					glyph_to_cmap(k) != S_room &&
+					glyph_to_cmap(k) != S_corr &&
+					glyph_to_cmap(k) != S_litcorr) {
 				    cx = tx,  cy = ty;
 				    if (msg_given) {
 					clear_nhwindow(WIN_MESSAGE);
@@ -209,8 +294,9 @@ const char *goal;
     lock_mouse_cursor(FALSE);
 #endif
     if (msg_given) clear_nhwindow(WIN_MESSAGE);
-    cc->x = cx;
-    cc->y = cy;
+    ccp->x = cx;
+    ccp->y = cy;
+    getpos_hilitefunc = NULL;
     return result;
 }
 
@@ -751,10 +837,10 @@ boolean called;
 	/* Put the actual monster name or type into the buffer now */
 	/* Be sure to remember whether the buffer starts with a name */
 	if (do_hallu) {
-	    const char *rname = rndmonnam();
-
+	    char rnamecode;
+	    char *rname = rndmonnam(&rnamecode);
 	    Strcat(buf, rname);
-	    name_at_start = bogon_is_pname(rname);
+	    name_at_start = bogon_is_pname(rnamecode);
 	} else if (has_mname(mtmp)) {
 	    char *name = MNAME(mtmp);
 
@@ -948,113 +1034,44 @@ char *outbuf;
     return outbuf;
 }
 
-/*
- *  Name prefix codes (same as shknam.c):
- *	dash          -  female, personal name
- *	underscore    _  female, general name
- *	plus          +  male, personal name
- *	vertical bar  |  male, general name
- *	equals        =  gender not specified, personal name
- */
-
-static const char * const bogusmons[] = {
-	"jumbo shrimp", "giant pigmy", "gnu", "killer penguin",
-	"giant cockroach", "giant slug", "maggot", "pterodactyl",
-	"tyrannosaurus rex", "basilisk", "beholder", "nightmare",
-	"efreeti", "marid", "rot grub", "bookworm", "master lichen",
-	"shadow", "hologram", "jester", "attorney", "sleazoid",
-	"killer tomato", "amazon", "robot", "battlemech",
-	"rhinovirus", "harpy", "lion-dog", "rat-ant", "Y2K bug",
-						/* misc. */
-	"grue", "Christmas-tree monster", "luck sucker", "paskald",
-	"brogmoid", "dornbeast",		/* Quendor (Zork, &c.) */
-	"Ancient Multi-Hued Dragon", "+Evil Iggy",
-						/* Moria */
-	"emu", "kestrel", "xeroc", "venus flytrap",
-						/* Rogue */
-	"creeping coins",			/* Wizardry */
-	"hydra", "siren",			/* Greek legend */
-	"killer bunny",				/* Monty Python */
-	"rodent of unusual size",		/* The Princess Bride */
-	"were-rabbit",				/* Wallace & Gromit */
-	"+Smokey Bear",		/* "Only you can prevent forest fires!" */
-	"Luggage",				/* Discworld */
-	"Ent",					/* Lord of the Rings */
-	"tangle tree", "nickelpede", "wiggle",	/* Xanth */
-	"white rabbit", "snark",		/* Lewis Carroll */
-	"pushmi-pullyu",			/* Dr. Dolittle */
-	"smurf",				/* The Smurfs */
-	"tribble", "Klingon", "Borg",		/* Star Trek */
-	"Ewok",					/* Star Wars */
-	"Totoro",				/* Tonari no Totoro */
-	"ohmu",					/* Nausicaa */
-	"youma",				/* Sailor Moon */
-	"nyaasu",				/* Pokemon (Meowth) */
-	"-Godzilla", "+King Kong",		/* monster movies */
-	"earthquake beast",			/* old L of SH */
-	"Invid",				/* Robotech */
-	"Terminator",				/* The Terminator */
-	"boomer",				/* Bubblegum Crisis */
-	"Dalek",				/* Dr. Who ("Exterminate!") */
-	"microscopic space fleet", "Ravenous Bugblatter Beast of Traal",
-						/* HGttG */
-	"teenage mutant ninja turtle",		/* TMNT */
-	"samurai rabbit",			/* Usagi Yojimbo */
-	"aardvark",				/* Cerebus */
-	"=Audrey II",				/* Little Shop of Horrors */
-	"witch doctor", "one-eyed one-horned flying purple people eater",
-						/* 50's rock 'n' roll */
-	"+Barney the dinosaur",			/* saccharine kiddy TV */
-	"+Morgoth",				/* Angband */
-	"Vorlon",				/* Babylon 5 */
-	"questing beast",			/* King Arthur */
-	"Predator",				/* Movie */
-	"mother-in-law"				/* common pest */
-};
-
-
+#define BOGUSMONSIZE 100  /* arbitrary */
 /* return a random monster name, for hallucination */
-const char *
-rndmonnam()
+char *
+rndmonnam(code)
+char *code;
 {
-	const char *mname;
+	static char buf[BUFSZ];
+	char *mname = buf;
 	int name;
 
+	if (code) *code = '\0';
+
 	do {
-	    name = rn1(SPECIAL_PM + SIZE(bogusmons) - LOW_PM, LOW_PM);
+	    name = rn1(SPECIAL_PM + BOGUSMONSIZE - LOW_PM, LOW_PM);
 	} while (name < SPECIAL_PM &&
 	    (type_is_pname(&mons[name]) || (mons[name].geno & G_NOGEN)));
 
 	if (name >= SPECIAL_PM) {
-	    mname = bogusmons[name - SPECIAL_PM];
+	    get_rnd_text(BOGUSMONFILE, buf);
 	    /* strip prefix if present */
-	    if (!letter(*mname)) ++mname;
+	    if (!letter(*mname)) {
+		if (code) *code = *mname;
+		++mname;
+	    }
 	} else {
-	    mname = mons[name].mname;
+	    Strcpy(buf, mons[name].mname);
 	}
 	return mname;
 }
+#undef BOGUSMONSIZE
 
 /* scan bogusmons to check whether this name is in the list and has a prefix */
 boolean
-bogon_is_pname(mname)
-const char *mname;
+bogon_is_pname(code)
+char code;
 {
-	const char *bname;
-	int name;
-
-	if (!mname || !*mname) return FALSE;
-	if (!strncmpi(mname, "the ", 4)) mname += 4;
-	/* scan the bogusmons[] list; case sensitive here */
-	for (name = 0; name < SIZE(bogusmons); name++) {
-	    bname = bogusmons[name];
-	    /* we can skip all ordinary entries */
-	    if (letter(*bname)) continue;
-	    /* starts with a classification code; does rest of name match? */
-	    if (!strcmp(mname, bname + 1))
-		return index("-+=", *bname) ? TRUE : FALSE;
-	}
-	return FALSE;
+    if (!code) return FALSE;
+    return index("-+=", code) ? TRUE : FALSE;
 }
 
 const char *

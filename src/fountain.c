@@ -1,5 +1,4 @@
-/* NetHack 3.5	fountain.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	fountain.c	$Date: 2011/08/20 00:22:20 $  $Revision: 1.32 $ */
+/* NetHack 3.5	fountain.c	$NHDT-Date: 1426953330 2015/03/21 15:55:30 $  $NHDT-Branch: master $:$NHDT-Revision: 1.40 $ */
 /*	Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -39,7 +38,7 @@ dowatersnakes() /* Fountain of snakes! */
     if (!(mvitals[PM_WATER_MOCCASIN].mvflags & G_GONE)) {
 	if (!Blind)
 	    pline("An endless stream of %s pours forth!",
-		  Hallucination ? makeplural(rndmonnam()) : "snakes");
+		  Hallucination ? makeplural(rndmonnam(NULL)) : "snakes");
 	else
 	    You_hear("%s hissing!", something);
 	while(num-- > 0)
@@ -136,7 +135,7 @@ genericptr_t poolcnt;
 	levl[x][y].typ = POOL;
 	/* No kelp! */
 	del_engr_at(x, y);
-	water_damage(&level.objects[x][y], FALSE, TRUE);
+	water_damage_chain(level.objects[x][y], TRUE);
 
 	if ((mtmp = m_at(x, y)) != 0)
 		(void) minliquid(mtmp);
@@ -402,12 +401,14 @@ register struct obj *obj;
 		if(in_town(u.ux, u.uy))
 		    (void) angry_guards(FALSE);
 		return;
-	} else if (get_wet(obj)) {
-	    if (obj->otyp == POT_ACID) { /* Acid and water don't mix */
-		useup(obj);
-		return;
-	    } else if (!rn2(2))		/* no further effect */
-		return;
+	} else {
+        int er = water_damage(obj, NULL, TRUE);
+	    if (obj->otyp == POT_ACID && er != ER_DESTROYED) { /* Acid and water don't mix */
+		    useup(obj);
+		    return;
+	    } else if (er != ER_NOTHING && !rn2(2)) {		/* no further effect */
+		    return;
+        }
 	}
 
 	switch (rnd(30)) {
@@ -456,7 +457,7 @@ register struct obj *obj;
 			    long money = money_cnt(invent);
 			    struct obj *otmp;
                             if (money > 10) {
-				/* Amount to loose.  Might get rounded up as fountains don't pay change... */
+				/* Amount to lose.  Might get rounded up as fountains don't pay change... */
 			        money = somegold(money) / 10; 
 			        for (otmp = invent; otmp && money > 0; otmp = otmp->nobj) if (otmp->oclass == COIN_CLASS) {
 				    int denomination = objects[otmp->otyp].oc_cost;

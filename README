@@ -1,18 +1,27 @@
-                NetHack 3.5.0 -- General information
+                NetHack 3.6.0 -- General information
 
-NetHack 3.5 is an enhancement to the dungeon exploration game NetHack.
+NetHack 3.6 is an enhancement to the dungeon exploration game NetHack.
 It is a distant descendent of Rogue and Hack, and a direct descendent of
-NetHack 3.4.
+NetHack 3.4. In order to avoid confusion with interim development code 
+that was posted online in 2014 by others, there is no NetHack 3.5 release.
 
-NetHack 3.5.0 has many new features.
- *  List new features here
+NetHack 3.6.0 contains some code reorganization, new features, and bugfixes.
 
-A fuller list of changes for this release can be found in the file 
-doc/fixes35.0 in the source distribution.  The text in there was written 
-for the development team's own use and is provided "as is", so please do 
-not ask us to further explain the entries in that file.
+The file doc/fixes36.0 in the source distribution has a full list of each. 
+The text in there was written for the development team's own use and is 
+provided "as is", so please do not ask us to further explain the entries 
+in that file. Some entries might be considered "spoilers", particularly
+in the "new features" section.
 
-If you are a developer, please see the file DEVEL/Developer.txt.
+Here are some additional general notes that are not considered spoilers:
+ * Some code paths and long-established game features have been made 
+   part of the base build and no longer conditional on compile settings.
+ * Save files and bones files should be compatible across platforms and 
+   machine architectures <FIXME>.
+ * The following treasured NetHack community patches, or a variation of 
+   them, have been rolled in to the base NetHack source tree: menucolors,
+   pickup thrown, statue glyphs, <FIXME>.
+
                         - - - - - - - - - - -
 
 Please read items (1), (2) and (3) BEFORE doing anything with your new code.
@@ -21,64 +30,28 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     directory as the 'Top' directory.  It makes no difference what you
     call it.
 
-2.  If there is no flaw in the packaging, many sub-directories will be
-    automatically created, and files will be deposited in them:
+2.  Having unpacked, you should have a file called 'Files' in your Top
+    directory.  
 
-    a.  A 'dat' directory, which contains a variety of data files.
-    b.  A 'doc' directory, which contains various documentation.
-    c.  An 'include' directory, which contains *.h files.
-    d.  A 'src' directory, which contains game *.c files used by all versions.
-    e.  A 'util' directory, which contains files for utility programs.
-    f.  A 'sys' directory, which contains subdirectories for files that
-        are operating-system specific.
-    g.  A 'sys/share' subdirectory, which contains files shared by some OSs.
-    h.  A 'sys/share/sounds' subsubdirectory, which contains sound files
-        shared by some OSs.
-    i.  A 'sys/amiga' subdirectory, which contains files specific to AmigaDOS.
-    j.  A 'sys/atari' subdirectory, which contains files specific to TOS.
-    k.  A 'sys/be' subdirectory, which contains files specific to Be OS.
-    l.  A 'sys/mac' subdirectory, which contains files specific to MacOS.
-    m.  A 'sys/msdos' subdirectory, which contains files specific to MS-DOS.
-    n.  A 'sys/os2' subdirectory, which contains files specific to OS/2.
-    o.  A 'sys/unix' subdirectory, which contains files specific to UNIX.
-    p.  A 'sys/vms' subdirectory, which contains files specific to VMS.
-    q.  A 'sys/wince' subdirectory, which contains files specific to Windows CE.
-    r.  A 'sys/wince/ceinc' subdirectory; header files for Windows CE
-    s.  A 'sys/wince/ceinc/sys' subdirectory; ditto
-    t.  A 'sys/winnt' subdirectory, which contains files specific to Windows NT.
-    u.  A 'win' directory, which contains subdirectories for files that
-        are windowing-system specific (but not operating-system specific).
-    v.  A 'win/share' subdirectory, which contains files shared by some
-        windowing systems.
-    w.  A 'win/Qt' subdirectory, which contains files specific to Qt.
-    x.  A 'win/X11' subdirectory, which contains files specific to X11.
-    y.  A 'win/gem' subdirectory, which contains files specific to GEM.
-    z.  A 'win/gnome' subdirectory, which contains files specific to GNOME.
-    A.  A 'win/tty' subdirectory, which contains files specific to ttys.
-    B.  A 'win/win32' subdirectory, which contains files specific to the
-        Windows Win32 API.
-    C.  A 'DEVEL' directory, which contains files for NetHack developers.
-
-    The names of these directories should not be changed unless you are
-    ready to go through the makefiles and the makedefs program and change
-    all the directory references in them.
-
-3.  Having unpacked, you should have a file called 'Files' in your Top
-    directory.  This file contains the list of all the files you now SHOULD
+    This file contains the list of all the files you now SHOULD
     have in each directory.  Please check the files in each directory
     against this list to make sure that you have a complete set.
 
-4.  Before you do anything else, please read carefully the file called
+    This file also contains a list of what files are created during 
+    the build process.
+
+    The names of the directories listed should not be changed unless you
+    are ready to go through the makefiles and the makedefs program and change
+    all the directory references in them.
+
+3.  Before you do anything else, please read carefully the file called
     "license" in the 'dat' subdirectory.  It is expected that you comply
     with the terms of that license, and we are very serious about it.
 
-5.  If everything is in order, you can now turn to trying to get the program
+4.  If everything is in order, you can now turn to trying to get the program
     to compile and run on your particular system.  It is worth mentioning
     that the default configuration is SysV/Sun/Solaris2.x (simply because
-    the code was housed on such a system).  It is also worth mentioning
-    here that NetHack 3.5 is a huge program.  If you intend to run it on a
-    small machine, you'll have to make hard choices among the options
-    available in config.h.
+    the code was housed on such a system).
 
     The files sys/*/Install.* were written to guide you in configuring the
     program for your operating system.  The files win/*/Install.* are
@@ -86,17 +59,16 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     for particular windowing environments.  Reading them, and the man pages,
     should answer most of your questions.
 
-    At the time of this release, NetHack 3.5 is known to run/compile on:
+    At the time of this release, NetHack 3.6 has been tested to run/compile on:
 
-        Intel 80386 or greater (or clone) boxes running Linux, BSDI, or
-                Windows NT/XP/2000/2003/2008
-        Intel Pentium or better (or clone) running BeOS 4.5
-        Sun SPARC based machine running SunOS 4.x, Solaris 2.x, or Solaris 7
+        Intel Pentium or better (or clone) running Linux, BSDI, or 
+                Windows (XP through 8.1)
+        Intel 80386 or greater (or clone) boxes running Linux, or BSDI
+	Mac OS X 10.9
 
-
-    Previous versions of NetHack were tested on the following systems,
-    and with a little work we expect that NetHack 3.5 will work on them 
-    as well:
+    Previous versions of NetHack were tested and known to run on the 
+    following systems, but it is unknown if they can still build and 
+    execute NetHack 3.6:
 
         Apple Macintosh running MacOS 7.5 or higher, LinuxPPC, BeOS 4.0
         Atari ST/TT/Falcon running TOS (or MultiTOS) with GCC
@@ -116,37 +88,35 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
         Gould NP1 running UTX 3/2
         HP 9000s300 running HP-UX
         HP 9000s700 running HP-UX 9.x, 10.x, 11.x
+        H/PC Pro devices running Windows CE 2.11 and higher.
         IBM PC/RT and RS/6000 running AIX 3.x
         IBM PS/2 and AT compatibles running OS/2 - 2.0 and up with GCC emx
         IBM PS/2 and AT compatibles running OS/2 1.1 - 2.0 (and probably
            Warp) with Microsoft 6.0, and OS/2 2.0 and up with IBM CSet++ 2.0.
         Intel 80386 or greater (or clone) running 386BSD
         Intel 80386 or greater (or clone) boxes running MS-DOS with DPMI.
+        Intel x86 running a version of Windows prior to XP.
         Mips M2000 running RiscOS 4.1
         NeXT running Mach (using BSD configuration)
+	Palm Size PC 1.1 devices running Windows CE 2.11
+        Pocket PC devices running Windows CE 3.0 and higher
         Pyramid 9820x running OSx 4.4c
         SGI Iris running IRIX
         Stardent Vistra 800 running SysV R4.0
         Stride 460 running UniStride 2.1
         Sun-3s, -4s, and -386is running SunOS 3.x
         Sun-3s and -386is running SunOS 4.x
+        Sun SPARC based machine running SunOS 4.x, Solaris 2.x, or Solaris 7
         Valid Logic Systems SCALD-System
+
+    Previous versions, using a cross-compiler hosted on another platform, such as 
+    win32, could also build the following from source:
+        Pocket PC devices running Windows CE 3.0 and higher
+        H/PC Pro devices running Windows CE 2.11 and higher
+        Palm Size PC 1.1 devices running Windows CE 2.11
 
     Unless otherwise mentioned, the compiler used was the OS-vendor's
     C compiler.
-
-    NetHack 3.5 may also run on the following, but a cross-compiler hosted
-    on another platform, such as win32, would be required to build from 
-    source.
-
-        Pocket PC devices running Windows CE 3.0 and higher
-        H/PC Pro devices running Windows CE 2.11 and higher.
-	Palm Size PC 1.1 devices running Windows CE 2.11
-
-    The sources necessary to build an 80286 DOS "real mode" overlaid version 
-    are still included in the source distribution, so if someone has access 
-    to a real-mode compiler and lots of spare time on their hands, you may 
-    be able to get things working. Of course you do so at your own risk.
 
                         - - - - - - - - - - -
 
@@ -154,35 +124,37 @@ If you have problems building the game, or you find bugs in it, we recommend
 filing a bug report from our "Contact Us" web page at:
     http://www.nethack.org/ 
 
+A public repository of the latest NetHack code that we've made
+available can be obtained via git here:
+    <FIXME>
+
 When sending correspondence, please observe the following:
 o Please be sure to include your machine type, OS, and patchlevel.
-o Never send us binary files (e.g. save files or bones files). Whichever 
-  platform you are using, only a small minority of the development team has 
-  access to it, and you will rapidly annoy the others.  If you have found 
-  a bug and think that your save file would aid in solving the problem, 
-  send us a description in words of the problem, your machine type, your 
-  operating system, and the version of NetHack.  Tell us that you have a 
-  save file, but do not actually send it.
-  In the rare case that we think your save file would be helpful, you will
-  be contacted by a member of the development team with the address of a
-  specific person to send the save file to.
+o Please avoid sending us binary files (e.g. save files or bones files). 
+  If you have found a bug and think that your save file would aid in solving
+  the problem, send us a description in words of the problem, your machine 
+  type, your operating system, and the version of NetHack.  Tell us that you 
+  have a save file, but do not actually send it.
+  You may then be contacted by a member of the development team with the 
+  address of a specific person to send the save file to.
 o Though we make an effort to reply to each bug report, it may take some
   time before you receive feedback.  This is especially true during the
   period immediately after a new release, when we get the most bug reports.
 o We don't give hints for playing the game.
-o Don't bother to ask when the next version will be out.  You will not get
-  a reply.
+o Don't bother to ask when the next version will be out or you can expect
+  to receive a stock answer.
 
-If you don't have access to the world wide web, or if you want to submit
-a patch for the NetHack source code via email directly, you can direct it 
-to this address:
+If you want to submit a patch for the NetHack source code via email directly, 
+you can direct it to this address:
     nethack-bugs (at) nethack.org
 
 If a feature is not accepted you are free, of course, to post the patches 
 to the net yourself and let the marketplace decide their worth.
 
 All of this amounts to the following:  If you decide to apply a free-lanced
-patch to your 3.5 code, you are on your own.  In our own patches, we will
-assume that your code is synchronized with ours.
+patch to your 3.6 code, you are welcome to do so, of course, but we won't
+be able to provide support or receive bug reports for it.  
+
+In our own patches, we will assume that your code is synchronized with ours.
 
                   -- Good luck, and happy Hacking --

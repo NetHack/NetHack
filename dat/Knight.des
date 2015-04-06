@@ -13,7 +13,7 @@
 MAZE: "Kni-strt",'.'
 FLAGS: noteleport,hardfloor
 # This is a kludge to init the level as a lit field.
-INIT_MAP: '.' , '.' , false , false , lit , false
+INIT_MAP: mines, '.' , '.' , false , false , lit , false
 GEOMETRY:center,center
 MAP
 ..................................................
@@ -62,21 +62,21 @@ DOOR:closed,(45,03)
 DOOR:closed,(04,12)
 DOOR:closed,(45,12)
 # King Arthur
-MONSTER:'@',"King Arthur",(09,07)
+MONSTER:('@',"King Arthur"),(09,07)
 # The treasure of King Arthur
-OBJECT:'(',"chest",(09,07)
+OBJECT:('(',"chest"),(09,07)
 # knight guards for the watchrooms
-MONSTER:'@',"knight",(04,02),peaceful
-MONSTER:'@',"knight",(04,13),peaceful
-MONSTER:'@',"knight",(45,02),peaceful
-MONSTER:'@',"knight",(45,13),peaceful
+MONSTER:('@',"knight"),(04,02),peaceful
+MONSTER:('@',"knight"),(04,13),peaceful
+MONSTER:('@',"knight"),(45,02),peaceful
+MONSTER:('@',"knight"),(45,13),peaceful
 # page guards for the audience chamber
-MONSTER:'@',"page",(16,06)
-MONSTER:'@',"page",(18,06)
-MONSTER:'@',"page",(20,06)
-MONSTER:'@',"page",(16,09)
-MONSTER:'@',"page",(18,09)
-MONSTER:'@',"page",(20,09)
+MONSTER:('@',"page"),(16,06)
+MONSTER:('@',"page"),(18,06)
+MONSTER:('@',"page"),(20,06)
+MONSTER:('@',"page"),(16,09)
+MONSTER:('@',"page"),(18,09)
+MONSTER:('@',"page"),(20,09)
 # Non diggable walls
 NON_DIGGABLE:(00,00,49,15)
 # Random traps
@@ -87,18 +87,18 @@ TRAP:random,random
 TRAP:random,random
 TRAP:random,random
 # Monsters on siege duty.
-MONSTER: 'i',"quasit",(14,00),hostile
-MONSTER: 'i',"quasit",(16,00),hostile
-MONSTER: 'i',"quasit",(18,00),hostile
-MONSTER: 'i',"quasit",(20,00),hostile
-MONSTER: 'i',"quasit",(22,00),hostile
-MONSTER: 'i',"quasit",(24,00),hostile
-MONSTER: 'i',"quasit",(26,00),hostile
-MONSTER: 'i',"quasit",(28,00),hostile
-MONSTER: 'i',"quasit",(30,00),hostile
-MONSTER: 'i',"quasit",(32,00),hostile
-MONSTER: 'i',"quasit",(34,00),hostile
-MONSTER: 'i',"quasit",(36,00),hostile
+MONSTER: ('i',"quasit"),(14,00),hostile
+MONSTER: ('i',"quasit"),(16,00),hostile
+MONSTER: ('i',"quasit"),(18,00),hostile
+MONSTER: ('i',"quasit"),(20,00),hostile
+MONSTER: ('i',"quasit"),(22,00),hostile
+MONSTER: ('i',"quasit"),(24,00),hostile
+MONSTER: ('i',"quasit"),(26,00),hostile
+MONSTER: ('i',"quasit"),(28,00),hostile
+MONSTER: ('i',"quasit"),(30,00),hostile
+MONSTER: ('i',"quasit"),(32,00),hostile
+MONSTER: ('i',"quasit"),(34,00),hostile
+MONSTER: ('i',"quasit"),(36,00),hostile
 
 #
 #	The "locate" level for the quest.
@@ -109,7 +109,7 @@ MONSTER: 'i',"quasit",(36,00),hostile
 
 MAZE: "Kni-loca",' '
 FLAGS: hardfloor
-INIT_MAP: '.' , 'P' , false , true , lit , false
+INIT_MAP: mines, '.' , 'P' , false , true , lit , false
 GEOMETRY:center,center
 MAP
 ...PPP.........PPPP..............PPPP...
@@ -136,21 +136,21 @@ STAIR:(18,05),down
 # The altar atop the Tor and its attendant (creating altar makes the priest).
 ALTAR:(17,05),neutral,shrine
 # Objects
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
 # Random traps
 # All of the avenues are guarded by magic except for the East.
 # South
@@ -210,33 +210,33 @@ TRAP:"anti magic",random
 TRAP:"anti magic",random
 TRAP:"anti magic",random
 # Random monsters.
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',random,random,hostile
-MONSTER:'j',random,random,hostile
-MONSTER:'j',"ochre jelly",random,hostile
-MONSTER:'j',"ochre jelly",random,hostile
-MONSTER:'j',"ochre jelly",random,hostile
-MONSTER:'j',"ochre jelly",random,hostile
-MONSTER:'j',"ochre jelly",random,hostile
-MONSTER:'j',"ochre jelly",random,hostile
-MONSTER:'j',"ochre jelly",random,hostile
-MONSTER:'j',random,random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:'i',random,hostile
+MONSTER:'j',random,hostile
+MONSTER:('j',"ochre jelly"),random,hostile
+MONSTER:('j',"ochre jelly"),random,hostile
+MONSTER:('j',"ochre jelly"),random,hostile
+MONSTER:('j',"ochre jelly"),random,hostile
+MONSTER:('j',"ochre jelly"),random,hostile
+MONSTER:('j',"ochre jelly"),random,hostile
+MONSTER:('j',"ochre jelly"),random,hostile
+MONSTER:'j',random,hostile
 
 #
 #	The "goal" level for the quest.
@@ -278,28 +278,28 @@ STAIR:(03,08),up
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,19)
 # Objects
-OBJECT:'(',"mirror",(50,06),blessed,0,"The Magic Mirror of Merlin"
-OBJECT:random,random,(33,01)
-OBJECT:random,random,(33,02)
-OBJECT:random,random,(33,03)
-OBJECT:random,random,(33,04)
-OBJECT:random,random,(33,05)
-OBJECT:random,random,(34,01)
-OBJECT:random,random,(34,02)
-OBJECT:random,random,(34,03)
-OBJECT:random,random,(34,04)
-OBJECT:random,random,(34,05)
-OBJECT:random,random,(35,01)
-OBJECT:random,random,(35,02)
-OBJECT:random,random,(35,03)
-OBJECT:random,random,(35,04)
-OBJECT:random,random,(35,05)
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:('(',"mirror"),(50,06),blessed,0,name:"The Magic Mirror of Merlin"
+OBJECT:random,(33,01)
+OBJECT:random,(33,02)
+OBJECT:random,(33,03)
+OBJECT:random,(33,04)
+OBJECT:random,(33,05)
+OBJECT:random,(34,01)
+OBJECT:random,(34,02)
+OBJECT:random,(34,03)
+OBJECT:random,(34,04)
+OBJECT:random,(34,05)
+OBJECT:random,(35,01)
+OBJECT:random,(35,02)
+OBJECT:random,(35,03)
+OBJECT:random,(35,04)
+OBJECT:random,(35,05)
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
 # Random traps
 TRAP:"spiked pit",(13,07)
 TRAP:"spiked pit",(12,08)
@@ -310,34 +310,34 @@ TRAP:random,random
 TRAP:random,random
 TRAP:random,random
 # Random monsters.
-MONSTER:'D',"Ixoth",(50,06),hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',"quasit",random,hostile
-MONSTER:'i',random,random,hostile
-MONSTER:'i',random,random,hostile
-MONSTER:'j',"ochre jelly",random,hostile
-MONSTER:'j',"ochre jelly",random,hostile
-MONSTER:'j',"ochre jelly",random,hostile
-MONSTER:'j',"ochre jelly",random,hostile
-MONSTER:'j',"ochre jelly",random,hostile
-MONSTER:'j',"ochre jelly",random,hostile
-MONSTER:'j',"ochre jelly",random,hostile
-MONSTER:'j',"ochre jelly",random,hostile
-MONSTER:'j',random,random,hostile
+MONSTER:('D',"Ixoth"),(50,06),hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:('i',"quasit"),random,hostile
+MONSTER:'i',random,hostile
+MONSTER:'i',random,hostile
+MONSTER:('j',"ochre jelly"),random,hostile
+MONSTER:('j',"ochre jelly"),random,hostile
+MONSTER:('j',"ochre jelly"),random,hostile
+MONSTER:('j',"ochre jelly"),random,hostile
+MONSTER:('j',"ochre jelly"),random,hostile
+MONSTER:('j',"ochre jelly"),random,hostile
+MONSTER:('j',"ochre jelly"),random,hostile
+MONSTER:('j',"ochre jelly"),random,hostile
+MONSTER:'j',random,hostile
 
 #
 #	The "fill" levels for the quest.
@@ -349,27 +349,27 @@ MONSTER:'j',random,random,hostile
 #
 
 MAZE: "Kni-fila" , '.'
-INIT_MAP: '.' , 'P' , false , true , lit , false
+INIT_MAP: mines, '.' , 'P' , false , true , lit , false
 NOMAP
 #
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
 #
-MONSTER: 'i', "quasit", random, hostile
-MONSTER: 'i', "quasit", random, hostile
-MONSTER: 'i', "quasit", random, hostile
-MONSTER: 'i', "quasit", random, hostile
-MONSTER: 'i', random, random, hostile
-MONSTER: 'j', "ochre jelly", random, hostile
+MONSTER: ('i', "quasit"), random, hostile
+MONSTER: ('i', "quasit"), random, hostile
+MONSTER: ('i', "quasit"), random, hostile
+MONSTER: ('i', "quasit"), random, hostile
+MONSTER: 'i', random, hostile
+MONSTER: ('j', "ochre jelly"), random, hostile
 #
 TRAP: random, random
 TRAP: random, random
@@ -377,32 +377,32 @@ TRAP: random, random
 TRAP: random, random
 
 MAZE: "Kni-filb" , '.'
-INIT_MAP: '.' , 'P' , false , true , lit , false
+INIT_MAP: mines, '.' , 'P' , false , true , lit , false
 NOMAP
 #
 STAIR: random, up
 STAIR: random, down
 #
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
+OBJECT: random, random
 #
-MONSTER: 'i', "quasit", random, hostile
-MONSTER: 'i', "quasit", random, hostile
-MONSTER: 'i', "quasit", random, hostile
-MONSTER: 'i', "quasit", random, hostile
-MONSTER: 'i', random, random, hostile
-MONSTER: 'j', "ochre jelly", random, hostile
-MONSTER: 'j', "ochre jelly", random, hostile
-MONSTER: 'j', "ochre jelly", random, hostile
+MONSTER: ('i', "quasit"), random, hostile
+MONSTER: ('i', "quasit"), random, hostile
+MONSTER: ('i', "quasit"), random, hostile
+MONSTER: ('i', "quasit"), random, hostile
+MONSTER: 'i', random, hostile
+MONSTER: ('j', "ochre jelly"), random, hostile
+MONSTER: ('j', "ochre jelly"), random, hostile
+MONSTER: ('j', "ochre jelly"), random, hostile
 #
 TRAP: random, random
 TRAP: random, random

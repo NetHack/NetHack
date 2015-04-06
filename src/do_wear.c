@@ -391,7 +391,7 @@ Helmet_on(VOID_ARGS)
 		   properties, including levitation; uarmh could get
 		   dropped or destroyed here */
 		uchangealign((u.ualign.type != A_NEUTRAL) ? -u.ualign.type :
-				rn2(2) ? A_CHAOTIC : A_LAWFUL, 1);
+			     (uarmh->o_id % 2) ? A_CHAOTIC : A_LAWFUL, 1);
 	     /* makeknown(uarmh->otyp);   -- moved below, after xname() */
 		/*FALLTHRU*/
 	case DUNCE_CAP:
@@ -1407,6 +1407,7 @@ register struct obj *otmp;
 	if(cursed(otmp)) return(0);
 	if(delay) {
 		nomul(delay);
+		multi_reason = "disrobing";
 		if (is_helmet(otmp)) {
 			/* ick... */
 			nomovemsg = !strcmp(helm_simple_name(otmp), "hat") ?
@@ -1664,6 +1665,7 @@ dowear()
 	delay = -objects[otmp->otyp].oc_delay;
 	if(delay){
 		nomul(delay);
+		multi_reason = "dressing up";
 		if(is_boots(otmp)) afternmv = Boots_on;
 		if(is_helmet(otmp)) afternmv = Helmet_on;
 		if(is_gloves(otmp)) afternmv = Gloves_on;
@@ -1935,20 +1937,6 @@ struct monst *victim;
 	otmp = (victim == &youmonst) ? uarms : which_armor(victim, W_ARMS);
 	if(otmp && (!otmph || !rn2(4))) otmph = otmp;
 	return(otmph);
-}
-
-/* erode some arbitrary armor worn by the victim */
-void
-erode_armor(victim, acid_dmg)
-struct monst *victim;
-boolean acid_dmg;
-{
-	struct obj *otmph = some_armor(victim);
-
-	if (otmph && (otmph != uarmf)) {
-	    (void) erode_obj(otmph, acid_dmg ? 3 : 1, FALSE, FALSE);
-	    if (carried(otmph)) update_inventory();
-	}
 }
 
 /* used for praying to check and fix levitation trouble */

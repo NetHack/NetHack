@@ -1,5 +1,4 @@
-/* NetHack 3.5	winmenu.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	winmenu.c	$Date: 2009/05/06 10:55:53 $  $Revision: 1.5 $ */
+/* NetHack 3.5	winmenu.c	$NHDT-Date: 1427881480 2015/04/01 09:44:40 $  $NHDT-Branch: master $:$NHDT-Revision: 1.5 $ */
 /*	SCCS Id: @(#)winmenu.c	3.5	1996/08/15	*/
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -206,6 +205,7 @@ menu_key(w, event, params, num_params)
     struct xwindow *wp;
     char ch;
     int count;
+    boolean selected_something;
 
     wp = find_widget(w);
     menu_info = wp->menu_information;
@@ -218,6 +218,13 @@ menu_key(w, event, params, num_params)
     }
 
     if (menu_info->is_active) {		/* waiting for input */
+	/* first check for an explicit selector match, so that it won't be
+	   overridden if it happens to duplicate a mapped menu command (':'
+	   to look inside a container vs ':' to select via search string) */
+	for (curr = menu_info->curr_menu.base; curr; curr = curr->next)
+	    if (curr->identifier.a_void != 0 && curr->selector == ch)
+		goto make_selection;
+
 	ch = map_menu_cmd(ch);
 	if (ch == '\033') {		/* quit */
 	    if (menu_info->counting) {
@@ -294,7 +301,8 @@ menu_key(w, event, params, num_params)
 		X11_nhbell();
 	    return;
 	} else {
-	    boolean selected_something = FALSE;
+ make_selection:
+	    selected_something = FALSE;
 	    for (count = 0, curr = menu_info->curr_menu.base; curr;
 						    curr = curr->next, count++)
 		if (curr->identifier.a_void != 0 && curr->selector == ch) break;

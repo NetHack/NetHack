@@ -1,5 +1,4 @@
-/* NetHack 3.5	config.h	$NHDT-Date: 1425083082 2015/02/28 00:24:42 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.51 $ */
-/* NetHack 3.5	config.h	$Date: 2012/01/27 20:15:26 $  $Revision: 1.37 $ */
+/* NetHack 3.5	config.h	$NHDT-Date: 1425083082 2015/02/28 00:24:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.51 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -187,6 +186,7 @@
 #endif
 
 #define LOGFILE "logfile"	/* larger file for debugging purposes */
+#define XLOGFILE "xlogfile"	/* even larger logfile */
 #define NEWS "news"		/* the file containing the latest hack news */
 #define PANICLOG "paniclog"	/* log of panic and impossible events */
 
@@ -316,6 +316,11 @@
 #endif /* CHDIR */
 
 
+/* If GENERIC_USERNAMES is defined, and the user name is found
+ * in that list, prompt for username instead.
+ * A public server should probably disable this. */
+#define GENERIC_USERNAMES "play player game games nethack nethacker"
+
 
 /*
  * Section 3:	Definitions that may vary with system type.
@@ -430,6 +435,14 @@ typedef unsigned char	uchar;
  * Enable any of these at your own risk -- there are almost certainly
  * bugs left here.
  */
+
+/* Menucolors */
+# define MENU_COLOR_REGEX  /* use GNU regex */
+/*# define MENU_COLOR_REGEX_POSIX*/ /* use POSIX regex */
+/* if neither is defined, uses pmatch()
+ * pmatch() provides basic globbing: '*' and '?' wildcards.
+ */
+
 
 #define STATUS_VIA_WINDOWPORT	/* re-work of the status line updating process */
 #define STATUS_HILITES		/* support hilites of status fields */

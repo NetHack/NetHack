@@ -1,5 +1,4 @@
-/* NetHack 3.5	rnd.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	rnd.c	$Date: 2009/05/06 10:47:41 $  $Revision: 1.7 $ */
+/* NetHack 3.5	rnd.c	$NHDT-Date: 1426465440 2015/03/16 00:24:00 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.8 $ */
 /*	SCCS Id: @(#)rnd.c	3.5	2004/08/27	*/
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -24,7 +23,7 @@ register int x;
 {
 #ifdef BETA
 	if (x <= 0) {
-		debugpline("rn2(%d) attempted", x);
+		debugpline1("rn2(%d) attempted", x);
 		return(0);
 	}
 	x = RND(x);
@@ -42,7 +41,7 @@ register int x;	/* good luck approaches 0, bad luck approaches (x-1) */
 
 #ifdef BETA
 	if (x <= 0) {
-		debugpline("rnl(%d) attempted", x);
+		debugpline1("rnl(%d) attempted", x);
 		return(0);
 	}
 #endif
@@ -81,7 +80,7 @@ register int x;
 {
 #ifdef BETA
 	if (x <= 0) {
-		debugpline("rnd(%d) attempted", x);
+		debugpline1("rnd(%d) attempted", x);
 		return(1);
 	}
 	x = RND(x)+1;
@@ -99,7 +98,7 @@ register int n, x;
 
 #ifdef BETA
 	if (x < 0 || n < 0 || (x == 0 && n != 0)) {
-		debugpline("d(%d,%d) attempted", n, x);
+		debugpline2("d(%d,%d) attempted", n, x);
 		return(1);
 	}
 #endif

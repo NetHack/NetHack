@@ -45,7 +45,6 @@ static void nhcoord2display(PNHMapWindow data, int x, int y, LPRECT lpOut);
 #if (VERSION_MAJOR < 4) && (VERSION_MINOR < 4) && (PATCHLEVEL < 2)
 static void nhglyph2charcolor(short glyph, uchar* ch, int* color);
 #endif
-static COLORREF nhcolor_to_RGB(int c);
 
 HWND mswin_init_map_window () {
 	static int run_once = 0;

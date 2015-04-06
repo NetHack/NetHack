@@ -21,6 +21,7 @@ char *catmore = 0;		/* default pager */
 NEARDATA int bases[MAXOCLASSES] = DUMMY;
 
 NEARDATA int multi = 0;
+const char *multi_reason = NULL;
 NEARDATA int nroom = 0;
 NEARDATA int nsubroom = 0;
 NEARDATA int occtime = 0;
@@ -102,9 +103,9 @@ NEARDATA struct multishot m_shot = { 0, 0, STRANGE_OBJECT, FALSE };
 
 NEARDATA dungeon dungeons[MAXDUNGEON];	/* ini'ed by init_dungeon() */
 NEARDATA s_level *sp_levchn;
-NEARDATA stairway upstair = { 0, 0 }, dnstair = { 0, 0 };
-NEARDATA stairway upladder = { 0, 0 }, dnladder = { 0, 0 };
-NEARDATA stairway sstairs = { 0, 0 };
+NEARDATA stairway upstair = { 0, 0, { 0,0 }, 0 }, dnstair = { 0, 0, { 0,0 }, 0  };
+NEARDATA stairway upladder = { 0, 0, { 0,0 }, 0  }, dnladder = { 0, 0, { 0,0 }, 0  };
+NEARDATA stairway sstairs = { 0, 0, { 0,0 }, 0  };
 NEARDATA dest_area updest = { 0, 0, 0, 0, 0, 0, 0, 0 };
 NEARDATA dest_area dndest = { 0, 0, 0, 0, 0, 0, 0, 0 };
 NEARDATA coord inv_pos = { 0, 0 };
@@ -136,6 +137,7 @@ NEARDATA struct sysflag sysflags = DUMMY;
 NEARDATA struct instance_flags iflags = DUMMY;
 NEARDATA struct you u = DUMMY;
 NEARDATA time_t ubirthday = DUMMY;
+NEARDATA struct u_realtime urealtime = DUMMY;
 
 
 schar lastseentyp[COLNO][ROWNO] = {DUMMY}; /* last seen/touched dungeon typ */
@@ -217,6 +219,8 @@ NEARDATA struct c_color_names c_color_names = {
 	"white"
 };
 
+struct menucoloring *menu_colorings = NULL;
+
 const char *c_obj_colors[] = {
 	"black",		/* CLR_BLACK */
 	"red",			/* CLR_RED */
@@ -267,12 +271,14 @@ char toplines[TBUFSZ];
 struct tc_gbl_data tc_gbl_data = { 0,0, 0,0 };	/* AS,AE, LI,CO */
 
 char *fqn_prefix[PREFIX_COUNT] = { (char *)0, (char *)0, (char *)0, (char *)0,
-				(char *)0, (char *)0, (char *)0, (char *)0, (char *)0 };
+				(char *)0, (char *)0, (char *)0, (char *)0,
+				(char *)0 , (char *)0 };
 
 #ifdef PREFIXES_IN_USE
 char *fqn_prefix_names[PREFIX_COUNT] = { "hackdir", "leveldir", "savedir",
 					"bonesdir", "datadir", "scoredir",
-					"lockdir", "configdir", "troubledir" };
+					"lockdir", "sysconfdir", "configdir",
+					"troubledir" };
 #endif
 
 NEARDATA struct savefile_info sfcap = {

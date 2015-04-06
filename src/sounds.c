@@ -304,7 +304,11 @@ dosounds()
 
 static const char * const h_sounds[] = {
     "beep", "boing", "sing", "belche", "creak", "cough", "rattle",
-    "ululate", "pop", "jingle", "sniffle", "tinkle", "eep"
+    "ululate", "pop", "jingle", "sniffle", "tinkle", "eep",
+    "clatter", "hum", "sizzle", "twitter", "wheeze", "rustle",
+    "honk", "lisp", "yodel", "coo", "burp", "moo", "boom",
+    "murmur", "oink", "quack", "rumble", "twang", "bellow",
+    "toot", "gargle", "hoot", "warble"
 };
 
 const char *
@@ -706,6 +710,7 @@ register struct monst *mtmp;
 	    pline("%s rattles noisily.", Monnam(mtmp));
 	    You("freeze for a moment.");
 	    nomul(-2);
+	    multi_reason = "scared by rattling";
 	    nomovemsg = 0;
 	    break;
 	case MS_LAUGH:
@@ -901,7 +906,15 @@ register struct monst *mtmp;
 
     if (pline_msg) pline("%s %s", Monnam(mtmp), pline_msg);
     else if (mtmp->mcan && verbl_msg_mcan) verbalize1(verbl_msg_mcan);
-    else if (verbl_msg) verbalize1(verbl_msg);
+    else if (verbl_msg) {
+	if (ptr == &mons[PM_DEATH]) { /* Death talks in CAPITAL LETTERS */
+	    char tmpbuf[BUFSZ];
+	    Sprintf(tmpbuf, "%s", verbl_msg);
+	    verbalize1(ucase(tmpbuf));
+	} else {
+	    verbalize1(verbl_msg);
+	}
+    }
     return(1);
 }
 
@@ -998,7 +1011,7 @@ dochat()
       if (!Blind) {
 	if (Hallucination) {
 	  /* if you're hallucinating, you can't tell it's a statue */
-	  pline_The("%s seems not to notice you.", rndmonnam());
+	  pline_The("%s seems not to notice you.", rndmonnam(NULL));
 	}
 	else {
 	  pline_The("statue seems not to notice you.");

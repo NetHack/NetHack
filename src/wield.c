@@ -1,5 +1,4 @@
-/* NetHack 3.5	wield.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	wield.c	$Date: 2009/05/06 10:48:14 $  $Revision: 1.31 $ */
+/* NetHack 3.5	wield.c	$NHDT-Date: 1427062304 2015/03/22 22:11:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.34 $ */
 /*	SCCS Id: @(#)wield.c	3.5	2009/01/20	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -349,10 +348,6 @@ dowieldquiver()
 	/* will_weld(), touch_petrifies(), etc. */
 	multi = 0;
 
-	/* Because 'Q' used to be quit... */
-	if (flags.suppress_alert < FEATURE_NOTICE_VER(3,3,0))
-		pline("Note: Please use #quit if you wish to exit the game.");
-
 	/* Prompt for a new quiver */
 	if (!(newquiver = getobj(quivee_types, "ready")))
 		/* Cancelled */
@@ -595,131 +590,6 @@ untwoweapon()
 		update_inventory();
 	}
 	return;
-}
-
-/* Maybe rust (or corrode, burn, rot) object.
- * Returns TRUE if something happened. */
-boolean
-erode_obj(target, type, fade_scrolls, for_dip)
-struct obj *target;		/* object (e.g. weapon or armor) to erode */
-int type;
-boolean fade_scrolls;
-boolean for_dip;
-{
-	static NEARDATA const char * const action[] = { "smoulder", "rust", "rot", "corrode" };
-	static NEARDATA const char * const msg[] =  { "burnt", "rusty", "rotten", "corroded" };
-	boolean vulnerable = FALSE;
-	boolean grprot = FALSE;
-	boolean is_primary = TRUE;
-	int erosion;
-	int dmgtyp = AD_ACID;
-	struct monst *victim;
-	boolean vismon, visobj, chill;
-	boolean ret = FALSE;
-	boolean already_affected = FALSE;
-
-	if (!target)
-	    return FALSE;
-	victim = carried(target) ? &youmonst :
-	    mcarried(target) ? target->ocarry : (struct monst *)0;
-	vismon = victim && (victim != &youmonst) && canseemon(victim);
-	visobj = !victim && cansee(bhitpos.x, bhitpos.y); /* assume thrown */
-
-	switch(type) {
-	case 0: vulnerable = is_flammable(target);
-	    dmgtyp = AD_FIRE;
-	    break;
-	case 1: vulnerable = is_rustprone(target);
-	    dmgtyp = AD_RUST;
-	    grprot = TRUE;
-	    if (target->lamplit) {
-		already_affected = snuff_lit(target);
-		if (already_affected) ret = TRUE;
-	    }
-	    break;
-	case 2: vulnerable = is_rottable(target);
-	    dmgtyp = AD_DCAY;
-	    is_primary = FALSE;
-	    break;
-	case 3: vulnerable = is_corrodeable(target);
-	    dmgtyp = AD_ACID;
-	    grprot = TRUE;
-	    is_primary = FALSE;
-	    break;
-	}
-	erosion = is_primary ? target->oeroded : target->oeroded2;
-
-	if (target->greased && grprot) {
-	    grease_protect(target,(char *)0,victim);
-	    ret = TRUE;
-	} else if (target->oclass == SCROLL_CLASS && (type == 1 || type == 3)) {
-	    if(fade_scrolls && target->otyp != SCR_BLANK_PAPER
-#ifdef MAIL
-	    && target->otyp != SCR_MAIL
-#endif
-					)
-	    {
-		if (!Blind) {
-		    if ((victim == &youmonst) || vismon || visobj)
-			pline("%s.", Yobjnam2(target, "fade"));
-		}
-		target->otyp = SCR_BLANK_PAPER;
-		target->spe = 0;
-		ret = TRUE;
-	    }
-	} else if (target->oartifact && arti_immune(target, dmgtyp)) {
-	    if (flags.verbose && (dmgtyp != AD_FIRE)) {
-		if (victim == &youmonst)
-		    pline("%s.", Yobjnam2(target, "sizzle"));
-	    }
-	    /* no damage to object */
-	} else if (target->oartifact && (type == 1) &&
-		/* cold and fire provide partial protection against rust */
-		((chill = arti_immune(target, AD_COLD)) != 0 ||
-		 arti_immune(target, AD_FIRE)) &&
-		/* once rusted, the chance for further rusting goes up */
-		rn2(2 * (MAX_ERODE + 1 - erosion))) {
-	    if (flags.verbose && target->oclass == WEAPON_CLASS) {
-		if (victim == &youmonst || vismon || visobj)
-		    pline("%s some water.",
-			  Yobjnam2(target, chill ? "freeze" : "boil"));
-	    }
-	    /* no damage to object */
-	} else if (target->oerodeproof || !vulnerable) {
-	    /* no message if dipping or not carried */
-	    if (for_dip) {
-		/* assumes that for_dip implies player action */
-		if (!Blind) target->rknown = 0;
-	    } else if (victim == &youmonst || vismon) {
-		if (flags.verbose || (vulnerable && !target->rknown))
-		    pline("%s not %s.", Yobjnam2(target, "are"),
-			  already_affected ? "harmed" : "affected");
-		if (vulnerable) target->rknown = 1;
-	    }
-	} else if (erosion < MAX_ERODE) {
-	    if (victim == &youmonst || vismon || visobj) {
-		pline("%s%s!", Yobjnam2(target, action[type]),
-		    erosion+1 == MAX_ERODE ? " completely" :
-		    erosion ? " further" : "");
-		target->rknown = 1;	/* it's obviously not erode-proof */
-	    }
-	    if (is_primary)
-		target->oeroded++;
-	    else
-		target->oeroded2++;
-	    ret = TRUE;
-	} else {
-	    if (flags.verbose && !for_dip) {
-		if (victim == &youmonst)
-		    pline("%s completely %s.",
-			Yobjnam2(target, Blind ? "feel" : "look"), msg[type]);
-		else if (vismon || visobj)
-		    pline("%s completely %s.",
-			Yobjnam2(target, "look"), msg[type]);
-	    }
-	}
-
-	return ret;
 }
 
 int

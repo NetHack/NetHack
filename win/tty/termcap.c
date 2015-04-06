@@ -1,5 +1,4 @@
-/* NetHack 3.5	termcap.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	termcap.c	$Date: 2009/05/06 10:59:19 $  $Revision: 1.13 $ */
+/* NetHack 3.5	termcap.c	$NHDT-Date: 1427756993 2015/03/30 23:09:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
 /*	SCCS Id: @(#)termcap.c	3.5	2007/12/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -809,10 +808,9 @@ cl_eos()			/* free after Robert Viduya */
 extern char *tparm();
 #endif
 
-#  ifdef COLOR_BLACK	/* trust include file */
-#undef COLOR_BLACK
-#  else
+#  ifndef COLOR_BLACK	/* trust include file */
 #   ifndef _M_UNIX	/* guess BGR */
+#define COLOR_BLACK   0
 #define COLOR_BLUE    1
 #define COLOR_GREEN   2
 #define COLOR_CYAN    3
@@ -821,6 +819,7 @@ extern char *tparm();
 #define COLOR_YELLOW  6
 #define COLOR_WHITE   7
 #   else		/* guess RGB */
+#define COLOR_BLACK   0
 #define COLOR_RED     1
 #define COLOR_GREEN   2
 #define COLOR_YELLOW  3
@@ -830,41 +829,125 @@ extern char *tparm();
 #define COLOR_WHITE   7
 #   endif
 #  endif
-#define COLOR_BLACK COLOR_BLUE
 
-const int ti_map[8] = {
-	COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
-	COLOR_BLUE, COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE };
+/* Mapping data for the six terminfo colors that resolve to pairs of nethack
+ * colors.  Black and white are handled specially.
+ */
+const struct {int ti_color, nh_color, nh_bright_color;} ti_map[6] =
+{
+	{COLOR_RED,CLR_RED,CLR_ORANGE},
+	{COLOR_GREEN,CLR_GREEN,CLR_BRIGHT_GREEN},
+	{COLOR_YELLOW,CLR_BROWN,CLR_YELLOW},
+	{COLOR_BLUE,CLR_BLUE,CLR_BRIGHT_BLUE},
+	{COLOR_MAGENTA,CLR_MAGENTA,CLR_BRIGHT_MAGENTA},
+	{COLOR_CYAN,CLR_CYAN,CLR_BRIGHT_CYAN}
+};
+
+static char nilstring[] = "";
 
 static void
 init_hilite()
 {
 	register int c;
 	char *setf, *scratch;
-
-	for (c = 0; c < SIZE(hilites); c++)
-		hilites[c] = nh_HI;
-	hilites[CLR_GRAY] = hilites[NO_COLOR] = (char *)0;
+	int md_len;
 
 	if (tgetnum("Co") < 8
+	    || (MD == NULL) || (strlen(MD) == 0)
 	    || ((setf = tgetstr("AF", (char **)0)) == (char *)0
 		 && (setf = tgetstr("Sf", (char **)0)) == (char *)0))
+	    {
+		/* Fallback when colors not available
+		 * It's arbitrary to collapse all colors except gray
+		 * together, but that's what the previous code did.
+		 */
+		hilites[CLR_BLACK] = nh_HI;
+		hilites[CLR_RED] = nh_HI;
+		hilites[CLR_GREEN] = nh_HI;
+		hilites[CLR_BROWN] = nh_HI;
+		hilites[CLR_BLUE] = nh_HI;
+		hilites[CLR_MAGENTA] = nh_HI;
+		hilites[CLR_CYAN] = nh_HI;
+		hilites[CLR_GRAY] = nilstring;
+		hilites[NO_COLOR] = nilstring;
+		hilites[CLR_ORANGE] = nh_HI;
+		hilites[CLR_BRIGHT_GREEN] = nh_HI;
+		hilites[CLR_YELLOW] = nh_HI;
+		hilites[CLR_BRIGHT_BLUE] = nh_HI;
+		hilites[CLR_BRIGHT_MAGENTA] = nh_HI;
+		hilites[CLR_BRIGHT_CYAN] = nh_HI;
+		hilites[CLR_WHITE] = nh_HI;
 		return;
-
-	for (c = 0; c < CLR_MAX / 2; c++) {
-	    scratch = tparm(setf, ti_map[c]);
-	    if (c != CLR_GRAY) {
-		hilites[c] = (char *) alloc(strlen(scratch) + 1);
-		Strcpy(hilites[c], scratch);
-	    }
-	    if (c != CLR_BLACK) {
-		hilites[c|BRIGHT] = (char*) alloc(strlen(scratch)+strlen(MD)+1);
-		Strcpy(hilites[c|BRIGHT], MD);
-		Strcat(hilites[c|BRIGHT], scratch);
 	    }
 
+	md_len = strlen(MD);
+
+	c = 6;
+	while (c--) {
+	    char *work;
+	    scratch = tparm(setf,ti_map[c].ti_color);
+	    work = (char *) alloc(strlen(scratch) + md_len + 1);
+	    Strcpy(work,MD);
+	    hilites[ti_map[c].nh_bright_color] = work;
+	    work += md_len;
+	    Strcpy(work,scratch);
+	    hilites[ti_map[c].nh_color] = work;
+	}
+
+	scratch = tparm(setf,COLOR_WHITE);
+	hilites[CLR_WHITE] = (char *) alloc(strlen(scratch) + md_len + 1);
+	Strcpy(hilites[CLR_WHITE],MD);
+	Strcat(hilites[CLR_WHITE],scratch);
+
+	hilites[CLR_GRAY] = nilstring;
+	hilites[NO_COLOR] = nilstring;
+
+	if (iflags.wc2_darkgray) {
+	    /* On many terminals, esp. those using classic PC CGA/EGA/VGA
+	     * textmode, specifying "hilight" and "black" simultaneously
+	     * produces a dark shade of gray that is visible against a
+	     * black background.  We can use it to represent black objects.
+	     */
+	    scratch = tparm(setf,COLOR_BLACK);
+	    hilites[CLR_BLACK] = (char *) alloc(strlen(scratch) + md_len + 1);
+	    Strcpy(hilites[CLR_BLACK],MD);
+	    Strcat(hilites[CLR_BLACK],scratch);
+	} else {
+	    /* But it's concievable that hilighted black-on-black could
+	     * still be invisible on many others.  We substitute blue for
+	     * black.
+	     */
+	    hilites[CLR_BLACK] = hilites[CLR_BLUE];
 	}
 }
+
+static void
+kill_hilite()
+{
+	/* if colors weren't available, no freeing needed */
+	if (hilites[CLR_BLACK] == nh_HI)
+		return;
+
+	if (hilites[CLR_BLACK] != hilites[CLR_BLUE])
+		free(hilites[CLR_BLACK]);
+
+	/* CLR_BLUE overlaps CLR_BRIGHT_BLUE, do not free */
+	/* CLR_GREEN overlaps CLR_BRIGHT_GREEN, do not free */
+	/* CLR_CYAN overlaps CLR_BRIGHT_CYAN, do not free */
+	/* CLR_RED overlaps CLR_ORANGE, do not free */
+	/* CLR_MAGENTA overlaps CLR_BRIGHT_MAGENTA, do not free */
+	/* CLR_BROWN overlaps CLR_YELLOW, do not free */
+	/* CLR_GRAY is static 'nilstring', do not free */
+	/* NO_COLOR is static 'nilstring', do not free */
+	free(hilites[CLR_BRIGHT_BLUE]);
+	free(hilites[CLR_BRIGHT_GREEN]);
+	free(hilites[CLR_BRIGHT_CYAN]);
+	free(hilites[CLR_YELLOW]);
+	free(hilites[CLR_ORANGE]);
+	free(hilites[CLR_BRIGHT_MAGENTA]);
+	free(hilites[CLR_WHITE]);
+}
+
 
 # else /* UNIX && TERMINFO */
 
@@ -1010,7 +1093,6 @@ init_hilite()
 #   endif
 #  endif /* TOS */
 }
-# endif /* UNIX */
 
 static void
 kill_hilite()
@@ -1028,6 +1110,7 @@ kill_hilite()
 # endif
 	return;
 }
+# endif /* UNIX */
 #endif /* TEXTCOLOR */
 
 

@@ -1,5 +1,4 @@
-/* NetHack 3.5	dig.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	dig.c	$Date: 2012/02/16 03:01:37 $  $Revision: 1.67 $ */
+/* NetHack 3.5	dig.c	$NHDT-Date: 1426465434 2015/03/16 00:23:54 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.73 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -486,16 +485,15 @@ boolean fill_if_any;	/* force filling if it exists at all */
 
     for (x1 = lo_x; x1 <= hi_x; x1++)
 	for (y1 = lo_y; y1 <= hi_y; y1++)
-	    if (levl[x1][y1].typ == POOL)
-		pool_cnt++;
-	    else if (levl[x1][y1].typ == MOAT ||
-		    (levl[x1][y1].typ == DRAWBRIDGE_UP &&
-			(levl[x1][y1].drawbridgemask & DB_UNDER) == DB_MOAT))
-		moat_cnt++;
-	    else if (levl[x1][y1].typ == LAVAPOOL ||
-		    (levl[x1][y1].typ == DRAWBRIDGE_UP &&
-			(levl[x1][y1].drawbridgemask & DB_UNDER) == DB_LAVA))
-		lava_cnt++;
+            if (is_moat(x1, y1))
+                moat_cnt++;
+            else if (is_pool(x1, y1))
+                /* This must come after is_moat since moats are pools
+                 * but not vice-versa. */
+                pool_cnt++;
+            else if (is_lava(x1, y1))
+                lava_cnt++;
+
     if (!fill_if_any) pool_cnt /= 3;		/* not as much liquid as the others */
 
     if ((lava_cnt > moat_cnt + pool_cnt && rn2(lava_cnt + 1)) ||
@@ -1024,6 +1022,7 @@ struct obj *obj;
 			    /* you ought to be able to let go; tough luck */
 			    /* (maybe `move_into_trap()' would be better) */
 			    nomul(-d(2,2));
+			    multi_reason = "stuck in a spider web";
 			    nomovemsg = "You pull free.";
 			} else if (lev->typ == IRONBARS) {
 			    pline("Clang!");
@@ -1246,7 +1245,7 @@ register struct monst *mtmp;
 
 	if (IS_WALL(here->typ)) {
 	    /* KMH -- Okay on arboreal levels (room walls are still stone) */
-	    if (!Deaf && flags.verbose && !rn2(5))
+	    if (flags.verbose && !rn2(5))
 		You_hear("crashing rock.");
 	    if (*in_rooms(mtmp->mx, mtmp->my, SHOPBASE))
 		add_damage(mtmp->mx, mtmp->my, 0L);
@@ -1284,7 +1283,7 @@ zap_dig()
 	struct monst *mtmp;
 	struct obj *otmp;
 	struct trap *trap_with_u = (struct trap *)0;
-	int zx, zy, diridx, digdepth, flow_x, flow_y;
+	int zx, zy, diridx = 8, digdepth, flow_x = -1, flow_y = -1;
 	boolean shopdoor, shopwall, maze_dig, pitdig = FALSE, pitflow = FALSE;
 
 	/*
@@ -1462,7 +1461,7 @@ zap_dig()
 	} /* while */
 	tmp_at(DISP_END,0);	/* closing call */
 
-	if (pitflow) {
+	if (pitflow && isok(flow_x, flow_y)) {
 		struct trap *ttmp  = t_at(flow_x, flow_y);
 		if (ttmp && (ttmp->ttyp == PIT || ttmp->ttyp == SPIKED_PIT)) {
 			schar filltyp = fillholetyp(ttmp->tx, ttmp->ty, TRUE);
@@ -1684,13 +1683,15 @@ buried_ball_to_freedom()
 /* move objects from fobj/nexthere lists to buriedobjlist, keeping position */
 /* information */
 struct obj *
-bury_an_obj(otmp)
+bury_an_obj(otmp, dealloced)
 	struct obj *otmp;
+	boolean *dealloced;
 {
 	struct obj *otmp2;
 	boolean under_ice;
 
-	debugpline("bury_an_obj: %s", xname(otmp));
+	debugpline1("bury_an_obj: %s", xname(otmp));
+	if (dealloced) *dealloced = FALSE;
 	if (otmp == uball) {
 		unpunish();
 		u.utrap = rn1(50,20);
@@ -1721,6 +1722,7 @@ bury_an_obj(otmp)
 	under_ice = is_ice(otmp->ox, otmp->oy);
 	if (otmp->otyp == ROCK && !under_ice) {
 		/* merges into burying material */
+		if (dealloced) *dealloced = TRUE;
 		obfree(otmp, (struct obj *)0);
 		return(otmp2);
 	}
@@ -1753,9 +1755,9 @@ int x, y;
 	struct obj *otmp, *otmp2;
 
 	if(level.objects[x][y] != (struct obj *)0)
-	    debugpline("bury_objs: at %d, %d", x, y);
+	    debugpline2("bury_objs: at <%d,%d>", x, y);
 	for (otmp = level.objects[x][y]; otmp; otmp = otmp2)
-		otmp2 = bury_an_obj(otmp);
+	    otmp2 = bury_an_obj(otmp, NULL);
 
 	/* don't expect any engravings here, but just in case */
 	del_engr_at(x, y);
@@ -1770,7 +1772,7 @@ int x, y;
 	struct obj *otmp, *otmp2, *bball;
 	coord cc;
 
-	debugpline("unearth_objs: at %d, %d", x, y);
+	debugpline2("unearth_objs: at <%d,%d>", x, y);
 	cc.x = x; cc.y = y;
 	bball = buried_ball(&cc);
 	for (otmp = level.buriedobjlist; otmp; otmp = otmp2) {
@@ -1815,7 +1817,7 @@ long timeout UNUSED;
 	    /* Everything which can be held in a container can also be
 	       buried, so bury_an_obj's use of obj_extract_self insures
 	       that Has_contents(obj) will eventually become false. */
-	    (void)bury_an_obj(obj->cobj);
+	    (void)bury_an_obj(obj->cobj, NULL);
 	}
 	obj_extract_self(obj);
 	obfree(obj, (struct obj *) 0);
@@ -1879,7 +1881,7 @@ void
 bury_monst(mtmp)
 struct monst *mtmp;
 {
-	debugpline("bury_monst: %s", mon_nam(mtmp));
+	debugpline1("bury_monst: %s", mon_nam(mtmp));
 	if(canseemon(mtmp)) {
 	    if(is_flyer(mtmp->data) || is_floater(mtmp->data)) {
 		pline_The("%s opens up, but %s is not swallowed!",
@@ -1898,7 +1900,7 @@ struct monst *mtmp;
 void
 bury_you()
 {
-    debugpline("bury_you");
+    debugpline0("bury_you");
     if (!Levitation && !Flying) {
 	if(u.uswallow)
 	    You_feel("a sensation like falling into a trap!");
@@ -1915,7 +1917,7 @@ bury_you()
 void
 unearth_you()
 {
-	debugpline("unearth_you");
+	debugpline0("unearth_you");
 	u.uburied = FALSE;
 	under_ground(0);
 	if(!uamul || uamul->otyp != AMULET_OF_STRANGULATION)
@@ -1926,7 +1928,7 @@ unearth_you()
 void
 escape_tomb()
 {
-	debugpline("escape_tomb");
+	debugpline0("escape_tomb");
 	if ((Teleportation || can_teleport(youmonst.data)) &&
 	    (Teleport_control || rn2(3) < Luck+2)) {
 		You("attempt a teleport spell.");
@@ -1958,7 +1960,7 @@ bury_obj(otmp)
 struct obj *otmp;
 {
 
-	debugpline("bury_obj");
+	debugpline0("bury_obj");
 	if(cansee(otmp->ox, otmp->oy))
 	   pline_The("objects on the %s tumble into a hole!",
 		surface(otmp->ox, otmp->oy));

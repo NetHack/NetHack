@@ -1,5 +1,4 @@
-/* NetHack 3.5	options.c	$NHDT-Date: 1425083082 2015/02/28 00:24:42 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.158 $ */
-/* NetHack 3.5	options.c	$Date: 2012/04/09 02:56:30 $  $Revision: 1.153 $ */
+/* NetHack 3.5	options.c	$NHDT-Date: 1427073746 2015/03/23 01:22:26 $  $NHDT-Branch: master $:$NHDT-Revision: 1.164 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -85,6 +84,8 @@ static struct Bool_Opt
 #else
 	{"BIOS", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
+	{"blind", &u.uroleplay.blind, FALSE, DISP_IN_GAME},
+	{"bones", &flags.bones, TRUE, SET_IN_FILE},
 #ifdef INSURANCE
 	{"checkpoint", &flags.ins_chkpt, TRUE, SET_IN_GAME},
 #else
@@ -138,14 +139,18 @@ static struct Bool_Opt
 #else
 	{"mail", (boolean *)0, TRUE, SET_IN_FILE},
 #endif
+	{"mention_walls", &iflags.mention_walls, FALSE, SET_IN_GAME},
+	{"menucolors", &iflags.use_menu_color, FALSE,  SET_IN_GAME},
 	/* for menu debugging only*/
 	{"menu_tab_sep", &iflags.menu_tab_sep, FALSE, SET_IN_GAME},
+	{"menu_objsyms", &iflags.menu_head_objsym, FALSE, SET_IN_GAME},
 	{"mouse_support", &iflags.wc_mouse_support, TRUE, DISP_IN_GAME},	/*WC*/
 #ifdef NEWS
 	{"news", &iflags.news, TRUE, DISP_IN_GAME},
 #else
 	{"news", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
+	{"nudist", &u.uroleplay.nudist, FALSE, DISP_IN_GAME},
 	{"null", &flags.null, TRUE, SET_IN_GAME},
 #if defined(SYSFLAGS) && defined(MAC)
 	{"page_wait", &sysflags.page_wait, TRUE, SET_IN_GAME},
@@ -198,6 +203,7 @@ static struct Bool_Opt
 	{"tombstone",&flags.tombstone, TRUE, SET_IN_GAME},
 	{"toptenwin",&iflags.toptenwin, FALSE, SET_IN_GAME},
 	{"travel", &flags.travelcmd, TRUE, SET_IN_GAME},
+	{"use_darkgray", &iflags.wc2_darkgray, TRUE, SET_IN_FILE},
 #ifdef WIN32CON
 	{"use_inverse",   &iflags.wc_inverse, TRUE, SET_IN_GAME},		/*WC*/
 #else
@@ -797,10 +803,10 @@ rejectoption(optname)
 const char *optname;
 {
 #ifdef MICRO
-	pline("\"%s\" settable only from %s.", optname, configfile);
+	pline("\"%s\" settable only from %s.", optname, lastconfigfile);
 #else
 	pline("%s can be set only from NETHACKOPTIONS or %s.", optname,
-			configfile);
+			lastconfigfile);
 #endif
 }
 
@@ -820,7 +826,7 @@ const char *opts;
 #endif
 
 	if(from_file)
-	    raw_printf("Bad syntax in OPTIONS in %s: %s.", configfile, opts);
+	    raw_printf("Bad syntax in OPTIONS in %s: %s.", lastconfigfile, opts);
 	else
 	    raw_printf("Bad syntax in NETHACKOPTIONS: %s.", opts);
 
@@ -1084,6 +1090,174 @@ STATIC_VAR const struct paranoia_opts {
 	{ ~0, "all", 3, 0, 0, 0 },	/* ditto */
 };
 
+
+extern struct menucoloring *menu_colorings;
+
+static const struct {
+   const char *name;
+   const int color;
+} colornames[] = {
+   {"black", CLR_BLACK},
+   {"red", CLR_RED},
+   {"green", CLR_GREEN},
+   {"brown", CLR_BROWN},
+   {"blue", CLR_BLUE},
+   {"magenta", CLR_MAGENTA},
+   {"cyan", CLR_CYAN},
+   {"gray", CLR_GRAY},
+   {"grey", CLR_GRAY},
+   {"orange", CLR_ORANGE},
+   {"lightgreen", CLR_BRIGHT_GREEN},
+   {"yellow", CLR_YELLOW},
+   {"lightblue", CLR_BRIGHT_BLUE},
+   {"lightmagenta", CLR_BRIGHT_MAGENTA},
+   {"lightcyan", CLR_BRIGHT_CYAN},
+   {"white", CLR_WHITE}
+};
+
+static const struct {
+   const char *name;
+   const int attr;
+} attrnames[] = {
+     {"none", ATR_NONE},
+     {"bold", ATR_BOLD},
+     {"dim", ATR_DIM},
+     {"underline", ATR_ULINE},
+     {"blink", ATR_BLINK},
+     {"inverse", ATR_INVERSE}
+};
+
+/* parse '"regex_string"=color&attr' and add it to menucoloring */
+boolean
+add_menu_coloring(str)
+char *str;
+{
+    int i, c = NO_COLOR, a = ATR_NONE;
+    struct menucoloring *tmp;
+    char *tmps, *cs = strchr(str, '=');
+#ifdef MENU_COLOR_REGEX_POSIX
+    int errnum;
+    char errbuf[80];
+#endif
+    const char *err = (char *)0;
+
+    if (!cs || !str) return FALSE;
+
+    tmps = cs;
+    tmps++;
+    while (*tmps && isspace(*tmps)) tmps++;
+
+    for (i = 0; i < SIZE(colornames); i++)
+	if (strstri(tmps, colornames[i].name) == tmps) {
+	    c = colornames[i].color;
+	    break;
+	}
+    if ((i == SIZE(colornames)) && (*tmps >= '0' && *tmps <='9'))
+	c = atoi(tmps);
+
+    if (c > 15) return FALSE;
+
+    tmps = strchr(str, '&');
+    if (tmps) {
+	tmps++;
+	while (*tmps && isspace(*tmps)) tmps++;
+	for (i = 0; i < SIZE(attrnames); i++)
+	    if (strstri(tmps, attrnames[i].name) == tmps) {
+		a = attrnames[i].attr;
+		break;
+	    }
+	if ((i == SIZE(attrnames)) && (*tmps >= '0' && *tmps <='9'))
+	    a = atoi(tmps);
+    }
+
+    *cs = '\0';
+    tmps = str;
+    if ((*tmps == '"') || (*tmps == '\'')) {
+	cs--;
+	while (isspace(*cs)) cs--;
+	if (*cs == *tmps) {
+	    *cs = '\0';
+	    tmps++;
+	}
+    }
+
+    tmp = (struct menucoloring *)alloc(sizeof(struct menucoloring));
+#ifdef MENU_COLOR_REGEX
+#ifdef MENU_COLOR_REGEX_POSIX
+    errnum = regcomp(&tmp->match, tmps, REG_EXTENDED | REG_NOSUB);
+    if (errnum != 0)
+    {
+	regerror(errnum, &tmp->match, errbuf, sizeof(errbuf));
+	err = errbuf;
+    }
+#else
+    tmp->match.translate = 0;
+    tmp->match.fastmap = 0;
+    tmp->match.buffer = 0;
+    tmp->match.allocated = 0;
+    tmp->match.regs_allocated = REGS_FIXED;
+    err = re_compile_pattern(tmps, strlen(tmps), &tmp->match);
+#endif
+#else
+    tmp->match = (char *)alloc(strlen(tmps)+1);
+    (void) memcpy((genericptr_t)tmp->match, (genericptr_t)tmps, strlen(tmps)+1);
+#endif
+    if (err) {
+	raw_printf("\nMenucolor regex error: %s\n", err);
+	wait_synch();
+	free(tmp);
+	return FALSE;
+    } else {
+	tmp->next = menu_colorings;
+	tmp->color = c;
+	tmp->attr = a;
+	menu_colorings = tmp;
+	return TRUE;
+    }
+}
+
+boolean
+get_menu_coloring(str, color, attr)
+char *str;
+int *color, *attr;
+{
+    struct menucoloring *tmpmc;
+    if (iflags.use_menu_color)
+	for (tmpmc = menu_colorings; tmpmc; tmpmc = tmpmc->next)
+#ifdef MENU_COLOR_REGEX
+# ifdef MENU_COLOR_REGEX_POSIX
+	    if (regexec(&tmpmc->match, str, 0, NULL, 0) == 0) {
+# else
+	    if (re_search(&tmpmc->match, str, strlen(str), 0, 9999, 0) >= 0) {
+# endif
+#else
+	    if (pmatch(tmpmc->match, str)) {
+#endif
+		*color = tmpmc->color;
+		*attr = tmpmc->attr;
+		return TRUE;
+	    }
+    return FALSE;
+}
+
+void
+free_menu_coloring()
+{
+    struct menucoloring *tmp = menu_colorings;
+
+    while (tmp) {
+	struct menucoloring *tmp2 = tmp->next;
+#ifdef MENU_COLOR_REGEX
+	(void) regfree(&tmp->match);
+#else
+	free(tmp->match);
+#endif
+	free(tmp);
+	tmp = tmp2;
+    }
+}
+
+
 void
 parseoptions(opts, tinitial, tfrom_file)
 register char *opts;
@@ -1300,6 +1474,7 @@ boolean tinitial, tfrom_file;
 		if (negated) bad_negation(fullname, FALSE);
 		else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0)
 			nmcpy(catname, op, PL_PSIZ);
+		sanitize_name(catname);
 		return;
 	}
 
@@ -1309,6 +1484,7 @@ boolean tinitial, tfrom_file;
 		if (negated) bad_negation(fullname, FALSE);
 		else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0)
 			nmcpy(dogname, op, PL_PSIZ);
+		sanitize_name(dogname);
 		return;
 	}
 
@@ -1318,6 +1494,7 @@ boolean tinitial, tfrom_file;
 		if (negated) bad_negation(fullname, FALSE);
 		else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0)
 			nmcpy(horsename, op, PL_PSIZ);
+		sanitize_name(horsename);
 		return;
 	}
 
@@ -1420,6 +1597,16 @@ boolean tinitial, tfrom_file;
 			badoption(opts);
 		}
 		return;
+	}
+
+	/* menucolor:"regex_string"=color */
+	fullname = "menucolor";
+	if (match_optname(opts, fullname, 9, TRUE)) {
+	    if (negated) bad_negation(fullname, FALSE);
+	    else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0)
+		if (!add_menu_coloring(op))
+		    badoption(opts);
+	    return;
 	}
 
 	fullname = "msghistory";
@@ -1662,6 +1849,7 @@ boolean tinitial, tfrom_file;
 		}
 goodfruit:
 		nmcpy(pl_fruit, op, PL_FSIZ);
+		sanitize_name(pl_fruit);
 	/* OBJ_NAME(objects[SLIME_MOLD]) won't work after initialization */
 		if (!*pl_fruit)
 		    nmcpy(pl_fruit, "slime mold", PL_FSIZ);
@@ -2479,7 +2667,7 @@ goodfruit:
 
 #if defined(BACKWARD_COMPAT)
 	fullname = "DECgraphics";
-	if (match_optname(opts, fullname, 10, TRUE)) {
+	if (match_optname(opts, fullname, 3, TRUE)) {
 		boolean badflag = FALSE;
 		if (duplicate) complain_about_duplicate(opts,1);
 		if (!negated) {
@@ -2503,7 +2691,7 @@ goodfruit:
 		return;
 	}
 	fullname = "IBMgraphics";
-	if (match_optname(opts, fullname, 10, TRUE)) {
+	if (match_optname(opts, fullname, 3, TRUE)) {
 		const char *sym_name = fullname;
 		boolean badflag = FALSE;
 		if (duplicate) complain_about_duplicate(opts,1);
@@ -2537,7 +2725,7 @@ goodfruit:
 #endif
 #ifdef MAC_GRAPHICS_ENV
 	fullname = "MACgraphics";
-	if (match_optname(opts, fullname, 11, TRUE)) {
+	if (match_optname(opts, fullname, 3, TRUE)) {
 		boolean badflag = FALSE;
 		if (duplicate) complain_about_duplicate(opts,1);
 		if (!negated) {
@@ -4065,7 +4253,7 @@ option_help()
     winid datawin;
 
     datawin = create_nhwindow(NHW_TEXT);
-    Sprintf(buf, "Set options as OPTIONS=<options> in %s", configfile);
+    Sprintf(buf, "Set options as OPTIONS=<options> in %s", lastconfigfile);
     opt_intro[CONFIG_SLOT] = (const char *) buf;
     for (i = 0; opt_intro[i]; i++)
 	putstr(datawin, 0, opt_intro[i]);
@@ -4391,6 +4579,7 @@ struct wc_Opt wc2_options[] = {
 	{"fullscreen", WC2_FULLSCREEN},
 	{"softkeyboard", WC2_SOFTKEYBOARD},
 	{"wraptext", WC2_WRAPTEXT},
+	{"use_darkgray", WC2_DARKGRAY},
 #ifdef STATUS_VIA_WINDOWPORT
 	{"hilite_status", WC2_HILITE_STATUS},
 #endif

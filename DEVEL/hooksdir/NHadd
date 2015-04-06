@@ -1,14 +1,19 @@
 #!/usr/bin/perl
 # wrapper for nhadd and nhcommit aliases
-# $NHDT-Date$
+# $NHDT-Date: 1427408239 2015/03/26 22:17:19 $
 
 %ok = map { $_ => 1 } ('add', 'commit');
 
 die "Bad subcommand '$ARGV[0]'" unless $ok{$ARGV[0]};
 
+# we won't fail on a failure, so just system()
+$rv = system('.git/hooks/nhsub',"--$ARGV[0]",@ARGV[1..$#ARGV]);
+if($rv){
+        print "warning: nhsub failed: $rv $!\n";
+}
+
 if(length $ENV{GIT_PREFIX}){
         chdir($ENV{GIT_PREFIX}) or die "Can't chdir $ENV{GIT_PREFIX}: $!";
 }
 
-$ENV{NHMODE} = 1;
 exec "git", @ARGV or die "Can't exec git: $!";

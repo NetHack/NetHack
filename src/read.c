@@ -27,7 +27,8 @@ STATIC_DCL void FDECL(randomize,(int *, int));
 STATIC_DCL void FDECL(forget_single_object, (int));
 STATIC_DCL void FDECL(forget, (int));
 STATIC_DCL int FDECL(maybe_tame, (struct monst *,struct obj *));
-
+STATIC_DCL boolean FDECL(is_valid_stinking_cloud_pos, (int, int, BOOLEAN_P));
+STATIC_DCL void FDECL(display_stinking_cloud_positions, (int));
 STATIC_PTR void FDECL(set_lit, (int,int,genericptr_t));
 
 STATIC_OVL boolean
@@ -53,6 +54,115 @@ struct obj *sobj;
 	(void) learnscrolltyp(sobj->otyp);
 }
 
+char *
+erode_obj_text(otmp, buf)
+struct obj *otmp;
+char *buf;
+{
+    int erosion = greatest_erosion(otmp);
+    if (erosion)
+	wipeout_text(buf,
+		     (int)(strlen(buf) * erosion / (2*MAX_ERODE)),
+		     otmp->o_id ^ (unsigned)ubirthday);
+    return buf;
+}
+
+char *
+tshirt_text(tshirt, buf)
+struct obj *tshirt;
+char *buf;
+{
+    static const char *shirt_msgs[] = { /* Scott Bigham */
+    "I explored the Dungeons of Doom and all I got was this lousy T-shirt!",
+    "Is that Mjollnir in your pocket or are you just happy to see me?",
+    "It's not the size of your sword, it's how #enhance'd you are with it.",
+    "Madame Elvira's House O' Succubi Lifetime Customer",
+    "Madame Elvira's House O' Succubi Employee of the Month",
+    "Ludios Vault Guards Do It In Small, Dark Rooms",
+    "Yendor Military Soldiers Do It In Large Groups",
+    "I survived Yendor Military Boot Camp",
+    "Ludios Accounting School Intra-Mural Lacrosse Team",
+    "Oracle(TM) Fountains 10th Annual Wet T-Shirt Contest",
+    "Hey, black dragon!  Disintegrate THIS!",
+    "I'm With Stupid -->",
+    "Don't blame me, I voted for Izchak!",
+    "Don't Panic",				/* HHGTTG */
+    "Furinkan High School Athletic Dept.",	/* Ranma 1/2 */
+    "Hel-LOOO, Nurse!",			/* Animaniacs */
+    "=^.^=",
+    "100% goblin hair - do not wash",
+    "Aberzombie and Fitch",
+    "cK -- Cockatrice touches the Kop",
+    "Don't ask me, I only adventure here",
+    "Down with pants!",
+    "d, your dog or a killer?",
+    "FREE PUG AND NEWT!",
+    "Go team ant!",
+    "Got newt?",
+    "Hello, my darlings!", /* Charlie Drake */
+    "Hey! Nymphs! Steal This T-Shirt!",
+    "I <3 Dungeon of Doom",
+    "I <3 Maud",
+    "I am a Valkyrie. If you see me running, try to keep up.",
+    "I am not a pack rat - I am a collector",
+    "I bounced off a rubber tree",  /* Monkey Island */
+    "Plunder Island Brimstone Beach Club", /* Monkey Island */
+    "If you can read this, I can hit you with my polearm",
+    "I'm confused!",
+    "I scored with the princess",
+    "I want to live forever or die in the attempt.",
+    "Lichen Park",
+    "LOST IN THOUGHT - please send search party",
+    "Meat is Mordor",
+    "Minetown Better Business Bureau",
+    "Minetown Watch",
+    "Ms. Palm's House of Negotiable Affection -- A Very Reputable House Of Disrepute",
+    "Protection Racketeer",
+    "Real men love Crom",
+    "Somebody stole my Mojo!",
+    "The Hellhound Gang",
+    "The Werewolves",
+    "They Might Be Storm Giants",
+    "Weapons don't kill people, I kill people",
+    "White Zombie",
+    "You're killing me!",
+    "Anhur State University - Home of the Fighting Fire Ants!",
+    "FREE HUGS",
+    "Serial Ascender",
+    "Real men are valkyries",
+    "Young Men's Cavedigging Association",
+    "Occupy Fort Ludios",
+    "I couldn't afford this T-shirt so I stole it!",
+    "Mind flayers suck",
+    "I'm not wearing any pants",
+    "Down with the living!",
+    "Pudding farmer",
+    "Vegetarian",
+    };
+    Strcpy(buf, shirt_msgs[tshirt->o_id % SIZE(shirt_msgs)]);
+    return erode_obj_text(tshirt, buf);
+}
+
+char *
+apron_text(apron, buf)
+struct obj *apron;
+char *buf;
+{
+    static const char *apron_msgs[] = {
+	"Kiss the cook",
+	"I'm making SCIENCE!",
+	"Don't mess with the chef",
+	"Don't make me poison you",
+	"Gehennom's Kitchen",
+	"Rat: The other white meat",
+	"If you can't stand the heat, get out of Gehennom!",
+	"If we weren't meant to eat animals, why are they made out of meat?",
+	"If you don't like the food, I'll stab you",
+    };
+    Strcpy(buf, apron_msgs[apron->o_id % SIZE(apron_msgs)]);
+    return erode_obj_text(apron, buf);
+}
+
 int
 doread()
 {
@@ -72,34 +182,15 @@ doread()
 	    if (!Blind) u.uconduct.literate++;
 	    useup(scroll);
 	    return(1);
-	} else if (scroll->otyp == T_SHIRT) {
-	    static const char *shirt_msgs[] = { /* Scott Bigham */
-    "I explored the Dungeons of Doom and all I got was this lousy T-shirt!",
-    "Is that Mjollnir in your pocket or are you just happy to see me?",
-    "It's not the size of your sword, it's how #enhance'd you are with it.",
-    "Madame Elvira's House O' Succubi Lifetime Customer",
-    "Madame Elvira's House O' Succubi Employee of the Month",
-    "Ludios Vault Guards Do It In Small, Dark Rooms",
-    "Yendor Military Soldiers Do It In Large Groups",
-    "I survived Yendor Military Boot Camp",
-    "Ludios Accounting School Intra-Mural Lacrosse Team",
-    "Oracle(TM) Fountains 10th Annual Wet T-Shirt Contest",
-    "Hey, black dragon!  Disintegrate THIS!",
-    "I'm With Stupid -->",
-    "Don't blame me, I voted for Izchak!",
-    "Don't Panic",				/* HHGTTG */
-    "Furinkan High School Athletic Dept.",	/* Ranma 1/2 */
-    "Hel-LOOO, Nurse!",			/* Animaniacs */
-	    };
+	} else if (scroll->otyp == T_SHIRT ||
+		   scroll->otyp == ALCHEMY_SMOCK) {
 	    char buf[BUFSZ];
-	    int erosion;
-
 	    if (Blind) {
 		You_cant("feel any Braille writing.");
 		return 0;
 	    }
 	    /* can't read shirt worn under suit (under cloak is ok though) */
-	    if (uarm && scroll == uarmu) {
+	    if (scroll->otyp == T_SHIRT && uarm && scroll == uarmu) {
 		pline("%s shirt is obscured by %s%s.",
 		      scroll->unpaid ? "That" : "Your",
 		      shk_your(buf, uarm), suit_simple_name(uarm));
@@ -108,19 +199,96 @@ doread()
 	    u.uconduct.literate++;
 	    if(flags.verbose)
 		pline("It reads:");
-	    Strcpy(buf, shirt_msgs[scroll->o_id % SIZE(shirt_msgs)]);
-	    erosion = greatest_erosion(scroll);
-	    if (erosion)
-		wipeout_text(buf,
-			(int)(strlen(buf) * erosion / (2*MAX_ERODE)),
-			     scroll->o_id ^ (unsigned)ubirthday);
-	    pline("\"%s\"", buf);
+	    pline("\"%s\"", (scroll->otyp == T_SHIRT)
+		  ? tshirt_text(scroll, buf)
+		  : apron_text(scroll, buf));
+	    return 1;
+	} else if (scroll->otyp == CREDIT_CARD) {
+	    static const char *card_msgs[] = {
+		"Leprechaun Gold Tru$t - Shamrock Card",
+		"Magic Memory Vault Charge Card",
+		"Larn National Bank", /* Larn */
+		"First Bank of Omega", /* Omega */
+		"Bank of Zork - Frobozz Magic Card", /* Zork */
+		"Ankh-Morpork Merchant's Guild Barter Card",
+		"Ankh-Morpork Thieves' Guild Unlimited Transaction Card",
+		"Ransmannsby Moneylenders Association",
+		"Bank of Gehennom - 99% Interest Card",
+		"Yendorian Express - Copper Card",
+		"Yendorian Express - Silver Card",
+		"Yendorian Express - Gold Card",
+		"Yendorian Express - Mithril Card",
+		"Yendorian Express - Platinum Card", /* must be last */
+            };
+            if (Blind) {
+                You("feel the embossed numbers:");
+            } else {
+		if(flags.verbose)
+                    pline("It reads:");
+                pline("\"%s\"", scroll->oartifact ? card_msgs[SIZE(card_msgs)-1]
+		      : card_msgs[scroll->o_id % (SIZE(card_msgs)-1)]);
+            }
+            /* Make a credit card number */
+            pline("\"%d0%d %d%d1 0%d%d0\"", ((scroll->o_id % 89)+10), (scroll->o_id % 4),
+                  (((scroll->o_id * 499) % 899999) + 100000), (scroll->o_id % 10),
+                  (!(scroll->o_id % 3)), ((scroll->o_id * 7) % 10));
+            u.uconduct.literate++;
+            return 1;
+	} else if (scroll->otyp == CAN_OF_GREASE) {
+            pline("This %s has no label.", singular(scroll, xname));
+            return 0;
+	} else if (scroll->otyp == MAGIC_MARKER) {
+	    if (Blind) {
+		You_cant("feel any Braille writing.");
+		return 0;
+	    }
+	    if (flags.verbose)
+		pline("It reads:");
+	    pline("\"Magic Marker(TM) Red Ink Marker Pen. Water Soluble.\"");
+	    u.uconduct.literate++;
+	    return 1;
+        } else if (scroll->oclass == COIN_CLASS) {
+	    if (Blind)
+		You("feel the embossed words:");
+	    else if (flags.verbose)
+		You("read:");
+	    pline("\"1 Zorkmid. 857 GUE. In Frobs We Trust.\"");
+	    u.uconduct.literate++;
+	    return 1;
+        } else if (scroll->oartifact == ART_ORB_OF_FATE) {
+	    if (Blind)
+		You("feel the engraved signature:");
+	    else pline("It is signed:");
+	    pline("\"Odin.\"");
+	    u.uconduct.literate++;
+	    return 1;
+	} else if (scroll->otyp == CANDY_BAR) {
+	    static const char *wrapper_msgs[] = {
+		"Apollo",	/* Lost */
+		"Moon Crunchy", /* South Park */
+		"Snacky Cake",
+		"Chocolate Nuggie",
+		"The Small Bar",
+		"Crispy Yum Yum",
+		"Nilla Crunchie",
+		"Berry Bar",
+		"Choco Nummer",
+		"Om-nom",	/* Cat Macro */
+		"Fruity Oaty",	/* Serenity */
+		"Wonka Bar"	/* Charlie and the Chocolate Factory */
+	    };
+	    if (Blind) {
+		You_cant("feel any Braille writing.");
+		return 0;
+	    }
+	    pline("The wrapper reads: \"%s\"", wrapper_msgs[scroll->o_id % SIZE(wrapper_msgs)]);
+	    u.uconduct.literate++;
 	    return 1;
 	} else if (scroll->oclass != SCROLL_CLASS
 		&& scroll->oclass != SPBOOK_CLASS) {
 	    pline(silly_thing_to, "read");
 	    return(0);
-	} else if (Blind) {
+	} else if (Blind && (scroll->otyp != SPE_BOOK_OF_THE_DEAD)) {
 	    const char *what = 0;
 	    if (scroll->oclass == SPBOOK_CLASS)
 		what = "mystic runes";
@@ -699,6 +867,39 @@ struct obj *sobj;
 		(!was_tame && mtmp->mtame)) return 1;
 	}
 	return 0;
+}
+
+boolean
+is_valid_stinking_cloud_pos(x,y, showmsg)
+int x,y;
+boolean showmsg;
+{
+    if (!cansee(x, y) || !ACCESSIBLE(levl[x][y].typ) || distu(x, y) >= 32) {
+	if (showmsg) You("smell rotten eggs.");
+	return FALSE;
+    }
+    return TRUE;
+}
+
+void
+display_stinking_cloud_positions(state)
+     int state;
+{
+    if (state == 0) {
+	tmp_at(DISP_BEAM, cmap_to_glyph(S_flashbeam));
+    } else if (state == 1) {
+	int x,y, dx, dy;
+	int dist = 6;
+	for (dx = -dist; dx <= dist; dx++)
+	    for (dy = -dist; dy <= dist; dy++) {
+		x = u.ux + dx;
+		y = u.uy + dy;
+		if (isok(x,y) && is_valid_stinking_cloud_pos(x,y, FALSE))
+		    tmp_at(x,y);
+	    }
+    } else {
+	tmp_at(DISP_END, 0);
+    }
 }
 
 /* scroll effects; return 1 if we use up the scroll and possibly make it
@@ -1446,14 +1647,13 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 		      already_known ? "stinking " : "");
 		cc.x = u.ux;
 		cc.y = u.uy;
+		getpos_sethilite(display_stinking_cloud_positions);
 		if (getpos(&cc, TRUE, "the desired position") < 0) {
 		    pline1(Never_mind);
 		    break;
 		}
-		if (!cansee(cc.x, cc.y) || distu(cc.x, cc.y) >= 32) {
-		    You("smell rotten eggs.");
+		if (!is_valid_stinking_cloud_pos(cc.x, cc.y, TRUE))
 		    break;
-		}
 		(void) create_gas_cloud(cc.x, cc.y, 3+bcsign(sobj),
 						8+4*bcsign(sobj));
 		break;

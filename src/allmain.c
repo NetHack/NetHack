@@ -292,8 +292,10 @@ boolean resuming;
 		    }
 		    restore_attrib();
 		    /* underwater and waterlevel vision are done here */
-		    if (Is_waterlevel(&u.uz))
+		    if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
 			movebubbles();
+		    else if (Is_firelevel(&u.uz))
+			fumaroles();
 		    else if (Underwater)
 			under_water(0);
 		    /* vision while buried done here */
@@ -532,6 +534,13 @@ newgame()
 	save_currentstate();
 #endif
 	program_state.something_worth_saving++;	/* useful data now exists */
+
+	urealtime.realtime = (time_t)0L;
+#if defined(BSD) && !defined(POSIX_TYPES)
+        (void) time((long *)&urealtime.restored);
+#else
+        (void) time(&urealtime.restored);
+#endif
 
 	/* Success! */
 	welcome(TRUE);

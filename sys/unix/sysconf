@@ -19,6 +19,14 @@ WIZARDS=root games
 # Only available if game has been compiled with DEBUG.
 #DEBUGFILES=*
 
+# Users allowed to use #exploremode. Same syntax as WIZARDS above.
+EXPLORERS=*
+
+# Show debugging information originating from these source files.
+# Use '*' for all, or list source files separated by spaces.
+# Only available if game has been compiled with DEBUG.
+#DEBUGFILES=*
+
 # Limit the number of simultaneous games (see also nethack.sh).
 MAXPLAYERS=10
 
@@ -44,6 +52,9 @@ MAXPLAYERS=10
 # Determine identity of "person" in the score file with name (0) or
 # numeric (1) user id.
 #PERS_IS_UID=1
+
+# Maximum number of score file entries to use for random statue names
+#MAX_STATUENAME_RANK=10
 
 # Try to get more info in case of a program bug or crash.  Using GDB can
 # get more information and works on more systems but requires gdb be available;

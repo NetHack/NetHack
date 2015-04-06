@@ -1,5 +1,4 @@
-/* NetHack 3.5	pickup.c	$NHDT-Date: 1425081977 2015/02/28 00:06:17 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.126 $ */
-/* NetHack 3.5	pickup.c	$Date: 2012/02/16 03:01:38 $  $Revision: 1.123 $ */
+/* NetHack 3.5	pickup.c	$NHDT-Date: 1426558927 2015/03/17 02:22:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.131 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -769,7 +768,9 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 		    if (sorted && !printed_type_name) {
 			any = zeroany;
 			add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
-					let_to_name(*pack, FALSE), MENU_UNSELECTED);
+				 let_to_name(*pack, FALSE,
+					     (how != PICK_NONE) && iflags.menu_head_objsym),
+				 MENU_UNSELECTED);
 			printed_type_name = TRUE;
 		    }
 
@@ -897,7 +898,7 @@ int how;			/* type of query */
 		(*pick_list)->item.a_int = curr->oclass;
 		return 1;
 	    } else {
-		debugpline("query_category: no single object match");
+		debugpline0("query_category: no single object match");
 	    }
 	    return 0;
 	}
@@ -928,8 +929,10 @@ int how;			/* type of query */
 			any.a_int = curr->oclass;
 			add_menu(win, NO_GLYPH, &any, invlet++,
 				def_oc_syms[(int)objects[curr->otyp].oc_class].sym,
-				ATR_NONE, let_to_name(*pack, FALSE),
-				MENU_UNSELECTED);
+				 ATR_NONE,
+				 let_to_name(*pack, FALSE,
+					     (how != PICK_NONE) && iflags.menu_head_objsym),
+				 MENU_UNSELECTED);
 			collected_type_name = TRUE;
 		   }
 		}
@@ -1452,6 +1455,36 @@ int x, y;
 }
 
 int
+do_loot_cont(cobjp)
+struct obj **cobjp;
+{
+    struct obj *cobj = *cobjp;
+    if (!cobj) return 0;
+    if (cobj->olocked) {
+	pline("%s locked.", cobj->lknown ? "It is" :
+	      "Hmmm, it turns out to be");
+	cobj->lknown = 1;
+	return 0;
+    }
+    cobj->lknown = 1;
+
+    if (cobj->otyp == BAG_OF_TRICKS) {
+	int tmp;
+	You("carefully open the bag...");
+	pline("It develops a huge set of teeth and bites you!");
+	tmp = rnd(10);
+	losehp(Maybe_Half_Phys(tmp), "carnivorous bag", KILLED_BY_AN);
+	makeknown(BAG_OF_TRICKS);
+	return 1;
+    }
+
+    You("%sopen %s...",
+	(!cobj->cknown || !cobj->lknown) ? "carefully " : "",
+	the(xname(cobj)));
+    return use_container(cobjp, 0);
+}
+
+int
 doloot()	/* loot a container on the floor or loot saddle from mon. */
 {
     struct obj *cobj, *nobj;
@@ -1464,6 +1497,7 @@ doloot()	/* loot a container on the floor or loot saddle from mon. */
     char qbuf[BUFSZ];
     int prev_inquiry = 0;
     boolean prev_loot = FALSE;
+    int num_conts;
 
     if (check_capacity((char *)0)) {
 	/* "Can't do that while carrying so much stuff." */
@@ -1484,48 +1518,60 @@ doloot()	/* loot a container on the floor or loot saddle from mon. */
 
 lootcont:
 
-    if (container_at(cc.x, cc.y, FALSE)) {
-	boolean any = FALSE;
+    if ((num_conts = container_at(cc.x, cc.y, TRUE)) > 0) {
+	boolean anyfound = FALSE;
 
 	if (!able_to_loot(cc.x, cc.y, TRUE)) return 0;
-	for (cobj = level.objects[cc.x][cc.y]; cobj; cobj = nobj) {
-	    nobj = cobj->nexthere;
 
-	    if (Is_container(cobj)) {
-		c = ynq(safe_qbuf(qbuf, "There is ", " here, loot it?",
-				  cobj, doname, ansimpleoname, "a container"));
-		if (c == 'q') return (timepassed);
-		if (c == 'n') continue;
-		any = TRUE;
+	if (num_conts > 1) {
+	    /* use a menu to loot many containers */
+	    int n, i;
+	    winid win;
+	    anything any;
+	    menu_item *pick_list = NULL;
 
-		if (cobj->olocked) {
-		    pline("%s locked.", cobj->lknown ? "It is" :
-			  "Hmmm, it turns out to be");
-		    cobj->lknown = 1;
-		    continue;
+	    any.a_void = 0;
+	    win = create_nhwindow(NHW_MENU);
+	    start_menu(win);
+
+	    for (cobj = level.objects[cc.x][cc.y]; cobj; cobj = cobj->nexthere)
+		if (Is_container(cobj)) {
+		    any.a_obj = cobj;
+		    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, doname(cobj), MENU_UNSELECTED);
 		}
-		cobj->lknown = 1;
+	    end_menu(win, "Loot which containers?");
+	    n = select_menu(win, PICK_ANY, &pick_list);
+	    destroy_nhwindow(win);
 
-		if (cobj->otyp == BAG_OF_TRICKS) {
-		    int tmp;
-		    You("carefully open the bag...");
-		    pline("It develops a huge set of teeth and bites you!");
-		    tmp = rnd(10);
-		    losehp(Maybe_Half_Phys(tmp), "carnivorous bag", KILLED_BY_AN);
-		    makeknown(BAG_OF_TRICKS);
-		    timepassed = 1;
-		    continue;
+	    if (n > 0) {
+		for (i = 0; i < n; i++) {
+		    timepassed |= do_loot_cont(&pick_list[i].item.a_obj);
+		    if (multi < 0 || !pick_list[i].item.a_obj) {
+			free((genericptr_t) pick_list);
+			return 1;
+		    }
 		}
-
-		You("%sopen %s...",
-		    (!cobj->cknown || !cobj->lknown) ? "carefully " : "",
-		    the(xname(cobj)));
-		timepassed |= use_container(&cobj, 0);
-		/* might have triggered chest trap or magic bag explosion */
-		if (multi < 0 || !cobj) return 1;
 	    }
+	    if (pick_list) free((genericptr_t) pick_list);
+	    if (n != 0) c = 'y';
+	} else {
+	    for (cobj = level.objects[cc.x][cc.y]; cobj; cobj = nobj) {
+		nobj = cobj->nexthere;
+
+		if (Is_container(cobj)) {
+		    c = ynq(safe_qbuf(qbuf, "There is ", " here, loot it?",
+				      cobj, doname, ansimpleoname, "a container"));
+		    if (c == 'q') return (timepassed);
+		    if (c == 'n') continue;
+		    anyfound = TRUE;
+
+		    timepassed |= do_loot_cont(&cobj);
+		    /* might have triggered chest trap or magic bag explosion */
+		    if (multi < 0 || !cobj) return 1;
+		}
+	    }
+	    if (anyfound) c = 'y';
 	}
-	if (any) c = 'y';
     } else if (IS_GRAVE(levl[cc.x][cc.y].typ)) {
 	You("need to dig up the grave to effectively loot it...");
     }
@@ -1994,7 +2040,7 @@ struct obj *box;
 	    (void) add_to_container(box, deadcat);
 	}
 	pline_The("%s inside the box is dead!",
-	    Hallucination ? rndmonnam() : "housecat");
+	    Hallucination ? rndmonnam(NULL) : "housecat");
     }
     box->owt = weight(box);
     return;
@@ -2074,6 +2120,7 @@ int held;
 	    /* even if the trap fails, you've used up this turn */
 	    if (multi >= 0) {	/* in case we didn't become paralyzed */
 		nomul(-1);
+		multi_reason = "opening a container";
 		nomovemsg = "";
 	    }
 	    return 1;
@@ -2583,6 +2630,7 @@ struct obj *box;	/* or bag */
 	/* even if the trap fails, you've used up this turn */
 	if (multi >= 0) {	/* in case we didn't become paralyzed */
 	    nomul(-1);
+	    multi_reason = "tipping a container";
 	    nomovemsg = "";
 	}
     } else if (box->otyp == BAG_OF_TRICKS || box->otyp == HORN_OF_PLENTY) {

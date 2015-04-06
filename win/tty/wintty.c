@@ -1,5 +1,4 @@
-/* NetHack 3.5	wintty.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	wintty.c	$Date: 2012/01/22 06:27:09 $  $Revision: 1.66 $ */
+/* NetHack 3.5	wintty.c	$NHDT-Date: 1427667623 2015/03/29 22:20:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.75 $ */
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -56,7 +55,7 @@ struct window_procs tty_procs = {
 #if defined(SELECTSAVED)
     WC2_SELECTSAVED|
 #endif
-    0L,
+    WC2_DARKGRAY,
     tty_init_nhwindows,
     tty_player_selection,
     tty_askname,
@@ -201,6 +200,7 @@ static const char default_menu_cmds[] = {
 	MENU_SELECT_PAGE,
 	MENU_UNSELECT_PAGE,
 	MENU_INVERT_PAGE,
+	MENU_SEARCH,
 	0	/* null terminator */
 };
 
@@ -1061,7 +1061,7 @@ tty_create_nhwindow(type)
 #endif
 	newwin->offy = min((int)ttyDisplay->rows-2, ROWNO+1);
 	newwin->rows = newwin->maxrow = 2;
-	newwin->cols = newwin->maxcol = min(ttyDisplay->cols, COLNO);
+	newwin->cols = newwin->maxcol = ttyDisplay->cols;
 	break;
     case NHW_MAP:
 	/* map window, ROWNO lines long, full width, below message window */
@@ -1228,6 +1228,42 @@ tty_clear_nhwindow(window)
     cw->curx = cw->cury = 0;
 }
 
+
+boolean
+toggle_menu_curr(window, curr, lineno, in_view, counting, count)
+winid window;
+tty_menu_item *curr;
+int lineno;
+boolean in_view, counting;
+long count;
+{
+    if (curr->selected) {
+	if (counting && count > 0) {
+	    curr->count = count;
+	    if (in_view) set_item_state(window, lineno, curr);
+	    return TRUE;
+	} else { /* change state */
+	    curr->selected = FALSE;
+	    curr->count = -1L;
+	    if (in_view) set_item_state(window, lineno, curr);
+	    return TRUE;
+	}
+    } else {	/* !selected */
+	if (counting && count > 0) {
+	    curr->count = count;
+	    curr->selected = TRUE;
+	    if (in_view) set_item_state(window, lineno, curr);
+	    return TRUE;
+	} else if (!counting) {
+	    curr->selected = TRUE;
+	    if (in_view) set_item_state(window, lineno, curr);
+	    return TRUE;
+	}
+	/* do nothing counting&&count==0 */
+    }
+    return FALSE;
+}
+
 STATIC_OVL void
 dmore(cw, s)
     register struct WinDesc *cw;
@@ -1354,10 +1390,11 @@ struct WinDesc *cw;
 {
     tty_menu_item *page_start, *page_end, *curr;
     long count;
-    int n, curr_page, page_lines;
+    int n, curr_page, page_lines, resp_len;
     boolean finished, counting, reset_count;
     char *cp, *rp, resp[QBUFSZ], gacc[QBUFSZ],
-	 *msave, *morestr;
+	 *msave, *morestr, really_morc;
+#define MENU_EXPLICIT_CHOICE 0x7f	/* pseudo menu manipulation char */
 
     curr_page = page_lines = 0;
     page_start = page_end = 0;
@@ -1424,6 +1461,8 @@ struct WinDesc *cw;
 		for (page_lines = 0, curr = page_start;
 			curr != page_end;
 			page_lines++, curr = curr->next) {
+		    int color = NO_COLOR, attr = ATR_NONE;
+		    boolean menucolr = FALSE;
 		    if (curr->selector)
 			*rp++ = curr->selector;
 
@@ -1439,6 +1478,11 @@ struct WinDesc *cw;
 		     * actually output the character.  We're faster doing
 		     * this.
 		     */
+		    if (iflags.use_menu_color &&
+			(menucolr = get_menu_coloring(curr->str, &color,&attr))) {
+			term_start_attr(attr);
+			if (color != NO_COLOR) term_start_color(color);
+		    } else
 		    term_start_attr(curr->attr);
 		    for (n = 0, cp = curr->str;
 #ifndef WIN32CON
@@ -1456,6 +1500,10 @@ struct WinDesc *cw;
 				(void) putchar('#'); /* count selected */
 			} else
 			    (void) putchar(*cp);
+		   if (iflags.use_menu_color && menucolr) {
+		       if (color != NO_COLOR) term_end_color();
+		       term_end_attr(attr);
+		   } else
 		    term_end_attr(curr->attr);
 		}
 	    } else {
@@ -1464,6 +1512,8 @@ struct WinDesc *cw;
 		page_lines = 0;
 	    }
 	    *rp = 0;
+	    /* remember how many explicit menu choices there are */
+	    resp_len = (int)strlen(resp);
 
 	    /* corner window - clear extra lines from last page */
 	    if (cw->offx) {
@@ -1496,7 +1546,15 @@ struct WinDesc *cw;
 	    xwaitforspace(resp);
 	}
 
-	morc = map_menu_cmd(morc);
+	really_morc = morc;	/* (only used with MENU_EXPLICIT_CHOICE */
+	if ((rp = index(resp, morc)) != 0 && rp < resp + resp_len)
+	    /* explicit menu selection; don't override it if it also
+	       happens to match a mapped menu command (such as ':' to
+	       look inside a container vs ':' to search) */
+	    morc = MENU_EXPLICIT_CHOICE;
+	else
+	    morc = map_menu_cmd(morc);
+
 	switch (morc) {
 	    case '0':
 		/* special case: '0' is also the default ball class */
@@ -1600,6 +1658,36 @@ struct WinDesc *cw;
 		if (cw->how == PICK_ANY)
 		    invert_all(window, page_start, page_end, 0);
 		break;
+	    case MENU_SEARCH:
+		if (cw->how == PICK_NONE) {
+		    tty_nhbell();
+		    break;
+		} else {
+		    char searchbuf[BUFSZ], tmpbuf[BUFSZ];
+		    boolean on_curr_page = FALSE;
+		    int lineno = 0;
+		    tty_getlin("Search for:", tmpbuf);
+		    if (!tmpbuf[0] || tmpbuf[0] == '\033') break;
+		    Sprintf(searchbuf, "*%s*", tmpbuf);
+		    for (curr = cw->mlist; curr; curr = curr->next) {
+			if (on_curr_page) lineno++;
+			if (curr == page_start)
+			    on_curr_page = TRUE;
+			else if (curr == page_end)
+			    on_curr_page = FALSE;
+			if (curr->identifier.a_void && pmatch(searchbuf, curr->str)) {
+			    toggle_menu_curr(window, curr, lineno, on_curr_page, counting, count);
+			    if (cw->how == PICK_ONE) {
+				finished = TRUE;
+				break;
+			    }
+			}
+		    }
+		}
+		break;
+	    case MENU_EXPLICIT_CHOICE:
+		morc = really_morc;
+		/*FALLTHRU*/
 	    default:
 		if (cw->how == PICK_NONE || !index(resp, morc)) {
 		    /* unacceptable input received */
@@ -1618,27 +1706,7 @@ struct WinDesc *cw;
 			curr != page_end;
 			n++, curr = curr->next)
 		    if (morc == curr->selector) {
-			if (curr->selected) {
-			    if (counting && count > 0) {
-				curr->count = count;
-				set_item_state(window, n, curr);
-			    } else { /* change state */
-				curr->selected = FALSE;
-				curr->count = -1L;
-				set_item_state(window, n, curr);
-			    }
-			} else {	/* !selected */
-			    if (counting && count > 0) {
-				curr->count = count;
-				curr->selected = TRUE;
-				set_item_state(window, n, curr);
-			    } else if (!counting) {
-				curr->selected = TRUE;
-				set_item_state(window, n, curr);
-			    }
-			    /* do nothing counting&&count==0 */
-			}
-
+			toggle_menu_curr(window, curr, n, TRUE, counting, count);
 			if (cw->how == PICK_ONE) finished = TRUE;
 			break;	/* from `for' loop */
 		    }
@@ -1765,6 +1833,7 @@ tty_display_nhwindow(window, blocking)
 	cw->offx = (uchar) (int)
 	    max((int) 10, (int) (ttyDisplay->cols - cw->maxcol - 1));
 #endif
+	if(cw->offx < 0) cw->offx = 0;
 	if(cw->type == NHW_MENU)
 	    cw->offy = 0;
 	if(ttyDisplay->toplin == 1)
@@ -1890,7 +1959,7 @@ register int x, y;	/* not xchar: perhaps xchar is unsigned and
 	case NHW_TEXT: s = "[text window]"; break;
 	case NHW_BASE: s = "[base window]"; break;
 	}
-	debugpline("bad curs positioning win %d %s (%d,%d)", window, s, x, y);
+	debugpline4("bad curs positioning win %d %s (%d,%d)", window, s, x, y);
 	return;
     }
 #endif
@@ -1997,7 +2066,7 @@ tty_putstr(window, attr, str)
     register struct WinDesc *cw = 0;
     register char *ob;
     register const char *nb;
-    register int i, j, n0;
+    register long i, j, n0;
 
     /* Assume there's a real problem if the window is missing --
      * probably a panic message
@@ -2134,11 +2203,6 @@ tty_putstr(window, attr, str)
 		cw->data[cw->cury-1][++i] = '\0';
 		tty_putstr(window, attr, &str[i]);
 	    }
-
-	}
-	break;
-    }
-}
 
 void
 tty_display_file(fname, complain)
@@ -2375,7 +2439,7 @@ tty_end_menu(window, prompt)
     if (cw->npages > 1) {
 	char buf[QBUFSZ];
 	/* produce the largest demo string */
-	Sprintf(buf, "(%d of %d) ", cw->npages, cw->npages);
+	Sprintf(buf, "(%ld of %ld) ", cw->npages, cw->npages);
 	len = strlen(buf);
 	cw->morestr = copy_of("");
     } else {

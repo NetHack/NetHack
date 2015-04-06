@@ -1,5 +1,4 @@
-/* NetHack 3.5  makedefs.c  $NHDT-Date: 1425083082 2015/02/28 00:24:42 $  $NHDT-Branch: (no branch, rebasing scshunt-unconditionals) $:$NHDT-Revision: 1.63 $ */
-/* NetHack 3.5  makedefs.c  $Date: 2012/01/15 09:27:03 $  $Revision: 1.50 $ */
+/* NetHack 3.5  makedefs.c  $NHDT-Date: 1425083082 2015/02/28 00:24:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.63 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) M. Stephenson, 1990, 1991.			  */
 /* Copyright (c) Dean Luick, 1990.				  */
@@ -169,8 +168,7 @@ static char *FDECL(bannerc_string, (char *,const char *));
 static char *FDECL(xcrypt, (const char *));
 static unsigned long FDECL(read_rumors_file,
 			   (const char *,int *,long *,unsigned long));
-static int FDECL(check_control, (char *));
-static char *FDECL(without_control, (char *));
+static void FDECL(do_rnd_access_file, (const char *));
 static boolean FDECL(d_filter, (char *));
 static boolean FDECL(h_filter, (char *));
 static boolean FDECL(ranged_attk,(struct permonst*));
@@ -215,7 +213,7 @@ extern unsigned _stklen = STKSIZ;
 int
 main(void)
 {
-    const char *def_options = "odemvpqrhz";
+    const char *def_options = "odemvpqrshz";
     char buf[100];
     int len;
 
@@ -330,6 +328,11 @@ char	*options;
 				break;
 		case 'r':
 		case 'R':	do_rumors();
+				break;
+		case 's':
+		case 'S':	do_rnd_access_file(EPITAPHFILE);
+				do_rnd_access_file(ENGRAVEFILE);
+				do_rnd_access_file(BOGUSMONFILE);
 				break;
 		case 'h':
 		case 'H':	do_oracles();
@@ -872,6 +875,44 @@ unsigned long old_rumor_offset;
     return rumor_offset;
 }
 
+
+void
+do_rnd_access_file(fname)
+const char *fname;
+{
+    Sprintf(filename, DATA_IN_TEMPLATE, fname);
+    Strcat(filename, ".txt");
+    if (!(ifp = fopen(filename, RDTMODE))) {
+	perror(filename);
+	exit(EXIT_FAILURE);
+    }
+    filename[0]='\0';
+#ifdef FILE_PREFIX
+    Strcat(filename, file_prefix);
+#endif
+    Sprintf(eos(filename), DATA_TEMPLATE, fname);
+    if (!(ofp = fopen(filename, WRTMODE))) {
+	perror(filename);
+	exit(EXIT_FAILURE);
+    }
+    Fprintf(ofp,"%s",Dont_Edit_Data);
+
+    tfp = getfp(DATA_TEMPLATE, "grep.tmp", WRTMODE);
+    grep0(ifp, tfp);
+    ifp = getfp(DATA_TEMPLATE, "grep.tmp", RDTMODE);
+
+    while (fgets(in_line, sizeof in_line, ifp) != 0) {
+	if (in_line[0] == '#') continue; /* discard comments */
+	if (in_line[0] == '\n') continue; /* and empty lines */
+	(void) fputs(xcrypt(in_line), ofp);
+    }
+    Fclose(ifp);
+    Fclose(ofp);
+
+    delete_file(DATA_TEMPLATE, "grep.tmp");
+    return;
+}
+
 void
 do_rumors()
 {
@@ -1251,6 +1292,11 @@ static const char *build_opts[] = {
 #endif
 #ifdef NEWS
 		"news file",
+#endif
+#ifdef MENU_COLOR_REGEX
+		"menu colors via regular expressions",
+#else
+		"menu colors via pmatch",
 #endif
 #ifdef OVERLAY
 # ifdef MOVERLAY
@@ -1788,38 +1834,6 @@ dead_data:  perror(in_line);	/* report the problem */
 	return;
 }
 
-
-static	struct deflist {
-
-	const char	*defname;
-	boolean	true_or_false;
-} deflist[] = {
-	      {	"REINCARNATION", TRUE },
-	      { 0, 0 }
-};
-
-static int
-check_control(s)
-	char	*s;
-{
-	int	i;
-
-	if(s[0] != '%') return(-1);
-
-	for(i = 0; deflist[i].defname; i++)
-	    if(!strncmp(deflist[i].defname, s+1, strlen(deflist[i].defname)))
-		return(i);
-
-	return(-1);
-}
-
-static char *
-without_control(s)
-	char *s;
-{
-	return(s + 1 + strlen(deflist[check_control(in_line)].defname));
-}
-
 void
 do_dungeon()
 {
@@ -1850,22 +1864,7 @@ do_dungeon()
 
 	    rcnt++;
 	    if(in_line[0] == '#') continue;	/* discard comments */
-recheck:
-	    if(in_line[0] == '%') {
-		int i = check_control(in_line);
-		if(i >= 0) {
-		    if(!deflist[i].true_or_false)  {
-			while (fgets(in_line, sizeof in_line, ifp) != 0)
-			    if(check_control(in_line) != i) goto recheck;
-		    } else
-			(void) fputs(without_control(in_line),ofp);
-		} else {
-		    Fprintf(stderr, "Unknown control option '%s' in file %s at line %d.\n",
-			    in_line, DGN_I_FILE, rcnt);
-		    exit(EXIT_FAILURE);
-		}
-	    } else
-		(void) fputs(in_line,ofp);
+	    (void) fputs(in_line,ofp);
 	}
 	Fclose(ifp);
 	Fclose(ofp);

@@ -107,8 +107,10 @@ struct obj {
 
 	int	corpsenm;	/* type of corpse is mons[corpsenm] */
 #define leashmon  corpsenm	/* gets m_id of attached pet */
-#define spestudied corpsenm	/* # of times a spellbook has been studied */
 #define fromsink  corpsenm	/* a potion from a sink */
+#define record_achieve_special corpsenm
+	int usecount;		/* overloaded for various things that tally */
+#define spestudied usecount	/* # of times a spellbook has been studied */
 	unsigned oeaten;	/* nutrition left in food, if partly eaten */
 	long age;		/* creation date */
 	long owornmask;
@@ -301,6 +303,17 @@ struct obj {
 				|| (otmp)->otyp == WAX_CANDLE\
 				|| (otmp)->otyp == POT_OIL)
 
+/* things that can be read */
+#define is_readable(otmp) ((otmp)->otyp == FORTUNE_COOKIE\
+			   || (otmp)->otyp == T_SHIRT\
+			   || (otmp)->otyp == ALCHEMY_SMOCK\
+			   || (otmp)->otyp == CREDIT_CARD\
+			   || (otmp)->otyp == CAN_OF_GREASE\
+			   || (otmp)->otyp == MAGIC_MARKER\
+			   || (otmp)->oclass == COIN_CLASS\
+			   || (otmp)->oartifact == ART_ORB_OF_FATE\
+			   || (otmp)->otyp == CANDY_BAR)
+
 /* special stones */
 #define is_graystone(obj)	((obj)->otyp == LUCKSTONE || \
 				 (obj)->otyp == LOADSTONE || \
@@ -318,6 +331,25 @@ struct obj {
 /* Flags for get_obj_location(). */
 #define CONTAINED_TOO	0x1
 #define BURIED_TOO	0x2
+
+/* object erosion types */
+#define ERODE_BURN 0
+#define ERODE_RUST 1
+#define ERODE_ROT 2
+#define ERODE_CORRODE 3
+
+/* erosion flags for erode_obj() */
+#define EF_NONE    0
+#define EF_GREASE  0x1 /* check for a greased object */
+#define EF_DESTROY 0x2 /* potentially destroy the object */
+#define EF_VERBOSE 0x4 /* print extra messages */
+#define EF_PAY     0x8 /* it's the player's fault */
+
+/* erosion return values for erode_obj(), water_damage() */
+#define ER_NOTHING   0 /* nothing happened */
+#define ER_GREASED   1 /* protected by grease */
+#define ER_DAMAGED   2 /* object was damaged in some way */
+#define ER_DESTROYED 3 /* object was destroyed */
 
 /*
  *  Notes for adding new oextra structures:

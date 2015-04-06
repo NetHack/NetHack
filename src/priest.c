@@ -284,13 +284,14 @@ char *pname;		/* caller-supplied output buffer */
     boolean do_hallu = Hallucination,
 	    aligned_priest = mon->data == &mons[PM_ALIGNED_PRIEST],
 	    high_priest = mon->data == &mons[PM_HIGH_PRIEST];
-    const char *what = do_hallu ? rndmonnam() : mon->data->mname;
+    char whatcode = '\0';
+    const char *what = do_hallu ? rndmonnam(&whatcode) : mon->data->mname;
 
     if (!mon->ispriest && !mon->isminion)	/* should never happen...  */
 	return strcpy(pname, what);		/* caller must be confused */
 
     *pname = '\0';
-    if (!do_hallu || !bogon_is_pname(what)) Strcat(pname, "the ");
+    if (!do_hallu || !bogon_is_pname(whatcode)) Strcat(pname, "the ");
     if (mon->minvis) Strcat(pname, "invisible ");
     if (mon->isminion && EMIN(mon)->renegade)
 	Strcat(pname, "renegade ");
@@ -474,6 +475,7 @@ int roomno;
 	    if (flags.verbose)
 		You("are frightened to death, and unable to move.");
 	    nomul(-3);
+	    multi_reason = "being terrified of a demon";
 	    nomovemsg = "You regain your composure.";
 	}
     }

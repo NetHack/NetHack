@@ -1,5 +1,4 @@
-/* NetHack 3.5	hack.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	hack.h	$Date: 2009/05/06 10:44:46 $  $Revision: 1.49 $ */
+/* NetHack 3.5	hack.h	$NHDT-Date: 1426465431 2015/03/16 00:23:51 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.52 $ */
 /*	SCCS Id: @(#)hack.h	3.5	2008/03/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -11,32 +10,22 @@
 #include "config.h"
 #endif
 
+/* [DEBUG shouldn't be defined unless you know what you're doing...] */
 #ifdef DEBUG
-/* due to strstr(), mon.c matches makemon.c */
-# define showdebug() (sysopt.debugfiles &&			\
-	    ((sysopt.debugfiles[0] == '*') ||			\
-	     (strstr( __FILE__ , sysopt.debugfiles))))
-
-/* GCC understands this syntax */
-# ifdef __GNUC__
-/* ... but whines about it anyway without these pragmas. */
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wvariadic-macros"
-#  define debugpline(args...)                       \
-     do { if (showdebug()) pline( args ); } while(0);
-# pragma GCC diagnostic pop
-# endif
-
-/* and Visual Studio understands this one */
-# ifdef _MSC_VER
-#  define debugpline(...)                           \
-     do { if (showdebug()) pline(__VA_ARGS__); } while(0);
-# endif
-
+# define ifdebug(stmt)	do { if (showdebug(__FILE__)) stmt; } while (0)
+/* these don't require compiler support for C99 variadic macros */
+# define debugpline0(str)		ifdebug(pline(str))
+# define debugpline1(fmt,arg)		ifdebug(pline(fmt,arg))
+# define debugpline2(fmt,a1,a2)		ifdebug(pline(fmt,a1,a2))
+# define debugpline3(fmt,a1,a2,a3)	ifdebug(pline(fmt,a1,a2,a3))
+# define debugpline4(fmt,a1,a2,a3,a4)	ifdebug(pline(fmt,a1,a2,a3,a4))
 #else
-# define showdebug() (0)
-# define debugpline(...)
-#endif
+# define debugpline0(str)		/*empty*/
+# define debugpline1(fmt,arg)		/*empty*/
+# define debugpline2(fmt,a1,a2)		/*empty*/
+# define debugpline3(fmt,a1,a2,a3)	/*empty*/
+# define debugpline4(fmt,a1,a2,a3,a4)	/*empty*/
+#endif	/*DEBUG*/
 
 #define TELL		1
 #define NOTELL		0
@@ -99,6 +88,9 @@
 #define COST_BITE   13	/* start eating food */
 #define COST_OPEN   14	/* open tin */
 #define COST_BRKLCK 15	/* break box/chest's lock */
+#define COST_RUST   16  /* rust damage */
+#define COST_ROT    17  /* rotting attack */
+#define COST_CORRODE 18 /* acid damage */
 
 /* bitmask flags for corpse_xname();
    PFX_THE takes precedence over ARTICLE, NO_PFX takes precedence over both */

@@ -168,7 +168,7 @@ magic_map_background(x, y, show)
 	lev->glyph = glyph;
     if (show) show_glyph(x,y, glyph);
 
-    remember_topology(x,y);	/* DUNGEON_OVERVIEW */
+    remember_topology(x,y);
 }
 
 /*
@@ -325,7 +325,7 @@ unmap_object(x, y)
     else								\
 	map_background(x,y,show);					\
 									\
-    remember_topology(x,y);	/* DUNGEON_OVERVIEW */			\
+    remember_topology(x,y);						\
 }
 
 void
@@ -674,7 +674,12 @@ newsym(x,y)
 	 */
 	lev->waslit = (lev->lit!=0);	/* remember lit condition */
 
-	if (reg != NULL && ACCESSIBLE(lev->typ)) {
+	/* normal region shown only on accessible positions, but poison clouds
+	 * also shown above lava, pools and moats.
+	 */
+	if (reg != NULL && (ACCESSIBLE(lev->typ) ||
+		(reg->glyph == cmap_to_glyph(S_poisoncloud) &&
+		 (lev->typ == LAVAPOOL || lev->typ == POOL || lev->typ == MOAT)))) {
 	    show_region(reg,x,y);
 	    return;
 	}
@@ -824,8 +829,10 @@ shieldeff(x,y)
  * DISP_ALWAYS- Like DISP_FLASH, but vision is not taken into account.
  */
 
+#define TMP_AT_MAX_GLYPHS (COLNO*2)
+
 static struct tmp_glyph {
-    coord saved[COLNO];	/* previously updated positions */
+    coord saved[TMP_AT_MAX_GLYPHS];	/* previously updated positions */
     int sidx;		/* index of next unused slot in saved[] */
     int style;		/* either DISP_BEAM or DISP_FLASH or DISP_ALWAYS */
     int glyph;		/* glyph to use when printing */
@@ -895,7 +902,7 @@ tmp_at(x, y)
 	default:	/* do it */
 	    if (tglyph->style == DISP_BEAM || tglyph->style == DISP_ALL) {
 		if (tglyph->style != DISP_ALL && !cansee(x,y)) break;
-		if (tglyph->sidx >= COLNO) break; /* too many locations */
+		if (tglyph->sidx >= TMP_AT_MAX_GLYPHS) break; /* too many locations */
 		/* save pos for later erasing */
 		tglyph->saved[tglyph->sidx].x = x;
 		tglyph->saved[tglyph->sidx].y = y;
