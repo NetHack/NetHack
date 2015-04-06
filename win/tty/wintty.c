@@ -2209,10 +2209,6 @@ tty_putstr(window, attr, str)
     }
 }
 
-	}
-	break;
-    }
-}
 
 void
 tty_display_file(fname, complain)
