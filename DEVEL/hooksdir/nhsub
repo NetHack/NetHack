@@ -27,7 +27,11 @@ my %codes = (
 	'd M'=>0, 'd D'=>0,
 	'c M'=>0, 'c D'=>0,
 
-#           M        [ MD]   updated in index
+	'dM '=>0, 'dMM'=>1, 'dMD'=>0,
+	'aM '=>0, 'aMM'=>1, 'aMD'=>0,
+	'cM '=>0, 'cMM'=>1, 'cMD'=>0,
+	'fM '=>0, 'fMM'=>1, 'fMD'=>0,
+				#           M        [ MD]   updated in index
 
 	'dA '=>1, 'dAM'=>1, 'dAD'=>1,
 	'aA '=>1, 'aAM'=>1, 'aAD'=>1,
@@ -41,9 +45,17 @@ my %codes = (
 	'fD '=>1, 'fDM'=>1,
 				   # D         [ M]   deleted from index
 
-#           R        [ MD]   renamed in index
+	'dR '=>0, 'dRM'=>1, 'dRD'=>0,
+	'aR '=>0, 'aRM'=>1, 'aRD'=>0,
+	'cR '=>0, 'cRM'=>1, 'cRD'=>0,
+	'fR '=>0, 'fRM'=>1, 'fRD'=>0,
+				#           R        [ MD]   renamed in index
 
-#           C        [ MD]   copied in index
+	'dC '=>0, 'dCM'=>1, 'dCD'=>0,
+	'aC '=>0, 'aCM'=>1, 'aCD'=>0,
+	'cC '=>0, 'cCM'=>1, 'cCD'=>0,
+	'fC '=>0, 'fCM'=>1, 'fCD'=>0,
+				#           C        [ MD]   copied in index
 
 	'aM '=>1, 'aA '=>1, 'aR '=>1, 'aC '=>1,
 	'fM '=>1, 'fA '=>1, 'fR '=>1, 'fC '=>1,
