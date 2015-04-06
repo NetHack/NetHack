@@ -1,4 +1,5 @@
 /* NetHack 3.5	wintty.c	$NHDT-Date: 1427667623 2015/03/29 22:20:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.75 $ */
+/* NetHack 3.5	wintty.c	$Date: 2012/01/22 06:27:09 $  $Revision: 1.66 $ */
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2203,6 +2204,11 @@ tty_putstr(window, attr, str)
 		cw->data[cw->cury-1][++i] = '\0';
 		tty_putstr(window, attr, &str[i]);
 	    }
+
+	}
+	break;
+    }
+}
 
 void
 tty_display_file(fname, complain)
