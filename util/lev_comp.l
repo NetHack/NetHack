@@ -1,5 +1,5 @@
 %{
-/* NetHack 3.5  lev_comp.l	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5  lev_comp.l	$NHDT-Date: 1428240296 2015/04/05 13:24:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $ */
 /* NetHack 3.5  lev_comp.l	$Date: 2009/05/06 10:54:31 $  $Revision: 1.9 $ */
 /*	SCCS Id: @(#)lev_lex.c	3.5	2002/03/27	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
@@ -69,6 +69,7 @@ void FDECL(init_yyout, (FILE *));
 long NDECL(handle_varstring_check);
 long FDECL(corefunc_str_check, (char *, long));
 
+extern void VDECL(lc_error, (const char *, ...));
 extern struct lc_vardefs *FDECL(vardef_defined,(struct lc_vardefs *,char *, int));
 
 extern struct lc_vardefs *variable_definitions;

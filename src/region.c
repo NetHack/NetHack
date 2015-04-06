@@ -996,7 +996,7 @@ int damage;
     cloud->arg = zeroany;
     cloud->arg.a_int = damage;
     cloud->visible = TRUE;
-    cloud->glyph = cmap_to_glyph(S_cloud);
+    cloud->glyph = cmap_to_glyph(damage ? S_poisoncloud : S_cloud);
     add_region(cloud);
     return cloud;
 }

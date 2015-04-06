@@ -1175,6 +1175,7 @@ void FDECL(init_yyout, (FILE *));
 long NDECL(handle_varstring_check);
 long FDECL(corefunc_str_check, (char *, long));
 
+extern void VDECL(lc_error, (const char *, ...));
 extern struct lc_vardefs *FDECL(vardef_defined,(struct lc_vardefs *,char *, int));
 
 extern struct lc_vardefs *variable_definitions;

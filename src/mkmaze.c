@@ -879,6 +879,26 @@ register xchar x, y, todnum, todlevel;
 	return;
 }
 
+void
+fumaroles()
+{
+    xchar n;
+    boolean snd = FALSE, loud = FALSE;
+    for (n = rn2(3)+2; n; n--) {
+	xchar x = rn1(COLNO-4,3);
+	xchar y = rn1(ROWNO-4,3);
+	struct trap *ttmp = t_at(x,y);
+	if (levl[x][y].typ == LAVAPOOL) {
+	    NhRegion *r = create_gas_cloud(x,y, 4+rn2(5), rn1(10,5));
+	    clear_heros_fault(r);
+	    snd = TRUE;
+	    if (distu(x,y) < 15) loud = TRUE;
+	}
+    }
+    if (snd && !Deaf)
+	Norep("You hear a %swhoosh!", loud ? "loud " : "");
+}
+
 /*
  * Special waterlevel stuff in endgame (TH).
  *

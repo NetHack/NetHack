@@ -162,7 +162,7 @@ dosave0()
 	    nh_uncompress(fq_save);
 	    fd = open_savefile();
 	    if (fd > 0) {
-		(void) close(fd);
+		(void) nhclose(fd);
 		clear_nhwindow(WIN_MESSAGE);
 		There("seems to be an old save file.");
 		if (yn("Overwrite the old file?") == 'n') {
@@ -218,7 +218,7 @@ dosave0()
 		    pline("Require %ld bytes but only have %ld.", needed, fds);
 		}
 		flushout();
-		(void) close(fd);
+		(void) nhclose(fd);
 		(void) delete_savefile();
 		return 0;
 	    }
@@ -265,7 +265,7 @@ dosave0()
 		ofd = open_levelfile(ltmp, whynot);
 		if (ofd < 0) {
 		    HUP pline1(whynot);
-		    (void) close(fd);
+		    (void) nhclose(fd);
 		    (void) delete_savefile();
 		    HUP Strcpy(killer.name, whynot);
 		    HUP done(TRICKED);
@@ -273,7 +273,7 @@ dosave0()
 		}
 		minit();	/* ZEROCOMP */
 		getlev(ofd, hackpid, ltmp, FALSE);
-		(void) close(ofd);
+		(void) nhclose(ofd);
 		bwrite(fd, (genericptr_t) &ltmp, sizeof ltmp); /* level number*/
 		savelev(fd, ltmp, WRITE_SAVE | FREE_SAVE);     /* actual level*/
 		delete_levelfile(ltmp);
@@ -404,7 +404,7 @@ savestateinlock()
 		    Strcpy(killer.name, whynot);
 		    done(TRICKED);
 		}
-		(void) close(fd);
+		(void) nhclose(fd);
 
 		fd = create_levelfile(0, whynot);
 		if (fd < 0) {
@@ -742,7 +742,7 @@ def_bclose(fd)
 	bw_FILE = 0;
     } else
 #endif
-	(void) close(fd);
+	(void) nhclose(fd);
     return;
 }
 
@@ -879,7 +879,7 @@ zerocomp_bclose(fd)
 int fd;
 {
     zerocomp_bufoff(fd);
-    (void) close(fd);
+    (void) nhclose(fd);
     return;
 }
 #endif /* ZEROCOMP */
@@ -1443,8 +1443,8 @@ char *from, *to;
 		if (nto != nfrom)
 			panic("Copyfile failed!");
 	} while (nfrom == BUFSIZ);
-	(void) close(fdfrom);
-	(void) close(fdto);
+	(void) nhclose(fdfrom);
+	(void) nhclose(fdto);
 # endif /* TOS */
 }
 

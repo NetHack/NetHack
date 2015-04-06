@@ -282,7 +282,7 @@ int start;
 	if (sysflags.asksavedisk) {
 		/* Don't prompt if you can find the save file */
 		if ((fd = open_savefile()) >= 0) {
-			(void) close(fd);
+			(void) nhclose(fd);
 			return 1;
 		}
 		clear_nhwindow(WIN_MESSAGE);
@@ -335,7 +335,7 @@ comspec_exists()
 
 	if ((comspec = getcomspec()))
 		if ((fd = open(comspec, O_RDONLY)) >= 0) {
-			(void) close(fd);
+			(void) nhclose(fd);
 			return TRUE;
 		}
 	return FALSE;
