@@ -121,3 +121,14 @@ OPTIONS=time,noshowexp,number_pad:2,lit_corridor
 # DEC Rainbows will hang if rawio is set, so they should instead use:
 #OPTIONS=BIOS,DECgraphics
 
+# Colored menus.
+#OPTIONS=menucolors
+# Syntax is: MENUCOLOR="string_to_match"=color&attribute
+#  Colors: black, red, green, brown, blue, magenta, cyan, gray, orange,
+#          lightgreen, yellow, lightblue, lightmagenta, lightcyan, white.
+#  Attributes: none, bold, dim, underline, blink, inverse.
+#MENUCOLOR=" blessed "=green
+#MENUCOLOR=" holy "=green
+#MENUCOLOR=" cursed "=red
+#MENUCOLOR=" unholy "=red
+#MENUCOLOR=" cursed .* (being worn)"=orange&underline

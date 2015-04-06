@@ -407,10 +407,6 @@ fixup_special()
 	place_lregion(0,0,0,0,0,0,0,0,LR_BRANCH,(d_level *)0);
     }
 
-	/* KMH -- Sokoban levels */
-	if(In_sokoban(&u.uz))
-		sokoban_detect();
-
     /* Still need to add some stuff to level file */
     if (Is_medusa_level(&u.uz)) {
 	struct obj *otmp;
@@ -557,7 +553,7 @@ register const char *s;
 #endif
 
 	maze0xy(&mm);
-	walkfrom((int) mm.x, (int) mm.y);
+	walkfrom((int) mm.x, (int) mm.y, 0);
 	/* put a boulder at the maze center */
 	(void) mksobj_at(BOULDER, (int) mm.x, (int) mm.y, TRUE, FALSE);
 
@@ -645,13 +641,20 @@ register const char *s;
  * that is totally safe.
  */
 void
-walkfrom(x,y)
+walkfrom(x,y,typ)
 int x,y;
+schar typ;
 {
 #define CELLS (ROWNO * COLNO) / 4		/* a maze cell is 4 squares */
 	char mazex[CELLS + 1], mazey[CELLS + 1];	/* char's are OK */
 	int q, a, dir, pos;
 	int dirs[4];
+
+#ifndef WALLIFIED_MAZE
+	if (!typ) typ = CORR;
+#else
+	if (!typ) typ = ROOM;
+#endif
 
 	pos = 1;
 	mazex[pos] = (char) x;
@@ -661,11 +664,7 @@ int x,y;
 		y = (int) mazey[pos];
 		if(!IS_DOOR(levl[x][y].typ)) {
 		    /* might still be on edge of MAP, so don't overwrite */
-#ifndef WALLIFIED_MAZE
-		    levl[x][y].typ = CORR;
-#else
-		    levl[x][y].typ = ROOM;
-#endif
+		    levl[x][y].typ = typ;
 		    levl[x][y].flags = 0;
 		}
 		q = 0;
@@ -676,11 +675,7 @@ int x,y;
 		else {
 			dir = dirs[rn2(q)];
 			move(&x, &y, dir);
-#ifndef WALLIFIED_MAZE
-			levl[x][y].typ = CORR;
-#else
-			levl[x][y].typ = ROOM;
-#endif
+			levl[x][y].typ = typ;
 			move(&x, &y, dir);
 			pos++;
 			if (pos > CELLS)
@@ -693,19 +688,22 @@ int x,y;
 #else
 
 void
-walkfrom(x,y)
+walkfrom(x,y,typ)
 int x,y;
+schar typ;
 {
 	register int q,a,dir;
 	int dirs[4];
 
+#ifndef WALLIFIED_MAZE
+	if (!typ) typ = CORR;
+#else
+	if (!typ) typ = ROOM;
+#endif
+
 	if(!IS_DOOR(levl[x][y].typ)) {
 	    /* might still be on edge of MAP, so don't overwrite */
-#ifndef WALLIFIED_MAZE
-	    levl[x][y].typ = CORR;
-#else
-	    levl[x][y].typ = ROOM;
-#endif
+	    levl[x][y].typ = typ;
 	    levl[x][y].flags = 0;
 	}
 
@@ -716,13 +714,9 @@ int x,y;
 		if(!q) return;
 		dir = dirs[rn2(q)];
 		move(&x,&y,dir);
-#ifndef WALLIFIED_MAZE
-		levl[x][y].typ = CORR;
-#else
-		levl[x][y].typ = ROOM;
-#endif
+		levl[x][y].typ = typ;
 		move(&x,&y,dir);
-		walkfrom(x,y);
+		walkfrom(x,y,typ);
 	}
 }
 #endif /* MICRO */
@@ -885,6 +879,26 @@ register xchar x, y, todnum, todlevel;
 	return;
 }
 
+void
+fumaroles()
+{
+    xchar n;
+    boolean snd = FALSE, loud = FALSE;
+    for (n = rn2(3)+2; n; n--) {
+	xchar x = rn1(COLNO-4,3);
+	xchar y = rn1(ROWNO-4,3);
+	struct trap *ttmp = t_at(x,y);
+	if (levl[x][y].typ == LAVAPOOL) {
+	    NhRegion *r = create_gas_cloud(x,y, 4+rn2(5), rn1(10,5));
+	    clear_heros_fault(r);
+	    snd = TRUE;
+	    if (distu(x,y) < 15) loud = TRUE;
+	}
+    }
+    if (snd && !Deaf)
+	Norep("You hear a %swhoosh!", loud ? "loud " : "");
+}
+
 /*
  * Special waterlevel stuff in endgame (TH).
  *
@@ -922,9 +936,9 @@ movebubbles()
 	register int x, y, i, j;
 	struct trap *btrap;
 	static const struct rm water_pos =
-		{ cmap_to_glyph(S_water), WATER, 0, 0, 0, 0, 0, 0, 0 };
+		{ cmap_to_glyph(S_water), WATER, 0, 0, 0, 0, 0, 0, 0, 0 };
 	static const struct rm air_pos =
-		{ cmap_to_glyph(S_cloud), AIR,   0, 0, 0, 1, 0, 0, 0 };
+		{ cmap_to_glyph(S_cloud), AIR,   0, 0, 0, 1, 0, 0, 0, 0 };
 
 	/* set up the portal the first time bubbles are moved */
 	if (!wportal) set_wportal();

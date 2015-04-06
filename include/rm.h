@@ -189,34 +189,35 @@
 #define S_ss2		72
 #define S_ss3		73
 #define S_ss4		74
+#define S_poisoncloud	75
 
 /* The 8 swallow symbols.  Do NOT separate.  To change order or add, see */
 /* the function swallow_to_glyph() in display.c.			 */
-#define S_sw_tl		75	/* swallow top left [1]			*/
-#define S_sw_tc		76	/* swallow top center [2]	Order:	*/
-#define S_sw_tr		77	/* swallow top right [3]		*/
-#define S_sw_ml		78	/* swallow middle left [4]	1 2 3	*/
-#define S_sw_mr		79	/* swallow middle right [6]	4 5 6	*/
-#define S_sw_bl		80	/* swallow bottom left [7]	7 8 9	*/
-#define S_sw_bc		81	/* swallow bottom center [8]		*/
-#define S_sw_br		82	/* swallow bottom right [9]		*/
+#define S_sw_tl		76	/* swallow top left [1]			*/
+#define S_sw_tc		77	/* swallow top center [2]	Order:	*/
+#define S_sw_tr		78	/* swallow top right [3]		*/
+#define S_sw_ml		79	/* swallow middle left [4]	1 2 3	*/
+#define S_sw_mr		80	/* swallow middle right [6]	4 5 6	*/
+#define S_sw_bl		81	/* swallow bottom left [7]	7 8 9	*/
+#define S_sw_bc		82	/* swallow bottom center [8]		*/
+#define S_sw_br		83	/* swallow bottom right [9]		*/
 
-#define S_explode1	83	/* explosion top left			*/
-#define S_explode2	84	/* explosion top center			*/
-#define S_explode3	85	/* explosion top right		 Ex.	*/
-#define S_explode4	86	/* explosion middle left		*/
-#define S_explode5	87	/* explosion middle center	 /-\	*/
-#define S_explode6	88	/* explosion middle right	 |@|	*/
-#define S_explode7	89	/* explosion bottom left	 \-/	*/
-#define S_explode8	90	/* explosion bottom center		*/
-#define S_explode9	91	/* explosion bottom right		*/
+#define S_explode1	84	/* explosion top left			*/
+#define S_explode2	85	/* explosion top center			*/
+#define S_explode3	86	/* explosion top right		 Ex.	*/
+#define S_explode4	87	/* explosion middle left		*/
+#define S_explode5	88	/* explosion middle center	 /-\	*/
+#define S_explode6	89	/* explosion middle right	 |@|	*/
+#define S_explode7	90	/* explosion bottom left	 \-/	*/
+#define S_explode8	91	/* explosion bottom center		*/
+#define S_explode9	92	/* explosion bottom right		*/
 
 /* end effects */
 
-#define MAXPCHARS	92	/* maximum number of mapped characters */
+#define MAXPCHARS	93	/* maximum number of mapped characters */
 #define MAXDCHARS	41	/* maximum of mapped dungeon characters */
 #define MAXTCHARS	22	/* maximum of mapped trap characters */
-#define MAXECHARS	29	/* maximum of mapped effects characters */
+#define MAXECHARS	30	/* maximum of mapped effects characters */
 #define MAXEXPCHARS	9	/* number of explosion characters */
 
 struct symdef {
@@ -291,6 +292,7 @@ extern struct symsetentry symset[NUM_GRAPHICS];		  /* from drawing.c */
 #define D_CLOSED	4
 #define D_LOCKED	8
 #define D_TRAPPED	16
+#define D_SECRET        32 /* only used by sp_lev.c, NOT in rm-struct */
 
 /*
  * Some altars are considered as shrines, so we need a flag.
@@ -392,6 +394,19 @@ struct rm {
 	Bitfield(edge,1);	/* marks boundaries for special rooms*/
 	Bitfield(candig,1);	/* Exception to Can_dig_down; was a trapdoor */
 };
+
+
+#define SET_TYPLIT(x,y,ttyp,llit)				\
+{								\
+  if ((x) >= 0 && (y) >= 0 && (x) < COLNO && (y) < ROWNO) {	\
+    if ((ttyp) < MAX_TYPE) levl[(x)][(y)].typ = (ttyp);		\
+    if ((ttyp) == LAVAPOOL) levl[(x)][(y)].lit = 1;		\
+    else if ((schar)(llit) != -2) {				\
+	if ((schar)(llit) == -1) levl[(x)][(y)].lit = rn2(2);	\
+	else levl[(x)][(y)].lit = (llit);			\
+    }								\
+  }								\
+}
 
 /*
  * Add wall angle viewing by defining "modes" for each wall type.  Each

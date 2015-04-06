@@ -1,4 +1,4 @@
-/* NetHack 3.5	topten.c	$NHDT-Date: 1426731079 2015/03/19 02:11:19 $  $NHDT-Branch: harder_d8 $:$NHDT-Revision: 1.25 $ */
+/* NetHack 3.5	topten.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
 /* NetHack 3.5	topten.c	$Date: 2012/01/24 04:26:15 $  $Revision: 1.23 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -353,8 +353,9 @@ encodexlogflags()
 {
     long e = 0L;
 
-    if (wizard)   e |= 1L << 0;
-    if (discover) e |= 1L << 1;
+    if (wizard)                e |= 1L << 0;
+    if (discover)              e |= 1L << 1;
+    if (!u.uroleplay.numbones) e |= 1L << 2;
 
     return e;
 }

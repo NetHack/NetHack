@@ -201,6 +201,7 @@ struct instance_flags {
 	boolean  rlecomp;	/* run-length comp of levels when writing savefile */
 	uchar	 num_pad_mode;
 	boolean  echo;		/* 1 to echo characters */
+	boolean use_menu_color;	/* use color in menus; only if wc_color */
 #if 0
 	boolean  DECgraphics;	/* use DEC VT-xxx extended character set */
 	boolean  IBMgraphics;	/* use IBM extended character set */

@@ -64,18 +64,18 @@ DOOR:closed,(52,14)
 # Unattended Altar - unaligned due to conflict - player must align it.
 ALTAR:(28,09),noalign,altar
 # High Priest
-MONSTER:'@',"Arch Priest",(28,10)
+MONSTER:('@',"Arch Priest"),(28,10)
 # The treasure of High Priest
-OBJECT:'(',"chest",(27,10)
+OBJECT:('(',"chest"),(27,10)
 # knight guards for the audience chamber
-MONSTER:'@',"acolyte",(32,07)
-MONSTER:'@',"acolyte",(32,08)
-MONSTER:'@',"acolyte",(32,11)
-MONSTER:'@',"acolyte",(32,12)
-MONSTER:'@',"acolyte",(33,07)
-MONSTER:'@',"acolyte",(33,08)
-MONSTER:'@',"acolyte",(33,11)
-MONSTER:'@',"acolyte",(33,12)
+MONSTER:('@',"acolyte"),(32,07)
+MONSTER:('@',"acolyte"),(32,08)
+MONSTER:('@',"acolyte"),(32,11)
+MONSTER:('@',"acolyte"),(32,12)
+MONSTER:('@',"acolyte"),(33,07)
+MONSTER:('@',"acolyte"),(33,08)
+MONSTER:('@',"acolyte"),(33,11)
+MONSTER:('@',"acolyte"),(33,12)
 # Non diggable walls
 NON_DIGGABLE:(00,00,75,19)
 # Random traps
@@ -86,18 +86,18 @@ TRAP:random,random
 TRAP:random,random
 TRAP:random,random
 # Monsters on siege duty.
-MONSTER: 'Z',"human zombie",(37,01)
-MONSTER: 'Z',"human zombie",(37,18)
-MONSTER: 'Z',"human zombie",(03,03)
-MONSTER: 'Z',"human zombie",(65,04)
-MONSTER: 'Z',"human zombie",(12,11)
-MONSTER: 'Z',"human zombie",(60,12)
-MONSTER: 'Z',"human zombie",(14,08)
-MONSTER: 'Z',"human zombie",(55,00)
-MONSTER: 'Z',"human zombie",(18,18)
-MONSTER: 'Z',"human zombie",(59,10)
-MONSTER: 'Z',"human zombie",(13,09)
-MONSTER: 'Z',"human zombie",(01,17)
+MONSTER: ('Z',"human zombie"),(37,01)
+MONSTER: ('Z',"human zombie"),(37,18)
+MONSTER: ('Z',"human zombie"),(03,03)
+MONSTER: ('Z',"human zombie"),(65,04)
+MONSTER: ('Z',"human zombie"),(12,11)
+MONSTER: ('Z',"human zombie"),(60,12)
+MONSTER: ('Z',"human zombie"),(14,08)
+MONSTER: ('Z',"human zombie"),(55,00)
+MONSTER: ('Z',"human zombie"),(18,18)
+MONSTER: ('Z',"human zombie"),(59,10)
+MONSTER: ('Z',"human zombie"),(13,09)
+MONSTER: ('Z',"human zombie"),(01,17)
 
 #
 #	The "locate" level for the quest.
@@ -109,7 +109,7 @@ MONSTER: 'Z',"human zombie",(01,17)
 MAZE: "Pri-loca",' '
 FLAGS: hardfloor
 # This is a kludge to init the level as a lit field.
-INIT_MAP: '.' , '.' , false , false , lit , false
+INIT_MAP: mines, '.' , '.' , false , false , lit , false
 GEOMETRY:center,center
 MAP
 ........................................
@@ -132,10 +132,10 @@ REGION:(00,00,09,13),unlit,"morgue"
 REGION:(09,00,30,01),unlit,"morgue"
 REGION:(09,12,30,13),unlit,"morgue"
 REGION:(31,00,39,13),unlit,"morgue"
-REGION:(11,03,29,10),lit,"temple",filled,true
+REGION:(11,03,29,10),lit,"temple",filled,irregular
 # The altar inside the temple
 ALTAR:(20,07),noalign,shrine
-MONSTER:'@',"aligned priest",(20,07),noalign,hostile
+MONSTER:('@',"aligned priest"),(20,07),noalign,hostile
 # Doors
 DOOR:locked,(10,06)
 DOOR:locked,(10,07)
@@ -150,21 +150,21 @@ STAIR:(20,06),down
 # Non diggable walls
 NON_DIGGABLE:(10,02,30,13)
 # Objects (inside the antechambers).
-OBJECT:random,random,(14,03)
-OBJECT:random,random,(15,03)
-OBJECT:random,random,(16,03)
-OBJECT:random,random,(14,10)
-OBJECT:random,random,(15,10)
-OBJECT:random,random,(16,10)
-OBJECT:random,random,(17,10)
-OBJECT:random,random,(24,03)
-OBJECT:random,random,(25,03)
-OBJECT:random,random,(26,03)
-OBJECT:random,random,(27,03)
-OBJECT:random,random,(24,10)
-OBJECT:random,random,(25,10)
-OBJECT:random,random,(26,10)
-OBJECT:random,random,(27,10)
+OBJECT:random,(14,03)
+OBJECT:random,(15,03)
+OBJECT:random,(16,03)
+OBJECT:random,(14,10)
+OBJECT:random,(15,10)
+OBJECT:random,(16,10)
+OBJECT:random,(17,10)
+OBJECT:random,(24,03)
+OBJECT:random,(25,03)
+OBJECT:random,(26,03)
+OBJECT:random,(27,03)
+OBJECT:random,(24,10)
+OBJECT:random,(25,10)
+OBJECT:random,(26,10)
+OBJECT:random,(27,10)
 # Random traps
 TRAP:random,(15,04)
 TRAP:random,(25,04)
@@ -183,7 +183,7 @@ TRAP:random,random
 #
 
 MAZE: "Pri-goal", ' '
-INIT_MAP: 'L' , '.' , false , false , unlit , false
+INIT_MAP: mines, 'L' , '.' , false , false , unlit , false
 GEOMETRY:center,center
 MAP
 .L......L.LLL.......LL....
@@ -199,26 +199,28 @@ LL........................
 .........LLL.........L....
 ENDMAP
 # Dungeon Description
-RANDOM_PLACES:(14,04),(13,07)
+$place = { (14,04),(13,07) }
+SHUFFLE: $place
+
 REGION:(00,00,25,10),unlit,"ordinary"
 # Stairs
 STAIR:(20,05),up
 # Objects
-OBJECT:'[',"helm of brilliance",place[0],blessed,0,"The Mitre of Holiness"
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
-OBJECT:random,random,random
+OBJECT:('[',"helm of brilliance"),$place[0],blessed,0,name:"The Mitre of Holiness"
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
 # Random traps
 TRAP:"fire",random
 TRAP:"fire",random
@@ -227,34 +229,34 @@ TRAP:"fire",random
 TRAP:random,random
 TRAP:random,random
 # Random monsters.
-MONSTER:'&',"Nalzok",place[0]
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',"human zombie",random
-MONSTER:'Z',random,random
-MONSTER:'Z',random,random
-MONSTER:'W',"wraith",random
-MONSTER:'W',"wraith",random
-MONSTER:'W',"wraith",random
-MONSTER:'W',"wraith",random
-MONSTER:'W',"wraith",random
-MONSTER:'W',"wraith",random
-MONSTER:'W',"wraith",random
-MONSTER:'W',"wraith",random
-MONSTER:'W',random,random
+MONSTER:('&',"Nalzok"),$place[0]
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:('Z',"human zombie"),random
+MONSTER:'Z',random
+MONSTER:'Z',random
+MONSTER:('W',"wraith"),random
+MONSTER:('W',"wraith"),random
+MONSTER:('W',"wraith"),random
+MONSTER:('W',"wraith"),random
+MONSTER:('W',"wraith"),random
+MONSTER:('W',"wraith"),random
+MONSTER:('W',"wraith"),random
+MONSTER:('W',"wraith"),random
+MONSTER:'W',random
 
 #
 #	The "fill" levels for the quest.
@@ -267,73 +269,85 @@ MONSTER:'W',random,random
 
 LEVEL: "Pri-fila"
 #
-ROOM: "ordinary" , random, random, random, random
-STAIR: random, up
-OBJECT: random,random,random
-MONSTER: 'Z', "human zombie", random
+ROOM: "ordinary" , random, random, random, random {
+  STAIR: random, up
+  OBJECT: random,random
+  MONSTER: ('Z', "human zombie"), random
+}
 
-ROOM: "ordinary" , random, random, random, random
-OBJECT: random, random, random
-OBJECT: random,random,random
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  OBJECT: random,random
+}
 
-ROOM: "ordinary" , random, random, random, random
-OBJECT: random, random, random
-TRAP: random, random
-OBJECT: random,random,random
-MONSTER: 'Z', "human zombie", random
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  TRAP: random, random
+  OBJECT: random,random
+  MONSTER: ('Z', "human zombie"), random
+}
 
-ROOM: "morgue" , random, random, random, random
-STAIR: random, down
-OBJECT: random, random, random
-TRAP: random, random
+ROOM: "morgue" , random, random, random, random {
+  STAIR: random, down
+  OBJECT: random, random
+  TRAP: random, random
+}
 
-ROOM: "ordinary" , random, random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-TRAP: random, random
-MONSTER: 'W', "wraith", random
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  OBJECT: random, random
+  TRAP: random, random
+  MONSTER: ('W', "wraith"), random
+}
 
-ROOM: "morgue" , random, random, random, random
-OBJECT: random, random, random
-TRAP: random, random
+ROOM: "morgue" , random, random, random, random {
+  OBJECT: random, random
+  TRAP: random, random
+}
 
 RANDOM_CORRIDORS
 
 LEVEL: "Pri-filb"
 #
-ROOM: "ordinary" , random, random, random, random
-STAIR: random, up
-OBJECT: random,random,random
-MONSTER: 'Z', "human zombie", random
-MONSTER: 'W', "wraith", random
+ROOM: "ordinary" , random, random, random, random {
+  STAIR: random, up
+  OBJECT: random,random
+  MONSTER: ('Z', "human zombie"), random
+  MONSTER: ('W', "wraith"), random
+}
 
-ROOM: "morgue" , random, random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-OBJECT: random,random,random
+ROOM: "morgue" , random, random, random, random {
+  OBJECT: random, random
+  OBJECT: random, random
+  OBJECT: random,random
+}
 
-ROOM: "ordinary" , random, random, random, random
-OBJECT: random, random, random
-TRAP: random, random
-OBJECT: random,random,random
-MONSTER: 'Z', "human zombie", random
-MONSTER: 'W', "wraith", random
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  TRAP: random, random
+  OBJECT: random,random
+  MONSTER: ('Z', "human zombie"), random
+  MONSTER: ('W', "wraith"), random
+}
 
-ROOM: "morgue" , random, random, random, random
-STAIR: random, down
-OBJECT: random, random, random
-OBJECT: random, random, random
-TRAP: random, random
+ROOM: "morgue" , random, random, random, random {
+  STAIR: random, down
+  OBJECT: random, random
+  OBJECT: random, random
+  TRAP: random, random
+}
 
-ROOM: "ordinary" , random, random, random, random
-OBJECT: random, random, random
-OBJECT: random, random, random
-TRAP: random, random
-MONSTER: 'Z', "human zombie", random
-MONSTER: 'W', "wraith", random
+ROOM: "ordinary" , random, random, random, random {
+  OBJECT: random, random
+  OBJECT: random, random
+  TRAP: random, random
+  MONSTER: ('Z', "human zombie"), random
+  MONSTER: ('W', "wraith"), random
+}
 
-ROOM: "morgue" , random, random, random, random
-OBJECT: random, random, random
-TRAP: random, random
+ROOM: "morgue" , random, random, random, random {
+  OBJECT: random, random
+  TRAP: random, random
+}
 
 RANDOM_CORRIDORS

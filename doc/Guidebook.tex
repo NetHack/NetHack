@@ -2479,6 +2479,10 @@ An obsolete synonym for ``{\tt gender:male}''.  Cannot be set with the
 \item[\ib{mention\_walls}]
 Give feedback when walking against a wall (default off).
 %.lp
+\item[\ib{menucolors}]
+Enable coloring menu lines (default off).
+See ``{\it Configuring Menu Colors\/}'' on how to configure the colors.
+%.lp
 \item[\ib{menustyle}]
 Controls the interface used when you need to choose various objects (in
 response to the Drop command, for instance).  The value specified should
@@ -3143,6 +3147,71 @@ autopickup.
 
 %.lp
 %.hn 2
+\subsection*{Configuring Menu Colors}
+
+%.pg
+Some platforms allow you to define colors used in menu lines when the
+line matches a user-defined pattern. At this time the tty, win32tty and
+win32gui support this.
+
+%.pg
+In general, the config file entries to configure the menu color mappings
+look like this:
+\begin{verbatim}
+    MENUCOLOR="pattern"=color&attribute
+\end{verbatim}
+
+\blist{}
+%.lp
+\item[\ib{pattern}]
+the pattern to match;
+%.lp
+\item[\ib{color}]
+the color to use for lines matching the pattern;
+%.lp
+\item[\ib{attribute}]
+the attribute to use for lines matching the pattern. The attribute is
+optional, and if left out, you must also leave out the preceding ampersand.
+If no attribute is defined, no attribute is used.
+\elist
+
+%.lp ""
+For explanation on pattern format and the matching routines, see
+the pattern in the {\it Configuring User Sounds} -section.
+
+%.lp ""
+Allowed colors are {\it black}, {\it red}, {\it green}, {\it brown},
+{\it blue}, {\it magenta}, {\it cyan}, {\it gray}, {\it orange},
+{\it lightgreen}, {\it yellow}, {\it lightblue}, {\it lightmagenta},
+{\it lightcyan}, and {\it white}.
+
+%.lp ""
+Allowed attributes are {\it none}, {\it bold}, {\it dim}, {\it underline},
+{\it blink}, and {\it inverse}.
+Note that the platform used may interpret the attributes any way it
+wants.
+
+%.lp ""
+Here's an example of menu colors using NetHack's internal
+pattern matching facility:
+
+\begin{verbatim}
+    MENUCOLOR="* blessed *"=green
+    MENUCOLOR="* cursed *"=red
+    MENUCOLOR="* cursed *(being worn)"=red&underline
+\end{verbatim}
+
+specifies that any menu line with " blessed " contained
+in it will be shown in green color, lines with " cursed " will be
+shown in red, and lines with " cursed " followed by "(being worn)"
+on the same line will be shown in red color and underlined.
+You can have multiple MENUCOLOR entries in your config file,
+and the last MENUCOLOR-line in your config file that matches
+a menu line will be used for the line.
+%.pg
+
+%.lp
+%.hn 2
 \subsection*{Configuring User Sounds}
 
 %.pg
@@ -3343,6 +3412,7 @@ Default  & Symbol Name                & Description\\
 \verb@o@ & S\_orc                     &	(orc)\\
 \verb@p@ & S\_piercer                 &	(piercer)\\
 \verb@^@ & S\_pit                     &	(pit)\\
+\verb@#@ & S\_poisoncloud             &	(poison cloud)\\
 \verb@^@ & S\_polymorph\_trap         &	(polymorph trap)\\
 \verb@}@ & S\_pool                    &	(water)\\
 \verb@!@ & S\_potion                  &	(potion)\\

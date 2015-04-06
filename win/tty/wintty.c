@@ -1462,6 +1462,8 @@ struct WinDesc *cw;
 		for (page_lines = 0, curr = page_start;
 			curr != page_end;
 			page_lines++, curr = curr->next) {
+		    int color = NO_COLOR, attr = ATR_NONE;
+		    boolean menucolr = FALSE;
 		    if (curr->selector)
 			*rp++ = curr->selector;
 
@@ -1477,6 +1479,11 @@ struct WinDesc *cw;
 		     * actually output the character.  We're faster doing
 		     * this.
 		     */
+		    if (iflags.use_menu_color &&
+			(menucolr = get_menu_coloring(curr->str, &color,&attr))) {
+			term_start_attr(attr);
+			if (color != NO_COLOR) term_start_color(color);
+		    } else
 		    term_start_attr(curr->attr);
 		    for (n = 0, cp = curr->str;
 #ifndef WIN32CON
@@ -1494,6 +1501,10 @@ struct WinDesc *cw;
 				(void) putchar('#'); /* count selected */
 			} else
 			    (void) putchar(*cp);
+		   if (iflags.use_menu_color && menucolr) {
+		       if (color != NO_COLOR) term_end_color();
+		       term_end_attr(attr);
+		   } else
 		    term_end_attr(curr->attr);
 		}
 	    } else {

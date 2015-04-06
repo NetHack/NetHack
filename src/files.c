@@ -2290,6 +2290,8 @@ int		src;
 	} else if (match_varname(buf, "BOULDER", 3)) {
 	    (void) get_uchars(fp, buf, bufp, &iflags.bouldersym, TRUE,
 			      1, "BOULDER");
+	} else if (match_varname(buf, "MENUCOLOR", 9)) {
+	    (void) add_menu_coloring(bufp);
 	} else if (match_varname(buf, "WARNINGS", 5)) {
 	    (void) get_uchars(fp, buf, bufp, translate, FALSE,
 					WARNCOUNT, "WARNINGS");

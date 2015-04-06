@@ -36,6 +36,7 @@ Debug/
 Release/
 binary/
 build/
+ipch/
 Nethack.sln
 Nethack.sdf
 Nethack.opensdf

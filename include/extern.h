@@ -276,7 +276,7 @@ E int FDECL(use_pick_axe2, (struct obj *));
 E boolean FDECL(mdig_tunnel, (struct monst *));
 E void FDECL(watch_dig, (struct monst *,XCHAR_P,XCHAR_P,BOOLEAN_P));
 E void NDECL(zap_dig);
-E struct obj *FDECL(bury_an_obj, (struct obj *));
+E struct obj *FDECL(bury_an_obj, (struct obj *, boolean *));
 E void FDECL(bury_objs, (int,int));
 E void FDECL(unearth_objs, (int,int));
 E void FDECL(rot_organic, (ANY_P *, long));
@@ -828,6 +828,7 @@ E char *FDECL(sitoa, (int));
 E int FDECL(sgn, (int));
 E int FDECL(rounddiv, (long,int));
 E int FDECL(dist2, (int,int,int,int));
+E int FDECL(isqrt, (int));
 E int FDECL(distmin, (int,int,int,int));
 E boolean FDECL(online2, (int,int,int,int));
 E boolean FDECL(pmatch, (const char *,const char *));
@@ -1138,6 +1139,7 @@ E void FDECL(dodoor, (int,int,struct mkroom *));
 E void FDECL(mktrap, (int,int,struct mkroom *,coord*));
 E void FDECL(mkstairs, (XCHAR_P,XCHAR_P,CHAR_P,struct mkroom *));
 E void NDECL(mkinvokearea);
+E void FDECL(mineralize, (int, int, int, int, BOOLEAN_P));
 
 /* ### mkmap.c ### */
 
@@ -1147,7 +1149,7 @@ void FDECL(remove_rooms, (int,int,int,int));
 /* ### mkmaze.c ### */
 
 E void FDECL(wallification, (int,int,int,int));
-E void FDECL(walkfrom, (int,int));
+E void FDECL(walkfrom, (int,int,SCHAR_P));
 E void FDECL(makemaz, (const char *));
 E void FDECL(mazexy, (coord *));
 E void NDECL(bound_digging);
@@ -1156,6 +1158,7 @@ E boolean FDECL(bad_location, (XCHAR_P,XCHAR_P,XCHAR_P,XCHAR_P,XCHAR_P,XCHAR_P))
 E void FDECL(place_lregion, (XCHAR_P,XCHAR_P,XCHAR_P,XCHAR_P,
 			     XCHAR_P,XCHAR_P,XCHAR_P,XCHAR_P,
 			     XCHAR_P,d_level *));
+E void NDECL(fumaroles);
 E void NDECL(movebubbles);
 E void NDECL(water_friction);
 E void FDECL(save_waterlevel, (int,int));
@@ -1581,6 +1584,9 @@ E void FDECL(parsesymbols, (char *));
 E struct symparse *FDECL(match_sym, (char *));
 E void NDECL(set_playmode);
 E int FDECL(sym_val, (char *));
+E boolean FDECL(add_menu_coloring, (char *));
+E boolean FDECL(get_menu_coloring, (char *, int *, int *));
+E void NDECL(free_menu_coloring);
 
 /* ### pager.c ### */
 
