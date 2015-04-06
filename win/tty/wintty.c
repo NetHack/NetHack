@@ -2204,6 +2204,10 @@ tty_putstr(window, attr, str)
 		cw->data[cw->cury-1][++i] = '\0';
 		tty_putstr(window, attr, &str[i]);
 	    }
+	}
+	break;
+    }
+}
 
 	}
 	break;
