@@ -3337,7 +3337,7 @@ const char *filename;
 
 void
 read_tribute(tribsection, tribtitle, tribpassage)
-char *tribsection, *tribtitle;
+const char *tribsection, *tribtitle;
 int  tribpassage;
 {
     dlb *fp;
