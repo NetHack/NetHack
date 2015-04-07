@@ -212,6 +212,7 @@ const struct symdef defsyms[MAXPCHARS] = {
 	{'@', "",		C(HI_ZAP)},
 	{'*', "",		C(HI_ZAP)},
 	{'#', "poison cloud",	C(CLR_BRIGHT_GREEN)},	/* [part of] a poison cloud */
+	{'?', "valid position",	C(CLR_BRIGHT_GREEN)},	/* valid position for targeting */
 	{'/', "",		C(CLR_GREEN)},	/* swallow top left	*/
 	{'-', "",		C(CLR_GREEN)},	/* swallow top center	*/
 	{'\\', "",		C(CLR_GREEN)},	/* swallow top right	*/
@@ -647,6 +648,7 @@ struct symparse loadsyms[] = {
 	{SYM_PCHAR, S_flashbeam, "S_flashbeam"},
 	{SYM_PCHAR, S_boomleft, "S_boomleft"},
 	{SYM_PCHAR, S_boomright, "S_boomright"},
+	{SYM_PCHAR, S_goodpos, "S_goodpos"},
 	{SYM_PCHAR, S_ss1, "S_ss1"},
 	{SYM_PCHAR, S_ss2, "S_ss2"},
 	{SYM_PCHAR, S_ss3, "S_ss3"},
