@@ -87,7 +87,7 @@ SPEC_LEVS = asmodeus.lev baalz.lev bigrm-?.lev castle.lev fakewiz?.lev \
 QUEST_LEVS = ???-goal.lev ???-fil?.lev ???-loca.lev ???-strt.lev
 
 DATNODLB = $(VARDATND) license
-DATDLB = $(DATHELP) dungeon $(SPEC_LEVS) $(QUEST_LEVS) $(VARDATD) tribute
+DATDLB = $(DATHELP) dungeon $(SPEC_LEVS) $(QUEST_LEVS) $(VARDATD)
 DAT = $(DATNODLB) $(DATDLB)
 
 $(GAME):
@@ -127,6 +127,9 @@ oracles: $(GAME)
 #	Note: options should have already been made with make, but...
 options: $(GAME)
 	( cd dat ; $(MAKE) options )
+
+tribute: $(GAME)
+	( cd dat ; $(MAKE) tribute )
 
 quest.dat: $(GAME)
 	( cd dat ; $(MAKE) quest.dat )
