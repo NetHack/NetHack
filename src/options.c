@@ -105,6 +105,7 @@ static struct Bool_Opt
 	{"color",	  &iflags.wc_color, FALSE, SET_IN_GAME},	/*WC*/
 # endif
 	{"confirm",&flags.confirm, TRUE, SET_IN_GAME},
+	{"dark_room", &flags.dark_room, TRUE, SET_IN_GAME},
 	{"eight_bit_tty", &iflags.wc_eight_bit_input, FALSE, SET_IN_GAME},	/*WC*/
 #ifdef TTY_GRAPHICS
 	{"extmenu", &iflags.extmenu, FALSE, SET_IN_GAME},
@@ -496,6 +497,35 @@ STATIC_OVL boolean FDECL(wc2_supported, (const char *));
 STATIC_DCL void FDECL(remove_autopickup_exception, (struct autopickup_exception *));
 STATIC_OVL int FDECL(count_ape_maps, (int *, int *));
 
+
+void
+reglyph_darkroom()
+{
+    xchar x,y;
+    for (x = 0; x < COLNO; x++)
+        for (y = 0; y < ROWNO; y++) {
+	    struct rm *lev = &levl[x][y];
+	    if (!flags.dark_room) {
+		if (lev->glyph == cmap_to_glyph(S_darkroom))
+		    lev->glyph = lev->waslit ? cmap_to_glyph(S_room) : cmap_to_glyph(S_stone);
+	    } else {
+		if (lev->glyph == cmap_to_glyph(S_room) &&
+		    lev->seenv &&
+		    lev->waslit && !cansee(x,y))
+		    lev->glyph = cmap_to_glyph(S_darkroom);
+		else if (lev->glyph == cmap_to_glyph(S_stone) &&
+			 lev->typ == ROOM &&
+			 lev->seenv &&
+			 !cansee(x,y))
+			 lev->glyph = cmap_to_glyph(S_darkroom);
+	    }
+	}
+    if (flags.dark_room && iflags.use_color)
+	showsyms[S_darkroom]=showsyms[S_room];
+    else
+	showsyms[S_darkroom]=showsyms[S_stone];
+}
+
 /* check whether a user-supplied option string is a proper leading
    substring of a particular option name; option string might have
    a colon or equals sign and arbitrary value appended to it */
@@ -703,6 +733,8 @@ initoptions_finish()
 	/* as a named (or default) fruit.  Wishing for "fruit" will	*/
 	/* result in the player's preferred fruit [better than "\033"].	*/
 	obj_descr[SLIME_MOLD].oc_name = "fruit";
+
+	reglyph_darkroom();
 
 	return;
 }
@@ -2810,7 +2842,8 @@ goodfruit:
 			else if ((boolopt[i].addr) == &flags.invlet_constant) {
 			    if (flags.invlet_constant) reassign();
 			}
-			else if ((boolopt[i].addr) == &flags.lit_corridor) {
+			else if (((boolopt[i].addr) == &flags.lit_corridor) ||
+				 ((boolopt[i].addr) == &flags.dark_room)) {
 			    /*
 			     * All corridor squares seen via night vision or
 			     * candles & lamps change.  Update them by calling
@@ -2820,6 +2853,7 @@ goodfruit:
 			     */
 			    vision_recalc(2);		/* shut down vision */
 			    vision_full_recalc = 1;	/* delayed recalc */
+			    if (iflags.use_color) need_redraw = TRUE;  /* darkroom refresh */
 			}
 			else if ((boolopt[i].addr) == &iflags.use_inverse ||
 					(boolopt[i].addr) == &flags.showrace ||
@@ -3149,8 +3183,10 @@ doset()
 	}
 
 	destroy_nhwindow(tmpwin);
-	if (need_redraw)
+	if (need_redraw) {
+	    reglyph_darkroom();
 	    (void) doredraw();
+	}
 	return 0;
 }
 
