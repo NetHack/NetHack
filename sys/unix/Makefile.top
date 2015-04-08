@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.5  Makefile.top	$NHDT-Date: 1427076345 2015/03/23 02:05:45 $  $NHDT-Branch: nhmall-booktribute $:$NHDT-Revision: 1.21 $
+# NetHack 3.5  Makefile.top	$NHDT-Date: 1428453876 2015/04/08 00:44:36 $  $NHDT-Branch: nhmall-booktribute $:$NHDT-Revision: 1.25 $
 # NetHack 3.5  Makefile.top	$Date: 2012/01/10 17:47:30 $  $Revision: 1.19 $
 
 # Root of source tree:
@@ -56,7 +56,7 @@ VARDIR  = $(HACKDIR)
 # for Gnome
 # VARDATND = x11tiles pet_mark.xbm rip.xpm mapbg.xpm
 
-VARDATD = bogusmon data engrave epitaph oracles options quest.dat rumors tribute
+VARDATD = bogusmon data engrave epitaph oracles options quest.dat rumors
 VARDAT = $(VARDATD) $(VARDATND)
 
 # Some versions of make use the SHELL environment variable as the shell
@@ -87,7 +87,7 @@ SPEC_LEVS = asmodeus.lev baalz.lev bigrm-?.lev castle.lev fakewiz?.lev \
 QUEST_LEVS = ???-goal.lev ???-fil?.lev ???-loca.lev ???-strt.lev
 
 DATNODLB = $(VARDATND) license
-DATDLB = $(DATHELP) dungeon $(SPEC_LEVS) $(QUEST_LEVS) $(VARDATD)
+DATDLB = $(DATHELP) dungeon tribute $(SPEC_LEVS) $(QUEST_LEVS) $(VARDATD)
 DAT = $(DATNODLB) $(DATDLB)
 
 $(GAME):
@@ -127,9 +127,6 @@ oracles: $(GAME)
 #	Note: options should have already been made with make, but...
 options: $(GAME)
 	( cd dat ; $(MAKE) options )
-
-tribute: $(GAME)
-	( cd dat ; $(MAKE) tribute )
 
 quest.dat: $(GAME)
 	( cd dat ; $(MAKE) quest.dat )
