@@ -27,7 +27,7 @@ CHAINBRANCH:	"Sokoban" "oracle" + (1, 0) up
 RNDLEVEL:	"bigrm" "B" @ (10, 3) 40 10
 CHAINBRANCH:	"The Quest" "oracle" + (6, 2) portal
 BRANCH:		"Fort Ludios" @ (18, 4) portal
-RNDLEVEL:	"medusa" "none" @ (-5, 4) 2
+RNDLEVEL:	"medusa" "none" @ (-5, 4) 4
 LEVALIGN:	chaotic
 LEVEL:		"castle" "none" @ (-1, 0)
 CHAINBRANCH:	"Gehennom" "castle" + (0, 0) no_down
