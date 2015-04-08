@@ -743,6 +743,7 @@ E boolean NDECL(recover_savefile);
 #ifdef SYSCF_FILE
 E void NDECL(assure_syscf_file);
 #endif
+E int FDECL(nhclose, (int));
 #ifdef HOLD_LOCKFILE_OPEN
 E void NDECL(really_close);
 #endif

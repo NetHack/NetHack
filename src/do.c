@@ -945,7 +945,7 @@ currentlevel_rewrite()
 
 #ifdef MFLOPPY
 	if (!savelev(fd, ledger_no(&u.uz), COUNT_SAVE)) {
-		(void) close(fd);
+		(void) nhclose(fd);
 		delete_levelfile(ledger_no(&u.uz));
 		pline("NetHack is out of disk space for making levels!");
 		You("can save, quit, or continue playing.");
@@ -1160,7 +1160,7 @@ boolean at_stairs, falling, portal;
 		}
 		minit();	/* ZEROCOMP */
 		getlev(fd, hackpid, new_ledger, FALSE);
-		(void) close(fd);
+		(void) nhclose(fd);
 		oinit(); /* reassign level dependent obj probabilities */
 	}
 	/* do this prior to level-change pline messages */

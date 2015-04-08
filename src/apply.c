@@ -1396,7 +1396,7 @@ display_jump_positions(state)
 int state;
 {
     if (state == 0) {
-	tmp_at(DISP_BEAM, cmap_to_glyph(S_flashbeam));
+	tmp_at(DISP_BEAM, cmap_to_glyph(S_goodpos));
     } else if (state == 1) {
 	int x,y, dx, dy;
 	for (dx = -4; dx <= 4; dx++)
@@ -2605,7 +2605,7 @@ display_polearm_positions(state)
 int state;
 {
     if (state == 0) {
-	tmp_at(DISP_BEAM, cmap_to_glyph(S_flashbeam));
+	tmp_at(DISP_BEAM, cmap_to_glyph(S_goodpos));
     } else if (state == 1) {
 	int x,y, dx,dy;
 	for (dx = -4; dx <= 4; dx++)
