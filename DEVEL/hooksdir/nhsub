@@ -99,11 +99,46 @@ if ($^O eq "MSWin32")
     $PDS = '\\';
 }
 
-my @rawlist = &cmdparse(@ARGV);
+# various command line options to consider and what the code actually does:
+#DONE nhcommit with no files should exit(0)
+#DONE nhadd with no files should exit(0)
+#DONE commit -a?
+#	add root dir
+#DONE commit -a + files -> exit(0)
+#nothing: commit --interactive/--patch
+#nothing: add -i/--interactive --patch/-p?
+#nothing: add -u/--update?????? -A/--all/--no-ignore-removal???
+#nothing (not quite right): add --no-all --ignore-removal???
+#DONE add --refresh
+#nothing: add -N/--intent-to-add
+#DONE add -n - exit(0)
+#DONE add --dry-run - exit 0
+#DONE commit --dry-run - exit 0
+#DONE?: add foo/\*/x (letting git expand the filenames)
+
+my @rawlist0 = &cmdparse(@ARGV);
+
+# Use git ls-files to expand command line filepaths with wildcards.
+# Let's try this for all commands.
+my @rawlist;
+foreach my $e (@rawlist0){
+	if($e =~ m/[?*[\\]/){
+		my @rv = &lsfiles(undef, $e);
+		push(@rawlist, @rv) if(@rv);
+		if($opt{f}){
+			my @rv = &lsfiles('-i', $e);
+			push(@rawlist, @rv) if(@rv);
+		}
+	} else {
+		push(@rawlist, $e);
+	}
+}
+
 push(@rawlist,'.') if($#rawlist == -1);
 
 # pick up the prefix for substitutions in this repo
-my $PREFIX = &git_config('nethack','substprefix');
+#TEST my $PREFIX = &git_config('nethack','substprefix');
+my $PREFIX = "NHDT";
 print "PREFIX: '$PREFIX'\n" if($opt{v});
 
 while(@rawlist){
@@ -256,8 +291,14 @@ sub cmdparse {
 			last;
 		}
 		if(m/^--/){
+			if($opt{cmd} eq 'add' && $_ eq '--dry-run'){
+				exit 0;
+			}
 			if($opt{cmd} eq 'commit' && $_ eq '--dry-run'){
-				$opt{'n'} = 1;
+				exit 0;
+			}
+			if($opt{cmd} eq 'add' && $_ eq '--refresh'){
+				exit 0;
 			}
 			shift @in;
 			next;
@@ -270,6 +311,10 @@ sub cmdparse {
 				} elsif($opt{cmd} eq 'date'){
 					$opt{$single}++;
 				}
+
+				if($opt{cmd} eq 'add' && $single eq 'n'){
+					exit 0;
+				}
 			}
 		}
 		shift @in;
@@ -279,6 +324,20 @@ sub cmdparse {
 	$mode = 'f' if($opt{cmd} eq 'date' && ($opt{f}||$opt{F}));
 	$mode = 'f' if($opt{cmd} eq 'add' && $opt{f});
 
+	if($opt{cmd} eq 'add' && $#in == -1){
+		exit 0;
+	}
+	if($opt{cmd} eq 'commit' && $#in == -1){
+		exit 0;
+	}
+	if($opt{cmd} eq 'add' && $opt{a} && $#in != -1){
+		exit 0;
+	}
+	if($opt{cmd} eq 'add' && $opt{a}){
+		my $x = `git rev-parse --show-toplevel`;
+		$x =~ s/[\n\r]+$//;
+		push(@in, $x);
+	}
 	return @in;	# this is our file list
 }
 
@@ -310,6 +369,19 @@ sub handlevar {
 	} else {
 		return "\$$PREFIX-$var\$";
 	}
+}
+
+sub lsfiles {
+	my ($flags, $ps) = @_;
+	open RV, "-|", "git ls-files $flags '$ps'" or die "Can't ls-files";
+	my @rv = <RV>;
+	map { s/[\r\n]+$// } @rv;
+	if(!close RV){
+		return undef if($! == 0);
+		die "close ls-files failed: $!";
+	}
+	return undef if($#rv == -1);
+	return @rv;
 }
 
 package PREFIX;
