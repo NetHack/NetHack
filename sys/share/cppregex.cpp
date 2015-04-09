@@ -1,10 +1,11 @@
 /* NetHack 3.5  cppregex.cpp	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	cppregex.cpp	$Date: 2009/05/06 10:44:33 $  $Revision: 1.4 $ */
 /* Copyright (c) Sean Hunt  2015.                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include <regex>
 #include <memory>
+
+/* nhregex interface documented in sys/share/posixregex.c */
 
 extern "C" {
   #include <hack.h>
