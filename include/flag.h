@@ -48,6 +48,7 @@ struct flag {
 	boolean  showexp;	/* show experience points */
 	boolean  showscore;	/* show score */
 	boolean  silent;	/* whether the bell rings or not */
+	boolean  sortloot;	/* sort items alphabetically when looting */
 	boolean  sortpack;	/* sorted inventory */
 	boolean  sparkle;	/* show "resisting" special FX (Scott Bigham) */
 	boolean  standout;	/* use standout for --More-- */

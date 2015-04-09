@@ -857,6 +857,8 @@ E int NDECL(midnight);
 
 /* ### invent.c ### */
 
+E struct obj **FDECL(objarr_init, (int));
+E void FDECL(objarr_set, (struct obj *, int, struct obj **, BOOLEAN_P));
 E void FDECL(assigninvlet, (struct obj *));
 E struct obj *FDECL(merge_choice, (struct obj *,struct obj *));
 E int FDECL(merged, (struct obj **,struct obj **));
@@ -1523,6 +1525,7 @@ E char *FDECL(doname, (struct obj *));
 E boolean FDECL(not_fully_identified, (struct obj *));
 E char *FDECL(corpse_xname, (struct obj *,const char *,unsigned));
 E char *FDECL(cxname, (struct obj *));
+E char *FDECL(cxname_singular, (struct obj *));
 E char *FDECL(killer_xname, (struct obj *));
 E char *FDECL(short_oname, (struct obj *,char *(*)(OBJ_P),char *(*)(OBJ_P),
 			    unsigned));

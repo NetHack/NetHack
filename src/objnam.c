@@ -19,6 +19,8 @@ STATIC_DCL void FDECL(add_erosion_words, (struct obj *, char *));
 STATIC_DCL boolean FDECL(singplur_lookup, (char *,char *,BOOLEAN_P,
 					   const char *const *));
 STATIC_DCL char *FDECL(singplur_compound, (char *));
+STATIC_DCL char *FDECL(xname_flags, (struct obj *, unsigned));
+
 
 struct Jitem {
 	int item;
@@ -237,7 +239,15 @@ boolean juice;	/* whether or not to append " juice" to the name */
 
 char *
 xname(obj)
+struct obj *obj;
+{
+    return xname_flags(obj, CXN_NORMAL);
+}
+
+char *
+xname_flags(obj, cxn_flags)
 register struct obj *obj;
+unsigned cxn_flags;	/* bitmask of CXN_xxx values */
 {
 	register char *buf;
 	register int typ = obj->otyp;
@@ -246,7 +256,7 @@ register struct obj *obj;
 	const char *actualn = OBJ_NAME(*ocl);
 	const char *dn = OBJ_DESCR(*ocl);
 	const char *un = ocl->oc_uname;
-	boolean pluralize = (obj->quan != 1L);
+	boolean pluralize = (obj->quan != 1L) && !(cxn_flags & CXN_SINGULAR);
 	boolean known, dknown, bknown;
 
 	buf = nextobuf() + PREFIX;	/* leave room for "17 -3 " */
@@ -1064,6 +1074,16 @@ struct obj *obj;
 	if (obj->otyp == CORPSE)
 	    return corpse_xname(obj, (const char *)0, CXN_NORMAL);
 	return xname(obj);
+}
+
+/* like cxname, but ignores quantity */
+char *
+cxname_singular(obj)
+struct obj *obj;
+{
+	if (obj->otyp == CORPSE)
+	    return corpse_xname(obj, (const char *)0, CXN_SINGULAR);
+	return xname_flags(obj, CXN_SINGULAR);
 }
 
 /* treat an object as fully ID'd when it might be used as reason for death */

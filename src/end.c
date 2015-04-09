@@ -1237,6 +1237,9 @@ struct obj *list;
 boolean identified, all_containers, reportempty;
 {
 	register struct obj *box, *obj;
+	struct obj **oarray;
+	int i,j,n;
+	char *invlet;
 	char buf[BUFSZ];
 	boolean cat, deadcat;
 
@@ -1256,10 +1259,30 @@ boolean identified, all_containers, reportempty;
 		    continue;	/* wrong type of container */
 		} else if (box->cobj) {
 		    winid tmpwin = create_nhwindow(NHW_MENU);
+
+		    /* count the number of items */
+		    for (n = 0, obj = box->cobj; obj; obj = obj->nobj) n++;
+		    /* Make a temporary array to store the objects sorted */
+		    oarray = objarr_init(n);
+
+		    /* Add objects to the array */
+		    i = 0;
+		    invlet = flags.inv_order;
+		nextclass:
+		    for (obj = box->cobj; obj; obj = obj->nobj) {
+			if (!flags.sortpack || obj->oclass == *invlet) {
+			    objarr_set(obj, i++, oarray, (flags.sortloot == 'f' || flags.sortloot == 'l') );
+			}
+		    } /* for loop */
+		    if (flags.sortpack) {
+			if (*++invlet) goto nextclass;
+		    }
+
 		    Sprintf(buf, "Contents of %s:", the(xname(box)));
 		    putstr(tmpwin, 0, buf);
 		    putstr(tmpwin, 0, "");
-		    for (obj = box->cobj; obj; obj = obj->nobj) {
+		    for (i = 0; i < n; i++) {
+			obj = oarray[i];
 			if (identified) {
 			    makeknown(obj->otyp);
 			    obj->known = obj->bknown =
@@ -1269,6 +1292,7 @@ boolean identified, all_containers, reportempty;
 			}
 			putstr(tmpwin, 0, doname(obj));
 		    }
+		    free(oarray);
 		    if (cat) putstr(tmpwin, 0, "Schroedinger's cat");
 		    else if (deadcat) putstr(tmpwin, 0, "Schroedinger's dead cat");
 		    display_nhwindow(tmpwin, TRUE);

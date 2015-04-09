@@ -347,6 +347,7 @@ static struct Comp_Opt
 	{ "scroll_amount", "amount to scroll map when scroll_margin is reached",
 						20, DISP_IN_GAME }, /*WC*/
 	{ "scroll_margin", "scroll map when this far from the edge", 20, DISP_IN_GAME }, /*WC*/
+	{ "sortloot", "sort object selection lists by description", 4, SET_IN_GAME },
 #ifdef MSDOS
 	{ "soundcard", "type of sound card to use", 20, SET_IN_FILE },
 #endif
@@ -659,6 +660,7 @@ initoptions_init()
 		     (genericptr_t)def_inv_order, sizeof flags.inv_order);
 	flags.pickup_types[0] = '\0';
 	flags.pickup_burden = MOD_ENCUMBER;
+	flags.sortloot = 'l'; /* sort only loot by default */
 
 	for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++)
 		flags.end_disclose[i] = DISCLOSE_PROMPT_DEFAULT_NO;
@@ -2360,6 +2362,22 @@ goodfruit:
 	    return;
 	}
 
+	fullname = "sortloot";
+	if (match_optname(opts, fullname, 4, TRUE)) {
+		op = string_for_env_opt(fullname, opts, FALSE);
+		if (op) {
+			switch (tolower(*op)) {
+			 case 'n':
+			 case 'l':
+			 case 'f': flags.sortloot = tolower(*op);
+				break;
+			 default:  badoption(opts);
+				return;
+			}
+		}
+		return;
+	}
+
 	fullname = "suppress_alert";
 	if (match_optname(opts, fullname, 4, TRUE)) {
 		if (duplicate) complain_about_duplicate(opts,1);
@@ -2896,6 +2914,10 @@ static NEARDATA const char *runmodes[] = {
 	"teleport", "run", "walk", "crawl"
 };
 
+static NEARDATA const char *sortltype[] = {
+	"none", "loot", "full"
+};
+
 /*
  * Convert the given string of object classes to a string of default object
  * symbols.
@@ -3204,7 +3226,8 @@ boolean setinitial,setfromfile;
     char buf[BUFSZ];
 
     /* Special handling of menustyle, pickup_burden, pickup_types,
-     * disclose, runmode, msg_window, menu_headings, and number_pad options.
+     * disclose, runmode, msg_window, menu_headings, sortloot,
+     * and number_pad options.
      * Also takes care of interactive autopickup_exception_handling changes.
      */
     if (!strcmp("menustyle", optname)) {
@@ -3385,6 +3408,23 @@ boolean setinitial,setfromfile;
 	}
 	destroy_nhwindow(tmpwin);
 #endif
+    } else if (!strcmp("sortloot", optname)) {
+	const char *sortl_name;
+	menu_item *sortl_pick = (menu_item *)0;
+	tmpwin = create_nhwindow(NHW_MENU);
+	start_menu(tmpwin);
+	for (i = 0; i < SIZE(sortltype); i++) {
+	    sortl_name = sortltype[i];
+	    any.a_char = *sortl_name;
+	    add_menu(tmpwin, NO_GLYPH, &any, *sortl_name, 0,
+		     ATR_NONE, sortl_name, MENU_UNSELECTED);
+	}
+	end_menu(tmpwin, "Select loot sorting type:");
+	if (select_menu(tmpwin, PICK_ONE, &sortl_pick) > 0) {
+	    flags.sortloot = sortl_pick->item.a_char;
+	    free((genericptr_t)sortl_pick);
+	}
+	destroy_nhwindow(tmpwin);
     } else if (!strcmp("align_message", optname) ||
 		!strcmp("align_status", optname)) {
 	menu_item *window_pick = (menu_item *)0;
@@ -3973,6 +4013,15 @@ char *buf;
 	else if (!strcmp(optname, "scroll_margin")) {
 		if (iflags.wc_scroll_margin) Sprintf(buf, "%d",iflags.wc_scroll_margin);
 		else Strcpy(buf, defopt);
+	}
+	else if (!strcmp(optname, "sortloot")) {
+		char *sortname = (char *)NULL;
+		for (i=0; i < SIZE(sortltype) && sortname==(char *)NULL; i++) {
+		   if (flags.sortloot == sortltype[i][0])
+		     sortname = (char *)sortltype[i];
+		}
+		if (sortname != (char *)NULL)
+		   Sprintf(buf, "%s", sortname);
 	}
 	else if (!strcmp(optname, "player_selection"))
 		Sprintf(buf, "%s", iflags.wc_player_selection ? "prompts" : "dialog");
