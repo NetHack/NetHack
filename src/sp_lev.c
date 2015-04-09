@@ -520,12 +520,11 @@ schar filling;
 
 	for (x = x1; x <= x2; x++)
 		for (y = y1; y <= y2; y++) {
-#ifndef WALLIFIED_MAZE
-			levl[x][y].typ = STONE;
-#else
-			levl[x][y].typ =
-				(y < 2 || ((x % 2) && (y % 2))) ? STONE : filling;
-#endif
+            if (level.flags.corrmaze)
+			    levl[x][y].typ = STONE;
+            else
+                levl[x][y].typ =
+                    (y < 2 || ((x % 2) && (y % 2))) ? STONE : filling;
 		}
 }
 
@@ -2948,6 +2947,7 @@ spo_level_flags(coder)
     if (lflags & GRAVEYARD)    level.flags.graveyard = 1;
     if (lflags & ICEDPOOLS)    icedpools = TRUE;
     if (lflags & SOLIDIFY)     coder->solidify = TRUE;
+    if (lflags & CORRMAZE)     level.flags.corrmaze = TRUE;
 
     opvar_free(flagdata);
 }
@@ -4114,11 +4114,7 @@ spo_mazewalk(coder)
     if (!isok(x,y)) return;
 
     if (OV_i(ftyp) < 1) {
-#ifndef WALLIFIED_MAZE
-	OV_i(ftyp) = CORR;
-#else
-	OV_i(ftyp) = ROOM;
-#endif
+      OV_i(ftyp) = level.flags.corrmaze ? CORR : ROOM;
     }
 
     /* don't use move() - it doesn't use W_NORTH, etc. */

@@ -502,8 +502,8 @@ TRAP:"magic", random
 #
 # The Baalzebub level
 #
-MAZE:"baalz",random
-FLAGS: noteleport
+MAZE:"baalz",' '
+FLAGS: noteleport,corrmaze
 GEOMETRY:right,center
 MAP
 -------------------------------------------------

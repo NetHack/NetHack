@@ -582,6 +582,7 @@ clear_level_structures()
 	level.flags.is_cavernous_lev = 0;
 	level.flags.arboreal = 0;
 	level.flags.wizard_bones = 0;
+        level.flags.corrmaze = 0;
 
 	nroom = 0;
 	rooms[0].hx = -1;

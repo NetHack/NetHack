@@ -30,6 +30,7 @@
 #define GRAVEYARD       0x00000100L
 #define ICEDPOOLS       0x00000200L  /* for ice locations: ICED_POOL vs ICED_MOAT */
 #define SOLIDIFY	0x00000400L  /* outer areas are nondiggable & nonpasswall */
+#define CORRMAZE        0x00000800L  /* for maze levels only */
 
 /* different level layout initializers */
 #define LVLINIT_NONE		0

@@ -416,7 +416,6 @@ typedef unsigned char	uchar;
 /* display features */
 /* dungeon features */
 /* dungeon levels */
-#define WALLIFIED_MAZE	/* Fancy mazes - Jean-Christophe Collet */
 /* monsters & objects */
 /* I/O */
 #if !defined(MAC)

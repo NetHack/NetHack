@@ -554,6 +554,8 @@ struct levelflags {
 	Bitfield(wizard_bones,1);       /* set if level came from a bones file
 					   which was created in wizard mode (or
 					   normal mode descendant of such) */
+        Bitfield(corrmaze, 1);          /* Whether corridors are used for the maze
+                                           rather than ROOM */
 };
 
 typedef struct
