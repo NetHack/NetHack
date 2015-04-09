@@ -1,4 +1,4 @@
-/* NetHack 3.5	tradstdc.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	tradstdc.h	$NHDT-Date: 1428574130 2015/04/09 10:08:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.18 $ */
 /* NetHack 3.5	tradstdc.h	$Date: 2012/01/11 18:23:26 $  $Revision: 1.15 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -91,14 +91,23 @@
 #  define VA_NEXT(var1,typ1)	var1 = va_arg(the_args,typ1)
 #  define VA_END()		va_end(the_args)
 # else
-#   define VA_ARGS	arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9
+    /* the core never uses this many arguments, but lev_comp does */
+#   define VA_ARGS	arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,\
+			arg10,arg11,arg12,arg13,arg14
 #   define VA_DECL(typ1,var1)  (var1,VA_ARGS) typ1 var1; \
-	char *arg1,*arg2,*arg3,*arg4,*arg5,*arg6,*arg7,*arg8,*arg9; {
+	char *arg1,*arg2,*arg3,*arg4,*arg5,*arg6,*arg7,*arg8,*arg9,\
+	     *arg10,*arg11,*arg12,*arg13,*arg14; {
 #   define VA_DECL2(typ1,var1,typ2,var2)  (var1,var2,VA_ARGS) \
-	typ1 var1; typ2 var2;\
-	char *arg1,*arg2,*arg3,*arg4,*arg5,*arg6,*arg7,*arg8,*arg9; {
+	typ1 var1; typ2 var2; \
+	char *arg1,*arg2,*arg3,*arg4,*arg5,*arg6,*arg7,*arg8,*arg9,\
+	     *arg10,*arg11,*arg12,*arg13,*arg14; {
 #   define VA_START(x)
 #   define VA_INIT(var1,typ1)
+#   define VA_SHIFT()	(arg1=arg2, arg2=arg3, arg3=arg4, arg4=arg5,\
+			 arg5=arg6, arg6=arg7, arg7=arg8, arg8=arg9,\
+			 arg9=arg10, arg10=arg11, arg11=arg12,\
+			 arg12=arg13, arg13=arg14, arg14=0)
+#   define VA_NEXT(var1,typ1)	((var1 = (typ1)arg1), VA_SHIFT(), var1)
 #   define VA_END()
 # endif
 #endif

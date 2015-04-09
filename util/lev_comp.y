@@ -1,5 +1,5 @@
 %{
-/* NetHack 3.5  lev_comp.y	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5  lev_comp.y	$NHDT-Date: 1428574134 2015/04/09 10:08:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
 /* NetHack 3.5  lev_comp.y	$Date: 2009/05/06 10:54:31 $  $Revision: 1.8 $ */
 /*	SCCS Id: @(#)lev_yacc.c	3.5	2007/08/01	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
@@ -1174,9 +1174,10 @@ room_begin      : room_type opt_percent ',' light_state
 
 subroom_def	: SUBROOM_ID ':' room_begin ',' subroom_pos ',' room_size optroomregionflags
 		  {
-		      long flags = $8;
-		      if (flags == -1) flags = (1 << 0);
-		      add_opvars(splev, "iiiiiiio", flags, ERR, ERR,
+		      long rflags = $8;
+
+		      if (rflags == -1) rflags = (1 << 0);
+		      add_opvars(splev, "iiiiiiio", rflags, ERR, ERR,
 				 $5.x, $5.y, $7.width, $7.height, SPO_SUBROOM);
 		      break_stmt_start();
 		  }
@@ -1189,9 +1190,10 @@ subroom_def	: SUBROOM_ID ':' room_begin ',' subroom_pos ',' room_size optroomreg
 
 room_def	: ROOM_ID ':' room_begin ',' room_pos ',' room_align ',' room_size optroomregionflags
 		  {
-		      long flags = $8;
-		      if (flags == -1) flags = (1 << 0);
-		      add_opvars(splev, "iiiiiiio", flags,
+		      long rflags = $8;
+
+		      if (rflags == -1) rflags = (1 << 0);
+		      add_opvars(splev, "iiiiiiio", rflags,
 				 $7.x, $7.y, $5.x, $5.y,
 				 $9.width, $9.height, SPO_ROOM);
 		      break_stmt_start();
@@ -1611,14 +1613,15 @@ trap_detail	: TRAP_ID ':' trap_name ',' coord_or_var
 
 drawbridge_detail: DRAWBRIDGE_ID ':' coord_or_var ',' DIRECTION ',' door_state
 		   {
-		       long d, state = 0;
+		       long dir, state = 0;
+
 		       /* convert dir from a DIRECTION to a DB_DIR */
-		       d = $5;
-		       switch(d) {
-		       case W_NORTH: d = DB_NORTH; break;
-		       case W_SOUTH: d = DB_SOUTH; break;
-		       case W_EAST:  d = DB_EAST;  break;
-		       case W_WEST:  d = DB_WEST;  break;
+		       dir = $5;
+		       switch (dir) {
+		       case W_NORTH: dir = DB_NORTH; break;
+		       case W_SOUTH: dir = DB_SOUTH; break;
+		       case W_EAST:  dir = DB_EAST;  break;
+		       case W_WEST:  dir = DB_WEST;  break;
 		       default:
 			   lc_error("Invalid drawbridge direction.");
 			   break;
@@ -1632,7 +1635,7 @@ drawbridge_detail: DRAWBRIDGE_ID ':' coord_or_var ',' DIRECTION ',' door_state
 			   state = -1;
 		       else
 			   lc_error("A drawbridge can only be open, closed or random!");
-		       add_opvars(splev, "iio", state, d, SPO_DRAWBRIDGE);
+		       add_opvars(splev, "iio", state, dir, SPO_DRAWBRIDGE);
 		   }
 		;
 
@@ -1782,13 +1785,14 @@ region_detail	: REGION_ID ':' region_or_var ',' light_state ',' room_type optroo
 		  {
 		      long irr;
 		      long rt = $7;
-		      long flags = $8;
-		      if (flags == -1) flags = (1 << 0);
-		      if (!(( flags ) & 1)) rt += MAXRTYPE+1;
-		      irr = ((( flags ) & 2) != 0);
+		      long rflags = $8;
+
+		      if (rflags == -1) rflags = (1 << 0);
+		      if (!(rflags & 1)) rt += MAXRTYPE+1;
+		      irr = ((rflags & 2) != 0);
 		      add_opvars(splev, "iiio",
-				 (long)$5, rt, flags, SPO_REGION);
-		      $<i>$ = (irr || (flags & 1) || rt != OROOM);
+				 (long)$5, rt, rflags, SPO_REGION);
+		      $<i>$ = (irr || (rflags & 1) || rt != OROOM);
 		      break_stmt_start();
 		  }
 		  region_detail_end

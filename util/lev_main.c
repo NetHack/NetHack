@@ -1,4 +1,4 @@
-/* NetHack 3.5	lev_main.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	lev_main.c	$NHDT-Date: 1428574133 2015/04/09 10:08:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.33 $ */
 /* NetHack 3.5	lev_main.c	$Date: 2012/01/12 04:48:12 $  $Revision: 1.20 $ */
 /*	SCCS Id: @(#)lev_main.c	3.5	2007/01/17	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
@@ -11,8 +11,7 @@
 #define SPEC_LEV	/* for MPW */
 /* although, why don't we move those special defines here.. and in dgn_main? */
 
-#include <stdarg.h>
-
+#define NEED_VARARGS
 #include "hack.h"
 #include "date.h"
 #include "sp_lev.h"
@@ -77,14 +76,14 @@ extern unsigned _stklen = STKSIZ;
 #endif
 #define MAX_ERRORS	25
 
-extern int  NDECL (yyparse);
-extern void FDECL (init_yyin, (FILE *));
-extern void FDECL (init_yyout, (FILE *));
+extern int  NDECL(yyparse);
+extern void FDECL(init_yyin, (FILE *));
+extern void FDECL(init_yyout, (FILE *));
 
-int  FDECL (main, (int, char **));
-void FDECL (yyerror, (const char *));
-void FDECL (yywarning, (const char *));
-int  NDECL (yywrap);
+int  FDECL(main, (int, char **));
+void FDECL(yyerror, (const char *));
+void FDECL(yywarning, (const char *));
+int  NDECL(yywrap);
 int FDECL(get_floor_type, (CHAR_P));
 int FDECL(get_room_type, (char *));
 int FDECL(get_trap_type, (char *));
@@ -113,11 +112,12 @@ extern void NDECL(decl_init);
 
 void FDECL(add_opcode, (sp_lev *, int, genericptr_t));
 
-static boolean FDECL(write_common_data, (int,sp_lev *));
+static boolean FDECL(write_common_data, (int));
 static boolean FDECL(write_maze, (int,sp_lev *));
 static void NDECL(init_obj_classes);
 static int FDECL(case_insensitive_comp, (const char *, const char *));
 
+void VDECL(lc_pline, (const char *, ...));
 void VDECL(lc_error, (const char *, ...));
 void VDECL(lc_warning, (const char *, ...));
 char * FDECL(decode_parm_chr, (CHAR_P));
@@ -128,8 +128,8 @@ struct opvar * FDECL(set_opvar_region, (struct opvar *, long));
 struct opvar * FDECL(set_opvar_mapchar, (struct opvar *, long));
 struct opvar * FDECL(set_opvar_monst, (struct opvar *, long));
 struct opvar * FDECL(set_opvar_obj, (struct opvar *, long));
-struct opvar * FDECL(set_opvar_str, (struct opvar *, char *));
-struct opvar * FDECL(set_opvar_var, (struct opvar *, char *));
+struct opvar * FDECL(set_opvar_str, (struct opvar *, const char *));
+struct opvar * FDECL(set_opvar_var, (struct opvar *, const char *));
 void VDECL(add_opvars, (sp_lev *, const char *, ...));
 void NDECL(break_stmt_start);
 void FDECL(break_stmt_end, (sp_lev *));
@@ -295,8 +295,7 @@ char **argv;
 		    }
 		    fin = freopen(fname, "r", stdin);
 		    if (!fin) {
-			(void) fprintf(stderr,"Can't open \"%s\" for input.\n",
-						fname);
+			lc_pline("Can't open \"%s\" for input.\n", fname);
 			perror(fname);
 			errors_encountered = TRUE;
 		    } else {
@@ -329,9 +328,10 @@ yyerror(s)
 const char *s;
 {
 	char *e = ((char *)s + strlen(s) - 1);
+
 	(void) fprintf(stderr, "%s: line %d, pos %d: %s",
 		       fname, nh_line_number,
-		       token_start_pos-strlen(curr_token), s);
+		       token_start_pos - (int)strlen(curr_token), s);
 	if (*e != '.' && *e != '!')
 	    (void) fprintf(stderr, " at \"%s\"", curr_token);
 	(void) fprintf(stderr, "\n");
@@ -362,30 +362,84 @@ yywrap()
 	return 1;
 }
 
+/*
+ * lc_pline(): lev_comp version of pline(), stripped down version of
+ * core's pline(), with convoluted handling for variadic arguments to
+ * support <stdarg.h>, <varargs.h>, and neither of the above.
+ *
+ * Using state for message/warning/error mode simplifies calling interface.
+ */
+#define LC_PLINE_MESSAGE	0
+#define LC_PLINE_WARNING	1
+#define LC_PLINE_ERROR		2
+static int lc_pline_mode = LC_PLINE_MESSAGE;
+
+#if defined(USE_STDARG) || defined(USE_VARARGS)
+static void FDECL(lc_vpline, (const char *, va_list));
+
 void
-lc_error(const char *fmt, ...)
-{
-    char buf[512];
-    va_list argp;
-
-    va_start(argp, fmt);
-    (void) vsnprintf(buf, 511, fmt, argp);
-    va_end(argp);
-
-    yyerror(buf);
+lc_pline VA_DECL(const char *, line)
+	VA_START(line);
+	VA_INIT(line, char *);
+	lc_vpline(line, VA_ARGS);
+	VA_END();
 }
 
+# ifdef USE_STDARG
+static void
+lc_vpline(const char *line, va_list the_args) {
+# else
+static void
+lc_vpline(line, the_args) const char *line; va_list the_args; {
+# endif
+
+#else	/* USE_STDARG | USE_VARARG */
+
+#define lc_vpline lc_pline
+
 void
-lc_warning(const char *fmt, ...)
-{
-    char buf[512];
-    va_list argp;
+lc_pline VA_DECL(const char *, line)
+#endif	/* USE_STDARG | USE_VARARG */
 
-    va_start(argp, fmt);
-    (void) vsnprintf(buf, 511, fmt, argp);
-    va_end(argp);
+	char pbuf[3*BUFSZ];
+	static char nomsg[] = "(no message)";
+/* Do NOT use VA_START and VA_END in here... see above */
 
-    yywarning(buf);
+	if (!line || !*line) line = nomsg;	/* shouldn't happen */
+	if (index(line, '%')) {
+	    Vsprintf(pbuf, line, VA_ARGS);
+	    pbuf[BUFSZ-1] = '\0';	/* truncate if long */
+	    line = pbuf;
+	}
+	switch (lc_pline_mode) {
+	case LC_PLINE_ERROR:	yyerror(line);   break;
+	case LC_PLINE_WARNING:	yywarning(line); break;
+	default: (void)fprintf(stderr, "%s\n", line); break;
+	}
+	lc_pline_mode = LC_PLINE_MESSAGE;	/* reset to default */
+	return;
+}
+
+/*VARARGS1*/
+void
+lc_error VA_DECL(const char *, line)
+	VA_START(line);
+	VA_INIT(line, const char *);
+	lc_pline_mode = LC_PLINE_ERROR;
+	lc_vpline(line, VA_ARGS);
+	VA_END();
+	return;
+}
+
+/*VARARGS1*/
+void
+lc_warning VA_DECL(const char *, line)
+	VA_START(line);
+	VA_INIT(line, const char *);
+	lc_pline_mode = LC_PLINE_WARNING;
+	lc_vpline(line, VA_ARGS);
+	VA_END();
+	return;
 }
 
 
@@ -394,16 +448,17 @@ decode_parm_chr(chr)
 char chr;
 {
     static char buf[32];
+
     switch (chr) {
-    default: sprintf(buf, "unknown"); break;
-    case 'i': sprintf(buf, "int"); break;
-    case 'r': sprintf(buf, "region"); break;
-    case 's': sprintf(buf, "str"); break;
-    case 'O': sprintf(buf, "obj"); break;
-    case 'c': sprintf(buf, "coord"); break;
-    case ' ': sprintf(buf, "nothing"); break;
-    case 'm': sprintf(buf, "mapchar"); break;
-    case 'M': sprintf(buf, "monster"); break;
+    default:  Strcpy(buf, "unknown"); break;
+    case 'i': Strcpy(buf, "int"); break;
+    case 'r': Strcpy(buf, "region"); break;
+    case 's': Strcpy(buf, "str"); break;
+    case 'O': Strcpy(buf, "obj"); break;
+    case 'c': Strcpy(buf, "coord"); break;
+    case ' ': Strcpy(buf, "nothing"); break;
+    case 'm': Strcpy(buf, "mapchar"); break;
+    case 'M': Strcpy(buf, "monster"); break;
     }
     return buf;
 }
@@ -500,7 +555,7 @@ long  val;
 struct opvar *
 set_opvar_str(ov, val)
 struct opvar *ov;
-char *val;
+const char *val;
 {
     if (ov) {
         ov->spovartyp = SPOVAR_STRING;
@@ -512,7 +567,7 @@ char *val;
 struct opvar *
 set_opvar_var(ov, val)
 struct opvar *ov;
-char *val;
+const char *val;
 {
     if (ov) {
         ov->spovartyp = SPOVAR_VARIABLE;
@@ -524,13 +579,36 @@ char *val;
 #define New(type)		\
 	(type *) memset((genericptr_t)alloc(sizeof(type)), 0, sizeof(type))
 
-void
-add_opvars(sp_lev *sp, const char *fmt, ...)
-{
-    const char *p;
-    va_list argp;
+#if defined(USE_STDARG) || defined(USE_VARARGS)
+static void FDECL(vadd_opvars, (sp_lev *, const char *, va_list));
 
-    va_start(argp, fmt);
+void
+add_opvars VA_DECL2(sp_lev *, sp, const char *, fmt)
+	VA_START(fmt);
+	VA_INIT(fmt, char *);
+	vadd_opvars(sp, fmt, VA_ARGS);
+	VA_END();
+}
+
+# ifdef USE_STDARG
+static void
+vadd_opvars(sp_lev *sp, const char *fmt, va_list the_args) {
+# else
+static void
+vadd_opvars(sp, fmt, the_args) sp_lev *sp; const char *fmt; va_list the_args; {
+# endif
+
+#else	/* USE_STDARG | USE_VARARG */
+
+#define vadd_opvars add_opvars
+
+void
+add_opvars VA_DECL2(sp_lev *, sp, const char *, fmt)
+#endif	/* USE_STDARG | USE_VARARG */
+
+    const char *p, *lp;
+    long la;
+/* Do NOT use VA_START and VA_END in here... see above */
 
     for(p = fmt; *p != '\0'; p++) {
 	switch(*p) {
@@ -538,74 +616,73 @@ add_opvars(sp_lev *sp, const char *fmt, ...)
 	case 'i': /* integer */
 	    {
 		struct opvar *ov = New(struct opvar);
-		set_opvar_int(ov, va_arg(argp, long));
+		set_opvar_int(ov, VA_NEXT(la, long));
 		add_opcode(sp, SPO_PUSH, ov);
 		break;
 	    }
 	case 'c': /* coordinate */
 	    {
 		struct opvar *ov = New(struct opvar);
-		set_opvar_coord(ov, va_arg(argp, long));
+		set_opvar_coord(ov, VA_NEXT(la, long));
 		add_opcode(sp, SPO_PUSH, ov);
 		break;
 	    }
 	case 'r': /* region */
 	    {
 		struct opvar *ov = New(struct opvar);
-		set_opvar_region(ov, va_arg(argp, long));
+		set_opvar_region(ov, VA_NEXT(la, long));
 		add_opcode(sp, SPO_PUSH, ov);
 		break;
 	    }
 	case 'm': /* mapchar */
 	    {
 		struct opvar *ov = New(struct opvar);
-		set_opvar_mapchar(ov, va_arg(argp, long));
+		set_opvar_mapchar(ov, VA_NEXT(la, long));
 		add_opcode(sp, SPO_PUSH, ov);
 		break;
 	    }
 	case 'M': /* monster */
 	    {
 		struct opvar *ov = New(struct opvar);
-		set_opvar_monst(ov, va_arg(argp, long));
+		set_opvar_monst(ov, VA_NEXT(la, long));
 		add_opcode(sp, SPO_PUSH, ov);
 		break;
 	    }
 	case 'O': /* object */
 	    {
 		struct opvar *ov = New(struct opvar);
-		set_opvar_obj(ov, va_arg(argp, long));
+		set_opvar_obj(ov, VA_NEXT(la, long));
 		add_opcode(sp, SPO_PUSH, ov);
 		break;
 	    }
 	case 's': /* string */
 	    {
 		struct opvar *ov = New(struct opvar);
-		set_opvar_str(ov, va_arg(argp, char *));
+		set_opvar_str(ov, VA_NEXT(lp, const char *));
 		add_opcode(sp, SPO_PUSH, ov);
 		break;
 	    }
 	case 'v': /* variable */
 	    {
 		struct opvar *ov = New(struct opvar);
-		set_opvar_var(ov, va_arg(argp, char *));
+		set_opvar_var(ov, VA_NEXT(lp, const char *));
 		add_opcode(sp, SPO_PUSH, ov);
 		break;
 	    }
 	case 'o': /* opcode */
 	    {
-		long i = va_arg(argp, int);
+		long i = VA_NEXT(la, int);
 		if (i < 0 || i >= MAX_SP_OPCODES)
-		    fprintf(stderr, "add_opvars: unknown opcode '%li'.\n", i);
+		    lc_pline("add_opvars: unknown opcode '%ld'.", i);
 		add_opcode(sp, i, NULL);
 		break;
 	    }
 	default:
-	    fprintf(stderr, "add_opvars: illegal format character '%c'.\n", *p);
+	    lc_pline("add_opvars: illegal format character '%c'.", *p);
 	    break;
 	}
     }
-
-    va_end(argp);
+    return;
 }
 
 void
@@ -785,12 +862,12 @@ spovar2str(spovar)
 {
     static int togl = 0;
     static char buf[2][128];
-    char *n = NULL;
+    const char *n = NULL;
     int is_array = (spovar & SPOVAR_ARRAY);
     spovar &= ~SPOVAR_ARRAY;
 
     switch (spovar) {
-    default:		  lc_error("spovar2str(%li)", spovar); break;
+    default:		  lc_error("spovar2str(%ld)", spovar); break;
     case SPOVAR_INT:	  n = "integer"; break;
     case SPOVAR_STRING:   n = "string"; break;
     case SPOVAR_VARIABLE: n = "variable"; break;
@@ -860,7 +937,7 @@ reverse_jmp_opcode(opcode)
     case SPO_JG:  return SPO_JLE;
     case SPO_JLE: return SPO_JG;
     case SPO_JGE: return SPO_JL;
-    default: lc_error("Cannot reverse comparison jmp opcode %i.", opcode); return SPO_NULL;
+    default: lc_error("Cannot reverse comparison jmp opcode %d.", opcode); return SPO_NULL;
     }
 }
 
@@ -897,7 +974,7 @@ opvar_clone(ov)
 	    break;
 	default:
 	    {
-		lc_error("Unknown opvar_clone value type (%i)!", ov->spovartyp);
+		lc_error("Unknown opvar_clone value type (%d)!", ov->spovartyp);
 	    }
 	}
 	return tmpov;
@@ -1133,7 +1210,7 @@ genericptr_t dat;
    _opcode *tmp;
 
    if ((opc < 0) || (opc >= MAX_SP_OPCODES))
-       lc_error("Unknown opcode '%i'", opc);
+       lc_error("Unknown opcode '%d'", opc);
 
    tmp = (_opcode *)alloc(sizeof(_opcode)*(nop+1));
    if (sp->opcodes && nop) {
@@ -1240,9 +1317,8 @@ sp_lev *sp;
  * Output some info common to all special levels.
  */
 static boolean
-write_common_data(fd, lvl)
+write_common_data(fd)
 int fd;
-sp_lev *lvl;
 {
 	static struct version_info version_data = {
 			VERSION_NUMBER, VERSION_FEATURES,
@@ -1264,7 +1340,7 @@ sp_lev *maze;
 {
         int i;
 
-        if (!write_common_data(fd, maze))
+        if (!write_common_data(fd))
             return FALSE;
 
 	Write(fd, &(maze->n_opcodes), sizeof(maze->n_opcodes));
@@ -1275,7 +1351,7 @@ sp_lev *maze;
 	   Write(fd, &(tmpo.opcode), sizeof(tmpo.opcode));
 
 	   if (tmpo.opcode < SPO_NULL || tmpo.opcode >= MAX_SP_OPCODES)
-	       panic("write_maze: unknown opcode (%i).", tmpo.opcode);
+	       panic("write_maze: unknown opcode (%d).", tmpo.opcode);
 
 	   if (tmpo.opcode == SPO_PUSH) {
 	       genericptr_t opdat = tmpo.opdat;
@@ -1304,14 +1380,14 @@ sp_lev *maze;
 			   Free(ov->vardata.str);
 		       }
 		       break;
-		   default: panic("write_maze: unknown data type (%i).", ov->spovartyp);
+		   default: panic("write_maze: unknown data type (%d).", ov->spovartyp);
 		   }
 	       } else panic("write_maze: PUSH with no data.");
 	   } else {
 	       /* sanity check */
 	       genericptr_t opdat = tmpo.opdat;
 	       if (opdat)
-		   panic("write_maze: opcode (%i) has data.", tmpo.opcode);
+		   panic("write_maze: opcode (%d) has data.", tmpo.opcode);
 	   }
 
 	   Free(tmpo.opdat);
@@ -1357,7 +1433,7 @@ sp_lev *lvl;
         if (!lvl) panic("write_level_file");
 
 	if (be_verbose)
-	    fprintf(stdout, "File: '%s', opcodes: %li\n", lbuf, lvl->n_opcodes);
+	    fprintf(stdout, "File: '%s', opcodes: %ld\n", lbuf, lvl->n_opcodes);
 
         if (!write_maze(fout, lvl))
           return FALSE;
