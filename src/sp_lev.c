@@ -5163,7 +5163,14 @@ next_opcode:
     link_doors_rooms();
     fill_rooms();
     remove_boundary_syms();
-    wallification(1, 0, COLNO-1, ROWNO-1);
+    /* FIXME: Ideally, we want this call to only cover areas of the map
+     * which were not inserted directly by the special level file (see
+     * the insect legs on Baalzebub's level, for instance). Since that
+     * is currently not possible, we overload the corrmaze flag for this
+     * purpose.
+     */
+    if (!level.flags.corrmaze)
+      wallification(1, 0, COLNO-1, ROWNO-1);
 
     count_features();
 
