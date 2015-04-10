@@ -1238,7 +1238,7 @@ boolean identified, all_containers, reportempty;
 {
 	register struct obj *box, *obj;
 	struct obj **oarray;
-	int i,j,n;
+	int i,n;
 	char *invlet;
 	char buf[BUFSZ];
 	boolean cat, deadcat;

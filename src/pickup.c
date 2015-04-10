@@ -708,7 +708,7 @@ menu_item **pick_list;		/* return list of items picked */
 int how;			/* type of query */
 boolean FDECL((*allow), (OBJ_P));/* allow function */
 {
-	int i, j, n;
+	int i, n;
 	winid win;
 	struct obj *curr, *last, fake_hero_object;
 	struct obj **oarray;
@@ -823,7 +823,7 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 
 	if (n > 0) {
 	    menu_item *mi;
-	    int i, k;
+	    int k;
 
 	    /* fix up counts:  -1 means no count used => pick all;
 	       if fake_hero_object was picked, discard that choice */

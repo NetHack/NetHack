@@ -1800,13 +1800,12 @@ long* out_cnt;
 	struct obj *otmp;
 	char ilet, ret;
 	char *invlet = flags.inv_order;
-	int n, classcount;
+	int i, n, classcount;
 	winid win;				/* windows being used */
 	static winid local_win = WIN_ERR;	/* window for partial menus */
 	anything any;
 	menu_item *selected;
 	struct obj **oarray;
-	int i, j;
 
 	/* overriden by global flag */
 	if (flags.perm_invent) {
