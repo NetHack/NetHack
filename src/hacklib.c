@@ -603,7 +603,7 @@ STATIC_DCL struct tm *NDECL(getlt);
 void
 setrandom()
 {
-	unsigned long seed = getnow();		/* time((TIME_type) 0) */
+	unsigned long seed = (unsigned long)getnow();		/* time((TIME_type) 0) */
 #ifdef UNIX
 	/* Quick dirty band-aid to prevent PRNG prediction */
 	seed *= getpid();
