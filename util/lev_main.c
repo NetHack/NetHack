@@ -1,4 +1,4 @@
-/* NetHack 3.5	lev_main.c	$NHDT-Date: 1428574133 2015/04/09 10:08:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.33 $ */
+/* NetHack 3.5	lev_main.c	$NHDT-Date: 1428655166 2015/04/10 08:39:26 $  $NHDT-Branch: master $:$NHDT-Revision: 1.34 $ */
 /* NetHack 3.5	lev_main.c	$Date: 2012/01/12 04:48:12 $  $Revision: 1.20 $ */
 /*	SCCS Id: @(#)lev_main.c	3.5	2007/01/17	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
@@ -8,8 +8,7 @@
  * This file contains the main function for the parser
  * and some useful functions needed by yacc
  */
-#define SPEC_LEV	/* for MPW */
-/* although, why don't we move those special defines here.. and in dgn_main? */
+#define SPEC_LEV    /* for USE_OLDARGS (sp_lev.h) and for MPW (macconf.h) */
 
 #define NEED_VARARGS
 #include "hack.h"
@@ -1303,7 +1302,7 @@ sp_lev *sp;
 
 	mbuf[((max_hig-1) * max_len) + (max_len-1) + 1] = '\0';
 
-	add_opvars(sp, "siio", mbuf, max_hig, max_len, SPO_MAP);
+	add_opvars(sp, "siio", VA_PASS4(mbuf, max_hig, max_len, SPO_MAP));
 
 	for (dy = 0; dy < max_hig; dy++)
 	    Free(tmpmap[dy]);
