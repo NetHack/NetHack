@@ -1437,43 +1437,72 @@ num_genocides()
     return n;
 }
 
+int
+num_extinct()
+{
+    int i, n = 0;
+
+    for (i = LOW_PM; i < NUMMONS; ++i)
+	if (!(mvitals[i].mvflags & G_GENOD) &&
+	    (mvitals[i].mvflags & G_GONE) &&
+	    !(mons[i].geno & G_UNIQ)) ++n;
+
+    return n;
+}
+
+
 STATIC_OVL void
 list_genocided(defquery, ask)
 char defquery;
 boolean ask;
 {
     register int i;
-    int ngenocided;
+    int ngenocided, nextinct;
     char c;
     winid klwin;
     char buf[BUFSZ];
 
     ngenocided = num_genocides();
+    nextinct = num_extinct();
 
-    /* genocided species list */
-    if (ngenocided != 0) {
-	c = ask ? yn_function("Do you want a list of species genocided?",
-			      ynqchars, defquery) : defquery;
+    /* genocided or extinct species list */
+    if (ngenocided != 0 || nextinct != 0) {
+	Sprintf(buf, "Do you want a list of %sspecies%s%s?",
+		(nextinct && !ngenocided) ? "extinct " : "",
+		(ngenocided) ? " genocided" : "",
+		(nextinct && ngenocided) ? " and extinct" : "");
+	c = ask ? yn_function(buf, ynqchars, defquery) : defquery;
 	if (c == 'q') done_stopprint++;
 	if (c == 'y') {
 	    klwin = create_nhwindow(NHW_MENU);
-	    putstr(klwin, 0, "Genocided species:");
+	    Sprintf(buf, "%s%s species:",
+		    (ngenocided) ? "Genocided" : "Extinct",
+		    (nextinct && ngenocided) ? " or extinct" : "");
+	    putstr(klwin, 0, buf);
 	    putstr(klwin, 0, "");
 
 	    for (i = LOW_PM; i < NUMMONS; i++)
-		if (mvitals[i].mvflags & G_GENOD) {
+		if (mvitals[i].mvflags & G_GONE && !(mons[i].geno & G_UNIQ)) {
 		    if ((mons[i].geno & G_UNIQ) && i != PM_HIGH_PRIEST)
 			Sprintf(buf, "%s%s",
 				!type_is_pname(&mons[i]) ? "" : "the ",
 				mons[i].mname);
 		    else
 			Strcpy(buf, makeplural(mons[i].mname));
+		    if (!(mvitals[i].mvflags & G_GENOD))
+			Strcat(buf, " (extinct)");
 		    putstr(klwin, 0, buf);
 		}
 
 	    putstr(klwin, 0, "");
-	    Sprintf(buf, "%d species genocided.", ngenocided);
-	    putstr(klwin, 0, buf);
+	    if (ngenocided > 0) {
+		Sprintf(buf, "%d species genocided.", ngenocided);
+		putstr(klwin, 0, buf);
+	    }
+	    if (nextinct > 0) {
+		Sprintf(buf, "%d species extinct.", nextinct);
+		putstr(klwin, 0, buf);
+	    }
 
 	    display_nhwindow(klwin, TRUE);
 	    destroy_nhwindow(klwin);
