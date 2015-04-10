@@ -112,18 +112,18 @@ FLAGS: hardfloor
 INIT_MAP: mines, '.' , 'P' , false , true , lit , false
 GEOMETRY:center,center
 MAP
-...PPP.........PPPP..............PPPP...
-.PPPP...........PP................PPPP..
-PP.................................PPP..
-....................................PPP.
-.....................................PP.
-.......................................P
+xxxxxxxxx......xxxx...........xxxxxxxxxx
+xxxxxxx.........xxx.............xxxxxxxx
+xxxx..............................xxxxxx
+xx.................................xxxxx
+....................................xxxx
+.......................................x
 ........................................
-PP...................................PPP
-.PPP...............................PPP..
-..PP.............................PPPP...
-..PPP...........................PPPPPP..
-....PPPP.........PPP.........PPPP..PP...
+xx...................................xxx
+xxxx..............................xxxxxx
+xxxxxx..........................xxxxxxxx
+xxxxxxxx.........xx..........xxxxxxxxxxx
+xxxxxxxxx.......xxxxxx.....xxxxxxxxxxxxx
 ENDMAP
 # Dungeon Description
 # The Isle of Glass is a Tor rising out of the swamps surrounding it.

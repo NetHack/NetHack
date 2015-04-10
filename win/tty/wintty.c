@@ -1,4 +1,4 @@
-/* NetHack 3.5	wintty.c	$NHDT-Date: 1427667623 2015/03/29 22:20:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.75 $ */
+/* NetHack 3.5	wintty.c	$NHDT-Date: 1428394244 2015/04/07 08:10:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.84 $ */
 /* NetHack 3.5	wintty.c	$Date: 2012/01/22 06:27:09 $  $Revision: 1.66 $ */
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1770,7 +1770,7 @@ struct WinDesc *cw;
     if (i == cw->maxrow) {
 #ifdef H2344_BROKEN
 	if(cw->type == NHW_TEXT){
-	    tty_curs(BASE_WINDOW, 0, (int)ttyDisplay->cury+1);
+	    tty_curs(BASE_WINDOW, 1, (int)ttyDisplay->cury+1);
 	    cl_eos();
 	}
 #endif

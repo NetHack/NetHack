@@ -2363,6 +2363,9 @@ players if it detects some anticipated mistakes (default on).
 Have user confirm attacks on pets, shopkeepers, and other
 peaceable creatures (default on).
 %.lp
+%.lp
+\item[\ib{dark\_room}]
+Show out-of-sight areas of lit rooms (default off).
 \item[\ib{disclose}]
 Controls what information the program reveals when the game ends.
 Value is a space separated list of prompting/category pairs
@@ -2788,6 +2791,20 @@ Show your approximate accumulated score on bottom line (default off).
 %.lp
 \item[\ib{silent}]
 Suppress terminal beeps (default on).
+%.lp
+\item[\ib{sortloot}]
+Controls the sorting behavior of pickup lists for inventory
+and \#loot commands and some others.
+
+The possible values are:
+%.sd
+%.si
+{\tt full} --- always sort the lists;\\
+{\tt loot} --- only sort the lists that don't use inventory
+       letters, like with the \#loot and pickup commands;\\
+{\tt none} --- show lists the traditional way without sorting.
+%.ei
+%.ed
 %.lp
 \item[\ib{sortpack}]
 Sort the pack contents by type when displaying inventory (default on).

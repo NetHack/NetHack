@@ -1420,7 +1420,7 @@ docompress_file(filename, uncomp)
 const char *filename;
 boolean uncomp;
 {
-	gzFile *compressedfile;
+	gzFile compressedfile;
 	FILE *uncompressedfile;
 	char cfn[256];
 	char buf[1024];

@@ -24,6 +24,7 @@ CONTENTS
 4. git configuration
 5. variable expansion
 6. reserved names
+7. nhadd/nhcommit
 ------------------------------------------------------------------------------
 1. email
 Email to devteam@nethack.org will usually get a response, but it may take a
@@ -52,7 +53,9 @@ XXX windows
 XXX linux
 B. Specify the prefix for variable substitution:
    (This assumes you are not a member of DevTeam or any variant's development
-   team.  If you are, this may be wrong.  Look for more specific documentation.)
+   team.  If you are, this may be wrong.  Look for more specific documentation.
+   For example, this file uses "MINE" for the substitution prefix - this will
+   almost always be wrong if you are working with someone else.)
 	Decide where you want to put this info; it should NOT be inside the
 	tree you cloned from git.  I use ~/nethack/GITADDDIR; for that base,
 	create the needed directories and edit the file:
@@ -82,8 +85,7 @@ D. aliases
 	nhadd
 	nhcommit
    These two commands take the same options as the normal git add and commit
-   commands but perform RCS/CVS-style variable substitution.  Note that the
-   substitutions do not show up in the working directory.
+   commands but perform RCS/CVS-style variable substitution.
 
    Note that nothing terrible will happen if you do not use the nh* versions
    of the commands.
@@ -93,6 +95,12 @@ D. aliases
    Experimental substitutions:
 	MINE-Revision	CVS style revision number
 	MINE-Branch	the current git branch
+
+   For direct access to the substitution mechanism, use:
+	nhsub
+
+   See the section "nhadd/nhcommit" for details on those aliases.
+   Run "perldoc DEVEL/hooksdir/nhsub" for details on nhsub.
 
 That's it.  If you need to do something more when setting up your repository,
 keep reading.  Otherwise, you are done with this section.
@@ -164,4 +172,27 @@ D. Using your own hooks
 6. reserved names
    Anything that matches m/^nh/i or m/^nethack/i is reserved in all
    namespaces (environment, file names, git config, etc).
+------------------------------------------------------------------------------
+7. nhadd/nhcommit
+   nhadd is essentially "git nhsub $*; git add $*"
+   nhcommit is essentially "git nhsub $*; git commit $*"
+
+   As "git add" and "git commit" have complex arguments, nhsub attempts to
+   do the right thing - or at least something reasonable - for most arguments.
+   If nhadd/nhcommit don't do what you need, run "git nhsub" on its own then
+   add/commit.
+
+   So when do I need to use what?
+   The object is to get nhsub run right before git takes a snapshot of each
+   file.  So for example:
+   - use "git nhcommit <filespec>" instead of "git commit <filespec>"
+   - use "git nhadd <filespec>" instead of "git add <filespec>"
+   - use either "git commit" or "git nhcommit" (because the snapshot was
+     already taken)
+   - if you use "git nhsub <filespec>" then you can "git add <filespec>" or
+     "git commit <filespec>" 
+
+   For more complex situations, "git nhsub" takes -v and -n flags - see
+   "perldoc DEVEL/hooksdir/nhsub".
+   
 ------------------------------------------------------------------------------
