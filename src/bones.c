@@ -331,7 +331,7 @@ struct obj *corpse;
 	clear_bypasses();
 	fd = open_bonesfile(&u.uz, &bonesid);
 	if (fd >= 0) {
-		(void) close(fd);
+		(void) nhclose(fd);
 		if (wizard) {
 		    if (yn("Bones file already exists.  Replace it?") == 'y') {
 			if (delete_bonesfile(&u.uz)) goto make_bones;
@@ -504,7 +504,7 @@ struct obj *corpse;
 	    if (bytes_counted > freediskspace(bones)) { /* not enough room */
 		if (wizard)
 			pline("Insufficient space to create bones file.");
-		(void) close(fd);
+		(void) nhclose(fd);
 		cancel_bonesfile();
 		return;
 	    }
@@ -551,7 +551,7 @@ getbones()
 		ok = TRUE;
 		if(wizard)  {
 			if(yn("Get bones?") == 'n') {
-				(void) close(fd);
+				(void) nhclose(fd);
 				compress_bonesfile();
 				return(0);
 			}
@@ -595,8 +595,9 @@ getbones()
 			resetobjs(level.buriedobjlist,TRUE);
 		}
 	}
-	(void) close(fd);
+	(void) nhclose(fd);
 	sanitize_engravings();
+	u.uroleplay.numbones++;
 
 	if(wizard) {
 		if(yn("Unlink bones?") == 'n') {

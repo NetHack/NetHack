@@ -353,8 +353,9 @@ encodexlogflags()
 {
     long e = 0L;
 
-    if (wizard)   e |= 1L << 0;
-    if (discover) e |= 1L << 1;
+    if (wizard)                e |= 1L << 0;
+    if (discover)              e |= 1L << 1;
+    if (!u.uroleplay.numbones) e |= 1L << 2;
 
     return e;
 }

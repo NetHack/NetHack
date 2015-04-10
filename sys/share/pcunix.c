@@ -150,7 +150,7 @@ getlock()
 		error("Cannot open %s", fq_lock);
 	}
 
-	(void) close(fd);
+	(void) nhclose(fd);
 
 	if(iflags.window_inited) { 
 # ifdef SELF_RECOVER
@@ -248,7 +248,7 @@ gotlock:
 # endif
 			error("cannot write lock (%s)", fq_lock);
 		}
-		if(close(fd) == -1) {
+		if(nhclose(fd) == -1) {
 # if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
 			chdirx(orgdir, 0);
 # endif

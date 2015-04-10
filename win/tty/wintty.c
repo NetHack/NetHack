@@ -1,4 +1,4 @@
-/* NetHack 3.5	wintty.c	$NHDT-Date: 1427667623 2015/03/29 22:20:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.75 $ */
+/* NetHack 3.5	wintty.c	$NHDT-Date: 1428394244 2015/04/07 08:10:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.84 $ */
 /* NetHack 3.5	wintty.c	$Date: 2012/01/22 06:27:09 $  $Revision: 1.66 $ */
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1462,6 +1462,8 @@ struct WinDesc *cw;
 		for (page_lines = 0, curr = page_start;
 			curr != page_end;
 			page_lines++, curr = curr->next) {
+		    int color = NO_COLOR, attr = ATR_NONE;
+		    boolean menucolr = FALSE;
 		    if (curr->selector)
 			*rp++ = curr->selector;
 
@@ -1477,6 +1479,11 @@ struct WinDesc *cw;
 		     * actually output the character.  We're faster doing
 		     * this.
 		     */
+		    if (iflags.use_menu_color &&
+			(menucolr = get_menu_coloring(curr->str, &color,&attr))) {
+			term_start_attr(attr);
+			if (color != NO_COLOR) term_start_color(color);
+		    } else
 		    term_start_attr(curr->attr);
 		    for (n = 0, cp = curr->str;
 #ifndef WIN32CON
@@ -1494,6 +1501,10 @@ struct WinDesc *cw;
 				(void) putchar('#'); /* count selected */
 			} else
 			    (void) putchar(*cp);
+		   if (iflags.use_menu_color && menucolr) {
+		       if (color != NO_COLOR) term_end_color();
+		       term_end_attr(attr);
+		   } else
 		    term_end_attr(curr->attr);
 		}
 	    } else {
@@ -1759,7 +1770,7 @@ struct WinDesc *cw;
     if (i == cw->maxrow) {
 #ifdef H2344_BROKEN
 	if(cw->type == NHW_TEXT){
-	    tty_curs(BASE_WINDOW, 0, (int)ttyDisplay->cury+1);
+	    tty_curs(BASE_WINDOW, 1, (int)ttyDisplay->cury+1);
 	    cl_eos();
 	}
 #endif

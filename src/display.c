@@ -160,7 +160,7 @@ magic_map_background(x, y, show)
     if (!cansee(x,y) && !lev->waslit) {
 	/* Floor spaces are dark if unlit.  Corridors are dark if unlit. */
 	if (lev->typ == ROOM && glyph == cmap_to_glyph(S_room))
-	    glyph = cmap_to_glyph(S_stone);
+	    glyph = cmap_to_glyph((flags.dark_room && iflags.use_color) ? (DARKROOMSYM) : S_stone);
 	else if (lev->typ == CORR && glyph == cmap_to_glyph(S_litcorr))
 	    glyph = cmap_to_glyph(S_corr);
     }
@@ -674,7 +674,12 @@ newsym(x,y)
 	 */
 	lev->waslit = (lev->lit!=0);	/* remember lit condition */
 
-	if (reg != NULL && ACCESSIBLE(lev->typ)) {
+	/* normal region shown only on accessible positions, but poison clouds
+	 * also shown above lava, pools and moats.
+	 */
+	if (reg != NULL && (ACCESSIBLE(lev->typ) ||
+		(reg->glyph == cmap_to_glyph(S_poisoncloud) &&
+		 (lev->typ == LAVAPOOL || lev->typ == POOL || lev->typ == MOAT)))) {
 	    show_region(reg,x,y);
 	    return;
 	}
@@ -759,11 +764,11 @@ newsym(x,y)
 	 * These checks and changes must be here and not in back_to_glyph().
 	 * They are dependent on the position being out of sight.
 	 */
-	else if (!lev->waslit) {
+	else if (!lev->waslit || (flags.dark_room && iflags.use_color)) {
 	    if (lev->glyph == cmap_to_glyph(S_litcorr) && lev->typ == CORR)
 		show_glyph(x, y, lev->glyph = cmap_to_glyph(S_corr));
 	    else if (lev->glyph == cmap_to_glyph(S_room) && lev->typ == ROOM)
-		show_glyph(x, y, lev->glyph = cmap_to_glyph(S_stone));
+		show_glyph(x, y, lev->glyph = cmap_to_glyph(DARKROOMSYM));
 	    else
 		goto show_mem;
 	} else {
@@ -824,8 +829,10 @@ shieldeff(x,y)
  * DISP_ALWAYS- Like DISP_FLASH, but vision is not taken into account.
  */
 
+#define TMP_AT_MAX_GLYPHS (COLNO*2)
+
 static struct tmp_glyph {
-    coord saved[COLNO];	/* previously updated positions */
+    coord saved[TMP_AT_MAX_GLYPHS];	/* previously updated positions */
     int sidx;		/* index of next unused slot in saved[] */
     int style;		/* either DISP_BEAM or DISP_FLASH or DISP_ALWAYS */
     int glyph;		/* glyph to use when printing */
@@ -895,7 +902,7 @@ tmp_at(x, y)
 	default:	/* do it */
 	    if (tglyph->style == DISP_BEAM || tglyph->style == DISP_ALL) {
 		if (tglyph->style != DISP_ALL && !cansee(x,y)) break;
-		if (tglyph->sidx >= COLNO) break; /* too many locations */
+		if (tglyph->sidx >= TMP_AT_MAX_GLYPHS) break; /* too many locations */
 		/* save pos for later erasing */
 		tglyph->saved[tglyph->sidx].x = x;
 		tglyph->saved[tglyph->sidx].y = y;

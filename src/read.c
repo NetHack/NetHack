@@ -27,7 +27,8 @@ STATIC_DCL void FDECL(randomize,(int *, int));
 STATIC_DCL void FDECL(forget_single_object, (int));
 STATIC_DCL void FDECL(forget, (int));
 STATIC_DCL int FDECL(maybe_tame, (struct monst *,struct obj *));
-
+STATIC_DCL boolean FDECL(is_valid_stinking_cloud_pos, (int, int, BOOLEAN_P));
+STATIC_DCL void FDECL(display_stinking_cloud_positions, (int));
 STATIC_PTR void FDECL(set_lit, (int,int,genericptr_t));
 
 STATIC_OVL boolean
@@ -868,6 +869,39 @@ struct obj *sobj;
 	return 0;
 }
 
+boolean
+is_valid_stinking_cloud_pos(x,y, showmsg)
+int x,y;
+boolean showmsg;
+{
+    if (!cansee(x, y) || !ACCESSIBLE(levl[x][y].typ) || distu(x, y) >= 32) {
+	if (showmsg) You("smell rotten eggs.");
+	return FALSE;
+    }
+    return TRUE;
+}
+
+void
+display_stinking_cloud_positions(state)
+     int state;
+{
+    if (state == 0) {
+	tmp_at(DISP_BEAM, cmap_to_glyph(S_goodpos));
+    } else if (state == 1) {
+	int x,y, dx, dy;
+	int dist = 6;
+	for (dx = -dist; dx <= dist; dx++)
+	    for (dy = -dist; dy <= dist; dy++) {
+		x = u.ux + dx;
+		y = u.uy + dy;
+		if (isok(x,y) && is_valid_stinking_cloud_pos(x,y, FALSE))
+		    tmp_at(x,y);
+	    }
+    } else {
+	tmp_at(DISP_END, 0);
+    }
+}
+
 /* scroll effects; return 1 if we use up the scroll and possibly make it
    become discovered, 0 if caller should take care of those side-effects */
 int
@@ -1613,14 +1647,13 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 		      already_known ? "stinking " : "");
 		cc.x = u.ux;
 		cc.y = u.uy;
+		getpos_sethilite(display_stinking_cloud_positions);
 		if (getpos(&cc, TRUE, "the desired position") < 0) {
 		    pline1(Never_mind);
 		    break;
 		}
-		if (!cansee(cc.x, cc.y) || distu(cc.x, cc.y) >= 32) {
-		    You("smell rotten eggs.");
+		if (!is_valid_stinking_cloud_pos(cc.x, cc.y, TRUE))
 		    break;
-		}
 		(void) create_gas_cloud(cc.x, cc.y, 3+bcsign(sobj),
 						8+4*bcsign(sobj));
 		break;

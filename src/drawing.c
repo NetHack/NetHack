@@ -156,7 +156,8 @@ const struct symdef defsyms[MAXPCHARS] = {
 	{'#', "iron bars",	C(HI_METAL)},	/* bars */
 	{'#', "tree",		C(CLR_GREEN)},	/* tree */
 	{'.', "floor of a room",C(CLR_GRAY)},	/* room */
-/*20*/	{'#', "corridor",	C(CLR_GRAY)},	/* dark corr */
+/*20*/	{'.', "dark part of a room",C(CLR_BLACK)},	/* dark room */
+	{'#', "corridor",	C(CLR_GRAY)},	/* dark corr */
 	{'#', "lit corridor",	C(CLR_GRAY)},	/* lit corr (see mapglyph.c) */
 	{'<', "staircase up",	C(CLR_GRAY)},	/* upstair */
 	{'>', "staircase down",	C(CLR_GRAY)},	/* dnstair */
@@ -165,8 +166,8 @@ const struct symdef defsyms[MAXPCHARS] = {
 	{'_', "altar",		C(CLR_GRAY)},	/* altar */
 	{'|', "grave",      C(CLR_GRAY)},   	/* grave */
 	{'\\', "opulent throne",C(HI_GOLD)},	/* throne */
-	{'#', "sink",		C(CLR_GRAY)},	/* sink */
-/*30*/	{'{', "fountain",	C(CLR_BLUE)},	/* fountain */
+/*30*/	{'#', "sink",		C(CLR_GRAY)},	/* sink */
+	{'{', "fountain",	C(CLR_BLUE)},	/* fountain */
 	{'}', "water",		C(CLR_BLUE)},	/* pool */
 	{'.', "ice",		C(CLR_CYAN)},	/* ice */
 	{'}', "molten lava",	C(CLR_RED)},	/* lava */
@@ -175,8 +176,8 @@ const struct symdef defsyms[MAXPCHARS] = {
 	{'#', "raised drawbridge",C(CLR_BROWN)},	/* vcdbridge */
 	{'#', "raised drawbridge",C(CLR_BROWN)},	/* hcdbridge */
 	{' ', "air",		C(CLR_CYAN)},	/* open air */
-	{'#', "cloud",		C(CLR_GRAY)},	/* [part of] a cloud */
-/*40*/	{'}', "water",		C(CLR_BLUE)},	/* under water */
+/*40*/	{'#', "cloud",		C(CLR_GRAY)},	/* [part of] a cloud */
+	{'}', "water",		C(CLR_BLUE)},	/* under water */
 	{'^', "arrow trap",	C(HI_METAL)},	/* trap */
 	{'^', "dart trap",	C(HI_METAL)},	/* trap */
 	{'^', "falling rock trap",C(CLR_GRAY)},	/* trap */
@@ -185,8 +186,8 @@ const struct symdef defsyms[MAXPCHARS] = {
 	{'^', "land mine",	C(CLR_RED)},	/* trap */
 	{'^', "rolling boulder trap",	C(CLR_GRAY)},	/* trap */
 	{'^', "sleeping gas trap",C(HI_ZAP)},	/* trap */
-	{'^', "rust trap",	C(CLR_BLUE)},	/* trap */
-/*50*/	{'^', "fire trap",	C(CLR_ORANGE)},	/* trap */
+/*50*/	{'^', "rust trap",	C(CLR_BLUE)},	/* trap */
+	{'^', "fire trap",	C(CLR_ORANGE)},	/* trap */
 	{'^', "pit",		C(CLR_BLACK)},	/* trap */
 	{'^', "spiked pit",	C(CLR_BLACK)},	/* trap */
 	{'^', "hole",		C(CLR_BROWN)},	/* trap */
@@ -195,8 +196,8 @@ const struct symdef defsyms[MAXPCHARS] = {
 	{'^', "level teleporter", C(CLR_MAGENTA)},	/* trap */
 	{'^', "magic portal",	C(CLR_BRIGHT_MAGENTA)},	/* trap */
 	{'"', "web",		C(CLR_GRAY)},	/* web */
-	{'^', "statue trap",	C(CLR_GRAY)},	/* trap */
-/*60*/	{'^', "magic trap",	C(HI_ZAP)},	/* trap */
+/*60*/	{'^', "statue trap",	C(CLR_GRAY)},	/* trap */
+	{'^', "magic trap",	C(HI_ZAP)},	/* trap */
 	{'^', "anti-magic field", C(HI_ZAP)},	/* trap */
 	{'^', "polymorph trap",	C(CLR_BRIGHT_GREEN)},	/* trap */
 	{'|', "wall",		C(CLR_GRAY)},	/* vbeam */
@@ -205,28 +206,30 @@ const struct symdef defsyms[MAXPCHARS] = {
 	{'/', "wall",		C(CLR_GRAY)},	/* rslant */
 	{'*', "",		C(CLR_WHITE)},	/* dig beam */
 	{'!', "",		C(CLR_WHITE)},	/* camera flash beam */
-	{')', "",		C(HI_WOOD)},	/* boomerang open left */
-/*70*/	{'(', "",		C(HI_WOOD)},	/* boomerang open right */
+/*70*/	{')', "",		C(HI_WOOD)},	/* boomerang open left */
+	{'(', "",		C(HI_WOOD)},	/* boomerang open right */
 	{'0', "",		C(HI_ZAP)},	/* 4 magic shield symbols */
 	{'#', "",		C(HI_ZAP)},
 	{'@', "",		C(HI_ZAP)},
 	{'*', "",		C(HI_ZAP)},
+	{'#', "poison cloud",	C(CLR_BRIGHT_GREEN)},	/* [part of] a poison cloud */
+	{'?', "valid position",	C(CLR_BRIGHT_GREEN)},	/* valid position for targeting */
 	{'/', "",		C(CLR_GREEN)},	/* swallow top left	*/
 	{'-', "",		C(CLR_GREEN)},	/* swallow top center	*/
-	{'\\', "",		C(CLR_GREEN)},	/* swallow top right	*/
+/*80*/	{'\\', "",		C(CLR_GREEN)},	/* swallow top right	*/
 	{'|', "",		C(CLR_GREEN)},	/* swallow middle left	*/
 	{'|', "",		C(CLR_GREEN)},	/* swallow middle right	*/
-/*80*/	{'\\', "",		C(CLR_GREEN)},	/* swallow bottom left	*/
+	{'\\', "",		C(CLR_GREEN)},	/* swallow bottom left	*/
 	{'-', "",		C(CLR_GREEN)},	/* swallow bottom center*/
 	{'/', "",		C(CLR_GREEN)},	/* swallow bottom right	*/
 	{'/', "",		C(CLR_ORANGE)},	/* explosion top left     */
 	{'-', "",		C(CLR_ORANGE)},	/* explosion top center   */
 	{'\\', "",		C(CLR_ORANGE)},	/* explosion top right    */
 	{'|', "",		C(CLR_ORANGE)},	/* explosion middle left  */
-	{' ', "",		C(CLR_ORANGE)},	/* explosion middle center*/
+/*90*/	{' ', "",		C(CLR_ORANGE)},	/* explosion middle center*/
 	{'|', "",		C(CLR_ORANGE)},	/* explosion middle right */
 	{'\\', "",		C(CLR_ORANGE)},	/* explosion bottom left  */
-/*90*/	{'-', "",		C(CLR_ORANGE)},	/* explosion bottom center*/
+	{'-', "",		C(CLR_ORANGE)},	/* explosion bottom center*/
 	{'/', "",		C(CLR_ORANGE)},	/* explosion bottom right */
 };
 
@@ -614,6 +617,7 @@ struct symparse loadsyms[] = {
 	{SYM_PCHAR, S_hcdbridge, "S_hcdbridge"},
 	{SYM_PCHAR, S_air, "S_air"},
 	{SYM_PCHAR, S_cloud, "S_cloud"},
+	{SYM_PCHAR, S_poisoncloud, "S_poisoncloud"},
 	{SYM_PCHAR, S_water, "S_water"},
 	{SYM_PCHAR, S_arrow_trap, "S_arrow_trap"},
 	{SYM_PCHAR, S_dart_trap, "S_dart_trap"},
@@ -645,6 +649,7 @@ struct symparse loadsyms[] = {
 	{SYM_PCHAR, S_flashbeam, "S_flashbeam"},
 	{SYM_PCHAR, S_boomleft, "S_boomleft"},
 	{SYM_PCHAR, S_boomright, "S_boomright"},
+	{SYM_PCHAR, S_goodpos, "S_goodpos"},
 	{SYM_PCHAR, S_ss1, "S_ss1"},
 	{SYM_PCHAR, S_ss2, "S_ss2"},
 	{SYM_PCHAR, S_ss3, "S_ss3"},

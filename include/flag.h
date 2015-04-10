@@ -23,6 +23,7 @@ struct flag {
 	boolean  biff;		/* enable checking for mail */
 	boolean  bones;		/* allow saving/loading bones */
 	boolean  confirm;	/* confirm before hitting tame monsters */
+	boolean  dark_room;	/* show shadows in lit rooms */
 	boolean  debug;		/* in debugging mode */
 #define wizard	 flags.debug
 	boolean  end_own;	/* list all own scores */
@@ -47,6 +48,7 @@ struct flag {
 	boolean  showexp;	/* show experience points */
 	boolean  showscore;	/* show score */
 	boolean  silent;	/* whether the bell rings or not */
+	boolean  sortloot;	/* sort items alphabetically when looting */
 	boolean  sortpack;	/* sorted inventory */
 	boolean  sparkle;	/* show "resisting" special FX (Scott Bigham) */
 	boolean  standout;	/* use standout for --More-- */
@@ -201,6 +203,7 @@ struct instance_flags {
 	boolean  rlecomp;	/* run-length comp of levels when writing savefile */
 	uchar	 num_pad_mode;
 	boolean  echo;		/* 1 to echo characters */
+	boolean use_menu_color;	/* use color in menus; only if wc_color */
 #if 0
 	boolean  DECgraphics;	/* use DEC VT-xxx extended character set */
 	boolean  IBMgraphics;	/* use IBM extended character set */

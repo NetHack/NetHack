@@ -416,7 +416,6 @@ typedef unsigned char	uchar;
 /* display features */
 /* dungeon features */
 /* dungeon levels */
-#define WALLIFIED_MAZE	/* Fancy mazes - Jean-Christophe Collet */
 /* monsters & objects */
 /* I/O */
 #if !defined(MAC)
@@ -436,6 +435,14 @@ typedef unsigned char	uchar;
  * Enable any of these at your own risk -- there are almost certainly
  * bugs left here.
  */
+
+/* Menucolors */
+# define MENU_COLOR_REGEX  /* use GNU regex */
+/*# define MENU_COLOR_REGEX_POSIX*/ /* use POSIX regex */
+/* if neither is defined, uses pmatch()
+ * pmatch() provides basic globbing: '*' and '?' wildcards.
+ */
+
 
 #define STATUS_VIA_WINDOWPORT	/* re-work of the status line updating process */
 #define STATUS_HILITES		/* support hilites of status fields */

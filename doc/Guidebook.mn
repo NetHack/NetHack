@@ -1952,6 +1952,8 @@ new players if it detects some anticipated mistakes (default on).
 .lp "confirm "
 Have user confirm attacks on pets, shopkeepers, and other
 peaceable creatures (default on).
+.lp dark_room
+Show out-of-sight areas of lit rooms (default off).
 .lp disclose
 Controls what information the program reveals when the game ends.
 Value is a space separated list of prompting/category pairs
@@ -2051,6 +2053,9 @@ An obsolete synonym for ``gender:male''.
 Cannot be set with the `O' command.
 .lp mention_walls
 Give feedback when walking against a wall (default off).
+.lp menucolors
+Enable coloring menu lines (default off).
+See ``Configuring Menu Colors'' on how to configure the colors.
 .lp menustyle
 Controls the interface used when you need to choose various objects (in
 response to the Drop command, for instance).  The value specified should
@@ -2321,6 +2326,19 @@ the appearance of the display, not the way the game treats you.
 Show your approximate accumulated score on bottom line (default off).
 .lp "silent  "
 Suppress terminal beeps (default on).
+.lp sortloot
+Controls the sorting behavior of the pickup lists for inventory
+and #loot commands and some others.
+The possible values are:
+.PS full
+.PL full
+always sort the lists;
+.PL loot
+only sort the lists that don't use inventory letters, like with
+the #loot and pickup commands;
+.PL none
+show lists the traditional way without sorting.
+.PE
 .lp sortpack
 Sort the pack contents by type when displaying inventory (default on).
 .lp sparkle
@@ -2604,6 +2622,56 @@ The second example results in the exclusion of any corpse from autopickup.
 The last example results in the exclusion of items known to be cursed from
 autopickup.
 .hn 2
+Configuring Menu Colors
+.pg
+Some platforms allow you to define colors used in menu lines when the
+line matches a user-defined pattern. At this time the tty, win32tty and
+win32gui support this.
+.pg
+In general, the config file entries to configure the menu color mappings
+look like this:
+.si
+.lp MENUCOLOR="pattern"=color&attribute
+.ei
+.PS "menu color"
+.PL pattern
+the pattern to match;
+.PL color
+the color to use for lines matching the pattern;
+.PL attribute
+the attribute to use for lines matching the pattern. The attribute is
+optional, and if left out, you must also leave out the preceding ampersand.
+If no attribute is defined, no attribute is used.
+.PE
+.lp ""
+For explanation on pattern format and the matching routines, see
+the pattern in the ``Configuring User Sounds'' -section.
+.lp ""
+Allowed colors are black, red, green, brown, blue, magenta, cyan, gray,
+orange, lightgreen, yellow, lightblue, lightmagenta, lightcyan, and white.
+.lp ""
+Allowed attributes are none, bold, dim, underline, blink, and inverse.
+Note that the platform used may interpret the attributes any way it
+wants.
+.lp ""
+Here's an example of menu colors using NetHack's internal
+pattern matching facility:
+.sd
+.si
+MENUCOLOR="* blessed *"=green
+MENUCOLOR="* cursed *"=red
+MENUCOLOR="* cursed *(being worn)"=red&underline
+.ei
+.ed
+specifies that any menu line with " blessed " contained
+in it will be shown in green color, lines with " cursed " will be
+shown in red, and lines with " cursed " followed by "(being worn)"
+on the same line will be shown in red color and underlined.
+You can have multiple MENUCOLOR entries in your config file,
+and the last MENUCOLOR-line in your config file that matches
+a menu line will be used for the line.
+.pg
+.hn 2
 Configuring User Sounds
 .pg
 Some platforms allow you to define sound files to be played when a message 
@@ -2784,6 +2852,7 @@ O	S_ogre	(ogre)
 o	S_orc	(orc)
 p	S_piercer	(piercer)
 ^	S_pit	(pit)
+#	S_poisoncloud	(poison cloud)
 ^	S_polymorph_trap	(polymorph trap)
 }	S_pool	(water)
 !	S_potion	(potion)

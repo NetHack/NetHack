@@ -541,25 +541,25 @@ register const char *s;
 	}
 
 	level.flags.is_maze_lev = TRUE;
+        level.flags.corrmaze = !rn2(3);
 
-#ifndef WALLIFIED_MAZE
-	for(x = 2; x < x_maze_max; x++)
-		for(y = 2; y < y_maze_max; y++)
-			levl[x][y].typ = STONE;
-#else
-	for(x = 2; x <= x_maze_max; x++)
-		for(y = 2; y <= y_maze_max; y++)
-			levl[x][y].typ = ((x % 2) && (y % 2)) ? STONE : HWALL;
-#endif
+        if (level.flags.corrmaze)
+            for(x = 2; x < x_maze_max; x++)
+                for(y = 2; y < y_maze_max; y++)
+                    levl[x][y].typ = STONE;
+        else
+            for(x = 2; x <= x_maze_max; x++)
+                for(y = 2; y <= y_maze_max; y++)
+                    levl[x][y].typ = ((x % 2) && (y % 2)) ? STONE : HWALL;
 
 	maze0xy(&mm);
 	walkfrom((int) mm.x, (int) mm.y, 0);
 	/* put a boulder at the maze center */
 	(void) mksobj_at(BOULDER, (int) mm.x, (int) mm.y, TRUE, FALSE);
 
-#ifdef WALLIFIED_MAZE
-	wallification(2, 2, x_maze_max, y_maze_max);
-#endif
+        if (!level.flags.corrmaze)
+            wallification(2, 2, x_maze_max, y_maze_max);
+
 	mazexy(&mm);
 	mkstairs(mm.x, mm.y, 1, (struct mkroom *)0);		/* up */
 	if (!Invocation_lev(&u.uz)) {
@@ -650,11 +650,12 @@ schar typ;
 	int q, a, dir, pos;
 	int dirs[4];
 
-#ifndef WALLIFIED_MAZE
-	if (!typ) typ = CORR;
-#else
-	if (!typ) typ = ROOM;
-#endif
+        if (!typ) {
+            if (level.flags.corrmaze)
+                typ = CORR;
+            else
+                typ = ROOM;
+        }
 
 	pos = 1;
 	mazex[pos] = (char) x;
@@ -695,11 +696,12 @@ schar typ;
 	register int q,a,dir;
 	int dirs[4];
 
-#ifndef WALLIFIED_MAZE
-	if (!typ) typ = CORR;
-#else
-	if (!typ) typ = ROOM;
-#endif
+        if (!typ) {
+            if (level.flags.corrmaze)
+                typ = CORR;
+            else
+                typ = ROOM;
+        }
 
 	if(!IS_DOOR(levl[x][y].typ)) {
 	    /* might still be on edge of MAP, so don't overwrite */
@@ -737,7 +739,7 @@ register int dir;
 
 void
 mazexy(cc)	/* find random point in generated corridors,
-		   so we don't create items in moats, bunkers, or walls */
+	           so we don't create items in moats, bunkers, or walls */
 	coord	*cc;
 {
 	int cpt=0;
@@ -746,13 +748,8 @@ mazexy(cc)	/* find random point in generated corridors,
 	    cc->x = 3 + 2*rn2((x_maze_max>>1) - 1);
 	    cc->y = 3 + 2*rn2((y_maze_max>>1) - 1);
 	    cpt++;
-	} while (cpt < 100 && levl[cc->x][cc->y].typ !=
-#ifdef WALLIFIED_MAZE
-		 ROOM
-#else
-		 CORR
-#endif
-		);
+	} while (cpt < 100 &&
+                 levl[cc->x][cc->y].typ != (level.flags.corrmaze ? CORR : ROOM));
 	if (cpt >= 100) {
 		register int x, y;
 		/* last try */
@@ -760,13 +757,8 @@ mazexy(cc)	/* find random point in generated corridors,
 		    for (y = 0; y < (y_maze_max>>1) - 1; y++) {
 			cc->x = 3 + 2 * x;
 			cc->y = 3 + 2 * y;
-			if (levl[cc->x][cc->y].typ ==
-#ifdef WALLIFIED_MAZE
-			    ROOM
-#else
-			    CORR
-#endif
-			   ) return;
+			if (levl[cc->x][cc->y].typ == (level.flags.corrmaze ? CORR : ROOM))
+			   return;
 		    }
 		panic("mazexy: can't find a place!");
 	}
@@ -783,7 +775,7 @@ bound_digging()
  * so the boundary would be breached
  *
  * we can't bound unconditionally on one beyond the last line, because
- * that provides a window of abuse for WALLIFIED_MAZE special levels
+ * that provides a window of abuse for wallified special levels
  */
 {
 	register int x,y;
@@ -879,6 +871,25 @@ register xchar x, y, todnum, todlevel;
 	return;
 }
 
+void
+fumaroles()
+{
+    xchar n;
+    boolean snd = FALSE, loud = FALSE;
+    for (n = rn2(3)+2; n; n--) {
+	xchar x = rn1(COLNO-4,3);
+	xchar y = rn1(ROWNO-4,3);
+	if (levl[x][y].typ == LAVAPOOL) {
+	    NhRegion *r = create_gas_cloud(x,y, 4+rn2(5), rn1(10,5));
+	    clear_heros_fault(r);
+	    snd = TRUE;
+	    if (distu(x,y) < 15) loud = TRUE;
+	}
+    }
+    if (snd && !Deaf)
+	Norep("You hear a %swhoosh!", loud ? "loud " : "");
+}
+
 /*
  * Special waterlevel stuff in endgame (TH).
  *
@@ -916,9 +927,9 @@ movebubbles()
 	register int x, y, i, j;
 	struct trap *btrap;
 	static const struct rm water_pos =
-		{ cmap_to_glyph(S_water), WATER, 0, 0, 0, 0, 0, 0, 0 };
+		{ cmap_to_glyph(S_water), WATER, 0, 0, 0, 0, 0, 0, 0, 0 };
 	static const struct rm air_pos =
-		{ cmap_to_glyph(S_cloud), AIR,   0, 0, 0, 1, 0, 0, 0 };
+		{ cmap_to_glyph(S_cloud), AIR,   0, 0, 0, 1, 0, 0, 0, 0 };
 
 	/* set up the portal the first time bubbles are moved */
 	if (!wportal) set_wportal();

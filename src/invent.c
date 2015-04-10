@@ -7,6 +7,7 @@
 #define NOINVSYM	'#'
 #define CONTAINED_SYM	'>'	/* designator for inside a container */
 
+STATIC_DCL int FDECL(sortloot_cmp, (struct obj *, struct obj *));
 STATIC_DCL void NDECL(reorder_invent);
 STATIC_DCL boolean FDECL(mergable,(struct obj *,struct obj *));
 STATIC_DCL void FDECL(noarmor, (BOOLEAN_P));
@@ -40,6 +41,88 @@ static int lastinvnr = 51;	/* 0 ... 51 (never saved&restored) */
  * around on a bones level for normal players to find.
  */
 static char venom_inv[] = { VENOM_CLASS, 0 };	/* (constant) */
+
+
+int
+sortloot_cmp(obj1, obj2)
+struct obj *obj1;
+struct obj *obj2;
+{
+        int val1 = 0;
+        int val2 = 0;
+
+        /* Sort object names in lexicographical order, ignoring quantity. */
+        int name_cmp = strcmpi(cxname_singular(obj1), cxname_singular(obj2));
+
+        if (name_cmp != 0) {
+                return name_cmp;
+        }
+
+        /* Sort by BUC. Map blessed to 4, uncursed to 2, cursed to 1, and unknown to 0. */
+        val1 = obj1->bknown ? (obj1->blessed << 2) + ((!obj1->blessed && !obj1->cursed) << 1) + obj1->cursed : 0;
+        val2 = obj2->bknown ? (obj2->blessed << 2) + ((!obj2->blessed && !obj2->cursed) << 1) + obj2->cursed : 0;
+        if (val1 != val2) {
+                return val2 - val1; /* Because bigger is better. */
+        }
+
+        /* Sort by greasing. This will put the objects in degreasing order. */
+        val1 = obj1->greased;
+        val2 = obj2->greased;
+        if (val1 != val2) {
+                return val2 - val1; /* Because bigger is better. */
+        }
+
+        /* Sort by erosion. The effective amount is what matters. */
+        val1 = greatest_erosion(obj1);
+        val2 = greatest_erosion(obj2);
+        if (val1 != val2) {
+                return val1 - val2; /* Because bigger is WORSE. */
+        }
+
+        /* Sort by erodeproofing. Map known-invulnerable to 1, and both
+         * known-vulnerable and unknown-vulnerability to 0, because that's how they're displayed. */
+        val1 = obj1->rknown && obj1->oerodeproof;
+        val2 = obj2->rknown && obj2->oerodeproof;
+        if (val1 != val2) {
+                return val2 - val1; /* Because bigger is better. */
+        }
+
+        /* Sort by enchantment. Map unknown to -1000, which is comfortably below the range of ->spe. */
+        val1 = obj1->known ? obj1->spe : -1000;
+        val2 = obj2->known ? obj2->spe : -1000;
+        if (val1 != val2) {
+                return val2 - val1; /* Because bigger is better. */
+        }
+
+        return 0; /* They're identical, as far as we're concerned. */
+}
+
+struct obj **
+objarr_init(n)
+int n;
+{
+    return (struct obj **)alloc(n * sizeof(struct obj *));
+}
+
+void
+objarr_set(otmp, idx, oarray, dosort)
+struct obj *otmp;
+int idx;
+struct obj **oarray;
+boolean dosort;
+{
+    if (dosort) {
+	int j;
+	for (j = idx; j; j--) {
+	    if (sortloot_cmp(otmp, oarray[j-1]) > 0) break;
+	    oarray[j] = oarray[j-1];
+	}
+	oarray[j] = otmp;
+    } else {
+	oarray[idx] = otmp;
+    }
+}
+
 
 void
 assigninvlet(otmp)
@@ -1726,11 +1809,12 @@ long* out_cnt;
     struct obj *otmp;
     char ilet, ret;
     char *invlet = flags.inv_order;
-    int n, classcount;
+	int i, n, classcount;
     winid win;				/* windows being used */
     static winid local_win = WIN_ERR;	/* window for partial menus */
     anything any;
     menu_item *selected;
+	struct obj **oarray;
 
     /* overriden by global flag */
     if (flags.perm_invent) {
@@ -1777,6 +1861,19 @@ long* out_cnt;
         return ret;
     }
 
+	/* count the number of items */
+	for (n = 0, otmp = invent; otmp; otmp = otmp->nobj)
+	    if (!lets || !*lets || index(lets, otmp->invlet)) n++;
+
+	oarray = objarr_init(n);
+
+	/* Add objects to the array */
+	i = 0;
+	for (otmp = invent; otmp; otmp = otmp->nobj)
+	    if (!lets || !*lets || index(lets, otmp->invlet)) {
+		objarr_set(otmp, i++, oarray, (flags.sortloot == 'f'));
+	    }
+
     start_menu(win);
     if (wizard && iflags.override_ID) {
         char prompt[BUFSZ];
@@ -1791,23 +1888,22 @@ long* out_cnt;
 nextclass:
     classcount = 0;
     any = zeroany;		/* set all bits to zero */
-    for(otmp = invent; otmp; otmp = otmp->nobj) {
-        ilet = otmp->invlet;
-        if(!lets || !*lets || index(lets, ilet)) {
-            any = zeroany;		/* zero */
-            if (!flags.sortpack || otmp->oclass == *invlet) {
-                if (flags.sortpack && !classcount) {
-                add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+	for(i = 0; i < n; i++) {
+	    otmp = oarray[i];
+	    ilet = otmp->invlet;
+	    any = zeroany;		/* zero */
+	    if (!flags.sortpack || otmp->oclass == *invlet) {
+		if (flags.sortpack && !classcount) {
+		    add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
 					 let_to_name(*invlet, FALSE, (want_reply && iflags.menu_head_objsym)), MENU_UNSELECTED);
-                classcount++;
-                }
-                any.a_char = ilet;
-                add_menu(win, obj_to_glyph(otmp),
-                    &any, ilet, 0, ATR_NONE, doname(otmp),
-                    MENU_UNSELECTED);
-            }
-        }
-    }
+		    classcount++;
+		}
+		any.a_char = ilet;
+		add_menu(win, obj_to_glyph(otmp),
+			 &any, ilet, 0, ATR_NONE, doname(otmp),
+			 MENU_UNSELECTED);
+	    }
+	}
     if (flags.sortpack) {
         if (*++invlet) goto nextclass;
         if (--invlet != venom_inv) {
@@ -1815,6 +1911,7 @@ nextclass:
             goto nextclass;
         }
     }
+	free(oarray);
     end_menu(win, (char *) 0);
 
     n = select_menu(win, want_reply ? PICK_ONE : PICK_NONE, &selected);

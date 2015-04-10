@@ -708,9 +708,10 @@ menu_item **pick_list;		/* return list of items picked */
 int how;			/* type of query */
 boolean FDECL((*allow), (OBJ_P));/* allow function */
 {
-	int n;
+	int i, n;
 	winid win;
 	struct obj *curr, *last, fake_hero_object;
+	struct obj **oarray;
 	char *pack;
 	anything any;
 	boolean printed_type_name,
@@ -743,6 +744,16 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 	    return 1;
 	}
 
+	oarray = objarr_init(n);
+	/* Add objects to the array */
+	i = 0;
+	for (curr = olist; curr; curr = FOLLOW(curr, qflags)) {
+	    if ((*allow)(curr)) {
+		objarr_set(curr, i++, oarray, (flags.sortloot == 'f' ||
+					       (flags.sortloot == 'l' && !(qflags & USE_INVLET))));
+	    }
+	}
+
 	win = create_nhwindow(NHW_MENU);
 	start_menu(win);
 	any = zeroany;
@@ -756,7 +767,8 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 	pack = flags.inv_order;
 	do {
 	    printed_type_name = FALSE;
-	    for (curr = olist; curr; curr = FOLLOW(curr, qflags)) {
+	    for (i = 0; i < n; i++) {
+		curr = oarray[i];
 		if ((qflags & FEEL_COCKATRICE) && curr->otyp == CORPSE &&
 		     will_feel_cockatrice(curr, FALSE)) {
 			destroy_nhwindow(win);	/* stop the menu and revert */
@@ -784,6 +796,7 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 	    }
 	    pack++;
 	} while (sorted && *pack);
+	free(oarray);
 
 	if (engulfer) {
 	    char buf[BUFSZ];
@@ -810,7 +823,7 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 
 	if (n > 0) {
 	    menu_item *mi;
-	    int i, k;
+	    int k;
 
 	    /* fix up counts:  -1 means no count used => pick all;
 	       if fake_hero_object was picked, discard that choice */

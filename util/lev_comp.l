@@ -1,5 +1,5 @@
 %{
-/* NetHack 3.5  lev_comp.l	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5  lev_comp.l	$NHDT-Date: 1428240296 2015/04/05 13:24:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $ */
 /* NetHack 3.5  lev_comp.l	$Date: 2009/05/06 10:54:31 $  $Revision: 1.9 $ */
 /*	SCCS Id: @(#)lev_lex.c	3.5	2002/03/27	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
@@ -69,6 +69,7 @@ void FDECL(init_yyout, (FILE *));
 long NDECL(handle_varstring_check);
 long FDECL(corefunc_str_check, (char *, long));
 
+extern void VDECL(lc_error, (const char *, ...));
 extern struct lc_vardefs *FDECL(vardef_defined,(struct lc_vardefs *,char *, int));
 
 extern struct lc_vardefs *variable_definitions;
@@ -111,7 +112,7 @@ FILE *orig_yyin = NULL;
 		  map_cnt = 0;
 		  return MAP_ID;
 		}
-<MAPC>[-|}{+xABCISHKMPLWTtFYU\\#. 0123456789]*\r?\n	{
+<MAPC>[-|}{+xABCISHKPLWTF\\#. 0123456789]*\r?\n	{
 		  int len = yyleng;
 		  savetoken(yytext);
 		  /* convert \r\n to \n */
@@ -295,6 +296,7 @@ shroud		{ savetoken(yytext); yylval.i=SHROUD; return FLAG_TYPE; }
 graveyard	{ savetoken(yytext); yylval.i=GRAVEYARD; return FLAG_TYPE; }
 icedpools	{ savetoken(yytext); yylval.i=ICEDPOOLS; return FLAG_TYPE; }
 solidify	{ savetoken(yytext); yylval.i=SOLIDIFY; return FLAG_TYPE; }
+corrmaze        { savetoken(yytext); yylval.i=CORRMAZE; return FLAG_TYPE; }
 [0-9]+d[0-9]+	{ char *p = strchr(yytext, 'd');
 		  savetoken(yytext);
 		  if (p) {

@@ -537,7 +537,7 @@ STATIC_OVL void
 clear_level_structures()
 {
 	static struct rm zerorm = { cmap_to_glyph(S_stone),
-						0, 0, 0, 0, 0, 0, 0, 0 };
+						0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	register int x,y;
 	register struct rm *lev;
 
@@ -582,6 +582,7 @@ clear_level_structures()
 	level.flags.is_cavernous_lev = 0;
 	level.flags.arboreal = 0;
 	level.flags.wizard_bones = 0;
+        level.flags.corrmaze = 0;
 
 	nroom = 0;
 	rooms[0].hx = -1;

@@ -743,6 +743,7 @@ E boolean NDECL(recover_savefile);
 #ifdef SYSCF_FILE
 E void NDECL(assure_syscf_file);
 #endif
+E int FDECL(nhclose, (int));
 #ifdef HOLD_LOCKFILE_OPEN
 E void NDECL(really_close);
 #endif
@@ -856,6 +857,8 @@ E int NDECL(midnight);
 
 /* ### invent.c ### */
 
+E struct obj **FDECL(objarr_init, (int));
+E void FDECL(objarr_set, (struct obj *, int, struct obj **, BOOLEAN_P));
 E void FDECL(assigninvlet, (struct obj *));
 E struct obj *FDECL(merge_choice, (struct obj *,struct obj *));
 E int FDECL(merged, (struct obj **,struct obj **));
@@ -1158,6 +1161,7 @@ E boolean FDECL(bad_location, (XCHAR_P,XCHAR_P,XCHAR_P,XCHAR_P,XCHAR_P,XCHAR_P))
 E void FDECL(place_lregion, (XCHAR_P,XCHAR_P,XCHAR_P,XCHAR_P,
 			     XCHAR_P,XCHAR_P,XCHAR_P,XCHAR_P,
 			     XCHAR_P,d_level *));
+E void NDECL(fumaroles);
 E void NDECL(movebubbles);
 E void NDECL(water_friction);
 E void FDECL(save_waterlevel, (int,int));
@@ -1525,6 +1529,7 @@ E char *FDECL(doname, (struct obj *));
 E boolean FDECL(not_fully_identified, (struct obj *));
 E char *FDECL(corpse_xname, (struct obj *,const char *,unsigned));
 E char *FDECL(cxname, (struct obj *));
+E char *FDECL(cxname_singular, (struct obj *));
 E char *FDECL(killer_xname, (struct obj *));
 E char *FDECL(short_oname, (struct obj *,char *(*)(OBJ_P),char *(*)(OBJ_P),
 			    unsigned));
@@ -1587,6 +1592,9 @@ E void FDECL(parsesymbols, (char *));
 E struct symparse *FDECL(match_sym, (char *));
 E void NDECL(set_playmode);
 E int FDECL(sym_val, (char *));
+E boolean FDECL(add_menu_coloring, (char *));
+E boolean FDECL(get_menu_coloring, (char *, int *, int *));
+E void NDECL(free_menu_coloring);
 
 /* ### pager.c ### */
 

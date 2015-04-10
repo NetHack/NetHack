@@ -105,6 +105,7 @@ static struct Bool_Opt
 	{"color",	  &iflags.wc_color, FALSE, SET_IN_GAME},	/*WC*/
 # endif
 	{"confirm",&flags.confirm, TRUE, SET_IN_GAME},
+	{"dark_room", &flags.dark_room, TRUE, SET_IN_GAME},
 	{"eight_bit_tty", &iflags.wc_eight_bit_input, FALSE, SET_IN_GAME},	/*WC*/
 #ifdef TTY_GRAPHICS
 	{"extmenu", &iflags.extmenu, FALSE, SET_IN_GAME},
@@ -141,6 +142,7 @@ static struct Bool_Opt
 	{"mail", (boolean *)0, TRUE, SET_IN_FILE},
 #endif
 	{"mention_walls", &iflags.mention_walls, FALSE, SET_IN_GAME},
+	{"menucolors", &iflags.use_menu_color, FALSE,  SET_IN_GAME},
 	/* for menu debugging only*/
 	{"menu_tab_sep", &iflags.menu_tab_sep, FALSE, SET_IN_GAME},
 	{"menu_objsyms", &iflags.menu_head_objsym, FALSE, SET_IN_GAME},
@@ -345,6 +347,7 @@ static struct Comp_Opt
 	{ "scroll_amount", "amount to scroll map when scroll_margin is reached",
 						20, DISP_IN_GAME }, /*WC*/
 	{ "scroll_margin", "scroll map when this far from the edge", 20, DISP_IN_GAME }, /*WC*/
+	{ "sortloot", "sort object selection lists by description", 4, SET_IN_GAME },
 #ifdef MSDOS
 	{ "soundcard", "type of sound card to use", 20, SET_IN_FILE },
 #endif
@@ -495,6 +498,35 @@ STATIC_OVL boolean FDECL(wc2_supported, (const char *));
 STATIC_DCL void FDECL(remove_autopickup_exception, (struct autopickup_exception *));
 STATIC_OVL int FDECL(count_ape_maps, (int *, int *));
 
+
+void
+reglyph_darkroom()
+{
+    xchar x,y;
+    for (x = 0; x < COLNO; x++)
+        for (y = 0; y < ROWNO; y++) {
+	    struct rm *lev = &levl[x][y];
+	    if (!flags.dark_room) {
+		if (lev->glyph == cmap_to_glyph(S_darkroom))
+		    lev->glyph = lev->waslit ? cmap_to_glyph(S_room) : cmap_to_glyph(S_stone);
+	    } else {
+		if (lev->glyph == cmap_to_glyph(S_room) &&
+		    lev->seenv &&
+		    lev->waslit && !cansee(x,y))
+		    lev->glyph = cmap_to_glyph(S_darkroom);
+		else if (lev->glyph == cmap_to_glyph(S_stone) &&
+			 lev->typ == ROOM &&
+			 lev->seenv &&
+			 !cansee(x,y))
+			 lev->glyph = cmap_to_glyph(S_darkroom);
+	    }
+	}
+    if (flags.dark_room && iflags.use_color)
+	showsyms[S_darkroom]=showsyms[S_room];
+    else
+	showsyms[S_darkroom]=showsyms[S_stone];
+}
+
 /* check whether a user-supplied option string is a proper leading
    substring of a particular option name; option string might have
    a colon or equals sign and arbitrary value appended to it */
@@ -628,6 +660,7 @@ initoptions_init()
 		     (genericptr_t)def_inv_order, sizeof flags.inv_order);
 	flags.pickup_types[0] = '\0';
 	flags.pickup_burden = MOD_ENCUMBER;
+	flags.sortloot = 'l'; /* sort only loot by default */
 
 	for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++)
 		flags.end_disclose[i] = DISCLOSE_PROMPT_DEFAULT_NO;
@@ -702,6 +735,8 @@ initoptions_finish()
 	/* as a named (or default) fruit.  Wishing for "fruit" will	*/
 	/* result in the player's preferred fruit [better than "\033"].	*/
 	obj_descr[SLIME_MOLD].oc_name = "fruit";
+
+	reglyph_darkroom();
 
 	return;
 }
@@ -1090,6 +1125,174 @@ STATIC_VAR const struct paranoia_opts {
 	{ ~0, "all", 3, 0, 0, 0 },	/* ditto */
 };
 
+
+extern struct menucoloring *menu_colorings;
+
+static const struct {
+   const char *name;
+   const int color;
+} colornames[] = {
+   {"black", CLR_BLACK},
+   {"red", CLR_RED},
+   {"green", CLR_GREEN},
+   {"brown", CLR_BROWN},
+   {"blue", CLR_BLUE},
+   {"magenta", CLR_MAGENTA},
+   {"cyan", CLR_CYAN},
+   {"gray", CLR_GRAY},
+   {"grey", CLR_GRAY},
+   {"orange", CLR_ORANGE},
+   {"lightgreen", CLR_BRIGHT_GREEN},
+   {"yellow", CLR_YELLOW},
+   {"lightblue", CLR_BRIGHT_BLUE},
+   {"lightmagenta", CLR_BRIGHT_MAGENTA},
+   {"lightcyan", CLR_BRIGHT_CYAN},
+   {"white", CLR_WHITE}
+};
+
+static const struct {
+   const char *name;
+   const int attr;
+} attrnames[] = {
+     {"none", ATR_NONE},
+     {"bold", ATR_BOLD},
+     {"dim", ATR_DIM},
+     {"underline", ATR_ULINE},
+     {"blink", ATR_BLINK},
+     {"inverse", ATR_INVERSE}
+};
+
+/* parse '"regex_string"=color&attr' and add it to menucoloring */
+boolean
+add_menu_coloring(str)
+char *str;
+{
+    int i, c = NO_COLOR, a = ATR_NONE;
+    struct menucoloring *tmp;
+    char *tmps, *cs = strchr(str, '=');
+#ifdef MENU_COLOR_REGEX_POSIX
+    int errnum;
+    char errbuf[80];
+#endif
+    const char *err = (char *)0;
+
+    if (!cs || !str) return FALSE;
+
+    tmps = cs;
+    tmps++;
+    while (*tmps && isspace(*tmps)) tmps++;
+
+    for (i = 0; i < SIZE(colornames); i++)
+	if (strstri(tmps, colornames[i].name) == tmps) {
+	    c = colornames[i].color;
+	    break;
+	}
+    if ((i == SIZE(colornames)) && (*tmps >= '0' && *tmps <='9'))
+	c = atoi(tmps);
+
+    if (c > 15) return FALSE;
+
+    tmps = strchr(str, '&');
+    if (tmps) {
+	tmps++;
+	while (*tmps && isspace(*tmps)) tmps++;
+	for (i = 0; i < SIZE(attrnames); i++)
+	    if (strstri(tmps, attrnames[i].name) == tmps) {
+		a = attrnames[i].attr;
+		break;
+	    }
+	if ((i == SIZE(attrnames)) && (*tmps >= '0' && *tmps <='9'))
+	    a = atoi(tmps);
+    }
+
+    *cs = '\0';
+    tmps = str;
+    if ((*tmps == '"') || (*tmps == '\'')) {
+	cs--;
+	while (isspace(*cs)) cs--;
+	if (*cs == *tmps) {
+	    *cs = '\0';
+	    tmps++;
+	}
+    }
+
+    tmp = (struct menucoloring *)alloc(sizeof(struct menucoloring));
+#ifdef MENU_COLOR_REGEX
+#ifdef MENU_COLOR_REGEX_POSIX
+    errnum = regcomp(&tmp->match, tmps, REG_EXTENDED | REG_NOSUB);
+    if (errnum != 0)
+    {
+	regerror(errnum, &tmp->match, errbuf, sizeof(errbuf));
+	err = errbuf;
+    }
+#else
+    tmp->match.translate = 0;
+    tmp->match.fastmap = 0;
+    tmp->match.buffer = 0;
+    tmp->match.allocated = 0;
+    tmp->match.regs_allocated = REGS_FIXED;
+    err = re_compile_pattern(tmps, strlen(tmps), &tmp->match);
+#endif
+#else
+    tmp->match = (char *)alloc(strlen(tmps)+1);
+    (void) memcpy((genericptr_t)tmp->match, (genericptr_t)tmps, strlen(tmps)+1);
+#endif
+    if (err) {
+	raw_printf("\nMenucolor regex error: %s\n", err);
+	wait_synch();
+	free(tmp);
+	return FALSE;
+    } else {
+	tmp->next = menu_colorings;
+	tmp->color = c;
+	tmp->attr = a;
+	menu_colorings = tmp;
+	return TRUE;
+    }
+}
+
+boolean
+get_menu_coloring(str, color, attr)
+char *str;
+int *color, *attr;
+{
+    struct menucoloring *tmpmc;
+    if (iflags.use_menu_color)
+	for (tmpmc = menu_colorings; tmpmc; tmpmc = tmpmc->next)
+#ifdef MENU_COLOR_REGEX
+# ifdef MENU_COLOR_REGEX_POSIX
+	    if (regexec(&tmpmc->match, str, 0, NULL, 0) == 0) {
+# else
+	    if (re_search(&tmpmc->match, str, strlen(str), 0, 9999, 0) >= 0) {
+# endif
+#else
+	    if (pmatch(tmpmc->match, str)) {
+#endif
+		*color = tmpmc->color;
+		*attr = tmpmc->attr;
+		return TRUE;
+	    }
+    return FALSE;
+}
+
+void
+free_menu_coloring()
+{
+    struct menucoloring *tmp = menu_colorings;
+
+    while (tmp) {
+	struct menucoloring *tmp2 = tmp->next;
+#ifdef MENU_COLOR_REGEX
+	(void) regfree(&tmp->match);
+#else
+	free(tmp->match);
+#endif
+	free(tmp);
+	tmp = tmp2;
+    }
+}
+
+
 void
 parseoptions(opts, tinitial, tfrom_file)
 register char *opts;
@@ -1429,6 +1632,16 @@ boolean tinitial, tfrom_file;
 			badoption(opts);
 		}
 		return;
+	}
+
+	/* menucolor:"regex_string"=color */
+	fullname = "menucolor";
+	if (match_optname(opts, fullname, 9, TRUE)) {
+	    if (negated) bad_negation(fullname, FALSE);
+	    else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0)
+		if (!add_menu_coloring(op))
+		    badoption(opts);
+	    return;
 	}
 
 	fullname = "msghistory";
@@ -2149,6 +2362,22 @@ goodfruit:
 	    return;
 	}
 
+	fullname = "sortloot";
+	if (match_optname(opts, fullname, 4, TRUE)) {
+		op = string_for_env_opt(fullname, opts, FALSE);
+		if (op) {
+			switch (tolower(*op)) {
+			 case 'n':
+			 case 'l':
+			 case 'f': flags.sortloot = tolower(*op);
+				break;
+			 default:  badoption(opts);
+				return;
+			}
+		}
+		return;
+	}
+
 	fullname = "suppress_alert";
 	if (match_optname(opts, fullname, 4, TRUE)) {
 		if (duplicate) complain_about_duplicate(opts,1);
@@ -2631,7 +2860,8 @@ goodfruit:
 			else if ((boolopt[i].addr) == &flags.invlet_constant) {
 			    if (flags.invlet_constant) reassign();
 			}
-			else if ((boolopt[i].addr) == &flags.lit_corridor) {
+			else if (((boolopt[i].addr) == &flags.lit_corridor) ||
+				 ((boolopt[i].addr) == &flags.dark_room)) {
 			    /*
 			     * All corridor squares seen via night vision or
 			     * candles & lamps change.  Update them by calling
@@ -2641,6 +2871,7 @@ goodfruit:
 			     */
 			    vision_recalc(2);		/* shut down vision */
 			    vision_full_recalc = 1;	/* delayed recalc */
+			    if (iflags.use_color) need_redraw = TRUE;  /* darkroom refresh */
 			}
 			else if ((boolopt[i].addr) == &iflags.use_inverse ||
 					(boolopt[i].addr) == &flags.showrace ||
@@ -2681,6 +2912,10 @@ static NEARDATA const char *burdentype[] = {
 
 static NEARDATA const char *runmodes[] = {
 	"teleport", "run", "walk", "crawl"
+};
+
+static NEARDATA const char *sortltype[] = {
+	"none", "loot", "full"
 };
 
 /*
@@ -2970,8 +3205,10 @@ doset()
 	}
 
 	destroy_nhwindow(tmpwin);
-	if (need_redraw)
+	if (need_redraw) {
+	    reglyph_darkroom();
 	    (void) doredraw();
+	}
 	return 0;
 }
 
@@ -2989,7 +3226,8 @@ boolean setinitial,setfromfile;
     char buf[BUFSZ];
 
     /* Special handling of menustyle, pickup_burden, pickup_types,
-     * disclose, runmode, msg_window, menu_headings, and number_pad options.
+     * disclose, runmode, msg_window, menu_headings, sortloot,
+     * and number_pad options.
      * Also takes care of interactive autopickup_exception_handling changes.
      */
     if (!strcmp("menustyle", optname)) {
@@ -3170,6 +3408,23 @@ boolean setinitial,setfromfile;
 	}
 	destroy_nhwindow(tmpwin);
 #endif
+    } else if (!strcmp("sortloot", optname)) {
+	const char *sortl_name;
+	menu_item *sortl_pick = (menu_item *)0;
+	tmpwin = create_nhwindow(NHW_MENU);
+	start_menu(tmpwin);
+	for (i = 0; i < SIZE(sortltype); i++) {
+	    sortl_name = sortltype[i];
+	    any.a_char = *sortl_name;
+	    add_menu(tmpwin, NO_GLYPH, &any, *sortl_name, 0,
+		     ATR_NONE, sortl_name, MENU_UNSELECTED);
+	}
+	end_menu(tmpwin, "Select loot sorting type:");
+	if (select_menu(tmpwin, PICK_ONE, &sortl_pick) > 0) {
+	    flags.sortloot = sortl_pick->item.a_char;
+	    free((genericptr_t)sortl_pick);
+	}
+	destroy_nhwindow(tmpwin);
     } else if (!strcmp("align_message", optname) ||
 		!strcmp("align_status", optname)) {
 	menu_item *window_pick = (menu_item *)0;
@@ -3758,6 +4013,15 @@ char *buf;
 	else if (!strcmp(optname, "scroll_margin")) {
 		if (iflags.wc_scroll_margin) Sprintf(buf, "%d",iflags.wc_scroll_margin);
 		else Strcpy(buf, defopt);
+	}
+	else if (!strcmp(optname, "sortloot")) {
+		char *sortname = (char *)NULL;
+		for (i=0; i < SIZE(sortltype) && sortname==(char *)NULL; i++) {
+		   if (flags.sortloot == sortltype[i][0])
+		     sortname = (char *)sortltype[i];
+		}
+		if (sortname != (char *)NULL)
+		   Sprintf(buf, "%s", sortname);
 	}
 	else if (!strcmp(optname, "player_selection"))
 		Sprintf(buf, "%s", iflags.wc_player_selection ? "prompts" : "dialog");

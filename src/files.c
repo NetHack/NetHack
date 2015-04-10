@@ -641,12 +641,12 @@ really_close()
     lftrack.fd = -1;
     lftrack.oflag = 0;
     if (fd != -1)
-        (void)_close(fd);
+		(void)close(fd);
     return;
 }
 
 int
-close(fd)
+nhclose(fd)
 int fd;
 {
     if (lftrack.fd == fd) {
@@ -655,10 +655,17 @@ int fd;
         lftrack.nethack_thinks_it_is_open = FALSE;
         return 0;
     }
-    return _close(fd);
+	return close(fd);
+}
+#else
+int
+nhclose(fd)
+int fd;
+{
+	return close(fd);
 }
 #endif
-    
+
 /* ----------  END LEVEL FILE HANDLING ----------- */
 
 
@@ -996,7 +1003,7 @@ restore_saved_game()
     if ((fd = open_savefile()) < 0) return fd;
 
     if (validate(fd, fq_save) != 0) {
-        (void) close(fd),  fd = -1;
+	    (void) nhclose(fd),  fd = -1;
         (void) delete_savefile();
     }
     return fd;
@@ -1021,7 +1028,7 @@ const char* filename;
         get_plname_from_file(fd, tplname);
         result = dupstr(tplname);
     }
-    (void) close(fd);
+	(void) nhclose(fd);
     }
     nh_compress(SAVEF);
 
@@ -1413,7 +1420,7 @@ docompress_file(filename, uncomp)
 const char *filename;
 boolean uncomp;
 {
-    gzFile *compressedfile;
+	gzFile compressedfile;
     FILE *uncompressedfile;
     char cfn[256];
     char buf[1024];
@@ -1777,7 +1784,7 @@ const char *filename;
         if (unlink(lockname) < 0)
             HUP raw_printf("Can't unlink %s.", lockname);
 # ifdef NO_FILE_LINKS
-        (void) close(lockfd);
+		(void) nhclose(lockfd);
 # endif
 
 #endif  /* UNIX || VMS */
@@ -2288,6 +2295,8 @@ int		src;
     } else if (match_varname(buf, "BOULDER", 3)) {
         (void) get_uchars(fp, buf, bufp, &iflags.bouldersym, TRUE,
                   1, "BOULDER");
+	} else if (match_varname(buf, "MENUCOLOR", 9)) {
+	    (void) add_menu_coloring(bufp);
     } else if (match_varname(buf, "WARNINGS", 5)) {
         (void) get_uchars(fp, buf, bufp, translate, FALSE,
                     WARNCOUNT, "WARNINGS");
@@ -2932,9 +2941,9 @@ const char *dir UNUSED_if_not_OS2_CODEVIEW;
         wait_synch();
         }
 # endif
-        (void) close(fd);	/* RECORD is accessible */
+	    (void) nhclose(fd);	/* RECORD is accessible */
     } else if ((fd = open(fq_record, O_CREAT|O_RDWR, FCMASK)) >= 0) {
-        (void) close(fd);	/* RECORD newly created */
+	    (void) nhclose(fd);	/* RECORD newly created */
 # if defined(VMS) && !defined(SECURE)
         /* Re-protect RECORD with world:read+write+execute+delete access. */
         (void) chmod(fq_record, FCMASK | 007);
@@ -2974,9 +2983,9 @@ const char *dir UNUSED_if_not_OS2_CODEVIEW;
     raw_printf("Warning: cannot write record %s", tmp);
         wait_synch();
         } else
-        (void) close(fd);
+		(void) nhclose(fd);
     } else		/* open succeeded */
-        (void) close(fd);
+	    (void) nhclose(fd);
 #else /* MICRO || WIN32*/
 
 # ifdef MAC
@@ -3060,14 +3069,14 @@ recover_savefile()
     if (read(gfd, (genericptr_t) &hpid, sizeof hpid) != sizeof hpid) {
         raw_printf(
 "\nCheckpoint data incompletely written or subsequently clobbered. Recovery impossible.");
-        (void)close(gfd);
+	    (void)nhclose(gfd);
         return FALSE;
     }
     if (read(gfd, (genericptr_t) &savelev, sizeof(savelev))
                             != sizeof(savelev)) {
         raw_printf("\nCheckpointing was not in effect for %s -- recovery impossible.\n",
             lock);
-        (void)close(gfd);
+	    (void)nhclose(gfd);
         return FALSE;
     }
     if ((read(gfd, (genericptr_t) savename, sizeof savename)
@@ -3081,7 +3090,7 @@ recover_savefile()
         (read(gfd, (genericptr_t) &tmpplbuf, pltmpsiz)
         != pltmpsiz)) {
         raw_printf("\nError reading %s -- can't recover.\n", lock);
-        (void)close(gfd);
+	    (void)nhclose(gfd);
         return FALSE;
     }
 
@@ -3097,15 +3106,15 @@ recover_savefile()
     sfd = create_savefile();
     if (sfd < 0) {
         raw_printf("\nCannot recover savefile %s.\n", SAVEF);
-        (void)close(gfd);
+	    (void)nhclose(gfd);
         return FALSE;
     }
 
     lfd = open_levelfile(savelev, errbuf);
     if (lfd < 0) {
         raw_printf("\n%s\n", errbuf);
-        (void)close(gfd);
-        (void)close(sfd);
+	    (void)nhclose(gfd);
+	    (void)nhclose(sfd);
         delete_savefile();
         return FALSE;
     }
@@ -3113,8 +3122,8 @@ recover_savefile()
     if (write(sfd, (genericptr_t) &version_data, sizeof version_data)
         != sizeof version_data) {
         raw_printf("\nError writing %s; recovery failed.", SAVEF);
-        (void)close(gfd);
-        (void)close(sfd);
+	    (void)nhclose(gfd);
+	    (void)nhclose(sfd);
         delete_savefile();
         return FALSE;
     }
@@ -3124,8 +3133,8 @@ recover_savefile()
         raw_printf(
             "\nError writing %s; recovery failed (savefile_info).\n",
             SAVEF);
-        (void)close(gfd);
-        (void)close(sfd);
+	    (void)nhclose(gfd);
+	    (void)nhclose(sfd);
         delete_savefile();
         return FALSE;
     }
@@ -3135,8 +3144,8 @@ recover_savefile()
         raw_printf(
             "Error writing %s; recovery failed (player name size).\n",
             SAVEF);
-        (void)close(gfd);
-        (void)close(sfd);
+	    (void)nhclose(gfd);
+	    (void)nhclose(sfd);
         delete_savefile();
         return FALSE;
     }
@@ -3146,28 +3155,28 @@ recover_savefile()
         raw_printf(
             "Error writing %s; recovery failed (player name).\n",
             SAVEF);
-        (void)close(gfd);
-        (void)close(sfd);
+	    (void)nhclose(gfd);
+	    (void)nhclose(sfd);
         delete_savefile();
         return FALSE;
     }
 
     if (!copy_bytes(lfd, sfd)) {
-        (void) close(lfd);
-        (void) close(sfd);
+		(void) nhclose(lfd);
+		(void) nhclose(sfd);
         delete_savefile();
         return FALSE;
     }
-    (void)close(lfd);
+	(void)nhclose(lfd);
     processed[savelev] = 1;
 
     if (!copy_bytes(gfd, sfd)) {
-        (void) close(lfd);
-        (void) close(sfd);
+		(void) nhclose(lfd);
+		(void) nhclose(sfd);
         delete_savefile();
         return FALSE;
     }
-    (void)close(gfd);
+	(void)nhclose(gfd);
     processed[0] = 1;
 
     for (lev = 1; lev < 256; lev++) {
@@ -3181,17 +3190,17 @@ recover_savefile()
                 levc = (xchar) lev;
                 write(sfd, (genericptr_t) &levc, sizeof(levc));
                 if (!copy_bytes(lfd, sfd)) {
-                    (void) close(lfd);
-                    (void) close(sfd);
+					(void) nhclose(lfd);
+					(void) nhclose(sfd);
                     delete_savefile();
                     return FALSE;
                 }
-                (void)close(lfd);
+				(void)nhclose(lfd);
                 processed[lev] = 1;
             }
         }
     }
-    (void)close(sfd);
+	(void)nhclose(sfd);
 
 #ifdef HOLD_LOCKFILE_OPEN
     really_close();
