@@ -1,4 +1,4 @@
-/* NetHack 3.5	config.h	$NHDT-Date: 1425083082 2015/02/28 00:24:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.51 $ */
+/* NetHack 3.5	config.h	$NHDT-Date: 1428706053 2015/04/10 22:47:33 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.77 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -437,8 +437,10 @@ typedef unsigned char	uchar;
  */
 
 /* Menucolors */
+#ifdef UNIX
 # define MENU_COLOR_REGEX  /* use GNU regex */
 /*# define MENU_COLOR_REGEX_POSIX*/ /* use POSIX regex */
+#endif
 /* if neither is defined, uses pmatch()
  * pmatch() provides basic globbing: '*' and '?' wildcards.
  */
