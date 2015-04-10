@@ -94,19 +94,19 @@ FLAGS: hardfloor,icedpools
 INIT_MAP: mines, '.', 'I', true, true, lit, false
 GEOMETRY:center,center
 MAP
-PPPP....                      ....PPPPP.
-PLP...                          .PPLLLPP
+PPPPxxxx                      xxxxPPPPPx
+PLPxxx                          xPPLLLPP
 PPP    .......................    PPPLLP
-..   ............................   PPPP
-.  ...............................  ....
-  .................................   ..
-....................................   .
+xx   ............................   PPPP
+x  ...............................  xxxx
+  .................................   xx
+....................................   x
   ...................................   
-.  ..................................  .
-..   ..............................   PP
-.PPP  ..........................     PLP
-.PLLP                             ..PLLP
-.PPPP..                         ....PPPP
+x  ..................................  x
+xx   ..............................   PP
+xPPP  ..........................     PLP
+xPLLP                             xxPLLP
+xPPPPxx                         xxxxPPPP
 ENDMAP
 # Dungeon Description
 REGION:(00,00,39,12),lit,"ordinary"
@@ -180,23 +180,23 @@ FLAGS: icedpools
 INIT_MAP: mines, '.', 'L', true, true, lit, false
 GEOMETRY:center,center
 MAP
-.L............................LLLLL
-LLL.........LLLLL.LLLLL.........LLL
-.LLL......LLLLLLLLLLLLLLL.......LL.
-.LLL.....LLL|---------|LLL.....L...
-..LL....LL|--.........--|LL.....LLL
-.......LL|-...LLLLLLL...-|LL.....L.
-.......LL|...LL.....LL...|LL.......
+xxxxxx.....................xxxxxxxx
+xxxxx.......LLLLL.LLLLL......xxxxxx
+xxxx......LLLLLLLLLLLLLLL......xxxx
+xxxx.....LLL|---------|LLL.....xxxx
+xxxx....LL|--.........--|LL.....xxx
+x......LL|-...LLLLLLL...-|LL.....xx
+.......LL|...LL.....LL...|LL......x
 ......LL|-..LL.......LL..-|LL......
 ......LL|.................|LL......
 ......LL|-..LL.......LL..-|LL......
 .......LL|...LL.....LL...|LL.......
-.......LL|-...LLLLLLL...-|LL.......
-..L.....LL|--.........--|LL.....LL.
-..LL.....LLL|---------|LLL....LLLL.
-..LLL.....LLLLLLLLLLLLLLL...LLLLL..
-.LLLL.......LLLLL.LLLLL.....LLLL...
-..LL...............................
+xx.....LL|-...LLLLLLL...-|LL......x
+xxx.....LL|--.........--|LL.....xxx
+xxxx.....LLL|---------|LLL...xxxxxx
+xxxxx.....LLLLLLLLLLLLLLL...xxxxxxx
+xxxxxx......LLLLL.LLLLL.....xxxxxxx
+xxxxxxxxx..................xxxxxxxx
 ENDMAP
 # Dungeon Description
 REGION:(00,00,34,16),lit,"ordinary"
