@@ -1845,6 +1845,7 @@ int src;
 {
     FILE *fp;
 #if defined(UNIX) || defined(VMS)
+    char tmp_config[BUFSZ];
     char *envp;
 #endif
 
