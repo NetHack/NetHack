@@ -561,6 +561,10 @@ MONSTER:'V',random
 #
 MAZE:"sanctum", ' '
 FLAGS: noteleport,hardfloor,nommap
+# This is outside the main map, below, so we must do it before adding
+# that map and anchoring coordinates to it. This extends the invisible
+# barrier up to the top row, which falls outside the drawn map.
+NON_PASSWALL:(39,00,41,00)
 GEOMETRY:center,center
 MAP
 ----------------------------------------------------------------------------
