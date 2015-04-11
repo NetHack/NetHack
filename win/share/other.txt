@@ -1458,7 +1458,7 @@ P = (108, 145, 182)
   BBBBBBGGGGBBBBBB
   BBBBBBBBBBBBBBBB
 }
-# tile 75 (cmap 75)
+# tile 76 (cmap 76)
 {
   AAAAAAADDDDDDAAA
   AAAAADDDDDDDDDDD
@@ -1477,7 +1477,7 @@ P = (108, 145, 182)
   AAAADDDDDDMMMMMM
   AAAADDDDDDMMMMMM
 }
-# tile 76 (cmap 76)
+# tile 77 (cmap 77)
 {
   AAAAAAAAAAAAAAAA
   DDAAAAAAAAAAAAAA
@@ -1496,7 +1496,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 77 (cmap 77)
+# tile 78 (cmap 78)
 {
   AAAAAAAAAAAAAAAA
   AAADDDDDAAAAAAAA
@@ -1515,7 +1515,7 @@ P = (108, 145, 182)
   MMMMDDDDDDDDDDDD
   MMMMDDDDDDDDDDDA
 }
-# tile 78 (cmap 78)
+# tile 79 (cmap 79)
 {
   AAAADDDDDDMMMMMM
   AAAADDDDDDDMMMMM
@@ -1534,7 +1534,7 @@ P = (108, 145, 182)
   DDDDDDDMMMMMMMMM
   DDCCDDDMMMMMMMMM
 }
-# tile 79 (cmap 79)
+# tile 80 (cmap 80)
 {
   MMMMDDDDDDDDDDDA
   MMMMDDDDDDDDDDDA
@@ -1553,7 +1553,7 @@ P = (108, 145, 182)
   MMMMMMDDDDDDDDAA
   MMMMMMMDDDDDDDAA
 }
-# tile 80 (cmap 80)
+# tile 81 (cmap 81)
 {
   DDDCDDDMMMMMMMMM
   DDDCDDDMMMMMMMMM
@@ -1572,7 +1572,7 @@ P = (108, 145, 182)
   AAAAAAAAAAAADDDD
   AAAAAAAAAAAAAADD
 }
-# tile 81 (cmap 81)
+# tile 82 (cmap 82)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -1591,7 +1591,7 @@ P = (108, 145, 182)
   DDDDDDDDDDDDDDDD
   DDDDDDDDDDDDDDAA
 }
-# tile 82 (cmap 82)
+# tile 83 (cmap 83)
 {
   MMMMMMDDDDDDDDAA
   MMMMMMDDDDDDDDDA
@@ -1610,7 +1610,7 @@ P = (108, 145, 182)
   DDAAAAAAAAAAAAAA
   AAAAAAAAAAAAAAAA
 }
-# tile 83 (explosion dark 0)
+# tile 84 (explosion dark 0)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -1629,7 +1629,7 @@ P = (108, 145, 182)
   MMAAAAMMAAAAMMMM
   MMAAAMMAAAAAMMMM
 }
-# tile 84 (explosion dark 1)
+# tile 85 (explosion dark 1)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -1648,7 +1648,7 @@ P = (108, 145, 182)
   MMMMMMMMAMAMAPAA
   MPAMMMAPAAAAAAAA
 }
-# tile 85 (explosion dark 2)
+# tile 86 (explosion dark 2)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -1667,7 +1667,7 @@ P = (108, 145, 182)
   AAMAMMAMAAAAMMMM
   AMAAMMAMAAAAAMMM
 }
-# tile 86 (explosion dark 3)
+# tile 87 (explosion dark 3)
 {
   MMAAAMAMAAAMMMMM
   MMAAAMAAAAAMAPMM
@@ -1686,7 +1686,7 @@ P = (108, 145, 182)
   MMAMAMMMAAPMMMPA
   MMMMAMMMMMMMMMPA
 }
-# tile 87 (explosion dark 4)
+# tile 88 (explosion dark 4)
 {
   APAAAMMPPAPAAAAA
   MAPAMMAMAAAPAAAM
@@ -1705,7 +1705,7 @@ P = (108, 145, 182)
   AAAAAAAAAAAAAMAA
   AAAAAAAAAAAMHHMM
 }
-# tile 88 (explosion dark 5)
+# tile 89 (explosion dark 5)
 {
   MMAAAMAMAMAAAAMM
   MMAAAAAMAMAAAAMM
@@ -1724,7 +1724,7 @@ P = (108, 145, 182)
   AAAMMMAAAAAAAMMM
   MMMMPPAAAAAAAAMM
 }
-# tile 89 (explosion dark 6)
+# tile 90 (explosion dark 6)
 {
   MMMMAMMMMMMMAMMP
   MMMMAMMMMMMMAAMM
@@ -1743,7 +1743,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 90 (explosion dark 7)
+# tile 91 (explosion dark 7)
 {
   PPPAAAAAPAAAMAMM
   AAPPAAPPPPAMAMMM
@@ -1762,7 +1762,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 91 (explosion dark 8)
+# tile 92 (explosion dark 8)
 {
   MMMMPMMAAAAAAAMM
   MMAMMAMAAMAMAAMM
@@ -1781,7 +1781,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 92 (explosion noxious 0)
+# tile 93 (explosion noxious 0)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -1800,7 +1800,7 @@ P = (108, 145, 182)
   MMFFFFMMFFFFMMMM
   MMFFFMMFFFFFMMMM
 }
-# tile 93 (explosion noxious 1)
+# tile 94 (explosion noxious 1)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -1819,7 +1819,7 @@ P = (108, 145, 182)
   MMMMMMMMFMFMFGFF
   MGHMMMHGHHFFFFFF
 }
-# tile 94 (explosion noxious 2)
+# tile 95 (explosion noxious 2)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -1838,7 +1838,7 @@ P = (108, 145, 182)
   FFMFMMFMFFFFMMMM
   FMFFMMFMFFFFFMMM
 }
-# tile 95 (explosion noxious 3)
+# tile 96 (explosion noxious 3)
 {
   MMFFFMFMFFFMMMMM
   MMFFFMFFFFFMFGMM
@@ -1857,7 +1857,7 @@ P = (108, 145, 182)
   MMFMFMMMFHGMMMGH
   MMMMFMMMMMMMMMGH
 }
-# tile 96 (explosion noxious 4)
+# tile 97 (explosion noxious 4)
 {
   FGHFFMMGGFGHFFFF
   MHGHMMFMFFHGFHFM
@@ -1876,7 +1876,7 @@ P = (108, 145, 182)
   HHHHNHNHNMGGGMGF
   GGGGNHHHGGGMHHMM
 }
-# tile 97 (explosion noxious 5)
+# tile 98 (explosion noxious 5)
 {
   MMFFFMFMFMFFFFMM
   MMFFFFFMFMFFFFMM
@@ -1895,7 +1895,7 @@ P = (108, 145, 182)
   HFHMMMFFFFFFFMMM
   MMMMGGFFFFFFFFMM
 }
-# tile 98 (explosion noxious 6)
+# tile 99 (explosion noxious 6)
 {
   MMMMFMMMMMMMHMMG
   MMMMFMMMMMMMFHMM
@@ -1914,7 +1914,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 99 (explosion noxious 7)
+# tile 100 (explosion noxious 7)
 {
   GGGHHHHHGHHHMHMM
   HHGGHHGGGGHMFMMM
@@ -1933,7 +1933,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 100 (explosion noxious 8)
+# tile 101 (explosion noxious 8)
 {
   MMMMGMMFFFFFFFMM
   MMFMMFMFFMFMFFMM
@@ -1952,7 +1952,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 101 (explosion muddy 0)
+# tile 102 (explosion muddy 0)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -1971,7 +1971,7 @@ P = (108, 145, 182)
   MMJJJJKKJJJJKKKK
   MMJJJKKJJJJJKKKK
 }
-# tile 102 (explosion muddy 1)
+# tile 103 (explosion muddy 1)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -1990,7 +1990,7 @@ P = (108, 145, 182)
   KKKKKKKKJKJKJCJJ
   KCLKKKLCLLJJJJJJ
 }
-# tile 103 (explosion muddy 2)
+# tile 104 (explosion muddy 2)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -2009,7 +2009,7 @@ P = (108, 145, 182)
   JJKJKKJKJJJJMMMM
   JKJJKKJKJJJJJMMM
 }
-# tile 104 (explosion muddy 3)
+# tile 105 (explosion muddy 3)
 {
   MMJJJKJKJJJKKKKK
   MMJJJKJJJJJKJCKK
@@ -2028,7 +2028,7 @@ P = (108, 145, 182)
   MMJMJKKKJLCKKKCL
   MMMMJKKKKKKKKKCL
 }
-# tile 105 (explosion muddy 4)
+# tile 106 (explosion muddy 4)
 {
   JCLJJKKCCJCLJJJJ
   KLCLKKJKJJLCJLJK
@@ -2047,7 +2047,7 @@ P = (108, 145, 182)
   LLLLCLCLCKCCCKCJ
   CCCCCLLLCCCKLLKK
 }
-# tile 106 (explosion muddy 5)
+# tile 107 (explosion muddy 5)
 {
   KKJJJKJKJKJJJJMM
   KKJJJJJKJKJJJJMM
@@ -2066,7 +2066,7 @@ P = (108, 145, 182)
   LJLKKKJJJJJJJMMM
   KKKKCCJJJJJJJJMM
 }
-# tile 107 (explosion muddy 6)
+# tile 108 (explosion muddy 6)
 {
   MMMMJKKKKKKKLKKC
   MMMMJKKKKKKKJLKK
@@ -2085,7 +2085,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 108 (explosion muddy 7)
+# tile 109 (explosion muddy 7)
 {
   CCCLLLLLCLLLKLKK
   LLCCLLCCCCLKJKKK
@@ -2104,7 +2104,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 109 (explosion muddy 8)
+# tile 110 (explosion muddy 8)
 {
   KKKKCKKJJJJJJJMM
   KKJKKJKJJKJKJJMM
@@ -2123,7 +2123,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 110 (explosion wet 0)
+# tile 111 (explosion wet 0)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -2142,7 +2142,7 @@ P = (108, 145, 182)
   MMEEEEPPEEEEPPPP
   MMEEEPPEEEEEPPPP
 }
-# tile 111 (explosion wet 1)
+# tile 112 (explosion wet 1)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -2161,7 +2161,7 @@ P = (108, 145, 182)
   PPPPPPPPEPEPEBEE
   PBNPPPNBEEEEEEEE
 }
-# tile 112 (explosion wet 2)
+# tile 113 (explosion wet 2)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -2180,7 +2180,7 @@ P = (108, 145, 182)
   EEPEPPEPEEEEMMMM
   EPEEPPEPEEEEEMMM
 }
-# tile 113 (explosion wet 3)
+# tile 114 (explosion wet 3)
 {
   MMEEEPEPEEEPPPPP
   MMEEEPEEEEEPEBPP
@@ -2199,7 +2199,7 @@ P = (108, 145, 182)
   MMEMEPPPENBPPPBE
   MMMMEPPPPPPPPPBE
 }
-# tile 114 (explosion wet 4)
+# tile 115 (explosion wet 4)
 {
   EBNEEPPBBEBNEEEE
   PNBNPPEPEEEBENEP
@@ -2218,7 +2218,7 @@ P = (108, 145, 182)
   EEEEEEEEEPBBBPBE
   BBBBEEEEBBBPNNPP
 }
-# tile 115 (explosion wet 5)
+# tile 116 (explosion wet 5)
 {
   PPEEEPEPEPEEEEMM
   PPEEEEEPEPEEEEMM
@@ -2237,7 +2237,7 @@ P = (108, 145, 182)
   NENPPPEEEEEEEMMM
   PPPPBBEEEEEEEEMM
 }
-# tile 116 (explosion wet 6)
+# tile 117 (explosion wet 6)
 {
   MMMMEPPPPPPPNPPB
   MMMMEPPPPPPPENPP
@@ -2256,7 +2256,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 117 (explosion wet 7)
+# tile 118 (explosion wet 7)
 {
   BBBEEEEEBEEEPEPP
   EEBBEEBBBBEPEPPP
@@ -2275,7 +2275,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 118 (explosion wet 8)
+# tile 119 (explosion wet 8)
 {
   PPPPBPPEEEEEEEMM
   PPEPPEPEEPEPEEMM
@@ -2294,7 +2294,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 119 (explosion magical 0)
+# tile 120 (explosion magical 0)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -2313,7 +2313,7 @@ P = (108, 145, 182)
   MMEEEEIIEEEEIIII
   MMEEEIIEEEEEIIII
 }
-# tile 120 (explosion magical 1)
+# tile 121 (explosion magical 1)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -2332,7 +2332,7 @@ P = (108, 145, 182)
   IIIIIIIIEIEIELEE
   ILHIIIHLHHEEEEEE
 }
-# tile 121 (explosion magical 2)
+# tile 122 (explosion magical 2)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -2351,7 +2351,7 @@ P = (108, 145, 182)
   EEIEIIEIEEEEMMMM
   EIEEIIEIEEEEEMMM
 }
-# tile 122 (explosion magical 3)
+# tile 123 (explosion magical 3)
 {
   MMEEEIEIEEEIIIII
   MMEEEIEEEEEIEIII
@@ -2370,7 +2370,7 @@ P = (108, 145, 182)
   MMEMEIIIENIIIIIN
   MMMMEIIIIIIIIIIN
 }
-# tile 123 (explosion magical 4)
+# tile 124 (explosion magical 4)
 {
   EINEEIIIIEINEEEE
   ININIIEIEENIENEI
@@ -2389,7 +2389,7 @@ P = (108, 145, 182)
   NNNNNNNNNIIIIIIE
   IIIINNNNIIIINNII
 }
-# tile 124 (explosion magical 5)
+# tile 125 (explosion magical 5)
 {
   IIEEEIEIEIEEEEMM
   IIEEEEEIEIEEEEMM
@@ -2408,7 +2408,7 @@ P = (108, 145, 182)
   NENIIIEEEEEEEMMM
   IIIIIIEEEEEEEEMM
 }
-# tile 125 (explosion magical 6)
+# tile 126 (explosion magical 6)
 {
   MMMMEIIIIIIIHIII
   MMMMEIIIIIIIEHII
@@ -2427,7 +2427,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 126 (explosion magical 7)
+# tile 127 (explosion magical 7)
 {
   IIINNNNNINNNINII
   NNIINNIIIINIEIII
@@ -2446,7 +2446,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 127 (explosion magical 8)
+# tile 128 (explosion magical 8)
 {
   IIIIIIIEEEEEEEMM
   IIEIIEIEEIEIEEMM
@@ -2465,7 +2465,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 128 (explosion fiery 0)
+# tile 129 (explosion fiery 0)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -2484,7 +2484,7 @@ P = (108, 145, 182)
   MMDDDDCCDDDDCCCC
   MMDDDCCDDDDDCCCC
 }
-# tile 129 (explosion fiery 1)
+# tile 130 (explosion fiery 1)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -2503,7 +2503,7 @@ P = (108, 145, 182)
   CCCCCCCCDCDCDLDD
   CLHCCCHLHHDDDDDD
 }
-# tile 130 (explosion fiery 2)
+# tile 131 (explosion fiery 2)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -2522,7 +2522,7 @@ P = (108, 145, 182)
   DDCDCCDCDDDDMMMM
   DCDDCCDCDDDDDMMM
 }
-# tile 131 (explosion fiery 3)
+# tile 132 (explosion fiery 3)
 {
   MMDDDCDCDDDCCCCC
   MMDDDCDDDDDCDLCC
@@ -2541,7 +2541,7 @@ P = (108, 145, 182)
   MMDMDCCCDHLCCCLH
   MMMMDCCCCCCCCCLH
 }
-# tile 132 (explosion fiery 4)
+# tile 133 (explosion fiery 4)
 {
   DLHDDCCLLDLHDDDD
   CHLHCCDCDDHLDHDC
@@ -2560,7 +2560,7 @@ P = (108, 145, 182)
   HHHHNHNHNCLLLCLD
   LLLLNHHHLLLCHHCC
 }
-# tile 133 (explosion fiery 5)
+# tile 134 (explosion fiery 5)
 {
   CCDDDCDCDCDDDDMM
   CCDDDDDCDCDDDDMM
@@ -2579,7 +2579,7 @@ P = (108, 145, 182)
   HDHCCCDDDDDDDMMM
   CCCCLLDDDDDDDDMM
 }
-# tile 134 (explosion fiery 6)
+# tile 135 (explosion fiery 6)
 {
   MMMMDCCCCCCCHCCL
   MMMMDCCCCCCCDHCC
@@ -2598,7 +2598,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 135 (explosion fiery 7)
+# tile 136 (explosion fiery 7)
 {
   LLLHHHHHLHHHCHCC
   HHLLHHLLLLHCDCCC
@@ -2617,7 +2617,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 136 (explosion fiery 8)
+# tile 137 (explosion fiery 8)
 {
   CCCCLCCDDDDDDDMM
   CCDCCDCDDCDCDDMM
@@ -2636,7 +2636,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 137 (explosion frosty 0)
+# tile 138 (explosion frosty 0)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -2655,7 +2655,7 @@ P = (108, 145, 182)
   MMEEEEPPNBEEPPPP
   MMEEEPPEEEEEPPPP
 }
-# tile 138 (explosion frosty 1)
+# tile 139 (explosion frosty 1)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -2674,7 +2674,7 @@ P = (108, 145, 182)
   PPPPPPPPEPEPEBEE
   PBNPPPNBNNEEEEEE
 }
-# tile 139 (explosion frosty 2)
+# tile 140 (explosion frosty 2)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -2693,7 +2693,7 @@ P = (108, 145, 182)
   EEPEPPEPEEEEMMMM
   EPEEPPEPEEEEEMMM
 }
-# tile 140 (explosion frosty 3)
+# tile 141 (explosion frosty 3)
 {
   MMEEEPEPEEEPPPPP
   MMEEEPEEEEEPEBPP
@@ -2712,7 +2712,7 @@ P = (108, 145, 182)
   MMEMEPPPENBPPPBN
   MMMMEPPPPPPPPPBN
 }
-# tile 141 (explosion frosty 4)
+# tile 142 (explosion frosty 4)
 {
   EBNEEPPBBEBNEEEE
   PNBNPPEPEENBENEP
@@ -2731,7 +2731,7 @@ P = (108, 145, 182)
   NNNNNNNNNPBBBPBE
   BBBBNNNNBBBPNNPP
 }
-# tile 142 (explosion frosty 5)
+# tile 143 (explosion frosty 5)
 {
   PPEEEPEPEPEEEEMM
   PPEEEEEPEPEEEEMM
@@ -2750,7 +2750,7 @@ P = (108, 145, 182)
   NENPPPEEEEEEEMMM
   PPPPBBEEEEEEEEMM
 }
-# tile 143 (explosion frosty 6)
+# tile 144 (explosion frosty 6)
 {
   MMMMEPPPPPPPNPPB
   MMMMEPPPPPPPENPP
@@ -2769,7 +2769,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 144 (explosion frosty 7)
+# tile 145 (explosion frosty 7)
 {
   BBBNNNNNBNNNPNPP
   NNBBNNBBBBNPEPPP
@@ -2788,7 +2788,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 145 (explosion frosty 8)
+# tile 146 (explosion frosty 8)
 {
   PPPPBPPEEEEEEEMM
   PPEPPEPEEPEPEEMM
@@ -2807,7 +2807,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMNMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 146 (zap 0 0)
+# tile 147 (zap 0 0)
 {
   MMMMMMMIIMMMMMMM
   MMMMMMIIIIMMMMMM
@@ -2826,7 +2826,7 @@ P = (108, 145, 182)
   MMMMMMIIIIMMMMMM
   MMMMMMMIIMMMMMMM
 }
-# tile 147 (zap 0 1)
+# tile 148 (zap 0 1)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -2845,7 +2845,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 148 (zap 0 2)
+# tile 149 (zap 0 2)
 {
   IIIMMMMMMMMMMMMM
   IIIIMMMMMMMMMMMM
@@ -2864,7 +2864,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMIIII
   MMMMMMMMMMMMMIII
 }
-# tile 149 (zap 0 3)
+# tile 150 (zap 0 3)
 {
   MMMMMMMMMMMMMIII
   MMMMMMMMMMMMIIII
@@ -2883,7 +2883,7 @@ P = (108, 145, 182)
   IIIIMMMMMMMMMMMM
   IIIMMMMMMMMMMMMM
 }
-# tile 150 (zap 1 0)
+# tile 151 (zap 1 0)
 {
   MMMMMMMCCMMMMMMM
   MMMMMMCCCCMMMMMM
@@ -2902,7 +2902,7 @@ P = (108, 145, 182)
   MMMMMMCCCCMMMMMM
   MMMMMMMCCMMMMMMM
 }
-# tile 151 (zap 1 1)
+# tile 152 (zap 1 1)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -2921,7 +2921,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 152 (zap 1 2)
+# tile 153 (zap 1 2)
 {
   CCCMMMMMMMMMMMMM
   CCCCMMMMMMMMMMMM
@@ -2940,7 +2940,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMCCCC
   MMMMMMMMMMMMMCCC
 }
-# tile 153 (zap 1 3)
+# tile 154 (zap 1 3)
 {
   MMMMMMMMMMMMMCCC
   MMMMMMMMMMMMCCCC
@@ -2959,7 +2959,7 @@ P = (108, 145, 182)
   CCCCMMMMMMMMMMMM
   CCCMMMMMMMMMMMMM
 }
-# tile 154 (zap 2 0)
+# tile 155 (zap 2 0)
 {
   MMMMMMMNNMMMMMMM
   MMMMMMNNNNMMMMMM
@@ -2978,7 +2978,7 @@ P = (108, 145, 182)
   MMMMMMNNNNMMMMMM
   MMMMMMMNNMMMMMMM
 }
-# tile 155 (zap 2 1)
+# tile 156 (zap 2 1)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -2997,7 +2997,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 156 (zap 2 2)
+# tile 157 (zap 2 2)
 {
   NNNMMMMMMMMMMMMM
   NNNNMMMMMMMMMMMM
@@ -3016,7 +3016,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMNNNN
   MMMMMMMMMMMMMNNN
 }
-# tile 157 (zap 2 3)
+# tile 158 (zap 2 3)
 {
   MMMMMMMMMMMMMNNN
   MMMMMMMMMMMMNNNN
@@ -3035,7 +3035,7 @@ P = (108, 145, 182)
   NNNNMMMMMMMMMMMM
   NNNMMMMMMMMMMMMM
 }
-# tile 158 (zap 3 0)
+# tile 159 (zap 3 0)
 {
   MMMMMMMBBMMMMMMM
   MMMMMMBBBBMMMMMM
@@ -3054,7 +3054,7 @@ P = (108, 145, 182)
   MMMMMMBBBBMMMMMM
   MMMMMMMBBMMMMMMM
 }
-# tile 159 (zap 3 1)
+# tile 160 (zap 3 1)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -3073,7 +3073,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 160 (zap 3 2)
+# tile 161 (zap 3 2)
 {
   BBBMMMMMMMMMMMMM
   BBBBMMMMMMMMMMMM
@@ -3092,7 +3092,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMBBBB
   MMMMMMMMMMMMMBBB
 }
-# tile 161 (zap 3 3)
+# tile 162 (zap 3 3)
 {
   MMMMMMMMMMMMMBBB
   MMMMMMMMMMMMBBBB
@@ -3111,7 +3111,7 @@ P = (108, 145, 182)
   BBBBMMMMMMMMMMMM
   BBBMMMMMMMMMMMMM
 }
-# tile 162 (zap 4 0)
+# tile 163 (zap 4 0)
 {
   MMMMMMMAAMMMMMMM
   MMMMMMAAAAMMMMMM
@@ -3130,7 +3130,7 @@ P = (108, 145, 182)
   MMMMMMAAAAMMMMMM
   MMMMMMMAAMMMMMMM
 }
-# tile 163 (zap 4 1)
+# tile 164 (zap 4 1)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -3149,7 +3149,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 164 (zap 4 2)
+# tile 165 (zap 4 2)
 {
   AAAMMMMMMMMMMMMM
   AAAAMMMMMMMMMMMM
@@ -3168,7 +3168,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMAAAA
   MMMMMMMMMMMMMAAA
 }
-# tile 165 (zap 4 3)
+# tile 166 (zap 4 3)
 {
   MMMMMMMMMMMMMAAA
   MMMMMMMMMMMMAAAA
@@ -3187,7 +3187,7 @@ P = (108, 145, 182)
   AAAAMMMMMMMMMMMM
   AAAMMMMMMMMMMMMM
 }
-# tile 166 (zap 5 0)
+# tile 167 (zap 5 0)
 {
   MMMMMMMNNMMMMMMM
   MMMMMMNNNNMMMMMM
@@ -3206,7 +3206,7 @@ P = (108, 145, 182)
   MMMMMMNNNNMMMMMM
   MMMMMMMNNMMMMMMM
 }
-# tile 167 (zap 5 1)
+# tile 168 (zap 5 1)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -3225,7 +3225,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 168 (zap 5 2)
+# tile 169 (zap 5 2)
 {
   NNNMMMMMMMMMMMMM
   NNNNMMMMMMMMMMMM
@@ -3244,7 +3244,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMNNNN
   MMMMMMMMMMMMMNNN
 }
-# tile 169 (zap 5 3)
+# tile 170 (zap 5 3)
 {
   MMMMMMMMMMMMMNNN
   MMMMMMMMMMMMNNNN
@@ -3263,7 +3263,7 @@ P = (108, 145, 182)
   NNNNMMMMMMMMMMMM
   NNNMMMMMMMMMMMMM
 }
-# tile 170 (zap 6 0)
+# tile 171 (zap 6 0)
 {
   MMMMMMMFFMMMMMMM
   MMMMMMFFFFMMMMMM
@@ -3282,7 +3282,7 @@ P = (108, 145, 182)
   MMMMMMFFFFMMMMMM
   MMMMMMMFFMMMMMMM
 }
-# tile 171 (zap 6 1)
+# tile 172 (zap 6 1)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -3301,7 +3301,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 172 (zap 6 2)
+# tile 173 (zap 6 2)
 {
   FFFMMMMMMMMMMMMM
   FFFFMMMMMMMMMMMM
@@ -3320,7 +3320,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMFFFF
   MMMMMMMMMMMMMFFF
 }
-# tile 173 (zap 6 3)
+# tile 174 (zap 6 3)
 {
   MMMMMMMMMMMMMFFF
   MMMMMMMMMMMMFFFF
@@ -3339,7 +3339,7 @@ P = (108, 145, 182)
   FFFFMMMMMMMMMMMM
   FFFMMMMMMMMMMMMM
 }
-# tile 174 (zap 7 0)
+# tile 175 (zap 7 0)
 {
   MMMMMMMGGMMMMMMM
   MMMMMMGGGGMMMMMM
@@ -3358,7 +3358,7 @@ P = (108, 145, 182)
   MMMMMMGGGGMMMMMM
   MMMMMMMGGMMMMMMM
 }
-# tile 175 (zap 7 1)
+# tile 176 (zap 7 1)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -3377,7 +3377,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 176 (zap 7 2)
+# tile 177 (zap 7 2)
 {
   GGGMMMMMMMMMMMMM
   GGGGMMMMMMMMMMMM
@@ -3396,7 +3396,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMGGGG
   MMMMMMMMMMMMMGGG
 }
-# tile 177 (zap 7 3)
+# tile 178 (zap 7 3)
 {
   MMMMMMMMMMMMMGGG
   MMMMMMMMMMMMGGGG
@@ -3415,7 +3415,7 @@ P = (108, 145, 182)
   GGGGMMMMMMMMMMMM
   GGGMMMMMMMMMMMMM
 }
-# tile 178 (warning 0)
+# tile 179 (warning 0)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -3434,7 +3434,7 @@ P = (108, 145, 182)
   MMMMMMMAAMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 179 (warning 1)
+# tile 180 (warning 1)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -3453,7 +3453,7 @@ P = (108, 145, 182)
   MMMMMMMAAMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 180 (warning 2)
+# tile 181 (warning 2)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -3472,7 +3472,7 @@ P = (108, 145, 182)
   MMMMMMMAAMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 181 (warning 3)
+# tile 182 (warning 3)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -3491,7 +3491,7 @@ P = (108, 145, 182)
   MMMMMMMAAMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 182 (warning 4)
+# tile 183 (warning 4)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -3510,7 +3510,7 @@ P = (108, 145, 182)
   MMMMMMMAAMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 183 (warning 5)
+# tile 184 (warning 5)
 {
   MMMMMMMMMMMMMMMM
   MMMMMMMMMMMMMMMM
@@ -3529,7 +3529,7 @@ P = (108, 145, 182)
   MMMMMMMAAMMMMMMM
   MMMMMMMMMMMMMMMM
 }
-# tile 184 (sub mine walls 0)
+# tile 185 (sub mine walls 0)
 {
   AJJKKKACJAAJJJAA
   AJKKKACLJJAJJJJA
@@ -3548,7 +3548,7 @@ P = (108, 145, 182)
   AAJACKCKKJJJAJAA
   AAJCKKJAAAJJJJJA
 }
-# tile 185 (sub mine walls 1)
+# tile 186 (sub mine walls 1)
 {
   AJAAAAAAJJAAAJAA
   JJJAAAJJJJJAAAAJ
@@ -3567,7 +3567,7 @@ P = (108, 145, 182)
   JJJJJJJJJJJJJJJJ
   AAAAAAAAAAAAAAAA
 }
-# tile 186 (sub mine walls 2)
+# tile 187 (sub mine walls 2)
 {
   AAAAAAKCCKKJAAAA
   AAAAKKCLCJKJJAAA
@@ -3586,7 +3586,7 @@ P = (108, 145, 182)
   AAJACKCKKJJJAJAA
   AAJCKKJAAAJJJJJA
 }
-# tile 187 (sub mine walls 3)
+# tile 188 (sub mine walls 3)
 {
   AAAAAAKCCKKJAAAA
   AAAAKKCLCJKJJAAA
@@ -3605,7 +3605,7 @@ P = (108, 145, 182)
   AAJACKCKKJJJAJAA
   AAJCKKJAAAJJJJJA
 }
-# tile 188 (sub mine walls 4)
+# tile 189 (sub mine walls 4)
 {
   AKKKAAKKKKAAJJJA
   AKKAAKCCCJJJAAJA
@@ -3624,7 +3624,7 @@ P = (108, 145, 182)
   AJJJJJJJJJJJJJJJ
   AAAAAAAAAAAAAAAA
 }
-# tile 189 (sub mine walls 5)
+# tile 190 (sub mine walls 5)
 {
   AKKAAAKKAAAAJJJA
   AKAAKKLCKAAAAAJA
@@ -3643,7 +3643,7 @@ P = (108, 145, 182)
   JJJJJJJJJJJJJJJA
   AAAAAAAAAAAAAAAA
 }
-# tile 190 (sub mine walls 6)
+# tile 191 (sub mine walls 6)
 {
   AAAAAAKCCKKJAAAA
   AAAAKCCLCJKJJAAA
@@ -3662,7 +3662,7 @@ P = (108, 145, 182)
   AAJACKCKKJJJAJAA
   AAJCKKJAAAJJJJJA
 }
-# tile 191 (sub mine walls 7)
+# tile 192 (sub mine walls 7)
 {
   AKKAAAKKKKAAJJJA
   AKAAKKLCCJJJAAJA
@@ -3681,7 +3681,7 @@ P = (108, 145, 182)
   JJJJJJJJJJJJJJJJ
   AAAAAAAAAAAAAAAA
 }
-# tile 192 (sub mine walls 8)
+# tile 193 (sub mine walls 8)
 {
   AAAAAAKCCKKJAAAA
   AAAAKCCLCJKJJAAA
@@ -3700,7 +3700,7 @@ P = (108, 145, 182)
   AAJACKCKKJJJAJAA
   AAJCKKJAAAJJJJJA
 }
-# tile 193 (sub mine walls 9)
+# tile 194 (sub mine walls 9)
 {
   AKKAACKCCKKJAJJA
   AKACKKKLLJKJJAJA
@@ -3719,7 +3719,7 @@ P = (108, 145, 182)
   AAJACKCKKJJJAJAA
   AAJCKKJAAAJJJJJA
 }
-# tile 194 (sub mine walls 10)
+# tile 195 (sub mine walls 10)
 {
   AKKAACKCCKKJAJJA
   AKACKKCLCJKJJAJA
@@ -3738,7 +3738,7 @@ P = (108, 145, 182)
   AAJACKCKKJJJAJAA
   AAJCKKJAAAJJJJJA
 }
-# tile 195 (sub gehennom walls 0)
+# tile 196 (sub gehennom walls 0)
 {
   ALLDAJMMMMMJLLDA
   ADDDAJMJMMJJDDDA
@@ -3757,7 +3757,7 @@ P = (108, 145, 182)
   AJJJAJJMMMMJJJJA
   ADMMAJJMMMMJDMJA
 }
-# tile 196 (sub gehennom walls 1)
+# tile 197 (sub gehennom walls 1)
 {
   AAALDDAAAAALDDAA
   DDDLDDAJDDDLDDAJ
@@ -3776,7 +3776,7 @@ P = (108, 145, 182)
   JJJJJJJJJJJJJJJJ
   AAAAAAAAAAAAAAAA
 }
-# tile 197 (sub gehennom walls 2)
+# tile 198 (sub gehennom walls 2)
 {
   AAALLLLDDDDDDAAA
   LLLLAAJJMMMMDJJJ
@@ -3795,7 +3795,7 @@ P = (108, 145, 182)
   AJJJAJJMMMMJJJJA
   ADMMAJJMMMMJDMJA
 }
-# tile 198 (sub gehennom walls 3)
+# tile 199 (sub gehennom walls 3)
 {
   AAALLLLDDDDDDAAA
   LLLLAAJJMMMMDJJJ
@@ -3814,7 +3814,7 @@ P = (108, 145, 182)
   AJJJAJJMMMMJJJJA
   ADMMAJJMMMMJDMJA
 }
-# tile 199 (sub gehennom walls 4)
+# tile 200 (sub gehennom walls 4)
 {
   AAALLLLDDDDDDAAA
   LLLLAAJJMMMMDJJJ
@@ -3833,7 +3833,7 @@ P = (108, 145, 182)
   JJJJJJJJJJJJJJJJ
   AAAAAAAAAAAAAAAA
 }
-# tile 200 (sub gehennom walls 5)
+# tile 201 (sub gehennom walls 5)
 {
   AAALLLLDDDDDDAAA
   LLLLAAJJMMMMDJJJ
@@ -3852,7 +3852,7 @@ P = (108, 145, 182)
   JJJJJJJJJJJJJJJJ
   AAAAAAAAAAAAAAAA
 }
-# tile 201 (sub gehennom walls 6)
+# tile 202 (sub gehennom walls 6)
 {
   AAALLLLDDDDDDAAA
   LLLLAAJJMMMMDJJJ
@@ -3871,7 +3871,7 @@ P = (108, 145, 182)
   AJJJAJJMMMMJJJJA
   ADMMAJJMMMMJDMJA
 }
-# tile 202 (sub gehennom walls 7)
+# tile 203 (sub gehennom walls 7)
 {
   AAALLLLDDDDDDAAA
   LLLLAAJJMMMMDJJJ
@@ -3890,7 +3890,7 @@ P = (108, 145, 182)
   JJJJJJJJJJJJJJJJ
   AAAAAAAAAAAAAAAA
 }
-# tile 203 (sub gehennom walls 8)
+# tile 204 (sub gehennom walls 8)
 {
   AAALLLLDDDDDDAAA
   LLLLAAJJMMMMDJJJ
@@ -3909,7 +3909,7 @@ P = (108, 145, 182)
   AJJJAJJMMMMJJJJA
   ADMMAJJMMMMJDMJA
 }
-# tile 204 (sub gehennom walls 9)
+# tile 205 (sub gehennom walls 9)
 {
   AAALLLLDDDDDDAAA
   LLLLAAJJMMMMDJJJ
@@ -3928,7 +3928,7 @@ P = (108, 145, 182)
   AJJJAJJMMMMJJJJA
   ADMMAJJMMMMJDMJA
 }
-# tile 205 (sub gehennom walls 10)
+# tile 206 (sub gehennom walls 10)
 {
   AAALLLLDDDDDDAAA
   LLLLAAJJMMMMDJJJ
@@ -3947,7 +3947,7 @@ P = (108, 145, 182)
   AJJJAJJMMMMJJJJA
   ADMMAJJMMMMJDMJA
 }
-# tile 206 (sub knox walls 0)
+# tile 207 (sub knox walls 0)
 {
   AJJJAAACJAAAJJJA
   AJJJAACLJJAAJJJA
@@ -3966,7 +3966,7 @@ P = (108, 145, 182)
   AAJAAACKKJAAAJAA
   ACJJAAAAAAAACJJA
 }
-# tile 207 (sub knox walls 1)
+# tile 208 (sub knox walls 1)
 {
   AJAAAJAAAJAAAJAA
   JJJAAAJAJJJAAAJA
@@ -3985,7 +3985,7 @@ P = (108, 145, 182)
   KJJACJJAKJJACJJA
   AAAAAAAAAAAAAAAA
 }
-# tile 208 (sub knox walls 2)
+# tile 209 (sub knox walls 2)
 {
   AAAAAAKCJKAAAAAA
   AAAAKKCLKJKKAAAA
@@ -4004,7 +4004,7 @@ P = (108, 145, 182)
   AAJAAACKKJAAAJAA
   ACJJAAAAAAAACJJA
 }
-# tile 209 (sub knox walls 3)
+# tile 210 (sub knox walls 3)
 {
   AAAAAAKCJKAAAAAA
   AAAAKKCLKJKKAAAA
@@ -4023,7 +4023,7 @@ P = (108, 145, 182)
   AAJAAACKKJAAAJAA
   ACJJAAAAAAAACJJA
 }
-# tile 210 (sub knox walls 4)
+# tile 211 (sub knox walls 4)
 {
   AAAAAAKCJKAAAAAA
   AAAAKKCLKJKKAAAA
@@ -4042,7 +4042,7 @@ P = (108, 145, 182)
   KJJACJJAKJJACJJA
   AAAAAAAAAAAAAAAA
 }
-# tile 211 (sub knox walls 5)
+# tile 212 (sub knox walls 5)
 {
   AAAAAAKCJKAAAAAA
   AAAAKKCLKJKKAAAA
@@ -4061,7 +4061,7 @@ P = (108, 145, 182)
   KJJACJJAKJJACJJA
   AAAAAAAAAAAAAAAA
 }
-# tile 212 (sub knox walls 6)
+# tile 213 (sub knox walls 6)
 {
   AAAAAAKCJKAAAAAA
   AAAAKKCLKJKKAAAA
@@ -4080,7 +4080,7 @@ P = (108, 145, 182)
   AAJAAACKKJAAAJAA
   ACJJAAAAAAAACJJA
 }
-# tile 213 (sub knox walls 7)
+# tile 214 (sub knox walls 7)
 {
   AAAAAAKCJKAAAAAA
   AAAAKKCLKJKKAAAA
@@ -4099,7 +4099,7 @@ P = (108, 145, 182)
   KJJACJJAKJJACJJA
   AAAAAAAAAAAAAAAA
 }
-# tile 214 (sub knox walls 8)
+# tile 215 (sub knox walls 8)
 {
   AAAAAAKCJKAAAAAA
   AAAAKKCLKJKKAAAA
@@ -4118,7 +4118,7 @@ P = (108, 145, 182)
   AAJAAACKKJAAAJAA
   ACJJAAAAAAAACJJA
 }
-# tile 215 (sub knox walls 9)
+# tile 216 (sub knox walls 9)
 {
   AAAAAAKCJKAAAAAA
   AAAAKKCLKJKKAAAA
@@ -4137,7 +4137,7 @@ P = (108, 145, 182)
   AAJAAACKKJAAAJAA
   ACJJAAAAAAAACJJA
 }
-# tile 216 (sub knox walls 10)
+# tile 217 (sub knox walls 10)
 {
   AAAAAAKCJKAAAAAA
   AAAAKKCLKJKKAAAA
@@ -4156,7 +4156,7 @@ P = (108, 145, 182)
   AAJAAACKKJAAAJAA
   ACJJAAAAAAAACJJA
 }
-# tile 217 (sub sokoban walls 0)
+# tile 218 (sub sokoban walls 0)
 {
   ANNBAMEEEEEMNNBA
   ABBBAMEMEEMMBBBA
@@ -4175,7 +4175,7 @@ P = (108, 145, 182)
   AMMMAMMEEEEMMMMA
   ABEEAMMEEEEMBEMA
 }
-# tile 218 (sub sokoban walls 1)
+# tile 219 (sub sokoban walls 1)
 {
   AAANBBAAAAANBBAA
   BBBNBBAMBBBNBBAM
@@ -4194,7 +4194,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   AAAAAAAAAAAAAAAA
 }
-# tile 219 (sub sokoban walls 2)
+# tile 220 (sub sokoban walls 2)
 {
   AAANNNNBBBBBBAAA
   NNNNAAMMEEEEBMMM
@@ -4213,7 +4213,7 @@ P = (108, 145, 182)
   AMMMAMMEEEEMMMMA
   ABEEAMMEEEEMBEMA
 }
-# tile 220 (sub sokoban walls 3)
+# tile 221 (sub sokoban walls 3)
 {
   AAANNNNBBBBBBAAA
   NNNNAAMMEEEEBMMM
@@ -4232,7 +4232,7 @@ P = (108, 145, 182)
   AMMMAMMEEEEMMMMA
   ABEEAMMEEEEMBEMA
 }
-# tile 221 (sub sokoban walls 4)
+# tile 222 (sub sokoban walls 4)
 {
   AAANNNNBBBBBBAAA
   NNNNAAMMEEEEBMMM
@@ -4251,7 +4251,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   AAAAAAAAAAAAAAAA
 }
-# tile 222 (sub sokoban walls 5)
+# tile 223 (sub sokoban walls 5)
 {
   AAANNNNBBBBBBAAA
   NNNNAAMMEEEEBMMM
@@ -4270,7 +4270,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   AAAAAAAAAAAAAAAA
 }
-# tile 223 (sub sokoban walls 6)
+# tile 224 (sub sokoban walls 6)
 {
   AAANNNNBBBBBBAAA
   NNNNAAMMEEEEBMMM
@@ -4289,7 +4289,7 @@ P = (108, 145, 182)
   AMMMAMMEEEEMMMMA
   ABEEAMMEEEEMBEMA
 }
-# tile 224 (sub sokoban walls 7)
+# tile 225 (sub sokoban walls 7)
 {
   AAANNNNBBBBBBAAA
   NNNNAAMMEEEEBMMM
@@ -4308,7 +4308,7 @@ P = (108, 145, 182)
   MMMMMMMMMMMMMMMM
   AAAAAAAAAAAAAAAA
 }
-# tile 225 (sub sokoban walls 8)
+# tile 226 (sub sokoban walls 8)
 {
   AAANNNNBBBBBBAAA
   NNNNAAMMEEEEBMMM
@@ -4327,7 +4327,7 @@ P = (108, 145, 182)
   AMMMAMMEEEEMMMMA
   ABEEAMMEEEEMBEMA
 }
-# tile 226 (sub sokoban walls 9)
+# tile 227 (sub sokoban walls 9)
 {
   AAANNNNBBBBBBAAA
   NNNNAAMMEEEEBMMM
@@ -4346,7 +4346,7 @@ P = (108, 145, 182)
   AMMMAMMEEEEMMMMA
   ABEEAMMEEEEMBEMA
 }
-# tile 227 (sub sokoban walls 10)
+# tile 228 (sub sokoban walls 10)
 {
   AAANNNNBBBBBBAAA
   NNNNAAMMEEEEBMMM
