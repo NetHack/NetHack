@@ -2206,6 +2206,9 @@ int		src;
     } else if (src == SET_IN_SYS && match_varname(buf, "RECOVER", 7)) {
         if (sysopt.recover) free(sysopt.recover);
         sysopt.recover = dupstr(bufp);
+    } else if (src == SET_IN_SYS && match_varname(buf, "CHECK_SAVE_UID", 14)) {
+	n = atoi(bufp);
+	sysopt.check_save_uid = n;
     } else if (match_varname(buf, "SEDUCE", 6)) {
         n = !!atoi(bufp);	/* XXX this could be tighter */
         /* allow anyone to turn it off, but only sysconf to turn it on*/

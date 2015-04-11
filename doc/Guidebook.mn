@@ -3007,6 +3007,9 @@ A string explaining how to recover a game on this system (no default value).
 SEDUCE
 0 or 1 to disable or enable, respectively, the SEDUCE option (see the source
 for details on this function).
+.lp
+CHECK_SAVE_UID
+0 or 1 to disable or enable, respectively, the UID checking for savefiles.
 .pg
 The following options affect the score file:
 .pg
