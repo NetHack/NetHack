@@ -1,4 +1,4 @@
-/* NetHack 3.5	mkobj.c	$NHDT-Date: 1426470337 2015/03/16 01:45:37 $  $NHDT-Branch: derek-farming $:$NHDT-Revision: 1.77 $ */
+/* NetHack 3.5	mkobj.c	$NHDT-Date: 1428715841 2015/04/11 01:30:41 $  $NHDT-Branch: master $:$NHDT-Revision: 1.91 $ */
 /* NetHack 3.5	mkobj.c	$Date: 2012/03/10 02:49:08 $  $Revision: 1.70 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2163,7 +2163,8 @@ obj_nexto(otmp)
  */
 struct obj*
 obj_nexto_xy(otyp, x, y, oid)
-    int otyp, x, y, oid;
+int otyp, x, y;
+unsigned oid;
 {
     struct obj* otmp;
     int fx, fy, ex, ey;
@@ -2187,13 +2188,12 @@ obj_nexto_xy(otyp, x, y, oid)
         for (fy = ey; abs(fy - ey) < 3; fy += dy) {
             /* 0, 0 was checked above */
             if (fx != x || fy != y) {
-                if (otmp = sobj_at(otyp, fx, fy)) {
+                if ((otmp = sobj_at(otyp, fx, fy)) != 0) {
                     return otmp;
                 }
             }
         }
     }
-    
     return NULL;
 }
 

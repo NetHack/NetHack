@@ -1,4 +1,4 @@
-/* NetHack 3.5	extern.h	$NHDT-Date: 1426966688 2015/03/21 19:38:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.411 $ */
+/* NetHack 3.5	extern.h	$NHDT-Date: 1428715841 2015/04/11 01:30:41 $  $NHDT-Branch: master $:$NHDT-Revision: 1.454 $ */
 /* NetHack 3.5	extern.h	$Date: 2013/11/05 00:57:53 $  $Revision: 1.380 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1228,7 +1228,7 @@ E long FDECL(peek_at_iced_corpse_age, (struct obj *));
 E int FDECL(hornoplenty, (struct obj *,BOOLEAN_P));
 E void NDECL(obj_sanity_check);
 E struct obj* FDECL(obj_nexto, (struct obj*));
-E struct obj* FDECL(obj_nexto_xy, (int, int, int, int));
+E struct obj* FDECL(obj_nexto_xy, (int, int, int, unsigned));
 E struct obj* FDECL(obj_absorb, (struct obj**, struct obj**));
 E struct obj* FDECL(obj_meld, (struct obj**, struct obj**));
 
