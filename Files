@@ -1,4 +1,4 @@
-This is a listing of all files in a full NetHack 3.5 distribution, organized
+This is a listing of all files in a full NetHack 3.6 distribution, organized
 in their standard manner on a UNIX system.  It indicates which files are
 necessary for which versions, so that you can tell which files may be deleted
 from or not transferred to your system if you wish.
@@ -17,7 +17,8 @@ cmdhelp         data.base       dungeon.def     endgame.des     gehennom.des
 help            hh              history         knox.des        license
 medusa.des      mines.des       opthelp         oracle.des      oracles.txt
 quest.txt       rumors.fal      rumors.tru      sokoban.des     symbols
-tower.des       wizhelp         yendor.des
+tower.des       wizhelp         yendor.des      tribute         bogusmon.txt
+engrave.txt     epitaph.txt
 
 doc:
 (files for all versions)
@@ -265,8 +266,8 @@ petmark.uu      resource.h      rip.uu          splash.uu       tiles.mak
 winMS.h         winhack.c       winhack.rc
 (files for Visual Studio 2010 Express Edition builds)
 dgncomp.vcxproj  dgnstuff.vcxproj dgnstuff.mak     dlb_main.vcxproj levcomp.vcxproj
-levstuff.vcxproj levstuff.mak     makedefs.vcxproj nethack.sln      uudecode.vcxproj
-nethackw.vcxproj tile2bmp.vcxproj recover.vcxproj  tilemap.vcxproj  tiles.vcxproj
+levstuff.vcxproj levstuff.mak     makedefs.vcxproj NetHack.sln      uudecode.vcxproj
+NetHackW.vcxproj tile2bmp.vcxproj recover.vcxproj  tilemap.vcxproj  tiles.vcxproj
 
 This is a list of files produced by auxiliary programs.  They can all be
 regenerated from the files in the distribution.

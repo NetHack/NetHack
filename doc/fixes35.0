@@ -894,6 +894,9 @@ non-pet rust monsters would eat rust-proofed non-digestibles but ignore
 kicking a grave may topple the gravestone
 allow showing legal positions for stinking cloud, jumping and polearms
 	when asked for a location
+cloned creatures (of any type) don't deathdrop items
+pudding corpses behave somewhat differently than before
+mithril armor should have silver color
 
 
 Platform- and/or Interface-Specific Fixes
@@ -1112,6 +1115,7 @@ show more explicit reason why player was helpless at death
 added new hallucinatory-only gods
 options to create the character blind or nudist
 moving clouds on the plane of air
+disclose extinct species alongside genocided ones
 tribute to Terry Pratchett
 
 
@@ -1153,7 +1157,7 @@ adopt/adapt/improve Dungeon Overview
 Aardvark Joe's Extended Logfile
 Michael Deutschmann's use_darkgray
 Clive Crous' dark_room
-Jukka Lahtinen's sortloot
+sortloot by Jeroen Demeyer and Jukka Lahtinen
 
 
 Code Cleanup and Reorganization

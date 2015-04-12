@@ -2215,7 +2215,7 @@ glovecheck:		    target = which_armor(mtmp, W_ARMG);
 			    (void) destroy_mitem(mtmp, SPBOOK_CLASS, AD_FIRE);
 			    (void) destroy_mitem(mtmp, POTION_CLASS, AD_FIRE);
 			}
-			if (burn_floor_paper(mtmp->mx, mtmp->my, see_it, FALSE) &&
+			if (burn_floor_objects(mtmp->mx, mtmp->my, see_it, FALSE) &&
 				!see_it && distu(mtmp->mx, mtmp->my) <= 3*3)
 			    You("smell smoke.");
 			if (is_ice(mtmp->mx,mtmp->my))
@@ -2853,7 +2853,7 @@ struct obj *box;	/* null for floor trap */
 	boolean see_it = !Blind;
 	int num, alt;
 
-/* Bug: for box case, the equivalent of burn_floor_paper() ought
+/* Bug: for box case, the equivalent of burn_floor_objects() ought
  * to be done upon its contents.
  */
 
@@ -2898,7 +2898,7 @@ struct obj *box;	/* null for floor trap */
 	    destroy_item(SPBOOK_CLASS, AD_FIRE);
 	    destroy_item(POTION_CLASS, AD_FIRE);
 	}
-	if (!box && burn_floor_paper(u.ux, u.uy, see_it, TRUE) && !see_it)
+	if (!box && burn_floor_objects(u.ux, u.uy, see_it, TRUE) && !see_it)
 	    You("smell paper burning.");
 	if (is_ice(u.ux, u.uy))
 	    melt_ice(u.ux, u.uy, (char *)0);

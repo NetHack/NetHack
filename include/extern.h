@@ -1,4 +1,4 @@
-/* NetHack 3.5	extern.h	$NHDT-Date: 1428196810 2015/04/05 01:20:10 $  $NHDT-Branch: nhmall-booktribute $:$NHDT-Revision: 1.451 $ */
+/* NetHack 3.5	extern.h	$NHDT-Date: 1428806395 2015/04/12 02:39:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.455 $ */
 /* NetHack 3.5	extern.h	$Date: 2013/11/05 00:57:53 $  $Revision: 1.380 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -836,6 +836,8 @@ E int FDECL(isqrt, (int));
 E int FDECL(distmin, (int,int,int,int));
 E boolean FDECL(online2, (int,int,int,int));
 E boolean FDECL(pmatch, (const char *,const char *));
+E boolean FDECL(pmatchi, (const char *,const char *));
+E boolean FDECL(pmatchz, (const char *,const char *));
 #ifndef STRNCMPI
 E int FDECL(strncmpi, (const char *,const char *,int));
 #endif
@@ -1230,6 +1232,10 @@ E void FDECL(obj_ice_effects, (int, int, BOOLEAN_P));
 E long FDECL(peek_at_iced_corpse_age, (struct obj *));
 E int FDECL(hornoplenty, (struct obj *,BOOLEAN_P));
 E void NDECL(obj_sanity_check);
+E struct obj* FDECL(obj_nexto, (struct obj*));
+E struct obj* FDECL(obj_nexto_xy, (int, int, int, unsigned));
+E struct obj* FDECL(obj_absorb, (struct obj**, struct obj**));
+E struct obj* FDECL(obj_meld, (struct obj**, struct obj**));
 
 /* ### mkroom.c ### */
 
@@ -2663,7 +2669,7 @@ E struct monst *FDECL(bhit, (int,int,int,int,int (*)(MONST_P,OBJ_P),
 			     int (*)(OBJ_P,OBJ_P),struct obj **));
 E struct monst *FDECL(boomhit, (struct obj *,int,int));
 E int FDECL(zhitm, (struct monst *,int,int,struct obj **));
-E int FDECL(burn_floor_paper, (int,int,BOOLEAN_P,BOOLEAN_P));
+E int FDECL(burn_floor_objects, (int,int,BOOLEAN_P,BOOLEAN_P));
 E void FDECL(buzz, (int,int,XCHAR_P,XCHAR_P,int,int));
 E void FDECL(melt_ice, (XCHAR_P,XCHAR_P,const char *));
 E void FDECL(start_melt_ice_timeout, (XCHAR_P,XCHAR_P,long));
