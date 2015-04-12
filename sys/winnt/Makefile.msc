@@ -1,4 +1,4 @@
-# NetHack 3.5	Makefile.msc	$NHDT-Date: 1427076358 2015/03/23 02:05:58 $  $NHDT-Branch: nhmall-booktribute $:$NHDT-Revision: 1.75 $ */
+# NetHack 3.5	Makefile.msc	$NHDT-Date: 1428855415 2015/04/12 16:16:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.80 $ */
 #       Copyright (c) NetHack PC Development Team 1993-2015
 #
 #==============================================================================
@@ -403,6 +403,9 @@ DLB =
 {$(SSYS)}.c{$(OBJ)}.o:
 	@$(CC) $(cflagsUtil)  -Fo$@  $<
 
+{$(SSYS)}.cpp{$(OBJ)}.o:
+	@$(CC) $(cflagsUtil)  -Fo$@  $<
+
 #==========================================
 # Rules for files in sys\winnt
 #==========================================
@@ -528,8 +531,9 @@ VOBJ24 = $(O)track.o    $(O)trap.o     $(O)u_init.o   $(O)uhitm.o
 VOBJ25 = $(O)vault.o    $(O)vis_tab.o  $(O)vision.o   $(O)weapon.o
 VOBJ26 = $(O)were.o     $(O)wield.o    $(O)windows.o  $(O)wizard.o
 VOBJ27 = $(O)worm.o     $(O)worn.o     $(O)write.o    $(O)zap.o     
-
 DLBOBJ = $(O)dlb.o
+
+REGEX  = $(O)cppregex.o
 
 TTYOBJ = $(O)topl.o     $(O)getline.o  $(O)wintty.o
 
@@ -541,7 +545,7 @@ OBJS   = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
          $(VOBJ11) $(VOBJ12) $(VOBJ13) $(VOBJ14) $(VOBJ15) \
          $(VOBJ16) $(VOBJ17) $(VOBJ18) $(VOBJ19) $(VOBJ20) \
          $(VOBJ21) $(VOBJ22) $(VOBJ23) $(VOBJ24) $(VOBJ25) \
-         $(VOBJ26) $(VOBJ27) $(VOBJ28) $(VOBJ29)
+         $(VOBJ26) $(VOBJ27) $(VOBJ28) $(VOBJ29) $(REGEX)
 
 WINPOBJ = $(WINPORT)
 
