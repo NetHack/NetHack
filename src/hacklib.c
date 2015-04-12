@@ -1,15 +1,15 @@
-/* NetHack 3.5	hacklib.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	hacklib.c	$NHDT-Date: 1428806394 2015/04/12 02:39:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.34 $ */
 /* NetHack 3.5	hacklib.c	$Date: 2009/05/06 10:46:32 $  $Revision: 1.23 $ */
 /*	SCCS Id: @(#)hacklib.c	3.5	2007/04/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) Robert Patrick Rankin, 1991		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/* We could include only config.h, except for the overlay definitions... */
-#include "hack.h"
+#include "hack.h"	/* for config.h+extern.h */
 /*=
     Assorted 'small' utility routines.	They're virtually independent of
-NetHack, except that rounddiv may call panic().
+NetHack, except that rounddiv may call panic().  setrandom calls one of
+srandom(), srand48(), or srand() depending upon configuration.
 
       return type     routine name    argument type(s)
 	boolean		digit		(char)
@@ -40,9 +40,12 @@ NetHack, except that rounddiv may call panic().
 	int		dist2		(int, int, int, int)
 	boolean		online2		(int, int)
 	boolean		pmatch		(const char *, const char *)
+	boolean		pmatchi		(const char *, const char *)
+	boolean		pmatchz		(const char *, const char *)
 	int		strncmpi	(const char *, const char *, int)
 	char *		strstri		(const char *, const char *)
-	boolean		fuzzymatch	(const char *,const char *,const char *,boolean)
+	boolean		fuzzymatch	(const char *,const char *,
+					 const char *,boolean)
 	void		setrandom	(void)
 	time_t		getnow		(void)
 	int		getyear		(void)
@@ -61,6 +64,9 @@ NetHack, except that rounddiv may call panic().
 #else
 # define Static static
 #endif
+
+static boolean FDECL(pmatch_internal, (const char *,const char *,
+				       BOOLEAN_P,const char *));
 
 boolean
 digit(c)		/* is 'c' a digit? */
@@ -465,9 +471,12 @@ online2(x0, y0, x1, y1) /* are two points lined up (on a straight line)? */
     return((boolean)(!dy || !dx || (dy == dx) || (dy + dx == 0)));	/* (dy == -dx) */
 }
 
-boolean
-pmatch(patrn, strng)	/* match a string against a pattern */
+/* guts of pmatch(), pmatchi(), and pmatchz() */
+static boolean
+pmatch_internal(patrn, strng, ci, sk) /* match a string against a pattern */
     const char *patrn, *strng;
+    boolean ci;		/* True => case-insensitive, False => case-sensitive */
+    const char *sk;	/* set of characters to skip */
 {
     char s, p;
   /*
@@ -475,16 +484,51 @@ pmatch(patrn, strng)	/* match a string against a pattern */
    :  any single character.  Returns TRUE if 'strng' matches 'patrn'.
    */
 pmatch_top:
-    s = *strng++;  p = *patrn++;	/* get next chars and pre-advance */
+    if (!sk) {
+	s = *strng++;  p = *patrn++;	/* get next chars and pre-advance */
+    } else {
+	/* fuzzy match variant of pmatch; particular characters are ignored */
+	do { s = *strng++; } while (index(sk, s));
+	do { p = *patrn++; } while (index(sk, p));
+    }
     if (!p)			/* end of pattern */
-	return((boolean)(s == '\0'));		/* matches iff end of string too */
+	return (boolean)(s == '\0');	/* matches iff end of string too */
     else if (p == '*')		/* wildcard reached */
-	return((boolean)((!*patrn || pmatch(patrn, strng-1)) ? TRUE :
-		s ? pmatch(patrn-1, strng) : FALSE));
-    else if (p != s && (p != '?' || !s))  /* check single character */
+	return (boolean)
+		((!*patrn || pmatch_internal(patrn, strng-1, ci, sk)) ? TRUE :
+		 s ? pmatch_internal(patrn-1, strng, ci, sk) : FALSE);
+    else if ((ci ? lowc(p) != lowc(s) : p != s)	/* check single character */
+	     && (p != '?' || !s))		/* & single-char wildcard */
 	return FALSE;		/* doesn't match */
-    else				/* return pmatch(patrn, strng); */
+    else	/* return pmatch_internal(patrn, strng, ci, sk); */
 	goto pmatch_top;	/* optimize tail recursion */
+}
+
+/* case-sensitive wildcard match */
+boolean
+pmatch(patrn, strng)
+    const char *patrn, *strng;
+{
+    return pmatch_internal(patrn, strng, FALSE, (const char *)0);
+}
+
+/* case-insensitive wildcard match */
+boolean
+pmatchi(patrn, strng)
+    const char *patrn, *strng;
+{
+    return pmatch_internal(patrn, strng, TRUE, (const char *)0);
+}
+
+/* case-insensitive wildcard fuzzymatch */
+boolean
+pmatchz(patrn, strng)
+    const char *patrn, *strng;
+{
+    /* ignore spaces, tabs (just in case), dashes, and underscores */
+    static const char fuzzychars[] = " \t-_";
+
+    return pmatch_internal(patrn, strng, TRUE, fuzzychars);
 }
 
 #ifndef STRNCMPI

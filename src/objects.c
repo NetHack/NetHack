@@ -1,4 +1,4 @@
-/* NetHack 3.5	objects.c	$NHDT-Date: 1426470348 2015/03/16 01:45:48 $  $NHDT-Branch: derek-farming $:$NHDT-Revision: 1.27 $ */
+/* NetHack 3.5	objects.c	$NHDT-Date: 1428802519 2015/04/12 01:35:19 $  $NHDT-Branch: master $:$NHDT-Revision: 1.34 $ */
 /* Copyright (c) Mike Threepoint, 1989.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -373,9 +373,9 @@ ARMOR("splint mail", (char *)0,
 ARMOR("banded mail", (char *)0,
 	1, 0, 1, 0,	72, 5, 350,  90,  4, 1, ARM_SUIT, IRON, HI_METAL),
 ARMOR("dwarvish mithril-coat", (char *)0,
-	1, 0, 0, 0,	10, 1, 150, 240,  4, 2, ARM_SUIT, MITHRIL, HI_METAL),
+	1, 0, 0, 0,	10, 1, 150, 240,  4, 2, ARM_SUIT, MITHRIL, HI_SILVER),
 ARMOR("elven mithril-coat", (char *)0,
-	1, 0, 0, 0,	15, 1, 150, 240,  5, 2, ARM_SUIT, MITHRIL, HI_METAL),
+	1, 0, 0, 0,	15, 1, 150, 240,  5, 2, ARM_SUIT, MITHRIL, HI_SILVER),
 ARMOR("chain mail", (char *)0,
 	1, 0, 0, 0,	72, 5, 300,  75,  5, 1, ARM_SUIT, IRON, HI_METAL),
 ARMOR("orcish chain mail", "crude chain mail",
