@@ -1,4 +1,4 @@
-/* NetHack 3.5	trap.c	$NHDT-Date: 1427934551 2015/04/02 00:29:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.223 $ */
+/* NetHack 3.5	trap.c	$NHDT-Date: 1428207616 2015/04/05 04:20:16 $  $NHDT-Branch: nhmall-booktribute $:$NHDT-Revision: 1.224 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3205,6 +3205,10 @@ boolean force;
                         pline("Steam rises from %s.", the(xname(obj)));
                         return 0;
                 }
+                if (obj->otyp == SPE_NOVEL) {
+                	obj->novelidx = 0;
+                	free_oname(obj);
+                } 
                 obj->otyp = SPE_BLANK_PAPER;
                 obj->dknown = 0;
                 if (carried(obj))

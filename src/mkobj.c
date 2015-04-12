@@ -869,6 +869,13 @@ boolean artif;
      /* case TIN: */
         set_corpsenm(otmp, otmp->corpsenm);
         break;
+	    case SPE_NOVEL:
+	        {
+	            int novidx = -1;
+	    	    otmp = oname(otmp, noveltitle(&novidx));
+		    otmp->novelidx = novidx;
+		}
+	    	break;
     }
 
     /* unique objects may have an associated artifact entry */

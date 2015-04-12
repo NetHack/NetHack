@@ -394,6 +394,8 @@ E const char *NDECL(roguename);
 E struct obj *FDECL(realloc_obj,
 		(struct obj *, int, genericptr_t, int, const char *));
 E char *FDECL(coyotename, (struct monst *,char *));
+E const char *FDECL(noveltitle, (int *));
+E const char *FDECL(lookup_novel, (const char *, int *));
 
 /* ### do_wear.c ### */
 
@@ -749,6 +751,7 @@ E void NDECL(really_close);
 #ifdef DEBUG
 E boolean FDECL(showdebug, (const char *));
 #endif
+E void FDECL(read_tribute, (const char *,const char *,int));
 
 /* ### fountain.c ### */
 

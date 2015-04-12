@@ -3329,4 +3329,152 @@ const char *filename;
 }
 #endif	/*DEBUG*/
 
+/* ----------  BEGIN TRIBUTE ----------- */
+
+/* 3.6 tribute code */
+
+#define SECTIONSCOPE 1
+#define TITLESCOPE   2
+#define PASSAGESCOPE 3
+
+void
+read_tribute(tribsection, tribtitle, tribpassage)
+const char *tribsection, *tribtitle;
+int  tribpassage;
+{
+    dlb *fp;
+    char *endp;
+    char line[BUFSZ];
+
+    int scopes[4] = {0, SECTIONSCOPE, TITLESCOPE, PASSAGESCOPE};
+    int scope = 0, section = 0, passage = 0, book = 0;
+    int linect = 0, passagecnt = 0, targetpassage = 0, textcnt = 0;
+    char *sectionnm = "", *booknm = "";
+    const char *badtranslation = "an incomprehensible foreign translation";
+    boolean matchedsection = FALSE, matchedtitle = FALSE;
+    winid tribwin = WIN_ERR;
+
+    /* check for mandatories */
+    if (!tribsection || !tribtitle) {
+	pline("It's %s of \"%s\"!",
+		badtranslation, tribtitle);
+	return;
+    }	
+
+    debugpline3("read_tribute %s, %s, %d.", tribsection, tribtitle, tribpassage);
+
+    fp = dlb_fopen(TRIBUTEFILE, "r");
+    if (!fp) {
+    	/* this is actually an error - cannot open tribute file! */
+    	pline("You feel too overwhelmed to continue!");
+	return;
+    }
+
+    /*
+     * Syntax (not case-sensitive):
+     *	%section books
+     *
+     * In the books section:
+     * 		%title booktitle(n)
+     *		where booktitle=book title
+     *		      (n)= total number of passages present for this title
+     *			%passage n
+     *			where n=sequential passage number
+     *
+     * %e ends the passage/book/section
+     *    If in a passage, it marks the end of that passage.
+     *    If in a book, it marks the end of that book.
+     *    If in a section, it marks the end of that section.
+     *
+     *  %section death
+     */
+     
+    while (dlb_fgets(line, sizeof line, fp) != 0) {
+	linect++;
+	if ((endp = index(line, '\n')) != 0) *endp = 0;
+	switch (line[0]) {
+	    case '%':
+		if (!strncmpi(&line[1], "section ", sizeof("section ")-1)) {
+		    char *st = &line[9];	/* 9 from "%section " */
+		    scope = SECTIONSCOPE;
+		    if (!strcmpi(st, tribsection))
+		    	matchedsection = TRUE;
+		    else
+		    	matchedsection = FALSE;
+		} else if (!strncmpi(&line[1], "title ", sizeof("title ")-1)) {
+		    char *st = &line[7];	/* 7 from "%title " */
+		    char *p1, *p2;
+		    if ((p1 = index(st, '(')) != 0) {
+			*p1++ = '\0';
+			(void)mungspaces(st);
+			if ((p2 = index(p1, ')')) != 0) {
+			    *p2 = '\0';
+			    passagecnt = atoi(p1);
+			    /* sanity check here caps #passages at 50 */
+			    if ((passagecnt > 0) && (passagecnt < 50)) {
+				scope = TITLESCOPE;
+				if (matchedsection && !strcmpi(st, tribtitle)) {
+				    matchedtitle = TRUE;
+				    if (!tribpassage) {
+					targetpassage = rnd(passagecnt);
+				    } else {
+				    	if (tribpassage <= passagecnt)
+						targetpassage = tribpassage;
+					else
+						targetpassage = 0;
+				    }
+				} else {
+				    matchedtitle = FALSE;
+				}
+			    }
+		    	}
+		    }
+		} else if (!strncmpi(&line[1], "passage ", sizeof("passage ")-1)) {
+		    int passagenum = 0;
+		    char *st = &line[9];	 /* 9 from "%passage " */
+		    while(*st == ' ' || *st == '\t') st++;
+		    if (*st && digit(*st) && (strlen(st) < 3))
+			passagenum = atoi(st);
+		    if (passagenum && (passagenum <= passagecnt)) {
+			scope = PASSAGESCOPE;
+			if (matchedtitle && (passagenum == targetpassage))
+			    tribwin = create_nhwindow(NHW_MENU);
+		    }
+		} else if (!strncmpi(&line[1], "e ", sizeof("e ")-1)) {
+		    if (matchedtitle && (scope == PASSAGESCOPE) && tribwin != WIN_ERR)
+			goto cleanup;
+		    if (scope == TITLESCOPE) matchedtitle = FALSE;
+		    if (scope == SECTIONSCOPE) matchedsection = FALSE;
+		    if (scope) --scope;
+		} else {
+		    debugpline1("tribute file error: bad %% command, line %d.",
+				linect);
+		}
+		break;
+	    case '#':
+		/* comment only, next! */
+		break;
+	    default:
+	    	if (matchedtitle && (scope == PASSAGESCOPE) && tribwin != WIN_ERR)
+			putstr(tribwin, 0, line);
+	}
+    }
+
+cleanup:
+    (void) dlb_fclose(fp);
+    if (tribwin != WIN_ERR) {
+	if (matchedtitle && (scope == PASSAGESCOPE))
+		display_nhwindow(tribwin, FALSE);
+	destroy_nhwindow(tribwin);
+	tribwin = WIN_ERR;
+	u.uconduct.literate++;
+    } else {
+    	pline("It seems to be %s of \"%s\"!",
+		badtranslation, tribtitle);
+    }
+
+    return;
+}
+/* ----------  END TRIBUTE ----------- */
+
 /*files.c*/

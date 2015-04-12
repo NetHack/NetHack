@@ -1,4 +1,4 @@
-/* NetHack 3.5	winmenu.c	$NHDT-Date: 1427881480 2015/04/01 09:44:40 $  $NHDT-Branch: master $:$NHDT-Revision: 1.5 $ */
+/* NetHack 3.5	winmenu.c	$NHDT-Date: 1428828477 2015/04/12 08:47:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
 /*	SCCS Id: @(#)winmenu.c	3.5	1996/08/15	*/
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -248,9 +248,13 @@ menu_key(w, event, params, num_params)
 	    return;
 	} else if (ch == MENU_SEARCH) {		/* search */
 	    if (menu_info->how == PICK_ANY || menu_info->how == PICK_ONE) {
-		char buf[BUFSZ];
-		X11_getlin("Search for:", buf);
-		if (!*buf || *buf == '\033') return;
+		char buf[BUFSZ+2], tmpbuf[BUFSZ];
+
+		X11_getlin("Search for:", tmpbuf);
+		if (!*tmpbuf || *tmpbuf == '\033') return;
+		/* convert "string" into "*string*" for use with pmatch() */
+		Sprintf(buf, "*%s*", tmpbuf);
+
 		if (menu_info->how == PICK_ANY) {
 		    invert_match(wp, buf);
 		    return;
@@ -394,10 +398,12 @@ menu_search(w, client_data, call_data)
 {
     struct xwindow *wp = (struct xwindow *) client_data;
     struct menu_info_t *menu_info = wp->menu_information;
+    char buf[BUFSZ+2], tmpbuf[BUFSZ];
 
-    char buf[BUFSZ];
-    X11_getlin("Search for:", buf);
-    if (!*buf || *buf == '\033') return;
+    X11_getlin("Search for:", tmpbuf);
+    if (!*tmpbuf || *tmpbuf == '\033') return;
+    /* convert "string" into "*string*" for use with pmatch() */
+    Sprintf(buf, "*%s*", tmpbuf);
 
     if (menu_info->how == PICK_ANY)
 	invert_match(wp, buf);
@@ -478,7 +484,7 @@ invert_all(wp)
 static void
 invert_match(wp, match)
     struct xwindow *wp;
-    char *match;
+    char *match;	/* wildcard pattern for pmatch() */
 {
     x11_menu_item *curr;
     int count;
@@ -487,7 +493,7 @@ invert_match(wp, match)
     reset_menu_count(wp->menu_information);
     for (count = 0, curr = wp->menu_information->curr_menu.base; curr;
 						curr = curr->next, count++)
-	if (curr->identifier.a_void != 0 && strstri(curr->str, match)) {
+	if (curr->identifier.a_void != 0 && pmatchi(match, curr->str)) {
 	    invert_line(wp, curr, count, -1L);
 	    changed = TRUE;
 	}
@@ -502,7 +508,7 @@ invert_match(wp, match)
 static void
 select_match(wp, match)
     struct xwindow *wp;
-    char *match;
+    char *match;	/* wildcard pattern for pmatch() */
 {
     x11_menu_item *curr;
     int count;
@@ -510,11 +516,12 @@ select_match(wp, match)
     reset_menu_count(wp->menu_information);
     for (count = 0, curr = wp->menu_information->curr_menu.base; curr;
 						curr = curr->next, count++)
-	if (curr->identifier.a_void != 0 && strstri(curr->str, match)) {
+	if (curr->identifier.a_void != 0 && pmatchi(match, curr->str)) {
 	    if (!curr->selected) {
 		invert_line(wp, curr, count, -1L);
 #ifndef USE_FWF
-		XawListChange(wp->w, wp->menu_information->curr_menu.list_pointer,
+		XawListChange(wp->w,
+			      wp->menu_information->curr_menu.list_pointer,
 			      0, 0, True);
 #endif
 	    }

@@ -411,8 +411,8 @@ int
 study_book(spellbook)
 register struct obj *spellbook;
 {
-	register int	 booktype = spellbook->otyp;
-	register boolean confused = (Confusion != 0);
+	int	 booktype = spellbook->otyp;
+	boolean confused = (Confusion != 0);
 	boolean too_hard = FALSE;
 
 	/* attempting to read dull book may make hero fall asleep */
@@ -440,7 +440,8 @@ register struct obj *spellbook;
 		    /* handle the sequence: start reading, get interrupted,
 		       have context.spbook.book become erased somehow, resume reading it */
 		    booktype != SPE_BLANK_PAPER) {
-		You("continue your efforts to memorize the spell.");
+		You("continue your efforts to %s.", (booktype == SPE_NOVEL) ?
+			"read the novel" : "memorize the spell");
 	} else {
 		/* KMH -- Simplified this code */
 		if (booktype == SPE_BLANK_PAPER) {
@@ -448,6 +449,16 @@ register struct obj *spellbook;
 			makeknown(booktype);
 			return(1);
 		}
+
+		/* 3.6.0 tribute */
+		if (booktype == SPE_NOVEL) {
+		    /* Obtain current Terry Pratchett book
+			title for the current game. */
+		    const char *tribtitle = noveltitle(&spellbook->novelidx);
+		    read_tribute("books", tribtitle, 0);
+		    return(1);
+		}
+
 		switch (objects[booktype].oc_level) {
 		 case 1:
 		 case 2:

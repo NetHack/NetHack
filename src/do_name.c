@@ -1,4 +1,4 @@
-/* NetHack 3.5	do_name.c	$NHDT-Date: 1426558927 2015/03/17 02:22:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.53 $ */
+/* NetHack 3.5	do_name.c	$NHDT-Date: 1428196077 2015/04/05 01:07:57 $  $NHDT-Branch: nhmall-booktribute $:$NHDT-Revision: 1.64 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -474,6 +474,12 @@ register struct obj *obj;
 	const char *aname;
 	short objtyp;
 
+	/* Do this now because there's no point in even asking for a name */
+	if (obj->otyp == SPE_NOVEL) {
+		pline("%s already has a published name.", Ysimple_name2(obj));
+		return;
+	}
+	
 	Sprintf(qbuf, "What do you want to name %s ",
 		is_plural(obj) ? "these" : "this");
 	(void)safe_qbuf(qbuf, qbuf, "?", obj, xname, simpleonames, "item");
@@ -1150,6 +1156,57 @@ char *buf;
 	    mtmp->mcan ? coynames[SIZE(coynames)-1] : coynames[rn2(SIZE(coynames)-1)]);
     }
     return buf;
+}
+
+/* make sure "The Colour of Magic" remains the first entry in here */
+static const char * const sir_Terry_novels[] = {
+	"The Colour of Magic", "The Light Fantastic", "Equal Rites",
+	"Mort", "Sourcery", "Wyrd Sisters", "Pyramids", "Guards! Guards!",
+	"Eric",	"Moving Pictures", "Reaper Man", "Witches Abroad",
+	"Small Gods", "Lords and Ladies", "Men at Arms", "Soul Music",
+	"Interesting Times", "Maskerade", "Feet of Clay", "Hogfather",
+	"Jingo", "The Last Continent", "Carpe Jugulum", "The Fifth Elephant",
+	"The Truth", "Thief of Time", "The Last Hero",
+	"The Amazing Maurice and his Educated Rodents", "Night Watch",
+	"The Wee Free Men", "Monstrous Regiment", "A Hat Full of Sky",
+	"Going Postal", "Thud!", "Wintersmith", "Making Money",
+	"Unseen Academicals", "I Shall Wear Midnight", "Snuff",
+	"Raising Steam", "The Shepherd's Crown"
+};
+
+const char *
+noveltitle(novidx)
+int *novidx;
+{
+    int j, k = SIZE(sir_Terry_novels)-1;
+
+    j = rn2(k);
+    if (novidx) {
+	if (*novidx == -1) *novidx = j;
+	else if ((*novidx >= 0) && (*novidx <= k)) j = *novidx;
+    }
+    return sir_Terry_novels[j];
+}    
+
+const char *
+lookup_novel(lookname, idx)
+const char *lookname;
+int *idx;
+{
+   int k;
+
+    /* Take American or U.K. spelling of this one */
+   if (strcmpi(lookname, "The Color of Magic") == 0)
+   	lookname = sir_Terry_novels[0];
+
+   for (k = 0; k < SIZE(sir_Terry_novels); ++k) {
+   	if (strcmpi(lookname, sir_Terry_novels[k]) == 0) {
+   		if (idx) *idx = k;
+   		return sir_Terry_novels[k];
+   	}
+   }
+
+   return (const char *)0;
 }
 
 /*do_name.c*/

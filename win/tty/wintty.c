@@ -1,4 +1,4 @@
-/* NetHack 3.5	wintty.c	$NHDT-Date: 1428394244 2015/04/07 08:10:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.84 $ */
+/* NetHack 3.5	wintty.c	$NHDT-Date: 1428828474 2015/04/12 08:47:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.85 $ */
 /* NetHack 3.5	wintty.c	$Date: 2012/01/22 06:27:09 $  $Revision: 1.66 $ */
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1664,20 +1664,24 @@ struct WinDesc *cw;
 		    tty_nhbell();
 		    break;
 		} else {
-		    char searchbuf[BUFSZ], tmpbuf[BUFSZ];
+		    char searchbuf[BUFSZ+2], tmpbuf[BUFSZ];
 		    boolean on_curr_page = FALSE;
 		    int lineno = 0;
+
 		    tty_getlin("Search for:", tmpbuf);
 		    if (!tmpbuf[0] || tmpbuf[0] == '\033') break;
 		    Sprintf(searchbuf, "*%s*", tmpbuf);
+
 		    for (curr = cw->mlist; curr; curr = curr->next) {
 			if (on_curr_page) lineno++;
 			if (curr == page_start)
 			    on_curr_page = TRUE;
 			else if (curr == page_end)
 			    on_curr_page = FALSE;
-			if (curr->identifier.a_void && pmatch(searchbuf, curr->str)) {
-			    toggle_menu_curr(window, curr, lineno, on_curr_page, counting, count);
+			if (curr->identifier.a_void
+			    && pmatchi(searchbuf, curr->str)) {
+			    toggle_menu_curr(window, curr, lineno,
+					     on_curr_page, counting, count);
 			    if (cw->how == PICK_ONE) {
 				finished = TRUE;
 				break;

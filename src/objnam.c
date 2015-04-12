@@ -465,7 +465,18 @@ unsigned cxn_flags;	/* bitmask of CXN_xxx values */
             Sprintf(buf, "%s wand", dn);
         break;
     case SPBOOK_CLASS:
-        if (!dknown) {
+        if (typ == SPE_NOVEL) {		/* 3.6 tribute */
+            if (!dknown)
+                Strcpy(buf, "book");
+	    else if (nn)
+                Strcpy(buf, actualn);
+	    else if (un)
+                Sprintf(buf, "novel called %s", un);
+	    else
+                Sprintf(buf, "%s book", dn);
+            break;
+           /* end of tribute */
+	} else if (!dknown) {
             Strcpy(buf, "spellbook");
         } else if (nn) {
             if (typ != SPE_BOOK_OF_THE_DEAD)
@@ -3044,6 +3055,15 @@ typfnd:
         }
     }
 
+	if (typ && wizard) {
+	    if (typ == SPE_NOVEL) {
+		if (name && !lookup_novel(name, (int *)0)) {
+		    pline("There's no novel by that name.");
+		    return ((struct obj *)0);
+		}
+	    }
+	}
+
     /*
      * Create the object, then fine-tune it.
      */
@@ -3235,6 +3255,18 @@ typfnd:
         /* an artifact name might need capitalization fixing */
         aname = artifact_name(name, &objtyp);
         if (aname && objtyp == otmp->otyp) name = aname;
+
+        /* 3.6.0 tribute - fix up novel */
+        if (otmp->otyp == SPE_NOVEL) {
+            int novidx = 0;
+            const char *novelname;
+
+            novelname = lookup_novel(name, &novidx);
+            if (novelname) {
+                 otmp->novelidx = novidx;
+                 name = novelname;
+            }
+	}
 
         otmp = oname(otmp, name);
         if (otmp->oartifact) {
