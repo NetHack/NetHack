@@ -5,84 +5,83 @@
 #
 
 sub bail($);
-sub setfile($);
-sub helpmessage();
 
-use Getopt::Long qw(:config bundling auto_version permute);
+use Getopt::Std;
 
-$main::VERSION = 1.1;
+# TODO: switch to Getopt::Long so we can parse normal arguments too
+$Getopt::Std::STANDARD_HELP_VERSION = TRUE;
+$main::VERSION = 1.0;
 
-our %opts = ();
-our %commands = (
-    'output|o:s' => "-o, --output\tspecify an alternate output file",
-    'debug|d!' => "-d, --debug\tforce output to STDOUT",
-    'help|h' => "-h, --help\tdisplay this message and exit",
+my %commands = (
+    'd' => 'debug mode; parse objects.txt to stdout instead of updating',
 );
 
-my $helpformat = "%20s   %s\n";
+getopts(join('', keys(%commands)));
+
+my $debug = (defined($opt_d) && $opt_d == 1);
 my $tilecount = 0;
+my $outfile = $debug ? "-" : "objects.txt";
+my $infile = $debug ? "objects.txt" : "objects.bak";
 
-GetOptions(\%opts, '<>' => \&setfile, keys(%commands));
 
-if ($opts{'help'}) { helpmessage(); exit; }
-if (!defined($opts{'infile'})) { helpmessage(); die "no file specified for processing; stopping\n"; }
-
-if ($opts{'debug'}) {
-    $opts{'output'} = '-';
+unless ($debug) {
+    if (-e "$infile") { die "something didn't clean up objects.bak from last time; stopping\n"; }
+    rename($outfile,$infile) or die "couldn't move objects.txt to objects.bak; stopping\n";
 }
 
-if (defined($opts{'output'})) {
-    if (-e $opts{'output'}) { die "can't write to $opts{'output'}, it already exists; stopping\n"; }
-    open(INFILE, "<$opts{'infile'}") or bail("couldn't open $opts{'infile'}; bailing");
-} else {
-    $opts{'output'} = $opts{'infile'};
-    if (-e "$opts{'infile'}.bak") { die "something didn't clean up $opts{'infile'}.bak from last time; stopping\n"; }
-    rename($opts{'infile'},"$opts{'infile'}.bak") or die "couldn't move $opts{'infile'} to $opts{'infile'}.bak; stopping\n";
-    open(INFILE, "<$opts{'infile'}.bak") or bail("couldn't open $opts{'infile'}.bak; bailing");
-}
-
-open(OUTFILE, ">$opts{'output'}") or bail("couldn't open $opts{'output'}; bailing");
+open(INFILE, "<$infile") or bail("couldn't open $infile; bailing");
+open(OUTFILE, ">$outfile") or bail("couldn't open $outfile; bailing");
 
 while (my $line = <INFILE>)
 {
-    $line =~ s/cmap \d+/cmap $tilecount/;
-    if ($line =~ s/^# tile \d+/# tile $tilecount/) { $tilecount++; }
+    if (my ($tiletext) = $line =~ /^# tile \d+ (.*)/)
+    {
+        $line = "# tile $tilecount $tiletext\n";
+        $tilecount++;
+    }
+
     print OUTFILE $line;
 }
 
 close(INFILE);
 close(OUTFILE);
 
-unless ($opts{'debug'}) { unlink "$opts{'infile'}.bak"; }
+unless ($debug) { unlink $infile; }
 
 exit;
 
-sub helpmessage()
+sub main::HELP_MESSAGE()
 {
-    print("Usage: renumtiles.pl [OPTIONS] <textfile>\n\n");
-    foreach $opt (keys(%commands)) {
-        my ($vname, $desc) = split("\t", $commands{$opt});
-        $desc =~ s/\t//g;
-        printf($helpformat, $vname, $desc);
+    print <<"STARTHELP";
+Usage: renumtiles.pl [OPTIONS] <textfile>
+
+STARTHELP
+    foreach $cmd (keys(%commands)) {
+        printf("%10s          %s\n", '-'.$cmd, $commands{$cmd});
     }
-    printf($helpformat, "--version", "display version and exit\n");
+    print <<"ENDHELP";
+
+\t--help      display this help message and exit
+\t--version   display version and exit
+ENDHELP
+    exit;
+}
+
+sub main::VERSION_MESSAGE()
+{
+    my ($objglob, $optpackage, $ver, $switches) = @_;
+    print <<"STARTHELP";
+renumtiles $ver -- tile-renumbering utility for NetHack
+STARTHELP
 }
 
 sub bail($)
 {
-    unless ($opts{'debug'}) {
-        unlink $opts{'outfile'};
-        rename ("$opts{'infile'}.bak",$opts{'outfile'});
+    unless ($debug) {
+        unlink $outfile;
+        rename ($infile,$outfile);
     }
     shift;
     die "$_\n";
-}
-
-sub setfile($)
-{
-    if (defined($opts{'infile'})) {
-        return;
-    }
-    $opts{'infile'} = shift;
 }
 

@@ -1,4 +1,4 @@
-/* NetHack 3.5	pcmain.c	$NHDT-Date: 1426966701 2015/03/21 19:38:21 $  $NHDT-Branch: master $:$NHDT-Revision: 1.51 $ */
+/* NetHack 3.5	pcmain.c	$NHDT-Date: 1427337317 2015/03/26 02:35:17 $  $NHDT-Branch: derek-farming $:$NHDT-Revision: 1.52 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -105,244 +105,271 @@ int argc;
 char *argv[];
 {
 
-	register int fd;
-	register char *dir;
+    register int fd;
+    register char *dir;
 #if defined(WIN32)
-	char fnamebuf[BUFSZ], encodedfnamebuf[BUFSZ];
-	boolean save_getreturn_status = getreturn_enabled;
+    char* envp = NULL;
+    char* sptr = NULL;
+    char fnamebuf[BUFSZ], encodedfnamebuf[BUFSZ];
+    boolean save_getreturn_status = getreturn_enabled;
 #endif
 #ifdef NOCWD_ASSUMPTIONS
-	char failbuf[BUFSZ];
+    char failbuf[BUFSZ];
 #endif
-	boolean resuming = FALSE;	/* assume new game */
+    boolean resuming = FALSE;	/* assume new game */
 
 #if defined(__BORLANDC__) && !defined(_WIN32)
-	startup();
+    startup();
 #endif
 
 #ifdef TOS
-	long clock_time;
-	if (*argv[0]) { 		/* only a CLI can give us argv[0] */
-		hname = argv[0];
-		run_from_desktop = FALSE;
-	} else
+    long clock_time;
+    if (*argv[0]) { 		/* only a CLI can give us argv[0] */
+        hname = argv[0];
+        run_from_desktop = FALSE;
+    } else
 #endif
-		hname = "NetHack";      /* used for syntax messages */
+        hname = "NetHack";      /* used for syntax messages */
 
-	choose_windows(DEFAULT_WINDOW_SYS);
+    choose_windows(DEFAULT_WINDOW_SYS);
 
 #if !defined(AMIGA) && !defined(GNUDOS)
-	/* Save current directory and make sure it gets restored when
-	 * the game is exited.
-	 */
-	if (getcwd(orgdir, sizeof orgdir) == (char *)0)
-		error("NetHack: current directory path too long");
+    /* Save current directory and make sure it gets restored when
+     * the game is exited.
+     */
+    if (getcwd(orgdir, sizeof orgdir) == (char *)0)
+        error("NetHack: current directory path too long");
 # ifndef NO_SIGNAL
-	signal(SIGINT, (SIG_RET_TYPE) nethack_exit);	/* restore original directory */
+    signal(SIGINT, (SIG_RET_TYPE) nethack_exit);	/* restore original directory */
 # endif
 #endif /* !AMIGA && !GNUDOS */
 
-	dir = nh_getenv("NETHACKDIR");
-	if (dir == (char *)0)
-		dir = nh_getenv("HACKDIR");
+    dir = nh_getenv("NETHACKDIR");
+    if (dir == (char *)0)
+        dir = nh_getenv("HACKDIR");
 #ifdef EXEPATH
-	if (dir == (char *)0)
-		dir = exepath(argv[0]);
+    if (dir == (char *)0)
+        dir = exepath(argv[0]);
 #endif
-	if (dir != (char *)0) {
-		(void) strncpy(hackdir, dir, PATHLEN - 1);
-		hackdir[PATHLEN-1] = '\0';
+    if (dir != (char *)0) {
+        (void) strncpy(hackdir, dir, PATHLEN - 1);
+        hackdir[PATHLEN-1] = '\0';
 #ifdef NOCWD_ASSUMPTIONS
-		{
-		    int prefcnt;
+        {
+            int prefcnt;
 
-		    fqn_prefix[0] = (char *)alloc(strlen(hackdir)+2);
-		    Strcpy(fqn_prefix[0], hackdir);
-		    append_slash(fqn_prefix[0]);
-		    for (prefcnt = 1; prefcnt < PREFIX_COUNT; prefcnt++)
-			fqn_prefix[prefcnt] = fqn_prefix[0];
-		}
+            fqn_prefix[0] = (char *)alloc(strlen(hackdir)+2);
+            Strcpy(fqn_prefix[0], hackdir);
+            append_slash(fqn_prefix[0]);
+            for (prefcnt = 1; prefcnt < PREFIX_COUNT; prefcnt++)
+            fqn_prefix[prefcnt] = fqn_prefix[0];
+
+# if defined(WIN32) || defined(MSDOS)
+            /* sysconf should be searched for in this location */
+            envp = nh_getenv("COMMONPROGRAMFILES");
+            if (envp) {
+                if ((sptr = index(envp, ';')) != 0) *sptr = '\0';
+                if (strlen(envp) > 0) {
+                    fqn_prefix[SYSCONFPREFIX] = (char *)alloc(strlen(envp) + 10);
+                    Strcpy(fqn_prefix[SYSCONFPREFIX], envp);
+                    append_slash(fqn_prefix[SYSCONFPREFIX]);
+                    Strcat(fqn_prefix[SYSCONFPREFIX], "NetHack\\");
+                }
+            }
+ 
+            /* user's home directory should default to this - unless overridden */
+            envp = nh_getenv("USERPROFILE");
+            if (envp) {
+                if ((sptr = index(envp, ';')) != 0) *sptr = '\0';
+                if (strlen(envp) > 0) {
+                    fqn_prefix[CONFIGPREFIX] = (char *)alloc(strlen(envp)+2);
+                    Strcpy(fqn_prefix[CONFIGPREFIX], envp);
+                    append_slash(fqn_prefix[CONFIGPREFIX]);
+                }
+            }
+# endif
+        }
 #endif
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
-		chdirx (dir, 1);
+        chdirx (dir, 1);
 #endif
-	}
+    }
 #ifdef AMIGA
 # ifdef CHDIR
-	/*
-	 * If we're dealing with workbench, change the directory.  Otherwise
-	 * we could get "Insert disk in drive 0" messages. (Must be done
-	 * before initoptions())....
-	 */
-	if(argc == 0)
-		chdirx(HACKDIR, 1);
+    /*
+     * If we're dealing with workbench, change the directory.  Otherwise
+     * we could get "Insert disk in drive 0" messages. (Must be done
+     * before initoptions())....
+     */
+    if(argc == 0)
+        chdirx(HACKDIR, 1);
 # endif
-	ami_wininit_data();
+    ami_wininit_data();
 #endif
 #ifdef WIN32CON
-	save_getreturn_status = getreturn_enabled;
-	raw_clear_screen();
-	getreturn_enabled = TRUE;
+    save_getreturn_status = getreturn_enabled;
+    raw_clear_screen();
+    getreturn_enabled = TRUE;
 #endif
-	initoptions();
+    initoptions();
 
 #ifdef NOCWD_ASSUMPTIONS
-	if (!validate_prefix_locations(failbuf)) {
-		raw_printf("Some invalid directory locations were specified:\n\t%s\n",
-				failbuf);
-		 nethack_exit(EXIT_FAILURE);
-	}
+    if (!validate_prefix_locations(failbuf)) {
+        raw_printf("Some invalid directory locations were specified:\n\t%s\n",
+                failbuf);
+         nethack_exit(EXIT_FAILURE);
+    }
 #endif
 
 #if defined(TOS) && defined(TEXTCOLOR)
-	if (iflags.BIOS && iflags.use_color)
-		set_colors();
+    if (iflags.BIOS && iflags.use_color)
+        set_colors();
 #endif
-	if (!hackdir[0])
+    if (!hackdir[0])
 #if !defined(LATTICE) && !defined(AMIGA)
-		Strcpy(hackdir, orgdir);
+        Strcpy(hackdir, orgdir);
 #else
-		Strcpy(hackdir, HACKDIR);
+        Strcpy(hackdir, HACKDIR);
 #endif
-	if(argc > 1) {
-	    if (!strncmp(argv[1], "-d", 2) && argv[1][2] != 'e') {
-		/* avoid matching "-dec" for DECgraphics; since the man page
-		 * says -d directory, hope nobody's using -desomething_else
-		 */
-		argc--;
-		argv++;
-		dir = argv[0]+2;
-		if(*dir == '=' || *dir == ':') dir++;
-		if(!*dir && argc > 1) {
-			argc--;
-			argv++;
-			dir = argv[0];
-		}
-		if(!*dir)
-		    error("Flag -d must be followed by a directory name.");
-		Strcpy(hackdir, dir);
-	    }
-	    if (argc > 1) {
+    if(argc > 1) {
+        if (!strncmp(argv[1], "-d", 2) && argv[1][2] != 'e') {
+        /* avoid matching "-dec" for DECgraphics; since the man page
+         * says -d directory, hope nobody's using -desomething_else
+         */
+        argc--;
+        argv++;
+        dir = argv[0]+2;
+        if(*dir == '=' || *dir == ':') dir++;
+        if(!*dir && argc > 1) {
+            argc--;
+            argv++;
+            dir = argv[0];
+        }
+        if(!*dir)
+            error("Flag -d must be followed by a directory name.");
+        Strcpy(hackdir, dir);
+        }
+        if (argc > 1) {
 
-		/*
-		 * Now we know the directory containing 'record' and
-		 * may do a prscore().
-		 */
-		if (!strncmp(argv[1], "-s", 2)) {
+        /*
+         * Now we know the directory containing 'record' and
+         * may do a prscore().
+         */
+        if (!strncmp(argv[1], "-s", 2)) {
 #if defined(MSWIN_GRAPHICS) || defined(WIN32CON)
-			int sfd = (int)_fileno(stdout);
-			redirect_stdout = (sfd >= 0) ? !isatty(sfd) : 0;
+            int sfd = (int)_fileno(stdout);
+            redirect_stdout = (sfd >= 0) ? !isatty(sfd) : 0;
 
 # ifdef MSWIN_GRAPHICS
-			if (!redirect_stdout) {
-			   raw_printf("-s is not supported for the Graphical Interface\n");
-			   nethack_exit(EXIT_SUCCESS);
-			}
+            if (!redirect_stdout) {
+               raw_printf("-s is not supported for the Graphical Interface\n");
+               nethack_exit(EXIT_SUCCESS);
+            }
 # endif
 #endif
 
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
-			chdirx(hackdir,0);
+            chdirx(hackdir,0);
 #endif
 #ifdef SYSCF
-			initoptions();
+            initoptions();
 #endif
-			prscore(argc, argv);
-			nethack_exit(EXIT_SUCCESS);
-		}
+            prscore(argc, argv);
+            nethack_exit(EXIT_SUCCESS);
+        }
 
 #ifdef MSWIN_GRAPHICS
-		if (!strncmpi(argv[1], "-clearreg", 6)) {	/* clear registry */
-			mswin_destroy_reg();
-			nethack_exit(EXIT_SUCCESS);
-		}
+        if (!strncmpi(argv[1], "-clearreg", 6)) {	/* clear registry */
+            mswin_destroy_reg();
+            nethack_exit(EXIT_SUCCESS);
+        }
 #endif
-		/* Don't initialize the window system just to print usage */
-		if (!strncmp(argv[1], "-?", 2) || !strncmp(argv[1], "/?", 2)) {
-			nhusage();
-			nethack_exit(EXIT_SUCCESS);
-		}
-	    }
-	}
+        /* Don't initialize the window system just to print usage */
+        if (!strncmp(argv[1], "-?", 2) || !strncmp(argv[1], "/?", 2)) {
+            nhusage();
+            nethack_exit(EXIT_SUCCESS);
+        }
+        }
+    }
 
 #ifdef WIN32
-	getreturn_enabled = save_getreturn_status;
+    getreturn_enabled = save_getreturn_status;
 #endif
-	/*
-	 * It seems you really want to play.
-	 */
+    /*
+     * It seems you really want to play.
+     */
 #ifdef TOS
-	if (comp_times((long)time(&clock_time)))
-		error("Your clock is incorrectly set!");
+    if (comp_times((long)time(&clock_time)))
+        error("Your clock is incorrectly set!");
 #endif
-	if (!dlb_init()) {
-	    pline(
+    if (!dlb_init()) {
+        pline(
     "%s\n%s\n%s\n%s\n\nNetHack was unable to open the required file \"%s\".%s",
-		  copyright_banner_line(1), copyright_banner_line(2),
-		  copyright_banner_line(3), copyright_banner_line(4), DLBFILE,
+          copyright_banner_line(1), copyright_banner_line(2),
+          copyright_banner_line(3), copyright_banner_line(4), DLBFILE,
 #ifdef WIN32
-	      "\nAre you perhaps trying to run NetHack within a zip utility?");
+          "\nAre you perhaps trying to run NetHack within a zip utility?");
 #else
-		  "");
+          "");
 #endif
-		error("dlb_init failure.");
-	}
+        error("dlb_init failure.");
+    }
 
-	u.uhp = 1;	/* prevent RIP on early quits */
-	u.ux = 0;	/* prevent flush_screen() */
+    u.uhp = 1;	/* prevent RIP on early quits */
+    u.ux = 0;	/* prevent flush_screen() */
 
-	/* chdir shouldn't be called before this point to keep the
-	 * code parallel to other ports.
-	 */
+    /* chdir shouldn't be called before this point to keep the
+     * code parallel to other ports.
+     */
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
-	chdirx(hackdir,1);
+    chdirx(hackdir,1);
 #endif
 
 #ifdef MSDOS
-	/* We do this early for MSDOS because there are several
-	 * display/tile related options that affect init_nhwindows()
-	 */
-	process_options(argc, argv);
+    /* We do this early for MSDOS because there are several
+     * display/tile related options that affect init_nhwindows()
+     */
+    process_options(argc, argv);
 #endif
 
 #if defined(MSDOS) || defined(WIN32)
-	/* Player didn't specify any symbol set so use IBM defaults */
-	if (!symset[PRIMARY].name) {
-		load_symset("IBMGraphics_2", PRIMARY);
-	}
-	if (!symset[ROGUESET].name) {
-		load_symset("RogueEpyx", ROGUESET);
-	}
+    /* Player didn't specify any symbol set so use IBM defaults */
+    if (!symset[PRIMARY].name) {
+        load_symset("IBMGraphics_2", PRIMARY);
+    }
+    if (!symset[ROGUESET].name) {
+        load_symset("RogueEpyx", ROGUESET);
+    }
 #endif
 
 #ifdef MSDOS
-	init_nhwindows(&argc,argv);
+    init_nhwindows(&argc,argv);
 #else
-	init_nhwindows(&argc,argv);
-	process_options(argc, argv);
+    init_nhwindows(&argc,argv);
+    process_options(argc, argv);
 #endif
 
 #ifdef WIN32CON
-	toggle_mouse_support();	/* must come after process_options */
+    toggle_mouse_support();	/* must come after process_options */
 #endif
 
 #ifdef MFLOPPY
-	set_lock_and_bones();
+    set_lock_and_bones();
 # ifndef AMIGA
-	copybones(FROMPERM);
+    copybones(FROMPERM);
 # endif
 #endif
 
-	/* strip role,race,&c suffix; calls askname() if plname[] is empty
-	   or holds a generic user name like "player" or "games" */
-	plnamesuffix();
-	set_playmode();	/* sets plname to "wizard" for wizard mode */
+    /* strip role,race,&c suffix; calls askname() if plname[] is empty
+       or holds a generic user name like "player" or "games" */
+    plnamesuffix();
+    set_playmode();	/* sets plname to "wizard" for wizard mode */
 #if 0
-	/* unlike Unix where the game might be invoked with a script
-	   which forces a particular character name for each player
-	   using a shared account, we always allow player to rename
-	   the character during role/race/&c selection */
-	iflags.renameallowed = TRUE;
+    /* unlike Unix where the game might be invoked with a script
+       which forces a particular character name for each player
+       using a shared account, we always allow player to rename
+       the character during role/race/&c selection */
+    iflags.renameallowed = TRUE;
 #else
  /* until the getlock code is resolved, override askname()'s
     setting of renameallowed; when False, player_selection()
@@ -351,138 +378,138 @@ char *argv[];
 #endif
 
 #if defined(PC_LOCKING)
-	/* 3.3.0 added this to support detection of multiple games
-	 * under the same plname on the same machine in a windowed
-	 * or multitasking environment.
-	 *
-	 * That allows user confirmation prior to overwriting the
-	 * level files of a game in progress.
-	 *
-	 * Also prevents an aborted game's level files from being
-	 * overwritten without confirmation when a user starts up
-	 * another game with the same player name.
-	 */
+    /* 3.3.0 added this to support detection of multiple games
+     * under the same plname on the same machine in a windowed
+     * or multitasking environment.
+     *
+     * That allows user confirmation prior to overwriting the
+     * level files of a game in progress.
+     *
+     * Also prevents an aborted game's level files from being
+     * overwritten without confirmation when a user starts up
+     * another game with the same player name.
+     */
 # if defined(WIN32)
-	/* Obtain the name of the logged on user and incorporate
-	 * it into the name. */
-	Sprintf(fnamebuf, "%s-%s", get_username(0), plname);
-	(void)fname_encode("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-.",
-				'%', fnamebuf, encodedfnamebuf, BUFSZ);
-	Sprintf(lock, "%s",encodedfnamebuf);
-	/* regularize(lock); */ /* we encode now, rather than substitute */
+    /* Obtain the name of the logged on user and incorporate
+     * it into the name. */
+    Sprintf(fnamebuf, "%s-%s", get_username(0), plname);
+    (void)fname_encode("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-.",
+                '%', fnamebuf, encodedfnamebuf, BUFSZ);
+    Sprintf(lock, "%s",encodedfnamebuf);
+    /* regularize(lock); */ /* we encode now, rather than substitute */
 # else
-	Strcpy(lock,plname);
-	regularize(lock);
+    Strcpy(lock,plname);
+    regularize(lock);
 # endif
-	getlock();
+    getlock();
 #else   /* What follows is !PC_LOCKING */
 # ifdef AMIGA /* We'll put the bones & levels in the user specified directory -jhsa */
-	Strcat(lock,plname);
-	Strcat(lock,".99");
+    Strcat(lock,plname);
+    Strcat(lock,".99");
 # else
 #  ifndef MFLOPPY
-	/* I'm not sure what, if anything, is left here, but MFLOPPY has
-	 * conflicts with set_lock_and_bones() in files.c.
-	 */
-	Strcpy(lock,plname);
-	Strcat(lock,".99");
-	regularize(lock);	/* is this necessary? */
-				/* not compatible with full path a la AMIGA */
+    /* I'm not sure what, if anything, is left here, but MFLOPPY has
+     * conflicts with set_lock_and_bones() in files.c.
+     */
+    Strcpy(lock,plname);
+    Strcat(lock,".99");
+    regularize(lock);	/* is this necessary? */
+                /* not compatible with full path a la AMIGA */
 #  endif
 # endif
 #endif	/* PC_LOCKING */
 
-	/* Set up level 0 file to keep the game state.
-	 */
-	fd = create_levelfile(0, (char *)0);
-	if (fd < 0) {
-		raw_print("Cannot create lock file");
-	} else {
+    /* Set up level 0 file to keep the game state.
+     */
+    fd = create_levelfile(0, (char *)0);
+    if (fd < 0) {
+        raw_print("Cannot create lock file");
+    } else {
 #ifdef WIN32
-		hackpid = GetCurrentProcessId();
+        hackpid = GetCurrentProcessId();
 #else
-		hackpid = 1;
+        hackpid = 1;
 #endif
-		write(fd, (genericptr_t) &hackpid, sizeof(hackpid));
+        write(fd, (genericptr_t) &hackpid, sizeof(hackpid));
 		nhclose(fd);
-	}
+    }
 #ifdef MFLOPPY
-	level_info[0].where = ACTIVE;
+    level_info[0].where = ACTIVE;
 #endif
 
-	/*
-	 *  Initialize the vision system.  This must be before mklev() on a
-	 *  new game or before a level restore on a saved game.
-	 */
-	vision_init();
+    /*
+     *  Initialize the vision system.  This must be before mklev() on a
+     *  new game or before a level restore on a saved game.
+     */
+    vision_init();
 
-	display_gamewindows();
+    display_gamewindows();
 #ifdef WIN32
-	getreturn_enabled = TRUE;
+    getreturn_enabled = TRUE;
 #endif
 
-	/*
-	 * First, try to find and restore a save file for specified character.
-	 * We'll return here if new game player_selection() renames the hero.
-	 */
+    /*
+     * First, try to find and restore a save file for specified character.
+     * We'll return here if new game player_selection() renames the hero.
+     */
  attempt_restore:
-	if ((fd = restore_saved_game()) >= 0) {
+    if ((fd = restore_saved_game()) >= 0) {
 #ifndef NO_SIGNAL
-		(void) signal(SIGINT, (SIG_RET_TYPE) done1);
+        (void) signal(SIGINT, (SIG_RET_TYPE) done1);
 #endif
 #ifdef NEWS
-		if(iflags.news){
-		    display_file(NEWS, FALSE);
-		    iflags.news = FALSE;
-		}
+        if(iflags.news){
+            display_file(NEWS, FALSE);
+            iflags.news = FALSE;
+        }
 #endif
-		pline("Restoring save file...");
-		mark_synch();	/* flush output */
+        pline("Restoring save file...");
+        mark_synch();	/* flush output */
 
-		if (dorecover(fd)) {
-		    resuming = TRUE;	/* not starting new game */
-		    if (discover)
-			You("are in non-scoring discovery mode.");
-		    if (discover || wizard) {
-			if(yn("Do you want to keep the save file?") == 'n')
-				(void) delete_savefile();
-			else {
-			    nh_compress(fqname(SAVEF, SAVEPREFIX, 0));
-			}
-		    }
-		}
-	}
+        if (dorecover(fd)) {
+            resuming = TRUE;	/* not starting new game */
+            if (discover)
+            You("are in non-scoring discovery mode.");
+            if (discover || wizard) {
+            if(yn("Do you want to keep the save file?") == 'n')
+                (void) delete_savefile();
+            else {
+                nh_compress(fqname(SAVEF, SAVEPREFIX, 0));
+            }
+            }
+        }
+    }
 
-	if (!resuming) {
-		/* new game:  start by choosing role, race, etc;
-		   player might change the hero's name while doing that,
-		   in which case we try to restore under the new name
-		   and skip selection this time if that didn't succeed */
-		if (!iflags.renameinprogress) {
-		    player_selection();
-		    if (iflags.renameinprogress) {
-			/* player has renamed the hero while selecting role;
-			   discard current lock file and create another for
-			   the new character name */
+    if (!resuming) {
+        /* new game:  start by choosing role, race, etc;
+           player might change the hero's name while doing that,
+           in which case we try to restore under the new name
+           and skip selection this time if that didn't succeed */
+        if (!iflags.renameinprogress) {
+            player_selection();
+            if (iflags.renameinprogress) {
+            /* player has renamed the hero while selecting role;
+               discard current lock file and create another for
+               the new character name */
 #if 0       /* this needs to be reconciled with the getlock mess above... */
-			delete_levelfile(0); /* remove empty lock file */
-			getlock();
+            delete_levelfile(0); /* remove empty lock file */
+            getlock();
 #endif
-			goto attempt_restore;
-		    }
-		}
-		newgame();
-		if (discover)
-			You("are in non-scoring discovery mode.");
-	}
+            goto attempt_restore;
+            }
+        }
+        newgame();
+        if (discover)
+            You("are in non-scoring discovery mode.");
+    }
 
 #ifndef NO_SIGNAL
-	(void) signal(SIGINT, SIG_IGN);
+    (void) signal(SIGINT, SIG_IGN);
 #endif
 #ifdef OS2
-	gettty(); /* somehow ctrl-P gets turned back on during startup ... */
+    gettty(); /* somehow ctrl-P gets turned back on during startup ... */
 #endif
-	return resuming;
+    return resuming;
 }
 
 STATIC_OVL void
@@ -490,172 +517,172 @@ process_options(argc, argv)
 int argc;
 char *argv[];
 {
-	int i;
+    int i;
 
 
-	/*
-	 * Process options.
-	 */
-	while(argc > 1 && argv[1][0] == '-'){
-		argv++;
-		argc--;
-		switch(argv[0][1]){
-		case 'a':
-			if (argv[0][2]) {
-			    if ((i = str2align(&argv[0][2])) >= 0)
-			    	flags.initalign = i;
-			} else if (argc > 1) {
-				argc--;
-				argv++;
-			    if ((i = str2align(argv[0])) >= 0)
-			    	flags.initalign = i;
-			}
-			break;
-		case 'D':
-			wizard = TRUE, discover = FALSE;
-			break;
-		case 'X':
-			discover = TRUE, wizard = FALSE;
-			break;
+    /*
+     * Process options.
+     */
+    while(argc > 1 && argv[1][0] == '-'){
+        argv++;
+        argc--;
+        switch(argv[0][1]){
+        case 'a':
+            if (argv[0][2]) {
+                if ((i = str2align(&argv[0][2])) >= 0)
+                    flags.initalign = i;
+            } else if (argc > 1) {
+                argc--;
+                argv++;
+                if ((i = str2align(argv[0])) >= 0)
+                    flags.initalign = i;
+            }
+            break;
+        case 'D':
+            wizard = TRUE, discover = FALSE;
+            break;
+        case 'X':
+            discover = TRUE, wizard = FALSE;
+            break;
 #ifdef NEWS
-		case 'n':
-			iflags.news = FALSE;
-			break;
+        case 'n':
+            iflags.news = FALSE;
+            break;
 #endif
-		case 'u':
-			if(argv[0][2])
-			  (void) strncpy(plname, argv[0]+2, sizeof(plname)-1);
-			else if(argc > 1) {
-			  argc--;
-			  argv++;
-			  (void) strncpy(plname, argv[0], sizeof(plname)-1);
-			} else
-				raw_print("Player name expected after -u");
-			break;
+        case 'u':
+            if(argv[0][2])
+              (void) strncpy(plname, argv[0]+2, sizeof(plname)-1);
+            else if(argc > 1) {
+              argc--;
+              argv++;
+              (void) strncpy(plname, argv[0], sizeof(plname)-1);
+            } else
+                raw_print("Player name expected after -u");
+            break;
 #ifndef AMIGA
-		case 'I':
-		case 'i':
-			if (!strncmpi(argv[0]+1, "IBM", 3)) {
-				load_symset("IBMGraphics", PRIMARY);
-				load_symset("RogueIBM", ROGUESET);
-				switch_symbols(TRUE);
-			}
-			break;
-	    /*	case 'D': */
-		case 'd':
-			if (!strncmpi(argv[0]+1, "DEC", 3)) {
-				load_symset("DECGraphics", PRIMARY);
-				switch_symbols(TRUE);
-			}
-			break;
+        case 'I':
+        case 'i':
+            if (!strncmpi(argv[0]+1, "IBM", 3)) {
+                load_symset("IBMGraphics", PRIMARY);
+                load_symset("RogueIBM", ROGUESET);
+                switch_symbols(TRUE);
+            }
+            break;
+        /*	case 'D': */
+        case 'd':
+            if (!strncmpi(argv[0]+1, "DEC", 3)) {
+                load_symset("DECGraphics", PRIMARY);
+                switch_symbols(TRUE);
+            }
+            break;
 #endif
-		case 'g':
-			if (argv[0][2]) {
-			    if ((i = str2gend(&argv[0][2])) >= 0)
-			    	flags.initgend = i;
-			} else if (argc > 1) {
-				argc--;
-				argv++;
-			    if ((i = str2gend(argv[0])) >= 0)
-			    	flags.initgend = i;
-			}
-			break;
-		case 'p': /* profession (role) */
-			if (argv[0][2]) {
-			    if ((i = str2role(&argv[0][2])) >= 0)
-			    	flags.initrole = i;
-			} else if (argc > 1) {
-				argc--;
-				argv++;
-			    if ((i = str2role(argv[0])) >= 0)
-			    	flags.initrole = i;
-			}
-			break;
-		case 'r': /* race */
-			if (argv[0][2]) {
-			    if ((i = str2race(&argv[0][2])) >= 0)
-			    	flags.initrace = i;
-			} else if (argc > 1) {
-				argc--;
-				argv++;
-			    if ((i = str2race(argv[0])) >= 0)
-			    	flags.initrace = i;
-			}
-			break;
+        case 'g':
+            if (argv[0][2]) {
+                if ((i = str2gend(&argv[0][2])) >= 0)
+                    flags.initgend = i;
+            } else if (argc > 1) {
+                argc--;
+                argv++;
+                if ((i = str2gend(argv[0])) >= 0)
+                    flags.initgend = i;
+            }
+            break;
+        case 'p': /* profession (role) */
+            if (argv[0][2]) {
+                if ((i = str2role(&argv[0][2])) >= 0)
+                    flags.initrole = i;
+            } else if (argc > 1) {
+                argc--;
+                argv++;
+                if ((i = str2role(argv[0])) >= 0)
+                    flags.initrole = i;
+            }
+            break;
+        case 'r': /* race */
+            if (argv[0][2]) {
+                if ((i = str2race(&argv[0][2])) >= 0)
+                    flags.initrace = i;
+            } else if (argc > 1) {
+                argc--;
+                argv++;
+                if ((i = str2race(argv[0])) >= 0)
+                    flags.initrace = i;
+            }
+            break;
 #ifdef MFLOPPY
 # ifndef AMIGA
-		/* Player doesn't want to use a RAM disk
-		 */
-		case 'R':
-			ramdisk = FALSE;
-			break;
+        /* Player doesn't want to use a RAM disk
+         */
+        case 'R':
+            ramdisk = FALSE;
+            break;
 # endif
 #endif
 #ifdef AMIGA
-			/* interlaced and non-interlaced screens */
-		case 'L':
-			bigscreen = 1;
-			break;
-		case 'l':
-			bigscreen = -1;
-			break;
+            /* interlaced and non-interlaced screens */
+        case 'L':
+            bigscreen = 1;
+            break;
+        case 'l':
+            bigscreen = -1;
+            break;
 #endif
-		case '@':
-			flags.randomall = 1;
-			break;
-		default:
-			if ((i = str2role(&argv[0][1])) >= 0) {
-			    flags.initrole = i;
-				break;
-			} else raw_printf("\nUnknown switch: %s", argv[0]);
-			/* FALL THROUGH */
-		case '?':
-			nhusage();
-			nethack_exit(EXIT_SUCCESS);
-		}
-	}
+        case '@':
+            flags.randomall = 1;
+            break;
+        default:
+            if ((i = str2role(&argv[0][1])) >= 0) {
+                flags.initrole = i;
+                break;
+            } else raw_printf("\nUnknown switch: %s", argv[0]);
+            /* FALL THROUGH */
+        case '?':
+            nhusage();
+            nethack_exit(EXIT_SUCCESS);
+        }
+    }
 }
 
 STATIC_OVL void 
 nhusage()
 {
-	char buf1[BUFSZ], buf2[BUFSZ], *bufptr;
+    char buf1[BUFSZ], buf2[BUFSZ], *bufptr;
 
-	buf1[0] = '\0';
-	bufptr = buf1;
+    buf1[0] = '\0';
+    bufptr = buf1;
 
 #define ADD_USAGE(s)	if ((strlen(buf1) + strlen(s)) < (BUFSZ - 1)) Strcat(bufptr, s);
 
-	/* -role still works for those cases which aren't already taken, but
-	 * is deprecated and will not be listed here.
-	 */
-	(void) Sprintf(buf2,
+    /* -role still works for those cases which aren't already taken, but
+     * is deprecated and will not be listed here.
+     */
+    (void) Sprintf(buf2,
 "\nUsage:\n%s [-d dir] -s [-r race] [-p profession] [maxrank] [name]...\n       or",
-		hname);
-	ADD_USAGE(buf2);
+        hname);
+    ADD_USAGE(buf2);
 
-	(void) Sprintf(buf2,
-	 "\n%s [-d dir] [-u name] [-r race] [-p profession] [-[DX]]",
-		hname);
-	ADD_USAGE(buf2);
+    (void) Sprintf(buf2,
+     "\n%s [-d dir] [-u name] [-r race] [-p profession] [-[DX]]",
+        hname);
+    ADD_USAGE(buf2);
 #ifdef NEWS
-	ADD_USAGE(" [-n]");
+    ADD_USAGE(" [-n]");
 #endif
 #ifndef AMIGA
-	ADD_USAGE(" [-I] [-i] [-d]");
+    ADD_USAGE(" [-I] [-i] [-d]");
 #endif
 #ifdef MFLOPPY
 # ifndef AMIGA
-	ADD_USAGE(" [-R]");
+    ADD_USAGE(" [-R]");
 # endif
 #endif
 #ifdef AMIGA
-	ADD_USAGE(" [-[lL]]");
+    ADD_USAGE(" [-[lL]]");
 #endif
-	if (!iflags.window_inited)
-		raw_printf("%s\n",buf1);
-	else
-		(void) printf("%s\n",buf1);
+    if (!iflags.window_inited)
+        raw_printf("%s\n",buf1);
+    else
+        (void) printf("%s\n",buf1);
 #undef ADD_USAGE
 }
 
@@ -666,24 +693,24 @@ char *dir;
 boolean wr;
 {
 # ifdef AMIGA
-	static char thisdir[] = "";
+    static char thisdir[] = "";
 # else
-	static char thisdir[] = ".";
+    static char thisdir[] = ".";
 # endif
-	if(dir && chdir(dir) < 0) {
-		error("Cannot chdir to %s.", dir);
-	}
+    if(dir && chdir(dir) < 0) {
+        error("Cannot chdir to %s.", dir);
+    }
 
 # ifndef AMIGA
-	/* Change the default drive as well.
-	 */
-	chdrive(dir);
+    /* Change the default drive as well.
+     */
+    chdrive(dir);
 # endif
 
-	/* warn the player if we can't write the record file */
-	/* perhaps we should also test whether . is writable */
-	/* unfortunately the access system-call is worthless */
-	if (wr) check_recordfile(dir ? dir : thisdir);
+    /* warn the player if we can't write the record file */
+    /* perhaps we should also test whether . is writable */
+    /* unfortunately the access system-call is worthless */
+    if (wr) check_recordfile(dir ? dir : thisdir);
 }
 #endif /* CHDIR */
 
@@ -702,8 +729,8 @@ port_help()
 boolean
 authorize_wizard_mode()
 {
-	if (!strcmp(plname, WIZARD_NAME)) return TRUE;
-	return FALSE;
+    if (!strcmp(plname, WIZARD_NAME)) return TRUE;
+    return FALSE;
 }
 
 #ifdef EXEPATH
@@ -719,28 +746,28 @@ char exepathbuf[EXEPATHBUFSZ];
 char *exepath(str)
 char *str;
 {
-	char *tmp, *tmp2;
-	int bsize;
+    char *tmp, *tmp2;
+    int bsize;
 
-	if (!str) return (char *)0;
-	bsize = EXEPATHBUFSZ;
-	tmp = exepathbuf;
+    if (!str) return (char *)0;
+    bsize = EXEPATHBUFSZ;
+    tmp = exepathbuf;
 # ifndef WIN32
-	Strcpy (tmp, str);
+    Strcpy (tmp, str);
 # else
-	#ifdef UNICODE
-	{
-		TCHAR wbuf[BUFSZ];
-		GetModuleFileName((HANDLE)0, wbuf, BUFSZ);
-		WideCharToMultiByte(CP_ACP, 0, wbuf, -1, tmp, bsize, NULL, NULL);
-	}
-	#else
-		*(tmp + GetModuleFileName((HANDLE)0, tmp, bsize)) = '\0';
-	#endif
+    #ifdef UNICODE
+    {
+        TCHAR wbuf[BUFSZ];
+        GetModuleFileName((HANDLE)0, wbuf, BUFSZ);
+        WideCharToMultiByte(CP_ACP, 0, wbuf, -1, tmp, bsize, NULL, NULL);
+    }
+    #else
+        *(tmp + GetModuleFileName((HANDLE)0, tmp, bsize)) = '\0';
+    #endif
 # endif
-	tmp2 = strrchr(tmp, PATH_SEPARATOR);
-	if (tmp2) *tmp2 = '\0';
-	return tmp;
+    tmp2 = strrchr(tmp, PATH_SEPARATOR);
+    if (tmp2) *tmp2 = '\0';
+    return tmp;
 }
 #endif /* EXEPATH */
 

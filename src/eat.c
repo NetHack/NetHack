@@ -1611,7 +1611,7 @@ start_eating(otmp)		/* called as you start to eat */
 	context.victual.fullwarn = context.victual.doreset = FALSE;
 	context.victual.eating = TRUE;
 
-	if (otmp->otyp == CORPSE) {
+	if (otmp->otyp == CORPSE || otmp->globby) {
 	    cprefx(context.victual.piece->corpsenm);
 	    if (!context.victual.piece || !context.victual.eating) {
 		/* rider revived, or died and lifesaved */
@@ -2126,7 +2126,7 @@ struct obj *otmp;
 				!Stone_resistance &&
 				!poly_when_stoned(youmonst.data));
 
-		if (mnum == PM_GREEN_SLIME)
+		if (mnum == PM_GREEN_SLIME || otmp->otyp == GLOB_OF_GREEN_SLIME)
 		    stoneorslime = (!Unchanging && !slimeproof(youmonst.data));
 
 		if (cadaver && !nonrotting_corpse(mnum)) {
@@ -2396,7 +2396,7 @@ doeat()		/* generic "eat" command funtion (see cmd.c) */
 	 * for normal vs. rotten food.  The reqtime and nutrit values are
 	 * then adjusted in accordance with the amount of food left.
 	 */
-	if(otmp->otyp == CORPSE) {
+	if(otmp->otyp == CORPSE || otmp->globby) {
 	    int tmp = eatcorpse(otmp);
 	    if (tmp == 2) {
 		/* used up */

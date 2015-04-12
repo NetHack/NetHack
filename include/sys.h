@@ -34,6 +34,7 @@ struct sysopt {
 # endif
 #endif
 	int seduce;
+	int check_save_uid; /* restoring savefile checks UID? */
 };
 
 extern  struct sysopt sysopt;

@@ -1,5 +1,4 @@
-/* NetHack 3.5	objects.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	objects.c	$Date: 2011/07/28 04:00:20 $  $Revision: 1.23 $ */
+/* NetHack 3.5	objects.c	$NHDT-Date: 1426470348 2015/03/16 01:45:48 $  $NHDT-Branch: derek-farming $:$NHDT-Revision: 1.27 $ */
 /* Copyright (c) Mike Threepoint, 1989.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -670,10 +669,17 @@ FOOD("egg",                 85, 1,  1, 1, FLESH,  80, CLR_WHITE),
 FOOD("meatball",             0, 1,  1, 0, FLESH,   5, CLR_BROWN),
 FOOD("meat stick",           0, 1,  1, 0, FLESH,   5, CLR_BROWN),
 FOOD("huge chunk of meat",   0,20,400, 0, FLESH,2000, CLR_BROWN),
+
 /* special case because it's not mergable */
 OBJECT(OBJ("meat ring", (char *)0),
     BITS(1,0,0,0,0,0,0,0,0,0,0,0,FLESH),
     0, FOOD_CLASS, 0, 1, 5, 1, 0, 0, 0, 0, 5, CLR_BROWN),
+
+/* pudding 'corpses' will turn into these and combine */
+FOOD("glob of gray ooze",      0, 2, 20, 0, FLESH,  20, CLR_GRAY),
+FOOD("glob of brown pudding",  0, 2, 20, 0, FLESH,  20, CLR_BROWN),
+FOOD("glob of green slime",    0, 2, 20, 0, FLESH,  20, CLR_GREEN),
+FOOD("glob of black pudding",  0, 2, 20, 0, FLESH,  20, CLR_BLACK),
 
 /* fruits & veggies */
 FOOD("kelp frond",           0, 1,  1, 0, VEGGY,  30, CLR_GREEN),

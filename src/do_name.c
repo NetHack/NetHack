@@ -237,6 +237,7 @@ const char *goal;
 				if (glyph_is_cmap(k) &&
 				    (IS_DOOR(levl[tx][ty].typ) ||
 				     glyph_to_cmap(k) == S_room ||
+				     glyph_to_cmap(k) == S_darkroom ||
 				     glyph_to_cmap(k) == S_corr ||
 				     glyph_to_cmap(k) == S_litcorr)) {
 				    /* what the hero remembers to be at tx,ty */

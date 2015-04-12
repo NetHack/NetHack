@@ -160,7 +160,7 @@ magic_map_background(x, y, show)
     if (!cansee(x,y) && !lev->waslit) {
 	/* Floor spaces are dark if unlit.  Corridors are dark if unlit. */
 	if (lev->typ == ROOM && glyph == cmap_to_glyph(S_room))
-	    glyph = cmap_to_glyph(S_stone);
+	    glyph = cmap_to_glyph((flags.dark_room && iflags.use_color) ? (DARKROOMSYM) : S_stone);
 	else if (lev->typ == CORR && glyph == cmap_to_glyph(S_litcorr))
 	    glyph = cmap_to_glyph(S_corr);
     }
@@ -764,11 +764,11 @@ newsym(x,y)
 	 * These checks and changes must be here and not in back_to_glyph().
 	 * They are dependent on the position being out of sight.
 	 */
-	else if (!lev->waslit) {
+	else if (!lev->waslit || (flags.dark_room && iflags.use_color)) {
 	    if (lev->glyph == cmap_to_glyph(S_litcorr) && lev->typ == CORR)
 		show_glyph(x, y, lev->glyph = cmap_to_glyph(S_corr));
 	    else if (lev->glyph == cmap_to_glyph(S_room) && lev->typ == ROOM)
-		show_glyph(x, y, lev->glyph = cmap_to_glyph(S_stone));
+		show_glyph(x, y, lev->glyph = cmap_to_glyph(DARKROOMSYM));
 	    else
 		goto show_mem;
 	} else {

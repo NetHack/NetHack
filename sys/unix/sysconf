@@ -40,6 +40,9 @@ MAXPLAYERS=10
 # Uncomment the next line to disable the SEDUCE option.
 #SEDUCE=0
 
+# Uncomment to disable savefile UID checking.
+#CHECK_SAVE_UID=0
+
 # Record (high score) file options.
 # CAUTION: changing these after people have started playing games can
 #  lead to lost high scores!

@@ -250,7 +250,7 @@ lookat(x, y, buf, monbuf)
 	int tnum = what_trap(glyph_to_trap(glyph));
 	Strcpy(buf, defsyms[trap_to_defsym(tnum)].explanation);
     } else if(!glyph_is_cmap(glyph)) {
-	Strcpy(buf,"dark part of a room");
+	Strcpy(buf,"unexplored area");
     } else switch(glyph_to_cmap(glyph)) {
     case S_altar:
 	Sprintf(buf, "%s %saltar",
@@ -557,8 +557,8 @@ const char **firstmatch;
 	x_str = defsyms[i].explanation;
 	if (sym == ((looked) ?
 		    showsyms[i] : defsyms[i].sym) && *x_str) {
-	    /* avoid "an air", "a water", or "a floor of a room" */
-	    int article = (i == S_room) ? 2 :		/* 2=>"the" */
+	    /* avoid "an air", "a water", "a floor of a room", "a dark part of a room"  */
+	    int article = ((i == S_room)||(i == S_darkroom)) ? 2 :	/* 2=>"the" */
 		!(strcmp(x_str, "air") == 0 ||	/* 1=>"an"  */
 		  strcmp(x_str, "water") == 0);	/* 0=>(none)*/
 

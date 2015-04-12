@@ -1,4 +1,4 @@
-/* NetHack 3.5	extern.h	$NHDT-Date: 1426966688 2015/03/21 19:38:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.411 $ */
+/* NetHack 3.5	extern.h	$NHDT-Date: 1428715841 2015/04/11 01:30:41 $  $NHDT-Branch: master $:$NHDT-Revision: 1.454 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -856,6 +856,8 @@ E int NDECL(midnight);
 
 /* ### invent.c ### */
 
+E struct obj **FDECL(objarr_init, (int));
+E void FDECL(objarr_set, (struct obj *, int, struct obj **, BOOLEAN_P));
 E void FDECL(assigninvlet, (struct obj *));
 E struct obj *FDECL(merge_choice, (struct obj *,struct obj *));
 E int FDECL(merged, (struct obj **,struct obj **));
@@ -1224,6 +1226,10 @@ E void FDECL(obj_ice_effects, (int, int, BOOLEAN_P));
 E long FDECL(peek_at_iced_corpse_age, (struct obj *));
 E int FDECL(hornoplenty, (struct obj *,BOOLEAN_P));
 E void NDECL(obj_sanity_check);
+E struct obj* FDECL(obj_nexto, (struct obj*));
+E struct obj* FDECL(obj_nexto_xy, (int, int, int, unsigned));
+E struct obj* FDECL(obj_absorb, (struct obj**, struct obj**));
+E struct obj* FDECL(obj_meld, (struct obj**, struct obj**));
 
 /* ### mkroom.c ### */
 
@@ -1522,6 +1528,7 @@ E char *FDECL(doname, (struct obj *));
 E boolean FDECL(not_fully_identified, (struct obj *));
 E char *FDECL(corpse_xname, (struct obj *,const char *,unsigned));
 E char *FDECL(cxname, (struct obj *));
+E char *FDECL(cxname_singular, (struct obj *));
 E char *FDECL(killer_xname, (struct obj *));
 E char *FDECL(short_oname, (struct obj *,char *(*)(OBJ_P),char *(*)(OBJ_P),
 			    unsigned));
@@ -2656,7 +2663,7 @@ E struct monst *FDECL(bhit, (int,int,int,int,int (*)(MONST_P,OBJ_P),
 			     int (*)(OBJ_P,OBJ_P),struct obj **));
 E struct monst *FDECL(boomhit, (struct obj *,int,int));
 E int FDECL(zhitm, (struct monst *,int,int,struct obj **));
-E int FDECL(burn_floor_paper, (int,int,BOOLEAN_P,BOOLEAN_P));
+E int FDECL(burn_floor_objects, (int,int,BOOLEAN_P,BOOLEAN_P));
 E void FDECL(buzz, (int,int,XCHAR_P,XCHAR_P,int,int));
 E void FDECL(melt_ice, (XCHAR_P,XCHAR_P,const char *));
 E void FDECL(start_melt_ice_timeout, (XCHAR_P,XCHAR_P,long));

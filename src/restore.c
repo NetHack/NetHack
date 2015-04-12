@@ -501,6 +501,13 @@ register struct obj *otmp;
 	else otmp->spe = fruitadd(oldf->fname, (struct fruit *)0);
 }
 
+
+#ifdef SYSCF
+#define SYSOPT_CHECK_SAVE_UID sysopt.check_save_uid
+#else
+#define SYSOPT_CHECK_SAVE_UID TRUE
+#endif
+
 STATIC_OVL
 boolean
 restgamestate(fd, stuckid, steedid)
@@ -516,7 +523,7 @@ unsigned int *stuckid, *steedid;
 	unsigned long uid;
 
 	mread(fd, (genericptr_t) &uid, sizeof uid);
-	if (uid != (unsigned long)getuid()) {		/* strange ... */
+	if (SYSOPT_CHECK_SAVE_UID && uid != (unsigned long)getuid()) {		/* strange ... */
 	    /* for wizard mode, issue a reminder; for others, treat it
 	       as an attempt to cheat and refuse to restore this file */
 	    pline("Saved game was not yours.");

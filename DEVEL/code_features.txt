@@ -7,7 +7,7 @@ rationale, etc.
 ==============================================
 FEATURE_NOTICE Alerts for a Release
 
-There is a code mechanism for alterting players to a change in behavior
+There is a code mechanism for alerting players to a change in behavior
 over prior versions of the game.
 
 Here's how to do it:

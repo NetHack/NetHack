@@ -524,12 +524,11 @@ schar filling;
 
 	for (x = x1; x <= x2; x++)
 		for (y = y1; y <= y2; y++) {
-#ifndef WALLIFIED_MAZE
-			levl[x][y].typ = STONE;
-#else
-			levl[x][y].typ =
-				(y < 2 || ((x % 2) && (y % 2))) ? STONE : filling;
-#endif
+            if (level.flags.corrmaze)
+			    levl[x][y].typ = STONE;
+            else
+                levl[x][y].typ =
+                    (y < 2 || ((x % 2) && (y % 2))) ? STONE : filling;
 		}
 }
 
@@ -2952,6 +2951,7 @@ spo_level_flags(coder)
     if (lflags & GRAVEYARD)    level.flags.graveyard = 1;
     if (lflags & ICEDPOOLS)    icedpools = TRUE;
     if (lflags & SOLIDIFY)     coder->solidify = TRUE;
+    if (lflags & CORRMAZE)     level.flags.corrmaze = TRUE;
 
     opvar_free(flagdata);
 }
@@ -4118,11 +4118,7 @@ spo_mazewalk(coder)
     if (!isok(x,y)) return;
 
     if (OV_i(ftyp) < 1) {
-#ifndef WALLIFIED_MAZE
-	OV_i(ftyp) = CORR;
-#else
-	OV_i(ftyp) = ROOM;
-#endif
+      OV_i(ftyp) = level.flags.corrmaze ? CORR : ROOM;
     }
 
     /* don't use move() - it doesn't use W_NORTH, etc. */
@@ -5040,7 +5036,7 @@ sp_lev *lvl;
 	    break;
 	case SPO_SEL_LINE:
 	    {
-		struct opvar *tmp, *tmp2, *pt = selection_opvar(NULL);
+		struct opvar *tmp = NULL, *tmp2 = NULL, *pt = selection_opvar(NULL);
 		schar x1,y1,x2,y2;
 		if (!OV_pop_c(tmp)) panic("no ter sel linecoord1");
 		if (!OV_pop_c(tmp2)) panic("no ter sel linecoord2");
@@ -5058,7 +5054,7 @@ sp_lev *lvl;
 	    break;
 	case SPO_SEL_RNDLINE:
 	    {
-		struct opvar *tmp, *tmp2, *tmp3, *pt = selection_opvar(NULL);
+		struct opvar *tmp = NULL, *tmp2 = NULL, *tmp3, *pt = selection_opvar(NULL);
 		schar x1,y1,x2,y2;
 		if (!OV_pop_i(tmp3)) panic("no ter sel randline1");
 		if (!OV_pop_c(tmp)) panic("no ter sel randline2");
@@ -5171,7 +5167,14 @@ next_opcode:
     link_doors_rooms();
     fill_rooms();
     remove_boundary_syms();
-    wallification(1, 0, COLNO-1, ROWNO-1);
+    /* FIXME: Ideally, we want this call to only cover areas of the map
+     * which were not inserted directly by the special level file (see
+     * the insect legs on Baalzebub's level, for instance). Since that
+     * is currently not possible, we overload the corrmaze flag for this
+     * purpose.
+     */
+    if (!level.flags.corrmaze)
+      wallification(1, 0, COLNO-1, ROWNO-1);
 
     count_features();
 

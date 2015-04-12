@@ -1,4 +1,4 @@
-/* NetHack 3.5	tradstdc.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	tradstdc.h	$NHDT-Date: 1428655166 2015/04/10 08:39:26 $  $NHDT-Branch: master $:$NHDT-Revision: 1.19 $ */
 /* NetHack 3.5	tradstdc.h	$Date: 2012/01/11 18:23:26 $  $Revision: 1.15 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -95,10 +95,17 @@
 #   define VA_DECL(typ1,var1)  (var1,VA_ARGS) typ1 var1; \
 	char *arg1,*arg2,*arg3,*arg4,*arg5,*arg6,*arg7,*arg8,*arg9; {
 #   define VA_DECL2(typ1,var1,typ2,var2)  (var1,var2,VA_ARGS) \
-	typ1 var1; typ2 var2;\
+	typ1 var1; typ2 var2; \
 	char *arg1,*arg2,*arg3,*arg4,*arg5,*arg6,*arg7,*arg8,*arg9; {
 #   define VA_START(x)
 #   define VA_INIT(var1,typ1)
+    /* this is inherently risky, and should only be attempted as a
+       very last resort; manipulating arguments which haven't actually
+       been passed may or may not cause severe trouble depending on
+       the function-calling/argument-passing mechanism being used */
+#   define VA_SHIFT()	(arg1=arg2, arg2=arg3, arg3=arg4, arg4=arg5,\
+			 arg5=arg6, arg6=arg7, arg7=arg8, arg8=arg9)
+#   define VA_NEXT(var1,typ1)	((var1 = (typ1)arg1), VA_SHIFT(), var1)
 #   define VA_END()
 # endif
 #endif

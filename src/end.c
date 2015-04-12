@@ -1236,6 +1236,9 @@ struct obj *list;
 boolean identified, all_containers, reportempty;
 {
 	register struct obj *box, *obj;
+	struct obj **oarray;
+	int i,n;
+	char *invlet;
 	char buf[BUFSZ];
 	boolean cat, deadcat;
 
@@ -1255,10 +1258,30 @@ boolean identified, all_containers, reportempty;
 		    continue;	/* wrong type of container */
 		} else if (box->cobj) {
 		    winid tmpwin = create_nhwindow(NHW_MENU);
+
+		    /* count the number of items */
+		    for (n = 0, obj = box->cobj; obj; obj = obj->nobj) n++;
+		    /* Make a temporary array to store the objects sorted */
+		    oarray = objarr_init(n);
+
+		    /* Add objects to the array */
+		    i = 0;
+		    invlet = flags.inv_order;
+		nextclass:
+		    for (obj = box->cobj; obj; obj = obj->nobj) {
+			if (!flags.sortpack || obj->oclass == *invlet) {
+			    objarr_set(obj, i++, oarray, (flags.sortloot == 'f' || flags.sortloot == 'l') );
+			}
+		    } /* for loop */
+		    if (flags.sortpack) {
+			if (*++invlet) goto nextclass;
+		    }
+
 		    Sprintf(buf, "Contents of %s:", the(xname(box)));
 		    putstr(tmpwin, 0, buf);
 		    putstr(tmpwin, 0, "");
-		    for (obj = box->cobj; obj; obj = obj->nobj) {
+		    for (i = 0; i < n; i++) {
+			obj = oarray[i];
 			if (identified) {
 			    makeknown(obj->otyp);
 			    obj->known = obj->bknown =
@@ -1268,6 +1291,7 @@ boolean identified, all_containers, reportempty;
 			}
 			putstr(tmpwin, 0, doname(obj));
 		    }
+		    free(oarray);
 		    if (cat) putstr(tmpwin, 0, "Schroedinger's cat");
 		    else if (deadcat) putstr(tmpwin, 0, "Schroedinger's dead cat");
 		    display_nhwindow(tmpwin, TRUE);
@@ -1412,43 +1436,72 @@ num_genocides()
     return n;
 }
 
+int
+num_extinct()
+{
+    int i, n = 0;
+
+    for (i = LOW_PM; i < NUMMONS; ++i)
+	if (!(mvitals[i].mvflags & G_GENOD) &&
+	    (mvitals[i].mvflags & G_GONE) &&
+	    !(mons[i].geno & G_UNIQ)) ++n;
+
+    return n;
+}
+
+
 STATIC_OVL void
 list_genocided(defquery, ask)
 char defquery;
 boolean ask;
 {
     register int i;
-    int ngenocided;
+    int ngenocided, nextinct;
     char c;
     winid klwin;
     char buf[BUFSZ];
 
     ngenocided = num_genocides();
+    nextinct = num_extinct();
 
-    /* genocided species list */
-    if (ngenocided != 0) {
-	c = ask ? yn_function("Do you want a list of species genocided?",
-			      ynqchars, defquery) : defquery;
+    /* genocided or extinct species list */
+    if (ngenocided != 0 || nextinct != 0) {
+	Sprintf(buf, "Do you want a list of %sspecies%s%s?",
+		(nextinct && !ngenocided) ? "extinct " : "",
+		(ngenocided) ? " genocided" : "",
+		(nextinct && ngenocided) ? " and extinct" : "");
+	c = ask ? yn_function(buf, ynqchars, defquery) : defquery;
 	if (c == 'q') done_stopprint++;
 	if (c == 'y') {
 	    klwin = create_nhwindow(NHW_MENU);
-	    putstr(klwin, 0, "Genocided species:");
+	    Sprintf(buf, "%s%s species:",
+		    (ngenocided) ? "Genocided" : "Extinct",
+		    (nextinct && ngenocided) ? " or extinct" : "");
+	    putstr(klwin, 0, buf);
 	    putstr(klwin, 0, "");
 
 	    for (i = LOW_PM; i < NUMMONS; i++)
-		if (mvitals[i].mvflags & G_GENOD) {
+		if (mvitals[i].mvflags & G_GONE && !(mons[i].geno & G_UNIQ)) {
 		    if ((mons[i].geno & G_UNIQ) && i != PM_HIGH_PRIEST)
 			Sprintf(buf, "%s%s",
 				!type_is_pname(&mons[i]) ? "" : "the ",
 				mons[i].mname);
 		    else
 			Strcpy(buf, makeplural(mons[i].mname));
+		    if (!(mvitals[i].mvflags & G_GENOD))
+			Strcat(buf, " (extinct)");
 		    putstr(klwin, 0, buf);
 		}
 
 	    putstr(klwin, 0, "");
-	    Sprintf(buf, "%d species genocided.", ngenocided);
-	    putstr(klwin, 0, buf);
+	    if (ngenocided > 0) {
+		Sprintf(buf, "%d species genocided.", ngenocided);
+		putstr(klwin, 0, buf);
+	    }
+	    if (nextinct > 0) {
+		Sprintf(buf, "%d species extinct.", nextinct);
+		putstr(klwin, 0, buf);
+	    }
 
 	    display_nhwindow(klwin, TRUE);
 	    destroy_nhwindow(klwin);

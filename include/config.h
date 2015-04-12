@@ -415,7 +415,6 @@ typedef unsigned char	uchar;
 /* display features */
 /* dungeon features */
 /* dungeon levels */
-#define WALLIFIED_MAZE	/* Fancy mazes - Jean-Christophe Collet */
 /* monsters & objects */
 /* I/O */
 #if !defined(MAC)
@@ -437,6 +436,8 @@ typedef unsigned char	uchar;
  */
 
 /* Menucolors */
+/* HACK: this is being added to fix the builds temporarily.
+ * Remove it whenever we finally get a real regex for Win32 */
 #ifdef UNIX
 # define MENU_COLOR_REGEX  /* use GNU regex */
 /*# define MENU_COLOR_REGEX_POSIX*/ /* use POSIX regex */

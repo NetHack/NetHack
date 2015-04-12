@@ -603,24 +603,28 @@ STATIC_DCL struct tm *NDECL(getlt);
 void
 setrandom()
 {
-	time_t now = getnow();		/* time((TIME_type) 0) */
+	unsigned long seed = (unsigned long)getnow();		/* time((TIME_type) 0) */
+#ifdef UNIX
+	/* Quick dirty band-aid to prevent PRNG prediction */
+	seed *= getpid();
+#endif
 
 	/* the types are different enough here that sweeping the different
 	 * routine names into one via #defines is even more confusing
 	 */
 #ifdef RANDOM	/* srandom() from sys/share/random.c */
-	srandom((unsigned int) now);
+	srandom((unsigned int) seed);
 #else
 # if defined(__APPLE__) || defined(BSD) || defined(LINUX) || defined(ULTRIX) || defined(CYGWIN32) /* system srandom() */
 #  if defined(BSD) && !defined(POSIX_TYPES) && defined(SUNOS4)
 	(void)
 #  endif
-		srandom((int) now);
+		srandom((int) seed);
 # else
 #  ifdef UNIX	/* system srand48() */
-	srand48((long) now);
+	srand48((long) seed);
 #  else		/* poor quality system routine */
-	srand((int) now);
+	srand((int) seed);
 #  endif
 # endif
 #endif
