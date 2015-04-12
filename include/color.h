@@ -1,4 +1,4 @@
-/* NetHack 3.5	color.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	color.h	$NHDT-Date: 1428088106 2015/04/03 19:08:26 $  $NHDT-Branch: scshunt-regex $:$NHDT-Revision: 1.8 $ */
 /* NetHack 3.5	color.h	$Date: 2009/05/06 10:44:34 $  $Revision: 1.5 $ */
 /*	SCCS Id: @(#)color.h	3.5	1992/02/02	*/
 /* Copyright (c) Steve Linhart, Eric Raymond, 1989. */
@@ -6,10 +6,6 @@
 
 #ifndef COLOR_H
 #define COLOR_H
-
-#ifdef MENU_COLOR_REGEX
-#include <regex.h>
-#endif
 
 /*
  * The color scheme used is tailored for an IBM PC.  It consists of the
@@ -56,15 +52,7 @@
 #define HI_ZAP		CLR_BRIGHT_BLUE
 
 struct menucoloring {
-# ifdef MENU_COLOR_REGEX
-#  ifdef MENU_COLOR_REGEX_POSIX
-    regex_t match;
-#  else
-    struct re_pattern_buffer match;
-#  endif
-# else
-    char *match;
-# endif
+    struct nhregex *match;
     int color, attr;
     struct menucoloring *next;
 };

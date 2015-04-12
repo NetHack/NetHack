@@ -1487,6 +1487,13 @@ E void NDECL(init_lan_features);
 E char *NDECL(lan_username);
 #endif
 
+/* ### nhregex.c ### */
+E struct nhregex * NDECL(regex_init);
+E boolean FDECL(regex_compile, (const char *, struct nhregex *));
+E const char *FDECL(regex_error_desc, (struct nhregex *));
+E boolean FDECL(regex_match, (const char *, struct nhregex*));
+E void FDECL(regex_free, (struct nhregex *));
+
 /* ### nttty.c ### */
 
 #ifdef WIN32CON
