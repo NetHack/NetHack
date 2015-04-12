@@ -3284,16 +3284,6 @@ successors originally by \fBDaniel Thaler\fP and then by \fBAlex Smith\fP,
 and Dynahack by \fBTung Nguyen\fP. Some of those variants continue to be 
 developed, maintained, and enjoyed by the community to this day.
 .pg
-In September 2014, an interim snapshot of the code under development was 
-released publicly by other parties. Since that code was a work-in-progress 
-and had not gone through a period of debugging, it was decided that the 
-version numbers present on that code snapshot would be retired and never 
-used in an official NetHack release. An announcement was posted on the 
-devteam's official nethack.org website to that effect, stating that there 
-would never be a 3.4.4, 3.5, or 3.5.0 official release version.
-.pg
-In January 2015, preparation began for the release of NetHack 3.6
-.pg
 At the beginning of development for what would eventually get released
 as 3.6.0, the development team consisted of \fBWarwick Allison\fP, 
 \fBMichael Allison\fP, \fBKen Arromdee\fP,
@@ -3302,13 +3292,24 @@ as 3.6.0, the development team consisted of \fBWarwick Allison\fP,
 \fBMike Stephenson\fP, \fBJanet Walz\fP, and \fBPaul Winner\fP.
 Leading up to the release of 3.6.0 in early 2015, new members
 \fBSean Hunt\fP, \fBPasi Kallinen\fP, and \fBDerek S. Ray\fP
-joined the NetHack development team, 
+joined the NetHack development team.
 .pg
-\fB3.6.0 TODO insert apprpriate description of 3.6.0 here
+In September 2014, an interim snapshot of the code under development was 
+released publicly by other parties. Since that code was a work-in-progress 
+and had not gone through a period of debugging, it was decided that the 
+version numbers present on that code snapshot would be retired and never 
+used in an official NetHack release. An announcement was posted on the 
+devteam's official nethack.org website to that effect, stating that there 
+would never be a 3.4.4, 3.5, or 3.5.0 official release version.
+.pg
+In January 2015, preparation began for the release of NetHack 3.6. The 3.6
+version merges work done by the development team since the previous release with 
+some of the beloved community patches. Many bugs were fixed and some code was 
+restructured.
 .pg
 \fBThe development team, as well as \fBSteve VanDevender\fP and 
 \fBKevin Smolkowski\fP ensured that NetHack 3.6.0 continued to operate on 
-various Unix flavors as well as maintaining the X11 interface. 
+various Unix flavors and maintained the X11 interface. 
 .pg
 \fBKen Lorber\fP, \fBHaoyang Wang\fP, \fBPat Rankin\fP, and \fBDean Luick\fP 
 maintained the port of NetHack 3.6.0 for Mac.
@@ -3318,8 +3319,6 @@ maintained the port of NetHack 3.6.0 for Mac.
 NetHack 3.6.0 for Microsoft Windows.
 .pg
 \fBJeff Bailey\fP created and maintained a port of NetHack 3.6.0 for Chrome.
-.pg
-TODO \fBAlex Kompel\fP maintained a port of NetHack 3.6.0 to Windows Phone.
 .pg
 \fBThis version of the game is special in a particular way.  Near the end of 
 the development of 3.6, one of the significant inspirations for many of the 
