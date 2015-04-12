@@ -1,4 +1,4 @@
-/* NetHack 3.5	extern.h	$NHDT-Date: 1428715841 2015/04/11 01:30:41 $  $NHDT-Branch: master $:$NHDT-Revision: 1.454 $ */
+/* NetHack 3.5	extern.h	$NHDT-Date: 1428806395 2015/04/12 02:39:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.455 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -832,6 +832,8 @@ E int FDECL(isqrt, (int));
 E int FDECL(distmin, (int,int,int,int));
 E boolean FDECL(online2, (int,int,int,int));
 E boolean FDECL(pmatch, (const char *,const char *));
+E boolean FDECL(pmatchi, (const char *,const char *));
+E boolean FDECL(pmatchz, (const char *,const char *));
 #ifndef STRNCMPI
 E int FDECL(strncmpi, (const char *,const char *,int));
 #endif
