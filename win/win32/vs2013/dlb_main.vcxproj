@@ -135,6 +135,7 @@ if NOT exist porthelp copy ..\sys\winnt\porthelp porthelp
 if exist porthelp echo porthelp &gt;&gt;dlb.lst
 echo quest.dat &gt;&gt;dlb.lst
 echo rumors &gt;&gt;dlb.lst
+echo tribute &gt;&gt;dlb.lst
 echo help &gt;&gt;dlb.lst
 echo hh &gt;&gt;dlb.lst
 echo cmdhelp &gt;&gt;dlb.lst
@@ -205,6 +206,7 @@ if NOT exist porthelp copy ..\sys\winnt\porthelp porthelp
 if exist porthelp echo porthelp &gt;&gt;dlb.lst
 echo quest.dat &gt;&gt;dlb.lst
 echo rumors &gt;&gt;dlb.lst
+echo tribute &gt;&gt;dlb.lst
 echo help &gt;&gt;dlb.lst
 echo hh &gt;&gt;dlb.lst
 echo cmdhelp &gt;&gt;dlb.lst
@@ -278,6 +280,7 @@ if NOT exist porthelp copy ..\sys\winnt\porthelp porthelp
 if exist porthelp echo porthelp &gt;&gt;dlb.lst
 echo quest.dat &gt;&gt;dlb.lst
 echo rumors &gt;&gt;dlb.lst
+echo tribute &gt;&gt;dlb.lst
 echo help &gt;&gt;dlb.lst
 echo hh &gt;&gt;dlb.lst
 echo cmdhelp &gt;&gt;dlb.lst
@@ -349,6 +352,7 @@ if NOT exist porthelp copy ..\sys\winnt\porthelp porthelp
 if exist porthelp echo porthelp &gt;&gt;dlb.lst
 echo quest.dat &gt;&gt;dlb.lst
 echo rumors &gt;&gt;dlb.lst
+echo tribute &gt;&gt;dlb.lst
 echo help &gt;&gt;dlb.lst
 echo hh &gt;&gt;dlb.lst
 echo cmdhelp &gt;&gt;dlb.lst
