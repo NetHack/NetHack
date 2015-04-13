@@ -884,12 +884,11 @@ BOOL onMeasureItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
     /* Set the height of the list box items to max height of the individual items */
 	for( i=0; i<data->menu.size;  i++) {
 		if( NHMENU_HAS_GLYPH(data->menu.items[i]) && !IS_MAP_ASCII(iflags.wc_map_mode) ) {
-			lpmis->itemHeight = max( lpmis->itemHeight, (UINT)max(tm.tmHeight, GetNHApp()->mapTile_Y) );
+			lpmis->itemHeight = max( lpmis->itemHeight, (UINT)max(tm.tmHeight, GetNHApp()->mapTile_Y)+2 );
 		} else {
-			lpmis->itemHeight = max( lpmis->itemHeight, (UINT)max(tm.tmHeight, TILE_Y) );
+			lpmis->itemHeight = max( lpmis->itemHeight, (UINT)max(tm.tmHeight, TILE_Y)+2 );
 		}
 	}
-	lpmis->itemHeight += 2;
 
 	/* set width to the window width */
 	lpmis->itemWidth = list_rect.right - list_rect.left;
