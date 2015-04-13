@@ -15,6 +15,11 @@
 
 #include "sp_lev.h"
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4244)
+#endif
+
 typedef void (*select_iter_func)(int, int, genericptr_t);
 
 extern void FDECL(mkmap, (lev_init *));
@@ -403,7 +408,7 @@ opvar_clone(ov)
     case SPOVAR_VARIABLE:
     case SPOVAR_STRING:
     case SPOVAR_SEL:
-	tmpov->vardata.str = strdup(ov->vardata.str);
+	tmpov->vardata.str = dupstr(ov->vardata.str);
 	break;
     default: impossible("Unknown push value type (%i)!", ov->spovartyp);
     }
@@ -2673,7 +2678,7 @@ spo_monster(coder)
 	case SP_M_V_NAME:
 	    if ((OV_typ(parm) == SPOVAR_STRING) &&
 		!tmpmons.name.str)
-		tmpmons.name.str = strdup(OV_s(parm));
+		tmpmons.name.str = dupstr(OV_s(parm));
 	    break;
 	case SP_M_V_APPEAR:
 	    if ((OV_typ(parm) == SPOVAR_INT) &&
@@ -2681,7 +2686,7 @@ spo_monster(coder)
 		tmpmons.appear = OV_i(parm);
 		opvar_free(parm);
 		OV_pop(parm);
-		tmpmons.appear_as.str = strdup(OV_s(parm));
+		tmpmons.appear_as.str = dupstr(OV_s(parm));
 	    }
 	    break;
 	case SP_M_V_ASLEEP:
@@ -2816,7 +2821,7 @@ spo_object(coder)
 	case SP_O_V_NAME:
 	    if ((OV_typ(parm) == SPOVAR_STRING) &&
 		!tmpobj.name.str)
-		tmpobj.name.str = strdup(OV_s(parm));
+		tmpobj.name.str = dupstr(OV_s(parm));
 	    break;
 	case SP_O_V_CORPSENM:
 	    if (OV_typ(parm) == SPOVAR_MONST) {
@@ -3921,7 +3926,7 @@ spo_levregion(coder)
     tmplregion->del_islev = OV_i(del_islev);
     tmplregion->rtype = OV_i(rtype);
     tmplregion->padding = OV_i(padding);
-    tmplregion->rname.str = strdup(OV_s(rname));
+    tmplregion->rname.str = dupstr(OV_s(rname));
 
     if(!tmplregion->in_islev) {
 	get_location(&tmplregion->inarea.x1, &tmplregion->inarea.y1,
@@ -4490,7 +4495,7 @@ spo_var_init(coder)
 	tmpvar = (struct splev_var *)malloc(sizeof(struct splev_var));
 	if (!tmpvar) panic("newvar tmpvar alloc");
 	tmpvar->next = coder->frame->variables;
-	tmpvar->name = strdup(OV_s(vname));
+	tmpvar->name = dupstr(OV_s(vname));
 	coder->frame->variables = tmpvar;
 
 	if (OV_i(arraylen) < 0) {
@@ -5032,7 +5037,7 @@ sp_lev *lvl;
 	    break;
 	case SPO_SEL_LINE:
 	    {
-		struct opvar *tmp, *tmp2, *pt = selection_opvar(NULL);
+		struct opvar *tmp = NULL, *tmp2 = NULL, *pt = selection_opvar(NULL);
 		schar x1,y1,x2,y2;
 		if (!OV_pop_c(tmp)) panic("no ter sel linecoord1");
 		if (!OV_pop_c(tmp2)) panic("no ter sel linecoord2");
@@ -5050,7 +5055,7 @@ sp_lev *lvl;
 	    break;
 	case SPO_SEL_RNDLINE:
 	    {
-		struct opvar *tmp, *tmp2, *tmp3, *pt = selection_opvar(NULL);
+		struct opvar *tmp = NULL, *tmp2 = NULL, *tmp3, *pt = selection_opvar(NULL);
 		schar x1,y1,x2,y2;
 		if (!OV_pop_i(tmp3)) panic("no ter sel randline1");
 		if (!OV_pop_c(tmp)) panic("no ter sel randline2");
@@ -5163,7 +5168,14 @@ next_opcode:
     link_doors_rooms();
     fill_rooms();
     remove_boundary_syms();
-    wallification(1, 0, COLNO-1, ROWNO-1);
+    /* FIXME: Ideally, we want this call to only cover areas of the map
+     * which were not inserted directly by the special level file (see
+     * the insect legs on Baalzebub's level, for instance). Since that
+     * is currently not possible, we overload the corrmaze flag for this
+     * purpose.
+     */
+    if (!level.flags.corrmaze)
+      wallification(1, 0, COLNO-1, ROWNO-1);
 
     count_features();
 
@@ -5214,5 +5226,9 @@ const char *name;
 	return result;
 }
 
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 /*sp_lev.c*/

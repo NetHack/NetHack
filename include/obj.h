@@ -94,7 +94,7 @@ struct obj {
 	Bitfield(recharged,3);	/* number of times it's been recharged */
 #define on_ice recharged	/* corpse on ice */
 	Bitfield(lamplit,1);	/* a light-source -- can be lit */
-	Bitfield(oreserved1,1);	/* was the placeholder for invisible objects, free for use */
+    Bitfield(globby,1);	    /* globby; will combine with like types on adjacent squares */
 	Bitfield(greased,1);	/* covered with grease */
 	Bitfield(nomerge,1);	/* set temporarily to prevent merging */
 	Bitfield(was_thrown,1);	/* thrown by hero since last picked up */
@@ -108,6 +108,7 @@ struct obj {
 	int	corpsenm;	/* type of corpse is mons[corpsenm] */
 #define leashmon  corpsenm	/* gets m_id of attached pet */
 #define fromsink  corpsenm	/* a potion from a sink */
+#define novelidx corpsenm	/* 3.6.0 tribute - the index of the novel title */
 #define record_achieve_special corpsenm
 	int usecount;		/* overloaded for various things that tally */
 #define spestudied usecount	/* # of times a spellbook has been studied */
@@ -232,6 +233,11 @@ struct obj {
 #define polyfodder(obj) (ofood(obj) && pm_to_cham((obj)->corpsenm) != NON_PM)
 #define mlevelgain(obj) (ofood(obj) && (obj)->corpsenm == PM_WRAITH)
 #define mhealup(obj)	(ofood(obj) && (obj)->corpsenm == PM_NURSE)
+#define Is_pudding(o) (o->otyp == GLOB_OF_GRAY_OOZE \
+                        || o->otyp == GLOB_OF_BROWN_PUDDING \
+                        || o->otyp == GLOB_OF_GREEN_SLIME \
+                        || o->otyp == GLOB_OF_BLACK_PUDDING)
+                        
 
 /* Containers */
 #define carried(o)	((o)->where == OBJ_INVENT)

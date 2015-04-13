@@ -78,6 +78,14 @@ struct polearm_info {
 	unsigned m_id;		/* monster id of hitmon, in save file */
 };
 
+struct tribute_info {
+	size_t tributesz;	/* make it possible to skip this in future */
+	boolean  enabled;	/* Do we have tributes turned on? */
+	Bitfield(bookstock,1);	/* Have we stocked the book? */
+				/* Markers for other tributes can go here */
+	/* 31 free bits */
+};
+	
 struct context_info {
 	unsigned ident;		/* social security number for each monster */
 	unsigned no_of_wizards; /* 0, 1 or 2 (wizard and his shadow) */
@@ -102,6 +110,7 @@ struct context_info {
 	boolean  bypasses;	/* bypass flag is set on at least one fobj */
 	boolean  botl;		/* partially redo status line */
 	boolean  botlx;		/* print an entirely new bottom line */
+	boolean  door_opened;	/* set to true if door was opened during test_move */
 	struct dig_info digging;
 	struct victual_info victual;
 	struct tin_info tin;
@@ -109,6 +118,7 @@ struct context_info {
 	struct takeoff_info takeoff;
 	struct warntype_info warntype;
 	struct polearm_info polearm;
+	struct tribute_info tribute;
 };
 
 extern NEARDATA struct context_info context;

@@ -1,5 +1,4 @@
-/* NetHack 3.5	objects.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	objects.c	$Date: 2011/07/28 04:00:20 $  $Revision: 1.23 $ */
+/* NetHack 3.5	objects.c	$NHDT-Date: 1428802519 2015/04/12 01:35:19 $  $NHDT-Branch: master $:$NHDT-Revision: 1.34 $ */
 /* Copyright (c) Mike Threepoint, 1989.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -374,9 +373,9 @@ ARMOR("splint mail", (char *)0,
 ARMOR("banded mail", (char *)0,
 	1, 0, 1, 0,	72, 5, 350,  90,  4, 1, ARM_SUIT, IRON, HI_METAL),
 ARMOR("dwarvish mithril-coat", (char *)0,
-	1, 0, 0, 0,	10, 1, 150, 240,  4, 2, ARM_SUIT, MITHRIL, HI_METAL),
+	1, 0, 0, 0,	10, 1, 150, 240,  4, 2, ARM_SUIT, MITHRIL, HI_SILVER),
 ARMOR("elven mithril-coat", (char *)0,
-	1, 0, 0, 0,	15, 1, 150, 240,  5, 2, ARM_SUIT, MITHRIL, HI_METAL),
+	1, 0, 0, 0,	15, 1, 150, 240,  5, 2, ARM_SUIT, MITHRIL, HI_SILVER),
 ARMOR("chain mail", (char *)0,
 	1, 0, 0, 0,	72, 5, 300,  75,  5, 1, ARM_SUIT, IRON, HI_METAL),
 ARMOR("orcish chain mail", "crude chain mail",
@@ -670,10 +669,17 @@ FOOD("egg",                 85, 1,  1, 1, FLESH,  80, CLR_WHITE),
 FOOD("meatball",             0, 1,  1, 0, FLESH,   5, CLR_BROWN),
 FOOD("meat stick",           0, 1,  1, 0, FLESH,   5, CLR_BROWN),
 FOOD("huge chunk of meat",   0,20,400, 0, FLESH,2000, CLR_BROWN),
+
 /* special case because it's not mergable */
 OBJECT(OBJ("meat ring", (char *)0),
     BITS(1,0,0,0,0,0,0,0,0,0,0,0,FLESH),
     0, FOOD_CLASS, 0, 1, 5, 1, 0, 0, 0, 0, 5, CLR_BROWN),
+
+/* pudding 'corpses' will turn into these and combine */
+FOOD("glob of gray ooze",      0, 2, 20, 0, FLESH,  20, CLR_GRAY),
+FOOD("glob of brown pudding",  0, 2, 20, 0, FLESH,  20, CLR_BROWN),
+FOOD("glob of green slime",    0, 2, 20, 0, FLESH,  20, CLR_GREEN),
+FOOD("glob of black pudding",  0, 2, 20, 0, FLESH,  20, CLR_BLACK),
 
 /* fruits & veggies */
 FOOD("kelp frond",           0, 1,  1, 0, VEGGY,  30, CLR_GREEN),
@@ -821,6 +827,9 @@ SPELL("freeze sphere",   "hardcover",   P_MATTER_SPELL, 20,  2, 1, 1, NODIR, CLR
 #endif
 /* blank spellbook must come last because it retains its description */
 SPELL("blank paper",     "plain",       P_NONE, 18,  0, 0, 0, 0,         HI_PAPER),
+/* tribute book for 3.6 */
+OBJECT(OBJ("novel", "paperback"), BITS(0,0,1,0,0,0,0,1,0,0,0,P_NONE,HI_PAPER), 0,
+	SPBOOK_CLASS, 0, 0, 0, 1, 0, 0, 0, 1, 20, CLR_BRIGHT_BLUE),
 /* a special, one of a kind, spellbook */
 OBJECT(OBJ("Book of the Dead", "papyrus"), BITS(0,0,1,0,1,0,1,1,0,0,0,P_NONE,PAPER), 0,
 	SPBOOK_CLASS, 0, 0,20, 10000, 0, 0, 0, 7, 20, HI_PAPER),

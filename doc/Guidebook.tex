@@ -33,7 +33,7 @@
 \begin{document}
 %
 % input file: guidebook.mn
-% $Revision: 1.122 $ $Date: 2015/03/27 06:00:00 $
+% $Revision: 1.122 $ $Date: 2015/04/12 06:00:00 $
 %
 %.ds h0 "
 %.ds h1 %.ds h2 \%
@@ -46,7 +46,7 @@
 %.au
 \author{Eric S. Raymond\\
 (Edited and expanded for 3.6)}
-\date{March 27, 2015}
+\date{April 12, 2015}
 
 \maketitle
 
@@ -2306,6 +2306,9 @@ Cannot be set with the `{\tt O}' command.
 Automatically dig if you are wielding a digging tool and moving into a place
 that can be dug (default false).
 %.lp
+\item[\ib{autoopen}]
+Walking into a door attempts to open it (default true).
+%.lp
 \item[\ib{autopickup}]
 Automatically pick up things onto which you move (default on).
 See ``{\it pickup\_types\/}'' to refine the behavior.
@@ -3597,6 +3600,9 @@ A string explaining how to recover a game on this system (no default value).
 \item[\ib{SEDUCE}]
 0 or 1 to disable or enable, respectively, the SEDUCE option (see the source)
 for details on this function.
+%.lp
+\item[\ib{CHECK\_SAVE\_UID}]
+0 or 1 to disable or enable, respectively, the UID checking for savefiles.
 \elist
 
 %.pg
@@ -3954,6 +3960,18 @@ maintained, and enjoyed by the community to this day.
 
 %.pg
 \medskip
+At the beginning of development for what would eventually get released
+as 3.6.0, the development team consisted of {\it Warwick Allison}, 
+{\it Michael Allison}, {\it Ken Arromdee},
+{\it David Cohrs}, {\it Jessie Collet}, 
+{\it Ken Lorber}, {\it Dean Luick}, {\it Pat Rankin}, 
+{\it Mike Stephenson}, {\it Janet Walz}, and {\it Paul Winner}.
+Leading up to the release of 3.6.0 in early 2015, new members
+{\it Sean Hunt}, {\it Pasi Kallinen}, and {\it Derek S. Ray}
+joined the NetHack development team.
+
+%.pg
+\medskip
 In September 2014, an interim snapshot of the code under development was 
 released publicly by other parties. Since that code was a work-in-progress 
 and had not gone through a period of debugging, it was decided that the 
@@ -3964,46 +3982,30 @@ would never be a 3.4.4, 3.5, or 3.5.0 official release version.
 
 %.pg
 \medskip
-In January 2015, preparation began for the release of NetHack 3.6
-
-%.pg
-\medskip
-At the beginning of development for what would eventually get released
-as 3.6.0, the development team consisted of {\it Warwick Allison}, 
-{\it Michael Allison}, {\it Ken Arromdee},
-{\it David Cohrs}, {\it Jessie Collet}, 
-{\it Ken Lorber}, {\it Dean Luick}, {\it Pat Rankin}, 
-{\it Mike Stephenson}, {\it Janet Walz}, and {\it Paul Winner}.
-Leading up to the release of 3.6.0 in early 2015, new members
-{\it Sean Hunt}, {\it Pasi Kallinen}, and {\it Derek S. Ray}
-joined the NetHack development team, 
-
-%.pg
-\medskip
-3.6.0 TODO insert apprpriate description of 3.6.0 here
+In January 2015, preparation began for the release of NetHack 3.6.
+The 3.6 version merges work done by the development team since the previous 
+release with some of the beloved community patches. Many bugs were fixed
+and some code was restructured.
 
 %.pg
 \medskip
 The development team, as well as {\it Steve VanDevender} and 
 {\it Kevin Smolkowski} ensured that NetHack 3.6.0 continued to operate on 
-various Unix flavors as well as maintaining the X11 interface. 
+various Unix flavors and maintained the X11 interface. 
 
+%.pg
 {\it Ken Lorber}, {\it Haoyang Wang}, {\it Pat Rankin}, and {\it Dean Luick} 
 maintained the port of NetHack 3.6.0 for Mac.
 
 %.pg
 \medskip
 {\it Michael Allison}, {\it Derek S. Ray}, {\it Yitzhak Sapir}, 
-{\it Alex Kompel}, and {\it David Cohrs} maintained the port of 
+{\it Alex Kompel}, and {\it Dion Nicolaas} maintained the port of 
 NetHack 3.6.0 for Microsoft Windows.
 
 %.pg
 \medskip
 {\it Jeff Bailey} created and maintained a port of NetHack 3.6.0 for Chrome.
-
-%.pg
-\medskip
-{\it Alex Kompel} maintained a port of NetHack 3.6.0 to Windows Phone. <FIXME>?
 
 %.pg
 \medskip

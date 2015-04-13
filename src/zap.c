@@ -1,4 +1,4 @@
-/* NetHack 3.5	zap.c	$NHDT-Date: 1427782839 2015/03/31 06:20:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.200 $ */
+/* NetHack 3.5	zap.c	$NHDT-Date: 1428207622 2015/04/05 04:20:22 $  $NHDT-Branch: nhmall-booktribute $:$NHDT-Revision: 1.215 $ */
 /* NetHack 3.5	zap.c	$Date: 2013/11/05 00:57:56 $  $Revision: 1.183 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -956,7 +956,9 @@ register struct obj *obj;
 		obj->spe = 0;
 		break;
 	      case SPBOOK_CLASS:
-		if (otyp != SPE_CANCELLATION && otyp != SPE_BOOK_OF_THE_DEAD) {
+		if (otyp != SPE_CANCELLATION &&
+			otyp != SPE_NOVEL &&
+			otyp != SPE_BOOK_OF_THE_DEAD) {
 		    costly_alteration(obj, COST_CANCEL);
 		    obj->otyp = SPE_BLANK_PAPER;
 		}
@@ -2110,18 +2112,19 @@ boolean ordinary;
 		case FIRE_HORN:
 		    learn_it = TRUE;
 		    if (Fire_resistance) {
-			shieldeff(u.ux, u.uy);
-			You_feel("rather warm.");
-			ugolemeffects(AD_FIRE, d(12,6));
-		    } else {
-			pline("You've set yourself afire!");
-			damage = d(12,6);
+                shieldeff(u.ux, u.uy);
+                You_feel("rather warm.");
+                ugolemeffects(AD_FIRE, d(12,6));
+            } else {
+                pline("You've set yourself afire!");
+                damage = d(12,6);
 		    }
 		    burn_away_slime();
 		    (void) burnarmor(&youmonst);
 		    destroy_item(SCROLL_CLASS, AD_FIRE);
 		    destroy_item(POTION_CLASS, AD_FIRE);
 		    destroy_item(SPBOOK_CLASS, AD_FIRE);
+            destroy_item(FOOD_CLASS, AD_FIRE);  /* only slime for now */
 		    break;
 
 		case WAN_COLD:
@@ -3327,6 +3330,7 @@ struct obj **ootmp;	/* to return worn armor for caller to disintegrate */
 		    if (!rn2(3)) (void)destroy_mitem(mon, POTION_CLASS, AD_FIRE);
 		    if (!rn2(3)) (void)destroy_mitem(mon, SCROLL_CLASS, AD_FIRE);
 		    if (!rn2(5)) (void)destroy_mitem(mon, SPBOOK_CLASS, AD_FIRE);
+            destroy_mitem(mon, FOOD_CLASS, AD_FIRE);  /* carried slime */
 		}
 		break;
 	case ZT_COLD:
@@ -3471,6 +3475,7 @@ xchar sx, sy;
 		if (!rn2(3)) destroy_item(POTION_CLASS, AD_FIRE);
 		if (!rn2(3)) destroy_item(SCROLL_CLASS, AD_FIRE);
 		if (!rn2(5)) destroy_item(SPBOOK_CLASS, AD_FIRE);
+        destroy_item(FOOD_CLASS, AD_FIRE);
 	    }
 	    break;
 	case ZT_COLD:
@@ -3567,11 +3572,11 @@ xchar sx, sy;
 }
 
 /*
- * burn scrolls and spellbooks on floor at position x,y
- * return the number of scrolls and spellbooks burned
+ * burn objects (such as scrolls and spellbooks) on floor 
+ * at position x,y; return the number of objects burned
  */
 int
-burn_floor_paper(x, y, give_feedback, u_caused)
+burn_floor_objects(x, y, give_feedback, u_caused)
 int x, y;
 boolean give_feedback;	/* caller needs to decide about visibility checks */
 boolean u_caused;
@@ -3583,37 +3588,39 @@ boolean u_caused;
 
 	for (obj = level.objects[x][y]; obj; obj = obj2) {
 	    obj2 = obj->nexthere;
-	    if (obj->oclass == SCROLL_CLASS || obj->oclass == SPBOOK_CLASS) {
-		if (obj->otyp == SCR_FIRE || obj->otyp == SPE_FIREBALL ||
-			obj_resists(obj, 2, 100))
-		    continue;
-		scrquan = obj->quan;	/* number present */
-		delquan = 0L;		/* number to destroy */
-		for (i = scrquan; i > 0L; i--)
-		    if (!rn2(3)) delquan++;
-		if (delquan) {
-		    /* save name before potential delobj() */
-		    if (give_feedback) {
-			obj->quan = 1L;
-			Strcpy(buf1, (x == u.ux && y == u.uy) ?
-				xname(obj) : distant_name(obj, xname));
-			obj->quan = 2L;
-		    	Strcpy(buf2, (x == u.ux && y == u.uy) ?
-				xname(obj) : distant_name(obj, xname));
-			obj->quan = scrquan;
-		    }
-		    /* useupf(), which charges, only if hero caused damage */
-		    if (u_caused) useupf(obj, delquan);
-		    else if (delquan < scrquan) obj->quan -= delquan;
-		    else delobj(obj);
-		    cnt += delquan;
-		    if (give_feedback) {
-			if (delquan > 1L)
-			    pline("%ld %s burn.", delquan, buf2);
-			else
-			    pline("%s burns.", An(buf1));
-		    }
-		}
+	    if (obj->oclass == SCROLL_CLASS || obj->oclass == SPBOOK_CLASS
+            || (obj->oclass == FOOD_CLASS 
+                && obj->otyp == GLOB_OF_GREEN_SLIME)) {
+            if (obj->otyp == SCR_FIRE || obj->otyp == SPE_FIREBALL ||
+                obj_resists(obj, 2, 100))
+                continue;
+            scrquan = obj->quan;	/* number present */
+            delquan = 0L;		/* number to destroy */
+            for (i = scrquan; i > 0L; i--)
+                if (!rn2(3)) delquan++;
+            if (delquan) {
+                /* save name before potential delobj() */
+                if (give_feedback) {
+                obj->quan = 1L;
+                Strcpy(buf1, (x == u.ux && y == u.uy) ?
+                    xname(obj) : distant_name(obj, xname));
+                obj->quan = 2L;
+                    Strcpy(buf2, (x == u.ux && y == u.uy) ?
+                    xname(obj) : distant_name(obj, xname));
+                obj->quan = scrquan;
+                }
+                /* useupf(), which charges, only if hero caused damage */
+                if (u_caused) useupf(obj, delquan);
+                else if (delquan < scrquan) obj->quan -= delquan;
+                else delobj(obj);
+                cnt += delquan;
+                if (give_feedback) {
+                if (delquan > 1L)
+                    pline("%ld %s burn.", delquan, buf2);
+                else
+                    pline("%s burns.", An(buf1));
+                }
+            }
 	    }
 	}
 	return cnt;
@@ -4253,7 +4260,7 @@ short exploding_wand_typ;
 	}
 
 	if(OBJ_AT(x, y) && abstype == ZT_FIRE)
-		if (burn_floor_paper(x, y, FALSE, type > 0) && couldsee(x, y)) {
+		if (burn_floor_objects(x, y, FALSE, type > 0) && couldsee(x, y)) {
 		    newsym(x,y);
 		    You("%s of smoke.",
 			!Blind ? "see a puff" : "smell a whiff");
@@ -4363,129 +4370,137 @@ const char * const destroy_strings[][3] = {	/* also used in trap.c */
 
 void
 destroy_item(osym, dmgtyp)
-register int osym, dmgtyp;
+    register int osym, dmgtyp;
 {
-	register struct obj *obj, *obj2;
-	register int dmg, xresist, skip;
-	register long i, cnt, quan;
-	register int dindx;
-	const char *mult;
-	boolean physical_damage;
+    register struct obj *obj, *obj2;
+    register int dmg, xresist, skip;
+    register long i, cnt, quan;
+    register int dindx;
+    const char *mult;
+    boolean physical_damage;
 
-	for(obj = invent; obj; obj = obj2) {
-	    obj2 = obj->nobj;
-	    physical_damage = FALSE;
-	    if(obj->oclass != osym) continue; /* test only objs of type osym */
-	    if(obj->oartifact) continue; /* don't destroy artifacts */
-	    if(obj->in_use && obj->quan == 1L) continue; /* not available */
-	    xresist = skip = 0;
-	    /* lint suppression */
-	    dmg = dindx = 0;
-	    quan = 0L;
+    for(obj = invent; obj; obj = obj2) {
+        obj2 = obj->nobj;
+        physical_damage = FALSE;
+        if(obj->oclass != osym) continue; /* test only objs of type osym */
+        if(obj->oartifact) continue; /* don't destroy artifacts */
+        if(obj->in_use && obj->quan == 1L) continue; /* not available */
+        xresist = skip = 0;
+        /* lint suppression */
+        dmg = dindx = 0;
+        quan = 0L;
 
-	    switch(dmgtyp) {
-		case AD_COLD:
-		    if(osym == POTION_CLASS && obj->otyp != POT_OIL) {
-			quan = obj->quan;
-			dindx = 0;
-			dmg = rnd(4);
-		    } else skip++;
-		    break;
-		case AD_FIRE:
-		    xresist = (Fire_resistance && obj->oclass != POTION_CLASS);
+        switch(dmgtyp) {
+            case AD_COLD:
+                if(osym == POTION_CLASS && obj->otyp != POT_OIL) {
+                    quan = obj->quan;
+                    dindx = 0;
+                    dmg = rnd(4);
+                } else skip++;
+                break;
+            case AD_FIRE:
+                xresist = (Fire_resistance 
+                        && obj->oclass != POTION_CLASS
+                        && obj->otyp != GLOB_OF_GREEN_SLIME);
 
-		    if (obj->otyp == SCR_FIRE || obj->otyp == SPE_FIREBALL)
-			skip++;
-		    if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
-			skip++;
-			if (!Blind)
-			    pline("%s glows a strange %s, but remains intact.",
-				The(xname(obj)), hcolor("dark red"));
-		    }
-		    quan = obj->quan;
-		    switch(osym) {
-			case POTION_CLASS:
-			    dindx = (obj->otyp != POT_OIL) ? 1 : 2;
-			    dmg = rnd(6);
-			    break;
-			case SCROLL_CLASS:
-			    dindx = 3;
-			    dmg = 1;
-			    break;
-			case SPBOOK_CLASS:
-			    dindx = 4;
-			    dmg = 1;
-			    break;
-			default:
-			    skip++;
-			    break;
-		    }
-		    break;
-		case AD_ELEC:
-		    xresist = (Shock_resistance && obj->oclass != RING_CLASS);
-		    quan = obj->quan;
-		    switch(osym) {
-			case RING_CLASS:
-			    if(obj->otyp == RIN_SHOCK_RESISTANCE)
-				    { skip++; break; }
-			    dindx = 5;
-			    dmg = 0;
-			    break;
-			case WAND_CLASS:
-			    if(obj->otyp == WAN_LIGHTNING) { skip++; break; }
+                if (obj->otyp == SCR_FIRE || obj->otyp == SPE_FIREBALL)
+                    skip++;
+                if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
+                    skip++;
+                    if (!Blind)
+                        pline("%s glows a strange %s, but remains intact.",
+                                The(xname(obj)), hcolor("dark red"));
+                }
+                quan = obj->quan;
+                switch(osym) {
+                    case POTION_CLASS:
+                        dindx = (obj->otyp != POT_OIL) ? 1 : 2;
+                        dmg = rnd(6);
+                        break;
+                    case SCROLL_CLASS:
+                        dindx = 3;
+                        dmg = 1;
+                        break;
+                    case SPBOOK_CLASS:
+                        dindx = 4;
+                        dmg = 1;
+                        break;
+                    case FOOD_CLASS:
+                        if (obj->otyp == GLOB_OF_GREEN_SLIME) {
+                            dindx = obj->owt / 20;
+                            dmg = 1;
+                        } else { skip++; }
+                        break;
+                    default:
+                        skip++;
+                        break;
+                }
+                break;
+            case AD_ELEC:
+                xresist = (Shock_resistance && obj->oclass != RING_CLASS);
+                quan = obj->quan;
+                switch(osym) {
+                    case RING_CLASS:
+                        if(obj->otyp == RIN_SHOCK_RESISTANCE)
+                        { skip++; break; }
+                        dindx = 5;
+                        dmg = 0;
+                        break;
+                    case WAND_CLASS:
+                        if(obj->otyp == WAN_LIGHTNING) { skip++; break; }
 #if 0
-			    if (obj == current_wand) { skip++; break; }
+                        if (obj == current_wand) { skip++; break; }
 #endif
-			    dindx = 6;
-			    dmg = rnd(10);
-			    break;
-			default:
-			    skip++;
-			    break;
-		    }
-		    break;
-		default:
-		    skip++;
-		    break;
-	    }
-	    if(!skip) {
-		if (obj->in_use) --quan; /* one will be used up elsewhere */
-		for(i = cnt = 0L; i < quan; i++)
-		    if(!rn2(3)) cnt++;
+                        dindx = 6;
+                        dmg = rnd(10);
+                        break;
+                    default:
+                        skip++;
+                        break;
+                }
+                break;
+            default:
+                skip++;
+                break;
+        }
+        if(!skip) {
+            if (obj->in_use) --quan; /* one will be used up elsewhere */
+            for(i = cnt = 0L; i < quan; i++)
+                if(!rn2(3)) cnt++;
 
-		if(!cnt) continue;
-		mult = (cnt == quan) ? "Your" :
-		       (cnt == 1L) ? "One of your" : "Some of your";
-		pline("%s %s %s!", mult, xname(obj),
-		      destroy_strings[dindx][(cnt > 1L)]);
-		if(osym == POTION_CLASS && dmgtyp != AD_COLD) {
-		    if (!breathless(youmonst.data) || haseyes(youmonst.data))
-		    	potionbreathe(obj);
-		}
-		if (obj->owornmask) {
-		    if (obj->owornmask & W_RING) /* ring being worn */
-			Ring_gone(obj);
-		    else
-			setnotworn(obj);
-		}
-		if (obj == current_wand) current_wand = 0;	/* destroyed */
-		for (i = 0; i < cnt; i++)
-		    useup(obj);
-		if(dmg) {
-		    if(xresist)	You("aren't hurt!");
-		    else {
-			const char *how = destroy_strings[dindx][2];
-			boolean one = (cnt == 1L);
+            if(!cnt) continue;
+            mult = (cnt == quan) ? (quan > 1) ?  "All of your " : "Your" :
+                (cnt == 1L) ? "One of your" : "Some of your";
+            pline("%s %s %s!", mult, xname(obj),
+                    destroy_strings[dindx][(cnt > 1L)]);
+            if(osym == POTION_CLASS && dmgtyp != AD_COLD) {
+                if (!breathless(youmonst.data) || haseyes(youmonst.data))
+                    potionbreathe(obj);
+            }
+            if (obj->owornmask) {
+                if (obj->owornmask & W_RING) /* ring being worn */
+                    Ring_gone(obj);
+                else
+                    setnotworn(obj);
+            }
+            if (obj == current_wand) current_wand = 0;	/* destroyed */
+            for (i = 0; i < cnt; i++)
+                useup(obj);
+            if(dmg) {
+                if(xresist)	You("aren't hurt!");
+                else {
+                    const char *how = destroy_strings[dindx][2];
+                    boolean one = (cnt == 1L);
 
-			if (physical_damage) dmg = Maybe_Half_Phys(dmg);
-			losehp(dmg, one ? how : (const char *)makeplural(how),
-			       one ? KILLED_BY_AN : KILLED_BY);
-			exercise(A_STR, FALSE);
-		    }
-		}
-	    }
-	}
-	return;
+                    if (physical_damage) dmg = Maybe_Half_Phys(dmg);
+                    losehp(dmg, one ? how : (const char *)makeplural(how),
+                            one ? KILLED_BY_AN : KILLED_BY);
+                    exercise(A_STR, FALSE);
+                }
+            }
+        }
+    }
+    return;
 }
 
 int
@@ -4544,6 +4559,12 @@ int osym, dmgtyp;
 			    dindx = 4;
 			    tmp++;
 			    break;
+            case FOOD_CLASS:
+                if (obj->otyp == GLOB_OF_GREEN_SLIME) {
+                    dindx = obj->owt / 20;
+                    tmp++;
+                } else { skip++; }
+                break;
 			default:
 			    skip++;
 			    break;

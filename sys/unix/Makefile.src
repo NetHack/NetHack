@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.5  Makefile.src	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+# NetHack 3.5  Makefile.src	$NHDT-Date: 1428590253 2015/04/09 14:37:33 $  $NHDT-Branch: scshunt-regex $:$NHDT-Revision: 1.38 $
 # NetHack 3.5  Makefile.src	$Date: 2012/01/20 03:41:33 $  $Revision: 1.37 $
 
 # Root of source tree:
@@ -338,7 +338,7 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 
 # all operating-system-dependent .c (for dependencies and such)
 SYSCSRC = ../sys/atari/tos.c ../sys/share/pcmain.c ../sys/share/pcsys.c \
-	../sys/share/pctty.c ../sys/share/pcunix.c ../sys/share/random.c \
+	../sys/share/pctty.c ../sys/share/pcunix.c ../sys/share/posixregex.c ../sys/share/random.c \
 	../sys/share/ioctl.c ../sys/share/unixtty.c ../sys/unix/unixmain.c \
 	../sys/unix/unixunix.c ../sys/unix/unixres.c ../sys/be/bemain.c
 
@@ -391,7 +391,7 @@ HOBJ = $(FIRSTOBJ) allmain.o alloc.o apply.o artifact.o attrib.o ball.o \
 	minion.o mklev.o mkmap.o \
 	mkmaze.o mkobj.o mkroom.o mon.o mondata.o monmove.o monstr.o \
 	mplayer.o mthrowu.o muse.o music.o o_init.o objnam.o options.o \
-	pager.o pickup.o pline.o polyself.o potion.o pray.o priest.o \
+	pager.o pickup.o pline.o polyself.o posixregex.o potion.o pray.o priest.o \
 	quest.o questpgr.o read.o rect.o region.o restore.o rip.o rnd.o \
 	role.o rumors.o save.o shk.o shknam.o sit.o sounds.o sp_lev.o spell.o \
 	sys.o \
@@ -603,6 +603,8 @@ random.o: ../sys/share/random.c $(HACK_H)
 	$(CC) $(CFLAGS) -c ../sys/share/random.c
 ioctl.o: ../sys/share/ioctl.c $(HACK_H) ../include/tcap.h
 	$(CC) $(CFLAGS) -c ../sys/share/ioctl.c
+posixregex.o: ../sys/share/posixregex.c $(HACK_H)
+	$(CC) $(CFLAGS) -c ../sys/share/posixregex.c
 unixtty.o: ../sys/share/unixtty.c $(HACK_H)
 	$(CC) $(CFLAGS) -c ../sys/share/unixtty.c
 unixmain.o: ../sys/unix/unixmain.c $(HACK_H) ../include/dlb.h

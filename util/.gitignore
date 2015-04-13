@@ -8,5 +8,6 @@ lev_yacc.c
 tile2x11
 lev_comp
 tileedit
+tile2bmp
 dlb
 recover

@@ -285,6 +285,7 @@ struct permonst *mptr;
 {
     return (boolean) (passes_walls(mptr) || amorphous(mptr) ||
 		      unsolid(mptr) || is_whirly(mptr) || verysmall(mptr) ||
+		      dmgtype(mptr, AD_CORR) || dmgtype(mptr, AD_RUST) ||
 		      (slithy(mptr) && !bigmonst(mptr)));
 }
 

@@ -1244,7 +1244,7 @@ char resultbuf[];	/* should be at least [7] to hold "18/100\0" */
 void
 enlightenment(mode, final)
 int mode;	/* BASICENLIGHTENMENT | MAGICENLIGHTENMENT (| both) */
-int final;	/* ENL_GAMEINPROGRESS:0, ENL_GAVEOVERALIVE, ENL_GAMEOVERDEAD */
+int final;	/* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
 {
     char buf[BUFSZ], tmpbuf[BUFSZ];
 

@@ -1370,7 +1370,7 @@ dosacrifice()
 		      a_gname(), u_gname());
 		pline("%s is enraged...", u_gname());
 		pline("Fortunately, %s permits you to live...", a_gname());
-		pline(cloud_of_smoke, hcolor("orange"));
+		pline(cloud_of_smoke, hcolor(NH_ORANGE));
 		done(ESCAPED);
 	    } else { /* super big win */
 		adjalign(10);

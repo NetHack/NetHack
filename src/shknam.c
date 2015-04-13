@@ -1,4 +1,4 @@
-/* NetHack 3.5	shknam.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	shknam.c	$NHDT-Date: 1428207608 2015/04/05 04:20:08 $  $NHDT-Branch: nhmall-booktribute $:$NHDT-Revision: 1.32 $ */
 /* NetHack 3.5	shknam.c	$Date: 2011/04/15 01:55:42 $  $Revision: 1.24 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -10,7 +10,7 @@
 STATIC_DCL boolean FDECL(veggy_item, (struct obj *obj,int));
 STATIC_DCL int NDECL(shkveg);
 STATIC_DCL void FDECL(mkveggy_at, (int,int));
-STATIC_DCL void FDECL(mkshobj_at, (const struct shclass *,int,int));
+STATIC_DCL void FDECL(mkshobj_at, (const struct shclass *,int,int,BOOLEAN_P));
 STATIC_DCL void FDECL(nameshk, (struct monst *,const char * const *));
 STATIC_DCL int  FDECL(shkinit, (const struct shclass *,struct mkroom *));
 
@@ -357,15 +357,24 @@ int sx, sy;
 }
 
 STATIC_OVL void
-mkshobj_at(shp, sx, sy)
+mkshobj_at(shp, sx, sy, mkspecl)
 /* make an object of the appropriate type for a shop square */
 const struct shclass *shp;
 int sx, sy;
+boolean mkspecl;
 {
 	struct monst *mtmp;
 	int atype;
 	struct permonst *ptr;
 
+	/* 3.6.0 tribute */
+	if (mkspecl && (!strcmp(shp->name, "rare books") ||
+			!strcmp(shp->name, "second-hand bookstore"))) {
+	    struct obj *novel=mksobj_at(SPE_NOVEL, sx, sy, FALSE, FALSE);
+	    if (novel) context.tribute.bookstock = TRUE;
+	    return;
+	}
+	
 	if (rn2(100) < depth(&u.uz) &&
 		!MON_AT(sx, sy) && (ptr = mkclass(S_MIMIC,0)) &&
 		(mtmp = makemon(ptr,sx,sy,NO_MM_FLAGS)) != 0) {
@@ -572,7 +581,8 @@ register struct mkroom *sroom;
      * shop-style placement (all squares except a row nearest the first
      * door get objects).
      */
-    register int sx, sy, sh;
+    int sx, sy, sh;
+    int stockcount = 0, specialspot = 0;
     char buf[BUFSZ];
     int rmno = (int)((sroom - rooms) + ROOMOFFSET);
     const struct shclass *shp = &shtypes[shp_indx];
@@ -608,6 +618,29 @@ register struct mkroom *sroom;
 	    make_engr_at(m, n, buf, 0L, DUST);
     }
 
+    if (context.tribute.enabled && !context.tribute.bookstock) {
+	/*
+	 * Out of the number of spots where we're actually
+	 * going to put stuff, randomly single out one in particular.
+	 */
+	for (sx = sroom->lx; sx <= sroom->hx; sx++)
+	    for (sy = sroom->ly; sy <= sroom->hy; sy++) {
+		if (sroom->irregular) {
+			if (levl[sx][sy].edge || (int)levl[sx][sy].roomno != rmno ||
+				distmin(sx, sy, doors[sh].x, doors[sh].y) <= 1)
+				continue;
+		}
+		else if ((sx == sroom->lx && doors[sh].x == sx - 1) ||
+			 (sx == sroom->hx && doors[sh].x == sx + 1) ||
+			 (sy == sroom->ly && doors[sh].y == sy - 1) ||
+			 (sy == sroom->hy && doors[sh].y == sy + 1)) continue;
+		stockcount++;
+	    }
+	    specialspot = rnd(stockcount);
+	    stockcount = 0;
+    }
+
+
     for(sx = sroom->lx; sx <= sroom->hx; sx++)
 	for(sy = sroom->ly; sy <= sroom->hy; sy++) {
 	    if(sroom->irregular) {
@@ -618,7 +651,8 @@ register struct mkroom *sroom;
 		      (sx == sroom->hx && doors[sh].x == sx+1) ||
 		      (sy == sroom->ly && doors[sh].y == sy-1) ||
 		      (sy == sroom->hy && doors[sh].y == sy+1)) continue;
-	    mkshobj_at(shp, sx, sy);
+	    stockcount++;
+	    mkshobj_at(shp, sx, sy, ((stockcount) && (stockcount == specialspot)));
 	}
 
     /*

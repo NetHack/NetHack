@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.5  Makefile.top	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+# NetHack 3.5  Makefile.top	$NHDT-Date: 1428453876 2015/04/08 00:44:36 $  $NHDT-Branch: nhmall-booktribute $:$NHDT-Revision: 1.25 $
 # NetHack 3.5  Makefile.top	$Date: 2012/01/10 17:47:30 $  $Revision: 1.19 $
 
 # Root of source tree:
@@ -87,7 +87,7 @@ SPEC_LEVS = asmodeus.lev baalz.lev bigrm-*.lev castle.lev fakewiz?.lev \
 QUEST_LEVS = ???-goal.lev ???-fil?.lev ???-loca.lev ???-strt.lev
 
 DATNODLB = $(VARDATND) license
-DATDLB = $(DATHELP) dungeon $(SPEC_LEVS) $(QUEST_LEVS) $(VARDATD)
+DATDLB = $(DATHELP) dungeon tribute $(SPEC_LEVS) $(QUEST_LEVS) $(VARDATD)
 DAT = $(DATNODLB) $(DATDLB)
 
 $(GAME):

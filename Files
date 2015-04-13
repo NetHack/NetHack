@@ -1,4 +1,4 @@
-This is a listing of all files in a full NetHack 3.5 distribution, organized
+This is a listing of all files in a full NetHack 3.6 distribution, organized
 in their standard manner on a UNIX system.  It indicates which files are
 necessary for which versions, so that you can tell which files may be deleted
 from or not transferred to your system if you wish.
@@ -17,7 +17,8 @@ cmdhelp         data.base       dungeon.def     endgame.des     gehennom.des
 help            hh              history         knox.des        license
 medusa.des      mines.des       opthelp         oracle.des      oracles.txt
 quest.txt       rumors.fal      rumors.tru      sokoban.des     symbols
-tower.des       wizhelp         yendor.des
+tower.des       wizhelp         yendor.des      tribute         bogusmon.txt
+engrave.txt     epitaph.txt
 
 doc:
 (files for all versions)
@@ -85,7 +86,7 @@ windows.c       wizard.c        worm.c          worn.c          write.c
 zap.c
 
 sys/amiga:
-(files for Amiga versions)
+(files for Amiga versions - untested for 3.6.0)
 Build.ami       Install.ami     Makefile.agc    Makefile.ami    NetHack.cnf
 amidos.c        amidos.p        amifont.uu      amifont8.uu     amigst.c
 amii.hlp        amimenu.c       amirip.c        amisnd.c        amistack.c
@@ -96,12 +97,12 @@ winfuncs.c      winkey.c        winmenu.c       winproto.h      winreq.c
 winstr.c        xpm2iff.c
 
 sys/atari:
-(files for Atari version)
+(files for Atari version - untested for 3.6.0)
 Install.tos     atarifnt.uue    nethack.mnu     setup.g         tos.c
 unx2atar.sed
 
 sys/be:
-(files for BeOS version)
+(files for BeOS version - untested for 3.6.0)
 README          bemain.c
 
 sys/mac:
@@ -114,7 +115,7 @@ macwin.c        mgetline.c      mmodal.c        mrecover.c      mrecover.hqx
 mttymain.c
 
 sys/msdos:
-(files for MSDOS version)
+(files for MSDOS version - untested for 3.6.0)
 Install.dos     Makefile.BC     Makefile.GCC    Makefile.MSC    moveinit.pat
 msdos.c         msdoshlp.txt    ovlinit.c       pckeys.c        pctiles.c
 pctiles.h       pcvideo.h       portio.h        schema1.BC      schema2.BC
@@ -124,7 +125,7 @@ vidtxt.c        vidvga.c
 nhico.uu        nhpif.uu
 
 sys/os2:
-(files for OS/2 version)
+(files for OS/2 version - untested for 3.6.0)
 Install.os2     Makefile.os2    nhpmico.uu      os2.c
 
 sys/share:
@@ -151,6 +152,10 @@ termcap
 (lex/yacc output for special level and dungeon compilers)
 dgn_comp.h      dgn_lex.c       dgn_yacc.c      lev_comp.h      lev_lex.c
 lev_yacc.c
+(posix regex for versions that include regex in their C library)
+posixregex.c
+(c++ regex code for versions that can build a C++ module and link it in)
+cppregex.cpp
 
 sys/share/sounds:
 (files for Amiga and Macintosh versions)
@@ -173,14 +178,14 @@ sys/unix/hints:
 linux           linux-x11       macosx          macos-x11       unix
 
 sys/vms:
-(files for VMS version)
+(files for VMS version - untested for 3.6.0)
 Install.vms     Makefile.dat    Makefile.doc    Makefile.src    Makefile.top
 Makefile.utl    install.com     lev_lex.h       nethack.com     oldcrtl.c
 spec_lev.com    vmsbuild.com    vmsfiles.c      vmsmail.c       vmsmain.c
 vmsmisc.c       vmstty.c        vmsunix.c
 
 sys/wince:
-(files for Windows CE and PocketPC)
+(files for Windows CE and PocketPC - untested for 3.6.0)
 Install.ce      bootstrp.mak    celib.c         cesetup.bat     cesound.c
 defaults.nh     keypad.uu       menubar.uu      mhaskyn.c       mhaskyn.h
 mhcmd.c         mhcmd.h         mhcolor.c       mhcolor.h       mhdlg.c
@@ -265,8 +270,8 @@ petmark.uu      resource.h      rip.uu          splash.uu       tiles.mak
 winMS.h         winhack.c       winhack.rc
 (files for Visual Studio 2010 Express Edition builds)
 dgncomp.vcxproj  dgnstuff.vcxproj dgnstuff.mak     dlb_main.vcxproj levcomp.vcxproj
-levstuff.vcxproj levstuff.mak     makedefs.vcxproj nethack.sln      uudecode.vcxproj
-nethackw.vcxproj tile2bmp.vcxproj recover.vcxproj  tilemap.vcxproj  tiles.vcxproj
+levstuff.vcxproj levstuff.mak     makedefs.vcxproj NetHack.sln      uudecode.vcxproj
+NetHackW.vcxproj tile2bmp.vcxproj recover.vcxproj  tilemap.vcxproj  tiles.vcxproj
 
 This is a list of files produced by auxiliary programs.  They can all be
 regenerated from the files in the distribution.

@@ -1186,15 +1186,15 @@ char c;
 		  case 'H'  : return(SCORR);
 		  case '{'  : return(FOUNTAIN);
 		  case '\\' : return(THRONE);
-		  case 'K'  :
-		      return(SINK);
+		  case 'K'  : return(SINK);
 		  case '}'  : return(MOAT);
 		  case 'P'  : return(POOL);
 		  case 'L'  : return(LAVAPOOL);
 		  case 'I'  : return(ICE);
 		  case 'W'  : return(WATER);
-		  case 'T'	: return (TREE);
-		  case 'F'	: return (IRONBARS);	/* Fe = iron */
+		  case 'T'  : return (TREE);
+		  case 'F'  : return (IRONBARS); /* Fe = iron */
+		  case 'x'  : return(MAX_TYPE); /* "see-through" */
 	    }
 	return(INVALID_TYPE);
 }

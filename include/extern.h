@@ -1,5 +1,4 @@
-/* NetHack 3.5	extern.h	$NHDT-Date: 1426966688 2015/03/21 19:38:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.411 $ */
-/* NetHack 3.5	extern.h	$Date: 2013/11/05 00:57:53 $  $Revision: 1.380 $ */
+/* NetHack 3.5	extern.h	$NHDT-Date: 1428806395 2015/04/12 02:39:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.455 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -395,6 +394,8 @@ E const char *NDECL(roguename);
 E struct obj *FDECL(realloc_obj,
 		(struct obj *, int, genericptr_t, int, const char *));
 E char *FDECL(coyotename, (struct monst *,char *));
+E const char *FDECL(noveltitle, (int *));
+E const char *FDECL(lookup_novel, (const char *, int *));
 
 /* ### do_wear.c ### */
 
@@ -496,6 +497,7 @@ E int FDECL(omon_adj, (struct monst *,struct obj *,BOOLEAN_P));
 E int FDECL(thitmonst, (struct monst *,struct obj *));
 E int FDECL(hero_breaks, (struct obj *,XCHAR_P,XCHAR_P,BOOLEAN_P));
 E int FDECL(breaks, (struct obj *,XCHAR_P,XCHAR_P));
+E void FDECL(release_camera_demon, (struct obj *, XCHAR_P,XCHAR_P));
 E void FDECL(breakobj, (struct obj *,XCHAR_P,XCHAR_P,BOOLEAN_P,BOOLEAN_P));
 E boolean FDECL(breaktest, (struct obj *));
 E boolean FDECL(walk_path, (coord *, coord *, boolean (*)(genericptr_t,int,int), genericptr_t));
@@ -750,6 +752,7 @@ E void NDECL(really_close);
 #ifdef DEBUG
 E boolean FDECL(showdebug, (const char *));
 #endif
+E void FDECL(read_tribute, (const char *,const char *,int));
 
 /* ### fountain.c ### */
 
@@ -833,6 +836,8 @@ E int FDECL(isqrt, (int));
 E int FDECL(distmin, (int,int,int,int));
 E boolean FDECL(online2, (int,int,int,int));
 E boolean FDECL(pmatch, (const char *,const char *));
+E boolean FDECL(pmatchi, (const char *,const char *));
+E boolean FDECL(pmatchz, (const char *,const char *));
 #ifndef STRNCMPI
 E int FDECL(strncmpi, (const char *,const char *,int));
 #endif
@@ -975,6 +980,7 @@ E int NDECL(doforce);
 E boolean FDECL(boxlock, (struct obj *,struct obj *));
 E boolean FDECL(doorlock, (struct obj *,int,int));
 E int NDECL(doopen);
+E int FDECL(doopen_indir, (int,int));
 E int NDECL(doclose);
 
 #ifdef MAC
@@ -1227,6 +1233,10 @@ E void FDECL(obj_ice_effects, (int, int, BOOLEAN_P));
 E long FDECL(peek_at_iced_corpse_age, (struct obj *));
 E int FDECL(hornoplenty, (struct obj *,BOOLEAN_P));
 E void NDECL(obj_sanity_check);
+E struct obj* FDECL(obj_nexto, (struct obj*));
+E struct obj* FDECL(obj_nexto_xy, (int, int, int, unsigned));
+E struct obj* FDECL(obj_absorb, (struct obj**, struct obj**));
+E struct obj* FDECL(obj_meld, (struct obj**, struct obj**));
 
 /* ### mkroom.c ### */
 
@@ -1358,6 +1368,7 @@ E boolean FDECL(onscary, (int,int,struct monst *));
 E void FDECL(monflee, (struct monst *, int, BOOLEAN_P, BOOLEAN_P));
 E int FDECL(dochug, (struct monst *));
 E int FDECL(m_move, (struct monst *,int));
+E void FDECL(dissolve_bars, (int,int));
 E boolean FDECL(closed_door, (int,int));
 E boolean FDECL(accessible, (int,int));
 E void FDECL(set_apparxy, (struct monst *));
@@ -1478,6 +1489,13 @@ E int FDECL(do_play_instrument, (struct obj *));
 E void NDECL(init_lan_features);
 E char *NDECL(lan_username);
 #endif
+
+/* ### nhregex.c ### */
+E struct nhregex * NDECL(regex_init);
+E boolean FDECL(regex_compile, (const char *, struct nhregex *));
+E const char *FDECL(regex_error_desc, (struct nhregex *));
+E boolean FDECL(regex_match, (const char *, struct nhregex*));
+E void FDECL(regex_free, (struct nhregex *));
 
 /* ### nttty.c ### */
 
@@ -2660,7 +2678,7 @@ E struct monst *FDECL(bhit, (int,int,int,int,int (*)(MONST_P,OBJ_P),
 			     int (*)(OBJ_P,OBJ_P),struct obj **));
 E struct monst *FDECL(boomhit, (struct obj *,int,int));
 E int FDECL(zhitm, (struct monst *,int,int,struct obj **));
-E int FDECL(burn_floor_paper, (int,int,BOOLEAN_P,BOOLEAN_P));
+E int FDECL(burn_floor_objects, (int,int,BOOLEAN_P,BOOLEAN_P));
 E void FDECL(buzz, (int,int,XCHAR_P,XCHAR_P,int,int));
 E void FDECL(melt_ice, (XCHAR_P,XCHAR_P,const char *));
 E void FDECL(start_melt_ice_timeout, (XCHAR_P,XCHAR_P,long));
