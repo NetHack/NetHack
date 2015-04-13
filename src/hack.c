@@ -627,6 +627,7 @@ int mode;
     register struct rm *tmpr = &levl[x][y];
     register struct rm *ust;
 
+    context.door_opened = FALSE;
     /*
      *  Check for physical obstacles.  First, the place we are going.
      */
@@ -680,8 +681,10 @@ int mode;
         if (mode == DO_MOVE) {
             if (amorphous(youmonst.data))
             You("try to ooze under the door, but can't squeeze your possessions through.");
-            else if (x == ux || y == uy) {
-            if (Blind || Stunned || ACURR(A_DEX) < 10 || Fumbling) {
+	    if (flags.autoopen && !context.run && !Confusion && !Stunned && !Fumbling) {
+		context.door_opened = context.move = doopen_indir(x, y);
+	    } else if (x == ux || y == uy) {
+		if (Blind || Stunned || ACURR(A_DEX) < 10 || Fumbling) {
                 if (u.usteed) {
                 You_cant("lead %s through that closed door.",
                          y_monnam(u.usteed));
@@ -1405,9 +1408,11 @@ domove()
     }
 
     if (!test_move(u.ux, u.uy, x-u.ux, y-u.uy, DO_MOVE)) {
-        context.move = 0;
-        nomul(0);
-        return;
+	if (!context.door_opened) {
+	    context.move = 0;
+	    nomul(0);
+	}
+	return;
     }
 
     /* Move ball and chain.  */
