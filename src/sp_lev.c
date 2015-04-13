@@ -408,7 +408,7 @@ opvar_clone(ov)
     case SPOVAR_VARIABLE:
     case SPOVAR_STRING:
     case SPOVAR_SEL:
-	tmpov->vardata.str = strdup(ov->vardata.str);
+	tmpov->vardata.str = dupstr(ov->vardata.str);
 	break;
     default: impossible("Unknown push value type (%i)!", ov->spovartyp);
     }
@@ -2678,7 +2678,7 @@ spo_monster(coder)
 	case SP_M_V_NAME:
 	    if ((OV_typ(parm) == SPOVAR_STRING) &&
 		!tmpmons.name.str)
-		tmpmons.name.str = strdup(OV_s(parm));
+		tmpmons.name.str = dupstr(OV_s(parm));
 	    break;
 	case SP_M_V_APPEAR:
 	    if ((OV_typ(parm) == SPOVAR_INT) &&
@@ -2686,7 +2686,7 @@ spo_monster(coder)
 		tmpmons.appear = OV_i(parm);
 		opvar_free(parm);
 		OV_pop(parm);
-		tmpmons.appear_as.str = strdup(OV_s(parm));
+		tmpmons.appear_as.str = dupstr(OV_s(parm));
 	    }
 	    break;
 	case SP_M_V_ASLEEP:
@@ -2821,7 +2821,7 @@ spo_object(coder)
 	case SP_O_V_NAME:
 	    if ((OV_typ(parm) == SPOVAR_STRING) &&
 		!tmpobj.name.str)
-		tmpobj.name.str = strdup(OV_s(parm));
+		tmpobj.name.str = dupstr(OV_s(parm));
 	    break;
 	case SP_O_V_CORPSENM:
 	    if (OV_typ(parm) == SPOVAR_MONST) {
@@ -3926,7 +3926,7 @@ spo_levregion(coder)
     tmplregion->del_islev = OV_i(del_islev);
     tmplregion->rtype = OV_i(rtype);
     tmplregion->padding = OV_i(padding);
-    tmplregion->rname.str = strdup(OV_s(rname));
+    tmplregion->rname.str = dupstr(OV_s(rname));
 
     if(!tmplregion->in_islev) {
 	get_location(&tmplregion->inarea.x1, &tmplregion->inarea.y1,
@@ -4495,7 +4495,7 @@ spo_var_init(coder)
 	tmpvar = (struct splev_var *)malloc(sizeof(struct splev_var));
 	if (!tmpvar) panic("newvar tmpvar alloc");
 	tmpvar->next = coder->frame->variables;
-	tmpvar->name = strdup(OV_s(vname));
+	tmpvar->name = dupstr(OV_s(vname));
 	coder->frame->variables = tmpvar;
 
 	if (OV_i(arraylen) < 0) {
