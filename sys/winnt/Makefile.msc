@@ -460,6 +460,9 @@ DLB =
 {$(SSYS)}.c{$(OBJ)}.o:
 	@$(CC) $(cflagsUtil)  -Fo$@  $<
 
+{$(SSYS)}.cpp{$(OBJ)}.o:
+	@$(CC) $(cflagsUtil)  -Fo$@  $<
+
 #==========================================
 # Rules for files in sys\winnt
 #==========================================
@@ -588,6 +591,8 @@ VOBJ27 = $(O)worm.o     $(O)worn.o     $(O)write.o    $(O)zap.o
 
 DLBOBJ = $(O)dlb.o
 
+REGEX  = $(O)cppregex.o
+
 TTYOBJ = $(O)topl.o     $(O)getline.o  $(O)wintty.o
 
 SOBJ   = $(O)winnt.o    $(O)pcsys.o      $(O)pcunix.o  \
@@ -598,7 +603,7 @@ OBJS   = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
          $(VOBJ11) $(VOBJ12) $(VOBJ13) $(VOBJ14) $(VOBJ15) \
          $(VOBJ16) $(VOBJ17) $(VOBJ18) $(VOBJ19) $(VOBJ20) \
          $(VOBJ21) $(VOBJ22) $(VOBJ23) $(VOBJ24) $(VOBJ25) \
-         $(VOBJ26) $(VOBJ27) $(VOBJ28) $(VOBJ29)
+         $(VOBJ26) $(VOBJ27) $(VOBJ28) $(VOBJ29) $(REGEX)
 
 WINPOBJ = $(WINPORT)
 
@@ -1408,6 +1413,13 @@ $(O)ntsound.o: $(HACK_H) $(MSWSYS)\ntsound.c
 
 $(O)panic.o:  $(U)panic.c $(CONFIG_H)
 	@$(CC) $(cflagsUtil) -Fo$@ $(U)panic.c
+
+# 
+# sys/share dependencies
+#
+
+#(O)cppregex.o:	$(O)cppregex.cpp $(HACK_H)
+	@$(CC) $(cflagsUtil) -Fo$@ ..\sys\share\cppregex.cpp
 
 #
 # The rest are stolen from sys/unix/Makefile.src, 
