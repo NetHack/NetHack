@@ -1819,6 +1819,15 @@ dodip()
 	    return 1;
 	}
 
+        if(potion->otyp == POT_ACID && obj->otyp == CORPSE &&
+           obj->corpsenm == PM_LICHEN & !Blind) {
+               pline("%s %s %s around the edges.", The(cxname(obj)),
+                     otense(obj, "turn"), potion->odiluted ?
+                     hcolor(NH_ORANGE) : hcolor(NH_RED));
+               potion->in_use = FALSE;    /* didn't go poof */
+               return(1);
+	}
+
 	if(is_poisonable(obj)) {
 	    if(potion->otyp == POT_SICKNESS && !obj->opoisoned) {
 		char buf[BUFSZ];

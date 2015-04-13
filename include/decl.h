@@ -266,7 +266,7 @@ E NEARDATA struct c_color_names {
     const char	*const c_black, *const c_amber, *const c_golden,
 		*const c_light_blue,*const c_red, *const c_green,
 		*const c_silver, *const c_blue, *const c_purple,
-		*const c_white;
+		*const c_white, *const c_orange;
 } c_color_names;
 #define NH_BLACK		c_color_names.c_black
 #define NH_AMBER		c_color_names.c_amber
@@ -278,6 +278,7 @@ E NEARDATA struct c_color_names {
 #define NH_BLUE			c_color_names.c_blue
 #define NH_PURPLE		c_color_names.c_purple
 #define NH_WHITE		c_color_names.c_white
+#define NH_ORANGE		c_color_names.c_orange
 
 /* The names of the colors used for gems, etc. */
 E const char *c_obj_colors[];
