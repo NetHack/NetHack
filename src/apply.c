@@ -703,6 +703,14 @@ register xchar x, y;
 	}
 }
 
+const char *
+beautiful()
+{
+    return (ACURR(A_CHA) > 14) ?
+	(poly_gender() == 1 ? "beautiful" : "handsome") : "ugly";
+}
+
+
 #define WEAK	3	/* from eat.c */
 
 static const char look_str[] = "look %s.";
@@ -720,8 +728,7 @@ struct obj *obj;
 	if(!getdir((char *)0)) return 0;
 	invis_mirror = Invis;
 	useeit = !Blind && (!invis_mirror || See_invisible);
-	uvisage = (ACURR(A_CHA) > 14) ?
-		    (poly_gender() == 1 ? "beautiful" : "handsome") : "ugly";
+	uvisage = beautiful();
 	mirror = simpleonames(obj); /* "mirror" or "looking glass" */
 	if(obj->cursed && !rn2(2)) {
 		if (!Blind)
