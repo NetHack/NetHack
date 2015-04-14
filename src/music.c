@@ -453,7 +453,7 @@ struct obj *instr;
 	    if (do_spec && instr->spe > 0) {
 		consume_obj_charge(instr, TRUE);
 
-		You("produce soft music.");
+		You("produce %s music.", Hallucination ? "piped" : "soft");
 		put_monsters_to_sleep(u.ulevel * 5);
 		exercise(A_DEX, TRUE);
 		break;
