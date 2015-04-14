@@ -149,16 +149,6 @@ in_trouble()
 	struct obj *otmp;
 	int i, j, count=0;
 
-/* Borrowed from eat.c */
-
-#define SATIATED	0
-#define NOT_HUNGRY	1
-#define HUNGRY		2
-#define WEAK		3
-#define FAINTING	4
-#define FAINTED		5
-#define STARVED		6
-
 	/*
 	 * major troubles
 	 */
