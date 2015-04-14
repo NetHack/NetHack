@@ -1,4 +1,4 @@
-# NetHack 3.5	Makefile.msc	$NHDT-Date: 1427076358 2015/03/23 02:05:58 $  $NHDT-Branch: nhmall-booktribute $:$NHDT-Revision: 1.75 $ */
+# NetHack 3.5	Makefile.msc	$NHDT-Date: 1428973004 2015/04/14 00:56:44 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.84 $ */
 #       Copyright (c) NetHack PC Development Team 1993-2015
 #
 #==============================================================================
@@ -1418,7 +1418,7 @@ $(O)panic.o:  $(U)panic.c $(CONFIG_H)
 # sys/share dependencies
 #
 
-#(O)cppregex.o:	$(O)cppregex.cpp $(HACK_H)
+(O)cppregex.o:	$(O)cppregex.cpp $(HACK_H)
 	@$(CC) $(cflagsUtil) -Fo$@ ..\sys\share\cppregex.cpp
 
 #
