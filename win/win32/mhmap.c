@@ -302,6 +302,8 @@ int mswin_map_mode(HWND hWnd, int mode)
 
 	mswin_map_stretch(hWnd, &mapSize, TRUE);
 
+	mswin_update_inventory(); /* for perm_invent to hide/show tiles */ 
+
 	return oldMode;
 }
 

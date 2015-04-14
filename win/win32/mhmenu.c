@@ -1459,10 +1459,10 @@ void mswin_menu_window_size (HWND hWnd, LPSIZE sz)
 		extra_cx = (wrt.right-wrt.left) - sz->cx;
 
 		if( data->type==MENU_TYPE_MENU ) {
-			sz->cx = max(sz->cx, data->menu.menu_cx + GetSystemMetrics(SM_CXVSCROLL) );
+			sz->cx = data->menu.menu_cx + GetSystemMetrics(SM_CXVSCROLL);
 		} else {
 			/* Use the width of the text box */
-			sz->cx = max( sz->cx, data->text.text_box_size.cx + 2*GetSystemMetrics(SM_CXVSCROLL));
+			sz->cx = data->text.text_box_size.cx + 2*GetSystemMetrics(SM_CXVSCROLL);
 		}
 		sz->cx += extra_cx;
 	} else { 
