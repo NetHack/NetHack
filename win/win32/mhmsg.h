@@ -28,9 +28,9 @@ typedef struct mswin_nhmsg_add_wnd {
 } MSNHMsgAddWnd, *PMSNHMsgAddWnd;
 
 typedef struct mswin_nhmsg_putstr {
-  int		  attr;
-  const char* text;
-  boolean	  append;
+  int			attr;
+  const char*		text;
+  int			append;
 } MSNHMsgPutstr, *PMSNHMsgPutstr;
 
 typedef struct mswin_nhmsg_print_glyph {
