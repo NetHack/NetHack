@@ -2540,6 +2540,7 @@ mergable(otmp, obj)	/* returns TRUE if obj  & otmp can be merged */
     register struct obj *otmp, *obj;
 {
     int objnamelth = 0, otmpnamelth = 0;
+    if (obj == otmp) return FALSE; /* already the same object */
     if (obj->otyp != otmp->otyp) return FALSE;
     /* coins of the same kind will always merge */
     if (obj->oclass == COIN_CLASS) return TRUE;

@@ -1,4 +1,4 @@
-/* NetHack 3.5	files.c	$NHDT-Date: 1427337311 2015/03/26 02:35:11 $  $NHDT-Branch: derek-farming $:$NHDT-Revision: 1.141 $ */
+/* NetHack 3.5	files.c	$NHDT-Date: 1428972596 2015/04/14 00:49:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.164 $ */
 
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3346,10 +3346,8 @@ int  tribpassage;
     char *endp;
     char line[BUFSZ];
 
-    int scopes[4] = {0, SECTIONSCOPE, TITLESCOPE, PASSAGESCOPE};
-    int scope = 0, section = 0, passage = 0, book = 0;
-    int linect = 0, passagecnt = 0, targetpassage = 0, textcnt = 0;
-    char *sectionnm = "", *booknm = "";
+    int scope = 0;
+    int linect = 0, passagecnt = 0, targetpassage = 0;
     const char *badtranslation = "an incomprehensible foreign translation";
     boolean matchedsection = FALSE, matchedtitle = FALSE;
     winid tribwin = WIN_ERR;

@@ -897,6 +897,11 @@ allow showing legal positions for stinking cloud, jumping and polearms
 cloned creatures (of any type) don't deathdrop items
 pudding corpses behave somewhat differently than before
 mithril armor should have silver color
+lichen corpse is an acid indicator
+camera may contain a picture-painting demon
+some monsters can eat through iron bars
+inaccessible niches occasionally have iron bars in front
+sinks may teleport or polymorph
 
 
 Platform- and/or Interface-Specific Fixes
@@ -1161,6 +1166,7 @@ Aardvark Joe's Extended Logfile
 Michael Deutschmann's use_darkgray
 Clive Crous' dark_room
 sortloot by Jeroen Demeyer and Jukka Lahtinen
+Auto open doors by Stefano Busti
 
 
 Code Cleanup and Reorganization

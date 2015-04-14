@@ -1,4 +1,4 @@
-/* NetHack 3.5	potion.c	$NHDT-Date: 1426953330 2015/03/21 15:55:30 $  $NHDT-Branch: master $:$NHDT-Revision: 1.99 $ */
+/* NetHack 3.5	potion.c	$NHDT-Date: 1428972597 2015/04/14 00:49:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.111 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1816,6 +1816,15 @@ dodip()
 	    (void) hold_another_object(obj, "You drop %s!", doname(obj),
 				       (const char *)0);
 	    return 1;
+	}
+
+        if(potion->otyp == POT_ACID && obj->otyp == CORPSE &&
+	   obj->corpsenm == PM_LICHEN && !Blind) {
+               pline("%s %s %s around the edges.", The(cxname(obj)),
+                     otense(obj, "turn"), potion->odiluted ?
+                     hcolor(NH_ORANGE) : hcolor(NH_RED));
+               potion->in_use = FALSE;    /* didn't go poof */
+               return(1);
 	}
 
 	if(is_poisonable(obj)) {

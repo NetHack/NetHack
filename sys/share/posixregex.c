@@ -1,8 +1,8 @@
-/* NetHack 3.5  posixregex.c	$NHDT-Date: 1428590280 2015/04/09 14:38:00 $  $NHDT-Branch: scshunt-regex $:$NHDT-Revision: 1.0 $ */
+/* NetHack 3.5  posixregex.c	$NHDT-Date: 1428970913 2015/04/14 00:21:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.0 $ */
 /* Copyright (c) Sean Hunt  2015.                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
-#include <hack.h>
+#include "hack.h"
 
 #include <regex.h>
 
@@ -50,7 +50,7 @@ struct nhregex {
 };
 
 struct nhregex *regex_init() {
-  return malloc (sizeof (struct nhregex));
+  return (struct nhregex *)alloc(sizeof (struct nhregex));
 }
 
 boolean regex_compile(const char *s, struct nhregex *re) {
@@ -65,7 +65,7 @@ const char *regex_error_desc(struct nhregex *re) {
   static char buf[BUFSZ];
 
   if (!re || !re->err)
-    return NULL;
+    return (const char *)0;
 
   /* FIXME: Using a static buffer here is not ideal, but avoids memory
    * leaks. Consider the allocation more carefully. */
@@ -75,11 +75,12 @@ const char *regex_error_desc(struct nhregex *re) {
 }
 
 boolean regex_match(const char *s, struct nhregex *re) {
+  int result;
+
   if (!re)
     return FALSE;
 
-  int result;
-  if ((result = regexec(&re->re, s, 0, NULL, 0))) {
+  if ((result = regexec(&re->re, s, 0, (genericptr_t)0, 0))) {
     if (result != REG_NOMATCH)
       re->err = result;
     return FALSE;
