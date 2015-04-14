@@ -61,10 +61,15 @@ boolean resuming;
 	set_wear((struct obj *)0); /* for side-effects of worn starting gear */
 	(void) pickup(1);	/* autopickup at initial location */
     } else {		/* restore old game */
+#ifndef WIN32
 	update_inventory();		/* for perm_invent */
+#endif
 	read_engr_at(u.ux, u.uy);	/* subset of pickup() */
     }
-
+#ifdef WIN32
+    update_inventory();		/* for perm_invent */
+#endif
+    
     (void) encumber_msg(); /* in case they auto-picked up something */
     if (defer_see_monsters) {
 	defer_see_monsters = FALSE;
