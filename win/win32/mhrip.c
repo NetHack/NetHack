@@ -28,7 +28,7 @@ typedef struct mswin_nethack_text_window {
 	TCHAR*  rip_text;
 } NHRIPWindow, *PNHRIPWindow;
 
-BOOL CALLBACK NHRIPWndProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK NHRIPWndProc(HWND, UINT, WPARAM, LPARAM);
 static void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 
 HWND mswin_init_RIP_window () {
@@ -47,7 +47,7 @@ HWND mswin_init_RIP_window () {
 	if( !data ) panic("out of memory");
 
 	ZeroMemory(data, sizeof(NHRIPWindow));
-	SetWindowLong(ret, GWL_USERDATA, (LONG)data);
+	SetWindowLongPtr(ret, GWLP_USERDATA, (LONG_PTR)data);
 	return ret;
 }
 
@@ -63,7 +63,7 @@ void mswin_display_RIP_window (HWND hWnd)
 	HDC hdc;
 	HFONT OldFont;
 
-	data = (PNHRIPWindow)GetWindowLong(hWnd, GWL_USERDATA);
+	data = (PNHRIPWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
 	GetNHApp()->hPopupWnd = hWnd;
 	mapWnd = mswin_hwnd_from_winid(WIN_MAP);
@@ -118,12 +118,12 @@ void mswin_display_RIP_window (HWND hWnd)
 	GetNHApp()->hPopupWnd = NULL;
 }
 
-BOOL CALLBACK NHRIPWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK NHRIPWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	HDC hdc;
 	PNHRIPWindow data;
 
-	data = (PNHRIPWindow)GetWindowLong(hWnd, GWL_USERDATA);
+	data = (PNHRIPWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	switch (message)
 	{
 	case WM_INITDIALOG:
@@ -218,7 +218,7 @@ BOOL CALLBACK NHRIPWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 			if( data->rip_text ) free(data->rip_text);
 			if (data->rip_bmp != NULL) DeleteObject(data->rip_bmp);
 			free(data);
-			SetWindowLong(hWnd, GWL_USERDATA, (LONG)0);
+			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)0);
 		}
 	break;
 
@@ -230,7 +230,7 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
 	PNHRIPWindow data;
 	static int InRipText = 1;
-	data = (PNHRIPWindow)GetWindowLong(hWnd, GWL_USERDATA);
+	data = (PNHRIPWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	switch( wParam ) {
 		case MSNH_MSG_PUTSTR: {
 			PMSNHMsgPutstr msg_data = (PMSNHMsgPutstr)lParam;

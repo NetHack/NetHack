@@ -64,7 +64,7 @@ HWND mswin_init_status_window () {
 	if( !data ) panic("out of memory");
 
 	ZeroMemory(data, sizeof(NHStatusWindow));
-	SetWindowLong(ret, GWL_USERDATA, (LONG)data);
+	SetWindowLongPtr(ret, GWLP_USERDATA, (LONG_PTR)data);
 	return ret;
 }
 
@@ -96,7 +96,7 @@ LRESULT CALLBACK StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 	HDC hdc;
 	PNHStatusWindow data;
 	
-	data = (PNHStatusWindow)GetWindowLong(hWnd, GWL_USERDATA);
+	data = (PNHStatusWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	switch (message) 
 	{
 	case WM_MSNH_COMMAND: {
@@ -174,7 +174,7 @@ LRESULT CALLBACK StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 
 	case WM_DESTROY:
 		free(data);
-		SetWindowLong(hWnd, GWL_USERDATA, (LONG)0);
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)0);
 		break;
 
 	case WM_SETFOCUS:
@@ -198,7 +198,7 @@ void mswin_status_window_size (HWND hWnd, LPSIZE sz)
  
 	GetClientRect(hWnd, &rt);
 
-	data = (PNHStatusWindow)GetWindowLong(hWnd, GWL_USERDATA);
+	data = (PNHStatusWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	if(data) {
 		hdc = GetDC(hWnd);
 		saveFont = SelectObject(hdc, mswin_get_font(NHW_STATUS, ATR_NONE, hdc, FALSE));

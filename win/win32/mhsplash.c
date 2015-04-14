@@ -16,7 +16,7 @@
 
 PNHWinApp GetNHApp(void);
 
-BOOL CALLBACK NHSplashWndProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK NHSplashWndProc(HWND, UINT, WPARAM, LPARAM);
 
 #define SPLASH_WIDTH		440
 #define SPLASH_HEIGHT  322
@@ -177,8 +177,10 @@ void mswin_display_splash_window (BOOL show_ver)
 	mswin_destroy_splashfonts();
 }
 
-BOOL CALLBACK NHSplashWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK NHSplashWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
+
 	HDC hdc;
 	switch (message)
 	{

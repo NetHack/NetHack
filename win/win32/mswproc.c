@@ -157,6 +157,9 @@ init_nhwindows(int* argcp, char** argv)
 */
 void mswin_init_nhwindows(int* argc, char** argv)
 {
+	UNREFERENCED_PARAMETER(argc);
+	UNREFERENCED_PARAMETER(argv);
+
 	logDebug("mswin_init_nhwindows()\n");
 
 #ifdef _DEBUG
@@ -985,7 +988,7 @@ void mswin_putstr_ex(winid wid, int attr, const char *text, int app)
 			 ZeroMemory(&data, sizeof(data));
 			 data.attr = attr;
 			 data.text = text;
-			 data.append = app;
+			 data.append = !!app;
 			 SendMessage( 
 				 GetNHApp()->windowlist[wid].win, 
 				 WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_PUTSTR, (LPARAM)&data );
@@ -1969,6 +1972,8 @@ char *mswin_getmsghistory(BOOLEAN_P init)
 
 void mswin_putmsghistory(const char * msg, BOOLEAN_P restoring)
 {
+	UNREFERENCED_PARAMETER(restoring);
+
 	BOOL save_sound_opt;
 
 	if (!msg) return;	/* end of message history restore */

@@ -25,7 +25,6 @@ static void __cdecl font_table_cleanup(void);
 void mswin_init_splashfonts(HWND hWnd)
 {
 	HDC hdc = GetDC(hWnd);
-	HFONT fnt = NULL;
 	LOGFONT lgfnt;
 	ZeroMemory( &lgfnt, sizeof(lgfnt) );
 	lgfnt.lfHeight		= -80;	 // height of font
