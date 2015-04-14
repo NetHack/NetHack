@@ -31,6 +31,8 @@
 
 extern winid WIN_STATUS;
 
+#define NHTRACE_LOG "nhtrace.log"
+
 #ifdef _DEBUG
 extern void logDebug(const char *fmt, ...);
 #else
@@ -158,9 +160,10 @@ void mswin_init_nhwindows(int* argc, char** argv)
 	logDebug("mswin_init_nhwindows()\n");
 
 #ifdef _DEBUG
+	if (showdebug(NHTRACE_LOG)) 
 	{
 		/* truncate trace file */
-		FILE *dfp = fopen("nhtrace.log", "w");
+		FILE *dfp = fopen(NHTRACE_LOG, "w");
 		fclose(dfp);
 	}
 #endif
@@ -2147,8 +2150,11 @@ void mswin_popup_destroy(HWND hWnd)
 void
 logDebug(const char *fmt, ...)
 {
-  FILE *dfp = fopen("nhtrace.log", "a");
+  FILE *dfp;
 
+  if (!showdebug(NHTRACE_LOG)) return;
+
+  dfp = fopen(NHTRACE_LOG, "a");
   if (dfp) {
      va_list args;
 
