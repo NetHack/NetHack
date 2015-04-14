@@ -194,20 +194,24 @@ void mswin_status_window_size (HWND hWnd, LPSIZE sz)
 	HDC hdc;
 	PNHStatusWindow data;
 	RECT rt;
-	GetWindowRect(hWnd, &rt);
-	sz->cx = rt.right - rt.left;
-	sz->cy = rt.bottom - rt.top;
+	SIZE text_sz;
+ 
+	GetClientRect(hWnd, &rt);
 
 	data = (PNHStatusWindow)GetWindowLong(hWnd, GWL_USERDATA);
 	if(data) {
 		hdc = GetDC(hWnd);
 		saveFont = SelectObject(hdc, mswin_get_font(NHW_STATUS, ATR_NONE, hdc, FALSE));
+		GetTextExtentPoint32(hdc, _T("W"), 1, &text_sz);
 		GetTextMetrics(hdc, &tm);
 
-		sz->cy = tm.tmHeight * NHSW_LINES + 2*GetSystemMetrics(SM_CYSIZEFRAME);
+		rt.bottom = rt.top + text_sz.cy*NHSW_LINES;
 
 		SelectObject(hdc, saveFont);
 		ReleaseDC(hWnd, hdc);
 	}
+	AdjustWindowRect(&rt, GetWindowLong(hWnd, GWL_STYLE), FALSE);
+	sz->cx = rt.right - rt.left;
+	sz->cy = rt.bottom - rt.top;
 }
 
