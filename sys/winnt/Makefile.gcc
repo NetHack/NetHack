@@ -686,10 +686,10 @@ $(SRC)/vis_tab.c: $(U)makedefs.exe
 $(DAT)/engrave: $(DAT)/engrave.txt $(U)makedefs.exe
 	$(subst /,\,$(U)makedefs -s)
 
-$(DAT)\epitaph: $(DAT)\epitaph.txt $(U)makedefs.exe
+$(DAT)\epitaph: $(DAT)/epitaph.txt $(U)makedefs.exe
 	$(subst /,\,$(U)makedefs -s)
 
-$(DAT)\bogusmon: $(DAT)\bogusmon.txt $(U)makedefs.exe
+$(DAT)\bogusmon: $(DAT)/bogusmon.txt $(U)makedefs.exe
 	$(subst /,\,$(U)makedefs -s)
 
 
