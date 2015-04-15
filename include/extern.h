@@ -1,4 +1,4 @@
-/* NetHack 3.5	extern.h	$NHDT-Date: 1428806395 2015/04/12 02:39:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.455 $ */
+/* NetHack 3.5	extern.h	$NHDT-Date: 1429135323 2015/04/15 22:02:03 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.464 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -749,7 +749,7 @@ E int FDECL(nhclose, (int));
 E void NDECL(really_close);
 #endif
 #ifdef DEBUG
-E boolean FDECL(showdebug, (const char *));
+E boolean FDECL(debugcore, (const char *, boolean));
 #endif
 E void FDECL(read_tribute, (const char *,const char *,int));
 

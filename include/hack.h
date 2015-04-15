@@ -1,4 +1,4 @@
-/* NetHack 3.5	hack.h	$NHDT-Date: 1426465431 2015/03/16 00:23:51 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.52 $ */
+/* NetHack 3.5	hack.h	$NHDT-Date: 1429136301 2015/04/15 22:18:21 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.59 $ */
 /*	SCCS Id: @(#)hack.h	3.5	2008/03/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -12,20 +12,34 @@
 
 /* [DEBUG shouldn't be defined unless you know what you're doing...] */
 #ifdef DEBUG
-# define ifdebug(stmt)	do { if (showdebug(__FILE__)) stmt; } while (0)
+# define showdebug(file)        debugcore(file, TRUE)
+# define explicitdebug(file)    debugcore(file, FALSE)
+# define ifdebug(stmt)    do { if (showdebug(__FILE__)) stmt; } while (0)
+# ifdef _MSC_VER 
+   /* if we have microsoft's C runtime we can use these instead */
+#  include <crtdbg.h>
+#  define crtdebug(stmt) do { if (showdebug(__FILE__)) stmt; \
+                                _RPT0(_CRT_WARN,"\n"); } while (0)
+#  define debugpline0(str)                crtdebug(_RPT0(_CRT_WARN,str))
+#  define debugpline1(fmt,arg)            crtdebug(_RPT1(_CRT_WARN,fmt,arg))
+#  define debugpline2(fmt,a1,a2)          crtdebug(_RPT2(_CRT_WARN,fmt,a1,a2))
+#  define debugpline3(fmt,a1,a2,a3)       crtdebug(_RPT3(_CRT_WARN,fmt,a1,a2,a3))
+#  define debugpline4(fmt,a1,a2,a3,a4)    crtdebug(_RPT4(_CRT_WARN,fmt,a1,a2,a3,a4))
+# else
 /* these don't require compiler support for C99 variadic macros */
-# define debugpline0(str)		ifdebug(pline(str))
-# define debugpline1(fmt,arg)		ifdebug(pline(fmt,arg))
-# define debugpline2(fmt,a1,a2)		ifdebug(pline(fmt,a1,a2))
-# define debugpline3(fmt,a1,a2,a3)	ifdebug(pline(fmt,a1,a2,a3))
-# define debugpline4(fmt,a1,a2,a3,a4)	ifdebug(pline(fmt,a1,a2,a3,a4))
+#  define debugpline0(str)                ifdebug(pline(str))
+#  define debugpline1(fmt,arg)            ifdebug(pline(fmt,arg))
+#  define debugpline2(fmt,a1,a2)          ifdebug(pline(fmt,a1,a2))
+#  define debugpline3(fmt,a1,a2,a3)       ifdebug(pline(fmt,a1,a2,a3))
+#  define debugpline4(fmt,a1,a2,a3,a4)    ifdebug(pline(fmt,a1,a2,a3,a4))
+# endif
 #else
-# define debugpline0(str)		/*empty*/
-# define debugpline1(fmt,arg)		/*empty*/
-# define debugpline2(fmt,a1,a2)		/*empty*/
-# define debugpline3(fmt,a1,a2,a3)	/*empty*/
-# define debugpline4(fmt,a1,a2,a3,a4)	/*empty*/
-#endif	/*DEBUG*/
+#  define debugpline0(str)              /*empty*/
+#  define debugpline1(fmt,arg)          /*empty*/
+#  define debugpline2(fmt,a1,a2)        /*empty*/
+#  define debugpline3(fmt,a1,a2,a3)     /*empty*/
+#  define debugpline4(fmt,a1,a2,a3,a4)  /*empty*/
+#endif    /*DEBUG*/
 
 #define TELL		1
 #define NOTELL		0

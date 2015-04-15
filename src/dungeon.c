@@ -1,4 +1,4 @@
-/* NetHack 3.5	dungeon.c	$NHDT-Date: 1426465434 2015/03/16 00:23:54 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.39 $ */
+/* NetHack 3.5	dungeon.c	$NHDT-Date: 1429135381 2015/04/15 22:03:01 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.49 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -80,7 +80,7 @@ dumpit()
 	s_level	*x;
 	branch *br;
 
-	if (!showdebug(__FILE__)) return;
+	if (!explicitdebug(__FILE__)) return;
 
 	for(i = 0; i < n_dgns; i++)  {
 	    fprintf(stderr, "\n#%d \"%s\" (%s):\n", i,

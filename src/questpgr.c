@@ -1,4 +1,4 @@
-/* NetHack 3.5	questpgr.c	$NHDT-Date: 1426465439 2015/03/16 00:23:59 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.18 $ */
+/* NetHack 3.5	questpgr.c	$NHDT-Date: 1429135390 2015/04/15 22:03:10 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.26 $ */
 /*	Copyright 1991, M. Stephenson		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -46,7 +46,7 @@ dump_qtlist()	/* dump the character msg list to check appearance */
 {
 	struct	qtmsg	*msg;
 
-	if (!showdebug(__FILE__)) return;
+	if (!explicitdebug(__FILE__)) return;
 
 	for (msg = qt_list.chrole; msg->msgnum > 0; msg++) {
 		pline("msgnum %d: delivery %c",

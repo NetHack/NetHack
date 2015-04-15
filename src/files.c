@@ -1,4 +1,4 @@
-/* NetHack 3.5	files.c	$NHDT-Date: 1427337311 2015/03/26 02:35:11 $  $NHDT-Branch: derek-farming $:$NHDT-Revision: 1.141 $ */
+/* NetHack 3.5	files.c	$NHDT-Date: 1429136302 2015/04/15 22:18:22 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.166 $ */
 
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3267,11 +3267,16 @@ assure_syscf_file() {
 
 #ifdef DEBUG
 /* used by debugpline() to decide whether to issue a message
-   from a partiular source file; caller passes __FILE__ and we check
-   whether it is in the source file list supplied by SYSCF's DEBUGFILES */ 
+ * from a partiular source file; caller passes __FILE__ and we check
+ * whether it is in the source file list supplied by SYSCF's DEBUGFILES
+ *
+ * pass FALSE to override wildcard matching; useful for files 
+ * like dungeon.c and questpgr.c, which generate a ridiculous amount of
+ * output if DEBUG is defined and effectively block the use of a wildcard */
 boolean
-showdebug(filename)
+debugcore(filename, wildcards)
 const char *filename;
+boolean wildcards;
 {
     const char *debugfiles, *p;
 
@@ -3314,7 +3319,7 @@ const char *filename;
      * attempt a wildcard match against each element, but that would be
      * overkill for the intended usage.]
      */
-    if (pmatch(debugfiles, filename))
+    if (wildcards && pmatch(debugfiles, filename))
     return TRUE;
 
     /* check whether filename is an element of the list */
@@ -3327,6 +3332,7 @@ const char *filename;
     }
     return FALSE;
 }
+
 #endif	/*DEBUG*/
 
 /* ----------  BEGIN TRIBUTE ----------- */
