@@ -67,9 +67,14 @@ dosit()
 	    register struct obj *obj;
 
 	    obj = level.objects[u.ux][u.uy];
-	    You("sit on %s.", the(xname(obj)));
-	    if (!(Is_box(obj) || objects[obj->otyp].oc_material == CLOTH))
-		pline("It's not very comfortable...");
+	    if (youmonst.data->mlet == S_DRAGON && obj->oclass == COIN_CLASS) {
+		You("coil up around your %shoard.",
+		    (obj->quan + money_cnt(invent) < u.ulevel*1000) ? "meager " : "");
+	    } else {
+		You("sit on %s.", the(xname(obj)));
+		if (!(Is_box(obj) || objects[obj->otyp].oc_material == CLOTH))
+		    pline("It's not very comfortable...");
+	    }
 	} else if (trap != 0 || (u.utrap && (u.utraptype >= TT_LAVA))) {
 	    if (u.utrap) {
 		exercise(A_WIS, FALSE);	/* you're getting stuck longer */

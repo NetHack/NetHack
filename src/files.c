@@ -3352,10 +3352,8 @@ int  tribpassage;
     char *endp;
     char line[BUFSZ];
 
-    int scopes[4] = {0, SECTIONSCOPE, TITLESCOPE, PASSAGESCOPE};
-    int scope = 0, section = 0, passage = 0, book = 0;
-    int linect = 0, passagecnt = 0, targetpassage = 0, textcnt = 0;
-    char *sectionnm = "", *booknm = "";
+    int scope = 0;
+    int linect = 0, passagecnt = 0, targetpassage = 0;
     const char *badtranslation = "an incomprehensible foreign translation";
     boolean matchedsection = FALSE, matchedtitle = FALSE;
     winid tribwin = WIN_ERR;

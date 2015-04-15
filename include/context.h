@@ -110,6 +110,7 @@ struct context_info {
 	boolean  bypasses;	/* bypass flag is set on at least one fobj */
 	boolean  botl;		/* partially redo status line */
 	boolean  botlx;		/* print an entirely new bottom line */
+	boolean  door_opened;	/* set to true if door was opened during test_move */
 	struct dig_info digging;
 	struct victual_info victual;
 	struct tin_info tin;

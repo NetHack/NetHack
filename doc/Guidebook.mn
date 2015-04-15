@@ -1905,6 +1905,8 @@ Cannot be set with the `O' command.
 .lp autodig
 Automatically dig if you are wielding a digging tool and moving into a place
 that can be dug (default false).
+.lp autoopen
+Walking into a door attempts to open it (default true).
 .lp "autopickup  "
 Automatically pick up things onto which you move (default on). 
 See

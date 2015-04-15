@@ -77,6 +77,7 @@ static struct Bool_Opt
 	{"asksavedisk", (boolean *)0, FALSE, SET_IN_FILE},
 #endif
 	{"autodig", &flags.autodig, FALSE, SET_IN_GAME},
+	{"autoopen", &flags.autoopen, TRUE, SET_IN_GAME},
 	{"autopickup", &flags.pickup, TRUE, SET_IN_GAME},
 	{"autoquiver", &flags.autoquiver, FALSE, SET_IN_GAME},
 #if defined(MICRO) && !defined(AMIGA)

@@ -106,7 +106,7 @@ void mswin_map_stretch(HWND hWnd, LPSIZE lpsz, BOOL redraw)
 	wnd_size.cy = client_rt.bottom - client_rt.top;
 	
 	/* set new screen tile size */
-	data = (PNHMapWindow)GetWindowLong(hWnd, GWL_USERDATA);
+	data = (PNHMapWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	data->xScrTile = 
 		max(1, (data->bFitToScreenMode? wnd_size.cx : lpsz->cx) / COLNO);
 	data->yScrTile = 
@@ -200,7 +200,7 @@ int mswin_map_mode(HWND hWnd, int mode)
 	int oldMode;
 	SIZE mapSize;
 
-	data = (PNHMapWindow)GetWindowLong(hWnd, GWL_USERDATA);
+	data = (PNHMapWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	if( mode == data->mapMode ) return mode;
 	
 	oldMode = data->mapMode;
@@ -302,6 +302,8 @@ int mswin_map_mode(HWND hWnd, int mode)
 
 	mswin_map_stretch(hWnd, &mapSize, TRUE);
 
+	mswin_update_inventory(); /* for perm_invent to hide/show tiles */ 
+
 	return oldMode;
 }
 
@@ -333,7 +335,7 @@ LRESULT CALLBACK MapWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 {
 	PNHMapWindow data;
 	
-	data = (PNHMapWindow)GetWindowLong(hWnd, GWL_USERDATA);
+	data = (PNHMapWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	switch (message) 
 	{
 	case WM_CREATE:
@@ -412,7 +414,7 @@ LRESULT CALLBACK MapWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 	case WM_DESTROY:
 		if( data->hMapFont ) DeleteObject(data->hMapFont);
 		free(data);
-		SetWindowLong(hWnd, GWL_USERDATA, (LONG)0);
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)0);
 		break;
 
 	default:
@@ -427,7 +429,7 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	PNHMapWindow data;
 	RECT rt;
 
-	data = (PNHMapWindow)GetWindowLong(hWnd, GWL_USERDATA);
+	data = (PNHMapWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	switch(wParam) {
 	case MSNH_MSG_PRINT_GLYPH: 
 	{
@@ -557,6 +559,9 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 /* on WM_CREATE */
 void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(wParam);
+	UNREFERENCED_PARAMETER(lParam);
+
 	PNHMapWindow data;
 	int i,j;
 
@@ -575,7 +580,7 @@ void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	data->xScrTile = GetNHApp()->mapTile_X;
 	data->yScrTile = GetNHApp()->mapTile_Y;
 
-	SetWindowLong(hWnd, GWL_USERDATA, (LONG)data);
+	SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)data);
 }
 
 /* on WM_PAINT */
@@ -590,7 +595,7 @@ void onPaint(HWND hWnd)
 	int i, j;
 
 	/* get window data */
-	data = (PNHMapWindow)GetWindowLong(hWnd, GWL_USERDATA);
+	data = (PNHMapWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
 	hDC = BeginPaint(hWnd, &ps);
 
@@ -740,13 +745,15 @@ void onPaint(HWND hWnd)
 /* on WM_VSCROLL */
 void onMSNH_VScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
+
 	PNHMapWindow data;
 	SCROLLINFO si;
 	int yNewPos;
 	int yDelta;
  
 	/* get window data */
-	data = (PNHMapWindow)GetWindowLong(hWnd, GWL_USERDATA);
+	data = (PNHMapWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
     switch(LOWORD (wParam)) 
     { 
@@ -798,13 +805,15 @@ void onMSNH_VScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
 /* on WM_HSCROLL */
 void onMSNH_HScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
+
 	PNHMapWindow data;
 	SCROLLINFO si;
 	int xNewPos;
 	int xDelta;
  
 	/* get window data */
-	data = (PNHMapWindow)GetWindowLong(hWnd, GWL_USERDATA);
+	data = (PNHMapWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	
     switch(LOWORD (wParam)) 
     { 

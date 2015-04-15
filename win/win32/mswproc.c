@@ -31,6 +31,8 @@
 
 extern winid WIN_STATUS;
 
+#define NHTRACE_LOG "nhtrace.log"
+
 #ifdef _DEBUG
 extern void logDebug(const char *fmt, ...);
 #else
@@ -155,12 +157,16 @@ init_nhwindows(int* argcp, char** argv)
 */
 void mswin_init_nhwindows(int* argc, char** argv)
 {
+	UNREFERENCED_PARAMETER(argc);
+	UNREFERENCED_PARAMETER(argv);
+
 	logDebug("mswin_init_nhwindows()\n");
 
 #ifdef _DEBUG
+	if (showdebug(NHTRACE_LOG)) 
 	{
 		/* truncate trace file */
-		FILE *dfp = fopen("nhtrace.log", "w");
+		FILE *dfp = fopen(NHTRACE_LOG, "w");
 		fclose(dfp);
 	}
 #endif
@@ -1966,6 +1972,8 @@ char *mswin_getmsghistory(BOOLEAN_P init)
 
 void mswin_putmsghistory(const char * msg, BOOLEAN_P restoring)
 {
+	UNREFERENCED_PARAMETER(restoring);
+
 	BOOL save_sound_opt;
 
 	if (!msg) return;	/* end of message history restore */
@@ -2147,8 +2155,11 @@ void mswin_popup_destroy(HWND hWnd)
 void
 logDebug(const char *fmt, ...)
 {
-  FILE *dfp = fopen("nhtrace.log", "a");
+  FILE *dfp;
 
+  if (!showdebug(NHTRACE_LOG)) return;
+
+  dfp = fopen(NHTRACE_LOG, "a");
   if (dfp) {
      va_list args;
 

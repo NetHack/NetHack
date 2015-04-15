@@ -74,6 +74,10 @@ int APIENTRY WinMain(HINSTANCE hInstance,
                      LPSTR     lpCmdLine,
                      int       nCmdShow)
 {
+	UNREFERENCED_PARAMETER(hPrevInstance);
+	UNREFERENCED_PARAMETER(lpCmdLine);
+	UNREFERENCED_PARAMETER(nCmdShow);
+
 	INITCOMMONCONTROLSEX InitCtrls;
 	int argc;
 	char* argv[MAX_CMDLINE_PARAM];

@@ -741,6 +741,7 @@ int thrown;		/* HMON_xxx (0 => hand-to-hand, other => ranged) */
 		    case EXPENSIVE_CAMERA:
 			You("succeed in destroying %s.  Congratulations!",
 			    ysimple_name(obj));
+			release_camera_demon(obj, u.ux, u.uy);
 			useup(obj);
 			return(TRUE);
 			/*NOTREACHED*/

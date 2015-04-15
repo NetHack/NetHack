@@ -3,6 +3,7 @@ Boolean options not under specific compile flags (with default values in []):
 option setting, which is reached via the 'O' cmd.)
 
 autodig        dig if moving and wielding digging tool            [FALSE]
+autoopen       walking into a door attempts to open it            [TRUE]
 autopickup     automatically pick up objects you move over        [TRUE]
 autoquiver     when firing with an empty quiver, select some
                suitable inventory weapon to fill the quiver       [FALSE]

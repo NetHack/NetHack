@@ -148,16 +148,6 @@ in_trouble()
 	struct obj *otmp;
 	int i, j, count=0;
 
-/* Borrowed from eat.c */
-
-#define SATIATED	0
-#define NOT_HUNGRY	1
-#define HUNGRY		2
-#define WEAK		3
-#define FAINTING	4
-#define FAINTED		5
-#define STARVED		6
-
 	/*
 	 * major troubles
 	 */
@@ -1369,7 +1359,7 @@ dosacrifice()
 		      a_gname(), u_gname());
 		pline("%s is enraged...", u_gname());
 		pline("Fortunately, %s permits you to live...", a_gname());
-		pline(cloud_of_smoke, hcolor("orange"));
+		pline(cloud_of_smoke, hcolor(NH_ORANGE));
 		done(ESCAPED);
 	    } else { /* super big win */
 		adjalign(10);

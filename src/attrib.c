@@ -371,15 +371,6 @@ boolean	inc_or_dec;
 	if (moves > 0 && (i == A_STR || i == A_CON)) (void)encumber_msg();
 }
 
-/* hunger values - from eat.c */
-#define SATIATED	0
-#define NOT_HUNGRY	1
-#define HUNGRY		2
-#define WEAK		3
-#define FAINTING	4
-#define FAINTED		5
-#define STARVED		6
-
 STATIC_OVL void
 exerper()
 {

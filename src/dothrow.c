@@ -1665,6 +1665,21 @@ xchar x, y;		/* object location (ox, oy may not be right) */
 	return 1;
 }
 
+void
+release_camera_demon(obj, x,y)
+struct obj *obj;
+xchar x,y;
+{
+    struct monst *mtmp;
+    if (!rn2(3) && (mtmp = makemon(&mons[rn2(3) ? PM_HOMUNCULUS : PM_IMP],x,y, NO_MM_FLAGS)) != 0) {
+	if (canspotmon(mtmp))
+	    pline("%s is released!", Hallucination ?
+		  An(rndmonnam(NULL)) : "The picture-painting demon");
+	mtmp->mpeaceful = !obj->cursed;
+	set_malign(mtmp);
+    }
+}
+
 /*
  * Unconditionally break an object. Assumes all resistance checks
  * and break messages have been delivered prior to getting here.
@@ -1707,6 +1722,9 @@ boolean from_invent;
 			}
 			/* monster breathing isn't handled... [yet?] */
 			break;
+		case EXPENSIVE_CAMERA:
+		    release_camera_demon(obj, x,y);
+		    break;
 		case EGG:
 			/* breaking your own eggs is bad luck */
 			if (hero_caused && obj->spe && obj->corpsenm >= LOW_PM)

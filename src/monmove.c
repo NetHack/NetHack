@@ -1180,7 +1180,14 @@ postmov:
 			    add_damage(mtmp->mx, mtmp->my, 0L);
 		    }
 		} else if (levl[mtmp->mx][mtmp->my].typ == IRONBARS) {
-			if (flags.verbose && canseemon(mtmp))
+		    if (may_dig(mtmp->mx,mtmp->my) &&
+			(dmgtype(ptr, AD_RUST) || dmgtype(ptr, AD_CORR))) {
+			if (canseemon(mtmp))
+			    pline("%s eats through the iron bars.",
+				  Monnam(mtmp));
+			dissolve_bars(mtmp->mx, mtmp->my);
+			return(3);
+		    } else if (flags.verbose && canseemon(mtmp))
 			    Norep("%s %s %s the iron bars.", Monnam(mtmp),
 				  /* pluralization fakes verb conjugation */
 				  makeplural(locomotion(ptr, "pass")),
@@ -1264,6 +1271,14 @@ postmov:
 	    }
 	}
 	return(mmoved);
+}
+
+void
+dissolve_bars(x, y)
+register int x, y;
+{
+    levl[x][y].typ = (Is_special(&u.uz) || *in_rooms(x,y,0)) ? ROOM : CORR;
+    newsym(x, y);
 }
 
 boolean

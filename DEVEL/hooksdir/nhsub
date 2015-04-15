@@ -267,6 +267,8 @@ my $count = s/\$$PREFIX-(([A-Za-z][A-Za-z0-9_]*)(: ([^\x24]+))?)\$/&handlevar($2
 	rename $ofile, $file or die "Can't rename $ofile to $file";
 }
 
+# XXX docs for --fixup and --squash are wrong in synopsis. --file missing
+#   --message --template -t
 sub cmdparse {
 	my(@in) = @_;
 
@@ -314,6 +316,21 @@ sub cmdparse {
 
 				if($opt{cmd} eq 'add' && $single eq 'n'){
 					exit 0;
+				}
+#need to deal with options that eat a following element (-m, -F etc etc)
+#add: nothing?
+#commit: -c -C  -F -m 
+#   -u<mode> mode is optional
+# -S<keyid>  keyid is optional
+				if($opt{cmd} eq 'commit'){
+					if($single =~ m/[uS]/){
+						last;
+					}
+					if($single =~ m/[cCFm]/){
+#XXX this will be a mess if the argument is wrong, but can we tell?  No.
+						shift @in;
+						last;
+					}
 				}
 			}
 		}
