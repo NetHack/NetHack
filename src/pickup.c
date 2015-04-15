@@ -708,7 +708,7 @@ menu_item **pick_list;		/* return list of items picked */
 int how;			/* type of query */
 boolean FDECL((*allow), (OBJ_P));/* allow function */
 {
-	int i, n;
+	int i, n, actualn;
 	winid win;
 	struct obj *curr, *last, fake_hero_object;
 	struct obj **oarray;
@@ -727,7 +727,7 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 		last = curr;
 		n++;
 	    }
-
+	actualn = n;
 	if (engulfer) {
 	    ++n;
 	    /* don't autoselect swallowed hero if it's the only choice */
@@ -744,7 +744,7 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 	    return 1;
 	}
 
-	oarray = objarr_init(n);
+	oarray = objarr_init(actualn);
 	/* Add objects to the array */
 	i = 0;
 	for (curr = olist; curr; curr = FOLLOW(curr, qflags)) {
@@ -767,7 +767,7 @@ boolean FDECL((*allow), (OBJ_P));/* allow function */
 	pack = flags.inv_order;
 	do {
 	    printed_type_name = FALSE;
-	    for (i = 0; i < n; i++) {
+	    for (i = 0; i < actualn; i++) {
 		curr = oarray[i];
 		if ((qflags & FEEL_COCKATRICE) && curr->otyp == CORPSE &&
 		     will_feel_cockatrice(curr, FALSE)) {
