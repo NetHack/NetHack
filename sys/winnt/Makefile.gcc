@@ -1,6 +1,6 @@
 # NetHack 3.5	Makefile.gcc	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
 # NetHack 3.5	Makefile.gcc	$Date: 2011/10/11 02:37:22 $  $Revision: 1.38 $
-#   Copyright (c) NetHack PC Development Team 1993-2010
+#   Copyright (c) NetHack PC Development Team 1993-2015
 #
 #   NetHack 3.5.x Makefile for MinGW
 #
@@ -89,7 +89,7 @@ SRC   = ../src
 # Shared system files
 SSYS  = ../sys/share
 # NT Win32 specific files
-NTSYS = ../sys/winnt
+MSWSYS = ../sys/winnt
 # window port files (tty)
 TTY   = ../win/tty
 # window port files (Win32)
@@ -262,14 +262,17 @@ $(OBJ)/%.o : $(SRC)/%.c
 $(OBJ)/%.o : $(SSYS)/%.c
 	$(cc) $(CFLAGS)  -o$@  $<
 
+$(OBJ)/%.o : $(SSYS)/%.cpp
+	g++ $(CFLAGS) -std=c++11  -o$@  $<
+
 #==========================================
 # Rules for files in sys/winnt
 #==========================================
 
-$(OBJ)/%.o : $(NTSYS)/%.c
+$(OBJ)/%.o : $(MSWSYS)/%.c
 	$(cc) $(CFLAGS)  -o$@  $<
 
-$(INCL)/%.h : $(NTSYS)/%.h
+$(INCL)/%.h : $(MSWSYS)/%.h
 	@copy $< $@
 
 #==========================================
@@ -313,7 +316,7 @@ $(OBJ)/%.o : $(WIN32)/%.c
 # referenced later on in the Makefile.
 #
 
-DEFFILE = $(NTSYS)/$(GAME).def
+DEFFILE = $(MSWSYS)/$(GAME).def
 
 #
 # Shorten up the location for some files
@@ -394,6 +397,8 @@ VOBJ27 = $(O)worm.o     $(O)worn.o     $(O)write.o    $(O)zap.o
 
 DLBOBJ = $(O)dlb.o
 
+REGEX  = $(O)cppregex.o
+
 TTYOBJ = $(O)topl.o     $(O)getline.o  $(O)wintty.o
 
 SOBJ   = $(O)winnt.o    $(O)pcsys.o      $(O)pcunix.o  \
@@ -404,7 +409,7 @@ OBJS   = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
 	$(VOBJ11) $(VOBJ12) $(VOBJ13) $(VOBJ14) $(VOBJ15) \
 	$(VOBJ16) $(VOBJ17) $(VOBJ18) $(VOBJ19) $(VOBJ20) \
 	$(VOBJ21) $(VOBJ22) $(VOBJ23) $(VOBJ24) $(VOBJ25) \
-	$(VOBJ26) $(VOBJ27)
+	$(VOBJ26) $(VOBJ27) $(REGEX)
 
 WINPOBJ = $(WINPORT)
 
@@ -437,7 +442,7 @@ HACK_H = $(INCL)/hack.h $(CONFIG_H) $(INCL)/align.h $(INCL)/context.h \
 	       $(INCL)/wintype.h $(INCL)/decl.h $(INCL)/quest.h \
 	       $(INCL)/spell.h $(INCL)/color.h $(INCL)/obj.h \
 	       $(INCL)/you.h $(INCL)/attrib.h $(INCL)/monst.h \
-	       $(INCL)/mextra.h $(INCL)/skills.h $(INCL)/onames.h 
+	       $(INCL)/mextra.h $(INCL)/skills.h $(INCL)/onames.h \
 	       $(INCL)/timeout.h $(INCL)/trap.h $(INCL)/flag.h $(INCL)/rm.h \
 	       $(INCL)/vision.h $(INCL)/display.h $(INCL)/engrave.h \
 	       $(INCL)/rect.h $(INCL)/region.h $(INCL)/winprocs.h \
@@ -506,13 +511,14 @@ else
 	$(subst /,\,copy $(DAT)/*.lev         $(GAMEDIR))
 	$(subst /,\,if exist $(GAMEDIR)/makefile del $(GAMEDIR)/makefile)
 endif
+	$(subst /,\,if not exist $(GAMEDIR)/sysconf copy $(MSWSYS)/sysconf $(GAMEDIR))
 	$(subst /,\,if exist $(DAT)/symbols copy $(DAT)/symbols $(GAMEDIR))
 	$(subst /,\,if exist $(DOC)/guidebook.txt copy $(DOC)/guidebook.txt $(GAMEDIR)/Guidebook.txt)
 	$(subst /,\,if exist $(DOC)/nethack.txt copy $(DOC)/nethack.txt $(GAMEDIR)/NetHack.txt)
-	$(subst /,\,copy $(NTSYS)/defaults.nh   $(GAMEDIR)/defaults.nh)
+	$(subst /,\,copy $(MSWSYS)/defaults.nh   $(GAMEDIR)/defaults.nh)
 	$(subst /,\,echo install done > $@)
 
-#  copy $(NTSYS)/winnt.hlp    $(GAMEDIR)
+#  copy $(MSWSYS)/winnt.hlp    $(GAMEDIR)
 
 recover: $(U)recover.exe
 	$(subst /,\,if exist $(U)recover.exe copy $(U)recover.exe  $(GAMEDIR))
@@ -570,8 +576,8 @@ $(NHRES): $(TILEBMP16) $(WIN32)/winhack.rc $(WIN32)/mnsel.bmp \
 	 $(WIN32)/splash.bmp
 	@$(rc) -o$@ --include-dir $(WIN32) -i $(WIN32)/winhack.rc
 else
-$(NHRES): $(NTSYS)/console.rc $(NTSYS)/NetHack.ico 
-	@$(rc) -o$@ --include-dir $(NTSYS) -i $(NTSYS)/console.rc
+$(NHRES): $(MSWSYS)/console.rc $(MSWSYS)/NetHack.ico 
+	@$(rc) -o$@ --include-dir $(MSWSYS) -i $(MSWSYS)/console.rc
 endif
 
 #==========================================
@@ -589,12 +595,12 @@ $(GAMEFILE) : $(ALLOBJ) $(NHRES) $(O)gamedir.tag \
 	 $(GAMEDIR)/nhdefkey.dll $(GAMEDIR)/nh340key.dll $(GAMEDIR)/nhraykey.dll
 endif
 	@echo Linking....
-	@$(link) $(lflags) -o$@ $(ALLOBJ) $(NHRES) $(WINPLIBS)
+	$(link) $(lflags) -o$@ $(ALLOBJ) $(NHRES) $(WINPLIBS) -lstdc++
 	$(subst /,\,@if exist $(O)install.tag del $(O)install.tag)
 
 
 $(O)nhdefkey.o:
-	$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(NTSYS)/nhdefkey.c 
+	$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(MSWSYS)/nhdefkey.c 
 
 $(GAMEDIR)/nhdefkey.dll : $(O)nhdefkey.o $(O)gamedir.tag
 	@echo Linking $@
@@ -602,7 +608,7 @@ $(GAMEDIR)/nhdefkey.dll : $(O)nhdefkey.o $(O)gamedir.tag
 		-Wl,--add-stdcall-alias -o $@ $<
 
 $(O)nh340key.o:
-	$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(NTSYS)/nh340key.c 
+	$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(MSWSYS)/nh340key.c 
 
 $(GAMEDIR)/nh340key.dll : $(O)nh340key.o $(O)gamedir.tag
 	@echo Linking $@
@@ -610,15 +616,15 @@ $(GAMEDIR)/nh340key.dll : $(O)nh340key.o $(O)gamedir.tag
 		-Wl,--add-stdcall-alias -o $@ $<
 
 $(O)nhraykey.o:
-		$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(NTSYS)/nhraykey.c 
+		$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(MSWSYS)/nhraykey.c 
 
 $(GAMEDIR)/nhraykey.dll : $(O)nhraykey.o $(O)gamedir.tag
 	@echo Linking $@
 	$(cc) -shared -Wl,--export-all-symbols \
 		-Wl,--add-stdcall-alias -o $@ $<
 
-$(GAME)_.ico : $(NTSYS)/$(GAME).ico
-	$(subst /,\,@copy $(NTSYS)/$(GAME).ico $@)
+$(GAME)_.ico : $(MSWSYS)/$(GAME).ico
+	$(subst /,\,@copy $(MSWSYS)/$(GAME).ico $@)
 
 #==========================================
 # Create directory for holding object files
@@ -686,12 +692,12 @@ $(U)uudecode.exe: $(O)uudecode.o
 
 $(O)uudecode.o: $(SSYS)/uudecode.c
 
-$(NTSYS)/NetHack.ico : $(U)uudecode.exe $(NTSYS)/nhico.uu
-	$(subst /,\,$(U)uudecode.exe $(NTSYS)/nhico.uu)
+$(MSWSYS)/NetHack.ico : $(U)uudecode.exe $(MSWSYS)/nhico.uu
+	$(subst /,\,$(U)uudecode.exe $(MSWSYS)/nhico.uu)
 	$(subst /,\,copy NetHack.ico $@)
 	del NetHack.ico
 
-$(WIN32)/NetHack.ico : $(NTSYS)/NetHack.ico
+$(WIN32)/NetHack.ico : $(MSWSYS)/NetHack.ico
 	$(subst /,\,copy $< $@)
 
 $(WIN32)/mnsel.bmp: $(U)uudecode.exe $(WIN32)/mnsel.uu
@@ -850,8 +856,8 @@ $(O)obj.tag:
 # Header files NOT distributed in ../include
 #===========================================
 
-$(INCL)/win32api.h: $(NTSYS)/win32api.h
-	$(subst /,\,copy $(NTSYS)/win32api.h $@)
+$(INCL)/win32api.h: $(MSWSYS)/win32api.h
+	$(subst /,\,copy $(MSWSYS)/win32api.h $@)
 
 
 #==========================================
@@ -868,8 +874,8 @@ $(O)dlb.o:   $(O)dlb_main.o $(O)alloc.o $(O)panic.o $(INCL)/dlb.h
 $(O)dlb_main.o: $(UTIL)/dlb_main.c $(INCL)/config.h $(INCL)/dlb.h
 	$(cc) $(CFLAGS) -o$@ $(UTIL)/dlb_main.c
 
-$(DAT)/porthelp: $(NTSYS)/porthelp
-	$(subst /,\,@copy $(NTSYS)/porthelp $@ >nul)
+$(DAT)/porthelp: $(MSWSYS)/porthelp
+	$(subst /,\,@copy $(MSWSYS)/porthelp $@ >nul)
 
 nhdat:  $(U)dlb_main.exe $(DAT)/data $(DAT)/oracles $(OPTIONS_FILE) \
 	 $(DAT)/quest.dat $(DAT)/rumors $(DAT)/help $(DAT)/hh $(DAT)/cmdhelp \
@@ -1085,12 +1091,19 @@ $(DAT)/dungeon: $(O)utility.tag  $(DAT)/dungeon.def
 # NT dependencies
 #
 
-$(O)nttty.o:   $(HACK_H) $(TILE_H) $(INCL)/win32api.h $(NTSYS)/nttty.c
-	$(cc) $(CFLAGS) -I$(WSHR) -o$@  $(NTSYS)/nttty.c
-$(O)winnt.o: $(HACK_H) $(INCL)/win32api.h $(NTSYS)/winnt.c
-	$(cc) $(CFLAGS) -o$@  $(NTSYS)/winnt.c
-$(O)ntsound.o: $(HACK_H) $(NTSYS)/ntsound.c
-	$(cc) $(CFLAGS)  -o$@ $(NTSYS)/ntsound.c
+$(O)nttty.o:   $(HACK_H) $(TILE_H) $(INCL)/win32api.h $(MSWSYS)/nttty.c
+	$(cc) $(CFLAGS) -I$(WSHR) -o$@  $(MSWSYS)/nttty.c
+$(O)winnt.o: $(HACK_H) $(INCL)/win32api.h $(MSWSYS)/winnt.c
+	$(cc) $(CFLAGS) -o$@  $(MSWSYS)/winnt.c
+$(O)ntsound.o: $(HACK_H) $(MSWSYS)/ntsound.c
+	$(cc) $(CFLAGS)  -o$@ $(MSWSYS)/ntsound.c
+
+#
+# sys/share dependencies
+#
+
+(O)cppregex.o:	$(O)cppregex.cpp $(HACK_H)
+	@$(CC) $(CFLAGS) -Fo$@ ../sys/share/cppregex.cpp
 
 #
 # util dependencies
