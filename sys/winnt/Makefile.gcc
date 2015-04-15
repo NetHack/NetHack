@@ -683,6 +683,17 @@ $(INCL)/vis_tab.h: $(U)makedefs.exe
 $(SRC)/vis_tab.c: $(U)makedefs.exe
 	$(subst /,\,$(U)makedefs -z)
 
+$(DAT)/engrave: $(DAT)/engrave.txt $(U)makedefs.exe
+	$(subst /,\,$(U)makedefs -s)
+
+$(DAT)\epitaph: $(DAT)\epitaph.txt $(U)makedefs.exe
+	$(subst /,\,$(U)makedefs -s)
+
+$(DAT)\bogusmon: $(DAT)\bogusmon.txt $(U)makedefs.exe
+	$(subst /,\,$(U)makedefs -s)
+
+
+
 #==========================================
 # uudecode utility and uuencoded targets
 #==========================================
@@ -880,7 +891,7 @@ $(DAT)/porthelp: $(MSWSYS)/porthelp
 nhdat:  $(U)dlb_main.exe $(DAT)/data $(DAT)/oracles $(OPTIONS_FILE) \
 	 $(DAT)/quest.dat $(DAT)/rumors $(DAT)/help $(DAT)/hh $(DAT)/cmdhelp \
 	 $(DAT)/history $(DAT)/opthelp $(DAT)/wizhelp $(DAT)/dungeon \
-	 $(DAT)/porthelp $(DAT)/license $(O)sp_lev.tag
+	 $(DAT)/porthelp $(DAT)/license $(DAT)/engrave $(DAT)/epitaph $(DAT)/bogusmon $(DAT)/tribute $(O)sp_lev.tag
 	$(subst /,\,echo data >$(DAT)/dlb.lst)
 	$(subst /,\,echo oracles >>$(DAT)/dlb.lst)
 	$(subst /,\,if exist $(DAT)/options echo options >>$(DAT)/dlb.lst)
@@ -897,6 +908,10 @@ nhdat:  $(U)dlb_main.exe $(DAT)/data $(DAT)/oracles $(OPTIONS_FILE) \
 	$(subst /,\,echo wizhelp >>$(DAT)/dlb.lst)
 	$(subst /,\,echo dungeon >>$(DAT)/dlb.lst)
 	$(subst /,\,echo license >>$(DAT)/dlb.lst)
+	$(subst /,\,echo engrave >>$(DAT)/dlb.lst)
+	$(subst /,\,echo epitaph >>$(DAT)/dlb.lst)
+	$(subst /,\,echo bogusmon >>$(DAT)/dlb.lst)
+	$(subst /,\,echo tribute >>$(DAT)/dlb.lst)
 	dir /l /b /-p $(subst /,\,$(DAT)/*.lev >>$(DAT)/dlb.lst)
 	$(subst /,\,$(U)dlb_main CcIf $(DAT) dlb.lst $(SRC)/nhdat)
 
