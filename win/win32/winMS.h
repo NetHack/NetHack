@@ -211,9 +211,10 @@ extern COLORREF message_fg_color;
 #define SYSCLR_TO_BRUSH(x) ((HBRUSH)((x) + 1))
 
 /* unicode stuff */
-#ifdef UNICODE
+#define NH_CODEPAGE (SYMHANDLING(H_IBM)?GetOEMCP():GetACP())
+#ifdef _UNICODE
 	#define NH_W2A(w, a, cb)     ( WideCharToMultiByte(                              \
-												   CP_ACP,                      \
+												   NH_CODEPAGE,                      \
 												   0,                           \
 												   (w),                           \
 												   -1,                          \
@@ -223,7 +224,7 @@ extern COLORREF message_fg_color;
 												   NULL), (a) )
 
 	#define NH_A2W(a, w, cb)     ( MultiByteToWideChar(                              \
-												   CP_ACP,                      \
+												   NH_CODEPAGE,                      \
 												   0,                           \
 												   (a),                           \
 												   -1,                          \

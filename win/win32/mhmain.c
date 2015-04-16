@@ -414,6 +414,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 				}
 			}
 
+
 			} /* end switch */
 		} break;
 
@@ -815,7 +816,7 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			char* p;
 			size_t len;
 			HANDLE hglbCopy;
-			TCHAR* p_copy;
+			char* p_copy;
 
 			p = nh_compose_ascii_screenshot();
 			if( !p ) return 0;
@@ -828,18 +829,18 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			
 			EmptyClipboard();
 
-			hglbCopy = GlobalAlloc(GMEM_MOVEABLE, (len + 1) * sizeof(TCHAR)); 
+			hglbCopy = GlobalAlloc(GMEM_MOVEABLE, (len + 1) * sizeof(char)); 
 			if (hglbCopy == NULL) { 
 				CloseClipboard(); 
 				return FALSE; 
 			} 
 
-			p_copy = (TCHAR*)GlobalLock(hglbCopy); 
-			NH_A2W( p, p_copy, len ); 
-			p_copy[len] = (TCHAR) 0;    // null character 
+			p_copy = (char*)GlobalLock(hglbCopy); 
+			strncpy(p_copy, p, len); 
+			p_copy[len] = 0;    // null character 
 			GlobalUnlock(hglbCopy); 
 
-			SetClipboardData(CF_TEXT, hglbCopy);
+			SetClipboardData(SYMHANDLING(H_IBM)? CF_OEMTEXT : CF_TEXT, hglbCopy);
 			
 			CloseClipboard();
 			
@@ -848,32 +849,34 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		
 		case IDM_SETTING_SCREEN_TO_FILE: {
 			OPENFILENAME ofn;
-			char filename[1024];
+			TCHAR filename[1024];
+			TCHAR whackdir[MAX_PATH];
 			FILE* pFile;
 			char* text;
+			wchar_t* wtext;
+			int tlen = 0;
 			
 			ZeroMemory(filename, sizeof(filename));
 			ZeroMemory(&ofn, sizeof(ofn));
 			ofn.lStructSize = sizeof (OPENFILENAME);
 			ofn.hwndOwner = hWnd;
 			ofn.hInstance = GetNHApp()->hApp;
-			ofn.lpstrFilter = 
-				"Text Files (*.txt)\x0*.txt\x0"
-				"All Files (*.*)\x0*.*\x0"
-				"\x0\x0";
+			ofn.lpstrFilter = TEXT("Text Files (*.txt)\x0*.txt\x0")
+				TEXT("All Files (*.*)\x0*.*\x0")
+				TEXT("\x0\x0");
 			ofn.lpstrCustomFilter = NULL;
 			ofn.nMaxCustFilter = 0;
 			ofn.nFilterIndex = 1;
 			ofn.lpstrFile = filename;
-			ofn.nMaxFile = sizeof(filename);
+			ofn.nMaxFile = _countof(filename);
 			ofn.lpstrFileTitle = NULL;
 			ofn.nMaxFileTitle = 0;
-			ofn.lpstrInitialDir = hackdir;
+			ofn.lpstrInitialDir = NH_A2W(hackdir, whackdir, MAX_PATH);
 			ofn.lpstrTitle = NULL;
 			ofn.Flags = OFN_LONGNAMES | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST;
 			ofn.nFileOffset = 0;
 			ofn.nFileExtension = 0;
-			ofn.lpstrDefExt = "txt";
+			ofn.lpstrDefExt = TEXT("txt");
 			ofn.lCustData = 0;
 			ofn.lpfnHook = 0;
 			ofn.lpTemplateName = 0;
@@ -883,18 +886,23 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			text = nh_compose_ascii_screenshot();
 			if( !text ) return FALSE;
 
-			pFile = fopen(filename, "wb");
+			pFile = _tfopen(filename, TEXT("wt+,ccs=UTF-8"));
 			if( !pFile ) {
-				char buf[4096];
-				sprintf(buf, "Cannot open %s for writing!", filename);
+				TCHAR buf[4096];
+				_stprintf_s(buf, _countof(buf), TEXT("Cannot open %s for writing!"), filename);
 				NHMessageBox(hWnd, buf, MB_OK | MB_ICONERROR);
 				free(text);
 				return FALSE;
 			}
 
-			fwrite(text, strlen(text), 1, pFile);
+			tlen = strlen(text);
+			wtext = (wchar_t*)malloc(tlen*sizeof(wchar_t));
+			if( !wtext ) panic("out of memory");
+			MultiByteToWideChar(NH_CODEPAGE,0,text,-1,wtext,tlen);
+			fwrite(wtext, tlen*sizeof(wchar_t), 1, pFile);
 			fclose(pFile);
 			free(text);
+			free(wtext);
 		} break;
 
         case IDM_NHMODE:
@@ -908,7 +916,7 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
             mswin_destroy_reg();
             /* Notify the user that windows settings will not be saved this time. */
             NHMessageBox(GetNHApp()->hMainWnd, 
-                "Your Windows Settings will not be stored when you exit this time.", 
+                TEXT("Your Windows Settings will not be stored when you exit this time."), 
                 MB_OK | MB_ICONINFORMATION);
             break;
         }
