@@ -16,6 +16,50 @@
 #include "mhmsgwnd.h"
 #include "mhmap.h"
 
+
+#ifdef __MINGW32__
+/* Force a compilation error if condition is true, but also produce a
+   result (of value 0 and type size_t), so the expression can be used
+   e.g. in a structure initializer (or where-ever else comma expressions
+   aren't permitted). */
+#define BUILD_BUG_ON_ZERO(e) (sizeof(struct { int:-!!(e); }))
+/* &a[0] degrades to a pointer: a different type from an array */
+#define __must_be_array(a) \
+ BUILD_BUG_ON_ZERO(__builtin_types_compatible_p(typeof(a), typeof(&a[0])))
+
+#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]) + __must_be_array(arr))
+#define _countof(arr) ARRAY_SIZE(arr)
+
+int _stprintf_s(
+        TCHAR*buffer,
+        size_t sizeOfBuffer,
+        const TCHAR *format ,
+        ...
+        )
+{
+    int ret;
+    va_list      args;
+
+    va_start (args, format);
+    ret = _vstprintf( buffer, format, args);
+    va_end(args);
+    return ret;
+}
+
+double _wtof( const wchar_t *string )
+{
+    double ret;
+    size_t len = wcslen(string) + 1;
+    char* p = (char*) malloc(len);
+
+    wcstombs(p,string,len);
+    ret = atof(p);
+    free(p);
+    return ret;
+}
+
+#endif
+
 typedef struct mswin_nethack_main_window {
 	int mapAcsiiModeSave;
 } NHMainWindow, *PNHMainWindow;

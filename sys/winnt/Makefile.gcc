@@ -595,7 +595,7 @@ $(GAMEFILE) : $(ALLOBJ) $(NHRES) $(O)gamedir.tag \
 	 $(GAMEDIR)/nhdefkey.dll $(GAMEDIR)/nh340key.dll $(GAMEDIR)/nhraykey.dll
 endif
 	@echo Linking....
-	$(link) $(lflags) -o$@ $(ALLOBJ) $(NHRES) $(WINPLIBS) -lstdc++
+	$(link) $(lflags) -o$@ $(ALLOBJ) $(NHRES) $(WINPLIBS) -static -lstdc++
 	$(subst /,\,@if exist $(O)install.tag del $(O)install.tag)
 
 
@@ -686,10 +686,10 @@ $(SRC)/vis_tab.c: $(U)makedefs.exe
 $(DAT)/engrave: $(DAT)/engrave.txt $(U)makedefs.exe
 	$(subst /,\,$(U)makedefs -s)
 
-$(DAT)\epitaph: $(DAT)/epitaph.txt $(U)makedefs.exe
+$(DAT)/epitaph: $(DAT)/epitaph.txt $(U)makedefs.exe
 	$(subst /,\,$(U)makedefs -s)
 
-$(DAT)\bogusmon: $(DAT)/bogusmon.txt $(U)makedefs.exe
+$(DAT)/bogusmon: $(DAT)/bogusmon.txt $(U)makedefs.exe
 	$(subst /,\,$(U)makedefs -s)
 
 
@@ -999,7 +999,7 @@ $(U)til2bm32.exe: $(O)til2bm32.o $(TEXT_IO32)
 	@$(link) $(LFLAGSU) -o$@ $(O)til2bm32.o $(TEXT_IO32)
 
 $(O)tile2bmp.o: $(WSHR)/tile2bmp.c $(HACK_H) $(TILE_H) $(INCL)/win32api.h
-	$(cc) $(CFLAGS) -I$(WSHR) -o$@ $(WSHR)/tile2bmp.c
+	$(cc) $(CFLAGS) -mno-ms-bitfields -I$(WSHR) -o$@ $(WSHR)/tile2bmp.c
 
 $(O)til2bm32.o: $(WSHR)/til2bm32.c $(HACK_H) $(TILE_H) $(INCL)/win32api.h
 	$(cc) $(CFLAGS) -I$(WSHR) -DTILE_X=32 -DTILE_Y=32 -o$@ $(WSHR)/til2bm32.c
