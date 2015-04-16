@@ -33,7 +33,7 @@ typedef struct _DLLVERSIONINFO
 
 typedef HRESULT (CALLBACK* DLLGETVERSIONPROC)(DLLVERSIONINFO *);
 
-/* en of shlwapi.h */
+/* end of shlwapi.h */
 
 /* Minimal common control library version
 Version     _WIN_32IE   Platform/IE
