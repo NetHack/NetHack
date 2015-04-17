@@ -792,6 +792,7 @@ time_from_yyyymmddhhmmss(buf)
 char *buf;
 {
 	int k;
+	time_t timeresult;
 	struct tm t, *lt;
 	char *g, *p, y[5],mo[3],md[3],h[3],mi[3],s[3];
 	if (buf && strlen(buf) == 14) {
@@ -829,8 +830,13 @@ char *buf;
 			t.tm_hour = atoi(h);
 			t.tm_min  = atoi(mi);
 			t.tm_sec  = atoi(s);
-			return mktime(&t);
+			timeresult = mktime(&t);
 		}
+		if ((int)timeresult == -1)
+		    debugpline1("time_from_yyyymmddhhmmss(%s) would have returned -1",
+				buf ? buf : "");
+		else
+		    return timeresult;
 	}
 	return (time_t)0;
 }
