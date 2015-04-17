@@ -567,7 +567,7 @@ unsigned int *stuckid, *steedid;
     foo = time_from_yyyymmddhhmmss(timebuf);
 
 	ReadTimebuf(ubirthday);
-	ReadTimebuf(urealtime.realtime);
+	mread(fd, &urealtime.realtime, sizeof(urealtime.realtime));
 	ReadTimebuf(urealtime.restored);
 #if defined(BSD) && !defined(POSIX_TYPES)
 	(void) time((long *)&urealtime.restored);

@@ -67,7 +67,7 @@ struct u_achieve {
 };
 
 struct u_realtime {
-	time_t realtime;		/* actual playing time up until the last restore */
+	long realtime;			/* actual playing time up until the last restore, seconds */
 	time_t restored;		/* time the game was started or restored */
 	time_t endtime;
 };
