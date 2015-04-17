@@ -900,6 +900,7 @@ tmp_at(x, y)
 	    break;
 
 	default:	/* do it */
+	    if (!isok(x,y)) break;
 	    if (tglyph->style == DISP_BEAM || tglyph->style == DISP_ALL) {
 		if (tglyph->style != DISP_ALL && !cansee(x,y)) break;
 		if (tglyph->sidx >= TMP_AT_MAX_GLYPHS) break; /* too many locations */

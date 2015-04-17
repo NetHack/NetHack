@@ -3469,7 +3469,7 @@ drown()
 	}
 	u.uinwater = 1;
 	You("drown.");
-	for (;;) {
+	for (i = 0; i < 5; i++) { /* arbitrary number of loops */
 	    /* killer format and name are reconstructed every iteration
 	       because lifesaving resets them */
 	    pool_of_water = waterbody_name(u.ux, u.uy);

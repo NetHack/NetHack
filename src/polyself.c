@@ -300,7 +300,7 @@ newman()
 	enmax = rounddiv((long)enmax * (long)rn1(4, 8), 10);
 	for (i = 0; (u.ulevel = i) < newlvl; i++) enmax += newpw();
 	if (enmax < u.ulevel) enmax = u.ulevel;
-	u.uen = rounddiv((long)u.uen * (long)enmax, u.uenmax);
+	u.uen = rounddiv((long)u.uen * (long)enmax, ((u.uenmax < 1) ? 1 : u.uenmax));
 	u.uenmax = enmax;
 	/* [should alignment record be tweaked too?] */
 

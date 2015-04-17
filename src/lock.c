@@ -692,6 +692,8 @@ doclose()		/* try to close a door */
 		return(1);
 	}
 
+	if (!isok(x,y)) goto nodoor;
+
 	if ((mtmp = m_at(x,y))				&&
 		mtmp->m_ap_type == M_AP_FURNITURE	&&
 		(mtmp->mappearance == S_hcdoor ||
@@ -723,8 +725,10 @@ doclose()		/* try to close a door */
 		    pline_The("drawbridge is already closed.");
 		else if (portcullis || door->typ == DRAWBRIDGE_DOWN)
 		    There("is no obvious way to close the drawbridge.");
-		else
+		else {
+nodoor:
 		    You("%s no door there.", Blind ? "feel" : "see");
+		}
 		return res;
 	}
 
