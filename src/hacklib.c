@@ -792,7 +792,7 @@ time_from_yyyymmddhhmmss(buf)
 char *buf;
 {
 	int k;
-	time_t timeresult;
+	time_t timeresult = (time_t)0;
 	struct tm t, *lt;
 	char *g, *p, y[5],mo[3],md[3],h[3],mi[3],s[3];
 	if (buf && strlen(buf) == 14) {
