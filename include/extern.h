@@ -753,7 +753,7 @@ E void NDECL(really_close);
 #ifdef DEBUG
 E boolean FDECL(showdebug, (const char *));
 #endif
-E void FDECL(read_tribute, (const char *,const char *,int));
+E boolean FDECL(read_tribute, (const char *,const char *,int));
 
 /* ### fountain.c ### */
 

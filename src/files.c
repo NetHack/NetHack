@@ -3331,13 +3331,17 @@ const char *filename;
 
 /* ----------  BEGIN TRIBUTE ----------- */
 
-/* 3.6 tribute code */
+/* 3.6 tribute code
+ *
+ * Returns TRUE if you were able to read something.
+ *
+ */
 
 #define SECTIONSCOPE 1
 #define TITLESCOPE   2
 #define PASSAGESCOPE 3
 
-void
+boolean
 read_tribute(tribsection, tribtitle, tribpassage)
 const char *tribsection, *tribtitle;
 int  tribpassage;
@@ -3351,12 +3355,13 @@ int  tribpassage;
     const char *badtranslation = "an incomprehensible foreign translation";
     boolean matchedsection = FALSE, matchedtitle = FALSE;
     winid tribwin = WIN_ERR;
+    boolean grasped = FALSE;
 
     /* check for mandatories */
     if (!tribsection || !tribtitle) {
 	pline("It's %s of \"%s\"!",
 		badtranslation, tribtitle);
-	return;
+	return grasped;
     }	
 
     debugpline3("read_tribute %s, %s, %d.", tribsection, tribtitle, tribpassage);
@@ -3365,7 +3370,7 @@ int  tribpassage;
     if (!fp) {
     	/* this is actually an error - cannot open tribute file! */
     	pline("You feel too overwhelmed to continue!");
-	return;
+	return grasped;
     }
 
     /*
@@ -3465,13 +3470,13 @@ cleanup:
 		display_nhwindow(tribwin, FALSE);
 	destroy_nhwindow(tribwin);
 	tribwin = WIN_ERR;
-	u.uconduct.literate++;
+	grasped = TRUE;
     } else {
     	pline("It seems to be %s of \"%s\"!",
 		badtranslation, tribtitle);
     }
 
-    return;
+    return grasped;
 }
 /* ----------  END TRIBUTE ----------- */
 
