@@ -22,6 +22,7 @@
 #define MSNH_MSG_DIED			109
 #define MSNH_MSG_CARET			110
 #define MSNH_MSG_GETTEXT		111
+#define MSNH_MSG_UPDATE_STATUS	112
 
 typedef struct mswin_nhmsg_add_wnd {
   winid		  wid;
@@ -67,6 +68,13 @@ typedef struct mswin_nhmsg_get_text {
 	size_t	max_size;
 	char	buffer[];
 } MSNHMsgGetText, *PMSNHMsgGetText;
+
+typedef struct mswin_nhmsg_update_status {
+	int				n_fields;
+	const char**	vals;
+	boolean*		activefields;
+	int*			colors;
+} MSNHMsgUpdateStatus, *PMSNHMsgUpdateStatus;
 
 #endif
 

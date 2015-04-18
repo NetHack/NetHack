@@ -925,7 +925,7 @@ assign_hilite(sa,sb,sc,sd)
 char *sa, *sb, *sc, *sd;
 {
 	char *tmp, *how;
-	int i, dt, idx = -1;
+	int i = -1, dt = -1, idx = -1;
 	int coloridx[2] = {-1, -1};
 	boolean inverse[2] = {FALSE, FALSE};
 	boolean bold[2]	   = {FALSE, FALSE};

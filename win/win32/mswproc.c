@@ -12,6 +12,7 @@
 #include "dlb.h"
 #include "func_tab.h"   /* for extended commands */
 #include "winMS.h"
+#include <assert.h>
 #include "mhmap.h"
 #include "mhstatus.h"
 #include "mhtext.h"
@@ -28,8 +29,6 @@
 #include "resource.h"
 
 #define LLEN 128
-
-extern winid WIN_STATUS;
 
 #define NHTRACE_LOG "nhtrace.log"
 
@@ -129,12 +128,12 @@ struct window_procs mswin_procs = {
     mswin_getmsghistory,
     mswin_putmsghistory,
 #ifdef STATUS_VIA_WINDOWPORT
-    genl_status_init,
-    genl_status_finish,
-    genl_status_enablefield,
-    genl_status_update,
+    mswin_status_init,
+    mswin_status_finish,
+    mswin_status_enablefield,
+    mswin_status_update,
 # ifdef STATUS_HILITES
-    genl_status_threshold,
+    mswin_status_threshold,
 # endif
 #endif
     genl_can_suspend_yes,
@@ -1823,7 +1822,8 @@ void mswin_outrip(winid wid, int how, time_t when)
 void mswin_preference_update(const char *pref)
 {
 	HDC hdc;
-
+	int i;
+	
 	if( stricmp( pref, "font_menu")==0 ||
 		stricmp( pref, "font_size_menu")==0 ) {
 		if( iflags.wc_fontsiz_menu<NHFONT_SIZE_MIN || 
@@ -1859,7 +1859,12 @@ void mswin_preference_update(const char *pref)
 		mswin_get_font(NHW_STATUS, ATR_INVERSE, hdc, TRUE);
 		ReleaseDC(GetNHApp()->hMainWnd, hdc);
 
-		InvalidateRect(mswin_hwnd_from_winid(WIN_STATUS), NULL, TRUE);
+		for (i=1; i<MAXWINDOWS; i++) {
+			if (GetNHApp()->windowlist[i].type == NHW_STATUS 
+		        && GetNHApp()->windowlist[i].win != NULL) {
+				InvalidateRect(GetNHApp()->windowlist[i].win, NULL, TRUE);
+			}
+		}
 		mswin_layout_main_window(NULL);
 		return;
 	}
@@ -2594,3 +2599,274 @@ int NHMessageBox(HWND hWnd, LPCTSTR text, UINT type)
     return MessageBox(hWnd, text, title, type);
 }
 
+#ifdef STATUS_VIA_WINDOWPORT
+static const char *_status_fieldnm[MAXBLSTATS];
+static const char *_status_fieldfmt[MAXBLSTATS];
+static char *_status_vals[MAXBLSTATS];
+static int  _status_colors[MAXBLSTATS];
+static boolean _status_activefields[MAXBLSTATS];
+extern winid WIN_STATUS;
+
+# ifdef STATUS_HILITES
+typedef struct hilite_data_struct {
+	int thresholdtype;
+	anything threshold;
+	int behavior;
+	int under;
+	int over;
+} hilite_data_t;
+static hilite_data_t _status_hilites[MAXBLSTATS];
+#endif /* STATUS_HILITES */
+/*
+status_init()   -- core calls this to notify the window port that a status
+		   display is required. The window port should perform 
+		   the necessary initialization in here, allocate memory, etc.
+*/
+void
+mswin_status_init(void)
+{
+	logDebug("mswin_status_init()\n");
+	int i;
+	for (i = 0; i < MAXBLSTATS; ++i) {
+		_status_vals[i] = (char *)alloc(BUFSZ);
+		*_status_vals[i] = '\0';
+		_status_activefields[i] = FALSE;
+		_status_fieldfmt[i] = (const char *)0;
+		_status_colors[i] = CLR_MAX; /* no color */
+# ifdef STATUS_HILITES
+		_status_hilites[i].thresholdtype = 0;
+		_status_hilites[i].behavior = BL_TH_NONE;
+		_status_hilites[i].under = BL_HILITE_NONE;
+		_status_hilites[i].over = BL_HILITE_NONE;
+#endif /* STATUS_HILITES */
+	}
+	/* Use a window for the genl version; backward port compatibility */
+	WIN_STATUS = create_nhwindow(NHW_STATUS);
+	display_nhwindow(WIN_STATUS, FALSE);
+}
+
+/*
+status_finish() -- called when it is time for the window port to tear down
+		   the status display and free allocated memory, etc.
+*/
+void
+mswin_status_finish(void)
+{
+	logDebug("mswin_status_finish()\n");
+	/* tear down routine */
+	int i;
+
+	/* free alloc'd memory here */
+	for (i = 0; i < MAXBLSTATS; ++i) {
+		if (_status_vals[i]) free((genericptr_t)_status_vals[i]);
+		_status_vals[i] = (char *)0;
+	}
+}
+
+/*
+status_enablefield(int fldindex, char fldname, char fieldfmt, boolean enable)   
+                -- notifies the window port which fields it is authorized to
+		   display.
+		-- This may be called at any time, and is used
+		   to disable as well as enable fields, depending on the 
+		   value of the final argument (TRUE = enable).
+		-- fldindex could be one of the following from botl.h:
+		   BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, 
+		   BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX, 
+		   BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX, 
+		   BL_LEVELDESC, BL_EXP, BL_CONDITION
+		-- There are MAXBLSTATS status fields (from botl.h)
+*/
+void
+mswin_status_enablefield(int fieldidx, const char *nm, const char *fmt, boolean enable)
+{
+	logDebug("mswin_status_enablefield(%d, %s, %s, %d)\n", fieldidx, nm, fmt, (int)enable);
+	_status_fieldfmt[fieldidx] = fmt;
+	_status_fieldnm[fieldidx] = nm;
+	_status_activefields[fieldidx] = enable;
+}
+
+# ifdef STATUS_HILITES
+/*
+status_threshold(int fldidx, int threshholdtype, anything threshold, 
+					int behavior, int under, int over)
+		-- called when a hiliting preference is added, changed, or
+		   removed.
+		-- the fldindex identifies which field is having its hiliting
+		   preference set. It is an integer index value from botl.h
+		-- fldindex could be any one of the following from botl.h:
+		   BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, 
+		   BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX, 
+		   BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX, 
+		   BL_LEVELDESC, BL_EXP, BL_CONDITION
+		-- datatype is P_INT, P_UINT, P_LONG, or P_MASK.
+		-- threshold is an "anything" union which can contain the 
+		   datatype value.
+		-- behavior is used to define how threshold is used and can
+		   be BL_TH_NONE, BL_TH_VAL_PERCENTAGE, BL_TH_VAL_ABSOLUTE,
+		   or BL_TH_UPDOWN. BL_TH_NONE means don't do anything above
+		   or below the threshold.  BL_TH_VAL_PERCENTAGE treats the
+		   threshold value as a precentage of the maximum possible
+		   value. BL_TH_VAL_ABSOLUTE means that the threshold is an
+		   actual value. BL_TH_UPDOWN means that threshold is not
+		   used, and the two below/above hilite values indicate how
+		   to display something going down (under) or rising (over).		    
+		-- under is the hilite attribute used if value is below the 
+		   threshold. The attribute can be BL_HILITE_NONE, 
+		   BL_HILITE_INVERSE, BL_HILITE_BOLD (-1, -2, or -3), or one 
+		   of the color indexes of CLR_BLACK, CLR_RED, CLR_GREEN, 
+		   CLR_BROWN, CLR_BLUE, CLR_MAGENTA, CLR_CYAN, CLR_GRAY, 
+		   CLR_ORANGE, CLR_BRIGHT_GREEN, CLR_YELLOW, CLR_BRIGHT_BLUE, 
+		   CLR_BRIGHT_MAGENTA, CLR_BRIGHT_CYAN, or CLR_WHITE (0 - 15).
+		-- over is the hilite attribute used if value is at or above 
+		   the threshold. The attribute can be BL_HILITE_NONE, 
+		   BL_HILITE_INVERSE, BL_HILITE_BOLD (-1, -2, or -3), or one 
+		   of the color indexes of CLR_BLACK, CLR_RED, CLR_GREEN, 
+		   CLR_BROWN, CLR_BLUE, CLR_MAGENTA, CLR_CYAN, CLR_GRAY, 
+		   CLR_ORANGE, CLR_BRIGHT_GREEN, CLR_YELLOW, CLR_BRIGHT_BLUE, 
+		   CLR_BRIGHT_MAGENTA, CLR_BRIGHT_CYAN, or CLR_WHITE (0 - 15).
+*/
+void
+mswin_status_threshold(int fldidx, int thresholdtype, anything threshold, int behavior, int under, int over)
+{
+	logDebug("mswin_status_threshold(%d, %d, %d, %d, %d)\n", fldidx, thresholdtype, behavior, under, over);
+	assert(fldidx>=0 && fldidx<MAXBLSTATS);
+	_status_hilites[fldidx].thresholdtype = thresholdtype;
+	_status_hilites[fldidx].threshold = threshold;
+	_status_hilites[fldidx].behavior = behavior;
+	_status_hilites[fldidx].under = under;
+	_status_hilites[fldidx].over = over;
+}
+#endif /* STATUS_HILITES */
+
+/*
+
+status_update(int fldindex, genericptr_t ptr, int chg, int percentage)
+		-- update the value of a status field.
+		-- the fldindex identifies which field is changing and
+		   is an integer index value from botl.h
+		-- fldindex could be any one of the following from botl.h:
+		   BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, 
+		   BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX, 
+		   BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX, 
+		   BL_LEVELDESC, BL_EXP, BL_CONDITION
+		-- fldindex could also be BL_FLUSH (-1), which is not really
+		   a field index, but is a special trigger to tell the 
+		   windowport that it should redisplay all its status fields,
+		   even if no changes have been presented to it.
+		-- ptr is usually a "char *", unless fldindex is BL_CONDITION.
+		   If fldindex is BL_CONDITION, then ptr is a long value with
+		   any or none of the following bits set (from botl.h):
+			BL_MASK_BLIND		0x00000001L
+			BL_MASK_CONF		0x00000002L
+			BL_MASK_FOODPOIS	0x00000004L
+			BL_MASK_ILL		0x00000008L
+			BL_MASK_HALLU		0x00000010L
+			BL_MASK_STUNNED		0x00000020L
+			BL_MASK_SLIMED		0x00000040L
+		-- The value passed for BL_GOLD includes a leading
+		   symbol for GOLD "$:nnn". If the window port needs to use 
+		   the textual gold amount without the leading "$:" the port 
+		   will have to add 2 to the passed "ptr" for the BL_GOLD case.
+*/
+void
+mswin_status_update(int idx, genericptr_t ptr, int chg, int percent)
+{
+	logDebug("mswin_status_update(%d, %p, %d, %d)\n", idx, ptr, chg, percent);
+	long cond, *condptr = (long *)ptr;
+	char *text = (char *)ptr;
+	MSNHMsgUpdateStatus update_cmd_data;
+	int ocolor, ochar;
+	unsigned ospecial;
+	long value = -1;
+	
+	if (idx != BL_FLUSH) {
+	    if (!_status_activefields[idx]) return;
+	    switch(idx) {
+		case BL_CONDITION: {
+			cond = *condptr;
+			*_status_vals[idx] = '\0';
+			if (cond & BL_MASK_BLIND) Strcat(_status_vals[idx], " Blind");
+			if (cond & BL_MASK_CONF) Strcat(_status_vals[idx], " Conf");
+			if (cond & BL_MASK_FOODPOIS)
+				Strcat(_status_vals[idx], " FoodPois");
+			if (cond & BL_MASK_ILL) Strcat(_status_vals[idx], " Ill");
+			if (cond & BL_MASK_STUNNED) Strcat(_status_vals[idx], " Stun");
+			if (cond & BL_MASK_HALLU) Strcat(_status_vals[idx], " Hallu");
+			if (cond & BL_MASK_SLIMED) Strcat(_status_vals[idx], " Slime");
+			value = cond;
+		} break;
+		case BL_GOLD: { 
+			char buf[BUFSZ];
+			char* p;
+			ZeroMemory(buf, sizeof(buf));
+			mapglyph(objnum_to_glyph(GOLD_PIECE), &ochar, &ocolor, &ospecial, 0, 0);
+			buf[0] = ochar;
+			p = strchr(text, ':');
+			if(p) strncpy(buf+1, p, sizeof(buf)-2);
+			value = atol(buf);
+			Sprintf(_status_vals[idx],
+			_status_fieldfmt[idx] ? _status_fieldfmt[idx] : "%s", buf);
+		} break;
+		default: {
+			value = atol(text);
+			Sprintf(_status_vals[idx],
+			_status_fieldfmt[idx] ? _status_fieldfmt[idx] : "%s", text);
+		} break;
+	    }
+	}
+
+# ifdef STATUS_HILITES
+	switch(_status_hilites[idx].behavior) {
+		case BL_TH_NONE: {
+			_status_colors[idx] = CLR_MAX;
+		} break;
+
+		case BL_TH_UPDOWN: {
+			if(chg > 0) _status_colors[idx] = _status_hilites[idx].over;
+			else if(chg < 0) _status_colors[idx] = _status_hilites[idx].under;
+			else _status_colors[idx] = CLR_MAX;
+		} break;
+
+		case BL_TH_VAL_PERCENTAGE: {
+			int pct_th = 0;
+			if(_status_hilites[idx].thresholdtype!=ANY_INT) {
+				impossible("mswin_status_update: unsupported percentage threshold type %d", _status_hilites[idx].thresholdtype);
+				break;
+			}
+			pct_th = _status_hilites[idx].threshold.a_int;
+			_status_colors[idx] = (percent >= pct_th)? _status_hilites[idx].over : _status_hilites[idx].under;
+		} break;
+
+		case BL_TH_VAL_ABSOLUTE: {
+			int c = CLR_MAX;
+			int o = _status_hilites[idx].over;
+			int u = _status_hilites[idx].under;
+			anything* t = &_status_hilites[idx].threshold;
+			switch (_status_hilites[idx].thresholdtype) {
+				case ANY_LONG:	c = (value >= t->a_long)? o : u; break;
+				case ANY_INT:	c = (value >= t->a_int)? o : u; break;
+				case ANY_UINT:	c = ((unsigned long)value >= t->a_uint)? o : u; break;
+				case ANY_ULONG:	c = ((unsigned long)value >= t->a_ulong)? o : u; break;
+				case ANY_MASK32: c = (value & t->a_ulong)? o : u; break;
+				default:
+					impossible("mswin_status_update: unsupported absolute threshold type %d\n", _status_hilites[idx].thresholdtype);
+				break;
+			}
+			_status_colors[idx] = c;
+		} break;
+	}
+#endif /* STATUS_HILITES */
+	
+	/* send command to status window */
+	ZeroMemory(&update_cmd_data, sizeof(update_cmd_data));
+	update_cmd_data.n_fields = MAXBLSTATS;
+	update_cmd_data.vals = _status_vals;
+	update_cmd_data.activefields = _status_activefields;
+	update_cmd_data.colors = _status_colors;
+	SendMessage( 
+		mswin_hwnd_from_winid(WIN_STATUS), 
+		WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_UPDATE_STATUS, (LPARAM)&update_cmd_data );
+}
+
+#endif /*STATUS_VIA_WINDOWPORT*/
