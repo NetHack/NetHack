@@ -10,6 +10,7 @@
 #define NUMOBUF 12
 
 STATIC_DCL char *FDECL(strprepend,(char *,const char *));
+STATIC_DCL short FDECL(rnd_otyp_by_wpnskill, (SCHAR_P));
 STATIC_DCL boolean FDECL(wishymatch, (const char *,const char *,BOOLEAN_P));
 STATIC_DCL char *NDECL(nextobuf);
 STATIC_DCL void FDECL(releaseobuf, (char *));
@@ -2277,6 +2278,27 @@ struct alt_spellings {
     { (const char *)0, 0 },
 };
 
+short
+rnd_otyp_by_wpnskill(skill)
+schar skill;
+{
+    int i,n = 0;
+    short otyp;
+    for (i = bases[WEAPON_CLASS]; i < NUM_OBJECTS && objects[i].oc_class == WEAPON_CLASS; i++)
+	if (objects[i].oc_skill == skill) {
+	    n++;
+	    otyp = i;
+	}
+    if (n > 0) {
+	n = rn2(n);
+	for (i = bases[WEAPON_CLASS]; i < NUM_OBJECTS && objects[i].oc_class == WEAPON_CLASS; i++)
+	    if (objects[i].oc_skill == skill)
+		if (--n < 0) return i;
+    }
+    return STRANGE_OBJECT;
+}
+
+
 /*
  * Return something wished for.  Specifying a null pointer for
  * the user request string results in a random object.  Otherwise,
@@ -3022,6 +3044,16 @@ wiztrap:
             newsym(x, y);
             return &zeroobj;
         }
+    }
+
+    if (!oclass && !typ) {
+	if (!strncmpi(bp, "polearm", 7)) {
+	    typ = rnd_otyp_by_wpnskill(P_POLEARMS);
+	    goto typfnd;
+	} else if (!strncmpi(bp, "hammer", 6)) {
+	    typ = rnd_otyp_by_wpnskill(P_HAMMER);
+	    goto typfnd;
+	}
     }
 
     if(!oclass) return((struct obj *)0);
