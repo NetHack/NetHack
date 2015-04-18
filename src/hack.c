@@ -1363,7 +1363,7 @@ domove()
 
         if (boulder)
             Strcpy(buf, ansimpleoname(boulder));
-        else if (solid)
+        else if (solid && glyph_is_cmap(glyph))
             Strcpy(buf, the(defsyms[glyph_to_cmap(glyph)].explanation));
         else if (!Underwater)
             Strcpy(buf, "thin air");

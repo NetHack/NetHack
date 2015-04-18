@@ -273,7 +273,8 @@ lookat(x, y, buf, monbuf)
 	Strcpy(buf, Is_airlevel(&u.uz) ? "cloudy area" : "fog/vapor cloud");
 	break;
     default:
-	Strcpy(buf,defsyms[glyph_to_cmap(glyph)].explanation);
+	if (glyph_is_cmap(glyph))
+	    Strcpy(buf,defsyms[glyph_to_cmap(glyph)].explanation);
 	break;
     }
 
