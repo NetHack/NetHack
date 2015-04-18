@@ -2,18 +2,22 @@
 # NetHack 3.5	Makefile.gcc	$Date: 2011/10/11 02:37:22 $  $Revision: 1.38 $
 #   Copyright (c) NetHack PC Development Team 1993-2015
 #
-#   NetHack 3.5.x Makefile for MinGW
+#==============================================================================
 #
 #   Win32 Compilers Tested:
-#                  - MinGW 1.0 (gcc version 2.95.3-6) (Console NetHack only)
-#                  - MinGW 2.0 (gcc version 3.2)
+#                  === TDM-GCC Compiler Suite for Windows ===
+#                  ---        GCC 4.6 & 4.7 Series        ---
+#                  ***   Standard MinGW 32-bit Edition    ***
 #
 #   If you don't have this compiler, you can get it at:
-#       http://www.mingw.org/
+#		http://tdm-gcc.tdragon.net/
 #
+#==============================================================================
 #   This is used for building two versions of NetHack:
+#
 #   A tty port utilizing the Win32 Console I/O subsystem, Console
 #       NetHack;
+#
 #   A Win32 native port built on the Windows API, Graphical NetHack or
 #       NetHackW.
 #
@@ -24,43 +28,56 @@
 #         .y                     yacc   (such as bison)
 #         .l                     lex    (such as flex)
 #
-#
 #   If you have any questions read the sys/winnt/Install.nt file included
 #   with the distribution.
-#
-#   --
-#   Dion Nicolaas
 #==============================================================================
+#==============================================================================
+# BUILD DECISIONS SECTION
+#
+# 1. 32-bit or 64-bit?
+#
+# 64 bit
+#TARGET_CPU=x64
+#
+# 32 bit
+TARGET_CPU=x86
+#
+#---------------------------------------------------------------
+# 2. Graphical version or command line version?
+#
 # Graphical interface
 # Set to Y for a graphical version
 # Set to anything else (or undefine) for a tty version
 
 #GRAPHICAL = Y
 
-# Debug
-# Set to Y for Debug support (to produce debug information)
-# Set to anything else (or undefine) for a "release" version
-# You can set your debug options below.
+#
+#---------------------------------------------------------------
+# 3. Where do you want the game to be built (which folder)?
+#    If not present prior to compilation it gets created.
+#
 
-DEBUG = Y
-
-cc     = gcc
-rc     = windres
-link   = gcc
-
-cflags = -mms-bitfields
-lflags  =
-ifeq  "$(DEBUG)" "Y"
-cdebug = -g
-linkdebug = -g
-else
-cdebug =
-linkdebug =
-endif
+GAMEDIR = ../binary
 
 #
-#  Set the gamedir according to your preference.
-#  If not present prior to compilation it gets created.
+#---------------------------------------------------------------
+# 4. Do you want debug information in the executable?
+#
+
+DEBUGINFO = Y
+
+# This marks the end of the BUILD DECISIONS section.
+#==============================================================================
+#
+#===============================================
+#======= End of Modification Section ===========
+#===============================================
+#
+################################################
+#                                              #
+# Nothing below here should have to be changed.#
+#                                              #
+################################################
 
 ifeq  "$(GRAPHICAL)" "Y"
 # Game Name
@@ -69,8 +86,6 @@ else
 # Game Name
 GAME    = NetHack
 endif
-# Game directory
-GAMEDIR = ../binary
 
 #
 #  Source directories.    Makedefs hardcodes these, don't change them.
@@ -103,6 +118,9 @@ WSHR  = ../win/share
 
 OBJ = o
 
+cc     = gcc
+rc     = windres
+link   = gcc
 
 #
 #==========================================
@@ -148,15 +166,6 @@ LEXYYC  = lexyy.c
 
 RANDOM  = $(OBJ)/random.o
 #RANDOM =
-
-#===============================================
-#======= End of Modification Section ===========
-#===============================================
-################################################
-#                                              #
-# Nothing below here should have to be changed.#
-#                                              #
-################################################
 
 ifeq  "$(GRAPHICAL)" "Y"
 WINPORT  = $(O)tile.o $(O)mhaskyn.o $(O)mhdlg.o \
@@ -207,6 +216,17 @@ endif
 # Setting up the compiler and linker
 # macros. All builds include the base ones.
 #==========================================
+cflags = -mms-bitfields
+lflags  =
+ifeq  "$(DEBUGINFO)" "Y"
+cdebug = -g
+linkdebug = -g
+else
+cdebug =
+linkdebug =
+endif
+
+
 
 CFLAGSBASE  = -c $(cflags) -I$(INCL) $(WINPINC) $(cdebug)
 LFLAGSBASEC = $(linkdebug)
@@ -230,8 +250,6 @@ lflags  = $(LFLAGSBASEG)
 else
 lflags  = $(LFLAGSBASEC)
 endif
-
-GAMEFILE = $(GAMEDIR)/$(GAME).exe # whole thing
 
 ifeq  "$(USE_DLB)" "Y"
 DLB = nhdat
@@ -480,10 +498,10 @@ GAMEFILE = $(GAMEDIR)/$(GAME).exe
 #
 #  The default make target (so just typing 'nmake' is useful).
 #
-default : $(GAMEFILE)
+default : install
 
 #
-#  The main target.
+#  The game target.
 #
 
 $(GAME) : $(O)obj.tag $(O)utility.tag graphicschk $(GAMEFILE)
@@ -661,9 +679,6 @@ $(O)makedefs.o: $(CONFIG_H) $(INCL)/monattk.h $(INCL)/monflag.h \
 
 $(INCL)/date.h $(OPTIONS_FILE): $(U)makedefs.exe
 	$(subst /,\,$(U)makedefs -v)
-
-#$(OPTIONS_FILE): $(U)makedefs.exe
-#	$(subst /,\,$(U)makedefs -v)
 
 $(INCL)/onames.h : $(U)makedefs.exe
 	$(subst /,\,$(U)makedefs -o)
@@ -1060,9 +1075,6 @@ spotless: clean
 	$(subst /,\,if exist $(U)recover.exe    del $(U)recover.exe)
 	$(subst /,\,if exist $(DAT)/dlb.lst      del $(DAT)/dlb.lst)
 	$(subst /,\,if exist nhdat.         del nhdat.)
-	$(subst /,\,if exist $(O)install.tag    del $(O)install.tag)
-	$(subst /,\,if exist $(O)obj.tag    del $(O)obj.tag)
-	$(subst /,\,if exist $(O)gamedir.tag    del $(O)gamedir.tag)
 ifneq "$(OBJ)" ""
 	$(subst /,\,rmdir $(OBJ)) /s /Q
 endif
@@ -1075,8 +1087,11 @@ clean:
 	$(subst /,\,if exist $(U)dgncomp.exe   del $(U)dgncomp.exe)
 	$(subst /,\,if exist $(SRC)/*.lnk      del $(SRC)/*.lnk)
 	$(subst /,\,if exist $(SRC)/*.map      del $(SRC)/*.map)
-	$(subst /,\,if exist $(TILEBMP16)      del $(TILEBMP16))
-	$(subst /,\,if exist $(TILEBMP32)      del $(TILEBMP32))
+	$(subst /,\,if exist $(O)install.tag   del $(O)install.tag)
+	$(subst /,\,if exist $(O)gamedir.tag  del $(O)gamedir.tag)
+	$(subst /,\,if exist $(O)obj.tag      del $(O)obj.tag)
+	$(subst /,\,if exist $(TILEBMP16)        del $(TILEBMP16))
+	$(subst /,\,if exist $(TILEBMP32)        del $(TILEBMP32))
 
 #===================================================================
 # OTHER DEPENDENCIES
@@ -1112,13 +1127,6 @@ $(O)winnt.o: $(HACK_H) $(INCL)/win32api.h $(MSWSYS)/winnt.c
 	$(cc) $(CFLAGS) -o$@  $(MSWSYS)/winnt.c
 $(O)ntsound.o: $(HACK_H) $(MSWSYS)/ntsound.c
 	$(cc) $(CFLAGS)  -o$@ $(MSWSYS)/ntsound.c
-
-#
-# sys/share dependencies
-#
-
-(O)cppregex.o:	$(O)cppregex.cpp $(HACK_H)
-	@$(CC) $(CFLAGS) -Fo$@ ../sys/share/cppregex.cpp
 
 #
 # util dependencies
