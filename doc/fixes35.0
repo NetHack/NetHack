@@ -1151,7 +1151,7 @@ tty,win32gui,win32tty: add menucolors
 NetHack Community Patches (or Variation) Included
 -------------------------------------------------
 Roderick Schertler's pickup_thrown patch
-Malcolm Ryan's Statue Glyphs patch
+adopt/adapt/extend Malcolm Ryan's Statue Glyphs patch to work for tty and tiles
 adopt/adapt/improve the Paranoid_Quit patch; default is paranoid_confirm:pray
 	paranoid_confirm:Confirm when requiring "yes" instead of y to confirm,
 				 also require explicit "no" to reject

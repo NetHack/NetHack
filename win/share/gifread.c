@@ -13,7 +13,7 @@
 /* +-------------------------------------------------------------------+ */
 
 /*
- * $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+ * $NHDT-Date: 1429464661 2015/04/19 17:31:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.2 $
  * $Date: 2002/01/05 21:06:02 $  $Revision: 1.1 $
  */
 
@@ -71,7 +71,7 @@ static void FDECL(ReadTileStrip, (FILE *fd, int len));
 
 /* These should be in gif.h, but there isn't one. */
 boolean FDECL(fopen_gif_file, (const char *, const char *));
-boolean FDECL(read_gif_tile, (pixel(*)[]));
+boolean FDECL(read_gif_tile, (pixel(*)[TILE_X]));
 int NDECL(fclose_gif_file);
 
 static int

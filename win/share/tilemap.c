@@ -1,4 +1,4 @@
-/* NetHack 3.5	tilemap.c	$NHDT-Date: 1425082379 2015/02/28 00:12:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
+/* NetHack 3.5	tilemap.c	$NHDT-Date: 1429464668 2015/04/19 17:31:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.18 $ */
 /*	SCCS Id: @(#)tilemap.c	3.5	2000/06/04	*/
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -237,7 +237,7 @@ int set, entry;
 #endif
 
 short tilemap[MAX_GLYPH];
-int lastmontile, lastobjtile, lastothtile;
+int lastmontile, lastobjtile, lastothtile, laststatuetile;
 
 /* Number of tiles for invisible monsters */
 #define NUM_INVIS_TILES 1
@@ -356,13 +356,25 @@ init_tilemap()
 		tilenum++;
 	}
 
-	/* statue patch: statues still use the same glyph as in vanilla */
-        
-	for ( i = 0; i < NUMMONS; i++) {
-	        tilemap[GLYPH_STATUE_OFF+i] = tilemap[GLYPH_OBJ_OFF+STATUE];
-        }        
-
 	lastothtile = tilenum - 1;
+	
+	/* skip over the substitutes to get to the grayscale statues */
+	for (i = 0; i < SIZE(substitutes); i++) {
+	   tilenum += substitutes[i].last_glyph - substitutes[i].first_glyph + 1;
+	}
+
+	/* statue patch: statues look more like the monster */
+	condnum = 0;				/* doing monsters again, so reset */
+	for (i = 0; i < NUMMONS; i++) {
+		tilemap[GLYPH_STATUE_OFF+i] = tilenum;
+		tilenum++;
+		while (conditionals[condnum].sequence == MON_GLYPH &&
+			conditionals[condnum].predecessor == i) {
+			condnum++;
+			tilenum++;
+		}
+	}
+	laststatuetile = tilenum - 1;
 }
 
 const char *prolog[] = {
