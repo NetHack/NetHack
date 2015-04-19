@@ -70,7 +70,7 @@ TARGET_CPU=x86
 # Graphical interface
 # Uncomment below to set to Y for a graphical version
 
-#GRAPHICAL = Y
+GRAPHICAL = Y
 
 #
 #---------------------------------------------------------------
@@ -1435,7 +1435,7 @@ $(O)wintext.o: ..\win\X11\wintext.c $(HACK_H) $(INCL)\winX.h $(INCL)\xwindow.h
 	@$(CC) $(cflagsUtil) -Fo$@ ..\win\X11\wintext.c
 $(O)winval.o: ..\win\X11\winval.c $(HACK_H) $(INCL)\winX.h
 	@$(CC) $(cflagsUtil) -Fo$@ ..\win\X11\winval.c
-$(O)tile.o: tile.c $(HACK_H)
+$(O)tile.o: $(SRC)\tile.c $(HACK_H)
 $(O)gnaskstr.o: ..\win\gnome\gnaskstr.c ..\win\gnome\gnaskstr.h \
 		..\win\gnome\gnmain.h
 	@$(CC) $(cflagsUtil) $(GNOMEINC) -Fo$@ ..\win\gnome\gnaskstr.c
@@ -1488,7 +1488,7 @@ $(O)load_img.o: ..\win\gem\load_img.c $(INCL)\load_img.h
 	@$(CC) $(cflagsUtil) -Fo$@ ..\win\gem\load_img.c
 $(O)gr_rect.o: ..\win\gem\gr_rect.c $(INCL)\gr_rect.h
 	@$(CC) $(cflagsUtil) -Fo$@ ..\win\gem\gr_rect.c
-$(O)tile.o: tile.c $(HACK_H)
+$(O)tile.o: $(SRC)\tile.c $(HACK_H)
 $(O)qt_win.o: ..\win\Qt\qt_win.cpp $(HACK_H) $(INCL)\func_tab.h \
 		$(INCL)\dlb.h $(INCL)\patchlevel.h $(INCL)\tile2x11.h \
 		$(INCL)\qt_win.h $(INCL)\qt_clust.h $(INCL)\qt_kde0.h \
