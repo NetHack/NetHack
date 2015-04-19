@@ -329,7 +329,7 @@ INT_PTR CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 	case WM_COMMAND: 
 	{
 		switch (LOWORD(wParam)) 
-        { 
+        	{ 
 		case IDCANCEL:
 			if( data->type == MENU_TYPE_MENU && 
 			    (data->how==PICK_ONE || data->how==PICK_ANY) &&
@@ -354,14 +354,6 @@ INT_PTR CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			data->done = 1;
 			data->result = 0;
 		return TRUE;
-
-        case IDC_MENU_TEXT:
-          switch (HIWORD(wParam))
-          {
-            case EN_SETFOCUS:
-              HideCaret((HWND)lParam);
-              return TRUE;
-          }
 		}
 	} break;
 
@@ -1599,8 +1591,13 @@ LRESULT CALLBACK NHMenuTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             SendMessage(hWnd, EM_SCROLL, SB_LINEDOWN, 0);
             return 0;
 
-		}
+	}
 	break;
+
+	/* edit control needs to know nothing of its focus */
+	case WM_SETFOCUS:
+            HideCaret(hWnd);
+	    return 0;
 
 	}
 

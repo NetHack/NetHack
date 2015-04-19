@@ -77,7 +77,7 @@ void mswin_display_text_window (HWND hWnd)
 		HWND control;
 		control = GetDlgItem(hWnd, IDC_TEXT_CONTROL);
 		SendMessage(control, EM_FMTLINES, 1, 0 );
-		SetWindowText(GetDlgItem(hWnd, IDC_TEXT_CONTROL), data->window_text);
+		SetWindowText(control, data->window_text);
 	}
 
 	mswin_popup_display(hWnd, NULL);
@@ -151,14 +151,7 @@ INT_PTR CALLBACK NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 			DestroyWindow(hWnd);
 			SetFocus(GetNHApp()->hMainWnd);
 			return TRUE;
-          case IDC_TEXT_CONTROL:
-            switch (HIWORD(wParam))
-            {
-              case EN_SETFOCUS:
-                HideCaret((HWND)lParam);
-                return TRUE;
-            }
-		}
+	}
 	break;
 
 	case WM_CTLCOLORSTATIC: { /* sent by edit control before it is drawn */
@@ -286,7 +279,13 @@ LRESULT CALLBACK NHEditHookWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 
 		}
 	break;
+
+	/* edit control needs to know nothing of focus. We will take care of it for it */
+	case WM_SETFOCUS:
+            HideCaret(hWnd);
+	    return 0;
 	}
+             
 
 	if( editControlWndProc ) 
 		return CallWindowProc(editControlWndProc, hWnd, message, wParam, lParam);
