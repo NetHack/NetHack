@@ -1,4 +1,4 @@
-/* NetHack 3.5	objnam.c	$NHDT-Date: 1426470349 2015/03/16 01:45:49 $  $NHDT-Branch: derek-farming $:$NHDT-Revision: 1.108 $ */
+/* NetHack 3.5	objnam.c	$NHDT-Date: 1429413519 2015/04/19 03:18:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.128 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -567,6 +567,10 @@ struct obj *obj;
             !objects[otyp].oc_uses_known;
     bareobj.quan = 1L;		/* don't want plural */
     bareobj.corpsenm = NON_PM;	/* suppress statue and figurine details */
+    /* but suppressing fruit details leads to "bad fruit #0"
+       [perhaps we should force "slime mold" rather than use xname?] */
+    if (obj->otyp == SLIME_MOLD) bareobj.spe = obj->spe;
+
     bufp = distant_name(&bareobj, xname);	/* xname(&bareobj) */
     if (!strncmp(bufp, "uncursed ", 9)) bufp += 9;  /* Role_if(PM_PRIEST) */
 
