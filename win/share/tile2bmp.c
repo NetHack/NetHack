@@ -1,4 +1,4 @@
-/* NetHack 3.5	tile2bmp.c	$NHDT-Date: 1429464667 2015/04/19 17:31:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
+/* NetHack 3.5	tile2bmp.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
 /*   Copyright (c) NetHack PC Development Team 1995                 */
 /*   NetHack may be freely redistributed.  See license for details. */
 
@@ -317,8 +317,8 @@ BITMAPINFOHEADER *pbmih;
 }
 
 static int graymappings[] = {
-      /*A   B   C   D   E   F   G   H   I   J   K   L   M   N   O   P*/
-	0, 16, 17, 18, 19, 12, 21, 22, 23, 24, 25, 14, 12, 13, 13, 13};
+/* .  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  */
+   0, 1,17,18,19,20,27,22,23,24,25,26,21,15,13,14,14};
 
 static void
 build_bmptile(pixels)
