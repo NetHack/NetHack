@@ -33,7 +33,7 @@ static void FDECL(write_txttile, (FILE *, pixel(*)[TILE_X]));
 
 /* Ugh.  DICE doesn't like %[A-Z], so we have to spell it out... */
 #define FORMAT_STRING \
-"%[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789] = (%d, %d, %d) "
+"%[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\.] = (%d, %d, %d) "
 
 static void
 read_text_colormap(txtfile)
