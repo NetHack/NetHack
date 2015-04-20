@@ -1001,6 +1001,9 @@ dochat()
     }
 
     tx = u.ux+u.dx; ty = u.uy+u.dy;
+
+    if (!isok(tx,ty)) return (0);
+
     mtmp = m_at(tx, ty);
 
     if ((!mtmp || mtmp->mundetected) && 
