@@ -1,4 +1,4 @@
-/* NetHack 3.5	you.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	you.h	$NHDT-Date: 1429513494 2015/04/20 07:04:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.25 $ */
 /* NetHack 3.5	you.h	$Date: 2012/04/14 08:31:03 $  $Revision: 1.13 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -39,12 +39,13 @@ struct u_have {
 struct u_event {
 	Bitfield(minor_oracle,1);	/* received at least 1 cheap oracle */
 	Bitfield(major_oracle,1);	/*  "  expensive oracle */
+	Bitfield(read_tribute,1);	/* read a passage from a novel */
 	Bitfield(qcalled,1);		/* called by Quest leader to do task */
 	Bitfield(qexpelled,1);		/* expelled from the Quest dungeon */
 	Bitfield(qcompleted,1);		/* successfully completed Quest task */
 	Bitfield(uheard_tune,2);	/* 1=know about, 2=heard passtune */
-	Bitfield(uopened_dbridge,1);	/* opened the drawbridge */
 
+	Bitfield(uopened_dbridge,1);	/* opened the drawbridge */
 	Bitfield(invoked,1);		/* invoked Gate to the Sanctum level */
 	Bitfield(gehennom_entered,1);	/* entered Gehennom via Valley */
 	Bitfield(uhand_of_elbereth,2);	/* became Hand of Elbereth */

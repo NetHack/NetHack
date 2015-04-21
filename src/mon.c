@@ -1,4 +1,4 @@
-/* NetHack 3.5	mon.c	$NHDT-Date: 1426470347 2015/03/16 01:45:47 $  $NHDT-Branch: derek-farming $:$NHDT-Revision: 1.140 $ */
+/* NetHack 3.5	mon.c	$NHDT-Date: 1429584308 2015/04/21 02:45:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.164 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1255,15 +1255,13 @@ dmonsfree()
     int count = 0;
 
     for (mtmp = &fmon; *mtmp;) {
-    freetmp = *mtmp;
-    if (freetmp->mhp <= 0 && !freetmp->isgd) {
-	    if (freetmp == context.polearm.hitmon)
-		context.polearm.hitmon = NULL;
-        *mtmp = freetmp->nmon;
-        dealloc_monst(freetmp);
-        count++;
-    } else
-        mtmp = &(freetmp->nmon);
+	freetmp = *mtmp;
+	if (freetmp->mhp <= 0 && !freetmp->isgd) {
+	    *mtmp = freetmp->nmon;
+	    dealloc_monst(freetmp);
+	    count++;
+	} else
+	    mtmp = &(freetmp->nmon);
     }
 
     if (count != iflags.purge_monsters)
@@ -1432,6 +1430,8 @@ m_detach(mtmp, mptr)
 struct monst *mtmp;
 struct permonst *mptr;	/* reflects mtmp->data _prior_ to mtmp's death */
 {
+    if (mtmp == context.polearm.hitmon)
+	context.polearm.hitmon = 0;
     if (mtmp->mleashed) m_unleash(mtmp, FALSE);
         /* to prevent an infinite relobj-flooreffects-hmon-killed loop */
     mtmp->mtrapped = 0;
@@ -1719,7 +1719,11 @@ mongone(mdef)
 register struct monst *mdef;
 {
     mdef->mhp = 0;	/* can skip some inventory bookkeeping */
-    /* Player is thrown from his steed when it disappears */
+
+    /* dead vault guard is actually kept at coordinate <0,0> until
+       his temporary corridor to/from the vault has been removed */
+    if (mdef->isgd && !grddead(mdef)) return;
+    /* hero is thrown from his steed when it disappears */
     if (mdef == u.usteed)
         dismount_steed(DISMOUNT_GENERIC);
 

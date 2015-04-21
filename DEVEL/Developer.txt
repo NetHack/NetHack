@@ -34,12 +34,21 @@ things.
 2. git repositories
 The public NetHack git repository is available (read-only) on SourceForge at:
   git://git.code.sf.net/p/nethack/NHsource
+
+XXX need to discuss what branches are available
 ------------------------------------------------------------------------------
 3. bug reporting
 Please use the form at http://www.nethack.org/common/contact.html (or send
 us an email if that's more appropriate).
 ------------------------------------------------------------------------------
 4. git configuration
+
+NOTE: These instructions assume you are on the default branch ("master");
+      this _is_ where you want to be for setting things up.  This may or may
+      not be the branch you want to use for your changes; see the appropriate
+      project private documentation for more information (if you are working
+      alone we suggest using branch names starting with "LOCAL-").
+
 A. If you have never set up git on this machine before:
    (This assumes you will only be using git for NetHack.  If you are going to
    use it for other projects as well, think before you type.)

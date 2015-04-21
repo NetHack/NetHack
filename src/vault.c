@@ -1,4 +1,4 @@
-/* NetHack 3.5	vault.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	vault.c	$NHDT-Date: 1429584309 2015/04/21 02:45:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.33 $ */
 /* NetHack 3.5	vault.c	$Date: 2011/10/13 00:31:10 $  $Revision: 1.28 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -141,6 +141,8 @@ register struct monst *grd;
 		relobj(grd, 0, FALSE);
 		/* guard is dead; monster traversal loops should skip it */
 		grd->mhp = 0;
+		if (grd == context.polearm.hitmon)
+		    context.polearm.hitmon = 0;
 		/* see comment by newpos in gd_move() */
 		remove_monster(grd->mx, grd->my);
 		newsym(grd->mx, grd->my);
