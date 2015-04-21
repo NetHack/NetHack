@@ -476,7 +476,7 @@ MONSTER:('E',"water elemental"),random,hostile
 
 
 MAZE:"astral",' '
-FLAGS: noteleport,hardfloor,nommap,shortsighted
+FLAGS: noteleport,hardfloor,nommap,shortsighted,solidify
 MESSAGE: "You arrive on the Astral Plane!"
 MESSAGE: "Here the High Temple of %d is located."
 MESSAGE: "You sense alarm, hostility, and excitement in the air!"
