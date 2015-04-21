@@ -1,4 +1,4 @@
-/* NetHack 3.5	files.c	$NHDT-Date: 1427337311 2015/03/26 02:35:11 $  $NHDT-Branch: derek-farming $:$NHDT-Revision: 1.141 $ */
+/* NetHack 3.5	files.c	$NHDT-Date: 1428972596 2015/04/14 00:49:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.164 $ */
 /* NetHack 3.5	files.c	$Date: 2012/03/10 02:49:08 $  $Revision: 1.124 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3331,13 +3331,17 @@ const char *filename;
 
 /* ----------  BEGIN TRIBUTE ----------- */
 
-/* 3.6 tribute code */
+/* 3.6 tribute code
+ *
+ * Returns TRUE if you were able to read something.
+ *
+ */
 
 #define SECTIONSCOPE 1
 #define TITLESCOPE   2
 #define PASSAGESCOPE 3
 
-void
+boolean
 read_tribute(tribsection, tribtitle, tribpassage)
 const char *tribsection, *tribtitle;
 int  tribpassage;
@@ -3346,19 +3350,18 @@ int  tribpassage;
     char *endp;
     char line[BUFSZ];
 
-    int scopes[4] = {0, SECTIONSCOPE, TITLESCOPE, PASSAGESCOPE};
-    int scope = 0, section = 0, passage = 0, book = 0;
-    int linect = 0, passagecnt = 0, targetpassage = 0, textcnt = 0;
-    char *sectionnm = "", *booknm = "";
+    int scope = 0;
+    int linect = 0, passagecnt = 0, targetpassage = 0;
     const char *badtranslation = "an incomprehensible foreign translation";
     boolean matchedsection = FALSE, matchedtitle = FALSE;
     winid tribwin = WIN_ERR;
+    boolean grasped = FALSE;
 
     /* check for mandatories */
     if (!tribsection || !tribtitle) {
 	pline("It's %s of \"%s\"!",
 		badtranslation, tribtitle);
-	return;
+	return grasped;
     }	
 
     debugpline3("read_tribute %s, %s, %d.", tribsection, tribtitle, tribpassage);
@@ -3367,7 +3370,7 @@ int  tribpassage;
     if (!fp) {
     	/* this is actually an error - cannot open tribute file! */
     	pline("You feel too overwhelmed to continue!");
-	return;
+	return grasped;
     }
 
     /*
@@ -3467,13 +3470,13 @@ cleanup:
 		display_nhwindow(tribwin, FALSE);
 	destroy_nhwindow(tribwin);
 	tribwin = WIN_ERR;
-	u.uconduct.literate++;
+	grasped = TRUE;
     } else {
     	pline("It seems to be %s of \"%s\"!",
 		badtranslation, tribtitle);
     }
 
-    return;
+    return grasped;
 }
 /* ----------  END TRIBUTE ----------- */
 

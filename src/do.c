@@ -9,6 +9,8 @@
 #include "lev.h"
 
 STATIC_DCL void FDECL(trycall, (struct obj *));
+STATIC_DCL void NDECL(polymorph_sink);
+STATIC_DCL boolean NDECL(teleport_sink);
 STATIC_DCL void FDECL(dosinkring, (struct obj *));
 
 STATIC_PTR int FDECL(drop, (struct obj *));
@@ -260,6 +262,72 @@ register struct obj *obj;
        docall(obj);
 }
 
+/** Transforms the sink at the player's position into
+ * a fountain, throne, altar or grave. */
+STATIC_DCL
+void
+polymorph_sink()
+{
+    if (levl[u.ux][u.uy].typ != SINK) return;
+
+    level.flags.nsinks--;
+    levl[u.ux][u.uy].doormask = 0;
+    switch(rn2(4)) {
+    default:
+    case 0:
+	levl[u.ux][u.uy].typ = FOUNTAIN;
+	level.flags.nfountains++;
+	break;
+    case 1:
+	levl[u.ux][u.uy].typ = THRONE;
+	break;
+    case 2:
+	levl[u.ux][u.uy].typ = ALTAR;
+	levl[u.ux][u.uy].altarmask = Align2amask(rn2((int)A_LAWFUL+2) - 1);
+	break;
+    case 3:
+	levl[u.ux][u.uy].typ = ROOM;
+	make_grave(u.ux, u.uy, (char *) 0);
+	break;
+    }
+    pline_The("sink transforms into %s!",
+	      (levl[u.ux][u.uy].typ == THRONE) ?
+	      "a throne" : an(surface(u.ux, u.uy)));
+    newsym(u.ux,u.uy);
+}
+
+/** Teleports the sink at the player's position.
+ * @return TRUE if sink teleported */
+STATIC_DCL
+boolean
+teleport_sink()
+{
+    int cx, cy;
+    int cnt = 0;
+    struct trap *trp;
+    struct engr *eng;
+    do {
+	cx = rnd(COLNO-1);
+	cy = rn2(ROWNO);
+	trp = t_at(cx,cy);
+	eng = engr_at(cx,cy);
+    } while (((levl[cx][cy].typ != ROOM) || (trp) || (eng) ||
+	      cansee(cx,cy)) && (cnt++ < 200));
+    if ((levl[cx][cy].typ == ROOM) && !trp && !eng) {
+	/* create sink at new position */
+	levl[cx][cy].typ = SINK;
+	levl[cx][cy].looted = levl[u.ux][u.uy].looted;
+	newsym(cx,cy);
+	/* remove old sink */
+	levl[u.ux][u.uy].typ = ROOM;
+	levl[u.ux][u.uy].looted = 0;
+	newsym(u.ux,u.uy);
+	return TRUE;
+    }
+    return FALSE;
+}
+
+
 STATIC_OVL
 void
 dosinkring(obj)  /* obj is a ring being dropped over a kitchen sink */
@@ -267,6 +335,7 @@ register struct obj *obj;
 {
     register struct obj *otmp,*otmp2;
     register boolean ideed = TRUE;
+    boolean nosink = FALSE;
 
     You("drop %s down the drain.", doname(obj));
     obj->in_use = TRUE;	/* block free identification via interrupt */
@@ -289,8 +358,9 @@ giveback:
         You("smell rotten %s.", makeplural(fruitname(FALSE)));
         break;
         case RIN_AGGRAVATE_MONSTER:
-        pline("Several flies buzz angrily around the sink.");
-        break;
+	    pline("Several %s buzz angrily around the sink.",
+		  Hallucination ? makeplural(rndmonnam(NULL)) : "flies");
+	    break;
         case RIN_SHOCK_RESISTANCE:
         pline("Static electricity surrounds the sink.");
         break;
@@ -355,7 +425,8 @@ giveback:
             You_see("the ring slide right down the drain!");
             break;
         case RIN_SEE_INVISIBLE:
-            You_see("some air in the sink.");
+            You_see("some %s in the sink.",
+		    Hallucination ? "oxygen molecules" : "air");
             break;
         case RIN_STEALTH:
         pline_The("sink seems to blend into the floor for a moment.");
@@ -377,13 +448,15 @@ giveback:
             pline_The("sink glows %s for a moment.", hcolor(NH_WHITE));
             break;
         case RIN_TELEPORTATION:
-            pline_The("sink momentarily vanishes.");
+	    nosink = teleport_sink();
+            pline_The("sink %svanishes.", nosink ? "" : "momentarily ");
             break;
         case RIN_TELEPORT_CONTROL:
         pline_The("sink looks like it is being beamed aboard somewhere.");
             break;
         case RIN_POLYMORPH:
-            pline_The("sink momentarily looks like a fountain.");
+	    polymorph_sink();
+	    nosink = TRUE;
             break;
         case RIN_POLYMORPH_CONTROL:
     pline_The("sink momentarily looks like a regularly erupting geyser.");
@@ -392,9 +465,9 @@ giveback:
     }
     if(ideed)
         trycall(obj);
-    else
+    else if (!nosink)
         You_hear("the ring bouncing down the drainpipe.");
-    if (!rn2(20)) {
+    if (!rn2(20) && !nosink) {
         pline_The("sink backs up, leaving %s.", doname(obj));
         obj->in_use = FALSE;
         dropx(obj);

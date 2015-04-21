@@ -783,6 +783,7 @@ time_t date;
 	Sprintf(datestr, "%04ld%02d%02d%02d%02d%02d",
 		datenum, lt->tm_mon + 1, lt->tm_mday,
 		lt->tm_hour, lt->tm_min, lt->tm_sec);
+	debugpline1("yyyymmddhhmmss() produced date string %s", datestr);
 	return(datestr);
 }
 
@@ -791,6 +792,7 @@ time_from_yyyymmddhhmmss(buf)
 char *buf;
 {
 	int k;
+	time_t timeresult = (time_t)0;
 	struct tm t, *lt;
 	char *g, *p, y[5],mo[3],md[3],h[3],mi[3],s[3];
 	if (buf && strlen(buf) == 14) {
@@ -828,8 +830,13 @@ char *buf;
 			t.tm_hour = atoi(h);
 			t.tm_min  = atoi(mi);
 			t.tm_sec  = atoi(s);
-			return mktime(&t);
+			timeresult = mktime(&t);
 		}
+		if ((int)timeresult == -1)
+		    debugpline1("time_from_yyyymmddhhmmss(%s) would have returned -1",
+				buf ? buf : "");
+		else
+		    return timeresult;
 	}
 	return (time_t)0;
 }

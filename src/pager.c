@@ -1,4 +1,4 @@
-/* NetHack 3.5	pager.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	pager.c	$NHDT-Date: 1429408230 2015/04/19 01:50:30 $  $NHDT-Branch: master $:$NHDT-Revision: 1.62 $ */
 /* NetHack 3.5	pager.c	$Date: 2012/01/15 09:27:06 $  $Revision: 1.41 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */

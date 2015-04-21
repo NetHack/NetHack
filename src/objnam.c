@@ -1,4 +1,4 @@
-/* NetHack 3.5	objnam.c	$NHDT-Date: 1426470349 2015/03/16 01:45:49 $  $NHDT-Branch: derek-farming $:$NHDT-Revision: 1.108 $ */
+/* NetHack 3.5	objnam.c	$NHDT-Date: 1429413519 2015/04/19 03:18:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.128 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -10,6 +10,7 @@
 #define NUMOBUF 12
 
 STATIC_DCL char *FDECL(strprepend,(char *,const char *));
+STATIC_DCL short FDECL(rnd_otyp_by_wpnskill, (SCHAR_P));
 STATIC_DCL boolean FDECL(wishymatch, (const char *,const char *,BOOLEAN_P));
 STATIC_DCL char *NDECL(nextobuf);
 STATIC_DCL void FDECL(releaseobuf, (char *));
@@ -566,6 +567,10 @@ struct obj *obj;
             !objects[otyp].oc_uses_known;
     bareobj.quan = 1L;		/* don't want plural */
     bareobj.corpsenm = NON_PM;	/* suppress statue and figurine details */
+    /* but suppressing fruit details leads to "bad fruit #0"
+       [perhaps we should force "slime mold" rather than use xname?] */
+    if (obj->otyp == SLIME_MOLD) bareobj.spe = obj->spe;
+
     bufp = distant_name(&bareobj, xname);	/* xname(&bareobj) */
     if (!strncmp(bufp, "uncursed ", 9)) bufp += 9;  /* Role_if(PM_PRIEST) */
 
@@ -2277,6 +2282,27 @@ struct alt_spellings {
     { (const char *)0, 0 },
 };
 
+short
+rnd_otyp_by_wpnskill(skill)
+schar skill;
+{
+    int i,n = 0;
+    short otyp;
+    for (i = bases[WEAPON_CLASS]; i < NUM_OBJECTS && objects[i].oc_class == WEAPON_CLASS; i++)
+	if (objects[i].oc_skill == skill) {
+	    n++;
+	    otyp = i;
+	}
+    if (n > 0) {
+	n = rn2(n);
+	for (i = bases[WEAPON_CLASS]; i < NUM_OBJECTS && objects[i].oc_class == WEAPON_CLASS; i++)
+	    if (objects[i].oc_skill == skill)
+		if (--n < 0) return i;
+    }
+    return STRANGE_OBJECT;
+}
+
+
 /*
  * Return something wished for.  Specifying a null pointer for
  * the user request string results in a random object.  Otherwise,
@@ -3022,6 +3048,16 @@ wiztrap:
             newsym(x, y);
             return &zeroobj;
         }
+    }
+
+    if (!oclass && !typ) {
+	if (!strncmpi(bp, "polearm", 7)) {
+	    typ = rnd_otyp_by_wpnskill(P_POLEARMS);
+	    goto typfnd;
+	} else if (!strncmpi(bp, "hammer", 6)) {
+	    typ = rnd_otyp_by_wpnskill(P_HAMMER);
+	    goto typfnd;
+	}
     }
 
     if(!oclass) return((struct obj *)0);

@@ -39,6 +39,7 @@ E void FDECL(m_unleash, (struct monst *,BOOLEAN_P));
 E void NDECL(unleash_all);
 E boolean NDECL(next_to_u);
 E struct obj *FDECL(get_mleash, (struct monst *));
+E const char *NDECL(beautiful);
 E void FDECL(check_leash, (XCHAR_P,XCHAR_P));
 E boolean FDECL(um_dist, (XCHAR_P,XCHAR_P,XCHAR_P));
 E boolean FDECL(snuff_candle, (struct obj *));
@@ -752,7 +753,7 @@ E void NDECL(really_close);
 #ifdef DEBUG
 E boolean FDECL(showdebug, (const char *));
 #endif
-E void FDECL(read_tribute, (const char *,const char *,int));
+E boolean FDECL(read_tribute, (const char *,const char *,int));
 
 /* ### fountain.c ### */
 

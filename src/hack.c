@@ -1,4 +1,4 @@
-/* NetHack 3.5	hack.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	hack.c	$NHDT-Date: 1429412557 2015/04/19 03:02:37 $  $NHDT-Branch: master $:$NHDT-Revision: 1.143 $ */
 /* NetHack 3.5	hack.c	$Date: 2013/10/26 21:33:47 $  $Revision: 1.120 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1336,49 +1336,67 @@ domove()
     if (context.forcefight ||
         /* remembered an 'I' && didn't use a move command */
         (glyph_is_invisible(levl[x][y].glyph) && !context.nopick)) {
-        struct obj *boulder = sobj_at(BOULDER, x, y);
+        struct obj *boulder = 0;
         boolean explo = (Upolyd && attacktype(youmonst.data, AT_EXPL)),
             solid = !accessible(x, y);
         int glyph = glyph_at(x, y);	/* might be monster */
         char buf[BUFSZ];
 
-        /* if a statue is displayed at the target location,
-           player is attempting to attack it [and boulder
-           handlng below is suitable for handling that] */
-        if (glyph_is_statue(glyph) ||
-            (Hallucination && glyph_is_monster(glyph)))
-            boulder = sobj_at(STATUE, x, y);
+	if (!Underwater) {
+	    boulder = sobj_at(BOULDER, x, y);
+	    /* if a statue is displayed at the target location,
+	       player is attempting to attack it [and boulder
+	       handlng below is suitable for handling that] */
+	    if (glyph_is_statue(glyph) ||
+		(Hallucination && glyph_is_monster(glyph)))
+		boulder = sobj_at(STATUE, x, y);
 
-        /* force fight at boulder/statue or wall/door while wielding
-           pick:  start digging to break the boulder or wall */
-        if (context.forcefight &&
-            /* can we dig? */
-            uwep && dig_typ(uwep, x, y) &&
-            /* should we dig? */
-            !glyph_is_invisible(glyph) &&
-            !glyph_is_monster(glyph)) {
-            (void)use_pick_axe2(uwep);
-            return;
-        }
+	    /* force fight at boulder/statue or wall/door while wielding
+	       pick:  start digging to break the boulder or wall */
+	    if (context.forcefight &&
+		/* can we dig? */
+		uwep && dig_typ(uwep, x, y) &&
+		/* should we dig? */
+		!glyph_is_invisible(glyph) &&
+		!glyph_is_monster(glyph)) {
+		(void)use_pick_axe2(uwep);
+		return;
+	    }
+	}
+
+	/* about to become known empty -- remove 'I' if present */
+        unmap_object(x, y);
+        if (boulder) map_object(boulder, TRUE);
+        newsym(x, y);
+        glyph = glyph_at(x, y);		/* might have just changed */
 
         if (boulder)
             Strcpy(buf, ansimpleoname(boulder));
+        else if (Underwater && !is_pool(x, y))
+            /* Underwater, targetting non-water; the map just shows blank
+	       because you don't see remembered terrain while underwater;
+	       although the hero can attack an adjacent monster this way,
+	       assume he can't reach out far enough to distinguish terrain */
+	    Sprintf(buf, (Is_waterlevel(&u.uz) && levl[x][y].typ == AIR) ?
+			   "an air bubble" : "nothing");
         else if (solid)
-            Strcpy(buf, the(defsyms[glyph_to_cmap(glyph)].explanation));
-        else if (!Underwater)
-            Strcpy(buf, "thin air");
-        else if (is_pool(x, y))
-            Strcpy(buf, "empty water");
-        else	/* Underwater, targetting non-water */
-            Sprintf(buf, "a vacant spot on the %s", surface(x,y));
+	    /* glyph might indicate unseen terrain if hero is blind;
+	       unlike searching, this won't reveal what that terrain is
+	       (except for solid rock, where the glyph would otherwise
+	       yield ludicrous "dark part of a room") */
+            Strcpy(buf, (levl[x][y].typ == STONE) ? "solid rock" :
+			  glyph_is_cmap(glyph) ?
+			    the(defsyms[glyph_to_cmap(glyph)].explanation) :
+			      (const char *)"an unknown obstacle");
+	    /* note: 'solid' is misleadingly named and catches pools
+	       of water and lava as well as rock and walls */
+        else
+	    Strcpy(buf, "thin air");
         You("%s%s %s.",
-            !(boulder || solid) ? "" :
-            !explo ? "harmlessly " : "futilely ",
+            !(boulder || solid) ? "" : !explo ? "harmlessly " : "futilely ",
             explo ? "explode at" : "attack",
             buf);
-        unmap_object(x, y); /* known empty -- remove 'I' if present */
-        if (boulder) map_object(boulder, TRUE);
-        newsym(x, y);
+
         nomul(0);
         if (explo) {
             wake_nearby();

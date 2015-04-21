@@ -564,15 +564,17 @@ feel_location(x, y)
 		if (lev->typ != ROOM && lev->seenv) {
 		    map_background(x, y, 1);
 		} else {
-		    lev->glyph = lev->waslit ? cmap_to_glyph(S_room) :
-					       cmap_to_glyph(S_stone);
+		    lev->glyph = flags.dark_room ? cmap_to_glyph(S_darkroom) :
+			(lev->waslit ? cmap_to_glyph(S_room) :
+			 cmap_to_glyph(S_stone));
 		    show_glyph(x,y,lev->glyph);
 		}
 	    } else if ((lev->glyph >= cmap_to_glyph(S_stone) &&
-			lev->glyph < cmap_to_glyph(S_room)) ||
+			lev->glyph < cmap_to_glyph(S_darkroom)) ||
 		       glyph_is_invisible(levl[x][y].glyph)) {
-		lev->glyph = lev->waslit ? cmap_to_glyph(S_room) :
-					   cmap_to_glyph(S_stone);
+		lev->glyph = flags.dark_room ? cmap_to_glyph(S_darkroom) :
+		    (lev->waslit ? cmap_to_glyph(S_room) :
+		     cmap_to_glyph(S_stone));
 		show_glyph(x,y,lev->glyph);
 	    }
 	} else {
@@ -583,6 +585,9 @@ feel_location(x, y)
 	    if (lev->typ == CORR &&
 		    lev->glyph == cmap_to_glyph(S_litcorr) && !lev->waslit)
 		show_glyph(x, y, lev->glyph = cmap_to_glyph(S_corr));
+	    else if (lev->typ == ROOM && flags.dark_room &&
+		    lev->glyph == cmap_to_glyph(S_room))
+		show_glyph(x, y, lev->glyph = cmap_to_glyph(S_darkroom));
 	}
     } else {
 	_map_location(x, y, 1);
@@ -610,9 +615,9 @@ feel_location(x, y)
 	}
 
 	/* Floor spaces are dark if unlit.  Corridors are dark if unlit. */
-	if (lev->typ == ROOM &&
-		    lev->glyph == cmap_to_glyph(S_room) && !lev->waslit)
-	    show_glyph(x,y, lev->glyph = cmap_to_glyph(S_stone));
+	if (lev->typ == ROOM && lev->glyph == cmap_to_glyph(S_room) &&
+	    (!lev->waslit || flags.dark_room))
+	    show_glyph(x,y, lev->glyph = cmap_to_glyph(flags.dark_room ? S_darkroom : S_stone));
 	else if (lev->typ == CORR &&
 		    lev->glyph == cmap_to_glyph(S_litcorr) && !lev->waslit)
 	    show_glyph(x,y, lev->glyph = cmap_to_glyph(S_corr));
@@ -900,6 +905,7 @@ tmp_at(x, y)
 	    break;
 
 	default:	/* do it */
+	    if (!isok(x,y)) break;
 	    if (tglyph->style == DISP_BEAM || tglyph->style == DISP_ALL) {
 		if (tglyph->style != DISP_ALL && !cansee(x,y)) break;
 		if (tglyph->sidx >= TMP_AT_MAX_GLYPHS) break; /* too many locations */

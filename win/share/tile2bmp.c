@@ -1,6 +1,4 @@
 /* NetHack 3.5	tile2bmp.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	tile2bmp.c	$Date: 2009/05/06 10:59:00 $  $Revision: 1.6 $ */
-/*	SCCS Id: @(#)tile2bmp.c	3.5	2002/03/14	*/
 /*   Copyright (c) NetHack PC Development Team 1995                 */
 /*   NetHack may be freely redistributed.  See license for details. */
 
@@ -8,6 +6,7 @@
  * Edit History:
  *
  *	Initial Creation			M.Allison   1994/01/11
+ *	256 colour bmp and statue support	M.Allison   2015/04/19
  *
  */
 
@@ -19,16 +18,18 @@
 #include "win32api.h"
 #endif
 
-/* #define COLORS_IN_USE MAXCOLORMAPSIZE       /* 256 colors */
 #if (TILE_X==32)
 #define COLORS_IN_USE 256
 #else
-#define COLORS_IN_USE 16                       /* 16 colors */
+/*#define COLORS_IN_USE 16 */   /* 16 colors */
+#define COLORS_IN_USE 256	/* 256 colors */
 #endif
 
 #define BITCOUNT 8
 
 extern char *FDECL(tilename, (int, int));
+
+#define MAGICTILENO	(340 + 440 + 231 + 340)
 
 #if BITCOUNT==4
 #define MAX_X 320		/* 2 per byte, 4 bits per pixel */
@@ -36,10 +37,10 @@ extern char *FDECL(tilename, (int, int));
 #else
 # if (TILE_X==32)
 #define MAX_X (32 * 40)
-#define MAX_Y 960
+#define MAX_Y ((MAGICTILENO * 32) / 40) * 2
 # else
-#define MAX_X 640		/* 1 per byte, 8 bits per pixel */
-#define MAX_Y 480
+#define MAX_X (16 * 40)
+#define MAX_Y ((MAGICTILENO * 16) / 40) * 2
 # endif
 #endif	
 
@@ -119,7 +120,8 @@ struct tagBMP{
 #if (TILE_X==32)
 #define RGBQUAD_COUNT 256
 #else
-#define RGBQUAD_COUNT 16
+/*#define RGBQUAD_COUNT 16 */
+#define RGBQUAD_COUNT 256
 #endif
     RGBQUAD          bmaColors[RGBQUAD_COUNT];
 #endif
@@ -146,11 +148,11 @@ char *tilefiles[] = {
 #if (TILE_X == 32)
 		"../win/share/mon32.txt",
 		"../win/share/obj32.txt",
-		"../win/share/oth32.txt"
+		"../win/share/oth32.txt",
 #else
 		"../win/share/monsters.txt",
 		"../win/share/objects.txt",
-		"../win/share/other.txt"
+		"../win/share/other.txt",
 #endif
 };
 
@@ -160,6 +162,7 @@ int max_tiles_in_row = 40;
 int tiles_in_row;
 int filenum;
 int initflag;
+int pass;
 int yoffset,xoffset;
 char bmpname[128];
 FILE *fp;
@@ -190,12 +193,14 @@ char *argv[];
 	xoffset = yoffset = 0;
 	initflag = 0;
 	filenum = 0;
+	pass = 0;
 	fp = fopen(bmpname,"wb");
 	if (!fp) {
 	    printf("Error creating tile file %s, aborting.\n",bmpname);
 	    exit(1);
 	}
-	while (filenum < (sizeof(tilefiles) / sizeof(char *))) {
+	while (pass < 4) {
+		filenum =pass % (sizeof(tilefiles) / sizeof(char *));
 		if (!fopen_text_file(tilefiles[filenum], RDTMODE)) {
 			Fprintf(stderr,
 				"usage: tile2bmp (from the util directory)\n");
@@ -235,7 +240,7 @@ char *argv[];
 			}
 		}
 		(void) fclose_text_file();
-		++filenum;
+		++pass;
 	}
 	fwrite(&bmp, sizeof(bmp), 1, fp);
 	fclose(fp);
@@ -303,18 +308,23 @@ BITMAPINFOHEADER *pbmih;
 #endif
 
 #if (TILE_X==16)
-	pbmih->biSizeImage = lelong(0);
+	/* pbmih->biSizeImage = lelong(0); */
+	pbmih->biSizeImage = lelong(((w * cClrBits +31) & ~31) /8 * h);
 #else
 	pbmih->biSizeImage = lelong(((w * cClrBits +31) & ~31) /8 * h);
 #endif
  	pbmih->biClrImportant = (DWORD)0;
 }
 
+static int graymappings[] = {
+/* .  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  */
+   0, 1,17,18,19,20,27,22,23,24,25,26,21,15,13,14,14};
+
 static void
 build_bmptile(pixels)
 pixel (*pixels)[TILE_X];
 {
-	int cur_x, cur_y, cur_color;
+	int cur_x, cur_y, cur_color, apply_color;
 	int x,y;
 
 	for (cur_y = 0; cur_y < TILE_Y; cur_y++) {
@@ -328,6 +338,15 @@ pixel (*pixels)[TILE_X];
 	  if (cur_color >= num_colors)
 		Fprintf(stderr, "color not in colormap!\n");
 	  y = (MAX_Y - 1) - (cur_y + yoffset);
+	  apply_color = cur_color;
+	  if (pass == 3) {
+		/* map to shades of gray */
+		if (cur_color > (SIZE(graymappings)-1))
+			Fprintf(stderr, "Gray mapping issue %d %d.\n",
+				cur_color, SIZE(graymappings)-1);
+		else
+			apply_color = graymappings[cur_color];
+	  }
 #if BITCOUNT==4
 	  x = (cur_x / 2) + xoffset;
 	  bmp.packtile[y][x] = cur_x%2 ?
@@ -335,7 +354,7 @@ pixel (*pixels)[TILE_X];
 		(uchar)(cur_color<<4);
 #else
 	  x = cur_x + xoffset;
-	  bmp.packtile[y][x] = (uchar)cur_color;
+	  bmp.packtile[y][x] = (uchar)apply_color;
 #endif
 	 }
 	}

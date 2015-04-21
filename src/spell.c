@@ -1,4 +1,4 @@
-/* NetHack 3.5	spell.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	spell.c	$NHDT-Date: 1429513494 2015/04/20 07:04:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.57 $ */
 /* NetHack 3.5	spell.c	$Date: 2011/12/29 22:01:25 $  $Revision: 1.44 $ */
 /*	Copyright (c) M. Stephenson 1988			  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -452,10 +452,18 @@ register struct obj *spellbook;
 
 		/* 3.6.0 tribute */
 		if (booktype == SPE_NOVEL) {
-		    /* Obtain current Terry Pratchett book
-			title for the current game. */
+		    /* Obtain current Terry Pratchett book title */
 		    const char *tribtitle = noveltitle(&spellbook->novelidx);
-		    read_tribute("books", tribtitle, 0);
+		    if (read_tribute("books", tribtitle, 0)) {
+		    	u.uconduct.literate++;
+		    	check_unpaid(spellbook);
+			if (!u.uevent.read_tribute) {
+			    /* give bonus of 20 xp and 4*20+0 pts */
+			    more_experienced(20, 0);
+			    newexplevel();
+			    u.uevent.read_tribute = 1;	/* only once */
+			}
+		    }
 		    return(1);
 		}
 

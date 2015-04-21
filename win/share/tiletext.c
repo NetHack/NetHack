@@ -1,4 +1,4 @@
-/* NetHack 3.5	tiletext.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	tiletext.c	$NHDT-Date: 1429484196 2015/04/19 22:56:36 $  $NHDT-Branch: master $:$NHDT-Revision: 1.6 $ */
 /* NetHack 3.5	tiletext.c	$Date: 2009/05/06 10:59:03 $  $Revision: 1.4 $ */
 /*	SCCS Id: @(#)tiletext.c	3.5	1999/10/24	*/
 /* NetHack may be freely redistributed.  See license for details. */
@@ -33,7 +33,7 @@ static void FDECL(write_txttile, (FILE *, pixel(*)[TILE_X]));
 
 /* Ugh.  DICE doesn't like %[A-Z], so we have to spell it out... */
 #define FORMAT_STRING \
-"%[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789] = (%d, %d, %d) "
+"%[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.] = (%d, %d, %d) "
 
 static void
 read_text_colormap(txtfile)
