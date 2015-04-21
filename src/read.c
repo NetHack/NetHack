@@ -1538,56 +1538,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 	    	    			!IS_ROCK(levl[x][y].typ) &&
 	    	    			!IS_AIR(levl[x][y].typ) &&
 					(x != u.ux || y != u.uy)) {
-			    register struct obj *otmp2;
-			    register struct monst *mtmp;
-
-	    	    	    /* Make the object(s) */
-	    	    	    otmp2 = mksobj(confused ? ROCK : BOULDER,
-	    	    	    		FALSE, FALSE);
-	    	    	    if (!otmp2) continue;  /* Shouldn't happen */
-	    	    	    otmp2->quan = confused ? rn1(5,2) : 1;
-	    	    	    otmp2->owt = weight(otmp2);
-
-	    	    	    /* Find the monster here (won't be player) */
-	    	    	    mtmp = m_at(x, y);
-	    	    	    if (mtmp && !amorphous(mtmp->data) &&
-	    	    	    		!passes_walls(mtmp->data) &&
-	    	    	    		!noncorporeal(mtmp->data) &&
-	    	    	    		!unsolid(mtmp->data)) {
-				struct obj *helmet = which_armor(mtmp, W_ARMH);
-				int mdmg;
-
-				if (cansee(mtmp->mx, mtmp->my)) {
-				    pline("%s is hit by %s!", Monnam(mtmp),
-	    	    	    			doname(otmp2));
-				    if (mtmp->minvis && !canspotmon(mtmp))
-					map_invisible(mtmp->mx, mtmp->my);
-				}
-	    	    	    	mdmg = dmgval(otmp2, mtmp) * otmp2->quan;
-				if (helmet) {
-				    if(is_metallic(helmet)) {
-					if (canspotmon(mtmp))
-					    pline("Fortunately, %s is wearing a hard helmet.", mon_nam(mtmp));
-					else if (!Deaf)
-					    You_hear("a clanging sound.");
-					if (mdmg > 2) mdmg = 2;
-				    } else {
-					if (canspotmon(mtmp))
-					    pline("%s's %s does not protect %s.",
-						Monnam(mtmp), xname(helmet),
-						mhim(mtmp));
-				    }
-				}
-	    	    	    	mtmp->mhp -= mdmg;
-	    	    	    	if (mtmp->mhp <= 0)
-	    	    	    	    xkilled(mtmp, 1);
-	    	    	    }
-	    	    	    /* Drop the rock/boulder to the floor */
-	    	    	    if (!flooreffects(otmp2, x, y, "fall")) {
-	    	    	    	place_object(otmp2, x, y);
-	    	    	    	stackobj(otmp2);
-	    	    	    	newsym(x, y);  /* map the rock */
-	    	    	    }
+			    (void) drop_boulder_on_monster(x, y, confused, TRUE);
 	    	    	}
 		    }
 		}
@@ -1664,6 +1615,70 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 		impossible("What weird effect is this? (%u)", otyp);
 	}
 	return sobj ? 0 : 1;
+}
+
+boolean
+drop_boulder_on_monster(x,y, confused, byu)
+int x,y;
+boolean confused;
+boolean byu;
+{
+    register struct obj *otmp2;
+    register struct monst *mtmp;
+
+    /* Make the object(s) */
+    otmp2 = mksobj(confused ? ROCK : BOULDER, FALSE, FALSE);
+    if (!otmp2) return FALSE;  /* Shouldn't happen */
+    otmp2->quan = confused ? rn1(5,2) : 1;
+    otmp2->owt = weight(otmp2);
+
+    /* Find the monster here (won't be player) */
+    mtmp = m_at(x, y);
+    if (mtmp && !amorphous(mtmp->data) &&
+	!passes_walls(mtmp->data) &&
+	!noncorporeal(mtmp->data) &&
+	!unsolid(mtmp->data)) {
+	struct obj *helmet = which_armor(mtmp, W_ARMH);
+	int mdmg;
+
+	if (cansee(mtmp->mx, mtmp->my)) {
+	    pline("%s is hit by %s!", Monnam(mtmp),
+		  doname(otmp2));
+	    if (mtmp->minvis && !canspotmon(mtmp))
+		map_invisible(mtmp->mx, mtmp->my);
+	}
+	mdmg = dmgval(otmp2, mtmp) * otmp2->quan;
+	if (helmet) {
+	    if(is_metallic(helmet)) {
+		if (canspotmon(mtmp))
+		    pline("Fortunately, %s is wearing a hard helmet.", mon_nam(mtmp));
+		else if (!Deaf)
+		    You_hear("a clanging sound.");
+		if (mdmg > 2) mdmg = 2;
+	    } else {
+		if (canspotmon(mtmp))
+		    pline("%s's %s does not protect %s.",
+			  Monnam(mtmp), xname(helmet),
+			  mhim(mtmp));
+	    }
+	}
+	mtmp->mhp -= mdmg;
+	if (mtmp->mhp <= 0) {
+	    if (byu)
+		xkilled(mtmp, 1);
+	    else {
+		pline("%s is killed.", Monnam(mtmp));
+		mondied(mtmp);
+	    }
+	}
+    }
+    /* Drop the rock/boulder to the floor */
+    if (!flooreffects(otmp2, x, y, "fall")) {
+	place_object(otmp2, x, y);
+	stackobj(otmp2);
+	newsym(x, y);  /* map the rock */
+    }
+    return TRUE;
 }
 
 /* overcharging any wand or zapping/engraving cursed wand */

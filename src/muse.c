@@ -1352,58 +1352,7 @@ struct monst *mtmp;
 	    	    			(((x == mmx) && (y == mmy)) ?
 	    	    			    !otmp->blessed : !otmp->cursed) &&
 					(x != u.ux || y != u.uy)) {
-			    register struct obj *otmp2;
-			    register struct monst *mtmp2;
-
-	    	    	    /* Make the object(s) */
-	    	    	    otmp2 = mksobj(confused ? ROCK : BOULDER,
-	    	    	    		FALSE, FALSE);
-	    	    	    if (!otmp2) continue;  /* Shouldn't happen */
-	    	    	    otmp2->quan = confused ? rn1(5,2) : 1;
-	    	    	    otmp2->owt = weight(otmp2);
-
-	    	    	    /* Find the monster here (might be same as mtmp) */
-	    	    	    mtmp2 = m_at(x, y);
-	    	    	    if (mtmp2 && !amorphous(mtmp2->data) &&
-	    	    	    		!passes_walls(mtmp2->data) &&
-	    	    	    		!noncorporeal(mtmp2->data) &&
-	    	    	    		!unsolid(mtmp2->data)) {
-				struct obj *helmet = which_armor(mtmp2, W_ARMH);
-				int mdmg;
-
-				if (cansee(mtmp2->mx, mtmp2->my)) {
-				    pline("%s is hit by %s!", Monnam(mtmp2),
-	    	    	    			doname(otmp2));
-				    if (mtmp2->minvis && !canspotmon(mtmp2))
-					map_invisible(mtmp2->mx, mtmp2->my);
-				}
-	    	    	    	mdmg = dmgval(otmp2, mtmp2) * otmp2->quan;
-				if (helmet) {
-				    if(is_metallic(helmet)) {
-					if (canspotmon(mtmp2))
-					    pline("Fortunately, %s is wearing a hard helmet.", mon_nam(mtmp2));
-					else if (!Deaf)
-					    You_hear("a clanging sound.");
-					if (mdmg > 2) mdmg = 2;
-				    } else {
-					if (canspotmon(mtmp2))
-					    pline("%s's %s does not protect %s.",
-						Monnam(mtmp2), xname(helmet),
-						mhim(mtmp2));
-				    }
-				}
-	    	    	    	mtmp2->mhp -= mdmg;
-	    	    	    	if (mtmp2->mhp <= 0) {
-				    pline("%s is killed.", Monnam(mtmp2));
-	    	    	    	    mondied(mtmp2);
-				}
-	    	    	    }
-	    	    	    /* Drop the rock/boulder to the floor */
-	    	    	    if (!flooreffects(otmp2, x, y, "fall")) {
-	    	    	    	place_object(otmp2, x, y);
-	    	    	    	stackobj(otmp2);
-	    	    	    	newsym(x, y);  /* map the rock */
-	    	    	    }
+			    (void) drop_boulder_on_monster(x,y, confused, FALSE);
 	    	    	}
 		    }
 		}
