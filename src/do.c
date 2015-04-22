@@ -1282,16 +1282,8 @@ boolean at_stairs, falling, portal;
             Punished || Fumbling) {
             You("fall down the %s.", at_ladder ? "ladder" : "stairs");
             if (Punished) {
-            drag_down();
-            if (carried(uball)) {
-                if (uwep == uball)
-                setuwep((struct obj *)0);
-                if (uswapwep == uball)
-                setuswapwep((struct obj *)0);
-                if (uquiver == uball)
-                setuqwep((struct obj *)0);
-                freeinv(uball);
-            }
+		drag_down();
+		ballrelease(FALSE);
             }
             /* falling off steed has its own losehp() call */
             if (u.usteed)

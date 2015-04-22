@@ -119,6 +119,7 @@ E void FDECL(uchangealign, (int,int));
 
 /* ### ball.c ### */
 
+E void FDECL(ballrelease, (boolean));
 E void NDECL(ballfall);
 E void NDECL(placebc);
 E void NDECL(unplacebc);
