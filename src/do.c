@@ -941,13 +941,7 @@ dodown()
 int
 doup()
 {
-    if(!youmonst.data->mmove) {
-        You("are rooted %s.",
-        Levitation || Is_airlevel(&u.uz) || Is_waterlevel(&u.uz) ?
-        "in place" : "to the ground");
-        nomul(0);
-        return 1;
-    }
+    if (u_rooted()) return 1;
 
     /* "up" to get out of a pit... */
     if (u.utrap && u.utraptype == TT_PIT) {
