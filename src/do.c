@@ -1225,11 +1225,7 @@ boolean at_stairs, falling, portal;
     } else {
         /* returning to previously visited level; reload it */
         fd = open_levelfile(new_ledger, whynot);
-        if (fd < 0) {
-            pline1(whynot);
-            pline("Probably someone removed it.");
-            Strcpy(killer.name, whynot);
-            done(TRICKED);
+        if (tricked_fileremoved(fd, whynot)) {
             /* we'll reach here if running in wizard mode */
             error("Cannot continue this game.");
         }

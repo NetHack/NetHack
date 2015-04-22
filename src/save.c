@@ -360,6 +360,21 @@ register int fd, mode;
 	bflush(fd);
 }
 
+boolean
+tricked_fileremoved(fd, whynot)
+int fd;
+char *whynot;
+{
+    if (fd < 0) {
+	pline1(whynot);
+	pline("Probably someone removed it.");
+	Strcpy(killer.name, whynot);
+	done(TRICKED);
+	return TRUE;
+    }
+    return FALSE;
+}
+
 #ifdef INSURANCE
 void
 savestateinlock()
@@ -387,13 +402,7 @@ savestateinlock()
 		 * readable by an external utility
 		 */
 		fd = open_levelfile(0, whynot);
-		if (fd < 0) {
-		    pline1(whynot);
-		    pline("Probably someone removed it.");
-		    Strcpy(killer.name, whynot);
-		    done(TRICKED);
-		    return;
-		}
+		if (tricked_fileremoved(fd, whynot)) return;
 
 		(void) read(fd, (genericptr_t) &hpid, sizeof(hpid));
 		if (hackpid != hpid) {
