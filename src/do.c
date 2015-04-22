@@ -840,13 +840,7 @@ dodown()
             (u.ux == sstairs.sx && u.uy == sstairs.sy && !sstairs.up)),
         ladder_down = (u.ux == xdnladder && u.uy == ydnladder);
 
-    if(!youmonst.data->mmove) {
-        You("are rooted %s.",
-        Levitation || Is_airlevel(&u.uz) || Is_waterlevel(&u.uz) ?
-        "in place" : "to the ground");
-        nomul(0);
-        return 1;
-    }
+    if (u_rooted()) return 1;
 
     if (stucksteed(TRUE)) {
         return 0;
