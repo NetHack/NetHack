@@ -1,5 +1,4 @@
-# NetHack 3.5	Makefile.gcc	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
-# NetHack 3.5	Makefile.gcc	$Date: 2011/10/11 02:37:22 $  $Revision: 1.38 $
+# NetHack 3.5	Makefile.gcc	$NHDT-Date: 1429675605 2015/04/22 04:06:45 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.45 $
 #   Copyright (c) NetHack PC Development Team 1993-2015
 #
 #==============================================================================
@@ -16,7 +15,7 @@
 #   This is used for building two versions of NetHack:
 #
 #   A tty port utilizing the Win32 Console I/O subsystem, Console
-#       NetHack;
+#       NetHack.
 #
 #   A Win32 native port built on the Windows API, Graphical NetHack or
 #       NetHackW.
@@ -31,11 +30,17 @@
 #   If you have any questions read the sys/winnt/Install.nt file included
 #   with the distribution.
 #==============================================================================
-#==============================================================================
 # BUILD DECISIONS SECTION
 #
+# There are currently only 3 decisions that you have to make.
+#	1. 32-bit or 64-bit?
+#	2. Where do you want your build to end up?
+#	3. Do you want debug information in the executable?
+#
+#==============================================================================
 # 1. 32-bit or 64-bit?
 #
+
 # 64 bit
 #TARGET_CPU=x64
 #
@@ -43,17 +48,7 @@
 TARGET_CPU=x86
 #
 #---------------------------------------------------------------
-# 2. Graphical version or command line version?
-#
-# Graphical interface
-# Set to Y for a graphical version
-# Set to anything else (or undefine) for a tty version
-
-#GRAPHICAL = Y
-
-#
-#---------------------------------------------------------------
-# 3. Where do you want the game to be built (which folder)?
+# 2. Where do you want the game to be built (which folder)?
 #    If not present prior to compilation it gets created.
 #
 
@@ -61,7 +56,7 @@ GAMEDIR = ../binary
 
 #
 #---------------------------------------------------------------
-# 4. Do you want debug information in the executable?
+# 3. Do you want debug information in the executable?
 #
 
 DEBUGINFO = Y
@@ -78,14 +73,6 @@ DEBUGINFO = Y
 # Nothing below here should have to be changed.#
 #                                              #
 ################################################
-
-ifeq  "$(GRAPHICAL)" "Y"
-# Game Name
-GAME    = NetHackW
-else
-# Game Name
-GAME    = NetHack
-endif
 
 #
 #  Source directories.    Makedefs hardcodes these, don't change them.
@@ -107,8 +94,8 @@ SSYS  = ../sys/share
 MSWSYS = ../sys/winnt
 # window port files (tty)
 TTY   = ../win/tty
-# window port files (Win32)
-WIN32 = ../win/win32
+# window port files (WIN32)
+MSWIN = ../win/win32
 # Tile support files
 WSHR  = ../win/share
 
@@ -124,7 +111,7 @@ link   = gcc
 
 #
 #==========================================
-# Exe File Info.
+# Level Compiler Info
 #==========================================
 
 # Yacc/Lex ... if you got 'em.
@@ -159,6 +146,9 @@ YTABC   = y_tab.c
 YTABH   = y_tab.h
 LEXYYC  = lexyy.c
 
+#==========================================
+# Exe File Info.
+#==========================================
 #
 # Optional high-quality BSD random number generation routines
 # (see pcconf.h). Set to nothing if not used.
@@ -167,39 +157,7 @@ LEXYYC  = lexyy.c
 RANDOM  = $(OBJ)/random.o
 #RANDOM =
 
-ifeq  "$(GRAPHICAL)" "Y"
-WINPORT  = $(O)tile.o $(O)mhaskyn.o $(O)mhdlg.o \
-	$(O)mhfont.o $(O)mhinput.o $(O)mhmain.o $(O)mhmap.o \
-	$(O)mhmenu.o $(O)mhmsgwnd.o $(O)mhrip.o $(O)mhsplash.o \
-	$(O)mhstatus.o $(O)mhtext.o $(O)mswproc.o $(O)winhack.o
-WINPFLAG   = -DTILES -DMSWIN_GRAPHICS -D_WIN32_IE=0x0400
-NHRES   = $(O)winres.o
-WINPINC = -I$(WIN32)
-WINPHDR = $(WIN32)/mhaskyn.h $(WIN32)/mhdlg.h $(WIN32)/mhfont.h \
-	$(WIN32)/mhinput.h $(WIN32)/mhmain.h $(WIN32)/mhmap.h \
-	$(WIN32)/mhmenu.h $(WIN32)/mhmsg.h $(WIN32)/mhmsgwnd.h \
-	$(WIN32)/mhrip.h $(WIN32)/mhstatus.h \
-	$(WIN32)/mhtext.h $(WIN32)/resource.h $(WIN32)/winMS.h
-WINPLIBS =  -lcomctl32 -lwinmm
-else
-WINPORT = $(O)nttty.o
-WINPFLAG= -DWIN32CON
-WINPHDR =
-NHRES   = $(O)console.o
-WINPINC =
-WINPLIBS = -lwinmm
-endif
-
-TILEUTIL16  = $(UTIL)/tile2bmp.exe
-TILEBMP16   = $(SRC)/tiles.bmp
-
-TILEUTIL32  = $(UTIL)/til2bm32.exe
-TILEBMP32   = $(SRC)/tiles32.bmp
-
-SOUND = $(OBJ)/ntsound.o
-
-#SOUND =
-
+WINPFLAG   = -DTILES -DMSWIN_GRAPHICS -DWIN32CON -D_WIN32_IE=0x0400 -D_WIN32_WINNT=0x0501
 # To store all the level files,
 # help files, etc. in a single library file.
 # USE_DLB = Y is left uncommented
@@ -229,8 +187,11 @@ endif
 
 
 CFLAGSBASE  = -c $(cflags) -I$(INCL) $(WINPINC) $(cdebug)
-LFLAGSBASEC = $(linkdebug)
-LFLAGSBASEG = $(linkdebug) -mwindows
+#LFLAGSBASEC = $(linkdebug)
+#LFLAGSBASEG = $(linkdebug) -mwindows
+
+conlibs = -lwinmm
+guilibs = -lcomctl32 -lwinmm
 
 #==========================================
 # Util builds
@@ -244,88 +205,13 @@ LFLAGSU = $(LFLAGSBASEC)
 #==========================================
 
 CFLAGS   = $(CFLAGSBASE) $(WINPFLAG) $(DLBFLG)
-lflags  = $(LFLAGSBASE)
-ifeq "$(GRAPHICAL)" "Y"
-lflags  = $(LFLAGSBASEG)
-else
-lflags  = $(LFLAGSBASEC)
-endif
+lflags  = $(LFLAGSBASEC) $(linkdebuf)
 
 ifeq  "$(USE_DLB)" "Y"
 DLB = nhdat
 else
 DLB =
 endif
-
-#==========================================
-#================ RULES ==================
-#==========================================
-
-.SUFFIXES: .exe .o .til .uu .c .y .l
-
-#==========================================
-# Rules for files in src
-#==========================================
-
-$(OBJ)/%.o : /%.c
-	$(cc) $(CFLAGS)  -o$@ $<
-
-$(OBJ)/%.o : $(SRC)/%.c
-	$(cc) $(CFLAGS)   -o$@  $<
-
-#==========================================
-# Rules for files in sys/share
-#==========================================
-
-$(OBJ)/%.o : $(SSYS)/%.c
-	$(cc) $(CFLAGS)  -o$@  $<
-
-$(OBJ)/%.o : $(SSYS)/%.cpp
-	g++ $(CFLAGS) -std=c++11  -o$@  $<
-
-#==========================================
-# Rules for files in sys/winnt
-#==========================================
-
-$(OBJ)/%.o : $(MSWSYS)/%.c
-	$(cc) $(CFLAGS)  -o$@  $<
-
-$(INCL)/%.h : $(MSWSYS)/%.h
-	@copy $< $@
-
-#==========================================
-# Rules for files in util
-#==========================================
-
-$(OBJ)/%.o : $(UTIL)/%.c
-	$(cc) $(CFLAGSU) -o$@ $<
-
-#==========================================
-# Rules for files in win/share
-#==========================================
-
-$(OBJ)/%.o : $(WSHR)/%.c
-	$(cc) $(CFLAGS)  -o$@ $<
-
-$(INCL)/%.h : $(WSHR)/%.h
-	@copy $< $@
-
-#{$(WSHR)}.txt{$(DAT)}.txt:
-#	@copy $< $@
-
-#==========================================
-# Rules for files in win/tty
-#==========================================
-
-$(OBJ)/%.o : $(TTY)/%.c
-	$(cc) $(CFLAGS)  -o$@  $<
-
-#==========================================
-# Rules for files in win/win32
-#==========================================
-
-$(OBJ)/%.o : $(WIN32)/%.c
-	$(cc) $(CFLAGS)  -o$@  $<
 
 #==========================================
 #================ MACROS ==================
@@ -429,17 +315,33 @@ OBJS   = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
 	$(VOBJ21) $(VOBJ22) $(VOBJ23) $(VOBJ24) $(VOBJ25) \
 	$(VOBJ26) $(VOBJ27) $(REGEX)
 
-WINPOBJ = $(WINPORT)
+GUIOBJ  = $(O)mhaskyn.o $(O)mhdlg.o \
+	$(O)mhfont.o $(O)mhinput.o $(O)mhmain.o $(O)mhmap.o \
+	$(O)mhmenu.o $(O)mhmsgwnd.o $(O)mhrip.o $(O)mhsplash.o \
+	$(O)mhstatus.o $(O)mhtext.o $(O)mswproc.o $(O)winhack.o
 
-VVOBJ  = $(O)version.o
+GUIHDR = $(MSWIN)/mhaskyn.h $(MSWIN)/mhdlg.h $(MSWIN)/mhfont.h \
+	$(MSWIN)/mhinput.h $(MSWIN)/mhmain.h $(MSWIN)/mhmap.h \
+	$(MSWIN)/mhmenu.h $(MSWIN)/mhmsg.h $(MSWIN)/mhmsgwnd.h \
+	$(MSWIN)/mhrip.h $(MSWIN)/mhstatus.h \
+	$(MSWIN)/mhtext.h $(MSWIN)/resource.h $(MSWIN)/winMS.h
 
-ALLOBJ  = $(WINPOBJ) $(SOBJ) $(DLBOBJ)  $(TTYOBJ) $(WOBJ) $(OBJS) $(VVOBJ)
+KEYDLLS = $(GAMEDIR)/nhdefkey.dll $(GAMEDIR)/nh340key.dll $(GAMEDIR)/nhraykey.dll
 
-ifeq "$(GRAPHICAL)" "Y"
-OPTIONS_FILE = $(DAT)/guioptions
-else
-OPTIONS_FILE = $(DAT)/ttyoptions
-endif
+TILEUTIL16  = $(UTIL)/tile2bmp.exe
+TILEBMP16   = $(SRC)/tiles.bmp
+
+TILEUTIL32  = $(UTIL)/til2bm32.exe
+TILEBMP32   = $(SRC)/tiles32.bmp
+
+SOUND = $(OBJ)/ntsound.o
+#SOUND =
+
+VVOBJ = $(O)version.o
+
+ALLOBJ = $(SOBJ) $(DLBOBJ) $(WOBJ) $(OBJS) $(VVOBJ)
+
+OPTIONS_FILE = $(DAT)\options
 
 #==========================================
 # Header file macros
@@ -478,12 +380,75 @@ TILE_H      = ../win/share/tile.h
 
 DATABASE = $(DAT)/data.base
 
-#
-#  The name of the game.
-#
+#==========================================
+#================ RULES ==================
+#==========================================
 
-GAMEFILE = $(GAMEDIR)/$(GAME).exe
+.SUFFIXES: .exe .o .til .uu .c .y .l
 
+#==========================================
+# Rules for files in src
+#==========================================
+
+$(OBJ)/%.o : /%.c
+	$(cc) $(CFLAGS)  -o$@ $<
+
+$(OBJ)/%.o : $(SRC)/%.c
+	$(cc) $(CFLAGS)   -o$@  $<
+
+#==========================================
+# Rules for files in sys/share
+#==========================================
+
+$(OBJ)/%.o : $(SSYS)/%.c
+	$(cc) $(CFLAGS)  -o$@  $<
+
+$(OBJ)/%.o : $(SSYS)/%.cpp
+	g++ $(CFLAGS) -std=c++11  -o$@  $<
+
+#==========================================
+# Rules for files in sys/winnt
+#==========================================
+
+$(OBJ)/%.o : $(MSWSYS)/%.c
+	$(cc) $(CFLAGS)  -o$@  $<
+
+$(INCL)/%.h : $(MSWSYS)/%.h
+	@copy $< $@
+
+#==========================================
+# Rules for files in util
+#==========================================
+
+$(OBJ)/%.o : $(UTIL)/%.c
+	$(cc) $(CFLAGSU) -o$@ $<
+
+#==========================================
+# Rules for files in win/share
+#==========================================
+
+$(OBJ)/%.o : $(WSHR)/%.c
+	$(cc) $(CFLAGS)  -o$@ $<
+
+$(INCL)/%.h : $(WSHR)/%.h
+	@copy $< $@
+
+#{$(WSHR)}.txt{$(DAT)}.txt:
+#	@copy $< $@
+
+#==========================================
+# Rules for files in win/tty
+#==========================================
+
+$(OBJ)/%.o : $(TTY)/%.c
+	$(cc) $(CFLAGS)  -o$@  $<
+
+#==========================================
+# Rules for files in win/win32
+#==========================================
+
+$(OBJ)/%.o : $(MSWIN)/%.c
+	$(cc) $(CFLAGS)  -o$@  $<
 
 #==========================================
 #=============== TARGETS ==================
@@ -501,19 +466,13 @@ GAMEFILE = $(GAMEDIR)/$(GAME).exe
 default : install
 
 #
-#  The game target.
-#
-
-$(GAME) : $(O)obj.tag $(O)utility.tag graphicschk $(GAMEFILE)
-	@echo $(GAME) is up to date.
-
-#
 #  Everything
 #
 
 all :   install
 
-install: graphicschk $(GAME) $(O)install.tag
+install: graphicschk $(O)obj.tag $(GAMEDIR)/NetHack.exe $(GAMEDIR)/NetHackW.exe $(O)install.tag
+	@echo NetHack is up to date.
 	@echo Done.
 
 
@@ -587,35 +546,36 @@ $(O)utility.tag: $(INCL)/date.h $(INCL)/onames.h $(INCL)/pm.h \
 tileutil: $(U)gif2txt.exe $(U)gif2tx32.exe $(U)txt2ppm.exe
 	@echo Optional tile development utilities are up to date.
 
-ifeq  "$(GRAPHICAL)" "Y"
-$(NHRES): $(TILEBMP16) $(WIN32)/winhack.rc $(WIN32)/mnsel.bmp \
-	 $(WIN32)/mnselcnt.bmp $(WIN32)/mnunsel.bmp \
-	 $(WIN32)/petmark.bmp $(WIN32)/NetHack.ico $(WIN32)/rip.bmp \
-	 $(WIN32)/splash.bmp
-	@$(rc) -o$@ --include-dir $(WIN32) -i $(WIN32)/winhack.rc
-else
-$(NHRES): $(MSWSYS)/console.rc $(MSWSYS)/NetHack.ico 
+$(O)winres.o: $(TILEBMP16) $(MSWIN)/winhack.rc $(MSWIN)/mnsel.bmp \
+	 $(MSWIN)/mnselcnt.bmp $(MSWIN)/mnunsel.bmp \
+	 $(MSWIN)/petmark.bmp $(MSWIN)/NetHack.ico $(MSWIN)/rip.bmp \
+	 $(MSWIN)/splash.bmp
+	@$(rc) -o$@ --include-dir $(MSWIN) -i $(MSWIN)/winhack.rc
+
+$(O)conres.o: $(MSWSYS)/console.rc $(MSWSYS)/NetHack.ico 
 	@$(rc) -o$@ --include-dir $(MSWSYS) -i $(MSWSYS)/console.rc
-endif
 
 #==========================================
-#  The main target.
+#  The game targets.
 #==========================================
 $(O)gamedir.tag:
 	$(subst /,\,@if not exist $(GAMEDIR)/*.* echo creating directory $(GAMEDIR))
 	$(subst /,\,@if not exist $(GAMEDIR)/*.* mkdir $(GAMEDIR))
 	$(subst /,\,@echo directory created > $@)
 
-ifeq  "$(GRAPHICAL)" "Y"
-$(GAMEFILE) : $(ALLOBJ) $(NHRES) $(O)gamedir.tag
-else
-$(GAMEFILE) : $(ALLOBJ) $(NHRES) $(O)gamedir.tag \
-	 $(GAMEDIR)/nhdefkey.dll $(GAMEDIR)/nh340key.dll $(GAMEDIR)/nhraykey.dll
-endif
-	@echo Linking....
-	$(link) $(lflags) -o$@ $(ALLOBJ) $(NHRES) $(WINPLIBS) -static -lstdc++
+$(GAMEDIR)/NetHack.exe : $(O)gamedir.tag $(O)tile.o $(O)nttty.o $(O)guistub.o \
+			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)conres.o $(KEYDLLS)
+	@echo Linking $@...
+	$(link) $(lflags) -o$@ $(ALLOBJ) $(TTYOBJ) $(O)nttty.o $(O)tile.o \
+		$(O)guistub.o $(O)conres.o $(conlibs) -static -lstdc++
 	$(subst /,\,@if exist $(O)install.tag del $(O)install.tag)
 
+$(GAMEDIR)/NetHackW.exe : $(O)gamedir.tag $(O)tile.o $(O)ttystub.o \
+			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)winres.o $(KEYDLLS)
+	@echo Linking $@...
+	$(link) $(lflags) -mwindows -o$@ $(ALLOBJ) $(GUIOBJ) $(O)tile.o $(O)ttystub.o \
+		$(O)winres.o $(guilibs) -static -lstdc++
+	$(subst /,\,@if exist $(O)install.tag del $(O)install.tag)
 
 $(O)nhdefkey.o:
 	$(cc) $(CFLAGS) -DBUILD_DLL -o$@ $(MSWSYS)/nhdefkey.c 
@@ -649,11 +609,9 @@ $(GAME)_.ico : $(MSWSYS)/$(GAME).ico
 #==========================================
 
 graphicschk:
-ifeq  "$(GRAPHICAL)" "Y"
 	@echo ----
 	@echo NOTE: This build will include tile support.
 	@echo ----
-endif
 	$(subst /,\,@echo graphicschk > graphicschk)
 
 #
@@ -723,36 +681,36 @@ $(MSWSYS)/NetHack.ico : $(U)uudecode.exe $(MSWSYS)/nhico.uu
 	$(subst /,\,copy NetHack.ico $@)
 	del NetHack.ico
 
-$(WIN32)/NetHack.ico : $(MSWSYS)/NetHack.ico
+$(MSWIN)/NetHack.ico : $(MSWSYS)/NetHack.ico
 	$(subst /,\,copy $< $@)
 
-$(WIN32)/mnsel.bmp: $(U)uudecode.exe $(WIN32)/mnsel.uu
-	$(subst /,\,$(U)uudecode.exe $(WIN32)/mnsel.uu)
+$(MSWIN)/mnsel.bmp: $(U)uudecode.exe $(MSWIN)/mnsel.uu
+	$(subst /,\,$(U)uudecode.exe $(MSWIN)/mnsel.uu)
 	$(subst /,\,copy mnsel.bmp $@)
 	del mnsel.bmp
 
-$(WIN32)/mnselcnt.bmp: $(U)uudecode.exe $(WIN32)/mnselcnt.uu
-	$(subst /,\,$(U)uudecode.exe $(WIN32)/mnselcnt.uu)
+$(MSWIN)/mnselcnt.bmp: $(U)uudecode.exe $(MSWIN)/mnselcnt.uu
+	$(subst /,\,$(U)uudecode.exe $(MSWIN)/mnselcnt.uu)
 	$(subst /,\,copy mnselcnt.bmp $@)
 	del mnselcnt.bmp
 
-$(WIN32)/mnunsel.bmp: $(U)uudecode.exe $(WIN32)/mnunsel.uu
-	$(subst /,\,$(U)uudecode.exe $(WIN32)/mnunsel.uu)
+$(MSWIN)/mnunsel.bmp: $(U)uudecode.exe $(MSWIN)/mnunsel.uu
+	$(subst /,\,$(U)uudecode.exe $(MSWIN)/mnunsel.uu)
 	$(subst /,\,copy mnunsel.bmp $@)
 	del mnunsel.bmp
 
-$(WIN32)/petmark.bmp: $(U)uudecode.exe $(WIN32)/petmark.uu
-	$(subst /,\,$(U)uudecode.exe $(WIN32)/petmark.uu)
+$(MSWIN)/petmark.bmp: $(U)uudecode.exe $(MSWIN)/petmark.uu
+	$(subst /,\,$(U)uudecode.exe $(MSWIN)/petmark.uu)
 	$(subst /,\,copy petmark.bmp $@)
 	del petmark.bmp
 
-$(WIN32)/rip.bmp: $(U)uudecode.exe $(WIN32)/rip.uu
-	$(subst /,\,$(U)uudecode.exe $(WIN32)/rip.uu)
+$(MSWIN)/rip.bmp: $(U)uudecode.exe $(MSWIN)/rip.uu
+	$(subst /,\,$(U)uudecode.exe $(MSWIN)/rip.uu)
 	$(subst /,\,copy rip.bmp $@)
 	del rip.bmp
 
-$(WIN32)/splash.bmp: $(U)uudecode.exe $(WIN32)/splash.uu
-	$(subst /,\,$(U)uudecode.exe $(WIN32)/splash.uu)
+$(MSWIN)/splash.bmp: $(U)uudecode.exe $(MSWIN)/splash.uu
+	$(subst /,\,$(U)uudecode.exe $(MSWIN)/splash.uu)
 	$(subst /,\,copy splash.bmp $@)
 	del splash.bmp
 
@@ -993,17 +951,9 @@ $(U)txt2ppm.exe: $(PPMWRITERS) $(TEXT_IO)
 	@$(link) $(LFLAGSU) -o$@ $(PPMWRITERS) $(TEXT_IO)
 
 
-ifeq  "$(GRAPHICAL)" "Y"
 $(TILEBMP16): $(TILEUTIL16) $(TILEFILES)
 	@echo Creating 16x16 binary tile files (this may take some time)
 	$(subst /,\,@$(U)tile2bmp $(TILEBMP16))
-#$(TILEBMP32): $(TILEUTIL32) $(TILEFILES32)
-#	@echo Creating 32x32 binary tile files (this may take some time)
-#	$(subst /,\,@$(U)til2bm32 $(TILEBMP32))
-else
-$(TILEBMP16):
-$(TILEBMP32):
-endif
 
 $(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXT_IO)
 	@echo Linking $@...
@@ -1128,6 +1078,21 @@ $(O)winnt.o: $(HACK_H) $(INCL)/win32api.h $(MSWSYS)/winnt.c
 $(O)ntsound.o: $(HACK_H) $(MSWSYS)/ntsound.c
 	$(cc) $(CFLAGS)  -o$@ $(MSWSYS)/ntsound.c
 
+
+#if you aren't linking in the full gui then
+#include the following stub for proper linkage.
+
+$(O)guistub.o: $(HACK_H) $(MSWSYS)/stubs.c
+	@$(cc) $(CFLAGS) -DGUISTUB  -o$@ $(MSWSYS)/stubs.c
+
+#if you aren't linking in the full tty then
+#include the following stub for proper linkage.
+
+$(O)ttystub.o: $(HACK_H) $(MSWSYS)/ttystub.c
+	@$(cc) $(CFLAGS) -DTTYSTUB -o$@ $(MSWSYS)/stubs.c
+
+$(O)tile.o: $(SRC)/tile.c $(HACK_H)
+
 #
 # util dependencies
 #
@@ -1206,7 +1171,7 @@ $(O)wintext.o: ../win/X11/wintext.c $(HACK_H) $(INCL)/winX.h $(INCL)/xwindow.h
 	$(cc) $(CFLAGS) -o$@ ../win/X11/wintext.c
 $(O)winval.o: ../win/X11/winval.c $(HACK_H) $(INCL)/winX.h
 	$(cc) $(CFLAGS) -o$@ ../win/X11/winval.c
-$(O)tile.o: tile.c $(HACK_H)
+$(O)tile.o: $(SRC)/tile.c $(HACK_H)
 $(O)gnaskstr.o: ../win/gnome/gnaskstr.c ../win/gnome/gnaskstr.h \
 		../win/gnome/gnmain.h
 	$(cc) $(CFLAGS) $(GNOMEINC) -o$@ ../win/gnome/gnaskstr.c
@@ -1258,7 +1223,6 @@ $(O)load_img.o: ../win/gem/load_img.c $(INCL)/load_img.h
 	$(cc) $(CFLAGS) -o$@ ../win/gem/load_img.c
 $(O)gr_rect.o: ../win/gem/gr_rect.c $(INCL)/gr_rect.h
 	$(cc) $(CFLAGS) -o$@ ../win/gem/gr_rect.c
-$(O)tile.o: tile.c $(HACK_H)
 $(O)qt_win.o: ../win/Qt/qt_win.cpp $(HACK_H) $(INCL)/func_tab.h \
 		$(INCL)/dlb.h $(INCL)/patchlevel.h $(INCL)/tile2x11.h \
 		$(INCL)/qt_win.h $(INCL)/qt_clust.h $(INCL)/qt_kde0.h \

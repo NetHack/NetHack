@@ -1,4 +1,4 @@
-/* NetHack 3.5	files.c	$NHDT-Date: 1429136302 2015/04/15 22:18:22 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.166 $ */
+/* NetHack 3.5	files.c	$NHDT-Date: 1429675565 2015/04/22 04:06:05 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.169 $ */
 
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1070,7 +1070,7 @@ get_saved_games()
 #if defined(SELECTSAVED)
     int n, j = 0;
     char **result = 0;
-# ifdef WIN32CON
+# ifdef WIN32
     {
     char *foundfile;
     const char *fq_save;

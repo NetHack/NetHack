@@ -1,4 +1,4 @@
-/* NetHack 3.5	wintty.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	wintty.h	$NHDT-Date: 1429675543 2015/04/22 04:05:43 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.18 $ */
 /* NetHack 3.5	wintty.h	$Date: 2012/01/23 10:45:26 $  $Revision: 1.12 $ */
 /* Copyright (c) David Cohrs, 1991,1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -241,15 +241,15 @@ E int FDECL(term_putc, (int c));
 E int FDECL(term_flush, (void *desc));
 E int FDECL(term_puts, (const char *str));
 # endif /* MAC */
-# if defined(MSDOS) || defined(WIN32CON)
-#  if defined(SCREEN_BIOS) || defined(SCREEN_DJGPPFAST) || defined(WIN32CON)
+# if defined(MSDOS) || defined(WIN32)
+#  if defined(SCREEN_BIOS) || defined(SCREEN_DJGPPFAST) || defined(WIN32)
 #   undef putchar
 #   undef putc
 #   undef puts
 #   define putchar(x) xputc(x)	/* these are in video.c, nttty.c */
 #   define putc(x) xputc(x)
 #   define puts(x) xputs(x)
-#  endif/*SCREEN_BIOS || SCREEN_DJGPPFAST || WIN32CON */
+#  endif/*SCREEN_BIOS || SCREEN_DJGPPFAST || WIN32 */
 #  ifdef POSITIONBAR
 E void FDECL(video_update_positionbar, (char *));
 #  endif

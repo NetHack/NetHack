@@ -1,4 +1,4 @@
-/* NetHack 3.5	global.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	global.h	$NHDT-Date: 1429675538 2015/04/22 04:05:38 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.41 $ */
 /* NetHack 3.5	global.h	$Date: 2012/01/29 03:00:14 $  $Revision: 1.31 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -197,13 +197,6 @@ typedef uchar nhsym;
 # endif
 # ifdef WIN32
 #  define PORT_ID	"Windows"
-#  ifndef PORT_SUB_ID
-#   ifdef MSWIN_GRAPHICS
-#    define PORT_SUB_ID	"graphical"
-#   else
-#    define PORT_SUB_ID	"tty"
-#   endif
-#  endif
 # endif
 #endif
 
@@ -234,7 +227,7 @@ typedef uchar nhsym;
 # define EXIT_FAILURE 1
 #endif
 
-#if defined(X11_GRAPHICS) || defined(QT_GRAPHICS) || defined(GNOME_GRAPHICS) || defined(MSWIN_GRAPHICS)
+#if defined(X11_GRAPHICS) || defined(QT_GRAPHICS) || defined(GNOME_GRAPHICS) || defined(WIN32)
 # ifndef USE_TILES
 #  define USE_TILES		/* glyph2tile[] will be available */
 # endif

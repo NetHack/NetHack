@@ -1,4 +1,4 @@
-/* NetHack 3.5	extern.h	$NHDT-Date: 1429135323 2015/04/15 22:02:03 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.464 $ */
+/* NetHack 3.5	extern.h	$NHDT-Date: 1429675537 2015/04/22 04:05:37 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.471 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1500,10 +1500,10 @@ E void FDECL(regex_free, (struct nhregex *));
 
 /* ### nttty.c ### */
 
-#ifdef WIN32CON
+#ifdef WIN32
 E void NDECL(get_scr_size);
 E int NDECL(nttty_kbhit);
-E void NDECL(nttty_open);
+E void FDECL(nttty_open,(int));
 E void NDECL(nttty_rubout);
 E int NDECL(tgetch);
 E int FDECL(ntposkey,(int *, int *, int *));

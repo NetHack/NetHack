@@ -1,4 +1,4 @@
-/* NetHack 3.5	ntconf.h	$NHDT-Date: 1426966690 2015/03/21 19:38:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.37 $ */
+/* NetHack 3.5	ntconf.h	$NHDT-Date: 1429675540 2015/04/22 04:05:40 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.44 $ */
 /*	SCCS Id: @(#)ntconf.h	3.5	2002/03/10	*/
 /* Copyright (c) NetHack PC Development Team 1993, 1994.  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -13,9 +13,8 @@
 
 #define EXEPATH			/* Allow .exe location to be used as HACKDIR */
 #define TRADITIONAL_GLYPHMAP	/* Store glyph mappings at level change time */
-#ifdef WIN32CON
+
 #define LAN_FEATURES		/* Include code for lan-aware features. Untested in 3.4.0*/
-#endif
 
 #define PC_LOCKING		/* Prevent overwrites of aborted or in-progress games */
 				/* without first receiving confirmation. */
@@ -29,10 +28,8 @@
 
 #define USER_SOUNDS
 
-#ifdef WIN32CON
-#define CHANGE_COLOR		/* allow palette changes in win32 console */
+/*#define CHANGE_COLOR*/		/* allow palette changes */
 #define SELECTSAVED		/* Provide menu of saved games to choose from at start */
-#endif
 
 /*
  * -----------------------------------------------------------------
@@ -56,18 +53,12 @@
 #ifdef OPTIONS_USED
 #undef OPTIONS_USED
 #endif
-#ifdef MSWIN_GRAPHICS
-#define OPTIONS_USED	"guioptions"
-#else
-#define OPTIONS_USED	"ttyoptions"
-#endif
+#define OPTIONS_USED	"options"
 #define OPTIONS_FILE OPTIONS_USED
 
 #define PORT_HELP	"porthelp"
 
-#ifdef WIN32CON
 #define PORT_DEBUG	/* include ability to debug international keyboard issues */
-#endif
 
 #define SAFERHANGUP	/* Define SAFERHANGUP to delay hangup processing
 			 * until the main command loop. 'safer' because it
@@ -199,13 +190,11 @@ extern char hackdir[];
 #define getuid() 1
 #define getlogin() ((char *)0)
 extern void NDECL(win32_abort);
-#ifdef WIN32CON
 extern void FDECL(nttty_preference_update, (const char *));
 extern void NDECL(toggle_mouse_support);
 extern void FDECL(map_subkeyvalue, (char *));
 extern void NDECL(load_keyboard_handler);
 extern void NDECL(raw_clear_screen);
-#endif
 
 #include <fcntl.h>
 #ifndef __BORLANDC__
@@ -237,7 +226,6 @@ int  _RTLENTRY _EXPFUNC read  (int __handle, void _FAR *__buf, unsigned __len);
 #endif
 
 extern int FDECL(set_win32_option, (const char *, const char *));
-#ifdef WIN32CON
 #define LEFTBUTTON  FROM_LEFT_1ST_BUTTON_PRESSED
 #define RIGHTBUTTON RIGHTMOST_BUTTON_PRESSED
 #define MIDBUTTON   FROM_LEFT_2ND_BUTTON_PRESSED
@@ -245,6 +233,5 @@ extern int FDECL(set_win32_option, (const char *, const char *));
 #ifdef CHANGE_COLOR
 extern int FDECL(alternative_palette, (char *));
 #endif
-#endif /* WIN32CON */
 
 #endif /* NTCONF_H */

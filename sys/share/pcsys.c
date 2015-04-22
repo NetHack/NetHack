@@ -1,4 +1,4 @@
-/* NetHack 3.5	pcsys.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	pcsys.c	$NHDT-Date: 1429675591 2015/04/22 04:06:31 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.24 $ */
 /* NetHack 3.5	pcsys.c	$Date: 2012/01/22 06:33:47 $  $Revision: 1.18 $ */
 /*	SCCS Id: @(#)pcsys.c	3.5	2002/01/22		  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -54,7 +54,7 @@ STATIC_DCL boolean NDECL(comspec_exists);
 # endif
 #endif
 
-#ifdef WIN32CON
+#ifdef WIN32
 extern int GUILaunched;    /* from nttty.c */
 #endif
 
@@ -411,7 +411,7 @@ const char *str;
 	return;
 }
 
-#ifndef WIN32CON
+#ifndef WIN32
 void
 msmsg VA_DECL(const char *, fmt)
 	VA_START(fmt);
@@ -529,7 +529,7 @@ STATIC_OVL void msexit()
 		restore_colors();
 # endif
 #endif
-#ifdef WIN32CON
+#ifdef WIN32
 	/* Only if we started from the GUI, not the command prompt,
 	 * we need to get one last return, so the score board does
 	 * not vanish instantly after being created.

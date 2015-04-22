@@ -1,4 +1,4 @@
-/* NetHack 3.5	pcunix.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	pcunix.c	$NHDT-Date: 1429675591 2015/04/22 04:06:31 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.31 $ */
 /* NetHack 3.5	pcunix.c	$Date: 2009/05/06 10:50:30 $  $Revision: 1.27 $ */
 /*	SCCS Id: @(#)pcunix.c	3.5	1994/11/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
@@ -192,8 +192,9 @@ getlock()
 	if(c == 'y' || c == 'Y')
 # ifndef SELF_RECOVER
 		if(eraseoldlocks()) {
-#  if defined(WIN32CON)
-			clear_screen();		/* display gets fouled up otherwise */
+#  if defined(WIN32)
+			if (!strncmpi(windowprocs.name, "tty", 3))
+				clear_screen();		/* display gets fouled up otherwise */
 #  endif
 			goto gotlock;
 		} else {
@@ -205,8 +206,9 @@ getlock()
 		}
 # else /*SELF_RECOVER*/
 		if(recover_savefile()) {
-#  if defined(WIN32CON)
-			clear_screen();		/* display gets fouled up otherwise */
+#  if defined(WIN32)
+			if (!strncmpi(windowprocs.name, "tty", 3))
+				clear_screen();		/* display gets fouled up otherwise */
 #  endif
 			goto gotlock;
 		} else {

@@ -1,6 +1,6 @@
-/* NetHack 3.5	nttty.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	nttty.c	$NHDT-Date: 1429675608 2015/04/22 04:06:48 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.59 $ */
 /* NetHack 3.5	nttty.c	$Date: 2009/05/06 10:53:34 $  $Revision: 1.54 $ */
-/*	SCCS Id: @(#)nttty.c	3.5	$NHDT-Date$   */
+/*	SCCS Id: @(#)nttty.c	3.5	$NHDT-Date: 1429675609 2015/04/22 04:06:49 $   */
 /*	SCCS Id: @(#)nttty.c	3.5	$Date: 2009/05/06 10:53:34 $   */
 /* Copyright (c) NetHack PC Development Team 1993    */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -15,7 +15,7 @@
  *
  */
 
-#ifdef WIN32CON
+#ifdef WIN32
 #define NEED_VARARGS /* Uses ... */
 #include "hack.h"
 #include "wintty.h"
@@ -273,35 +273,53 @@ DWORD ctrltype;
 	}
 }
 
-/* called by init_tty in wintty.c for WIN32CON port only */
+/* called by init_tty in wintty.c for WIN32 port only */
 void
-nttty_open()
+nttty_open(mode)
+int mode;
 {
         HANDLE hStdOut;
         DWORD cmode;
         long mask;
 
-	load_keyboard_handler();
-	/* Initialize the function pointer that points to
-         * the kbhit() equivalent, in this TTY case nttty_kbhit()
-         */
-	nt_kbhit = nttty_kbhit;
-
-        /* The following 6 lines of code were suggested by 
+try:
+        /* The following lines of code were suggested by 
          * Bob Landau of Microsoft WIN32 Developer support,
          * as the only current means of determining whether
          * we were launched from the command prompt, or from
          * the NT program manager. M. Allison
          */
-        hStdOut = GetStdHandle( STD_OUTPUT_HANDLE );
-        GetConsoleScreenBufferInfo( hStdOut, &origcsbi);
-        GUILaunched = ((origcsbi.dwCursorPosition.X == 0) &&
-                           (origcsbi.dwCursorPosition.Y == 0));
-        if ((origcsbi.dwSize.X <= 0) || (origcsbi.dwSize.Y <= 0))
-            GUILaunched = 0;
+        hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	if (hStdOut) {
+			GetConsoleScreenBufferInfo(hStdOut, &origcsbi);
+			GUILaunched = ((origcsbi.dwCursorPosition.X == 0) &&
+				(origcsbi.dwCursorPosition.Y == 0));
+			if ((origcsbi.dwSize.X <= 0) || (origcsbi.dwSize.Y <= 0))
+				GUILaunched = 0;
+	} else  if (mode) {
+		HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+		HANDLE hStdIn = GetStdHandle(STD_INPUT_HANDLE);
 
-        /* Obtain handles for the standard Console I/O devices */
-	hConIn = GetStdHandle(STD_INPUT_HANDLE);
+		if (!hStdOut && !hStdIn) {
+			/* Bool rval; */
+			AllocConsole();
+			AttachConsole(GetCurrentProcessId());
+			/* 	rval = SetStdHandle(STD_OUTPUT_HANDLE, hWrite); */
+			freopen("CON", "w", stdout);
+			freopen("CON", "r", stdin);
+		}
+		mode = 0;
+		goto try;
+	} else return;
+
+	load_keyboard_handler();
+	/* Initialize the function pointer that points to
+	* the kbhit() equivalent, in this TTY case nttty_kbhit()
+	*/
+	nt_kbhit = nttty_kbhit;
+
+    /* Obtain handles for the standard Console I/O devices */
+ 	hConIn = GetStdHandle(STD_INPUT_HANDLE);
 	hConOut = GetStdHandle(STD_OUTPUT_HANDLE);
 #if 0
 	hConIn = CreateFile("CONIN$",
@@ -1041,7 +1059,7 @@ msmsg VA_DECL(const char *, fmt)
 /* fatal error */
 /*VARARGS1*/
 void
-error VA_DECL(const char *,s)
+nttty_error VA_DECL(const char *,s)
 	char buf[BUFSZ];
 	VA_START(s);
 	VA_INIT(s, const char *);
@@ -1445,4 +1463,4 @@ GetConsoleHwnd(void)
        return hwndFound;
 }
 # endif /*CHANGE_COLOR*/
-#endif /* WIN32CON */
+#endif /* WIN32 */

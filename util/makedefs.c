@@ -1,4 +1,4 @@
-/* NetHack 3.5  makedefs.c  $NHDT-Date: 1425083082 2015/02/28 00:24:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.63 $ */
+/* NetHack 3.5  makedefs.c  $NHDT-Date: 1429675627 2015/04/22 04:07:07 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.91 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) M. Stephenson, 1990, 1991.			  */
 /* Copyright (c) Dean Luick, 1990.				  */
@@ -1331,10 +1331,8 @@ static const char *build_opts[] = {
 # ifdef SCREEN_VGA
 		"screen control via VGA graphics",
 # endif
-# ifndef MSWIN_GRAPHICS
-#  ifdef WIN32CON
+# ifdef WIN32CON
 		"screen control via WIN32 console I/O",
-#  endif
 # endif
 #endif
 #ifdef SHELL
