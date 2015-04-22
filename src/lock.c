@@ -526,6 +526,22 @@ doopen()		/* try to open a door */
     return doopen_indir(0, 0);
 }
 
+boolean
+stumble_on_door_mimic(x,y)
+int x,y;
+{
+    struct monst *mtmp;
+    if ((mtmp = m_at(x,y))			&&
+	mtmp->m_ap_type == M_AP_FURNITURE	&&
+	(mtmp->mappearance == S_hcdoor ||
+	 mtmp->mappearance == S_vcdoor)	&&
+	!Protection_from_shape_changers)	 {
+	stumble_onto_mimic(mtmp);
+	return TRUE;
+    }
+    return FALSE;
+}
+
 int
 doopen_indir(x, y)             /* try to open a door in direction u.dx/u.dy */
 int x, y;
@@ -554,15 +570,7 @@ int x, y;
 
 	if((cc.x == u.ux) && (cc.y == u.uy)) return(0);
 
-	if ((mtmp = m_at(cc.x,cc.y))			&&
-		mtmp->m_ap_type == M_AP_FURNITURE	&&
-		(mtmp->mappearance == S_hcdoor ||
-			mtmp->mappearance == S_vcdoor)	&&
-		!Protection_from_shape_changers)	 {
-
-	    stumble_onto_mimic(mtmp);
-	    return(1);
-	}
+	if (stumble_on_door_mimic(cc.x, cc.y)) return 1;
 
 	/* when choosing a direction is impaired, use a turn
 	   regardless of whether a door is successfully targetted */
