@@ -1,4 +1,4 @@
-/* NetHack 3.5	extern.h	$NHDT-Date: 1429675537 2015/04/22 04:05:37 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.471 $ */
+/* NetHack 3.5	extern.h	$NHDT-Date: 1429666893 2015/04/22 01:41:33 $  $NHDT-Branch: master $:$NHDT-Revision: 1.467 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -119,6 +119,7 @@ E void FDECL(uchangealign, (int,int));
 
 /* ### ball.c ### */
 
+E void FDECL(ballrelease, (boolean));
 E void NDECL(ballfall);
 E void NDECL(placebc);
 E void NDECL(unplacebc);
@@ -606,6 +607,7 @@ E void NDECL(vomit);
 E int FDECL(eaten_stat, (int,struct obj *));
 E void FDECL(food_disappears, (struct obj *));
 E void FDECL(food_substitution, (struct obj *,struct obj *));
+E void FDECL(eating_conducts, (struct permonst *));
 E int FDECL(eat_brains, (struct monst *,struct monst *,BOOLEAN_P,int *));
 E void NDECL(fix_petrification);
 E void FDECL(consume_oeaten, (struct obj *,int));
@@ -752,6 +754,7 @@ E void NDECL(really_close);
 #endif
 #ifdef DEBUG
 E boolean FDECL(debugcore, (const char *, boolean));
+E boolean FDECL(showdebug, (const char *));
 #endif
 E boolean FDECL(read_tribute, (const char *,const char *,int));
 
@@ -782,6 +785,7 @@ E boolean FDECL(bad_rock, (struct permonst *,XCHAR_P,XCHAR_P));
 E int FDECL(cant_squeeze_thru, (struct monst *));
 E boolean FDECL(invocation_pos, (XCHAR_P,XCHAR_P));
 E boolean FDECL(test_move, (int, int, int, int, int));
+E boolean NDECL(u_rooted);
 E void NDECL(domove);
 E boolean NDECL(overexertion);
 E void NDECL(invocation_message);
@@ -981,6 +985,7 @@ E int NDECL(doforce);
 E boolean FDECL(boxlock, (struct obj *,struct obj *));
 E boolean FDECL(doorlock, (struct obj *,int,int));
 E int NDECL(doopen);
+E boolean FDECL(stumble_on_door_mimic, (int,int));
 E int FDECL(doopen_indir, (int,int));
 E int NDECL(doclose);
 
@@ -1306,6 +1311,7 @@ E boolean FDECL(hideunder, (struct monst*));
 E void FDECL(hide_monst, (struct monst *));
 E void FDECL(mon_animal_list, (BOOLEAN_P));
 E int FDECL(select_newcham_form, (struct monst *));
+E void FDECL(mgender_from_permonst, (struct monst *, struct permonst *));
 E int FDECL(newcham, (struct monst *,struct permonst *,BOOLEAN_P,BOOLEAN_P));
 E int FDECL(can_be_hatched, (int));
 E int FDECL(egg_type_from_parent, (int,BOOLEAN_P));
@@ -1698,6 +1704,7 @@ E struct obj *FDECL(pick_obj, (struct obj *));
 E int NDECL(encumber_msg);
 E int NDECL(doloot);
 E boolean FDECL(container_gone, (int (*)(OBJ_P)));
+E boolean NDECL(u_handsy);
 E int FDECL(use_container, (struct obj **,int));
 E int FDECL(loot_mon, (struct monst *,int *,boolean *));
 E int NDECL(dotip);
@@ -1723,6 +1730,7 @@ E const char *FDECL(align_str, (ALIGNTYP_P));
 E void FDECL(mstatusline, (struct monst *));
 E void NDECL(ustatusline);
 E void NDECL(self_invis_message);
+E void FDECL(pudding_merge_message, (struct obj*, struct obj*));
 
 /* ### polyself.c ### */
 
@@ -1979,6 +1987,7 @@ E void NDECL(rumor_check);
 
 E int NDECL(dosave);
 E int NDECL(dosave0);
+E boolean FDECL(tricked_fileremoved, (int, char *));
 #ifdef INSURANCE
 E void NDECL(savestateinlock);
 #endif

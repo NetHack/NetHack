@@ -1,4 +1,4 @@
-/* NetHack 3.5	mon.c	$NHDT-Date: 1429584308 2015/04/21 02:45:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.164 $ */
+/* NetHack 3.5	mon.c	$NHDT-Date: 1429666918 2015/04/22 01:41:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.165 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -280,7 +280,7 @@ unsigned corpseflags;
                                 x, y, TRUE, FALSE);
 
             while ((obj && (otmp = obj_nexto(obj)) != (struct obj*)0)) {
-                pline("The %s coalesce.", makeplural(obj_typename(obj->otyp)));
+                pudding_merge_message(obj, otmp);
                 obj = obj_meld(&obj, &otmp);
             }
             free_mname(mtmp);
@@ -2744,6 +2744,20 @@ int mndx;
     return polyok(mdat) ? mdat : 0;
 }
 
+void
+mgender_from_permonst(mtmp, mdat)
+struct monst *mtmp;
+struct permonst *mdat;
+{
+    if(is_male(mdat)) {
+        if(mtmp->female) mtmp->female = FALSE;
+    } else if (is_female(mdat)) {
+        if(!mtmp->female) mtmp->female = TRUE;
+    } else if (!is_neuter(mdat)) {
+        if(!rn2(10)) mtmp->female = !mtmp->female;
+    }
+}
+
 /* make a chameleon take on another shape, or a polymorph target
    (possibly self-infliced) become a different monster;
    returns 1 if it actually changes form */
@@ -2783,13 +2797,7 @@ boolean msg;		/* "The oldmon turns into a newmon!" */
     } else if (mvitals[monsndx(mdat)].mvflags & G_GENOD)
         return(0);	/* passed in mdat is genocided */
 
-    if(is_male(mdat)) {
-        if(mtmp->female) mtmp->female = FALSE;
-    } else if (is_female(mdat)) {
-        if(!mtmp->female) mtmp->female = TRUE;
-    } else if (!is_neuter(mdat)) {
-        if(!rn2(10)) mtmp->female = !mtmp->female;
-    }
+    mgender_from_permonst(mtmp, mdat);
 
     if (In_endgame(&u.uz) && is_mplayer(olddata) && has_mname(mtmp)) {
         /* mplayers start out as "Foo the Bar", but some of the

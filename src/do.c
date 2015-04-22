@@ -1,4 +1,4 @@
-/* NetHack 3.5	do.c	$NHDT-Date: 1426991040 2015/03/22 02:24:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.111 $ */
+/* NetHack 3.5	do.c	$NHDT-Date: 1429666911 2015/04/22 01:41:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.130 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -216,7 +216,7 @@ const char *verb;
     } else if (obj->globby) {
         /* Globby things like puddings might stick together */
         while (obj && (otmp = obj_nexto_xy(obj->otyp, x, y, obj->o_id)) != (struct obj*)0) {
-            pline("The %s coalesce.", makeplural(obj_typename(obj->otyp)));
+            pudding_merge_message(obj, otmp);
             obj_meld(&obj, &otmp);
         }
         return (obj == NULL); 
@@ -839,13 +839,7 @@ dodown()
             (u.ux == sstairs.sx && u.uy == sstairs.sy && !sstairs.up)),
         ladder_down = (u.ux == xdnladder && u.uy == ydnladder);
 
-    if(!youmonst.data->mmove) {
-        You("are rooted %s.",
-        Levitation || Is_airlevel(&u.uz) || Is_waterlevel(&u.uz) ?
-        "in place" : "to the ground");
-        nomul(0);
-        return 1;
-    }
+    if (u_rooted()) return 1;
 
     if (stucksteed(TRUE)) {
         return 0;
@@ -946,13 +940,7 @@ dodown()
 int
 doup()
 {
-    if(!youmonst.data->mmove) {
-        You("are rooted %s.",
-        Levitation || Is_airlevel(&u.uz) || Is_waterlevel(&u.uz) ?
-        "in place" : "to the ground");
-        nomul(0);
-        return 1;
-    }
+    if (u_rooted()) return 1;
 
     /* "up" to get out of a pit... */
     if (u.utrap && u.utraptype == TT_PIT) {
@@ -1230,11 +1218,7 @@ boolean at_stairs, falling, portal;
     } else {
         /* returning to previously visited level; reload it */
         fd = open_levelfile(new_ledger, whynot);
-        if (fd < 0) {
-            pline1(whynot);
-            pline("Probably someone removed it.");
-            Strcpy(killer.name, whynot);
-            done(TRICKED);
+        if (tricked_fileremoved(fd, whynot)) {
             /* we'll reach here if running in wizard mode */
             error("Cannot continue this game.");
         }
@@ -1291,16 +1275,8 @@ boolean at_stairs, falling, portal;
             Punished || Fumbling) {
             You("fall down the %s.", at_ladder ? "ladder" : "stairs");
             if (Punished) {
-            drag_down();
-            if (carried(uball)) {
-                if (uwep == uball)
-                setuwep((struct obj *)0);
-                if (uswapwep == uball)
-                setuswapwep((struct obj *)0);
-                if (uquiver == uball)
-                setuqwep((struct obj *)0);
-                freeinv(uball);
-            }
+		drag_down();
+		ballrelease(FALSE);
             }
             /* falling off steed has its own losehp() call */
             if (u.usteed)

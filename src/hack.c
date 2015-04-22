@@ -1111,6 +1111,19 @@ struct trap *desttrap;	/* nonnull if another trap at <x,y> */
     return FALSE;
 }
 
+boolean
+u_rooted()
+{
+    if(!youmonst.data->mmove) {
+        You("are rooted %s.",
+            Levitation || Is_airlevel(&u.uz) || Is_waterlevel(&u.uz) ?
+            "in place" : "to the ground");
+        nomul(0);
+        return TRUE;
+    }
+    return FALSE;
+}
+
 void
 domove()
 {
@@ -1414,13 +1427,9 @@ domove()
         nomul(0);
         return;
     }
-    if(!youmonst.data->mmove) {
-        You("are rooted %s.",
-            Levitation || Is_airlevel(&u.uz) || Is_waterlevel(&u.uz) ?
-            "in place" : "to the ground");
-        nomul(0);
-        return;
-    }
+
+    if (u_rooted()) return;
+
     if(u.utrap) {
         if (!trapmove(x, y, trap)) return;
     }

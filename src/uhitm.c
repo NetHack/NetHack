@@ -1809,14 +1809,8 @@ register struct attack *mattk;
 			(mattk->adtyp == AD_DGST && (is_rider(pd) ||
 			    (pd == &mons[PM_MEDUSA] && !Stone_resistance)));
 
-	    if ((mattk->adtyp == AD_DGST && !Slow_digestion) || fatal_gulp) {
-		/* KMH, conduct */
-		u.uconduct.food++;
-		if (!vegan(pd))
-		     u.uconduct.unvegan++;
-		if (!vegetarian(pd))
-		     violated_vegetarian();
-	    }
+	    if ((mattk->adtyp == AD_DGST && !Slow_digestion) || fatal_gulp)
+		eating_conducts(pd);
 
 	    if (fatal_gulp && !is_rider(pd)) {	/* petrification */
 		char kbuf[BUFSZ];

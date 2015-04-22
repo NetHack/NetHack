@@ -1498,14 +1498,8 @@ struct mkroom	*croom;
 			    if ((mndx != NON_PM) && (&mons[mndx] != mtmp->data)) {
 				struct permonst *mdat = &mons[mndx];
 				struct permonst *olddata = mtmp->data;
-				/* this code duplicated from newcham() */
-				if(is_male(mdat)) {
-				    if(mtmp->female) mtmp->female = FALSE;
-				} else if (is_female(mdat)) {
-				    if(!mtmp->female) mtmp->female = TRUE;
-				} else if (!is_neuter(mdat)) {
-				    if(!rn2(10)) mtmp->female = !mtmp->female;
-				}
+
+				mgender_from_permonst(mtmp, mdat);
 				set_mon_data(mtmp, mdat, 0);
 				if (emits_light(olddata) != emits_light(mtmp->data)) {
 				    /* used to give light, now doesn't, or vice versa,

@@ -11,23 +11,30 @@ STATIC_DCL int NDECL(bc_order);
 STATIC_DCL void NDECL(litter);
 
 void
+ballrelease(showmsg)
+boolean showmsg;
+{
+    if (carried(uball)) {
+	if (showmsg) pline("Startled, you drop the iron ball.");
+	if (uwep == uball)
+	    setuwep((struct obj *)0);
+	if (uswapwep == uball)
+	    setuswapwep((struct obj *)0);
+	if (uquiver == uball)
+	    setuqwep((struct obj *)0);;
+	if (uwep != uball)
+	    freeinv(uball);
+    }
+}
+
+void
 ballfall()
 {
 	boolean gets_hit;
 
 	gets_hit = (((uball->ox != u.ux) || (uball->oy != u.uy)) &&
 		    ((uwep == uball)? FALSE : (boolean)rn2(5)));
-	if (carried(uball)) {
-		pline("Startled, you drop the iron ball.");
-		if (uwep == uball)
-			setuwep((struct obj *)0);
-		if (uswapwep == uball)
-			setuswapwep((struct obj *)0);
-		if (uquiver == uball)
-			setuqwep((struct obj *)0);;
-		if (uwep != uball)
-			freeinv(uball);
-	}
+	ballrelease(TRUE);
 	if(gets_hit){
 		int dmg = rn1(7,25);
 		pline_The("iron ball falls on your %s.",
