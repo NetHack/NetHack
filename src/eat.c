@@ -431,6 +431,17 @@ boolean message;
 	context.victual.fullwarn = context.victual.eating = context.victual.doreset = FALSE;
 }
 
+void
+eating_conducts(pd)
+struct permonst *pd;
+{
+    u.uconduct.food++;
+    if (!vegan(pd))
+	u.uconduct.unvegan++;
+    if (!vegetarian(pd))
+	violated_vegetarian();
+}
+
 /* handle side-effects of mind flayer's tentacle attack */
 int
 eat_brains(magr, mdef, visflag, dmg_p)
@@ -483,11 +494,7 @@ int *dmg_p;	/* for dishing out extra damage in lieu of Int loss */
 	/*
 	 * player mind flayer is eating something's brain
 	 */
-	u.uconduct.food++;
-	if (!vegan(pd))
-	    u.uconduct.unvegan++;
-	if (!vegetarian(pd))
-	    violated_vegetarian();
+	eating_conducts(pd);
 	if (mindless(pd)) {		/* (cannibalism not possible here) */
 	    pline("%s doesn't notice.", Monnam(mdef));
 	    /* all done; no extra harm inflicted upon target */
@@ -1270,12 +1277,7 @@ const char *mesg;
 
 	You("consume %s %s.", tintxts[r].txt, mons[mnum].mname);
 
-	/* KMH, conduct */
-	u.uconduct.food++;
-	if (!vegan(&mons[mnum]))
-	    u.uconduct.unvegan++;
-	if (!vegetarian(&mons[mnum]))
-	    violated_vegetarian();
+	eating_conducts(&mons[mnum]);
 
 	tin->dknown = tin->known = 1;
 	cprefx(mnum);
