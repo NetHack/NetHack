@@ -1,4 +1,4 @@
-/* NetHack 3.5	pline.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	pline.c	$NHDT-Date: 1429666920 2015/04/22 01:42:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.37 $ */
 /* NetHack 3.5	pline.c	$Date: 2013/02/09 01:33:37 $  $Revision: 1.30 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -489,4 +489,33 @@ self_invis_message()
 		"can't see yourself");
 }
 
+void
+pudding_merge_message(otmp, otmp2)
+struct obj* otmp;
+struct obj* otmp2;
+{
+    boolean visible = cansee(otmp->ox, otmp->oy) || cansee(otmp2->ox, otmp2->oy);
+    boolean onfloor = otmp->where == OBJ_FLOOR || otmp2->where == OBJ_FLOOR;
+    boolean inpack = carried(otmp) || carried(otmp2);
+
+    /* the player will know something happened inside his own inventory */
+    if ((!Blind && visible) || inpack) {
+        if (Hallucination) {
+            if (onfloor) {
+                You_see("parts of the floor melting!");
+            } else if (inpack) {
+                Your("pack reaches out and grabs something!");
+            }
+            /* even though we can see where they should be, 
+             * they'll be out of our view (minvent or container)
+             * so don't actually show anything */
+        } else if (onfloor || inpack) {
+            pline("The %s coalesce%s.", makeplural(obj_typename(otmp->otyp)),
+                    inpack ? " inside your pack" : "");
+        }
+    } else {
+        You_hear("a faint sloshing sound.");
+    }
+}
+ 
 /*pline.c*/

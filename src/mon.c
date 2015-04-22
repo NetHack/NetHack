@@ -1,4 +1,4 @@
-/* NetHack 3.5	mon.c	$NHDT-Date: 1429584308 2015/04/21 02:45:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.164 $ */
+/* NetHack 3.5	mon.c	$NHDT-Date: 1429666918 2015/04/22 01:41:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.165 $ */
 /* NetHack 3.5	mon.c	$Date: 2012/05/16 02:15:10 $  $Revision: 1.126 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -281,7 +281,7 @@ unsigned corpseflags;
                                 x, y, TRUE, FALSE);
 
             while ((obj && (otmp = obj_nexto(obj)) != (struct obj*)0)) {
-                pline("The %s coalesce.", makeplural(obj_typename(obj->otyp)));
+                pudding_merge_message(obj, otmp);
                 obj = obj_meld(&obj, &otmp);
             }
             free_mname(mtmp);

@@ -1,4 +1,4 @@
-/* NetHack 3.5	do.c	$NHDT-Date: 1426991040 2015/03/22 02:24:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.111 $ */
+/* NetHack 3.5	do.c	$NHDT-Date: 1429666911 2015/04/22 01:41:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.130 $ */
 /* NetHack 3.5	do.c	$Date: 2014/11/18 03:10:39 $  $Revision: 1.101 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -217,7 +217,7 @@ const char *verb;
     } else if (obj->globby) {
         /* Globby things like puddings might stick together */
         while (obj && (otmp = obj_nexto_xy(obj->otyp, x, y, obj->o_id)) != (struct obj*)0) {
-            pline("The %s coalesce.", makeplural(obj_typename(obj->otyp)));
+            pudding_merge_message(obj, otmp);
             obj_meld(&obj, &otmp);
         }
         return (obj == NULL); 

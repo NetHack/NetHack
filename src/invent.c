@@ -301,7 +301,7 @@ struct obj **potmp, **pobj;
          * free the other object automatically so we can just 
          * return out from here.  */
         if (Is_pudding(obj)) {
-            pline("The %s coalesce.", makeplural(obj_typename(obj->otyp)));
+            pudding_merge_message(otmp, obj);
             obj_absorb(potmp, pobj);
             return(1);
         }
