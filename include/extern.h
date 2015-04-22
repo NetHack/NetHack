@@ -1701,6 +1701,7 @@ E struct obj *FDECL(pick_obj, (struct obj *));
 E int NDECL(encumber_msg);
 E int NDECL(doloot);
 E boolean FDECL(container_gone, (int (*)(OBJ_P)));
+E boolean NDECL(u_handsy);
 E int FDECL(use_container, (struct obj **,int));
 E int FDECL(loot_mon, (struct monst *,int *,boolean *));
 E int NDECL(dotip);

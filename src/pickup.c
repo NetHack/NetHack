@@ -2099,6 +2099,19 @@ explain_container_prompt()
     }
 }
 
+boolean
+u_handsy()
+{
+    if (nohands(youmonst.data)) {
+	You("have no hands!");	/* not `body_part(HAND)' */
+	return FALSE;
+    } else if (!freehand()) {
+	You("have no free %s.", body_part(HAND));
+	return FALSE;
+    }
+    return TRUE;
+}
+
 static const char stashable[] = { ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, 0 };
 
 int
@@ -2115,13 +2128,9 @@ int held;
 	int used = 0;
 
 	emptymsg[0] = '\0';
-	if (nohands(youmonst.data)) {
-	    You("have no hands!");	/* not `body_part(HAND)' */
-	    return 0;
-	} else if (!freehand()) {
-	    You("have no free %s.", body_part(HAND));
-	    return 0;
-	}
+
+	if (!u_handsy()) return 0;
+
 	if (obj->olocked) {
 	    pline("%s locked.", Tobjnam(obj, "are"));
 	    if (held) You("must put it down to unlock.");

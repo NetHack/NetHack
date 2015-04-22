@@ -46,14 +46,7 @@ use_saddle(otmp)
 	const char *s;
 
 
-	/* Can you use it? */
-	if (nohands(youmonst.data)) {
-		You("have no hands!");	/* not `body_part(HAND)' */
-		return 0;
-	} else if (!freehand()) {
-		You("have no free %s.", body_part(HAND));
-		return 0;
-	}
+	if (!u_handsy()) return 0;
 
 	/* Select an animal */
 	if (u.uswallow || Underwater || !getdir((char *)0)) {
