@@ -1,4 +1,4 @@
-# NetHack 3.5	Makefile.gcc	$NHDT-Date: 1429675605 2015/04/22 04:06:45 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.45 $
+# NetHack 3.5	Makefile.gcc	$NHDT-Date: 1429676997 2015/04/22 04:29:57 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.46 $
 #   Copyright (c) NetHack PC Development Team 1993-2015
 #
 #==============================================================================
@@ -954,6 +954,10 @@ $(U)txt2ppm.exe: $(PPMWRITERS) $(TEXT_IO)
 $(TILEBMP16): $(TILEUTIL16) $(TILEFILES)
 	@echo Creating 16x16 binary tile files (this may take some time)
 	$(subst /,\,@$(U)tile2bmp $(TILEBMP16))
+
+#$(TILEBMP32): $(TILEUTIL32) $(TILEFILES32)
+#	@echo Creating 32x32 binary tile files (this may take some time)
+#	$(subst /,\,@$(U)til2bm32 $(TILEBMP32))
 
 $(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXT_IO)
 	@echo Linking $@...
