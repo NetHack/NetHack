@@ -1522,6 +1522,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 	    if (!Is_rogue_level(&u.uz)
             && (!In_endgame(&u.uz) || Is_earthlevel(&u.uz))) {
 		register int x, y;
+		int nboulders = 0;
 
 		/* Identify the scroll */
 		pline_The("%s rumbles %s you!", ceiling(u.ux,u.uy),
@@ -1538,47 +1539,14 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 	    	    			!IS_ROCK(levl[x][y].typ) &&
 	    	    			!IS_AIR(levl[x][y].typ) &&
 					(x != u.ux || y != u.uy)) {
-			    (void) drop_boulder_on_monster(x, y, confused, TRUE);
+			    nboulders += drop_boulder_on_monster(x, y, confused, TRUE);
 	    	    	}
 		    }
 		}
 		/* Attack the player */
 		if (!sblessed) {
-		    int dmg;
-		    struct obj *otmp2;
-
-		    /* Okay, _you_ write this without repeating the code */
-		    otmp2 = mksobj(confused ? ROCK : BOULDER,
-				FALSE, FALSE);
-		    if (!otmp2) break;
-		    otmp2->quan = confused ? rn1(5,2) : 1;
-		    otmp2->owt = weight(otmp2);
-		    if (!amorphous(youmonst.data) &&
-				!Passes_walls &&
-				!noncorporeal(youmonst.data) &&
-				!unsolid(youmonst.data)) {
-			You("are hit by %s!", doname(otmp2));
-			dmg = dmgval(otmp2, &youmonst) * otmp2->quan;
-			if (uarmh && !scursed) {
-			    if(is_metallic(uarmh)) {
-				pline("Fortunately, you are wearing a hard helmet.");
-				if (dmg > 2) dmg = 2;
-			    } else if (flags.verbose) {
-				pline("%s does not protect you.",
-						Yname2(uarmh));
-			    }
-			}
-		    } else
-			dmg = 0;
-		    /* Must be before the losehp(), for bones files */
-		    if (!flooreffects(otmp2, u.ux, u.uy, "fall")) {
-			place_object(otmp2, u.ux, u.uy);
-			stackobj(otmp2);
-			newsym(u.ux, u.uy);
-		    }
-		    if (dmg) losehp(Maybe_Half_Phys(dmg), "scroll of earth",
-					KILLED_BY_AN);
-		}
+		    drop_boulder_on_player(confused, !scursed, TRUE, FALSE);
+		} else if (!nboulders) pline("But nothing else happens.");
 	    }
 	    break;
 	case SCR_PUNISHMENT:
@@ -1617,6 +1585,51 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 	return sobj ? 0 : 1;
 }
 
+void
+drop_boulder_on_player(confused, helmet_protects, byu, skip_uswallow)
+boolean confused;
+boolean helmet_protects;
+boolean byu;
+boolean skip_uswallow;
+{
+    int dmg;
+    struct obj *otmp2;
+
+    /* hit monster if swallowed */
+    if (u.uswallow && !skip_uswallow) {
+	drop_boulder_on_monster(u.ux, u.uy, confused, byu);
+	return;
+    }
+
+    otmp2 = mksobj(confused ? ROCK : BOULDER, FALSE, FALSE);
+    if (!otmp2) return;
+    otmp2->quan = confused ? rn1(5,2) : 1;
+    otmp2->owt = weight(otmp2);
+    if (!amorphous(youmonst.data) && !Passes_walls &&
+	!noncorporeal(youmonst.data) &&	!unsolid(youmonst.data)) {
+	You("are hit by %s!", doname(otmp2));
+	dmg = dmgval(otmp2, &youmonst) * otmp2->quan;
+	if (uarmh && helmet_protects) {
+	    if(is_metallic(uarmh)) {
+		pline("Fortunately, you are wearing a hard helmet.");
+		if (dmg > 2) dmg = 2;
+	    } else if (flags.verbose) {
+		pline("%s does not protect you.",
+		      Yname2(uarmh));
+	    }
+	}
+    } else
+	dmg = 0;
+    /* Must be before the losehp(), for bones files */
+    if (!flooreffects(otmp2, u.ux, u.uy, "fall")) {
+	place_object(otmp2, u.ux, u.uy);
+	stackobj(otmp2);
+	newsym(u.ux, u.uy);
+    }
+    if (dmg) losehp(Maybe_Half_Phys(dmg), "scroll of earth",
+		    KILLED_BY_AN);
+}
+
 boolean
 drop_boulder_on_monster(x,y, confused, byu)
 int x,y;
@@ -1646,7 +1659,12 @@ boolean byu;
 		  doname(otmp2));
 	    if (mtmp->minvis && !canspotmon(mtmp))
 		map_invisible(mtmp->mx, mtmp->my);
-	}
+	} else if (u.uswallow && mtmp == u.ustuck)
+	    You_hear("something hit %s %s over your %s!",
+		     s_suffix(mon_nam(mtmp)),
+		     mbodypart(mtmp, STOMACH),
+		     body_part(HEAD));
+
 	mdmg = dmgval(otmp2, mtmp) * otmp2->quan;
 	if (helmet) {
 	    if(is_metallic(helmet)) {
@@ -1671,6 +1689,11 @@ boolean byu;
 		mondied(mtmp);
 	    }
 	}
+    } else if (u.uswallow && mtmp == u.ustuck) {
+	obfree(otmp2, (struct obj *)0);
+	/* fall through to player */
+	drop_boulder_on_player(confused, TRUE, FALSE, TRUE);
+	return 1;
     }
     /* Drop the rock/boulder to the floor */
     if (!flooreffects(otmp2, x, y, "fall")) {
