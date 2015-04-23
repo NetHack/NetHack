@@ -1,4 +1,4 @@
-/* NetHack 3.5	display.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	display.h	$NHDT-Date: 1429757270 2015/04/23 02:47:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.19 $ */
 /* NetHack 3.5	display.h	$Date: 2009/05/06 10:44:38 $  $Revision: 1.14 $ */
 /*	SCCS Id: @(#)display.h	3.5	2005/06/21	*/
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
@@ -308,16 +308,6 @@
 	(int) (obj)->otyp + GLYPH_OBJ_OFF)
 
 
-#define obj_to_glyph_vanilla(obj)                    \
-    (Hallucination ?							      \
-	((otg_temp = random_object()) == CORPSE ?			      \
-	    random_monster() + GLYPH_BODY_OFF :				      \
-	    otg_temp + GLYPH_OBJ_OFF)	:				      \
-	((obj)->otyp == CORPSE ?					      \
-	    (int) (obj)->corpsenm + GLYPH_BODY_OFF :			      \
-	    (int) (obj)->otyp + GLYPH_OBJ_OFF))
-
-
 /* MRKR: Statues now have glyphs corresponding to the monster they    */
 /*       brepresent and look like monsters when you are hallucinating. */
 
@@ -405,8 +395,6 @@
 
 #define glyph_is_statue(glyph)						\
     ((glyph) >= GLYPH_STATUE_OFF && (glyph) < (GLYPH_STATUE_OFF+NUMMONS))
-#define GLYPH_STATUE_VANILLA  ((int) GLYPH_OBJ_OFF + STATUE)
-#define glyph_is_statue_vanilla(glyph) ( glyph == GLYPH_STATUE_VANILLA)
 
 #define glyph_is_ridden_monster(glyph)					\
     ((glyph) >= GLYPH_RIDDEN_OFF && (glyph) < (GLYPH_RIDDEN_OFF+NUMMONS))

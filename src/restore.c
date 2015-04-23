@@ -1,4 +1,4 @@
-/* NetHack 3.5	restore.c	$NHDT-Date: 1426465439 2015/03/16 00:23:59 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.77 $ */
+/* NetHack 3.5	restore.c	$NHDT-Date: 1429757270 2015/04/23 02:47:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.93 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -123,15 +123,6 @@ find_lev_obj()
 		fobjtmp = otmp->nobj;
 		place_object(otmp, otmp->ox, otmp->oy);
 	}
-
-	/* statue patch: imagine we're loading a vanilla nh file */
-	for(x=0; x<COLNO; x++) 
-          for(y=0; y<ROWNO; y++)
-            if ( level.objects[x][y] != 0 &&
-                 level.objects[x][y]->otyp == STATUE &&
-		 glyph_is_statue_vanilla(levl[x][y].glyph))  {            
-              levl[x][y].glyph = obj_to_glyph(level.objects[x][y]);
-            }
 }
 
 /* Things that were marked "in_use" when the game was saved (ex. via the
