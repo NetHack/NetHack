@@ -1,4 +1,4 @@
-/* NetHack 3.5	extern.h	$NHDT-Date: 1429666893 2015/04/22 01:41:33 $  $NHDT-Branch: master $:$NHDT-Revision: 1.467 $ */
+/* NetHack 3.5	extern.h	$NHDT-Date: 1429755449 2015/04/23 02:17:29 $  $NHDT-Branch: master $:$NHDT-Revision: 1.477 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -119,7 +119,7 @@ E void FDECL(uchangealign, (int,int));
 
 /* ### ball.c ### */
 
-E void FDECL(ballrelease, (boolean));
+E void FDECL(ballrelease, (BOOLEAN_P));
 E void NDECL(ballfall);
 E void NDECL(placebc);
 E void NDECL(unplacebc);
