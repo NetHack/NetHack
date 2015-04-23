@@ -481,8 +481,13 @@ boolean td;	/* td == TRUE : trap door or hole */
 	if (Is_stronghold(&u.uz)) {
 	    find_hell(&dtmp);
 	} else {
+	    int dist = newlevel - dunlev(&u.uz);
 	    dtmp.dnum = u.uz.dnum;
 	    dtmp.dlevel = newlevel;
+	    if (dist > 1)
+		You("fall down a %s%sshaft!",
+		    dist > 3 ? "very " : "",
+		    dist > 2 ? "deep " : "");
 	}
 	if (!td)
 	    Sprintf(msgbuf, "The hole in the %s above you closes up.",
