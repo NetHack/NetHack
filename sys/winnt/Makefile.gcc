@@ -1092,7 +1092,7 @@ $(O)guistub.o: $(HACK_H) $(MSWSYS)/stubs.c
 #if you aren't linking in the full tty then
 #include the following stub for proper linkage.
 
-$(O)ttystub.o: $(HACK_H) $(MSWSYS)/ttystub.c
+$(O)ttystub.o: $(HACK_H) $(MSWSYS)/stub.c
 	@$(cc) $(CFLAGS) -DTTYSTUB -o$@ $(MSWSYS)/stubs.c
 
 $(O)tile.o: $(SRC)/tile.c $(HACK_H)

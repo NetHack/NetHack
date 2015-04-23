@@ -1290,7 +1290,7 @@ $(O)guistub.o: $(HACK_H) $(MSWSYS)\stubs.c
 #if you aren't linking in the full tty then
 #include the following stub for proper linkage.
 
-$(O)ttystub.o: $(HACK_H) $(MSWSYS)\ttystubs.c
+$(O)ttystub.o: $(HACK_H) $(MSWSYS)\stubs.c
 	@$(cc) $(cflagsBuild) -DTTYSTUB -Fo$@ $(MSWSYS)\stubs.c
 
 # 
