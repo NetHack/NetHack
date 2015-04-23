@@ -1,4 +1,4 @@
-/* NetHack 3.5	sp_lev.c	$NHDT-Date: 1427934549 2015/04/02 00:29:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.40 $ */
+/* NetHack 3.5	sp_lev.c	$NHDT-Date: 1429755531 2015/04/23 02:18:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.50 $ */
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -50,7 +50,9 @@ STATIC_DCL struct splevstack * FDECL(splev_stack_reverse, (struct splevstack *))
 STATIC_DCL struct opvar * FDECL(opvar_new_str, (char *));
 STATIC_DCL struct opvar * FDECL(opvar_new_int, (long));
 STATIC_DCL struct opvar * FDECL(opvar_new_coord, (int, int));
+#if 0
 STATIC_DCL struct opvar * FDECL(opvar_new_region, (int,int, int,int));
+#endif /*0*/
 STATIC_DCL void FDECL(opvar_free_x, (struct opvar *));
 STATIC_DCL struct opvar * FDECL(opvar_clone, (struct opvar *));
 STATIC_DCL struct opvar * FDECL(opvar_var_conversion, (struct sp_coder *, struct opvar *));
@@ -202,7 +204,6 @@ splev_stack_init(st)
 	st->depth = 0;
 	st->depth_alloc = SPLEV_STACK_RESERVE;
 	st->stackdata = (struct opvar **)alloc(st->depth_alloc * sizeof(struct opvar *));
-	if (!st->stackdata) panic("stack init alloc");
     }
 }
 
@@ -253,7 +254,6 @@ splev_stack_push(st, v)
 
     if (st->depth >= st->depth_alloc) {
 	struct opvar **tmp = (struct opvar **)alloc((st->depth_alloc + SPLEV_STACK_RESERVE) * sizeof(struct opvar *));
-	if (!tmp) panic("stack push alloc");
 	(void)memcpy(tmp, st->stackdata, st->depth_alloc * sizeof(struct opvar *));
 	Free(st->stackdata);
 	st->stackdata = tmp;
@@ -314,14 +314,12 @@ opvar_new_str(s)
      char *s;
 {
     struct opvar *tmpov = (struct opvar *)alloc(sizeof(struct opvar));
-    if (!tmpov) panic("could not alloc opvar struct");
+
     tmpov->spovartyp = SPOVAR_STRING;
     if (s) {
 	int len = strlen(s);
 	tmpov->vardata.str = (char *)alloc(len + 1);
-	if (!tmpov->vardata.str) panic("opvar new str alloc");
-	(void)memcpy((genericptr_t)tmpov->vardata.str,
-		     (genericptr_t)s, len);
+	(void)memcpy((genericptr_t)tmpov->vardata.str, (genericptr_t)s, len);
 	tmpov->vardata.str[len] = '\0';
     } else
 	tmpov->vardata.str = NULL;
@@ -333,7 +331,7 @@ opvar_new_int(i)
      long i;
 {
     struct opvar *tmpov = (struct opvar *)alloc(sizeof(struct opvar));
-    if (!tmpov) panic("could not alloc opvar struct");
+
     tmpov->spovartyp = SPOVAR_INT;
     tmpov->vardata.l = i;
     return tmpov;
@@ -344,22 +342,24 @@ opvar_new_coord(x,y)
      int x,y;
 {
     struct opvar *tmpov = (struct opvar *)alloc(sizeof(struct opvar));
-    if (!tmpov) panic("could not alloc opvar struct");
+
     tmpov->spovartyp = SPOVAR_COORD;
     tmpov->vardata.l = SP_COORD_PACK(x,y);
     return tmpov;
 }
 
+#if 0
 struct opvar *
 opvar_new_region(x1,y1,x2,y2)
      int x1,y1,x2,y2;
 {
     struct opvar *tmpov = (struct opvar *)alloc(sizeof(struct opvar));
-    if (!tmpov) panic("could not alloc opvar struct");
+
     tmpov->spovartyp = SPOVAR_REGION;
     tmpov->vardata.l = SP_REGION_PACK(x1,y1,x2,y2);
     return tmpov;
 }
+#endif /*0*/
 
 void
 opvar_free_x(ov)
@@ -391,9 +391,9 @@ opvar_clone(ov)
      struct opvar *ov;
 {
     struct opvar *tmpov;
+
     if (!ov) panic("no opvar to clone");
     tmpov = (struct opvar *)alloc(sizeof(struct opvar));
-    if (!tmpov) panic("could not alloc opvar struct");
     tmpov->spovartyp = ov->spovartyp;
     switch (ov->spovartyp) {
     case SPOVAR_COORD:
@@ -2362,9 +2362,8 @@ sp_lev *lvl;
     int opcode;
 
     Fread((genericptr_t)&(lvl->n_opcodes), 1, sizeof(lvl->n_opcodes), fd);
-
     lvl->opcodes = (_opcode *)alloc(sizeof(_opcode) * (lvl->n_opcodes));
-    if (!lvl->opcodes) panic("sp lvl load opcodes alloc");
+
     while (n_opcode < lvl->n_opcodes) {
 
 	Fread((genericptr_t) &lvl->opcodes[n_opcode].opcode, 1,
@@ -2377,10 +2376,10 @@ sp_lev *lvl;
 	    panic("sp_level_loader: impossible opcode %i.", opcode);
 
 	if (opcode == SPO_PUSH) {
-	    struct opvar *ov = (opdat = (struct opvar *)alloc(sizeof(struct opvar)));
 	    int nsize;
+	    struct opvar *ov = (struct opvar *)alloc(sizeof(struct opvar));
 
-	    if (!ov) panic("push ov alloc");
+	    opdat = ov;
 	    ov->spovartyp = SPO_NULL;
 	    ov->vardata.l = 0;
 	    Fread((genericptr_t)&(ov->spovartyp), 1, sizeof(ov->spovartyp), fd);
@@ -2402,7 +2401,7 @@ sp_lev *lvl;
 		    char *opd;
 		    Fread((genericptr_t) &nsize, 1, sizeof(nsize), fd);
 		    opd = (char *)alloc(nsize + 1);
-		    if (!opd) panic("sp lvl load opd alloc");
+
 		    if (nsize) Fread(opd, 1, nsize, fd);
 		    opd[nsize] = 0;
 		    ov->vardata.str = opd;
@@ -2476,12 +2475,11 @@ frame_new(execptr)
      long execptr;
 {
     struct sp_frame *frame = (struct sp_frame *)alloc(sizeof(struct sp_frame));
-    if (!frame) panic("could not create execution frame.");
+
     frame->next = NULL;
     frame->variables = NULL;
     frame->n_opcode = execptr;
     frame->stack = (struct splevstack *)alloc(sizeof(struct splevstack));
-    if (!frame->stack) panic("could not create execution frame stack.");
     splev_stack_init(frame->stack);
     return frame;
 }
@@ -2617,7 +2615,6 @@ spo_message(coder)
     n = strlen(msg);
 
     levmsg = (char *) alloc(old_n+n+1);
-    if (!levmsg) panic("spo_message alloc");
     if (old_n) levmsg[old_n-1] = '\n';
     if (lev_message)
 	(void) memcpy((genericptr_t)levmsg, (genericptr_t)lev_message, old_n-1);
@@ -3609,9 +3606,9 @@ selection_do_gradient(ov, x,y, x2,y2, gtyp, mind, maxd, limit)
 	{
 	    for (dx = 0; dx < COLNO; dx++)
 		for (dy = 0; dy < ROWNO; dy++) {
-		    long d = line_dist_coord(x,y, x2,y2, dx,dy);
-		    if (d >= mind && (!limit || (d <= maxd))) {
-			if ((d - mind) > rn2(dofs))
+		    long d0 = line_dist_coord(x,y, x2,y2, dx,dy);
+		    if (d0 >= mind && (!limit || d0 <= maxd)) {
+			if (d0 - mind > rn2(dofs))
 			    selection_setpoint(dx,dy, ov, 1);
 		    }
 		}
@@ -3626,10 +3623,10 @@ selection_do_gradient(ov, x,y, x2,y2, gtyp, mind, maxd, limit)
 		    long d3 = line_dist_coord(x,y, x2,y2, x2,dy);
 		    long d4 = line_dist_coord(x,y, x2,y2, dx,y2);
 		    long d5 = line_dist_coord(x,y, x2,y2, dx,dy);
-		    long d = min(d5, min(max(d1, d2),max(d3,d4)));
+		    long d0 = min(d5, min(max(d1, d2), max(d3, d4)));
 
-		    if (d >= mind && (!limit || (d <= maxd))) {
-			if ((d - mind) > rn2(dofs))
+		    if (d0 >= mind && (!limit || d0 <= maxd)) {
+			if (d0 - mind > rn2(dofs))
 			    selection_setpoint(dx,dy, ov, 1);
 		    }
 		}
@@ -3643,7 +3640,7 @@ selection_do_line(x1,y1,x2,y2, ov) /* bresenham line algo */
      schar x1,y1,x2,y2;
      struct opvar *ov;
 {
-    int d,dx,dy,ai,bi,xi,yi;
+    int d0, dx, dy, ai, bi, xi, yi;
 
     if (x1 < x2) {
 	xi = 1;
@@ -3666,24 +3663,24 @@ selection_do_line(x1,y1,x2,y2, ov) /* bresenham line algo */
     if (dx > dy) {
 	ai = (dy - dx) * 2;
 	bi = dy * 2;
-	d  = bi - dx;
+	d0  = bi - dx;
 	do {
-	    if (d >= 0) {
+	    if (d0 >= 0) {
 		y1 += yi;
-		d += ai;
-	    } else d += bi;
+		d0 += ai;
+	    } else d0 += bi;
 	    x1 += xi;
 	    selection_setpoint(x1,y1, ov, 1);
 	} while (x1 != x2);
     } else {
 	ai = (dx - dy) * 2;
 	bi = dx * 2;
-	d  = bi - dy;
+	d0  = bi - dy;
 	do {
-	    if (d >= 0) {
+	    if (d0 >= 0) {
 		x1 += xi;
-		d += ai;
-	    } else d += bi;
+		d0 += ai;
+	    } else d0 += bi;
 	    y1 += yi;
 	    selection_setpoint(x1,y1, ov, 1);
 	} while (y1 != y2);
@@ -3904,7 +3901,7 @@ spo_levregion(coder)
 	!OV_pop_i(ix1)) return;
 
     tmplregion = (lev_region *)alloc(sizeof(lev_region));
-    if (!tmplregion) panic("levreg alloc");
+
     tmplregion->inarea.x1 = OV_i(ix1);
     tmplregion->inarea.y1 = OV_i(iy1);
     tmplregion->inarea.x2 = OV_i(ix2);
@@ -3938,7 +3935,6 @@ spo_levregion(coder)
 	/* realloc the lregion space to add the new one */
 	lev_region *newl = (lev_region *) alloc(sizeof(lev_region) *
 						(unsigned)(1+num_lregions));
-	if (!newl) panic("levreg newl alloc");
 	(void) memcpy((genericptr_t)(newl), (genericptr_t)lregions,
 		      sizeof(lev_region) * num_lregions);
 	Free(lregions);
@@ -3947,7 +3943,6 @@ spo_levregion(coder)
     } else {
 	num_lregions = 1;
 	lregions = (lev_region *) alloc(sizeof(lev_region));
-	if (!lregions) panic("lregions alloc");
     }
     (void) memcpy(&lregions[num_lregions-1], tmplregion, sizeof(lev_region));
 
@@ -4485,8 +4480,7 @@ spo_var_init(coder)
 	}
     } else {
 	/* new variable definition */
-	tmpvar = (struct splev_var *)malloc(sizeof(struct splev_var));
-	if (!tmpvar) panic("newvar tmpvar alloc");
+	tmpvar = (struct splev_var *)alloc(sizeof(struct splev_var));
 	tmpvar->next = coder->frame->variables;
 	tmpvar->name = dupstr(OV_s(vname));
 	coder->frame->variables = tmpvar;
@@ -4501,8 +4495,7 @@ copy_variable:
 	    tmpvar->array_len = tmp2->array_len;
 	    if (tmpvar->array_len) {
 		idx = tmpvar->array_len;
-		tmpvar->data.arrayvalues = (struct opvar **)malloc(sizeof(struct opvar *) * idx);
-		if (!tmpvar->data.arrayvalues) panic("tmpvar->data.arrayvalues alloc");
+		tmpvar->data.arrayvalues = (struct opvar **)alloc(sizeof(struct opvar *) * idx);
 		while (idx-- > 0) {
 		    tmpvar->data.arrayvalues[idx] = opvar_clone(tmp2->data.arrayvalues[idx]);
 		}
@@ -4515,8 +4508,7 @@ copy_variable:
 create_new_array:
 	    idx = OV_i(arraylen);
 	    tmpvar->array_len = idx;
-	    tmpvar->data.arrayvalues = (struct opvar **)malloc(sizeof(struct opvar *) * idx);
-	    if (!tmpvar->data.arrayvalues) panic("malloc tmpvar->data.arrayvalues");
+	    tmpvar->data.arrayvalues = (struct opvar **)alloc(sizeof(struct opvar *) * idx);
 	    while (idx-- > 0) {
 		OV_pop(vvalue);
 		if (!vvalue) panic("no value for arrayvariable");
@@ -4610,7 +4602,7 @@ sp_lev *lvl;
     long room_stack = 0;
     unsigned long max_execution = SPCODER_MAX_RUNTIME;
     struct sp_coder *coder = (struct sp_coder *)alloc(sizeof(struct sp_coder));
-    if (!coder) panic("coder alloc");
+
     coder->frame = frame_new(0);
     coder->stack = NULL;
     coder->premapped = FALSE;
@@ -4769,20 +4761,14 @@ sp_lev *lvl;
 			splev_stack_push(coder->stack, a);
 			opvar_free(b);
 		    } else if (OV_typ(a) == SPOVAR_STRING) {
+			struct opvar *c;
 			char *tmpbuf = (char *)alloc(strlen(OV_s(a)) + strlen(OV_s(b)) + 1);
-			if (tmpbuf) {
-			    struct opvar *c;
-			    (void) sprintf(tmpbuf, "%s%s", OV_s(a), OV_s(b));
-			    c = opvar_new_str(tmpbuf);
-			    splev_stack_push(coder->stack, c);
-			    opvar_free(a);
-			    opvar_free(b);
-			    Free(tmpbuf);
-			} else {
-			    splev_stack_push(coder->stack, a);
-			    opvar_free(b);
-			    impossible("malloc at str concat");
-			}
+			(void) sprintf(tmpbuf, "%s%s", OV_s(a), OV_s(b));
+			c = opvar_new_str(tmpbuf);
+			splev_stack_push(coder->stack, c);
+			opvar_free(a);
+			opvar_free(b);
+			Free(tmpbuf);
 		    } else {
 			splev_stack_push(coder->stack, a);
 			opvar_free(b);
@@ -5208,7 +5194,6 @@ const char *name;
 	    goto give_up;
 	}
 	lvl = (sp_lev *)alloc(sizeof(sp_lev));
-	if (!lvl) panic("alloc sp_lev");
 	result = sp_level_loader(fd, lvl);
 	(void)dlb_fclose(fd);
 	if (result) result = sp_level_coder(lvl);

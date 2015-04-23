@@ -1,4 +1,4 @@
-/* NetHack 3.5	extern.h	$NHDT-Date: 1429666893 2015/04/22 01:41:33 $  $NHDT-Branch: master $:$NHDT-Revision: 1.467 $ */
+/* NetHack 3.5	extern.h	$NHDT-Date: 1429755449 2015/04/23 02:17:29 $  $NHDT-Branch: master $:$NHDT-Revision: 1.477 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -119,7 +119,7 @@ E void FDECL(uchangealign, (int,int));
 
 /* ### ball.c ### */
 
-E void FDECL(ballrelease, (boolean));
+E void FDECL(ballrelease, (BOOLEAN_P));
 E void NDECL(ballfall);
 E void NDECL(placebc);
 E void NDECL(unplacebc);
@@ -1870,6 +1870,7 @@ E void FDECL(forget_levels, (int));
 E void NDECL(forget_traps);
 E void FDECL(forget_map, (int));
 E int FDECL(seffects, (struct obj *));
+E void FDECL(drop_boulder_on_player, (BOOLEAN_P, BOOLEAN_P, BOOLEAN_P, BOOLEAN_P));
 E boolean FDECL(drop_boulder_on_monster, (int, int, BOOLEAN_P, BOOLEAN_P));
 E void FDECL(wand_explode, (struct obj *,int));
 #ifdef USE_TRAMPOLI

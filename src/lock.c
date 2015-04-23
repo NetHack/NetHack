@@ -1,4 +1,4 @@
-/* NetHack 3.5	lock.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	lock.c	$NHDT-Date: 1429755451 2015/04/23 02:17:31 $  $NHDT-Branch: master $:$NHDT-Revision: 1.56 $ */
 /* NetHack 3.5	lock.c	$Date: 2014/09/20 00:32:01 $  $Revision: 1.39 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -546,10 +546,8 @@ int
 doopen_indir(x, y)             /* try to open a door in direction u.dx/u.dy */
 int x, y;
 {
-
 	coord cc;
 	register struct rm *door;
-	struct monst *mtmp;
 	boolean portcullis;
 	int res = 0;
 
