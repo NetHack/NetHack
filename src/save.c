@@ -1,4 +1,4 @@
-/* NetHack 3.5	save.c	$NHDT-Date: 1426496455 2015/03/16 09:00:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.62 $ */
+/* NetHack 3.5	save.c	$NHDT-Date: 1429757271 2015/04/23 02:47:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.82 $ */
 /* NetHack 3.5	save.c	$Date: 2012/02/16 02:40:24 $  $Revision: 1.53 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -81,23 +81,6 @@ static long nulls[sizeof(struct trap) + sizeof(struct fruit)];
 #else
 #define HUP
 #endif
-
-
-/* compute object glyphs for vanilla nethack -- statue patch */
-void
-make_glyphs_vanilla(lev)
-xchar lev;
-{
-  int x,y;
-      
-  for (x = 0; x < COLNO; x++)         
-    for (y = 0; y < ROWNO; y++)
-      if ( level.objects[x][y] != 0 &&
-           level.objects[x][y]->otyp == STATUE &&
-           glyph_is_statue(levl[x][y].glyph))  
-             levl[x][y].glyph = obj_to_glyph_vanilla(level.objects[x][y]);
-}
-
 
 /* need to preserve these during save to avoid accessing freed memory */
 static unsigned ustuck_id = 0, usteed_id = 0;
@@ -487,20 +470,16 @@ int mode;
 	short tlev;
 #endif
 
-        /* make remembered glyphs correct fo rloading into vanilla nh */
-        make_glyphs_vanilla(lev);  
-
 	/* if we're tearing down the current level without saving anything
 	   (which happens upon entrance to the endgame or after an aborted
 	   restore attempt) then we don't want to do any actual I/O */
 	if (mode == FREE_SAVE) goto skip_lots;
-	if (iflags.purge_monsters) {
-		/* purge any dead monsters (necessary if we're starting
-		 * a panic save rather than a normal one, or sometimes
-		 * when changing levels without taking time -- e.g.
-		 * create statue trap then immediately level teleport) */
-		dmonsfree();
-	}
+
+	/* purge any dead monsters (necessary if we're starting
+	   a panic save rather than a normal one, or sometimes
+	   when changing levels without taking time -- e.g.
+	   create statue trap then immediately level teleport) */
+	if (iflags.purge_monsters) dmonsfree();
 
 	if(fd < 0) panic("Save on bad file!");	/* impossible */
 #ifdef MFLOPPY
