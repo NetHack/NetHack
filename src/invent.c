@@ -710,12 +710,37 @@ register int type;
     return((struct obj *) 0);
 }
 
+/** Fictional and not-so-fictional currencies.
+ * http://concord.wikia.com/wiki/List_of_Fictional_Currencies */
+static const char * const currencies[] = {
+	"Altarian Dollar",	/* The Hitchhiker's Guide to the Galaxy */
+	"Ankh-Morpork Dollar",	/* Discworld */
+	"auric",		/* The Domination of Draka */
+	"buckazoid",		/* Space Quest */
+	"cirbozoid",		/* Starslip */
+	"credit chit",		/* Deus Ex */
+	"cubit",		/* Battlestar Galactica */
+	"Flanian Pobble Bead",	/* The Hitchhiker's Guide to the Galaxy */
+	"fretzer",		/* Jules Verne */
+	"imperial credit",	/* Star Wars */
+	"Hong Kong Luna Dollar",/* The Moon is a Harsh Mistress */
+	"kongbuck",		/* Snow Crash */
+	"nanite",		/* System Shock 2 */
+	"quatloo",		/* Sim City */
+	"simoleon",		/* Sim City */
+	"solari",		/* Spaceballs */
+	"spacebuck",		/* Spaceballs */
+	"sporebuck",		/* Spore */
+	"Triganic Pu",		/* The Hitchhiker's Guide to the Galaxy */
+	"woolong",		/* Cowboy Bebop */
+};
+
 const char *
 currency(amount)
 long amount;
 {
-    if (amount == 1L) return "zorkmid";
-    else return "zorkmids";
+    if (amount == 1L) return (Hallucination ? currencies[rn2(SIZE(currencies))] : "zorkmid");
+    else return (Hallucination ? makeplural(currencies[rn2(SIZE(currencies))]) : "zorkmids");
 }
 
 boolean
