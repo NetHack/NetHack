@@ -350,7 +350,7 @@ int psflags;
 		monsterpoly = (psflags == 2),
 		draconian = (uarm && Is_dragon_armor(uarm)),
 		iswere = (u.ulycn >= LOW_PM),
-		isvamp = (youmonst.data->mlet == S_VAMPIRE),
+		isvamp = is_vampire(youmonst.data),
 		controllable_poly = Polymorph_control && !(Stunned || Unaware);
 
 	if (Unchanging) {
@@ -730,7 +730,7 @@ int	mntmp;
 		pline(use_thec,monsterc,"emit a mental blast");
 	    if (youmonst.data->msound == MS_SHRIEK) /* worthless, actually */
 		pline(use_thec,monsterc,"shriek");
-	    if (youmonst.data->mlet == S_VAMPIRE)
+	    if (is_vampire(youmonst.data))
 		pline(use_thec,monsterc,"change shape");
 
 	    if (lays_eggs(youmonst.data) && flags.female)
@@ -1386,9 +1386,8 @@ dohide()
 int
 dopoly()
 {
-	boolean isvampire = youmonst.data->mlet == S_VAMPIRE;
 	struct permonst *savedat = youmonst.data;
-	if (isvampire) {
+	if (is_vampire(youmonst.data)) {
 		polyself(2);
 		if (savedat != youmonst.data) {
 			You("transform into %s.", an(youmonst.data->mname));
