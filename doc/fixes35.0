@@ -1127,6 +1127,7 @@ Some levels in Gehennom now use the old corridor-style maze instead of
     the new room-style. Beelzebub's level always does this and the
     "beetle legs" are restored.
 gnomes will occasionally have a candle
+stop travel or run when you get hungry
 
 
 Platform- and/or Interface-Specific New Features
