@@ -113,17 +113,42 @@ onscary(x, y, mtmp)
 int x, y;
 struct monst *mtmp;
 {
-	if (mtmp->isshk || mtmp->isgd || mtmp->iswiz || !mtmp->mcansee ||
-	    mtmp->mpeaceful || mtmp->data->mlet == S_HUMAN ||
-	    is_lminion(mtmp) || mtmp->data == &mons[PM_ANGEL] ||
-	    is_rider(mtmp->data) || mtmp->data == &mons[PM_MINOTAUR])
-		return(FALSE);
+        boolean epresent = sengr_at("Elbereth", x, y, TRUE);
+         
+        /* creatures who are directly resistant to magical scaring:
+         * Rodney, lawful minions, angels, the Riders
+         */
+        if (mtmp->iswiz || is_lminion(mtmp) 
+                        || mtmp->data == &mons[PM_ANGEL]
+                        || is_rider(mtmp->data))
+                return(FALSE);
 
-	return (boolean)(sobj_at(SCR_SCARE_MONSTER, x, y) ||
-			 sengr_at("Elbereth", x, y) ||
-			 (IS_ALTAR(levl[x][y].typ) &&
-			    (mtmp->data->mlet == S_VAMPIRE ||
-			     is_vampshifter(mtmp))));
+        /* creatures who don't (or can't) fear a written Elbereth:
+         * all the above plus shopkeepers, guards, blind or 
+         * peaceful monsters, humans, and minotaurs.
+         *
+         * Elbereth doesn't work in Gehennom, the Elemental Planes, or the
+         * Astral Plane; the influence of the Valar only reaches so far.
+         */
+        if (epresent && (mtmp->isshk || mtmp->isgd || !mtmp->mcansee 
+                        || mtmp->mpeaceful || mtmp->data->mlet == S_HUMAN 
+                        || mtmp->data == &mons[PM_MINOTAUR] 
+                        || Inhell || In_endgame(&u.uz)))
+                return(FALSE);
+
+        /* should this still be true for defiled/molochian altars? */
+        if (IS_ALTAR(levl[x][y].typ) && (mtmp->data->mlet == S_VAMPIRE 
+                        || is_vampshifter(mtmp)))
+                return(TRUE);
+
+        /* if the player isn't actually on the square OR the player's image
+         * isn't displaced to the square, no protection is being granted
+         *
+         * the scare monster scroll, though, is quite powerful.
+         */
+        return (boolean)(sobj_at(SCR_SCARE_MONSTER, x, y) 
+                        || (epresent && ((u.ux == x && u.uy == y)
+                                || (Displaced && mtmp->mux == x && mtmp->muy == y))));
 }
 
 /* regenerate lost hit points */

@@ -652,7 +652,7 @@ E void FDECL(cant_reach_floor, (int,int,BOOLEAN_P,BOOLEAN_P));
 E const char *FDECL(surface, (int,int));
 E const char *FDECL(ceiling, (int,int));
 E struct engr *FDECL(engr_at, (XCHAR_P,XCHAR_P));
-E int FDECL(sengr_at, (const char *,XCHAR_P,XCHAR_P));
+E int FDECL(sengr_at, (const char *,XCHAR_P,XCHAR_P,BOOLEAN_P));
 E void FDECL(u_wipe_engr, (int));
 E void FDECL(wipe_engr_at, (XCHAR_P,XCHAR_P,XCHAR_P));
 E void FDECL(read_engr_at, (int,int));
