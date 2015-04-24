@@ -1,4 +1,4 @@
-/* NetHack 3.5	pager.c	$NHDT-Date: 1429842296 2015/04/24 02:24:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.63 $ */
+/* NetHack 3.5	pager.c	$NHDT-Date: 1429867083 2015/04/24 09:18:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.64 $ */
 /* NetHack 3.5	pager.c	$Date: 2012/01/15 09:27:06 $  $Revision: 1.41 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -302,6 +302,7 @@ checkfile(inp, pm, user_typed_name, without_asking)
     unsigned long txt_offset;
     int chk_skip;
     boolean found_in_file = FALSE, skipping_entry = FALSE;
+    winid datawin = WIN_ERR;
 
     fp = dlb_fopen(DATAFILE, "r");
     if (!fp) {
@@ -358,12 +359,8 @@ checkfile(inp, pm, user_typed_name, without_asking)
 	 * will usually be found under their name, rather than under their
 	 * object type, so looking for a singular form is pointless.
 	 */
-
 	if (!alt)
 	    alt = makesingular(dbase_str);
-	else
-	    if (user_typed_name)
-		(void) lcase(alt);
 
 	/* skip first record; read second */
 	txt_offset = 0L;
@@ -410,14 +407,15 @@ checkfile(inp, pm, user_typed_name, without_asking)
 	    if (!dlb_fgets(buf, BUFSZ, fp)) goto bad_data_file;
 	} while (!digit(*buf));
 	if (sscanf(buf, "%ld,%d\n", &entry_offset, &entry_count) < 2) {
-bad_data_file:	impossible("'data' file in wrong format");
-		(void) dlb_fclose(fp);
-		return;
+ bad_data_file:
+	    impossible("'data' file in wrong format or corrupted");
+	    /* window will exist if we came here from below via 'goto' */
+	    if (datawin != WIN_ERR) destroy_nhwindow(datawin);
+	    (void) dlb_fclose(fp);
+	    return;
 	}
 
 	if (user_typed_name || without_asking || yn("More info?") == 'y') {
-	    winid datawin;
-
 	    if (dlb_fseek(fp, (long)txt_offset + entry_offset, SEEK_SET) < 0) {
 		pline("? Seek error on 'data' file!");
 		(void) dlb_fclose(fp);
