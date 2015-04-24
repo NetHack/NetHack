@@ -1,4 +1,4 @@
-/* NetHack 3.5	pager.c	$NHDT-Date: 1429408230 2015/04/19 01:50:30 $  $NHDT-Branch: master $:$NHDT-Revision: 1.62 $ */
+/* NetHack 3.5	pager.c	$NHDT-Date: 1429888966 2015/04/24 15:22:46 $  $NHDT-Branch: master $:$NHDT-Revision: 1.65 $ */
 /* NetHack 3.5	pager.c	$Date: 2012/01/15 09:27:06 $  $Revision: 1.41 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -302,6 +302,7 @@ checkfile(inp, pm, user_typed_name, without_asking)
     unsigned long txt_offset;
     int chk_skip;
     boolean found_in_file = FALSE, skipping_entry = FALSE;
+    winid datawin = WIN_ERR;
 
     fp = dlb_fopen(DATAFILE, "r");
     if (!fp) {
@@ -332,6 +333,8 @@ checkfile(inp, pm, user_typed_name, without_asking)
 	dbase_str += 9;
     if (!strncmp(dbase_str, "invisible ", 10))
 	dbase_str += 10;
+    if (!strncmp(dbase_str, "saddled ", 8))
+	dbase_str += 8;
     if (!strncmp(dbase_str, "statue of ", 10))
 	dbase_str[6] = '\0';
     else if (!strncmp(dbase_str, "figurine of ", 12))
@@ -356,12 +359,8 @@ checkfile(inp, pm, user_typed_name, without_asking)
 	 * will usually be found under their name, rather than under their
 	 * object type, so looking for a singular form is pointless.
 	 */
-
 	if (!alt)
 	    alt = makesingular(dbase_str);
-	else
-	    if (user_typed_name)
-		(void) lcase(alt);
 
 	/* skip first record; read second */
 	txt_offset = 0L;
@@ -408,14 +407,15 @@ checkfile(inp, pm, user_typed_name, without_asking)
 	    if (!dlb_fgets(buf, BUFSZ, fp)) goto bad_data_file;
 	} while (!digit(*buf));
 	if (sscanf(buf, "%ld,%d\n", &entry_offset, &entry_count) < 2) {
-bad_data_file:	impossible("'data' file in wrong format");
-		(void) dlb_fclose(fp);
-		return;
+ bad_data_file:
+	    impossible("'data' file in wrong format or corrupted");
+	    /* window will exist if we came here from below via 'goto' */
+	    if (datawin != WIN_ERR) destroy_nhwindow(datawin);
+	    (void) dlb_fclose(fp);
+	    return;
 	}
 
 	if (user_typed_name || without_asking || yn("More info?") == 'y') {
-	    winid datawin;
-
 	    if (dlb_fseek(fp, (long)txt_offset + entry_offset, SEEK_SET) < 0) {
 		pline("? Seek error on 'data' file!");
 		(void) dlb_fclose(fp);
@@ -676,7 +676,7 @@ do_look(mode, click_cc)
 {
     boolean quick = (mode == 1); /* use cursor && don't search for "more info" */
     boolean clicklook = (mode == 2); /* right mouse-click method */
-    char    out_str[BUFSZ];
+    char    out_str[BUFSZ] = {0};
     const char *firstmatch = 0;
     struct permonst *pm = 0;
     int     i = '\0', ans = 0;

@@ -618,6 +618,15 @@ register struct	monst	*mtmp;
 			(void)mongets(mtmp, WAN_FIRE);
 		}
 		break;
+	    case S_GNOME:
+		if (!rn2((In_mines(&u.uz) ? 5 : 10))) {
+		    otmp = mksobj(rn2(4) ? TALLOW_CANDLE : WAX_CANDLE, TRUE, FALSE);
+		    otmp->quan = 1;
+		    otmp->owt = weight(otmp);
+		    if (!mpickobj(mtmp, otmp) && !levl[mtmp->mx][mtmp->my].lit)
+			begin_burn(otmp, FALSE);
+		}
+		break;
 	    default:
 		break;
 	}

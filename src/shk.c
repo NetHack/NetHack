@@ -27,6 +27,7 @@ STATIC_VAR NEARDATA long int followmsg;	/* last time of follow message */
 STATIC_VAR const char and_its_contents[] = " and its contents";
 STATIC_VAR const char the_contents_of[] = "the contents of ";
 
+STATIC_DCL void FDECL(append_honorific, (char *));
 STATIC_DCL void FDECL(setpaid, (struct monst *));
 STATIC_DCL long FDECL(addupbill, (struct monst *));
 STATIC_DCL void FDECL(pacify_shk, (struct monst *));
@@ -2343,23 +2344,13 @@ boolean ininv, dummy, silent;
 		      The(xname(obj)), ltmp, currency(ltmp),
 		      (obj->quan > 1L) ? " each" : "");
 	    } else {
-		/* (chooses among [0]..[3] normally; [1]..[4] after the
-		   Wizard has been killed or invocation ritual performed) */
-		static const char * const honored[] = {
-		    "good", "honored", "most gracious", "esteemed",
-		    "most renowned and sacred"
-		};
 		long save_quan = obj->quan;
 
 		Strcpy(buf, "\"For you, ");
 		if (ANGRY(shkp)) {
 		    Strcat(buf, "scum;");
 		} else {
-		    int idx = rn2(SIZE(honored) - 1) + u.uevent.udemigod;
-
-		    Strcat(buf, honored[idx]);
-		    Strcat(buf, !is_human(youmonst.data) ? " creature" :
-				(flags.female) ? " lady" : " sir");
+		    append_honorific(buf);
 		    Strcat(buf, "; only");
 		}
 		obj->quan = 1L; /* fool xname() into giving singular */
@@ -2382,6 +2373,26 @@ boolean ininv, dummy, silent;
 				(obj->quan > 1L) ? " each" : "");
 	    else pline("%s does not notice.", Monnam(shkp));
 	}
+}
+
+void
+append_honorific(buf)
+char *buf;
+{
+    /* (chooses among [0]..[3] normally; [1]..[4] after the
+       Wizard has been killed or invocation ritual performed) */
+    static const char * const honored[] = {
+	"good", "honored", "most gracious", "esteemed",
+	"most renowned and sacred"
+    };
+    Strcat(buf, honored[rn2(SIZE(honored) - 1) + u.uevent.udemigod]);
+    if (is_vampire(youmonst.data))
+	Strcat(buf, (flags.female) ? " dark lady" : " dark lord");
+    else if (is_elf(youmonst.data))
+	Strcat(buf,(flags.female) ? " hiril" : " hir");
+    else
+	Strcat(buf, !is_human(youmonst.data) ? " creature" :
+	       (flags.female) ? " lady" : " sir");
 }
 
 void

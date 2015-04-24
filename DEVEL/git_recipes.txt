@@ -1,6 +1,7 @@
 Git has a messy learning curve. This file is an attempt to serve as a quick
 reference for basic tasks while you get up to speed.
 
+$NHDT-Date: 1429884051 2015/04/24 14:00:51 $
 ------------------------
 
 [*] git checkout [-f] (branch)

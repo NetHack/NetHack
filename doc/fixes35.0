@@ -902,6 +902,7 @@ camera may contain a picture-painting demon
 some monsters can eat through iron bars
 inaccessible niches occasionally have iron bars in front
 sinks may teleport or polymorph
+shopkeepers give honorifics to vampires and elves
 
 
 Platform- and/or Interface-Specific Fixes
@@ -1125,6 +1126,8 @@ tribute to Terry Pratchett
 Some levels in Gehennom now use the old corridor-style maze instead of
     the new room-style. Beelzebub's level always does this and the
     "beetle legs" are restored.
+gnomes will occasionally have a candle
+stop travel or run when you get hungry
 
 
 Platform- and/or Interface-Specific New Features

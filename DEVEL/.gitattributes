@@ -1,4 +1,4 @@
-Developer.txt NHSUBST
+*.txt NHSUBST
 nhgitset.pl NHSUBST
 hooksdir/* NHSUBST
 * text=auto
