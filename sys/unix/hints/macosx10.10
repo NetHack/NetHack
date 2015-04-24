@@ -1,12 +1,12 @@
 #
-# NetHack 3.5  macosx10.7 $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
-# NetHack 3.5  macosx10.7 $Date: 2012/01/18 22:32:24 $  $Revision: 1.4 $
+# NetHack 3.5  macosx10.10 $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+# NetHack 3.5  macosx10.10 $Date: 2012/01/18 22:32:24 $  $Revision: 1.4 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2009.
 # NetHack may be freely redistributed.  See license for details.
 #
 #-PRE
 # Mac OS X (Darwin) hints file
-# This is for Mac OS X 10.7.2.  If this doesn't work for some other version
+# This is for Mac OS X 10.10.3.  If this doesn't work for some other version
 # of Mac OS X, make a new file for that OS, don't change this one.  And
 # let us know about it.
 # Useful info: http://www.opensource.apple.com/darwinsource/index.html
@@ -16,7 +16,7 @@
 
 # 1. Which window system(s) should be included in this binary?
 WANT_WIN_TTY=1
-#WANT_WIN_X11=1
+WANT_WIN_X11=1
 #WANT_WIN_QT=1
 
 # 1a. What is the default window system?
