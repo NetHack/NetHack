@@ -1,4 +1,4 @@
-/* NetHack 3.5	pager.c	$NHDT-Date: 1429408230 2015/04/19 01:50:30 $  $NHDT-Branch: master $:$NHDT-Revision: 1.62 $ */
+/* NetHack 3.5	pager.c	$NHDT-Date: 1429842296 2015/04/24 02:24:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.63 $ */
 /* NetHack 3.5	pager.c	$Date: 2012/01/15 09:27:06 $  $Revision: 1.41 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -332,6 +332,8 @@ checkfile(inp, pm, user_typed_name, without_asking)
 	dbase_str += 9;
     if (!strncmp(dbase_str, "invisible ", 10))
 	dbase_str += 10;
+    if (!strncmp(dbase_str, "saddled ", 8))
+	dbase_str += 8;
     if (!strncmp(dbase_str, "statue of ", 10))
 	dbase_str[6] = '\0';
     else if (!strncmp(dbase_str, "figurine of ", 12))
