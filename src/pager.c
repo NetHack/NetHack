@@ -1,4 +1,4 @@
-/* NetHack 3.5	pager.c	$NHDT-Date: 1429867083 2015/04/24 09:18:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.64 $ */
+/* NetHack 3.5	pager.c	$NHDT-Date: 1429888966 2015/04/24 15:22:46 $  $NHDT-Branch: master $:$NHDT-Revision: 1.65 $ */
 /* NetHack 3.5	pager.c	$Date: 2012/01/15 09:27:06 $  $Revision: 1.41 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -676,7 +676,7 @@ do_look(mode, click_cc)
 {
     boolean quick = (mode == 1); /* use cursor && don't search for "more info" */
     boolean clicklook = (mode == 2); /* right mouse-click method */
-    char    out_str[BUFSZ];
+    char    out_str[BUFSZ] = {0};
     const char *firstmatch = 0;
     struct permonst *pm = 0;
     int     i = '\0', ans = 0;
