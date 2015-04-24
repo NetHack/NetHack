@@ -4,7 +4,7 @@
  |___/\___|\_/\___|_\___/ .__/\___|_|  
                         |_|            
 
-$NHDT-Date$
+$NHDT-Date: 1429881078 2015/04/24 13:11:18 $
 
 Welcome to the NetHack Infrastructure Developer's Guide.
 
