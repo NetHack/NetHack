@@ -1,4 +1,4 @@
-/* NetHack 3.5	hacklib.c	$NHDT-Date: 1428806394 2015/04/12 02:39:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.34 $ */
+/* NetHack 3.5	hacklib.c	$NHDT-Date: 1429953063 2015/04/25 09:11:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.38 $ */
 /* NetHack 3.5	hacklib.c	$Date: 2009/05/06 10:46:32 $  $Revision: 1.23 $ */
 /*	SCCS Id: @(#)hacklib.c	3.5	2007/04/30	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
@@ -135,6 +135,7 @@ char *bp;
     boolean was_space = TRUE;
 
     for (p = p2 = bp; (c = *p) != '\0'; p++) {
+	if (c == '\n') break;	/* treat newline the same as end-of-string */
 	if (c == '\t') c = ' ';
 	if (c != ' ' || !was_space) *p2++ = c;
 	was_space = (c == ' ');

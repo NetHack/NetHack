@@ -1348,6 +1348,7 @@ proceed:
 	/* now check items on bill */
 	if (eshkp->billct) {
 	    register boolean itemize;
+	    int iprompt;
             umoney = money_cnt(invent);
 	    if (!umoney && !eshkp->credit) {
 		You("%shave no money or credit%s.",
@@ -1365,7 +1366,9 @@ proceed:
 
 	    /* this isn't quite right; it itemizes without asking if the
 	     * single item on the bill is partly used up and partly unpaid */
-	    itemize = (eshkp->billct > 1 ? yn("Itemized billing?") == 'y' : 1);
+	    iprompt = (eshkp->billct > 1 ? ynq("Itemized billing?") : 'y');
+	    itemize = (iprompt == 'y');
+	    if (iprompt == 'q') goto thanks;
 
 	    for (pass = 0; pass <= 1; pass++) {
 		tmp = 0;

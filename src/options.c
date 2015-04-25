@@ -1,4 +1,4 @@
-/* NetHack 3.5	options.c	$NHDT-Date: 1429675568 2015/04/22 04:06:08 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.187 $ */
+/* NetHack 3.5	options.c	$NHDT-Date: 1429953065 2015/04/25 09:11:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.186 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -543,7 +543,7 @@ boolean val_allowed;
 		       *q = index(user_string, '=');
 
 	    if (!p || (q && q < p)) p = q;
-	    while(p && p > user_string && isspace(*(p-1))) p--;
+	    while (p && p > user_string && isspace((uchar)*(p-1))) p--;
 	    if (p) len = (int)(p - user_string);
 	}
 
@@ -1175,7 +1175,7 @@ char *str;
 
     tmps = cs;
     tmps++;
-    while (*tmps && isspace(*tmps)) tmps++;
+    while (*tmps && isspace((uchar)*tmps)) tmps++;
 
     for (i = 0; i < SIZE(colornames); i++)
 	if (strstri(tmps, colornames[i].name) == tmps) {
@@ -1190,7 +1190,7 @@ char *str;
     tmps = strchr(str, '&');
     if (tmps) {
 	tmps++;
-	while (*tmps && isspace(*tmps)) tmps++;
+	while (*tmps && isspace((uchar)*tmps)) tmps++;
 	for (i = 0; i < SIZE(attrnames); i++)
 	    if (strstri(tmps, attrnames[i].name) == tmps) {
 		a = attrnames[i].attr;
@@ -1204,7 +1204,7 @@ char *str;
     tmps = str;
     if ((*tmps == '"') || (*tmps == '\'')) {
 	cs--;
-	while (isspace(*cs)) cs--;
+	while (isspace((uchar)*cs)) cs--;
 	if (*cs == *tmps) {
 	    *cs = '\0';
 	    tmps++;
@@ -1280,9 +1280,9 @@ boolean tinitial, tfrom_file;
 	}
 
 	/* strip leading and trailing white space */
-	while (isspace(*opts)) opts++;
+	while (isspace((uchar)*opts)) opts++;
 	op = eos(opts);
-	while (--op >= opts && isspace(*op)) *op = '\0';
+	while (--op >= opts && isspace((uchar)*op)) *op = '\0';
 
 	if (!*opts) return;
 	negated = FALSE;
@@ -4114,8 +4114,7 @@ const char *mapping;
 		ape->pattern = (char *) alloc(textsize+1);
 		Strcpy(ape->pattern, text2);
 		ape->grab = grab;
-		if (!*apehead) ape->next = (struct autopickup_exception *)0;
-		else ape->next = *apehead;
+		ape->next = *apehead;
 		*apehead = ape;
 	} else {
 	    raw_print("syntax error in AUTOPICKUP_EXCEPTION");
@@ -4206,7 +4205,7 @@ parsesymbols(opts)
 register char *opts;
 {
 	int val;
-	char *op, *symname, *strval, *p;
+	char *op, *symname, *strval;
 	struct symparse *symp;
 
 	if ((op = index(opts, ',')) != 0) {
@@ -4217,18 +4216,13 @@ register char *opts;
 	/* S_sample:string */
 	symname = opts;
 	strval = index(opts, ':');
-	if (!symname || !strval) return;
-	*strval++ = 0;
+	if (!strval) strval = index(opts, '=');
+	if (!strval) return;
+	*strval++ = '\0';
 
-	/* strip leading and trailing white space from symname */
-	while (isspace(*symname)) symname++;
-	p = eos(symname);
-	while (--p >= symname && isspace(*p)) *p = '\0';
-
-	/* strip leading and trailing white space from strval */
-	while (isspace(*strval)) strval++;
-	p = eos(strval);
-	while (--p >= strval && isspace(*p)) *p = '\0';
+	/* strip leading and trailing white space from symname and strval */
+	mungspaces(symname);
+	mungspaces(strval);
 
 	symp = match_sym(symname);
 	if (!symp) return;
@@ -4249,8 +4243,12 @@ char *buf;
 	struct symparse *sp = loadsyms;
 
 	if (!p || (q && q < p)) p = q;
-	while(p && p > buf && isspace(*(p-1))) p--;
-	if (p) len = (int)(p - buf);
+	if (p) {
+	    /* note: there will be at most one space before the '='
+	       because caller has condensed buf[] with mungspaces() */
+	    if (p > buf && p[-1] == ' ') p--;
+	    len = (int)(p - buf);
+	}
 	while(sp->range) {
 	    if ((len >= strlen(sp->name)) && !strncmpi(buf, sp->name, len))
 		return sp;
@@ -4423,7 +4421,7 @@ struct fruit *replace_fruit;
 
 		    for(c = pl_fruit; *c >= '0' && *c <= '9'; c++)
 			;
-		    if (isspace(*c) || *c == 0) numeric = TRUE;
+		    if (isspace((uchar)*c) || *c == 0) numeric = TRUE;
 		}
 		if (found || numeric ||
 		    !strncmp(str, "cursed ", 7) ||
@@ -4846,34 +4844,34 @@ char *op;
 		wn = tfg = tbg = (char *)0;
 
 		/* until first non-space in case there's leading spaces - before colorname*/
-		while(*newop && isspace(*newop)) newop++;
+		if (*newop == ' ') newop++;
 		if (*newop) wn = newop;
 		else return 0;
 
 		/* until first space - colorname*/
-		while(*newop && !isspace(*newop)) newop++;
+		while (*newop && *newop != ' ') newop++;
 		if (*newop) *newop = '\0';
 		else return 0;
 		newop++;
 
 		/* until first non-space - before foreground*/
-		while(*newop && isspace(*newop)) newop++;
+		if (*newop == ' ') newop++;
 		if (*newop) tfg = newop;
 		else return 0;
 
 		/* until slash - foreground */
-		while(*newop && *newop != '/') newop++;
+		while (*newop && *newop != '/') newop++;
 		if (*newop) *newop = '\0';
 		else return 0;
 		newop++;
 
 		/* until first non-space (in case there's leading space after slash) - before background */
-		while(*newop && isspace(*newop)) newop++;
+		if (*newop == ' ') newop++;
 		if (*newop) tbg = newop;
 		else return 0;
 
 		/* until first space - background */
-		while(*newop && !isspace(*newop)) newop++;
+		while (*newop && *newop != ' ') newop++;
 		if (*newop) *newop++ = '\0';
 
 		for (j = 0; j < 4; ++j) {

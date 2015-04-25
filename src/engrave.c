@@ -1,11 +1,10 @@
-/* NetHack 3.5	engrave.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	engrave.c	$NHDT-Date: 1429953062 2015/04/25 09:11:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.47 $ */
 /* NetHack 3.5	engrave.c	$Date: 2012/12/20 01:48:36 $  $Revision: 1.39 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 #include "lev.h"
-#include <ctype.h>
 
 STATIC_VAR NEARDATA struct engr *head_engr;
 
@@ -973,10 +972,13 @@ doengrave()
 	/* Prompt for engraving! */
 	Sprintf(qbuf,"What do you want to %s the %s here?", everb, eloc);
 	getlin(qbuf, ebuf);
+	/* convert tabs to spaces and condense consecutive spaces to one */
+	mungspaces(ebuf);
 
 	/* Count the actual # of chars engraved not including spaces */
 	len = strlen(ebuf);
-	for (sp = ebuf; *sp; sp++) if (isspace(*sp)) len -= 1;
+	for (sp = ebuf; *sp; sp++)
+	    if (*sp == ' ') len -= 1;
 
 	if (len == 0 || index(ebuf, '\033')) {
 	    if (zapwand) {
@@ -997,7 +999,7 @@ doengrave()
 	/* Mix up engraving if surface or state of mind is unsound.
 	   Note: this won't add or remove any spaces. */
 	for (sp = ebuf; *sp; sp++) {
-	    if (isspace(*sp)) continue;
+	    if (*sp == ' ') continue;
 	    if (((type == DUST || type == ENGR_BLOOD) && !rn2(25)) ||
 		    (Blind && !rn2(11)) || (Confusion && !rn2(7)) ||
 		    (Stunned && !rn2(4)) || (Hallucination && !rn2(2)))
@@ -1081,7 +1083,7 @@ doengrave()
 	/* Chop engraving down to size if necessary */
 	if (len > maxelen) {
 	    for (sp = ebuf; (maxelen && *sp); sp++)
-		if (!isspace(*sp)) maxelen--;
+		if (*sp == ' ') maxelen--;
 	    if (!maxelen && *sp) {
 		*sp = (char)0;
 		if (multi) nomovemsg = "You cannot write any more.";

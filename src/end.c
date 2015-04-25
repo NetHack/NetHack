@@ -1,4 +1,4 @@
-/* NetHack 3.5	end.c	$NHDT-Date: 1425319883 2015/03/02 18:11:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.81 $ */
+/* NetHack 3.5	end.c	$NHDT-Date: 1429953061 2015/04/25 09:11:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.93 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1604,10 +1604,11 @@ wordcount(p)
     char *p;
 {
     int words = 0;
-    while(*p){
-	while(*p && isspace(*p))p++;
-	if(*p) words++;
-	while(*p && !isspace(*p))p++;
+
+    while (*p) {
+	while (*p && isspace((uchar)*p)) p++;
+	if (*p) words++;
+	while (*p && !isspace((uchar)*p)) p++;
     }
     return words;
 }
@@ -1619,8 +1620,8 @@ bel_copy1(inp, out)
     char *in = *inp;
 
     out += strlen(out);	/* eos() */
-    while(*in && isspace(*in)) in++;
-    while(*in && !isspace(*in)) *out++ = *in++;
+    while (*in && isspace((uchar)*in)) in++;
+    while (*in && !isspace((uchar)*in)) *out++ = *in++;
     *out = '\0';
     *inp = in;
 }
