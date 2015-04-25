@@ -115,8 +115,7 @@ const char *goal;
 	    cc.x = cx;
 	    cc.y = cy;
 	    if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch)) {
-		/* there may be an encoded glyph */
-		putmixed(WIN_MESSAGE, 0, tmpbuf);
+		pline1(firstmatch);
 		curs(WIN_MAP, cx, cy);
 		flush_screen(0);
 	    }
