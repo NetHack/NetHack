@@ -311,8 +311,8 @@ checkfile(inp, pm, user_typed_name, without_asking)
     }
 
     /*
-     * If someone passed us garbage, prevent fault
-     *
+     * If someone passed us garbage, prevent fault.
+     */
     if (!inp || (inp && strlen(inp) > (BUFSZ - 1))) {
 	pline("bad do_look buffer passed!");
 	return;
