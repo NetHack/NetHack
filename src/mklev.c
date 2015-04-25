@@ -343,18 +343,30 @@ register struct mkroom *aroom;
 {
 	register struct mkroom *broom;
 	register int tmp;
+	int i;
+
+	if (aroom->doorct == 0)
+	    aroom->fdoor = doorindex;
 
 	aroom->doorct++;
-	broom = aroom+1;
-	if(broom->hx < 0)
-		tmp = doorindex;
-	else
-		for(tmp = doorindex; tmp > broom->fdoor; tmp--)
-			doors[tmp] = doors[tmp-1];
+
+	for (tmp = doorindex; tmp > aroom->fdoor; tmp--)
+	    doors[tmp] = doors[tmp - 1];
+
+	for (i = 0; i < nroom; i++) {
+	    broom = &rooms[i];
+	    if (broom != aroom && broom->doorct && broom->fdoor >= aroom->fdoor)
+		broom->fdoor++;
+	}
+	for (i = 0; i < nsubroom; i++) {
+	    broom = &subrooms[i];
+	    if (broom != aroom && broom->doorct && broom->fdoor >= aroom->fdoor)
+		broom->fdoor++;
+	}
+
 	doorindex++;
-	doors[tmp].x = x;
-	doors[tmp].y = y;
-	for( ; broom->hx >= 0; broom++) broom->fdoor++;
+	doors[aroom->fdoor].x = x;
+	doors[aroom->fdoor].y = y;
 }
 
 STATIC_OVL void
