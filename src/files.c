@@ -1,4 +1,4 @@
-/* NetHack 3.5	files.c	$NHDT-Date: 1428972596 2015/04/14 00:49:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.164 $ */
+/* NetHack 3.5	files.c	$NHDT-Date: 1429953063 2015/04/25 09:11:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.166 $ */
 /* NetHack 3.5	files.c	$Date: 2012/03/10 02:49:08 $  $Revision: 1.124 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -9,8 +9,6 @@
 #ifdef TTY_GRAPHICS
 #include "wintty.h" /* more() */
 #endif
-
-#include <ctype.h>
 
 #if (!defined(MAC) && !defined(O_WRONLY) && !defined(AZTEC_C)) || defined(USE_FCNTL)
 #include <fcntl.h>
@@ -2060,9 +2058,9 @@ int prefixid;
 #define match_varname(INP,NAM,LEN) match_optname(INP, NAM, LEN, TRUE)
 
 int
-parse_config_line(fp, buf, src)
+parse_config_line(fp, origbuf, src)
 FILE		*fp;
-char		*buf;
+char		*origbuf;
 int		src;
 {
 #if defined(MICRO) && !defined(NOCWD_ASSUMPTIONS)
@@ -2071,37 +2069,39 @@ int		src;
 #ifdef SYSCF
     int n;
 #endif
-    char		*bufp, *altp;
+    char  *bufp, *altp, buf[BUFSZ];
     uchar   translate[MAXPCHARS];
     int   len;
-    /* lines beginning with '#' are comments */
-    if (*buf == '#')
-        return 1;
 
-    /* remove trailing whitespace */
-    bufp = eos(buf);
-    while (--bufp > buf && isspace(*bufp))
-        continue;
-
-    if (bufp <= buf)
-        return 1;		/* skip all-blank lines */
-    else
-        *(bufp + 1) = '\0';	/* terminate line */
+    /* convert any tab to space, condense consecutive spaces into one,
+       remove leading and trailing spaces (exception: if there is nothing
+       but spaces, one of them will be kept even though it leads/trails) */
+    mungspaces(strcpy(buf, origbuf));
+    /* lines beginning with '#' are comments; accept empty lines too */
+    if (!*buf || *buf == '#' || !strcmp(buf, " ")) return 1;
 
     /* find the '=' or ':' */
     bufp = index(buf, '=');
     altp = index(buf, ':');
     if (!bufp || (altp && altp < bufp)) bufp = altp;
     if (!bufp) return 0;
-
-    /* skip  whitespace between '=' and value */
-    do { ++bufp; } while (isspace(*bufp));
+    /* skip past '=', then space between it and value, if any */
+    ++bufp;
+    if (*bufp == ' ') ++bufp;
 
     /* Go through possible variables */
     /* some of these (at least LEVELS and SAVE) should now set the
      * appropriate fqn_prefix[] rather than specialized variables
      */
     if (match_varname(buf, "OPTIONS", 4)) {
+	/* hack: un-mungspaces to allow consecutive spaces in
+	   general options until we verify that this is unnecessary;
+	   '=' or ':' is guaranteed to be present */
+	bufp = index(origbuf, '=');
+	altp = index(origbuf, ':');
+	if (!bufp || (altp && altp < bufp)) bufp = altp;
+	++bufp;		/* skip '='; parseoptions() handles spaces */
+
         parseoptions(bufp, TRUE, TRUE);
         if (plname[0])		/* If a name was given */
             plnamesuffix();	/* set the character class */
@@ -2190,16 +2190,17 @@ int		src;
     } else if (src == SET_IN_SYS && match_varname(buf, "SHELLERS", 8)) {
         if (sysopt.shellers) free(sysopt.shellers);
         sysopt.shellers = dupstr(bufp);
-	} else if (src == SET_IN_SYS && match_varname(buf, "EXPLORERS", 7)) {
-	    if (sysopt.explorers) free(sysopt.explorers);
+    } else if (src == SET_IN_SYS && match_varname(buf, "EXPLORERS", 7)) {
+	if (sysopt.explorers) free(sysopt.explorers);
 	    sysopt.explorers = dupstr(bufp);
     } else if (src == SET_IN_SYS && match_varname(buf, "DEBUGFILES", 5)) {
-        if (sysopt.debugfiles) free(sysopt.debugfiles);
         /* if showdebug() has already been called (perhaps we've added
            some debugpline() calls to option processing) and has found
            a value for getenv("DEBUGFILES"), don't override that */
-        if (sysopt.env_dbgfl == 0)
-        sysopt.debugfiles = dupstr(bufp);
+        if (sysopt.env_dbgfl == 0) {
+	    if (sysopt.debugfiles) free(sysopt.debugfiles);
+	    sysopt.debugfiles = dupstr(bufp);
+	}
     } else if (src == SET_IN_SYS && match_varname(buf, "SUPPORT", 7)) {
         if (sysopt.support) free(sysopt.support);
         sysopt.support = dupstr(bufp);
@@ -2308,33 +2309,29 @@ int		src;
     } else if (match_varname(buf, "SYMBOLS", 4)) {
         char *op, symbuf[BUFSZ];
         boolean morelines;
+
         do {
-            morelines = FALSE;
-
-            /* strip leading and trailing white space */
-            while (isspace(*bufp)) bufp++;
-            op = eos(bufp);
-            while (--op >= bufp && isspace(*op)) *op = '\0';
-
             /* check for line continuation (trailing '\') */
             op = eos(bufp);
-            if (--op >= bufp && *op == '\\') {
+	    morelines = (--op >= bufp && *op == '\\');
+	    if (morelines) {
                 *op = '\0';
-                morelines = TRUE;
                 /* strip trailing space now that '\' is gone */
-                while (--op >= bufp && isspace(*op)) *op = '\0';
+                if (--op >= bufp && *op == ' ') *op = '\0';
             }
             /* parse here */
             parsesymbols(bufp);	
-            if (morelines)
-              do  {
-                *symbuf = '\0';
-                if (!fgets(symbuf, BUFSZ, fp)) {
-                    morelines = FALSE;
-                    break;
-                }
-                bufp = symbuf;
-            } while (*bufp == '#');
+            if (morelines) {
+		do  {
+		    *symbuf = '\0';
+		    if (!fgets(symbuf, BUFSZ, fp)) {
+			morelines = FALSE;
+			break;
+		    }
+		    mungspaces(symbuf);
+		    bufp = symbuf;
+		} while (*bufp == '#');
+	    }
         } while (morelines);
         switch_symbols(TRUE);
     } else if (match_varname(buf, "WIZKIT", 6)) {
@@ -2355,7 +2352,7 @@ int		src;
         extern int amii_numcolors;
         int val = atoi( bufp );
         amii_numcolors = 1L << min( DEPTH, val );
-#if defined(SYSFLAGS)
+# ifdef SYSFLAGS
     } else if (match_varname(buf, "DRIPENS", 7)) {
         int i, val;
         char *t;
@@ -2364,7 +2361,7 @@ int		src;
             sscanf(t, "%d", &val );
             sysflags.amii_dripens[i] = val;
         }
-#endif
+# endif
     } else if (match_varname(buf, "SCREENMODE", 10 )) {
         extern long amii_scrnmode;
         if (!stricmp(bufp,"req"))
@@ -2450,7 +2447,7 @@ int		src;
         {
             sscanf(t, "%d", &backg[i]);
         }
-#endif
+#endif	/*AMIGA*/
 #ifdef USER_SOUNDS
     } else if (match_varname(buf, "SOUNDDIR", 8)) {
         sounddir = dupstr(bufp);
@@ -2717,46 +2714,36 @@ int which_set;
     struct symparse *symp = (struct symparse *)0;
     char *bufp, *commentp, *altp;
 
-    if (*buf == '#')
+    /* convert each instance of whitespace (tabs, consecutive spaces)
+       into a single space; leading and trailing spaces are stripped */
+    mungspaces(buf);
+    if (!*buf || *buf == '#' || !strcmp(buf, " "))
         return 1;
-
-    /* remove trailing comment(s) */
-    commentp = eos(buf);
-    while (--commentp > buf) {
-        if (*commentp != '#') continue;
+    /* remove trailing comment, if any */
+    if ((commentp = rindex(buf, '#')) != 0) {
         *commentp = '\0';
+	/* remove space preceding the stripped comment, if any;
+	   we know 'commentp > buf' because *buf=='#' was caught above */
+	if (commentp[-1] == ' ') *--commentp = '\0';
     }
 
-    /* remove trailing whitespace */
-    bufp = eos(buf);
-    while (--bufp > buf && isspace(*bufp))
-        continue;
-
-    if (bufp <= buf)
-        return 1;		/* skip all-blank lines */
-    else
-        *(bufp + 1) = '\0';	/* terminate line */
-
-    /* skip leading whitespace on option name */
-    while (isspace(*buf)) ++buf;
-    
     /* find the '=' or ':' */
     bufp = index(buf, '=');
     altp = index(buf, ':');
     if (!bufp || (altp && altp < bufp)) bufp = altp;
     if (!bufp) {
         if (strncmpi(buf, "finish", 6) == 0) {
-        /* end current graphics set */
-        if (chosen_symset_start)
-            chosen_symset_end = TRUE;
-        chosen_symset_start = FALSE;
-        return 1;
+	    /* end current graphics set */
+	    if (chosen_symset_start)
+		chosen_symset_end = TRUE;
+	    chosen_symset_start = FALSE;
+	    return 1;
         }
         return 0;
     }
-
-    /* skip  whitespace between '=' and value */
-    do { ++bufp; } while (isspace(*bufp));
+    /* skip '=' and space which follows, if any */
+    ++bufp;
+    if (*bufp == ' ') ++bufp;
 
     symp = match_sym(buf);
     if (!symp)
@@ -2829,17 +2816,19 @@ int which_set;
             case 0:
                 /* start of symset */
                 if (!strcmpi(bufp, symset[which_set].name)) {
-                /* matches desired one */
-                chosen_symset_start = TRUE;
-                /* these init_*() functions clear symset fields too */
-                if (which_set == ROGUESET) init_r_symbols();
-                                else if (which_set == PRIMARY)  init_l_symbols();
+		    /* matches desired one */
+		    chosen_symset_start = TRUE;
+		    /* these init_*() functions clear symset fields too */
+		    if (which_set == ROGUESET)
+			init_r_symbols();
+		    else if (which_set == PRIMARY)
+			init_l_symbols();
                 }
                 break;
             case 1:
                 /* finish symset */
                 if (chosen_symset_start)
-                chosen_symset_end = TRUE;
+		    chosen_symset_end = TRUE;
                 chosen_symset_start = FALSE;
                 break;
             case 2:
@@ -2851,14 +2840,14 @@ int which_set;
             case 4:  /* color:off */
                 if (chosen_symset_start) {
                     if (bufp) {
-                    if (!strcmpi(bufp, "true") ||
-                        !strcmpi(bufp, "yes")  ||
-                        !strcmpi(bufp, "on"))
-                        symset[which_set].nocolor = 0;
+			if (!strcmpi(bufp, "true") ||
+			    !strcmpi(bufp, "yes")  ||
+			    !strcmpi(bufp, "on"))
+			    symset[which_set].nocolor = 0;
                         else if (!strcmpi(bufp, "false") ||
-                         !strcmpi(bufp, "no")    ||
-                         !strcmpi(bufp, "off"))
-                        symset[which_set].nocolor = 1;
+				 !strcmpi(bufp, "no")    ||
+				 !strcmpi(bufp, "off"))
+			    symset[which_set].nocolor = 1;
                     }
                 }
                 break;
@@ -2866,17 +2855,17 @@ int which_set;
                 if (chosen_symset_start) {
                     int n = 0;
                     while (known_restrictions[n]) {
-                    if (!strcmpi(known_restrictions[n], bufp)) {
-                    switch(n) {
-                        case  0: symset[which_set].primary = 1;
-                         break;
-                    case  1: symset[which_set].rogue   = 1;
-                         break;
-                    }
-                    break;	/* while loop */
-                            }
-                    n++;
-                        }
+			if (!strcmpi(known_restrictions[n], bufp)) {
+			    switch(n) {
+			    case 0: symset[which_set].primary = 1;
+				    break;
+			    case 1: symset[which_set].rogue   = 1;
+				    break;
+			    }
+			    break;	/* while loop */
+			}
+			n++;
+		    }
                 }
                 break;
         }
