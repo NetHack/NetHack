@@ -3749,7 +3749,7 @@ register int dx,dy;
 		    unmap_object(sx, sy);
 		    newsym(sx, sy);
 		}
-		if(ZAP_POS(lev->typ) || cansee(lsx,lsy))
+		if(ZAP_POS(lev->typ) || (isok(lsx,lsy) && cansee(lsx,lsy)))
 		    tmp_at(sx,sy);
 		delay_output(); /* wait a little */
 	    }
