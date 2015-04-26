@@ -596,6 +596,9 @@ docallcmd()
 	any.a_char = 'd';	/* entry 'd' (or 'b'), group accelator 'd' */
 	add_menu(win, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
 		 "the type of an object on discoveries list", MENU_UNSELECTED);
+	any.a_char = 'e';
+	add_menu(win, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
+		 "the current level", MENU_UNSELECTED);
 #if 0
 	any.a_char = 'f';	/* entry 'e' (or 'c'), group accelator 'f' */
 	add_menu(win, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
@@ -642,6 +645,9 @@ docallcmd()
 		break;
 	case 'd':	/* name a type of object on the discoveries list */
 		rename_disco();
+		break;
+	case 'e':	/* annotate level */
+		donamelevel();
 		break;
 #if 0
 	case 'f':	/* name a type of object visible on the floor */
