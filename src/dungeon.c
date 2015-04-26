@@ -1847,6 +1847,16 @@ d_level *dest;
     }
 }
 
+char *
+get_annotation(lev)
+d_level *lev;
+{
+    mapseen *mptr;
+    if ((mptr = find_mapseen(lev)))
+	return mptr->custom;
+    return NULL;
+}
+
 /* #annotate command - add a custom name to the current level */
 int
 donamelevel()
@@ -1856,8 +1866,14 @@ donamelevel()
 
     if (!(mptr = find_mapseen(&u.uz))) return 0;
 
-    getlin("What do you want to call this dungeon level?", nbuf);
+    if (mptr->custom) {
+	char qbuf[BUFSZ];
+	Sprintf(qbuf, "Replace annotation \"%s\" with?", mptr->custom);
+	getlin(qbuf, nbuf);
+    } else
+	getlin("What do you want to call this dungeon level?", nbuf);
     if (index(nbuf, '\033')) return 0;
+    (void)mungspaces(nbuf);
 
     /* discard old annotation, if any */
     if (mptr->custom) {
