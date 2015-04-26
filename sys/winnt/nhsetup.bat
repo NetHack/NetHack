@@ -5,8 +5,7 @@
 @REM  Win32 setup batch file, see Install.nt for details
 @REM
 @echo off
-
-set _pause=
+pushd %~dp0
 set WIN32PATH=..\..\win\win32
 set BUILDPATH=..\..\build
 set BINPATH=..\..\binary
@@ -183,7 +182,8 @@ echo.
 
 :fini
 :end
-set _pause=Y
-if /i "%0"=="nhsetup" set _pause=N
+set _pause=N
+for %%x in (%cmdcmdline%) do if /i "%%~x"=="/c" set _pause=Y
 if "%_pause%"=="Y" pause
 set _pause=
+popd
