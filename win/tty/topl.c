@@ -1,4 +1,4 @@
-/* NetHack 3.5	topl.c	$NHDT-Date: 1425081315 2015/02/27 23:55:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.24 $ */
+/* NetHack 3.5	topl.c	$NHDT-Date: 1430040322 2015/04/26 09:25:22 $  $NHDT-Branch: master $:$NHDT-Revision: 1.29 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -333,7 +333,7 @@ char def;
 {
 	register char q;
 	char rtmp[40];
-	boolean digit_ok, allow_num;
+	boolean digit_ok, allow_num, preserve_case = FALSE;
 	struct WinDesc *cw = wins[WIN_MESSAGE];
 	boolean doprev = 0;
 	char prompt[BUFSZ];
@@ -347,6 +347,14 @@ char def;
 
 	    allow_num = (index(resp, '#') != 0);
 	    Strcpy(respbuf, resp);
+	    /* normally we force lowercase, but if any uppercase letters
+	       are present in the allowed response, preserve case;
+	       check this before stripping the hidden choices */
+	    for (rb = respbuf; *rb; ++rb)
+		if ('A' <= *rb && *rb <= 'Z') {
+		    preserve_case = TRUE;
+		    break;
+		}
 	    /* any acceptable responses that follow <esc> aren't displayed */
 	    if ((rb = index(respbuf, '\033')) != 0) *rb = '\0';
 	    (void)strncpy(prompt, query, QBUFSZ-1);
@@ -358,13 +366,16 @@ char def;
 	    Strcat(prompt, " ");
 	    pline("%s", prompt);
 	} else {
+	    /* no restriction on allowed response, so always preserve case */
+	 /* preserve_case = TRUE; -- moot since we're jumping to the end */
 	    pline("%s ", query);
 	    q = readchar();
 	    goto clean_up;
 	}
 
 	do {	/* loop until we get valid input */
-	    q = lowc(readchar());
+	    q = readchar();
+	    if (!preserve_case) q = lowc(q);
 	    if (q == '\020') { /* ctrl-P */
 		if (iflags.prevmsg_window != 's') {
 		    int sav = ttyDisplay->inread;
@@ -422,7 +433,8 @@ char def;
 		    q = '#';
 		}
 		do {	/* loop until we get a non-digit */
-		    z = lowc(readchar());
+		    z = readchar();
+		    if (!preserve_case) z = lowc(z);
 		    if (digit(z)) {
 			value = (10 * value) + (z - '0');
 			if (value < 0) break;	/* overflow: try again */

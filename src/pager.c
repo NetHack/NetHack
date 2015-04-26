@@ -310,6 +310,14 @@ checkfile(inp, pm, user_typed_name, without_asking)
 	return;
     }
 
+    /*
+     * If someone passed us garbage, prevent fault.
+     */
+    if (!inp || (inp && strlen(inp) > (BUFSZ - 1))) {
+	pline("bad do_look buffer passed!");
+	return;
+    }
+
     /* To prevent the need for entries in data.base like *ngel to account
      * for Angel and angel, make the lookup string the same for both
      * user_typed_name and picked name.

@@ -1,4 +1,4 @@
-/* NetHack 3.5	winX.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	winX.c	$NHDT-Date: 1430040327 2015/04/26 09:25:27 $  $NHDT-Branch: master $:$NHDT-Revision: 1.28 $ */
 /* NetHack 3.5	winX.c	$Date: 2012/01/24 04:26:26 $  $Revision: 1.27 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1532,6 +1532,7 @@ static char yn_esc_map;		/* ESC maps to this char. */
 static Widget yn_popup;		/* popup for the yn fuction (created once) */
 static Widget yn_label;		/* label for yn function (created once) */
 static boolean yn_getting_num;	/* TRUE if accepting digits */
+static boolean yn_preserve_case; /* default is to force yn to lower case */
 static int yn_ndigits;		/* digit count */
 static long yn_val;		/* accumulated value */
 
@@ -1604,7 +1605,8 @@ yn_key(w, event, params, num_params)
     if (!yn_choices) {			/* accept any input */
 	yn_return = ch;
     } else {
-	ch = lowc(ch);			/* move to lower case */
+	if (!yn_preserve_case)
+	    ch = lowc(ch);			/* move to lower case */
 
 	if (ch == '\033') {
 	    yn_getting_num = FALSE;
@@ -1664,6 +1666,7 @@ X11_yn_function(ques, choices, def)
 
     yn_choices = choices;	/* set up globals for callback to use */
     yn_def     = def;
+    yn_preserve_case = !choices; /* preserve when arbitrary response allowed */
 
     /*
      * This is sort of a kludge.  There are quite a few places in the main
@@ -1679,6 +1682,14 @@ X11_yn_function(ques, choices, def)
 	char *cb, choicebuf[QBUFSZ];
 
 	Strcpy(choicebuf, choices);	/* anything beyond <esc> is hidden */
+	/* default when choices are present is to force yn answer to
+	   lowercase unless one or more choices are explicitly uppercase;
+	   check this before stripping the hidden choices */
+	for (cb = choicebuf; *cb; ++cb)
+	    if ('A' <= *cb && *cb <= 'Z') {
+		yn_preserve_case = TRUE;
+		break;
+	    }
 	if ((cb = index(choicebuf, '\033')) != 0) *cb = '\0';
 	/* ques [choices] (def) */
 	if ((int)(1 + strlen(ques) + 2 + strlen(choicebuf) + 4) >= BUFSZ)

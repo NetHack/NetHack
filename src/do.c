@@ -1068,6 +1068,7 @@ boolean at_stairs, falling, portal;
     boolean new = FALSE;	/* made a new level? */
     struct monst *mtmp;
     char whynot[BUFSZ];
+    char *annotation;
 
     if (dunlev(newlevel) > dunlevs_in_dungeon(newlevel))
         newlevel->dlevel = dunlevs_in_dungeon(newlevel);
@@ -1456,6 +1457,9 @@ boolean at_stairs, falling, portal;
 #ifdef INSURANCE
     save_currentstate();
 #endif
+
+    if ((annotation = get_annotation(&u.uz)))
+	You("remember this level as %s.", annotation);
 
     /* assume this will always return TRUE when changing level */
     (void) in_out_region(u.ux, u.uy);
