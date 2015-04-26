@@ -24,6 +24,7 @@ STATIC_PTR char *FDECL(safeq_xprname, (struct obj *));
 STATIC_PTR char *FDECL(safeq_shortxprname, (struct obj *));
 STATIC_DCL char FDECL(display_pickinv, (const char *,BOOLEAN_P, long *));
 STATIC_DCL char FDECL(display_used_invlets, (CHAR_P));
+STATIC_DCL void FDECL(tally_BUCX, (struct obj *,int *,int *,int *,int *,int *));
 STATIC_DCL boolean FDECL(this_type_only, (struct obj *));
 STATIC_DCL void NDECL(dounpaid);
 STATIC_DCL struct obj *FDECL(find_unpaid,(struct obj *,struct obj **));
@@ -2067,6 +2068,33 @@ count_buc(list, type)
     return count;
 }
 
+/* similar to count_buc(), but tallies all states at once
+   rather than looking for a specific type */
+STATIC_OVL void
+tally_BUCX(list, bcp, ucp, ccp, xcp, ocp)
+struct obj *list;
+int *bcp, *ucp, *ccp, *xcp, *ocp;
+{
+    *bcp = *ucp = *ccp = *xcp = *ocp = 0;
+    for ( ; list; list = list->nobj) {
+	if (list->oclass == COIN_CLASS) {
+	    ++(*ocp);	/* "other" */
+	    continue;
+	}
+	/* priests always know bless/curse state */
+	if (Role_if(PM_PRIEST)) list->bknown = 1;
+
+	if (!list->bknown)
+	    ++(*xcp);
+	else if (list->blessed)
+	    ++(*bcp);
+	else if (list->cursed)
+	    ++(*ccp);
+	else	/* neither blessed nor cursed => uncursed */
+	    ++(*ucp);
+    }
+}
+
 long
 count_contents(container, nested, quantity, everything)
 struct obj *container;
@@ -2189,7 +2217,18 @@ STATIC_OVL boolean
 this_type_only(obj)
     struct obj *obj;
 {
-    return (obj->oclass == this_type);
+    boolean res = (obj->oclass == this_type);
+
+    if (obj->oclass != COIN_CLASS) {
+	switch (this_type) {
+	case 'B': res = (obj->bknown && obj->blessed); break;
+	case 'U': res = (obj->bknown && !(obj->blessed || obj->cursed)); break;
+	case 'C': res = (obj->bknown && obj->cursed); break;
+	case 'X': res = !obj->bknown; break;
+	default:  break;	/* use 'res' as-is */
+	}
+    }
+    return res;
 }
 
 /* the 'I' command */
@@ -2200,6 +2239,7 @@ dotypeinv()
     int n, i = 0;
     char *extra_types, types[BUFSZ];
     int class_count, oclass, unpaid_count, itemcount;
+    int bcnt, ccnt, ucnt, xcnt, ocnt;
     boolean billx = *u.ushops && doinvbill(0);
     menu_item *pick_list;
     boolean traditional = TRUE;
@@ -2210,12 +2250,18 @@ dotypeinv()
         return 0;
     }
     unpaid_count = count_unpaid(invent);
+    tally_BUCX(invent, &bcnt, &ucnt, &ccnt, &xcnt, &ocnt);
+
     if (flags.menu_style != MENU_TRADITIONAL) {
         if (flags.menu_style == MENU_FULL ||
                 flags.menu_style == MENU_PARTIAL) {
         traditional = FALSE;
         i = UNPAID_TYPES;
         if (billx) i |= BILLED_TYPES;
+	if (bcnt) i |= BUC_BLESSED;
+	if (ucnt) i |= BUC_UNCURSED;
+	if (ccnt) i |= BUC_CURSED;
+	if (xcnt) i |= BUC_UNKNOWN;
         n = query_category(prompt, invent, i, &pick_list, PICK_ONE);
         if (!n) return 0;
         this_type = c = pick_list[0].item.a_int;
@@ -2225,73 +2271,96 @@ dotypeinv()
     if (traditional) {
         /* collect a list of classes of objects carried, for use as a prompt */
         types[0] = 0;
-        class_count = collect_obj_classes(types, invent,
-                          FALSE,
-                          (boolean FDECL((*),(OBJ_P))) 0, &itemcount);
-        if (unpaid_count) {
-        Strcat(types, "u");
-        class_count++;
-        }
-        if (billx) {
-        Strcat(types, "x");
-        class_count++;
-        }
+        class_count = collect_obj_classes(types, invent, FALSE,
+					  (boolean FDECL((*),(OBJ_P))) 0,
+					  &itemcount);
+	if (unpaid_count || billx || (bcnt + ccnt + ucnt + xcnt) != 0)
+			  types[class_count++] = ' ';
+        if (unpaid_count) types[class_count++] = 'u';
+        if (billx)	  types[class_count++] = 'x';
+        if (bcnt)	  types[class_count++] = 'B';
+        if (ucnt)	  types[class_count++] = 'U';
+        if (ccnt)	  types[class_count++] = 'C';
+        if (xcnt)	  types[class_count++] = 'X';
+	types[class_count] = '\0';
         /* add everything not already included; user won't see these */
         extra_types = eos(types);
         *extra_types++ = '\033';
         if (!unpaid_count) *extra_types++ = 'u';
         if (!billx) *extra_types++ = 'x';
+	if (!bcnt) *extra_types++ = 'B';
+	if (!ucnt) *extra_types++ = 'U';
+	if (!ccnt) *extra_types++ = 'C';
+	if (!xcnt) *extra_types++ = 'X';
         *extra_types = '\0';	/* for index() */
         for (i = 0; i < MAXOCLASSES; i++)
-        if (!index(types, def_oc_syms[i].sym)) {
-            *extra_types++ = def_oc_syms[i].sym;
-            *extra_types = '\0';
-        }
+	    if (!index(types, def_oc_syms[i].sym)) {
+		*extra_types++ = def_oc_syms[i].sym;
+		*extra_types = '\0';
+	    }
 
-        if(class_count > 1) {
-        c = yn_function(prompt, types, '\0');
-        savech(c);
-        if(c == '\0') {
-            clear_nhwindow(WIN_MESSAGE);
-            return 0;
-        }
+        if (class_count > 1) {
+	    c = yn_function(prompt, types, '\0');
+	    savech(c);
+	    if (c == '\0') {
+		clear_nhwindow(WIN_MESSAGE);
+		return 0;
+	    }
         } else {
-        /* only one thing to itemize */
-        if (unpaid_count)
-            c = 'u';
-        else if (billx)
-            c = 'x';
-        else
-            c = types[0];
+	    /* only one thing to itemize */
+	    if (unpaid_count)
+		c = 'u';
+	    else if (billx)
+		c = 'x';
+	    else
+		c = types[0];
         }
     }
-    if (c == 'x') {
+    if (c == 'x' || (c == 'X' && billx && !xcnt)) {
         if (billx)
-        (void) doinvbill(1);
-        else
-        pline("No used-up objects on your shopping bill.");
+	    (void) doinvbill(1);
+	else
+	    pline("No used-up objects%s.",
+		  unpaid_count ? " on your shopping bill" : "");
         return 0;
     }
-    if (c == 'u') {
+    if (c == 'u' || (c == 'U' && unpaid_count && !ucnt)) {
         if (unpaid_count)
-        dounpaid();
+	    dounpaid();
         else
-        You("are not carrying any unpaid objects.");
+	    You("are not carrying any unpaid objects.");
         return 0;
     }
     if (traditional) {
-        oclass = def_char_to_objclass(c); /* change to object class */
-        if (oclass == COIN_CLASS) {
-        return doprgold();
-        } else if (index(types, c) > index(types, '\033')) {
-        You("have no such objects.");
-        return 0;
+	if (index("BUCX", c))
+	    oclass = c; /* not a class but understood by this_type_only() */
+	else
+	    oclass = def_char_to_objclass(c); /* change to object class */
+
+        if (oclass == COIN_CLASS)
+	    return doprgold();
+        if (index(types, c) > index(types, '\033')) {
+	    /* '> ESC' => "hidden choice", something known not to be carried */
+	    const char *which = 0;
+
+	    switch (c) {
+	    case 'B': which = "known to be blessed"; break;
+	    case 'U': which = "known to be uncursed"; break;
+	    case 'C': which = "known to be cursed"; break;
+	    case 'X': You(
+	   "have no objects whose blessed/uncursed/cursed status is unknown.");
+		      break;	/* better phrasing is desirable */
+	    default:  which = "such"; break;
+	    }
+	    if (which)
+		You("have no %s objects.", which);
+	    return 0;
         }
         this_type = oclass;
     }
     if (query_objlist((char *) 0, invent,
-            (flags.invlet_constant ? USE_INVLET : 0)|INVORDER_SORT,
-            &pick_list, PICK_NONE, this_type_only) > 0)
+		      (flags.invlet_constant ? USE_INVLET : 0)|INVORDER_SORT,
+		      &pick_list, PICK_NONE, this_type_only) > 0)
         free((genericptr_t)pick_list);
     return 0;
 }
