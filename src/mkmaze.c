@@ -1267,6 +1267,9 @@ register int x, y, n;
 		impossible("n too large (mk_bubble)");
 		n = SIZE(bmask) - 1;
 	}
+	if (bmask[n][1] > MAX_BMASK) {
+		panic("bmask size is larger than MAX_BMASK");
+	}
 	b = (struct bubble *)alloc(sizeof(struct bubble));
 	if ((x + (int) bmask[n][0] - 1) > bxmax) x = bxmax - bmask[n][0] + 1;
 	if ((y + (int) bmask[n][1] - 1) > bymax) y = bymax - bmask[n][1] + 1;
@@ -1274,7 +1277,9 @@ register int x, y, n;
 	b->y = y;
 	b->dx = 1 - rn2(3);
 	b->dy = 1 - rn2(3);
-	b->bm = bmask[n];
+	/* y dimension is the length of bitmap data - see bmask above */
+	(void)memcpy((genericptr_t)b->bm, (genericptr_t)bmask[n], 
+		     (bmask[n][1]+2)*sizeof(b->bm[0]));
 	b->cons = 0;
 	if (!bbubbles) bbubbles = b;
 	if (ebubbles) {
