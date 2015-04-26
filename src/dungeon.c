@@ -1868,9 +1868,10 @@ donamelevel()
     if (!(mptr = find_mapseen(&u.uz))) return 0;
 
     if (mptr->custom) {
-	char qbuf[BUFSZ];
-	Sprintf(qbuf, "Replace annotation \"%s\" with?", mptr->custom);
-	getlin(qbuf, nbuf);
+	const char querystr[] = "Replace annotation \"%s\" with?";
+	char tmpbuf[BUFSZ + sizeof(querystr)];
+	Sprintf(tmpbuf, querystr, mptr->custom);
+	getlin(tmpbuf, nbuf);
     } else
 	getlin("What do you want to call this dungeon level?", nbuf);
     if (index(nbuf, '\033')) return 0;
