@@ -1869,6 +1869,7 @@ donamelevel()
 
     getlin("What do you want to call this dungeon level?", nbuf);
     if (index(nbuf, '\033')) return 0;
+    (void)mungspaces(nbuf);
 
     /* discard old annotation, if any */
     if (mptr->custom) {
