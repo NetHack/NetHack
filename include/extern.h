@@ -570,6 +570,7 @@ E boolean FDECL(Invocation_lev, (d_level *));
 E xchar NDECL(level_difficulty);
 E schar FDECL(lev_by_name, (const char *));
 E schar FDECL(print_dungeon, (BOOLEAN_P,schar *,xchar *));
+E char *FDECL(get_annotation, (d_level *));
 E int NDECL(donamelevel);
 E int NDECL(dooverview);
 E void FDECL(show_overview, (int,int));

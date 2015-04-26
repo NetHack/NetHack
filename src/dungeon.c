@@ -1848,6 +1848,16 @@ d_level *dest;
     }
 }
 
+char *
+get_annotation(lev)
+d_level *lev;
+{
+    mapseen *mptr;
+    if ((mptr = find_mapseen(lev)))
+	return mptr->custom;
+    return NULL;
+}
+
 /* #annotate command - add a custom name to the current level */
 int
 donamelevel()
