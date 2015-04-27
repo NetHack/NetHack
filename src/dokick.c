@@ -1201,11 +1201,7 @@ dumb:
 		    if (is_watch(mtmp->data) &&
 			couldsee(mtmp->mx, mtmp->my) &&
 			mtmp->mpeaceful) {
-			if (canspotmon(mtmp))
-			    pline("%s yells:", Amonnam(mtmp));
-			else
-			    You_hear("someone yell:");
-			verbalize("Halt, thief!  You're under arrest!");
+			mon_yells(mtmp, "Halt, thief!  You're under arrest!");
 			(void) angry_guards(FALSE);
 			break;
 		    }
@@ -1219,15 +1215,11 @@ dumb:
 		    if (DEADMONSTER(mtmp)) continue;
 		    if (is_watch(mtmp->data) &&
 			    mtmp->mpeaceful && couldsee(mtmp->mx, mtmp->my)) {
-			if (canspotmon(mtmp))
-			    pline("%s yells:", Amonnam(mtmp));
-			else
-			    You_hear("someone yell:");
 			if(levl[x][y].looted & D_WARNED) {
-			    verbalize("Halt, vandal!  You're under arrest!");
+			    mon_yells(mtmp, "Halt, vandal!  You're under arrest!");
 			    (void) angry_guards(FALSE);
 			} else {
-			    verbalize("Hey, stop damaging that door!");
+			    mon_yells(mtmp, "Hey, stop damaging that door!");
 			    levl[x][y].looted |= D_WARNED;
 			}
 			break;

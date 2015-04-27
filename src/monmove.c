@@ -50,6 +50,18 @@ boolean for_unlocking;	/* true => credit card ok, false => not ok */
     return m_carrying(mon, SKELETON_KEY) || m_carrying(mon, LOCK_PICK);
 }
 
+void
+mon_yells(mon, shout)
+struct monst *mon;
+const char *shout;
+{
+    if (canspotmon(mon))
+	pline("%s yells:", Amonnam(mon));
+    else
+	You_hear("someone yell:");
+    verbalize(shout);
+}
+
 STATIC_OVL void
 watch_on_duty(mtmp)
 register struct monst *mtmp;
@@ -63,13 +75,11 @@ register struct monst *mtmp;
 	       (levl[x][y].doormask & D_LOCKED)) {
 
 		if(couldsee(mtmp->mx, mtmp->my)) {
-
-		  pline("%s yells:", Amonnam(mtmp));
 		  if(levl[x][y].looted & D_WARNED) {
-			verbalize("Halt, thief!  You're under arrest!");
+			mon_yells(mtmp, "Halt, thief!  You're under arrest!");
 			(void) angry_guards(!!Deaf);
 		  } else {
-			verbalize("Hey, stop picking that lock!");
+			mon_yells(mtmp, "Hey, stop picking that lock!");
 			levl[x][y].looted |=  D_WARNED;
 		  }
 		  stop_occupation();
