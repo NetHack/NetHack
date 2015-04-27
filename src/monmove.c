@@ -1305,15 +1305,10 @@ register int x, y;
 {
 	int levtyp = levl[x][y].typ;
 
-	if (levtyp == DRAWBRIDGE_UP) {
-	    /* use underlying terrain in front of closed drawbridge */
-	    switch (levl[x][y].drawbridgemask & DB_UNDER) {
-	    case DB_MOAT:  levtyp = MOAT; break;
-	    case DB_LAVA:  levtyp = LAVAPOOL; break;
-	    case DB_ICE:   levtyp = ICE; break;
-	    case DB_FLOOR: levtyp = ROOM; break;
-	    }
-	}
+	/* use underlying terrain in front of closed drawbridge */
+	if (levtyp == DRAWBRIDGE_UP)
+	    levtyp = db_under_typ(levl[x][y].drawbridgemask);
+
 	return (boolean)(ACCESSIBLE(levtyp) && !closed_door(x, y));
 }
 

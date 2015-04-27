@@ -222,6 +222,7 @@ E boolean FDECL(is_lava, (int,int));
 E boolean FDECL(is_pool_or_lava, (int,int));
 E boolean FDECL(is_ice, (int,int));
 E boolean FDECL(is_moat, (int,int));
+E schar FDECL(db_under_typ, (int));
 E int FDECL(is_drawbridge_wall, (int,int));
 E boolean FDECL(is_db_wall, (int,int));
 E boolean FDECL(find_drawbridge, (int *,int*));

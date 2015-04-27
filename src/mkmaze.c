@@ -1157,12 +1157,7 @@ xchar x,y;
 	lev = &levl[x][y];
 	ltyp = lev->typ;
 	if (ltyp == DRAWBRIDGE_UP)
-	    switch (lev->drawbridgemask & DB_UNDER) {
-	    case DB_ICE:  ltyp = ICE; break;
-	    case DB_LAVA: ltyp = LAVAPOOL; break;
-	    case DB_MOAT: ltyp = MOAT; break;
-	    default:      ltyp = STONE; break;
-	    }
+	    ltyp = db_under_typ(lev->drawbridgemask);
 
 	if (ltyp == LAVAPOOL)
 		return "lava";
