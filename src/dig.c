@@ -1171,8 +1171,7 @@ watch_dig(mtmp, x, y, zap)
 	    if (!mtmp) {
 		for(mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
 		    if (DEADMONSTER(mtmp)) continue;
-		    if ((mtmp->data == &mons[PM_WATCHMAN] ||
-			 mtmp->data == &mons[PM_WATCH_CAPTAIN]) &&
+		    if (is_watch(mtmp->data) &&
 			mtmp->mcansee && m_canseeu(mtmp) &&
 			couldsee(mtmp->mx, mtmp->my) && mtmp->mpeaceful)
 			break;

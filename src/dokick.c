@@ -1198,8 +1198,7 @@ dumb:
 		if (in_town(x, y))
 		  for(mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
 		    if (DEADMONSTER(mtmp)) continue;
-		    if((mtmp->data == &mons[PM_WATCHMAN] ||
-			mtmp->data == &mons[PM_WATCH_CAPTAIN]) &&
+		    if (is_watch(mtmp->data) &&
 			couldsee(mtmp->mx, mtmp->my) &&
 			mtmp->mpeaceful) {
 			if (canspotmon(mtmp))
@@ -1218,8 +1217,7 @@ dumb:
 	    if (in_town(x, y))
 		for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
 		    if (DEADMONSTER(mtmp)) continue;
-		    if ((mtmp->data == &mons[PM_WATCHMAN] ||
-				mtmp->data == &mons[PM_WATCH_CAPTAIN]) &&
+		    if (is_watch(mtmp->data) &&
 			    mtmp->mpeaceful && couldsee(mtmp->mx, mtmp->my)) {
 			if (canspotmon(mtmp))
 			    pline("%s yells:", Amonnam(mtmp));

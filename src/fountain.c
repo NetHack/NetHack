@@ -169,8 +169,7 @@ boolean isyou;
 			/* Warn about future fountain use. */
 			for(mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
 			    if (DEADMONSTER(mtmp)) continue;
-			    if ((mtmp->data == &mons[PM_WATCHMAN] ||
-				mtmp->data == &mons[PM_WATCH_CAPTAIN]) &&
+			    if (is_watch(mtmp->data) &&
 			       couldsee(mtmp->mx, mtmp->my) &&
 			       mtmp->mpeaceful) {
 				pline("%s yells:", Amonnam(mtmp));

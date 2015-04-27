@@ -3117,9 +3117,7 @@ register boolean silent;
 
     for(mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp)) continue;
-        if((mtmp->data == &mons[PM_WATCHMAN] ||
-                   mtmp->data == &mons[PM_WATCH_CAPTAIN])
-                    && mtmp->mpeaceful) {
+        if (is_watch(mtmp->data) && mtmp->mpeaceful) {
             ct++;
             if(cansee(mtmp->mx, mtmp->my) && mtmp->mcanmove) {
                 if (distu(mtmp->mx, mtmp->my) == 2) nct++;
@@ -3157,9 +3155,8 @@ pacify_guards()
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp)) continue;
-        if (mtmp->data == &mons[PM_WATCHMAN] ||
-        mtmp->data == &mons[PM_WATCH_CAPTAIN])
-        mtmp->mpeaceful = 1;
+        if (is_watch(mtmp->data))
+	    mtmp->mpeaceful = 1;
     }
 }
 

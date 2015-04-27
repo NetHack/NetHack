@@ -400,7 +400,7 @@ register struct monst *mtmp;
 	}
 
 	/* the watch will look around and see if you are up to no good :-) */
-	if (mdat == &mons[PM_WATCHMAN] || mdat == &mons[PM_WATCH_CAPTAIN])
+	if (is_watch(mdat))
 		watch_on_duty(mtmp);
 
 	else if (is_mind_flayer(mdat) && !rn2(20)) {
