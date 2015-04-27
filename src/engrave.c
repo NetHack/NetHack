@@ -1,4 +1,4 @@
-/* NetHack 3.5	engrave.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	engrave.c	$NHDT-Date: 1430172943 2015/04/27 22:15:43 $  $NHDT-Branch: derek-elbereth $:$NHDT-Revision: 1.49 $ */
 /* NetHack 3.5	engrave.c	$Date: 2012/12/20 01:48:36 $  $Revision: 1.39 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -245,27 +245,29 @@ u_wipe_engr(cnt)
 register int cnt;
 {
 	if (can_reach_floor(TRUE))
-		wipe_engr_at(u.ux, u.uy, cnt);
+		wipe_engr_at(u.ux, u.uy, cnt, FALSE);
 }
 
 void
-wipe_engr_at(x,y,cnt)
-register xchar x,y,cnt;
+wipe_engr_at(x,y,cnt,magical)
+register xchar x,y,cnt,magical;
 {
-	register struct engr *ep = engr_at(x,y);
+        register struct engr *ep = engr_at(x,y);
 
-	/* Headstones are indelible */
-	if(ep && ep->engr_type != HEADSTONE){
-	    if(ep->engr_type != BURN || is_ice(x,y)) {
-		if(ep->engr_type != DUST && ep->engr_type != ENGR_BLOOD) {
-			cnt = rn2(1 + 50/(cnt+1)) ? 0 : 1;
-		}
-		wipeout_text(ep->engr_txt, (int)cnt, 0);
-		while(ep->engr_txt[0] == ' ')
-			ep->engr_txt++;
-		if(!ep->engr_txt[0]) del_engr(ep);
-	    }
-	}
+        /* Headstones are indelible */
+        if(ep && ep->engr_type != HEADSTONE) {
+                debugpline1("asked to erode %d characters", cnt);
+                if(ep->engr_type != BURN || is_ice(x,y) || (magical && !rn2(2))) {
+                        if(ep->engr_type != DUST && ep->engr_type != ENGR_BLOOD) {
+                                cnt = rn2(1 + 50/(cnt+1)) ? 0 : 1;
+                                debugpline1("actually eroding %d characters", cnt);
+                        }
+                        wipeout_text(ep->engr_txt, (int)cnt, 0);
+                        while(ep->engr_txt[0] == ' ')
+                                ep->engr_txt++;
+                        if(!ep->engr_txt[0]) del_engr(ep);
+                }
+        }
 }
 
 void

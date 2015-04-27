@@ -1,4 +1,4 @@
-/* NetHack 3.5	extern.h	$NHDT-Date: 1429755449 2015/04/23 02:17:29 $  $NHDT-Branch: master $:$NHDT-Revision: 1.477 $ */
+/* NetHack 3.5	extern.h	$NHDT-Date: 1430172934 2015/04/27 22:15:34 $  $NHDT-Branch: derek-elbereth $:$NHDT-Revision: 1.485 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -654,7 +654,7 @@ E const char *FDECL(ceiling, (int,int));
 E struct engr *FDECL(engr_at, (XCHAR_P,XCHAR_P));
 E int FDECL(sengr_at, (const char *,XCHAR_P,XCHAR_P,BOOLEAN_P));
 E void FDECL(u_wipe_engr, (int));
-E void FDECL(wipe_engr_at, (XCHAR_P,XCHAR_P,XCHAR_P));
+E void FDECL(wipe_engr_at, (XCHAR_P,XCHAR_P,XCHAR_P,BOOLEAN_P));
 E void FDECL(read_engr_at, (int,int));
 E void FDECL(make_engr_at, (int,int,const char *,long,XCHAR_P));
 E void FDECL(del_engr_at, (int,int));

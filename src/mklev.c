@@ -1,4 +1,4 @@
-/* NetHack 3.5	mklev.c	$NHDT-Date: 1426465436 2015/03/16 00:23:56 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.25 $ */
+/* NetHack 3.5	mklev.c	$NHDT-Date: 1430172946 2015/04/27 22:15:46 $  $NHDT-Branch: derek-elbereth $:$NHDT-Revision: 1.38 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -482,7 +482,7 @@ int trap_type;
 			if (trap_engravings[trap_type]) {
 			    make_engr_at(xx, yy-dy,
 				     trap_engravings[trap_type], 0L, DUST);
-			    wipe_engr_at(xx, yy-dy, 5); /* age it a little */
+			    wipe_engr_at(xx, yy-dy, 5, FALSE); /* age it a little */
 			}
 		    }
 		}

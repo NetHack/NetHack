@@ -1,4 +1,4 @@
-/* NetHack 3.5	zap.c	$NHDT-Date: 1428207622 2015/04/05 04:20:22 $  $NHDT-Branch: nhmall-booktribute $:$NHDT-Revision: 1.215 $ */
+/* NetHack 3.5	zap.c	$NHDT-Date: 1430172954 2015/04/27 22:15:54 $  $NHDT-Branch: derek-elbereth $:$NHDT-Revision: 1.218 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2719,12 +2719,12 @@ struct obj *obj;	/* wand or spell */
 			pline_The(Hallucination ?
 			    "floor runs like butter!" :
 			    "edges on the floor get smoother.");
-			wipe_engr_at(x, y, d(2,4));
+			wipe_engr_at(x, y, d(2,4), TRUE);
 			}
 		    break;
 		case WAN_STRIKING:
 		case SPE_FORCE_BOLT:
-		    wipe_engr_at(x, y, d(2,4));
+		    wipe_engr_at(x, y, d(2,4), TRUE);
 		    break;
 		default:
 		    break;

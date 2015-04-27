@@ -1,4 +1,4 @@
-/* NetHack 3.5	monmove.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	monmove.c	$NHDT-Date: 1430172947 2015/04/27 22:15:47 $  $NHDT-Branch: derek-elbereth $:$NHDT-Revision: 1.62 $ */
 /* NetHack 3.5	monmove.c	$Date: 2011/08/30 22:13:27 $  $Revision: 1.46 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -269,6 +269,7 @@ register struct monst *mtmp;
 int *inrange, *nearby, *scared;
 {
 	int seescaryx, seescaryy;
+        boolean sawscary = FALSE;
 
 	*inrange = (dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) <=
 							(BOLT_LIM * BOLT_LIM));
@@ -288,11 +289,18 @@ int *inrange, *nearby, *scared;
 		seescaryx = u.ux;
 		seescaryy = u.uy;
 	}
-	if (*nearby &&
-		(onscary(seescaryx, seescaryy, mtmp) ||
-		    (!mtmp->mpeaceful && in_your_sanctuary(mtmp, 0, 0)))) {
+
+        sawscary = onscary(seescaryx, seescaryy, mtmp);
+	if (*nearby && (sawscary || (!mtmp->mpeaceful 
+                                        && in_your_sanctuary(mtmp, 0, 0)))) {
 		*scared = 1;
 		monflee(mtmp, rnd(rn2(7) ? 10 : 100), TRUE, TRUE);
+
+                /* magical protection won't last forever, so there'll be a
+                 * chance of the magic being used up regardless of type */
+                if (sawscary) {
+                        wipe_engr_at(seescaryx, seescaryy, 1, TRUE);
+                }
 	} else
 		*scared = 0;
 }
@@ -352,7 +360,7 @@ register struct monst *mtmp;
 	}
 
 	/* not frozen or sleeping: wipe out texts written in the dust */
-	wipe_engr_at(mtmp->mx, mtmp->my, 1);
+	wipe_engr_at(mtmp->mx, mtmp->my, 1, FALSE);
 
 	/* confused monsters get unconfused with small probability */
 	if (mtmp->mconf && !rn2(50)) mtmp->mconf = 0;
