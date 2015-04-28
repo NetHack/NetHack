@@ -1204,6 +1204,7 @@ query_color()
     start_menu(tmpwin);
     any = zeroany;
     for (i = 0; i < SIZE(colornames); i++) {
+	if (!strcmp(colornames[i].name, "grey")) continue;
 	any.a_int = i + 1;
 	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, colornames[i].name, MENU_UNSELECTED);
     }
