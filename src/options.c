@@ -1,4 +1,4 @@
-/* NetHack 3.5	options.c	$NHDT-Date: 1429953065 2015/04/25 09:11:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.186 $ */
+/* NetHack 3.5	options.c	$NHDT-Date: 1430192504 2015/04/28 03:41:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.189 $ */
 /* NetHack 3.5	options.c	$Date: 2012/04/09 02:56:30 $  $Revision: 1.153 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1279,7 +1279,6 @@ add_menu_coloring(str)
 char *str;
 {
     int i, c = NO_COLOR, a = ATR_NONE;
-    struct menucoloring *tmp;
     char *tmps, *cs = strchr(str, '=');
 
     if (!cs || !str) return FALSE;
