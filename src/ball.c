@@ -112,12 +112,14 @@ placebc()
 	return;
     }
 
+    obj_extract_self(uchain);
     (void) flooreffects(uchain, u.ux, u.uy, "");	/* chain might rust */
 
     if (carried(uball))		/* the ball is carried */
 	u.bc_order = BCPOS_DIFFER;
     else {
 	/* ball might rust -- already checked when carried */
+	obj_extract_self(uball);
 	(void) flooreffects(uball, u.ux, u.uy, "");
 	place_object(uball, u.ux, u.uy);
 	u.bc_order = BCPOS_CHAIN;
