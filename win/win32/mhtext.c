@@ -164,7 +164,7 @@ INT_PTR CALLBACK NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 			SetTextColor(hdcEdit, 
 				text_fg_brush ? text_fg_color : (COLORREF)GetSysColor(DEFAULT_COLOR_FG_TEXT) 
 				); 
-			return (BOOL)(text_bg_brush 
+			return (INT_PTR)(text_bg_brush 
 					? text_bg_brush : SYSCLR_TO_BRUSH(DEFAULT_COLOR_BG_TEXT));
 		}
 	} return FALSE;
@@ -242,7 +242,15 @@ void LayoutText(HWND hWnd)
 /* Edit box hook */
 LRESULT CALLBACK NHEditHookWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	HDC hDC;
+	RECT rc;
+
 	switch(message) {
+	case WM_ERASEBKGND: 
+	    hDC = (HDC) wParam; 
+	    GetClientRect(hWnd, &rc); 
+	    FillRect(hDC, &rc, text_bg_brush? text_bg_brush : SYSCLR_TO_BRUSH(DEFAULT_COLOR_BG_TEXT)); 
+	return 1;
 
 	case WM_KEYDOWN:
 		switch (wParam)

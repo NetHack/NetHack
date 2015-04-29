@@ -469,7 +469,7 @@ INT_PTR CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			SetTextColor(hdcEdit, 
 				text_fg_brush ? text_fg_color : (COLORREF)GetSysColor(DEFAULT_COLOR_FG_TEXT) 
 				); 
-			return (BOOL)(text_bg_brush 
+			return (INT_PTR)(text_bg_brush 
 					? text_bg_brush : SYSCLR_TO_BRUSH(DEFAULT_COLOR_BG_TEXT));
 		}
 	} return FALSE;
@@ -1556,7 +1556,15 @@ LRESULT CALLBACK NHMenuListWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 /* Text control window proc - implements scrolling without a cursor */
 LRESULT CALLBACK NHMenuTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	HDC hDC;
+	RECT rc;
+
 	switch(message) {
+	case WM_ERASEBKGND: 
+	    hDC = (HDC) wParam; 
+	    GetClientRect(hWnd, &rc); 
+	    FillRect(hDC, &rc, text_bg_brush? text_bg_brush : SYSCLR_TO_BRUSH(DEFAULT_COLOR_BG_TEXT)); 
+            return 0;
 
 	case WM_KEYDOWN:
 		switch (wParam)
