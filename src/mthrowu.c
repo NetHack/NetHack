@@ -421,7 +421,8 @@ struct obj *obj;		/* missile (or stack providing it) */
 			(void) drop_throw(singleobj, hitu, u.ux, u.uy);
 			break;
 		    }
-		} else if (!range	/* reached end of path */
+		}
+		if (!range	/* reached end of path */
 			/* missile hits edge of screen */
 			|| !isok(bhitpos.x+dx,bhitpos.y+dy)
 			/* missile hits the wall */
@@ -440,7 +441,7 @@ struct obj *obj;		/* missile (or stack providing it) */
 		tmp_at(bhitpos.x, bhitpos.y);
 		delay_output();
 	}
-	if (isok(bhitpos.x, bhitpos.y)) tmp_at(bhitpos.x, bhitpos.y);
+	tmp_at(bhitpos.x, bhitpos.y);
 	delay_output();
 	tmp_at(DISP_END, 0);
 
