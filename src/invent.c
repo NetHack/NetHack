@@ -395,6 +395,7 @@ addinv(obj)
 struct obj *obj;
 {
     struct obj *otmp, *prev;
+    int saved_otyp = (int)obj->otyp;	/* for panic */
 
     if (obj->where != OBJ_FREE)
         panic("addinv: obj not free");
@@ -411,12 +412,16 @@ struct obj *obj;
        extra to quivered stack is more useful than to wielded one */
     if (uquiver && merged(&uquiver, &obj)) {
         obj = uquiver;
+        if (!obj)
+            panic("addinv: null obj after quiver merge otyp=%d", saved_otyp);
         goto added;
     }
     /* merge if possible; find end of chain in the process */
     for (prev = 0, otmp = invent; otmp; prev = otmp, otmp = otmp->nobj)
         if (merged(&otmp, &obj)) {
         obj = otmp;
+        if (!obj)
+            panic("addinv: null obj after merge otyp=%d", saved_otyp);
         goto added;
         }
     /* didn't merge, so insert into chain */

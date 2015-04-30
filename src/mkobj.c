@@ -2193,7 +2193,7 @@ unsigned oid;
     for (fx = ex; abs(fx - ex) < 3; fx += dx) {
         for (fy = ey; abs(fy - ey) < 3; fy += dy) {
             /* 0, 0 was checked above */
-            if (fx != x || fy != y) {
+            if (isok(fx,fy) && (fx != x || fy != y)) {
                 if ((otmp = sobj_at(otyp, fx, fy)) != 0) {
                     return otmp;
                 }

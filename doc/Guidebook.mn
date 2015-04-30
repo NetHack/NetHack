@@ -2097,8 +2097,8 @@ Implemented by the Amiga, Gem and tty ports.
 Default '^'.
 .lp menu_headings
 Controls how the headings in a menu are highlighted.
-Values are 'bold', 'inverse', or 'underline'.
-Not all ports can actually display all three types.
+Values are 'none', 'bold', 'dim', 'underline', 'blink', or 'inverse'.
+Not all ports can actually display all types.
 .lp menu_invert_all
 Menu character accelerator to invert all items in a menu.
 Implemented by the Amiga, Gem, X11 and tty ports.

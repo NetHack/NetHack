@@ -134,6 +134,8 @@
 #define is_displacer(ptr)	(((ptr)->mflags3 & M3_DISPLACES) != 0L) 
 #define is_mplayer(ptr)		(((ptr) >= &mons[PM_ARCHEOLOGIST]) && \
 				 ((ptr) <= &mons[PM_WIZARD]))
+#define is_watch(ptr)		((ptr) == &mons[PM_WATCHMAN] || \
+				 (ptr) == &mons[PM_WATCH_CAPTAIN])
 #define is_rider(ptr)		((ptr) == &mons[PM_DEATH] || \
 				 (ptr) == &mons[PM_FAMINE] || \
 				 (ptr) == &mons[PM_PESTILENCE])

@@ -50,6 +50,18 @@ boolean for_unlocking;	/* true => credit card ok, false => not ok */
     return m_carrying(mon, SKELETON_KEY) || m_carrying(mon, LOCK_PICK);
 }
 
+void
+mon_yells(mon, shout)
+struct monst *mon;
+const char *shout;
+{
+    if (canspotmon(mon))
+	pline("%s yells:", Amonnam(mon));
+    else
+	You_hear("someone yell:");
+    verbalize(shout);
+}
+
 STATIC_OVL void
 watch_on_duty(mtmp)
 register struct monst *mtmp;
@@ -63,13 +75,11 @@ register struct monst *mtmp;
 	       (levl[x][y].doormask & D_LOCKED)) {
 
 		if(couldsee(mtmp->mx, mtmp->my)) {
-
-		  pline("%s yells:", Amonnam(mtmp));
 		  if(levl[x][y].looted & D_WARNED) {
-			verbalize("Halt, thief!  You're under arrest!");
+			mon_yells(mtmp, "Halt, thief!  You're under arrest!");
 			(void) angry_guards(!!Deaf);
 		  } else {
-			verbalize("Hey, stop picking that lock!");
+			mon_yells(mtmp, "Hey, stop picking that lock!");
 			levl[x][y].looted |=  D_WARNED;
 		  }
 		  stop_occupation();
@@ -400,7 +410,7 @@ register struct monst *mtmp;
 	}
 
 	/* the watch will look around and see if you are up to no good :-) */
-	if (mdat == &mons[PM_WATCHMAN] || mdat == &mons[PM_WATCH_CAPTAIN])
+	if (is_watch(mdat))
 		watch_on_duty(mtmp);
 
 	else if (is_mind_flayer(mdat) && !rn2(20)) {
@@ -1295,15 +1305,10 @@ register int x, y;
 {
 	int levtyp = levl[x][y].typ;
 
-	if (levtyp == DRAWBRIDGE_UP) {
-	    /* use underlying terrain in front of closed drawbridge */
-	    switch (levl[x][y].drawbridgemask & DB_UNDER) {
-	    case DB_MOAT:  levtyp = MOAT; break;
-	    case DB_LAVA:  levtyp = LAVAPOOL; break;
-	    case DB_ICE:   levtyp = ICE; break;
-	    case DB_FLOOR: levtyp = ROOM; break;
-	    }
-	}
+	/* use underlying terrain in front of closed drawbridge */
+	if (levtyp == DRAWBRIDGE_UP)
+	    levtyp = db_under_typ(levl[x][y].drawbridgemask);
+
 	return (boolean)(ACCESSIBLE(levtyp) && !closed_door(x, y));
 }
 

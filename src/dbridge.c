@@ -102,6 +102,18 @@ int x, y;
     return FALSE;
 }
 
+schar
+db_under_typ(mask)
+int mask;
+{
+    switch (mask & DB_UNDER) {
+    case DB_ICE:  return ICE; break;
+    case DB_LAVA: return LAVAPOOL; break;
+    case DB_MOAT: return MOAT; break;
+    default:      return STONE; break;
+    }
+}
+
 /*
  * We want to know whether a wall (or a door) is the portcullis (passageway)
  * of an eventual drawbridge.

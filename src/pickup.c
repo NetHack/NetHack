@@ -1,4 +1,4 @@
-/* NetHack 3.5	pickup.c	$NHDT-Date: 1426558927 2015/03/17 02:22:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.131 $ */
+/* NetHack 3.5	pickup.c	$NHDT-Date: 1430122768 2015/04/27 08:19:28 $  $NHDT-Branch: master $:$NHDT-Revision: 1.150 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -307,8 +307,10 @@ struct obj *obj;
     return (obj->quan >= val_for_n_or_more);
 }
 
-/* List of valid menu classes for query_objlist() and allow_category callback */
-static char valid_menu_classes[MAXOCLASSES + 2];
+/* list of valid menu classes for query_objlist() and allow_category callback
+   (with room for all object classes, 'u'npaid, BUCX, and terminator) */
+static char valid_menu_classes[MAXOCLASSES + 1 + 4 + 1];
+static boolean class_filter, bucx_filter, shop_filter;
 
 void
 add_valid_menu_class(c)
@@ -316,10 +318,19 @@ int c;
 {
 	static int vmc_count = 0;
 
-	if (c == 0)  /* reset */
-	  vmc_count = 0;
-	else
-	  valid_menu_classes[vmc_count++] = (char)c;
+	if (c == 0) { /* reset */
+	    vmc_count = 0;
+	    class_filter = bucx_filter = shop_filter = FALSE;
+	} else {
+	    valid_menu_classes[vmc_count++] = (char)c;
+	    /* categorize the new class */
+	    switch (c) {
+	    case 'B': case 'U': case 'C': /*FALLTHRU*/
+	    case 'X': bucx_filter = TRUE; break;
+	    case 'u': shop_filter = TRUE; break;
+	    default: class_filter = TRUE; break;
+	    }
+	}
 	valid_menu_classes[vmc_count] = '\0';
 }
 
@@ -344,26 +355,47 @@ boolean
 allow_category(obj)
 struct obj *obj;
 {
-    if (Role_if(PM_PRIEST)) obj->bknown = TRUE;
-
-    /* if obj's class is in the list, then obj is acceptable */
-    if (index(valid_menu_classes, obj->oclass))
-	return TRUE;
     /* unpaid and BUC checks don't apply to coins */
     if (obj->oclass == COIN_CLASS)
+	return index(valid_menu_classes, COIN_CLASS) ? TRUE : FALSE;
+
+    if (Role_if(PM_PRIEST)) obj->bknown = TRUE;
+    /*
+     * There are three types of filters possible and the first and
+     * third can have more than one entry:
+     *  1) object class (armor, potion, &c);
+     *  2) unpaid shop item;
+     *  3) bless/curse state (blessed, uncursed, cursed, BUC-unknown).
+     * When only one type is present, the situation is simple:
+     * to be accepted, obj's status must match one of the entries.
+     * When more than one type is present, the obj will now only
+     * be accepted when it matches one entry of each type.
+     * So ?!B will accept blessed scrolls or potions, and [u will
+     * accept unpaid armor.  (In 3.4.3, an object was accepted by
+     * this filter if it met any entry of any type, so ?!B resulted
+     * in accepting all scrolls and potions regardless of bless/curse
+     * state plus all blessed non-scroll, non-potion objects.)
+     */
+    /* if class is expected but obj's class is not in the list, reject */
+    if (class_filter && !index(valid_menu_classes, obj->oclass))
 	return FALSE;
-    /* check for unpaid item */
-    if (index(valid_menu_classes, 'u') &&
-	    (obj->unpaid || (Has_contents(obj) && count_unpaid(obj))))
-	return TRUE;
+    /* if unpaid is expected and obj isn't unpaid, reject (treat a container
+       holding any unpaid object as unpaid even if isn't unpaid itself) */
+    if (shop_filter && !obj->unpaid
+	&& !(Has_contents(obj) && count_unpaid(obj) > 0))
+	return FALSE;
     /* check for particular bless/curse state */
-    if (!obj->bknown ? index(valid_menu_classes, 'X') :	/* unknown BUC state */
-	obj->blessed ? index(valid_menu_classes, 'B') :	/* known blessed */
-	!obj->cursed ? index(valid_menu_classes, 'U') :	/* known uncursed */
-		       index(valid_menu_classes, 'C'))	/* known cursed */
-	return TRUE;
-    /* obj isn't acceptable */
-    return FALSE;
+    if (bucx_filter) {
+	/* first categorize this object's bless/curse state */
+	char bucx = !obj->bknown ? 'X'
+		    : obj->blessed ? 'B' : obj->cursed ? 'C' : 'U';
+
+	/* if its category is not in the list, reject */
+	if (!index(valid_menu_classes, bucx))
+	    return FALSE;
+    }
+    /* obj didn't fail any of the filter checks, so accept */
+    return TRUE;
 }
 
 #if 0 /* not used */
