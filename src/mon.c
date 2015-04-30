@@ -1,4 +1,4 @@
-/* NetHack 3.5	mon.c	$NHDT-Date: 1430365894 2015/04/30 03:51:34 $  $NHDT-Branch: master $:$NHDT-Revision: 1.168 $ */
+/* NetHack 3.5	mon.c	$NHDT-Date: 1430396792 2015/04/30 12:26:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.169 $ */
 /* NetHack 3.5	mon.c	$Date: 2012/05/16 02:15:10 $  $Revision: 1.126 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1850,7 +1850,7 @@ register struct monst *mtmp;
             u.uy = mtmp->my;
             u.uswallow = 0;
             u.uswldtim = 0;
-            if (BALL_IN_MON) placebc();
+            if (Punished && uball->where == OBJ_FREE) placebc();
             vision_full_recalc = 1;
             docrt();
         }
