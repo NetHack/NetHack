@@ -1,4 +1,4 @@
-/* NetHack 3.5	display.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	display.c	$NHDT-Date: 1430365890 2015/04/30 03:51:30 $  $NHDT-Branch: master $:$NHDT-Revision: 1.49 $ */
 /* NetHack 3.5	display.c	$Date: 2011/12/05 03:17:36 $  $Revision: 1.34 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
@@ -1363,11 +1363,16 @@ row_refresh(start,stop,y)
 void
 cls()
 {
+    static boolean in_cls = 0;
+
+    if (in_cls) return;
+    in_cls = TRUE;
     display_nhwindow(WIN_MESSAGE, FALSE); /* flush messages */
     context.botlx = 1;		/* force update of botl window */
     clear_nhwindow(WIN_MAP);	/* clear physical screen */
 
     clear_glyph_buffer();	/* this is sort of an extra effort, but OK */
+    in_cls = FALSE;
 }
 
 /*

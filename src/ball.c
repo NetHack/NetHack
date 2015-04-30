@@ -1,4 +1,4 @@
-/* NetHack 3.5	ball.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	ball.c	$NHDT-Date: 1430365884 2015/04/30 03:51:24 $  $NHDT-Branch: master $:$NHDT-Revision: 1.22 $ */
 /* NetHack 3.5	ball.c	$Date: 2011/08/30 22:13:26 $  $Revision: 1.17 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -102,7 +102,7 @@ ballfall()
  *  It is assumed that when this is called, the ball and chain are NOT
  *  attached to the object list.
  *
- *  Should not be called while swallowed.
+ *  Should not be called while swallowed except on waterlevel.
  */
 void
 placebc()
@@ -112,14 +112,12 @@ placebc()
 	return;
     }
 
-    obj_extract_self(uchain);
     (void) flooreffects(uchain, u.ux, u.uy, "");	/* chain might rust */
 
     if (carried(uball))		/* the ball is carried */
 	u.bc_order = BCPOS_DIFFER;
     else {
 	/* ball might rust -- already checked when carried */
-	obj_extract_self(uball);
 	(void) flooreffects(uball, u.ux, u.uy, "");
 	place_object(uball, u.ux, u.uy);
 	u.bc_order = BCPOS_CHAIN;
@@ -135,7 +133,19 @@ placebc()
 void
 unplacebc()
 {
-    if (u.uswallow) return;	/* ball&chain not placed while swallowed */
+    if (u.uswallow) {
+	if (Is_waterlevel(&u.uz)) {
+    	    /* we need to proceed with the removal from the floor
+    	     * so that movebubbles() processing will disregard it as
+    	     * intended. Ignore all the vision stuff.
+    	     */
+    	     if (!carried(uball))
+                 obj_extract_self(uball);
+             obj_extract_self(uchain);
+        }
+        /* ball&chain not unplaced while swallowed */
+        return;
+    }
 
     if (!carried(uball)) {
 	obj_extract_self(uball);
