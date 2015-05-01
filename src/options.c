@@ -1,4 +1,4 @@
-/* NetHack 3.5	options.c	$NHDT-Date: 1429953065 2015/04/25 09:11:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.186 $ */
+/* NetHack 3.5	options.c	$NHDT-Date: 1430441885 2015/05/01 00:58:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.191 $ */
 /* NetHack 3.5	options.c	$Date: 2012/04/09 02:56:30 $  $Revision: 1.153 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -283,7 +283,7 @@ static struct Comp_Opt
 						4, SET_IN_FILE },
 	{ "menu_first_page", "jump to the first page in a menu",
 						4, SET_IN_FILE },
-	{ "menu_headings", "bold, inverse, or underline headings", 9, SET_IN_GAME },
+	{ "menu_headings", "text attribute for menu headings", 9, SET_IN_GAME },
 	{ "menu_invert_all", "invert all items in a menu", 4, SET_IN_FILE },
 	{ "menu_invert_page", "invert all items on this page of a menu",
 						4, SET_IN_FILE },
@@ -498,6 +498,13 @@ STATIC_OVL boolean FDECL(is_wc2_option, (const char *));
 STATIC_OVL boolean FDECL(wc2_supported, (const char *));
 STATIC_DCL void FDECL(remove_autopickup_exception, (struct autopickup_exception *));
 STATIC_OVL int FDECL(count_ape_maps, (int *, int *));
+STATIC_DCL const char *FDECL(clr2colorname, (int));
+STATIC_DCL const char *FDECL(attr2attrname, (int));
+STATIC_DCL int NDECL(query_color);
+STATIC_DCL int FDECL(query_attr, (const char *));
+STATIC_DCL boolean FDECL(add_menu_coloring_parsed, (char *, int, int));
+STATIC_DCL void FDECL(free_one_menu_coloring, (int));
+STATIC_DCL int NDECL(count_menucolors);
 
 
 void
@@ -1163,13 +1170,117 @@ static const struct {
      {"inverse", ATR_INVERSE}
 };
 
+const char *
+clr2colorname(clr)
+int clr;
+{
+    int i;
+    for (i = 0; i < SIZE(colornames); i++)
+	if (colornames[i].color == clr)
+	    return colornames[i].name;
+    return NULL;
+}
+
+const char *
+attr2attrname(attr)
+int attr;
+{
+    int i;
+    for (i = 0; i < SIZE(attrnames); i++)
+	if (attrnames[i].attr == attr)
+	    return attrnames[i].name;
+    return NULL;
+}
+
+int
+query_color()
+{
+    winid tmpwin;
+    anything any;
+    int i, pick_cnt;
+    menu_item *picks = (menu_item *)0;
+
+    tmpwin = create_nhwindow(NHW_MENU);
+    start_menu(tmpwin);
+    any = zeroany;
+    for (i = 0; i < SIZE(colornames); i++) {
+	if (!strcmp(colornames[i].name, "grey")) continue;
+	any.a_int = i + 1;
+	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, colornames[i].name, MENU_UNSELECTED);
+    }
+    end_menu(tmpwin, "Pick a color");
+    pick_cnt = select_menu(tmpwin, PICK_ONE, &picks);
+    destroy_nhwindow(tmpwin);
+    if (pick_cnt > 0) {
+	i = colornames[picks->item.a_int - 1].color;
+	free((genericptr_t)picks);
+	return i;
+    }
+    return -1;
+}
+
+int
+query_attr(prompt)
+const char *prompt;
+{
+    winid tmpwin;
+    anything any;
+    int i, pick_cnt;
+    menu_item *picks = (menu_item *)0;
+
+    tmpwin = create_nhwindow(NHW_MENU);
+    start_menu(tmpwin);
+    any = zeroany;
+    for (i = 0; i < SIZE(attrnames); i++) {
+	any.a_int = i + 1;
+	add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
+		 attrnames[i].attr, attrnames[i].name, MENU_UNSELECTED);
+    }
+    end_menu(tmpwin, prompt ? prompt : "Pick an attribute");
+    pick_cnt = select_menu(tmpwin, PICK_ONE, &picks);
+    destroy_nhwindow(tmpwin);
+    if (pick_cnt > 0) {
+	i = attrnames[picks->item.a_int - 1].attr;
+	free((genericptr_t)picks);
+	return i;
+    }
+    return -1;
+}
+
+boolean
+add_menu_coloring_parsed(str, c, a)
+char *str;
+int c, a;
+{
+    struct menucoloring *tmp;
+    if (!str) return FALSE;
+    tmp = (struct menucoloring *)alloc(sizeof(struct menucoloring));
+    tmp->match = regex_init();
+    if (!regex_compile(str, tmp->match)) {
+	static const char *re_error = "Menucolor regex error";
+	if (!iflags.window_inited)
+	    raw_printf("\n%s: %s\n", re_error, regex_error_desc(tmp->match));
+	else
+	    pline("%s: %s", re_error, regex_error_desc(tmp->match));
+	wait_synch();
+	free(tmp);
+	return FALSE;
+    } else {
+	tmp->next = menu_colorings;
+	tmp->origstr = dupstr(str);
+	tmp->color = c;
+	tmp->attr = a;
+	menu_colorings = tmp;
+	return TRUE;
+    }
+}
+
 /* parse '"regex_string"=color&attr' and add it to menucoloring */
 boolean
 add_menu_coloring(str)
 char *str;
 {
     int i, c = NO_COLOR, a = ATR_NONE;
-    struct menucoloring *tmp;
     char *tmps, *cs = strchr(str, '=');
 
     if (!cs || !str) return FALSE;
@@ -1212,20 +1323,7 @@ char *str;
 	}
     }
 
-    tmp = (struct menucoloring *)alloc(sizeof(struct menucoloring));
-    tmp->match = regex_init();
-    if (!regex_compile(tmps, tmp->match)) {
-	raw_printf("\nMenucolor regex error: %s\n", regex_error_desc(tmp->match));
-	wait_synch();
-	free(tmp);
-	return FALSE;
-    } else {
-	tmp->next = menu_colorings;
-	tmp->color = c;
-	tmp->attr = a;
-	menu_colorings = tmp;
-	return TRUE;
-    }
+    return add_menu_coloring_parsed(tmps, c, a);
 }
 
 boolean
@@ -1252,11 +1350,48 @@ free_menu_coloring()
     while (tmp) {
 	struct menucoloring *tmp2 = tmp->next;
         regex_free(tmp->match);
+	free(tmp->origstr);
 	free(tmp);
 	tmp = tmp2;
     }
 }
 
+void
+free_one_menu_coloring(idx)
+int idx; /* 0 .. */
+{
+    struct menucoloring *tmp = menu_colorings;
+    struct menucoloring *prev = NULL;
+
+    while (tmp) {
+	if (idx == 0) {
+	    struct menucoloring *next = tmp->next;
+	    regex_free(tmp->match);
+	    free(tmp->origstr);
+	    free(tmp);
+	    if (prev) prev->next = next;
+	    else menu_colorings = next;
+	    return;
+	}
+	idx--;
+	prev = tmp;
+	tmp = tmp->next;
+    }
+}
+
+
+int
+count_menucolors()
+{
+    int count = 0;
+    struct menucoloring *tmp = menu_colorings;
+
+    while (tmp) {
+	count++;
+	tmp = tmp->next;
+    }
+    return count;
+}
 
 void
 parseoptions(opts, tinitial, tfrom_file)
@@ -2618,14 +2753,12 @@ goodfruit:
 		else if (!(opts = string_for_env_opt(fullname, opts, FALSE))) {
 			return;
 		}
-		if (!strcmpi(opts,"bold"))
-			iflags.menu_headings = ATR_BOLD;
-		else if (!strcmpi(opts,"inverse"))
-			iflags.menu_headings = ATR_INVERSE;
-		else if (!strcmpi(opts,"underline"))
-			iflags.menu_headings = ATR_ULINE;
-		else
-			badoption(opts);
+		for (i = 0; i < SIZE(attrnames); i++)
+		    if (!strcmpi(opts, attrnames[i].name)) {
+			iflags.menu_headings = attrnames[i].attr;
+			return;
+		    }
+		badoption(opts);
 		return;
 	}
 
@@ -3087,6 +3220,11 @@ doset()
 				doset_add_menu(tmpwin, compopt[i].name,
 					(pass == DISP_IN_GAME) ? 0 : indexoffset);
 		}
+	any.a_int = -3;
+	Sprintf(buf2, "(%d currently set)", count_menucolors());
+	Sprintf(buf, fmtstr_doset_add_menu, any.a_int ? "" : "    ",
+		"menucolors", buf2);
+	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
 #ifdef STATUS_VIA_WINDOWPORT
 # ifdef STATUS_HILITES
 	any.a_int = -2;
@@ -3138,6 +3276,10 @@ doset()
 		} else
 # endif
 #endif
+		if (opt_indx == -4) {
+		    (void)special_handling("menucolors",
+					   setinitial, fromfile);
+		} else
 		if (opt_indx < boolcount) {
 		    /* boolean option */
 		    Sprintf(buf, "%s%s", *boolopt[opt_indx].addr ? "!" : "",
@@ -3176,6 +3318,57 @@ doset()
 	}
 	return 0;
 }
+
+int
+handle_add_list_remove(optname, numtotal)
+char *optname;
+int numtotal;
+{
+	winid tmpwin;
+	anything any;
+	int i, pick_cnt, pick_idx, opt_idx;
+	menu_item *pick_list = (menu_item *)0;
+	static const struct action {
+	    char letr;
+	    const char *desc;
+	} action_titles[] = {
+	    { 'a', "add new %s" },		/* [0] */
+	    { 'l', "list %s" },		/* [1] */
+	    { 'r', "remove existing %s" },	/* [2] */
+	    { 'x', "exit this menu" },				/* [3] */
+	};
+
+	opt_idx = 0;
+	tmpwin = create_nhwindow(NHW_MENU);
+	start_menu(tmpwin);
+	any = zeroany;
+	for (i = 0; i < SIZE(action_titles); i++) {
+		char tmpbuf[BUFSZ];
+		any.a_int++;
+		/* omit list and remove if there aren't any yet */
+		if (!numtotal && (i == 1 || i == 2)) continue;
+		Sprintf(tmpbuf, action_titles[i].desc, (i == 1) ? makeplural(optname) : optname);
+		add_menu(tmpwin, NO_GLYPH, &any, action_titles[i].letr,
+			 0, ATR_NONE, tmpbuf,
+#if 0		/* this ought to work but doesn't... */
+			 (action_titles[i].letr == 'x') ? MENU_SELECTED :
+#endif
+			 MENU_UNSELECTED);
+	}
+	end_menu(tmpwin, "Do what?");
+	if ((pick_cnt = select_menu(tmpwin, PICK_ONE, &pick_list)) > 0) {
+		for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx) {
+			opt_idx = pick_list[pick_idx].item.a_int - 1;
+		}
+		free((genericptr_t)pick_list);
+		pick_list = (menu_item *)0;
+	}
+	destroy_nhwindow(tmpwin);
+
+	if (pick_cnt < 1) opt_idx = 3;  /* none selected, exit menu */
+	return opt_idx;
+}
+
 
 struct symsetentry *symset_list = 0;	/* files.c will populate this with
 						 list of available sets */
@@ -3454,79 +3647,70 @@ boolean setinitial,setfromfile;
 	}
 	destroy_nhwindow(tmpwin);
     } else if (!strcmp("menu_headings", optname)) {
-	static const char *mhchoices[3] = {"bold", "inverse", "underline"};
-	const char *npletters = "biu";
-	menu_item *mode_pick = (menu_item *)0;
-
-	tmpwin = create_nhwindow(NHW_MENU);
-	start_menu(tmpwin);
-	any = zeroany;
-	for (i = 0; i < SIZE(mhchoices); i++) {
-		any.a_int = i + 1;
-		add_menu(tmpwin, NO_GLYPH, &any, npletters[i], 0,
-			 ATR_NONE, mhchoices[i], MENU_UNSELECTED);
-	}
-	end_menu(tmpwin, "How to highlight menu headings:");
-	if (select_menu(tmpwin, PICK_ONE, &mode_pick) > 0) {
-		int mode = mode_pick->item.a_int - 1;
-		switch(mode) {
-			case 2:
-				iflags.menu_headings = ATR_ULINE;
-				break;
-			case 0:
-				iflags.menu_headings = ATR_BOLD;
-				break;
-			case 1:
-			default:
-				iflags.menu_headings = ATR_INVERSE;
+	int mhattr = query_attr("How to highlight menu headings:");
+	if (mhattr != -1) iflags.menu_headings = mhattr;
+    } else if (!strcmp("menucolors", optname)) {
+	int opt_idx, nmc, mcclr, mcattr;
+	char mcbuf[BUFSZ];
+menucolors_again:
+	nmc = count_menucolors();
+	opt_idx = handle_add_list_remove("menucolor", nmc);
+	if (opt_idx == 3) {
+		;	/* done--fall through to function exit */
+	} else if (opt_idx == 0) {	/* add new */
+		getlin("What new menucolor pattern?", mcbuf);
+		if (*mcbuf == '\033' || !*mcbuf) goto menucolors_again;
+		mcclr = query_color();
+		if (mcclr == -1) goto menucolors_again;
+		mcattr = query_attr(NULL);
+		if (mcattr == -1) goto menucolors_again;
+		if (!add_menu_coloring_parsed(mcbuf, mcclr, mcattr)) {
+		    pline("Error adding the menu color.");
+		    wait_synch();
+		    goto menucolors_again;
 		}
-		free((genericptr_t)mode_pick);
-	}
-	destroy_nhwindow(tmpwin);
-    } else if (!strcmp("autopickup_exception", optname)) {
-	int pick_cnt, pick_idx, opt_idx, pass;
-	int totalapes = 0, numapes[2] = {0,0};
-	menu_item *pick_list = (menu_item *)0;
-	char apebuf[1+BUFSZ];	/* so &apebuf[1] is BUFSZ long for getlin() */
-	struct autopickup_exception *ape;
-	static const struct ape_action {
-	    char letr;
-	    const char *desc;
-	} action_titles[] = {
-	    { 'a', "add new autopickup exception" },		/* [0] */
-	    { 'l', "list autopickup exceptions" },		/* [1] */
-	    { 'r', "remove existing autopickup exception" },	/* [2] */
-	    { 'x', "exit this menu" },				/* [3] */
-	};
-
- ape_again:
-	opt_idx = 0;
-	totalapes = count_ape_maps(&numapes[AP_LEAVE], &numapes[AP_GRAB]);
-	tmpwin = create_nhwindow(NHW_MENU);
-	start_menu(tmpwin);
-	any = zeroany;
-	for (i = 0; i < SIZE(action_titles); i++) {
-		any.a_int++;
-		/* omit list and remove if there aren't any yet */
-		if (!totalapes && (i == 1 || i == 2)) continue;
-		add_menu(tmpwin, NO_GLYPH, &any, action_titles[i].letr,
-			 0, ATR_NONE, action_titles[i].desc,
-#if 0		/* this ought to work but doesn't... */
-			 (action_titles[i].letr == 'x') ? MENU_SELECTED :
-#endif
-			 MENU_UNSELECTED);
-	}
-	end_menu(tmpwin, "Do what?");
-	if ((pick_cnt = select_menu(tmpwin, PICK_ONE, &pick_list)) > 0) {
-		for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx) {
-			opt_idx = pick_list[pick_idx].item.a_int - 1;
+	} else {	/* list or remove */
+		int pick_idx, pick_cnt;
+		int mc_idx;
+		menu_item *pick_list = (menu_item *)0;
+		struct menucoloring *tmp = menu_colorings;
+		tmpwin = create_nhwindow(NHW_MENU);
+		start_menu(tmpwin);
+		any = zeroany;
+		mc_idx = 0;
+		while (tmp) {
+		    const char *sattr = attr2attrname(tmp->attr);
+		    const char *sclr = clr2colorname(tmp->color);
+		    any.a_int = (++mc_idx);
+		    Sprintf(mcbuf, "\"%s\"=%s%s%s", tmp->origstr, sclr,
+			    (tmp->attr != ATR_NONE) ? " & " : "",
+			    (tmp->attr != ATR_NONE) ? sattr : "");
+		    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, mcbuf, MENU_UNSELECTED);
+		    tmp = tmp->next;
+		}
+		Sprintf(mcbuf, "%s menu colors",
+			(opt_idx == 1) ? "List of" : "Remove which");
+		end_menu(tmpwin, mcbuf);
+		pick_cnt = select_menu(tmpwin,
+					(opt_idx == 1) ?  PICK_NONE : PICK_ANY,
+					&pick_list);
+		if (pick_cnt > 0) {
+		    for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx)
+			free_one_menu_coloring(pick_list[pick_idx].item.a_int - 1 - pick_idx);
 		}
 		free((genericptr_t)pick_list);
 		pick_list = (menu_item *)0;
+		destroy_nhwindow(tmpwin);
+		if (pick_cnt >= 0) goto menucolors_again;
 	}
-	destroy_nhwindow(tmpwin);
-
-	if (pick_cnt < 1 || opt_idx == 3) {
+    } else if (!strcmp("autopickup_exception", optname)) {
+	int opt_idx, pass, totalapes = 0, numapes[2] = {0,0};
+	char apebuf[1+BUFSZ];	/* so &apebuf[1] is BUFSZ long for getlin() */
+	struct autopickup_exception *ape;
+ape_again:
+	totalapes = count_ape_maps(&numapes[AP_LEAVE], &numapes[AP_GRAB]);
+	opt_idx = handle_add_list_remove("autopickup exception", totalapes);
+	if (opt_idx == 3) {
 		;	/* done--fall through to function exit */
 	} else if (opt_idx == 0) {	/* add new */
 		getlin("What new autopickup exception pattern?", &apebuf[1]);
@@ -3546,6 +3730,8 @@ boolean setinitial,setfromfile;
 		    goto ape_again;
 		}
 	} else {	/* list or remove */
+		int pick_idx, pick_cnt;
+		menu_item *pick_list = (menu_item *)0;
 		tmpwin = create_nhwindow(NHW_MENU);
 		start_menu(tmpwin);
 		for (pass = AP_LEAVE; pass <= AP_GRAB; ++pass) {
@@ -3870,10 +4056,7 @@ char *buf;
 	else if (!strcmp(optname, "menu_invert_all"))
 		Sprintf(buf, "%s", to_be_done);
 	else if (!strcmp(optname, "menu_headings")) {
-		Sprintf(buf, "%s", (iflags.menu_headings == ATR_BOLD) ?
-			"bold" :   (iflags.menu_headings == ATR_INVERSE) ?
-			"inverse" :   (iflags.menu_headings == ATR_ULINE) ?
-			"underline" : "unknown");
+		Sprintf(buf, "%s", attr2attrname(iflags.menu_headings));
 	}
 	else if (!strcmp(optname, "menu_invert_page"))
 		Sprintf(buf, "%s", to_be_done);

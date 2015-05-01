@@ -1,4 +1,4 @@
-/* NetHack 3.5	zap.c	$NHDT-Date: 1428207622 2015/04/05 04:20:22 $  $NHDT-Branch: nhmall-booktribute $:$NHDT-Revision: 1.215 $ */
+/* NetHack 3.5	zap.c	$NHDT-Date: 1430355196 2015/04/30 00:53:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.218 $ */
 /* NetHack 3.5	zap.c	$Date: 2013/11/05 00:57:56 $  $Revision: 1.183 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2870,9 +2870,11 @@ int skill;
     else if (dex < 8)
 	hit_bon -= 1;
     else if (dex < 14)
-	hit_bon -= 0;		/* Will change when print stuff below removed */
+        /* Will change when print stuff below removed */
+	hit_bon -= 0;
     else
-	hit_bon += dex - 14; /* Even increment for dextrous heroes (see weapon.c abon) */
+	/* Even increment for dextrous heroes (see weapon.c abon) */
+	hit_bon += dex - 14;
 
     return hit_bon;
 }

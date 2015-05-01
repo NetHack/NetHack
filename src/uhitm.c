@@ -516,8 +516,7 @@ int thrown;		/* HMON_xxx (0 => hand-to-hand, other => ranged) */
 
 	anger_guards = (mon->mpeaceful &&
 			    (mon->ispriest || mon->isshk ||
-			     mon->data == &mons[PM_WATCHMAN] ||
-			     mon->data == &mons[PM_WATCH_CAPTAIN]));
+			     is_watch(mon->data)));
 	result = hmon_hitmon(mon, obj, thrown);
 	if (mon->ispriest && !rn2(2)) ghod_hitsu(mon);
 	if (anger_guards) (void)angry_guards(!!Deaf);

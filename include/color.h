@@ -53,6 +53,7 @@
 
 struct menucoloring {
     struct nhregex *match;
+    char *origstr;
     int color, attr;
     struct menucoloring *next;
 };

@@ -742,12 +742,18 @@ something appropriate if {\it autoquiver\/} is true.
 List your inventory (everything you're carrying).
 %.lp
 \item[\tb{I}]
-List selected parts of your inventory.\\
+List selected parts of your inventory, usually be specifying the character
+for a particular set of objects, like `{\tt [}' for armor or `{\tt !}'
+for potions.\\
 %.sd
 %.si
 {\tt I*} --- list all gems in inventory;\\
 {\tt Iu} --- list all unpaid items;\\
 {\tt Ix} --- list all used up items that are on your shopping bill;\\
+{\tt IB} --- list all items known to be blessed;\\
+{\tt IU} --- list all items known to be uncursed;\\
+{\tt IC} --- list all items known to be cursed;\\
+{\tt IX} --- list all items whose bless/curse status is unknown;\\
 {\tt I\$} --- count your money.
 %.ei
 %.ed
@@ -1544,6 +1550,12 @@ more beneficially than normal uncursed items.  For example, a blessed
 weapon will do more damage against demons.
 
 %.pg
+Objects which are neither cursed nor blessed are referred to as uncursed.
+They could just as easily have been described as unblessed, but the
+uncursed designation is what you will see within the game.  A ``glass
+half full versus glass half empty'' situation; make of that what you will.
+
+%.pg
 There are magical means of bestowing or removing curses upon objects,
 so even if you are stuck with one, you can still have the curse
 lifted and the item removed.  Priests and Priestesses have an innate
@@ -1555,6 +1567,8 @@ An item with unknown status will be reported in your inventory with no prefix.
 An item which you know the state of will be distinguished in your inventory
 by the presence of the word ``cursed'', ``uncursed'' or ``blessed'' in the
 description of the item.
+In some cases ``uncursed'' will be omitted as being redundant when
+enough other information is displayed.
 
 %.hn 2
 \subsection*{Weapons (`{\tt )}')}
@@ -2516,8 +2530,9 @@ Implemented by the Amiga, Gem and tty ports.
 Default `\verb+^+'.
 \item[\ib{menu\_headings}]
 Controls how the headings in a menu are highlighted.
-Values are ``{\tt bold}'', ``{\tt inverse}'', or ``{\tt underline}''.
-Not all ports can actually display all three types.
+Values are ``{\tt none}'', ``{\tt bold}'', ``{\tt dim}'',
+``{\tt underline}'', ``{\tt blink}'', or ``{\tt inverse}''.
+Not all ports can actually display all types.
 \item[\ib{menu\_invert\_all}]
 Menu character accelerator to invert all items in a menu.
 Implemented by the Amiga, Gem, X11 and tty ports.

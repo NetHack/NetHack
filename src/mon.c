@@ -1,4 +1,4 @@
-/* NetHack 3.5	mon.c	$NHDT-Date: 1429666918 2015/04/22 01:41:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.165 $ */
+/* NetHack 3.5	mon.c	$NHDT-Date: 1430396792 2015/04/30 12:26:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.169 $ */
 /* NetHack 3.5	mon.c	$Date: 2012/05/16 02:15:10 $  $Revision: 1.126 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1850,7 +1850,7 @@ register struct monst *mtmp;
             u.uy = mtmp->my;
             u.uswallow = 0;
             u.uswldtim = 0;
-            if (Punished) placebc();
+            if (Punished && uball->where == OBJ_FREE) placebc();
             vision_full_recalc = 1;
             docrt();
         }
@@ -3117,9 +3117,7 @@ register boolean silent;
 
     for(mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp)) continue;
-        if((mtmp->data == &mons[PM_WATCHMAN] ||
-                   mtmp->data == &mons[PM_WATCH_CAPTAIN])
-                    && mtmp->mpeaceful) {
+        if (is_watch(mtmp->data) && mtmp->mpeaceful) {
             ct++;
             if(cansee(mtmp->mx, mtmp->my) && mtmp->mcanmove) {
                 if (distu(mtmp->mx, mtmp->my) == 2) nct++;
@@ -3157,9 +3155,8 @@ pacify_guards()
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp)) continue;
-        if (mtmp->data == &mons[PM_WATCHMAN] ||
-        mtmp->data == &mons[PM_WATCH_CAPTAIN])
-        mtmp->mpeaceful = 1;
+        if (is_watch(mtmp->data))
+	    mtmp->mpeaceful = 1;
     }
 }
 

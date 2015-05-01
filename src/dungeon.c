@@ -1848,6 +1848,16 @@ d_level *dest;
     }
 }
 
+char *
+get_annotation(lev)
+d_level *lev;
+{
+    mapseen *mptr;
+    if ((mptr = find_mapseen(lev)))
+	return mptr->custom;
+    return NULL;
+}
+
 /* #annotate command - add a custom name to the current level */
 int
 donamelevel()
@@ -1857,8 +1867,15 @@ donamelevel()
 
     if (!(mptr = find_mapseen(&u.uz))) return 0;
 
-    getlin("What do you want to call this dungeon level?", nbuf);
+    if (mptr->custom) {
+	char tmpbuf[BUFSZ];
+	Sprintf(tmpbuf, "Replace annotation \"%.30s%s\" with?",
+		mptr->custom, strlen(mptr->custom) > 30 ? "..." : "");
+	getlin(tmpbuf, nbuf);
+    } else
+	getlin("What do you want to call this dungeon level?", nbuf);
     if (index(nbuf, '\033')) return 0;
+    (void)mungspaces(nbuf);
 
     /* discard old annotation, if any */
     if (mptr->custom) {
@@ -2190,12 +2207,7 @@ recalc_mapseen()
 	    if (cansee(x, y) || (x == u.ux && y == u.uy && !Levitation)) {
 		ltyp = levl[x][y].typ;
 		if (ltyp == DRAWBRIDGE_UP)
-		    switch (levl[x][y].drawbridgemask & DB_UNDER) {
-			case DB_ICE:  ltyp = ICE; break;
-			case DB_LAVA: ltyp = LAVAPOOL; break;
-			case DB_MOAT: ltyp = MOAT; break;
-			default:      ltyp = STONE; break;
-		    }
+		    ltyp = db_under_typ(levl[x][y].drawbridgemask);
 		if ((mtmp = m_at(x, y)) != 0 &&
 			mtmp->m_ap_type == M_AP_FURNITURE && canseemon(mtmp))
 		    ltyp = cmap_to_type(mtmp->mappearance);
