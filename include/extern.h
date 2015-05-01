@@ -515,6 +515,7 @@ E void FDECL(switch_symbols, (int));
 E void FDECL(assign_graphics, (int));
 E void NDECL(init_r_symbols);
 E void NDECL(init_symbols);
+E void NDECL(update_bouldersym);
 E void NDECL(init_showsyms);
 E void NDECL(init_l_symbols);
 E void FDECL(clear_symsetentry, (int,BOOLEAN_P));

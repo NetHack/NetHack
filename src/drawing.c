@@ -351,6 +351,14 @@ init_symbols()
 }
 
 void
+update_bouldersym()
+{
+    showsyms[SYM_BOULDER + SYM_OFF_X] = iflags.bouldersym;
+    l_syms[SYM_BOULDER + SYM_OFF_X] = iflags.bouldersym;
+    r_syms[SYM_BOULDER + SYM_OFF_X] = iflags.bouldersym;
+}
+
+void
 init_showsyms()
 {
 	register int i;
