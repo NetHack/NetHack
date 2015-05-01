@@ -5,7 +5,7 @@
 # Note: was originally called nhdate; the rename is not reflected in the code.
 
 use strict;
-my %opt;	#cmd v n f F (other single char, but we don't care)
+our %opt;	#cmd v n f F m (other single char, but we don't care)
 my $mode;	# a c d f (add, commit, date, date -f)
 
 if(length $ENV{GIT_PREFIX}){
@@ -249,7 +249,6 @@ my $count = s/\$$PREFIX-(([A-Za-z][A-Za-z0-9_]*)(: ([^\x24]+))?)\$/&handlevar($2
 	my $ofile = $file . ".nht";
 	open(TOUT, ">", $ofile) or die "Can't open $ofile";
 
-#XXX MUST add a loop here
 #	die "write failed: $!" unless defined syswrite(TOUT, $_);
 	my $offset = 0;
 	my $sent;
@@ -267,7 +266,7 @@ my $count = s/\$$PREFIX-(([A-Za-z][A-Za-z0-9_]*)(: ([^\x24]+))?)\$/&handlevar($2
 	rename $ofile, $file or die "Can't rename $ofile to $file";
 }
 
-# XXX docs for --fixup and --squash are wrong in synopsis. --file missing
+# XXX docs for --fixup and --squash are wrong in git's synopsis. --file missing
 #   --message --template -t
 sub cmdparse {
 	my(@in) = @_;
@@ -305,11 +304,15 @@ sub cmdparse {
 			shift @in;
 			next;
 		}
+# XXX this is messy - time for a rewrite?
 		if(m/^-(.*)/){
 			foreach my $single ( split(//,$1) ){
 					# don't do -v here from add/commit
 				if($single ne 'v'){
-					$opt{$single}++;
+					# don't use -m from add/commit
+					if($opt{cmd} eq 'date' || $single ne 'm'){
+						$opt{$single}++;
+					}
 				} elsif($opt{cmd} eq 'date'){
 					$opt{$single}++;
 				}
@@ -408,8 +411,14 @@ use POSIX qw(strftime);
 # On pull, keep the current value so we can see the last change date.
 sub Date {
 	my($val) = @_;
-	# we add this to make merge easier for now XXX
-	my $now = time; # not %s below - may not be portable
+	my $now;
+	if($opt{m}){
+		my $hash = `git log -1 '--format=format:%H' $::current_file`;
+			#author keni <keni@his.com> 1429884677 -0400
+		chomp($now = `git cat-file -p $hash | awk '/author/{print \$4}'`);
+	} else {
+		$now = time;
+	}
 	# YYYY/MM/DD HH:MM:SS
 	$val = "$now " . strftime("%Y/%m/%d %H:%M:%S", gmtime($now));
 	return $val;
@@ -448,7 +457,7 @@ C<nhsub> - NetHack git command for substitution variables
 
 =head1 SYNOPSIS
 
-C<git nhsub [-v[v[v]] [-n] [-f|-F] [--] [file...]>
+C<git nhsub [-v[v[v]] [-n] [-f|-F] [-m] [--] [file...]>
 
 =head1 DESCRIPTION
 
@@ -497,5 +506,12 @@ Perform substitution even if the file has not changed,
 even if the NHSUBST attribute is not set for the
 file, and only if the file is not ignored by git.  Not available
 when invoked as part of C<nhadd> or C<nhcommit>.
+
+=item C<-m>
+
+Use metadata (C<git log> and C<git cat-file>) to find the last change date to
+substitute.  Often used with C<-f>.  This is useful for cleaning up dates in files that were not
+updated when last changed. (Do not use C<git nhadd>/C<git nhcommit> after C<nhsub -m>
+or the changes will be overwritten with the current date.)
 
 =back
