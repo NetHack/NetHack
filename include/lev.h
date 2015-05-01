@@ -13,6 +13,8 @@
 #define WRITE_SAVE	0x2
 #define FREE_SAVE	0x4
 
+#define MAX_BMASK	4
+
 /* operations of the various saveXXXchn & co. routines */
 #define perform_bwrite(mode)	((mode) & (COUNT_SAVE|WRITE_SAVE))
 #define release_data(mode)	((mode) & FREE_SAVE)
@@ -33,7 +35,7 @@ struct container {
 struct bubble {
 	xchar x, y;	/* coordinates of the upper left corner */
 	schar dx, dy;	/* the general direction of the bubble's movement */
-	uchar *bm;	/* pointer to the bubble bit mask */
+	uchar bm[MAX_BMASK+2];	/* bubble bit mask */
 	struct bubble *prev, *next; /* need to traverse the list up and down */
 	struct container *cons;
 };
