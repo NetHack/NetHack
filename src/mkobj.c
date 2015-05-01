@@ -1,4 +1,4 @@
-/* NetHack 3.5	mkobj.c	$NHDT-Date: 1428715841 2015/04/11 01:30:41 $  $NHDT-Branch: master $:$NHDT-Revision: 1.91 $ */
+/* NetHack 3.5	mkobj.c	$NHDT-Date: 1430472720 2015/05/01 09:32:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.95 $ */
 /* NetHack 3.5	mkobj.c	$Date: 2012/03/10 02:49:08 $  $Revision: 1.70 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -16,6 +16,7 @@ STATIC_DCL const char *FDECL(where_name, (struct obj *));
 STATIC_DCL void FDECL(insane_object,
               (struct obj *,const char *,const char *,struct monst *));
 STATIC_DCL void FDECL(check_contained, (struct obj *,const char *));
+STATIC_DCL void FDECL(sanity_check_worn, (struct obj *));
 
 struct icp {
     int  iprob;		/* probability of an item type */
@@ -1968,18 +1969,18 @@ obj_sanity_check()
        those objects should have already been sanity checked via
        the floor list so container contents are skipped here */
     for (x = 0; x < COLNO; x++)
-    for (y = 0; y < ROWNO; y++)
+      for (y = 0; y < ROWNO; y++)
         for (obj = level.objects[x][y]; obj; obj = obj->nexthere) {
-        /* <ox,oy> should match <x,y>; <0,*> should always be empty */
-        if (obj->where != OBJ_FLOOR || x == 0 ||
-            obj->ox != x || obj->oy != y) {
-            char at_fmt[BUFSZ];
+	    /* <ox,oy> should match <x,y>; <0,*> should always be empty */
+	    if (obj->where != OBJ_FLOOR || x == 0 ||
+		obj->ox != x || obj->oy != y) {
+		char at_fmt[BUFSZ];
 
-            Sprintf(at_fmt, "%%s obj@<%d,%d> %%s %%s: %%s@<%d,%d>",
-                x, y, obj->ox, obj->oy);
-            insane_object(obj, at_fmt, "location sanity",
-                 (struct monst *)0);
-        }
+		Sprintf(at_fmt, "%%s obj@<%d,%d> %%s %%s: %%s@<%d,%d>",
+			x, y, obj->ox, obj->oy);
+		insane_object(obj, at_fmt, "location sanity",
+			      (struct monst *)0);
+	    }
         }
 
     objlist_sanity(invent, OBJ_INVENT, "invent sanity");
@@ -1992,16 +1993,16 @@ obj_sanity_check()
     /* monsters temporarily in transit;
        they should have arrived with hero by the time we get called */
     if (mydogs) {
-    pline("mydogs sanity [not empty]");
-    mon_obj_sanity(mydogs, "mydogs minvent sanity");
+	pline("mydogs sanity [not empty]");
+	mon_obj_sanity(mydogs, "mydogs minvent sanity");
     }
 
     /* objects temporarily freed from invent/floor lists;
        they should have arrived somewhere by the time we get called */
     if (thrownobj)
-    insane_object(thrownobj, ofmt3, "thrownobj sanity", (struct monst *)0);
+	insane_object(thrownobj, ofmt3, "thrownobj sanity", (struct monst *)0);
     if (kickedobj)
-    insane_object(kickedobj, ofmt3, "kickedobj sanity", (struct monst *)0);
+	insane_object(kickedobj, ofmt3, "kickedobj sanity", (struct monst *)0);
     /* [how about current_wand too?] */
 }
 
@@ -2015,15 +2016,40 @@ const char *mesg;
     struct obj *obj;
 
     for (obj = objlist; obj; obj = obj->nobj) {
-    if (obj->where != wheretype)
-        insane_object(obj, ofmt0, mesg, (struct monst *)0);
-    if (Has_contents(obj)) {
-        if (wheretype == OBJ_ONBILL)
-        /* containers on shop bill should always be empty */
-        insane_object(obj, "%s obj contains something! %s %s: %s",
-                  mesg, (struct monst *)0);
-        check_contained(obj, mesg);
-    }
+	if (obj->where != wheretype)
+	    insane_object(obj, ofmt0, mesg, (struct monst *)0);
+	if (Has_contents(obj)) {
+	    if (wheretype == OBJ_ONBILL)
+		/* containers on shop bill should always be empty */
+		insane_object(obj, "%s obj contains something! %s %s: %s",
+			      mesg, (struct monst *)0);
+	    check_contained(obj, mesg);
+	}
+	if (obj->owornmask) {
+	    char maskbuf[40];
+	    boolean bc_ok = FALSE;
+
+	    switch (obj->where) {
+	    case OBJ_INVENT:
+	    case OBJ_MINVENT:
+	    case OBJ_MIGRATING:
+		sanity_check_worn(obj);
+		break;
+	    case OBJ_FLOOR:
+		/* note: ball and chain can also be OBJ_FREE, but not across
+		   turns so this sanity check shouldn't encounter that */
+		bc_ok = TRUE;
+		/*FALLTHRU*/
+	    default:
+		if ((obj != uchain && obj != uball) || !bc_ok) {
+		    /* discovered an object not in inventory which
+		       erroneously has worn mask set */
+		    Sprintf(maskbuf, "worn mask 0x%08lx", obj->owornmask);
+		    insane_object(obj, ofmt0, maskbuf, (struct monst *)0);
+		}
+		break;
+	    }
+	}
     }
 }
 
@@ -2037,18 +2063,18 @@ const char *mesg;
     struct obj *obj;
 
     for (mon = monlist; mon; mon = mon->nmon)
-    for (obj = mon->minvent; obj; obj = obj->nobj) {
-        if (obj->where != OBJ_MINVENT)
-        insane_object(obj, mfmt1, mesg, mon);
-        if (obj->ocarry != mon)
-        insane_object(obj, mfmt2, mesg, mon);
-        check_contained(obj, mesg);
-    }
+	for (obj = mon->minvent; obj; obj = obj->nobj) {
+	    if (obj->where != OBJ_MINVENT)
+		insane_object(obj, mfmt1, mesg, mon);
+	    if (obj->ocarry != mon)
+		insane_object(obj, mfmt2, mesg, mon);
+	    check_contained(obj, mesg);
+	}
 }
 
 /* This must stay consistent with the defines in obj.h. */
 static const char *obj_state_names[NOBJ_STATES] = {
-    "free",		"floor",	"contained",	"invent",
+    "free",	"floor",	"contained",	"invent",
     "minvent",	"migrating",	"buried",	"onbill"
 };
 
@@ -2062,8 +2088,8 @@ struct obj *obj;
     if (!obj) return "nowhere";
     where = obj->where;
     if (where < 0 || where >= NOBJ_STATES || !obj_state_names[where]) {
-    Sprintf(unknown, "unknown[%d]", where);
-    return unknown;
+	Sprintf(unknown, "unknown[%d]", where);
+	return unknown;
     }
     return obj_state_names[where];
 }
@@ -2079,19 +2105,19 @@ struct monst *mon;
 
     objnm = monnm = "null!";
     if (obj) {
-    iflags.override_ID++;
-    objnm = doname(obj);
-    iflags.override_ID--;
+	iflags.override_ID++;
+	objnm = doname(obj);
+	iflags.override_ID--;
     }
     if (mon || (strstri(mesg, "minvent") && !strstri(mesg, "contained"))) {
-    Strcat(strcpy(altfmt, fmt), " held by mon %s (%s)");
-    if (mon)
-        monnm = x_monnam(mon, ARTICLE_A, (char *)0, EXACT_NAME, TRUE);
-    pline(altfmt, mesg,
-          fmt_ptr((genericptr_t)obj), where_name(obj), objnm,
-          fmt_ptr((genericptr_t)mon), monnm);
+	Strcat(strcpy(altfmt, fmt), " held by mon %s (%s)");
+	if (mon)
+	    monnm = x_monnam(mon, ARTICLE_A, (char *)0, EXACT_NAME, TRUE);
+	pline(altfmt, mesg,
+	      fmt_ptr((genericptr_t)obj), where_name(obj), objnm,
+	      fmt_ptr((genericptr_t)mon), monnm);
     } else {
-    pline(fmt, mesg, fmt_ptr((genericptr_t)obj), where_name(obj), objnm);
+	pline(fmt, mesg, fmt_ptr((genericptr_t)obj), where_name(obj), objnm);
     }
 }
 
@@ -2109,37 +2135,122 @@ check_contained(container, mesg)
     /* change "invent sanity" to "contained invent sanity"
        but leave "nested contained invent sanity" as is */
     if (!strstri(mesg, "contained"))
-    mesg = strcat(strcpy(mesgbuf, "contained "), mesg);
+	mesg = strcat(strcpy(mesgbuf, "contained "), mesg);
 
     for (obj = container->cobj; obj; obj = obj->nobj) {
-    /* catch direct cycle to avoid unbounded recursion */
-    if (obj == container)
-        panic("failed sanity check: container holds itself");
-    if (obj->where != OBJ_CONTAINED)
-        insane_object(obj, "%s obj %s %s: %s", mesg, (struct monst *)0);
-    else if (obj->ocontainer != container)
-        pline("%s obj %s in container %s, not %s", mesg,
-          fmt_ptr((genericptr_t)obj),
-          fmt_ptr((genericptr_t)obj->ocontainer),
-          fmt_ptr((genericptr_t)container));
+	/* catch direct cycle to avoid unbounded recursion */
+	if (obj == container)
+	    panic("failed sanity check: container holds itself");
+	if (obj->where != OBJ_CONTAINED)
+	    insane_object(obj, "%s obj %s %s: %s", mesg, (struct monst *)0);
+	else if (obj->ocontainer != container)
+	    pline("%s obj %s in container %s, not %s", mesg,
+		  fmt_ptr((genericptr_t)obj),
+		  fmt_ptr((genericptr_t)obj->ocontainer),
+		  fmt_ptr((genericptr_t)container));
 
-    if (Has_contents(obj)) {
-        /* catch most likely indirect cycle; we won't notice if
-           parent is present when something comes before it, or
-           notice more deeply embedded cycles (grandparent, &c) */
-        if (obj->cobj == container)
-        panic("failed sanity check: container holds its parent");
-        /* change "contained... sanity" to "nested contained... sanity"
-           and "nested contained..." to "nested nested contained..." */
-        Strcpy(nestedmesg, "nested ");
-        copynchars(eos(nestedmesg), mesg,
-               (int)sizeof nestedmesg - (int)strlen(nestedmesg) - 1);
-        /* recursively check contents */
-        check_contained(obj, nestedmesg);
-    }
+	if (Has_contents(obj)) {
+	    /* catch most likely indirect cycle; we won't notice if
+	       parent is present when something comes before it, or
+	       notice more deeply embedded cycles (grandparent, &c) */
+	    if (obj->cobj == container)
+		panic("failed sanity check: container holds its parent");
+	    /* change "contained... sanity" to "nested contained... sanity"
+	       and "nested contained..." to "nested nested contained..." */
+	    Strcpy(nestedmesg, "nested ");
+	    copynchars(eos(nestedmesg), mesg,
+		       (int)sizeof nestedmesg - (int)strlen(nestedmesg) - 1);
+	    /* recursively check contents */
+	    check_contained(obj, nestedmesg);
+	}
     }
 }
 
+/* check an object in hero's or monster's inventory which has worn mask set */
+STATIC_OVL void
+sanity_check_worn(obj)
+struct obj *obj;
+{
+#if defined(BETA) || defined(DEBUG)
+    static unsigned long wearbits[] = {
+	W_ARM, W_ARMC, W_ARMH, W_ARMS, W_ARMG, W_ARMF, W_ARMU,
+	W_WEP, W_QUIVER, W_SWAPWEP, W_AMUL, W_RINGL, W_RINGR,
+	W_TOOL, W_SADDLE, W_BALL, W_CHAIN,
+	0
+	/* [W_ART,W_ARTI are property bits for items which aren't worn] */
+    };
+    char maskbuf[60];
+    unsigned long allmask = 0L;
+    int i, n = 0;
+
+    for (i = 0; wearbits[i]; ++i) {
+	allmask |= wearbits[i];
+	if ((obj->owornmask & wearbits[i]) != 0L) ++n;
+    }
+    if (n > 1) {
+	/* multiple bits set */
+	Sprintf(maskbuf, "worn mask (multiple) 0x%08lx", obj->owornmask);
+	insane_object(obj, ofmt0, maskbuf, (struct monst *)0);
+    }
+    if ((obj->owornmask & ~allmask) != 0L
+	|| (carried(obj) && (obj->owornmask & W_SADDLE) != 0L)) {
+	/* non-wearable bit(s) set */
+	Sprintf(maskbuf, "worn mask (bogus)) 0x%08lx", obj->owornmask);
+	insane_object(obj, ofmt0, maskbuf, (struct monst *)0);
+    }
+    if (n == 1 && (carried(obj)
+		   || (obj->owornmask & (W_BALL|W_CHAIN)) != 0L)) {
+	const char *what = 0;
+
+	/* verify that obj in hero's invent (or ball/chain elsewhere)
+	   with owornmask of W_foo is the object pointed to by ufoo */
+	switch (obj->owornmask) {
+	case W_ARM:	if (obj != uarm)  what = "armor";	/* suit */
+			break;
+	case W_ARMC:	if (obj != uarmc) what = "cloak";
+			break;
+	case W_ARMH:	if (obj != uarmh) what = "helm";
+			break;
+	case W_ARMS:	if (obj != uarms) what = "shield";
+			break;
+	case W_ARMG:	if (obj != uarmg) what = "gloves";
+			break;
+	case W_ARMF:	if (obj != uarmf) what = "boots";
+			break;
+	case W_ARMU:	if (obj != uarmu) what = "shirt";
+			break;
+	case W_WEP:	if (obj != uwep)  what = "primary weapon";
+			break;
+	case W_QUIVER:	if (obj != uquiver) what = "quiver";
+			break;
+	case W_SWAPWEP:	if (obj != uswapwep)
+		what = u.twoweap ? "secondary weapon" : "alternate weapon";
+			break;
+	case W_AMUL:	if (obj != uamul) what = "amulet";
+			break;
+	case W_RINGL:	if (obj != uleft) what = "left ring";
+			break;
+	case W_RINGR:	if (obj != uright) what = "right ring";
+			break;
+	case W_TOOL:	if (obj != ublindf) what = "blindfold";
+			break;
+     /* case W_SADDLE: */
+	case W_BALL:	if (obj != uball) what = "ball";
+			break;
+	case W_CHAIN:	if (obj != uchain) what = "chain";
+			break;
+	default:	break;
+	}
+	if (what) {
+	    Sprintf(maskbuf, "worn mask 0x%08lx != %s", obj->owornmask, what);
+	    insane_object(obj, ofmt0, maskbuf, (struct monst *)0);
+	}
+    }
+#else	/* not (BETA || DEBUG) */
+    /* dummy use of obj to avoid "arg not used" complaint */
+    if (!obj) insane_object(obj, ofmt0, "<null>", (struct monst *)0);
+#endif
+}
 
 /* 
  * wrapper to make "near this object" convenient
