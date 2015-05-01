@@ -1,4 +1,4 @@
-/* NetHack 3.5	options.c	$NHDT-Date: 1430192504 2015/04/28 03:41:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.189 $ */
+/* NetHack 3.5	options.c	$NHDT-Date: 1430441885 2015/05/01 00:58:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.191 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -500,7 +500,7 @@ STATIC_OVL int FDECL(count_ape_maps, (int *, int *));
 STATIC_DCL const char *FDECL(clr2colorname, (int));
 STATIC_DCL const char *FDECL(attr2attrname, (int));
 STATIC_DCL int NDECL(query_color);
-STATIC_DCL int FDECL(query_attr, (char *));
+STATIC_DCL int FDECL(query_attr, (const char *));
 STATIC_DCL boolean FDECL(add_menu_coloring_parsed, (char *, int, int));
 STATIC_DCL void FDECL(free_one_menu_coloring, (int));
 STATIC_DCL int NDECL(count_menucolors);
@@ -1220,7 +1220,7 @@ query_color()
 
 int
 query_attr(prompt)
-char *prompt;
+const char *prompt;
 {
     winid tmpwin;
     anything any;
@@ -1232,7 +1232,8 @@ char *prompt;
     any = zeroany;
     for (i = 0; i < SIZE(attrnames); i++) {
 	any.a_int = i + 1;
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, attrnames[i].attr, attrnames[i].name, MENU_UNSELECTED);
+	add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
+		 attrnames[i].attr, attrnames[i].name, MENU_UNSELECTED);
     }
     end_menu(tmpwin, prompt ? prompt : "Pick an attribute");
     pick_cnt = select_menu(tmpwin, PICK_ONE, &picks);
@@ -3569,6 +3570,7 @@ boolean setinitial,setfromfile;
 	menu_item *sortl_pick = (menu_item *)0;
 	tmpwin = create_nhwindow(NHW_MENU);
 	start_menu(tmpwin);
+	any = zeroany;
 	for (i = 0; i < SIZE(sortltype); i++) {
 	    sortl_name = sortltype[i];
 	    any.a_char = *sortl_name;

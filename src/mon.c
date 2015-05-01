@@ -1,4 +1,4 @@
-/* NetHack 3.5	mon.c	$NHDT-Date: 1430433254 2015/04/30 22:34:14 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.171 $ */
+/* NetHack 3.5	mon.c	$NHDT-Date: 1430480373 2015/05/01 11:39:33 $  $NHDT-Branch: master $:$NHDT-Revision: 1.170 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1866,7 +1866,7 @@ register struct monst *mtmp;
             u.uy = mtmp->my;
             u.uswallow = 0;
             u.uswldtim = 0;
-            if (Punished && uball->where == OBJ_FREE) placebc();
+            if (Punished && uchain->where != OBJ_FLOOR) placebc();
             vision_full_recalc = 1;
             docrt();
         }
