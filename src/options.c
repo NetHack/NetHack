@@ -3571,6 +3571,7 @@ boolean setinitial,setfromfile;
 	menu_item *sortl_pick = (menu_item *)0;
 	tmpwin = create_nhwindow(NHW_MENU);
 	start_menu(tmpwin);
+	any = zeroany;
 	for (i = 0; i < SIZE(sortltype); i++) {
 	    sortl_name = sortltype[i];
 	    any.a_char = *sortl_name;
