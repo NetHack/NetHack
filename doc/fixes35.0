@@ -906,6 +906,7 @@ shopkeepers give honorifics to vampires and elves
 when commands (D, A, object identify) mix object class filtering with BUCX
 	filtering, take the intersection rather than the union (so ?B picks
 	blessed scrolls rather than all scrolls plus blessed everything)
+bmask is stored with the objects on the Plane of Water to prevent segfault
 
 
 Platform- and/or Interface-Specific Fixes
