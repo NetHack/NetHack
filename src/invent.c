@@ -1912,9 +1912,8 @@ long* out_cnt;
         any.a_char = -1;
         /* wiz_identify stuffed the wiz_identify cmd character
            into iflags.override_ID */
-        Sprintf(prompt, "Debug Identify (%s to permanently identify)",
-                visctrl(iflags.override_ID));
-        add_menu(win, NO_GLYPH, &any,' ', iflags.override_ID, ATR_NONE,
+        Sprintf(prompt, "Debug Identify (%s to permanently identify)",visctrl(iflags.override_ID));
+        add_menu(win, NO_GLYPH, &any,'.', iflags.override_ID, ATR_NONE,
                 prompt, MENU_UNSELECTED);
     }
 nextclass:
