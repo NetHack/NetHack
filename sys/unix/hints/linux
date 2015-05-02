@@ -15,6 +15,10 @@ PREFIX=$(wildcard ~)/nh/install
 HACKDIR=$(PREFIX)/games/lib/$(GAME)dir
 SHELLDIR = $(PREFIX)/games
 
+
+
+POSTINSTALL=cp -n sys/unix/sysconf $(HACKDIR)/sysconf; $(CHOWN) $(GAMEUID) $(HACKDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(HACKDIR)/sysconf; chmod $(VARFILEPERM) $(HACKDIR)/sysconf;
+
 CFLAGS=-g -O -I../include -DNOTPARMDECL $(CFLAGS1) -DDLB
 CFLAGS1=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
 CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE

@@ -15,6 +15,10 @@ PREFIX=$(wildcard ~)/nh/install
 HACKDIR=$(PREFIX)/games/lib/$(GAME)dir
 SHELLDIR = $(PREFIX)/games
 
+
+POSTINSTALL= cp -n sys/unix/sysconf $(HACKDIR)/sysconf; $(CHOWN) $(GAMEUID) $(HACKDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(HACKDIR)/sysconf; chmod $(VARFILEPERM) $(HACKDIR)/sysconf;
+POSTINSTALL+= bdftopcf win/X11/nh10.bdf > $(HACKDIR)/nh10.pcf; (cd $(HACKDIR); mkfontdir);
+
 CFLAGS=-O -I../include -DNOTPARMDECL $(CFLAGS1) $(CFLAGS3)
 CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\"
 CFLAGS1=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
