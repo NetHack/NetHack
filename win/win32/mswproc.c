@@ -692,6 +692,7 @@ void mswin_get_nh_event(void)
 	MSG msg;
 
 	logDebug("mswin_get_nh_event()\n");
+
 	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)!=0 ) {
 		if (!TranslateAccelerator(msg.hwnd, GetNHApp()->hAccelTable, &msg)) {
 			TranslateMessage(&msg);
@@ -707,6 +708,7 @@ void mswin_get_nh_event(void)
 void mswin_exit_nhwindows(const char *str)
 {
 	logDebug("mswin_exit_nhwindows(%s)\n", str);
+
     /* Write Window settings to the registry */
     mswin_write_reg();
     while (max_brush) 
@@ -717,6 +719,7 @@ void mswin_exit_nhwindows(const char *str)
 void mswin_suspend_nhwindows(const char *str)
 {
 	logDebug("mswin_suspend_nhwindows(%s)\n", str);
+
 	return;
 }
 
@@ -725,6 +728,7 @@ void mswin_suspend_nhwindows(const char *str)
 void mswin_resume_nhwindows()
 {
 	logDebug("mswin_resume_nhwindows()\n");
+
 	return;
 }
 
@@ -1977,9 +1981,9 @@ char *mswin_getmsghistory(BOOLEAN_P init)
 
 void mswin_putmsghistory(const char * msg, BOOLEAN_P restoring)
 {
-	UNREFERENCED_PARAMETER(restoring);
-
 	BOOL save_sound_opt;
+
+	UNREFERENCED_PARAMETER(restoring);
 
 	if (!msg) return;	/* end of message history restore */
 	save_sound_opt = GetNHApp()->bNoSounds;
@@ -2625,8 +2629,8 @@ status_init()   -- core calls this to notify the window port that a status
 void
 mswin_status_init(void)
 {
-	logDebug("mswin_status_init()\n");
 	int i;
+	logDebug("mswin_status_init()\n");
 	for (i = 0; i < MAXBLSTATS; ++i) {
 		_status_vals[i] = (char *)alloc(BUFSZ);
 		*_status_vals[i] = '\0';
@@ -2652,9 +2656,10 @@ status_finish() -- called when it is time for the window port to tear down
 void
 mswin_status_finish(void)
 {
-	logDebug("mswin_status_finish()\n");
 	/* tear down routine */
 	int i;
+
+	logDebug("mswin_status_finish()\n");
 
 	/* free alloc'd memory here */
 	for (i = 0; i < MAXBLSTATS; ++i) {
@@ -2772,7 +2777,6 @@ status_update(int fldindex, genericptr_t ptr, int chg, int percentage)
 void
 mswin_status_update(int idx, genericptr_t ptr, int chg, int percent)
 {
-	logDebug("mswin_status_update(%d, %p, %d, %d)\n", idx, ptr, chg, percent);
 	long cond, *condptr = (long *)ptr;
 	char *text = (char *)ptr;
 	MSNHMsgUpdateStatus update_cmd_data;
@@ -2780,6 +2784,8 @@ mswin_status_update(int idx, genericptr_t ptr, int chg, int percent)
 	unsigned ospecial;
 	long value = -1;
 	
+	logDebug("mswin_status_update(%d, %p, %d, %d)\n", idx, ptr, chg, percent);
+
 	if (idx != BL_FLUSH) {
 	    if (!_status_activefields[idx]) return;
 	    switch(idx) {

@@ -378,12 +378,12 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 void onMSNH_VScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-	UNREFERENCED_PARAMETER(lParam);
-
 	PNHMessageWindow data;
 	SCROLLINFO si; 
 	int yInc;
  
+	UNREFERENCED_PARAMETER(lParam);
+
 	/* get window data */
 	data = (PNHMessageWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	
@@ -653,11 +653,11 @@ void onPaint(HWND hWnd)
 
 void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-	UNREFERENCED_PARAMETER(wParam);
-	UNREFERENCED_PARAMETER(lParam);
-
 	PNHMessageWindow data;
 	SIZE	dummy;
+
+	UNREFERENCED_PARAMETER(wParam);
+	UNREFERENCED_PARAMETER(lParam);
 
 	/* set window data */
 	data = (PNHMessageWindow)malloc(sizeof(NHMessageWindow));

@@ -559,11 +559,11 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 /* on WM_CREATE */
 void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-	UNREFERENCED_PARAMETER(wParam);
-	UNREFERENCED_PARAMETER(lParam);
-
 	PNHMapWindow data;
 	int i,j;
+
+	UNREFERENCED_PARAMETER(wParam);
+	UNREFERENCED_PARAMETER(lParam);
 
 	/* set window data */
 	data = (PNHMapWindow)malloc(sizeof(NHMapWindow));
@@ -745,13 +745,13 @@ void onPaint(HWND hWnd)
 /* on WM_VSCROLL */
 void onMSNH_VScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-	UNREFERENCED_PARAMETER(lParam);
-
 	PNHMapWindow data;
 	SCROLLINFO si;
 	int yNewPos;
 	int yDelta;
  
+	UNREFERENCED_PARAMETER(lParam);
+
 	/* get window data */
 	data = (PNHMapWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
@@ -805,13 +805,13 @@ void onMSNH_VScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
 /* on WM_HSCROLL */
 void onMSNH_HScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-	UNREFERENCED_PARAMETER(lParam);
-
 	PNHMapWindow data;
 	SCROLLINFO si;
 	int xNewPos;
 	int xDelta;
  
+	UNREFERENCED_PARAMETER(lParam);
+
 	/* get window data */
 	data = (PNHMapWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	

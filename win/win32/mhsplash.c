@@ -179,9 +179,10 @@ void mswin_display_splash_window (BOOL show_ver)
 
 INT_PTR CALLBACK NHSplashWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	HDC hdc;
+
 	UNREFERENCED_PARAMETER(lParam);
 
-	HDC hdc;
 	switch (message)
 	{
 	case WM_INITDIALOG:

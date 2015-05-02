@@ -857,8 +857,6 @@ HWND GetMenuControl(HWND hWnd)
 /*-----------------------------------------------------------------------------*/
 BOOL onMeasureItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-    UNREFERENCED_PARAMETER(wParam);
-
     LPMEASUREITEMSTRUCT lpmis; 
     TEXTMETRIC tm;
 	HGDIOBJ saveFont;
@@ -866,6 +864,8 @@ BOOL onMeasureItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	PNHMenuWindow data;
 	RECT list_rect;
 	int i;
+
+    UNREFERENCED_PARAMETER(wParam);
 
     lpmis = (LPMEASUREITEMSTRUCT) lParam; 
 	data = (PNHMenuWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
@@ -894,8 +894,6 @@ BOOL onMeasureItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 /*-----------------------------------------------------------------------------*/
 BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-	UNREFERENCED_PARAMETER(wParam);
-
 	LPDRAWITEMSTRUCT lpdis;
 	PNHMenuItem item;
 	PNHMenuWindow data;
@@ -914,6 +912,8 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	int color = NO_COLOR, attr;
 	boolean menucolr = FALSE;
+
+	UNREFERENCED_PARAMETER(wParam);
 
 	lpdis = (LPDRAWITEMSTRUCT) lParam; 
 

@@ -73,10 +73,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,
                      LPSTR     lpCmdLine,
                      int       nCmdShow)
 {
-	UNREFERENCED_PARAMETER(hPrevInstance);
-	UNREFERENCED_PARAMETER(lpCmdLine);
-	UNREFERENCED_PARAMETER(nCmdShow);
-
 	INITCOMMONCONTROLSEX InitCtrls;
 	int argc;
 	char* argv[MAX_CMDLINE_PARAM];
@@ -87,6 +83,9 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     DWORD major, minor;
 	boolean resuming;
 
+	UNREFERENCED_PARAMETER(hPrevInstance);
+	UNREFERENCED_PARAMETER(lpCmdLine);
+	UNREFERENCED_PARAMETER(nCmdShow);
 
 	/* ensure that we don't access violate on a panic() */
 	windowprocs.win_raw_print = mswin_raw_print;

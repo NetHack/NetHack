@@ -671,9 +671,9 @@ void  plselAdjustLists(HWND hWnd, int changed_sel)
 /* player made up his mind - get final selection here */ 
 int	plselFinalSelection(HWND hWnd, int* selection)
 {
-	UNREFERENCED_PARAMETER(selection);
-
 	LRESULT ind;
+
+	UNREFERENCED_PARAMETER(selection);
 
 	/* get current selections */
 	if( SendDlgItemMessage(hWnd, IDC_PLSEL_ROLE_RANDOM, BM_GETCHECK, 0, 0)==BST_CHECKED ) {

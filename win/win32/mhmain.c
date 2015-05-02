@@ -757,10 +757,10 @@ void mswin_layout_main_window(HWND changed_child)
 
 LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-	UNREFERENCED_PARAMETER(lParam);
-
 	int wmId, wmEvent;
 	PNHMainWindow  data;
+
+	UNREFERENCED_PARAMETER(lParam);
 
 	data = (PNHMainWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	wmId    = LOWORD(wParam); 
@@ -986,12 +986,12 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 // Mesage handler for about box.
 LRESULT CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	UNREFERENCED_PARAMETER(lParam);
-
 	char buf[BUFSZ];
 	TCHAR wbuf[BUFSZ];
 	RECT   main_rt, dlg_rt;
 	SIZE   dlg_sz;
+
+	UNREFERENCED_PARAMETER(lParam);
 
 	switch (message)
 	{
