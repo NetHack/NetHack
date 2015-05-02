@@ -2450,11 +2450,11 @@ ter_selection_x	: coord_or_var
 		  {
 		      add_opvars(splev, "o", VA_PASS1(SPO_SEL_FILLRECT));
 		  }
-		| line_ID coord_or_var '-' coord_or_var
+		| line_ID coord_or_var ',' coord_or_var
 		  {
 		      add_opvars(splev, "o", VA_PASS1(SPO_SEL_LINE));
 		  }
-		| randline_ID coord_or_var '-' coord_or_var ',' math_expr_var
+		| randline_ID coord_or_var ',' coord_or_var ',' math_expr_var
 		  {
 		      /* randline (x1,y1),(x2,y2), roughness */
 		      add_opvars(splev, "o", VA_PASS1(SPO_SEL_RNDLINE));
