@@ -587,6 +587,12 @@ MAP
                              ----------------------------------------------
 ENDMAP
 
+IF [40%] {
+   $terrain = TERRAIN:{ 'L', '}', 'T', '.', '-', 'C' }
+   SHUFFLE:$terrain
+   REPLACE_TERRAIN:(0,0,74,17),'F', $terrain[0], 100%
+}
+
 REGION:(01,01,73,16),lit,"ordinary"
 
 STAIR:random,up
