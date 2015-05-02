@@ -30,6 +30,32 @@ MAP
 |.........................................................................|
 ---------------------------------------------------------------------------
 ENDMAP
+
+$terrains = TERRAIN:{'-', 'F', 'L', 'T', 'C'}
+SHUFFLE:$terrains
+
+[50%]: SWITCH [ 4 ] {
+  CASE 0:
+    TERRAIN:line (10,8),(65, 8), $terrains[0]
+    BREAK
+  CASE 1:
+    TERRAIN:line (15,4),(15, 13), $terrains[0]
+    TERRAIN:line (59,4),(59, 13), $terrains[0]
+    BREAK
+  CASE 2:
+    TERRAIN:line (10,8),(38, 8), $terrains[0]
+    TERRAIN:line (37,8),(65, 8), $terrains[0]
+    TERRAIN:line (37,3),(37, 8), $terrains[0]
+    TERRAIN:line (37,8),(37,14), $terrains[0]
+    BREAK
+  CASE 3:
+      TERRAIN:rect (4,4,70,13), $terrains[0]
+      TERRAIN:line (25, 4),(50, 4), '.'
+      TERRAIN:line (25,13),(50,13), '.'
+      BREAK
+  DEFAULT:
+}
+
 # Dungeon Description
 REGION:(01,01,73,16),lit,"ordinary"
 # Stairs
@@ -561,6 +587,12 @@ MAP
                              ----------------------------------------------
 ENDMAP
 
+IF [40%] {
+   $terrain = TERRAIN:{ 'L', '}', 'T', '.', '-', 'C' }
+   SHUFFLE:$terrain
+   REPLACE_TERRAIN:(0,0,74,17),'F', $terrain[0], 100%
+}
+
 REGION:(01,01,73,16),lit,"ordinary"
 
 STAIR:random,up
@@ -653,6 +685,15 @@ MAP
 .......................................................................
 .......................................................................
 ENDMAP
+
+IF [33%] {
+   # occasionally it's not a fog maze
+   $terrain = TERRAIN:{ 'L', '}', 'T', '-', 'F' }
+   SHUFFLE:$terrain
+   # break it up a bit
+   REPLACE_TERRAIN:(0,0,70,18),'C', '.', 5%
+   REPLACE_TERRAIN:(0,0,70,18),'C', $terrain[0], 100%
+}
 
 REGION:(00,00,70,18),lit,"ordinary"
 
