@@ -193,44 +193,44 @@ ROOM: "ordinary" , lit, (3,3), (center,center), (31,15) {
 FOUNTAIN: (17, 5)
 FOUNTAIN: (13, 8)
 
-SUBROOM: "ordinary", random, (2,0), (2,2) {
+[75%]: SUBROOM: "ordinary", random, (2,0), (2,2) {
   ROOMDOOR: false, closed, west, random
 }
 
-SUBROOM: "ordinary", unlit, (5,0), (2,2) {
+[75%]: SUBROOM: "ordinary", unlit, (5,0), (2,2) {
   ROOMDOOR: false, closed, south, random
 }
 
-SUBROOM: "ordinary", random, (8,0), (2,2) {
+[75%]: SUBROOM: "ordinary", random, (8,0), (2,2) {
   ROOMDOOR: false, closed, east, random
 }
 
-SUBROOM: "ordinary", lit, (16,0), (2,2) {
+[75%]: SUBROOM: "ordinary", lit, (16,0), (2,2) {
   ROOMDOOR: false, closed, west, random
 }
 
-SUBROOM: "ordinary", unlit, (19,0), (2,2) {
+[75%]: SUBROOM: "ordinary", unlit, (19,0), (2,2) {
   ROOMDOOR: false, closed, south, random
 }
 
-SUBROOM: "ordinary", random, (22,0), (2,2) {
+[75%]: SUBROOM: "ordinary", random, (22,0), (2,2) {
   ROOMDOOR: false, locked, south, random
   MONSTER: ('G', "gnome"), random
 }
 
-SUBROOM: "ordinary", unlit, (25,0), (2,2) {
+[75%]: SUBROOM: "ordinary", unlit, (25,0), (2,2) {
   ROOMDOOR: false, closed, east, random
 }
 
-SUBROOM: "ordinary", lit, (2,5), (2,2) {
+[75%]: SUBROOM: "ordinary", lit, (2,5), (2,2) {
   ROOMDOOR: false, closed, north, random
 }
 
-SUBROOM: "ordinary", lit, (5,5), (2,2) {
+[75%]: SUBROOM: "ordinary", lit, (5,5), (2,2) {
   ROOMDOOR: false, closed, south, random
 }
 
-SUBROOM: "ordinary", random, (8,5), (2,2) {
+[75%]: SUBROOM: "ordinary", random, (8,5), (2,2) {
   ROOMDOOR: false, locked, north, random
   MONSTER: ('G', "gnome"), random
 }
@@ -251,7 +251,7 @@ SUBROOM: "candle shop", lit, (11,10), (4,3) {
   ROOMDOOR: false, closed, east, random
 }
 
-SUBROOM: "ordinary", unlit, (7,10), (3,3) {
+[75%]: SUBROOM: "ordinary", unlit, (7,10), (3,3) {
   ROOMDOOR: false, locked, north, random
   MONSTER: ('G', "gnome"), random
 }
@@ -263,7 +263,7 @@ SUBROOM: "temple", lit, (19,5), (4,4) {
   MONSTER: ('G', "gnomish wizard"), random
 }
 
-SUBROOM: "ordinary", lit, (18,10), (4,3) {
+[75%]: SUBROOM: "ordinary", lit, (18,10), (4,3) {
   ROOMDOOR: false, locked, west, random
   MONSTER: ('G', "gnome lord"), random
 }
@@ -534,6 +534,32 @@ MAP
 -----                   ------                     -------  ---------------
 ENDMAP
 
+IF [75%] {
+   IF [50%] {
+      TERRAIN:line (25,8),(25,9), '|'
+   } ELSE {
+      TERRAIN:line (16,13),(17,13), '-'
+   }
+}
+IF [75%] {
+   IF [50%] {
+      TERRAIN:line (36,10),(36,11), '|'
+   } ELSE {
+      TERRAIN:line (32,15),(33,15), '-'
+   }
+}
+IF [50%] {
+   TERRAIN:fillrect (21,4,22,5), '.'
+   TERRAIN:line (14,9),(14,10), '|'
+}
+IF [50%] {
+   TERRAIN:(46,13), '|'
+   TERRAIN:line (43,5),(47,5), '-'
+   TERRAIN:line (42,6),(46,6), '.'
+   TERRAIN:line (46,7),(47,7), '.'
+}
+[50%]: TERRAIN:fillrect (69,11,71,11), '-'
+
 STAIR:(01,01),up
 STAIR:(46,03),down
 FOUNTAIN:(50,09)
@@ -693,19 +719,19 @@ ROOM: "ordinary" , lit, (3,3), (center,center), (30,15) {
 FOUNTAIN: (12, 07)
 FOUNTAIN: (11, 13)
 
-SUBROOM: "ordinary", random, (2,2), (4,2) {
+[75%]: SUBROOM: "ordinary", random, (2,2), (4,2) {
   ROOMDOOR: false, closed, south, random
 }
 
-SUBROOM: "ordinary", random, (7,2), (2,2) {
+[75%]: SUBROOM: "ordinary", random, (7,2), (2,2) {
   ROOMDOOR: false, closed, north, random
 }
 
-SUBROOM: "ordinary", random, (7,5), (2,2) {
+[75%]: SUBROOM: "ordinary", random, (7,5), (2,2) {
   ROOMDOOR: false, closed, south, random
 }
 
-SUBROOM: "ordinary", lit, (10,2), (3,4) {
+[75%]: SUBROOM: "ordinary", lit, (10,2), (3,4) {
   MONSTER:('G',"gnome"),random
   MONSTER:('Y',"monkey"),random
   MONSTER:('Y',"monkey"),random
@@ -713,16 +739,16 @@ SUBROOM: "ordinary", lit, (10,2), (3,4) {
   ROOMDOOR: false, closed, south, random
 }
 
-SUBROOM: "ordinary", random, (14,2), (4,2) {
+[75%]: SUBROOM: "ordinary", random, (14,2), (4,2) {
   ROOMDOOR: false, closed, south, 0
   MONSTER: 'n', random
 }
 
-SUBROOM: "ordinary", random, (16,5), (2,2) {
+[75%]: SUBROOM: "ordinary", random, (16,5), (2,2) {
   ROOMDOOR: false, closed, south, random
 }
 
-SUBROOM: "ordinary", unlit, (19,2), (2,2) {
+[75%]: SUBROOM: "ordinary", unlit, (19,2), (2,2) {
   ROOMDOOR: false, locked, east, random
   MONSTER: ('G',"gnome king"),random
 }
@@ -731,7 +757,7 @@ SUBROOM: "food shop" [50%], lit, (19,5), (2,3) {
   ROOMDOOR: false, closed, south, random
 }
 
-SUBROOM: "ordinary", random, (2,7), (2,2) {
+[75%]: SUBROOM: "ordinary", random, (2,7), (2,2) {
   ROOMDOOR: false, closed, east, random
 }
 
@@ -743,7 +769,7 @@ SUBROOM: "candle shop", lit, (5,10),(3,3) {
   ROOMDOOR: false, closed, north, random
 }
 
-SUBROOM: "ordinary", random, (11,10), (2,2) {
+[75%]: SUBROOM: "ordinary", random, (11,10), (2,2) {
   ROOMDOOR: false, locked, west, random
   MONSTER: 'G',random
 }
@@ -752,11 +778,11 @@ SUBROOM: "shop" [60%], lit, (14,10), (2,3) {
   ROOMDOOR: false, closed, north, random
 }
 
-SUBROOM: "ordinary", random, (17,11), (4,2) {
+[75%]: SUBROOM: "ordinary", random, (17,11), (4,2) {
   ROOMDOOR: false, closed, north, random
 }
 
-SUBROOM: "ordinary", random, (22,11), (2,2) {
+[75%]: SUBROOM: "ordinary", random, (22,11), (2,2) {
   ROOMDOOR: false, closed, south, random
   SINK: (00,00)
 }
@@ -952,6 +978,31 @@ MAP
 |.................|                    |.....................|........    |
 ---------------------------------------------------------------------------
 ENDMAP
+
+IF [50%] {
+   TERRAIN:(55,14),'-'
+   TERRAIN:(56,14),'-'
+   TERRAIN:(61,15),'|'
+   TERRAIN:(52,5), 'S'
+   DOOR:locked, (52,5)
+}
+IF [50%] {
+   TERRAIN:(18,1), '|'
+   TERRAIN:rect (7,12, 8,13), '.'
+}
+IF [50%] {
+   TERRAIN:(49,4), '|'
+   TERRAIN:(21,5), '.'
+}
+IF [50%] {
+   IF [50%] {
+      TERRAIN:(22,1), '|'
+   } ELSE {
+      TERRAIN:(50,7), '-'
+      TERRAIN:(51,7), '-'
+   }
+}
+
 
 # Dungeon Description
 FOUNTAIN:(14,13)
