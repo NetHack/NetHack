@@ -39,6 +39,10 @@ MAP
 ENDMAP
 # Dungeon Description
 #REGION:(00,00,75,20),lit,"ordinary"
+
+$streets = selection: floodfill(0,12)
+
+
 # The down stairs is at one of the 4 "exits".  The others are mimics,
 # mimicing stairwells.
 $place = { (33,0), (0,12), (25,20), (75,05) }
@@ -149,26 +153,14 @@ MONSTER: ('l',"leprechaun"),(74,04),hostile
 # South exit
 MONSTER: ('l',"leprechaun"),(25,19),hostile
 MONSTER: ('n',"water nymph"),(25,18),hostile
-# Wandering the streets.  What I'd really like for this is a random
-# location, but make sure we're on a given type, e.g. street (if they
-# existed, of course).
-MONSTER: ('n',"water nymph"),(07,05),hostile
-MONSTER: ('l',"leprechaun"),(28,06),hostile
-MONSTER: ('n',"water nymph"),(38,07),hostile
-MONSTER: ('l',"leprechaun"),(45,01),hostile
-MONSTER: ('n',"water nymph"),(59,07),hostile
-MONSTER: ('l',"leprechaun"),(62,14),hostile
-MONSTER: ('n',"water nymph"),(71,14),hostile
-MONSTER: ('l',"leprechaun"),(39,13),hostile
-MONSTER: ('n',"water nymph"),(18,14),hostile
-MONSTER: (':',"chameleon"),(19,08),hostile
-MONSTER: (':',"chameleon"),(22,08),hostile
-MONSTER: (':',"chameleon"),(16,08),hostile
-MONSTER: (':',"chameleon"),random,hostile
-MONSTER: (':',"chameleon"),random,hostile
-MONSTER: (':',"chameleon"),random,hostile
-MONSTER: (':',"chameleon"),random,hostile
-MONSTER: (':',"chameleon"),random,hostile
+# Wandering the streets.
+LOOP [ 4 + 1d3 ] {
+  MONSTER: ('n',"water nymph"),rndcoord($streets),hostile
+  MONSTER: ('l',"leprechaun"),rndcoord($streets),hostile
+}
+LOOP [ 7 + 1d3 ] {
+  MONSTER: (':',"chameleon"),rndcoord($streets),hostile
+}
 
 #
 #	The "locate" level for the quest.
