@@ -1,4 +1,4 @@
-/* NetHack 3.5	steal.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	steal.c	$NHDT-Date: 1430528463 2015/05/02 01:01:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.53 $ */
 /* NetHack 3.5	steal.c	$Date: 2012/02/05 04:26:48 $  $Revision: 1.41 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -23,15 +23,31 @@ register struct obj *otmp;
 }
 
 long		/* actually returns something that fits in an int */
-somegold(umoney)
-long umoney;
+somegold(lmoney)
+long lmoney;
 {
 #ifdef LINT	/* long conv. ok */
-	return(0L);
+    int igold = 0;
 #else
-	return (long)( (umoney < 100) ? umoney :
-		(umoney > 10000) ? rnd(10000) : rnd((int) umoney) );
+    int igold = (lmoney >= (long)LARGEST_INT) ? LARGEST_INT : (int)lmoney;
 #endif
+
+    if (igold < 50)
+	;	/* all gold */
+    else if (igold < 100)
+	igold = rn1(igold - 25 + 1, 25);
+    else if (igold < 500)
+	igold = rn1(igold - 50 + 1, 50);
+    else if (igold < 1000)
+	igold = rn1(igold - 100 + 1, 100);
+    else if (igold < 5000)
+	igold = rn1(igold - 500 + 1, 500);
+    else if (igold < 10000)
+	igold = rn1(igold - 1000 + 1, 1000);
+    else
+	igold = rn1(igold - 5000 + 1, 5000);
+
+    return (long)igold;
 }
 
 /*
