@@ -31,6 +31,24 @@ MAP
 |        |..|..B...........| |.|..........|.|              |.|........|    |
 ----------------------------------------------------------------------------
 ENDMAP
+
+# Make the path somewhat unpredictable
+# If you get "lucky", you may have to go through all three graveyards.
+IF [50%] {
+   TERRAIN:line (50,8),(53,8), '-'
+   TERRAIN:line (40,8),(43,8), 'B'
+}
+IF [50%] {
+   TERRAIN:(27,12),'|'
+   TERRAIN:line (27,3),(29,3), 'B'
+   TERRAIN:(28,2), '-'
+}
+IF [50%] {
+   TERRAIN:line (16,10),(16,11),'|'
+   TERRAIN:line (9,13),(14,13), 'B'
+}
+
+
 # Dungeon Description
 # The shrine to Moloch.
 REGION:(01,06,05,14),lit,"temple"
