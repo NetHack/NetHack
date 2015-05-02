@@ -34,6 +34,12 @@ MAP
 ..........C.C.........................C............C...........}}}}}........
 ......................CCC.C.................................................
 ENDMAP
+
+# first do cloud everywhere
+REPLACE_TERRAIN:(0,0, 75,19), '.', 'C', 10%
+# then replace clouds inside the tower back to floor
+REPLACE_TERRAIN:(13,5, 33,15), 'C', '.', 100%
+
 # Dungeon Description
 REGION:(00,00,75,19),lit,"ordinary"
 REGION:(35,00,49,03),unlit,"ordinary"
@@ -43,6 +49,7 @@ REGION:(30,10,31,10),unlit,"ordinary"
 # Stairs
 STAIR:(30,10),down
 # Portal arrival point
+TERRAIN:(63,06),'.'
 BRANCH:(63,06,63,06),(0,0,0,0)
 # Doors
 DOOR:closed,(31,09)
@@ -129,6 +136,11 @@ MAP
 .............        .............}}}}}}}.}}}}}}}}}}}}}}}}}}}.}}}}}}}.......
 .............        .......................................................
 ENDMAP
+
+REPLACE_TERRAIN:(0,0,30,20), '.', 'C', 15%
+REPLACE_TERRAIN:(68,0,75,20), '.', '}', 25%
+REPLACE_TERRAIN:(34,1,68,19), '}', '.', 2%
+
 # Dungeon Description
 REGION:(00,00,75,20),lit,"ordinary"
 REGION:(37,04,65,16),unlit,"ordinary"
@@ -148,6 +160,7 @@ DOOR:locked,(55,12)
 DOOR:locked,(47,08)
 DOOR:locked,(47,12)
 # Stairs
+TERRAIN:(03,17),'.'
 STAIR:(03,17),up
 STAIR:(48,10),down
 # Non diggable walls
