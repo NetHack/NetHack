@@ -680,6 +680,15 @@ MAP
 .......................................................................
 ENDMAP
 
+IF [33%] {
+   # occasionally it's not a fog maze
+   $terrain = TERRAIN:{ 'L', '}', 'T', '-', 'F' }
+   SHUFFLE:$terrain
+   # break it up a bit
+   REPLACE_TERRAIN:(0,0,70,18),'C', '.', 5%
+   REPLACE_TERRAIN:(0,0,70,18),'C', $terrain[0], 100%
+}
+
 REGION:(00,00,70,18),lit,"ordinary"
 
 # when falling down on this level, never end up in the fog maze
