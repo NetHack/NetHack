@@ -239,10 +239,15 @@ boolean devour;
 	       unseen spot to eat the food there, avoid referring to that
 	       pet as "it".  However, we want "it" if invisible/unsensed
 	       pet eats visible food. */
-	    if (seeobj || sawpet)
-		pline("%s %s %s.",
-		      (sawpet || canspotmon(mtmp)) ? noit_Monnam(mtmp) : "It",
-		      devour ? "devours" : "eats", distant_name(obj, doname));
+            if (sawpet || (seeobj && canspotmon(mtmp))) {
+                if (tunnels(mtmp->data))
+                    pline("%s digs in.", noit_Monnam(mtmp));
+                else
+                    pline("%s %s %s.", noit_Monnam(mtmp),
+                          devour ? "devours" : "eats", distant_name(obj, doname));
+            } else if (seeobj)
+                pline("It %s %s.", devour ? "devours" : "eats",
+                      distant_name(obj, doname));
 	}
 	if (obj->unpaid) {
 	    Strcpy(objnambuf, xname(obj));
