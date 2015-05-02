@@ -1906,6 +1906,7 @@ long* out_cnt;
 	    }
 
     start_menu(win);
+    any = zeroany;
     if (wizard && iflags.override_ID) {
         char prompt[BUFSZ];
         any.a_char = -1;

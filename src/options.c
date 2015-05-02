@@ -744,6 +744,8 @@ initoptions_finish()
 	/* result in the player's preferred fruit [better than "\033"].	*/
 	obj_descr[SLIME_MOLD].oc_name = "fruit";
 
+        if (iflags.bouldersym) update_bouldersym();
+
 	reglyph_darkroom();
 
 	return;
@@ -3571,6 +3573,7 @@ boolean setinitial,setfromfile;
 	menu_item *sortl_pick = (menu_item *)0;
 	tmpwin = create_nhwindow(NHW_MENU);
 	start_menu(tmpwin);
+	any = zeroany;
 	for (i = 0; i < SIZE(sortltype); i++) {
 	    sortl_name = sortltype[i];
 	    any.a_char = *sortl_name;
