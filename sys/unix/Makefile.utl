@@ -1,5 +1,5 @@
 #	Makefile for NetHack's utility programs.
-# NetHack 3.5  Makefile.utl	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+# NetHack 3.5  Makefile.utl	$NHDT-Date: 1430639195 2015/05/03 07:46:35 $  $NHDT-Branch: master $:$NHDT-Revision: 1.19 $
 # NetHack 3.5  Makefile.utl	$Date: 2012/01/10 17:47:30 $  $Revision: 1.18 $
 
 # Root of source tree:
@@ -325,8 +325,13 @@ xpm2img.ttp: xpm2img.o bitmfile.o
 tile2beos: tile2beos.o $(TEXT_IO)
 	$(CC) $(LFLAGS) -o tile2beos tile2beos.o $(TEXT_IO) -lbe
 
-tilemap: ../win/share/tilemap.c $(HACK_H)
-	$(CC) $(CFLAGS) $(LFLAGS) -o tilemap ../win/share/tilemap.c $(LIBS)
+#--compiling and linking in one step leaves extra debugging files (in their
+#  own subdirectories!) on OSX; compile and link separately to suppress
+#  that without mucking about with extra OS-specific CFLAGS and/or LFLAGS
+#tilemap: ../win/share/tilemap.c $(HACK_H)
+#	$(CC) $(CFLAGS) $(LFLAGS) -o tilemap ../win/share/tilemap.c $(LIBS)
+tilemap: tilemap.o
+	$(CC) $(LFLAGS) -o tilemap tilemap.o $(LIBS)
 ../src/tile.c: tilemap
 	./tilemap
 
@@ -334,9 +339,17 @@ tilemap: ../win/share/tilemap.c $(HACK_H)
 	cp ../win/share/tile.h ../include/tile.h
 tiletext.o: ../win/share/tiletext.c $(CONFIG_H) ../include/tile.h
 	$(CC) $(CFLAGS) -c ../win/share/tiletext.c
-tiletxt.o: ../win/share/tilemap.c $(HACK_H)
-	$(CC) $(CFLAGS) -c -DTILETEXT ../win/share/tilemap.c
-	mv tilemap.o tiletxt.o
+tiletxt.c: ./Makefile
+	echo '/* alternate compilation for tilemap.c to create tiletxt.o' > tiletxt.c
+	echo '   that does not rely on "cc -c -o tiletxt.o tilemap.c"'	 >> tiletxt.c
+	echo '   since many pre-POSIX compilers did not support that */' >> tiletxt.c
+	echo '#define TILETEXT'			 >> tiletxt.c
+	echo '#include "../win/share/tilemap.c"' >> tiletxt.c
+	echo '/*tiletxt.c*/'			 >> tiletxt.c
+tiletxt.o: tiletxt.c ../win/share/tilemap.c $(HACK_H)
+	$(CC) $(CFLAGS) -c tiletxt.c
+tilemap.o: ../win/share/tilemap.c $(HACK_H)
+	$(CC) $(CFLAGS) -c ../win/share/tilemap.c
 
 gifread.o: ../win/share/gifread.c $(CONFIG_H) ../include/tile.h
 	$(CC) $(CFLAGS) -c ../win/share/gifread.c
@@ -402,7 +415,7 @@ clean:
 spotless: clean
 	-rm -f lev_lex.c lev_yacc.c dgn_lex.c dgn_yacc.c
 	-rm -f ../include/lev_comp.h ../include/dgn_comp.h
-	-rm -f ../include/tile.h
+	-rm -f ../include/tile.h tiletxt.c
 	-rm -f makedefs lev_comp dgn_comp recover dlb
 	-rm -f gif2txt txt2ppm tile2x11 tile2img.ttp xpm2img.ttp tilemap
 
