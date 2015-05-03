@@ -1,10 +1,10 @@
+/* $NHDT-Date: 1430640199 2015/05/03 08:03:19 $  $NHDT-Branch: master $:$NHDT-Revision: 1.3 $ */
+/* $Date: 2002/03/17 20:02:47 $  $Revision: 1.2 $ */
+
 /*
  * Convert the given input files into an output file that is expected
  * by nethack.
  *
- * $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
- * $Date: 2002/03/17 20:02:47 $  $Revision: 1.2 $
- * 
  * Assumptions:
  * 	+ Two dimensional byte arrays are in row order and are not padded
  *	  between rows (x11_colormap[][]).
@@ -28,7 +28,7 @@ static unsigned char
 pix_to_colormap(pix)
     pixel pix;
 {
-    int i;
+    unsigned i;
 
     for (i = 0; i < header.ncolors; i++) {
 	if (pix.r == ColorMap[CM_RED][i] &&
@@ -80,9 +80,9 @@ convert_tiles(tb_ptr, total)
 static void
 merge_text_colormap()
 {
-    int i, j;
+    unsigned i, j;
 
-    for (i = 0; i < colorsinmap; i++) {
+    for (i = 0; i < (unsigned)colorsinmap; i++) {
 	for (j = 0; j < header.ncolors; j++)
 	    if (x11_colormap[j][CM_RED] == ColorMap[CM_RED][i] &&
 		    x11_colormap[j][CM_GREEN] == ColorMap[CM_GREEN][i] &&

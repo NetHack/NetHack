@@ -35,6 +35,15 @@ MAP
 ....................................PP...PP.................................
 ....................................PP....PP................................
 ENDMAP
+
+# the forest beyond the river
+REPLACE_TERRAIN:(37,0,59,19),'.','T', 5%
+REPLACE_TERRAIN:(60,0,64,19),'.','T', 10%
+REPLACE_TERRAIN:(65,0,75,19),'.','T', 20%
+# guarantee a path and free spot for the portal
+TERRAIN:(randline (37,7),(62,02),7), '.'
+TERRAIN:(62,02),'.'
+
 # Dungeon Description
 REGION:(00,00,75,19),lit,"ordinary"
 REGION:(09,05,11,05),unlit,"ordinary"
