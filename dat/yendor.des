@@ -162,7 +162,7 @@ MAP
 |..---|.}--.--}.|..|.......|.
 |.....|.}}---}}.|..|.......|.
 |.....S.}}}}}}}.|..|.......|.
-|.....|.........|..S.......|.
+|.....|.........|..|.......|.
 ----------------------------.
 ENDMAP
 STAIR:levregion(01,00,79,20),(0,0,28,12),up
@@ -175,9 +175,10 @@ REGION:(07,03,15,11),unlit,"morgue",unfilled
 REGION:(17,06,18,11),unlit,"beehive"
 # make the entry chamber a real room; it affects monster arrival;
 # `unfilled' is a kludge to force an ordinary room to remain a room
-REGION:(20,06,26,11),unlit,"ordinary",unfilled
+REGION:(20,06,26,11),unlit,"ordinary",unfilled {
+  ROOMDOOR:true, closed, north|west, random
+}
 DOOR:closed,(18,05)
-DOOR:closed,(19,11)
 LADDER:(11,07),up
 # Non diggable walls
 # Walls inside the moat stay diggable
