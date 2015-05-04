@@ -176,8 +176,10 @@
 # define WIZARD_NAME "wizard"
 #endif
 
-/* #define SYSCF */	/* use a global configuration */
-/* #define SYSCF_FILE "sysconf" */ /* global configuration is in a file */
+#ifndef SYSCF
+#define SYSCF /* use a global configuration */
+#define SYSCF_FILE "sysconf" /* global configuration is in a file */
+#endif
 
 #ifndef GDBPATH
 # define GDBPATH "/usr/bin/gdb"
