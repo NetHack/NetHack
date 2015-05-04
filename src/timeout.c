@@ -1,4 +1,4 @@
-/* NetHack 3.5	timeout.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	timeout.c	$NHDT-Date: 1430754548 2015/05/04 15:49:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.55 $ */
 /* NetHack 3.5	timeout.c	$Date: 2012/04/16 00:57:37 $  $Revision: 1.48 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -817,7 +817,8 @@ long timeout;
 		    obj->spe = 0;	/* no more candles */
 		} else if (Is_candle(obj) || obj->otyp == POT_OIL) {
 		    /* get rid of candles and burning oil potions;
-		       we know this object isn't carried by hero */
+		       we know this object isn't carried by hero,
+		       nor is it migrating */
 		    obj_extract_self(obj);
 		    obfree(obj, (struct obj *)0);
 		    obj = (struct obj *) 0;
@@ -861,6 +862,9 @@ long timeout;
 		    if (carried(obj)) {
 			useupall(obj);
 		    } else {
+			/* clear migrating obj's destination code before obfree
+			   to avoid false complaint of deleting worn item */
+			if (obj->where == OBJ_MIGRATING) obj->owornmask = 0L;
 			obj_extract_self(obj);
 			obfree(obj, (struct obj *)0);
 		    }
@@ -1037,6 +1041,10 @@ long timeout;
 			    if (carried(obj)) {
 				useupall(obj);
 			    } else {
+				/* clear migrating obj's destination code
+				   so obfree won't think this item is worn */
+				if (obj->where == OBJ_MIGRATING)
+				    obj->owornmask = 0L;
 				obj_extract_self(obj);
 				obfree(obj, (struct obj *)0);
 			    }
