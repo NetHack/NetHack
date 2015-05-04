@@ -1,4 +1,4 @@
-/* NetHack 3.5	tilemap.c	$NHDT-Date: 1429464668 2015/04/19 17:31:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.18 $ */
+/* NetHack 3.5	tilemap.c	$NHDT-Date: 1430621065 2015/05/03 02:44:25 $  $NHDT-Branch: master $:$NHDT-Revision: 1.19 $ */
 /*	SCCS Id: @(#)tilemap.c	3.5	2000/06/04	*/
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -177,7 +177,7 @@ int set, entry;
 	i = entry - tilenum;
 	if (i < (MAXEXPCHARS * EXPL_MAX)) {
 	    if (set == OTH_GLYPH) {
-		static char *explosion_types[] = { /* hack.h */
+		static const char *explosion_types[] = { /* hack.h */
 			"dark", "noxious", "muddy", "wet",
 			"magical", "fiery", "frosty"
 		};

@@ -1,4 +1,4 @@
-/* NetHack 3.5	cmd.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	cmd.c	$NHDT-Date: 1430534601 2015/05/02 02:43:21 $  $NHDT-Branch: master $:$NHDT-Revision: 1.186 $ */
 /* NetHack 3.5	cmd.c	$Date: 2013/03/16 01:44:28 $  $Revision: 1.162 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1935,27 +1935,54 @@ int final;
 	}
 	if (Half_physical_damage) enlght_halfdmg(HALF_PHDAM, final);
 	if (Half_spell_damage) enlght_halfdmg(HALF_SPDAM, final);
+	/* polymorph and other shape change */
 	if (Protection_from_shape_changers)
 		you_are("protected from shape changers",
 			from_what(PROT_FROM_SHAPE_CHANGERS));
-	if (Polymorph) you_are("polymorphing", from_what(POLYMORPH));
+	if (Unchanging) {
+		const char *what = 0;
+
+		if (!Upolyd)	/* Upolyd handled below after current form */
+		    you_can("not change from your current form",
+			    from_what(UNCHANGING));
+		/* blocked shape changes */
+		if (Polymorph)
+		    what = !final ? "polymorph" : "have polymorphed";
+		else if (u.ulycn >= LOW_PM)
+		    what = !final ? "change shape" : "have changed shape";
+		if (what) {
+		    Sprintf(buf, "would %s periodically", what);
+		    /* omit from_what(UNCHANGING); too verbose */
+		    enl_msg(You_, buf, buf,
+			    " if not locked into your current form", "");
+		}
+	} else if (Polymorph) {
+		you_are("polymorphing periodically", from_what(POLYMORPH));
+	}
 	if (Polymorph_control)
 		you_have("polymorph control",from_what(POLYMORPH_CONTROL));
-	if (u.ulycn >= LOW_PM) {
-		Strcpy(buf, an(mons[u.ulycn].mname));
+	if (Upolyd && u.umonnum != u.ulycn) {
+		/* foreign shape (except were-form which is handled below) */
+		Sprintf(buf, "polymorphed into %s", an(youmonst.data->mname));
+		if (wizard) Sprintf(eos(buf), " (%d)", u.mtimedone);
 		you_are(buf,"");
 	}
-	if (Upolyd) {
-	    if (u.umonnum == u.ulycn) Strcpy(buf, "in beast form");
-	    else Sprintf(buf, "polymorphed into %s", an(youmonst.data->mname));
-	    if (wizard) Sprintf(eos(buf), " (%d)", u.mtimedone);
-	    you_are(buf,"");
-	    if (lays_eggs(youmonst.data) && flags.female)
+	if (lays_eggs(youmonst.data) && flags.female)	/* Upolyd */
 		you_can("lay eggs", "");
+	if (u.ulycn >= LOW_PM) {
+		/* "you are a werecreature [in beast form]" */
+		Strcpy(buf, an(mons[u.ulycn].mname));
+		if (u.umonnum == u.ulycn) {
+		    Strcat(buf, " in beast form");
+		    if (wizard) Sprintf(eos(buf), " (%d)", u.mtimedone);
+		}
+		you_are(buf,"");
 	}
-	if (Unchanging) you_can("not change from your current form",
-				from_what(UNCHANGING));
+	if (Unchanging && Upolyd)	/* !Upolyd handled above */
+		you_can("not change from your current form",
+			from_what(UNCHANGING));
 	if (Hate_silver) you_are("harmed by silver","");
+	/* movement and non-armor-based protection */
 	if (Fast) you_are(Very_fast ? "very fast" : "fast",from_what(FAST));
 	if (Reflecting) you_have("reflection",from_what(REFLECTING));
 	if (Free_action) you_have("free action",from_what(FREE_ACTION));

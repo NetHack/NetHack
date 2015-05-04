@@ -1,4 +1,4 @@
-/* NetHack 3.5	mkobj.c	$NHDT-Date: 1430472720 2015/05/01 09:32:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.95 $ */
+/* NetHack 3.5	mkobj.c	$NHDT-Date: 1430697424 2015/05/03 23:57:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.97 $ */
 /* NetHack 3.5	mkobj.c	$Date: 2012/03/10 02:49:08 $  $Revision: 1.70 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2032,8 +2032,11 @@ const char *mesg;
 	    switch (obj->where) {
 	    case OBJ_INVENT:
 	    case OBJ_MINVENT:
-	    case OBJ_MIGRATING:
 		sanity_check_worn(obj);
+		break;
+	    case OBJ_MIGRATING:
+		/* migrating objects overload the owornmask field
+		   with a destination code; skip attempt to check it */
 		break;
 	    case OBJ_FLOOR:
 		/* note: ball and chain can also be OBJ_FREE, but not across
@@ -2180,32 +2183,44 @@ struct obj *obj;
 	/* [W_ART,W_ARTI are property bits for items which aren't worn] */
     };
     char maskbuf[60];
-    unsigned long allmask = 0L;
+    const char *what;
+    unsigned long owornmask, allmask = 0L;
     int i, n = 0;
 
+    /* use owornmask for testing and bit twiddling, but use original
+       obj->owornmask for printing */
+    owornmask = obj->owornmask;
+    /* figure out how many bits are set, and also which are viable */
     for (i = 0; wearbits[i]; ++i) {
+	if ((owornmask & wearbits[i]) != 0L) ++n;
 	allmask |= wearbits[i];
-	if ((obj->owornmask & wearbits[i]) != 0L) ++n;
+    }
+    if (n == 2 && carried(obj) && obj == uball && (owornmask & W_BALL) != 0L
+	&& (owornmask & (W_WEP|W_SWAPWEP|W_QUIVER)) != 0L) {
+	/* chained ball can be wielded/alt-wielded/quivered; if so,
+	  pretend it's not chained in order to check the weapon pointer
+	  (we've already verified the ball pointer by successfully passing
+	  the if-condition to get here...) */
+	owornmask &= ~W_BALL;
+	n = 1;
     }
     if (n > 1) {
 	/* multiple bits set */
 	Sprintf(maskbuf, "worn mask (multiple) 0x%08lx", obj->owornmask);
 	insane_object(obj, ofmt0, maskbuf, (struct monst *)0);
     }
-    if ((obj->owornmask & ~allmask) != 0L
-	|| (carried(obj) && (obj->owornmask & W_SADDLE) != 0L)) {
+    if ((owornmask & ~allmask) != 0L
+	|| (carried(obj) && (owornmask & W_SADDLE) != 0L)) {
 	/* non-wearable bit(s) set */
 	Sprintf(maskbuf, "worn mask (bogus)) 0x%08lx", obj->owornmask);
 	insane_object(obj, ofmt0, maskbuf, (struct monst *)0);
     }
-    if (n == 1 && (carried(obj)
-		   || (obj->owornmask & (W_BALL|W_CHAIN)) != 0L)) {
-	const char *what = 0;
-
+    if (n == 1 && (carried(obj) || (owornmask & (W_BALL|W_CHAIN)) != 0L)) {
+	what = 0;
 	/* verify that obj in hero's invent (or ball/chain elsewhere)
 	   with owornmask of W_foo is the object pointed to by ufoo */
-	switch (obj->owornmask) {
-	case W_ARM:	if (obj != uarm)  what = "armor";	/* suit */
+	switch (owornmask) {
+	case W_ARM:	if (obj != uarm)  what = "suit";
 			break;
 	case W_ARMC:	if (obj != uarmc) what = "cloak";
 			break;
@@ -2244,6 +2259,50 @@ struct obj *obj;
 	if (what) {
 	    Sprintf(maskbuf, "worn mask 0x%08lx != %s", obj->owornmask, what);
 	    insane_object(obj, ofmt0, maskbuf, (struct monst *)0);
+	}
+    }
+    if (n == 1 && (carried(obj) || (owornmask & (W_BALL|W_CHAIN)) != 0L
+		   || mcarried(obj))) {
+	/* check for items worn in invalid slots; practically anything can
+	   be wielded/alt-wielded/quivered, so tests on those are limited */
+	what = 0;
+	if (owornmask & W_ARMOR) {
+	    if (obj->oclass != ARMOR_CLASS) what = "armor";
+	} else if (owornmask & (W_WEP|W_SWAPWEP|W_QUIVER)) {
+	    /* monsters don't maintain alternate weapon or quiver */
+	    if (mcarried(obj) && (owornmask & (W_SWAPWEP|W_QUIVER)) != 0L)
+		what = (owornmask & W_SWAPWEP) != 0L ? "monst alt weapon?"
+						     : "monst quiver?";
+	    /* hero can quiver gold but not wield it (hence not alt-wield
+	       it either); also catches monster wielding gold */
+	    else if (obj->oclass == COIN_CLASS
+		     && (owornmask & (W_WEP|W_SWAPWEP)) != 0L)
+		what = (owornmask & W_WEP) != 0L ? "weapon" : "alt weapon";
+	} else if (owornmask & W_AMUL) {
+	    if (obj->oclass != AMULET_CLASS) what = "amulet";
+	} else if (owornmask & W_RING) {
+	    if (obj->oclass != RING_CLASS && obj->otyp != MEAT_RING)
+		what = "ring";
+	} else if (owornmask & W_TOOL) {
+	    if (obj->otyp != BLINDFOLD && obj->otyp != TOWEL
+		&& obj->otyp != LENSES) what = "blindfold";
+	} else if (owornmask & W_BALL) {
+	    if (obj->oclass != BALL_CLASS) what = "chained ball";
+	} else if (owornmask & W_CHAIN) {
+	    if (obj->oclass != CHAIN_CLASS) what = "chain";
+	} else if (owornmask & W_SADDLE) {
+	    if (obj->otyp != SADDLE) what = "saddle";
+	}
+	if (what) {
+	    char oclassname[30];
+	    struct monst *mon = mcarried(obj) ? obj->ocarry : 0;
+
+	    /* if we've found a potion worn in the amulet slot,
+	       this yields "worn (potion amulet)" */
+	    Strcpy(oclassname, def_oc_syms[(uchar)obj->oclass].name);
+	    Sprintf(maskbuf, "worn (%s %s)",
+		    makesingular(oclassname), what);
+	    insane_object(obj, ofmt0, maskbuf, mon);
 	}
     }
 #else	/* not (BETA || DEBUG) */

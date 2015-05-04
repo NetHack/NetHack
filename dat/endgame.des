@@ -45,6 +45,9 @@ MAP
    ..                                                                       
                                                                             
 ENDMAP
+
+REPLACE_TERRAIN:(0,0,75,19), ' ', ('.', unlit), 5%
+
 #  Since there are no stairs, this forces the hero's initial placement
 TELEPORT_REGION:(69,16,69,16),(0,0,0,0)
 PORTAL:(0,0,75,19),(65,13,75,19),"air"
@@ -503,6 +506,19 @@ MAP
                              |...............|                             
                              -----------------                             
 ENDMAP
+
+IF [75%] {
+  TERRAIN:fillrect (17,14, 30,18),'.'
+  TERRAIN:fillrect (44,14, 57,18),'.'
+  WALLIFY
+
+  $hall = selection:floodfill(37,18)
+  LOOP [6 + 3d4] {
+    MONSTER:('A',"Angel"),rndcoord($hall),noalign,hostile
+    [50%]: MONSTER:random,rndcoord($hall),hostile
+  }
+}
+
 # Rider locations
 $place = { (23,9),(37,14),(51,9) }
 SHUFFLE: $place

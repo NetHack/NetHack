@@ -1111,7 +1111,30 @@ register const char *let,*word;
 		    }
 		    return(allownone ? &zeroobj : (struct obj *) 0);
         }
-        if(ilet == def_oc_syms[COIN_CLASS].sym) {
+	/* since gold is now kept in inventory, we need to do processing for
+	   select-from-invent before checking whether gold has been picked */
+        if (ilet == '?' || ilet == '*') {
+            char *allowed_choices = (ilet == '?') ? lets : (char *)0;
+            long ctmp = 0;
+
+            if (ilet == '?' && !*lets && *altlets)
+		allowed_choices = altlets;
+            ilet = display_pickinv(allowed_choices, TRUE,
+				   allowcnt ? &ctmp : (long *)0);
+            if (!ilet) continue;
+            if (allowcnt && ctmp >= 0) {
+		cnt = ctmp;
+		if (!cnt) prezero = TRUE;
+		allowcnt = 2;
+            }
+            if (ilet == '\033') {
+		if (flags.verbose)
+		    pline1(Never_mind);
+		return (struct obj *)0;
+            }
+            /* they typed a letter (not a space) at the prompt */
+        }
+        if (ilet == def_oc_syms[COIN_CLASS].sym) {
             if (!usegold) {
                 You("cannot %s gold.", word);
                 return(struct obj *)0;
@@ -1124,43 +1147,21 @@ register const char *let,*word;
              */
             if (allowcnt == 2 && cnt <= 0) {
                 if (cnt < 0 || !prezero)
-                pline_The(
-          "LRS would be very interested to know you have that much.");
+		    pline_The(
+		  "LRS would be very interested to know you have that much.");
                 return (struct obj *)0;
             }
-
         }
-        if(ilet == '?' || ilet == '*') {
-            char *allowed_choices = (ilet == '?') ? lets : (char *)0;
-            long ctmp = 0;
-
-            if (ilet == '?' && !*lets && *altlets)
-            allowed_choices = altlets;
-            ilet = display_pickinv(allowed_choices, TRUE,
-                       allowcnt ? &ctmp : (long *)0);
-            if(!ilet) continue;
-            if (allowcnt && ctmp >= 0) {
-            cnt = ctmp;
-            if (!cnt) prezero = TRUE;
-            allowcnt = 2;
-            }
-            if(ilet == '\033') {
-            if(flags.verbose)
-                pline1(Never_mind);
-            return((struct obj *)0);
-            }
-            /* they typed a letter (not a space) at the prompt */
-        }
-        if(allowcnt == 2 && !strcmp(word,"throw")) {
+        if (allowcnt == 2 && !strcmp(word,"throw")) {
             /* permit counts for throwing gold, but don't accept
              * counts for other things since the throw code will
              * split off a single item anyway */
             if (ilet != def_oc_syms[COIN_CLASS].sym)
-            allowcnt = 1;
-            if(cnt == 0 && prezero) return((struct obj *)0);
-            if(cnt > 1) {
-            You("can only throw one item at a time.");
-            continue;
+		allowcnt = 1;
+            if (cnt == 0 && prezero) return (struct obj *)0;
+            if (cnt > 1) {
+		You("can only throw one item at a time.");
+		continue;
             }
         }
         context.botl = 1; /* May have changed the amount of money */
@@ -1913,8 +1914,8 @@ long* out_cnt;
         /* wiz_identify stuffed the wiz_identify cmd character
            into iflags.override_ID */
         Sprintf(prompt, "Debug Identify (%s to permanently identify)",
-                visctrl(iflags.override_ID));
-        add_menu(win, NO_GLYPH, &any,' ', iflags.override_ID, ATR_NONE,
+		visctrl(iflags.override_ID));
+        add_menu(win, NO_GLYPH, &any,'_', iflags.override_ID, ATR_NONE,
                 prompt, MENU_UNSELECTED);
     }
 nextclass:

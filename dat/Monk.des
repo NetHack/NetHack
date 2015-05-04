@@ -38,7 +38,12 @@ ENDMAP
 # Dungeon Description
 REGION:(00,00,75,19),lit,"ordinary"
 REGION:(24,06,33,13),lit,"temple"
+
+REPLACE_TERRAIN:(0,0,10,19),'.','T',10%
+REPLACE_TERRAIN:(65,0,75,19),'.','T',10%
+
 # Portal arrival point
+TERRAIN:(05,04),'.'
 BRANCH:(05,04,05,04),(0,0,0,0)
 # Stairs
 STAIR:(52,09),down
@@ -76,7 +81,7 @@ MONSTER:('@',"abbot"),(33,08)
 MONSTER:('@',"abbot"),(33,11)
 MONSTER:('@',"abbot"),(33,12)
 # Non diggable walls
-NON_DIGGABLE:(00,00,75,19)
+NON_DIGGABLE:(18,03,55,16)
 # Random traps
 TRAP:"dart",(20,09)
 TRAP:"dart",(20,10)

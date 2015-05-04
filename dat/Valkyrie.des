@@ -12,28 +12,41 @@
 #
 MAZE: "Val-strt",' '
 FLAGS: noteleport,hardfloor,icedpools
+INIT_MAP:solidfill,'I'
+
+$pools = selection: random & random & random & random & random &
+	   random & random & random & random & random & random &
+	   random & random &
+	   grow(west, random) &
+	   grow(north, random) &
+	   grow(random & random)
+# This works because the random coordinates in $pools are evaluated once,
+# when the variable is initialized.
+TERRAIN:grow($pools), 'P'
+TERRAIN:$pools, 'L'
+
 GEOMETRY:center,center
 MAP
-IIIIIIPPPIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
-IIIIPPPPPIIIIIIII..IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII...IIIIIIIIIIIIIIIIIIIII
-IIIIPLLPPIIIIIII..IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII..{..IIIIIIIIIIIIIIIIIIII
-IIIIPLPPIIIIIII..IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII.....IIIIIIPPPIIIIIIIIII
-IIIPPPPPIIIIII..IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII.IIIIIPPLPIIIIIIIIII
-IIIIPIIIIIIII..IIIIPPPIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII.IIIIIPLPPIIIIIIIIII
-IIIIIIIIIIII..IIIIIPLPPIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII..IIIIIPPPIIIIIIIIIII
-IIIIIIII.....IIIIIIPPPIIII|----------------|IIIIIPPPIII.IIIIIIIIIIIIIIIIIIII
-IIIIIII..III...IIIIIIIIIII|................|IIIIIPLPII..IIIIIIIIIIIIIIIIIIII
-IIIIII..IIIIII......IIIII.|................|.IIIIPPPII.IIIIIIIIIIIIIIIIIIIII
-IIIII..IIIIIIIIIIII.......+................+...IIIIIII.IIIIIIIIIIIIIIIIIIIII
-IIII..IIIIIIIII.....IIIII.|................|.I...IIIII.IIIIIIIIIIIIIIIIIIIII
-III..IIIIIIIII..IIIIIIIIII|................|IIII.......IIIIIIIIIIIIIIIIIIIII
-IIII..IIIIIII..IIIIIIIIIII|----------------|IIIIIIIIII...IIIIIIIIIIIIIIIIIII
-IIIIII..IIII..IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIPPPPIIII...IIIIIIIIIIIIIIIII
-IIIIIII......IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIPLLPPIIIII...IIIIIIIIIIIIIII
-IIIIPPPIP...IIIIIIIIIIIPIIIIIIIIIIIIIIIIIIIIIIIIPPPPIIIIIIII...I......IIIIII
-IIIPPLPPIIIIIIIIIIIIIIPPPIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII.........IIIII
-IIIIPPPIIIIIIIIIIIIIIPPLPIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII.......IIIIII
-IIIIIIIIIIIIIIIIIIIIIIPPPIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxx..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxx..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx..{..xxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxx..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.....xxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxx..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.xxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxx..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.xxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxx..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx..xxxxxxxxxxxxxxxxxxx
+xxxxxxxx.....xxxxxxxxxxxxx|----------------|xxxxxxxxxxx.xxxxxxxxxxxxxxxxxxxx
+xxxxxxx..xxx...xxxxxxxxxxx|................|xxxxxxxxxx..xxxxxxxxxxxxxxxxxxxx
+xxxxxx..xxxxxx......xxxxx.|................|.xxxxxxxxx.xxxxxxxxxxxxxxxxxxxxx
+xxxxx..xxxxxxxxxxxx.......+................+...xxxxxxx.xxxxxxxxxxxxxxxxxxxxx
+xxxx..xxxxxxxxx.....xxxxx.|................|.x...xxxxx.xxxxxxxxxxxxxxxxxxxxx
+xxx..xxxxxxxxx..xxxxxxxxxx|................|xxxx.......xxxxxxxxxxxxxxxxxxxxx
+xxxx..xxxxxxx..xxxxxxxxxxx|----------------|xxxxxxxxxx...xxxxxxxxxxxxxxxxxxx
+xxxxxx..xxxx..xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxxxx
+xxxxxxx......xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...xxxxxxxxxxxxxxx
+xxxxxxxxx...xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...x......xxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.........xxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.......xxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ENDMAP
 # Dungeon Description
 REGION:(00,00,75,19),lit,"ordinary"
