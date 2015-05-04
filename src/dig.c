@@ -1,4 +1,4 @@
-/* NetHack 3.5	dig.c	$NHDT-Date: 1426465434 2015/03/16 00:23:54 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.73 $ */
+/* NetHack 3.5	dig.c	$NHDT-Date: 1430697288 2015/05/03 23:54:48 $  $NHDT-Branch: master $:$NHDT-Revision: 1.86 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1861,6 +1861,10 @@ long timeout;	/* unused */
 		setmnotwielded(obj->ocarry,obj);
 		MON_NOWEP(obj->ocarry);
 	    }
+	} else if (obj->where == OBJ_MIGRATING) {
+	    /* clear destination flag so that obfree()'s check for
+	       freeing a worn object doesn't get a false hit */
+	    obj->owornmask = 0L;
 	}
 	rot_organic(arg, timeout);
 	if (on_floor) {
