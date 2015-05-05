@@ -115,6 +115,7 @@ register struct monst *mtmp;
 	    tmp = (somegold(money_cnt(invent)) + gold_price - 1) / gold_price;
 	    tmp = min(tmp, ygold->quan);
             if (tmp < ygold->quan) ygold = splitobj(ygold, tmp);
+	    else setnotworn(ygold);
             freeinv(ygold);
             add_to_minv(mtmp, ygold);
 	    Your("purse feels lighter.");
