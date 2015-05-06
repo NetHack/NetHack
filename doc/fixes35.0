@@ -907,6 +907,8 @@ when commands (D, A, object identify) mix object class filtering with BUCX
 	filtering, take the intersection rather than the union (so ?B picks
 	blessed scrolls rather than all scrolls plus blessed everything)
 bmask is stored with the objects on the Plane of Water to prevent segfault
+engraving on drawbridge with wand of digging should produce appropriate
+        message instead of referring to gravel
 
 
 Platform- and/or Interface-Specific Fixes
@@ -1144,6 +1146,9 @@ win32gui: menu option to add/remove windows captions
 win32gui: support for saving/restoring message history
 win32gui: added menu options "Copy ASCII Screenshot To Clipboard" and "Save 
 	ASCII Screenshot To File"
+win32gui, win32tty: add support for looking for sysconf in %COMMONPROGRAMFILES%
+        first and for user config file in %USERPROFILE% (improves support for
+        multi-login Windows environments)
 win32tty: support for 'selectsaved' option for menu of existing save files
 	to choose from at game startup
 tty: add window port routines for saving/restoring message history
