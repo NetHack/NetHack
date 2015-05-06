@@ -1,0 +1,52 @@
+/* NetHack 3.5	lint.h	$NHDT-Date: 1430897871 2015/05/06 07:37:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.0 $ */
+/* NetHack may be freely redistributed.  See license for details. */
+
+/*
+ * Hacks to suppress compiler warnings.  Use with caution.
+ * Assumes it has been preceded by '#include "config.h"' but
+ * not necessarily by '#include "hack.h"'.
+ */
+#ifndef LINT_H
+#define LINT_H
+
+/* cast away implicit const from a string literal (caller's responsibility
+   to ensure that) in order to avoid a warning from 'gcc -Wwrite-strings'
+   (also caller's responsibility to ensure it isn't actually modified!) */
+#define nhStr(str) ((char *)str)
+
+#if defined(GCC_WARN) && !defined(FORCE_ARG_USAGE)
+#  define FORCE_ARG_USAGE
+#endif
+
+#ifdef FORCE_ARG_USAGE
+/* force an unused function argument to become used in an arbitrary
+   manner in order to suppress warning about unused function arguments;
+   viable for scalar and pointer arguments */
+# define nhUse(arg)	nhUse_dummy += (unsigned)arg;
+extern unsigned nhUse_dummy;
+#else
+# define nhUse(arg)	/*empty*/
+#endif
+
+/*
+ * This stuff isn't related to lint suppression but lives here to
+ * avoid cluttering up hack.h.
+ */
+/* [DEBUG shouldn't be defined unless you know what you're doing...] */
+#ifdef DEBUG
+# define ifdebug(stmt)	do { if (showdebug(__FILE__)) stmt; } while (0)
+/* these don't require compiler support for C99 variadic macros */
+# define debugpline0(str)		ifdebug(pline(str))
+# define debugpline1(fmt,arg)		ifdebug(pline(fmt,arg))
+# define debugpline2(fmt,a1,a2)		ifdebug(pline(fmt,a1,a2))
+# define debugpline3(fmt,a1,a2,a3)	ifdebug(pline(fmt,a1,a2,a3))
+# define debugpline4(fmt,a1,a2,a3,a4)	ifdebug(pline(fmt,a1,a2,a3,a4))
+#else
+# define debugpline0(str)		/*empty*/
+# define debugpline1(fmt,arg)		/*empty*/
+# define debugpline2(fmt,a1,a2)		/*empty*/
+# define debugpline3(fmt,a1,a2,a3)	/*empty*/
+# define debugpline4(fmt,a1,a2,a3,a4)	/*empty*/
+#endif	/*DEBUG*/
+
+#endif /* LINT_H */

@@ -1,4 +1,4 @@
-/* NetHack 3.5	hack.h	$NHDT-Date: 1426465431 2015/03/16 00:23:51 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.52 $ */
+/* NetHack 3.5	hack.h	$NHDT-Date: 1430897858 2015/05/06 07:37:38 $  $NHDT-Branch: master $:$NHDT-Revision: 1.59 $ */
 /* NetHack 3.5	hack.h	$Date: 2009/05/06 10:44:46 $  $Revision: 1.49 $ */
 /*	SCCS Id: @(#)hack.h	3.5	2008/03/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
@@ -10,23 +10,7 @@
 #ifndef CONFIG_H
 #include "config.h"
 #endif
-
-/* [DEBUG shouldn't be defined unless you know what you're doing...] */
-#ifdef DEBUG
-# define ifdebug(stmt)	do { if (showdebug(__FILE__)) stmt; } while (0)
-/* these don't require compiler support for C99 variadic macros */
-# define debugpline0(str)		ifdebug(pline(str))
-# define debugpline1(fmt,arg)		ifdebug(pline(fmt,arg))
-# define debugpline2(fmt,a1,a2)		ifdebug(pline(fmt,a1,a2))
-# define debugpline3(fmt,a1,a2,a3)	ifdebug(pline(fmt,a1,a2,a3))
-# define debugpline4(fmt,a1,a2,a3,a4)	ifdebug(pline(fmt,a1,a2,a3,a4))
-#else
-# define debugpline0(str)		/*empty*/
-# define debugpline1(fmt,arg)		/*empty*/
-# define debugpline2(fmt,a1,a2)		/*empty*/
-# define debugpline3(fmt,a1,a2,a3)	/*empty*/
-# define debugpline4(fmt,a1,a2,a3,a4)	/*empty*/
-#endif	/*DEBUG*/
+#include "lint.h"
 
 #define TELL		1
 #define NOTELL		0
