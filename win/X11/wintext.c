@@ -1,4 +1,4 @@
-/* NetHack 3.5	wintext.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	wintext.c	$NHDT-Date: 1430899138 2015/05/06 07:58:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
 /* NetHack 3.5	wintext.c	$Date: 2012/01/24 04:26:27 $  $Revision: 1.7 $ */
 /*	SCCS Id: @(#)wintext.c	3.5	1996/04/05	*/
 /* Copyright (c) Dean Luick, 1992				  */
@@ -66,6 +66,10 @@ delete_text(w, event, params, num_params)
     struct xwindow *wp;
     struct text_info_t *text_info;
 
+    nhUse(event);
+    nhUse(params);
+    nhUse(num_params);
+
     wp = find_widget(w);
     text_info = wp->text_information;
 
@@ -93,6 +97,10 @@ dismiss_text(w, event, params, num_params)
 {
     struct xwindow *wp;
     struct text_info_t *text_info;
+
+    nhUse(event);
+    nhUse(params);
+    nhUse(num_params);
 
     wp = find_widget(w);
     text_info = wp->text_information;
@@ -141,6 +149,8 @@ add_to_text_window(wp, attr, str)
 {
     struct text_info_t *text_info = wp->text_information;
     int width;
+
+    nhUse(attr);
 
     append_text_buffer(&text_info->text, str, FALSE);
 
@@ -223,12 +233,12 @@ display_text_window(wp, blocking)
     /* if added before the window is displayed, so do it afterward. */
     num_args = 0;
     if (nlines < text_info->text.num_lines) {	/* add vert scrollbar */
-	XtSetArg(args[num_args], XtNscrollVertical, XawtextScrollAlways);
-								num_args++;
+	XtSetArg(args[num_args], nhStr(XtNscrollVertical),
+		 XawtextScrollAlways);				num_args++;
     }
     if (width >= (Dimension) (XtScreen(wp->w)->width-20)) {	/* too wide */
-	XtSetArg(args[num_args], XtNscrollHorizontal, XawtextScrollAlways);
-								num_args++;
+	XtSetArg(args[num_args], nhStr(XtNscrollHorizontal),
+		 XawtextScrollAlways);				num_args++;
     }
     if (num_args) XtSetValues(wp->w, args, num_args);
 
@@ -286,7 +296,7 @@ create_text_window(wp)
 		args, num_args);
 
     num_args = 0;
-    XtSetArg(args[num_args], XtNdisplayCaret, False);		num_args++;
+    XtSetArg(args[num_args], nhStr(XtNdisplayCaret), False);	num_args++;
     XtSetArg(args[num_args], XtNresize, XawtextResizeBoth);	num_args++;
     XtSetArg(args[num_args], XtNtranslations,
 		XtParseTranslationTable(text_translations));	num_args++;
@@ -301,11 +311,15 @@ create_text_window(wp)
 
     /* Get the font and margin information. */
     num_args = 0;
-    XtSetArg(args[num_args], XtNfont,	      &text_info->fs); num_args++;
-    XtSetArg(args[num_args], XtNtopMargin,    &top_margin);    num_args++;
-    XtSetArg(args[num_args], XtNbottomMargin, &bottom_margin); num_args++;
-    XtSetArg(args[num_args], XtNleftMargin,   &left_margin);   num_args++;
-    XtSetArg(args[num_args], XtNrightMargin,  &right_margin);  num_args++;
+    XtSetArg(args[num_args], XtNfont,	&text_info->fs);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNtopMargin),
+					&top_margin);		num_args++;
+    XtSetArg(args[num_args], nhStr(XtNbottomMargin),
+					&bottom_margin);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNleftMargin),
+					&left_margin);		num_args++;
+    XtSetArg(args[num_args], nhStr(XtNrightMargin),
+					&right_margin);		num_args++;
     XtGetValues(wp->w, args, num_args);
 
     text_info->extra_width  = left_margin + right_margin;

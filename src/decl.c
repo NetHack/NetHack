@@ -1,4 +1,4 @@
-/* NetHack 3.5	decl.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	decl.c	$NHDT-Date: 1430897862 2015/05/06 07:37:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.56 $ */
 /* NetHack 3.5	decl.c	$Date: 2012/04/09 02:56:30 $  $Revision: 1.37 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -330,6 +330,9 @@ NEARDATA struct savefile_info sfrestinfo, sfsaveinfo = {
 #ifdef PANICTRACE
 char *ARGV0;
 #endif
+
+/* support for lint.h */
+unsigned nhUse_dummy = 0;
 
 /* dummy routine used to force linkage */
 void

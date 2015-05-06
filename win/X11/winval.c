@@ -1,4 +1,4 @@
-/* NetHack 3.5	winval.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	winval.c	$NHDT-Date: 1430899139 2015/05/06 07:58:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.5 $ */
 /* NetHack 3.5	winval.c	$Date: 2009/05/06 10:56:06 $  $Revision: 1.4 $ */
 /*	SCCS Id: @(#)winval.c	3.5	1992/3/7	*/
 /* Copyright (c) Dean Luick, 1992				  */
@@ -45,7 +45,7 @@ create_value(parent, name_value)
 
     num_args = 0;
     XtSetArg(args[num_args], XtNborderWidth, 0);		num_args++;
-    XtSetArg(args[num_args], XtNdefaultDistance, 0);		num_args++;
+    XtSetArg(args[num_args], nhStr(XtNdefaultDistance), 0);	num_args++;
     form = XtCreateManagedWidget(name_value,
 				formWidgetClass,
 				parent, args, num_args);
@@ -62,7 +62,7 @@ create_value(parent, name_value)
     num_args = 0;
     XtSetArg(args[num_args], XtNjustify, XtJustifyRight);	num_args++;
     XtSetArg(args[num_args], XtNborderWidth, 0);		num_args++;
-    XtSetArg(args[num_args], XtNfromHoriz, name);		num_args++;
+    XtSetArg(args[num_args], nhStr(XtNfromHoriz), name);	num_args++;
     XtSetArg(args[num_args], XtNinternalHeight, 0);		num_args++;
     (void) XtCreateManagedWidget(WVALUE,
 				labelWidgetClass,
@@ -73,7 +73,7 @@ create_value(parent, name_value)
 void
 set_name(w, new_label)
     Widget w;
-    char *new_label;
+    const char *new_label;
 {
     Arg args[1];
     Widget name;

@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.5  Makefile.src	$NHDT-Date: 1428590253 2015/04/09 14:37:33 $  $NHDT-Branch: scshunt-regex $:$NHDT-Revision: 1.38 $
+# NetHack 3.5  Makefile.src	$NHDT-Date: 1430897864 2015/05/06 07:37:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.39 $
 # NetHack 3.5  Makefile.src	$Date: 2012/01/20 03:41:33 $  $Revision: 1.37 $
 
 # Root of source tree:
@@ -369,7 +369,8 @@ CSOURCES = $(HACKCSRC) $(SYSCSRC) $(WINCSRC) $(CHAINSRC) $(GENCSRC)
 HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h botl.h \
 	color.h config.h config1.h context.h coord.h decl.h def_os2.h \
 	display.h dlb.h dungeon.h engrave.h extern.h flag.h func_tab.h \
-	global.h hack.h lev.h macconf.h mextra.h mfndpos.h micro.h mkroom.h \
+	global.h hack.h lev.h lint.h macconf.h mextra.h mfndpos.h micro.h \
+	mkroom.h \
 	monattk.h mondata.h monflag.h monst.h monsym.h obj.h objclass.h \
 	os2conf.h patchlevel.h pcconf.h permonst.h prop.h rect.h region.h rm.h \
 	sp_lev.h spell.h sys.h system.h tcap.h timeout.h tosconf.h tradstdc.h \
@@ -572,7 +573,7 @@ $(CONFIG_H): ../include/config.h ../include/config1.h ../include/tradstdc.h \
 		../include/wceconf.h ../include/ntconf.h
 	touch $(CONFIG_H)
 # hack.h timestamp
-$(HACK_H): ../include/hack.h $(CONFIG_H) ../include/align.h \
+$(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/align.h \
 		../include/dungeon.h ../include/monsym.h ../include/mkroom.h \
 		../include/objclass.h ../include/youprop.h ../include/prop.h \
 		../include/permonst.h ../include/monattk.h \
@@ -624,7 +625,7 @@ topl.o: ../win/tty/topl.c $(HACK_H) ../include/tcap.h
 wintty.o: ../win/tty/wintty.c $(HACK_H) ../include/dlb.h ../include/tcap.h
 	$(CC) $(CFLAGS) -c ../win/tty/wintty.c
 Window.o: ../win/X11/Window.c ../include/xwindowp.h ../include/xwindow.h \
-		$(CONFIG_H)
+		$(CONFIG_H) ../include/lint.h
 	$(CC) $(CFLAGS) -c ../win/X11/Window.c
 dialogs.o: ../win/X11/dialogs.c $(CONFIG_H)
 	$(CC) $(CFLAGS) -c ../win/X11/dialogs.c

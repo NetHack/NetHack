@@ -568,6 +568,7 @@ int ttyp;
 	if (!ttmp) return;
 	newobjs = level.objects[x][y];
 	ttmp->madeby_u = madeby_u;
+	ttmp->tseen = 0;
 	if (cansee(x,y)) seetrap(ttmp);
 	else if (madeby_u) feeltrap(ttmp);
 

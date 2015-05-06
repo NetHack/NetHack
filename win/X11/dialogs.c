@@ -40,7 +40,15 @@
  *    + Changed the default width response text widget to be as wide as the
  *	window itself.  Suggestion from David E. Wexelblat, dwex@goblin.org.
  *
- * $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+ * Modified 5/2015, anonymous.
+ *    + Include nethack's lint.h to get nhStr() macro.
+ *    + Use nhStr() on string literals (or macros from <X11/StringDefs.h>
+ *	that hide string literals) to cast away implicit 'const' in order
+ *	to suppress "warning: assignment discards qualifers from pointer
+ *	target type" issued by 'gcc -Wwrite-strings' as used by nethack.
+ *	(For this file, always the second parameter to XtSetArg().)
+ *
+ * $NHDT-Date: 1430899133 2015/05/06 07:58:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.3 $
  * $Date: 2002/03/31 17:11:23 $  $Revision: 1.2 $
  */
 
@@ -65,6 +73,7 @@
 #endif
 
 #include "config.h"	/* #define for const for non __STDC__ compilers */
+#include "lint.h"	/* for nethack's nhStr() macro */
 
 /* ":" added to both translations below to allow limited redefining of
  * keysyms before testing for keysym values -- dlc */
@@ -98,7 +107,7 @@ CreateDialog(parent, name, okay_callback, cancel_callback)
 							num_args = 0;
 #ifdef SPECIAL_CMAP
     if (special_cmap) {
-	XtSetArg(args[num_args], XtNbackground, white);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNbackground), white);	num_args++;
     }
 #endif
     form = XtCreateManagedWidget(name, formWidgetClass, parent, args, num_args);
@@ -106,52 +115,52 @@ CreateDialog(parent, name, okay_callback, cancel_callback)
 							num_args = 0;
 #ifdef SPECIAL_CMAP
     if (special_cmap) {
-	XtSetArg(args[num_args], XtNforeground, black);	num_args++;
-	XtSetArg(args[num_args], XtNbackground, white);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNforeground), black);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNbackground), white);	num_args++;
     }
 #endif
-    XtSetArg(args[num_args], XtNtop, XtChainTop);	num_args++;
-    XtSetArg(args[num_args], XtNbottom, XtChainTop);	num_args++;
-    XtSetArg(args[num_args], XtNleft, XtChainLeft);	num_args++;
-    XtSetArg(args[num_args], XtNright, XtChainLeft);	num_args++;
-    XtSetArg(args[num_args], XtNresizable, True);	num_args++;
-    XtSetArg(args[num_args], XtNborderWidth, 0);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNbottom), XtChainTop);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNresizable), True);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNborderWidth), 0);		num_args++;
     prompt = XtCreateManagedWidget("prompt", labelWidgetClass,
 				   form, args, num_args);
 
 							num_args = 0;
 #ifdef SPECIAL_CMAP
     if (special_cmap) {
-	XtSetArg(args[num_args], XtNforeground, black);	num_args++;
-	XtSetArg(args[num_args], XtNbackground, white);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNforeground), black);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNbackground), white);	num_args++;
     }
 #endif
-    XtSetArg(args[num_args], XtNfromVert, prompt);	num_args++;
-    XtSetArg(args[num_args], XtNtop, XtChainTop);	num_args++;
-    XtSetArg(args[num_args], XtNbottom, XtChainTop);	num_args++;
-    XtSetArg(args[num_args], XtNleft, XtChainLeft);	num_args++;
-    XtSetArg(args[num_args], XtNright, XtChainLeft);	num_args++;
-    XtSetArg(args[num_args], XtNresizable, True);	num_args++;
-    XtSetArg(args[num_args], XtNeditType, XawtextEdit);	num_args++;
-    XtSetArg(args[num_args], XtNresize, XawtextResizeWidth);	num_args++;
-    XtSetArg(args[num_args], XtNstring, "");		num_args++;
+    XtSetArg(args[num_args], nhStr(XtNfromVert), prompt);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNbottom), XtChainTop);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNresizable), True);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNeditType), XawtextEdit);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNresize), XawtextResizeWidth); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNstring), "");		num_args++;
     response = XtCreateManagedWidget("response", asciiTextWidgetClass,
 				     form, args, num_args);
 
 							num_args = 0;
 #ifdef SPECIAL_CMAP
     if (special_cmap) {
-	XtSetArg(args[num_args], XtNforeground, black);	num_args++;
-	XtSetArg(args[num_args], XtNbackground, white);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNforeground), black);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNbackground), white);	num_args++;
     }
 #endif
-    XtSetArg(args[num_args], XtNfromVert, response);	num_args++;
-    XtSetArg(args[num_args], XtNtop, XtChainTop);	num_args++;
-    XtSetArg(args[num_args], XtNbottom, XtChainTop);	num_args++;
-    XtSetArg(args[num_args], XtNleft, XtChainLeft);	num_args++;
-    XtSetArg(args[num_args], XtNright, XtChainLeft);	num_args++;
-    XtSetArg(args[num_args], XtNresizable, True);	num_args++;
-    XtSetArg(args[num_args], XtNaccelerators,
+    XtSetArg(args[num_args], nhStr(XtNfromVert), response);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNbottom), XtChainTop);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNresizable), True);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNaccelerators),
 	     XtParseAcceleratorTable(okay_accelerators));	num_args++;
     okay = XtCreateManagedWidget("okay", commandWidgetClass,
 				 form, args, num_args);
@@ -162,18 +171,18 @@ CreateDialog(parent, name, okay_callback, cancel_callback)
 								num_args = 0;
 #ifdef SPECIAL_CMAP
 	if (special_cmap) {
-	    XtSetArg(args[num_args], XtNforeground, black);	num_args++;
-	    XtSetArg(args[num_args], XtNbackground, white);	num_args++;
+	    XtSetArg(args[num_args], nhStr(XtNforeground), black); num_args++;
+	    XtSetArg(args[num_args], nhStr(XtNbackground), white); num_args++;
 	}
 #endif
-	XtSetArg(args[num_args], XtNfromVert, response);	num_args++;
-	XtSetArg(args[num_args], XtNfromHoriz, okay);		num_args++;
-	XtSetArg(args[num_args], XtNtop, XtChainTop);		num_args++;
-	XtSetArg(args[num_args], XtNbottom, XtChainTop);	num_args++;
-	XtSetArg(args[num_args], XtNleft, XtChainLeft);		num_args++;
-	XtSetArg(args[num_args], XtNright, XtChainLeft);	num_args++;
-	XtSetArg(args[num_args], XtNresizable, True);		num_args++;
-	XtSetArg(args[num_args], XtNaccelerators,
+	XtSetArg(args[num_args], nhStr(XtNfromVert), response);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNfromHoriz), okay);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNbottom), XtChainTop);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNresizable), True);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNaccelerators),
 	     XtParseAcceleratorTable(cancel_accelerators));	num_args++;
 	cancel = XtCreateManagedWidget("cancel", commandWidgetClass,
 				       form, args, num_args);
@@ -199,7 +208,7 @@ GetDialogPrompt(w)
     String s;
 
     label = XtNameToWidget(w, "prompt");
-    XtSetArg(args[0], XtNlabel, &s);
+    XtSetArg(args[0], nhStr(XtNlabel), &s);
     XtGetValues(label, args, ONE);
     return XtNewString(s);
 }
@@ -215,7 +224,7 @@ SetDialogPrompt(w, newprompt)
     Widget label;
 
     label = XtNameToWidget(w, "prompt");
-    XtSetArg(args[0], XtNlabel, newprompt);
+    XtSetArg(args[0], nhStr(XtNlabel), newprompt);
     XtSetValues(label, args, ONE);
 }
 
@@ -229,7 +238,7 @@ GetDialogResponse(w)
     String s;
 
     response = XtNameToWidget(w, "response");
-    XtSetArg(args[0], XtNstring, &s);
+    XtSetArg(args[0], nhStr(XtNstring), &s);
     XtGetValues(response, args, ONE);
     return XtNewString(s);
 }
@@ -247,18 +256,18 @@ SetDialogResponse(w, s)
     Dimension width, nwidth, leftMargin, rightMargin;
 
     response = XtNameToWidget(w, "response");
-    XtSetArg(args[0], XtNfont, &font);
-    XtSetArg(args[1], XtNleftMargin, &leftMargin);
-    XtSetArg(args[2], XtNrightMargin, &rightMargin);
-    XtSetArg(args[3], XtNwidth, &width);
+    XtSetArg(args[0], nhStr(XtNfont), &font);
+    XtSetArg(args[1], nhStr(XtNleftMargin), &leftMargin);
+    XtSetArg(args[2], nhStr(XtNrightMargin), &rightMargin);
+    XtSetArg(args[3], nhStr(XtNwidth), &width);
     XtGetValues(response, args, FOUR);
     /* width includes margins as per Xaw documentation */
     nwidth = (font->max_bounds.width * strlen(s))+leftMargin+rightMargin;
     if (nwidth < width)
 	nwidth = width;
 
-    XtSetArg(args[0], XtNstring, s);
-    XtSetArg(args[1], XtNwidth, nwidth);
+    XtSetArg(args[0], nhStr(XtNstring), s);
+    XtSetArg(args[1], nhStr(XtNwidth), nwidth);
     XtSetValues(response, args, TWO);
     XawTextSetInsertionPoint(response, strlen(s));
 }
@@ -273,8 +282,8 @@ ClearDialogResponse(w)
     Widget response;
 
     response = XtNameToWidget(w, "response");
-    XtSetArg(args[0], XtNstring, "");
-    XtSetArg(args[1], XtNwidth, 100);
+    XtSetArg(args[0], nhStr(XtNstring), "");
+    XtSetArg(args[1], nhStr(XtNwidth), 100);
     XtSetValues(response, args, TWO);
 }
 #endif

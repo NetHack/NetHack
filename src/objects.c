@@ -675,7 +675,8 @@ OBJECT(OBJ("meat ring", (char *)0),
     BITS(1,0,0,0,0,0,0,0,0,0,0,0,FLESH),
     0, FOOD_CLASS, 0, 1, 5, 1, 0, 0, 0, 0, 5, CLR_BROWN),
 
-/* pudding 'corpses' will turn into these and combine */
+/* pudding 'corpses' will turn into these and combine.
+   must be in same order as the pudding monsters */
 FOOD("glob of gray ooze",      0, 2, 20, 0, FLESH,  20, CLR_GRAY),
 FOOD("glob of brown pudding",  0, 2, 20, 0, FLESH,  20, CLR_BROWN),
 FOOD("glob of green slime",    0, 2, 20, 0, FLESH,  20, CLR_GREEN),

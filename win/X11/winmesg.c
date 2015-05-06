@@ -1,4 +1,4 @@
-/* NetHack 3.5	winmesg.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	winmesg.c	$NHDT-Date: 1430899136 2015/05/06 07:58:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.5 $ */
 /* NetHack 3.5	winmesg.c	$Date: 2009/05/06 10:55:57 $  $Revision: 1.4 $ */
 /*	SCCS Id: @(#)winmesg.c	3.5	1996/04/05	*/
 /* Copyright (c) Dean Luick, 1992				  */
@@ -92,8 +92,8 @@ create_message_window(wp, create_popup, parent)
     mesg_info->dirty = False;
     mesg_info->viewport_width = mesg_info->viewport_height = 0;
 
-    if (iflags.msg_history < appResources.message_lines)
-	iflags.msg_history = appResources.message_lines;
+    if (iflags.msg_history < (unsigned) appResources.message_lines)
+	iflags.msg_history = (unsigned) appResources.message_lines;
     if (iflags.msg_history > MAX_HISTORY)	/* a sanity check */
 	iflags.msg_history = MAX_HISTORY;
 
@@ -534,6 +534,8 @@ mesg_exposed(w, client_data, widget_data)
 {
     XExposeEvent *event = (XExposeEvent *) widget_data;
 
+    nhUse(client_data);
+
     if (XtIsRealized(w) && event->count == 0) {
 	struct xwindow *wp;
 	Display *dpy;
@@ -602,6 +604,9 @@ mesg_resized(w, client_data, call_data)
 
     old_lines = wp->mesg_information->num_lines;;
 #endif
+
+    nhUse(call_data);
+    nhUse(client_data);
 
     num_args = 0;
     XtSetArg(args[num_args], XtNwidth,  &pixel_width);   num_args++;

@@ -217,7 +217,8 @@ const char *verb;
         /* Globby things like puddings might stick together */
         while (obj && (otmp = obj_nexto_xy(obj->otyp, x, y, obj->o_id)) != (struct obj*)0) {
             pudding_merge_message(obj, otmp);
-            obj = obj_meld(&obj, &otmp);
+	    /* intentionally not getting the melded object; obj_meld may set obj to null. */
+            (void) obj_meld(&obj, &otmp);
         }
         return (obj == NULL); 
     }

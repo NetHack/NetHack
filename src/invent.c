@@ -425,8 +425,8 @@ struct obj *obj;
         goto added;
         }
     /* didn't merge, so insert into chain */
+    assigninvlet(obj);
     if (flags.invlet_constant || !prev) {
-        if (flags.invlet_constant) assigninvlet(obj);
         obj->nobj = invent;		/* insert at beginning */
         invent = obj;
         if (flags.invlet_constant) reorder_invent();
@@ -1134,7 +1134,14 @@ register const char *let,*word;
             }
             /* they typed a letter (not a space) at the prompt */
         }
-        if (ilet == def_oc_syms[COIN_CLASS].sym) {
+	/* find the item which was picked */
+	for (otmp = invent; otmp; otmp = otmp->nobj)
+	    if (otmp->invlet == ilet) break;
+	/* some items have restrictions */
+	if (ilet == def_oc_syms[COIN_CLASS].sym
+	    /* guard against the [hypothetical] chace of having more
+	       than one invent slot of gold and picking the non-'$' one */
+	    || (otmp && otmp->oclass == COIN_CLASS)) {
             if (!usegold) {
                 You("cannot %s gold.", word);
                 return(struct obj *)0;
@@ -1156,7 +1163,8 @@ register const char *let,*word;
             /* permit counts for throwing gold, but don't accept
              * counts for other things since the throw code will
              * split off a single item anyway */
-            if (ilet != def_oc_syms[COIN_CLASS].sym)
+	    if (ilet != def_oc_syms[COIN_CLASS].sym
+		&& !(otmp && otmp->oclass == COIN_CLASS))
 		allowcnt = 1;
             if (cnt == 0 && prezero) return (struct obj *)0;
             if (cnt > 1) {
@@ -1166,8 +1174,9 @@ register const char *let,*word;
         }
         context.botl = 1; /* May have changed the amount of money */
         savech(ilet);
-        for (otmp = invent; otmp; otmp = otmp->nobj)
-            if (otmp->invlet == ilet) break;
+	/* [we used to set otmp (by finding ilet in invent) here, but
+	   that's been moved above so that otmp can be checked earlier] */
+	/* verify the chosen object */
         if(!otmp) {
             You("don't have that object.");
             if (in_doagain) return((struct obj *) 0);
@@ -2958,23 +2967,33 @@ free_invbuf()
     invbufsiz = 0;
 }
 
-/* give consecutive letters to every item in inventory (for !fixinv mode) */
+/* give consecutive letters to every item in inventory (for !fixinv mode);
+   gold is always forced to '$' slot at head of list */
 void
 reassign()
 {
-    register int i;
-    register struct obj *obj;
+    int i;
+    struct obj *obj, *prevobj, *goldobj;
 
-    for(obj = invent, i = 0; obj; obj = obj->nobj, i++) {
-        if (obj->oclass == COIN_CLASS && obj->invlet == GOLD_SYM)
-        --i;	/* keep $ instead of using up i'th letter */
-        else
-        if (i < 52)
-        obj->invlet = (i < 26) ? ('a'+i) : ('A'+i-26);
-        else if (obj->oclass == COIN_CLASS)
-        obj->invlet = GOLD_SYM;
-        else
-        obj->invlet = NOINVSYM;
+    /* first, remove [first instance of] gold from invent, if present */
+    prevobj = goldobj = 0;
+    for (obj = invent; obj; prevobj = obj, obj = obj->nobj)
+	if (obj->oclass == COIN_CLASS) {
+	    goldobj = obj;
+	    if (prevobj)
+		prevobj->nobj = goldobj->nobj;
+	    else
+		invent = goldobj->nobj;
+	    break;
+	}
+    /* second, re-letter the rest of the list */
+    for (obj = invent, i = 0; obj; obj = obj->nobj, i++)
+	obj->invlet = (i < 26) ? ('a'+i) : (i < 52) ? ('A'+i-26) : NOINVSYM;
+    /* third, assign gold the "letter" '$' and re-insert it at head */
+    if (goldobj) {
+	goldobj->invlet = GOLD_SYM;
+	goldobj->nobj = invent;
+	invent = goldobj;
     }
     if (i >= 52) i = 52 - 1;
     lastinvnr = i;

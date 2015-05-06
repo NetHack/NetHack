@@ -1,4 +1,4 @@
-/* NetHack 3.5	winX.c	$NHDT-Date: 1430040327 2015/04/26 09:25:27 $  $NHDT-Branch: master $:$NHDT-Revision: 1.28 $ */
+/* NetHack 3.5	winX.c	$NHDT-Date: 1430899139 2015/05/06 07:58:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.29 $ */
 /* NetHack 3.5	winX.c	$Date: 2012/01/24 04:26:26 $  $Revision: 1.27 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -418,18 +418,17 @@ XtPointer	*closure_ret;
 		*closure_ret = (char*)True;
 		done(Pixel, screenColor.pixel);
 	    }
-	    type = "noColormap";
-	    msg = "Cannot allocate colormap entry for \"%s\"";
-	}
-	else {
+	    type = nhStr("noColormap");
+	    msg = nhStr("Cannot allocate colormap entry for \"%s\"");
+	} else {
 	    /* some versions of XLookupColor also don't allow #xxyyzz names */
 	    if(str[0] == '#' &&
 	       (nhApproxColor(screen, colormap, (char*) str, &screenColor))) {
 		*closure_ret = (char*)True;
 		done(Pixel, screenColor.pixel);
 	    }
-	    type = "badValue";
-	    msg = "Color name \"%s\" is not defined";
+	    type = nhStr("badValue");
+	    msg = nhStr("Color name \"%s\" is not defined");
 	}
 
 	XtAppWarningMsg(app, type, "cvtStringToPixel",
@@ -884,14 +883,24 @@ void X11_wait_synch() { if (x_inited) XFlush(XtDisplay(toplevel)); }
 
 /* Both resume_ and suspend_ are called from ioctl.c and unixunix.c. */
 void X11_resume_nhwindows() { return; }
-
 /* ARGSUSED */
-void X11_suspend_nhwindows(str) const char *str; { return; }
+void X11_suspend_nhwindows(str)
+    const char *str;
+{
+    nhUse(str);
+
+    return;
+}
 
 /* Under X, we don't need to initialize the number pad. */
 /* ARGSUSED */
-void X11_number_pad(state) int state; { return; } /* called from options.c */
+void X11_number_pad(state)	/* called from options.c */
+    int state;
+{
+    nhUse(state);
 
+    return;
+}
 
 void X11_start_screen() { return; } /* called from setftty() in unixtty.c */
 void X11_end_screen() { return; }   /* called from settty() in unixtty.c */
@@ -924,60 +933,65 @@ Widget	     toplevel = (Widget) 0;	/* toplevel widget */
 Atom         wm_delete_window;		/* pop down windows */
 
 static XtActionsRec actions[] = {
-    {"dismiss_file",	dismiss_file},	/* action for file viewing widget */
-    {"delete_file",	delete_file},	/* action for file delete-window */
-    {"dismiss_text",	dismiss_text},	/* button action for text widget */
-    {"delete_text",	delete_text},	/* delete action for text widget */
-    {"key_dismiss_text",key_dismiss_text},/* key action for text widget */
+    {nhStr("dismiss_file"),	dismiss_file},	/* file viewing widget */
+    {nhStr("delete_file"),	delete_file},	/* file delete-window */
+    {nhStr("dismiss_text"),	dismiss_text},	/* text widget button action */
+    {nhStr("delete_text"),	delete_text},	/* text widget delete action */
+    {nhStr("key_dismiss_text"), key_dismiss_text}, /* text widget key action */
 #ifdef GRAPHIC_TOMBSTONE
-    {"rip_dismiss_text",rip_dismiss_text},/* action for rip in text widget */
+    {nhStr("rip_dismiss_text"), rip_dismiss_text}, /* rip in text widget */
 #endif
-    {"menu_key",	menu_key},	/* action for menu accelerators */
-    {"yn_key",		yn_key},	/* action for yn accelerators */
-    {"yn_delete",	yn_delete},	/* action for yn delete-window */
-    {"askname_delete",	askname_delete},/* action for askname delete-window */
-    {"getline_delete",	getline_delete},/* action for getline delete-window */
-    {"menu_delete",	menu_delete},	/* action for menu delete-window */
-    {"ec_key",		ec_key},	/* action for extended commands */
-    {"ec_delete",	ec_delete},	/* action for ext-com menu delete */
-    {"ps_key",		ps_key},	/* action for player selection */
-    {"race_key",	race_key},	/* action for race selection */
-    {"gend_key",	gend_key},	/* action for gender selection */
-    {"algn_key",	algn_key},	/* action for alignment selection */
-    {"X11_hangup",	X11_hangup},	/* action for delete of top-level */
-    {"input",		map_input},	/* action for key input */
-    {"scroll",		nh_keyscroll},	/* action for scrolling by keys */
+    {nhStr("menu_key"),		menu_key},	/* menu accelerators */
+    {nhStr("yn_key"),		yn_key},	/* yn accelerators */
+    {nhStr("yn_delete"),	yn_delete},	/* yn delete-window */
+    {nhStr("askname_delete"),	askname_delete}, /* askname delete-window */
+    {nhStr("getline_delete"),	getline_delete}, /* getline delete-window */
+    {nhStr("menu_delete"),	menu_delete},	/* menu delete-window */
+    {nhStr("ec_key"),		ec_key},	/* extended commands */
+    {nhStr("ec_delete"),	ec_delete},	/* ext-com menu delete */
+    {nhStr("ps_key"),		ps_key},	/* player selection */
+    {nhStr("race_key"),		race_key},	/* race selection */
+    {nhStr("gend_key"),		gend_key},	/* gender selection */
+    {nhStr("algn_key"),		algn_key},	/* alignment selection */
+    {nhStr("X11_hangup"),	X11_hangup},	/* delete of top-level */
+    {nhStr("input"),		map_input},	/* key input */
+    {nhStr("scroll"),		nh_keyscroll},	/* scrolling by keys */
 };
 
 static XtResource resources[] = {
-    { "slow", "Slow", XtRBoolean, sizeof(Boolean),
-      XtOffset(AppResources *,slow), XtRString, "True" },
-    { "autofocus", "AutoFocus", XtRBoolean, sizeof(Boolean),
-      XtOffset(AppResources *,autofocus), XtRString, "False" },
-    { "message_line", "Message_line", XtRBoolean, sizeof(Boolean),
-      XtOffset(AppResources *,message_line), XtRString, "False" },
-    { "double_tile_size", "Double_tile_size", XtRBoolean, sizeof(Boolean),
-      XtOffset(AppResources *,double_tile_size), XtRString, "False" },
-    { "tile_file", "Tile_file", XtRString, sizeof(String),
-      XtOffset(AppResources *,tile_file), XtRString, "x11tiles" },
-    { "icon", "Icon", XtRString, sizeof(String),
-      XtOffset(AppResources *,icon), XtRString, "nh72" },
-    { "message_lines", "Message_lines", XtRInt, sizeof(int),
-      XtOffset(AppResources *,message_lines), XtRString, "12" },
-    { "pet_mark_bitmap", "Pet_mark_bitmap", XtRString, sizeof(String),
-      XtOffset(AppResources *,pet_mark_bitmap), XtRString, "pet_mark.xbm" },
-    { "pet_mark_color", "Pet_mark_color", XtRPixel, sizeof(XtRPixel),
-      XtOffset(AppResources *,pet_mark_color), XtRString, "Red" },
+    { nhStr("slow"), nhStr("Slow"), XtRBoolean, sizeof(Boolean),
+      XtOffset(AppResources *,slow), XtRString, nhStr("True") },
+    { nhStr("autofocus"), nhStr("AutoFocus"), XtRBoolean, sizeof(Boolean),
+      XtOffset(AppResources *,autofocus), XtRString, nhStr("False") },
+    { nhStr("message_line"), nhStr("Message_line"), XtRBoolean,
+						sizeof(Boolean),
+      XtOffset(AppResources *,message_line), XtRString, nhStr("False") },
+    { nhStr("double_tile_size"), nhStr("Double_tile_size"), XtRBoolean,
+						sizeof(Boolean),
+      XtOffset(AppResources *,double_tile_size), XtRString, nhStr("False") },
+    { nhStr("tile_file"), nhStr("Tile_file"), XtRString, sizeof(String),
+      XtOffset(AppResources *,tile_file), XtRString, nhStr("x11tiles") },
+    { nhStr("icon"), nhStr("Icon"), XtRString, sizeof(String),
+      XtOffset(AppResources *,icon), XtRString, nhStr("nh72") },
+    { nhStr("message_lines"), nhStr("Message_lines"), XtRInt, sizeof(int),
+      XtOffset(AppResources *,message_lines), XtRString, nhStr("12") },
+    { nhStr("pet_mark_bitmap"), nhStr("Pet_mark_bitmap"), XtRString,
+						sizeof(String),
+      XtOffset(AppResources *,pet_mark_bitmap), XtRString,
+						nhStr("pet_mark.xbm") },
+    { nhStr("pet_mark_color"), nhStr("Pet_mark_color"), XtRPixel,
+						sizeof(XtRPixel),
+      XtOffset(AppResources *,pet_mark_color), XtRString, nhStr("Red") },
 #ifdef GRAPHIC_TOMBSTONE
-    { "tombstone", "Tombstone", XtRString, sizeof(String),
+    { nhStr("tombstone"), "Tombstone", XtRString, sizeof(String),
       XtOffset(AppResources *,tombstone), XtRString, "rip.xpm" },
-    { "tombtext_x", "Tombtext_x", XtRInt, sizeof(int),
+    { nhStr("tombtext_x"), "Tombtext_x", XtRInt, sizeof(int),
       XtOffset(AppResources *,tombtext_x), XtRString, "155" },
-    { "tombtext_y", "Tombtext_y", XtRInt, sizeof(int),
+    { nhStr("tombtext_y"), "Tombtext_y", XtRInt, sizeof(int),
       XtOffset(AppResources *,tombtext_y), XtRString, "78" },
-    { "tombtext_dx", "Tombtext_dx", XtRInt, sizeof(int),
+    { nhStr("tombtext_dx"), "Tombtext_dx", XtRInt, sizeof(int),
       XtOffset(AppResources *,tombtext_dx), XtRString, "0" },
-    { "tombtext_dy", "Tombtext_dy", XtRInt, sizeof(int),
+    { nhStr("tombtext_dy"), "Tombtext_dy", XtRInt, sizeof(int),
       XtOffset(AppResources *,tombtext_dy), XtRString, "13" },
 #endif
 };
@@ -1085,6 +1099,8 @@ void X11_exit_nhwindows(dummy)
 {
     extern Pixmap tile_pixmap;	/* from winmap.c */
 
+    nhUse(dummy);
+
     /* explicitly free the icon and tile pixmaps */
     if (icon_pixmap != None) {
 	XFreePixmap(XtDisplay(toplevel), icon_pixmap);
@@ -1121,6 +1137,9 @@ X11_sig_cb(not_used, id)
     XEvent event;
     XClientMessageEvent *mesg;
 
+    nhUse(not_used);
+    nhUse(id);
+
     /* Set up a fake message to the event handler. */
     mesg = (XClientMessageEvent *) &event;
     mesg->type = ClientMessage;
@@ -1149,6 +1168,9 @@ d_timeout(client_data, id)
 {
     XEvent event;
     XClientMessageEvent *mesg;
+
+    nhUse(client_data);
+    nhUse(id);
 
     /* Set up a fake message to the event handler. */
     mesg = (XClientMessageEvent *) &event;
@@ -1188,6 +1210,11 @@ X11_hangup(w, event, params, num_params)
     String *params;
     Cardinal *num_params;
 {
+    nhUse(w);
+    nhUse(event);
+    nhUse(params);
+    nhUse(num_params);
+
     hangup(1);		/* 1 is commonly SIGHUP, but ignored anyway */
     exit_x_event = TRUE;
 }
@@ -1201,6 +1228,10 @@ askname_delete(w, event, params, num_params)
     String *params;
     Cardinal *num_params;
 {
+    nhUse(event);
+    nhUse(params);
+    nhUse(num_params);
+
     nh_XtPopdown(w);
     (void) strcpy(plname, "Mumbles");	/* give them a name... ;-) */
     exit_x_event = TRUE;
@@ -1218,17 +1249,20 @@ askname_done(w, client_data, call_data)
     char *s;
     Widget dialog = (Widget) client_data;
 
+    nhUse(w);
+    nhUse(call_data);
+
     s = (char *) GetDialogResponse(dialog);
 
-    len = strlen(s);
+    len = (int) strlen(s);
     if (len == 0) {
 	X11_nhbell();
 	return;
     }
 
     /* Truncate name if necessary */
-    if (len >= sizeof(plname)-1)
-	len = sizeof(plname)-1;
+    if (len >= (int) sizeof(plname)-1)
+	len = (int) sizeof(plname)-1;
 
     (void) strncpy(plname, s, len);
     plname[len] = '\0';
@@ -1251,11 +1285,11 @@ X11_askname()
     XtOverrideTranslations(popup,
 	XtParseTranslationTable("<Message>WM_PROTOCOLS: askname_delete()"));
 
-    dialog = CreateDialog(popup, "dialog",
+    dialog = CreateDialog(popup, nhStr("dialog"),
 				    askname_done, (XtCallbackProc) 0);
 
-    SetDialogPrompt(dialog, "What is your name?");	/* set prompt */
-    SetDialogResponse(dialog, "");		/* set default answer */
+    SetDialogPrompt(dialog, nhStr("What is your name?"));  /* set prompt */
+    SetDialogResponse(dialog, nhStr(""));	/* set default answer */
 
     XtRealizeWidget(popup);
     positionpopup(popup, TRUE);		/* center,bottom */
@@ -1288,6 +1322,9 @@ done_button(w, client_data, call_data)
     char *s;
     Widget dialog = (Widget) client_data;
 
+    nhUse(w);
+    nhUse(call_data);
+
     s = (char *) GetDialogResponse(dialog);
     len = strlen(s);
 
@@ -1310,6 +1347,10 @@ getline_delete(w, event, params, num_params)
     String *params;
     Cardinal *num_params;
 {
+    nhUse(event);
+    nhUse(params);
+    nhUse(num_params);
+
     Strcpy(getline_input, CANCEL_STR);
     nh_XtPopdown(w);
     exit_x_event = TRUE;
@@ -1324,6 +1365,9 @@ abort_button(w, client_data, call_data)
     XtPointer call_data;
 {
     Widget dialog = (Widget) client_data;
+
+    nhUse(w);
+    nhUse(call_data);
 
     Strcpy(getline_input, CANCEL_STR);
     nh_XtPopdown(XtParent(dialog));
@@ -1353,7 +1397,7 @@ X11_getlin(question, input)
 	XtOverrideTranslations(getline_popup,
 	    XtParseTranslationTable("<Message>WM_PROTOCOLS: getline_delete()"));
 
-	getline_dialog = CreateDialog(getline_popup, "dialog",
+	getline_dialog = CreateDialog(getline_popup, nhStr("dialog"),
 				    done_button, abort_button);
 
 	XtRealizeWidget(getline_popup);
@@ -1361,7 +1405,7 @@ X11_getlin(question, input)
 			&wm_delete_window, 1);
     }
     SetDialogPrompt(getline_dialog, (String)question);	/* set prompt */
-    SetDialogResponse(getline_dialog, "");	/* set default answer */
+    SetDialogResponse(getline_dialog, nhStr(""));  /* set default answer */
     positionpopup(getline_popup, TRUE);		/* center,bottom */
 
     nh_XtPopup(getline_popup, (int)XtGrabExclusive, getline_dialog);
@@ -1388,6 +1432,10 @@ delete_file(w, event, params, num_params)
     String *params;
     Cardinal *num_params;
 {
+    nhUse(event);
+    nhUse(params);
+    nhUse(num_params);
+
     nh_XtPopdown(w);
     XtDestroyWidget(w);
 }
@@ -1402,6 +1450,11 @@ dismiss_file(w, event, params, num_params)
     Cardinal *num_params;
 {
     Widget popup = XtParent(w);
+
+    nhUse(event);
+    nhUse(params);
+    nhUse(num_params);
+
     nh_XtPopdown(popup);
     XtDestroyWidget(popup);
 }
@@ -1468,7 +1521,7 @@ X11_display_file(str, complain)
     (void) dlb_fclose(fp);
 
     num_args = 0;
-    XtSetArg(args[num_args], XtNtitle, str);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNtitle), str);	num_args++;
 
     popup = XtCreatePopupShell("display_file", topLevelShellWidgetClass,
 					       toplevel, args, num_args);
@@ -1476,15 +1529,15 @@ X11_display_file(str, complain)
 	XtParseTranslationTable("<Message>WM_PROTOCOLS: delete_file()"));
 
     num_args = 0;
-    XtSetArg(args[num_args], XtNscrollHorizontal,
-				XawtextScrollWhenNeeded);	num_args++;
-    XtSetArg(args[num_args], XtNscrollVertical,
-				XawtextScrollAlways);		num_args++;
-    XtSetArg(args[num_args], XtNtype, XawAsciiString);		num_args++;
-    XtSetArg(args[num_args], XtNstring, textlines);		num_args++;
-    XtSetArg(args[num_args], XtNdisplayCaret, False);		num_args++;
-    XtSetArg(args[num_args], XtNtranslations,
-	XtParseTranslationTable(display_translations));		num_args++;
+    XtSetArg(args[num_args], nhStr(XtNscrollHorizontal),
+				    XawtextScrollWhenNeeded);   num_args++;
+    XtSetArg(args[num_args], nhStr(XtNscrollVertical),
+					XawtextScrollAlways);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNtype), XawAsciiString);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNstring), textlines);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNdisplayCaret), False);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNtranslations),
+	     XtParseTranslationTable(display_translations));	num_args++;
 
     dispfile = XtCreateManagedWidget(
 			"text",			/* name */
@@ -1495,11 +1548,12 @@ X11_display_file(str, complain)
 
     /* Get font and border information. */
     num_args = 0;
-    XtSetArg(args[num_args], XtNfont,	      &fs);	       num_args++;
-    XtSetArg(args[num_args], XtNtopMargin,    &top_margin);    num_args++;
-    XtSetArg(args[num_args], XtNbottomMargin, &bottom_margin); num_args++;
-    XtSetArg(args[num_args], XtNleftMargin,   &left_margin);   num_args++;
-    XtSetArg(args[num_args], XtNrightMargin,  &right_margin);  num_args++;
+    XtSetArg(args[num_args], nhStr(XtNfont),	    &fs);	    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNtopMargin),   &top_margin);   num_args++;
+    XtSetArg(args[num_args], nhStr(XtNbottomMargin),
+						   &bottom_margin); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNleftMargin),  &left_margin);  num_args++;
+    XtSetArg(args[num_args], nhStr(XtNrightMargin), &right_margin); num_args++;
     XtGetValues(dispfile, args, num_args);
 
     /*
@@ -1573,6 +1627,11 @@ yn_delete(w, event, params, num_params)
     String *params;
     Cardinal *num_params;
 {
+    nhUse(w);
+    nhUse(event);
+    nhUse(params);
+    nhUse(num_params);
+
     yn_getting_num = FALSE;
     /* Only use yn_esc_map if we have choices.  Otherwise, return ESC. */
     yn_return = yn_choices ? yn_esc_map : '\033';
@@ -1808,6 +1867,10 @@ msgkey(w, data, event)
     XEvent *event;
 {
     Cardinal num = 0;
+
+    nhUse(w);
+    nhUse(data);
+
     map_input(window_list[WIN_MAP].w, event, (String*) 0, &num);
 }
 
@@ -1820,6 +1883,9 @@ win_visible(w, data, event, flag)	/* only called for autofocus */
     Boolean *flag;	/* continue_to_dispatch flag not used */
 {
     XVisibilityEvent *vis_event = (XVisibilityEvent *)event;
+
+    nhUse(data);
+    nhUse(flag);
 
     if (vis_event->state != VisibilityFullyObscured) {
 	/* one-time operation; cancel ourself */
@@ -1871,9 +1937,9 @@ init_standard_windows()
 
     /* Tell the form that contains it that resizes are OK. */
     num_args = 0;
-    XtSetArg(args[num_args], XtNresizable, True);		num_args++;
-    XtSetArg(args[num_args], XtNleft,	   XtChainLeft);	num_args++;
-    XtSetArg(args[num_args], XtNtop,	   XtChainTop);		num_args++;
+    XtSetArg(args[num_args], nhStr(XtNresizable), True);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNleft),	  XtChainLeft);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNtop),	  XtChainTop);	num_args++;
     XtSetValues(message_viewport, args, num_args);
 
     if(appResources.slow) {
@@ -1885,10 +1951,12 @@ init_standard_windows()
 					 form,
 					 args, num_args);
 	num_args = 0;
-	XtSetArg(args[num_args], XtNfromVert, message_viewport); num_args++;
-	XtSetArg(args[num_args], XtNjustify, XtJustifyLeft);	num_args++;
-	XtSetArg(args[num_args], XtNresizable, True);	num_args++;
-	XtSetArg(args[num_args], XtNlabel, " ");	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNfromVert),
+					     message_viewport);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNjustify),
+						XtJustifyLeft);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNresizable), True);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNlabel), " ");		num_args++;
 	XtSetValues(yn_label, args, num_args);
     }
 
@@ -1906,11 +1974,12 @@ init_standard_windows()
     /* Chain beneath message_viewport or yn window. */
     num_args = 0;
     if(appResources.slow) {
-	XtSetArg(args[num_args], XtNfromVert, yn_label);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNfromVert), yn_label);	num_args++;
     } else {
-	XtSetArg(args[num_args], XtNfromVert, message_viewport);num_args++;
+	XtSetArg(args[num_args], nhStr(XtNfromVert),
+					    message_viewport);	num_args++;
     }
-    XtSetArg(args[num_args], XtNbottom, XtChainBottom);		num_args++;
+    XtSetArg(args[num_args], nhStr(XtNbottom), XtChainBottom);	num_args++;
     XtSetValues(map_viewport, args, num_args);
 
     /* Create the status window, with the form as it's parent. */
@@ -1929,11 +1998,11 @@ init_standard_windows()
      * will never expand or contract.
      */
     num_args = 0;
-    XtSetArg(args[num_args], XtNfromVert, map_viewport);	num_args++;
-    XtSetArg(args[num_args], XtNleft,	  XtChainLeft);		num_args++;
-    XtSetArg(args[num_args], XtNright,	  XtChainLeft);		num_args++;
-    XtSetArg(args[num_args], XtNtop,	  XtChainBottom);	num_args++;
-    XtSetArg(args[num_args], XtNbottom,	  XtChainBottom);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNfromVert), map_viewport);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNleft),   XtChainLeft);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNright),  XtChainLeft);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNtop),    XtChainBottom);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNbottom), XtChainBottom);	num_args++;
     XtSetValues(status, args, num_args);
 
 
@@ -1980,13 +2049,13 @@ init_standard_windows()
     /*
      * Now get the default widths of the windows.
      */
-    XtSetArg(args[0], XtNwidth, &message_vp_width);
+    XtSetArg(args[0], nhStr(XtNwidth), &message_vp_width);
     XtGetValues(message_viewport, args, ONE);
-    XtSetArg(args[0], XtNwidth, &map_vp_width);
-    XtSetArg(args[1], XtNhorizDistance, &map_vp_hd);
+    XtSetArg(args[0], nhStr(XtNwidth), &map_vp_width);
+    XtSetArg(args[1], nhStr(XtNhorizDistance), &map_vp_hd);
     XtGetValues(map_viewport, args, TWO);
-    XtSetArg(args[0], XtNwidth, &status_width);
-    XtSetArg(args[1], XtNhorizDistance, &status_hd);
+    XtSetArg(args[0], nhStr(XtNwidth), &status_width);
+    XtSetArg(args[1], nhStr(XtNhorizDistance), &status_hd);
     XtGetValues(status, args, TWO);
 
     /*
@@ -1996,17 +2065,18 @@ init_standard_windows()
      */
     if (map_vp_width < status_width || map_vp_width < message_vp_width) {
 	if (status_width > message_vp_width) {
-	    XtSetArg(args[0], XtNwidth, status_width);
+	    XtSetArg(args[0], nhStr(XtNwidth), status_width);
 	    XtSetValues(message_viewport, args, ONE);
 	    max_width = status_width;
 	} else {
 	    max_width = message_vp_width;
 	}
-	XtSetArg(args[0], XtNhorizDistance, map_vp_hd+((int)(max_width-map_vp_width)/2));
+	XtSetArg(args[0], nhStr(XtNhorizDistance),
+		 map_vp_hd + ((int)(max_width - map_vp_width) / 2));
 	XtSetValues(map_viewport, args, ONE);
 
     } else {	/* map is widest */
-	XtSetArg(args[0], XtNwidth, map_vp_width);
+	XtSetArg(args[0], nhStr(XtNwidth), map_vp_width);
 	XtSetValues(message_viewport, args, ONE);
     }
     /*
@@ -2094,6 +2164,8 @@ nh_keyscroll(viewport, event, params, num_params)
     int direction;
     Cardinal in_nparams = (num_params ? *num_params : 0);
 
+    nhUse(event);
+
     if (in_nparams != 1) return; /* bad translation */
 
     direction=atoi(params[0]);
@@ -2115,8 +2187,8 @@ nh_keyscroll(viewport, event, params, num_params)
 /* The V_DELTA is 1/2 the value of shown. */
 
     if (horiz_sb) {
-	XtSetArg(arg[0], XtNshown,	&shown);
-	XtSetArg(arg[1], XtNtopOfThumb, &top);
+	XtSetArg(arg[0], nhStr(XtNshown),      &shown);
+	XtSetArg(arg[1], nhStr(XtNtopOfThumb), &top);
 	XtGetValues(horiz_sb, arg, TWO);
 
 	do_call = True;
@@ -2138,8 +2210,8 @@ nh_keyscroll(viewport, event, params, num_params)
     }
 
     if (vert_sb) {
-	XtSetArg(arg[0], XtNshown,      &shown);
-	XtSetArg(arg[1], XtNtopOfThumb, &top);
+	XtSetArg(arg[0], nhStr(XtNshown),      &shown);
+	XtSetArg(arg[1], nhStr(XtNtopOfThumb), &top);
 	XtGetValues(vert_sb, arg, TWO);
 
 	do_call = True;

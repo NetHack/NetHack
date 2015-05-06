@@ -1818,6 +1818,8 @@ struct permonst _mons2[] = {
 	M3_INFRAVISIBLE|M3_INFRAVISION, HI_LORD),
 /*
  * Puddings
+ *
+ * must be in the same order as the pudding globs in objects.c
  */
     MON("gray ooze", S_PUDDING,
 	LVL(3, 1, 8, 0, 0), (G_GENO|G_NOCORPSE|2),
