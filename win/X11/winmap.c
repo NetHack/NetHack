@@ -1,4 +1,4 @@
-/* NetHack 3.5	winmap.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	winmap.c	$NHDT-Date: 1430899135 2015/05/06 07:58:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.17 $ */
 /* NetHack 3.5	winmap.c	$Date: 2009/05/06 10:55:49 $  $Revision: 1.14 $ */
 /*	SCCS Id: @(#)winmap.c	3.5	2005/11/12	*/
 /* Copyright (c) Dean Luick, 1992				  */
@@ -66,7 +66,7 @@ static void FDECL(map_check_size_change, (struct xwindow *));
 static void FDECL(map_update, (struct xwindow *,int,int,int,int,BOOLEAN_P));
 static void FDECL(init_text, (struct xwindow *));
 static void FDECL(map_exposed, (Widget,XtPointer,XtPointer));
-static void FDECL(set_gc, (Widget,Font,char *,Pixel,GC *,GC *));
+static void FDECL(set_gc, (Widget,Font,const char *,Pixel,GC *,GC *));
 static void FDECL(get_text_gc, (struct xwindow *,Font));
 static void FDECL(get_char_info, (struct xwindow *));
 static void FDECL(display_cursor, (struct xwindow *));
@@ -249,7 +249,8 @@ init_tiles(wp)
     unsigned char *tb, *tile_bytes = (unsigned char *)0;
     int size;
     XColor *colors = (XColor *)0;
-    int i, x, y;
+    unsigned i;
+    int x, y;
     int bitmap_pad;
     int ddepth;
 #endif
@@ -348,7 +349,7 @@ init_tiles(wp)
 	goto tiledone;
     }
 
-    if (fread((char *) &header, sizeof(header), 1, fp) != 1) {
+    if ((int) fread((char *) &header, sizeof(header), 1, fp) != 1) {
 	X11_raw_print("read of header failed");
 	result = FALSE;
 	goto tiledone;
@@ -374,7 +375,7 @@ init_tiles(wp)
 
     size = 3*header.ncolors;
     colormap = (unsigned char *) alloc((unsigned)size);
-    if (fread((char *) colormap, 1, size, fp) != size) {
+    if ((int) fread((char *) colormap, 1, size, fp) != size) {
 	X11_raw_print("read of colormap failed");
 	result = FALSE;
 	goto tiledone;
@@ -410,13 +411,13 @@ init_tiles(wp)
 	tile_count += header.per_row - (tile_count % header.per_row);
     }
     tile_bytes = (unsigned char *) alloc((unsigned)tile_count*size);
-    if (fread((char *) tile_bytes, size, tile_count, fp) != tile_count) {
+    if ((int) fread((char *) tile_bytes, size, tile_count, fp) != tile_count) {
 	X11_raw_print("read of tile bytes failed");
 	result = FALSE;
 	goto tiledone;
     }
 
-    if (header.ntiles < total_tiles_used) {
+    if (header.ntiles < (unsigned) total_tiles_used) {
 	Sprintf(buf, "tile file incomplete, expecting %d tiles, found %lu",
 		total_tiles_used, header.ntiles);
 	X11_raw_print(buf);
@@ -463,27 +464,27 @@ init_tiles(wp)
 
     if (appResources.double_tile_size) {
 	unsigned long *expanded_row =
-	    (unsigned long *)alloc(sizeof(unsigned long)*(unsigned)image_width);
+	    (unsigned long *)alloc(sizeof (unsigned long) * image_width);
 
 	tb = tile_bytes;
-	for (y = 0; y < image_height; y++) {
-	    for (x = 0; x < image_width/2; x++)
+	for (y = 0; y < (int) image_height; y++) {
+	    for (x = 0; x < (int) image_width / 2; x++)
 		expanded_row[2*x] =
 			    expanded_row[(2*x)+1] = colors[*tb++].pixel;
 
-	    for (x = 0; x < image_width; x++)
+	    for (x = 0; x < (int) image_width; x++)
 		XPutPixel(tile_image, x, y, expanded_row[x]);
 
 	    y++;	/* duplicate row */
-	    for (x = 0; x < image_width; x++)
+	    for (x = 0; x < (int) image_width; x++)
 		XPutPixel(tile_image, x, y, expanded_row[x]);
 	}
 	free((genericptr_t)expanded_row);
 
     } else {
 
-	for (tb = tile_bytes, y = 0; y < image_height; y++)
-	    for (x = 0; x < image_width; x++, tb++)
+	for (tb = tile_bytes, y = 0; y < (int) image_height; y++)
+	    for (x = 0; x < (int) image_width; x++, tb++)
 		XPutPixel(tile_image, x, y, colors[*tb].pixel);
     }
 #endif /* USE_XPM */
@@ -569,7 +570,7 @@ check_cursor_visibility(wp)
 
     if (horiz_sb) {
 	XtSetArg(arg[0], XtNshown,	&shown);
-	XtSetArg(arg[1], XtNtopOfThumb, &top);
+	XtSetArg(arg[1], nhStr(XtNtopOfThumb), &top);
 	XtGetValues(horiz_sb, arg, TWO);
 
 	/* [ALI] Don't assume map widget is the same size as actual map */
@@ -620,7 +621,7 @@ check_cursor_visibility(wp)
 
     if (vert_sb) {
 	XtSetArg(arg[0], XtNshown,      &shown);
-	XtSetArg(arg[1], XtNtopOfThumb, &top);
+	XtSetArg(arg[1], nhStr(XtNtopOfThumb), &top);
 	XtGetValues(vert_sb, arg, TWO);
 
 	if (wp->map_information->is_tile)
@@ -742,7 +743,7 @@ static void
 set_gc(w, font, resource_name, bgpixel, regular, inverse)
     Widget w;
     Font font;
-    char *resource_name;
+    const char *resource_name;
     Pixel bgpixel;
     GC   *regular, *inverse;
 {
@@ -751,7 +752,7 @@ set_gc(w, font, resource_name, bgpixel, regular, inverse)
     Pixel curpixel;
     Arg arg[1];
 
-    XtSetArg(arg[0], resource_name, &curpixel);
+    XtSetArg(arg[0], (char *) resource_name, &curpixel);
     XtGetValues(w, arg, ONE);
 
     values.foreground = curpixel;
@@ -1124,6 +1125,8 @@ map_exposed(w, client_data, widget_data)
     XExposeEvent *event = (XExposeEvent *) widget_data;
     int t_height, t_width;	/* tile/text height & width */
 
+    nhUse(client_data);
+
     if (!XtIsRealized(w) || event->count > 0) return;
 
     wp = find_widget(w);
@@ -1489,8 +1492,8 @@ create_map_window(wp, create_popup, parent)
      * realized, then the map can resize to its normal size.
      */
     num_args = 0;
-    XtSetArg(args[num_args], XtNrows,    &rows);	num_args++;
-    XtSetArg(args[num_args], XtNcolumns, &columns);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNrows),    &rows);		num_args++;
+    XtSetArg(args[num_args], nhStr(XtNcolumns), &columns);	num_args++;
     XtGetValues(wp->w, args, num_args);
 
     /* Don't bother with windows larger than ROWNOxCOLNO. */

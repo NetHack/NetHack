@@ -1,4 +1,4 @@
-/* NetHack 3.5	winmenu.c	$NHDT-Date: 1428828477 2015/04/12 08:47:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
+/* NetHack 3.5	winmenu.c	$NHDT-Date: 1430899135 2015/05/06 07:58:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
 /* NetHack 3.5	winmenu.c	$Date: 2009/05/06 10:55:53 $  $Revision: 1.5 $ */
 /*	SCCS Id: @(#)winmenu.c	3.5	1996/08/15	*/
 /* Copyright (c) Dean Luick, 1992				  */
@@ -98,6 +98,8 @@ menu_select(w, client_data, call_data)
 #endif
     long how_many;
 
+    nhUse(client_data);
+
     wp = find_widget(w);
     menu_info  = wp->menu_information;
     how_many = menu_info->counting ? menu_info->menu_count : -1L;
@@ -157,6 +159,10 @@ menu_delete(w, event, params, num_params)
     String *params;
     Cardinal *num_params;
 {
+    nhUse(event);
+    nhUse(params);
+    nhUse(num_params);
+
     menu_cancel((Widget)None, (XtPointer) find_widget(w), (XtPointer) 0);
 }
 
@@ -171,6 +177,9 @@ invert_line(wp, curr, which, how_many)
     int which;
     long how_many;
 {
+#ifndef USE_FWF
+    nhUse(which);
+#endif
     reset_menu_count(wp->menu_information);
     curr->selected = !curr->selected;
     if (curr->selected) {
@@ -207,6 +216,9 @@ menu_key(w, event, params, num_params)
     char ch;
     int count;
     boolean selected_something;
+
+    nhUse(params);
+    nhUse(num_params);
 
     wp = find_widget(w);
     menu_info = wp->menu_information;
@@ -346,6 +358,9 @@ menu_ok(w, client_data, call_data)
 {
     struct xwindow *wp = (struct xwindow *) client_data;
 
+    nhUse(w);
+    nhUse(call_data);
+
     menu_popdown(wp);
 }
 
@@ -356,6 +371,9 @@ menu_cancel(w, client_data, call_data)
     XtPointer client_data, call_data;
 {
     struct xwindow *wp = (struct xwindow *) client_data;
+
+    nhUse(w);
+    nhUse(call_data);
 
     if (wp->menu_information->is_active) {
 	select_none(wp);
@@ -370,6 +388,9 @@ menu_all(w, client_data, call_data)
     Widget w;
     XtPointer client_data, call_data;
 {
+    nhUse(w);
+    nhUse(call_data);
+
     select_all((struct xwindow *) client_data);
 }
 
@@ -379,6 +400,9 @@ menu_none(w, client_data, call_data)
     Widget w;
     XtPointer client_data, call_data;
 {
+    nhUse(w);
+    nhUse(call_data);
+
     select_none((struct xwindow *) client_data);
 }
 
@@ -388,6 +412,9 @@ menu_invert(w, client_data, call_data)
     Widget w;
     XtPointer client_data, call_data;
 {
+    nhUse(w);
+    nhUse(call_data);
+
     invert_all((struct xwindow *) client_data);
 }
 
@@ -400,6 +427,9 @@ menu_search(w, client_data, call_data)
     struct xwindow *wp = (struct xwindow *) client_data;
     struct menu_info_t *menu_info = wp->menu_information;
     char buf[BUFSZ+2], tmpbuf[BUFSZ];
+
+    nhUse(w);
+    nhUse(call_data);
 
     X11_getlin("Search for:", tmpbuf);
     if (!*tmpbuf || *tmpbuf == '\033') return;
@@ -614,6 +644,9 @@ X11_add_menu(window, glyph, identifier, ch, gch, attr, str, preselected)
     x11_menu_item *item;
     struct menu_info_t *menu_info;
 
+    nhUse(glyph);
+    nhUse(preselected);		/*FIXME*/
+
     check_winid(window);
     menu_info = window_list[window].menu_information;
     if (!menu_info->is_menu) {
@@ -805,10 +838,10 @@ X11_select_menu(window, how, menu_list)
 
 	num_args = 0;
 	XtSetArg(args[num_args], XtNborderWidth, 0);		num_args++;
-	XtSetArg(args[num_args], XtNtop, XtChainTop);		num_args++;
-	XtSetArg(args[num_args], XtNbottom, XtChainTop);	num_args++;
-	XtSetArg(args[num_args], XtNleft, XtChainLeft);		num_args++;
-	XtSetArg(args[num_args], XtNright, XtChainLeft);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNbottom), XtChainTop);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft);	num_args++;
 
 	if (labeled)
 	    label = XtCreateManagedWidget(menu_info->new_menu.query,
@@ -821,11 +854,11 @@ X11_select_menu(window, how, menu_list)
 	 * Create ok, cancel, all, none, invert, and search buttons..
 	 */
 	num_args = 0;
-	XtSetArg(args[num_args], XtNfromVert, label);		num_args++;
-	XtSetArg(args[num_args], XtNtop, XtChainTop);		num_args++;
-	XtSetArg(args[num_args], XtNbottom, XtChainTop);	num_args++;
-	XtSetArg(args[num_args], XtNleft, XtChainLeft);		num_args++;
-	XtSetArg(args[num_args], XtNright, XtChainLeft);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNfromVert), label);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNbottom), XtChainTop);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft);	num_args++;
 	ok = XtCreateManagedWidget("OK",
 			commandWidgetClass,
 			form,
@@ -833,13 +866,14 @@ X11_select_menu(window, how, menu_list)
 	XtAddCallback(ok, XtNcallback, menu_ok, (XtPointer) wp);
 
 	num_args = 0;
-	XtSetArg(args[num_args], XtNfromVert, label);		num_args++;
-	XtSetArg(args[num_args], XtNfromHoriz, ok);		num_args++;
-	XtSetArg(args[num_args], XtNsensitive, how!=PICK_NONE);	num_args++;
-	XtSetArg(args[num_args], XtNtop, XtChainTop);		num_args++;
-	XtSetArg(args[num_args], XtNbottom, XtChainTop);	num_args++;
-	XtSetArg(args[num_args], XtNleft, XtChainLeft);		num_args++;
-	XtSetArg(args[num_args], XtNright, XtChainLeft);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNfromVert), label);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNfromHoriz), ok);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNsensitive),
+					 how != PICK_NONE);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNbottom), XtChainTop);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft);	num_args++;
 	cancel = XtCreateManagedWidget("cancel",
 			commandWidgetClass,
 			form,
@@ -848,13 +882,13 @@ X11_select_menu(window, how, menu_list)
 
 	sens = (how == PICK_ANY);
 	num_args = 0;
-	XtSetArg(args[num_args], XtNfromVert, label);		num_args++;
-	XtSetArg(args[num_args], XtNfromHoriz, cancel);		num_args++;
-	XtSetArg(args[num_args], XtNsensitive, sens);		num_args++;
-	XtSetArg(args[num_args], XtNtop, XtChainTop);		num_args++;
-	XtSetArg(args[num_args], XtNbottom, XtChainTop);	num_args++;
-	XtSetArg(args[num_args], XtNleft, XtChainLeft);		num_args++;
-	XtSetArg(args[num_args], XtNright, XtChainLeft);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNfromVert), label);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNfromHoriz), cancel);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNsensitive), sens);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNbottom), XtChainTop);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft);	num_args++;
 	all = XtCreateManagedWidget("all",
 			commandWidgetClass,
 			form,
@@ -862,13 +896,13 @@ X11_select_menu(window, how, menu_list)
 	XtAddCallback(all, XtNcallback, menu_all, (XtPointer) wp);
 
 	num_args = 0;
-	XtSetArg(args[num_args], XtNfromVert, label);		num_args++;
-	XtSetArg(args[num_args], XtNfromHoriz, all);		num_args++;
-	XtSetArg(args[num_args], XtNsensitive, sens);		num_args++;
-	XtSetArg(args[num_args], XtNtop, XtChainTop);		num_args++;
-	XtSetArg(args[num_args], XtNbottom, XtChainTop);	num_args++;
-	XtSetArg(args[num_args], XtNleft, XtChainLeft);		num_args++;
-	XtSetArg(args[num_args], XtNright, XtChainLeft);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNfromVert), label);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNfromHoriz), all);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNsensitive), sens);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNbottom), XtChainTop);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft);	num_args++;
 	none = XtCreateManagedWidget("none",
 			commandWidgetClass,
 			form,
@@ -876,13 +910,13 @@ X11_select_menu(window, how, menu_list)
 	XtAddCallback(none, XtNcallback, menu_none, (XtPointer) wp);
 
 	num_args = 0;
-	XtSetArg(args[num_args], XtNfromVert, label);		num_args++;
-	XtSetArg(args[num_args], XtNfromHoriz, none);		num_args++;
-	XtSetArg(args[num_args], XtNsensitive, sens);		num_args++;
-	XtSetArg(args[num_args], XtNtop, XtChainTop);		num_args++;
-	XtSetArg(args[num_args], XtNbottom, XtChainTop);	num_args++;
-	XtSetArg(args[num_args], XtNleft, XtChainLeft);		num_args++;
-	XtSetArg(args[num_args], XtNright, XtChainLeft);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNfromVert), label);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNfromHoriz), none);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNsensitive), sens);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNbottom), XtChainTop);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft);	num_args++;
 	invert = XtCreateManagedWidget("invert",
 			commandWidgetClass,
 			form,
@@ -890,13 +924,14 @@ X11_select_menu(window, how, menu_list)
 	XtAddCallback(invert, XtNcallback, menu_invert, (XtPointer) wp);
 
 	num_args = 0;
-	XtSetArg(args[num_args], XtNfromVert, label);		num_args++;
-	XtSetArg(args[num_args], XtNfromHoriz, invert);		num_args++;
-	XtSetArg(args[num_args], XtNsensitive, how!=PICK_NONE);	num_args++;
-	XtSetArg(args[num_args], XtNtop, XtChainTop);		num_args++;
-	XtSetArg(args[num_args], XtNbottom, XtChainTop);	num_args++;
-	XtSetArg(args[num_args], XtNleft, XtChainLeft);		num_args++;
-	XtSetArg(args[num_args], XtNright, XtChainLeft);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNfromVert), label);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNfromHoriz), invert);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNsensitive),
+					how != PICK_NONE);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNbottom), XtChainTop);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft);	num_args++;
 	search = XtCreateManagedWidget("search",
 			commandWidgetClass,
 			form,
@@ -904,18 +939,18 @@ X11_select_menu(window, how, menu_list)
 	XtAddCallback(search, XtNcallback, menu_search, (XtPointer) wp);
 
 	num_args = 0;
-	XtSetArg(args[num_args], XtNallowVert,  True);		num_args++;
-	XtSetArg(args[num_args], XtNallowHoriz, False);		num_args++;
-	XtSetArg(args[num_args], XtNuseBottom, True);		num_args++;
-	XtSetArg(args[num_args], XtNuseRight, True);		num_args++;
+	XtSetArg(args[num_args], nhStr(XtNallowVert),  True);	   num_args++;
+	XtSetArg(args[num_args], nhStr(XtNallowHoriz), False);	   num_args++;
+	XtSetArg(args[num_args], nhStr(XtNuseBottom), True);	   num_args++;
+	XtSetArg(args[num_args], nhStr(XtNuseRight), True);	   num_args++;
 /*
-	XtSetArg(args[num_args], XtNforceBars, True);		num_args++;
+	XtSetArg(args[num_args], nhStr(XtNforceBars), True);	   num_args++;
 */
-	XtSetArg(args[num_args], XtNfromVert, all);		num_args++;
-	XtSetArg(args[num_args], XtNtop, XtChainTop);		num_args++;
-	XtSetArg(args[num_args], XtNbottom, XtChainBottom);	num_args++;
-	XtSetArg(args[num_args], XtNleft, XtChainLeft);		num_args++;
-	XtSetArg(args[num_args], XtNright, XtChainRight);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNfromVert), all);	   num_args++;
+	XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop);	   num_args++;
+	XtSetArg(args[num_args], nhStr(XtNbottom), XtChainBottom); num_args++;
+	XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft);	   num_args++;
+	XtSetArg(args[num_args], nhStr(XtNright), XtChainRight);   num_args++;
 	viewport_widget = XtCreateManagedWidget(
 		    "menu_viewport",	/* name */
 		    viewportWidgetClass,
@@ -926,15 +961,15 @@ X11_select_menu(window, how, menu_list)
 	move_menu(&menu_info->new_menu, &menu_info->curr_menu);
 
 	num_args = 0;
-	XtSetArg(args[num_args], XtNforceColumns, True);	num_args++;
-	XtSetArg(args[num_args], XtNcolumnSpacing, 1);		num_args++;
-	XtSetArg(args[num_args], XtNdefaultColumns, 1);		num_args++;
-	XtSetArg(args[num_args], XtNlist,
+	XtSetArg(args[num_args], nhStr(XtNforceColumns), True);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNcolumnSpacing), 1);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNdefaultColumns), 1);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNlist),
 			menu_info->curr_menu.list_pointer);	num_args++;
 #ifdef USE_FWF
-	XtSetArg(args[num_args], XtNsensitiveArray,
+	XtSetArg(args[num_args], nhStr(XtNsensitiveArray),
 			menu_info->curr_menu.sensitive);	num_args++;
-	XtSetArg(args[num_args], XtNmaxSelectable,
+	XtSetArg(args[num_args], nhStr(XtNmaxSelectable),
 			menu_info->curr_menu.count);		num_args++;
 #endif
 	wp->w = XtCreateManagedWidget(
@@ -957,7 +992,8 @@ X11_select_menu(window, how, menu_list)
 				&menu_info->internal_height);	num_args++;
 	XtSetArg(args[num_args], XtNinternalWidth,
 				&menu_info->internal_width);	num_args++;
-	XtSetArg(args[num_args], XtNrowSpacing, &row_spacing);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNrowSpacing),
+				&row_spacing);			num_args++;
 	XtGetValues(wp->w, args, num_args);
 
 	/* font height is ascent + descent */

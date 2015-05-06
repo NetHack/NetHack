@@ -1,4 +1,4 @@
-/* NetHack 3.5	winstat.c	$NHDT-Date: 1425083083 2015/02/28 00:24:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.5 $ */
+/* NetHack 3.5	winstat.c	$NHDT-Date: 1430899137 2015/05/06 07:58:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
 /* NetHack 3.5	winstat.c	$Date: 2009/05/06 10:55:59 $  $Revision: 1.4 $ */
 /*	SCCS Id: @(#)winstat.c	3.5	1996/04/05	*/
 /* Copyright (c) Dean Luick, 1992				  */
@@ -86,10 +86,10 @@ create_status_window(wp, create_popup, parent)
      */
 
     num_args = 0;
-    XtSetArg(args[num_args], XtNdisplayCaret, False); num_args++;
-    XtSetArg(args[num_args], XtNscrollHorizontal,
+    XtSetArg(args[num_args], nhStr(XtNdisplayCaret), False);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNscrollHorizontal),
 				    XawtextScrollWhenNeeded);	num_args++;
-    XtSetArg(args[num_args], XtNscrollVertical,
+    XtSetArg(args[num_args], nhStr(XtNscrollVertical),
 				    XawtextScrollWhenNeeded);	num_args++;
 
     wp->w = XtCreateManagedWidget(
@@ -106,11 +106,15 @@ create_status_window(wp, create_popup, parent)
 
     /* Get the font and margin information. */
     num_args = 0;
-    XtSetArg(args[num_args], XtNfont,	      &fs);	       num_args++;
-    XtSetArg(args[num_args], XtNtopMargin,    &top_margin);    num_args++;
-    XtSetArg(args[num_args], XtNbottomMargin, &bottom_margin); num_args++;
-    XtSetArg(args[num_args], XtNleftMargin,   &left_margin);   num_args++;
-    XtSetArg(args[num_args], XtNrightMargin,  &right_margin);  num_args++;
+    XtSetArg(args[num_args], XtNfont,	&fs);		  num_args++;
+    XtSetArg(args[num_args], nhStr(XtNtopMargin),
+					&top_margin);	  num_args++;
+    XtSetArg(args[num_args], nhStr(XtNbottomMargin),
+					&bottom_margin);  num_args++;
+    XtSetArg(args[num_args], nhStr(XtNleftMargin),
+					&left_margin);	  num_args++;
+    XtSetArg(args[num_args], nhStr(XtNrightMargin),
+					&right_margin);	  num_args++;
     XtGetValues(wp->w, args, num_args);
 
     wp->pixel_height = 2 * nhFontHeight(wp->w) + top_margin + bottom_margin;
@@ -183,13 +187,14 @@ adjust_status(wp, str)
 static int hilight_time = 1;	/* number of turns to hilight a changed value */
 
 struct X_status_value {
-    char    *name;		/* text name */
-    int     type;		/* status type */
-    Widget  w;			/* widget of name/value pair */
-    long    last_value;		/* value displayed */
-    int	    turn_count;		/* last time the value changed */
-    boolean set;		/* if hilighed */
-    boolean after_init;		/* don't hilight on first change (init) */
+    /* we have to cast away 'const' when assigning new names */
+    const char *name;		/* text name */
+    int		type;		/* status type */
+    Widget	w;		/* widget of name/value pair */
+    long	last_value;	/* value displayed */
+    int		turn_count;	/* last time the value changed */
+    boolean	set;		/* if hilighed */
+    boolean	after_init;	/* don't hilight on first change (init) */
 };
 
 /* valid type values */
@@ -203,7 +208,7 @@ static const char *FDECL(width_string, (int));
 static void FDECL(create_widget, (Widget,struct X_status_value *,int));
 static void FDECL(get_widths, (struct X_status_value *,int *,int *));
 static void FDECL(set_widths, (struct X_status_value *,int,int));
-static Widget FDECL(init_column, (char *,Widget,Widget,Widget,int *));
+static Widget FDECL(init_column, (const char *,Widget,Widget,Widget,int *));
 static Widget FDECL(init_info_form, (Widget,Widget,Widget));
 
 /*
@@ -370,8 +375,9 @@ update_val(attr_rec, new_value)
 
 	if (strcmp(buf, attr_rec->name) == 0) return;	/* same */
 
-	/* Set the label. */
-	Strcpy(attr_rec->name, buf);
+	/* Set the label.  'name' field is const for most entries;
+	   we need to cast away that const for this assignment */
+	Strcpy((char *) attr_rec->name, buf);
 	XtSetArg(args[0], XtNlabel, buf);
 	XtSetValues(attr_rec->w, args, ONE);
 
@@ -715,7 +721,8 @@ create_widget(parent, sv, sv_index)
 	case SV_LABEL:
 	    /* Labels get their own buffer. */
 	    sv->name = (char *) alloc(BUFSZ);
-	    sv->name[0] = '\0';
+	    /* we need to cast away 'const' when assigning a value */
+	    *(char *)(sv->name) = '\0';
 
 	    num_args = 0;
 	    XtSetArg(args[num_args], XtNborderWidth, 0);	num_args++;
@@ -792,7 +799,7 @@ set_widths(sv, width1, width2)
 
 static Widget
 init_column(name, parent, top, left, col_indices)
-    char *name;
+    const char *name;
     Widget parent, top, left;
     int *col_indices;
 {
@@ -805,12 +812,12 @@ init_column(name, parent, top, left, col_indices)
 
     num_args = 0;
     if (top != (Widget) 0) {
-	XtSetArg(args[num_args], XtNfromVert, top);		num_args++;
+	XtSetArg(args[num_args], nhStr(XtNfromVert), top);	num_args++;
     }
     if (left != (Widget) 0) {
-	XtSetArg(args[num_args], XtNfromHoriz, left);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNfromHoriz), left);	num_args++;
     }
-    XtSetArg(args[num_args], XtNdefaultDistance, 0);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNdefaultDistance), 0);	num_args++;
     form = XtCreateManagedWidget(name,
 				formWidgetClass,
 				parent, args, num_args);
@@ -821,8 +828,8 @@ init_column(name, parent, top, left, col_indices)
 	create_widget(form, sv, *ip);	/* will set init width */
 	if (ip != col_indices) {	/* not first */
 	    num_args = 0;
-	    XtSetArg(args[num_args], XtNfromVert, shown_stats[*(ip-1)].w);
-								num_args++;
+	    XtSetArg(args[num_args], nhStr(XtNfromVert),
+		     shown_stats[*(ip-1)].w);			num_args++;
 	    XtSetValues(sv->w, args, num_args);
 	}
 	get_widths(sv, &width1, &width2);
@@ -878,12 +885,12 @@ init_info_form(parent, top, left)
 
     num_args = 0;
     if (top != (Widget) 0) {
-	XtSetArg(args[num_args], XtNfromVert, top);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNfromVert), top);	num_args++;
     }
     if (left != (Widget) 0) {
-	XtSetArg(args[num_args], XtNfromHoriz, left);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNfromHoriz), left);	num_args++;
     }
-    XtSetArg(args[num_args], XtNdefaultDistance, 0);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNdefaultDistance), 0);	num_args++;
     form = XtCreateManagedWidget("status_info",
 				formWidgetClass,
 				parent,
@@ -898,7 +905,7 @@ init_info_form(parent, top, left)
     create_widget(form, sv_dlevel, F_DLEVEL);
 
     num_args = 0;
-    XtSetArg(args[num_args], XtNfromVert, sv_name->w);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNfromVert), sv_name->w);	num_args++;
     XtSetValues(sv_dlevel->w, args, num_args);
 
     /* two columns beneath */
@@ -940,10 +947,10 @@ create_fancy_status(parent, top)
 
     num_args = 0;
     if (top != (Widget) 0) {
-	XtSetArg(args[num_args], XtNfromVert, top);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNfromVert), top);	  num_args++;
     }
-    XtSetArg(args[num_args], XtNdefaultDistance, 0);	num_args++;
-    XtSetArg(args[num_args], XtNborderWidth, 0);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNdefaultDistance), 0);	  num_args++;
+    XtSetArg(args[num_args], XtNborderWidth, 0);		  num_args++;
     XtSetArg(args[num_args], XtNorientation, XtorientHorizontal); num_args++;
     form = XtCreateManagedWidget("fancy_status",
 				panedWidgetClass,

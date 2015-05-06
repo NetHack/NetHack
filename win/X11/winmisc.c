@@ -1,4 +1,4 @@
-/* NetHack 3.5	winmisc.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.5	winmisc.c	$NHDT-Date: 1430899137 2015/05/06 07:58:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
 /* NetHack 3.5	winmisc.c	$Date: 2009/05/06 10:55:57 $  $Revision: 1.7 $ */
 /*	SCCS Id: @(#)winmisc.c	3.5	2000/05/21	*/
 /* Copyright (c) Dean Luick, 1992				  */
@@ -89,6 +89,10 @@ ps_quit(w, client_data, call_data)
     Widget w;
     XtPointer client_data, call_data;
 {
+    nhUse(w);
+    nhUse(client_data);
+    nhUse(call_data);
+
     ps_selected = PS_QUIT;
     exit_x_event = TRUE;		/* leave event loop */
 }
@@ -99,6 +103,10 @@ ps_random(w, client_data, call_data)
     Widget w;
     XtPointer client_data, call_data;
 {
+    nhUse(w);
+    nhUse(client_data);
+    nhUse(call_data);
+
     ps_selected = PS_RANDOM;
     exit_x_event = TRUE;		/* leave event loop */
 }
@@ -109,6 +117,9 @@ ps_select(w, client_data, call_data)
     Widget w;
     XtPointer client_data, call_data;
 {
+    nhUse(w);
+    nhUse(call_data);
+
     ps_selected = (int) client_data;
     exit_x_event = TRUE;		/* leave event loop */
 }
@@ -124,6 +135,10 @@ ps_key(w, event, params, num_params)
     char ch, *mark;
     char rolechars[QBUFSZ];
     int i;
+
+    nhUse(w);
+    nhUse(params);
+    nhUse(num_params);
 
     (void)memset(rolechars, '\0', sizeof rolechars);  /* for index() */
     for (i = 0; roles[i].name.m; ++i) {
@@ -167,6 +182,10 @@ race_key(w, event, params, num_params)
     char racechars[QBUFSZ];
     int i;
 
+    nhUse(w);
+    nhUse(params);
+    nhUse(num_params);
+
     (void)memset(racechars, '\0', sizeof racechars);  /* for index() */
     for (i = 0; races[i].noun; ++i) {
 	ch = lowc(*races[i].noun);
@@ -207,6 +226,10 @@ gend_key(w, event, params, num_params)
     char ch, *mark;
     static char gendchars[] = "mf";
 
+    nhUse(w);
+    nhUse(params);
+    nhUse(num_params);
+
     ch = key_event_to_char((XKeyEvent *) event);
     if (ch == '\0') {	/* don't accept nul char/modifier event */
 	/* don't beep */
@@ -238,6 +261,10 @@ algn_key(w, event, params, num_params)
 {
     char ch, *mark;
     static char algnchars[] = "LNC";
+
+    nhUse(w);
+    nhUse(params);
+    nhUse(num_params);
 
     ch = key_event_to_char((XKeyEvent *) event);
     if (ch == '\0') {	/* don't accept nul char/modifier event */
@@ -565,6 +592,9 @@ extend_select(w, client_data, call_data)
 {
     int selected = (int) client_data;
 
+    nhUse(w);
+    nhUse(call_data);
+
     if (extended_command_selected != selected) {
 	/* visibly deselect old one */
 	if (extended_command_selected >= 0)
@@ -588,6 +618,10 @@ extend_dismiss(w, client_data, call_data)
     Widget w;
     XtPointer client_data, call_data;
 {
+    nhUse(w);
+    nhUse(client_data);
+    nhUse(call_data);
+
     ec_dismiss();
 }
 
@@ -597,6 +631,10 @@ extend_help(w, client_data, call_data)
     Widget w;
     XtPointer client_data, call_data;
 {
+    nhUse(w);
+    nhUse(client_data);
+    nhUse(call_data);
+
     /* We might need to make it known that we already have one listed. */
     (void) doextlist();
 }
@@ -624,6 +662,10 @@ popup_delete(w, event, params, num_params)
     String *params;
     Cardinal *num_params;
 {
+    nhUse(event);
+    nhUse(params);
+    nhUse(num_params);
+
     ps_selected = PS_QUIT;
     nh_XtPopdown(w);
     exit_x_event = TRUE;		/* leave event loop */
@@ -652,6 +694,10 @@ ec_key(w, event, params, num_params)
     char ch;
     int i;
     XKeyEvent *xkey = (XKeyEvent *) event;
+
+    nhUse(w);
+    nhUse(params);
+    nhUse(num_params);
 
     ch = key_event_to_char(xkey);
 
@@ -812,7 +858,7 @@ make_menu(popup_name, popup_label, popup_translations,
 
     /* Get the default distance between objects in the form widget. */
     num_args = 0;
-    XtSetArg(args[num_args], XtNdefaultDistance, &distance);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNdefaultDistance), &distance); num_args++;
     XtGetValues(form, args, num_args);
 
     /*
@@ -829,9 +875,9 @@ make_menu(popup_name, popup_label, popup_translations,
      * Create the left button.
      */
     num_args = 0;
-    XtSetArg(args[num_args], XtNfromVert, label);		num_args++;
+    XtSetArg(args[num_args], nhStr(XtNfromVert), label);	num_args++;
 /*
-    XtSetArg(args[num_args], XtNshapeStyle,
+    XtSetArg(args[num_args], nhStr(XtNshapeStyle),
 				XmuShapeRoundedRectangle);	num_args++;
 */
     left = XtCreateManagedWidget(left_name,
@@ -846,10 +892,10 @@ make_menu(popup_name, popup_label, popup_translations,
      * Create right button.
      */
     num_args = 0;
-    XtSetArg(args[num_args], XtNfromHoriz, left);		num_args++;
-    XtSetArg(args[num_args], XtNfromVert, label);		num_args++;
+    XtSetArg(args[num_args], nhStr(XtNfromHoriz), left);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNfromVert), label);	num_args++;
 /*
-    XtSetArg(args[num_args], XtNshapeStyle,
+    XtSetArg(args[num_args], nhStr(XtNshapeStyle),
 				XmuShapeRoundedRectangle);	num_args++;
 */
     right = XtCreateManagedWidget(right_name,
@@ -867,10 +913,10 @@ make_menu(popup_name, popup_label, popup_translations,
     for (i = 0, above = left, curr = commands; i < num_names; i++) {
 	if (!widget_names[i]) continue;
 	num_args = 0;
-	XtSetArg(args[num_args], XtNfromVert, above);	num_args++;
+	XtSetArg(args[num_args], nhStr(XtNfromVert), above);	num_args++;
 	if (above == left) {
 	    /* if first, we are farther apart */
-	    XtSetArg(args[num_args], XtNvertDistance, skip);	num_args++;
+	    XtSetArg(args[num_args], nhStr(XtNvertDistance), skip); num_args++;
 	}
 
 	*curr = XtCreateManagedWidget(widget_names[i],
