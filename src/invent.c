@@ -2031,6 +2031,7 @@ char avoidlet;
         free((genericptr_t)selected);
         } else
         ret = !n ? '\0' : '\033';	/* cancelled */
+	destroy_nhwindow(win);
     }
     return ret;
 }
