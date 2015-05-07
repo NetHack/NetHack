@@ -415,7 +415,7 @@ HACK_H = $(INCL)\hack.h $(CONFIG_H) $(INCL)\align.h $(INCL)\context.h \
 		$(INCL)\monflag.h $(INCL)\mondata.h $(INCL)\pm.h \
 		$(INCL)\wintype.h $(INCL)\decl.h $(INCL)\quest.h \
 		$(INCL)\spell.h $(INCL)\color.h $(INCL)\obj.h \
-		$(INCL)\you.h $(INCL)\attrib.h $(INCL)\monst.h \
+		$(INCL)\you.h $(INCL)\attrib.h $(INCL)\monst.h $(INCL)\lint.h \
 		$(INCL)\mextra.h $(INCL)\skills.h $(INCL)\onames.h \
 		$(INCL)\timeout.h $(INCL)\trap.h $(INCL)\flag.h $(INCL)\rm.h \
 		$(INCL)\vision.h $(INCL)\display.h $(INCL)\engrave.h \
