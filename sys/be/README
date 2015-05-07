@@ -1,5 +1,5 @@
 This file is sys/be/README.  It is for those intending to compile
-NetHack 3.5 on a BeOS 4.5 system.
+NetHack 3.6 on a BeOS 4.5 system.
 
 BeOS NetHack currently only supports the TTY windowing system.  In
 order to compile it, it would benefit you greatly to think of your Be

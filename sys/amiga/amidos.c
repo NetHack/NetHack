@@ -1,5 +1,5 @@
-/* NetHack 3.5	amidos.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	amidos.c	$Date: 2009/05/06 10:48:29 $  $Revision: 1.6 $ */
+/* NetHack 3.6	amidos.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	amidos.c	$Date: 2009/05/06 10:48:29 $  $Revision: 1.6 $ */
 /*    SCCS Id: @(#)amidos.c     3.5    2000/01/12
 /* Copyright (c) Olaf Seibert, Nijmegen, The Netherlands, 1988,1990.    */
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1991,1992,1993,1996.  */

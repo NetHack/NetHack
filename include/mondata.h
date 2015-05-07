@@ -1,5 +1,5 @@
-/* NetHack 3.5	mondata.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	mondata.h	$Date: 2009/05/06 10:44:54 $  $Revision: 1.18 $ */
+/* NetHack 3.6	mondata.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	mondata.h	$Date: 2009/05/06 10:44:54 $  $Revision: 1.18 $ */
 /*	SCCS Id: @(#)mondata.h	3.5	2007/04/27	*/
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */

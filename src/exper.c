@@ -1,5 +1,5 @@
-/* NetHack 3.5	exper.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	exper.c	$Date: 2009/05/06 10:46:24 $  $Revision: 1.19 $ */
+/* NetHack 3.6	exper.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	exper.c	$Date: 2009/05/06 10:46:24 $  $Revision: 1.19 $ */
 /*	SCCS Id: @(#)exper.c	3.5	2005/09/19	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */

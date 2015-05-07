@@ -1,5 +1,5 @@
-/* NetHack 3.5	botl.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	botl.h	$Date: 2012/01/10 17:47:16 $  $Revision: 1.6 $ */
+/* NetHack 3.6	botl.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	botl.h	$Date: 2012/01/10 17:47:16 $  $Revision: 1.6 $ */
 /* Copyright (c) Michael Allison, 2003				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

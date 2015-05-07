@@ -1,10 +1,10 @@
-# NetHack 3.5	Makefile.BC	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
-# NetHack 3.5	Makefile.BC	$Date: 2012/01/10 17:47:26 $  $Revision: 1.14 $
+# NetHack 3.6	Makefile.BC	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+# NetHack 3.6	Makefile.BC	$Date: 2012/01/10 17:47:26 $  $Revision: 1.14 $
 # Copyright (c) Yitzhak Sapir, 1999-2006.
 # NetHack may be freely distributed.  See license for details.
 #
 
-# PC NetHack 3.5 Makefile for Borland C++ 3.1 and 4.5.
+# PC NetHack 3.6 Makefile for Borland C++ 3.1 and 4.5.
 #
 # Nota Bene:	Before you get to here you should have already read
 # 		the Install.dos file located in the sys/msdos directory.
@@ -18,7 +18,7 @@
 # compiler.  It supports only one overlay management facility - VROOMM.
 # (This Makefile won't work with make45l or NDMAKE)
 #
-# NOTE: This Makefile has not been tested with NetHack 3.5.x
+# NOTE: This Makefile has not been tested with NetHack 3.6.x
 
 #
 # Game Installation Variables.

@@ -1,5 +1,5 @@
-/* NetHack 3.5	xwindowp.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	xwindowp.h	$Date: 2009/05/06 10:45:19 $  $Revision: 1.4 $ */
+/* NetHack 3.6	xwindowp.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	xwindowp.h	$Date: 2009/05/06 10:45:19 $  $Revision: 1.4 $ */
 /*	SCCS Id: @(#)xwindowp.h 3.5	1992/03/07	*/
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */

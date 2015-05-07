@@ -1,5 +1,5 @@
-/* NetHack 3.5	ioctl.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	ioctl.c	$Date: 2011/06/16 15:10:14 $  $Revision: 1.8 $ */
+/* NetHack 3.6	ioctl.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	ioctl.c	$Date: 2011/06/16 15:10:14 $  $Revision: 1.8 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

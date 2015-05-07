@@ -1,5 +1,5 @@
-/* NetHack 3.5	mextra.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	mextra.h	$Date: 2011/04/15 01:55:40 $  $Revision: 1.12 $ */
+/* NetHack 3.6	mextra.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	mextra.h	$Date: 2011/04/15 01:55:40 $  $Revision: 1.12 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

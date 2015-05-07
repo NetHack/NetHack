@@ -1,5 +1,5 @@
-/* NetHack 3.5	mac-qt.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	mac-qt.h	$Date: 2009/05/06 10:44:50 $  $Revision: 1.4 $ */
+/* NetHack 3.6	mac-qt.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	mac-qt.h	$Date: 2009/05/06 10:44:50 $  $Revision: 1.4 $ */
 /*	SCCS Id: @(#)mac-qt.h	3.5	2003/06/01	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 2003. */
 /* NetHack may be freely redistributed.  See license for details. */

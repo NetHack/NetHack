@@ -1,5 +1,5 @@
-/* NetHack 3.5	tile2x11.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	tile2x11.h	$Date: 2009/05/06 10:45:11 $  $Revision: 1.5 $ */
+/* NetHack 3.6	tile2x11.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	tile2x11.h	$Date: 2009/05/06 10:45:11 $  $Revision: 1.5 $ */
 /*	SCCS Id: @(#)tile2x11.h 3.5	1995/01/25	*/
 /* NetHack may be freely redistributed.  See license for details. */
 

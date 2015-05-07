@@ -1,4 +1,4 @@
-/* NetHack 3.5  posixregex.c	$NHDT-Date: 1428970913 2015/04/14 00:21:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.0 $ */
+/* NetHack 3.6  posixregex.c	$NHDT-Date: 1428970913 2015/04/14 00:21:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.0 $ */
 /* Copyright (c) Sean Hunt  2015.                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 

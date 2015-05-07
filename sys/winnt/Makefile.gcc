@@ -1,8 +1,8 @@
-# NetHack 3.5	Makefile.gcc	$NHDT-Date: 1430958114 2015/05/07 00:21:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.39 $
-# NetHack 3.5	Makefile.gcc	$Date: 2011/10/11 02:37:22 $  $Revision: 1.38 $
+# NetHack 3.6	Makefile.gcc	$NHDT-Date: 1430958114 2015/05/07 00:21:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.39 $
+# NetHack 3.6	Makefile.gcc	$Date: 2011/10/11 02:37:22 $  $Revision: 1.38 $
 #   Copyright (c) NetHack PC Development Team 1993-2010
 #
-#   NetHack 3.5.x Makefile for MinGW
+#   NetHack 3.6.x Makefile for MinGW
 #
 #   Win32 Compilers Tested:
 #                  - MinGW 1.0 (gcc version 2.95.3-6) (Console NetHack only)

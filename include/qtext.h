@@ -1,5 +1,5 @@
-/* NetHack 3.5	qtext.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	qtext.h	$Date: 2009/05/06 10:45:02 $  $Revision: 1.7 $ */
+/* NetHack 3.6	qtext.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	qtext.h	$Date: 2009/05/06 10:45:02 $  $Revision: 1.7 $ */
 /*	SCCS Id: @(#)qtext.h	3.5	1997/02/02	*/
 /* Copyright (c) Mike Stephenson 1991.				  */
 /* NetHack may be freely redistributed.  See license for details. */

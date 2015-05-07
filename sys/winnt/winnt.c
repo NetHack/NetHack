@@ -1,5 +1,5 @@
-/* NetHack 3.5	winnt.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	winnt.c	$Date: 2012/01/15 19:11:41 $  $Revision: 1.18 $ */
+/* NetHack 3.6	winnt.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	winnt.c	$Date: 2012/01/15 19:11:41 $  $Revision: 1.18 $ */
 /*	SCCS Id: @(#)winnt.c	 3.5	 $NHDT-Date$		  */
 /*	SCCS Id: @(#)winnt.c	 3.5	 $Date: 2012/01/15 19:11:41 $		  */
 /* Copyright (c) NetHack PC Development Team 1993, 1994 */

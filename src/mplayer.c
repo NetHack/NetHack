@@ -1,5 +1,5 @@
-/* NetHack 3.5	mplayer.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	mplayer.c	$Date: 2009/05/06 10:47:09 $  $Revision: 1.11 $ */
+/* NetHack 3.6	mplayer.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	mplayer.c	$Date: 2009/05/06 10:47:09 $  $Revision: 1.11 $ */
 /*	SCCS Id: @(#)mplayer.c	3.5	2006/12/15	*/
 /*	Copyright (c) Izchak Miller, 1992.			  */
 /* NetHack may be freely redistributed.  See license for details. */

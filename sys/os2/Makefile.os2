@@ -1,6 +1,6 @@
-# NetHack 3.5	Makefile.os2	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
-# NetHack 3.5	Makefile.os2	$Date: 2012/01/10 17:47:28 $  $Revision: 1.16 $
-#	OS/2 NetHack 3.5 Makefile for OS/2 versions 1.x and 2.x
+# NetHack 3.6	Makefile.os2	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+# NetHack 3.6	Makefile.os2	$Date: 2012/01/10 17:47:28 $  $Revision: 1.16 $
+#	OS/2 NetHack 3.6 Makefile for OS/2 versions 1.x and 2.x
 #	Copyright (C) 1990, 1991, 1992, 1993, 1996 Timo Hakulinen
 #
 #	Several compilers exist for OS/2 but, currently only GCC emx is tested
@@ -185,7 +185,7 @@ RLIBP	= c:\emx\lib		# Possible real mode C libraries
 #
 
 GAME	= nethack
-GAMEDES = "NetHack 3.5.0"
+GAMEDES = "NetHack 3.6.0"
 
 #
 #	The uppermost two lines for MSC, the middle two for GCC, and

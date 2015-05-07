@@ -1,5 +1,5 @@
-/* NetHack 3.5	wintext.c	$NHDT-Date: 1430899138 2015/05/06 07:58:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
-/* NetHack 3.5	wintext.c	$Date: 2012/01/24 04:26:27 $  $Revision: 1.7 $ */
+/* NetHack 3.6	wintext.c	$NHDT-Date: 1430899138 2015/05/06 07:58:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
+/* NetHack 3.6	wintext.c	$Date: 2012/01/24 04:26:27 $  $Revision: 1.7 $ */
 /*	SCCS Id: @(#)wintext.c	3.5	1996/04/05	*/
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */

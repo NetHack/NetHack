@@ -1,5 +1,5 @@
-/* NetHack 3.5	mhsplash.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	mhsplash.c	$Date: 2012/01/11 01:15:37 $  $Revision: 1.17 $ */
+/* NetHack 3.6	mhsplash.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	mhsplash.c	$Date: 2012/01/11 01:15:37 $  $Revision: 1.17 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 

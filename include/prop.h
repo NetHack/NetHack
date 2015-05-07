@@ -1,5 +1,5 @@
-/* NetHack 3.5	prop.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	prop.h	$Date: 2011/10/01 00:25:52 $  $Revision: 1.7 $ */
+/* NetHack 3.6	prop.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	prop.h	$Date: 2011/10/01 00:25:52 $  $Revision: 1.7 $ */
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

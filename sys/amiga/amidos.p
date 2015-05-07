@@ -1,5 +1,5 @@
-/* NetHack 3.5	amidos.p	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	amidos.p	$Date: 2009/05/06 10:48:29 $  $Revision: 1.4 $ */
+/* NetHack 3.6	amidos.p	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	amidos.p	$Date: 2009/05/06 10:48:29 $  $Revision: 1.4 $ */
 /*    SCCS Id: @(#)amidos.p 	3.5    1993/01/08
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1992, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */

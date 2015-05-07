@@ -1,5 +1,5 @@
-/* NetHack 3.5	vmstty.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	vmstty.c	$Date: 2011/04/13 01:48:13 $  $Revision: 1.10 $ */
+/* NetHack 3.6	vmstty.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	vmstty.c	$Date: 2011/04/13 01:48:13 $  $Revision: 1.10 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 /* tty.c - (VMS) version */

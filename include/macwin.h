@@ -1,5 +1,5 @@
-/* NetHack 3.5	macwin.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	macwin.h	$Date: 2009/05/06 10:44:52 $  $Revision: 1.5 $ */
+/* NetHack 3.6	macwin.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	macwin.h	$Date: 2009/05/06 10:44:52 $  $Revision: 1.5 $ */
 /*	SCCS Id: @(#)macwin.h	3.5	1996/01/15	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */

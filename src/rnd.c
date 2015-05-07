@@ -1,5 +1,5 @@
-/* NetHack 3.5	rnd.c	$NHDT-Date: 1426465440 2015/03/16 00:24:00 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.8 $ */
-/* NetHack 3.5	rnd.c	$Date: 2009/05/06 10:47:41 $  $Revision: 1.7 $ */
+/* NetHack 3.6	rnd.c	$NHDT-Date: 1426465440 2015/03/16 00:24:00 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.8 $ */
+/* NetHack 3.6	rnd.c	$Date: 2009/05/06 10:47:41 $  $Revision: 1.7 $ */
 /*	SCCS Id: @(#)rnd.c	3.5	2004/08/27	*/
 /* NetHack may be freely redistributed.  See license for details. */
 

@@ -1,5 +1,5 @@
 #!perl
-# NetHack 3.5  mdgrep.pl  $NHDT-Date: 1423877528 2015/02/14 01:32:08 $  $NHDT-Branch$:$NHDT-Revision: 1.7 $
+# NetHack 3.6  mdgrep.pl  $NHDT-Date: 1423877528 2015/02/14 01:32:08 $  $NHDT-Branch$:$NHDT-Revision: 1.7 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -64,7 +64,7 @@ sub start_file {
 # before generating mdgrep.h and committing that file).
 	print OUT <<E_O_M;
 /*
- * NetHack 3.5  $outfile  $date $branch:$revision
+ * NetHack 3.6  $outfile  $date $branch:$revision
  * Copyright (c) Kenneth Lorber, Kensington, Maryland, 2008
  * NetHack may be freely redistributed.  See license for details.
  *

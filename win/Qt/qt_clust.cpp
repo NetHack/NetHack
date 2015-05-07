@@ -1,5 +1,5 @@
-/* NetHack 3.5	qt_clust.cpp	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	qt_clust.cpp	$Date: 2009/05/06 10:55:03 $  $Revision: 1.4 $ */
+/* NetHack 3.6	qt_clust.cpp	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	qt_clust.cpp	$Date: 2009/05/06 10:55:03 $  $Revision: 1.4 $ */
 /*	SCCS Id: @(#)qt_clust.cpp	3.5	1999/11/19	*/
 /* Copyright (c) Warwick Allison, 1999. */
 /* NetHack may be freely redistributed.  See license for details. */

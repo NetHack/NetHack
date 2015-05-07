@@ -2,7 +2,7 @@
          NetHack may be freely redistributed.  See license for details.
          ==============================================================
                   Instructions for compiling and installing
-                       NetHack 3.5 on a Windows system
+                       NetHack 3.6 on a Windows system
                  (Windows XP and Windows 2003 or later only)
          ==============================================================
                  Last revision: $NHDT-Date$
@@ -17,7 +17,7 @@ contributed the port.
 
 The PC Windows porting team consisting of Michael Allison, David Cohrs, 
 Alex Kompel, Dion Nicolaas, Yitzhak Sapir, and Janet Walz maintained the 
-tty and graphical win32 versions of NetHack 3.5.0.
+tty and graphical win32 versions of NetHack 3.6.0.
 
 You can build either the TTY version of NetHack or the Windows Graphical 
 version.  In either case you can use one of the following build
@@ -171,7 +171,7 @@ Setting Up
     For the Borland Makefile, you can simply invoke the Make utility 
     from the Makefile's directory (For the standard Borland compiler 
     installation you can just use the explicit path 
-    "c:\borland\bcc55\bin\make /f Makefile.bcc". NetHack 3.5.0 has not
+    "c:\borland\bcc55\bin\make /f Makefile.bcc". NetHack 3.6.0 has not
     yet been tested with the Borland compiler.
 
 
@@ -525,10 +525,10 @@ II. Executing the game
     If you will be running it by launching it from a shortcut, just use
     the following information when setting up the shortcut.
 
-        Description      :  NetHack 3.5.0 Console version
+        Description      :  NetHack 3.6.0 Console version
         Command Line     :  C:\NETHACK\BINARY\NETHACK.EXE
 
-        Description      :  NetHack 3.5.0 Graphical Interface
+        Description      :  NetHack 3.6.0 Graphical Interface
          Command Line     :  C:\NETHACK\BINARY\NETHACKW.EXE
 
    (changing the directory to the appropriate one of course)

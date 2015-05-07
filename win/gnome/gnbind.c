@@ -1,5 +1,5 @@
-/* NetHack 3.5	gnbind.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	gnbind.c	$Date: 2012/01/24 04:26:31 $  $Revision: 1.25 $ */
+/* NetHack 3.6	gnbind.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	gnbind.c	$Date: 2012/01/24 04:26:31 $  $Revision: 1.25 $ */
 /* Copyright (C) 1998 by Erik Andersen <andersee@debian.org> */
 /* NetHack may be freely redistributed.  See license for details. */
 

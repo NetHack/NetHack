@@ -1,5 +1,5 @@
-/* NetHack 3.5	ntconf.h	$NHDT-Date: 1426966690 2015/03/21 19:38:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.37 $ */
-/* NetHack 3.5	ntconf.h	$Date: 2012/01/15 19:11:38 $  $Revision: 1.35 $ */
+/* NetHack 3.6	ntconf.h	$NHDT-Date: 1426966690 2015/03/21 19:38:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.37 $ */
+/* NetHack 3.6	ntconf.h	$Date: 2012/01/15 19:11:38 $  $Revision: 1.35 $ */
 /*	SCCS Id: @(#)ntconf.h	3.5	2002/03/10	*/
 /* Copyright (c) NetHack PC Development Team 1993, 1994.  */
 /* NetHack may be freely redistributed.  See license for details. */

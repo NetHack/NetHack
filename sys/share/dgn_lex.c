@@ -406,7 +406,7 @@ static char *yy_last_accepting_cpos;
 #define YY_MORE_ADJ 0
 char *yytext;
 #define INITIAL 0
-/* NetHack 3.5  dgn_comp.l	$Date: 2009/05/11 22:53:51 $  $Revision: 1.10 $ */
+/* NetHack 3.6  dgn_comp.l	$Date: 2009/05/11 22:53:51 $  $Revision: 1.10 $ */
 /*	SCCS Id: @(#)dgn_lex.c	3.5	2002/03/27	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /*	Copyright (c) 1990 by M. Stephenson	     */

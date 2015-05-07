@@ -1,5 +1,5 @@
-/* NetHack 3.5	mhcmd.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	mhcmd.c	$Date: 2009/10/22 02:59:30 $  $Revision: 1.8 $ */
+/* NetHack 3.6	mhcmd.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	mhcmd.c	$Date: 2009/10/22 02:59:30 $  $Revision: 1.8 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "winMS.h"

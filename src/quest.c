@@ -1,5 +1,5 @@
-/* NetHack 3.5	quest.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	quest.c	$Date: 2009/05/06 10:47:33 $  $Revision: 1.10 $ */
+/* NetHack 3.6	quest.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	quest.c	$Date: 2009/05/06 10:47:33 $  $Revision: 1.10 $ */
 /*	SCCS Id: @(#)quest.c	3.5	2006/08/05	*/
 /*	Copyright 1991, M. Stephenson		  */
 /* NetHack may be freely redistributed.  See license for details. */

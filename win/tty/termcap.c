@@ -1,5 +1,5 @@
-/* NetHack 3.5	termcap.c	$NHDT-Date: 1427756993 2015/03/30 23:09:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
-/* NetHack 3.5	termcap.c	$Date: 2009/05/06 10:59:19 $  $Revision: 1.13 $ */
+/* NetHack 3.6	termcap.c	$NHDT-Date: 1427756993 2015/03/30 23:09:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
+/* NetHack 3.6	termcap.c	$Date: 2009/05/06 10:59:19 $  $Revision: 1.13 $ */
 /*	SCCS Id: @(#)termcap.c	3.5	2007/12/12	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */

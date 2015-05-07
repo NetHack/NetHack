@@ -1,5 +1,5 @@
-// NetHack 3.5	qt_win.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
-// NetHack 3.5	qt_win.h	$Date: 2012/01/24 04:26:17 $  $Revision: 1.11 $
+// NetHack 3.6	qt_win.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+// NetHack 3.6	qt_win.h	$Date: 2012/01/24 04:26:17 $  $Revision: 1.11 $
 // Copyright (c) Warwick Allison, 1999.
 // NetHack may be freely redistributed.  See license for details.
 //

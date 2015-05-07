@@ -1,4 +1,4 @@
-/* NetHack 3.5	tile2bmp.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	tile2bmp.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
 /*   Copyright (c) NetHack PC Development Team 1995                 */
 /*   NetHack may be freely redistributed.  See license for details. */
 

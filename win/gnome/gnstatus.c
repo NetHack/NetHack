@@ -1,5 +1,5 @@
-/* NetHack 3.5	gnstatus.c	$NHDT-Date: 1425083083 2015/02/28 00:24:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.6 $ */
-/* NetHack 3.5	gnstatus.c	$Date: 2009/05/06 10:57:54 $  $Revision: 1.5 $ */
+/* NetHack 3.6	gnstatus.c	$NHDT-Date: 1425083083 2015/02/28 00:24:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.6 $ */
+/* NetHack 3.6	gnstatus.c	$Date: 2009/05/06 10:57:54 $  $Revision: 1.5 $ */
 /*	SCCS Id: @(#)gnstatus.c	3.5	2000/07/16	*/
 /* Copyright (C) 1998 by Erik Andersen <andersee@debian.org> */
 /* NetHack may be freely redistributed.  See license for details. */

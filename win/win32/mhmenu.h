@@ -1,5 +1,5 @@
-/* NetHack 3.5	mhmenu.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	mhmenu.h	$Date: 2009/05/06 11:00:00 $  $Revision: 1.4 $ */
+/* NetHack 3.6	mhmenu.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	mhmenu.h	$Date: 2009/05/06 11:00:00 $  $Revision: 1.4 $ */
 /*	SCCS Id: @(#)mhmenu.h	3.5	2005/01/23	*/
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */

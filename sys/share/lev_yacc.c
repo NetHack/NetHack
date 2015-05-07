@@ -64,8 +64,8 @@
 /* Copy the first part of user declarations.  */
 #line 1 "lev_comp.y" /* yacc.c:339  */
 
-/* NetHack 3.5  lev_comp.y	$NHDT-Date: 1428655167 2015/04/10 08:39:27 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
-/* NetHack 3.5  lev_comp.y	$Date: 2009/05/06 10:54:31 $  $Revision: 1.8 $ */
+/* NetHack 3.6  lev_comp.y	$NHDT-Date: 1428655167 2015/04/10 08:39:27 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
+/* NetHack 3.6  lev_comp.y	$Date: 2009/05/06 10:54:31 $  $Revision: 1.8 $ */
 /*	SCCS Id: @(#)lev_yacc.c	3.5	2007/08/01	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */

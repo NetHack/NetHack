@@ -1,5 +1,5 @@
-/* NetHack 3.5	winMS.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	winMS.h	$Date: 2012/01/24 04:26:33 $  $Revision: 1.28 $ */
+/* NetHack 3.6	winMS.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	winMS.h	$Date: 2012/01/24 04:26:33 $  $Revision: 1.28 $ */
 /*	SCCS Id: @(#)winMS.h	3.5	2005/01/23	*/
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */

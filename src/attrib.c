@@ -1,5 +1,5 @@
-/* NetHack 3.5	attrib.c	$NHDT-Date: 1426465433 2015/03/16 00:23:53 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.34 $ */
-/* NetHack 3.5	attrib.c	$Date: 2011/10/01 00:25:55 $  $Revision: 1.30 $ */
+/* NetHack 3.6	attrib.c	$NHDT-Date: 1426465433 2015/03/16 00:23:53 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.34 $ */
+/* NetHack 3.6	attrib.c	$Date: 2011/10/01 00:25:55 $  $Revision: 1.30 $ */
 /*	Copyright 1988, 1989, 1990, 1992, M. Stephenson		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
