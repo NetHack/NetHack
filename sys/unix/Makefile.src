@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.5  Makefile.src	$NHDT-Date: 1430897864 2015/05/06 07:37:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.39 $
+# NetHack 3.5  Makefile.src	$NHDT-Date: 1430958824 2015/05/07 00:33:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.40 $
 # NetHack 3.5  Makefile.src	$Date: 2012/01/20 03:41:33 $  $Revision: 1.37 $
 
 # Root of source tree:
@@ -627,7 +627,7 @@ wintty.o: ../win/tty/wintty.c $(HACK_H) ../include/dlb.h ../include/tcap.h
 Window.o: ../win/X11/Window.c ../include/xwindowp.h ../include/xwindow.h \
 		$(CONFIG_H) ../include/lint.h
 	$(CC) $(CFLAGS) -c ../win/X11/Window.c
-dialogs.o: ../win/X11/dialogs.c $(CONFIG_H)
+dialogs.o: ../win/X11/dialogs.c $(CONFIG_H) ../include/lint.h
 	$(CC) $(CFLAGS) -c ../win/X11/dialogs.c
 winX.o: ../win/X11/winX.c $(HACK_H) ../include/winX.h ../include/dlb.h \
 		../win/X11/nh72icon ../win/X11/nh56icon ../win/X11/nh32icon
