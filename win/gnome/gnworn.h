@@ -1,4 +1,4 @@
-/* NetHack 3.5	gnworn.h	2009/05/06 10:58:06  1.3 */
+/* NetHack 3.6	gnworn.h	2009/05/06 10:58:06  1.3 */
 /*
  * $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
  * $Date: 2012/01/10 17:47:38 $  $Revision: 1.4 $

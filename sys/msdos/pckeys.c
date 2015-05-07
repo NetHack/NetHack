@@ -1,5 +1,5 @@
-/* NetHack 3.5	pckeys.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	pckeys.c	$Date: 2009/05/06 10:49:39 $  $Revision: 1.4 $ */
+/* NetHack 3.6	pckeys.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	pckeys.c	$Date: 2009/05/06 10:49:39 $  $Revision: 1.4 $ */
 /*	SCCS Id: @(#)pckeys.c	 3.5	 1996/05/11		  */
 /* Copyright (c) NetHack PC Development Team 1996                 */
 /* NetHack may be freely redistributed.  See license for details. */

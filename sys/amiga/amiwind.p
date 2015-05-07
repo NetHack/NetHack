@@ -1,5 +1,5 @@
-/* NetHack 3.5	amiwind.p	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	amiwind.p	$Date: 2009/05/06 10:48:31 $  $Revision: 1.3 $ */
+/* NetHack 3.6	amiwind.p	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	amiwind.p	$Date: 2009/05/06 10:48:31 $  $Revision: 1.3 $ */
 /*   SCCS Id: @(#)amiwind.p	3.5	1993/01/08		  */
 /*   Copyright (c) Gregg Wonderly, Naperville, IL, 1992, 1993	  */
 /* NetHack may be freely redistributed.  See license for details. */

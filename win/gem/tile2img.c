@@ -1,5 +1,5 @@
-/* NetHack 3.5	tile2img.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	tile2img.c	$Date: 2009/05/06 10:56:40 $  $Revision: 1.2 $ */
+/* NetHack 3.6	tile2img.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	tile2img.c	$Date: 2009/05/06 10:56:40 $  $Revision: 1.2 $ */
 /*	SCCS Id: @(#)tile2bmp.c	3.2	95/09/06	*/
 /*   Copyright (c) NetHack PC Development Team 1995                 */
 /*   NetHack may be freely redistributed.  See license for details. */

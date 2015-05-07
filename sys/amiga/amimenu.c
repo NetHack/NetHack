@@ -1,5 +1,5 @@
-/* NetHack 3.5	amimenu.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	amimenu.c	$Date: 2009/05/06 10:48:29 $  $Revision: 1.3 $ */
+/* NetHack 3.6	amimenu.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	amimenu.c	$Date: 2009/05/06 10:48:29 $  $Revision: 1.3 $ */
 /*    SCCS Id: @(#)amimenu.c    3.5    1996/02/04		   */
 /*    Copyright (c) Olaf 'Rhialto' Seibert, 1989		   */
 /*    Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1992, 1993, 1996 */

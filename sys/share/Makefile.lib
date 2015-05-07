@@ -1,5 +1,5 @@
-# NetHack 3.5	Makefile.lib	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
-# NetHack 3.5	Makefile.lib	$Date: 2009/05/06 10:50:26 $  $Revision: 1.4 $
+# NetHack 3.6	Makefile.lib	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+# NetHack 3.6	Makefile.lib	$Date: 2009/05/06 10:50:26 $  $Revision: 1.4 $
 #	SCCS Id: @(#)Makefile.lib	3.5	1990/22/02
 #	Nethack makefile for Fred fish termlib -- Norman Meluch
 #

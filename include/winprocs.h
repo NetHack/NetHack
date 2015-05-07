@@ -1,5 +1,5 @@
-/* NetHack 3.5	winprocs.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	winprocs.h	$Date: 2012/01/23 10:45:26 $  $Revision: 1.29 $ */
+/* NetHack 3.6	winprocs.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	winprocs.h	$Date: 2012/01/23 10:45:26 $  $Revision: 1.29 $ */
 /* Copyright (c) David Cohrs, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

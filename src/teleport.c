@@ -1,4 +1,5 @@
-/* NetHack 3.5	teleport.c	$NHDT-Date: 1426465443 2015/03/16 00:24:03 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.48 $ */
+/* NetHack 3.6	teleport.c	$NHDT-Date: 1426465443 2015/03/16 00:24:03 $  $NHDT-Branch: debug $:$NHDT-Revision: 1.48 $ */
+/* NetHack 3.6	teleport.c	$Date: 2012/01/04 18:52:36 $  $Revision: 1.45 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

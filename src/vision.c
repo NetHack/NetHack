@@ -1,5 +1,5 @@
-/* NetHack 3.5	vision.c	$NHDT-Date: 1426449474 2015/03/15 19:57:54 $  $NHDT-Branch: derek-farming $:$NHDT-Revision: 1.14 $ */
-/* NetHack 3.5	vision.c	$Date: 2009/05/06 10:48:10 $  $Revision: 1.12 $ */
+/* NetHack 3.6	vision.c	$NHDT-Date: 1426449474 2015/03/15 19:57:54 $  $NHDT-Branch: derek-farming $:$NHDT-Revision: 1.14 $ */
+/* NetHack 3.6	vision.c	$Date: 2009/05/06 10:48:10 $  $Revision: 1.12 $ */
 /*	SCCS Id: @(#)vision.c	3.5	2007/11/05	*/
 /* Copyright (c) Dean Luick, with acknowledgements to Dave Cohrs, 1990.	*/
 /* NetHack may be freely redistributed.  See license for details.	*/

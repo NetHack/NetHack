@@ -1,5 +1,5 @@
-/* NetHack 3.5	micro.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	micro.h	$Date: 2009/05/06 10:44:53 $  $Revision: 1.5 $ */
+/* NetHack 3.6	micro.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	micro.h	$Date: 2009/05/06 10:44:53 $  $Revision: 1.5 $ */
 /*	SCCS Id: @(#)micro.h	3.5	1990/02/22	*/
 /* micro.h - function declarations for various microcomputers */
 /* NetHack may be freely redistributed.  See license for details. */

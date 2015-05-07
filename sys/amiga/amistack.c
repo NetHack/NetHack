@@ -1,5 +1,5 @@
-/* NetHack 3.5	amistack.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	amistack.c	$Date: 2009/05/06 10:48:30 $  $Revision: 1.4 $ */
+/* NetHack 3.6	amistack.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	amistack.c	$Date: 2009/05/06 10:48:30 $  $Revision: 1.4 $ */
 /* SCCS Id: @(#)amistack.c	3.5	2000/05/03			*/
 /* Copyright (c) Janne Salmijärvi, Tampere, Finland, 2000		*/
 /* NetHack may be freely redistributed.  See license for details.	*/

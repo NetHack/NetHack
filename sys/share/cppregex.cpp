@@ -1,4 +1,4 @@
-/* NetHack 3.5  cppregex.cpp	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6  cppregex.cpp	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
 /* Copyright (c) Sean Hunt  2015.                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 

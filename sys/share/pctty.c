@@ -1,5 +1,5 @@
-/* NetHack 3.5	pctty.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	pctty.c	$Date: 2009/05/06 10:50:30 $  $Revision: 1.6 $ */
+/* NetHack 3.6	pctty.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	pctty.c	$Date: 2009/05/06 10:50:30 $  $Revision: 1.6 $ */
 /*	SCCS Id: @(#)pctty.c	3.5	1990/22/02
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */

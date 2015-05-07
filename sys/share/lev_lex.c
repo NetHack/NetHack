@@ -1090,8 +1090,8 @@ int yy_flex_debug = 0;
 char *yytext;
 #line 1 "lev_comp.l"
 #line 2 "lev_comp.l"
-/* NetHack 3.5  lev_comp.l	$NHDT-Date: 1428240296 2015/04/05 13:24:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $ */
-/* NetHack 3.5  lev_comp.l	$Date: 2009/05/06 10:54:31 $  $Revision: 1.9 $ */
+/* NetHack 3.6  lev_comp.l	$NHDT-Date: 1428240296 2015/04/05 13:24:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $ */
+/* NetHack 3.6  lev_comp.l	$Date: 2009/05/06 10:54:31 $  $Revision: 1.9 $ */
 /*	SCCS Id: @(#)lev_lex.c	3.5	2002/03/27	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */

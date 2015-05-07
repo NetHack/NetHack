@@ -1,5 +1,5 @@
-/* NetHack 3.5	steed.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	steed.c	$Date: 2012/01/04 18:52:36 $  $Revision: 1.36 $ */
+/* NetHack 3.6	steed.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	steed.c	$Date: 2012/01/04 18:52:36 $  $Revision: 1.36 $ */
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 

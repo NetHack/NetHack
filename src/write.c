@@ -1,5 +1,5 @@
-/* NetHack 3.5	write.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	write.c	$Date: 2010/12/28 19:54:41 $  $Revision: 1.9 $ */
+/* NetHack 3.6	write.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	write.c	$Date: 2010/12/28 19:54:41 $  $Revision: 1.9 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"

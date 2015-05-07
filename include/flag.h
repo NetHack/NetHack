@@ -1,4 +1,5 @@
-/* NetHack 3.5	flag.h	$NHDT-Date: 1429675538 2015/04/22 04:05:38 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.78 $ */
+/* NetHack 3.6	flag.h	$NHDT-Date: 1425081976 2015/02/28 00:06:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.6	flag.h	$Date: 2012/04/09 02:56:32 $  $Revision: 1.59 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

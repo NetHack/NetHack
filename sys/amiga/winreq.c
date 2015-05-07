@@ -1,5 +1,5 @@
-/* NetHack 3.5	winreq.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	winreq.c	$Date: 2009/05/06 10:48:41 $  $Revision: 1.4 $ */
+/* NetHack 3.6	winreq.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	winreq.c	$Date: 2009/05/06 10:48:41 $  $Revision: 1.4 $ */
 /*    SCCS Id: @(#)winreq.c    3.5    1993/04/02 */
 /* Copyright (c) Gregg Wonderly, Naperville, Illinois,  1991,1992,1993. */
 /* NetHack may be freely redistributed.  See license for details. */

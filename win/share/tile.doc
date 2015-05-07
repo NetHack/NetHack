@@ -1,5 +1,5 @@
-NetHack 3.5  tile.doc	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
-NetHack 3.5  tile.doc	$Date: 2009/05/06 10:59:00 $  $Revision: 1.2 $
+NetHack 3.6  tile.doc	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+NetHack 3.6  tile.doc	$Date: 2009/05/06 10:59:00 $  $Revision: 1.2 $
 
 Window ports can optionally make use of the tiles (pictures for NetHack
 symbols) found in this directory.  They are distributed in a text format

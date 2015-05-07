@@ -1,5 +1,5 @@
-# NetHack 3.5	Makefile.bcc	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
-# NetHack 3.5	Makefile.bcc	$Date: 2011/10/11 02:37:22 $  $Revision: 1.46 $
+# NetHack 3.6	Makefile.bcc	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+# NetHack 3.6	Makefile.bcc	$Date: 2011/10/11 02:37:22 $  $Revision: 1.46 $
 #   Copyright (c) NetHack PC Development Team 1993-2015
 #
 #==============================================================================
@@ -7,7 +7,7 @@
 # IMPORTANT NOTE: This Makefile has not been tested for 3.5.x.
 #
 #
-#   NetHack 3.5.x Makefile for Borland C++ V5.5.1 and above and Borland's MAKE
+#   NetHack 3.6.x Makefile for Borland C++ V5.5.1 and above and Borland's MAKE
 #  
 #   Win32 Compilers Tested for 3.4.x:
 #                              - Borland C++ 5.5.1 for Win32

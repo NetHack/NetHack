@@ -1,5 +1,5 @@
-/* NetHack 3.5	bemain.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	bemain.c	$Date: 2009/05/06 10:48:59 $  $Revision: 1.11 $ */
+/* NetHack 3.6	bemain.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	bemain.c	$Date: 2009/05/06 10:48:59 $  $Revision: 1.11 $ */
 /*	SCCS Id: @(#)bemain.c	3.5	2008/01/30	*/
 /* Copyright (c) Dean Luick, 1996. */
 /* NetHack may be freely redistributed.  See license for details. */

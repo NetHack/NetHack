@@ -1,5 +1,5 @@
-/* NetHack 3.5	monsym.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	monsym.h	$Date: 2009/05/06 10:44:55 $  $Revision: 1.5 $ */
+/* NetHack 3.6	monsym.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	monsym.h	$Date: 2009/05/06 10:44:55 $  $Revision: 1.5 $ */
 /*	SCCS Id: @(#)monsym.h	3.5	2007/04/07	*/
 /*	Monster symbols and creation information rev 1.0	  */
 /* NetHack may be freely redistributed.  See license for details. */

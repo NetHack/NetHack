@@ -1,6 +1,6 @@
 #
-# NetHack 3.5 sysconf $NHDT-Date$ $NHDT-Branch$:$NHDT-Revision$
-# NetHack 3.5 sysconf $Date: 2012/01/27 20:15:31 $ $Revision: 1.6 $
+# NetHack 3.6 sysconf $NHDT-Date$ $NHDT-Branch$:$NHDT-Revision$
+# NetHack 3.6 sysconf $Date: 2012/01/27 20:15:31 $ $Revision: 1.6 $
 #
 # Sample sysconf file.
 # The sysconf file is only used if NetHack is compiled with SYSCF defined.

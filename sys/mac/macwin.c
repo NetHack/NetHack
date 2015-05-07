@@ -1,5 +1,5 @@
-/* NetHack 3.5	macwin.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	macwin.c	$Date: 2012/01/10 17:47:23 $  $Revision: 1.22 $ */
+/* NetHack 3.6	macwin.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	macwin.c	$Date: 2012/01/10 17:47:23 $  $Revision: 1.22 $ */
 /* Copyright (c) Jon W{tte, Hao-Yang Wang, Jonathan Handler 1992. */
 /* NetHack may be freely redistributed.  See license for details. */
 

@@ -1,5 +1,5 @@
-/* NetHack 3.5	global.h	$NHDT-Date: 1429675538 2015/04/22 04:05:38 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.41 $ */
-/* NetHack 3.5	global.h	$Date: 2012/01/29 03:00:14 $  $Revision: 1.31 $ */
+/* NetHack 3.6	global.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	global.h	$Date: 2012/01/29 03:00:14 $  $Revision: 1.31 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

@@ -1,5 +1,5 @@
-/* NetHack 3.5	youprop.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	youprop.h	$Date: 2011/10/15 03:00:42 $  $Revision: 1.13 $ */
+/* NetHack 3.6	youprop.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	youprop.h	$Date: 2011/10/15 03:00:42 $  $Revision: 1.13 $ */
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

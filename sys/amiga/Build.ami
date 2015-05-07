@@ -38,7 +38,7 @@ II.B. Basic Compilation
 
     NetHack can be built with SAS/C version 6.5x.  The commercial version
     of DICE might work, but NetHack version 3.2.2 or later haven't been
-    compiled with it.  The "official" compiler for NetHack 3.5 is SAS/C 6.58
+    compiled with it.  The "official" compiler for NetHack 3.6 is SAS/C 6.58
     - we have dropped support for SAS/C 5.x.
 
     The Manx/Aztec port has not been tested recently and is certainly

@@ -1,5 +1,5 @@
-/* NetHack 3.5	region.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	region.h	$Date: 2009/05/06 10:45:04 $  $Revision: 1.9 $ */
+/* NetHack 3.6	region.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	region.h	$Date: 2009/05/06 10:45:04 $  $Revision: 1.9 $ */
 /*	SCCS Id: @(#)region.h	3.5	2006/06/27	*/
 /* Copyright (c) 1996 by Jean-Christophe Collet			  */
 /* NetHack may be freely redistributed.  See license for details. */

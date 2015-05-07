@@ -1,5 +1,5 @@
-/* NetHack 3.5	windows.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	windows.c	$Date: 2012/01/23 10:45:28 $  $Revision: 1.23 $ */
+/* NetHack 3.6	windows.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	windows.c	$Date: 2012/01/23 10:45:28 $  $Revision: 1.23 $ */
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 

@@ -1,4 +1,4 @@
-/* NetHack 3.5	lint.h	$NHDT-Date: 1430897871 2015/05/06 07:37:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.0 $ */
+/* NetHack 3.6	lint.h	$NHDT-Date: 1430897871 2015/05/06 07:37:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.0 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*

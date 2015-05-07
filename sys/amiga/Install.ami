@@ -24,9 +24,9 @@ I.A. Overview
     light those mundane tasks which must be dealt with before beginning
     your journey; for those of you who are faced with the task of
     installing the pre-fabricated version of our town, section III
-    (Installing Amiga NetHack 3.5) will guide you through the task at
+    (Installing Amiga NetHack 3.6) will guide you through the task at
     hand.  If you are ready to visit, the local visitors guide is in
-    section II (Using Amiga NetHack 3.5); please also see the general
+    section II (Using Amiga NetHack 3.6); please also see the general
     guide packaged separately (the file "GuideBook").
     
     To all our visitors, a hearty Welcome! - and please be careful.
@@ -121,7 +121,7 @@ III.A. General Installation
     current version and then update.
 
 Will NetHack fit on your machine?
-    NetHack 3.5 is large.  NetHack 3.4 is very large.  You will need:
+    NetHack 3.6 is large.  NetHack 3.4 is very large.  You will need:
     > Any standard series Amiga: 500, 600, 1000, 1200, 2000, 2500, 3000, 4000.
     > WorkBench 2.04 or later.
     > At least 3 meg of RAM.  NetHack will NOT run in 1 meg (probably even 2).

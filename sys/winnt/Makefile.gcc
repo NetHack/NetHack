@@ -1,5 +1,5 @@
-# NetHack 3.5	Makefile.gcc	$NHDT-Date: 1429676997 2015/04/22 04:29:57 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.46 $
-#   Copyright (c) NetHack PC Development Team 1993-2015
+# NetHack 3.6	Makefile.gcc	$NHDT-Date: 1430958114 2015/05/07 00:21:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.39 $
+# NetHack 3.6	Makefile.gcc	$Date: 2011/10/11 02:37:22 $  $Revision: 1.38 $
 #
 #==============================================================================
 #

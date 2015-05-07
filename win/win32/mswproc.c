@@ -1,5 +1,5 @@
-/* NetHack 3.5	mswproc.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	mswproc.c	$Date: 2012/01/24 04:26:33 $  $Revision: 1.71 $ */
+/* NetHack 3.6	mswproc.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	mswproc.c	$Date: 2012/01/24 04:26:33 $  $Revision: 1.71 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2185,7 +2185,7 @@ logDebug(const char *fmt, ...)
 /* Reading and writing settings from the registry. */
 #define CATEGORYKEY         "Software"
 #define COMPANYKEY          "NetHack"
-#define PRODUCTKEY          "NetHack 3.5.0"
+#define PRODUCTKEY          "NetHack 3.6.0"
 #define SETTINGSKEY         "Settings"
 #define MAINSHOWSTATEKEY    "MainShowState"
 #define MAINMINXKEY         "MainMinX"

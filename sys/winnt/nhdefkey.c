@@ -1,5 +1,5 @@
-/* NetHack 3.5	nhdefkey.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	nhdefkey.c	$Date: 2009/05/06 10:53:29 $  $Revision: 1.10 $ */
+/* NetHack 3.6	nhdefkey.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	nhdefkey.c	$Date: 2009/05/06 10:53:29 $  $Revision: 1.10 $ */
 /*	SCCS Id: @(#)nhdefkey.c	3.5	$NHDT-Date$   */
 /*	SCCS Id: @(#)nhdefkey.c	3.5	$Date: 2009/05/06 10:53:29 $   */
 /* Copyright (c) NetHack PC Development Team 2003                      */

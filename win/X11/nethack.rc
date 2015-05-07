@@ -15,7 +15,7 @@ OPTIONS=verbose,news,fruit:pineapple
 OPTIONS=dogname:Dhairrhuwyth
 OPTIONS=catname:Ghisteslwchlohm
 #
-# The graphics symbols mappings below are for NetHack 3.4.  NetHack 3.5
+# The graphics symbols mappings below are for NetHack 3.4.  NetHack 3.6
 # uses a new scheme, but this file has not been updated.
 #
 # There are 17 object symbols and various graphics symbols.

@@ -1,5 +1,5 @@
-/* NetHack 3.5	pcsys.c	$NHDT-Date: 1429675591 2015/04/22 04:06:31 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.24 $ */
-/* NetHack 3.5	pcsys.c	$Date: 2012/01/22 06:33:47 $  $Revision: 1.18 $ */
+/* NetHack 3.6	pcsys.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	pcsys.c	$Date: 2012/01/22 06:33:47 $  $Revision: 1.18 $ */
 /*	SCCS Id: @(#)pcsys.c	3.5	2002/01/22		  */
 /* NetHack may be freely redistributed.  See license for details. */
 

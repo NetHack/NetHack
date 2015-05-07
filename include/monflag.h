@@ -1,5 +1,5 @@
-/* NetHack 3.5	monflag.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	monflag.h	$Date: 2009/05/06 10:44:54 $  $Revision: 1.6 $ */
+/* NetHack 3.6	monflag.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	monflag.h	$Date: 2009/05/06 10:44:54 $  $Revision: 1.6 $ */
 /*	SCCS Id: @(#)monflag.h	3.5	1996/05/04	*/
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */

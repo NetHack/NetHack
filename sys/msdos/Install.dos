@@ -4,13 +4,13 @@
        NetHack may be freely redistributed.  See license for details.
        ==============================================================
               Instructions for compiling and installing
-		     NetHack 3.5 on a DOS system
+		     NetHack 3.6 on a DOS system
          ======================================================
-                   (or, How to make PC NetHack 3.5)
+                   (or, How to make PC NetHack 3.6)
                  Last revision: $NHDT-Date$
                  Last revision: $Date: 2005/01/02 17:16:53 $
 
-Credit for a runnable full PC NetHack 3.5 goes to the PC Development team
+Credit for a runnable full PC NetHack 3.6 goes to the PC Development team
 of Paul Winner, Kevin Smolkowski, Michael Allison, Yitzhak Sapir, Bill Dyer, 
 Timo Hakulinen, Yamamoto Keizo, Mike Threepoint, Mike Stephenson, 
 Stephen White, Ken Washikita and Janet Walz.  The present port is based

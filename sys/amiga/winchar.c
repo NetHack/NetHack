@@ -1,5 +1,5 @@
-/* NetHack 3.5	winchar.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.5	winchar.c	$Date: 2009/05/06 10:48:33 $  $Revision: 1.4 $ */
+/* NetHack 3.6	winchar.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	winchar.c	$Date: 2009/05/06 10:48:33 $  $Revision: 1.4 $ */
 /*    SCCS Id: @(#)winchar.c     3.5    1993/07/22			*/
 /*    Copyright (c) Olaf Seibert (KosmoSoft), 1989, 1992	  */
 /*    Copyright (c) Kenneth Lorber, Bethesda, Maryland 1993	  */
