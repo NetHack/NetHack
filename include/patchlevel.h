@@ -1,11 +1,11 @@
-/* NetHack 3.6	patchlevel.h	$NHDT-Date: 1429513493 2015/04/20 07:04:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.102 $ */
+/* NetHack 3.6	patchlevel.h	$NHDT-Date: 1430989134 2015/05/07 08:58:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.104 $ */
 /* NetHack 3.6	patchlevel.h	$Date: 2012/04/14 08:31:03 $  $Revision: 1.93 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* NetHack 3.6.0 */
 #define VERSION_MAJOR	3
-#define VERSION_MINOR	5
+#define VERSION_MINOR	6
 /*
  * PATCHLEVEL is updated for each release.
  */
@@ -14,7 +14,7 @@
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
  */
-#define EDITLEVEL	63
+#define EDITLEVEL	0
 
 #define COPYRIGHT_BANNER_A \
 "NetHack, Copyright 1985-2015"
@@ -37,14 +37,13 @@
 
 
 /*****************************************************************************/
-/* Version 3.5.x */
+/* Version 3.6.x */
 
 /*
- *  NetHack 3.6.0, October NN, NNNN
+ *  NetHack 3.6.0, June NN, NNNN
  *
  */
 
-/* Version 3.5 */
 
 /*****************************************************************************/
 /* Version 3.4.x */
