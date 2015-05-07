@@ -1,7 +1,4 @@
-/* NetHack 3.6	winnt.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.6	winnt.c	$Date: 2012/01/15 19:11:41 $  $Revision: 1.18 $ */
-/*	SCCS Id: @(#)winnt.c	 3.5	 $NHDT-Date: 1429675610 2015/04/22 04:06:50 $		  */
-/*	SCCS Id: @(#)winnt.c	 3.5	 $Date: 2012/01/15 19:11:41 $		  */
+/* NetHack 3.6	winnt.c	$NHDT-Date: 1430988900 2015/05/07 08:55:00 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.24 $ */
 /* Copyright (c) NetHack PC Development Team 1993, 1994 */
 /* NetHack may be freely redistributed.  See license for details. */
 
