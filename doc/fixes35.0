@@ -908,7 +908,12 @@ when commands (D, A, object identify) mix object class filtering with BUCX
 	blessed scrolls rather than all scrolls plus blessed everything)
 bmask is stored with the objects on the Plane of Water to prevent segfault
 engraving on drawbridge with wand of digging should produce appropriate
-        message instead of referring to gravel
+    message instead of referring to gravel
+engraving Elbereth is less efficient as protection
+scare monster scroll now provides a better effect
+monsters without hands can no longer pick up piles of objects (with 
+    certain exceptions)
+uncursed enchant weapon now correctly fixes erosion
 
 
 Platform- and/or Interface-Specific Fixes
@@ -1136,6 +1141,9 @@ gnomes will occasionally have a candle
 stop travel or run when you get hungry
 'I' command can accept 'B','U','C',or 'X' as an alternative to normal object
 	class character to show inventory of items known to be blessed,&c
+debug-mode viewing of object weight
+prizes on various levels now protected by ?oSM scrolls as well as Elbereth
+
 
 
 Platform- and/or Interface-Specific New Features
@@ -1147,8 +1155,8 @@ win32gui: support for saving/restoring message history
 win32gui: added menu options "Copy ASCII Screenshot To Clipboard" and "Save 
 	ASCII Screenshot To File"
 win32gui, win32tty: add support for looking for sysconf in %COMMONPROGRAMFILES%
-        first and for user config file in %USERPROFILE% (improves support for
-        multi-login Windows environments)
+    first and for user config file in %USERPROFILE% (improves support for
+    multi-login Windows environments)
 win32tty: support for 'selectsaved' option for menu of existing save files
 	to choose from at game startup
 tty: add window port routines for saving/restoring message history
@@ -1160,6 +1168,7 @@ smartphone: added Q(quiver) command to "Attack" layout
 smartphone: fixed F command to prompt for direction
 unix,vms: altmeta option to handle terminals which send "ESC c" for Alt+c
 tty,win32gui,win32tty: add menucolors
+MSVC: send debugpline output to 'debug' window to declutter game screen
 
 
 NetHack Community Patches (or Variation) Included
