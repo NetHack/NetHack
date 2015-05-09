@@ -1,16 +1,16 @@
-/* NetHack 3.6	mswproc.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	mswproc.c	$NHDT-Date: 1431192776 2015/05/09 17:32:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.87 $ */
 /* NetHack 3.6	mswproc.c	$Date: 2012/01/24 04:26:33 $  $Revision: 1.71 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
  * This file implements the interface between the window port specific
- * code in the mswin port and the rest of the nethack game engine. 
+ * code in the mswin port and the rest of the nethack game engine.
 */
 
 #include "hack.h"
 #include "dlb.h"
-#include "func_tab.h"   /* for extended commands */
+#include "func_tab.h" /* for extended commands */
 #include "winMS.h"
 #include <assert.h>
 #include "mhmap.h"
@@ -35,15 +35,19 @@
 #ifdef _DEBUG
 extern void logDebug(const char *fmt, ...);
 #else
-void logDebug(const char *fmt, ...) { }
+void
+logDebug(const char *fmt, ...)
+{
+}
 #endif
 
 static void mswin_main_loop(void);
 static BOOL initMapTiles(void);
-static void mswin_color_from_string(char *colorstring, HBRUSH* brushptr, COLORREF *colorptr);
+static void mswin_color_from_string(char *colorstring, HBRUSH *brushptr,
+                                    COLORREF *colorptr);
 static void prompt_for_player_selection(void);
 
-#define TOTAL_BRUSHES	10
+#define TOTAL_BRUSHES 10
 HBRUSH brush_table[TOTAL_BRUSHES];
 int max_brush = 0;
 
@@ -68,79 +72,47 @@ COLORREF message_fg_color = RGB(0xFF, 0xFF, 0xFF);
 /* Interface definition, for windows.c */
 struct window_procs mswin_procs = {
     "MSWIN",
-    WC_COLOR|WC_HILITE_PET|WC_ALIGN_MESSAGE|WC_ALIGN_STATUS|
-	WC_INVERSE|WC_SCROLL_AMOUNT|WC_SCROLL_MARGIN|WC_MAP_MODE|
-	WC_FONT_MESSAGE|WC_FONT_STATUS|WC_FONT_MENU|WC_FONT_TEXT|WC_FONT_MAP|
-	WC_FONTSIZ_MESSAGE|WC_FONTSIZ_STATUS|WC_FONTSIZ_MENU|WC_FONTSIZ_TEXT|
-	WC_TILE_WIDTH|WC_TILE_HEIGHT|WC_TILE_FILE|WC_VARY_MSGCOUNT|
-	WC_WINDOWCOLORS|WC_PLAYER_SELECTION|WC_SPLASH_SCREEN|WC_POPUP_DIALOG,
-    0L,
-    mswin_init_nhwindows,
-    mswin_player_selection,
-    mswin_askname,
-    mswin_get_nh_event,
-    mswin_exit_nhwindows,
-    mswin_suspend_nhwindows,
-    mswin_resume_nhwindows,
-    mswin_create_nhwindow,
-    mswin_clear_nhwindow,
-    mswin_display_nhwindow,
-    mswin_destroy_nhwindow,
-    mswin_curs,
-    mswin_putstr,
-    genl_putmixed,
-    mswin_display_file,
-    mswin_start_menu,
-    mswin_add_menu,
-    mswin_end_menu,
-    mswin_select_menu,
-    genl_message_menu,		/* no need for X-specific handling */
-    mswin_update_inventory,
-    mswin_mark_synch,
-    mswin_wait_synch,
+    WC_COLOR | WC_HILITE_PET | WC_ALIGN_MESSAGE | WC_ALIGN_STATUS | WC_INVERSE
+        | WC_SCROLL_AMOUNT | WC_SCROLL_MARGIN | WC_MAP_MODE | WC_FONT_MESSAGE
+        | WC_FONT_STATUS | WC_FONT_MENU | WC_FONT_TEXT | WC_FONT_MAP
+        | WC_FONTSIZ_MESSAGE | WC_FONTSIZ_STATUS | WC_FONTSIZ_MENU
+        | WC_FONTSIZ_TEXT | WC_TILE_WIDTH | WC_TILE_HEIGHT | WC_TILE_FILE
+        | WC_VARY_MSGCOUNT | WC_WINDOWCOLORS | WC_PLAYER_SELECTION
+        | WC_SPLASH_SCREEN | WC_POPUP_DIALOG,
+    0L, mswin_init_nhwindows, mswin_player_selection, mswin_askname,
+    mswin_get_nh_event, mswin_exit_nhwindows, mswin_suspend_nhwindows,
+    mswin_resume_nhwindows, mswin_create_nhwindow, mswin_clear_nhwindow,
+    mswin_display_nhwindow, mswin_destroy_nhwindow, mswin_curs, mswin_putstr,
+    genl_putmixed, mswin_display_file, mswin_start_menu, mswin_add_menu,
+    mswin_end_menu, mswin_select_menu,
+    genl_message_menu, /* no need for X-specific handling */
+    mswin_update_inventory, mswin_mark_synch, mswin_wait_synch,
 #ifdef CLIPPING
     mswin_cliparound,
 #endif
 #ifdef POSITIONBAR
     donull,
 #endif
-    mswin_print_glyph,
-    mswin_raw_print,
-    mswin_raw_print_bold,
-    mswin_nhgetch,
-    mswin_nh_poskey,
-    mswin_nhbell,
-    mswin_doprev_message,
-    mswin_yn_function,
-    mswin_getlin,
-    mswin_get_ext_cmd,
-    mswin_number_pad,
-    mswin_delay_output,
-#ifdef CHANGE_COLOR	/* only a Mac option currently */
-	mswin,
-	mswin_change_background,
+    mswin_print_glyph, mswin_raw_print, mswin_raw_print_bold, mswin_nhgetch,
+    mswin_nh_poskey, mswin_nhbell, mswin_doprev_message, mswin_yn_function,
+    mswin_getlin, mswin_get_ext_cmd, mswin_number_pad, mswin_delay_output,
+#ifdef CHANGE_COLOR /* only a Mac option currently */
+    mswin, mswin_change_background,
 #endif
     /* other defs that really should go away (they're tty specific) */
-    mswin_start_screen,
-    mswin_end_screen,
-    mswin_outrip,
-    mswin_preference_update,
-    mswin_getmsghistory,
-    mswin_putmsghistory,
+    mswin_start_screen, mswin_end_screen, mswin_outrip,
+    mswin_preference_update, mswin_getmsghistory, mswin_putmsghistory,
 #ifdef STATUS_VIA_WINDOWPORT
-    mswin_status_init,
-    mswin_status_finish,
-    mswin_status_enablefield,
+    mswin_status_init, mswin_status_finish, mswin_status_enablefield,
     mswin_status_update,
-# ifdef STATUS_HILITES
+#ifdef STATUS_HILITES
     mswin_status_threshold,
-# endif
+#endif
 #endif
     genl_can_suspend_yes,
 };
 
-
-/*  
+/*
 init_nhwindows(int* argcp, char** argv)
                 -- Initialize the windows used by NetHack.  This can also
                    create the standard windows listed at the top, but does
@@ -154,26 +126,26 @@ init_nhwindows(int* argcp, char** argv)
                 ** Why not have init_nhwindows() create all of the "standard"
                 ** windows?  Or at least all but WIN_INFO?      -dean
 */
-void mswin_init_nhwindows(int* argc, char** argv)
+void
+mswin_init_nhwindows(int *argc, char **argv)
 {
-	UNREFERENCED_PARAMETER(argc);
-	UNREFERENCED_PARAMETER(argv);
+    UNREFERENCED_PARAMETER(argc);
+    UNREFERENCED_PARAMETER(argv);
 
-	logDebug("mswin_init_nhwindows()\n");
+    logDebug("mswin_init_nhwindows()\n");
 
 #ifdef _DEBUG
-	if (showdebug(NHTRACE_LOG)) 
-	{
-		/* truncate trace file */
-		FILE *dfp = fopen(NHTRACE_LOG, "w");
-		fclose(dfp);
-	}
+    if (showdebug(NHTRACE_LOG)) {
+        /* truncate trace file */
+        FILE *dfp = fopen(NHTRACE_LOG, "w");
+        fclose(dfp);
+    }
 #endif
     mswin_nh_input_init();
 
-	/* set it to WIN_ERR so we can detect attempts to
-	   use this ID before it is inialized */
-	WIN_MAP = WIN_ERR;
+    /* set it to WIN_ERR so we can detect attempts to
+       use this ID before it is inialized */
+    WIN_MAP = WIN_ERR;
 
     /* Read Windows settings from the reqistry */
     /* First set safe defaults */
@@ -181,8 +153,7 @@ void mswin_init_nhwindows(int* argc, char** argv)
     mswin_read_reg();
     /* Create the main window */
     GetNHApp()->hMainWnd = mswin_init_main_window();
-    if (!GetNHApp()->hMainWnd)
-    {
+    if (!GetNHApp()->hMainWnd) {
         panic("Cannot create main window");
     }
 
@@ -190,638 +161,663 @@ void mswin_init_nhwindows(int* argc, char** argv)
     mswin_menu_check_intf_mode();
 
     /* check default values */
-	if( iflags.wc_fontsiz_status<NHFONT_SIZE_MIN || 
-		iflags.wc_fontsiz_status>NHFONT_SIZE_MAX )
-		iflags.wc_fontsiz_status = NHFONT_DEFAULT_SIZE;
+    if (iflags.wc_fontsiz_status < NHFONT_SIZE_MIN
+        || iflags.wc_fontsiz_status > NHFONT_SIZE_MAX)
+        iflags.wc_fontsiz_status = NHFONT_DEFAULT_SIZE;
 
-	if( iflags.wc_fontsiz_message<NHFONT_SIZE_MIN || 
-		iflags.wc_fontsiz_message>NHFONT_SIZE_MAX )
-		iflags.wc_fontsiz_message = NHFONT_DEFAULT_SIZE;
+    if (iflags.wc_fontsiz_message < NHFONT_SIZE_MIN
+        || iflags.wc_fontsiz_message > NHFONT_SIZE_MAX)
+        iflags.wc_fontsiz_message = NHFONT_DEFAULT_SIZE;
 
-	if( iflags.wc_fontsiz_text<NHFONT_SIZE_MIN || 
-		iflags.wc_fontsiz_text>NHFONT_SIZE_MAX )
-		iflags.wc_fontsiz_text = NHFONT_DEFAULT_SIZE;
+    if (iflags.wc_fontsiz_text < NHFONT_SIZE_MIN
+        || iflags.wc_fontsiz_text > NHFONT_SIZE_MAX)
+        iflags.wc_fontsiz_text = NHFONT_DEFAULT_SIZE;
 
-	if( iflags.wc_fontsiz_menu<NHFONT_SIZE_MIN || 
-		iflags.wc_fontsiz_menu>NHFONT_SIZE_MAX )
-		iflags.wc_fontsiz_menu = NHFONT_DEFAULT_SIZE;
+    if (iflags.wc_fontsiz_menu < NHFONT_SIZE_MIN
+        || iflags.wc_fontsiz_menu > NHFONT_SIZE_MAX)
+        iflags.wc_fontsiz_menu = NHFONT_DEFAULT_SIZE;
 
-	if( iflags.wc_align_message==0 ) iflags.wc_align_message = ALIGN_TOP;
-	if( iflags.wc_align_status==0 ) iflags.wc_align_status = ALIGN_BOTTOM;
-	if( iflags.wc_scroll_margin==0 ) iflags.wc_scroll_margin = DEF_CLIPAROUND_MARGIN;
-	if( iflags.wc_scroll_amount==0 ) iflags.wc_scroll_amount = DEF_CLIPAROUND_AMOUNT;
-	if( iflags.wc_tile_width==0 ) iflags.wc_tile_width = TILE_X;
-	if( iflags.wc_tile_height==0 ) iflags.wc_tile_height = TILE_Y;
+    if (iflags.wc_align_message == 0)
+        iflags.wc_align_message = ALIGN_TOP;
+    if (iflags.wc_align_status == 0)
+        iflags.wc_align_status = ALIGN_BOTTOM;
+    if (iflags.wc_scroll_margin == 0)
+        iflags.wc_scroll_margin = DEF_CLIPAROUND_MARGIN;
+    if (iflags.wc_scroll_amount == 0)
+        iflags.wc_scroll_amount = DEF_CLIPAROUND_AMOUNT;
+    if (iflags.wc_tile_width == 0)
+        iflags.wc_tile_width = TILE_X;
+    if (iflags.wc_tile_height == 0)
+        iflags.wc_tile_height = TILE_Y;
 
-	if( iflags.wc_vary_msgcount==0 ) iflags.wc_vary_msgcount = 4;
+    if (iflags.wc_vary_msgcount == 0)
+        iflags.wc_vary_msgcount = 4;
 
-	/* force tabs in menus */
-	iflags.menu_tab_sep = 1;
+    /* force tabs in menus */
+    iflags.menu_tab_sep = 1;
 
-	/* force toptenwin to be true.  toptenwin is the option that decides whether to
-	 * write output to a window or stdout.  stdout doesn't make sense on Windows
-	 * non-console applications
-	 */
-	iflags.toptenwin = 1;
-	set_option_mod_status("toptenwin", SET_IN_FILE);
-	set_option_mod_status("perm_invent", SET_IN_FILE);
+    /* force toptenwin to be true.  toptenwin is the option that decides
+     * whether to
+     * write output to a window or stdout.  stdout doesn't make sense on
+     * Windows
+     * non-console applications
+     */
+    iflags.toptenwin = 1;
+    set_option_mod_status("toptenwin", SET_IN_FILE);
+    set_option_mod_status("perm_invent", SET_IN_FILE);
 
-	/* initialize map tiles bitmap */
-	initMapTiles();
+    /* initialize map tiles bitmap */
+    initMapTiles();
 
-	/* set tile-related options to readonly */
-	set_wc_option_mod_status(
-	   WC_TILE_WIDTH|WC_TILE_HEIGHT|WC_TILE_FILE,
-	   DISP_IN_GAME);
+    /* set tile-related options to readonly */
+    set_wc_option_mod_status(WC_TILE_WIDTH | WC_TILE_HEIGHT | WC_TILE_FILE,
+                             DISP_IN_GAME);
 
-	/* set font-related options to change in the game */
-	set_wc_option_mod_status(
-		WC_HILITE_PET |
-		WC_ALIGN_MESSAGE | 
-		WC_ALIGN_STATUS |
-		WC_SCROLL_AMOUNT |
-		WC_SCROLL_MARGIN |
-		WC_MAP_MODE |
-		WC_FONT_MESSAGE |
-		WC_FONT_STATUS |
-		WC_FONT_MENU |
-		WC_FONT_TEXT |
-		WC_FONTSIZ_MESSAGE | 
-		WC_FONTSIZ_STATUS | 
-		WC_FONTSIZ_MENU | 
-		WC_FONTSIZ_TEXT |
-		WC_VARY_MSGCOUNT,
-		SET_IN_GAME 
-	);
+    /* set font-related options to change in the game */
+    set_wc_option_mod_status(
+        WC_HILITE_PET | WC_ALIGN_MESSAGE | WC_ALIGN_STATUS | WC_SCROLL_AMOUNT
+            | WC_SCROLL_MARGIN | WC_MAP_MODE | WC_FONT_MESSAGE
+            | WC_FONT_STATUS | WC_FONT_MENU | WC_FONT_TEXT
+            | WC_FONTSIZ_MESSAGE | WC_FONTSIZ_STATUS | WC_FONTSIZ_MENU
+            | WC_FONTSIZ_TEXT | WC_VARY_MSGCOUNT,
+        SET_IN_GAME);
 
-	mswin_color_from_string(iflags.wc_foregrnd_menu, &menu_fg_brush, &menu_fg_color);
-	mswin_color_from_string(iflags.wc_foregrnd_message, &message_fg_brush, &message_fg_color);
-	mswin_color_from_string(iflags.wc_foregrnd_status, &status_fg_brush, &status_fg_color);
-	mswin_color_from_string(iflags.wc_foregrnd_text, &text_fg_brush, &text_fg_color);
-	mswin_color_from_string(iflags.wc_backgrnd_menu, &menu_bg_brush, &menu_bg_color);
-	mswin_color_from_string(iflags.wc_backgrnd_message, &message_bg_brush, &message_bg_color);
-	mswin_color_from_string(iflags.wc_backgrnd_status, &status_bg_brush, &status_bg_color);
-	mswin_color_from_string(iflags.wc_backgrnd_text, &text_bg_brush, &text_bg_color);
+    mswin_color_from_string(iflags.wc_foregrnd_menu, &menu_fg_brush,
+                            &menu_fg_color);
+    mswin_color_from_string(iflags.wc_foregrnd_message, &message_fg_brush,
+                            &message_fg_color);
+    mswin_color_from_string(iflags.wc_foregrnd_status, &status_fg_brush,
+                            &status_fg_color);
+    mswin_color_from_string(iflags.wc_foregrnd_text, &text_fg_brush,
+                            &text_fg_color);
+    mswin_color_from_string(iflags.wc_backgrnd_menu, &menu_bg_brush,
+                            &menu_bg_color);
+    mswin_color_from_string(iflags.wc_backgrnd_message, &message_bg_brush,
+                            &message_bg_color);
+    mswin_color_from_string(iflags.wc_backgrnd_status, &status_bg_brush,
+                            &status_bg_color);
+    mswin_color_from_string(iflags.wc_backgrnd_text, &text_bg_brush,
+                            &text_bg_color);
 
-	if (iflags.wc_splash_screen) mswin_display_splash_window(FALSE);
-		
-	iflags.window_inited = TRUE;
+    if (iflags.wc_splash_screen)
+        mswin_display_splash_window(FALSE);
+
+    iflags.window_inited = TRUE;
 }
-
 
 /* Do a window-port specific player type selection. If player_selection()
    offers a Quit option, it is its responsibility to clean up and terminate
    the process. You need to fill in pl_character[0].
 */
-void mswin_player_selection(void)
+void
+mswin_player_selection(void)
 {
-	int nRole;
+    int nRole;
 
-	logDebug("mswin_player_selection()\n");
+    logDebug("mswin_player_selection()\n");
 
-	if (iflags.wc_player_selection == VIA_DIALOG) {
-	    /* pick player type randomly (use pre-selected role/race/gender/alignment) */
-	    if( flags.randomall ) {
-		if (flags.initrole < 0) {
-			flags.initrole = pick_role(flags.initrace, flags.initgend,
-							flags.initalign, PICK_RANDOM);
-			if (flags.initrole < 0) {
-				raw_print("Incompatible role!");
-				flags.initrole = randrole();
-			}
-		}
+    if (iflags.wc_player_selection == VIA_DIALOG) {
+        /* pick player type randomly (use pre-selected
+         * role/race/gender/alignment) */
+        if (flags.randomall) {
+            if (flags.initrole < 0) {
+                flags.initrole = pick_role(flags.initrace, flags.initgend,
+                                           flags.initalign, PICK_RANDOM);
+                if (flags.initrole < 0) {
+                    raw_print("Incompatible role!");
+                    flags.initrole = randrole();
+                }
+            }
 
-		if (flags.initrace < 0 || !validrace(flags.initrole, flags.initrace)) {
-			flags.initrace = pick_race(flags.initrole, flags.initgend,
-								flags.initalign, PICK_RANDOM);
-			if (flags.initrace < 0) {
-				raw_print("Incompatible race!");
-				flags.initrace = randrace(flags.initrole);
-			}
-		}
+            if (flags.initrace < 0
+                || !validrace(flags.initrole, flags.initrace)) {
+                flags.initrace = pick_race(flags.initrole, flags.initgend,
+                                           flags.initalign, PICK_RANDOM);
+                if (flags.initrace < 0) {
+                    raw_print("Incompatible race!");
+                    flags.initrace = randrace(flags.initrole);
+                }
+            }
 
-		if (flags.initgend < 0 || !validgend(flags.initrole, flags.initrace,
-						flags.initgend)) {
-			flags.initgend = pick_gend(flags.initrole, flags.initrace,
-							flags.initalign, PICK_RANDOM);
-			if (flags.initgend < 0) {
-				raw_print("Incompatible gender!");
-				flags.initgend = randgend(flags.initrole, flags.initrace);
-			}
-		}
+            if (flags.initgend < 0
+                || !validgend(flags.initrole, flags.initrace,
+                              flags.initgend)) {
+                flags.initgend = pick_gend(flags.initrole, flags.initrace,
+                                           flags.initalign, PICK_RANDOM);
+                if (flags.initgend < 0) {
+                    raw_print("Incompatible gender!");
+                    flags.initgend = randgend(flags.initrole, flags.initrace);
+                }
+            }
 
-		if (flags.initalign < 0 || !validalign(flags.initrole, flags.initrace,
-								flags.initalign)) {
-			flags.initalign = pick_align(flags.initrole, flags.initrace,
-								flags.initgend, PICK_RANDOM);
-			if (flags.initalign < 0) {
-				raw_print("Incompatible alignment!");
-				flags.initalign = randalign(flags.initrole, flags.initrace);
-			}
-		}
-	    } else {
-		/* select a role */
-		if( mswin_player_selection_window( &nRole ) == IDCANCEL ) {
-			bail(0);
-		}
-	    }
-	} else { /* iflags.wc_player_selection == VIA_PROMPTS */
-	    prompt_for_player_selection();
-	}
+            if (flags.initalign < 0
+                || !validalign(flags.initrole, flags.initrace,
+                               flags.initalign)) {
+                flags.initalign = pick_align(flags.initrole, flags.initrace,
+                                             flags.initgend, PICK_RANDOM);
+                if (flags.initalign < 0) {
+                    raw_print("Incompatible alignment!");
+                    flags.initalign =
+                        randalign(flags.initrole, flags.initrace);
+                }
+            }
+        } else {
+            /* select a role */
+            if (mswin_player_selection_window(&nRole) == IDCANCEL) {
+                bail(0);
+            }
+        }
+    } else { /* iflags.wc_player_selection == VIA_PROMPTS */
+        prompt_for_player_selection();
+    }
 }
 
-void prompt_for_player_selection(void)
+void
+prompt_for_player_selection(void)
 {
-	int i, k, n;
-	char pick4u = 'n', thisch, lastch = 0;
-	char pbuf[QBUFSZ], plbuf[QBUFSZ];
-	winid win;
-	anything any;
-	menu_item *selected = 0;
-        DWORD box_result;
+    int i, k, n;
+    char pick4u = 'n', thisch, lastch = 0;
+    char pbuf[QBUFSZ], plbuf[QBUFSZ];
+    winid win;
+    anything any;
+    menu_item *selected = 0;
+    DWORD box_result;
 
-  	logDebug("prompt_for_player_selection()\n");
+    logDebug("prompt_for_player_selection()\n");
 
-	/* prevent an unnecessary prompt */
-	rigid_role_checks();
+    /* prevent an unnecessary prompt */
+    rigid_role_checks();
 
-	/* Should we randomly pick for the player? */
-	if (!flags.randomall &&
-	    (flags.initrole == ROLE_NONE || flags.initrace == ROLE_NONE ||
-	     flags.initgend == ROLE_NONE || flags.initalign == ROLE_NONE)) {
-	    /* int echoline; */
-	    char *prompt = build_plselection_prompt(pbuf, QBUFSZ, flags.initrole,
-				flags.initrace, flags.initgend, flags.initalign);
+    /* Should we randomly pick for the player? */
+    if (!flags.randomall
+        && (flags.initrole == ROLE_NONE || flags.initrace == ROLE_NONE
+            || flags.initgend == ROLE_NONE || flags.initalign == ROLE_NONE)) {
+        /* int echoline; */
+        char *prompt = build_plselection_prompt(
+            pbuf, QBUFSZ, flags.initrole, flags.initrace, flags.initgend,
+            flags.initalign);
 
-	    /* tty_putstr(BASE_WINDOW, 0, ""); */
-	    /* echoline = wins[BASE_WINDOW]->cury; */
-            box_result = NHMessageBox(NULL, prompt, 
-					MB_YESNOCANCEL | MB_DEFBUTTON1 | MB_ICONQUESTION);
-            pick4u = (box_result == IDYES) ? 'y' : (box_result == IDNO) ? 'n' : '\033';
-	    /* tty_putstr(BASE_WINDOW, 0, prompt); */
-	    do {
-		/* pick4u = lowc(readchar()); */
-		if (index(quitchars, pick4u)) pick4u = 'y';
-	    } while(!index(ynqchars, pick4u));
-	    if ((int)strlen(prompt) + 1 < CO) {
-		/* Echo choice and move back down line */
-		/* tty_putsym(BASE_WINDOW, (int)strlen(prompt)+1, echoline, pick4u); */
-		/* tty_putstr(BASE_WINDOW, 0, ""); */
-	    } else
-		/* Otherwise it's hard to tell where to echo, and things are
-		 * wrapping a bit messily anyway, so (try to) make sure the next
-		 * question shows up well and doesn't get wrapped at the
-		 * bottom of the window.
-		 */
-		/* tty_clear_nhwindow(BASE_WINDOW) */ ;
-	    
-	    if (pick4u != 'y' && pick4u != 'n') {
-give_up:	/* Quit */
-		if (selected) free((genericptr_t) selected);
-		bail((char *)0);
-		/*NOTREACHED*/
-		return;
-	    }
-	}
+        /* tty_putstr(BASE_WINDOW, 0, ""); */
+        /* echoline = wins[BASE_WINDOW]->cury; */
+        box_result = NHMessageBox(NULL, prompt, MB_YESNOCANCEL | MB_DEFBUTTON1
+                                                    | MB_ICONQUESTION);
+        pick4u =
+            (box_result == IDYES) ? 'y' : (box_result == IDNO) ? 'n' : '\033';
+        /* tty_putstr(BASE_WINDOW, 0, prompt); */
+        do {
+            /* pick4u = lowc(readchar()); */
+            if (index(quitchars, pick4u))
+                pick4u = 'y';
+        } while (!index(ynqchars, pick4u));
+        if ((int) strlen(prompt) + 1 < CO) {
+            /* Echo choice and move back down line */
+            /* tty_putsym(BASE_WINDOW, (int)strlen(prompt)+1, echoline,
+             * pick4u); */
+            /* tty_putstr(BASE_WINDOW, 0, ""); */
+        } else
+            /* Otherwise it's hard to tell where to echo, and things are
+             * wrapping a bit messily anyway, so (try to) make sure the next
+             * question shows up well and doesn't get wrapped at the
+             * bottom of the window.
+             */
+            /* tty_clear_nhwindow(BASE_WINDOW) */;
 
-	(void)  root_plselection_prompt(plbuf, QBUFSZ - 1,
-			flags.initrole, flags.initrace, flags.initgend, flags.initalign);
+        if (pick4u != 'y' && pick4u != 'n') {
+        give_up: /* Quit */
+            if (selected)
+                free((genericptr_t) selected);
+            bail((char *) 0);
+            /*NOTREACHED*/
+            return;
+        }
+    }
 
-	/* Select a role, if necessary */
-	/* we'll try to be compatible with pre-selected race/gender/alignment,
-	 * but may not succeed */
-	if (flags.initrole < 0) {
-	    char rolenamebuf[QBUFSZ];
-	    /* Process the choice */
-	    if (pick4u == 'y' || flags.initrole == ROLE_RANDOM || flags.randomall) {
-		/* Pick a random role */
-		flags.initrole = pick_role(flags.initrace, flags.initgend,
-						flags.initalign, PICK_RANDOM);
-		if (flags.initrole < 0) {
-		    /* tty_putstr(BASE_WINDOW, 0, "Incompatible role!"); */
-		    flags.initrole = randrole();
-		}
- 	    } else {
-	    	/* tty_clear_nhwindow(BASE_WINDOW); */
-		/* tty_putstr(BASE_WINDOW, 0, "Choosing Character's Role"); */
-		/* Prompt for a role */
-		win = create_nhwindow(NHW_MENU);
-		start_menu(win);
-		any = zeroany;         /* zero out all bits */
-		for (i = 0; roles[i].name.m; i++) {
-		    if (ok_role(i, flags.initrace, flags.initgend,
-							flags.initalign)) {
-			any.a_int = i+1;	/* must be non-zero */
-			thisch = lowc(roles[i].name.m[0]);
-			if (thisch == lastch) thisch = highc(thisch);
-			if (flags.initgend != ROLE_NONE && flags.initgend != ROLE_RANDOM) {
-				if (flags.initgend == 1  && roles[i].name.f)
-					Strcpy(rolenamebuf, roles[i].name.f);
-				else
-					Strcpy(rolenamebuf, roles[i].name.m);
-			} else {
-				if (roles[i].name.f) {
-					Strcpy(rolenamebuf, roles[i].name.m);
-					Strcat(rolenamebuf, "/");
-					Strcat(rolenamebuf, roles[i].name.f);
-				} else 
-					Strcpy(rolenamebuf, roles[i].name.m);
-			}	
-			add_menu(win, NO_GLYPH, &any, thisch,
-			    0, ATR_NONE, an(rolenamebuf), MENU_UNSELECTED);
-			lastch = thisch;
-		    }
-		}
-		any.a_int = pick_role(flags.initrace, flags.initgend,
-				    flags.initalign, PICK_RANDOM)+1;
-		if (any.a_int == 0)	/* must be non-zero */
-		    any.a_int = randrole()+1;
-		add_menu(win, NO_GLYPH, &any , '*', 0, ATR_NONE,
-				"Random", MENU_UNSELECTED);
-		any.a_int = i+1;	/* must be non-zero */
-		add_menu(win, NO_GLYPH, &any , 'q', 0, ATR_NONE,
-				"Quit", MENU_UNSELECTED);
-		Sprintf(pbuf, "Pick a role for your %s", plbuf);
-		end_menu(win, pbuf);
-		n = select_menu(win, PICK_ONE, &selected);
-		destroy_nhwindow(win);
+    (void) root_plselection_prompt(plbuf, QBUFSZ - 1, flags.initrole,
+                                   flags.initrace, flags.initgend,
+                                   flags.initalign);
 
-		/* Process the choice */
-		if (n != 1 || selected[0].item.a_int == any.a_int)
-		    goto give_up;		/* Selected quit */
+    /* Select a role, if necessary */
+    /* we'll try to be compatible with pre-selected race/gender/alignment,
+     * but may not succeed */
+    if (flags.initrole < 0) {
+        char rolenamebuf[QBUFSZ];
+        /* Process the choice */
+        if (pick4u == 'y' || flags.initrole == ROLE_RANDOM
+            || flags.randomall) {
+            /* Pick a random role */
+            flags.initrole = pick_role(flags.initrace, flags.initgend,
+                                       flags.initalign, PICK_RANDOM);
+            if (flags.initrole < 0) {
+                /* tty_putstr(BASE_WINDOW, 0, "Incompatible role!"); */
+                flags.initrole = randrole();
+            }
+        } else {
+            /* tty_clear_nhwindow(BASE_WINDOW); */
+            /* tty_putstr(BASE_WINDOW, 0, "Choosing Character's Role"); */
+            /* Prompt for a role */
+            win = create_nhwindow(NHW_MENU);
+            start_menu(win);
+            any = zeroany; /* zero out all bits */
+            for (i = 0; roles[i].name.m; i++) {
+                if (ok_role(i, flags.initrace, flags.initgend,
+                            flags.initalign)) {
+                    any.a_int = i + 1; /* must be non-zero */
+                    thisch = lowc(roles[i].name.m[0]);
+                    if (thisch == lastch)
+                        thisch = highc(thisch);
+                    if (flags.initgend != ROLE_NONE
+                        && flags.initgend != ROLE_RANDOM) {
+                        if (flags.initgend == 1 && roles[i].name.f)
+                            Strcpy(rolenamebuf, roles[i].name.f);
+                        else
+                            Strcpy(rolenamebuf, roles[i].name.m);
+                    } else {
+                        if (roles[i].name.f) {
+                            Strcpy(rolenamebuf, roles[i].name.m);
+                            Strcat(rolenamebuf, "/");
+                            Strcat(rolenamebuf, roles[i].name.f);
+                        } else
+                            Strcpy(rolenamebuf, roles[i].name.m);
+                    }
+                    add_menu(win, NO_GLYPH, &any, thisch, 0, ATR_NONE,
+                             an(rolenamebuf), MENU_UNSELECTED);
+                    lastch = thisch;
+                }
+            }
+            any.a_int = pick_role(flags.initrace, flags.initgend,
+                                  flags.initalign, PICK_RANDOM) + 1;
+            if (any.a_int == 0) /* must be non-zero */
+                any.a_int = randrole() + 1;
+            add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
+                     MENU_UNSELECTED);
+            any.a_int = i + 1; /* must be non-zero */
+            add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
+                     MENU_UNSELECTED);
+            Sprintf(pbuf, "Pick a role for your %s", plbuf);
+            end_menu(win, pbuf);
+            n = select_menu(win, PICK_ONE, &selected);
+            destroy_nhwindow(win);
 
-		flags.initrole = selected[0].item.a_int - 1;
-		free((genericptr_t) selected),	selected = 0;
-	    }
-	    (void)  root_plselection_prompt(plbuf, QBUFSZ - 1,
-			flags.initrole, flags.initrace, flags.initgend, flags.initalign);
-	}
-	
-	/* Select a race, if necessary */
-	/* force compatibility with role, try for compatibility with
-	 * pre-selected gender/alignment */
-	if (flags.initrace < 0 || !validrace(flags.initrole, flags.initrace)) {
-	    /* pre-selected race not valid */
-	    if (pick4u == 'y' || flags.initrace == ROLE_RANDOM || flags.randomall) {
-		flags.initrace = pick_race(flags.initrole, flags.initgend,
-							flags.initalign, PICK_RANDOM);
-		if (flags.initrace < 0) {
-		    /* tty_putstr(BASE_WINDOW, 0, "Incompatible race!"); */
-		    flags.initrace = randrace(flags.initrole);
-		}
-	    } else {	/* pick4u == 'n' */
-		/* Count the number of valid races */
-		n = 0;	/* number valid */
-		k = 0;	/* valid race */
-		for (i = 0; races[i].noun; i++) {
-		    if (ok_race(flags.initrole, i, flags.initgend,
-							flags.initalign)) {
-			n++;
-			k = i;
-		    }
-		}
-		if (n == 0) {
-		    for (i = 0; races[i].noun; i++) {
-			if (validrace(flags.initrole, i)) {
-			    n++;
-			    k = i;
-			}
-		    }
-		}
+            /* Process the choice */
+            if (n != 1 || selected[0].item.a_int == any.a_int)
+                goto give_up; /* Selected quit */
 
-		/* Permit the user to pick, if there is more than one */
-		if (n > 1) {
-		    /* tty_clear_nhwindow(BASE_WINDOW); */
-		    /* tty_putstr(BASE_WINDOW, 0, "Choosing Race"); */
-		    win = create_nhwindow(NHW_MENU);
-		    start_menu(win);
-		    any = zeroany;         /* zero out all bits */
-		    for (i = 0; races[i].noun; i++)
-			if (ok_race(flags.initrole, i, flags.initgend,
-							flags.initalign)) {
-			    any.a_int = i+1;	/* must be non-zero */
-			    add_menu(win, NO_GLYPH, &any, races[i].noun[0],
-				0, ATR_NONE, races[i].noun, MENU_UNSELECTED);
-			}
-		    any.a_int = pick_race(flags.initrole, flags.initgend,
-					flags.initalign, PICK_RANDOM)+1;
-		    if (any.a_int == 0)	/* must be non-zero */
-			any.a_int = randrace(flags.initrole)+1;
-		    add_menu(win, NO_GLYPH, &any , '*', 0, ATR_NONE,
-				    "Random", MENU_UNSELECTED);
-		    any.a_int = i+1;	/* must be non-zero */
-		    add_menu(win, NO_GLYPH, &any , 'q', 0, ATR_NONE,
-				    "Quit", MENU_UNSELECTED);
-		    Sprintf(pbuf, "Pick the race of your %s", plbuf);
-		    end_menu(win, pbuf);
-		    n = select_menu(win, PICK_ONE, &selected);
-		    destroy_nhwindow(win);
-		    if (n != 1 || selected[0].item.a_int == any.a_int)
-			goto give_up;		/* Selected quit */
+            flags.initrole = selected[0].item.a_int - 1;
+            free((genericptr_t) selected), selected = 0;
+        }
+        (void) root_plselection_prompt(plbuf, QBUFSZ - 1, flags.initrole,
+                                       flags.initrace, flags.initgend,
+                                       flags.initalign);
+    }
 
-		    k = selected[0].item.a_int - 1;
-		    free((genericptr_t) selected),	selected = 0;
-		}
-		flags.initrace = k;
-	    }
-	    (void)  root_plselection_prompt(plbuf, QBUFSZ - 1,
-			flags.initrole, flags.initrace, flags.initgend, flags.initalign);
-	}
+    /* Select a race, if necessary */
+    /* force compatibility with role, try for compatibility with
+     * pre-selected gender/alignment */
+    if (flags.initrace < 0 || !validrace(flags.initrole, flags.initrace)) {
+        /* pre-selected race not valid */
+        if (pick4u == 'y' || flags.initrace == ROLE_RANDOM
+            || flags.randomall) {
+            flags.initrace = pick_race(flags.initrole, flags.initgend,
+                                       flags.initalign, PICK_RANDOM);
+            if (flags.initrace < 0) {
+                /* tty_putstr(BASE_WINDOW, 0, "Incompatible race!"); */
+                flags.initrace = randrace(flags.initrole);
+            }
+        } else { /* pick4u == 'n' */
+            /* Count the number of valid races */
+            n = 0; /* number valid */
+            k = 0; /* valid race */
+            for (i = 0; races[i].noun; i++) {
+                if (ok_race(flags.initrole, i, flags.initgend,
+                            flags.initalign)) {
+                    n++;
+                    k = i;
+                }
+            }
+            if (n == 0) {
+                for (i = 0; races[i].noun; i++) {
+                    if (validrace(flags.initrole, i)) {
+                        n++;
+                        k = i;
+                    }
+                }
+            }
 
-	/* Select a gender, if necessary */
-	/* force compatibility with role/race, try for compatibility with
-	 * pre-selected alignment */
-	if (flags.initgend < 0 || !validgend(flags.initrole, flags.initrace,
-						flags.initgend)) {
-	    /* pre-selected gender not valid */
-	    if (pick4u == 'y' || flags.initgend == ROLE_RANDOM || flags.randomall) {
-		flags.initgend = pick_gend(flags.initrole, flags.initrace,
-						flags.initalign, PICK_RANDOM);
-		if (flags.initgend < 0) {
-		    /* tty_putstr(BASE_WINDOW, 0, "Incompatible gender!"); */
-		    flags.initgend = randgend(flags.initrole, flags.initrace);
-		}
-	    } else {	/* pick4u == 'n' */
-		/* Count the number of valid genders */
-		n = 0;	/* number valid */
-		k = 0;	/* valid gender */
-		for (i = 0; i < ROLE_GENDERS; i++) {
-		    if (ok_gend(flags.initrole, flags.initrace, i,
-							flags.initalign)) {
-			n++;
-			k = i;
-		    }
-		}
-		if (n == 0) {
-		    for (i = 0; i < ROLE_GENDERS; i++) {
-			if (validgend(flags.initrole, flags.initrace, i)) {
-			    n++;
-			    k = i;
-			}
-		    }
-		}
+            /* Permit the user to pick, if there is more than one */
+            if (n > 1) {
+                /* tty_clear_nhwindow(BASE_WINDOW); */
+                /* tty_putstr(BASE_WINDOW, 0, "Choosing Race"); */
+                win = create_nhwindow(NHW_MENU);
+                start_menu(win);
+                any = zeroany; /* zero out all bits */
+                for (i = 0; races[i].noun; i++)
+                    if (ok_race(flags.initrole, i, flags.initgend,
+                                flags.initalign)) {
+                        any.a_int = i + 1; /* must be non-zero */
+                        add_menu(win, NO_GLYPH, &any, races[i].noun[0], 0,
+                                 ATR_NONE, races[i].noun, MENU_UNSELECTED);
+                    }
+                any.a_int = pick_race(flags.initrole, flags.initgend,
+                                      flags.initalign, PICK_RANDOM) + 1;
+                if (any.a_int == 0) /* must be non-zero */
+                    any.a_int = randrace(flags.initrole) + 1;
+                add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
+                         MENU_UNSELECTED);
+                any.a_int = i + 1; /* must be non-zero */
+                add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
+                         MENU_UNSELECTED);
+                Sprintf(pbuf, "Pick the race of your %s", plbuf);
+                end_menu(win, pbuf);
+                n = select_menu(win, PICK_ONE, &selected);
+                destroy_nhwindow(win);
+                if (n != 1 || selected[0].item.a_int == any.a_int)
+                    goto give_up; /* Selected quit */
 
-		/* Permit the user to pick, if there is more than one */
-		if (n > 1) {
-		    /* tty_clear_nhwindow(BASE_WINDOW); */
-		    /* tty_putstr(BASE_WINDOW, 0, "Choosing Gender"); */
-		    win = create_nhwindow(NHW_MENU);
-		    start_menu(win);
-		    any = zeroany;         /* zero out all bits */
-		    for (i = 0; i < ROLE_GENDERS; i++)
-			if (ok_gend(flags.initrole, flags.initrace, i,
-							    flags.initalign)) {
-			    any.a_int = i+1;
-			    add_menu(win, NO_GLYPH, &any, genders[i].adj[0],
-				0, ATR_NONE, genders[i].adj, MENU_UNSELECTED);
-			}
-		    any.a_int = pick_gend(flags.initrole, flags.initrace,
-					    flags.initalign, PICK_RANDOM)+1;
-		    if (any.a_int == 0)	/* must be non-zero */
-			any.a_int = randgend(flags.initrole, flags.initrace)+1;
-		    add_menu(win, NO_GLYPH, &any , '*', 0, ATR_NONE,
-				    "Random", MENU_UNSELECTED);
-		    any.a_int = i+1;	/* must be non-zero */
-		    add_menu(win, NO_GLYPH, &any , 'q', 0, ATR_NONE,
-				    "Quit", MENU_UNSELECTED);
-		    Sprintf(pbuf, "Pick the gender of your %s", plbuf);
-		    end_menu(win, pbuf);
-		    n = select_menu(win, PICK_ONE, &selected);
-		    destroy_nhwindow(win);
-		    if (n != 1 || selected[0].item.a_int == any.a_int)
-			goto give_up;		/* Selected quit */
+                k = selected[0].item.a_int - 1;
+                free((genericptr_t) selected), selected = 0;
+            }
+            flags.initrace = k;
+        }
+        (void) root_plselection_prompt(plbuf, QBUFSZ - 1, flags.initrole,
+                                       flags.initrace, flags.initgend,
+                                       flags.initalign);
+    }
 
-		    k = selected[0].item.a_int - 1;
-		    free((genericptr_t) selected),	selected = 0;
-		}
-		flags.initgend = k;
-	    }
-	    (void)  root_plselection_prompt(plbuf, QBUFSZ - 1,
-			flags.initrole, flags.initrace, flags.initgend, flags.initalign);
-	}
+    /* Select a gender, if necessary */
+    /* force compatibility with role/race, try for compatibility with
+     * pre-selected alignment */
+    if (flags.initgend < 0
+        || !validgend(flags.initrole, flags.initrace, flags.initgend)) {
+        /* pre-selected gender not valid */
+        if (pick4u == 'y' || flags.initgend == ROLE_RANDOM
+            || flags.randomall) {
+            flags.initgend = pick_gend(flags.initrole, flags.initrace,
+                                       flags.initalign, PICK_RANDOM);
+            if (flags.initgend < 0) {
+                /* tty_putstr(BASE_WINDOW, 0, "Incompatible gender!"); */
+                flags.initgend = randgend(flags.initrole, flags.initrace);
+            }
+        } else { /* pick4u == 'n' */
+            /* Count the number of valid genders */
+            n = 0; /* number valid */
+            k = 0; /* valid gender */
+            for (i = 0; i < ROLE_GENDERS; i++) {
+                if (ok_gend(flags.initrole, flags.initrace, i,
+                            flags.initalign)) {
+                    n++;
+                    k = i;
+                }
+            }
+            if (n == 0) {
+                for (i = 0; i < ROLE_GENDERS; i++) {
+                    if (validgend(flags.initrole, flags.initrace, i)) {
+                        n++;
+                        k = i;
+                    }
+                }
+            }
 
-	/* Select an alignment, if necessary */
-	/* force compatibility with role/race/gender */
-	if (flags.initalign < 0 || !validalign(flags.initrole, flags.initrace,
-							flags.initalign)) {
-	    /* pre-selected alignment not valid */
-	    if (pick4u == 'y' || flags.initalign == ROLE_RANDOM || flags.randomall) {
-		flags.initalign = pick_align(flags.initrole, flags.initrace,
-							flags.initgend, PICK_RANDOM);
-		if (flags.initalign < 0) {
-		    /* tty_putstr(BASE_WINDOW, 0, "Incompatible alignment!"); */
-		    flags.initalign = randalign(flags.initrole, flags.initrace);
-		}
-	    } else {	/* pick4u == 'n' */
-		/* Count the number of valid alignments */
-		n = 0;	/* number valid */
-		k = 0;	/* valid alignment */
-		for (i = 0; i < ROLE_ALIGNS; i++) {
-		    if (ok_align(flags.initrole, flags.initrace, flags.initgend,
-							i)) {
-			n++;
-			k = i;
-		    }
-		}
-		if (n == 0) {
-		    for (i = 0; i < ROLE_ALIGNS; i++) {
-			if (validalign(flags.initrole, flags.initrace, i)) {
-			    n++;
-			    k = i;
-			}
-		    }
-		}
+            /* Permit the user to pick, if there is more than one */
+            if (n > 1) {
+                /* tty_clear_nhwindow(BASE_WINDOW); */
+                /* tty_putstr(BASE_WINDOW, 0, "Choosing Gender"); */
+                win = create_nhwindow(NHW_MENU);
+                start_menu(win);
+                any = zeroany; /* zero out all bits */
+                for (i = 0; i < ROLE_GENDERS; i++)
+                    if (ok_gend(flags.initrole, flags.initrace, i,
+                                flags.initalign)) {
+                        any.a_int = i + 1;
+                        add_menu(win, NO_GLYPH, &any, genders[i].adj[0], 0,
+                                 ATR_NONE, genders[i].adj, MENU_UNSELECTED);
+                    }
+                any.a_int = pick_gend(flags.initrole, flags.initrace,
+                                      flags.initalign, PICK_RANDOM) + 1;
+                if (any.a_int == 0) /* must be non-zero */
+                    any.a_int = randgend(flags.initrole, flags.initrace) + 1;
+                add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
+                         MENU_UNSELECTED);
+                any.a_int = i + 1; /* must be non-zero */
+                add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
+                         MENU_UNSELECTED);
+                Sprintf(pbuf, "Pick the gender of your %s", plbuf);
+                end_menu(win, pbuf);
+                n = select_menu(win, PICK_ONE, &selected);
+                destroy_nhwindow(win);
+                if (n != 1 || selected[0].item.a_int == any.a_int)
+                    goto give_up; /* Selected quit */
 
-		/* Permit the user to pick, if there is more than one */
-		if (n > 1) {
-		    /* tty_clear_nhwindow(BASE_WINDOW); */
-		    /* tty_putstr(BASE_WINDOW, 0, "Choosing Alignment"); */
-		    win = create_nhwindow(NHW_MENU);
-		    start_menu(win);
-		    any = zeroany;         /* zero out all bits */
-		    for (i = 0; i < ROLE_ALIGNS; i++)
-			if (ok_align(flags.initrole, flags.initrace,
-							flags.initgend, i)) {
-			    any.a_int = i+1;
-			    add_menu(win, NO_GLYPH, &any, aligns[i].adj[0],
-				 0, ATR_NONE, aligns[i].adj, MENU_UNSELECTED);
-			}
-		    any.a_int = pick_align(flags.initrole, flags.initrace,
-					    flags.initgend, PICK_RANDOM)+1;
-		    if (any.a_int == 0)	/* must be non-zero */
-			any.a_int = randalign(flags.initrole, flags.initrace)+1;
-		    add_menu(win, NO_GLYPH, &any , '*', 0, ATR_NONE,
-				    "Random", MENU_UNSELECTED);
-		    any.a_int = i+1;	/* must be non-zero */
-		    add_menu(win, NO_GLYPH, &any , 'q', 0, ATR_NONE,
-				    "Quit", MENU_UNSELECTED);
-		    Sprintf(pbuf, "Pick the alignment of your %s", plbuf);
-		    end_menu(win, pbuf);
-		    n = select_menu(win, PICK_ONE, &selected);
-		    destroy_nhwindow(win);
-		    if (n != 1 || selected[0].item.a_int == any.a_int)
-			goto give_up;		/* Selected quit */
+                k = selected[0].item.a_int - 1;
+                free((genericptr_t) selected), selected = 0;
+            }
+            flags.initgend = k;
+        }
+        (void) root_plselection_prompt(plbuf, QBUFSZ - 1, flags.initrole,
+                                       flags.initrace, flags.initgend,
+                                       flags.initalign);
+    }
 
-		    k = selected[0].item.a_int - 1;
-		    free((genericptr_t) selected),	selected = 0;
-		}
-		flags.initalign = k;
-	    }
-	}
-	/* Success! */
-	/* tty_display_nhwindow(BASE_WINDOW, FALSE); */
+    /* Select an alignment, if necessary */
+    /* force compatibility with role/race/gender */
+    if (flags.initalign < 0
+        || !validalign(flags.initrole, flags.initrace, flags.initalign)) {
+        /* pre-selected alignment not valid */
+        if (pick4u == 'y' || flags.initalign == ROLE_RANDOM
+            || flags.randomall) {
+            flags.initalign = pick_align(flags.initrole, flags.initrace,
+                                         flags.initgend, PICK_RANDOM);
+            if (flags.initalign < 0) {
+                /* tty_putstr(BASE_WINDOW, 0, "Incompatible alignment!"); */
+                flags.initalign = randalign(flags.initrole, flags.initrace);
+            }
+        } else { /* pick4u == 'n' */
+            /* Count the number of valid alignments */
+            n = 0; /* number valid */
+            k = 0; /* valid alignment */
+            for (i = 0; i < ROLE_ALIGNS; i++) {
+                if (ok_align(flags.initrole, flags.initrace, flags.initgend,
+                             i)) {
+                    n++;
+                    k = i;
+                }
+            }
+            if (n == 0) {
+                for (i = 0; i < ROLE_ALIGNS; i++) {
+                    if (validalign(flags.initrole, flags.initrace, i)) {
+                        n++;
+                        k = i;
+                    }
+                }
+            }
+
+            /* Permit the user to pick, if there is more than one */
+            if (n > 1) {
+                /* tty_clear_nhwindow(BASE_WINDOW); */
+                /* tty_putstr(BASE_WINDOW, 0, "Choosing Alignment"); */
+                win = create_nhwindow(NHW_MENU);
+                start_menu(win);
+                any = zeroany; /* zero out all bits */
+                for (i = 0; i < ROLE_ALIGNS; i++)
+                    if (ok_align(flags.initrole, flags.initrace,
+                                 flags.initgend, i)) {
+                        any.a_int = i + 1;
+                        add_menu(win, NO_GLYPH, &any, aligns[i].adj[0], 0,
+                                 ATR_NONE, aligns[i].adj, MENU_UNSELECTED);
+                    }
+                any.a_int = pick_align(flags.initrole, flags.initrace,
+                                       flags.initgend, PICK_RANDOM) + 1;
+                if (any.a_int == 0) /* must be non-zero */
+                    any.a_int = randalign(flags.initrole, flags.initrace) + 1;
+                add_menu(win, NO_GLYPH, &any, '*', 0, ATR_NONE, "Random",
+                         MENU_UNSELECTED);
+                any.a_int = i + 1; /* must be non-zero */
+                add_menu(win, NO_GLYPH, &any, 'q', 0, ATR_NONE, "Quit",
+                         MENU_UNSELECTED);
+                Sprintf(pbuf, "Pick the alignment of your %s", plbuf);
+                end_menu(win, pbuf);
+                n = select_menu(win, PICK_ONE, &selected);
+                destroy_nhwindow(win);
+                if (n != 1 || selected[0].item.a_int == any.a_int)
+                    goto give_up; /* Selected quit */
+
+                k = selected[0].item.a_int - 1;
+                free((genericptr_t) selected), selected = 0;
+            }
+            flags.initalign = k;
+        }
+    }
+    /* Success! */
+    /* tty_display_nhwindow(BASE_WINDOW, FALSE); */
 }
 
 /* Ask the user for a player name. */
-void mswin_askname(void)
+void
+mswin_askname(void)
 {
-	logDebug("mswin_askname()\n");
+    logDebug("mswin_askname()\n");
 
-	if( mswin_getlin_window("Who are you?", plname, PL_NSIZ)==IDCANCEL ) {
-		bail("bye-bye");
-		/* not reached */
-	}
+    if (mswin_getlin_window("Who are you?", plname, PL_NSIZ) == IDCANCEL) {
+        bail("bye-bye");
+        /* not reached */
+    }
 }
-
 
 /* Does window event processing (e.g. exposure events).
    A noop for the tty and X window-ports.
 */
-void mswin_get_nh_event(void)
+void
+mswin_get_nh_event(void)
 {
-	MSG msg;
+    MSG msg;
 
-	logDebug("mswin_get_nh_event()\n");
+    logDebug("mswin_get_nh_event()\n");
 
-	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)!=0 ) {
-		if (!TranslateAccelerator(msg.hwnd, GetNHApp()->hAccelTable, &msg)) {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-	} 
-	return;
+    while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) != 0) {
+        if (!TranslateAccelerator(msg.hwnd, GetNHApp()->hAccelTable, &msg)) {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+    }
+    return;
 }
 
 /* Exits the window system.  This should dismiss all windows,
    except the "window" used for raw_print().  str is printed if possible.
 */
-void mswin_exit_nhwindows(const char *str)
+void
+mswin_exit_nhwindows(const char *str)
 {
-	logDebug("mswin_exit_nhwindows(%s)\n", str);
+    logDebug("mswin_exit_nhwindows(%s)\n", str);
 
     /* Write Window settings to the registry */
     mswin_write_reg();
-    while (max_brush) 
-	DeleteObject(brush_table[--max_brush]);
+    while (max_brush)
+        DeleteObject(brush_table[--max_brush]);
 }
 
 /* Prepare the window to be suspended. */
-void mswin_suspend_nhwindows(const char *str)
+void
+mswin_suspend_nhwindows(const char *str)
 {
-	logDebug("mswin_suspend_nhwindows(%s)\n", str);
+    logDebug("mswin_suspend_nhwindows(%s)\n", str);
 
-	return;
+    return;
 }
-
 
 /* Restore the windows after being suspended. */
-void mswin_resume_nhwindows()
+void
+mswin_resume_nhwindows()
 {
-	logDebug("mswin_resume_nhwindows()\n");
+    logDebug("mswin_resume_nhwindows()\n");
 
-	return;
+    return;
 }
 
-/*  Create a window of type "type" which can be 
+/*  Create a window of type "type" which can be
         NHW_MESSAGE     (top line)
         NHW_STATUS      (bottom lines)
         NHW_MAP         (main dungeon)
         NHW_MENU        (inventory or other "corner" windows)
         NHW_TEXT        (help/text, full screen paged window)
 */
-winid 
+winid
 mswin_create_nhwindow(int type)
 {
-	winid i = 0;
-	MSNHMsgAddWnd data;
+    winid i = 0;
+    MSNHMsgAddWnd data;
 
-	logDebug("mswin_create_nhwindow(%d)\n", type);
+    logDebug("mswin_create_nhwindow(%d)\n", type);
 
-	/* Return the next available winid
-	 */
+    /* Return the next available winid
+     */
 
-	for (i=1; i<MAXWINDOWS; i++)
-	  if (GetNHApp()->windowlist[i].win == NULL &&
-		  !GetNHApp()->windowlist[i].dead)
-		  break;
-	if (i == MAXWINDOWS)
-	  panic ("ERROR:  No windows available...\n");
+    for (i = 1; i < MAXWINDOWS; i++)
+        if (GetNHApp()->windowlist[i].win == NULL
+            && !GetNHApp()->windowlist[i].dead)
+            break;
+    if (i == MAXWINDOWS)
+        panic("ERROR:  No windows available...\n");
 
     switch (type) {
-    case NHW_MAP:
-	{
-		GetNHApp()->windowlist[i].win = mswin_init_map_window();
-		GetNHApp()->windowlist[i].type = type;
-		GetNHApp()->windowlist[i].dead = 0;
-		break;
-	}
-    case NHW_MESSAGE:
-	{
-		GetNHApp()->windowlist[i].win = mswin_init_message_window();
-		GetNHApp()->windowlist[i].type = type;
-		GetNHApp()->windowlist[i].dead = 0;
-		break;
-	}
-    case NHW_STATUS:
-	{
-		GetNHApp()->windowlist[i].win = mswin_init_status_window();
-		GetNHApp()->windowlist[i].type = type;
-		GetNHApp()->windowlist[i].dead = 0;
-		break;
-	}    
-    case NHW_MENU:
-	{
-		GetNHApp()->windowlist[i].win = NULL; //will create later
-		GetNHApp()->windowlist[i].type = type;
-		GetNHApp()->windowlist[i].dead = 1;
-		break;
-	} 
-    case NHW_TEXT:
-	{
-		GetNHApp()->windowlist[i].win = mswin_init_text_window();
-		GetNHApp()->windowlist[i].type = type;
-		GetNHApp()->windowlist[i].dead = 0;
-		break;
-	}
-	}
+    case NHW_MAP: {
+        GetNHApp()->windowlist[i].win = mswin_init_map_window();
+        GetNHApp()->windowlist[i].type = type;
+        GetNHApp()->windowlist[i].dead = 0;
+        break;
+    }
+    case NHW_MESSAGE: {
+        GetNHApp()->windowlist[i].win = mswin_init_message_window();
+        GetNHApp()->windowlist[i].type = type;
+        GetNHApp()->windowlist[i].dead = 0;
+        break;
+    }
+    case NHW_STATUS: {
+        GetNHApp()->windowlist[i].win = mswin_init_status_window();
+        GetNHApp()->windowlist[i].type = type;
+        GetNHApp()->windowlist[i].dead = 0;
+        break;
+    }
+    case NHW_MENU: {
+        GetNHApp()->windowlist[i].win = NULL; // will create later
+        GetNHApp()->windowlist[i].type = type;
+        GetNHApp()->windowlist[i].dead = 1;
+        break;
+    }
+    case NHW_TEXT: {
+        GetNHApp()->windowlist[i].win = mswin_init_text_window();
+        GetNHApp()->windowlist[i].type = type;
+        GetNHApp()->windowlist[i].dead = 0;
+        break;
+    }
+    }
 
-	ZeroMemory(&data, sizeof(data) );
-	data.wid = i;
-	SendMessage( GetNHApp()->hMainWnd, 
-		         WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_ADDWND, (LPARAM)&data );
-	return i;
+    ZeroMemory(&data, sizeof(data));
+    data.wid = i;
+    SendMessage(GetNHApp()->hMainWnd, WM_MSNH_COMMAND,
+                (WPARAM) MSNH_MSG_ADDWND, (LPARAM) &data);
+    return i;
 }
 
 /* Clear the given window, when asked to. */
-void mswin_clear_nhwindow(winid wid)
+void
+mswin_clear_nhwindow(winid wid)
 {
-	logDebug("mswin_clear_nhwindow(%d)\n", wid);
+    logDebug("mswin_clear_nhwindow(%d)\n", wid);
 
-    if ((wid >= 0) && 
-        (wid < MAXWINDOWS) &&
-        (GetNHApp()->windowlist[wid].win != NULL))
-    {
-		if( GetNHApp()->windowlist[wid].type == NHW_MAP ) {
-			if( Is_rogue_level(&u.uz) ) 
-				mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP), ROGUE_LEVEL_MAP_MODE);
-			else 
-				mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP), iflags.wc_map_mode);
-		}
+    if ((wid >= 0) && (wid < MAXWINDOWS)
+        && (GetNHApp()->windowlist[wid].win != NULL)) {
+        if (GetNHApp()->windowlist[wid].type == NHW_MAP) {
+            if (Is_rogue_level(&u.uz))
+                mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP),
+                               ROGUE_LEVEL_MAP_MODE);
+            else
+                mswin_map_mode(mswin_hwnd_from_winid(WIN_MAP),
+                               iflags.wc_map_mode);
+        }
 
-		SendMessage( 
-			 GetNHApp()->windowlist[wid].win, 
-			 WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_CLEAR_WINDOW, (LPARAM)NULL );
-	}
+        SendMessage(GetNHApp()->windowlist[wid].win, WM_MSNH_COMMAND,
+                    (WPARAM) MSNH_MSG_CLEAR_WINDOW, (LPARAM) NULL);
+    }
 }
 
 /* -- Display the window on the screen.  If there is data
@@ -833,93 +829,100 @@ void mswin_clear_nhwindow(winid wid)
                 -- Calling display_nhwindow(WIN_MESSAGE,???) will do a
                    --more--, if necessary, in the tty window-port.
 */
-void mswin_display_nhwindow(winid wid, BOOLEAN_P block)
+void
+mswin_display_nhwindow(winid wid, BOOLEAN_P block)
 {
-	logDebug("mswin_display_nhwindow(%d, %d)\n", wid, block);
-	if (GetNHApp()->windowlist[wid].win != NULL)
-	{
-		ShowWindow(GetNHApp()->windowlist[wid].win, SW_SHOW);
-		mswin_layout_main_window(GetNHApp()->windowlist[wid].win);
-		if (GetNHApp()->windowlist[wid].type == NHW_MENU) {
-			MENU_ITEM_P* p;
-			mswin_menu_window_select_menu(GetNHApp()->windowlist[wid].win, PICK_NONE, &p, TRUE);
-		} if (GetNHApp()->windowlist[wid].type == NHW_TEXT) {
-			mswin_display_text_window(GetNHApp()->windowlist[wid].win);
-		} if (GetNHApp()->windowlist[wid].type == NHW_RIP) {
-			mswin_display_RIP_window(GetNHApp()->windowlist[wid].win);
-		} else {
-			if( !block ) {
-				UpdateWindow(GetNHApp()->windowlist[wid].win);
-			} else {
-				if ( GetNHApp()->windowlist[wid].type == NHW_MAP ) {
-					(void) mswin_nhgetch();
-				}
-			}
-		}
-		SetFocus(GetNHApp()->hMainWnd);
-	}
+    logDebug("mswin_display_nhwindow(%d, %d)\n", wid, block);
+    if (GetNHApp()->windowlist[wid].win != NULL) {
+        ShowWindow(GetNHApp()->windowlist[wid].win, SW_SHOW);
+        mswin_layout_main_window(GetNHApp()->windowlist[wid].win);
+        if (GetNHApp()->windowlist[wid].type == NHW_MENU) {
+            MENU_ITEM_P *p;
+            mswin_menu_window_select_menu(GetNHApp()->windowlist[wid].win,
+                                          PICK_NONE, &p, TRUE);
+        }
+        if (GetNHApp()->windowlist[wid].type == NHW_TEXT) {
+            mswin_display_text_window(GetNHApp()->windowlist[wid].win);
+        }
+        if (GetNHApp()->windowlist[wid].type == NHW_RIP) {
+            mswin_display_RIP_window(GetNHApp()->windowlist[wid].win);
+        } else {
+            if (!block) {
+                UpdateWindow(GetNHApp()->windowlist[wid].win);
+            } else {
+                if (GetNHApp()->windowlist[wid].type == NHW_MAP) {
+                    (void) mswin_nhgetch();
+                }
+            }
+        }
+        SetFocus(GetNHApp()->hMainWnd);
+    }
 }
 
-
-HWND mswin_hwnd_from_winid(winid wid)
+HWND
+mswin_hwnd_from_winid(winid wid)
 {
-	if( wid>=0 && wid<MAXWINDOWS) {
-		return GetNHApp()->windowlist[wid].win;
-	} else {
-		return NULL;
-	}
+    if (wid >= 0 && wid < MAXWINDOWS) {
+        return GetNHApp()->windowlist[wid].win;
+    } else {
+        return NULL;
+    }
 }
 
-winid mswin_winid_from_handle(HWND hWnd)
+winid
+mswin_winid_from_handle(HWND hWnd)
 {
-	winid i = 0;
+    winid i = 0;
 
-	for (i=1; i<MAXWINDOWS; i++)
-	  if (GetNHApp()->windowlist[i].win == hWnd)
-		  return i;
-	return -1;
+    for (i = 1; i < MAXWINDOWS; i++)
+        if (GetNHApp()->windowlist[i].win == hWnd)
+            return i;
+    return -1;
 }
 
-winid mswin_winid_from_type(int type)
+winid
+mswin_winid_from_type(int type)
 {
-	winid i = 0;
+    winid i = 0;
 
-	for (i=1; i<MAXWINDOWS; i++)
-	  if (GetNHApp()->windowlist[i].type == type)
-		  return i;
-	return -1;
+    for (i = 1; i < MAXWINDOWS; i++)
+        if (GetNHApp()->windowlist[i].type == type)
+            return i;
+    return -1;
 }
 
-void mswin_window_mark_dead(winid wid)
+void
+mswin_window_mark_dead(winid wid)
 {
-	if( wid>=0 && wid<MAXWINDOWS) {
-		GetNHApp()->windowlist[wid].win = NULL;
-		GetNHApp()->windowlist[wid].dead = 1;
-	}
+    if (wid >= 0 && wid < MAXWINDOWS) {
+        GetNHApp()->windowlist[wid].win = NULL;
+        GetNHApp()->windowlist[wid].dead = 1;
+    }
 }
 
-/* Destroy will dismiss the window if the window has not 
+/* Destroy will dismiss the window if the window has not
  * already been dismissed.
 */
-void mswin_destroy_nhwindow(winid wid)
+void
+mswin_destroy_nhwindow(winid wid)
 {
-	logDebug("mswin_destroy_nhwindow(%d)\n", wid);
+    logDebug("mswin_destroy_nhwindow(%d)\n", wid);
 
-    if ((GetNHApp()->windowlist[wid].type == NHW_MAP) || 
-        (GetNHApp()->windowlist[wid].type == NHW_MESSAGE) || 
-        (GetNHApp()->windowlist[wid].type == NHW_STATUS)) {
-		/* main windows is going to take care of those */
-		return;
+    if ((GetNHApp()->windowlist[wid].type == NHW_MAP)
+        || (GetNHApp()->windowlist[wid].type == NHW_MESSAGE)
+        || (GetNHApp()->windowlist[wid].type == NHW_STATUS)) {
+        /* main windows is going to take care of those */
+        return;
     }
 
     if (wid != -1) {
-		if( !GetNHApp()->windowlist[wid].dead &&
-			GetNHApp()->windowlist[wid].win != NULL ) 
-			DestroyWindow(GetNHApp()->windowlist[wid].win);
-		GetNHApp()->windowlist[wid].win = NULL;
-		GetNHApp()->windowlist[wid].type = 0;
-		GetNHApp()->windowlist[wid].dead = 0;
-	}
+        if (!GetNHApp()->windowlist[wid].dead
+            && GetNHApp()->windowlist[wid].win != NULL)
+            DestroyWindow(GetNHApp()->windowlist[wid].win);
+        GetNHApp()->windowlist[wid].win = NULL;
+        GetNHApp()->windowlist[wid].type = 0;
+        GetNHApp()->windowlist[wid].dead = 0;
+    }
 }
 
 /* Next output to window will start at (x,y), also moves
@@ -927,20 +930,18 @@ void mswin_destroy_nhwindow(winid wid)
  1 <= x < cols, 0 <= y < rows, where cols and rows are
  the size of window.
 */
-void mswin_curs(winid wid, int x, int y)
+void
+mswin_curs(winid wid, int x, int y)
 {
-	logDebug("mswin_curs(%d, %d, %d)\n", wid, x, y);
+    logDebug("mswin_curs(%d, %d, %d)\n", wid, x, y);
 
-    if ((wid >= 0) && 
-        (wid < MAXWINDOWS) &&
-        (GetNHApp()->windowlist[wid].win != NULL))
-    {
-		 MSNHMsgCursor data;
-		 data.x = x;
-		 data.y = y;
-		 SendMessage( 
-			 GetNHApp()->windowlist[wid].win, 
-			 WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_CURSOR, (LPARAM)&data );
+    if ((wid >= 0) && (wid < MAXWINDOWS)
+        && (GetNHApp()->windowlist[wid].win != NULL)) {
+        MSNHMsgCursor data;
+        data.x = x;
+        data.y = y;
+        SendMessage(GetNHApp()->windowlist[wid].win, WM_MSNH_COMMAND,
+                    (WPARAM) MSNH_MSG_CURSOR, (LPARAM) &data);
     }
 }
 
@@ -967,81 +968,83 @@ Attributes
                    then the second.  In the tty port, pline() achieves this
                    by calling more() or displaying both on the same line.
 */
-void mswin_putstr(winid wid, int attr, const char *text)
+void
+mswin_putstr(winid wid, int attr, const char *text)
 {
-	logDebug("mswin_putstr(%d, %d, %s)\n", wid, attr, text);
-	
-	mswin_putstr_ex(wid, attr, text, 0);
+    logDebug("mswin_putstr(%d, %d, %s)\n", wid, attr, text);
+
+    mswin_putstr_ex(wid, attr, text, 0);
 }
 
-void mswin_putstr_ex(winid wid, int attr, const char *text, int app)
+void
+mswin_putstr_ex(winid wid, int attr, const char *text, int app)
 {
-	if( (wid >= 0) && 
-        (wid < MAXWINDOWS) )
-	{
-		if( GetNHApp()->windowlist[wid].win==NULL &&
-			GetNHApp()->windowlist[wid].type==NHW_MENU ) {
-			GetNHApp()->windowlist[wid].win = mswin_init_menu_window(MENU_TYPE_TEXT);
-			GetNHApp()->windowlist[wid].dead = 0;
-		}
+    if ((wid >= 0) && (wid < MAXWINDOWS)) {
+        if (GetNHApp()->windowlist[wid].win == NULL
+            && GetNHApp()->windowlist[wid].type == NHW_MENU) {
+            GetNHApp()->windowlist[wid].win =
+                mswin_init_menu_window(MENU_TYPE_TEXT);
+            GetNHApp()->windowlist[wid].dead = 0;
+        }
 
-		if (GetNHApp()->windowlist[wid].win != NULL)
-		{
-			 MSNHMsgPutstr data;
-			 ZeroMemory(&data, sizeof(data));
-			 data.attr = attr;
-			 data.text = text;
-			 data.append = app;
-			 SendMessage( 
-				 GetNHApp()->windowlist[wid].win, 
-				 WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_PUTSTR, (LPARAM)&data );
-		}
+        if (GetNHApp()->windowlist[wid].win != NULL) {
+            MSNHMsgPutstr data;
+            ZeroMemory(&data, sizeof(data));
+            data.attr = attr;
+            data.text = text;
+            data.append = app;
+            SendMessage(GetNHApp()->windowlist[wid].win, WM_MSNH_COMMAND,
+                        (WPARAM) MSNH_MSG_PUTSTR, (LPARAM) &data);
+        }
         /* yield a bit so it gets done immediately */
         mswin_get_nh_event();
-	}
-	else
-	{
-		// build text to display later in message box
-		GetNHApp()->saved_text = realloc(GetNHApp()->saved_text, strlen(text) +
-			strlen(GetNHApp()->saved_text) + 1);
-		strcat(GetNHApp()->saved_text, text);
-	}
+    } else {
+        // build text to display later in message box
+        GetNHApp()->saved_text =
+            realloc(GetNHApp()->saved_text,
+                    strlen(text) + strlen(GetNHApp()->saved_text) + 1);
+        strcat(GetNHApp()->saved_text, text);
+    }
 }
 
 /* Display the file named str.  Complain about missing files
                    iff complain is TRUE.
 */
-void mswin_display_file(const char *filename,BOOLEAN_P must_exist)
+void
+mswin_display_file(const char *filename, BOOLEAN_P must_exist)
 {
-	dlb *f;
-	TCHAR wbuf[BUFSZ];
+    dlb *f;
+    TCHAR wbuf[BUFSZ];
 
-	logDebug("mswin_display_file(%s, %d)\n", filename, must_exist);
+    logDebug("mswin_display_file(%s, %d)\n", filename, must_exist);
 
-	f = dlb_fopen(filename, RDTMODE);
-	if (!f) {
-		if (must_exist) {
-			TCHAR message[90];
-			_stprintf(message, TEXT("Warning! Could not find file: %s\n"), NH_A2W(filename, wbuf, sizeof(wbuf)));
-			NHMessageBox(GetNHApp()->hMainWnd, message, MB_OK | MB_ICONEXCLAMATION );
-		} 
-	} else {
-		winid text;
-		char line[LLEN];
+    f = dlb_fopen(filename, RDTMODE);
+    if (!f) {
+        if (must_exist) {
+            TCHAR message[90];
+            _stprintf(message, TEXT("Warning! Could not find file: %s\n"),
+                      NH_A2W(filename, wbuf, sizeof(wbuf)));
+            NHMessageBox(GetNHApp()->hMainWnd, message,
+                         MB_OK | MB_ICONEXCLAMATION);
+        }
+    } else {
+        winid text;
+        char line[LLEN];
 
-		text = mswin_create_nhwindow(NHW_TEXT);
+        text = mswin_create_nhwindow(NHW_TEXT);
 
-		while (dlb_fgets(line, LLEN, f)) {
-			 size_t len;
-			 len = strlen(line);
-			 if( line[len-1]=='\n' ) line[len-1]='\x0';
-				mswin_putstr(text, ATR_NONE, line);
-		}
-		(void) dlb_fclose(f);
+        while (dlb_fgets(line, LLEN, f)) {
+            size_t len;
+            len = strlen(line);
+            if (line[len - 1] == '\n')
+                line[len - 1] = '\x0';
+            mswin_putstr(text, ATR_NONE, line);
+        }
+        (void) dlb_fclose(f);
 
-		mswin_display_nhwindow(text, 1);
-		mswin_destroy_nhwindow(text);
-	}
+        mswin_display_nhwindow(text, 1);
+        mswin_destroy_nhwindow(text);
+    }
 }
 
 /* Start using window as a menu.  You must call start_menu()
@@ -1049,31 +1052,31 @@ void mswin_display_file(const char *filename,BOOLEAN_P must_exist)
    putstr() to the window.  Only windows of type NHW_MENU may
    be used for menus.
 */
-void mswin_start_menu(winid wid)
+void
+mswin_start_menu(winid wid)
 {
-	logDebug("mswin_start_menu(%d)\n", wid);
-	if( (wid >= 0) && 
-        (wid < MAXWINDOWS) ) {
-		if( GetNHApp()->windowlist[wid].win==NULL &&
-			GetNHApp()->windowlist[wid].type==NHW_MENU ) {
-			GetNHApp()->windowlist[wid].win = mswin_init_menu_window(MENU_TYPE_MENU);
-			GetNHApp()->windowlist[wid].dead = 0;
-		}
+    logDebug("mswin_start_menu(%d)\n", wid);
+    if ((wid >= 0) && (wid < MAXWINDOWS)) {
+        if (GetNHApp()->windowlist[wid].win == NULL
+            && GetNHApp()->windowlist[wid].type == NHW_MENU) {
+            GetNHApp()->windowlist[wid].win =
+                mswin_init_menu_window(MENU_TYPE_MENU);
+            GetNHApp()->windowlist[wid].dead = 0;
+        }
 
-		if(GetNHApp()->windowlist[wid].win != NULL)	{
-			SendMessage( 
-				 GetNHApp()->windowlist[wid].win, 
-				 WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_STARTMENU, (LPARAM)NULL
-			);
-		}
-	}
+        if (GetNHApp()->windowlist[wid].win != NULL) {
+            SendMessage(GetNHApp()->windowlist[wid].win, WM_MSNH_COMMAND,
+                        (WPARAM) MSNH_MSG_STARTMENU, (LPARAM) NULL);
+        }
+    }
 }
 
 /*
 add_menu(windid window, int glyph, const anything identifier,
                                 char accelerator, char groupacc,
                                 int attr, char *str, boolean preselected)
-                -- Add a text line str to the given menu window.  If identifier
+                -- Add a text line str to the given menu window.  If
+identifier
                    is 0, then the line cannot be selected (e.g. a title).
                    Otherwise, identifier is the value returned if the line is
                    selected.  Accelerator is a keyboard key that can be used
@@ -1100,32 +1103,29 @@ add_menu(windid window, int glyph, const anything identifier,
                 -- If you want this choice to be preselected when the
                    menu is displayed, set preselected to TRUE.
 */
-void mswin_add_menu(winid wid, int glyph, const ANY_P * identifier,
-		CHAR_P accelerator, CHAR_P group_accel, int attr, 
-		const char *str, BOOLEAN_P presel)
+void
+mswin_add_menu(winid wid, int glyph, const ANY_P *identifier,
+               CHAR_P accelerator, CHAR_P group_accel, int attr,
+               const char *str, BOOLEAN_P presel)
 {
-	logDebug("mswin_add_menu(%d, %d, %p, %c, %c, %d, %s, %d)\n",
-		     wid, glyph, identifier, (char)accelerator, (char)group_accel,
-			 attr, str, presel);
-	if ((wid >= 0) && 
-		(wid < MAXWINDOWS) &&
-		(GetNHApp()->windowlist[wid].win != NULL))
-	{
-		MSNHMsgAddMenu data;
-		ZeroMemory(&data, sizeof(data));
-		data.glyph = glyph;
-		data.identifier = identifier;
-		data.accelerator = accelerator;
-		data.group_accel = group_accel;
-		data.attr = attr;
-		data.str = str;
-		data.presel = presel;
+    logDebug("mswin_add_menu(%d, %d, %p, %c, %c, %d, %s, %d)\n", wid, glyph,
+             identifier, (char) accelerator, (char) group_accel, attr, str,
+             presel);
+    if ((wid >= 0) && (wid < MAXWINDOWS)
+        && (GetNHApp()->windowlist[wid].win != NULL)) {
+        MSNHMsgAddMenu data;
+        ZeroMemory(&data, sizeof(data));
+        data.glyph = glyph;
+        data.identifier = identifier;
+        data.accelerator = accelerator;
+        data.group_accel = group_accel;
+        data.attr = attr;
+        data.str = str;
+        data.presel = presel;
 
-		SendMessage( 
-			 GetNHApp()->windowlist[wid].win, 
-			 WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_ADDMENU, (LPARAM)&data
-		);
-	}
+        SendMessage(GetNHApp()->windowlist[wid].win, WM_MSNH_COMMAND,
+                    (WPARAM) MSNH_MSG_ADDMENU, (LPARAM) &data);
+    }
 }
 
 /*
@@ -1137,22 +1137,19 @@ end_menu(window, prompt)
                 ** This probably shouldn't flush the window any more (if
                 ** it ever did).  That should be select_menu's job.  -dean
 */
-void mswin_end_menu(winid wid, const char *prompt)
+void
+mswin_end_menu(winid wid, const char *prompt)
 {
-	logDebug("mswin_end_menu(%d, %s)\n", wid, prompt);
-	if ((wid >= 0) && 
-		(wid < MAXWINDOWS) &&
-		(GetNHApp()->windowlist[wid].win != NULL))
-	{
-		MSNHMsgEndMenu data;
-		ZeroMemory(&data, sizeof(data));
-		data.text = prompt;
+    logDebug("mswin_end_menu(%d, %s)\n", wid, prompt);
+    if ((wid >= 0) && (wid < MAXWINDOWS)
+        && (GetNHApp()->windowlist[wid].win != NULL)) {
+        MSNHMsgEndMenu data;
+        ZeroMemory(&data, sizeof(data));
+        data.text = prompt;
 
-		SendMessage( 
-			 GetNHApp()->windowlist[wid].win, 
-			 WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_ENDMENU, (LPARAM)&data
-		);
-	}
+        SendMessage(GetNHApp()->windowlist[wid].win, WM_MSNH_COMMAND,
+                    (WPARAM) MSNH_MSG_ENDMENU, (LPARAM) &data);
+    }
 }
 
 /*
@@ -1180,39 +1177,38 @@ int select_menu(windid window, int how, menu_item **selected)
                    select_menu() will be called for the window at
                    create_nhwindow() time.
 */
-int mswin_select_menu(winid wid, int how, MENU_ITEM_P **selected)
+int
+mswin_select_menu(winid wid, int how, MENU_ITEM_P **selected)
 {
-	int nReturned = -1;
+    int nReturned = -1;
 
-	logDebug("mswin_select_menu(%d, %d)\n", wid, how);
+    logDebug("mswin_select_menu(%d, %d)\n", wid, how);
 
-	if ((wid >= 0) && 
-		(wid < MAXWINDOWS) &&
-		(GetNHApp()->windowlist[wid].win != NULL))
-	{
-		ShowWindow(GetNHApp()->windowlist[wid].win, SW_SHOW);
-		nReturned = mswin_menu_window_select_menu(
-			GetNHApp()->windowlist[wid].win, 
-			how, 
-			selected, 
-			!(flags.perm_invent && wid==WIN_INVEN && how==PICK_NONE) /* don't activate inventory window if perm_invent is on */
-			);
-	}
+    if ((wid >= 0) && (wid < MAXWINDOWS)
+        && (GetNHApp()->windowlist[wid].win != NULL)) {
+        ShowWindow(GetNHApp()->windowlist[wid].win, SW_SHOW);
+        nReturned = mswin_menu_window_select_menu(
+            GetNHApp()->windowlist[wid].win, how, selected,
+            !(flags.perm_invent && wid == WIN_INVEN
+              && how == PICK_NONE) /* don't activate inventory window if
+                                      perm_invent is on */
+            );
+    }
     return nReturned;
 }
 
 /*
     -- Indicate to the window port that the inventory has been changed.
-    -- Merely calls display_inventory() for window-ports that leave the 
-	window up, otherwise empty.
+    -- Merely calls display_inventory() for window-ports that leave the
+        window up, otherwise empty.
 */
-void mswin_update_inventory()
+void
+mswin_update_inventory()
 {
-	logDebug("mswin_update_inventory()\n");
-	if( flags.perm_invent &&
-		program_state.something_worth_saving &&
-		iflags.window_inited && 
-		WIN_INVEN!=WIN_ERR ) display_inventory(NULL, FALSE);
+    logDebug("mswin_update_inventory()\n");
+    if (flags.perm_invent && program_state.something_worth_saving
+        && iflags.window_inited && WIN_INVEN != WIN_ERR)
+        display_inventory(NULL, FALSE);
 }
 
 /*
@@ -1220,9 +1216,10 @@ mark_synch()    -- Don't go beyond this point in I/O on any channel until
                    all channels are caught up to here.  Can be an empty call
                    for the moment
 */
-void mswin_mark_synch()
+void
+mswin_mark_synch()
 {
-	logDebug("mswin_mark_synch()\n");
+    logDebug("mswin_mark_synch()\n");
 }
 
 /*
@@ -1231,9 +1228,10 @@ wait_synch()    -- Wait until all pending output is complete (*flush*() for
                 -- May also deal with exposure events etc. so that the
                    display is OK when return from wait_synch().
 */
-void mswin_wait_synch()
+void
+mswin_wait_synch()
 {
-	logDebug("mswin_wait_synch()\n");
+    logDebug("mswin_wait_synch()\n");
 }
 
 /*
@@ -1241,22 +1239,20 @@ cliparound(x, y)-- Make sure that the user is more-or-less centered on the
                    screen if the playing area is larger than the screen.
                 -- This function is only defined if CLIPPING is defined.
 */
-void mswin_cliparound(int x, int y)
+void
+mswin_cliparound(int x, int y)
 {
-	winid wid = WIN_MAP;
+    winid wid = WIN_MAP;
 
-	logDebug("mswin_cliparound(%d, %d)\n", x, y);
+    logDebug("mswin_cliparound(%d, %d)\n", x, y);
 
-    if ((wid >= 0) && 
-        (wid < MAXWINDOWS) &&
-        (GetNHApp()->windowlist[wid].win != NULL))
-    {
-		 MSNHMsgClipAround data;
-		 data.x = x;
-		 data.y = y;
-         SendMessage( 
-			 GetNHApp()->windowlist[wid].win, 
-			 WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_CLIPAROUND, (LPARAM)&data );
+    if ((wid >= 0) && (wid < MAXWINDOWS)
+        && (GetNHApp()->windowlist[wid].win != NULL)) {
+        MSNHMsgClipAround data;
+        data.x = x;
+        data.y = y;
+        SendMessage(GetNHApp()->windowlist[wid].win, WM_MSNH_COMMAND,
+                    (WPARAM) MSNH_MSG_CLIPAROUND, (LPARAM) &data);
     }
 }
 
@@ -1267,23 +1263,22 @@ print_glyph(window, x, y, glyph)
                    port wants (symbol, font, color, attributes, ...there's
                    a 1-1 map between glyphs and distinct things on the map).
 */
-void mswin_print_glyph(winid wid,XCHAR_P x,XCHAR_P y,int glyph)
+void
+mswin_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph)
 {
     logDebug("mswin_print_glyph(%d, %d, %d, %d)\n", wid, x, y, glyph);
 
-    if ((wid >= 0) && 
-        (wid < MAXWINDOWS) &&
-        (GetNHApp()->windowlist[wid].win != NULL))
-    {
-		MSNHMsgPrintGlyph data;
+    if ((wid >= 0) && (wid < MAXWINDOWS)
+        && (GetNHApp()->windowlist[wid].win != NULL)) {
+        MSNHMsgPrintGlyph data;
 
-		ZeroMemory(&data, sizeof(data) );
-		data.x = x;
-		data.y = y;
-		data.glyph = glyph;
-		SendMessage( GetNHApp()->windowlist[wid].win, 
-		         WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_PRINT_GLYPH, (LPARAM)&data );
-	}
+        ZeroMemory(&data, sizeof(data));
+        data.x = x;
+        data.y = y;
+        data.glyph = glyph;
+        SendMessage(GetNHApp()->windowlist[wid].win, WM_MSNH_COMMAND,
+                    (WPARAM) MSNH_MSG_PRINT_GLYPH, (LPARAM) &data);
+    }
 }
 
 /*
@@ -1295,17 +1290,20 @@ raw_print(str)  -- Print directly to a screen, or otherwise guarantee that
                    for error messages, and maybe other "msg" uses.  E.g.
                    updating status for micros (i.e, "saving").
 */
-void mswin_raw_print(const char *str)
+void
+mswin_raw_print(const char *str)
 {
-	TCHAR wbuf[255];
+    TCHAR wbuf[255];
     logDebug("mswin_raw_print(%s)\n", str);
-	if( str && *str ) {
-	    extern int redirect_stdout;
-	    if (!redirect_stdout)
-		NHMessageBox(GetNHApp()->hMainWnd, NH_A2W(str, wbuf, sizeof(wbuf)), MB_ICONINFORMATION | MB_OK );
-	    else
-	    	fprintf(stdout,"%s",str);
-	}
+    if (str && *str) {
+        extern int redirect_stdout;
+        if (!redirect_stdout)
+            NHMessageBox(GetNHApp()->hMainWnd,
+                         NH_A2W(str, wbuf, sizeof(wbuf)),
+                         MB_ICONINFORMATION | MB_OK);
+        else
+            fprintf(stdout, "%s", str);
+    }
 }
 
 /*
@@ -1313,12 +1311,14 @@ raw_print_bold(str)
                 -- Like raw_print(), but prints in bold/standout (if
 possible).
 */
-void mswin_raw_print_bold(const char *str)
+void
+mswin_raw_print_bold(const char *str)
 {
-	TCHAR wbuf[255];
+    TCHAR wbuf[255];
     logDebug("mswin_raw_print_bold(%s)\n", str);
-	if( str && *str )
-		NHMessageBox(GetNHApp()->hMainWnd, NH_A2W(str, wbuf, sizeof(wbuf)), MB_ICONINFORMATION | MB_OK );
+    if (str && *str)
+        NHMessageBox(GetNHApp()->hMainWnd, NH_A2W(str, wbuf, sizeof(wbuf)),
+                     MB_ICONINFORMATION | MB_OK);
 }
 
 /*
@@ -1327,19 +1327,18 @@ int nhgetch()   -- Returns a single character input from the user.
                    will be the routine the OS provides to read a character.
                    Returned character _must_ be non-zero.
 */
-int mswin_nhgetch()
+int
+mswin_nhgetch()
 {
-	PMSNHEvent event;
+    PMSNHEvent event;
     int key = 0;
 
-	logDebug("mswin_nhgetch()\n");
-	
+    logDebug("mswin_nhgetch()\n");
 
-	while( (event = mswin_input_pop()) == NULL ||
-		   event->type != NHEVENT_CHAR ) 
-		mswin_main_loop();
+    while ((event = mswin_input_pop()) == NULL || event->type != NHEVENT_CHAR)
+        mswin_main_loop();
 
-	key = event->kbd.ch;
+    key = event->kbd.ch;
     return (key);
 }
 
@@ -1351,40 +1350,44 @@ int nh_poskey(int *x, int *y, int *mod)
                    a position in the MAP window is returned in x, y and mod.
                    mod may be one of
 
-                        CLICK_1         -- mouse click type 1 
-                        CLICK_2         -- mouse click type 2 
+                        CLICK_1         -- mouse click type 1
+                        CLICK_2         -- mouse click type 2
 
                    The different click types can map to whatever the
                    hardware supports.  If no mouse is supported, this
                    routine always returns a non-zero character.
 */
-int mswin_nh_poskey(int *x, int *y, int *mod)
+int
+mswin_nh_poskey(int *x, int *y, int *mod)
 {
-	PMSNHEvent event;
-  	int key;
+    PMSNHEvent event;
+    int key;
 
-	logDebug("mswin_nh_poskey()\n");
+    logDebug("mswin_nh_poskey()\n");
 
-	while( (event = mswin_input_pop())==NULL ) mswin_main_loop();
+    while ((event = mswin_input_pop()) == NULL)
+        mswin_main_loop();
 
-	if( event->type==NHEVENT_MOUSE ) {
-		*mod = event->ms.mod;
-		*x = event->ms.x;
-		*y = event->ms.y;
-		key = 0;
-	} else {
-		key = event->kbd.ch;
-	}
-	return (key);
+    if (event->type == NHEVENT_MOUSE) {
+        *mod = event->ms.mod;
+        *x = event->ms.x;
+        *y = event->ms.y;
+        key = 0;
+    } else {
+        key = event->kbd.ch;
+    }
+    return (key);
 }
 
 /*
 nhbell()        -- Beep at user.  [This will exist at least until sounds are
-                   redone, since sounds aren't attributable to windows anyway.]
+                   redone, since sounds aren't attributable to windows
+anyway.]
 */
-void mswin_nhbell()
+void
+mswin_nhbell()
 {
-	logDebug("mswin_nhbell()\n");
+    logDebug("mswin_nhbell()\n");
 }
 
 /*
@@ -1392,10 +1395,12 @@ doprev_message()
                 -- Display previous messages.  Used by the ^P command.
                 -- On the tty-port this scrolls WIN_MESSAGE back one line.
 */
-int mswin_doprev_message()
+int
+mswin_doprev_message()
 {
     logDebug("mswin_doprev_message()\n");
-	SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), WM_VSCROLL, MAKEWPARAM(SB_LINEUP, 0), (LPARAM)NULL); 
+    SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), WM_VSCROLL,
+                MAKEWPARAM(SB_LINEUP, 0), (LPARAM) NULL);
     return 0;
 }
 
@@ -1418,598 +1423,625 @@ char yn_function(const char *ques, const char *choices, char default)
                 -- This uses the top line in the tty window-port, other
                    ports might use a popup.
 */
-char mswin_yn_function(const char *question, const char *choices,
-		CHAR_P def)
+char
+mswin_yn_function(const char *question, const char *choices, CHAR_P def)
 {
     char ch;
-    char yn_esc_map='\033';
+    char yn_esc_map = '\033';
     char message[BUFSZ];
-	char res_ch[2];
+    char res_ch[2];
     int createcaret;
-	boolean digit_ok, allow_num;
+    boolean digit_ok, allow_num;
 
-	logDebug("mswin_yn_function(%s, %s, %d)\n", question, choices, def);
+    logDebug("mswin_yn_function(%s, %s, %d)\n", question, choices, def);
 
     if (WIN_MESSAGE == WIN_ERR && choices == ynchars) {
-        char *text = realloc(strdup(GetNHApp()->saved_text), strlen(question)
-			+ strlen(GetNHApp()->saved_text) + 1);
+        char *text =
+            realloc(strdup(GetNHApp()->saved_text),
+                    strlen(question) + strlen(GetNHApp()->saved_text) + 1);
         DWORD box_result;
         strcat(text, question);
-        box_result = NHMessageBox(NULL,
-             NH_W2A(text, message, sizeof(message)),
-             MB_ICONQUESTION | MB_YESNOCANCEL |
-             ((def == 'y') ? MB_DEFBUTTON1 :
-              (def == 'n') ? MB_DEFBUTTON2 : MB_DEFBUTTON3));
+        box_result =
+            NHMessageBox(NULL, NH_W2A(text, message, sizeof(message)),
+                         MB_ICONQUESTION | MB_YESNOCANCEL
+                             | ((def == 'y') ? MB_DEFBUTTON1
+                                             : (def == 'n') ? MB_DEFBUTTON2
+                                                            : MB_DEFBUTTON3));
         free(text);
-		GetNHApp()->saved_text = strdup("");
+        GetNHApp()->saved_text = strdup("");
         return box_result == IDYES ? 'y' : box_result == IDNO ? 'n' : '\033';
     }
 
     if (choices) {
-		char *cb, choicebuf[QBUFSZ];
+        char *cb, choicebuf[QBUFSZ];
 
-		allow_num = (index(choices, '#') != 0);
+        allow_num = (index(choices, '#') != 0);
 
-		Strcpy(choicebuf, choices);
-		if ((cb = index(choicebuf, '\033')) != 0) {
-			/* anything beyond <esc> is hidden */
-			*cb = '\0';
-		}
-		(void)strncpy(message, question, QBUFSZ-1);
-		message[QBUFSZ-1] = '\0';
-		sprintf(eos(message), " [%s]", choicebuf);
-		if (def) sprintf(eos(message), " (%c)", def);
-		Strcat(message, " ");
-		/* escape maps to 'q' or 'n' or default, in that order */
-		yn_esc_map = (index(choices, 'q') ? 'q' :
-			(index(choices, 'n') ? 'n' : def));
+        Strcpy(choicebuf, choices);
+        if ((cb = index(choicebuf, '\033')) != 0) {
+            /* anything beyond <esc> is hidden */
+            *cb = '\0';
+        }
+        (void) strncpy(message, question, QBUFSZ - 1);
+        message[QBUFSZ - 1] = '\0';
+        sprintf(eos(message), " [%s]", choicebuf);
+        if (def)
+            sprintf(eos(message), " (%c)", def);
+        Strcat(message, " ");
+        /* escape maps to 'q' or 'n' or default, in that order */
+        yn_esc_map =
+            (index(choices, 'q') ? 'q' : (index(choices, 'n') ? 'n' : def));
     } else {
-		Strcpy(message, question);
-		Strcat(message, " ");
+        Strcpy(message, question);
+        Strcat(message, " ");
     }
 
     createcaret = 1;
-    SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), 
-        WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_CARET, (LPARAM)&createcaret );
+    SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), WM_MSNH_COMMAND,
+                (WPARAM) MSNH_MSG_CARET, (LPARAM) &createcaret);
 
     mswin_clear_nhwindow(WIN_MESSAGE);
     mswin_putstr(WIN_MESSAGE, ATR_BOLD, message);
 
     /* Only here if main window is not present */
-	ch = 0;
+    ch = 0;
     do {
-		ShowCaret(mswin_hwnd_from_winid(WIN_MESSAGE));
-		ch=mswin_nhgetch();
-		HideCaret(mswin_hwnd_from_winid(WIN_MESSAGE));
-		if (choices) ch = lowc(ch);
-		else break; /* If choices is NULL, all possible inputs are accepted and returned. */
+        ShowCaret(mswin_hwnd_from_winid(WIN_MESSAGE));
+        ch = mswin_nhgetch();
+        HideCaret(mswin_hwnd_from_winid(WIN_MESSAGE));
+        if (choices)
+            ch = lowc(ch);
+        else
+            break; /* If choices is NULL, all possible inputs are accepted and
+                      returned. */
 
-		digit_ok = allow_num && digit(ch);
-		if (ch=='\033') {
-			if (index(choices, 'q'))
-				ch = 'q';
-			else if (index(choices, 'n'))
-				ch = 'n';
-			else
-				ch = def;
-			break;
-	    } else if (index(quitchars, ch)) {
-			ch = def;
-			break;
-		} else if (!index(choices, ch) && !digit_ok) {
-			mswin_nhbell();
-			ch = (char)0;
-			/* and try again... */
-		} else if (ch == '#' || digit_ok) {
-			char z, digit_string[2];
-			int n_len = 0;
-			long value = 0;
-			mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, ("#"), 1); n_len++;
-			digit_string[1] = '\0';
-			if (ch != '#') {
-				digit_string[0] = ch;
-				mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, digit_string, 1); n_len++;
-				value = ch - '0';
-				ch = '#';
-			}
-			do {	/* loop until we get a non-digit */
-				z = lowc(readchar());
-				if (digit(z)) {
-					value = (10 * value) + (z - '0');
-					if (value < 0) break;	/* overflow: try again */
-					digit_string[0] = z;
-					mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, digit_string, 1);
-					n_len++;
-				} else if (z == 'y' || index(quitchars, z)) {
-					if (z == '\033')  value = -1;	/* abort */
-					z = '\n';	/* break */
-				} else if (z == '\b') {
-					if (n_len <= 1) { value = -1;  break; }
-					else { value /= 10;  mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, digit_string, -1);  n_len--; }
-				} else {
-					value = -1;	/* abort */
-					mswin_nhbell();
-					break;
-				}
-			} while (z != '\n');
-			if (value > 0) yn_number = value;
-			else if (value == 0) ch = 'n';		/* 0 => "no" */
-			else {	/* remove number from top line, then try again */
-				mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, digit_string, -n_len); n_len = 0;
-				ch = (char)0;
-			}
-		}
-	} while( !ch );
+        digit_ok = allow_num && digit(ch);
+        if (ch == '\033') {
+            if (index(choices, 'q'))
+                ch = 'q';
+            else if (index(choices, 'n'))
+                ch = 'n';
+            else
+                ch = def;
+            break;
+        } else if (index(quitchars, ch)) {
+            ch = def;
+            break;
+        } else if (!index(choices, ch) && !digit_ok) {
+            mswin_nhbell();
+            ch = (char) 0;
+            /* and try again... */
+        } else if (ch == '#' || digit_ok) {
+            char z, digit_string[2];
+            int n_len = 0;
+            long value = 0;
+            mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, ("#"), 1);
+            n_len++;
+            digit_string[1] = '\0';
+            if (ch != '#') {
+                digit_string[0] = ch;
+                mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, digit_string, 1);
+                n_len++;
+                value = ch - '0';
+                ch = '#';
+            }
+            do { /* loop until we get a non-digit */
+                z = lowc(readchar());
+                if (digit(z)) {
+                    value = (10 * value) + (z - '0');
+                    if (value < 0)
+                        break; /* overflow: try again */
+                    digit_string[0] = z;
+                    mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, digit_string, 1);
+                    n_len++;
+                } else if (z == 'y' || index(quitchars, z)) {
+                    if (z == '\033')
+                        value = -1; /* abort */
+                    z = '\n';       /* break */
+                } else if (z == '\b') {
+                    if (n_len <= 1) {
+                        value = -1;
+                        break;
+                    } else {
+                        value /= 10;
+                        mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, digit_string,
+                                        -1);
+                        n_len--;
+                    }
+                } else {
+                    value = -1; /* abort */
+                    mswin_nhbell();
+                    break;
+                }
+            } while (z != '\n');
+            if (value > 0)
+                yn_number = value;
+            else if (value == 0)
+                ch = 'n'; /* 0 => "no" */
+            else {        /* remove number from top line, then try again */
+                mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, digit_string, -n_len);
+                n_len = 0;
+                ch = (char) 0;
+            }
+        }
+    } while (!ch);
 
     createcaret = 0;
-    SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), 
-        WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_CARET, (LPARAM)&createcaret );
+    SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), WM_MSNH_COMMAND,
+                (WPARAM) MSNH_MSG_CARET, (LPARAM) &createcaret);
 
-	/* display selection in the message window */
-	if( isprint(ch) && ch!='#' ) {
-		res_ch[0] = ch;
-		res_ch[1] = '\x0';
-		mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, res_ch, 1);
-	}
+    /* display selection in the message window */
+    if (isprint(ch) && ch != '#') {
+        res_ch[0] = ch;
+        res_ch[1] = '\x0';
+        mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, res_ch, 1);
+    }
 
     return ch;
 }
 
 /*
 getlin(const char *ques, char *input)
-	    -- Prints ques as a prompt and reads a single line of text,
-	       up to a newline.  The string entered is returned without the
-	       newline.  ESC is used to cancel, in which case the string
-	       "\033\000" is returned.
-	    -- getlin() must call flush_screen(1) before doing anything.
-	    -- This uses the top line in the tty window-port, other
-	       ports might use a popup.
+            -- Prints ques as a prompt and reads a single line of text,
+               up to a newline.  The string entered is returned without the
+               newline.  ESC is used to cancel, in which case the string
+               "\033\000" is returned.
+            -- getlin() must call flush_screen(1) before doing anything.
+            -- This uses the top line in the tty window-port, other
+               ports might use a popup.
 */
-void mswin_getlin(const char *question, char *input)
+void
+mswin_getlin(const char *question, char *input)
 {
+    logDebug("mswin_getlin(%s, %p)\n", question, input);
 
-	logDebug("mswin_getlin(%s, %p)\n", question, input);
-
-    if (!iflags.wc_popup_dialog)
-    {
+    if (!iflags.wc_popup_dialog) {
         char c;
         int len;
         int done;
         int createcaret;
 
         createcaret = 1;
-        SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), 
-            WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_CARET, (LPARAM)&createcaret );
+        SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), WM_MSNH_COMMAND,
+                    (WPARAM) MSNH_MSG_CARET, (LPARAM) &createcaret);
 
- mswin_clear_nhwindow(WIN_MESSAGE);
+        mswin_clear_nhwindow(WIN_MESSAGE);
         mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, question, 0);
         mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, " ", 1);
         input[0] = '\0';
         len = 0;
         ShowCaret(mswin_hwnd_from_winid(WIN_MESSAGE));
         done = FALSE;
-        while (!done)
-        {
+        while (!done) {
             c = mswin_nhgetch();
-            switch (c)
-            {
-                case VK_ESCAPE:
-                    strcpy(input, "\033");
-                    done = TRUE;
-                    break;
-                case '\n':
-                case '\r':
-                case -115:
-                    done = TRUE;
-                    break;
-                default:
-                    if (input[0])
-                        mswin_putstr_ex(WIN_MESSAGE, ATR_NONE, input, -len);
-                    if (c == VK_BACK) {
-                        if (len > 0) len--;
-                        input[len] = '\0';
-                    } else {
-
-                        input[len++] = c;
-                        input[len] = '\0';
-                    }
-                    mswin_putstr_ex(WIN_MESSAGE, ATR_NONE, input, 1);
-                    break;
+            switch (c) {
+            case VK_ESCAPE:
+                strcpy(input, "\033");
+                done = TRUE;
+                break;
+            case '\n':
+            case '\r':
+            case -115:
+                done = TRUE;
+                break;
+            default:
+                if (input[0])
+                    mswin_putstr_ex(WIN_MESSAGE, ATR_NONE, input, -len);
+                if (c == VK_BACK) {
+                    if (len > 0)
+                        len--;
+                    input[len] = '\0';
+                } else {
+                    input[len++] = c;
+                    input[len] = '\0';
+                }
+                mswin_putstr_ex(WIN_MESSAGE, ATR_NONE, input, 1);
+                break;
             }
         }
         HideCaret(mswin_hwnd_from_winid(WIN_MESSAGE));
         createcaret = 0;
-        SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), 
-            WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_CARET, (LPARAM)&createcaret );
-    }
-    else
-    {
-	    if( mswin_getlin_window(question, input, BUFSZ)==IDCANCEL ) {
-		    strcpy(input, "\033");
-	    }
+        SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), WM_MSNH_COMMAND,
+                    (WPARAM) MSNH_MSG_CARET, (LPARAM) &createcaret);
+    } else {
+        if (mswin_getlin_window(question, input, BUFSZ) == IDCANCEL) {
+            strcpy(input, "\033");
+        }
     }
 }
 
 /*
 int get_ext_cmd(void)
-	    -- Get an extended command in a window-port specific way.
-	       An index into extcmdlist[] is returned on a successful
-	       selection, -1 otherwise.
+            -- Get an extended command in a window-port specific way.
+               An index into extcmdlist[] is returned on a successful
+               selection, -1 otherwise.
 */
-int mswin_get_ext_cmd()
+int
+mswin_get_ext_cmd()
 {
-	int ret;
-	logDebug("mswin_get_ext_cmd()\n");
+    int ret;
+    logDebug("mswin_get_ext_cmd()\n");
 
-    if (!iflags.wc_popup_dialog)
-    {
+    if (!iflags.wc_popup_dialog) {
         char c;
         char cmd[BUFSZ];
         int i, len;
         int createcaret;
 
         createcaret = 1;
-        SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), 
-            WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_CARET, (LPARAM)&createcaret );
+        SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), WM_MSNH_COMMAND,
+                    (WPARAM) MSNH_MSG_CARET, (LPARAM) &createcaret);
 
         cmd[0] = '\0';
         i = -2;
- mswin_clear_nhwindow(WIN_MESSAGE);
+        mswin_clear_nhwindow(WIN_MESSAGE);
         mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, "#", 0);
         len = 0;
         ShowCaret(mswin_hwnd_from_winid(WIN_MESSAGE));
-        while (i == -2)
-        {
+        while (i == -2) {
             int oindex, com_index;
             c = mswin_nhgetch();
-            switch (c)
-            {
-                case VK_ESCAPE:
+            switch (c) {
+            case VK_ESCAPE:
+                i = -1;
+                break;
+            case '\n':
+            case '\r':
+            case -115:
+                for (i = 0; extcmdlist[i].ef_txt != (char *) 0; i++)
+                    if (!strcmpi(cmd, extcmdlist[i].ef_txt))
+                        break;
+
+                if (extcmdlist[i].ef_txt == (char *) 0) {
+                    pline("%s: unknown extended command.", cmd);
                     i = -1;
-                    break;
-                case '\n':
-                case '\r':
-                case -115:
-                    for (i = 0; extcmdlist[i].ef_txt != (char *)0; i++)
-                        if (!strcmpi(cmd, extcmdlist[i].ef_txt)) break;
-
-                    if (extcmdlist[i].ef_txt == (char *)0) {
-                        pline("%s: unknown extended command.", cmd);
-                        i = -1;
+                }
+                break;
+            default:
+                if (cmd[0])
+                    mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, cmd,
+                                    -(int) strlen(cmd));
+                if (c == VK_BACK) {
+                    if (len > 0)
+                        len--;
+                    cmd[len] = '\0';
+                } else {
+                    cmd[len++] = c;
+                    cmd[len] = '\0';
+                    /* Find a command with this prefix in extcmdlist */
+                    com_index = -1;
+                    for (oindex = 0; extcmdlist[oindex].ef_txt != (char *) 0;
+                         oindex++) {
+                        if (!strncmpi(cmd, extcmdlist[oindex].ef_txt, len)) {
+                            if (com_index == -1) /* no matches yet */
+                                com_index = oindex;
+                            else
+                                com_index =
+                                    -2; /* two matches, don't complete */
+                        }
                     }
-                    break;
-                default:
-                    if (cmd[0])
-                        mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, cmd, -(int)strlen(cmd));
-                    if (c == VK_BACK)
-                    {
-                        if (len > 0) len--;
-                        cmd[len] = '\0';
+                    if (com_index >= 0) {
+                        Strcpy(cmd, extcmdlist[com_index].ef_txt);
                     }
-                    else
-                    {
-
-                        cmd[len++] = c;
-                        cmd[len] = '\0';
-                        /* Find a command with this prefix in extcmdlist */
-	                    com_index = -1;
-	                    for (oindex = 0; extcmdlist[oindex].ef_txt != (char *)0; oindex++) {
-		                    if (!strncmpi(cmd, extcmdlist[oindex].ef_txt, len)) {
-			                    if (com_index == -1)	/* no matches yet */
-			                        com_index = oindex;
-                                else
-                                    com_index = -2;     /* two matches, don't complete */
-		                    }
-	                    }
-	                    if (com_index >= 0) {
-		                    Strcpy(cmd, extcmdlist[com_index].ef_txt);
-	                    }
-                    }
-                    mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, cmd, 1);
-                    break;
+                }
+                mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, cmd, 1);
+                break;
             }
         }
         HideCaret(mswin_hwnd_from_winid(WIN_MESSAGE));
         createcaret = 0;
-        SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), 
-            WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_CARET, (LPARAM)&createcaret );
-	    return i;
-    }
-    else
-    {
-    	if(mswin_ext_cmd_window (&ret) == IDCANCEL)
-	    	return -1;
-	    else 
-		    return ret;
+        SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), WM_MSNH_COMMAND,
+                    (WPARAM) MSNH_MSG_CARET, (LPARAM) &createcaret);
+        return i;
+    } else {
+        if (mswin_ext_cmd_window(&ret) == IDCANCEL)
+            return -1;
+        else
+            return ret;
     }
 }
 
-
 /*
 number_pad(state)
-	    -- Initialize the number pad to the given state.
+            -- Initialize the number pad to the given state.
 */
-void mswin_number_pad(int state)
+void
+mswin_number_pad(int state)
 {
     /* Do Nothing */
-	logDebug("mswin_number_pad(%d)\n", state);
+    logDebug("mswin_number_pad(%d)\n", state);
 }
 
 /*
 delay_output()  -- Causes a visible delay of 50ms in the output.
-	       Conceptually, this is similar to wait_synch() followed
-	       by a nap(50ms), but allows asynchronous operation.
+               Conceptually, this is similar to wait_synch() followed
+               by a nap(50ms), but allows asynchronous operation.
 */
-void mswin_delay_output()
+void
+mswin_delay_output()
 {
-	logDebug("mswin_delay_output()\n");
-	Sleep(50);
+    logDebug("mswin_delay_output()\n");
+    Sleep(50);
 }
 
-void mswin_change_color() 
-{ 
-	logDebug("mswin_change_color()\n"); 
+void
+mswin_change_color()
+{
+    logDebug("mswin_change_color()\n");
 }
 
-char *mswin_get_color_string() 
-{ 
-	logDebug("mswin_get_color_string()\n");
-	return( "" ); 
+char *
+mswin_get_color_string()
+{
+    logDebug("mswin_get_color_string()\n");
+    return ("");
 }
 
 /*
 start_screen()  -- Only used on Unix tty ports, but must be declared for
-	       completeness.  Sets up the tty to work in full-screen
-	       graphics mode.  Look at win/tty/termcap.c for an
-	       example.  If your window-port does not need this function
-	       just declare an empty function.
+               completeness.  Sets up the tty to work in full-screen
+               graphics mode.  Look at win/tty/termcap.c for an
+               example.  If your window-port does not need this function
+               just declare an empty function.
 */
-void mswin_start_screen()
+void
+mswin_start_screen()
 {
     /* Do Nothing */
-	logDebug("mswin_start_screen()\n");
+    logDebug("mswin_start_screen()\n");
 }
 
 /*
 end_screen()    -- Only used on Unix tty ports, but must be declared for
-	       completeness.  The complement of start_screen().
+               completeness.  The complement of start_screen().
 */
-void mswin_end_screen()
+void
+mswin_end_screen()
 {
     /* Do Nothing */
-	logDebug("mswin_end_screen()\n");
+    logDebug("mswin_end_screen()\n");
 }
 
 /*
 outrip(winid, int, when)
-	    -- The tombstone code.  If you want the traditional code use
-	       genl_outrip for the value and check the #if in rip.c.
+            -- The tombstone code.  If you want the traditional code use
+               genl_outrip for the value and check the #if in rip.c.
 */
-#define STONE_LINE_LEN	16
-void mswin_outrip(winid wid, int how, time_t when)
+#define STONE_LINE_LEN 16
+void
+mswin_outrip(winid wid, int how, time_t when)
 {
-	char buf[BUFSZ];
-	long year;
+    char buf[BUFSZ];
+    long year;
 
-   	logDebug("mswin_outrip(%d, %d, %ld)\n", wid, how, (long)when);
-    if ((wid >= 0) && (wid < MAXWINDOWS) ) {
-		DestroyWindow(GetNHApp()->windowlist[wid].win);
-		GetNHApp()->windowlist[wid].win = mswin_init_RIP_window();
-		GetNHApp()->windowlist[wid].type = NHW_RIP;
-		GetNHApp()->windowlist[wid].dead = 0;
-	}
+    logDebug("mswin_outrip(%d, %d, %ld)\n", wid, how, (long) when);
+    if ((wid >= 0) && (wid < MAXWINDOWS)) {
+        DestroyWindow(GetNHApp()->windowlist[wid].win);
+        GetNHApp()->windowlist[wid].win = mswin_init_RIP_window();
+        GetNHApp()->windowlist[wid].type = NHW_RIP;
+        GetNHApp()->windowlist[wid].dead = 0;
+    }
 
-	/* Put name on stone */
-	Sprintf(buf, "%s", plname);
-	buf[STONE_LINE_LEN] = 0;
-	putstr(wid, 0, buf);
+    /* Put name on stone */
+    Sprintf(buf, "%s", plname);
+    buf[STONE_LINE_LEN] = 0;
+    putstr(wid, 0, buf);
 
-	/* Put $ on stone */
-	Sprintf(buf, "%ld Au", done_money);
-	buf[STONE_LINE_LEN] = 0; /* It could be a *lot* of gold :-) */
-	putstr(wid, 0, buf);
+    /* Put $ on stone */
+    Sprintf(buf, "%ld Au", done_money);
+    buf[STONE_LINE_LEN] = 0; /* It could be a *lot* of gold :-) */
+    putstr(wid, 0, buf);
 
-	/* Put together death description */
-	formatkiller(buf, sizeof buf, how);
+    /* Put together death description */
+    formatkiller(buf, sizeof buf, how);
 
-	/* Put death type on stone */
-	putstr(wid, 0, buf);
+    /* Put death type on stone */
+    putstr(wid, 0, buf);
 
-	/* Put year on stone */
-	year = yyyymmdd(when) / 10000L;
-	Sprintf(buf, "%4ld", year);
-	putstr(wid, 0, buf);
-	mswin_finish_rip_text(wid);
+    /* Put year on stone */
+    year = yyyymmdd(when) / 10000L;
+    Sprintf(buf, "%4ld", year);
+    putstr(wid, 0, buf);
+    mswin_finish_rip_text(wid);
 }
 
 /* handle options updates here */
-void mswin_preference_update(const char *pref)
+void
+mswin_preference_update(const char *pref)
 {
-	HDC hdc;
-	int i;
-	
-	if( stricmp( pref, "font_menu")==0 ||
-		stricmp( pref, "font_size_menu")==0 ) {
-		if( iflags.wc_fontsiz_menu<NHFONT_SIZE_MIN || 
-			iflags.wc_fontsiz_menu>NHFONT_SIZE_MAX )
-			iflags.wc_fontsiz_menu = NHFONT_DEFAULT_SIZE;
+    HDC hdc;
+    int i;
 
-		hdc = GetDC(GetNHApp()->hMainWnd);
-		mswin_get_font(NHW_MENU, ATR_NONE, hdc, TRUE);
-		mswin_get_font(NHW_MENU, ATR_BOLD, hdc, TRUE);
-		mswin_get_font(NHW_MENU, ATR_DIM, hdc, TRUE);
-		mswin_get_font(NHW_MENU, ATR_ULINE, hdc, TRUE);
-		mswin_get_font(NHW_MENU, ATR_BLINK, hdc, TRUE);
-		mswin_get_font(NHW_MENU, ATR_INVERSE, hdc, TRUE);
-		ReleaseDC(GetNHApp()->hMainWnd, hdc);
+    if (stricmp(pref, "font_menu") == 0
+        || stricmp(pref, "font_size_menu") == 0) {
+        if (iflags.wc_fontsiz_menu < NHFONT_SIZE_MIN
+            || iflags.wc_fontsiz_menu > NHFONT_SIZE_MAX)
+            iflags.wc_fontsiz_menu = NHFONT_DEFAULT_SIZE;
 
-		mswin_layout_main_window(NULL);
-		return;
-	}
+        hdc = GetDC(GetNHApp()->hMainWnd);
+        mswin_get_font(NHW_MENU, ATR_NONE, hdc, TRUE);
+        mswin_get_font(NHW_MENU, ATR_BOLD, hdc, TRUE);
+        mswin_get_font(NHW_MENU, ATR_DIM, hdc, TRUE);
+        mswin_get_font(NHW_MENU, ATR_ULINE, hdc, TRUE);
+        mswin_get_font(NHW_MENU, ATR_BLINK, hdc, TRUE);
+        mswin_get_font(NHW_MENU, ATR_INVERSE, hdc, TRUE);
+        ReleaseDC(GetNHApp()->hMainWnd, hdc);
 
-	if( stricmp( pref, "font_status")==0 ||
-		stricmp( pref, "font_size_status")==0 ) {
+        mswin_layout_main_window(NULL);
+        return;
+    }
 
-		if( iflags.wc_fontsiz_status<NHFONT_SIZE_MIN || 
-			iflags.wc_fontsiz_status>NHFONT_SIZE_MAX )
-			iflags.wc_fontsiz_status = NHFONT_DEFAULT_SIZE;
+    if (stricmp(pref, "font_status") == 0
+        || stricmp(pref, "font_size_status") == 0) {
+        if (iflags.wc_fontsiz_status < NHFONT_SIZE_MIN
+            || iflags.wc_fontsiz_status > NHFONT_SIZE_MAX)
+            iflags.wc_fontsiz_status = NHFONT_DEFAULT_SIZE;
 
-		hdc = GetDC(GetNHApp()->hMainWnd);
-		mswin_get_font(NHW_STATUS, ATR_NONE, hdc, TRUE);
-		mswin_get_font(NHW_STATUS, ATR_BOLD, hdc, TRUE);
-		mswin_get_font(NHW_STATUS, ATR_DIM, hdc, TRUE);
-		mswin_get_font(NHW_STATUS, ATR_ULINE, hdc, TRUE);
-		mswin_get_font(NHW_STATUS, ATR_BLINK, hdc, TRUE);
-		mswin_get_font(NHW_STATUS, ATR_INVERSE, hdc, TRUE);
-		ReleaseDC(GetNHApp()->hMainWnd, hdc);
+        hdc = GetDC(GetNHApp()->hMainWnd);
+        mswin_get_font(NHW_STATUS, ATR_NONE, hdc, TRUE);
+        mswin_get_font(NHW_STATUS, ATR_BOLD, hdc, TRUE);
+        mswin_get_font(NHW_STATUS, ATR_DIM, hdc, TRUE);
+        mswin_get_font(NHW_STATUS, ATR_ULINE, hdc, TRUE);
+        mswin_get_font(NHW_STATUS, ATR_BLINK, hdc, TRUE);
+        mswin_get_font(NHW_STATUS, ATR_INVERSE, hdc, TRUE);
+        ReleaseDC(GetNHApp()->hMainWnd, hdc);
 
-		for (i=1; i<MAXWINDOWS; i++) {
-			if (GetNHApp()->windowlist[i].type == NHW_STATUS 
-		        && GetNHApp()->windowlist[i].win != NULL) {
-				InvalidateRect(GetNHApp()->windowlist[i].win, NULL, TRUE);
-			}
-		}
-		mswin_layout_main_window(NULL);
-		return;
-	}
+        for (i = 1; i < MAXWINDOWS; i++) {
+            if (GetNHApp()->windowlist[i].type == NHW_STATUS
+                && GetNHApp()->windowlist[i].win != NULL) {
+                InvalidateRect(GetNHApp()->windowlist[i].win, NULL, TRUE);
+            }
+        }
+        mswin_layout_main_window(NULL);
+        return;
+    }
 
-	if( stricmp( pref, "font_message")==0 ||
-		stricmp( pref, "font_size_message")==0 ) {
+    if (stricmp(pref, "font_message") == 0
+        || stricmp(pref, "font_size_message") == 0) {
+        if (iflags.wc_fontsiz_message < NHFONT_SIZE_MIN
+            || iflags.wc_fontsiz_message > NHFONT_SIZE_MAX)
+            iflags.wc_fontsiz_message = NHFONT_DEFAULT_SIZE;
 
-		if( iflags.wc_fontsiz_message<NHFONT_SIZE_MIN || 
-			iflags.wc_fontsiz_message>NHFONT_SIZE_MAX )
-			iflags.wc_fontsiz_message = NHFONT_DEFAULT_SIZE;
+        hdc = GetDC(GetNHApp()->hMainWnd);
+        mswin_get_font(NHW_MESSAGE, ATR_NONE, hdc, TRUE);
+        mswin_get_font(NHW_MESSAGE, ATR_BOLD, hdc, TRUE);
+        mswin_get_font(NHW_MESSAGE, ATR_DIM, hdc, TRUE);
+        mswin_get_font(NHW_MESSAGE, ATR_ULINE, hdc, TRUE);
+        mswin_get_font(NHW_MESSAGE, ATR_BLINK, hdc, TRUE);
+        mswin_get_font(NHW_MESSAGE, ATR_INVERSE, hdc, TRUE);
+        ReleaseDC(GetNHApp()->hMainWnd, hdc);
 
-		hdc = GetDC(GetNHApp()->hMainWnd);
-		mswin_get_font(NHW_MESSAGE, ATR_NONE, hdc, TRUE);
-		mswin_get_font(NHW_MESSAGE, ATR_BOLD, hdc, TRUE);
-		mswin_get_font(NHW_MESSAGE, ATR_DIM, hdc, TRUE);
-		mswin_get_font(NHW_MESSAGE, ATR_ULINE, hdc, TRUE);
-		mswin_get_font(NHW_MESSAGE, ATR_BLINK, hdc, TRUE);
-		mswin_get_font(NHW_MESSAGE, ATR_INVERSE, hdc, TRUE);
-		ReleaseDC(GetNHApp()->hMainWnd, hdc);
+        InvalidateRect(mswin_hwnd_from_winid(WIN_MESSAGE), NULL, TRUE);
+        mswin_layout_main_window(NULL);
+        return;
+    }
 
-		InvalidateRect(mswin_hwnd_from_winid(WIN_MESSAGE), NULL, TRUE);
-		mswin_layout_main_window(NULL);
-		return;
-	}
+    if (stricmp(pref, "font_text") == 0
+        || stricmp(pref, "font_size_text") == 0) {
+        if (iflags.wc_fontsiz_text < NHFONT_SIZE_MIN
+            || iflags.wc_fontsiz_text > NHFONT_SIZE_MAX)
+            iflags.wc_fontsiz_text = NHFONT_DEFAULT_SIZE;
 
-	if( stricmp( pref, "font_text")==0 ||
-		stricmp( pref, "font_size_text")==0 ) {
+        hdc = GetDC(GetNHApp()->hMainWnd);
+        mswin_get_font(NHW_TEXT, ATR_NONE, hdc, TRUE);
+        mswin_get_font(NHW_TEXT, ATR_BOLD, hdc, TRUE);
+        mswin_get_font(NHW_TEXT, ATR_DIM, hdc, TRUE);
+        mswin_get_font(NHW_TEXT, ATR_ULINE, hdc, TRUE);
+        mswin_get_font(NHW_TEXT, ATR_BLINK, hdc, TRUE);
+        mswin_get_font(NHW_TEXT, ATR_INVERSE, hdc, TRUE);
+        ReleaseDC(GetNHApp()->hMainWnd, hdc);
 
-		if( iflags.wc_fontsiz_text<NHFONT_SIZE_MIN || 
-			iflags.wc_fontsiz_text>NHFONT_SIZE_MAX )
-			iflags.wc_fontsiz_text = NHFONT_DEFAULT_SIZE;
+        mswin_layout_main_window(NULL);
+        return;
+    }
 
-		hdc = GetDC(GetNHApp()->hMainWnd);
-		mswin_get_font(NHW_TEXT, ATR_NONE, hdc, TRUE);
-		mswin_get_font(NHW_TEXT, ATR_BOLD, hdc, TRUE);
-		mswin_get_font(NHW_TEXT, ATR_DIM, hdc, TRUE);
-		mswin_get_font(NHW_TEXT, ATR_ULINE, hdc, TRUE);
-		mswin_get_font(NHW_TEXT, ATR_BLINK, hdc, TRUE);
-		mswin_get_font(NHW_TEXT, ATR_INVERSE, hdc, TRUE);
-		ReleaseDC(GetNHApp()->hMainWnd, hdc);
+    if (stricmp(pref, "scroll_amount") == 0) {
+        mswin_cliparound(u.ux, u.uy);
+        return;
+    }
 
-		mswin_layout_main_window(NULL);
-		return;
-	}
+    if (stricmp(pref, "scroll_margin") == 0) {
+        mswin_cliparound(u.ux, u.uy);
+        return;
+    }
 
-	if( stricmp( pref, "scroll_amount")==0 ) {
-		mswin_cliparound(u.ux, u.uy);
-		return;
-	}
+    if (stricmp(pref, "map_mode") == 0) {
+        mswin_select_map_mode(iflags.wc_map_mode);
+        return;
+    }
 
-	if( stricmp( pref, "scroll_margin")==0 ) {
-		mswin_cliparound(u.ux, u.uy);
-		return;
-	}
+    if (stricmp(pref, "hilite_pet") == 0) {
+        InvalidateRect(mswin_hwnd_from_winid(WIN_MAP), NULL, TRUE);
+        return;
+    }
 
-	if( stricmp( pref, "map_mode")==0 ) {
-		mswin_select_map_mode( iflags.wc_map_mode );
-		return;
-	}
+    if (stricmp(pref, "align_message") == 0
+        || stricmp(pref, "align_status") == 0) {
+        mswin_layout_main_window(NULL);
+        return;
+    }
 
-	if( stricmp( pref, "hilite_pet")==0 ) {
-		InvalidateRect(mswin_hwnd_from_winid(WIN_MAP), NULL, TRUE);
-		return;
-	}
-
-	if( stricmp( pref, "align_message")==0 ||
-		stricmp( pref, "align_status")==0 ) {
-		mswin_layout_main_window(NULL);
-		return;
-	}
-
-	if( stricmp( pref, "vary_msgcount")==0 ) {
-		InvalidateRect(mswin_hwnd_from_winid(WIN_MESSAGE), NULL, TRUE);
-		mswin_layout_main_window(NULL);
-		return;
-	}
-
+    if (stricmp(pref, "vary_msgcount") == 0) {
+        InvalidateRect(mswin_hwnd_from_winid(WIN_MESSAGE), NULL, TRUE);
+        mswin_layout_main_window(NULL);
+        return;
+    }
 }
 
 #define TEXT_BUFFER_SIZE 4096
-char *mswin_getmsghistory(BOOLEAN_P init)
+char *
+mswin_getmsghistory(BOOLEAN_P init)
 {
-	static PMSNHMsgGetText text = 0;
-	static char* next_message = 0;
+    static PMSNHMsgGetText text = 0;
+    static char *next_message = 0;
 
-	if( init ) {
-		text = (PMSNHMsgGetText)malloc(sizeof(MSNHMsgGetText) + TEXT_BUFFER_SIZE);
-		text->max_size = TEXT_BUFFER_SIZE-1;	/* make sure we always have 0 at the end of the buffer */
+    if (init) {
+        text = (PMSNHMsgGetText) malloc(sizeof(MSNHMsgGetText)
+                                        + TEXT_BUFFER_SIZE);
+        text->max_size =
+            TEXT_BUFFER_SIZE
+            - 1; /* make sure we always have 0 at the end of the buffer */
 
-		ZeroMemory(text->buffer, TEXT_BUFFER_SIZE);
-		SendMessage( mswin_hwnd_from_winid(WIN_MESSAGE), 
-					WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_GETTEXT, (LPARAM)text );
-	
-		next_message = text->buffer;
-	}
+        ZeroMemory(text->buffer, TEXT_BUFFER_SIZE);
+        SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), WM_MSNH_COMMAND,
+                    (WPARAM) MSNH_MSG_GETTEXT, (LPARAM) text);
 
-	if( !(next_message && next_message[0]) ) {
-		free(text);
-		next_message = 0;
-		return (char*)0;
-	} else {
-		char* retval = next_message;
-		char* p;
-		next_message = p = strchr(next_message, '\n');
-		if( next_message ) next_message++;
-		if( p )	while( p>=retval && isspace(*p) ) *p-- = (char)0; /* delete trailing whitespace */
-		return retval;
-	}
+        next_message = text->buffer;
+    }
+
+    if (!(next_message && next_message[0])) {
+        free(text);
+        next_message = 0;
+        return (char *) 0;
+    } else {
+        char *retval = next_message;
+        char *p;
+        next_message = p = strchr(next_message, '\n');
+        if (next_message)
+            next_message++;
+        if (p)
+            while (p >= retval && isspace(*p))
+                *p-- = (char) 0; /* delete trailing whitespace */
+        return retval;
+    }
 }
 
-void mswin_putmsghistory(const char * msg, BOOLEAN_P restoring)
+void
+mswin_putmsghistory(const char *msg, BOOLEAN_P restoring)
 {
-	BOOL save_sound_opt;
+    BOOL save_sound_opt;
 
-	UNREFERENCED_PARAMETER(restoring);
+    UNREFERENCED_PARAMETER(restoring);
 
-	if (!msg) return;	/* end of message history restore */
-	save_sound_opt = GetNHApp()->bNoSounds;
-	GetNHApp()->bNoSounds = TRUE;	/* disable sounds while restoring message history */
-	mswin_putstr_ex(WIN_MESSAGE, ATR_NONE, msg, 0);
-	clear_nhwindow(WIN_MESSAGE); /* it is in fact end-of-turn indication so each message will print on the new line */
-	GetNHApp()->bNoSounds = save_sound_opt; /* restore sounds option */
+    if (!msg)
+        return; /* end of message history restore */
+    save_sound_opt = GetNHApp()->bNoSounds;
+    GetNHApp()->bNoSounds =
+        TRUE; /* disable sounds while restoring message history */
+    mswin_putstr_ex(WIN_MESSAGE, ATR_NONE, msg, 0);
+    clear_nhwindow(WIN_MESSAGE); /* it is in fact end-of-turn indication so
+                                    each message will print on the new line */
+    GetNHApp()->bNoSounds = save_sound_opt; /* restore sounds option */
 }
 
-void mswin_main_loop()
+void
+mswin_main_loop()
 {
-	MSG msg;
+    MSG msg;
 
-	while( !mswin_have_input() &&
-		   GetMessage(&msg, NULL, 0, 0)!=0 ) {
- 		if (GetNHApp()->regNetHackMode ||
- 			!TranslateAccelerator(msg.hwnd, GetNHApp()->hAccelTable, &msg))
- 		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-	} 
+    while (!mswin_have_input() && GetMessage(&msg, NULL, 0, 0) != 0) {
+        if (GetNHApp()->regNetHackMode
+            || !TranslateAccelerator(msg.hwnd, GetNHApp()->hAccelTable,
+                                     &msg)) {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+    }
 }
 
 /* clean up and quit */
-void bail(const char *mesg)
+void
+bail(const char *mesg)
 {
     clearlocks();
     mswin_exit_nhwindows(mesg);
@@ -2017,145 +2049,142 @@ void bail(const char *mesg)
     /*NOTREACHED*/
 }
 
-BOOL initMapTiles(void)
+BOOL
+initMapTiles(void)
 {
-	HBITMAP hBmp;
-	BITMAP  bm;
-	TCHAR   wbuf[MAX_PATH];
-	int     tl_num;
-	SIZE    map_size;
-	extern int total_tiles_used;
+    HBITMAP hBmp;
+    BITMAP bm;
+    TCHAR wbuf[MAX_PATH];
+    int tl_num;
+    SIZE map_size;
+    extern int total_tiles_used;
 
-	/* no file - no tile */
-	if( !(iflags.wc_tile_file && *iflags.wc_tile_file) ) 
-		return TRUE;
+    /* no file - no tile */
+    if (!(iflags.wc_tile_file && *iflags.wc_tile_file))
+        return TRUE;
 
-	/* load bitmap */
-	hBmp = LoadImage(
-				GetNHApp()->hApp, 
-				NH_A2W(iflags.wc_tile_file, wbuf, MAX_PATH),
-				IMAGE_BITMAP,
-				0,
-				0,
-				LR_LOADFROMFILE | LR_DEFAULTSIZE 
-			);
-	if( hBmp==NULL ) {
-		raw_print("Cannot load tiles from the file. Reverting back to default.");
-		return FALSE;
-	}
+    /* load bitmap */
+    hBmp = LoadImage(GetNHApp()->hApp,
+                     NH_A2W(iflags.wc_tile_file, wbuf, MAX_PATH),
+                     IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_DEFAULTSIZE);
+    if (hBmp == NULL) {
+        raw_print(
+            "Cannot load tiles from the file. Reverting back to default.");
+        return FALSE;
+    }
 
-	/* calculate tile dimensions */
-	GetObject(hBmp, sizeof(BITMAP), (LPVOID)&bm);
-	if( bm.bmWidth%iflags.wc_tile_width ||
-		bm.bmHeight%iflags.wc_tile_height ) {
-		DeleteObject(hBmp);
-		raw_print("Tiles bitmap does not match tile_width and tile_height options. Reverting back to default.");
-		return FALSE;
-	}
+    /* calculate tile dimensions */
+    GetObject(hBmp, sizeof(BITMAP), (LPVOID) &bm);
+    if (bm.bmWidth % iflags.wc_tile_width
+        || bm.bmHeight % iflags.wc_tile_height) {
+        DeleteObject(hBmp);
+        raw_print("Tiles bitmap does not match tile_width and tile_height "
+                  "options. Reverting back to default.");
+        return FALSE;
+    }
 
-	tl_num = (bm.bmWidth/iflags.wc_tile_width)*
-		     (bm.bmHeight/iflags.wc_tile_height);
-	if( tl_num<total_tiles_used ) {
-		DeleteObject(hBmp);
-		raw_print("Number of tiles in the bitmap is less than required by the game. Reverting back to default.");
-		return FALSE;
-	}
+    tl_num = (bm.bmWidth / iflags.wc_tile_width)
+             * (bm.bmHeight / iflags.wc_tile_height);
+    if (tl_num < total_tiles_used) {
+        DeleteObject(hBmp);
+        raw_print("Number of tiles in the bitmap is less than required by "
+                  "the game. Reverting back to default.");
+        return FALSE;
+    }
 
-	/* set the tile information */
-	if( GetNHApp()->bmpMapTiles!=GetNHApp()->bmpTiles ) {
-		DeleteObject(GetNHApp()->bmpMapTiles);
-	}
+    /* set the tile information */
+    if (GetNHApp()->bmpMapTiles != GetNHApp()->bmpTiles) {
+        DeleteObject(GetNHApp()->bmpMapTiles);
+    }
 
-	GetNHApp()->bmpMapTiles = hBmp;
-	GetNHApp()->mapTile_X = iflags.wc_tile_width;
-	GetNHApp()->mapTile_Y = iflags.wc_tile_height;
-	GetNHApp()->mapTilesPerLine = bm.bmWidth / iflags.wc_tile_width;
+    GetNHApp()->bmpMapTiles = hBmp;
+    GetNHApp()->mapTile_X = iflags.wc_tile_width;
+    GetNHApp()->mapTile_Y = iflags.wc_tile_height;
+    GetNHApp()->mapTilesPerLine = bm.bmWidth / iflags.wc_tile_width;
 
-	map_size.cx = GetNHApp()->mapTile_X * COLNO;
-	map_size.cy = GetNHApp()->mapTile_Y * ROWNO;
-	mswin_map_stretch(
-		mswin_hwnd_from_winid(WIN_MAP),
-		&map_size,
-		TRUE 
-	);
-	return TRUE;
+    map_size.cx = GetNHApp()->mapTile_X * COLNO;
+    map_size.cy = GetNHApp()->mapTile_Y * ROWNO;
+    mswin_map_stretch(mswin_hwnd_from_winid(WIN_MAP), &map_size, TRUE);
+    return TRUE;
 }
 
-void mswin_popup_display(HWND hWnd, int* done_indicator)
+void
+mswin_popup_display(HWND hWnd, int *done_indicator)
 {
-	MSG msg;
-	HWND hChild;
-	HMENU hMenu;
-	int mi_count;
-	int i;
+    MSG msg;
+    HWND hChild;
+    HMENU hMenu;
+    int mi_count;
+    int i;
 
-	/* activate the menu window */
-	GetNHApp()->hPopupWnd = hWnd;
+    /* activate the menu window */
+    GetNHApp()->hPopupWnd = hWnd;
 
-	mswin_layout_main_window(hWnd);
+    mswin_layout_main_window(hWnd);
 
-	/* disable game windows */
-	for( hChild=GetWindow(GetNHApp()->hMainWnd, GW_CHILD);
-		 hChild;
-		 hChild = GetWindow(hChild, GW_HWNDNEXT) ) {
-		if( hChild!= hWnd) EnableWindow(hChild, FALSE);
-	}
+    /* disable game windows */
+    for (hChild = GetWindow(GetNHApp()->hMainWnd, GW_CHILD); hChild;
+         hChild = GetWindow(hChild, GW_HWNDNEXT)) {
+        if (hChild != hWnd)
+            EnableWindow(hChild, FALSE);
+    }
 
-	/* disable menu */
-	hMenu = GetMenu( GetNHApp()->hMainWnd );
-	mi_count = GetMenuItemCount( hMenu );
-	for( i=0; i<mi_count; i++ ) {
-		EnableMenuItem(hMenu, i, MF_BYPOSITION | MF_GRAYED);
-	}
-	DrawMenuBar( GetNHApp()->hMainWnd );
+    /* disable menu */
+    hMenu = GetMenu(GetNHApp()->hMainWnd);
+    mi_count = GetMenuItemCount(hMenu);
+    for (i = 0; i < mi_count; i++) {
+        EnableMenuItem(hMenu, i, MF_BYPOSITION | MF_GRAYED);
+    }
+    DrawMenuBar(GetNHApp()->hMainWnd);
 
-	/* bring menu window on top */
-	SetWindowPos(hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
-	SetFocus(hWnd);
+    /* bring menu window on top */
+    SetWindowPos(hWnd, HWND_TOP, 0, 0, 0, 0,
+                 SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+    SetFocus(hWnd);
 
-	/* go into message loop */
-	while( IsWindow(hWnd) && 
-		   (done_indicator==NULL || !*done_indicator) &&
-		   GetMessage(&msg, NULL, 0, 0)!=0 ) {
-		if( !IsDialogMessage(hWnd, &msg) ) {
-			if (!TranslateAccelerator(msg.hwnd, GetNHApp()->hAccelTable, &msg)) {
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-		}
-	}
+    /* go into message loop */
+    while (IsWindow(hWnd) && (done_indicator == NULL || !*done_indicator)
+           && GetMessage(&msg, NULL, 0, 0) != 0) {
+        if (!IsDialogMessage(hWnd, &msg)) {
+            if (!TranslateAccelerator(msg.hwnd, GetNHApp()->hAccelTable,
+                                      &msg)) {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+        }
+    }
 }
 
-void mswin_popup_destroy(HWND hWnd)
+void
+mswin_popup_destroy(HWND hWnd)
 {
-	HWND hChild;
-	HMENU hMenu;
-	int mi_count;
-	int i;
+    HWND hChild;
+    HMENU hMenu;
+    int mi_count;
+    int i;
 
-	/* enable game windows */
-	for( hChild=GetWindow(GetNHApp()->hMainWnd, GW_CHILD);
-		 hChild;
-		 hChild = GetWindow(hChild, GW_HWNDNEXT) ) {
-		if( hChild!= hWnd) {
-			EnableWindow(hChild, TRUE);
-		}
-	}
+    /* enable game windows */
+    for (hChild = GetWindow(GetNHApp()->hMainWnd, GW_CHILD); hChild;
+         hChild = GetWindow(hChild, GW_HWNDNEXT)) {
+        if (hChild != hWnd) {
+            EnableWindow(hChild, TRUE);
+        }
+    }
 
-	/* enable menu */
-	hMenu = GetMenu( GetNHApp()->hMainWnd );
-	mi_count = GetMenuItemCount( hMenu );
-	for( i=0; i<mi_count; i++ ) {
-		EnableMenuItem(hMenu, i, MF_BYPOSITION | MF_ENABLED);
-	}
-	DrawMenuBar( GetNHApp()->hMainWnd );
+    /* enable menu */
+    hMenu = GetMenu(GetNHApp()->hMainWnd);
+    mi_count = GetMenuItemCount(hMenu);
+    for (i = 0; i < mi_count; i++) {
+        EnableMenuItem(hMenu, i, MF_BYPOSITION | MF_ENABLED);
+    }
+    DrawMenuBar(GetNHApp()->hMainWnd);
 
-	ShowWindow(hWnd, SW_HIDE);
-	GetNHApp()->hPopupWnd = NULL;
+    ShowWindow(hWnd, SW_HIDE);
+    GetNHApp()->hPopupWnd = NULL;
 
-	mswin_layout_main_window(hWnd);
+    mswin_layout_main_window(hWnd);
 
-	SetFocus(GetNHApp()->hMainWnd );
+    SetFocus(GetNHApp()->hMainWnd);
 }
 
 #ifdef _DEBUG
@@ -2164,63 +2193,63 @@ void mswin_popup_destroy(HWND hWnd)
 void
 logDebug(const char *fmt, ...)
 {
-  FILE *dfp;
+    FILE *dfp;
 
-  if (!showdebug(NHTRACE_LOG)) return;
+    if (!showdebug(NHTRACE_LOG))
+        return;
 
-  dfp = fopen(NHTRACE_LOG, "a");
-  if (dfp) {
-     va_list args;
+    dfp = fopen(NHTRACE_LOG, "a");
+    if (dfp) {
+        va_list args;
 
-     va_start(args, fmt);
-     vfprintf(dfp, fmt, args);
-     va_end(args);
-     fclose(dfp);
-  }
+        va_start(args, fmt);
+        vfprintf(dfp, fmt, args);
+        va_end(args);
+        fclose(dfp);
+    }
 }
 
 #endif
 
-
 /* Reading and writing settings from the registry. */
-#define CATEGORYKEY         "Software"
-#define COMPANYKEY          "NetHack"
-#define PRODUCTKEY          "NetHack 3.6.0"
-#define SETTINGSKEY         "Settings"
-#define MAINSHOWSTATEKEY    "MainShowState"
-#define MAINMINXKEY         "MainMinX"
-#define MAINMINYKEY         "MainMinY"
-#define MAINMAXXKEY         "MainMaxX"
-#define MAINMAXYKEY         "MainMaxY"
-#define MAINLEFTKEY         "MainLeft"
-#define MAINRIGHTKEY        "MainRight"
-#define MAINTOPKEY          "MainTop"
-#define MAINBOTTOMKEY       "MainBottom"
-#define MAINAUTOLAYOUT		"AutoLayout"
-#define MAPLEFT				"MapLeft"
-#define MAPRIGHT			"MapRight"
-#define MAPTOP				"MapTop"
-#define MAPBOTTOM			"MapBottom"
-#define MSGLEFT				"MsgLeft"
-#define MSGRIGHT			"MsgRight"
-#define MSGTOP				"MsgTop"
-#define MSGBOTTOM			"MsgBottom"
-#define STATUSLEFT			"StatusLeft"
-#define STATUSRIGHT			"StatusRight"
-#define STATUSTOP			"StatusTop"
-#define STATUSBOTTOM		"StatusBottom"
-#define MENULEFT			"MenuLeft"
-#define MENURIGHT			"MenuRight"
-#define MENUTOP				"MenuTop"
-#define MENUBOTTOM			"MenuBottom"
-#define TEXTLEFT			"TextLeft"
-#define TEXTRIGHT			"TextRight"
-#define TEXTTOP				"TextTop"
-#define TEXTBOTTOM			"TextBottom"
-#define INVENTLEFT			"InventLeft"
-#define INVENTRIGHT			"InventRight"
-#define INVENTTOP			"InventTop"
-#define INVENTBOTTOM		"InventBottom"
+#define CATEGORYKEY "Software"
+#define COMPANYKEY "NetHack"
+#define PRODUCTKEY "NetHack 3.6.0"
+#define SETTINGSKEY "Settings"
+#define MAINSHOWSTATEKEY "MainShowState"
+#define MAINMINXKEY "MainMinX"
+#define MAINMINYKEY "MainMinY"
+#define MAINMAXXKEY "MainMaxX"
+#define MAINMAXYKEY "MainMaxY"
+#define MAINLEFTKEY "MainLeft"
+#define MAINRIGHTKEY "MainRight"
+#define MAINTOPKEY "MainTop"
+#define MAINBOTTOMKEY "MainBottom"
+#define MAINAUTOLAYOUT "AutoLayout"
+#define MAPLEFT "MapLeft"
+#define MAPRIGHT "MapRight"
+#define MAPTOP "MapTop"
+#define MAPBOTTOM "MapBottom"
+#define MSGLEFT "MsgLeft"
+#define MSGRIGHT "MsgRight"
+#define MSGTOP "MsgTop"
+#define MSGBOTTOM "MsgBottom"
+#define STATUSLEFT "StatusLeft"
+#define STATUSRIGHT "StatusRight"
+#define STATUSTOP "StatusTop"
+#define STATUSBOTTOM "StatusBottom"
+#define MENULEFT "MenuLeft"
+#define MENURIGHT "MenuRight"
+#define MENUTOP "MenuTop"
+#define MENUBOTTOM "MenuBottom"
+#define TEXTLEFT "TextLeft"
+#define TEXTRIGHT "TextRight"
+#define TEXTTOP "TextTop"
+#define TEXTBOTTOM "TextBottom"
+#define INVENTLEFT "InventLeft"
+#define INVENTRIGHT "InventRight"
+#define INVENTTOP "InventTop"
+#define INVENTBOTTOM "InventBottom"
 
 /* #define all the subkeys here */
 #define INTFKEY "Interface"
@@ -2230,79 +2259,81 @@ mswin_read_reg()
 {
     HKEY key;
     DWORD size;
-	DWORD safe_buf;
+    DWORD safe_buf;
     char keystring[MAX_PATH];
 
-    sprintf(keystring, "%s\\%s\\%s\\%s", 
-        CATEGORYKEY, COMPANYKEY, PRODUCTKEY, SETTINGSKEY);
+    sprintf(keystring, "%s\\%s\\%s\\%s", CATEGORYKEY, COMPANYKEY, PRODUCTKEY,
+            SETTINGSKEY);
 
-    /* Set the defaults here. The very first time the app is started, nothing is 
+    /* Set the defaults here. The very first time the app is started, nothing
+       is
        read from the registry, so these defaults apply. */
-    GetNHApp()->saveRegistrySettings = 1;   /* Normally, we always save */
+    GetNHApp()->saveRegistrySettings = 1; /* Normally, we always save */
     GetNHApp()->regNetHackMode = 0;
 
-    if (RegOpenKeyEx(HKEY_CURRENT_USER, keystring, 0, KEY_READ, &key) 
-            != ERROR_SUCCESS)
+    if (RegOpenKeyEx(HKEY_CURRENT_USER, keystring, 0, KEY_READ, &key)
+        != ERROR_SUCCESS)
         return;
 
     size = sizeof(DWORD);
 
-#define NHGETREG_DWORD(name, val) \
-	RegQueryValueEx(key, (name), 0, NULL, (unsigned char *)(&safe_buf), &size); (val) = safe_buf;
+#define NHGETREG_DWORD(name, val)                                       \
+    RegQueryValueEx(key, (name), 0, NULL, (unsigned char *)(&safe_buf), \
+                    &size);                                             \
+    (val) = safe_buf;
 
-        /* read the keys here */
-        NHGETREG_DWORD(INTFKEY, GetNHApp()->regNetHackMode);
+    /* read the keys here */
+    NHGETREG_DWORD(INTFKEY, GetNHApp()->regNetHackMode);
 
-        /* read window placement */
-        NHGETREG_DWORD(MAINSHOWSTATEKEY, GetNHApp()->regMainShowState);
-        NHGETREG_DWORD(MAINMINXKEY, GetNHApp()->regMainMinX);
-        NHGETREG_DWORD(MAINMINYKEY, GetNHApp()->regMainMinY);
-        NHGETREG_DWORD(MAINMAXXKEY, GetNHApp()->regMainMaxX);
-        NHGETREG_DWORD(MAINMAXYKEY, GetNHApp()->regMainMaxY);
-        NHGETREG_DWORD(MAINLEFTKEY, GetNHApp()->regMainLeft);
-        NHGETREG_DWORD(MAINRIGHTKEY, GetNHApp()->regMainRight);
-        NHGETREG_DWORD(MAINTOPKEY, GetNHApp()->regMainTop);
-        NHGETREG_DWORD(MAINBOTTOMKEY, GetNHApp()->regMainBottom);
+    /* read window placement */
+    NHGETREG_DWORD(MAINSHOWSTATEKEY, GetNHApp()->regMainShowState);
+    NHGETREG_DWORD(MAINMINXKEY, GetNHApp()->regMainMinX);
+    NHGETREG_DWORD(MAINMINYKEY, GetNHApp()->regMainMinY);
+    NHGETREG_DWORD(MAINMAXXKEY, GetNHApp()->regMainMaxX);
+    NHGETREG_DWORD(MAINMAXYKEY, GetNHApp()->regMainMaxY);
+    NHGETREG_DWORD(MAINLEFTKEY, GetNHApp()->regMainLeft);
+    NHGETREG_DWORD(MAINRIGHTKEY, GetNHApp()->regMainRight);
+    NHGETREG_DWORD(MAINTOPKEY, GetNHApp()->regMainTop);
+    NHGETREG_DWORD(MAINBOTTOMKEY, GetNHApp()->regMainBottom);
 
-		NHGETREG_DWORD(MAINAUTOLAYOUT, GetNHApp()->bAutoLayout);
-		NHGETREG_DWORD(MAPLEFT, GetNHApp()->rtMapWindow.left);
-		NHGETREG_DWORD(MAPRIGHT, GetNHApp()->rtMapWindow.right);
-		NHGETREG_DWORD(MAPTOP, GetNHApp()->rtMapWindow.top);
-		NHGETREG_DWORD(MAPBOTTOM, GetNHApp()->rtMapWindow.bottom);
-		NHGETREG_DWORD(MSGLEFT, GetNHApp()->rtMsgWindow.left);
-		NHGETREG_DWORD(MSGRIGHT, GetNHApp()->rtMsgWindow.right);
-		NHGETREG_DWORD(MSGTOP, GetNHApp()->rtMsgWindow.top);
-		NHGETREG_DWORD(MSGBOTTOM, GetNHApp()->rtMsgWindow.bottom);
-		NHGETREG_DWORD(STATUSLEFT, GetNHApp()->rtStatusWindow.left);
-		NHGETREG_DWORD(STATUSRIGHT, GetNHApp()->rtStatusWindow.right);
-		NHGETREG_DWORD(STATUSTOP, GetNHApp()->rtStatusWindow.top);
-		NHGETREG_DWORD(STATUSBOTTOM, GetNHApp()->rtStatusWindow.bottom);
-		NHGETREG_DWORD(MENULEFT, GetNHApp()->rtMenuWindow.left);
-		NHGETREG_DWORD(MENURIGHT, GetNHApp()->rtMenuWindow.right);
-		NHGETREG_DWORD(MENUTOP, GetNHApp()->rtMenuWindow.top);
-		NHGETREG_DWORD(MENUBOTTOM, GetNHApp()->rtMenuWindow.bottom);
-		NHGETREG_DWORD(TEXTLEFT, GetNHApp()->rtTextWindow.left);
-		NHGETREG_DWORD(TEXTRIGHT, GetNHApp()->rtTextWindow.right);
-		NHGETREG_DWORD(TEXTTOP, GetNHApp()->rtTextWindow.top);
-		NHGETREG_DWORD(TEXTBOTTOM, GetNHApp()->rtTextWindow.bottom);
-		NHGETREG_DWORD(INVENTLEFT, GetNHApp()->rtInvenWindow.left);
-		NHGETREG_DWORD(INVENTRIGHT, GetNHApp()->rtInvenWindow.right);
-		NHGETREG_DWORD(INVENTTOP, GetNHApp()->rtInvenWindow.top);
-		NHGETREG_DWORD(INVENTBOTTOM, GetNHApp()->rtInvenWindow.bottom);
+    NHGETREG_DWORD(MAINAUTOLAYOUT, GetNHApp()->bAutoLayout);
+    NHGETREG_DWORD(MAPLEFT, GetNHApp()->rtMapWindow.left);
+    NHGETREG_DWORD(MAPRIGHT, GetNHApp()->rtMapWindow.right);
+    NHGETREG_DWORD(MAPTOP, GetNHApp()->rtMapWindow.top);
+    NHGETREG_DWORD(MAPBOTTOM, GetNHApp()->rtMapWindow.bottom);
+    NHGETREG_DWORD(MSGLEFT, GetNHApp()->rtMsgWindow.left);
+    NHGETREG_DWORD(MSGRIGHT, GetNHApp()->rtMsgWindow.right);
+    NHGETREG_DWORD(MSGTOP, GetNHApp()->rtMsgWindow.top);
+    NHGETREG_DWORD(MSGBOTTOM, GetNHApp()->rtMsgWindow.bottom);
+    NHGETREG_DWORD(STATUSLEFT, GetNHApp()->rtStatusWindow.left);
+    NHGETREG_DWORD(STATUSRIGHT, GetNHApp()->rtStatusWindow.right);
+    NHGETREG_DWORD(STATUSTOP, GetNHApp()->rtStatusWindow.top);
+    NHGETREG_DWORD(STATUSBOTTOM, GetNHApp()->rtStatusWindow.bottom);
+    NHGETREG_DWORD(MENULEFT, GetNHApp()->rtMenuWindow.left);
+    NHGETREG_DWORD(MENURIGHT, GetNHApp()->rtMenuWindow.right);
+    NHGETREG_DWORD(MENUTOP, GetNHApp()->rtMenuWindow.top);
+    NHGETREG_DWORD(MENUBOTTOM, GetNHApp()->rtMenuWindow.bottom);
+    NHGETREG_DWORD(TEXTLEFT, GetNHApp()->rtTextWindow.left);
+    NHGETREG_DWORD(TEXTRIGHT, GetNHApp()->rtTextWindow.right);
+    NHGETREG_DWORD(TEXTTOP, GetNHApp()->rtTextWindow.top);
+    NHGETREG_DWORD(TEXTBOTTOM, GetNHApp()->rtTextWindow.bottom);
+    NHGETREG_DWORD(INVENTLEFT, GetNHApp()->rtInvenWindow.left);
+    NHGETREG_DWORD(INVENTRIGHT, GetNHApp()->rtInvenWindow.right);
+    NHGETREG_DWORD(INVENTTOP, GetNHApp()->rtInvenWindow.top);
+    NHGETREG_DWORD(INVENTBOTTOM, GetNHApp()->rtInvenWindow.bottom);
 #undef NHGETREG_DWORD
-    
+
     RegCloseKey(key);
 
-	/* check the data for validity */
-	if( IsRectEmpty(&GetNHApp()->rtMapWindow) ||
-		IsRectEmpty(&GetNHApp()->rtMsgWindow) ||
-		IsRectEmpty(&GetNHApp()->rtStatusWindow) ||
-		IsRectEmpty(&GetNHApp()->rtMenuWindow) ||
-		IsRectEmpty(&GetNHApp()->rtTextWindow) ||
-		IsRectEmpty(&GetNHApp()->rtInvenWindow) ) 
-	{
-		GetNHApp()->bAutoLayout = TRUE;
-	}
+    /* check the data for validity */
+    if (IsRectEmpty(&GetNHApp()->rtMapWindow)
+        || IsRectEmpty(&GetNHApp()->rtMsgWindow)
+        || IsRectEmpty(&GetNHApp()->rtStatusWindow)
+        || IsRectEmpty(&GetNHApp()->rtMenuWindow)
+        || IsRectEmpty(&GetNHApp()->rtTextWindow)
+        || IsRectEmpty(&GetNHApp()->rtInvenWindow)) {
+        GetNHApp()->bAutoLayout = TRUE;
+    }
 }
 
 void
@@ -2311,22 +2342,24 @@ mswin_write_reg()
     HKEY key;
     DWORD disposition;
 
-    if (GetNHApp()->saveRegistrySettings)
-    {
+    if (GetNHApp()->saveRegistrySettings) {
         char keystring[MAX_PATH];
-		DWORD safe_buf;
+        DWORD safe_buf;
 
-        sprintf(keystring, "%s\\%s\\%s\\%s", 
-            CATEGORYKEY, COMPANYKEY, PRODUCTKEY, SETTINGSKEY);
+        sprintf(keystring, "%s\\%s\\%s\\%s", CATEGORYKEY, COMPANYKEY,
+                PRODUCTKEY, SETTINGSKEY);
 
-        if (RegOpenKeyEx(HKEY_CURRENT_USER, keystring, 0, KEY_WRITE, &key) != ERROR_SUCCESS)
-        {
+        if (RegOpenKeyEx(HKEY_CURRENT_USER, keystring, 0, KEY_WRITE, &key)
+            != ERROR_SUCCESS) {
             RegCreateKeyEx(HKEY_CURRENT_USER, keystring, 0, "",
-                REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &key, &disposition);
+                           REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL,
+                           &key, &disposition);
         }
 
-#define NHSETREG_DWORD(name, val) \
-		RegSetValueEx(key, (name), 0, REG_DWORD, (unsigned char *)((safe_buf=(val)), &safe_buf), sizeof(DWORD));
+#define NHSETREG_DWORD(name, val)                                   \
+    RegSetValueEx(key, (name), 0, REG_DWORD,                        \
+                  (unsigned char *)((safe_buf = (val)), &safe_buf), \
+                  sizeof(DWORD));
 
         /* Write the keys here */
         NHSETREG_DWORD(INTFKEY, GetNHApp()->regNetHackMode);
@@ -2342,31 +2375,31 @@ mswin_write_reg()
         NHSETREG_DWORD(MAINTOPKEY, GetNHApp()->regMainTop);
         NHSETREG_DWORD(MAINBOTTOMKEY, GetNHApp()->regMainBottom);
 
-		NHSETREG_DWORD(MAINAUTOLAYOUT, GetNHApp()->bAutoLayout);
-		NHSETREG_DWORD(MAPLEFT, GetNHApp()->rtMapWindow.left);
-		NHSETREG_DWORD(MAPRIGHT, GetNHApp()->rtMapWindow.right);
-		NHSETREG_DWORD(MAPTOP, GetNHApp()->rtMapWindow.top);
-		NHSETREG_DWORD(MAPBOTTOM, GetNHApp()->rtMapWindow.bottom);
-		NHSETREG_DWORD(MSGLEFT, GetNHApp()->rtMsgWindow.left);
-		NHSETREG_DWORD(MSGRIGHT, GetNHApp()->rtMsgWindow.right);
-		NHSETREG_DWORD(MSGTOP, GetNHApp()->rtMsgWindow.top);
-		NHSETREG_DWORD(MSGBOTTOM, GetNHApp()->rtMsgWindow.bottom);
-		NHSETREG_DWORD(STATUSLEFT, GetNHApp()->rtStatusWindow.left);
-		NHSETREG_DWORD(STATUSRIGHT, GetNHApp()->rtStatusWindow.right);
-		NHSETREG_DWORD(STATUSTOP, GetNHApp()->rtStatusWindow.top);
-		NHSETREG_DWORD(STATUSBOTTOM, GetNHApp()->rtStatusWindow.bottom);
-		NHSETREG_DWORD(MENULEFT, GetNHApp()->rtMenuWindow.left);
-		NHSETREG_DWORD(MENURIGHT, GetNHApp()->rtMenuWindow.right);
-		NHSETREG_DWORD(MENUTOP, GetNHApp()->rtMenuWindow.top);
-		NHSETREG_DWORD(MENUBOTTOM, GetNHApp()->rtMenuWindow.bottom);
-		NHSETREG_DWORD(TEXTLEFT, GetNHApp()->rtTextWindow.left);
-		NHSETREG_DWORD(TEXTRIGHT, GetNHApp()->rtTextWindow.right);
-		NHSETREG_DWORD(TEXTTOP, GetNHApp()->rtTextWindow.top);
-		NHSETREG_DWORD(TEXTBOTTOM, GetNHApp()->rtTextWindow.bottom);
-		NHSETREG_DWORD(INVENTLEFT, GetNHApp()->rtInvenWindow.left);
-		NHSETREG_DWORD(INVENTRIGHT, GetNHApp()->rtInvenWindow.right);
-		NHSETREG_DWORD(INVENTTOP, GetNHApp()->rtInvenWindow.top);
-		NHSETREG_DWORD(INVENTBOTTOM, GetNHApp()->rtInvenWindow.bottom);
+        NHSETREG_DWORD(MAINAUTOLAYOUT, GetNHApp()->bAutoLayout);
+        NHSETREG_DWORD(MAPLEFT, GetNHApp()->rtMapWindow.left);
+        NHSETREG_DWORD(MAPRIGHT, GetNHApp()->rtMapWindow.right);
+        NHSETREG_DWORD(MAPTOP, GetNHApp()->rtMapWindow.top);
+        NHSETREG_DWORD(MAPBOTTOM, GetNHApp()->rtMapWindow.bottom);
+        NHSETREG_DWORD(MSGLEFT, GetNHApp()->rtMsgWindow.left);
+        NHSETREG_DWORD(MSGRIGHT, GetNHApp()->rtMsgWindow.right);
+        NHSETREG_DWORD(MSGTOP, GetNHApp()->rtMsgWindow.top);
+        NHSETREG_DWORD(MSGBOTTOM, GetNHApp()->rtMsgWindow.bottom);
+        NHSETREG_DWORD(STATUSLEFT, GetNHApp()->rtStatusWindow.left);
+        NHSETREG_DWORD(STATUSRIGHT, GetNHApp()->rtStatusWindow.right);
+        NHSETREG_DWORD(STATUSTOP, GetNHApp()->rtStatusWindow.top);
+        NHSETREG_DWORD(STATUSBOTTOM, GetNHApp()->rtStatusWindow.bottom);
+        NHSETREG_DWORD(MENULEFT, GetNHApp()->rtMenuWindow.left);
+        NHSETREG_DWORD(MENURIGHT, GetNHApp()->rtMenuWindow.right);
+        NHSETREG_DWORD(MENUTOP, GetNHApp()->rtMenuWindow.top);
+        NHSETREG_DWORD(MENUBOTTOM, GetNHApp()->rtMenuWindow.bottom);
+        NHSETREG_DWORD(TEXTLEFT, GetNHApp()->rtTextWindow.left);
+        NHSETREG_DWORD(TEXTRIGHT, GetNHApp()->rtTextWindow.right);
+        NHSETREG_DWORD(TEXTTOP, GetNHApp()->rtTextWindow.top);
+        NHSETREG_DWORD(TEXTBOTTOM, GetNHApp()->rtTextWindow.bottom);
+        NHSETREG_DWORD(INVENTLEFT, GetNHApp()->rtInvenWindow.left);
+        NHSETREG_DWORD(INVENTRIGHT, GetNHApp()->rtInvenWindow.right);
+        NHSETREG_DWORD(INVENTTOP, GetNHApp()->rtInvenWindow.top);
+        NHSETREG_DWORD(INVENTBOTTOM, GetNHApp()->rtInvenWindow.bottom);
 #undef NHSETREG_DWORD
 
         RegCloseKey(key);
@@ -2381,11 +2414,10 @@ mswin_destroy_reg()
     DWORD nrsubkeys;
 
     /* Delete keys one by one, as NT does not delete trees */
-    sprintf(keystring, "%s\\%s\\%s\\%s", 
-        CATEGORYKEY, COMPANYKEY, PRODUCTKEY, SETTINGSKEY);
+    sprintf(keystring, "%s\\%s\\%s\\%s", CATEGORYKEY, COMPANYKEY, PRODUCTKEY,
+            SETTINGSKEY);
     RegDeleteKey(HKEY_CURRENT_USER, keystring);
-    sprintf(keystring, "%s\\%s\\%s", 
-        CATEGORYKEY, COMPANYKEY, PRODUCTKEY);
+    sprintf(keystring, "%s\\%s\\%s", CATEGORYKEY, COMPANYKEY, PRODUCTKEY);
     RegDeleteKey(HKEY_CURRENT_USER, keystring);
     /* The company key will also contain information about newer versions
        of nethack (e.g. a subkey called NetHack 4.0), so only delete that
@@ -2393,10 +2425,10 @@ mswin_destroy_reg()
     sprintf(keystring, "%s\\%s", CATEGORYKEY, COMPANYKEY);
     /* If we cannot open it, we probably cannot delete it either... Just
        go on and see what happens. */
-    RegOpenKeyEx(HKEY_CURRENT_USER, keystring, 0, KEY_READ, &key); 
+    RegOpenKeyEx(HKEY_CURRENT_USER, keystring, 0, KEY_READ, &key);
     nrsubkeys = 0;
-    RegQueryInfoKey(key, NULL, NULL, NULL, &nrsubkeys, NULL, NULL, NULL, 
-        NULL, NULL, NULL, NULL);
+    RegQueryInfoKey(key, NULL, NULL, NULL, &nrsubkeys, NULL, NULL, NULL, NULL,
+                    NULL, NULL, NULL);
     RegCloseKey(key);
     if (nrsubkeys == 0)
         RegDeleteKey(HKEY_CURRENT_USER, keystring);
@@ -2405,10 +2437,9 @@ mswin_destroy_reg()
     GetNHApp()->saveRegistrySettings = 0;
 }
 
-typedef struct ctv
-{
-	const char *colorstring;
-	COLORREF colorvalue;
+typedef struct ctv {
+    const char *colorstring;
+    COLORREF colorvalue;
 } color_table_value;
 
 /*
@@ -2418,186 +2449,197 @@ typedef struct ctv
  */
 
 static color_table_value color_table[] = {
-/* NetHack colors */
-	{ "black",		RGB(0x55, 0x55, 0x55)},
-	{ "red", 		RGB(0xFF, 0x00, 0x00)},
-	{ "green", 		RGB(0x00, 0x80, 0x00)},
-	{ "brown",		RGB(0xA5, 0x2A, 0x2A)},
-	{ "blue",		RGB(0x00, 0x00, 0xFF)},
-	{ "magenta", 		RGB(0xFF, 0x00, 0xFF)},
-	{ "cyan", 		RGB(0x00, 0xFF, 0xFF)},
-	{ "orange",		RGB(0xFF, 0xA5, 0x00)},
-	{ "brightgreen",	RGB(0x00, 0xFF, 0x00)},
-	{ "yellow", 		RGB(0xFF, 0xFF, 0x00)},
-	{ "brightblue",		RGB(0x00, 0xC0, 0xFF)},
-	{ "brightmagenta",	RGB(0xFF, 0x80, 0xFF)},
-	{ "brightcyan", 	RGB(0x80, 0xFF, 0xFF)},
-	{ "white", 		RGB(0xFF, 0xFF, 0xFF)},
-/* Remaining HTML colors */
-	{ "trueblack",		RGB(0x00, 0x00, 0x00)},
-	{ "gray", 		RGB(0x80, 0x80, 0x80)},
-	{ "grey", 		RGB(0x80, 0x80, 0x80)},
-	{ "purple",		RGB(0x80, 0x00, 0x80)},
-	{ "silver",		RGB(0xC0, 0xC0, 0xC0)},
-	{ "maroon",		RGB(0x80, 0x00, 0x00)},
-	{ "fuchsia",		RGB(0xFF, 0x00, 0xFF)}, /* = NetHack magenta */
-	{ "lime", 		RGB(0x00, 0xFF, 0x00)}, /* = NetHack bright green */
-	{ "olive", 		RGB(0x80, 0x80, 0x00)},
-	{ "navy", 		RGB(0x00, 0x00, 0x80)},
-	{ "teal", 		RGB(0x00, 0x80, 0x80)},
-	{ "aqua", 		RGB(0x00, 0xFF, 0xFF)}, /* = NetHack cyan */
-	{ "", 			RGB(0x00, 0x00, 0x00)},
+    /* NetHack colors */
+    { "black", RGB(0x55, 0x55, 0x55) },
+    { "red", RGB(0xFF, 0x00, 0x00) },
+    { "green", RGB(0x00, 0x80, 0x00) },
+    { "brown", RGB(0xA5, 0x2A, 0x2A) },
+    { "blue", RGB(0x00, 0x00, 0xFF) },
+    { "magenta", RGB(0xFF, 0x00, 0xFF) },
+    { "cyan", RGB(0x00, 0xFF, 0xFF) },
+    { "orange", RGB(0xFF, 0xA5, 0x00) },
+    { "brightgreen", RGB(0x00, 0xFF, 0x00) },
+    { "yellow", RGB(0xFF, 0xFF, 0x00) },
+    { "brightblue", RGB(0x00, 0xC0, 0xFF) },
+    { "brightmagenta", RGB(0xFF, 0x80, 0xFF) },
+    { "brightcyan", RGB(0x80, 0xFF, 0xFF) },
+    { "white", RGB(0xFF, 0xFF, 0xFF) },
+    /* Remaining HTML colors */
+    { "trueblack", RGB(0x00, 0x00, 0x00) },
+    { "gray", RGB(0x80, 0x80, 0x80) },
+    { "grey", RGB(0x80, 0x80, 0x80) },
+    { "purple", RGB(0x80, 0x00, 0x80) },
+    { "silver", RGB(0xC0, 0xC0, 0xC0) },
+    { "maroon", RGB(0x80, 0x00, 0x00) },
+    { "fuchsia", RGB(0xFF, 0x00, 0xFF) }, /* = NetHack magenta */
+    { "lime", RGB(0x00, 0xFF, 0x00) },    /* = NetHack bright green */
+    { "olive", RGB(0x80, 0x80, 0x00) },
+    { "navy", RGB(0x00, 0x00, 0x80) },
+    { "teal", RGB(0x00, 0x80, 0x80) },
+    { "aqua", RGB(0x00, 0xFF, 0xFF) }, /* = NetHack cyan */
+    { "", RGB(0x00, 0x00, 0x00) },
 };
 
-typedef struct ctbv
-{
-	char *colorstring;
-	int syscolorvalue;
+typedef struct ctbv {
+    char *colorstring;
+    int syscolorvalue;
 } color_table_brush_value;
 
 static color_table_brush_value color_table_brush[] = {
-	{ "activeborder", 	COLOR_ACTIVEBORDER	},
-	{ "activecaption",	COLOR_ACTIVECAPTION	},
-	{ "appworkspace",		COLOR_APPWORKSPACE	},
-	{ "background",		COLOR_BACKGROUND		},
-	{ "btnface",		COLOR_BTNFACE		},
-	{ "btnshadow",		COLOR_BTNSHADOW		},
-	{ "btntext", 		COLOR_BTNTEXT		},
-	{ "captiontext",		COLOR_CAPTIONTEXT		},
-	{ "graytext",		COLOR_GRAYTEXT		},
-	{ "greytext",		COLOR_GRAYTEXT 		},
-	{ "highlight",		COLOR_HIGHLIGHT 		},
-	{ "highlighttext",	COLOR_HIGHLIGHTTEXT	},
-	{ "inactiveborder", 	COLOR_INACTIVEBORDER 	},
-	{ "inactivecaption",	COLOR_INACTIVECAPTION 	},
-	{ "menu",			COLOR_MENU 			},
-	{ "menutext",		COLOR_MENUTEXT 		},
-	{ "scrollbar",		COLOR_SCROLLBAR 		},
-	{ "window",			COLOR_WINDOW 		},
-	{ "windowframe", 		COLOR_WINDOWFRAME 	},
-	{ "windowtext",		COLOR_WINDOWTEXT 		},
-	{ "", 			-1				},
+    { "activeborder", COLOR_ACTIVEBORDER },
+    { "activecaption", COLOR_ACTIVECAPTION },
+    { "appworkspace", COLOR_APPWORKSPACE },
+    { "background", COLOR_BACKGROUND },
+    { "btnface", COLOR_BTNFACE },
+    { "btnshadow", COLOR_BTNSHADOW },
+    { "btntext", COLOR_BTNTEXT },
+    { "captiontext", COLOR_CAPTIONTEXT },
+    { "graytext", COLOR_GRAYTEXT },
+    { "greytext", COLOR_GRAYTEXT },
+    { "highlight", COLOR_HIGHLIGHT },
+    { "highlighttext", COLOR_HIGHLIGHTTEXT },
+    { "inactiveborder", COLOR_INACTIVEBORDER },
+    { "inactivecaption", COLOR_INACTIVECAPTION },
+    { "menu", COLOR_MENU },
+    { "menutext", COLOR_MENUTEXT },
+    { "scrollbar", COLOR_SCROLLBAR },
+    { "window", COLOR_WINDOW },
+    { "windowframe", COLOR_WINDOWFRAME },
+    { "windowtext", COLOR_WINDOWTEXT },
+    { "", -1 },
 };
 
-static void mswin_color_from_string(char *colorstring, HBRUSH* brushptr, COLORREF *colorptr)
+static void
+mswin_color_from_string(char *colorstring, HBRUSH *brushptr,
+                        COLORREF *colorptr)
 {
-	color_table_value *ctv_ptr = color_table;
-	color_table_brush_value *ctbv_ptr = color_table_brush;
-	int red_value, blue_value, green_value;
-	static char *hexadecimals = "0123456789abcdef";
+    color_table_value *ctv_ptr = color_table;
+    color_table_brush_value *ctbv_ptr = color_table_brush;
+    int red_value, blue_value, green_value;
+    static char *hexadecimals = "0123456789abcdef";
 
-	if (colorstring == NULL) return;
-	if (*colorstring == '#') {
-		if (strlen(++colorstring) != 6) return;
+    if (colorstring == NULL)
+        return;
+    if (*colorstring == '#') {
+        if (strlen(++colorstring) != 6)
+            return;
 
-		red_value = (int)(index(hexadecimals, tolower(*colorstring++)) - hexadecimals);
-		red_value *= 16;
-		red_value += (int)(index(hexadecimals, tolower(*colorstring++)) - hexadecimals);
+        red_value = (int) (index(hexadecimals, tolower(*colorstring++))
+                           - hexadecimals);
+        red_value *= 16;
+        red_value += (int) (index(hexadecimals, tolower(*colorstring++))
+                            - hexadecimals);
 
-		green_value = (int)(index(hexadecimals, tolower(*colorstring++)) - hexadecimals);
-		green_value *= 16;
-		green_value += (int)(index(hexadecimals, tolower(*colorstring++)) - hexadecimals);
+        green_value = (int) (index(hexadecimals, tolower(*colorstring++))
+                             - hexadecimals);
+        green_value *= 16;
+        green_value += (int) (index(hexadecimals, tolower(*colorstring++))
+                              - hexadecimals);
 
-		blue_value = (int)(index(hexadecimals, tolower(*colorstring++)) - hexadecimals);
-		blue_value *= 16;
-		blue_value += (int)(index(hexadecimals, tolower(*colorstring++)) - hexadecimals);
+        blue_value = (int) (index(hexadecimals, tolower(*colorstring++))
+                            - hexadecimals);
+        blue_value *= 16;
+        blue_value += (int) (index(hexadecimals, tolower(*colorstring++))
+                             - hexadecimals);
 
-		*colorptr = RGB(red_value, green_value, blue_value);
-	} else {
-	    while (*ctv_ptr->colorstring && stricmp(ctv_ptr->colorstring, colorstring))
-		++ctv_ptr;
-	    if (*ctv_ptr->colorstring) {
-		*colorptr = ctv_ptr->colorvalue;
-	    } else {
-	      while (*ctbv_ptr->colorstring && stricmp(ctbv_ptr->colorstring, colorstring))
-		    ++ctbv_ptr;
-		if (*ctbv_ptr->colorstring) {
-		    *brushptr = SYSCLR_TO_BRUSH(ctbv_ptr->syscolorvalue);
-		    *colorptr = GetSysColor(ctbv_ptr->syscolorvalue);
-		}
-	    }
-	}
-	if (max_brush > TOTAL_BRUSHES) panic("Too many colors!");
-	*brushptr = CreateSolidBrush(*colorptr);
-	brush_table[max_brush++] = *brushptr;
+        *colorptr = RGB(red_value, green_value, blue_value);
+    } else {
+        while (*ctv_ptr->colorstring
+               && stricmp(ctv_ptr->colorstring, colorstring))
+            ++ctv_ptr;
+        if (*ctv_ptr->colorstring) {
+            *colorptr = ctv_ptr->colorvalue;
+        } else {
+            while (*ctbv_ptr->colorstring
+                   && stricmp(ctbv_ptr->colorstring, colorstring))
+                ++ctbv_ptr;
+            if (*ctbv_ptr->colorstring) {
+                *brushptr = SYSCLR_TO_BRUSH(ctbv_ptr->syscolorvalue);
+                *colorptr = GetSysColor(ctbv_ptr->syscolorvalue);
+            }
+        }
+    }
+    if (max_brush > TOTAL_BRUSHES)
+        panic("Too many colors!");
+    *brushptr = CreateSolidBrush(*colorptr);
+    brush_table[max_brush++] = *brushptr;
 }
 
-void mswin_get_window_placement(int type, LPRECT rt)
+void
+mswin_get_window_placement(int type, LPRECT rt)
 {
     switch (type) {
     case NHW_MAP:
-		*rt = GetNHApp()->rtMapWindow;
-		break;
+        *rt = GetNHApp()->rtMapWindow;
+        break;
 
     case NHW_MESSAGE:
-		*rt = GetNHApp()->rtMsgWindow;
-		break;
+        *rt = GetNHApp()->rtMsgWindow;
+        break;
 
     case NHW_STATUS:
-		*rt = GetNHApp()->rtStatusWindow;
-		break;
+        *rt = GetNHApp()->rtStatusWindow;
+        break;
 
     case NHW_MENU:
-		*rt = GetNHApp()->rtMenuWindow;
-		break;
+        *rt = GetNHApp()->rtMenuWindow;
+        break;
 
     case NHW_TEXT:
-		*rt = GetNHApp()->rtTextWindow;
-		break;
+        *rt = GetNHApp()->rtTextWindow;
+        break;
 
     case NHW_INVEN:
-		*rt = GetNHApp()->rtInvenWindow;
-		break;
+        *rt = GetNHApp()->rtInvenWindow;
+        break;
 
-	default:
-		SetRect(rt, 0, 0, 0, 0);
-		break;
-	}
+    default:
+        SetRect(rt, 0, 0, 0, 0);
+        break;
+    }
 }
 
-void mswin_update_window_placement(int type, LPRECT rt)
+void
+mswin_update_window_placement(int type, LPRECT rt)
 {
-	LPRECT rt_conf = NULL;
+    LPRECT rt_conf = NULL;
 
     switch (type) {
     case NHW_MAP:
-		rt_conf = &GetNHApp()->rtMapWindow;
-		break;
+        rt_conf = &GetNHApp()->rtMapWindow;
+        break;
 
     case NHW_MESSAGE:
-		rt_conf = &GetNHApp()->rtMsgWindow;
-		break;
+        rt_conf = &GetNHApp()->rtMsgWindow;
+        break;
 
     case NHW_STATUS:
-		rt_conf = &GetNHApp()->rtStatusWindow;
-		break;
+        rt_conf = &GetNHApp()->rtStatusWindow;
+        break;
 
     case NHW_MENU:
-		rt_conf = &GetNHApp()->rtMenuWindow;
-		break;
+        rt_conf = &GetNHApp()->rtMenuWindow;
+        break;
 
     case NHW_TEXT:
-		rt_conf = &GetNHApp()->rtTextWindow;
-		break;
-    
-	case NHW_INVEN:
-		rt_conf = &GetNHApp()->rtInvenWindow;
-		break;
-	}
-	
-	if( rt_conf && 
-		!IsRectEmpty(rt) &&
-		!EqualRect(rt_conf, rt) ) 
-	{
-		*rt_conf = *rt;
-	}
+        rt_conf = &GetNHApp()->rtTextWindow;
+        break;
+
+    case NHW_INVEN:
+        rt_conf = &GetNHApp()->rtInvenWindow;
+        break;
+    }
+
+    if (rt_conf && !IsRectEmpty(rt) && !EqualRect(rt_conf, rt)) {
+        *rt_conf = *rt;
+    }
 }
 
-
-int NHMessageBox(HWND hWnd, LPCTSTR text, UINT type)
+int
+NHMessageBox(HWND hWnd, LPCTSTR text, UINT type)
 {
     TCHAR title[MAX_LOADSTRING];
-    
+
     LoadString(GetNHApp()->hApp, IDS_APP_TITLE_SHORT, title, MAX_LOADSTRING);
 
     return MessageBox(hWnd, text, title, type);
@@ -2607,272 +2649,307 @@ int NHMessageBox(HWND hWnd, LPCTSTR text, UINT type)
 static const char *_status_fieldnm[MAXBLSTATS];
 static const char *_status_fieldfmt[MAXBLSTATS];
 static char *_status_vals[MAXBLSTATS];
-static int  _status_colors[MAXBLSTATS];
+static int _status_colors[MAXBLSTATS];
 static boolean _status_activefields[MAXBLSTATS];
 extern winid WIN_STATUS;
 
-# ifdef STATUS_HILITES
+#ifdef STATUS_HILITES
 typedef struct hilite_data_struct {
-	int thresholdtype;
-	anything threshold;
-	int behavior;
-	int under;
-	int over;
+    int thresholdtype;
+    anything threshold;
+    int behavior;
+    int under;
+    int over;
 } hilite_data_t;
 static hilite_data_t _status_hilites[MAXBLSTATS];
 #endif /* STATUS_HILITES */
 /*
 status_init()   -- core calls this to notify the window port that a status
-		   display is required. The window port should perform 
-		   the necessary initialization in here, allocate memory, etc.
+                   display is required. The window port should perform
+                   the necessary initialization in here, allocate memory, etc.
 */
 void
 mswin_status_init(void)
 {
-	int i;
-	logDebug("mswin_status_init()\n");
-	for (i = 0; i < MAXBLSTATS; ++i) {
-		_status_vals[i] = (char *)alloc(BUFSZ);
-		*_status_vals[i] = '\0';
-		_status_activefields[i] = FALSE;
-		_status_fieldfmt[i] = (const char *)0;
-		_status_colors[i] = CLR_MAX; /* no color */
-# ifdef STATUS_HILITES
-		_status_hilites[i].thresholdtype = 0;
-		_status_hilites[i].behavior = BL_TH_NONE;
-		_status_hilites[i].under = BL_HILITE_NONE;
-		_status_hilites[i].over = BL_HILITE_NONE;
+    int i;
+    logDebug("mswin_status_init()\n");
+    for (i = 0; i < MAXBLSTATS; ++i) {
+        _status_vals[i] = (char *) alloc(BUFSZ);
+        *_status_vals[i] = '\0';
+        _status_activefields[i] = FALSE;
+        _status_fieldfmt[i] = (const char *) 0;
+        _status_colors[i] = CLR_MAX; /* no color */
+#ifdef STATUS_HILITES
+        _status_hilites[i].thresholdtype = 0;
+        _status_hilites[i].behavior = BL_TH_NONE;
+        _status_hilites[i].under = BL_HILITE_NONE;
+        _status_hilites[i].over = BL_HILITE_NONE;
 #endif /* STATUS_HILITES */
-	}
-	/* Use a window for the genl version; backward port compatibility */
-	WIN_STATUS = create_nhwindow(NHW_STATUS);
-	display_nhwindow(WIN_STATUS, FALSE);
+    }
+    /* Use a window for the genl version; backward port compatibility */
+    WIN_STATUS = create_nhwindow(NHW_STATUS);
+    display_nhwindow(WIN_STATUS, FALSE);
 }
 
 /*
 status_finish() -- called when it is time for the window port to tear down
-		   the status display and free allocated memory, etc.
+                   the status display and free allocated memory, etc.
 */
 void
 mswin_status_finish(void)
 {
-	/* tear down routine */
-	int i;
+    /* tear down routine */
+    int i;
 
-	logDebug("mswin_status_finish()\n");
+    logDebug("mswin_status_finish()\n");
 
-	/* free alloc'd memory here */
-	for (i = 0; i < MAXBLSTATS; ++i) {
-		if (_status_vals[i]) free((genericptr_t)_status_vals[i]);
-		_status_vals[i] = (char *)0;
-	}
+    /* free alloc'd memory here */
+    for (i = 0; i < MAXBLSTATS; ++i) {
+        if (_status_vals[i])
+            free((genericptr_t) _status_vals[i]);
+        _status_vals[i] = (char *) 0;
+    }
 }
 
 /*
-status_enablefield(int fldindex, char fldname, char fieldfmt, boolean enable)   
+status_enablefield(int fldindex, char fldname, char fieldfmt, boolean enable)
                 -- notifies the window port which fields it is authorized to
-		   display.
-		-- This may be called at any time, and is used
-		   to disable as well as enable fields, depending on the 
-		   value of the final argument (TRUE = enable).
-		-- fldindex could be one of the following from botl.h:
-		   BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, 
-		   BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX, 
-		   BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX, 
-		   BL_LEVELDESC, BL_EXP, BL_CONDITION
-		-- There are MAXBLSTATS status fields (from botl.h)
+                   display.
+                -- This may be called at any time, and is used
+                   to disable as well as enable fields, depending on the
+                   value of the final argument (TRUE = enable).
+                -- fldindex could be one of the following from botl.h:
+                   BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH,
+                   BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX,
+                   BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX,
+                   BL_LEVELDESC, BL_EXP, BL_CONDITION
+                -- There are MAXBLSTATS status fields (from botl.h)
 */
 void
-mswin_status_enablefield(int fieldidx, const char *nm, const char *fmt, boolean enable)
+mswin_status_enablefield(int fieldidx, const char *nm, const char *fmt,
+                         boolean enable)
 {
-	logDebug("mswin_status_enablefield(%d, %s, %s, %d)\n", fieldidx, nm, fmt, (int)enable);
-	_status_fieldfmt[fieldidx] = fmt;
-	_status_fieldnm[fieldidx] = nm;
-	_status_activefields[fieldidx] = enable;
+    logDebug("mswin_status_enablefield(%d, %s, %s, %d)\n", fieldidx, nm, fmt,
+             (int) enable);
+    _status_fieldfmt[fieldidx] = fmt;
+    _status_fieldnm[fieldidx] = nm;
+    _status_activefields[fieldidx] = enable;
 }
 
-# ifdef STATUS_HILITES
+#ifdef STATUS_HILITES
 /*
-status_threshold(int fldidx, int threshholdtype, anything threshold, 
-					int behavior, int under, int over)
-		-- called when a hiliting preference is added, changed, or
-		   removed.
-		-- the fldindex identifies which field is having its hiliting
-		   preference set. It is an integer index value from botl.h
-		-- fldindex could be any one of the following from botl.h:
-		   BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, 
-		   BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX, 
-		   BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX, 
-		   BL_LEVELDESC, BL_EXP, BL_CONDITION
-		-- datatype is P_INT, P_UINT, P_LONG, or P_MASK.
-		-- threshold is an "anything" union which can contain the 
-		   datatype value.
-		-- behavior is used to define how threshold is used and can
-		   be BL_TH_NONE, BL_TH_VAL_PERCENTAGE, BL_TH_VAL_ABSOLUTE,
-		   or BL_TH_UPDOWN. BL_TH_NONE means don't do anything above
-		   or below the threshold.  BL_TH_VAL_PERCENTAGE treats the
-		   threshold value as a precentage of the maximum possible
-		   value. BL_TH_VAL_ABSOLUTE means that the threshold is an
-		   actual value. BL_TH_UPDOWN means that threshold is not
-		   used, and the two below/above hilite values indicate how
-		   to display something going down (under) or rising (over).		    
-		-- under is the hilite attribute used if value is below the 
-		   threshold. The attribute can be BL_HILITE_NONE, 
-		   BL_HILITE_INVERSE, BL_HILITE_BOLD (-1, -2, or -3), or one 
-		   of the color indexes of CLR_BLACK, CLR_RED, CLR_GREEN, 
-		   CLR_BROWN, CLR_BLUE, CLR_MAGENTA, CLR_CYAN, CLR_GRAY, 
-		   CLR_ORANGE, CLR_BRIGHT_GREEN, CLR_YELLOW, CLR_BRIGHT_BLUE, 
-		   CLR_BRIGHT_MAGENTA, CLR_BRIGHT_CYAN, or CLR_WHITE (0 - 15).
-		-- over is the hilite attribute used if value is at or above 
-		   the threshold. The attribute can be BL_HILITE_NONE, 
-		   BL_HILITE_INVERSE, BL_HILITE_BOLD (-1, -2, or -3), or one 
-		   of the color indexes of CLR_BLACK, CLR_RED, CLR_GREEN, 
-		   CLR_BROWN, CLR_BLUE, CLR_MAGENTA, CLR_CYAN, CLR_GRAY, 
-		   CLR_ORANGE, CLR_BRIGHT_GREEN, CLR_YELLOW, CLR_BRIGHT_BLUE, 
-		   CLR_BRIGHT_MAGENTA, CLR_BRIGHT_CYAN, or CLR_WHITE (0 - 15).
+status_threshold(int fldidx, int threshholdtype, anything threshold,
+                                        int behavior, int under, int over)
+                -- called when a hiliting preference is added, changed, or
+                   removed.
+                -- the fldindex identifies which field is having its hiliting
+                   preference set. It is an integer index value from botl.h
+                -- fldindex could be any one of the following from botl.h:
+                   BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH,
+                   BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX,
+                   BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX,
+                   BL_LEVELDESC, BL_EXP, BL_CONDITION
+                -- datatype is P_INT, P_UINT, P_LONG, or P_MASK.
+                -- threshold is an "anything" union which can contain the
+                   datatype value.
+                -- behavior is used to define how threshold is used and can
+                   be BL_TH_NONE, BL_TH_VAL_PERCENTAGE, BL_TH_VAL_ABSOLUTE,
+                   or BL_TH_UPDOWN. BL_TH_NONE means don't do anything above
+                   or below the threshold.  BL_TH_VAL_PERCENTAGE treats the
+                   threshold value as a precentage of the maximum possible
+                   value. BL_TH_VAL_ABSOLUTE means that the threshold is an
+                   actual value. BL_TH_UPDOWN means that threshold is not
+                   used, and the two below/above hilite values indicate how
+                   to display something going down (under) or rising (over).
+                -- under is the hilite attribute used if value is below the
+                   threshold. The attribute can be BL_HILITE_NONE,
+                   BL_HILITE_INVERSE, BL_HILITE_BOLD (-1, -2, or -3), or one
+                   of the color indexes of CLR_BLACK, CLR_RED, CLR_GREEN,
+                   CLR_BROWN, CLR_BLUE, CLR_MAGENTA, CLR_CYAN, CLR_GRAY,
+                   CLR_ORANGE, CLR_BRIGHT_GREEN, CLR_YELLOW, CLR_BRIGHT_BLUE,
+                   CLR_BRIGHT_MAGENTA, CLR_BRIGHT_CYAN, or CLR_WHITE (0 - 15).
+                -- over is the hilite attribute used if value is at or above
+                   the threshold. The attribute can be BL_HILITE_NONE,
+                   BL_HILITE_INVERSE, BL_HILITE_BOLD (-1, -2, or -3), or one
+                   of the color indexes of CLR_BLACK, CLR_RED, CLR_GREEN,
+                   CLR_BROWN, CLR_BLUE, CLR_MAGENTA, CLR_CYAN, CLR_GRAY,
+                   CLR_ORANGE, CLR_BRIGHT_GREEN, CLR_YELLOW, CLR_BRIGHT_BLUE,
+                   CLR_BRIGHT_MAGENTA, CLR_BRIGHT_CYAN, or CLR_WHITE (0 - 15).
 */
 void
-mswin_status_threshold(int fldidx, int thresholdtype, anything threshold, int behavior, int under, int over)
+mswin_status_threshold(int fldidx, int thresholdtype, anything threshold,
+                       int behavior, int under, int over)
 {
-	logDebug("mswin_status_threshold(%d, %d, %d, %d, %d)\n", fldidx, thresholdtype, behavior, under, over);
-	assert(fldidx>=0 && fldidx<MAXBLSTATS);
-	_status_hilites[fldidx].thresholdtype = thresholdtype;
-	_status_hilites[fldidx].threshold = threshold;
-	_status_hilites[fldidx].behavior = behavior;
-	_status_hilites[fldidx].under = under;
-	_status_hilites[fldidx].over = over;
+    logDebug("mswin_status_threshold(%d, %d, %d, %d, %d)\n", fldidx,
+             thresholdtype, behavior, under, over);
+    assert(fldidx >= 0 && fldidx < MAXBLSTATS);
+    _status_hilites[fldidx].thresholdtype = thresholdtype;
+    _status_hilites[fldidx].threshold = threshold;
+    _status_hilites[fldidx].behavior = behavior;
+    _status_hilites[fldidx].under = under;
+    _status_hilites[fldidx].over = over;
 }
 #endif /* STATUS_HILITES */
 
 /*
 
 status_update(int fldindex, genericptr_t ptr, int chg, int percentage)
-		-- update the value of a status field.
-		-- the fldindex identifies which field is changing and
-		   is an integer index value from botl.h
-		-- fldindex could be any one of the following from botl.h:
-		   BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, 
-		   BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX, 
-		   BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX, 
-		   BL_LEVELDESC, BL_EXP, BL_CONDITION
-		-- fldindex could also be BL_FLUSH (-1), which is not really
-		   a field index, but is a special trigger to tell the 
-		   windowport that it should redisplay all its status fields,
-		   even if no changes have been presented to it.
-		-- ptr is usually a "char *", unless fldindex is BL_CONDITION.
-		   If fldindex is BL_CONDITION, then ptr is a long value with
-		   any or none of the following bits set (from botl.h):
-			BL_MASK_BLIND		0x00000001L
-			BL_MASK_CONF		0x00000002L
-			BL_MASK_FOODPOIS	0x00000004L
-			BL_MASK_ILL		0x00000008L
-			BL_MASK_HALLU		0x00000010L
-			BL_MASK_STUNNED		0x00000020L
-			BL_MASK_SLIMED		0x00000040L
-		-- The value passed for BL_GOLD includes a leading
-		   symbol for GOLD "$:nnn". If the window port needs to use 
-		   the textual gold amount without the leading "$:" the port 
-		   will have to add 2 to the passed "ptr" for the BL_GOLD case.
+                -- update the value of a status field.
+                -- the fldindex identifies which field is changing and
+                   is an integer index value from botl.h
+                -- fldindex could be any one of the following from botl.h:
+                   BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH,
+                   BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX,
+                   BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX,
+                   BL_LEVELDESC, BL_EXP, BL_CONDITION
+                -- fldindex could also be BL_FLUSH (-1), which is not really
+                   a field index, but is a special trigger to tell the
+                   windowport that it should redisplay all its status fields,
+                   even if no changes have been presented to it.
+                -- ptr is usually a "char *", unless fldindex is BL_CONDITION.
+                   If fldindex is BL_CONDITION, then ptr is a long value with
+                   any or none of the following bits set (from botl.h):
+                        BL_MASK_BLIND		0x00000001L
+                        BL_MASK_CONF		0x00000002L
+                        BL_MASK_FOODPOIS	0x00000004L
+                        BL_MASK_ILL		0x00000008L
+                        BL_MASK_HALLU		0x00000010L
+                        BL_MASK_STUNNED		0x00000020L
+                        BL_MASK_SLIMED		0x00000040L
+                -- The value passed for BL_GOLD includes a leading
+                   symbol for GOLD "$:nnn". If the window port needs to use
+                   the textual gold amount without the leading "$:" the port
+                   will have to add 2 to the passed "ptr" for the BL_GOLD
+case.
 */
 void
 mswin_status_update(int idx, genericptr_t ptr, int chg, int percent)
 {
-	long cond, *condptr = (long *)ptr;
-	char *text = (char *)ptr;
-	MSNHMsgUpdateStatus update_cmd_data;
-	int ocolor, ochar;
-	unsigned ospecial;
-	long value = -1;
-	
-	logDebug("mswin_status_update(%d, %p, %d, %d)\n", idx, ptr, chg, percent);
+    long cond, *condptr = (long *) ptr;
+    char *text = (char *) ptr;
+    MSNHMsgUpdateStatus update_cmd_data;
+    int ocolor, ochar;
+    unsigned ospecial;
+    long value = -1;
 
-	if (idx != BL_FLUSH) {
-	    if (!_status_activefields[idx]) return;
-	    switch(idx) {
-		case BL_CONDITION: {
-			cond = *condptr;
-			*_status_vals[idx] = '\0';
-			if (cond & BL_MASK_BLIND) Strcat(_status_vals[idx], " Blind");
-			if (cond & BL_MASK_CONF) Strcat(_status_vals[idx], " Conf");
-			if (cond & BL_MASK_FOODPOIS)
-				Strcat(_status_vals[idx], " FoodPois");
-			if (cond & BL_MASK_ILL) Strcat(_status_vals[idx], " Ill");
-			if (cond & BL_MASK_STUNNED) Strcat(_status_vals[idx], " Stun");
-			if (cond & BL_MASK_HALLU) Strcat(_status_vals[idx], " Hallu");
-			if (cond & BL_MASK_SLIMED) Strcat(_status_vals[idx], " Slime");
-			value = cond;
-		} break;
-		case BL_GOLD: { 
-			char buf[BUFSZ];
-			char* p;
-			ZeroMemory(buf, sizeof(buf));
-			mapglyph(objnum_to_glyph(GOLD_PIECE), &ochar, &ocolor, &ospecial, 0, 0);
-			buf[0] = ochar;
-			p = strchr(text, ':');
-			if(p) strncpy(buf+1, p, sizeof(buf)-2);
-			value = atol(buf);
-			Sprintf(_status_vals[idx],
-			_status_fieldfmt[idx] ? _status_fieldfmt[idx] : "%s", buf);
-		} break;
-		default: {
-			value = atol(text);
-			Sprintf(_status_vals[idx],
-			_status_fieldfmt[idx] ? _status_fieldfmt[idx] : "%s", text);
-		} break;
-	    }
-	}
+    logDebug("mswin_status_update(%d, %p, %d, %d)\n", idx, ptr, chg, percent);
 
-# ifdef STATUS_HILITES
-	switch(_status_hilites[idx].behavior) {
-		case BL_TH_NONE: {
-			_status_colors[idx] = CLR_MAX;
-		} break;
+    if (idx != BL_FLUSH) {
+        if (!_status_activefields[idx])
+            return;
+        switch (idx) {
+        case BL_CONDITION: {
+            cond = *condptr;
+            *_status_vals[idx] = '\0';
+            if (cond & BL_MASK_BLIND)
+                Strcat(_status_vals[idx], " Blind");
+            if (cond & BL_MASK_CONF)
+                Strcat(_status_vals[idx], " Conf");
+            if (cond & BL_MASK_FOODPOIS)
+                Strcat(_status_vals[idx], " FoodPois");
+            if (cond & BL_MASK_ILL)
+                Strcat(_status_vals[idx], " Ill");
+            if (cond & BL_MASK_STUNNED)
+                Strcat(_status_vals[idx], " Stun");
+            if (cond & BL_MASK_HALLU)
+                Strcat(_status_vals[idx], " Hallu");
+            if (cond & BL_MASK_SLIMED)
+                Strcat(_status_vals[idx], " Slime");
+            value = cond;
+        } break;
+        case BL_GOLD: {
+            char buf[BUFSZ];
+            char *p;
+            ZeroMemory(buf, sizeof(buf));
+            mapglyph(objnum_to_glyph(GOLD_PIECE), &ochar, &ocolor, &ospecial,
+                     0, 0);
+            buf[0] = ochar;
+            p = strchr(text, ':');
+            if (p)
+                strncpy(buf + 1, p, sizeof(buf) - 2);
+            value = atol(buf);
+            Sprintf(_status_vals[idx],
+                    _status_fieldfmt[idx] ? _status_fieldfmt[idx] : "%s",
+                    buf);
+        } break;
+        default: {
+            value = atol(text);
+            Sprintf(_status_vals[idx],
+                    _status_fieldfmt[idx] ? _status_fieldfmt[idx] : "%s",
+                    text);
+        } break;
+        }
+    }
 
-		case BL_TH_UPDOWN: {
-			if(chg > 0) _status_colors[idx] = _status_hilites[idx].over;
-			else if(chg < 0) _status_colors[idx] = _status_hilites[idx].under;
-			else _status_colors[idx] = CLR_MAX;
-		} break;
+#ifdef STATUS_HILITES
+    switch (_status_hilites[idx].behavior) {
+    case BL_TH_NONE: {
+        _status_colors[idx] = CLR_MAX;
+    } break;
 
-		case BL_TH_VAL_PERCENTAGE: {
-			int pct_th = 0;
-			if(_status_hilites[idx].thresholdtype!=ANY_INT) {
-				impossible("mswin_status_update: unsupported percentage threshold type %d", _status_hilites[idx].thresholdtype);
-				break;
-			}
-			pct_th = _status_hilites[idx].threshold.a_int;
-			_status_colors[idx] = (percent >= pct_th)? _status_hilites[idx].over : _status_hilites[idx].under;
-		} break;
+    case BL_TH_UPDOWN: {
+        if (chg > 0)
+            _status_colors[idx] = _status_hilites[idx].over;
+        else if (chg < 0)
+            _status_colors[idx] = _status_hilites[idx].under;
+        else
+            _status_colors[idx] = CLR_MAX;
+    } break;
 
-		case BL_TH_VAL_ABSOLUTE: {
-			int c = CLR_MAX;
-			int o = _status_hilites[idx].over;
-			int u = _status_hilites[idx].under;
-			anything* t = &_status_hilites[idx].threshold;
-			switch (_status_hilites[idx].thresholdtype) {
-				case ANY_LONG:	c = (value >= t->a_long)? o : u; break;
-				case ANY_INT:	c = (value >= t->a_int)? o : u; break;
-				case ANY_UINT:	c = ((unsigned long)value >= t->a_uint)? o : u; break;
-				case ANY_ULONG:	c = ((unsigned long)value >= t->a_ulong)? o : u; break;
-				case ANY_MASK32: c = (value & t->a_ulong)? o : u; break;
-				default:
-					impossible("mswin_status_update: unsupported absolute threshold type %d\n", _status_hilites[idx].thresholdtype);
-				break;
-			}
-			_status_colors[idx] = c;
-		} break;
-	}
+    case BL_TH_VAL_PERCENTAGE: {
+        int pct_th = 0;
+        if (_status_hilites[idx].thresholdtype != ANY_INT) {
+            impossible("mswin_status_update: unsupported percentage "
+                       "threshold type %d",
+                       _status_hilites[idx].thresholdtype);
+            break;
+        }
+        pct_th = _status_hilites[idx].threshold.a_int;
+        _status_colors[idx] = (percent >= pct_th)
+                                  ? _status_hilites[idx].over
+                                  : _status_hilites[idx].under;
+    } break;
+
+    case BL_TH_VAL_ABSOLUTE: {
+        int c = CLR_MAX;
+        int o = _status_hilites[idx].over;
+        int u = _status_hilites[idx].under;
+        anything *t = &_status_hilites[idx].threshold;
+        switch (_status_hilites[idx].thresholdtype) {
+        case ANY_LONG:
+            c = (value >= t->a_long) ? o : u;
+            break;
+        case ANY_INT:
+            c = (value >= t->a_int) ? o : u;
+            break;
+        case ANY_UINT:
+            c = ((unsigned long) value >= t->a_uint) ? o : u;
+            break;
+        case ANY_ULONG:
+            c = ((unsigned long) value >= t->a_ulong) ? o : u;
+            break;
+        case ANY_MASK32:
+            c = (value & t->a_ulong) ? o : u;
+            break;
+        default:
+            impossible("mswin_status_update: unsupported absolute threshold "
+                       "type %d\n",
+                       _status_hilites[idx].thresholdtype);
+            break;
+        }
+        _status_colors[idx] = c;
+    } break;
+    }
 #endif /* STATUS_HILITES */
-	
-	/* send command to status window */
-	ZeroMemory(&update_cmd_data, sizeof(update_cmd_data));
-	update_cmd_data.n_fields = MAXBLSTATS;
-	update_cmd_data.vals = _status_vals;
-	update_cmd_data.activefields = _status_activefields;
-	update_cmd_data.colors = _status_colors;
-	SendMessage( 
-		mswin_hwnd_from_winid(WIN_STATUS), 
-		WM_MSNH_COMMAND, (WPARAM)MSNH_MSG_UPDATE_STATUS, (LPARAM)&update_cmd_data );
+
+    /* send command to status window */
+    ZeroMemory(&update_cmd_data, sizeof(update_cmd_data));
+    update_cmd_data.n_fields = MAXBLSTATS;
+    update_cmd_data.vals = _status_vals;
+    update_cmd_data.activefields = _status_activefields;
+    update_cmd_data.colors = _status_colors;
+    SendMessage(mswin_hwnd_from_winid(WIN_STATUS), WM_MSNH_COMMAND,
+                (WPARAM) MSNH_MSG_UPDATE_STATUS, (LPARAM) &update_cmd_data);
 }
 
 #endif /*STATUS_VIA_WINDOWPORT*/

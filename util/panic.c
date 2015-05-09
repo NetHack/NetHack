@@ -1,4 +1,4 @@
-/* NetHack 3.6	panic.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	panic.c	$NHDT-Date: 1431192770 2015/05/09 17:32:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
 /* NetHack 3.6	panic.c	$Date: 2009/05/06 10:54:39 $  $Revision: 1.4 $ */
 /*	SCCS Id: @(#)panic.c	3.5	1994/03/02	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
@@ -21,30 +21,30 @@ extern void NDECL(vms_abort);
 
 /*VARARGS1*/
 boolean panicking;
-void VDECL(panic, (char *,...));
+void VDECL(panic, (char *, ...));
 
-void
-panic VA_DECL(char *,str)
-	VA_START(str);
-	VA_INIT(str, char *);
-	if(panicking++)
+void panic
+VA_DECL(char *, str)
+    VA_START(str);
+    VA_INIT(str, char *);
+    if (panicking++)
 #ifdef SYSV
-	    (void)
+        (void)
 #endif
-		abort();    /* avoid loops - this should never happen*/
+            abort(); /* avoid loops - this should never happen*/
 
-	(void) fputs(" ERROR:  ", stderr);
-	Vfprintf(stderr, str, VA_ARGS);
-	(void) fflush(stderr);
+    (void) fputs(" ERROR:  ", stderr);
+    Vfprintf(stderr, str, VA_ARGS);
+    (void) fflush(stderr);
 #if defined(UNIX) || defined(VMS)
-# ifdef SYSV
-		(void)
-# endif
-		    abort();	/* generate core dump */
+#ifdef SYSV
+    (void)
 #endif
-	VA_END();
-	exit(EXIT_FAILURE);		/* redundant */
-	return;
+        abort(); /* generate core dump */
+#endif
+    VA_END();
+    exit(EXIT_FAILURE); /* redundant */
+    return;
 }
 
 #ifdef ALLOCA_HACK
@@ -53,10 +53,11 @@ panic VA_DECL(char *,str)
  * have it then just use malloc() instead.  This may not work on some
  * systems, but they should either use yacc or get a real alloca routine.
  */
-long *alloca(cnt)
+long *
+alloca(cnt)
 unsigned cnt;
 {
-	return cnt ? alloc(cnt) : (long *)0;
+    return cnt ? alloc(cnt) : (long *) 0;
 }
 #endif
 

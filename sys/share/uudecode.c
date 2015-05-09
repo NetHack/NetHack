@@ -32,7 +32,7 @@
  * but other programs such as zoo or arc may or may not require the file
  * to be "BILFed" (or "unBILFed" or whatever).  Also, unlike the other
  * flavors, VMS files don't get overwritten (a higher version is created).
- * 
+ *
  * Modified 13 April 1991 by Gary Mussar to be forgiving of systems that
  * appear to be stripping trailing blanks.
  *
@@ -41,7 +41,7 @@
  * Modified 08 July 2006 to cast strlen() result to int to suppress a
  * warning on platforms where size_t > sizeof(int).
  *
- * $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+ * $NHDT-Date: 1431192778 2015/05/09 17:32:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.6 $
  * $Date: 2006/07/09 16:42:21 $  $Revision: 1.4 $
  */
 
@@ -49,7 +49,7 @@
 static char sccsid[] = "@(#)uudecode.c	5.5 (Berkeley) 7/6/88";
 #endif /* not lint */
 
-#ifdef __MSDOS__        /* For Turbo C */
+#ifdef __MSDOS__ /* For Turbo C */
 #define MSDOS 1
 #endif
 
@@ -70,108 +70,110 @@ static char sccsid[] = "@(#)uudecode.c	5.5 (Berkeley) 7/6/88";
 #include <stdio.h>
 
 #ifdef VMS
-#  include <types.h>
-#  include <stat.h>
+#include <types.h>
+#include <stat.h>
 #else
-#  if !defined(MSDOS) && !defined(WIN32)
-#    include <pwd.h>
-#  endif
-#  include <sys/types.h>   /* MSDOS, WIN32, or UNIX */
-#  include <sys/stat.h>
-#  include <string.h>
-#  include <stdlib.h>
+#if !defined(MSDOS) && !defined(WIN32)
+#include <pwd.h>
+#endif
+#include <sys/types.h> /* MSDOS, WIN32, or UNIX */
+#include <sys/stat.h>
+#include <string.h>
+#include <stdlib.h>
 #endif
 
 static void decode(FILE *, FILE *);
 static void outdec(char *, FILE *, int);
 
 /* single-character decode */
-#define DEC(c)	(((c) - ' ') & 077)
+#define DEC(c) (((c) - ' ') & 077)
 
-int main(argc, argv)
+int
+main(argc, argv)
 int argc;
 char **argv;
 {
-	FILE *in, *out;
-	int mode;
-	char dest[128];
-	char buf[80];
+    FILE *in, *out;
+    int mode;
+    char dest[128];
+    char buf[80];
 
-	/* optional input arg */
-	if (argc > 1) {
-		if ((in = fopen(argv[1], "r")) == NULL) {
-			perror(argv[1]);
-			exit(1);
-		}
-		argv++; argc--;
-	} else
-		in = stdin;
+    /* optional input arg */
+    if (argc > 1) {
+        if ((in = fopen(argv[1], "r")) == NULL) {
+            perror(argv[1]);
+            exit(1);
+        }
+        argv++;
+        argc--;
+    } else
+        in = stdin;
 
-	if (argc != 1) {
-		printf("Usage: uudecode [infile]\n");
-		exit(2);
-	}
+    if (argc != 1) {
+        printf("Usage: uudecode [infile]\n");
+        exit(2);
+    }
 
-	/* search for header line */
-	for (;;) {
-		if (fgets(buf, sizeof buf, in) == NULL) {
-			fprintf(stderr, "No begin line\n");
-			exit(3);
-		}
-		if (strncmp(buf, "begin ", 6) == 0)
-			break;
-	}
-	(void)sscanf(buf, "begin %o %s", &mode, dest);
+    /* search for header line */
+    for (;;) {
+        if (fgets(buf, sizeof buf, in) == NULL) {
+            fprintf(stderr, "No begin line\n");
+            exit(3);
+        }
+        if (strncmp(buf, "begin ", 6) == 0)
+            break;
+    }
+    (void) sscanf(buf, "begin %o %s", &mode, dest);
 
 #if !defined(MSDOS) && !defined(VMS) && !defined(WIN32)
-	/* handle ~user/file format */
-	if (dest[0] == '~') {
-		char *sl;
-		struct passwd *getpwnam();
-		struct passwd *user;
-		char dnbuf[100], *index(), *strcat(), *strcpy();
+    /* handle ~user/file format */
+    if (dest[0] == '~') {
+        char *sl;
+        struct passwd *getpwnam();
+        struct passwd *user;
+        char dnbuf[100], *index(), *strcat(), *strcpy();
 
-		sl = index(dest, '/');
-		if (sl == NULL) {
-			fprintf(stderr, "Illegal ~user\n");
-			exit(3);
-		}
-		*sl++ = 0;
-		user = getpwnam(dest+1);
-		if (user == NULL) {
-			fprintf(stderr, "No such user as %s\n", dest);
-			exit(4);
-		}
-		strcpy(dnbuf, user->pw_dir);
-		strcat(dnbuf, "/");
-		strcat(dnbuf, sl);
-		strcpy(dest, dnbuf);
-	}
-#endif	/* !defined(MSDOS) && !defined(VMS) */
+        sl = index(dest, '/');
+        if (sl == NULL) {
+            fprintf(stderr, "Illegal ~user\n");
+            exit(3);
+        }
+        *sl++ = 0;
+        user = getpwnam(dest + 1);
+        if (user == NULL) {
+            fprintf(stderr, "No such user as %s\n", dest);
+            exit(4);
+        }
+        strcpy(dnbuf, user->pw_dir);
+        strcat(dnbuf, "/");
+        strcat(dnbuf, sl);
+        strcpy(dest, dnbuf);
+    }
+#endif /* !defined(MSDOS) && !defined(VMS) */
 
-	/* create output file */
+/* create output file */
 #if defined(MSDOS) || defined(WIN32)
-	out = fopen(dest, "wb");	/* Binary file */
+    out = fopen(dest, "wb"); /* Binary file */
 #else
-	out = fopen(dest, "w");
+    out = fopen(dest, "w");
 #endif
-	if (out == NULL) {
-		perror(dest);
-		exit(4);
-	}
-#if !defined(MSDOS) && !defined(VMS) && !defined(WIN32)	/* i.e., UNIX */
-	chmod(dest, mode);
+    if (out == NULL) {
+        perror(dest);
+        exit(4);
+    }
+#if !defined(MSDOS) && !defined(VMS) && !defined(WIN32) /* i.e., UNIX */
+    chmod(dest, mode);
 #endif
 
-	decode(in, out);
+    decode(in, out);
 
-	if (fgets(buf, sizeof buf, in) == NULL || strcmp(buf, "end\n")) {
-		fprintf(stderr, "No end line\n");
-		exit(5);
-	}
-	exit(0);
-	/*NOTREACHED*/
-	return 0;
+    if (fgets(buf, sizeof buf, in) == NULL || strcmp(buf, "end\n")) {
+        fprintf(stderr, "No end line\n");
+        exit(5);
+    }
+    exit(0);
+    /*NOTREACHED*/
+    return 0;
 }
 
 /*
@@ -182,31 +184,32 @@ decode(in, out)
 FILE *in;
 FILE *out;
 {
-	char buf[80];
-	char *bp;
-	int n, i, expected;
+    char buf[80];
+    char *bp;
+    int n, i, expected;
 
-	for (;;) {
-		/* for each input line */
-		if (fgets(buf, sizeof buf, in) == NULL) {
-			printf("Short file\n");
-			exit(10);
-		}
-		n = DEC(buf[0]);
-		if ((n <= 0) || (buf[0] == '\n'))
-			break;
+    for (;;) {
+        /* for each input line */
+        if (fgets(buf, sizeof buf, in) == NULL) {
+            printf("Short file\n");
+            exit(10);
+        }
+        n = DEC(buf[0]);
+        if ((n <= 0) || (buf[0] == '\n'))
+            break;
 
-		/* Calculate expected # of chars and pad if necessary */
-		expected = ((n+2)/3)<<2;
-		for (i = (int)strlen(buf)-1; i <= expected; i++) buf[i] = ' ';
+        /* Calculate expected # of chars and pad if necessary */
+        expected = ((n + 2) / 3) << 2;
+        for (i = (int) strlen(buf) - 1; i <= expected; i++)
+            buf[i] = ' ';
 
-		bp = &buf[1];
-		while (n > 0) {
-			outdec(bp, out, n);
-			bp += 4;
-			n -= 3;
-		}
-	}
+        bp = &buf[1];
+        while (n > 0) {
+            outdec(bp, out, n);
+            bp += 4;
+            n -= 3;
+        }
+    }
 }
 
 /*
@@ -221,17 +224,17 @@ char *p;
 FILE *f;
 int n;
 {
-	int c1, c2, c3;
+    int c1, c2, c3;
 
-	c1 = DEC(*p) << 2 | DEC(p[1]) >> 4;
-	c2 = DEC(p[1]) << 4 | DEC(p[2]) >> 2;
-	c3 = DEC(p[2]) << 6 | DEC(p[3]);
-	if (n >= 1)
-		putc(c1, f);
-	if (n >= 2)
-		putc(c2, f);
-	if (n >= 3)
-		putc(c3, f);
+    c1 = DEC(*p) << 2 | DEC(p[1]) >> 4;
+    c2 = DEC(p[1]) << 4 | DEC(p[2]) >> 2;
+    c3 = DEC(p[2]) << 6 | DEC(p[3]);
+    if (n >= 1)
+        putc(c1, f);
+    if (n >= 2)
+        putc(c2, f);
+    if (n >= 3)
+        putc(c3, f);
 }
 
 #if !defined(MSDOS) && !defined(VMS) && !defined(WIN32)
@@ -241,18 +244,17 @@ int n;
  */
 
 #ifndef NULL
-#define	NULL	0
+#define NULL 0
 #endif
 
 char *
 index(sp, c)
 register char *sp, c;
 {
-	do {
-		if (*sp == c)
-			return(sp);
-	} while (*sp++);
-	return(NULL);
+    do {
+        if (*sp == c)
+            return (sp);
+    } while (*sp++);
+    return (NULL);
 }
 #endif
-

@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhrip.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	mhrip.c	$NHDT-Date: 1431192788 2015/05/09 17:33:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
 /* NetHack 3.6	mhrip.c	$Date: 2009/05/06 10:52:26 $  $Revision: 1.5 $ */
 /*	SCCS Id: @(#)mhrip.c	3.5	2005/01/23	*/
 /* Copyright (C) 2001 by Alex Kompel 	 */
@@ -8,13 +8,14 @@
 #include "mhrip.h"
 #include "mhtext.h"
 
-HWND mswin_init_RIP_window () 
+HWND
+mswin_init_RIP_window()
 {
-	return mswin_init_text_window();
+    return mswin_init_text_window();
 }
 
-void mswin_display_RIP_window (HWND hWnd)
+void
+mswin_display_RIP_window(HWND hWnd)
 {
-	mswin_display_text_window(hWnd);
+    mswin_display_text_window(hWnd);
 }
-

@@ -1,4 +1,4 @@
-/* NetHack 3.6	lev_main.c	$NHDT-Date: 1428655166 2015/04/10 08:39:26 $  $NHDT-Branch: master $:$NHDT-Revision: 1.34 $ */
+/* NetHack 3.6	lev_main.c	$NHDT-Date: 1431192770 2015/05/09 17:32:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.38 $ */
 /* NetHack 3.6	lev_main.c	$Date: 2012/01/12 04:48:12 $  $Revision: 1.20 $ */
 /*	SCCS Id: @(#)lev_main.c	3.5	2007/01/17	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
@@ -8,7 +8,7 @@
  * This file contains the main function for the parser
  * and some useful functions needed by yacc
  */
-#define SPEC_LEV    /* for USE_OLDARGS (sp_lev.h) and for MPW (macconf.h) */
+#define SPEC_LEV /* for USE_OLDARGS (sp_lev.h) and for MPW (macconf.h) */
 
 #define NEED_VARARGS
 #include "hack.h"
@@ -20,15 +20,15 @@
 #include <ctype.h>
 
 #ifdef MAC
-# if defined(__SC__) || defined(__MRC__)
-#  define MPWTOOL
-#  define PREFIX ":dungeon:"	/* place output files here */
-#  include <CursorCtl.h>
-# else
-#  if !defined(__MACH__)
-#   define PREFIX ":lib:"	/* place output files here */
-#  endif
-# endif
+#if defined(__SC__) || defined(__MRC__)
+#define MPWTOOL
+#define PREFIX ":dungeon:" /* place output files here */
+#include <CursorCtl.h>
+#else
+#if !defined(__MACH__)
+#define PREFIX ":lib:" /* place output files here */
+#endif
+#endif
 #endif
 
 #ifdef WIN_CE
@@ -36,72 +36,77 @@
 #endif
 
 #ifndef MPWTOOL
-# define SpinCursor(x)
+#define SpinCursor(x)
 #endif
 
 #if defined(AMIGA) && defined(DLB)
-# define PREFIX "NH:slib/"
+#define PREFIX "NH:slib/"
 #endif
 
 #ifndef O_WRONLY
 #include <fcntl.h>
 #endif
-#ifndef O_CREAT	/* some older BSD systems do not define O_CREAT in <fcntl.h> */
+#ifndef O_CREAT /* some older BSD systems do not define O_CREAT in <fcntl.h> \
+                   */
 #include <sys/file.h>
 #endif
-#ifndef O_BINARY	/* used for micros, no-op for others */
-# define O_BINARY 0
+#ifndef O_BINARY /* used for micros, no-op for others */
+#define O_BINARY 0
 #endif
 
 #if defined(MICRO) || defined(WIN32)
-# define OMASK FCMASK
+#define OMASK FCMASK
 #else
-# define OMASK 0644
+#define OMASK 0644
 #endif
 
-#define ERR		(-1)
+#define ERR (-1)
 
-#define NewTab(type, size)	(type **) alloc(sizeof(type *) * size)
-#define Free(ptr)		if(ptr) free((genericptr_t) (ptr))
-	/* write() returns a signed value but its size argument is unsigned;
-	   types might be int and unsigned or ssize_t and size_t; casting
-	   to long should be safe for all permutations (even if size_t is
-	   bigger, since the values involved won't be too big for long) */
-#define Write(fd, item, size) if ((long)write(fd, (genericptr_t)(item), size) \
-				  != (long)(size)) return FALSE;
+#define NewTab(type, size) (type **) alloc(sizeof(type *) * size)
+#define Free(ptr) \
+    if (ptr)      \
+    free((genericptr_t)(ptr))
+/* write() returns a signed value but its size argument is unsigned;
+   types might be int and unsigned or ssize_t and size_t; casting
+   to long should be safe for all permutations (even if size_t is
+   bigger, since the values involved won't be too big for long) */
+#define Write(fd, item, size)                                          \
+    if ((long) write(fd, (genericptr_t)(item), size) != (long) (size)) \
+        return FALSE;
 
 #if defined(__BORLANDC__) && !defined(_WIN32)
 extern unsigned _stklen = STKSIZ;
 #endif
-#define MAX_ERRORS	25
+#define MAX_ERRORS 25
 
-extern int  NDECL(yyparse);
+extern int NDECL(yyparse);
 extern void FDECL(init_yyin, (FILE *));
 extern void FDECL(init_yyout, (FILE *));
 
-int  FDECL(main, (int, char **));
+int FDECL(main, (int, char **));
 void FDECL(yyerror, (const char *));
 void FDECL(yywarning, (const char *));
-int  NDECL(yywrap);
+int NDECL(yywrap);
 int FDECL(get_floor_type, (CHAR_P));
 int FDECL(get_room_type, (char *));
 int FDECL(get_trap_type, (char *));
-int FDECL(get_monster_id, (char *,CHAR_P));
-int FDECL(get_object_id, (char *,CHAR_P));
+int FDECL(get_monster_id, (char *, CHAR_P));
+int FDECL(get_object_id, (char *, CHAR_P));
 boolean FDECL(check_monster_char, (CHAR_P));
 boolean FDECL(check_object_char, (CHAR_P));
 char FDECL(what_map_char, (CHAR_P));
 void FDECL(scan_map, (char *, sp_lev *));
 boolean NDECL(check_subrooms);
-boolean FDECL(write_level_file, (char *,sp_lev *));
+boolean FDECL(write_level_file, (char *, sp_lev *));
 
-struct lc_funcdefs *FDECL(funcdef_new,(long,char *));
-void FDECL(funcdef_free_all,(struct lc_funcdefs *));
-struct lc_funcdefs *FDECL(funcdef_defined,(struct lc_funcdefs *,char *, int));
+struct lc_funcdefs *FDECL(funcdef_new, (long, char *));
+void FDECL(funcdef_free_all, (struct lc_funcdefs *));
+struct lc_funcdefs *FDECL(funcdef_defined,
+                          (struct lc_funcdefs *, char *, int));
 
-struct lc_vardefs *FDECL(vardef_new,(long,char *));
-void FDECL(vardef_free_all,(struct lc_vardefs *));
-struct lc_vardefs *FDECL(vardef_defined,(struct lc_vardefs *,char *, int));
+struct lc_vardefs *FDECL(vardef_new, (long, char *));
+void FDECL(vardef_free_all, (struct lc_vardefs *));
+struct lc_vardefs *FDECL(vardef_defined, (struct lc_vardefs *, char *, int));
 
 void FDECL(splev_add_from, (sp_lev *, sp_lev *));
 
@@ -112,23 +117,23 @@ extern void NDECL(decl_init);
 void FDECL(add_opcode, (sp_lev *, int, genericptr_t));
 
 static boolean FDECL(write_common_data, (int));
-static boolean FDECL(write_maze, (int,sp_lev *));
+static boolean FDECL(write_maze, (int, sp_lev *));
 static void NDECL(init_obj_classes);
 static int FDECL(case_insensitive_comp, (const char *, const char *));
 
 void VDECL(lc_pline, (const char *, ...));
 void VDECL(lc_error, (const char *, ...));
 void VDECL(lc_warning, (const char *, ...));
-char * FDECL(decode_parm_chr, (CHAR_P));
-char * FDECL(decode_parm_str, (char *));
-struct opvar * FDECL(set_opvar_int, (struct opvar *, long));
-struct opvar * FDECL(set_opvar_coord, (struct opvar *, long));
-struct opvar * FDECL(set_opvar_region, (struct opvar *, long));
-struct opvar * FDECL(set_opvar_mapchar, (struct opvar *, long));
-struct opvar * FDECL(set_opvar_monst, (struct opvar *, long));
-struct opvar * FDECL(set_opvar_obj, (struct opvar *, long));
-struct opvar * FDECL(set_opvar_str, (struct opvar *, const char *));
-struct opvar * FDECL(set_opvar_var, (struct opvar *, const char *));
+char *FDECL(decode_parm_chr, (CHAR_P));
+char *FDECL(decode_parm_str, (char *));
+struct opvar *FDECL(set_opvar_int, (struct opvar *, long));
+struct opvar *FDECL(set_opvar_coord, (struct opvar *, long));
+struct opvar *FDECL(set_opvar_region, (struct opvar *, long));
+struct opvar *FDECL(set_opvar_mapchar, (struct opvar *, long));
+struct opvar *FDECL(set_opvar_monst, (struct opvar *, long));
+struct opvar *FDECL(set_opvar_obj, (struct opvar *, long));
+struct opvar *FDECL(set_opvar_str, (struct opvar *, const char *));
+struct opvar *FDECL(set_opvar_var, (struct opvar *, const char *));
 void VDECL(add_opvars, (sp_lev *, const char *, ...));
 void NDECL(break_stmt_start);
 void FDECL(break_stmt_end, (sp_lev *));
@@ -137,73 +142,71 @@ char *FDECL(funcdef_paramtypes, (struct lc_funcdefs *));
 const char *FDECL(spovar2str, (long));
 void FDECL(vardef_used, (struct lc_vardefs *, char *));
 void FDECL(check_vardef_type, (struct lc_vardefs *, char *, long));
-struct lc_vardefs * FDECL(add_vardef_type, (struct lc_vardefs *, char *, long));
+struct lc_vardefs *FDECL(add_vardef_type,
+                         (struct lc_vardefs *, char *, long));
 int FDECL(reverse_jmp_opcode, (int));
-struct opvar * FDECL(opvar_clone, (struct opvar *));
+struct opvar *FDECL(opvar_clone, (struct opvar *));
 void FDECL(start_level_def, (sp_lev **, char *));
 
+static struct {
+    const char *name;
+    int type;
+} trap_types[] = { { "arrow", ARROW_TRAP },
+                   { "dart", DART_TRAP },
+                   { "falling rock", ROCKTRAP },
+                   { "board", SQKY_BOARD },
+                   { "bear", BEAR_TRAP },
+                   { "land mine", LANDMINE },
+                   { "rolling boulder", ROLLING_BOULDER_TRAP },
+                   { "sleep gas", SLP_GAS_TRAP },
+                   { "rust", RUST_TRAP },
+                   { "fire", FIRE_TRAP },
+                   { "pit", PIT },
+                   { "spiked pit", SPIKED_PIT },
+                   { "hole", HOLE },
+                   { "trap door", TRAPDOOR },
+                   { "teleport", TELEP_TRAP },
+                   { "level teleport", LEVEL_TELEP },
+                   { "magic portal", MAGIC_PORTAL },
+                   { "web", WEB },
+                   { "statue", STATUE_TRAP },
+                   { "magic", MAGIC_TRAP },
+                   { "anti magic", ANTI_MAGIC },
+                   { "polymorph", POLY_TRAP },
+                   { 0, 0 } };
 
 static struct {
-	const char *name;
-	int type;
-} trap_types[] = {
-	{ "arrow",	ARROW_TRAP },
-	{ "dart",	DART_TRAP },
-	{ "falling rock", ROCKTRAP },
-	{ "board",	SQKY_BOARD },
-	{ "bear",	BEAR_TRAP },
-	{ "land mine",	LANDMINE },
-	{ "rolling boulder",	ROLLING_BOULDER_TRAP },
-	{ "sleep gas",	SLP_GAS_TRAP },
-	{ "rust",	RUST_TRAP },
-	{ "fire",	FIRE_TRAP },
-	{ "pit",	PIT },
-	{ "spiked pit",	SPIKED_PIT },
-	{ "hole",	HOLE },
-	{ "trap door",	TRAPDOOR },
-	{ "teleport",	TELEP_TRAP },
-	{ "level teleport", LEVEL_TELEP },
-	{ "magic portal",   MAGIC_PORTAL },
-	{ "web",	WEB },
-	{ "statue",	STATUE_TRAP },
-	{ "magic",	MAGIC_TRAP },
-	{ "anti magic",	ANTI_MAGIC },
-	{ "polymorph",	POLY_TRAP },
-	{ 0, 0 }
-};
-
-static struct {
-	const char *name;
-	int type;
+    const char *name;
+    int type;
 } room_types[] = {
-	/* for historical reasons, room types are not contiguous numbers */
-	/* (type 1 is skipped) */
-	{ "ordinary",	 OROOM },
-	{ "throne",	 COURT },
-	{ "swamp",	 SWAMP },
-	{ "vault",	 VAULT },
-	{ "beehive",	 BEEHIVE },
-	{ "morgue",	 MORGUE },
-	{ "barracks",	 BARRACKS },
-	{ "zoo",	 ZOO },
-	{ "delphi",	 DELPHI },
-	{ "temple",	 TEMPLE },
-	{ "anthole",	 ANTHOLE },
-	{ "cocknest",	 COCKNEST },
-	{ "leprehall",	 LEPREHALL },
-	{ "shop",	 SHOPBASE },
-	{ "armor shop",	 ARMORSHOP },
-	{ "scroll shop", SCROLLSHOP },
-	{ "potion shop", POTIONSHOP },
-	{ "weapon shop", WEAPONSHOP },
-	{ "food shop",	 FOODSHOP },
-	{ "ring shop",	 RINGSHOP },
-	{ "wand shop",	 WANDSHOP },
-	{ "tool shop",	 TOOLSHOP },
-	{ "book shop",	 BOOKSHOP },
-	{ "health food shop", FODDERSHOP },
-	{ "candle shop", CANDLESHOP },
-	{ 0, 0 }
+    /* for historical reasons, room types are not contiguous numbers */
+    /* (type 1 is skipped) */
+    { "ordinary", OROOM },
+    { "throne", COURT },
+    { "swamp", SWAMP },
+    { "vault", VAULT },
+    { "beehive", BEEHIVE },
+    { "morgue", MORGUE },
+    { "barracks", BARRACKS },
+    { "zoo", ZOO },
+    { "delphi", DELPHI },
+    { "temple", TEMPLE },
+    { "anthole", ANTHOLE },
+    { "cocknest", COCKNEST },
+    { "leprehall", LEPREHALL },
+    { "shop", SHOPBASE },
+    { "armor shop", ARMORSHOP },
+    { "scroll shop", SCROLLSHOP },
+    { "potion shop", POTIONSHOP },
+    { "weapon shop", WEAPONSHOP },
+    { "food shop", FOODSHOP },
+    { "ring shop", RINGSHOP },
+    { "wand shop", WANDSHOP },
+    { "tool shop", TOOLSHOP },
+    { "book shop", BOOKSHOP },
+    { "health food shop", FODDERSHOP },
+    { "candle shop", CANDLESHOP },
+    { 0, 0 }
 };
 
 const char *fname = "(stdin)";
@@ -235,83 +238,68 @@ main(argc, argv)
 int argc;
 char **argv;
 {
-	FILE *fin;
-	int i;
-	boolean errors_encountered = FALSE;
+    FILE *fin;
+    int i;
+    boolean errors_encountered = FALSE;
 #if defined(MAC) && (defined(THINK_C) || defined(__MWERKS__))
-	static char *mac_argv[] = {	"lev_comp",	/* dummy argv[0] */
-				":dat:Arch.des",
-				":dat:Barb.des",
-				":dat:Caveman.des",
-				":dat:Healer.des",
-				":dat:Knight.des",
-				":dat:Monk.des",
-				":dat:Priest.des",
-				":dat:Ranger.des",
-				":dat:Rogue.des",
-				":dat:Samurai.des",
-				":dat:Tourist.des",
-				":dat:Valkyrie.des",
-				":dat:Wizard.des",
-				":dat:bigroom.des",
-				":dat:castle.des",
-				":dat:endgame.des",
-				":dat:gehennom.des",
-				":dat:knox.des",
-				":dat:medusa.des",
-				":dat:mines.des",
-				":dat:oracle.des",
-				":dat:sokoban.des",
-				":dat:tower.des",
-				":dat:yendor.des"
-				};
+    static char *mac_argv[] = {
+        "lev_comp", /* dummy argv[0] */
+        ":dat:Arch.des",    ":dat:Barb.des",     ":dat:Caveman.des",
+        ":dat:Healer.des",  ":dat:Knight.des",   ":dat:Monk.des",
+        ":dat:Priest.des",  ":dat:Ranger.des",   ":dat:Rogue.des",
+        ":dat:Samurai.des", ":dat:Tourist.des",  ":dat:Valkyrie.des",
+        ":dat:Wizard.des",  ":dat:bigroom.des",  ":dat:castle.des",
+        ":dat:endgame.des", ":dat:gehennom.des", ":dat:knox.des",
+        ":dat:medusa.des",  ":dat:mines.des",    ":dat:oracle.des",
+        ":dat:sokoban.des", ":dat:tower.des",    ":dat:yendor.des"
+    };
 
-	argc = SIZE(mac_argv);
-	argv = mac_argv;
+    argc = SIZE(mac_argv);
+    argv = mac_argv;
 #endif
-	/* Note:  these initializers don't do anything except guarantee that
-		we're linked properly.
-	*/
-	monst_init();
-	objects_init();
-	decl_init();
-	/* this one does something... */
-	init_obj_classes();
+    /* Note:  these initializers don't do anything except guarantee that
+            we're linked properly.
+    */
+    monst_init();
+    objects_init();
+    decl_init();
+    /* this one does something... */
+    init_obj_classes();
 
-	init_yyout(stdout);
-	if (argc == 1) {		/* Read standard input */
-	    init_yyin(stdin);
-	    (void) yyparse();
-	    if (fatal_error > 0) {
-		    errors_encountered = TRUE;
-	    }
-	} else {			/* Otherwise every argument is a filename */
-	    for(i=1; i<argc; i++) {
-		    fname = argv[i];
-		    if(!strcmp(fname, "-v")) {
-			be_verbose++;
-			continue;
-		    }
-		    fin = freopen(fname, "r", stdin);
-		    if (!fin) {
-			lc_pline("Can't open \"%s\" for input.\n", fname);
-			perror(fname);
-			errors_encountered = TRUE;
-		    } else {
-			fname_counter = 1;
-			init_yyin(fin);
-			(void) yyparse();
-			nh_line_number = 1;
-			if (fatal_error > 0 || got_errors > 0) {
-				errors_encountered = TRUE;
-				fatal_error = 0;
-			}
-		    }
-	    }
-	}
-	exit(errors_encountered ? EXIT_FAILURE : EXIT_SUCCESS);
-	/*NOTREACHED*/
-	return 0;
+    init_yyout(stdout);
+    if (argc == 1) { /* Read standard input */
+        init_yyin(stdin);
+        (void) yyparse();
+        if (fatal_error > 0) {
+            errors_encountered = TRUE;
+        }
+    } else { /* Otherwise every argument is a filename */
+        for (i = 1; i < argc; i++) {
+            fname = argv[i];
+            if (!strcmp(fname, "-v")) {
+                be_verbose++;
+                continue;
+            }
+            fin = freopen(fname, "r", stdin);
+            if (!fin) {
+                lc_pline("Can't open \"%s\" for input.\n", fname);
+                perror(fname);
+                errors_encountered = TRUE;
+            } else {
+                fname_counter = 1;
+                init_yyin(fin);
+                (void) yyparse();
+                nh_line_number = 1;
+                if (fatal_error > 0 || got_errors > 0) {
+                    errors_encountered = TRUE;
+                    fatal_error = 0;
+                }
+            }
+        }
+    }
+    exit(errors_encountered ? EXIT_FAILURE : EXIT_SUCCESS);
+    /*NOTREACHED*/
+    return 0;
 }
 
 /*
@@ -326,19 +314,18 @@ void
 yyerror(s)
 const char *s;
 {
-	char *e = ((char *)s + strlen(s) - 1);
+    char *e = ((char *) s + strlen(s) - 1);
 
-	(void) fprintf(stderr, "%s: line %d, pos %d: %s",
-		       fname, nh_line_number,
-		       token_start_pos - (int)strlen(curr_token), s);
-	if (*e != '.' && *e != '!')
-	    (void) fprintf(stderr, " at \"%s\"", curr_token);
-	(void) fprintf(stderr, "\n");
+    (void) fprintf(stderr, "%s: line %d, pos %d: %s", fname, nh_line_number,
+                   token_start_pos - (int) strlen(curr_token), s);
+    if (*e != '.' && *e != '!')
+        (void) fprintf(stderr, " at \"%s\"", curr_token);
+    (void) fprintf(stderr, "\n");
 
-	if (++fatal_error > MAX_ERRORS) {
-		(void) fprintf(stderr,"Too many errors, good bye!\n");
-		exit(EXIT_FAILURE);
-	}
+    if (++fatal_error > MAX_ERRORS) {
+        (void) fprintf(stderr, "Too many errors, good bye!\n");
+        exit(EXIT_FAILURE);
+    }
 }
 
 /*
@@ -348,8 +335,8 @@ void
 yywarning(s)
 const char *s;
 {
-	(void) fprintf(stderr, "%s: line %d : WARNING : %s\n",
-				fname, nh_line_number, s);
+    (void) fprintf(stderr, "%s: line %d : WARNING : %s\n", fname,
+                   nh_line_number, s);
 }
 
 /*
@@ -358,7 +345,7 @@ const char *s;
 int
 yywrap()
 {
-	return 1;
+    return 1;
 }
 
 /*
@@ -368,79 +355,89 @@ yywrap()
  *
  * Using state for message/warning/error mode simplifies calling interface.
  */
-#define LC_PLINE_MESSAGE	0
-#define LC_PLINE_WARNING	1
-#define LC_PLINE_ERROR		2
+#define LC_PLINE_MESSAGE 0
+#define LC_PLINE_WARNING 1
+#define LC_PLINE_ERROR 2
 static int lc_pline_mode = LC_PLINE_MESSAGE;
 
 #if defined(USE_STDARG) || defined(USE_VARARGS)
 static void FDECL(lc_vpline, (const char *, va_list));
 
-void
-lc_pline VA_DECL(const char *, line)
-	VA_START(line);
-	VA_INIT(line, char *);
-	lc_vpline(line, VA_ARGS);
-	VA_END();
+void lc_pline
+VA_DECL(const char *, line)
+    VA_START(line);
+    VA_INIT(line, char *);
+    lc_vpline(line, VA_ARGS);
+    VA_END();
 }
 
-# ifdef USE_STDARG
+#ifdef USE_STDARG
 static void
-lc_vpline(const char *line, va_list the_args) {
-# else
+lc_vpline(const char *line, va_list the_args)
+{
+#else
 static void
-lc_vpline(line, the_args) const char *line; va_list the_args; {
-# endif
+lc_vpline(line, the_args)
+const char *line;
+va_list the_args;
+{
+#endif
 
-#else	/* USE_STDARG | USE_VARARG */
+#else /* USE_STDARG | USE_VARARG */
 
 #define lc_vpline lc_pline
 
-void
-lc_pline VA_DECL(const char *, line)
-#endif	/* USE_STDARG | USE_VARARG */
+void lc_pline
+VA_DECL(const char *, line)
+#endif /* USE_STDARG | USE_VARARG */
 
-	char pbuf[3*BUFSZ];
-	static char nomsg[] = "(no message)";
-/* Do NOT use VA_START and VA_END in here... see above */
+    char pbuf[3 * BUFSZ];
+    static char nomsg[] = "(no message)";
+    /* Do NOT use VA_START and VA_END in here... see above */
 
-	if (!line || !*line) line = nomsg;	/* shouldn't happen */
-	if (index(line, '%')) {
-	    Vsprintf(pbuf, line, VA_ARGS);
-	    pbuf[BUFSZ-1] = '\0';	/* truncate if long */
-	    line = pbuf;
-	}
-	switch (lc_pline_mode) {
-	case LC_PLINE_ERROR:	yyerror(line);   break;
-	case LC_PLINE_WARNING:	yywarning(line); break;
-	default: (void)fprintf(stderr, "%s\n", line); break;
-	}
-	lc_pline_mode = LC_PLINE_MESSAGE;	/* reset to default */
-	return;
+    if (!line || !*line)
+        line = nomsg; /* shouldn't happen */
+    if (index(line, '%')) {
+        Vsprintf(pbuf, line, VA_ARGS);
+        pbuf[BUFSZ - 1] = '\0'; /* truncate if long */
+        line = pbuf;
+    }
+    switch (lc_pline_mode) {
+    case LC_PLINE_ERROR:
+        yyerror(line);
+        break;
+    case LC_PLINE_WARNING:
+        yywarning(line);
+        break;
+    default:
+        (void) fprintf(stderr, "%s\n", line);
+        break;
+    }
+    lc_pline_mode = LC_PLINE_MESSAGE; /* reset to default */
+    return;
 }
 
 /*VARARGS1*/
-void
-lc_error VA_DECL(const char *, line)
-	VA_START(line);
-	VA_INIT(line, const char *);
-	lc_pline_mode = LC_PLINE_ERROR;
-	lc_vpline(line, VA_ARGS);
-	VA_END();
-	return;
+void lc_error
+VA_DECL(const char *, line)
+    VA_START(line);
+    VA_INIT(line, const char *);
+    lc_pline_mode = LC_PLINE_ERROR;
+    lc_vpline(line, VA_ARGS);
+    VA_END();
+    return;
 }
 
 /*VARARGS1*/
-void
-lc_warning VA_DECL(const char *, line)
-	VA_START(line);
-	VA_INIT(line, const char *);
-	lc_pline_mode = LC_PLINE_WARNING;
-	lc_vpline(line, VA_ARGS);
-	VA_END();
-	return;
+void lc_warning
+VA_DECL(const char *, line)
+    VA_START(line);
+    VA_INIT(line, const char *);
+    lc_pline_mode = LC_PLINE_WARNING;
+    lc_vpline(line, VA_ARGS);
+    VA_END();
+    return;
 }
-
 
 char *
 decode_parm_chr(chr)
@@ -449,15 +446,33 @@ char chr;
     static char buf[32];
 
     switch (chr) {
-    default:  Strcpy(buf, "unknown"); break;
-    case 'i': Strcpy(buf, "int"); break;
-    case 'r': Strcpy(buf, "region"); break;
-    case 's': Strcpy(buf, "str"); break;
-    case 'O': Strcpy(buf, "obj"); break;
-    case 'c': Strcpy(buf, "coord"); break;
-    case ' ': Strcpy(buf, "nothing"); break;
-    case 'm': Strcpy(buf, "mapchar"); break;
-    case 'M': Strcpy(buf, "monster"); break;
+    default:
+        Strcpy(buf, "unknown");
+        break;
+    case 'i':
+        Strcpy(buf, "int");
+        break;
+    case 'r':
+        Strcpy(buf, "region");
+        break;
+    case 's':
+        Strcpy(buf, "str");
+        break;
+    case 'O':
+        Strcpy(buf, "obj");
+        break;
+    case 'c':
+        Strcpy(buf, "coord");
+        break;
+    case ' ':
+        Strcpy(buf, "nothing");
+        break;
+    case 'm':
+        Strcpy(buf, "mapchar");
+        break;
+    case 'M':
+        Strcpy(buf, "monster");
+        break;
     }
     return buf;
 }
@@ -470,19 +485,19 @@ char *str;
     char *p = str;
     tmpbuf[0] = '\0';
     if (str) {
-	for ( ; *p; p++) {
-	    Strcat(tmpbuf, decode_parm_chr(*p));
-	    if (*(p + 1)) Strcat(tmpbuf, ", ");
-	}
+        for (; *p; p++) {
+            Strcat(tmpbuf, decode_parm_chr(*p));
+            if (*(p + 1))
+                Strcat(tmpbuf, ", ");
+        }
     }
     return tmpbuf;
 }
 
-
 struct opvar *
 set_opvar_int(ov, val)
 struct opvar *ov;
-long  val;
+long val;
 {
     if (ov) {
         ov->spovartyp = SPOVAR_INT;
@@ -494,7 +509,7 @@ long  val;
 struct opvar *
 set_opvar_coord(ov, val)
 struct opvar *ov;
-long  val;
+long val;
 {
     if (ov) {
         ov->spovartyp = SPOVAR_COORD;
@@ -506,7 +521,7 @@ long  val;
 struct opvar *
 set_opvar_region(ov, val)
 struct opvar *ov;
-long  val;
+long val;
 {
     if (ov) {
         ov->spovartyp = SPOVAR_REGION;
@@ -518,7 +533,7 @@ long  val;
 struct opvar *
 set_opvar_mapchar(ov, val)
 struct opvar *ov;
-long  val;
+long val;
 {
     if (ov) {
         ov->spovartyp = SPOVAR_MAPCHAR;
@@ -530,7 +545,7 @@ long  val;
 struct opvar *
 set_opvar_monst(ov, val)
 struct opvar *ov;
-long  val;
+long val;
 {
     if (ov) {
         ov->spovartyp = SPOVAR_MONST;
@@ -542,7 +557,7 @@ long  val;
 struct opvar *
 set_opvar_obj(ov, val)
 struct opvar *ov;
-long  val;
+long val;
 {
     if (ov) {
         ov->spovartyp = SPOVAR_OBJ;
@@ -558,7 +573,7 @@ const char *val;
 {
     if (ov) {
         ov->spovartyp = SPOVAR_STRING;
-	ov->vardata.str = (val) ? strdup(val) : NULL;
+        ov->vardata.str = (val) ? strdup(val) : NULL;
     }
     return ov;
 }
@@ -570,116 +585,122 @@ const char *val;
 {
     if (ov) {
         ov->spovartyp = SPOVAR_VARIABLE;
-	ov->vardata.str = (val) ? strdup(val) : NULL;
+        ov->vardata.str = (val) ? strdup(val) : NULL;
     }
     return ov;
 }
 
-#define New(type)		\
-	(type *) memset((genericptr_t)alloc(sizeof(type)), 0, sizeof(type))
+#define New(type) \
+    (type *) memset((genericptr_t) alloc(sizeof(type)), 0, sizeof(type))
 
 #if defined(USE_STDARG) || defined(USE_VARARGS)
 static void FDECL(vadd_opvars, (sp_lev *, const char *, va_list));
 
-void
-add_opvars VA_DECL2(sp_lev *, sp, const char *, fmt)
-	VA_START(fmt);
-	VA_INIT(fmt, char *);
-	vadd_opvars(sp, fmt, VA_ARGS);
-	VA_END();
+void add_opvars
+VA_DECL2(sp_lev *, sp, const char *, fmt)
+    VA_START(fmt);
+    VA_INIT(fmt, char *);
+    vadd_opvars(sp, fmt, VA_ARGS);
+    VA_END();
 }
 
-# ifdef USE_STDARG
+#ifdef USE_STDARG
 static void
-vadd_opvars(sp_lev *sp, const char *fmt, va_list the_args) {
-# else
+vadd_opvars(sp_lev *sp, const char *fmt, va_list the_args)
+{
+#else
 static void
-vadd_opvars(sp, fmt, the_args) sp_lev *sp; const char *fmt; va_list the_args; {
-# endif
+vadd_opvars(sp, fmt, the_args)
+sp_lev *sp;
+const char *fmt;
+va_list the_args;
+{
+#endif
 
-#else	/* USE_STDARG | USE_VARARG */
+#else /* USE_STDARG | USE_VARARG */
 
 #define vadd_opvars add_opvars
 
-void
-add_opvars VA_DECL2(sp_lev *, sp, const char *, fmt)
-#endif	/* USE_STDARG | USE_VARARG */
+void add_opvars
+VA_DECL2(sp_lev *, sp, const char *, fmt)
+#endif /* USE_STDARG | USE_VARARG */
 
     const char *p, *lp;
     long la;
-/* Do NOT use VA_START and VA_END in here... see above */
+    /* Do NOT use VA_START and VA_END in here... see above */
 
-    for(p = fmt; *p != '\0'; p++) {
-	switch(*p) {
-	case ' ': break;
-	case 'i': /* integer */
-	    {
-		struct opvar *ov = New(struct opvar);
-		set_opvar_int(ov, VA_NEXT(la, long));
-		add_opcode(sp, SPO_PUSH, ov);
-		break;
-	    }
-	case 'c': /* coordinate */
-	    {
-		struct opvar *ov = New(struct opvar);
-		set_opvar_coord(ov, VA_NEXT(la, long));
-		add_opcode(sp, SPO_PUSH, ov);
-		break;
-	    }
-	case 'r': /* region */
-	    {
-		struct opvar *ov = New(struct opvar);
-		set_opvar_region(ov, VA_NEXT(la, long));
-		add_opcode(sp, SPO_PUSH, ov);
-		break;
-	    }
-	case 'm': /* mapchar */
-	    {
-		struct opvar *ov = New(struct opvar);
-		set_opvar_mapchar(ov, VA_NEXT(la, long));
-		add_opcode(sp, SPO_PUSH, ov);
-		break;
-	    }
-	case 'M': /* monster */
-	    {
-		struct opvar *ov = New(struct opvar);
-		set_opvar_monst(ov, VA_NEXT(la, long));
-		add_opcode(sp, SPO_PUSH, ov);
-		break;
-	    }
-	case 'O': /* object */
-	    {
-		struct opvar *ov = New(struct opvar);
-		set_opvar_obj(ov, VA_NEXT(la, long));
-		add_opcode(sp, SPO_PUSH, ov);
-		break;
-	    }
-	case 's': /* string */
-	    {
-		struct opvar *ov = New(struct opvar);
-		set_opvar_str(ov, VA_NEXT(lp, const char *));
-		add_opcode(sp, SPO_PUSH, ov);
-		break;
-	    }
-	case 'v': /* variable */
-	    {
-		struct opvar *ov = New(struct opvar);
-		set_opvar_var(ov, VA_NEXT(lp, const char *));
-		add_opcode(sp, SPO_PUSH, ov);
-		break;
-	    }
-	case 'o': /* opcode */
-	    {
-		long i = VA_NEXT(la, int);
-		if (i < 0 || i >= MAX_SP_OPCODES)
-		    lc_pline("add_opvars: unknown opcode '%ld'.", i);
-		add_opcode(sp, i, NULL);
-		break;
-	    }
-	default:
-	    lc_pline("add_opvars: illegal format character '%c'.", *p);
-	    break;
-	}
+    for (p = fmt; *p != '\0'; p++) {
+        switch (*p) {
+        case ' ':
+            break;
+        case 'i': /* integer */
+        {
+            struct opvar *ov = New(struct opvar);
+            set_opvar_int(ov, VA_NEXT(la, long) );
+            add_opcode(sp, SPO_PUSH, ov);
+            break;
+        }
+        case 'c': /* coordinate */
+        {
+            struct opvar *ov = New(struct opvar);
+            set_opvar_coord(ov, VA_NEXT(la, long) );
+            add_opcode(sp, SPO_PUSH, ov);
+            break;
+        }
+        case 'r': /* region */
+        {
+            struct opvar *ov = New(struct opvar);
+            set_opvar_region(ov, VA_NEXT(la, long) );
+            add_opcode(sp, SPO_PUSH, ov);
+            break;
+        }
+        case 'm': /* mapchar */
+        {
+            struct opvar *ov = New(struct opvar);
+            set_opvar_mapchar(ov, VA_NEXT(la, long) );
+            add_opcode(sp, SPO_PUSH, ov);
+            break;
+        }
+        case 'M': /* monster */
+        {
+            struct opvar *ov = New(struct opvar);
+            set_opvar_monst(ov, VA_NEXT(la, long) );
+            add_opcode(sp, SPO_PUSH, ov);
+            break;
+        }
+        case 'O': /* object */
+        {
+            struct opvar *ov = New(struct opvar);
+            set_opvar_obj(ov, VA_NEXT(la, long) );
+            add_opcode(sp, SPO_PUSH, ov);
+            break;
+        }
+        case 's': /* string */
+        {
+            struct opvar *ov = New(struct opvar);
+            set_opvar_str(ov, VA_NEXT(lp, const char *) );
+            add_opcode(sp, SPO_PUSH, ov);
+            break;
+        }
+        case 'v': /* variable */
+        {
+            struct opvar *ov = New(struct opvar);
+            set_opvar_var(ov, VA_NEXT(lp, const char *) );
+            add_opcode(sp, SPO_PUSH, ov);
+            break;
+        }
+        case 'o': /* opcode */
+        {
+            long i = VA_NEXT(la, int);
+            if (i < 0 || i >= MAX_SP_OPCODES)
+                lc_pline("add_opvars: unknown opcode '%ld'.", i);
+            add_opcode(sp, i, NULL);
+            break;
+        }
+        default:
+            lc_pline("add_opvars: illegal format character '%c'.", *p);
+            break;
+        }
     }
     return;
 }
@@ -692,31 +713,34 @@ break_stmt_start()
 
 void
 break_stmt_end(splev)
-     sp_lev *splev;
+sp_lev *splev;
 {
     struct lc_breakdef *tmp = break_list;
     struct lc_breakdef *prv = NULL;
     while (tmp) {
-	if (tmp->break_depth == allow_break_statements) {
-	    struct lc_breakdef *nxt = tmp->next;
-	    set_opvar_int(tmp->breakpoint, splev->n_opcodes - tmp->breakpoint->vardata.l-1);
-	    tmp->next = NULL;
-	    Free(tmp);
-	    if (!prv) break_list = NULL;
-	    else prv->next = nxt;
-	    tmp = nxt;
-	} else {
-	    prv = tmp;
-	    tmp = tmp->next;
-	}
+        if (tmp->break_depth == allow_break_statements) {
+            struct lc_breakdef *nxt = tmp->next;
+            set_opvar_int(tmp->breakpoint,
+                          splev->n_opcodes - tmp->breakpoint->vardata.l - 1);
+            tmp->next = NULL;
+            Free(tmp);
+            if (!prv)
+                break_list = NULL;
+            else
+                prv->next = nxt;
+            tmp = nxt;
+        } else {
+            prv = tmp;
+            tmp = tmp->next;
+        }
     }
     allow_break_statements--;
 }
 
 void
-break_stmt_new(splev,i)
-     sp_lev *splev;
-     long i;
+break_stmt_new(splev, i)
+sp_lev *splev;
+long i;
 {
     struct lc_breakdef *tmp = New(struct lc_breakdef);
     tmp->breakpoint = New(struct opvar);
@@ -730,13 +754,13 @@ break_stmt_new(splev,i)
 
 struct lc_funcdefs *
 funcdef_new(addr, name)
-     long addr;
-     char *name;
+long addr;
+char *name;
 {
     struct lc_funcdefs *f = New(struct lc_funcdefs);
     if (!f) {
-	lc_error("Could not alloc function definition for '%s'.", name);
-	return NULL;
+        lc_error("Could not alloc function definition for '%s'.", name);
+        return NULL;
     }
     f->next = NULL;
     f->addr = addr;
@@ -751,37 +775,37 @@ funcdef_new(addr, name)
 
 void
 funcdef_free_all(fchain)
-     struct lc_funcdefs *fchain;
+struct lc_funcdefs *fchain;
 {
     struct lc_funcdefs *tmp = fchain;
     struct lc_funcdefs *nxt;
     struct lc_funcdefs_parm *tmpparam;
     while (tmp) {
-	nxt = tmp->next;
-	Free(tmp->name);
-	while (tmp->params) {
-	    tmpparam = tmp->params->next;
-	    Free(tmp->params->name);
-	    tmp->params = tmpparam;
-	}
-	/* FIXME: free tmp->code */
-	Free(tmp);
-	tmp = nxt;
+        nxt = tmp->next;
+        Free(tmp->name);
+        while (tmp->params) {
+            tmpparam = tmp->params->next;
+            Free(tmp->params->name);
+            tmp->params = tmpparam;
+        }
+        /* FIXME: free tmp->code */
+        Free(tmp);
+        tmp = nxt;
     }
 }
 
-
 char *
 funcdef_paramtypes(f)
-     struct lc_funcdefs *f;
+struct lc_funcdefs *f;
 {
     int i = 0;
     struct lc_funcdefs_parm *fp = f->params;
-    char *tmp = (char *)alloc((f->n_params) + 1);
-    if (!tmp) return NULL;
+    char *tmp = (char *) alloc((f->n_params) + 1);
+    if (!tmp)
+        return NULL;
     while (fp) {
-	tmp[i++] = fp->parmtype;
-	fp = fp->next;
+        tmp[i++] = fp->parmtype;
+        fp = fp->next;
     }
     tmp[i] = '\0';
     return tmp;
@@ -789,31 +813,32 @@ funcdef_paramtypes(f)
 
 struct lc_funcdefs *
 funcdef_defined(f, name, casesense)
-     struct lc_funcdefs *f;
-     char *name;
-     int casesense;
+struct lc_funcdefs *f;
+char *name;
+int casesense;
 {
     while (f) {
-	if (casesense) {
-	    if (!strcmp(name, f->name)) return f;
-	} else {
-	    if (!case_insensitive_comp(name, f->name)) return f;
-	}
-	f = f->next;
+        if (casesense) {
+            if (!strcmp(name, f->name))
+                return f;
+        } else {
+            if (!case_insensitive_comp(name, f->name))
+                return f;
+        }
+        f = f->next;
     }
     return NULL;
 }
 
-
 struct lc_vardefs *
 vardef_new(typ, name)
-     long typ;
-     char *name;
+long typ;
+char *name;
 {
     struct lc_vardefs *f = New(struct lc_vardefs);
     if (!f) {
-	lc_error("Could not alloc variable definition for '%s'.", name);
-	return NULL;
+        lc_error("Could not alloc variable definition for '%s'.", name);
+        return NULL;
     }
     f->next = NULL;
     f->var_type = typ;
@@ -824,40 +849,42 @@ vardef_new(typ, name)
 
 void
 vardef_free_all(fchain)
-     struct lc_vardefs *fchain;
+struct lc_vardefs *fchain;
 {
     struct lc_vardefs *tmp = fchain;
     struct lc_vardefs *nxt;
     while (tmp) {
-	if (be_verbose && (tmp->n_used == 0))
-	    lc_warning("Unused variable '%s'", tmp->name);
-	nxt = tmp->next;
-	Free(tmp->name);
-	Free(tmp);
-	tmp = nxt;
+        if (be_verbose && (tmp->n_used == 0))
+            lc_warning("Unused variable '%s'", tmp->name);
+        nxt = tmp->next;
+        Free(tmp->name);
+        Free(tmp);
+        tmp = nxt;
     }
 }
 
 struct lc_vardefs *
 vardef_defined(f, name, casesense)
-     struct lc_vardefs *f;
-     char *name;
-     int casesense;
+struct lc_vardefs *f;
+char *name;
+int casesense;
 {
     while (f) {
-	if (casesense) {
-	    if (!strcmp(name, f->name)) return f;
-	} else {
-	    if (!case_insensitive_comp(name, f->name)) return f;
-	}
-	f = f->next;
+        if (casesense) {
+            if (!strcmp(name, f->name))
+                return f;
+        } else {
+            if (!case_insensitive_comp(name, f->name))
+                return f;
+        }
+        f = f->next;
     }
     return NULL;
 }
 
 const char *
 spovar2str(spovar)
-     long spovar;
+long spovar;
 {
     static int togl = 0;
     static char buf[2][128];
@@ -866,15 +893,33 @@ spovar2str(spovar)
     spovar &= ~SPOVAR_ARRAY;
 
     switch (spovar) {
-    default:		  lc_error("spovar2str(%ld)", spovar); break;
-    case SPOVAR_INT:	  n = "integer"; break;
-    case SPOVAR_STRING:   n = "string"; break;
-    case SPOVAR_VARIABLE: n = "variable"; break;
-    case SPOVAR_COORD:	  n = "coordinate"; break;
-    case SPOVAR_REGION:	  n = "region"; break;
-    case SPOVAR_MAPCHAR:  n = "mapchar"; break;
-    case SPOVAR_MONST:	  n = "monster"; break;
-    case SPOVAR_OBJ:	  n = "object"; break;
+    default:
+        lc_error("spovar2str(%ld)", spovar);
+        break;
+    case SPOVAR_INT:
+        n = "integer";
+        break;
+    case SPOVAR_STRING:
+        n = "string";
+        break;
+    case SPOVAR_VARIABLE:
+        n = "variable";
+        break;
+    case SPOVAR_COORD:
+        n = "coordinate";
+        break;
+    case SPOVAR_REGION:
+        n = "region";
+        break;
+    case SPOVAR_MAPCHAR:
+        n = "mapchar";
+        break;
+    case SPOVAR_MONST:
+        n = "monster";
+        break;
+    case SPOVAR_OBJ:
+        n = "object";
+        break;
     }
 
     togl = ((togl + 1) % 2);
@@ -885,114 +930,119 @@ spovar2str(spovar)
 
 void
 vardef_used(vd, varname)
-     struct lc_vardefs *vd;
-     char *varname;
+struct lc_vardefs *vd;
+char *varname;
 {
     struct lc_vardefs *tmp;
-    if ((tmp = vardef_defined(vd, varname, 1))) tmp->n_used++;
+    if ((tmp = vardef_defined(vd, varname, 1)))
+        tmp->n_used++;
 }
 
 void
 check_vardef_type(vd, varname, vartype)
-     struct lc_vardefs *vd;
-     char *varname;
-     long vartype;
+struct lc_vardefs *vd;
+char *varname;
+long vartype;
 {
     struct lc_vardefs *tmp;
     if ((tmp = vardef_defined(vd, varname, 1))) {
-	if (tmp->var_type != vartype)
-	    lc_error("Trying to use variable '%s' as %s, when it is %s.",
-		     varname, spovar2str(vartype), spovar2str(tmp->var_type));
-    } else lc_error("Variable '%s' not defined.", varname);
+        if (tmp->var_type != vartype)
+            lc_error("Trying to use variable '%s' as %s, when it is %s.",
+                     varname, spovar2str(vartype), spovar2str(tmp->var_type));
+    } else
+        lc_error("Variable '%s' not defined.", varname);
 }
 
 struct lc_vardefs *
 add_vardef_type(vd, varname, vartype)
-     struct lc_vardefs *vd;
-     char *varname;
-     long vartype;
+struct lc_vardefs *vd;
+char *varname;
+long vartype;
 {
     struct lc_vardefs *tmp;
     if ((tmp = vardef_defined(vd, varname, 1))) {
-	if (tmp->var_type != vartype)
-	    lc_error("Trying to redefine variable '%s' as %s, when it is %s.",
-		     varname, spovar2str(vartype), spovar2str(tmp->var_type));
+        if (tmp->var_type != vartype)
+            lc_error("Trying to redefine variable '%s' as %s, when it is %s.",
+                     varname, spovar2str(vartype), spovar2str(tmp->var_type));
     } else {
-	tmp = vardef_new(vartype, varname);
-	tmp->next = vd;
-	return tmp;
+        tmp = vardef_new(vartype, varname);
+        tmp->next = vd;
+        return tmp;
     }
     return vd;
 }
 
 int
 reverse_jmp_opcode(opcode)
-     int opcode;
+int opcode;
 {
     switch (opcode) {
-    case SPO_JE:  return SPO_JNE;
-    case SPO_JNE: return SPO_JE;
-    case SPO_JL:  return SPO_JGE;
-    case SPO_JG:  return SPO_JLE;
-    case SPO_JLE: return SPO_JG;
-    case SPO_JGE: return SPO_JL;
-    default: lc_error("Cannot reverse comparison jmp opcode %d.", opcode); return SPO_NULL;
+    case SPO_JE:
+        return SPO_JNE;
+    case SPO_JNE:
+        return SPO_JE;
+    case SPO_JL:
+        return SPO_JGE;
+    case SPO_JG:
+        return SPO_JLE;
+    case SPO_JLE:
+        return SPO_JG;
+    case SPO_JGE:
+        return SPO_JL;
+    default:
+        lc_error("Cannot reverse comparison jmp opcode %d.", opcode);
+        return SPO_NULL;
     }
 }
 
 /* basically copied from src/sp_lev.c */
 struct opvar *
 opvar_clone(ov)
-     struct opvar *ov;
+struct opvar *ov;
 {
     if (ov) {
-	struct opvar *tmpov = (struct opvar *)alloc(sizeof(struct opvar));
-	if (!tmpov) panic("could not alloc opvar struct");
-	switch (ov->spovartyp) {
-	case SPOVAR_COORD:
-	case SPOVAR_REGION:
-	case SPOVAR_MAPCHAR:
-	case SPOVAR_MONST:
-	case SPOVAR_OBJ:
-	case SPOVAR_INT:
-	    {
-		tmpov->spovartyp = ov->spovartyp;
-		tmpov->vardata.l = ov->vardata.l;
-	    }
-	    break;
-	case SPOVAR_VARIABLE:
-	case SPOVAR_STRING:
-	    {
-		int len = strlen(ov->vardata.str);
-		tmpov->spovartyp = ov->spovartyp;
-		tmpov->vardata.str = (char *)alloc(len+1);
-		(void)memcpy((genericptr_t)tmpov->vardata.str,
-			     (genericptr_t)ov->vardata.str, len);
-		tmpov->vardata.str[len] = '\0';
-	    }
-	    break;
-	default:
-	    {
-		lc_error("Unknown opvar_clone value type (%d)!", ov->spovartyp);
-	    }
-	}
-	return tmpov;
+        struct opvar *tmpov = (struct opvar *) alloc(sizeof(struct opvar));
+        if (!tmpov)
+            panic("could not alloc opvar struct");
+        switch (ov->spovartyp) {
+        case SPOVAR_COORD:
+        case SPOVAR_REGION:
+        case SPOVAR_MAPCHAR:
+        case SPOVAR_MONST:
+        case SPOVAR_OBJ:
+        case SPOVAR_INT: {
+            tmpov->spovartyp = ov->spovartyp;
+            tmpov->vardata.l = ov->vardata.l;
+        } break;
+        case SPOVAR_VARIABLE:
+        case SPOVAR_STRING: {
+            int len = strlen(ov->vardata.str);
+            tmpov->spovartyp = ov->spovartyp;
+            tmpov->vardata.str = (char *) alloc(len + 1);
+            (void) memcpy((genericptr_t) tmpov->vardata.str,
+                          (genericptr_t) ov->vardata.str, len);
+            tmpov->vardata.str[len] = '\0';
+        } break;
+        default: {
+            lc_error("Unknown opvar_clone value type (%d)!", ov->spovartyp);
+        }
+        }
+        return tmpov;
     }
     return NULL;
 }
 
-
 void
 splev_add_from(splev, from_splev)
-     sp_lev *splev;
-     sp_lev *from_splev;
+sp_lev *splev;
+sp_lev *from_splev;
 {
     int i;
     if (splev && from_splev)
-	for (i = 0; i < from_splev->n_opcodes; i++)
-	    add_opcode(splev, from_splev->opcodes[i].opcode, opvar_clone(from_splev->opcodes[i].opdat));
+        for (i = 0; i < from_splev->n_opcodes; i++)
+            add_opcode(splev, from_splev->opcodes[i].opcode,
+                       opvar_clone(from_splev->opcodes[i].opdat));
 }
-
 
 void
 start_level_def(splev, ldfname)
@@ -1001,22 +1051,21 @@ char *ldfname;
 {
     struct lc_funcdefs *f;
     if (index(ldfname, '.'))
-	lc_error("Invalid dot ('.') in level name '%s'.", ldfname);
+        lc_error("Invalid dot ('.') in level name '%s'.", ldfname);
     if ((int) strlen(ldfname) > 14)
-	lc_error("Level names limited to 14 characters ('%s').", ldfname);
+        lc_error("Level names limited to 14 characters ('%s').", ldfname);
     f = function_definitions;
     while (f) {
-	f->n_called = 0;
-	f = f->next;
+        f->n_called = 0;
+        f = f->next;
     }
-    *splev = (sp_lev *)alloc(sizeof(sp_lev));
+    *splev = (sp_lev *) alloc(sizeof(sp_lev));
     (*splev)->n_opcodes = 0;
     (*splev)->opcodes = NULL;
 
     vardef_free_all(variable_definitions);
     variable_definitions = NULL;
 }
-
 
 /*
  * Find the type of floor, knowing its char representation.
@@ -1025,15 +1074,15 @@ int
 get_floor_type(c)
 char c;
 {
-	int val;
+    int val;
 
-	SpinCursor(3);
-	val = what_map_char(c);
-	if(val == INVALID_TYPE) {
-	    val = ERR;
-	    yywarning("Invalid fill character in MAZE declaration");
-	}
-	return val;
+    SpinCursor(3);
+    val = what_map_char(c);
+    if (val == INVALID_TYPE) {
+        val = ERR;
+        yywarning("Invalid fill character in MAZE declaration");
+    }
+    return val;
 }
 
 /*
@@ -1043,13 +1092,13 @@ int
 get_room_type(s)
 char *s;
 {
-	register int i;
+    register int i;
 
-	SpinCursor(3);
-	for(i=0; room_types[i].name; i++)
-	    if (!strcmp(s, room_types[i].name))
-		return ((int) room_types[i].type);
-	return ERR;
+    SpinCursor(3);
+    for (i = 0; room_types[i].name; i++)
+        if (!strcmp(s, room_types[i].name))
+            return ((int) room_types[i].type);
+    return ERR;
 }
 
 /*
@@ -1059,13 +1108,13 @@ int
 get_trap_type(s)
 char *s;
 {
-	register int i;
+    register int i;
 
-	SpinCursor(3);
-	for (i=0; trap_types[i].name; i++)
-	    if(!strcmp(s,trap_types[i].name))
-		return trap_types[i].type;
-	return ERR;
+    SpinCursor(3);
+    for (i = 0; trap_types[i].name; i++)
+        if (!strcmp(s, trap_types[i].name))
+            return trap_types[i].type;
+    return ERR;
 }
 
 /*
@@ -1076,24 +1125,27 @@ get_monster_id(s, c)
 char *s;
 char c;
 {
-	register int i, class;
+    register int i, class;
 
-	SpinCursor(3);
-	class = c ? def_char_to_monclass(c) : 0;
-	if (class == MAXMCLASSES) return ERR;
+    SpinCursor(3);
+    class = c ? def_char_to_monclass(c) : 0;
+    if (class == MAXMCLASSES)
+        return ERR;
 
-	for (i = LOW_PM; i < NUMMONS; i++)
-	    if (!class || class == mons[i].mlet)
-		if (!strcmp(s, mons[i].mname)) return i;
-	/* didn't find it; lets try case insensitive search */
-	for (i = LOW_PM; i < NUMMONS; i++)
-	    if (!class || class == mons[i].mlet)
-		if (!case_insensitive_comp(s, mons[i].mname)) {
-		    if (be_verbose)
-			lc_warning("Monster type \"%s\" matches \"%s\".", s, mons[i].mname);
-		    return i;
-		}
-	return ERR;
+    for (i = LOW_PM; i < NUMMONS; i++)
+        if (!class || class == mons[i].mlet)
+            if (!strcmp(s, mons[i].mname))
+                return i;
+    /* didn't find it; lets try case insensitive search */
+    for (i = LOW_PM; i < NUMMONS; i++)
+        if (!class || class == mons[i].mlet)
+            if (!case_insensitive_comp(s, mons[i].mname)) {
+                if (be_verbose)
+                    lc_warning("Monster type \"%s\" matches \"%s\".", s,
+                               mons[i].mname);
+                return i;
+            }
+    return ERR;
 }
 
 /*
@@ -1102,46 +1154,49 @@ char c;
 int
 get_object_id(s, c)
 char *s;
-char c;		/* class */
+char c; /* class */
 {
-	int i, class;
-	const char *objname;
+    int i, class;
+    const char *objname;
 
-	SpinCursor(3);
-	class = (c > 0) ? def_char_to_objclass(c) : 0;
-	if (class == MAXOCLASSES) return ERR;
+    SpinCursor(3);
+    class = (c > 0) ? def_char_to_objclass(c) : 0;
+    if (class == MAXOCLASSES)
+        return ERR;
 
-	for (i = class ? bases[class] : 0; i < NUM_OBJECTS; i++) {
-	    if (class && objects[i].oc_class != class) break;
-	    objname = obj_descr[i].oc_name;
-	    if (objname && !strcmp(s, objname))
-		return i;
-	}
-	for (i = class ? bases[class] : 0; i < NUM_OBJECTS; i++) {
-	    if (class && objects[i].oc_class != class) break;
-	    objname = obj_descr[i].oc_name;
-	    if (objname && !case_insensitive_comp(s, objname)) {
-		if (be_verbose)
-		    lc_warning("Object type \"%s\" matches \"%s\".", s, objname);
-		return i;
-	    }
-	}
-	return ERR;
+    for (i = class ? bases[class] : 0; i < NUM_OBJECTS; i++) {
+        if (class && objects[i].oc_class != class)
+            break;
+        objname = obj_descr[i].oc_name;
+        if (objname && !strcmp(s, objname))
+            return i;
+    }
+    for (i = class ? bases[class] : 0; i < NUM_OBJECTS; i++) {
+        if (class && objects[i].oc_class != class)
+            break;
+        objname = obj_descr[i].oc_name;
+        if (objname && !case_insensitive_comp(s, objname)) {
+            if (be_verbose)
+                lc_warning("Object type \"%s\" matches \"%s\".", s, objname);
+            return i;
+        }
+    }
+    return ERR;
 }
 
 static void
 init_obj_classes()
 {
-	int i, class, prev_class;
+    int i, class, prev_class;
 
-	prev_class = -1;
-	for (i = 0; i < NUM_OBJECTS; i++) {
-	    class = objects[i].oc_class;
-	    if (class != prev_class) {
-		bases[class] = i;
-		prev_class = class;
-	    }
-	}
+    prev_class = -1;
+    for (i = 0; i < NUM_OBJECTS; i++) {
+        class = objects[i].oc_class;
+        if (class != prev_class) {
+            bases[class] = i;
+            prev_class = class;
+        }
+    }
 }
 
 /*
@@ -1151,7 +1206,7 @@ boolean
 check_monster_char(c)
 char c;
 {
-	return (def_char_to_monclass(c) != MAXMCLASSES);
+    return (def_char_to_monclass(c) != MAXMCLASSES);
 }
 
 /*
@@ -1161,7 +1216,7 @@ boolean
 check_object_char(c)
 char c;
 {
-	return (def_char_to_objclass(c) != MAXOCLASSES);
+    return (def_char_to_objclass(c) != MAXOCLASSES);
 }
 
 /*
@@ -1171,32 +1226,54 @@ char
 what_map_char(c)
 char c;
 {
-	SpinCursor(3);
-	switch(c) {
-		  case ' '  : return(STONE);
-		  case '#'  : return(CORR);
-		  case '.'  : return(ROOM);
-		  case '-'  : return(HWALL);
-		  case '|'  : return(VWALL);
-		  case '+'  : return(DOOR);
-		  case 'A'  : return(AIR);
-		  case 'B'  : return(CROSSWALL); /* hack: boundary location */
-		  case 'C'  : return(CLOUD);
-		  case 'S'  : return(SDOOR);
-		  case 'H'  : return(SCORR);
-		  case '{'  : return(FOUNTAIN);
-		  case '\\' : return(THRONE);
-		  case 'K'  : return(SINK);
-		  case '}'  : return(MOAT);
-		  case 'P'  : return(POOL);
-		  case 'L'  : return(LAVAPOOL);
-		  case 'I'  : return(ICE);
-		  case 'W'  : return(WATER);
-		  case 'T'  : return (TREE);
-		  case 'F'  : return (IRONBARS); /* Fe = iron */
-		  case 'x'  : return(MAX_TYPE); /* "see-through" */
-	    }
-	return(INVALID_TYPE);
+    SpinCursor(3);
+    switch (c) {
+    case ' ':
+        return (STONE);
+    case '#':
+        return (CORR);
+    case '.':
+        return (ROOM);
+    case '-':
+        return (HWALL);
+    case '|':
+        return (VWALL);
+    case '+':
+        return (DOOR);
+    case 'A':
+        return (AIR);
+    case 'B':
+        return (CROSSWALL); /* hack: boundary location */
+    case 'C':
+        return (CLOUD);
+    case 'S':
+        return (SDOOR);
+    case 'H':
+        return (SCORR);
+    case '{':
+        return (FOUNTAIN);
+    case '\\':
+        return (THRONE);
+    case 'K':
+        return (SINK);
+    case '}':
+        return (MOAT);
+    case 'P':
+        return (POOL);
+    case 'L':
+        return (LAVAPOOL);
+    case 'I':
+        return (ICE);
+    case 'W':
+        return (WATER);
+    case 'T':
+        return (TREE);
+    case 'F':
+        return (IRONBARS); /* Fe = iron */
+    case 'x':
+        return (MAX_TYPE); /* "see-through" */
+    }
+    return (INVALID_TYPE);
 }
 
 void
@@ -1205,27 +1282,26 @@ sp_lev *sp;
 int opc;
 genericptr_t dat;
 {
-   long nop = sp->n_opcodes;
-   _opcode *tmp;
+    long nop = sp->n_opcodes;
+    _opcode *tmp;
 
-   if ((opc < 0) || (opc >= MAX_SP_OPCODES))
-       lc_error("Unknown opcode '%d'", opc);
+    if ((opc < 0) || (opc >= MAX_SP_OPCODES))
+        lc_error("Unknown opcode '%d'", opc);
 
-   tmp = (_opcode *)alloc(sizeof(_opcode)*(nop+1));
-   if (sp->opcodes && nop) {
-       (void) memcpy(tmp, sp->opcodes, sizeof(_opcode)*nop);
-       free(sp->opcodes);
-   } else if (!tmp)
-       lc_error("Could not alloc opcode space");
+    tmp = (_opcode *) alloc(sizeof(_opcode) * (nop + 1));
+    if (sp->opcodes && nop) {
+        (void) memcpy(tmp, sp->opcodes, sizeof(_opcode) * nop);
+        free(sp->opcodes);
+    } else if (!tmp)
+        lc_error("Could not alloc opcode space");
 
-   sp->opcodes = tmp;
+    sp->opcodes = tmp;
 
-   sp->opcodes[nop].opcode = opc;
-   sp->opcodes[nop].opdat = dat;
+    sp->opcodes[nop].opcode = opc;
+    sp->opcodes[nop].opdat = dat;
 
-   sp->n_opcodes++;
+    sp->n_opcodes++;
 }
-
 
 /*
  * Yep! LEX gives us the map in a raw mode.
@@ -1236,81 +1312,83 @@ scan_map(map, sp)
 char *map;
 sp_lev *sp;
 {
-	register int i, len;
-	register char *s1, *s2;
-	int max_len = 0;
-	int max_hig = 0;
-	char *tmpmap[ROWNO];
-	int dx,dy;
-	char *mbuf;
+    register int i, len;
+    register char *s1, *s2;
+    int max_len = 0;
+    int max_hig = 0;
+    char *tmpmap[ROWNO];
+    int dx, dy;
+    char *mbuf;
 
-	/* First, strip out digits 0-9 (line numbering) */
-	for (s1 = s2 = map; *s1; s1++)
-	    if (*s1 < '0' || *s1 > '9')
-		*s2++ = *s1;
-	*s2 = '\0';
+    /* First, strip out digits 0-9 (line numbering) */
+    for (s1 = s2 = map; *s1; s1++)
+        if (*s1 < '0' || *s1 > '9')
+            *s2++ = *s1;
+    *s2 = '\0';
 
-	/* Second, find the max width of the map */
-	s1 = map;
-	while (s1 && *s1) {
-		s2 = index(s1, '\n');
-		if (s2) {
-			len = (int) (s2 - s1);
-			s1 = s2 + 1;
-		} else {
-			len = (int) strlen(s1);
-			s1 = (char *) 0;
-		}
-		if (len > max_len) max_len = len;
-	}
+    /* Second, find the max width of the map */
+    s1 = map;
+    while (s1 && *s1) {
+        s2 = index(s1, '\n');
+        if (s2) {
+            len = (int) (s2 - s1);
+            s1 = s2 + 1;
+        } else {
+            len = (int) strlen(s1);
+            s1 = (char *) 0;
+        }
+        if (len > max_len)
+            max_len = len;
+    }
 
-	/* Then parse it now */
-	while (map && *map) {
-		tmpmap[max_hig] = (char *) alloc(max_len);
-		s1 = index(map, '\n');
-		if (s1) {
-			len = (int) (s1 - map);
-			s1++;
-		} else {
-			len = (int) strlen(map);
-			s1 = map + len;
-		}
-		for(i=0; i<len; i++)
-		  if((tmpmap[max_hig][i] = what_map_char(map[i])) == INVALID_TYPE) {
-		      lc_warning("Invalid character '%c' @ (%d, %d) - replacing with stone", map[i], max_hig, i);
-		      tmpmap[max_hig][i] = STONE;
-		    }
-		while(i < max_len)
-		    tmpmap[max_hig][i++] = STONE;
-		map = s1;
-		max_hig++;
-	}
+    /* Then parse it now */
+    while (map && *map) {
+        tmpmap[max_hig] = (char *) alloc(max_len);
+        s1 = index(map, '\n');
+        if (s1) {
+            len = (int) (s1 - map);
+            s1++;
+        } else {
+            len = (int) strlen(map);
+            s1 = map + len;
+        }
+        for (i = 0; i < len; i++)
+            if ((tmpmap[max_hig][i] = what_map_char(map[i]))
+                == INVALID_TYPE) {
+                lc_warning("Invalid character '%c' @ (%d, %d) - replacing "
+                           "with stone",
+                           map[i], max_hig, i);
+                tmpmap[max_hig][i] = STONE;
+            }
+        while (i < max_len)
+            tmpmap[max_hig][i++] = STONE;
+        map = s1;
+        max_hig++;
+    }
 
-	/* Memorize boundaries */
+    /* Memorize boundaries */
 
-	max_x_map = max_len - 1;
-	max_y_map = max_hig - 1;
+    max_x_map = max_len - 1;
+    max_y_map = max_hig - 1;
 
-	if(max_len > MAP_X_LIM || max_hig > MAP_Y_LIM) {
-	    lc_error("Map too large at (%d x %d), max is (%d x %d)", max_len, max_hig, MAP_X_LIM, MAP_Y_LIM);
-	}
+    if (max_len > MAP_X_LIM || max_hig > MAP_Y_LIM) {
+        lc_error("Map too large at (%d x %d), max is (%d x %d)", max_len,
+                 max_hig, MAP_X_LIM, MAP_Y_LIM);
+    }
 
-	mbuf = (char *) alloc(((max_hig-1) * max_len) + (max_len-1) + 2);
-	for (dy = 0; dy < max_hig; dy++)
-	    for (dx = 0; dx < max_len; dx++)
-		mbuf[(dy * max_len) + dx] = (tmpmap[dy][dx] + 1);
+    mbuf = (char *) alloc(((max_hig - 1) * max_len) + (max_len - 1) + 2);
+    for (dy = 0; dy < max_hig; dy++)
+        for (dx = 0; dx < max_len; dx++)
+            mbuf[(dy * max_len) + dx] = (tmpmap[dy][dx] + 1);
 
-	mbuf[((max_hig-1) * max_len) + (max_len-1) + 1] = '\0';
+    mbuf[((max_hig - 1) * max_len) + (max_len - 1) + 1] = '\0';
 
-	add_opvars(sp, "siio", VA_PASS4(mbuf, max_hig, max_len, SPO_MAP));
+    add_opvars(sp, "siio", VA_PASS4(mbuf, max_hig, max_len, SPO_MAP));
 
-	for (dy = 0; dy < max_hig; dy++)
-	    Free(tmpmap[dy]);
-	Free(mbuf);
+    for (dy = 0; dy < max_hig; dy++)
+        Free(tmpmap[dy]);
+    Free(mbuf);
 }
-
-
-
 
 /*
  * Output some info common to all special levels.
@@ -1319,13 +1397,13 @@ static boolean
 write_common_data(fd)
 int fd;
 {
-	static struct version_info version_data = {
-			VERSION_NUMBER, VERSION_FEATURES,
-			VERSION_SANITY1, VERSION_SANITY2, VERSION_SANITY3
-	};
+    static struct version_info version_data = {
+        VERSION_NUMBER, VERSION_FEATURES, VERSION_SANITY1, VERSION_SANITY2,
+        VERSION_SANITY3
+    };
 
-	Write(fd, &version_data, sizeof version_data);
-	return TRUE;
+    Write(fd, &version_data, sizeof version_data);
+    return TRUE;
 }
 
 /*
@@ -1337,71 +1415,73 @@ write_maze(fd, maze)
 int fd;
 sp_lev *maze;
 {
-        int i;
+    int i;
 
-        if (!write_common_data(fd))
-            return FALSE;
+    if (!write_common_data(fd))
+        return FALSE;
 
-	Write(fd, &(maze->n_opcodes), sizeof(maze->n_opcodes));
+    Write(fd, &(maze->n_opcodes), sizeof(maze->n_opcodes));
 
-        for (i = 0; i < maze->n_opcodes; i++) {
-	   _opcode tmpo = maze->opcodes[i];
+    for (i = 0; i < maze->n_opcodes; i++) {
+        _opcode tmpo = maze->opcodes[i];
 
-	   Write(fd, &(tmpo.opcode), sizeof(tmpo.opcode));
+        Write(fd, &(tmpo.opcode), sizeof(tmpo.opcode));
 
-	   if (tmpo.opcode < SPO_NULL || tmpo.opcode >= MAX_SP_OPCODES)
-	       panic("write_maze: unknown opcode (%d).", tmpo.opcode);
+        if (tmpo.opcode < SPO_NULL || tmpo.opcode >= MAX_SP_OPCODES)
+            panic("write_maze: unknown opcode (%d).", tmpo.opcode);
 
-	   if (tmpo.opcode == SPO_PUSH) {
-	       genericptr_t opdat = tmpo.opdat;
-	       if (opdat) {
-		   struct opvar *ov = (struct opvar *)opdat;
-		   int size;
-		   Write(fd, &(ov->spovartyp), sizeof(ov->spovartyp));
-		   switch (ov->spovartyp) {
-		   case SPOVAR_NULL: break;
-		   case SPOVAR_COORD:
-		   case SPOVAR_REGION:
-		   case SPOVAR_MAPCHAR:
-		   case SPOVAR_MONST:
-		   case SPOVAR_OBJ:
-		   case SPOVAR_INT:
-		       Write(fd, &(ov->vardata.l), sizeof(ov->vardata.l));
-		       break;
-		   case SPOVAR_VARIABLE:
-		   case SPOVAR_STRING:
-		       if (ov->vardata.str)
-			   size = strlen(ov->vardata.str);
-		       else size = 0;
-		       Write(fd, &size, sizeof(size));
-		       if (size) {
-			   Write(fd, ov->vardata.str, size);
-			   Free(ov->vardata.str);
-		       }
-		       break;
-		   default: panic("write_maze: unknown data type (%d).", ov->spovartyp);
-		   }
-	       } else panic("write_maze: PUSH with no data.");
-	   } else {
-	       /* sanity check */
-	       genericptr_t opdat = tmpo.opdat;
-	       if (opdat)
-		   panic("write_maze: opcode (%d) has data.", tmpo.opcode);
-	   }
+        if (tmpo.opcode == SPO_PUSH) {
+            genericptr_t opdat = tmpo.opdat;
+            if (opdat) {
+                struct opvar *ov = (struct opvar *) opdat;
+                int size;
+                Write(fd, &(ov->spovartyp), sizeof(ov->spovartyp));
+                switch (ov->spovartyp) {
+                case SPOVAR_NULL:
+                    break;
+                case SPOVAR_COORD:
+                case SPOVAR_REGION:
+                case SPOVAR_MAPCHAR:
+                case SPOVAR_MONST:
+                case SPOVAR_OBJ:
+                case SPOVAR_INT:
+                    Write(fd, &(ov->vardata.l), sizeof(ov->vardata.l));
+                    break;
+                case SPOVAR_VARIABLE:
+                case SPOVAR_STRING:
+                    if (ov->vardata.str)
+                        size = strlen(ov->vardata.str);
+                    else
+                        size = 0;
+                    Write(fd, &size, sizeof(size));
+                    if (size) {
+                        Write(fd, ov->vardata.str, size);
+                        Free(ov->vardata.str);
+                    }
+                    break;
+                default:
+                    panic("write_maze: unknown data type (%d).",
+                          ov->spovartyp);
+                }
+            } else
+                panic("write_maze: PUSH with no data.");
+        } else {
+            /* sanity check */
+            genericptr_t opdat = tmpo.opdat;
+            if (opdat)
+                panic("write_maze: opcode (%d) has data.", tmpo.opcode);
+        }
 
-	   Free(tmpo.opdat);
+        Free(tmpo.opdat);
+    }
+    /* clear the struct for next user */
+    Free(maze->opcodes);
+    maze->opcodes = NULL;
+    /*(void) memset((genericptr_t) &maze->init_lev, 0, sizeof
+     * maze->init_lev);*/
 
-	}
-        /* clear the struct for next user */
-	Free(maze->opcodes);
-	maze->opcodes = NULL;
-        /*(void) memset((genericptr_t) &maze->init_lev, 0, sizeof maze->init_lev);*/
-
-	return TRUE;
+    return TRUE;
 }
-
-
-
 
 /*
  * Open and write maze or rooms file, based on which pointer is non-null.
@@ -1412,34 +1492,36 @@ write_level_file(filename, lvl)
 char *filename;
 sp_lev *lvl;
 {
-	int fout;
-	char lbuf[60];
+    int fout;
+    char lbuf[60];
 
-	lbuf[0] = '\0';
+    lbuf[0] = '\0';
 #ifdef PREFIX
-	Strcat(lbuf, PREFIX);
+    Strcat(lbuf, PREFIX);
 #endif
-	Strcat(lbuf, filename);
-	Strcat(lbuf, LEV_EXT);
+    Strcat(lbuf, filename);
+    Strcat(lbuf, LEV_EXT);
 
 #if defined(MAC) && (defined(__SC__) || defined(__MRC__))
-	fout = open(lbuf, O_WRONLY|O_CREAT|O_BINARY);
+    fout = open(lbuf, O_WRONLY | O_CREAT | O_BINARY);
 #else
-	fout = open(lbuf, O_WRONLY|O_CREAT|O_BINARY, OMASK);
+    fout = open(lbuf, O_WRONLY | O_CREAT | O_BINARY, OMASK);
 #endif
-	if (fout < 0) return FALSE;
+    if (fout < 0)
+        return FALSE;
 
-        if (!lvl) panic("write_level_file");
+    if (!lvl)
+        panic("write_level_file");
 
-	if (be_verbose)
-	    fprintf(stdout, "File: '%s', opcodes: %ld\n", lbuf, lvl->n_opcodes);
+    if (be_verbose)
+        fprintf(stdout, "File: '%s', opcodes: %ld\n", lbuf, lvl->n_opcodes);
 
-        if (!write_maze(fout, lvl))
-          return FALSE;
+    if (!write_maze(fout, lvl))
+        return FALSE;
 
-	(void) close(fout);
+    (void) close(fout);
 
-	return TRUE;
+    return TRUE;
 }
 
 static int
@@ -1449,16 +1531,15 @@ const char *s2;
 {
     unsigned char u1, u2;
 
-    for ( ; ; s1++, s2++) {
-	u1 = tolower((unsigned char) *s1);
-	u2 = tolower((unsigned char) *s2);
-	if ((u1 == '\0') || (u1 != u2)) {
-	    break;
-	}
+    for (;; s1++, s2++) {
+        u1 = tolower((unsigned char) *s1);
+        u2 = tolower((unsigned char) *s2);
+        if ((u1 == '\0') || (u1 != u2)) {
+            break;
+        }
     }
-    return u1-u2;
+    return u1 - u2;
 }
-
 
 #ifdef STRICT_REF_DEF
 /*
@@ -1474,54 +1555,55 @@ struct attribs attrmax, attrmin;
 const char *configfile;
 char lock[ARBITRARY_SIZE];
 char SAVEF[ARBITRARY_SIZE];
-# ifdef MICRO
+#ifdef MICRO
 char SAVEP[ARBITRARY_SIZE];
-# endif
+#endif
 /* termcap.c */
 struct tc_lcl_data tc_lcl_data;
-# ifdef TEXTCOLOR
-#  ifdef TOS
+#ifdef TEXTCOLOR
+#ifdef TOS
 const char *hilites[CLR_MAX];
-#  else
+#else
 char NEARDATA *hilites[CLR_MAX];
-#  endif
-# endif
+#endif
+#endif
 /* trap.c */
 const char *traps[TRAPNUM];
 /* window.c */
-# ifdef HANGUPHANDLING
+#ifdef HANGUPHANDLING
 volatile
-# endif
-struct window_procs windowprocs;
+#endif
+    struct window_procs windowprocs;
 /* xxxtty.c */
-# ifdef DEFINE_OSPEED
+#ifdef DEFINE_OSPEED
 short ospeed;
-# endif
-# ifndef STRNCMPI
-char
-lowc(c)			/* force 'c' into lowercase */
-    char c;
+#endif
+#ifndef STRNCMPI
+char lowc(c) /* force 'c' into lowercase */
+char c;
 {
-    return((char)(('A' <= c && c <= 'Z') ? (c | 040) : c));
+    return ((char) (('A' <= c && c <= 'Z') ? (c | 040) : c));
 }
 
-int
-strncmpi(s1, s2, n)	/* case insensitive counted string comparison */
-    register const char *s1, *s2;
-    register int n; /*(should probably be size_t, which is usually unsigned)*/
-{					/*{ aka strncasecmp }*/
+int strncmpi(s1, s2, n) /* case insensitive counted string comparison */
+register const char *s1, *s2;
+register int n; /*(should probably be size_t, which is usually unsigned)*/
+{               /*{ aka strncasecmp }*/
     register char t1, t2;
 
     while (n--) {
-	if (!*s2) return (*s1 != 0);	/* s1 >= s2 */
-	else if (!*s1) return -1;	/* s1  < s2 */
-	t1 = lowc(*s1++);
-	t2 = lowc(*s2++);
-	if (t1 != t2) return (t1 > t2) ? 1 : -1;
+        if (!*s2)
+            return (*s1 != 0); /* s1 >= s2 */
+        else if (!*s1)
+            return -1; /* s1  < s2 */
+        t1 = lowc(*s1++);
+        t2 = lowc(*s2++);
+        if (t1 != t2)
+            return (t1 > t2) ? 1 : -1;
     }
-    return 0;				/* s1 == s2 */
+    return 0; /* s1 == s2 */
 }
-# endif	/* STRNCMPI */
-#endif	/* STRICT_REF_DEF */
+#endif /* STRNCMPI */
+#endif /* STRICT_REF_DEF */
 
 /*lev_main.c*/

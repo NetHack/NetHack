@@ -1,41 +1,41 @@
 #include "hack.h"
 
 #ifdef GUISTUB
-# ifdef TTYSTUB
-# error You can't compile this with both GUISTUB and TTYSTUB defined.
-# endif
+#ifdef TTYSTUB
+#error You can't compile this with both GUISTUB and TTYSTUB defined.
+#endif
 
 int GUILaunched;
-struct window_procs mswin_procs = {"guistubs"};
+struct window_procs mswin_procs = { "guistubs" };
 void
 mswin_destroy_reg()
 {
-	return;
+    return;
 }
 
 /* MINGW32 has trouble with both a main() and WinMain()
  * so we move main for the MINGW tty version into this stub
  * so that it is out of sight for the gui linkage.
  */
-# ifdef __MINGW32__
+#ifdef __MINGW32__
 extern char default_window_sys[];
 
 int
-main(argc,argv)
+main(argc, argv)
 int argc;
 char *argv[];
 {
-     boolean resuming;
+    boolean resuming;
 
-     sys_early_init();
-     Strcpy(default_window_sys, "tty");
-     resuming = pcmain(argc,argv);
-     moveloop(resuming);
-     nethack_exit(EXIT_SUCCESS);
-     /*NOTREACHED*/
-     return 0;
+    sys_early_init();
+    Strcpy(default_window_sys, "tty");
+    resuming = pcmain(argc, argv);
+    moveloop(resuming);
+    nethack_exit(EXIT_SUCCESS);
+    /*NOTREACHED*/
+    return 0;
 }
-# endif
+#endif
 #endif /* GUISTUB */
 
 /* =============================================== */
@@ -45,7 +45,7 @@ char *argv[];
 #include "hack.h"
 
 int GUILaunched;
-struct window_procs tty_procs = {"ttystubs"};
+struct window_procs tty_procs = { "ttystubs" };
 
 void
 win_tty_init(dir)
@@ -58,45 +58,44 @@ void
 nttty_open(mode)
 int mode;
 {
-	return;
+    return;
 }
 
 void
 xputc(ch)
 char ch;
 {
-	return;
+    return;
 }
 
 void
 xputs(s)
 const char *s;
 {
-	return;
+    return;
 }
 
 void
 raw_clear_screen()
 {
-	return;
+    return;
 }
 
 void
 clear_screen()
 {
-	return;
+    return;
 }
 
 void
 backsp()
 {
-	return;
+    return;
 }
 
 int
 has_color(int color)
 {
-
     return 1;
 }
 
@@ -104,7 +103,7 @@ has_color(int color)
 void
 toggle_mouse_support()
 {
-	return;
+    return;
 }
 #endif
 
@@ -112,12 +111,12 @@ toggle_mouse_support()
 void
 win32con_debug_keystrokes()
 {
-	return;
+    return;
 }
 void
 win32con_handler_info()
 {
-	return;
+    return;
 }
 #endif
 
@@ -125,45 +124,45 @@ void
 map_subkeyvalue(op)
 register char *op;
 {
-	return;
+    return;
 }
 
 void
 load_keyboard_handler()
 {
-	return;
+    return;
 }
 
 /* this is used as a printf() replacement when the window
  * system isn't initialized yet
  */
-void
-msmsg VA_DECL(const char *, fmt)
-	VA_START(fmt);
-	VA_INIT(fmt, const char *);
-	VA_END();
-	return;
+void msmsg
+VA_DECL(const char *, fmt)
+    VA_START(fmt);
+    VA_INIT(fmt, const char *);
+    VA_END();
+    return;
 }
 
 /*VARARGS1*/
-void
-nttty_error VA_DECL(const char *,s)
-	VA_START(s);
-	VA_INIT(s, const char *);
-	VA_END();
-	return;
+void nttty_error
+VA_DECL(const char *, s)
+    VA_START(s);
+    VA_INIT(s, const char *);
+    VA_END();
+    return;
 }
 
 void
 synch_cursor()
 {
-	return;
+    return;
 }
 
-void more()
+void
+more()
 {
-	return;
+    return;
 }
 
 #endif /* TTYSTUBS */
-

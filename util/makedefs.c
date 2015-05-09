@@ -1,11 +1,11 @@
-/* NetHack 3.6  makedefs.c  $NHDT-Date: 1425083082 2015/02/28 00:24:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.63 $ */
+/* NetHack 3.6  makedefs.c  $NHDT-Date: 1431192769 2015/05/09 17:32:49 $  $NHDT-Branch: master $:$NHDT-Revision: 1.93 $ */
 /* NetHack 3.6  makedefs.c  $Date: 2012/01/15 09:27:03 $  $Revision: 1.50 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) M. Stephenson, 1990, 1991.			  */
 /* Copyright (c) Dean Luick, 1990.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
-#define MAKEDEFS_C	/* use to conditionally include file sections */
+#define MAKEDEFS_C /* use to conditionally include file sections */
 
 #include "config.h"
 #include "permonst.h"
@@ -29,102 +29,102 @@
 
 #include <ctype.h>
 #ifdef MAC
-# if defined(__SC__) || defined(__MRC__)	/* MPW compilers */
-#  define MPWTOOL
+#if defined(__SC__) || defined(__MRC__) /* MPW compilers */
+#define MPWTOOL
 #include <CursorCtl.h>
 #include <string.h>
-# else		/* MAC without MPWTOOL */
-#  define MACsansMPWTOOL
-# endif
+#else /* MAC without MPWTOOL */
+#define MACsansMPWTOOL
+#endif
 #endif /* MAC */
 
 #ifndef MPWTOOL
-# define SpinCursor(x)
+#define SpinCursor(x)
 #endif
 
-#define Fprintf	(void) fprintf
-#define Fclose	(void) fclose
-#define Unlink	(void) unlink
+#define Fprintf (void) fprintf
+#define Fclose (void) fclose
+#define Unlink (void) unlink
 #if !defined(AMIGA) || defined(AZTEC_C)
-#define rewind(fp) fseek((fp),0L,SEEK_SET)	/* guarantee a return value */
+#define rewind(fp) fseek((fp), 0L, SEEK_SET) /* guarantee a return value */
 #endif
 
 #if defined(UNIX) && !defined(LINT) && !defined(GCC_WARN)
-static	const char	SCCS_Id[] = "@(#)makedefs.c\t3.5\t2004/02/01";
+static const char SCCS_Id[] = "@(#)makedefs.c\t3.5\t2004/02/01";
 #endif
 
-	/* names of files to be generated */
-#define DATE_FILE	"date.h"
-#define MONST_FILE	"pm.h"
-#define ONAME_FILE	"onames.h"
+/* names of files to be generated */
+#define DATE_FILE "date.h"
+#define MONST_FILE "pm.h"
+#define ONAME_FILE "onames.h"
 #ifndef OPTIONS_FILE
-#define OPTIONS_FILE	"options"
+#define OPTIONS_FILE "options"
 #endif
-#define ORACLE_FILE	"oracles"
-#define DATA_FILE	"data"
-#define RUMOR_FILE	"rumors"
-#define DGN_I_FILE	"dungeon.def"
-#define DGN_O_FILE	"dungeon.pdf"
-#define MON_STR_C	"monstr.c"
-#define QTXT_I_FILE	"quest.txt"
-#define QTXT_O_FILE	"quest.dat"
-#define VIS_TAB_H	"vis_tab.h"
-#define VIS_TAB_C	"vis_tab.c"
-	/* locations for those files */
+#define ORACLE_FILE "oracles"
+#define DATA_FILE "data"
+#define RUMOR_FILE "rumors"
+#define DGN_I_FILE "dungeon.def"
+#define DGN_O_FILE "dungeon.pdf"
+#define MON_STR_C "monstr.c"
+#define QTXT_I_FILE "quest.txt"
+#define QTXT_O_FILE "quest.dat"
+#define VIS_TAB_H "vis_tab.h"
+#define VIS_TAB_C "vis_tab.c"
+/* locations for those files */
 #ifdef AMIGA
-# define FILE_PREFIX
-# define INCLUDE_TEMPLATE	"NH:include/t.%s"
-# define SOURCE_TEMPLATE	"NH:src/%s"
-# define DGN_TEMPLATE		"NH:dat/%s"  /* where dungeon.pdf file goes */
-# define DATA_TEMPLATE		"NH:slib/%s"
-# define DATA_IN_TEMPLATE	"NH:dat/%s"
+#define FILE_PREFIX
+#define INCLUDE_TEMPLATE "NH:include/t.%s"
+#define SOURCE_TEMPLATE "NH:src/%s"
+#define DGN_TEMPLATE "NH:dat/%s" /* where dungeon.pdf file goes */
+#define DATA_TEMPLATE "NH:slib/%s"
+#define DATA_IN_TEMPLATE "NH:dat/%s"
 #else /* not AMIGA */
-# if defined(MAC) && !defined(__MACH__)
-    /* MacOS 9 or earlier */
-#   define INCLUDE_TEMPLATE	":include:%s"
-#   define SOURCE_TEMPLATE	":src:%s"
-#   define DGN_TEMPLATE		":dat:%s"  /* where dungeon.pdf file goes */
-#  if __SC__ || __MRC__
-#   define DATA_TEMPLATE	":Dungeon:%s"
-#  else
-#   define DATA_TEMPLATE	":lib:%s"
-#  endif /* __SC__ || __MRC__ */
-#   define DATA_IN_TEMPLATE	":dat:%s"
-# else /* neither AMIGA nor MAC */
-#  ifdef OS2
-#   define INCLUDE_TEMPLATE	"..\\include\\%s"
-#   define SOURCE_TEMPLATE	"..\\src\\%s"
-#   define DGN_TEMPLATE		"..\\dat\\%s"  /* where dungeon.pdf file goes */
-#   define DATA_TEMPLATE	"..\\dat\\%s"
-#   define DATA_IN_TEMPLATE	"..\\dat\\%s"
-#  else /* not AMIGA, MAC, or OS2 */
-#   define INCLUDE_TEMPLATE	"../include/%s"
-#   define SOURCE_TEMPLATE	"../src/%s"
-#   define DGN_TEMPLATE		"../dat/%s"  /* where dungeon.pdf file goes */
-#   define DATA_TEMPLATE	"../dat/%s"
-#   define DATA_IN_TEMPLATE	"../dat/%s"
-#  endif /* else !OS2 */
-# endif /* else !MAC */
-#endif	/* else !AMIGA */
+#if defined(MAC) && !defined(__MACH__)
+/* MacOS 9 or earlier */
+#define INCLUDE_TEMPLATE ":include:%s"
+#define SOURCE_TEMPLATE ":src:%s"
+#define DGN_TEMPLATE ":dat:%s" /* where dungeon.pdf file goes */
+#if __SC__ || __MRC__
+#define DATA_TEMPLATE ":Dungeon:%s"
+#else
+#define DATA_TEMPLATE ":lib:%s"
+#endif /* __SC__ || __MRC__ */
+#define DATA_IN_TEMPLATE ":dat:%s"
+#else /* neither AMIGA nor MAC */
+#ifdef OS2
+#define INCLUDE_TEMPLATE "..\\include\\%s"
+#define SOURCE_TEMPLATE "..\\src\\%s"
+#define DGN_TEMPLATE "..\\dat\\%s" /* where dungeon.pdf file goes */
+#define DATA_TEMPLATE "..\\dat\\%s"
+#define DATA_IN_TEMPLATE "..\\dat\\%s"
+#else /* not AMIGA, MAC, or OS2 */
+#define INCLUDE_TEMPLATE "../include/%s"
+#define SOURCE_TEMPLATE "../src/%s"
+#define DGN_TEMPLATE "../dat/%s" /* where dungeon.pdf file goes */
+#define DATA_TEMPLATE "../dat/%s"
+#define DATA_IN_TEMPLATE "../dat/%s"
+#endif /* else !OS2 */
+#endif /* else !MAC */
+#endif /* else !AMIGA */
 
 static const char
     *Dont_Edit_Code =
-	"/* This source file is generated by 'makedefs'.  Do not edit. */\n",
+        "/* This source file is generated by 'makedefs'.  Do not edit. */\n",
     *Dont_Edit_Data =
-	"#\tThis data file is generated by 'makedefs'.  Do not edit. \n";
+        "#\tThis data file is generated by 'makedefs'.  Do not edit. \n";
 
 static struct version_info version;
 
 /* definitions used for vision tables */
-#define TEST_WIDTH  COLNO
+#define TEST_WIDTH COLNO
 #define TEST_HEIGHT ROWNO
 #define BLOCK_WIDTH (TEST_WIDTH + 10)
-#define BLOCK_HEIGHT TEST_HEIGHT	/* don't need extra spaces */
+#define BLOCK_HEIGHT TEST_HEIGHT /* don't need extra spaces */
 #define MAX_ROW (BLOCK_HEIGHT + TEST_HEIGHT)
 #define MAX_COL (BLOCK_WIDTH + TEST_WIDTH)
 /* Use this as an out-of-bound value in the close table.  */
-#define CLOSE_OFF_TABLE_STRING "99"	/* for the close table */
-#define FAR_OFF_TABLE_STRING "0xff"	/* for the far table */
+#define CLOSE_OFF_TABLE_STRING "99" /* for the close table */
+#define FAR_OFF_TABLE_STRING "0xff" /* for the far table */
 
 #define sign(z) ((z) < 0 ? -1 : ((z) ? 1 : 0))
 #ifdef VISION_TABLES
@@ -132,19 +132,19 @@ static char xclear[MAX_ROW][MAX_COL];
 #endif
 /*-end of vision defs-*/
 
-static char	in_line[256], filename[600];
+static char in_line[256], filename[600];
 
 #ifdef FILE_PREFIX
-		/* if defined, a first argument not starting with - is
-		 * taken as a text string to be prepended to any
-		 * output filename generated */
-char *file_prefix="";
+/* if defined, a first argument not starting with - is
+ * taken as a text string to be prepended to any
+ * output filename generated */
+char *file_prefix = "";
 #endif
 
 #ifdef MACsansMPWTOOL
 int FDECL(main, (void));
 #else
-int FDECL(main, (int,char **));
+int FDECL(main, (int, char **));
 #endif
 void FDECL(do_makedefs, (char *));
 void NDECL(do_objs);
@@ -159,32 +159,32 @@ void NDECL(do_rumors);
 void NDECL(do_oracles);
 void NDECL(do_vision);
 
-extern void NDECL(monst_init);		/* monst.c */
-extern void NDECL(objects_init);	/* objects.c */
+extern void NDECL(monst_init);   /* monst.c */
+extern void NDECL(objects_init); /* objects.c */
 
 static void NDECL(make_version);
 static char *FDECL(version_string, (char *, const char *));
-static char *FDECL(version_id_string, (char *,const char *));
-static char *FDECL(bannerc_string, (char *,const char *));
+static char *FDECL(version_id_string, (char *, const char *));
+static char *FDECL(bannerc_string, (char *, const char *));
 static char *FDECL(xcrypt, (const char *));
 static unsigned long FDECL(read_rumors_file,
-			   (const char *,int *,long *,unsigned long));
+                           (const char *, int *, long *, unsigned long));
 static void FDECL(do_rnd_access_file, (const char *));
 static boolean FDECL(d_filter, (char *));
 static boolean FDECL(h_filter, (char *));
-static boolean FDECL(ranged_attk,(struct permonst*));
-static int FDECL(mstrength,(struct permonst *));
+static boolean FDECL(ranged_attk, (struct permonst *));
+static int FDECL(mstrength, (struct permonst *));
 static void NDECL(build_savebones_compat_string);
-static void FDECL(do_ext_makedefs,(int , char **));
+static void FDECL(do_ext_makedefs, (int, char **));
 static void NDECL(windowing_sanity);
 
 static boolean FDECL(qt_comment, (char *));
 static boolean FDECL(qt_control, (char *));
 static int FDECL(get_hdr, (char *));
 static boolean FDECL(new_id, (char *));
-static boolean FDECL(known_msg, (int,int));
-static void FDECL(new_msg, (char *,int,int));
-static char *FDECL(valid_qt_summary, (char *,BOOLEAN_P));
+static boolean FDECL(known_msg, (int, int));
+static void FDECL(new_msg, (char *, int, int));
+static char *FDECL(valid_qt_summary, (char *, BOOLEAN_P));
 static void FDECL(do_qt_control, (char *));
 static void FDECL(do_qt_text, (char *));
 static void NDECL(adjust_qt_hdrs);
@@ -195,11 +195,11 @@ static void NDECL(H_close_gen);
 static void NDECL(H_far_gen);
 static void NDECL(C_close_gen);
 static void NDECL(C_far_gen);
-static int FDECL(clear_path, (int,int,int,int));
+static int FDECL(clear_path, (int, int, int, int));
 #endif
 
 static char *FDECL(tmpdup, (const char *));
-static char *FDECL(limit, (char *,int));
+static char *FDECL(limit, (char *, int));
 static char *FDECL(eos, (char *));
 
 /* input, output, tmp */
@@ -208,7 +208,6 @@ static FILE *ifp, *ofp, *tfp;
 #if defined(__BORLANDC__) && !defined(_WIN32)
 extern unsigned _stklen = STKSIZ;
 #endif
-
 
 #ifdef MACsansMPWTOOL
 int
@@ -223,17 +222,17 @@ main(void)
     fgets(buf, 100, stdin);
     len = strlen(buf);
     if (len <= 1)
-	Strcpy(buf, def_options);
+        Strcpy(buf, def_options);
     else
-	buf[len-1] = 0;			/* remove return */
+        buf[len - 1] = 0; /* remove return */
 
-    if(buf[0]=='-' && buf[1]=='-'){
+    if (buf[0] == '-' && buf[1] == '-') {
 #if 0
 	split up buf into words
 	do_ext_makedefs(fakeargc, fakeargv);
 #else
-	printf("extended makedefs not implemented for Mac OS9\n");
-	exit(EXIT_FAILURE);
+        printf("extended makedefs not implemented for Mac OS9\n");
+        exit(EXIT_FAILURE);
 #endif
     }
 
@@ -246,146 +245,157 @@ main(void)
 
 int
 main(argc, argv)
-int	argc;
-char	*argv[];
+int argc;
+char *argv[];
 {
-	if ( (argc != 2)
+    if ((argc != 2)
 #ifdef FILE_PREFIX
-		&& (argc != 3)
+        && (argc != 3)
 #endif
-		&& !(argv[1][0]=='-' && argv[1][1]=='-')
-	) {
-	    Fprintf(stderr, "Bad arg count (%d).\n", argc-1);
-	    (void) fflush(stderr);
-	    return 1;
-	}
+        && !(argv[1][0] == '-' && argv[1][1] == '-')) {
+        Fprintf(stderr, "Bad arg count (%d).\n", argc - 1);
+        (void) fflush(stderr);
+        return 1;
+    }
 
 #ifdef FILE_PREFIX
-	if(argc >=2 && argv[1][0]!='-'){
-	    file_prefix=argv[1];
-	    argc--;argv++;
-	}
+    if (argc >= 2 && argv[1][0] != '-') {
+        file_prefix = argv[1];
+        argc--;
+        argv++;
+    }
 #endif
 
-	if(argv[1][0]=='-' && argv[1][1]=='-'){
-		do_ext_makedefs(argc, argv);
-	} else {
-		do_makedefs(&argv[1][1]);
-	}
-	exit(EXIT_SUCCESS);
-	/*NOTREACHED*/
-	return 0;
+    if (argv[1][0] == '-' && argv[1][1] == '-') {
+        do_ext_makedefs(argc, argv);
+    } else {
+        do_makedefs(&argv[1][1]);
+    }
+    exit(EXIT_SUCCESS);
+    /*NOTREACHED*/
+    return 0;
 }
 
 #endif
 
 static void
-link_sanity_check(){
-	/* Note:  these initializers don't do anything except guarantee that
-		we're linked properly.
-	*/
-	monst_init();
-	objects_init();
+link_sanity_check()
+{
+    /* Note:  these initializers don't do anything except guarantee that
+            we're linked properly.
+    */
+    monst_init();
+    objects_init();
 }
 
 void
 do_makedefs(options)
-char	*options;
+char *options;
 {
-	boolean more_than_one;
+    boolean more_than_one;
 
-	link_sanity_check();
+    link_sanity_check();
 
-	/* construct the current version number */
-	make_version();
+    /* construct the current version number */
+    make_version();
 
-	more_than_one = strlen(options) > 1;
-	while (*options) {
-	    if (more_than_one)
-		Fprintf(stderr, "makedefs -%c\n", *options);
+    more_than_one = strlen(options) > 1;
+    while (*options) {
+        if (more_than_one)
+            Fprintf(stderr, "makedefs -%c\n", *options);
 
-	    switch (*options) {
-		case 'o':
-		case 'O':	do_objs();
-				break;
-		case 'd':
-		case 'D':	do_data();
-				break;
-		case 'e':
-		case 'E':	do_dungeon();
-				break;
-		case 'm':
-		case 'M':	do_monstr();
-				break;
-		case 'v':
-		case 'V':	do_date();
-				do_options();
-				break;
-		case 'p':
-		case 'P':	do_permonst();
-				break;
-		case 'q':
-		case 'Q':	do_questtxt();
-				break;
-		case 'r':
-		case 'R':	do_rumors();
-				break;
-		case 's':
-		case 'S':	do_rnd_access_file(EPITAPHFILE);
-				do_rnd_access_file(ENGRAVEFILE);
-				do_rnd_access_file(BOGUSMONFILE);
-				break;
-		case 'h':
-		case 'H':	do_oracles();
-				break;
-		case 'z':
-		case 'Z':	do_vision();
-				break;
+        switch (*options) {
+        case 'o':
+        case 'O':
+            do_objs();
+            break;
+        case 'd':
+        case 'D':
+            do_data();
+            break;
+        case 'e':
+        case 'E':
+            do_dungeon();
+            break;
+        case 'm':
+        case 'M':
+            do_monstr();
+            break;
+        case 'v':
+        case 'V':
+            do_date();
+            do_options();
+            break;
+        case 'p':
+        case 'P':
+            do_permonst();
+            break;
+        case 'q':
+        case 'Q':
+            do_questtxt();
+            break;
+        case 'r':
+        case 'R':
+            do_rumors();
+            break;
+        case 's':
+        case 'S':
+            do_rnd_access_file(EPITAPHFILE);
+            do_rnd_access_file(ENGRAVEFILE);
+            do_rnd_access_file(BOGUSMONFILE);
+            break;
+        case 'h':
+        case 'H':
+            do_oracles();
+            break;
+        case 'z':
+        case 'Z':
+            do_vision();
+            break;
 
-		default:	Fprintf(stderr,	"Unknown option '%c'.\n",
-					*options);
-				(void) fflush(stderr);
-				exit(EXIT_FAILURE);
-		
-	    }
-	    options++;
-	}
-	if (more_than_one) Fprintf(stderr, "Completed.\n");	/* feedback */
-
+        default:
+            Fprintf(stderr, "Unknown option '%c'.\n", *options);
+            (void) fflush(stderr);
+            exit(EXIT_FAILURE);
+        }
+        options++;
+    }
+    if (more_than_one)
+        Fprintf(stderr, "Completed.\n"); /* feedback */
 }
 
 static char namebuf[1000];
 static char *
 name_file(template, tag)
-	char *template;
-	char *tag;
+char *template;
+char *tag;
 {
-	Sprintf(namebuf, template, tag);
-	return namebuf;
+    Sprintf(namebuf, template, tag);
+    return namebuf;
 }
 
 static void
 delete_file(template, tag)
-	char *template;
-	char *tag;
+char *template;
+char *tag;
 {
-	char *name = name_file(template, tag);
-	Unlink(name);
+    char *name = name_file(template, tag);
+    Unlink(name);
 }
 
 static FILE *
 getfp(template, tag, mode)
-	char *template;
-	char *tag;
-	char *mode;
+char *template;
+char *tag;
+char *mode;
 {
-	char *name = name_file(template, tag);
-	FILE *rv = fopen(name, mode);
-	if(!rv){
-		Fprintf(stderr, "Can't open '%s'.\n", name);
-		exit(EXIT_FAILURE);
-	}
-	return rv;
+    char *name = name_file(template, tag);
+    FILE *rv = fopen(name, mode);
+    if (!rv) {
+        Fprintf(stderr, "Can't open '%s'.\n", name);
+        exit(EXIT_FAILURE);
+    }
+    return rv;
 }
 
 static boolean debug = FALSE;
@@ -394,8 +404,8 @@ static FILE *inputfp;
 static FILE *outputfp;
 
 struct grep_var {
-	const char *name;
-	int is_defined;		/* 0 undef; 1 defined */
+    const char *name;
+    int is_defined; /* 0 undef; 1 defined */
 };
 /* struct grep_var grep_vars[] and TODO_* constants in include file: */
 #include "mdgrep.h"
@@ -406,133 +416,154 @@ static struct grep_var *FDECL(grepsearch, (char *));
 static int grep_trace = 0;
 
 static void
-do_ext_makedefs(int argc, char **argv){
-	int todo = 0;
+do_ext_makedefs(int argc, char **argv)
+{
+    int todo = 0;
 
-	link_sanity_check();
+    link_sanity_check();
 
-	argc--; argv++;		/* skip program name */
+    argc--;
+    argv++; /* skip program name */
 
-	while(argc){
-		if(argv[0][0] != '-') break;
-		if(argv[0][1] != '-'){
-			Fprintf(stderr, "Can't mix - and -- options.\n");
-			exit(EXIT_FAILURE);
-		}
-#define IS_OPTION(str)	if(!strcmp(&argv[0][2], str))
-#define CONTINUE argv++, argc--; continue
-#define CONSUME \
-  argv++, argc--; \
-  if(argc==0){Fprintf(stderr, "missing option\n"); exit(EXIT_FAILURE);}
-		IS_OPTION("svs"){
-				/* short version string for packaging - note
-				 * no \n */
-			char buf[100];
-			char delim[10];
-			argv++;		/* not CONSUME */
-			delim[0] = '\0';
-			if(argv[0]) strcpy(delim, argv[0]);
-			Fprintf(stdout, "%s", version_string(buf, delim));
-			exit(EXIT_SUCCESS);
-		}
-		IS_OPTION("debug"){
-		    debug = TRUE;
-		    CONTINUE;
-		}
-		IS_OPTION("make"){
-		    CONSUME;
-		    do_makedefs(argv[0]);
-		    exit(EXIT_SUCCESS);
-		}
-		IS_OPTION("input"){
-			CONSUME;
-			if(!strcmp(argv[0], "-")){
-				inputfp = stdin;
-			} else {
-				inputfp = fopen(argv[0], RDTMODE);
-				if(!inputfp){
-					Fprintf(stderr, "Can't open '%s'.\n", argv[0]);
-					exit(EXIT_FAILURE);
-				}
-			}
-			CONTINUE;
-		}
-		IS_OPTION("output"){
-			CONSUME;
-			if(!strcmp(argv[0], "-")){
-				outputfp = stdout;
-			} else {
-				outputfp = fopen(argv[0], WRTMODE);
-				if(!outputfp){
-					Fprintf(stderr, "Can't open '%s'.\n", argv[0]);
-					exit(EXIT_FAILURE);
-				}
-			}
-			CONTINUE;
-		}
-		IS_OPTION("grep"){
-			if(todo){
-				Fprintf(stderr, "Can't do grep and something else.\n");
-				exit(EXIT_FAILURE);
-			}
-			todo = TODO_GREP;
-			CONTINUE;
-		}
-		IS_OPTION("grep-showvars"){
-			do_grep_showvars();
-			exit(EXIT_SUCCESS);
-		}
-		IS_OPTION("grep-trace"){
-			grep_trace = 1;
-			CONTINUE;
-		}
-		IS_OPTION("grep-define"){
-			struct grep_var *p;
-			CONSUME;
-			p = grepsearch(argv[0]);
-			if(p){
-				p->is_defined = 1;
-			} else {
-				Fprintf(stderr, "Unknown symbol '%s'\n", argv[0]);
-				exit(EXIT_FAILURE);
-			}
-			CONTINUE;
-		}
-		IS_OPTION("grep-undef"){
-			struct grep_var *p;
-			CONSUME;
-			p = grepsearch(argv[0]);
-			if(p){
-				p->is_defined = 0;
-			} else {
-				Fprintf(stderr, "Unknown symbol '%s'\n", argv[0]);
-				exit(EXIT_FAILURE);
-			}
-			CONTINUE;
-		}
+    while (argc) {
+        if (argv[0][0] != '-')
+            break;
+        if (argv[0][1] != '-') {
+            Fprintf(stderr, "Can't mix - and -- options.\n");
+            exit(EXIT_FAILURE);
+        }
+#define IS_OPTION(str) if (!strcmp(&argv[0][2], str))
+#define CONTINUE    \
+    argv++, argc--; \
+    continue
+#define CONSUME                              \
+    argv++, argc--;                          \
+    if (argc == 0) {                         \
+        Fprintf(stderr, "missing option\n"); \
+        exit(EXIT_FAILURE);                  \
+    }
+        IS_OPTION("svs")
+        {
+            /* short version string for packaging - note
+             * no \n */
+            char buf[100];
+            char delim[10];
+            argv++; /* not CONSUME */
+            delim[0] = '\0';
+            if (argv[0])
+                strcpy(delim, argv[0]);
+            Fprintf(stdout, "%s", version_string(buf, delim));
+            exit(EXIT_SUCCESS);
+        }
+        IS_OPTION("debug")
+        {
+            debug = TRUE;
+            CONTINUE;
+        }
+        IS_OPTION("make")
+        {
+            CONSUME;
+            do_makedefs(argv[0]);
+            exit(EXIT_SUCCESS);
+        }
+        IS_OPTION("input")
+        {
+            CONSUME;
+            if (!strcmp(argv[0], "-")) {
+                inputfp = stdin;
+            } else {
+                inputfp = fopen(argv[0], RDTMODE);
+                if (!inputfp) {
+                    Fprintf(stderr, "Can't open '%s'.\n", argv[0]);
+                    exit(EXIT_FAILURE);
+                }
+            }
+            CONTINUE;
+        }
+        IS_OPTION("output")
+        {
+            CONSUME;
+            if (!strcmp(argv[0], "-")) {
+                outputfp = stdout;
+            } else {
+                outputfp = fopen(argv[0], WRTMODE);
+                if (!outputfp) {
+                    Fprintf(stderr, "Can't open '%s'.\n", argv[0]);
+                    exit(EXIT_FAILURE);
+                }
+            }
+            CONTINUE;
+        }
+        IS_OPTION("grep")
+        {
+            if (todo) {
+                Fprintf(stderr, "Can't do grep and something else.\n");
+                exit(EXIT_FAILURE);
+            }
+            todo = TODO_GREP;
+            CONTINUE;
+        }
+        IS_OPTION("grep-showvars")
+        {
+            do_grep_showvars();
+            exit(EXIT_SUCCESS);
+        }
+        IS_OPTION("grep-trace")
+        {
+            grep_trace = 1;
+            CONTINUE;
+        }
+        IS_OPTION("grep-define")
+        {
+            struct grep_var *p;
+            CONSUME;
+            p = grepsearch(argv[0]);
+            if (p) {
+                p->is_defined = 1;
+            } else {
+                Fprintf(stderr, "Unknown symbol '%s'\n", argv[0]);
+                exit(EXIT_FAILURE);
+            }
+            CONTINUE;
+        }
+        IS_OPTION("grep-undef")
+        {
+            struct grep_var *p;
+            CONSUME;
+            p = grepsearch(argv[0]);
+            if (p) {
+                p->is_defined = 0;
+            } else {
+                Fprintf(stderr, "Unknown symbol '%s'\n", argv[0]);
+                exit(EXIT_FAILURE);
+            }
+            CONTINUE;
+        }
 #ifdef notyet
-		IS_OPTION("help"){
-		}
+        IS_OPTION("help")
+        {
+        }
 #endif
 #undef IS_OPTION
-		Fprintf(stderr, "Unknown option '%s'.\n", argv[0]);
-		exit(EXIT_FAILURE);
-	}
-	if(argc){
-		Fprintf(stderr, "unexpected argument '%s'.\n", argv[0]);
-		exit(EXIT_FAILURE);
-	}
+        Fprintf(stderr, "Unknown option '%s'.\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }
+    if (argc) {
+        Fprintf(stderr, "unexpected argument '%s'.\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }
 
-	switch(todo){
-		default:
-			Fprintf(stderr, "Confused about what to do?\n");
-			exit(EXIT_FAILURE);
-		case 0:
-			Fprintf(stderr, "Nothing to do?\n");
-			exit(EXIT_FAILURE);
-		case TODO_GREP:
-			do_grep(); break;
-	}
+    switch (todo) {
+    default:
+        Fprintf(stderr, "Confused about what to do?\n");
+        exit(EXIT_FAILURE);
+    case 0:
+        Fprintf(stderr, "Nothing to do?\n");
+        exit(EXIT_FAILURE);
+    case TODO_GREP:
+        do_grep();
+        break;
+    }
 }
 
 /*
@@ -551,7 +582,8 @@ do_ext_makedefs(int argc, char **argv){
  processing to continue past the unknown identifier (note that "#undef" is
  different than unknown).
 
- Any line starting with a caret is a control line; as in C, zero or more spaces
+ Any line starting with a caret is a control line; as in C, zero or more
+ spaces
  may be embedded in the line almost anywhere; the caret MUST be in column 1.
  (XXX for the moment, no white space is allowed after the caret because
   existing lines in the docs look like that)
@@ -564,264 +596,268 @@ do_ext_makedefs(int argc, char **argv){
  ^:	else
  ^.	endif
 
-*/ 
+*/
 #define GREP_MAGIC '^'
 #define GREP_STACK_SIZE 100
 #ifdef notyet
-static int grep_rewrite = 0;	/* need to (possibly) rewrite lines */
+static int grep_rewrite = 0; /* need to (possibly) rewrite lines */
 #endif
-static int grep_writing = 1;	/* need to copy lines to output */
+static int grep_writing = 1; /* need to copy lines to output */
 static int grep_errors = 0;
 static int grep_sp = 0;
-#define ST_LD(old,opp) (!!(old) | (!!(opp)<<1))
-#define ST_OLD(v)	((v) & 1)
-#define ST_OPP(v)	!!((v) & 2)
+#define ST_LD(old, opp) (!!(old) | (!!(opp) << 1))
+#define ST_OLD(v) ((v) &1)
+#define ST_OPP(v) !!((v) &2)
 #define ST_ELSE 4
-static int grep_stack[GREP_STACK_SIZE] = {ST_LD(1,0)};
+static int grep_stack[GREP_STACK_SIZE] = { ST_LD(1, 0) };
 static int grep_lineno = 0;
 
 static void
-do_grep_showvars(){
-	int x;
-	for(x=0;x<SIZE(grep_vars)-1;x++){
-		printf("%d\t%s\n",grep_vars[x].is_defined,grep_vars[x].name);
-	}
+do_grep_showvars()
+{
+    int x;
+    for (x = 0; x < SIZE(grep_vars) - 1; x++) {
+        printf("%d\t%s\n", grep_vars[x].is_defined, grep_vars[x].name);
+    }
 }
 
 static struct grep_var *
 grepsearch(name)
-	char *name;
+char *name;
 {
-	/* XXX make into binary search */
-	int x=0;
-	while(x < SIZE(grep_vars)-1){
-		if(!strcmp(grep_vars[x].name, name))
-			return &grep_vars[x];
-		x++;
-	}
-	return 0;
+    /* XXX make into binary search */
+    int x = 0;
+    while (x < SIZE(grep_vars) - 1) {
+        if (!strcmp(grep_vars[x].name, name))
+            return &grep_vars[x];
+        x++;
+    }
+    return 0;
 }
 
 static int
 grep_check_id(id)
-	char *id;
+char *id;
 {
-	struct grep_var *rv;
-	while(*id && isspace(*id))id++;
-	if(! *id){
-		Fprintf(stderr, "missing identifier in line %d", grep_lineno);
-		grep_errors++;
-		return 0;
-	}
-	rv = grepsearch(id);
-	if(rv){
-		if(grep_trace){
-			Fprintf(outputfp, "ID %d %s\n", rv->is_defined, id);
-		}
-		return rv->is_defined;
-	}
+    struct grep_var *rv;
+    while (*id && isspace(*id))
+        id++;
+    if (!*id) {
+        Fprintf(stderr, "missing identifier in line %d", grep_lineno);
+        grep_errors++;
+        return 0;
+    }
+    rv = grepsearch(id);
+    if (rv) {
+        if (grep_trace) {
+            Fprintf(outputfp, "ID %d %s\n", rv->is_defined, id);
+        }
+        return rv->is_defined;
+    }
 
-	if(grep_trace){
-		Fprintf(outputfp, "ID U %s\n", id);
-	}
-	Fprintf(stderr, "unknown identifier '%s' in line %d.\n", id,
-			grep_lineno);
-	grep_errors++;
-	return 2;	/* So new features can be checked before makedefs
-			 * is rebuilt. */
+    if (grep_trace) {
+        Fprintf(outputfp, "ID U %s\n", id);
+    }
+    Fprintf(stderr, "unknown identifier '%s' in line %d.\n", id, grep_lineno);
+    grep_errors++;
+    return 2; /* So new features can be checked before makedefs
+               * is rebuilt. */
 }
 
 static void
 grep_show_wstack(tag)
-	char *tag;
+char *tag;
 {
-	int x;
+    int x;
 
-	if(!grep_trace) return;
+    if (!grep_trace)
+        return;
 
-	Fprintf(outputfp, "%s w=%d sp=%d\t",tag,grep_writing, grep_sp);
-	for(x=grep_sp; x>=0 && x>grep_sp-6;x--){
-		Fprintf(outputfp, "[%d]=%d ", x, grep_stack[x]);
-	}
-	Fprintf(outputfp, "\n");
+    Fprintf(outputfp, "%s w=%d sp=%d\t", tag, grep_writing, grep_sp);
+    for (x = grep_sp; x >= 0 && x > grep_sp - 6; x--) {
+        Fprintf(outputfp, "[%d]=%d ", x, grep_stack[x]);
+    }
+    Fprintf(outputfp, "\n");
 }
 
 static char *
 do_grep_control(buf)
-	char *buf;
+char *buf;
 {
-	int isif = 1;
-	char *buf0 = buf;
+    int isif = 1;
+    char *buf0 = buf;
 #if 1
-	if(isspace(buf[0])) return &buf[-1];		/* XXX see docs above */
+    if (isspace(buf[0]))
+        return &buf[-1]; /* XXX see docs above */
 #else
-	while(buf[0] && isspace(buf[0])) buf++;
+    while (buf[0] && isspace(buf[0]))
+        buf++;
 #endif
-	switch(buf[0]){
-	case '#':	/* comment */
-		break;
-	case '.':	/* end of if level */
-		if(grep_sp==0){
-			Fprintf(stderr, "unmatched ^. (endif) at line %d.\n",
-				grep_lineno);
-			grep_errors++;
-		} else {
-			grep_writing = ST_OLD(grep_stack[grep_sp--]);
-			grep_show_wstack("pop");
-		}
-		break;
-	case '!':	/* if not ID */
-		isif = 0;
-		/* FALLTHROUGH */
-	case '?':	/* if ID */
-		if(grep_sp == GREP_STACK_SIZE-2){
-			Fprintf(stderr, "stack overflow at line %d.",
-				grep_lineno);
-			exit(EXIT_FAILURE);
-		}
-		if(grep_writing){
-			isif = grep_check_id(&buf[1])?isif:!isif;
-			grep_stack[++grep_sp] = ST_LD(grep_writing, !isif);
-			grep_writing = isif;
-		} else {
-			grep_stack[++grep_sp] = ST_LD(0, 0);
-			/* grep_writing = 0; */
-		}
-		grep_show_wstack("push");
-		break;
-	case ':':	/* else */
-		if(ST_ELSE & grep_stack[grep_sp]){
-			Fprintf(stderr,
-"multiple : for same conditional at line %d.\n", grep_lineno);
-			grep_errors++;
-		}
-		grep_writing = ST_OPP(grep_stack[grep_sp]);
-		grep_stack[grep_sp] |= ST_ELSE;
-		break;
+    switch (buf[0]) {
+    case '#': /* comment */
+        break;
+    case '.': /* end of if level */
+        if (grep_sp == 0) {
+            Fprintf(stderr, "unmatched ^. (endif) at line %d.\n",
+                    grep_lineno);
+            grep_errors++;
+        } else {
+            grep_writing = ST_OLD(grep_stack[grep_sp--]);
+            grep_show_wstack("pop");
+        }
+        break;
+    case '!': /* if not ID */
+        isif = 0;
+    /* FALLTHROUGH */
+    case '?': /* if ID */
+        if (grep_sp == GREP_STACK_SIZE - 2) {
+            Fprintf(stderr, "stack overflow at line %d.", grep_lineno);
+            exit(EXIT_FAILURE);
+        }
+        if (grep_writing) {
+            isif = grep_check_id(&buf[1]) ? isif : !isif;
+            grep_stack[++grep_sp] = ST_LD(grep_writing, !isif);
+            grep_writing = isif;
+        } else {
+            grep_stack[++grep_sp] = ST_LD(0, 0);
+            /* grep_writing = 0; */
+        }
+        grep_show_wstack("push");
+        break;
+    case ':': /* else */
+        if (ST_ELSE & grep_stack[grep_sp]) {
+            Fprintf(stderr, "multiple : for same conditional at line %d.\n",
+                    grep_lineno);
+            grep_errors++;
+        }
+        grep_writing = ST_OPP(grep_stack[grep_sp]);
+        grep_stack[grep_sp] |= ST_ELSE;
+        break;
 #if defined(notyet)
-	case '(':	/* start of expression */
+    case '(': /* start of expression */
 #endif
-	case GREP_MAGIC:	/* ^^ -> ^ */
-		return buf0;
-	default:
-		{
-		char str[10];
-		if(isprint(buf[0])){
-			str[0] = buf[0]; str[1] = '\0';
-		} else {
-			sprintf(str, "0x%02x", buf[0]);
-		}
-		Fprintf(stderr, "unknown control ^%s at line %d.\n",
-			str, grep_lineno);
-		grep_errors++;
-		}
-		break;
-	}
-	return NULL;
+    case GREP_MAGIC: /* ^^ -> ^ */
+        return buf0;
+    default: {
+        char str[10];
+        if (isprint(buf[0])) {
+            str[0] = buf[0];
+            str[1] = '\0';
+        } else {
+            sprintf(str, "0x%02x", buf[0]);
+        }
+        Fprintf(stderr, "unknown control ^%s at line %d.\n", str,
+                grep_lineno);
+        grep_errors++;
+    } break;
+    }
+    return NULL;
 }
 
 #ifdef notyet
 static void
 do_grep_rewrite(buf)
-	char *buf;
+char *buf;
 {
-		/* no language features use this yet */
-	return;
+    /* no language features use this yet */
+    return;
 }
 #endif
 
 static void grep0(FILE *, FILE *);
 
 static void
-do_grep(){
-	if(!inputfp){
-		Fprintf(stderr,"--grep requires --input\n");
-	}
-	if(!outputfp){
-		Fprintf(stderr,"--grep requires --output\n");
-	}
-	if(!inputfp || !outputfp){
-		exit(EXIT_FAILURE);
-	}
+do_grep()
+{
+    if (!inputfp) {
+        Fprintf(stderr, "--grep requires --input\n");
+    }
+    if (!outputfp) {
+        Fprintf(stderr, "--grep requires --output\n");
+    }
+    if (!inputfp || !outputfp) {
+        exit(EXIT_FAILURE);
+    }
 
-	grep0(inputfp, outputfp);
+    grep0(inputfp, outputfp);
 }
 
 static void
 grep0(inputfp0, outputfp0)
-	FILE *inputfp0;
-	FILE *outputfp0;
+FILE *inputfp0;
+FILE *outputfp0;
 {
-	char buf[16384];	/* looong, just in case */
+    char buf[16384]; /* looong, just in case */
 
-	while(!feof(inputfp0) && !ferror(inputfp0)){
-		char *tmp;
-		char *buf1;
+    while (!feof(inputfp0) && !ferror(inputfp0)) {
+        char *tmp;
+        char *buf1;
 
-		if(fgets(buf, sizeof(buf), inputfp0) == 0) break;
-		if( (tmp=strchr(buf,'\n')) ) *tmp = '\0';
-		grep_lineno++;
-		if(grep_trace){
-			Fprintf(outputfp0, "%04d %c >%s\n",
-				grep_lineno,
-				grep_writing?' ':'#',
-				buf
-			);
-		}
+        if (fgets(buf, sizeof(buf), inputfp0) == 0)
+            break;
+        if ((tmp = strchr(buf, '\n')))
+            *tmp = '\0';
+        grep_lineno++;
+        if (grep_trace) {
+            Fprintf(outputfp0, "%04d %c >%s\n", grep_lineno,
+                    grep_writing ? ' ' : '#', buf);
+        }
 
-		if(buf[0] == GREP_MAGIC){
-			buf1 = do_grep_control(&buf[1]);
-			if(!buf1) continue;
-		} else {
-			buf1 = buf;
-		}
+        if (buf[0] == GREP_MAGIC) {
+            buf1 = do_grep_control(&buf[1]);
+            if (!buf1)
+                continue;
+        } else {
+            buf1 = buf;
+        }
 #ifdef notyet
-		if(grep_rewrite)
-			do_grep_rewrite(buf1);
+        if (grep_rewrite)
+            do_grep_rewrite(buf1);
 #endif
-		if(grep_writing)
-			Fprintf(outputfp0, "%s\n", buf1);
-	}
-	if(ferror(inputfp0)){
-		Fprintf(stderr, "read error!\n");
-		exit(EXIT_FAILURE);
-	}
-	if(ferror(outputfp0)){
-		Fprintf(stderr, "write error!\n");
-		exit(EXIT_FAILURE);
-	}
-	fclose(inputfp0);
-	fclose(outputfp0);
-	if(grep_sp){
-		Fprintf(stderr, "%d unterminated conditional level%s\n",
-			grep_sp, grep_sp==1?"":"s");
-		grep_errors++;
-	}
-	if(grep_errors){
-		Fprintf(stderr, "%d error%s detected.\n", grep_errors,
-			grep_errors==1?"":"s");
-		exit(EXIT_FAILURE);
-	}
+        if (grep_writing)
+            Fprintf(outputfp0, "%s\n", buf1);
+    }
+    if (ferror(inputfp0)) {
+        Fprintf(stderr, "read error!\n");
+        exit(EXIT_FAILURE);
+    }
+    if (ferror(outputfp0)) {
+        Fprintf(stderr, "write error!\n");
+        exit(EXIT_FAILURE);
+    }
+    fclose(inputfp0);
+    fclose(outputfp0);
+    if (grep_sp) {
+        Fprintf(stderr, "%d unterminated conditional level%s\n", grep_sp,
+                grep_sp == 1 ? "" : "s");
+        grep_errors++;
+    }
+    if (grep_errors) {
+        Fprintf(stderr, "%d error%s detected.\n", grep_errors,
+                grep_errors == 1 ? "" : "s");
+        exit(EXIT_FAILURE);
+    }
 }
 
-
 /* trivial text encryption routine which can't be broken with `tr' */
-static
-char *xcrypt(str)
+static char *
+xcrypt(str)
 const char *str;
-{				/* duplicated in src/hacklib.c */
-	static char buf[BUFSZ];
-	register const char *p;
-	register char *q;
-	register int bitmask;
+{ /* duplicated in src/hacklib.c */
+    static char buf[BUFSZ];
+    register const char *p;
+    register char *q;
+    register int bitmask;
 
-	for (bitmask = 1, p = str, q = buf; *p; q++) {
-		*q = *p++;
-		if (*q & (32|64)) *q ^= bitmask;
-		if ((bitmask <<= 1) >= 32) bitmask = 1;
-	}
-	*q = '\0';
-	return buf;
+    for (bitmask = 1, p = str, q = buf; *p; q++) {
+        *q = *p++;
+        if (*q & (32 | 64))
+            *q ^= bitmask;
+        if ((bitmask <<= 1) >= 32)
+            bitmask = 1;
+    }
+    *q = '\0';
+    return buf;
 }
 
 #define PAD_RUMORS_TO 60
@@ -839,43 +875,42 @@ unsigned long old_rumor_offset;
     Sprintf(infile, DATA_IN_TEMPLATE, RUMOR_FILE);
     Strcat(infile, file_ext);
     if (!(ifp = fopen(infile, RDTMODE))) {
-	perror(infile);
-	return 0L;
+        perror(infile);
+        return 0L;
     }
 
     /* copy the rumors */
     while (fgets(in_line, sizeof in_line, ifp) != 0) {
 #ifdef PAD_RUMORS_TO
-	int len = strlen(in_line);
-	if(len <= PAD_RUMORS_TO){	/* XXX enforce min len? */
-	    char *base = index(in_line, '\n');
-	    while(len++<PAD_RUMORS_TO){
-		*base++ = '_';	/* XXX */
-	    }
-	    *base++ = '\n';
-	    *base = '\0';
-	}
+        int len = strlen(in_line);
+        if (len <= PAD_RUMORS_TO) { /* XXX enforce min len? */
+            char *base = index(in_line, '\n');
+            while (len++ < PAD_RUMORS_TO) {
+                *base++ = '_'; /* XXX */
+            }
+            *base++ = '\n';
+            *base = '\0';
+        }
 #endif
-	(*rumor_count)++;
+        (*rumor_count)++;
 #if 0
 	/*[if we forced binary output, this would be sufficient]*/
 	*rumor_size += strlen(in_line);	/* includes newline */
 #endif
-	(void) fputs(xcrypt(in_line), tfp);
+        (void) fputs(xcrypt(in_line), tfp);
     }
     /* record the current position; next rumors section will start here */
-    rumor_offset = (unsigned long)ftell(tfp);
-    Fclose(ifp);		/* all done with rumors.file_ext */
+    rumor_offset = (unsigned long) ftell(tfp);
+    Fclose(ifp); /* all done with rumors.file_ext */
 
     /* the calculated value for *_rumor_count assumes that
        a single-byte line terminator is in use; for platforms
        which use two byte CR+LF, we need to override that value
        [it's much simpler to do so unconditionally, rendering
        the loop's accumulation above obsolete] */
-    *rumor_size = (long)(rumor_offset - old_rumor_offset);
+    *rumor_size = (long) (rumor_offset - old_rumor_offset);
     return rumor_offset;
 }
-
 
 void
 do_rnd_access_file(fname)
@@ -884,28 +919,30 @@ const char *fname;
     Sprintf(filename, DATA_IN_TEMPLATE, fname);
     Strcat(filename, ".txt");
     if (!(ifp = fopen(filename, RDTMODE))) {
-	perror(filename);
-	exit(EXIT_FAILURE);
+        perror(filename);
+        exit(EXIT_FAILURE);
     }
-    filename[0]='\0';
+    filename[0] = '\0';
 #ifdef FILE_PREFIX
     Strcat(filename, file_prefix);
 #endif
     Sprintf(eos(filename), DATA_TEMPLATE, fname);
     if (!(ofp = fopen(filename, WRTMODE))) {
-	perror(filename);
-	exit(EXIT_FAILURE);
+        perror(filename);
+        exit(EXIT_FAILURE);
     }
-    Fprintf(ofp,"%s",Dont_Edit_Data);
+    Fprintf(ofp, "%s", Dont_Edit_Data);
 
     tfp = getfp(DATA_TEMPLATE, "grep.tmp", WRTMODE);
     grep0(ifp, tfp);
     ifp = getfp(DATA_TEMPLATE, "grep.tmp", RDTMODE);
 
     while (fgets(in_line, sizeof in_line, ifp) != 0) {
-	if (in_line[0] == '#') continue; /* discard comments */
-	if (in_line[0] == '\n') continue; /* and empty lines */
-	(void) fputs(xcrypt(in_line), ofp);
+        if (in_line[0] == '#')
+            continue; /* discard comments */
+        if (in_line[0] == '\n')
+            continue; /* and empty lines */
+        (void) fputs(xcrypt(in_line), ofp);
     }
     Fclose(ifp);
     Fclose(ofp);
@@ -917,83 +954,83 @@ const char *fname;
 void
 do_rumors()
 {
-	static const char rumors_header[] =
-			"%s%04d,%06ld,%06lx;%04d,%06ld,%06lx;0,0,%06lx\n";
-	char	tempfile[600];
-	int	true_rumor_count, false_rumor_count;
-	long	true_rumor_size, false_rumor_size;
-	unsigned long true_rumor_offset, false_rumor_offset, eof_offset;
+    static const char rumors_header[] =
+        "%s%04d,%06ld,%06lx;%04d,%06ld,%06lx;0,0,%06lx\n";
+    char tempfile[600];
+    int true_rumor_count, false_rumor_count;
+    long true_rumor_size, false_rumor_size;
+    unsigned long true_rumor_offset, false_rumor_offset, eof_offset;
 
-	Sprintf(tempfile, DATA_TEMPLATE, "rumors.tmp");
-	filename[0]='\0';
+    Sprintf(tempfile, DATA_TEMPLATE, "rumors.tmp");
+    filename[0] = '\0';
 #ifdef FILE_PREFIX
-	Strcat(filename, file_prefix);
+    Strcat(filename, file_prefix);
 #endif
-	Sprintf(eos(filename), DATA_TEMPLATE, RUMOR_FILE);
-	if (!(ofp = fopen(filename, WRTMODE))) {
-		perror(filename);
-		exit(EXIT_FAILURE);
-	}
-	if (!(tfp = fopen(tempfile, WRTMODE))) {
-		perror(tempfile);
-		Fclose(ofp);
-		exit(EXIT_FAILURE);
-	}
+    Sprintf(eos(filename), DATA_TEMPLATE, RUMOR_FILE);
+    if (!(ofp = fopen(filename, WRTMODE))) {
+        perror(filename);
+        exit(EXIT_FAILURE);
+    }
+    if (!(tfp = fopen(tempfile, WRTMODE))) {
+        perror(tempfile);
+        Fclose(ofp);
+        exit(EXIT_FAILURE);
+    }
 
-	true_rumor_count = false_rumor_count = 0;
-	true_rumor_size = false_rumor_size = 0L;
-	true_rumor_offset = false_rumor_offset = eof_offset = 0L;
+    true_rumor_count = false_rumor_count = 0;
+    true_rumor_size = false_rumor_size = 0L;
+    true_rumor_offset = false_rumor_offset = eof_offset = 0L;
 
-	/* output a dummy header record; we'll replace it in final output */
-	Fprintf(tfp, rumors_header, Dont_Edit_Data, 
-		true_rumor_count, true_rumor_size, true_rumor_offset,
-		false_rumor_count, false_rumor_size, false_rumor_offset,
-		eof_offset);
-	/* record the current position; true rumors will start here */
-	true_rumor_offset = ftell(tfp);
+    /* output a dummy header record; we'll replace it in final output */
+    Fprintf(tfp, rumors_header, Dont_Edit_Data, true_rumor_count,
+            true_rumor_size, true_rumor_offset, false_rumor_count,
+            false_rumor_size, false_rumor_offset, eof_offset);
+    /* record the current position; true rumors will start here */
+    true_rumor_offset = ftell(tfp);
 
-	false_rumor_offset = read_rumors_file(".tru", &true_rumor_count,
-					  &true_rumor_size, true_rumor_offset);
-	if(!false_rumor_offset) goto rumors_failure;
+    false_rumor_offset = read_rumors_file(
+        ".tru", &true_rumor_count, &true_rumor_size, true_rumor_offset);
+    if (!false_rumor_offset)
+        goto rumors_failure;
 
-	eof_offset = read_rumors_file(".fal", &false_rumor_count,
-				      &false_rumor_size, false_rumor_offset);
-	if(!eof_offset) goto rumors_failure;
+    eof_offset = read_rumors_file(".fal", &false_rumor_count,
+                                  &false_rumor_size, false_rumor_offset);
+    if (!eof_offset)
+        goto rumors_failure;
 
-	/* get ready to transfer the contents of temp file to output file */
-	Sprintf(in_line, "rewind of \"%s\"", tempfile);
-	if (rewind(tfp) != 0) {
-		perror(in_line);
-		goto rumors_failure;
-	}
+    /* get ready to transfer the contents of temp file to output file */
+    Sprintf(in_line, "rewind of \"%s\"", tempfile);
+    if (rewind(tfp) != 0) {
+        perror(in_line);
+        goto rumors_failure;
+    }
 
-	/* output the header record */
-	Fprintf(ofp, rumors_header, Dont_Edit_Data, 
-		true_rumor_count, true_rumor_size, true_rumor_offset,
-		false_rumor_count, false_rumor_size, false_rumor_offset,
-		eof_offset);
-	/* skip the temp file's dummy header */
-	if (!fgets(in_line, sizeof in_line, tfp) ||	/* "Don't Edit" */
-	    !fgets(in_line, sizeof in_line, tfp)) {	/* count,size,offset */
-		perror(tempfile);
-		goto rumors_failure;
-	}
-	/* copy the rest of the temp file into the final output file */
-	while (fgets(in_line, sizeof in_line, tfp) != 0) {
-		(void) fputs(in_line, ofp);
-	}
-	/* all done; delete temp file */
-	Fclose(tfp);
-	Unlink(tempfile);
-	Fclose(ofp);
-	return;
+    /* output the header record */
+    Fprintf(ofp, rumors_header, Dont_Edit_Data, true_rumor_count,
+            true_rumor_size, true_rumor_offset, false_rumor_count,
+            false_rumor_size, false_rumor_offset, eof_offset);
+    /* skip the temp file's dummy header */
+    if (!fgets(in_line, sizeof in_line, tfp) || /* "Don't Edit" */
+        !fgets(in_line, sizeof in_line, tfp)) { /* count,size,offset */
+        perror(tempfile);
+        goto rumors_failure;
+    }
+    /* copy the rest of the temp file into the final output file */
+    while (fgets(in_line, sizeof in_line, tfp) != 0) {
+        (void) fputs(in_line, ofp);
+    }
+    /* all done; delete temp file */
+    Fclose(tfp);
+    Unlink(tempfile);
+    Fclose(ofp);
+    return;
 
- rumors_failure:
-	Fclose(ofp);
-	Unlink(filename);	/* kill empty or incomplete output file */
-	Fclose(tfp);
-	Unlink(tempfile);	/* and temporary file */
-	exit(EXIT_FAILURE);
+rumors_failure:
+    Fclose(ofp);
+    Unlink(filename); /* kill empty or incomplete output file */
+    Fclose(tfp);
+    Unlink(tempfile); /* and temporary file */
+    exit(EXIT_FAILURE);
 }
 
 /*
@@ -1008,85 +1045,89 @@ do_rumors()
  * version_info, and that is what needs to be checked against the
  * feature set of the port that is reading the savefile back in.
  * That check is done in src/restore.c now.
- * 
+ *
  */
-#define IGNORED_FEATURES	( 0L \
-				| (1L << 19)	/* SCORE_ON_BOTL */ \
-				| (1L << 27)	/* ZEROCOMP */ \
-				| (1L << 28)	/* RLECOMP */ \
-				)
+#define IGNORED_FEATURES                 \
+    (0L | (1L << 19) /* SCORE_ON_BOTL */ \
+     | (1L << 27)    /* ZEROCOMP */      \
+     | (1L << 28)    /* RLECOMP */       \
+     )
 
 static void
 make_version()
 {
-	register int i;
+    register int i;
 
-	/*
-	 * integer version number
-	 */
-	version.incarnation = ((unsigned long)VERSION_MAJOR << 24) |
-				((unsigned long)VERSION_MINOR << 16) |
-				((unsigned long)PATCHLEVEL << 8) |
-				((unsigned long)EDITLEVEL);
-	/*
-	 * encoded feature list
-	 * Note:  if any of these magic numbers are changed or reassigned,
-	 * EDITLEVEL in patchlevel.h should be incremented at the same time.
-	 * The actual values have no special meaning, and the category
-	 * groupings are just for convenience.
-	 */
-	version.feature_set = (unsigned long)(0L
-		/* levels and/or topology (0..4) */
-		/* monsters (5..9) */
+    /*
+     * integer version number
+     */
+    version.incarnation = ((unsigned long) VERSION_MAJOR << 24)
+                          | ((unsigned long) VERSION_MINOR << 16)
+                          | ((unsigned long) PATCHLEVEL << 8)
+                          | ((unsigned long) EDITLEVEL);
+    /*
+     * encoded feature list
+     * Note:  if any of these magic numbers are changed or reassigned,
+     * EDITLEVEL in patchlevel.h should be incremented at the same time.
+     * The actual values have no special meaning, and the category
+     * groupings are just for convenience.
+     */
+    version.feature_set = (unsigned long) (0L
+/* levels and/or topology (0..4) */
+/* monsters (5..9) */
 #ifdef MAIL
-			| (1L <<  6)
+                                           | (1L << 6)
 #endif
-		/* objects (10..14) */
-		/* flag bits and/or other global variables (15..26) */
+/* objects (10..14) */
+/* flag bits and/or other global variables (15..26) */
 #ifdef TEXTCOLOR
-			| (1L << 17)
+                                           | (1L << 17)
 #endif
 #ifdef INSURANCE
-			| (1L << 18)
+                                           | (1L << 18)
 #endif
 #ifdef SCORE_ON_BOTL
-			| (1L << 19)
+                                           | (1L << 19)
 #endif
-		/* data format (27..31)
-		 * External compression methods such as COMPRESS and ZLIB_COMP
-		 * do not affect the contents and are thus excluded from here */
+/* data format (27..31)
+ * External compression methods such as COMPRESS and ZLIB_COMP
+ * do not affect the contents and are thus excluded from here */
 #ifdef ZEROCOMP
-			| (1L << 27)
+                                           | (1L << 27)
 #endif
 #ifdef RLECOMP
-			| (1L << 28)
+                                           | (1L << 28)
 #endif
-			);
-	/*
-	 * Value used for object & monster sanity check.
-	 *    (NROFARTIFACTS<<24) | (NUM_OBJECTS<<12) | (NUMMONS<<0)
-	 */
-	for (i = 1; artifact_names[i]; i++) continue;
-	version.entity_count = (unsigned long)(i - 1);
-	for (i = 1; objects[i].oc_class != ILLOBJ_CLASS; i++) continue;
-	version.entity_count = (version.entity_count << 12) | (unsigned long)i;
-	for (i = 0; mons[i].mlet; i++) continue;
-	version.entity_count = (version.entity_count << 12) | (unsigned long)i;
-	/*
-	 * Value used for compiler (word size/field alignment/padding) check.
-	 */
-	version.struct_sizes1 = (((unsigned long)sizeof (struct context_info)  << 24) |
-				((unsigned long)sizeof (struct obj)   << 17) |
-				((unsigned long)sizeof (struct monst) << 10) |
-				((unsigned long)sizeof (struct you)));
-	version.struct_sizes2 = (((unsigned long)sizeof (struct flag)  << 10) |
-				/* free bits in here */
+                                               );
+    /*
+     * Value used for object & monster sanity check.
+     *    (NROFARTIFACTS<<24) | (NUM_OBJECTS<<12) | (NUMMONS<<0)
+     */
+    for (i = 1; artifact_names[i]; i++)
+        continue;
+    version.entity_count = (unsigned long) (i - 1);
+    for (i = 1; objects[i].oc_class != ILLOBJ_CLASS; i++)
+        continue;
+    version.entity_count = (version.entity_count << 12) | (unsigned long) i;
+    for (i = 0; mons[i].mlet; i++)
+        continue;
+    version.entity_count = (version.entity_count << 12) | (unsigned long) i;
+    /*
+     * Value used for compiler (word size/field alignment/padding) check.
+     */
+    version.struct_sizes1 =
+        (((unsigned long) sizeof(struct context_info) << 24)
+         | ((unsigned long) sizeof(struct obj) << 17)
+         | ((unsigned long) sizeof(struct monst) << 10)
+         | ((unsigned long) sizeof(struct you)));
+    version.struct_sizes2 = (((unsigned long) sizeof(struct flag) << 10) |
+/* free bits in here */
 #ifdef SYSFLAGS
-				((unsigned long)sizeof (struct sysflag)));
+                             ((unsigned long) sizeof(struct sysflag)));
 #else
-				((unsigned long)0L));
+                             ((unsigned long) 0L));
 #endif
-	return;
+    return;
 }
 
 static char *
@@ -1094,8 +1135,8 @@ version_string(outbuf, delim)
 char *outbuf;
 const char *delim;
 {
-    Sprintf(outbuf, "%d%s%d%s%d", VERSION_MAJOR, delim, VERSION_MINOR,
-		delim, PATCHLEVEL);
+    Sprintf(outbuf, "%d%s%d%s%d", VERSION_MAJOR, delim, VERSION_MINOR, delim,
+            PATCHLEVEL);
 #ifdef BETA
     Sprintf(eos(outbuf), "-%d", EDITLEVEL);
 #endif
@@ -1118,8 +1159,8 @@ const char *build_date;
     Strcat(subbuf, " Beta");
 #endif
 
-    Sprintf(outbuf, "%s NetHack%s Version %s - last build %s.",
-	    PORT_ID, subbuf, version_string(versbuf,"."), build_date);
+    Sprintf(outbuf, "%s NetHack%s Version %s - last build %s.", PORT_ID,
+            subbuf, version_string(versbuf, "."), build_date);
     return outbuf;
 }
 
@@ -1139,9 +1180,8 @@ const char *build_date;
     Strcat(subbuf, " Beta");
 #endif
 
-    Sprintf(outbuf, "         Version %s %s%s, built %s.", 
-version_string(versbuf, "."), 
-PORT_ID, subbuf, &build_date[4]);
+    Sprintf(outbuf, "         Version %s %s%s, built %s.",
+            version_string(versbuf, "."), PORT_ID, subbuf, &build_date[4]);
 #if 0
     Sprintf(outbuf, "%s NetHack%s %s Copyright 1985-%s (built %s)",
 	    PORT_ID, subbuf, version_string(versbuf,"."), RELEASE_YEAR,
@@ -1154,77 +1194,79 @@ void
 do_date()
 {
 #ifdef KR1ED
-	long clocktim = 0;
+    long clocktim = 0;
 #else
-	time_t clocktim = 0;
+    time_t clocktim = 0;
 #endif
-	char *c, cbuf[60], buf[BUFSZ];
-	const char *ul_sfx;
+    char *c, cbuf[60], buf[BUFSZ];
+    const char *ul_sfx;
 
-	/* before creating date.h, make sure that xxx_GRAPHICS and
-	   DEFAULT_WINDOW_SYS have been set up in a viable fashion */
-	windowing_sanity();
+    /* before creating date.h, make sure that xxx_GRAPHICS and
+       DEFAULT_WINDOW_SYS have been set up in a viable fashion */
+    windowing_sanity();
 
-	filename[0]='\0';
+    filename[0] = '\0';
 #ifdef FILE_PREFIX
-	Strcat(filename,file_prefix);
+    Strcat(filename, file_prefix);
 #endif
-	Sprintf(eos(filename), INCLUDE_TEMPLATE, DATE_FILE);
-	if (!(ofp = fopen(filename, WRTMODE))) {
-		perror(filename);
-		exit(EXIT_FAILURE);
-	}
-		/* NB: We've moved on from SCCS, but this way this line
-		 * won't get clobbered when downstream projects import
-		 * this file into something more modern. */
-	Fprintf(ofp,"/*\tSCCS Id: @(#)date.h\t3.5\t2004/02/01 */\n\n");
-	Fprintf(ofp,"%s",Dont_Edit_Code);
+    Sprintf(eos(filename), INCLUDE_TEMPLATE, DATE_FILE);
+    if (!(ofp = fopen(filename, WRTMODE))) {
+        perror(filename);
+        exit(EXIT_FAILURE);
+    }
+    /* NB: We've moved on from SCCS, but this way this line
+     * won't get clobbered when downstream projects import
+     * this file into something more modern. */
+    Fprintf(ofp, "/*\tSCCS Id: @(#)date.h\t3.5\t2004/02/01 */\n\n");
+    Fprintf(ofp, "%s", Dont_Edit_Code);
 
-	(void) time(&clocktim);
-	Strcpy(cbuf, ctime(&clocktim));
+    (void) time(&clocktim);
+    Strcpy(cbuf, ctime(&clocktim));
 
-	for (c = cbuf; *c; c++) if (*c == '\n') break;
-	*c = '\0';	/* strip off the '\n' */
-	Fprintf(ofp,"#define BUILD_DATE \"%s\"\n", cbuf);
-	Fprintf(ofp,"#define BUILD_TIME (%ldL)\n", (long)clocktim);
-	Fprintf(ofp,"\n");
+    for (c = cbuf; *c; c++)
+        if (*c == '\n')
+            break;
+    *c = '\0'; /* strip off the '\n' */
+    Fprintf(ofp, "#define BUILD_DATE \"%s\"\n", cbuf);
+    Fprintf(ofp, "#define BUILD_TIME (%ldL)\n", (long) clocktim);
+    Fprintf(ofp, "\n");
 #ifdef NHSTDC
-	ul_sfx = "UL";
+    ul_sfx = "UL";
 #else
-	ul_sfx = "L";
+    ul_sfx = "L";
 #endif
-	Fprintf(ofp,"#define VERSION_NUMBER 0x%08lx%s\n",
-		version.incarnation, ul_sfx);
-	Fprintf(ofp,"#define VERSION_FEATURES 0x%08lx%s\n",
-		version.feature_set, ul_sfx);
+    Fprintf(ofp, "#define VERSION_NUMBER 0x%08lx%s\n", version.incarnation,
+            ul_sfx);
+    Fprintf(ofp, "#define VERSION_FEATURES 0x%08lx%s\n", version.feature_set,
+            ul_sfx);
 #ifdef IGNORED_FEATURES
-	Fprintf(ofp,"#define IGNORED_FEATURES 0x%08lx%s\n",
-		(unsigned long) IGNORED_FEATURES, ul_sfx);
+    Fprintf(ofp, "#define IGNORED_FEATURES 0x%08lx%s\n",
+            (unsigned long) IGNORED_FEATURES, ul_sfx);
 #endif
-	Fprintf(ofp,"#define VERSION_SANITY1 0x%08lx%s\n",
-		version.entity_count, ul_sfx);
-	Fprintf(ofp,"#define VERSION_SANITY2 0x%08lx%s\n",
-		version.struct_sizes1, ul_sfx);
-	Fprintf(ofp,"#define VERSION_SANITY3 0x%08lx%s\n",
-		version.struct_sizes2, ul_sfx);
-	Fprintf(ofp,"\n");
-	Fprintf(ofp,"#define VERSION_STRING \"%s\"\n", version_string(buf,"."));
-	Fprintf(ofp,"#define VERSION_ID \\\n \"%s\"\n",
-		version_id_string(buf, cbuf));
-	Fprintf(ofp,"#define COPYRIGHT_BANNER_C \\\n \"%s\"\n",
-		bannerc_string(buf, cbuf));
-	Fprintf(ofp,"\n");
+    Fprintf(ofp, "#define VERSION_SANITY1 0x%08lx%s\n", version.entity_count,
+            ul_sfx);
+    Fprintf(ofp, "#define VERSION_SANITY2 0x%08lx%s\n", version.struct_sizes1,
+            ul_sfx);
+    Fprintf(ofp, "#define VERSION_SANITY3 0x%08lx%s\n", version.struct_sizes2,
+            ul_sfx);
+    Fprintf(ofp, "\n");
+    Fprintf(ofp, "#define VERSION_STRING \"%s\"\n", version_string(buf, "."));
+    Fprintf(ofp, "#define VERSION_ID \\\n \"%s\"\n",
+            version_id_string(buf, cbuf));
+    Fprintf(ofp, "#define COPYRIGHT_BANNER_C \\\n \"%s\"\n",
+            bannerc_string(buf, cbuf));
+    Fprintf(ofp, "\n");
 #ifdef AMIGA
-	{
-	struct tm *tm = localtime((time_t *) &clocktim);
-	Fprintf(ofp,"#define AMIGA_VERSION_STRING ");
-	Fprintf(ofp,"\"\\0$VER: NetHack %d.%d.%d (%d.%d.%d)\"\n",
-		VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL,
-		tm->tm_mday, tm->tm_mon+1, tm->tm_year+1900);
-	}
+    {
+        struct tm *tm = localtime((time_t *) &clocktim);
+        Fprintf(ofp, "#define AMIGA_VERSION_STRING ");
+        Fprintf(ofp, "\"\\0$VER: NetHack %d.%d.%d (%d.%d.%d)\"\n",
+                VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL, tm->tm_mday,
+                tm->tm_mon + 1, tm->tm_year + 1900);
+    }
 #endif
-	Fclose(ofp);
-	return;
+    Fclose(ofp);
+    return;
 }
 
 static char save_bones_compat_buf[BUFSZ];
@@ -1233,309 +1275,314 @@ static void
 build_savebones_compat_string()
 {
 #ifdef VERSION_COMPATIBILITY
-	unsigned long uver = VERSION_COMPATIBILITY;
+    unsigned long uver = VERSION_COMPATIBILITY;
 #endif
-	Strcpy(save_bones_compat_buf,
-		"save and bones files accepted from version");
+    Strcpy(save_bones_compat_buf,
+           "save and bones files accepted from version");
 #ifdef VERSION_COMPATIBILITY
-	Sprintf(eos(save_bones_compat_buf), "s %lu.%lu.%lu through %d.%d.%d",
-		((uver & 0xFF000000L) >> 24), ((uver & 0x00FF0000L) >> 16),
-		((uver & 0x0000FF00L) >> 8),
-		VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);
+    Sprintf(eos(save_bones_compat_buf), "s %lu.%lu.%lu through %d.%d.%d",
+            ((uver & 0xFF000000L) >> 24), ((uver & 0x00FF0000L) >> 16),
+            ((uver & 0x0000FF00L) >> 8), VERSION_MAJOR, VERSION_MINOR,
+            PATCHLEVEL);
 #else
-	Sprintf(eos(save_bones_compat_buf), " %d.%d.%d only",
-		VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);
+    Sprintf(eos(save_bones_compat_buf), " %d.%d.%d only", VERSION_MAJOR,
+            VERSION_MINOR, PATCHLEVEL);
 #endif
 }
 
 static const char *build_opts[] = {
 #ifdef AMIGA_WBENCH
-		"Amiga WorkBench support",
+    "Amiga WorkBench support",
 #endif
 #ifdef ANSI_DEFAULT
-		"ANSI default terminal",
+    "ANSI default terminal",
 #endif
 #ifdef TEXTCOLOR
-		"color",
+    "color",
 #endif
 #ifdef COM_COMPL
-		"command line completion",
+    "command line completion",
 #endif
 #ifdef LIFE
-		"Conway's Game of Life",
+    "Conway's Game of Life",
 #endif
 #ifdef COMPRESS
-		"data file compression",
+    "data file compression",
 #endif
 #ifdef ZLIB_COMP
-		"ZLIB data file compression",
+    "ZLIB data file compression",
 #endif
 #ifdef DLB
-		"data librarian",
+    "data librarian",
 #endif
 #ifdef MFLOPPY
-		"floppy drive support",
+    "floppy drive support",
 #endif
 #ifdef INSURANCE
-		"insurance files for recovering from crashes",
+    "insurance files for recovering from crashes",
 #endif
 #ifdef HOLD_LOCKFILE_OPEN
-		"exclusive lock on level 0 file",
+    "exclusive lock on level 0 file",
 #endif
 #ifdef LOGFILE
-		"log file",
+    "log file",
 #endif
 #ifdef MAIL
-		"mail daemon",
+    "mail daemon",
 #endif
 #ifdef GNUDOS
-		"MSDOS protected mode",
+    "MSDOS protected mode",
 #endif
 #ifdef NEWS
-		"news file",
+    "news file",
 #endif
 #ifdef MENU_COLOR_REGEX
-		"menu colors via regular expressions",
+    "menu colors via regular expressions",
 #else
-		"menu colors via pmatch",
+    "menu colors via pmatch",
 #endif
 #ifdef OVERLAY
-# ifdef MOVERLAY
-		"MOVE overlays",
-# else
-#  ifdef VROOMM
-		"VROOMM overlays",
-#  else
-		"overlays",
-#  endif
-# endif
+#ifdef MOVERLAY
+    "MOVE overlays",
+#else
+#ifdef VROOMM
+    "VROOMM overlays",
+#else
+    "overlays",
+#endif
+#endif
 #endif
 #ifdef SELECTSAVED
-		"restore saved games via menu",
+    "restore saved games via menu",
 #endif
 #ifdef SCORE_ON_BOTL
-		"score on status line",
+    "score on status line",
 #endif
 #ifdef CLIPPING
-		"screen clipping",
+    "screen clipping",
 #endif
 #ifdef NO_TERMS
-# ifdef MAC
-		"screen control via mactty",
-# endif
-# ifdef SCREEN_BIOS
-		"screen control via BIOS",
-# endif
-# ifdef SCREEN_DJGPPFAST
-		"screen control via DJGPP fast",
-# endif
-# ifdef SCREEN_VGA
-		"screen control via VGA graphics",
-# endif
-# ifdef WIN32CON
-		"screen control via WIN32 console I/O",
-# endif
+#ifdef MAC
+    "screen control via mactty",
+#endif
+#ifdef SCREEN_BIOS
+    "screen control via BIOS",
+#endif
+#ifdef SCREEN_DJGPPFAST
+    "screen control via DJGPP fast",
+#endif
+#ifdef SCREEN_VGA
+    "screen control via VGA graphics",
+#endif
+#ifdef WIN32CON
+    "screen control via WIN32 console I/O",
+#endif
 #endif
 #ifdef SHELL
-		"shell command",
+    "shell command",
 #endif
 #ifdef SUSPEND
-		"suspend command",
+    "suspend command",
 #endif
 #ifdef TERMINFO
-		"terminal info library",
+    "terminal info library",
 #else
-# if defined(TERMLIB) || ((!defined(MICRO) && !defined(WIN32)) && defined(TTY_GRAPHICS))
-		"terminal capability library",
-# endif
+#if defined(TERMLIB) \
+    || ((!defined(MICRO) && !defined(WIN32)) && defined(TTY_GRAPHICS))
+    "terminal capability library",
+#endif
 #endif
 #ifdef TIMED_DELAY
-		"timed wait for display effects",
+    "timed wait for display effects",
 #endif
 #ifdef USER_SOUNDS
-# ifdef USER_SOUNDS_REGEX
-		"user sounds via regular expressions",
-# else
-		"user sounds via pmatch",
-# endif
+#ifdef USER_SOUNDS_REGEX
+    "user sounds via regular expressions",
+#else
+    "user sounds via pmatch",
+#endif
 #endif
 #ifdef PREFIXES_IN_USE
-		"variable playground",
+    "variable playground",
 #endif
 #ifdef VISION_TABLES
-		"vision tables",
+    "vision tables",
 #endif
 #ifdef ZEROCOMP
-		"zero-compressed save files",
+    "zero-compressed save files",
 #endif
 #ifdef RLECOMP
-		"run-length compression of map in save files",
+    "run-length compression of map in save files",
 #endif
 #ifdef SYSCF
-		"system configuration at run-time",
+    "system configuration at run-time",
 #endif
-		save_bones_compat_buf,
-		"and basic NetHack features"
-	};
+    save_bones_compat_buf, "and basic NetHack features"
+};
 
 struct win_info {
-    const char *id,	/* DEFAULT_WINDOW_SYS string */
-	       *name;	/* description, often same as id */
+    const char *id, /* DEFAULT_WINDOW_SYS string */
+        *name;      /* description, often same as id */
 };
 static struct win_info window_opts[] = {
 #ifdef TTY_GRAPHICS
-		{ "tty", "traditional tty-based graphics" },
+    { "tty", "traditional tty-based graphics" },
 #endif
 #ifdef X11_GRAPHICS
-		{ "X11", "X11" },
+    { "X11", "X11" },
 #endif
 #ifdef QT_GRAPHICS
-		{ "Qt", "Qt" },
+    { "Qt", "Qt" },
 #endif
 #ifdef GNOME_GRAPHICS
-		{ "Gnome", "Gnome" },
+    { "Gnome", "Gnome" },
 #endif
 #ifdef MAC
-		{ "mac", "Mac" },
+    { "mac", "Mac" },
 #endif
 #ifdef AMIGA_INTUITION
-		{ "amii", "Amiga Intuition" },
+    { "amii", "Amiga Intuition" },
 #endif
 #ifdef GEM_GRAPHICS
-		{ "Gem", "Gem" },
+    { "Gem", "Gem" },
 #endif
 #ifdef MSWIN_GRAPHICS
-		{ "mswin", "mswin" },
+    { "mswin", "mswin" },
 #endif
 #ifdef BEOS_GRAPHICS
-		{ "BeOS", "BeOS InterfaceKit" },
+    { "BeOS", "BeOS InterfaceKit" },
 #endif
-		{ 0, 0 }
-	};
+    { 0, 0 }
+};
 
 static void
 windowing_sanity()
 {
 #ifndef DEFAULT_WINDOW_SYS
-	/* pre-standard compilers didn't support #error; wait til run-time */
-	Fprintf(stderr,
- "Configuration error: DEFAULT_WINDOW_SYS is not defined.\n");
-	exit(EXIT_FAILURE);
-	/*NOTREACHED*/
+    /* pre-standard compilers didn't support #error; wait til run-time */
+    Fprintf(stderr,
+            "Configuration error: DEFAULT_WINDOW_SYS is not defined.\n");
+    exit(EXIT_FAILURE);
+/*NOTREACHED*/
 
-	/* put in a dummy value so that do_options() will compile and makedefs
-	   will build, otherwise the message above won't ever get delivered */
-# define DEFAULT_WINDOW_SYS "<undefined>"
-#else	/*DEFAULT_WINDOW_SYS*/
+/* put in a dummy value so that do_options() will compile and makedefs
+   will build, otherwise the message above won't ever get delivered */
+#define DEFAULT_WINDOW_SYS "<undefined>"
+#else  /*DEFAULT_WINDOW_SYS*/
 
-	if (!window_opts[0].id) {
-		Fprintf(stderr,
- "Configuration error: no windowing systems (TTY_GRAPHICS, &c) enabled.\n");
-		exit(EXIT_FAILURE);
-	}
+    if (!window_opts[0].id) {
+        Fprintf(stderr, "Configuration error: no windowing systems "
+                        "(TTY_GRAPHICS, &c) enabled.\n");
+        exit(EXIT_FAILURE);
+    }
 
     {
-	int i;
+        int i;
 
-	for (i = 0; window_opts[i].id; ++i)
-		if (!strcmp(window_opts[i].id, DEFAULT_WINDOW_SYS)) break;
-	if (!window_opts[i].id) { /* went through whole list without a match */
-		Fprintf(stderr,
- "Configuration error: DEFAULT_WINDOW_SYS (%s)\n", DEFAULT_WINDOW_SYS);
-		Fprintf(stderr,
- " does not match any enabled windowing system (%s%s).\n",
-			window_opts[0].id,
-			window_opts[1].id ? ", &c" : "");
-		exit(EXIT_FAILURE);
-	}
+        for (i = 0; window_opts[i].id; ++i)
+            if (!strcmp(window_opts[i].id, DEFAULT_WINDOW_SYS))
+                break;
+        if (!window_opts[i]
+                 .id) { /* went through whole list without a match */
+            Fprintf(stderr, "Configuration error: DEFAULT_WINDOW_SYS (%s)\n",
+                    DEFAULT_WINDOW_SYS);
+            Fprintf(stderr,
+                    " does not match any enabled windowing system (%s%s).\n",
+                    window_opts[0].id, window_opts[1].id ? ", &c" : "");
+            exit(EXIT_FAILURE);
+        }
     }
-#endif	/*DEFAULT_WINDOW_SYS*/
+#endif /*DEFAULT_WINDOW_SYS*/
 }
 
 void
 do_options()
 {
-	static const char indent[] = "    ";
-	const char *str, *sep;
-	char *word, buf[BUFSZ];
-	int i, length, winsyscnt;
+    static const char indent[] = "    ";
+    const char *str, *sep;
+    char *word, buf[BUFSZ];
+    int i, length, winsyscnt;
 
-	windowing_sanity();
+    windowing_sanity();
 
-	filename[0]='\0';
+    filename[0] = '\0';
 #ifdef FILE_PREFIX
-	Strcat(filename,file_prefix);
+    Strcat(filename, file_prefix);
 #endif
-	Sprintf(eos(filename), DATA_TEMPLATE, OPTIONS_FILE);
-	if (!(ofp = fopen(filename, WRTMODE))) {
-		perror(filename);
-		exit(EXIT_FAILURE);
-	}
+    Sprintf(eos(filename), DATA_TEMPLATE, OPTIONS_FILE);
+    if (!(ofp = fopen(filename, WRTMODE))) {
+        perror(filename);
+        exit(EXIT_FAILURE);
+    }
 
-	build_savebones_compat_string();
-	Fprintf(ofp,
+    build_savebones_compat_string();
+    Fprintf(ofp,
 #ifdef BETA
-		"\n    NetHack version %d.%d.%d [beta]\n",
+            "\n    NetHack version %d.%d.%d [beta]\n",
 #else
-		"\n    NetHack version %d.%d.%d\n",
+            "\n    NetHack version %d.%d.%d\n",
 #endif
-		VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);
+            VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);
 
-	Fprintf(ofp,"\nOptions compiled into this edition:\n");
-	length = COLNO + 1;	/* force 1st item onto new line */
-	for (i = 0; i < SIZE(build_opts); i++) {
-	    str = strcpy(buf, build_opts[i]);
-	    while (*str) {
-		word = index(str, ' ');
-		if (word) *word = '\0';
-		if (length + strlen(str) > COLNO - 5)
-		    Fprintf(ofp,"\n%s", indent),  length = strlen(indent);
-		else
-		    Fprintf(ofp," "),  length++;
-		Fprintf(ofp,"%s", str),  length += strlen(str);
-		str += strlen(str) + (word ? 1 : 0);
-	    }
-	    Fprintf(ofp,(i < SIZE(build_opts) - 1) ? "," : "."),  length++;
-	}
+    Fprintf(ofp, "\nOptions compiled into this edition:\n");
+    length = COLNO + 1; /* force 1st item onto new line */
+    for (i = 0; i < SIZE(build_opts); i++) {
+        str = strcpy(buf, build_opts[i]);
+        while (*str) {
+            word = index(str, ' ');
+            if (word)
+                *word = '\0';
+            if (length + strlen(str) > COLNO - 5)
+                Fprintf(ofp, "\n%s", indent), length = strlen(indent);
+            else
+                Fprintf(ofp, " "), length++;
+            Fprintf(ofp, "%s", str), length += strlen(str);
+            str += strlen(str) + (word ? 1 : 0);
+        }
+        Fprintf(ofp, (i < SIZE(build_opts) - 1) ? "," : "."), length++;
+    }
 
-	winsyscnt = SIZE(window_opts) - 1;
-	Fprintf(ofp, "\n\nSupported windowing system%s:\n",
-		(winsyscnt > 1) ? "s" : "");
-	length = COLNO + 1;	/* force 1st item onto new line */
-	for (i = 0; i < winsyscnt; i++) {
-	    str = window_opts[i].name;
-	    if (length + strlen(str) > COLNO - 5)
-		Fprintf(ofp,"\n%s", indent),  length = strlen(indent);
-	    else
-		Fprintf(ofp," "),  length++;
-	    Fprintf(ofp,"%s", str),  length += strlen(str);
-	    sep = (winsyscnt == 1) ? "." :
-		    (winsyscnt == 2) ? ((i == 0) ? " and" : "") :
-		      (i < winsyscnt - 2) ? "," :
-			((i == winsyscnt - 2) ? ", and" : "");
-	    Fprintf(ofp, "%s", sep),  length += strlen(sep);
-	}
-	if (winsyscnt > 1)
-		Fprintf(ofp, "\n%swith a default of %s.",
-			indent, DEFAULT_WINDOW_SYS);
-	Fprintf(ofp,"\n\n");
+    winsyscnt = SIZE(window_opts) - 1;
+    Fprintf(ofp, "\n\nSupported windowing system%s:\n",
+            (winsyscnt > 1) ? "s" : "");
+    length = COLNO + 1; /* force 1st item onto new line */
+    for (i = 0; i < winsyscnt; i++) {
+        str = window_opts[i].name;
+        if (length + strlen(str) > COLNO - 5)
+            Fprintf(ofp, "\n%s", indent), length = strlen(indent);
+        else
+            Fprintf(ofp, " "), length++;
+        Fprintf(ofp, "%s", str), length += strlen(str);
+        sep = (winsyscnt == 1)
+                  ? "."
+                  : (winsyscnt == 2)
+                        ? ((i == 0) ? " and" : "")
+                        : (i < winsyscnt - 2)
+                              ? ","
+                              : ((i == winsyscnt - 2) ? ", and" : "");
+        Fprintf(ofp, "%s", sep), length += strlen(sep);
+    }
+    if (winsyscnt > 1)
+        Fprintf(ofp, "\n%swith a default of %s.", indent, DEFAULT_WINDOW_SYS);
+    Fprintf(ofp, "\n\n");
 
-	Fclose(ofp);
-	return;
+    Fclose(ofp);
+    return;
 }
 
 /* routine to decide whether to discard something from data.base */
 static boolean
 d_filter(line)
-    char *line;
+char *line;
 {
-    if (*line == '#') return TRUE;	/* ignore comment lines */
+    if (*line == '#')
+        return TRUE; /* ignore comment lines */
     return FALSE;
 }
 
-   /*
-    *
-	New format (v3.1) of 'data' file which allows much faster lookups [pr]
+/*
+ *
+     New format (v3.1) of 'data' file which allows much faster lookups [pr]
 "do not edit"		first record is a comment line
 01234567		hexadecimal formatted offset to text area
 name-a			first name of interest
@@ -1552,135 +1599,140 @@ text-a
 text-b/text-c		7 lines of text for names-b and -c
 text-b/text-c		at fseek(0x01234567L + 456L)
 ...
-    *
-    */
+ *
+ */
 
 void
 do_data()
 {
-	char	infile[60], tempfile[60];
-	boolean ok;
-	long	txt_offset;
-	int	entry_cnt, line_cnt;
+    char infile[60], tempfile[60];
+    boolean ok;
+    long txt_offset;
+    int entry_cnt, line_cnt;
 
-	Sprintf(tempfile, DATA_TEMPLATE, "database.tmp");
-	filename[0]='\0';
+    Sprintf(tempfile, DATA_TEMPLATE, "database.tmp");
+    filename[0] = '\0';
 #ifdef FILE_PREFIX
-	Strcat(filename,file_prefix);
+    Strcat(filename, file_prefix);
 #endif
-	Sprintf(eos(filename), DATA_TEMPLATE, DATA_FILE);
-	Sprintf(infile, DATA_IN_TEMPLATE, DATA_FILE);
+    Sprintf(eos(filename), DATA_TEMPLATE, DATA_FILE);
+    Sprintf(infile, DATA_IN_TEMPLATE, DATA_FILE);
 #ifdef SHORT_FILENAMES
-	Strcat(infile, ".bas");
+    Strcat(infile, ".bas");
 #else
-	Strcat(infile, ".base");
+    Strcat(infile, ".base");
 #endif
-	if (!(ifp = fopen(infile, RDTMODE))) {		/* data.base */
-		perror(infile);
-		exit(EXIT_FAILURE);
-	}
-	if (!(ofp = fopen(filename, WRTMODE))) {	/* data */
-		perror(filename);
-		Fclose(ifp);
-		exit(EXIT_FAILURE);
-	}
-	if (!(tfp = fopen(tempfile, WRTMODE))) {	/* database.tmp */
-		perror(tempfile);
-		Fclose(ifp);
-		Fclose(ofp);
-		Unlink(filename);
-		exit(EXIT_FAILURE);
-	}
+    if (!(ifp = fopen(infile, RDTMODE))) { /* data.base */
+        perror(infile);
+        exit(EXIT_FAILURE);
+    }
+    if (!(ofp = fopen(filename, WRTMODE))) { /* data */
+        perror(filename);
+        Fclose(ifp);
+        exit(EXIT_FAILURE);
+    }
+    if (!(tfp = fopen(tempfile, WRTMODE))) { /* database.tmp */
+        perror(tempfile);
+        Fclose(ifp);
+        Fclose(ofp);
+        Unlink(filename);
+        exit(EXIT_FAILURE);
+    }
 
-	/* output a dummy header record; we'll rewind and overwrite it later */
-	Fprintf(ofp, "%s%08lx\n", Dont_Edit_Data, 0L);
+    /* output a dummy header record; we'll rewind and overwrite it later */
+    Fprintf(ofp, "%s%08lx\n", Dont_Edit_Data, 0L);
 
-	entry_cnt = line_cnt = 0;
-	/* read through the input file and split it into two sections */
-	while (fgets(in_line, sizeof in_line, ifp)) {
-	    if (d_filter(in_line)) continue;
-	    if (*in_line > ' ') {	/* got an entry name */
-		/* first finish previous entry */
-		if (line_cnt)  Fprintf(ofp, "%d\n", line_cnt),  line_cnt = 0;
-		/* output the entry name */
-		(void) fputs(in_line, ofp);
-		entry_cnt++;		/* update number of entries */
-	    } else if (entry_cnt) {	/* got some descriptive text */
-		/* update previous entry with current text offset */
-		if (!line_cnt)  Fprintf(ofp, "%ld,", ftell(tfp));
-		/* save the text line in the scratch file */
-		(void) fputs(in_line, tfp);
-		line_cnt++;		/* update line counter */
-	    }
-	}
-	/* output an end marker and then record the current position */
-	if (line_cnt)  Fprintf(ofp, "%d\n", line_cnt);
-	Fprintf(ofp, ".\n%ld,%d\n", ftell(tfp), 0);
-	txt_offset = ftell(ofp);
-	Fclose(ifp);		/* all done with original input file */
+    entry_cnt = line_cnt = 0;
+    /* read through the input file and split it into two sections */
+    while (fgets(in_line, sizeof in_line, ifp)) {
+        if (d_filter(in_line))
+            continue;
+        if (*in_line > ' ') { /* got an entry name */
+            /* first finish previous entry */
+            if (line_cnt)
+                Fprintf(ofp, "%d\n", line_cnt), line_cnt = 0;
+            /* output the entry name */
+            (void) fputs(in_line, ofp);
+            entry_cnt++;        /* update number of entries */
+        } else if (entry_cnt) { /* got some descriptive text */
+            /* update previous entry with current text offset */
+            if (!line_cnt)
+                Fprintf(ofp, "%ld,", ftell(tfp));
+            /* save the text line in the scratch file */
+            (void) fputs(in_line, tfp);
+            line_cnt++; /* update line counter */
+        }
+    }
+    /* output an end marker and then record the current position */
+    if (line_cnt)
+        Fprintf(ofp, "%d\n", line_cnt);
+    Fprintf(ofp, ".\n%ld,%d\n", ftell(tfp), 0);
+    txt_offset = ftell(ofp);
+    Fclose(ifp); /* all done with original input file */
 
-	/* reprocess the scratch file; 1st format an error msg, just in case */
-	Sprintf(in_line, "rewind of \"%s\"", tempfile);
-	if (rewind(tfp) != 0)  goto dead_data;
-	/* copy all lines of text from the scratch file into the output file */
-	while (fgets(in_line, sizeof in_line, tfp))
-	    (void) fputs(in_line, ofp);
+    /* reprocess the scratch file; 1st format an error msg, just in case */
+    Sprintf(in_line, "rewind of \"%s\"", tempfile);
+    if (rewind(tfp) != 0)
+        goto dead_data;
+    /* copy all lines of text from the scratch file into the output file */
+    while (fgets(in_line, sizeof in_line, tfp))
+        (void) fputs(in_line, ofp);
 
-	/* finished with scratch file */
-	Fclose(tfp);
-	Unlink(tempfile);	/* remove it */
+    /* finished with scratch file */
+    Fclose(tfp);
+    Unlink(tempfile); /* remove it */
 
-	/* update the first record of the output file; prepare error msg 1st */
-	Sprintf(in_line, "rewind of \"%s\"", filename);
-	ok = (rewind(ofp) == 0);
-	if (ok) {
-	   Sprintf(in_line, "header rewrite of \"%s\"", filename);
-	   ok = (fprintf(ofp, "%s%08lx\n", Dont_Edit_Data,
-			 (unsigned long)txt_offset) >= 0);
-	}
-	if (!ok) {
-dead_data:  perror(in_line);	/* report the problem */
-	    /* close and kill the aborted output file, then give up */
-	    Fclose(ofp);
-	    Unlink(filename);
-	    exit(EXIT_FAILURE);
-	}
+    /* update the first record of the output file; prepare error msg 1st */
+    Sprintf(in_line, "rewind of \"%s\"", filename);
+    ok = (rewind(ofp) == 0);
+    if (ok) {
+        Sprintf(in_line, "header rewrite of \"%s\"", filename);
+        ok = (fprintf(ofp, "%s%08lx\n", Dont_Edit_Data,
+                      (unsigned long) txt_offset) >= 0);
+    }
+    if (!ok) {
+    dead_data:
+        perror(in_line); /* report the problem */
+        /* close and kill the aborted output file, then give up */
+        Fclose(ofp);
+        Unlink(filename);
+        exit(EXIT_FAILURE);
+    }
 
-	/* all done */
-	Fclose(ofp);
+    /* all done */
+    Fclose(ofp);
 
-	return;
+    return;
 }
 
 /* routine to decide whether to discard something from oracles.txt */
 static boolean
 h_filter(line)
-    char *line;
+char *line;
 {
     static boolean skip = FALSE;
     char tag[sizeof in_line];
 
     SpinCursor(3);
 
-    if (*line == '#') return TRUE;	/* ignore comment lines */
+    if (*line == '#')
+        return TRUE; /* ignore comment lines */
     if (sscanf(line, "----- %s", tag) == 1) {
-	skip = FALSE;
+        skip = FALSE;
     } else if (skip && !strncmp(line, "-----", 5))
-	skip = FALSE;
+        skip = FALSE;
     return skip;
 }
 
 static const char *special_oracle[] = {
-	"\"...it is rather disconcerting to be confronted with the",
-	"following theorem from [Baker, Gill, and Solovay, 1975].",
-	"",
-	"Theorem 7.18  There exist recursive languages A and B such that",
-	"  (1)  P(A) == NP(A), and",
-	"  (2)  P(B) != NP(B)",
-	"",
-	"This provides impressive evidence that the techniques that are",
-	"currently available will not suffice for proving that P != NP or          ",
-	"that P == NP.\"  [Garey and Johnson, p. 185.]"
+    "\"...it is rather disconcerting to be confronted with the",
+    "following theorem from [Baker, Gill, and Solovay, 1975].", "",
+    "Theorem 7.18  There exist recursive languages A and B such that",
+    "  (1)  P(A) == NP(A), and", "  (2)  P(B) != NP(B)", "",
+    "This provides impressive evidence that the techniques that are",
+    "currently available will not suffice for proving that P != NP or        "
+    "  ",
+    "that P == NP.\"  [Garey and Johnson, p. 185.]"
 };
 
 /*
@@ -1694,194 +1746,205 @@ static const char *special_oracle[] = {
 void
 do_oracles()
 {
-	char	infile[60], tempfile[60];
-	boolean in_oracle, ok;
-	long	fpos;
-	unsigned long txt_offset, offset;
-	int	oracle_cnt;
-	register int i;
+    char infile[60], tempfile[60];
+    boolean in_oracle, ok;
+    long fpos;
+    unsigned long txt_offset, offset;
+    int oracle_cnt;
+    register int i;
 
-	Sprintf(tempfile, DATA_TEMPLATE, "oracles.tmp");
-	filename[0]='\0';
+    Sprintf(tempfile, DATA_TEMPLATE, "oracles.tmp");
+    filename[0] = '\0';
 #ifdef FILE_PREFIX
-	Strcat(filename, file_prefix);
+    Strcat(filename, file_prefix);
 #endif
-	Sprintf(eos(filename), DATA_TEMPLATE, ORACLE_FILE);
-	Sprintf(infile, DATA_IN_TEMPLATE, ORACLE_FILE);
-	Strcat(infile, ".txt");
-	if (!(ifp = fopen(infile, RDTMODE))) {
-		perror(infile);
-		exit(EXIT_FAILURE);
-	}
-	if (!(ofp = fopen(filename, WRTMODE))) {
-		perror(filename);
-		Fclose(ifp);
-		exit(EXIT_FAILURE);
-	}
-	if (!(tfp = fopen(tempfile, WRTMODE))) {	/* oracles.tmp */
-		perror(tempfile);
-		Fclose(ifp);
-		Fclose(ofp);
-		Unlink(filename);
-		exit(EXIT_FAILURE);
-	}
+    Sprintf(eos(filename), DATA_TEMPLATE, ORACLE_FILE);
+    Sprintf(infile, DATA_IN_TEMPLATE, ORACLE_FILE);
+    Strcat(infile, ".txt");
+    if (!(ifp = fopen(infile, RDTMODE))) {
+        perror(infile);
+        exit(EXIT_FAILURE);
+    }
+    if (!(ofp = fopen(filename, WRTMODE))) {
+        perror(filename);
+        Fclose(ifp);
+        exit(EXIT_FAILURE);
+    }
+    if (!(tfp = fopen(tempfile, WRTMODE))) { /* oracles.tmp */
+        perror(tempfile);
+        Fclose(ifp);
+        Fclose(ofp);
+        Unlink(filename);
+        exit(EXIT_FAILURE);
+    }
 
-	/* output a dummy header record; we'll rewind and overwrite it later */
-	Fprintf(ofp, "%s%5d\n", Dont_Edit_Data, 0);
+    /* output a dummy header record; we'll rewind and overwrite it later */
+    Fprintf(ofp, "%s%5d\n", Dont_Edit_Data, 0);
 
-	/* handle special oracle; it must come first */
-	(void) fputs("---\n", tfp);
-	offset = (unsigned long)ftell(tfp);
-	Fprintf(ofp, "%05lx\n", offset);  /* start pos of special oracle */
-	for (i = 0; i < SIZE(special_oracle); i++) {
-	    (void) fputs(xcrypt(special_oracle[i]), tfp);
-	    (void) fputc('\n', tfp);
-	}
-	SpinCursor(3);
+    /* handle special oracle; it must come first */
+    (void) fputs("---\n", tfp);
+    offset = (unsigned long) ftell(tfp);
+    Fprintf(ofp, "%05lx\n", offset); /* start pos of special oracle */
+    for (i = 0; i < SIZE(special_oracle); i++) {
+        (void) fputs(xcrypt(special_oracle[i]), tfp);
+        (void) fputc('\n', tfp);
+    }
+    SpinCursor(3);
 
-	oracle_cnt = 1;
-	(void) fputs("---\n", tfp);
-	offset = (unsigned long)ftell(tfp);
-	Fprintf(ofp, "%05lx\n", offset);  /* start pos of first oracle */
-	in_oracle = FALSE;
+    oracle_cnt = 1;
+    (void) fputs("---\n", tfp);
+    offset = (unsigned long) ftell(tfp);
+    Fprintf(ofp, "%05lx\n", offset); /* start pos of first oracle */
+    in_oracle = FALSE;
 
-	while (fgets(in_line, sizeof in_line, ifp)) {
-	    SpinCursor(3);
+    while (fgets(in_line, sizeof in_line, ifp)) {
+        SpinCursor(3);
 
-	    if (h_filter(in_line)) continue;
-	    if (!strncmp(in_line, "-----", 5)) {
-		if (!in_oracle) continue;
-		in_oracle = FALSE;
-		oracle_cnt++;
-		(void) fputs("---\n", tfp);
-		offset = (unsigned long)ftell(tfp);
-		Fprintf(ofp, "%05lx\n", offset); /* start pos of this oracle */
-	    } else {
-		in_oracle = TRUE;
-		(void) fputs(xcrypt(in_line), tfp);
-	    }
-	}
+        if (h_filter(in_line))
+            continue;
+        if (!strncmp(in_line, "-----", 5)) {
+            if (!in_oracle)
+                continue;
+            in_oracle = FALSE;
+            oracle_cnt++;
+            (void) fputs("---\n", tfp);
+            offset = (unsigned long) ftell(tfp);
+            Fprintf(ofp, "%05lx\n", offset); /* start pos of this oracle */
+        } else {
+            in_oracle = TRUE;
+            (void) fputs(xcrypt(in_line), tfp);
+        }
+    }
 
-	if (in_oracle) {	/* need to terminate last oracle */
-	    oracle_cnt++;
-	    (void) fputs("---\n", tfp);
-	    offset = (unsigned long)ftell(tfp);
-	    Fprintf(ofp, "%05lx\n", offset);  /* eof position */
-	}
+    if (in_oracle) { /* need to terminate last oracle */
+        oracle_cnt++;
+        (void) fputs("---\n", tfp);
+        offset = (unsigned long) ftell(tfp);
+        Fprintf(ofp, "%05lx\n", offset); /* eof position */
+    }
 
-	/* record the current position */
-	txt_offset = (unsigned long)ftell(ofp);
-	Fclose(ifp);		/* all done with original input file */
+    /* record the current position */
+    txt_offset = (unsigned long) ftell(ofp);
+    Fclose(ifp); /* all done with original input file */
 
-	/* reprocess the scratch file; 1st format an error msg, just in case */
-	Sprintf(in_line, "rewind of \"%s\"", tempfile);
-	if (rewind(tfp) != 0)  goto dead_data;
-	/* copy all lines of text from the scratch file into the output file */
-	while (fgets(in_line, sizeof in_line, tfp))
-	    (void) fputs(in_line, ofp);
+    /* reprocess the scratch file; 1st format an error msg, just in case */
+    Sprintf(in_line, "rewind of \"%s\"", tempfile);
+    if (rewind(tfp) != 0)
+        goto dead_data;
+    /* copy all lines of text from the scratch file into the output file */
+    while (fgets(in_line, sizeof in_line, tfp))
+        (void) fputs(in_line, ofp);
 
-	/* finished with scratch file */
-	Fclose(tfp);
-	Unlink(tempfile);	/* remove it */
+    /* finished with scratch file */
+    Fclose(tfp);
+    Unlink(tempfile); /* remove it */
 
-	/* update the first record of the output file; prepare error msg 1st */
-	Sprintf(in_line, "rewind of \"%s\"", filename);
-	ok = (rewind(ofp) == 0);
-	if (ok) {
-	    Sprintf(in_line, "header rewrite of \"%s\"", filename);
-	    ok = (fprintf(ofp, "%s%5d\n", Dont_Edit_Data, oracle_cnt) >=0);
-	}
-	if (ok) {
-	    Sprintf(in_line, "data rewrite of \"%s\"", filename);
-	    for (i = 0; i <= oracle_cnt; i++) {
-#ifndef VMS	/* alpha/vms v1.0; this fflush seems to confuse ftell */
-		if (!(ok = (fflush(ofp) == 0))) break;
+    /* update the first record of the output file; prepare error msg 1st */
+    Sprintf(in_line, "rewind of \"%s\"", filename);
+    ok = (rewind(ofp) == 0);
+    if (ok) {
+        Sprintf(in_line, "header rewrite of \"%s\"", filename);
+        ok = (fprintf(ofp, "%s%5d\n", Dont_Edit_Data, oracle_cnt) >= 0);
+    }
+    if (ok) {
+        Sprintf(in_line, "data rewrite of \"%s\"", filename);
+        for (i = 0; i <= oracle_cnt; i++) {
+#ifndef VMS /* alpha/vms v1.0; this fflush seems to confuse ftell */
+            if (!(ok = (fflush(ofp) == 0)))
+                break;
 #endif
-		if (!(ok = (fpos = ftell(ofp)) >= 0)) break;
-		if (!(ok = (fseek(ofp, fpos, SEEK_SET) >= 0))) break;
-		if (!(ok = (fscanf(ofp, "%5lx", &offset) == 1))) break;
+            if (!(ok = (fpos = ftell(ofp)) >= 0))
+                break;
+            if (!(ok = (fseek(ofp, fpos, SEEK_SET) >= 0)))
+                break;
+            if (!(ok = (fscanf(ofp, "%5lx", &offset) == 1)))
+                break;
 #ifdef MAC
-# ifdef __MWERKS__
-		/*
-		MetroWerks CodeWarrior Pro 1's (AKA CW12) version of MSL
-		(ANSI C Libraries) needs this rewind or else the fprintf
-		stops working.  This may also be true for CW11, but has
-		never been checked.
-		*/
-		rewind(ofp);
-# endif
+#ifdef __MWERKS__
+            /*
+            MetroWerks CodeWarrior Pro 1's (AKA CW12) version of MSL
+            (ANSI C Libraries) needs this rewind or else the fprintf
+            stops working.  This may also be true for CW11, but has
+            never been checked.
+            */
+            rewind(ofp);
 #endif
-		if (!(ok = (fseek(ofp, fpos, SEEK_SET) >= 0))) break;
-		offset += txt_offset;
-		if (!(ok = (fprintf(ofp, "%05lx\n", offset) >= 0))) break;
-	    }
-	}
-	if (!ok) {
-dead_data:  perror(in_line);	/* report the problem */
-	    /* close and kill the aborted output file, then give up */
-	    Fclose(ofp);
-	    Unlink(filename);
-	    exit(EXIT_FAILURE);
-	}
+#endif
+            if (!(ok = (fseek(ofp, fpos, SEEK_SET) >= 0)))
+                break;
+            offset += txt_offset;
+            if (!(ok = (fprintf(ofp, "%05lx\n", offset) >= 0)))
+                break;
+        }
+    }
+    if (!ok) {
+    dead_data:
+        perror(in_line); /* report the problem */
+        /* close and kill the aborted output file, then give up */
+        Fclose(ofp);
+        Unlink(filename);
+        exit(EXIT_FAILURE);
+    }
 
-	/* all done */
-	Fclose(ofp);
+    /* all done */
+    Fclose(ofp);
 
-	return;
+    return;
 }
 
 void
 do_dungeon()
 {
-	int rcnt = 0;
+    int rcnt = 0;
 
-	Sprintf(filename, DATA_IN_TEMPLATE, DGN_I_FILE);
-	if (!(ifp = fopen(filename, RDTMODE))) {
-		perror(filename);
-		exit(EXIT_FAILURE);
-	}
-	filename[0]='\0';
+    Sprintf(filename, DATA_IN_TEMPLATE, DGN_I_FILE);
+    if (!(ifp = fopen(filename, RDTMODE))) {
+        perror(filename);
+        exit(EXIT_FAILURE);
+    }
+    filename[0] = '\0';
 #ifdef FILE_PREFIX
-	Strcat(filename, file_prefix);
+    Strcat(filename, file_prefix);
 #endif
-	Sprintf(eos(filename), DGN_TEMPLATE, DGN_O_FILE);
-	if (!(ofp = fopen(filename, WRTMODE))) {
-		perror(filename);
-		exit(EXIT_FAILURE);
-	}
-	Fprintf(ofp,"%s",Dont_Edit_Data);
+    Sprintf(eos(filename), DGN_TEMPLATE, DGN_O_FILE);
+    if (!(ofp = fopen(filename, WRTMODE))) {
+        perror(filename);
+        exit(EXIT_FAILURE);
+    }
+    Fprintf(ofp, "%s", Dont_Edit_Data);
 
-	tfp = getfp(DATA_TEMPLATE, "grep.tmp", WRTMODE);
-	grep0(ifp, tfp);
-	ifp = getfp(DATA_TEMPLATE, "grep.tmp", RDTMODE);
-	
-	while (fgets(in_line, sizeof in_line, ifp) != 0) {
-	    SpinCursor(3);
+    tfp = getfp(DATA_TEMPLATE, "grep.tmp", WRTMODE);
+    grep0(ifp, tfp);
+    ifp = getfp(DATA_TEMPLATE, "grep.tmp", RDTMODE);
 
-	    rcnt++;
-	    if(in_line[0] == '#') continue;	/* discard comments */
-	    (void) fputs(in_line,ofp);
-	}
-	Fclose(ifp);
-	Fclose(ofp);
+    while (fgets(in_line, sizeof in_line, ifp) != 0) {
+        SpinCursor(3);
 
-	delete_file(DATA_TEMPLATE, "grep.tmp");
-	return;
+        rcnt++;
+        if (in_line[0] == '#')
+            continue; /* discard comments */
+        (void) fputs(in_line, ofp);
+    }
+    Fclose(ifp);
+    Fclose(ofp);
+
+    delete_file(DATA_TEMPLATE, "grep.tmp");
+    return;
 }
 
 static boolean
-ranged_attk(ptr)	/* returns TRUE if monster can attack at range */
-	register struct permonst *ptr;
+ranged_attk(ptr) /* returns TRUE if monster can attack at range */
+register struct permonst *ptr;
 {
-	register int	i, j;
-	register int atk_mask = (1<<AT_BREA) | (1<<AT_SPIT) | (1<<AT_GAZE);
+    register int i, j;
+    register int atk_mask = (1 << AT_BREA) | (1 << AT_SPIT) | (1 << AT_GAZE);
 
-	for(i = 0; i < NATTK; i++) {
-	    if((j=ptr->mattk[i].aatyp) >= AT_WEAP || (atk_mask & (1<<j)))
-		return TRUE;
-	}
+    for (i = 0; i < NATTK; i++) {
+        if ((j = ptr->mattk[i].aatyp) >= AT_WEAP || (atk_mask & (1 << j)))
+            return TRUE;
+    }
 
-	return(FALSE);
+    return (FALSE);
 }
 
 /* This routine is designed to return an integer value which represents
@@ -1892,55 +1955,60 @@ static int
 mstrength(ptr)
 struct permonst *ptr;
 {
-	int	i, tmp2, n, tmp = ptr->mlevel;
+    int i, tmp2, n, tmp = ptr->mlevel;
 
-	if(tmp > 49)		/* special fixed hp monster */
-	    tmp = 2*(tmp - 6) / 4;
+    if (tmp > 49) /* special fixed hp monster */
+        tmp = 2 * (tmp - 6) / 4;
 
-/*	For creation in groups */
-	n = (!!(ptr->geno & G_SGROUP));
-	n += (!!(ptr->geno & G_LGROUP)) << 1;
+    /*	For creation in groups */
+    n = (!!(ptr->geno & G_SGROUP));
+    n += (!!(ptr->geno & G_LGROUP)) << 1;
 
-/*	For ranged attacks */
-	if (ranged_attk(ptr)) n++;
+    /*	For ranged attacks */
+    if (ranged_attk(ptr))
+        n++;
 
-/*	For higher ac values */
-	n += (ptr->ac < 4);
-	n += (ptr->ac < 0);
+    /*	For higher ac values */
+    n += (ptr->ac < 4);
+    n += (ptr->ac < 0);
 
-/*	For very fast monsters */
-	n += (ptr->mmove >= 18);
+    /*	For very fast monsters */
+    n += (ptr->mmove >= 18);
 
-/*	For each attack and "special" attack */
-	for(i = 0; i < NATTK; i++) {
+    /*	For each attack and "special" attack */
+    for (i = 0; i < NATTK; i++) {
+        tmp2 = ptr->mattk[i].aatyp;
+        n += (tmp2 > 0);
+        n += (tmp2 == AT_MAGC);
+        n += (tmp2 == AT_WEAP && (ptr->mflags2 & M2_STRONG));
+    }
 
-	    tmp2 = ptr->mattk[i].aatyp;
-	    n += (tmp2 > 0);
-	    n += (tmp2 == AT_MAGC);
-	    n += (tmp2 == AT_WEAP && (ptr->mflags2 & M2_STRONG));
-	}
+    /*	For each "special" damage type */
+    for (i = 0; i < NATTK; i++) {
+        tmp2 = ptr->mattk[i].adtyp;
+        if ((tmp2 == AD_DRLI) || (tmp2 == AD_STON) || (tmp2 == AD_DRST)
+            || (tmp2 == AD_DRDX) || (tmp2 == AD_DRCO) || (tmp2 == AD_WERE))
+            n += 2;
+        else if (strcmp(ptr->mname, "grid bug"))
+            n += (tmp2 != AD_PHYS);
+        n += ((int) (ptr->mattk[i].damd * ptr->mattk[i].damn) > 23);
+    }
 
-/*	For each "special" damage type */
-	for(i = 0; i < NATTK; i++) {
+    /*	Leprechauns are special cases.  They have many hit dice so they
+            can hit and are hard to kill, but they don't really do much
+       damage. */
+    if (!strcmp(ptr->mname, "leprechaun"))
+        n -= 2;
 
-	    tmp2 = ptr->mattk[i].adtyp;
-	    if ((tmp2 == AD_DRLI) || (tmp2 == AD_STON) || (tmp2 == AD_DRST)
-		|| (tmp2 == AD_DRDX) || (tmp2 == AD_DRCO) || (tmp2 == AD_WERE))
-			n += 2;
-	    else if (strcmp(ptr->mname, "grid bug")) n += (tmp2 != AD_PHYS);
-	    n += ((int) (ptr->mattk[i].damd * ptr->mattk[i].damn) > 23);
-	}
+    /*	Finally, adjust the monster level  0 <= n <= 24 (approx.) */
+    if (n == 0)
+        tmp--;
+    else if (n >= 6)
+        tmp += (n / 2);
+    else
+        tmp += (n / 3 + 1);
 
-/*	Leprechauns are special cases.  They have many hit dice so they
-	can hit and are hard to kill, but they don't really do much damage. */
-	if (!strcmp(ptr->mname, "leprechaun")) n -= 2;
-
-/*	Finally, adjust the monster level  0 <= n <= 24 (approx.) */
-	if(n == 0) tmp--;
-	else if(n >= 6) tmp += ( n / 2 );
-	else tmp += ( n / 3 + 1);
-
-	return((tmp >= 0) ? tmp : 0);
+    return ((tmp >= 0) ? tmp : 0);
 }
 
 void
@@ -1952,35 +2020,34 @@ do_monstr()
     /*
      * create the source file, "monstr.c"
      */
-    filename[0]='\0';
+    filename[0] = '\0';
 #ifdef FILE_PREFIX
     Strcat(filename, file_prefix);
 #endif
     Sprintf(eos(filename), SOURCE_TEMPLATE, MON_STR_C);
     if (!(ofp = fopen(filename, WRTMODE))) {
-	perror(filename);
-	exit(EXIT_FAILURE);
+        perror(filename);
+        exit(EXIT_FAILURE);
     }
-    Fprintf(ofp,"%s",Dont_Edit_Code);
-    Fprintf(ofp,"#include \"config.h\"\n");
-    Fprintf(ofp,"\nconst int monstr[] = {\n");
+    Fprintf(ofp, "%s", Dont_Edit_Code);
+    Fprintf(ofp, "#include \"config.h\"\n");
+    Fprintf(ofp, "\nconst int monstr[] = {\n");
     for (ptr = &mons[0], j = 0; ptr->mlet; ptr++) {
+        SpinCursor(3);
 
-	SpinCursor(3);
-
-	i = mstrength(ptr);
-	Fprintf(ofp,"%2d,%c", i, (++j & 15) ? ' ' : '\n');
+        i = mstrength(ptr);
+        Fprintf(ofp, "%2d,%c", i, (++j & 15) ? ' ' : '\n');
     }
     /* might want to insert a final 0 entry here instead of just newline */
-    Fprintf(ofp,"%s};\n", (j & 15) ? "\n" : "");
+    Fprintf(ofp, "%s};\n", (j & 15) ? "\n" : "");
 
-    Fprintf(ofp,"\nvoid NDECL(monstr_init);\n");
-    Fprintf(ofp,"\nvoid\n");
-    Fprintf(ofp,"monstr_init()\n");
-    Fprintf(ofp,"{\n");
-    Fprintf(ofp,"    return;\n");
-    Fprintf(ofp,"}\n");
-    Fprintf(ofp,"\n/*monstr.c*/\n");
+    Fprintf(ofp, "\nvoid NDECL(monstr_init);\n");
+    Fprintf(ofp, "\nvoid\n");
+    Fprintf(ofp, "monstr_init()\n");
+    Fprintf(ofp, "{\n");
+    Fprintf(ofp, "    return;\n");
+    Fprintf(ofp, "}\n");
+    Fprintf(ofp, "\n/*monstr.c*/\n");
 
     Fclose(ofp);
     return;
@@ -1989,509 +2056,540 @@ do_monstr()
 void
 do_permonst()
 {
-	int	i;
-	char	*c, *nam;
+    int i;
+    char *c, *nam;
 
-	filename[0]='\0';
+    filename[0] = '\0';
 #ifdef FILE_PREFIX
-	Strcat(filename, file_prefix);
+    Strcat(filename, file_prefix);
 #endif
-	Sprintf(eos(filename), INCLUDE_TEMPLATE, MONST_FILE);
-	if (!(ofp = fopen(filename, WRTMODE))) {
-		perror(filename);
-		exit(EXIT_FAILURE);
-	}
-	Fprintf(ofp,"/*\tSCCS Id: @(#)pm.h\t3.5\t2004/02/01 */\n\n");
-	Fprintf(ofp,"%s",Dont_Edit_Code);
-	Fprintf(ofp,"#ifndef PM_H\n#define PM_H\n");
+    Sprintf(eos(filename), INCLUDE_TEMPLATE, MONST_FILE);
+    if (!(ofp = fopen(filename, WRTMODE))) {
+        perror(filename);
+        exit(EXIT_FAILURE);
+    }
+    Fprintf(ofp, "/*\tSCCS Id: @(#)pm.h\t3.5\t2004/02/01 */\n\n");
+    Fprintf(ofp, "%s", Dont_Edit_Code);
+    Fprintf(ofp, "#ifndef PM_H\n#define PM_H\n");
 
-	if (strcmp(mons[0].mname, "playermon") != 0)
-		Fprintf(ofp,"\n#define\tPM_PLAYERMON\t(-1)");
+    if (strcmp(mons[0].mname, "playermon") != 0)
+        Fprintf(ofp, "\n#define\tPM_PLAYERMON\t(-1)");
 
-	for (i = 0; mons[i].mlet; i++) {
-		SpinCursor(3);
+    for (i = 0; mons[i].mlet; i++) {
+        SpinCursor(3);
 
-		Fprintf(ofp,"\n#define\tPM_");
-		if (mons[i].mlet == S_HUMAN &&
-				!strncmp(mons[i].mname, "were", 4))
-		    Fprintf(ofp, "HUMAN_");
-		for (nam = c = tmpdup(mons[i].mname); *c; c++)
-		    if (*c >= 'a' && *c <= 'z') *c -= (char)('a' - 'A');
-		    else if (*c < 'A' || *c > 'Z') *c = '_';
-		Fprintf(ofp,"%s\t%d", nam, i);
-	}
-	Fprintf(ofp,"\n\n#define\tNUMMONS\t%d\n", i);
-	Fprintf(ofp,"\n#endif /* PM_H */\n");
-	Fclose(ofp);
-	return;
+        Fprintf(ofp, "\n#define\tPM_");
+        if (mons[i].mlet == S_HUMAN && !strncmp(mons[i].mname, "were", 4))
+            Fprintf(ofp, "HUMAN_");
+        for (nam = c = tmpdup(mons[i].mname); *c; c++)
+            if (*c >= 'a' && *c <= 'z')
+                *c -= (char) ('a' - 'A');
+            else if (*c < 'A' || *c > 'Z')
+                *c = '_';
+        Fprintf(ofp, "%s\t%d", nam, i);
+    }
+    Fprintf(ofp, "\n\n#define\tNUMMONS\t%d\n", i);
+    Fprintf(ofp, "\n#endif /* PM_H */\n");
+    Fclose(ofp);
+    return;
 }
-
 
 /*	Start of Quest text file processing. */
 #include "qtext.h"
 
-static struct qthdr	qt_hdr;
-static struct msghdr	msg_hdr[N_HDR];
-static struct qtmsg	*curr_msg;
+static struct qthdr qt_hdr;
+static struct msghdr msg_hdr[N_HDR];
+static struct qtmsg *curr_msg;
 
-static int	qt_line;
+static int qt_line;
 
-static boolean	in_msg;
-#define NO_MSG	1	/* strlen of a null line returned by fgets() */
+static boolean in_msg;
+#define NO_MSG 1 /* strlen of a null line returned by fgets() */
 
 static boolean
 qt_comment(s)
-	char *s;
+char *s;
 {
-	if(s[0] == '#') return(TRUE);
-	return((boolean)(!in_msg  && strlen(s) == NO_MSG));
+    if (s[0] == '#')
+        return (TRUE);
+    return ((boolean)(!in_msg && strlen(s) == NO_MSG));
 }
 
 static boolean
 qt_control(s)
-	char *s;
+char *s;
 {
-	return((boolean)(s[0] == '%' && (s[1] == 'C' || s[1] == 'E')));
+    return ((boolean)(s[0] == '%' && (s[1] == 'C' || s[1] == 'E')));
 }
 
 static int
-get_hdr (code)
-	char *code;
+get_hdr(code)
+char *code;
 {
-	int	i;
+    int i;
 
-	for(i = 0; i < qt_hdr.n_hdr; i++)
-	    if(!strncmp(code, qt_hdr.id[i], LEN_HDR)) return (++i);
+    for (i = 0; i < qt_hdr.n_hdr; i++)
+        if (!strncmp(code, qt_hdr.id[i], LEN_HDR))
+            return (++i);
 
-	return(0);
+    return (0);
 }
 
 static boolean
-new_id (code)
-	char *code;
+new_id(code)
+char *code;
 {
-	if(qt_hdr.n_hdr >= N_HDR) {
-	    Fprintf(stderr, OUT_OF_HEADERS, qt_line);
-	    return(FALSE);
-	}
+    if (qt_hdr.n_hdr >= N_HDR) {
+        Fprintf(stderr, OUT_OF_HEADERS, qt_line);
+        return (FALSE);
+    }
 
-	strncpy(&qt_hdr.id[qt_hdr.n_hdr][0], code, LEN_HDR);
-	msg_hdr[qt_hdr.n_hdr].n_msg = 0;
-	qt_hdr.offset[qt_hdr.n_hdr++] = 0L;
-	return(TRUE);
+    strncpy(&qt_hdr.id[qt_hdr.n_hdr][0], code, LEN_HDR);
+    msg_hdr[qt_hdr.n_hdr].n_msg = 0;
+    qt_hdr.offset[qt_hdr.n_hdr++] = 0L;
+    return (TRUE);
 }
 
 static boolean
 known_msg(num, id)
-	int num, id;
+int num, id;
 {
-	int i;
+    int i;
 
-	for(i = 0; i < msg_hdr[num].n_msg; i++)
-	    if(msg_hdr[num].qt_msg[i].msgnum == id) return(TRUE);
+    for (i = 0; i < msg_hdr[num].n_msg; i++)
+        if (msg_hdr[num].qt_msg[i].msgnum == id)
+            return (TRUE);
 
-	return(FALSE);
+    return (FALSE);
 }
-
 
 static void
 new_msg(s, num, id)
-	char *s;
-	int num, id;
+char *s;
+int num, id;
 {
-	struct	qtmsg	*qt_msg;
+    struct qtmsg *qt_msg;
 
-	if(msg_hdr[num].n_msg >= N_MSG) {
-		Fprintf(stderr, OUT_OF_MESSAGES, qt_line);
-	} else {
-		qt_msg = &(msg_hdr[num].qt_msg[msg_hdr[num].n_msg++]);
-		qt_msg->msgnum = id;
-		qt_msg->delivery = s[2];
-		qt_msg->offset = qt_msg->size = qt_msg->summary_size = 0L;
+    if (msg_hdr[num].n_msg >= N_MSG) {
+        Fprintf(stderr, OUT_OF_MESSAGES, qt_line);
+    } else {
+        qt_msg = &(msg_hdr[num].qt_msg[msg_hdr[num].n_msg++]);
+        qt_msg->msgnum = id;
+        qt_msg->delivery = s[2];
+        qt_msg->offset = qt_msg->size = qt_msg->summary_size = 0L;
 
-		curr_msg = qt_msg;
-	}
+        curr_msg = qt_msg;
+    }
 }
 
 /* check %E record for "[summary text]" that nethack can stuff into the
    message history buffer when delivering text via window instead of pline */
 static char *
 valid_qt_summary(s, parsing)
-char *s;	/* end record: "%E" optionally followed by " [summary]" */
-boolean parsing;	/* curr_msg is valid iff this is True */
+char *s;         /* end record: "%E" optionally followed by " [summary]" */
+boolean parsing; /* curr_msg is valid iff this is True */
 {
     static char summary[BUFSZ];
     char *p;
 
-    if (*s != '%' || *(s + 1) != 'E') return (char *)0;
-    if ((p = index(s, '[')) == 0) return (char *)0;
+    if (*s != '%' || *(s + 1) != 'E')
+        return (char *) 0;
+    if ((p = index(s, '[')) == 0)
+        return (char *) 0;
     /* note: opening '[' and closing ']' will be retained in the output;
        anything after ']' will be discarded by putting a newline there */
     Strcpy(summary, p);
 
-    /* have an opening bracket; summary[] holds it and all text that follows */
+    /* have an opening bracket; summary[] holds it and all text that follows
+     */
     p = eos(summary);
     /* find closing bracket */
-    while (p > summary && *(p - 1) != ']') --p; 
+    while (p > summary && *(p - 1) != ']')
+        --p;
 
     if (p == summary) {
-	/* we backed up all the way to the start without finding a bracket */
-	if (parsing) /* malformed summary */
-	    Fprintf(stderr, MAL_SUM, qt_line);
+        /* we backed up all the way to the start without finding a bracket */
+        if (parsing) /* malformed summary */
+            Fprintf(stderr, MAL_SUM, qt_line);
     } else if (p == summary + 1) {
-	;	/* ignore empty [] */
-    } else {	/* got something */
-	/* p points one spot past ']', usually to '\n';
-	   we need to include the \n as part of the size */
-	if (parsing) {
-	    /* during the writing pass we won't be able to recheck
-	       delivery, so any useless summary for a pline mode
-	       message has to be carried along to the output file */
-	    if (curr_msg->delivery == 'p')
-		Fprintf(stderr, DUMB_SUM, qt_line);
-	    /* +1 is for terminating newline */
-	    curr_msg->summary_size = (long)(p - summary) + 1L;
-	} else {
-	    /* caller is writing rather than just parsing;
-	       force newline after the closing bracket */
-	    Strcpy(p, "\n");
-	}
-	return summary;
+        ;    /* ignore empty [] */
+    } else { /* got something */
+             /* p points one spot past ']', usually to '\n';
+                we need to include the \n as part of the size */
+        if (parsing) {
+            /* during the writing pass we won't be able to recheck
+               delivery, so any useless summary for a pline mode
+               message has to be carried along to the output file */
+            if (curr_msg->delivery == 'p')
+                Fprintf(stderr, DUMB_SUM, qt_line);
+            /* +1 is for terminating newline */
+            curr_msg->summary_size = (long) (p - summary) + 1L;
+        } else {
+            /* caller is writing rather than just parsing;
+               force newline after the closing bracket */
+            Strcpy(p, "\n");
+        }
+        return summary;
     }
-    return (char *)0;
+    return (char *) 0;
 }
 
 static void
 do_qt_control(s)
-	char *s;
+char *s;
 {
-	char code[BUFSZ];
-	int num, id = 0;
+    char code[BUFSZ];
+    int num, id = 0;
 
-	if (!index(s, '\n'))
-	    Fprintf(stderr, CTRL_TRUNC, qt_line);
+    if (!index(s, '\n'))
+        Fprintf(stderr, CTRL_TRUNC, qt_line);
 
-	switch(s[1]) {
+    switch (s[1]) {
+    case 'C':
+        if (in_msg) {
+            Fprintf(stderr, CREC_IN_MSG, qt_line);
+            break;
+        } else {
+            in_msg = TRUE;
+            if (sscanf(&s[4], "%s %5d", code, &id) != 2) {
+                Fprintf(stderr, UNREC_CREC, qt_line);
+                break;
+            }
+            num = get_hdr(code);
+            if (!num && !new_id(code))
+                break;
+            num = get_hdr(code) - 1;
+            if (known_msg(num, id))
+                Fprintf(stderr, DUP_MSG, qt_line);
+            else
+                new_msg(s, num, id);
+        }
+        break;
 
-	    case 'C':	if(in_msg) {
-			    Fprintf(stderr, CREC_IN_MSG, qt_line);
-			    break;
-			} else {
-			    in_msg = TRUE;
-			    if (sscanf(&s[4], "%s %5d", code, &id) != 2) {
-			    	Fprintf(stderr, UNREC_CREC, qt_line);
-			    	break;
-			    }
-			    num = get_hdr(code);
-			    if (!num && !new_id(code))
-			    	break;
-			    num = get_hdr(code)-1;
-			    if(known_msg(num, id))
-			    	Fprintf(stderr, DUP_MSG, qt_line);
-			    else new_msg(s, num, id);
-			}
-			break;
+    case 'E':
+        if (!in_msg) {
+            Fprintf(stderr, END_NOT_IN_MSG, qt_line);
+        } else {
+            /* sets curr_msg->summary_size if applicable */
+            (void) valid_qt_summary(s, TRUE);
+            in_msg = FALSE;
+        }
+        break;
 
-	    case 'E':	if(!in_msg) {
-			    Fprintf(stderr, END_NOT_IN_MSG, qt_line);
-			} else {
-			    /* sets curr_msg->summary_size if applicable */
-			    (void) valid_qt_summary(s, TRUE);
-			    in_msg = FALSE;
-			}
-			break;
-
-	    default:	Fprintf(stderr, UNREC_CREC, qt_line);
-			break;
-	}
+    default:
+        Fprintf(stderr, UNREC_CREC, qt_line);
+        break;
+    }
 }
 
 static void
 do_qt_text(s)
-	char *s;
+char *s;
 {
-	if (!in_msg) {
-	    Fprintf(stderr, TEXT_NOT_IN_MSG, qt_line);
-	} else if (!index(s, '\n')) {
-	    Fprintf(stderr, TEXT_TRUNC, qt_line);
-	}
+    if (!in_msg) {
+        Fprintf(stderr, TEXT_NOT_IN_MSG, qt_line);
+    } else if (!index(s, '\n')) {
+        Fprintf(stderr, TEXT_TRUNC, qt_line);
+    }
 
-	curr_msg->size += strlen(s);
-	return;
+    curr_msg->size += strlen(s);
+    return;
 }
 
 static void
 adjust_qt_hdrs()
 {
-	int	i, j;
-	long count = 0L, hdr_offset = sizeof(int) +
-			(sizeof(char)*LEN_HDR + sizeof(long)) * qt_hdr.n_hdr;
+    int i, j;
+    long count = 0L, hdr_offset = sizeof(int)
+                                  + (sizeof(char) * LEN_HDR + sizeof(long))
+                                        * qt_hdr.n_hdr;
 
-	for(i = 0; i < qt_hdr.n_hdr; i++) {
-	    qt_hdr.offset[i] = hdr_offset;
-	    hdr_offset += sizeof(int) + sizeof(struct qtmsg) * msg_hdr[i].n_msg;
-	}
+    for (i = 0; i < qt_hdr.n_hdr; i++) {
+        qt_hdr.offset[i] = hdr_offset;
+        hdr_offset += sizeof(int) + sizeof(struct qtmsg) * msg_hdr[i].n_msg;
+    }
 
-	for(i = 0; i < qt_hdr.n_hdr; i++)
-	    for(j = 0; j < msg_hdr[i].n_msg; j++) {
-
-		msg_hdr[i].qt_msg[j].offset = hdr_offset + count;
-		count += msg_hdr[i].qt_msg[j].size
-			+ msg_hdr[i].qt_msg[j].summary_size;
-	    }
-	return;
+    for (i = 0; i < qt_hdr.n_hdr; i++)
+        for (j = 0; j < msg_hdr[i].n_msg; j++) {
+            msg_hdr[i].qt_msg[j].offset = hdr_offset + count;
+            count +=
+                msg_hdr[i].qt_msg[j].size + msg_hdr[i].qt_msg[j].summary_size;
+        }
+    return;
 }
 
 static void
 put_qt_hdrs()
 {
-	int	i;
+    int i;
 
-	/*
-	 *	The main header record.
-	 */
-	if (debug) Fprintf(stderr, "%ld: header info.\n", ftell(ofp));
-	(void) fwrite((genericptr_t)&(qt_hdr.n_hdr), sizeof(int), 1, ofp);
-	(void) fwrite((genericptr_t)&(qt_hdr.id[0][0]), sizeof(char)*LEN_HDR,
-							qt_hdr.n_hdr, ofp);
-	(void) fwrite((genericptr_t)&(qt_hdr.offset[0]), sizeof(long),
-							qt_hdr.n_hdr, ofp);
-	if (debug) {
-	    for(i = 0; i < qt_hdr.n_hdr; i++)
-		Fprintf(stderr, "%s @ %ld, ", qt_hdr.id[i], qt_hdr.offset[i]);
-	    Fprintf(stderr, "\n");
-	}
+    /*
+     *	The main header record.
+     */
+    if (debug)
+        Fprintf(stderr, "%ld: header info.\n", ftell(ofp));
+    (void) fwrite((genericptr_t) & (qt_hdr.n_hdr), sizeof(int), 1, ofp);
+    (void) fwrite((genericptr_t) & (qt_hdr.id[0][0]), sizeof(char) * LEN_HDR,
+                  qt_hdr.n_hdr, ofp);
+    (void) fwrite((genericptr_t) & (qt_hdr.offset[0]), sizeof(long),
+                  qt_hdr.n_hdr, ofp);
+    if (debug) {
+        for (i = 0; i < qt_hdr.n_hdr; i++)
+            Fprintf(stderr, "%s @ %ld, ", qt_hdr.id[i], qt_hdr.offset[i]);
+        Fprintf(stderr, "\n");
+    }
 
-	/*
-	 *	The individual class headers.
-	 */
-	for(i = 0; i < qt_hdr.n_hdr; i++) {
-
-	    if (debug) Fprintf(stderr, "%ld: %s header info.\n", ftell(ofp),
-			       qt_hdr.id[i]);
-	    (void) fwrite((genericptr_t)&(msg_hdr[i].n_msg), sizeof(int),
-							1, ofp);
-	    (void) fwrite((genericptr_t)&(msg_hdr[i].qt_msg[0]),
-			    sizeof(struct qtmsg), msg_hdr[i].n_msg, ofp);
-	    if (debug) { int j;
-	      for(j = 0; j < msg_hdr[i].n_msg; j++) {
-		Fprintf(stderr, "msg %d @ %ld (%ld)",
-			msg_hdr[i].qt_msg[j].msgnum,
-			msg_hdr[i].qt_msg[j].offset,
-			msg_hdr[i].qt_msg[j].size);
-		if (msg_hdr[i].qt_msg[j].summary_size)
-		    Fprintf(stderr, " [%ld]",
-			    msg_hdr[i].qt_msg[j].summary_size);
-		Fprintf(stderr, "\n");
-	      }
-	    }
-	}
+    /*
+     *	The individual class headers.
+     */
+    for (i = 0; i < qt_hdr.n_hdr; i++) {
+        if (debug)
+            Fprintf(stderr, "%ld: %s header info.\n", ftell(ofp),
+                    qt_hdr.id[i]);
+        (void) fwrite((genericptr_t) & (msg_hdr[i].n_msg), sizeof(int), 1,
+                      ofp);
+        (void) fwrite((genericptr_t) & (msg_hdr[i].qt_msg[0]),
+                      sizeof(struct qtmsg), msg_hdr[i].n_msg, ofp);
+        if (debug) {
+            int j;
+            for (j = 0; j < msg_hdr[i].n_msg; j++) {
+                Fprintf(
+                    stderr, "msg %d @ %ld (%ld)", msg_hdr[i].qt_msg[j].msgnum,
+                    msg_hdr[i].qt_msg[j].offset, msg_hdr[i].qt_msg[j].size);
+                if (msg_hdr[i].qt_msg[j].summary_size)
+                    Fprintf(stderr, " [%ld]",
+                            msg_hdr[i].qt_msg[j].summary_size);
+                Fprintf(stderr, "\n");
+            }
+        }
+    }
 }
 
 void
 do_questtxt()
 {
-	Sprintf(filename, DATA_IN_TEMPLATE, QTXT_I_FILE);
-	if(!(ifp = fopen(filename, RDTMODE))) {
-		perror(filename);
-		exit(EXIT_FAILURE);
-	}
+    Sprintf(filename, DATA_IN_TEMPLATE, QTXT_I_FILE);
+    if (!(ifp = fopen(filename, RDTMODE))) {
+        perror(filename);
+        exit(EXIT_FAILURE);
+    }
 
-	filename[0]='\0';
+    filename[0] = '\0';
 #ifdef FILE_PREFIX
-	Strcat(filename, file_prefix);
+    Strcat(filename, file_prefix);
 #endif
-	Sprintf(eos(filename), DATA_TEMPLATE, QTXT_O_FILE);
-	if(!(ofp = fopen(filename, WRBMODE))) {
-		perror(filename);
-		Fclose(ifp);
-		exit(EXIT_FAILURE);
-	}
+    Sprintf(eos(filename), DATA_TEMPLATE, QTXT_O_FILE);
+    if (!(ofp = fopen(filename, WRBMODE))) {
+        perror(filename);
+        Fclose(ifp);
+        exit(EXIT_FAILURE);
+    }
 
-	qt_hdr.n_hdr = 0;
-	qt_line = 0;
-	in_msg = FALSE;
+    qt_hdr.n_hdr = 0;
+    qt_line = 0;
+    in_msg = FALSE;
 
-	while (fgets(in_line, QTEXT_IN_SIZ, ifp) != 0) {
-	    SpinCursor (3);
+    while (fgets(in_line, QTEXT_IN_SIZ, ifp) != 0) {
+        SpinCursor(3);
 
-	    qt_line++;
-	    if(qt_control(in_line)) do_qt_control(in_line);
-	    else if(qt_comment(in_line)) continue;
-	    else		    do_qt_text(in_line);
-	}
+        qt_line++;
+        if (qt_control(in_line))
+            do_qt_control(in_line);
+        else if (qt_comment(in_line))
+            continue;
+        else
+            do_qt_text(in_line);
+    }
 
-	(void) rewind(ifp);
-	in_msg = FALSE;
-	adjust_qt_hdrs();
-	put_qt_hdrs();
-	while (fgets(in_line, QTEXT_IN_SIZ, ifp) != 0) {
+    (void) rewind(ifp);
+    in_msg = FALSE;
+    adjust_qt_hdrs();
+    put_qt_hdrs();
+    while (fgets(in_line, QTEXT_IN_SIZ, ifp) != 0) {
+        if (qt_control(in_line)) {
+            char *summary_p = 0;
 
-		if(qt_control(in_line)) {
-		    char *summary_p = 0;
-
-		    in_msg = (in_line[1] == 'C');
-		    if (!in_msg) summary_p = valid_qt_summary(in_line, FALSE);
-		    /* don't write anything unless we've got a summary */
-		    if (!summary_p) continue;
-		    /* we have summary text; replace raw %E record with it */
-		    Strcpy(in_line, summary_p);	/* (guaranteed to fit) */
-		} else if(qt_comment(in_line)) continue;
-		if (debug) Fprintf(stderr, "%ld: %s", ftell(stdout), in_line);
-		(void) fputs(xcrypt(in_line), ofp);
-	}
-	Fclose(ifp);
-	Fclose(ofp);
-	return;
+            in_msg = (in_line[1] == 'C');
+            if (!in_msg)
+                summary_p = valid_qt_summary(in_line, FALSE);
+            /* don't write anything unless we've got a summary */
+            if (!summary_p)
+                continue;
+            /* we have summary text; replace raw %E record with it */
+            Strcpy(in_line, summary_p); /* (guaranteed to fit) */
+        } else if (qt_comment(in_line))
+            continue;
+        if (debug)
+            Fprintf(stderr, "%ld: %s", ftell(stdout), in_line);
+        (void) fputs(xcrypt(in_line), ofp);
+    }
+    Fclose(ifp);
+    Fclose(ofp);
+    return;
 }
 
+static char temp[32];
 
-static	char	temp[32];
-
-static char *
-limit(name,pref)	/* limit a name to 30 characters length */
-char	*name;
-int	pref;
+static char *limit(name, pref) /* limit a name to 30 characters length */
+char *name;
+int pref;
 {
-	(void) strncpy(temp, name, pref ? 26 : 30);
-	temp[pref ? 26 : 30] = 0;
-	return temp;
+    (void) strncpy(temp, name, pref ? 26 : 30);
+    temp[pref ? 26 : 30] = 0;
+    return temp;
 }
 
 void
 do_objs()
 {
-	int i, sum = 0;
-	char *c, *objnam;
-	int nspell = 0;
-	int prefix = 0;
-	char class = '\0';
-	boolean	sumerr = FALSE;
+    int i, sum = 0;
+    char *c, *objnam;
+    int nspell = 0;
+    int prefix = 0;
+    char class = '\0';
+    boolean sumerr = FALSE;
 
-	filename[0]='\0';
+    filename[0] = '\0';
 #ifdef FILE_PREFIX
-	Strcat(filename, file_prefix);
+    Strcat(filename, file_prefix);
 #endif
-	Sprintf(eos(filename), INCLUDE_TEMPLATE, ONAME_FILE);
-	if (!(ofp = fopen(filename, WRTMODE))) {
-		perror(filename);
-		exit(EXIT_FAILURE);
-	}
-	Fprintf(ofp,"/*\tSCCS Id: @(#)onames.h\t3.5\t2004/02/01 */\n\n");
-	Fprintf(ofp,"%s",Dont_Edit_Code);
-	Fprintf(ofp,"#ifndef ONAMES_H\n#define ONAMES_H\n\n");
+    Sprintf(eos(filename), INCLUDE_TEMPLATE, ONAME_FILE);
+    if (!(ofp = fopen(filename, WRTMODE))) {
+        perror(filename);
+        exit(EXIT_FAILURE);
+    }
+    Fprintf(ofp, "/*\tSCCS Id: @(#)onames.h\t3.5\t2004/02/01 */\n\n");
+    Fprintf(ofp, "%s", Dont_Edit_Code);
+    Fprintf(ofp, "#ifndef ONAMES_H\n#define ONAMES_H\n\n");
 
-	for(i = 0; !i || objects[i].oc_class != ILLOBJ_CLASS; i++) {
-		SpinCursor(3);
+    for (i = 0; !i || objects[i].oc_class != ILLOBJ_CLASS; i++) {
+        SpinCursor(3);
 
-		objects[i].oc_name_idx = objects[i].oc_descr_idx = i;	/* init */
-		if (!(objnam = tmpdup(OBJ_NAME(objects[i])))) continue;
+        objects[i].oc_name_idx = objects[i].oc_descr_idx = i; /* init */
+        if (!(objnam = tmpdup(OBJ_NAME(objects[i]))))
+            continue;
 
-		/* make sure probabilities add up to 1000 */
-		if(objects[i].oc_class != class) {
-			if (sum && sum != 1000) {
-			    Fprintf(stderr, "prob error for class %d (%d%%)",
-				    class, sum);
-			    (void) fflush(stderr);
-			    sumerr = TRUE;
-			}
-			class = objects[i].oc_class;
-			sum = 0;
-		}
+        /* make sure probabilities add up to 1000 */
+        if (objects[i].oc_class != class) {
+            if (sum && sum != 1000) {
+                Fprintf(stderr, "prob error for class %d (%d%%)", class, sum);
+                (void) fflush(stderr);
+                sumerr = TRUE;
+            }
+            class = objects[i].oc_class;
+            sum = 0;
+        }
 
-		for (c = objnam; *c; c++)
-		    if (*c >= 'a' && *c <= 'z') *c -= (char)('a' - 'A');
-		    else if (*c < 'A' || *c > 'Z') *c = '_';
+        for (c = objnam; *c; c++)
+            if (*c >= 'a' && *c <= 'z')
+                *c -= (char) ('a' - 'A');
+            else if (*c < 'A' || *c > 'Z')
+                *c = '_';
 
-		switch (class) {
-		    case WAND_CLASS:
-			Fprintf(ofp,"#define\tWAN_"); prefix = 1; break;
-		    case RING_CLASS:
-			Fprintf(ofp,"#define\tRIN_"); prefix = 1; break;
-		    case POTION_CLASS:
-			Fprintf(ofp,"#define\tPOT_"); prefix = 1; break;
-		    case SPBOOK_CLASS:
-			Fprintf(ofp,"#define\tSPE_"); prefix = 1; nspell++; break;
-		    case SCROLL_CLASS:
-			Fprintf(ofp,"#define\tSCR_"); prefix = 1; break;
-		    case AMULET_CLASS:
-			/* avoid trouble with stupid C preprocessors */
-			Fprintf(ofp,"#define\t");
-			if(objects[i].oc_material == PLASTIC) {
-			    Fprintf(ofp,"FAKE_AMULET_OF_YENDOR\t%d\n", i);
-			    prefix = -1;
-			    break;
-			}
-			break;
-		    case GEM_CLASS:
-			/* avoid trouble with stupid C preprocessors */
-			if(objects[i].oc_material == GLASS) {
-			    Fprintf(ofp,"/* #define\t%s\t%d */\n",
-							objnam, i);
-			    prefix = -1;
-			    break;
-			}
-		    default:
-			Fprintf(ofp,"#define\t");
-		}
-		if (prefix >= 0)
-			Fprintf(ofp,"%s\t%d\n", limit(objnam, prefix), i);
-		prefix = 0;
+        switch (class) {
+        case WAND_CLASS:
+            Fprintf(ofp, "#define\tWAN_");
+            prefix = 1;
+            break;
+        case RING_CLASS:
+            Fprintf(ofp, "#define\tRIN_");
+            prefix = 1;
+            break;
+        case POTION_CLASS:
+            Fprintf(ofp, "#define\tPOT_");
+            prefix = 1;
+            break;
+        case SPBOOK_CLASS:
+            Fprintf(ofp, "#define\tSPE_");
+            prefix = 1;
+            nspell++;
+            break;
+        case SCROLL_CLASS:
+            Fprintf(ofp, "#define\tSCR_");
+            prefix = 1;
+            break;
+        case AMULET_CLASS:
+            /* avoid trouble with stupid C preprocessors */
+            Fprintf(ofp, "#define\t");
+            if (objects[i].oc_material == PLASTIC) {
+                Fprintf(ofp, "FAKE_AMULET_OF_YENDOR\t%d\n", i);
+                prefix = -1;
+                break;
+            }
+            break;
+        case GEM_CLASS:
+            /* avoid trouble with stupid C preprocessors */
+            if (objects[i].oc_material == GLASS) {
+                Fprintf(ofp, "/* #define\t%s\t%d */\n", objnam, i);
+                prefix = -1;
+                break;
+            }
+        default:
+            Fprintf(ofp, "#define\t");
+        }
+        if (prefix >= 0)
+            Fprintf(ofp, "%s\t%d\n", limit(objnam, prefix), i);
+        prefix = 0;
 
-		sum += objects[i].oc_prob;
-	}
+        sum += objects[i].oc_prob;
+    }
 
-	/* check last set of probabilities */
-	if (sum && sum != 1000) {
-	    Fprintf(stderr, "prob error for class %d (%d%%)", class, sum);
-	    (void) fflush(stderr);
-	    sumerr = TRUE;
-	}
+    /* check last set of probabilities */
+    if (sum && sum != 1000) {
+        Fprintf(stderr, "prob error for class %d (%d%%)", class, sum);
+        (void) fflush(stderr);
+        sumerr = TRUE;
+    }
 
-	Fprintf(ofp,"#define\tLAST_GEM\t(JADE)\n");
-	Fprintf(ofp,"#define\tMAXSPELL\t%d\n", nspell+1);
-	Fprintf(ofp,"#define\tNUM_OBJECTS\t%d\n", i);
+    Fprintf(ofp, "#define\tLAST_GEM\t(JADE)\n");
+    Fprintf(ofp, "#define\tMAXSPELL\t%d\n", nspell + 1);
+    Fprintf(ofp, "#define\tNUM_OBJECTS\t%d\n", i);
 
-	Fprintf(ofp, "\n/* Artifacts (unique objects) */\n\n");
+    Fprintf(ofp, "\n/* Artifacts (unique objects) */\n\n");
 
-	for (i = 1; artifact_names[i]; i++) {
-		SpinCursor(3);
+    for (i = 1; artifact_names[i]; i++) {
+        SpinCursor(3);
 
-		for (c = objnam = tmpdup(artifact_names[i]); *c; c++)
-		    if (*c >= 'a' && *c <= 'z') *c -= (char)('a' - 'A');
-		    else if (*c < 'A' || *c > 'Z') *c = '_';
+        for (c = objnam = tmpdup(artifact_names[i]); *c; c++)
+            if (*c >= 'a' && *c <= 'z')
+                *c -= (char) ('a' - 'A');
+            else if (*c < 'A' || *c > 'Z')
+                *c = '_';
 
-		if (!strncmp(objnam, "THE_", 4))
-			objnam += 4;
-		/* fudge _platinum_ YENDORIAN EXPRESS CARD */
-		if (!strncmp(objnam, "PLATINUM_", 9))
-			objnam += 9;
-		Fprintf(ofp,"#define\tART_%s\t%d\n", limit(objnam, 1), i);
-	}
+        if (!strncmp(objnam, "THE_", 4))
+            objnam += 4;
+        /* fudge _platinum_ YENDORIAN EXPRESS CARD */
+        if (!strncmp(objnam, "PLATINUM_", 9))
+            objnam += 9;
+        Fprintf(ofp, "#define\tART_%s\t%d\n", limit(objnam, 1), i);
+    }
 
-	Fprintf(ofp, "#define\tNROFARTIFACTS\t%d\n", i-1);
-	Fprintf(ofp,"\n#endif /* ONAMES_H */\n");
-	Fclose(ofp);
-	if (sumerr) exit(EXIT_FAILURE);
-	return;
+    Fprintf(ofp, "#define\tNROFARTIFACTS\t%d\n", i - 1);
+    Fprintf(ofp, "\n#endif /* ONAMES_H */\n");
+    Fclose(ofp);
+    if (sumerr)
+        exit(EXIT_FAILURE);
+    return;
 }
 
 static char *
 tmpdup(str)
 const char *str;
 {
-	static char buf[128];
+    static char buf[128];
 
-	if (!str) return (char *)0;
-	(void)strncpy(buf, str, 127);
-	return buf;
+    if (!str)
+        return (char *) 0;
+    (void) strncpy(buf, str, 127);
+    return buf;
 }
 
 static char *
 eos(str)
 char *str;
 {
-    while (*str) str++;
+    while (*str)
+        str++;
     return str;
 }
 
@@ -2510,11 +2608,11 @@ do_vision()
      * Block the upper left corner (BLOCK_HEIGHTxBLOCK_WIDTH)
      */
     for (i = 0; i < MAX_ROW; i++)
-	for (j = 0; j < MAX_COL; j++)
-	    if (i < BLOCK_HEIGHT && j < BLOCK_WIDTH)
-		xclear[i][j] = '\000';
-	    else
-		xclear[i][j] = '\001';
+        for (j = 0; j < MAX_COL; j++)
+            if (i < BLOCK_HEIGHT && j < BLOCK_WIDTH)
+                xclear[i][j] = '\000';
+            else
+                xclear[i][j] = '\001';
 #endif /* VISION_TABLES */
 
     SpinCursor(3);
@@ -2522,22 +2620,22 @@ do_vision()
     /*
      * create the include file, "vis_tab.h"
      */
-    filename[0]='\0';
+    filename[0] = '\0';
 #ifdef FILE_PREFIX
     Strcat(filename, file_prefix);
 #endif
     Sprintf(filename, INCLUDE_TEMPLATE, VIS_TAB_H);
     if (!(ofp = fopen(filename, WRTMODE))) {
-	perror(filename);
-	exit(EXIT_FAILURE);
+        perror(filename);
+        exit(EXIT_FAILURE);
     }
-    Fprintf(ofp,"%s",Dont_Edit_Code);
-    Fprintf(ofp,"#ifdef VISION_TABLES\n");
+    Fprintf(ofp, "%s", Dont_Edit_Code);
+    Fprintf(ofp, "#ifdef VISION_TABLES\n");
 #ifdef VISION_TABLES
     H_close_gen();
     H_far_gen();
 #endif /* VISION_TABLES */
-    Fprintf(ofp,"\n#endif /* VISION_TABLES */\n");
+    Fprintf(ofp, "\n#endif /* VISION_TABLES */\n");
     Fclose(ofp);
 
     SpinCursor(3);
@@ -2545,34 +2643,34 @@ do_vision()
     /*
      * create the source file, "vis_tab.c"
      */
-    filename[0]='\0';
+    filename[0] = '\0';
 #ifdef FILE_PREFIX
     Strcat(filename, file_prefix);
 #endif
     Sprintf(filename, SOURCE_TEMPLATE, VIS_TAB_C);
     if (!(ofp = fopen(filename, WRTMODE))) {
-	perror(filename);
-	Sprintf(filename, INCLUDE_TEMPLATE, VIS_TAB_H);
-	Unlink(filename);
-	exit(EXIT_FAILURE);
+        perror(filename);
+        Sprintf(filename, INCLUDE_TEMPLATE, VIS_TAB_H);
+        Unlink(filename);
+        exit(EXIT_FAILURE);
     }
-    Fprintf(ofp,"%s",Dont_Edit_Code);
-    Fprintf(ofp,"#include \"config.h\"\n");
-    Fprintf(ofp,"#ifdef VISION_TABLES\n");
-    Fprintf(ofp,"#include \"vis_tab.h\"\n");
+    Fprintf(ofp, "%s", Dont_Edit_Code);
+    Fprintf(ofp, "#include \"config.h\"\n");
+    Fprintf(ofp, "#ifdef VISION_TABLES\n");
+    Fprintf(ofp, "#include \"vis_tab.h\"\n");
 
     SpinCursor(3);
 
 #ifdef VISION_TABLES
     C_close_gen();
     C_far_gen();
-    Fprintf(ofp,"\nvoid vis_tab_init() { return; }\n");
+    Fprintf(ofp, "\nvoid vis_tab_init() { return; }\n");
 #endif /* VISION_TABLES */
 
     SpinCursor(3);
 
-    Fprintf(ofp,"\n#endif /* VISION_TABLES */\n");
-    Fprintf(ofp,"\n/*vis_tab.c*/\n");
+    Fprintf(ofp, "\n#endif /* VISION_TABLES */\n");
+    Fprintf(ofp, "\n/*vis_tab.c*/\n");
 
     Fclose(ofp);
     return;
@@ -2635,93 +2733,100 @@ do_vision()
 static void
 H_close_gen()
 {
-    Fprintf(ofp,"\n/* Close */\n");
-    Fprintf(ofp,"#define CLOSE_MAX_SB_DY %2d\t/* |src row - block row| - 1\t*/\n",
-	    TEST_HEIGHT-1);
-    Fprintf(ofp,"#define CLOSE_MAX_SB_DX %2d\t/* |src col - block col|\t*/\n",
-	    TEST_WIDTH);
-    Fprintf(ofp,"#define CLOSE_MAX_BC_DY %2d\t/* |block row - check row|\t*/\n",
-	    TEST_HEIGHT);
-    Fprintf(ofp,"typedef struct {\n");
-    Fprintf(ofp,"    unsigned char close[CLOSE_MAX_SB_DX][CLOSE_MAX_BC_DY];\n");
-    Fprintf(ofp,"} close2d;\n");
-    Fprintf(ofp,"extern close2d close_table[CLOSE_MAX_SB_DY];\n");
+    Fprintf(ofp, "\n/* Close */\n");
+    Fprintf(ofp,
+            "#define CLOSE_MAX_SB_DY %2d\t/* |src row - block row| - 1\t*/\n",
+            TEST_HEIGHT - 1);
+    Fprintf(ofp,
+            "#define CLOSE_MAX_SB_DX %2d\t/* |src col - block col|\t*/\n",
+            TEST_WIDTH);
+    Fprintf(ofp,
+            "#define CLOSE_MAX_BC_DY %2d\t/* |block row - check row|\t*/\n",
+            TEST_HEIGHT);
+    Fprintf(ofp, "typedef struct {\n");
+    Fprintf(ofp,
+            "    unsigned char close[CLOSE_MAX_SB_DX][CLOSE_MAX_BC_DY];\n");
+    Fprintf(ofp, "} close2d;\n");
+    Fprintf(ofp, "extern close2d close_table[CLOSE_MAX_SB_DY];\n");
     return;
 }
 
 static void
 H_far_gen()
 {
-    Fprintf(ofp,"\n/* Far */\n");
-    Fprintf(ofp,"#define FAR_MAX_SB_DY %2d\t/* |src row - block row|\t*/\n",
-	    TEST_HEIGHT);
-    Fprintf(ofp,"#define FAR_MAX_SB_DX %2d\t/* |src col - block col| - 1\t*/\n",
-	    TEST_WIDTH-1);
-    Fprintf(ofp,"#define FAR_MAX_BC_DY %2d\t/* |block row - check row| - 1\t*/\n",
-	    TEST_HEIGHT-1);
-    Fprintf(ofp,"typedef struct {\n");
-    Fprintf(ofp,"    unsigned char far_q[FAR_MAX_SB_DX][FAR_MAX_BC_DY];\n");
-    Fprintf(ofp,"} far2d;\n");
-    Fprintf(ofp,"extern far2d far_table[FAR_MAX_SB_DY];\n");
+    Fprintf(ofp, "\n/* Far */\n");
+    Fprintf(ofp, "#define FAR_MAX_SB_DY %2d\t/* |src row - block row|\t*/\n",
+            TEST_HEIGHT);
+    Fprintf(ofp,
+            "#define FAR_MAX_SB_DX %2d\t/* |src col - block col| - 1\t*/\n",
+            TEST_WIDTH - 1);
+    Fprintf(ofp,
+            "#define FAR_MAX_BC_DY %2d\t/* |block row - check row| - 1\t*/\n",
+            TEST_HEIGHT - 1);
+    Fprintf(ofp, "typedef struct {\n");
+    Fprintf(ofp, "    unsigned char far_q[FAR_MAX_SB_DX][FAR_MAX_BC_DY];\n");
+    Fprintf(ofp, "} far2d;\n");
+    Fprintf(ofp, "extern far2d far_table[FAR_MAX_SB_DY];\n");
     return;
 }
 
 static void
 C_close_gen()
 {
-    int i,dx,dy;
-    int src_row, src_col;	/* source */
-    int block_row, block_col;	/* block */
+    int i, dx, dy;
+    int src_row, src_col;     /* source */
+    int block_row, block_col; /* block */
     int this_row;
     int no_more;
     const char *delim;
 
-    block_row = BLOCK_HEIGHT-1;
-    block_col = BLOCK_WIDTH-1;
+    block_row = BLOCK_HEIGHT - 1;
+    block_col = BLOCK_WIDTH - 1;
 
-    Fprintf(ofp,"\n#ifndef FAR_TABLE_ONLY\n");
-    Fprintf(ofp,"\nclose2d close_table[CLOSE_MAX_SB_DY] = {\n");
+    Fprintf(ofp, "\n#ifndef FAR_TABLE_ONLY\n");
+    Fprintf(ofp, "\nclose2d close_table[CLOSE_MAX_SB_DY] = {\n");
 #ifndef no_vision_progress
-    Fprintf(stderr,"\nclose:");
+    Fprintf(stderr, "\nclose:");
 #endif
 
     for (dy = 1; dy < TEST_HEIGHT; dy++) {
-	src_row = block_row + dy;
-	Fprintf(ofp, "/* DY = %2d (- 1)*/\n  {{\n", dy);
+        src_row = block_row + dy;
+        Fprintf(ofp, "/* DY = %2d (- 1)*/\n  {{\n", dy);
 #ifndef no_vision_progress
-	Fprintf(stderr," %2d",dy),  (void)fflush(stderr);
+        Fprintf(stderr, " %2d", dy), (void) fflush(stderr);
 #endif
-	for (dx = 0; dx < TEST_WIDTH; dx++) {
-	    src_col = block_col - dx;
-	    Fprintf(ofp, "  /*%2d*/ {", dx);
+        for (dx = 0; dx < TEST_WIDTH; dx++) {
+            src_col = block_col - dx;
+            Fprintf(ofp, "  /*%2d*/ {", dx);
 
-	    no_more = 0;
-	    for (this_row = 0; this_row < TEST_HEIGHT; this_row++) {
-		delim = (this_row < TEST_HEIGHT - 1) ? "," : "";
-		if (no_more) {
-		    Fprintf(ofp, "%s%s", CLOSE_OFF_TABLE_STRING, delim);
-		    continue;
-		}
-		SpinCursor(3);
+            no_more = 0;
+            for (this_row = 0; this_row < TEST_HEIGHT; this_row++) {
+                delim = (this_row < TEST_HEIGHT - 1) ? "," : "";
+                if (no_more) {
+                    Fprintf(ofp, "%s%s", CLOSE_OFF_TABLE_STRING, delim);
+                    continue;
+                }
+                SpinCursor(3);
 
-		/* Find the first column that we can see. */
-		for (i = block_col+1; i < MAX_COL; i++) {
-		    if (clear_path(src_row,src_col,block_row-this_row,i))
-			break;
-		}
+                /* Find the first column that we can see. */
+                for (i = block_col + 1; i < MAX_COL; i++) {
+                    if (clear_path(src_row, src_col, block_row - this_row, i))
+                        break;
+                }
 
-		if (i == MAX_COL) no_more = 1;
-		Fprintf(ofp, "%2d%s", i - block_col, delim);
-	    }
-	    Fprintf(ofp, "}%s", (dx < TEST_WIDTH - 1) ? ",\n" : "\n");
-	}
-	Fprintf(ofp,"  }},\n");
+                if (i == MAX_COL)
+                    no_more = 1;
+                Fprintf(ofp, "%2d%s", i - block_col, delim);
+            }
+            Fprintf(ofp, "}%s", (dx < TEST_WIDTH - 1) ? ",\n" : "\n");
+        }
+        Fprintf(ofp, "  }},\n");
     }
 
-    Fprintf(ofp,"}; /* close_table[] */\n");		/* closing brace for table */
-    Fprintf(ofp,"#endif /* !FAR_TABLE_ONLY */\n");
+    Fprintf(ofp, "}; /* close_table[] */\n"); /* closing brace for table */
+    Fprintf(ofp, "#endif /* !FAR_TABLE_ONLY */\n");
 #ifndef no_vision_progress
-    Fprintf(stderr,"\n");
+    Fprintf(stderr, "\n");
 #endif
     return;
 }
@@ -2729,55 +2834,56 @@ C_close_gen()
 static void
 C_far_gen()
 {
-    int i,dx,dy;
-    int src_row, src_col;	/* source */
-    int block_row, block_col;	/* block */
+    int i, dx, dy;
+    int src_row, src_col;     /* source */
+    int block_row, block_col; /* block */
     int this_row;
     const char *delim;
 
-    block_row = BLOCK_HEIGHT-1;
-    block_col = BLOCK_WIDTH-1;
+    block_row = BLOCK_HEIGHT - 1;
+    block_col = BLOCK_WIDTH - 1;
 
-    Fprintf(ofp,"\n#ifndef CLOSE_TABLE_ONLY\n");
-    Fprintf(ofp,"\nfar2d far_table[FAR_MAX_SB_DY] = {\n");
+    Fprintf(ofp, "\n#ifndef CLOSE_TABLE_ONLY\n");
+    Fprintf(ofp, "\nfar2d far_table[FAR_MAX_SB_DY] = {\n");
 #ifndef no_vision_progress
-    Fprintf(stderr,"\n_far_:");
+    Fprintf(stderr, "\n_far_:");
 #endif
 
     for (dy = 0; dy < TEST_HEIGHT; dy++) {
-	src_row = block_row - dy;
-	Fprintf(ofp, "/* DY = %2d */\n  {{\n", dy);
+        src_row = block_row - dy;
+        Fprintf(ofp, "/* DY = %2d */\n  {{\n", dy);
 #ifndef no_vision_progress
-	Fprintf(stderr," %2d",dy),  (void)fflush(stderr);
+        Fprintf(stderr, " %2d", dy), (void) fflush(stderr);
 #endif
-	for (dx = 1; dx < TEST_WIDTH; dx++) {
-	    src_col = block_col + dx;
-	    Fprintf(ofp, "  /*%2d(-1)*/ {", dx);
+        for (dx = 1; dx < TEST_WIDTH; dx++) {
+            src_col = block_col + dx;
+            Fprintf(ofp, "  /*%2d(-1)*/ {", dx);
 
-	    for (this_row = block_row+1; this_row < block_row+TEST_HEIGHT;
-								this_row++) {
-		delim = (this_row < block_row + TEST_HEIGHT - 1) ? "," : "";
+            for (this_row = block_row + 1; this_row < block_row + TEST_HEIGHT;
+                 this_row++) {
+                delim = (this_row < block_row + TEST_HEIGHT - 1) ? "," : "";
 
-		SpinCursor(3);
-		/* Find first col that we can see. */
-		for (i = 0; i <= block_col; i++) {
-		    if (clear_path(src_row,src_col,this_row,i)) break;
-		}
+                SpinCursor(3);
+                /* Find first col that we can see. */
+                for (i = 0; i <= block_col; i++) {
+                    if (clear_path(src_row, src_col, this_row, i))
+                        break;
+                }
 
-		if (block_col-i < 0)
-		    Fprintf(ofp, "%s%s", FAR_OFF_TABLE_STRING, delim);
-		else
-		    Fprintf(ofp, "%2d%s", block_col - i, delim);
-	    }
-	    Fprintf(ofp, "}%s", (dx < TEST_WIDTH - 1) ? ",\n" : "\n");
-	}
-	Fprintf(ofp,"  }},\n");
+                if (block_col - i < 0)
+                    Fprintf(ofp, "%s%s", FAR_OFF_TABLE_STRING, delim);
+                else
+                    Fprintf(ofp, "%2d%s", block_col - i, delim);
+            }
+            Fprintf(ofp, "}%s", (dx < TEST_WIDTH - 1) ? ",\n" : "\n");
+        }
+        Fprintf(ofp, "  }},\n");
     }
 
-    Fprintf(ofp,"}; /* far_table[] */\n");	/* closing brace for table */
-    Fprintf(ofp,"#endif /* !CLOSE_TABLE_ONLY */\n");
+    Fprintf(ofp, "}; /* far_table[] */\n"); /* closing brace for table */
+    Fprintf(ofp, "#endif /* !CLOSE_TABLE_ONLY */\n");
 #ifndef no_vision_progress
-    Fprintf(stderr,"\n");
+    Fprintf(stderr, "\n");
 #endif
     return;
 }
@@ -2797,61 +2903,70 @@ C_far_gen()
  *  same row as the hero.
  */
 static int
-clear_path(you_row,you_col,y2,x2)
-    int you_row, you_col, y2, x2;
+clear_path(you_row, you_col, y2, x2)
+int you_row, you_col, y2, x2;
 {
     int dx, dy, s1, s2;
     register int i, error, x, y, dxs, dys;
 
-    x  = you_col;		y  = you_row;
-    dx = abs(x2-you_col);	dy = abs(y2-you_row);
-    s1 = sign(x2-you_col);	s2 = sign(y2-you_row);
+    x = you_col;
+    y = you_row;
+    dx = abs(x2 - you_col);
+    dy = abs(y2 - you_row);
+    s1 = sign(x2 - you_col);
+    s2 = sign(y2 - you_row);
 
-    if (s1 == 0) {	/* same column */
-	if (s2 == 1) {	/* below (larger y2 value) */
-	    for (i = you_row+1; i < y2; i++)
-		if (!xclear[i][you_col]) return 0;
-	} else {	/* above (smaller y2 value) */
-	    for (i = y2+1; i < you_row; i++)
-		if (!xclear[i][you_col]) return 0;
-	}
-	return 1;
+    if (s1 == 0) {     /* same column */
+        if (s2 == 1) { /* below (larger y2 value) */
+            for (i = you_row + 1; i < y2; i++)
+                if (!xclear[i][you_col])
+                    return 0;
+        } else { /* above (smaller y2 value) */
+            for (i = y2 + 1; i < you_row; i++)
+                if (!xclear[i][you_col])
+                    return 0;
+        }
+        return 1;
     }
 
     /*
      *  Lines at 0 and 90 degrees have been weeded out.
      */
     if (dy > dx) {
-	error = dx; dx = dy; dy = error;	/* swap the values */
-	dxs = dx << 1;		/* save the shifted values */
-	dys = dy << 1;
-	error = dys - dx;	/* NOTE: error is used as a temporary above */
+        error = dx;
+        dx = dy;
+        dy = error;    /* swap the values */
+        dxs = dx << 1; /* save the shifted values */
+        dys = dy << 1;
+        error = dys - dx; /* NOTE: error is used as a temporary above */
 
-	for (i = 0; i < dx; i++) {
-	    if (!xclear[y][x]) return 0;	/* plot point */
+        for (i = 0; i < dx; i++) {
+            if (!xclear[y][x])
+                return 0; /* plot point */
 
-	    while (error >= 0) {
-		x += s1;
-		error -= dxs;
-	    }
-	    y += s2;
-	    error += dys;
-	}
+            while (error >= 0) {
+                x += s1;
+                error -= dxs;
+            }
+            y += s2;
+            error += dys;
+        }
     } else {
-	dxs = dx << 1;		/* save the shifted values */
-	dys = dy << 1;
-	error = dys - dx;
+        dxs = dx << 1; /* save the shifted values */
+        dys = dy << 1;
+        error = dys - dx;
 
-	for (i = 0; i < dx; i++) {
-	    if (!xclear[y][x]) return 0;	/* plot point */
+        for (i = 0; i < dx; i++) {
+            if (!xclear[y][x])
+                return 0; /* plot point */
 
-	    while (error >= 0) {
-		y += s2;
-		error -= dxs;
-	    }
-	    x += s1;
-	    error += dys;
-	}
+            while (error >= 0) {
+                y += s2;
+                error -= dxs;
+            }
+            x += s1;
+            error += dys;
+        }
     }
     return 1;
 }
@@ -2859,9 +2974,9 @@ clear_path(you_row,you_col,y2,x2)
 
 #ifdef STRICT_REF_DEF
 NEARDATA struct flag flags;
-# ifdef ATTRIB_H
+#ifdef ATTRIB_H
 struct attribs attrmax, attrmin;
-# endif
+#endif
 #endif /* STRICT_REF_DEF */
 
 /*makedefs.c*/

@@ -1,4 +1,4 @@
-/* NetHack 3.6	vmsmisc.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	vmsmisc.c	$NHDT-Date: 1431192780 2015/05/09 17:33:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
 /* NetHack 3.6	vmsmisc.c	$Date: 2011/09/01 01:47:00 $  $Revision: 1.6 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -7,13 +7,13 @@
 #include <ssdef.h>
 #include <stsdef.h>
 
-int debuggable = 0;	/* 1 if we can debug or show a call trace */
+int debuggable = 0; /* 1 if we can debug or show a call trace */
 
 void FDECL(vms_exit, (int));
 void NDECL(vms_abort);
 
 /* first arg should be unsigned long but <lib$routines.h> has unsigned int */
-extern void VDECL(lib$signal, (unsigned,...));
+extern void VDECL(lib$signal, (unsigned, ...));
 
 /* terminate, converting Unix-style exit code into VMS status code */
 void
@@ -30,17 +30,17 @@ void
 vms_abort()
 {
     if (debuggable)
-	lib$signal(SS$_DEBUG);
+        lib$signal(SS$_DEBUG);
 
     /* we'll get here if the debugger isn't available, or if the user
        uses GO to resume execution instead of EXIT to quit */
-    vms_exit(2);	/* don't return to caller (2==arbitrary non-zero) */
+    vms_exit(2); /* don't return to caller (2==arbitrary non-zero) */
     /* NOT REACHED */
 }
 
-    /*
-     * Caveat: the VERYOLD_VMS configuration hasn't been tested in many years.
-     */
+/*
+ * Caveat: the VERYOLD_VMS configuration hasn't been tested in many years.
+ */
 #ifdef VERYOLD_VMS
 #include "oldcrtl.c"
 #endif

@@ -1,4 +1,4 @@
-/* NetHack 3.6	gnsignal.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	gnsignal.c	$NHDT-Date: 1431192772 2015/05/09 17:32:52 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
 /* NetHack 3.6	gnsignal.c	$Date: 2009/05/06 10:57:45 $  $Revision: 1.7 $ */
 /*	SCCS Id: @(#)gnsignal.c	3.5	2005/11/19	*/
 /* Copyright (C) 1998 by Anthony Taylor <tonyt@ptialaska.net> */
@@ -10,10 +10,10 @@
 
 GList *g_keyBuffer;
 GList *g_clickBuffer;
-int g_numKeys=0;
-int g_numClicks=0;
-int g_askingQuestion=0;
-static int s_done=FALSE;
+int g_numKeys = 0;
+int g_numClicks = 0;
+int g_askingQuestion = 0;
+static int s_done = FALSE;
 
 /*
  * ghack_init_signals
@@ -59,161 +59,102 @@ static int s_done=FALSE;
 */
 
 void
-ghack_init_signals( void)
+ghack_init_signals(void)
 {
-  ghack_signals[GHSIG_CURS] =
-    gtk_object_class_user_signal_new (gtk_type_class (gtk_widget_get_type ()),
-				      "ghack_curs",
-				      GTK_RUN_FIRST,
-				      gtk_marshal_NONE__INT_INT,
-				      GTK_TYPE_NONE,
-				      2,
-				      GTK_TYPE_INT,
-				      GTK_TYPE_INT);  
+    ghack_signals[GHSIG_CURS] = gtk_object_class_user_signal_new(
+        gtk_type_class(gtk_widget_get_type()), "ghack_curs", GTK_RUN_FIRST,
+        gtk_marshal_NONE__INT_INT, GTK_TYPE_NONE, 2, GTK_TYPE_INT,
+        GTK_TYPE_INT);
 
-  ghack_signals[GHSIG_PUTSTR] =
-    gtk_object_class_user_signal_new (gtk_type_class (gtk_widget_get_type ()),
-				      "ghack_putstr",
-				      GTK_RUN_FIRST,
-				      gtk_marshal_NONE__INT_POINTER,
-				      GTK_TYPE_NONE,
-				      2,
-				      GTK_TYPE_INT,
-				      GTK_TYPE_POINTER);
+    ghack_signals[GHSIG_PUTSTR] = gtk_object_class_user_signal_new(
+        gtk_type_class(gtk_widget_get_type()), "ghack_putstr", GTK_RUN_FIRST,
+        gtk_marshal_NONE__INT_POINTER, GTK_TYPE_NONE, 2, GTK_TYPE_INT,
+        GTK_TYPE_POINTER);
 
-  ghack_signals[GHSIG_PRINT_GLYPH] =
-    gtk_object_class_user_signal_new (gtk_type_class (gtk_widget_get_type ()),
-				      "ghack_print_glyph",
-				      GTK_RUN_FIRST,
-				      gtk_marshal_NONE__INT_INT_POINTER,
-				      GTK_TYPE_NONE,
-				      3,
-				      GTK_TYPE_INT,
-				      GTK_TYPE_INT,
-				      GTK_TYPE_POINTER);
+    ghack_signals[GHSIG_PRINT_GLYPH] = gtk_object_class_user_signal_new(
+        gtk_type_class(gtk_widget_get_type()), "ghack_print_glyph",
+        GTK_RUN_FIRST, gtk_marshal_NONE__INT_INT_POINTER, GTK_TYPE_NONE, 3,
+        GTK_TYPE_INT, GTK_TYPE_INT, GTK_TYPE_POINTER);
 
-  ghack_signals[GHSIG_CLEAR] =
-    gtk_object_class_user_signal_new (gtk_type_class (gtk_widget_get_type ()),
-				      "ghack_clear",
-				      GTK_RUN_FIRST,
-				      gtk_marshal_NONE__NONE,
-				      GTK_TYPE_NONE,
-				      0);
-  
-  ghack_signals[GHSIG_DISPLAY] =
-    gtk_object_class_user_signal_new (gtk_type_class (gtk_widget_get_type ()),
-				      "ghack_display",
-				      GTK_RUN_FIRST,
-				      gtk_marshal_NONE__BOOL,
-				      GTK_TYPE_NONE,
-				      1,
-				      GTK_TYPE_BOOL);
-  
-  ghack_signals[GHSIG_START_MENU] =
-    gtk_object_class_user_signal_new (gtk_type_class (gtk_widget_get_type ()),
-				      "ghack_start_menu",
-				      GTK_RUN_FIRST,
-				      gtk_marshal_NONE__NONE,
-				      GTK_TYPE_NONE,
-				      0);
-  
-  ghack_signals[GHSIG_ADD_MENU] =
-    gtk_object_class_user_signal_new (gtk_type_class (gtk_widget_get_type ()),
-				      "ghack_add_menu",
-				      GTK_RUN_FIRST,
-				      gtk_marshal_NONE__POINTER,
-				      GTK_TYPE_NONE,
-				      1,
-				      GTK_TYPE_POINTER);
-  
-  ghack_signals[GHSIG_END_MENU] =
-    gtk_object_class_user_signal_new (gtk_type_class (gtk_widget_get_type ()),
-				      "ghack_end_menu",
-				      GTK_RUN_FIRST,
-				      gtk_marshal_NONE__POINTER,
-				      GTK_TYPE_NONE,
-				      1,
-				      GTK_TYPE_POINTER);
-  
-  ghack_signals[GHSIG_SELECT_MENU] =
-    gtk_object_class_user_signal_new (gtk_type_class (gtk_widget_get_type ()),
-				      "ghack_select_menu",
-				      GTK_RUN_FIRST,
-				      gtk_marshal_NONE__POINTER_INT_POINTER,
-				      GTK_TYPE_NONE,
-				      3,
-				      GTK_TYPE_POINTER,
-				      GTK_TYPE_INT,
-				      GTK_TYPE_POINTER);
-  
-  ghack_signals[GHSIG_CLIPAROUND] =
-    gtk_object_class_user_signal_new (gtk_type_class (gtk_widget_get_type ()),
-				      "ghack_cliparound",
-				      GTK_RUN_FIRST,
-				      gtk_marshal_NONE__INT_INT,
-				      GTK_TYPE_NONE,
-				      2,
-				      GTK_TYPE_INT,
-				      GTK_TYPE_INT);
+    ghack_signals[GHSIG_CLEAR] = gtk_object_class_user_signal_new(
+        gtk_type_class(gtk_widget_get_type()), "ghack_clear", GTK_RUN_FIRST,
+        gtk_marshal_NONE__NONE, GTK_TYPE_NONE, 0);
 
-  ghack_signals[GHSIG_FADE_HIGHLIGHT] =
-    gtk_object_class_user_signal_new (gtk_type_class (gtk_widget_get_type ()),
-				      "ghack_fade_highlight",
-				      GTK_RUN_FIRST,
-				      gtk_marshal_NONE__NONE,
-				      GTK_TYPE_NONE,
-				      0);
-  
-  ghack_signals[GHSIG_DELAY] =
-    gtk_object_class_user_signal_new (gtk_type_class (gtk_widget_get_type ()),
-				      "gnome_delay_output",
-				      GTK_RUN_FIRST,
-				      gtk_marshal_NONE__INT,
-				      GTK_TYPE_NONE,
-				      1,
-				      GTK_TYPE_INT);
-  
+    ghack_signals[GHSIG_DISPLAY] = gtk_object_class_user_signal_new(
+        gtk_type_class(gtk_widget_get_type()), "ghack_display", GTK_RUN_FIRST,
+        gtk_marshal_NONE__BOOL, GTK_TYPE_NONE, 1, GTK_TYPE_BOOL);
+
+    ghack_signals[GHSIG_START_MENU] = gtk_object_class_user_signal_new(
+        gtk_type_class(gtk_widget_get_type()), "ghack_start_menu",
+        GTK_RUN_FIRST, gtk_marshal_NONE__NONE, GTK_TYPE_NONE, 0);
+
+    ghack_signals[GHSIG_ADD_MENU] = gtk_object_class_user_signal_new(
+        gtk_type_class(gtk_widget_get_type()), "ghack_add_menu",
+        GTK_RUN_FIRST, gtk_marshal_NONE__POINTER, GTK_TYPE_NONE, 1,
+        GTK_TYPE_POINTER);
+
+    ghack_signals[GHSIG_END_MENU] = gtk_object_class_user_signal_new(
+        gtk_type_class(gtk_widget_get_type()), "ghack_end_menu",
+        GTK_RUN_FIRST, gtk_marshal_NONE__POINTER, GTK_TYPE_NONE, 1,
+        GTK_TYPE_POINTER);
+
+    ghack_signals[GHSIG_SELECT_MENU] = gtk_object_class_user_signal_new(
+        gtk_type_class(gtk_widget_get_type()), "ghack_select_menu",
+        GTK_RUN_FIRST, gtk_marshal_NONE__POINTER_INT_POINTER, GTK_TYPE_NONE,
+        3, GTK_TYPE_POINTER, GTK_TYPE_INT, GTK_TYPE_POINTER);
+
+    ghack_signals[GHSIG_CLIPAROUND] = gtk_object_class_user_signal_new(
+        gtk_type_class(gtk_widget_get_type()), "ghack_cliparound",
+        GTK_RUN_FIRST, gtk_marshal_NONE__INT_INT, GTK_TYPE_NONE, 2,
+        GTK_TYPE_INT, GTK_TYPE_INT);
+
+    ghack_signals[GHSIG_FADE_HIGHLIGHT] = gtk_object_class_user_signal_new(
+        gtk_type_class(gtk_widget_get_type()), "ghack_fade_highlight",
+        GTK_RUN_FIRST, gtk_marshal_NONE__NONE, GTK_TYPE_NONE, 0);
+
+    ghack_signals[GHSIG_DELAY] = gtk_object_class_user_signal_new(
+        gtk_type_class(gtk_widget_get_type()), "gnome_delay_output",
+        GTK_RUN_FIRST, gtk_marshal_NONE__INT, GTK_TYPE_NONE, 1, GTK_TYPE_INT);
 }
 
 /* For want of a better place, I'm putting the delay output stuff here
  *   -Erik
  */
-static gint timeout_callback(gpointer data)
+static gint
+timeout_callback(gpointer data)
 {
-    s_done=TRUE;
+    s_done = TRUE;
     return FALSE;
 }
 
 void
-ghack_delay( GtkWidget *win, int numMillisecs, gpointer data)
+ghack_delay(GtkWidget *win, int numMillisecs, gpointer data)
 {
-    s_done=FALSE;
-    gtk_timeout_add( (unsigned int) numMillisecs, 
-	    timeout_callback, NULL);
-    while( s_done==FALSE)
-	gtk_main_iteration();
+    s_done = FALSE;
+    gtk_timeout_add((unsigned int) numMillisecs, timeout_callback, NULL);
+    while (s_done == FALSE)
+        gtk_main_iteration();
 }
 
-
-void 
-ghack_handle_button_press(GtkWidget *widget, GdkEventButton *event, 
-	gpointer data)
+void
+ghack_handle_button_press(GtkWidget *widget, GdkEventButton *event,
+                          gpointer data)
 {
     GHClick *click;
     double x1, y1;
 
     if (event->type != GDK_BUTTON_PRESS)
-	return;
-    
-    gnome_canvas_window_to_world( GNOME_CANVAS( widget), event->x, 
-	    event->y, &x1, &y1);
-/*
-    g_message("I got a click at %f,%f with button %d \n", 
-	    x1, y1, event->button);
-*/
+        return;
+
+    gnome_canvas_window_to_world(GNOME_CANVAS(widget), event->x, event->y,
+                                 &x1, &y1);
+    /*
+        g_message("I got a click at %f,%f with button %d \n",
+                x1, y1, event->button);
+    */
 
     /* We allocate storage here, so we need to remember if (g_numClicks>0)
-     * to blow this away when closing the app using something like 
+     * to blow this away when closing the app using something like
      *  while (g_clickBuffer)
      *       {
      *		g_free((GHClick)g_clickBuffer->data);
@@ -222,32 +163,31 @@ ghack_handle_button_press(GtkWidget *widget, GdkEventButton *event,
      *  g_list_free( g_clickBuffer );
      *
      */
-    click = g_new( GHClick, 1);
-    
-    click->x=(int)x1/ghack_glyph_width();
-    click->y=(int)y1/ghack_glyph_height();
-    click->mod=(event->button == 1)? CLICK_1 : CLICK_2;
-    
-    g_clickBuffer = g_list_prepend (g_clickBuffer, click);
+    click = g_new(GHClick, 1);
+
+    click->x = (int) x1 / ghack_glyph_width();
+    click->y = (int) y1 / ghack_glyph_height();
+    click->mod = (event->button == 1) ? CLICK_1 : CLICK_2;
+
+    g_clickBuffer = g_list_prepend(g_clickBuffer, click);
     /* Could use g_list_length(), but it is stupid and just
-     * traverses the list while counting, so we'll just do 
+     * traverses the list while counting, so we'll just do
      * the counting ourselves in advance. */
     g_numClicks++;
 }
 
 #ifndef M
-# ifndef NHSTDC
-#  define M(c)          (0x80 | (c))
-# else
-#  define M(c)          ((c) - 128)
-# endif /* NHSTDC */
+#ifndef NHSTDC
+#define M(c) (0x80 | (c))
+#else
+#define M(c) ((c) -128)
+#endif /* NHSTDC */
 #endif
 #ifndef C
-#define C(c)            (0x1f & (c))
+#define C(c) (0x1f & (c))
 #endif
 
-
-void 
+void
 ghack_handle_key_press(GtkWidget *widget, GdkEventKey *event, gpointer data)
 {
     static int was_pound = 0;
@@ -255,7 +195,7 @@ ghack_handle_key_press(GtkWidget *widget, GdkEventKey *event, gpointer data)
     int ctl = GDK_CONTROL_MASK;
     int alt = GDK_MOD1_MASK;
 
-    /* Turn this on to debug key events */
+/* Turn this on to debug key events */
 #if 0
     g_message("I got a \"%s\" key (%d) %s%s", 
 	      gdk_keyval_name (event->keyval), event->keyval, 
@@ -263,118 +203,136 @@ ghack_handle_key_press(GtkWidget *widget, GdkEventKey *event, gpointer data)
 #endif
 
     switch (event->keyval) {
-	/* special keys to do stuff with */
+    /* special keys to do stuff with */
 
-	/* Set up the direction keys */
+    /* Set up the direction keys */
 
-	/* First handle the arrow keys -- these always mean move */
+    /* First handle the arrow keys -- these always mean move */
     case GDK_Right:
     case GDK_rightarrow:
-	key = Cmd.move_E; break;
+        key = Cmd.move_E;
+        break;
     case GDK_Left:
     case GDK_leftarrow:
-	key = Cmd.move_W; break;
+        key = Cmd.move_W;
+        break;
     case GDK_Up:
     case GDK_uparrow:
-	key = Cmd.move_N; break;
+        key = Cmd.move_N;
+        break;
     case GDK_Down:
     case GDK_downarrow:
-	key = Cmd.move_S; break;
+        key = Cmd.move_S;
+        break;
     case GDK_Home:
-	key = Cmd.move_NW; break;
+        key = Cmd.move_NW;
+        break;
     case GDK_End:
-	key = Cmd.move_SW; break;
+        key = Cmd.move_SW;
+        break;
     case GDK_Page_Down:
-	key = Cmd.move_SE; break;
+        key = Cmd.move_SE;
+        break;
     case GDK_Page_Up:
-	key = Cmd.move_NE; break;
-    case ' ':		 key='.'; break;
+        key = Cmd.move_NE;
+        break;
+    case ' ':
+        key = '.';
+        break;
 
-	/* Now, handle the numberpad (move or numbers) */
+    /* Now, handle the numberpad (move or numbers) */
     case GDK_KP_Right:
     case GDK_KP_6:
-	if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK) && iflags.num_pad)
-	    key = GDK_KP_6;
-	else
-	    key='6'; 
-	break;
+        if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK)
+            && iflags.num_pad)
+            key = GDK_KP_6;
+        else
+            key = '6';
+        break;
 
     case GDK_KP_Left:
     case GDK_KP_4:
-	if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK) && iflags.num_pad)
-	    key = GDK_KP_4;
-	else
-	    key='4'; 
-	break;
+        if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK)
+            && iflags.num_pad)
+            key = GDK_KP_4;
+        else
+            key = '4';
+        break;
 
     case GDK_KP_Up:
     case GDK_KP_8:
-	if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK) && iflags.num_pad)
-	    key = GDK_KP_8;
-	else
-	    key='8'; 
-	break;
+        if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK)
+            && iflags.num_pad)
+            key = GDK_KP_8;
+        else
+            key = '8';
+        break;
 
     case GDK_KP_Down:
     case GDK_KP_2:
-	if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK) && iflags.num_pad)
-	    key = GDK_KP_2;
-	else
-	    key='2'; 
-	break;
+        if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK)
+            && iflags.num_pad)
+            key = GDK_KP_2;
+        else
+            key = '2';
+        break;
 
-	/* Move Top-Left */
+    /* Move Top-Left */
     case GDK_KP_Home:
     case GDK_KP_7:
-	if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK) && iflags.num_pad)
-	    key = GDK_KP_7;
-	else
-	    key='7'; 
-	break;
+        if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK)
+            && iflags.num_pad)
+            key = GDK_KP_7;
+        else
+            key = '7';
+        break;
 
     case GDK_KP_Page_Up:
     case GDK_KP_9:
-	if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK) && iflags.num_pad)
-	    key = GDK_KP_9;
-	else
-	    key='9'; 
-	break;
+        if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK)
+            && iflags.num_pad)
+            key = GDK_KP_9;
+        else
+            key = '9';
+        break;
 
     case GDK_KP_End:
     case GDK_KP_1:
-	if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK) && iflags.num_pad)
-	    key = GDK_KP_1;
-	else
-	    key='1'; 
-	break;
+        if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK)
+            && iflags.num_pad)
+            key = GDK_KP_1;
+        else
+            key = '1';
+        break;
 
     case GDK_KP_Page_Down:
     case GDK_KP_3:
-	if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK) && iflags.num_pad)
-	    key = GDK_KP_3;
-	else
-	    key='3'; 
-	break;
-  
-  
+        if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK)
+            && iflags.num_pad)
+            key = GDK_KP_3;
+        else
+            key = '3';
+        break;
+
     case GDK_KP_5:
-	if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK) && iflags.num_pad)
-	    key = GDK_KP_5;
-	else
-	    key='5'; 
-	break;
+        if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK)
+            && iflags.num_pad)
+            key = GDK_KP_5;
+        else
+            key = '5';
+        break;
 
     case GDK_KP_Delete:
     case GDK_KP_Decimal:
-	key='.'; 
-	break;
+        key = '.';
+        break;
 
-	/* can't just ignore "#", it's a core feature */
+    /* can't just ignore "#", it's a core feature */
     case GDK_numbersign:
-	key='#';
-	break;
+        key = '#';
+        break;
 
-	/* We will probably want to do something with these later... */
+    /* We will probably want to do something with these later... */
     case GDK_KP_Begin:
     case GDK_KP_F1:
     case GDK_F1:
@@ -392,8 +350,8 @@ ghack_handle_key_press(GtkWidget *widget, GdkEventKey *event, gpointer data)
     case GDK_F10:
     case GDK_F11:
     case GDK_F12:
-	break;
-	/* various keys to ignore */
+        break;
+    /* various keys to ignore */
     case GDK_KP_Insert:
     case GDK_Insert:
     case GDK_Delete:
@@ -414,31 +372,30 @@ ghack_handle_key_press(GtkWidget *widget, GdkEventKey *event, gpointer data)
     case GDK_Meta_R:
     case GDK_Mode_switch:
     case GDK_Multi_key:
-	return;
+        return;
 
     default:
-	key = event->keyval;
-	break;
+        key = event->keyval;
+        break;
     }
 
     if ((event->state & alt) || was_pound) {
-	key=M(event->keyval);
+        key = M(event->keyval);
     } else if (event->state & ctl) {
-	key=C(event->keyval);
+        key = C(event->keyval);
     }
     if (was_pound) {
-	was_pound = 0;
+        was_pound = 0;
     }
- 
+
     /* Ok, here is where we do clever stuff to overide the default
      * game behavior */
     if (g_askingQuestion == 0) {
-
-	if (key == 'S' || key == M('S') || key == C('S')) {
-	    ghack_save_game_cb( NULL, NULL);
-	    return;
-	}
+        if (key == 'S' || key == M('S') || key == C('S')) {
+            ghack_save_game_cb(NULL, NULL);
+            return;
+        }
     }
-    g_keyBuffer = g_list_prepend (g_keyBuffer, GINT_TO_POINTER( key));
+    g_keyBuffer = g_list_prepend(g_keyBuffer, GINT_TO_POINTER(key));
     g_numKeys++;
 }

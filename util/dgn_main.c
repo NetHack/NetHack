@@ -1,4 +1,4 @@
-/* NetHack 3.6	dgn_main.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	dgn_main.c	$NHDT-Date: 1431192770 2015/05/09 17:32:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
 /* NetHack 3.6	dgn_main.c	$Date: 2009/05/06 10:54:27 $  $Revision: 1.7 $ */
 /*	SCCS Id: @(#)dgn_main.c 3.5	1994/09/23	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet	*/
@@ -15,41 +15,41 @@
 
 /* Macintosh-specific code */
 #if defined(__APPLE__) && defined(__MACH__)
-  /* MacOS X has Unix-style files and processes */
-# undef MAC
+/* MacOS X has Unix-style files and processes */
+#undef MAC
 #endif
 #ifdef MAC
-# if defined(__SC__) || defined(__MRC__)
-#  define MPWTOOL
+#if defined(__SC__) || defined(__MRC__)
+#define MPWTOOL
 #include <CursorCtl.h>
-# else
-   /* put dungeon file in library location */
-#  define PREFIX ":lib:"
-# endif
+#else
+/* put dungeon file in library location */
+#define PREFIX ":lib:"
+#endif
 #endif
 
 #ifndef MPWTOOL
-# define SpinCursor(x)
+#define SpinCursor(x)
 #endif
 
-#define MAX_ERRORS	25
+#define MAX_ERRORS 25
 
-extern int  NDECL (yyparse);
+extern int NDECL(yyparse);
 extern int nh_line_number;
 const char *fname = "(stdin)";
 int fatal_error = 0;
 
-int  FDECL (main, (int,char **));
-void FDECL (yyerror, (const char *));
-void FDECL (yywarning, (const char *));
-int  NDECL (yywrap);
-void FDECL (init_yyin, (FILE *));
-void FDECL (init_yyout, (FILE *));
+int FDECL(main, (int, char **));
+void FDECL(yyerror, (const char *));
+void FDECL(yywarning, (const char *));
+int NDECL(yywrap);
+void FDECL(init_yyin, (FILE *));
+void FDECL(init_yyout, (FILE *));
 
 #ifdef AZTEC_36
-FILE *FDECL (freopen, (char *,char *,FILE *));
+FILE *FDECL(freopen, (char *, char *, FILE *));
 #endif
-#define Fprintf (void)fprintf
+#define Fprintf (void) fprintf
 
 #if defined(__BORLANDC__) && !defined(_WIN32)
 extern unsigned _stklen = STKSIZ;
@@ -59,99 +59,98 @@ main(argc, argv)
 int argc;
 char **argv;
 {
-	char	infile[64], outfile[64], basename[64];
-	FILE	*fin, *fout;
-	int	i, len;
-	boolean errors_encountered = FALSE;
+    char infile[64], outfile[64], basename[64];
+    FILE *fin, *fout;
+    int i, len;
+    boolean errors_encountered = FALSE;
 #if defined(MAC) && (defined(THINK_C) || defined(__MWERKS__))
-	char	*mark;
-	static char *mac_argv[] = {	"dgn_comp",	/* dummy argv[0] */
-				":dat:dungeon.pdf"
-				};
+    char *mark;
+    static char *mac_argv[] = { "dgn_comp", /* dummy argv[0] */
+                                ":dat:dungeon.pdf" };
 
-	argc = SIZE(mac_argv);
-	argv = mac_argv;
+    argc = SIZE(mac_argv);
+    argv = mac_argv;
 #endif
 
-	Strcpy(infile, "(stdin)");
-	fin = stdin;
-	Strcpy(outfile, "(stdout)");
-	fout = stdout;
+    Strcpy(infile, "(stdin)");
+    fin = stdin;
+    Strcpy(outfile, "(stdout)");
+    fout = stdout;
 
-	if (argc == 1) {	/* Read standard input */
-	    init_yyin(fin);
-	    init_yyout(fout);
-	    (void) yyparse();
-	    if (fatal_error > 0)
-		errors_encountered = TRUE;
-	} else {		/* Otherwise every argument is a filename */
-	    for(i=1; i<argc; i++) {
-		fname = strcpy(infile, argv[i]);
-		/* the input file had better be a .pdf file */
-		len = strlen(fname) - 4;	/* length excluding suffix */
-		if (len < 0 || strncmp(".pdf", fname + len, 4)) {
-		    Fprintf(stderr,
-			    "Error - file name \"%s\" in wrong format.\n",
-			    fname);
-		    errors_encountered = TRUE;
-		    continue;
-		}
+    if (argc == 1) { /* Read standard input */
+        init_yyin(fin);
+        init_yyout(fout);
+        (void) yyparse();
+        if (fatal_error > 0)
+            errors_encountered = TRUE;
+    } else { /* Otherwise every argument is a filename */
+        for (i = 1; i < argc; i++) {
+            fname = strcpy(infile, argv[i]);
+            /* the input file had better be a .pdf file */
+            len = strlen(fname) - 4; /* length excluding suffix */
+            if (len < 0 || strncmp(".pdf", fname + len, 4)) {
+                Fprintf(stderr, "Error - file name \"%s\" in wrong format.\n",
+                        fname);
+                errors_encountered = TRUE;
+                continue;
+            }
 
-		/* build output file name */
+/* build output file name */
 #if defined(MAC) && (defined(THINK_C) || defined(__MWERKS__))
-		/* extract basename from path to infile */
-		mark = strrchr(infile, ':');
-		strcpy(basename, mark ? mark+1 : infile);
-		mark = strchr(basename, '.');
-		if (mark) *mark = '\0';
+            /* extract basename from path to infile */
+            mark = strrchr(infile, ':');
+            strcpy(basename, mark ? mark + 1 : infile);
+            mark = strchr(basename, '.');
+            if (mark)
+                *mark = '\0';
 #else
-		/* Use the whole name - strip off the last 3 or 4 chars. */
+/* Use the whole name - strip off the last 3 or 4 chars. */
 
-#ifdef VMS	/* avoid possible interaction with logical name */
-		len++;	/* retain "." as trailing punctuation */
+#ifdef VMS /* avoid possible interaction with logical name */
+            len++; /* retain "." as trailing punctuation */
 #endif
-		(void) strncpy(basename, infile, len);
-		basename[len] = '\0';
+            (void) strncpy(basename, infile, len);
+            basename[len] = '\0';
 #endif
 
-		outfile[0] = '\0';
+            outfile[0] = '\0';
 #ifdef PREFIX
-		(void) strcat(outfile, PREFIX);
+            (void) strcat(outfile, PREFIX);
 #endif
-		(void) strcat(outfile, basename);
+            (void) strcat(outfile, basename);
 
-		fin = freopen(infile, "r", stdin);
-		if (!fin) {
-		    Fprintf(stderr, "Can't open %s for input.\n", infile);
-		    perror(infile);
-		    errors_encountered = TRUE;
-		    continue;
-		}
-		fout = freopen(outfile, WRBMODE, stdout);
-		if (!fout) {
-		    Fprintf(stderr, "Can't open %s for output.\n", outfile);
-		    perror(outfile);
-		    errors_encountered = TRUE;
-		    continue;
-		}
-		init_yyin(fin);
-		init_yyout(fout);
-		(void) yyparse();
-		nh_line_number = 1;
-		if (fatal_error > 0) {
-			errors_encountered = TRUE;
-			fatal_error = 0;
-		}
-	    }
-	}
-	if (fout && fclose(fout) < 0) {
-	    Fprintf(stderr, "Can't finish output file.");
-	    perror(outfile);
-	    errors_encountered = TRUE;
-	}
-	exit(errors_encountered ? EXIT_FAILURE : EXIT_SUCCESS);
-	/*NOTREACHED*/
-	return 0;
+            fin = freopen(infile, "r", stdin);
+            if (!fin) {
+                Fprintf(stderr, "Can't open %s for input.\n", infile);
+                perror(infile);
+                errors_encountered = TRUE;
+                continue;
+            }
+            fout = freopen(outfile, WRBMODE, stdout);
+            if (!fout) {
+                Fprintf(stderr, "Can't open %s for output.\n", outfile);
+                perror(outfile);
+                errors_encountered = TRUE;
+                continue;
+            }
+            init_yyin(fin);
+            init_yyout(fout);
+            (void) yyparse();
+            nh_line_number = 1;
+            if (fatal_error > 0) {
+                errors_encountered = TRUE;
+                fatal_error = 0;
+            }
+        }
+    }
+    if (fout && fclose(fout) < 0) {
+        Fprintf(stderr, "Can't finish output file.");
+        perror(outfile);
+        errors_encountered = TRUE;
+    }
+    exit(errors_encountered ? EXIT_FAILURE : EXIT_SUCCESS);
+    /*NOTREACHED*/
+    return 0;
 }
 
 /*
@@ -160,32 +159,37 @@ char **argv;
  * MAX_ERRORS wouldn't be reasonable.
  */
 
-void yyerror(s)
+void
+yyerror(s)
 const char *s;
 {
-	(void) fprintf(stderr,"%s : line %d : %s\n",fname,nh_line_number, s);
-	if (++fatal_error > MAX_ERRORS) {
-		(void) fprintf(stderr,"Too many errors, good bye!\n");
-		exit(EXIT_FAILURE);
-	}
+    (void) fprintf(stderr, "%s : line %d : %s\n", fname, nh_line_number, s);
+    if (++fatal_error > MAX_ERRORS) {
+        (void) fprintf(stderr, "Too many errors, good bye!\n");
+        exit(EXIT_FAILURE);
+    }
 }
 
 /*
  * Just display a warning (that is : a non fatal error)
  */
 
-void yywarning(s)
+void
+yywarning(s)
 const char *s;
 {
-	(void) fprintf(stderr,"%s : line %d : WARNING : %s\n",fname,nh_line_number,s);
+    (void) fprintf(stderr, "%s : line %d : WARNING : %s\n", fname,
+                   nh_line_number, s);
 }
 
-int yywrap()
+int
+yywrap()
 {
-	SpinCursor(3); /*	Don't know if this is a good place to put it ?
-						Is it called for our grammar ? Often enough ?
-						Too often ? -- h+ */
-       return 1;
+    SpinCursor(3); /*	Don't know if this is a good place to put it ?
+                                            Is it called for our grammar ?
+                      Often enough ?
+                                            Too often ? -- h+ */
+    return 1;
 }
 
 /*dgn_main.c*/

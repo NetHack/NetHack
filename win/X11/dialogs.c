@@ -14,7 +14,8 @@
  *
  * THE UNIVERSITY OF WISCONSIN-MADISON DISCLAIMS ALL WARRANTIES WITH REGARD TO
  * THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS, IN NO EVENT SHALL THE UNIVERSITY OF WISCONSIN-MADISON BE LIABLE FOR
+ * FITNESS, IN NO EVENT SHALL THE UNIVERSITY OF WISCONSIN-MADISON BE LIABLE
+ *FOR
  * ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
  * RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
  * CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
@@ -48,12 +49,12 @@
  *	target type" issued by 'gcc -Wwrite-strings' as used by nethack.
  *	(For this file, always the second parameter to XtSetArg().)
  *
- * $NHDT-Date: 1430899133 2015/05/06 07:58:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.3 $
+ * $NHDT-Date: 1431192774 2015/05/09 17:32:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.5 $
  * $Date: 2002/03/31 17:11:23 $  $Revision: 1.2 $
  */
 
 #ifndef SYSV
-#define PRESERVE_NO_SYSV	/* X11 include files may define SYSV */
+#define PRESERVE_NO_SYSV /* X11 include files may define SYSV */
 #endif
 
 #include <X11/Intrinsic.h>
@@ -66,26 +67,23 @@
 #include <X11/Xaw/Command.h>
 
 #ifdef PRESERVE_NO_SYSV
-# ifdef SYSV
-#  undef SYSV
-# endif
-# undef PRESERVE_NO_SYSV
+#ifdef SYSV
+#undef SYSV
+#endif
+#undef PRESERVE_NO_SYSV
 #endif
 
-#include "config.h"	/* #define for const for non __STDC__ compilers */
-#include "lint.h"	/* for nethack's nhStr() macro */
+#include "config.h" /* #define for const for non __STDC__ compilers */
+#include "lint.h"   /* for nethack's nhStr() macro */
 
 /* ":" added to both translations below to allow limited redefining of
  * keysyms before testing for keysym values -- dlc */
-static const char okay_accelerators[] =
-    "#override\n\
+static const char okay_accelerators[] = "#override\n\
      :<Key>Return: set() notify() unset()\n";
 
-static const char cancel_accelerators[] =
-    "#override\n\
+static const char cancel_accelerators[] = "#override\n\
      :<Key>Escape: set() notify() unset()\n\
-     :<Ctrl>[: set() notify() unset()\n";	/* for keyboards w/o an ESC */
-
+     :<Ctrl>[: set() notify() unset()\n"; /* for keyboards w/o an ESC */
 
 /* Create a dialog widget.  It is just a form widget with
  *	a label prompt
@@ -95,99 +93,139 @@ static const char cancel_accelerators[] =
  */
 Widget
 CreateDialog(parent, name, okay_callback, cancel_callback)
-    Widget parent;
-    String name;
-    XtCallbackProc okay_callback;
-    XtCallbackProc cancel_callback;
+Widget parent;
+String name;
+XtCallbackProc okay_callback;
+XtCallbackProc cancel_callback;
 {
     Widget form, prompt, response, okay, cancel;
     Arg args[20];
     Cardinal num_args;
 
-							num_args = 0;
+    num_args = 0;
 #ifdef SPECIAL_CMAP
     if (special_cmap) {
-	XtSetArg(args[num_args], nhStr(XtNbackground), white);	num_args++;
+        XtSetArg(args[num_args], nhStr(XtNbackground), white);
+        num_args++;
     }
 #endif
-    form = XtCreateManagedWidget(name, formWidgetClass, parent, args, num_args);
+    form =
+        XtCreateManagedWidget(name, formWidgetClass, parent, args, num_args);
 
-							num_args = 0;
+    num_args = 0;
 #ifdef SPECIAL_CMAP
     if (special_cmap) {
-	XtSetArg(args[num_args], nhStr(XtNforeground), black);	num_args++;
-	XtSetArg(args[num_args], nhStr(XtNbackground), white);	num_args++;
+        XtSetArg(args[num_args], nhStr(XtNforeground), black);
+        num_args++;
+        XtSetArg(args[num_args], nhStr(XtNbackground), white);
+        num_args++;
     }
 #endif
-    XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop);	num_args++;
-    XtSetArg(args[num_args], nhStr(XtNbottom), XtChainTop);	num_args++;
-    XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft);	num_args++;
-    XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft);	num_args++;
-    XtSetArg(args[num_args], nhStr(XtNresizable), True);	num_args++;
-    XtSetArg(args[num_args], nhStr(XtNborderWidth), 0);		num_args++;
-    prompt = XtCreateManagedWidget("prompt", labelWidgetClass,
-				   form, args, num_args);
+    XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop);
+    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNbottom), XtChainTop);
+    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft);
+    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft);
+    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNresizable), True);
+    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNborderWidth), 0);
+    num_args++;
+    prompt = XtCreateManagedWidget("prompt", labelWidgetClass, form, args,
+                                   num_args);
 
-							num_args = 0;
+    num_args = 0;
 #ifdef SPECIAL_CMAP
     if (special_cmap) {
-	XtSetArg(args[num_args], nhStr(XtNforeground), black);	num_args++;
-	XtSetArg(args[num_args], nhStr(XtNbackground), white);	num_args++;
+        XtSetArg(args[num_args], nhStr(XtNforeground), black);
+        num_args++;
+        XtSetArg(args[num_args], nhStr(XtNbackground), white);
+        num_args++;
     }
 #endif
-    XtSetArg(args[num_args], nhStr(XtNfromVert), prompt);	num_args++;
-    XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop);	num_args++;
-    XtSetArg(args[num_args], nhStr(XtNbottom), XtChainTop);	num_args++;
-    XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft);	num_args++;
-    XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft);	num_args++;
-    XtSetArg(args[num_args], nhStr(XtNresizable), True);	num_args++;
-    XtSetArg(args[num_args], nhStr(XtNeditType), XawtextEdit);	num_args++;
-    XtSetArg(args[num_args], nhStr(XtNresize), XawtextResizeWidth); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNstring), "");		num_args++;
-    response = XtCreateManagedWidget("response", asciiTextWidgetClass,
-				     form, args, num_args);
+    XtSetArg(args[num_args], nhStr(XtNfromVert), prompt);
+    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop);
+    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNbottom), XtChainTop);
+    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft);
+    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft);
+    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNresizable), True);
+    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNeditType), XawtextEdit);
+    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNresize), XawtextResizeWidth);
+    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNstring), "");
+    num_args++;
+    response = XtCreateManagedWidget("response", asciiTextWidgetClass, form,
+                                     args, num_args);
 
-							num_args = 0;
+    num_args = 0;
 #ifdef SPECIAL_CMAP
     if (special_cmap) {
-	XtSetArg(args[num_args], nhStr(XtNforeground), black);	num_args++;
-	XtSetArg(args[num_args], nhStr(XtNbackground), white);	num_args++;
+        XtSetArg(args[num_args], nhStr(XtNforeground), black);
+        num_args++;
+        XtSetArg(args[num_args], nhStr(XtNbackground), white);
+        num_args++;
     }
 #endif
-    XtSetArg(args[num_args], nhStr(XtNfromVert), response);	num_args++;
-    XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop);	num_args++;
-    XtSetArg(args[num_args], nhStr(XtNbottom), XtChainTop);	num_args++;
-    XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft);	num_args++;
-    XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft);	num_args++;
-    XtSetArg(args[num_args], nhStr(XtNresizable), True);	num_args++;
+    XtSetArg(args[num_args], nhStr(XtNfromVert), response);
+    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop);
+    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNbottom), XtChainTop);
+    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft);
+    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft);
+    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNresizable), True);
+    num_args++;
     XtSetArg(args[num_args], nhStr(XtNaccelerators),
-	     XtParseAcceleratorTable(okay_accelerators));	num_args++;
-    okay = XtCreateManagedWidget("okay", commandWidgetClass,
-				 form, args, num_args);
+             XtParseAcceleratorTable(okay_accelerators));
+    num_args++;
+    okay = XtCreateManagedWidget("okay", commandWidgetClass, form, args,
+                                 num_args);
     XtAddCallback(okay, XtNcallback, okay_callback, form);
 
     /* Only create cancel button if there is a callback for it. */
     if (cancel_callback) {
-								num_args = 0;
+        num_args = 0;
 #ifdef SPECIAL_CMAP
-	if (special_cmap) {
-	    XtSetArg(args[num_args], nhStr(XtNforeground), black); num_args++;
-	    XtSetArg(args[num_args], nhStr(XtNbackground), white); num_args++;
-	}
+        if (special_cmap) {
+            XtSetArg(args[num_args], nhStr(XtNforeground), black);
+            num_args++;
+            XtSetArg(args[num_args], nhStr(XtNbackground), white);
+            num_args++;
+        }
 #endif
-	XtSetArg(args[num_args], nhStr(XtNfromVert), response);	num_args++;
-	XtSetArg(args[num_args], nhStr(XtNfromHoriz), okay);	num_args++;
-	XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop);	num_args++;
-	XtSetArg(args[num_args], nhStr(XtNbottom), XtChainTop);	num_args++;
-	XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft);	num_args++;
-	XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft);	num_args++;
-	XtSetArg(args[num_args], nhStr(XtNresizable), True);	num_args++;
-	XtSetArg(args[num_args], nhStr(XtNaccelerators),
-	     XtParseAcceleratorTable(cancel_accelerators));	num_args++;
-	cancel = XtCreateManagedWidget("cancel", commandWidgetClass,
-				       form, args, num_args);
-	XtAddCallback(cancel, XtNcallback, cancel_callback, form);
-	XtInstallAccelerators(response, cancel);
+        XtSetArg(args[num_args], nhStr(XtNfromVert), response);
+        num_args++;
+        XtSetArg(args[num_args], nhStr(XtNfromHoriz), okay);
+        num_args++;
+        XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop);
+        num_args++;
+        XtSetArg(args[num_args], nhStr(XtNbottom), XtChainTop);
+        num_args++;
+        XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft);
+        num_args++;
+        XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft);
+        num_args++;
+        XtSetArg(args[num_args], nhStr(XtNresizable), True);
+        num_args++;
+        XtSetArg(args[num_args], nhStr(XtNaccelerators),
+                 XtParseAcceleratorTable(cancel_accelerators));
+        num_args++;
+        cancel = XtCreateManagedWidget("cancel", commandWidgetClass, form,
+                                       args, num_args);
+        XtAddCallback(cancel, XtNcallback, cancel_callback, form);
+        XtInstallAccelerators(response, cancel);
     }
 
     XtInstallAccelerators(response, okay);
@@ -217,8 +255,8 @@ GetDialogPrompt(w)
 /* set the prompt.  This is used to put error information in the prompt */
 void
 SetDialogPrompt(w, newprompt)
-    Widget w;
-    String newprompt;
+Widget w;
+String newprompt;
 {
     Arg args[1];
     Widget label;
@@ -231,7 +269,7 @@ SetDialogPrompt(w, newprompt)
 /* get what the user typed; caller must free the response */
 String
 GetDialogResponse(w)
-    Widget w;
+Widget w;
 {
     Arg args[1];
     Widget response;
@@ -243,12 +281,12 @@ GetDialogResponse(w)
     return XtNewString(s);
 }
 
-#define max(a,b) (((a) > (b)) ? (a) : (b))
+#define max(a, b) (((a) > (b)) ? (a) : (b))
 /* set the default reponse */
 void
 SetDialogResponse(w, s)
-    Widget w;
-    String s;
+Widget w;
+String s;
 {
     Arg args[4];
     Widget response;
@@ -262,9 +300,9 @@ SetDialogResponse(w, s)
     XtSetArg(args[3], nhStr(XtNwidth), &width);
     XtGetValues(response, args, FOUR);
     /* width includes margins as per Xaw documentation */
-    nwidth = (font->max_bounds.width * strlen(s))+leftMargin+rightMargin;
+    nwidth = (font->max_bounds.width * strlen(s)) + leftMargin + rightMargin;
     if (nwidth < width)
-	nwidth = width;
+        nwidth = width;
 
     XtSetArg(args[0], nhStr(XtNstring), s);
     XtSetArg(args[1], nhStr(XtNwidth), nwidth);
@@ -288,14 +326,14 @@ ClearDialogResponse(w)
 }
 #endif
 
-
-/* Not a part of the original dialogs.c from ghostview --------------------- */
+/* Not a part of the original dialogs.c from ghostview ---------------------
+ */
 
 /* position popup window under the cursor */
 void
 positionpopup(w, bottom)
-    Widget w;
-    boolean bottom;	/* position y on bottom? */
+Widget w;
+boolean bottom; /* position y on bottom? */
 {
     Arg args[3];
     Cardinal num_args;
@@ -310,38 +348,47 @@ positionpopup(w, bottom)
     /* following line deals with a race condition w/brain-damaged WM's -dlc */
     XtUnrealizeWidget(w);
 
-    XQueryPointer(XtDisplay(toplevel), XtWindow(toplevel), &root, &child,
-		  &x, &y, &dummyx, &dummyy, &dummymask);
+    XQueryPointer(XtDisplay(toplevel), XtWindow(toplevel), &root, &child, &x,
+                  &y, &dummyx, &dummyy, &dummymask);
     num_args = 0;
-    XtSetArg(args[num_args], XtNwidth, &width); num_args++;
-    XtSetArg(args[num_args], XtNheight, &height); num_args++;
-    XtSetArg(args[num_args], XtNborderWidth, &b_width); num_args++;
+    XtSetArg(args[num_args], XtNwidth, &width);
+    num_args++;
+    XtSetArg(args[num_args], XtNheight, &height);
+    num_args++;
+    XtSetArg(args[num_args], XtNborderWidth, &b_width);
+    num_args++;
     XtGetValues(w, args, num_args);
 
     /* position so that the cursor is center,center or center,bottom */
     width += 2 * b_width;
-    x -= ( (Position) width/2 );
-    if (x < 0) x = 0;
-    if ( x > (max_x = (Position) (XtScreen(w)->width - width)) ) x = max_x;
+    x -= ((Position) width / 2);
+    if (x < 0)
+        x = 0;
+    if (x > (max_x = (Position)(XtScreen(w)->width - width)))
+        x = max_x;
 
     if (bottom) {
-	y -= (height+b_width-1);
-	height += 2 * b_width;
+        y -= (height + b_width - 1);
+        height += 2 * b_width;
     } else {
-	height += 2 * b_width;
-	y -= ( (Position) height/2 );
+        height += 2 * b_width;
+        y -= ((Position) height / 2);
     }
-    if (y < 0) y = 0;
-    if ( y > (max_y = (Position) (XtScreen(w)->height - height)) ) y = max_y;
-
+    if (y < 0)
+        y = 0;
+    if (y > (max_y = (Position)(XtScreen(w)->height - height)))
+        y = max_y;
 
     num_args = 0;
-    XtSetArg(args[num_args], XtNx, x); num_args++;
-    XtSetArg(args[num_args], XtNy, y); num_args++;
+    XtSetArg(args[num_args], XtNx, x);
+    num_args++;
+    XtSetArg(args[num_args], XtNy, y);
+    num_args++;
     XtSetValues(w, args, num_args);
 
     /* Some older window managers ignore XtN{x,y}; hint the same values */
-    /* The {x,y} are not used by newer window managers; older ones need them */
+    /* The {x,y} are not used by newer window managers; older ones need them
+     */
     XtRealizeWidget(w);
     hints = XAllocSizeHints();
     hints->flags = USPosition;

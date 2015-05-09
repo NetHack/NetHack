@@ -1,4 +1,4 @@
-/* NetHack 3.6	gnaskstr.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	gnaskstr.c	$NHDT-Date: 1431192772 2015/05/09 17:32:52 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
 /* NetHack 3.6	gnaskstr.c	$Date: 2009/05/06 10:57:24 $  $Revision: 1.4 $ */
 /*	SCCS Id: @(#)gnaskstr.c	3.5	2000/07/16	*/
 /* Copyright (C) 1998 by Erik Andersen <andersee@debian.org> */
@@ -8,56 +8,52 @@
 #include "gnmain.h"
 #include <gnome.h>
 
-
-static
-void ghack_ask_string_callback(gchar * string, gpointer data)
+static void
+ghack_ask_string_callback(gchar *string, gpointer data)
 {
-  char **user_text = (char **) data;
+    char **user_text = (char **) data;
 
-  g_assert(user_text != NULL);
+    g_assert(user_text != NULL);
 
-  *user_text = string; /* note - value must be g_free'd */
+    *user_text = string; /* note - value must be g_free'd */
 }
 
-
-int ghack_ask_string_dialog(const char *szMessageStr, 
-	const char *szDefaultStr, const char *szTitleStr, 
-	char *buffer)
+int
+ghack_ask_string_dialog(const char *szMessageStr, const char *szDefaultStr,
+                        const char *szTitleStr, char *buffer)
 {
     int i;
-    GtkWidget* dialog;
-    gchar   *user_text = NULL;
+    GtkWidget *dialog;
+    gchar *user_text = NULL;
 
-    dialog = gnome_request_dialog(FALSE, szMessageStr,
-    				  szDefaultStr, 0,
-				  ghack_ask_string_callback,
-				  &user_text, NULL);
+    dialog =
+        gnome_request_dialog(FALSE, szMessageStr, szDefaultStr, 0,
+                             ghack_ask_string_callback, &user_text, NULL);
     g_assert(dialog != NULL);
 
     gtk_window_set_title(GTK_WINDOW(dialog), szTitleStr);
 
-    gnome_dialog_set_default( GNOME_DIALOG(dialog), 0);
-    gtk_window_set_modal( GTK_WINDOW(dialog), TRUE);
-    gnome_dialog_set_parent (GNOME_DIALOG (dialog), 
-	    GTK_WINDOW (ghack_get_main_window ()) );
+    gnome_dialog_set_default(GNOME_DIALOG(dialog), 0);
+    gtk_window_set_modal(GTK_WINDOW(dialog), TRUE);
+    gnome_dialog_set_parent(GNOME_DIALOG(dialog),
+                            GTK_WINDOW(ghack_get_main_window()));
 
-    i = gnome_dialog_run_and_close (GNOME_DIALOG (dialog));
-    
+    i = gnome_dialog_run_and_close(GNOME_DIALOG(dialog));
+
     /* Quit */
-    if ( i != 0 || user_text == NULL ) {
-	if (user_text)
-	  g_free(user_text);
-	return -1;
+    if (i != 0 || user_text == NULL) {
+        if (user_text)
+            g_free(user_text);
+        return -1;
     }
 
-    if ( *user_text == 0 ) {
-      g_free(user_text);
-      return -1;
+    if (*user_text == 0) {
+        g_free(user_text);
+        return -1;
     }
 
     g_assert(strlen(user_text) > 0);
-    strcpy (buffer, user_text);
+    strcpy(buffer, user_text);
     g_free(user_text);
     return 0;
 }
-

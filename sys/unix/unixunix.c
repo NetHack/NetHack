@@ -1,11 +1,11 @@
-/* NetHack 3.6	unixunix.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	unixunix.c	$NHDT-Date: 1431192780 2015/05/09 17:33:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.21 $ */
 /* NetHack 3.6	unixunix.c	$Date: 2012/01/27 20:15:31 $  $Revision: 1.16 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* This file collects some Unix dependencies */
 
-#include "hack.h"	/* mainly for index() which depends on BSD */
+#include "hack.h" /* mainly for index() which depends on BSD */
 
 #include <errno.h>
 #include <sys/stat.h>
@@ -34,200 +34,208 @@ static int
 veryold(fd)
 int fd;
 {
-	time_t date;
+    time_t date;
 
-	if(fstat(fd, &buf)) return(0);			/* cannot get status */
+    if (fstat(fd, &buf))
+        return (0); /* cannot get status */
 #ifndef INSURANCE
-	if(buf.st_size != sizeof(int)) return(0);	/* not an xlock file */
+    if (buf.st_size != sizeof(int))
+        return (0); /* not an xlock file */
 #endif
 #if defined(BSD) && !defined(POSIX_TYPES)
-	(void) time((long *)(&date));
+    (void) time((long *) (&date));
 #else
-	(void) time(&date);
+    (void) time(&date);
 #endif
-	if(date - buf.st_mtime < 3L*24L*60L*60L) {	/* recent */
-		int lockedpid;	/* should be the same size as hackpid */
+    if (date - buf.st_mtime < 3L * 24L * 60L * 60L) { /* recent */
+        int lockedpid; /* should be the same size as hackpid */
 
-		if(read(fd, (genericptr_t)&lockedpid, sizeof(lockedpid)) !=
-			sizeof(lockedpid))
-			/* strange ... */
-			return(0);
+        if (read(fd, (genericptr_t) &lockedpid, sizeof(lockedpid))
+            != sizeof(lockedpid))
+            /* strange ... */
+            return (0);
 
-		/* From: Rick Adams <seismo!rick> */
-		/* This will work on 4.1cbsd, 4.2bsd and system 3? & 5. */
-		/* It will do nothing on V7 or 4.1bsd. */
+/* From: Rick Adams <seismo!rick> */
+/* This will work on 4.1cbsd, 4.2bsd and system 3? & 5. */
+/* It will do nothing on V7 or 4.1bsd. */
 #ifndef NETWORK
-		/* It will do a VERY BAD THING if the playground is shared
-		   by more than one machine! -pem */
-		if(!(kill(lockedpid, 0) == -1 && errno == ESRCH))
+        /* It will do a VERY BAD THING if the playground is shared
+           by more than one machine! -pem */
+        if (!(kill(lockedpid, 0) == -1 && errno == ESRCH))
 #endif
-			return(0);
-	}
-	(void) close(fd);
-	return(1);
+            return (0);
+    }
+    (void) close(fd);
+    return (1);
 }
 
 static int
 eraseoldlocks()
 {
-	register int i;
+    register int i;
 
-	program_state.preserve_locks = 0; /* not required but shows intent */
-	/* cannot use maxledgerno() here, because we need to find a lock name
-	 * before starting everything (including the dungeon initialization
-	 * that sets astral_level, needed for maxledgerno()) up
-	 */
-	for(i = 1; i <= MAXDUNGEON*MAXLEVEL + 1; i++) {
-		/* try to remove all */
-		set_levelfile_name(lock, i);
-		(void) unlink(fqname(lock, LEVELPREFIX, 0));
-	}
-	set_levelfile_name(lock, 0);
-	if (unlink(fqname(lock, LEVELPREFIX, 0)))
-		return(0);				/* cannot remove it */
-	return(1);					/* success! */
+    program_state.preserve_locks = 0; /* not required but shows intent */
+    /* cannot use maxledgerno() here, because we need to find a lock name
+     * before starting everything (including the dungeon initialization
+     * that sets astral_level, needed for maxledgerno()) up
+     */
+    for (i = 1; i <= MAXDUNGEON * MAXLEVEL + 1; i++) {
+        /* try to remove all */
+        set_levelfile_name(lock, i);
+        (void) unlink(fqname(lock, LEVELPREFIX, 0));
+    }
+    set_levelfile_name(lock, 0);
+    if (unlink(fqname(lock, LEVELPREFIX, 0)))
+        return (0); /* cannot remove it */
+    return (1);     /* success! */
 }
 
 void
 getlock()
 {
-	register int i = 0, fd, c;
-	const char *fq_lock;
+    register int i = 0, fd, c;
+    const char *fq_lock;
 
 #ifdef TTY_GRAPHICS
-	/* idea from rpick%ucqais@uccba.uc.edu
-	 * prevent automated rerolling of characters
-	 * test input (fd0) so that tee'ing output to get a screen dump still
-	 * works
-	 * also incidentally prevents development of any hack-o-matic programs
-	 */
-	/* added check for window-system type -dlc */
-	if (!strcmp(windowprocs.name, "tty"))
-	    if (!isatty(0))
-		error("You must play from a terminal.");
+    /* idea from rpick%ucqais@uccba.uc.edu
+     * prevent automated rerolling of characters
+     * test input (fd0) so that tee'ing output to get a screen dump still
+     * works
+     * also incidentally prevents development of any hack-o-matic programs
+     */
+    /* added check for window-system type -dlc */
+    if (!strcmp(windowprocs.name, "tty"))
+        if (!isatty(0))
+            error("You must play from a terminal.");
 #endif
 
-	/* we ignore QUIT and INT at this point */
-	if (!lock_file(HLOCK, LOCKPREFIX, 10)) {
-		wait_synch();
-		error("%s", "");
-	}
+    /* we ignore QUIT and INT at this point */
+    if (!lock_file(HLOCK, LOCKPREFIX, 10)) {
+        wait_synch();
+        error("%s", "");
+    }
 
-	/* default value of lock[] is "1lock" where '1' gets changed to
-	   'a','b',&c below; override the default and use <uid><charname>
-	   if we aren't restricting the number of simultaneous games */
-	if (!locknum)
-		Sprintf(lock, "%u%s", (unsigned)getuid(), plname);
+    /* default value of lock[] is "1lock" where '1' gets changed to
+       'a','b',&c below; override the default and use <uid><charname>
+       if we aren't restricting the number of simultaneous games */
+    if (!locknum)
+        Sprintf(lock, "%u%s", (unsigned) getuid(), plname);
 
-	regularize(lock);
-	set_levelfile_name(lock, 0);
+    regularize(lock);
+    set_levelfile_name(lock, 0);
 
-	if(locknum) {
-		if(locknum > 25) locknum = 25;
+    if (locknum) {
+        if (locknum > 25)
+            locknum = 25;
 
-		do {
-			lock[0] = 'a' + i++;
-			fq_lock = fqname(lock, LEVELPREFIX, 0);
+        do {
+            lock[0] = 'a' + i++;
+            fq_lock = fqname(lock, LEVELPREFIX, 0);
 
-			if((fd = open(fq_lock, 0)) == -1) {
-			    if(errno == ENOENT) goto gotlock; /* no such file */
-			    perror(fq_lock);
-			    unlock_file(HLOCK);
-			    error("Cannot open %s", fq_lock);
-			}
+            if ((fd = open(fq_lock, 0)) == -1) {
+                if (errno == ENOENT)
+                    goto gotlock; /* no such file */
+                perror(fq_lock);
+                unlock_file(HLOCK);
+                error("Cannot open %s", fq_lock);
+            }
 
-			if(veryold(fd) /* closes fd if true */
-							&& eraseoldlocks())
-				goto gotlock;
-			(void) close(fd);
-		} while(i < locknum);
+            if (veryold(fd) /* closes fd if true */
+                && eraseoldlocks())
+                goto gotlock;
+            (void) close(fd);
+        } while (i < locknum);
 
-		unlock_file(HLOCK);
-		error("Too many hacks running now.");
-	} else {
-		fq_lock = fqname(lock, LEVELPREFIX, 0);
-		if((fd = open(fq_lock, 0)) == -1) {
-			if(errno == ENOENT) goto gotlock;    /* no such file */
-			perror(fq_lock);
-			unlock_file(HLOCK);
-			error("Cannot open %s", fq_lock);
-		}
+        unlock_file(HLOCK);
+        error("Too many hacks running now.");
+    } else {
+        fq_lock = fqname(lock, LEVELPREFIX, 0);
+        if ((fd = open(fq_lock, 0)) == -1) {
+            if (errno == ENOENT)
+                goto gotlock; /* no such file */
+            perror(fq_lock);
+            unlock_file(HLOCK);
+            error("Cannot open %s", fq_lock);
+        }
 
-		if(veryold(fd) /* closes fd if true */ && eraseoldlocks())
-			goto gotlock;
-		(void) close(fd);
+        if (veryold(fd) /* closes fd if true */ && eraseoldlocks())
+            goto gotlock;
+        (void) close(fd);
 
-		if(iflags.window_inited) {
-		    c = yn("There is already a game in progress under your name.  Destroy old game?");
-		} else {
-		    (void) printf("\nThere is already a game in progress under your name.");
-		    (void) printf("  Destroy old game? [yn] ");
-		    (void) fflush(stdout);
-		    if ((c = getchar()) != EOF) {
-			int tmp;
+        if (iflags.window_inited) {
+            c = yn("There is already a game in progress under your name.  "
+                   "Destroy old game?");
+        } else {
+            (void) printf(
+                "\nThere is already a game in progress under your name.");
+            (void) printf("  Destroy old game? [yn] ");
+            (void) fflush(stdout);
+            if ((c = getchar()) != EOF) {
+                int tmp;
 
-			(void) putchar(c);
-			(void) fflush(stdout);
-			while ((tmp = getchar()) != '\n' && tmp != EOF)
-			    ; /* eat rest of line and newline */
-		    }
-		}
-		if(c == 'y' || c == 'Y') {
-			if(eraseoldlocks())
-				goto gotlock;
-			else {
-				unlock_file(HLOCK);
-				error("Couldn't destroy old game.");
-			}
-		} else {
-			unlock_file(HLOCK);
-			error("%s", "");
-		}
-	}
+                (void) putchar(c);
+                (void) fflush(stdout);
+                while ((tmp = getchar()) != '\n' && tmp != EOF)
+                    ; /* eat rest of line and newline */
+            }
+        }
+        if (c == 'y' || c == 'Y') {
+            if (eraseoldlocks())
+                goto gotlock;
+            else {
+                unlock_file(HLOCK);
+                error("Couldn't destroy old game.");
+            }
+        } else {
+            unlock_file(HLOCK);
+            error("%s", "");
+        }
+    }
 
 gotlock:
-	fd = creat(fq_lock, FCMASK);
-	unlock_file(HLOCK);
-	if(fd == -1) {
-		error("cannot creat lock file (%s).", fq_lock);
-	} else {
-		if(write(fd, (genericptr_t) &hackpid, sizeof(hackpid))
-		    != sizeof(hackpid)){
-			error("cannot write lock (%s)", fq_lock);
-		}
-		if(close(fd) == -1) {
-			error("cannot close lock (%s)", fq_lock);
-		}
-	}
+    fd = creat(fq_lock, FCMASK);
+    unlock_file(HLOCK);
+    if (fd == -1) {
+        error("cannot creat lock file (%s).", fq_lock);
+    } else {
+        if (write(fd, (genericptr_t) &hackpid, sizeof(hackpid))
+            != sizeof(hackpid)) {
+            error("cannot write lock (%s)", fq_lock);
+        }
+        if (close(fd) == -1) {
+            error("cannot close lock (%s)", fq_lock);
+        }
+    }
 }
 
-void
-regularize(s)	/* normalize file name - we don't like .'s, /'s, spaces */
+void regularize(s) /* normalize file name - we don't like .'s, /'s, spaces */
 register char *s;
 {
-	register char *lp;
+    register char *lp;
 
-	while((lp=index(s, '.')) || (lp=index(s, '/')) || (lp=index(s,' ')))
-		*lp = '_';
-#if defined(SYSV) && !defined(AIX_31) && !defined(SVR4) && !defined(LINUX) && !defined(__APPLE__)
-	/* avoid problems with 14 character file name limit */
-# ifdef COMPRESS
-	/* leave room for .e from error and .Z from compress appended to
-	 * save files */
-	{
-#  ifdef COMPRESS_EXTENSION
-	    int i = 12 - strlen(COMPRESS_EXTENSION);
-#  else
-	    int i = 10;		/* should never happen... */
-#  endif
-	    if(strlen(s) > i)
-		s[i] = '\0';
-	}
-# else
-	if(strlen(s) > 11)
-		/* leave room for .nn appended to level files */
-		s[11] = '\0';
-# endif
+    while ((lp = index(s, '.')) || (lp = index(s, '/'))
+           || (lp = index(s, ' ')))
+        *lp = '_';
+#if defined(SYSV) && !defined(AIX_31) && !defined(SVR4) && !defined(LINUX) \
+    && !defined(__APPLE__)
+/* avoid problems with 14 character file name limit */
+#ifdef COMPRESS
+    /* leave room for .e from error and .Z from compress appended to
+     * save files */
+    {
+#ifdef COMPRESS_EXTENSION
+        int i = 12 - strlen(COMPRESS_EXTENSION);
+#else
+        int i = 10; /* should never happen... */
+#endif
+        if (strlen(s) > i)
+            s[i] = '\0';
+    }
+#else
+    if (strlen(s) > 11)
+        /* leave room for .nn appended to level files */
+        s[11] = '\0';
+#endif
 #endif
 }
 
@@ -236,13 +244,14 @@ register char *s;
 
 void
 msleep(msec)
-unsigned msec;				/* milliseconds */
+unsigned msec; /* milliseconds */
 {
-	struct pollfd unused;
-	int msecs = msec;		/* poll API is signed */
+    struct pollfd unused;
+    int msecs = msec; /* poll API is signed */
 
-	if (msecs < 0) msecs = 0;	/* avoid infinite sleep */
-	(void) poll(&unused, (unsigned long)0, msecs);
+    if (msecs < 0)
+        msecs = 0; /* avoid infinite sleep */
+    (void) poll(&unused, (unsigned long) 0, msecs);
 }
 #endif /* TIMED_DELAY for SYSV */
 
@@ -250,25 +259,23 @@ unsigned msec;				/* milliseconds */
 int
 dosh()
 {
-	register char *str;
-# ifdef SYSCF
-	if(   !sysopt.shellers
-	   || !sysopt.shellers[0]
-	   || !check_user_string(sysopt.shellers)
-	){
-		Norep("Unknown command '!'.");
-		return 0;
-	}
-# endif
-	if(child(0)) {
-		if((str = getenv("SHELL")) != (char*)0)
-			(void) execl(str, str, (char *)0);
-		else
-			(void) execl("/bin/sh", "sh", (char *)0);
-		raw_print("sh: cannot execute.");
-		exit(EXIT_FAILURE);
-	}
-	return 0;
+    register char *str;
+#ifdef SYSCF
+    if (!sysopt.shellers || !sysopt.shellers[0]
+        || !check_user_string(sysopt.shellers)) {
+        Norep("Unknown command '!'.");
+        return 0;
+    }
+#endif
+    if (child(0)) {
+        if ((str = getenv("SHELL")) != (char *) 0)
+            (void) execl(str, str, (char *) 0);
+        else
+            (void) execl("/bin/sh", "sh", (char *) 0);
+        raw_print("sh: cannot execute.");
+        exit(EXIT_FAILURE);
+    }
+    return 0;
 }
 #endif /* SHELL */
 
@@ -277,48 +284,49 @@ int
 child(wt)
 int wt;
 {
-	register int f;
-	suspend_nhwindows((char *)0);	/* also calls end_screen() */
+    register int f;
+    suspend_nhwindows((char *) 0); /* also calls end_screen() */
 #ifdef _M_UNIX
-	sco_mapon();
+    sco_mapon();
 #endif
 #ifdef __linux__
-	linux_mapon();
+    linux_mapon();
 #endif
-	if((f = fork()) == 0){		/* child */
-		(void) setgid(getgid());
-		(void) setuid(getuid());
+    if ((f = fork()) == 0) { /* child */
+        (void) setgid(getgid());
+        (void) setuid(getuid());
 #ifdef CHDIR
-		(void) chdir(getenv("HOME"));
+        (void) chdir(getenv("HOME"));
 #endif
-		return(1);
-	}
-	if(f == -1) {	/* cannot fork */
-		pline("Fork failed.  Try again.");
-		return(0);
-	}
-	/* fork succeeded; wait for child to exit */
+        return (1);
+    }
+    if (f == -1) { /* cannot fork */
+        pline("Fork failed.  Try again.");
+        return (0);
+    }
+/* fork succeeded; wait for child to exit */
 #ifndef NO_SIGNAL
-	(void) signal(SIGINT,SIG_IGN);
-	(void) signal(SIGQUIT,SIG_IGN);
+    (void) signal(SIGINT, SIG_IGN);
+    (void) signal(SIGQUIT, SIG_IGN);
 #endif
-	(void) wait( (int *) 0);
+    (void) wait((int *) 0);
 #ifdef _M_UNIX
-	sco_mapoff();
+    sco_mapoff();
 #endif
 #ifdef __linux__
-	linux_mapoff();
+    linux_mapoff();
 #endif
 #ifndef NO_SIGNAL
-	(void) signal(SIGINT, (SIG_RET_TYPE) done1);
-	if(wizard) (void) signal(SIGQUIT,SIG_DFL);
+    (void) signal(SIGINT, (SIG_RET_TYPE) done1);
+    if (wizard)
+        (void) signal(SIGQUIT, SIG_DFL);
 #endif
-	if(wt) {
-		raw_print("");
-		wait_synch();
-	}
-	resume_nhwindows();
-	return(0);
+    if (wt) {
+        raw_print("");
+        wait_synch();
+    }
+    resume_nhwindows();
+    return (0);
 }
 #endif
 
@@ -331,57 +339,52 @@ extern int FDECL(nh_getresgid, (gid_t *, gid_t *, gid_t *));
 extern gid_t NDECL(nh_getgid);
 extern gid_t NDECL(nh_getegid);
 
-int
-(getresuid)(ruid, euid, suid)
+int(getresuid)(ruid, euid, suid)
 uid_t *ruid, *euid, *suid;
 {
     return nh_getresuid(ruid, euid, suid);
 }
 
-uid_t
-(getuid)()
+uid_t(getuid)()
 {
     return nh_getuid();
 }
 
-uid_t
-(geteuid)()
+uid_t(geteuid)()
 {
     return nh_geteuid();
 }
 
-int
-(getresgid)(rgid, egid, sgid)
+int(getresgid)(rgid, egid, sgid)
 gid_t *rgid, *egid, *sgid;
 {
     return nh_getresgid(rgid, egid, sgid);
 }
 
-gid_t
-(getgid)()
+gid_t(getgid)()
 {
     return nh_getgid();
 }
 
-gid_t
-(getegid)()
+gid_t(getegid)()
 {
     return nh_getegid();
 }
 
-#endif	/* GETRES_SUPPORT */
+#endif /* GETRES_SUPPORT */
 
 /* XXX should be ifdef PANICTRACE_GDB, but there's no such symbol yet */
 #ifdef PANICTRACE
 boolean
-file_exists(const char *path){
-	/* Just see if it's there - trying to figure out if we can actually
-	 * execute it in all cases is too hard - we really just want to
-	 * catch typos in SYSCF. */
-	struct stat sb;
-	if(stat(path, &sb)){
-		return FALSE;
-	}
-	return TRUE;
+file_exists(const char *path)
+{
+    /* Just see if it's there - trying to figure out if we can actually
+     * execute it in all cases is too hard - we really just want to
+     * catch typos in SYSCF. */
+    struct stat sb;
+    if (stat(path, &sb)) {
+        return FALSE;
+    }
+    return TRUE;
 }
 #endif

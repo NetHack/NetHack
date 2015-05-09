@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1429916796 2015/04/24 23:06:36 $  $NHDT-Branch: master $:$NHDT-Revision: 1.66 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1431192756 2015/05/09 17:32:36 $  $NHDT-Branch: master $:$NHDT-Revision: 1.71 $ */
 /* NetHack 3.6	pager.c	$Date: 2012/01/15 09:27:06 $  $Revision: 1.41 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -11,9 +11,9 @@
 
 STATIC_DCL boolean FDECL(is_swallow_sym, (int));
 STATIC_DCL int FDECL(append_str, (char *, const char *));
-STATIC_DCL struct permonst * FDECL(lookat, (int, int, char *, char *));
+STATIC_DCL struct permonst *FDECL(lookat, (int, int, char *, char *));
 STATIC_DCL void FDECL(checkfile,
-		      (char *,struct permonst *,BOOLEAN_P,BOOLEAN_P));
+                      (char *, struct permonst *, BOOLEAN_P, BOOLEAN_P));
 STATIC_DCL boolean FDECL(help_menu, (int *));
 #ifdef PORT_HELP
 extern void NDECL(port_help);
@@ -26,7 +26,8 @@ int c;
 {
     int i;
     for (i = S_sw_tl; i <= S_sw_br; i++)
-	if ((int)showsyms[i] == c) return TRUE;
+        if ((int) showsyms[i] == c)
+            return TRUE;
     return FALSE;
 }
 
@@ -37,12 +38,13 @@ int c;
  */
 STATIC_OVL int
 append_str(buf, new_str)
-    char *buf;
-    const char *new_str;
+char *buf;
+const char *new_str;
 {
-    int space_left;	/* space remaining in buf */
+    int space_left; /* space remaining in buf */
 
-    if (strstri(buf, new_str)) return 0;
+    if (strstri(buf, new_str))
+        return 0;
 
     space_left = BUFSZ - strlen(buf) - 1;
     (void) strncat(buf, " or ", space_left);
@@ -55,19 +57,19 @@ char *
 self_lookat(outbuf)
 char *outbuf;
 {
-	char race[QBUFSZ];
+    char race[QBUFSZ];
 
-	/* include race with role unless polymorphed */
-	race[0] = '\0';
-	if (!Upolyd)
-	    Sprintf(race, "%s ", urace.adj);
-	Sprintf(outbuf, "%s%s%s called %s",
-		/* being blinded may hide invisibility from self */
-		(Invis && (senseself() || !Blind)) ? "invisible " : "",
-		race, mons[u.umonnum].mname, plname);
-	if (u.usteed)
-	    Sprintf(eos(outbuf), ", mounted on %s", y_monnam(u.usteed));
-	return outbuf;
+    /* include race with role unless polymorphed */
+    race[0] = '\0';
+    if (!Upolyd)
+        Sprintf(race, "%s ", urace.adj);
+    Sprintf(outbuf, "%s%s%s called %s",
+            /* being blinded may hide invisibility from self */
+            (Invis && (senseself() || !Blind)) ? "invisible " : "", race,
+            mons[u.umonnum].mname, plname);
+    if (u.usteed)
+        Sprintf(eos(outbuf), ", mounted on %s", y_monnam(u.usteed));
+    return outbuf;
 }
 
 /*
@@ -76,206 +78,227 @@ char *outbuf;
  */
 STATIC_OVL struct permonst *
 lookat(x, y, buf, monbuf)
-    int x, y;
-    char *buf, *monbuf;
+int x, y;
+char *buf, *monbuf;
 {
     register struct monst *mtmp = (struct monst *) 0;
     struct permonst *pm = (struct permonst *) 0;
     int glyph;
 
     buf[0] = monbuf[0] = 0;
-    glyph = glyph_at(x,y);
+    glyph = glyph_at(x, y);
     if (u.ux == x && u.uy == y && canspotself()) {
-	/* fill in buf[] */
-	(void)self_lookat(buf);
+        /* fill in buf[] */
+        (void) self_lookat(buf);
 
-	/* file lookup can't distinguish between "gnomish wizard" monster
-	   and correspondingly named player character, always picking the
-	   former; force it to find the general "wizard" entry instead */
-	if (Role_if(PM_WIZARD) && Race_if(PM_GNOME) && !Upolyd)
-	    pm = &mons[PM_WIZARD];
+        /* file lookup can't distinguish between "gnomish wizard" monster
+           and correspondingly named player character, always picking the
+           former; force it to find the general "wizard" entry instead */
+        if (Role_if(PM_WIZARD) && Race_if(PM_GNOME) && !Upolyd)
+            pm = &mons[PM_WIZARD];
 
-	/* When you see yourself normally, no explanation is appended
-	   (even if you could also see yourself via other means).
-	   Sensing self while blind or swallowed is treated as if it
-	   were by normal vision (cf canseeself()). */
-	if ((Invisible || u.uundetected) && !Blind && !u.uswallow) {
-	    unsigned how = 0;
+        /* When you see yourself normally, no explanation is appended
+           (even if you could also see yourself via other means).
+           Sensing self while blind or swallowed is treated as if it
+           were by normal vision (cf canseeself()). */
+        if ((Invisible || u.uundetected) && !Blind && !u.uswallow) {
+            unsigned how = 0;
 
-	    if (Infravision)	 how |= 1;
-	    if (Unblind_telepat) how |= 2;
-	    if (Detect_monsters) how |= 4;
+            if (Infravision)
+                how |= 1;
+            if (Unblind_telepat)
+                how |= 2;
+            if (Detect_monsters)
+                how |= 4;
 
-	    if (how)
-		Sprintf(eos(buf), " [seen: %s%s%s%s%s]",
-			(how & 1) ? "infravision" : "",
-			/* add comma if telep and infrav */
-			((how & 3) > 2) ? ", " : "",
-			(how & 2) ? "telepathy" : "",
-			/* add comma if detect and (infrav or telep or both) */
-			((how & 7) > 4) ? ", " : "",
-			(how & 4) ? "monster detection" : "");
-	}
+            if (how)
+                Sprintf(
+                    eos(buf), " [seen: %s%s%s%s%s]",
+                    (how & 1) ? "infravision" : "",
+                    /* add comma if telep and infrav */
+                    ((how & 3) > 2) ? ", " : "", (how & 2) ? "telepathy" : "",
+                    /* add comma if detect and (infrav or telep or both) */
+                    ((how & 7) > 4) ? ", " : "",
+                    (how & 4) ? "monster detection" : "");
+        }
     } else if (u.uswallow) {
-	/* all locations when swallowed other than the hero are the monster */
-	Sprintf(buf, "interior of %s",
-				    Blind ? "a monster" : a_monnam(u.ustuck));
-	pm = u.ustuck->data;
+        /* all locations when swallowed other than the hero are the monster */
+        Sprintf(buf, "interior of %s",
+                Blind ? "a monster" : a_monnam(u.ustuck));
+        pm = u.ustuck->data;
     } else if (glyph_is_monster(glyph)) {
-	bhitpos.x = x;
-	bhitpos.y = y;
-	mtmp = m_at(x,y);
-	if (mtmp) {
-	    char *name, monnambuf[BUFSZ];
-	    unsigned how_seen;
-	    boolean accurate = !Hallucination;
+        bhitpos.x = x;
+        bhitpos.y = y;
+        mtmp = m_at(x, y);
+        if (mtmp) {
+            char *name, monnambuf[BUFSZ];
+            unsigned how_seen;
+            boolean accurate = !Hallucination;
 
-	    if (mtmp->data == &mons[PM_COYOTE] && accurate)
-		name = coyotename(mtmp, monnambuf);
-	    else
-		name = distant_monnam(mtmp, ARTICLE_NONE, monnambuf);
+            if (mtmp->data == &mons[PM_COYOTE] && accurate)
+                name = coyotename(mtmp, monnambuf);
+            else
+                name = distant_monnam(mtmp, ARTICLE_NONE, monnambuf);
 
-	    pm = mtmp->data;
-	    Sprintf(buf, "%s%s%s",
-		    (mtmp->mx != x || mtmp->my != y) ?
-			((mtmp->isshk && accurate)
-				? "tail of " : "tail of a ") : "",
-		    (mtmp->mtame && accurate) ? "tame " :
-		    (mtmp->mpeaceful && accurate) ? "peaceful " : "",
-		    name);
-	    if (u.ustuck == mtmp)
-		Strcat(buf, (Upolyd && sticks(youmonst.data)) ?
-			", being held" : ", holding you");
-	    if (mtmp->mleashed)
-		Strcat(buf, ", leashed to you");
+            pm = mtmp->data;
+            Sprintf(
+                buf, "%s%s%s",
+                (mtmp->mx != x || mtmp->my != y)
+                    ? ((mtmp->isshk && accurate) ? "tail of " : "tail of a ")
+                    : "",
+                (mtmp->mtame && accurate)
+                    ? "tame "
+                    : (mtmp->mpeaceful && accurate) ? "peaceful " : "",
+                name);
+            if (u.ustuck == mtmp)
+                Strcat(buf, (Upolyd && sticks(youmonst.data))
+                                ? ", being held"
+                                : ", holding you");
+            if (mtmp->mleashed)
+                Strcat(buf, ", leashed to you");
 
-	    if (mtmp->mtrapped && cansee(mtmp->mx, mtmp->my)) {
-		struct trap *t = t_at(mtmp->mx, mtmp->my);
-		int tt = t ? t->ttyp : NO_TRAP;
+            if (mtmp->mtrapped && cansee(mtmp->mx, mtmp->my)) {
+                struct trap *t = t_at(mtmp->mx, mtmp->my);
+                int tt = t ? t->ttyp : NO_TRAP;
 
-		/* newsym lets you know of the trap, so mention it here */
-		if (tt == BEAR_TRAP || tt == PIT ||
-			tt == SPIKED_PIT || tt == WEB)
-		    Sprintf(eos(buf), ", trapped in %s",
-			    an(defsyms[trap_to_defsym(tt)].explanation));
-	    }
+                /* newsym lets you know of the trap, so mention it here */
+                if (tt == BEAR_TRAP || tt == PIT || tt == SPIKED_PIT
+                    || tt == WEB)
+                    Sprintf(eos(buf), ", trapped in %s",
+                            an(defsyms[trap_to_defsym(tt)].explanation));
+            }
 
-	    how_seen = howmonseen(mtmp);
-	    if (how_seen && how_seen != MONSEEN_NORMAL) {
-		if (how_seen & MONSEEN_NORMAL) {
-		    Strcat(monbuf, "normal vision");
-		    how_seen &= ~MONSEEN_NORMAL;
-		    /* how_seen can't be 0 yet... */
-		    if (how_seen) Strcat(monbuf, ", ");
-		}
-		if (how_seen & MONSEEN_SEEINVIS) {
-		    Strcat(monbuf, "see invisible");
-		    how_seen &= ~MONSEEN_SEEINVIS;
-		    if (how_seen) Strcat(monbuf, ", ");
-		}
-		if (how_seen & MONSEEN_INFRAVIS) {
-		    Strcat(monbuf, "infravision");
-		    how_seen &= ~MONSEEN_INFRAVIS;
-		    if (how_seen) Strcat(monbuf, ", ");
-		}
-		if (how_seen & MONSEEN_TELEPAT) {
-		    Strcat(monbuf, "telepathy");
-		    how_seen &= ~MONSEEN_TELEPAT;
-		    if (how_seen) Strcat(monbuf, ", ");
-		}
-		if (how_seen & MONSEEN_XRAYVIS) {
-		    /* Eyes of the Overworld */
-		    Strcat(monbuf, "astral vision");
-		    how_seen &= ~MONSEEN_XRAYVIS;
-		    if (how_seen) Strcat(monbuf, ", ");
-		}
-		if (how_seen & MONSEEN_DETECT) {
-		    Strcat(monbuf, "monster detection");
-		    how_seen &= ~MONSEEN_DETECT;
-		    if (how_seen) Strcat(monbuf, ", ");
-		}
-		if (how_seen & MONSEEN_WARNMON) {
-		    if (Hallucination)
-			Strcat(monbuf, "paranoid delusion");
-		    else
-			Sprintf(eos(monbuf), "warned of %s",
-				makeplural(mtmp->data->mname));
-		    how_seen &= ~MONSEEN_WARNMON;
-		    if (how_seen) Strcat(monbuf, ", ");
-		}
-		/* should have used up all the how_seen bits by now */
-		if (how_seen) {
-		    impossible("lookat: unknown method of seeing monster");
-		    Sprintf(eos(monbuf), "(%u)", how_seen);
-		}
-	    } /* seen by something other than normal vision */
-	} /* mtmp */
+            how_seen = howmonseen(mtmp);
+            if (how_seen && how_seen != MONSEEN_NORMAL) {
+                if (how_seen & MONSEEN_NORMAL) {
+                    Strcat(monbuf, "normal vision");
+                    how_seen &= ~MONSEEN_NORMAL;
+                    /* how_seen can't be 0 yet... */
+                    if (how_seen)
+                        Strcat(monbuf, ", ");
+                }
+                if (how_seen & MONSEEN_SEEINVIS) {
+                    Strcat(monbuf, "see invisible");
+                    how_seen &= ~MONSEEN_SEEINVIS;
+                    if (how_seen)
+                        Strcat(monbuf, ", ");
+                }
+                if (how_seen & MONSEEN_INFRAVIS) {
+                    Strcat(monbuf, "infravision");
+                    how_seen &= ~MONSEEN_INFRAVIS;
+                    if (how_seen)
+                        Strcat(monbuf, ", ");
+                }
+                if (how_seen & MONSEEN_TELEPAT) {
+                    Strcat(monbuf, "telepathy");
+                    how_seen &= ~MONSEEN_TELEPAT;
+                    if (how_seen)
+                        Strcat(monbuf, ", ");
+                }
+                if (how_seen & MONSEEN_XRAYVIS) {
+                    /* Eyes of the Overworld */
+                    Strcat(monbuf, "astral vision");
+                    how_seen &= ~MONSEEN_XRAYVIS;
+                    if (how_seen)
+                        Strcat(monbuf, ", ");
+                }
+                if (how_seen & MONSEEN_DETECT) {
+                    Strcat(monbuf, "monster detection");
+                    how_seen &= ~MONSEEN_DETECT;
+                    if (how_seen)
+                        Strcat(monbuf, ", ");
+                }
+                if (how_seen & MONSEEN_WARNMON) {
+                    if (Hallucination)
+                        Strcat(monbuf, "paranoid delusion");
+                    else
+                        Sprintf(eos(monbuf), "warned of %s",
+                                makeplural(mtmp->data->mname));
+                    how_seen &= ~MONSEEN_WARNMON;
+                    if (how_seen)
+                        Strcat(monbuf, ", ");
+                }
+                /* should have used up all the how_seen bits by now */
+                if (how_seen) {
+                    impossible("lookat: unknown method of seeing monster");
+                    Sprintf(eos(monbuf), "(%u)", how_seen);
+                }
+            } /* seen by something other than normal vision */
+        }     /* mtmp */
 
     } else if (glyph_is_object(glyph)) {
-	int glyphotyp = glyph_to_obj(glyph);
-	struct obj *otmp = vobj_at(x,y);
+        int glyphotyp = glyph_to_obj(glyph);
+        struct obj *otmp = vobj_at(x, y);
 
-	/* there might be a mimic here posing as an object */
-	mtmp = m_at(x, y);
-	if (mtmp && mtmp->m_ap_type == M_AP_OBJECT &&
-	    mtmp->mappearance == (unsigned)glyphotyp) otmp = 0;
-	else mtmp = 0;
+        /* there might be a mimic here posing as an object */
+        mtmp = m_at(x, y);
+        if (mtmp && mtmp->m_ap_type == M_AP_OBJECT
+            && mtmp->mappearance == (unsigned) glyphotyp)
+            otmp = 0;
+        else
+            mtmp = 0;
 
-	if (!otmp || otmp->otyp != glyphotyp) {
-	    if (glyphotyp != STRANGE_OBJECT) {
-		otmp = mksobj(glyphotyp, FALSE, FALSE);
-		if (otmp->oclass == COIN_CLASS)
-		    otmp->quan = 2L; /* to force pluralization */
-		else if (otmp->otyp == SLIME_MOLD)
-		    otmp->spe = context.current_fruit;	/* give it a type */
-		if (mtmp && has_mcorpsenm(mtmp)) /* mimic as corpse/statue */
-		    otmp->corpsenm = MCORPSENM(mtmp);
-		Strcpy(buf, distant_name(otmp, xname));
-		dealloc_obj(otmp);
-	    }
-	} else
-	    Strcpy(buf, distant_name(otmp, xname));
+        if (!otmp || otmp->otyp != glyphotyp) {
+            if (glyphotyp != STRANGE_OBJECT) {
+                otmp = mksobj(glyphotyp, FALSE, FALSE);
+                if (otmp->oclass == COIN_CLASS)
+                    otmp->quan = 2L; /* to force pluralization */
+                else if (otmp->otyp == SLIME_MOLD)
+                    otmp->spe = context.current_fruit; /* give it a type */
+                if (mtmp && has_mcorpsenm(mtmp)) /* mimic as corpse/statue */
+                    otmp->corpsenm = MCORPSENM(mtmp);
+                Strcpy(buf, distant_name(otmp, xname));
+                dealloc_obj(otmp);
+            }
+        } else
+            Strcpy(buf, distant_name(otmp, xname));
 
-	if (levl[x][y].typ == STONE || levl[x][y].typ == SCORR)
-	    Strcat(buf, " embedded in stone");
-	else if (IS_WALL(levl[x][y].typ) || levl[x][y].typ == SDOOR)
-	    Strcat(buf, " embedded in a wall");
-	else if (closed_door(x,y))
-	    Strcat(buf, " embedded in a door");
-	else if (is_pool(x,y))
-	    Strcat(buf, " in water");
-	else if (is_lava(x,y))
-	    Strcat(buf, " in molten lava");	/* [can this ever happen?] */
+        if (levl[x][y].typ == STONE || levl[x][y].typ == SCORR)
+            Strcat(buf, " embedded in stone");
+        else if (IS_WALL(levl[x][y].typ) || levl[x][y].typ == SDOOR)
+            Strcat(buf, " embedded in a wall");
+        else if (closed_door(x, y))
+            Strcat(buf, " embedded in a door");
+        else if (is_pool(x, y))
+            Strcat(buf, " in water");
+        else if (is_lava(x, y))
+            Strcat(buf, " in molten lava"); /* [can this ever happen?] */
     } else if (glyph_is_trap(glyph)) {
-	int tnum = what_trap(glyph_to_trap(glyph));
-	Strcpy(buf, defsyms[trap_to_defsym(tnum)].explanation);
-    } else if(!glyph_is_cmap(glyph)) {
-	Strcpy(buf,"unexplored area");
-    } else switch(glyph_to_cmap(glyph)) {
-    case S_altar:
-	Sprintf(buf, "%s %saltar",
-		/* like endgame high priests, endgame high altars
-		   are only recognizable when immediately adjacent */
-		(Is_astralevel(&u.uz) && distu(x, y) > 2) ? "aligned" :
-		align_str(Amask2align(levl[x][y].altarmask & ~AM_SHRINE)),
-		((levl[x][y].altarmask & AM_SHRINE) &&
-		 (Is_astralevel(&u.uz) || Is_sanctum(&u.uz))) ? "high " : "");
-	break;
-    case S_ndoor:
-	if (is_drawbridge_wall(x, y) >= 0)
-	    Strcpy(buf,"open drawbridge portcullis");
-	else if ((levl[x][y].doormask & ~D_TRAPPED) == D_BROKEN)
-	    Strcpy(buf,"broken door");
-	else
-	    Strcpy(buf,"doorway");
-	break;
-    case S_cloud:
-	Strcpy(buf, Is_airlevel(&u.uz) ? "cloudy area" : "fog/vapor cloud");
-	break;
-    default:
-	Strcpy(buf,defsyms[glyph_to_cmap(glyph)].explanation);
-	break;
-    }
+        int tnum = what_trap(glyph_to_trap(glyph));
+        Strcpy(buf, defsyms[trap_to_defsym(tnum)].explanation);
+    } else if (!glyph_is_cmap(glyph)) {
+        Strcpy(buf, "unexplored area");
+    } else
+        switch (glyph_to_cmap(glyph)) {
+        case S_altar:
+            Sprintf(buf, "%s %saltar",
+                    /* like endgame high priests, endgame high altars
+                       are only recognizable when immediately adjacent */
+                    (Is_astralevel(&u.uz) && distu(x, y) > 2)
+                        ? "aligned"
+                        : align_str(
+                              Amask2align(levl[x][y].altarmask & ~AM_SHRINE)),
+                    ((levl[x][y].altarmask & AM_SHRINE)
+                     && (Is_astralevel(&u.uz) || Is_sanctum(&u.uz)))
+                        ? "high "
+                        : "");
+            break;
+        case S_ndoor:
+            if (is_drawbridge_wall(x, y) >= 0)
+                Strcpy(buf, "open drawbridge portcullis");
+            else if ((levl[x][y].doormask & ~D_TRAPPED) == D_BROKEN)
+                Strcpy(buf, "broken door");
+            else
+                Strcpy(buf, "doorway");
+            break;
+        case S_cloud:
+            Strcpy(buf,
+                   Is_airlevel(&u.uz) ? "cloudy area" : "fog/vapor cloud");
+            break;
+        default:
+            Strcpy(buf, defsyms[glyph_to_cmap(glyph)].explanation);
+            break;
+        }
 
     return ((pm && !Hallucination) ? pm : (struct permonst *) 0);
 }
@@ -292,9 +315,9 @@ lookat(x, y, buf, monbuf)
  */
 STATIC_OVL void
 checkfile(inp, pm, user_typed_name, without_asking)
-    char *inp;
-    struct permonst *pm;
-    boolean user_typed_name, without_asking;
+char *inp;
+struct permonst *pm;
+boolean user_typed_name, without_asking;
 {
     dlb *fp;
     char buf[BUFSZ], newstr[BUFSZ];
@@ -306,16 +329,16 @@ checkfile(inp, pm, user_typed_name, without_asking)
 
     fp = dlb_fopen(DATAFILE, "r");
     if (!fp) {
-	pline("Cannot open data file!");
-	return;
+        pline("Cannot open data file!");
+        return;
     }
 
     /*
      * If someone passed us garbage, prevent fault.
      */
     if (!inp || (inp && strlen(inp) > (BUFSZ - 1))) {
-	pline("bad do_look buffer passed!");
-	return;
+        pline("bad do_look buffer passed!");
+        return;
     }
 
     /* To prevent the need for entries in data.base like *ngel to account
@@ -323,124 +346,136 @@ checkfile(inp, pm, user_typed_name, without_asking)
      * user_typed_name and picked name.
      */
     if (pm != (struct permonst *) 0 && !user_typed_name)
-	dbase_str = strcpy(newstr, pm->mname);
-    else dbase_str = strcpy(newstr, inp);
+        dbase_str = strcpy(newstr, pm->mname);
+    else
+        dbase_str = strcpy(newstr, inp);
     (void) lcase(dbase_str);
 
     if (!strncmp(dbase_str, "interior of ", 12))
-	dbase_str += 12;
+        dbase_str += 12;
     if (!strncmp(dbase_str, "a ", 2))
-	dbase_str += 2;
+        dbase_str += 2;
     else if (!strncmp(dbase_str, "an ", 3))
-	dbase_str += 3;
+        dbase_str += 3;
     else if (!strncmp(dbase_str, "the ", 4))
-	dbase_str += 4;
+        dbase_str += 4;
     if (!strncmp(dbase_str, "tame ", 5))
-	dbase_str += 5;
+        dbase_str += 5;
     else if (!strncmp(dbase_str, "peaceful ", 9))
-	dbase_str += 9;
+        dbase_str += 9;
     if (!strncmp(dbase_str, "invisible ", 10))
-	dbase_str += 10;
+        dbase_str += 10;
     if (!strncmp(dbase_str, "saddled ", 8))
-	dbase_str += 8;
+        dbase_str += 8;
     if (!strncmp(dbase_str, "statue of ", 10))
-	dbase_str[6] = '\0';
+        dbase_str[6] = '\0';
     else if (!strncmp(dbase_str, "figurine of ", 12))
-	dbase_str[8] = '\0';
+        dbase_str[8] = '\0';
 
     /* Make sure the name is non-empty. */
     if (*dbase_str) {
-	/* adjust the input to remove "named " and convert to lower case */
-	char *alt = 0;	/* alternate description */
+        /* adjust the input to remove "named " and convert to lower case */
+        char *alt = 0; /* alternate description */
 
-	if ((ep = strstri(dbase_str, " named ")) != 0)
-	    alt = ep + 7;
-	else
-	    ep = strstri(dbase_str, " called ");
-	if (!ep) ep = strstri(dbase_str, ", ");
-	if (ep && ep > dbase_str) *ep = '\0';
+        if ((ep = strstri(dbase_str, " named ")) != 0)
+            alt = ep + 7;
+        else
+            ep = strstri(dbase_str, " called ");
+        if (!ep)
+            ep = strstri(dbase_str, ", ");
+        if (ep && ep > dbase_str)
+            *ep = '\0';
 
-	/*
-	 * If the object is named, then the name is the alternate description;
-	 * otherwise, the result of makesingular() applied to the name is. This
-	 * isn't strictly optimal, but named objects of interest to the user
-	 * will usually be found under their name, rather than under their
-	 * object type, so looking for a singular form is pointless.
-	 */
-	if (!alt)
-	    alt = makesingular(dbase_str);
+        /*
+         * If the object is named, then the name is the alternate description;
+         * otherwise, the result of makesingular() applied to the name is.
+         * This
+         * isn't strictly optimal, but named objects of interest to the user
+         * will usually be found under their name, rather than under their
+         * object type, so looking for a singular form is pointless.
+         */
+        if (!alt)
+            alt = makesingular(dbase_str);
 
-	/* skip first record; read second */
-	txt_offset = 0L;
-	if (!dlb_fgets(buf, BUFSZ, fp) || !dlb_fgets(buf, BUFSZ, fp)) {
-	    impossible("can't read 'data' file");
-	    (void) dlb_fclose(fp);
-	    return;
-	} else if (sscanf(buf, "%8lx\n", &txt_offset) < 1 || txt_offset == 0L)
-	    goto bad_data_file;
+        /* skip first record; read second */
+        txt_offset = 0L;
+        if (!dlb_fgets(buf, BUFSZ, fp) || !dlb_fgets(buf, BUFSZ, fp)) {
+            impossible("can't read 'data' file");
+            (void) dlb_fclose(fp);
+            return;
+        } else if (sscanf(buf, "%8lx\n", &txt_offset) < 1 || txt_offset == 0L)
+            goto bad_data_file;
 
-	/* look for the appropriate entry */
-	while (dlb_fgets(buf,BUFSZ,fp)) {
-	    if (*buf == '.') break;  /* we passed last entry without success */
+        /* look for the appropriate entry */
+        while (dlb_fgets(buf, BUFSZ, fp)) {
+            if (*buf == '.')
+                break; /* we passed last entry without success */
 
-	    if (digit(*buf)) {
-		/* a number indicates the end of current entry */
-		skipping_entry = FALSE;
-	    } else if (!skipping_entry) {
-		if (!(ep = index(buf, '\n'))) goto bad_data_file;
-		*ep = 0;
-		/* if we match a key that begins with "~", skip this entry */
-		chk_skip = (*buf == '~') ? 1 : 0;
-		if (pmatch(&buf[chk_skip], dbase_str) ||
-			(alt && pmatch(&buf[chk_skip], alt))) {
-		    if (chk_skip) {
-			skipping_entry = TRUE;
-			continue;
-		    } else {
-			found_in_file = TRUE;
-			break;
-		    }
-		}
-	    }
-	}
+            if (digit(*buf)) {
+                /* a number indicates the end of current entry */
+                skipping_entry = FALSE;
+            } else if (!skipping_entry) {
+                if (!(ep = index(buf, '\n')))
+                    goto bad_data_file;
+                *ep = 0;
+                /* if we match a key that begins with "~", skip this entry */
+                chk_skip = (*buf == '~') ? 1 : 0;
+                if (pmatch(&buf[chk_skip], dbase_str)
+                    || (alt && pmatch(&buf[chk_skip], alt))) {
+                    if (chk_skip) {
+                        skipping_entry = TRUE;
+                        continue;
+                    } else {
+                        found_in_file = TRUE;
+                        break;
+                    }
+                }
+            }
+        }
     }
 
-    if(found_in_file) {
-	long entry_offset;
-	int  entry_count;
-	int  i;
+    if (found_in_file) {
+        long entry_offset;
+        int entry_count;
+        int i;
 
-	/* skip over other possible matches for the info */
-	do {
-	    if (!dlb_fgets(buf, BUFSZ, fp)) goto bad_data_file;
-	} while (!digit(*buf));
-	if (sscanf(buf, "%ld,%d\n", &entry_offset, &entry_count) < 2) {
- bad_data_file:
-	    impossible("'data' file in wrong format or corrupted");
-	    /* window will exist if we came here from below via 'goto' */
-	    if (datawin != WIN_ERR) destroy_nhwindow(datawin);
-	    (void) dlb_fclose(fp);
-	    return;
-	}
+        /* skip over other possible matches for the info */
+        do {
+            if (!dlb_fgets(buf, BUFSZ, fp))
+                goto bad_data_file;
+        } while (!digit(*buf));
+        if (sscanf(buf, "%ld,%d\n", &entry_offset, &entry_count) < 2) {
+        bad_data_file:
+            impossible("'data' file in wrong format or corrupted");
+            /* window will exist if we came here from below via 'goto' */
+            if (datawin != WIN_ERR)
+                destroy_nhwindow(datawin);
+            (void) dlb_fclose(fp);
+            return;
+        }
 
-	if (user_typed_name || without_asking || yn("More info?") == 'y') {
-	    if (dlb_fseek(fp, (long)txt_offset + entry_offset, SEEK_SET) < 0) {
-		pline("? Seek error on 'data' file!");
-		(void) dlb_fclose(fp);
-		return;
-	    }
-	    datawin = create_nhwindow(NHW_MENU);
-	    for (i = 0; i < entry_count; i++) {
-		if (!dlb_fgets(buf, BUFSZ, fp)) goto bad_data_file;
-		if ((ep = index(buf, '\n')) != 0) *ep = 0;
-		if (index(buf+1, '\t') != 0) (void) tabexpand(buf+1);
-		putstr(datawin, 0, buf+1);
-	    }
-	    display_nhwindow(datawin, FALSE);
-	    destroy_nhwindow(datawin);
-	}
+        if (user_typed_name || without_asking || yn("More info?") == 'y') {
+            if (dlb_fseek(fp, (long) txt_offset + entry_offset, SEEK_SET)
+                < 0) {
+                pline("? Seek error on 'data' file!");
+                (void) dlb_fclose(fp);
+                return;
+            }
+            datawin = create_nhwindow(NHW_MENU);
+            for (i = 0; i < entry_count; i++) {
+                if (!dlb_fgets(buf, BUFSZ, fp))
+                    goto bad_data_file;
+                if ((ep = index(buf, '\n')) != 0)
+                    *ep = 0;
+                if (index(buf + 1, '\t') != 0)
+                    (void) tabexpand(buf + 1);
+                putstr(datawin, 0, buf + 1);
+            }
+            display_nhwindow(datawin, FALSE);
+            destroy_nhwindow(datawin);
+        }
     } else if (user_typed_name)
-	pline("I don't have any information on those things.");
+        pline("I don't have any information on those things.");
 
     (void) dlb_fclose(fp);
 }
@@ -455,9 +490,9 @@ const char **firstmatch;
 {
     boolean need_to_look = FALSE;
     int glyph;
-    static char    look_buf[BUFSZ];
+    static char look_buf[BUFSZ];
     char prefix[BUFSZ];
-    int	    found = 0;		/* count of matching syms found */
+    int found = 0; /* count of matching syms found */
     int i;
     int skipped_venom = 0;
     boolean hit_trap;
@@ -465,19 +500,19 @@ const char **firstmatch;
     static const char *mon_interior = "the interior of a monster";
 
     if (looked) {
-	int oc;
-	unsigned os;
+        int oc;
+        unsigned os;
 
-	glyph = glyph_at(cc.x,cc.y);
+        glyph = glyph_at(cc.x, cc.y);
 
-	/* Convert the glyph at the selected position to a symbol. */
-	(void) mapglyph(glyph, &sym, &oc, &os, cc.x, cc.y);
+        /* Convert the glyph at the selected position to a symbol. */
+        (void) mapglyph(glyph, &sym, &oc, &os, cc.x, cc.y);
     }
 
     if (looked)
-	Sprintf(prefix, "%s        ", encglyph(glyph));
+        Sprintf(prefix, "%s        ", encglyph(glyph));
     else
-	Sprintf(prefix, "%c        ", sym);
+        Sprintf(prefix, "%c        ", sym);
 
     /*
      * Check all the possibilities, saving all explanations in a buffer.
@@ -486,28 +521,26 @@ const char **firstmatch;
 
     /* Check for monsters */
     for (i = 0; i < MAXMCLASSES; i++) {
-	if (sym == ((looked) ?
-		    showsyms[i + SYM_OFF_M] : def_monsyms[i].sym) &&
-	    def_monsyms[i].explain) {
-	    need_to_look = TRUE;
-	    if (!found) {
-		Sprintf(out_str, "%s%s",
-			prefix, an(def_monsyms[i].explain));
-		*firstmatch = def_monsyms[i].explain;
-		found++;
-	    } else {
-		found += append_str(out_str, an(def_monsyms[i].explain));
-	    }
-	}
+        if (sym == ((looked) ? showsyms[i + SYM_OFF_M] : def_monsyms[i].sym)
+            && def_monsyms[i].explain) {
+            need_to_look = TRUE;
+            if (!found) {
+                Sprintf(out_str, "%s%s", prefix, an(def_monsyms[i].explain));
+                *firstmatch = def_monsyms[i].explain;
+                found++;
+            } else {
+                found += append_str(out_str, an(def_monsyms[i].explain));
+            }
+        }
     }
     /* handle '@' as a special case if it refers to you and you're
        playing a character which isn't normally displayed by that
        symbol; firstmatch is assumed to already be set for '@' */
-    if (((looked) ?
-	 (sym == showsyms[S_HUMAN + SYM_OFF_M] && cc.x == u.ux && cc.y == u.uy) :
-	 (sym == def_monsyms[S_HUMAN].sym && !flags.showrace)) &&
-	!(Race_if(PM_HUMAN) || Race_if(PM_ELF)) && !Upolyd)
-	found += append_str(out_str, "you");	/* tack on "or you" */
+    if (((looked) ? (sym == showsyms[S_HUMAN + SYM_OFF_M] && cc.x == u.ux
+                     && cc.y == u.uy)
+                  : (sym == def_monsyms[S_HUMAN].sym && !flags.showrace))
+        && !(Race_if(PM_HUMAN) || Race_if(PM_ELF)) && !Upolyd)
+        found += append_str(out_str, "you"); /* tack on "or you" */
 
     /*
      * Special case: if identifying from the screen, and we're swallowed,
@@ -515,46 +548,42 @@ const char **firstmatch;
      * "the interior of a monster".
      */
     if (u.uswallow && (looked) && is_swallow_sym(sym)) {
-	if (!found) {
-	    Sprintf(out_str, "%s%s",
-		    prefix, mon_interior);
-	    *firstmatch = mon_interior;
-	} else {
-	    found += append_str(out_str, mon_interior);
-	}
-	need_to_look = TRUE;
+        if (!found) {
+            Sprintf(out_str, "%s%s", prefix, mon_interior);
+            *firstmatch = mon_interior;
+        } else {
+            found += append_str(out_str, mon_interior);
+        }
+        need_to_look = TRUE;
     }
 
     /* Now check for objects */
     for (i = 1; i < MAXOCLASSES; i++) {
-	if (sym == ((looked) ?
-		    showsyms[i + SYM_OFF_O] : def_oc_syms[i].sym)) {
-	    need_to_look = TRUE;
-	    if ((looked) && i == VENOM_CLASS) {
-		skipped_venom++;
-		continue;
-	    }
-	    if (!found) {
-		Sprintf(out_str, "%s%s",
-			prefix,	an(def_oc_syms[i].explain));
-		*firstmatch = def_oc_syms[i].explain;
-		found++;
-	    } else {
-		found += append_str(out_str, an(def_oc_syms[i].explain));
-	    }
-	}
+        if (sym
+            == ((looked) ? showsyms[i + SYM_OFF_O] : def_oc_syms[i].sym)) {
+            need_to_look = TRUE;
+            if ((looked) && i == VENOM_CLASS) {
+                skipped_venom++;
+                continue;
+            }
+            if (!found) {
+                Sprintf(out_str, "%s%s", prefix, an(def_oc_syms[i].explain));
+                *firstmatch = def_oc_syms[i].explain;
+                found++;
+            } else {
+                found += append_str(out_str, an(def_oc_syms[i].explain));
+            }
+        }
     }
 
     if (sym == DEF_INVISIBLE) {
-	if (!found) {
-	    Sprintf(out_str, "%s%s",
-		    prefix,
-		    an(invisexplain));
-	    *firstmatch = invisexplain;
-	    found++;
-	} else {
-	    found += append_str(out_str, an(invisexplain));
-	}
+        if (!found) {
+            Sprintf(out_str, "%s%s", prefix, an(invisexplain));
+            *firstmatch = invisexplain;
+            found++;
+        } else {
+            found += append_str(out_str, an(invisexplain));
+        }
     }
 
 #define is_cmap_trap(i) ((i) >= S_arrow_trap && (i) <= S_polymorph_trap)
@@ -562,83 +591,80 @@ const char **firstmatch;
 
     /* Now check for graphics symbols */
     for (hit_trap = FALSE, i = 0; i < MAXPCHARS; i++) {
-	x_str = defsyms[i].explanation;
-	if (sym == ((looked) ?
-		    showsyms[i] : defsyms[i].sym) && *x_str) {
-	    /* avoid "an air", "a water", "a floor of a room", "a dark part of a room"  */
-	    int article = ((i == S_room)||(i == S_darkroom)) ? 2 :	/* 2=>"the" */
-		!(strcmp(x_str, "air") == 0 ||	/* 1=>"an"  */
-		  strcmp(x_str, "water") == 0);	/* 0=>(none)*/
+        x_str = defsyms[i].explanation;
+        if (sym == ((looked) ? showsyms[i] : defsyms[i].sym) && *x_str) {
+            /* avoid "an air", "a water", "a floor of a room", "a dark part of
+             * a room"  */
+            int article =
+                ((i == S_room) || (i == S_darkroom)) ? 2 : /* 2=>"the" */
+                    !(strcmp(x_str, "air") == 0 ||         /* 1=>"an"  */
+                      strcmp(x_str, "water") == 0);        /* 0=>(none)*/
 
-	    if (!found) {
-		if (is_cmap_trap(i)) {
-		    Sprintf(out_str, "%sa trap", prefix);
-		    hit_trap = TRUE;
-		} else {
-		    Sprintf(out_str, "%s%s",
-			    prefix,
-			    article == 2 ? the(x_str) :
-			    article == 1 ? an(x_str) : x_str);
-		}
-		*firstmatch = x_str;
-		found++;
-	    } else if (!u.uswallow && !(hit_trap && is_cmap_trap(i)) &&
-		       !(found >= 3 && is_cmap_drawbridge(i))) {
-		found += append_str(out_str,
-				    article == 2 ? the(x_str) :
-				    article == 1 ? an(x_str) : x_str);
-		if (is_cmap_trap(i)) hit_trap = TRUE;
-	    }
+            if (!found) {
+                if (is_cmap_trap(i)) {
+                    Sprintf(out_str, "%sa trap", prefix);
+                    hit_trap = TRUE;
+                } else {
+                    Sprintf(out_str, "%s%s", prefix,
+                            article == 2 ? the(x_str)
+                                         : article == 1 ? an(x_str) : x_str);
+                }
+                *firstmatch = x_str;
+                found++;
+            } else if (!u.uswallow && !(hit_trap && is_cmap_trap(i))
+                       && !(found >= 3 && is_cmap_drawbridge(i))) {
+                found += append_str(
+                    out_str, article == 2 ? the(x_str)
+                                          : article == 1 ? an(x_str) : x_str);
+                if (is_cmap_trap(i))
+                    hit_trap = TRUE;
+            }
 
-	    if (i == S_altar || is_cmap_trap(i))
-		need_to_look = TRUE;
-	}
+            if (i == S_altar || is_cmap_trap(i))
+                need_to_look = TRUE;
+        }
     }
 
     /* Now check for warning symbols */
     for (i = 1; i < WARNCOUNT; i++) {
-	x_str = def_warnsyms[i].explanation;
-	if (sym == ((looked) ?
-		    warnsyms[i] : def_warnsyms[i].sym)) {
-	    if (!found) {
-		Sprintf(out_str, "%s%s",
-			prefix, def_warnsyms[i].explanation);
-		*firstmatch = def_warnsyms[i].explanation;
-		found++;
-	    } else {
-		found += append_str(out_str, def_warnsyms[i].explanation);
-	    }
-	    /* Kludge: warning trumps boulders on the display.
-	       Reveal the boulder too or player can get confused */
-	    if ((looked) && sobj_at(BOULDER, cc.x, cc.y))
-		Strcat(out_str, " co-located with a boulder");
-	    break;	/* out of for loop*/
-	}
+        x_str = def_warnsyms[i].explanation;
+        if (sym == ((looked) ? warnsyms[i] : def_warnsyms[i].sym)) {
+            if (!found) {
+                Sprintf(out_str, "%s%s", prefix, def_warnsyms[i].explanation);
+                *firstmatch = def_warnsyms[i].explanation;
+                found++;
+            } else {
+                found += append_str(out_str, def_warnsyms[i].explanation);
+            }
+            /* Kludge: warning trumps boulders on the display.
+               Reveal the boulder too or player can get confused */
+            if ((looked) && sobj_at(BOULDER, cc.x, cc.y))
+                Strcat(out_str, " co-located with a boulder");
+            break; /* out of for loop*/
+        }
     }
 
     /* if we ignored venom and list turned out to be short, put it back */
     if (skipped_venom && found < 2) {
-	x_str = def_oc_syms[VENOM_CLASS].explain;
-	if (!found) {
-	    Sprintf(out_str, "%s%s",
-		    prefix, an(x_str));
-	    *firstmatch = x_str;
-	    found++;
-	} else {
-	    found += append_str(out_str, an(x_str));
-	}
+        x_str = def_oc_syms[VENOM_CLASS].explain;
+        if (!found) {
+            Sprintf(out_str, "%s%s", prefix, an(x_str));
+            *firstmatch = x_str;
+            found++;
+        } else {
+            found += append_str(out_str, an(x_str));
+        }
     }
 
     /* handle optional boulder symbol as a special case */
     if (iflags.bouldersym && sym == iflags.bouldersym) {
-	if (!found) {
-	    *firstmatch = "boulder";
-	    Sprintf(out_str, "%s%s",
-		    prefix, an(*firstmatch));
-	    found++;
-	} else {
-	    found += append_str(out_str, "boulder");
-	}
+        if (!found) {
+            *firstmatch = "boulder";
+            Sprintf(out_str, "%s%s", prefix, an(*firstmatch));
+            found++;
+        } else {
+            found += append_str(out_str, "boulder");
+        }
     }
 
     /*
@@ -646,127 +672,135 @@ const char **firstmatch;
      * an ambiguous explanation by something more detailed.
      */
     if (looked) {
-	if (found > 1 || need_to_look) {
-	    char monbuf[BUFSZ];
-	    char temp_buf[BUFSZ];
+        if (found > 1 || need_to_look) {
+            char monbuf[BUFSZ];
+            char temp_buf[BUFSZ];
 
-	    (void) lookat(cc.x, cc.y, look_buf, monbuf);
-	    *firstmatch = look_buf;
-	    if (*(*firstmatch)) {
-		Sprintf(temp_buf, " (%s)", *firstmatch);
-		(void)strncat(out_str, temp_buf, BUFSZ-strlen(out_str)-1);
-		found = 1;	/* we have something to look up */
-	    }
-	    if (monbuf[0]) {
-		Sprintf(temp_buf, " [seen: %s]", monbuf);
-		(void)strncat(out_str, temp_buf, BUFSZ-strlen(out_str)-1);
-	    }
-	}
+            (void) lookat(cc.x, cc.y, look_buf, monbuf);
+            *firstmatch = look_buf;
+            if (*(*firstmatch)) {
+                Sprintf(temp_buf, " (%s)", *firstmatch);
+                (void) strncat(out_str, temp_buf,
+                               BUFSZ - strlen(out_str) - 1);
+                found = 1; /* we have something to look up */
+            }
+            if (monbuf[0]) {
+                Sprintf(temp_buf, " [seen: %s]", monbuf);
+                (void) strncat(out_str, temp_buf,
+                               BUFSZ - strlen(out_str) - 1);
+            }
+        }
     }
 
     return found;
 }
 
-
 /* getpos() return values */
-#define LOOK_TRADITIONAL	0	/* '.' -- ask about "more info?" */
-#define LOOK_QUICK		1	/* ',' -- skip "more info?" */
-#define LOOK_ONCE		2	/* ';' -- skip and stop looping */
-#define LOOK_VERBOSE		3	/* ':' -- show more info w/o asking */
+#define LOOK_TRADITIONAL 0 /* '.' -- ask about "more info?" */
+#define LOOK_QUICK 1       /* ',' -- skip "more info?" */
+#define LOOK_ONCE 2        /* ';' -- skip and stop looping */
+#define LOOK_VERBOSE 3     /* ':' -- show more info w/o asking */
 
 /* also used by getpos hack in do_name.c */
 const char what_is_an_unknown_object[] = "an unknown object";
 
 int
 do_look(mode, click_cc)
-    int mode;
-    coord *click_cc;
+int mode;
+coord *click_cc;
 {
-    boolean quick = (mode == 1); /* use cursor && don't search for "more info" */
+    boolean quick =
+        (mode == 1); /* use cursor && don't search for "more info" */
     boolean clicklook = (mode == 2); /* right mouse-click method */
-    char    out_str[BUFSZ];
+    char out_str[BUFSZ];
     const char *firstmatch = 0;
     struct permonst *pm = 0;
-    int     i = '\0', ans = 0;
-    int     sym;		/* typed symbol or converted glyph */
-    int	    found;		/* count of matching syms found */
-    coord   cc;			/* screen pos of unknown glyph */
-    boolean save_verbose;	/* saved value of flags.verbose */
-    boolean from_screen;	/* question from the screen */
+    int i = '\0', ans = 0;
+    int sym;              /* typed symbol or converted glyph */
+    int found;            /* count of matching syms found */
+    coord cc;             /* screen pos of unknown glyph */
+    boolean save_verbose; /* saved value of flags.verbose */
+    boolean from_screen;  /* question from the screen */
 
     if (!clicklook) {
-	if (quick) {
-		from_screen = TRUE;	/* yes, we want to use the cursor */
-		i = 'y';
+        if (quick) {
+            from_screen = TRUE; /* yes, we want to use the cursor */
+            i = 'y';
         }
 
-	if (i != 'y') {
-	    menu_item *pick_list = (menu_item *)0;
-	    winid win;
-	    anything any;
-	    win = create_nhwindow(NHW_MENU);
-	    start_menu(win);
-	    any.a_void = 0; any.a_char ='a';
-	    /* 'y' and 'n' to keep backwards compat with previous versions */
-	    add_menu(win, NO_GLYPH, &any, 'a', 'y', ATR_NONE, "something on the map", MENU_UNSELECTED);
-	    any.a_void = 0; any.a_char ='b';
-	    add_menu(win, NO_GLYPH, &any, 'b', 0, ATR_NONE, "something you're carrying", MENU_UNSELECTED);
-	    any.a_void = 0; any.a_char ='c';
-	    add_menu(win, NO_GLYPH, &any, 'c', 'n', ATR_NONE, "something else", MENU_UNSELECTED);
-	    end_menu(win, "What do you want to look at:");
-	    if (select_menu(win, PICK_ONE, &pick_list) > 0) {
-		i = pick_list->item.a_char;
-		free((genericptr_t)pick_list);
-	    }
-	    destroy_nhwindow(win);
-	}
+        if (i != 'y') {
+            menu_item *pick_list = (menu_item *) 0;
+            winid win;
+            anything any;
+            win = create_nhwindow(NHW_MENU);
+            start_menu(win);
+            any.a_void = 0;
+            any.a_char = 'a';
+            /* 'y' and 'n' to keep backwards compat with previous versions */
+            add_menu(win, NO_GLYPH, &any, 'a', 'y', ATR_NONE,
+                     "something on the map", MENU_UNSELECTED);
+            any.a_void = 0;
+            any.a_char = 'b';
+            add_menu(win, NO_GLYPH, &any, 'b', 0, ATR_NONE,
+                     "something you're carrying", MENU_UNSELECTED);
+            any.a_void = 0;
+            any.a_char = 'c';
+            add_menu(win, NO_GLYPH, &any, 'c', 'n', ATR_NONE,
+                     "something else", MENU_UNSELECTED);
+            end_menu(win, "What do you want to look at:");
+            if (select_menu(win, PICK_ONE, &pick_list) > 0) {
+                i = pick_list->item.a_char;
+                free((genericptr_t) pick_list);
+            }
+            destroy_nhwindow(win);
+        }
 
-	switch (i) {
-	default:
-	case 'q': return 0;
-	case 'y':
-	case 'a':
-	    from_screen = TRUE;
-	    sym = 0;
-	    cc.x = u.ux;
-	    cc.y = u.uy;
-	    break;
-	case 'b':
-	    {
-		char invlet;
-		struct obj *invobj;
+        switch (i) {
+        default:
+        case 'q':
+            return 0;
+        case 'y':
+        case 'a':
+            from_screen = TRUE;
+            sym = 0;
+            cc.x = u.ux;
+            cc.y = u.uy;
+            break;
+        case 'b': {
+            char invlet;
+            struct obj *invobj;
 
-		invlet = display_inventory(NULL, TRUE);
-		if (!invlet || invlet == '\033') return 0;
-		*out_str = '\0';
-		for (invobj = invent; invobj; invobj = invobj->nobj)
-		    if (invobj->invlet == invlet) {
-			strcpy(out_str, singular(invobj, xname));
-			break;
-		    }
-		if (*out_str)
-		    checkfile(out_str, pm, TRUE, TRUE);
-		return 0;
-	    }
-	    break;
-	case 'c':
-	    from_screen = FALSE;
-	    getlin("Specify what? (type the word)", out_str);
-	    if (out_str[0] == '\0' || out_str[0] == '\033')
-		return 0;
+            invlet = display_inventory(NULL, TRUE);
+            if (!invlet || invlet == '\033')
+                return 0;
+            *out_str = '\0';
+            for (invobj = invent; invobj; invobj = invobj->nobj)
+                if (invobj->invlet == invlet) {
+                    strcpy(out_str, singular(invobj, xname));
+                    break;
+                }
+            if (*out_str)
+                checkfile(out_str, pm, TRUE, TRUE);
+            return 0;
+        } break;
+        case 'c':
+            from_screen = FALSE;
+            getlin("Specify what? (type the word)", out_str);
+            if (out_str[0] == '\0' || out_str[0] == '\033')
+                return 0;
 
-	    if (out_str[1]) {	/* user typed in a complete string */
-		checkfile(out_str, pm, TRUE, TRUE);
-		return 0;
-	    }
-	    sym = out_str[0];
-	    break;
-	}
-    } else {	/* clicklook */
-	cc.x = click_cc->x;
-	cc.y = click_cc->y;
-	sym = 0;
-	from_screen = FALSE;
+            if (out_str[1]) { /* user typed in a complete string */
+                checkfile(out_str, pm, TRUE, TRUE);
+                return 0;
+            }
+            sym = out_str[0];
+            break;
+        }
+    } else { /* clicklook */
+        cc.x = click_cc->x;
+        cc.y = click_cc->y;
+        sym = 0;
+        from_screen = FALSE;
     }
 
     /* Save the verbose flag, we change it later. */
@@ -776,46 +810,49 @@ do_look(mode, click_cc)
      * The user typed one letter, or we're identifying from the screen.
      */
     do {
-	/* Reset some variables. */
-	pm = (struct permonst *)0;
-	found = 0;
-	out_str[0] = '\0';
+        /* Reset some variables. */
+        pm = (struct permonst *) 0;
+        found = 0;
+        out_str[0] = '\0';
 
-	if (from_screen || clicklook) {
-	    if (from_screen) {
-		if (flags.verbose)
-			pline("Please move the cursor to %s.",
-				what_is_an_unknown_object);
-		else
-			pline("Pick an object.");
+        if (from_screen || clicklook) {
+            if (from_screen) {
+                if (flags.verbose)
+                    pline("Please move the cursor to %s.",
+                          what_is_an_unknown_object);
+                else
+                    pline("Pick an object.");
 
-		ans = getpos(&cc, quick, what_is_an_unknown_object);
-		if (ans < 0 || cc.x < 0) {
-			flags.verbose = save_verbose;
-			return 0;	/* done */
-	        }
-		flags.verbose = FALSE;	/* only print long question once */
-	    }
-	}
+                ans = getpos(&cc, quick, what_is_an_unknown_object);
+                if (ans < 0 || cc.x < 0) {
+                    flags.verbose = save_verbose;
+                    return 0; /* done */
+                }
+                flags.verbose = FALSE; /* only print long question once */
+            }
+        }
 
-	found = do_screen_description(cc, (from_screen||clicklook), sym, out_str, &firstmatch);
+        found = do_screen_description(cc, (from_screen || clicklook), sym,
+                                      out_str, &firstmatch);
 
-	/* Finally, print out our explanation. */
-	if (found) {
+        /* Finally, print out our explanation. */
+        if (found) {
+            /* Used putmixed() because there may be an encoded glyph present
+             */
+            putmixed(WIN_MESSAGE, 0, out_str);
 
-	    /* Used putmixed() because there may be an encoded glyph present */
-	    putmixed(WIN_MESSAGE, 0, out_str);
-
-	    /* check the data file for information about this thing */
-	    if (found == 1 && ans != LOOK_QUICK && ans != LOOK_ONCE &&
-			(ans == LOOK_VERBOSE || (flags.help && !quick)) && !clicklook) {
-		char temp_buf[BUFSZ];
-		Strcpy(temp_buf, firstmatch);
-		checkfile(temp_buf, pm, FALSE, (boolean)(ans == LOOK_VERBOSE));
-	    }
-	} else {
-	    pline("I've never heard of such things.");
-	}
+            /* check the data file for information about this thing */
+            if (found == 1 && ans != LOOK_QUICK && ans != LOOK_ONCE
+                && (ans == LOOK_VERBOSE || (flags.help && !quick))
+                && !clicklook) {
+                char temp_buf[BUFSZ];
+                Strcpy(temp_buf, firstmatch);
+                checkfile(temp_buf, pm, FALSE,
+                          (boolean)(ans == LOOK_VERBOSE));
+            }
+        } else {
+            pline("I've never heard of such things.");
+        }
 
     } while (from_screen && !quick && ans != LOOK_ONCE && !clicklook);
 
@@ -827,47 +864,53 @@ do_look(mode, click_cc)
 int
 dowhatis()
 {
-	return do_look(0,(coord *)0);
+    return do_look(0, (coord *) 0);
 }
 
 /* the ';' command */
 int
 doquickwhatis()
 {
-	return do_look(1,(coord *)0);
+    return do_look(1, (coord *) 0);
 }
 
 /* the '^' command */
 int
 doidtrap()
 {
-	register struct trap *trap;
-	int x, y, tt;
+    register struct trap *trap;
+    int x, y, tt;
 
-	if (!getdir("^")) return 0;
-	x = u.ux + u.dx;
-	y = u.uy + u.dy;
-	for (trap = ftrap; trap; trap = trap->ntrap)
-	    if (trap->tx == x && trap->ty == y) {
-		if (!trap->tseen) break;
-		tt = trap->ttyp;
-		if (u.dz) {
-		    if (u.dz < 0 ? (tt == TRAPDOOR || tt == HOLE) :
-			    tt == ROCKTRAP) break;
-		}
-		tt = what_trap(tt);
-		pline("That is %s%s%s.",
-		      an(defsyms[trap_to_defsym(tt)].explanation),
-		      !trap->madeby_u ? "" : (tt == WEB) ? " woven" :
-			  /* trap doors & spiked pits can't be made by
-			     player, and should be considered at least
-			     as much "set" as "dug" anyway */
-			  (tt == HOLE || tt == PIT) ? " dug" : " set",
-		      !trap->madeby_u ? "" : " by you");
-		return 0;
-	    }
-	pline("I can't see a trap there.");
-	return 0;
+    if (!getdir("^"))
+        return 0;
+    x = u.ux + u.dx;
+    y = u.uy + u.dy;
+    for (trap = ftrap; trap; trap = trap->ntrap)
+        if (trap->tx == x && trap->ty == y) {
+            if (!trap->tseen)
+                break;
+            tt = trap->ttyp;
+            if (u.dz) {
+                if (u.dz < 0 ? (tt == TRAPDOOR || tt == HOLE)
+                             : tt == ROCKTRAP)
+                    break;
+            }
+            tt = what_trap(tt);
+            pline(
+                "That is %s%s%s.",
+                an(defsyms[trap_to_defsym(tt)].explanation),
+                !trap->madeby_u
+                    ? ""
+                    : (tt == WEB) ? " woven" :
+                                  /* trap doors & spiked pits can't be made by
+                                     player, and should be considered at least
+                                     as much "set" as "dug" anyway */
+                          (tt == HOLE || tt == PIT) ? " dug" : " set",
+                !trap->madeby_u ? "" : " by you");
+            return 0;
+        }
+    pline("I can't see a trap there.");
+    return 0;
 }
 
 char *
@@ -875,201 +918,225 @@ dowhatdoes_core(q, cbuf)
 char q;
 char *cbuf;
 {
-	dlb *fp;
-	char bufr[BUFSZ];
-	register char *buf = &bufr[6], *ep, ctrl, meta;
+    dlb *fp;
+    char bufr[BUFSZ];
+    register char *buf = &bufr[6], *ep, ctrl, meta;
 
-	fp = dlb_fopen(CMDHELPFILE, "r");
-	if (!fp) {
-		pline("Cannot open data file!");
-		return 0;
-	}
+    fp = dlb_fopen(CMDHELPFILE, "r");
+    if (!fp) {
+        pline("Cannot open data file!");
+        return 0;
+    }
 
-  	ctrl = ((q <= '\033') ? (q - 1 + 'A') : 0);
-	meta = ((0x80 & q) ? (0x7f & q) : 0);
-	while(dlb_fgets(buf,BUFSZ-6,fp)) {
-	    if ((ctrl && *buf=='^' && *(buf+1)==ctrl) ||
-		(meta && *buf=='M' && *(buf+1)=='-' && *(buf+2)==meta) ||
-		*buf==q) {
-		ep = index(buf, '\n');
-		if(ep) *ep = 0;
-		if (ctrl && buf[2] == '\t'){
-			buf = bufr + 1;
-			(void) strncpy(buf, "^?      ", 8);
-			buf[1] = ctrl;
-		} else if (meta && buf[3] == '\t'){
-			buf = bufr + 2;
-			(void) strncpy(buf, "M-?     ", 8);
-			buf[2] = meta;
-		} else if(buf[1] == '\t'){
-			buf = bufr;
-			buf[0] = q;
-			(void) strncpy(buf+1, "       ", 7);
-		}
-		(void) dlb_fclose(fp);
-		Strcpy(cbuf, buf);
-		return cbuf;
-	    }
-	}
-	(void) dlb_fclose(fp);
-	return (char *)0;
+    ctrl = ((q <= '\033') ? (q - 1 + 'A') : 0);
+    meta = ((0x80 & q) ? (0x7f & q) : 0);
+    while (dlb_fgets(buf, BUFSZ - 6, fp)) {
+        if ((ctrl && *buf == '^' && *(buf + 1) == ctrl)
+            || (meta && *buf == 'M' && *(buf + 1) == '-'
+                && *(buf + 2) == meta) || *buf == q) {
+            ep = index(buf, '\n');
+            if (ep)
+                *ep = 0;
+            if (ctrl && buf[2] == '\t') {
+                buf = bufr + 1;
+                (void) strncpy(buf, "^?      ", 8);
+                buf[1] = ctrl;
+            } else if (meta && buf[3] == '\t') {
+                buf = bufr + 2;
+                (void) strncpy(buf, "M-?     ", 8);
+                buf[2] = meta;
+            } else if (buf[1] == '\t') {
+                buf = bufr;
+                buf[0] = q;
+                (void) strncpy(buf + 1, "       ", 7);
+            }
+            (void) dlb_fclose(fp);
+            Strcpy(cbuf, buf);
+            return cbuf;
+        }
+    }
+    (void) dlb_fclose(fp);
+    return (char *) 0;
 }
 
 int
 dowhatdoes()
 {
-	char bufr[BUFSZ];
-	char q, *reslt;
+    char bufr[BUFSZ];
+    char q, *reslt;
 
 #if defined(UNIX) || defined(VMS)
-	introff();
+    introff();
 #endif
-	q = yn_function("What command?", (char *)0, '\0');
+    q = yn_function("What command?", (char *) 0, '\0');
 #if defined(UNIX) || defined(VMS)
-	intron();
+    intron();
 #endif
-	reslt = dowhatdoes_core(q, bufr);
-	if (reslt)
-		pline1(reslt);
-	else
-		pline("I've never heard of such commands.");
-	return 0;
+    reslt = dowhatdoes_core(q, bufr);
+    if (reslt)
+        pline1(reslt);
+    else
+        pline("I've never heard of such commands.");
+    return 0;
 }
 
 void
 docontact()
 {
-	winid cwin = create_nhwindow(NHW_TEXT);
-	char buf[BUFSZ];
-	if(sysopt.support){
-/*XXX overflow possibilities*/
-		Sprintf(buf, "To contact local support, %s", sysopt.support);
-		putstr(cwin, 0, buf);
-		putstr(cwin, 0, "");
-	} else if(sysopt.wizards){
-		char *tmp = build_english_list(sysopt.wizards);
-		Sprintf(buf, "To contact local support, contact %s.", tmp);
-		free(tmp);
-		putstr(cwin, 0, buf);
-		putstr(cwin, 0, "");
-	}
-	putstr(cwin, 0, "To contact the NetHack development team directly,");
-/*XXX overflow possibilities*/
-	Sprintf(buf, "see the Contact form on our website or email %s",
-		DEVTEAM_EMAIL);
-	putstr(cwin, 0, buf);
-	putstr(cwin, 0, "");
-	putstr(cwin, 0, "For more information on NetHack, or to report a bug,");
-	Sprintf(buf, "visit our website %s", DEVTEAM_URL);
-	putstr(cwin, 0, buf);
-	display_nhwindow(cwin, FALSE);
-	destroy_nhwindow(cwin);
+    winid cwin = create_nhwindow(NHW_TEXT);
+    char buf[BUFSZ];
+    if (sysopt.support) {
+        /*XXX overflow possibilities*/
+        Sprintf(buf, "To contact local support, %s", sysopt.support);
+        putstr(cwin, 0, buf);
+        putstr(cwin, 0, "");
+    } else if (sysopt.wizards) {
+        char *tmp = build_english_list(sysopt.wizards);
+        Sprintf(buf, "To contact local support, contact %s.", tmp);
+        free(tmp);
+        putstr(cwin, 0, buf);
+        putstr(cwin, 0, "");
+    }
+    putstr(cwin, 0, "To contact the NetHack development team directly,");
+    /*XXX overflow possibilities*/
+    Sprintf(buf, "see the Contact form on our website or email %s",
+            DEVTEAM_EMAIL);
+    putstr(cwin, 0, buf);
+    putstr(cwin, 0, "");
+    putstr(cwin, 0, "For more information on NetHack, or to report a bug,");
+    Sprintf(buf, "visit our website %s", DEVTEAM_URL);
+    putstr(cwin, 0, buf);
+    display_nhwindow(cwin, FALSE);
+    destroy_nhwindow(cwin);
 }
 
 /* data for help_menu() */
 static const char *help_menu_items[] = {
-/*  0*/	"About NetHack (version information).",
-/*  1*/	"Long description of the game and commands.",
-/*  2*/	"List of game commands.",
-/*  3*/	"Concise history of NetHack.",
-/*  4*/	"Info on a character in the game display.",
-/*  5*/	"Info on what a given key does.",
-/*  6*/	"List of game options.",
-/*  7*/	"Longer explanation of game options.",
-/*  8*/	"List of extended commands.",
-/*  9*/	"The NetHack license.",
-/* 10*/	"Support information.",
+    /*  0*/ "About NetHack (version information).",
+    /*  1*/ "Long description of the game and commands.",
+    /*  2*/ "List of game commands.",
+    /*  3*/ "Concise history of NetHack.",
+    /*  4*/ "Info on a character in the game display.",
+    /*  5*/ "Info on what a given key does.",
+    /*  6*/ "List of game options.",
+    /*  7*/ "Longer explanation of game options.",
+    /*  8*/ "List of extended commands.",
+    /*  9*/ "The NetHack license.",
+    /* 10*/ "Support information.",
 #ifdef PORT_HELP
-	"%s-specific help and commands.",
+    "%s-specific help and commands.",
 #define PORT_HELP_ID 100
 #define WIZHLP_SLOT 12
 #else
 #define WIZHLP_SLOT 11
 #endif
-	"List of wizard-mode commands.",
-	"",
-	(char *)0
+    "List of wizard-mode commands.", "", (char *) 0
 };
 
 STATIC_OVL boolean
 help_menu(sel)
-	int *sel;
+int *sel;
 {
-	winid tmpwin = create_nhwindow(NHW_MENU);
+    winid tmpwin = create_nhwindow(NHW_MENU);
 #ifdef PORT_HELP
-	char helpbuf[QBUFSZ];
+    char helpbuf[QBUFSZ];
 #endif
-	int i, n;
-	menu_item *selected;
-	anything any;
+    int i, n;
+    menu_item *selected;
+    anything any;
 
-	any = zeroany;		/* zero all bits */
-	start_menu(tmpwin);
-	if (!wizard) help_menu_items[WIZHLP_SLOT] = "",
-		     help_menu_items[WIZHLP_SLOT+1] = (char *)0;
-	for (i = 0; help_menu_items[i]; i++)
+    any = zeroany; /* zero all bits */
+    start_menu(tmpwin);
+    if (!wizard)
+        help_menu_items[WIZHLP_SLOT] = "",
+        help_menu_items[WIZHLP_SLOT + 1] = (char *) 0;
+    for (i = 0; help_menu_items[i]; i++)
 #ifdef PORT_HELP
-	    /* port-specific line has a %s in it for the PORT_ID */
-	    if (help_menu_items[i][0] == '%') {
-		Sprintf(helpbuf, help_menu_items[i], PORT_ID);
-		any.a_int = PORT_HELP_ID + 1;
-		add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
-			 helpbuf, MENU_UNSELECTED);
-	    } else
+        /* port-specific line has a %s in it for the PORT_ID */
+        if (help_menu_items[i][0] == '%') {
+            Sprintf(helpbuf, help_menu_items[i], PORT_ID);
+            any.a_int = PORT_HELP_ID + 1;
+            add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, helpbuf,
+                     MENU_UNSELECTED);
+        } else
 #endif
-	    {
-		any.a_int = (*help_menu_items[i]) ? i+1 : 0;
-		add_menu(tmpwin, NO_GLYPH, &any, 0, 0,
-			ATR_NONE, help_menu_items[i], MENU_UNSELECTED);
-	    }
-	end_menu(tmpwin, "Select one item:");
-	n = select_menu(tmpwin, PICK_ONE, &selected);
-	destroy_nhwindow(tmpwin);
-	if (n > 0) {
-	    *sel = selected[0].item.a_int - 1;
-	    free((genericptr_t)selected);
-	    return TRUE;
-	}
-	return FALSE;
+        {
+            any.a_int = (*help_menu_items[i]) ? i + 1 : 0;
+            add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                     help_menu_items[i], MENU_UNSELECTED);
+        }
+    end_menu(tmpwin, "Select one item:");
+    n = select_menu(tmpwin, PICK_ONE, &selected);
+    destroy_nhwindow(tmpwin);
+    if (n > 0) {
+        *sel = selected[0].item.a_int - 1;
+        free((genericptr_t) selected);
+        return TRUE;
+    }
+    return FALSE;
 }
 
 /* the '?' command */
 int
 dohelp()
 {
-	int sel = 0;
+    int sel = 0;
 
-	if (help_menu(&sel)) {
-		switch (sel) {
-			case  0:  (void) doextversion();  break;
-			case  1:  display_file(HELP, TRUE);  break;
-			case  2:  display_file(SHELP, TRUE);  break;
-			case  3:  (void) dohistory();  break;
-			case  4:  (void) dowhatis();  break;
-			case  5:  (void) dowhatdoes();  break;
-			case  6:  option_help();  break;
-			case  7:  display_file(OPTIONFILE, TRUE);  break;
-			case  8:  (void) doextlist();  break;
-			case  9:  display_file(LICENSE, TRUE);  break;
-			case 10:  (void) docontact(); break;
+    if (help_menu(&sel)) {
+        switch (sel) {
+        case 0:
+            (void) doextversion();
+            break;
+        case 1:
+            display_file(HELP, TRUE);
+            break;
+        case 2:
+            display_file(SHELP, TRUE);
+            break;
+        case 3:
+            (void) dohistory();
+            break;
+        case 4:
+            (void) dowhatis();
+            break;
+        case 5:
+            (void) dowhatdoes();
+            break;
+        case 6:
+            option_help();
+            break;
+        case 7:
+            display_file(OPTIONFILE, TRUE);
+            break;
+        case 8:
+            (void) doextlist();
+            break;
+        case 9:
+            display_file(LICENSE, TRUE);
+            break;
+        case 10:
+            (void) docontact();
+            break;
 #ifdef PORT_HELP
-			case PORT_HELP_ID:  port_help();  break;
+        case PORT_HELP_ID:
+            port_help();
+            break;
 #endif
-			default:
-			/* handle slot 11 or 12 */
-				display_file(DEBUGHELP, TRUE);
-				break;
-		}
-	}
-	return 0;
+        default:
+            /* handle slot 11 or 12 */
+            display_file(DEBUGHELP, TRUE);
+            break;
+        }
+    }
+    return 0;
 }
 
 /* the 'V' command; also a choice for '?' */
 int
 dohistory()
 {
-	display_file(HISTORY, TRUE);
-	return 0;
+    display_file(HISTORY, TRUE);
+    return 0;
 }
 
 /*pager.c*/

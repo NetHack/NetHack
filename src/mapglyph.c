@@ -1,4 +1,4 @@
-/* NetHack 3.6	mapglyph.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	mapglyph.c	$NHDT-Date: 1431192760 2015/05/09 17:32:40 $  $NHDT-Branch: master $:$NHDT-Revision: 1.34 $ */
 /* NetHack 3.6	mapglyph.c	$Date: 2009/05/06 10:46:45 $  $Revision: 1.24 $ */
 /*	SCCS Id: @(#)mapglyph.c	3.5	2006/10/01	*/
 /* Copyright (c) David Cohrs, 1991				  */
@@ -6,36 +6,37 @@
 
 #include "hack.h"
 #if defined(TTY_GRAPHICS)
-#include "wintty.h"	/* for prototype of has_color() only */
+#include "wintty.h" /* for prototype of has_color() only */
 #endif
 #include "color.h"
-#define HI_DOMESTIC CLR_WHITE	/* monst.c */
+#define HI_DOMESTIC CLR_WHITE /* monst.c */
 
 int explcolors[] = {
-	CLR_BLACK,	/* dark    */
-	CLR_GREEN,	/* noxious */
-	CLR_BROWN,	/* muddy   */
-	CLR_BLUE,	/* wet     */
-	CLR_MAGENTA,	/* magical */
-	CLR_ORANGE,	/* fiery   */
-	CLR_WHITE,	/* frosty  */
+    CLR_BLACK,   /* dark    */
+    CLR_GREEN,   /* noxious */
+    CLR_BROWN,   /* muddy   */
+    CLR_BLUE,    /* wet     */
+    CLR_MAGENTA, /* magical */
+    CLR_ORANGE,  /* fiery   */
+    CLR_WHITE,   /* frosty  */
 };
 
 #if !defined(TTY_GRAPHICS)
-#define has_color(n)  TRUE
+#define has_color(n) TRUE
 #endif
 
 #ifdef TEXTCOLOR
-#define zap_color(n)  color = iflags.use_color ? zapcolors[n] : NO_COLOR
+#define zap_color(n) color = iflags.use_color ? zapcolors[n] : NO_COLOR
 #define cmap_color(n) color = iflags.use_color ? defsyms[n].color : NO_COLOR
-#define obj_color(n)  color = iflags.use_color ? objects[n].oc_color : NO_COLOR
-#define mon_color(n)  color = iflags.use_color ? mons[n].mcolor : NO_COLOR
+#define obj_color(n) color = iflags.use_color ? objects[n].oc_color : NO_COLOR
+#define mon_color(n) color = iflags.use_color ? mons[n].mcolor : NO_COLOR
 #define invis_color(n) color = NO_COLOR
-#define pet_color(n)  color = iflags.use_color ? mons[n].mcolor : NO_COLOR
-#define warn_color(n) color = iflags.use_color ? def_warnsyms[n].color : NO_COLOR
+#define pet_color(n) color = iflags.use_color ? mons[n].mcolor : NO_COLOR
+#define warn_color(n) \
+    color = iflags.use_color ? def_warnsyms[n].color : NO_COLOR
 #define explode_color(n) color = iflags.use_color ? explcolors[n] : NO_COLOR
 
-#else	/* no text color */
+#else /* no text color */
 
 #define zap_color(n)
 #define cmap_color(n)
@@ -47,13 +48,13 @@ int explcolors[] = {
 #define explode_color(n)
 #endif
 
-# if defined(USE_TILES) && defined(MSDOS)
-#define HAS_ROGUE_IBM_GRAPHICS (currentgraphics == ROGUESET && \
-				SYMHANDLING(H_IBM) && !iflags.grmode)
-# else
-#define HAS_ROGUE_IBM_GRAPHICS (currentgraphics == ROGUESET && \
-				SYMHANDLING(H_IBM))
-# endif
+#if defined(USE_TILES) && defined(MSDOS)
+#define HAS_ROGUE_IBM_GRAPHICS \
+    (currentgraphics == ROGUESET && SYMHANDLING(H_IBM) && !iflags.grmode)
+#else
+#define HAS_ROGUE_IBM_GRAPHICS \
+    (currentgraphics == ROGUESET && SYMHANDLING(H_IBM))
+#endif
 
 /*ARGSUSED*/
 int
@@ -62,14 +63,14 @@ int glyph, *ocolor, x, y;
 int *ochar;
 unsigned *ospecial;
 {
-	register int offset, idx;
-	int color = NO_COLOR;
-	nhsym ch;
-	unsigned special = 0;
-	/* condense multiple tests in macro version down to single */
-	boolean has_rogue_ibm_graphics = HAS_ROGUE_IBM_GRAPHICS;
-	boolean has_rogue_color = (has_rogue_ibm_graphics &&
-				   (symset[currentgraphics].nocolor == 0));
+    register int offset, idx;
+    int color = NO_COLOR;
+    nhsym ch;
+    unsigned special = 0;
+    /* condense multiple tests in macro version down to single */
+    boolean has_rogue_ibm_graphics = HAS_ROGUE_IBM_GRAPHICS;
+    boolean has_rogue_color =
+        (has_rogue_ibm_graphics && (symset[currentgraphics].nocolor == 0));
 
     /*
      *  Map the glyph back to a character and color.
@@ -77,138 +78,147 @@ unsigned *ospecial;
      *  Warning:  For speed, this makes an assumption on the order of
      *		  offsets.  The order is set in display.h.
      */
-    if ((offset = (glyph - GLYPH_STATUE_OFF)) >= 0) {   /* a statue */
-	idx = mons[offset].mlet + SYM_OFF_M;
-	if (has_rogue_color)
-		color = CLR_RED;
-	else
-	obj_color(STATUE);
-	special |= MG_STATUE;
-    } else if ((offset = (glyph - GLYPH_WARNING_OFF)) >= 0) {	/* a warning flash */
-	idx = offset + SYM_OFF_W;
-	if (has_rogue_color)
-	    color = NO_COLOR;
-	else
-	    warn_color(offset);
-    } else if ((offset = (glyph - GLYPH_SWALLOW_OFF)) >= 0) {	/* swallow */
-	/* see swallow_to_glyph() in display.c */
-	idx = (S_sw_tl + (offset & 0x7)) + SYM_OFF_P;
-	if (has_rogue_color && iflags.use_color)
-	    color = NO_COLOR;
-	else
-	    mon_color(offset >> 3);
-    } else if ((offset = (glyph - GLYPH_ZAP_OFF)) >= 0) {	/* zap beam */
-	/* see zapdir_to_glyph() in display.c */
-	idx = (S_vbeam + (offset & 0x3)) + SYM_OFF_P;
-	if (has_rogue_color && iflags.use_color)
-	    color = NO_COLOR;
-	else
-	    zap_color((offset >> 2));
-    } else if ((offset = (glyph - GLYPH_EXPLODE_OFF)) >= 0) {	/* explosion */
-	idx = ((offset % MAXEXPCHARS) + S_explode1) + SYM_OFF_P;
-	explode_color(offset / MAXEXPCHARS);
-    } else if ((offset = (glyph - GLYPH_CMAP_OFF)) >= 0) {	/* cmap */
-	idx = offset + SYM_OFF_P;
-	if (has_rogue_color && iflags.use_color) {
-	    if (offset >= S_vwall && offset <= S_hcdoor)
-		color = CLR_BROWN;
-	    else if (offset >= S_arrow_trap && offset <= S_polymorph_trap)
-		color = CLR_MAGENTA;
-	    else if (offset == S_corr || offset == S_litcorr)
-		color = CLR_GRAY;
-	    else if (offset >= S_room && offset <= S_water && offset != S_darkroom)
-		color = CLR_GREEN;
-	    else
-		color = NO_COLOR;
-	} else
+    if ((offset = (glyph - GLYPH_STATUE_OFF)) >= 0) { /* a statue */
+        idx = mons[offset].mlet + SYM_OFF_M;
+        if (has_rogue_color)
+            color = CLR_RED;
+        else
+            obj_color(STATUE);
+        special |= MG_STATUE;
+    } else if ((offset = (glyph - GLYPH_WARNING_OFF))
+               >= 0) { /* a warning flash */
+        idx = offset + SYM_OFF_W;
+        if (has_rogue_color)
+            color = NO_COLOR;
+        else
+            warn_color(offset);
+    } else if ((offset = (glyph - GLYPH_SWALLOW_OFF)) >= 0) { /* swallow */
+        /* see swallow_to_glyph() in display.c */
+        idx = (S_sw_tl + (offset & 0x7)) + SYM_OFF_P;
+        if (has_rogue_color && iflags.use_color)
+            color = NO_COLOR;
+        else
+            mon_color(offset >> 3);
+    } else if ((offset = (glyph - GLYPH_ZAP_OFF)) >= 0) { /* zap beam */
+        /* see zapdir_to_glyph() in display.c */
+        idx = (S_vbeam + (offset & 0x3)) + SYM_OFF_P;
+        if (has_rogue_color && iflags.use_color)
+            color = NO_COLOR;
+        else
+            zap_color((offset >> 2));
+    } else if ((offset = (glyph - GLYPH_EXPLODE_OFF)) >= 0) { /* explosion */
+        idx = ((offset % MAXEXPCHARS) + S_explode1) + SYM_OFF_P;
+        explode_color(offset / MAXEXPCHARS);
+    } else if ((offset = (glyph - GLYPH_CMAP_OFF)) >= 0) { /* cmap */
+        idx = offset + SYM_OFF_P;
+        if (has_rogue_color && iflags.use_color) {
+            if (offset >= S_vwall && offset <= S_hcdoor)
+                color = CLR_BROWN;
+            else if (offset >= S_arrow_trap && offset <= S_polymorph_trap)
+                color = CLR_MAGENTA;
+            else if (offset == S_corr || offset == S_litcorr)
+                color = CLR_GRAY;
+            else if (offset >= S_room && offset <= S_water
+                     && offset != S_darkroom)
+                color = CLR_GREEN;
+            else
+                color = NO_COLOR;
+        } else
 #ifdef TEXTCOLOR
-	    /* provide a visible difference if normal and lit corridor
-	     * use the same symbol */
-	    if (iflags.use_color && offset == S_litcorr &&
-		showsyms[idx] == showsyms[S_corr + SYM_OFF_P])
-		color = CLR_WHITE;
-	    else
+            /* provide a visible difference if normal and lit corridor
+             * use the same symbol */
+            if (iflags.use_color && offset == S_litcorr
+                && showsyms[idx] == showsyms[S_corr + SYM_OFF_P])
+            color = CLR_WHITE;
+        else
 #endif
-	    cmap_color(offset);
-    } else if ((offset = (glyph - GLYPH_OBJ_OFF)) >= 0) {	/* object */
-	idx = objects[offset].oc_class + SYM_OFF_O;
-	if (offset == BOULDER && iflags.bouldersym)
-		idx = SYM_BOULDER + SYM_OFF_X;
-	if (has_rogue_color && iflags.use_color) {
-	    switch(objects[offset].oc_class) {
-		case COIN_CLASS: color = CLR_YELLOW; break;
-		case FOOD_CLASS: color = CLR_RED; break;
-		default: color = CLR_BRIGHT_BLUE; break;
-	    }
-	} else
-	    obj_color(offset);
-    } else if ((offset = (glyph - GLYPH_RIDDEN_OFF)) >= 0) {	/* mon ridden */
-	idx = mons[offset].mlet + SYM_OFF_M;
-	if (has_rogue_color)
-	    /* This currently implies that the hero is here -- monsters */
-	    /* don't ride (yet...).  Should we set it to yellow like in */
-	    /* the monster case below?  There is no equivalent in rogue. */
-	    color = NO_COLOR;	/* no need to check iflags.use_color */
-	else
-	    mon_color(offset);
-	    special |= MG_RIDDEN;
-    } else if ((offset = (glyph - GLYPH_BODY_OFF)) >= 0) {	/* a corpse */
-	idx = objects[CORPSE].oc_class + SYM_OFF_O;
-	if (has_rogue_color && iflags.use_color)
-	    color = CLR_RED;
-	else
-	    mon_color(offset);
-	    special |= MG_CORPSE;
-    } else if ((offset = (glyph - GLYPH_DETECT_OFF)) >= 0) {	/* mon detect */
-	idx = mons[offset].mlet + SYM_OFF_M;
-	if (has_rogue_color)
-	    color = NO_COLOR;	/* no need to check iflags.use_color */
-	else
-	    mon_color(offset);
-	/* Disabled for now; anyone want to get reverse video to work? */
-	/* is_reverse = TRUE; */
-	    special |= MG_DETECT;
-    } else if ((offset = (glyph - GLYPH_INVIS_OFF)) >= 0) {	/* invisible */
-	idx = SYM_INVISIBLE + SYM_OFF_X;
-	if (has_rogue_color)
-	    color = NO_COLOR;	/* no need to check iflags.use_color */
-	else
-	    invis_color(offset);
-	    special |= MG_INVIS;
-    } else if ((offset = (glyph - GLYPH_PET_OFF)) >= 0) {	/* a pet */
-	idx = mons[offset].mlet + SYM_OFF_M;
-	if (has_rogue_color)
-	    color = NO_COLOR;	/* no need to check iflags.use_color */
-	else
-	    pet_color(offset);
-	    special |= MG_PET;
-    } else {							/* a monster */
-	idx = mons[glyph].mlet + SYM_OFF_M;
-	if (has_rogue_color && iflags.use_color) {
-	    if (x == u.ux && y == u.uy)
-		/* actually player should be yellow-on-gray if in a corridor */
-		color = CLR_YELLOW;
-	    else
-		color = NO_COLOR;
-	} else {
-	    mon_color(glyph);
-	    /* special case the hero for `showrace' option */
+            cmap_color(offset);
+    } else if ((offset = (glyph - GLYPH_OBJ_OFF)) >= 0) { /* object */
+        idx = objects[offset].oc_class + SYM_OFF_O;
+        if (offset == BOULDER && iflags.bouldersym)
+            idx = SYM_BOULDER + SYM_OFF_X;
+        if (has_rogue_color && iflags.use_color) {
+            switch (objects[offset].oc_class) {
+            case COIN_CLASS:
+                color = CLR_YELLOW;
+                break;
+            case FOOD_CLASS:
+                color = CLR_RED;
+                break;
+            default:
+                color = CLR_BRIGHT_BLUE;
+                break;
+            }
+        } else
+            obj_color(offset);
+    } else if ((offset = (glyph - GLYPH_RIDDEN_OFF)) >= 0) { /* mon ridden */
+        idx = mons[offset].mlet + SYM_OFF_M;
+        if (has_rogue_color)
+            /* This currently implies that the hero is here -- monsters */
+            /* don't ride (yet...).  Should we set it to yellow like in */
+            /* the monster case below?  There is no equivalent in rogue. */
+            color = NO_COLOR; /* no need to check iflags.use_color */
+        else
+            mon_color(offset);
+        special |= MG_RIDDEN;
+    } else if ((offset = (glyph - GLYPH_BODY_OFF)) >= 0) { /* a corpse */
+        idx = objects[CORPSE].oc_class + SYM_OFF_O;
+        if (has_rogue_color && iflags.use_color)
+            color = CLR_RED;
+        else
+            mon_color(offset);
+        special |= MG_CORPSE;
+    } else if ((offset = (glyph - GLYPH_DETECT_OFF)) >= 0) { /* mon detect */
+        idx = mons[offset].mlet + SYM_OFF_M;
+        if (has_rogue_color)
+            color = NO_COLOR; /* no need to check iflags.use_color */
+        else
+            mon_color(offset);
+        /* Disabled for now; anyone want to get reverse video to work? */
+        /* is_reverse = TRUE; */
+        special |= MG_DETECT;
+    } else if ((offset = (glyph - GLYPH_INVIS_OFF)) >= 0) { /* invisible */
+        idx = SYM_INVISIBLE + SYM_OFF_X;
+        if (has_rogue_color)
+            color = NO_COLOR; /* no need to check iflags.use_color */
+        else
+            invis_color(offset);
+        special |= MG_INVIS;
+    } else if ((offset = (glyph - GLYPH_PET_OFF)) >= 0) { /* a pet */
+        idx = mons[offset].mlet + SYM_OFF_M;
+        if (has_rogue_color)
+            color = NO_COLOR; /* no need to check iflags.use_color */
+        else
+            pet_color(offset);
+        special |= MG_PET;
+    } else { /* a monster */
+        idx = mons[glyph].mlet + SYM_OFF_M;
+        if (has_rogue_color && iflags.use_color) {
+            if (x == u.ux && y == u.uy)
+                /* actually player should be yellow-on-gray if in a corridor
+                 */
+                color = CLR_YELLOW;
+            else
+                color = NO_COLOR;
+        } else {
+            mon_color(glyph);
+/* special case the hero for `showrace' option */
 #ifdef TEXTCOLOR
-	    if (iflags.use_color && x == u.ux && y == u.uy &&
-		    flags.showrace && !Upolyd)
-		color = HI_DOMESTIC;
+            if (iflags.use_color && x == u.ux && y == u.uy && flags.showrace
+                && !Upolyd)
+                color = HI_DOMESTIC;
 #endif
-	}
+        }
     }
 
     ch = showsyms[idx];
 #ifdef TEXTCOLOR
     /* Turn off color if no color defined, or rogue level w/o PC graphics. */
     if (!has_color(color) || (Is_rogue_level(&u.uz) && !has_rogue_color))
-	color = NO_COLOR;
+        color = NO_COLOR;
 #endif
 
-    *ochar = (int)ch;
+    *ochar = (int) ch;
     *ospecial = special;
 #ifdef TEXTCOLOR
     *ocolor = color;
@@ -220,9 +230,9 @@ char *
 encglyph(glyph)
 int glyph;
 {
-	static char encbuf[20];
-	Sprintf(encbuf, "\\G%04X%04X", context.rndencode, glyph);
-	return encbuf;
+    static char encbuf[20];
+    Sprintf(encbuf, "\\G%04X%04X", context.rndencode, glyph);
+    return encbuf;
 }
 
 /*
@@ -230,7 +240,7 @@ int glyph;
  * contain a sequence of characters representing:
  *        \GXXXXNNNN	a glyph value, encoded by encglyph().
  *
- * For window ports that haven't yet written their own 
+ * For window ports that haven't yet written their own
  * XXX_putmixed() routine, this general one can be used.
  * It replaces the encoded glyph sequence with a single
  * showsyms[] char, then just passes that string onto
@@ -239,39 +249,41 @@ int glyph;
 
 void
 genl_putmixed(window, attr, str)
-    winid window;
-    int attr;
-    const char *str;
+winid window;
+int attr;
+const char *str;
 {
-	char buf[BUFSZ];
-	const char *cp = str;
-	char *put = buf;
-	while (*cp) {
-	    if (*cp == '\\') {
-		int rndchk = 0, so = 0, gv = 0, ch, oc, dcount;
-		unsigned os;
-		const char *dp, *hex = "00112233445566778899aAbBcCdDeEfF";
-		const char *save_cp = cp;
-		
-		cp++;
-		switch(*cp) {
-		case 'G':	/* glyph value \GXXXXNNNN*/
-		    dcount = 0;
-		    for (++cp; *cp && (dp = index(hex, *cp)) && (dcount++ < 4); cp++)
-			rndchk = (int)((rndchk * 16) + ((int)(dp - hex) / 2));
+    char buf[BUFSZ];
+    const char *cp = str;
+    char *put = buf;
+    while (*cp) {
+        if (*cp == '\\') {
+            int rndchk = 0, so = 0, gv = 0, ch, oc, dcount;
+            unsigned os;
+            const char *dp, *hex = "00112233445566778899aAbBcCdDeEfF";
+            const char *save_cp = cp;
 
-		    if (rndchk == context.rndencode) {
-			dcount = 0;
-		        for (; *cp && (dp = index(hex, *cp)) && (dcount++ < 4); cp++)
-			    gv = (int)((gv * 16) + ((int)(dp - hex) / 2));
-			so = mapglyph(gv, &ch, &oc, &os, 0, 0);
-			*put++ = showsyms[so];
-		    } else {
-			/* possible forgery - leave it the way it is */
-			cp = save_cp;
-		    }
-		    break;
-# if 0
+            cp++;
+            switch (*cp) {
+            case 'G': /* glyph value \GXXXXNNNN*/
+                dcount = 0;
+                for (++cp; *cp && (dp = index(hex, *cp)) && (dcount++ < 4);
+                     cp++)
+                    rndchk = (int) ((rndchk * 16) + ((int) (dp - hex) / 2));
+
+                if (rndchk == context.rndencode) {
+                    dcount = 0;
+                    for (; *cp && (dp = index(hex, *cp)) && (dcount++ < 4);
+                         cp++)
+                        gv = (int) ((gv * 16) + ((int) (dp - hex) / 2));
+                    so = mapglyph(gv, &ch, &oc, &os, 0, 0);
+                    *put++ = showsyms[so];
+                } else {
+                    /* possible forgery - leave it the way it is */
+                    cp = save_cp;
+                }
+                break;
+#if 0
 		case 'S':	/* symbol offset */
 		    dcount = 0;
 		    for (++cp; *cp && (dp = index(hex, *cp)) && (dcount++ < 4); cp++)
@@ -284,15 +296,15 @@ genl_putmixed(window, attr, str)
 		    }
 		    *put++ = showsyms[so];
 		    break;
-# endif
-		case '\\':
-		    break;
-	        }
-	    }
-	    *put++ = *cp++;
-	}
-	*put = '\0';
-	/* now send it to the normal putstr */
-	putstr(window, attr, buf);
+#endif
+            case '\\':
+                break;
+            }
+        }
+        *put++ = *cp++;
+    }
+    *put = '\0';
+    /* now send it to the normal putstr */
+    putstr(window, attr, buf);
 }
 /*mapglyph.c*/

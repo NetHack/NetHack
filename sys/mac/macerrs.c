@@ -1,4 +1,4 @@
-/* NetHack 3.6	macerrs.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	macerrs.c	$NHDT-Date: 1431192785 2015/05/09 17:33:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
 /* NetHack 3.6	macerrs.c	$Date: 2009/05/06 10:49:10 $  $Revision: 1.5 $ */
 /*	SCCS Id: @(#)macerrs.c	3.5	1993/01/24		  */
 /* Copyright (c) Michael Hamel, 1991 */
@@ -17,26 +17,25 @@
 #include <Resources.h>
 #endif
 
-
-void error(const char *format,...)
+void
+error(const char *format, ...)
 {
-	Str255 buf;
-	va_list ap;
+    Str255 buf;
+    va_list ap;
 
-	va_start(ap, format);
-	vsprintf((char *)buf, format, ap);
-	va_end(ap);
+    va_start(ap, format);
+    vsprintf((char *) buf, format, ap);
+    va_end(ap);
 
-	C2P((char *)buf, buf);
-	ParamText(buf, (StringPtr)"", (StringPtr)"", (StringPtr)"");
-	Alert(128, (ModalFilterUPP) NULL);
-	ExitToShell();
+    C2P((char *) buf, buf);
+    ParamText(buf, (StringPtr) "", (StringPtr) "", (StringPtr) "");
+    Alert(128, (ModalFilterUPP) NULL);
+    ExitToShell();
 }
 
+#if 0 /* Remainder of file is obsolete and will be removed */
 
-#if 0	/* Remainder of file is obsolete and will be removed */
-
-#define stackDepth  1
+#define stackDepth 1
 #define errAlertID 129
 #define stdIOErrID 1999
 
@@ -95,34 +94,33 @@ void mustwork(short errcode)
 	else ExitToShell();
 }
 
-
 #if defined(USE_STDARG) || defined(USE_VARARGS)
-# ifdef USE_STDARG
+#ifdef USE_STDARG
 static void vprogerror(const char *line, va_list the_args);
-# else
+#else
 static void vprogerror();
-# endif
+#endif
 
 /* Macro substitute for error() */
-void error VA_DECL(const char *, line)
+void error VA_DECL(const char *, line){
 	VA_START(line);
 	VA_INIT(line, char *);
 	vprogerror(line, VA_ARGS);
 	VA_END();
 }
 
-# ifdef USE_STDARG
+#ifdef USE_STDARG
 static void
 vprogerror(const char *line, va_list the_args) {
-# else
+#else
 static void
 vprogerror(line, the_args) const char *line; va_list the_args; {
-# endif
+#endif
 
-#else  /* USE_STDARG | USE_VARARG */
+#else /* USE_STDARG | USE_VARARG */
 
 void
-error VA_DECL(const char *, line)
+error VA_DECL(const char *, line){
 #endif
 /* Do NOT use VA_START and VA_END in here... see above */
 	char pbuf[BUFSZ];

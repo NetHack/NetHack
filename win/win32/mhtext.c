@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhtext.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	mhtext.c	$NHDT-Date: 1431192777 2015/05/09 17:32:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.24 $ */
 /* NetHack 3.6	mhtext.c	$Date: 2012/01/11 01:53:44 $  $Revision: 1.17 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -12,264 +12,283 @@
 PNHWinApp GetNHApp(void);
 
 typedef struct mswin_nethack_text_window {
-	TCHAR*  window_text;
+    TCHAR *window_text;
 } NHTextWindow, *PNHTextWindow;
 
-static WNDPROC  editControlWndProc = 0;
-#define DEFAULT_COLOR_BG_TEXT	COLOR_WINDOW
-#define DEFAULT_COLOR_FG_TEXT	COLOR_WINDOWTEXT
+static WNDPROC editControlWndProc = 0;
+#define DEFAULT_COLOR_BG_TEXT COLOR_WINDOW
+#define DEFAULT_COLOR_FG_TEXT COLOR_WINDOWTEXT
 
-INT_PTR	CALLBACK	NHTextWndProc(HWND, UINT, WPARAM, LPARAM);
-LRESULT CALLBACK	NHEditHookWndProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK NHTextWndProc(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK NHEditHookWndProc(HWND, UINT, WPARAM, LPARAM);
 static void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void LayoutText(HWND hwnd);
 
-HWND mswin_init_text_window () {
-	HWND ret;
-	PNHTextWindow data;
-	RECT  rt;
+HWND
+mswin_init_text_window()
+{
+    HWND ret;
+    PNHTextWindow data;
+    RECT rt;
 
-	/* get window position */
-	if( GetNHApp()->bAutoLayout ) {
-		SetRect( &rt, 0, 0, 0, 0);
-	} else {
-		mswin_get_window_placement(NHW_TEXT, &rt);
-	}
+    /* get window position */
+    if (GetNHApp()->bAutoLayout) {
+        SetRect(&rt, 0, 0, 0, 0);
+    } else {
+        mswin_get_window_placement(NHW_TEXT, &rt);
+    }
 
-	/* create text widnow object */
-	ret = CreateDialog(
-			GetNHApp()->hApp,
-			MAKEINTRESOURCE(IDD_NHTEXT),
-			GetNHApp()->hMainWnd,
-			NHTextWndProc
-	);
-	if( !ret ) panic("Cannot create text window");
+    /* create text widnow object */
+    ret = CreateDialog(GetNHApp()->hApp, MAKEINTRESOURCE(IDD_NHTEXT),
+                       GetNHApp()->hMainWnd, NHTextWndProc);
+    if (!ret)
+        panic("Cannot create text window");
 
-	/* move it in the predefined position */
-	if( !GetNHApp()->bAutoLayout ) {
-		MoveWindow(ret, rt.left, rt.top, rt.right - rt.left, rt.bottom - rt.top, TRUE);
-	}
+    /* move it in the predefined position */
+    if (!GetNHApp()->bAutoLayout) {
+        MoveWindow(ret, rt.left, rt.top, rt.right - rt.left,
+                   rt.bottom - rt.top, TRUE);
+    }
 
-	/* Set window caption */
-	SetWindowText(ret, "Text");
-	if( !GetNHApp()->bWindowsLocked ) {
-		DWORD style;
-		style = GetWindowLong(ret, GWL_STYLE);
-		style |= WS_CAPTION;
-		SetWindowLong(ret, GWL_STYLE, style);
-		SetWindowPos(ret, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
-	}
+    /* Set window caption */
+    SetWindowText(ret, "Text");
+    if (!GetNHApp()->bWindowsLocked) {
+        DWORD style;
+        style = GetWindowLong(ret, GWL_STYLE);
+        style |= WS_CAPTION;
+        SetWindowLong(ret, GWL_STYLE, style);
+        SetWindowPos(ret, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE
+                                                | SWP_NOZORDER
+                                                | SWP_FRAMECHANGED);
+    }
 
-	/* create and set window data */
-	data = (PNHTextWindow)malloc(sizeof(NHTextWindow));
-	if( !data ) panic("out of memory");
-	ZeroMemory(data, sizeof(NHTextWindow));
-	SetWindowLongPtr(ret, GWLP_USERDATA, (LONG_PTR)data);
-	return ret;
+    /* create and set window data */
+    data = (PNHTextWindow) malloc(sizeof(NHTextWindow));
+    if (!data)
+        panic("out of memory");
+    ZeroMemory(data, sizeof(NHTextWindow));
+    SetWindowLongPtr(ret, GWLP_USERDATA, (LONG_PTR) data);
+    return ret;
 }
 
-void mswin_display_text_window (HWND hWnd)
+void
+mswin_display_text_window(HWND hWnd)
 {
-	PNHTextWindow data;
-	
-	data = (PNHTextWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
-	if( data && data->window_text ) {
-		HWND control;
-		control = GetDlgItem(hWnd, IDC_TEXT_CONTROL);
-		SendMessage(control, EM_FMTLINES, 1, 0 );
-		SetWindowText(control, data->window_text);
-	}
+    PNHTextWindow data;
 
-	mswin_popup_display(hWnd, NULL);
-	mswin_popup_destroy(hWnd);
+    data = (PNHTextWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
+    if (data && data->window_text) {
+        HWND control;
+        control = GetDlgItem(hWnd, IDC_TEXT_CONTROL);
+        SendMessage(control, EM_FMTLINES, 1, 0);
+        SetWindowText(control, data->window_text);
+    }
+
+    mswin_popup_display(hWnd, NULL);
+    mswin_popup_destroy(hWnd);
 }
-    
-INT_PTR CALLBACK NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+
+INT_PTR CALLBACK
+NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	HWND control;
-	HDC hdc;
-	PNHTextWindow data;
+    HWND control;
+    HDC hdc;
+    PNHTextWindow data;
     TCHAR title[MAX_LOADSTRING];
-	
-	data = (PNHTextWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
-	switch (message) 
-	{
-	case WM_INITDIALOG:
-	    /* set text control font */
-		control = GetDlgItem(hWnd, IDC_TEXT_CONTROL);
-		if( !control ) {
-			panic("cannot get text view window");
-		}
 
-		hdc = GetDC(control);
-		SendMessage(control, WM_SETFONT, (WPARAM)mswin_get_font(NHW_TEXT, ATR_NONE, hdc, FALSE), 0);
-		ReleaseDC(control, hdc);
+    data = (PNHTextWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
+    switch (message) {
+    case WM_INITDIALOG:
+        /* set text control font */
+        control = GetDlgItem(hWnd, IDC_TEXT_CONTROL);
+        if (!control) {
+            panic("cannot get text view window");
+        }
 
-		/* subclass edit control */
-		editControlWndProc = (WNDPROC)GetWindowLongPtr(control, GWLP_WNDPROC);
-		SetWindowLongPtr(control, GWLP_WNDPROC, (LONG_PTR)NHEditHookWndProc);
+        hdc = GetDC(control);
+        SendMessage(control, WM_SETFONT,
+                    (WPARAM) mswin_get_font(NHW_TEXT, ATR_NONE, hdc, FALSE),
+                    0);
+        ReleaseDC(control, hdc);
 
-		SetFocus(control);
+        /* subclass edit control */
+        editControlWndProc =
+            (WNDPROC) GetWindowLongPtr(control, GWLP_WNDPROC);
+        SetWindowLongPtr(control, GWLP_WNDPROC, (LONG_PTR) NHEditHookWndProc);
 
-        /* Even though the dialog has no caption, you can still set the title 
+        SetFocus(control);
+
+        /* Even though the dialog has no caption, you can still set the title
            which shows on Alt-Tab */
         LoadString(GetNHApp()->hApp, IDS_APP_TITLE, title, MAX_LOADSTRING);
         SetWindowText(hWnd, title);
-	return FALSE;
+        return FALSE;
 
-	case WM_MSNH_COMMAND:
-		onMSNHCommand(hWnd, wParam, lParam);
-	break;
+    case WM_MSNH_COMMAND:
+        onMSNHCommand(hWnd, wParam, lParam);
+        break;
 
-	case WM_SIZE: {
-		RECT	rt;
+    case WM_SIZE: {
+        RECT rt;
 
-		GetWindowRect(hWnd, &rt);
-		ScreenToClient(GetNHApp()->hMainWnd, (LPPOINT)&rt);
-		ScreenToClient(GetNHApp()->hMainWnd, ((LPPOINT)&rt)+1);
-		mswin_update_window_placement(NHW_TEXT, &rt);
+        GetWindowRect(hWnd, &rt);
+        ScreenToClient(GetNHApp()->hMainWnd, (LPPOINT) &rt);
+        ScreenToClient(GetNHApp()->hMainWnd, ((LPPOINT) &rt) + 1);
+        mswin_update_window_placement(NHW_TEXT, &rt);
 
-		LayoutText(hWnd);
-	} return FALSE;
+        LayoutText(hWnd);
+    }
+        return FALSE;
 
-	case WM_MOVE: {
-		RECT rt;
-		GetWindowRect(hWnd, &rt);
-		ScreenToClient(GetNHApp()->hMainWnd, (LPPOINT)&rt);
-		ScreenToClient(GetNHApp()->hMainWnd, ((LPPOINT)&rt)+1);
-		mswin_update_window_placement(NHW_TEXT, &rt);
-	} return FALSE;
+    case WM_MOVE: {
+        RECT rt;
+        GetWindowRect(hWnd, &rt);
+        ScreenToClient(GetNHApp()->hMainWnd, (LPPOINT) &rt);
+        ScreenToClient(GetNHApp()->hMainWnd, ((LPPOINT) &rt) + 1);
+        mswin_update_window_placement(NHW_TEXT, &rt);
+    }
+        return FALSE;
 
-	case WM_COMMAND:
-		switch (LOWORD(wParam)) 
-        { 
-          case IDOK: 
-		  case IDCANCEL:
-			mswin_window_mark_dead(mswin_winid_from_handle(hWnd));
-			if( GetNHApp()->hMainWnd==hWnd ) 
-				GetNHApp()->hMainWnd=NULL;
-			DestroyWindow(hWnd);
-			SetFocus(GetNHApp()->hMainWnd);
-			return TRUE;
-	}
-	break;
+    case WM_COMMAND:
+        switch (LOWORD(wParam)) {
+        case IDOK:
+        case IDCANCEL:
+            mswin_window_mark_dead(mswin_winid_from_handle(hWnd));
+            if (GetNHApp()->hMainWnd == hWnd)
+                GetNHApp()->hMainWnd = NULL;
+            DestroyWindow(hWnd);
+            SetFocus(GetNHApp()->hMainWnd);
+            return TRUE;
+        }
+        break;
 
-	case WM_CTLCOLORSTATIC: { /* sent by edit control before it is drawn */
-		HDC hdcEdit = (HDC) wParam; 
-		HWND hwndEdit = (HWND) lParam;
-		if( hwndEdit == GetDlgItem(hWnd, IDC_TEXT_CONTROL) ) {
-			SetBkColor(hdcEdit, 
-				text_bg_brush ? text_bg_color : (COLORREF)GetSysColor(DEFAULT_COLOR_BG_TEXT)
-				);
-			SetTextColor(hdcEdit, 
-				text_fg_brush ? text_fg_color : (COLORREF)GetSysColor(DEFAULT_COLOR_FG_TEXT) 
-				); 
-			return (INT_PTR)(text_bg_brush 
-					? text_bg_brush : SYSCLR_TO_BRUSH(DEFAULT_COLOR_BG_TEXT));
-		}
-	} return FALSE;
+    case WM_CTLCOLORSTATIC: { /* sent by edit control before it is drawn */
+        HDC hdcEdit = (HDC) wParam;
+        HWND hwndEdit = (HWND) lParam;
+        if (hwndEdit == GetDlgItem(hWnd, IDC_TEXT_CONTROL)) {
+            SetBkColor(hdcEdit, text_bg_brush ? text_bg_color
+                                              : (COLORREF) GetSysColor(
+                                                    DEFAULT_COLOR_BG_TEXT));
+            SetTextColor(hdcEdit, text_fg_brush ? text_fg_color
+                                                : (COLORREF) GetSysColor(
+                                                      DEFAULT_COLOR_FG_TEXT));
+            return (INT_PTR)(text_bg_brush
+                                 ? text_bg_brush
+                                 : SYSCLR_TO_BRUSH(DEFAULT_COLOR_BG_TEXT));
+        }
+    }
+        return FALSE;
 
-	case WM_DESTROY:
-		if( data ) {
-			if( data->window_text ) free(data->window_text);
-			free(data);
-			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)0);
-		}
-	break;
-
-	}
-	return FALSE;
+    case WM_DESTROY:
+        if (data) {
+            if (data->window_text)
+                free(data->window_text);
+            free(data);
+            SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR) 0);
+        }
+        break;
+    }
+    return FALSE;
 }
 
-void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
+void
+onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
-	PNHTextWindow data;
-	
-	data = (PNHTextWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
-	switch( wParam ) {
-	case MSNH_MSG_PUTSTR: {
-		PMSNHMsgPutstr msg_data = (PMSNHMsgPutstr)lParam;
-		TCHAR	wbuf[BUFSZ];
-		size_t text_size;
+    PNHTextWindow data;
 
-		if( !data->window_text ) {
-			text_size = strlen(msg_data->text) + 4;
-			data->window_text = (TCHAR*)malloc(text_size*sizeof(data->window_text[0]));
-			ZeroMemory(data->window_text, text_size*sizeof(data->window_text[0]));
-		} else {
-			text_size = _tcslen(data->window_text) + strlen(msg_data->text) + 4;
-			data->window_text = (TCHAR*)realloc(data->window_text, text_size*sizeof(data->window_text[0]));
-		}
-		if( !data->window_text ) break;
-		
-		_tcscat(data->window_text, NH_A2W(msg_data->text, wbuf, BUFSZ)); 
-		_tcscat(data->window_text, TEXT("\r\n"));
-		break;
-	}
-	}
+    data = (PNHTextWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
+    switch (wParam) {
+    case MSNH_MSG_PUTSTR: {
+        PMSNHMsgPutstr msg_data = (PMSNHMsgPutstr) lParam;
+        TCHAR wbuf[BUFSZ];
+        size_t text_size;
+
+        if (!data->window_text) {
+            text_size = strlen(msg_data->text) + 4;
+            data->window_text =
+                (TCHAR *) malloc(text_size * sizeof(data->window_text[0]));
+            ZeroMemory(data->window_text,
+                       text_size * sizeof(data->window_text[0]));
+        } else {
+            text_size =
+                _tcslen(data->window_text) + strlen(msg_data->text) + 4;
+            data->window_text = (TCHAR *) realloc(
+                data->window_text, text_size * sizeof(data->window_text[0]));
+        }
+        if (!data->window_text)
+            break;
+
+        _tcscat(data->window_text, NH_A2W(msg_data->text, wbuf, BUFSZ));
+        _tcscat(data->window_text, TEXT("\r\n"));
+        break;
+    }
+    }
 }
 
-void LayoutText(HWND hWnd) 
+void
+LayoutText(HWND hWnd)
 {
-	HWND  btn_ok;
-	HWND  text;
-	RECT  clrt, rt;
-	POINT pt_elem, pt_ok;
-	SIZE  sz_elem, sz_ok;
+    HWND btn_ok;
+    HWND text;
+    RECT clrt, rt;
+    POINT pt_elem, pt_ok;
+    SIZE sz_elem, sz_ok;
 
-	text = GetDlgItem(hWnd, IDC_TEXT_CONTROL);
-	btn_ok = GetDlgItem(hWnd, IDOK);
+    text = GetDlgItem(hWnd, IDC_TEXT_CONTROL);
+    btn_ok = GetDlgItem(hWnd, IDOK);
 
-	/* get window coordinates */
-	GetClientRect(hWnd, &clrt );
-	
-	/* set window placements */
-	GetWindowRect(btn_ok, &rt);
-	sz_ok.cx = clrt.right - clrt.left;
-	sz_ok.cy = rt.bottom-rt.top;
-	pt_ok.x = clrt.left;
-	pt_ok.y = clrt.bottom - sz_ok.cy;
+    /* get window coordinates */
+    GetClientRect(hWnd, &clrt);
 
-	pt_elem.x = clrt.left;
-	pt_elem.y = clrt.top;
-	sz_elem.cx = clrt.right - clrt.left;
-	sz_elem.cy = pt_ok.y;
+    /* set window placements */
+    GetWindowRect(btn_ok, &rt);
+    sz_ok.cx = clrt.right - clrt.left;
+    sz_ok.cy = rt.bottom - rt.top;
+    pt_ok.x = clrt.left;
+    pt_ok.y = clrt.bottom - sz_ok.cy;
 
-	MoveWindow(text, pt_elem.x, pt_elem.y, sz_elem.cx, sz_elem.cy, TRUE );
-	MoveWindow(btn_ok, pt_ok.x, pt_ok.y, sz_ok.cx, sz_ok.cy, TRUE );
+    pt_elem.x = clrt.left;
+    pt_elem.y = clrt.top;
+    sz_elem.cx = clrt.right - clrt.left;
+    sz_elem.cy = pt_ok.y;
+
+    MoveWindow(text, pt_elem.x, pt_elem.y, sz_elem.cx, sz_elem.cy, TRUE);
+    MoveWindow(btn_ok, pt_ok.x, pt_ok.y, sz_ok.cx, sz_ok.cy, TRUE);
 }
 
 /* Edit box hook */
-LRESULT CALLBACK NHEditHookWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK
+NHEditHookWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	HDC hDC;
-	RECT rc;
+    HDC hDC;
+    RECT rc;
 
-	switch(message) {
-	case WM_ERASEBKGND: 
-	    hDC = (HDC) wParam; 
-	    GetClientRect(hWnd, &rc); 
-	    FillRect(hDC, &rc, text_bg_brush? text_bg_brush : SYSCLR_TO_BRUSH(DEFAULT_COLOR_BG_TEXT)); 
-	return 1;
+    switch (message) {
+    case WM_ERASEBKGND:
+        hDC = (HDC) wParam;
+        GetClientRect(hWnd, &rc);
+        FillRect(hDC, &rc, text_bg_brush
+                               ? text_bg_brush
+                               : SYSCLR_TO_BRUSH(DEFAULT_COLOR_BG_TEXT));
+        return 1;
 
-	case WM_KEYDOWN:
-		switch (wParam)
-        {
-    	/* close on space in Windows mode
+    case WM_KEYDOWN:
+        switch (wParam) {
+        /* close on space in Windows mode
            page down on space in NetHack mode */
-        case VK_SPACE:
-        {   
+        case VK_SPACE: {
             SCROLLINFO si;
 
             si.cbSize = sizeof(SCROLLINFO);
             si.fMask = SIF_POS | SIF_RANGE | SIF_PAGE;
             GetScrollInfo(hWnd, SB_VERT, &si);
             /* If nethackmode and not at the end of the list */
-            if (GetNHApp()->regNetHackMode &&
-                    (si.nPos + (int)si.nPage) <= (si.nMax - si.nMin))
+            if (GetNHApp()->regNetHackMode
+                && (si.nPos + (int) si.nPage) <= (si.nMax - si.nMin))
                 SendMessage(hWnd, EM_SCROLL, SB_PAGEDOWN, 0);
             else
-			    PostMessage(GetParent(hWnd), WM_COMMAND, MAKELONG(IDOK, 0), 0);
+                PostMessage(GetParent(hWnd), WM_COMMAND, MAKELONG(IDOK, 0),
+                            0);
             return 0;
         }
         case VK_NEXT:
@@ -284,20 +303,19 @@ LRESULT CALLBACK NHEditHookWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
         case VK_DOWN:
             SendMessage(hWnd, EM_SCROLL, SB_LINEDOWN, 0);
             return 0;
+        }
+        break;
 
-		}
-	break;
+    /* edit control needs to know nothing of focus. We will take care of it
+     * for it */
+    case WM_SETFOCUS:
+        HideCaret(hWnd);
+        return 0;
+    }
 
-	/* edit control needs to know nothing of focus. We will take care of it for it */
-	case WM_SETFOCUS:
-            HideCaret(hWnd);
-	    return 0;
-	}
-             
-
-	if( editControlWndProc ) 
-		return CallWindowProc(editControlWndProc, hWnd, message, wParam, lParam);
-	else 
-		return 0;
+    if (editControlWndProc)
+        return CallWindowProc(editControlWndProc, hWnd, message, wParam,
+                              lParam);
+    else
+        return 0;
 }
-

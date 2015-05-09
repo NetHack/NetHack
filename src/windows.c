@@ -1,4 +1,4 @@
-/* NetHack 3.6	windows.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	windows.c	$NHDT-Date: 1431192762 2015/05/09 17:32:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.26 $ */
 /* NetHack 3.6	windows.c	$Date: 2012/01/23 10:45:28 $  $Revision: 1.23 $ */
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -24,10 +24,11 @@ extern struct window_procs mac_procs;
 #endif
 #ifdef BEOS_GRAPHICS
 extern struct window_procs beos_procs;
-extern void FDECL(be_win_init, (int));	FAIL /* be_win_init doesn't exist? XXX*/
+extern void FDECL(be_win_init, (int));
+FAIL /* be_win_init doesn't exist? XXX*/
 #endif
 #ifdef AMIGA_INTUITION
-extern struct window_procs amii_procs;
+    extern struct window_procs amii_procs;
 extern struct window_procs amiv_procs;
 extern void FDECL(ami_wininit_data, (int));
 #endif
@@ -60,20 +61,19 @@ STATIC_DCL void FDECL(def_raw_print, (const char *s));
 #ifdef HANGUPHANDLING
 volatile
 #endif
-NEARDATA struct window_procs windowprocs;
+    NEARDATA struct window_procs windowprocs;
 
 #ifdef WINCHAIN
-# define CHAINR(x) ,x
+#define CHAINR(x) , x
 #else
-# define CHAINR(x)
+#define CHAINR(x)
 #endif
 
-static
-struct win_choices {
+static struct win_choices {
     struct window_procs *procs;
-    void FDECL((*ini_routine), (int));		/* optional (can be 0) */
+    void FDECL((*ini_routine), (int)); /* optional (can be 0) */
 #ifdef WINCHAIN
-    void *FDECL((*chain_routine),(int, int, void *, void *, void *));
+    void *FDECL((*chain_routine), (int, int, void *, void *, void *));
 #endif
 } winchoices[] = {
 #ifdef TTY_GRAPHICS
@@ -95,8 +95,10 @@ struct win_choices {
     { &beos_procs, be_win_init CHAINR(0) },
 #endif
 #ifdef AMIGA_INTUITION
-    { &amii_procs, ami_wininit_data CHAINR(0) },		/* Old font version of the game */
-    { &amiv_procs, ami_wininit_data CHAINR(0) },		/* Tile version of the game */
+    { &amii_procs,
+      ami_wininit_data CHAINR(0) }, /* Old font version of the game */
+    { &amiv_procs,
+      ami_wininit_data CHAINR(0) }, /* Tile version of the game */
 #endif
 #ifdef WIN32_GRAPHICS
     { &win32_procs, 0 CHAINR(0) },
@@ -109,49 +111,64 @@ struct win_choices {
 #endif
 #ifdef WINCHAIN
     { &chainin_procs, chainin_procs_init, chainin_procs_chain },
-    { (struct window_procs *)&chainout_procs, chainout_procs_init, chainout_procs_chain },
+    { (struct window_procs *) &chainout_procs, chainout_procs_init,
+      chainout_procs_chain },
 
-    { (struct window_procs *)&trace_procs, trace_procs_init, trace_procs_chain },
+    { (struct window_procs *) &trace_procs, trace_procs_init,
+      trace_procs_chain },
 #endif
-    { 0, 0 CHAINR(0) }		/* must be last */
+    { 0, 0 CHAINR(0) } /* must be last */
 };
 
 #ifdef WINCHAIN
 struct winlink {
-	struct winlink *nextlink;
-	struct win_choices *wincp;
-	void *linkdata;
+    struct winlink *nextlink;
+    struct win_choices *wincp;
+    void *linkdata;
 };
 /* NB: this chain does not contain the terminal real window system pointer */
 
 static struct winlink *chain = 0;
 
-static struct winlink *wl_new(){
-	return calloc(1, sizeof(struct winlink));
+static struct winlink *
+wl_new()
+{
+    return calloc(1, sizeof(struct winlink));
 }
-static void wl_addhead(struct winlink *wl){
-	wl->nextlink = chain;
-	chain = wl;
+static void
+wl_addhead(struct winlink *wl)
+{
+    wl->nextlink = chain;
+    chain = wl;
 }
-static void wl_addtail(struct winlink *wl){
-	struct winlink *p = chain;
+static void
+wl_addtail(struct winlink *wl)
+{
+    struct winlink *p = chain;
 
-	if(!chain){ chain = wl; return; }
-	while(p->nextlink){ p=p->nextlink; }
-	p->nextlink = wl;
-	return;
+    if (!chain) {
+        chain = wl;
+        return;
+    }
+    while (p->nextlink) {
+        p = p->nextlink;
+    }
+    p->nextlink = wl;
+    return;
 }
 #endif
 
 static struct win_choices *last_winchoice = 0;
 
 boolean
-genl_can_suspend_no(VOID_ARGS){
+genl_can_suspend_no(VOID_ARGS)
+{
     return FALSE;
 }
 
 boolean
-genl_can_suspend_yes(VOID_ARGS){
+genl_can_suspend_yes(VOID_ARGS)
+{
     return TRUE;
 }
 
@@ -170,14 +187,13 @@ const char *s;
 {
     register int i;
 
-    for(i=0; winchoices[i].procs; i++){
-	if(!strcmpi(s, winchoices[i].procs->name)){
-	    return &winchoices[i];
-	}
+    for (i = 0; winchoices[i].procs; i++) {
+        if (!strcmpi(s, winchoices[i].procs->name)) {
+            return &winchoices[i];
+        }
     }
 
     return NULL;
-
 }
 #endif
 
@@ -187,42 +203,46 @@ const char *s;
 {
     register int i;
 
-    for(i=0; winchoices[i].procs; i++){
-	if ('+' == winchoices[i].procs->name[0]) continue;
-	if ('-' == winchoices[i].procs->name[0]) continue;
-	if (!strcmpi(s, winchoices[i].procs->name)) {
-	    windowprocs = *winchoices[i].procs;
+    for (i = 0; winchoices[i].procs; i++) {
+        if ('+' == winchoices[i].procs->name[0])
+            continue;
+        if ('-' == winchoices[i].procs->name[0])
+            continue;
+        if (!strcmpi(s, winchoices[i].procs->name)) {
+            windowprocs = *winchoices[i].procs;
 
-	    if (last_winchoice && last_winchoice->ini_routine)
-		(*last_winchoice->ini_routine)(WININIT_UNDO);
-	    if (winchoices[i].ini_routine)
-		(*winchoices[i].ini_routine)(WININIT);
-	    last_winchoice = &winchoices[i];
-	    return;
-	}
+            if (last_winchoice && last_winchoice->ini_routine)
+                (*last_winchoice->ini_routine)(WININIT_UNDO);
+            if (winchoices[i].ini_routine)
+                (*winchoices[i].ini_routine)(WININIT);
+            last_winchoice = &winchoices[i];
+            return;
+        }
     }
 
     if (!windowprocs.win_raw_print)
-	windowprocs.win_raw_print = def_raw_print;
+        windowprocs.win_raw_print = def_raw_print;
 
-    if(!winchoices[0].procs){
-	raw_printf("No window types?");
-	exit(EXIT_FAILURE);
+    if (!winchoices[0].procs) {
+        raw_printf("No window types?");
+        exit(EXIT_FAILURE);
     }
-    if(!winchoices[1].procs){
-	raw_printf("Window type %s not recognized.  The only choice is: %s.",
-		s, winchoices[0].procs->name);
+    if (!winchoices[1].procs) {
+        raw_printf("Window type %s not recognized.  The only choice is: %s.",
+                   s, winchoices[0].procs->name);
     } else {
-	raw_printf("Window type %s not recognized.  Choices are:", s);
-	for(i=0; winchoices[i].procs; i++){
-	    if ('+' == winchoices[i].procs->name[0]) continue;
-	    if ('-' == winchoices[i].procs->name[0]) continue;
-	    raw_printf("        %s", winchoices[i].procs->name);
-	}
+        raw_printf("Window type %s not recognized.  Choices are:", s);
+        for (i = 0; winchoices[i].procs; i++) {
+            if ('+' == winchoices[i].procs->name[0])
+                continue;
+            if ('-' == winchoices[i].procs->name[0])
+                continue;
+            raw_printf("        %s", winchoices[i].procs->name);
+        }
     }
 
     if (windowprocs.win_raw_print == def_raw_print)
-	terminate(EXIT_SUCCESS);
+        terminate(EXIT_SUCCESS);
     wait_synch();
 }
 
@@ -233,101 +253,100 @@ const char *s;
 {
     register int i;
 
-    for(i=0; winchoices[i].procs; i++) {
-	if ('+' != winchoices[i].procs->name[0]) continue;
-	if (!strcmpi(s, winchoices[i].procs->name)) {
-	    struct winlink *p = wl_new();
-	    p->wincp = &winchoices[i];
-	    wl_addtail(p);
-	    /* NB: The ini_routine() will be called during commit. */
-	    return;
-	}
+    for (i = 0; winchoices[i].procs; i++) {
+        if ('+' != winchoices[i].procs->name[0])
+            continue;
+        if (!strcmpi(s, winchoices[i].procs->name)) {
+            struct winlink *p = wl_new();
+            p->wincp = &winchoices[i];
+            wl_addtail(p);
+            /* NB: The ini_routine() will be called during commit. */
+            return;
+        }
     }
 
     windowprocs.win_raw_print = def_raw_print;
 
     raw_printf("Window processor %s not recognized.  Choices are:", s);
-    for(i=0; winchoices[i].procs; i++) {
-	if ('+' != winchoices[i].procs->name[0]) continue;
-	raw_printf("        %s", winchoices[i].procs->name);
+    for (i = 0; winchoices[i].procs; i++) {
+        if ('+' != winchoices[i].procs->name[0])
+            continue;
+        raw_printf("        %s", winchoices[i].procs->name);
     }
 
     exit(EXIT_FAILURE);
 }
 
 void
-commit_windowchain(){
+commit_windowchain()
+{
     struct winlink *p;
     int n;
     int wincap, wincap2;
 
-    if(!chain) return;
+    if (!chain)
+        return;
 
-	/* Save wincap* from the real window system - we'll restore it below. */
+    /* Save wincap* from the real window system - we'll restore it below. */
     wincap = windowprocs.wincap;
     wincap2 = windowprocs.wincap2;
 
-	/* add -chainin at head and -chainout at tail */
-    p=wl_new();
+    /* add -chainin at head and -chainout at tail */
+    p = wl_new();
     p->wincp = win_choices_find("-chainin");
-    if(! p->wincp){
-	raw_printf("Can't locate processor '-chainin'");
-	exit(EXIT_FAILURE);
+    if (!p->wincp) {
+        raw_printf("Can't locate processor '-chainin'");
+        exit(EXIT_FAILURE);
     }
     wl_addhead(p);
 
-    p=wl_new();
+    p = wl_new();
     p->wincp = win_choices_find("-chainout");
-    if(! p->wincp){
-	raw_printf("Can't locate processor '-chainout'");
-	exit(EXIT_FAILURE);
+    if (!p->wincp) {
+        raw_printf("Can't locate processor '-chainout'");
+        exit(EXIT_FAILURE);
     }
     wl_addtail(p);
 
-	/* Now alloc() init() similar to Objective-C. */
-    for(n=1,p=chain;p;n++,p=p->nextlink){
-	p->linkdata = (*p->wincp->chain_routine)(WINCHAIN_ALLOC,n,0,0,0);
+    /* Now alloc() init() similar to Objective-C. */
+    for (n = 1, p = chain; p; n++, p = p->nextlink) {
+        p->linkdata = (*p->wincp->chain_routine)(WINCHAIN_ALLOC, n, 0, 0, 0);
     }
 
-    for(n=1,p=chain;p;n++,p=p->nextlink){
-	if(p->nextlink){
-	    (void)(*p->wincp->chain_routine)(
-			WINCHAIN_INIT,n,
-			p->linkdata,p->nextlink->wincp->procs,
-			p->nextlink->linkdata
-	    );
-	} else {
-	    (void)(*p->wincp->chain_routine)(
-			WINCHAIN_INIT,n,
-			p->linkdata,last_winchoice->procs,
-			0
-	    );
-	}
+    for (n = 1, p = chain; p; n++, p = p->nextlink) {
+        if (p->nextlink) {
+            (void) (*p->wincp->chain_routine)(WINCHAIN_INIT, n, p->linkdata,
+                                              p->nextlink->wincp->procs,
+                                              p->nextlink->linkdata);
+        } else {
+            (void) (*p->wincp->chain_routine)(WINCHAIN_INIT, n, p->linkdata,
+                                              last_winchoice->procs, 0);
+        }
     }
 
-	/* Restore the saved wincap* values.  We do it here to give the
-	 * ini_routine()s a chance to change or check them. */
+    /* Restore the saved wincap* values.  We do it here to give the
+     * ini_routine()s a chance to change or check them. */
     chain->wincp->procs->wincap = wincap;
     chain->wincp->procs->wincap2 = wincap2;
 
-	/* Call the init procs.  Do not re-init the terminal real win. */
-    p=chain;
-    while(p->nextlink){
-	if(p->wincp->ini_routine){
-	    (*p->wincp->ini_routine)(WININIT);
-	}
-	p=p->nextlink;
+    /* Call the init procs.  Do not re-init the terminal real win. */
+    p = chain;
+    while (p->nextlink) {
+        if (p->wincp->ini_routine) {
+            (*p->wincp->ini_routine)(WININIT);
+        }
+        p = p->nextlink;
     }
 
-	/* Install the chain into window procs very late so ini_routine()s
-	 * can raw_print on error. */
+    /* Install the chain into window procs very late so ini_routine()s
+     * can raw_print on error. */
     windowprocs = *chain->wincp->procs;
 
-    p=chain;
-    while(p){
-	struct winlink *np = p->nextlink;
-	free(p);
-	p = np;		/* assignment, not proof */
+    p = chain;
+    while (p) {
+        struct winlink *np = p->nextlink;
+        free(p);
+        p = np; /* assignment, not proof */
     }
 }
 #endif
@@ -352,30 +371,30 @@ void
 genl_preference_update(pref)
 const char *pref UNUSED;
 {
-	/* window ports are expected to provide
-	   their own preference update routine
-	   for the preference capabilities that
-	   they support.
-	   Just return in this genl one. */
-	return;
+    /* window ports are expected to provide
+       their own preference update routine
+       for the preference capabilities that
+       they support.
+       Just return in this genl one. */
+    return;
 }
 
 char *
 genl_getmsghistory(init)
 boolean init UNUSED;
 {
-	/* window ports can provide
-	   their own getmsghistory() routine to
-	   preserve message history between games.
-	   The routine is called repeatedly from
-	   the core save routine, and the window
-	   port is expected to successively return
-	   each message that it wants saved, starting
-	   with the oldest message first, finishing
-	   with the most recent.
-	   Return null pointer when finished.
-	 */
-	 return (char *)0;
+    /* window ports can provide
+       their own getmsghistory() routine to
+       preserve message history between games.
+       The routine is called repeatedly from
+       the core save routine, and the window
+       port is expected to successively return
+       each message that it wants saved, starting
+       with the oldest message first, finishing
+       with the most recent.
+       Return null pointer when finished.
+     */
+    return (char *) 0;
 }
 
 /*ARGSUSED*/
@@ -384,65 +403,65 @@ genl_putmsghistory(msg, is_restoring)
 const char *msg UNUSED;
 boolean is_restoring UNUSED;
 {
-	/* window ports can provide
-	   their own putmsghistory() routine to
-	   load message history from a saved game.
-	   The routine is called repeatedly from
-	   the core restore routine, starting with
-	   the oldest saved message first, and
-	   finishing with the latest.
-	   The window port routine is expected to
-	   load the message recall buffers in such
-	   a way that the ordering is preserved.
-	   The window port routine should make no
-	   assumptions about how many messages are
-	   forthcoming, nor should it assume that
-	   another message will follow this one,
-	   so it should keep all pointers/indexes
-	   intact at the end of each call.
-	 */
-#if 0		/* maybe... */
+/* window ports can provide
+   their own putmsghistory() routine to
+   load message history from a saved game.
+   The routine is called repeatedly from
+   the core restore routine, starting with
+   the oldest saved message first, and
+   finishing with the latest.
+   The window port routine is expected to
+   load the message recall buffers in such
+   a way that the ordering is preserved.
+   The window port routine should make no
+   assumptions about how many messages are
+   forthcoming, nor should it assume that
+   another message will follow this one,
+   so it should keep all pointers/indexes
+   intact at the end of each call.
+ */
+#if 0 /* maybe... */
 	if (!is_restoring) pline1("%s", msg);
 #endif
-	return;
+    return;
 }
 
 #ifdef HANGUPHANDLING
-    /*
-     * Dummy windowing scheme used to replace current one with no-ops
-     * in order to avoid all terminal I/O after hangup/disconnect.
-     */
+/*
+ * Dummy windowing scheme used to replace current one with no-ops
+ * in order to avoid all terminal I/O after hangup/disconnect.
+ */
 
 static int NDECL(hup_nhgetch);
-static char FDECL(hup_yn_function, (const char *,const char *,CHAR_P));
-static int FDECL(hup_nh_poskey, (int *,int *,int *));
-static void FDECL(hup_getlin, (const char *,char *));
-static void FDECL(hup_init_nhwindows, (int *,char **));
+static char FDECL(hup_yn_function, (const char *, const char *, CHAR_P));
+static int FDECL(hup_nh_poskey, (int *, int *, int *));
+static void FDECL(hup_getlin, (const char *, char *));
+static void FDECL(hup_init_nhwindows, (int *, char **));
 static void FDECL(hup_exit_nhwindows, (const char *));
 static winid FDECL(hup_create_nhwindow, (int));
-static int FDECL(hup_select_menu, (winid,int,MENU_ITEM_P **));
-static void FDECL(hup_add_menu, (winid,int,const anything *,CHAR_P,CHAR_P,
-				 int,const char *,BOOLEAN_P));
-static void FDECL(hup_end_menu, (winid,const char *));
-static void FDECL(hup_putstr, (winid,int,const char *));
-static void FDECL(hup_print_glyph, (winid,XCHAR_P,XCHAR_P,int));
-static void FDECL(hup_outrip, (winid,int,time_t));
-static void FDECL(hup_curs, (winid,int,int));
-static void FDECL(hup_display_nhwindow, (winid,BOOLEAN_P));
-static void FDECL(hup_display_file, (const char *,BOOLEAN_P));
-# ifdef CLIPPING
-static void FDECL(hup_cliparound, (int,int));
-# endif
-# ifdef CHANGE_COLOR
-static void FDECL(hup_change_color, (int,long,int));
-#  ifdef MAC
-static short FDECL(hup_set_font_name, (winid,char *));
-#  endif
+static int FDECL(hup_select_menu, (winid, int, MENU_ITEM_P **));
+static void FDECL(hup_add_menu, (winid, int, const anything *, CHAR_P, CHAR_P,
+                                 int, const char *, BOOLEAN_P));
+static void FDECL(hup_end_menu, (winid, const char *));
+static void FDECL(hup_putstr, (winid, int, const char *));
+static void FDECL(hup_print_glyph, (winid, XCHAR_P, XCHAR_P, int));
+static void FDECL(hup_outrip, (winid, int, time_t));
+static void FDECL(hup_curs, (winid, int, int));
+static void FDECL(hup_display_nhwindow, (winid, BOOLEAN_P));
+static void FDECL(hup_display_file, (const char *, BOOLEAN_P));
+#ifdef CLIPPING
+static void FDECL(hup_cliparound, (int, int));
+#endif
+#ifdef CHANGE_COLOR
+static void FDECL(hup_change_color, (int, long, int));
+#ifdef MAC
+static short FDECL(hup_set_font_name, (winid, char *));
+#endif
 static char *NDECL(hup_get_color_string);
-# endif /* CHANGE_COLOR */
-# ifdef STATUS_VIA_WINDOWPORT
-static void FDECL(hup_status_update, (int,genericptr_t,int,int));
-# endif
+#endif /* CHANGE_COLOR */
+#ifdef STATUS_VIA_WINDOWPORT
+static void FDECL(hup_status_update, (int, genericptr_t, int, int));
+#endif
 
 static int NDECL(hup_int_ndecl);
 static void NDECL(hup_void_ndecl);
@@ -451,73 +470,54 @@ static void FDECL(hup_void_fdecl_winid, (winid));
 static void FDECL(hup_void_fdecl_constchar_p, (const char *));
 
 static struct window_procs hup_procs = {
-    "hup",
-    0L,
-    0L,
-    hup_init_nhwindows,
-    hup_void_ndecl,		/* player_selection */
-    hup_void_ndecl,		/* askname */
-    hup_void_ndecl,		/* get_nh_event */
-    hup_exit_nhwindows,
-    hup_void_fdecl_constchar_p, /* suspend_nhwindows */
-    hup_void_ndecl,		/* resume_nhwindows */
-    hup_create_nhwindow,
-    hup_void_fdecl_winid,	/* clear_nhwindow */
-    hup_display_nhwindow,
-    hup_void_fdecl_winid,	/* destroy_nhwindow */
-    hup_curs,
-    hup_putstr,
-    hup_putstr,			/* putmixed */
-    hup_display_file,
-    hup_void_fdecl_winid,	/* start_menu */
-    hup_add_menu,
-    hup_end_menu,
-    hup_select_menu,
-    genl_message_menu,
-    hup_void_ndecl,		/* update_inventory */
-    hup_void_ndecl,		/* mark_synch */
-    hup_void_ndecl,		/* wait_synch */
-# ifdef CLIPPING
+    "hup", 0L, 0L, hup_init_nhwindows, hup_void_ndecl, /* player_selection */
+    hup_void_ndecl,                                    /* askname */
+    hup_void_ndecl,                                    /* get_nh_event */
+    hup_exit_nhwindows, hup_void_fdecl_constchar_p,    /* suspend_nhwindows */
+    hup_void_ndecl,                                    /* resume_nhwindows */
+    hup_create_nhwindow, hup_void_fdecl_winid,         /* clear_nhwindow */
+    hup_display_nhwindow, hup_void_fdecl_winid,        /* destroy_nhwindow */
+    hup_curs, hup_putstr, hup_putstr,                  /* putmixed */
+    hup_display_file, hup_void_fdecl_winid,            /* start_menu */
+    hup_add_menu, hup_end_menu, hup_select_menu, genl_message_menu,
+    hup_void_ndecl, /* update_inventory */
+    hup_void_ndecl, /* mark_synch */
+    hup_void_ndecl, /* wait_synch */
+#ifdef CLIPPING
     hup_cliparound,
-# endif
-# ifdef POSITIONBAR
-    (void FDECL((*),(char *)))hup_void_fdecl_constchar_p, /* update_positionbar */
-# endif
+#endif
+#ifdef POSITIONBAR
+    (void FDECL(
+        (*), (char *))) hup_void_fdecl_constchar_p, /* update_positionbar */
+#endif
     hup_print_glyph,
-    hup_void_fdecl_constchar_p,	/* raw_print */
-    hup_void_fdecl_constchar_p,	/* raw_print_bold */
-    hup_nhgetch,
-    hup_nh_poskey,
-    hup_void_ndecl,		/* nhbell  */
-    hup_int_ndecl,		/* doprev_message */
-    hup_yn_function,
-    hup_getlin,
-    hup_int_ndecl,		/* get_ext_cmd */
-    hup_void_fdecl_int,		/* number_pad */
-    hup_void_ndecl,		/* delay_output  */
-# ifdef CHANGE_COLOR
+    hup_void_fdecl_constchar_p,                 /* raw_print */
+    hup_void_fdecl_constchar_p,                 /* raw_print_bold */
+    hup_nhgetch, hup_nh_poskey, hup_void_ndecl, /* nhbell  */
+    hup_int_ndecl,                              /* doprev_message */
+    hup_yn_function, hup_getlin, hup_int_ndecl, /* get_ext_cmd */
+    hup_void_fdecl_int,                         /* number_pad */
+    hup_void_ndecl,                             /* delay_output  */
+#ifdef CHANGE_COLOR
     hup_change_color,
-#  ifdef MAC
-    hup_void_fdecl_int,		/* change_background */
+#ifdef MAC
+    hup_void_fdecl_int, /* change_background */
     hup_set_font_name,
-#  endif
+#endif
     hup_get_color_string,
-# endif /* CHANGE_COLOR */
-    hup_void_ndecl,		/* start_screen */
-    hup_void_ndecl,		/* end_screen */
-    hup_outrip,
-    genl_preference_update,
-    genl_getmsghistory,
+#endif              /* CHANGE_COLOR */
+    hup_void_ndecl, /* start_screen */
+    hup_void_ndecl, /* end_screen */
+    hup_outrip, genl_preference_update, genl_getmsghistory,
     genl_putmsghistory,
-# ifdef STATUS_VIA_WINDOWPORT
-    hup_void_ndecl,		/* status_init */
-    hup_void_ndecl,		/* status_finish */
-    genl_status_enablefield,
-    hup_status_update,
-#  ifdef STATUS_HILITES
+#ifdef STATUS_VIA_WINDOWPORT
+    hup_void_ndecl, /* status_init */
+    hup_void_ndecl, /* status_finish */
+    genl_status_enablefield, hup_status_update,
+#ifdef STATUS_HILITES
     genl_status_threshold,
-#  endif
-# endif /* STATUS_VIA_WINDOWPORT */
+#endif
+#endif /* STATUS_VIA_WINDOWPORT */
     genl_can_suspend_no,
 };
 
@@ -537,19 +537,19 @@ nhwindows_hangup()
     /* don't call exit_nhwindows() directly here; if a hangup occurs
        while interface code is executing, exit_nhwindows could knock
        the interface's active data structures out from under itself */
-    if (iflags.window_inited &&
-	    windowprocs.win_exit_nhwindows != hup_exit_nhwindows)
-	previnterface_exit_nhwindows = windowprocs.win_exit_nhwindows;
+    if (iflags.window_inited
+        && windowprocs.win_exit_nhwindows != hup_exit_nhwindows)
+        previnterface_exit_nhwindows = windowprocs.win_exit_nhwindows;
 
     /* also, we have to leave the old interface's getmsghistory()
        in place because it will be called while saving the game */
     if (windowprocs.win_getmsghistory != hup_procs.win_getmsghistory)
-	previnterface_getmsghistory = windowprocs.win_getmsghistory;
+        previnterface_getmsghistory = windowprocs.win_getmsghistory;
 
     windowprocs = hup_procs;
 
     if (previnterface_getmsghistory)
-	windowprocs.win_getmsghistory = previnterface_getmsghistory;
+        windowprocs.win_getmsghistory = previnterface_getmsghistory;
 }
 
 static void
@@ -560,17 +560,17 @@ const char *lastgasp;
        shutdown routine now; xxx_exit_nhwindows() needs to call other
        xxx_ routines directly rather than through windowprocs pointers */
     if (previnterface_exit_nhwindows) {
-	lastgasp = 0;	/* don't want exit routine to attempt extra output */
-	(*previnterface_exit_nhwindows)(lastgasp);
-	previnterface_exit_nhwindows = 0;
+        lastgasp = 0; /* don't want exit routine to attempt extra output */
+        (*previnterface_exit_nhwindows)(lastgasp);
+        previnterface_exit_nhwindows = 0;
     }
     iflags.window_inited = 0;
 }
 
 static int
-hup_nhgetch( VOID_ARGS )
+hup_nhgetch(VOID_ARGS)
 {
-    return '\033';	/* ESC */
+    return '\033'; /* ESC */
 }
 
 /*ARGSUSED*/
@@ -579,7 +579,8 @@ hup_yn_function(prompt, resp, deflt)
 const char *prompt UNUSED, *resp UNUSED;
 char deflt;
 {
-    if (!deflt) deflt = '\033';
+    if (!deflt)
+        deflt = '\033';
     return deflt;
 }
 
@@ -706,7 +707,7 @@ boolean complain UNUSED;
     return;
 }
 
-# ifdef CLIPPING
+#ifdef CLIPPING
 /*ARGSUSED*/
 static void
 hup_cliparound(x, y)
@@ -714,9 +715,9 @@ int x UNUSED, y UNUSED;
 {
     return;
 }
-# endif
+#endif
 
-# ifdef CHANGE_COLOR
+#ifdef CHANGE_COLOR
 /*ARGSUSED*/
 static void
 hup_change_color(color, rgb, reverse)
@@ -726,7 +727,7 @@ long rgb;
     return;
 }
 
-#  ifdef MAC
+#ifdef MAC
 /*ARGSUSED*/
 static short
 hup_set_font_name(window, fontname)
@@ -735,16 +736,16 @@ char *fontname;
 {
     return 0;
 }
-#  endif /* MAC */
+#endif /* MAC */
 
 static char *
 hup_get_color_string(VOID_ARGS)
 {
-    return (char *)0;
+    return (char *) 0;
 }
-# endif /* CHANGE_COLOR */
+#endif /* CHANGE_COLOR */
 
-# ifdef STATUS_VIA_WINDOWPORT
+#ifdef STATUS_VIA_WINDOWPORT
 /*ARGSUSED*/
 static void
 hup_status_update(idx, ptr, chg, percent)
@@ -753,11 +754,11 @@ genericptr_t ptr UNUSED;
 {
     return;
 }
-# endif /* STATUS_VIA_WINDOWPORT */
+#endif /* STATUS_VIA_WINDOWPORT */
 
-    /*
-     * Non-specific stubs.
-     */
+/*
+ * Non-specific stubs.
+ */
 
 static int
 hup_int_ndecl(VOID_ARGS)

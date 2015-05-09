@@ -1,4 +1,4 @@
-/* NetHack 3.6	nhlan.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	nhlan.c	$NHDT-Date: 1431192778 2015/05/09 17:32:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
 /* NetHack 3.6	nhlan.c	$Date: 2009/05/06 10:50:26 $  $Revision: 1.5 $ */
 /*	SCCS Id: @(#)nhlan.c	3.5	1999/11/21	*/
 /* Copyright (c) Michael Allison, 1997                  */
@@ -19,9 +19,10 @@
 
 #ifdef LAN_FEATURES
 
-void init_lan_features()
+void
+init_lan_features()
 {
-	lan_username();
+    lan_username();
 }
 /*
  * The get_lan_username() call is a required call, since some of
@@ -31,14 +32,16 @@ void init_lan_features()
 char lusername[MAX_LAN_USERNAME];
 int lusername_size = MAX_LAN_USERNAME;
 
-char *lan_username()
+char *
+lan_username()
 {
-	char *lu;
-	lu = get_username(&lusername_size);
-	if (lu) {
-	 Strcpy(lusername, lu);
-	 return lusername;
-	} else return (char *)0;
+    char *lu;
+    lu = get_username(&lusername_size);
+    if (lu) {
+        Strcpy(lusername, lu);
+        return lusername;
+    } else
+        return (char *) 0;
 }
 #endif /*LAN_FEATURES*/
 /*nhlan.c*/

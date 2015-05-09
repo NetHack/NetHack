@@ -1,4 +1,4 @@
-/* NetHack 3.6	vidtxt.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	vidtxt.c	$NHDT-Date: 1431192781 2015/05/09 17:33:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
 /* NetHack 3.6	vidtxt.c	$Date: 2009/05/06 10:49:49 $  $Revision: 1.6 $ */
 /*   SCCS Id: @(#)vidtxt.c   3.5     1994/04/04                     */
 /*   Copyright (c) NetHack PC Development Team 1993                 */
@@ -6,7 +6,7 @@
 /*                                                                  */
 /*
  * vidtxt.c - Textmode video hardware support (BIOS and DJGPPFAST)
- *                                                  
+ *
  *Edit History:
  *     Initial Creation              M. Allison      93/04/04
  *     Add djgpp support             K. Smolkowski   93/04/26
@@ -23,66 +23,67 @@
 #include <ctype.h>
 
 #if defined(_MSC_VER)
-# if _MSC_VER >= 700
-#pragma warning(disable:4018)	/* signed/unsigned mismatch */
-#pragma warning(disable:4127)	/* conditional expression is constant */
-#pragma warning(disable:4131)	/* old style declarator */
-#pragma warning(disable:4305)	/* prevents complaints with MK_FP */
-#pragma warning(disable:4309)	/* initializing */
-#pragma warning(disable:4759)	/* prevents complaints with MK_FP */
-# endif
+#if _MSC_VER >= 700
+#pragma warning(disable : 4018) /* signed/unsigned mismatch */
+#pragma warning(disable : 4127) /* conditional expression is constant */
+#pragma warning(disable : 4131) /* old style declarator */
+#pragma warning(disable : 4305) /* prevents complaints with MK_FP */
+#pragma warning(disable : 4309) /* initializing */
+#pragma warning(disable : 4759) /* prevents complaints with MK_FP */
+#endif
 #endif
 
-/* void FDECL(txt_xputc,(char, int)); */ /* write out character (and attribute) */
+/* void FDECL(txt_xputc,(char, int)); */ /* write out character (and
+                                            attribute) */
 
-extern int attrib_text_normal;	/* text mode normal attribute */
-extern int attrib_gr_normal;	/* graphics mode normal attribute */
-extern int attrib_text_intense;	/* text mode intense attribute */
-extern int attrib_gr_intense;	/* graphics mode intense attribute */
+extern int attrib_text_normal;  /* text mode normal attribute */
+extern int attrib_gr_normal;    /* graphics mode normal attribute */
+extern int attrib_text_intense; /* text mode intense attribute */
+extern int attrib_gr_intense;   /* graphics mode intense attribute */
 
 void
 txt_get_scr_size()
 {
-	union REGS regs;
+    union REGS regs;
 
-	if (!iflags.BIOS) {
-		CO = 80;
-		LI = 24;
-		return;
-	}
+    if (!iflags.BIOS) {
+        CO = 80;
+        LI = 24;
+        return;
+    }
 
-# ifdef PC9800
-	regs.h.ah = SENSEMODE;
-	(void) int86(CRT_BIOS, &regs, &regs);
+#ifdef PC9800
+    regs.h.ah = SENSEMODE;
+    (void) int86(CRT_BIOS, &regs, &regs);
 
-	CO = (regs.h.al & 0x02) ? 40 : 80;
-	LI = (regs.h.al & 0x01) ? 20 : 25;
-# else 
-	regs.x.ax = FONTINFO;
-	regs.x.bx = 0;			/* current ROM BIOS font */
-	regs.h.dl = 24;			/* default row count */
-					/* in case no EGA/MCGA/VGA */
-	(void) int86(VIDEO_BIOS, &regs, &regs); /* Get Font Information */
+    CO = (regs.h.al & 0x02) ? 40 : 80;
+    LI = (regs.h.al & 0x01) ? 20 : 25;
+#else
+    regs.x.ax = FONTINFO;
+    regs.x.bx = 0;  /* current ROM BIOS font */
+    regs.h.dl = 24; /* default row count */
+    /* in case no EGA/MCGA/VGA */
+    (void) int86(VIDEO_BIOS, &regs, &regs); /* Get Font Information */
 
-	/* MDA/CGA/PCjr ignore INT 10h, Function 11h, but since we
-	 * cleverly loaded up DL with the default, everything's fine.
-	 *
-	 * Otherwise, DL now contains rows - 1.  Also, CX contains the
-	 * points (bytes per character) and ES:BP points to the font
-	 * table.  -3.
-	 */
+    /* MDA/CGA/PCjr ignore INT 10h, Function 11h, but since we
+     * cleverly loaded up DL with the default, everything's fine.
+     *
+     * Otherwise, DL now contains rows - 1.  Also, CX contains the
+     * points (bytes per character) and ES:BP points to the font
+     * table.  -3.
+     */
 
-	regs.h.ah = GETMODE;
-	(void) int86(VIDEO_BIOS, &regs, &regs); /* Get Video Mode */
+    regs.h.ah = GETMODE;
+    (void) int86(VIDEO_BIOS, &regs, &regs); /* Get Video Mode */
 
-	/* This goes back all the way to the original PC.  Completely
-	 * safe.  AH contains # of columns, AL contains display mode,
-	 * and BH contains the active display page.
-	 */
+    /* This goes back all the way to the original PC.  Completely
+     * safe.  AH contains # of columns, AL contains display mode,
+     * and BH contains the active display page.
+     */
 
-	LI = regs.h.dl + 1;
-	CO = regs.h.ah;
-# endif /* PC9800 */
+    LI = regs.h.dl + 1;
+    CO = regs.h.ah;
+#endif /* PC9800 */
 }
 
 /*
@@ -94,54 +95,56 @@ txt_get_scr_size()
 #ifdef NO_TERMS
 /* #include "wintty.h" */
 
-# ifdef SCREEN_DJGPPFAST
+#ifdef SCREEN_DJGPPFAST
 #include <pc.h>
 #include <unistd.h>
-# endif
+#endif
 
-void FDECL(txt_gotoxy, (int,int));
+void FDECL(txt_gotoxy, (int, int));
 
-# if defined(SCREEN_BIOS) && !defined(PC9800)
+#if defined(SCREEN_BIOS) && !defined(PC9800)
 void FDECL(txt_get_cursor, (int *, int *));
-# endif
+#endif
 
-# ifdef SCREEN_DJGPPFAST
-#define txt_get_cursor(x,y) ScreenGetCursor(y,x)
-# endif
+#ifdef SCREEN_DJGPPFAST
+#define txt_get_cursor(x, y) ScreenGetCursor(y, x)
+#endif
 
-extern int  g_attribute;	/* Current attribute to use */
-extern int  monoflag;		/* 0 = not monochrome, else monochrome */
+extern int g_attribute; /* Current attribute to use */
+extern int monoflag;    /* 0 = not monochrome, else monochrome */
 
 void
 txt_backsp()
 {
-#  ifdef PC9800
-	union REGS regs;
+#ifdef PC9800
+    union REGS regs;
 
-	regs.h.dl = 0x01;		  /* one column */
-	regs.h.ah = CURSOR_LEFT;
-	regs.h.cl = DIRECT_CON_IO;
+    regs.h.dl = 0x01; /* one column */
+    regs.h.ah = CURSOR_LEFT;
+    regs.h.cl = DIRECT_CON_IO;
 
-	int86(DOS_EXT_FUNC, &regs, &regs);
+    int86(DOS_EXT_FUNC, &regs, &regs);
 
-#  else
-	int col,row;
+#else
+    int col, row;
 
-	txt_get_cursor(&col, &row);
-	if (col > 0) col = col-1;
-	txt_gotoxy(col,row);
-#  endif
+    txt_get_cursor(&col, &row);
+    if (col > 0)
+        col = col - 1;
+    txt_gotoxy(col, row);
+#endif
 }
 
 void
 txt_nhbell()
 {
-        union REGS regs;
+    union REGS regs;
 
-        if (flags.silent) return;
-        regs.h.dl = 0x07;			/* bell */
-        regs.h.ah = 0x02; 			/* Character Output function */
-        (void) int86(DOSCALL, &regs, &regs);
+    if (flags.silent)
+        return;
+    regs.h.dl = 0x07; /* bell */
+    regs.h.ah = 0x02; /* Character Output function */
+    (void) int86(DOSCALL, &regs, &regs);
 }
 
 void
@@ -150,118 +153,116 @@ txt_clear_screen()
  * so for now we just use the BIOS Routines
  */
 {
-	union REGS regs;
-#  ifdef PC9800
-	regs.h.dl = attr98[attrib_text_normal];
-	regs.h.ah = SETATT;
-	regs.h.cl = DIRECT_CON_IO;
+    union REGS regs;
+#ifdef PC9800
+    regs.h.dl = attr98[attrib_text_normal];
+    regs.h.ah = SETATT;
+    regs.h.cl = DIRECT_CON_IO;
 
-	(void) int86(DOS_EXT_FUNC, &regs, &regs);
+    (void) int86(DOS_EXT_FUNC, &regs, &regs);
 
-	regs.h.dl = 0x02;		/* clear whole screen */
-	regs.h.ah = SCREEN_CLEAR;
-	regs.h.cl = DIRECT_CON_IO;
+    regs.h.dl = 0x02; /* clear whole screen */
+    regs.h.ah = SCREEN_CLEAR;
+    regs.h.cl = DIRECT_CON_IO;
 
-	(void) int86(DOS_EXT_FUNC, &regs, &regs);
-#  else
-	regs.h.dl = (char)(CO - 1);	/* columns */
-	regs.h.dh = (char)(LI - 1);	/* rows */
-	regs.x.cx = 0;			/* CL,CH = x,y of upper left */
-	regs.x.ax = 0;	
-	regs.x.bx = 0;
-	regs.h.bh = (char)attrib_text_normal;
-	regs.h.ah = (char)SCROLL;
-					  	/* DL,DH = x,y of lower rt */
-	(void) int86(VIDEO_BIOS, &regs, &regs); /* Scroll or init window   */
-	txt_gotoxy(0,0);
-#  endif
+    (void) int86(DOS_EXT_FUNC, &regs, &regs);
+#else
+    regs.h.dl = (char) (CO - 1); /* columns */
+    regs.h.dh = (char) (LI - 1); /* rows */
+    regs.x.cx = 0;               /* CL,CH = x,y of upper left */
+    regs.x.ax = 0;
+    regs.x.bx = 0;
+    regs.h.bh = (char) attrib_text_normal;
+    regs.h.ah = (char) SCROLL;
+    /* DL,DH = x,y of lower rt */
+    (void) int86(VIDEO_BIOS, &regs, &regs); /* Scroll or init window   */
+    txt_gotoxy(0, 0);
+#endif
 }
 
-void
-txt_cl_end(col,row)	/* clear to end of line */
-int col,row;
+void txt_cl_end(col, row) /* clear to end of line */
+int col, row;
 {
-	union REGS regs;
-#  ifndef PC9800
-	int count;
-#  endif
+    union REGS regs;
+#ifndef PC9800
+    int count;
+#endif
 
-#  ifdef PC9800
-	regs.h.dl = attr98[attrib_text_normal];
-	regs.h.ah = SETATT;
-	regs.h.cl = DIRECT_CON_IO;
+#ifdef PC9800
+    regs.h.dl = attr98[attrib_text_normal];
+    regs.h.ah = SETATT;
+    regs.h.cl = DIRECT_CON_IO;
 
-	(void) int86(DOS_EXT_FUNC, &regs, &regs);
+    (void) int86(DOS_EXT_FUNC, &regs, &regs);
 
-	regs.h.dl = 0x00;		/* clear to end of line */
-	regs.h.ah = LINE_CLEAR;
-	regs.h.cl = DIRECT_CON_IO;
+    regs.h.dl = 0x00; /* clear to end of line */
+    regs.h.ah = LINE_CLEAR;
+    regs.h.cl = DIRECT_CON_IO;
 
-	(void) int86(DOS_EXT_FUNC, &regs, &regs);
-#  else
-	count = CO - col;
-	txt_gotoxy(col,row);
-	regs.h.ah = PUTCHARATT;	     /* write attribute & character */	
-	regs.h.al = ' ';	     /* character */
-	regs.h.bh = 0;		     /* display page */
-				     /* BL = attribute */
-	regs.h.bl = (char)attrib_text_normal;
-	regs.x.cx = count;
-	if (count != 0)
-		(void) int86(VIDEO_BIOS, &regs, &regs); /* write attribute 
-							   & character */
-#  endif
+    (void) int86(DOS_EXT_FUNC, &regs, &regs);
+#else
+    count = CO - col;
+    txt_gotoxy(col, row);
+    regs.h.ah = PUTCHARATT; /* write attribute & character */
+    regs.h.al = ' ';        /* character */
+    regs.h.bh = 0;          /* display page */
+                            /* BL = attribute */
+    regs.h.bl = (char) attrib_text_normal;
+    regs.x.cx = count;
+    if (count != 0)
+        (void) int86(VIDEO_BIOS, &regs, &regs); /* write attribute
+                                                   & character */
+#endif
 }
 
-void
-txt_cl_eos()	/* clear to end of screen */
+void txt_cl_eos() /* clear to end of screen */
 {
-	union REGS regs;
-#  ifndef PC9800
-	int col,row;
-#  endif
+    union REGS regs;
+#ifndef PC9800
+    int col, row;
+#endif
 
-#  ifdef PC9800
-	regs.h.dl = attr98[attrib_text_normal];
-	regs.h.ah = SETATT;
-	regs.h.cl = DIRECT_CON_IO;
+#ifdef PC9800
+    regs.h.dl = attr98[attrib_text_normal];
+    regs.h.ah = SETATT;
+    regs.h.cl = DIRECT_CON_IO;
 
-	(void) int86(DOS_EXT_FUNC, &regs, &regs);
+    (void) int86(DOS_EXT_FUNC, &regs, &regs);
 
-	regs.h.dl = 0x00;		/* clear to end of screen */
-	regs.h.ah = SCREEN_CLEAR;
-	regs.h.cl = DIRECT_CON_IO;
+    regs.h.dl = 0x00; /* clear to end of screen */
+    regs.h.ah = SCREEN_CLEAR;
+    regs.h.cl = DIRECT_CON_IO;
 
-	(void) int86(DOS_EXT_FUNC, &regs, &regs);
-#  else
-	txt_get_cursor(&col, &row);
-	txt_cl_end(col,row);			/* clear to end of line */
-	txt_gotoxy(0,(row < (LI-1) ? row+1 : (LI-1)));		
-	regs.h.dl = (char) (CO-1);	/* X  of lower right */
-	regs.h.dh = (char) (LI-1);	/* Y  of lower right */
-	regs.h.cl = 0;			/* X  of upper left */
-  				  	/* Y (row)  of upper left */
-	regs.h.ch = (char) (row < (LI-1) ? row+1 :(LI-1));
-	regs.x.cx = 0; 
-	regs.x.ax = 0;
-	regs.x.bx = 0;
-	regs.h.bh = (char)attrib_text_normal;
-	regs.h.ah = SCROLL;
-	(void) int86(VIDEO_BIOS, &regs, &regs); /* Scroll or initialize window */
-# endif
+    (void) int86(DOS_EXT_FUNC, &regs, &regs);
+#else
+    txt_get_cursor(&col, &row);
+    txt_cl_end(col, row); /* clear to end of line */
+    txt_gotoxy(0, (row < (LI - 1) ? row + 1 : (LI - 1)));
+    regs.h.dl = (char) (CO - 1); /* X  of lower right */
+    regs.h.dh = (char) (LI - 1); /* Y  of lower right */
+    regs.h.cl = 0;               /* X  of upper left */
+                                 /* Y (row)  of upper left */
+    regs.h.ch = (char) (row < (LI - 1) ? row + 1 : (LI - 1));
+    regs.x.cx = 0;
+    regs.x.ax = 0;
+    regs.x.bx = 0;
+    regs.h.bh = (char) attrib_text_normal;
+    regs.h.ah = SCROLL;
+    (void) int86(VIDEO_BIOS, &regs, &regs); /* Scroll or initialize window */
+#endif
 }
 
 void
 txt_startup(wid, hgt)
-    int *wid, *hgt;
+int *wid, *hgt;
 {
-	txt_get_scr_size();
-	*wid = CO;
-	*hgt = LI;
+    txt_get_scr_size();
+    *wid = CO;
+    *hgt = LI;
 
-	attrib_gr_normal    = attrib_text_normal;
-	attrib_gr_intense   = attrib_text_intense;
-	g_attribute         = attrib_text_normal;		/* Give it a starting value */
+    attrib_gr_normal = attrib_text_normal;
+    attrib_gr_intense = attrib_text_intense;
+    g_attribute = attrib_text_normal; /* Give it a starting value */
 }
 
 /*
@@ -289,80 +290,81 @@ txt_startup(wid, hgt)
  */
 
 void
-txt_xputs(s,col,row)
+txt_xputs(s, col, row)
 const char *s;
-int col,row;
+int col, row;
 {
-	char c;
+    char c;
 
-	if (s != (char *)0) {
-		while (*s != '\0') {
-			txt_gotoxy(col,row);
-			c = *s++;
-			txt_xputc(c,g_attribute);
-			if (col < (CO-1)) col++;
-			txt_gotoxy(col,row);
-		}
-	}
+    if (s != (char *) 0) {
+        while (*s != '\0') {
+            txt_gotoxy(col, row);
+            c = *s++;
+            txt_xputc(c, g_attribute);
+            if (col < (CO - 1))
+                col++;
+            txt_gotoxy(col, row);
+        }
+    }
 }
 
-void
-txt_xputc(ch,attr)	/* write out character (and attribute) */
+void txt_xputc(ch, attr) /* write out character (and attribute) */
 char ch;
 int attr;
 {
-#  ifdef PC9800
-	union REGS regs;
+#ifdef PC9800
+    union REGS regs;
 
-	regs.h.dl = attr98[attr];
-	regs.h.ah = SETATT;
-	regs.h.cl = DIRECT_CON_IO;
+    regs.h.dl = attr98[attr];
+    regs.h.ah = SETATT;
+    regs.h.cl = DIRECT_CON_IO;
 
-	(void) int86(DOS_EXT_FUNC, &regs, &regs);
+    (void) int86(DOS_EXT_FUNC, &regs, &regs);
 
-	if (ch == '\n') {
-		regs.h.dl = '\r';
-		regs.h.ah = PUTCHAR;
-		regs.h.cl = DIRECT_CON_IO;
+    if (ch == '\n') {
+        regs.h.dl = '\r';
+        regs.h.ah = PUTCHAR;
+        regs.h.cl = DIRECT_CON_IO;
 
-		(void) int86(DOS_EXT_FUNC, &regs, &regs);
-	}
-	regs.h.dl = ch;
-	regs.h.ah = PUTCHAR;
-	regs.h.cl = DIRECT_CON_IO;
+        (void) int86(DOS_EXT_FUNC, &regs, &regs);
+    }
+    regs.h.dl = ch;
+    regs.h.ah = PUTCHAR;
+    regs.h.cl = DIRECT_CON_IO;
 
-	(void) int86(DOS_EXT_FUNC, &regs, &regs);
-#  else
-#   ifdef SCREEN_BIOS
-	union REGS regs;
-#   endif
-	int col,row;
+    (void) int86(DOS_EXT_FUNC, &regs, &regs);
+#else
+#ifdef SCREEN_BIOS
+    union REGS regs;
+#endif
+    int col, row;
 
-	txt_get_cursor(&col,&row);
-	switch(ch) {
-	    case '\n':	
+    txt_get_cursor(&col, &row);
+    switch (ch) {
+    case '\n':
 #if 0
 			col = 0;
 			++row;
 #endif
-			break;
-	    default:
-#   ifdef SCREEN_DJGPPFAST
-			ScreenPutChar((int)ch,attr,col,row);
-#   endif
-#   ifdef SCREEN_BIOS
-			regs.h.ah = PUTCHARATT;  /* write att & character */
-			regs.h.al = ch;	    	 /* character             */
-			regs.h.bh = 0;           /* display page          */
-		 	regs.h.bl = (char)attr;        /* BL = attribute        */
-			regs.x.cx = 1;	    	 /* one character         */
-			(void) int86(VIDEO_BIOS, &regs, &regs);
-#   endif
-			if (col < (CO -1 )) ++col;
-			break;
-	} /* end switch */
-	txt_gotoxy(col,row);
-#  endif /* PC9800 */
+        break;
+    default:
+#ifdef SCREEN_DJGPPFAST
+        ScreenPutChar((int) ch, attr, col, row);
+#endif
+#ifdef SCREEN_BIOS
+        regs.h.ah = PUTCHARATT;  /* write att & character */
+        regs.h.al = ch;          /* character             */
+        regs.h.bh = 0;           /* display page          */
+        regs.h.bl = (char) attr; /* BL = attribute        */
+        regs.x.cx = 1;           /* one character         */
+        (void) int86(VIDEO_BIOS, &regs, &regs);
+#endif
+        if (col < (CO - 1))
+            ++col;
+        break;
+    } /* end switch */
+    txt_gotoxy(col, row);
+#endif /* PC9800 */
 }
 
 /*
@@ -386,74 +388,74 @@ int attr;
  *                    screen writes will occur next, it does not change
  *                    the location of the player on the NetHack level.
  */
- 
-#  if defined(SCREEN_BIOS) && !defined(PC9800)
+
+#if defined(SCREEN_BIOS) && !defined(PC9800)
 /*
  * This is implemented as a macro under DJGPPFAST.
  */
-void
-txt_get_cursor(x,y)	/* get cursor position */
+void txt_get_cursor(x, y) /* get cursor position */
 int *x, *y;
 {
-	union REGS regs;
+    union REGS regs;
 
-	regs.x.dx = 0;
-	regs.h.ah = GETCURPOS;		 /* get cursor position */
-	regs.x.cx = 0;
-	regs.x.bx = 0;	
-	(void) int86(VIDEO_BIOS, &regs, &regs); /* Get Cursor Position */
-	*x = regs.h.dl;
-	*y = regs.h.dh;
+    regs.x.dx = 0;
+    regs.h.ah = GETCURPOS; /* get cursor position */
+    regs.x.cx = 0;
+    regs.x.bx = 0;
+    (void) int86(VIDEO_BIOS, &regs, &regs); /* Get Cursor Position */
+    *x = regs.h.dl;
+    *y = regs.h.dh;
 }
-#  endif /* SCREEN_BIOS && !PC9800 */
+#endif /* SCREEN_BIOS && !PC9800 */
 
 void
-txt_gotoxy(x,y)
-int x,y;
+txt_gotoxy(x, y)
+int x, y;
 {
-#  ifdef SCREEN_BIOS
-	union REGS regs;
+#ifdef SCREEN_BIOS
+    union REGS regs;
 
-#   ifdef PC9800
-	regs.h.dh = (char)y;		/* row */
-	regs.h.dl = (char)x;		/* column */
-	regs.h.ah = SETCURPOS;
-	regs.h.cl = DIRECT_CON_IO;
-	(void) int86(DOS_EXT_FUNC, &regs, &regs); /* Set Cursor Position */
-#   else
-	regs.h.ah = SETCURPOS;
-	regs.h.bh = 0;			/* display page */
-	regs.h.dh = (char)y;		/* row */
-	regs.h.dl = (char)x;		/* column */
-	(void) int86(VIDEO_BIOS, &regs, &regs); /* Set Cursor Position */
-#   endif
-#  endif
-#  if defined(SCREEN_DJGPPFAST)
-	ScreenSetCursor(y,x);
-#  endif
-	/* The above, too, goes back all the way to the original PC.  If
-	 * we ever get so fancy as to swap display pages (i doubt it),
-	 * then we'll need to set BH appropriately.  This function
-	 * returns nothing.  -3.
-	 */
+#ifdef PC9800
+    regs.h.dh = (char) y; /* row */
+    regs.h.dl = (char) x; /* column */
+    regs.h.ah = SETCURPOS;
+    regs.h.cl = DIRECT_CON_IO;
+    (void) int86(DOS_EXT_FUNC, &regs, &regs); /* Set Cursor Position */
+#else
+    regs.h.ah = SETCURPOS;
+    regs.h.bh = 0;                          /* display page */
+    regs.h.dh = (char) y;                   /* row */
+    regs.h.dl = (char) x;                   /* column */
+    (void) int86(VIDEO_BIOS, &regs, &regs); /* Set Cursor Position */
+#endif
+#endif
+#if defined(SCREEN_DJGPPFAST)
+    ScreenSetCursor(y, x);
+#endif
+    /* The above, too, goes back all the way to the original PC.  If
+     * we ever get so fancy as to swap display pages (i doubt it),
+     * then we'll need to set BH appropriately.  This function
+     * returns nothing.  -3.
+     */
 }
 
 /*
  * This marks the end of the cursor manipulation/information routines.
  * -------------------------------------------------------------------
- */ 
+ */
 
-#  ifdef MONO_CHECK
-int txt_monoadapt_check()
+#ifdef MONO_CHECK
+int
+txt_monoadapt_check()
 {
-	union REGS regs;
+    union REGS regs;
 
-	regs.h.al = 0;
-	regs.h.ah = GETMODE;			/* get video mode */
-	(void) int86(VIDEO_BIOS, &regs, &regs);
-	return (regs.h.al == 7) ? 1 : 0;	/* 7 means monochrome mode */
+    regs.h.al = 0;
+    regs.h.ah = GETMODE; /* get video mode */
+    (void) int86(VIDEO_BIOS, &regs, &regs);
+    return (regs.h.al == 7) ? 1 : 0; /* 7 means monochrome mode */
 }
-#  endif /* MONO_CHECK */
+#endif /* MONO_CHECK */
 #endif /* NO_TERMS  */
 
 /* vidtxt.c */

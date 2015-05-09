@@ -1,4 +1,4 @@
-/* NetHack 3.6  posixregex.c	$NHDT-Date: 1428970913 2015/04/14 00:21:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.0 $ */
+/* NetHack 3.6  posixregex.c	$NHDT-Date: 1431192778 2015/05/09 17:32:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.2 $ */
 /* Copyright (c) Sean Hunt  2015.                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -45,49 +45,59 @@
  */
 
 struct nhregex {
-  regex_t re;
-  int err;
+    regex_t re;
+    int err;
 };
 
-struct nhregex *regex_init() {
-  return (struct nhregex *)alloc(sizeof (struct nhregex));
+struct nhregex *
+regex_init()
+{
+    return (struct nhregex *) alloc(sizeof(struct nhregex));
 }
 
-boolean regex_compile(const char *s, struct nhregex *re) {
-  if (!re)
-    return FALSE;
-  if ((re->err = regcomp(&re->re, s, REG_EXTENDED | REG_NOSUB)))
-    return FALSE;
-  return TRUE;
+boolean
+regex_compile(const char *s, struct nhregex *re)
+{
+    if (!re)
+        return FALSE;
+    if ((re->err = regcomp(&re->re, s, REG_EXTENDED | REG_NOSUB)))
+        return FALSE;
+    return TRUE;
 }
 
-const char *regex_error_desc(struct nhregex *re) {
-  static char buf[BUFSZ];
+const char *
+regex_error_desc(struct nhregex *re)
+{
+    static char buf[BUFSZ];
 
-  if (!re || !re->err)
-    return (const char *)0;
+    if (!re || !re->err)
+        return (const char *) 0;
 
-  /* FIXME: Using a static buffer here is not ideal, but avoids memory
-   * leaks. Consider the allocation more carefully. */
-  regerror(re->err, &re->re, buf, BUFSZ);
+    /* FIXME: Using a static buffer here is not ideal, but avoids memory
+     * leaks. Consider the allocation more carefully. */
+    regerror(re->err, &re->re, buf, BUFSZ);
 
-  return buf;
+    return buf;
 }
 
-boolean regex_match(const char *s, struct nhregex *re) {
-  int result;
+boolean
+regex_match(const char *s, struct nhregex *re)
+{
+    int result;
 
-  if (!re)
-    return FALSE;
+    if (!re)
+        return FALSE;
 
-  if ((result = regexec(&re->re, s, 0, (genericptr_t)0, 0))) {
-    if (result != REG_NOMATCH)
-      re->err = result;
-    return FALSE;
-  }
-  return TRUE;
+    if ((result = regexec(&re->re, s, 0, (genericptr_t) 0, 0))) {
+        if (result != REG_NOMATCH)
+            re->err = result;
+        return FALSE;
+    }
+    return TRUE;
 }
 
-void regex_free(struct nhregex *re) {
-  free(re);
+void
+regex_free(struct nhregex *re)
+{
+    free(re);
 }

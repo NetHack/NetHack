@@ -1,4 +1,4 @@
-/* NetHack 3.6	macunix.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	macunix.c	$NHDT-Date: 1431192785 2015/05/09 17:33:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
 /* NetHack 3.6	macunix.c	$Date: 2009/05/06 10:49:16 $  $Revision: 1.6 $ */
 /*	SCCS Id: @(#)macunix.c	3.5	1994/11/07	*/
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
@@ -11,31 +11,31 @@
 void
 regularize(char *s)
 {
-	register char *lp;
+    register char *lp;
 
-	for (lp = s; *lp; lp++) {
-		if (*lp == '.' || *lp == ':')
-			*lp = '_';
-	}
+    for (lp = s; *lp; lp++) {
+        if (*lp == '.' || *lp == ':')
+            *lp = '_';
+    }
 }
 
 void
 getlock(void)
 {
-	int fd;
-	int pid = getpid(); /* Process ID */
+    int fd;
+    int pid = getpid(); /* Process ID */
 
-	Sprintf(lock, "%d%s", getuid(), plname);
-	set_levelfile_name (lock, 0);
+    Sprintf(lock, "%d%s", getuid(), plname);
+    set_levelfile_name(lock, 0);
 
-	if ((fd = open (lock, O_RDWR | O_EXCL | O_CREAT, LEVL_TYPE)) == -1) {
-		raw_printf ("Could not lock the game %s.", lock);
-		panic ("Another game in progress?");
-	}
+    if ((fd = open(lock, O_RDWR | O_EXCL | O_CREAT, LEVL_TYPE)) == -1) {
+        raw_printf("Could not lock the game %s.", lock);
+        panic("Another game in progress?");
+    }
 
-	if (write (fd, (char *)&pid, sizeof (pid)) != sizeof (pid))  {
-		raw_printf ("Could not lock the game %s.", lock);
-		panic("Disk locked?");
-	}
-	close (fd);
+    if (write(fd, (char *) &pid, sizeof(pid)) != sizeof(pid)) {
+        raw_printf("Could not lock the game %s.", lock);
+        panic("Disk locked?");
+    }
+    close(fd);
 }

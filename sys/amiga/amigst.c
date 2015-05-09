@@ -1,4 +1,4 @@
-/* NetHack 3.6	amigst.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	amigst.c	$NHDT-Date: 1431192783 2015/05/09 17:33:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.6 $ */
 /* NetHack 3.6	amigst.c	$Date: 2009/05/06 10:48:29 $  $Revision: 1.3 $ */
 /*    SCCS Id: @(#)amigst.c     3.5    1993/01/08
 /*    Copyright (c) Gregg Wonderly, Naperville, IL, 1992, 1993	  */
@@ -15,12 +15,12 @@
 #include <intuition/intuition.h>
 #include <libraries/dosextens.h>
 #include <ctype.h>
-#undef  strcmpi
+#undef strcmpi
 #include <string.h>
 #include <errno.h>
 
 #ifdef __SASC
-#include <dos.h>        /* for __emit */
+#include <dos.h> /* for __emit */
 #include <string.h>
 #include <proto/dos.h>
 #include <proto/exec.h>

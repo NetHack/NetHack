@@ -1,4 +1,4 @@
-/* NetHack 3.6	macsnd.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
+/* NetHack 3.6	macsnd.c	$NHDT-Date: 1431192786 2015/05/09 17:33:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
 /* NetHack 3.6	macsnd.c	$Date: 2009/05/06 10:49:14 $  $Revision: 1.6 $ */
 /*	SCCS Id: @(#)macsnd.c	3.5	1992/11/28	*/
 /* 	Copyright (c) 1992 by Jon Watte */
@@ -20,92 +20,94 @@
 #include "mactty.h"
 #include "macwin.h"
 #if 1 /*!TARGET_API_MAC_CARBON*/
-# include <Sound.h>
-# include <Resources.h>
+#include <Sound.h>
+#include <Resources.h>
 #endif
 
 #ifndef freqDurationCmd
-# define freqDurationCmd 40
+#define freqDurationCmd 40
 #endif
 
 #define SND_BUFFER(s) (&(*s)[20])
-#define SND_LEN(s) (GetHandleSize(s)-42)
-
+#define SND_LEN(s) (GetHandleSize(s) - 42)
 
 void
-mac_speaker (struct obj *instr, char *melody) {
-	SndChannelPtr theChannel = (SndChannelPtr) 0;
-	SndCommand theCmd;
-	Handle theSound;
-	unsigned char theName [32];
-	char *n = (char *) &theName [1];
-	int typ = instr->otyp;
-	const char *actualn = OBJ_NAME (objects [typ]);
+mac_speaker(struct obj *instr, char *melody)
+{
+    SndChannelPtr theChannel = (SndChannelPtr) 0;
+    SndCommand theCmd;
+    Handle theSound;
+    unsigned char theName[32];
+    char *n = (char *) &theName[1];
+    int typ = instr->otyp;
+    const char *actualn = OBJ_NAME(objects[typ]);
 
-	/*
-	 * First: are we in the library ?
-	 */
-	if (flags.silent) {
-		return;
-	}
+    /*
+     * First: are we in the library ?
+     */
+    if (flags.silent) {
+        return;
+    }
 
-	/*
-	 * Is this a known instrument ?
-	 */
-	strcpy (n, actualn);
-	theName [0] = strlen (n);
-	theSound = GetNamedResource ('snd ', theName);
-	if (! theSound) {
-		return;
-	}
-	HLock (theSound);
+    /*
+     * Is this a known instrument ?
+     */
+    strcpy(n, actualn);
+    theName[0] = strlen(n);
+    theSound = GetNamedResource('snd ', theName);
+    if (!theSound) {
+        return;
+    }
+    HLock(theSound);
 
-	/*
-	 * Set up the synth
-	 */
-	if (SndNewChannel(&theChannel, sampledSynth, initMono +
-		initNoInterp, (void *) 0) == noErr) {
-		char midi_note [] = {57, 59, 60, 62, 64, 65, 67};
+    /*
+     * Set up the synth
+     */
+    if (SndNewChannel(&theChannel, sampledSynth, initMono + initNoInterp,
+                      (void *) 0) == noErr) {
+        char midi_note[] = { 57, 59, 60, 62, 64, 65, 67 };
 
-		short err;
-		short snd_len = SND_LEN (theSound) / 18;
+        short err;
+        short snd_len = SND_LEN(theSound) / 18;
 
-		theCmd.cmd = soundCmd;
-		theCmd.param1 = 0;
-		theCmd.param2 = (long) SND_BUFFER (theSound);
-		err = SndDoCommand (theChannel, &theCmd, false);
+        theCmd.cmd = soundCmd;
+        theCmd.param1 = 0;
+        theCmd.param2 = (long) SND_BUFFER(theSound);
+        err = SndDoCommand(theChannel, &theCmd, false);
 
-	/*
-	 * We rack 'em up all in a row
-	 * The mac will play them correctly and then end, since
-	 * we do a sync close below.
-	 *
-	 */
-		while (*melody && ! err) {
-			while (*melody > 'G') {
-				*melody -= 8;
-			}
-			while (*melody < 'A') {
-				*melody += 8;
-			}
-			theCmd.cmd = freqDurationCmd;
-			theCmd.param1 = snd_len;
-			theCmd.param2 = midi_note [*melody - 'A'];
-			err = SndDoCommand (theChannel, &theCmd, false);
-			melody ++;
-		}
-		SndDisposeChannel (theChannel, false);	/* Sync wait for completion */
-		ReleaseResource (theSound);
-	}
+        /*
+         * We rack 'em up all in a row
+         * The mac will play them correctly and then end, since
+         * we do a sync close below.
+         *
+         */
+        while (*melody && !err) {
+            while (*melody > 'G') {
+                *melody -= 8;
+            }
+            while (*melody < 'A') {
+                *melody += 8;
+            }
+            theCmd.cmd = freqDurationCmd;
+            theCmd.param1 = snd_len;
+            theCmd.param2 = midi_note[*melody - 'A'];
+            err = SndDoCommand(theChannel, &theCmd, false);
+            melody++;
+        }
+        SndDisposeChannel(theChannel, false); /* Sync wait for completion */
+        ReleaseResource(theSound);
+    }
 }
 
-void tty_nhbell (void) {
-	Handle h = GetNamedResource ('snd ', "\pNetHack Bell");
+void
+tty_nhbell(void)
+{
+    Handle h = GetNamedResource('snd ', "\pNetHack Bell");
 
-	if (h) {
-		HLock (h);
-		SndPlay ((SndChannelPtr) 0, (SndListHandle) h, 0);
-		ReleaseResource (h);
-	} else
-		SysBeep (30);
+    if (h) {
+        HLock(h);
+        SndPlay((SndChannelPtr) 0, (SndListHandle) h, 0);
+        ReleaseResource(h);
+    } else
+        SysBeep(30);
 }
