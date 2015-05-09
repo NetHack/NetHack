@@ -385,6 +385,10 @@ opvar_free_x(ov)
     Free(ov);
 }
 
+/* Borland doesn't know __FUNCTION__ */
+#ifdef __BORLANDC__
+#define __FUNCTION__ __FUNC__
+#endif
 #define opvar_free(ov) { if (ov) { opvar_free_x(ov); ov = NULL; } else impossible("opvar_free(), %s", __FUNCTION__); }
 
 struct opvar *

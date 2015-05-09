@@ -28,7 +28,7 @@ typedef struct mswin_nethack_text_window {
 	TCHAR*  rip_text;
 } NHRIPWindow, *PNHRIPWindow;
 
-LRESULT CALLBACK NHRIPWndProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK NHRIPWndProc(HWND, UINT, WPARAM, LPARAM);
 static void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 
 HWND mswin_init_RIP_window () {
@@ -47,7 +47,7 @@ HWND mswin_init_RIP_window () {
 	if( !data ) panic("out of memory");
 
 	ZeroMemory(data, sizeof(NHRIPWindow));
-	SetWindowLongPtr(ret, GWLP_USERDATA, (LONG)data);
+	SetWindowLongPtr(ret, GWLP_USERDATA, (LONG_PTR)data);
 	return ret;
 }
 
@@ -118,7 +118,7 @@ void mswin_display_RIP_window (HWND hWnd)
 	GetNHApp()->hPopupWnd = NULL;
 }
 
-LRESULT CALLBACK NHRIPWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK NHRIPWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	HDC hdc;
 	PNHRIPWindow data;
@@ -218,7 +218,7 @@ LRESULT CALLBACK NHRIPWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 			if( data->rip_text ) free(data->rip_text);
 			if (data->rip_bmp != NULL) DeleteObject(data->rip_bmp);
 			free(data);
-			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG)0);
+			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)0);
 		}
 	break;
 

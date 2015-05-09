@@ -939,6 +939,8 @@ struct obj *otmp;
 {
     int otyp = otmp->otyp, newload = otmp->owt;
     struct permonst *mdat = mtmp->data;
+    short nattk = 0;
+    boolean glomper = FALSE;
 
     if (notake(mdat)) return FALSE;		/* can't carry anything */
 
@@ -950,6 +952,21 @@ struct obj *otmp;
     if (objects[otyp].oc_material == SILVER && mon_hates_silver(mtmp) &&
         (otyp != BELL_OF_OPENING || !is_covetous(mdat)))
         return FALSE;
+
+    /* monsters without hands can't pick up multiple objects at once
+     * unless they have an engulfing attack
+     *
+     * ...dragons, of course, can always carry gold pieces somehow */
+    if (otmp->quan > 1) {
+        for (nattk = 0; nattk < NATTK; nattk++)
+            glomper = (glomper || mtmp->data->mattk[nattk].aatyp == AT_ENGL);
+
+        if ((mtmp->data->mflags1 & M1_NOHANDS) && !glomper
+                && (!(mtmp->data->mlet == S_DRAGON 
+                                && otmp->oclass == COIN_CLASS))) {
+                return FALSE;
+        }
+    }
 
     /* Steeds don't pick up stuff (to avoid shop abuse) */
     if (mtmp == u.usteed) return (FALSE);

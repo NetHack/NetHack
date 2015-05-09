@@ -207,7 +207,7 @@ static struct Bool_Opt
 	{"toptenwin",&iflags.toptenwin, FALSE, SET_IN_GAME},
 	{"travel", &flags.travelcmd, TRUE, SET_IN_GAME},
 	{"use_darkgray", &iflags.wc2_darkgray, TRUE, SET_IN_FILE},
-#ifdef WIN32CON
+#ifdef WIN32
 	{"use_inverse",   &iflags.wc_inverse, TRUE, SET_IN_GAME},		/*WC*/
 #else
 	{"use_inverse",   &iflags.wc_inverse, FALSE, SET_IN_GAME},		/*WC*/
@@ -312,7 +312,7 @@ static struct Comp_Opt
 						MAXOCLASSES, SET_IN_GAME },
 #ifdef CHANGE_COLOR
 	{ "palette",
-# ifndef WIN32CON
+# ifndef WIN32
 			"palette (00c/880/-fff is blue/yellow/reverse white)",
 						15 , SET_IN_GAME },
 # else
@@ -373,7 +373,7 @@ static struct Comp_Opt
 	{ "videoshades", "gray shades to map to black/gray/white",
 						32, DISP_IN_GAME },
 #endif
-#ifdef WIN32CON
+#ifdef WIN32
 	{"subkeyvalue", "override keystroke value", 7, SET_IN_FILE},
 #endif
 	{ "windowcolors",  "the foreground/background colors of windows",	/*WC*/
@@ -1872,7 +1872,7 @@ boolean tinitial, tfrom_file;
 							) {
 	    int color_number, color_incr;
 
-# ifndef WIN32CON
+# ifndef WIN32
 	    if (duplicate) complain_about_duplicate(opts,1);
 # endif
 # ifdef MAC
@@ -1894,7 +1894,7 @@ boolean tinitial, tfrom_file;
 # ifdef MAC
 	    }
 # endif
-#ifdef WIN32CON
+#ifdef WIN32
 	    op = string_for_opt(opts, TRUE);
 	    if (!alternative_palette(op))
 		badoption(opts);
@@ -1940,7 +1940,7 @@ boolean tinitial, tfrom_file;
 		    color_number += color_incr;
 		}
 	    }
-# endif	/* !WIN32CON */
+# endif	/* !WIN32 */
 	    if (!initial) {
 		need_redraw = TRUE;
 	    }
@@ -2061,7 +2061,7 @@ goodfruit:
 		if (duplicate) complain_about_duplicate(opts,1);
 		if (negated) bad_negation(fullname, FALSE);
 		else if ((op = string_for_opt(opts, negated))) {
-#ifdef WIN32CON
+#ifdef WIN32
 		    (void)strncpy(iflags.altkeyhandler, op, MAX_ALTKEYHANDLER - 5);
 		    load_keyboard_handler();
 #endif
@@ -2619,7 +2619,7 @@ goodfruit:
 		/* no duplicate complaint here */
 		if (negated) bad_negation(fullname, FALSE);
 		else {
-#if defined(WIN32CON)
+#if defined(WIN32)
 			op = string_for_opt(opts, 0);
 			map_subkeyvalue(op);
 #endif
@@ -3972,7 +3972,7 @@ char *buf;
 				   defopt);
 	else if (!strcmp(optname,"align"))
 		Sprintf(buf, "%s", rolestring(flags.initalign, aligns, adj));
-#ifdef WIN32CON
+#ifdef WIN32
 	else if (!strcmp(optname,"altkeyhandler"))
 		Sprintf(buf, "%s", iflags.altkeyhandler[0] ?
 			iflags.altkeyhandler : "default");

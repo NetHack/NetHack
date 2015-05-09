@@ -81,7 +81,7 @@ dumpit()
 	s_level	*x;
 	branch *br;
 
-	if (!showdebug(__FILE__)) return;
+	if (!explicitdebug(__FILE__)) return;
 
 	for(i = 0; i < n_dgns; i++)  {
 	    fprintf(stderr, "\n#%d \"%s\" (%s):\n", i,

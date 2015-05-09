@@ -302,6 +302,8 @@ int mswin_map_mode(HWND hWnd, int mode)
 
 	mswin_map_stretch(hWnd, &mapSize, TRUE);
 
+	mswin_update_inventory(); /* for perm_invent to hide/show tiles */ 
+
 	return oldMode;
 }
 
@@ -412,7 +414,7 @@ LRESULT CALLBACK MapWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 	case WM_DESTROY:
 		if( data->hMapFont ) DeleteObject(data->hMapFont);
 		free(data);
-		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG)0);
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)0);
 		break;
 
 	default:
@@ -560,6 +562,9 @@ void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	PNHMapWindow data;
 	int i,j;
 
+	UNREFERENCED_PARAMETER(wParam);
+	UNREFERENCED_PARAMETER(lParam);
+
 	/* set window data */
 	data = (PNHMapWindow)malloc(sizeof(NHMapWindow));
 	if( !data ) panic("out of memory");
@@ -575,7 +580,7 @@ void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	data->xScrTile = GetNHApp()->mapTile_X;
 	data->yScrTile = GetNHApp()->mapTile_Y;
 
-	SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG)data);
+	SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)data);
 }
 
 /* on WM_PAINT */
@@ -745,6 +750,8 @@ void onMSNH_VScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	int yNewPos;
 	int yDelta;
  
+	UNREFERENCED_PARAMETER(lParam);
+
 	/* get window data */
 	data = (PNHMapWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
@@ -803,6 +810,8 @@ void onMSNH_HScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	int xNewPos;
 	int xDelta;
  
+	UNREFERENCED_PARAMETER(lParam);
+
 	/* get window data */
 	data = (PNHMapWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	

@@ -756,7 +756,7 @@ E int FDECL(nhclose, (int));
 E void NDECL(really_close);
 #endif
 #ifdef DEBUG
-E boolean FDECL(showdebug, (const char *));
+E boolean FDECL(debugcore, (const char *, boolean));
 #endif
 E boolean FDECL(read_tribute, (const char *,const char *,int));
 
@@ -1509,10 +1509,10 @@ E void FDECL(regex_free, (struct nhregex *));
 
 /* ### nttty.c ### */
 
-#ifdef WIN32CON
+#ifdef WIN32
 E void NDECL(get_scr_size);
 E int NDECL(nttty_kbhit);
-E void NDECL(nttty_open);
+E void FDECL(nttty_open,(int));
 E void NDECL(nttty_rubout);
 E int NDECL(tgetch);
 E int FDECL(ntposkey,(int *, int *, int *));

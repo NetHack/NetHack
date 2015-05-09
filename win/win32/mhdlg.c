@@ -19,14 +19,9 @@ struct getlin_data {
 	size_t		result_size;
 };
 
-#ifdef _M_X64
-INT_PTR
-#else
-BOOL
-#endif
-CALLBACK	GetlinDlgProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK	GetlinDlgProc(HWND, UINT, WPARAM, LPARAM);
 
-INT_PTR mswin_getlin_window (
+int mswin_getlin_window (
 	const char *question, 
 	char *result, 
 	size_t result_size
@@ -51,15 +46,10 @@ INT_PTR mswin_getlin_window (
 	);
 	if( ret==-1 ) panic("Cannot create getlin window");
 	
-	return ret;
+	return (int)ret;
 }
     
-#ifdef _M_X64
-INT_PTR
-#else
-BOOL
-#endif
-CALLBACK GetlinDlgProc(HWND hWnd, UINT message, WPARAM wParam, LONG_PTR lParam)
+INT_PTR CALLBACK GetlinDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	struct getlin_data* data;
 	RECT   main_rt, dlg_rt;
@@ -79,7 +69,7 @@ CALLBACK GetlinDlgProc(HWND hWnd, UINT message, WPARAM wParam, LONG_PTR lParam)
 	case WM_INITDIALOG:
 		data = (struct getlin_data*)lParam;
 		SetWindowText(hWnd, NH_A2W(data->question, wbuf, sizeof(wbuf)));
-		SetWindowLongPtr(hWnd, GWLP_USERDATA, lParam);
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)data);
 
 		/* center dialog in the main window */
 		GetWindowRect(hWnd, &dlg_rt);
@@ -177,14 +167,9 @@ struct extcmd_data {
 	int*		selection;
 };
 
-#ifdef _M_X64
-INT_PTR
-#else
-BOOL
-#endif
-CALLBACK	ExtCmdDlgProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK	ExtCmdDlgProc(HWND, UINT, WPARAM, LPARAM);
 
-INT_PTR mswin_ext_cmd_window (int* selection)
+int mswin_ext_cmd_window (int* selection)
 {
 	INT_PTR ret;
 	struct extcmd_data data;
@@ -203,29 +188,22 @@ INT_PTR mswin_ext_cmd_window (int* selection)
 			(LPARAM)&data
 	);
 	if( ret==-1 ) panic("Cannot create extcmd window");
-	return ret;
+	return (int)ret;
 }
     
-
-#ifdef _M_X64
-INT_PTR
-#else
-BOOL
-#endif
-CALLBACK ExtCmdDlgProc(HWND hWnd, UINT message, WPARAM wParam, LONG_PTR lParam)
+INT_PTR CALLBACK ExtCmdDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	struct extcmd_data* data;
 	RECT   main_rt, dlg_rt;
 	SIZE   dlg_sz;
 	int    i;
-	const char *ptr;
 	TCHAR wbuf[255];
 
 	switch (message) 
 	{
 	case WM_INITDIALOG:
 		data = (struct extcmd_data*)lParam;
-		SetWindowLongPtr(hWnd, GWLP_USERDATA, lParam);
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)data);
 
 		/* center dialog in the main window */
 		GetWindowRect(GetNHApp()->hMainWnd, &main_rt);
@@ -245,8 +223,8 @@ CALLBACK ExtCmdDlgProc(HWND hWnd, UINT message, WPARAM wParam, LONG_PTR lParam)
 					TRUE );
 
 		/* fill combobox with extended commands */
-		for(i=0; (ptr=extcmdlist[i].ef_txt); i++) {
-			SendDlgItemMessage(hWnd, IDC_EXTCMD_LIST, LB_ADDSTRING, (WPARAM)0, (LPARAM)NH_A2W(ptr, wbuf, sizeof(wbuf)) );
+		for(i=0; extcmdlist[i].ef_txt; i++) {
+			SendDlgItemMessage(hWnd, IDC_EXTCMD_LIST, LB_ADDSTRING, (WPARAM)0, (LPARAM)NH_A2W(extcmdlist[i].ef_txt, wbuf, sizeof(wbuf)) );
 		}
 
 		/* set focus to the list control */
@@ -302,17 +280,12 @@ struct plsel_data {
 	int*	selection;
 };
 
-#ifdef _M_X64
-INT_PTR
-#else
-BOOL
-#endif
-CALLBACK	PlayerSelectorDlgProc(HWND, UINT, WPARAM, LONG_PTR);
+INT_PTR CALLBACK	PlayerSelectorDlgProc(HWND, UINT, WPARAM, LPARAM);
 static void 		plselInitDialog(HWND hWnd);
 static void			plselAdjustLists(HWND hWnd, int changed_opt);
 static int			plselFinalSelection(HWND hWnd, int* selection);
 
- INT_PTR mswin_player_selection_window ( int* selection )
+int mswin_player_selection_window ( int* selection )
 {
 	INT_PTR ret;
 	struct plsel_data data;
@@ -331,15 +304,10 @@ static int			plselFinalSelection(HWND hWnd, int* selection);
 	);
 	if( ret==-1 ) panic("Cannot create getlin window");
 	
-	return ret;
+	return (int)ret;
 }
 
-#ifdef _M_X64
-INT_PTR
-#else
-BOOL
-#endif
-CALLBACK PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LONG_PTR lParam)
+INT_PTR CALLBACK PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	struct plsel_data* data;
 	RECT   main_rt, dlg_rt;
@@ -349,7 +317,7 @@ CALLBACK PlayerSelectorDlgProc(HWND hWnd, UINT message, WPARAM wParam, LONG_PTR 
 	{
 	case WM_INITDIALOG:
 		data = (struct plsel_data*)lParam;
-		SetWindowLongPtr(hWnd, GWLP_USERDATA, lParam);
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)data);
 
 		/* center dialog in the main window */
 		GetWindowRect(GetNHApp()->hMainWnd, &main_rt);
@@ -704,6 +672,8 @@ void  plselAdjustLists(HWND hWnd, int changed_sel)
 int	plselFinalSelection(HWND hWnd, int* selection)
 {
 	LRESULT ind;
+
+	UNREFERENCED_PARAMETER(selection);
 
 	/* get current selections */
 	if( SendDlgItemMessage(hWnd, IDC_PLSEL_ROLE_RANDOM, BM_GETCHECK, 0, 0)==BST_CHECKED ) {

@@ -2320,14 +2320,14 @@ create_particular()
 	    pline1(thats_enough_tries);
 	} else {
 	    if (!randmonst) {
-		firstchoice = which;
-		if (cant_revive(&which, FALSE, (struct obj *)0)) {
-		    /* wizard mode can override handling of special monsters */
-		    Sprintf(buf, "Creating %s instead; force %s?",
-			    mons[which].mname, mons[firstchoice].mname);
-		    if (yn(buf) == 'y') which = firstchoice;
-		}
-		whichpm = &mons[which];
+            firstchoice = which;
+            if (cant_revive(&which, FALSE, (struct obj *)0)) {
+                /* wizard mode can override handling of special monsters */
+                Sprintf(buf, "Creating %s instead; force %s?",
+                    mons[which].mname, mons[firstchoice].mname);
+                if (yn(buf) == 'y') which = firstchoice;
+            }
+            whichpm = &mons[which];
 	    }
 	    for (i = 0; i <= multi; i++) {
 		if (monclass != MAXMCLASSES)

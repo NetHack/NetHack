@@ -1068,7 +1068,7 @@ get_saved_games()
 #if defined(SELECTSAVED)
     int n, j = 0;
     char **result = 0;
-# ifdef WIN32CON
+# ifdef WIN32
     {
     char *foundfile;
     const char *fq_save;
@@ -3256,11 +3256,16 @@ assure_syscf_file() {
 
 #ifdef DEBUG
 /* used by debugpline() to decide whether to issue a message
-   from a partiular source file; caller passes __FILE__ and we check
-   whether it is in the source file list supplied by SYSCF's DEBUGFILES */ 
+ * from a partiular source file; caller passes __FILE__ and we check
+ * whether it is in the source file list supplied by SYSCF's DEBUGFILES
+ *
+ * pass FALSE to override wildcard matching; useful for files 
+ * like dungeon.c and questpgr.c, which generate a ridiculous amount of
+ * output if DEBUG is defined and effectively block the use of a wildcard */
 boolean
-showdebug(filename)
+debugcore(filename, wildcards)
 const char *filename;
+boolean wildcards;
 {
     const char *debugfiles, *p;
 
@@ -3303,7 +3308,7 @@ const char *filename;
      * attempt a wildcard match against each element, but that would be
      * overkill for the intended usage.]
      */
-    if (pmatch(debugfiles, filename))
+    if (wildcards && pmatch(debugfiles, filename))
     return TRUE;
 
     /* check whether filename is an element of the list */
@@ -3316,6 +3321,7 @@ const char *filename;
     }
     return FALSE;
 }
+
 #endif	/*DEBUG*/
 
 /* ----------  BEGIN TRIBUTE ----------- */

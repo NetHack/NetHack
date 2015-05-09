@@ -19,7 +19,7 @@ static WNDPROC  editControlWndProc = 0;
 #define DEFAULT_COLOR_BG_TEXT	COLOR_WINDOW
 #define DEFAULT_COLOR_FG_TEXT	COLOR_WINDOWTEXT
 
-LRESULT	CALLBACK	NHTextWndProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR	CALLBACK	NHTextWndProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK	NHEditHookWndProc(HWND, UINT, WPARAM, LPARAM);
 static void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void LayoutText(HWND hwnd);
@@ -54,9 +54,9 @@ HWND mswin_init_text_window () {
 	SetWindowText(ret, "Text");
 	if( !GetNHApp()->bWindowsLocked ) {
 		DWORD style;
-		style = (DWORD)GetWindowLongPtr(ret, GWL_STYLE);
+		style = GetWindowLong(ret, GWL_STYLE);
 		style |= WS_CAPTION;
-		SetWindowLongPtr(ret, GWL_STYLE, style);
+		SetWindowLong(ret, GWL_STYLE, style);
 		SetWindowPos(ret, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 	}
 
@@ -64,7 +64,7 @@ HWND mswin_init_text_window () {
 	data = (PNHTextWindow)malloc(sizeof(NHTextWindow));
 	if( !data ) panic("out of memory");
 	ZeroMemory(data, sizeof(NHTextWindow));
-	SetWindowLongPtr(ret, GWLP_USERDATA, (LONG)data);
+	SetWindowLongPtr(ret, GWLP_USERDATA, (LONG_PTR)data);
 	return ret;
 }
 
@@ -77,14 +77,14 @@ void mswin_display_text_window (HWND hWnd)
 		HWND control;
 		control = GetDlgItem(hWnd, IDC_TEXT_CONTROL);
 		SendMessage(control, EM_FMTLINES, 1, 0 );
-		SetWindowText(GetDlgItem(hWnd, IDC_TEXT_CONTROL), data->window_text);
+		SetWindowText(control, data->window_text);
 	}
 
 	mswin_popup_display(hWnd, NULL);
 	mswin_popup_destroy(hWnd);
 }
     
-LRESULT CALLBACK NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	HWND control;
 	HDC hdc;
@@ -107,7 +107,7 @@ LRESULT CALLBACK NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 
 		/* subclass edit control */
 		editControlWndProc = (WNDPROC)GetWindowLongPtr(control, GWLP_WNDPROC);
-		SetWindowLongPtr(control, GWLP_WNDPROC, (LONG)NHEditHookWndProc);
+		SetWindowLongPtr(control, GWLP_WNDPROC, (LONG_PTR)NHEditHookWndProc);
 
 		SetFocus(control);
 
@@ -151,14 +151,7 @@ LRESULT CALLBACK NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 			DestroyWindow(hWnd);
 			SetFocus(GetNHApp()->hMainWnd);
 			return TRUE;
-          case IDC_TEXT_CONTROL:
-            switch (HIWORD(wParam))
-            {
-              case EN_SETFOCUS:
-                HideCaret((HWND)lParam);
-                return TRUE;
-            }
-		}
+	}
 	break;
 
 	case WM_CTLCOLORSTATIC: { /* sent by edit control before it is drawn */
@@ -171,7 +164,7 @@ LRESULT CALLBACK NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 			SetTextColor(hdcEdit, 
 				text_fg_brush ? text_fg_color : (COLORREF)GetSysColor(DEFAULT_COLOR_FG_TEXT) 
 				); 
-			return (BOOL)(text_bg_brush 
+			return (INT_PTR)(text_bg_brush 
 					? text_bg_brush : SYSCLR_TO_BRUSH(DEFAULT_COLOR_BG_TEXT));
 		}
 	} return FALSE;
@@ -180,7 +173,7 @@ LRESULT CALLBACK NHTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lP
 		if( data ) {
 			if( data->window_text ) free(data->window_text);
 			free(data);
-			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG)0);
+			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)0);
 		}
 	break;
 
@@ -249,7 +242,15 @@ void LayoutText(HWND hWnd)
 /* Edit box hook */
 LRESULT CALLBACK NHEditHookWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	HDC hDC;
+	RECT rc;
+
 	switch(message) {
+	case WM_ERASEBKGND: 
+	    hDC = (HDC) wParam; 
+	    GetClientRect(hWnd, &rc); 
+	    FillRect(hDC, &rc, text_bg_brush? text_bg_brush : SYSCLR_TO_BRUSH(DEFAULT_COLOR_BG_TEXT)); 
+	return 1;
 
 	case WM_KEYDOWN:
 		switch (wParam)
@@ -286,7 +287,13 @@ LRESULT CALLBACK NHEditHookWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 
 		}
 	break;
+
+	/* edit control needs to know nothing of focus. We will take care of it for it */
+	case WM_SETFOCUS:
+            HideCaret(hWnd);
+	    return 0;
 	}
+             
 
 	if( editControlWndProc ) 
 		return CallWindowProc(editControlWndProc, hWnd, message, wParam, lParam);

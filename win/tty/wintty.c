@@ -111,7 +111,7 @@ struct window_procs tty_procs = {
     tty_start_screen,
     tty_end_screen,
     genl_outrip,
-#if defined(WIN32CON)
+#if defined(WIN32)
     nttty_preference_update,
 #else
     genl_preference_update,
@@ -2208,11 +2208,11 @@ tty_putstr(window, attr, str)
 		cw->data[cw->cury-1][++i] = '\0';
 		tty_putstr(window, attr, &str[i]);
 	    }
-
 	}
 	break;
     }
 }
+
 
 void
 tty_display_file(fname, complain)
@@ -2906,7 +2906,7 @@ int dir;
 {
     if(dir != WININIT) return;
 # if defined(WIN32CON)
-    nttty_open();
+    if (!strncmpi(windowprocs.name, "tty", 3)) nttty_open(0);
 # endif
     return;
 }

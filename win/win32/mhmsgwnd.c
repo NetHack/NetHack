@@ -163,7 +163,7 @@ LRESULT CALLBACK NHMessageWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
 		PNHMessageWindow data;
 		data = (PNHMessageWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 		free(data);
-		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG)0);
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)0);
 	}	break;
 
     case WM_SIZE: 
@@ -273,7 +273,7 @@ void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 					/* get the input */
 					while (!okkey) {
-					char c = mswin_nhgetch();
+					int c = mswin_nhgetch();
 
 					switch (c)
 					{
@@ -382,6 +382,8 @@ void onMSNH_VScroll(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	SCROLLINFO si; 
 	int yInc;
  
+	UNREFERENCED_PARAMETER(lParam);
+
 	/* get window data */
 	data = (PNHMessageWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	
@@ -564,7 +566,6 @@ void onPaint(HWND hWnd)
 	TCHAR wbuf[MAXWINDOWTEXT+2];
 	size_t wlen;
 	COLORREF OldBg, OldFg;
-    int do_more = 0;
 
 	hdc = BeginPaint(hWnd, &ps);
 
@@ -655,12 +656,15 @@ void onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	PNHMessageWindow data;
 	SIZE	dummy;
 
+	UNREFERENCED_PARAMETER(wParam);
+	UNREFERENCED_PARAMETER(lParam);
+
 	/* set window data */
 	data = (PNHMessageWindow)malloc(sizeof(NHMessageWindow));
 	if( !data ) panic("out of memory");
 	ZeroMemory(data, sizeof(NHMessageWindow));
 	data->max_text = MAXWINDOWTEXT;
-	SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG)data);
+	SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)data);
 
 	/* re-calculate window size (+ font size) */
 	mswin_message_window_size(hWnd, &dummy);
@@ -760,8 +764,6 @@ BOOL more_prompt_check(HWND hWnd)
 	HDC hdc;
 	HGDIOBJ saveFont;
 	RECT client_rt, draw_rt;
-	BOOL retval = FALSE;
-	int visible_lines = 0;
 	int i;
 	int remaining_height;
 	char tmptext[MAXWINDOWTEXT+1];

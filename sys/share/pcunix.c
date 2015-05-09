@@ -192,8 +192,9 @@ getlock()
 	if(c == 'y' || c == 'Y')
 # ifndef SELF_RECOVER
 		if(eraseoldlocks()) {
-#  if defined(WIN32CON)
-			clear_screen();		/* display gets fouled up otherwise */
+#  if defined(WIN32)
+			if (!strncmpi(windowprocs.name, "tty", 3))
+				clear_screen();		/* display gets fouled up otherwise */
 #  endif
 			goto gotlock;
 		} else {
@@ -205,8 +206,9 @@ getlock()
 		}
 # else /*SELF_RECOVER*/
 		if(recover_savefile()) {
-#  if defined(WIN32CON)
-			clear_screen();		/* display gets fouled up otherwise */
+#  if defined(WIN32)
+			if (!strncmpi(windowprocs.name, "tty", 3))
+				clear_screen();		/* display gets fouled up otherwise */
 #  endif
 			goto gotlock;
 		} else {

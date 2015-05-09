@@ -54,7 +54,7 @@ STATIC_DCL boolean NDECL(comspec_exists);
 # endif
 #endif
 
-#ifdef WIN32CON
+#ifdef WIN32
 extern int GUILaunched;    /* from nttty.c */
 #endif
 
@@ -411,7 +411,7 @@ const char *str;
 	return;
 }
 
-#ifndef WIN32CON
+#ifndef WIN32
 void
 msmsg VA_DECL(const char *, fmt)
 	VA_START(fmt);
@@ -529,7 +529,7 @@ STATIC_OVL void msexit()
 		restore_colors();
 # endif
 #endif
-#ifdef WIN32CON
+#ifdef WIN32
 	/* Only if we started from the GUI, not the command prompt,
 	 * we need to get one last return, so the score board does
 	 * not vanish instantly after being created.

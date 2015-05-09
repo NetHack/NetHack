@@ -75,7 +75,7 @@ static WNDPROC editControlWndProc = NULL;
 #define NHMENU_IS_SELECTED(item) ((item).count!=0)
 #define NHMENU_HAS_GLYPH(item) 	((item).glyph!=NO_GLYPH) 
 
-LRESULT	CALLBACK	MenuWndProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR	CALLBACK	MenuWndProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK	NHMenuListWndProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK	NHMenuTextWndProc(HWND, UINT, WPARAM, LPARAM);
 static void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
@@ -122,9 +122,9 @@ HWND mswin_init_menu_window (int type) {
 
 	if( !GetNHApp()->bWindowsLocked ) {
 		DWORD style;
-		style = (DWORD)GetWindowLongPtr(ret, GWL_STYLE);
+		style = GetWindowLong(ret, GWL_STYLE);
 		style |= WS_CAPTION;
-		SetWindowLongPtr(ret, GWL_STYLE, style);
+		SetWindowLong(ret, GWL_STYLE, style);
 		SetWindowPos(ret, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 	}
 
@@ -247,7 +247,7 @@ int mswin_menu_window_select_menu (HWND hWnd, int how, MENU_ITEM_P ** _selected,
 	return ret_val;
 }
 /*-----------------------------------------------------------------------------*/   
-LRESULT CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	PNHMenuWindow data;
 	HWND control;
@@ -269,7 +269,7 @@ LRESULT CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		data->bmpCheckedCount = LoadBitmap(GetNHApp()->hApp, MAKEINTRESOURCE(IDB_MENU_SEL_COUNT));
 		data->bmpNotChecked = LoadBitmap(GetNHApp()->hApp, MAKEINTRESOURCE(IDB_MENU_UNSEL));
 		data->is_active = FALSE;
-		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG)data);
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)data);
 
 		/* set font for the text cotrol */
 		control = GetDlgItem(hWnd, IDC_MENU_TEXT);
@@ -279,7 +279,7 @@ LRESULT CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 
 		/* subclass edit control */
 		editControlWndProc = (WNDPROC)GetWindowLongPtr(control, GWLP_WNDPROC);
-		SetWindowLongPtr(control,GWLP_WNDPROC, (LONG)NHMenuTextWndProc);
+		SetWindowLongPtr(control, GWLP_WNDPROC, (LONG_PTR)NHMenuTextWndProc);
 
         /* Even though the dialog has no caption, you can still set the title 
            which shows on Alt-Tab */
@@ -329,7 +329,7 @@ LRESULT CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 	case WM_COMMAND: 
 	{
 		switch (LOWORD(wParam)) 
-        { 
+        	{ 
 		case IDCANCEL:
 			if( data->type == MENU_TYPE_MENU && 
 			    (data->how==PICK_ONE || data->how==PICK_ANY) &&
@@ -354,14 +354,6 @@ LRESULT CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			data->done = 1;
 			data->result = 0;
 		return TRUE;
-
-        case IDC_MENU_TEXT:
-          switch (HIWORD(wParam))
-          {
-            case EN_SETFOCUS:
-              HideCaret((HWND)lParam);
-              return TRUE;
-          }
 		}
 	} break;
 
@@ -477,7 +469,7 @@ LRESULT CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			SetTextColor(hdcEdit, 
 				text_fg_brush ? text_fg_color : (COLORREF)GetSysColor(DEFAULT_COLOR_FG_TEXT) 
 				); 
-			return (BOOL)(text_bg_brush 
+			return (INT_PTR)(text_bg_brush 
 					? text_bg_brush : SYSCLR_TO_BRUSH(DEFAULT_COLOR_BG_TEXT));
 		}
 	} return FALSE;
@@ -491,7 +483,7 @@ LRESULT CALLBACK MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 				if( data->text.text ) free(data->text.text);
 			}
 			free(data);
-			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG)0);
+			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)0);
 		}
 		return TRUE;
 	}
@@ -809,7 +801,7 @@ void SetMenuListType(HWND hWnd, int how)
 	
 	/* install the hook for the control window procedure */
 	wndProcListViewOrig = (WNDPROC)GetWindowLongPtr(control, GWLP_WNDPROC);
-	SetWindowLongPtr(control, GWLP_WNDPROC, (LONG)NHMenuListWndProc);
+	SetWindowLongPtr(control, GWLP_WNDPROC, (LONG_PTR)NHMenuListWndProc);
 
 	/* set control colors */
 	ListView_SetBkColor(control, 
@@ -873,6 +865,8 @@ BOOL onMeasureItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	RECT list_rect;
 	int i;
 
+    UNREFERENCED_PARAMETER(wParam);
+
     lpmis = (LPMEASUREITEMSTRUCT) lParam; 
 	data = (PNHMenuWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	GetClientRect(GetMenuControl(hWnd), &list_rect);
@@ -884,12 +878,11 @@ BOOL onMeasureItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
     /* Set the height of the list box items to max height of the individual items */
 	for( i=0; i<data->menu.size;  i++) {
 		if( NHMENU_HAS_GLYPH(data->menu.items[i]) && !IS_MAP_ASCII(iflags.wc_map_mode) ) {
-			lpmis->itemHeight = max( lpmis->itemHeight, (UINT)max(tm.tmHeight, GetNHApp()->mapTile_Y) );
+			lpmis->itemHeight = max( lpmis->itemHeight, (UINT)max(tm.tmHeight, GetNHApp()->mapTile_Y)+2 );
 		} else {
-			lpmis->itemHeight = max( lpmis->itemHeight, (UINT)max(tm.tmHeight, TILE_Y) );
+			lpmis->itemHeight = max( lpmis->itemHeight, (UINT)max(tm.tmHeight, TILE_Y)+2 );
 		}
 	}
-	lpmis->itemHeight += 2;
 
 	/* set width to the window width */
 	lpmis->itemWidth = list_rect.right - list_rect.left;
@@ -919,6 +912,8 @@ BOOL onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
 	int color = NO_COLOR, attr;
 	boolean menucolr = FALSE;
+
+	UNREFERENCED_PARAMETER(wParam);
 
 	lpdis = (LPDRAWITEMSTRUCT) lParam; 
 
@@ -1460,10 +1455,10 @@ void mswin_menu_window_size (HWND hWnd, LPSIZE sz)
 		extra_cx = (wrt.right-wrt.left) - sz->cx;
 
 		if( data->type==MENU_TYPE_MENU ) {
-			sz->cx = max(sz->cx, data->menu.menu_cx + GetSystemMetrics(SM_CXVSCROLL) );
+			sz->cx = data->menu.menu_cx + GetSystemMetrics(SM_CXVSCROLL);
 		} else {
 			/* Use the width of the text box */
-			sz->cx = max( sz->cx, data->text.text_box_size.cx + 2*GetSystemMetrics(SM_CXVSCROLL));
+			sz->cx = data->text.text_box_size.cx + 2*GetSystemMetrics(SM_CXVSCROLL);
 		}
 		sz->cx += extra_cx;
 	} else { 
@@ -1561,7 +1556,15 @@ LRESULT CALLBACK NHMenuListWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 /* Text control window proc - implements scrolling without a cursor */
 LRESULT CALLBACK NHMenuTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	HDC hDC;
+	RECT rc;
+
 	switch(message) {
+	case WM_ERASEBKGND: 
+	    hDC = (HDC) wParam; 
+	    GetClientRect(hWnd, &rc); 
+	    FillRect(hDC, &rc, text_bg_brush? text_bg_brush : SYSCLR_TO_BRUSH(DEFAULT_COLOR_BG_TEXT)); 
+            return 0;
 
 	case WM_KEYDOWN:
 		switch (wParam)
@@ -1596,8 +1599,13 @@ LRESULT CALLBACK NHMenuTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
             SendMessage(hWnd, EM_SCROLL, SB_LINEDOWN, 0);
             return 0;
 
-		}
+	}
 	break;
+
+	/* edit control needs to know nothing of its focus */
+	case WM_SETFOCUS:
+            HideCaret(hWnd);
+	    return 0;
 
 	}
 

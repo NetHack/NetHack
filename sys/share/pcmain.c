@@ -56,6 +56,8 @@ extern void FDECL(nethack_exit,(int));
 #ifdef WIN32
 extern boolean getreturn_enabled;	/* from sys/share/pcsys.c */
 extern int redirect_stdout;		/* from sys/share/pcsys.c */
+char *NDECL(exename);
+char default_window_sys[] = "mswin";
 #endif
 
 #if defined(MSWIN_GRAPHICS)
@@ -80,7 +82,7 @@ unsigned _stklen = STKSIZ;
  * to help MinGW decide which entry point to choose. If both main and 
  * WinMain exist, the resulting executable won't work correctly.
  */
-#ifndef MSWIN_GRAPHICS
+#ifndef __MINGW32__
 int
 main(argc,argv)
 int argc;
@@ -89,6 +91,10 @@ char *argv[];
      boolean resuming;
 
      sys_early_init();
+#ifdef WIN32
+     Strcpy(default_window_sys, "tty");
+#endif
+
      resuming = pcmain(argc,argv);
 #ifdef LAN_FEATURES
      init_lan_features();
@@ -98,7 +104,7 @@ char *argv[];
      /*NOTREACHED*/
      return 0;
 }
-#endif /*MSWIN_GRAPHICS*/
+#endif
 
 boolean
 pcmain(argc,argv)
@@ -119,6 +125,17 @@ char *argv[];
 #endif
     boolean resuming = FALSE;	/* assume new game */
 
+#ifdef _MSC_VER
+    /* set these appropriately for VS debugging */
+    _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
+    _CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG); /* | _CRTDBG_MODE_FILE);*/
+    _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_DEBUG);
+                        /*| _CRTDBG_MODE_FILE | _CRTDBG_MODE_WNDW);*/
+    /* use STDERR by default 
+    _CrtSetReportFile(_CRT_ERROR, _CRTDBG_FILE_STDERR);
+    _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
+#endif
+
 #if defined(__BORLANDC__) && !defined(_WIN32)
     startup();
 #endif
@@ -132,7 +149,11 @@ char *argv[];
 #endif
         hname = "NetHack";      /* used for syntax messages */
 
+#ifndef WIN32
     choose_windows(DEFAULT_WINDOW_SYS);
+#else
+    choose_windows(default_window_sys);
+#endif
 
 #if !defined(AMIGA) && !defined(GNUDOS)
     /* Save current directory and make sure it gets restored when
@@ -207,7 +228,7 @@ char *argv[];
 # endif
     ami_wininit_data();
 #endif
-#ifdef WIN32CON
+#ifdef WIN32
     save_getreturn_status = getreturn_enabled;
     raw_clear_screen();
     getreturn_enabled = TRUE;
@@ -257,16 +278,14 @@ char *argv[];
          * may do a prscore().
          */
         if (!strncmp(argv[1], "-s", 2)) {
-#if defined(MSWIN_GRAPHICS) || defined(WIN32CON)
+#if defined(WIN32)
             int sfd = (int)_fileno(stdout);
             redirect_stdout = (sfd >= 0) ? !isatty(sfd) : 0;
 
-# ifdef MSWIN_GRAPHICS
             if (!redirect_stdout) {
                raw_printf("-s is not supported for the Graphical Interface\n");
                nethack_exit(EXIT_SUCCESS);
             }
-# endif
 #endif
 
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
@@ -326,11 +345,22 @@ char *argv[];
     chdirx(hackdir,1);
 #endif
 
-#ifdef MSDOS
-    /* We do this early for MSDOS because there are several
-     * display/tile related options that affect init_nhwindows()
+#if defined(MSDOS) || defined (WIN32)
+    /* In 3.6.0, several ports process options before they init
+     * the window port. This allows settings that impact window
+     * ports to be specified or read from the sys or user config files.
      */
     process_options(argc, argv);
+
+# ifdef WIN32
+/*
+    if (!strncmpi(windowprocs.name, "mswin", 5))
+	NHWinMainInit();
+    else
+*/
+    if (!strncmpi(windowprocs.name, "tty", 3))
+	nttty_open(1);
+# endif
 #endif
 
 #if defined(MSDOS) || defined(WIN32)
@@ -343,14 +373,14 @@ char *argv[];
     }
 #endif
 
-#ifdef MSDOS
+#if defined(MSDOS) || defined(WIN32)
     init_nhwindows(&argc,argv);
 #else
     init_nhwindows(&argc,argv);
     process_options(argc, argv);
 #endif
 
-#ifdef WIN32CON
+#ifdef WIN32
     toggle_mouse_support();	/* must come after process_options */
 #endif
 
@@ -628,6 +658,19 @@ char *argv[];
             bigscreen = -1;
             break;
 #endif
+#ifdef WIN32
+        case 'w': /* windowtype */
+            if (strncmpi(&argv[0][2],"tty", 3)) {
+                nttty_open(1);
+            }
+/*
+	    else {
+                NHWinMainInit();
+            }
+*/
+            choose_windows(&argv[0][2]);
+            break;
+#endif
         case '@':
             flags.randomall = 1;
             break;
@@ -740,6 +783,32 @@ authorize_wizard_mode()
 # else
 #define PATH_SEPARATOR '\\'
 # endif
+
+
+#ifdef WIN32
+static char  exenamebuf[PATHLEN];
+
+char *
+exename()
+{
+    int bsize = PATHLEN;
+    char *tmp = exenamebuf, *tmp2;
+
+# ifdef UNICODE
+    {
+        TCHAR wbuf[PATHLEN * 4];
+        GetModuleFileName((HANDLE)0, wbuf, PATHLEN * 4);
+        WideCharToMultiByte(CP_ACP, 0, wbuf, -1, tmp, bsize, NULL, NULL);
+    }
+# else
+    *(tmp + GetModuleFileName((HANDLE)0, tmp, bsize)) = '\0';
+# endif
+    tmp2 = strrchr(tmp, PATH_SEPARATOR);
+    if (tmp2) *tmp2 = '\0';
+    tmp2++;
+    return tmp2;
+}
+#endif
 
 #define EXEPATHBUFSZ 256
 char exepathbuf[EXEPATHBUFSZ];

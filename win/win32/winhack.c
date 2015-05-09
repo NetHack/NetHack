@@ -15,9 +15,8 @@
 #include "mhmain.h"
 #include "mhmap.h"
 
-#ifndef __BORLANDC__
-#include <shlwapi.h>
-#else /* Borland redefines "boolean" in shlwapi.h so just use the little bit we need */
+/* Borland and MinGW redefine "boolean" in shlwapi.h,
+   so just use the little bit we need */
 typedef struct _DLLVERSIONINFO
 {
     DWORD cbSize;
@@ -34,7 +33,7 @@ typedef struct _DLLVERSIONINFO
 
 typedef HRESULT (CALLBACK* DLLGETVERSIONPROC)(DLLVERSIONINFO *);
 
-#endif
+/* end of shlwapi.h */
 
 /* Minimal common control library version
 Version     _WIN_32IE   Platform/IE
@@ -84,6 +83,9 @@ int APIENTRY WinMain(HINSTANCE hInstance,
     DWORD major, minor;
 	boolean resuming;
 
+	UNREFERENCED_PARAMETER(hPrevInstance);
+	UNREFERENCED_PARAMETER(lpCmdLine);
+	UNREFERENCED_PARAMETER(nCmdShow);
 
 	/* ensure that we don't access violate on a panic() */
 	windowprocs.win_raw_print = mswin_raw_print;

@@ -1,7 +1,8 @@
 # NetHack 3.6	Makefile.bcc	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
 # NetHack 3.6	Makefile.bcc	$Date: 2011/10/11 02:37:22 $  $Revision: 1.46 $
-#   Copyright (c) NetHack PC Development Team 1993-2010
+#   Copyright (c) NetHack PC Development Team 1993-2015
 #
+#==============================================================================
 #
 # IMPORTANT NOTE: This Makefile has not been tested for 3.5.x.
 #
@@ -14,15 +15,15 @@
 #   If you don't have this compiler, you can get it at:
 #       http://www.borland.com/bcppbuilder/freecompiler/
 #
-#   This makefile is set up to assume the directories are extracted at the
-#   root, but this can be changed by modifying the bccroot and related
-#   variables.
+#==============================================================================
 #
 #   This is used for building two versions of NetHack:
+#
 #   A tty port utilizing the Win32 Console I/O subsystem, Console
-#       NetHack;
+#       NetHack.exe
+#
 #   A Win32 native port built on the Windows API, Graphical NetHack or
-#       NetHackW.
+#       NetHackW.exe
 #
 #   In addition to your C compiler,
 #
@@ -31,32 +32,64 @@
 #              .y                   yacc   (such as bison)
 #              .l                   lex    (such as flex)
 #
-#
 #   If you have any questions read the sys/winnt/Install.nt file included 
 #   with the distribution.
-#
-#   --
-#   Yitzhak Sapir
 #==============================================================================
-# Do not delete the following 3 lines.
 #
 TARGETOS=BOTH
-APPVER=4.0
+APPVER=5.0
 
 bccbin = $(MAKEDIR)
 bccroot = $(MAKEDIR)\..
 bccinc = $(bccroot)\include
 bcclib = $(bccroot)\lib
 
-!IFNDEF APPVER
-APPVER = 4.0
-!ENDIF
+#==============================================================================
+# BUILD DECISIONS SECTION
+#
+# There are currently only 3 decisions that you have to make.
+#	1. 32-bit or 64-bit?
+#	2. Where do you want your build to end up?
+#	3. Do you want debug information in the executable?
+#
+#---------------------------------------------------------------
+#==============================================================================
+# 1. 32-bit or 64-bit? (comment/uncomment appropriate TARGET_CPU line)
+#
+# TODO
+#---------------------------------------------------------------
+# 2. Where do you want the game to be built (which folder)?
+#
+GAMEDIR = ..\binary               # Game directory
 
+#
+#---------------------------------------------------------------
+# 3. Do you want debug information in the executable?
+#
+  
+DEBUGINFO = Y
+
+#==============================================================================
+# This marks the end of the BUILD DECISIONS section.
+#==============================================================================
+#
+#===============================================
+#======= End of Modification Section ===========
+#===============================================
+#
+################################################
+#                                              #
+# Nothing below here should have to be changed.#
+#                                              #
+################################################
+
+#
+#==============================================================================
 # Graphical interface
 # Set to Y for a graphical version
 # Set to anything else (or undefine) for a tty version
 
-#GRAPHICAL = Y
+GRAPHICAL = Y
 
 # Debug
 # Set to Y for Debug support (to produce full map files, listing files, and debug information)
@@ -96,16 +129,12 @@ startobjg = $(startobj)
 !ENDIF
 libsmt  = $(bcclib)\cw32mt.lib $(bcclib)\import32.lib 
 
-#
-#  Set the gamedir according to your preference.  
-#  It must be present prior to compilation.
 
 !IF "$(GRAPHICAL)" == "Y"
 GAME    = NetHackW                # Game Name
 !ELSE
 GAME    = NetHack                 # Game Name
 !ENDIF
-GAMEDIR = ..\binary               # Game directory
 
 #
 #  Source directories.    Makedefs hardcodes these, don't change them.
@@ -202,14 +231,6 @@ RANDOM	= $(OBJ)\random.o
 
 PRECOMPHEAD = N			# set to Y if you want to use precomp. headers
 
-#===============================================
-#======= End of Modification Section ===========
-#===============================================
-################################################
-#                                              #
-# Nothing below here should have to be changed.#
-#                                              #
-################################################
 
 !IF "$(GRAPHICAL)" == "Y"
 WINPORT	= $(O)tile.o $(O)mhaskyn.o $(O)mhdlg.o \
@@ -279,13 +300,158 @@ CFLAGS	 = $(CFLAGSBASE) $(WINPFLAG) $(DLBFLG)
 NHLFLAGS1 = /Gn /v /m /s /Gz /q /c
 lflags	= $(LFLAGSBASE) $(NHLFLAGS1)
 
-GAMEFILE = $(FDIR)\$(GAME).exe # whole thing
-
 ! IF ("$(USE_DLB)"=="Y")
 DLB = nhdat
 ! ELSE
 DLB =
 ! ENDIF
+
+#==========================================
+#================ MACROS ==================
+#==========================================
+# This section creates shorthand macros for many objects
+# referenced later on in the Makefile.
+#
+
+DEFFILE = $(NTSYS)\$(GAME).def
+
+#
+# Shorten up the location for some files
+#
+
+O  = $(OBJ)^\
+
+U  = $(UTIL)^\
+
+#
+# Utility Objects.
+#
+
+MAKESRC        = $(U)makedefs.c
+
+SPLEVSRC       = $(U)lev_yacc.c	$(U)lev_$(LEX).c $(U)lev_main.c  $(U)panic.c
+
+DGNCOMPSRC     = $(U)dgn_yacc.c	$(U)dgn_$(LEX).c $(U)dgn_main.c
+
+MAKEOBJS       = $(O)makedefs.o $(O)monst.o $(O)objects.o
+
+SPLEVOBJS      = $(O)lev_yacc.o	$(O)lev_$(LEX).o $(O)lev_main.o \
+		 $(O)alloc.o	$(O)decl.o	$(O)drawing.o \
+		 $(O)monst.o	$(O)objects.o	$(O)panic.o
+
+DGNCOMPOBJS    = $(O)dgn_yacc.o	$(O)dgn_$(LEX).o $(O)dgn_main.o \
+		 $(O)alloc.o	$(O)panic.o
+
+RECOVOBJS      = $(O)recover.o
+
+TILEFILES      = $(WSHR)\monsters.txt $(WSHR)\objects.txt $(WSHR)\other.txt
+
+#
+# These are not invoked during a normal game build in 3.4
+#
+TEXT_IO        = $(O)tiletext.o	$(O)tiletxt.o	$(O)drawing.o \
+		 $(O)decl.o	$(O)monst.o	$(O)objects.o
+
+GIFREADERS     = $(O)gifread.o	$(O)alloc.o $(O)panic.o
+
+PPMWRITERS     = $(O)ppmwrite.o $(O)alloc.o $(O)panic.o
+
+#
+#  Object files for the game itself.
+#
+
+VOBJ01 = $(O)allmain.o  $(O)alloc.o    $(O)apply.o    $(O)artifact.o
+VOBJ02 = $(O)attrib.o   $(O)ball.o     $(O)bones.o    $(O)botl.o    
+VOBJ03 = $(O)cmd.o      $(O)dbridge.o  $(O)decl.o     $(O)detect.o  
+VOBJ04 = $(O)dig.o      $(O)display.o  $(O)do.o       $(O)do_name.o 
+VOBJ05 = $(O)do_wear.o  $(O)dog.o      $(O)dogmove.o  $(O)dokick.o  
+VOBJ06 = $(O)dothrow.o  $(O)drawing.o  $(O)dungeon.o  $(O)eat.o     
+VOBJ07 = $(O)end.o      $(O)engrave.o  $(O)exper.o    $(O)explode.o 
+VOBJ08 = $(O)extralev.o $(O)files.o    $(O)fountain.o $(O)hack.o    
+VOBJ09 = $(O)hacklib.o  $(O)invent.o   $(O)light.o    $(O)lock.o    
+VOBJ10 = $(O)mail.o     $(O)pcmain.o   $(O)makemon.o  $(O)mapglyph.o $(O)mcastu.o  
+VOBJ11 = $(O)mhitm.o    $(O)mhitu.o    $(O)minion.o   $(O)mklev.o   
+VOBJ12 = $(O)mkmap.o    $(O)mkmaze.o   $(O)mkobj.o    $(O)mkroom.o  
+VOBJ13 = $(O)mon.o      $(O)mondata.o  $(O)monmove.o  $(O)monst.o   
+VOBJ14 = $(O)monstr.o   $(O)mplayer.o  $(O)mthrowu.o  $(O)muse.o    
+VOBJ15 = $(O)music.o    $(O)o_init.o   $(O)objects.o  $(O)objnam.o  
+VOBJ16 = $(O)options.o  $(O)pager.o    $(O)pickup.o   $(O)pline.o   
+VOBJ17 = $(O)polyself.o $(O)potion.o   $(O)pray.o     $(O)priest.o  
+VOBJ18 = $(O)quest.o    $(O)questpgr.o $(RANDOM)      $(O)read.o    
+VOBJ19 = $(O)rect.o     $(O)region.o   $(O)restore.o  $(O)rip.o     
+VOBJ20 = $(O)rnd.o      $(O)role.o     $(O)rumors.o   $(O)save.o    
+VOBJ21 = $(O)shk.o      $(O)shknam.o   $(O)sit.o      $(O)sounds.o  
+VOBJ22 = $(O)sp_lev.o   $(O)spell.o    $(O)steal.o    $(O)steed.o   
+VOBJ23 = $(O)sys.o      $(O)teleport.o $(O)timeout.o  $(O)topten.o
+VOBJ24 = $(O)track.o    $(O)trap.o     $(O)u_init.o   $(O)uhitm.o
+VOBJ25 = $(O)vault.o    $(O)vis_tab.o  $(O)vision.o   $(O)weapon.o
+VOBJ26 = $(O)were.o     $(O)wield.o    $(O)windows.o  $(O)wizard.o
+VOBJ27 = $(O)worm.o     $(O)worn.o     $(O)write.o    $(O)zap.o     
+
+DLBOBJ = $(O)dlb.o
+
+REGEX  = $(O)cppregex.o
+
+TTYOBJ = $(O)topl.o     $(O)getline.o  $(O)wintty.o
+
+SOBJ   = $(O)winnt.o    $(O)pcsys.o      $(O)pcunix.o  \
+	   $(SOUND) 	$(O)nhlan.o
+
+OBJS   = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
+         $(VOBJ06) $(VOBJ07) $(VOBJ08) $(VOBJ09) $(VOBJ10) \
+         $(VOBJ11) $(VOBJ12) $(VOBJ13) $(VOBJ14) $(VOBJ15) \
+         $(VOBJ16) $(VOBJ17) $(VOBJ18) $(VOBJ19) $(VOBJ20) \
+         $(VOBJ21) $(VOBJ22) $(VOBJ23) $(VOBJ24) $(VOBJ25) \
+         $(VOBJ26) $(VOBJ27)
+
+TILOBJ = $(WINPORT)
+
+VVOBJ  = $(O)version.o
+
+ALLOBJ  = $(TILOBJ) $(SOBJ) $(DLBOBJ)  $(TTYOBJ) $(WOBJ) $(OBJS) $(VVOBJ)
+
+
+!IF "$(GRAPHICAL)" == "Y"
+OPTIONS_FILE = $(DAT)\guioptions
+!ELSE
+OPTIONS_FILE = $(DAT)\ttyoptions
+!ENDIF
+#==========================================
+# Header file macros
+#==========================================
+
+CONFIG_H = $(INCL)\config.h $(INCL)\config1.h $(INCL)\tradstdc.h \
+		$(INCL)\global.h $(INCL)\coord.h $(INCL)\vmsconf.h \
+		$(INCL)\system.h $(INCL)\unixconf.h $(INCL)\os2conf.h \
+		$(INCL)\micro.h $(INCL)\pcconf.h $(INCL)\tosconf.h \
+		$(INCL)\amiconf.h $(INCL)\macconf.h $(INCL)\beconf.h \
+		$(INCL)\ntconf.h
+
+HACK_H = $(INCL)\hack.h $(CONFIG_H) $(INCL)\context.h $(INCL)\align.h \
+		$(INCL)\dungeon.h $(INCL)\monsym.h $(INCL)\mkroom.h \
+		$(INCL)\objclass.h $(INCL)\youprop.h $(INCL)\prop.h \
+		$(INCL)\permonst.h $(INCL)\monattk.h \
+		$(INCL)\monflag.h $(INCL)\mondata.h $(INCL)\pm.h \
+		$(INCL)\wintype.h $(INCL)\decl.h $(INCL)\quest.h \
+		$(INCL)\spell.h $(INCL)\sys.h $(INCL)\color.h $(INCL)\obj.h \
+		$(INCL)\you.h $(INCL)\attrib.h $(INCL)\monst.h $(INCL)\lint.h \
+		$(INCL)\mextra.h $(INCL)\skills.h $(INCL)\onames.h \
+		$(INCL)\timeout.h $(INCL)\trap.h $(INCL)\flag.h $(INCL)\rm.h \
+		$(INCL)\vision.h $(INCL)\display.h $(INCL)\engrave.h \
+		$(INCL)\rect.h $(INCL)\region.h $(INCL)\winprocs.h $(INCL)\botl.h \
+		$(INCL)\wintty.h $(INCL)\trampoli.h
+
+LEV_H       = $(INCL)\lev.h
+DGN_FILE_H  = $(INCL)\dgn_file.h
+LEV_COMP_H  = $(INCL)\lev_comp.h
+SP_LEV_H    = $(INCL)\sp_lev.h
+TILE_H      = ..\win\share\tile.h
+
+#==========================================
+# Miscellaneous
+#==========================================
+
+DATABASE = $(DAT)\data.base
 
 #==========================================
 #================ RULES ==================
@@ -353,151 +519,6 @@ DLB =
 
 {$(WIN32)}.c{$(OBJ)}.o:
 	@$(cc) $(CFLAGS)  -o$@  $<
-
-#==========================================
-#================ MACROS ==================
-#==========================================
-# This section creates shorthand macros for many objects
-# referenced later on in the Makefile.
-#
-
-DEFFILE = $(NTSYS)\$(GAME).def
-
-#
-# Shorten up the location for some files
-#
-
-O  = $(OBJ)^\
-
-U  = $(UTIL)^\
-
-#
-# Utility Objects.
-#
-
-MAKESRC        = $(U)makedefs.c
-
-SPLEVSRC       = $(U)lev_yacc.c	$(U)lev_$(LEX).c $(U)lev_main.c  $(U)panic.c
-
-DGNCOMPSRC     = $(U)dgn_yacc.c	$(U)dgn_$(LEX).c $(U)dgn_main.c
-
-MAKEOBJS       = $(O)makedefs.o $(O)monst.o $(O)objects.o
-
-SPLEVOBJS      = $(O)lev_yacc.o	$(O)lev_$(LEX).o $(O)lev_main.o \
-		 $(O)alloc.o	$(O)decl.o	$(O)drawing.o \
-		 $(O)monst.o	$(O)objects.o	$(O)panic.o
-
-DGNCOMPOBJS    = $(O)dgn_yacc.o	$(O)dgn_$(LEX).o $(O)dgn_main.o \
-		 $(O)alloc.o	$(O)panic.o
-
-RECOVOBJS      = $(O)recover.o
-
-TILEFILES      = $(WSHR)\monsters.txt $(WSHR)\objects.txt $(WSHR)\other.txt
-
-#
-# These are not invoked during a normal game build in 3.4
-#
-TEXT_IO        = $(O)tiletext.o	$(O)tiletxt.o	$(O)drawing.o \
-		 $(O)decl.o	$(O)monst.o	$(O)objects.o
-
-GIFREADERS     = $(O)gifread.o	$(O)alloc.o $(O)panic.o
-
-PPMWRITERS     = $(O)ppmwrite.o $(O)alloc.o $(O)panic.o
-
-#
-#  Object files for the game itself.
-#
-
-VOBJ01 = $(O)allmain.o  $(O)alloc.o    $(O)apply.o    $(O)artifact.o
-VOBJ02 = $(O)attrib.o   $(O)ball.o     $(O)bones.o    $(O)botl.o    
-VOBJ03 = $(O)cmd.o      $(O)dbridge.o  $(O)decl.o     $(O)detect.o  
-VOBJ04 = $(O)dig.o      $(O)display.o  $(O)do.o       $(O)do_name.o 
-VOBJ05 = $(O)do_wear.o  $(O)dog.o      $(O)dogmove.o  $(O)dokick.o  
-VOBJ06 = $(O)dothrow.o  $(O)drawing.o  $(O)dungeon.o  $(O)eat.o     
-VOBJ07 = $(O)end.o      $(O)engrave.o  $(O)exper.o    $(O)explode.o 
-VOBJ08 = $(O)extralev.o $(O)files.o    $(O)fountain.o $(O)hack.o    
-VOBJ09 = $(O)hacklib.o  $(O)invent.o   $(O)light.o    $(O)lock.o    
-VOBJ10 = $(O)mail.o     $(O)makemon.o  $(O)mapglyph.o $(O)mcastu.o  
-VOBJ11 = $(O)mhitm.o    $(O)mhitu.o    $(O)minion.o   $(O)mklev.o   
-VOBJ12 = $(O)mkmap.o    $(O)mkmaze.o   $(O)mkobj.o    $(O)mkroom.o  
-VOBJ13 = $(O)mon.o      $(O)mondata.o  $(O)monmove.o  $(O)monst.o   
-VOBJ14 = $(O)monstr.o   $(O)mplayer.o  $(O)mthrowu.o  $(O)muse.o    
-VOBJ15 = $(O)music.o    $(O)o_init.o   $(O)objects.o  $(O)objnam.o  
-VOBJ16 = $(O)options.o  $(O)pager.o    $(O)pickup.o   $(O)pline.o   
-VOBJ17 = $(O)polyself.o $(O)potion.o   $(O)pray.o     $(O)priest.o  
-VOBJ18 = $(O)quest.o    $(O)questpgr.o $(RANDOM)      $(O)read.o    
-VOBJ19 = $(O)rect.o     $(O)region.o   $(O)restore.o  $(O)rip.o     
-VOBJ20 = $(O)rnd.o      $(O)role.o     $(O)rumors.o   $(O)save.o    
-VOBJ21 = $(O)shk.o      $(O)shknam.o   $(O)sit.o      $(O)sounds.o  
-VOBJ22 = $(O)sp_lev.o   $(O)spell.o    $(O)steal.o    $(O)steed.o   
-VOBJ23 = $(O)sys.o      $(O)teleport.o $(O)timeout.o  $(O)topten.o
-VOBJ24 = $(O)track.o    $(O)trap.o     $(O)u_init.o   $(O)uhitm.o
-VOBJ25 = $(O)vault.o    $(O)vis_tab.o  $(O)vision.o   $(O)weapon.o
-VOBJ26 = $(O)were.o     $(O)wield.o    $(O)windows.o  $(O)wizard.o
-VOBJ27 = $(O)worm.o     $(O)worn.o     $(O)write.o    $(O)zap.o     
-
-DLBOBJ = $(O)dlb.o
-
-TTYOBJ = $(O)topl.o     $(O)getline.o  $(O)wintty.o
-
-SOBJ   = $(O)winnt.o    $(O)pcsys.o      $(O)pcunix.o  \
-	   $(SOUND) $(O)pcmain.o	$(O)nhlan.o
-
-OBJS   = $(VOBJ01) $(VOBJ02) $(VOBJ03) $(VOBJ04) $(VOBJ05) \
-         $(VOBJ06) $(VOBJ07) $(VOBJ08) $(VOBJ09) $(VOBJ10) \
-         $(VOBJ11) $(VOBJ12) $(VOBJ13) $(VOBJ14) $(VOBJ15) \
-         $(VOBJ16) $(VOBJ17) $(VOBJ18) $(VOBJ19) $(VOBJ20) \
-         $(VOBJ21) $(VOBJ22) $(VOBJ23) $(VOBJ24) $(VOBJ25) \
-         $(VOBJ26) $(VOBJ27)
-
-TILOBJ = $(WINPORT)
-
-VVOBJ  = $(O)version.o
-
-ALLOBJ  = $(TILOBJ) $(SOBJ) $(DLBOBJ)  $(TTYOBJ) $(WOBJ) $(OBJS) $(VVOBJ)
-
-
-!IF "$(GRAPHICAL)" == "Y"
-OPTIONS_FILE = $(DAT)\guioptions
-!ELSE
-OPTIONS_FILE = $(DAT)\ttyoptions
-!ENDIF
-#==========================================
-# Header file macros
-#==========================================
-
-CONFIG_H = $(INCL)\config.h $(INCL)\config1.h $(INCL)\tradstdc.h \
-		$(INCL)\global.h $(INCL)\coord.h $(INCL)\vmsconf.h \
-		$(INCL)\system.h $(INCL)\unixconf.h $(INCL)\os2conf.h \
-		$(INCL)\micro.h $(INCL)\pcconf.h $(INCL)\tosconf.h \
-		$(INCL)\amiconf.h $(INCL)\macconf.h $(INCL)\beconf.h \
-		$(INCL)\ntconf.h
-
-HACK_H = $(INCL)\hack.h $(CONFIG_H) $(INCL)\context.h $(INCL)\align.h \
-		$(INCL)\dungeon.h $(INCL)\monsym.h $(INCL)\mkroom.h \
-		$(INCL)\objclass.h $(INCL)\youprop.h $(INCL)\prop.h \
-		$(INCL)\permonst.h $(INCL)\monattk.h \
-		$(INCL)\monflag.h $(INCL)\mondata.h $(INCL)\pm.h \
-		$(INCL)\wintype.h $(INCL)\decl.h $(INCL)\quest.h \
-		$(INCL)\spell.h $(INCL)\sys.h $(INCL)\color.h $(INCL)\obj.h \
-		$(INCL)\you.h $(INCL)\attrib.h $(INCL)\monst.h \
-		$(INCL)\mextra.h $(INCL)\skills.h $(INCL)\onames.h \
-		$(INCL)\timeout.h $(INCL)\trap.h $(INCL)\flag.h $(INCL)\rm.h \
-		$(INCL)\vision.h $(INCL)\display.h $(INCL)\engrave.h \
-		$(INCL)\rect.h $(INCL)\region.h $(INCL)\winprocs.h \
-		$(INCL)\wintty.h $(INCL)\trampoli.h
-
-LEV_H       = $(INCL)\lev.h
-DGN_FILE_H  = $(INCL)\dgn_file.h
-LEV_COMP_H  = $(INCL)\lev_comp.h
-SP_LEV_H    = $(INCL)\sp_lev.h
-TILE_H      = ..\win\share\tile.h
-
-#==========================================
-# Miscellaneous
-#==========================================
-
-DATABASE = $(DAT)\data.base
 
 #
 #  The name of the game.
@@ -737,6 +758,14 @@ $(INCL)\vis_tab.h: $(U)makedefs.exe
 
 $(SRC)\vis_tab.c: $(U)makedefs.exe
 	$(U)makedefs -z
+
+$(DAT)\engrave: $(DAT)\engrave.txt $(U)makedefs.exe
+	..\util\makedefs -s
+$(DAT)\epitaph: $(DAT)\epitaph.txt $(U)makedefs.exe
+	..\util\makedefs -s
+$(DAT)\bogusmon: $(DAT)\bogusmon.txt $(U)makedefs.exe
+	..\util\makedefs -s
+
 
 #==========================================
 # uudecode utility and uuencoded targets
@@ -1029,6 +1058,12 @@ $(O)tile2bmp.o: $(WSHR)\tile2bmp.c $(HACK_H) $(TILE_H) $(INCL)\win32api.h
 spotless: clean
 ! IF ("$(OBJ)"!="")
 	-rmdir $(OBJ) /s /Q
+	if exist $(GAMEDIR)\nhdefkey.dll del $(GAMEDIR)\nhdefkey.dll
+	if exist $(GAMEDIR)\nh340key.dll del $(GAMEDIR)\nh340key.dll
+	if exist $(GAMEDIR)\nhraykey.dll del $(GAMEDIR)\nhraykey.dll
+	if exist $(GAMEDIR)\NetHack.exe  del $(GAMEDIR)\NetHack.exe
+	if exist $(GAMEDIR)\NetHack.pdb  del $(GAMEDIR)\NetHack.pdb
+	if exist $(GAMEDIR)\nhdat        del $(GAMEDIR)\nhdat
 ! ENDIF
 	if exist $(INCL)\date.h    del $(INCL)\date.h
 	if exist $(INCL)\onames.h  del $(INCL)\onames.h
@@ -1040,6 +1075,9 @@ spotless: clean
 	if exist $(U)*.map         del $(U)*.map
 	if exist $(DAT)\data       del $(DAT)\data
 	if exist $(DAT)\rumors     del $(DAT)\rumors
+	if exist $(DAT)\engrave    del $(DAT)\engrave
+	if exist $(DAT)\epitaph    del $(DAT)\epitaph
+	if exist $(DAT)\bogusmon   del $(DAT)\bogusmon
 	if exist $(DAT)\???-fil?.lev	del $(DAT)\???-fil?.lev
 	if exist $(DAT)\???-goal.lev	del $(DAT)\???-goal.lev
 	if exist $(DAT)\???-loca.lev	del $(DAT)\???-loca.lev
@@ -1080,7 +1118,10 @@ spotless: clean
 	if exist $(SRC)\vis_tab.c       del $(SRC)\vis_tab.c
 	if exist $(U)recover.exe        del $(U)recover.exe
 	if exist nhdat.			del nhdat.
-
+	if exist $(O)obj.tag            del $(O)obj.tag
+	if exist $(O)gamedir.tag        del $(O)gamedir.tag
+	if exist $(O)nh*key.lib         del $(O)nh*key.lib
+	if exist $(O)nh*key.exp         del $(O)nh*key.exp
 clean:
 	if exist $(O)*.o del $(O)*.o
 	if exist $(O)utility.tag   del $(O)utility.tag
@@ -1089,7 +1130,48 @@ clean:
 	if exist $(U)dgncomp.exe  del $(U)dgncomp.exe
 	if exist $(SRC)\*.lnk      del $(SRC)\*.lnk
 	if exist $(SRC)\*.map      del $(SRC)\*.map
+	if exist $(O)install.tag   del $(O)install.tag
+	if exist $(O)console.res  del $(O)console.res
+	if exist $(O)dgncomp.MAP  del $(O)dgncomp.MAP
+	if exist $(O)dgncomp.PDB  del $(O)dgncomp.PDB
+	if exist $(O)dlb_main.MAP del $(O)dlb_main.MAP
+	if exist $(O)dlb_main.PDB del $(O)dlb_main.PDB
+	if exist $(O)gamedir.tag  del $(O)gamedir.tag
+	if exist $(O)levcomp.MAP  del $(O)levcomp.MAP
+	if exist $(O)levcomp.PDB  del $(O)levcomp.PDB
+	if exist $(O)makedefs.MAP del $(O)makedefs.MAP
+	if exist $(O)makedefs.PDB del $(O)makedefs.PDB
+	if exist $(O)NetHack.MAP  del $(O)NetHack.MAP
+	if exist $(O)nh340key.def del $(O)nh340key.def
+	if exist $(O)nh340key.exp del $(O)nh340key.exp
+	if exist $(O)nh340key.lib del $(O)nh340key.lib
+	if exist $(O)nh340key.map del $(O)nh340key.map
+	if exist $(O)nh340key.PDB del $(O)nh340key.PDB
+	if exist $(O)nhdefkey.def del $(O)nhdefkey.def
+	if exist $(O)nhdefkey.exp del $(O)nhdefkey.exp
+	if exist $(O)nhdefkey.lib del $(O)nhdefkey.lib
+	if exist $(O)nhdefkey.map del $(O)nhdefkey.map
+	if exist $(O)nhdefkey.PDB del $(O)nhdefkey.PDB
+	if exist $(O)nhraykey.def del $(O)nhraykey.def
+	if exist $(O)nhraykey.exp del $(O)nhraykey.exp
+	if exist $(O)nhraykey.lib del $(O)nhraykey.lib
+	if exist $(O)nhraykey.map del $(O)nhraykey.map
+	if exist $(O)nhraykey.PDB del $(O)nhraykey.PDB
+	if exist $(O)obj.tag      del $(O)obj.tag
+	if exist $(O)sp_lev.tag   del $(O)sp_lev.tag
+	if exist $(O)uudecode.MAP del $(O)uudecode.MAP
+	if exist $(O)uudecode.PDB del $(O)uudecode.PDB
+	rem
+	rem defer to the steps in ..\win\win32\levstuff.mak
+	rem 
+	make -f ..\win\win32\levstuff.mak clean
+	rem
+	rem defer to the steps in ..\win\win32\dgnstuff.mak
+	rem
+	make -f ..\win\win32\dgnstuff.mak clean
+
 	if exist $(TILEBMP16)        del $(TILEBMP16)
+	if exist $(TILEBMP32)        del $(TILEBMP32)
 
 #===================================================================
 # OTHER DEPENDENCIES

@@ -197,13 +197,6 @@ typedef uchar nhsym;
 # endif
 # ifdef WIN32
 #  define PORT_ID	"Windows"
-#  ifndef PORT_SUB_ID
-#   ifdef MSWIN_GRAPHICS
-#    define PORT_SUB_ID	"graphical"
-#   else
-#    define PORT_SUB_ID	"tty"
-#   endif
-#  endif
 # endif
 #endif
 
@@ -234,7 +227,7 @@ typedef uchar nhsym;
 # define EXIT_FAILURE 1
 #endif
 
-#if defined(X11_GRAPHICS) || defined(QT_GRAPHICS) || defined(GNOME_GRAPHICS) || defined(MSWIN_GRAPHICS)
+#if defined(X11_GRAPHICS) || defined(QT_GRAPHICS) || defined(GNOME_GRAPHICS) || defined(WIN32)
 # ifndef USE_TILES
 #  define USE_TILES		/* glyph2tile[] will be available */
 # endif

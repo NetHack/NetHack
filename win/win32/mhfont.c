@@ -25,7 +25,6 @@ static void __cdecl font_table_cleanup(void);
 void mswin_init_splashfonts(HWND hWnd)
 {
 	HDC hdc = GetDC(hWnd);
-	HFONT fnt = NULL;
 	LOGFONT lgfnt;
 	ZeroMemory( &lgfnt, sizeof(lgfnt) );
 	lgfnt.lfHeight		= -80;	 // height of font
@@ -78,11 +77,12 @@ HGDIOBJ mswin_get_font(int win_type, int attr, HDC hdc, BOOL replace)
 
 	switch(win_type) {
 	case NHW_STATUS:
-		lgfnt.lfHeight			=	-iflags.wc_fontsiz_status*GetDeviceCaps(hdc, LOGPIXELSY)/72;	 // height of font
+		font_size = (attr==ATR_BOLD)? iflags.wc_fontsiz_status+1 : iflags.wc_fontsiz_status;
+		lgfnt.lfHeight			=	-font_size*GetDeviceCaps(hdc, LOGPIXELSY)/72;	 // height of font
 		lgfnt.lfWidth			=	0;				     // average character width
 		lgfnt.lfEscapement		=	0;					 // angle of escapement
 		lgfnt.lfOrientation		=	0;					 // base-line orientation angle
-		lgfnt.lfWeight			=	FW_BOLD;             // font weight
+		lgfnt.lfWeight			=	(attr==ATR_BOLD)? FW_BOLD : FW_NORMAL;             // font weight
 		lgfnt.lfItalic			=	FALSE;		         // italic attribute option
 		lgfnt.lfUnderline		=	FALSE;			     // underline attribute option
 		lgfnt.lfStrikeOut		=	FALSE;			     // strikeout attribute option

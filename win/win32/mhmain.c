@@ -26,7 +26,7 @@ static TCHAR szMainWindowClass[] = TEXT("MSNHMainWndClass");
 static TCHAR szTitle[MAX_LOADSTRING];
 extern void mswin_display_splash_window(BOOL);
 
-LRESULT CALLBACK	MainWndProc(HWND, UINT, UINT, LPARAM);
+LRESULT CALLBACK	MainWndProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
 static LRESULT  onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
 static void		onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam);
@@ -176,7 +176,7 @@ static const char scanmap[] = { 	/* ... */
 //
 //  PURPOSE:  Processes messages for the main window.
 */
-LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, UINT wParam, LPARAM lParam)
+LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	PNHMainWindow data;
 
@@ -188,7 +188,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, UINT wParam, LPARAM lParam
 			if( !data ) panic("out of memory");
 			ZeroMemory(data, sizeof(NHMainWindow));
 			data->mapAcsiiModeSave = MAP_MODE_ASCII12x16;
-			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG)data);
+			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)data);
 
 			/* update menu items */
 			CheckMenuItem(
@@ -414,6 +414,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, UINT wParam, LPARAM lParam
 				}
 			}
 
+
 			} /* end switch */
 		} break;
 
@@ -526,7 +527,7 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, UINT wParam, LPARAM lParam
 
 			/* clean up */
 			free( (PNHMainWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA) );
-			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG)0);
+			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)0);
 
 			// PostQuitMessage(0);
 			exit(1); 
@@ -540,6 +541,10 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT message, UINT wParam, LPARAM lParam
 
 void onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(hWnd);
+	UNREFERENCED_PARAMETER(wParam);
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch(wParam) {
 
 	/* new window was just added */
@@ -755,6 +760,8 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 	int wmId, wmEvent;
 	PNHMainWindow  data;
 
+	UNREFERENCED_PARAMETER(lParam);
+
 	data = (PNHMainWindow)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	wmId    = LOWORD(wParam); 
 	wmEvent = HIWORD(wParam); 
@@ -809,7 +816,7 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			char* p;
 			size_t len;
 			HANDLE hglbCopy;
-			TCHAR* p_copy;
+			char* p_copy;
 
 			p = nh_compose_ascii_screenshot();
 			if( !p ) return 0;
@@ -822,18 +829,18 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			
 			EmptyClipboard();
 
-			hglbCopy = GlobalAlloc(GMEM_MOVEABLE, (len + 1) * sizeof(TCHAR)); 
+			hglbCopy = GlobalAlloc(GMEM_MOVEABLE, (len + 1) * sizeof(char)); 
 			if (hglbCopy == NULL) { 
 				CloseClipboard(); 
 				return FALSE; 
 			} 
 
-			p_copy = (TCHAR*)GlobalLock(hglbCopy); 
-			NH_A2W( p, p_copy, len ); 
-			p_copy[len] = (TCHAR) 0;    // null character 
+			p_copy = (char*)GlobalLock(hglbCopy); 
+			strncpy(p_copy, p, len); 
+			p_copy[len] = 0;    // null character 
 			GlobalUnlock(hglbCopy); 
 
-			SetClipboardData(CF_TEXT, hglbCopy);
+			SetClipboardData(SYMHANDLING(H_IBM)? CF_OEMTEXT : CF_TEXT, hglbCopy);
 			
 			CloseClipboard();
 			
@@ -842,32 +849,34 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 		
 		case IDM_SETTING_SCREEN_TO_FILE: {
 			OPENFILENAME ofn;
-			char filename[1024];
+			TCHAR filename[1024];
+			TCHAR whackdir[MAX_PATH];
 			FILE* pFile;
 			char* text;
+			wchar_t* wtext;
+			int tlen = 0;
 			
 			ZeroMemory(filename, sizeof(filename));
 			ZeroMemory(&ofn, sizeof(ofn));
 			ofn.lStructSize = sizeof (OPENFILENAME);
 			ofn.hwndOwner = hWnd;
 			ofn.hInstance = GetNHApp()->hApp;
-			ofn.lpstrFilter = 
-				"Text Files (*.txt)\x0*.txt\x0"
-				"All Files (*.*)\x0*.*\x0"
-				"\x0\x0";
+			ofn.lpstrFilter = TEXT("Text Files (*.txt)\x0*.txt\x0")
+				TEXT("All Files (*.*)\x0*.*\x0")
+				TEXT("\x0\x0");
 			ofn.lpstrCustomFilter = NULL;
 			ofn.nMaxCustFilter = 0;
 			ofn.nFilterIndex = 1;
 			ofn.lpstrFile = filename;
-			ofn.nMaxFile = sizeof(filename);
+			ofn.nMaxFile = SIZE(filename);
 			ofn.lpstrFileTitle = NULL;
 			ofn.nMaxFileTitle = 0;
-			ofn.lpstrInitialDir = hackdir;
+			ofn.lpstrInitialDir = NH_A2W(hackdir, whackdir, MAX_PATH);
 			ofn.lpstrTitle = NULL;
 			ofn.Flags = OFN_LONGNAMES | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST;
 			ofn.nFileOffset = 0;
 			ofn.nFileExtension = 0;
-			ofn.lpstrDefExt = "txt";
+			ofn.lpstrDefExt = TEXT("txt");
 			ofn.lCustData = 0;
 			ofn.lpfnHook = 0;
 			ofn.lpTemplateName = 0;
@@ -877,18 +886,23 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 			text = nh_compose_ascii_screenshot();
 			if( !text ) return FALSE;
 
-			pFile = fopen(filename, "wb");
+			pFile = _tfopen(filename, TEXT("wt+,ccs=UTF-8"));
 			if( !pFile ) {
-				char buf[4096];
-				sprintf(buf, "Cannot open %s for writing!", filename);
+				TCHAR buf[4096];
+				_stprintf(buf, TEXT("Cannot open %s for writing!"), filename);
 				NHMessageBox(hWnd, buf, MB_OK | MB_ICONERROR);
 				free(text);
 				return FALSE;
 			}
 
-			fwrite(text, strlen(text), 1, pFile);
+			tlen = strlen(text);
+			wtext = (wchar_t*)malloc(tlen*sizeof(wchar_t));
+			if( !wtext ) panic("out of memory");
+			MultiByteToWideChar(NH_CODEPAGE,0,text,-1,wtext,tlen);
+			fwrite(wtext, tlen*sizeof(wchar_t), 1, pFile);
 			fclose(pFile);
 			free(text);
+			free(wtext);
 		} break;
 
         case IDM_NHMODE:
@@ -902,7 +916,7 @@ LRESULT onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
             mswin_destroy_reg();
             /* Notify the user that windows settings will not be saved this time. */
             NHMessageBox(GetNHApp()->hMainWnd, 
-                "Your Windows Settings will not be stored when you exit this time.", 
+                TEXT("Your Windows Settings will not be stored when you exit this time."), 
                 MB_OK | MB_ICONINFORMATION);
             break;
         }
@@ -976,6 +990,8 @@ LRESULT CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	TCHAR wbuf[BUFSZ];
 	RECT   main_rt, dlg_rt;
 	SIZE   dlg_sz;
+
+	UNREFERENCED_PARAMETER(lParam);
 
 	switch (message)
 	{
@@ -1129,10 +1145,10 @@ void nhlock_windows( BOOL lock )
 	for( i=0; i<MAXWINDOWS; i++ ) {
 		if( IsWindow(GetNHApp()->windowlist[i].win) && !GetNHApp()->windowlist[i].dead) {
 			DWORD style;
-			style = (DWORD)GetWindowLongPtr(GetNHApp()->windowlist[i].win, GWL_STYLE);
+			style = GetWindowLong(GetNHApp()->windowlist[i].win, GWL_STYLE);
 			if( lock )	style &= ~WS_CAPTION;
 			else		style |= WS_CAPTION;
-			SetWindowLongPtr(GetNHApp()->windowlist[i].win, GWL_STYLE, style);
+			SetWindowLong(GetNHApp()->windowlist[i].win, GWL_STYLE, style);
 			SetWindowPos(
 				GetNHApp()->windowlist[i].win, 
 				NULL, 

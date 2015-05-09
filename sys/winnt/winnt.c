@@ -1,7 +1,4 @@
-/* NetHack 3.6	winnt.c	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.6	winnt.c	$Date: 2012/01/15 19:11:41 $  $Revision: 1.18 $ */
-/*	SCCS Id: @(#)winnt.c	 3.5	 $NHDT-Date$		  */
-/*	SCCS Id: @(#)winnt.c	 3.5	 $Date: 2012/01/15 19:11:41 $		  */
+/* NetHack 3.6	winnt.c	$NHDT-Date: 1430988900 2015/05/07 08:55:00 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.24 $ */
 /* Copyright (c) NetHack PC Development Team 1993, 1994 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -20,9 +17,7 @@
 #endif
 #include <ctype.h>
 #include "win32api.h"
-#ifdef WIN32CON
 #include "wintty.h"
-#endif
 #ifdef WIN32
 
 
@@ -200,7 +195,7 @@ return &szFullPath[0];
 }
 # endif
 
-#ifndef WIN32CON
+
 /* fatal error */
 /*VARARGS1*/
 void
@@ -223,21 +218,17 @@ error VA_DECL(const char *,s)
 	VA_END();
 	exit(EXIT_FAILURE);
 }
-#endif
 
 void Delay(int ms)
 {
 	(void)Sleep(ms);
 }
 
-#ifdef WIN32CON
 extern void NDECL(backsp);
-#endif
 
 void win32_abort()
 {
    	if (wizard) {
-# ifdef WIN32CON
 	    int c, ci, ct;
 
    	    if (!iflags.window_inited)
@@ -260,7 +251,6 @@ void win32_abort()
 		}
 		if (c == 'y')
 			DebugBreak();
-# endif
 	}
 	abort();
 }

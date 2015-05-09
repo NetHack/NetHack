@@ -47,7 +47,7 @@ dump_qtlist()	/* dump the character msg list to check appearance */
 {
 	struct	qtmsg	*msg;
 
-	if (!showdebug(__FILE__)) return;
+	if (!explicitdebug(__FILE__)) return;
 
 	for (msg = qt_list.chrole; msg->msgnum > 0; msg++) {
 		pline("msgnum %d: delivery %c",
