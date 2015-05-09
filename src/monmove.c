@@ -1,4 +1,4 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1431192759 2015/05/09 17:32:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.67 $ */
+/* NetHack 3.6	monmove.c	$NHDT-Date: 1431195024 2015/05/09 18:10:24 $  $NHDT-Branch: master $:$NHDT-Revision: 1.67 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -130,34 +130,35 @@ struct monst *mtmp;
         || is_rider(mtmp->data))
         return (FALSE);
 
+        /* should this still be true for defiled/molochian altars? */
+        if (IS_ALTAR(levl[x][y].typ) && (mtmp->data->mlet == S_VAMPIRE 
+                        || is_vampshifter(mtmp)))
+                return(TRUE);
+
+        /* the scare monster scroll doesn't have any of the below
+         * restrictions, being its own source of power */
+        if (sobj_at(SCR_SCARE_MONSTER, x, y)) return(TRUE);
+
     /* creatures who don't (or can't) fear a written Elbereth:
      * all the above plus shopkeepers, guards, blind or
      * peaceful monsters, humans, and minotaurs.
      *
+         * if the player isn't actually on the square OR the player's image
+         * isn't displaced to the square, no protection is being granted
+         *
      * Elbereth doesn't work in Gehennom, the Elemental Planes, or the
      * Astral Plane; the influence of the Valar only reaches so far.
      */
-    if (epresent
-        && (mtmp->isshk || mtmp->isgd || !mtmp->mcansee || mtmp->mpeaceful
-            || mtmp->data->mlet == S_HUMAN || mtmp->data == &mons[PM_MINOTAUR]
-            || Inhell || In_endgame(&u.uz)))
-        return (FALSE);
+        return (epresent 
+                    && ((u.ux == x && u.uy == y)
+                        || (Displaced && mtmp->mux == x && mtmp->muy == y))
+                    && !(mtmp->isshk || mtmp->isgd || !mtmp->mcansee 
+                        || mtmp->mpeaceful || mtmp->data->mlet == S_HUMAN 
+                        || mtmp->data == &mons[PM_MINOTAUR] 
+                        || Inhell || In_endgame(&u.uz)));
 
-    /* should this still be true for defiled/molochian altars? */
-    if (IS_ALTAR(levl[x][y].typ)
-        && (mtmp->data->mlet == S_VAMPIRE || is_vampshifter(mtmp)))
-        return (TRUE);
-
-    /* if the player isn't actually on the square OR the player's image
-     * isn't displaced to the square, no protection is being granted
-     *
-     * the scare monster scroll, though, is quite powerful.
-     */
-    return (boolean)(sobj_at(SCR_SCARE_MONSTER, x, y)
-                     || (epresent && ((u.ux == x && u.uy == y)
-                                      || (Displaced && mtmp->mux == x
-                                          && mtmp->muy == y))));
 }
+
 
 /* regenerate lost hit points */
 void
