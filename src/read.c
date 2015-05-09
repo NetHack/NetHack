@@ -1281,7 +1281,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                       hcolor(scursed ? NH_PURPLE : NH_GOLDEN),
                       scursed ? "glow" : "shield");
             }
-			if (new_erodeproof && (uwep->oeroded || uwep->oeroded2)) {
+            if (new_erodeproof && (uwep->oeroded || uwep->oeroded2)) {
                 uwep->oeroded = uwep->oeroded2 = 0;
                 pline("%s as good as new!",
                       Yobjnam2(uwep, Blind ? "feel" : "look"));
