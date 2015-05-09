@@ -756,7 +756,7 @@ E int FDECL(nhclose, (int));
 E void NDECL(really_close);
 #endif
 #ifdef DEBUG
-E boolean FDECL(debugcore, (const char *, boolean));
+E boolean FDECL(debugcore, (const char *, BOOLEAN_P));
 #endif
 E boolean FDECL(read_tribute, (const char *,const char *,int));
 
