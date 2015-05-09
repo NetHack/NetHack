@@ -159,3 +159,23 @@ ensure that indentation is done correctly:
     set textwidth=78
     set cindent
     set filetype=c
+
+
+Visual Studio Configuration
+===========================
+
+In Visual Studio under Tools->Options->Text Editor->C/C++, you can set the 
+following options to obtain desired behavior:
+
+[Tabs]
+Indenting: Smart
+Tab size: 4
+Indent size: 4
+Insert Spaces
+
+There are a number of other options under [Formatting] that should be
+checked (Indentation, New Lines, Spacing, and Wrapping), but there are so
+many entries that reproducing them here is impractical. Fortunately, the 
+options are in plain English, so walking through them with a copy of 
+this Guide handy and making changes as required will suffice.
+
