@@ -1,0 +1,161 @@
+NetHack DevTeam Coding Style
+============================
+
+NetHack is written in C, with a little bit of C++ to access platform
+libraries. This coding style document is concerned primarily with the style
+used for C source files. We do not have a defined style for C++ files, but C++
+should be styled in keeping with C.
+
+The code base in C files was, close to the 3.6 release, reformatted using a
+version of the clang-format tool patched to support K&R-style argument
+declarations. Due to some incompatibilities, the patch is not publicly
+available and clang-format is not expected to be regularly used.
+
+Developers should do their best to adhere to the coding style to promote
+legibile, easy-to-edit code. Legibility is paramount, so in some cases, it may
+be better not to fully adhere to the style guidelines.
+
+Recipes for common text editors can be found at the end of this file.
+
+Indentation and Spacing
+-----------------------
+
+The basic indentation is 4 spaces wide. All indentation is done using space
+characters, not tabs.
+
+Lines should be at most 78 characters wide. If a line would be longer than the
+limit, the line should be wrapped and the wrapped portion should be aligned
+with the parentheses or brackets containing the wrap. If there is no set of
+parenthese or brackets, the line should be indented four spaces. Wrapping
+should normally occur after a comma or before a binary operator, when
+possible:
+
+    int index
+        = SomeExcessivelyLongExpression;
+
+    fcall(arg1,
+          arg2, (cond13
+                 && cond2));
+
+Single blank lines should be used wherever convenient to improve readability.
+
+Functions and Control Satements
+-------------------------------
+
+For a function definition, the return type, declarator, and opening brace
+should each appear on a line of their own. Arguments are never declared in the
+function declarator, but are declared, unintended, K&R-style before the
+opening brace:
+
+    void
+    foo(i, c)
+    int i;
+    char c;
+    {
+        /* function body */
+    }
+
+Opening braces of control statements appear on the same line as the control
+statement:
+
+    if (condition) {
+        /* body */
+    }
+
+Else statements and the while statements of do-while blocks appear on the same
+line as the closing brace of the if or do statement. Otherwise, closing braces
+always get a line of their own.
+
+    if (condition) {
+        /* body */
+    } else if (condition) {
+        do {
+            /* body */
+        } while (condition);
+    } else {
+        /* body */
+    }
+
+If a control block has only a single statement, it can appear on a line of its
+own, with an indent. If the statement is a null statement, then it should be
+expressed as an empty set block, not with a semicolon, because many compilers
+will warn if a null statement is used:
+
+    if (condition)
+        fcall();
+
+    if (condition) {
+    } else
+        fcall();
+
+If multiple control blocks are being used in a row, it may be more readable to
+use braces even for single statements, and they should be used if they improve
+readability. The following is an example of poor usage:
+
+    if (condition) {
+        /* long body */
+    } else if (condition)
+        statement;
+    else {
+        /* very long body */
+    }
+
+Switch statements should have the case labels unindented, and the statements
+should be indented normally. The default case should occur last unless there's
+a compelling reason not to, and fallthroughs should be explicitly marked as
+such with a comment, to avoid Yeenoghu getting the touch of death again:
+
+    switch (condition) {
+    case FOO:
+    case BAR:
+        fcall();
+        /* fall-through */
+    case BAZ:
+        fcall();
+        break;
+
+    default:
+        statement;
+    }
+
+Variables should never be declared in a condition or a for loop
+initialization, and if an assignment is used as a condition, it should be
+wrapped in an additional set of parentheses for clarity:
+
+    int *p;
+    if ((p = fcall())) {
+        /* body */
+    }
+
+    int i;
+    for (i = 1; i < 10; ++i) {
+        /* body */
+    }
+
+Spaces in Expressions
+---------------------
+
+Spaces should appear around binary operators, after commas, after a C-style
+cast, and after the keyword in a control statement. They should not appear
+between a function name and the opening parenthesis of a function call, nor
+immediately inside a pair of parentheses:
+
+    foo(i, j, l);
+    if ((boolean) condition) {
+        /* body */
+    }
+
+Vim Configuration
+=================
+
+For vim, the following settings are encouraged when editing NetHack code, to
+ensure that indentation is done correctly:
+
+    set shiftwidth=4
+    set softtabstop=4
+    set expandtab
+    set tabstop=4
+    set shiftround
+    set textwidth=78
+    set cindent
+    set filetype=c
