@@ -219,16 +219,24 @@ xchar x, y;
 /* Decide whether a particular string is engraved at a specified
  * location; a case-insensitive substring match used.
  * Ignore headstones, in case the player names herself "Elbereth".
+ *
+ * If strict checking is requested, the word is only considered to be
+ * present if it is intact and is the first word in the engraving.
+ * ("Elbereth burrito" matches; "o Elbereth" does not.)
  */
 int
-sengr_at(s, x, y)
+sengr_at(s, x, y, strict)
 	const char *s;
 	xchar x, y;
+        boolean strict;
 {
 	register struct engr *ep = engr_at(x,y);
 
-	return (ep && ep->engr_type != HEADSTONE &&
-		ep->engr_time <= moves && strstri(ep->engr_txt, s) != 0);
+	if (ep && ep->engr_type != HEADSTONE && ep->engr_time <= moves) {
+                return strict ? (strncmpi(ep->engr_txt, s, strlen(s)) == 0) :
+                                (strstri(ep->engr_txt, s) != 0);
+        }
+        return FALSE;
 }
 
 void
@@ -236,27 +244,29 @@ u_wipe_engr(cnt)
 register int cnt;
 {
 	if (can_reach_floor(TRUE))
-		wipe_engr_at(u.ux, u.uy, cnt);
+		wipe_engr_at(u.ux, u.uy, cnt, FALSE);
 }
 
 void
-wipe_engr_at(x,y,cnt)
-register xchar x,y,cnt;
+wipe_engr_at(x,y,cnt,magical)
+register xchar x,y,cnt,magical;
 {
-	register struct engr *ep = engr_at(x,y);
+        register struct engr *ep = engr_at(x,y);
 
-	/* Headstones are indelible */
-	if(ep && ep->engr_type != HEADSTONE){
-	    if(ep->engr_type != BURN || is_ice(x,y)) {
-		if(ep->engr_type != DUST && ep->engr_type != ENGR_BLOOD) {
-			cnt = rn2(1 + 50/(cnt+1)) ? 0 : 1;
-		}
-		wipeout_text(ep->engr_txt, (int)cnt, 0);
-		while(ep->engr_txt[0] == ' ')
-			ep->engr_txt++;
-		if(!ep->engr_txt[0]) del_engr(ep);
-	    }
-	}
+        /* Headstones are indelible */
+        if(ep && ep->engr_type != HEADSTONE) {
+                debugpline1("asked to erode %d characters", cnt);
+                if(ep->engr_type != BURN || is_ice(x,y) || (magical && !rn2(2))) {
+                        if(ep->engr_type != DUST && ep->engr_type != ENGR_BLOOD) {
+                                cnt = rn2(1 + 50/(cnt+1)) ? 0 : 1;
+                                debugpline1("actually eroding %d characters", cnt);
+                        }
+                        wipeout_text(ep->engr_txt, (int)cnt, 0);
+                        while(ep->engr_txt[0] == ' ')
+                                ep->engr_txt++;
+                        if(!ep->engr_txt[0]) del_engr(ep);
+                }
+        }
 }
 
 void

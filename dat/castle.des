@@ -1,5 +1,4 @@
-# NetHack 3.6	castle.des	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
-# NetHack 3.6	castle.des	$Date: 2009/05/06 10:44:18 $  $Revision: 1.5 $
+# NetHack 3.6	castle.des	$NHDT-Date: 1430348677 2015/04/29 23:04:37 $  $NHDT-Branch: derek-elbereth $:$NHDT-Revision: 1.8 $
 #	SCCS Id: @(#)castle.des	3.5	2002/05/02
 #	Copyright (c) 1989 by Jean-Christophe Collet
 # NetHack may be freely redistributed.  See license for details.
@@ -143,6 +142,7 @@ OBJECT:('/',"wishing")
 }
 # Prevent monsters from eating it.  (@'s never eat objects)
 ENGRAVING:$place[0],burn,"Elbereth"
+OBJECT:('?',"scare monster"),$place[0],cursed
 # The treasure of the lord
 OBJECT:('(',"chest"),(37,08)
 # Traps
