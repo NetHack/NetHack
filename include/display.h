@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.h	$NHDT-Date: 1429757270 2015/04/23 02:47:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.19 $ */
+/* NetHack 3.6	display.h	$NHDT-Date: 1431215630 2015/05/09 23:53:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.22 $ */
 /* NetHack 3.6	display.h	$Date: 2009/05/06 10:44:38 $  $Revision: 1.14 $ */
 /*	SCCS Id: @(#)display.h	3.5	2005/06/21	*/
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
@@ -11,7 +11,6 @@
 #ifndef VISION_H
 #include "vision.h"
 #endif
-
 #ifndef MONDATA_H
 #include "mondata.h"	/* for mindless() */
 #endif
@@ -32,22 +31,23 @@
  */
 #define tp_sensemon(mon) (	/* The hero can always sense a monster IF:  */\
     (!mindless(mon->data)) &&	/* 1. the monster has a brain to sense AND  */\
-      ((Blind && Blind_telepat) ||	/* 2a. hero is blind and telepathic OR	    */\
+      ((Blind && Blind_telepat) ||  /* 2a. hero is blind and telepathic OR  */\
 				/* 2b. hero is using a telepathy inducing   */\
 				/*	 object and in range		    */\
-      (Unblind_telepat &&					      \
+      (Unblind_telepat &&					              \
 	(distu(mon->mx, mon->my) <= (BOLT_LIM * BOLT_LIM))))		      \
 )
 
-#define sensemon(mon) (tp_sensemon(mon) || Detect_monsters || MATCH_WARN_OF_MON(mon))
+#define sensemon(mon) \
+    (tp_sensemon(mon) || Detect_monsters || MATCH_WARN_OF_MON(mon))
 
 /*
  * mon_warning() is used to warn of any dangerous monsters in your
  * vicinity, and a glyph representing the warning level is displayed.
  */
 
-#define mon_warning(mon) (Warning && !(mon)->mpeaceful && 				\
-			 (distu((mon)->mx, (mon)->my) < 100) &&				\
+#define mon_warning(mon) (Warning && !(mon)->mpeaceful &&		\
+			 (distu((mon)->mx, (mon)->my) < 100) &&		\
 			 (((int) ((mon)->m_lev / 4)) >= context.warnlevel))
 
 /*
@@ -73,7 +73,9 @@
  * invisible to infravision), because this is usually called from within
  * canseemon() or canspotmon() which already check that.
  */
-#define see_with_infrared(mon) (!Blind && Infravision && infravisible(mon->data) && couldsee(mon->mx, mon->my))
+#define see_with_infrared(mon)                          \
+    (!Blind && Infravision && infravisible(mon->data)   \
+     && couldsee(mon->mx, mon->my))
 
 
 /*
@@ -83,10 +85,10 @@
  * routines.  Like mon_visible(), but it checks to see if the hero sees the
  * location instead of assuming it.  (And also considers worms.)
  */
-#define canseemon(mon) ((mon->wormno ? worm_known(mon) : \
-	    (cansee(mon->mx, mon->my) || see_with_infrared(mon))) \
-	&& mon_visible(mon))
-
+#define canseemon(mon)                                          \
+    ((mon->wormno ? worm_known(mon) :                           \
+        (cansee(mon->mx, mon->my) || see_with_infrared(mon)))   \
+     && mon_visible(mon))
 
 /*
  * canspotmon(mon)
@@ -95,8 +97,7 @@
  * telepathy, and is what you usually call for monsters about which nothing is
  * known.
  */
-#define canspotmon(mon) \
-	(canseemon(mon) || sensemon(mon))
+#define canspotmon(mon) (canseemon(mon) || sensemon(mon))
 
 /* knowninvisible(mon)
  * This one checks to see if you know a monster is both there and invisible.
@@ -110,13 +111,14 @@
  * invisible to infravision.
  */
 #define knowninvisible(mon) \
-	(mtmp->minvis && \
-	    ((cansee(mon->mx, mon->my) && (See_invisible || Detect_monsters)) || \
-		(!Blind && (HTelepat & ~INTRINSIC) && \
-		    distu(mon->mx, mon->my) <= (BOLT_LIM * BOLT_LIM) \
-		) \
-	    ) \
-	)
+    (mtmp->minvis                                                       \
+     && ((cansee(mon->mx, mon->my)                                      \
+          && (See_invisible || Detect_monsters))                        \
+         || (!Blind && (HTelepat & ~INTRINSIC)                          \
+             && distu(mon->mx, mon->my) <= (BOLT_LIM * BOLT_LIM)        \
+             )                                                          \
+         )                                                              \
+     )
 
 /*
  * is_safepet(mon)
@@ -125,9 +127,8 @@
  * definition here is convenient.
  */
 #define is_safepet(mon) \
-	(mon && mon->mtame && canspotmon(mon) && flags.safe_dog \
-		&& !Confusion && !Hallucination && !Stunned)
-
+    (mon && mon->mtame && canspotmon(mon) && flags.safe_dog     \
+     && !Confusion && !Hallucination && !Stunned)
 
 /*
  * canseeself()
@@ -174,7 +175,7 @@
  * These routines are true if what is really at the given location will
  * "cover" any objects or traps that might be there.
  */
-#define covers_objects(xx,yy)						      \
+#define covers_objects(xx,yy) \
     ((is_pool(xx,yy) && !Underwater) || (levl[xx][yy].typ == LAVAPOOL))
 
 #define covers_traps(xx,yy)	covers_objects(xx,yy)
@@ -191,10 +192,8 @@
 #define DISP_END     (-6)  /* Clean up. */
 #define DISP_FREEMEM (-7)  /* Free all memory during exit only. */
 
-
 /* Total number of cmap indices in the sheild_static[] array. */
 #define SHIELD_COUNT 21
-
 
 /*
  * display_self()
@@ -202,19 +201,20 @@
  * Display the hero.  It is assumed that all checks necessary to determine
  * _if_ the hero can be seen have already been done.
  */
-#define maybe_display_usteed	(u.usteed && mon_visible(u.usteed)) ? \
-					ridden_mon_to_glyph(u.usteed) :
+#define maybe_display_usteed(otherwise_self)            \
+    ((u.usteed && mon_visible(u.usteed)) ?              \
+     ridden_mon_to_glyph(u.usteed) : (otherwise_self))
 
-#define display_self()							\
-    show_glyph(u.ux, u.uy,						\
-	maybe_display_usteed			/* else */		\
-	youmonst.m_ap_type == M_AP_NOTHING ?				\
-				hero_glyph :				\
-	youmonst.m_ap_type == M_AP_FURNITURE ?				\
-				cmap_to_glyph(youmonst.mappearance) :	\
-	youmonst.m_ap_type == M_AP_OBJECT ?				\
-				objnum_to_glyph(youmonst.mappearance) : \
-	/* else M_AP_MONSTER */ monnum_to_glyph(youmonst.mappearance))
+#define display_self()						        \
+    show_glyph(u.ux, u.uy, maybe_display_usteed(		        \
+                            youmonst.m_ap_type == M_AP_NOTHING ?        \
+                                hero_glyph :                            \
+                            youmonst.m_ap_type == M_AP_FURNITURE ?      \
+                                cmap_to_glyph(youmonst.mappearance) :   \
+                            youmonst.m_ap_type == M_AP_OBJECT ?         \
+                                objnum_to_glyph(youmonst.mappearance) : \
+                            /* else M_AP_MONSTER */                     \
+                                monnum_to_glyph(youmonst.mappearance)))
 
 /*
  * A glyph is an abstraction that represents a _unique_ monster, object,
@@ -318,26 +318,25 @@
 
 #define cmap_to_glyph(cmap_idx) ((int) (cmap_idx)   + GLYPH_CMAP_OFF)
 #define explosion_to_glyph(expltype,idx)	\
-		((((expltype) * MAXEXPCHARS) + ((idx) - S_explode1)) + GLYPH_EXPLODE_OFF)
+    ((((expltype) * MAXEXPCHARS) + ((idx) - S_explode1)) + GLYPH_EXPLODE_OFF)
 
 #define trap_to_glyph(trap)	\
 			cmap_to_glyph(trap_to_defsym(what_trap((trap)->ttyp)))
 
 /* Not affected by hallucination.  Gives a generic body for CORPSE */
 /* MRKR: ...and the generic statue */
-#define objnum_to_glyph(onum)	((int) (onum) + GLYPH_OBJ_OFF)
-#define monnum_to_glyph(mnum)	((int) (mnum) + GLYPH_MON_OFF)
+#define objnum_to_glyph(onum)		((int) (onum) + GLYPH_OBJ_OFF)
+#define monnum_to_glyph(mnum)		((int) (mnum) + GLYPH_MON_OFF)
 #define detected_monnum_to_glyph(mnum)	((int) (mnum) + GLYPH_DETECT_OFF)
 #define ridden_monnum_to_glyph(mnum)	((int) (mnum) + GLYPH_RIDDEN_OFF)
-#define petnum_to_glyph(mnum)	((int) (mnum) + GLYPH_PET_OFF)
+#define petnum_to_glyph(mnum)		((int) (mnum) + GLYPH_PET_OFF)
 
 /* The hero's glyph when seen as a monster.
  */
 #define hero_glyph \
 	monnum_to_glyph((Upolyd || !flags.showrace) ? u.umonnum : \
-	                (flags.female && urace.femalenum != NON_PM) ? urace.femalenum : \
-	                urace.malenum)
-
+	                (flags.female && urace.femalenum != NON_PM) ? \
+                        urace.femalenum : urace.malenum)
 
 /*
  * Change the given glyph into it's given type.  Note:
@@ -405,15 +404,17 @@
     ((glyph) >= GLYPH_OBJ_OFF && (glyph) < (GLYPH_OBJ_OFF+NUM_OBJECTS))
 #define glyph_is_object(glyph)						\
 		(glyph_is_normal_object(glyph)				\
-		|| glyph_is_statue(glyph)				\
-		|| glyph_is_body(glyph))
+                 || glyph_is_statue(glyph)				\
+                 || glyph_is_body(glyph))
 #define glyph_is_trap(glyph)						\
     ((glyph) >= (GLYPH_CMAP_OFF+trap_to_defsym(1)) &&			\
      (glyph) <	(GLYPH_CMAP_OFF+trap_to_defsym(1)+TRAPNUM))
 #define glyph_is_cmap(glyph)						\
     ((glyph) >= GLYPH_CMAP_OFF && (glyph) < (GLYPH_CMAP_OFF+MAXPCHARS))
 #define glyph_is_swallow(glyph) \
-    ((glyph) >= GLYPH_SWALLOW_OFF && (glyph) < (GLYPH_SWALLOW_OFF+(NUMMONS << 3)))
+    ((glyph) >= GLYPH_SWALLOW_OFF \
+     && (glyph) < (GLYPH_SWALLOW_OFF+(NUMMONS << 3)))
 #define glyph_is_warning(glyph)	\
     ((glyph) >= GLYPH_WARNING_OFF && (glyph) < (GLYPH_WARNING_OFF + WARNCOUNT))
+
 #endif /* DISPLAY_H */
