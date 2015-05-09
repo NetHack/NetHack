@@ -1,4 +1,4 @@
-/* NetHack 3.6	tilemap.c	$NHDT-Date: 1430621065 2015/05/03 02:44:25 $  $NHDT-Branch: master $:$NHDT-Revision: 1.19 $ */
+/* NetHack 3.6	tilemap.c	$NHDT-Date: 1431183539 2015/05/09 14:58:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.22 $ */
 /*	SCCS Id: @(#)tilemap.c	3.5	2000/06/04	*/
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -19,6 +19,10 @@ void FDECL(process_substitutions, (FILE *));
 #if !defined(MSDOS) && !defined(WIN32)
 extern void FDECL(exit, (int));
 #endif
+#endif
+
+#if defined(WIN32)
+#define STATUES_LOOK_LIKE_MONSTERS
 #endif
 
 #define MON_GLYPH 1
@@ -237,7 +241,12 @@ int set, entry;
 #endif
 
 short tilemap[MAX_GLYPH];
+
+#ifdef STATUES_LOOK_LIKE_MONSTERS
 int lastmontile, lastobjtile, lastothtile, laststatuetile;
+#else
+int lastmontile, lastobjtile, lastothtile;
+#endif
 
 /* Number of tiles for invisible monsters */
 #define NUM_INVIS_TILES 1
@@ -356,8 +365,17 @@ init_tilemap()
 		tilenum++;
 	}
 
+#ifndef STATUES_LOOK_LIKE_MONSTERS
+	/* statue patch: statues still use the same glyph as in vanilla */
+        
+	for ( i = 0; i < NUMMONS; i++) {
+	        tilemap[GLYPH_STATUE_OFF+i] = tilemap[GLYPH_OBJ_OFF+STATUE];
+        }        
+#endif
+
 	lastothtile = tilenum - 1;
 	
+#ifdef STATUES_LOOK_LIKE_MONSTERS
 	/* skip over the substitutes to get to the grayscale statues */
 	for (i = 0; i < SIZE(substitutes); i++) {
 	   tilenum += substitutes[i].last_glyph - substitutes[i].first_glyph + 1;
@@ -375,6 +393,8 @@ init_tilemap()
 		}
 	}
 	laststatuetile = tilenum - 1;
+#endif
+
 }
 
 const char *prolog[] = {
