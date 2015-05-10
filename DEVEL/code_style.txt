@@ -179,3 +179,16 @@ many entries that reproducing them here is impractical. Fortunately, the
 options are in plain English, so walking through them with a copy of 
 this Guide handy and making changes as required will suffice.
 
+emacs Configuration
+===================
+
+There are no doubt umpteen different ways to handle this in emacs.
+Putting the following in ~/.emacs.el is one
+
+(defun hook-c ()
+  (setq c-set-style "k&r")
+  (setq c-basic-offset 4)
+  (setq indent-tabs-mode nil)
+  (c-set-offset 'knr-argdecl-intro 0))
+(add-hook 'c-mode-common-hook 'hook-c)
+
