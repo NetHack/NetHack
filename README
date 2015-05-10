@@ -16,11 +16,9 @@ in the "new features" section.
 Here are some additional general notes that are not considered spoilers:
  * Some code paths and long-established game features have been made 
    part of the base build and no longer conditional on compile settings.
- * Save files and bones files should be compatible across platforms and 
-   machine architectures <FIXME>.
- * The following treasured NetHack community patches, or a variation of 
-   them, have been rolled in to the base NetHack source tree: menucolors,
-   pickup thrown, statue glyphs, <FIXME>.
+ * Several treasured NetHack community patches, or a variation of 
+   them, have been rolled in to the base NetHack source tree, incuding: 
+   menucolors, pickup thrown, statue glyphs, dungeon overview, sortloot.
 
                         - - - - - - - - - - -
 
