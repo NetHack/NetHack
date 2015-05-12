@@ -1,4 +1,4 @@
-/* NetHack 3.6	detect.c	$NHDT-Date: 1431192759 2015/05/09 17:32:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.55 $ */
+/* NetHack 3.6	detect.c	$NHDT-Date: 1431472031 2015/05/12 23:07:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.56 $ */
 /* NetHack 3.6	detect.c	$Date: 2012/04/16 02:05:40 $  $Revision: 1.47 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1474,13 +1474,16 @@ boolean full; /* wizard|explore modes allow player to request full map */
 {
     int x, y, glyph, S_stone_glyph;
     uchar seenv;
+    unsigned save_swallowed;
     struct monst *mtmp;
 
     if ((Hallucination || Stunned || Confusion) && !full) {
         You("are too disoriented for this.");
     } else {
+        save_swallowed = u.uswallow;
         iflags.save_uinwater = u.uinwater, iflags.save_uburied = u.uburied;
         u.uinwater = u.uburied = 0;
+        u.uswallow = 0;
         S_stone_glyph = cmap_to_glyph(S_stone);
         /* rewrite the map, displaying map background for seen spots
            (all spots seen if 'full') and stone everywhere else */
@@ -1507,6 +1510,7 @@ boolean full; /* wizard|explore modes allow player to request full map */
             }
         /* [TODO: highlight hero's location somehow] */
         u.uinwater = iflags.save_uinwater, u.uburied = iflags.save_uburied;
+        u.uswallow = save_swallowed;
         flush_screen(1);
         pline("Showing underlying terrain only...");
         display_nhwindow(WIN_MAP, TRUE); /* give "--More--" prompt */
