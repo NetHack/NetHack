@@ -1,4 +1,4 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1431195533 2015/05/09 18:18:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.69 $ */
+/* NetHack 3.6	monmove.c	$NHDT-Date: 1431563244 2015/05/14 00:27:24 $  $NHDT-Branch: master $:$NHDT-Revision: 1.70 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1100,9 +1100,9 @@ not_special:
         if (mmoved == 1 && (u.ux != nix || u.uy != niy) && itsstuck(mtmp))
             return (3);
 
-        if (((IS_ROCK(levl[nix][niy].typ) && may_dig(nix, niy))
-             || closed_door(nix, niy)) && mmoved == 1
-            && can_tunnel && needspick(ptr)) {
+        if (mmoved == 1 && can_tunnel && needspick(ptr)
+            && ((IS_ROCK(levl[nix][niy].typ) && may_dig(nix, niy))
+                || closed_door(nix, niy))) {
             if (closed_door(nix, niy)) {
                 if (!(mw_tmp = MON_WEP(mtmp)) || !is_pick(mw_tmp)
                     || !is_axe(mw_tmp))

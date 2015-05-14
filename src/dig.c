@@ -1,4 +1,4 @@
-/* NetHack 3.6	dig.c	$NHDT-Date: 1431192766 2015/05/09 17:32:46 $  $NHDT-Branch: master $:$NHDT-Revision: 1.90 $ */
+/* NetHack 3.6	dig.c	$NHDT-Date: 1431563241 2015/05/14 00:27:21 $  $NHDT-Branch: master $:$NHDT-Revision: 1.91 $ */
 /* NetHack 3.6	dig.c	$Date: 2012/02/16 03:01:37 $  $Revision: 1.67 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1272,14 +1272,21 @@ register struct monst *mtmp;
         }
         newsym(mtmp->mx, mtmp->my);
         return FALSE;
+    } else if (here->typ == SCORR) {
+        here->typ = CORR;
+        unblock_point(mtmp->mx, mtmp->my);
+        newsym(mtmp->mx, mtmp->my);
+        You_feel("a draft.");
+        return FALSE;
     } else if (!IS_ROCK(here->typ) && !IS_TREE(here->typ)) /* no dig */
         return FALSE;
 
     /* Only rock, trees, and walls fall through to this point. */
     if ((here->wall_info & W_NONDIGGABLE) != 0) {
         impossible("mdig_tunnel:  %s at (%d,%d) is undiggable",
-                   (IS_WALL(here->typ) ? "wall" : "stone"), (int) mtmp->mx,
-                   (int) mtmp->my);
+                   (IS_WALL(here->typ) ? "wall"
+                    : IS_TREE(here->typ) ? "tree" : "stone"),
+                   (int) mtmp->mx, (int) mtmp->my);
         return FALSE; /* still alive */
     }
 

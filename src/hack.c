@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1431192758 2015/05/09 17:32:38 $  $NHDT-Branch: master $:$NHDT-Revision: 1.148 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1431563243 2015/05/14 00:27:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.149 $ */
 /* NetHack 3.6	hack.c	$Date: 2013/10/26 21:33:47 $  $Revision: 1.120 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -580,13 +580,15 @@ dosinkfall()
     float_vs_flight();
 }
 
+/* intended to be called only on ROCKs or TREEs */
 boolean
 may_dig(x, y)
 register xchar x, y;
-/* intended to be called only on ROCKs */
 {
-    return (boolean)(!(IS_STWALL(levl[x][y].typ)
-                       && (levl[x][y].wall_info & W_NONDIGGABLE)));
+    struct rm *lev = &levl[x][y];
+
+    return (boolean)(!((IS_STWALL(lev->typ) || IS_TREE(lev->typ))
+                       && (lev->wall_info & W_NONDIGGABLE)));
 }
 
 boolean

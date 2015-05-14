@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1431192769 2015/05/09 17:32:49 $  $NHDT-Branch: master $:$NHDT-Revision: 1.174 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1431563243 2015/05/14 00:27:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.175 $ */
 /* NetHack 3.6	mon.c	$Date: 2012/05/16 02:15:10 $  $Revision: 1.126 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1114,11 +1114,12 @@ long flag;
             treeok = (m_carrying(mon, AXE) || (m_carrying(mon, BATTLE_AXE)
                                                && !which_armor(mon, W_ARMS)));
         }
-        thrudoor |= rockok || treeok;
+        if (rockok || treeok)
+            thrudoor = TRUE;
     }
 
 nexttry: /* eels prefer the water, but if there is no water nearby,
-    they will crawl over land */
+            they will crawl over land */
     if (mon->mconf) {
         flag |= ALLOW_ALL;
         flag &= ~NOTONL;
@@ -1131,7 +1132,8 @@ nexttry: /* eels prefer the water, but if there is no water nearby,
         for (ny = max(0, y - 1); ny <= maxy; ny++) {
             if (nx == x && ny == y)
                 continue;
-            if (IS_ROCK(ntyp = levl[nx][ny].typ)
+            ntyp = levl[nx][ny].typ;
+            if (IS_ROCK(ntyp)
                 && !((flag & ALLOW_WALL) && may_passwall(nx, ny))
                 && !((IS_TREE(ntyp) ? treeok : rockok) && may_dig(nx, ny)))
                 continue;
