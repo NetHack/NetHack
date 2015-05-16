@@ -1,4 +1,4 @@
-/* NetHack 3.6	winhack.c	$NHDT-Date: 1431192786 2015/05/09 17:33:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.16 $ */
+/* NetHack 3.6	winhack.c	$NHDT-Date: 1431737065 2015/05/16 00:44:25 $  $NHDT-Branch: master $:$NHDT-Revision: 1.17 $ */
 /* NetHack 3.6	winhack.c	$Date: 2009/10/22 02:59:35 $  $Revision: 1.11 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 // winhack.cpp : Defines the entry point for the application.
@@ -240,6 +240,7 @@ gotlock:
 /* misc functions */
 void error
 VA_DECL(const char *, s)
+{
     TCHAR wbuf[1024];
     char buf[1024];
     DWORD last_error = GetLastError();
@@ -269,10 +270,8 @@ VA_DECL(const char *, s)
             LocalFree(lpMsgBuf);
         }
     }
-    VA_END();
-
     MessageBox(NULL, wbuf, TEXT("Error"), MB_OK | MB_ICONERROR);
-
+    VA_END();
     exit(EXIT_FAILURE);
 }
 

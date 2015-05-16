@@ -138,6 +138,7 @@ load_keyboard_handler()
  */
 void msmsg
 VA_DECL(const char *, fmt)
+{
     VA_START(fmt);
     VA_INIT(fmt, const char *);
     VA_END();
@@ -147,6 +148,7 @@ VA_DECL(const char *, fmt)
 /*VARARGS1*/
 void nttty_error
 VA_DECL(const char *, s)
+{
     VA_START(s);
     VA_INIT(s, const char *);
     VA_END();

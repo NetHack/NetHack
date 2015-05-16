@@ -1,4 +1,4 @@
-/* NetHack 3.6	unixtty.c	$NHDT-Date: 1431192779 2015/05/09 17:32:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.17 $ */
+/* NetHack 3.6	unixtty.c	$NHDT-Date: 1431737063 2015/05/16 00:44:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.18 $ */
 /* NetHack 3.6	unixtty.c	$Date: 2012/01/23 07:11:09 $  $Revision: 1.10 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -456,6 +456,7 @@ init_linux_cons()
 /*VARARGS1*/
 void error
 VA_DECL(const char *, s)
+{
     VA_START(s);
     VA_INIT(s, const char *);
     if (settty_needed)

@@ -1,4 +1,4 @@
-/* NetHack 3.6	pcsys.c	$NHDT-Date: 1431192778 2015/05/09 17:32:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.26 $ */
+/* NetHack 3.6	pcsys.c	$NHDT-Date: 1431737062 2015/05/16 00:44:22 $  $NHDT-Branch: master $:$NHDT-Revision: 1.27 $ */
 /* NetHack 3.6	pcsys.c	$Date: 2012/01/22 06:33:47 $  $Revision: 1.18 $ */
 /*	SCCS Id: @(#)pcsys.c	3.5	2002/01/22		  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -418,6 +418,7 @@ const char *str;
 #ifndef WIN32
 void msmsg
 VA_DECL(const char *, fmt)
+{
     VA_START(fmt);
     VA_INIT(fmt, const char *);
 #if defined(MSDOS) && defined(NO_TERMS)

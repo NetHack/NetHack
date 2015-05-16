@@ -1,4 +1,4 @@
-/* NetHack 3.6	lev_main.c	$NHDT-Date: 1431192770 2015/05/09 17:32:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.38 $ */
+/* NetHack 3.6	lev_main.c	$NHDT-Date: 1431737057 2015/05/16 00:44:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.39 $ */
 /* NetHack 3.6	lev_main.c	$Date: 2012/01/12 04:48:12 $  $Revision: 1.20 $ */
 /*	SCCS Id: @(#)lev_main.c	3.5	2007/01/17	*/
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
@@ -365,6 +365,7 @@ static void FDECL(lc_vpline, (const char *, va_list));
 
 void lc_pline
 VA_DECL(const char *, line)
+{
     VA_START(line);
     VA_INIT(line, char *);
     lc_vpline(line, VA_ARGS);
@@ -374,13 +375,11 @@ VA_DECL(const char *, line)
 #ifdef USE_STDARG
 static void
 lc_vpline(const char *line, va_list the_args)
-{
 #else
 static void
 lc_vpline(line, the_args)
 const char *line;
 va_list the_args;
-{
 #endif
 
 #else /* USE_STDARG | USE_VARARG */
@@ -390,6 +389,7 @@ va_list the_args;
 void lc_pline
 VA_DECL(const char *, line)
 #endif /* USE_STDARG | USE_VARARG */
+{   /* opening brace for lc_vpline, nested block for USE_OLDARGS lc_pline */
 
     char pbuf[3 * BUFSZ];
     static char nomsg[] = "(no message)";
@@ -415,11 +415,15 @@ VA_DECL(const char *, line)
     }
     lc_pline_mode = LC_PLINE_MESSAGE; /* reset to default */
     return;
+#if !(defined(USE_STDARG) || defined(USE_VARARGS))
+    VA_END();  /* closing brace ofr USE_OLDARGS's nested block */
+#endif
 }
 
 /*VARARGS1*/
 void lc_error
 VA_DECL(const char *, line)
+{
     VA_START(line);
     VA_INIT(line, const char *);
     lc_pline_mode = LC_PLINE_ERROR;
@@ -431,6 +435,7 @@ VA_DECL(const char *, line)
 /*VARARGS1*/
 void lc_warning
 VA_DECL(const char *, line)
+{
     VA_START(line);
     VA_INIT(line, const char *);
     lc_pline_mode = LC_PLINE_WARNING;
@@ -598,6 +603,7 @@ static void FDECL(vadd_opvars, (sp_lev *, const char *, va_list));
 
 void add_opvars
 VA_DECL2(sp_lev *, sp, const char *, fmt)
+{
     VA_START(fmt);
     VA_INIT(fmt, char *);
     vadd_opvars(sp, fmt, VA_ARGS);

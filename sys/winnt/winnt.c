@@ -1,4 +1,4 @@
-/* NetHack 3.6	winnt.c	$NHDT-Date: 1431192782 2015/05/09 17:33:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.25 $ */
+/* NetHack 3.6	winnt.c	$NHDT-Date: 1431737068 2015/05/16 00:44:28 $  $NHDT-Branch: master $:$NHDT-Revision: 1.26 $ */
 /* Copyright (c) NetHack PC Development Team 1993, 1994 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -197,6 +197,7 @@ return &szFullPath[0];
 /*VARARGS1*/
 void error
 VA_DECL(const char *, s)
+{
     char buf[BUFSZ];
     VA_START(s);
     VA_INIT(s, const char *);

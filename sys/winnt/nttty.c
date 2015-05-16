@@ -1,4 +1,4 @@
-/* NetHack 3.6	nttty.c	$NHDT-Date: 1431192782 2015/05/09 17:33:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.62 $ */
+/* NetHack 3.6	nttty.c	$NHDT-Date: 1431737067 2015/05/16 00:44:27 $  $NHDT-Branch: master $:$NHDT-Revision: 1.63 $ */
 /* Copyright (c) NetHack PC Development Team 1993    */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1014,11 +1014,11 @@ load_keyboard_handler()
  */
 void msmsg
 VA_DECL(const char *, fmt)
+{
     char buf[ROWNO * COLNO]; /* worst case scenario */
     VA_START(fmt);
     VA_INIT(fmt, const char *);
     Vsprintf(buf, fmt, VA_ARGS);
-    VA_END();
     if (redirect_stdout)
         fprintf(stdout, "%s", buf);
     else {
@@ -1026,6 +1026,7 @@ VA_DECL(const char *, fmt)
         if (ttyDisplay)
             curs(BASE_WINDOW, cursor.X + 1, cursor.Y);
     }
+    VA_END();
     return;
 }
 
@@ -1033,6 +1034,7 @@ VA_DECL(const char *, fmt)
 /*VARARGS1*/
 void nttty_error
 VA_DECL(const char *, s)
+{
     char buf[BUFSZ];
     VA_START(s);
     VA_INIT(s, const char *);
@@ -1041,9 +1043,9 @@ VA_DECL(const char *, s)
         end_screen();
     buf[0] = '\n';
     (void) vsprintf(&buf[1], s, VA_ARGS);
-    VA_END();
     msmsg(buf);
     really_move_cursor();
+    VA_END();
     exit(EXIT_FAILURE);
 }
 

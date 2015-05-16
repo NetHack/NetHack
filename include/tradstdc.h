@@ -1,4 +1,4 @@
-/* NetHack 3.6	tradstdc.h	$NHDT-Date: 1428655166 2015/04/10 08:39:26 $  $NHDT-Branch: master $:$NHDT-Revision: 1.19 $ */
+/* NetHack 3.6	tradstdc.h	$NHDT-Date: 1431737043 2015/05/16 00:44:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.22 $ */
 /* NetHack 3.6	tradstdc.h	$Date: 2012/01/11 18:23:26 $  $Revision: 1.15 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -65,6 +65,25 @@
 #endif
 
 #ifdef NEED_VARARGS		/* only define these if necessary */
+/*
+ * These have changed since 3.4.3.  VA_END() now provides an explicit
+ * closing brace to complement VA_DECL()'s hidden opening brace, so code
+ * started with VA_DECL() needs an extra opening brace to complement
+ * the explicit final closing brace.  This was done so that the source
+ * would look less strange, where VA_DECL() appeared to introduce a
+ * function whose opening brace was missing; there are now visible and
+ * invisible braces at beginning and end.  Sample usage:
+void foo VA_DECL(int, arg)  --macro expansion has a hidden opening brace
+{  --new, explicit opening brace (actually introduces a nested block)
+  VA_START(bar);
+  ...code for foo...
+  VA_END();  --expansion now provides a closing brace for the nested block
+}  --existing closing brace, still pairs with the hidden one in VA_DECL()
+ * Reading the code--or using source browsing tools which match braces--
+ * results in seeing a matched set of braces.  Usage of VA_END() is
+ * potentially trickier, but nethack uses it in a straightforward manner.
+ */
+
 #ifdef USE_STDARG
 #include <stdarg.h>
 # define VA_DECL(typ1,var1)	(typ1 var1, ...) { va_list the_args;
@@ -74,7 +93,7 @@
 # define VA_NEXT(var1,typ1)	var1 = va_arg(the_args, typ1)
 # define VA_ARGS		the_args
 # define VA_START(x)		va_start(the_args, x)
-# define VA_END()		va_end(the_args)
+# define VA_END()		va_end(the_args); }
 # if defined(ULTRIX_PROTO) && !defined(_VA_LIST_)
 #  define _VA_LIST_	/* prevents multiple def in stdio.h */
 # endif
@@ -89,7 +108,7 @@
 #  define VA_START(x)		va_start(the_args)
 #  define VA_INIT(var1,typ1)	var1 = va_arg(the_args, typ1)
 #  define VA_NEXT(var1,typ1)	var1 = va_arg(the_args,typ1)
-#  define VA_END()		va_end(the_args)
+#  define VA_END()		va_end(the_args); }
 # else
 #   define VA_ARGS	arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9
 #   define VA_DECL(typ1,var1)  (var1,VA_ARGS) typ1 var1; \
@@ -106,9 +125,10 @@
 #   define VA_SHIFT()	(arg1=arg2, arg2=arg3, arg3=arg4, arg4=arg5,\
 			 arg5=arg6, arg6=arg7, arg7=arg8, arg8=arg9)
 #   define VA_NEXT(var1,typ1)	((var1 = (typ1)arg1), VA_SHIFT(), var1)
-#   define VA_END()
+#   define VA_END()	}
 # endif
 #endif
+
 #endif /* NEED_VARARGS */
 
 #if defined(NHSTDC) || defined(MSDOS) || defined(MAC) || defined(ULTRIX_PROTO) || defined(__BEOS__)

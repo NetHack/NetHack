@@ -1,4 +1,4 @@
-/* NetHack 3.6	pline.c	$NHDT-Date: 1431192765 2015/05/09 17:32:45 $  $NHDT-Branch: master $:$NHDT-Revision: 1.40 $ */
+/* NetHack 3.6	pline.c	$NHDT-Date: 1431737055 2015/05/16 00:44:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.41 $ */
 /* NetHack 3.6	pline.c	$Date: 2013/02/09 01:33:37 $  $Revision: 1.30 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -21,32 +21,31 @@ static void FDECL(vpline, (const char *, va_list));
 
 void pline
 VA_DECL(const char *, line)
+{
     VA_START(line);
     VA_INIT(line, char *);
     vpline(line, VA_ARGS);
     VA_END();
 }
 
-#ifdef USE_STDARG
+# ifdef USE_STDARG
 static void
 vpline(const char *line, va_list the_args)
-{
-#else
+# else
 static void
 vpline(line, the_args)
 const char *line;
 va_list the_args;
-{
-#endif
+# endif
 
 #else /* USE_STDARG | USE_VARARG */
 
-#define vpline pline
+# define vpline pline
 
 void pline
 VA_DECL(const char *, line)
 #endif /* USE_STDARG | USE_VARARG */
-
+{       /* start of vpline() or of nested block in USE_OLDARG's pline() */
     char pbuf[3 * BUFSZ];
     int ln;
     /* Do NOT use VA_START and VA_END in here... see above */
@@ -94,11 +93,17 @@ VA_DECL(const char *, line)
     putstr(WIN_MESSAGE, 0, line);
     /* this gets cleared after every pline message */
     iflags.last_msg = PLNMSG_UNKNOWN;
+#if !(defined(USE_STDARG) || defined(USE_VARARGS))
+    /* provide closing brace for the nested block
+       which immediately follows USE_OLDARGS's VA_DECL() */
+    VA_END();
+#endif
 }
 
 /*VARARGS1*/
 void Norep
 VA_DECL(const char *, line)
+{
     VA_START(line);
     VA_INIT(line, const char *);
     no_repeat = TRUE;
@@ -143,6 +148,7 @@ free_youbuf()
 /*VARARGS1*/
 void You
 VA_DECL(const char *, line)
+{
     char *tmp;
     VA_START(line);
     VA_INIT(line, const char *);
@@ -153,6 +159,7 @@ VA_DECL(const char *, line)
 /*VARARGS1*/
 void Your
 VA_DECL(const char *, line)
+{
     char *tmp;
     VA_START(line);
     VA_INIT(line, const char *);
@@ -163,6 +170,7 @@ VA_DECL(const char *, line)
 /*VARARGS1*/
 void You_feel
 VA_DECL(const char *, line)
+{
     char *tmp;
     VA_START(line);
     VA_INIT(line, const char *);
@@ -177,6 +185,7 @@ VA_DECL(const char *, line)
 /*VARARGS1*/
 void You_cant
 VA_DECL(const char *, line)
+{
     char *tmp;
     VA_START(line);
     VA_INIT(line, const char *);
@@ -187,6 +196,7 @@ VA_DECL(const char *, line)
 /*VARARGS1*/
 void pline_The
 VA_DECL(const char *, line)
+{
     char *tmp;
     VA_START(line);
     VA_INIT(line, const char *);
@@ -197,6 +207,7 @@ VA_DECL(const char *, line)
 /*VARARGS1*/
 void There
 VA_DECL(const char *, line)
+{
     char *tmp;
     VA_START(line);
     VA_INIT(line, const char *);
@@ -207,6 +218,7 @@ VA_DECL(const char *, line)
 /*VARARGS1*/
 void You_hear
 VA_DECL(const char *, line)
+{
     char *tmp;
 
     if (Deaf || !flags.acoustics)
@@ -226,6 +238,7 @@ VA_DECL(const char *, line)
 /*VARARGS1*/
 void You_see
 VA_DECL(const char *, line)
+{
     char *tmp;
 
     VA_START(line);
@@ -247,6 +260,7 @@ VA_DECL(const char *, line)
 /*VARARGS1*/
 void verbalize
 VA_DECL(const char *, line)
+{
     char *tmp;
 
     VA_START(line);
@@ -269,30 +283,29 @@ static void FDECL(vraw_printf, (const char *, va_list));
 
 void raw_printf
 VA_DECL(const char *, line)
+{
     VA_START(line);
     VA_INIT(line, char *);
     vraw_printf(line, VA_ARGS);
     VA_END();
 }
 
-#ifdef USE_STDARG
+# ifdef USE_STDARG
 static void
 vraw_printf(const char *line, va_list the_args)
-{
-#else
+# else
 static void
 vraw_printf(line, the_args)
 const char *line;
 va_list the_args;
-{
-#endif
+# endif
 
 #else /* USE_STDARG | USE_VARARG */
 
 void raw_printf
 VA_DECL(const char *, line)
 #endif
-
+{
     char pbuf[3 * BUFSZ];
     int ln;
     /* Do NOT use VA_START and VA_END in here... see above */
@@ -308,11 +321,15 @@ VA_DECL(const char *, line)
         pbuf[BUFSZ - 1] = '\0'; /* terminate strncpy or truncate vsprintf */
     }
     raw_print(line);
+#if !(defined(USE_STDARG) || defined(USE_VARARGS))
+    VA_END(); /* (see vpline) */
+#endif
 }
 
 /*VARARGS1*/
 void impossible
 VA_DECL(const char *, s)
+{
     char pbuf[2 * BUFSZ];
     VA_START(s);
     VA_INIT(s, const char *);

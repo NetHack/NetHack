@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1431192755 2015/05/09 17:32:35 $  $NHDT-Branch: master $:$NHDT-Revision: 1.96 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1431737052 2015/05/16 00:44:12 $  $NHDT-Branch: master $:$NHDT-Revision: 1.97 $ */
 /* NetHack 3.6	end.c	$Date: 2012/04/09 02:56:30 $  $Revision: 1.79 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -511,6 +511,7 @@ int how;
 /*VARARGS1*/
 void panic
 VA_DECL(const char *, str)
+{
     VA_START(str);
     VA_INIT(str, char *);
 

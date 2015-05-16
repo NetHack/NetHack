@@ -1,4 +1,4 @@
-/* NetHack 3.6	amiwind.c	$NHDT-Date: 1431192783 2015/05/09 17:33:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
+/* NetHack 3.6	amiwind.c	$NHDT-Date: 1431737059 2015/05/16 00:44:19 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
 /* NetHack 3.6	amiwind.c	$Date: 2009/05/06 10:48:30 $  $Revision: 1.5 $ */
 /*    SCCS Id: @(#)amiwind.c     3.5    2000/01/12
 /*    Copyright (c) Olaf Seibert (KosmoSoft), 1989, 1992	  */
@@ -889,6 +889,7 @@ amii_loadlib(void)
 /*VARARGS1*/
 void error
 VA_DECL(const char *, s)
+{
     VA_START(s);
     VA_INIT(s, char *);
 
