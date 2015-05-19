@@ -1,4 +1,4 @@
-/* NetHack 3.6	dig.c	$NHDT-Date: 1431563241 2015/05/14 00:27:21 $  $NHDT-Branch: master $:$NHDT-Revision: 1.91 $ */
+/* NetHack 3.6	dig.c	$NHDT-Date: 1431998736 2015/05/19 01:25:36 $  $NHDT-Branch: master $:$NHDT-Revision: 1.92 $ */
 /* NetHack 3.6	dig.c	$Date: 2012/02/16 03:01:37 $  $Revision: 1.67 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1267,7 +1267,7 @@ register struct monst *mtmp;
             }
         } else {
             if (!rn2(3) && flags.verbose) /* not too often.. */
-                You_feel("an unexpected draft.");
+                draft_message(TRUE); /* "You feel an unexpected draft." */
             here->doormask = D_BROKEN;
         }
         newsym(mtmp->mx, mtmp->my);
@@ -1276,7 +1276,7 @@ register struct monst *mtmp;
         here->typ = CORR;
         unblock_point(mtmp->mx, mtmp->my);
         newsym(mtmp->mx, mtmp->my);
-        You_feel("a draft.");
+        draft_message(FALSE); /* "You feel a draft." */
         return FALSE;
     } else if (!IS_ROCK(here->typ) && !IS_TREE(here->typ)) /* no dig */
         return FALSE;
@@ -1320,6 +1320,54 @@ register struct monst *mtmp;
         unblock_point(mtmp->mx, mtmp->my); /* vision */
 
     return FALSE;
+}
+
+#define STRIDENT 4 /* from pray.c */
+
+/* draft refers to air currents, but can be a pun on "draft" as conscription
+   for military service (probably not a good pun if it has to be explained) */
+void
+draft_message(unexpected)
+boolean unexpected;
+{
+    /*
+     * [Bug or TODO?  Have caller pass coordinates and use the travel
+     * mechanism to determine whether there is a path between
+     * destroyed door (or exposed secret corridor) and hero's location.
+     * When there is no such path, no draft should be felt.]
+     */
+
+    if (unexpected) {
+        if (!Hallucination)
+            You_feel("an unexpected draft.");
+        else
+            /* U.S. classification system uses 1-A for eligible to serve
+               and 4-F for ineligible due to physical or mental defect;
+               some intermediate values exist but are rarely seen */
+            You_feel("like you are %s.",
+                     (ACURR(A_STR) < 6 || ACURR(A_DEX) < 6
+                      || ACURR(A_CON) < 6 || ACURR(A_CHA) < 6
+                      || ACURR(A_INT) < 6 || ACURR(A_WIS) < 6) ? "4-F"
+                                                               : "1-A");
+    } else {
+        if (!Hallucination) {
+            You_feel("a draft.");
+        } else {
+            /* "marching" is deliberately ambiguous; it might mean drills
+                after entering military service or mean engaging in protests */
+            static const char *draft_reaction[] = {
+                "enlisting", "marching", "protesting", "fleeing",
+            };
+            int dridx;
+
+            /* Lawful: 0..1, Neutral: 1..2, Chaotic: 2..3 */
+            dridx = rn1(2, 1 - sgn(u.ualign.type));
+            if (u.ualign.record < STRIDENT)
+                /* L: +(0..2), N: +(-1..1), C: +(-2..0); all: 0..3 */
+                dridx += rn1(3, sgn(u.ualign.type) - 1);
+            You_feel("like %s.", draft_reaction[dridx]);
+        }
+    }
 }
 
 /* digging via wand zap or spell cast */

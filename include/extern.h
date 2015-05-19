@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1429755449 2015/04/23 02:17:29 $  $NHDT-Branch: master $:$NHDT-Revision: 1.477 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1431998729 2015/05/19 01:25:29 $  $NHDT-Branch: master $:$NHDT-Revision: 1.492 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -276,6 +276,7 @@ E boolean FDECL(dighole, (BOOLEAN_P,BOOLEAN_P,coord *));
 E int FDECL(use_pick_axe, (struct obj *));
 E int FDECL(use_pick_axe2, (struct obj *));
 E boolean FDECL(mdig_tunnel, (struct monst *));
+E void FDECL(draft_message, (BOOLEAN_P));
 E void FDECL(watch_dig, (struct monst *,XCHAR_P,XCHAR_P,BOOLEAN_P));
 E void NDECL(zap_dig);
 E struct obj *FDECL(bury_an_obj, (struct obj *, boolean *));

@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1431192757 2015/05/09 17:32:37 $  $NHDT-Branch: master $:$NHDT-Revision: 1.222 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1431998738 2015/05/19 01:25:38 $  $NHDT-Branch: master $:$NHDT-Revision: 1.223 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -4318,7 +4318,7 @@ short exploding_wand_typ;
             pline("%s %s reveals a secret door.", yourzap ? "Your" : "The",
                   zapverb);
         else if (Is_rogue_level(&u.uz))
-            You_feel("a draft."); /* new open doorway */
+            draft_message(FALSE); /* "You feel a draft." (open doorway) */
     }
 
     /* regular door absorbs remaining zap range, possibly gets destroyed */
