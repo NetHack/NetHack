@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1431192758 2015/05/09 17:32:38 $  $NHDT-Branch: master $:$NHDT-Revision: 1.190 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1432249761 2015/05/21 23:09:21 $  $NHDT-Branch: master $:$NHDT-Revision: 1.191 $ */
 /* NetHack 3.6	cmd.c	$Date: 2013/03/16 01:44:28 $  $Revision: 1.162 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1109,76 +1109,78 @@ wiz_rumor_check(VOID_ARGS)
     return 0;
 }
 
-/* #terrain command */
+/* #terrain command -- show known map, inspired by crawl's '|' command */
 STATIC_PTR int
 doterrain(VOID_ARGS)
 {
-    int which = 1; /* show known map, ala crawl's '|' command */
+    winid men;
+    menu_item *sel;
+    anything any;
+    int n;
+    int which;
 
+    /*
+     * normal play: choose between known map without mons, obj, and traps
+     *  (to see underlying terrain only), or
+     *  known map without mons and objs (to see traps under mons and objs), or
+     *  known map without mons (to see objects under monsters);
+     * explore mode: normal choices plus full map (w/o mons, objs, traps);
+     * wizard mode: normal and explore choices plus
+     *  a dump of the internal levl[][].typ codes w/ level flags, or
+     *  a legend for the levl[][].typ codes dump
+     */
+    men = create_nhwindow(NHW_MENU);
+    any = zeroany;
+    any.a_int = 1;
+    add_menu(men, NO_GLYPH, &any, 0, 0, ATR_NONE,
+             "known map without monsters, objects, and traps",
+             MENU_SELECTED);
+    any.a_int = 2;
+    add_menu(men, NO_GLYPH, &any, 0, 0, ATR_NONE,
+             "known map without monsters and objects",
+             MENU_UNSELECTED);
+    any.a_int = 3;
+    add_menu(men, NO_GLYPH, &any, 0, 0, ATR_NONE,
+             "known map without monsters",
+             MENU_UNSELECTED);
     if (discover || wizard) {
-        /* explore mode #terrain: choose between known map and full map;
-           wizard mode #terrain: choose between known map, full map,
-           a dump of the internal levl[][].typ codes w/ level flags,
-           and a legend for the levl[][].typ codes */
-        winid men;
-        menu_item *sel;
-        anything any;
-        int n;
-
-        men = create_nhwindow(NHW_MENU);
-        any = zeroany;
-        any.a_int = 1;
-        add_menu(men, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                 "known map without monsters, objects, and traps",
-                 MENU_SELECTED);
-        any.a_int = 2;
+        any.a_int = 4;
         add_menu(men, NO_GLYPH, &any, 0, 0, ATR_NONE,
                  "full map without monsters, objects, and traps",
                  MENU_UNSELECTED);
         if (wizard) {
-            any.a_int = 3;
+            any.a_int = 5;
             add_menu(men, NO_GLYPH, &any, 0, 0, ATR_NONE,
                      "internal levl[][].typ codes in base-36",
                      MENU_UNSELECTED);
-            any.a_int = 4;
+            any.a_int = 6;
             add_menu(men, NO_GLYPH, &any, 0, 0, ATR_NONE,
-                     "legend of base-36 levl[][].typ codes", MENU_UNSELECTED);
+                     "legend of base-36 levl[][].typ codes",
+                     MENU_UNSELECTED);
         }
-        end_menu(men, "View which?");
+    }
+    end_menu(men, "View which?");
 
-        n = select_menu(men, PICK_ONE, &sel);
-        destroy_nhwindow(men);
-        /*
-         * n <  0: player used ESC to cancel;
-         * n == 0: preselected entry was explicitly chosen and got toggled
-         * off;
-         * n == 1: preselected entry was implicitly chosen via
-         * <space>|<enter>;
-         * n == 2: another entry was explicitly chosen, so skip preselected
-         * one
-         */
-        which = (n < 0) ? -1 : (n == 0) ? 1 : sel[0].item.a_int;
-        if (n > 1 && which == 1)
-            which = sel[1].item.a_int;
-        if (n > 0)
-            free((genericptr_t) sel);
-    } /* discover || wizard */
+    n = select_menu(men, PICK_ONE, &sel);
+    destroy_nhwindow(men);
+    /*
+     * n <  0: player used ESC to cancel;
+     * n == 0: preselected entry was explicitly chosen and got toggled off;
+     * n == 1: preselected entry was implicitly chosen via <space>|<enter>;
+     * n == 2: another entry was explicitly chosen, so skip preselected one.
+     */
+    which = (n < 0) ? -1 : (n == 0) ? 1 : sel[0].item.a_int;
+    if (n > 1 && which == 1) which = sel[1].item.a_int;
+    if (n > 0) free((genericptr_t)sel);
 
     switch (which) {
-    case 1:
-        reveal_terrain(FALSE);
-        break; /* known map */
-    case 2:
-        reveal_terrain(TRUE);
-        break; /* full map */
-    case 3:
-        wiz_map_levltyp();
-        break; /* map internals */
-    case 4:
-        wiz_levltyp_legend();
-        break; /* internal details */
-    default:
-        break;
+    case 1: reveal_terrain(0, 0);   break; /* known map */
+    case 2: reveal_terrain(0, 1);   break; /* known map with traps */
+    case 3: reveal_terrain(0, 1|2); break; /* known map w/ traps & objs */
+    case 4: reveal_terrain(1, 0);   break; /* full map */
+    case 5: wiz_map_levltyp();      break; /* map internals */
+    case 6: wiz_levltyp_legend();   break; /* internal details */
+    default: break;
     }
     return 0; /* no time elapses */
 }
