@@ -435,8 +435,8 @@ typedef unsigned char	uchar;
  * bugs left here.
  */
 
-#define STATUS_VIA_WINDOWPORT	/* re-work of the status line updating process */
-#define STATUS_HILITES		/* support hilites of status fields */
+/* #define STATUS_VIA_WINDOWPORT */	/* re-work of the status line updating process */
+/* #define STATUS_HILITES */		/* support hilites of status fields */
 /* #define WINCHAIN*/		/* stacked window systems */
 /* End of Section 5 */
 
