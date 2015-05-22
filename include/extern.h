@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1431998729 2015/05/19 01:25:29 $  $NHDT-Branch: master $:$NHDT-Revision: 1.492 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1432249760 2015/05/21 23:09:20 $  $NHDT-Branch: master $:$NHDT-Revision: 1.493 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -260,7 +260,7 @@ E void FDECL(find_trap, (struct trap *));
 E int FDECL(dosearch0, (int));
 E int NDECL(dosearch);
 E void NDECL(sokoban_detect);
-E void FDECL(reveal_terrain, (BOOLEAN_P));
+E void FDECL(reveal_terrain, (int,int));
 
 /* ### dig.c ### */
 
