@@ -1,12 +1,11 @@
 .\" $NHDT-Branch: master $:$NHDT-Revision: 1.160 $ $NHDT-Date: 1430043650 2015/04/26 10:20:50 $
-.\" $Revision: 1.130 $ $Date: 2015/03/27 00:38:30 $
 .ds h0 "NetHack Guidebook
 .ds h1
 .ds h2 %
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "April 12, 2015
+.ds f2 "May 21, 2015
 .\" labeled paragraph start (should be part of tmac.n, but I don't want to
 .\" make changes to that file)
 .\" .PS word
@@ -3331,8 +3330,6 @@ maintained the port of NetHack 3.6.0 for Mac.
 \fBMichael Allison\fP, \fBDerek S. Ray\fP, \fBYitzhak Sapir\fP, 
 \fBAlex Kompel\fP, and \fBDion Nicolaas\fP maintained the port of 
 NetHack 3.6.0 for Microsoft Windows.
-.pg
-\fBJeff Bailey\fP created and maintained a port of NetHack 3.6.0 for Chrome.
 .pg
 \fBThis version of the game is special in a particular way.  Near the end of 
 the development of 3.6, one of the significant inspirations for many of the 
