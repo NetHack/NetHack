@@ -1,4 +1,4 @@
-# NetHack 3.6	quest.txt	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+# NetHack 3.6	quest.txt	$NHDT-Date: 1432368651 2015/05/23 08:10:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.26 $
 # NetHack 3.6	quest.txt	$Date: 2009/05/06 10:44:23 $  $Revision: 1.23 $
 #	SCCS Id: @(#)quest.txt	3.5	2005/12/03
 #	Copyright (c) 1991 by M. Stephenson
@@ -103,7 +103,7 @@ You have an odd feeling this may be the last time you ever come here.
 "Finally you have returned, %p.  You were always
 my most promising student.  Allow me to see if you are ready for the
 most difficult task of your career."
-%E [You have returned, %p, to a difficult task.]
+%E ["You have returned, %p, to a difficult task."]
 %Cp Arc 00016
 "Again, %p, you stand before me.
 Let me see if you have gained experience in the interim."
@@ -117,7 +117,7 @@ Are you finally ready for the task that must be accomplished?"
 vain.  Begone!  Your tenure at this college has been revoked!
 
 "You are a disgrace to the profession!"
-%E [%pC, you have failed us.  Begone!]
+%E ["%pC, you have failed us.  Begone!"]
 %Cc Arc 00019
 "%p, you are yet too inexperienced to undertake such a demanding
 quest.  A mere %r could not possibly face the rigors demanded and
@@ -130,7 +130,7 @@ results lately can hardly be called suitable for %ra!
 
 "How could you have strayed from the %a path?  Go from here, and come
 back only when you have purified yourself."
-%E [%pC, you have strayed from the %a path.  Purify yourself!]
+%E ["%pC, you have strayed from the %a path.  Purify yourself!"]
 %Cc Arc 00021
 "Grave times have befallen the college, for %na has
 stolen %o.  Without it, the board of directors of
@@ -202,14 +202,14 @@ The familiar presence of %o is in the ether.
 %o, when your teacher, %l, has already failed.
 
 "Come, try your best!  I shall destroy you, and gnaw on your bones."
-%E [Come, %p, I shall destroy you!]
+%E ["Come, %p, I shall destroy you!"]
 %Cc Arc 00051
 "Again you try to best me, eh %p?  Well, you shall fail again.
 
 "You shall never recover %o.
 
 "I shall bear your soul to the Plane of Origins for my master's pleasure."
-%E [Again you try to best me, %p?  You shall never recover %o.]
+%E ["Again you try to best me, %p?  You shall never recover %o."]
 %Cp Arc 00052
 "You persist yet %p!  Good.  Now, you shall die!"
 %E
@@ -275,11 +275,11 @@ May the blessings of %d follow you and guard you."
 a tragic loss.  You are its keeper now, and the time has come to
 resume your search for the Amulet.  %Z await your
 return through the magic portal that brought you here."
-%E [Resume your search for the Amulet beyond the magic portal to %Z.]
+%E ["Resume your search for the Amulet beyond the magic portal to %Z."]
 %Cc Arc 00090
 "Welcome back, %p.  Have you progressed with your quest to
 regain the Amulet of Yendor for %d?"
-%E [Have you progressed with your quest to regain the Amulet of Yendor for %d?]
+%E ["Have you progressed with your quest to regain the Amulet of Yendor for %d?"]
 %Cc Arc 00091
 "Congratulations, %p.  I wondered if anyone could prevail against
 the Wizard and the minions of Moloch.  Now, you must embark on one
@@ -307,7 +307,7 @@ evil magic in the air.
 Without thought, you ready your weapon, and mutter under your breath:
 
     "By %d, there will be blood spilt today."
-%E
+%E [You reach the vicinity of %H, but sense evil magic nearby.]
 %Cp Bar 00002
 Once again, you near %H.  You know that %l
 will be waiting.
@@ -351,7 +351,7 @@ Again, and you think possibly for the last time, you approach
 need of your help.  There is a great quest you must undertake.
 
 "But first, I must see if you are ready to take on such a challenge."
-%E
+%E ["At last you have returned.  There is a great quest you must undertake."]
 %Cp Bar 00016
 "%p, you are back.  Are you ready now for the challenge?"
 %E
@@ -365,18 +365,18 @@ closed this future to you.
 
 "I will protect these people as best I can, but soon %n will overcome
 me and destroy all who once called you %s.  Now begone!"
-%E
+%E ["You have betrayed %d; soon %n will destroy us.  Begone!"]
 %Cc Bar 00019
 "%p, I fear that you are as yet too inexperienced to face
 %n.  Only %Ra with the help of %d could ever hope to
 defeat him."
-%E
+%E ["You are too inexperienced.  Come back when you are %Ra."]
 %Cc Bar 00020
 "%pC!  You have wandered from the path of the %a!
 If you attempt to overcome %n in this state, he will surely
 enslave your soul.  Your only hope, and ours, lies in your purification.
 Go forth, and return when you feel ready."
-%E
+%E ["You have wandered from the path of the %a.  Come back when you have atoned."]
 %Cc Bar 00021
 "The world is in great need of your assistance, %p.
 
@@ -401,7 +401,7 @@ and with %d behind you, you alone can defeat %n.
 "You must go to %i.  From there, you can track down
 %n, defeat him, and return %o to us.  Only
 then will the world be safe."
-%E
+%E ["Find %n, defeat him, and return %o to us."]
 %Cp Bar 00025
 "%nC is strong in the dark arts, but not immune to cold steel."
 %E
@@ -438,7 +438,7 @@ guard."
 %Cc Bar 00035
 The scent of water comes to you in the desert breeze.  You know that
 you have located %i.
-%E
+%E [You have located %i.]
 %Cp Bar 00036
 Yet again you have a chance to infiltrate %i.
 %E
@@ -446,7 +446,7 @@ Yet again you have a chance to infiltrate %i.
 The hairs on the nape of your neck lift as you sense an energy in the
 very air around you.  You fight down a primordial panic that seeks to
 make you turn and run.  This is surely the lair of %n.
-%E
+%E [This is surely the lair of %n.]
 %Cp Bar 00041
 Yet again you feel the air around you heavy with malevolent magical energy.
 %E
@@ -455,7 +455,7 @@ Yet again you feel the air around you heavy with malevolent magical energy.
 I have slain many before you.  You shall give me little sport.
 
 "Prepare to die, %c."
-%E
+%E [%nC boasts that %nh has slain many.  "Prepare to die, %c."]
 %Cp Bar 00051
 "I have wasted too much time on you already.  Now, you shall die."
 %E
@@ -500,13 +500,13 @@ And your life as well."
 As you pick up %o, you feel the power of it
 flowing through your hands.  It seems to be in two or more places
 at once, even though you are holding it.
-%E
+%E [You feel the power of %o flowing through your hands.]
 %Cc Bar 00080
 %nC falls to the ground, and utters a last curse at you.  Then his
 body fades slowly, seemingly dispersing into the air around you.  You
 slowly become aware that the overpowering aura of magic in the air has
 begun to fade.
-%E
+%E [%nC curses you, but you feel the overpowering aura of magic fading.]
 %Cc Bar 00081
 When %l sees %o, he smiles, and says:
 
@@ -523,14 +523,14 @@ When %l sees %o, he smiles, and says:
     Remember me, %p, and return when you have triumphed.  I
     will tell you then of what you must do.  You will understand when the
     time comes.
-%E
+%E [%lC tells you to guard %o, and to return when you have triumphed.]
 %Cc Bar 00082
 %l gazes reverently at %o, then back at you.
 
 "You are its keeper now, and the time has come to resume your search
 for the Amulet.  %Z await your return through the
 magic portal which brought you here."
-%E
+%E ["You keep %o.  Return to %Z to search for the Amulet."]
 %Cp Bar 00090
 "Tell us, %p, have you fared well on your great quest?"
 %E
@@ -556,7 +556,7 @@ speaks of you.
     stand by %d as champion of all %cP for eternity.
 
 "This is all I know, %p.  I hope it will help you."
-%E
+%E ["Take the Amulet to the altar of %d on the Astral Plane and offer it."]
 #
 #	Cave(wo)man
 #
@@ -567,7 +567,7 @@ You descend through a barely familiar stairwell that you remember
 You arrive back at %H, but something seems
 wrong here.  The usual smoke and glowing light of the fires of the
 outer caves are absent, and an uneasy quiet fills the damp air.
-%E
+%E [You arrive back at %H, but something is wrong here.]
 %Cp Cav 00002
 Once again, you arrive back at %H.
 %E
@@ -613,7 +613,7 @@ off our access to the outer world."
 
 "But first, I must see if you are yet capable of the quest I would
 ask you to undertake."
-%E
+%E ["You have returned.  We are in dire need of your help."]
 %Cp Cav 00016
 "Again, you return to us, %p.  Let me see if you are ready now."
 %E
@@ -628,7 +628,7 @@ so I must select another to take your place.
 the path of the %C over the true path of the %L.
 
 "You no longer live in our eyes."
-%E
+%E ["You have betrayed the %L.  Begone!"]
 %Cc Cav 00019
 "Alas, %p, you are as yet too inexperienced to embark upon such
 a difficult quest as that I propose to give you.
@@ -638,13 +638,13 @@ a difficult quest as that I propose to give you.
 
 "Adventure some more, and you will learn the skills you will require.
 %d decrees it."
-%E
+%E ["%rA is too inexperienced.  Come back when you have progressed."]
 %Cc Cav 00020
 "%pC!  You have deviated from my teachings.  You no longer follow
 the path of the %a as you should.  I banish you from these caves, to
 go forth and purify yourself.  Then, you might be able to accomplish this
 quest."
-%E
+%E ["You no longer follow the path of the %a.  Go, and purify yourself."]
 %Cc Cav 00021
 "You are indeed ready now, %p.  I shall tell you a tale of
 great suffering among your people:
@@ -664,7 +664,7 @@ jealously as she guards all treasures she attains.  But with it,
 we can make our caves safe once more.
 
 "Please, %p, recover %o for us, and return it here."
-%E
+%E [Find and defeat %n, recover %o, and return with it.]
 %Cp Cav 00025
 "%nC is immune to her own breath weapons.
 You should use magic upon her that she does not use herself."
@@ -706,7 +706,7 @@ ever been in before.
 
 Your nose detects the smell of carrion from within, and bones litter
 the sides of the tunnels.
-%E
+%E [You %x many large claw marks, smell carrion, and notice bones.]
 %Cp Cav 00036
 Once again, you approach %i.
 %E
@@ -717,15 +717,16 @@ nevertheless show signs of being scorched by fire.
 Bones litter the floor, and there are objects scattered everywhere.
 The air is close with the stench of sulphurous fumes.
 
-%nC is clearly visible, but she seems to be asleep.
-%E
+%nC is clearly visible, but %nh seems to be asleep.
+%E [You enter a large cavern.  %nC is present.]
 %Cp Cav 00041
 Once again, you find yourself in the lair of %n.
 %E
 %Cc Cav 00050
-"So, follower of %l, you seek to invade the lair of %n.
-Only my meals are allowed down here.  Prepare to be eaten!"
-%E
+"So, follower of %l, you seek to invade the lair of
+%n.  Only my meals are allowed down here.  Prepare
+to be eaten!"
+%E [%nC threatens to eat you.]
 %Cp Cav 00051
 "So, again you face me, %c.  No one has ever before escaped me.
 Now I shall kill you."
@@ -772,7 +773,7 @@ hold it strength flows into your arms.
 
 You suddenly feel full of power, as if nothing could possibly stand
 in your path.
-%E
+%E [%oC fills you with a feeling of power.]
 %Cp Cav 00080
 %nC sinks to the ground, her heads flailing about.
 As she dies, a cloud of noxious fumes billows about her.
@@ -788,14 +789,14 @@ He smiles and says:
     To prevent further trouble, I would like you, %p,
     to take %o away with you.  It will help you as you
     quest for the Amulet of Yendor.
-%E
+%E ["Take %o with you.  It will help in your quest for the Amulet of Yendor."]
 %Cc Cav 00082
 %l grasps %o proudly for a moment, then looks at you.
 
 "You are its keeper now, and the time has come to resume your search
 for the Amulet.  %Z await your return through the
 magic portal which brought you here."
-%E
+%E ["You are the keeper of %o now.  Return to %Z to search for the Amulet.]
 %Cp Cav 00090
 "%pC!  Welcome back.
 How goes your quest to recover the Amulet for %d?"
@@ -810,7 +811,7 @@ take you into the Astral Planes, where the Great Temple of %d
 casts its influence throughout our world.
 
 "Sacrifice the Amulet on the altar.  Thus shall %d become supreme!"
-%E
+%E ["Take the Amulet to the altar of %d on the Astral Plane and offer it."]
 #
 #	Healer
 #
