@@ -1,4 +1,4 @@
-/* NetHack 3.6	windows.c	$NHDT-Date: 1431192762 2015/05/09 17:32:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.26 $ */
+/* NetHack 3.6	windows.c	$NHDT-Date: 1432367952 2015/05/23 07:59:12 $  $NHDT-Branch: master $:$NHDT-Revision: 1.27 $ */
 /* NetHack 3.6	windows.c	$Date: 2012/01/23 10:45:28 $  $Revision: 1.23 $ */
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -362,7 +362,7 @@ char let UNUSED;
 int how UNUSED;
 const char *mesg;
 {
-    pline1(mesg);
+    pline("%s", mesg);
     return 0;
 }
 
@@ -397,11 +397,10 @@ boolean init UNUSED;
     return (char *) 0;
 }
 
-/*ARGSUSED*/
 void
 genl_putmsghistory(msg, is_restoring)
-const char *msg UNUSED;
-boolean is_restoring UNUSED;
+const char *msg;
+boolean is_restoring;
 {
 /* window ports can provide
    their own putmsghistory() routine to
@@ -420,9 +419,11 @@ boolean is_restoring UNUSED;
    so it should keep all pointers/indexes
    intact at the end of each call.
  */
-#if 0 /* maybe... */
-	if (!is_restoring) pline1("%s", msg);
-#endif
+    /* this doesn't provide for reloading the message window with the
+       previous session's messages upon restore, but it does put the quest
+       message summary lines there by treating them as ordinary messages */
+    if (!is_restoring)
+        pline("%s", msg);
     return;
 }
 
