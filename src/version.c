@@ -1,5 +1,4 @@
-/* NetHack 3.6	version.c	$NHDT-Date: 1431192762 2015/05/09 17:32:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.29 $ */
-/* NetHack 3.6	version.c	$Date: 2012/01/04 18:52:36 $  $Revision: 1.26 $ */
+/* NetHack 3.6	version.c	$NHDT-Date: 1432339708 2015/05/23 00:08:28 $  $NHDT-Branch: master $:$NHDT-Revision: 1.30 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -16,7 +15,7 @@
 #include "patchlevel.h"
 #endif
 
-/* #define BETA_INFO "" */
+#define BETA_INFO "Beta1"
 
 /* fill buffer with short version (so caller can avoid including date.h) */
 char *
