@@ -1,4 +1,4 @@
-/* NetHack 3.6	questpgr.c	$NHDT-Date: 1431192763 2015/05/09 17:32:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.28 $ */
+/* NetHack 3.6	questpgr.c	$NHDT-Date: 1432367420 2015/05/23 07:50:20 $  $NHDT-Branch: master $:$NHDT-Revision: 1.29 $ */
 /* NetHack 3.6	questpgr.c	$Date: 2012/02/02 09:18:14 $  $Revision: 1.14 $ */
 /*	Copyright 1991, M. Stephenson		  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -39,32 +39,24 @@ static dlb *msg_file;
 /* used by ldrname() and neminame(), then copied into cvt_buf */
 static char nambuf[sizeof cvt_buf];
 
-#ifdef DEBUG
 static void NDECL(dump_qtlist);
 
 static void
 dump_qtlist() /* dump the character msg list to check appearance */
 {
+#ifdef DEBUG
     struct qtmsg *msg;
 
     if (!explicitdebug(__FILE__))
         return;
 
     for (msg = qt_list.chrole; msg->msgnum > 0; msg++) {
-        pline("msgnum %d: delivery %c", msg->msgnum, msg->delivery);
-#ifdef TTY_GRAPHICS
-        more();
-#endif
         (void) dlb_fseek(msg_file, msg->offset, SEEK_SET);
-        deliver_by_window(msg, NHW_TEXT);
+        deliver_by_window(msg, NHW_MAP);
     }
-}
-#else
-static void
-dump_qtlist()
-{
-}
 #endif /* !DEBUG */
+    return;
+}
 
 static void
 Fread(ptr, size, nitems, stream)
@@ -479,8 +471,21 @@ struct qtmsg *qt_msg;
 int how;
 {
     long size;
-    winid datawin = create_nhwindow(how);
+    boolean qtdump = (how == NHW_MAP);
+    winid datawin = create_nhwindow(qtdump ? NHW_TEXT : how);
 
+#ifdef DEBUG
+    if (qtdump) {
+        char buf[BUFSZ];
+        /* when dumping quest messages at startup, all of them are passed to
+         * deliver_by_window(), even if normally given to deliver_by_pline()
+         */
+        Sprintf(buf, "msgnum: %d, delivery: %c",
+                qt_msg->msgnum, qt_msg->delivery);
+        putstr(datawin, 0, buf);
+        putstr(datawin, 0, "");
+    }
+#endif
     for (size = 0; size < qt_msg->size; size += (long) strlen(in_line)) {
         (void) dlb_fgets(in_line, QTEXT_IN_SIZ, msg_file);
         convert_line();
