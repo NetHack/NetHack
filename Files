@@ -156,6 +156,8 @@ lev_yacc.c
 posixregex.c
 (c++ regex code for versions that can build a C++ module and link it in)
 cppregex.cpp
+(pmatch regex for other versions)
+pmatchregex.c
 
 sys/share/sounds:
 (files for Amiga and Macintosh versions)
