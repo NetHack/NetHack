@@ -1532,14 +1532,17 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         break;
     case SCR_EARTH:
         /* TODO: handle steeds */
-        if (!Is_rogue_level(&u.uz)
+        if (!Is_rogue_level(&u.uz) && has_ceiling(&u.uz)
             && (!In_endgame(&u.uz) || Is_earthlevel(&u.uz))) {
             register int x, y;
             int nboulders = 0;
 
             /* Identify the scroll */
-            pline_The("%s rumbles %s you!", ceiling(u.ux, u.uy),
-                      sblessed ? "around" : "above");
+            if (u.uswallow)
+                You_hear("rumbling.");
+            else
+                pline_The("%s rumbles %s you!", ceiling(u.ux, u.uy),
+                          sblessed ? "around" : "above");
             known = 1;
             sokoban_guilt();
 

@@ -233,7 +233,7 @@ register int x, y;
              || IS_DOOR(lev->typ) || lev->typ == SDOOR)
         what = "ceiling";
     else
-        what = "rock above";
+        what = "rock cavern";
 
     return what;
 }

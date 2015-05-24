@@ -914,6 +914,7 @@ scare monster scroll now provides a better effect
 monsters without hands can no longer pick up piles of objects (with 
     certain exceptions)
 uncursed enchant weapon now correctly fixes erosion
+scroll of earth messages cleaned up
 
 
 Platform- and/or Interface-Specific Fixes
