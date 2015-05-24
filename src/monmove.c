@@ -59,7 +59,7 @@ const char *shout;
         pline("%s yells:", Amonnam(mon));
     else
         You_hear("someone yell:");
-    verbalize(shout);
+    verbalize1(shout);
 }
 
 STATIC_OVL void

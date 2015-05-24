@@ -4554,7 +4554,7 @@ const char *mapping;
             free(ape);
             return 0;
         }
-        ape->pattern = alloc(strlen(text2) + 1);
+        ape->pattern = (char *)alloc(strlen(text2) + 1);
         strcpy(ape->pattern, text2);
         ape->grab = grab;
         ape->next = *apehead;

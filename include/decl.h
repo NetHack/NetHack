@@ -390,7 +390,7 @@ E NEARDATA struct savefile_info sfcap, sfrestinfo, sfsaveinfo;
 
 struct autopickup_exception {
 	struct nhregex *regex;
-    const char *pattern;
+    char *pattern;
 	boolean grab;
 	struct autopickup_exception *next;
 };

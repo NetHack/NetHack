@@ -199,9 +199,9 @@ bot1()
                 mbot[k] += 'A' - 'a';
             k++;
         }
-        Sprintf(nb = eos(nb), mbot);
+        Strcpy(nb = eos(nb), mbot);
     } else
-        Sprintf(nb = eos(nb), rank());
+        Strcpy(nb = eos(nb), rank());
 
     Sprintf(nb = eos(nb), "  ");
     i = mrank_sz + 15;
