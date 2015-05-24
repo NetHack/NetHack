@@ -1,13 +1,9 @@
-/* NetHack 3.6	sounds.c	$NHDT-Date: 1432472661 2015/05/24 13:04:21 $  $NHDT-Branch: master $:$NHDT-Revision: 1.61 $ */
+/* NetHack 3.6	sounds.c	$NHDT-Date: 1432510145 2015/05/24 23:29:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.62 $ */
 /* NetHack 3.6	sounds.c	$Date: 2012/03/10 02:49:08 $  $Revision: 1.39 $ */
 /*	Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-
-#ifdef USER_SOUNDS
-#include <nhregex.h>
-#endif
 
 STATIC_DCL boolean FDECL(mon_is_gecko, (struct monst *));
 STATIC_DCL int FDECL(domonnoise, (struct monst *));
