@@ -49,6 +49,7 @@ struct	qthdr {
 #define TEXT_TRUNC	"Text record truncated at line %d\n"
 #define OUT_OF_HEADERS	"Too many message types (line %d)\nAdjust N_HDR in qtext.h and recompile.\n"
 #define OUT_OF_MESSAGES "Too many messages in class (line %d)\nAdjust N_MSG in qtext.h and recompile.\n"
+#define QLINE_TOO_LONG	"Line %d too long; truncated\n"
 
 
 #else	/***** !MAKEDEFS *****/

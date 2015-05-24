@@ -2423,6 +2423,14 @@ do_questtxt()
         SpinCursor(3);
 
         qt_line++;
+        if (!index(in_line, '\n')) {
+            /* no newline; line is longer than QTEXT_IN_SIZ-1 */
+            int c;
+
+            Fprintf(stderr, QLINE_TOO_LONG, qt_line);
+            /* discard the rest of the current input line */
+            do { c = fgetc(ifp); } while (c != '\n' && c != EOF);
+        }
         if (qt_control(line))
             do_qt_control(line);
         else if (qt_comment(line))
