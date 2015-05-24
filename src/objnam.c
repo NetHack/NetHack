@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1431192756 2015/05/09 17:32:36 $  $NHDT-Branch: master $:$NHDT-Revision: 1.131 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1432469843 2015/05/24 12:17:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.132 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -814,7 +814,7 @@ register struct obj *obj;
 
     if (cknown && Has_contents(obj)) {
         /* we count all objects (obj->quantity); perhaps we should
-           count seperate stacks instead (or even introduce a user
+           count separate stacks instead (or even introduce a user
            preference option to choose between the two alternatives)
            since it's somewhat odd so see "containing 1002 items"
            when there are 2 scrolls plus 1000 gold pieces */
