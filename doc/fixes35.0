@@ -915,6 +915,7 @@ monsters without hands can no longer pick up piles of objects (with
     certain exceptions)
 uncursed enchant weapon now correctly fixes erosion
 scroll of earth messages cleaned up
+long worms can no longer be leashed
 
 
 Platform- and/or Interface-Specific Fixes

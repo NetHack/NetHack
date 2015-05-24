@@ -544,6 +544,13 @@ void unleash_all() /* player is about to die (for bones) */
 
 #define MAXLEASHED 2
 
+static boolean
+leashable(mtmp)
+struct monst *mtmp;
+{
+    return mtmp->mnum != PM_LONG_WORM;
+}
+
 /* ARGSUSED */
 STATIC_OVL void
 use_leash(obj)
@@ -593,6 +600,12 @@ got_target:
                   spotmon ? l_monnam(mtmp) : "monster");
             return;
         }
+        if (!leashable(mtmp)) {
+            pline("The leash won't fit onto %s%s.", spotmon ? "your " : "",
+                  l_monnam(mtmp));
+            return;
+        }
+
         You("slip the leash around %s%s.", spotmon ? "your " : "",
             l_monnam(mtmp));
         mtmp->mleashed = 1;
