@@ -85,7 +85,7 @@ regex_match(const char *s, struct nhregex *re)
 {
     int result;
 
-    if (!re)
+    if (!re || !s)
         return FALSE;
 
     if ((result = regexec(&re->re, s, 0, (genericptr_t) 0, 0))) {

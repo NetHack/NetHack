@@ -1,4 +1,4 @@
-/* NetHack 3.6  makedefs.c  $NHDT-Date: 1432448606 2015/05/24 06:23:26 $  $NHDT-Branch: master $:$NHDT-Revision: 1.95 $ */
+/* NetHack 3.6  makedefs.c  $NHDT-Date: 1432472661 2015/05/24 13:04:21 $  $NHDT-Branch: master $:$NHDT-Revision: 1.95 $ */
 /* NetHack 3.6  makedefs.c  $Date: 2012/01/15 09:27:03 $  $Revision: 1.50 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) M. Stephenson, 1990, 1991.			  */
@@ -1406,11 +1406,7 @@ static const char *build_opts[] = {
     "timed wait for display effects",
 #endif
 #ifdef USER_SOUNDS
-#ifdef USER_SOUNDS_REGEX
-    "user sounds via regular expressions",
-#else
-    "user sounds via pmatch",
-#endif
+    "user sounds",
 #endif
 #ifdef PREFIXES_IN_USE
     "variable playground",

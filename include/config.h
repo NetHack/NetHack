@@ -1,4 +1,4 @@
-/* NetHack 3.6	config.h	$NHDT-Date: 1428084467 2015/04/03 18:07:47 $  $NHDT-Branch: scshunt-regex $:$NHDT-Revision: 1.76 $ */
+/* NetHack 3.6	config.h	$NHDT-Date: 1432472662 2015/05/24 13:04:22 $  $NHDT-Branch: master $:$NHDT-Revision: 1.85 $ */
 /* NetHack 3.6	config.h	$Date: 2012/01/27 20:15:26 $  $Revision: 1.37 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -91,7 +91,6 @@
 # endif
 #ifndef NOUSER_SOUNDS
 # define USER_SOUNDS		/* Use sounds */
-/* # define USER_SOUNDS_REGEX */    /* Use regexps for sound message matches */
 #endif
 # define USE_XPM		/* Use XPM format for images (required) */
 # define GRAPHIC_TOMBSTONE	/* Use graphical tombstone (rip.ppm) */

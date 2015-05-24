@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1431192768 2015/05/09 17:32:48 $  $NHDT-Branch: master $:$NHDT-Revision: 1.153 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1432472661 2015/05/24 13:04:21 $  $NHDT-Branch: master $:$NHDT-Revision: 1.154 $ */
 /* NetHack 3.6	pickup.c	$Date: 2012/02/16 03:01:38 $  $Revision: 1.123 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -689,7 +689,7 @@ boolean grab; /* forced pickup, rather than forced leave behind? */
         (grab) ? iflags.autopickup_exceptions[AP_GRAB]
                : iflags.autopickup_exceptions[AP_LEAVE];
     while (ape) {
-        if (pmatch(ape->pattern, objdesc))
+        if (regex_match(objdesc, ape->regex))
             return TRUE;
         ape = ape->next;
     }

@@ -1,4 +1,4 @@
-/* NetHack 3.6	sounds.c	$NHDT-Date: 1431192768 2015/05/09 17:32:48 $  $NHDT-Branch: master $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.6	sounds.c	$NHDT-Date: 1432472661 2015/05/24 13:04:21 $  $NHDT-Branch: master $:$NHDT-Revision: 1.61 $ */
 /* NetHack 3.6	sounds.c	$Date: 2012/03/10 02:49:08 $  $Revision: 1.39 $ */
 /*	Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6,10 +6,7 @@
 #include "hack.h"
 
 #ifdef USER_SOUNDS
-#ifdef USER_SOUNDS_REGEX
-#include <sys/types.h>
-#include <regex.h>
-#endif
+#include <nhregex.h>
 #endif
 
 STATIC_DCL boolean FDECL(mon_is_gecko, (struct monst *));
@@ -1075,11 +1072,7 @@ dochat()
 extern void FDECL(play_usersound, (const char *, int));
 
 typedef struct audio_mapping_rec {
-#ifdef USER_SOUNDS_REGEX
-    struct re_pattern_buffer regex;
-#else
-    char *pattern;
-#endif
+    struct nhregex *regex;
     char *filename;
     int volume;
     struct audio_mapping_rec *next;
@@ -1101,7 +1094,6 @@ const char *mapping;
 
     if (sscanf(mapping, "MESG \"%255[^\"]\"%*[\t ]\"%255[^\"]\" %d", text,
                filename, &volume) == 3) {
-        const char *err;
         audio_mapping *new_map;
 
         if (strlen(sounddir) + strlen(filename) > 254) {
@@ -1112,26 +1104,14 @@ const char *mapping;
 
         if (can_read_file(filespec)) {
             new_map = (audio_mapping *) alloc(sizeof(audio_mapping));
-#ifdef USER_SOUNDS_REGEX
-            new_map->regex.translate = 0;
-            new_map->regex.fastmap = 0;
-            new_map->regex.buffer = 0;
-            new_map->regex.allocated = 0;
-            new_map->regex.regs_allocated = REGS_FIXED;
-#else
-            new_map->pattern = dupstr(text);
-#endif
+            new_map->regex = regex_init();
             new_map->filename = dupstr(filespec);
             new_map->volume = volume;
             new_map->next = soundmap;
 
-#ifdef USER_SOUNDS_REGEX
-            err = re_compile_pattern(text, strlen(text), &new_map->regex);
-#else
-            err = 0;
-#endif
-            if (err) {
-                raw_print(err);
+            if (!regex_compile(text, new_map->regex)) {
+                raw_print(regex_error_desc(new_map->regex));
+                regex_free(new_map->regex);
                 free(new_map->filename);
                 free(new_map);
                 return 0;
@@ -1158,11 +1138,7 @@ const char *msg;
     audio_mapping *cursor = soundmap;
 
     while (cursor) {
-#ifdef USER_SOUNDS_REGEX
-        if (re_search(&cursor->regex, msg, strlen(msg), 0, 9999, 0) >= 0) {
-#else
-        if (pmatch(cursor->pattern, msg)) {
-#endif
+        if (regex_match(msg, cursor->regex)) {
             play_usersound(cursor->filename, cursor->volume);
         }
         cursor = cursor->next;

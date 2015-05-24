@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1431192763 2015/05/09 17:32:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.197 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1432472660 2015/05/24 13:04:20 $  $NHDT-Branch: master $:$NHDT-Revision: 1.198 $ */
 /* NetHack 3.6	options.c	$Date: 2012/04/09 02:56:30 $  $Revision: 1.153 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4547,8 +4547,15 @@ const char *mapping;
                          : &iflags.autopickup_exceptions[AP_LEAVE];
         ape = (struct autopickup_exception *) alloc(
             sizeof(struct autopickup_exception));
-        ape->pattern = (char *) alloc(textsize + 1);
-        Strcpy(ape->pattern, text2);
+        ape->regex = regex_init();
+        if (!regex_compile(text2, ape->regex)) {
+            raw_print("regex error in AUTOPICKUP_EXCEPTION");
+            regex_free(ape->regex);
+            free(ape);
+            return 0;
+        }
+        ape->pattern = alloc(strlen(text2) + 1);
+        strcpy(ape->pattern, text2);
         ape->grab = grab;
         ape->next = *apehead;
         *apehead = ape;
@@ -4574,6 +4581,7 @@ struct autopickup_exception *whichape;
                 prev->next = ape;
             else
                 iflags.autopickup_exceptions[chain] = ape;
+            regex_free(freeape->regex);
             free(freeape->pattern);
             free(freeape);
         } else {
@@ -4613,6 +4621,7 @@ free_autopickup_exceptions()
 
     for (pass = AP_LEAVE; pass <= AP_GRAB; ++pass) {
         while ((ape = iflags.autopickup_exceptions[pass]) != 0) {
+            regex_free(ape->regex);
             free(ape->pattern);
             iflags.autopickup_exceptions[pass] = ape->next;
             free(ape);
