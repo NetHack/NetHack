@@ -1,4 +1,4 @@
-/* NetHack 3.6  makedefs.c  $NHDT-Date: 1431192769 2015/05/09 17:32:49 $  $NHDT-Branch: master $:$NHDT-Revision: 1.93 $ */
+/* NetHack 3.6  makedefs.c  $NHDT-Date: 1432448606 2015/05/24 06:23:26 $  $NHDT-Branch: master $:$NHDT-Revision: 1.95 $ */
 /* NetHack 3.6  makedefs.c  $Date: 2012/01/15 09:27:03 $  $Revision: 1.50 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) M. Stephenson, 1990, 1991.			  */
@@ -132,7 +132,7 @@ static char xclear[MAX_ROW][MAX_COL];
 #endif
 /*-end of vision defs-*/
 
-static char in_line[256], filename[600];
+static char filename[600];
 
 #ifdef FILE_PREFIX
 /* if defined, a first argument not starting with - is
@@ -198,6 +198,7 @@ static void NDECL(C_far_gen);
 static int FDECL(clear_path, (int, int, int, int));
 #endif
 
+static char *FDECL(fgetline, (FILE*));
 static char *FDECL(tmpdup, (const char *));
 static char *FDECL(limit, (char *, int));
 static char *FDECL(eos, (char *));
@@ -870,6 +871,7 @@ long *rumor_size;
 unsigned long old_rumor_offset;
 {
     char infile[600];
+    char *line;
     unsigned long rumor_offset;
 
     Sprintf(infile, DATA_IN_TEMPLATE, RUMOR_FILE);
@@ -880,11 +882,11 @@ unsigned long old_rumor_offset;
     }
 
     /* copy the rumors */
-    while (fgets(in_line, sizeof in_line, ifp) != 0) {
+    while ((line = fgetline(ifp))) {
 #ifdef PAD_RUMORS_TO
-        int len = strlen(in_line);
+        int len = strlen(line);
         if (len <= PAD_RUMORS_TO) { /* XXX enforce min len? */
-            char *base = index(in_line, '\n');
+            char *base = index(line, '\n');
             while (len++ < PAD_RUMORS_TO) {
                 *base++ = '_'; /* XXX */
             }
@@ -895,9 +897,10 @@ unsigned long old_rumor_offset;
         (*rumor_count)++;
 #if 0
 	/*[if we forced binary output, this would be sufficient]*/
-	*rumor_size += strlen(in_line);	/* includes newline */
+	*rumor_size += strlen(line);	/* includes newline */
 #endif
-        (void) fputs(xcrypt(in_line), tfp);
+        (void) fputs(xcrypt(line), tfp);
+        free(line);
     }
     /* record the current position; next rumors section will start here */
     rumor_offset = (unsigned long) ftell(tfp);
@@ -916,6 +919,8 @@ void
 do_rnd_access_file(fname)
 const char *fname;
 {
+    char *line;
+
     Sprintf(filename, DATA_IN_TEMPLATE, fname);
     Strcat(filename, ".txt");
     if (!(ifp = fopen(filename, RDTMODE))) {
@@ -937,12 +942,12 @@ const char *fname;
     grep0(ifp, tfp);
     ifp = getfp(DATA_TEMPLATE, "grep.tmp", RDTMODE);
 
-    while (fgets(in_line, sizeof in_line, ifp) != 0) {
-        if (in_line[0] == '#')
+    while ((line = fgetline(ifp))) {
+        if (line[0] == '#')
             continue; /* discard comments */
-        if (in_line[0] == '\n')
+        if (line[0] == '\n')
             continue; /* and empty lines */
-        (void) fputs(xcrypt(in_line), ofp);
+        (void) fputs(xcrypt(line), ofp);
     }
     Fclose(ifp);
     Fclose(ofp);
@@ -954,6 +959,7 @@ const char *fname;
 void
 do_rumors()
 {
+    char *line;
     static const char rumors_header[] =
         "%s%04d,%06ld,%06lx;%04d,%06ld,%06lx;0,0,%06lx\n";
     char tempfile[600];
@@ -999,25 +1005,29 @@ do_rumors()
         goto rumors_failure;
 
     /* get ready to transfer the contents of temp file to output file */
-    Sprintf(in_line, "rewind of \"%s\"", tempfile);
+    line = malloc(256);
+    Sprintf(line, "rewind of \"%s\"", tempfile);
     if (rewind(tfp) != 0) {
-        perror(in_line);
+        perror(line);
+        free(line);
         goto rumors_failure;
     }
+    free(line);
 
     /* output the header record */
     Fprintf(ofp, rumors_header, Dont_Edit_Data, true_rumor_count,
             true_rumor_size, true_rumor_offset, false_rumor_count,
             false_rumor_size, false_rumor_offset, eof_offset);
     /* skip the temp file's dummy header */
-    if (!fgets(in_line, sizeof in_line, tfp) || /* "Don't Edit" */
-        !fgets(in_line, sizeof in_line, tfp)) { /* count,size,offset */
+    if (!fgetline(tfp) || /* "Don't Edit" */
+        !fgetline(tfp)) { /* count,size,offset */
         perror(tempfile);
         goto rumors_failure;
     }
     /* copy the rest of the temp file into the final output file */
-    while (fgets(in_line, sizeof in_line, tfp) != 0) {
-        (void) fputs(in_line, ofp);
+    while ((line = fgetline(tfp))) {
+        (void) fputs(line, ofp);
+        free(line);
     }
     /* all done; delete temp file */
     Fclose(tfp);
@@ -1609,6 +1619,7 @@ do_data()
     boolean ok;
     long txt_offset;
     int entry_cnt, line_cnt;
+    char *line;
 
     Sprintf(tempfile, DATA_TEMPLATE, "database.tmp");
     filename[0] = '\0';
@@ -1644,24 +1655,25 @@ do_data()
 
     entry_cnt = line_cnt = 0;
     /* read through the input file and split it into two sections */
-    while (fgets(in_line, sizeof in_line, ifp)) {
-        if (d_filter(in_line))
+    while ((line = fgetline(ifp))) {
+        if (d_filter(line))
             continue;
-        if (*in_line > ' ') { /* got an entry name */
+        if (*line > ' ') { /* got an entry name */
             /* first finish previous entry */
             if (line_cnt)
                 Fprintf(ofp, "%d\n", line_cnt), line_cnt = 0;
             /* output the entry name */
-            (void) fputs(in_line, ofp);
+            (void) fputs(line, ofp);
             entry_cnt++;        /* update number of entries */
         } else if (entry_cnt) { /* got some descriptive text */
             /* update previous entry with current text offset */
             if (!line_cnt)
                 Fprintf(ofp, "%ld,", ftell(tfp));
             /* save the text line in the scratch file */
-            (void) fputs(in_line, tfp);
+            (void) fputs(line, tfp);
             line_cnt++; /* update line counter */
         }
+        free(line);
     }
     /* output an end marker and then record the current position */
     if (line_cnt)
@@ -1671,33 +1683,40 @@ do_data()
     Fclose(ifp); /* all done with original input file */
 
     /* reprocess the scratch file; 1st format an error msg, just in case */
-    Sprintf(in_line, "rewind of \"%s\"", tempfile);
+    line = malloc(256);
+    Sprintf(line, "rewind of \"%s\"", tempfile);
     if (rewind(tfp) != 0)
         goto dead_data;
+    free(line);
     /* copy all lines of text from the scratch file into the output file */
-    while (fgets(in_line, sizeof in_line, tfp))
-        (void) fputs(in_line, ofp);
+    while ((line = fgetline(tfp))) {
+        (void) fputs(line, ofp);
+        free(line);
+    }
 
     /* finished with scratch file */
     Fclose(tfp);
     Unlink(tempfile); /* remove it */
 
     /* update the first record of the output file; prepare error msg 1st */
-    Sprintf(in_line, "rewind of \"%s\"", filename);
+    line = malloc(256);
+    Sprintf(line, "rewind of \"%s\"", filename);
     ok = (rewind(ofp) == 0);
     if (ok) {
-        Sprintf(in_line, "header rewrite of \"%s\"", filename);
+        Sprintf(line, "header rewrite of \"%s\"", filename);
         ok = (fprintf(ofp, "%s%08lx\n", Dont_Edit_Data,
                       (unsigned long) txt_offset) >= 0);
     }
     if (!ok) {
     dead_data:
-        perror(in_line); /* report the problem */
+        perror(line); /* report the problem */
+        free(line);
         /* close and kill the aborted output file, then give up */
         Fclose(ofp);
         Unlink(filename);
         exit(EXIT_FAILURE);
     }
+    free(line);
 
     /* all done */
     Fclose(ofp);
@@ -1711,16 +1730,19 @@ h_filter(line)
 char *line;
 {
     static boolean skip = FALSE;
-    char tag[sizeof in_line];
+    char *tag;
 
     SpinCursor(3);
 
     if (*line == '#')
         return TRUE; /* ignore comment lines */
+
+    tag = malloc(strlen(line));
     if (sscanf(line, "----- %s", tag) == 1) {
         skip = FALSE;
     } else if (skip && !strncmp(line, "-----", 5))
         skip = FALSE;
+    free(tag);
     return skip;
 }
 
@@ -1752,6 +1774,7 @@ do_oracles()
     unsigned long txt_offset, offset;
     int oracle_cnt;
     register int i;
+    char *line;
 
     Sprintf(tempfile, DATA_TEMPLATE, "oracles.tmp");
     filename[0] = '\0';
@@ -1797,12 +1820,12 @@ do_oracles()
     Fprintf(ofp, "%05lx\n", offset); /* start pos of first oracle */
     in_oracle = FALSE;
 
-    while (fgets(in_line, sizeof in_line, ifp)) {
+    while ((line = fgetline(ifp))) {
         SpinCursor(3);
 
-        if (h_filter(in_line))
+        if (h_filter(line))
             continue;
-        if (!strncmp(in_line, "-----", 5)) {
+        if (!strncmp(line, "-----", 5)) {
             if (!in_oracle)
                 continue;
             in_oracle = FALSE;
@@ -1812,8 +1835,9 @@ do_oracles()
             Fprintf(ofp, "%05lx\n", offset); /* start pos of this oracle */
         } else {
             in_oracle = TRUE;
-            (void) fputs(xcrypt(in_line), tfp);
+            (void) fputs(xcrypt(line), tfp);
         }
+        free(line);
     }
 
     if (in_oracle) { /* need to terminate last oracle */
@@ -1828,26 +1852,31 @@ do_oracles()
     Fclose(ifp); /* all done with original input file */
 
     /* reprocess the scratch file; 1st format an error msg, just in case */
-    Sprintf(in_line, "rewind of \"%s\"", tempfile);
+    line = malloc(256);
+    Sprintf(line, "rewind of \"%s\"", tempfile);
     if (rewind(tfp) != 0)
         goto dead_data;
+    free(line);
     /* copy all lines of text from the scratch file into the output file */
-    while (fgets(in_line, sizeof in_line, tfp))
-        (void) fputs(in_line, ofp);
+    while ((line = fgetline(tfp))) {
+        (void) fputs(line, ofp);
+        free(line);
+    }
 
     /* finished with scratch file */
     Fclose(tfp);
     Unlink(tempfile); /* remove it */
 
     /* update the first record of the output file; prepare error msg 1st */
-    Sprintf(in_line, "rewind of \"%s\"", filename);
+    line = malloc(256);
+    Sprintf(line, "rewind of \"%s\"", filename);
     ok = (rewind(ofp) == 0);
     if (ok) {
-        Sprintf(in_line, "header rewrite of \"%s\"", filename);
+        Sprintf(line, "header rewrite of \"%s\"", filename);
         ok = (fprintf(ofp, "%s%5d\n", Dont_Edit_Data, oracle_cnt) >= 0);
     }
     if (ok) {
-        Sprintf(in_line, "data rewrite of \"%s\"", filename);
+        Sprintf(line, "data rewrite of \"%s\"", filename);
         for (i = 0; i <= oracle_cnt; i++) {
 #ifndef VMS /* alpha/vms v1.0; this fflush seems to confuse ftell */
             if (!(ok = (fflush(ofp) == 0)))
@@ -1879,12 +1908,14 @@ do_oracles()
     }
     if (!ok) {
     dead_data:
-        perror(in_line); /* report the problem */
+        perror(line); /* report the problem */
+        free(line);
         /* close and kill the aborted output file, then give up */
         Fclose(ofp);
         Unlink(filename);
         exit(EXIT_FAILURE);
     }
+    free(line);
 
     /* all done */
     Fclose(ofp);
@@ -1896,6 +1927,7 @@ void
 do_dungeon()
 {
     int rcnt = 0;
+    char *line;
 
     Sprintf(filename, DATA_IN_TEMPLATE, DGN_I_FILE);
     if (!(ifp = fopen(filename, RDTMODE))) {
@@ -1917,13 +1949,13 @@ do_dungeon()
     grep0(ifp, tfp);
     ifp = getfp(DATA_TEMPLATE, "grep.tmp", RDTMODE);
 
-    while (fgets(in_line, sizeof in_line, ifp) != 0) {
+    while ((line = fgetline(ifp))) {
         SpinCursor(3);
 
         rcnt++;
-        if (in_line[0] == '#')
+        if (line[0] == '#')
             continue; /* discard comments */
-        (void) fputs(in_line, ofp);
+        (void) fputs(line, ofp);
     }
     Fclose(ifp);
     Fclose(ofp);
@@ -2368,6 +2400,8 @@ put_qt_hdrs()
 void
 do_questtxt()
 {
+    char *line;
+
     Sprintf(filename, DATA_IN_TEMPLATE, QTXT_I_FILE);
     if (!(ifp = fopen(filename, RDTMODE))) {
         perror(filename);
@@ -2389,39 +2423,40 @@ do_questtxt()
     qt_line = 0;
     in_msg = FALSE;
 
-    while (fgets(in_line, QTEXT_IN_SIZ, ifp) != 0) {
+    while ((line = fgetline(ifp))) {
         SpinCursor(3);
 
         qt_line++;
-        if (qt_control(in_line))
-            do_qt_control(in_line);
-        else if (qt_comment(in_line))
+        if (qt_control(line))
+            do_qt_control(line);
+        else if (qt_comment(line))
             continue;
         else
-            do_qt_text(in_line);
+            do_qt_text(line);
+        free(line);
     }
 
     (void) rewind(ifp);
     in_msg = FALSE;
     adjust_qt_hdrs();
     put_qt_hdrs();
-    while (fgets(in_line, QTEXT_IN_SIZ, ifp) != 0) {
-        if (qt_control(in_line)) {
+    while ((line = fgetline(ifp))) {
+        if (qt_control(line)) {
             char *summary_p = 0;
 
-            in_msg = (in_line[1] == 'C');
+            in_msg = (line[1] == 'C');
             if (!in_msg)
-                summary_p = valid_qt_summary(in_line, FALSE);
+                summary_p = valid_qt_summary(line, FALSE);
             /* don't write anything unless we've got a summary */
             if (!summary_p)
                 continue;
             /* we have summary text; replace raw %E record with it */
-            Strcpy(in_line, summary_p); /* (guaranteed to fit) */
-        } else if (qt_comment(in_line))
+            Strcpy(line, summary_p); /* (guaranteed to fit) */
+        } else if (qt_comment(line))
             continue;
         if (debug)
-            Fprintf(stderr, "%ld: %s", ftell(stdout), in_line);
-        (void) fputs(xcrypt(in_line), ofp);
+            Fprintf(stderr, "%ld: %s", ftell(stdout), line);
+        (void) fputs(xcrypt(line), ofp);
     }
     Fclose(ifp);
     Fclose(ofp);
@@ -2571,6 +2606,36 @@ do_objs()
         exit(EXIT_FAILURE);
     return;
 }
+
+/* Read one line from input, up to and including the next newline
+ * character. Returns a pointer to the heap-allocated string, or a
+ * null pointer if no characters were read.
+ */
+static char *
+fgetline(fd)
+FILE *fd;
+{
+    static const int inc = 256;
+    int len = inc;
+    char *c = malloc(len-1), *ret;
+
+    do {
+        ret = fgets(c + len - inc, inc, fd);
+        if (!ret) {
+            free(c);
+            c = NULL;
+            break;
+        }
+
+        if (strlen(c) == len - 1 && c[len - 2] != '\n') {
+            len += inc;
+            c = realloc(c, len);
+        } else
+            break;
+    } while (1);
+
+    return c;
+};
 
 static char *
 tmpdup(str)

@@ -13,7 +13,6 @@
 
 /* quest text message buffer sizes; used to be hardcoded as 80 and 128, but
    have been expanded to allow some slop for block message summary lines */
-#define QTEXT_IN_SIZ	100	/* used by both nethack and makedefs */
 #define QTEXT_OUTSIZ	200	/* used only by nethack */
 
 struct qtmsg {
