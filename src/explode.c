@@ -1,4 +1,4 @@
-/* NetHack 3.6	explode.c	$NHDT-Date: 1431192763 2015/05/09 17:32:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.40 $ */
+/* NetHack 3.6	explode.c	$NHDT-Date: 1432454165 2015/05/24 07:56:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.41 $ */
 /* NetHack 3.6	explode.c	$Date: 2013/11/05 00:57:55 $  $Revision: 1.34 $ */
 /*	Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -56,7 +56,8 @@ int expltype;
             exploding_wand_typ = (short) type;
             /* most attack wands produce specific explosions;
                other types produce a generic magical explosion */
-            if (objects[type].oc_dir == RAY && type != WAN_DIGGING) {
+            if (objects[type].oc_dir == RAY && type != WAN_DIGGING &&
+                type != WAN_SLEEP) {
                 type -= WAN_MAGIC_MISSILE;
                 if (type < 0 || type > 9) {
                     impossible("explode: wand has bad zap type (%d).", type);
@@ -317,43 +318,64 @@ int expltype;
                     str = hallu_buf;
                 }
                 if (u.uswallow && mtmp == u.ustuck) {
-                    if (is_animal(u.ustuck->data))
-                        pline("%s gets %s!", Monnam(u.ustuck),
-                              (adtyp == AD_FIRE)
-                                  ? "heartburn"
-                                  : (adtyp == AD_COLD)
-                                        ? "chilly"
-                                        : (adtyp == AD_DISN)
-                                              ? ((olet == WAND_CLASS)
-                                                     ? "irradiated by pure "
-                                                       "energy"
-                                                     : "perforated")
-                                              : (adtyp == AD_ELEC)
-                                                    ? "shocked"
-                                                    : (adtyp == AD_DRST)
-                                                          ? "poisoned"
-                                                          : (adtyp == AD_ACID)
-                                                                ? "an upset "
-                                                                  "stomach"
-                                                                : "fried");
-                    else
-                        pline("%s gets slightly %s!", Monnam(u.ustuck),
-                              (adtyp == AD_FIRE)
-                                  ? "toasted"
-                                  : (adtyp == AD_COLD)
-                                        ? "chilly"
-                                        : (adtyp == AD_DISN)
-                                              ? ((olet == WAND_CLASS)
-                                                     ? "overwhelmed by pure "
-                                                       "energy"
-                                                     : "perforated")
-                                              : (adtyp == AD_ELEC)
-                                                    ? "shocked"
-                                                    : (adtyp == AD_DRST)
-                                                          ? "intoxicated"
-                                                          : (adtyp == AD_ACID)
-                                                                ? "burned"
-                                                                : "fried");
+                    const char *adj = NULL;
+                    if (is_animal(u.ustuck->data)) {
+                        switch (adtyp) {
+                        case AD_FIRE:
+                            adj = "heartburn";
+                            break;
+                        case AD_COLD:
+                            adj = "chilly";
+                            break;
+                        case AD_DISN:
+                            if (olet == WAND_CLASS)
+                                adj = "irradiated by pure energy";
+                            else
+                                adj = "perforated";
+                            break;
+                        case AD_ELEC:
+                            adj = "shocked";
+                            break;
+                        case AD_DRST:
+                            adj = "poisoned";
+                            break;
+                        case AD_ACID:
+                            adj = "an upset stomach";
+                            break;
+                        default:
+                            adj = "fried";
+                            break;
+                        }
+                        pline("%s gets %s!", Monnam(u.ustuck), adj);
+                    } else {
+                        switch (adtyp) {
+                        case AD_FIRE:
+                            adj = "toasted";
+                            break;
+                        case AD_COLD:
+                            adj = "chilly";
+                            break;
+                        case AD_DISN:
+                            if (olet == WAND_CLASS)
+                                adj = "overwhelmed by pure energy";
+                            else
+                                adj = "perforated";
+                            break;
+                        case AD_ELEC:
+                            adj = "shocked";
+                            break;
+                        case AD_DRST:
+                            adj = "intoxicated";
+                            break;
+                        case AD_ACID:
+                            adj = "burned";
+                            break;
+                        default:
+                            adj = "fried";
+                            break;
+                        }
+                        pline("%s gets slightly %s!", Monnam(u.ustuck), adj);
+                    }
                 } else if (cansee(i + x - 1, j + y - 1)) {
                     if (mtmp->m_ap_type)
                         seemimic(mtmp);
