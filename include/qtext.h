@@ -1,4 +1,4 @@
-/* NetHack 3.6	qtext.h	$NHDT-Date: 1432447889 2015/05/24 06:11:29 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
+/* NetHack 3.6	qtext.h	$NHDT-Date: 1432476581 2015/05/24 14:09:41 $  $NHDT-Branch: sean_on_the_road $:$NHDT-Revision: 1.11 $ */
 /* NetHack 3.6	qtext.h	$Date: 2009/05/06 10:45:02 $  $Revision: 1.7 $ */
 /*	SCCS Id: @(#)qtext.h	3.5	1997/02/02	*/
 /* Copyright (c) Mike Stephenson 1991.				  */
@@ -12,9 +12,8 @@
 #define LEN_HDR 3		/* Maximum length of a category name */
 
 /* quest text message buffer sizes; used to be hardcoded as 80 and 128, but
-   have been expanded to allow some slop for block message summary lines
-   and for source repository header lines */
-#define QTEXT_IN_SIZ	150	/* used by both nethack and makedefs */
+   have been expanded to allow some slop for block message summary lines */
+#define QTEXT_IN_SIZ	100	/* used by both nethack and makedefs */
 #define QTEXT_OUTSIZ	200	/* used only by nethack */
 
 struct qtmsg {
@@ -51,7 +50,7 @@ struct	qthdr {
 #define TEXT_TRUNC	"Text record truncated at line %d\n"
 #define OUT_OF_HEADERS	"Too many message types (line %d)\nAdjust N_HDR in qtext.h and recompile.\n"
 #define OUT_OF_MESSAGES "Too many messages in class (line %d)\nAdjust N_MSG in qtext.h and recompile.\n"
-#define QLINE_TOO_LONG	"Line %d too long; truncated\n"
+
 
 #else	/***** !MAKEDEFS *****/
 
