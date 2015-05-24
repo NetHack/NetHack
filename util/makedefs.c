@@ -1,4 +1,4 @@
-/* NetHack 3.6  makedefs.c  $NHDT-Date: 1431192769 2015/05/09 17:32:49 $  $NHDT-Branch: master $:$NHDT-Revision: 1.93 $ */
+/* NetHack 3.6  makedefs.c  $NHDT-Date: 1432447897 2015/05/24 06:11:37 $  $NHDT-Branch: master $:$NHDT-Revision: 1.94 $ */
 /* NetHack 3.6  makedefs.c  $Date: 2012/01/15 09:27:03 $  $Revision: 1.50 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) M. Stephenson, 1990, 1991.			  */
@@ -2393,6 +2393,14 @@ do_questtxt()
         SpinCursor(3);
 
         qt_line++;
+        if (!index(in_line, '\n')) {
+            /* no newline; line is longer than QTEXT_IN_SIZ-1 */
+            int c;
+
+            Fprintf(stderr, QLINE_TOO_LONG, qt_line);
+            /* discard the rest of the current input line */
+            do { c = fgetc(ifp); } while (c != '\n' && c != EOF);
+        }
         if (qt_control(in_line))
             do_qt_control(in_line);
         else if (qt_comment(in_line))
