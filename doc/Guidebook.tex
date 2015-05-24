@@ -3119,9 +3119,18 @@ if this does not correct the problem, try {\tt !color}.
 Cannot be set with the `{\tt O}' command.
 \elist
 
-%.lp
+%.nh 2
+\subsection*{Regular Expressions}
+
+%.pg
+Regular expressions are normally POSIX extended regular expressions. It is
+possible to compile NetHack without regular expression support on a platform where
+there is no regular expression library. While this is not true of any modern
+platform, if your NetHack was built this way, patterns are instead glob
+patterns.
+
 %.hn 2
-\subsection*{Configuring autopickup exceptions}
+\subsection*{Configuring Autopickup Exceptions}
 
 %.pg
 You can further refine the behavior of the ``{\tt autopickup}'' option
@@ -3136,17 +3145,9 @@ autopickup something.
 %.lp
 \item[\ib{autopickup\_exception}]
 Sets an exception to the `{\it pickup\_types}' option.
-The {\it autopickup\_exception\/} option should be followed by a string of 1--80
-characters to be used as a pattern to match against the singular form
-of the description of an object at your location.
-
-%.lp ""
-You may use the following special characters in a pattern:
-
-%.sd .si
-{\tt *} --- matches zero or more characters;\\
-{\tt ?} --- matches any single character.
-%.ei .ed
+The {\it autopickup\_exception\/} option should be followed by a regular
+expression to be used as a pattern to match against the singular form of the
+description of an object at your location.
 
 In addition, some characters are treated specially if they occur as the first 
 character in the pattern, specifically:
@@ -3211,8 +3212,7 @@ If no attribute is defined, no attribute is used.
 \elist
 
 %.lp ""
-For explanation on pattern format and the matching routines, see
-the pattern in the {\it Configuring User Sounds} -section.
+The pattern should be a regular expression.
 
 %.lp ""
 Allowed colors are {\it black}, {\it red}, {\it green}, {\it brown},
@@ -3279,37 +3279,7 @@ Each SOUND entry is broken down into the following parts:
 \elist
 
 %.lp ""
-The exact format for the pattern depends on whether the platform is
-built to use {\it regular expressions \/} or NetHack's own internal pattern 
-matching facility. The {\it regular expressions \/} matching can be much more 
-sophisticated than the internal NetHack pattern matching, but requires 
-3rd party libraries on some platforms.  There are plenty of references 
-available elsewhere for explaining {\it regular expressions \/}. You can verify 
-which pattern matching is used by your port with the 
-\#version command.  
-
-%.lp ""
-NetHack's internal pattern matching routine uses the following
-special characters in its pattern matching:
-
-%.sd
-%.si
-{\tt *} --- matches 0 or more characters;
-{\tt ?} --- matches any single character.
-%.ei
-%.ed
-
-%.lp ""
-Here's an example of a sound mapping using NetHack's internal
-pattern matching facility:
-
-%.sd.si
-{\tt SOUND=MESG "*chime of a cash register*" "gong.wav" 50}
-%.ei.ed
-
-specifies that any message with ``chime of a cash register'' contained
-in it will trigger the playing of file {\tt gong.wav}.  You can have multiple
-SOUND entries in your config file.
+The pattern should be a regular expression.
 
 %.lp
 %.hn 2

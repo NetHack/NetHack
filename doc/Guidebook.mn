@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: master $:$NHDT-Revision: 1.160 $ $NHDT-Date: 1430043650 2015/04/26 10:20:50 $
+.\" $NHDT-Branch: master $:$NHDT-Revision: 1.164 $ $NHDT-Date: 1432473674 2015/05/24 13:21:14 $
 .ds h0 "NetHack Guidebook
 .ds h1
 .ds h2 %
@@ -2575,7 +2575,15 @@ If the game display is difficult to read, try adjusting these scales;
 if this does not correct the problem, try !color.
 Cannot be set with the `O' command.
 .hn 2
-Configuring autopickup exceptions
+Regular Expressions
+.pg
+Regular expressions are normally POSIX extended regular expressions. It is
+possible to compile NetHack without regular expression support on a platform
+where there is no regular expression library. While this is not true of any
+modern platform, if your NetHack was built this way, patterns are instead glob
+patterns.
+.hn 2
+Configuring Autopickup Exceptions
 .pg
 You can further refine the behavior of the
 .op autopickup
@@ -2594,17 +2602,10 @@ Sets an exception to the
 option.
 The
 .op autopickup_exception
-option should be followed by a string of 1-80 characters to be used as a 
-pattern to match against the singular form of the description of an 
-object at your location.
+option should be followed by a regular expression to be used as a pattern to
+match against the singular form of the description of an object at your
+location.
 .lp ""
-You may use the following special characters in a pattern:
-.sd
-.si
-.CC * "matches zero or more characters;"
-.CC ? "matches any single character."
-.ei
-.ed
 In addition, some characters are treated specially if they occur as the first 
 character in the pattern, specifically:
 .sd
@@ -2657,8 +2658,7 @@ optional, and if left out, you must also leave out the preceding ampersand.
 If no attribute is defined, no attribute is used.
 .PE
 .lp ""
-For explanation on pattern format and the matching routines, see
-the pattern in the ``Configuring User Sounds'' -section.
+The pattern should be a regular expression.
 .lp ""
 Allowed colors are black, red, green, brown, blue, magenta, cyan, gray,
 orange, lightgreen, yellow, lightblue, lightmagenta, lightcyan, and white.
@@ -2710,33 +2710,7 @@ the sound file to play;
 the volume to be set while playing the sound file.
 .PE
 .lp ""
-The exact format for the pattern depends on whether the platform is
-built to use ``regular expressions'' or NetHack's own internal pattern 
-matching facility. The ``regular expressions'' matching can be much more 
-sophisticated than the internal NetHack pattern matching, but requires 
-3rd party libraries on some platforms.  There are plenty of references 
-available elsewhere for explaining ``regular expressions''. You can verify 
-which pattern matching is used by your port with the #version command.  
-.lp ""
-NetHack's internal pattern matching routine uses the following
-special characters in its pattern matching:
-.sd
-.si
-.CC * "matches 0 or more characters;"
-.CC ? "matches any single character."
-.ei
-.ed
-.lp ""
-Here's an example of a sound mapping using NetHack's internal
-pattern matching facility:
-.sd
-.si
-SOUND=MESG "*chime of a cash register*" "gong.wav" 50
-.ei
-.ed
-specifies that any message with "chime of a cash register" contained
-in it will trigger the playing of file \fBgong.wav\fP.  You can have multiple
-SOUND entries in your config file.
+The pattern should be a POSIX extended regular expression.
 .pg
 .hn 2
 Modifying NetHack Symbols 

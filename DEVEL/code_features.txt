@@ -1,4 +1,4 @@
-$NHDT-Date: 1426969026 2015/03/21 20:17:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.137 $
+$NHDT-Date: 1432473678 2015/05/24 13:21:18 $  $NHDT-Branch: master $:$NHDT-Revision: 1.2 $
 code_features.txt
 
 Developer-useful info about code features, assumptions, purpose,
@@ -76,6 +76,29 @@ separation of:
 - read-only stuff from read-write stuff.
 - sysadmin stuff from user-writeable stuff.
 etc.
+
+==============================================
+REGULAR EXPRESSIONS
+
+There are multiple regular expression libraries supported. Currently, one (and
+only one) of the following files should be linked into a built:
+  sys/share/cppregex.cpp
+  sys/share/posixregex.c
+  sys/share/pmatchregex.c
+
+This provides a way to access different system regular expression libraries,
+or fall back onto pmatch() if none is available. cppregex.cpp uses the regular
+expression library in the C++11 standard, and is the default on Windows.
+posixregex.c uses the POSIX regular expression library, and is the default on
+POSIX. pmatchregex.c is the fallback.
+
+Configuration files written using either of the two true regex engines are
+compatible with one another, as the regular expressions are both POSIX
+extended regular expressions. Configuration files written using the fallback
+engine are incompatible.
+
+Additional regular expression implementations can be written. The full
+interface documentation is in sys/share/posixregex.c
 
 =================== NEXT FEATURE ==========================
 

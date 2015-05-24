@@ -1143,6 +1143,7 @@ stop travel or run when you get hungry
 	class character to show inventory of items known to be blessed,&c
 debug-mode viewing of object weight
 prizes on various levels now protected by ?oSM scrolls as well as Elbereth
+regexes now use system libraries consistently for all pattern-matching systems
 
 
 Platform- and/or Interface-Specific New Features
