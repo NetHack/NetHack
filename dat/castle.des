@@ -137,7 +137,7 @@ OBJECT:$object[3],(53,11)
 OBJECT:$object[3],(54,11)
 OBJECT:$object[3],(55,11)
 # THE WAND OF WISHING in 1 of the 4 towers
-CONTAINER:('(',"chest"),$place[0] {
+CONTAINER:('(',"chest"),not_trapped,$place[0] {
 OBJECT:('/',"wishing")
 }
 # Prevent monsters from eating it.  (@'s never eat objects)

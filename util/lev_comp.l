@@ -209,7 +209,8 @@ quantity	ST_RET(QUANTITY_ID);
 buried		ST_RET(BURIED_ID);
 eroded		ST_RET(ERODED_ID);
 erodeproof	ST_RET(ERODEPROOF_ID);
-trapped		ST_RET(TRAPPED_ID);
+trapped     { savetoken(yytext); yylval.i=1; return TRAPPED_STATE; }
+not_trapped { savetoken(yytext); yylval.i=0; return TRAPPED_STATE; }
 recharged	ST_RET(RECHARGED_ID);
 invisible	ST_RET(INVIS_ID);
 greased		ST_RET(GREASED_ID);
