@@ -476,7 +476,7 @@ static NEARDATA const char *trap_engravings[TRAPNUM] = {
     (char *) 0,      (char *) 0,    (char *) 0,    (char *) 0,
     /* 14..16: trap door, teleport, level-teleport */
     "Vlad was here", "ad aerarium", "ad aerarium", (char *) 0, (char *) 0,
-    (char *) 0,      (char *) 0,    (char *) 0,    (char *) 0,
+    (char *) 0,      (char *) 0,    (char *) 0,    (char *) 0, (char *) 0,
 };
 
 STATIC_OVL void
@@ -1295,6 +1295,7 @@ coord *tm;
             /* reject "too hard" traps */
             switch (kind) {
             case MAGIC_PORTAL:
+            case VIBRATING_SQUARE:
                 kind = NO_TRAP;
                 break;
             case ROLLING_BOULDER_TRAP:

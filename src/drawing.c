@@ -204,14 +204,15 @@ const struct symdef defsyms[MAXPCHARS] = {
     { '^', "magic trap", C(HI_ZAP) },               /* trap */
     { '^', "anti-magic field", C(HI_ZAP) },         /* trap */
     { '^', "polymorph trap", C(CLR_BRIGHT_GREEN) }, /* trap */
+    { '^', "vibrating square", C(CLR_YELLOW) },     /* trap */
     { '|', "wall", C(CLR_GRAY) },                   /* vbeam */
     { '-', "wall", C(CLR_GRAY) },                   /* hbeam */
     { '\\', "wall", C(CLR_GRAY) },                  /* lslant */
     { '/', "wall", C(CLR_GRAY) },                   /* rslant */
     { '*', "", C(CLR_WHITE) },                      /* dig beam */
     { '!', "", C(CLR_WHITE) },                      /* camera flash beam */
-    /*70*/ { ')', "", C(HI_WOOD) },                 /* boomerang open left */
-    { '(', "", C(HI_WOOD) },                        /* boomerang open right */
+    { ')', "", C(HI_WOOD) },                        /* boomerang open left */
+    /*70*/ { '(', "", C(HI_WOOD) },                 /* boomerang open right */
     { '0', "", C(HI_ZAP) }, /* 4 magic shield symbols */
     { '#', "", C(HI_ZAP) },
     { '@', "", C(HI_ZAP) },
@@ -222,8 +223,8 @@ const struct symdef defsyms[MAXPCHARS] = {
       C(CLR_BRIGHT_GREEN) },           /* valid position for targeting */
     { '/', "", C(CLR_GREEN) },         /* swallow top left	*/
     { '-', "", C(CLR_GREEN) },         /* swallow top center	*/
-    /*80*/ { '\\', "", C(CLR_GREEN) }, /* swallow top right	*/
-    { '|', "", C(CLR_GREEN) },         /* swallow middle left	*/
+    { '\\', "", C(CLR_GREEN) },        /* swallow top right	*/
+    /*80*/ { '|', "", C(CLR_GREEN) },  /* swallow middle left	*/
     { '|', "", C(CLR_GREEN) },         /* swallow middle right	*/
     { '\\', "", C(CLR_GREEN) },        /* swallow bottom left	*/
     { '-', "", C(CLR_GREEN) },         /* swallow bottom center*/
@@ -232,8 +233,8 @@ const struct symdef defsyms[MAXPCHARS] = {
     { '-', "", C(CLR_ORANGE) },        /* explosion top center   */
     { '\\', "", C(CLR_ORANGE) },       /* explosion top right    */
     { '|', "", C(CLR_ORANGE) },        /* explosion middle left  */
-    /*90*/ { ' ', "", C(CLR_ORANGE) }, /* explosion middle center*/
-    { '|', "", C(CLR_ORANGE) },        /* explosion middle right */
+    { ' ', "", C(CLR_ORANGE) },        /* explosion middle center*/
+    /*90*/ { '|', "", C(CLR_ORANGE) }, /* explosion middle right */
     { '\\', "", C(CLR_ORANGE) },       /* explosion bottom left  */
     { '-', "", C(CLR_ORANGE) },        /* explosion bottom center*/
     { '/', "", C(CLR_ORANGE) },        /* explosion bottom right */

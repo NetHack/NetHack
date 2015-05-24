@@ -314,7 +314,7 @@ register int x, y, typ;
     register boolean oldplace;
 
     if ((ttmp = t_at(x, y)) != 0) {
-        if (ttmp->ttyp == MAGIC_PORTAL)
+        if (ttmp->ttyp == MAGIC_PORTAL || ttmp->ttyp == VIBRATING_SQUARE)
             return (struct trap *) 0;
         oldplace = TRUE;
         if (u.utrap && (x == u.ux) && (y == u.uy)
@@ -826,8 +826,8 @@ unsigned trflags;
                 defsyms[trap_to_defsym(ttype)].explanation);
             return;
         }
-        if (!Fumbling && ttype != MAGIC_PORTAL && ttype != ANTI_MAGIC
-            && !forcebungle && !plunged && !adj_pit
+        if (!Fumbling && ttype != MAGIC_PORTAL && ttype != VIBRATING_SQUARE
+            && ttype != ANTI_MAGIC && !forcebungle && !plunged && !adj_pit
             && (!rn2(5) || ((ttype == PIT || ttype == SPIKED_PIT)
                             && is_clinger(youmonst.data)))) {
             You("escape %s %s.", (ttype == ARROW_TRAP && !trap->madeby_u)
@@ -1425,6 +1425,11 @@ unsigned trflags;
     case MAGIC_PORTAL:
         feeltrap(trap);
         domagicportal(trap);
+        break;
+    case VIBRATING_SQUARE:
+        seetrap(trap);
+        /* messages handled elsewhere; the trap symbol is merely to mark the
+         * square for future reference */
         break;
 
     default:
@@ -2587,6 +2592,18 @@ register struct monst *mtmp;
                     deltrap(trap);
                     newsym(mtmp->mx, mtmp->my);
                 }
+            }
+            break;
+
+        case VIBRATING_SQUARE:
+            if (see_it && !Blind) {
+                if (in_sight)
+                    pline("You see a strange vibration beneath %s %s.",
+                          s_suffix(mon_nam(mtmp)),
+                          makeplural(mbodypart(mtmp, FOOT)));
+                else
+                    pline("You see the ground vibrate in the distance.");
+                seetrap(trap);
             }
             break;
 

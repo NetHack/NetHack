@@ -735,6 +735,7 @@ rndtrap()
         rtrap = rnd(TRAPNUM - 1);
         switch (rtrap) {
         case HOLE: /* no random holes on special levels */
+        case VIBRATING_SQUARE:
         case MAGIC_PORTAL:
             rtrap = NO_TRAP;
             break;

@@ -619,6 +619,9 @@ int x, y;
         if (ttmp->ttyp == MAGIC_PORTAL) {
             dotrap(ttmp, 0);
             return FALSE;
+        } else if (ttmp->ttyp == VIBRATING_SQUARE) {
+            pline("The ground vibrates as you pass it.");
+            dotrap(ttmp, 0); /* doesn't print messages */
         } else if (ttmp->ttyp == FIRE_TRAP) {
             dotrap(ttmp, 0);
         } else if ((ttmp->ttyp == PIT || ttmp->ttyp == SPIKED_PIT

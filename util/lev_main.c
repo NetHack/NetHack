@@ -173,6 +173,7 @@ static struct {
                    { "magic", MAGIC_TRAP },
                    { "anti magic", ANTI_MAGIC },
                    { "polymorph", POLY_TRAP },
+                   { "vibrating square", VIBRATING_SQUARE },
                    { 0, 0 } };
 
 static struct {
