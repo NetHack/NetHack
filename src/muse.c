@@ -646,7 +646,7 @@ struct monst *mtmp;
         }
         if (oseen && how)
             makeknown(how);
-        (void) rloc(mtmp, FALSE);
+        (void) rloc(mtmp, TRUE);
         return 2;
     case MUSE_WAN_TELEPORTATION:
         zap_oseen = oseen;
@@ -1238,7 +1238,7 @@ register struct obj *otmp;
                 if (cansee(mtmp->mx, mtmp->my))
                     pline("%s resists the magic!", Monnam(mtmp));
             } else if (!tele_restrict(mtmp))
-                (void) rloc(mtmp, FALSE);
+                (void) rloc(mtmp, TRUE);
         }
         break;
     case WAN_CANCELLATION:

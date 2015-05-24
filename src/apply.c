@@ -886,7 +886,7 @@ struct obj *obj;
         freeinv(obj);
         (void) mpickobj(mtmp, obj);
         if (!tele_restrict(mtmp))
-            (void) rloc(mtmp, FALSE);
+            (void) rloc(mtmp, TRUE);
     } else if (!is_unicorn(mtmp->data) && !humanoid(mtmp->data)
                && (!mtmp->minvis || perceives(mtmp->data)) && rn2(5)) {
         if (vis)

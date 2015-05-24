@@ -1655,7 +1655,7 @@ nopick:
     if (!Blind)
         pline1(buf);
     if (!tele_restrict(mon))
-        (void) rloc(mon, FALSE);
+        (void) rloc(mon, TRUE);
     return (ret);
 }
 

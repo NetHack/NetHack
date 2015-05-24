@@ -1068,7 +1068,7 @@ struct monst *mtmp;
         rloc_to(mtmp, c.x, c.y);
         return;
     }
-    (void) rloc(mtmp, FALSE);
+    (void) rloc(mtmp, TRUE);
 }
 
 boolean
@@ -1105,7 +1105,7 @@ int in_sight;
         if (trap->once)
             mvault_tele(mtmp);
         else
-            (void) rloc(mtmp, FALSE);
+            (void) rloc(mtmp, TRUE);
 
         if (in_sight) {
             if (canseemon(mtmp))
@@ -1333,12 +1333,12 @@ boolean give_feedback;
         if (give_feedback)
             You("are no longer inside %s!", mon_nam(mtmp));
         unstuck(mtmp);
-        (void) rloc(mtmp, FALSE);
+        (void) rloc(mtmp, TRUE);
     } else if (is_rider(mtmp->data) && rn2(13)
                && enexto(&cc, u.ux, u.uy, mtmp->data))
         rloc_to(mtmp, cc.x, cc.y);
     else
-        (void) rloc(mtmp, FALSE);
+        (void) rloc(mtmp, TRUE);
     return TRUE;
 }
 

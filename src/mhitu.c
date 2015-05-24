@@ -1265,7 +1265,7 @@ register struct attack *mattk;
                       : "makes some remarks about how difficult theft is "
                         "lately");
             if (!tele_restrict(mtmp))
-                (void) rloc(mtmp, FALSE);
+                (void) rloc(mtmp, TRUE);
             return 3;
         } else if (mtmp->mcan) {
             if (!Blind) {
@@ -1276,7 +1276,7 @@ register struct attack *mattk;
             }
             if (rn2(3)) {
                 if (!tele_restrict(mtmp))
-                    (void) rloc(mtmp, FALSE);
+                    (void) rloc(mtmp, TRUE);
                 return 3;
             }
             break;
@@ -1289,7 +1289,7 @@ register struct attack *mattk;
             break;
         default:
             if (!is_animal(mtmp->data) && !tele_restrict(mtmp))
-                (void) rloc(mtmp, FALSE);
+                (void) rloc(mtmp, TRUE);
             if (is_animal(mtmp->data) && *buf) {
                 if (canseemon(mtmp))
                     pline("%s tries to %s away with %s.", Monnam(mtmp),
@@ -1392,7 +1392,7 @@ register struct attack *mattk;
                 return 2;
             } else if (!rn2(33)) {
                 if (!tele_restrict(mtmp))
-                    (void) rloc(mtmp, FALSE);
+                    (void) rloc(mtmp, TRUE);
                 monflee(mtmp, d(3, 6), TRUE, FALSE);
                 return 3;
             }
@@ -2381,7 +2381,7 @@ register struct monst *mon;
         verbalize("You're such a %s; I wish...",
                   flags.female ? "sweet lady" : "nice guy");
         if (!tele_restrict(mon))
-            (void) rloc(mon, FALSE);
+            (void) rloc(mon, TRUE);
         return 1;
     }
     if (u.ualign.type == A_CHAOTIC)
@@ -2503,7 +2503,7 @@ register struct monst *mon;
     if (!rn2(25))
         mon->mcan = 1; /* monster is worn out */
     if (!tele_restrict(mon))
-        (void) rloc(mon, FALSE);
+        (void) rloc(mon, TRUE);
     return 1;
 }
 

@@ -1017,7 +1017,7 @@ register struct attack *mattk;
             if (vis)
                 Strcpy(mdef_Monnam, Monnam(mdef));
             mdef->mstrategy &= ~STRAT_WAITFORU;
-            (void) rloc(mdef, FALSE);
+            (void) rloc(mdef, TRUE);
             if (vis && !canspotmon(mdef) && mdef != u.usteed)
                 pline("%s suddenly disappears!", mdef_Monnam);
         }
@@ -1139,7 +1139,7 @@ register struct attack *mattk;
             pline("%s steals some gold from %s.", buf, mon_nam(mdef));
         }
         if (!tele_restrict(magr)) {
-            (void) rloc(magr, FALSE);
+            (void) rloc(magr, TRUE);
             if (vis && !canspotmon(magr))
                 pline("%s suddenly disappears!", buf);
         }
@@ -1202,7 +1202,7 @@ register struct attack *mattk;
                 return (MM_DEF_DIED
                         | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
             if (pa->mlet == S_NYMPH && !tele_restrict(magr)) {
-                (void) rloc(magr, FALSE);
+                (void) rloc(magr, TRUE);
                 if (vis && !canspotmon(magr))
                     pline("%s suddenly disappears!", buf);
             }

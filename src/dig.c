@@ -63,7 +63,7 @@ boolean waslit, rockit;
             return;                   /* don't cover the portal */
         if ((mtmp = m_at(x, y)) != 0) /* make sure crucial monsters survive */
             if (!passes_walls(mtmp->data))
-                (void) rloc(mtmp, FALSE);
+                (void) rloc(mtmp, TRUE);
     } else if (lev->typ == ROOM)
         return;
 

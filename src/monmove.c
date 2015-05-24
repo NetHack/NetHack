@@ -386,7 +386,7 @@ register struct monst *mtmp;
     /* some monsters teleport */
     if (mtmp->mflee && !rn2(40) && can_teleport(mdat) && !mtmp->iswiz
         && !level.flags.noteleport) {
-        (void) rloc(mtmp, FALSE);
+        (void) rloc(mtmp, TRUE);
         return (0);
     }
     if (mdat->msound == MS_SHRIEK && !um_dist(mtmp->mx, mtmp->my, 1))
@@ -439,7 +439,7 @@ register struct monst *mtmp;
             if (is_demon(youmonst.data)) {
                 /* "Good hunting, brother" */
                 if (!tele_restrict(mtmp))
-                    (void) rloc(mtmp, FALSE);
+                    (void) rloc(mtmp, TRUE);
             } else {
                 mtmp->minvis = mtmp->perminvis = 0;
                 /* Why?  For the same reason in real demon talk */
@@ -821,7 +821,7 @@ register int after;
     if (ptr == &mons[PM_TENGU] && !rn2(5) && !mtmp->mcan
         && !tele_restrict(mtmp)) {
         if (mtmp->mhp < 7 || mtmp->mpeaceful || rn2(2))
-            (void) rloc(mtmp, FALSE);
+            (void) rloc(mtmp, TRUE);
         else
             mnexto(mtmp);
         mmoved = 1;
@@ -1192,7 +1192,7 @@ not_special:
             worm_move(mtmp);
     } else {
         if (is_unicorn(ptr) && rn2(2) && !tele_restrict(mtmp)) {
-            (void) rloc(mtmp, FALSE);
+            (void) rloc(mtmp, TRUE);
             return (1);
         }
         if (mtmp->wormno)

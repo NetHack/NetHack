@@ -326,7 +326,7 @@ register struct monst *mtmp;
         if (In_W_tower(mtmp->mx, mtmp->my, &u.uz)
             || (mtmp->iswiz && !xupstair && !mon_has_amulet(mtmp))) {
             if (!rn2(3 + mtmp->mhp / 10))
-                (void) rloc(mtmp, FALSE);
+                (void) rloc(mtmp, TRUE);
         } else if (xupstair
                    && (mtmp->mx != xupstair || mtmp->my != yupstair)) {
             (void) mnearto(mtmp, xupstair, yupstair, TRUE);

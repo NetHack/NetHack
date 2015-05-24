@@ -614,7 +614,7 @@ register struct monst *grd;
             if (u_carry_gold) { /* player teleported */
                 m = grd->mx;
                 n = grd->my;
-                (void) rloc(grd, FALSE);
+                (void) rloc(grd, TRUE);
                 levl[m][n].typ = egrd->fakecorr[0].ftyp;
                 newsym(m, n);
                 grd->mpeaceful = 0;

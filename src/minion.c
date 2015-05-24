@@ -245,7 +245,7 @@ register struct monst *mtmp;
         pline("%s says, \"Good hunting, %s.\"", Amonnam(mtmp),
               flags.female ? "Sister" : "Brother");
         if (!tele_restrict(mtmp))
-            (void) rloc(mtmp, FALSE);
+            (void) rloc(mtmp, TRUE);
         return (1);
     }
     cash = money_cnt(invent);
