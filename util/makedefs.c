@@ -2423,7 +2423,7 @@ do_questtxt()
         SpinCursor(3);
 
         qt_line++;
-        if (!index(in_line, '\n')) {
+        if (!index(line, '\n')) {
             /* no newline; line is longer than QTEXT_IN_SIZ-1 */
             int c;
 
