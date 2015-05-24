@@ -1,4 +1,4 @@
-/* NetHack 3.6  makedefs.c  $NHDT-Date: 1432476576 2015/05/24 14:09:36 $  $NHDT-Branch: sean_on_the_road $:$NHDT-Revision: 1.95 $ */
+/* NetHack 3.6  makedefs.c  $NHDT-Date: 1431192769 2015/05/09 17:32:49 $  $NHDT-Branch: master $:$NHDT-Revision: 1.93 $ */
 /* NetHack 3.6  makedefs.c  $Date: 2012/01/15 09:27:03 $  $Revision: 1.50 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) M. Stephenson, 1990, 1991.			  */
