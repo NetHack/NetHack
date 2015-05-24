@@ -2289,7 +2289,7 @@ boolean move_other; /* make sure mtmp gets to x, y! so move m_at(x, y) */
     coord mm;
 
     if ((mtmp->mx == x) && (mtmp->my == y))
-        return (FALSE);
+        return FALSE;
 
     if (move_other && (othermon = m_at(x, y))) {
         if (othermon->wormno)
@@ -2307,7 +2307,7 @@ boolean move_other; /* make sure mtmp gets to x, y! so move m_at(x, y) */
          * no end of trouble.
          */
         if (!enexto(&mm, newx, newy, mtmp->data))
-            return (FALSE);
+            return FALSE;
         newx = mm.x;
         newy = mm.y;
     }
@@ -2315,13 +2315,19 @@ boolean move_other; /* make sure mtmp gets to x, y! so move m_at(x, y) */
     rloc_to(mtmp, newx, newy);
 
     if (move_other && othermon) {
+        xchar oldx = othermon->mx, oldy = othermon->my;
         othermon->mx = othermon->my = 0;
-        (void) mnearto(othermon, x, y, FALSE);
+        if (!mnearto(othermon, x, y, FALSE)) {
+            othermon->mx = oldx;
+            othermon->my = oldy;
+            return FALSE;
+        }
+
         if ((othermon->mx != x) || (othermon->my != y))
-            return (TRUE);
+            return TRUE;
     }
 
-    return (FALSE);
+    return FALSE;
 }
 
 /* monster responds to player action; not the same as a passive attack */
