@@ -818,7 +818,7 @@ register struct obj *obj;
            preference option to choose between the two alternatives)
            since it's somewhat odd so see "containing 1002 items"
            when there are 2 scrolls plus 1000 gold pieces */
-        long itemcount = count_contents(obj, FALSE, TRUE, TRUE);
+        long itemcount = count_contents(obj, FALSE, FALSE, TRUE);
 
         Sprintf(eos(bp), " containing %ld item%s", itemcount,
                 plur(itemcount));
