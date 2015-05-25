@@ -1,4 +1,4 @@
-/* NetHack 3.6  makedefs.c  $NHDT-Date: 1432512784 2015/05/25 00:13:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.96 $ */
+/* NetHack 3.6  makedefs.c  $NHDT-Date: 1432535188 2015/05/25 06:26:28 $  $NHDT-Branch: master $:$NHDT-Revision: 1.102 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) M. Stephenson, 1990, 1991.			  */
 /* Copyright (c) Dean Luick, 1990.				  */
@@ -881,13 +881,21 @@ unsigned long old_rumor_offset;
     }
 
     /* copy the rumors */
-    while ((line = fgetline(ifp))) {
+    while ((line = fgetline(ifp)) != 0) {
 #ifdef PAD_RUMORS_TO
-        int len = strlen(line);
-        if (len <= PAD_RUMORS_TO) { /* XXX enforce min len? */
+        /* rumor selection is accomplished by seeking to a random
+           position in the file, advancing to newline, and taking
+           the next line; therefore, rumors which follow long-line
+           rumors are most likely to be chosen and rumors which
+           follow short-line rumors are least likely to be chosen;
+           we ameliorate the latter by padding the shortest lines,
+           increasing the chance of the random seek landing in them */
+        int len = (int) strlen(line);
+        if (len <= PAD_RUMORS_TO) {
             char *base = index(line, '\n');
+            /* this is only safe because fgetline() overallocates */
             while (len++ < PAD_RUMORS_TO) {
-                *base++ = '_'; /* XXX */
+                *base++ = '_';
             }
             *base++ = '\n';
             *base = '\0';
@@ -941,7 +949,7 @@ const char *fname;
     grep0(ifp, tfp);
     ifp = getfp(DATA_TEMPLATE, "grep.tmp", RDTMODE);
 
-    while ((line = fgetline(ifp))) {
+    while ((line = fgetline(ifp)) != 0) {
         if (line[0] == '#')
             continue; /* discard comments */
         if (line[0] == '\n')
@@ -1024,7 +1032,7 @@ do_rumors()
         goto rumors_failure;
     }
     /* copy the rest of the temp file into the final output file */
-    while ((line = fgetline(tfp))) {
+    while ((line = fgetline(tfp)) != 0) {
         (void) fputs(line, ofp);
         free(line);
     }
@@ -1649,7 +1657,7 @@ do_data()
 
     entry_cnt = line_cnt = 0;
     /* read through the input file and split it into two sections */
-    while ((line = fgetline(ifp))) {
+    while ((line = fgetline(ifp)) != 0) {
         if (d_filter(line))
             continue;
         if (*line > ' ') { /* got an entry name */
@@ -1683,7 +1691,7 @@ do_data()
         goto dead_data;
     free(line);
     /* copy all lines of text from the scratch file into the output file */
-    while ((line = fgetline(tfp))) {
+    while ((line = fgetline(tfp)) != 0) {
         (void) fputs(line, ofp);
         free(line);
     }
@@ -1814,7 +1822,7 @@ do_oracles()
     Fprintf(ofp, "%05lx\n", offset); /* start pos of first oracle */
     in_oracle = FALSE;
 
-    while ((line = fgetline(ifp))) {
+    while ((line = fgetline(ifp)) != 0) {
         SpinCursor(3);
 
         if (h_filter(line))
@@ -1852,7 +1860,7 @@ do_oracles()
         goto dead_data;
     free(line);
     /* copy all lines of text from the scratch file into the output file */
-    while ((line = fgetline(tfp))) {
+    while ((line = fgetline(tfp)) != 0) {
         (void) fputs(line, ofp);
         free(line);
     }
@@ -1943,7 +1951,7 @@ do_dungeon()
     grep0(ifp, tfp);
     ifp = getfp(DATA_TEMPLATE, "grep.tmp", RDTMODE);
 
-    while ((line = fgetline(ifp))) {
+    while ((line = fgetline(ifp)) != 0) {
         SpinCursor(3);
 
         rcnt++;
@@ -2416,18 +2424,10 @@ do_questtxt()
     qt_line = 0;
     in_msg = FALSE;
 
-    while ((line = fgetline(ifp))) {
+    while ((line = fgetline(ifp)) != 0) {
         SpinCursor(3);
 
         qt_line++;
-        if (!index(line, '\n')) {
-            /* no newline; line is longer than QTEXT_IN_SIZ-1 */
-            int c;
-
-            Fprintf(stderr, QLINE_TOO_LONG, qt_line);
-            /* discard the rest of the current input line */
-            do { c = fgetc(ifp); } while (c != '\n' && c != EOF);
-        }
         if (qt_control(line))
             do_qt_control(line);
         else if (qt_comment(line))
@@ -2441,7 +2441,7 @@ do_questtxt()
     in_msg = FALSE;
     adjust_qt_hdrs();
     put_qt_hdrs();
-    while ((line = fgetline(ifp))) {
+    while ((line = fgetline(ifp)) != 0) {
         if (qt_control(line)) {
             char *summary_p = 0;
 
@@ -2617,25 +2617,23 @@ FILE *fd;
 {
     static const int inc = 256;
     int len = inc;
-    char *c = malloc(len-1), *ret;
+    char *c = malloc(len), *ret;
 
-    do {
+    for (;;) {
         ret = fgets(c + len - inc, inc, fd);
         if (!ret) {
             free(c);
             c = NULL;
             break;
-        }
-
-        if (strlen(c) == len - 1 && c[len - 2] != '\n') {
-            len += inc;
-            c = realloc(c, len);
-        } else
+        } else if (index(c, '\n')) {
+            /* normal case: we have a full line */
             break;
-    } while (1);
-
+        }
+        len += inc;
+        c = realloc(c, len);
+    }
     return c;
-};
+}
 
 static char *
 tmpdup(str)
