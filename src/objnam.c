@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1432469843 2015/05/24 12:17:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.132 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1432590848 2015/05/25 21:54:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.133 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2315,6 +2315,7 @@ struct alt_spellings {
     { "can opener", TIN_OPENER },
     { "kelp", KELP_FROND },
     { "eucalyptus", EUCALYPTUS_LEAF },
+    { "royal jelly", LUMP_OF_ROYAL_JELLY },
     { "hook", GRAPPLING_HOOK },
     { "grappling iron", GRAPPLING_HOOK },
     { "grapnel", GRAPPLING_HOOK },
