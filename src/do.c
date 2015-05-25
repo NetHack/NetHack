@@ -1253,6 +1253,7 @@ boolean at_stairs, falling, portal;
         (void) nhclose(fd);
         oinit(); /* reassign level dependent obj probabilities */
     }
+    reglyph_darkroom();
     /* do this prior to level-change pline messages */
     vision_reset();         /* clear old level's line-of-sight */
     vision_full_recalc = 0; /* don't let that reenable vision yet */

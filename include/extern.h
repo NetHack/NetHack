@@ -1607,6 +1607,7 @@ E char *FDECL(safe_qbuf, (char *, const char *, const char *, struct obj *,
 
 /* ### options.c ### */
 
+E void NDECL(reglyph_darkroom);
 E boolean FDECL(match_optname, (const char *, const char *, int, BOOLEAN_P));
 E void NDECL(initoptions);
 E void NDECL(initoptions_init);
