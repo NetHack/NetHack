@@ -3302,6 +3302,9 @@ boolean force;
     if (snuff_lit(obj))
         return ER_DAMAGED;
 
+    if (!ostr)
+        ostr = cxname(obj);
+
     if (obj->otyp == CAN_OF_GREASE && obj->spe > 0) {
         return ER_NOTHING;
     } else if (obj->greased) {
@@ -3312,6 +3315,9 @@ boolean force;
         return ER_GREASED;
     } else if (Is_container(obj) && !Is_box(obj)
                && (obj->otyp != OILSKIN_SACK || (obj->cursed && !rn2(3)))) {
+        if (carried(obj))
+            pline("Water gets into your %s!", ostr);
+
         water_damage_chain(obj->cobj, FALSE);
         return ER_NOTHING;
     } else if (!force && (Luck + 5) > rn2(20)) {
@@ -3326,6 +3332,9 @@ boolean force;
         if (obj->otyp == SCR_MAIL)
             return 0;
 #endif
+        if (carried(obj))
+            pline("Your %s %s.", ostr, vtense(ostr, "fade"));
+
         obj->otyp = SCR_BLANK_PAPER;
         obj->dknown = 0;
         obj->spe = 0;
@@ -3337,10 +3346,15 @@ boolean force;
             pline("Steam rises from %s.", the(xname(obj)));
             return 0;
         }
+
+        if (carried(obj))
+            pline("Your %s %s.", ostr, vtense(ostr, "fade"));
+
         if (obj->otyp == SPE_NOVEL) {
             obj->novelidx = 0;
             free_oname(obj);
         }
+
         obj->otyp = SPE_BLANK_PAPER;
         obj->dknown = 0;
         if (carried(obj))
@@ -3384,6 +3398,9 @@ boolean force;
                 update_inventory();
             return ER_DESTROYED;
         } else if (obj->odiluted) {
+            if (carried(obj))
+                pline("Your %s %s furthers.", ostr, vtense(ostr, "dilute"));
+
             obj->otyp = POT_WATER;
             obj->dknown = 0;
             obj->blessed = obj->cursed = 0;
@@ -3392,6 +3409,9 @@ boolean force;
                 update_inventory();
             return ER_DAMAGED;
         } else if (obj->otyp != POT_WATER) {
+            if (carried(obj))
+                pline("Your %s %s.", ostr, vtense(ostr, "dilute"));
+
             obj->odiluted++;
             if (carried(obj))
                 update_inventory();
