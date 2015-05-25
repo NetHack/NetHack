@@ -1,4 +1,4 @@
-/* NetHack 3.6	qtext.h	$NHDT-Date: 1432512777 2015/05/25 00:12:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
+/* NetHack 3.6	qtext.h	$NHDT-Date: 1432594167 2015/05/25 22:49:27 $  $NHDT-Branch: master $:$NHDT-Revision: 1.17 $ */
 /* Copyright (c) Mike Stephenson 1991.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -8,10 +8,6 @@
 #define N_HDR 16 /* Maximum number of categories */
 /* (i.e., num roles + 1) */
 #define LEN_HDR 3 /* Maximum length of a category name */
-
-/* quest text message buffer sizes; used to be hardcoded as 80 and 128, but
-   have been expanded to allow some slop for block message summary lines */
-#define QTEXT_OUTSIZ 200 /* used only by nethack */
 
 struct qtmsg {
     int msgnum;
@@ -50,14 +46,13 @@ struct qthdr {
 #define OUT_OF_MESSAGES                                                  \
     "Too many messages in class (line %d)\nAdjust N_MSG in qtext.h and " \
     "recompile.\n"
-#define QLINE_TOO_LONG "Line %d too long; truncated\n"
 
 #else /***** !MAKEDEFS *****/
 
 struct qtlists {
     struct qtmsg *common,
 #if 0 /* UNUSED but available */
-			*chrace,
+        *chrace,
 #endif
         *chrole;
 };

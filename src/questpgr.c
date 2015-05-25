@@ -1,4 +1,4 @@
-/* NetHack 3.6	questpgr.c	$NHDT-Date: 1432512768 2015/05/25 00:12:48 $  $NHDT-Branch: master $:$NHDT-Revision: 1.31 $ */
+/* NetHack 3.6	questpgr.c	$NHDT-Date: 1432593742 2015/05/25 22:42:22 $  $NHDT-Branch: master $:$NHDT-Revision: 1.32 $ */
 /*	Copyright 1991, M. Stephenson		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -18,6 +18,7 @@
 /* from sp_lev.c, for deliver_splev_message() */
 extern char *lev_message;
 
+static void NDECL(dump_qtlist);
 static void FDECL(Fread, (genericptr_t, int, int, dlb *));
 STATIC_DCL struct qtmsg *FDECL(construct_qtlist, (long));
 STATIC_DCL const char *NDECL(intermed);
@@ -27,18 +28,16 @@ STATIC_DCL const char *NDECL(homebase);
 STATIC_DCL void FDECL(qtext_pronoun, (CHAR_P, CHAR_P));
 STATIC_DCL struct qtmsg *FDECL(msg_in, (struct qtmsg *, int));
 STATIC_DCL void FDECL(convert_arg, (CHAR_P));
-STATIC_DCL void NDECL(convert_line);
+STATIC_DCL void FDECL(convert_line, (char *,char *));
 STATIC_DCL void FDECL(deliver_by_pline, (struct qtmsg *));
 STATIC_DCL void FDECL(deliver_by_window, (struct qtmsg *, int));
 STATIC_DCL boolean FDECL(skip_pager, (BOOLEAN_P));
 
-static char in_line[QTEXT_OUTSIZ], out_line[QTEXT_OUTSIZ], cvt_buf[64];
+static char cvt_buf[64];
 static struct qtlists qt_list;
 static dlb *msg_file;
 /* used by ldrname() and neminame(), then copied into cvt_buf */
 static char nambuf[sizeof cvt_buf];
-
-static void NDECL(dump_qtlist);
 
 static void
 dump_qtlist() /* dump the character msg list to check appearance */
@@ -126,8 +125,8 @@ load_qtlist()
         else if (!strncmp(urole.filecode, qt_classes[i], LEN_HDR))
             qt_list.chrole = construct_qtlist(qt_offsets[i]);
 #if 0 /* UNUSED but available */
-	    else if (!strncmp(urace.filecode, qt_classes[i], LEN_HDR))
-	    	qt_list.chrace = construct_qtlist(qt_offsets[i]);
+        else if (!strncmp(urace.filecode, qt_classes[i], LEN_HDR))
+            qt_list.chrace = construct_qtlist(qt_offsets[i]);
 #endif
     }
 
@@ -169,7 +168,8 @@ int typ;
     return 0;
 }
 
-const char *ldrname() /* return your role leader's name */
+const char *
+ldrname() /* return your role leader's name */
 {
     int i = urole.ldrnum;
 
@@ -178,7 +178,8 @@ const char *ldrname() /* return your role leader's name */
     return nambuf;
 }
 
-STATIC_OVL const char *intermed() /* return your intermediate target string */
+STATIC_OVL const char *
+intermed() /* return your intermediate target string */
 {
     return (urole.intermed);
 }
@@ -190,7 +191,8 @@ struct obj *otmp;
     return ((boolean)(otmp->oartifact == urole.questarti));
 }
 
-STATIC_OVL const char *neminame() /* return your role nemesis' name */
+STATIC_OVL const char *
+neminame() /* return your role nemesis' name */
 {
     int i = urole.neminum;
 
@@ -207,7 +209,8 @@ guardname() /* return your role leader's guard monster name */
     return (mons[i].mname);
 }
 
-STATIC_OVL const char *homebase() /* return your role leader's location */
+STATIC_OVL const char *
+homebase() /* return your role leader's location */
 {
     return (urole.homebase);
 }
@@ -231,21 +234,17 @@ char who,  /* 'd' => deity, 'l' => leader, 'n' => nemesis, 'o' => artifact */
      * and makesingular() understands how to handle "the foos of bar".
      */
     if (who == 'o' && strcmpi(cvt_buf, makesingular(cvt_buf))) {
-        pnoun =
-            (lwhich == 'h') ? "they" : (lwhich == 'i')
-                                           ? "them"
-                                           : (lwhich == 'j') ? "their" : "?";
+        pnoun = (lwhich == 'h') ? "they" 
+                : (lwhich == 'i') ? "them"
+                : (lwhich == 'j') ? "their" : "?";
     } else {
-        g = (who == 'd')
-                ? quest_status.godgend
-                : (who == 'l') ? quest_status.ldrgend
-                               : (who == 'n') ? quest_status.nemgend
-                                              : 2; /* default to neuter */
-        pnoun = (lwhich == 'h') ? genders[g].he : (lwhich == 'i')
-                                                      ? genders[g].him
-                                                      : (lwhich == 'j')
-                                                            ? genders[g].his
-                                                            : "?";
+        g = (who == 'd') ? quest_status.godgend
+            : (who == 'l') ? quest_status.ldrgend
+            : (who == 'n') ? quest_status.nemgend
+            : 2; /* default to neuter */
+        pnoun = (lwhich == 'h') ? genders[g].he
+                : (lwhich == 'i') ? genders[g].him
+                : (lwhich == 'j') ? genders[g].his : "?";
     }
     Strcpy(cvt_buf, pnoun);
     /* capitalize for H,I,J */
@@ -361,7 +360,8 @@ char c;
 }
 
 STATIC_OVL void
-convert_line()
+convert_line(in_line, out_line)
+char *in_line, *out_line;
 {
     char *c, *cc;
     char xbuf[BUFSZ];
@@ -445,7 +445,7 @@ convert_line()
             break;
         }
     }
-    if (cc >= out_line + sizeof out_line)
+    if (cc > &out_line[BUFSZ-1])
         panic("convert_line: overflow");
     *cc = 0;
     return;
@@ -456,11 +456,13 @@ deliver_by_pline(qt_msg)
 struct qtmsg *qt_msg;
 {
     long size;
+    char in_line[BUFSZ], out_line[BUFSZ];
 
+    *in_line = '\0';
     for (size = 0; size < qt_msg->size; size += (long) strlen(in_line)) {
-        (void) dlb_fgets(in_line, QTEXT_OUTSIZ, msg_file);
-        convert_line();
-        pline1(out_line);
+        (void) dlb_fgets(in_line, sizeof in_line, msg_file);
+        convert_line(in_line, out_line);
+        pline("%s", out_line);
     }
 }
 
@@ -470,6 +472,7 @@ struct qtmsg *qt_msg;
 int how;
 {
     long size;
+    char in_line[BUFSZ], out_line[BUFSZ];
     boolean qtdump = (how == NHW_MAP);
     winid datawin = create_nhwindow(qtdump ? NHW_TEXT : how);
 
@@ -486,8 +489,8 @@ int how;
     }
 #endif
     for (size = 0; size < qt_msg->size; size += (long) strlen(in_line)) {
-        (void) dlb_fgets(in_line, QTEXT_OUTSIZ, msg_file);
-        convert_line();
+        (void) dlb_fgets(in_line, sizeof in_line, msg_file);
+        convert_line(in_line, out_line);
         putstr(datawin, 0, out_line);
     }
     display_nhwindow(datawin, TRUE);
@@ -496,8 +499,8 @@ int how;
     /* block messages delivered by window aren't kept in message history
        but can have a one-line summary which is put there for ^P recall */
     if (qt_msg->summary_size) {
-        (void) dlb_fgets(in_line, QTEXT_OUTSIZ, msg_file);
-        convert_line();
+        (void) dlb_fgets(in_line, sizeof in_line, msg_file);
+        convert_line(in_line, out_line);
         putmsghistory(out_line, FALSE);
     }
 }
@@ -586,7 +589,7 @@ qt_montype()
 void
 deliver_splev_message()
 {
-    char *str, *nl;
+    char *str, *nl, in_line[BUFSZ], out_line[BUFSZ];
 
     /* there's no provision for delivering via window instead of pline */
     if (lev_message) {
@@ -596,11 +599,10 @@ deliver_splev_message()
             /* copying will stop at newline if one is present */
             copynchars(in_line, str, (int) (sizeof in_line) - 1);
 
-            /* convert_line() expects encrypted input;
-               it reads from in_line[] and writes to out_line[] */
+            /* convert_line() expects encrypted input */
             (void) xcrypt(in_line, in_line);
-            convert_line();
-            pline1(out_line);
+            convert_line(in_line, out_line);
+            pline("%s", out_line);
 
             if ((nl = index(str, '\n')) == 0)
                 break; /* done if no newline */
