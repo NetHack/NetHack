@@ -1242,7 +1242,26 @@ Z = (195, 195, 195)
   ......AAAAA.....
   ................
 }
-# tile 64 (wall)
+# tile 64 (vibrating square)
+{
+  ................
+  ................
+  ......H.H.......
+  ...H.H.H.H.H....
+  ....H.H.H.H.....
+  ...H.H.H.H.H....
+  ....H.H.H.H.....
+  ...H.H.H.H.H....
+  ...H.H.H.H.H....
+  ....H.H.H.H.....
+  ...H.H.H.H.H....
+  ....H.H.H.H.....
+  ...H.H.H.H.H....
+  ......H.H.......
+  ................
+  ................
+}
+# tile 65 (wall)
 {
   .......NN.......
   ......NN........
@@ -1261,7 +1280,7 @@ Z = (195, 195, 195)
   .........NN.....
   ........NN......
 }
-# tile 65 (wall)
+# tile 66 (wall)
 {
   ................
   ................
@@ -1280,27 +1299,27 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 66 (wall)
-{
-  NNNNN...........
-  ....N...........
-  ....N...........
-  ....N...........
-  ....N...........
-  ....N...........
-  ....N...........
-  ....N...........
-  ....NNNNNNNNN...
-  ............N...
-  ............N...
-  ............N...
-  ............N...
-  ............N...
-  ............N...
-  ............NNNN
-}
 # tile 67 (wall)
 {
+  NNNNN...........
+  ....N...........
+  ....N...........
+  ....N...........
+  ....N...........
+  ....N...........
+  ....N...........
+  ....N...........
+  ....NNNNNNNNN...
+  ............N...
+  ............N...
+  ............N...
+  ............N...
+  ............N...
+  ............N...
+  ............NNNN
+}
+# tile 68 (wall)
+{
   ............NNNN
   ............N...
   ............N...
@@ -1318,7 +1337,7 @@ Z = (195, 195, 195)
   ....N...........
   NNNNN...........
 }
-# tile 68 (cmap 68)
+# tile 69 (cmap 69)
 {
   ....AAAA........
   ..A....AA..AA...
@@ -1337,7 +1356,7 @@ Z = (195, 195, 195)
   ....AA....AAA...
   ................
 }
-# tile 69 (cmap 69)
+# tile 70 (cmap 70)
 {
   ................
   .....NNNNNN.....
@@ -1356,7 +1375,7 @@ Z = (195, 195, 195)
   .....NNNNNN.....
   ................
 }
-# tile 70 (cmap 70)
+# tile 71 (cmap 71)
 {
   ................
   ................
@@ -1375,7 +1394,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 71 (cmap 71)
+# tile 72 (cmap 72)
 {
   ................
   ................
@@ -1394,7 +1413,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 72 (cmap 72)
+# tile 73 (cmap 73)
 {
   ................
   .....I....I.....
@@ -1413,7 +1432,7 @@ Z = (195, 195, 195)
   .....I....I.....
   ................
 }
-# tile 73 (cmap 73)
+# tile 74 (cmap 74)
 {
   ................
   .CCCCCCCCCCCCCCC
@@ -1432,7 +1451,7 @@ Z = (195, 195, 195)
   .CCCCCCCCCCCCCC.
   ................
 }
-# tile 74 (cmap 74)
+# tile 75 (cmap 75)
 {
   .......HH.......
   .......HH.......
@@ -1451,7 +1470,7 @@ Z = (195, 195, 195)
   .......HH.......
   .......HH.......
 }
-# tile 75 (cmap 75)
+# tile 76 (cmap 76)
 {
   ................
   ......NNNNN.....
@@ -1470,7 +1489,7 @@ Z = (195, 195, 195)
   .....NNNNN......
   ................
 }
-# tile 76 (poison cloud)
+# tile 77 (poison cloud)
 {
   BBBBBBBBBBBBBBBB
   BBBBBFFFFFFFBBBB
@@ -1489,7 +1508,7 @@ Z = (195, 195, 195)
   BBBBBBGGGGBBBBBB
   BBBBBBBBBBBBBBBB
 }
-# tile 77 (valid position)
+# tile 78 (valid position)
 {
   ................
   ................
@@ -1508,7 +1527,7 @@ Z = (195, 195, 195)
   .......FF.......
   ................
 }
-# tile 78 (cmap 78)
+# tile 79 (cmap 79)
 {
   AAAAAAADDDDDDAAA
   AAAAADDDDDDDDDDD
@@ -1527,7 +1546,7 @@ Z = (195, 195, 195)
   AAAADDDDDD......
   AAAADDDDDD......
 }
-# tile 79 (cmap 79)
+# tile 80 (cmap 80)
 {
   AAAAAAAAAAAAAAAA
   DDAAAAAAAAAAAAAA
@@ -1546,7 +1565,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 80 (cmap 80)
+# tile 81 (cmap 81)
 {
   AAAAAAAAAAAAAAAA
   AAADDDDDAAAAAAAA
@@ -1565,7 +1584,7 @@ Z = (195, 195, 195)
   ....DDDDDDDDDDDD
   ....DDDDDDDDDDDA
 }
-# tile 81 (cmap 81)
+# tile 82 (cmap 82)
 {
   AAAADDDDDD......
   AAAADDDDDDD.....
@@ -1584,7 +1603,7 @@ Z = (195, 195, 195)
   DDDDDDD.........
   DDCCDDD.........
 }
-# tile 82 (cmap 82)
+# tile 83 (cmap 83)
 {
   ....DDDDDDDDDDDA
   ....DDDDDDDDDDDA
@@ -1603,7 +1622,7 @@ Z = (195, 195, 195)
   ......DDDDDDDDAA
   .......DDDDDDDAA
 }
-# tile 83 (cmap 83)
+# tile 84 (cmap 84)
 {
   DDDCDDD.........
   DDDCDDD.........
@@ -1622,7 +1641,7 @@ Z = (195, 195, 195)
   AAAAAAAAAAAADDDD
   AAAAAAAAAAAAAADD
 }
-# tile 84 (cmap 84)
+# tile 85 (cmap 85)
 {
   ................
   ................
@@ -1641,7 +1660,7 @@ Z = (195, 195, 195)
   DDDDDDDDDDDDDDDD
   DDDDDDDDDDDDDDAA
 }
-# tile 85 (cmap 85)
+# tile 86 (cmap 86)
 {
   ......DDDDDDDDAA
   ......DDDDDDDDDA
@@ -1660,7 +1679,7 @@ Z = (195, 195, 195)
   DDAAAAAAAAAAAAAA
   AAAAAAAAAAAAAAAA
 }
-# tile 86 (explosion dark 0)
+# tile 87 (explosion dark 0)
 {
   ................
   ................
@@ -1679,7 +1698,7 @@ Z = (195, 195, 195)
   ..AAAA..AAAA....
   ..AAA..AAAAA....
 }
-# tile 87 (explosion dark 1)
+# tile 88 (explosion dark 1)
 {
   ................
   ................
@@ -1698,7 +1717,7 @@ Z = (195, 195, 195)
   ........A.A.APAA
   .PA...APAAAAAAAA
 }
-# tile 88 (explosion dark 2)
+# tile 89 (explosion dark 2)
 {
   ................
   ................
@@ -1717,7 +1736,7 @@ Z = (195, 195, 195)
   AA.A..A.AAAA....
   A.AA..A.AAAAA...
 }
-# tile 89 (explosion dark 3)
+# tile 90 (explosion dark 3)
 {
   ..AAA.A.AAA.....
   ..AAA.AAAAA.AP..
@@ -1736,7 +1755,7 @@ Z = (195, 195, 195)
   ..A.A...AAP...PA
   ....A.........PA
 }
-# tile 90 (explosion dark 4)
+# tile 91 (explosion dark 4)
 {
   APAAA..PPAPAAAAA
   .APA..A.AAAPAAA.
@@ -1755,7 +1774,7 @@ Z = (195, 195, 195)
   AAAAAAAAAAAAA.AA
   AAAAAAAAAAA.HH..
 }
-# tile 91 (explosion dark 5)
+# tile 92 (explosion dark 5)
 {
   ..AAA.A.A.AAAA..
   ..AAAAA.A.AAAA..
@@ -1774,7 +1793,7 @@ Z = (195, 195, 195)
   AAA...AAAAAAA...
   ....PPAAAAAAAA..
 }
-# tile 92 (explosion dark 6)
+# tile 93 (explosion dark 6)
 {
   ....A.......A..P
   ....A.......AA..
@@ -1793,7 +1812,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 93 (explosion dark 7)
+# tile 94 (explosion dark 7)
 {
   PPPAAAAAPAAA.A..
   AAPPAAPPPPA.A...
@@ -1812,7 +1831,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 94 (explosion dark 8)
+# tile 95 (explosion dark 8)
 {
   ....P..AAAAAAA..
   ..A..A.AA.A.AA..
@@ -1831,7 +1850,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 95 (explosion noxious 0)
+# tile 96 (explosion noxious 0)
 {
   ................
   ................
@@ -1850,7 +1869,7 @@ Z = (195, 195, 195)
   ..FFFF..FFFF....
   ..FFF..FFFFF....
 }
-# tile 96 (explosion noxious 1)
+# tile 97 (explosion noxious 1)
 {
   ................
   ................
@@ -1869,7 +1888,7 @@ Z = (195, 195, 195)
   ........F.F.FGFF
   .GH...HGHHFFFFFF
 }
-# tile 97 (explosion noxious 2)
+# tile 98 (explosion noxious 2)
 {
   ................
   ................
@@ -1888,7 +1907,7 @@ Z = (195, 195, 195)
   FF.F..F.FFFF....
   F.FF..F.FFFFF...
 }
-# tile 98 (explosion noxious 3)
+# tile 99 (explosion noxious 3)
 {
   ..FFF.F.FFF.....
   ..FFF.FFFFF.FG..
@@ -1907,7 +1926,7 @@ Z = (195, 195, 195)
   ..F.F...FHG...GH
   ....F.........GH
 }
-# tile 99 (explosion noxious 4)
+# tile 100 (explosion noxious 4)
 {
   FGHFF..GGFGHFFFF
   .HGH..F.FFHGFHF.
@@ -1926,7 +1945,7 @@ Z = (195, 195, 195)
   HHHHNHNHN.GGG.GF
   GGGGNHHHGGG.HH..
 }
-# tile 100 (explosion noxious 5)
+# tile 101 (explosion noxious 5)
 {
   ..FFF.F.F.FFFF..
   ..FFFFF.F.FFFF..
@@ -1945,7 +1964,7 @@ Z = (195, 195, 195)
   HFH...FFFFFFF...
   ....GGFFFFFFFF..
 }
-# tile 101 (explosion noxious 6)
+# tile 102 (explosion noxious 6)
 {
   ....F.......H..G
   ....F.......FH..
@@ -1964,7 +1983,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 102 (explosion noxious 7)
+# tile 103 (explosion noxious 7)
 {
   GGGHHHHHGHHH.H..
   HHGGHHGGGGH.F...
@@ -1983,7 +2002,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 103 (explosion noxious 8)
+# tile 104 (explosion noxious 8)
 {
   ....G..FFFFFFF..
   ..F..F.FF.F.FF..
@@ -2002,7 +2021,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 104 (explosion muddy 0)
+# tile 105 (explosion muddy 0)
 {
   ................
   ................
@@ -2021,7 +2040,7 @@ Z = (195, 195, 195)
   ..JJJJKKJJJJKKKK
   ..JJJKKJJJJJKKKK
 }
-# tile 105 (explosion muddy 1)
+# tile 106 (explosion muddy 1)
 {
   ................
   ................
@@ -2040,7 +2059,7 @@ Z = (195, 195, 195)
   KKKKKKKKJKJKJCJJ
   KCLKKKLCLLJJJJJJ
 }
-# tile 106 (explosion muddy 2)
+# tile 107 (explosion muddy 2)
 {
   ................
   ................
@@ -2059,7 +2078,7 @@ Z = (195, 195, 195)
   JJKJKKJKJJJJ....
   JKJJKKJKJJJJJ...
 }
-# tile 107 (explosion muddy 3)
+# tile 108 (explosion muddy 3)
 {
   ..JJJKJKJJJKKKKK
   ..JJJKJJJJJKJCKK
@@ -2078,7 +2097,7 @@ Z = (195, 195, 195)
   ..J.JKKKJLCKKKCL
   ....JKKKKKKKKKCL
 }
-# tile 108 (explosion muddy 4)
+# tile 109 (explosion muddy 4)
 {
   JCLJJKKCCJCLJJJJ
   KLCLKKJKJJLCJLJK
@@ -2097,7 +2116,7 @@ Z = (195, 195, 195)
   LLLLCLCLCKCCCKCJ
   CCCCCLLLCCCKLLKK
 }
-# tile 109 (explosion muddy 5)
+# tile 110 (explosion muddy 5)
 {
   KKJJJKJKJKJJJJ..
   KKJJJJJKJKJJJJ..
@@ -2116,7 +2135,7 @@ Z = (195, 195, 195)
   LJLKKKJJJJJJJ...
   KKKKCCJJJJJJJJ..
 }
-# tile 110 (explosion muddy 6)
+# tile 111 (explosion muddy 6)
 {
   ....JKKKKKKKLKKC
   ....JKKKKKKKJLKK
@@ -2135,7 +2154,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 111 (explosion muddy 7)
+# tile 112 (explosion muddy 7)
 {
   CCCLLLLLCLLLKLKK
   LLCCLLCCCCLKJKKK
@@ -2154,7 +2173,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 112 (explosion muddy 8)
+# tile 113 (explosion muddy 8)
 {
   KKKKCKKJJJJJJJ..
   KKJKKJKJJKJKJJ..
@@ -2173,7 +2192,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 113 (explosion wet 0)
+# tile 114 (explosion wet 0)
 {
   ................
   ................
@@ -2192,7 +2211,7 @@ Z = (195, 195, 195)
   ..EEEEPPEEEEPPPP
   ..EEEPPEEEEEPPPP
 }
-# tile 114 (explosion wet 1)
+# tile 115 (explosion wet 1)
 {
   ................
   ................
@@ -2211,7 +2230,7 @@ Z = (195, 195, 195)
   PPPPPPPPEPEPEBEE
   PBNPPPNBEEEEEEEE
 }
-# tile 115 (explosion wet 2)
+# tile 116 (explosion wet 2)
 {
   ................
   ................
@@ -2230,7 +2249,7 @@ Z = (195, 195, 195)
   EEPEPPEPEEEE....
   EPEEPPEPEEEEE...
 }
-# tile 116 (explosion wet 3)
+# tile 117 (explosion wet 3)
 {
   ..EEEPEPEEEPPPPP
   ..EEEPEEEEEPEBPP
@@ -2249,7 +2268,7 @@ Z = (195, 195, 195)
   ..E.EPPPENBPPPBE
   ....EPPPPPPPPPBE
 }
-# tile 117 (explosion wet 4)
+# tile 118 (explosion wet 4)
 {
   EBNEEPPBBEBNEEEE
   PNBNPPEPEEEBENEP
@@ -2268,7 +2287,7 @@ Z = (195, 195, 195)
   EEEEEEEEEPBBBPBE
   BBBBEEEEBBBPNNPP
 }
-# tile 118 (explosion wet 5)
+# tile 119 (explosion wet 5)
 {
   PPEEEPEPEPEEEE..
   PPEEEEEPEPEEEE..
@@ -2287,7 +2306,7 @@ Z = (195, 195, 195)
   NENPPPEEEEEEE...
   PPPPBBEEEEEEEE..
 }
-# tile 119 (explosion wet 6)
+# tile 120 (explosion wet 6)
 {
   ....EPPPPPPPNPPB
   ....EPPPPPPPENPP
@@ -2306,7 +2325,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 120 (explosion wet 7)
+# tile 121 (explosion wet 7)
 {
   BBBEEEEEBEEEPEPP
   EEBBEEBBBBEPEPPP
@@ -2325,7 +2344,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 121 (explosion wet 8)
+# tile 122 (explosion wet 8)
 {
   PPPPBPPEEEEEEE..
   PPEPPEPEEPEPEE..
@@ -2344,7 +2363,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 122 (explosion magical 0)
+# tile 123 (explosion magical 0)
 {
   ................
   ................
@@ -2363,7 +2382,7 @@ Z = (195, 195, 195)
   ..EEEEIIEEEEIIII
   ..EEEIIEEEEEIIII
 }
-# tile 123 (explosion magical 1)
+# tile 124 (explosion magical 1)
 {
   ................
   ................
@@ -2382,7 +2401,7 @@ Z = (195, 195, 195)
   IIIIIIIIEIEIELEE
   ILHIIIHLHHEEEEEE
 }
-# tile 124 (explosion magical 2)
+# tile 125 (explosion magical 2)
 {
   ................
   ................
@@ -2401,7 +2420,7 @@ Z = (195, 195, 195)
   EEIEIIEIEEEE....
   EIEEIIEIEEEEE...
 }
-# tile 125 (explosion magical 3)
+# tile 126 (explosion magical 3)
 {
   ..EEEIEIEEEIIIII
   ..EEEIEEEEEIEIII
@@ -2420,7 +2439,7 @@ Z = (195, 195, 195)
   ..E.EIIIENIIIIIN
   ....EIIIIIIIIIIN
 }
-# tile 126 (explosion magical 4)
+# tile 127 (explosion magical 4)
 {
   EINEEIIIIEINEEEE
   ININIIEIEENIENEI
@@ -2439,7 +2458,7 @@ Z = (195, 195, 195)
   NNNNNNNNNIIIIIIE
   IIIINNNNIIIINNII
 }
-# tile 127 (explosion magical 5)
+# tile 128 (explosion magical 5)
 {
   IIEEEIEIEIEEEE..
   IIEEEEEIEIEEEE..
@@ -2458,7 +2477,7 @@ Z = (195, 195, 195)
   NENIIIEEEEEEE...
   IIIIIIEEEEEEEE..
 }
-# tile 128 (explosion magical 6)
+# tile 129 (explosion magical 6)
 {
   ....EIIIIIIIHIII
   ....EIIIIIIIEHII
@@ -2477,7 +2496,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 129 (explosion magical 7)
+# tile 130 (explosion magical 7)
 {
   IIINNNNNINNNINII
   NNIINNIIIINIEIII
@@ -2496,7 +2515,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 130 (explosion magical 8)
+# tile 131 (explosion magical 8)
 {
   IIIIIIIEEEEEEE..
   IIEIIEIEEIEIEE..
@@ -2515,7 +2534,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 131 (explosion fiery 0)
+# tile 132 (explosion fiery 0)
 {
   ................
   ................
@@ -2534,7 +2553,7 @@ Z = (195, 195, 195)
   ..DDDDCCDDDDCCCC
   ..DDDCCDDDDDCCCC
 }
-# tile 132 (explosion fiery 1)
+# tile 133 (explosion fiery 1)
 {
   ................
   ................
@@ -2553,7 +2572,7 @@ Z = (195, 195, 195)
   CCCCCCCCDCDCDLDD
   CLHCCCHLHHDDDDDD
 }
-# tile 133 (explosion fiery 2)
+# tile 134 (explosion fiery 2)
 {
   ................
   ................
@@ -2572,7 +2591,7 @@ Z = (195, 195, 195)
   DDCDCCDCDDDD....
   DCDDCCDCDDDDD...
 }
-# tile 134 (explosion fiery 3)
+# tile 135 (explosion fiery 3)
 {
   ..DDDCDCDDDCCCCC
   ..DDDCDDDDDCDLCC
@@ -2591,7 +2610,7 @@ Z = (195, 195, 195)
   ..D.DCCCDHLCCCLH
   ....DCCCCCCCCCLH
 }
-# tile 135 (explosion fiery 4)
+# tile 136 (explosion fiery 4)
 {
   DLHDDCCLLDLHDDDD
   CHLHCCDCDDHLDHDC
@@ -2610,7 +2629,7 @@ Z = (195, 195, 195)
   HHHHNHNHNCLLLCLD
   LLLLNHHHLLLCHHCC
 }
-# tile 136 (explosion fiery 5)
+# tile 137 (explosion fiery 5)
 {
   CCDDDCDCDCDDDD..
   CCDDDDDCDCDDDD..
@@ -2629,7 +2648,7 @@ Z = (195, 195, 195)
   HDHCCCDDDDDDD...
   CCCCLLDDDDDDDD..
 }
-# tile 137 (explosion fiery 6)
+# tile 138 (explosion fiery 6)
 {
   ....DCCCCCCCHCCL
   ....DCCCCCCCDHCC
@@ -2648,7 +2667,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 138 (explosion fiery 7)
+# tile 139 (explosion fiery 7)
 {
   LLLHHHHHLHHHCHCC
   HHLLHHLLLLHCDCCC
@@ -2667,7 +2686,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 139 (explosion fiery 8)
+# tile 140 (explosion fiery 8)
 {
   CCCCLCCDDDDDDD..
   CCDCCDCDDCDCDD..
@@ -2686,7 +2705,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 140 (explosion frosty 0)
+# tile 141 (explosion frosty 0)
 {
   ................
   ................
@@ -2705,7 +2724,7 @@ Z = (195, 195, 195)
   ..EEEEPPNBEEPPPP
   ..EEEPPEEEEEPPPP
 }
-# tile 141 (explosion frosty 1)
+# tile 142 (explosion frosty 1)
 {
   ................
   ................
@@ -2724,7 +2743,7 @@ Z = (195, 195, 195)
   PPPPPPPPEPEPEBEE
   PBNPPPNBNNEEEEEE
 }
-# tile 142 (explosion frosty 2)
+# tile 143 (explosion frosty 2)
 {
   ................
   ................
@@ -2743,7 +2762,7 @@ Z = (195, 195, 195)
   EEPEPPEPEEEE....
   EPEEPPEPEEEEE...
 }
-# tile 143 (explosion frosty 3)
+# tile 144 (explosion frosty 3)
 {
   ..EEEPEPEEEPPPPP
   ..EEEPEEEEEPEBPP
@@ -2762,7 +2781,7 @@ Z = (195, 195, 195)
   ..E.EPPPENBPPPBN
   ....EPPPPPPPPPBN
 }
-# tile 144 (explosion frosty 4)
+# tile 145 (explosion frosty 4)
 {
   EBNEEPPBBEBNEEEE
   PNBNPPEPEENBENEP
@@ -2781,7 +2800,7 @@ Z = (195, 195, 195)
   NNNNNNNNNPBBBPBE
   BBBBNNNNBBBPNNPP
 }
-# tile 145 (explosion frosty 5)
+# tile 146 (explosion frosty 5)
 {
   PPEEEPEPEPEEEE..
   PPEEEEEPEPEEEE..
@@ -2800,7 +2819,7 @@ Z = (195, 195, 195)
   NENPPPEEEEEEE...
   PPPPBBEEEEEEEE..
 }
-# tile 146 (explosion frosty 6)
+# tile 147 (explosion frosty 6)
 {
   ....EPPPPPPPNPPB
   ....EPPPPPPPENPP
@@ -2819,7 +2838,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 147 (explosion frosty 7)
+# tile 148 (explosion frosty 7)
 {
   BBBNNNNNBNNNPNPP
   NNBBNNBBBBNPEPPP
@@ -2838,7 +2857,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 148 (explosion frosty 8)
+# tile 149 (explosion frosty 8)
 {
   PPPPBPPEEEEEEE..
   PPEPPEPEEPEPEE..
@@ -2857,7 +2876,7 @@ Z = (195, 195, 195)
   ...........N....
   ................
 }
-# tile 149 (zap 0 0)
+# tile 150 (zap 0 0)
 {
   .......II.......
   ......IIII......
@@ -2876,7 +2895,7 @@ Z = (195, 195, 195)
   ......IIII......
   .......II.......
 }
-# tile 150 (zap 0 1)
+# tile 151 (zap 0 1)
 {
   ................
   ................
@@ -2895,7 +2914,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 151 (zap 0 2)
+# tile 152 (zap 0 2)
 {
   III.............
   IIII............
@@ -2914,7 +2933,7 @@ Z = (195, 195, 195)
   ............IIII
   .............III
 }
-# tile 152 (zap 0 3)
+# tile 153 (zap 0 3)
 {
   .............III
   ............IIII
@@ -2933,7 +2952,7 @@ Z = (195, 195, 195)
   IIII............
   III.............
 }
-# tile 153 (zap 1 0)
+# tile 154 (zap 1 0)
 {
   .......CC.......
   ......CCCC......
@@ -2952,7 +2971,7 @@ Z = (195, 195, 195)
   ......CCCC......
   .......CC.......
 }
-# tile 154 (zap 1 1)
+# tile 155 (zap 1 1)
 {
   ................
   ................
@@ -2971,7 +2990,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 155 (zap 1 2)
+# tile 156 (zap 1 2)
 {
   CCC.............
   CCCC............
@@ -2990,7 +3009,7 @@ Z = (195, 195, 195)
   ............CCCC
   .............CCC
 }
-# tile 156 (zap 1 3)
+# tile 157 (zap 1 3)
 {
   .............CCC
   ............CCCC
@@ -3009,7 +3028,7 @@ Z = (195, 195, 195)
   CCCC............
   CCC.............
 }
-# tile 157 (zap 2 0)
+# tile 158 (zap 2 0)
 {
   .......NN.......
   ......NNNN......
@@ -3028,7 +3047,7 @@ Z = (195, 195, 195)
   ......NNNN......
   .......NN.......
 }
-# tile 158 (zap 2 1)
+# tile 159 (zap 2 1)
 {
   ................
   ................
@@ -3047,7 +3066,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 159 (zap 2 2)
+# tile 160 (zap 2 2)
 {
   NNN.............
   NNNN............
@@ -3066,7 +3085,7 @@ Z = (195, 195, 195)
   ............NNNN
   .............NNN
 }
-# tile 160 (zap 2 3)
+# tile 161 (zap 2 3)
 {
   .............NNN
   ............NNNN
@@ -3085,7 +3104,7 @@ Z = (195, 195, 195)
   NNNN............
   NNN.............
 }
-# tile 161 (zap 3 0)
+# tile 162 (zap 3 0)
 {
   .......BB.......
   ......BBBB......
@@ -3104,7 +3123,7 @@ Z = (195, 195, 195)
   ......BBBB......
   .......BB.......
 }
-# tile 162 (zap 3 1)
+# tile 163 (zap 3 1)
 {
   ................
   ................
@@ -3123,7 +3142,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 163 (zap 3 2)
+# tile 164 (zap 3 2)
 {
   BBB.............
   BBBB............
@@ -3142,7 +3161,7 @@ Z = (195, 195, 195)
   ............BBBB
   .............BBB
 }
-# tile 164 (zap 3 3)
+# tile 165 (zap 3 3)
 {
   .............BBB
   ............BBBB
@@ -3161,7 +3180,7 @@ Z = (195, 195, 195)
   BBBB............
   BBB.............
 }
-# tile 165 (zap 4 0)
+# tile 166 (zap 4 0)
 {
   .......AA.......
   ......AAAA......
@@ -3180,7 +3199,7 @@ Z = (195, 195, 195)
   ......AAAA......
   .......AA.......
 }
-# tile 166 (zap 4 1)
+# tile 167 (zap 4 1)
 {
   ................
   ................
@@ -3199,7 +3218,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 167 (zap 4 2)
+# tile 168 (zap 4 2)
 {
   AAA.............
   AAAA............
@@ -3218,7 +3237,7 @@ Z = (195, 195, 195)
   ............AAAA
   .............AAA
 }
-# tile 168 (zap 4 3)
+# tile 169 (zap 4 3)
 {
   .............AAA
   ............AAAA
@@ -3237,7 +3256,7 @@ Z = (195, 195, 195)
   AAAA............
   AAA.............
 }
-# tile 169 (zap 5 0)
+# tile 170 (zap 5 0)
 {
   .......NN.......
   ......NNNN......
@@ -3256,7 +3275,7 @@ Z = (195, 195, 195)
   ......NNNN......
   .......NN.......
 }
-# tile 170 (zap 5 1)
+# tile 171 (zap 5 1)
 {
   ................
   ................
@@ -3275,7 +3294,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 171 (zap 5 2)
+# tile 172 (zap 5 2)
 {
   NNN.............
   NNNN............
@@ -3294,7 +3313,7 @@ Z = (195, 195, 195)
   ............NNNN
   .............NNN
 }
-# tile 172 (zap 5 3)
+# tile 173 (zap 5 3)
 {
   .............NNN
   ............NNNN
@@ -3313,7 +3332,7 @@ Z = (195, 195, 195)
   NNNN............
   NNN.............
 }
-# tile 173 (zap 6 0)
+# tile 174 (zap 6 0)
 {
   .......FF.......
   ......FFFF......
@@ -3332,7 +3351,7 @@ Z = (195, 195, 195)
   ......FFFF......
   .......FF.......
 }
-# tile 174 (zap 6 1)
+# tile 175 (zap 6 1)
 {
   ................
   ................
@@ -3351,7 +3370,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 175 (zap 6 2)
+# tile 176 (zap 6 2)
 {
   FFF.............
   FFFF............
@@ -3370,7 +3389,7 @@ Z = (195, 195, 195)
   ............FFFF
   .............FFF
 }
-# tile 176 (zap 6 3)
+# tile 177 (zap 6 3)
 {
   .............FFF
   ............FFFF
@@ -3389,7 +3408,7 @@ Z = (195, 195, 195)
   FFFF............
   FFF.............
 }
-# tile 177 (zap 7 0)
+# tile 178 (zap 7 0)
 {
   .......GG.......
   ......GGGG......
@@ -3408,7 +3427,7 @@ Z = (195, 195, 195)
   ......GGGG......
   .......GG.......
 }
-# tile 178 (zap 7 1)
+# tile 179 (zap 7 1)
 {
   ................
   ................
@@ -3427,7 +3446,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 179 (zap 7 2)
+# tile 180 (zap 7 2)
 {
   GGG.............
   GGGG............
@@ -3446,7 +3465,7 @@ Z = (195, 195, 195)
   ............GGGG
   .............GGG
 }
-# tile 180 (zap 7 3)
+# tile 181 (zap 7 3)
 {
   .............GGG
   ............GGGG
@@ -3465,7 +3484,7 @@ Z = (195, 195, 195)
   GGGG............
   GGG.............
 }
-# tile 181 (warning 0)
+# tile 182 (warning 0)
 {
   ................
   ................
@@ -3484,7 +3503,7 @@ Z = (195, 195, 195)
   .......AA.......
   ................
 }
-# tile 182 (warning 1)
+# tile 183 (warning 1)
 {
   ................
   ................
@@ -3503,7 +3522,7 @@ Z = (195, 195, 195)
   .......AA.......
   ................
 }
-# tile 183 (warning 2)
+# tile 184 (warning 2)
 {
   ................
   ................
@@ -3522,7 +3541,7 @@ Z = (195, 195, 195)
   .......AA.......
   ................
 }
-# tile 184 (warning 3)
+# tile 185 (warning 3)
 {
   ................
   ................
@@ -3541,7 +3560,7 @@ Z = (195, 195, 195)
   .......AA.......
   ................
 }
-# tile 185 (warning 4)
+# tile 186 (warning 4)
 {
   ................
   ................
@@ -3560,7 +3579,7 @@ Z = (195, 195, 195)
   .......AA.......
   ................
 }
-# tile 186 (warning 5)
+# tile 187 (warning 5)
 {
   ................
   ................
@@ -3579,7 +3598,7 @@ Z = (195, 195, 195)
   .......AA.......
   ................
 }
-# tile 187 (sub mine walls 0)
+# tile 188 (sub mine walls 0)
 {
   AJJKKKACJAAJJJAA
   AJKKKACLJJAJJJJA
@@ -3598,7 +3617,7 @@ Z = (195, 195, 195)
   AAJACKCKKJJJAJAA
   AAJCKKJAAAJJJJJA
 }
-# tile 188 (sub mine walls 1)
+# tile 189 (sub mine walls 1)
 {
   AJAAAAAAJJAAAJAA
   JJJAAAJJJJJAAAAJ
@@ -3617,7 +3636,7 @@ Z = (195, 195, 195)
   JJJJJJJJJJJJJJJJ
   AAAAAAAAAAAAAAAA
 }
-# tile 189 (sub mine walls 2)
+# tile 190 (sub mine walls 2)
 {
   AAAAAAKCCKKJAAAA
   AAAAKKCLCJKJJAAA
@@ -3636,7 +3655,7 @@ Z = (195, 195, 195)
   AAJACKCKKJJJAJAA
   AAJCKKJAAAJJJJJA
 }
-# tile 190 (sub mine walls 3)
+# tile 191 (sub mine walls 3)
 {
   AAAAAAKCCKKJAAAA
   AAAAKKCLCJKJJAAA
@@ -3655,7 +3674,7 @@ Z = (195, 195, 195)
   AAJACKCKKJJJAJAA
   AAJCKKJAAAJJJJJA
 }
-# tile 191 (sub mine walls 4)
+# tile 192 (sub mine walls 4)
 {
   AKKKAAKKKKAAJJJA
   AKKAAKCCCJJJAAJA
@@ -3674,7 +3693,7 @@ Z = (195, 195, 195)
   AJJJJJJJJJJJJJJJ
   AAAAAAAAAAAAAAAA
 }
-# tile 192 (sub mine walls 5)
+# tile 193 (sub mine walls 5)
 {
   AKKAAAKKAAAAJJJA
   AKAAKKLCKAAAAAJA
@@ -3693,7 +3712,7 @@ Z = (195, 195, 195)
   JJJJJJJJJJJJJJJA
   AAAAAAAAAAAAAAAA
 }
-# tile 193 (sub mine walls 6)
+# tile 194 (sub mine walls 6)
 {
   AAAAAAKCCKKJAAAA
   AAAAKCCLCJKJJAAA
@@ -3712,7 +3731,7 @@ Z = (195, 195, 195)
   AAJACKCKKJJJAJAA
   AAJCKKJAAAJJJJJA
 }
-# tile 194 (sub mine walls 7)
+# tile 195 (sub mine walls 7)
 {
   AKKAAAKKKKAAJJJA
   AKAAKKLCCJJJAAJA
@@ -3731,7 +3750,7 @@ Z = (195, 195, 195)
   JJJJJJJJJJJJJJJJ
   AAAAAAAAAAAAAAAA
 }
-# tile 195 (sub mine walls 8)
+# tile 196 (sub mine walls 8)
 {
   AAAAAAKCCKKJAAAA
   AAAAKCCLCJKJJAAA
@@ -3750,7 +3769,7 @@ Z = (195, 195, 195)
   AAJACKCKKJJJAJAA
   AAJCKKJAAAJJJJJA
 }
-# tile 196 (sub mine walls 9)
+# tile 197 (sub mine walls 9)
 {
   AKKAACKCCKKJAJJA
   AKACKKKLLJKJJAJA
@@ -3769,7 +3788,7 @@ Z = (195, 195, 195)
   AAJACKCKKJJJAJAA
   AAJCKKJAAAJJJJJA
 }
-# tile 197 (sub mine walls 10)
+# tile 198 (sub mine walls 10)
 {
   AKKAACKCCKKJAJJA
   AKACKKCLCJKJJAJA
@@ -3788,7 +3807,7 @@ Z = (195, 195, 195)
   AAJACKCKKJJJAJAA
   AAJCKKJAAAJJJJJA
 }
-# tile 198 (sub gehennom walls 0)
+# tile 199 (sub gehennom walls 0)
 {
   ALLDAJ.....JLLDA
   ADDDAJ.J..JJDDDA
@@ -3807,7 +3826,7 @@ Z = (195, 195, 195)
   AJJJAJJ....JJJJA
   AD..AJJ....JD.JA
 }
-# tile 199 (sub gehennom walls 1)
+# tile 200 (sub gehennom walls 1)
 {
   AAALDDAAAAALDDAA
   DDDLDDAJDDDLDDAJ
@@ -3826,7 +3845,7 @@ Z = (195, 195, 195)
   JJJJJJJJJJJJJJJJ
   AAAAAAAAAAAAAAAA
 }
-# tile 200 (sub gehennom walls 2)
+# tile 201 (sub gehennom walls 2)
 {
   AAALLLLDDDDDDAAA
   LLLLAAJJ....DJJJ
@@ -3845,7 +3864,7 @@ Z = (195, 195, 195)
   AJJJAJJ....JJJJA
   AD..AJJ....JD.JA
 }
-# tile 201 (sub gehennom walls 3)
+# tile 202 (sub gehennom walls 3)
 {
   AAALLLLDDDDDDAAA
   LLLLAAJJ....DJJJ
@@ -3864,7 +3883,7 @@ Z = (195, 195, 195)
   AJJJAJJ....JJJJA
   AD..AJJ....JD.JA
 }
-# tile 202 (sub gehennom walls 4)
+# tile 203 (sub gehennom walls 4)
 {
   AAALLLLDDDDDDAAA
   LLLLAAJJ....DJJJ
@@ -3883,7 +3902,7 @@ Z = (195, 195, 195)
   JJJJJJJJJJJJJJJJ
   AAAAAAAAAAAAAAAA
 }
-# tile 203 (sub gehennom walls 5)
+# tile 204 (sub gehennom walls 5)
 {
   AAALLLLDDDDDDAAA
   LLLLAAJJ....DJJJ
@@ -3902,7 +3921,7 @@ Z = (195, 195, 195)
   JJJJJJJJJJJJJJJJ
   AAAAAAAAAAAAAAAA
 }
-# tile 204 (sub gehennom walls 6)
+# tile 205 (sub gehennom walls 6)
 {
   AAALLLLDDDDDDAAA
   LLLLAAJJ....DJJJ
@@ -3921,7 +3940,7 @@ Z = (195, 195, 195)
   AJJJAJJ....JJJJA
   AD..AJJ....JD.JA
 }
-# tile 205 (sub gehennom walls 7)
+# tile 206 (sub gehennom walls 7)
 {
   AAALLLLDDDDDDAAA
   LLLLAAJJ....DJJJ
@@ -3940,7 +3959,7 @@ Z = (195, 195, 195)
   JJJJJJJJJJJJJJJJ
   AAAAAAAAAAAAAAAA
 }
-# tile 206 (sub gehennom walls 8)
+# tile 207 (sub gehennom walls 8)
 {
   AAALLLLDDDDDDAAA
   LLLLAAJJ....DJJJ
@@ -3959,7 +3978,7 @@ Z = (195, 195, 195)
   AJJJAJJ....JJJJA
   AD..AJJ....JD.JA
 }
-# tile 207 (sub gehennom walls 9)
+# tile 208 (sub gehennom walls 9)
 {
   AAALLLLDDDDDDAAA
   LLLLAAJJ....DJJJ
@@ -3978,7 +3997,7 @@ Z = (195, 195, 195)
   AJJJAJJ....JJJJA
   AD..AJJ....JD.JA
 }
-# tile 208 (sub gehennom walls 10)
+# tile 209 (sub gehennom walls 10)
 {
   AAALLLLDDDDDDAAA
   LLLLAAJJ....DJJJ
@@ -3997,7 +4016,7 @@ Z = (195, 195, 195)
   AJJJAJJ....JJJJA
   AD..AJJ....JD.JA
 }
-# tile 209 (sub knox walls 0)
+# tile 210 (sub knox walls 0)
 {
   AJJJAAACJAAAJJJA
   AJJJAACLJJAAJJJA
@@ -4016,7 +4035,7 @@ Z = (195, 195, 195)
   AAJAAACKKJAAAJAA
   ACJJAAAAAAAACJJA
 }
-# tile 210 (sub knox walls 1)
+# tile 211 (sub knox walls 1)
 {
   AJAAAJAAAJAAAJAA
   JJJAAAJAJJJAAAJA
@@ -4035,7 +4054,7 @@ Z = (195, 195, 195)
   KJJACJJAKJJACJJA
   AAAAAAAAAAAAAAAA
 }
-# tile 211 (sub knox walls 2)
+# tile 212 (sub knox walls 2)
 {
   AAAAAAKCJKAAAAAA
   AAAAKKCLKJKKAAAA
@@ -4054,7 +4073,7 @@ Z = (195, 195, 195)
   AAJAAACKKJAAAJAA
   ACJJAAAAAAAACJJA
 }
-# tile 212 (sub knox walls 3)
+# tile 213 (sub knox walls 3)
 {
   AAAAAAKCJKAAAAAA
   AAAAKKCLKJKKAAAA
@@ -4073,7 +4092,7 @@ Z = (195, 195, 195)
   AAJAAACKKJAAAJAA
   ACJJAAAAAAAACJJA
 }
-# tile 213 (sub knox walls 4)
+# tile 214 (sub knox walls 4)
 {
   AAAAAAKCJKAAAAAA
   AAAAKKCLKJKKAAAA
@@ -4092,7 +4111,7 @@ Z = (195, 195, 195)
   KJJACJJAKJJACJJA
   AAAAAAAAAAAAAAAA
 }
-# tile 214 (sub knox walls 5)
+# tile 215 (sub knox walls 5)
 {
   AAAAAAKCJKAAAAAA
   AAAAKKCLKJKKAAAA
@@ -4111,7 +4130,7 @@ Z = (195, 195, 195)
   KJJACJJAKJJACJJA
   AAAAAAAAAAAAAAAA
 }
-# tile 215 (sub knox walls 6)
+# tile 216 (sub knox walls 6)
 {
   AAAAAAKCJKAAAAAA
   AAAAKKCLKJKKAAAA
@@ -4130,7 +4149,7 @@ Z = (195, 195, 195)
   AAJAAACKKJAAAJAA
   ACJJAAAAAAAACJJA
 }
-# tile 216 (sub knox walls 7)
+# tile 217 (sub knox walls 7)
 {
   AAAAAAKCJKAAAAAA
   AAAAKKCLKJKKAAAA
@@ -4149,7 +4168,7 @@ Z = (195, 195, 195)
   KJJACJJAKJJACJJA
   AAAAAAAAAAAAAAAA
 }
-# tile 217 (sub knox walls 8)
+# tile 218 (sub knox walls 8)
 {
   AAAAAAKCJKAAAAAA
   AAAAKKCLKJKKAAAA
@@ -4168,7 +4187,7 @@ Z = (195, 195, 195)
   AAJAAACKKJAAAJAA
   ACJJAAAAAAAACJJA
 }
-# tile 218 (sub knox walls 9)
+# tile 219 (sub knox walls 9)
 {
   AAAAAAKCJKAAAAAA
   AAAAKKCLKJKKAAAA
@@ -4187,7 +4206,7 @@ Z = (195, 195, 195)
   AAJAAACKKJAAAJAA
   ACJJAAAAAAAACJJA
 }
-# tile 219 (sub knox walls 10)
+# tile 220 (sub knox walls 10)
 {
   AAAAAAKCJKAAAAAA
   AAAAKKCLKJKKAAAA
@@ -4206,7 +4225,7 @@ Z = (195, 195, 195)
   AAJAAACKKJAAAJAA
   ACJJAAAAAAAACJJA
 }
-# tile 220 (sub sokoban walls 0)
+# tile 221 (sub sokoban walls 0)
 {
   ANNBA.EEEEE.NNBA
   ABBBA.E.EE..BBBA
@@ -4225,7 +4244,7 @@ Z = (195, 195, 195)
   A...A..EEEE....A
   ABEEA..EEEE.BE.A
 }
-# tile 221 (sub sokoban walls 1)
+# tile 222 (sub sokoban walls 1)
 {
   AAANBBAAAAANBBAA
   BBBNBBA.BBBNBBA.
@@ -4244,7 +4263,7 @@ Z = (195, 195, 195)
   ................
   AAAAAAAAAAAAAAAA
 }
-# tile 222 (sub sokoban walls 2)
+# tile 223 (sub sokoban walls 2)
 {
   AAANNNNBBBBBBAAA
   NNNNAA..EEEEB...
@@ -4263,7 +4282,7 @@ Z = (195, 195, 195)
   A...A..EEEE....A
   ABEEA..EEEE.BE.A
 }
-# tile 223 (sub sokoban walls 3)
+# tile 224 (sub sokoban walls 3)
 {
   AAANNNNBBBBBBAAA
   NNNNAA..EEEEB...
@@ -4282,7 +4301,7 @@ Z = (195, 195, 195)
   A...A..EEEE....A
   ABEEA..EEEE.BE.A
 }
-# tile 224 (sub sokoban walls 4)
+# tile 225 (sub sokoban walls 4)
 {
   AAANNNNBBBBBBAAA
   NNNNAA..EEEEB...
@@ -4301,7 +4320,7 @@ Z = (195, 195, 195)
   ................
   AAAAAAAAAAAAAAAA
 }
-# tile 225 (sub sokoban walls 5)
+# tile 226 (sub sokoban walls 5)
 {
   AAANNNNBBBBBBAAA
   NNNNAA..EEEEB...
@@ -4320,7 +4339,7 @@ Z = (195, 195, 195)
   ................
   AAAAAAAAAAAAAAAA
 }
-# tile 226 (sub sokoban walls 6)
+# tile 227 (sub sokoban walls 6)
 {
   AAANNNNBBBBBBAAA
   NNNNAA..EEEEB...
@@ -4339,7 +4358,7 @@ Z = (195, 195, 195)
   A...A..EEEE....A
   ABEEA..EEEE.BE.A
 }
-# tile 227 (sub sokoban walls 7)
+# tile 228 (sub sokoban walls 7)
 {
   AAANNNNBBBBBBAAA
   NNNNAA..EEEEB...
@@ -4358,7 +4377,7 @@ Z = (195, 195, 195)
   ................
   AAAAAAAAAAAAAAAA
 }
-# tile 228 (sub sokoban walls 8)
+# tile 229 (sub sokoban walls 8)
 {
   AAANNNNBBBBBBAAA
   NNNNAA..EEEEB...
@@ -4377,7 +4396,7 @@ Z = (195, 195, 195)
   A...A..EEEE....A
   ABEEA..EEEE.BE.A
 }
-# tile 229 (sub sokoban walls 9)
+# tile 230 (sub sokoban walls 9)
 {
   AAANNNNBBBBBBAAA
   NNNNAA..EEEEB...
@@ -4396,7 +4415,7 @@ Z = (195, 195, 195)
   A...A..EEEE....A
   ABEEA..EEEE.BE.A
 }
-# tile 230 (sub sokoban walls 10)
+# tile 231 (sub sokoban walls 10)
 {
   AAANNNNBBBBBBAAA
   NNNNAA..EEEEB...
