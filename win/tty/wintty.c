@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1432512813 2015/05/25 00:13:33 $  $NHDT-Branch: master $:$NHDT-Revision: 1.93 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1432536533 2015/05/25 06:48:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.94 $ */
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2980,9 +2980,13 @@ int *x, *y, *mod;
     if (ttyDisplay && ttyDisplay->toplin == 1)
         ttyDisplay->toplin = 2;
     return i;
-#else
+#else /* !WIN32CON */
+    nhUse(x);
+    nhUse(y);
+    nhUse(mod);
+
     return tty_nhgetch();
-#endif
+#endif /* ?WIN32CON */
 }
 
 void

@@ -1,4 +1,4 @@
-/* NetHack 3.6	save.c	$NHDT-Date: 1432512768 2015/05/25 00:12:48 $  $NHDT-Branch: master $:$NHDT-Revision: 1.87 $ */
+/* NetHack 3.6	save.c	$NHDT-Date: 1432536532 2015/05/25 06:48:52 $  $NHDT-Branch: master $:$NHDT-Revision: 1.88 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -591,9 +591,12 @@ boolean rlecomp;
             bwrite(fd, (genericptr_t) &match, sizeof(uchar));
             bwrite(fd, (genericptr_t) rgrm, sizeof(struct rm));
         }
-    } else
-#endif /* RLECOMP */
-        bwrite(fd, (genericptr_t) levl, sizeof(levl));
+        return;
+    }
+#else /* !RLECOMP */
+    nhUse(rlecomp);
+#endif /* ?RLECOMP */
+    bwrite(fd, (genericptr_t) levl, sizeof levl);
 }
 
 /*ARGSUSED*/

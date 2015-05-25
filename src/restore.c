@@ -1,4 +1,4 @@
-/* NetHack 3.6	restore.c	$NHDT-Date: 1432512772 2015/05/25 00:12:52 $  $NHDT-Branch: master $:$NHDT-Revision: 1.98 $ */
+/* NetHack 3.6	restore.c	$NHDT-Date: 1432536531 2015/05/25 06:48:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.99 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -698,17 +698,18 @@ unsigned int stuckid, steedid;
     }
 }
 
-/*ARGSUSED*/ /* fd used in MFLOPPY only */
-STATIC_OVL int restlevelfile(fd, ltmp) register int fd;
+/*ARGSUSED*/
+STATIC_OVL int
+restlevelfile(fd, ltmp)
+int fd; /* fd used in MFLOPPY only */
 xchar ltmp;
-#if defined(macintosh) && (defined(__SC__) || defined(__MRC__)) \
-    && !defined(MFLOPPY)
-#pragma unused(fd)
-#endif
 {
-    register int nfd;
+    int nfd;
     char whynot[BUFSZ];
 
+#ifndef MFLOPPY
+    nhUse(fd);
+#endif
     nfd = create_levelfile(ltmp, whynot);
     if (nfd < 0) {
         /* BUG: should suppress any attempt to write a panic
@@ -727,7 +728,7 @@ xchar ltmp;
         (void) nhclose(nfd);
 #ifdef AMIGA
         clearlocks();
-#else
+#else /* !AMIGA */
         eraseall(levels, alllevels);
         eraseall(levels, allbones);
 
@@ -743,19 +744,16 @@ xchar ltmp;
             (void) lseek(fd, (off_t) 0, 0);
             (void) validate(fd, (char *) 0); /* skip version etc */
             return dorecover(fd);            /* 0 or 1 */
-        } else {
-#endif
+        }
+#endif /* ?AMIGA */
         pline("Be seeing you...");
         terminate(EXIT_SUCCESS);
-#ifndef AMIGA
     }
-#endif
-}
-#endif
-bufon(nfd);
-savelev(nfd, ltmp, WRITE_SAVE | FREE_SAVE);
-bclose(nfd);
-return (2);
+#endif /* MFLOPPY */
+    bufon(nfd);
+    savelev(nfd, ltmp, WRITE_SAVE | FREE_SAVE);
+    bclose(nfd);
+    return 2;
 }
 
 int
@@ -933,10 +931,7 @@ boolean rlecomp;
     struct rm r;
 
     if (rlecomp) {
-#if defined(MAC)
-        /* Suppress warning about used before set */
         (void) memset((genericptr_t) &r, 0, sizeof(r));
-#endif
         i = 0;
         j = 0;
         len = 0;
@@ -954,9 +949,12 @@ boolean rlecomp;
             j = 0;
             i += 1;
         }
-    } else
-#endif /* RLECOMP */
-        mread(fd, (genericptr_t) levl, sizeof(levl));
+        return;
+    }
+#else /* !RLECOMP */
+    nhUse(rlecomp);
+#endif /* ?RLECOMP */
+    mread(fd, (genericptr_t) levl, sizeof levl);
 }
 
 void

@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1432512764 2015/05/25 00:12:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.57 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1432536532 2015/05/25 06:48:52 $  $NHDT-Branch: master $:$NHDT-Revision: 1.58 $ */
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2772,7 +2772,7 @@ struct sp_coder *coder;
 /*ARGUSED*/
 void
 spo_end_moninvent(coder)
-struct sp_coder *coder;
+struct sp_coder *coder UNUSED;
 {
     if (invent_carrying_monster)
         m_dowear(invent_carrying_monster, TRUE);
@@ -2782,7 +2782,7 @@ struct sp_coder *coder;
 /*ARGUSED*/
 void
 spo_pop_container(coder)
-struct sp_coder *coder;
+struct sp_coder *coder UNUSED;
 {
     if (container_idx > 0) {
         container_idx--;
@@ -4487,7 +4487,7 @@ struct sp_coder *coder;
 void
 sel_set_wallify(x, y, arg)
 int x, y;
-genericptr_t arg;
+genericptr_t arg UNUSED;
 {
     wallify_map(x, y, x, y);
 }

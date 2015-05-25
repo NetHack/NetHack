@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1432512771 2015/05/25 00:12:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.53 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1432536528 2015/05/25 06:48:48 $  $NHDT-Branch: master $:$NHDT-Revision: 1.54 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1766,9 +1766,13 @@ int x, y, a, b, c;
 /* Return the wall mode for a T wall. */
 STATIC_OVL int
 set_twall(x0, y0, x1, y1, x2, y2, x3, y3)
-int x0, y0, x1, y1, x2, y2, x3, y3;
+int x0, y0; /* used #if WA_VERBOSE */
+int x1, y1, x2, y2, x3, y3;
 {
     int wmode, is_1, is_2, is_3;
+
+    nhUse(x0);
+    nhUse(y0);
 
     is_1 = check_pos(x1, y1, WM_T_LONG);
     is_2 = check_pos(x2, y2, WM_T_BL);
