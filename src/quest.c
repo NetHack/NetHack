@@ -1,6 +1,4 @@
-/* NetHack 3.6	quest.c	$NHDT-Date: 1431192766 2015/05/09 17:32:46 $  $NHDT-Branch: master $:$NHDT-Revision: 1.17 $ */
-/* NetHack 3.6	quest.c	$Date: 2009/05/06 10:47:33 $  $Revision: 1.10 $ */
-/*	SCCS Id: @(#)quest.c	3.5	2006/08/05	*/
+/* NetHack 3.6	quest.c	$NHDT-Date: 1432512771 2015/05/25 00:12:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.18 $ */
 /*	Copyright 1991, M. Stephenson		  */
 /* NetHack may be freely redistributed.  See license for details. */
 

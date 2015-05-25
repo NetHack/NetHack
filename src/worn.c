@@ -1,6 +1,4 @@
-/* NetHack 3.6	worn.c	$NHDT-Date: 1431192767 2015/05/09 17:32:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.43 $ */
-/* NetHack 3.6	worn.c	$Date: 2013/11/05 00:57:56 $  $Revision: 1.32 $ */
-/*	SCCS Id: @(#)worn.c	3.5	2009/02/28	*/
+/* NetHack 3.6	worn.c	$NHDT-Date: 1432512772 2015/05/25 00:12:52 $  $NHDT-Branch: master $:$NHDT-Revision: 1.44 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

@@ -1,6 +1,4 @@
-/* NetHack 3.6	mhmsg.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.6	mhmsg.h	$Date: 2009/05/06 11:00:00 $  $Revision: 1.9 $ */
-/*	SCCS Id: @(#)mhmsg.h	3.5	2005/01/23	*/
+/* NetHack 3.6	mhmsg.h	$NHDT-Date: 1432512811 2015/05/25 00:13:31 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 

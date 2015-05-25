@@ -1,7 +1,6 @@
 $ ! vms/vmsbuild.com -- compile and link NetHack 3.6.*			[pr]
 $	version_number = "3.5.0"
 $ ! $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
-$ ! $Date: 2011/05/23 03:27:10 $  $Revision: 1.8 $
 $ !
 $ ! usage:
 $ !   $ set default [.src]	!or [-.-.src] if starting from [.sys.vms]

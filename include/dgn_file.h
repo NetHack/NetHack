@@ -1,6 +1,4 @@
-/* NetHack 3.6	dgn_file.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.6	dgn_file.h	$Date: 2009/05/06 10:44:38 $  $Revision: 1.4 $ */
-/*	SCCS Id: @(#)dgn_file.h 3.5	1993/01/17	*/
+/* NetHack 3.6	dgn_file.h	$NHDT-Date: 1432512780 2015/05/25 00:13:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
 /* Copyright (c) 1989 by M. Stephenson				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

@@ -1,5 +1,4 @@
-/* NetHack 3.6	mhmenu.c	$NHDT-Date: 1431192776 2015/05/09 17:32:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.47 $ */
-/* NetHack 3.6	mhmenu.c	$Date: 2012/01/11 01:53:44 $  $Revision: 1.36 $ */
+/* NetHack 3.6	mhmenu.c	$NHDT-Date: 1432512811 2015/05/25 00:13:31 $  $NHDT-Branch: master $:$NHDT-Revision: 1.48 $ */
 /* Copyright (c) Alex Kompel, 2002                                */
 /* NetHack may be freely redistributed.  See license for details. */
 

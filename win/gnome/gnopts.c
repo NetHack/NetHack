@@ -1,6 +1,4 @@
-/* NetHack 3.6	gnopts.c	$NHDT-Date: 1431192772 2015/05/09 17:32:52 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
-/* NetHack 3.6	gnopts.c	$Date: 2009/05/06 10:57:40 $  $Revision: 1.5 $ */
-/*	SCCS Id: @(#)gnopts.c	3.5	2000/07/16	*/
+/* NetHack 3.6	gnopts.c	$NHDT-Date: 1432512805 2015/05/25 00:13:25 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
 /* Copyright (C) 1998 by Erik Andersen <andersee@debian.org> */
 /* NetHack may be freely redistributed.  See license for details. */
 

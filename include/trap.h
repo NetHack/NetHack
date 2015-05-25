@@ -1,6 +1,4 @@
-/* NetHack 3.6	trap.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.6	trap.h	$Date: 2009/05/06 10:45:14 $  $Revision: 1.7 $ */
-/*	SCCS Id: @(#)trap.h	3.5	2000/08/30	*/
+/* NetHack 3.6	trap.h	$NHDT-Date: 1432512776 2015/05/25 00:12:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

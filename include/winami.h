@@ -1,6 +1,4 @@
-/* NetHack 3.6	winami.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.6	winami.h	$Date: 2009/05/06 10:45:17 $  $Revision: 1.4 $ */
-/*	SCCS Id: @(#)winami.h	3.5	1993/01/17	*/
+/* NetHack 3.6	winami.h	$NHDT-Date: 1432512780 2015/05/25 00:13:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1991. */
 /* Copyright (c) Gregg Wonderly, Naperville, Illinois, 1992, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */

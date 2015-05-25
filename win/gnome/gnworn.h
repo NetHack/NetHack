@@ -1,7 +1,6 @@
 /* NetHack 3.6	gnworn.h	2009/05/06 10:58:06  1.3 */
 /*
- * $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
- * $Date: 2012/01/10 17:47:38 $  $Revision: 1.4 $
+ * $NHDT-Date: 1432512804 2015/05/25 00:13:24 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $
  */
 /* Copyright (C) 2002 by Dylan Alex Simon		*/
 /* NetHack may be freely redistributed.  See license for details. */

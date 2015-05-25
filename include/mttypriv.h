@@ -1,6 +1,4 @@
-/* NetHack 3.6	mttypriv.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.6	mttypriv.h	$Date: 2009/05/06 10:44:55 $  $Revision: 1.5 $ */
-/*	SCCS Id: @(#)mttypriv.h 3.5	1993/03/01	*/
+/* NetHack 3.6	mttypriv.h	$NHDT-Date: 1432512780 2015/05/25 00:13:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
 /* Copyright (c) Jon W{tte 1993.					*/
 /* NetHack may be freely redistributed.  See license for details.	*/
 

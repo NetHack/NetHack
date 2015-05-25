@@ -1,6 +1,4 @@
-/* NetHack 3.6	nhlan.c	$NHDT-Date: 1431192778 2015/05/09 17:32:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
-/* NetHack 3.6	nhlan.c	$Date: 2009/05/06 10:50:26 $  $Revision: 1.5 $ */
-/*	SCCS Id: @(#)nhlan.c	3.5	1999/11/21	*/
+/* NetHack 3.6	nhlan.c	$NHDT-Date: 1432512786 2015/05/25 00:13:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
 /* Copyright (c) Michael Allison, 1997                  */
 /* NetHack may be freely redistributed.  See license for details. */
 

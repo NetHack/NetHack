@@ -1,5 +1,4 @@
-/* NetHack 3.6	region.c	$NHDT-Date: 1431192769 2015/05/09 17:32:49 $  $NHDT-Branch: master $:$NHDT-Revision: 1.32 $ */
-/* NetHack 3.6	region.c	$Date: 2012/05/07 01:44:38 $  $Revision: 1.26 $ */
+/* NetHack 3.6	region.c	$NHDT-Date: 1432512774 2015/05/25 00:12:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.33 $ */
 /* Copyright (c) 1996 by Jean-Christophe Collet	 */
 /* NetHack may be freely redistributed.  See license for details. */
 

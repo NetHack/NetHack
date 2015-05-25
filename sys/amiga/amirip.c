@@ -1,5 +1,4 @@
-/* NetHack 3.6	amirip.c	$NHDT-Date: 1431192783 2015/05/09 17:33:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
-/* NetHack 3.6	amirip.c	$Date: 2012/01/24 04:26:20 $  $Revision: 1.7 $ */
+/* NetHack 3.6	amirip.c	$NHDT-Date: 1432512795 2015/05/25 00:13:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $ */
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland 1991,1992,1993,1995,1996.
  */
 /* NetHack may be freely redistributed.  See license for details. */

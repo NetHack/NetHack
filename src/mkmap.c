@@ -1,6 +1,4 @@
-/* NetHack 3.6	mkmap.c	$NHDT-Date: 1431192762 2015/05/09 17:32:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
-/* NetHack 3.6	mkmap.c	$Date: 2009/05/06 10:46:55 $  $Revision: 1.12 $ */
-/*	SCCS Id: @(#)mkmap.c	3.5	2008/02/29	*/
+/* NetHack 3.6	mkmap.c	$NHDT-Date: 1432512767 2015/05/25 00:12:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.16 $ */
 /* Copyright (c) J. C. Collet, M. Stephenson and D. Cohrs, 1992   */
 /* NetHack may be freely redistributed.  See license for details. */
 

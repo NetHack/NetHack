@@ -1,7 +1,4 @@
-/* NetHack 3.6	cesound.c	$NHDT-Date: 1431192786 2015/05/09 17:33:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
-/* NetHack 3.6	cesound.c	$Date: 2009/05/06 10:52:00 $  $Revision: 1.4 $ */
-/*   SCCS Id: @(#)cesound.c   3.5     $NHDT-Date: 1431192786 2015/05/09 17:33:06 $                        */
-/*   SCCS Id: @(#)cesound.c   3.5     $Date: 2009/05/06 10:52:00 $ */
+/* NetHack 3.6	cesound.c	$NHDT-Date: 1432512799 2015/05/25 00:13:19 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $ */
 /*   Copyright (c) NetHack PC Development Team 1993                 */
 /*   NetHack may be freely redistributed.  See license for details. */
 /*                                                                  */

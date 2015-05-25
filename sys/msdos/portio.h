@@ -1,6 +1,4 @@
-/* NetHack 3.6	portio.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.6	portio.h	$Date: 2009/05/06 10:49:41 $  $Revision: 1.4 $ */
-/*   SCCS Id: @(#)portio.h   3.5     1995/08/05                       */
+/* NetHack 3.6	portio.h	$NHDT-Date: 1432512791 2015/05/25 00:13:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
 /*   Copyright (c) NetHack PC Development Team 1995                 */
 /*   NetHack may be freely redistributed.  See license for details. */
 /*                                                                  */

@@ -1,6 +1,4 @@
-/* NetHack 3.6	mfndpos.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.6	mfndpos.h	$Date: 2009/05/06 10:44:53 $  $Revision: 1.6 $ */
-/*	SCCS Id: @(#)mfndpos.h	3.5	2002/04/06	*/
+/* NetHack 3.6	mfndpos.h	$NHDT-Date: 1432512776 2015/05/25 00:12:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

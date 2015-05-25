@@ -1,5 +1,4 @@
-/* NetHack 3.6	msdos.c	$NHDT-Date: 1431192781 2015/05/09 17:33:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
-/* NetHack 3.6	msdos.c	$Date: 2012/01/22 06:27:07 $  $Revision: 1.7 $ */
+/* NetHack 3.6	msdos.c	$NHDT-Date: 1432512792 2015/05/25 00:13:12 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
 /* Copyright (c) NetHack PC Development Team 1990 */
 /* NetHack may be freely redistributed.  See license for details.         */
 

@@ -1,5 +1,4 @@
-/* NetHack 3.6	wintty.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.6	wintty.h	$Date: 2012/01/23 10:45:26 $  $Revision: 1.12 $ */
+/* NetHack 3.6	wintty.h	$NHDT-Date: 1432512782 2015/05/25 00:13:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.21 $ */
 /* Copyright (c) David Cohrs, 1991,1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

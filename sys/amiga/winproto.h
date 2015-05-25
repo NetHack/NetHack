@@ -1,5 +1,4 @@
-/* NetHack 3.6	winproto.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.6	winproto.h	$Date: 2012/01/24 04:26:20 $  $Revision: 1.4 $ */
+/* NetHack 3.6	winproto.h	$NHDT-Date: 1432512795 2015/05/25 00:13:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
 /* Copyright (c) Gregg Wonderly, Naperville, Illinois,  1991,1992,1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 

@@ -33,8 +33,7 @@
  *	- cast result of pointer subtraction to long since ptrdiff_t could
  *	be bigger than that and trigger warnings when assigning to long
  *
- * $NHDT-Date: 1431192779 2015/05/09 17:32:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.4 $
- * $Date: 2007/12/23 00:59:25 $  $Revision: 1.2 $
+ * $NHDT-Date: 1432512787 2015/05/25 00:13:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.5 $
  */
 
 #include "hack.h"

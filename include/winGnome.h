@@ -1,6 +1,4 @@
-/* NetHack 3.6	winGnome.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.6	winGnome.h	$Date: 2009/05/06 10:45:16 $  $Revision: 1.4 $ */
-/*	SCCS Id: @(#)winGnome.h	3.4.	2000/07/16	*/
+/* NetHack 3.6	winGnome.h	$NHDT-Date: 1432512782 2015/05/25 00:13:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
 /* Copyright (C) 1998 by Erik Andersen <andersee@debian.org> */
 /* Copyright (C) 1998 by Anthony Taylor <tonyt@ptialaska.net> */
 /* NetHack may be freely redistributed.  See license for details. */

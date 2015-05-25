@@ -1,6 +1,4 @@
-/* NetHack 3.6	bemain.c	$NHDT-Date: 1431192781 2015/05/09 17:33:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.16 $ */
-/* NetHack 3.6	bemain.c	$Date: 2009/05/06 10:48:59 $  $Revision: 1.11 $ */
-/*	SCCS Id: @(#)bemain.c	3.5	2008/01/30	*/
+/* NetHack 3.6	bemain.c	$NHDT-Date: 1432512791 2015/05/25 00:13:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.17 $ */
 /* Copyright (c) Dean Luick, 1996. */
 /* NetHack may be freely redistributed.  See license for details. */
 

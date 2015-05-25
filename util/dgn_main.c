@@ -1,6 +1,4 @@
-/* NetHack 3.6	dgn_main.c	$NHDT-Date: 1431192770 2015/05/09 17:32:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
-/* NetHack 3.6	dgn_main.c	$Date: 2009/05/06 10:54:27 $  $Revision: 1.7 $ */
-/*	SCCS Id: @(#)dgn_main.c 3.5	1994/09/23	*/
+/* NetHack 3.6	dgn_main.c	$NHDT-Date: 1432512785 2015/05/25 00:13:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
 /*	Copyright (c) 1989 by Jean-Christophe Collet	*/
 /*	Copyright (c) 1990 by M. Stephenson		*/
 /* NetHack may be freely redistributed.  See license for details. */

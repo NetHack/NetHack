@@ -1,7 +1,6 @@
 $ ! sys/vms/spec_lev.com -- preprocess nethack's special level compiler code
 $ !
 $ ! $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
-$ ! $Date: 2002/01/05 21:06:00 $  $Revision: 1.1 $
 $ !
 $ ! This operation needs to be performed prior to executing vmsbuild.com.
 $ ! Process the scanning and parsing code for NetHack's special level

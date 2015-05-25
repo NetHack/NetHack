@@ -1,6 +1,4 @@
-/* NetHack 3.6	beconf.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.6	beconf.h	$Date: 2009/05/06 10:44:34 $  $Revision: 1.4 $ */
-/*	SCCS Id: @(#)beconf.h	3.5	1998/07/08	*/
+/* NetHack 3.6	beconf.h	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
 /* Copyright (c) Dean Luick 1996.	*/
 /* NetHack may be freely redistributed.  See license for details. */
 

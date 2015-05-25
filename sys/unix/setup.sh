@@ -1,6 +1,5 @@
 #!/bin/sh
-# NetHack 3.6  setup.sh	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
-# NetHack 3.6  setup.sh	$Date: 2011/12/27 00:34:52 $  $Revision: 1.6 $
+# NetHack 3.6  setup.sh	$NHDT-Date: 1432512789 2015/05/25 00:13:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.14 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details.
 #

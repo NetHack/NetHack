@@ -1,6 +1,4 @@
-/* NetHack 3.6	wingem1.c	$NHDT-Date: 1431192775 2015/05/09 17:32:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
-/* NetHack 3.6	wingem1.c	$Date: 2009/05/06 10:56:42 $  $Revision: 1.8 $ */
-/*	SCCS Id: @(#)wingem1.c	3.5	1999/12/10	*/
+/* NetHack 3.6	wingem1.c	$NHDT-Date: 1432512809 2015/05/25 00:13:29 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
 /* Copyright (c) Christian Bressler 1999 	  */
 /* NetHack may be freely redistributed.  See license for details. */
 

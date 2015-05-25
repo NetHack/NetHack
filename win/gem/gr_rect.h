@@ -1,7 +1,6 @@
 /* gr_rect.h */
 /*
- * $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
- * $Date: 2002/03/20 03:50:49 $  $Revision: 1.1 $
+ * $NHDT-Date: 1432512809 2015/05/25 00:13:29 $  $NHDT-Branch: master $:$NHDT-Revision: 1.4 $
  */
 #include <e_gem.h>
 /********** structs **********/

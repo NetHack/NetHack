@@ -1,5 +1,4 @@
 ! $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
-! $Date: 2003/10/03 02:09:25 $  $Revision: 1.5 $
 
 ! The display_file, tombstone, and menu windows are all formatted assuming
 ! a fixed width font.  Text windows may or may not be formatted as above.

@@ -1,6 +1,4 @@
-/* NetHack 3.6	mhcolor.c	$NHDT-Date: 1431192788 2015/05/09 17:33:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.6 $ */
-/* NetHack 3.6	mhcolor.c	$Date: 2009/05/06 10:52:03 $  $Revision: 1.3 $ */
-/*	SCCS Id: @(#)mhcolor.c	3.5	2005/01/23	*/
+/* NetHack 3.6	mhcolor.c	$NHDT-Date: 1432512802 2015/05/25 00:13:22 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 

@@ -1,6 +1,4 @@
-/* NetHack 3.6	worm.c	$NHDT-Date: 1431192765 2015/05/09 17:32:45 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
-/* NetHack 3.6	worm.c	$Date: 2009/05/06 10:48:17 $  $Revision: 1.12 $ */
-/*	SCCS Id: @(#)worm.c	3.5	2009/03/05	*/
+/* NetHack 3.6	worm.c	$NHDT-Date: 1432512770 2015/05/25 00:12:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.16 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

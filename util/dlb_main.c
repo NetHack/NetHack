@@ -1,5 +1,4 @@
-/* NetHack 3.6	dlb_main.c	$NHDT-Date: 1431192770 2015/05/09 17:32:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
-/* NetHack 3.6	dlb_main.c	$Date: 2012/01/16 03:56:08 $  $Revision: 1.6 $ */
+/* NetHack 3.6	dlb_main.c	$NHDT-Date: 1432512785 2015/05/25 00:13:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 

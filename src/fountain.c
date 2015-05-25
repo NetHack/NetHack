@@ -1,5 +1,4 @@
-/* NetHack 3.6	fountain.c	$NHDT-Date: 1431192761 2015/05/09 17:32:41 $  $NHDT-Branch: master $:$NHDT-Revision: 1.52 $ */
-/* NetHack 3.6	fountain.c	$Date: 2011/08/20 00:22:20 $  $Revision: 1.32 $ */
+/* NetHack 3.6	fountain.c	$NHDT-Date: 1432512767 2015/05/25 00:12:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.53 $ */
 /*	Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
 

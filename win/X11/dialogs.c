@@ -49,8 +49,7 @@
  *	target type" issued by 'gcc -Wwrite-strings' as used by nethack.
  *	(For this file, always the second parameter to XtSetArg().)
  *
- * $NHDT-Date: 1431192774 2015/05/09 17:32:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.5 $
- * $Date: 2002/03/31 17:11:23 $  $Revision: 1.2 $
+ * $NHDT-Date: 1432512808 2015/05/25 00:13:28 $  $NHDT-Branch: master $:$NHDT-Revision: 1.6 $
  */
 
 #ifndef SYSV

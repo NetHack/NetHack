@@ -1,5 +1,4 @@
-/* NetHack 3.6	winhack.c	$NHDT-Date: 1431737065 2015/05/16 00:44:25 $  $NHDT-Branch: master $:$NHDT-Revision: 1.17 $ */
-/* NetHack 3.6	winhack.c	$Date: 2009/10/22 02:59:35 $  $Revision: 1.11 $ */
+/* NetHack 3.6	winhack.c	$NHDT-Date: 1432512799 2015/05/25 00:13:19 $  $NHDT-Branch: master $:$NHDT-Revision: 1.18 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 // winhack.cpp : Defines the entry point for the application.
 //

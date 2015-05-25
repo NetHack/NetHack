@@ -1,6 +1,4 @@
-/* NetHack 3.6	mrecover.c	$NHDT-Date: 1431192786 2015/05/09 17:33:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
-/* NetHack 3.6	mrecover.c	$Date: 2009/05/06 10:49:19 $  $Revision: 1.4 $ */
-/*	SCCS Id: @(#)mrecover.c	3.5		1996/07/24	  */
+/* NetHack 3.6	mrecover.c	$NHDT-Date: 1432512798 2015/05/25 00:13:18 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
 /*      Copyright (c) David Hairston, 1993.                       */
 /* NetHack may be freely redistributed.  See license for details. */
 

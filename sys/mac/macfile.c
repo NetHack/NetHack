@@ -1,6 +1,4 @@
-/* NetHack 3.6	macfile.c	$NHDT-Date: 1431192786 2015/05/09 17:33:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
-/* NetHack 3.6	macfile.c	$Date: 2009/05/06 10:49:10 $  $Revision: 1.7 $ */
-/*	SCCS Id: @(#)macfile.c	3.5	1993/01/24		  */
+/* NetHack 3.6	macfile.c	$NHDT-Date: 1432512798 2015/05/25 00:13:18 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
 /* Copyright (c) Jon W{tte, Hao-Yang Wang, Jonathan Handler 1992. */
 /* NetHack may be freely redistributed.  See license for details. */
 /*

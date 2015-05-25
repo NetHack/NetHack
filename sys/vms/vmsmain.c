@@ -1,5 +1,4 @@
-/* NetHack 3.6	vmsmain.c	$NHDT-Date: 1431192780 2015/05/09 17:33:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.30 $ */
-/* NetHack 3.6	vmsmain.c	$Date: 2011/04/23 01:51:01 $  $Revision: 1.22 $ */
+/* NetHack 3.6	vmsmain.c	$NHDT-Date: 1432512790 2015/05/25 00:13:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.31 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 /* main.c - VMS NetHack */

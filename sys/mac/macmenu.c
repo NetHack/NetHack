@@ -1,6 +1,4 @@
-/* NetHack 3.6	macmenu.c	$NHDT-Date: 1431192785 2015/05/09 17:33:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
-/* NetHack 3.6	macmenu.c	$Date: 2009/05/06 10:49:13 $  $Revision: 1.7 $ */
-/*	SCCS Id: @(#)macmenu.c	3.5	1999/11/24	*/
+/* NetHack 3.6	macmenu.c	$NHDT-Date: 1432512797 2015/05/25 00:13:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $ */
 /*      Copyright (c) Macintosh NetHack Port Team, 1993.          */
 /* NetHack may be freely redistributed.  See license for details. */
 

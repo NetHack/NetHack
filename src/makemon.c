@@ -1,5 +1,4 @@
-/* NetHack 3.6	makemon.c	$NHDT-Date: 1431192761 2015/05/09 17:32:41 $  $NHDT-Branch: master $:$NHDT-Revision: 1.87 $ */
-/* NetHack 3.6	makemon.c	$Date: 2012/01/29 00:34:33 $  $Revision: 1.69 $ */
+/* NetHack 3.6	makemon.c	$NHDT-Date: 1432512767 2015/05/25 00:12:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.88 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

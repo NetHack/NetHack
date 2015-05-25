@@ -483,9 +483,7 @@ char *yytext;
 #line 1 "dgn_comp.l"
 #define INITIAL 0
 #line 2 "dgn_comp.l"
-/* NetHack 3.6  dgn_comp.l	$NHDT-Date: 1431196861 2015/05/09 18:41:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
-/* NetHack 3.6  dgn_comp.l	$Date: 2009/05/06 10:54:26 $  $Revision: 1.7 $ */
-/*	SCCS Id: @(#)dgn_lex.c	3.5	2002/03/27	*/
+/* NetHack 3.6  dgn_comp.l	$NHDT-Date: 1432512788 2015/05/25 00:13:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /*	Copyright (c) 1990 by M. Stephenson	     */
 /* NetHack may be freely redistributed.  See license for details. */

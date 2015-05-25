@@ -1,5 +1,4 @@
-/* NetHack 3.6	wceconf.h	$NHDT-Date: 1425081976 2015/02/28 00:06:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
-/* NetHack 3.6	wceconf.h	$Date: 2009/10/22 02:59:14 $  $Revision: 1.12 $ */
+/* NetHack 3.6	wceconf.h	$NHDT-Date: 1432512776 2015/05/25 00:12:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.22 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 

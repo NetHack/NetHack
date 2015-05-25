@@ -1,6 +1,4 @@
-/* NetHack 3.6	drawing.c	$NHDT-Date: 1431192760 2015/05/09 17:32:40 $  $NHDT-Branch: master $:$NHDT-Revision: 1.43 $ */
-/* NetHack 3.6	drawing.c	$Date: 2009/05/06 10:46:09 $  $Revision: 1.28 $ */
-/*	SCCS Id: @(#)drawing.c	3.5	2007/07/30	*/
+/* NetHack 3.6	drawing.c	$NHDT-Date: 1432512765 2015/05/25 00:12:45 $  $NHDT-Branch: master $:$NHDT-Revision: 1.45 $ */
 /* Copyright (c) NetHack Development Team 1992.			  */
 /* NetHack may be freely redistributed.  See license for details. */
 

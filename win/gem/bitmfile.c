@@ -8,8 +8,7 @@
 * -> Programmcode						 *
 \****************************/
 /*
- * $NHDT-Date: 1431192775 2015/05/09 17:32:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.3 $
- * $Date: 2002/01/05 21:06:00 $  $Revision: 1.1 $
+ * $NHDT-Date: 1432512809 2015/05/25 00:13:29 $  $NHDT-Branch: master $:$NHDT-Revision: 1.4 $
  */
 
 #include <errno.h>

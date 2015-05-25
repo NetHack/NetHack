@@ -1,5 +1,4 @@
-/* NetHack 3.6	wc_trace.c	$NHDT-Date: 1431192771 2015/05/09 17:32:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.5 $ */
-/* NetHack 3.6	wc_trace.c	$Date: 2012/01/23 10:45:31 $  $Revision: 1.2 $ */
+/* NetHack 3.6	wc_trace.c	$NHDT-Date: 1432512804 2015/05/25 00:13:24 $  $NHDT-Branch: master $:$NHDT-Revision: 1.6 $ */
 /* Copyright (c) Kenneth Lorber, 2012				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

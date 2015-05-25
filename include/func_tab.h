@@ -1,6 +1,4 @@
-/* NetHack 3.6	func_tab.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.6	func_tab.h	$Date: 2009/05/06 10:44:44 $  $Revision: 1.4 $ */
-/*	SCCS Id: @(#)func_tab.h 3.5	1992/04/03	*/
+/* NetHack 3.6	func_tab.h	$NHDT-Date: 1432512775 2015/05/25 00:12:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

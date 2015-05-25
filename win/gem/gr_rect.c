@@ -1,6 +1,4 @@
-/* NetHack 3.6	gr_rect.c	$NHDT-Date: 1431192775 2015/05/09 17:32:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.6 $ */
-/* NetHack 3.6	gr_rect.c	$Date: 2009/05/06 10:56:40 $  $Revision: 1.3 $ */
-/*	SCCS Id: @(#)gr_rect.c	3.5	2001/12/10
+/* NetHack 3.6	gr_rect.c	$NHDT-Date: 1432512810 2015/05/25 00:13:30 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
  */
 /* Copyright (c) Christian Bressler, 2001 */
 /* NetHack may be freely redistributed.  See license for details. */

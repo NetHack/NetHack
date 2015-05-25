@@ -1,5 +1,4 @@
-/* NetHack 3.6	dungeon.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.6	dungeon.h	$Date: 2012/04/14 08:31:03 $  $Revision: 1.11 $ */
+/* NetHack 3.6	dungeon.h	$NHDT-Date: 1432512778 2015/05/25 00:12:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.20 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

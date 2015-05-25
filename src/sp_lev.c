@@ -1,5 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1431192758 2015/05/09 17:32:38 $  $NHDT-Branch: master $:$NHDT-Revision: 1.55 $ */
-/* NetHack 3.6	sp_lev.c	$Date: 2011/01/05 01:28:36 $  $Revision: 1.23 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1432512764 2015/05/25 00:12:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.57 $ */
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 

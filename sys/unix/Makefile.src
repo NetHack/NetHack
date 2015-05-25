@@ -1,6 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.6  Makefile.src	$NHDT-Date: 1430958824 2015/05/07 00:33:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.40 $
-# NetHack 3.6  Makefile.src	$Date: 2012/01/20 03:41:33 $  $Revision: 1.37 $
+# NetHack 3.6  Makefile.src	$NHDT-Date: 1432512789 2015/05/25 00:13:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.43 $
 
 # Root of source tree:
 NHSROOT=..

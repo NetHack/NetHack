@@ -1,6 +1,4 @@
-/* NetHack 3.6	minion.c	$NHDT-Date: 1431192768 2015/05/09 17:32:48 $  $NHDT-Branch: master $:$NHDT-Revision: 1.31 $ */
-/* NetHack 3.6	minion.c	$Date: 2009/05/06 10:46:52 $  $Revision: 1.26 $ */
-/*	SCCS Id: @(#)minion.c	3.5	2008/11/14	*/
+/* NetHack 3.6	minion.c	$NHDT-Date: 1432512773 2015/05/25 00:12:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.33 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

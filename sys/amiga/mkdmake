@@ -7,7 +7,6 @@ CG
 9(F P/#SFD_BEGIN/; D ; GE /##// ; F P/#SFD_ELSE/ ; CG ; DF P/#SFD_END/ ; D )
 Q
 
-	SCCS Id: @(#)mkdmake	3.5	1996/02/17
 Copyright (c) Andrew Church, Olney, Maryland, 1994,1996.
 NetHack may be freely redistributed.  See license for details.
 

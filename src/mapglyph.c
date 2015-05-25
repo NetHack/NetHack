@@ -1,6 +1,4 @@
-/* NetHack 3.6	mapglyph.c	$NHDT-Date: 1431192760 2015/05/09 17:32:40 $  $NHDT-Branch: master $:$NHDT-Revision: 1.34 $ */
-/* NetHack 3.6	mapglyph.c	$Date: 2009/05/06 10:46:45 $  $Revision: 1.24 $ */
-/*	SCCS Id: @(#)mapglyph.c	3.5	2006/10/01	*/
+/* NetHack 3.6	mapglyph.c	$NHDT-Date: 1432512766 2015/05/25 00:12:46 $  $NHDT-Branch: master $:$NHDT-Revision: 1.35 $ */
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

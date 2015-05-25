@@ -1,6 +1,4 @@
-/* NetHack 3.6	macerrs.c	$NHDT-Date: 1431737061 2015/05/16 00:44:21 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
-/* NetHack 3.6	macerrs.c	$Date: 2009/05/06 10:49:10 $  $Revision: 1.5 $ */
-/*	SCCS Id: @(#)macerrs.c	3.5	1993/01/24		  */
+/* NetHack 3.6	macerrs.c	$NHDT-Date: 1432512797 2015/05/25 00:13:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
 /* Copyright (c) Michael Hamel, 1991 */
 /* NetHack may be freely redistributed.  See license for details. */
 

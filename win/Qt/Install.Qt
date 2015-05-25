@@ -1,7 +1,6 @@
 Installing NetHack with a Qt or KDE interface
 ---------------------------------------------
 $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
-$Date: 2004/07/01 18:21:51 $  $Revision: 1.7 $
 
 This document describes the installation of NetHack with a Qt interface
 on UNIX/X11 or Mac OS X. This code should also work with Qt/Windows, but

@@ -70,9 +70,7 @@
 /* Line 189 of yacc.c  */
 #line 1 "lev_comp.y"
 
-/* NetHack 3.6  lev_comp.y	$NHDT-Date: 1431196865 2015/05/09 18:41:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.14 $ */
-/* NetHack 3.6  lev_comp.y	$Date: 2009/05/06 10:54:31 $  $Revision: 1.8 $ */
-/*	SCCS Id: @(#)lev_yacc.c	3.5	2007/08/01	*/
+/* NetHack 3.6  lev_comp.y	$NHDT-Date: 1432512787 2015/05/25 00:13:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 

@@ -1,6 +1,4 @@
-/* NetHack 3.6	pcsys.c	$NHDT-Date: 1431737062 2015/05/16 00:44:22 $  $NHDT-Branch: master $:$NHDT-Revision: 1.27 $ */
-/* NetHack 3.6	pcsys.c	$Date: 2012/01/22 06:33:47 $  $Revision: 1.18 $ */
-/*	SCCS Id: @(#)pcsys.c	3.5	2002/01/22		  */
+/* NetHack 3.6	pcsys.c	$NHDT-Date: 1432512787 2015/05/25 00:13:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.28 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*

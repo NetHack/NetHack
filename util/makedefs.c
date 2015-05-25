@@ -1,5 +1,4 @@
-/* NetHack 3.6  makedefs.c  $NHDT-Date: 1432472661 2015/05/24 13:04:21 $  $NHDT-Branch: master $:$NHDT-Revision: 1.95 $ */
-/* NetHack 3.6  makedefs.c  $Date: 2012/01/15 09:27:03 $  $Revision: 1.50 $ */
+/* NetHack 3.6  makedefs.c  $NHDT-Date: 1432512784 2015/05/25 00:13:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.96 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) M. Stephenson, 1990, 1991.			  */
 /* Copyright (c) Dean Luick, 1990.				  */
@@ -1227,7 +1226,6 @@ do_date()
     /* NB: We've moved on from SCCS, but this way this line
      * won't get clobbered when downstream projects import
      * this file into something more modern. */
-    Fprintf(ofp, "/*\tSCCS Id: @(#)date.h\t3.5\t2004/02/01 */\n\n");
     Fprintf(ofp, "%s", Dont_Edit_Code);
 
     (void) time(&clocktim);
@@ -2096,7 +2094,6 @@ do_permonst()
         perror(filename);
         exit(EXIT_FAILURE);
     }
-    Fprintf(ofp, "/*\tSCCS Id: @(#)pm.h\t3.5\t2004/02/01 */\n\n");
     Fprintf(ofp, "%s", Dont_Edit_Code);
     Fprintf(ofp, "#ifndef PM_H\n#define PM_H\n");
 
@@ -2497,7 +2494,6 @@ do_objs()
         perror(filename);
         exit(EXIT_FAILURE);
     }
-    Fprintf(ofp, "/*\tSCCS Id: @(#)onames.h\t3.5\t2004/02/01 */\n\n");
     Fprintf(ofp, "%s", Dont_Edit_Code);
     Fprintf(ofp, "#ifndef ONAMES_H\n#define ONAMES_H\n\n");
 

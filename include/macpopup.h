@@ -1,6 +1,4 @@
-/* NetHack 3.6	macpopup.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.6	macpopup.h	$Date: 2009/05/06 10:44:51 $  $Revision: 1.6 $ */
-/*	SCCS Id: @(#)macpopup.h	3.5	1999/10/25	*/
+/* NetHack 3.6	macpopup.h	$NHDT-Date: 1432512781 2015/05/25 00:13:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
 /* Copyright (c) Nethack Develpment Team, 1999.		*/
 /* NetHack may be freely redistributed.  See license for details. */
 

@@ -1,5 +1,4 @@
-/* NetHack 3.6	vmsmisc.c	$NHDT-Date: 1431192780 2015/05/09 17:33:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
-/* NetHack 3.6	vmsmisc.c	$Date: 2011/09/01 01:47:00 $  $Revision: 1.6 $ */
+/* NetHack 3.6	vmsmisc.c	$NHDT-Date: 1432512789 2015/05/25 00:13:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "config.h"

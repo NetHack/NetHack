@@ -1,5 +1,4 @@
-/* NetHack 3.6	winfuncs.c	$NHDT-Date: 1431192784 2015/05/09 17:33:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $ */
-/* NetHack 3.6	winfuncs.c	$Date: 2012/01/10 17:47:21 $  $Revision: 1.8 $ */
+/* NetHack 3.6	winfuncs.c	$NHDT-Date: 1432512796 2015/05/25 00:13:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.14 $ */
 /* Copyright (c) Gregg Wonderly, Naperville, Illinois,  1991,1992,1993,1996.
  */
 /* NetHack may be freely redistributed.  See license for details. */

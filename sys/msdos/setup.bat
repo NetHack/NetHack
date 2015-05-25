@@ -1,6 +1,5 @@
 @echo off
-REM    NetHack 3.6 setup.bat   $NHDT-Date$ $NHDT-Branch$:$NHDT-Revision$
-REM    NetHack 3.6 setup.bat   $Date: 2012/01/22 06:27:07 $ $Revision: 1.3 $
+REM    NetHack 3.6 setup.bat   $NHDT-Date: 1432512792 2015/05/25 00:13:12 $ $NHDT-Branch: master $:$NHDT-Revision: 1.9 $
 REM    Copyright (c) NetHack PC Development Team 1990 - 2012
 REM    NetHack may be freely redistributed.  See license for details.
 

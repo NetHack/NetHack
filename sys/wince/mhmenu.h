@@ -1,7 +1,6 @@
 /* NetHack may be freely redistributed.  See license for details. */
 /*
- * $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
- * $Date: 2002/07/22 03:19:13 $  $Revision: 1.1 $
+ * $NHDT-Date: 1432512802 2015/05/25 00:13:22 $  $NHDT-Branch: master $:$NHDT-Revision: 1.5 $
  */
 
 #ifndef MSWINMenuWindow_h

@@ -1,6 +1,4 @@
-/* NetHack 3.6	maccurs.c	$NHDT-Date: 1431192785 2015/05/09 17:33:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
-/* NetHack 3.6	maccurs.c	$Date: 2009/05/06 10:49:10 $  $Revision: 1.5 $ */
-/*	SCCS Id: @(#)maccurs.c	3.5	1993/01/24		  */
+/* NetHack 3.6	maccurs.c	$NHDT-Date: 1432512797 2015/05/25 00:13:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
 /* Copyright (c) Jon W{tte, 1992.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

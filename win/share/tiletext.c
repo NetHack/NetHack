@@ -1,6 +1,4 @@
-/* NetHack 3.6	tiletext.c	$NHDT-Date: 1431192770 2015/05/09 17:32:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
-/* NetHack 3.6	tiletext.c	$Date: 2009/05/06 10:59:03 $  $Revision: 1.4 $ */
-/*	SCCS Id: @(#)tiletext.c	3.5	1999/10/24	*/
+/* NetHack 3.6	tiletext.c	$NHDT-Date: 1432512803 2015/05/25 00:13:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "config.h"

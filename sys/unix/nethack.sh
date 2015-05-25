@@ -1,7 +1,5 @@
 #!/bin/sh
-# NetHack 3.6  nethack.sh	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
-# NetHack 3.6  nethack.sh	$Date: 2009/05/06 10:50:54 $  $Revision: 1.9 $
-#	SCCS Id: @(#)nethack.sh	3.5	2007/12/12
+# NetHack 3.6  nethack.sh	$NHDT-Date: 1432512789 2015/05/25 00:13:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.17 $
 
 HACKDIR=/usr/games/lib/nethackdir
 export HACKDIR

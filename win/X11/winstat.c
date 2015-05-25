@@ -1,6 +1,4 @@
-/* NetHack 3.6	winstat.c	$NHDT-Date: 1431192774 2015/05/09 17:32:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.14 $ */
-/* NetHack 3.6	winstat.c	$Date: 2009/05/06 10:55:59 $  $Revision: 1.4 $ */
-/*	SCCS Id: @(#)winstat.c	3.5	1996/04/05	*/
+/* NetHack 3.6	winstat.c	$NHDT-Date: 1432512808 2015/05/25 00:13:28 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

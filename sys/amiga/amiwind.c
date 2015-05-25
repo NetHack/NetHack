@@ -1,6 +1,4 @@
-/* NetHack 3.6	amiwind.c	$NHDT-Date: 1431737059 2015/05/16 00:44:19 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
-/* NetHack 3.6	amiwind.c	$Date: 2009/05/06 10:48:30 $  $Revision: 1.5 $ */
-/*    SCCS Id: @(#)amiwind.c     3.5    2000/01/12
+/* NetHack 3.6	amiwind.c	$NHDT-Date: 1432512794 2015/05/25 00:13:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
 /*    Copyright (c) Olaf Seibert (KosmoSoft), 1989, 1992	  */
 /*    Copyright (c) Kenneth Lorber, Bethesda, Maryland 1993,1996  */
 /* NetHack may be freely redistributed.  See license for details. */

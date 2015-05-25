@@ -1,6 +1,4 @@
-/* NetHack 3.6	recover.c	$NHDT-Date: 1431192769 2015/05/09 17:32:49 $  $NHDT-Branch: master $:$NHDT-Revision: 1.14 $ */
-/* NetHack 3.6	recover.c	$Date: 2009/05/06 10:54:40 $  $Revision: 1.11 $ */
-/*	SCCS Id: @(#)recover.c	3.5	1999/10/23	*/
+/* NetHack 3.6	recover.c	$NHDT-Date: 1432512785 2015/05/25 00:13:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
 /*	Copyright (c) Janet Walz, 1992.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 

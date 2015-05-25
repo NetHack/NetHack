@@ -1,5 +1,4 @@
-/* NetHack 3.6	dokick.c	$NHDT-Date: 1431192760 2015/05/09 17:32:40 $  $NHDT-Branch: master $:$NHDT-Revision: 1.98 $ */
-/* NetHack 3.6	dokick.c	$Date: 2012/05/06 02:29:33 $  $Revision: 1.78 $ */
+/* NetHack 3.6	dokick.c	$NHDT-Date: 1432512765 2015/05/25 00:12:45 $  $NHDT-Branch: master $:$NHDT-Revision: 1.99 $ */
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 

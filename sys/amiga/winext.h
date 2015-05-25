@@ -1,6 +1,4 @@
-/* NetHack 3.6	winext.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.6	winext.h	$Date: 2009/05/06 10:48:35 $  $Revision: 1.3 $ */
-/*    SCCS Id: @(#)winext.h    3.5    2000/01/12 */
+/* NetHack 3.6	winext.h	$NHDT-Date: 1432512794 2015/05/25 00:13:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
 /* Copyright (c) Gregg Wonderly, Naperville, Illinois,  1991,1992,1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 

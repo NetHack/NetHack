@@ -1,7 +1,4 @@
-/* NetHack 3.6	nh340key.c	$NHDT-Date: 1431192782 2015/05/09 17:33:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
-/* NetHack 3.6	nh340key.c	$Date: 2009/05/06 10:53:29 $  $Revision: 1.7 $ */
-/*	SCCS Id: @(#)nh340key.c	3.5	$NHDT-Date: 1431192782 2015/05/09 17:33:02 $   */
-/*	SCCS Id: @(#)nh340key.c	3.5	$Date: 2009/05/06 10:53:29 $   */
+/* NetHack 3.6	nh340key.c	$NHDT-Date: 1432512793 2015/05/25 00:13:13 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
 /* Copyright (c) NetHack PC Development Team 2003                      */
 /* NetHack may be freely redistributed.  See license for details.      */
 

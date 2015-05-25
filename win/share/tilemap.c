@@ -1,5 +1,4 @@
-/* NetHack 3.6	tilemap.c	$NHDT-Date: 1431192771 2015/05/09 17:32:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.23 $ */
-/*	SCCS Id: @(#)tilemap.c	3.5	2000/06/04	*/
+/* NetHack 3.6	tilemap.c	$NHDT-Date: 1432512803 2015/05/25 00:13:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.24 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*

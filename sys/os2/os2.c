@@ -1,6 +1,4 @@
-/* NetHack 3.6	os2.c	$NHDT-Date: 1431192782 2015/05/09 17:33:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
-/* NetHack 3.6	os2.c	$Date: 2009/05/06 10:50:12 $  $Revision: 1.5 $ */
-/*	SCCS Id: @(#)os2.c	3.5	1996/02/29 */
+/* NetHack 3.6	os2.c	$NHDT-Date: 1432512793 2015/05/25 00:13:13 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
 /*	Copyright (c) Timo Hakulinen, 1990, 1991, 1992, 1993, 1996. */
 /*	NetHack may be freely redistributed.  See license for details. */
 

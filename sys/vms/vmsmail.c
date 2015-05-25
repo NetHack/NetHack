@@ -1,6 +1,4 @@
-/* NetHack 3.6	vmsmail.c	$NHDT-Date: 1431192780 2015/05/09 17:33:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
-/* NetHack 3.6	vmsmail.c	$Date: 2009/05/06 10:51:25 $  $Revision: 1.5 $ */
-/*	SCCS Id: @(#)vmsmail.c	3.5	2006/04/14	*/
+/* NetHack 3.6	vmsmail.c	$NHDT-Date: 1432512789 2015/05/25 00:13:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
 /* Copyright (c) Robert Patrick Rankin, 1991.			  */
 /* NetHack may be freely redistributed.  See license for details. */
 

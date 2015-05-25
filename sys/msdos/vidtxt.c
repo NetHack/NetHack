@@ -1,6 +1,4 @@
-/* NetHack 3.6	vidtxt.c	$NHDT-Date: 1431192781 2015/05/09 17:33:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
-/* NetHack 3.6	vidtxt.c	$Date: 2009/05/06 10:49:49 $  $Revision: 1.6 $ */
-/*   SCCS Id: @(#)vidtxt.c   3.5     1994/04/04                     */
+/* NetHack 3.6	vidtxt.c	$NHDT-Date: 1432512791 2015/05/25 00:13:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
 /*   Copyright (c) NetHack PC Development Team 1993                 */
 /*   NetHack may be freely redistributed.  See license for details. */
 /*                                                                  */

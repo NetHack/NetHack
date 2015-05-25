@@ -1,6 +1,4 @@
-/* NetHack 3.6	mail.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.6	mail.h	$Date: 2009/05/06 10:44:52 $  $Revision: 1.4 $ */
-/*	SCCS Id: @(#)mail.h	3.5	1991/10/11	*/
+/* NetHack 3.6	mail.h	$NHDT-Date: 1432512777 2015/05/25 00:12:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* used by ckmailstatus() to pass information to the mail-daemon in newmail()

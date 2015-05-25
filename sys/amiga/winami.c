@@ -1,5 +1,4 @@
-/* NetHack 3.6	winami.c	$NHDT-Date: 1431192783 2015/05/09 17:33:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.18 $ */
-/* NetHack 3.6	winami.c	$Date: 2012/01/10 17:47:21 $  $Revision: 1.13 $ */
+/* NetHack 3.6	winami.c	$NHDT-Date: 1432512794 2015/05/25 00:13:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.19 $ */
 /* Copyright (c) Gregg Wonderly, Naperville, Illinois,  1991,1992,1993,1996.
  */
 /* NetHack may be freely redistributed.  See license for details. */

@@ -1,7 +1,6 @@
 .KEY oper/a,tmp/a,real/a,f1,f2,f3,f4,f5
 
 . ; miscellaneous script functions for the Amiga
-. ; SCCS Id: @(#)ifchange	3.2	96/02/04
 . ; Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1992, 1993, 1996.
 . ; NetHack may be freely redistributed.  See license for details.
 

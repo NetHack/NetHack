@@ -1,5 +1,4 @@
-/* NetHack 3.6	topten.c	$NHDT-Date: 1431192766 2015/05/09 17:32:46 $  $NHDT-Branch: master $:$NHDT-Revision: 1.34 $ */
-/* NetHack 3.6	topten.c	$Date: 2012/01/24 04:26:15 $  $Revision: 1.23 $ */
+/* NetHack 3.6	topten.c	$NHDT-Date: 1432512771 2015/05/25 00:12:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.35 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

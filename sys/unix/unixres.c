@@ -1,6 +1,4 @@
-/* NetHack 3.6	unixres.c	$NHDT-Date: 1431192779 2015/05/09 17:32:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
-/* NetHack 3.6	unixres.c	$Date: 2009/05/06 10:50:57 $  $Revision: 1.8 $ */
-/*	SCCS Id: @(#)unixres.c	3.5	2001/07/08	*/
+/* NetHack 3.6	unixres.c	$NHDT-Date: 1432512788 2015/05/25 00:13:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
 /* Copyright (c) Slash'EM development team, 2001. */
 /* NetHack may be freely redistributed.  See license for details. */
 

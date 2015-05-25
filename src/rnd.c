@@ -1,6 +1,4 @@
-/* NetHack 3.6	rnd.c	$NHDT-Date: 1431192762 2015/05/09 17:32:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.14 $ */
-/* NetHack 3.6	rnd.c	$Date: 2009/05/06 10:47:41 $  $Revision: 1.7 $ */
-/*	SCCS Id: @(#)rnd.c	3.5	2004/08/27	*/
+/* NetHack 3.6	rnd.c	$NHDT-Date: 1432512767 2015/05/25 00:12:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"

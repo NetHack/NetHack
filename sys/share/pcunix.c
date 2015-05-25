@@ -1,6 +1,4 @@
-/* NetHack 3.6	pcunix.c	$NHDT-Date: 1431192778 2015/05/09 17:32:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.33 $ */
-/* NetHack 3.6	pcunix.c	$Date: 2009/05/06 10:50:30 $  $Revision: 1.27 $ */
-/*	SCCS Id: @(#)pcunix.c	3.5	1994/11/07	*/
+/* NetHack 3.6	pcunix.c	$NHDT-Date: 1432512787 2015/05/25 00:13:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.34 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

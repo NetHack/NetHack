@@ -1,6 +1,4 @@
-/* NetHack 3.6	color.h	$NHDT-Date: 1428088106 2015/04/03 19:08:26 $  $NHDT-Branch: scshunt-regex $:$NHDT-Revision: 1.8 $ */
-/* NetHack 3.6	color.h	$Date: 2009/05/06 10:44:34 $  $Revision: 1.5 $ */
-/*	SCCS Id: @(#)color.h	3.5	1992/02/02	*/
+/* NetHack 3.6	color.h	$NHDT-Date: 1432512776 2015/05/25 00:12:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $ */
 /* Copyright (c) Steve Linhart, Eric Raymond, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 

@@ -1,5 +1,4 @@
 # $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
-# $Date:2002/01/22 22:54:54 $  $Revision: 1.2 $
 
 # Set all of these or none of them.
 #

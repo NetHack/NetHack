@@ -1,6 +1,4 @@
-/* NetHack 3.6	tcap.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.6	tcap.h	$Date: 2009/05/06 10:45:11 $  $Revision: 1.6 $ */
-/*	SCCS Id: @(#)tcap.h	3.5	1992/10/21	*/
+/* NetHack 3.6	tcap.h	$NHDT-Date: 1432512774 2015/05/25 00:12:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 

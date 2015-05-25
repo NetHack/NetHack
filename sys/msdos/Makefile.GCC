@@ -1,5 +1,4 @@
-# NetHack 3.6	Makefile.GCC	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
-# NetHack 3.6	Makefile.GCC	$Date: 2012/01/10 17:47:26 $  $Revision: 1.25 $
+# NetHack 3.6	Makefile.GCC	$NHDT-Date: 1432512792 2015/05/25 00:13:12 $  $NHDT-Branch: master $:$NHDT-Revision: 1.28 $
 #	Copyright (c) NetHack PC Development Team 1996-2006.
 #	PC NetHack 3.6 Makefile for djgpp V2
 #

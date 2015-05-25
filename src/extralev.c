@@ -1,5 +1,4 @@
-/* NetHack 3.6	extralev.c	$NHDT-Date: 1431192759 2015/05/09 17:32:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
-/* NetHack 3.6	extralev.c	$Date: 2010/01/10 02:35:19 $  $Revision: 1.5 $ */
+/* NetHack 3.6	extralev.c	$NHDT-Date: 1432512765 2015/05/25 00:12:45 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
 /*	Copyright 1988, 1989 by Ken Arromdee				*/
 /* NetHack may be freely redistributed.  See license for details. */
 

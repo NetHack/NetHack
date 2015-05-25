@@ -1,6 +1,4 @@
-/* NetHack 3.6	mmodal.c	$NHDT-Date: 1431192785 2015/05/09 17:33:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
-/* NetHack 3.6	mmodal.c	$Date: 2009/05/06 10:49:18 $  $Revision: 1.7 $ */
-/*	SCCS Id: @(#)mmodal.c	3.5	1993/01/24		  */
+/* NetHack 3.6	mmodal.c	$NHDT-Date: 1432512797 2015/05/25 00:13:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
 /* Copyright (c) Jon W{tte, Hao-Yang Wang, Jonathan Handler 1992. */
 /* NetHack may be freely redistributed.  See license for details. */
 

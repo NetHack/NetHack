@@ -1,6 +1,4 @@
-/* NetHack 3.6	pcconf.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.6	pcconf.h	$Date: 2009/05/06 10:45:00 $  $Revision: 1.11 $ */
-/*	SCCS Id: @(#)pcconf.h	3.5	1995/10/11	*/
+/* NetHack 3.6	pcconf.h	$NHDT-Date: 1432512776 2015/05/25 00:12:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.17 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

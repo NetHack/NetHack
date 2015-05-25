@@ -1,6 +1,5 @@
 #!/bin/sh
-# NetHack 3.6  macosx.sh $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
-# NetHack 3.6  macosx.sh $Date: 2011/10/17 01:29:17 $  $Revision: 1.5 $
+# NetHack 3.6  macosx.sh $NHDT-Date: 1432512814 2015/05/25 00:13:34 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details.
 #

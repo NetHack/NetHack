@@ -1,6 +1,4 @@
-/* NetHack 3.6	align.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.6	align.h	$Date: 2009/05/06 10:44:33 $  $Revision: 1.4 $ */
-/*	SCCS Id: @(#)align.h	3.5	1991/12/29	*/
+/* NetHack 3.6	align.h	$NHDT-Date: 1432512779 2015/05/25 00:12:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
 /* Copyright (c) Mike Stephenson, Izchak Miller  1991.		  */
 /* NetHack may be freely redistributed.  See license for details. */
 

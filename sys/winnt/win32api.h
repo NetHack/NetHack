@@ -1,7 +1,4 @@
-/* NetHack 3.6	win32api.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.6	win32api.h	$Date: 2009/05/06 10:53:39 $  $Revision: 1.6 $ */
-/*	SCCS Id: @(#)win32api.h	 3.5	 $NHDT-Date$		  */
-/*	SCCS Id: @(#)win32api.h	 3.5	 $Date: 2009/05/06 10:53:39 $
+/* NetHack 3.6	win32api.h	$NHDT-Date: 1432512793 2015/05/25 00:13:13 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
  */
 /* Copyright (c) NetHack PC Development Team 1996                 */
 /* NetHack may be freely redistributed.  See license for details. */

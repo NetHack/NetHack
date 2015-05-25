@@ -1,5 +1,4 @@
-/* NetHack 3.6	mhmap.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.6	mhmap.h	$Date: 2009/10/13 01:55:12 $  $Revision: 1.6 $ */
+/* NetHack 3.6	mhmap.h	$NHDT-Date: 1432512799 2015/05/25 00:13:19 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 

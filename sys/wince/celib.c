@@ -1,5 +1,4 @@
-/* NetHack 3.6	celib.c	$NHDT-Date: 1431192789 2015/05/09 17:33:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
-/* NetHack 3.6	celib.c	$Date: 2009/10/22 02:59:30 $  $Revision: 1.6 $ */
+/* NetHack 3.6	celib.c	$NHDT-Date: 1432512803 2015/05/25 00:13:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 

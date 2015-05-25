@@ -1,6 +1,4 @@
-/* NetHack 3.6	tile2bin.c	$NHDT-Date: 1431192781 2015/05/09 17:33:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
-/* NetHack 3.6	tile2bin.c	$Date: 2009/05/06 10:49:47 $  $Revision: 1.4 $ */
-/*   SCCS Id: @(#)tile2bin.c   3.5     1995/01/26                     */
+/* NetHack 3.6	tile2bin.c	$NHDT-Date: 1432512792 2015/05/25 00:13:12 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
 /*   Copyright (c) NetHack PC Development Team 1993, 1994, 1995     */
 /*   NetHack may be freely redistributed.  See license for details. */
 

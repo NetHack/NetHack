@@ -1,6 +1,4 @@
-/* NetHack 3.6	txt2iff.c	$NHDT-Date: 1431192784 2015/05/09 17:33:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.6 $ */
-/* NetHack 3.6	txt2iff.c	$Date: 2009/05/06 10:48:31 $  $Revision: 1.3 $ */
-/*	SCCS Id: @(#)txt2iff.c	3.5	1995/07/28	*/
+/* NetHack 3.6	txt2iff.c	$NHDT-Date: 1432512795 2015/05/25 00:13:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
 /* 	Copyright (c) 1995 by Gregg Wonderly, Naperville, Illinois */
 /* NetHack may be freely redistributed.  See license for details. */
 

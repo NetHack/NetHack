@@ -1,6 +1,4 @@
-/* NetHack 3.6	amimenu.c	$NHDT-Date: 1431192784 2015/05/09 17:33:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.6 $ */
-/* NetHack 3.6	amimenu.c	$Date: 2009/05/06 10:48:29 $  $Revision: 1.3 $ */
-/*    SCCS Id: @(#)amimenu.c    3.5    1996/02/04		   */
+/* NetHack 3.6	amimenu.c	$NHDT-Date: 1432512796 2015/05/25 00:13:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
 /*    Copyright (c) Olaf 'Rhialto' Seibert, 1989		   */
 /*    Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1992, 1993, 1996 */
 /*    Copyright (c) Janne Salmijärvi, 2000 */

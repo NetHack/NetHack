@@ -41,8 +41,7 @@
  * Modified 08 July 2006 to cast strlen() result to int to suppress a
  * warning on platforms where size_t > sizeof(int).
  *
- * $NHDT-Date: 1431192778 2015/05/09 17:32:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.6 $
- * $Date: 2006/07/09 16:42:21 $  $Revision: 1.4 $
+ * $NHDT-Date: 1432512787 2015/05/25 00:13:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $
  */
 
 #ifndef lint

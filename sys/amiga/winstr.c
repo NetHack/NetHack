@@ -1,6 +1,4 @@
-/* NetHack 3.6	winstr.c	$NHDT-Date: 1431192783 2015/05/09 17:33:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.6 $ */
-/* NetHack 3.6	winstr.c	$Date: 2009/05/06 10:48:42 $  $Revision: 1.3 $ */
-/*    SCCS Id: @(#)winstr.c    3.5    1993/04/02 */
+/* NetHack 3.6	winstr.c	$NHDT-Date: 1432512795 2015/05/25 00:13:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
 /* Copyright (c) Gregg Wonderly, Naperville, Illinois,  1991,1992,1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 

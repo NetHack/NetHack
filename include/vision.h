@@ -1,6 +1,4 @@
-/* NetHack 3.6	vision.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.6	vision.h	$Date: 2009/05/06 10:45:15 $  $Revision: 1.5 $ */
-/*	SCCS Id: @(#)vision.h	3.5	2007/05/11	*/
+/* NetHack 3.6	vision.h	$NHDT-Date: 1432512777 2015/05/25 00:12:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Dave Cohrs, 1990. */
 /* NetHack may be freely redistributed.  See license for details.	*/
 

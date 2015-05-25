@@ -1,7 +1,4 @@
-/* NetHack 3.6	nhraykey.c	$NHDT-Date: 1431192782 2015/05/09 17:33:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.14 $ */
-/* NetHack 3.6	nhraykey.c	$Date: 2009/05/06 10:53:31 $  $Revision: 1.8 $ */
-/*	SCCS Id: @(#)nhraykey.c	3.5	$NHDT-Date: 1431192783 2015/05/09 17:33:03 $   */
-/*	SCCS Id: @(#)nhraykey.c	3.5	$Date: 2009/05/06 10:53:31 $   */
+/* NetHack 3.6	nhraykey.c	$NHDT-Date: 1432512794 2015/05/25 00:13:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
 /* Copyright (c) NetHack PC Development Team 2003                      */
 /* NetHack may be freely redistributed.  See license for details.      */
 

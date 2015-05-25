@@ -1,6 +1,4 @@
-/* NetHack 3.6	mhinput.c	$NHDT-Date: 1431192776 2015/05/09 17:32:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
-/* NetHack 3.6	mhinput.c	$Date: 2009/05/06 10:59:48 $  $Revision: 1.7 $ */
-/*	SCCS Id: @(#)mhinput.c	3.5	2005/01/23	*/
+/* NetHack 3.6	mhinput.c	$NHDT-Date: 1432512810 2015/05/25 00:13:30 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 

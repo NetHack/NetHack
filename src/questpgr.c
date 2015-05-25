@@ -1,5 +1,4 @@
-/* NetHack 3.6	questpgr.c	$NHDT-Date: 1432367420 2015/05/23 07:50:20 $  $NHDT-Branch: master $:$NHDT-Revision: 1.29 $ */
-/* NetHack 3.6	questpgr.c	$Date: 2012/02/02 09:18:14 $  $Revision: 1.14 $ */
+/* NetHack 3.6	questpgr.c	$NHDT-Date: 1432512768 2015/05/25 00:12:48 $  $NHDT-Branch: master $:$NHDT-Revision: 1.31 $ */
 /*	Copyright 1991, M. Stephenson		  */
 /* NetHack may be freely redistributed.  See license for details. */
 

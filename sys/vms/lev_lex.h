@@ -1,6 +1,4 @@
-/* NetHack 3.6	lev_lex.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.6	lev_lex.h	$Date: 2009/05/06 10:51:24 $  $Revision: 1.4 $ */
-/*	SCCS Id: @(#)lev_lex.h	3.5	1999/08/08	*/
+/* NetHack 3.6	lev_lex.h	$NHDT-Date: 1432512790 2015/05/25 00:13:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
 /* "vms/lev_lex.h" copied into "util/stdio.h" for use in *_lex.c only!
  * This is an awful kludge to allow util/*_lex.c made by SunOS's `lex'
  * to be compiled as is.  (It isn't needed with `flex' or VMS POSIX

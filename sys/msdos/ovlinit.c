@@ -1,6 +1,4 @@
-/* NetHack 3.6	ovlinit.c	$NHDT-Date: 1431192781 2015/05/09 17:33:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
-/* NetHack 3.6	ovlinit.c	$Date: 2009/05/06 10:49:38 $  $Revision: 1.4 $ */
-/*	SCCS Id: @(#)ovlinit.c	3.5	1994/03/20	          */
+/* NetHack 3.6	ovlinit.c	$NHDT-Date: 1432512792 2015/05/25 00:13:12 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
 /* Copyright (c) NetHack PC Development Team 1995                 */
 /* NetHack may be freely redistributed.  See license for details. */
 

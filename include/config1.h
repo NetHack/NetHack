@@ -1,5 +1,4 @@
-/* NetHack 3.6	config1.h	$NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$ */
-/* NetHack 3.6	config1.h	$Date: 2011/05/23 03:27:07 $  $Revision: 1.13 $ */
+/* NetHack 3.6	config1.h	$NHDT-Date: 1432512781 2015/05/25 00:13:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.17 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 

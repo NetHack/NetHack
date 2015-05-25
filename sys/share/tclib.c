@@ -1,6 +1,4 @@
-/* NetHack 3.6	tclib.c	$NHDT-Date: 1431192779 2015/05/09 17:32:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
-/* NetHack 3.6	tclib.c	$Date: 2009/05/06 10:50:31 $  $Revision: 1.4 $ */
-/*	SCCS Id: @(#)tclib.c	3.5	1996/02/25	*/
+/* NetHack 3.6	tclib.c	$NHDT-Date: 1432512788 2015/05/25 00:13:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
 /* Copyright (c) Robert Patrick Rankin, 1995			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
