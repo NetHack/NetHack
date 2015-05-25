@@ -339,7 +339,7 @@ register int x, y, typ;
         for (k = 0; k < 12; ++k)
             tavail[k] = 0;
         for (t = ftrap; t; t = t->ntrap)
-            if (t->ttyp == SQKY_BOARD)
+            if (t->ttyp == SQKY_BOARD && t != ttmp)
                 tavail[t->tnote] = 1;
 
         /* Now populate tpick with the available indexes */
