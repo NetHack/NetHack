@@ -1,0 +1,64 @@
+---
+Language:        Cpp
+# BasedOnStyle:  LLVM
+AccessModifierOffset: -2
+AlignAfterOpenBracket: true
+AlignEscapedNewlinesLeft: true
+AlignOperands:   true
+AlignTrailingComments: true
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortBlocksOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+AlwaysBreakAfterDefinitionReturnType: true
+AlwaysBreakTemplateDeclarations: false
+AlwaysBreakBeforeMultilineStrings: false
+BreakBeforeBinaryOperators: NonAssignment
+BreakBeforeTernaryOperators: true
+BreakConstructorInitializersBeforeComma: false
+BinPackParameters: true
+BinPackArguments: true
+ColumnLimit:     78
+ConstructorInitializerAllOnOneLineOrOnePerLine: false
+ConstructorInitializerIndentWidth: 4
+DerivePointerAlignment: false
+ExperimentalAutoDetectBinPacking: false
+IndentCaseLabels: false
+IndentWrappedFunctionNames: false
+IndentFunctionDeclarationAfterType: false
+MaxEmptyLinesToKeep: 1
+KeepEmptyLinesAtTheStartOfBlocks: false
+NamespaceIndentation: None
+ObjCBlockIndentWidth: 2
+ObjCSpaceAfterProperty: false
+ObjCSpaceBeforeProtocolList: true
+PenaltyBreakBeforeFirstCallParameter: 19
+PenaltyBreakComment: 300
+PenaltyBreakString: 1000
+PenaltyBreakFirstLessLess: 120
+PenaltyExcessCharacter: 1000000
+PenaltyReturnTypeOnItsOwnLine: 100
+PointerAlignment: Right
+SpacesBeforeTrailingComments: 1
+Cpp11BracedListStyle: false
+Standard:        Cpp03
+IndentWidth:     4
+TabWidth:        8
+UseTab:          Never
+BreakBeforeBraces: Linux
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+SpacesInAngles:  false
+SpaceInEmptyParentheses: false
+SpacesInCStyleCastParentheses: false
+SpaceAfterCStyleCast: true
+SpacesInContainerLiterals: true
+SpaceBeforeAssignmentOperators: true
+ContinuationIndentWidth: 4
+CommentPragmas:  '^ NetHack 3'
+ForEachMacros:   [ foreach, Q_FOREACH, BOOST_FOREACH ]
+SpaceBeforeParens: ControlStatements
+DisableFormat:   false
+...
