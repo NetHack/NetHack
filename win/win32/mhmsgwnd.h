@@ -11,9 +11,7 @@
 #include "config.h"
 #include "global.h"
 
-HWND mswin_init_message_window (void);
-void mswin_message_window_size (HWND hWnd, LPSIZE sz);
-
+HWND mswin_init_message_window(void);
+void mswin_message_window_size(HWND hWnd, LPSIZE sz);
 
 #endif /* MSWINMessageWindow_h */
-

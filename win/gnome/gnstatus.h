@@ -11,6 +11,6 @@
 #include "config.h"
 #include "global.h"
 
-GtkWidget* ghack_init_status_window ();
+GtkWidget *ghack_init_status_window();
 
 #endif /* GnomeHackStatusWindow_h */

@@ -7,10 +7,8 @@
 #ifndef GnomeHackAskStringDialog_h
 #define GnomeHackAskStringDialog_h
 
-
 int ghack_ask_string_dialog(const char *szMessageStr,
-        const char *szDefaultStr, const char *szTitleStr,
-        char *buffer);
+                            const char *szDefaultStr, const char *szTitleStr,
+                            char *buffer);
 
 #endif /* GnomeHackAskStringDialog_h */
-

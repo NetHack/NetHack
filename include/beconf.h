@@ -15,7 +15,7 @@
 
 #define index strchr
 #define rindex strrchr
-#define Rand rand	/* Be should have a better rand function! */
+#define Rand rand /* Be should have a better rand function! */
 #define tgetch getchar
 #define FCMASK 0666
 #define PORT_ID "BeOS"
@@ -23,12 +23,11 @@
 #define POSIX_TYPES
 #define SIG_RET_TYPE __signal_func_ptr
 
-#include <time.h>	/* for time_t */
-#include <unistd.h>	/* for lseek() */
+#include <time.h>   /* for time_t */
+#include <unistd.h> /* for lseek() */
 
 /* could go in extern.h, under bemain.c (or something..) */
 void regularize(char *);
-
 
 /* instead of including system.h... */
 #include <string.h>

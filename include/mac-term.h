@@ -26,11 +26,11 @@
 #undef MAC
 #define UNIX
 #define BSD
-#define __FreeBSD__ 	/* Darwin is based on FreeBSD */
+#define __FreeBSD__ /* Darwin is based on FreeBSD */
 #define GCC_WARN
 
 /* May already be defined by CodeWarrior as 0 or 1 */
 #ifdef TARGET_API_MAC_CARBON
-# undef TARGET_API_MAC_CARBON
+#undef TARGET_API_MAC_CARBON
 #endif
-#define TARGET_API_MAC_CARBON 0 	/* Not Carbon */
+#define TARGET_API_MAC_CARBON 0 /* Not Carbon */

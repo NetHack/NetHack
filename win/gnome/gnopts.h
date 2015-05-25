@@ -7,9 +7,6 @@
 #ifndef GnomeHackSettings_h
 #define GnomeHackSettings_h
 
-
-void ghack_settings_dialog( void);
-
+void ghack_settings_dialog(void);
 
 #endif /* GnomeHackSettings.h */
-

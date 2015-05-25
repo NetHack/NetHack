@@ -4,7 +4,7 @@
 /* Copyright (C) 1998 by Erik Andersen <andersee@debian.org> */
 /* NetHack may be freely redistributed.  See license for details. */
 /* These XPMs are the artwork of Warwick Allison
- * <warwick@troll.no>.  They have been borrowed from 
+ * <warwick@troll.no>.  They have been borrowed from
  * the most excellent NetHackQt, until such time as
  * we can come up with something better.
  *
@@ -12,6 +12,7 @@
  * http://www.troll.no/~warwick/nethack/
  */
 
+/* clang-format off */
 /* XPM */
 static char *blind_xpm[] = {
 /* width height ncolors chars_per_pixel */
@@ -1449,4 +1450,4 @@ static char *nothing_xpm[] = {
 "oooooooooooooooooooooooooooooooooooooooo",
 "oooooooooooooooooooooooooooooooooooooooo"
 };
-
+/* clang-format on */

@@ -10,20 +10,20 @@
 #define TCAP_H
 
 #ifndef MICRO
-# define TERMLIB	/* include termcap code */
+#define TERMLIB /* include termcap code */
 #endif
 
 /* might display need graphics code? */
 #if !defined(AMIGA) && !defined(TOS) && !defined(MAC)
-# if defined(TERMLIB) || defined(OS2) || defined(MSDOS)
-#  define ASCIIGRAPH
-# endif
+#if defined(TERMLIB) || defined(OS2) || defined(MSDOS)
+#define ASCIIGRAPH
+#endif
 #endif
 
 #ifndef DECL_H
-extern struct tc_gbl_data {   /* also declared in decl.h; defined in decl.c */
-    char *tc_AS, *tc_AE;	/* graphics start and end (tty font swapping) */
-    int   tc_LI,  tc_CO;	/* lines and columns */
+extern struct tc_gbl_data { /* also declared in decl.h; defined in decl.c */
+    char *tc_AS, *tc_AE;    /* graphics start and end (tty font swapping) */
+    int tc_LI, tc_CO;       /* lines and columns */
 } tc_gbl_data;
 #define AS tc_gbl_data.tc_AS
 #define AE tc_gbl_data.tc_AE
@@ -31,7 +31,7 @@ extern struct tc_gbl_data {   /* also declared in decl.h; defined in decl.c */
 #define CO tc_gbl_data.tc_CO
 #endif
 
-extern struct tc_lcl_data {   /* defined and set up in termcap.c */
+extern struct tc_lcl_data { /* defined and set up in termcap.c */
     char *tc_CM, *tc_ND, *tc_CD;
     char *tc_HI, *tc_HE, *tc_US, *tc_UE;
     boolean tc_ul_hack;
@@ -46,14 +46,14 @@ extern struct tc_lcl_data {   /* defined and set up in termcap.c */
 #define nh_UE tc_lcl_data.tc_UE
 #define ul_hack tc_lcl_data.tc_ul_hack
 
-extern short ospeed;		/* set up in termcap.c */
+extern short ospeed; /* set up in termcap.c */
 
 #ifdef TEXTCOLOR
-# ifdef TOS
+#ifdef TOS
 extern const char *hilites[CLR_MAX];
-# else
+#else
 extern NEARDATA char *hilites[CLR_MAX];
-# endif
+#endif
 #endif
 
 #endif /* TCAP_H */

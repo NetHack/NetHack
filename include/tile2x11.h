@@ -21,4 +21,4 @@ typedef struct {
 /* how wide each row in the tile file is, in tiles */
 #define TILES_PER_ROW (40)
 
-#endif	/* TILE2X11_H */
+#endif /* TILE2X11_H */

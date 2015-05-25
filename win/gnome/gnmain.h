@@ -10,19 +10,15 @@
 #include <gnome.h>
 #include <gtk/gtk.h>
 
-
-void ghack_init_main_window( int argc, char** argv);
-void ghack_main_window_add_map_window(GtkWidget* win);
-void ghack_main_window_add_message_window(GtkWidget* win);
-void ghack_main_window_add_status_window(GtkWidget* win);
+void ghack_init_main_window(int argc, char **argv);
+void ghack_main_window_add_map_window(GtkWidget *win);
+void ghack_main_window_add_message_window(GtkWidget *win);
+void ghack_main_window_add_status_window(GtkWidget *win);
 void ghack_main_window_add_text_window(GtkWidget *);
-void ghack_main_window_add_worn_window(GtkWidget* win);
+void ghack_main_window_add_worn_window(GtkWidget *win);
 void ghack_main_window_remove_window(GtkWidget *);
 void ghack_main_window_update_inventory();
 void ghack_save_game_cb(GtkWidget *widget, gpointer data);
-GtkWidget* ghack_get_main_window();
-
-
+GtkWidget *ghack_get_main_window();
 
 #endif /* GnomeHackMainWindow_h */
-

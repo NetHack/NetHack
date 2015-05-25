@@ -15,33 +15,32 @@
 /* The list of custom signals */
 
 enum {
-  GHSIG_CURS,
-  GHSIG_PUTSTR,
-  GHSIG_PRINT_GLYPH,
-  GHSIG_CLEAR,
-  GHSIG_DISPLAY,
-  GHSIG_START_MENU,
-  GHSIG_ADD_MENU,
-  GHSIG_END_MENU,
-  GHSIG_SELECT_MENU,
-  GHSIG_CLIPAROUND,
-  GHSIG_FADE_HIGHLIGHT,
-  GHSIG_DELAY,
-  GHSIG_LAST_SIG
+    GHSIG_CURS,
+    GHSIG_PUTSTR,
+    GHSIG_PRINT_GLYPH,
+    GHSIG_CLEAR,
+    GHSIG_DISPLAY,
+    GHSIG_START_MENU,
+    GHSIG_ADD_MENU,
+    GHSIG_END_MENU,
+    GHSIG_SELECT_MENU,
+    GHSIG_CLIPAROUND,
+    GHSIG_FADE_HIGHLIGHT,
+    GHSIG_DELAY,
+    GHSIG_LAST_SIG
 };
 
 guint ghack_signals[GHSIG_LAST_SIG];
 
-extern void ghack_init_signals( void);
+extern void ghack_init_signals(void);
 
-
-void ghack_handle_key_press(GtkWidget *widget, GdkEventKey *event, 
-	gpointer data);
-void ghack_handle_button_press(GtkWidget *widget, GdkEventButton *event, 
-	gpointer data);
+void ghack_handle_key_press(GtkWidget *widget, GdkEventKey *event,
+                            gpointer data);
+void ghack_handle_button_press(GtkWidget *widget, GdkEventButton *event,
+                               gpointer data);
 
 typedef struct {
-        int x, y, mod;
+    int x, y, mod;
 } GHClick;
 
 extern GList *g_keyBuffer;
@@ -51,8 +50,6 @@ extern int g_numClicks;
 
 extern int g_askingQuestion;
 
-void ghack_delay( GtkWidget *win, int numMillisecs, gpointer data);
+void ghack_delay(GtkWidget *win, int numMillisecs, gpointer data);
 
-
-#endif    /* GnomeHackSignals_h */
-
+#endif /* GnomeHackSignals_h */

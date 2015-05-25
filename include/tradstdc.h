@@ -28,12 +28,12 @@
 /* Ultrix seems to be in a constant state of flux.  This check attempts to
  * set up ansi compatibility if it wasn't set up correctly by the compiler.
  */
-# ifdef mips
-#  define __mips mips
-# endif
-# ifdef LANGUAGE_C
-#  define __LANGUAGE_C LANGUAGE_C
-# endif
+#ifdef mips
+#define __mips mips
+#endif
+#ifdef LANGUAGE_C
+#define __LANGUAGE_C LANGUAGE_C
+#endif
 #endif
 
 /*
@@ -51,87 +51,109 @@
  * others.
  */
 
-/* #define USE_VARARGS */	/* use <varargs.h> instead of <stdarg.h> */
-/* #define USE_OLDARGS */	/* don't use any variable argument facilites */
+/* #define USE_VARARGS */ /* use <varargs.h> instead of <stdarg.h> */
+/* #define USE_OLDARGS */ /* don't use any variable argument facilites */
 
-#if defined(apollo)		/* Apollos have stdarg(3) but not stdarg.h */
-# define USE_VARARGS
+#if defined(apollo) /* Apollos have stdarg(3) but not stdarg.h */
+#define USE_VARARGS
 #endif
 
 #if defined(NHSTDC) || defined(ULTRIX_PROTO) || defined(MAC)
-# if !defined(USE_VARARGS) && !defined(USE_OLDARGS) && !defined(USE_STDARG)
-#   define USE_STDARG
-# endif
+#if !defined(USE_VARARGS) && !defined(USE_OLDARGS) && !defined(USE_STDARG)
+#define USE_STDARG
+#endif
 #endif
 
-#ifdef NEED_VARARGS		/* only define these if necessary */
-/*
- * These have changed since 3.4.3.  VA_END() now provides an explicit
- * closing brace to complement VA_DECL()'s hidden opening brace, so code
- * started with VA_DECL() needs an extra opening brace to complement
- * the explicit final closing brace.  This was done so that the source
- * would look less strange, where VA_DECL() appeared to introduce a
- * function whose opening brace was missing; there are now visible and
- * invisible braces at beginning and end.  Sample usage:
-void foo VA_DECL(int, arg)  --macro expansion has a hidden opening brace
-{  --new, explicit opening brace (actually introduces a nested block)
-  VA_START(bar);
-  ...code for foo...
-  VA_END();  --expansion now provides a closing brace for the nested block
-}  --existing closing brace, still pairs with the hidden one in VA_DECL()
- * Reading the code--or using source browsing tools which match braces--
- * results in seeing a matched set of braces.  Usage of VA_END() is
- * potentially trickier, but nethack uses it in a straightforward manner.
- */
+#ifdef NEED_VARARGS /* only define these if necessary */
+                    /*
+                     * These have changed since 3.4.3.  VA_END() now provides an explicit
+                     * closing brace to complement VA_DECL()'s hidden opening brace, so code
+                     * started with VA_DECL() needs an extra opening brace to complement
+                     * the explicit final closing brace.  This was done so that the source
+                     * would look less strange, where VA_DECL() appeared to introduce a
+                     * function whose opening brace was missing; there are now visible and
+                     * invisible braces at beginning and end.  Sample usage:
+                    void foo VA_DECL(int, arg)  --macro expansion has a hidden opening brace
+                    {  --new, explicit opening brace (actually introduces a nested block)
+                      VA_START(bar);
+                      ...code for foo...
+                      VA_END();  --expansion now provides a closing brace for the nested block
+                    }  --existing closing brace, still pairs with the hidden one in VA_DECL()
+                     * Reading the code--or using source browsing tools which match braces--
+                     * results in seeing a matched set of braces.  Usage of VA_END() is
+                     * potentially trickier, but nethack uses it in a straightforward manner.
+                     */
 
 #ifdef USE_STDARG
 #include <stdarg.h>
-# define VA_DECL(typ1,var1)	(typ1 var1, ...) { va_list the_args;
-# define VA_DECL2(typ1,var1,typ2,var2)	\
-	(typ1 var1, typ2 var2, ...) { va_list the_args;
-# define VA_INIT(var1,typ1)
-# define VA_NEXT(var1,typ1)	var1 = va_arg(the_args, typ1)
-# define VA_ARGS		the_args
-# define VA_START(x)		va_start(the_args, x)
-# define VA_END()		va_end(the_args); }
-# if defined(ULTRIX_PROTO) && !defined(_VA_LIST_)
-#  define _VA_LIST_	/* prevents multiple def in stdio.h */
-# endif
+#define VA_DECL(typ1, var1) \
+    (typ1 var1, ...)        \
+    {                       \
+        va_list the_args;
+#define VA_DECL2(typ1, var1, typ2, var2) \
+    (typ1 var1, typ2 var2, ...)          \
+    {                                    \
+        va_list the_args;
+#define VA_INIT(var1, typ1)
+#define VA_NEXT(var1, typ1) var1 = va_arg(the_args, typ1)
+#define VA_ARGS the_args
+#define VA_START(x) va_start(the_args, x)
+#define VA_END()      \
+    va_end(the_args); \
+    }
+#if defined(ULTRIX_PROTO) && !defined(_VA_LIST_)
+#define _VA_LIST_ /* prevents multiple def in stdio.h */
+#endif
 #else
-# ifdef USE_VARARGS
+#ifdef USE_VARARGS
 #include <varargs.h>
-#  define VA_DECL(typ1,var1)	(va_alist) va_dcl {\
-		va_list the_args; typ1 var1;
-#  define VA_DECL2(typ1,var1,typ2,var2) (va_alist) va_dcl {\
-		va_list the_args; typ1 var1; typ2 var2;
-#  define VA_ARGS		the_args
-#  define VA_START(x)		va_start(the_args)
-#  define VA_INIT(var1,typ1)	var1 = va_arg(the_args, typ1)
-#  define VA_NEXT(var1,typ1)	var1 = va_arg(the_args,typ1)
-#  define VA_END()		va_end(the_args); }
-# else
-#   define VA_ARGS	arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9
-#   define VA_DECL(typ1,var1)  (var1,VA_ARGS) typ1 var1; \
-	char *arg1,*arg2,*arg3,*arg4,*arg5,*arg6,*arg7,*arg8,*arg9; {
-#   define VA_DECL2(typ1,var1,typ2,var2)  (var1,var2,VA_ARGS) \
-	typ1 var1; typ2 var2; \
-	char *arg1,*arg2,*arg3,*arg4,*arg5,*arg6,*arg7,*arg8,*arg9; {
-#   define VA_START(x)
-#   define VA_INIT(var1,typ1)
-    /* this is inherently risky, and should only be attempted as a
-       very last resort; manipulating arguments which haven't actually
-       been passed may or may not cause severe trouble depending on
-       the function-calling/argument-passing mechanism being used */
-#   define VA_SHIFT()	(arg1=arg2, arg2=arg3, arg3=arg4, arg4=arg5,\
-			 arg5=arg6, arg6=arg7, arg7=arg8, arg8=arg9)
-#   define VA_NEXT(var1,typ1)	((var1 = (typ1)arg1), VA_SHIFT(), var1)
-#   define VA_END()	}
-# endif
+#define VA_DECL(typ1, var1) \
+    (va_alist) va_dcl       \
+    {                       \
+        va_list the_args;   \
+        typ1 var1;
+#define VA_DECL2(typ1, var1, typ2, var2) \
+    (va_alist) va_dcl                    \
+    {                                    \
+        va_list the_args;                \
+        typ1 var1;                       \
+        typ2 var2;
+#define VA_ARGS the_args
+#define VA_START(x) va_start(the_args)
+#define VA_INIT(var1, typ1) var1 = va_arg(the_args, typ1)
+#define VA_NEXT(var1, typ1) var1 = va_arg(the_args, typ1)
+#define VA_END()      \
+    va_end(the_args); \
+    }
+#else
+#define VA_ARGS arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
+#define VA_DECL(typ1, var1)                                             \
+    (var1, VA_ARGS) typ1 var1;                                          \
+    char *arg1, *arg2, *arg3, *arg4, *arg5, *arg6, *arg7, *arg8, *arg9; \
+    {
+#define VA_DECL2(typ1, var1, typ2, var2)                                \
+    (var1, var2, VA_ARGS) typ1 var1;                                    \
+    typ2 var2;                                                          \
+    char *arg1, *arg2, *arg3, *arg4, *arg5, *arg6, *arg7, *arg8, *arg9; \
+    {
+#define VA_START(x)
+#define VA_INIT(var1, typ1)
+/* this is inherently risky, and should only be attempted as a
+   very last resort; manipulating arguments which haven't actually
+   been passed may or may not cause severe trouble depending on
+   the function-calling/argument-passing mechanism being used */
+#define VA_SHIFT()                                                    \
+    (arg1 = arg2, arg2 = arg3, arg3 = arg4, arg4 = arg5, arg5 = arg6, \
+     arg6 = arg7, arg7 = arg8, arg8 = arg9)
+#define VA_NEXT(var1, typ1) ((var1 = (typ1) arg1), VA_SHIFT(), var1)
+#define VA_END() }
+#endif
 #endif
 
 #endif /* NEED_VARARGS */
 
-#if defined(NHSTDC) || defined(MSDOS) || defined(MAC) || defined(ULTRIX_PROTO) || defined(__BEOS__)
+#if defined(NHSTDC) || defined(MSDOS) || defined(MAC) \
+    || defined(ULTRIX_PROTO) || defined(__BEOS__)
 
 /*
  * Used for robust ANSI parameter forward declarations:
@@ -145,15 +167,15 @@ void foo VA_DECL(int, arg)  --macro expansion has a hidden opening brace
  * trampoli.* mechanism conflicts with the ANSI <<f(void)>> syntax.
  */
 
-# define NDECL(f)	f(void) /* overridden later if USE_TRAMPOLI set */
+#define NDECL(f) f(void) /* overridden later if USE_TRAMPOLI set */
 
-# define FDECL(f,p)	f p
+#define FDECL(f, p) f p
 
-# if defined(MSDOS) || defined(USE_STDARG)
-#  define VDECL(f,p)	f p
-# else
-#  define VDECL(f,p)	f()
-# endif
+#if defined(MSDOS) || defined(USE_STDARG)
+#define VDECL(f, p) f p
+#else
+#define VDECL(f, p) f()
+#endif
 
 /*
  * Used for definitions of functions which take no arguments to force
@@ -163,23 +185,23 @@ void foo VA_DECL(int, arg)  --macro expansion has a hidden opening brace
 #define VOID_ARGS void
 
 /* generic pointer, always a macro; genericptr_t is usually a typedef */
-# define genericptr	void *
+#define genericptr void *
 
-# if (defined(ULTRIX_PROTO) && !defined(__GNUC__)) || defined(OS2_CSET2)
+#if (defined(ULTRIX_PROTO) && !defined(__GNUC__)) || defined(OS2_CSET2)
 /* Cover for Ultrix on a DECstation with 2.0 compiler, which coredumps on
  *   typedef void * genericptr_t;
  *   extern void a(void(*)(int, genericptr_t));
  * Using the #define is OK for other compiler versions too.
  */
 /* And IBM CSet/2.  The redeclaration of free hoses the compile. */
-#  define genericptr_t	genericptr
-# else
-#  if !defined(NHSTDC) && !defined(MAC)
-#   define const
-#   define signed
-#   define volatile
-#  endif
-# endif
+#define genericptr_t genericptr
+#else
+#if !defined(NHSTDC) && !defined(MAC)
+#define const
+#define signed
+#define volatile
+#endif
+#endif
 
 /*
  * Suppress `const' if necessary and not handled elsewhere.
@@ -187,39 +209,40 @@ void foo VA_DECL(int, arg)  --macro expansion has a hidden opening brace
  * because some compilers choke on `defined(const)'.
  * This has been observed with Lattice, MPW, and High C.
  */
-# if (defined(ULTRIX_PROTO) && !defined(NHSTDC)) || defined(apollo)
-	/* the system header files don't use `const' properly */
-#  ifndef const
-#   define const
-#  endif
-# endif
+#if (defined(ULTRIX_PROTO) && !defined(NHSTDC)) || defined(apollo)
+/* the system header files don't use `const' properly */
+#ifndef const
+#define const
+#endif
+#endif
 
-#else /* NHSTDC */	/* a "traditional" C  compiler */
+#else /* NHSTDC */ /* a "traditional" C  compiler */
 
-# define NDECL(f)	f()
-# define FDECL(f,p)	f()
-# define VDECL(f,p)	f()
+#define NDECL(f) f()
+#define FDECL(f, p) f()
+#define VDECL(f, p) f()
 
 #define VOID_ARGS /*empty*/
 
-# if defined(AMIGA) || defined(HPUX) || defined(POSIX_TYPES) || defined(__DECC) || defined(__BORLANDC__)
-#  define genericptr	void *
-# endif
-# ifndef genericptr
-#  define genericptr	char *
-# endif
+#if defined(AMIGA) || defined(HPUX) || defined(POSIX_TYPES) \
+    || defined(__DECC) || defined(__BORLANDC__)
+#define genericptr void *
+#endif
+#ifndef genericptr
+#define genericptr char *
+#endif
 
 /*
  * Traditional C compilers don't have "signed", "const", or "volatile".
  */
-# define signed
-# define const
-# define volatile
+#define signed
+#define const
+#define volatile
 
 #endif /* NHSTDC */
 
 #ifndef genericptr_t
-typedef genericptr genericptr_t;	/* (void *) or (char *) */
+typedef genericptr genericptr_t; /* (void *) or (char *) */
 #endif
 
 #if defined(MICRO) || defined(WIN32)
@@ -230,7 +253,7 @@ typedef genericptr genericptr_t;	/* (void *) or (char *) */
  * computers which may have older libraries give reasonable results with
  * casting pointers to unsigned long int (fmt_ptr() in alloc.c).
  */
-# define HAS_PTR_FMT
+#define HAS_PTR_FMT
 #endif
 
 /*
@@ -242,61 +265,61 @@ typedef genericptr genericptr_t;	/* (void *) or (char *) */
  * prototypes to match the standard and thus lose the typechecking.
  */
 #if defined(MSDOS) && !defined(__GO32__)
-# define UNWIDENED_PROTOTYPES
+#define UNWIDENED_PROTOTYPES
 #endif
 #if defined(AMIGA) && !defined(AZTEC_50)
-# define UNWIDENED_PROTOTYPES
+#define UNWIDENED_PROTOTYPES
 #endif
 #if defined(macintosh) && (defined(__SC__) || defined(__MRC__))
-# define WIDENED_PROTOTYPES
+#define WIDENED_PROTOTYPES
 #endif
 #if defined(__MWERKS__) && defined(__BEOS__)
-# define UNWIDENED_PROTOTYPES
+#define UNWIDENED_PROTOTYPES
 #endif
 #if defined(WIN32)
-# define UNWIDENED_PROTOTYPES
+#define UNWIDENED_PROTOTYPES
 #endif
 
 #if defined(ULTRIX_PROTO) && defined(ULTRIX_CC20)
-# define UNWIDENED_PROTOTYPES
+#define UNWIDENED_PROTOTYPES
 #endif
 #if defined(apollo)
-# define UNWIDENED_PROTOTYPES
+#define UNWIDENED_PROTOTYPES
 #endif
 
 #ifndef UNWIDENED_PROTOTYPES
-# if defined(NHSTDC) || defined(ULTRIX_PROTO) || defined(THINK_C)
-#  ifndef WIDENED_PROTOTYPES
-#   define WIDENED_PROTOTYPES
-#  endif
-# endif
+#if defined(NHSTDC) || defined(ULTRIX_PROTO) || defined(THINK_C)
+#ifndef WIDENED_PROTOTYPES
+#define WIDENED_PROTOTYPES
+#endif
+#endif
 #endif
 
 /* These are used for arguments within FDECL/VDECL prototype declarations.
  */
 #ifdef UNWIDENED_PROTOTYPES
-# define CHAR_P char
-# define SCHAR_P schar
-# define UCHAR_P uchar
-# define XCHAR_P xchar
-# define SHORT_P short
-# ifndef SKIP_BOOLEAN
-#  define BOOLEAN_P boolean
-# endif
-# define ALIGNTYP_P aligntyp
+#define CHAR_P char
+#define SCHAR_P schar
+#define UCHAR_P uchar
+#define XCHAR_P xchar
+#define SHORT_P short
+#ifndef SKIP_BOOLEAN
+#define BOOLEAN_P boolean
+#endif
+#define ALIGNTYP_P aligntyp
 #else
-# ifdef WIDENED_PROTOTYPES
-#  define CHAR_P int
-#  define SCHAR_P int
-#  define UCHAR_P int
-#  define XCHAR_P int
-#  define SHORT_P int
-#  define BOOLEAN_P int
-#  define ALIGNTYP_P int
-# else
-   /* Neither widened nor unwidened prototypes.  Argument list expansion
-    * by FDECL/VDECL always empty; all xxx_P vanish so defs aren't needed. */
-# endif
+#ifdef WIDENED_PROTOTYPES
+#define CHAR_P int
+#define SCHAR_P int
+#define UCHAR_P int
+#define XCHAR_P int
+#define SHORT_P int
+#define BOOLEAN_P int
+#define ALIGNTYP_P int
+#else
+/* Neither widened nor unwidened prototypes.  Argument list expansion
+ * by FDECL/VDECL always empty; all xxx_P vanish so defs aren't needed. */
+#endif
 #endif
 
 /* OBJ_P and MONST_P should _only_ be used for declaring function pointers.
@@ -307,11 +330,11 @@ typedef genericptr genericptr_t;	/* (void *) or (char *) */
  * but both seem to work if we put "void*" in the prototype instead.  This
  * gives us minimal prototype checking but avoids the compiler bugs.
  */
-# define OBJ_P void*
-# define MONST_P void*
+#define OBJ_P void *
+#define MONST_P void *
 #else
-# define OBJ_P struct obj *
-# define MONST_P struct monst *
+#define OBJ_P struct obj *
+#define MONST_P struct monst *
 #endif
 
 #if 0
@@ -328,43 +351,41 @@ typedef genericptr genericptr_t;	/* (void *) or (char *) */
  * include files have prototypes and the compiler also complains that
  * prototyped and unprototyped declarations don't match.
  */
-# undef NDECL
-# undef FDECL
-# undef VDECL
-# define NDECL(f)	f()
-# define FDECL(f,p)	f()
-# define VDECL(f,p)	f()
-# undef VOID_ARGS
-# define VOID_ARGS /*empty*/
+#undef NDECL
+#undef FDECL
+#undef VDECL
+#define NDECL(f) f()
+#define FDECL(f, p) f()
+#define VDECL(f, p) f()
+#undef VOID_ARGS
+#define VOID_ARGS /*empty*/
 #endif
 #endif
 
-
-	/* MetaWare High-C defaults to unsigned chars */
-	/* AIX 3.2 needs this also */
+/* MetaWare High-C defaults to unsigned chars */
+/* AIX 3.2 needs this also */
 #if defined(__HC__) || defined(_AIX32)
-# undef signed
+#undef signed
 #endif
-
 
 /*
  * Allow gcc2 to check parameters of printf-like calls with -Wformat;
  * append this to a prototype declaration (see pline() in extern.h).
  */
 #ifdef __GNUC__
-# if __GNUC__ >= 2
-#  define PRINTF_F(f,v) __attribute__ ((format (printf, f, v)))
-# endif
-# if __GNUC__ >= 3
-#  define UNUSED __attribute__ ((unused))
-# endif
+#if __GNUC__ >= 2
+#define PRINTF_F(f, v) __attribute__((format(printf, f, v)))
+#endif
+#if __GNUC__ >= 3
+#define UNUSED __attribute__((unused))
+#endif
 #endif
 
 #ifndef PRINTF_F
-# define PRINTF_F(f,v)
+#define PRINTF_F(f, v)
 #endif
 #ifndef UNUSED
-# define UNUSED
+#define UNUSED
 #endif
 
 #endif /* TRADSTDC_H */

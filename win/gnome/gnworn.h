@@ -13,6 +13,6 @@
 #include "config.h"
 #include "global.h"
 
-GtkWidget* ghack_init_worn_window();
+GtkWidget *ghack_init_worn_window();
 
 #endif /* GnomeHackWornWindow_h */

@@ -5,7 +5,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef MACPOPUP_H
-# define MACPOPUP_H
+#define MACPOPUP_H
 
 /* ### mmodal.c ### */
 

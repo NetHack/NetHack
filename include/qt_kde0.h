@@ -6,7 +6,8 @@
 
 #ifndef QT_DUMMYKDE
 #define QT_DUMMYKDE
-class KTopLevelWidget : public QMainWindow {
-        Q_OBJECT
+class KTopLevelWidget : public QMainWindow
+{
+    Q_OBJECT
 };
 #endif

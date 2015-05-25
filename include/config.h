@@ -3,9 +3,9 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-#ifndef CONFIG_H /* make sure the compiler does not see the typedefs twice */
+#ifndef CONFIG_H /* make sure the compiler does not see the typedefs twice \
+                    */
 #define CONFIG_H
-
 
 /*
  * Section 1:	Operating and window systems selection.
@@ -15,41 +15,40 @@
  *		provide it (no need to change sec#1, vmsconf.h handles it).
  */
 
-#define UNIX		/* delete if no fork(), exec() available */
+#define UNIX /* delete if no fork(), exec() available */
 
-/* #define MSDOS */	/* in case it's not auto-detected */
+/* #define MSDOS */ /* in case it's not auto-detected */
 
-/* #define OS2 */	/* define for OS/2 */
+/* #define OS2 */ /* define for OS/2 */
 
-/* #define TOS */	/* define for Atari ST/TT */
+/* #define TOS */ /* define for Atari ST/TT */
 
-/* #define STUPID */	/* avoid some complicated expressions if
-			   your C compiler chokes on them */
+/* #define STUPID */ /* avoid some complicated expressions if
+                        your C compiler chokes on them */
 /* #define MINIMAL_TERM */
-			/* if a terminal handles highlighting or tabs poorly,
-			   try this define, used in pager.c and termcap.c */
+/* if a terminal handles highlighting or tabs poorly,
+   try this define, used in pager.c and termcap.c */
 /* #define ULTRIX_CC20 */
-			/* define only if using cc v2.0 on a DECstation */
+/* define only if using cc v2.0 on a DECstation */
 /* #define ULTRIX_PROTO */
-			/* define for Ultrix 4.0 (or higher) on a DECstation;
-			 * if you get compiler errors, don't define this. */
-			/* Hint: if you're not developing code, don't define
-			   ULTRIX_PROTO. */
+/* define for Ultrix 4.0 (or higher) on a DECstation;
+ * if you get compiler errors, don't define this. */
+/* Hint: if you're not developing code, don't define
+   ULTRIX_PROTO. */
 
-#include "config1.h"	/* should auto-detect MSDOS, MAC, AMIGA, and WIN32 */
-
+#include "config1.h" /* should auto-detect MSDOS, MAC, AMIGA, and WIN32 */
 
 /* Windowing systems...
  * Define all of those you want supported in your binary.
  * Some combinations make no sense.  See the installation document.
  */
 #if !defined(NOTTYGRAPHICS)
-# define TTY_GRAPHICS	/* good old tty based graphics */
+#define TTY_GRAPHICS /* good old tty based graphics */
 #endif
-/* #define X11_GRAPHICS */	/* X11 interface */
-/* #define QT_GRAPHICS */	/* Qt interface */
-/* #define GNOME_GRAPHICS */	/* Gnome interface */
-/* #define MSWIN_GRAPHICS */	/* Windows NT, CE, Graphics */
+/* #define X11_GRAPHICS */   /* X11 interface */
+/* #define QT_GRAPHICS */    /* Qt interface */
+/* #define GNOME_GRAPHICS */ /* Gnome interface */
+/* #define MSWIN_GRAPHICS */ /* Windows NT, CE, Graphics */
 
 /*
  * Define the default window system.  This should be one that is compiled
@@ -60,62 +59,63 @@
 
 /* MAC also means MAC windows */
 #ifdef MAC
-# ifndef	AUX
-#  define DEFAULT_WINDOW_SYS "mac"
-# endif
+#ifndef AUX
+#define DEFAULT_WINDOW_SYS "mac"
+#endif
 #endif
 
 /* Amiga supports AMII_GRAPHICS and/or TTY_GRAPHICS */
 #ifdef AMIGA
-# define AMII_GRAPHICS			/* (optional) */
-# define DEFAULT_WINDOW_SYS "amii"	/* "amii", "amitile" or "tty" */
+#define AMII_GRAPHICS             /* (optional) */
+#define DEFAULT_WINDOW_SYS "amii" /* "amii", "amitile" or "tty" */
 #endif
 
 /* Atari supports GEM_GRAPHICS and/or TTY_GRAPHICS */
 #ifdef TOS
-# define GEM_GRAPHICS			/* Atari GEM interface (optional) */
-# define DEFAULT_WINDOW_SYS "Gem"	/* "Gem" or "tty" */
+#define GEM_GRAPHICS             /* Atari GEM interface (optional) */
+#define DEFAULT_WINDOW_SYS "Gem" /* "Gem" or "tty" */
 #endif
 
 #ifdef __BEOS__
-#define BEOS_GRAPHICS /* (optional) */
-#define DEFAULT_WINDOW_SYS "BeOS"  /* "tty" */
-#ifndef HACKDIR	/* override the default hackdir below */
-# define HACKDIR "/boot/apps/NetHack"
+#define BEOS_GRAPHICS             /* (optional) */
+#define DEFAULT_WINDOW_SYS "BeOS" /* "tty" */
+#ifndef HACKDIR                   /* override the default hackdir below */
+#define HACKDIR "/boot/apps/NetHack"
 #endif
 #endif
 
 #ifdef QT_GRAPHICS
-# ifndef DEFAULT_WC_TILED_MAP
-#  define DEFAULT_WC_TILED_MAP	/* Default to tiles if users doesn't say wc_ascii_map */
-# endif
-#ifndef NOUSER_SOUNDS
-# define USER_SOUNDS		/* Use sounds */
+#ifndef DEFAULT_WC_TILED_MAP
+#define DEFAULT_WC_TILED_MAP /* Default to tiles if users doesn't say \
+                                wc_ascii_map */
 #endif
-# define USE_XPM		/* Use XPM format for images (required) */
-# define GRAPHIC_TOMBSTONE	/* Use graphical tombstone (rip.ppm) */
-# ifndef DEFAULT_WINDOW_SYS
-#  define DEFAULT_WINDOW_SYS "Qt"
-# endif
+#ifndef NOUSER_SOUNDS
+#define USER_SOUNDS /* Use sounds */
+#endif
+#define USE_XPM           /* Use XPM format for images (required) */
+#define GRAPHIC_TOMBSTONE /* Use graphical tombstone (rip.ppm) */
+#ifndef DEFAULT_WINDOW_SYS
+#define DEFAULT_WINDOW_SYS "Qt"
+#endif
 #endif
 
 #ifdef GNOME_GRAPHICS
-# define USE_XPM		/* Use XPM format for images (required) */
-# define GRAPHIC_TOMBSTONE	/* Use graphical tombstone (rip.ppm) */
-# ifndef DEFAULT_WINDOW_SYS
-#  define DEFAULT_WINDOW_SYS "Gnome"
-# endif
+#define USE_XPM           /* Use XPM format for images (required) */
+#define GRAPHIC_TOMBSTONE /* Use graphical tombstone (rip.ppm) */
+#ifndef DEFAULT_WINDOW_SYS
+#define DEFAULT_WINDOW_SYS "Gnome"
+#endif
 #endif
 
 #ifdef MSWIN_GRAPHICS
-# ifndef DEFAULT_WINDOW_SYS
-#  define DEFAULT_WINDOW_SYS "mswin"
-# endif
-# define HACKDIR "\\nethack"
+#ifndef DEFAULT_WINDOW_SYS
+#define DEFAULT_WINDOW_SYS "mswin"
+#endif
+#define HACKDIR "\\nethack"
 #endif
 
 #ifndef DEFAULT_WINDOW_SYS
-# define DEFAULT_WINDOW_SYS "tty"
+#define DEFAULT_WINDOW_SYS "tty"
 #endif
 
 #ifdef X11_GRAPHICS
@@ -127,15 +127,14 @@
  * would allow:
  *  xpmtoppm <x11tiles.xpm | pnmscale 1.25 | ppmquant 90 >x11tiles_big.xpm
  */
-/* # define USE_XPM */		/* Disable if you do not have the XPM library */
-# ifdef USE_XPM
-#  define GRAPHIC_TOMBSTONE	/* Use graphical tombstone (rip.xpm) */
-# endif
-# ifndef DEFAULT_WC_TILED_MAP
-#  define DEFAULT_WC_TILED_MAP	/* Default to tiles */
-# endif
+/* # define USE_XPM */ /* Disable if you do not have the XPM library */
+#ifdef USE_XPM
+#define GRAPHIC_TOMBSTONE /* Use graphical tombstone (rip.xpm) */
 #endif
-
+#ifndef DEFAULT_WC_TILED_MAP
+#define DEFAULT_WC_TILED_MAP /* Default to tiles */
+#endif
+#endif
 
 /*
  * Section 2:	Some global parameters and filenames.
@@ -151,14 +150,16 @@
  *                              (this does NOT default to compiled-in value)
  *		MAXPLAYERS	(see MAX_NR_OF_PLAYERS above and nethack.sh)
  *		SUPPORT		(how to get local support)(no default)
- *		RECOVER		(how to recover a game at your site)(no default)
+ *		RECOVER		(how to recover a game at your site)(no
+ *default)
  *		SHELLERS	(who can use !, syntax as WIZARDS)
  *		  for the record file (see topten.c):
  *		PERSMAX		(max entries for one person)
  *		ENTRYMAX	(max entries in the record file)
  *		POINTSMIN	(min points to get an entry)
  *		PERS_IS_UID	(0 or 1 - person is name or (numeric) userid)
- *		SEDUCE		(0 or 1 - runtime disable/enable SEDUCE option)
+ *		SEDUCE		(0 or 1 - runtime disable/enable SEDUCE
+ *option)
  *
  *		The following options select how the config space is stored:
  *		SYSCF_FILE	in the named file
@@ -168,44 +169,43 @@
  *              GDBPATH		(the path to the system gdb(1) program)
  */
 
-#ifndef WIZARD_NAME		/* allow for compile-time or Makefile changes */
-# define WIZARD_NAME "wizard"
+#ifndef WIZARD_NAME /* allow for compile-time or Makefile changes */
+#define WIZARD_NAME "wizard"
 #endif
 
 #ifndef SYSCF
-#define SYSCF /* use a global configuration */
+#define SYSCF                /* use a global configuration */
 #define SYSCF_FILE "sysconf" /* global configuration is in a file */
 #endif
 
 #ifndef GDBPATH
-# define GDBPATH "/usr/bin/gdb"
+#define GDBPATH "/usr/bin/gdb"
 #endif
 #ifndef GREPPATH
-# define GREPPATH "/bin/grep"
+#define GREPPATH "/bin/grep"
 #endif
 
-#define LOGFILE "logfile"	/* larger file for debugging purposes */
-#define XLOGFILE "xlogfile"	/* even larger logfile */
-#define NEWS "news"		/* the file containing the latest hack news */
-#define PANICLOG "paniclog"	/* log of panic and impossible events */
+#define LOGFILE "logfile"   /* larger file for debugging purposes */
+#define XLOGFILE "xlogfile" /* even larger logfile */
+#define NEWS "news"         /* the file containing the latest hack news */
+#define PANICLOG "paniclog" /* log of panic and impossible events */
 
 #ifndef PERSMAX
-# define PERSMAX        3       /* entries per name/uid per char. allowed */
+#define PERSMAX 3 /* entries per name/uid per char. allowed */
 #endif
 #ifndef POINTSMIN
-# define POINTSMIN      1       /* must be > 0 */
+#define POINTSMIN 1 /* must be > 0 */
 #endif
 #ifndef ENTRYMAX
-# define ENTRYMAX       100     /* must be >= 10 */
+#define ENTRYMAX 100 /* must be >= 10 */
 #endif
 #ifndef PERS_IS_UID
-# if !defined(MICRO) && !defined(MAC) && !defined(WIN32)
-#  define PERS_IS_UID   1         /* delete for PERSMAX per name; now per uid */
-# else
-#  define PERS_IS_UID   0
-# endif
+#if !defined(MICRO) && !defined(MAC) && !defined(WIN32)
+#define PERS_IS_UID 1 /* delete for PERSMAX per name; now per uid */
+#else
+#define PERS_IS_UID 0
 #endif
-
+#endif
 
 /*
  *	If COMPRESS is defined, it should contain the full path name of your
@@ -224,18 +224,18 @@
  *	COMPRESS and ZLIB_COMP are mutually exclusive.
  *
  */
- 
+
 #if defined(UNIX) && !defined(ZLIB_COMP) && !defined(COMPRESS)
 /* path and file name extension for compression program */
-#define COMPRESS "/usr/bin/compress"	/* Lempel-Ziv compression */
-#define COMPRESS_EXTENSION ".Z"		/* compress's extension */
+#define COMPRESS "/usr/bin/compress" /* Lempel-Ziv compression */
+#define COMPRESS_EXTENSION ".Z"      /* compress's extension */
 /* An example of one alternative you might want to use: */
-/* #define COMPRESS "/usr/local/bin/gzip" */	/* FSF gzip compression */
-/* #define COMPRESS_EXTENSION ".gz" */		/* normal gzip extension */
+/* #define COMPRESS "/usr/local/bin/gzip" */ /* FSF gzip compression */
+/* #define COMPRESS_EXTENSION ".gz" */       /* normal gzip extension */
 #endif
 
 #ifndef COMPRESS
-/* # define ZLIB_COMP		*/	/* ZLIB for compression */
+/* # define ZLIB_COMP		*/ /* ZLIB for compression */
 #endif
 
 /*
@@ -266,26 +266,26 @@
  *	files at the cost of additional code and time.
  */
 
-/* # define INTERNAL_COMP	*/	/* defines both ZEROCOMP and RLECOMP */
-/* # define ZEROCOMP		*/	/* Support ZEROCOMP compression */
-/* # define RLECOMP		*/	/* Support RLECOMP compression  */
+/* # define INTERNAL_COMP	*/ /* defines both ZEROCOMP and RLECOMP */
+/* # define ZEROCOMP		*/ /* Support ZEROCOMP compression */
+/* # define RLECOMP		*/ /* Support RLECOMP compression  */
 
 /*
  *	Data librarian.  Defining DLB places most of the support files into
  *	a tar-like file, thus making a neater installation.  See *conf.h
  *	for detailed configuration.
  */
-/* #define DLB */	/* not supported on all platforms */
+/* #define DLB */ /* not supported on all platforms */
 
 /*
  *	Defining INSURANCE slows down level changes, but allows games that
  *	died due to program or system crashes to be resumed from the point
  *	of the last level change, after running a utility program.
  */
-#define INSURANCE	/* allow crashed game recovery */
+#define INSURANCE /* allow crashed game recovery */
 
 #ifndef MAC
-# define CHDIR		/* delete if no chdir() available */
+#define CHDIR /* delete if no chdir() available */
 #endif
 
 #ifdef CHDIR
@@ -293,9 +293,9 @@
  * If you define HACKDIR, then this will be the default playground;
  * otherwise it will be the current directory.
  */
-# ifndef HACKDIR
-#  define HACKDIR "/usr/games/lib/nethackdir"
-# endif
+#ifndef HACKDIR
+#define HACKDIR "/usr/games/lib/nethackdir"
+#endif
 
 /*
  * Some system administrators are stupid enough to make Hack suid root
@@ -304,7 +304,7 @@
  * since the user might create files in a directory of his choice.
  * Of course SECURE is meaningful only if HACKDIR is defined.
  */
-/* #define SECURE */	/* do setuid(getuid()) after chdir() */
+/* #define SECURE */ /* do setuid(getuid()) after chdir() */
 
 /*
  * If it is desirable to limit the number of people that can play Hack
@@ -314,12 +314,10 @@
  */
 #endif /* CHDIR */
 
-
 /* If GENERIC_USERNAMES is defined, and the user name is found
  * in that list, prompt for username instead.
  * A public server should probably disable this. */
 #define GENERIC_USERNAMES "play player game games nethack nethacker"
-
 
 /*
  * Section 3:	Definitions that may vary with system type.
@@ -332,14 +330,14 @@
  * 'void' type (and thus would give all sorts of compile errors without
  * this definition).
  */
-/* #define NOVOID */			/* define if no "void" data type. */
+/* #define NOVOID */ /* define if no "void" data type. */
 
 /*
  * Uncomment the following line if your compiler falsely claims to be
  * a standard C compiler (i.e., defines __STDC__ without cause).
  * Examples are Apollo's cc (in some versions) and possibly SCO UNIX's rcc.
  */
-/* #define NOTSTDC */			/* define for lying compilers */
+/* #define NOTSTDC */ /* define for lying compilers */
 
 #include "tradstdc.h"
 
@@ -353,9 +351,9 @@
  *	typedef short int schar;
  */
 #ifdef AZTEC
-# define schar	char
+#define schar char
 #else
-typedef signed char	schar;
+typedef signed char schar;
 #endif
 
 /*
@@ -368,8 +366,8 @@ typedef signed char	schar;
  *
  *	typedef unsigned short int uchar;
  */
-#ifndef _AIX32		/* identical typedef in system file causes trouble */
-typedef unsigned char	uchar;
+#ifndef _AIX32 /* identical typedef in system file causes trouble */
+typedef unsigned char uchar;
 #endif
 
 /*
@@ -379,9 +377,9 @@ typedef unsigned char	uchar;
  * allocate a separate character for each bitfield.  (The bitfields used never
  * have more than 7 bits, and most are only 1 bit.)
  */
-#define BITFIELDS	/* Good bitfield handling */
+#define BITFIELDS /* Good bitfield handling */
 
-/* #define STRNCMPI */	/* compiler/library has the strncmpi function */
+/* #define STRNCMPI */ /* compiler/library has the strncmpi function */
 
 /*
  * There are various choices for the NetHack vision system.  There is a
@@ -398,9 +396,9 @@ typedef unsigned char	uchar;
 
 /* #define VISION_TABLES */ /* use vision tables generated at compile time */
 #ifndef VISION_TABLES
-# ifndef NO_MACRO_CPATH
-#  define MACRO_CPATH	/* use clear_path macros instead of functions */
-# endif
+#ifndef NO_MACRO_CPATH
+#define MACRO_CPATH /* use clear_path macros instead of functions */
+#endif
 #endif
 
 /*
@@ -417,14 +415,14 @@ typedef unsigned char	uchar;
 /* monsters & objects */
 /* I/O */
 #if !defined(MAC)
-# if !defined(NOCLIPPING)
-# define CLIPPING	/* allow smaller screens -- ERS */
-# endif
+#if !defined(NOCLIPPING)
+#define CLIPPING /* allow smaller screens -- ERS */
+#endif
 #endif
 
 #define DOAGAIN '\001' /* ^A, the "redo" key used in cmd.c and getline.c */
 
-/* #define SCORE_ON_BOTL */	/* added by Gary Erickson (erickson@ucivax) */
+/* #define SCORE_ON_BOTL */ /* added by Gary Erickson (erickson@ucivax) */
 
 /*
  * Section 5:  EXPERIMENTAL STUFF
@@ -434,11 +432,12 @@ typedef unsigned char	uchar;
  * bugs left here.
  */
 
-/* #define STATUS_VIA_WINDOWPORT */	/* re-work of the status line updating process */
-/* #define STATUS_HILITES */		/* support hilites of status fields */
-/* #define WINCHAIN*/		/* stacked window systems */
+/* #define STATUS_VIA_WINDOWPORT */ /* re-work of the status line updating
+                                       process */
+/* #define STATUS_HILITES */        /* support hilites of status fields */
+/* #define WINCHAIN*/               /* stacked window systems */
 /* End of Section 5 */
 
-#include "global.h"	/* Define everything else according to choices above */
+#include "global.h" /* Define everything else according to choices above */
 
 #endif /* CONFIG_H */

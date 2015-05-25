@@ -14,7 +14,4 @@
 
 #include "winGnome.h"
 
-#endif    /* GnomeHack_h */
-
-
-
+#endif /* GnomeHack_h */

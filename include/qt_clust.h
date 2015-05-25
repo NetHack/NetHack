@@ -9,23 +9,28 @@
 
 #include <qrect.h>
 
-class Clusterizer {
-public:
-	Clusterizer(int maxclusters);
-	~Clusterizer();
+class Clusterizer
+{
+  public:
+    Clusterizer(int maxclusters);
+    ~Clusterizer();
 
-	void add(int x, int y); // 1x1 rectangle (point)
-	void add(int x, int y, int w, int h);
-	void add(const QRect& rect);
+    void add(int x, int y); // 1x1 rectangle (point)
+    void add(int x, int y, int w, int h);
+    void add(const QRect &rect);
 
-	void clear();
-	int clusters() { return count; }
-	const QRect& operator[](int i);
+    void clear();
+    int
+    clusters()
+    {
+        return count;
+    }
+    const QRect &operator[](int i);
 
-private:
-	QRect* cluster;
-	int count;
-	const int max;
+  private:
+    QRect *cluster;
+    int count;
+    const int max;
 };
 
 #endif

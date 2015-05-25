@@ -7,8 +7,7 @@
 #ifndef GnomeHackYesNoDialog_h
 #define GnomeHackYesNoDialog_h
 
-int ghack_yes_no_dialog( const char* szQuestionStr, 
-	const char* szChoicesStr, int nDefault);
-
+int ghack_yes_no_dialog(const char *szQuestionStr, const char *szChoicesStr,
+                        int nDefault);
 
 #endif

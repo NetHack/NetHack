@@ -12,23 +12,22 @@
 #include "global.h"
 #include "gnomeprv.h"
 
-GtkWidget* ghack_init_menu_window( void );
+GtkWidget *ghack_init_menu_window(void);
 
-struct _GHackMenuItem
-{
-  int		glyph; 
-  const ANY_P *identifier;
-  CHAR_P       accelerator;
-  CHAR_P       group_accel;
-  int          attr;
-  const char*  str;
-  BOOLEAN_P    presel;
+struct _GHackMenuItem {
+    int glyph;
+    const ANY_P *identifier;
+    CHAR_P accelerator;
+    CHAR_P group_accel;
+    int attr;
+    const char *str;
+    BOOLEAN_P presel;
 };
 
 typedef struct _GHackMenuItem GHackMenuItem;
 
-int ghack_menu_window_select_menu (GtkWidget *menuWin, 
-	MENU_ITEM_P **_selected, gint how);
+int ghack_menu_window_select_menu(GtkWidget *menuWin, MENU_ITEM_P **_selected,
+                                  gint how);
 int ghack_menu_ext_cmd(void);
 
-#endif  /* GnomeHackMenuWindow_h */
+#endif /* GnomeHackMenuWindow_h */

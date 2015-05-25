@@ -28,7 +28,7 @@
 
 /* May already be defined by CodeWarrior as 0 or 1 */
 #ifdef TARGET_API_MAC_CARBON
-# undef TARGET_API_MAC_CARBON
+#undef TARGET_API_MAC_CARBON
 #endif
 #define TARGET_API_MAC_CARBON 0
 

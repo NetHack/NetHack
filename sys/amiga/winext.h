@@ -6,7 +6,7 @@
 
 extern int reclip;
 
-#ifdef	CLIPPING
+#ifdef CLIPPING
 extern int clipping;
 extern int clipx;
 extern int clipy;
@@ -20,14 +20,15 @@ extern int LI;
 extern int scrollmsg;
 extern int alwaysinvent;
 
-#ifndef	SHAREDLIB
-extern unsigned short amii_defpens[ 20 ];
-extern struct amii_DisplayDesc *amiIDisplay;	/* the Amiga Intuition descriptor */
+#ifndef SHAREDLIB
+extern unsigned short amii_defpens[20];
+extern struct amii_DisplayDesc
+    *amiIDisplay; /* the Amiga Intuition descriptor */
 extern struct window_procs amii_procs;
 extern struct window_procs amiv_procs;
-extern unsigned short amii_initmap[ AMII_MAXCOLORS ];
-extern unsigned short amiv_init_map[ AMII_MAXCOLORS ];
-extern unsigned short amii_init_map[ AMII_MAXCOLORS ];
+extern unsigned short amii_initmap[AMII_MAXCOLORS];
+extern unsigned short amiv_init_map[AMII_MAXCOLORS];
+extern unsigned short amii_init_map[AMII_MAXCOLORS];
 extern int bigscreen;
 extern int amii_numcolors;
 extern long amii_scrnmode;
@@ -35,7 +36,7 @@ extern winid amii_rawprwin;
 extern struct Screen *HackScreen;
 extern char Initialized;
 /* These have already been defined elsewhere (and some are conflicting)
- * ... going ... going once ... going twice .... 
+ * ... going ... going once ... going twice ....
  * extern const char *roles[];
  * extern struct Library *ConsoleDevice;
  * extern char toplines[ TBUFSZ ];
@@ -79,7 +80,7 @@ extern struct IOStdReq ConsoleIO;
 extern struct MsgPort *HackPort;
 
 extern int txwidth, txheight, txbaseline;
-#ifdef	SUPERBITMAP_MAP
+#ifdef SUPERBITMAP_MAP
 extern struct BitMap amii_vbm;
 #endif
 
@@ -95,10 +96,9 @@ extern struct Gadget MsgScroll;
 
 extern struct TagItem tags[];
 
-extern struct win_setup
-{
+extern struct win_setup {
     struct NewWindow newwin;
-    UWORD offx,offy,maxrow,rows,maxcol,cols;	/* CHECK TYPES */
+    UWORD offx, offy, maxrow, rows, maxcol, cols; /* CHECK TYPES */
 } new_wins[];
 
 extern UWORD scrnpens[];
@@ -109,32 +109,36 @@ extern struct TagItem scrntags[];
 extern struct NewScreen NewHackScreen;
 
 extern int topl_addspace;
-extern char spaces[ 76 ];
-extern int wincnt;   /* # of nh windows opened */
+extern char spaces[76];
+extern int wincnt; /* # of nh windows opened */
 extern struct Rectangle lastinvent, lastmsg;
 
 typedef struct {
-	UWORD w, h;
-	WORD x, y;
-	UBYTE nPlanes;
-	UBYTE masking;
-	UBYTE compression;
-	UBYTE reserved1;
-	UWORD transparentColor;
-	UBYTE xAspect, yAspect;
-	WORD pageWidth, pageHeight;
+    UWORD w, h;
+    WORD x, y;
+    UBYTE nPlanes;
+    UBYTE masking;
+    UBYTE compression;
+    UBYTE reserved1;
+    UWORD transparentColor;
+    UBYTE xAspect, yAspect;
+    WORD pageWidth, pageHeight;
 } BitMapHeader;
 
-typedef enum {COL_MAZE_BRICK,COL_MAZE_STONE,COL_MAZE_HEAT,COL_MAZE_WOOD} MazeType;
+typedef enum {
+    COL_MAZE_BRICK,
+    COL_MAZE_STONE,
+    COL_MAZE_HEAT,
+    COL_MAZE_WOOD
+} MazeType;
 extern struct PDAT pictdata;
 extern struct Hook fillhook;
 extern struct TagItem wintags[];
-#ifndef	SHAREDLIB
+#ifndef SHAREDLIB
 #ifndef __GNUC__
-void __asm LayerFillHook(
-    register __a0 struct Hook *hk,
-    register __a2 struct RastPort *rp,
-    register __a1 struct FillParams *fp );
+void __asm LayerFillHook(register __a0 struct Hook *hk,
+                         register __a2 struct RastPort *rp,
+                         register __a1 struct FillParams *fp);
 #else
 #ifdef __PPC__
 struct EmulLibEntry LayerFillHook;

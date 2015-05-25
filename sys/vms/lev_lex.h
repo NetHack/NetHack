@@ -18,10 +18,10 @@
 
 #include <stdio.h>
 #ifdef stdin
-# undef stdin
+#undef stdin
 #endif
-#define stdin  0
+#define stdin 0
 #ifdef stdout
-# undef stdout
+#undef stdout
 #endif
 #define stdout 0

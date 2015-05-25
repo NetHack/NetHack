@@ -6,11 +6,11 @@ typedef struct pixel_s {
     pixval r, g, b;
 } pixel;
 
-#define MAXCOLORMAPSIZE 	256
+#define MAXCOLORMAPSIZE 256
 
-#define CM_RED		0
-#define CM_GREEN	1
-#define CM_BLUE 	2
+#define CM_RED 0
+#define CM_GREEN 1
+#define CM_BLUE 2
 
 /* shared between reader and writer */
 extern pixval ColorMap[3][MAXCOLORMAPSIZE];
@@ -19,7 +19,7 @@ extern int colorsinmap;
 extern pixval MainColorMap[3][MAXCOLORMAPSIZE];
 extern int colorsinmainmap;
 
-#include "dlb.h"	/* for MODEs */
+#include "dlb.h" /* for MODEs */
 
 /* size of tiles */
 #ifndef TILE_X
@@ -31,10 +31,9 @@ extern int colorsinmainmap;
 
 #define Fprintf (void) fprintf
 
-
 extern boolean FDECL(fopen_text_file, (const char *, const char *));
-extern boolean FDECL(read_text_tile, (pixel (*)[TILE_X]));
-extern boolean FDECL(write_text_tile, (pixel (*)[TILE_X]));
+extern boolean FDECL(read_text_tile, (pixel(*) [TILE_X]));
+extern boolean FDECL(write_text_tile, (pixel(*) [TILE_X]));
 extern int NDECL(fclose_text_file);
 
 extern void NDECL(init_colormap);
@@ -42,7 +41,7 @@ extern void NDECL(merge_colormap);
 
 #if defined(MICRO) || defined(WIN32)
 #undef exit
-# if !defined(MSDOS) && !defined(WIN32)
+#if !defined(MSDOS) && !defined(WIN32)
 extern void FDECL(exit, (int));
-# endif
+#endif
 #endif

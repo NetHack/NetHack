@@ -11,27 +11,28 @@
 #include <qimage.h>
 #include <qvbox.h>
 
-class TilePickerTab : public QWidget {
+class TilePickerTab : public QWidget
+{
     Q_OBJECT
-public:
-    TilePickerTab(const char* basename, int id, QWidget* parent);
+  public:
+    TilePickerTab(const char *basename, int id, QWidget *parent);
 
     bool save();
     int numTiles();
 
-signals:
-    void pick(const QImage&);
-    void pickName(const QString&);
+  signals:
+    void pick(const QImage &);
+    void pickName(const QString &);
 
-public slots:
-    void setCurrent(const QImage&);
+  public slots:
+    void setCurrent(const QImage &);
 
-protected:
-    void paintEvent( QPaintEvent* );
+  protected:
+    void paintEvent(QPaintEvent *);
     QSize sizeHint() const;
-    void mousePressEvent(QMouseEvent*);
+    void mousePressEvent(QMouseEvent *);
 
-private:
+  private:
     QString filename;
     int id;
     int last_pick;
@@ -40,89 +41,95 @@ private:
     QImage image;
 };
 
-class TilePicker : public QTabWidget {
+class TilePicker : public QTabWidget
+{
     Q_OBJECT
-public:
-    TilePicker(QWidget* parent);
+  public:
+    TilePicker(QWidget *parent);
 
-    void setTile(int tilenum, const QImage&);
+    void setTile(int tilenum, const QImage &);
 
-signals:
-    void pick(const QImage&);
-    void pickName(const QString&);
+  signals:
+    void pick(const QImage &);
+    void pickName(const QString &);
 
-public slots:
-    void setCurrent(const QImage&);
+  public slots:
+    void setCurrent(const QImage &);
     void save();
 };
 
-class TrivialTileEditor : public QWidget {
+class TrivialTileEditor : public QWidget
+{
     Q_OBJECT
-public:
-    TrivialTileEditor( QWidget* parent );
-    const QImage& image() const;
+  public:
+    TrivialTileEditor(QWidget *parent);
+    const QImage &image() const;
 
-signals:
-    void edited(const QImage&);
+  signals:
+    void edited(const QImage &);
     void pick(QRgb);
 
-public slots:
+  public slots:
     void setColor(QRgb);
-    void setImage( const QImage& );
+    void setImage(const QImage &);
 
-protected:
-    void paintEvent( QPaintEvent* );
-    void mousePressEvent(QMouseEvent*);
-    void mouseReleaseEvent(QMouseEvent*);
-    void mouseMoveEvent(QMouseEvent*);
+  protected:
+    void paintEvent(QPaintEvent *);
+    void mousePressEvent(QMouseEvent *);
+    void mouseReleaseEvent(QMouseEvent *);
+    void mouseMoveEvent(QMouseEvent *);
     QSize sizeHint() const;
     QSize sizeForWidth(int) const;
     QSizePolicy sizePolicy() const;
 
-private:
-    void fill(QPainter& painter, QPoint p, uchar from);
+  private:
+    void fill(QPainter &painter, QPoint p, uchar from);
     QImage img;
     QColor pen;
     int penpixel;
-    void paintPoint(QPainter& painter, QPoint p);
+    void paintPoint(QPainter &painter, QPoint p);
     QPoint screenPoint(QPoint) const;
     QPoint imagePoint(QPoint) const;
 };
 
-class TilePalette : public QWidget {
+class TilePalette : public QWidget
+{
     Q_OBJECT
-public:
-    TilePalette( QWidget* parent );
+  public:
+    TilePalette(QWidget *parent);
     ~TilePalette();
-    void setFromImage( const QImage& );
-protected:
-    void paintEvent( QPaintEvent* );
-    void mousePressEvent(QMouseEvent*);
+    void setFromImage(const QImage &);
+
+  protected:
+    void paintEvent(QPaintEvent *);
+    void mousePressEvent(QMouseEvent *);
     QSize sizeHint() const;
     QSizePolicy sizePolicy() const;
-signals:
+  signals:
     void pick(QRgb);
-public slots:
+  public slots:
     void setColor(QRgb);
-private:
+
+  private:
     int num;
     QRgb *rgb;
 };
 
-class TileEditor : public QVBox {
+class TileEditor : public QVBox
+{
     Q_OBJECT
-public:
-    TileEditor(QWidget* parent);
+  public:
+    TileEditor(QWidget *parent);
 
-    const QImage& image() const;
+    const QImage &image() const;
 
-signals:
-    void edited(const QImage&);
+  signals:
+    void edited(const QImage &);
 
-public slots:
-    void edit(const QImage&);
+  public slots:
+    void edit(const QImage &);
 
-private:
+  private:
     TrivialTileEditor editor;
     TilePalette palette;
 };

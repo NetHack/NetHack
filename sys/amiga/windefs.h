@@ -27,24 +27,24 @@
  * around with the rest of the #includes.  --AMC
  */
 #if defined(_DCC) && !defined(HACK_H)
-# define ptrdiff_t	ptrdiff_t_
-# define size_t		size_t_
-# define wchar_t	wchar_t_
+#define ptrdiff_t ptrdiff_t_
+#define size_t size_t_
+#define wchar_t wchar_t_
 #endif
 #include <ctype.h>
-#undef  strcmpi
+#undef strcmpi
 #include <string.h>
 #include <errno.h>
 #if defined(_DCC) && !defined(HACK_H)
-# undef ptrdiff_t
-# undef size_t
-# undef wchar_T
+#undef ptrdiff_t
+#undef size_t
+#undef wchar_T
 #endif
 
-#ifdef  IDCMP_CLOSEWINDOW
-# ifndef	INTUI_NEW_LOOK
-#  define	INTUI_NEW_LOOK
-# endif
+#ifdef IDCMP_CLOSEWINDOW
+#ifndef INTUI_NEW_LOOK
+#define INTUI_NEW_LOOK
+#endif
 #endif
 
 #ifndef HACK_H
@@ -54,12 +54,12 @@
 #include "winami.h"
 #include "func_tab.h"
 
-#ifndef	CLIPPING
+#ifndef CLIPPING
 CLIPPING must be defined for the AMIGA version
 #endif
 
-#undef	LI
-#undef	CO
+#undef LI
+#undef CO
 
 /*#define   TOPL_GETLINE	/* Don't use a window for getlin() */
 /*#define   WINDOW_YN		/* Use a window for y/n questions */
@@ -85,22 +85,22 @@ CLIPPING must be defined for the AMIGA version
 #endif
 
 /* kludge - see amirip for why */
-# undef red
-# undef green
-# undef blue
+#undef red
+#undef green
+#undef blue
 #ifdef _DCC
-# include <clib/graphics_protos.h>
+#include <clib/graphics_protos.h>
 #else
-# include <proto/graphics.h>
+#include <proto/graphics.h>
 #endif
 
 #ifdef _DCC
-# define __asm		/* DICE doesn't like __asm */
+#define __asm /* DICE doesn't like __asm */
 #endif
 
 #ifndef __SASC_60
 #undef index
-# define index strchr
+#define index strchr
 #endif
 
 #ifdef _DCC
@@ -110,24 +110,24 @@ CLIPPING must be defined for the AMIGA version
 #endif
 #endif
 
-#ifdef	SHAREDLIB
+#ifdef SHAREDLIB
 #include "NH:sys/amiga/lib/libmacs.h"
 #endif
 
-#ifdef	INTUI_NEW_LOOK
+#ifdef INTUI_NEW_LOOK
 #include <utility/tagitem.h>
 #endif
 
-#define	WINVERS_AMII	(strcmp("amii",windowprocs.name)==0)
-#define	WINVERS_AMIV	(strcmp("amitile",windowprocs.name)==0)
-#define	WINVERS_AMIT	(strcmp("amitty",windowprocs.name)==0)
+#define WINVERS_AMII (strcmp("amii", windowprocs.name) == 0)
+#define WINVERS_AMIV (strcmp("amitile", windowprocs.name) == 0)
+#define WINVERS_AMIT (strcmp("amitty", windowprocs.name) == 0)
 
 /* cw->data[x] contains 2 characters worth of special information.  These
  * characters are stored at the offsets as described here.
  */
-#define VATTR	  0	/* Video attribute is in this slot */
-#define SEL_ITEM  1	/* If this is a select item, slot is 1 else 0 */
-#define SOFF	  2	/* The string starts here.  */
+#define VATTR 0    /* Video attribute is in this slot */
+#define SEL_ITEM 1 /* If this is a select item, slot is 1 else 0 */
+#define SOFF 2     /* The string starts here.  */
 
 #undef NULL
 #define NULL 0L
@@ -138,68 +138,68 @@ CLIPPING must be defined for the AMIGA version
  * don't have that version number in the 1.2 ROM.
  */
 
-#define LIBRARY_FONT_VERSION	34L
-#define LIBRARY_TILE_VERSION	37L
+#define LIBRARY_FONT_VERSION 34L
+#define LIBRARY_TILE_VERSION 37L
 
-/* These values are just sorta suggestions in use, but are minimum requirements
+/* These values are just sorta suggestions in use, but are minimum
+ * requirements
  * in reality...
  */
-#define WINDOWHEIGHT	192
-#define SCREENHEIGHT	200
-#define WIDTH		640
+#define WINDOWHEIGHT 192
+#define SCREENHEIGHT 200
+#define WIDTH 640
 
 /* This character is a solid block (cursor) in Hack.font */
-#define CURSOR_CHAR	0x90
+#define CURSOR_CHAR 0x90
 
-#define FONTHEIGHT	8
-#define FONTWIDTH	8
-#define FONTBASELINE	8
+#define FONTHEIGHT 8
+#define FONTWIDTH 8
+#define FONTBASELINE 8
 
-#define MAPFTWIDTH	8
-#define MAPFTHEIGHT	8
-#define MAPFTBASELN	6
+#define MAPFTWIDTH 8
+#define MAPFTHEIGHT 8
+#define MAPFTBASELN 6
 
 /* If Compiling with the "New Look", redefine these now */
-#ifdef  INTUI_NEW_LOOK
+#ifdef INTUI_NEW_LOOK
 #define NewWindow ExtNewWindow
 #define NewScreen ExtNewScreen
 #endif
 
-#define         SIZEOF_DISKNAME 8
+#define SIZEOF_DISKNAME 8
 
-#define CSI     '\x9b'
-#define NO_CHAR     -1
-#define RAWHELP     0x5F    /* Rawkey code of the HELP key */
+#define CSI '\x9b'
+#define NO_CHAR -1
+#define RAWHELP 0x5F /* Rawkey code of the HELP key */
 
-
-#define C_BLACK		0
-#define C_WHITE		1
-#define C_BROWN		(WINVERS_AMIV ? 11 : 2)
-#define C_CYAN		(WINVERS_AMIV ? 2  : 3)
-#define C_GREEN		(WINVERS_AMIV ? 5  : 4)
-#define C_MAGENTA	(WINVERS_AMIV ? 10 : 5)
-#define C_BLUE		(WINVERS_AMIV ? 4  : 6)
-#define C_RED		7
-#define C_ORANGE	3
-#define C_GREY		6
-#define C_LTGREEN	8
-#define C_YELLOW	9
-#define C_GREYBLUE	12
-#define C_LTBROWN	13
-#define C_LTGREY	14
-#define C_PEACH		15
+#define C_BLACK 0
+#define C_WHITE 1
+#define C_BROWN (WINVERS_AMIV ? 11 : 2)
+#define C_CYAN (WINVERS_AMIV ? 2 : 3)
+#define C_GREEN (WINVERS_AMIV ? 5 : 4)
+#define C_MAGENTA (WINVERS_AMIV ? 10 : 5)
+#define C_BLUE (WINVERS_AMIV ? 4 : 6)
+#define C_RED 7
+#define C_ORANGE 3
+#define C_GREY 6
+#define C_LTGREEN 8
+#define C_YELLOW 9
+#define C_GREYBLUE 12
+#define C_LTBROWN 13
+#define C_LTGREY 14
+#define C_PEACH 15
 
 /* Structure describing tile files */
 struct PDAT
 {
-    long nplanes;		/* Depth of images */
-    long pbytes;		/* Bytes in a plane of data */
-    long across;		/* Number of tiles across */
-    long down;			/* Number of tiles down */
-    long npics;			/* Number of pictures in this file */
-    long xsize;			/* X-size of a tile */
-    long ysize;			/* Y-size of a-tile */
+    long nplanes; /* Depth of images */
+    long pbytes;  /* Bytes in a plane of data */
+    long across;  /* Number of tiles across */
+    long down;    /* Number of tiles down */
+    long npics;   /* Number of pictures in this file */
+    long xsize;   /* X-size of a tile */
+    long ysize;   /* Y-size of a-tile */
 };
 
-#undef	MAXCOLORS
-#define	MAXCOLORS	256
+#undef MAXCOLORS
+#define MAXCOLORS 256

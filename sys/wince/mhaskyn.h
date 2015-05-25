@@ -9,6 +9,6 @@
 
 #include "winMS.h"
 
-int mswin_yes_no_dialog( const char *question, const char *choices, int def);
+int mswin_yes_no_dialog(const char *question, const char *choices, int def);
 
 #endif /* MSWINAskYesNO_h */

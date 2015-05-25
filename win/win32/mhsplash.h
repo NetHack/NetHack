@@ -12,7 +12,6 @@ $Date: 2003/03/03 23:31:36 $  $Revision: 1.3 $
 #include "config.h"
 #include "global.h"
 
-void mswin_display_splash_window (BOOL);
+void mswin_display_splash_window(BOOL);
 
 #endif /* MSWINSplashWindow_h */
-
