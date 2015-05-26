@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1432590848 2015/05/25 21:54:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.133 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1432598715 2015/05/26 00:05:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.135 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2316,6 +2316,8 @@ struct alt_spellings {
     { "kelp", KELP_FROND },
     { "eucalyptus", EUCALYPTUS_LEAF },
     { "royal jelly", LUMP_OF_ROYAL_JELLY },
+    { "lembas", LEMBAS_WAFER },
+    { "marker", MAGIC_MARKER },
     { "hook", GRAPPLING_HOOK },
     { "grappling iron", GRAPPLING_HOOK },
     { "grapnel", GRAPPLING_HOOK },
