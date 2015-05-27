@@ -132,6 +132,7 @@ static struct Bool_Opt {
 #else
     { "ignintr", (boolean *) 0, FALSE, SET_IN_FILE },
 #endif
+    { "implicit_uncursed", &iflags.implicit_uncursed, TRUE, SET_IN_GAME },
     { "large_font", &iflags.obsolete, FALSE, SET_IN_FILE }, /* OBSOLETE */
     { "legacy", &flags.legacy, TRUE, DISP_IN_GAME },
     { "lit_corridor", &flags.lit_corridor, FALSE, SET_IN_GAME },
@@ -154,7 +155,6 @@ static struct Bool_Opt {
 #endif
     { "nudist", &u.uroleplay.nudist, FALSE, DISP_IN_GAME },
     { "null", &flags.null, TRUE, SET_IN_GAME },
-    { "omit_buc", &iflags.omit_buc, TRUE, SET_IN_GAME },
 #if defined(SYSFLAGS) && defined(MAC)
     { "page_wait", &sysflags.page_wait, TRUE, SET_IN_GAME },
 #else
