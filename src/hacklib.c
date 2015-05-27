@@ -1,96 +1,106 @@
-/* NetHack 3.6	hacklib.c	$NHDT-Date: 1432512764 2015/05/25 00:12:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.42 $ */
+/* NetHack 3.6	hacklib.c	$NHDT-Date: 1432723746 2015/05/27 10:49:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.43 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) Robert Patrick Rankin, 1991		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h" /* for config.h+extern.h */
-                  /*=
-                      Assorted 'small' utility routines.	They're virtually independent of
-                  NetHack, except that rounddiv may call panic().  setrandom calls one of
-                  srandom(), srand48(), or srand() depending upon configuration.
+/*=
+    Assorted 'small' utility routines.  They're virtually independent of
+    NetHack, except that rounddiv may call panic().  setrandom calls one
+    of srandom(), srand48(), or srand() depending upon configuration.
                   
-                        return type     routine name    argument type(s)
-                          boolean		digit		(char)
-                          boolean		letter		(char)
-                          char		highc		(char)
-                          char		lowc		(char)
-                          char *		lcase		(char *)
-                          char *		ucase		(char *)
-                          char *		upstart		(char *)
-                          char *		mungspaces	(char *)
-                          char *		eos		(char *)
-                          char *		strkitten	(char *,char)
-                          void		copynchars	(char *,const char *,int)
-                          char		chrcasecpy	(int,int)
-                          char *		strcasecpy	(char *,const char *)
-                          char *		s_suffix	(const char *)
-                          char *		ing_suffix	(const char *)
-                          char *		xcrypt		(const char *, char *)
-                          boolean		onlyspace	(const char *)
-                          char *		tabexpand	(char *)
-                          char *		visctrl		(char)
-                          char *		strsubst	(char *, const char *, const char *)
-                          const char *	ordin		(int)
-                          char *		sitoa		(int)
-                          int		sgn		(int)
-                          int		rounddiv	(long, int)
-                          int		distmin		(int, int, int, int)
-                          int		dist2		(int, int, int, int)
-                          boolean		online2		(int, int)
-                          boolean		pmatch		(const char *, const char *)
-                          boolean		pmatchi		(const char *, const char *)
-                          boolean		pmatchz		(const char *, const char *)
-                          int		strncmpi	(const char *, const char *, int)
-                          char *		strstri		(const char *, const char *)
-                          boolean		fuzzymatch	(const char *,const char *,
-                                                           const char *,boolean)
-                          void		setrandom	(void)
-                          time_t		getnow		(void)
-                          int		getyear		(void)
-                          char *		yymmdd		(time_t)
-                          long		yyyymmdd	(time_t)
-                          long		hhmmss		(time_t)
-                          char *		yyyymmddhhmmss	(time_t)
-                          time_t		time_from_yyyymmddhhmmss (char *)
-                          int		phase_of_the_moon	(void)
-                          boolean		friday_13th	(void)
-                          int		night		(void)
-                          int		midnight	(void)
-                  =*/
+      return type     routine name    argument type(s)
+        boolean         digit           (char)
+        boolean         letter          (char)
+        char            highc           (char)
+        char            lowc            (char)
+        char *          lcase           (char *)
+        char *          ucase           (char *)
+        char *          upstart         (char *)
+        char *          mungspaces      (char *)
+        char *          eos             (char *)
+        char *          strkitten       (char *,char)
+        void            copynchars      (char *,const char *,int)
+        char            chrcasecpy      (int,int)
+        char *          strcasecpy      (char *,const char *)
+        char *          s_suffix        (const char *)
+        char *          ing_suffix      (const char *)
+        char *          xcrypt          (const char *, char *)
+        boolean         onlyspace       (const char *)
+        char *          tabexpand       (char *)
+        char *          visctrl         (char)
+        char *          strsubst        (char *, const char *, const char *)
+        const char *    ordin           (int)
+        char *          sitoa           (int)
+        int             sgn             (int)
+        int             rounddiv        (long, int)
+        int             distmin         (int, int, int, int)
+        int             dist2           (int, int, int, int)
+        boolean         online2         (int, int)
+        boolean         pmatch          (const char *, const char *)
+        boolean         pmatchi         (const char *, const char *)
+        boolean         pmatchz         (const char *, const char *)
+        int             strncmpi        (const char *, const char *, int)
+        char *          strstri         (const char *, const char *)
+        boolean         fuzzymatch      (const char *,const char *,
+                                         const char *, boolean)
+        void            setrandom       (void)
+        time_t          getnow          (void)
+        int             getyear         (void)
+        char *          yymmdd          (time_t)
+        long            yyyymmdd        (time_t)
+        long            hhmmss          (time_t)
+        char *          yyyymmddhhmmss  (time_t)
+        time_t          time_from_yyyymmddhhmmss (char *)
+        int             phase_of_the_moon (void)
+        boolean         friday_13th     (void)
+        int             night           (void)
+        int             midnight        (void)
+=*/
 #ifdef LINT
 #define Static /* pacify lint */
 #else
 #define Static static
 #endif
 
-static boolean FDECL(pmatch_internal,
-                     (const char *, const char *, BOOLEAN_P, const char *));
+static boolean FDECL(pmatch_internal, (const char *, const char *,
+                                       BOOLEAN_P, const char *));
 
-boolean digit(c) /* is 'c' a digit? */
+/* is 'c' a digit? */
+boolean
+digit(c)
 char c;
 {
-    return ((boolean)('0' <= c && c <= '9'));
+    return (boolean) ('0' <= c && c <= '9');
 }
 
-boolean letter(c) /* is 'c' a letter?  note: '@' classed as letter */
+/* is 'c' a letter?  note: '@' classed as letter */
+boolean
+letter(c)
 char c;
 {
-    return ((boolean)(('@' <= c && c <= 'Z') || ('a' <= c && c <= 'z')));
+    return (boolean) ('@' <= c && c <= 'Z') || ('a' <= c && c <= 'z');
 }
 
-char highc(c) /* force 'c' into uppercase */
+/* force 'c' into uppercase */
+char
+highc(c)
 char c;
 {
-    return ((char) (('a' <= c && c <= 'z') ? (c & ~040) : c));
+    return (char) (('a' <= c && c <= 'z') ? (c & ~040) : c);
 }
 
-char lowc(c) /* force 'c' into lowercase */
+/* force 'c' into lowercase */
+char
+lowc(c)
 char c;
 {
-    return ((char) (('A' <= c && c <= 'Z') ? (c | 040) : c));
+    return (char) (('A' <= c && c <= 'Z') ? (c | 040) : c);
 }
 
-char *lcase(s) /* convert a string into all lowercase */
+/* convert a string into all lowercase */
+char *
+lcase(s)
 char *s;
 {
     register char *p;
@@ -101,7 +111,9 @@ char *s;
     return s;
 }
 
-char *ucase(s) /* convert a string into all uppercase */
+/* convert a string into all uppercase */
+char *
+ucase(s)
 char *s;
 {
     register char *p;
@@ -112,7 +124,9 @@ char *s;
     return s;
 }
 
-char *upstart(s) /* convert first character of a string to uppercase */
+/* convert first character of a string to uppercase */
+char *
+upstart(s)
 char *s;
 {
     if (s)
@@ -143,7 +157,9 @@ char *bp;
     return bp;
 }
 
-char *eos(s) /* return the end of a string (pointing at '\0') */
+/* return the end of a string (pointing at '\0') */
+char *
+eos(s)
 register char *s;
 {
     while (*s)
@@ -151,8 +167,9 @@ register char *s;
     return s;
 }
 
-/* strcat(s, {c,'\0'}); */
-char *strkitten(s, c) /* append a character to a string (in place) */
+/* append a character to a string (in place): strcat(s, {c,'\0'}); */
+char *
+strkitten(s, c)
 char *s;
 char c;
 {
@@ -163,7 +180,9 @@ char c;
     return s;
 }
 
-void copynchars(dst, src, n) /* truncating string copy */
+/* truncating string copy */
+void
+copynchars(dst, src, n)
 char *dst;
 const char *src;
 int n;
@@ -178,8 +197,9 @@ int n;
     *dst = '\0';
 }
 
-/* mostly used by strcasecpy */
-char chrcasecpy(oc, nc) /* convert char nc into oc's case */
+/* convert char nc into oc's case; mostly used by strcasecpy */
+char
+chrcasecpy(oc, nc)
 int oc, nc;
 {
 #if 0 /* this will be necessary if we switch to <ctype.h> */
@@ -198,9 +218,11 @@ int oc, nc;
     return (char) nc;
 }
 
-/* for case-insensitive editions of makeplural() and makesingular();
+/* overwrite string, preserving old chars' case;
+   for case-insensitive editions of makeplural() and makesingular();
    src might be shorter, same length, or longer than dst */
-char *strcasecpy(dst, src) /* overwrite string, preserving old chars' case */
+char *
+strcasecpy(dst, src)
 char *dst;
 const char *src;
 {
@@ -222,7 +244,9 @@ const char *src;
     return result;
 }
 
-char *s_suffix(s) /* return a name converted to possessive */
+/* return a name converted to possessive */
+char *
+s_suffix(s)
 const char *s;
 {
     Static char buf[BUFSZ];
@@ -239,6 +263,7 @@ const char *s;
     return buf;
 }
 
+/* construct a gerund (a verb formed by appending "ing" to a noun) */
 char *
 ing_suffix(s)
 const char *s;
@@ -247,6 +272,7 @@ const char *s;
     static char buf[BUFSZ];
     char onoff[10];
     char *p;
+
     Strcpy(buf, s);
     p = eos(buf);
     onoff[0] = *p = *(p + 1) = '\0';
@@ -272,7 +298,9 @@ const char *s;
     return buf;
 }
 
-char *xcrypt(str, buf) /* trivial text encryption routine (see makedefs) */
+/* trivial text encryption routine (see makedefs) */
+char *
+xcrypt(str, buf)
 const char *str;
 char *buf;
 {
@@ -309,7 +337,6 @@ char *sbuf;
 
     if (!*s)
         return sbuf;
-
     /* warning: no bounds checking performed */
     for (bp = buf, idx = 0; *s; s++)
         if (*s == '\t') {
@@ -330,7 +357,6 @@ char c;
     Static char ccc[3];
 
     c &= 0177;
-
     ccc[2] = '\0';
     if (c < 040) {
         ccc[0] = '^';
@@ -365,17 +391,20 @@ const char *orig, *replacement;
     return bp;
 }
 
-const char *ordin(n) /* return the ordinal suffix of a number */
+/* return the ordinal suffix of a number */
+const char *
+ordin(n)
 int n;               /* note: should be non-negative */
 {
     register int dd = n % 10;
 
-    return (dd == 0 || dd > 3 || (n % 100) / 10 == 1)
-               ? "th"
+    return (dd == 0 || dd > 3 || (n % 100) / 10 == 1) ? "th"
                : (dd == 1) ? "st" : (dd == 2) ? "nd" : "rd";
 }
 
-char *sitoa(n) /* make a signed digit string from a number */
+/* make a signed digit string from a number */
+char *
+sitoa(n)
 int n;
 {
     Static char buf[13];
@@ -384,13 +413,17 @@ int n;
     return buf;
 }
 
-int sgn(n) /* return the sign of a number: -1, 0, or 1 */
+/* return the sign of a number: -1, 0, or 1 */
+int
+sgn(n)
 int n;
 {
     return (n < 0) ? -1 : (n != 0);
 }
 
-int rounddiv(x, y) /* calculate x/y, rounding as appropriate */
+/* calculate x/y, rounding as appropriate */
+int
+rounddiv(x, y)
 long x;
 int y;
 {
@@ -415,42 +448,48 @@ int y;
     return divsgn * r;
 }
 
-int distmin(x0, y0, x1, y1) /* distance between two points, in moves */
+/* distance between two points, in moves */
+int
+distmin(x0, y0, x1, y1)
 int x0, y0, x1, y1;
 {
     register int dx = x0 - x1, dy = y0 - y1;
+
     if (dx < 0)
         dx = -dx;
     if (dy < 0)
         dy = -dy;
     /*  The minimum number of moves to get from (x0,y0) to (x1,y1) is the
-     :  larger of the [absolute value of the] two deltas.
+     *  larger of the [absolute value of the] two deltas.
      */
     return (dx < dy) ? dy : dx;
 }
 
-int dist2(x0, y0, x1,
-          y1) /* square of euclidean distance between pair of pts */
+/* square of euclidean distance between pair of pts */
+int
+dist2(x0, y0, x1, y1)
 int x0, y0, x1, y1;
 {
     register int dx = x0 - x1, dy = y0 - y1;
+
     return dx * dx + dy * dy;
 }
 
-/* Integer square root function without using floating point.
- * This could be replaced by a faster algorithm, but has not been because:
- * + the simple algorithm is easy to read
- * + this algorithm does not require 64-bit support
- * + in current usage, the values passed to isqrt() are not really that
- *   large, so the performance difference is negligible
- * + isqrt() is used in only few places, which are not bottle-necks
- */
+/* integer square root function without using floating point */
 int
 isqrt(val)
 int val;
 {
     int rt = 0;
     int odd = 1;
+    /*
+     * This could be replaced by a faster algorithm, but has not been because:
+     * + the simple algorithm is easy to read;
+     * + this algorithm does not require 64-bit support;
+     * + in current usage, the values passed to isqrt() are not really that
+     *   large, so the performance difference is negligible;
+     * + isqrt() is used in only few places, which are not bottle-necks.
+     */
     while (val >= odd) {
         val = val - odd;
         odd = odd + 2;
@@ -459,30 +498,30 @@ int val;
     return rt;
 }
 
-boolean online2(x0, y0, x1,
-                y1) /* are two points lined up (on a straight line)? */
+/* are two points lined up (on a straight line)? */
+boolean
+online2(x0, y0, x1, y1)
 int x0, y0, x1, y1;
 {
     int dx = x0 - x1, dy = y0 - y1;
     /*  If either delta is zero then they're on an orthogonal line,
      *  else if the deltas are equal (signs ignored) they're on a diagonal.
      */
-    return ((boolean)(!dy || !dx || (dy == dx)
-                      || (dy + dx == 0))); /* (dy == -dx) */
+    return (boolean) (!dy || !dx || dy == dx || dy == -dx);
 }
 
 /* guts of pmatch(), pmatchi(), and pmatchz() */
-static boolean pmatch_internal(patrn, strng, ci,
-                               sk) /* match a string against a pattern */
+static boolean
+pmatch_internal(patrn, strng, ci, sk) /* match a string against a pattern */
 const char *patrn, *strng;
 boolean ci;     /* True => case-insensitive, False => case-sensitive */
 const char *sk; /* set of characters to skip */
 {
     char s, p;
-/*
- :  Simple pattern matcher:  '*' matches 0 or more characters, '?' matches
- :  any single character.  Returns TRUE if 'strng' matches 'patrn'.
- */
+    /*
+     *  Simple pattern matcher:  '*' matches 0 or more characters, '?' matches
+     *  any single character.  Returns TRUE if 'strng' matches 'patrn'.
+     */
 pmatch_top:
     if (!sk) {
         s = *strng++;
@@ -496,13 +535,14 @@ pmatch_top:
             p = *patrn++;
         } while (index(sk, p));
     }
-    if (!p)                          /* end of pattern */
-        return (boolean)(s == '\0'); /* matches iff end of string too */
-    else if (p == '*')               /* wildcard reached */
-        return (boolean)(
-            (!*patrn || pmatch_internal(patrn, strng - 1, ci, sk))
-                ? TRUE
-                : s ? pmatch_internal(patrn - 1, strng, ci, sk) : FALSE);
+    if (!p)                           /* end of pattern */
+        return (boolean) (s == '\0'); /* matches iff end of string too */
+    else if (p == '*')                /* wildcard reached */
+        return (boolean) ((!*patrn
+                           || pmatch_internal(patrn, strng - 1, ci, sk))
+                          ? TRUE
+                          : s ? pmatch_internal(patrn - 1, strng, ci, sk)
+                              : FALSE);
     else if ((ci ? lowc(p) != lowc(s) : p != s) /* check single character */
              && (p != '?' || !s))               /* & single-char wildcard */
         return FALSE;                           /* doesn't match */
@@ -538,10 +578,12 @@ const char *patrn, *strng;
 }
 
 #ifndef STRNCMPI
-int strncmpi(s1, s2, n) /* case insensitive counted string comparison */
+/* case insensitive counted string comparison */
+int
+strncmpi(s1, s2, n) /*{ aka strncasecmp }*/
 register const char *s1, *s2;
-register int n; /*(should probably be size_t, which is usually unsigned)*/
-{               /*{ aka strncasecmp }*/
+register int n; /*(should probably be size_t, which is unsigned)*/
+{
     register char t1, t2;
 
     while (n--) {
@@ -559,8 +601,9 @@ register int n; /*(should probably be size_t, which is usually unsigned)*/
 #endif /* STRNCMPI */
 
 #ifndef STRSTRI
-
-char *strstri(str, sub) /* case insensitive substring search */
+/* case insensitive substring search */
+char *
+strstri(str, sub)
 const char *str;
 const char *sub;
 {
@@ -570,7 +613,7 @@ const char *sub;
     char tstr[TABSIZ], tsub[TABSIZ]; /* nibble count tables */
 #if 0
     assert( (TABSIZ & ~(TABSIZ-1)) == TABSIZ ); /* must be exact power of 2 */
-    assert( &lowc != 0 );			/* can't be unsafe macro */
+    assert( &lowc != 0 );                       /* can't be unsafe macro */
 #endif
 
     /* special case: empty substring */
@@ -629,18 +672,18 @@ boolean caseblind;
     } while (c1 == c2);
 
     /* match occurs only when the end of both strings has been reached */
-    return (boolean)(!c1 && !c2);
+    return (boolean) (!c1 && !c2);
 }
 
 /*
  * Time routines
  *
  * The time is used for:
- *	- seed for rand()
- *	- year on tombstone and yyyymmdd in record file
- *	- phase of the moon (various monsters react to NEW_MOON or FULL_MOON)
- *	- night and midnight (the undead are dangerous at midnight)
- *	- determination of what files are "very old"
+ *  - seed for rand()
+ *  - year on tombstone and yyyymmdd in record file
+ *  - phase of the moon (various monsters react to NEW_MOON or FULL_MOON)
+ *  - night and midnight (the undead are dangerous at midnight)
+ *  - determination of what files are "very old"
  */
 
 /* TIME_type: type of the argument to time(); we actually use &(time_t) */
@@ -667,14 +710,23 @@ void
 setrandom()
 {
     unsigned long seed = (unsigned long) getnow(); /* time((TIME_type) 0) */
-#ifdef UNIX
-    /* Quick dirty band-aid to prevent PRNG prediction */
-    seed *= getpid();
+
+#if defined(UNIX) || defined(VMS)
+    {
+        unsigned long pid = (unsigned long) getpid();
+
+        /* Quick dirty band-aid to prevent PRNG prediction */
+        if (pid) {
+            if (!(pid & 3L))
+                pid -= 1L;
+            seed *= pid;
+        }
+    }
 #endif
 
-/* the types are different enough here that sweeping the different
- * routine names into one via #defines is even more confusing
- */
+    /* the types are different enough here that sweeping the different
+     * routine names into one via #defines is even more confusing
+     */
 #ifdef RANDOM /* srandom() from sys/share/random.c */
     srandom((unsigned int) seed);
 #else
@@ -723,17 +775,17 @@ char *
 yymmdd(date)
 time_t date;
 {
-	Static char datestr[10];
-	struct tm *lt;
+    Static char datestr[10];
+    struct tm *lt;
 
-	if (date == 0)
-		lt = getlt();
-	else
-		lt = localtime((LOCALTIME_type) &date);
+    if (date == 0)
+        lt = getlt();
+    else
+        lt = localtime((LOCALTIME_type) &date);
 
-	Sprintf(datestr, "%02d%02d%02d",
-		lt->tm_year, lt->tm_mon + 1, lt->tm_mday);
-	return(datestr);
+    Sprintf(datestr, "%02d%02d%02d",
+            lt->tm_year, lt->tm_mon + 1, lt->tm_mday);
+    return datestr;
 }
 #endif
 
@@ -804,7 +856,7 @@ time_t date;
     Sprintf(datestr, "%04ld%02d%02d%02d%02d%02d", datenum, lt->tm_mon + 1,
             lt->tm_mday, lt->tm_hour, lt->tm_min, lt->tm_sec);
     debugpline1("yyyymmddhhmmss() produced date string %s", datestr);
-    return (datestr);
+    return datestr;
 }
 
 time_t
@@ -815,6 +867,7 @@ char *buf;
     time_t timeresult = (time_t) 0;
     struct tm t, *lt;
     char *g, *p, y[5], mo[3], md[3], h[3], mi[3], s[3];
+
     if (buf && strlen(buf) == 14) {
         g = buf;
         p = y; /* year */
@@ -864,17 +917,18 @@ char *buf;
 /*
  * moon period = 29.53058 days ~= 30, year = 365.2422 days
  * days moon phase advances on first day of year compared to preceding year
- *	= 365.2422 - 12*29.53058 ~= 11
+ *      = 365.2422 - 12*29.53058 ~= 11
  * years in Metonic cycle (time until same phases fall on the same days of
- *	the month) = 18.6 ~= 19
+ *      the month) = 18.6 ~= 19
  * moon phase on first day of year (epact) ~= (11*(year%19) + 29) % 30
- *	(29 as initial condition)
+ *      (29 as initial condition)
  * current phase in days = first day phase + days elapsed in year
  * 6 moons ~= 177 days
  * 177 ~= 8 reported phases * 22
  * + 11/22 for rounding
  */
-int phase_of_the_moon() /* 0-7, with 0: new, 4: full */
+int
+phase_of_the_moon() /* 0-7, with 0: new, 4: full */
 {
     register struct tm *lt = getlt();
     register int epact, diy, goldn;
@@ -893,7 +947,8 @@ friday_13th()
 {
     register struct tm *lt = getlt();
 
-    return ((boolean)(lt->tm_wday == 5 /* friday */ && lt->tm_mday == 13));
+    /* tm_wday (day of week; 0==Sunday) == 5 => Friday */
+    return (boolean) (lt->tm_wday == 5 && lt->tm_mday == 13);
 }
 
 int
