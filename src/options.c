@@ -3447,6 +3447,7 @@ doset()
     int indexoffset, startpass, endpass;
     boolean setinitial = FALSE, fromfile = FALSE;
     int biggest_name = 0;
+    const char *n_currently_set = "(%d currently set)";
 
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin);
@@ -3475,7 +3476,7 @@ doset()
                     continue;
                 any.a_int = (pass == 0) ? 0 : i + 1;
                 if (!iflags.menu_tab_sep)
-                    Sprintf(buf, "%s%-13s [%s]", pass == 0 ? "    " : "",
+                    Sprintf(buf, "%s%-17s [%s]", pass == 0 ? "    " : "",
                             boolopt[i].name, *bool_p ? "true" : "false");
                 else
                     Sprintf(buf, "%s\t[%s]", boolopt[i].name,
@@ -3543,12 +3544,12 @@ doset()
                                    (pass == DISP_IN_GAME) ? 0 : indexoffset);
             }
     any.a_int = -4;
-    Sprintf(buf2, "(%d currently set)", msgtype_count());
+    Sprintf(buf2, n_currently_set, msgtype_count());
     Sprintf(buf, fmtstr_doset_add_menu, any.a_int ? "" : "    ", "message types",
             buf2);
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
     any.a_int = -3;
-    Sprintf(buf2, "(%d currently set)", count_menucolors());
+    Sprintf(buf2, n_currently_set, count_menucolors());
     Sprintf(buf, fmtstr_doset_add_menu, any.a_int ? "" : "    ", "menucolors",
             buf2);
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
@@ -3565,8 +3566,9 @@ doset()
 #endif
 #endif
     any.a_int = -1;
-    Sprintf(buf, "autopickup exceptions (%d currently set)",
-            count_ape_maps((int *) 0, (int *) 0));
+    Sprintf(buf2, n_currently_set, count_ape_maps((int *) 0, (int *) 0));
+    Sprintf(buf, fmtstr_doset_add_menu, any.a_int ? "" : "    ",
+            "autopickup exceptions", buf2);
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
 #ifdef PREFIXES_IN_USE
     any = zeroany;
