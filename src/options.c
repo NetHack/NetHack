@@ -154,6 +154,7 @@ static struct Bool_Opt {
 #endif
     { "nudist", &u.uroleplay.nudist, FALSE, DISP_IN_GAME },
     { "null", &flags.null, TRUE, SET_IN_GAME },
+    { "omit_buc", &iflags.omit_buc, TRUE, SET_IN_GAME },
 #if defined(SYSFLAGS) && defined(MAC)
     { "page_wait", &sysflags.page_wait, TRUE, SET_IN_GAME },
 #else

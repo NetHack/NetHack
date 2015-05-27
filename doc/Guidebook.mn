@@ -2196,6 +2196,8 @@ location of the `y' and `z' keys swapped.)
 When moving by numbers, to enter a count prefix for those commands
 which accept one (such as ``12s'' to search twelve times), precede it
 with the letter `n' (``n12s'').
+.lp omit_buc
+Omit "uncursed" from inventory lists, if possible (default on).
 .lp packorder
 Specify the order to list object types in (default ``")[%?+!=/(*`0_'').
 The value of this option should be a string containing the

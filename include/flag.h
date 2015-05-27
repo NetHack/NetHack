@@ -194,6 +194,7 @@ struct instance_flags {
     boolean deferred_X;       /* deferred entry into explore mode */
     boolean num_pad;          /* use numbers for movement commands */
     boolean news;             /* print news */
+    boolean omit_buc;         /* omit "uncursed" status in inventory lists */
     boolean mention_walls;    /* give feedback when bumping walls */
     boolean menu_tab_sep;     /* Use tabs to separate option menu fields */
     boolean menu_head_objsym; /* Show obj symbol in menu headings */

@@ -778,7 +778,7 @@ register struct obj *obj;
             Strcat(prefix, "cursed ");
         else if (obj->blessed)
             Strcat(prefix, "blessed ");
-        else if ((!known || !objects[obj->otyp].oc_charged
+        else if (!iflags.omit_buc || (!known || !objects[obj->otyp].oc_charged
                   || (obj->oclass == ARMOR_CLASS
                       || obj->oclass == RING_CLASS))
 /* For most items with charges or +/-, if you know how many
