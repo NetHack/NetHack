@@ -705,9 +705,10 @@ char *prefix;
                                        is_flammable(obj) ? "fireproof " : "");
 }
 
-char *
-doname(obj)
+static char *
+doname_base(obj, with_price)
 register struct obj *obj;
+boolean with_price;
 {
     boolean ispoisoned = FALSE;
     boolean known, cknown, bknown, lknown;
@@ -988,6 +989,10 @@ register struct obj *obj;
 
         Sprintf(eos(bp), " (%s, %ld %s)", obj->unpaid ? "unpaid" : "contents",
                 quotedprice, currency(quotedprice));
+    } else if (with_price) {
+        long price = get_cost_of_shop_item(obj);
+        if (price > 0)
+            Sprintf(eos(bp), " (%ld %s)", price, currency(price));
     }
     if (!strncmp(prefix, "a ", 2)
         && index(vowels, *(prefix + 2) ? *(prefix + 2) : *bp)
@@ -1006,6 +1011,21 @@ register struct obj *obj;
     }
     bp = strprepend(bp, prefix);
     return (bp);
+}
+
+char *
+doname(obj)
+register struct obj *obj;
+{
+    return doname_base(obj, FALSE);
+}
+
+/* Name of object including price. */
+char *
+doname_with_price(obj)
+register struct obj *obj;
+{
+    return doname_base(obj, TRUE);
 }
 
 /* used from invent.c */
