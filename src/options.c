@@ -505,6 +505,7 @@ STATIC_OVL int FDECL(count_ape_maps, (int *, int *));
 STATIC_DCL const char *FDECL(clr2colorname, (int));
 STATIC_DCL const char *FDECL(attr2attrname, (int));
 STATIC_DCL int NDECL(query_color);
+STATIC_DCL int NDECL(query_msgtype);
 STATIC_DCL int FDECL(query_attr, (const char *));
 STATIC_DCL boolean FDECL(add_menu_coloring_parsed, (char *, int, int));
 STATIC_DCL void FDECL(free_one_menu_coloring, (int));
@@ -1277,6 +1278,168 @@ const char *prompt;
         return i;
     }
     return -1;
+}
+
+static const struct {
+    const char *name;
+    const xchar msgtyp;
+    const char *descr;
+} msgtype_names[] = {
+    { "show", MSGTYP_NORMAL, "Show message normally" },
+    { "hide", MSGTYP_NOSHOW, "Hide message" },
+    { "noshow", MSGTYP_NOSHOW, NULL },
+    { "stop", MSGTYP_STOP, "Prompt for more after the message" },
+    { "more", MSGTYP_STOP, NULL },
+    { "norep", MSGTYP_NOREP, "Do not repeat the message" }
+};
+
+const char *
+msgtype2name(typ)
+int typ;
+{
+    int i;
+    for (i = 0; i < SIZE(msgtype_names); i++)
+	if (msgtype_names[i].descr && msgtype_names[i].msgtyp == typ)
+	    return msgtype_names[i].name;
+    return NULL;
+}
+
+int
+query_msgtype()
+{
+    winid tmpwin;
+    anything any;
+    int i, pick_cnt;
+    xchar prev_typ = -1;
+    menu_item *picks = (menu_item *) 0;
+
+    tmpwin = create_nhwindow(NHW_MENU);
+    start_menu(tmpwin);
+    any = zeroany;
+    for (i = 0; i < SIZE(msgtype_names); i++)
+	if (msgtype_names[i].descr) {
+	    any.a_int = msgtype_names[i].msgtyp + 1;
+	    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                 msgtype_names[i].descr, MENU_UNSELECTED);
+	}
+    end_menu(tmpwin, "How to show the message");
+    pick_cnt = select_menu(tmpwin, PICK_ONE, &picks);
+    destroy_nhwindow(tmpwin);
+    if (pick_cnt > 0) {
+        i = picks->item.a_int - 1;
+        free((genericptr_t) picks);
+        return i;
+    }
+    return -1;
+}
+
+boolean
+msgtype_add(typ, pattern)
+int typ;
+char *pattern;
+{
+    struct plinemsg_type *tmp = (struct plinemsg_type *) alloc(sizeof(struct plinemsg_type));
+    if (!tmp) return FALSE;
+    tmp->msgtype = typ;
+    tmp->regex = regex_init();
+    if (!regex_compile(pattern, tmp->regex)) {
+	static const char *re_error = "MSGTYPE regex error";
+        if (!iflags.window_inited)
+            raw_printf("\n%s: %s\n", re_error, regex_error_desc(tmp->regex));
+        else
+            pline("%s: %s", re_error, regex_error_desc(tmp->regex));
+        wait_synch();
+        free(tmp);
+        return FALSE;
+    }
+    tmp->pattern = dupstr(pattern);
+    tmp->next = plinemsg_types;
+    plinemsg_types = tmp;
+    return TRUE;
+}
+
+void
+msgtype_free()
+{
+    struct plinemsg_type *tmp = plinemsg_types;
+    struct plinemsg_type *tmp2;
+    while (tmp) {
+	free(tmp->pattern);
+	regex_free(tmp->regex);
+	tmp2 = tmp;
+	tmp = tmp->next;
+	free(tmp2);
+    }
+    plinemsg_types = NULL;
+}
+
+void
+free_one_msgtype(idx)
+int idx; /* 0 .. */
+{
+    struct plinemsg_type *tmp = plinemsg_types;
+    struct plinemsg_type *prev = NULL;
+
+    while (tmp) {
+        if (idx == 0) {
+            struct plinemsg_type *next = tmp->next;
+            regex_free(tmp->regex);
+            free(tmp->pattern);
+            free(tmp);
+            if (prev)
+                prev->next = next;
+            else
+                plinemsg_types = next;
+            return;
+        }
+        idx--;
+        prev = tmp;
+        tmp = tmp->next;
+    }
+}
+
+int
+msgtype_type(msg)
+const char *msg;
+{
+    struct plinemsg_type *tmp = plinemsg_types;
+    while (tmp) {
+	if (regex_match(msg, tmp->regex)) return tmp->msgtype;
+	tmp = tmp->next;
+    }
+    return MSGTYP_NORMAL;
+}
+
+int
+msgtype_count()
+{
+    int c = 0;
+    struct plinemsg_type *tmp = plinemsg_types;
+    while (tmp) {
+	c++;
+	tmp = tmp->next;
+    }
+    return c;
+}
+
+boolean
+msgtype_parse_add(str)
+char *str;
+{
+    char pattern[256];
+    char msgtype[11];
+    if (sscanf(str, "%10s \"%255[^\"]\"", msgtype, pattern) == 2) {
+	int typ = -1;
+	int i;
+	for (i = 0; i < SIZE(msgtype_names); i++)
+	    if (!strcasecmp(msgtype_names[i].name, msgtype)) {
+		typ = msgtype_names[i].msgtyp;
+		break;
+	    }
+	if (typ != -1)
+	    return msgtype_add(typ, pattern);
+    }
+    return FALSE;
 }
 
 boolean
@@ -3379,6 +3542,11 @@ doset()
                     doset_add_menu(tmpwin, compopt[i].name,
                                    (pass == DISP_IN_GAME) ? 0 : indexoffset);
             }
+    any.a_int = -4;
+    Sprintf(buf2, "(%d currently set)", msgtype_count());
+    Sprintf(buf, fmtstr_doset_add_menu, any.a_int ? "" : "    ", "message types",
+            buf2);
+    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
     any.a_int = -3;
     Sprintf(buf2, "(%d currently set)", count_menucolors());
     Sprintf(buf, fmtstr_doset_add_menu, any.a_int ? "" : "    ", "menucolors",
@@ -3438,6 +3606,8 @@ doset()
 #endif
                 if (opt_indx == -4) {
                 (void) special_handling("menucolors", setinitial, fromfile);
+		} else if (opt_indx == -5) {
+		    (void) special_handling("msgtype", setinitial, fromfile);
             } else if (opt_indx < boolcount) {
                 /* boolean option */
                 Sprintf(buf, "%s%s", *boolopt[opt_indx].addr ? "!" : "",
@@ -3835,6 +4005,60 @@ boolean setinitial, setfromfile;
         int mhattr = query_attr("How to highlight menu headings:");
         if (mhattr != -1)
             iflags.menu_headings = mhattr;
+    } else if (!strcmp("msgtype", optname)) {
+	int opt_idx, nmt, mttyp;
+	char mtbuf[BUFSZ];
+    msgtypes_again:
+	nmt = msgtype_count();
+	opt_idx = handle_add_list_remove("message type", nmt);
+	if (opt_idx == 3) {
+	    ; /* done--fall through to function exit */
+	} else if (opt_idx == 0) { /* add new */
+	    getlin("What new message pattern?", mtbuf);
+	    if (*mtbuf == '\033' || !*mtbuf)
+		goto msgtypes_again;
+	    mttyp = query_msgtype();
+	    if (mttyp == -1)
+		goto msgtypes_again;
+	    if (!msgtype_add(mttyp, mtbuf)) {
+		pline("Error adding the message type.");
+		wait_synch();
+		goto msgtypes_again;
+	    }
+	} else { /* list or remove */
+            int pick_idx, pick_cnt;
+            int mt_idx;
+	    char mtbuf[BUFSZ];
+            menu_item *pick_list = (menu_item *) 0;
+            struct plinemsg_type *tmp = plinemsg_types;
+            tmpwin = create_nhwindow(NHW_MENU);
+            start_menu(tmpwin);
+            any = zeroany;
+            mt_idx = 0;
+            while (tmp) {
+                const char *mtype = msgtype2name(tmp->msgtype);
+                any.a_int = (++mt_idx);
+                Sprintf(mtbuf, "%-5s \"%s\"", mtype, tmp->pattern);
+                add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, mtbuf,
+                         MENU_UNSELECTED);
+                tmp = tmp->next;
+            }
+            Sprintf(mtbuf, "%s message types",
+                    (opt_idx == 1) ? "List of" : "Remove which");
+            end_menu(tmpwin, mtbuf);
+            pick_cnt = select_menu(
+                tmpwin, (opt_idx == 1) ? PICK_NONE : PICK_ANY, &pick_list);
+            if (pick_cnt > 0) {
+                for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx)
+                    free_one_msgtype(pick_list[pick_idx].item.a_int - 1
+                                           - pick_idx);
+            }
+            free((genericptr_t) pick_list);
+            pick_list = (menu_item *) 0;
+            destroy_nhwindow(tmpwin);
+            if (pick_cnt >= 0)
+                goto msgtypes_again;
+	}
     } else if (!strcmp("menucolors", optname)) {
         int opt_idx, nmc, mcclr, mcattr;
         char mcbuf[BUFSZ];

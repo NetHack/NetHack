@@ -3186,6 +3186,64 @@ autopickup.
 
 %.lp
 %.hn 2
+\subsection*{Configuring Message Types}
+
+%.pg
+You can change the way the messages are shown in the message area, when
+the message matches a user-defined pattern.
+
+%.pg
+In general, the config file entries to configure the message types
+look like this:
+\begin{verbatim}
+    MSGTYPE=type "pattern"
+\end{verbatim}
+
+\blist{}
+%.lp
+\item[\ib{type}]
+how the message should be shown;
+%.lp
+\item[\ib{pattern}]
+the pattern to match.
+\elist
+
+%.lp ""
+The pattern should be a regular expression.
+
+%.lp ""
+Allowed types are:
+
+%.sd
+%.si
+{\tt show}  --- show message normally.\\
+{\tt hide}  --- never show the message.\\
+{\tt stop}  --- wait for user with more-prompt.\\
+{\tt norep} --- show the message once, but not again if no other message is shown in between.
+%.ei
+%.ed
+
+%.lp ""
+Here's an example of menu colors using NetHack's internal
+pattern matching facility:
+
+\begin{verbatim}
+    MSGTYPE=stop "You feel hungry."
+    MSGTYPE=hide "You displaced *."
+\end{verbatim}
+
+specifies that whenever a message ``You feel hungry'' is shown,
+the user is prompted with more-prompt, and a message matching
+``You displaced <something>'' is not shown at all.
+
+%.lp
+The order of the defined MSGTYPE-lines is important; the last matching
+rule is used. Put the general case first, exceptions below them.
+
+%.pg
+
+%.lp
+%.hn 2
 \subsection*{Configuring Menu Colors}
 
 %.pg

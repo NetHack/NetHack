@@ -2134,6 +2134,8 @@ int src;
             plnamesuffix(); /* set the character class */
     } else if (match_varname(buf, "AUTOPICKUP_EXCEPTION", 5)) {
         add_autopickup_exception(bufp);
+    } else if (match_varname(buf, "MSGTYPE", 7)) {
+	(void) msgtype_parse_add(bufp);
 #ifdef NOCWD_ASSUMPTIONS
     } else if (match_varname(buf, "HACKDIR", 4)) {
         adjust_prefix(bufp, HACKPREFIX);

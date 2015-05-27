@@ -2638,6 +2638,50 @@ The second example results in the exclusion of any corpse from autopickup.
 The last example results in the exclusion of items known to be cursed from
 autopickup.
 .hn 2
+Configuring Message Types
+.pg
+You can change the way the messages are shown in the message area, when
+the message matches a user-defined pattern.
+.pg
+In general, the config file entries to configure the message types
+look like this:
+.si
+MSGTYPE=type "pattern"
+.ei
+.PS "message type"
+.PL type
+how the message should be shown;
+.PL pattern
+the pattern to match.
+.PE
+.lp ""
+The pattern should be a regular expression.
+.lp ""
+Allowed types are:
+.sd
+.si
+show  - show message normally.
+hide  - never show the message.
+stop  - wait for user with more-prompt.
+norep - show the message once, but not again if no other message is shown in between.
+.ei
+.ed
+.lp ""
+Here's an example of message types using NetHack's internal
+pattern matching facility:
+.sd
+.si
+MSGTYPE=stop "You feel hungry."
+MSGTYPE=hide "You displaced *."
+.ei
+.ed
+specifies that whenever a message "You feel hungry" is shown,
+the user is prompted with more-prompt, and a message matching
+"You displaced <something>." is not shown at all.
+.lp ""
+The order of the defined MSGTYPE-lines is important; the last matching
+rule is used. Put the general case first, exceptions below them.
+.hn 2
 Configuring Menu Colors
 .pg
 Some platforms allow you to define colors used in menu lines when the

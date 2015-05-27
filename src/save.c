@@ -1320,6 +1320,7 @@ freedynamicdata()
     free_menu_coloring();
     free_invbuf();           /* let_to_name (invent.c) */
     free_youbuf();           /* You_buf,&c (pline.c) */
+    msgtype_free();
     tmp_at(DISP_FREEMEM, 0); /* temporary display effects */
 #ifdef FREE_ALL_MEMORY
 #define freeobjchn(X) (saveobjchn(0, X, FREE_SAVE), X = 0)

@@ -395,6 +395,20 @@ struct autopickup_exception {
     struct autopickup_exception *next;
 };
 
+struct plinemsg_type {
+    xchar msgtype;  /* one of MSGTYP_foo */
+    struct nhregex *regex;
+    char *pattern;
+    struct plinemsg_type *next;
+};
+
+#define MSGTYP_NORMAL   0
+#define MSGTYP_NOREP    1
+#define MSGTYP_NOSHOW   2
+#define MSGTYP_STOP     3
+
+E struct plinemsg_type *plinemsg_types;
+
 #ifdef PANICTRACE
 E char *ARGV0;
 #endif

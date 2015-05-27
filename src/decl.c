@@ -328,6 +328,8 @@ NEARDATA struct savefile_info sfrestinfo, sfsaveinfo = {
 #endif
 };
 
+struct plinemsg_type *plinemsg_types = NULL;
+
 #ifdef PANICTRACE
 char *ARGV0;
 #endif

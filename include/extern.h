@@ -1638,6 +1638,9 @@ E int FDECL(sym_val, (char *));
 E boolean FDECL(add_menu_coloring, (char *));
 E boolean FDECL(get_menu_coloring, (char *, int *, int *));
 E void NDECL(free_menu_coloring);
+E boolean FDECL(msgtype_parse_add, (char *));
+E int FDECL(msgtype_type, (const char *));
+E void NDECL(msgtype_free);
 
 /* ### pager.c ### */
 

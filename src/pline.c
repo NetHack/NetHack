@@ -7,6 +7,7 @@
 #include "hack.h"
 
 static boolean no_repeat = FALSE;
+static char prevmsg[BUFSZ];
 
 static char *FDECL(You_buf, (int));
 
@@ -47,6 +48,7 @@ VA_DECL(const char *, line)
 {       /* start of vpline() or of nested block in USE_OLDARG's pline() */
     char pbuf[3 * BUFSZ];
     int ln;
+    xchar msgtyp;
     /* Do NOT use VA_START and VA_END in here... see above */
 
     if (!line || !*line)
@@ -89,9 +91,15 @@ VA_DECL(const char *, line)
         vision_recalc(0);
     if (u.ux)
         flush_screen(1); /* %% */
+    msgtyp = msgtype_type(line);
+    if (msgtyp == MSGTYP_NOSHOW) return;
+    if (msgtyp == MSGTYP_NOREP && !strcmp(line, prevmsg)) return;
     putstr(WIN_MESSAGE, 0, line);
     /* this gets cleared after every pline message */
     iflags.last_msg = PLNMSG_UNKNOWN;
+    strncpy(prevmsg, line, BUFSZ);
+    if (msgtyp == MSGTYP_STOP) display_nhwindow(WIN_MESSAGE, TRUE); /* --more-- */
+
 #if !(defined(USE_STDARG) || defined(USE_VARARGS))
     /* provide closing brace for the nested block
        which immediately follows USE_OLDARGS's VA_DECL() */
