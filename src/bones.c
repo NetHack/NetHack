@@ -111,6 +111,7 @@ boolean restore;
                discarding player notes attached to statues.] */
             if (has_oname(otmp)
                 && !(otmp->oartifact || otmp->otyp == STATUE
+                     || otmp->otyp == SPE_NOVEL
                      || (otmp->otyp == CORPSE
                          && otmp->corpsenm >= SPECIAL_PM))) {
                 free_oname(otmp);
