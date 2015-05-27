@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1432512762 2015/05/25 00:12:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.72 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1432685499 2015/05/27 00:11:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.73 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -248,7 +248,8 @@ char *buf, *monbuf;
                     otmp->corpsenm = MCORPSENM(mtmp);
                 Strcpy(buf, distant_name(otmp, xname));
                 dealloc_obj(otmp);
-            }
+            } else
+                Strcpy(buf, obj_descr[STRANGE_OBJECT].oc_name);
         } else
             Strcpy(buf, distant_name(otmp, xname));
 

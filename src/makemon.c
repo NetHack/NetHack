@@ -1,4 +1,4 @@
-/* NetHack 3.6	makemon.c	$NHDT-Date: 1432512767 2015/05/25 00:12:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.88 $ */
+/* NetHack 3.6	makemon.c	$NHDT-Date: 1432685497 2015/05/27 00:11:37 $  $NHDT-Branch: master $:$NHDT-Revision: 1.89 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1908,10 +1908,11 @@ static NEARDATA char syms[] = {
     MAXOCLASSES,  MAXOCLASSES + 1, RING_CLASS,   WAND_CLASS,   WEAPON_CLASS,
     FOOD_CLASS,   COIN_CLASS,      SCROLL_CLASS, POTION_CLASS, ARMOR_CLASS,
     AMULET_CLASS, TOOL_CLASS,      ROCK_CLASS,   GEM_CLASS,    SPBOOK_CLASS,
-    S_MIMIC_DEF,  S_MIMIC_DEF,     S_MIMIC_DEF,
+    S_MIMIC_DEF,  S_MIMIC_DEF,
 };
 
-void set_mimic_sym(mtmp) /* KAA, modified by ERS */
+void
+set_mimic_sym(mtmp)
 register struct monst *mtmp;
 {
     int typ, roomno, rt;
@@ -1999,9 +2000,9 @@ register struct monst *mtmp;
     } else {
         s_sym = syms[rn2((int) sizeof(syms))];
     assign_sym:
-        if (s_sym >= MAXOCLASSES) {
+        if (s_sym == MAXOCLASSES || s_sym == MAXOCLASSES + 1) {
             ap_type = M_AP_FURNITURE;
-            appear = s_sym == MAXOCLASSES ? S_upstair : S_dnstair;
+            appear = (s_sym == MAXOCLASSES) ? S_upstair : S_dnstair;
         } else {
             ap_type = M_AP_OBJECT;
             if (s_sym == S_MIMIC_DEF) {
