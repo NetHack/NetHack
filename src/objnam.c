@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1432598715 2015/05/26 00:05:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.135 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1432722918 2015/05/27 10:35:18 $  $NHDT-Branch: master $:$NHDT-Revision: 1.137 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -778,25 +778,26 @@ register struct obj *obj;
             Strcat(prefix, "cursed ");
         else if (obj->blessed)
             Strcat(prefix, "blessed ");
-        else if (!iflags.omit_buc || (!known || !objects[obj->otyp].oc_charged
-                  || (obj->oclass == ARMOR_CLASS
-                      || obj->oclass == RING_CLASS))
-/* For most items with charges or +/-, if you know how many
- * charges are left or what the +/- is, then you must have
- * totally identified the item, so "uncursed" is unneccesary,
- * because an identified object not described as "blessed" or
- * "cursed" must be uncursed.
- *
- * If the charges or +/- is not known, "uncursed" must be
- * printed to avoid ambiguity between an item whose curse
- * status is unknown, and an item known to be uncursed.
- */
+        else if (!iflags.omit_buc
+            /* For most items with charges or +/-, if you know how many
+             * charges are left or what the +/- is, then you must have
+             * totally identified the item, so "uncursed" is unneccesary,
+             * because an identified object not described as "blessed" or
+             * "cursed" must be uncursed.
+             *
+             * If the charges or +/- is not known, "uncursed" must be
+             * printed to avoid ambiguity between an item whose curse
+             * status is unknown, and an item known to be uncursed.
+             */
+                 || ((!known || !objects[obj->otyp].oc_charged
+                      || obj->oclass == ARMOR_CLASS
+                      || obj->oclass == RING_CLASS)
 #ifdef MAIL
-                 && obj->otyp != SCR_MAIL
+                     && obj->otyp != SCR_MAIL
 #endif
-                 && obj->otyp != FAKE_AMULET_OF_YENDOR
-                 && obj->otyp != AMULET_OF_YENDOR
-                 && !Role_if(PM_PRIEST))
+                     && obj->otyp != FAKE_AMULET_OF_YENDOR
+                     && obj->otyp != AMULET_OF_YENDOR
+                     && !Role_if(PM_PRIEST)))
             Strcat(prefix, "uncursed ");
     }
 
