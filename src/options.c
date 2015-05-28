@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1432775377 2015/05/28 01:09:37 $  $NHDT-Branch: master $:$NHDT-Revision: 1.205 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1432805756 2015/05/28 09:35:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.206 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1310,7 +1310,6 @@ query_msgtype()
     winid tmpwin;
     anything any;
     int i, pick_cnt;
-    xchar prev_typ = -1;
     menu_item *picks = (menu_item *) 0;
 
     tmpwin = create_nhwindow(NHW_MENU);
@@ -4005,11 +4004,13 @@ boolean setinitial, setfromfile;
         destroy_nhwindow(tmpwin);
     } else if (!strcmp("menu_headings", optname)) {
         int mhattr = query_attr("How to highlight menu headings:");
+
         if (mhattr != -1)
             iflags.menu_headings = mhattr;
     } else if (!strcmp("msgtype", optname)) {
 	int opt_idx, nmt, mttyp;
 	char mtbuf[BUFSZ];
+
     msgtypes_again:
 	nmt = msgtype_count();
 	opt_idx = handle_add_list_remove("message type", nmt);
@@ -4030,9 +4031,9 @@ boolean setinitial, setfromfile;
 	} else { /* list or remove */
             int pick_idx, pick_cnt;
             int mt_idx;
-	    char mtbuf[BUFSZ];
             menu_item *pick_list = (menu_item *) 0;
             struct plinemsg_type *tmp = plinemsg_types;
+
             tmpwin = create_nhwindow(NHW_MENU);
             start_menu(tmpwin);
             any = zeroany;
@@ -4064,6 +4065,7 @@ boolean setinitial, setfromfile;
     } else if (!strcmp("menucolors", optname)) {
         int opt_idx, nmc, mcclr, mcattr;
         char mcbuf[BUFSZ];
+
     menucolors_again:
         nmc = count_menucolors();
         opt_idx = handle_add_list_remove("menucolor", nmc);
@@ -4089,6 +4091,7 @@ boolean setinitial, setfromfile;
             int mc_idx;
             menu_item *pick_list = (menu_item *) 0;
             struct menucoloring *tmp = menu_colorings;
+
             tmpwin = create_nhwindow(NHW_MENU);
             start_menu(tmpwin);
             any = zeroany;
@@ -4096,6 +4099,7 @@ boolean setinitial, setfromfile;
             while (tmp) {
                 const char *sattr = attr2attrname(tmp->attr);
                 const char *sclr = clr2colorname(tmp->color);
+
                 any.a_int = (++mc_idx);
                 Sprintf(mcbuf, "\"%s\"=%s%s%s", tmp->origstr, sclr,
                         (tmp->attr != ATR_NONE) ? " & " : "",
@@ -4124,6 +4128,7 @@ boolean setinitial, setfromfile;
         int opt_idx, pass, totalapes = 0, numapes[2] = { 0, 0 };
         char apebuf[1 + BUFSZ]; /* so &apebuf[1] is BUFSZ long for getlin() */
         struct autopickup_exception *ape;
+
     ape_again:
         totalapes = count_ape_maps(&numapes[AP_LEAVE], &numapes[AP_GRAB]);
         opt_idx = handle_add_list_remove("autopickup exception", totalapes);
@@ -4149,6 +4154,7 @@ boolean setinitial, setfromfile;
         } else { /* list or remove */
             int pick_idx, pick_cnt;
             menu_item *pick_list = (menu_item *) 0;
+
             tmpwin = create_nhwindow(NHW_MENU);
             start_menu(tmpwin);
             for (pass = AP_LEAVE; pass <= AP_GRAB; ++pass) {
@@ -4210,6 +4216,7 @@ boolean setinitial, setfromfile;
         if (res && symset_list) {
             char symsetchoice[BUFSZ];
             int let = 'a', biggest = 0, thissize = 0;
+
             sl = symset_list;
             while (sl) {
                 /* check restrictions */
