@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1432512773 2015/05/25 00:12:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.155 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1432804962 2015/05/28 09:22:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.157 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -401,7 +401,7 @@ struct obj *obj;
     /* if unpaid is expected and obj isn't unpaid, reject (treat a container
        holding any unpaid object as unpaid even if isn't unpaid itself) */
     if (shop_filter && !obj->unpaid
-        && !(Has_contents(obj) && count_unpaid(obj) > 0))
+        && !(Has_contents(obj) && count_unpaid(obj->cobj) > 0))
         return FALSE;
     /* check for particular bless/curse state */
     if (bucx_filter) {
