@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1432512768 2015/05/25 00:12:48 $  $NHDT-Branch: master $:$NHDT-Revision: 1.200 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1432775377 2015/05/28 01:09:37 $  $NHDT-Branch: master $:$NHDT-Revision: 1.205 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1432,7 +1432,7 @@ char *str;
 	int typ = -1;
 	int i;
 	for (i = 0; i < SIZE(msgtype_names); i++)
-	    if (!strcasecmp(msgtype_names[i].name, msgtype)) {
+	    if (!strncmpi(msgtype_names[i].name, msgtype, strlen(msgtype))) {
 		typ = msgtype_names[i].msgtyp;
 		break;
 	    }
