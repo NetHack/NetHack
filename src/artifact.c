@@ -1,4 +1,4 @@
-/* NetHack 3.6	artifact.c	$NHDT-Date: 1432512770 2015/05/25 00:12:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.86 $ */
+/* NetHack 3.6	artifact.c	$NHDT-Date: 1432863398 2015/05/29 01:36:38 $  $NHDT-Branch: master $:$NHDT-Revision: 1.87 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1813,15 +1813,24 @@ Sting_effects(orc_count)
 int orc_count;
 {
     if (uwep && uwep->oartifact == ART_STING) {
+        /*
+         * Toggling blindness in between warning messages can result in
+         *   Sting glows light blue!  [...]  Sting stops quivering.
+         * or
+         *   Sting quivers slightly.  [...]  Sting stops glowing.
+         * but addressing that is far more trouble than it's worth.
+         */
         if (orc_count > 0 && warn_obj_cnt == 0) {
-            if (!Blind) {
-                pline("%s %s %s!", bare_artifactname(uwep), otense(uwep, "glow"),
+            if (!Blind)
+                pline("%s %s %s!", bare_artifactname(uwep),
+                      otense(uwep, "glow"),
                       hcolor(NH_LIGHT_BLUE));
-            } else if (!Deaf) {
-                pline("A very faint portamento briefly emanates from %s!", bare_artifactname(uwep));
-	    } 
-        } else if (orc_count == 0 && warn_obj_cnt > 0 && !Blind)
-            pline("%s stops glowing.", bare_artifactname(uwep));
+            else
+                pline("%s quivers slightly.", bare_artifactname(uwep));
+        } else if (orc_count == 0 && warn_obj_cnt > 0) {
+            pline("%s stops %s.", bare_artifactname(uwep),
+                  !Blind ? "glowing" : "quivering");
+        }
     }
 }
 
