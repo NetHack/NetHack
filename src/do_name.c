@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1432512768 2015/05/25 00:12:48 $  $NHDT-Branch: master $:$NHDT-Revision: 1.72 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1432890462 2015/05/29 09:07:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.73 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -8,6 +8,7 @@ STATIC_DCL char *NDECL(nextmbuf);
 STATIC_DCL void FDECL(getpos_help, (BOOLEAN_P, const char *));
 STATIC_DCL void NDECL(do_mname);
 STATIC_DCL void FDECL(do_oname, (struct obj *));
+STATIC_DCL void NDECL(namefloorobj);
 
 extern const char what_is_an_unknown_object[]; /* from pager.c */
 
@@ -587,9 +588,9 @@ boolean
 objtyp_is_callable(i)
 int i;
 {
-    return (boolean)(
-        objects[i].oc_uname
-        || (OBJ_DESCR(objects[i]) && index(callable, objects[i].oc_class)));
+    return (boolean) (objects[i].oc_uname
+                      || (OBJ_DESCR(objects[i])
+                          && index(callable, objects[i].oc_class)));
 }
 
 /* C and #name commands - player can name monster or object or type of obj */
@@ -601,34 +602,34 @@ docallcmd()
     anything any;
     menu_item *pick_list = 0;
     char ch, allowall[2];
+    /* if player wants a,b,c instead of i,o when looting, do that here too */
+    boolean abc = flags.lootabc;
 
     win = create_nhwindow(NHW_MENU);
     start_menu(win);
     any = zeroany;
-    any.a_char = 'm'; /* entry 'a', group accelator 'C' */
-    add_menu(win, NO_GLYPH, &any, 0, 'C', ATR_NONE, "a monster",
-             MENU_UNSELECTED);
+    any.a_char = 'm'; /* group accelerator 'C' */
+    add_menu(win, NO_GLYPH, &any, abc ? 0 : any.a_char, 'C', ATR_NONE,
+             "a monster", MENU_UNSELECTED);
     if (invent) {
         /* we use y and n as accelerators so that we can accept user's
            response keyed to old "name an individual object?" prompt */
-        any.a_char = 'i'; /* entry 'b', group accelator 'y' */
-        add_menu(win, NO_GLYPH, &any, 0, 'y', ATR_NONE,
+        any.a_char = 'i'; /* group accelerator 'y' */
+        add_menu(win, NO_GLYPH, &any, abc ? 0 : any.a_char, 'y', ATR_NONE,
                  "a particular object in inventory", MENU_UNSELECTED);
-        any.a_char = 'o'; /* entry 'c', group accelator 'n' */
-        add_menu(win, NO_GLYPH, &any, 0, 'n', ATR_NONE,
+        any.a_char = 'o'; /* group accelerator 'n' */
+        add_menu(win, NO_GLYPH, &any, abc ? 0 : any.a_char, 'n', ATR_NONE,
                  "the type of an object in inventory", MENU_UNSELECTED);
     }
-    any.a_char = 'd'; /* entry 'd' (or 'b'), group accelator 'd' */
-    add_menu(win, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
+    any.a_char = 'f'; /* group accelerator ',' (or ':' instead?) */
+    add_menu(win, NO_GLYPH, &any, abc ? 0 : any.a_char, ',', ATR_NONE,
+             "the type of an object upon the floor", MENU_UNSELECTED);
+    any.a_char = 'd'; /* group accelerator '\' */
+    add_menu(win, NO_GLYPH, &any, abc ? 0 : any.a_char, '\\', ATR_NONE,
              "the type of an object on discoveries list", MENU_UNSELECTED);
-    any.a_char = 'e';
-    add_menu(win, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
-             "the current level", MENU_UNSELECTED);
-#if 0
-	any.a_char = 'f';	/* entry 'e' (or 'c'), group accelator 'f' */
-	add_menu(win, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
-		 "the type of an object upon the floor", MENU_UNSELECTED);
-#endif
+    any.a_char = 'a'; /* group accelerator 'l' */
+    add_menu(win, NO_GLYPH, &any, abc ? 0 : any.a_char, 'l', ATR_NONE,
+             "record an annotation for the current level", MENU_UNSELECTED);
     end_menu(win, "What do you want to name?");
     if (select_menu(win, PICK_ONE, &pick_list) > 0) {
         ch = pick_list[0].item.a_char;
@@ -662,25 +663,23 @@ docallcmd()
             if (!obj->dknown) {
                 You("would never recognize another one.");
 #if 0
-			} else if (!objtyp_is_callable(obj->otyp)) {
-			    You("know those as well as you ever will.");
+            } else if (!objtyp_is_callable(obj->otyp)) {
+                You("know those as well as you ever will.");
 #endif
             } else {
                 docall(obj);
             }
         }
         break;
+    case 'f': /* name a type of object visible on the floor */
+        namefloorobj();
+        break;
     case 'd': /* name a type of object on the discoveries list */
         rename_disco();
         break;
-    case 'e': /* annotate level */
+    case 'a': /* annotate level */
         donamelevel();
         break;
-#if 0
-	case 'f':	/* name a type of object visible on the floor */
-		/* [not implemented] */
-		break;
-#endif
     }
     return 0;
 }
@@ -727,6 +726,57 @@ register struct obj *obj;
         *str1 = dupstr(buf);
         discover_object(obj->otyp, FALSE, TRUE); /* possibly add to disco[] */
     }
+}
+
+STATIC_OVL void
+namefloorobj()
+{
+    coord cc;
+    int glyph;
+    char buf[BUFSZ];
+    struct obj *obj = 0;
+    boolean fakeobj = FALSE, use_plural;
+
+    cc.x = u.ux, cc.y = u.uy;
+    if (getpos(&cc, FALSE, "object on map (or '.' for one under you)") < 0
+        || cc.x <= 0)
+        return;
+    if (cc.x == u.ux && cc.y == u.uy) {
+        obj = vobj_at(u.ux, u.uy);
+    } else {
+        glyph = glyph_at(cc.x, cc.y);
+        if (glyph_is_object(glyph))
+            fakeobj = object_from_map(glyph, cc.x, cc.y, &obj);
+        /* else 'obj' stays null */
+    }
+    if (!obj) {
+        pline("There doesn't seem to be any object %s.",
+              (cc.x == u.ux && cc.y == u.uy) ? "under you" : "there");
+        return;
+    }
+    /* note well: 'obj' might be as instance of STRANGE_OBJECT if target
+       is a mimic; passing that to xname (directly or via simpleonames)
+       would yield "glorkum" so we need to handle it explicitly; it will
+       alwlays fail the Hallucination test and pass the !callable test,
+       resulting in the "can't be assigned a type name" message */
+    Strcpy(buf, (obj->otyp != STRANGE_OBJECT)
+                 ? simpleonames(obj)
+                 : obj_descr[STRANGE_OBJECT].oc_name);
+    use_plural = (obj->quan > 1L);
+    if (Hallucination) {
+        pline("%s %s to call you \"Wibbly Wobbly.\"",
+              The(buf), use_plural ? "decide" : "decides");
+    } else if (!objtyp_is_callable(obj->otyp)) {
+        pline("%s %s can't be assigned a type name.",
+              use_plural ? "Those" : "That", buf);
+    } else if (!obj->dknown) {
+        You("don't know %s %s well enough to name %s.",
+            use_plural ? "those" : "that", buf, use_plural ? "them" : "it");
+    } else {
+        docall(obj);
+    }
+    if (fakeobj)
+        dealloc_obj(obj);
 }
 
 static const char *const ghostnames[] = {

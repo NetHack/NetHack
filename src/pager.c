@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1432685499 2015/05/27 00:11:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.73 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1432890463 2015/05/29 09:07:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.74 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -69,6 +69,47 @@ char *outbuf;
     if (u.usteed)
         Sprintf(eos(outbuf), ", mounted on %s", y_monnam(u.usteed));
     return outbuf;
+}
+
+/* extracted from lookat(); also used by namefloorobj() */
+boolean
+object_from_map(glyph, x, y, obj_p)
+int glyph, x, y;
+struct obj **obj_p;
+{
+    boolean fakeobj = FALSE;
+    struct monst *mtmp;
+    struct obj *otmp = vobj_at(x, y);
+    int glyphotyp = glyph_to_obj(glyph);
+
+    *obj_p = (struct obj *) 0;
+    /* there might be a mimic here posing as an object */
+    mtmp = m_at(x, y);
+    if (mtmp && mtmp->m_ap_type == M_AP_OBJECT
+        && mtmp->mappearance == (unsigned) glyphotyp)
+        otmp = 0;
+    else
+        mtmp = 0;
+
+    if (!otmp || otmp->otyp != glyphotyp) {
+        /* this used to exclude STRANGE_OBJECT; now caller deals with it */
+        otmp = mksobj(glyphotyp, FALSE, FALSE);
+        if (!otmp)
+            return FALSE;
+        fakeobj = TRUE;
+        if (otmp->oclass == COIN_CLASS)
+            otmp->quan = 2L; /* to force pluralization */
+        else if (otmp->otyp == SLIME_MOLD)
+            otmp->spe = context.current_fruit; /* give it a type */
+        if (mtmp && has_mcorpsenm(mtmp)) /* mimic as corpse/statue */
+            otmp->corpsenm = MCORPSENM(mtmp);
+    }
+    /* if located at adajcent spot, mark it as having been seen up close */
+    if (otmp && distu(x, y) <= 2 && !Blind && !Hallucination)
+        otmp->dknown = 1;
+
+    *obj_p = otmp;
+    return fakeobj; /* when True, caller needs to dealloc *obj_p */
 }
 
 /*
@@ -226,32 +267,16 @@ char *buf, *monbuf;
         }     /* mtmp */
 
     } else if (glyph_is_object(glyph)) {
-        int glyphotyp = glyph_to_obj(glyph);
-        struct obj *otmp = vobj_at(x, y);
+        struct obj *otmp = 0;
+        boolean fakeobj = object_from_map(glyph, x, y, &otmp);
 
-        /* there might be a mimic here posing as an object */
-        mtmp = m_at(x, y);
-        if (mtmp && mtmp->m_ap_type == M_AP_OBJECT
-            && mtmp->mappearance == (unsigned) glyphotyp)
-            otmp = 0;
-        else
-            mtmp = 0;
-
-        if (!otmp || otmp->otyp != glyphotyp) {
-            if (glyphotyp != STRANGE_OBJECT) {
-                otmp = mksobj(glyphotyp, FALSE, FALSE);
-                if (otmp->oclass == COIN_CLASS)
-                    otmp->quan = 2L; /* to force pluralization */
-                else if (otmp->otyp == SLIME_MOLD)
-                    otmp->spe = context.current_fruit; /* give it a type */
-                if (mtmp && has_mcorpsenm(mtmp)) /* mimic as corpse/statue */
-                    otmp->corpsenm = MCORPSENM(mtmp);
-                Strcpy(buf, distant_name(otmp, xname));
-                dealloc_obj(otmp);
-            } else
-                Strcpy(buf, obj_descr[STRANGE_OBJECT].oc_name);
-        } else
-            Strcpy(buf, distant_name(otmp, xname));
+        if (otmp) {
+            Strcpy(buf, (otmp->otyp != STRANGE_OBJECT)
+                         ? distant_name(otmp, xname)
+                         : obj_descr[STRANGE_OBJECT].oc_name);
+            if (fakeobj)
+                dealloc_obj(otmp), otmp = 0;
+        }
 
         if (levl[x][y].typ == STONE || levl[x][y].typ == SCORR)
             Strcat(buf, " embedded in stone");

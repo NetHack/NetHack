@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1432249760 2015/05/21 23:09:20 $  $NHDT-Branch: master $:$NHDT-Revision: 1.493 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1432890461 2015/05/29 09:07:41 $  $NHDT-Branch: master $:$NHDT-Revision: 1.498 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1646,6 +1646,7 @@ E void NDECL(msgtype_free);
 /* ### pager.c ### */
 
 E char *FDECL(self_lookat, (char *));
+E boolean FDECL(object_from_map, (int,int,int,struct obj **));
 E int NDECL(dowhatis);
 E int NDECL(doquickwhatis);
 E int NDECL(doidtrap);
