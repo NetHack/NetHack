@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1432536528 2015/05/25 06:48:48 $  $NHDT-Branch: master $:$NHDT-Revision: 1.54 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1432863399 2015/05/29 01:36:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.55 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1141,11 +1141,8 @@ see_monsters()
         newsym(mon->mx, mon->my);
         if (mon->wormno)
             see_wsegs(mon);
-        if (MATCH_WARN_OF_MON(mon)) {
-            if (context.warntype.obj
-                && (context.warntype.obj & mon->data->mflags2))
-                new_warn_obj_cnt++;
-        }
+        if (Warn_of_mon && (context.warntype.obj & mon->data->mflags2) != 0L)
+            new_warn_obj_cnt++;
     }
     /*
      * Make Sting glow blue or stop glowing if required.
