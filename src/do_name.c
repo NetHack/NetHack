@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1432890462 2015/05/29 09:07:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.73 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1432937666 2015/05/29 22:14:26 $  $NHDT-Branch: master $:$NHDT-Revision: 1.74 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,6 +9,7 @@ STATIC_DCL void FDECL(getpos_help, (BOOLEAN_P, const char *));
 STATIC_DCL void NDECL(do_mname);
 STATIC_DCL void FDECL(do_oname, (struct obj *));
 STATIC_DCL void NDECL(namefloorobj);
+STATIC_DCL char *FDECL(bogusmon, (char *,char *));
 
 extern const char what_is_an_unknown_object[]; /* from pager.c */
 
@@ -738,8 +739,12 @@ namefloorobj()
     boolean fakeobj = FALSE, use_plural;
 
     cc.x = u.ux, cc.y = u.uy;
-    if (getpos(&cc, FALSE, "object on map (or '.' for one under you)") < 0
-        || cc.x <= 0)
+    /* "dot for under/over you" only makes sense when the cursor hasn't
+       been moved off the hero's '@' yet, but there's no way to adjust
+       the help text once getpos() has started */
+    Sprintf(buf, "object on map (or '.' for one %s you)",
+            (u.uundetected && hides_under(youmonst.data)) ? "over" : "under");
+    if (getpos(&cc, FALSE, buf) < 0 || cc.x <= 0)
         return;
     if (cc.x == u.ux && cc.y == u.uy) {
         obj = vobj_at(u.ux, u.uy);
@@ -750,6 +755,7 @@ namefloorobj()
         /* else 'obj' stays null */
     }
     if (!obj) {
+        /* "under you" is safe here since there's no object to hide under */
         pline("There doesn't seem to be any object %s.",
               (cc.x == u.ux && cc.y == u.uy) ? "under you" : "there");
         return;
@@ -764,8 +770,26 @@ namefloorobj()
                  : obj_descr[STRANGE_OBJECT].oc_name);
     use_plural = (obj->quan > 1L);
     if (Hallucination) {
-        pline("%s %s to call you \"Wibbly Wobbly.\"",
-              The(buf), use_plural ? "decide" : "decides");
+        const char *unames[6];
+        char tmpbuf[BUFSZ];
+
+        /* straight role name */
+        unames[0] = ((Upolyd ? u.mfemale : flags.female) && urole.name.f)
+                     ? urole.name.f
+                     : urole.name.m;
+        /* random rank title for hero's role */
+        unames[1] = rank_of(rnd(30), Role_switch, flags.female);
+        /* random fake monster */
+        unames[2] = bogusmon(tmpbuf, (char *) 0);
+        /* increased chance for fake monster */
+        unames[3] = unames[2];
+        /* traditional */
+        unames[4] = roguename();
+        /* silly */
+        unames[5] = "Wibbly Wobbly";
+        pline("%s %s to call you \"%s.\"",
+              The(buf), use_plural ? "decide" : "decides",
+              unames[rn2(SIZE(unames))]);
     } else if (!objtyp_is_callable(obj->otyp)) {
         pline("%s %s can't be assigned a type name.",
               use_plural ? "Those" : "That", buf);
@@ -1126,6 +1150,26 @@ char *outbuf;
     return outbuf;
 }
 
+/* fake monsters used to be in a hard-coded array, now in a data file */
+STATIC_OVL char *
+bogusmon(buf, code)
+char *buf, *code;
+{
+    char *mname = buf;
+
+    get_rnd_text(BOGUSMONFILE, buf);
+    /* strip prefix if present */
+    if (!letter(*mname)) {
+        if (code)
+            *code = *mname;
+        ++mname;
+    } else {
+        if (code)
+            *code = '\0';
+    }
+    return mname;
+}
+
 #define BOGUSMONSIZE 100 /* arbitrary */
 /* return a random monster name, for hallucination */
 char *
@@ -1133,7 +1177,7 @@ rndmonnam(code)
 char *code;
 {
     static char buf[BUFSZ];
-    char *mname = buf;
+    char *mname;
     int name;
 
     if (code)
@@ -1145,22 +1189,15 @@ char *code;
              && (type_is_pname(&mons[name]) || (mons[name].geno & G_NOGEN)));
 
     if (name >= SPECIAL_PM) {
-        get_rnd_text(BOGUSMONFILE, buf);
-        /* strip prefix if present */
-        if (!letter(*mname)) {
-            if (code)
-                *code = *mname;
-            ++mname;
-        }
+        mname = bogusmon(buf, code);
     } else {
-        Strcpy(buf, mons[name].mname);
+        mname = strcpy(buf, mons[name].mname);
     }
     return mname;
 }
 #undef BOGUSMONSIZE
 
-/* scan bogusmons to check whether this name is in the list and has a prefix
- */
+/* check bogusmon prefix to decide whether it's a personal name */
 boolean
 bogon_is_pname(code)
 char code;
@@ -1170,7 +1207,9 @@ char code;
     return index("-+=", code) ? TRUE : FALSE;
 }
 
-const char *roguename() /* Name of a Rogue player */
+/* name of a Rogue player */
+const char *
+roguename()
 {
     char *i, *opts;
 
