@@ -1813,10 +1813,14 @@ Sting_effects(orc_count)
 int orc_count;
 {
     if (uwep && uwep->oartifact == ART_STING) {
-        if (orc_count > 0 && warn_obj_cnt == 0)
-            pline("%s %s %s!", bare_artifactname(uwep), otense(uwep, "glow"),
-                  hcolor(NH_LIGHT_BLUE));
-        else if (orc_count == 0 && warn_obj_cnt > 0)
+        if (orc_count > 0 && warn_obj_cnt == 0) {
+            if (!Blind) {
+                pline("%s %s %s!", bare_artifactname(uwep), otense(uwep, "glow"),
+                      hcolor(NH_LIGHT_BLUE));
+            } else if (!Deaf) {
+                pline("A very faint portamento briefly emanates from %s!", bare_artifactname(uwep));
+	    } 
+        } else if (orc_count == 0 && warn_obj_cnt > 0 && !Blind)
             pline("%s stops glowing.", bare_artifactname(uwep));
     }
 }
