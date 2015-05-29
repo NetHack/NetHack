@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1432512763 2015/05/25 00:12:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.164 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1432939569 2015/05/29 22:46:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.166 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1337,7 +1337,7 @@ STATIC_PTR int
 ckunpaid(otmp)
 register struct obj *otmp;
 {
-    return (otmp->unpaid || (Has_contents(otmp) && count_unpaid(otmp)));
+    return (otmp->unpaid || (Has_contents(otmp) && count_unpaid(otmp->cobj)));
 }
 
 boolean
