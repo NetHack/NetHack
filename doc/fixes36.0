@@ -1231,4 +1231,5 @@ make TOURIST unconditional
 make KOPS unconditional
 make ELBERETH unconditional
 allow defining of generic usernames in config.h instead of hard-coding in role.c
+set indentation to 4 spaces in most source files
 
