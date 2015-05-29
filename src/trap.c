@@ -3399,7 +3399,7 @@ boolean force;
             return ER_DESTROYED;
         } else if (obj->odiluted) {
             if (carried(obj))
-                pline("Your %s %s furthers.", ostr, vtense(ostr, "dilute"));
+                pline("Your %s %s further.", ostr, vtense(ostr, "dilute"));
 
             obj->otyp = POT_WATER;
             obj->dknown = 0;
