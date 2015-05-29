@@ -177,44 +177,45 @@
 #define S_magic_trap 61
 #define S_anti_magic_trap 62
 #define S_polymorph_trap 63
+#define S_vibrating_square 64
 
 /* end traps, begin special effects */
 
-#define S_vbeam 64  /* The 4 zap beam symbols.  Do NOT separate. */
-#define S_hbeam 65  /* To change order or add, see function     */
-#define S_lslant 66 /* zapdir_to_glyph() in display.c.	    */
-#define S_rslant 67
-#define S_digbeam 68   /* dig beam symbol */
-#define S_flashbeam 69 /* camera flash symbol */
-#define S_boomleft 70  /* thrown boomerang, open left, e.g ')'    */
-#define S_boomright 71 /* thrown boomerand, open right, e.g. '('  */
-#define S_ss1 72       /* 4 magic shield glyphs */
-#define S_ss2 73
-#define S_ss3 74
-#define S_ss4 75
-#define S_poisoncloud 76
-#define S_goodpos 77 /* valid position for targeting */
+#define S_vbeam 65  /* The 4 zap beam symbols.  Do NOT separate. */
+#define S_hbeam 66  /* To change order or add, see function     */
+#define S_lslant 67 /* zapdir_to_glyph() in display.c.	    */
+#define S_rslant 68
+#define S_digbeam 69   /* dig beam symbol */
+#define S_flashbeam 70 /* camera flash symbol */
+#define S_boomleft 71  /* thrown boomerang, open left, e.g ')'    */
+#define S_boomright 72 /* thrown boomerand, open right, e.g. '('  */
+#define S_ss1 73       /* 4 magic shield glyphs */
+#define S_ss2 74
+#define S_ss3 75
+#define S_ss4 76
+#define S_poisoncloud 77
+#define S_goodpos 78 /* valid position for targeting */
 
 /* The 8 swallow symbols.  Do NOT separate.  To change order or add, see */
 /* the function swallow_to_glyph() in display.c.			 */
-#define S_sw_tl 78 /* swallow top left [1]			*/
-#define S_sw_tc 79 /* swallow top center [2]	Order:	*/
-#define S_sw_tr 80 /* swallow top right [3]		*/
-#define S_sw_ml 81 /* swallow middle left [4]	1 2 3	*/
-#define S_sw_mr 82 /* swallow middle right [6]	4 5 6	*/
-#define S_sw_bl 83 /* swallow bottom left [7]	7 8 9	*/
-#define S_sw_bc 84 /* swallow bottom center [8]		*/
-#define S_sw_br 85 /* swallow bottom right [9]		*/
+#define S_sw_tl 79 /* swallow top left [1]			*/
+#define S_sw_tc 80 /* swallow top center [2]	Order:	*/
+#define S_sw_tr 81 /* swallow top right [3]		*/
+#define S_sw_ml 82 /* swallow middle left [4]	1 2 3	*/
+#define S_sw_mr 83 /* swallow middle right [6]	4 5 6	*/
+#define S_sw_bl 84 /* swallow bottom left [7]	7 8 9	*/
+#define S_sw_bc 85 /* swallow bottom center [8]		*/
+#define S_sw_br 86 /* swallow bottom right [9]		*/
 
-#define S_explode1 86 /* explosion top left			*/
-#define S_explode2 87 /* explosion top center			*/
-#define S_explode3 88 /* explosion top right		 Ex.	*/
-#define S_explode4 89 /* explosion middle left		*/
-#define S_explode5 90 /* explosion middle center	 /-\	*/
-#define S_explode6 91 /* explosion middle right	 |@|	*/
-#define S_explode7 92 /* explosion bottom left	 \-/	*/
-#define S_explode8 93 /* explosion bottom center		*/
-#define S_explode9 94 /* explosion bottom right		*/
+#define S_explode1 87 /* explosion top left			*/
+#define S_explode2 88 /* explosion top center			*/
+#define S_explode3 89 /* explosion top right		 Ex.	*/
+#define S_explode4 90 /* explosion middle left		*/
+#define S_explode5 91 /* explosion middle center	 /-\	*/
+#define S_explode6 92 /* explosion middle right	 |@|	*/
+#define S_explode7 93 /* explosion bottom left	 \-/	*/
+#define S_explode8 94 /* explosion bottom center		*/
+#define S_explode9 95 /* explosion bottom right		*/
 
 /* end effects */
 
