@@ -1,4 +1,4 @@
-/* NetHack 3.6	artifact.c	$NHDT-Date: 1432863398 2015/05/29 01:36:38 $  $NHDT-Branch: master $:$NHDT-Revision: 1.87 $ */
+/* NetHack 3.6	artifact.c	$NHDT-Date: 1432946531 2015/05/30 00:42:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.89 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -842,6 +842,10 @@ int tmp;
     if (!weap || (weap->attk.adtyp == AD_PHYS && /* check for `NO_ATTK' */
                   weap->attk.damn == 0 && weap->attk.damd == 0))
         spec_dbon_applies = FALSE;
+    else if (otmp->oartifact == ART_GRIMTOOTH)
+        /* Grimtooth has SPFX settings to warn against elves but we want its
+           damage bonus to apply to all targets, so bypass spec_applies() */
+        spec_dbon_applies = TRUE;
     else
         spec_dbon_applies = spec_applies(weap, mon);
 
@@ -1808,11 +1812,15 @@ long *abil;
     return (struct obj *) 0;
 }
 
+/* use for warning "glow" for Sting, Orcrist, and Grimtooth */
 void
 Sting_effects(orc_count)
 int orc_count;
 {
-    if (uwep && uwep->oartifact == ART_STING) {
+    if (uwep
+        && (uwep->oartifact == ART_STING
+            || uwep->oartifact == ART_ORCRIST
+            || uwep->oartifact == ART_GRIMTOOTH)) {
         /*
          * Toggling blindness in between warning messages can result in
          *   Sting glows light blue!  [...]  Sting stops quivering.
@@ -1824,7 +1832,9 @@ int orc_count;
             if (!Blind)
                 pline("%s %s %s!", bare_artifactname(uwep),
                       otense(uwep, "glow"),
-                      hcolor(NH_LIGHT_BLUE));
+                      hcolor((uwep->oartifact == ART_GRIMTOOTH)
+                             ? NH_RED
+                             : NH_LIGHT_BLUE));
             else
                 pline("%s quivers slightly.", bare_artifactname(uwep));
         } else if (orc_count == 0 && warn_obj_cnt > 0) {

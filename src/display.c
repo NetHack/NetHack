@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1432863399 2015/05/29 01:36:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.55 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1432946532 2015/05/30 00:42:12 $  $NHDT-Branch: master $:$NHDT-Revision: 1.56 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1147,8 +1147,7 @@ see_monsters()
     /*
      * Make Sting glow blue or stop glowing if required.
      */
-    if (new_warn_obj_cnt != warn_obj_cnt && uwep
-        && uwep->oartifact == ART_STING) {
+    if (new_warn_obj_cnt != warn_obj_cnt) {
         Sting_effects(new_warn_obj_cnt);
         warn_obj_cnt = new_warn_obj_cnt;
     }
