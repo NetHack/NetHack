@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1432805756 2015/05/28 09:35:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.206 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1432974335 2015/05/30 08:25:35 $  $NHDT-Branch: master $:$NHDT-Revision: 1.207 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -100,7 +100,7 @@ static struct Bool_Opt {
     { "cmdassist", &iflags.cmdassist, TRUE, SET_IN_GAME },
 #if defined(MICRO) || defined(WIN32)
     { "color", &iflags.wc_color, TRUE, SET_IN_GAME }, /*WC*/
-#else                                                 /* systems that support multiple terminals, many monochrome */
+#else /* systems that support multiple terminals, many monochrome */
     { "color", &iflags.wc_color, FALSE, SET_IN_GAME }, /*WC*/
 #endif
     { "confirm", &flags.confirm, TRUE, SET_IN_GAME },
@@ -451,17 +451,17 @@ typedef struct {
 
 #define NUM_MENU_CMDS 11
 static const menu_cmd_t default_menu_cmd_info[NUM_MENU_CMDS] = {
-    /* 0*/ { "menu_first_page", MENU_FIRST_PAGE },
-    { "menu_last_page", MENU_LAST_PAGE },
-    { "menu_next_page", MENU_NEXT_PAGE },
-    { "menu_previous_page", MENU_PREVIOUS_PAGE },
-    { "menu_select_all", MENU_SELECT_ALL },
-    /* 5*/ { "menu_deselect_all", MENU_UNSELECT_ALL },
-    { "menu_invert_all", MENU_INVERT_ALL },
-    { "menu_select_page", MENU_SELECT_PAGE },
-    { "menu_deselect_page", MENU_UNSELECT_PAGE },
-    { "menu_invert_page", MENU_INVERT_PAGE },
-    /*10*/ { "menu_search", MENU_SEARCH },
+/* 0*/  { "menu_first_page", MENU_FIRST_PAGE },
+        { "menu_last_page", MENU_LAST_PAGE },
+        { "menu_next_page", MENU_NEXT_PAGE },
+        { "menu_previous_page", MENU_PREVIOUS_PAGE },
+        { "menu_select_all", MENU_SELECT_ALL },
+/* 5*/  { "menu_deselect_all", MENU_UNSELECT_ALL },
+        { "menu_invert_all", MENU_INVERT_ALL },
+        { "menu_select_page", MENU_SELECT_PAGE },
+        { "menu_deselect_page", MENU_UNSELECT_PAGE },
+        { "menu_invert_page", MENU_INVERT_PAGE },
+/*10*/  { "menu_search", MENU_SEARCH },
 };
 
 /*
@@ -515,9 +515,11 @@ void
 reglyph_darkroom()
 {
     xchar x, y;
+
     for (x = 0; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++) {
             struct rm *lev = &levl[x][y];
+
             if (!flags.dark_room) {
                 if (lev->glyph == cmap_to_glyph(S_darkroom))
                     lev->glyph = lev->waslit ? cmap_to_glyph(S_room)
@@ -678,13 +680,13 @@ initoptions_init()
         flags.end_disclose[i] = DISCLOSE_PROMPT_DEFAULT_NO;
     switch_symbols(FALSE); /* set default characters */
 #if defined(UNIX) && defined(TTY_GRAPHICS)
-                           /*
-                            * Set defaults for some options depending on what we can
-                            * detect about the environment's capabilities.
-                            * This has to be done after the global initialization above
-                            * and before reading user-specific initialization via
-                            * config file/environment variable below.
-                            */
+    /*
+     * Set defaults for some options depending on what we can
+     * detect about the environment's capabilities.
+     * This has to be done after the global initialization above
+     * and before reading user-specific initialization via
+     * config file/environment variable below.
+     */
     /* this detects the IBM-compatible console on most 386 boxes */
     if ((opts = nh_getenv("TERM")) && !strncmp(opts, "AT", 2)) {
         if (!symset[PRIMARY].name)
@@ -726,6 +728,7 @@ initoptions_finish()
 {
 #ifndef MAC
     char *opts = getenv("NETHACKOPTIONS");
+
     if (!opts)
         opts = getenv("HACKOPTIONS");
     if (opts) {
@@ -747,17 +750,17 @@ initoptions_finish()
         read_config_file((char *) 0, SET_IN_FILE);
 
     (void) fruitadd(pl_fruit, (struct fruit *) 0);
-    /* Remove "slime mold" from list of object names; this will	*/
-    /* prevent it from being wished unless it's actually present	*/
-    /* as a named (or default) fruit.  Wishing for "fruit" will	*/
-    /* result in the player's preferred fruit [better than "\033"].	*/
+    /*
+     * Remove "slime mold" from list of object names.  This will
+     * prevent it from being wished unless it's actually present
+     * as a named (or default) fruit.  Wishing for "fruit" will
+     * result in the player's preferred fruit [better than "\033"].
+     */
     obj_descr[SLIME_MOLD].oc_name = "fruit";
 
     if (iflags.bouldersym)
         update_bouldersym();
-
     reglyph_darkroom();
-
     return;
 }
 
@@ -1013,6 +1016,7 @@ assign_warnings(graph_chars)
 register uchar *graph_chars;
 {
     int i;
+
     for (i = 0; i < WARNCOUNT; i++)
         if (graph_chars[i])
             warnsyms[i] = graph_chars[i];
@@ -1026,6 +1030,7 @@ const char *optn;
     char buf[BUFSZ];
     boolean rejectver = FALSE;
     unsigned long fnv = get_feature_notice_ver(op); /* version.c */
+
     if (fnv == 0L)
         return 0;
     if (fnv > get_current_feature_ver())
@@ -1058,6 +1063,7 @@ set_duplicate_opt_detection(on_or_off)
 int on_or_off;
 {
     int k, *optptr;
+
     if (on_or_off != 0) {
         /*-- ON --*/
         if (iflags.opt_booldup)
@@ -1090,6 +1096,7 @@ const char *opts;
 int iscompound; /* 0 == boolean option, 1 == compound */
 {
     int i, *optptr;
+
     if (!iscompound && iflags.opt_booldup && initial && from_file) {
         for (i = 0; boolopt[i].name; i++) {
             if (match_optname(opts, boolopt[i].name, 3, FALSE)) {
@@ -1122,17 +1129,16 @@ complain_about_duplicate(opts, iscompound)
 const char *opts;
 int iscompound; /* 0 == boolean option, 1 == compound */
 {
-#if defined(MAC)
+#ifdef MAC
     /* the Mac has trouble dealing with the output of messages while
      * processing the config file.  That should get fixed one day.
      * For now just return.
      */
-    return;
-#endif
-
+#else /* !MAC */
     raw_printf("\nWarning - %s option specified multiple times: %s.\n",
                iscompound ? "compound" : "boolean", opts);
     wait_synch();
+#endif /* ?MAC */
     return;
 }
 
@@ -1174,38 +1180,43 @@ extern struct menucoloring *menu_colorings;
 static const struct {
     const char *name;
     const int color;
-} colornames[] = { { "black", CLR_BLACK },
-                   { "red", CLR_RED },
-                   { "green", CLR_GREEN },
-                   { "brown", CLR_BROWN },
-                   { "blue", CLR_BLUE },
-                   { "magenta", CLR_MAGENTA },
-                   { "cyan", CLR_CYAN },
-                   { "gray", CLR_GRAY },
-                   { "grey", CLR_GRAY },
-                   { "orange", CLR_ORANGE },
-                   { "lightgreen", CLR_BRIGHT_GREEN },
-                   { "yellow", CLR_YELLOW },
-                   { "lightblue", CLR_BRIGHT_BLUE },
-                   { "lightmagenta", CLR_BRIGHT_MAGENTA },
-                   { "lightcyan", CLR_BRIGHT_CYAN },
-                   { "white", CLR_WHITE } };
+} colornames[] = {
+    { "black", CLR_BLACK },
+    { "red", CLR_RED },
+    { "green", CLR_GREEN },
+    { "brown", CLR_BROWN },
+    { "blue", CLR_BLUE },
+    { "magenta", CLR_MAGENTA },
+    { "cyan", CLR_CYAN },
+    { "gray", CLR_GRAY },
+    { "grey", CLR_GRAY },
+    { "orange", CLR_ORANGE },
+    { "light green", CLR_BRIGHT_GREEN },
+    { "yellow", CLR_YELLOW },
+    { "light blue", CLR_BRIGHT_BLUE },
+    { "light magenta", CLR_BRIGHT_MAGENTA },
+    { "light cyan", CLR_BRIGHT_CYAN },
+    { "white", CLR_WHITE }
+};
 
 static const struct {
     const char *name;
     const int attr;
-} attrnames[] = { { "none", ATR_NONE },
-                  { "bold", ATR_BOLD },
-                  { "dim", ATR_DIM },
-                  { "underline", ATR_ULINE },
-                  { "blink", ATR_BLINK },
-                  { "inverse", ATR_INVERSE } };
+} attrnames[] = {
+    { "none", ATR_NONE },
+    { "bold", ATR_BOLD },
+    { "dim", ATR_DIM },
+    { "underline", ATR_ULINE },
+    { "blink", ATR_BLINK },
+    { "inverse", ATR_INVERSE }
+};
 
 const char *
 clr2colorname(clr)
 int clr;
 {
     int i;
+
     for (i = 0; i < SIZE(colornames); i++)
         if (colornames[i].color == clr)
             return colornames[i].name;
@@ -1217,6 +1228,7 @@ attr2attrname(attr)
 int attr;
 {
     int i;
+
     for (i = 0; i < SIZE(attrnames); i++)
         if (attrnames[i].attr == attr)
             return attrnames[i].name;
@@ -1298,6 +1310,7 @@ msgtype2name(typ)
 int typ;
 {
     int i;
+
     for (i = 0; i < SIZE(msgtype_names); i++)
 	if (msgtype_names[i].descr && msgtype_names[i].msgtyp == typ)
 	    return msgtype_names[i].name;
@@ -1337,8 +1350,11 @@ msgtype_add(typ, pattern)
 int typ;
 char *pattern;
 {
-    struct plinemsg_type *tmp = (struct plinemsg_type *) alloc(sizeof(struct plinemsg_type));
-    if (!tmp) return FALSE;
+    struct plinemsg_type *tmp
+        = (struct plinemsg_type *) alloc(sizeof (struct plinemsg_type));
+
+    if (!tmp)
+        return FALSE;
     tmp->msgtype = typ;
     tmp->regex = regex_init();
     if (!regex_compile(pattern, tmp->regex)) {
@@ -1362,6 +1378,7 @@ msgtype_free()
 {
     struct plinemsg_type *tmp = plinemsg_types;
     struct plinemsg_type *tmp2;
+
     while (tmp) {
 	free(tmp->pattern);
 	regex_free(tmp->regex);
@@ -1402,6 +1419,7 @@ msgtype_type(msg)
 const char *msg;
 {
     struct plinemsg_type *tmp = plinemsg_types;
+
     while (tmp) {
 	if (regex_match(msg, tmp->regex)) return tmp->msgtype;
 	tmp = tmp->next;
@@ -1414,6 +1432,7 @@ msgtype_count()
 {
     int c = 0;
     struct plinemsg_type *tmp = plinemsg_types;
+
     while (tmp) {
 	c++;
 	tmp = tmp->next;
@@ -1427,6 +1446,7 @@ char *str;
 {
     char pattern[256];
     char msgtype[11];
+
     if (sscanf(str, "%10s \"%255[^\"]\"", msgtype, pattern) == 2) {
 	int typ = -1;
 	int i;
@@ -1446,13 +1466,14 @@ add_menu_coloring_parsed(str, c, a)
 char *str;
 int c, a;
 {
+    static const char re_error[] = "Menucolor regex error";
     struct menucoloring *tmp;
+
     if (!str)
         return FALSE;
     tmp = (struct menucoloring *) alloc(sizeof(struct menucoloring));
     tmp->match = regex_init();
     if (!regex_compile(str, tmp->match)) {
-        static const char *re_error = "Menucolor regex error";
         if (!iflags.window_inited)
             raw_printf("\n%s: %s\n", re_error, regex_error_desc(tmp->match));
         else
@@ -1476,44 +1497,49 @@ add_menu_coloring(str)
 char *str;
 {
     int i, c = NO_COLOR, a = ATR_NONE;
-    char *tmps, *cs = strchr(str, '=');
+    char *tmps, *cs, *amp;
 
-    if (!cs || !str)
+    if (!str || (cs = index(str, '=')) == 0)
         return FALSE;
 
-    tmps = cs;
-    tmps++;
-    while (*tmps && isspace((uchar) *tmps))
-        tmps++;
+    tmps = cs + 1; /* advance past '=' */
+    mungspaces(tmps);
+    if ((amp = index(tmps, '&')) != 0)
+        *amp = '\0';
 
+    /* allow "lightblue", "light blue", and "light-blue" to match "light blue"
+       (also junk like "_l i-gh_t---b l u e" but we won't worry about that);
+       also copes with trailing space; mungspaces removed any leading space */
     for (i = 0; i < SIZE(colornames); i++)
-        if (strstri(tmps, colornames[i].name) == tmps) {
+        if (fuzzymatch(tmps, colornames[i].name, " -_", TRUE)) {
             c = colornames[i].color;
             break;
         }
-    if ((i == SIZE(colornames)) && (*tmps >= '0' && *tmps <= '9'))
+    if (i == SIZE(colornames) && (*tmps >= '0' && *tmps <= '9'))
         c = atoi(tmps);
 
     if (c > 15)
         return FALSE;
 
-    tmps = strchr(str, '&');
-    if (tmps) {
-        tmps++;
-        while (*tmps && isspace((uchar) *tmps))
-            tmps++;
+    if (amp) {
+        tmps = amp + 1; /* advance past '&' */
+        /* unlike colors, none of he attribute names has any embedded spaces,
+           but use of fuzzymatch() allows us ignore the presence of leading
+           and/or trailing (and also embedded) spaces in the user's string;
+           dash and underscore skipping could be omitted but does no harm */
         for (i = 0; i < SIZE(attrnames); i++)
-            if (strstri(tmps, attrnames[i].name) == tmps) {
+            if (fuzzymatch(tmps, attrnames[i].name, " -_", TRUE)) {
                 a = attrnames[i].attr;
                 break;
             }
-        if ((i == SIZE(attrnames)) && (*tmps >= '0' && *tmps <= '9'))
+        if (i == SIZE(attrnames) && (*tmps >= '0' && *tmps <= '9'))
             a = atoi(tmps);
     }
 
+    /* the regexp portion here has not been condensed by mungspaces() */
     *cs = '\0';
     tmps = str;
-    if ((*tmps == '"') || (*tmps == '\'')) {
+    if (*tmps == '"' || *tmps == '\'') {
         cs--;
         while (isspace((uchar) *cs))
             cs--;
@@ -1532,6 +1558,7 @@ char *str;
 int *color, *attr;
 {
     struct menucoloring *tmpmc;
+
     if (iflags.use_menu_color)
         for (tmpmc = menu_colorings; tmpmc; tmpmc = tmpmc->next)
             if (regex_match(str, tmpmc->match)) {
