@@ -321,89 +321,33 @@ bot()
 #else /* STATUS_VIA_WINDOWPORT */
 
 /* If entries are added to this, botl.h will require updating too */
-struct istat_s blstats[2][MAXBLSTATS] = { {
-    { 0L,
-      ANY_STR,
-      { (genericptr_t) 0L },
-      (char *) 0,
-      80,
-      0 }, /*  0 BL_TITLE */
-    { 0L, ANY_INT, { (genericptr_t) 0L }, (char *) 0, 10, 0 }, /*  1 BL_STR */
-    { 0L, ANY_INT, { (genericptr_t) 0L }, (char *) 0, 10, 0 }, /*  2 BL_DX */
-    { 0L, ANY_INT, { (genericptr_t) 0L }, (char *) 0, 10, 0 }, /*  3 BL_CO */
-    { 0L, ANY_INT, { (genericptr_t) 0L }, (char *) 0, 10, 0 }, /*  4 BL_IN */
-    { 0L, ANY_INT, { (genericptr_t) 0L }, (char *) 0, 10, 0 }, /*  5 BL_WI */
-    { 0L, ANY_INT, { (genericptr_t) 0L }, (char *) 0, 10, 0 }, /*  6 BL_CH */
-    { 0L,
-      ANY_STR,
-      { (genericptr_t) 0L },
-      (char *) 0,
-      40,
-      0 }, /*  7 BL_ALIGN */
-    { 0L,
-      ANY_LONG,
-      { (genericptr_t) 0L },
-      (char *) 0,
-      20,
-      0 }, /*  8 BL_SCORE */
-    { 0L, ANY_LONG, { (genericptr_t) 0L }, (char *) 0, 20, 0 }, /*  9 BL_CAP
-                                                                   */
-    { 0L,
-      ANY_LONG,
-      { (genericptr_t) 0L },
-      (char *) 0,
-      30,
-      0 }, /* 10 BL_GOLD */
-    { 0L,
-      ANY_INT,
-      { (genericptr_t) 0L },
-      (char *) 0,
-      10,
-      BL_ENEMAX }, /* 11 BL_ENE */
-    { 0L,
-      ANY_INT,
-      { (genericptr_t) 0L },
-      (char *) 0,
-      10,
-      0 }, /* 12 BL_ENEMAX */
-    { 0L, ANY_LONG, { (genericptr_t) 0L }, (char *) 0, 10, 0 }, /* 13 BL_XP */
-    { 0L, ANY_INT, { (genericptr_t) 0L }, (char *) 0, 10, 0 },  /* 14 BL_AC */
-    { 0L, ANY_INT, { (genericptr_t) 0L }, (char *) 0, 10, 0 },  /* 15 BL_HD */
-    { 0L, ANY_INT, { (genericptr_t) 0L }, (char *) 0, 20, 0 },  /* 16 BL_TIME
-                                                                   */
-    { 0L,
-      ANY_UINT,
-      { (genericptr_t) 0L },
-      (char *) 0,
-      40,
-      0 }, /* 17 BL_HUNGER */
-    { 0L,
-      ANY_INT,
-      { (genericptr_t) 0L },
-      (char *) 0,
-      10,
-      BL_HPMAX }, /* 18 BL_HP */
-    { 0L,
-      ANY_INT,
-      { (genericptr_t) 0L },
-      (char *) 0,
-      10,
-      0 }, /* 19 BL_HPMAX */
-    { 0L,
-      ANY_STR,
-      { (genericptr_t) 0L },
-      (char *) 0,
-      80,
-      0 }, /* 20 BL_LEVELDESC */
-    { 0L, ANY_LONG, { (genericptr_t) 0L }, (char *) 0, 20, 0 }, /* 21 BL_EXP
-                                                                   */
-    { 0L,
-      ANY_MASK32,
-      { (genericptr_t) 0L },
-      (char *) 0,
-      0,
-      0 } /* 22 BL_CONDITION */
-} };
+struct istat_s blstats[2][MAXBLSTATS] = {
+    {
+    { 0L, ANY_STR,  {(genericptr_t)0L}, (char *)0, 80, 0 },	/*  0 BL_TITLE */
+    { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0},	/*  1 BL_STR */
+    { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0},	/*  2 BL_DX */
+    { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0},	/*  3 BL_CO */
+    { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0},	/*  4 BL_IN */
+    { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0},	/*  5 BL_WI */
+    { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0},	/*  6 BL_CH */
+    { 0L, ANY_STR,  {(genericptr_t)0L}, (char *)0, 40,  0},	/*  7 BL_ALIGN */
+    { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 20,  0},	/*  8 BL_SCORE */
+    { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 20,  0},	/*  9 BL_CAP */
+    { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 30,  0},	/* 10 BL_GOLD */
+    { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10, BL_ENEMAX}, /* 11 BL_ENE */
+    { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0},	/* 12 BL_ENEMAX */
+    { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 10,  0},	/* 13 BL_XP */
+    { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0},	/* 14 BL_AC */
+    { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0},	/* 15 BL_HD */
+    { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 20,  0},	/* 16 BL_TIME */
+    { 0L, ANY_UINT, {(genericptr_t)0L}, (char *)0, 40,  0},	/* 17 BL_HUNGER */
+    { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10, BL_HPMAX},  /* 18 BL_HP */
+    { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0},	/* 19 BL_HPMAX */
+    { 0L, ANY_STR,  {(genericptr_t)0L}, (char *)0, 80,  0},	/* 20 BL_LEVELDESC */
+    { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 20,  0},	/* 21 BL_EXP */
+    { 0L, ANY_MASK32,{(genericptr_t)0L},(char *)0,  0,  0}	/* 22 BL_CONDITION */
+    }
+};
 
 static boolean blinit = FALSE, update_all = FALSE;
 const char *status_fieldnames[] = {
