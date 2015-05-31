@@ -18,7 +18,69 @@ struct istat_s {
     char *val;
     int valwidth;
     int idxmax;
+    enum statusfields fld;
 };
+
+/* If entries are added to this, botl.h will require updating too */
+struct istat_s initblstats[MAXBLSTATS] = {
+        { 0L, ANY_STR,  {(genericptr_t)0L}, (char *)0, 80,  0, BL_TITLE},
+        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_STR},
+        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_DX},
+        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_CO},
+        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_IN},
+        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_WI},
+        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_CH},
+        { 0L, ANY_STR,  {(genericptr_t)0L}, (char *)0, 40,  0, BL_ALIGN},
+        { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 20,  0, BL_SCORE},
+        { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 20,  0, BL_CAP},
+        { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 30,  0, BL_GOLD},
+        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_ENE},
+        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_ENEMAX},
+        { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 10,  0, BL_XP},
+        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_AC},
+        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_HD},
+        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 20,  0, BL_TIME},
+        { 0L, ANY_UINT, {(genericptr_t)0L}, (char *)0, 40,  0, BL_HUNGER},
+        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_HP},
+        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_HPMAX},
+        { 0L, ANY_STR,  {(genericptr_t)0L}, (char *)0, 80,  0, BL_LEVELDESC},
+        { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 20,  0, BL_EXP},
+        { 0L, ANY_MASK32,{(genericptr_t)0L},(char *)0,  0,  0, BL_CONDITION}
+};
+
+static struct fieldid_t {
+        const char *fieldname;
+        enum statusfields fldid;
+} fieldids[] = {
+        {"title",               BL_TITLE},
+        {"strength",            BL_STR},
+        {"dexterity",           BL_DX},
+        {"constitution",        BL_CO},
+        {"intelligence",        BL_IN},
+        {"wisdom",              BL_WI},
+        {"charisma",            BL_CH},
+        {"alignment",           BL_ALIGN},
+        {"score",               BL_SCORE},
+        {"carrying-capacity",   BL_CAP},
+        {"gold",                BL_GOLD},
+        {"power",               BL_ENE},
+        {"power-max",           BL_ENEMAX},
+        {"experience-level",    BL_XP},
+        {"armor-class",         BL_AC},
+        {"HD",                  BL_HD},
+        {"time",                BL_TIME},
+        {"hunger",              BL_HUNGER},
+        {"hitpoints",           BL_HP},
+        {"hitpoints-max",       BL_HPMAX},
+        {"dungeon-level",       BL_LEVELDESC},
+        {"experience",          BL_EXP},
+        {"condition",           BL_CONDITION},
+};
+
+
+struct istat_s blstats[2][MAXBLSTATS];
+
+static boolean blinit = FALSE, update_all = FALSE;
 
 STATIC_DCL void NDECL(init_blstats);
 STATIC_DCL char *FDECL(anything_to_s, (char *, anything *, int));
@@ -320,69 +382,148 @@ bot()
 
 #else /* STATUS_VIA_WINDOWPORT */
 
-/* If entries are added to this, botl.h will require updating too */
-struct istat_s blstats[2][MAXBLSTATS] = {
-    {
-    { 0L, ANY_STR,  {(genericptr_t)0L}, (char *)0, 80, 0 },	/*  0 BL_TITLE */
-    { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0},	/*  1 BL_STR */
-    { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0},	/*  2 BL_DX */
-    { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0},	/*  3 BL_CO */
-    { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0},	/*  4 BL_IN */
-    { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0},	/*  5 BL_WI */
-    { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0},	/*  6 BL_CH */
-    { 0L, ANY_STR,  {(genericptr_t)0L}, (char *)0, 40,  0},	/*  7 BL_ALIGN */
-    { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 20,  0},	/*  8 BL_SCORE */
-    { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 20,  0},	/*  9 BL_CAP */
-    { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 30,  0},	/* 10 BL_GOLD */
-    { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10, BL_ENEMAX}, /* 11 BL_ENE */
-    { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0},	/* 12 BL_ENEMAX */
-    { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 10,  0},	/* 13 BL_XP */
-    { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0},	/* 14 BL_AC */
-    { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0},	/* 15 BL_HD */
-    { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 20,  0},	/* 16 BL_TIME */
-    { 0L, ANY_UINT, {(genericptr_t)0L}, (char *)0, 40,  0},	/* 17 BL_HUNGER */
-    { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10, BL_HPMAX},  /* 18 BL_HP */
-    { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0},	/* 19 BL_HPMAX */
-    { 0L, ANY_STR,  {(genericptr_t)0L}, (char *)0, 80,  0},	/* 20 BL_LEVELDESC */
-    { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 20,  0},	/* 21 BL_EXP */
-    { 0L, ANY_MASK32,{(genericptr_t)0L},(char *)0,  0,  0}	/* 22 BL_CONDITION */
-    }
-};
-
-static boolean blinit = FALSE, update_all = FALSE;
-const char *status_fieldnames[] = {
-    "title", "strength", "dexterity", "constitution", "intelligence",
-    "wisdom", "charisma", "alignment", "score", "carrying-capacity", "gold",
-    "power", "power-max", "experience-level", "armor-class", "HD", "time",
-    "hunger", "hitpoints", "hitpoints-max", "dungeon-level", "experience",
-    "condition"
-};
-
 void
 status_initialize(reassessment)
 boolean
     reassessment; /* TRUE = just reassess fields w/o other initialization*/
 {
     int i;
-    const char *fieldfmts[] = { "%s",     " St:%s", " Dx:%s", " Co:%s",
-                                " In:%s", " Wi:%s", " Ch:%s", " %s",
-                                " S:%s",  " %s",    " %s",    " Pw:%s",
-                                "(%s)",   " Xp:%s", " AC:%s", " HD:%s",
-                                " T:%s",  " %s",    " HP:%s", "(%s)",
-                                "%s",     "/%s",    "%s" };
+    const char *fieldfmt = (const char *)0;
+    const char *fieldname = (const char *)0;
+
     if (!reassessment) {
         init_blstats();
         (*windowprocs.win_status_init)();
         blinit = TRUE;
     }
     for (i = 0; i < MAXBLSTATS; ++i) {
-        if ((i == BL_SCORE && !flags.showscore)
-            || (i == BL_EXP && !flags.showexp)
-            || (i == BL_TIME && !flags.time) || (i == BL_HD && !Upolyd)
-            || ((i == BL_XP || i == BL_EXP) && Upolyd))
-            status_enablefield(i, status_fieldnames[i], fieldfmts[i], FALSE);
-        else
-            status_enablefield(i, status_fieldnames[i], fieldfmts[i], TRUE);
+        enum statusfields fld = initblstats[i].fld;
+        
+        switch (fld) {
+        case BL_TITLE:
+            fieldfmt = "%s";
+            fieldname = "title";
+            status_enablefield(fld, fieldname, fieldfmt, TRUE);
+            break;
+        case BL_STR:
+            fieldfmt = " St:%s";
+            fieldname = "strength";
+            status_enablefield(fld, fieldname, fieldfmt, TRUE);
+            break;
+        case BL_DX:
+            fieldfmt = " Dx:%s";
+            fieldname = "dexterity";
+            status_enablefield(fld, fieldname, fieldfmt, TRUE);
+            break;
+        case BL_CO:
+            fieldfmt = " Co:%s";
+            fieldname = "constitution";
+            status_enablefield(fld, fieldname, fieldfmt, TRUE);
+            break;
+        case BL_IN:
+            fieldfmt = " In:%s";
+            fieldname = "intelligence";
+            status_enablefield(fld, fieldname, fieldfmt, TRUE);
+            break;
+        case BL_WI:
+            fieldfmt = " Wi:%s";
+            fieldname = "wisdom";
+            status_enablefield(fld, fieldname, fieldfmt, TRUE);
+            break;
+        case BL_CH:
+            fieldfmt = " Ch:%s";
+            fieldname = "charisma";
+            status_enablefield(fld, fieldname, fieldfmt, TRUE);
+            break;
+        case BL_ALIGN:
+            fieldfmt = " %s";
+            fieldname = "alignment";
+            status_enablefield(fld, fieldname, fieldfmt, TRUE);
+            break;
+        case BL_SCORE:
+            fieldfmt = " S:%s";
+            fieldname = "score";
+            status_enablefield(fld, fieldname, fieldfmt,
+                                  (!flags.showscore) ? FALSE : TRUE);
+            break;
+        case BL_CAP:
+            fieldfmt = " %s";
+            fieldname = "carrying-capacity";
+            status_enablefield(fld, fieldname, fieldfmt, TRUE);
+            break;
+        case BL_GOLD:
+            fieldfmt = " %s";
+            fieldname = "gold";
+            status_enablefield(fld, fieldname, fieldfmt, TRUE);
+            break;
+        case BL_ENE:
+            fieldfmt = " Pw:%s";
+            fieldname = "power";
+            status_enablefield(fld, fieldname, fieldfmt, TRUE);
+            break;
+        case BL_ENEMAX:
+            fieldfmt = "(%s)";
+            fieldname = "power-max";
+            status_enablefield(fld, fieldname, fieldfmt, TRUE);
+            break;
+        case BL_XP:
+            fieldfmt = " Xp:%s";
+            fieldname = "experience-level";
+            status_enablefield(fld, fieldname, fieldfmt,
+                                   (Upolyd) ? FALSE : TRUE);
+            break;
+        case BL_AC:
+            fieldfmt = " AC:%s";
+            fieldname = "armor-class";
+            status_enablefield(fld, fieldname, fieldfmt, TRUE);
+            break;
+        case BL_HD:
+            fieldfmt = " HD:%s";
+            fieldname = "HD";
+            status_enablefield(fld, fieldname, fieldfmt,
+                                   (!Upolyd) ? FALSE : TRUE);
+            break;
+        case BL_TIME:
+            fieldfmt = " T:%s";
+            fieldname = "time";
+            status_enablefield(fld, fieldname, fieldfmt,
+                                   (!flags.time) ? FALSE : TRUE);
+            break;
+        case BL_HUNGER:
+            fieldfmt = " %s";
+            fieldname = "hunger";
+            status_enablefield(fld, fieldname, fieldfmt, TRUE);
+            break;
+        case BL_HP:
+            fieldfmt = " HP:%s";
+            fieldname = "hitpoints";
+            status_enablefield(fld, fieldname, fieldfmt, TRUE);
+            break;
+        case BL_HPMAX:
+            fieldfmt = "(%s)";
+            fieldname = "hitpoint-max";
+            status_enablefield(fld, fieldname, fieldfmt, TRUE);
+            break;
+        case BL_LEVELDESC:
+            fieldfmt = "%s";
+            fieldname = "dungeon-level";
+            status_enablefield(fld, fieldname, fieldfmt, TRUE);
+            break;
+        case BL_EXP:
+            fieldfmt = "/%s";
+            fieldname = "experience";
+            status_enablefield(fld, fieldname, fieldfmt,
+                                  (!flags.showexp || Upolyd) ? FALSE : TRUE);
+            break;
+        case BL_CONDITION:
+            fieldfmt = "%S";
+            fieldname = "condition";
+            status_enablefield(fld, fieldname, fieldfmt, TRUE);
+            break;
+        case BL_BOGUS:
+        default:
+            break;
+	}
     }
     update_all = TRUE;
 }
@@ -407,20 +548,24 @@ status_finish()
 STATIC_OVL void
 init_blstats()
 {
-    int i;
+    static boolean initalready = FALSE;
+    int i, j;
 
-    for (i = 0; i < MAXBLSTATS; ++i) {
-        /* ensure initial field values set on blstats[1][i] too */
-        blstats[1][i] = blstats[0][i];
+    if (initalready) {
+        impossible("init_blstats called more than once.");
+        return;
+    }
 
-        blstats[0][i].a = zeroany;
-        blstats[1][i].a = zeroany;
-        if (blstats[0][i].valwidth) {
-            blstats[0][i].val = (char *) alloc(blstats[0][i].valwidth);
-            blstats[1][i].val = (char *) alloc(blstats[0][i].valwidth);
-        } else {
-            blstats[0][i].val = (char *) 0;
-            blstats[1][i].val = (char *) 0;
+    initalready = TRUE;
+    for (i = BEFORE; i <= NOW; ++i) {
+        for (j = 0; j < MAXBLSTATS; ++j) {
+            blstats[i][j] = initblstats[j];
+            blstats[i][j].a = zeroany;
+            if (blstats[i][j].valwidth) {
+                blstats[i][j].val = (char *) alloc(blstats[i][j].valwidth);
+                blstats[i][j].val[0] = '\0';
+            } else
+                blstats[i][j].val = (char *) 0;
         }
     }
 }
@@ -887,10 +1032,10 @@ bot()
      * text display obliterates the status line.
      *
      * To work around it, we call status_update() with ficticious
-     * index of BL_FLUSH (-1).
+     * index of BL_BOGUS (-1).
      */
     if (context.botlx && !updated)
-        status_update(BL_FLUSH, (genericptr_t) 0, 0, 0);
+        status_update(BL_BOGUS, (genericptr_t) 0, 0, 0);
 
     context.botl = context.botlx = 0;
     update_all = FALSE;
@@ -991,17 +1136,18 @@ char *sa, *sb, *sc, *sd;
     boolean normal[2] = { 0, 0 };
     boolean percent = FALSE, down_up = FALSE, changed = FALSE;
     anything threshold;
-
+    enum statusfields fld = BL_BOGUS;
     threshold.a_void = 0;
 
     /* Example:
      * 	hilite_status: hitpoints/10%/red/normal
      */
 
-    /* field name to idx */
-    for (i = 0; sa && i < MAXBLSTATS; ++i) {
-        if (strcmpi(sa, status_fieldnames[i]) == 0) {
+    /* field name to statusfield */
+    for (i = 0; sa && i < SIZE(fieldids); ++i) {
+        if (strcmpi(sa, fieldids[i].fieldname) == 0) {
             idx = i;
+            fld = fieldids[i].fldid;
             break;
         }
     }
@@ -1016,8 +1162,8 @@ char *sa, *sb, *sc, *sd;
         || (strcmpi(sb, "up") == 0) || (strcmpi(sb, "down") == 0)) {
         down_up = TRUE;
     } else if ((strcmpi(sb, "changed") == 0)
-               && (idx == BL_TITLE || idx == BL_ALIGN || idx == BL_LEVELDESC
-                   || idx == BL_CONDITION)) {
+               && (fld == BL_TITLE || fld == BL_ALIGN || fld == BL_LEVELDESC
+                   || fld == BL_CONDITION)) {
         changed = TRUE; /* changed is only thing allowed */
     } else {
         tmp = sb;
@@ -1146,9 +1292,9 @@ int bufsiz;
                 Strcat(buf, " ");
                 bufsiz--;
             }
-            k = strlen(status_fieldnames[i]);
+            k = strlen(fieldids[i].fieldname);
             if (k < bufsiz) {
-                Strcat(buf, status_fieldnames[i]);
+                Strcat(buf, fieldids[i].fieldname);
                 bufsiz -= k;
             }
             if (bufsiz > 1) {
@@ -1239,7 +1385,7 @@ status_hilite_menu()
     start_menu(tmpwin);
     for (i = 0; i < MAXBLSTATS; i++) {
         (void) memset(&hltemp[i], 0, sizeof(struct hilite_s));
-        fieldname = status_fieldnames[i];
+        fieldname = fieldids[i].fieldname;
         any.a_int = i + 1;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, fieldname,
                  MENU_UNSELECTED);
@@ -1262,7 +1408,7 @@ status_hilite_menu()
         if (field_picks[i]) {
             menu_item *pick = (menu_item *) 0;
             Sprintf(buf, "Threshold behavior options for %s:",
-                    status_fieldnames[i]);
+                    fieldids[i].fieldname);
             tmpwin = create_nhwindow(NHW_MENU);
             start_menu(tmpwin);
             if (i == BL_CONDITION) {
@@ -1301,12 +1447,12 @@ status_hilite_menu()
                 return FALSE;
 
             if (hltemp[i].behavior == BL_TH_UPDOWN) {
-                Sprintf(below, "%s decreases", status_fieldnames[i]);
-                Sprintf(above, "%s increases", status_fieldnames[i]);
+                Sprintf(below, "%s decreases", fieldids[i].fieldname);
+                Sprintf(above, "%s increases", fieldids[i].fieldname);
             } else if (hltemp[i].behavior) {
                 /* Have them enter the threshold*/
                 Sprintf(
-                    buf, "Set %s threshold to what%s?", status_fieldnames[i],
+                    buf, "Set %s threshold to what%s?", fieldids[i].fieldname,
                     (hltemp[i].behavior == BL_TH_VAL_PERCENTAGE)
                         ? " percentage"
                         : (hltemp[i].behavior == BL_TH_CONDITION) ? " mask"
@@ -1319,11 +1465,11 @@ status_hilite_menu()
                 if (!hltemp[i].threshold.a_void)
                     return FALSE;
 
-                Sprintf(below, "%s falls below %s%s", status_fieldnames[i],
+                Sprintf(below, "%s falls below %s%s", fieldids[i].fieldname,
                         thresholdbuf,
                         (hltemp[i].behavior == BL_TH_VAL_PERCENTAGE) ? "%"
                                                                      : "");
-                Sprintf(above, "%s rises above %s%s", status_fieldnames[i],
+                Sprintf(above, "%s rises above %s%s", fieldids[i].fieldname,
                         thresholdbuf,
                         (hltemp[i].behavior == BL_TH_VAL_PERCENTAGE) ? "%"
                                                                      : "");
@@ -1368,7 +1514,7 @@ status_hilite_menu()
     buf[0] = '\0';
     for (i = 0; i < MAXBLSTATS; i++) {
         if (field_picks[i]) {
-            Sprintf(eos(buf), "%s/%s%s/", status_fieldnames[i],
+            Sprintf(eos(buf), "%s/%s%s/", fieldids[i].fieldname,
                     (hltemp[i].behavior == BL_TH_UPDOWN)
                         ? "updown"
                         : anything_to_s(thresholdbuf, &hltemp[i].threshold,
@@ -1457,14 +1603,16 @@ genericptr_t ptr;
     long cond, *condptr = (long *) ptr;
     register int i;
     char *text = (char *) ptr;
-    int fieldorder1[] = { BL_TITLE, BL_STR, BL_DX,    BL_CO,    BL_IN,
-                          BL_WI,    BL_CH,  BL_ALIGN, BL_SCORE, -1 };
-    int fieldorder2[] = { BL_LEVELDESC, BL_GOLD,      BL_HP,   BL_HPMAX,
-                          BL_ENE,       BL_ENEMAX,    BL_AC,   BL_XP,
-                          BL_EXP,       BL_HD,        BL_TIME, BL_HUNGER,
-                          BL_CAP,       BL_CONDITION, -1 };
 
-    if (idx != BL_FLUSH) {
+    enum statusfields fieldorder[2][15] = {
+        { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
+          BL_SCORE, BL_BOGUS, BL_BOGUS, BL_BOGUS, BL_BOGUS, BL_BOGUS, BL_BOGUS},
+        { BL_LEVELDESC, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX,
+          BL_AC, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER,
+          BL_CAP, BL_CONDITION, BL_BOGUS}
+    };
+
+    if (idx != BL_BOGUS) {
         if (!activefields[idx])
             return;
         switch (idx) {
@@ -1494,14 +1642,14 @@ genericptr_t ptr;
 
     /* This genl version updates everything on the display, everytime */
     newbot1[0] = '\0';
-    for (i = 0; fieldorder1[i] >= 0; ++i) {
-        int idx1 = fieldorder1[i];
+    for (i = 0; fieldorder[0][i] != BL_BOGUS; ++i) {
+        int idx1 = fieldorder[0][i];
         if (activefields[idx1])
             Strcat(newbot1, vals[idx1]);
     }
     newbot2[0] = '\0';
-    for (i = 0; fieldorder2[i] >= 0; ++i) {
-        int idx2 = fieldorder2[i];
+    for (i = 0; fieldorder[1][i] != BL_BOGUS; ++i) {
+        int idx2 = fieldorder[1][i];
         if (activefields[idx2])
             Strcat(newbot2, vals[idx2]);
     }

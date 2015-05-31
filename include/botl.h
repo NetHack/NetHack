@@ -6,9 +6,9 @@
 #define BOTL_H
 
 #ifdef STATUS_VIA_WINDOWPORT
-
+#if 0
 /* clang-format off */
-#define BL_FLUSH        -1
+#define BL_BOGUS        -1
 #define BL_TITLE        0
 #define BL_STR          1
 #define BL_DX           2
@@ -32,8 +32,18 @@
 #define BL_LEVELDESC    20
 #define BL_EXP          21
 #define BL_CONDITION    22
-#define MAXBLSTATS      23
 /* clang-format on */
+#else
+enum statusfields { BL_BOGUS = -1, BL_TITLE = 0, BL_STR, BL_DX, BL_CO, BL_IN,
+BL_WI, BL_CH, BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX,
+BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX, BL_LEVELDESC,
+BL_EXP, BL_CONDITION };
+#define BL_FLUSH BL_BOGUS
+#define MAXBLSTATS      BL_CONDITION+1
+
+#define BEFORE  0
+#define NOW     1
+#endif
 
 /* Boolean condition bits for the condition mask */
 
