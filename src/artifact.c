@@ -1,4 +1,4 @@
-/* NetHack 3.6	artifact.c	$NHDT-Date: 1433050876 2015/05/31 05:41:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.90 $ */
+/* NetHack 3.6	artifact.c	$NHDT-Date: 1433060653 2015/05/31 08:24:13 $  $NHDT-Branch: master $:$NHDT-Revision: 1.91 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1834,26 +1834,26 @@ int arti_indx;
 /* use for warning "glow" for Sting, Orcrist, and Grimtooth */
 void
 Sting_effects(orc_count)
-int orc_count;
+int orc_count; /* new count (warn_obj_cnt is old count); -1 is a flag value */
 {
     if (uwep
         && (uwep->oartifact == ART_STING
             || uwep->oartifact == ART_ORCRIST
             || uwep->oartifact == ART_GRIMTOOTH)) {
-        /*
-         * Toggling blindness in between warning messages can result in
-         *   Sting glows light blue!  [...]  Sting stops quivering.
-         * or
-         *   Sting quivers slightly.  [...]  Sting stops glowing.
-         * but addressing that is far more trouble than it's worth.
-         */
-        if (orc_count > 0 && warn_obj_cnt == 0) {
+        if (orc_count == -1 && warn_obj_cnt > 0) {
+            /* -1 means that blindess has just been toggled; give a
+               'continue' message that eventual 'stop' message will match */
+            pline("%s is %s.", bare_artifactname(uwep),
+                  !Blind ? "glowing" : "quivering");
+        } else if (orc_count > 0 && warn_obj_cnt == 0) {
+            /* 'start' message */
             if (!Blind)
                 pline("%s %s %s!", bare_artifactname(uwep),
                       otense(uwep, "glow"), glow_color(uwep->oartifact));
             else
                 pline("%s quivers slightly.", bare_artifactname(uwep));
         } else if (orc_count == 0 && warn_obj_cnt > 0) {
+            /* 'stop' message */
             pline("%s stops %s.", bare_artifactname(uwep),
                   !Blind ? "glowing" : "quivering");
         }

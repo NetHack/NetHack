@@ -1,4 +1,4 @@
-/* NetHack 3.6	potion.c	$NHDT-Date: 1432512769 2015/05/25 00:12:49 $  $NHDT-Branch: master $:$NHDT-Revision: 1.115 $ */
+/* NetHack 3.6	potion.c	$NHDT-Date: 1433060654 2015/05/31 08:24:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.116 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -304,6 +304,14 @@ boolean talk;
         if (Blind_telepat || Infravision)
             see_monsters();
 
+        /* avoid either of the sequences
+           "Sting starts glowing", [become blind], "Sting stops quivering" or
+           "Sting starts quivering", [regain sight], "Sting stops glowing"
+           by giving "Sting is quivering" when becoming blind or
+           "Sting is glowing" when regaining sight so that the eventual
+           "stops" message matches */
+        if (warn_obj_cnt && uwep && (EWarn_of_mon & W_WEP) != 0L)
+            Sting_effects(-1);
         /* update dknown flag for inventory picked up while blind */
         if (can_see_now)
             learn_unseen_invent();
