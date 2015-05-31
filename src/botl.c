@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1433087810 2015/05/31 15:56:50 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.55 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1433088374 2015/05/31 16:06:14 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.56 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -381,6 +381,9 @@ boolean
         init_blstats();
         (*windowprocs.win_status_init)();
         blinit = TRUE;
+#ifdef STATUS_HILITES
+        status_notify_windowport(TRUE);
+#endif
     }
     for (i = 0; i < MAXBLSTATS; ++i) {
         enum statusfields fld = initblstats[i].fld;
