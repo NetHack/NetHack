@@ -1,4 +1,4 @@
-/* NetHack 3.6	artifact.c	$NHDT-Date: 1432946531 2015/05/30 00:42:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.89 $ */
+/* NetHack 3.6	artifact.c	$NHDT-Date: 1433050876 2015/05/31 05:41:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.90 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1784,10 +1784,12 @@ long *abil;
     unsigned long spfx;
     long wornbits;
     long wornmask =
-        (W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF | W_WEP | W_QUIVER
-         | W_SWAPWEP | W_ART | W_ARTI | W_AMUL | W_RINGL | W_RINGR | W_TOOL
-         | W_BALL | W_CHAIN | W_SADDLE | W_ARMU);
+        (W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF | W_ARMU
+         | W_AMUL | W_RINGL | W_RINGR | W_TOOL | W_ART | W_ARTI);
+         /* [do W_ART and W_ARTI actually belong here?] */
 
+    if (u.twoweap)
+        wornmask |= W_SWAPWEP;
     dtyp = abil_to_adtyp(abil);
     spfx = abil_to_spfx(abil);
     wornbits = (wornmask & *abil);
@@ -1795,14 +1797,21 @@ long *abil;
     for (obj = invent; obj; obj = obj->nobj) {
         if (obj->oartifact
             && ((abil != &EWarn_of_mon) || context.warntype.obj)) {
-            register const struct artifact *art = get_artifact(obj);
+            const struct artifact *art = get_artifact(obj);
+
             if (art) {
-                if (dtyp
-                    && (art->cary.adtyp == dtyp || art->defn.adtyp == dtyp))
-                    return obj;
-                if (spfx && ((art->cspfx & spfx) == spfx
-                             || (art->spfx & spfx) == spfx))
-                    return obj;
+                if (dtyp) {
+                    if (art->cary.adtyp == dtyp || art->defn.adtyp == dtyp)
+                        return obj;
+                }
+                if (spfx) {
+                    /* property conferred when carried */
+                    if ((art->cspfx & spfx) == spfx)
+                        return obj;
+                    /* property conferred when wielded or worn */
+                    if ((art->spfx & spfx) == spfx && obj->owornmask)
+                        return obj;
+                }
             }
         } else {
             if (wornbits && wornbits == (wornmask & obj->owornmask))
@@ -1810,6 +1819,16 @@ long *abil;
         }
     }
     return (struct obj *) 0;
+}
+
+const char *
+glow_color(arti_indx)
+int arti_indx;
+{
+    int colornum = artilist[arti_indx].acolor;
+    const char *colorstr = clr2colorname(colornum);
+
+    return hcolor(colorstr);
 }
 
 /* use for warning "glow" for Sting, Orcrist, and Grimtooth */
@@ -1831,10 +1850,7 @@ int orc_count;
         if (orc_count > 0 && warn_obj_cnt == 0) {
             if (!Blind)
                 pline("%s %s %s!", bare_artifactname(uwep),
-                      otense(uwep, "glow"),
-                      hcolor((uwep->oartifact == ART_GRIMTOOTH)
-                             ? NH_RED
-                             : NH_LIGHT_BLUE));
+                      otense(uwep, "glow"), glow_color(uwep->oartifact));
             else
                 pline("%s quivers slightly.", bare_artifactname(uwep));
         } else if (orc_count == 0 && warn_obj_cnt > 0) {

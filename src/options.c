@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1432974335 2015/05/30 08:25:35 $  $NHDT-Branch: master $:$NHDT-Revision: 1.207 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1433050879 2015/05/31 05:41:19 $  $NHDT-Branch: master $:$NHDT-Revision: 1.208 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -502,7 +502,6 @@ STATIC_OVL boolean FDECL(wc2_supported, (const char *));
 STATIC_DCL void FDECL(remove_autopickup_exception,
                       (struct autopickup_exception *));
 STATIC_OVL int FDECL(count_ape_maps, (int *, int *));
-STATIC_DCL const char *FDECL(clr2colorname, (int));
 STATIC_DCL const char *FDECL(attr2attrname, (int));
 STATIC_DCL int NDECL(query_color);
 STATIC_DCL int NDECL(query_msgtype);

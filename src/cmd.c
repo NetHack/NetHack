@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1432512764 2015/05/25 00:12:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.192 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1433050877 2015/05/31 05:41:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.193 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1952,10 +1952,9 @@ int final;
         you_are("warned", from_what(WARNING));
     if (Warn_of_mon && context.warntype.obj) {
         Sprintf(buf, "aware of the presence of %s",
-                (context.warntype.obj & M2_ORC)
-                    ? "orcs"
-                    : (context.warntype.obj & M2_DEMON) ? "demons"
-                                                        : something);
+                (context.warntype.obj & M2_ORC) ? "orcs"
+                : (context.warntype.obj & M2_ELF) ? "elves"
+                : (context.warntype.obj & M2_DEMON) ? "demons" : something);
         you_are(buf, from_what(WARN_OF_MON));
     }
     if (Warn_of_mon && context.warntype.polyd) {

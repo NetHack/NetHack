@@ -1,4 +1,4 @@
-/* NetHack 3.6	artifact.h	$NHDT-Date: 1432512779 2015/05/25 00:12:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
+/* NetHack 3.6	artifact.h	$NHDT-Date: 1433050871 2015/05/31 05:41:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -52,6 +52,7 @@ struct artifact {
     short role;         /* character role associated with */
     short race;         /* character race associated with */
     long cost; /* price when sold to hero (default 100 x base cost) */
+    char acolor;        /* color to use if artifact 'glows' */
 };
 
 /* invoked properties with special powers */
