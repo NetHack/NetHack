@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1432974335 2015/05/30 08:25:35 $  $NHDT-Branch: master $:$NHDT-Revision: 1.207 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1433087636 2015/05/31 15:53:56 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.208 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3153,7 +3153,7 @@ boolean tinitial, tfrom_file;
             badoption(opts);
             return;
         }
-        if (!set_status_hilites(op))
+        if (!set_status_hilites(op, tfrom_file))
             badoption(opts);
         return;
     }

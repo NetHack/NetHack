@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1433082365 2015/05/31 14:26:05 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.53 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1433087631 2015/05/31 15:53:51 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.54 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -94,20 +94,6 @@ STATIC_DCL const char *FDECL(clridx_to_s, (char *, int));
 #else
 STATIC_DCL void NDECL(bot1);
 STATIC_DCL void NDECL(bot2);
-#endif
-
-/* MAXCO must hold longest uncompressed status line, and must be larger
- * than COLNO
- *
- * longest practical second status line at the moment is
- *	Astral Plane $:12345 HP:700(700) Pw:111(111) AC:-127 Xp:30/123456789
- *	T:123456 Satiated Conf FoodPois Ill Blind Stun Hallu Overloaded
- * -- or somewhat over 130 characters
- */
-#if COLNO <= 140
-#define MAXCO 160
-#else
-#define MAXCO (COLNO + 20)
 #endif
 
 STATIC_OVL NEARDATA int mrank_sz =
@@ -1049,6 +1035,7 @@ bot()
 
 struct hilite_s {
     boolean set;
+    unsigned anytype;
     anything threshold;
     int behavior;
     int coloridx[2];
@@ -1065,8 +1052,9 @@ struct hilite_s status_hilites[MAXBLSTATS];
  * strings, then calls assign_hilite() to make the adjustments.
  */
 boolean
-set_status_hilites(op)
+set_status_hilites(op, from_configfile)
 char *op;
+boolean from_configfile;
 {
     char hsbuf[4][QBUFSZ];
     boolean rslt, badopt = FALSE;
@@ -1080,7 +1068,7 @@ char *op;
         if (c == ' ') {
             if (fldnum >= 2) {
                 rslt = assign_hilite(&hsbuf[0][0], &hsbuf[1][0], &hsbuf[2][0],
-                                     &hsbuf[3][0]);
+                                     &hsbuf[3][0], from_configfile);
                 if (!rslt) {
                     badopt = TRUE;
                     break;
@@ -1101,7 +1089,7 @@ char *op;
     }
     if (fldnum >= 2 && !badopt) {
         rslt = assign_hilite(&hsbuf[0][0], &hsbuf[1][0], &hsbuf[2][0],
-                             &hsbuf[3][0]);
+                             &hsbuf[3][0], from_configfile);
         if (!rslt)
             badopt = TRUE;
     }
@@ -1125,8 +1113,9 @@ clear_status_hilites()
 }
 
 STATIC_OVL boolean
-assign_hilite(sa, sb, sc, sd)
+assign_hilite(sa, sb, sc, sd, from_configfile)
 char *sa, *sb, *sc, *sd;
+boolean from_configfile;
 {
     char *tmp, *how;
     int i = -1, dt = -1, idx = -1;
@@ -1253,13 +1242,35 @@ char *sa, *sb, *sc, *sd;
         status_hilites[idx].threshold = threshold;
         status_hilites[idx].set = TRUE;
     }
+    status_hilites[idx].anytype = dt;
 
     /* Now finally, we notify the window port */
-    status_threshold(idx, dt, threshold, status_hilites[idx].behavior,
-                     status_hilites[idx].coloridx[0],
-                     status_hilites[idx].coloridx[1]);
+    if (!from_configfile)
+        status_threshold(idx, status_hilites[idx].anytype,
+                        status_hilites[idx].threshold,
+                        status_hilites[idx].behavior,
+                        status_hilites[idx].coloridx[0],
+                        status_hilites[idx].coloridx[1]);
+
     return TRUE;
 }
+
+void
+status_notify_windowport(all)
+boolean all;
+{
+    int idx;
+
+    for (idx = 0; idx < MAXBLSTATS; ++idx) {
+        if (status_hilites[idx].set)
+            status_threshold(idx, status_hilites[idx].anytype,
+                            status_hilites[idx].threshold,
+                            status_hilites[idx].behavior,
+                            status_hilites[idx].coloridx[0],
+                            status_hilites[idx].coloridx[1]);
+    }
+}
+
 /*
  * get_status_hilites
  *

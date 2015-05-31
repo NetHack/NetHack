@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1432890461 2015/05/29 09:07:41 $  $NHDT-Branch: master $:$NHDT-Revision: 1.498 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1433087625 2015/05/31 15:53:45 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.499 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -152,14 +152,9 @@ E void NDECL(bot);
 #ifdef STATUS_VIA_WINDOWPORT
 E void FDECL(status_initialize, (BOOLEAN_P));
 E void NDECL(status_finish);
-E void NDECL(genl_status_init);
-E void NDECL(genl_status_finish);
-E void FDECL(genl_status_update, (int, genericptr_t, int, int));
-E void FDECL(genl_status_enablefield,
-             (int, const char *, const char *, BOOLEAN_P));
+E void FDECL(status_notify_windowport, (BOOLEAN_P));
 #ifdef STATUS_HILITES
-E void FDECL(genl_status_threshold, (int, int, anything, int, int, int));
-E boolean FDECL(set_status_hilites, (char *op));
+E boolean FDECL(set_status_hilites, (char *op, BOOLEAN_P));
 E void NDECL(clear_status_hilites);
 E char *FDECL(get_status_hilites, (char *, int));
 E boolean NDECL(status_hilite_menu);
@@ -2628,6 +2623,16 @@ E char *FDECL(genl_getmsghistory, (BOOLEAN_P));
 E void FDECL(genl_putmsghistory, (const char *, BOOLEAN_P));
 #ifdef HANGUPHANDLING
 E void NDECL(nhwindows_hangup);
+#endif
+#ifdef STATUS_VIA_WINDOWPORT
+E void NDECL(genl_status_init);
+E void NDECL(genl_status_finish);
+E void FDECL(genl_status_enablefield,
+             (int, const char *, const char *, BOOLEAN_P));
+E void FDECL(genl_status_update, (int, genericptr_t, int, int));
+#ifdef STATUS_HILITES
+E void FDECL(genl_status_threshold, (int, int, anything, int, int, int));
+#endif
 #endif
 
 /* ### wizard.c ### */
