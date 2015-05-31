@@ -1,4 +1,4 @@
-/* NetHack 3.6	teleport.c	$NHDT-Date: 1432512774 2015/05/25 00:12:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.58 $ */
+/* NetHack 3.6	teleport.c	$NHDT-Date: 1433014241 2015/05/30 19:30:41 $  $NHDT-Branch: master $:$NHDT-Revision: 1.59 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -440,7 +440,7 @@ struct obj *scroll;
 
     if ((u.uhave.amulet || On_W_tower_level(&u.uz)) && !rn2(3)) {
         You_feel("disoriented for a moment.");
-        if (wizard && yn("Override?") != 'y')
+        if (!wizard || yn("Override?") != 'y')
             return FALSE;
     }
     if ((Teleport_control && !Stunned) || wizard) {
