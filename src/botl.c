@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1433097925 2015/05/31 18:45:25 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.57 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1433099909 2015/05/31 19:18:29 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.58 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -10,8 +10,7 @@ extern const char *hu_stat[]; /* defined in eat.c */
 const char *const enc_stat[] = { "",         "Burdened",  "Stressed",
                                  "Strained", "Overtaxed", "Overloaded" };
 
-STATIC_OVL NEARDATA int mrank_sz =
-    0; /* loaded by max_rank_sz (from u_init) */
+STATIC_OVL NEARDATA int mrank_sz = 0; /* loaded by max_rank_sz (from u_init) */
 STATIC_DCL const char *NDECL(rank);
 
 #ifndef STATUS_VIA_WINDOWPORT
@@ -286,18 +285,30 @@ char *buf;
 #ifdef STATUS_VIA_WINDOWPORT
 /* =======================================================================*/
 
+STATIC_DCL void NDECL(init_blstats);
+STATIC_DCL char *FDECL(anything_to_s, (char *, anything *, int));
+STATIC_DCL void FDECL(s_to_anything, (anything *, char *, int));
+STATIC_OVL int FDECL(percentage, (struct istat_s *, struct istat_s *));
+STATIC_OVL int FDECL(compare_blstats, (struct istat_s *, struct istat_s *));
+
+#ifdef STATUS_HILITES
+STATIC_DCL boolean FDECL(assign_hilite, (char *, char *, char *, char *, BOOLEAN_P));
+STATIC_DCL const char *FDECL(clridx_to_s, (char *, int));
+#endif
+
+/* structure that tracks the status details in the core */
 struct istat_s {
     long time;
     unsigned anytype;
     anything a;
     char *val;
     int valwidth;
-    int idxmax;
+    enum statusfields idxmax;
     enum statusfields fld;
 };
 
 /* If entries are added to this, botl.h will require updating too */
-struct istat_s initblstats[MAXBLSTATS] = {
+STATIC_DCL struct istat_s initblstats[MAXBLSTATS] = {
         { 0L, ANY_STR,  {(genericptr_t)0L}, (char *)0, 80,  0, BL_TITLE},
         { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_STR},
         { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_DX},
@@ -309,14 +320,14 @@ struct istat_s initblstats[MAXBLSTATS] = {
         { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 20,  0, BL_SCORE},
         { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 20,  0, BL_CAP},
         { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 30,  0, BL_GOLD},
-        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_ENE},
+        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  BL_ENEMAX, BL_ENE},
         { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_ENEMAX},
         { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 10,  0, BL_XP},
         { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_AC},
         { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_HD},
         { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 20,  0, BL_TIME},
         { 0L, ANY_UINT, {(genericptr_t)0L}, (char *)0, 40,  0, BL_HUNGER},
-        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_HP},
+        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  BL_HPMAX, BL_HP},
         { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_HPMAX},
         { 0L, ANY_STR,  {(genericptr_t)0L}, (char *)0, 80,  0, BL_LEVELDESC},
         { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 20,  0, BL_EXP},
@@ -352,21 +363,8 @@ static struct fieldid_t {
         {"condition",           BL_CONDITION},
 };
 
-
 struct istat_s blstats[2][MAXBLSTATS];
-
 static boolean blinit = FALSE, update_all = FALSE;
-
-STATIC_DCL void NDECL(init_blstats);
-STATIC_DCL char *FDECL(anything_to_s, (char *, anything *, int));
-STATIC_DCL void FDECL(s_to_anything, (anything *, char *, int));
-STATIC_OVL int FDECL(percentage, (struct istat_s *, struct istat_s *));
-STATIC_OVL int FDECL(compare_blstats, (struct istat_s *, struct istat_s *));
-
-#ifdef STATUS_HILITES
-STATIC_DCL boolean FDECL(assign_hilite, (char *, char *, char *, char *, BOOLEAN_P));
-STATIC_DCL const char *FDECL(clridx_to_s, (char *, int));
-#endif
 
 void
 bot()
@@ -612,10 +610,10 @@ bot()
      * text display obliterates the status line.
      *
      * To work around it, we call status_update() with ficticious
-     * index of BL_BOGUS (-1).
+     * index of BL_FLUSH (-1).
      */
     if (context.botlx && !updated)
-        status_update(BL_BOGUS, (genericptr_t) 0, 0, 0);
+        status_update(BL_FLUSH, (genericptr_t) 0, 0, 0);
 
     context.botl = context.botlx = 0;
     update_all = FALSE;
@@ -762,7 +760,7 @@ boolean
             fieldname = "condition";
             status_enablefield(fld, fieldname, fieldfmt, TRUE);
             break;
-        case BL_BOGUS:
+        case BL_FLUSH:
         default:
             break;
 	}
@@ -1129,7 +1127,7 @@ boolean from_configfile;
     boolean normal[2] = { 0, 0 };
     boolean percent = FALSE, down_up = FALSE, changed = FALSE;
     anything threshold;
-    enum statusfields fld = BL_BOGUS;
+    enum statusfields fld = BL_FLUSH;
     threshold.a_void = 0;
 
     /* Example:

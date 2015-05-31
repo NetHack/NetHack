@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1433082408 2015/05/31 14:26:48 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.95 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1433099933 2015/05/31 19:18:53 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.96 $ */
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3052,13 +3052,13 @@ genericptr_t ptr;
 
     enum statusfields fieldorder[2][15] = {
         { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
-          BL_SCORE, BL_BOGUS, BL_BOGUS, BL_BOGUS, BL_BOGUS, BL_BOGUS, BL_BOGUS},
+          BL_SCORE, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH},
         { BL_LEVELDESC, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX,
           BL_AC, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER,
-          BL_CAP, BL_CONDITION, BL_BOGUS}
+          BL_CAP, BL_CONDITION, BL_FLUSH}
     };
 
-    if (idx != BL_BOGUS) {
+    if (idx != BL_FLUSH) {
         if (!activefields[idx])
             return;
         switch (idx) {
@@ -3088,13 +3088,13 @@ genericptr_t ptr;
 
     /* This genl version updates everything on the display, everytime */
     newbot1[0] = '\0';
-    for (i = 0; fieldorder[0][i] != BL_BOGUS; ++i) {
+    for (i = 0; fieldorder[0][i] != BL_FLUSH; ++i) {
         int idx1 = fieldorder[0][i];
         if (activefields[idx1])
             Strcat(newbot1, vals[idx1]);
     }
     newbot2[0] = '\0';
-    for (i = 0; fieldorder[1][i] != BL_BOGUS; ++i) {
+    for (i = 0; fieldorder[1][i] != BL_FLUSH; ++i) {
         int idx2 = fieldorder[1][i];
         if (activefields[idx2])
             Strcat(newbot2, vals[idx2]);
