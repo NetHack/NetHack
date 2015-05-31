@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1432512768 2015/05/25 00:12:48 $  $NHDT-Branch: master $:$NHDT-Revision: 1.109 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1433035328 2015/05/31 01:22:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.111 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1873,24 +1873,20 @@ register struct obj *obj;
 {
     struct monst *shkp;
     xchar x, y;
-    int cost=0;
+    long cost = 0L;
 
-    if (get_obj_location(obj, &x, &y, 0) &&
-        (obj->unpaid ||
-         (obj->where == OBJ_FLOOR && !obj->no_charge && costly_spot(x,y)))) {
-
-        if (!(shkp = shop_keeper(*in_rooms(x, y, SHOPBASE)))) return 0;
-        if (!inhishop(shkp)) return 0;
-        if (!costly_spot(x, y))	return 0;
-        if (!*u.ushops) return 0;
-
-        if (obj->oclass != COIN_CLASS) {
-            cost = (obj == uball || obj == uchain) ? 0L :
-                obj->quan * get_cost(obj, shkp);
-            if (Has_contents(obj)) {
-                cost += contained_cost(obj, shkp, 0L, FALSE, FALSE);
-            }
-        }
+    if (*u.ushops
+        && obj->oclass != COIN_CLASS
+        && obj != uball && obj != uchain
+        && get_obj_location(obj, &x, &y, 0)
+        && (obj->unpaid
+            || (obj->where == OBJ_FLOOR
+                && !obj->no_charge && costly_spot(x, y)))
+        && (shkp = shop_keeper(*in_rooms(x, y, SHOPBASE))) != 0
+        && inhishop(shkp)) {
+        cost = obj->quan * get_cost(obj, shkp);
+        if (Has_contents(obj))
+            cost += contained_cost(obj, shkp, 0L, FALSE, FALSE);
     }
     return cost;
 }
