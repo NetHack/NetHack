@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1433087631 2015/05/31 15:53:51 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.54 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1433087810 2015/05/31 15:56:50 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.55 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -88,7 +88,7 @@ STATIC_DCL void FDECL(s_to_anything, (anything *, char *, int));
 STATIC_OVL int FDECL(percentage, (struct istat_s *, struct istat_s *));
 STATIC_OVL int FDECL(compare_blstats, (struct istat_s *, struct istat_s *));
 #ifdef STATUS_HILITES
-STATIC_DCL boolean FDECL(assign_hilite, (char *, char *, char *, char *));
+STATIC_DCL boolean FDECL(assign_hilite, (char *, char *, char *, char *, BOOLEAN_P));
 STATIC_DCL const char *FDECL(clridx_to_s, (char *, int));
 #endif
 #else
@@ -1540,7 +1540,7 @@ status_hilite_menu()
                     clridx_to_s(thresholdbuf, hltemp[i].coloridx[1]));
         }
     }
-    return set_status_hilites(buf);
+    return set_status_hilites(buf, FALSE);
 }
 #endif /*STATUS_HILITES*/
 #endif /*STATUS_VIA_WINDOWPORT*/
