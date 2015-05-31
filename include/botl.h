@@ -1,4 +1,4 @@
-/* NetHack 3.6  botl.h  $NHDT-Date: 1433099923 2015/05/31 19:18:43 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.13 $ */
+/* NetHack 3.6  botl.h  $NHDT-Date: 1433105378 2015/05/31 20:49:38 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.14 $ */
 /* Copyright (c) Michael Allison, 2003                            */
 /* NetHack may be freely redistributed.  See license for details. */
 

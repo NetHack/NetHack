@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.h	$NHDT-Date: 1432512782 2015/05/25 00:13:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.21 $ */
+/* NetHack 3.6	wintty.h	$NHDT-Date: 1433105383 2015/05/31 20:49:43 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.22 $ */
 /* Copyright (c) David Cohrs, 1991,1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -214,6 +214,13 @@ E void FDECL(tty_change_background, (int white_or_black));
 E short FDECL(set_tty_font_name, (winid, char *));
 #endif
 E char *NDECL(tty_get_color_string);
+#endif
+#ifdef STATUS_VIA_WINDOWPORT
+E void NDECL(tty_status_init);
+E void FDECL(tty_status_update, (int, genericptr_t, int, int));
+#ifdef STATUS_HILITES
+E void FDECL(tty_status_threshold, (int, int, anything, int, int, int));
+#endif
 #endif
 
 /* other defs that really should go away (they're tty specific) */

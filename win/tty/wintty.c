@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1433099933 2015/05/31 19:18:53 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.96 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1433105400 2015/05/31 20:50:00 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.97 $ */
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -89,10 +89,11 @@ struct window_procs tty_procs = {
 #endif
     tty_getmsghistory, tty_putmsghistory,
 #ifdef STATUS_VIA_WINDOWPORT
-    genl_status_init, genl_status_finish, genl_status_enablefield,
-    genl_status_update,
+    tty_status_init,
+    genl_status_finish, genl_status_enablefield,
+    tty_status_update,
 #ifdef STATUS_HILITES
-    genl_status_threshold,
+    tty_status_threshold,
 #endif
 #endif
     genl_can_suspend_yes,
@@ -3031,18 +3032,51 @@ const char *s;
 #ifdef STATUS_VIA_WINDOWPORT
 
 /*
- * These come from the genl_ routines
- * in src/windows.c
+ * The following data structures come from the genl_ routines in
+ * src/windows.c and as such are considered to be on the window-port
+ * "side" of things, rather than the NetHack-core "side" of things.
  */
-extern const char *fieldnm[MAXBLSTATS];
-extern const char *fieldfmt[MAXBLSTATS];
-extern char *vals[MAXBLSTATS];
-extern boolean activefields[MAXBLSTATS];
+
+extern const char *status_fieldnm[MAXBLSTATS];
+extern const char *status_fieldfmt[MAXBLSTATS];
+extern char *status_vals[MAXBLSTATS];
+extern boolean status_activefields[MAXBLSTATS];
 extern winid WIN_STATUS;
 
+#ifdef STATUS_HILITES
+typedef struct hilite_data_struct {
+    int thresholdtype;
+    anything threshold;
+    int behavior;
+    int under;
+    int over;
+} hilite_data_t;
+static hilite_data_t tty_status_hilites[MAXBLSTATS];
+static int tty_status_colors[MAXBLSTATS];
+#endif
+
 void
-tty_status_update(idx, ptr, chg, percent)
-int idx, chg, percent;
+tty_status_init()
+{
+    int i;
+
+    /* let genl_status_init do most of the initialization */
+    genl_status_init();
+
+    for (i = 0; i < MAXBLSTATS; ++i) {
+#ifdef STATUS_HILITES
+        tty_status_colors[i] = CLR_MAX; /* no color */
+        tty_status_hilites[i].thresholdtype = 0;
+        tty_status_hilites[i].behavior = BL_TH_NONE;
+        tty_status_hilites[i].under = BL_HILITE_NONE;
+        tty_status_hilites[i].over = BL_HILITE_NONE;
+#endif /* STATUS_HILITES */
+    }
+}
+
+void
+tty_status_update(fldidx, ptr, chg, percent)
+int fldidx, chg, percent;
 genericptr_t ptr;
 {
     char newbot1[MAXCO], newbot2[MAXCO];
@@ -3058,46 +3092,48 @@ genericptr_t ptr;
           BL_CAP, BL_CONDITION, BL_FLUSH}
     };
 
-    if (idx != BL_FLUSH) {
-        if (!activefields[idx])
+    if (fldidx != BL_FLUSH) {
+        if (!status_activefields[fldidx])
             return;
-        switch (idx) {
+        switch (fldidx) {
         case BL_CONDITION:
             cond = *condptr;
-            *vals[idx] = '\0';
+            *status_vals[fldidx] = '\0';
             if (cond & BL_MASK_BLIND)
-                Strcat(vals[idx], " Blind");
+                Strcat(status_vals[fldidx], " Blind");
             if (cond & BL_MASK_CONF)
-                Strcat(vals[idx], " Conf");
+                Strcat(status_vals[fldidx], " Conf");
             if (cond & BL_MASK_FOODPOIS)
-                Strcat(vals[idx], " FoodPois");
+                Strcat(status_vals[fldidx], " FoodPois");
             if (cond & BL_MASK_ILL)
-                Strcat(vals[idx], " Ill");
+                Strcat(status_vals[fldidx], " Ill");
             if (cond & BL_MASK_STUNNED)
-                Strcat(vals[idx], " Stun");
+                Strcat(status_vals[fldidx], " Stun");
             if (cond & BL_MASK_HALLU)
-                Strcat(vals[idx], " Hallu");
+                Strcat(status_vals[fldidx], " Hallu");
             if (cond & BL_MASK_SLIMED)
-                Strcat(vals[idx], " Slime");
+                Strcat(status_vals[fldidx], " Slime");
             break;
         default:
-            Sprintf(vals[idx], fieldfmt[idx] ? fieldfmt[idx] : "%s", text);
+            Sprintf(status_vals[fldidx], status_fieldfmt[fldidx] ? status_fieldfmt[fldidx] : "%s", text);
             break;
         }
     }
 
-    /* This genl version updates everything on the display, everytime */
+    /* This version copied from the genl_ version currently
+     * updates everything on the display, everytime
+     */
     newbot1[0] = '\0';
     for (i = 0; fieldorder[0][i] != BL_FLUSH; ++i) {
-        int idx1 = fieldorder[0][i];
-        if (activefields[idx1])
-            Strcat(newbot1, vals[idx1]);
+        int fldidx1 = fieldorder[0][i];
+        if (status_activefields[fldidx1])
+            Strcat(newbot1, status_vals[fldidx1]);
     }
     newbot2[0] = '\0';
     for (i = 0; fieldorder[1][i] != BL_FLUSH; ++i) {
-        int idx2 = fieldorder[1][i];
-        if (activefields[idx2])
-            Strcat(newbot2, vals[idx2]);
+        int fldidx2 = fieldorder[1][i];
+        if (status_activefields[fldidx2])
+            Strcat(newbot2, status_vals[fldidx2]);
     }
     curs(WIN_STATUS, 1, 0);
     putstr(WIN_STATUS, 0, newbot1);
@@ -3106,12 +3142,18 @@ genericptr_t ptr;
 }
 
 #ifdef STATUS_HILITES
+
 void
 tty_status_threshold(fldidx, thresholdtype, threshold, behavior, under, over)
 int fldidx, thresholdtype;
 int behavior, under, over;
 anything threshold;
 {
+    tty_status_hilites[fldidx].thresholdtype = thresholdtype;
+    tty_status_hilites[fldidx].threshold = threshold;
+    tty_status_hilites[fldidx].behavior = behavior;
+    tty_status_hilites[fldidx].under = under;
+    tty_status_hilites[fldidx].over = over;
     return;
 }
 #endif /* STATUS_HILITES */

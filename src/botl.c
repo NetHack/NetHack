@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1433099909 2015/05/31 19:18:29 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.58 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1433105388 2015/05/31 20:49:48 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.59 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1101,7 +1101,8 @@ boolean from_configfile;
 }
 
 void
-clear_status_hilites()
+clear_status_hilites(from_configfile)
+boolean from_configfile;
 {
     int i;
     anything it;
@@ -1110,7 +1111,8 @@ clear_status_hilites()
         (void) memset((genericptr_t) &status_hilites[i], 0,
                       sizeof(struct hilite_s));
         /* notify window port */
-        status_threshold(i, blstats[0][i].anytype, it, 0, 0, 0);
+        if (!from_configfile)
+            status_threshold(i, blstats[0][i].anytype, it, 0, 0, 0);
     }
 }
 
@@ -1262,7 +1264,9 @@ status_notify_windowport(all)
 boolean all;
 {
     int idx;
+    anything it;
 
+    it.a_void = 0;
     for (idx = 0; idx < MAXBLSTATS; ++idx) {
         if (status_hilites[idx].set)
             status_threshold(idx, status_hilites[idx].anytype,
@@ -1270,6 +1274,9 @@ boolean all;
                             status_hilites[idx].behavior,
                             status_hilites[idx].coloridx[0],
                             status_hilites[idx].coloridx[1]);
+        else
+            status_threshold(idx, blstats[0][idx].anytype, it, 0, 0, 0);
+
     }
 }
 
