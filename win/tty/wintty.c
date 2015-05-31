@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1432536533 2015/05/25 06:48:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.94 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1433082408 2015/05/31 14:26:48 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.95 $ */
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3027,6 +3027,95 @@ const char *s;
         s = "";
     return strcpy((char *) alloc((unsigned) (strlen(s) + 1)), s);
 }
+
+#ifdef STATUS_VIA_WINDOWPORT
+
+/*
+ * These come from the genl_ routines
+ * in src/windows.c
+ */
+extern const char *fieldnm[MAXBLSTATS];
+extern const char *fieldfmt[MAXBLSTATS];
+extern char *vals[MAXBLSTATS];
+extern boolean activefields[MAXBLSTATS];
+extern winid WIN_STATUS;
+
+void
+tty_status_update(idx, ptr, chg, percent)
+int idx, chg, percent;
+genericptr_t ptr;
+{
+    char newbot1[MAXCO], newbot2[MAXCO];
+    long cond, *condptr = (long *) ptr;
+    register int i;
+    char *text = (char *) ptr;
+
+    enum statusfields fieldorder[2][15] = {
+        { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
+          BL_SCORE, BL_BOGUS, BL_BOGUS, BL_BOGUS, BL_BOGUS, BL_BOGUS, BL_BOGUS},
+        { BL_LEVELDESC, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX,
+          BL_AC, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER,
+          BL_CAP, BL_CONDITION, BL_BOGUS}
+    };
+
+    if (idx != BL_BOGUS) {
+        if (!activefields[idx])
+            return;
+        switch (idx) {
+        case BL_CONDITION:
+            cond = *condptr;
+            *vals[idx] = '\0';
+            if (cond & BL_MASK_BLIND)
+                Strcat(vals[idx], " Blind");
+            if (cond & BL_MASK_CONF)
+                Strcat(vals[idx], " Conf");
+            if (cond & BL_MASK_FOODPOIS)
+                Strcat(vals[idx], " FoodPois");
+            if (cond & BL_MASK_ILL)
+                Strcat(vals[idx], " Ill");
+            if (cond & BL_MASK_STUNNED)
+                Strcat(vals[idx], " Stun");
+            if (cond & BL_MASK_HALLU)
+                Strcat(vals[idx], " Hallu");
+            if (cond & BL_MASK_SLIMED)
+                Strcat(vals[idx], " Slime");
+            break;
+        default:
+            Sprintf(vals[idx], fieldfmt[idx] ? fieldfmt[idx] : "%s", text);
+            break;
+        }
+    }
+
+    /* This genl version updates everything on the display, everytime */
+    newbot1[0] = '\0';
+    for (i = 0; fieldorder[0][i] != BL_BOGUS; ++i) {
+        int idx1 = fieldorder[0][i];
+        if (activefields[idx1])
+            Strcat(newbot1, vals[idx1]);
+    }
+    newbot2[0] = '\0';
+    for (i = 0; fieldorder[1][i] != BL_BOGUS; ++i) {
+        int idx2 = fieldorder[1][i];
+        if (activefields[idx2])
+            Strcat(newbot2, vals[idx2]);
+    }
+    curs(WIN_STATUS, 1, 0);
+    putstr(WIN_STATUS, 0, newbot1);
+    curs(WIN_STATUS, 1, 1);
+    putmixed(WIN_STATUS, 0, newbot2); /* putmixed() due to GOLD glyph */
+}
+
+#ifdef STATUS_HILITES
+void
+tty_status_threshold(fldidx, thresholdtype, threshold, behavior, under, over)
+int fldidx, thresholdtype;
+int behavior, under, over;
+anything threshold;
+{
+    return;
+}
+#endif /* STATUS_HILITES */
+#endif /*STATUS_VIA_WINDOWPORT*/
 
 #endif /* TTY_GRAPHICS */
 

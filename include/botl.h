@@ -1,9 +1,23 @@
-/* NetHack 3.6  botl.h  $NHDT-Date: 1432512780 2015/05/25 00:13:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
+/* NetHack 3.6  botl.h  $NHDT-Date: 1433082340 2015/05/31 14:25:40 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.12 $ */
 /* Copyright (c) Michael Allison, 2003                            */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef BOTL_H
 #define BOTL_H
+
+/* MAXCO must hold longest uncompressed status line, and must be larger
+ * than COLNO
+ *
+ * longest practical second status line at the moment is
+ *	Astral Plane $:12345 HP:700(700) Pw:111(111) AC:-127 Xp:30/123456789
+ *	T:123456 Satiated Conf FoodPois Ill Blind Stun Hallu Overloaded
+ * -- or somewhat over 130 characters
+ */
+#if COLNO <= 140
+#define MAXCO 160
+#else
+#define MAXCO (COLNO + 20)
+#endif
 
 #ifdef STATUS_VIA_WINDOWPORT
 #if 0

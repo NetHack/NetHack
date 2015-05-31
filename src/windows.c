@@ -1,4 +1,4 @@
-/* NetHack 3.6	windows.c	$NHDT-Date: 1432512768 2015/05/25 00:12:48 $  $NHDT-Branch: master $:$NHDT-Revision: 1.28 $ */
+/* NetHack 3.6	windows.c	$NHDT-Date: 1433082382 2015/05/31 14:26:22 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.29 $ */
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -797,5 +797,135 @@ const char *string UNUSED;
 }
 
 #endif /* HANGUPHANDLING */
+
+#ifdef STATUS_VIA_WINDOWPORT
+
+/*****************************************************************************/
+/* genl backward compat stuff                                                */
+/*****************************************************************************/
+
+const char *fieldnm[MAXBLSTATS];
+const char *fieldfmt[MAXBLSTATS];
+char *vals[MAXBLSTATS];
+boolean activefields[MAXBLSTATS];
+NEARDATA winid WIN_STATUS;
+
+void
+genl_status_init()
+{
+    int i;
+    for (i = 0; i < MAXBLSTATS; ++i) {
+        vals[i] = (char *) alloc(MAXCO);
+        *vals[i] = '\0';
+        activefields[i] = FALSE;
+        fieldfmt[i] = (const char *) 0;
+    }
+    /* Use a window for the genl version; backward port compatibility */
+    WIN_STATUS = create_nhwindow(NHW_STATUS);
+    display_nhwindow(WIN_STATUS, FALSE);
+}
+
+void
+genl_status_finish()
+{
+    /* tear down routine */
+    int i;
+
+    /* free alloc'd memory here */
+    for (i = 0; i < MAXBLSTATS; ++i) {
+        if (vals[i])
+            free((genericptr_t) vals[i]);
+        vals[i] = (char *) 0;
+    }
+}
+
+void
+genl_status_enablefield(fieldidx, nm, fmt, enable)
+int fieldidx;
+const char *nm;
+const char *fmt;
+boolean enable;
+{
+    fieldfmt[fieldidx] = fmt;
+    fieldnm[fieldidx] = nm;
+    activefields[fieldidx] = enable;
+}
+
+void
+genl_status_update(idx, ptr, chg, percent)
+int idx, chg, percent;
+genericptr_t ptr;
+{
+    char newbot1[MAXCO], newbot2[MAXCO];
+    long cond, *condptr = (long *) ptr;
+    register int i;
+    char *text = (char *) ptr;
+
+    enum statusfields fieldorder[2][15] = {
+        { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
+          BL_SCORE, BL_BOGUS, BL_BOGUS, BL_BOGUS, BL_BOGUS, BL_BOGUS, BL_BOGUS},
+        { BL_LEVELDESC, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX,
+          BL_AC, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER,
+          BL_CAP, BL_CONDITION, BL_BOGUS}
+    };
+
+    if (idx != BL_BOGUS) {
+        if (!activefields[idx])
+            return;
+        switch (idx) {
+        case BL_CONDITION:
+            cond = *condptr;
+            *vals[idx] = '\0';
+            if (cond & BL_MASK_BLIND)
+                Strcat(vals[idx], " Blind");
+            if (cond & BL_MASK_CONF)
+                Strcat(vals[idx], " Conf");
+            if (cond & BL_MASK_FOODPOIS)
+                Strcat(vals[idx], " FoodPois");
+            if (cond & BL_MASK_ILL)
+                Strcat(vals[idx], " Ill");
+            if (cond & BL_MASK_STUNNED)
+                Strcat(vals[idx], " Stun");
+            if (cond & BL_MASK_HALLU)
+                Strcat(vals[idx], " Hallu");
+            if (cond & BL_MASK_SLIMED)
+                Strcat(vals[idx], " Slime");
+            break;
+        default:
+            Sprintf(vals[idx], fieldfmt[idx] ? fieldfmt[idx] : "%s", text);
+            break;
+        }
+    }
+
+    /* This genl version updates everything on the display, everytime */
+    newbot1[0] = '\0';
+    for (i = 0; fieldorder[0][i] != BL_BOGUS; ++i) {
+        int idx1 = fieldorder[0][i];
+        if (activefields[idx1])
+            Strcat(newbot1, vals[idx1]);
+    }
+    newbot2[0] = '\0';
+    for (i = 0; fieldorder[1][i] != BL_BOGUS; ++i) {
+        int idx2 = fieldorder[1][i];
+        if (activefields[idx2])
+            Strcat(newbot2, vals[idx2]);
+    }
+    curs(WIN_STATUS, 1, 0);
+    putstr(WIN_STATUS, 0, newbot1);
+    curs(WIN_STATUS, 1, 1);
+    putmixed(WIN_STATUS, 0, newbot2); /* putmixed() due to GOLD glyph */
+}
+
+#ifdef STATUS_HILITES
+void
+genl_status_threshold(fldidx, thresholdtype, threshold, behavior, under, over)
+int fldidx, thresholdtype;
+int behavior, under, over;
+anything threshold;
+{
+    return;
+}
+#endif /* STATUS_HILITES */
+#endif /* STATUS_VIA_WINDOWPORT */
 
 /*windows.c*/
