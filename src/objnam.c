@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1433050879 2015/05/31 05:41:19 $  $NHDT-Branch: master $:$NHDT-Revision: 1.140 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1433058272 2015/05/31 07:44:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.141 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -945,7 +945,8 @@ boolean with_price;
             if (bimanual(obj))
                 hand_s = makeplural(hand_s);
             Sprintf(eos(bp), " (weapon in %s)", hand_s);
-            if (obj == uwep && obj->oartifact && warn_obj_cnt) {
+
+            if (warn_obj_cnt && obj == uwep && (EWarn_of_mon & W_WEP) != 0L) {
                 /* presumeably can be felt when blind */
                 Strcat(bp, " (glowing");
                 if (!Blind)
