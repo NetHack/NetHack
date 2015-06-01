@@ -697,7 +697,7 @@ register struct monst *mtmp;
         }
         break;
     case S_GNOME:
-        if (!rn2((In_mines(&u.uz) ? 5 : 10))) {
+        if (!rn2((In_mines(&u.uz) && in_mklev) ? 20 : 60)) {
             otmp = mksobj(rn2(4) ? TALLOW_CANDLE : WAX_CANDLE, TRUE, FALSE);
             otmp->quan = 1;
             otmp->owt = weight(otmp);
