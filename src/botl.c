@@ -1380,6 +1380,7 @@ char *buf;
 int idx;
 {
     static const char *a[] = { "bold", "inverse", "normal" };
+    char* p = 0;
 
     if (buf) {
         buf[0] = '\0';
@@ -1387,6 +1388,9 @@ int idx;
             Strcpy(buf, a[idx + 3]);
         else if (idx >= 0 && idx < CLR_MAX)
             Strcpy(buf, c_obj_colors[idx]);
+        /* replace spaces with - */
+        for(p = buf; *p; p++)
+            if(*p == ' ') *p = '-';
     }
     return buf;
 }
