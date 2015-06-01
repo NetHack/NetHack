@@ -1,4 +1,4 @@
-/* NetHack 3.6  botl.h  $NHDT-Date: 1433082340 2015/05/31 14:25:40 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.12 $ */
+/* NetHack 3.6  botl.h  $NHDT-Date: 1433105378 2015/05/31 20:49:38 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.14 $ */
 /* Copyright (c) Michael Allison, 2003                            */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -22,7 +22,7 @@
 #ifdef STATUS_VIA_WINDOWPORT
 #if 0
 /* clang-format off */
-#define BL_BOGUS        -1
+#define BL_FLUSH        -1
 #define BL_TITLE        0
 #define BL_STR          1
 #define BL_DX           2
@@ -47,12 +47,12 @@
 #define BL_EXP          21
 #define BL_CONDITION    22
 /* clang-format on */
+
 #else
-enum statusfields { BL_BOGUS = -1, BL_TITLE = 0, BL_STR, BL_DX, BL_CO, BL_IN,
+enum statusfields { BL_FLUSH = -1, BL_TITLE = 0, BL_STR, BL_DX, BL_CO, BL_IN,
 BL_WI, BL_CH, BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX,
 BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX, BL_LEVELDESC,
 BL_EXP, BL_CONDITION };
-#define BL_FLUSH BL_BOGUS
 #define MAXBLSTATS      BL_CONDITION+1
 
 #define BEFORE  0

@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1433082408 2015/05/31 14:26:48 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.95 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1433115559 2015/05/31 23:39:19 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.98 $ */
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -89,10 +89,11 @@ struct window_procs tty_procs = {
 #endif
     tty_getmsghistory, tty_putmsghistory,
 #ifdef STATUS_VIA_WINDOWPORT
-    genl_status_init, genl_status_finish, genl_status_enablefield,
-    genl_status_update,
+    tty_status_init,
+    genl_status_finish, genl_status_enablefield,
+    tty_status_update,
 #ifdef STATUS_HILITES
-    genl_status_threshold,
+    tty_status_threshold,
 #endif
 #endif
     genl_can_suspend_yes,
@@ -3031,89 +3032,319 @@ const char *s;
 #ifdef STATUS_VIA_WINDOWPORT
 
 /*
- * These come from the genl_ routines
- * in src/windows.c
+ * The following data structures come from the genl_ routines in
+ * src/windows.c and as such are considered to be on the window-port
+ * "side" of things, rather than the NetHack-core "side" of things.
  */
-extern const char *fieldnm[MAXBLSTATS];
-extern const char *fieldfmt[MAXBLSTATS];
-extern char *vals[MAXBLSTATS];
-extern boolean activefields[MAXBLSTATS];
+
+extern const char *status_fieldnm[MAXBLSTATS];
+extern const char *status_fieldfmt[MAXBLSTATS];
+extern char *status_vals[MAXBLSTATS];
+extern boolean status_activefields[MAXBLSTATS];
 extern winid WIN_STATUS;
 
+#ifdef STATUS_HILITES
+typedef struct hilite_data_struct {
+    int thresholdtype;
+    anything threshold;
+    int behavior;
+    int under;
+    int over;
+} hilite_data_t;
+static hilite_data_t tty_status_hilites[MAXBLSTATS];
+static int tty_status_colors[MAXBLSTATS];
+
+struct color_option {
+    int color;
+    int attr_bits;
+};
+
+static void FDECL(start_color_option, (struct color_option));
+static void FDECL(end_color_option, (struct color_option));
+static void FDECL(apply_color_option, (struct color_option, const char *));
+static void FDECL(add_colored_text, (const char *, char *));
+#endif
+
 void
-tty_status_update(idx, ptr, chg, percent)
-int idx, chg, percent;
+tty_status_init()
+{
+    int i;
+
+    /* let genl_status_init do most of the initialization */
+    genl_status_init();
+
+    for (i = 0; i < MAXBLSTATS; ++i) {
+#ifdef STATUS_HILITES
+        tty_status_colors[i] = CLR_MAX; /* no color */
+        tty_status_hilites[i].thresholdtype = 0;
+        tty_status_hilites[i].behavior = BL_TH_NONE;
+        tty_status_hilites[i].under = BL_HILITE_NONE;
+        tty_status_hilites[i].over = BL_HILITE_NONE;
+#endif /* STATUS_HILITES */
+    }
+}
+
+/*
+ *  *_status_update()
+ *      -- update the value of a status field.
+ *      -- the fldindex identifies which field is changing and
+ *         is an integer index value from botl.h
+ *      -- fldindex could be any one of the following from botl.h:
+ *         BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, 
+ *         BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX, 
+ *         BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX, 
+ *         BL_LEVELDESC, BL_EXP, BL_CONDITION
+ *      -- fldindex could also be BL_FLUSH (-1), which is not really
+ *         a field index, but is a special trigger to tell the 
+ *         windowport that it should redisplay all its status fields,
+ *         even if no changes have been presented to it.
+ *      -- ptr is usually a "char *", unless fldindex is BL_CONDITION.
+ *         If fldindex is BL_CONDITION, then ptr is a long value with
+ *         any or none of the following bits set (from botl.h):
+ *              BL_MASK_BLIND		0x00000001L
+ *              BL_MASK_CONF		0x00000002L
+ *              BL_MASK_FOODPOIS	0x00000004L
+ *              BL_MASK_ILL		0x00000008L
+ *              BL_MASK_HALLU		0x00000010L
+ *              BL_MASK_STUNNED		0x00000020L
+ *              BL_MASK_SLIMED		0x00000040L
+ *      -- The value passed for BL_GOLD includes a leading
+ *         symbol for GOLD "$:nnn". If the window port needs to use 
+ *         the textual gold amount without the leading "$:" the port 
+ *         will have to add 2 to the passed "ptr" for the BL_GOLD case.
+ */
+ 
+void
+tty_status_update(fldidx, ptr, chg, percent)
+int fldidx, chg, percent;
 genericptr_t ptr;
 {
-    char newbot1[MAXCO], newbot2[MAXCO];
     long cond, *condptr = (long *) ptr;
     register int i;
     char *text = (char *) ptr;
+   /* Mapping BL attributes to tty attributes
+    * BL_HILITE_NONE     -1 + 3 = 2 (statusattr[2])
+    * BL_HILITE_INVERSE  -2 + 3 = 1 (statusattr[1])
+    * BL_HILITE_BOLD     -3 + 3 = 0 (statusattr[0])
+    */
+    int statusattr[] = {ATR_BOLD, ATR_INVERSE, ATR_NONE};
+    int attridx = 0;
+    long value = -1L;
 
     enum statusfields fieldorder[2][15] = {
         { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
-          BL_SCORE, BL_BOGUS, BL_BOGUS, BL_BOGUS, BL_BOGUS, BL_BOGUS, BL_BOGUS},
+          BL_SCORE, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH},
         { BL_LEVELDESC, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX,
           BL_AC, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER,
-          BL_CAP, BL_CONDITION, BL_BOGUS}
+          BL_CAP, BL_CONDITION, BL_FLUSH}
     };
 
-    if (idx != BL_BOGUS) {
-        if (!activefields[idx])
+    if (fldidx != BL_FLUSH) {
+        if (!status_activefields[fldidx])
             return;
-        switch (idx) {
+        switch (fldidx) {
         case BL_CONDITION:
             cond = *condptr;
-            *vals[idx] = '\0';
+            *status_vals[fldidx] = '\0';
             if (cond & BL_MASK_BLIND)
-                Strcat(vals[idx], " Blind");
+                Strcat(status_vals[fldidx], " Blind");
             if (cond & BL_MASK_CONF)
-                Strcat(vals[idx], " Conf");
+                Strcat(status_vals[fldidx], " Conf");
             if (cond & BL_MASK_FOODPOIS)
-                Strcat(vals[idx], " FoodPois");
+                Strcat(status_vals[fldidx], " FoodPois");
             if (cond & BL_MASK_ILL)
-                Strcat(vals[idx], " Ill");
+                Strcat(status_vals[fldidx], " Ill");
             if (cond & BL_MASK_STUNNED)
-                Strcat(vals[idx], " Stun");
+                Strcat(status_vals[fldidx], " Stun");
             if (cond & BL_MASK_HALLU)
-                Strcat(vals[idx], " Hallu");
+                Strcat(status_vals[fldidx], " Hallu");
             if (cond & BL_MASK_SLIMED)
-                Strcat(vals[idx], " Slime");
+                Strcat(status_vals[fldidx], " Slime");
+            value = cond;
             break;
         default:
-            Sprintf(vals[idx], fieldfmt[idx] ? fieldfmt[idx] : "%s", text);
+            value = atol(text);
+            Sprintf(status_vals[fldidx],
+                    status_fieldfmt[fldidx] ? status_fieldfmt[fldidx] :
+                    "%s", text);
             break;
         }
     }
 
-    /* This genl version updates everything on the display, everytime */
-    newbot1[0] = '\0';
-    for (i = 0; fieldorder[0][i] != BL_BOGUS; ++i) {
-        int idx1 = fieldorder[0][i];
-        if (activefields[idx1])
-            Strcat(newbot1, vals[idx1]);
+#ifdef STATUS_HILITES
+    switch (tty_status_hilites[fldidx].behavior) {
+        case BL_TH_NONE:
+            tty_status_colors[fldidx] = CLR_MAX;
+            break;
+
+        case BL_TH_UPDOWN:
+            if (chg > 0)
+                tty_status_colors[fldidx] = tty_status_hilites[fldidx].over;
+            else if (chg < 0)
+                tty_status_colors[fldidx] = tty_status_hilites[fldidx].under;
+            else
+                tty_status_colors[fldidx] = CLR_MAX;
+            break;
+
+        case BL_TH_VAL_PERCENTAGE:
+           {
+            int pct_th = 0;
+            if (tty_status_hilites[fldidx].thresholdtype != ANY_INT) {
+                impossible("tty_status_update: unsupported percentage "
+                           "threshold type %d",
+                           tty_status_hilites[fldidx].thresholdtype);
+                break;
+            }
+            pct_th = tty_status_hilites[fldidx].threshold.a_int;
+            tty_status_colors[fldidx] = (percent >= pct_th)
+                                  ? tty_status_hilites[fldidx].over
+                                  : tty_status_hilites[fldidx].under;
+           }
+           break;
+
+        case BL_TH_VAL_ABSOLUTE:
+           {
+            int c = CLR_MAX;
+            int o = tty_status_hilites[fldidx].over;
+            int u = tty_status_hilites[fldidx].under;
+            anything *t = &tty_status_hilites[fldidx].threshold;
+            switch (tty_status_hilites[fldidx].thresholdtype) {
+            case ANY_LONG:
+                c = (value >= t->a_long) ? o : u;
+                break;
+            case ANY_INT:
+                c = (value >= t->a_int) ? o : u;
+                break;
+            case ANY_UINT:
+                c = ((unsigned long) value >= t->a_uint) ? o : u;
+                break;
+            case ANY_ULONG:
+                c = ((unsigned long) value >= t->a_ulong) ? o : u;
+                break;
+            case ANY_MASK32:
+                c = (value & t->a_ulong) ? o : u;
+                break;
+            default:
+                impossible("tty_status_update: unsupported absolute threshold "
+                       "type %d\n",
+                       tty_status_hilites[fldidx].thresholdtype);
+            break;
+            }
+            tty_status_colors[fldidx] = c;
+           }
+           break;
     }
-    newbot2[0] = '\0';
-    for (i = 0; fieldorder[1][i] != BL_BOGUS; ++i) {
-        int idx2 = fieldorder[1][i];
-        if (activefields[idx2])
-            Strcat(newbot2, vals[idx2]);
-    }
+#endif /* STATUS_HILITES */
+
+    /* This version copied from the genl_ version currently
+     * updates everything on the display, everytime
+     */
     curs(WIN_STATUS, 1, 0);
-    putstr(WIN_STATUS, 0, newbot1);
+    for (i = 0; fieldorder[0][i] != BL_FLUSH; ++i) {
+        int fldidx1 = fieldorder[0][i];
+        if (status_activefields[fldidx1]) {
+            if (tty_status_colors[fldidx1] < 0 &&
+                    tty_status_colors[fldidx1] >= -3) {
+                /* attribute, not a color */
+                attridx = tty_status_colors[fldidx1] + 3;
+                term_start_attr(statusattr[attridx]);
+                putstr(WIN_STATUS, 0, status_vals[fldidx1]);
+                term_end_attr(statusattr[attridx]);
+#ifdef TEXTCOLOR
+            } else if (tty_status_colors[fldidx1] != NO_COLOR) {
+                term_start_color(tty_status_colors[fldidx1]);
+                putstr(WIN_STATUS, 0, status_vals[fldidx1]);
+                term_end_color();
+#endif
+            } else
+                putstr(WIN_STATUS, 0, status_vals[fldidx1]);
+        }
+    }
     curs(WIN_STATUS, 1, 1);
-    putmixed(WIN_STATUS, 0, newbot2); /* putmixed() due to GOLD glyph */
+    for (i = 0; fieldorder[1][i] != BL_FLUSH; ++i) {
+        int fldidx2 = fieldorder[1][i];
+        if (status_activefields[fldidx2]) {
+            if (tty_status_colors[fldidx2] < 0 &&
+                    tty_status_colors[fldidx2] >= -3) {
+                /* attribute, not a color */
+                attridx = tty_status_colors[fldidx2] + 3;
+                term_start_attr(statusattr[attridx]);
+                putstr(WIN_STATUS, 0, status_vals[fldidx2]);
+                term_end_attr(statusattr[attridx]);
+#ifdef TEXTCOLOR
+            } else if (tty_status_colors[fldidx2] != NO_COLOR) {
+                term_start_color(tty_status_colors[fldidx2]);
+                if (fldidx2 == BL_GOLD) {
+                    /* putmixed() due to GOLD glyph */
+                   putmixed(WIN_STATUS, 0, status_vals[fldidx2]);
+		} else {
+                   putstr(WIN_STATUS, 0, status_vals[fldidx2]);
+                }
+                term_end_color();
+#endif
+            } else
+                putstr(WIN_STATUS, 0, status_vals[fldidx2]);
+        }
+    }
+    return;
 }
 
 #ifdef STATUS_HILITES
+/*
+ *  status_threshold(int fldidx, int threshholdtype, anything threshold, 
+ *                   int behavior, int under, int over)
+ *
+ *        -- called when a hiliting preference is added, changed, or
+ *           removed.
+ *        -- the fldindex identifies which field is having its hiliting
+ *           preference set. It is an integer index value from botl.h
+ *        -- fldindex could be any one of the following from botl.h:
+ *           BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, 
+ *           BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX, 
+ *           BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX, 
+ *           BL_LEVELDESC, BL_EXP, BL_CONDITION
+ *        -- datatype is P_INT, P_UINT, P_LONG, or P_MASK.
+ *        -- threshold is an "anything" union which can contain the 
+ *           datatype value.
+ *        -- behavior is used to define how threshold is used and can
+ *           be BL_TH_NONE, BL_TH_VAL_PERCENTAGE, BL_TH_VAL_ABSOLUTE,
+ *           or BL_TH_UPDOWN. BL_TH_NONE means don't do anything above
+ *           or below the threshold.  BL_TH_VAL_PERCENTAGE treats the
+ *           threshold value as a precentage of the maximum possible
+ *           value. BL_TH_VAL_ABSOLUTE means that the threshold is an
+ *           actual value. BL_TH_UPDOWN means that threshold is not
+ *           used, and the two below/above hilite values indicate how
+ *           to display something going down (under) or rising (over).		    
+ *        -- under is the hilite attribute used if value is below the 
+ *           threshold. The attribute can be BL_HILITE_NONE, 
+ *           BL_HILITE_INVERSE, BL_HILITE_BOLD (-1, -2, or -3), or one 
+ *           of the color indexes of CLR_BLACK, CLR_RED, CLR_GREEN, 
+ *           CLR_BROWN, CLR_BLUE, CLR_MAGENTA, CLR_CYAN, CLR_GRAY, 
+ *           CLR_ORANGE, CLR_BRIGHT_GREEN, CLR_YELLOW, CLR_BRIGHT_BLUE, 
+ *           CLR_BRIGHT_MAGENTA, CLR_BRIGHT_CYAN, or CLR_WHITE (0 - 15).
+ *        -- over is the hilite attribute used if value is at or above 
+ *           the threshold. The attribute can be BL_HILITE_NONE, 
+ *           BL_HILITE_INVERSE, BL_HILITE_BOLD (-1, -2, or -3), or one 
+ *           of the color indexes of CLR_BLACK, CLR_RED, CLR_GREEN, 
+ *           CLR_BROWN, CLR_BLUE, CLR_MAGENTA, CLR_CYAN, CLR_GRAY, 
+ *           CLR_ORANGE, CLR_BRIGHT_GREEN, CLR_YELLOW, CLR_BRIGHT_BLUE, 
+ *           CLR_BRIGHT_MAGENTA, CLR_BRIGHT_CYAN, or CLR_WHITE (0 - 15).
+ */
+
 void
 tty_status_threshold(fldidx, thresholdtype, threshold, behavior, under, over)
 int fldidx, thresholdtype;
 int behavior, under, over;
 anything threshold;
 {
+    tty_status_hilites[fldidx].thresholdtype = thresholdtype;
+    tty_status_hilites[fldidx].threshold = threshold;
+    tty_status_hilites[fldidx].behavior = behavior;
+    tty_status_hilites[fldidx].under = under;
+    tty_status_hilites[fldidx].over = over;
     return;
 }
+ 
 #endif /* STATUS_HILITES */
 #endif /*STATUS_VIA_WINDOWPORT*/
 

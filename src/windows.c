@@ -1,4 +1,4 @@
-/* NetHack 3.6	windows.c	$NHDT-Date: 1433087641 2015/05/31 15:54:01 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.30 $ */
+/* NetHack 3.6	windows.c	$NHDT-Date: 1433105394 2015/05/31 20:49:54 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.32 $ */
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -804,10 +804,10 @@ const char *string UNUSED;
 /* genl backward compat stuff                                                */
 /*****************************************************************************/
 
-const char *fieldnm[MAXBLSTATS];
-const char *fieldfmt[MAXBLSTATS];
-char *vals[MAXBLSTATS];
-boolean activefields[MAXBLSTATS];
+const char *status_fieldnm[MAXBLSTATS];
+const char *status_fieldfmt[MAXBLSTATS];
+char *status_vals[MAXBLSTATS];
+boolean status_activefields[MAXBLSTATS];
 NEARDATA winid WIN_STATUS;
 
 void
@@ -815,10 +815,10 @@ genl_status_init()
 {
     int i;
     for (i = 0; i < MAXBLSTATS; ++i) {
-        vals[i] = (char *) alloc(MAXCO);
-        *vals[i] = '\0';
-        activefields[i] = FALSE;
-        fieldfmt[i] = (const char *) 0;
+        status_vals[i] = (char *) alloc(MAXCO);
+        *status_vals[i] = '\0';
+        status_activefields[i] = FALSE;
+        status_fieldfmt[i] = (const char *) 0;
     }
     /* Use a window for the genl version; backward port compatibility */
     WIN_STATUS = create_nhwindow(NHW_STATUS);
@@ -833,9 +833,9 @@ genl_status_finish()
 
     /* free alloc'd memory here */
     for (i = 0; i < MAXBLSTATS; ++i) {
-        if (vals[i])
-            free((genericptr_t) vals[i]);
-        vals[i] = (char *) 0;
+        if (status_vals[i])
+            free((genericptr_t) status_vals[i]);
+        status_vals[i] = (char *) 0;
     }
 }
 
@@ -846,9 +846,9 @@ const char *nm;
 const char *fmt;
 boolean enable;
 {
-    fieldfmt[fieldidx] = fmt;
-    fieldnm[fieldidx] = nm;
-    activefields[fieldidx] = enable;
+    status_fieldfmt[fieldidx] = fmt;
+    status_fieldnm[fieldidx] = nm;
+    status_activefields[fieldidx] = enable;
 }
 
 void
@@ -863,52 +863,52 @@ genericptr_t ptr;
 
     enum statusfields fieldorder[2][15] = {
         { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
-          BL_SCORE, BL_BOGUS, BL_BOGUS, BL_BOGUS, BL_BOGUS, BL_BOGUS, BL_BOGUS},
+          BL_SCORE, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH},
         { BL_LEVELDESC, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX,
           BL_AC, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER,
-          BL_CAP, BL_CONDITION, BL_BOGUS}
+          BL_CAP, BL_CONDITION, BL_FLUSH}
     };
 
-    if (idx != BL_BOGUS) {
-        if (!activefields[idx])
+    if (idx != BL_FLUSH) {
+        if (!status_activefields[idx])
             return;
         switch (idx) {
         case BL_CONDITION:
             cond = *condptr;
-            *vals[idx] = '\0';
+            *status_vals[idx] = '\0';
             if (cond & BL_MASK_BLIND)
-                Strcat(vals[idx], " Blind");
+                Strcat(status_vals[idx], " Blind");
             if (cond & BL_MASK_CONF)
-                Strcat(vals[idx], " Conf");
+                Strcat(status_vals[idx], " Conf");
             if (cond & BL_MASK_FOODPOIS)
-                Strcat(vals[idx], " FoodPois");
+                Strcat(status_vals[idx], " FoodPois");
             if (cond & BL_MASK_ILL)
-                Strcat(vals[idx], " Ill");
+                Strcat(status_vals[idx], " Ill");
             if (cond & BL_MASK_STUNNED)
-                Strcat(vals[idx], " Stun");
+                Strcat(status_vals[idx], " Stun");
             if (cond & BL_MASK_HALLU)
-                Strcat(vals[idx], " Hallu");
+                Strcat(status_vals[idx], " Hallu");
             if (cond & BL_MASK_SLIMED)
-                Strcat(vals[idx], " Slime");
+                Strcat(status_vals[idx], " Slime");
             break;
         default:
-            Sprintf(vals[idx], fieldfmt[idx] ? fieldfmt[idx] : "%s", text);
+            Sprintf(status_vals[idx], status_fieldfmt[idx] ? status_fieldfmt[idx] : "%s", text);
             break;
         }
     }
 
     /* This genl version updates everything on the display, everytime */
     newbot1[0] = '\0';
-    for (i = 0; fieldorder[0][i] != BL_BOGUS; ++i) {
+    for (i = 0; fieldorder[0][i] != BL_FLUSH; ++i) {
         int idx1 = fieldorder[0][i];
-        if (activefields[idx1])
-            Strcat(newbot1, vals[idx1]);
+        if (status_activefields[idx1])
+            Strcat(newbot1, status_vals[idx1]);
     }
     newbot2[0] = '\0';
-    for (i = 0; fieldorder[1][i] != BL_BOGUS; ++i) {
+    for (i = 0; fieldorder[1][i] != BL_FLUSH; ++i) {
         int idx2 = fieldorder[1][i];
-        if (activefields[idx2])
-            Strcat(newbot2, vals[idx2]);
+        if (status_activefields[idx2])
+            Strcat(newbot2, status_vals[idx2]);
     }
     curs(WIN_STATUS, 1, 0);
     putstr(WIN_STATUS, 0, newbot1);

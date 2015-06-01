@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1433087625 2015/05/31 15:53:45 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.499 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1433105379 2015/05/31 20:49:39 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.500 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -155,7 +155,7 @@ E void NDECL(status_finish);
 E void FDECL(status_notify_windowport, (BOOLEAN_P));
 #ifdef STATUS_HILITES
 E boolean FDECL(set_status_hilites, (char *op, BOOLEAN_P));
-E void NDECL(clear_status_hilites);
+E void FDECL(clear_status_hilites, (BOOLEAN_P));
 E char *FDECL(get_status_hilites, (char *, int));
 E boolean NDECL(status_hilite_menu);
 #endif
