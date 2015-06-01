@@ -1,11 +1,11 @@
-.\" $NHDT-Branch: master $:$NHDT-Revision: 1.164 $ $NHDT-Date: 1432473674 2015/05/24 13:21:14 $
+.\" $NHDT-Branch: master $:$NHDT-Revision: 1.170 $ $NHDT-Date: 1433125736 2015/06/01 02:28:56 $
 .ds h0 "NetHack Guidebook
 .ds h1
 .ds h2 %
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "May 30, 2015
+.ds f2 "May 31, 2015
 .\" labeled paragraph start (should be part of tmac.n, but I don't want to
 .\" make changes to that file)
 .\" .PS word
@@ -56,8 +56,15 @@
 A Guide to the Mazes of Menace
 (Guidebook for NetHack)
 .au
-Eric S. Raymond
-(Edited and expanded for 3.6)
+Original version - Eric S. Raymond
+(Edited and expanded for 3.6 by Michael Allison, Mike Stephenson)
+.hn 1
+Preface - Version 3.6
+\fBThis version of the game is special in a particular way.  Near the end of 
+the development of 3.6, one of the significant inspirations for many of the 
+humorous and fun features found in the game, author \fBTerry Pratchett\fP, 
+passed away.  We have dedicated this version of the game in his memory.
+.pg
 .hn 1
 Introduction
 
@@ -3330,16 +3337,17 @@ joined the NetHack development team.
 .pg
 In September 2014, an interim snapshot of the code under development was 
 released publicly by other parties. Since that code was a work-in-progress 
-and had not gone through a period of debugging, it was decided that the 
-version numbers present on that code snapshot would be retired and never 
-used in an official NetHack release. An announcement was posted on the 
-devteam's official nethack.org website to that effect, stating that there 
-would never be a 3.4.4, 3.5, or 3.5.0 official release version.
+and had not gone through the process of debugging it as a suitable release,
+it was decided that the version numbers present on that code snapshot would
+be retired and never used in an official NetHack release. An announcement
+was posted on the devteam's official nethack.org website to that effect,
+stating that there would never be a 3.4.4, 3.5, or 3.5.0 official release
+version.
 .pg
-In January 2015, preparation began for the release of NetHack 3.6. The 3.6
-version merges work done by the development team since the previous release with 
-some of the beloved community patches. Many bugs were fixed and some code was 
-restructured.
+In November 2014, preparation began for the release of NetHack 3.6. The 3.6
+version merges work done by the development team since the previous release
+with some of the beloved community patches. Many bugs were fixed and a
+large amount of code was restructured.
 .pg
 \fBThe development team, as well as \fBSteve VanDevender\fP and 
 \fBKevin Smolkowski\fP ensured that NetHack 3.6.0 continued to operate on 
@@ -3351,11 +3359,6 @@ maintained the port of NetHack 3.6.0 for Mac.
 \fBMichael Allison\fP, \fBDerek S. Ray\fP, \fBYitzhak Sapir\fP, 
 \fBAlex Kompel\fP, and \fBDion Nicolaas\fP maintained the port of 
 NetHack 3.6.0 for Microsoft Windows.
-.pg
-\fBThis version of the game is special in a particular way.  Near the end of 
-the development of 3.6, one of the significant inspirations for many of the 
-humorous and fun features found in the game, author \fBTerry Pratchett\fP, 
-passed away.  This version of the game is dedicated to him.
 .pg
 The official NetHack web site is maintained by \fBKen Lorber\fP at http://www.nethack.org/.
 .pg

@@ -503,7 +503,6 @@ STATIC_OVL boolean FDECL(wc2_supported, (const char *));
 STATIC_DCL void FDECL(remove_autopickup_exception,
                       (struct autopickup_exception *));
 STATIC_OVL int FDECL(count_ape_maps, (int *, int *));
-STATIC_DCL const char *FDECL(clr2colorname, (int));
 STATIC_DCL const char *FDECL(attr2attrname, (int));
 STATIC_DCL int NDECL(query_color);
 STATIC_DCL int NDECL(query_msgtype);

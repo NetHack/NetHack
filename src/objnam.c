@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1432722918 2015/05/27 10:35:18 $  $NHDT-Branch: master $:$NHDT-Revision: 1.137 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1433058272 2015/05/31 07:44:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.141 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -550,9 +550,9 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
 
 /* similar to simple_typename but minimal_xname operates on a particular
    object rather than its general type; it formats the most basic info:
-    potion				-- if description not known
-    brown potion			-- if oc_name_known not set
-    potion of object detection	-- if discovered
+     potion                     -- if description not known
+     brown potion               -- if oc_name_known not set
+     potion of object detection -- if discovered
  */
 static char *
 minimal_xname(obj)
@@ -945,6 +945,14 @@ boolean with_price;
             if (bimanual(obj))
                 hand_s = makeplural(hand_s);
             Sprintf(eos(bp), " (weapon in %s)", hand_s);
+
+            if (warn_obj_cnt && obj == uwep && (EWarn_of_mon & W_WEP) != 0L) {
+                /* presumeably can be felt when blind */
+                Strcat(bp, " (glowing");
+                if (!Blind)
+                    Sprintf(eos(bp), " %s", glow_color(obj->oartifact));
+                Strcat(bp, ")");
+            }
         }
     }
     if (obj->owornmask & W_SWAPWEP) {
@@ -991,6 +999,7 @@ boolean with_price;
                 quotedprice, currency(quotedprice));
     } else if (with_price) {
         long price = get_cost_of_shop_item(obj);
+
         if (price > 0)
             Sprintf(eos(bp), " (%ld %s)", price, currency(price));
     }

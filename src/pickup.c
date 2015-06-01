@@ -2688,27 +2688,59 @@ dotip()
 
     /* check floor container(s) first; at most one will be accessed */
     if ((boxes = container_at(cc.x, cc.y, TRUE)) > 0) {
-        if (flags.verbose)
-            pline("There %s here.",
-                  (boxes > 1) ? "are containers" : "is a container");
         Sprintf(buf, "You can't tip %s while carrying so much.",
                 !flags.verbose ? "a container" : (boxes > 1) ? "one" : "it");
         if (!check_capacity(buf) && able_to_loot(cc.x, cc.y, FALSE)) {
-            for (cobj = level.objects[cc.x][cc.y]; cobj; cobj = nobj) {
-                nobj = cobj->nexthere;
-                if (!Is_container(cobj))
-                    continue;
 
-                c = ynq(safe_qbuf(qbuf, "There is ", " here, tip it?", cobj,
-                                  doname, ansimpleoname, "container"));
-                if (c == 'q')
+            if (boxes > 1) {
+                /* use menu to pick a container to tip */
+                int n, i;
+                winid win;
+                anything any;
+                menu_item *pick_list = NULL;
+                any = zeroany;
+                win = create_nhwindow(NHW_MENU);
+                start_menu(win);
+
+                for (cobj = level.objects[cc.x][cc.y]; cobj;
+                     cobj = cobj->nexthere)
+                    if (Is_container(cobj)) {
+                        any.a_obj = cobj;
+                        add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                                 doname(cobj), MENU_UNSELECTED);
+                    }
+                end_menu(win, "Tip which container?");
+                n = select_menu(win, PICK_ONE, &pick_list);
+                destroy_nhwindow(win);
+
+                if (n > 0) {
+                    for (i = 0; i < n; i++) {
+                        tipcontainer(pick_list[i].item.a_obj);
+                        free((genericptr_t) pick_list);
+                        return 1;
+                    }
+                }
+                if (pick_list)
+                    free((genericptr_t) pick_list);
+                if (n == -1)
                     return 0;
-                if (c == 'n')
-                    continue;
+            } else {
+                for (cobj = level.objects[cc.x][cc.y]; cobj; cobj = nobj) {
+                    nobj = cobj->nexthere;
+                    if (!Is_container(cobj))
+                        continue;
 
-                tipcontainer(cobj);
-                return 1;
-            } /* next cobj */
+                    c = ynq(safe_qbuf(qbuf, "There is ", " here, tip it?", cobj,
+                                      doname, ansimpleoname, "container"));
+                    if (c == 'q')
+                        return 0;
+                    if (c == 'n')
+                        continue;
+
+                    tipcontainer(cobj);
+                    return 1;
+                }
+            }
         }
     }
 

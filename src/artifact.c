@@ -1,4 +1,4 @@
-/* NetHack 3.6	artifact.c	$NHDT-Date: 1432946531 2015/05/30 00:42:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.89 $ */
+/* NetHack 3.6	artifact.c	$NHDT-Date: 1433060653 2015/05/31 08:24:13 $  $NHDT-Branch: master $:$NHDT-Revision: 1.91 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1784,10 +1784,12 @@ long *abil;
     unsigned long spfx;
     long wornbits;
     long wornmask =
-        (W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF | W_WEP | W_QUIVER
-         | W_SWAPWEP | W_ART | W_ARTI | W_AMUL | W_RINGL | W_RINGR | W_TOOL
-         | W_BALL | W_CHAIN | W_SADDLE | W_ARMU);
+        (W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF | W_ARMU
+         | W_AMUL | W_RINGL | W_RINGR | W_TOOL | W_ART | W_ARTI);
+         /* [do W_ART and W_ARTI actually belong here?] */
 
+    if (u.twoweap)
+        wornmask |= W_SWAPWEP;
     dtyp = abil_to_adtyp(abil);
     spfx = abil_to_spfx(abil);
     wornbits = (wornmask & *abil);
@@ -1795,14 +1797,21 @@ long *abil;
     for (obj = invent; obj; obj = obj->nobj) {
         if (obj->oartifact
             && ((abil != &EWarn_of_mon) || context.warntype.obj)) {
-            register const struct artifact *art = get_artifact(obj);
+            const struct artifact *art = get_artifact(obj);
+
             if (art) {
-                if (dtyp
-                    && (art->cary.adtyp == dtyp || art->defn.adtyp == dtyp))
-                    return obj;
-                if (spfx && ((art->cspfx & spfx) == spfx
-                             || (art->spfx & spfx) == spfx))
-                    return obj;
+                if (dtyp) {
+                    if (art->cary.adtyp == dtyp || art->defn.adtyp == dtyp)
+                        return obj;
+                }
+                if (spfx) {
+                    /* property conferred when carried */
+                    if ((art->cspfx & spfx) == spfx)
+                        return obj;
+                    /* property conferred when wielded or worn */
+                    if ((art->spfx & spfx) == spfx && obj->owornmask)
+                        return obj;
+                }
             }
         } else {
             if (wornbits && wornbits == (wornmask & obj->owornmask))
@@ -1812,32 +1821,39 @@ long *abil;
     return (struct obj *) 0;
 }
 
+const char *
+glow_color(arti_indx)
+int arti_indx;
+{
+    int colornum = artilist[arti_indx].acolor;
+    const char *colorstr = clr2colorname(colornum);
+
+    return hcolor(colorstr);
+}
+
 /* use for warning "glow" for Sting, Orcrist, and Grimtooth */
 void
 Sting_effects(orc_count)
-int orc_count;
+int orc_count; /* new count (warn_obj_cnt is old count); -1 is a flag value */
 {
     if (uwep
         && (uwep->oartifact == ART_STING
             || uwep->oartifact == ART_ORCRIST
             || uwep->oartifact == ART_GRIMTOOTH)) {
-        /*
-         * Toggling blindness in between warning messages can result in
-         *   Sting glows light blue!  [...]  Sting stops quivering.
-         * or
-         *   Sting quivers slightly.  [...]  Sting stops glowing.
-         * but addressing that is far more trouble than it's worth.
-         */
-        if (orc_count > 0 && warn_obj_cnt == 0) {
+        if (orc_count == -1 && warn_obj_cnt > 0) {
+            /* -1 means that blindess has just been toggled; give a
+               'continue' message that eventual 'stop' message will match */
+            pline("%s is %s.", bare_artifactname(uwep),
+                  !Blind ? "glowing" : "quivering");
+        } else if (orc_count > 0 && warn_obj_cnt == 0) {
+            /* 'start' message */
             if (!Blind)
                 pline("%s %s %s!", bare_artifactname(uwep),
-                      otense(uwep, "glow"),
-                      hcolor((uwep->oartifact == ART_GRIMTOOTH)
-                             ? NH_RED
-                             : NH_LIGHT_BLUE));
+                      otense(uwep, "glow"), glow_color(uwep->oartifact));
             else
                 pline("%s quivers slightly.", bare_artifactname(uwep));
         } else if (orc_count == 0 && warn_obj_cnt > 0) {
+            /* 'stop' message */
             pline("%s stops %s.", bare_artifactname(uwep),
                   !Blind ? "glowing" : "quivering");
         }
