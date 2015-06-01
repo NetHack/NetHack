@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1433115559 2015/05/31 23:39:19 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.98 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1433161993 2015/06/01 12:33:13 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.99 $ */
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3075,7 +3075,7 @@ tty_status_init()
 
     for (i = 0; i < MAXBLSTATS; ++i) {
 #ifdef STATUS_HILITES
-        tty_status_colors[i] = CLR_MAX; /* no color */
+        tty_status_colors[i] = NO_COLOR; /* no color */
         tty_status_hilites[i].thresholdtype = 0;
         tty_status_hilites[i].behavior = BL_TH_NONE;
         tty_status_hilites[i].under = BL_HILITE_NONE;
@@ -3130,7 +3130,7 @@ genericptr_t ptr;
     int statusattr[] = {ATR_BOLD, ATR_INVERSE, ATR_NONE};
     int attridx = 0;
     long value = -1L;
-
+    static boolean beenhere = FALSE;
     enum statusfields fieldorder[2][15] = {
         { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
           BL_SCORE, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH},
@@ -3174,7 +3174,7 @@ genericptr_t ptr;
 #ifdef STATUS_HILITES
     switch (tty_status_hilites[fldidx].behavior) {
         case BL_TH_NONE:
-            tty_status_colors[fldidx] = CLR_MAX;
+            tty_status_colors[fldidx] = NO_COLOR;
             break;
 
         case BL_TH_UPDOWN:
@@ -3183,7 +3183,7 @@ genericptr_t ptr;
             else if (chg < 0)
                 tty_status_colors[fldidx] = tty_status_hilites[fldidx].under;
             else
-                tty_status_colors[fldidx] = CLR_MAX;
+                tty_status_colors[fldidx] = NO_COLOR;
             break;
 
         case BL_TH_VAL_PERCENTAGE:
@@ -3204,7 +3204,7 @@ genericptr_t ptr;
 
         case BL_TH_VAL_ABSOLUTE:
            {
-            int c = CLR_MAX;
+            int c = NO_COLOR;
             int o = tty_status_hilites[fldidx].over;
             int u = tty_status_hilites[fldidx].under;
             anything *t = &tty_status_hilites[fldidx].threshold;
@@ -3236,9 +3236,34 @@ genericptr_t ptr;
     }
 #endif /* STATUS_HILITES */
 
-    /* This version copied from the genl_ version currently
+    /* For now, this version copied from the genl_ version currently
      * updates everything on the display, everytime
      */
+
+    if (!beenhere || !iflags.use_status_color) {
+        char newbot1[MAXCO], newbot2[MAXCO];
+
+        newbot1[0] = '\0';
+        for (i = 0; fieldorder[0][i] >= 0; ++i) {
+            int idx1 = fieldorder[0][i];
+            if (status_activefields[idx1])
+                Strcat(newbot1, status_vals[idx1]);
+        }
+        newbot2[0] = '\0';
+        for (i = 0; fieldorder[1][i] >= 0; ++i) {
+            int idx2 = fieldorder[1][i];
+            if (status_activefields[idx2])
+                Strcat(newbot2, status_vals[idx2]);
+        }
+
+        curs(WIN_STATUS, 1, 0);
+        putstr(WIN_STATUS, 0, newbot1);
+        curs(WIN_STATUS, 1, 1);
+        putmixed(WIN_STATUS, 0, newbot2); /* putmixed() due to GOLD glyph */
+        beenhere = TRUE;
+        return;
+    }
+
     curs(WIN_STATUS, 1, 0);
     for (i = 0; fieldorder[0][i] != BL_FLUSH; ++i) {
         int fldidx1 = fieldorder[0][i];
@@ -3251,10 +3276,12 @@ genericptr_t ptr;
                 putstr(WIN_STATUS, 0, status_vals[fldidx1]);
                 term_end_attr(statusattr[attridx]);
 #ifdef TEXTCOLOR
-            } else if (tty_status_colors[fldidx1] != NO_COLOR) {
-                term_start_color(tty_status_colors[fldidx1]);
+            } else if (tty_status_colors[fldidx1] != CLR_MAX) {
+                if (tty_status_colors[fldidx1] != NO_COLOR)
+                    term_start_color(tty_status_colors[fldidx1]);
                 putstr(WIN_STATUS, 0, status_vals[fldidx1]);
-                term_end_color();
+                if (tty_status_colors[fldidx1] != NO_COLOR)
+                    term_end_color();
 #endif
             } else
                 putstr(WIN_STATUS, 0, status_vals[fldidx1]);
@@ -3272,15 +3299,17 @@ genericptr_t ptr;
                 putstr(WIN_STATUS, 0, status_vals[fldidx2]);
                 term_end_attr(statusattr[attridx]);
 #ifdef TEXTCOLOR
-            } else if (tty_status_colors[fldidx2] != NO_COLOR) {
-                term_start_color(tty_status_colors[fldidx2]);
+            } else if (tty_status_colors[fldidx2] != CLR_MAX) {
+                if (tty_status_colors[fldidx2] != NO_COLOR)
+                    term_start_color(tty_status_colors[fldidx2]);
                 if (fldidx2 == BL_GOLD) {
                     /* putmixed() due to GOLD glyph */
                    putmixed(WIN_STATUS, 0, status_vals[fldidx2]);
 		} else {
                    putstr(WIN_STATUS, 0, status_vals[fldidx2]);
                 }
-                term_end_color();
+                if (tty_status_colors[fldidx2] != NO_COLOR)
+                    term_end_color();
 #endif
             } else
                 putstr(WIN_STATUS, 0, status_vals[fldidx2]);
