@@ -2864,9 +2864,14 @@ mswin_status_update(int idx, genericptr_t ptr, int chg, int percent)
                      0, 0);
             buf[0] = ochar;
             p = strchr(text, ':');
-            if (p)
+            if (p) {
                 strncpy(buf + 1, p, sizeof(buf) - 2);
-            value = atol(buf);
+                value = atol(p + 1);
+            } else {
+                buf[1] = ':';
+                strncpy(buf + 2, text, sizeof(buf) - 2);
+                value = atol(text);
+            }
             Sprintf(_status_vals[idx],
                     _status_fieldfmt[idx] ? _status_fieldfmt[idx] : "%s",
                     buf);
