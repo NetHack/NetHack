@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1433161993 2015/06/01 12:33:13 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.99 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1433201840 2015/06/01 23:37:20 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.100 $ */
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2181,8 +2181,14 @@ const char *str;
 
         (void) strncpy(&cw->data[cw->cury][j], str, cw->cols - j - 1);
         cw->data[cw->cury][cw->cols - 1] = '\0'; /* null terminate */
-        cw->cury = (cw->cury + 1) % 2;
-        cw->curx = 0;
+#ifdef STATUS_VIA_WINDOWPORT
+        if (!iflags.use_status_color) {
+#endif
+            cw->cury = (cw->cury + 1) % 2;
+            cw->curx = 0;
+#ifdef STATUS_VIA_WINDOWPORT
+	}
+#endif
         break;
     case NHW_MAP:
         tty_curs(window, cw->curx + 1, cw->cury);
