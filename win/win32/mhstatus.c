@@ -245,7 +245,11 @@ onWMPaint(HWND hWnd, WPARAM wParam, LPARAM lParam)
             vlen = strlen(data->vals[*f]);
             NH_A2W(data->vals[*f], wbuf, SIZE(wbuf));
 
-            if (data->colors[*f] == CLR_MAX
+            if (!iflags.use_status_hilites) {
+                SelectObject(hdc, normalFont);
+                SetBkColor(hdc, Bg);
+                SetTextColor(hdc, Fg);
+            } else if (data->colors[*f] == CLR_MAX
                 || data->colors[*f] == BL_HILITE_NONE) {
                 SelectObject(hdc, normalFont);
                 SetBkColor(hdc, Bg);
