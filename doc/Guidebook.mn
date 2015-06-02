@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "May 31, 2015
+.ds f2 "June 1, 2015
 .\" labeled paragraph start (should be part of tmac.n, but I don't want to
 .\" make changes to that file)
 .\" .PS word
@@ -2368,6 +2368,9 @@ Display a sparkly effect when a monster (including yourself) is hit by an
 attack to which it is resistant (default on).
 .lp standout
 Boldface monsters and ``\fB--More--\fP'' (default off).
+.lp statuscolors
+Enable coloring of status fields (default off).
+See ``Configuring Status Hilites'' for futher information.
 .lp suppress_alert
 This option may be set to a NetHack version level to suppress
 alert notification messages about feature changes for that 
@@ -2736,7 +2739,6 @@ on the same line will be shown in red color and underlined.
 You can have multiple MENUCOLOR entries in your config file,
 and the last MENUCOLOR-line in your config file that matches
 a menu line will be used for the line.
-.pg
 .hn 2
 Configuring User Sounds
 .pg
@@ -2764,6 +2766,54 @@ the volume to be set while playing the sound file.
 .PE
 .lp ""
 The pattern should be a POSIX extended regular expression.
+.pg
+.hn 2
+Configuring Status Hilites
+.pg
+Your copy of NetHack may have been compiled with support for {\tStatus Hilites}.
+If so, you can customize your game display by setting thresholds to 
+change the color or appearance of fields in the status display.
+.pg
+For example, the following line in your config file will cause
+the hitpoints field to display in the color red if your hitpoints
+drop to or below a threshold of 30%:
+.si
+.lp OPTION=hilite_status: hitpoints/30%/red/normal
+.ei
+.pg
+For another example, the following line in your config file will cause
+wisdom to be displayed red if it drops and green if it rises.
+.si
+.lp OPTION=hilite_status: wisdom/updown/red/green
+.ei
+You can adjust the display of the following status fields:
+.TS S
+center;
+c c c.
+.\"TABLE_START
+title	strength	dexterity
+constitution	intelligence	wisdom
+charisma	alignment	score
+carrying-capacity	gold	power
+power-max	experience-level	armor-class
+HD	time	hunger
+hitpoints	hitpoints-max	dungeon-level
+experience	condition
+.\"TABLE_END  Do not delete this line.
+.TE
+.lp ""
+Allowed colors are black, red, green, brown, blue, magenta, cyan, gray,
+orange, lightgreen, yellow, lightblue, lightmagenta, lightcyan, and white.
+.lp ""
+Allowed attributes are bold, inverse, normal.
+Note that the platform used may interpret the attributes any way it
+wants.
+.lp ""
+Behaviours can occur based on percentage thresholds, updown, or absolute values.
+The in-game options menu can help you determine the correct syntax for a 
+config file.
+.lp ""
+The whole feature can be disable by setting option {\itstatuscolors} off.
 .pg
 .hn 2
 Modifying NetHack Symbols 
