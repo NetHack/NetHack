@@ -196,7 +196,11 @@ static struct Bool_Opt {
     { "sparkle", &flags.sparkle, TRUE, SET_IN_GAME },
     { "splash_screen", &iflags.wc_splash_screen, TRUE, DISP_IN_GAME }, /*WC*/
     { "standout", &flags.standout, FALSE, SET_IN_GAME },
-    { "statushilites", &iflags.use_status_hilites, FALSE, SET_IN_GAME },
+#ifdef STATUS_VIA_WINDOWPORT
+#ifdef STATUS_HILITES
+    { "statushilites", &iflags.use_status_hilites, TRUE, SET_IN_GAME },
+#endif
+#endif
     { "tiled_map", &iflags.wc_tiled_map, PREFER_TILED, DISP_IN_GAME }, /*WC*/
     { "time", &flags.time, FALSE, SET_IN_GAME },
 #ifdef TIMED_DELAY
