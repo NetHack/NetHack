@@ -41,7 +41,10 @@ OPTIONS=symset:IBMGraphics_2,roguesymset:RogueEpyx
 #OPTIONS=scores:10 top/2 around/own
 #OPTIONS=nolegacy,noverbose
 #OPTIONS=menustyle:traditional
+#OPTIONS=hilite_status:hitpoints/30%/bright-magenta/normal
 
+# Turn off all status hilites.
+#OPTIONS=!statushilites
 #
 # General options.  You might also set "silent" so as not to attract
 # the boss's attention.
