@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1433050874 2015/05/31 05:41:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.499 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1433207912 2015/06/02 01:18:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.500 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1982,8 +1982,8 @@ E int FDECL(randgend, (int, int));
 E int FDECL(randalign, (int, int));
 E int FDECL(str2role, (const char *));
 E int FDECL(str2race, (const char *));
-E int FDECL(str2gend, (char *));
-E int FDECL(str2align, (char *));
+E int FDECL(str2gend, (const char *));
+E int FDECL(str2align, (const char *));
 E boolean FDECL(ok_role, (int, int, int, int));
 E int FDECL(pick_role, (int, int, int, int));
 E boolean FDECL(ok_race, (int, int, int, int));
@@ -1993,7 +1993,9 @@ E int FDECL(pick_gend, (int, int, int, int));
 E boolean FDECL(ok_align, (int, int, int, int));
 E int FDECL(pick_align, (int, int, int, int));
 E void NDECL(rigid_role_checks);
-E boolean FDECL(setrolefilter, (char *));
+E boolean FDECL(setrolefilter, (const char *));
+E boolean NDECL(gotrolefilter);
+E void NDECL(clearrolefilter);
 E char *FDECL(build_plselection_prompt, (char *, int, int, int, int, int));
 E char *FDECL(root_plselection_prompt, (char *, int, int, int, int, int));
 E void NDECL(plnamesuffix);
