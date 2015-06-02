@@ -1,4 +1,4 @@
-/* NetHack 3.6	config.h	$NHDT-Date: 1433209251 2015/06/02 01:40:51 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.88 $ */
+/* NetHack 3.6	config.h	$NHDT-Date: 1433279371 2015/06/02 21:09:31 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.89 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -431,8 +431,8 @@ typedef unsigned char uchar;
  * bugs left here.
  */
 
-#define STATUS_VIA_WINDOWPORT /* re-work of the status line updating process */
-#define STATUS_HILITES        /* support hilites of status fields */
+/* #define STATUS_VIA_WINDOWPORT */ /* re-work of the status line updating process */
+/* #define STATUS_HILITES       */ /* support hilites of status fields */
 /* #define WINCHAIN*/               /* stacked window systems */
 
 /* End of Section 5 */
