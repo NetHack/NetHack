@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: master $:$NHDT-Revision: 1.170 $ $NHDT-Date: 1433125736 2015/06/01 02:28:56 $
+.\" $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.172 $ $NHDT-Date: 1433212164 2015/06/02 02:29:24 $
 .ds h0 "NetHack Guidebook
 .ds h1
 .ds h2 %
@@ -2368,7 +2368,7 @@ Display a sparkly effect when a monster (including yourself) is hit by an
 attack to which it is resistant (default on).
 .lp standout
 Boldface monsters and ``\fB--More--\fP'' (default off).
-.lp statuscolors
+.lp statushilites
 Enable coloring of status fields (default off).
 See ``Configuring Status Hilites'' for futher information.
 .lp suppress_alert
@@ -2813,7 +2813,7 @@ Behaviours can occur based on percentage thresholds, updown, or absolute values.
 The in-game options menu can help you determine the correct syntax for a 
 config file.
 .lp ""
-The whole feature can be disable by setting option {\itstatuscolors} off.
+The whole feature can be disable by setting option statushilites off.
 .pg
 .hn 2
 Modifying NetHack Symbols 

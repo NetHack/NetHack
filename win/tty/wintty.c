@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1433209190 2015/06/02 01:39:50 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.101 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1433212192 2015/06/02 02:29:52 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.103 $ */
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2363,7 +2363,7 @@ const char *str;
         (void) strncpy(&cw->data[cw->cury][j], str, cw->cols - j - 1);
         cw->data[cw->cury][cw->cols - 1] = '\0'; /* null terminate */
 #ifdef STATUS_VIA_WINDOWPORT
-        if (!iflags.use_status_color) {
+        if (!iflags.use_status_hilites) {
 #endif
             cw->cury = (cw->cury + 1) % 2;
             cw->curx = 0;
@@ -3427,7 +3427,7 @@ genericptr_t ptr;
      * updates everything on the display, everytime
      */
 
-    if (!beenhere || !iflags.use_status_color) {
+    if (!beenhere || !iflags.use_status_hilites) {
         char newbot1[MAXCO], newbot2[MAXCO];
 
         newbot1[0] = '\0';
