@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1433212185 2015/06/02 02:29:45 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.213 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1433280017 2015/06/02 21:20:17 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.215 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -902,10 +902,21 @@ const char *opts;
 #endif
 
     if (from_file)
-        raw_printf("Bad syntax in OPTIONS in %s: %s.", lastconfigfile, opts);
+        raw_printf("Bad syntax in OPTIONS in %s: %s%s.\n", lastconfigfile,
+#ifdef WIN32
+                    "\n",
+#else
+                    "",
+#endif
+                    opts);
     else
-        raw_printf("Bad syntax in NETHACKOPTIONS: %s.", opts);
-
+        raw_printf("Bad syntax in NETHACKOPTIONS: %s%s.\n",
+#ifdef WIN32
+                    "\n",
+#else
+                    "",
+#endif
+                    opts);
     wait_synch();
 }
 
