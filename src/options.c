@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1433280017 2015/06/02 21:20:17 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.215 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1433283602 2015/06/02 22:20:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.216 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -196,10 +196,10 @@ static struct Bool_Opt {
     { "sparkle", &flags.sparkle, TRUE, SET_IN_GAME },
     { "splash_screen", &iflags.wc_splash_screen, TRUE, DISP_IN_GAME }, /*WC*/
     { "standout", &flags.standout, FALSE, SET_IN_GAME },
-#ifdef STATUS_VIA_WINDOWPORT
-#ifdef STATUS_HILITES
+#if defined(STATUS_VIA_WINDOWPORT) && defined(STATUS_HILITES)
     { "statushilites", &iflags.use_status_hilites, TRUE, SET_IN_GAME },
-#endif
+#else
+    { "statushilites", &iflags.use_status_hilites, FALSE, DISP_IN_GAME },
 #endif
     { "tiled_map", &iflags.wc_tiled_map, PREFER_TILED, DISP_IN_GAME }, /*WC*/
     { "time", &flags.time, FALSE, SET_IN_GAME },
