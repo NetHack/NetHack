@@ -159,6 +159,11 @@ STATIC_DCL const char *FDECL(compress_str, (const char *));
 STATIC_DCL void FDECL(tty_putsym, (winid, int, int, CHAR_P));
 STATIC_DCL char *FDECL(copy_of, (const char *));
 STATIC_DCL void FDECL(bail, (const char *)); /* __attribute__((noreturn)) */
+STATIC_DCL void FDECL(setup_rolemenu, (winid, BOOLEAN_P, int, int, int));
+STATIC_DCL void FDECL(setup_racemenu, (winid, BOOLEAN_P, int, int, int));
+STATIC_DCL void FDECL(setup_gendmenu, (winid, BOOLEAN_P, int, int, int));
+STATIC_DCL void FDECL(setup_algnmenu, (winid, BOOLEAN_P, int, int, int));
+STATIC_DCL boolean NDECL(reset_role_filtering);
 
 /*
  * A string containing all the default commands -- to add to a list
@@ -328,7 +333,7 @@ tty_player_selection()
 {
     int i, k, n, choice, nextpick;
     boolean getconfirmation;
-    char pick4u = 'n', thisch, lastch = 0;
+    char pick4u = 'n';
     char pbuf[QBUFSZ], plbuf[QBUFSZ];
     winid win;
     anything any;
@@ -352,8 +357,8 @@ tty_player_selection()
     if (ROLE == ROLE_NONE || RACE == ROLE_NONE || GEND == ROLE_NONE
         || ALGN == ROLE_NONE) {
         int echoline;
-        char *prompt =
-            build_plselection_prompt(pbuf, QBUFSZ, ROLE, RACE, GEND, ALGN);
+        char *prompt = build_plselection_prompt(pbuf, QBUFSZ,
+                                                ROLE, RACE, GEND, ALGN);
 
         /* this prompt string ends in "[ynaq]?":
            y - game picks role,&c then asks player to confirm;
@@ -405,36 +410,13 @@ makepicks:
                     }
                 } else {
                     /* Prompt for a role */
-                    char rolenamebuf[QBUFSZ];
-
                     tty_clear_nhwindow(BASE_WINDOW);
                     role_selection_prolog(RS_ROLE, BASE_WINDOW);
                     win = create_nhwindow(NHW_MENU);
                     start_menu(win);
-                    any = zeroany; /* zero out all bits */
-                    for (i = 0; roles[i].name.m; i++) {
-                        if (!ok_role(i, RACE, GEND, ALGN))
-                            continue;
-                        any.a_int = i + 1; /* must be non-zero */
-                        thisch = lowc(roles[i].name.m[0]);
-                        if (thisch == lastch)
-                            thisch = highc(thisch);
-                        Strcpy(rolenamebuf, roles[i].name.m);
-                        if (roles[i].name.f) {
-                            /* role has distinct name for female (C,P) */
-                            if (GEND == 1) {
-                                /* female already chosen; replace male name */
-                                Strcpy(rolenamebuf, roles[i].name.f);
-                            } else if (GEND < 0) {
-                                /* not chosen yet; append slash+female name */
-                                Strcat(rolenamebuf, "/");
-                                Strcat(rolenamebuf, roles[i].name.f);
-                            }
-                        }
-                        add_menu(win, NO_GLYPH, &any, thisch, 0, ATR_NONE,
-                                 an(rolenamebuf), MENU_UNSELECTED);
-                        lastch = thisch;
-                    }
+                    /* populate the menu with role choices */
+                    setup_rolemenu(win, TRUE, RACE, GEND, ALGN);
+                    /* add miscellaneous menu entries */
                     role_menu_extra(ROLE_RANDOM, win);
                     any.a_int = 0; /* separator, not a choice */
                     add_menu(win, NO_GLYPH, &any, ' ', 0, ATR_NONE, "",
@@ -442,6 +424,8 @@ makepicks:
                     role_menu_extra(RS_RACE, win);
                     role_menu_extra(RS_GENDER, win);
                     role_menu_extra(RS_ALGNMNT, win);
+                    if (gotrolefilter())
+                        role_menu_extra(RS_filter, win);
                     role_menu_extra(ROLE_NONE, win); /* quit */
                     Strcpy(pbuf, "Pick a role or profession");
                     end_menu(win, pbuf);
@@ -462,6 +446,10 @@ makepicks:
                     } else if (choice == RS_menu_arg(RS_RACE)) {
                         RACE = k = ROLE_NONE;
                         nextpick = RS_RACE;
+                    } else if (choice == RS_menu_arg(RS_filter)) {
+                        ROLE = k = ROLE_NONE;
+                        (void) reset_role_filtering();
+                        nextpick = RS_ROLE;
                     } else if (choice == ROLE_RANDOM) {
                         k = pick_role(RACE, GEND, ALGN, PICK_RANDOM);
                         if (k < 0)
@@ -510,14 +498,9 @@ makepicks:
                         win = create_nhwindow(NHW_MENU);
                         start_menu(win);
                         any = zeroany; /* zero out all bits */
-                        for (i = 0; races[i].noun; i++) {
-                            if (!ok_race(ROLE, i, GEND, ALGN))
-                                continue;
-                            any.a_int = i + 1; /* must be non-zero */
-                            add_menu(win, NO_GLYPH, &any, races[i].noun[0], 0,
-                                     ATR_NONE, races[i].noun,
-                                     MENU_UNSELECTED);
-                        }
+                        /* populate the menu with role choices */
+                        setup_racemenu(win, TRUE, ROLE, GEND, ALGN);
+                        /* add miscellaneous menu entries */
                         role_menu_extra(ROLE_RANDOM, win);
                         any.a_int = 0; /* separator, not a choice */
                         add_menu(win, NO_GLYPH, &any, ' ', 0, ATR_NONE, "",
@@ -525,12 +508,14 @@ makepicks:
                         role_menu_extra(RS_ROLE, win);
                         role_menu_extra(RS_GENDER, win);
                         role_menu_extra(RS_ALGNMNT, win);
+                        if (gotrolefilter())
+                            role_menu_extra(RS_filter, win);
                         role_menu_extra(ROLE_NONE, win); /* quit */
                         Strcpy(pbuf, "Pick a race or species");
                         end_menu(win, pbuf);
                         n = select_menu(win, PICK_ONE, &selected);
-                        choice =
-                            (n == 1) ? selected[0].item.a_int : ROLE_NONE;
+                        choice = (n == 1) ? selected[0].item.a_int
+                                          : ROLE_NONE;
                         if (selected)
                             free((genericptr_t) selected), selected = 0;
                         destroy_nhwindow(win);
@@ -546,6 +531,12 @@ makepicks:
                         } else if (choice == RS_menu_arg(RS_ROLE)) {
                             ROLE = k = ROLE_NONE;
                             nextpick = RS_ROLE;
+                        } else if (choice == RS_menu_arg(RS_filter)) {
+                            RACE = k = ROLE_NONE;
+                            if (reset_role_filtering())
+                                nextpick = RS_ROLE;
+                            else
+                                nextpick = RS_RACE;
                         } else if (choice == ROLE_RANDOM) {
                             k = pick_race(ROLE, GEND, ALGN, PICK_RANDOM);
                             if (k < 0)
@@ -560,8 +551,8 @@ makepicks:
         }     /* picking race */
 
         if (nextpick == RS_GENDER) {
-            nextpick =
-                (ROLE < 0) ? RS_ROLE : (RACE < 0) ? RS_RACE : RS_ALGNMNT;
+            nextpick = (ROLE < 0) ? RS_ROLE : (RACE < 0) ? RS_RACE
+                       : RS_ALGNMNT;
             /* Select a gender, if necessary;
                force compatibility with role/race, try for compatibility
                with pre-selected alignment. */
@@ -596,14 +587,9 @@ makepicks:
                         win = create_nhwindow(NHW_MENU);
                         start_menu(win);
                         any = zeroany; /* zero out all bits */
-                        for (i = 0; i < ROLE_GENDERS; i++) {
-                            if (!ok_gend(ROLE, RACE, i, ALGN))
-                                continue;
-                            any.a_int = i + 1; /* non-zero */
-                            add_menu(win, NO_GLYPH, &any, genders[i].adj[0],
-                                     0, ATR_NONE, genders[i].adj,
-                                     MENU_UNSELECTED);
-                        }
+                        /* populate the menu with gender choices */
+                        setup_gendmenu(win, TRUE, ROLE, RACE, ALGN);
+                        /* add miscellaneous menu entries */
                         role_menu_extra(ROLE_RANDOM, win);
                         any.a_int = 0; /* separator, not a choice */
                         add_menu(win, NO_GLYPH, &any, ' ', 0, ATR_NONE, "",
@@ -611,12 +597,14 @@ makepicks:
                         role_menu_extra(RS_ROLE, win);
                         role_menu_extra(RS_RACE, win);
                         role_menu_extra(RS_ALGNMNT, win);
+                        if (gotrolefilter())
+                            role_menu_extra(RS_filter, win);
                         role_menu_extra(ROLE_NONE, win); /* quit */
                         Strcpy(pbuf, "Pick a gender or sex");
                         end_menu(win, pbuf);
                         n = select_menu(win, PICK_ONE, &selected);
-                        choice =
-                            (n == 1) ? selected[0].item.a_int : ROLE_NONE;
+                        choice = (n == 1) ? selected[0].item.a_int
+                                          : ROLE_NONE;
                         if (selected)
                             free((genericptr_t) selected), selected = 0;
                         destroy_nhwindow(win);
@@ -632,6 +620,12 @@ makepicks:
                         } else if (choice == RS_menu_arg(RS_ROLE)) {
                             ROLE = k = ROLE_NONE;
                             nextpick = RS_ROLE;
+                        } else if (choice == RS_menu_arg(RS_filter)) {
+                            GEND = k = ROLE_NONE;
+                            if (reset_role_filtering())
+                                nextpick = RS_ROLE;
+                            else
+                                nextpick = RS_GENDER;
                         } else if (choice == ROLE_RANDOM) {
                             k = pick_gend(ROLE, RACE, ALGN, PICK_RANDOM);
                             if (k < 0)
@@ -646,8 +640,7 @@ makepicks:
         }     /* picking gender */
 
         if (nextpick == RS_ALGNMNT) {
-            nextpick =
-                (ROLE < 0) ? RS_ROLE : (RACE < 0) ? RS_RACE : RS_GENDER;
+            nextpick = (ROLE < 0) ? RS_ROLE : (RACE < 0) ? RS_RACE : RS_GENDER;
             /* Select an alignment, if necessary;
                force compatibility with role/race/gender. */
             if (ALGN < 0 || !validalign(ROLE, RACE, ALGN)) {
@@ -681,14 +674,7 @@ makepicks:
                         win = create_nhwindow(NHW_MENU);
                         start_menu(win);
                         any = zeroany; /* zero out all bits */
-                        for (i = 0; i < ROLE_ALIGNS; i++) {
-                            if (!ok_align(ROLE, RACE, GEND, i))
-                                continue;
-                            any.a_int = i + 1; /* non-zero */
-                            add_menu(win, NO_GLYPH, &any, aligns[i].adj[0], 0,
-                                     ATR_NONE, aligns[i].adj,
-                                     MENU_UNSELECTED);
-                        }
+                        setup_algnmenu(win, TRUE, ROLE, RACE, GEND);
                         role_menu_extra(ROLE_RANDOM, win);
                         any.a_int = 0; /* separator, not a choice */
                         add_menu(win, NO_GLYPH, &any, ' ', 0, ATR_NONE, "",
@@ -696,12 +682,14 @@ makepicks:
                         role_menu_extra(RS_ROLE, win);
                         role_menu_extra(RS_RACE, win);
                         role_menu_extra(RS_GENDER, win);
+                        if (gotrolefilter())
+                            role_menu_extra(RS_filter, win);
                         role_menu_extra(ROLE_NONE, win); /* quit */
                         Strcpy(pbuf, "Pick an alignment or creed");
                         end_menu(win, pbuf);
                         n = select_menu(win, PICK_ONE, &selected);
-                        choice =
-                            (n == 1) ? selected[0].item.a_int : ROLE_NONE;
+                        choice = (n == 1) ? selected[0].item.a_int
+                                          : ROLE_NONE;
                         if (selected)
                             free((genericptr_t) selected), selected = 0;
                         destroy_nhwindow(win);
@@ -717,6 +705,12 @@ makepicks:
                         } else if (choice == RS_menu_arg(RS_ROLE)) {
                             ROLE = k = ROLE_NONE;
                             nextpick = RS_ROLE;
+                        } else if (choice == RS_menu_arg(RS_filter)) {
+                            ALGN = k = ROLE_NONE;
+                            if (reset_role_filtering())
+                                nextpick = RS_ROLE;
+                            else
+                                nextpick = RS_ALGNMNT;
                         } else if (choice == ROLE_RANDOM) {
                             k = pick_align(ROLE, RACE, GEND, PICK_RANDOM);
                             if (k < 0)
@@ -812,11 +806,11 @@ makepicks:
                 /* plnamesuffix() can change any or all of ROLE, RACE,
                    GEND, ALGN; we'll override that and honor only the name */
                 saveROLE = ROLE, saveRACE = RACE, saveGEND = GEND,
-                saveALGN = ALGN;
+                    saveALGN = ALGN;
                 *plname = '\0';
                 plnamesuffix(); /* calls askname() when plname[] is empty */
                 ROLE = saveROLE, RACE = saveRACE, GEND = saveGEND,
-                ALGN = saveALGN;
+                    ALGN = saveALGN;
             }
             break; /* getconfirmation is still True */
         case 2:    /* 'n' */
@@ -847,10 +841,197 @@ give_up:
     return;
 }
 
+STATIC_OVL boolean
+reset_role_filtering()
+{
+    winid win;
+    anything any;
+    int i, n;
+    menu_item *selected = 0;
+
+    win = create_nhwindow(NHW_MENU);
+    start_menu(win);
+    any = zeroany;
+
+    /* no extra blank line preceding this entry; end_menu supplies one */
+    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
+             "Unacceptable roles", MENU_UNSELECTED);
+    setup_rolemenu(win, FALSE, ROLE_NONE, ROLE_NONE, ROLE_NONE);
+
+    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
+    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
+             "Unacceptable races", MENU_UNSELECTED);
+    setup_racemenu(win, FALSE, ROLE_NONE, ROLE_NONE, ROLE_NONE);
+
+    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
+    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
+             "Unacceptable genders", MENU_UNSELECTED);
+    setup_gendmenu(win, FALSE, ROLE_NONE, ROLE_NONE, ROLE_NONE);
+
+    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
+    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
+             "Uncceptable alignments", MENU_UNSELECTED);
+    setup_algnmenu(win, FALSE, ROLE_NONE, ROLE_NONE, ROLE_NONE);
+
+    end_menu(win, "Pick all that apply");
+    n = select_menu(win, PICK_ANY, &selected);
+
+    if (n > 0) {
+        clearrolefilter();
+        for (i = 0; i < n; i++)
+            setrolefilter(selected[i].item.a_string);
+
+        ROLE = RACE = GEND = ALGN = ROLE_NONE;
+    }
+    if (selected)
+        free((genericptr_t) selected), selected = 0;
+    destroy_nhwindow(win);
+    return (n > 0) ? TRUE : FALSE;
+}
+
 #undef ROLE
 #undef RACE
 #undef GEND
 #undef ALGN
+
+/* add entries a-Archeologist, b-Barbarian, &c to menu being built in 'win' */
+STATIC_OVL void
+setup_rolemenu(win, filtering, race, gend, algn)
+winid win;
+boolean filtering; /* True => exclude filtered roles; False => filter reset */
+int race, gend, algn; /* all ROLE_NONE for !filtering case */
+{
+    anything any;
+    int i;
+    boolean role_ok;
+    char thisch, lastch = '\0', rolenamebuf[50];
+
+    any = zeroany; /* zero out all bits */
+    for (i = 0; roles[i].name.m; i++) {
+        role_ok = ok_role(i, race, gend, algn);
+        if (filtering && !role_ok)
+            continue;
+        if (filtering)
+            any.a_int = i + 1;
+        else
+            any.a_string = roles[i].name.m;
+        thisch = lowc(*roles[i].name.m);
+        if (thisch == lastch)
+            thisch = highc(thisch);
+        Strcpy(rolenamebuf, roles[i].name.m);
+        if (roles[i].name.f) {
+            /* role has distinct name for female (C,P) */
+            if (gend == 1) {
+                /* female already chosen; replace male name */
+                Strcpy(rolenamebuf, roles[i].name.f);
+            } else if (gend < 0) {
+                /* not chosen yet; append slash+female name */
+                Strcat(rolenamebuf, "/");
+                Strcat(rolenamebuf, roles[i].name.f);
+            }
+        }
+        /* !filtering implies reset_role_filtering() where we want to
+           mark this role as preseleted if current filter excludes it */
+        add_menu(win, NO_GLYPH, &any, thisch, 0, ATR_NONE, an(rolenamebuf),
+                 (!filtering && !role_ok) ? MENU_SELECTED : MENU_UNSELECTED);
+        lastch = thisch;
+    }
+}
+
+STATIC_OVL void
+setup_racemenu(win, filtering, role, gend, algn)
+winid win;
+boolean filtering;
+int role, gend, algn;
+{
+    anything any;
+    boolean race_ok;
+    int i;
+    char this_ch;
+
+    any = zeroany;
+    for (i = 0; races[i].noun; i++) {
+        race_ok = ok_race(role, i, gend, algn);
+        if (filtering && !race_ok)
+            continue;
+        if (filtering)
+            any.a_int = i + 1;
+        else
+            any.a_string = races[i].noun;
+        this_ch = *races[i].noun;
+        /* filtering: picking race, so choose by first letter, with
+           capital letter as unseen accelerator;
+           !filtering: resetting filter rather than picking, choose by
+           capital letter since lowercase role letters will be present */
+        add_menu(win, NO_GLYPH, &any,
+                 filtering ? this_ch : highc(this_ch),
+                 filtering ? highc(this_ch) : 0,
+                 ATR_NONE, races[i].noun,
+                 (!filtering && !race_ok) ? MENU_SELECTED : MENU_UNSELECTED);
+    }
+}
+
+STATIC_DCL void
+setup_gendmenu(win, filtering, role, race, algn)
+winid win;
+boolean filtering;
+int role, race, algn;
+{
+    anything any;
+    boolean gend_ok;
+    int i;
+    char this_ch;
+
+    any = zeroany;
+    for (i = 0; i < ROLE_GENDERS; i++) {
+        gend_ok = ok_gend(role, race, i, algn);
+        if (filtering && !gend_ok)
+            continue;
+        if (filtering)
+            any.a_int = i + 1;
+        else
+            any.a_string = genders[i].adj;
+        this_ch = *genders[i].adj;
+        /* (see setup_racemenu for explanation of selector letters
+           and setup_rolemenu for preselection) */
+        add_menu(win, NO_GLYPH, &any,
+                 filtering ? this_ch : highc(this_ch),
+                 filtering ? highc(this_ch) : 0,
+                 ATR_NONE, genders[i].adj,
+                 (!filtering && !gend_ok) ? MENU_SELECTED : MENU_UNSELECTED);
+    }
+}
+
+STATIC_DCL void
+setup_algnmenu(win, filtering, role, race, gend)
+winid win;
+boolean filtering;
+int role, race, gend;
+{
+    anything any;
+    boolean algn_ok;
+    int i;
+    char this_ch;
+
+    any = zeroany;
+    for (i = 0; i < ROLE_ALIGNS; i++) {
+        algn_ok = ok_align(role, race, gend, i);
+        if (filtering && !algn_ok)
+            continue;
+        if (filtering)
+            any.a_int = i + 1;
+        else
+            any.a_string = aligns[i].adj;
+        this_ch = *aligns[i].adj;
+        /* (see setup_racemenu for explanation of selector letters
+           and setup_rolemenu for preselection) */
+        add_menu(win, NO_GLYPH, &any,
+                 filtering ? this_ch : highc(this_ch),
+                 filtering ? highc(this_ch) : 0,
+                 ATR_NONE, aligns[i].adj,
+                 (!filtering && !algn_ok) ? MENU_SELECTED : MENU_UNSELECTED);
+    }
+}
 
 /*
  * plname is filled either by an option (-u Player  or  -uPlayer) or

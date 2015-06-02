@@ -1,4 +1,4 @@
-/* NetHack 3.6	winprocs.h	$NHDT-Date: 1432512776 2015/05/25 00:12:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.34 $ */
+/* NetHack 3.6	winprocs.h	$NHDT-Date: 1433207914 2015/06/02 01:18:34 $  $NHDT-Branch: master $:$NHDT-Revision: 1.35 $ */
 /* Copyright (c) David Cohrs, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -289,7 +289,8 @@ struct wc_Opt {
 #define RS_RACE 2
 #define RS_GENDER 3
 #define RS_ALGNMNT 4
-#define RS_menu_arg(x) (ROLE_RANDOM - ((x) + 1)) /* 0..4 -> -3..-7 */
+#define RS_filter 5
+#define RS_menu_arg(x) (ROLE_RANDOM - ((x) + 1)) /* 0..5 -> -3..-8 */
 
 /* Choose_windows() may be called multiple times; these constants tell the
  * init function whether the window system is coming or going. */

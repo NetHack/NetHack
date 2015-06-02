@@ -1,4 +1,4 @@
-/* NetHack 3.6  wintype.h       $NHDT-Date: 1432512782 2015/05/25 00:13:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.14 $ */
+/* NetHack 3.6  wintype.h       $NHDT-Date: 1433207914 2015/06/02 01:18:34 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -22,6 +22,7 @@ typedef union any {
     long *a_lptr;
     unsigned long *a_ulptr;
     unsigned *a_uptr;
+    const char *a_string;
     /* add types as needed */
 } anything;
 #define ANY_P union any /* avoid typedef in prototypes */
