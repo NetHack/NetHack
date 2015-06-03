@@ -2770,7 +2770,7 @@ The pattern should be a POSIX extended regular expression.
 .hn 2
 Configuring Status Hilites
 .pg
-Your copy of NetHack may have been compiled with support for {\tStatus Hilites}.
+Your copy of NetHack may have been compiled with support for ``Status Hilites''.
 If so, you can customize your game display by setting thresholds to 
 change the color or appearance of fields in the status display.
 .pg
@@ -2778,14 +2778,15 @@ For example, the following line in your config file will cause
 the hitpoints field to display in the color red if your hitpoints
 drop to or below a threshold of 30%:
 .si
-.lp OPTION=hilite_status: hitpoints/30%/red/normal
+.lp "OPTION=hilite_status: hitpoints/30%/red/normal"
 .ei
 .pg
 For another example, the following line in your config file will cause
 wisdom to be displayed red if it drops and green if it rises.
 .si
-.lp OPTION=hilite_status: wisdom/updown/red/green
+.lp "OPTION=hilite_status: wisdom/updown/red/green"
 .ei
+.pg
 You can adjust the display of the following status fields:
 .TS S
 center;
@@ -2810,10 +2811,10 @@ Note that the platform used may interpret the attributes any way it
 wants.
 .lp ""
 Behaviours can occur based on percentage thresholds, updown, or absolute values.
-The in-game options menu can help you determine the correct syntax for a 
+The in-game options menu can help you determine the correct syntax for a
 config file.
 .lp ""
-The whole feature can be disable by setting option statushilites off.
+The whole feature can be disabled by setting option statushilites off.
 .pg
 .hn 2
 Modifying NetHack Symbols 
