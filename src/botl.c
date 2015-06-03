@@ -285,17 +285,6 @@ char *buf;
 #ifdef STATUS_VIA_WINDOWPORT
 /* =======================================================================*/
 
-STATIC_DCL void NDECL(init_blstats);
-STATIC_DCL char *FDECL(anything_to_s, (char *, anything *, int));
-STATIC_DCL void FDECL(s_to_anything, (anything *, char *, int));
-STATIC_OVL int FDECL(percentage, (struct istat_s *, struct istat_s *));
-STATIC_OVL int FDECL(compare_blstats, (struct istat_s *, struct istat_s *));
-
-#ifdef STATUS_HILITES
-STATIC_DCL boolean FDECL(assign_hilite, (char *, char *, char *, char *, BOOLEAN_P));
-STATIC_DCL const char *FDECL(clridx_to_s, (char *, int));
-#endif
-
 /* structure that tracks the status details in the core */
 struct istat_s {
     long time;
@@ -306,6 +295,18 @@ struct istat_s {
     enum statusfields idxmax;
     enum statusfields fld;
 };
+
+
+STATIC_DCL void NDECL(init_blstats);
+STATIC_DCL char *FDECL(anything_to_s, (char *, anything *, int));
+STATIC_DCL void FDECL(s_to_anything, (anything *, char *, int));
+STATIC_OVL int FDECL(percentage, (struct istat_s *, struct istat_s *));
+STATIC_OVL int FDECL(compare_blstats, (struct istat_s *, struct istat_s *));
+
+#ifdef STATUS_HILITES
+STATIC_DCL boolean FDECL(assign_hilite, (char *, char *, char *, char *, BOOLEAN_P));
+STATIC_DCL const char *FDECL(clridx_to_s, (char *, int));
+#endif
 
 /* If entries are added to this, botl.h will require updating too */
 STATIC_DCL struct istat_s initblstats[MAXBLSTATS] = {
