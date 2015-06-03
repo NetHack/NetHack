@@ -577,7 +577,7 @@ xchar x, y;
                 if (lev->typ != ROOM && lev->seenv) {
                     map_background(x, y, 1);
                 } else {
-                    lev->glyph = flags.dark_room
+                    lev->glyph = (flags.dark_room && !Is_rogue_level(&u.uz))
                                      ? cmap_to_glyph(S_darkroom)
                                      : (lev->waslit ? cmap_to_glyph(S_room)
                                                     : cmap_to_glyph(S_stone));
@@ -586,7 +586,7 @@ xchar x, y;
             } else if ((lev->glyph >= cmap_to_glyph(S_stone)
                         && lev->glyph < cmap_to_glyph(S_darkroom))
                        || glyph_is_invisible(levl[x][y].glyph)) {
-                lev->glyph = flags.dark_room
+                lev->glyph = (flags.dark_room && !Is_rogue_level(&u.uz))
                                  ? cmap_to_glyph(S_darkroom)
                                  : (lev->waslit ? cmap_to_glyph(S_room)
                                                 : cmap_to_glyph(S_stone));
@@ -799,6 +799,14 @@ register int x, y;
          * These checks and changes must be here and not in back_to_glyph().
          * They are dependent on the position being out of sight.
          */
+        else if (Is_rogue_level(&u.uz)) {
+            if (lev->glyph == cmap_to_glyph(S_litcorr) && lev->typ == CORR)
+                show_glyph(x, y, lev->glyph = cmap_to_glyph(S_corr));
+            else if (lev->glyph == cmap_to_glyph(S_room) && lev->typ == ROOM && !lev->waslit)
+                show_glyph(x, y, lev->glyph = cmap_to_glyph(S_stone));
+            else
+                goto show_mem;
+        }
         else if (!lev->waslit || (flags.dark_room && iflags.use_color)) {
             if (lev->glyph == cmap_to_glyph(S_litcorr) && lev->typ == CORR)
                 show_glyph(x, y, lev->glyph = cmap_to_glyph(S_corr));
