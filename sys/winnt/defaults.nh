@@ -42,6 +42,7 @@ OPTIONS=symset:IBMGraphics_2,roguesymset:RogueEpyx
 #OPTIONS=nolegacy,noverbose
 #OPTIONS=menustyle:traditional
 #OPTIONS=hilite_status:hitpoints/30%/bright-magenta/normal
+#OPTIONS=perm_invent
 
 # Turn off all status hilites.
 #OPTIONS=!statushilites
