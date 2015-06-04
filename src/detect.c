@@ -637,7 +637,8 @@ int mclass;                /* monster class, 0 for all */
                         show_glyph(mtmp->mx, mtmp->my,
                                    detected_mon_to_glyph(mtmp));
                     else
-                        show_glyph(mtmp->mx, mtmp->my, mon_to_glyph(mtmp));
+                        show_glyph(mtmp->mx, mtmp->my,
+                                   mtmp->mtame ? pet_to_glyph(mtmp) : mon_to_glyph(mtmp));
                     /* don't be stingy - display entire worm */
                     if (mtmp->data == &mons[PM_LONG_WORM])
                         detect_wsegs(mtmp, 0);
