@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1432512774 2015/05/25 00:12:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.177 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1433457072 2015/06/04 22:31:12 $  $NHDT-Branch: master $:$NHDT-Revision: 1.178 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2667,10 +2667,18 @@ boolean construct;
 STATIC_OVL int
 pick_animal()
 {
+    int res;
+
     if (!animal_list)
         mon_animal_list(TRUE);
 
-    return animal_list[rn2(animal_list_count)];
+    res = animal_list[rn2(animal_list_count)];
+    /* rogue level should use monsters represented by uppercase letters
+       only, but since chameleons aren't generated there (not uppercase!)
+       we don't perform a lot of retries */
+    if (Is_rogue_level(&u.uz) && !isupper((uchar) mons[res].mlet))
+        res = animal_list[rn2(animal_list_count)];
+    return res;
 }
 
 void
@@ -2710,6 +2718,9 @@ pickvampshape(mon)
 struct monst *mon;
 {
     int mndx = mon->cham;
+    /* avoid picking monsters with lowercase display symbols ('d' for wolf
+       and 'v' for fog cloud) on rogue level*/
+    boolean uppercase_only = Is_rogue_level(&u.uz);
 
     switch (mndx) {
     case PM_VLAD_THE_IMPALER:
@@ -2718,13 +2729,13 @@ struct monst *mon;
             break; /* leave mndx as is */
     /*FALLTHRU*/
     case PM_VAMPIRE_LORD: /* vampire lord or Vlad can become wolf */
-        if (!rn2(10)) {
+        if (!rn2(10) && !uppercase_only) {
             mndx = PM_WOLF;
             break;
         }
     /*FALLTHRU*/
     case PM_VAMPIRE: /* any vampire can become fog or bat */
-        mndx = !rn2(4) ? PM_FOG_CLOUD : PM_VAMPIRE_BAT;
+        mndx = (!rn2(4) && !uppercase_only) ? PM_FOG_CLOUD : PM_VAMPIRE_BAT;
         break;
     }
     return mndx;
@@ -2786,7 +2797,8 @@ int *mndx_p, monclass;
         *mndx_p = PM_VLAD_THE_IMPALER;
         return TRUE;
     }
-    /* basic vampires can't become wolves; any can become fog or bat */
+    /* basic vampires can't become wolves; any can become fog or bat
+       (we don't enforce upper-case only for rogue level here) */
     if (*mndx_p == PM_WOLF)
         return (mon->cham != PM_VAMPIRE);
     if (*mndx_p == PM_FOG_CLOUD || *mndx_p == PM_VAMPIRE_BAT)
@@ -2916,7 +2928,10 @@ struct monst *mon;
         tryct = 50;
         do {
             mndx = rn1(SPECIAL_PM - LOW_PM, LOW_PM);
-        } while (--tryct > 0 && !validspecmon(mon, mndx));
+        } while (--tryct > 0 && !validspecmon(mon, mndx)
+                 /* try harder to select uppercase monster on rogue level */
+                 && (tryct > 40 && Is_rogue_level(&u.uz)
+                     && !isupper((uchar) mons[mndx].mlet)));
     }
     return mndx;
 }
@@ -2995,6 +3010,11 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
         do {
             mndx = select_newcham_form(mtmp);
             mdat = accept_newcham_form(mndx);
+            /* for the first several tries we require upper-case on
+               the rogue level (after that, we take whatever we get) */
+            if (tryct > 15 && Is_rogue_level(&u.uz)
+                && !isupper((uchar) mdat->mlet))
+                mdat = 0;
             if (mdat)
                 break;
         } while (--tryct > 0);

@@ -1,4 +1,4 @@
-/* NetHack 3.6	makemon.c	$NHDT-Date: 1432685497 2015/05/27 00:11:37 $  $NHDT-Branch: master $:$NHDT-Revision: 1.89 $ */
+/* NetHack 3.6	makemon.c	$NHDT-Date: 1433457069 2015/06/04 22:31:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.92 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1134,23 +1134,18 @@ register int mmflags;
     mtmp->cham = NON_PM; /* default is "not a shapechanger" */
     if ((mcham = pm_to_cham(mndx)) != NON_PM) {
         /* this is a shapechanger after all */
-        if (Protection_from_shape_changers) {
+        if (Protection_from_shape_changers
+            || mtmp->cham == PM_VLAD_THE_IMPALER) {
             ; /* stuck in its natural form (NON_PM) */
         } else {
             /* Note: shapechanger's initial form used to be
-               chosen with rndmonst(), yielding a monster
+               chosen here with rndmonst(), yielding a monster
                which was approriate to the level's difficulty
                but ignored the changer's usual type selection
-               so would be inppropriate for vampshifters. */
-            mtmp->cham = mcham; /* remember base form */
-            if (mcham != PM_VLAD_THE_IMPALER &&
-                /* select initial shape */
-                (mcham = select_newcham_form(mtmp)) != NON_PM) {
-                /* take on initial shape; if successful,
-                   avoid giving that shape's usual inventory */
-                if (newcham(mtmp, &mons[mcham], FALSE, FALSE))
-                    allow_minvent = FALSE;
-            }
+               so would be inppropriate for vampshifters.
+               Let newcham() pick the shape. */
+            if (newcham(mtmp, (struct permonst *) 0, FALSE, FALSE))
+                allow_minvent = FALSE;
         }
     } else if (mndx == PM_WIZARD_OF_YENDOR) {
         mtmp->iswiz = TRUE;
