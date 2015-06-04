@@ -431,7 +431,7 @@ register xchar worm_tail; /* mon is actually a worm tail */
         /* [ALI] Only use detected glyphs when monster wouldn't be
          * visible by any other means.
          */
-        if (sightflags == DETECTED) {
+        if (sightflags == DETECTED && !mon->mtame) {
             if (worm_tail)
                 num = detected_monnum_to_glyph(what_mon(PM_LONG_WORM_TAIL));
             else
@@ -768,10 +768,10 @@ register int x, y;
                    && ((see_it =
                             (tp_sensemon(mon) || MATCH_WARN_OF_MON(mon)
                              || (see_with_infrared(mon) && mon_visible(mon))))
-                       || Detect_monsters) && !is_worm_tail(mon)) {
+                       || Detect_monsters)) {
             /* Monsters are printed every time. */
             /* This also gets rid of any invisibility glyph */
-            display_monster(x, y, mon, see_it ? 0 : DETECTED, 0);
+            display_monster(x, y, mon, see_it ? 0 : DETECTED, is_worm_tail(mon) ? TRUE : FALSE);
         } else if ((mon = m_at(x, y)) && mon_warning(mon)
                    && !is_worm_tail(mon)) {
             display_warning(mon);
