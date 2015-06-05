@@ -1650,6 +1650,23 @@ NHMenuTextWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         break;
 
+    case WM_CHAR:
+        switch(wParam) {
+        case MENU_FIRST_PAGE:
+            SendMessage(hWnd, EM_SCROLL, SB_TOP, 0);
+            return 0;
+        case MENU_LAST_PAGE:
+            SendMessage(hWnd, EM_SCROLL, SB_BOTTOM, 0);
+            return 0;
+        case MENU_NEXT_PAGE:
+            SendMessage(hWnd, EM_SCROLL, SB_PAGEDOWN, 0);
+            return 0;
+        case MENU_PREVIOUS_PAGE:
+            SendMessage(hWnd, EM_SCROLL, SB_PAGEUP, 0);
+            return 0;
+        }
+        break;
+
     /* edit control needs to know nothing of its focus */
     case WM_SETFOCUS:
         HideCaret(hWnd);
