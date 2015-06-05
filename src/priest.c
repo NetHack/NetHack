@@ -76,8 +76,8 @@ register xchar omx, omy, gx, gy;
         allowflags |= ALLOW_DIG;
     if (!nohands(mtmp->data) && !verysmall(mtmp->data)) {
         allowflags |= OPENDOOR;
-        if (m_carrying(mtmp, SKELETON_KEY))
-            allowflags |= BUSTDOOR;
+        if (monhaskey(mtmp, TRUE))
+            allowflags |= UNLOCKDOOR;
     }
     if (is_giant(mtmp->data))
         allowflags |= BUSTDOOR;

@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1433050877 2015/05/31 05:41:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.193 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1433291955 2015/06/03 00:39:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.194 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1604,11 +1604,10 @@ int final;
     int cap;
     char buf[BUFSZ], youtoo[BUFSZ];
     boolean Riding = (u.usteed
-                      &&
                       /* if hero dies while dismounting, u.usteed will still
                          be set; we want to ignore steed in that situation */
-                      !(final == ENL_GAMEOVERDEAD
-                        && !strcmp(killer.name, "riding accident")));
+                      && !(final == ENL_GAMEOVERDEAD
+                           && !strcmp(killer.name, "riding accident")));
     const char *steedname =
         !Riding
             ? (char *) 0
@@ -1650,13 +1649,10 @@ int final;
         you_are(Swimming ? "swimming" : "in water", from_what(SWIMMING));
     } else if (walking_on_water()) {
         /* show active Wwalking here, potential Wwalking elsewhere */
-        Sprintf(
-            buf, "walking on %s",
-            is_pool(u.ux, u.uy)
-                ? "water"
-                : is_lava(u.ux, u.uy)
-                      ? "lava"
-                      : surface(u.ux, u.uy)); /* catchall; shouldn't happen */
+        Sprintf(buf, "walking on %s",
+                is_pool(u.ux, u.uy) ? "water"
+                : is_lava(u.ux, u.uy) ? "lava"
+                  : surface(u.ux, u.uy)); /* catchall; shouldn't happen */
         you_are(buf, from_what(WWALKING));
     }
     if (Upolyd && (u.uundetected || youmonst.m_ap_type != M_AP_NOTHING))
@@ -1692,8 +1688,21 @@ int final;
         you_are("confused", "");
     if (Hallucination)
         you_are("hallucinating", "");
-    if (Blind)
-        you_are("blind", from_what(BLINDED));
+    if (Blind) {
+        /* from_what() (currently wizard-mode only) checks !haseyes()
+           before u.uroleplay.blind, so we should too */
+        Sprintf(buf, "%s blind",
+                !haseyes(youmonst.data) ? "innately"
+                : u.uroleplay.blind ? "permanently"
+                  /* better phrasing desparately wanted... */
+                  : Blindfolded_only ? "deliberately"
+                    : "temporarily");
+        if (wizard && (Blinded & TIMEOUT) != 0L
+            && !u.uroleplay.blind && haseyes(youmonst.data))
+            Sprintf(eos(buf), " (%ld)", (Blinded & TIMEOUT));
+        /* !haseyes: avoid "you are innately blind innately" */
+        you_are(buf, !haseyes(youmonst.data) ? "" : from_what(BLINDED));
+    }
     if (Deaf)
         you_are("deaf", from_what(DEAF));
 
@@ -1823,26 +1832,27 @@ int final;
                 (cap < OVERLOADED) ? " slowed" : "");
         you_are(buf, "");
     } else {
-        /* last resort entry, guarantees Status section is non-empty */
+        /* last resort entry, guarantees Status section is non-empty
+           (no longer needed for that purpose since weapon status added;
+           still useful though) */
         you_are("unencumbered", "");
     }
     /* report being weaponless; distinguish whether gloves are worn */
-    if (!uwep)
-        you_are(uarmg ? "empty handed" : /* gloves imply hands */
-                    /* no weapon and no gloves */
-                    humanoid(youmonst.data)
-                        ? "bare handed"
-                        :
-                        /* alternate phrasing for paws or lack of hands */
-                        "not wielding anything",
+    if (!uwep) {
+        you_are(uarmg ? "empty handed" /* gloves imply hands */
+                /* no weapon and no gloves */
+                : humanoid(youmonst.data)
+                  ? "bare handed"
+                  /* alternate phrasing for paws or lack of hands */
+                  : "not wielding anything",
                 "");
     /* two-weaponing implies a weapon (not other odd stuff) in each hand */
-    else if (u.twoweap)
+    } else if (u.twoweap) {
         you_are("wielding two weapons at once", "");
     /* report most weapons by their skill class (so a katana will be
        described as a long sword, for instance; mattock and hook are
        exceptions), or wielded non-weapon item by its object class */
-    else {
+    } else {
         const char *what = weapon_descr(uwep);
 
         if (!strcmpi(what, "armor") || !strcmpi(what, "food")
@@ -1852,6 +1862,13 @@ int final;
             Sprintf(buf, "wielding %s",
                     (uwep->quan == 1L) ? an(what) : makeplural(what));
         you_are(buf, "");
+    }
+    /* report 'nudity' */
+    if (!uarm && !uarmu && !uarmc && !uarmg && !uarmf && !uarmh) {
+        if (u.uroleplay.nudist)
+            enl_msg(You_, "do", "did", " not wear any armor", "");
+        else
+            you_are("not wearing any armor", "");
     }
 }
 

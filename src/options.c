@@ -524,7 +524,7 @@ reglyph_darkroom()
         for (y = 0; y < ROWNO; y++) {
             struct rm *lev = &levl[x][y];
 
-            if (!flags.dark_room) {
+            if (!flags.dark_room || Is_rogue_level(&u.uz)) {
                 if (lev->glyph == cmap_to_glyph(S_darkroom))
                     lev->glyph = lev->waslit ? cmap_to_glyph(S_room)
                                              : cmap_to_glyph(S_stone);

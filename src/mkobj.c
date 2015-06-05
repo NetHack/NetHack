@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1432512771 2015/05/25 00:12:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.101 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1433500549 2015/06/05 10:35:49 $  $NHDT-Branch: master $:$NHDT-Revision: 1.102 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -520,6 +520,7 @@ register struct obj *otmp;
         free_omid(dummy); /* only one association with m_id*/
     if (Is_candle(dummy))
         dummy->lamplit = 0;
+    dummy->owornmask = 0L; /* dummy object is not worn */
     addtobill(dummy, FALSE, TRUE, TRUE);
     if (cost)
         alter_cost(dummy, -cost);

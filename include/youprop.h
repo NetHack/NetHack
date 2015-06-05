@@ -1,4 +1,4 @@
-/* NetHack 3.6	youprop.h	$NHDT-Date: 1432512778 2015/05/25 00:12:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.22 $ */
+/* NetHack 3.6	youprop.h	$NHDT-Date: 1433291407 2015/06/03 00:30:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.23 $ */
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -91,10 +91,10 @@
      && !(ublindf && ublindf->oartifact == ART_EYES_OF_THE_OVERWORLD))
 /* ...the Eyes operate even when you really are blind
     or don't have any eyes */
-#define Blindfolded_only                               \
-    (!Blinded && haseyes(youmonst.data) && Blindfolded \
-     && !(ublindf && ublindf->oartifact == ART_EYES_OF_THE_OVERWORLD))
-/* blind because of a blindfold, and *only* that */
+#define Blindfolded_only                                            \
+    (Blindfolded && ublindf->oartifact != ART_EYES_OF_THE_OVERWORLD \
+     && !u.uroleplay.blind && !Blinded && haseyes(youmonst.data))
+/* ...blind because of a blindfold, and *only* that */
 
 #define Sick u.uprops[SICK].intrinsic
 #define Stoned u.uprops[STONED].intrinsic

@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1432512763 2015/05/25 00:12:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.81 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1433289458 2015/06/02 23:57:38 $  $NHDT-Branch: master $:$NHDT-Revision: 1.82 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1084,7 +1084,14 @@ register struct obj *otmp;
     } else if (already_blind && !Blind) {
         changed = TRUE;
         /* "You are now wearing the Eyes of the Overworld." */
-        You("can see!");
+        if (u.uroleplay.blind) {
+            /* this can only happen by putting on the Eyes of the Overworld;
+               that shouldn't actually produce a permanent cure, but we
+               can't let the "blind from birth" conduct remain intact */
+            pline("For the first time in your life, you can see!");
+            u.uroleplay.blind = FALSE;
+        } else
+            You("can see!");
     }
     if (changed) {
         /* blindness has just been toggled */

@@ -1,4 +1,4 @@
-/* NetHack 3.6	wizard.c	$NHDT-Date: 1432512766 2015/05/25 00:12:46 $  $NHDT-Branch: master $:$NHDT-Revision: 1.37 $ */
+/* NetHack 3.6	wizard.c	$NHDT-Date: 1433457074 2015/06/04 22:31:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.38 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -428,9 +428,19 @@ clonewiz()
 int
 pick_nasty()
 {
+    int res = nasties[rn2(SIZE(nasties))];
+
     /* To do?  Possibly should filter for appropriate forms when
-       in the elemental planes or surrounded by water or lava. */
-    return nasties[rn2(SIZE(nasties))];
+     * in the elemental planes or surrounded by water or lava.
+     *
+     * We want monsters represented by uppercase on rogue level,
+     * but we don't try very hard.
+     */
+    if (Is_rogue_level(&u.uz)
+        && !('A' <= mons[res].mlet && mons[res].mlet <= 'Z'))
+        res = nasties[rn2(SIZE(nasties))];
+
+    return res;
 }
 
 /* create some nasty monsters, aligned or neutral with the caster */

@@ -544,6 +544,22 @@ const char **firstmatch;
      * When all have been checked then the string is printed.
      */
 
+    /*
+     * Special case: if identifying from the screen, and we're swallowed,
+     * and looking at something other than our own symbol, then just say
+     * "the interior of a monster".
+     */
+    if (u.uswallow && (looked) && (is_swallow_sym(sym) || (int)showsyms[S_stone] == sym)) {
+        if (!found) {
+            Sprintf(out_str, "%s%s", prefix, mon_interior);
+            *firstmatch = mon_interior;
+        } else {
+            found += append_str(out_str, mon_interior);
+        }
+        need_to_look = TRUE;
+        goto didlook;
+    }
+
     /* Check for monsters */
     for (i = 0; i < MAXMCLASSES; i++) {
         if (sym == ((looked) ? showsyms[i + SYM_OFF_M] : def_monsyms[i].sym)
@@ -566,21 +582,6 @@ const char **firstmatch;
                   : (sym == def_monsyms[S_HUMAN].sym && !flags.showrace))
         && !(Race_if(PM_HUMAN) || Race_if(PM_ELF)) && !Upolyd)
         found += append_str(out_str, "you"); /* tack on "or you" */
-
-    /*
-     * Special case: if identifying from the screen, and we're swallowed,
-     * and looking at something other than our own symbol, then just say
-     * "the interior of a monster".
-     */
-    if (u.uswallow && (looked) && is_swallow_sym(sym)) {
-        if (!found) {
-            Sprintf(out_str, "%s%s", prefix, mon_interior);
-            *firstmatch = mon_interior;
-        } else {
-            found += append_str(out_str, mon_interior);
-        }
-        need_to_look = TRUE;
-    }
 
     /* Now check for objects */
     for (i = 1; i < MAXOCLASSES; i++) {
@@ -696,6 +697,7 @@ const char **firstmatch;
      * If we are looking at the screen, follow multiple possibilities or
      * an ambiguous explanation by something more detailed.
      */
+ didlook:
     if (looked) {
         if (found > 1 || need_to_look) {
             char monbuf[BUFSZ];
