@@ -39,6 +39,4 @@ VARDIRPERM = 0755
 VARFILEPERM = 0600
 GAMEPERM = 0755
 
-POSTINSTALL= bdftopcf win/X11/nh10.bdf > $(HACKDIR)/nh10.pcf; (cd $(HACKDIR); mkfontdir)
-
 # note: needs libxt-dev libxaw7-dev libx11-dev bdftopcf
