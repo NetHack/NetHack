@@ -3980,8 +3980,13 @@ register int dx, dy;
             }
             bounce = 0;
             range--;
-            if (range && isok(lsx, lsy) && cansee(lsx, lsy))
-                pline("%s bounces!", The(fltxt));
+            if (range && isok(lsx, lsy) && cansee(lsx, lsy)) {
+                    pline("%s %s!", The(fltxt),
+                          Is_airlevel(&u.uz)
+                          ? "vanishes into the aether"
+                          : "bounces");
+                    if (Is_airlevel(&u.uz)) goto get_out_buzz;
+            }
             if (!dx || !dy || !rn2(20)) {
                 dx = -dx;
                 dy = -dy;
@@ -4015,6 +4020,7 @@ register int dx, dy;
     tmp_at(DISP_END, 0);
     if (type == ZT_SPELL(ZT_FIRE))
         explode(sx, sy, type, d(12, 6), 0, EXPL_FIERY);
+ get_out_buzz:
     if (shopdamage)
         pay_for_damage(
             abstype == ZT_FIRE
