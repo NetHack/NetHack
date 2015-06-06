@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1433560744 2015/06/06 03:19:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.76 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1433572586 2015/06/06 06:36:26 $  $NHDT-Branch: master $:$NHDT-Revision: 1.77 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -626,7 +626,7 @@ const char **firstmatch;
 
     /* Now check for graphics symbols */
     alt_i = (sym == (looked ? showsyms[0] : defsyms[0].sym)) ? 0 : 2+1;
-    for (hit_trap = FALSE, i = alt_i = 0; i < MAXPCHARS; i++) {
+    for (hit_trap = FALSE, i = 0; i < MAXPCHARS; i++) {
         /* when sym is the default background character, we process
            i == 0 three times: unexplored, stone, dark part of a room */
         if (alt_i < 2) {
