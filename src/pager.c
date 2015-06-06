@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1432890463 2015/05/29 09:07:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.74 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1433560744 2015/06/06 03:19:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.76 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -320,6 +320,15 @@ char *buf, *monbuf;
             Strcpy(buf,
                    Is_airlevel(&u.uz) ? "cloudy area" : "fog/vapor cloud");
             break;
+        case S_stone:
+            if (!levl[x][y].seenv) {
+                Strcpy(buf, "unexplored");
+                break;
+            } else if (levl[x][y].typ == STONE || levl[x][y].typ == SCORR) {
+                Strcpy(buf, "stone");
+                break;
+            }
+            /*else FALLTHRU*/
         default:
             Strcpy(buf, defsyms[glyph_to_cmap(glyph)].explanation);
             break;
@@ -514,11 +523,11 @@ char *out_str;
 const char **firstmatch;
 {
     boolean need_to_look = FALSE;
-    int glyph;
+    int glyph = NO_GLYPH;
     static char look_buf[BUFSZ];
     char prefix[BUFSZ];
     int found = 0; /* count of matching syms found */
-    int i;
+    int i, alt_i;
     int skipped_venom = 0;
     boolean hit_trap;
     const char *x_str;
@@ -549,7 +558,8 @@ const char **firstmatch;
      * and looking at something other than our own symbol, then just say
      * "the interior of a monster".
      */
-    if (u.uswallow && (looked) && (is_swallow_sym(sym) || (int)showsyms[S_stone] == sym)) {
+    if (u.uswallow && looked
+        && (is_swallow_sym(sym) || (int)showsyms[S_stone] == sym)) {
         if (!found) {
             Sprintf(out_str, "%s%s", prefix, mon_interior);
             *firstmatch = mon_interior;
@@ -562,7 +572,7 @@ const char **firstmatch;
 
     /* Check for monsters */
     for (i = 0; i < MAXMCLASSES; i++) {
-        if (sym == ((looked) ? showsyms[i + SYM_OFF_M] : def_monsyms[i].sym)
+        if (sym == (looked ? showsyms[i + SYM_OFF_M] : def_monsyms[i].sym)
             && def_monsyms[i].explain) {
             need_to_look = TRUE;
             if (!found) {
@@ -577,18 +587,17 @@ const char **firstmatch;
     /* handle '@' as a special case if it refers to you and you're
        playing a character which isn't normally displayed by that
        symbol; firstmatch is assumed to already be set for '@' */
-    if (((looked) ? (sym == showsyms[S_HUMAN + SYM_OFF_M] && cc.x == u.ux
-                     && cc.y == u.uy)
-                  : (sym == def_monsyms[S_HUMAN].sym && !flags.showrace))
+    if ((looked ? (sym == showsyms[S_HUMAN + SYM_OFF_M]
+                   && cc.x == u.ux && cc.y == u.uy)
+                : (sym == def_monsyms[S_HUMAN].sym && !flags.showrace))
         && !(Race_if(PM_HUMAN) || Race_if(PM_ELF)) && !Upolyd)
         found += append_str(out_str, "you"); /* tack on "or you" */
 
     /* Now check for objects */
     for (i = 1; i < MAXOCLASSES; i++) {
-        if (sym
-            == ((looked) ? showsyms[i + SYM_OFF_O] : def_oc_syms[i].sym)) {
+        if (sym == (looked ? showsyms[i + SYM_OFF_O] : def_oc_syms[i].sym)) {
             need_to_look = TRUE;
-            if ((looked) && i == VENOM_CLASS) {
+            if (looked && i == VENOM_CLASS) {
                 skipped_venom++;
                 continue;
             }
@@ -616,15 +625,28 @@ const char **firstmatch;
 #define is_cmap_drawbridge(i) ((i) >= S_vodbridge && (i) <= S_hcdbridge)
 
     /* Now check for graphics symbols */
-    for (hit_trap = FALSE, i = 0; i < MAXPCHARS; i++) {
-        x_str = defsyms[i].explanation;
-        if (sym == ((looked) ? showsyms[i] : defsyms[i].sym) && *x_str) {
-            /* avoid "an air", "a water", "a floor of a room", "a dark part of
-             * a room"  */
-            int article =
-                ((i == S_room) || (i == S_darkroom)) ? 2 : /* 2=>"the" */
-                    !(strcmp(x_str, "air") == 0 ||         /* 1=>"an"  */
-                      strcmp(x_str, "water") == 0);        /* 0=>(none)*/
+    alt_i = (sym == (looked ? showsyms[0] : defsyms[0].sym)) ? 0 : 2+1;
+    for (hit_trap = FALSE, i = alt_i = 0; i < MAXPCHARS; i++) {
+        /* when sym is the default background character, we process
+           i == 0 three times: unexplored, stone, dark part of a room */
+        if (alt_i < 2) {
+            x_str = !alt_i++ ? "unexplored" : "stone";
+            i = 0; /* for second iteration, undo loop increment */
+            /* alt_i is now 1 or 2 */
+        } else {
+            if (alt_i++ == 2)
+                i = 0; /* undo loop increment */
+            x_str = defsyms[i].explanation;
+            /* alt_i is now 3 or more and no longer of interest */
+        }
+        if (sym == (looked ? showsyms[i] : defsyms[i].sym) && *x_str) {
+            /* avoid "an unexplored", "an stone", "an air", "a water",
+               "a floor of a room", "a dark part of a room";
+               article==2 => "the", 1 => "an", 0 => (none) */
+            int article = strstri(x_str, " of a room") ? 2
+                          : !(alt_i <= 2
+                              || strcmp(x_str, "air") == 0
+                              || strcmp(x_str, "water") == 0);
 
             if (!found) {
                 if (is_cmap_trap(i)) {
@@ -633,15 +655,15 @@ const char **firstmatch;
                 } else {
                     Sprintf(out_str, "%s%s", prefix,
                             article == 2 ? the(x_str)
-                                         : article == 1 ? an(x_str) : x_str);
+                            : article == 1 ? an(x_str) : x_str);
                 }
                 *firstmatch = x_str;
                 found++;
             } else if (!u.uswallow && !(hit_trap && is_cmap_trap(i))
                        && !(found >= 3 && is_cmap_drawbridge(i))) {
-                found += append_str(
-                    out_str, article == 2 ? the(x_str)
-                                          : article == 1 ? an(x_str) : x_str);
+                found += append_str(out_str,
+                                    article == 2 ? the(x_str)
+                                    : article == 1 ? an(x_str) : x_str);
                 if (is_cmap_trap(i))
                     hit_trap = TRUE;
             }
@@ -654,7 +676,7 @@ const char **firstmatch;
     /* Now check for warning symbols */
     for (i = 1; i < WARNCOUNT; i++) {
         x_str = def_warnsyms[i].explanation;
-        if (sym == ((looked) ? warnsyms[i] : def_warnsyms[i].sym)) {
+        if (sym == (looked ? warnsyms[i] : def_warnsyms[i].sym)) {
             if (!found) {
                 Sprintf(out_str, "%s%s", prefix, def_warnsyms[i].explanation);
                 *firstmatch = def_warnsyms[i].explanation;
@@ -664,7 +686,7 @@ const char **firstmatch;
             }
             /* Kludge: warning trumps boulders on the display.
                Reveal the boulder too or player can get confused */
-            if ((looked) && sobj_at(BOULDER, cc.x, cc.y))
+            if (looked && sobj_at(BOULDER, cc.x, cc.y))
                 Strcat(out_str, " co-located with a boulder");
             break; /* out of for loop*/
         }
