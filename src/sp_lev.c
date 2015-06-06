@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1432536532 2015/05/25 06:48:52 $  $NHDT-Branch: master $:$NHDT-Revision: 1.58 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1433553490 2015/06/06 01:18:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.59 $ */
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -417,18 +417,23 @@ struct opvar *ov;
     Free(ov);
 }
 
-/* Borland doesn't know __FUNCTION__ */
-#ifdef __BORLANDC__
-#define __FUNCTION__ __FUNC__
-#endif
+/*
+ * Name of current function for use in messages:
+ * __func__     -- C99 standard;
+ * __FUNCTION__ -- gcc extension, starting before C99 and continuing after;
+ *                 picked up by other compilers (or vice versa?);
+ * __FUNC__     -- supported by Borland;
+ * nhFunc       -- slightly intrusive but fully portable nethack construct
+ *                 for any version of any compiler.
+ */
 #define opvar_free(ov)                                    \
-    {                                                     \
+    do {                                                  \
         if (ov) {                                         \
             opvar_free_x(ov);                             \
             ov = NULL;                                    \
         } else                                            \
-            impossible("opvar_free(), %s", __FUNCTION__); \
-    }
+            impossible("opvar_free(), %s", nhFunc);       \
+    } while (0)
 
 struct opvar *
 opvar_clone(ov)
@@ -546,13 +551,16 @@ void
 variable_list_del(varlist)
 struct splev_var *varlist;
 {
+    static const char nhFunc[] = "variable_list_del";
     struct splev_var *tmp = varlist;
+
     if (!tmp)
         return;
     while (tmp) {
         Free(tmp->name);
         if ((tmp->svtyp & SPOVAR_ARRAY)) {
             long idx = tmp->array_len;
+
             while (idx-- > 0) {
                 opvar_free(tmp->data.arrayvalues[idx]);
             };
@@ -2600,6 +2608,7 @@ STATIC_OVL boolean
 sp_level_free(lvl)
 sp_lev *lvl;
 {
+    static const char nhFunc[] = "sp_level_free";
     long n_opcode = 0;
 
     while (n_opcode < lvl->n_opcodes) {
@@ -2716,6 +2725,7 @@ void
 spo_call(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_call";
     struct opvar *addr;
     struct opvar *params;
     struct sp_frame *tmpframe;
@@ -2745,7 +2755,9 @@ void
 spo_return(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_return";
     struct opvar *params;
+
     if (!coder->frame || !coder->frame->next)
         panic("return: no frame.");
     if (!OV_pop_i(params))
@@ -2794,7 +2806,9 @@ void
 spo_message(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_message";
     struct opvar *op;
+
     char *msg, *levmsg;
     int old_n, n;
     if (!OV_pop_s(op))
@@ -2823,6 +2837,7 @@ void
 spo_monster(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_monster";
     int nparams = 0;
 
     struct opvar *varparam;
@@ -2857,6 +2872,7 @@ struct sp_coder *coder;
     while ((nparams++ < (SP_M_V_END + 1)) && (OV_typ(varparam) == SPOVAR_INT)
            && (OV_i(varparam) >= 0) && (OV_i(varparam) < SP_M_V_END)) {
         struct opvar *parm = NULL;
+
         OV_pop(parm);
         switch (OV_i(varparam)) {
         case SP_M_V_NAME:
@@ -2956,7 +2972,6 @@ struct sp_coder *coder;
 
     Free(tmpmons.name.str);
     Free(tmpmons.appear_as.str);
-
     opvar_free(id);
     opvar_free(mcoord);
     opvar_free(has_inv);
@@ -2967,12 +2982,11 @@ void
 spo_object(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_object";
     int nparams = 0;
     long quancnt;
-
     struct opvar *varparam;
     struct opvar *id, *containment;
-
     object tmpobj;
 
     tmpobj.spe = -127;
@@ -3108,7 +3122,6 @@ struct sp_coder *coder;
                                && !objects[tmpobj.id].oc_merge));
 
     Free(tmpobj.name.str);
-
     opvar_free(varparam);
     opvar_free(id);
     opvar_free(containment);
@@ -3118,6 +3131,7 @@ void
 spo_level_flags(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_level_flags";
     struct opvar *flagdata;
     long lflags;
 
@@ -3157,6 +3171,7 @@ void
 spo_initlevel(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_initlevel";
     lev_init init_lev;
     struct opvar *init_style, *fg, *bg, *smoothed, *joined, *lit, *walled,
         *filling;
@@ -3195,6 +3210,7 @@ void
 spo_engraving(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_engraving";
     struct opvar *etyp, *txt, *ecoord;
     xchar x, y;
 
@@ -3213,6 +3229,7 @@ void
 spo_mineralize(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_mineralize";
     struct opvar *kelp_pool, *kelp_moat, *gold_prob, *gem_prob;
 
     if (!OV_pop_i(gem_prob) || !OV_pop_i(gold_prob) || !OV_pop_i(kelp_moat)
@@ -3232,6 +3249,7 @@ void
 spo_room(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_room";
     if (coder->n_subroom > MAX_NESTED_ROOMS) {
         panic("Too deeply nested rooms?!");
     } else {
@@ -3313,6 +3331,7 @@ void
 spo_stair(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_stair";
     xchar x, y;
     struct opvar *up, *scoord;
     struct trap *badtrap;
@@ -3334,6 +3353,7 @@ void
 spo_ladder(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_ladder";
     xchar x, y;
     struct opvar *up, *lcoord;
 
@@ -3361,8 +3381,10 @@ void
 spo_grave(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_grave";
     struct opvar *gcoord, *typ, *txt;
     schar x, y;
+
     if (!OV_pop_i(typ) || !OV_pop_s(txt) || !OV_pop_c(gcoord))
         return;
 
@@ -3392,6 +3414,7 @@ void
 spo_altar(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_altar";
     struct opvar *al, *shrine, *acoord;
     altar tmpaltar;
 
@@ -3413,6 +3436,7 @@ void
 spo_trap(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_trap";
     struct opvar *type;
     struct opvar *tcoord;
     trap tmptrap;
@@ -3432,6 +3456,7 @@ void
 spo_gold(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_gold";
     struct opvar *gcoord, *amt;
     schar x, y;
     long amount;
@@ -3451,6 +3476,7 @@ void
 spo_corridor(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_corridor";
     struct opvar *deswall, *desdoor, *desroom, *srcwall, *srcdoor, *srcroom;
     corridor tc;
 
@@ -3706,17 +3732,19 @@ selection_floodfill(ov, x, y)
 struct opvar *ov;
 int x, y;
 {
+    static const char nhFunc[] = "selection_floorfill";
     struct opvar *tmp = selection_opvar(NULL);
 #define SEL_FLOOD_STACK (COLNO * ROWNO)
 #define SEL_FLOOD(nx, ny)                     \
-    {                                         \
+    do {                                      \
         if (idx < SEL_FLOOD_STACK) {          \
             dx[idx] = (nx);                   \
             dy[idx] = (ny);                   \
             idx++;                            \
         } else                                \
-            panic("floodfill stack overrun"); \
-    }
+            panic(floodfill_stack_overrun);   \
+    } while (0)
+    static const char floodfill_stack_overrun[] = "floorfill stack overrun";
     int idx = 0;
     xchar dx[SEL_FLOOD_STACK];
     xchar dy[SEL_FLOOD_STACK];
@@ -4068,6 +4096,7 @@ void
 spo_door(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_door";
     struct opvar *msk, *sel;
     xchar typ;
 
@@ -4086,6 +4115,7 @@ void
 spo_feature(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_feature";
     struct opvar *sel;
     int typ;
 
@@ -4114,6 +4144,7 @@ void
 spo_terrain(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_terrain";
     terrain tmpterrain;
     struct opvar *ter, *sel;
 
@@ -4132,6 +4163,7 @@ void
 spo_replace_terrain(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_replace_terrain";
     replaceterrain rt;
     struct opvar *reg, *from_ter, *to_ter, *chance;
 
@@ -4161,6 +4193,7 @@ void
 spo_levregion(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spot_levregion";
     struct opvar *rname, *padding, *rtype, *del_islev, *dy2, *dx2, *dy1, *dx1,
         *in_islev, *iy2, *ix2, *iy1, *ix1;
 
@@ -4241,6 +4274,7 @@ void
 spo_region(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_region";
     struct opvar *rtype, *rlit, *rflags, *area;
     xchar dx1, dy1, dx2, dy2;
     register struct mkroom *troom;
@@ -4340,6 +4374,7 @@ void
 spo_drawbridge(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_drawbridge";
     xchar x, y;
     struct opvar *dir, *db_open, *dcoord;
 
@@ -4360,6 +4395,7 @@ void
 spo_mazewalk(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_mazewalk";
     xchar x, y;
     struct opvar *ftyp, *fstocked, *fdir, *mcoord;
     int dir;
@@ -4438,6 +4474,7 @@ void
 spo_wall_property(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_wall_property";
     struct opvar *r;
     xchar dx1, dy1, dx2, dy2;
     int wprop =
@@ -4463,6 +4500,7 @@ void
 spo_room_door(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_room_door";
     struct opvar *wall, *secret, *mask, *pos;
     room_door tmpd;
 
@@ -4496,8 +4534,10 @@ void
 spo_wallify(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_wallify";
     struct opvar *typ, *r;
     int dx1, dy1, dx2, dy2;
+
     if (!OV_pop_i(typ))
         return;
     switch (OV_i(typ)) {
@@ -4526,6 +4566,7 @@ void
 spo_map(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_map";
     mazepart tmpmazepart;
     struct opvar *mpxs, *mpys, *mpmap, *mpa, *mpkeepr, *mpzalign;
     xchar halign, valign;
@@ -4683,6 +4724,7 @@ spo_jmp(coder, lvl)
 struct sp_coder *coder;
 sp_lev *lvl;
 {
+    static const char nhFunc[] = "spo_jmp";
     struct opvar *tmpa;
     long a;
     if (!OV_pop_i(tmpa))
@@ -4698,9 +4740,11 @@ spo_conditional_jump(coder, lvl)
 struct sp_coder *coder;
 sp_lev *lvl;
 {
+    static const char nhFunc[] = "spo_conditional_jump";
     struct opvar *oa, *oc;
     long a, c;
     int test = 0;
+
     if (!OV_pop_i(oa) || !OV_pop_i(oc))
         return;
 
@@ -4743,6 +4787,7 @@ void
 spo_var_init(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_var_init";
     struct opvar *vname;
     struct opvar *arraylen;
     struct opvar *vvalue;
@@ -4852,6 +4897,7 @@ long
 opvar_array_length(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "opvar_array_length";
     struct opvar *vname;
     struct splev_var *tmp;
     long len = 0;
@@ -4887,6 +4933,7 @@ void
 spo_shuffle_array(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "spo_shuffle_array";
     struct opvar *vname;
     struct splev_var *tmp;
     struct opvar *tmp2;
@@ -4918,6 +4965,7 @@ STATIC_OVL boolean
 sp_level_coder(lvl)
 sp_lev *lvl;
 {
+    static const char nhFunc[] = "sp_level_coder";
     unsigned long exec_opcodes = 0;
     int tmpi;
     long room_stack = 0;
