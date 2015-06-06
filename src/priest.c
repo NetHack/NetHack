@@ -150,7 +150,8 @@ histemple_at(priest, x, y)
 register struct monst *priest;
 register xchar x, y;
 {
-    return ((boolean)((EPRI(priest)->shroom == *in_rooms(x, y, TEMPLE))
+    return ((boolean)(priest && priest->ispriest
+                      && (EPRI(priest)->shroom == *in_rooms(x, y, TEMPLE))
                       && on_level(&(EPRI(priest)->shrlevel), &u.uz)));
 }
 
@@ -342,7 +343,7 @@ boolean
 p_coaligned(priest)
 struct monst *priest;
 {
-    return ((boolean)(u.ualign.type == ((int) EPRI(priest)->shralign)));
+    return ((boolean)(u.ualign.type == mon_aligntyp(priest)));
 }
 
 STATIC_OVL boolean
@@ -542,7 +543,7 @@ register struct monst *priest;
     }
 
     /* priests don't chat unless peaceful and in their own temple */
-    if (!histemple_at(priest, priest->mx, priest->my) || !priest->mpeaceful
+    if (!inhistemple(priest) || !priest->mpeaceful
         || !priest->mcanmove || priest->msleeping) {
         static const char *cranky_msg[3] = {
             "Thou wouldst have words, eh?  I'll give thee a word or two!",
