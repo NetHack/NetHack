@@ -1,4 +1,4 @@
-/* NetHack 3.6	winX.h	$NHDT-Date: 1432512780 2015/05/25 00:13:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.14 $ */
+/* NetHack 3.6	winX.h	$NHDT-Date: 1433806583 2015/06/08 23:36:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -389,7 +389,7 @@ E void NDECL(X11_wait_synch);
 #ifdef CLIPPING
 E void FDECL(X11_cliparound, (int, int));
 #endif
-E void FDECL(X11_print_glyph, (winid, XCHAR_P, XCHAR_P, int));
+E void FDECL(X11_print_glyph, (winid, XCHAR_P, XCHAR_P, int, int));
 E void FDECL(X11_raw_print, (const char *));
 E void FDECL(X11_raw_print_bold, (const char *));
 E int NDECL(X11_nhgetch);

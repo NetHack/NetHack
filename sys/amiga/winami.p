@@ -1,4 +1,4 @@
-/* NetHack 3.6	winami.p	$NHDT-Date: 1432512795 2015/05/25 00:13:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.6 $ */
+/* NetHack 3.6	winami.p	$NHDT-Date: 1433806595 2015/06/08 23:36:35 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
 /*    Copyright (c) Gregg Wonderly, Naperville, IL, 1992, 1993	 */
 /* NetHack may be freely redistributed. See license for details. */
 /* winami.c */
@@ -35,7 +35,7 @@ int NDECL(amii_doprev_message );
 void FDECL(amii_display_nhwindow, (winid  , boolean ));
 void FDECL(amii_display_file, (const char * , boolean ));
 void FDECL(amii_curs, (winid  , int  , int ));
-void FDECL(amii_print_glyph, (winid  , xchar  , xchar  , int ));
+void FDECL(amii_print_glyph, (winid  , xchar  , xchar  , int, int ));
 void FDECL(DoMenuScroll, (int  , int ));
 void FDECL(DisplayData, (int  , int  , int ));
 void FDECL(SetPropInfo, (struct Window * , struct Gadget * , long  , long  , long ));

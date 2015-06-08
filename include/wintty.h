@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.h	$NHDT-Date: 1432512782 2015/05/25 00:13:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.21 $ */
+/* NetHack 3.6	wintty.h	$NHDT-Date: 1433806583 2015/06/08 23:36:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.24 $ */
 /* Copyright (c) David Cohrs, 1991,1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -195,7 +195,7 @@ E void FDECL(tty_cliparound, (int, int));
 #ifdef POSITIONBAR
 E void FDECL(tty_update_positionbar, (char *));
 #endif
-E void FDECL(tty_print_glyph, (winid, XCHAR_P, XCHAR_P, int));
+E void FDECL(tty_print_glyph, (winid, XCHAR_P, XCHAR_P, int, int));
 E void FDECL(tty_raw_print, (const char *));
 E void FDECL(tty_raw_print_bold, (const char *));
 E int NDECL(tty_nhgetch);

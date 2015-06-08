@@ -1,4 +1,4 @@
-/* NetHack 3.6	gnbind.c	$NHDT-Date: 1432512804 2015/05/25 00:13:24 $  $NHDT-Branch: master $:$NHDT-Revision: 1.31 $ */
+/* NetHack 3.6	gnbind.c	$NHDT-Date: 1433806614 2015/06/08 23:36:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.32 $ */
 /* Copyright (C) 1998 by Erik Andersen <andersee@debian.org> */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -849,14 +849,14 @@ gnome_cliparound_proper(winid wid, int x, int y)
 }
 
 /*
-print_glyph(window, x, y, glyph)
+print_glyph(window, x, y, glyph, bkglyph)
                 -- Print the glyph at (x,y) on the given window.  Glyphs are
                    integers at the interface, mapped to whatever the window-
                    port wants (symbol, font, color, attributes, ...there's
                    a 1-1 map between glyphs and distinct things on the map).
 */
 void
-gnome_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph)
+gnome_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph)
 {
     if (wid != -1 && gnome_windowlist[wid].win != NULL) {
         GdkImlibImage *im;

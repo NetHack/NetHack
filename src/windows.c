@@ -1,4 +1,4 @@
-/* NetHack 3.6	windows.c	$NHDT-Date: 1433161992 2015/06/01 12:33:12 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.33 $ */
+/* NetHack 3.6	windows.c	$NHDT-Date: 1433806591 2015/06/08 23:36:31 $  $NHDT-Branch: master $:$NHDT-Revision: 1.34 $ */
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -444,7 +444,7 @@ static void FDECL(hup_add_menu, (winid, int, const anything *, CHAR_P, CHAR_P,
                                  int, const char *, BOOLEAN_P));
 static void FDECL(hup_end_menu, (winid, const char *));
 static void FDECL(hup_putstr, (winid, int, const char *));
-static void FDECL(hup_print_glyph, (winid, XCHAR_P, XCHAR_P, int));
+static void FDECL(hup_print_glyph, (winid, XCHAR_P, XCHAR_P, int, int));
 static void FDECL(hup_outrip, (winid, int, time_t));
 static void FDECL(hup_curs, (winid, int, int));
 static void FDECL(hup_display_nhwindow, (winid, BOOLEAN_P));
@@ -662,10 +662,11 @@ const char *text UNUSED;
 
 /*ARGSUSED*/
 static void
-hup_print_glyph(window, x, y, glyph)
+hup_print_glyph(window, x, y, glyph, bkglyph)
 winid window UNUSED;
 xchar x UNUSED, y UNUSED;
 int glyph UNUSED;
+int bkglyph UNUSED;
 {
     return;
 }

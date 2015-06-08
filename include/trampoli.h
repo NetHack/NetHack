@@ -1,4 +1,4 @@
-/* NetHack 3.6	trampoli.h	$NHDT-Date: 1432512776 2015/05/25 00:12:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
+/* NetHack 3.6	trampoli.h	$NHDT-Date: 1433806581 2015/06/08 23:36:21 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
 /* Copyright (c) 1989, by Norm Meluch and Stephen Spackman	  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -277,7 +277,7 @@
 #ifdef POSITIONBAR
 #define tty_update_positionbar(x) tty_update_positionbar_(x)
 #endif
-#define tty_print_glyph(a, b, c, d) tty_print_glyph_(a, b, c, d)
+#define tty_print_glyph(a, b, c, d, e) tty_print_glyph_(a, b, c, d, e)
 #define tty_raw_print(x) tty_raw_print_(x)
 #define tty_raw_print_bold(x) tty_raw_print_bold_(x)
 #define tty_nhgetch() tty_nhgetch_()

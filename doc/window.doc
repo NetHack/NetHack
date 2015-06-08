@@ -1,4 +1,4 @@
-NetHack 3.6  window.doc	$NHDT-Date: 1432512786 2015/05/25 00:13:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.39 $
+NetHack 3.6  window.doc	$NHDT-Date: 1433806574 2015/06/08 23:36:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.40 $
 
 Introduction
 
@@ -192,11 +192,16 @@ int nh_poskey(int *x, int *y, int *mod)
 
 B.  High-level routines:
 
-print_glyph(window, x, y, glyph)
+print_glyph(window, x, y, glyph, bkglyph)
 		-- Print the glyph at (x,y) on the given window.  Glyphs are
 		   integers at the interface, mapped to whatever the window-
 		   port wants (symbol, font, color, attributes, ...there's
 		   a 1-1 map between glyphs and distinct things on the map).
+		-- bkglyph is a background glyph for potential use by some
+		   graphical or tiled environments to allow the depiction
+		   to fall against a background consistent with the grid 
+		   around x,y.
+                   
 char yn_function(const char *ques, const char *choices, char default)
 		-- Print a prompt made up of ques, choices and default.
 		   Read a single character response that is contained in

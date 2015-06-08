@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1432946532 2015/05/30 00:42:12 $  $NHDT-Branch: master $:$NHDT-Revision: 1.56 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1433806584 2015/06/08 23:36:24 $  $NHDT-Branch: master $:$NHDT-Revision: 1.59 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1426,7 +1426,7 @@ int start, stop, y;
 
     for (x = start; x <= stop; x++)
         if (gbuf[y][x].glyph != cmap_to_glyph(S_stone))
-            print_glyph(WIN_MAP, x, y, gbuf[y][x].glyph);
+            print_glyph(WIN_MAP, x, y, gbuf[y][x].glyph, NO_GLYPH);
 }
 
 void
@@ -1475,7 +1475,7 @@ int cursor_on_u;
         register gbuf_entry *gptr = &gbuf[y][x = gbuf_start[y]];
         for (; x <= gbuf_stop[y]; gptr++, x++)
             if (gptr->new) {
-                print_glyph(WIN_MAP, x, y, gptr->glyph);
+                print_glyph(WIN_MAP, x, y, gptr->glyph, NO_GLYPH);
                 gptr->new = 0;
             }
     }

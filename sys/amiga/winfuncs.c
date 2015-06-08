@@ -1,4 +1,4 @@
-/* NetHack 3.6	winfuncs.c	$NHDT-Date: 1432512796 2015/05/25 00:13:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.14 $ */
+/* NetHack 3.6	winfuncs.c	$NHDT-Date: 1433806596 2015/06/08 23:36:36 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
 /* Copyright (c) Gregg Wonderly, Naperville, Illinois,  1991,1992,1993,1996.
  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1936,10 +1936,10 @@ port_help()
  */
 
 void
-amii_print_glyph(win, x, y, glyph)
+amii_print_glyph(win, x, y, glyph, bkglyph)
 winid win;
 xchar x, y;
-int glyph;
+int glyph, bkglyph;
 {
     struct amii_WinDesc *cw;
     uchar ch;
