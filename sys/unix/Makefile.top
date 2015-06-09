@@ -156,6 +156,9 @@ NetHack.ad: $(GAME)
 pet_mark.xbm:
 	( cd dat ; $(MAKE) pet_mark.xbm )
 
+pilemark.xbm:
+	( cd dat ; $(MAKE) pilemark.xbm )
+
 rip.xpm:
 	( cd dat ; $(MAKE) rip.xpm )
 

@@ -197,5 +197,6 @@ dialogs.c	- A better dialog widget.  Original code (modified slightly
 		  Theisen.  This is from his Ghostview program (which is under
 		  the GNU public license, v2 or higher).
 pet_mark.xbm	- A pet indicator bitmap for tiles.
+pilemark.xbm	- Item pile indicator for tiles.
 rip.xpm		- A graphical tombstone.
 tile2x11.c	- Converts win/share tiles for X11 use.

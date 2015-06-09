@@ -27,6 +27,9 @@ NetHack.tile_file: x11tiles
 ! The annotation of pets.
 !NetHack.pet_mark_bitmap: pet_mark.xbm
 !NetHack.pet_mark_color: Red
+! The annotation of item piles.
+!NetHack.pilemark_bitmap: pilemark.xbm
+!NetHack.pilemark_color: Green
 
 ! Tombstone
 ! The image file

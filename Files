@@ -230,9 +230,9 @@ win/X11:
 (files for X versions)
 Install.X11     NetHack.ad      Window.c        dialogs.c       ibm.bdf
 nethack.rc      nh10.bdf        nh32icon        nh56icon        nh72icon
-nh_icon.xpm     pet_mark.xbm    rip.xpm         tile2x11.c      winX.c
-winmap.c        winmenu.c       winmesg.c       winmisc.c       winstat.c
-wintext.c       winval.c
+nh_icon.xpm     pet_mark.xbm    pilemark.xbm    rip.xpm         tile2x11.c
+winX.c          winmap.c        winmenu.c       winmesg.c       winmisc.c
+winstat.c       wintext.c       winval.c
 
 win/gem:
 (files for GEM versions)

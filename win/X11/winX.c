@@ -980,6 +980,12 @@ static XtResource resources[] = {
     { nhStr("pet_mark_color"), nhStr("Pet_mark_color"), XtRPixel,
       sizeof(XtRPixel), XtOffset(AppResources *, pet_mark_color), XtRString,
       nhStr("Red") },
+    { nhStr("pilemark_bitmap"), nhStr("Pilemark_bitmap"), XtRString,
+      sizeof(String), XtOffset(AppResources *, pilemark_bitmap), XtRString,
+      nhStr("pilemark.xbm") },
+    { nhStr("pilemark_color"), nhStr("Pilemark_color"), XtRPixel,
+      sizeof(XtRPixel), XtOffset(AppResources *, pilemark_color), XtRString,
+      nhStr("Green") },
 #ifdef GRAPHIC_TOMBSTONE
     { nhStr("tombstone"), "Tombstone", XtRString, sizeof(String),
       XtOffset(AppResources *, tombstone), XtRString, "rip.xpm" },
