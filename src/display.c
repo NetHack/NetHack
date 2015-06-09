@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1433838903 2015/06/09 08:35:03 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.61 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1433840054 2015/06/09 08:54:14 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.62 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1703,7 +1703,6 @@ get_bk_glyph(x,y)
 xchar x, y;
 {
     int idx;
-    int retglyph = NO_GLYPH;
     struct rm *lev = &levl[x][y];
 
     switch (lev->typ) {
@@ -1734,18 +1733,16 @@ xchar x, y;
         break;
     }
 
-    retglyph = cmap_to_glyph(idx);
-
     if (!cansee(x, y) && !lev->waslit) {
         /* Floor spaces are dark if unlit.  Corridors are dark if unlit. */
-        if (lev->typ == ROOM && retglyph == cmap_to_glyph(S_room))
-            retglyph = cmap_to_glyph((flags.dark_room && iflags.use_color)
-                                      ? (DARKROOMSYM)
-                                      : S_stone);
-        else if (lev->typ == CORR && retglyph == cmap_to_glyph(S_litcorr))
-            retglyph = cmap_to_glyph(S_corr);
+        if (lev->typ == ROOM && idx == S_room)
+            idx = (flags.dark_room && iflags.use_color) ?
+                    (DARKROOMSYM) :  S_stone;
+        else if (lev->typ == CORR && idx == S_litcorr)
+            idx = S_corr;
     }
-    return retglyph;
+
+    return cmap_to_glyph(idx);
 }
 
 /* -------------------------------------------------------------------------
