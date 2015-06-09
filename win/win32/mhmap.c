@@ -1,5 +1,5 @@
 /* NetHack 3.6	mhmap.c	$NHDT-Date: 1432512811 2015/05/25 00:13:31 $  $NHDT-Branch: master $:$NHDT-Revision: 1.48 $ */
-/* Copyright (C) 2001 by Alex Kompel 	 */
+/* Copyright (C) 2001 by Alex Kompel      */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "winMS.h"
@@ -16,9 +16,13 @@
 
 extern short glyph2tile[];
 
+#define TILEBMP_X(ntile) ((ntile % GetNHApp()->mapTilesPerLine) * GetNHApp()->mapTile_X)
+#define TILEBMP_Y(ntile) ((ntile / GetNHApp()->mapTilesPerLine) * GetNHApp()->mapTile_Y)
+
 /* map window data */
 typedef struct mswin_nethack_map_window {
     int map[COLNO][ROWNO]; /* glyph map */
+    int bkmap[COLNO][ROWNO]; /* backround glyph map */
 
     int mapMode;              /* current map mode */
     boolean bAsciiMode;       /* switch ASCII/tiled mode */
@@ -29,7 +33,7 @@ typedef struct mswin_nethack_map_window {
     int xScrTile, yScrTile;   /* size of display tile */
     POINT map_orig;           /* map origin point */
 
-    HFONT hMapFont; /* font for ASCII mode */
+    HFONT hMapFont;           /* font for ASCII mode */
 } NHMapWindow, *PNHMapWindow;
 
 static TCHAR szNHMapWindowClass[] = TEXT("MSNethackMapWndClass");
@@ -449,6 +453,7 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
     case MSNH_MSG_PRINT_GLYPH: {
         PMSNHMsgPrintGlyph msg_data = (PMSNHMsgPrintGlyph) lParam;
         data->map[msg_data->x][msg_data->y] = msg_data->glyph;
+        data->bkmap[msg_data->x][msg_data->y] = msg_data->bkglyph;
 
         /* invalidate the update area */
         nhcoord2display(data, msg_data->x, msg_data->y, &rt);
@@ -589,6 +594,7 @@ onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
     for (i = 0; i < COLNO; i++)
         for (j = 0; j < ROWNO; j++) {
             data->map[i][j] = -1;
+            data->bkmap[i][j] = -1;
         }
 
     data->bAsciiMode = FALSE;
@@ -693,34 +699,53 @@ onPaint(HWND hWnd)
                     }
             SelectObject(hDC, oldFont);
         } else {
+            short ntile;
+            int t_x, t_y;
+            int glyph, bkglyph;
+            RECT glyph_rect;
+
             /* prepare tiles DC for mapping */
             tileDC = CreateCompatibleDC(hDC);
             saveBmp = SelectObject(tileDC, GetNHApp()->bmpMapTiles);
 
             /* draw the map */
             for (i = paint_rt.left; i < paint_rt.right; i++)
-                for (j = paint_rt.top; j < paint_rt.bottom; j++)
-                    if (data->map[i][j] >= 0) {
-                        short ntile;
-                        int t_x, t_y;
-                        RECT glyph_rect;
+                for (j = paint_rt.top; j < paint_rt.bottom; j++) {
+                    glyph = data->map[i][j];
+                    bkglyph = (glyph >= 0)? data->bkmap[i][j] : -1;
 
-                        ntile = glyph2tile[data->map[i][j]];
-                        t_x = (ntile % GetNHApp()->mapTilesPerLine)
-                              * GetNHApp()->mapTile_X;
-                        t_y = (ntile / GetNHApp()->mapTilesPerLine)
-                              * GetNHApp()->mapTile_Y;
+                    if (glyph == bkglyph) {
+                        glyph = -1;
+                    }
 
+                    if (bkglyph >= 0) {
+                        ntile = glyph2tile[bkglyph];
+                        t_x = TILEBMP_X(ntile);
+                        t_y = TILEBMP_Y(ntile);
                         nhcoord2display(data, i, j, &glyph_rect);
 
                         StretchBlt(hDC, glyph_rect.left, glyph_rect.top,
                                    data->xScrTile, data->yScrTile, tileDC,
                                    t_x, t_y, GetNHApp()->mapTile_X,
                                    GetNHApp()->mapTile_Y, SRCCOPY);
-                        if (glyph_is_pet(data->map[i][j])
+                    }
+
+                    if (glyph >= 0) {
+                        ntile = glyph2tile[glyph];
+                        t_x = TILEBMP_X(ntile);
+                        t_y = TILEBMP_Y(ntile);
+                        nhcoord2display(data, i, j, &glyph_rect);
+
+                        (*GetNHApp()->lpfnTransparentBlt)(
+                            hDC, glyph_rect.left, glyph_rect.top,
+                            data->xScrTile, data->yScrTile, tileDC,
+                            t_x, t_y, GetNHApp()->mapTile_X,
+                            GetNHApp()->mapTile_Y, TILE_BK_COLOR);
+
+                        if (glyph_is_pet(glyph)
                             && iflags.wc_hilite_pet) {
                             /* apply pet mark transparently over
-                               pet image */
+                                pet image */
                             HDC hdcPetMark;
                             HBITMAP bmPetMarkOld;
 
@@ -729,7 +754,7 @@ onPaint(HWND hWnd)
                             bmPetMarkOld = SelectObject(
                                 hdcPetMark, GetNHApp()->bmpPetMark);
 
-                            nhapply_image_transparent(
+                            (*GetNHApp()->lpfnTransparentBlt)(
                                 hDC, glyph_rect.left, glyph_rect.top,
                                 data->xScrTile, data->yScrTile, hdcPetMark, 0,
                                 0, TILE_X, TILE_Y, TILE_BK_COLOR);
@@ -737,6 +762,7 @@ onPaint(HWND hWnd)
                             DeleteDC(hdcPetMark);
                         }
                     }
+                }
             SelectObject(tileDC, saveBmp);
             DeleteDC(tileDC);
         }
@@ -987,87 +1013,3 @@ nhcolor_to_RGB(int c)
     }
 }
 
-/* apply bitmap pointed by sourceDc transparently over
-   bitmap pointed by hDC */
-
-typedef BOOL(WINAPI *LPTRANSPARENTBLT)(HDC, int, int, int, int, HDC, int, int,
-                                       int, int, UINT);
-void
-nhapply_image_transparent(HDC hDC, int x, int y, int width, int height,
-                          HDC sourceDC, int s_x, int s_y, int s_width,
-                          int s_height, COLORREF cTransparent)
-{
-    /* Don't use TransparentBlt; According to Microsoft, it contains a memory
-     * leak in Window 95/98. */
-    HDC hdcMem, hdcBack, hdcObject, hdcSave;
-    COLORREF cColor;
-    HBITMAP bmAndBack, bmAndObject, bmAndMem, bmSave;
-    HBITMAP bmBackOld, bmObjectOld, bmMemOld, bmSaveOld;
-
-    /* Create some DCs to hold temporary data. */
-    hdcBack = CreateCompatibleDC(hDC);
-    hdcObject = CreateCompatibleDC(hDC);
-    hdcMem = CreateCompatibleDC(hDC);
-    hdcSave = CreateCompatibleDC(hDC);
-
-    /* this is bitmap for our pet image */
-    bmSave = CreateCompatibleBitmap(hDC, width, height);
-
-    /* Monochrome DC */
-    bmAndBack = CreateBitmap(width, height, 1, 1, NULL);
-    bmAndObject = CreateBitmap(width, height, 1, 1, NULL);
-
-    /* resulting bitmap */
-    bmAndMem = CreateCompatibleBitmap(hDC, width, height);
-
-    /* Each DC must select a bitmap object to store pixel data. */
-    bmBackOld = SelectObject(hdcBack, bmAndBack);
-    bmObjectOld = SelectObject(hdcObject, bmAndObject);
-    bmMemOld = SelectObject(hdcMem, bmAndMem);
-    bmSaveOld = SelectObject(hdcSave, bmSave);
-
-    /* copy source image because it is going to be overwritten */
-    StretchBlt(hdcSave, 0, 0, width, height, sourceDC, s_x, s_y, s_width,
-               s_height, SRCCOPY);
-
-    /* Set the background color of the source DC to the color.
-       contained in the parts of the bitmap that should be transparent */
-    cColor = SetBkColor(hdcSave, cTransparent);
-
-    /* Create the object mask for the bitmap by performing a BitBlt
-       from the source bitmap to a monochrome bitmap. */
-    BitBlt(hdcObject, 0, 0, width, height, hdcSave, 0, 0, SRCCOPY);
-
-    /* Set the background color of the source DC back to the original
-       color. */
-    SetBkColor(hdcSave, cColor);
-
-    /* Create the inverse of the object mask. */
-    BitBlt(hdcBack, 0, 0, width, height, hdcObject, 0, 0, NOTSRCCOPY);
-
-    /* Copy background to the resulting image  */
-    BitBlt(hdcMem, 0, 0, width, height, hDC, x, y, SRCCOPY);
-
-    /* Mask out the places where the source image will be placed. */
-    BitBlt(hdcMem, 0, 0, width, height, hdcObject, 0, 0, SRCAND);
-
-    /* Mask out the transparent colored pixels on the source image. */
-    BitBlt(hdcSave, 0, 0, width, height, hdcBack, 0, 0, SRCAND);
-
-    /* XOR the source image with the beckground. */
-    BitBlt(hdcMem, 0, 0, width, height, hdcSave, 0, 0, SRCPAINT);
-
-    /* blt resulting image to the screen */
-    BitBlt(hDC, x, y, width, height, hdcMem, 0, 0, SRCCOPY);
-
-    /* cleanup */
-    DeleteObject(SelectObject(hdcBack, bmBackOld));
-    DeleteObject(SelectObject(hdcObject, bmObjectOld));
-    DeleteObject(SelectObject(hdcMem, bmMemOld));
-    DeleteObject(SelectObject(hdcSave, bmSaveOld));
-
-    DeleteDC(hdcMem);
-    DeleteDC(hdcBack);
-    DeleteDC(hdcObject);
-    DeleteDC(hdcSave);
-}

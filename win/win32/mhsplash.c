@@ -206,7 +206,7 @@ NHSplashWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         hdcBitmap = CreateCompatibleDC(hdc);
         SetBkMode(hdc, OPAQUE);
         OldBitmap = SelectObject(hdcBitmap, GetNHApp()->bmpSplash);
-        nhapply_image_transparent(hdc, SPLASH_OFFSET_X, SPLASH_OFFSET_Y,
+        (*GetNHApp()->lpfnTransparentBlt)(hdc, SPLASH_OFFSET_X, SPLASH_OFFSET_Y,
                                   SPLASH_WIDTH, SPLASH_HEIGHT, hdcBitmap, 0,
                                   0, SPLASH_WIDTH, SPLASH_HEIGHT,
                                   TILE_BK_COLOR);

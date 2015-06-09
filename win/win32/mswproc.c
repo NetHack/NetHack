@@ -1280,6 +1280,7 @@ mswin_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph)
         data.x = x;
         data.y = y;
         data.glyph = glyph;
+        data.bkglyph = bkglyph;
         SendMessage(GetNHApp()->windowlist[wid].win, WM_MSNH_COMMAND,
                     (WPARAM) MSNH_MSG_PRINT_GLYPH, (LPARAM) &data);
     }

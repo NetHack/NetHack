@@ -1,5 +1,5 @@
-/* NetHack 3.6	winhack.c	$NHDT-Date: 1432512811 2015/05/25 00:13:31 $  $NHDT-Branch: master $:$NHDT-Revision: 1.40 $ */
-/* Copyright (C) 2001 by Alex Kompel 	 */
+/* NetHack 3.6    winhack.c    $NHDT-Date: 1432512811 2015/05/25 00:13:31 $  $NHDT-Branch: master $:$NHDT-Revision: 1.40 $ */
+/* Copyright (C) 2001 by Alex Kompel      */
 /* NetHack may be freely redistributed.  See license for details. */
 
 // winhack.cpp : Defines the entry point for the application.
@@ -50,6 +50,10 @@ Version     _WIN_32IE   Platform/IE
 extern void FDECL(nethack_exit, (int));
 static TCHAR *_get_cmd_arg(TCHAR *pCmdLine);
 static HRESULT GetComCtlVersion(LPDWORD pdwMajor, LPDWORD pdwMinor);
+BOOL WINAPI
+_nhapply_image_transparent(HDC hDC, int x, int y, int width, int height,
+                           HDC sourceDC, int s_x, int s_y, int s_width,
+                           int s_height, UINT cTransparent);
 
 // Global Variables:
 NHWinApp _nethack_app;
@@ -78,6 +82,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     char buf[BUFSZ];
     DWORD major, minor;
     boolean resuming;
+    /* OSVERSIONINFO osvi; */
 
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
@@ -120,6 +125,17 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     _nethack_app.bWindowsLocked = TRUE;
 
     _nethack_app.bNoSounds = FALSE;
+
+#if 0  /* GdiTransparentBlt does not render spash bitmap for whatever reason */
+    /* use system-provided TransparentBlt for Win2k+ */
+    ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
+    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+    GetVersionEx(&osvi);
+    if (osvi.dwMajorVersion >= 5)
+        _nethack_app.lpfnTransparentBlt = GdiTransparentBlt;
+    else
+#endif
+        _nethack_app.lpfnTransparentBlt = _nhapply_image_transparent;
 
     // init controls
     if (FAILED(GetComCtlVersion(&major, &minor))) {
@@ -286,4 +302,88 @@ GetComCtlVersion(LPDWORD pdwMajor, LPDWORD pdwMinor)
     }
     FreeLibrary(hComCtl);
     return hr;
+}
+
+/* apply bitmap pointed by sourceDc transparently over
+bitmap pointed by hDC */
+BOOL WINAPI
+_nhapply_image_transparent(HDC hDC, int x, int y, int width, int height,
+                           HDC sourceDC, int s_x, int s_y, int s_width,
+                           int s_height, UINT cTransparent)
+{
+    /* Don't use TransparentBlt; According to Microsoft, it contains a memory
+     * leak in Window 95/98. */
+    HDC hdcMem, hdcBack, hdcObject, hdcSave;
+    COLORREF cColor;
+    HBITMAP bmAndBack, bmAndObject, bmAndMem, bmSave;
+    HBITMAP bmBackOld, bmObjectOld, bmMemOld, bmSaveOld;
+
+    /* Create some DCs to hold temporary data. */
+    hdcBack = CreateCompatibleDC(hDC);
+    hdcObject = CreateCompatibleDC(hDC);
+    hdcMem = CreateCompatibleDC(hDC);
+    hdcSave = CreateCompatibleDC(hDC);
+
+    /* this is bitmap for our pet image */
+    bmSave = CreateCompatibleBitmap(hDC, width, height);
+
+    /* Monochrome DC */
+    bmAndBack = CreateBitmap(width, height, 1, 1, NULL);
+    bmAndObject = CreateBitmap(width, height, 1, 1, NULL);
+
+    /* resulting bitmap */
+    bmAndMem = CreateCompatibleBitmap(hDC, width, height);
+
+    /* Each DC must select a bitmap object to store pixel data. */
+    bmBackOld = SelectObject(hdcBack, bmAndBack);
+    bmObjectOld = SelectObject(hdcObject, bmAndObject);
+    bmMemOld = SelectObject(hdcMem, bmAndMem);
+    bmSaveOld = SelectObject(hdcSave, bmSave);
+
+    /* copy source image because it is going to be overwritten */
+    StretchBlt(hdcSave, 0, 0, width, height, sourceDC, s_x, s_y, s_width,
+        s_height, SRCCOPY);
+
+    /* Set the background color of the source DC to the color.
+    contained in the parts of the bitmap that should be transparent */
+    cColor = SetBkColor(hdcSave, cTransparent);
+
+    /* Create the object mask for the bitmap by performing a BitBlt
+    from the source bitmap to a monochrome bitmap. */
+    BitBlt(hdcObject, 0, 0, width, height, hdcSave, 0, 0, SRCCOPY);
+
+    /* Set the background color of the source DC back to the original
+    color. */
+    SetBkColor(hdcSave, cColor);
+
+    /* Create the inverse of the object mask. */
+    BitBlt(hdcBack, 0, 0, width, height, hdcObject, 0, 0, NOTSRCCOPY);
+
+    /* Copy background to the resulting image  */
+    BitBlt(hdcMem, 0, 0, width, height, hDC, x, y, SRCCOPY);
+
+    /* Mask out the places where the source image will be placed. */
+    BitBlt(hdcMem, 0, 0, width, height, hdcObject, 0, 0, SRCAND);
+
+    /* Mask out the transparent colored pixels on the source image. */
+    BitBlt(hdcSave, 0, 0, width, height, hdcBack, 0, 0, SRCAND);
+
+    /* XOR the source image with the beckground. */
+    BitBlt(hdcMem, 0, 0, width, height, hdcSave, 0, 0, SRCPAINT);
+
+    /* blt resulting image to the screen */
+    BitBlt(hDC, x, y, width, height, hdcMem, 0, 0, SRCCOPY);
+
+    /* cleanup */
+    DeleteObject(SelectObject(hdcBack, bmBackOld));
+    DeleteObject(SelectObject(hdcObject, bmObjectOld));
+    DeleteObject(SelectObject(hdcMem, bmMemOld));
+    DeleteObject(SelectObject(hdcSave, bmSaveOld));
+
+    DeleteDC(hdcMem);
+    DeleteDC(hdcBack);
+    DeleteDC(hdcObject);
+    DeleteDC(hdcSave);
+
+    return TRUE;
 }

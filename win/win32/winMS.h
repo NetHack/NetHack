@@ -1,5 +1,5 @@
 /* NetHack 3.6	winMS.h	$NHDT-Date: 1433806621 2015/06/08 23:37:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.37 $ */
-/* Copyright (C) 2001 by Alex Kompel 	 */
+/* Copyright (C) 2001 by Alex Kompel */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef WINMS_H
@@ -58,6 +58,9 @@ typedef struct mswin_nhwindow_data {
     int dead;
 } MSNHWinData, *PMSNHWinData;
 
+typedef BOOL(WINAPI *LPTRANSPARENTBLT)(HDC, int, int, int, int, HDC, int, int,
+                                       int, int, UINT);
+
 typedef struct mswin_nhwindow_app {
     HINSTANCE hApp;
     HWND hMainWnd;
@@ -107,6 +110,8 @@ typedef struct mswin_nhwindow_app {
     BOOL bWindowsLocked; /* TRUE if windows are "locked" - no captions */
 
     BOOL bNoSounds; /* disable sounds */
+
+    LPTRANSPARENTBLT lpfnTransparentBlt; /* transparent blt function */
 } NHWinApp, *PNHWinApp;
 
 #define E extern
@@ -182,9 +187,6 @@ winid mswin_winid_from_type(int type);
 winid mswin_winid_from_handle(HWND hWnd);
 void mswin_window_mark_dead(winid wid);
 void bail(const char *mesg);
-void nhapply_image_transparent(HDC hDC, int x, int y, int width, int height,
-                               HDC sourceDC, int s_x, int s_y, int s_width,
-                               int s_height, COLORREF cTransparent);
 
 void mswin_popup_display(HWND popup, int *done_indicator);
 void mswin_popup_destroy(HWND popup);

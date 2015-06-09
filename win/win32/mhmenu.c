@@ -1056,7 +1056,7 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
             if (GetNHApp()->bmpMapTiles == GetNHApp()->bmpTiles) {
                 /* using original nethack tiles - apply image transparently */
-                nhapply_image_transparent(lpdis->hDC, x, y, TILE_X, TILE_Y,
+                (*GetNHApp()->lpfnTransparentBlt)(lpdis->hDC, x, y, TILE_X, TILE_Y,
                                           tileDC, t_x, t_y, TILE_X, TILE_Y,
                                           TILE_BK_COLOR);
             } else {

@@ -36,6 +36,7 @@ typedef struct mswin_nhmsg_print_glyph {
     XCHAR_P x;
     XCHAR_P y;
     int glyph;
+    int bkglyph;
 } MSNHMsgPrintGlyph, *PMSNHMsgPrintGlyph;
 
 typedef struct mswin_nhmsg_cliparound {
