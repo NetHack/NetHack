@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1433808638 2015/06/09 00:10:38 $  $NHDT-Branch: master $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1433838903 2015/06/09 08:35:03 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.61 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1702,10 +1702,40 @@ STATIC_OVL int
 get_bk_glyph(x,y)
 xchar x, y;
 {
+    int idx;
     int retglyph = NO_GLYPH;
     struct rm *lev = &levl[x][y];
 
-    retglyph = back_to_glyph(x, y); /* assumes hero can see x,y */
+    switch (lev->typ) {
+    case SCORR:
+    case STONE:
+        idx = level.flags.arboreal ? S_tree : S_stone;
+        break;
+    case ROOM:
+        idx = S_room;
+        break;
+    case CORR:
+        idx = (lev->waslit || flags.lit_corridor) ? S_litcorr : S_corr;
+        break;
+    case ICE:
+        idx = S_ice;
+        break;
+    case AIR:
+        idx = S_air;
+        break;
+    case CLOUD:
+        idx = S_cloud;
+        break;
+    case WATER:
+        idx = S_water;
+        break;
+    default:
+        idx = S_room;
+        break;
+    }
+
+    retglyph = cmap_to_glyph(idx);
+
     if (!cansee(x, y) && !lev->waslit) {
         /* Floor spaces are dark if unlit.  Corridors are dark if unlit. */
         if (lev->typ == ROOM && retglyph == cmap_to_glyph(S_room))
