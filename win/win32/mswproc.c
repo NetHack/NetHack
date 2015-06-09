@@ -32,6 +32,7 @@
 #define NHTRACE_LOG "nhtrace.log"
 
 #ifdef _DEBUG
+static FILE* _s_debugfp = NULL;
 extern void logDebug(const char *fmt, ...);
 #else
 void
@@ -131,15 +132,14 @@ mswin_init_nhwindows(int *argc, char **argv)
     UNREFERENCED_PARAMETER(argc);
     UNREFERENCED_PARAMETER(argv);
 
-    logDebug("mswin_init_nhwindows()\n");
-
 #ifdef _DEBUG
-    if (showdebug(NHTRACE_LOG)) {
+    if (showdebug(NHTRACE_LOG) && !_s_debugfp) {
         /* truncate trace file */
-        FILE *dfp = fopen(NHTRACE_LOG, "w");
-        fclose(dfp);
+        _s_debugfp = fopen(NHTRACE_LOG, "w");
     }
 #endif
+    logDebug("mswin_init_nhwindows()\n");
+
     mswin_nh_input_init();
 
     /* set it to WIN_ERR so we can detect attempts to
@@ -2198,20 +2198,15 @@ mswin_popup_destroy(HWND hWnd)
 void
 logDebug(const char *fmt, ...)
 {
-    FILE *dfp;
+    va_list args;
 
-    if (!showdebug(NHTRACE_LOG))
+    if (!showdebug(NHTRACE_LOG) || !_s_debugfp)
         return;
 
-    dfp = fopen(NHTRACE_LOG, "a");
-    if (dfp) {
-        va_list args;
-
-        va_start(args, fmt);
-        vfprintf(dfp, fmt, args);
-        va_end(args);
-        fclose(dfp);
-    }
+    va_start(args, fmt);
+    vfprintf(_s_debugfp, fmt, args);
+    va_end(args);
+    fflush(_s_debugfp);
 }
 
 #endif
