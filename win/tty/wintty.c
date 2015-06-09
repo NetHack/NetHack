@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1433212192 2015/06/02 02:29:52 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.103 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1433806618 2015/06/08 23:36:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.104 $ */
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2999,10 +2999,10 @@ int x, y;
  */
 
 void
-tty_print_glyph(window, x, y, glyph)
+tty_print_glyph(window, x, y, glyph, bkglyph)
 winid window;
 xchar x, y;
-int glyph;
+int glyph, bkglyph;
 {
     int ch;
     boolean reverse_on = FALSE;

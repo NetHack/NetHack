@@ -1,4 +1,4 @@
-/* NetHack 3.6	wc_chainout.c	$NHDT-Date: 1432512804 2015/05/25 00:13:24 $  $NHDT-Branch: master $:$NHDT-Revision: 1.6 $ */
+/* NetHack 3.6	wc_chainout.c	$NHDT-Date: 1433806611 2015/06/08 23:36:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.7 $ */
 /* Copyright (c) Kenneth Lorber, 2012				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -333,15 +333,15 @@ char *posbar;
 #endif
 
 void
-chainout_print_glyph(vp, window, x, y, glyph)
+chainout_print_glyph(vp, window, x, y, glyph, bkglyph)
 void *vp;
 winid window;
 xchar x, y;
-int glyph;
+int glyph, bkglyph;
 {
     struct chainout_data *tdp = vp;
 
-    (*tdp->nprocs->win_print_glyph)(window, x, y, glyph);
+    (*tdp->nprocs->win_print_glyph)(window, x, y, glyph, bkglyph);
 }
 
 void

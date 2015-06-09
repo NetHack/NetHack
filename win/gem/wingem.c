@@ -1,4 +1,4 @@
-/* NetHack 3.6	wingem.c	$NHDT-Date: 1432512810 2015/05/25 00:13:30 $  $NHDT-Branch: master $:$NHDT-Revision: 1.24 $ */
+/* NetHack 3.6	wingem.c	$NHDT-Date: 1433806613 2015/06/08 23:36:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.25 $ */
 /* Copyright (c) Christian Bressler, 1999 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -899,10 +899,10 @@ extern int mar_set_rogue(int);
 extern void mar_add_pet_sign(winid, int, int);
 
 void
-Gem_print_glyph(window, x, y, glyph)
+Gem_print_glyph(window, x, y, glyph, bkglyph)
 winid window;
 xchar x, y;
-int glyph;
+int glyph, bkglyph;
 {
     /* Move the cursor. */
     Gem_curs(window, x, y);
@@ -911,7 +911,7 @@ int glyph;
 
     x--; /* MAR -- because x ranges from 1 to COLNO */
     if (mar_set_tile_mode(-1)) {
-        mar_print_glyph(window, x, y, glyph2tile[glyph]);
+        mar_print_glyph(window, x, y, glyph2tile[glyph], glyph2tile[bkglyph]);
         if (
 #ifdef TEXTCOLOR
             iflags.hilite_pet &&

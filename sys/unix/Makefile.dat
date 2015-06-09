@@ -13,22 +13,22 @@ VARDAT = bogusmon data engrave epitaph rumors quest.dat oracles options
 all:	$(VARDAT) spec_levs quest_levs dungeon
 
 ../util/makedefs:
-	(cd ../util ; make makedefs)
+	(cd ../util ; $(MAKE) makedefs)
 
 ../util/dgn_comp:
-	(cd ../util ; make dgn_comp)
+	(cd ../util ; $(MAKE) dgn_comp)
 
 ../util/lev_comp:
-	(cd ../util ; make lev_comp)
+	(cd ../util ; $(MAKE) lev_comp)
 
 ../util/tile2x11:
-	(cd ../util ; make tile2x11)
+	(cd ../util ; $(MAKE) tile2x11)
 
 ../util/tile2beos:
-	(cd ../util ; make tile2beos)
+	(cd ../util ; $(MAKE) tile2beos)
 
 ../util/tile2bmp:
-	(cd ../util ; make tile2bmp)
+	(cd ../util ; $(MAKE) tile2bmp)
 
 x11tiles: ../util/tile2x11 ../win/share/monsters.txt ../win/share/objects.txt \
 				../win/share/other.txt
@@ -66,10 +66,10 @@ Info.plist: ../win/Qt/Info.pli
 	cp ../win/Qt/Info.pli Info.plist
 
 ../util/tile2img.ttp:
-	(cd ../util ; make tile2img.ttp)
+	(cd ../util ; $(MAKE) tile2img.ttp)
 
 ../util/xpm2img.ttp:
-	(cd ../util ; make xpm2img.ttp)
+	(cd ../util ; $(MAKE) xpm2img.ttp)
 nh16.img: ../util/tile2img.ttp ../win/share/monsters.txt \
 				../win/share/objects.txt ../win/share/other.txt
 	../util/tile2img.ttp nh16.img

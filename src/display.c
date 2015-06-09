@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1432946532 2015/05/30 00:42:12 $  $NHDT-Branch: master $:$NHDT-Revision: 1.56 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1433808638 2015/06/09 00:10:38 $  $NHDT-Branch: master $:$NHDT-Revision: 1.60 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -124,6 +124,7 @@ STATIC_DCL int FDECL(swallow_to_glyph, (int, int));
 STATIC_DCL void FDECL(display_warning, (struct monst *));
 
 STATIC_DCL int FDECL(check_pos, (int, int, int));
+STATIC_DCL int FDECL(get_bk_glyph, (XCHAR_P, XCHAR_P));
 
 /*#define WA_VERBOSE*/ /* give (x,y) locations for all "bad" spots */
 #ifdef WA_VERBOSE
@@ -1426,7 +1427,7 @@ int start, stop, y;
 
     for (x = start; x <= stop; x++)
         if (gbuf[y][x].glyph != cmap_to_glyph(S_stone))
-            print_glyph(WIN_MAP, x, y, gbuf[y][x].glyph);
+            print_glyph(WIN_MAP, x, y, gbuf[y][x].glyph, get_bk_glyph(x,y));
 }
 
 void
@@ -1475,7 +1476,7 @@ int cursor_on_u;
         register gbuf_entry *gptr = &gbuf[y][x = gbuf_start[y]];
         for (; x <= gbuf_stop[y]; gptr++, x++)
             if (gptr->new) {
-                print_glyph(WIN_MAP, x, y, gptr->glyph);
+                print_glyph(WIN_MAP, x, y, gptr->glyph, get_bk_glyph(x, y));
                 gptr->new = 0;
             }
     }
@@ -1690,6 +1691,31 @@ xchar x, y;
     if (x < 0 || y < 0 || x >= COLNO || y >= ROWNO)
         return cmap_to_glyph(S_room); /* XXX */
     return gbuf[y][x].glyph;
+}
+
+/*
+ * This is used to get the glyph for background to merge into
+ * tile ports to improve the appearance of stuff on dark room
+ * squares and the plane of air there.
+ */
+STATIC_OVL int
+get_bk_glyph(x,y)
+xchar x, y;
+{
+    int retglyph = NO_GLYPH;
+    struct rm *lev = &levl[x][y];
+
+    retglyph = back_to_glyph(x, y); /* assumes hero can see x,y */
+    if (!cansee(x, y) && !lev->waslit) {
+        /* Floor spaces are dark if unlit.  Corridors are dark if unlit. */
+        if (lev->typ == ROOM && retglyph == cmap_to_glyph(S_room))
+            retglyph = cmap_to_glyph((flags.dark_room && iflags.use_color)
+                                      ? (DARKROOMSYM)
+                                      : S_stone);
+        else if (lev->typ == CORR && retglyph == cmap_to_glyph(S_litcorr))
+            retglyph = cmap_to_glyph(S_corr);
+    }
+    return retglyph;
 }
 
 /* -------------------------------------------------------------------------

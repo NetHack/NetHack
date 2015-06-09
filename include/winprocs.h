@@ -1,4 +1,4 @@
-/* NetHack 3.6	winprocs.h	$NHDT-Date: 1433207914 2015/06/02 01:18:34 $  $NHDT-Branch: master $:$NHDT-Revision: 1.35 $ */
+/* NetHack 3.6	winprocs.h	$NHDT-Date: 1433806582 2015/06/08 23:36:22 $  $NHDT-Branch: master $:$NHDT-Revision: 1.36 $ */
 /* Copyright (c) David Cohrs, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -45,7 +45,7 @@ struct window_procs {
 #ifdef POSITIONBAR
     void FDECL((*win_update_positionbar), (char *));
 #endif
-    void FDECL((*win_print_glyph), (winid, XCHAR_P, XCHAR_P, int));
+    void FDECL((*win_print_glyph), (winid, XCHAR_P, XCHAR_P, int, int));
     void FDECL((*win_raw_print), (const char *));
     void FDECL((*win_raw_print_bold), (const char *));
     int NDECL((*win_nhgetch));
@@ -353,7 +353,7 @@ struct chain_procs {
 #ifdef POSITIONBAR
     void FDECL((*win_update_positionbar), (CARGS, char *));
 #endif
-    void FDECL((*win_print_glyph), (CARGS, winid, XCHAR_P, XCHAR_P, int));
+    void FDECL((*win_print_glyph), (CARGS, winid, XCHAR_P, XCHAR_P, int, int));
     void FDECL((*win_raw_print), (CARGS, const char *));
     void FDECL((*win_raw_print_bold), (CARGS, const char *));
     int FDECL((*win_nhgetch), (CARGS));

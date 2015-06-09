@@ -1,4 +1,4 @@
-/* NetHack 3.6	winproto.h	$NHDT-Date: 1432512795 2015/05/25 00:13:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.8 $ */
+/* NetHack 3.6	winproto.h	$NHDT-Date: 1433806597 2015/06/08 23:36:37 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
 /* Copyright (c) Gregg Wonderly, Naperville, Illinois,  1991,1992,1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -65,7 +65,7 @@ void Abort(long rc);
 #endif
 void CleanUp(void);
 void flush_glyph_buffer(struct Window *w);
-void amiga_print_glyph(winid window, int color_index, int glyph);
+void amiga_print_glyph(winid window, int color_index, int glyph, int bkglyph);
 void start_glyphout(winid window);
 void amii_end_glyphout(winid window);
 struct NewWindow *DupNewWindow(struct NewWindow *win);
@@ -101,7 +101,7 @@ void amii_resume_nhwindows(void);
 void amii_bell(void);
 void removetopl(int cnt);
 void port_help(void);
-void amii_print_glyph(winid win, xchar x, xchar y, int glyph);
+void amii_print_glyph(winid win, xchar x, xchar y, int glyph, int bkglyph);
 void amii_raw_print(const char *s);
 void amii_raw_print_bold(const char *s);
 void amii_update_inventory(void);

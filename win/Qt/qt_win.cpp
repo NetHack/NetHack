@@ -4832,7 +4832,7 @@ void NetHackQtBind::qt_cliparound_window(winid wid, int x, int y)
     NetHackQtWindow* window=id_to_window[wid];
     window->ClipAround(x,y);
 }
-void NetHackQtBind::qt_print_glyph(winid wid,XCHAR_P x,XCHAR_P y,int glyph)
+void NetHackQtBind::qt_print_glyph(winid wid,XCHAR_P x,XCHAR_P y,int glyph, int bkglyph)
 {
     NetHackQtWindow* window=id_to_window[wid];
     window->PrintGlyph(x,y,glyph);

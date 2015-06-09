@@ -1,4 +1,4 @@
-/* NetHack 3.6	winmap.c	$NHDT-Date: 1432512808 2015/05/25 00:13:28 $  $NHDT-Branch: master $:$NHDT-Revision: 1.21 $ */
+/* NetHack 3.6	winmap.c	$NHDT-Date: 1433806622 2015/06/08 23:37:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.22 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -71,10 +71,10 @@ static void FDECL(display_cursor, (struct xwindow *));
  */
 
 void
-X11_print_glyph(window, x, y, glyph)
+X11_print_glyph(window, x, y, glyph, bkglyph)
 winid window;
 xchar x, y;
-int glyph;
+int glyph, bkglyph;
 {
     struct map_info_t *map_info;
     boolean update_bbox = FALSE;

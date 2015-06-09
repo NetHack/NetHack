@@ -1,4 +1,4 @@
-/* NetHack 3.6	mswproc.c	$NHDT-Date: 1432512801 2015/05/25 00:13:21 $  $NHDT-Branch: master $:$NHDT-Revision: 1.59 $ */
+/* NetHack 3.6	mswproc.c	$NHDT-Date: 1433806606 2015/06/08 23:36:46 $  $NHDT-Branch: master $:$NHDT-Revision: 1.60 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1205,16 +1205,16 @@ mswin_cliparound(int x, int y)
 }
 
 /*
-print_glyph(window, x, y, glyph)
+print_glyph(window, x, y, glyph, bkglyph)
                 -- Print the glyph at (x,y) on the given window.  Glyphs are
                    integers at the interface, mapped to whatever the window-
                    port wants (symbol, font, color, attributes, ...there's
                    a 1-1 map between glyphs and distinct things on the map).
 */
 void
-mswin_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph)
+mswin_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph)
 {
-    logDebug("mswin_print_glyph(%d, %d, %d, %d)\n", wid, x, y, glyph);
+    logDebug("mswin_print_glyph(%d, %d, %d, %d, %d)\n", wid, x, y, glyph, bkglyph);
 
     if ((wid >= 0) && (wid < MAXWINDOWS)
         && (GetNHApp()->windowlist[wid].win != NULL)) {

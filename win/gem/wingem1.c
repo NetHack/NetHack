@@ -1,4 +1,4 @@
-/* NetHack 3.6	wingem1.c	$NHDT-Date: 1432512809 2015/05/25 00:13:29 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
+/* NetHack 3.6	wingem1.c	$NHDT-Date: 1433806613 2015/06/08 23:36:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $ */
 /* Copyright (c) Christian Bressler 1999 	  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2918,9 +2918,9 @@ int x, y;
 }
 
 void
-mar_print_glyph(window, x, y, gl)
+mar_print_glyph(window, x, y, gl, bkgl)
 winid window;
-int x, y, gl;
+int x, y, gl, bkgl;
 {
     if (window != WIN_ERR && window == WIN_MAP) {
         static int pla[8];
