@@ -476,13 +476,129 @@ There's a fifth element, and generally it's called Surprise.
 %e title
 #
 #
+# The Last Hero has never been released in the U.S. (or anywhere?) as a
+# conventional mass market paperback.  The large (roughly 10" by 12")
+# trade paperback contains many full page color illustrations and most
+# text pages include decorations of varying degress of elaborateness.
+# The actual text is probably only novella length.
 #
-%title The Last Hero (1)
+%title The Last Hero (7)
+# pg. 41 (end of 1st paragraph)
 %passage 1
-Too many people, when listing all the perils to be found in the search for lost treasure or ancient wisdom, 
-had forgotten to put at the top of the list 'the man who arrived just before you'.
+Too many people, when listing all the perils to be found in the search
+for lost treasure or ancient wisdom, had forgotten to put at the top of
+the list 'the man who arrived just before you'.
 
-  [The Last Hero, by Terry Pratchett]
+  [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
+%e passage
+# pg. 5 (1st page of text, 4th & 5th paragraphs)
+# second paragraph is a bit "on the nose" but is too good to leave out
+%passage 2
+The reason for the story was a mix of many things.  There was humanity's
+desire to do forebidden deeds merely because they were forebidden.
+There was its desire to find new horizon's and kill the people who live
+beyond them.  There were the mysterious scrolls.  There was the cucumber.
+But mostly there was the knowledge that one day, it would all be over.
+
+'Ah, well, life goes on,' people say when someone dies.  But from the
+point of view of the person who has just died, it doesn't.  It's the
+universe that goes on.  Just as the deceased was getting the hang of
+everything it's all whisked away, by illness or accident or, in one
+case, a cucumber.  Why this has to be is one of the imponderables of
+life, in the face of which people either start to pray...
+or become really, really angry.
+
+  [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
+%e passage
+# pg. 19 (bottom 20%)
+%passage 3
+'And they're /heroes/,' said Mr Betteridge of the Guild of Historians.
+
+'And that means, exactly?' said the Patrician, sighing.
+
+'They're good at doing what they want to do.'
+
+'But they are also, as I understand it, very old men.'
+
+'Very old /heroes/,' the historian corrected him.  'That just means
+they've had a lot of /experience/ in doing what they want to do.
+
+Lord Vetinari sighed again.  He did not like to live in a world of
+heroes.  You had civilisation, such as it was, and you had heroes.
+
+  [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
+%e passage
+# pg. 25 (2nd & 3rd fifths)
+%passage 4
+They were, all of them, old men.  Their background conversation was
+a litany of complaints about feet, stomachs and backs.  They moved
+slowly.  But they had a /look/ about them.  It was in their eyes.
+
+Their eyes said that wherever it was, they had been there.  Whatever
+it was, they had done it, sometimes more than once.  But they would
+never, ever, /buy/ the T-shirt.  And they /did/ know the meaning of
+the word 'fear'.  It was something that happened to other people.
+
+  [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
+%e passage
+# pg. 97 (middle)
+%passage 5
+Captain Carrot saluted.  'Force is always the last resort, sir,' he said.
+
+'I believe for Cohen it's the first choice,' said Lord Vetinari.
+
+'He's not too bad if you don't come up behind him suddenly,' said Rincewind.
+
+'Ah, there is the voice of our mission specialist,' said the Patrician.
+'I just hope--  What is that on your badge, Captain Carrot?'
+
+'Mission motto, sir,' said Carrot cheerfully.  '/Morituri Nolumus Mori/.
+Rincewind suggested it.'
+
+'I imagine he did,' said Lord Vetinari, observing the wizard coldly.
+'And would you care to give us a colloquial translation, Mr Rincewind?'
+
+'Er...' Rincewind hesitated, but there really was no escape.  'Er...
+roughly speaking, it means, "We who are about to die don't want to", sir.'
+
+  [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
+%e passage
+# pg. 125 (near top, then continued half way down)
+%passage 6
+'A good wizard, Rincewind,' said the Chair of Indefinite Studies.  'Not
+particularly bright, but, frankly, I've never been quite happy with
+intelligence.  An overrated talent, in my humble opinion.'
+
+Ponder's ears went red.
+
+[...]
+
+'Mr Stibbons was right, was he?' said Ridcully, staring at Ponder.  'How
+did you work that out so /exactly/, Mr Stibbons?'
+
+'I, er...' Ponder felt the eyes of the wizards on him.  'I--' He stopped.
+'It was a lucky guess, sir.'
+
+The wizards relaxed.  They were extremely uneasy with cleverness, but
+lucky guessing was what being a wizard was all about.
+
+  [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
+%e passage
+# pg. 146 (top)
+%passage 7
+Evil Harry looked down and shuffled his feet, his face a battle between
+pride and relief.
+
+'Good of you to say that, lads,' he mumbled.  'I mean, you know, if it
+was up to me I wouldn't do this to yer, but I got a reputation to--'
+
+'I said we /understand/,' said Cohen.  'It's just like with us.  You see
+a big hairy thing galloping towards you, you don't stop to think:  Is
+this a rare species on the point of extinction?  No, you hack its head
+off.  'Cos that's heroing, am I right?  An' /you/ see someone, you
+betray 'em, quick as a wink.  'Cos that's villaining.'
+
+  [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
 %e passage
 %e title
 #
