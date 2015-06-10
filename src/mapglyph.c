@@ -83,6 +83,8 @@ unsigned *ospecial;
         else
             obj_color(STATUE);
         special |= MG_STATUE;
+	if (level.objects[x][y] && level.objects[x][y]->nexthere)
+	    special |= MG_OBJPILE;
     } else if ((offset = (glyph - GLYPH_WARNING_OFF))
                >= 0) { /* a warning flash */
         idx = offset + SYM_OFF_W;
@@ -149,6 +151,8 @@ unsigned *ospecial;
             }
         } else
             obj_color(offset);
+	if (offset != BOULDER && level.objects[x][y] && level.objects[x][y]->nexthere)
+	    special |= MG_OBJPILE;
     } else if ((offset = (glyph - GLYPH_RIDDEN_OFF)) >= 0) { /* mon ridden */
         idx = mons[offset].mlet + SYM_OFF_M;
         if (has_rogue_color)
@@ -166,6 +170,8 @@ unsigned *ospecial;
         else
             mon_color(offset);
         special |= MG_CORPSE;
+	if (level.objects[x][y] && level.objects[x][y]->nexthere)
+	    special |= MG_OBJPILE;
     } else if ((offset = (glyph - GLYPH_DETECT_OFF)) >= 0) { /* mon detect */
         idx = mons[offset].mlet + SYM_OFF_M;
         if (has_rogue_color)

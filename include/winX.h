@@ -56,8 +56,13 @@ struct text_map_info_t {
         square_lbearing;
 };
 
+struct tile_glyph_info_t {
+    unsigned short glyph;
+    unsigned special;
+};
+
 struct tile_map_info_t {
-    unsigned short glyphs[ROWNO][COLNO]; /* Saved glyph numbers. */
+    struct tile_glyph_info_t glyphs[ROWNO][COLNO]; /* Saved glyph numbers. */
     GC white_gc;
     GC black_gc;
     unsigned long image_width; /* dimensions of tile image */
@@ -247,6 +252,8 @@ typedef struct {
     int message_lines;        /* number of lines to attempt to show */
     String pet_mark_bitmap;   /* X11 bitmap file used to mark pets */
     Pixel pet_mark_color;     /* color of pet mark */
+    String pilemark_bitmap;   /* X11 bitmap file used to mark item piles */
+    Pixel pilemark_color;     /* color of item pile mark */
 #ifdef GRAPHIC_TOMBSTONE
     String tombstone; /* name of XPM file for tombstone */
     int tombtext_x;   /* x-coord of center of first tombstone text */

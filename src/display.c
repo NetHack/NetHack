@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1433840054 2015/06/09 08:54:14 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.62 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1433899975 2015/06/10 01:32:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.61 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1694,55 +1694,23 @@ xchar x, y;
 }
 
 /*
- * This is used to get the glyph for background to merge into
- * tile ports to improve the appearance of stuff on dark room
- * squares and the plane of air there.
+ * This will be used to get the glyph for the background so that
+ * it can potentially be merged into graphical window ports
+ * to improve the appearance of stuff on dark room
+ * squares and the plane of air etc.
+ *
+ * Until that is working correctly in the branch, however, for now
+ * we just return the standard lit room background.
  */
+
 STATIC_OVL int
 get_bk_glyph(x,y)
 xchar x, y;
 {
-    int idx;
+    int retglyph = NO_GLYPH;
     struct rm *lev = &levl[x][y];
 
-    switch (lev->typ) {
-    case SCORR:
-    case STONE:
-        idx = level.flags.arboreal ? S_tree : S_stone;
-        break;
-    case ROOM:
-        idx = S_room;
-        break;
-    case CORR:
-        idx = (lev->waslit || flags.lit_corridor) ? S_litcorr : S_corr;
-        break;
-    case ICE:
-        idx = S_ice;
-        break;
-    case AIR:
-        idx = S_air;
-        break;
-    case CLOUD:
-        idx = S_cloud;
-        break;
-    case WATER:
-        idx = S_water;
-        break;
-    default:
-        idx = S_room;
-        break;
-    }
-
-    if (!cansee(x, y) && !lev->waslit) {
-        /* Floor spaces are dark if unlit.  Corridors are dark if unlit. */
-        if (lev->typ == ROOM && idx == S_room)
-            idx = (flags.dark_room && iflags.use_color) ?
-                    (DARKROOMSYM) :  S_stone;
-        else if (lev->typ == CORR && idx == S_litcorr)
-            idx = S_corr;
-    }
-
-    return cmap_to_glyph(idx);
+    return cmap_to_glyph(S_room);
 }
 
 /* -------------------------------------------------------------------------
