@@ -50,6 +50,9 @@ NetHack.ad: ../win/X11/NetHack.ad
 pet_mark.xbm: ../win/X11/pet_mark.xbm
 	cp ../win/X11/pet_mark.xbm pet_mark.xbm
 
+pilemark.xbm: ../win/X11/pilemark.xbm
+	cp ../win/X11/pilemark.xbm pilemark.xbm
+
 rip.xpm: ../win/X11/rip.xpm
 	cp ../win/X11/rip.xpm rip.xpm
 
@@ -152,5 +155,5 @@ dungeon: dungeon.def ../util/makedefs ../util/dgn_comp
 
 spotless:
 	-rm -f spec_levs quest_levs *.lev $(VARDAT) dungeon dungeon.pdf
-	-rm -f nhdat x11tiles beostiles pet_mark.xbm rip.xpm mapbg.xpm
+	-rm -f nhdat x11tiles beostiles pet_mark.xbm pilemark.xbm rip.xpm mapbg.xpm
 	-rm -f rip.img GEM_RSC.RSC title.img nh16.img NetHack.ad

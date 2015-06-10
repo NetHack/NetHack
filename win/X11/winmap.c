@@ -88,7 +88,7 @@ int glyph, bkglyph;
 
     /* update both the tile and text backing stores */
     {
-        unsigned short *t_ptr = &map_info->tile_map.glyphs[y][x];
+        unsigned short *t_ptr = &map_info->tile_map.glyphs[y][x].glyph;
 
         if (*t_ptr != glyph) {
             *t_ptr = glyph;
@@ -108,6 +108,11 @@ int glyph, bkglyph;
         (void) mapglyph(glyph, &och, &color, &special, x, y);
         ch = (uchar) och;
 
+        if (special != map_info->tile_map.glyphs[y][x].special) {
+            map_info->tile_map.glyphs[y][x].special = special;
+            update_bbox = TRUE;
+        }
+
         /* Only update if we need to. */
         ch_ptr = &map_info->text_map.text[y][x];
 
@@ -122,6 +127,7 @@ int glyph, bkglyph;
 #ifdef TEXTCOLOR
             if ((special & MG_PET) && iflags.hilite_pet)
                 color += CLR_MAX;
+            if ((special & MG_OBJPILE) && iflags.use_inverse)
             *co_ptr = color;
 #endif
             if (!map_info->is_tile)
@@ -178,6 +184,7 @@ struct tile_annotation {
 };
 
 static struct tile_annotation pet_annotation;
+static struct tile_annotation pile_annotation;
 
 static void
 init_annotation(annotation, filename, colorpixel)
@@ -232,6 +239,8 @@ post_process_tiles()
 
     init_annotation(&pet_annotation, appResources.pet_mark_bitmap,
                     appResources.pet_mark_color);
+    init_annotation(&pile_annotation, appResources.pilemark_bitmap,
+                    appResources.pilemark_color);
 }
 
 /*
@@ -902,14 +911,15 @@ static void
 map_all_stone(map_info)
 struct map_info_t *map_info;
 {
-    int i;
+    int x,y;
     unsigned short *sp, stone;
     stone = cmap_to_glyph(S_stone);
 
-    for (sp = (unsigned short *) map_info->tile_map.glyphs, i = 0;
-         i < ROWNO * COLNO; sp++, i++) {
-        *sp = stone;
-    }
+    for (x = 0; x < COLNO; x++)
+        for (y = 0; y < ROWNO; y++) {
+            map_info->tile_map.glyphs[y][x].glyph = stone;
+            map_info->tile_map.glyphs[y][x].special = 0;
+        }
 }
 
 /*
@@ -1248,7 +1258,7 @@ boolean inverted;
 
         for (row = start_row; row <= stop_row; row++) {
             for (cur_col = start_col; cur_col <= stop_col; cur_col++) {
-                int glyph = tile_map->glyphs[row][cur_col];
+                int glyph = tile_map->glyphs[row][cur_col].glyph;
                 int tile = glyph2tile[glyph];
                 int src_x, src_y;
                 int dest_x = cur_col * tile_map->square_width;
@@ -1276,6 +1286,21 @@ boolean inverted;
                     XSetForeground(dpy, tile_map->black_gc,
                                    BlackPixelOfScreen(screen));
                 }
+                if ((tile_map->glyphs[row][cur_col].special & MG_OBJPILE)) {
+                    /* draw object pile annotation (a plus sign) */
+                    XSetForeground(dpy, tile_map->black_gc,
+                                   pile_annotation.foreground);
+                    XSetClipOrigin(dpy, tile_map->black_gc, dest_x, dest_y);
+                    XSetClipMask(dpy, tile_map->black_gc,
+                                 pile_annotation.bitmap);
+                    XCopyPlane(dpy, pile_annotation.bitmap, XtWindow(wp->w),
+                               tile_map->black_gc, 0, 0, pile_annotation.width,
+                               pile_annotation.height, dest_x, dest_y, 1);
+                    XSetClipOrigin(dpy, tile_map->black_gc, 0, 0);
+                    XSetClipMask(dpy, tile_map->black_gc, None);
+                    XSetForeground(dpy, tile_map->black_gc,
+                                   BlackPixelOfScreen(screen));
+                }
             }
         }
 
@@ -1284,7 +1309,7 @@ boolean inverted;
                 XtDisplay(wp->w), XtWindow(wp->w),
 #ifdef USE_WHITE
                 /* kludge for white square... */
-                tile_map->glyphs[start_row][start_col] == cmap_to_glyph(S_ice)
+                tile_map->glyphs[start_row][start_col].glyph == cmap_to_glyph(S_ice)
                     ? tile_map->black_gc
                     : tile_map->white_gc,
 #else

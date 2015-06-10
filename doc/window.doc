@@ -840,7 +840,14 @@ int mapglyph(int glyph, int *ochar, int *ocolor, unsigned *special, int x, int y
 		   the default set.
 
 		   If the glyph represents something special such as a pet, 
-		   that information is returned as set bits in "special." 
+		   that information is returned as set bits in "special.":
+			MG_CORPSE	0x01
+			MG_INVIS	0x02
+			MG_DETECT	0x04
+			MG_PET		0x08
+			MG_RIDDEN	0x10
+			MG_STATUE	0x20
+			MG_OBJPILE	0x40
 		   Usually called from the window port's print_glyph() 
 		   routine. 
 

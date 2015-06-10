@@ -941,6 +941,7 @@ tty: fix crashing when a location has more than 32k items
 tty: fix segfault when MD termcap is not defined
 tty: do not cut off statuslines at 80 characters for wider term
 tty: prevent accidental escapes from string entries
+tty: hilight object piles
 unix: remove use of parentheses in nethack man page usage that confused a
 	man page conversion tool
 unix: new -wwindowtype option
@@ -990,6 +991,7 @@ X11: added support for hilite_pet to text map mode
 X11: ensure vertical scrollbar shows up in text display windows
 X11: fix typo in mouse click sanity check; result might have pointed to
 	spurious location after window resizing
+X11: use a plus sign to mark piles of objects
 platforms that support hangup: SAFERHANGUP to avoid losing objects in transit
 	between lists when hangup occurs, and also avoid cheats due to
 	well-timed hangups to stop a long melee
