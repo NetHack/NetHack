@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1433808638 2015/06/09 00:10:38 $  $NHDT-Branch: master $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1433899975 2015/06/10 01:32:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.61 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1694,10 +1694,15 @@ xchar x, y;
 }
 
 /*
- * This is used to get the glyph for background to merge into
- * tile ports to improve the appearance of stuff on dark room
- * squares and the plane of air there.
+ * This will be used to get the glyph for the background so that
+ * it can potentially be merged into graphical window ports
+ * to improve the appearance of stuff on dark room
+ * squares and the plane of air etc.
+ *
+ * Until that is working correctly in the branch, however, for now
+ * we just return the standard lit room background.
  */
+
 STATIC_OVL int
 get_bk_glyph(x,y)
 xchar x, y;
@@ -1705,17 +1710,7 @@ xchar x, y;
     int retglyph = NO_GLYPH;
     struct rm *lev = &levl[x][y];
 
-    retglyph = back_to_glyph(x, y); /* assumes hero can see x,y */
-    if (!cansee(x, y) && !lev->waslit) {
-        /* Floor spaces are dark if unlit.  Corridors are dark if unlit. */
-        if (lev->typ == ROOM && retglyph == cmap_to_glyph(S_room))
-            retglyph = cmap_to_glyph((flags.dark_room && iflags.use_color)
-                                      ? (DARKROOMSYM)
-                                      : S_stone);
-        else if (lev->typ == CORR && retglyph == cmap_to_glyph(S_litcorr))
-            retglyph = cmap_to_glyph(S_corr);
-    }
-    return retglyph;
+    return cmap_to_glyph(S_room);
 }
 
 /* -------------------------------------------------------------------------
