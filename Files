@@ -177,7 +177,8 @@ snd86unx.shr
 
 sys/unix/hints:
 (files for configuring UNIX NetHack versions)
-linux           linux-x11       macosx          macos-x11       unix
+linux           linux-x11       macosx          macosx10.5      macosx10.7
+macosx10.10     unix
 
 sys/vms:
 (files for VMS version - untested for 3.6.0)
