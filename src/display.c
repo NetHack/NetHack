@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1433899975 2015/06/10 01:32:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.61 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1433901380 2015/06/10 01:56:20 $  $NHDT-Branch: master $:$NHDT-Revision: 1.62 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1700,7 +1700,7 @@ xchar x, y;
  * squares and the plane of air etc.
  *
  * Until that is working correctly in the branch, however, for now
- * we just return the standard lit room background.
+ * we just return NO_GLYPH as an indicator to ignore it.
  */
 
 STATIC_OVL int
@@ -1708,9 +1708,9 @@ get_bk_glyph(x,y)
 xchar x, y;
 {
     int retglyph = NO_GLYPH;
-    struct rm *lev = &levl[x][y];
+    /* struct rm *lev = &levl[x][y]; */
 
-    return cmap_to_glyph(S_room);
+    return retglyph;
 }
 
 /* -------------------------------------------------------------------------
