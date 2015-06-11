@@ -452,12 +452,15 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
     switch (wParam) {
     case MSNH_MSG_PRINT_GLYPH: {
         PMSNHMsgPrintGlyph msg_data = (PMSNHMsgPrintGlyph) lParam;
-        data->map[msg_data->x][msg_data->y] = msg_data->glyph;
-        data->bkmap[msg_data->x][msg_data->y] = msg_data->bkglyph;
+        if((data->map[msg_data->x][msg_data->y] != msg_data->glyph)
+            || (data->bkmap[msg_data->x][msg_data->y] != msg_data->bkglyph)) {
+            data->map[msg_data->x][msg_data->y] = msg_data->glyph;
+            data->bkmap[msg_data->x][msg_data->y] = msg_data->bkglyph;
 
-        /* invalidate the update area */
-        nhcoord2display(data, msg_data->x, msg_data->y, &rt);
-        InvalidateRect(hWnd, &rt, TRUE);
+            /* invalidate the update area */
+            nhcoord2display(data, msg_data->x, msg_data->y, &rt);
+            InvalidateRect(hWnd, &rt, FALSE);
+        }
     } break;
 
     case MSNH_MSG_CLIPAROUND: {
@@ -508,7 +511,8 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         int i, j;
         for (i = 0; i < COLNO; i++)
             for (j = 0; j < ROWNO; j++) {
-                data->map[i][j] = -1;
+                data->map[i][j] = NO_GLYPH;
+                data->bkmap[i][j] = NO_GLYPH;
             }
         InvalidateRect(hWnd, NULL, TRUE);
     } break;
@@ -556,7 +560,7 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
             for (col = 0; col < COLNO; col++) {
                 if (index >= msg_data->max_size)
                     break;
-                if (data->map[col][row] == -1) {
+                if (data->map[col][row] == NO_GLYPH) {
                     mgch = ' ';
                 } else {
                     (void) mapglyph(data->map[col][row], &mgch, &color,
@@ -593,8 +597,8 @@ onCreate(HWND hWnd, WPARAM wParam, LPARAM lParam)
     ZeroMemory(data, sizeof(NHMapWindow));
     for (i = 0; i < COLNO; i++)
         for (j = 0; j < ROWNO; j++) {
-            data->map[i][j] = -1;
-            data->bkmap[i][j] = -1;
+            data->map[i][j] = NO_GLYPH;
+            data->bkmap[i][j] = NO_GLYPH;
         }
 
     data->bAsciiMode = FALSE;
@@ -712,13 +716,13 @@ onPaint(HWND hWnd)
             for (i = paint_rt.left; i < paint_rt.right; i++)
                 for (j = paint_rt.top; j < paint_rt.bottom; j++) {
                     glyph = data->map[i][j];
-                    bkglyph = (glyph >= 0)? data->bkmap[i][j] : -1;
+                    bkglyph = (glyph != NO_GLYPH)? data->bkmap[i][j] : NO_GLYPH;
 
                     if (glyph == bkglyph) {
-                        glyph = -1;
+                        glyph = NO_GLYPH;
                     }
 
-                    if (bkglyph >= 0) {
+                    if (bkglyph != NO_GLYPH) {
                         ntile = glyph2tile[bkglyph];
                         t_x = TILEBMP_X(ntile);
                         t_y = TILEBMP_Y(ntile);
@@ -730,7 +734,7 @@ onPaint(HWND hWnd)
                                    GetNHApp()->mapTile_Y, SRCCOPY);
                     }
 
-                    if (glyph >= 0) {
+                    if (glyph != NO_GLYPH) {
                         ntile = glyph2tile[glyph];
                         t_x = TILEBMP_X(ntile);
                         t_y = TILEBMP_Y(ntile);
