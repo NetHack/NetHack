@@ -452,14 +452,16 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
     switch (wParam) {
     case MSNH_MSG_PRINT_GLYPH: {
         PMSNHMsgPrintGlyph msg_data = (PMSNHMsgPrintGlyph) lParam;
-        if((data->map[msg_data->x][msg_data->y] != msg_data->glyph)
+        if ((data->map[msg_data->x][msg_data->y] != msg_data->glyph)
             || (data->bkmap[msg_data->x][msg_data->y] != msg_data->bkglyph)) {
             data->map[msg_data->x][msg_data->y] = msg_data->glyph;
             data->bkmap[msg_data->x][msg_data->y] = msg_data->bkglyph;
 
-            /* invalidate the update area */
+            /* invalidate the update area. Erase backround if there 
+               is nothing to paint */
             nhcoord2display(data, msg_data->x, msg_data->y, &rt);
-            InvalidateRect(hWnd, &rt, FALSE);
+            InvalidateRect(hWnd, &rt, 
+                           ((msg_data->glyph == NO_GLYPH) && (msg_data->bkglyph == NO_GLYPH)));
         }
     } break;
 
@@ -707,6 +709,7 @@ onPaint(HWND hWnd)
             int t_x, t_y;
             int glyph, bkglyph;
             RECT glyph_rect;
+            int layer;
 
             /* prepare tiles DC for mapping */
             tileDC = CreateCompatibleDC(hDC);
@@ -715,12 +718,9 @@ onPaint(HWND hWnd)
             /* draw the map */
             for (i = paint_rt.left; i < paint_rt.right; i++)
                 for (j = paint_rt.top; j < paint_rt.bottom; j++) {
+                    layer = 0;
                     glyph = data->map[i][j];
-                    bkglyph = (glyph != NO_GLYPH)? data->bkmap[i][j] : NO_GLYPH;
-
-                    if (glyph == bkglyph) {
-                        glyph = NO_GLYPH;
-                    }
+                    bkglyph = data->bkmap[i][j];
 
                     if (bkglyph != NO_GLYPH) {
                         ntile = glyph2tile[bkglyph];
@@ -732,41 +732,52 @@ onPaint(HWND hWnd)
                                    data->xScrTile, data->yScrTile, tileDC,
                                    t_x, t_y, GetNHApp()->mapTile_X,
                                    GetNHApp()->mapTile_Y, SRCCOPY);
+                        layer ++;
                     }
 
-                    if (glyph != NO_GLYPH) {
+                    if ((glyph != NO_GLYPH) && (glyph != bkglyph)) {
                         ntile = glyph2tile[glyph];
                         t_x = TILEBMP_X(ntile);
                         t_y = TILEBMP_Y(ntile);
                         nhcoord2display(data, i, j, &glyph_rect);
 
-                        (*GetNHApp()->lpfnTransparentBlt)(
-                            hDC, glyph_rect.left, glyph_rect.top,
-                            data->xScrTile, data->yScrTile, tileDC,
-                            t_x, t_y, GetNHApp()->mapTile_X,
-                            GetNHApp()->mapTile_Y, TILE_BK_COLOR);
-
-                        if (glyph_is_pet(glyph)
-                            && iflags.wc_hilite_pet) {
-                            /* apply pet mark transparently over
-                                pet image */
-                            HDC hdcPetMark;
-                            HBITMAP bmPetMarkOld;
-
-                            /* this is DC for petmark bitmap */
-                            hdcPetMark = CreateCompatibleDC(hDC);
-                            bmPetMarkOld = SelectObject(
-                                hdcPetMark, GetNHApp()->bmpPetMark);
-
+                        if (layer > 0) {
                             (*GetNHApp()->lpfnTransparentBlt)(
                                 hDC, glyph_rect.left, glyph_rect.top,
-                                data->xScrTile, data->yScrTile, hdcPetMark, 0,
-                                0, TILE_X, TILE_Y, TILE_BK_COLOR);
-                            SelectObject(hdcPetMark, bmPetMarkOld);
-                            DeleteDC(hdcPetMark);
+                                data->xScrTile, data->yScrTile, tileDC,
+                                t_x, t_y, GetNHApp()->mapTile_X,
+                                GetNHApp()->mapTile_Y, TILE_BK_COLOR);
+                        } else {
+                            StretchBlt(hDC, glyph_rect.left, glyph_rect.top,
+                                       data->xScrTile, data->yScrTile, tileDC,
+                                       t_x, t_y, GetNHApp()->mapTile_X,
+                                       GetNHApp()->mapTile_Y, SRCCOPY);
                         }
+
+                        layer ++;
+                     }
+
+                     if ((glyph != NO_GLYPH) && glyph_is_pet(glyph)
+                           && iflags.wc_hilite_pet) {
+                        /* apply pet mark transparently over
+                           pet image */
+                        HDC hdcPetMark;
+                        HBITMAP bmPetMarkOld;
+
+                        /* this is DC for petmark bitmap */
+                        hdcPetMark = CreateCompatibleDC(hDC);
+                        bmPetMarkOld = SelectObject(
+                            hdcPetMark, GetNHApp()->bmpPetMark);
+
+                        (*GetNHApp()->lpfnTransparentBlt)(
+                            hDC, glyph_rect.left, glyph_rect.top,
+                            data->xScrTile, data->yScrTile, hdcPetMark, 0,
+                            0, TILE_X, TILE_Y, TILE_BK_COLOR);
+                        SelectObject(hdcPetMark, bmPetMarkOld);
+                        DeleteDC(hdcPetMark);
                     }
                 }
+
             SelectObject(tileDC, saveBmp);
             DeleteDC(tileDC);
         }
