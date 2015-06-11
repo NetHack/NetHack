@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1433806618 2015/06/08 23:36:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.104 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1433984834 2015/06/11 01:07:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.106 $ */
 /* Copyright (c) David Cohrs, 1991				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1684,8 +1684,10 @@ struct WinDesc *cw;
                         && (menucolr = get_menu_coloring(curr->str, &color,
                                                          &attr))) {
                         term_start_attr(attr);
+#ifdef TEXTCOLOR
                         if (color != NO_COLOR)
                             term_start_color(color);
+#endif
                     } else
                         term_start_attr(curr->attr);
                     for (n = 0, cp = curr->str;
@@ -1707,8 +1709,10 @@ struct WinDesc *cw;
                         } else
                             (void) putchar(*cp);
                     if (iflags.use_menu_color && menucolr) {
+#ifdef TEXTCOLOR
                         if (color != NO_COLOR)
                             term_end_color();
+#endif
                         term_end_attr(attr);
                     } else
                         term_end_attr(curr->attr);

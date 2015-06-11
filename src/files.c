@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1432512772 2015/05/25 00:12:52 $  $NHDT-Branch: master $:$NHDT-Revision: 1.173 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1433978592 2015/06/10 23:23:12 $  $NHDT-Branch: master $:$NHDT-Revision: 1.175 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3398,7 +3398,7 @@ int tribpassage;
 {
     dlb *fp;
     char *endp;
-    char line[BUFSZ];
+    char line[BUFSZ], lastline[BUFSZ];
 
     int scope = 0;
     int linect = 0, passagecnt = 0, targetpassage = 0;
@@ -3442,6 +3442,7 @@ int tribpassage;
      *  %section death
      */
 
+    *line = *lastline = '\0';
     while (dlb_fgets(line, sizeof line, fp) != 0) {
         linect++;
         if ((endp = index(line, '\n')) != 0)
@@ -3515,16 +3516,26 @@ int tribpassage;
             /* comment only, next! */
             break;
         default:
-            if (matchedtitle && (scope == PASSAGESCOPE) && tribwin != WIN_ERR)
+            if (matchedtitle && scope == PASSAGESCOPE && tribwin != WIN_ERR) {
                 putstr(tribwin, 0, line);
+                Strcpy(lastline, line);
+            }
         }
     }
 
 cleanup:
     (void) dlb_fclose(fp);
     if (tribwin != WIN_ERR) {
-        if (matchedtitle && (scope == PASSAGESCOPE))
+        if (matchedtitle && scope == PASSAGESCOPE) {
             display_nhwindow(tribwin, FALSE);
+            /* put the final attribution line into message history,
+               analogous to the summary line from long quest messages */
+            if (index(lastline, '['))
+                mungspaces(lastline); /* to remove leading spaces */
+            else /* construct one if necessary */
+                Sprintf(lastline, "[%s, by Terry Pratchett]", tribtitle);
+            putmsghistory(lastline, FALSE);
+        }
         destroy_nhwindow(tribwin);
         tribwin = WIN_ERR;
         grasped = TRUE;
