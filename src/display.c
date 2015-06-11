@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1434024834 2015/06/11 12:13:54 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.67 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1434025166 2015/06/11 12:19:26 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.68 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1373,14 +1373,14 @@ int x, y, glyph;
         return;
     }
 
-/*    if (gbuf[y][x].glyph != glyph) { */
+    if (gbuf[y][x].glyph != glyph || iflags.use_background_glyph) {
         gbuf[y][x].glyph = glyph;
         gbuf[y][x].new = 1;
         if (gbuf_start[y] > x)
             gbuf_start[y] = x;
         if (gbuf_stop[y] < x)
             gbuf_stop[y] = x;
-/*    } */
+    }
 }
 
 /*
