@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1433901380 2015/06/10 01:56:20 $  $NHDT-Branch: master $:$NHDT-Revision: 1.62 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1434024834 2015/06/11 12:13:54 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.67 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1747,7 +1747,7 @@ xchar x, y;
                    (DARKROOMSYM) :  S_stone;
     }
 
-    /* if (idx != S_room) */
+    if (idx != S_room)
         bkglyph = cmap_to_glyph(idx);
 
     return bkglyph;
