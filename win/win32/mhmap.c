@@ -458,10 +458,12 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
             data->bkmap[msg_data->x][msg_data->y] = msg_data->bkglyph;
 
             /* invalidate the update area. Erase backround if there 
-               is nothing to paint */
+               is nothing to paint or we are in text mode */
             nhcoord2display(data, msg_data->x, msg_data->y, &rt);
             InvalidateRect(hWnd, &rt, 
-                           ((msg_data->glyph == NO_GLYPH) && (msg_data->bkglyph == NO_GLYPH)));
+                           (((msg_data->glyph == NO_GLYPH) && (msg_data->bkglyph == NO_GLYPH))
+                            || data->bAsciiMode 
+                            || Is_rogue_level(&u.uz)));
         }
     } break;
 
