@@ -2519,15 +2519,19 @@ See ``{\it Configuring Menu Colors\/}'' on how to configure the colors.
 Controls the interface used when you need to choose various objects (in
 response to the Drop command, for instance).  The value specified should
 be the first letter of one of the following:  traditional, combination,
-partial, or full.  Traditional was the only interface available for
-earlier versions; it consists of a prompt for object class characters,
+full, or partial.
+Traditional was the only interface available for
+early versions; it consists of a prompt for object class characters,
 followed by an object-by-object prompt for all items matching the selected
-object class(es).  Combination starts with a prompt for object class(es)
+object class(es).
+Combination starts with a prompt for object class(es)
 of interest, but then displays a menu of matching objects rather than
-prompting one-by-one.  Partial skips the object class filtering and
-immediately displays a menu of all objects.  Full displays a menu of
+prompting one-by-one.
+Full displays a menu of
 object classes rather than a character prompt, and then a menu of matching
 objects for selection.
+Partial skips the object class filtering and
+immediately displays a menu of all objects.
 \item[\ib{menu\_deselect\_all}]
 Menu character accelerator to deselect all items in a menu.
 Implemented by the Amiga, Gem, X11 and tty ports.
