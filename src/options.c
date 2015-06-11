@@ -4805,7 +4805,6 @@ const char *mapping;
 {
     struct autopickup_exception *ape, **apehead;
     char text[256], *text2;
-    int textsize = 0;
     boolean grab = FALSE;
 
     if (sscanf(mapping, "\"%255[^\"]\"", text) == 1) {
@@ -4817,7 +4816,6 @@ const char *mapping;
             grab = FALSE;
             ++text2;
         }
-        textsize = strlen(text2);
         apehead = (grab) ? &iflags.autopickup_exceptions[AP_GRAB]
                          : &iflags.autopickup_exceptions[AP_LEAVE];
         ape = (struct autopickup_exception *) alloc(
