@@ -1,4 +1,4 @@
-/* NetHack 3.6	flag.h	$NHDT-Date: 1433212171 2015/06/02 02:29:31 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.85 $ */
+/* NetHack 3.6	flag.h	$NHDT-Date: 1433983706 2015/06/11 00:48:26 $  $NHDT-Branch: master $:$NHDT-Revision: 1.86 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -329,9 +329,7 @@ struct instance_flags {
 #ifdef TTY_GRAPHICS
 #define eight_bit_tty wc_eight_bit_input
 #endif
-#ifdef TEXTCOLOR
 #define use_color wc_color
-#endif
 #define hilite_pet wc_hilite_pet
 #define use_inverse wc_inverse
 #ifdef MAC_GRAPHICS_ENV
