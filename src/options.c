@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1433283602 2015/06/02 22:20:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.216 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1434056951 2015/06/11 21:09:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.219 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3067,7 +3067,7 @@ boolean tinitial, tfrom_file;
         return;
     }
 
-    /* menustyle:traditional or combo or full or partial */
+    /* menustyle:traditional or combination or full or partial */
     if (match_optname(opts, "menustyle", 4, TRUE)) {
         int tmp;
         boolean val_required = (strlen(opts) > 5 && !negated);
@@ -3361,7 +3361,7 @@ boolean tinitial, tfrom_file;
 }
 
 static NEARDATA const char *menutype[] = { "traditional", "combination",
-                                           "partial", "full" };
+                                           "full", "partial" };
 
 static NEARDATA const char *burdentype[] = { "unencumbered", "burdened",
                                              "stressed",     "strained",

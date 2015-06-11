@@ -103,10 +103,12 @@ disclose      the types of information you want offered at the end of the
 fruit         the name of a fruit you enjoy eating  [slime mold]
               (basically a whimsy which NetHack uses from time to time).
 menustyle     user interface for selection of multiple objects:
-              Traditional -- one object at a time prompting;
-              Combination -- prompt for classes of interest, then menu;
-              Partial     -- skip class prompt, use menu of all objects;
-              Full        -- menu for classes of interest, then object menu;
+              Traditional -- prompt for classes of interest, then
+                             prompt item-by-item for those classes;
+              Combination -- prompt for classes of interest, then
+                             use a menu for choosing items;
+              Full        -- menu for classes of interest, then item menu;
+              Partial     -- skip class filtering, use menu of all items;
               only the first letter ('T','C','P','F') matters; 'N' (None)
               is a synonym for 'T', as is boolean style negation  [Full]
 number_pad    alphabetic versus numeric control over movement:
@@ -202,16 +204,16 @@ menu_*     create single character accelerators for menu commands.  Below
            ports that implement them:  'x' is X11, 't' is tty, 'g' is Gem,
            'a' is Amiga.
            menu_deselect_all  deselect all items in a menu [-](gxta)
-           menu_deselect_page deselect all items on this page of a menu [\](gta)
+           menu_deselect_page deselect all items on this menu page [\](gta)
            menu_first_page    jump to the first page in a menu [^](gta)
            menu_invert_all    invert all items in a menu [@](gxta)
-           menu_invert_page   invert all items on this page of a menu [~](gta)
+           menu_invert_page   invert all items on this menu page [~](gta)
            menu_last_page     jump to the last page in a menu [|](gta)
            menu_next_page     goto the next menu page [>](gta)
            menu_previous_page goto the previous menu page [<](gta)
-           menu_search        search for a menu item [:](gxa)
+           menu_search        search for a menu item [:](gxta)
            menu_select_all    select all items in a menu [.](gxta)
-           menu_select_page   select all items on this page of a menu [,](gta)
+           menu_select_page   select all items on this menu page [,](gta)
 monsters   like dungeon, but for monster symbols
            default:  abcdefghijklmnopqrstuvwxyz
                      ABCDEFGHIJKLMNOPQRSTUVWXYZ@\ \\&;:~]
