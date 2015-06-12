@@ -1,4 +1,4 @@
-/* NetHack 3.6  makedefs.c  $NHDT-Date: 1432535188 2015/05/25 06:26:28 $  $NHDT-Branch: master $:$NHDT-Revision: 1.102 $ */
+/* NetHack 3.6  makedefs.c  $NHDT-Date: 1434151372 2015/06/12 23:22:52 $  $NHDT-Branch: master $:$NHDT-Revision: 1.103 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) M. Stephenson, 1990, 1991.			  */
 /* Copyright (c) Dean Luick, 1990.				  */
@@ -1351,11 +1351,6 @@ static const char *build_opts[] = {
 #endif
 #ifdef NEWS
     "news file",
-#endif
-#ifdef MENU_COLOR_REGEX
-    "menu colors via regular expressions",
-#else
-    "menu colors via pmatch",
 #endif
 #ifdef OVERLAY
 #ifdef MOVERLAY

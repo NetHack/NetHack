@@ -1,4 +1,4 @@
-/* NetHack 3.6  posixregex.c	$NHDT-Date: 1431192778 2015/05/09 17:32:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.2 $ */
+/* NetHack 3.6  posixregex.c	$NHDT-Date: 1434151361 2015/06/12 23:22:41 $  $NHDT-Branch: master $:$NHDT-Revision: 1.4 $ */
 /* Copyright (c) Sean Hunt  2015.                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -43,6 +43,8 @@
  * void regex_free(struct nhregex *re)
  * Deallocate a regex object.
  */
+
+char regex_id[] = "posixregex";
 
 struct nhregex {
     regex_t re;
