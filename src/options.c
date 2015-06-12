@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1434024839 2015/06/11 12:13:59 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.218 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1434056951 2015/06/11 21:09:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.219 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3072,7 +3072,7 @@ boolean tinitial, tfrom_file;
         return;
     }
 
-    /* menustyle:traditional or combo or full or partial */
+    /* menustyle:traditional or combination or full or partial */
     if (match_optname(opts, "menustyle", 4, TRUE)) {
         int tmp;
         boolean val_required = (strlen(opts) > 5 && !negated);
@@ -3366,7 +3366,7 @@ boolean tinitial, tfrom_file;
 }
 
 static NEARDATA const char *menutype[] = { "traditional", "combination",
-                                           "partial", "full" };
+                                           "full", "partial" };
 
 static NEARDATA const char *burdentype[] = { "unencumbered", "burdened",
                                              "stressed",     "strained",
@@ -4810,7 +4810,6 @@ const char *mapping;
 {
     struct autopickup_exception *ape, **apehead;
     char text[256], *text2;
-    int textsize = 0;
     boolean grab = FALSE;
 
     if (sscanf(mapping, "\"%255[^\"]\"", text) == 1) {
@@ -4822,7 +4821,6 @@ const char *mapping;
             grab = FALSE;
             ++text2;
         }
-        textsize = strlen(text2);
         apehead = (grab) ? &iflags.autopickup_exceptions[AP_GRAB]
                          : &iflags.autopickup_exceptions[AP_LEAVE];
         ape = (struct autopickup_exception *) alloc(

@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1433291955 2015/06/03 00:39:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.194 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1434071945 2015/06/12 01:19:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.195 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1570,7 +1570,7 @@ int mode, final, attrindx;
         alimit = ATTRMAX(attrindx);
         /* criterium for whether the limit is interesting varies */
         interesting_alimit =
-            final ? (abase != alimit)
+            final ? TRUE /* was originally `(abase != alimit)' */
                   : (alimit != (attrindx != A_STR ? 18 : STR18(100)));
         paren_pfx = final ? " (" : " (current; ";
         if (acurrent != abase) {
@@ -1584,7 +1584,9 @@ int mode, final, attrindx;
             paren_pfx = ", ";
         }
         if (interesting_alimit) {
-            Sprintf(eos(valubuf), "%slimit:%s", paren_pfx,
+            Sprintf(eos(valubuf), "%s%slimit:%s", paren_pfx,
+                    /* more verbose if exceeding 'limit' due to magic bonus */
+                    (acurrent > alimit) ? "innate " : "",
                     attrval(attrindx, alimit, valstring));
             /* paren_pfx = ", "; */
         }

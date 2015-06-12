@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.h	$NHDT-Date: 1432512781 2015/05/25 00:13:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.64 $ */
+/* NetHack 3.6	hack.h	$NHDT-Date: 1434056948 2015/06/11 21:09:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.66 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -355,8 +355,8 @@ NEARDATA extern coord bhitpos; /* place where throw or zap hits or stops */
 #define MENUTYPELEN sizeof("traditional ")
 #define MENU_TRADITIONAL 0
 #define MENU_COMBINATION 1
-#define MENU_PARTIAL 2
-#define MENU_FULL 3
+#define MENU_FULL 2
+#define MENU_PARTIAL 3
 
 #define MENU_SELECTED TRUE
 #define MENU_UNSELECTED FALSE

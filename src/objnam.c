@@ -2360,7 +2360,7 @@ rnd_otyp_by_wpnskill(skill)
 schar skill;
 {
     int i, n = 0;
-    short otyp;
+    short otyp = STRANGE_OBJECT;
     for (i = bases[WEAPON_CLASS];
          i < NUM_OBJECTS && objects[i].oc_class == WEAPON_CLASS; i++)
         if (objects[i].oc_skill == skill) {
@@ -2375,7 +2375,7 @@ schar skill;
                 if (--n < 0)
                     return i;
     }
-    return STRANGE_OBJECT;
+    return otyp;
 }
 
 /*

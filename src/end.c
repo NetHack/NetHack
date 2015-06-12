@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1432512762 2015/05/25 00:12:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.98 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1434071495 2015/06/12 01:11:35 $  $NHDT-Branch: master $:$NHDT-Revision: 1.99 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -539,21 +539,21 @@ VA_DECL(const char *, str)
 #else
     if (!wizard) {
         if (sysopt.support)
-            raw_printf("To report this error, %s%s.", sysopt.support,
+            raw_printf("To report this error, %s%s", sysopt.support,
                        !program_state.something_worth_saving
-                           ? ""
+                           ? "."
                            : " and it may be possible to rebuild.");
         else if (sysopt.wizards) {
             char *tmp = build_english_list(sysopt.wizards);
             raw_printf("To report this error, contact %s%s", tmp,
                        !program_state.something_worth_saving
-                           ? ""
+                           ? "."
                            : " and it may be possible to rebuild.");
             free(tmp);
         } else
-            raw_printf("Report error to \"%s\"%s.", WIZARD_NAME,
+            raw_printf("Report error to \"%s\"%s", WIZARD_NAME,
                        !program_state.something_worth_saving
-                           ? ""
+                           ? "."
                            : " and it may be possible to rebuild.");
     }
 #endif
