@@ -3215,22 +3215,10 @@ look like this:
 \begin{verbatim}
     MSGTYPE=type "pattern"
 \end{verbatim}
-
 \blist{}
 %.lp
 \item[\ib{type}]
 how the message should be shown;
-%.lp
-\item[\ib{pattern}]
-the pattern to match.
-\elist
-
-%.lp ""
-The pattern should be a regular expression.
-
-%.lp ""
-Allowed types are:
-
 %.sd
 %.si
 {\tt show}  --- show message normally.\\
@@ -3239,6 +3227,11 @@ Allowed types are:
 {\tt norep} --- show the message once, but not again if no other message is shown in between.
 %.ei
 %.ed
+%.lp
+\item[\ib{pattern}]
+the pattern to match. The pattern should be a regular expression.
+\elist
+
 
 %.lp ""
 Here's an example of menu colors using NetHack's internal
@@ -4214,3 +4207,4 @@ Izchak Miller & Mike Passaretti & Yitzhak Sapir
 %\end{flushleft}
 
 \end{document}
+
