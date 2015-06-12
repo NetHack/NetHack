@@ -1,4 +1,4 @@
-/* NetHack 3.6	role.c	$NHDT-Date: 1433207910 2015/06/02 01:18:30 $  $NHDT-Branch: master $:$NHDT-Revision: 1.31 $ */
+/* NetHack 3.6	role.c	$NHDT-Date: 1434073671 2015/06/12 01:47:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.32 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1634,7 +1634,7 @@ int buflen, rolenum, racenum, gendnum, alignnum;
 {
     const char *defprompt = "Shall I pick a character for you? [ynaq] ";
     int num_post_attribs = 0;
-    char tmpbuf[BUFSZ];
+    char tmpbuf[BUFSZ], *p;
 
     if (buflen < QBUFSZ)
         return (char *) defprompt;
@@ -1650,6 +1650,12 @@ int buflen, rolenum, racenum, gendnum, alignnum;
     (void) root_plselection_prompt(eos(tmpbuf), buflen - strlen(tmpbuf),
                                    rolenum, racenum, gendnum, alignnum);
     Sprintf(buf, "%s", s_suffix(tmpbuf));
+    /* don't bother splitting caveman/cavewoman or priest/priestess
+       in order to apply possessive suffix to both halves, but do
+       change "priest/priestess'" to "priest/priestess's" */
+    if ((p = strstri(buf, "priest/priestess'")) != 0
+        && p[sizeof "priest/priestess'" - sizeof ""] == '\0')
+        strkitten(buf, 's');
 
     /* buf should now be:
      *    <your lawful female gnomish cavewoman's>
