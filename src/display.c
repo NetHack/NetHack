@@ -1710,46 +1710,47 @@ xchar x, y;
     int idx, bkglyph = NO_GLYPH;
     struct rm *lev = &levl[x][y];
 
-    switch (lev->typ) {
-    case SCORR:
-    case STONE:
-        idx = level.flags.arboreal ? S_tree : S_stone;
-        break;
-    case ROOM:
-       idx = S_room;
-       break;
-    case CORR:
-       idx = (lev->waslit || flags.lit_corridor) ? S_litcorr : S_corr;
-       break;
-    case ICE:
-       idx = S_ice;
-       break;
-    case AIR:
-       idx = S_air;
-       break;
-    case CLOUD:
-       idx = S_cloud;
-       break;
-    case WATER:
-       idx = S_water;
-       break;
-    default:
-       idx = S_room;
-       break;
+    if (iflags.use_background_glyph) {
+        switch (lev->typ) {
+        case SCORR:
+        case STONE:
+            idx = level.flags.arboreal ? S_tree : S_stone;
+            break;
+        case ROOM:
+           idx = S_room;
+           break;
+        case CORR:
+           idx = (lev->waslit || flags.lit_corridor) ? S_litcorr : S_corr;
+           break;
+        case ICE:
+           idx = S_ice;
+           break;
+        case AIR:
+           idx = S_air;
+           break;
+        case CLOUD:
+           idx = S_cloud;
+           break;
+        case WATER:
+           idx = S_water;
+           break;
+        default:
+           idx = S_room;
+           break;
+        }
+
+        if (!cansee(x, y) && (!lev->waslit || flags.dark_room)) {
+            /* Floor spaces are dark if unlit.  Corridors are dark if unlit. */
+            if (lev->typ == CORR && idx == S_litcorr)
+                idx = S_corr;
+            else if (idx == S_room)
+                idx = (flags.dark_room && iflags.use_color) ?
+                       (DARKROOMSYM) :  S_stone;
+        }
+
+        if (idx != S_room)
+            bkglyph = cmap_to_glyph(idx);
     }
-
-    if (!cansee(x, y) && (!lev->waslit || flags.dark_room)) {
-        /* Floor spaces are dark if unlit.  Corridors are dark if unlit. */
-        if (lev->typ == CORR && idx == S_litcorr)
-            idx = S_corr;
-        else if (idx == S_room)
-            idx = (flags.dark_room && iflags.use_color) ?
-                   (DARKROOMSYM) :  S_stone;
-    }
-
-    if (idx != S_room)
-        bkglyph = cmap_to_glyph(idx);
-
     return bkglyph;
 }
 
