@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1433978592 2015/06/10 23:23:12 $  $NHDT-Branch: master $:$NHDT-Revision: 1.175 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1434202413 2015/06/13 13:33:33 $  $NHDT-Branch: tribute_read $:$NHDT-Revision: 1.176 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3387,6 +3387,8 @@ boolean wildcards;
  *
  */
 
+STATIC_OVL char *FDECL(bookformat,(char *,char *,int,int *));
+
 #define SECTIONSCOPE 1
 #define TITLESCOPE 2
 #define PASSAGESCOPE 3
@@ -3517,7 +3519,13 @@ int tribpassage;
             break;
         default:
             if (matchedtitle && scope == PASSAGESCOPE && tribwin != WIN_ERR) {
-                putstr(tribwin, 0, line);
+                if (strlen(line) > COLNO - 5) {
+                    char *s, partial[BUFSZ];
+                    int cntxt = 0;
+                    while ((s = bookformat(line, partial, COLNO-5, &cntxt)))
+                        putstr(tribwin, 0, s);
+                } else
+                    putstr(tribwin, 0, line);
                 Strcpy(lastline, line);
             }
         }
@@ -3545,6 +3553,49 @@ cleanup:
 
     return grasped;
 }
+
+char *
+bookformat(line, partial, maxlen, cntxt)
+char *line, *partial;
+int maxlen, *cntxt;
+{
+    /* Try to do a little better at where we break the line */
+    char *txt = partial;
+    int start, finish;
+    int  ccnt, k, k2, lastbreak = 0;
+
+    if (!line || !partial || !maxlen)
+        return (char *)0;
+
+    start = *cntxt;
+    ccnt = start; k2 = 0;
+    if (!line[ccnt])
+        return (char *)0;
+
+    while (line[ccnt] && k2 < maxlen) {
+        if (line[ccnt] == ' ')
+            lastbreak = ccnt;
+        k2++;
+        ccnt++;
+    }
+    finish = ccnt;
+
+    if (!line[ccnt]) {
+        if (k2 <= maxlen)
+            finish = ccnt;
+    } else
+        finish = lastbreak;
+
+    k2 = 0;
+    for (k = start; k < finish; ++k) {
+        partial[k2++] = line[k];
+    }
+    partial[k2] = '\0';
+    *cntxt = finish;
+
+    return partial;
+}
+
 /* ----------  END TRIBUTE ----------- */
 
 /*files.c*/
