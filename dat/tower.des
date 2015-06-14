@@ -19,15 +19,17 @@ MAP
   |.| |.| |.|  
   --- --- ---  
 ENDMAP
+$niches = { (03,01), (03,09), (07,01), (07,09), (11,01), (11,09) }
+SHUFFLE: $niches
 LADDER:(11,05),down
 # The lord and his court
 MONSTER:('V',"Vlad the Impaler"),(06,05)
-MONSTER:'V',(03,09)
-MONSTER:'V',(07,09)
-MONSTER:'V',(11,09)
-MONSTER:'V',(03,01)
-MONSTER:'V',(07,01)
-MONSTER:'V',(11,01)
+MONSTER:'V',$niches[0]
+MONSTER:'V',$niches[1]
+MONSTER:'V',$niches[2]
+MONSTER:'V',$niches[3]
+MONSTER:'V',$niches[4]
+MONSTER:'V',$niches[5]
 # The doors
 DOOR:closed,(08,03)
 DOOR:closed,(10,03)
@@ -38,12 +40,17 @@ DOOR:locked,(10,07)
 DOOR:closed,(03,06)
 # treasures
 OBJECT:('(',"chest"),(07,05)
-OBJECT:('(',"chest"),(03,09)
-OBJECT:('(',"chest"),(07,09)
-OBJECT:('(',"chest"),(11,09)
-OBJECT:('(',"chest"),(03,01)
-OBJECT:('(',"chest"),(07,01)
-OBJECT:('(',"chest"),(11,01)
+
+OBJECT:('(',"chest"),$niches[0]
+OBJECT:('(',"chest"),$niches[1]
+OBJECT:('(',"chest"),$niches[2]
+OBJECT:('(',"chest"),$niches[3]
+CONTAINER:('(',"chest"),$niches[4] {
+  OBJECT:('(', "wax candle"), quantity:4d2
+}
+CONTAINER:('(',"chest"),$niches[5] {
+  OBJECT:('(', "tallow candle"), quantity:4d2
+}
 # We have to protect the tower against outside attacks
 NON_DIGGABLE:(00,00,14,10)
 

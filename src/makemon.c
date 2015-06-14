@@ -1135,9 +1135,10 @@ register int mmflags;
     if ((mcham = pm_to_cham(mndx)) != NON_PM) {
         /* this is a shapechanger after all */
         if (Protection_from_shape_changers
-            || mtmp->cham == PM_VLAD_THE_IMPALER) {
+            || mndx == PM_VLAD_THE_IMPALER) {
             ; /* stuck in its natural form (NON_PM) */
         } else {
+            mtmp->cham = mcham;
             /* Note: shapechanger's initial form used to be
                chosen here with rndmonst(), yielding a monster
                which was approriate to the level's difficulty

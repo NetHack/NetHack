@@ -1,4 +1,4 @@
-/* NetHack 3.6  posixregex.c	$NHDT-Date: 1432472490 2015/05/24 13:01:30 $  $NHDT-Branch: master $:$NHDT-Revision: 1.0 $ */
+/* NetHack 3.6  posixregex.c	$NHDT-Date: 1434151360 2015/06/12 23:22:40 $  $NHDT-Branch: master $:$NHDT-Revision: 1.0 $ */
 /* Copyright (c) Sean Hunt  2015.                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -15,6 +15,8 @@
 /*
  * NOTE: This file is untested.
  */
+
+char regex_id[] = "pmatchregex";
 
 struct nhregex {
   const char *pat;
