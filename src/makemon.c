@@ -1134,6 +1134,7 @@ register int mmflags;
     mtmp->cham = NON_PM; /* default is "not a shapechanger" */
     if ((mcham = pm_to_cham(mndx)) != NON_PM) {
         /* this is a shapechanger after all */
+        mtmp->cham = mcham;
         if (Protection_from_shape_changers
             || mtmp->cham == PM_VLAD_THE_IMPALER) {
             ; /* stuck in its natural form (NON_PM) */
