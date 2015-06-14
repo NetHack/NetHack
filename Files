@@ -269,8 +269,8 @@ mhmap.c         mhmap.h         mhmenu.c        mhmenu.h        mhmsg.h
 mhmsgwnd.c      mhmsgwnd.h      mhrip.c         mhrip.h         mhsplash.c
 mhsplash.h      mhstatus.c      mhstatus.h      mhtext.c        mhtext.h
 mnsel.uu        mnselcnt.uu     mnunsel.uu      mswproc.c
-petmark.uu      resource.h      rip.uu          splash.uu       tiles.mak
-winMS.h         winhack.c       winhack.rc
+petmark.uu      pilemark.uu     resource.h      rip.uu          splash.uu
+tiles.mak       winMS.h         winhack.c       winhack.rc
 (files for Visual Studio 2010 Express Edition builds)
 dgncomp.vcxproj  dgnstuff.vcxproj dgnstuff.mak     dlb_main.vcxproj levcomp.vcxproj
 levstuff.vcxproj levstuff.mak     makedefs.vcxproj NetHack.sln      uudecode.vcxproj

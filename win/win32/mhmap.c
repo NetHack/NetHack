@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhmap.c	$NHDT-Date: 1432512811 2015/05/25 00:13:31 $  $NHDT-Branch: master $:$NHDT-Revision: 1.48 $ */
+/* NetHack 3.6	mhmap.c	$NHDT-Date: 1434321129 2015/06/14 22:32:09 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.53 $ */
 /* Copyright (C) 2001 by Alex Kompel      */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -712,7 +712,11 @@ onPaint(HWND hWnd)
             int glyph, bkglyph;
             RECT glyph_rect;
             int layer;
-
+#ifndef IGNORE_MJA
+            int color;
+            unsigned special;
+            int mgch;
+#endif
             /* prepare tiles DC for mapping */
             tileDC = CreateCompatibleDC(hDC);
             saveBmp = SelectObject(tileDC, GetNHApp()->bmpMapTiles);
@@ -759,7 +763,14 @@ onPaint(HWND hWnd)
                         layer ++;
                      }
 
+#ifndef IGNORE_NHMALL
+                     /* rely on NetHack core helper routine */
+                     (void) mapglyph(data->map[i][j], &mgch, &color,
+                                        &special, i, j);
+                     if ((glyph != NO_GLYPH) && (special & MG_PET) 
+#else
                      if ((glyph != NO_GLYPH) && glyph_is_pet(glyph)
+#endif
                            && iflags.wc_hilite_pet) {
                         /* apply pet mark transparently over
                            pet image */
@@ -778,6 +789,25 @@ onPaint(HWND hWnd)
                         SelectObject(hdcPetMark, bmPetMarkOld);
                         DeleteDC(hdcPetMark);
                     }
+#ifndef IGNORE_NHMALL
+                    if ((glyph != NO_GLYPH) && (special & MG_OBJPILE)) {
+                        /* apply pilemark transparently over other image */
+                        HDC hdcPileMark;
+                        HBITMAP bmPileMarkOld;
+
+                        /* this is DC for pilemark bitmap */
+                        hdcPileMark = CreateCompatibleDC(hDC);
+                        bmPileMarkOld = SelectObject(
+                            hdcPileMark, GetNHApp()->bmpPileMark);
+
+                        (*GetNHApp()->lpfnTransparentBlt)(
+                            hDC, glyph_rect.left, glyph_rect.top,
+                            data->xScrTile, data->yScrTile, hdcPileMark, 0,
+                            0, TILE_X, TILE_Y, TILE_BK_COLOR);
+                        SelectObject(hdcPileMark, bmPileMarkOld);
+                        DeleteDC(hdcPileMark);                        
+		    }
+#endif
                 }
 
             SelectObject(tileDC, saveBmp);
