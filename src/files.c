@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1434243576 2015/06/14 00:59:36 $  $NHDT-Branch: master $:$NHDT-Revision: 1.178 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1434249087 2015/06/14 02:31:27 $  $NHDT-Branch: master $:$NHDT-Revision: 1.179 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3387,10 +3387,6 @@ boolean wildcards;
  *
  */
 
-STATIC_DCL boolean FDECL(add_book_content,(char *,BOOLEAN_P));
-STATIC_DCL char *FDECL(get_book_content,(char *,int));
-STATIC_DCL void NDECL(free_book_content);
-
 #define SECTIONSCOPE 1
 #define TITLESCOPE 2
 #define PASSAGESCOPE 3
@@ -3409,7 +3405,7 @@ int tribpassage;
     const char *badtranslation = "an incomprehensible foreign translation";
     boolean matchedsection = FALSE, matchedtitle = FALSE;
     winid tribwin = WIN_ERR;
-    boolean grasped = FALSE, partial_line = FALSE;
+    boolean grasped = FALSE;
 
     /* check for mandatories */
     if (!tribsection || !tribtitle) {
@@ -3449,12 +3445,8 @@ int tribpassage;
     *line = *lastline = '\0';
     while (dlb_fgets(line, sizeof line, fp) != 0) {
         linect++;
-        if ((endp = index(line, '\n')) != 0) {
-            *endp = '\0';
-            partial_line = FALSE;
-        } else {
-            partial_line = TRUE;
-        }
+        if ((endp = index(line, '\n')) != 0)
+            *endp = 0;
         switch (line[0]) {
         case '%':
             if (!strncmpi(&line[1], "section ", sizeof("section ") - 1)) {
@@ -3524,21 +3516,17 @@ int tribpassage;
             /* comment only, next! */
             break;
         default:
-            if (matchedtitle && scope == PASSAGESCOPE && tribwin != WIN_ERR)
-                add_book_content(line, partial_line);
+            if (matchedtitle && scope == PASSAGESCOPE && tribwin != WIN_ERR) {
+                putstr(tribwin, 0, line);
+                Strcpy(lastline, line);
+            }
         }
     }
 
 cleanup:
     (void) dlb_fclose(fp);
     if (tribwin != WIN_ERR) {
-        char *s, buf[BUFSZ];
         if (matchedtitle && scope == PASSAGESCOPE) {
-            while ((s = get_book_content(buf, COLNO-5))) {
-                putstr(tribwin, 0, s);
-                Strcpy(lastline, s);
-            }
-            free_book_content();
             display_nhwindow(tribwin, FALSE);
             /* put the final attribution line into message history,
                analogous to the summary line from long quest messages */
@@ -3557,139 +3545,6 @@ cleanup:
 
     return grasped;
 }
-
-static char *content = 0;
-static int strt = 0;
-static int creditpass = 0;
-static int bookerror = 0;
-
-boolean
-add_book_content(line, partial_line)
-char *line;
-boolean partial_line;
-{
-    int l;
-    char *new_content = 0;
-
-    if (!content) {
-        l = strlen(line) + (partial_line ? 1 : 2);
-        content = (char *)alloc(l);
-        Strcpy(content, line);
-        if (!partial_line)
-            Strcat(content, " ");
-        strt = 0;
-        creditpass = 0;
-    } else {
-        l = strlen(content) + strlen(line) + (partial_line ? 1 : 2);
-        new_content = (char *)alloc(l);
-        if (!new_content) return FALSE;
-        Strcpy(new_content, content);
-        Strcat(new_content, line);
-        if (!partial_line)
-            Strcat(new_content, " ");
-        free(content);
-        content = new_content;
-        new_content = (char *)0;
-        l = strlen(content);
-    }
-    return TRUE;
-}
-
-char *
-get_book_content(buf, bufsiz)
-char *buf;
-int bufsiz;
-{
-    /* Try to do a little better at where we do or don't break the line */
-    char hold;
-    int k, this_line;
-    boolean creditline = FALSE;
-    static int this_passage = 0;
-
-    if (strt == -1 || !buf || !bufsiz)
-        return (char *)0;
-
-    this_line = 0;
-    for (k = strt; content[k] &&
-            (content[k] != '[' || creditpass != 0) &&
-            this_line < (bufsiz - 2); ++k) {
-        this_passage++;
-        this_line++;
-    }
-    if (this_line >= (bufsiz - 2)) {
-        while(content[k] != ' ' &&
-              content[k] != '.' &&
-              content[k] != '?' &&
-              content[k] != '!')
-              --k;
-        if (content[k] != ' ') k++;
-        hold = content[k];
-        content[k] = '\0';
-	Strcpy(buf, &content[strt]);
-        content[k] = hold;
-        if (content[k] == ' ') k++;
-        strt = k;
-        creditpass = 0;
-        return buf;
-    }
-    if (!content[k]) {
-        /* found the trailing null */
-        Strcpy(buf, &content[strt]);
-        strt = -1;
-        return buf;
-        creditpass = 0;
-    }
-    if (content[k] == '[') {
-        if ((int)strlen(&content[strt]) > bufsiz - 1) {
-            /* This isn't really the credit line */
-            creditpass = -1;
-            if (this_line > 0) {
-                /* some stuff to output */
-                hold = content[k];
-                content[k] = '\0';
-                Strcpy(buf, &content[strt]);
-                content[k] = hold;
-            } else {
-                Strcpy(buf, "");
-            }
-            strt = k;
-            return buf;
-        }
-        if (this_line > 0) {
-            /* There's some stuff to pass back */
-            hold = content[k];
-            content[k] = '\0';
-            Strcpy(buf, &content[strt]);
-            content[k] = hold;
-            strt = k;
-            return buf;
-        } else {
-            if (creditpass == 0) {
-                Strcpy(buf, "");
-                creditpass++;
-                return buf;
-            } else if (creditpass == 1) {
-                if (content[strt-1] == ' ') strt--;
-                if (content[strt-1] == ' ') strt--;
-                Strcpy(buf, &content[strt]);
-                strt = -1;
-                return buf;
-            }
-        }
-    }
-    strt = -1;
-    return (char *)0;
-}
-
-void
-free_book_content()
-{
-    if (content)
-        free(content);
-    content = (char *)0;
-    strt = -1;
-}
-
 /* ----------  END TRIBUTE ----------- */
 
 /*files.c*/
