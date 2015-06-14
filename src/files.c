@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1434237479 2015/06/13 23:17:59 $  $NHDT-Branch: tribute_read $:$NHDT-Revision: 1.177 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1434243576 2015/06/14 00:59:36 $  $NHDT-Branch: master $:$NHDT-Revision: 1.178 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3561,6 +3561,7 @@ cleanup:
 static char *content = 0;
 static int strt = 0;
 static int creditpass = 0;
+static int bookerror = 0;
 
 boolean
 add_book_content(line, partial_line)
@@ -3609,7 +3610,8 @@ int bufsiz;
         return (char *)0;
 
     this_line = 0;
-    for (k = strt; content[k] && (content[k] != '[') &&
+    for (k = strt; content[k] &&
+            (content[k] != '[' || creditpass != 0) &&
             this_line < (bufsiz - 2); ++k) {
         this_passage++;
         this_line++;
@@ -3623,10 +3625,11 @@ int bufsiz;
         if (content[k] != ' ') k++;
         hold = content[k];
         content[k] = '\0';
-        Strcpy(buf, &content[strt]);
+	Strcpy(buf, &content[strt]);
         content[k] = hold;
         if (content[k] == ' ') k++;
         strt = k;
+        creditpass = 0;
         return buf;
     }
     if (!content[k]) {
@@ -3634,8 +3637,24 @@ int bufsiz;
         Strcpy(buf, &content[strt]);
         strt = -1;
         return buf;
+        creditpass = 0;
     }
     if (content[k] == '[') {
+        if ((int)strlen(&content[strt]) > bufsiz - 1) {
+            /* This isn't really the credit line */
+            creditpass = -1;
+            if (this_line > 0) {
+                /* some stuff to output */
+                hold = content[k];
+                content[k] = '\0';
+                Strcpy(buf, &content[strt]);
+                content[k] = hold;
+            } else {
+                Strcpy(buf, "");
+            }
+            strt = k;
+            return buf;
+        }
         if (this_line > 0) {
             /* There's some stuff to pass back */
             hold = content[k];
@@ -3649,7 +3668,7 @@ int bufsiz;
                 Strcpy(buf, "");
                 creditpass++;
                 return buf;
-            } else {
+            } else if (creditpass == 1) {
                 if (content[strt-1] == ' ') strt--;
                 if (content[strt-1] == ' ') strt--;
                 Strcpy(buf, &content[strt]);
