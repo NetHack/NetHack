@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1434071495 2015/06/12 01:11:35 $  $NHDT-Branch: master $:$NHDT-Revision: 1.99 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1434408399 2015/06/15 22:46:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.100 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -979,8 +979,10 @@ die:
         force_launch_placement();
 
     /* maintain ugrave_arise even for !bones_ok */
-    if (how == BURNING || how == DISSOLVED) /* corpse gets burnt up too */
-        u.ugrave_arise = (NON_PM - 2);      /* leave no corpse */
+    if (how == PANICKED)
+        u.ugrave_arise = (NON_PM - 3); /* no corpse, no grave */
+    else if (how == BURNING || how == DISSOLVED) /* corpse burns up too */
+        u.ugrave_arise = (NON_PM - 2); /* leave no corpse */
     else if (how == STONING)
         u.ugrave_arise = (NON_PM - 1); /* statue instead of corpse */
     else if (how == TURNED_SLIME)
@@ -1097,16 +1099,12 @@ die:
     if (have_windows) {
         wait_synch();
         display_nhwindow(WIN_MESSAGE, TRUE);
-        destroy_nhwindow(WIN_MAP);
+        destroy_nhwindow(WIN_MAP),  WIN_MAP = WIN_ERR;
 #ifndef STATUS_VIA_WINDOWPORT
-        destroy_nhwindow(WIN_STATUS);
+        destroy_nhwindow(WIN_STATUS),  WIN_STATUS = WIN_ERR;
 #endif
-        destroy_nhwindow(WIN_MESSAGE);
-#ifdef STATUS_VIA_WINDOWPORT
-        WIN_MESSAGE = WIN_MAP = WIN_ERR;
-#else
-        WIN_MESSAGE = WIN_STATUS = WIN_MAP = WIN_ERR;
-#endif
+        destroy_nhwindow(WIN_MESSAGE),  WIN_MESSAGE = WIN_ERR;
+
         if (!done_stopprint || flags.tombstone)
             endwin = create_nhwindow(NHW_TEXT);
 
@@ -1115,9 +1113,9 @@ die:
     } else
         done_stopprint = 1; /* just avoid any more output */
 
-    if (u.uhave.amulet)
+    if (u.uhave.amulet) {
         Strcat(killer.name, " (with the Amulet)");
-    else if (how == ESCAPED) {
+    } else if (how == ESCAPED) {
         if (Is_astralevel(&u.uz)) /* offered Amulet to wrong deity */
             Strcat(killer.name, " (in celestial disgrace)");
         else if (carrying(FAKE_AMULET_OF_YENDOR))
