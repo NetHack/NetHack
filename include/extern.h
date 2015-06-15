@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1433207912 2015/06/02 01:18:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.500 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1434330826 2015/06/15 01:13:46 $  $NHDT-Branch: master $:$NHDT-Revision: 1.503 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -537,6 +537,7 @@ E void NDECL(init_dungeons);
 E s_level *FDECL(find_level, (const char *));
 E s_level *FDECL(Is_special, (d_level *));
 E branch *FDECL(Is_branchlev, (d_level *));
+E boolean FDECL(builds_up, (d_level *));
 E xchar FDECL(ledger_no, (d_level *));
 E xchar NDECL(maxledgerno);
 E schar FDECL(depth, (d_level *));

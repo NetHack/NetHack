@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1432512769 2015/05/25 00:12:49 $  $NHDT-Branch: master $:$NHDT-Revision: 1.142 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1434330833 2015/06/15 01:13:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.144 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1224,8 +1224,14 @@ boolean at_stairs, falling, portal;
     assign_level(&u.uz, newlevel);
     assign_level(&u.utolev, newlevel);
     u.utotype = 0;
-    if (dunlev_reached(&u.uz) < dunlev(&u.uz))
-        dunlev_reached(&u.uz) = dunlev(&u.uz);
+    if (!builds_up(&u.uz)) { /* usual case */
+        if (dunlev(&u.uz) > dunlev_reached(&u.uz))
+            dunlev_reached(&u.uz) = dunlev(&u.uz);
+    } else {
+        if (dunlev_reached(&u.uz) == 0
+            || dunlev(&u.uz) < dunlev_reached(&u.uz))
+            dunlev_reached(&u.uz) = dunlev(&u.uz);
+    }
     reset_rndmonst(NON_PM); /* u.uz change affects monster generation */
 
     /* set default level change destination areas */
