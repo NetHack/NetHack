@@ -1,4 +1,4 @@
-/* NetHack 3.6	dungeon.c	$NHDT-Date: 1432512766 2015/05/25 00:12:46 $  $NHDT-Branch: master $:$NHDT-Revision: 1.58 $ */
+/* NetHack 3.6	dungeon.c	$NHDT-Date: 1434330836 2015/06/15 01:13:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.59 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1067,8 +1067,7 @@ xchar
 ledger_to_dlev(ledgerno)
 xchar ledgerno;
 {
-    return (
-        (xchar)(ledgerno - dungeons[ledger_to_dnum(ledgerno)].ledger_start));
+    return (xchar)(ledgerno - dungeons[ledger_to_dnum(ledgerno)].ledger_start);
 }
 
 /* returns the depth of a level, in floors below the surface	*/
@@ -1077,14 +1076,16 @@ schar
 depth(lev)
 d_level *lev;
 {
-    return ((schar)(dungeons[lev->dnum].depth_start + lev->dlevel - 1));
+    return (schar) (dungeons[lev->dnum].depth_start + lev->dlevel - 1);
 }
 
-boolean on_level(lev1, lev2) /* are "lev1" and "lev2" actually the same? */
+/* are "lev1" and "lev2" actually the same? */
+boolean
+on_level(lev1, lev2)
 d_level *lev1, *lev2;
 {
-    return ((boolean)((lev1->dnum == lev2->dnum)
-                      && (lev1->dlevel == lev2->dlevel)));
+    return (boolean) ((lev1->dnum == lev2->dnum)
+                      && (lev1->dlevel == lev2->dlevel));
 }
 
 /* is this level referenced in the special level chain? */
@@ -1098,7 +1099,7 @@ d_level *lev;
         if (on_level(lev, &levtmp->dlevel))
             return (levtmp);
 
-    return ((s_level *) 0);
+    return (s_level *) 0;
 }
 
 /*
@@ -1116,6 +1117,20 @@ d_level *lev;
             return curr;
     }
     return (branch *) 0;
+}
+
+/* returns True iff the branch 'lev' is in a branch which builds up */
+boolean
+builds_up(lev)
+d_level *lev;
+{
+    dungeon *dptr = &dungeons[lev->dnum];
+    /*
+     * FIXME:  this misclassifies a single level branch reached via stairs
+     * from below.  Saving grace is that no such branches currently exist.
+     */
+    return (boolean) (dptr->num_dunlevs > 1
+                      && dptr->entry_lev == dptr->num_dunlevs);
 }
 
 /* goto the next level (or appropriate dungeon) */
@@ -1523,12 +1538,39 @@ d_level *lev;
 xchar
 level_difficulty()
 {
-    if (In_endgame(&u.uz))
-        return ((xchar)(depth(&sanctum_level) + u.ulevel / 2));
-    else if (u.uhave.amulet)
-        return (deepest_lev_reached(FALSE));
-    else
-        return ((xchar) depth(&u.uz));
+    int res;
+
+    if (In_endgame(&u.uz)) {
+        res = depth(&sanctum_level) + u.ulevel / 2;
+    } else if (u.uhave.amulet) {
+        res = deepest_lev_reached(FALSE);
+    } else {
+        res = depth(&u.uz);
+        /* depth() is the number of elevation units (levels) below
+           the theorhetical surface; in a builds-up branch, that value
+           ends up making the harder to reach levels be treated as if
+           they were easier; adjust for the extra effort involved in
+           going down to the entrance and then up to the location */
+        if (builds_up(&u.uz))
+            res += 2 * (dungeons[u.uz.dnum].entry_lev - u.uz.dlevel + 1);
+            /*
+             * 'Proof' by example:  suppose the entrance to sokoban is
+             * on dungeon level 9, leading up to bottom sokoban level
+             * of 8 [entry_lev].  When the hero is on sokoban level 8
+             * [uz.dlevel], depth() yields eight but he has ventured
+             * one level beyond 9, so difficulty depth should be 10:
+             *   8 + 2 * (8 - 8 + 1) => 10.
+             * Going up to 7, depth is 7 but hero will be two beyond 9:
+             *   7 + 2 * (8 - 7 + 1) => 11.
+             * When he goes up to level 6, three levels beyond 9:
+             *   6 + 2 * (8 - 6 + 1) => 12.
+             * And the top level of sokoban at 5, four levels beyond 9:
+             *   5 + 2 * (8 - 5 + 1) => 13.
+             * The same applies to Vlad's Tower, although the increment
+             * there is inconsequential compared to overall depth.
+             */
+    }
+    return (xchar) res;
 }
 
 /* Take one word and try to match it to a level.
@@ -2143,10 +2185,12 @@ mapseen *mptr;
     if (In_endgame(&u.uz))
         return In_endgame(&mptr->lev);
     /* level is of interest if it has non-zero feature count or known bones
-       or user annotation or known connection to another dungeon brancth */
+       or user annotation or known connection to another dungeon branch
+       or is the furthest level reached in its branch */
     return (INTEREST(mptr->feat) || (mptr->final_resting_place
                                      && (mptr->flags.knownbones || wizard))
-            || mptr->custom || mptr->br);
+            || mptr->custom || mptr->br
+            || mptr->lev.dlevel == dungeons[mptr->lev.dnum].dunlev_ureached);
 }
 
 /* recalculate mapseen for the current level */
@@ -2634,30 +2678,33 @@ int how;   /* cause of death; only used if final==2 and mptr->lev==u.uz */
 boolean printdun;
 {
     char buf[BUFSZ], tmpbuf[BUFSZ];
-    int i, depthstart;
+    int i, depthstart, dnum;
     boolean died_here = (final == 2 && on_level(&u.uz, &mptr->lev));
 
     /* Damnable special cases */
     /* The quest and knox should appear to be level 1 to match
      * other text.
      */
-    if (mptr->lev.dnum == quest_dnum || mptr->lev.dnum == knox_level.dnum)
+    dnum = mptr->lev.dnum;
+    if (dnum == quest_dnum || dnum == knox_level.dnum)
         depthstart = 1;
     else
-        depthstart = dungeons[mptr->lev.dnum].depth_start;
+        depthstart = dungeons[dnum].depth_start;
 
     if (printdun) {
-        /* Sokoban lies about dunlev_ureached and we should
-         * suppress the negative numbers in the endgame.
-         */
-        if (dungeons[mptr->lev.dnum].dunlev_ureached == 1
-            || mptr->lev.dnum == sokoban_dnum || In_endgame(&mptr->lev))
-            Sprintf(buf, "%s:", dungeons[mptr->lev.dnum].dname);
+        if (dungeons[dnum].dunlev_ureached == dungeons[dnum].entry_lev
+            /* suppress the negative numbers in the endgame */
+            || In_endgame(&mptr->lev))
+            Sprintf(buf, "%s:", dungeons[dnum].dname);
+        else if (builds_up(&mptr->lev))
+            Sprintf(buf, "%s: levels %d up to %d",
+                    dungeons[dnum].dname,
+                    depthstart + dungeons[dnum].entry_lev - 1,
+                    depthstart + dungeons[dnum].dunlev_ureached - 1);
         else
             Sprintf(buf, "%s: levels %d to %d",
-                    dungeons[mptr->lev.dnum].dname, depthstart,
-                    depthstart + dungeons[mptr->lev.dnum].dunlev_ureached
-                        - 1);
+                    dungeons[dnum].dname, depthstart,
+                    depthstart + dungeons[dnum].dunlev_ureached - 1);
         putstr(win, !final ? ATR_INVERSE : 0, buf);
     }
 
