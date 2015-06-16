@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1434447701 2015/06/16 09:41:41 $  $NHDT-Branch: master $:$NHDT-Revision: 1.63 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1434450195 2015/06/16 10:23:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.64 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1373,7 +1373,7 @@ int x, y, glyph;
         return;
     }
 
-    if (gbuf[y][x].glyph != glyph) {
+    if (gbuf[y][x].glyph != glyph || iflags.use_background_glyph) {
         gbuf[y][x].glyph = glyph;
         gbuf[y][x].new = 1;
         if (gbuf_start[y] > x)
@@ -1707,15 +1707,51 @@ STATIC_OVL int
 get_bk_glyph(x,y)
 xchar x, y;
 {
-#if 1
-    int retglyph = NO_GLYPH;
-    nhUse(x);
-    nhUse(y);
-#else
+    int idx, bkglyph = NO_GLYPH;
     struct rm *lev = &levl[x][y];
-#endif
 
-    return retglyph;
+    if (iflags.use_background_glyph) {
+        switch (lev->typ) {
+        case SCORR:
+        case STONE:
+            idx = level.flags.arboreal ? S_tree : S_stone;
+            break;
+        case ROOM:
+           idx = S_room;
+           break;
+        case CORR:
+           idx = (lev->waslit || flags.lit_corridor) ? S_litcorr : S_corr;
+           break;
+        case ICE:
+           idx = S_ice;
+           break;
+        case AIR:
+           idx = S_air;
+           break;
+        case CLOUD:
+           idx = S_cloud;
+           break;
+        case WATER:
+           idx = S_water;
+           break;
+        default:
+           idx = S_room;
+           break;
+        }
+
+        if (!cansee(x, y) && (!lev->waslit || flags.dark_room)) {
+            /* Floor spaces are dark if unlit.  Corridors are dark if unlit. */
+            if (lev->typ == CORR && idx == S_litcorr)
+                idx = S_corr;
+            else if (idx == S_room)
+                idx = (flags.dark_room && iflags.use_color) ?
+                       (DARKROOMSYM) :  S_stone;
+        }
+
+        if (idx != S_room)
+            bkglyph = cmap_to_glyph(idx);
+    }
+    return bkglyph;
 }
 
 /* -------------------------------------------------------------------------

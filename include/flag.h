@@ -1,4 +1,4 @@
-/* NetHack 3.6	flag.h	$NHDT-Date: 1433983706 2015/06/11 00:48:26 $  $NHDT-Branch: master $:$NHDT-Revision: 1.86 $ */
+/* NetHack 3.6	flag.h	$NHDT-Date: 1434450203 2015/06/16 10:23:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.87 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -207,8 +207,9 @@ struct instance_flags {
     boolean rlecomp; /* run-length comp of levels when writing savefile */
     uchar num_pad_mode;
     boolean echo;             /* 1 to echo characters */
-    boolean use_menu_color;   /* use color in menus; only if wc_color */
-    boolean use_status_hilites; /* use color in status */
+    boolean use_menu_color;       /* use color in menus; only if wc_color */
+    boolean use_status_hilites;   /* use color in status line */
+    boolean use_background_glyph; /* use background glyph when appropriate */
 #if 0
 	boolean  DECgraphics;	/* use DEC VT-xxx extended character set */
 	boolean  IBMgraphics;	/* use IBM extended character set */
