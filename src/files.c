@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1434249087 2015/06/14 02:31:27 $  $NHDT-Branch: master $:$NHDT-Revision: 1.179 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1434421344 2015/06/16 02:22:24 $  $NHDT-Branch: master $:$NHDT-Revision: 1.180 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3392,9 +3392,10 @@ boolean wildcards;
 #define PASSAGESCOPE 3
 
 boolean
-read_tribute(tribsection, tribtitle, tribpassage)
+read_tribute(tribsection, tribtitle, tribpassage, nowin_buf, bufsz)
 const char *tribsection, *tribtitle;
-int tribpassage;
+int tribpassage, bufsz;
+char *nowin_buf;
 {
     dlb *fp;
     char *endp;
@@ -3409,7 +3410,8 @@ int tribpassage;
 
     /* check for mandatories */
     if (!tribsection || !tribtitle) {
-        pline("It's %s of \"%s\"!", badtranslation, tribtitle);
+        if (!nowin_buf)
+            pline("It's %s of \"%s\"!", badtranslation, tribtitle);
         return grasped;
     }
 
@@ -3419,7 +3421,8 @@ int tribpassage;
     fp = dlb_fopen(TRIBUTEFILE, "r");
     if (!fp) {
         /* this is actually an error - cannot open tribute file! */
-        pline("You feel too overwhelmed to continue!");
+        if (!nowin_buf)
+            pline("You feel too overwhelmed to continue!");
         return grasped;
     }
 
@@ -3494,12 +3497,14 @@ int tribpassage;
                     passagenum = atoi(st);
                 if (passagenum && (passagenum <= passagecnt)) {
                     scope = PASSAGESCOPE;
-                    if (matchedtitle && (passagenum == targetpassage))
-                        tribwin = create_nhwindow(NHW_MENU);
+                    if (matchedtitle && (passagenum == targetpassage)) {
+                        if (!nowin_buf)
+                            tribwin = create_nhwindow(NHW_MENU);
+                    }
                 }
             } else if (!strncmpi(&line[1], "e ", sizeof("e ") - 1)) {
                 if (matchedtitle && (scope == PASSAGESCOPE)
-                    && tribwin != WIN_ERR)
+                    && (!nowin_buf && tribwin != WIN_ERR))
                     goto cleanup;
                 if (scope == TITLESCOPE)
                     matchedtitle = FALSE;
@@ -3516,16 +3521,21 @@ int tribpassage;
             /* comment only, next! */
             break;
         default:
-            if (matchedtitle && scope == PASSAGESCOPE && tribwin != WIN_ERR) {
-                putstr(tribwin, 0, line);
-                Strcpy(lastline, line);
+            if (matchedtitle && scope == PASSAGESCOPE) {
+                if (!nowin_buf && tribwin != WIN_ERR) {
+                    putstr(tribwin, 0, line);
+                    Strcpy(lastline, line);
+                } else if (nowin_buf) {
+                    if ((int)strlen(line) < bufsz-1)
+                        Strcpy(nowin_buf, line);
+                }
             }
         }
     }
 
 cleanup:
     (void) dlb_fclose(fp);
-    if (tribwin != WIN_ERR) {
+    if (!nowin_buf && tribwin != WIN_ERR) {
         if (matchedtitle && scope == PASSAGESCOPE) {
             display_nhwindow(tribwin, FALSE);
             /* put the final attribution line into message history,
@@ -3540,10 +3550,20 @@ cleanup:
         tribwin = WIN_ERR;
         grasped = TRUE;
     } else {
-        pline("It seems to be %s of \"%s\"!", badtranslation, tribtitle);
+        if (!nowin_buf)
+            pline("It seems to be %s of \"%s\"!", badtranslation, tribtitle);
+        else
+            grasped = TRUE;
     }
-
     return grasped;
+}
+
+boolean
+Death_quote(buf, bufsz)
+char *buf;
+int bufsz;
+{
+    return read_tribute("Death", "Death Quotes", 0, buf, bufsz);
 }
 /* ----------  END TRIBUTE ----------- */
 

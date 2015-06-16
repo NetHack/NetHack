@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1432939569 2015/05/29 22:46:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.166 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1434421348 2015/06/16 02:22:28 $  $NHDT-Branch: master $:$NHDT-Revision: 1.167 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -813,6 +813,18 @@ have_lizard()
         if (otmp->otyp == CORPSE && otmp->corpsenm == PM_LIZARD)
             return (TRUE);
     return (FALSE);
+}
+
+/* 3.6.0 tribute */
+struct obj *
+u_have_novel()
+{
+    register struct obj *otmp;
+
+    for (otmp = invent; otmp; otmp = otmp->nobj)
+        if (otmp->otyp == SPE_NOVEL)
+            return otmp;
+    return (struct obj *)0;
 }
 
 struct obj *

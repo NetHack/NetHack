@@ -1,4 +1,4 @@
-/* NetHack 3.6	context.h	$NHDT-Date: 1432512775 2015/05/25 00:12:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.25 $ */
+/* NetHack 3.6	context.h	$NHDT-Date: 1434421363 2015/06/16 02:22:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.26 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -80,8 +80,9 @@ struct tribute_info {
     size_t tributesz;       /* make it possible to skip this in future */
     boolean enabled;        /* Do we have tributes turned on? */
     Bitfield(bookstock, 1); /* Have we stocked the book? */
+    Bitfield(Deathnotice,1);    /* Did Death notice the book? */
     /* Markers for other tributes can go here */
-    /* 31 free bits */
+    /* 30 free bits */
 };
 
 struct context_info {
