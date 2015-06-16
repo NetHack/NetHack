@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1434447701 2015/06/16 09:41:41 $  $NHDT-Branch: master $:$NHDT-Revision: 1.63 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1434450195 2015/06/16 10:23:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.64 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
 /* NetHack may be freely redistributed.  See license for details. */

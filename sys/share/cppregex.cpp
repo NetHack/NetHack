@@ -10,7 +10,7 @@
 extern "C" {
   #include <hack.h>
 
-  const char regex_id[] = "cppregex";
+  char regex_id[] = "cppregex";
 
   struct nhregex {
     std::unique_ptr<std::regex> re;
