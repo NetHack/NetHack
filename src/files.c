@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1434422673 2015/06/16 02:44:33 $  $NHDT-Branch: master $:$NHDT-Revision: 1.181 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1434425313 2015/06/16 03:28:33 $  $NHDT-Branch: master $:$NHDT-Revision: 1.182 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3407,6 +3407,7 @@ char *nowin_buf;
     boolean matchedsection = FALSE, matchedtitle = FALSE;
     winid tribwin = WIN_ERR;
     boolean grasped = FALSE;
+    boolean foundpassage = FALSE;
 
     /* check for mandatories */
     if (!tribsection || !tribtitle) {
@@ -3500,11 +3501,13 @@ char *nowin_buf;
                     if (matchedtitle && (passagenum == targetpassage)) {
                         if (!nowin_buf)
                             tribwin = create_nhwindow(NHW_MENU);
+                        else
+                            foundpassage = TRUE;
                     }
                 }
             } else if (!strncmpi(&line[1], "e ", sizeof("e ") - 1)) {
                 if (matchedtitle && (scope == PASSAGESCOPE)
-                    && ((!nowin_buf && tribwin != WIN_ERR) || nowin_buf))
+                    && ((!nowin_buf && tribwin != WIN_ERR) || (nowin_buf && foundpassage)))
                     goto cleanup;
                 if (scope == TITLESCOPE)
                     matchedtitle = FALSE;
@@ -3553,7 +3556,8 @@ cleanup:
         if (!nowin_buf)
             pline("It seems to be %s of \"%s\"!", badtranslation, tribtitle);
         else
-            grasped = TRUE;
+            if (foundpassage)
+                grasped = TRUE;
     }
     return grasped;
 }
