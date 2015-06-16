@@ -10,7 +10,7 @@
 extern "C" {
   #include <hack.h>
 
-  char regex_id[] = "cppregex";
+  const char regex_id[] = "cppregex";
 
   struct nhregex {
     std::unique_ptr<std::regex> re;
@@ -25,7 +25,9 @@ extern "C" {
     if (!re)
       return FALSE;
     try {
-      re->re.reset(new std::regex(s, std::regex::extended | std::regex::nosubs | std::regex::optimize));
+      re->re.reset(new std::regex(s, (std::regex::extended
+                                    | std::regex::nosubs
+                                    | std::regex::optimize)));
       re->err.reset(nullptr);
       return TRUE;
     } catch (const std::regex_error& err) {

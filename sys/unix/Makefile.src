@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.6  Makefile.src	$NHDT-Date: 1432512789 2015/05/25 00:13:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.43 $
+# NetHack 3.6  Makefile.src	$NHDT-Date: 1434446945 2015/06/16 09:29:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.44 $
 
 # Root of source tree:
 NHSROOT=..
@@ -166,6 +166,11 @@ CXX=g++
 #	For cross-compiling, eg. with gcc on Linux (see also CC further up):
 #CXX=arm-linux-g++
 #LINK=arm-linux-gcc
+
+# file for regular expression matching
+REGEXOBJ = posixregex.o
+#REGEXOBJ = pmatchregex.o
+#REGEXOBJ = cppregex.o
 
 # Set the WINSRC, WINOBJ, and WINLIB lines to correspond to your desired
 # combination of windowing systems.  Also set windowing systems in config.h.
@@ -337,7 +342,9 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 
 # all operating-system-dependent .c (for dependencies and such)
 SYSCSRC = ../sys/atari/tos.c ../sys/share/pcmain.c ../sys/share/pcsys.c \
-	../sys/share/pctty.c ../sys/share/pcunix.c ../sys/share/posixregex.c ../sys/share/random.c \
+	../sys/share/pctty.c ../sys/share/pcunix.c \
+	../sys/share/pmatchregex.c ../sys/share/posixregex.c \
+	../sys/share/random.c \
 	../sys/share/ioctl.c ../sys/share/unixtty.c ../sys/unix/unixmain.c \
 	../sys/unix/unixunix.c ../sys/unix/unixres.c ../sys/be/bemain.c
 
@@ -391,14 +398,14 @@ HOBJ = $(FIRSTOBJ) allmain.o alloc.o apply.o artifact.o attrib.o ball.o \
 	minion.o mklev.o mkmap.o \
 	mkmaze.o mkobj.o mkroom.o mon.o mondata.o monmove.o monstr.o \
 	mplayer.o mthrowu.o muse.o music.o o_init.o objnam.o options.o \
-	pager.o pickup.o pline.o polyself.o posixregex.o potion.o pray.o priest.o \
+	pager.o pickup.o pline.o polyself.o potion.o pray.o priest.o \
 	quest.o questpgr.o read.o rect.o region.o restore.o rip.o rnd.o \
 	role.o rumors.o save.o shk.o shknam.o sit.o sounds.o sp_lev.o spell.o \
 	sys.o \
 	steal.o steed.o teleport.o timeout.o topten.o track.o trap.o u_init.o \
 	uhitm.o vault.o vision.o vis_tab.o weapon.o were.o wield.o windows.o \
 	wizard.o worm.o worn.o write.o zap.o \
-	$(RANDOBJ) $(SYSOBJ) $(WINOBJ) $(HINTOBJ) version.o
+	$(REGEXOBJ) $(RANDOBJ) $(SYSOBJ) $(WINOBJ) $(HINTOBJ) version.o
 # the .o files from the HACKCSRC, SYSSRC, and WINSRC lists
 
 $(GAME):	$(SYSTEM)
@@ -599,12 +606,14 @@ pctty.o: ../sys/share/pctty.c $(HACK_H)
 	$(CC) $(CFLAGS) -c ../sys/share/pctty.c
 pcunix.o: ../sys/share/pcunix.c $(HACK_H)
 	$(CC) $(CFLAGS) -c ../sys/share/pcunix.c
+pmatchregex.o: ../sys/share/pmatchregex.c $(HACK_H)
+	$(CC) $(CFLAGS) -c ../sys/share/pmatchregex.c
+posixregex.o: ../sys/share/posixregex.c $(HACK_H)
+	$(CC) $(CFLAGS) -c ../sys/share/posixregex.c
 random.o: ../sys/share/random.c $(HACK_H)
 	$(CC) $(CFLAGS) -c ../sys/share/random.c
 ioctl.o: ../sys/share/ioctl.c $(HACK_H) ../include/tcap.h
 	$(CC) $(CFLAGS) -c ../sys/share/ioctl.c
-posixregex.o: ../sys/share/posixregex.c $(HACK_H)
-	$(CC) $(CFLAGS) -c ../sys/share/posixregex.c
 unixtty.o: ../sys/share/unixtty.c $(HACK_H)
 	$(CC) $(CFLAGS) -c ../sys/share/unixtty.c
 unixmain.o: ../sys/unix/unixmain.c $(HACK_H) ../include/dlb.h
