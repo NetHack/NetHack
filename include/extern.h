@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1434330826 2015/06/15 01:13:46 $  $NHDT-Branch: master $:$NHDT-Revision: 1.503 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1434421365 2015/06/16 02:22:45 $  $NHDT-Branch: master $:$NHDT-Revision: 1.504 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -765,7 +765,8 @@ E void NDECL(really_close);
 #ifdef DEBUG
 E boolean FDECL(debugcore, (const char *, BOOLEAN_P));
 #endif
-E boolean FDECL(read_tribute, (const char *, const char *, int));
+E boolean FDECL(read_tribute, (const char *, const char *, int, char *, int));
+E boolean FDECL(Death_quote, (char *, int));
 
 /* ### fountain.c ### */
 
@@ -901,6 +902,7 @@ E struct obj *FDECL(sobj_at, (int, int, int));
 E struct obj *FDECL(nxtobj, (struct obj *, int, BOOLEAN_P));
 E struct obj *FDECL(carrying, (int));
 E boolean NDECL(have_lizard);
+E struct obj *NDECL(u_have_novel);
 E struct obj *FDECL(o_on, (unsigned int, struct obj *));
 E boolean FDECL(obj_here, (struct obj *, int, int));
 E boolean NDECL(wearing_armor);

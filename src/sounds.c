@@ -1,4 +1,4 @@
-/* NetHack 3.6	sounds.c	$NHDT-Date: 1432510145 2015/05/24 23:29:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.62 $ */
+/* NetHack 3.6	sounds.c	$NHDT-Date: 1434421352 2015/06/16 02:22:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.64 $ */
 /*	Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -906,7 +906,29 @@ register struct monst *mtmp;
                                     : soldier_foe_msg[rn2(3)];
     } break;
     case MS_RIDER:
-        if (ptr == &mons[PM_DEATH] && !rn2(10))
+        /* 3.6.0 tribute */
+        if (ptr == &mons[PM_DEATH] &&
+            !context.tribute.Deathnotice && u_have_novel()) {
+            struct obj *book = u_have_novel();
+            const char *tribtitle = (char *)0;
+
+            if (book) {
+                int novelidx = book->novelidx;
+                tribtitle = noveltitle(&novelidx);
+            }
+            if (tribtitle) {
+                Sprintf(verbuf,
+             "Ah, so you have a copy of '%s'. I may have been misquoted there.",
+                        tribtitle);
+                verbl_msg = verbuf;
+                context.tribute.Deathnotice = 1;
+            }
+        } else if (ptr == &mons[PM_DEATH] &&
+                    !rn2(2) && Death_quote(verbuf, BUFSZ)) {
+                verbl_msg = verbuf;
+        }
+        /* end of tribute addition */
+        else if (ptr == &mons[PM_DEATH] && !rn2(10))
             pline_msg = "is busy reading a copy of Sandman #8.";
         else
             verbl_msg = "Who do you think you are, War?";

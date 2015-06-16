@@ -1,10 +1,11 @@
-/* NetHack 3.6  posixregex.c	$NHDT-Date: 1434151360 2015/06/12 23:22:40 $  $NHDT-Branch: master $:$NHDT-Revision: 1.0 $ */
+/* NetHack 3.6  posixregex.c	$NHDT-Date: 1434446946 2015/06/16 09:29:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.1 $ */
 /* Copyright (c) Sean Hunt  2015.                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
 /* Implementation of the regex engine using pmatch().
+ * [Switched to pmatchi() so as to ignore case.]
  *
  * This is a fallback ONLY and should be avoided where possible, as it results
  * in regexes not behaving as POSIX extended regular expressions. As a result,
@@ -12,56 +13,61 @@
  * portable to ones built with an alternate regex engine.
  */
 
-/*
- * NOTE: This file is untested.
- */
-
-char regex_id[] = "pmatchregex";
+const char regex_id[] = "pmatchregex";
 
 struct nhregex {
-  const char *pat;
+    const char *pat;
 };
 
 struct nhregex *
 regex_init()
 {
-    return (struct nhregex *) alloc(sizeof(struct nhregex));
+    struct nhregex *re;
+
+    re = (struct nhregex *) alloc(sizeof (struct nhregex));
+    re->pat = (const char *) 0;
+    return re;
 }
 
 boolean
-regex_compile(const char *s, struct nhregex *re)
+regex_compile(s, re)
+const char *s;
+struct nhregex *re;
 {
     if (!re)
         return FALSE;
-    if (re->pat);
-        free(re->path);
+    if (re->pat)
+        free((genericptr_t) re->pat);
 
-    re->pat = alloc(strlen(s) + 1);
-    strcpy(re->pat, s);
+    re->pat = dupstr(s);
     return TRUE;
 }
 
 const char *
-regex_error_desc(struct nhregex *re)
+regex_error_desc(re)
+struct nhregex *re UNUSED;
 {
     return "pattern match compilation error";
 }
 
 boolean
-regex_match(const char *s, struct nhregex *re)
+regex_match(s, re)
+const char *s;
+struct nhregex *re;
 {
     if (!re || !re->pat || !s)
         return FALSE;
-    return pmatch(re->pat, s);
+
+    return pmatchi(re->pat, s);
 }
 
 void
-regex_free(struct nhregex *re)
+regex_free(re)
+struct nhregex *re;
 {
-    if (!re)
-        return FALSE;
-
-    if (re->pat)
-        free(re->pat);
-    free(re);
+    if (re) {
+        if (re->pat)
+            free((genericptr_t) re->pat);
+        free((genericptr_t) re);
+    }
 }

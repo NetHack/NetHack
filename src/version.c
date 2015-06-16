@@ -1,4 +1,4 @@
-/* NetHack 3.6	version.c	$NHDT-Date: 1434151385 2015/06/12 23:23:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.32 $ */
+/* NetHack 3.6	version.c	$NHDT-Date: 1434446944 2015/06/16 09:29:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.33 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -130,9 +130,9 @@ doextversion()
     return 0;
 }
 
-extern char regex_id[];
+extern const char regex_id[];
 
-static char *rt_opts[] = {
+static const char *rt_opts[] = {
     "pattern matching via", regex_id,
 };
 static const char indent[] = "    ";
@@ -150,7 +150,7 @@ char *buf;
 {
     char rtbuf[BUFSZ];
     char *pd;
-    int l, i = 0, j = 0;
+    int l, i = 0;
 
     if (strlen(buf) >= BUFSZ - 3)
         return;
