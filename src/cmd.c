@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1434071945 2015/06/12 01:19:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.195 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1434507810 2015/06/17 02:23:30 $  $NHDT-Branch: master $:$NHDT-Revision: 1.196 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3201,7 +3201,8 @@ STATIC_OVL boolean
 accept_menu_prefix(cmd_func)
 int NDECL((*cmd_func));
 {
-    if (cmd_func == dopickup || cmd_func == doextcmd || cmd_func == doextlist)
+    if (cmd_func == dopickup || cmd_func == dotip
+        || cmd_func == doextcmd || cmd_func == doextlist)
         return TRUE;
     return FALSE;
 }
