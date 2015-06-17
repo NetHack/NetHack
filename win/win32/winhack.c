@@ -103,6 +103,10 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
         panic("cannot load tiles bitmap");
     _nethack_app.bmpPetMark =
         LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_PETMARK));
+#ifndef IGNORE_NHMALL
+    _nethack_app.bmpPileMark =
+        LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_PILEMARK));
+#endif
     if (_nethack_app.bmpPetMark == NULL)
         panic("cannot load pet mark bitmap");
     _nethack_app.bmpRip = LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_RIP));
