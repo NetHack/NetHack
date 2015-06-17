@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1432804962 2015/05/28 09:22:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.157 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1434507811 2015/06/17 02:23:31 $  $NHDT-Branch: master $:$NHDT-Revision: 1.159 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2691,53 +2691,74 @@ dotip()
         Sprintf(buf, "You can't tip %s while carrying so much.",
                 !flags.verbose ? "a container" : (boxes > 1) ? "one" : "it");
         if (!check_capacity(buf) && able_to_loot(cc.x, cc.y, FALSE)) {
-
-            if (boxes > 1) {
+            if (boxes > 1 && (flags.menu_style != MENU_TRADITIONAL
+                              || iflags.menu_requested)) {
                 /* use menu to pick a container to tip */
                 int n, i;
                 winid win;
                 anything any;
                 menu_item *pick_list = NULL;
+                struct obj dummyobj, *otmp;
+
                 any = zeroany;
                 win = create_nhwindow(NHW_MENU);
                 start_menu(win);
 
-                for (cobj = level.objects[cc.x][cc.y]; cobj;
+                for (cobj = level.objects[cc.x][cc.y], i = 0; cobj;
                      cobj = cobj->nexthere)
                     if (Is_container(cobj)) {
+                        ++i;
                         any.a_obj = cobj;
                         add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
                                  doname(cobj), MENU_UNSELECTED);
                     }
+                if (invent) {
+                    any = zeroany;
+                    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                             "", MENU_UNSELECTED);
+                    any.a_obj = &dummyobj;
+                    /* use 'i' for inventory unless there are so many
+                       containers that it's already being used */
+                    i = (i <= 'i' - 'a' && !flags.lootabc) ? 'i' : 0;
+                    add_menu(win, NO_GLYPH, &any, i, 0, ATR_NONE,
+                             "tip something being carried", MENU_SELECTED);
+                }
                 end_menu(win, "Tip which container?");
                 n = select_menu(win, PICK_ONE, &pick_list);
                 destroy_nhwindow(win);
-
-                if (n > 0) {
-                    for (i = 0; i < n; i++) {
-                        tipcontainer(pick_list[i].item.a_obj);
-                        free((genericptr_t) pick_list);
-                        return 1;
-                    }
-                }
+                /*
+                 * Deal with quirk of preselected item in pick-one menu:
+                 * n ==  0 => picked preselected entry, toggling it off;
+                 * n ==  1 => accepted preselected choice via SPACE or RETURN;
+                 * n ==  2 => picked something other than preselected entry;
+                 * n == -1 => cancelled via ESC;
+                 */
+                otmp = (n <= 0) ? (struct obj *) 0 : pick_list[0].item.a_obj;
+                if (n > 1 && otmp == &dummyobj)
+                    otmp = pick_list[1].item.a_obj;
                 if (pick_list)
                     free((genericptr_t) pick_list);
+                if (otmp && otmp != &dummyobj) {
+                    tipcontainer(otmp);
+                    return 1;
+                }
                 if (n == -1)
                     return 0;
+                /* else pick-from-invent below */
             } else {
                 for (cobj = level.objects[cc.x][cc.y]; cobj; cobj = nobj) {
                     nobj = cobj->nexthere;
                     if (!Is_container(cobj))
                         continue;
-
-                    c = ynq(safe_qbuf(qbuf, "There is ", " here, tip it?", cobj,
+                    c = ynq(safe_qbuf(qbuf, "There is ", " here, tip it?",
+                                      cobj,
                                       doname, ansimpleoname, "container"));
                     if (c == 'q')
                         return 0;
                     if (c == 'n')
                         continue;
-
                     tipcontainer(cobj);
+                    /* can only tip one container at a time */
                     return 1;
                 }
             }

@@ -937,7 +937,7 @@ There's a fifth element, and generally it's called Surprise.
 # The actual text is probably only novella length.
 #
 %title The Last Hero (7)
-# pg. 41 (end of 1st paragraph)
+# p. 41 (end of 1st paragraph)
 %passage 1
 Too many people, when listing all the perils to be found in the search
 for lost treasure or ancient wisdom, had forgotten to put at the top of
@@ -945,12 +945,12 @@ the list 'the man who arrived just before you'.
 
   [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
 %e passage
-# pg. 5 (1st page of text, 4th & 5th paragraphs)
+# p. 5 (1st page of text, 4th & 5th paragraphs)
 # second paragraph is a bit "on the nose" but is too good to leave out
 %passage 2
 The reason for the story was a mix of many things.  There was humanity's
-desire to do forebidden deeds merely because they were forebidden.
-There was its desire to find new horizon's and kill the people who live
+desire to do forebidden deeds merely because they were forbidden.
+There was its desire to find new horizons and kill the people who live
 beyond them.  There were the mysterious scrolls.  There was the cucumber.
 But mostly there was the knowledge that one day, it would all be over.
 
@@ -964,7 +964,7 @@ or become really, really angry.
 
   [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
 %e passage
-# pg. 19 (bottom 20%)
+# p. 19 (bottom 20%)
 %passage 3
 'And they're /heroes/,' said Mr Betteridge of the Guild of Historians.
 
@@ -982,7 +982,7 @@ heroes.  You had civilisation, such as it was, and you had heroes.
 
   [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
 %e passage
-# pg. 25 (2nd & 3rd fifths)
+# p. 25 (2nd & 3rd fifths)
 %passage 4
 They were, all of them, old men.  Their background conversation was
 a litany of complaints about feet, stomachs and backs.  They moved
@@ -995,7 +995,7 @@ the word 'fear'.  It was something that happened to other people.
 
   [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
 %e passage
-# pg. 97 (middle)
+# p. 97 (middle)
 %passage 5
 Captain Carrot saluted.  'Force is always the last resort, sir,' he said.
 
@@ -1017,7 +1017,7 @@ roughly speaking, it means, "We who are about to die don't want to", sir.'
 
   [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
 %e passage
-# pg. 125 (near top, then continued half way down)
+# p. 125 (near top, then continued half way down)
 %passage 6
 'A good wizard, Rincewind,' said the Chair of Indefinite Studies.  'Not
 particularly bright, but, frankly, I've never been quite happy with
@@ -1038,7 +1038,7 @@ lucky guessing was what being a wizard was all about.
 
   [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
 %e passage
-# pg. 146 (top)
+# p. 146 (top)
 %passage 7
 Evil Harry looked down and shuffled his feet, his face a battle between
 pride and relief.

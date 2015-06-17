@@ -1,4 +1,4 @@
-/* NetHack 3.6	version.c	$NHDT-Date: 1434446944 2015/06/16 09:29:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.33 $ */
+/* NetHack 3.6	version.c	$NHDT-Date: 1434505545 2015/06/17 01:45:45 $  $NHDT-Branch: master $:$NHDT-Revision: 1.35 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -17,7 +17,7 @@
 
 #define BETA_INFO "Beta2"
 
-STATIC_DCL void FDECL(insert_rtoptions, (winid,char *));
+STATIC_DCL void FDECL(insert_rtoptions, (winid,char *,const char *));
 
 /* fill buffer with short version (so caller can avoid including date.h) */
 char *
@@ -112,13 +112,13 @@ doextversion()
                 continue;
 
             if (!rtadded) {
-                pd = eos(buf);
-                pd--;
-                if (*pd == '.' && strlen(buf) > 1) {
-                    insert_rtoptions(win, buf);
-                    rtadded = TRUE;     /* only do it once */
-                    *buf = 0;
-                }
+                const char *catchphrase = ", and basic NetHack features.";
+                pd = strstri(buf, catchphrase);
+                if (pd) {
+                    *pd = '\0';
+                    insert_rtoptions(win, buf, &catchphrase[2]);
+                    rtadded = TRUE; /* only do it once */
+		}
             }
             if (*buf)
                 putstr(win, 0, buf);
@@ -144,42 +144,57 @@ static const char indent[] = "    ";
  * game image, so we insert those options here.
  */
 STATIC_OVL void
-insert_rtoptions(win, buf)
+insert_rtoptions(win, buf, finalphrase)
 winid win;
 char *buf;
+const char *finalphrase;
 {
     char rtbuf[BUFSZ];
-    char *pd;
-    int l, i = 0;
+    int l, i;
+    const char *s1 = 0, *s2 = 0, *s3 = 0, *s4 = 0;
 
-    if (strlen(buf) >= BUFSZ - 3)
+    if ((int)strlen(buf) >= (BUFSZ - 1))
         return;
 
     strcpy(rtbuf, buf);
-    pd = eos(rtbuf);
-    pd--;
-    if (*pd == '.')
-        *pd = 0;
-    Strcat(rtbuf, ", ");
-    l = strlen(rtbuf);
-
-    for (i = 0; i < SIZE(rt_opts); i++) {
-        if (l + strlen(rt_opts[i]) > COLNO - 5) {
-           putstr(win, 0, rtbuf);
-           if (strlen(rt_opts[i]) < BUFSZ - (1 + strlen(indent))) {
-              Strcpy(rtbuf, indent);
-           }
+    for (i = 0; i < (SIZE(rt_opts) + 1); i += 2) {
+        if (i < SIZE(rt_opts)) {
+            s1 = ", ";
+            s2 = rt_opts[i];
+            s3 = " ";
+            s4 = rt_opts[i+1];
+        } else {
+            s1 = " ";
+            s2 = finalphrase;
+            s3 = "";
+            s4 = "";
         }
-        Strcat(rtbuf, rt_opts[i]);
-        l = strlen(rtbuf);
-        if (i % 2)
-            Strcat(rtbuf, (i < SIZE(rt_opts)- 1) ? "," : "."), l++;
-        else
-            Strcat(rtbuf, " "), l++;
+        l = (int)strlen(rtbuf) + (int)strlen(s1) + (int)strlen(s2) +
+            (int)strlen(s3) + (int)strlen(s4) + 1;
+        if (l <= (COLNO - 5) && l < (BUFSZ-1)) {
+            Strcat(rtbuf, s1);
+            Strcat(rtbuf, s2);
+            Strcat(rtbuf, s3);
+            Strcat(rtbuf, s4);
+        } else {
+            putstr(win, 0, rtbuf);
+            if (i >= SIZE(rt_opts))
+                s1 = "";
+            l = (int)strlen(indent) + (int)strlen(s1) + (int)strlen(s2) +
+                (int)strlen(s3) + (int)strlen(s4) + 1;
+            if (l <= (COLNO -5) && l < (BUFSZ-1)) {
+                Strcpy(rtbuf, indent);
+                Strcat(rtbuf, s1);
+                Strcat(rtbuf, s2);
+                Strcat(rtbuf, s3);
+                Strcat(rtbuf, s4);
+            }
+	}
     }
 
     if (l)
         putstr(win, 0, rtbuf);
+    *buf = '\0';
 }
 
 #ifdef MICRO
