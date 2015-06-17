@@ -1,4 +1,4 @@
-/* NetHack 3.6	version.c	$NHDT-Date: 1434505027 2015/06/17 01:37:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.34 $ */
+/* NetHack 3.6	version.c	$NHDT-Date: 1434505545 2015/06/17 01:45:45 $  $NHDT-Branch: master $:$NHDT-Revision: 1.35 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -150,15 +150,13 @@ char *buf;
 const char *finalphrase;
 {
     char rtbuf[BUFSZ];
-    int l, i, k;
+    int l, i;
     const char *s1 = 0, *s2 = 0, *s3 = 0, *s4 = 0;
 
     if ((int)strlen(buf) >= (BUFSZ - 1))
         return;
 
     strcpy(rtbuf, buf);
-    k = SIZE(rt_opts) + 1;
-
     for (i = 0; i < (SIZE(rt_opts) + 1); i += 2) {
         if (i < SIZE(rt_opts)) {
             s1 = ", ";
