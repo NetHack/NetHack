@@ -375,7 +375,7 @@ init_showsyms()
 
     for (i = 0; i < MAXOTHER; i++) {
         if (i == SYM_BOULDER)
-            showsyms[i + SYM_OFF_X] = iflags.bouldersym;
+            showsyms[i + SYM_OFF_X] = iflags.bouldersym ? iflags.bouldersym : def_oc_syms[ROCK_CLASS].sym;
         else if (i == SYM_INVISIBLE)
             showsyms[i + SYM_OFF_X] = DEF_INVISIBLE;
     }
@@ -401,7 +401,7 @@ init_l_symbols()
 
     for (i = 0; i < MAXOTHER; i++) {
         if (i == SYM_BOULDER)
-            l_syms[i + SYM_OFF_X] = iflags.bouldersym;
+            l_syms[i + SYM_OFF_X] = iflags.bouldersym ? iflags.bouldersym : def_oc_syms[ROCK_CLASS].sym;
         else if (i == SYM_INVISIBLE)
             l_syms[i + SYM_OFF_X] = DEF_INVISIBLE;
     }
@@ -433,7 +433,7 @@ init_r_symbols()
 
     for (i = 0; i < MAXOTHER; i++) {
         if (i == SYM_BOULDER)
-            r_syms[i + SYM_OFF_X] = iflags.bouldersym;
+            r_syms[i + SYM_OFF_X] = iflags.bouldersym ? iflags.bouldersym : def_oc_syms[ROCK_CLASS].sym;
         else if (i == SYM_INVISIBLE)
             r_syms[i + SYM_OFF_X] = DEF_INVISIBLE;
     }
