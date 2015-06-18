@@ -135,7 +135,7 @@ unsigned *ospecial;
             cmap_color(offset);
     } else if ((offset = (glyph - GLYPH_OBJ_OFF)) >= 0) { /* object */
         idx = objects[offset].oc_class + SYM_OFF_O;
-        if (offset == BOULDER && iflags.bouldersym)
+        if (offset == BOULDER)
             idx = SYM_BOULDER + SYM_OFF_X;
         if (has_rogue_color && iflags.use_color) {
             switch (objects[offset].oc_class) {
