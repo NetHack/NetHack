@@ -1,4 +1,4 @@
-/* NetHack 3.6	sounds.c	$NHDT-Date: 1434749273 2015/06/19 21:27:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.67 $ */
+/* NetHack 3.6	sounds.c	$NHDT-Date: 1434750452 2015/06/19 21:47:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.68 $ */
 /*	Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -942,10 +942,12 @@ register struct monst *mtmp;
     else if (mtmp->mcan && verbl_msg_mcan)
         verbalize1(verbl_msg_mcan);
     else if (verbl_msg) {
-        if (ptr == &mons[PM_DEATH]) { /* Death talks in CAPITAL LETTERS */
+        if (ptr == &mons[PM_DEATH]) {
+            /* Death talks in CAPITAL LETTERS
+               and without quotation marks */
             char tmpbuf[BUFSZ];
             Sprintf(tmpbuf, "%s", verbl_msg);
-            verbalize1(ucase(tmpbuf));
+            pline(ucase(tmpbuf));
         } else {
             verbalize1(verbl_msg);
         }
