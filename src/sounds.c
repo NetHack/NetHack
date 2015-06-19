@@ -1,4 +1,4 @@
-/* NetHack 3.6	sounds.c	$NHDT-Date: 1434748653 2015/06/19 21:17:33 $  $NHDT-Branch: master $:$NHDT-Revision: 1.65 $ */
+/* NetHack 3.6	sounds.c	$NHDT-Date: 1434749027 2015/06/19 21:23:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.66 $ */
 /*	Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -920,8 +920,8 @@ register struct monst *mtmp;
             if (tribtitle) {
                 Sprintf(verbuf, "Ah, so you have a copy of /%s/.", tribtitle);
                 /* no Death featured in these two, so exlude them */
-                if (!(strcmpi(tribtitle "Snuff") == 0 ||                
-                      strcmpi(tribtitle, "The Wee Free Men" == 0)))
+                if (!(strcmpi(tribtitle, "Snuff") == 0) ||                
+                     (strcmpi(tribtitle, "The Wee Free Men") == 0))
                     Strcat(verbuf, " I may have been misquoted there.");
                 verbl_msg = verbuf;
                 context.tribute.Deathnotice = 1;
