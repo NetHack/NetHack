@@ -1342,15 +1342,12 @@ If you take enough precautions, you never need to take precautions.
 %e title
 %e section
 #-----------------------------------------------------
-# Currently this section is not used. It is added
-# to illustrate how these could be added and adapted
-# should they be useful for something
+# Used for interaction with Death.
 #
 %section Death
 %title Death Quotes (2)
 %passage 1
-WHERE THE FIRST PRIMAL CELL WAS, THERE WAS I ALSO. WHERE MAN IS, THERE AM I.
-WHEN THE LAST LIFE CRAWLS UNDER FREEZING STARS, THERE WILL I BE.
+WHERE THE FIRST PRIMAL CELL WAS, THERE WAS I ALSO. WHERE MAN IS, THERE AM I. WHEN THE LAST LIFE CRAWLS UNDER FREEZING STARS, THERE WILL I BE.
 %e passage
 %passage 2
 I AM DEATH, NOT TAXES. *I* TURN UP ONLY ONCE.
