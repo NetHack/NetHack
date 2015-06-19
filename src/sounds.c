@@ -1,4 +1,4 @@
-/* NetHack 3.6	sounds.c	$NHDT-Date: 1434421352 2015/06/16 02:22:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.64 $ */
+/* NetHack 3.6	sounds.c	$NHDT-Date: 1434748653 2015/06/19 21:17:33 $  $NHDT-Branch: master $:$NHDT-Revision: 1.65 $ */
 /*	Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -911,15 +911,18 @@ register struct monst *mtmp;
             !context.tribute.Deathnotice && u_have_novel()) {
             struct obj *book = u_have_novel();
             const char *tribtitle = (char *)0;
+            boolean features_Death = TRUE;
 
             if (book) {
                 int novelidx = book->novelidx;
                 tribtitle = noveltitle(&novelidx);
             }
             if (tribtitle) {
-                Sprintf(verbuf,
-             "Ah, so you have a copy of '%s'. I may have been misquoted there.",
-                        tribtitle);
+                Sprintf(verbuf, "Ah, so you have a copy of /%s/.", tribtitle);
+                /* no Death featured in these two, so exlude them */
+                if (!(strcmpi(tribtitle "Snuff") == 0 ||                
+                      strcmpi(tribtitle, "The Wee Free Men" == 0)))
+                    Strcat(verbuf, " I may have been misquoted there.");
                 verbl_msg = verbuf;
                 context.tribute.Deathnotice = 1;
             }
