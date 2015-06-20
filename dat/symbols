@@ -302,6 +302,7 @@ finish
 # Recommended symset for blind players 
 # courtesy Michael Feir
 start: NHAccess
+	Description: Recommended for blind players
 	S_stone: \032
 	S_vwall: \124
 	S_hwall: \045

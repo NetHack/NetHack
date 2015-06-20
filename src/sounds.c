@@ -1,4 +1,4 @@
-/* NetHack 3.6	sounds.c	$NHDT-Date: 1434421352 2015/06/16 02:22:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.64 $ */
+/* NetHack 3.6	sounds.c	$NHDT-Date: 1434750452 2015/06/19 21:47:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.68 $ */
 /*	Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -917,9 +917,11 @@ register struct monst *mtmp;
                 tribtitle = noveltitle(&novelidx);
             }
             if (tribtitle) {
-                Sprintf(verbuf,
-             "Ah, so you have a copy of '%s'. I may have been misquoted there.",
-                        tribtitle);
+                Sprintf(verbuf, "Ah, so you have a copy of /%s/.", tribtitle);
+                /* no Death featured in these two, so exclude them */
+                if (!(strcmpi(tribtitle, "Snuff") == 0 ||                
+                      strcmpi(tribtitle, "The Wee Free Men") == 0))
+                    Strcat(verbuf, " I may have been misquoted there.");
                 verbl_msg = verbuf;
                 context.tribute.Deathnotice = 1;
             }
@@ -940,10 +942,12 @@ register struct monst *mtmp;
     else if (mtmp->mcan && verbl_msg_mcan)
         verbalize1(verbl_msg_mcan);
     else if (verbl_msg) {
-        if (ptr == &mons[PM_DEATH]) { /* Death talks in CAPITAL LETTERS */
+        if (ptr == &mons[PM_DEATH]) {
+            /* Death talks in CAPITAL LETTERS
+               and without quotation marks */
             char tmpbuf[BUFSZ];
             Sprintf(tmpbuf, "%s", verbl_msg);
-            verbalize1(ucase(tmpbuf));
+            pline(ucase(tmpbuf));
         } else {
             verbalize1(verbl_msg);
         }
