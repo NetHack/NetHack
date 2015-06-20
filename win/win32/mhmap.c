@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhmap.c	$NHDT-Date: 1434803617 2015/06/20 12:33:37 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.54 $ */
+/* NetHack 3.6	mhmap.c	$NHDT-Date: 1434803886 2015/06/20 12:38:06 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.55 $ */
 /* Copyright (C) 2001 by Alex Kompel      */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -712,7 +712,7 @@ onPaint(HWND hWnd)
             int glyph, bkglyph;
             RECT glyph_rect;
             int layer;
-#ifndef IGNORE_MJA
+#ifdef USE_PILEMARK
             int color;
             unsigned special;
             int mgch;
