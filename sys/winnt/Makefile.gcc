@@ -1,4 +1,4 @@
-# NetHack 3.6	Makefile.gcc	$NHDT-Date: 1432512793 2015/05/25 00:13:13 $  $NHDT-Branch: master $:$NHDT-Revision: 1.52 $
+# NetHack 3.6	Makefile.gcc	$NHDT-Date: 1434804544 2015/06/20 12:49:04 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.53 $
 #
 #==============================================================================
 #
@@ -547,7 +547,7 @@ tileutil: $(U)gif2txt.exe $(U)gif2tx32.exe $(U)txt2ppm.exe
 
 $(O)winres.o: $(TILEBMP16) $(MSWIN)/winhack.rc $(MSWIN)/mnsel.bmp \
 	 $(MSWIN)/mnselcnt.bmp $(MSWIN)/mnunsel.bmp \
-	 $(MSWIN)/petmark.bmp $(MSWIN)/NetHack.ico $(MSWIN)/rip.bmp \
+	 $(MSWIN)/petmark.bmp $(MSWIN)/pilemark.bmp $(MSWIN)/NetHack.ico $(MSWIN)/rip.bmp \
 	 $(MSWIN)/splash.bmp
 	@$(rc) -o$@ --include-dir $(MSWIN) -i $(MSWIN)/winhack.rc
 
@@ -702,6 +702,11 @@ $(MSWIN)/petmark.bmp: $(U)uudecode.exe $(MSWIN)/petmark.uu
 	$(subst /,\,$(U)uudecode.exe $(MSWIN)/petmark.uu)
 	$(subst /,\,copy petmark.bmp $@)
 	del petmark.bmp
+
+$(MSWIN)/pilemark.bmp: $(U)uudecode.exe $(MSWIN)/pilemark.uu
+	$(subst /,\,$(U)uudecode.exe $(MSWIN)/pilemark.uu)
+	$(subst /,\,copy pilemark.bmp $@)
+	del pilemark.bmp
 
 $(MSWIN)/rip.bmp: $(U)uudecode.exe $(MSWIN)/rip.uu
 	$(subst /,\,$(U)uudecode.exe $(MSWIN)/rip.uu)

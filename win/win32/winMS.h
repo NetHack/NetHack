@@ -1,4 +1,4 @@
-/* NetHack 3.6	winMS.h	$NHDT-Date: 1434803624 2015/06/20 12:33:44 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.40 $ */
+/* NetHack 3.6	winMS.h	$NHDT-Date: 1434804346 2015/06/20 12:45:46 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.41 $ */
 /* Copyright (C) 2001 by Alex Kompel */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -51,6 +51,7 @@
 #define NHFONT_SIZE_MAX 20
 
 #define MAX_LOADSTRING 100
+#define USE_PILEMARK
 
 typedef struct mswin_nhwindow_data {
     HWND win;
