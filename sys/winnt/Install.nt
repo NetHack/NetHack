@@ -5,7 +5,7 @@
                        NetHack 3.6 on a Windows system
            (Windows 7/8.x or later only. XP may work but is untested)
          ==============================================================
-          Last revision: $NHDT-Date: 1432512793 2015/05/25 00:13:13 $
+          Last revision: $NHDT-Date: 1434806470 2015/06/20 13:21:10 $
 
 Credit for the porting of NetHack to the Win32 Console Subsystem goes to 
 the NT Porting Team started by Michael Allison.
@@ -385,7 +385,7 @@ Setting Up
     choosing "set as Startup Project."
 
     In Visual C 2013 Express IDE menus right-click on 
-    "Solution NetHack (12 Projects)" and select "Configuration Manager."
+    "Solution NetHack (14 Projects)" and select "Configuration Manager."
 
     Set the "Active Solution Configuration" to either 
         Debug
