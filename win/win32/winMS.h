@@ -1,4 +1,4 @@
-/* NetHack 3.6	winMS.h	$NHDT-Date: 1434321135 2015/06/14 22:32:15 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.39 $ */
+/* NetHack 3.6	winMS.h	$NHDT-Date: 1434803624 2015/06/20 12:33:44 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.40 $ */
 /* Copyright (C) 2001 by Alex Kompel */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -71,7 +71,7 @@ typedef struct mswin_nhwindow_app {
 
     HBITMAP bmpTiles;
     HBITMAP bmpPetMark;
-#ifndef IGNORE_NHMALL
+#ifdef USE_PILEMARK
     HBITMAP bmpPileMark;
 #endif
     HBITMAP bmpMapTiles; /* custom tiles bitmap */

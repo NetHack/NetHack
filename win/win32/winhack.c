@@ -1,4 +1,4 @@
-/* NetHack 3.6    winhack.c    $NHDT-Date: 1432512811 2015/05/25 00:13:31 $  $NHDT-Branch: master $:$NHDT-Revision: 1.40 $ */
+/* NetHack 3.6    winhack.c    $NHDT-Date: 1434803624 2015/06/20 12:33:44 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.43 $ */
 /* Copyright (C) 2001 by Alex Kompel      */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -103,12 +103,14 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
         panic("cannot load tiles bitmap");
     _nethack_app.bmpPetMark =
         LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_PETMARK));
-#ifndef IGNORE_NHMALL
-    _nethack_app.bmpPileMark =
-        LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_PILEMARK));
-#endif
     if (_nethack_app.bmpPetMark == NULL)
         panic("cannot load pet mark bitmap");
+#ifdef USE_PILEMARK
+    _nethack_app.bmpPileMark =
+        LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_PILEMARK));
+    if (_nethack_app.bmpPileMark == NULL)
+        panic("cannot load pile mark bitmap");
+#endif
     _nethack_app.bmpRip = LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_RIP));
     if (_nethack_app.bmpRip == NULL)
         panic("cannot load rip bitmap");

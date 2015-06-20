@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhmap.c	$NHDT-Date: 1434321129 2015/06/14 22:32:09 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.53 $ */
+/* NetHack 3.6	mhmap.c	$NHDT-Date: 1434803617 2015/06/20 12:33:37 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.54 $ */
 /* Copyright (C) 2001 by Alex Kompel      */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -763,7 +763,7 @@ onPaint(HWND hWnd)
                         layer ++;
                      }
 
-#ifndef IGNORE_NHMALL
+#ifdef USE_PILEMARK
                      /* rely on NetHack core helper routine */
                      (void) mapglyph(data->map[i][j], &mgch, &color,
                                         &special, i, j);
@@ -789,7 +789,7 @@ onPaint(HWND hWnd)
                         SelectObject(hdcPetMark, bmPetMarkOld);
                         DeleteDC(hdcPetMark);
                     }
-#ifndef IGNORE_NHMALL
+#ifdef USE_PILEMARK
                     if ((glyph != NO_GLYPH) && (special & MG_OBJPILE)) {
                         /* apply pilemark transparently over other image */
                         HDC hdcPileMark;
