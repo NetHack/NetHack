@@ -60,17 +60,6 @@ echo           ..\..\src\Makefile-orig
 copy Makefile.msc ..\..\src\Makefile >nul
 echo Microsoft Makefile copied ok.
 
-echo Copying Borland Makefile - Makefile.bcc to ..\..\src\Makefile.bcc...
-if NOT exist ..\..\src\Makefile.bcc goto :dobor
-copy ..\..\src\Makefile.bcc ..\..\src\Makefile.bcc-orig >nul
-echo      Your existing 
-echo           ..\..\src\Makefile.bcc 
-echo      has been renamed to 
-echo           ..\..\src\Makefile.bcc-orig
-:dobor
-copy Makefile.bcc ..\..\src\Makefile.bcc >nul
-echo Borland Makefile copied ok.
-
 echo Copying MinGW Makefile - Makefile.gcc to ..\..\src\Makefile.gcc...
 if NOT exist ..\..\src\Makefile.gcc goto :dogcc
 copy ..\..\src\Makefile.gcc ..\..\src\Makefile.gcc-orig >nul
