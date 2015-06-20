@@ -2434,7 +2434,8 @@ wake_nearby()
             continue;
         if (distu(mtmp->mx, mtmp->my) < u.ulevel * 20) {
             mtmp->msleeping = 0;
-            mtmp->mstrategy &= ~STRAT_WAITMASK;
+            if (!unique_corpstat(mtmp->data))
+                mtmp->mstrategy &= ~STRAT_WAITMASK;
             if (mtmp->mtame && !mtmp->isminion)
                 EDOG(mtmp)->whistletime = moves;
         }
@@ -2453,7 +2454,8 @@ register int x, y, distance;
             continue;
         if (distance == 0 || dist2(mtmp->mx, mtmp->my, x, y) < distance) {
             mtmp->msleeping = 0;
-            mtmp->mstrategy &= ~STRAT_WAITMASK;
+            if (!unique_corpstat(mtmp->data))
+                mtmp->mstrategy &= ~STRAT_WAITMASK;
         }
     }
 }
