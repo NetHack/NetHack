@@ -398,8 +398,8 @@ register struct monst *mtmp;
 register struct edog *edog;
 int udist;
 {
-    register int omx, omy;
-    struct obj *obj;
+    register int omx, omy, carryamt = 0;
+    struct obj *obj, *otmp;
 
     if (mtmp->msleeping || !mtmp->mcanmove)
         return (0);
@@ -433,16 +433,20 @@ int udist;
                 && could_reach_item(mtmp, obj->ox, obj->oy))
                 return dog_eat(mtmp, obj, omx, omy, FALSE);
 
-            if (can_carry(mtmp, obj) && !obj->cursed
+            carryamt = can_carry(mtmp, obj);
+            if (carryamt > 0 && !obj->cursed
                 && could_reach_item(mtmp, obj->ox, obj->oy)) {
                 if (rn2(20) < edog->apport + 3) {
                     if (rn2(udist) || !rn2(edog->apport)) {
+                        otmp = obj;
+                        if (carryamt != obj->quan)
+                            otmp = splitobj(obj, carryamt);
                         if (cansee(omx, omy) && flags.verbose)
                             pline("%s picks up %s.", Monnam(mtmp),
-                                  distant_name(obj, doname));
-                        obj_extract_self(obj);
+                                  distant_name(otmp, doname));
+                        obj_extract_self(otmp);
                         newsym(omx, omy);
-                        (void) mpickobj(mtmp, obj);
+                        (void) mpickobj(mtmp, otmp);
                         if (attacktype(mtmp->data, AT_WEAP)
                             && mtmp->weapon_check == NEED_WEAPON) {
                             mtmp->weapon_check = NEED_HTH_WEAPON;
@@ -531,7 +535,7 @@ int after, udist, whappr;
                            && !dog_has_minvent
                            && (!levl[omx][omy].lit || levl[u.ux][u.uy].lit)
                            && (otyp == MANFOOD || m_cansee(mtmp, nx, ny))
-                           && edog->apport > rn2(8) && can_carry(mtmp, obj)) {
+                           && edog->apport > rn2(8) && can_carry(mtmp, obj) > 0) {
                     gx = nx;
                     gy = ny;
                     gtyp = APPORT;

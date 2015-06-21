@@ -1291,7 +1291,7 @@ E void FDECL(mpickgold, (struct monst *));
 E boolean FDECL(mpickstuff, (struct monst *, const char *));
 E int FDECL(curr_mon_load, (struct monst *));
 E int FDECL(max_mon_load, (struct monst *));
-E boolean FDECL(can_carry, (struct monst *, struct obj *));
+E int FDECL(can_carry, (struct monst *, struct obj *));
 E int FDECL(mfndpos, (struct monst *, coord *, long *, long));
 E boolean FDECL(monnear, (struct monst *, int, int));
 E void NDECL(dmonsfree);

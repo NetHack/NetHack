@@ -922,7 +922,8 @@ mpickstuff(mtmp, str)
 register struct monst *mtmp;
 register const char *str;
 {
-    register struct obj *otmp, *otmp2;
+    register struct obj *otmp, *otmp2, *otmp3;
+    int carryamt = 0;
 
     /*	prevent shopkeepers from leaving the door of their shop */
     if (mtmp->isshk && inhishop(mtmp))
@@ -942,17 +943,23 @@ register const char *str;
                 continue;
             if (!touch_artifact(otmp, mtmp))
                 continue;
-            if (!can_carry(mtmp, otmp))
+            carryamt = can_carry(mtmp, otmp);
+            if (carryamt == 0)
                 continue;
             if (is_pool(mtmp->mx, mtmp->my))
                 continue;
+            /* handle cases where the critter can only get some */
+            otmp3 = otmp;
+            if (carryamt != otmp->quan) {
+                otmp3 = splitobj(otmp, carryamt);
+            }
             if (cansee(mtmp->mx, mtmp->my) && flags.verbose)
                 pline("%s picks up %s.", Monnam(mtmp),
                       (distu(mtmp->mx, mtmp->my) <= 5)
-                          ? doname(otmp)
-                          : distant_name(otmp, doname));
-            obj_extract_self(otmp);      /* remove from floor */
-            (void) mpickobj(mtmp, otmp); /* may merge and free otmp */
+                          ? doname(otmp3)
+                          : distant_name(otmp3, doname));
+            obj_extract_self(otmp3);      /* remove from floor */
+            (void) mpickobj(mtmp, otmp3); /* may merge and free otmp3 */
             m_dowear(mtmp, FALSE);
             newsym(mtmp->mx, mtmp->my);
             return TRUE; /* pick only one object */
@@ -1006,8 +1013,17 @@ register struct monst *mtmp;
     return (int) maxload;
 }
 
-/* for restricting monsters' object-pickup */
-boolean
+/* for restricting monsters' object-pickup.
+ * 
+ * to support the new pet behavior, this now returns the max # of objects
+ * that a given monster could pick up from a pile. frequently this will be
+ * otmp->quan, but special cases for 'only one' now exist so.
+ *
+ * this will probably cause very amusing behavior with pets and gold coins.
+ *
+ * TODO: allow picking up 2-N objects from a pile of N based on weight
+ */
+int
 can_carry(mtmp, otmp)
 struct monst *mtmp;
 struct obj *otmp;
@@ -1018,16 +1034,16 @@ struct obj *otmp;
     boolean glomper = FALSE;
 
     if (notake(mdat))
-        return FALSE; /* can't carry anything */
+        return 0; /* can't carry anything */
 
     if (otyp == CORPSE && touch_petrifies(&mons[otmp->corpsenm])
         && !(mtmp->misc_worn_check & W_ARMG) && !resists_ston(mtmp))
-        return FALSE;
+        return 0;
     if (otyp == CORPSE && is_rider(&mons[otmp->corpsenm]))
-        return FALSE;
+        return 0;
     if (objects[otyp].oc_material == SILVER && mon_hates_silver(mtmp)
         && (otyp != BELL_OF_OPENING || !is_covetous(mdat)))
-        return FALSE;
+        return 0;
 
     /* monsters without hands can't pick up multiple objects at once
      * unless they have an engulfing attack
@@ -1040,33 +1056,33 @@ struct obj *otmp;
         if ((mtmp->data->mflags1 & M1_NOHANDS) && !glomper
             && (!(mtmp->data->mlet == S_DRAGON
                   && otmp->oclass == COIN_CLASS))) {
-            return FALSE;
+            return 1;
         }
     }
 
     /* Steeds don't pick up stuff (to avoid shop abuse) */
     if (mtmp == u.usteed)
-        return (FALSE);
+        return 0;
     if (mtmp->isshk)
-        return (TRUE); /* no limit */
+        return otmp->quan; /* no limit */
     if (mtmp->mpeaceful && !mtmp->mtame)
-        return (FALSE);
+        return 0;
     /* otherwise players might find themselves obligated to violate
      * their alignment if the monster takes something they need
      */
 
     /* special--boulder throwers carry unlimited amounts of boulders */
     if (throws_rocks(mdat) && otyp == BOULDER)
-        return (TRUE);
+        return otmp->quan;
 
     /* nymphs deal in stolen merchandise, but not boulders or statues */
     if (mdat->mlet == S_NYMPH)
-        return (boolean)(otmp->oclass != ROCK_CLASS);
+        return otmp->oclass == ROCK_CLASS ? 0 : otmp->quan;
 
     if (curr_mon_load(mtmp) + newload > max_mon_load(mtmp))
-        return FALSE;
+        return 0;
 
-    return (TRUE);
+    return otmp->quan;
 }
 
 /* return number of acceptable neighbour positions */

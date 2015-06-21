@@ -961,7 +961,7 @@ not_special:
                              && !(otmp->otyp == CORPSE
                                   && touch_petrifies(&mons[otmp->corpsenm]))))
                         && touch_artifact(otmp, mtmp)) {
-                        if (can_carry(mtmp, otmp)
+                        if (can_carry(mtmp, otmp) > 0
                             && (throws_rocks(ptr)
                                 || !sobj_at(BOULDER, xx, yy))
                             && (!is_unicorn(ptr)
