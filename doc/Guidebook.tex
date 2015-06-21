@@ -6,7 +6,7 @@
 %-%% if hyperref isn't available, we can get by with this instead
 %-%%\RequirePackage[errorshow]{tracefnt} \DeclareSymbolFont{typewriter}{OT1}{cmtt}{m}{n}
 %-%\usepackage{longtable}
-
+\usepackage[T1]{fontenc} 
 \textheight 220mm
 \textwidth 160mm
 \oddsidemargin 0mm
@@ -564,7 +564,7 @@ command.
 %.pg
 You can put a number before some commands to repeat them that many
 times; for example, ``{\tt 10s}'' will search ten times.  If you have the
-{\it number\_pad\/}
+{\it number\verb+_+pad\/}
 option set, you must type `{\tt n}' to prefix a count, so the example above
 would be typed ``{\tt n10s}'' instead.  Commands for which counts make no
 sense ignore them.  In addition, movement commands can be prefixed for
@@ -624,7 +624,7 @@ one-step movement commands cause you to fight monsters; the others
 \verb+   h- . -l   + & \verb+   4- . -6   +\\
 \verb+    / | \    + & \verb+    / | \    +\\
 \verb+   b  j  n   + & \verb+   1  2  3   +\\
-                     & (if {\it number\_pad\/} set)
+                     & (if {\it number\verb+_+pad\/} set)
 \end{tabular}
 \end{center}
 %.ed
@@ -794,7 +794,7 @@ Use the `{\tt W}' command to wear armor.
 Repeat previous message.\\
 %.lp ""
 Subsequent {\tt \^{}P}'s repeat earlier messages.
-The behavior can be varied via the {\it msg\_\-win\-dow} option.
+The behavior can be varied via the {\it msg\verb+_+window} option.
 %.lp
 \item[\tb{q}]
 Quaff (drink) something (potion, water, etc).
@@ -815,7 +815,7 @@ Remove an accessory (ring, amulet, etc).\\
 If you're wearing more than one, you'll be prompted for which one to
 remove.  If you're only wearing one, then by default it will be removed
 without asking, but you can set the
-{\it paranoid\_confirmation\/}
+{\it paranoid\verb+_+confirmation\/}
 option to require a prompt.\\
 %.lp ""
 Use the `{\tt T}' command to take off armor.
@@ -840,7 +840,7 @@ Take off armor.\\
 If you're wearing more than one piece, you'll be prompted for which
 one to take off.  If you're only wearing one, then by default it will
 be taken off without asking, but you can set the
-{\it paranoid\_confirmation\/}
+{\it paranoid\verb+_+confirmation\/}
 option to require a prompt.\\
 %.lp ""
 Use the `{\tt R}' command to remove accessories.
@@ -1042,7 +1042,7 @@ You probably shouldn't start off a new game by praying right away.)
 Since using this command by accident can cause trouble, there is an
 option to make you confirm your intent before praying.  It is enabled
 by default, and you can reset the
-{\it paranoid\_confirmation\/}
+{\it paranoid\verb+_+confirmation\/}
 option to disable it.
 %.lp
 \item[\tb{\#quit}]
@@ -1051,7 +1051,7 @@ Quit the program without saving your game.\\
 Since using this command by accident would throw away the current game,
 you are asked to confirm your intent before quitting.  By default a
 response of `{\tt y}' acknowledges that intent.  You can set the
-{\it paranoid\_confirmation\/}
+{\it paranoid\verb+_+confirmation\/}
 option to require a response of ``{\tt yes}'' instead.
 %.lp
 \item[\tb{\#ride}]
@@ -1111,7 +1111,7 @@ option to have nethack combine them into meta\+key.
 {\tt\#?} (not supported by all platforms)
 %.lp
 \item[\tb{M-2}]
-{\tt\#twoweapon} (unless the {\it number\_pad\/} option is enabled)
+{\tt\#twoweapon} (unless the {\it number\verb+_+pad\/} option is enabled)
 %.lp
 \item[\tb{M-a}]
 {\tt\#adjust}
@@ -1187,7 +1187,7 @@ option to have nethack combine them into meta\+key.
 \elist
 
 %.pg
-\nd If the {\it number\_pad\/} option is on, some additional letter commands
+\nd If the {\it number\verb+_+pad\/} option is on, some additional letter commands
 are available:
 \blist{}
 %.lp 
@@ -1418,7 +1418,7 @@ In most circumstances, if you attempt to attack a peaceful monster by
 moving into its location, you'll be asked to confirm your intent.  By 
 default an answer of `{\tt y}' acknowledges that intent,
 which can be error prone if you're using `{\tt y}' to move.  You can set the
-{\it paranoid\_confirmation\/}
+{\it paranoid\verb+_+confirmation\/}
 option to require a response of ``{\tt yes}'' instead.
 %.pg
 
@@ -1684,7 +1684,7 @@ The number of items that the character has a chance to fire varies from
 turn to turn.  You can explicitly limit the number of shots by using a
 numeric prefix before the `{\tt t}' or `{\tt f}' command.
 For example, ``{\tt 2f}'' (or ``{\tt n2f}'' if using
-{\it number\_pad\/}
+{\it number\verb+_+pad\/}
 mode) would ensure that at most 2 arrows are shot
 even if you could have fired 3.  If you specify
 a larger number than would have been shot (``{\tt 4f}'' in this example),
@@ -2294,8 +2294,8 @@ each entry. Such a sequence can be continued to multiple lines by putting a
 `{\tt \verb+\+}' at the end of each line to be continued.
 
 %.pg
-Any line starting with ``{\tt AUTOPICKUP\_EXCEPTION=}'' 
-is taken as defining an exception to the ``{\tt pickup\_types}'' option.
+Any line starting with ``{\tt AUTOPICKUP\verb+_+EXCEPTION=}'' 
+is taken as defining an exception to the ``{\tt pickup\verb+_+types}'' option.
 There is a section of this Guidebook that discusses that.
 
 %.pg
@@ -2334,7 +2334,7 @@ Walking into a door attempts to open it (default true).
 %.lp
 \item[\ib{autopickup}]
 Automatically pick up things onto which you move (default on).
-See ``{\it pickup\_types\/}'' to refine the behavior.
+See ``{\it pickup\verb+_+types\/}'' to refine the behavior.
 %.lp
 \item[\ib{autoquiver}]
 This option controls what happens when you attempt the `f' (fire)
@@ -2390,7 +2390,7 @@ Have user confirm attacks on pets, shopkeepers, and other
 peaceable creatures (default on).
 %.lp
 %.lp
-\item[\ib{dark\_room}]
+\item[\ib{dark\verb+_+room}]
 Show out-of-sight areas of lit rooms (default off).
 \item[\ib{disclose}]
 Controls what information the program reveals when the game ends.
@@ -2487,13 +2487,13 @@ Cannot be set with the `{\tt O}' command.
 \item[\ib{ignintr}]
 Ignore interrupt signals, including breaks (default off).
 %.lp
-\item[\ib{implicit\_uncursed}]
+\item[\ib{implicit\verb+_+uncursed}]
 Omit ``uncursed'' from inventory lists, if possible (default on).
 %.lp
 \item[\ib{legacy}]
 Display an introductory message when starting the game (default on).
 %.lp
-\item[\ib{lit\_corridor}]
+\item[\ib{lit\verb+_+corridor}]
 Show corridor squares seen by night vision or a light source held by your
 character as lit (default off).
 %.lp
@@ -2508,7 +2508,7 @@ Enable mail delivery during the game (default on).
 An obsolete synonym for ``{\tt gender:male}''.  Cannot be set with the
 `{\tt O}' command.
 %.lp
-\item[\ib{mention\_walls}]
+\item[\ib{mention\verb+_+walls}]
 Give feedback when walking against a wall (default off).
 %.lp
 \item[\ib{menucolors}]
@@ -2532,55 +2532,55 @@ object classes rather than a character prompt, and then a menu of matching
 objects for selection.
 Partial skips the object class filtering and
 immediately displays a menu of all objects.
-\item[\ib{menu\_deselect\_all}]
+\item[\ib{menu\verb+_+deselect\verb+_+all}]
 Menu character accelerator to deselect all items in a menu.
 Implemented by the Amiga, Gem, X11 and tty ports.
 Default `-'.
-\item[\ib{menu\_deselect\_page}]
+\item[\ib{menu\verb+_+deselect\verb+_+page}]
 Menu character accelerator to deselect all items on this page of a menu.
 Implemented by the Amiga, Gem and tty ports.
 Default `\verb+\+'.
-\item[\ib{menu\_first\_page}]
+\item[\ib{menu\verb+_+first\verb+_+page}]
 Menu character accelerator to jump to the first page in a menu.
 Implemented by the Amiga, Gem and tty ports.
 Default `\verb+^+'.
-\item[\ib{menu\_headings}]
+\item[\ib{menu\verb+_+headings}]
 Controls how the headings in a menu are highlighted.
 Values are ``{\tt none}'', ``{\tt bold}'', ``{\tt dim}'',
 ``{\tt underline}'', ``{\tt blink}'', or ``{\tt inverse}''.
 Not all ports can actually display all types.
-\item[\ib{menu\_invert\_all}]
+\item[\ib{menu\verb+_+invert\verb+_+all}]
 Menu character accelerator to invert all items in a menu.
 Implemented by the Amiga, Gem, X11 and tty ports.
 Default `@'.
-\item[\ib{menu\_invert\_page}]
+\item[\ib{menu\verb+_+invert\verb+_+page}]
 Menu character accelerator to invert all items on this page of a menu.
 Implemented by the Amiga, Gem and tty ports.
 Default `\verb+~+'.
-\item[\ib{menu\_last\_page}]
+\item[\ib{menu\verb+_+last\verb+_+page}]
 Menu character accelerator to jump to the last page in a menu.
 Implemented by the Amiga, Gem and tty ports.
 Default `\verb+|+'.
-\item[\ib{menu\_next\_page}]
+\item[\ib{menu\verb+_+next\verb+_+page}]
 Menu character accelerator to goto the next menu page.
 Implemented by the Amiga, Gem and tty ports.
 Default `\verb+>+'.
-\item[\ib{menu\_objsyms}]
+\item[\ib{menu\verb+_+objsyms}]
 Show object symbols in menu headings in menus where
 the object symbols act as menu accelerators (default off).
-\item[\ib{menu\_previous\_page}]
+\item[\ib{menu\verb+_+previous\verb+_+page}]
 Menu character accelerator to goto the previous menu page.
 Implemented by the Amiga, Gem and tty ports.
 Default `\verb+<+'.
-\item[\ib{menu\_search}]
+\item[\ib{menu\verb+_+search}]
 Menu character accelerator to search for a menu item.
 Implemented by the Amiga, Gem, X11 and tty ports.
 Default `:'.
-\item[\ib{menu\_select\_all}]
+\item[\ib{menu\verb+_+select\verb+_+all}]
 Menu character accelerator to select all items in a menu.
 Implemented by the Amiga, Gem, X11 and tty ports.
 Default `.'.
-\item[\ib{menu\_select\_page}]
+\item[\ib{menu\verb+_+select\verb+_+page}]
 Menu character accelerator to select all items on this page of a menu.
 Implemented by the Amiga, Gem and tty ports.
 Default `,'.
@@ -2589,7 +2589,7 @@ Default `,'.
 The number of top line messages to save (and recall with `{\tt \^{}P}')
 (default 20). Cannot be set with the `{\tt O}' command.
 %.lp
-\item[\ib{msg\_window}]
+\item[\ib{msg\verb+_+window}]
 Allows you to change the way recalled messages are displayed.
 (It is currently implemented for tty only.) The possible values are:
 
@@ -2626,7 +2626,7 @@ Start the character with no armor (default false).
 \item[\ib{null}]
 Send padding nulls to the terminal (default on).
 %.lp
-\item[\ib{number\_pad}]
+\item[\ib{number\verb+_+pad}]
 Use digit keys instead of letters to move (default 0 or off).\\
 Valid settings are:
 
@@ -2646,7 +2646,7 @@ Valid settings are:
 
 For backward compatibility, omitting a value is the same as specifying {\tt 1}
 and negating
-{\it number\_pad\/}
+{\it number\verb+_+pad\/}
 is the same as specifying {\tt 0}.
 (Settings {\tt 2} and {\tt 4} are for compatibility with MSDOS or old PC Hack;
 in addition to the different behavior for `{\tt 5}', `{\tt Alt-5}' acts as `{\tt G}'
@@ -2663,9 +2663,9 @@ Specify the order to list object types in (default
 containing the symbols for the various object types.  Any omitted types
 are filled in at the end from the previous order.
 %.lp
-\item[\ib{paranoid\_confirmation}]
+\item[\ib{paranoid\verb+_+confirmation}]
 A space separated list of specific situations where alternate
-prompting is desired.  The default is ``{\it paranoid\_confirmation:pray}''.
+prompting is desired.  The default is ``{\it paranoid\verb+_+confirmation:pray}''.
 %.sd
 %.si
 \newlength{\pcwidth}
@@ -2698,11 +2698,11 @@ commands even when wearing just one applicable item.
 %.ed
 By default, the pray choice is enabled, the others disabled.
 To disable it without setting
-any of the other choices, use ``{\it paranoid\_confirmation:none}''.  To keep
+any of the other choices, use ``{\it paranoid\verb+_+confirmation:none}''.  To keep
 it enabled while setting others, include it in the list,
-such as ``{\it par\-a\-noid\_con\-fir\-ma\-tion:attack~pray~Remove}''.
+such as ``{\it par\-a\-noid\verb+_+con\-fir\-ma\-tion:attack~pray~Remove}''.
 %.lp
-\item[\ib{perm\_invent}]
+\item[\ib{perm\verb+_+invent}]
 If true, always display your current inventory in a window.  This only
 makes sense for windowing system interfaces that implement this feature.
 %.lp
@@ -2716,23 +2716,23 @@ it will be silently ignored.  For example, ``{\tt horse}'' will only be
 honored when playing a knight.
 Cannot be set with the `{\tt O}' command.
 %.lp
-\item[\ib{pickup\_burden}]
+\item[\ib{pickup\verb+_+burden}]
 When you pick up an item that would exceed this encumbrance
 level (Unencumbered, Burdened, streSsed, straiNed, overTaxed,
 or overLoaded), you will be asked if you want to continue.
 (Default `S').
 %.lp
-\item[\ib{pickup\_thrown}]
+\item[\ib{pickup\verb+_+thrown}]
 If this option is on and ``{\it autopickup\/}'' is also on, try to pick up
-things that you threw, even if they aren't in ``{\it pickup\_types\/}'' or
+things that you threw, even if they aren't in ``{\it pickup\verb+_+types\/}'' or
 match an autopickup exception.  Default is on.
 %.lp
-\item[\ib{pickup\_types}]
+\item[\ib{pickup\verb+_+types}]
 Specify the object types to be picked up when ``{\it autopickup\/}'' 
-is on.  Default is all types.  You can use ``{\it autopickup\_exception\/}''
+is on.  Default is all types.  You can use ``{\it autopickup\verb+_+exception\/}''
 configuration file lines to further refine ``{\it autopickup\/}'' behavior.
 %.lp
-\item[\ib{pile\_limit}]
+\item[\ib{pile\verb+_+limit}]
 When walking across a pile of objects on the floor, threshold at which
 the message ``there are few/several/many objects here'' is given instead
 of showing a popup list of those objects.  A value of 0 means ``no limit''
@@ -2762,7 +2762,7 @@ If you prefix `{\tt !}' or ``{\tt no}'' to the value, you can
 exclude that race from being picked randomly. 
 Cannot be set with the `{\tt O}' command.
 %.lp
-\item[\ib{rest\_on\_space}]
+\item[\ib{rest\verb+_+on\verb+_+space}]
 Make the space bar a synonym for the `{\tt .}' (rest) command (default off).
 %.lp
 \item[\ib{role}]
@@ -2804,7 +2804,7 @@ results of moving.  The default is {\it run\/}; versions prior to 3.4.1
 used {\it teleport\/} only.  Whether or not the effect is noticeable will
 depend upon the window port used or on the type of terminal.
 %.lp
-\item[\ib{safe\_pet}]
+\item[\ib{safe\verb+_+pet}]
 Prevent you from (knowingly) attacking your pets (default on).
 %.lp
 \item[\ib{scores}]
@@ -2854,10 +2854,10 @@ Boldface monsters and ``{\tt --More--}'' (default off).
 Enable coloring of status fields (default off).
 See ``{\it Configuring Status Hilites\/}'' for further information.
 %.lp
-\item[\ib{suppress\_alert}]
+\item[\ib{suppress\verb+_+alert}]
 This option may be set to a NetHack version level to suppress
 alert notification messages about feature changes for that 
-and prior versions (ex.\ ``{\tt suppress\_alert:3.3.1}'')
+and prior versions (ex.\ ``{\tt suppress\verb+_+alert:3.3.1}'')
 %.lp
 \item[\ib{symset}]
 This option may be used to select one of the named symbol sets found within
@@ -2866,7 +2866,7 @@ This option may be used to select one of the named symbol sets found within
 \item[\ib{time}]
 Show the elapsed game time in turns on bottom line (default off).
 %.lp
-\item[\ib{timed\_delay}]
+\item[\ib{timed\verb+_+delay}]
 When pausing momentarily for display effect, such as with explosions and
 moving objects, use a timer rather than sending extra characters to the
 screen.  (Applies to ``tty'' interface only; ``X11'' interface always
@@ -2921,89 +2921,89 @@ with the `{\tt O}' command.
 
 \blist{}
 %.lp
-\item[\ib{align\_message}]
+\item[\ib{align\verb+_+message}]
  Where to align or place the message window (top, bottom, left, or right)
 %.lp
-\item[\ib{align\_status}]
+\item[\ib{align\verb+_+status}]
  Where to align or place the status window (top, bottom, left, or right).
 %.lp
-\item[\ib{ascii\_map}]
+\item[\ib{ascii\verb+_+map}]
 NetHack should display an ascii map if it can.
 %.lp
 \item[\ib{color}]
 NetHack should display color if it can for different monsters, 
 objects, and dungeon features
 %.lp
-\item[\ib{eight\_bit\_tty}]
+\item[\ib{eight\verb+_+bit\verb+_+tty}]
 Pass eight-bit character values (for example, specified with the {\it
 traps \/} option) straight through to your terminal (default off).
 %.lp
-\item[\ib{font\_map}]
+\item[\ib{font\verb+_+map}]
 NetHack should use a font by the chosen name for the map window.
 %.lp
-\item[\ib{font\_menu}]
+\item[\ib{font\verb+_+menu}]
 NetHack should use a font by the chosen name for menu windows.
 %.lp
-\item[\ib{font\_message}]
+\item[\ib{font\verb+_+message}]
 NetHack should use a font by the chosen name for the message window.
 %.lp
-\item[\ib{font\_status}]
+\item[\ib{font\verb+_+status}]
 NetHack should use a font by the chosen name for the status window.
 %.lp
-\item[\ib{font\_text}]
+\item[\ib{font\verb+_+text}]
 NetHack should use a font by the chosen name for text windows.
 %.lp
-\item[\ib{font\_size\_map}]
+\item[\ib{font\verb+_+size\verb+_+map}]
 NetHack should use this size font for the map window.
 %.lp
-\item[\ib{font\_size\_menu}]
+\item[\ib{font\verb+_+size\verb+_+menu}]
 NetHack should use this size font for menu windows.
 %.lp
-\item[\ib{font\_size\_message}]
+\item[\ib{font\verb+_+size\verb+_+message}]
 NetHack should use this size font for the message window.
 %.lp
-\item[\ib{font\_size\_status}]
+\item[\ib{font\verb+_+size\verb+_+status}]
 NetHack should use this size font for the status window.
 %.lp
-\item[\ib{font\_size\_text}]
+\item[\ib{font\verb+_+size\verb+_+text}]
 NetHack should use this size font for text windows.
 %.lp
 \item[\ib{fullscreen}]
 NetHack should try and display on the entire screen rather than in a window.
 %.lp
-\item[\ib{hilite\_pet}]
+\item[\ib{hilite\verb+_+pet}]
 Visually distinguish pets from similar animals (default off).
 The behavior of this option depends on the type of windowing you use.
 In text windowing, text highlighting or inverse video is often used;
 with tiles, generally displays a heart symbol near pets.
 %.lp
-\item[\ib{large\_font}]
+\item[\ib{large\verb+_+font}]
 NetHack should use a large font.
 %.lp
-\item[\ib{map\_mode}]
+\item[\ib{map\verb+_+mode}]
 NetHack should display the map in the manner specified.
 %.lp
-\item[\ib{mouse\_support}]
+\item[\ib{mouse\verb+_+support}]
 Allow use of the mouse for input and travel.
 %.lp
-\item[\ib{player\_selection}]
+\item[\ib{player\verb+_+selection}]
 NetHack should pop up dialog boxes or use prompts for character selection.
 %.lp
-\item[\ib{popup\_dialog}]
+\item[\ib{popup\verb+_+dialog}]
 NetHack should pop up dialog boxes for input.
 %.lp
-\item[\ib{preload\_tiles}]
+\item[\ib{preload\verb+_+tiles}]
 NetHack should preload tiles into memory.
 For example, in the protected mode MSDOS version, control whether tiles
 get pre-loaded into RAM at the start of the game.  Doing so
 enhances performance of the tile graphics, but uses more memory. (default on).
 Cannot be set with the `{\tt O}' command.
 %.lp
-\item[\ib{scroll\_amount}]
+\item[\ib{scroll\verb+_+amount}]
 NetHack should scroll the display by this number of cells
-when the hero reaches the scroll\_margin.
+when the hero reaches the scroll\verb+_+margin.
 %.lp
-\item[\ib{scroll\_margin}]
+\item[\ib{scroll\verb+_+margin}]
 NetHack should scroll the display when the hero or cursor
 is this number of cells away from the edge of the window.
 %.lp
@@ -3014,28 +3014,28 @@ choose from at game startup, if it can. Not all ports support this option.
 \item[\ib{softkeyboard}]
 Display an onscreen keyboard.  Handhelds are most likely to support this option.
 %.lp
-\item[\ib{splash\_screen}]
+\item[\ib{splash\verb+_+screen}]
 NetHack should display an opening splash screen when it starts up (default yes).
 %.lp
-\item[\ib{tiled\_map}]
+\item[\ib{tiled\verb+_+map}]
 NetHack should display a tiled map if it can.
 %.lp
-\item[\ib{tile\_file}]
+\item[\ib{tile\verb+_+file}]
 Specify the name of an alternative tile file to override the default.
 %.lp
-\item[\ib{tile\_height}]
+\item[\ib{tile\verb+_+height}]
 Specify the preferred height of each tile in a tile capable port.
 %.lp
-\item[\ib{tile\_width}]
+\item[\ib{tile\verb+_+width}]
 Specify the preferred width of each tile in a tile capable port
 %.lp
-\item[\ib{use\_darkgray}]
+\item[\ib{use\verb+_+darkgray}]
 Use bold black instead of blue for black glyphs (TTY only).
 %.lp
-\item[\ib{use\_inverse}]
+\item[\ib{use\verb+_+inverse}]
 NetHack should display inverse when the game specifies it.
 %.lp
-\item[\ib{vary\_msgcount}]
+\item[\ib{vary\verb+_+msgcount}]
 NetHack should display this number of messages at a time in the message window.
 %.lp
 \item[\ib{windowcolors}]
@@ -3074,7 +3074,7 @@ ESC into a meta-shifted version of the second character (default off).
 %.lp ""
 This conversion is only done for commands, not for other input prompts.
 Note that typing one or more digits as a count prefix prior to a
-command---preceded by {\tt n} if the {\it number\_pad\/}
+command---preceded by {\tt n} if the {\it number\verb+_+pad\/}
 option is set---is also subject to this conversion, so attempting to
 abort the count by typing ESC will leave nethack waiting for another
 character to complete the two character sequence.  Type a second ESC to
@@ -3091,7 +3091,7 @@ compatible BIOS ROM (default off, {\it OS/2, PC\/ {\rm and} ST NetHack\/} only).
 \item[\ib{Macgraphics}]
 (default on, {\it Mac NetHack \/} only).
 %.lp 
-\item[\ib{page\_wait}]
+\item[\ib{page\verb+_+wait}]
 (default off, {\it Mac NetHack \/} only).
 %.lp
 \item[\ib{rawio}]
@@ -3123,7 +3123,7 @@ Cannot be set with the `{\tt O}' command.
 %.lp
 \item[\ib{videocolors}]
 \begin{sloppypar}
-Set the color palette for PC systems using NO\_TERMS
+Set the color palette for PC systems using NO\verb+_+TERMS
 (default 4-2-6-1-5-3-15-12-10-14-9-13-11, {\it PC\/ NetHack\/} only).
 The order of colors is red, green, brown, blue, magenta, cyan,
 bright.white, bright.red, bright.green, yellow, bright.blue,
@@ -3154,18 +3154,18 @@ patterns.
 
 %.pg
 You can further refine the behavior of the ``{\tt autopickup}'' option
-beyond what is available through the ``{\tt pickup\_types}'' option.
+beyond what is available through the ``{\tt pickup\verb+_+types}'' option.
 
 %.pg
-By placing ``{\tt autopickup\_exception}'' lines in your configuration
+By placing ``{\tt autopickup\verb+_+exception}'' lines in your configuration
 file, you can define patterns to be checked when the game is about to
 autopickup something.
 
 \blist{}
 %.lp
-\item[\ib{autopickup\_exception}]
-Sets an exception to the `{\it pickup\_types}' option.
-The {\it autopickup\_exception\/} option should be followed by a regular
+\item[\ib{autopickup\verb+_+exception}]
+Sets an exception to the `{\it pickup\verb+_+types}' option.
+The {\it autopickup\verb+_+exception\/} option should be followed by a regular
 expression to be used as a pattern to match against the singular form of the
 description of an object at your location.
 
@@ -3661,9 +3661,9 @@ use by blind players.
 \item[\ib{menustyle:traditional}]
 This will assist in the interface to speech synthesizers.
 %.lp
-\item[\ib{number\_pad}]
+\item[\ib{number\verb+_+pad}]
 A lot of speech access programs use the number-pad to review the screen.
-If this is the case, disable the number\_pad option and use the traditional
+If this is the case, disable the number\verb+_+pad option and use the traditional
 Rogue-like commands.
 \elist
 
@@ -3710,7 +3710,7 @@ A string explaining how to recover a game on this system (no default value).
 0 or 1 to disable or enable, respectively, the SEDUCE option (see the source)
 for details on this function.
 %.lp
-\item[\ib{CHECK\_SAVE\_UID}]
+\item[\ib{CHECK\verb+_+SAVE\verb+_+UID}]
 0 or 1 to disable or enable, respectively, the UID checking for savefiles.
 \elist
 
@@ -3728,7 +3728,7 @@ Maximum number of entries in the score file
 \item[\ib{POINTSMIN}]
 Minimum number of points to get an entry in the score file.
 %.lp
-\item[\ib{PERS_IS_UID}]
+\item[\ib{PERS\verb+_+IS\verb+_+UID}]
 0 or 1 to use user names or numeric userids, respectively, to identify
 unique people for the score file
 \elist
