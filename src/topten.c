@@ -262,10 +262,10 @@ struct toptenentry *tt;
     static const char fmt33[] = "%s %s %s %s "; /* role,race,gndr,algn */
 #ifndef NO_SCAN_BRACK
     static const char fmt0[] = "%d.%d.%d %ld %d %d %d %d %d %d %ld %ld %d ";
-    static const char fmtX[] = "%s,%s\n";
+    static const char fmtX[] = "%s,%s%s%s\n";
 #else /* NO_SCAN_BRACK */
     static const char fmt0[] = "%d %d %d %ld %d %d %d %d %d %d %ld %ld %d ";
-    static const char fmtX[] = "%s %s\n";
+    static const char fmtX[] = "%s %s%s%s\n";
 
     nsb_mung_line(tt->name);
     nsb_mung_line(tt->death);
@@ -281,7 +281,9 @@ struct toptenentry *tt;
         (void) fprintf(rfile, fmt33, tt->plrole, tt->plrace, tt->plgend,
                        tt->plalign);
     (void) fprintf(rfile, fmtX, onlyspace(tt->name) ? "_" : tt->name,
-                   tt->death);
+                   tt->death,
+                   (multi ? ", while " : ""),
+                   (multi ? (multi_reason ? multi_reason : "helpless") : ""));
 
 #ifdef NO_SCAN_BRACK
     nsb_unmung_line(tt->name);
@@ -315,6 +317,8 @@ struct toptenentry *tt;
     Fprintf(rfile, "%s%cname=%s%cdeath=%s",
             buf, /* (already includes separator) */
             XLOG_SEP, plname, XLOG_SEP, tt->death);
+    if (multi)
+        Fprintf(rfile, "%cwhile=%s", XLOG_SEP, multi_reason ? multi_reason : "helpless");
     Fprintf(rfile, "%cconduct=0x%lx%cturns=%ld%cachieve=0x%lx", XLOG_SEP,
             encodeconduct(), XLOG_SEP, moves, XLOG_SEP, encodeachieve());
     Fprintf(rfile, "%crealtime=%ld%cstarttime=%ld%cendtime=%ld", XLOG_SEP,
