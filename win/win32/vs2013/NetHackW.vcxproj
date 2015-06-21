@@ -138,7 +138,6 @@
       <Command>copy $(OutDir)NetHackW.exe ..\binary
 copy ..\dat\nhdat ..\binary
 copy ..\dat\license ..\binary
-if exist ..\src\tiles.bmp copy ..\src\tiles.bmp ..\binary
 if NOT exist ..\binary\sysconf copy ..\sys\winnt\sysconf ..\binary\sysconf
 if exist ..\doc\Guidebook.txt copy ..\doc\Guidebook.txt ..\binary\Guidebook.txt
 if exist ..\doc\nethack.txt copy ..\doc\nethack.txt ..\binary\NetHack.txt
@@ -200,7 +199,6 @@ copy ..\sys\winnt\defaults.nh ..\binary\defaults.nh
       <Command>copy $(OutDir)NetHackW.exe ..\binary
 copy ..\dat\nhdat ..\binary
 copy ..\dat\license ..\binary
-if exist ..\src\tiles.bmp copy ..\src\tiles.bmp ..\binary
 if NOT exist ..\binary\sysconf copy ..\sys\winnt\sysconf ..\binary\sysconf
 if exist ..\doc\Guidebook.txt copy ..\doc\Guidebook.txt ..\binary\Guidebook.txt
 if exist ..\doc\nethack.txt copy ..\doc\nethack.txt ..\binary\NetHack.txt
@@ -262,7 +260,6 @@ copy $(OutDir)NetHackW.exe ..\binary
 copy ..\dat\nhdat ..\binary
 copy ..\dat\license ..\binary
 copy ..\dat\symbols ..\binary
-if exist ..\src\tiles.bmp copy ..\src\tiles.bmp ..\binary
 if NOT exist ..\binary\sysconf copy ..\sys\winnt\sysconf ..\binary\sysconf
 if exist ..\doc\Guidebook.txt copy ..\doc\Guidebook.txt ..\binary\Guidebook.txt
 if exist ..\doc\nethack.txt copy ..\doc\nethack.txt ..\binary\NetHack.txt
@@ -321,7 +318,6 @@ copy $(OutDir)NetHackW.exe ..\binary
 copy ..\dat\nhdat ..\binary
 copy ..\dat\license ..\binary
 copy ..\dat\symbols ..\binary
-if exist ..\src\tiles.bmp copy ..\src\tiles.bmp ..\binary
 if NOT exist ..\binary\sysconf copy ..\sys\winnt\sysconf ..\binary\sysconf
 if exist ..\doc\Guidebook.txt copy ..\doc\Guidebook.txt ..\binary\Guidebook.txt
 if exist ..\doc\nethack.txt copy ..\doc\nethack.txt ..\binary\NetHack.txt
@@ -493,6 +489,10 @@ copy ..\sys\winnt\defaults.nh ..\binary\defaults.nh
     <ProjectReference Include="tiles.vcxproj">
       <Project>{55946465-fc65-47b3-bb48-742c7694c0d6}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <Private>false</Private>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
     <ProjectReference Include="uudecode.vcxproj">
       <Project>{63f9b82b-f589-4082-abe5-d4f0682050ab}</Project>
