@@ -180,6 +180,8 @@ LOOP [9 + 2d5] {
     }
 }
 
+# Hack to force full-level wallification
+NOMAP
 WALLIFY
 
 
