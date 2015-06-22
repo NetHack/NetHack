@@ -2479,6 +2479,19 @@ Turning help off makes just looking at things faster, since you aren't
 interrupted with the ``{\tt More info?}'' prompt, but it also means that you
 might miss some interesting and/or important information.
 %.lp
+\item[\ib{hilite\verb+_+pet}]
+Visually distinguish pets from similar animals (default off).
+The behavior of this option depends on the type of windowing you use.
+In text windowing, text highlighting or inverse video is often used;
+with tiles, generally displays a heart symbol near pets.
+%.lp
+\item[\ib{hilite\verb+_+pile}]
+Visually distinguish piles of objects from individual objects (default off).
+The behavior of this option depends on the type of windowing you use.
+In text windowing, text highlighting or inverse video is often used;
+with tiles, generally displays a small plus-symbol beside the object
+on the top of the pile.
+%.lp
 \item[\ib{horsename}]
 Name your starting horse (ex.\ ``{\tt horsename:Trigger}'').
 Cannot be set with the `{\tt O}' command.
@@ -2969,19 +2982,6 @@ NetHack should use this size font for text windows.
 %.lp
 \item[\ib{fullscreen}]
 NetHack should try and display on the entire screen rather than in a window.
-%.lp
-\item[\ib{hilite\verb+_+pet}]
-Visually distinguish pets from similar animals (default off).
-The behavior of this option depends on the type of windowing you use.
-In text windowing, text highlighting or inverse video is often used;
-with tiles, generally displays a heart symbol near pets.
-%.lp
-\item[\ib{hilite\verb+_+pile}]
-Visually distinguish piles of objects from individual objects (default off).
-The behavior of this option depends on the type of windowing you use.
-In text windowing, text highlighting or inverse video is often used;
-with tiles, generally displays a small plus-symbol beside the object
-on the top of the pile.
 %.lp
 \item[\ib{large\verb+_+font}]
 NetHack should use a large font.
@@ -4203,6 +4203,7 @@ Erik Andersen & Kevin Sitze & Richard Addison
 %\end{flushleft}
 
 \end{document}
+
 
 
 

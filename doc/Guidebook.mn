@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: master $:$NHDT-Revision: 1.178 $ $NHDT-Date: 1435002662 2015/06/22 19:51:02 $
+.\" $NHDT-Branch: master $:$NHDT-Revision: 1.179 $ $NHDT-Date: 1435003374 2015/06/22 20:02:54 $
 .ds h0 "NetHack Guidebook
 .ds h1
 .ds h2 %
@@ -2053,6 +2053,17 @@ with the `/' command, ask if you want to see it (default on). Turning help
 off makes just looking at things faster, since you aren't interrupted with the
 ``More info?'' prompt, but it also means that you might miss some
 interesting and/or important information.
+.lp hilite_pet
+Visually distinguish pets from similar animals (default off).
+The behavior of this option depends on the type of windowing you use.
+In text windowing, text highlighting or inverse video is often used;
+with tiles, generally displays a heart symbol near pets.
+.lp hilite_pile
+Visually distinguish piles of objects from individual objects (default off).
+The behavior of this option depends on the type of windowing you use.
+In text windowing, text highlighting or inverse video is often used;
+with tiles, generally displays a small plus-symbol beside the object
+on the top of the pile.
 .lp horsename
 Name your starting horse (ex. ``horsename:Trigger'').
 Cannot be set with the `O' command.
@@ -2462,17 +2473,6 @@ NetHack should use this size font for the status window.
 NetHack should use this size font for text windows.
 .lp fullscreen
 NetHack should try and display on the entire screen rather than in a window.
-.lp hilite_pet
-Visually distinguish pets from similar animals (default off).
-The behavior of this option depends on the type of windowing you use.
-In text windowing, text highlighting or inverse video is often used;
-with tiles, generally displays a heart symbol near pets.
-.lp hilite_pile
-Visually distinguish piles of objects from individual objects (default off).
-The behavior of this option depends on the type of windowing you use.
-In text windowing, text highlighting or inverse video is often used;
-with tiles, generally displays a small plus-symbol beside the object
-on the top of the pile.
 .lp large_font	
 NetHack should use a large font.
 .lp map_mode	
