@@ -345,7 +345,7 @@ gotobj:
                       (otmp == uright && welded(uwep))
                       || (otmp == uleft && welded(uwep) && bimanual(uwep)));
 
-        if (ostuck || !can_carry(mtmp, otmp) > 0) {
+        if (ostuck || can_carry(mtmp, otmp) == 0) {
             static const char *const how[] = { "steal", "snatch", "grab",
                                                "take" };
         cant_take:
