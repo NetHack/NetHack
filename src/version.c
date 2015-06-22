@@ -1,4 +1,4 @@
-/* NetHack 3.6	version.c	$NHDT-Date: 1434916287 2015/06/21 19:51:27 $  $NHDT-Branch: master $:$NHDT-Revision: 1.37 $ */
+/* NetHack 3.6	version.c	$NHDT-Date: 1434999940 2015/06/22 19:05:40 $  $NHDT-Branch: master $:$NHDT-Revision: 1.38 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -15,7 +15,7 @@
 #include "patchlevel.h"
 #endif
 
-#define BETA_INFO "Beta4"
+#define BETA_INFO "Beta5"
 
 STATIC_DCL void FDECL(insert_rtoptions, (winid,char *,const char *));
 

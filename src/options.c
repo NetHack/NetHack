@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1434056951 2015/06/11 21:09:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.219 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1434999932 2015/06/22 19:05:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.221 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -79,11 +79,6 @@ static struct Bool_Opt {
     { "autoopen", &flags.autoopen, TRUE, SET_IN_GAME },
     { "autopickup", &flags.pickup, TRUE, SET_IN_GAME },
     { "autoquiver", &flags.autoquiver, FALSE, SET_IN_GAME },
-#if defined(WIN32)
-    { "background_glyphs", &iflags.use_background_glyph, TRUE, DISP_IN_GAME },
-#else
-    { "background_glyphs", &iflags.use_background_glyph, FALSE, DISP_IN_GAME },
-#endif
 #if defined(MICRO) && !defined(AMIGA)
     { "BIOS", &iflags.BIOS, FALSE, SET_IN_FILE },
 #else

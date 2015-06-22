@@ -1,4 +1,4 @@
-/* NetHack 3.6	pcmain.c	$NHDT-Date: 1432512787 2015/05/25 00:13:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.64 $ */
+/* NetHack 3.6	pcmain.c	$NHDT-Date: 1434999947 2015/06/22 19:05:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.65 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -364,8 +364,12 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
             NHWinMainInit();
         else
     */
-    if (!strncmpi(windowprocs.name, "tty", 3))
+    if (!strncmpi(windowprocs.name, "tty", 3)) {
+        iflags.use_background_glyph = FALSE;
         nttty_open(1);
+    } else {
+        iflags.use_background_glyph = TRUE;
+    }
 #endif
 #endif
 
