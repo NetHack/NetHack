@@ -1,4 +1,4 @@
-/* NetHack 3.6	flag.h	$NHDT-Date: 1434450203 2015/06/16 10:23:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.87 $ */
+/* NetHack 3.6	flag.h	$NHDT-Date: 1435002669 2015/06/22 19:51:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.89 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -210,6 +210,7 @@ struct instance_flags {
     boolean use_menu_color;       /* use color in menus; only if wc_color */
     boolean use_status_hilites;   /* use color in status line */
     boolean use_background_glyph; /* use background glyph when appropriate */
+    boolean hilite_pile;          /* mark piles of objects with a hilite */
 #if 0
 	boolean  DECgraphics;	/* use DEC VT-xxx extended character set */
 	boolean  IBMgraphics;	/* use IBM extended character set */

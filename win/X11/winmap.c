@@ -1,4 +1,4 @@
-/* NetHack 3.6	winmap.c	$NHDT-Date: 1433806622 2015/06/08 23:37:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.22 $ */
+/* NetHack 3.6	winmap.c	$NHDT-Date: 1435002689 2015/06/22 19:51:29 $  $NHDT-Branch: master $:$NHDT-Revision: 1.24 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -127,7 +127,7 @@ int glyph, bkglyph;
 #ifdef TEXTCOLOR
             if ((special & MG_PET) && iflags.hilite_pet)
                 color += CLR_MAX;
-            if ((special & MG_OBJPILE) && iflags.use_inverse)
+            if ((special & MG_OBJPILE) && iflags.hilite_pile)
             *co_ptr = color;
 #endif
             if (!map_info->is_tile)

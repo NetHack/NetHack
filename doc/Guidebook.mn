@@ -1,11 +1,11 @@
-.\" $NHDT-Branch: master $:$NHDT-Revision: 1.175 $ $NHDT-Date: 1434054937 2015/06/11 20:35:37 $
+.\" $NHDT-Branch: master $:$NHDT-Revision: 1.178 $ $NHDT-Date: 1435002662 2015/06/22 19:51:02 $
 .ds h0 "NetHack Guidebook
 .ds h1
 .ds h2 %
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "June 21, 2015
+.ds f2 "June 22, 2015
 .\" labeled paragraph start (should be part of tmac.n, but I don't want to
 .\" make changes to that file)
 .\" .PS word
@@ -2467,6 +2467,12 @@ Visually distinguish pets from similar animals (default off).
 The behavior of this option depends on the type of windowing you use.
 In text windowing, text highlighting or inverse video is often used;
 with tiles, generally displays a heart symbol near pets.
+.lp hilite_pile
+Visually distinguish piles of objects from individual objects (default off).
+The behavior of this option depends on the type of windowing you use.
+In text windowing, text highlighting or inverse video is often used;
+with tiles, generally displays a small plus-symbol beside the object
+on the top of the pile.
 .lp large_font	
 NetHack should use a large font.
 .lp map_mode	

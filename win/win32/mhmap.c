@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhmap.c	$NHDT-Date: 1434803886 2015/06/20 12:38:06 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.55 $ */
+/* NetHack 3.6	mhmap.c	$NHDT-Date: 1435002695 2015/06/22 19:51:35 $  $NHDT-Branch: master $:$NHDT-Revision: 1.56 $ */
 /* Copyright (C) 2001 by Alex Kompel      */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -790,7 +790,8 @@ onPaint(HWND hWnd)
                         DeleteDC(hdcPetMark);
                     }
 #ifdef USE_PILEMARK
-                    if ((glyph != NO_GLYPH) && (special & MG_OBJPILE)) {
+                    if ((glyph != NO_GLYPH)
+                        && (special & MG_OBJPILE) && iflags.hilite_pile) {
                         /* apply pilemark transparently over other image */
                         HDC hdcPileMark;
                         HBITMAP bmPileMarkOld;

@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1433161984 2015/06/01 12:33:04 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.61 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1435002677 2015/06/22 19:51:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.64 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1107,7 +1107,7 @@ boolean from_configfile;
 {
     int i;
     anything it;
-    it.a_void = 0;
+    it = zeroany;
     for (i = 0; i < MAXBLSTATS; ++i) {
         (void) memset((genericptr_t) &status_hilites[i], 0,
                       sizeof(struct hilite_s));
@@ -1267,7 +1267,7 @@ boolean all;
     int idx;
     anything it;
 
-    it.a_void = 0;
+    it = zeroany;
     for (idx = 0; idx < MAXBLSTATS; ++idx) {
         if (status_hilites[idx].set)
             status_threshold(idx, status_hilites[idx].anytype,
