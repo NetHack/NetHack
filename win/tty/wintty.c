@@ -3044,7 +3044,8 @@ int glyph, bkglyph;
 
     /* must be after color check; term_end_color may turn off inverse too */
     if (((special & MG_PET) && iflags.hilite_pet)
-        || ((special & (MG_DETECT|MG_OBJPILE)) && iflags.use_inverse)) {
+	|| ((special & MG_OBJPILE) && iflags.hilite_pile)
+        || ((special & MG_DETECT) && iflags.use_inverse)) {
         term_start_attr(ATR_INVERSE);
         reverse_on = TRUE;
     }
