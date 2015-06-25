@@ -1143,7 +1143,7 @@ register int mmflags;
                chosen here with rndmonst(), yielding a monster
                which was approriate to the level's difficulty
                but ignored the changer's usual type selection
-               so would be inppropriate for vampshifters.
+               so would be inappropriate for vampshifters.
                Let newcham() pick the shape. */
             if (newcham(mtmp, (struct permonst *) 0, FALSE, FALSE))
                 allow_minvent = FALSE;
