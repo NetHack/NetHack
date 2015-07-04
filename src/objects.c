@@ -1,4 +1,4 @@
-/* NetHack 3.6	objects.c	$NHDT-Date: 1434679652 2015/06/19 02:07:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.42 $ */
+/* NetHack 3.6	objects.c	$NHDT-Date: 1436052459 2015/07/04 23:27:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.43 $ */
 /* Copyright (c) Mike Threepoint, 1989.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -514,13 +514,13 @@ BOOTS("high boots", "jackboots",
 BOOTS("speed boots", "combat boots",
       0, 1,       FAST, 12, 2, 20, 50, 9, 0, LEATHER, HI_LEATHER),
 BOOTS("water walking boots", "jungle boots",
-      0, 1,   WWALKING, 12, 2, 20, 50, 9, 0, LEATHER, HI_LEATHER),
+      0, 1,   WWALKING, 12, 2, 15, 50, 9, 0, LEATHER, HI_LEATHER),
 BOOTS("jumping boots", "hiking boots",
       0, 1,    JUMPING, 12, 2, 20, 50, 9, 0, LEATHER, HI_LEATHER),
 BOOTS("elven boots", "mud boots",
       0, 1,    STEALTH, 12, 2, 15,  8, 9, 0, LEATHER, HI_LEATHER),
 BOOTS("kicking boots", "buckled boots",
-      0, 1,          0, 12, 2, 15,  8, 9, 0, IRON, CLR_BROWN),
+      0, 1,          0, 12, 2, 50,  8, 9, 0, IRON, CLR_BROWN),
         /* CLR_BROWN for same reason as gauntlets of power */
 BOOTS("fumble boots", "riding boots",
       0, 1,   FUMBLING, 12, 2, 20, 30, 9, 0, LEATHER, HI_LEATHER),
