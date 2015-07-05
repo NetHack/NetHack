@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1434330833 2015/06/15 01:13:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.144 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1436054844 2015/07/05 00:07:24 $  $NHDT-Branch: master $:$NHDT-Revision: 1.145 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -11,10 +11,8 @@ STATIC_DCL void FDECL(trycall, (struct obj *));
 STATIC_DCL void NDECL(polymorph_sink);
 STATIC_DCL boolean NDECL(teleport_sink);
 STATIC_DCL void FDECL(dosinkring, (struct obj *));
-
 STATIC_PTR int FDECL(drop, (struct obj *));
 STATIC_PTR int NDECL(wipeoff);
-
 STATIC_DCL int FDECL(menu_drop, (int));
 STATIC_DCL int NDECL(currentlevel_rewrite);
 STATIC_DCL void NDECL(final_level);
@@ -51,9 +49,9 @@ struct obj *otmp;
 register int rx, ry;
 boolean pushing;
 {
-    if (!otmp || otmp->otyp != BOULDER)
+    if (!otmp || otmp->otyp != BOULDER) {
         impossible("Not a boulder?");
-    else if (!Is_waterlevel(&u.uz) && is_pool_or_lava(rx, ry)) {
+    } else if (!Is_waterlevel(&u.uz) && is_pool_or_lava(rx, ry)) {
         boolean lava = is_lava(rx, ry), fills_up;
         const char *what = waterbody_name(rx, ry);
         schar ltyp = levl[rx][ry].typ;
@@ -145,9 +143,9 @@ const char *verb;
     /* make sure things like water_damage() have no pointers to follow */
     obj->nobj = obj->nexthere = (struct obj *) 0;
 
-    if (obj->otyp == BOULDER && boulder_hits_pool(obj, x, y, FALSE))
+    if (obj->otyp == BOULDER && boulder_hits_pool(obj, x, y, FALSE)) {
         return TRUE;
-    else if (obj->otyp == BOULDER && (t = t_at(x, y)) != 0
+    } else if (obj->otyp == BOULDER && (t = t_at(x, y)) != 0
              && (t->ttyp == PIT || t->ttyp == SPIKED_PIT
                  || t->ttyp == TRAPDOOR || t->ttyp == HOLE)) {
         if (((mtmp = m_at(x, y)) && mtmp->mtrapped)
@@ -230,7 +228,9 @@ const char *verb;
     return FALSE;
 }
 
-void doaltarobj(obj) /* obj is an object dropped on an altar */
+/* obj is an object dropped on an altar */
+void
+doaltarobj(obj)
 register struct obj *obj;
 {
     if (Blind)
@@ -257,8 +257,7 @@ register struct obj *obj;
     }
 }
 
-STATIC_OVL
-void
+STATIC_OVL void
 trycall(obj)
 register struct obj *obj;
 {
@@ -268,8 +267,7 @@ register struct obj *obj;
 
 /** Transforms the sink at the player's position into
  * a fountain, throne, altar or grave. */
-STATIC_DCL
-void
+STATIC_DCL void
 polymorph_sink()
 {
     if (levl[u.ux][u.uy].typ != SINK)
@@ -303,8 +301,7 @@ polymorph_sink()
 
 /** Teleports the sink at the player's position.
  * @return TRUE if sink teleported */
-STATIC_DCL
-boolean
+STATIC_DCL boolean
 teleport_sink()
 {
     int cx, cy;
@@ -316,7 +313,7 @@ teleport_sink()
         cy = rn2(ROWNO);
         trp = t_at(cx, cy);
         eng = engr_at(cx, cy);
-    } while (((levl[cx][cy].typ != ROOM) || (trp) || (eng) || cansee(cx, cy))
+    } while ((levl[cx][cy].typ != ROOM || trp || eng || cansee(cx, cy))
              && (cnt++ < 200));
     if ((levl[cx][cy].typ == ROOM) && !trp && !eng) {
         /* create sink at new position */
@@ -332,12 +329,13 @@ teleport_sink()
     return FALSE;
 }
 
-STATIC_OVL
-void dosinkring(obj) /* obj is a ring being dropped over a kitchen sink */
+/* obj is a ring being dropped over a kitchen sink */
+STATIC_OVL void
+dosinkring(obj)
 register struct obj *obj;
 {
-    register struct obj *otmp, *otmp2;
-    register boolean ideed = TRUE;
+    struct obj *otmp, *otmp2;
+    boolean ideed = TRUE;
     boolean nosink = FALSE;
 
     You("drop %s down the drain.", doname(obj));
@@ -481,8 +479,8 @@ register struct obj *obj;
 /* some common tests when trying to drop or throw items */
 boolean
 canletgo(obj, word)
-register struct obj *obj;
-register const char *word;
+struct obj *obj;
+const char *word;
 {
     if (obj->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL)) {
         if (*word)
@@ -517,8 +515,7 @@ register const char *word;
     return (TRUE);
 }
 
-STATIC_PTR
-int
+STATIC_PTR int
 drop(obj)
 register struct obj *obj;
 {
@@ -602,8 +599,7 @@ register struct obj *obj;
     dropy(obj);
 }
 
-/* dropy - put dropped object at its destination; called from lots of places
- */
+/* dropy - put dropped object at destination; called from lots of places */
 void
 dropy(obj)
 struct obj *obj;
@@ -1070,8 +1066,10 @@ static boolean
 badspot(x, y)
 register xchar x, y;
 {
-    return((levl[x][y].typ != ROOM && levl[x][y].typ != AIR &&
-             levl[x][y].typ != CORR) || MON_AT(x, y));
+    return (boolean) ((levl[x][y].typ != ROOM
+                       && levl[x][y].typ != AIR
+                       && levl[x][y].typ != CORR)
+                      || MON_AT(x, y));
 }
 */
 
@@ -1103,20 +1101,20 @@ boolean at_stairs, falling, portal;
     if (new_ledger <= 0)
         done(ESCAPED); /* in fact < 0 is impossible */
 
-    /* If you have the amulet and are trying to get out of Gehennom, going
-     * up a set of stairs sometimes does some very strange things!
-         * Biased against law and towards chaos. (The chance to be sent
-         * down multiple levels when attempting to go up are significantly
-         * less than the corresponding comment in older versions indicated
-         * due to overlooking the effect of the call to assign_rnd_lvl().)
-         *
-         * Odds for making it to the next level up, or of being sent down:
-         *	"up"    L      N      C
-         *	 +1   75.0   75.0   75.0
-         *	  0    6.25   8.33  12.5
-         *	 -1   11.46  12.50  12.5
-         *	 -2    5.21   4.17   0.0
-         *	 -3    2.08   0.0    0.0
+    /* If you have the amulet and are trying to get out of Gehennom,
+     * going up a set of stairs sometimes does some very strange things!
+     * Biased against law and towards chaos.  (The chance to be sent
+     * down multiple levels when attempting to go up are significantly
+     * less than the corresponding comment in older versions indicated
+     * due to overlooking the effect of the call to assign_rnd_lvl().)
+     *
+     * Odds for making it to the next level up, or of being sent down:
+     *	"up"    L      N      C
+     *	 +1   75.0   75.0   75.0
+     *	  0    6.25   8.33  12.5
+     *	 -1   11.46  12.50  12.5
+     *	 -2    5.21   4.17   0.0
+     *	 -3    2.08   0.0    0.0
      */
     if (Inhell && up && u.uhave.amulet && !newdungeon && !portal
         && (dunlev(&u.uz) < dunlevs_in_dungeon(&u.uz) - 3)) {
@@ -1179,11 +1177,11 @@ boolean at_stairs, falling, portal;
     if (u.uswallow) /* idem */
         u.uswldtim = u.uswallow = 0;
     recalc_mapseen(); /* recalculate map overview before we leave the level */
-                      /*
-                       *  We no longer see anything on the level.  Make sure that this
-                       *  follows u.uswallow set to null since uswallow overrides all
-                       *  normal vision.
-                       */
+    /*
+     *  We no longer see anything on the level.  Make sure that this
+     *  follows u.uswallow set to null since uswallow overrides all
+     *  normal vision.
+     */
     vision_recalc(2);
 
     /*
@@ -1341,11 +1339,11 @@ boolean at_stairs, falling, portal;
     obj_delivery(FALSE);
     losedogs();
     kill_genocided_monsters(); /* for those wiped out while in limbo */
-                               /*
-                                * Expire all timers that have gone off while away.  Must be
-                                * after migrating monsters and objects are delivered
-                                * (losedogs and obj_delivery).
-                                */
+    /*
+     * Expire all timers that have gone off while away.  Must be
+     * after migrating monsters and objects are delivered
+     * (losedogs and obj_delivery).
+     */
     run_timers();
 
     initrack();
