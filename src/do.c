@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1436054844 2015/07/05 00:07:24 $  $NHDT-Branch: master $:$NHDT-Revision: 1.145 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1436057350 2015/07/05 00:49:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.146 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1473,7 +1473,7 @@ boolean at_stairs, falling, portal;
             }
         }
     } else {
-        if (new &&Is_rogue_level(&u.uz))
+        if (new && Is_rogue_level(&u.uz))
             You("enter what seems to be an older, more primitive world.");
         /* main dungeon message from your quest leader */
         if (!In_quest(&u.uz0) && at_dgn_entrance("The Quest")
