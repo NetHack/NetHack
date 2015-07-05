@@ -1,4 +1,4 @@
-/* NetHack 3.6	dungeon.h	$NHDT-Date: 1432512778 2015/05/25 00:12:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.20 $ */
+/* NetHack 3.6	dungeon.h	$NHDT-Date: 1436065581 2015/07/05 03:06:21 $  $NHDT-Branch: master $:$NHDT-Revision: 1.21 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -235,6 +235,11 @@ typedef struct mapseen {
         Bitfield(msanctum, 1);
         Bitfield(ludios, 1);
         Bitfield(roguelevel, 1);
+        /* quest annotations: quest_summons is for main dungeon level
+           with entry portal and is reset once quest has been finished;
+           questing is for quest home (level 1) */
+        Bitfield(quest_summons, 1); /* heard summons from leader */
+        Bitfield(questing, 1); /* quest leader has unlocked quest stairs */
     } flags;
     /* custom naming */
     char *custom;
