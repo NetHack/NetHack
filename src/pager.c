@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1433572586 2015/06/06 06:36:26 $  $NHDT-Branch: master $:$NHDT-Revision: 1.77 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1436234837 2015/07/07 02:07:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.78 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -10,9 +10,13 @@
 
 STATIC_DCL boolean FDECL(is_swallow_sym, (int));
 STATIC_DCL int FDECL(append_str, (char *, const char *));
+STATIC_DCL void FDECL(look_at_object, (char *, int, int, int));
+STATIC_DCL void FDECL(look_at_monster, (char *, char *,
+                                        struct monst *, int, int));
 STATIC_DCL struct permonst *FDECL(lookat, (int, int, char *, char *));
-STATIC_DCL void FDECL(checkfile,
-                      (char *, struct permonst *, BOOLEAN_P, BOOLEAN_P));
+STATIC_DCL void FDECL(checkfile, (char *, struct permonst *,
+                                  BOOLEAN_P, BOOLEAN_P));
+STATIC_DCL void FDECL(look_all, (BOOLEAN_P,BOOLEAN_P));
 STATIC_DCL boolean FDECL(help_menu, (int *));
 #ifdef PORT_HELP
 extern void NDECL(port_help);
@@ -112,6 +116,138 @@ struct obj **obj_p;
     return fakeobj; /* when True, caller needs to dealloc *obj_p */
 }
 
+STATIC_OVL void
+look_at_object(buf, x, y, glyph)
+char *buf; /* output buffer */
+int x, y, glyph;
+{
+    struct obj *otmp = 0;
+    boolean fakeobj = object_from_map(glyph, x, y, &otmp);
+
+    if (otmp) {
+        Strcpy(buf, (otmp->otyp != STRANGE_OBJECT)
+                     ? distant_name(otmp, xname)
+                     : obj_descr[STRANGE_OBJECT].oc_name);
+        if (fakeobj)
+            dealloc_obj(otmp), otmp = 0;
+    } else
+        Strcpy(buf, something); /* sanity precaution */
+
+    if (levl[x][y].typ == STONE || levl[x][y].typ == SCORR)
+        Strcat(buf, " embedded in stone");
+    else if (IS_WALL(levl[x][y].typ) || levl[x][y].typ == SDOOR)
+        Strcat(buf, " embedded in a wall");
+    else if (closed_door(x, y))
+        Strcat(buf, " embedded in a door");
+    else if (is_pool(x, y))
+        Strcat(buf, " in water");
+    else if (is_lava(x, y))
+        Strcat(buf, " in molten lava"); /* [can this ever happen?] */
+    return;
+}
+
+STATIC_OVL void
+look_at_monster(buf, monbuf, mtmp, x, y)
+char *buf, *monbuf; /* buf: output, monbuf: optional output */
+struct monst *mtmp;
+int x, y;
+{
+    char *name, monnambuf[BUFSZ];
+    boolean accurate = !Hallucination;
+
+    if (mtmp->data == &mons[PM_COYOTE] && accurate)
+        name = coyotename(mtmp, monnambuf);
+    else
+        name = distant_monnam(mtmp, ARTICLE_NONE, monnambuf);
+
+    Sprintf(buf, "%s%s%s",
+            (mtmp->mx != x || mtmp->my != y)
+                ? ((mtmp->isshk && accurate) ? "tail of " : "tail of a ")
+                : "",
+            (mtmp->mtame && accurate)
+                ? "tame "
+                : (mtmp->mpeaceful && accurate)
+                    ? "peaceful "
+                    : "",
+            name);
+    if (u.ustuck == mtmp)
+        Strcat(buf, (Upolyd && sticks(youmonst.data))
+                     ? ", being held" : ", holding you");
+    if (mtmp->mleashed)
+        Strcat(buf, ", leashed to you");
+
+    if (mtmp->mtrapped && cansee(mtmp->mx, mtmp->my)) {
+        struct trap *t = t_at(mtmp->mx, mtmp->my);
+        int tt = t ? t->ttyp : NO_TRAP;
+
+        /* newsym lets you know of the trap, so mention it here */
+        if (tt == BEAR_TRAP || tt == PIT || tt == SPIKED_PIT || tt == WEB)
+            Sprintf(eos(buf), ", trapped in %s",
+                    an(defsyms[trap_to_defsym(tt)].explanation));
+    }
+
+    if (monbuf) {
+        unsigned how_seen = howmonseen(mtmp);
+
+        monbuf[0] = '\0';
+        if (how_seen != 0 && how_seen != MONSEEN_NORMAL) {
+            if (how_seen & MONSEEN_NORMAL) {
+                Strcat(monbuf, "normal vision");
+                how_seen &= ~MONSEEN_NORMAL;
+                /* how_seen can't be 0 yet... */
+                if (how_seen)
+                    Strcat(monbuf, ", ");
+            }
+            if (how_seen & MONSEEN_SEEINVIS) {
+                Strcat(monbuf, "see invisible");
+                how_seen &= ~MONSEEN_SEEINVIS;
+                if (how_seen)
+                    Strcat(monbuf, ", ");
+            }
+            if (how_seen & MONSEEN_INFRAVIS) {
+                Strcat(monbuf, "infravision");
+                how_seen &= ~MONSEEN_INFRAVIS;
+                if (how_seen)
+                    Strcat(monbuf, ", ");
+            }
+            if (how_seen & MONSEEN_TELEPAT) {
+                Strcat(monbuf, "telepathy");
+                how_seen &= ~MONSEEN_TELEPAT;
+                if (how_seen)
+                    Strcat(monbuf, ", ");
+            }
+            if (how_seen & MONSEEN_XRAYVIS) {
+                /* Eyes of the Overworld */
+                Strcat(monbuf, "astral vision");
+                how_seen &= ~MONSEEN_XRAYVIS;
+                if (how_seen)
+                    Strcat(monbuf, ", ");
+            }
+            if (how_seen & MONSEEN_DETECT) {
+                Strcat(monbuf, "monster detection");
+                how_seen &= ~MONSEEN_DETECT;
+                if (how_seen)
+                    Strcat(monbuf, ", ");
+            }
+            if (how_seen & MONSEEN_WARNMON) {
+                if (Hallucination)
+                    Strcat(monbuf, "paranoid delusion");
+                else
+                    Sprintf(eos(monbuf), "warned of %s",
+                            makeplural(mtmp->data->mname));
+                how_seen &= ~MONSEEN_WARNMON;
+                if (how_seen)
+                    Strcat(monbuf, ", ");
+            }
+            /* should have used up all the how_seen bits by now */
+            if (how_seen) {
+                impossible("lookat: unknown method of seeing monster");
+                Sprintf(eos(monbuf), "(%u)", how_seen);
+            }
+        } /* seen by something other than normal vision */
+    } /* monbuf is non-null */
+}
+
 /*
  * Return the name of the glyph found at (x,y).
  * If not hallucinating and the glyph is a monster, also monster data.
@@ -125,7 +261,7 @@ char *buf, *monbuf;
     struct permonst *pm = (struct permonst *) 0;
     int glyph;
 
-    buf[0] = monbuf[0] = 0;
+    buf[0] = monbuf[0] = '\0';
     glyph = glyph_at(x, y);
     if (u.ux == x && u.uy == y && canspotself()) {
         /* fill in buf[] */
@@ -169,125 +305,12 @@ char *buf, *monbuf;
     } else if (glyph_is_monster(glyph)) {
         bhitpos.x = x;
         bhitpos.y = y;
-        mtmp = m_at(x, y);
-        if (mtmp) {
-            char *name, monnambuf[BUFSZ];
-            unsigned how_seen;
-            boolean accurate = !Hallucination;
-
-            if (mtmp->data == &mons[PM_COYOTE] && accurate)
-                name = coyotename(mtmp, monnambuf);
-            else
-                name = distant_monnam(mtmp, ARTICLE_NONE, monnambuf);
-
+        if ((mtmp = m_at(x, y)) != 0) {
+            look_at_monster(buf, monbuf, mtmp, x, y);
             pm = mtmp->data;
-            Sprintf(
-                buf, "%s%s%s",
-                (mtmp->mx != x || mtmp->my != y)
-                    ? ((mtmp->isshk && accurate) ? "tail of " : "tail of a ")
-                    : "",
-                (mtmp->mtame && accurate)
-                    ? "tame "
-                    : (mtmp->mpeaceful && accurate) ? "peaceful " : "",
-                name);
-            if (u.ustuck == mtmp)
-                Strcat(buf, (Upolyd && sticks(youmonst.data))
-                                ? ", being held"
-                                : ", holding you");
-            if (mtmp->mleashed)
-                Strcat(buf, ", leashed to you");
-
-            if (mtmp->mtrapped && cansee(mtmp->mx, mtmp->my)) {
-                struct trap *t = t_at(mtmp->mx, mtmp->my);
-                int tt = t ? t->ttyp : NO_TRAP;
-
-                /* newsym lets you know of the trap, so mention it here */
-                if (tt == BEAR_TRAP || tt == PIT || tt == SPIKED_PIT
-                    || tt == WEB)
-                    Sprintf(eos(buf), ", trapped in %s",
-                            an(defsyms[trap_to_defsym(tt)].explanation));
-            }
-
-            how_seen = howmonseen(mtmp);
-            if (how_seen && how_seen != MONSEEN_NORMAL) {
-                if (how_seen & MONSEEN_NORMAL) {
-                    Strcat(monbuf, "normal vision");
-                    how_seen &= ~MONSEEN_NORMAL;
-                    /* how_seen can't be 0 yet... */
-                    if (how_seen)
-                        Strcat(monbuf, ", ");
-                }
-                if (how_seen & MONSEEN_SEEINVIS) {
-                    Strcat(monbuf, "see invisible");
-                    how_seen &= ~MONSEEN_SEEINVIS;
-                    if (how_seen)
-                        Strcat(monbuf, ", ");
-                }
-                if (how_seen & MONSEEN_INFRAVIS) {
-                    Strcat(monbuf, "infravision");
-                    how_seen &= ~MONSEEN_INFRAVIS;
-                    if (how_seen)
-                        Strcat(monbuf, ", ");
-                }
-                if (how_seen & MONSEEN_TELEPAT) {
-                    Strcat(monbuf, "telepathy");
-                    how_seen &= ~MONSEEN_TELEPAT;
-                    if (how_seen)
-                        Strcat(monbuf, ", ");
-                }
-                if (how_seen & MONSEEN_XRAYVIS) {
-                    /* Eyes of the Overworld */
-                    Strcat(monbuf, "astral vision");
-                    how_seen &= ~MONSEEN_XRAYVIS;
-                    if (how_seen)
-                        Strcat(monbuf, ", ");
-                }
-                if (how_seen & MONSEEN_DETECT) {
-                    Strcat(monbuf, "monster detection");
-                    how_seen &= ~MONSEEN_DETECT;
-                    if (how_seen)
-                        Strcat(monbuf, ", ");
-                }
-                if (how_seen & MONSEEN_WARNMON) {
-                    if (Hallucination)
-                        Strcat(monbuf, "paranoid delusion");
-                    else
-                        Sprintf(eos(monbuf), "warned of %s",
-                                makeplural(mtmp->data->mname));
-                    how_seen &= ~MONSEEN_WARNMON;
-                    if (how_seen)
-                        Strcat(monbuf, ", ");
-                }
-                /* should have used up all the how_seen bits by now */
-                if (how_seen) {
-                    impossible("lookat: unknown method of seeing monster");
-                    Sprintf(eos(monbuf), "(%u)", how_seen);
-                }
-            } /* seen by something other than normal vision */
-        }     /* mtmp */
-
-    } else if (glyph_is_object(glyph)) {
-        struct obj *otmp = 0;
-        boolean fakeobj = object_from_map(glyph, x, y, &otmp);
-
-        if (otmp) {
-            Strcpy(buf, (otmp->otyp != STRANGE_OBJECT)
-                         ? distant_name(otmp, xname)
-                         : obj_descr[STRANGE_OBJECT].oc_name);
-            if (fakeobj)
-                dealloc_obj(otmp), otmp = 0;
         }
-
-        if (levl[x][y].typ == STONE || levl[x][y].typ == SCORR)
-            Strcat(buf, " embedded in stone");
-        else if (IS_WALL(levl[x][y].typ) || levl[x][y].typ == SDOOR)
-            Strcat(buf, " embedded in a wall");
-        else if (closed_door(x, y))
-            Strcat(buf, " embedded in a door");
-        else if (is_pool(x, y))
-            Strcat(buf, " in water");
-        else if (is_lava(x, y))
-            Strcat(buf, " in molten lava"); /* [can this ever happen?] */
+    } else if (glyph_is_object(glyph)) {
+        look_at_object(buf, x, y, glyph); /* fill in buf[] */
     } else if (glyph_is_trap(glyph)) {
         int tnum = what_trap(glyph_to_trap(glyph));
         Strcpy(buf, defsyms[trap_to_defsym(tnum)].explanation);
@@ -758,8 +781,7 @@ do_look(mode, click_cc)
 int mode;
 coord *click_cc;
 {
-    boolean quick =
-        (mode == 1); /* use cursor && don't search for "more info" */
+    boolean quick = (mode == 1); /* use cursor; don't search for "more info" */
     boolean clicklook = (mode == 2); /* right mouse-click method */
     char out_str[BUFSZ];
     const char *firstmatch = 0;
@@ -781,21 +803,50 @@ coord *click_cc;
             menu_item *pick_list = (menu_item *) 0;
             winid win;
             anything any;
+
+            any = zeroany;
             win = create_nhwindow(NHW_MENU);
             start_menu(win);
-            any.a_void = 0;
-            any.a_char = 'a';
-            /* 'y' and 'n' to keep backwards compat with previous versions */
-            add_menu(win, NO_GLYPH, &any, 'a', 'y', ATR_NONE,
+            any.a_char = '/';
+            /* 'y' and 'n' to keep backwards compatability with previous
+               versions: "Specify unknown object by cursor?" */
+            add_menu(win, NO_GLYPH, &any,
+                     flags.lootabc ? 0 : any.a_char, 'y', ATR_NONE,
                      "something on the map", MENU_UNSELECTED);
-            any.a_void = 0;
-            any.a_char = 'b';
-            add_menu(win, NO_GLYPH, &any, 'b', 0, ATR_NONE,
+            any.a_char = 'i';
+            add_menu(win, NO_GLYPH, &any,
+                     flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
                      "something you're carrying", MENU_UNSELECTED);
-            any.a_void = 0;
-            any.a_char = 'c';
-            add_menu(win, NO_GLYPH, &any, 'c', 'n', ATR_NONE,
-                     "something else", MENU_UNSELECTED);
+            any.a_char = '?';
+            add_menu(win, NO_GLYPH, &any,
+                     flags.lootabc ? 0 : any.a_char, 'n', ATR_NONE,
+                     "something else (by symbol or name)", MENU_UNSELECTED);
+            if (!u.uswallow && !Hallucination) {
+                any = zeroany;
+                add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE,
+                         "", MENU_UNSELECTED);
+                /* these options work sensibly for the swallowed case,
+                   but there's no reason for the player to use them then;
+                   objects work fine when hallucinating, but screen
+                   symbol/monster class letter doesn't match up with
+                   bogus monster type, so suppress when hallucinating */
+                any.a_char = 'm';
+                add_menu(win, NO_GLYPH, &any,
+                         flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
+                         "nearby monsters", MENU_UNSELECTED);
+                any.a_char = 'M';
+                add_menu(win, NO_GLYPH, &any,
+                         flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
+                         "all monsters shown on map", MENU_UNSELECTED);
+                any.a_char = 'o';
+                add_menu(win, NO_GLYPH, &any,
+                         flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
+                         "nearby objects", MENU_UNSELECTED);
+                any.a_char = 'O';
+                add_menu(win, NO_GLYPH, &any,
+                         flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
+                         "all objects shown on map", MENU_UNSELECTED);
+            }
             end_menu(win, "What do you want to look at:");
             if (select_menu(win, PICK_ONE, &pick_list) > 0) {
                 i = pick_list->item.a_char;
@@ -809,17 +860,18 @@ coord *click_cc;
         case 'q':
             return 0;
         case 'y':
-        case 'a':
+        case '/':
             from_screen = TRUE;
             sym = 0;
             cc.x = u.ux;
             cc.y = u.uy;
             break;
-        case 'b': {
+        case 'i':
+          {
             char invlet;
             struct obj *invobj;
 
-            invlet = display_inventory(NULL, TRUE);
+            invlet = display_inventory((const char *) 0, TRUE);
             if (!invlet || invlet == '\033')
                 return 0;
             *out_str = '\0';
@@ -831,8 +883,8 @@ coord *click_cc;
             if (*out_str)
                 checkfile(out_str, pm, TRUE, TRUE);
             return 0;
-        } break;
-        case 'c':
+          }
+        case '?':
             from_screen = FALSE;
             getlin("Specify what? (type the word)", out_str);
             if (out_str[0] == '\0' || out_str[0] == '\033')
@@ -844,6 +896,18 @@ coord *click_cc;
             }
             sym = out_str[0];
             break;
+        case 'm':
+            look_all(TRUE, TRUE); /* list nearby monsters */
+            return 0;
+        case 'M':
+            look_all(FALSE, TRUE); /* list all monsters */
+            return 0;
+        case 'o':
+            look_all(TRUE, FALSE); /* list nearby objects */
+            return 0;
+        case 'O':
+            look_all(FALSE, FALSE); /* list all objects */
+            return 0;
         }
     } else { /* clicklook */
         cc.x = click_cc->x;
@@ -907,6 +971,92 @@ coord *click_cc;
 
     flags.verbose = save_verbose;
     return 0;
+}
+
+STATIC_OVL void
+look_all(nearby, do_mons)
+boolean nearby; /* True => within BOLTLIM, False => entire map */
+boolean do_mons; /* True => monsters, False => objects */
+{
+    winid win;
+    int x, y, lo_x, lo_y, hi_x, hi_y, glyph, count = 0;
+    char buf[BUFSZ], outbuf[BUFSZ], coordbuf[12], fmt[12]; /* "%02d,%02d" */
+
+    /* row,column orientation rather than cartesian x,y */
+    Sprintf(fmt, "%%%sd,%%%sd",
+            (ROWNO <= 100) ? "02" : (ROWNO <= 1000) ? "03" : "",
+            (COLNO <= 100) ? "02" : (COLNO <= 1000) ? "03" : "");
+
+    win = create_nhwindow(NHW_TEXT);
+    lo_y = nearby ? max(u.uy - BOLT_LIM, 0) : 0;
+    lo_x = nearby ? max(u.ux - BOLT_LIM, 1) : 1;
+    hi_y = nearby ? min(u.uy + BOLT_LIM, ROWNO - 1) : ROWNO - 1;
+    hi_x = nearby ? min(u.ux + BOLT_LIM, COLNO - 1) : COLNO - 1;
+    for (y = lo_y; y <= hi_y; y++) {
+        for (x = lo_x; x <= hi_x; x++) {
+            buf[0] = '\0';
+            glyph = glyph_at(x, y);
+            if (do_mons) {
+                if (glyph_is_monster(glyph)) {
+                    struct monst *mtmp;
+
+                    bhitpos.x = x; /* [is this actually necessary?] */
+                    bhitpos.y = y;
+                    if (x == u.ux && y == u.uy && canspotself()) {
+                        (void) self_lookat(buf);
+                        ++count;
+                    } else if ((mtmp = m_at(x, y)) != 0) {
+                        look_at_monster(buf, (char *) 0, mtmp, x, y);
+                        ++count;
+                    }
+                } else if (glyph_is_invisible(glyph)) {
+                    /* remembered, unseen, creature */
+                    Strcpy(buf, invisexplain);
+                    ++count;
+                } else if (glyph_is_warning(glyph)) {
+                    int warnindx = glyph_to_warning(glyph);
+
+                    Strcpy(buf, def_warnsyms[warnindx].explanation);
+                    ++count;
+                }
+            } else { /* !do_mons */
+                if (glyph_is_object(glyph)) {
+                    look_at_object(buf, x, y, glyph);
+                    ++count;
+                }
+            }
+            if (*buf) {
+                if (count == 1) {
+                    char which[12];
+
+                    Strcpy(which, do_mons ? "monsters" : "objects");
+                    if (nearby) {
+                        Sprintf(coordbuf, fmt, u.uy, u.ux);
+                        Sprintf(outbuf, "%s currently shown near %s:",
+                                upstart(which), coordbuf);
+                    } else
+                        Sprintf(outbuf, "All %s currently shown on the map:",
+                                which);
+                    putstr(win, 0, outbuf);
+                    putstr(win, 0, "");
+                }
+                Sprintf(coordbuf, fmt, y, x);
+                /* prefix: "C  row,column  " */
+                Sprintf(outbuf, "%s  %s  ", encglyph(glyph), coordbuf);
+                /* guard against potential overflow */
+                buf[sizeof buf - 1 - strlen(outbuf)] = '\0';
+                Strcat(outbuf, buf);
+                putmixed(win, 0, outbuf);
+            }
+        }
+    }
+    if (count)
+        display_nhwindow(win, TRUE);
+    else
+        pline("No %s are currently shown %s.",
+              do_mons ? "monsters" : "objects",
+              nearby ? "nearby" : "on the map");
+    destroy_nhwindow(win);
 }
 
 /* the '/' command */
