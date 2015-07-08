@@ -1,4 +1,4 @@
-# NetHack 3.6	quest.txt	$NHDT-Date: 1432368651 2015/05/23 08:10:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.26 $
+# NetHack 3.6	quest.txt	$NHDT-Date: 1436347142 2015/07/08 09:19:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.28 $
 #	Copyright (c) 1991 by M. Stephenson
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -367,7 +367,7 @@ me and destroy all who once called you %s.  Now begone!"
 %Cc Bar 00019
 "%p, I fear that you are as yet too inexperienced to face
 %n.  Only %Ra with the help of %d could ever hope to
-defeat him."
+defeat %ni."
 %E ["You are too inexperienced.  Come back when you are %Ra."]
 %Cc Bar 00020
 "%pC!  You have wandered from the path of the %a!
@@ -380,26 +380,26 @@ Go forth, and return when you feel ready."
 
 "About six months ago, I learned that a mysterious sorcerer, known
 as %n, had begun to gather a large group of cutthroats and brigands
-about him.
+about %ni.
 
 "At about the same time, these people you once rode with `liberated' a
 potent magical talisman, %o, from a Turanian caravan.
 
-"%nC and his Black Horde swept down upon %i and defeated
+"%nC and %nj Black Horde swept down upon %i and defeated
 the people there, driving them out into the desert.  He has taken
-%o, and seeks to bend it to his will.  I detected the
+%o, and seeks to bend it to %nj will.  I detected the
 subtle changes in the currents of fate, and joined these people.
 Then I sent forth a summons for you.
 
-"If %n can bend %o to his will, he will become
+"If %n can bend %o to %nj will, he will become
 almost indestructible.  He will then be able to enslave the minds of
 men across the world.  You are the only hope.  The gods smile upon you,
 and with %d behind you, you alone can defeat %n.
 
 "You must go to %i.  From there, you can track down
-%n, defeat him, and return %o to us.  Only
+%n, defeat %ni, and return %o to us.  Only
 then will the world be safe."
-%E ["Find %n, defeat him, and return %o to us."]
+%E ["Find %n, defeat %ni, and return %o to us."]
 %Cp Bar 00025
 "%nC is strong in the dark arts, but not immune to cold steel."
 %E
@@ -427,7 +427,7 @@ guard."
 "I cannot stand against %ns sorcery.  But %d will help you."
 %E
 %Cp Bar 00033
-"Do not fear %n.  I know you can defeat him."
+"Do not fear %n.  I know you can defeat %ni."
 %E
 %Cp Bar 00034
 "You have a great road to travel, %p, but only after you defeat
@@ -449,7 +449,7 @@ make you turn and run.  This is surely the lair of %n.
 Yet again you feel the air around you heavy with malevolent magical energy.
 %E
 %Cc Bar 00050
-"So.  This is what that second rate sorcerer %l sends to do his bidding.
+"So.  This is what that second rate sorcerer %l sends to do %lj bidding.
 I have slain many before you.  You shall give me little sport.
 
 "Prepare to die, %c."
@@ -500,7 +500,7 @@ flowing through your hands.  It seems to be in two or more places
 at once, even though you are holding it.
 %E [You feel the power of %o flowing through your hands.]
 %Cc Bar 00080
-%nC falls to the ground, and utters a last curse at you.  Then his
+%nC falls to the ground, and utters a last curse at you.  Then %nj
 body fades slowly, seemingly dispersing into the air around you.  You
 slowly become aware that the overpowering aura of magic in the air has
 begun to fade.
@@ -550,7 +550,7 @@ speaks of you.
 
     The child of %d will take the Amulet, and travel to the Astral
     Plane, where the Great Temple of %d is to be found.  The Amulet
-    will be sacrificed to %d, there on His altar.  Then the child will
+    will be sacrificed to %d, there on %dJ altar.  Then the child will
     stand by %d as champion of all %cP for eternity.
 
 "This is all I know, %p.  I hope it will help you."
@@ -822,13 +822,11 @@ No rhizotomists are tending the materia medica gardens, and where are the
 common folk who used to come for the cures?
 
 You know that you must quickly make your way to the collegium, and
-%ls iatreion, and find out what has happened in your
-absence.
-%E
+%ls iatreion, and find out what has happened in your absence.
+%E [You arrive back at %H and must find %l.]
 %Cp Hea 00002
 After your last experience you expected to be here, but you certainly
-did not expect to see things so much worse.  This time you must
-succeed.
+did not expect to see things so much worse.  This time you must succeed.
 %E
 %Cp Hea 00003
 Again, you %x %H in the distance.
@@ -849,7 +847,7 @@ to be %Ra to know that %n is on the verge of victory.
 "I've heard that even %l has not been able to cure Chiron."
 %E
 %Cp Hea 00009
-"We think %n has used his alchemists, and %o,
+"We think %n has used %nj alchemists, and %o,
 to unleash a new disease we call 'the cold' on Gehennom."
 %E
 %Cp Hea 00010
@@ -869,7 +867,7 @@ microscopic organisms, and not ill humors?"
 "I see that you bring %o, now you can cure this plague!"
 %E
 %Cc Hea 00015
-Feebly, %l raises his head to look at you.
+Feebly, %l raises %lj head to look at you.
 
 "It is good to see you again, %p.  I see the concern in your
 eyes, but do not worry for me.  I am not ready for Hades yet.  We have
@@ -878,7 +876,7 @@ I need your fresh strength to carry on our work.
 
 "Come closer and let me lay hands on you, and determine if you have
 the skills necessary to accomplish this mission."
-%E
+%E [%l is weak from the struggle with %n.  %lH wants to examine you.]
 %Cp Hea 00016
 "Again you return to me, %p.  I sense that each trip back
 the pleurisy and maladies of our land begin to infect you.  Let us
@@ -895,7 +893,7 @@ have come prepared this time."
 
 "Hades will be happy to hear that you are once again practicing your
 arts on the unsuspecting."
-%E
+%E [You are a failure as a healer.]
 %Cc Hea 00019
 "Alas, %p, you are yet too inexperienced to deal with the rigors
 of such a task.  You must be able to draw on the knowledge of botany,
@@ -903,38 +901,38 @@ vetenary, and alchemy before I can send you on this quest with good
 conscience.
 
 "Return when you wear %Ra's caduceus."
-%E
+%E [You are too inexperienced.  Return when you are %Ra.]
 %Cc Hea 00020
 "You have learned much of the remedies that benefit, but you must also
 know which physic for which ail.  That is why %ds teachings are a
 part of your training.
 
 "Return to us when you have healed thyself."
-%E
+%E [Return when you are more %a.]
 %Cc Hea 00021
 For the first time, you sense a smile on %ls face.
 
-    You have indeed learned as much as we can teach you in preparation
+    "You have indeed learned as much as we can teach you in preparation
     for this task.  Let me tell you what I know of the symptoms and hope
     that you can provide a cure.
 
-    A short while ago, the dreaded %nt was fooled by the gods
-    into thinking that he could use %o to find a
-    cure for old age.  Think of it, eternal youth!  But his good
-    health is accomplished by drawing the health from those around him.
+    "A short while ago, the dreaded %nt was fooled by the gods
+    into thinking that %nh could use %o to find a
+    cure for old age.  Think of it, eternal youth!  But %nj good
+    health is accomplished by drawing the health from those around %ni.
 
-    He has exhausted his own supply of healthy people and now he seeks to
-    extend his influence into our world.  You must recover from him
+    "He has exhausted %nj own supply of healthy people and now %nh seeks to
+    extend %nj influence into our world.  You must recover from %ni
     %o and break the spell.
 
-    You must travel into the swamps to %i, and from there
-    follow the trail to %ns island lair.  Be careful.
-%E
+    "You must travel into the swamps to %i, and from there
+    follow the trail to %ns island lair.  Be careful."
+%E [Travel to %i on your way to recover %o from %n.]
 %Cp Hea 00025
 "Remember, %p, to always wash your hands before operating."
 %E
 %Cp Hea 00026
-"%nC has no real magic of his own.  To this he is vulnerable."
+"%nC has no real magic of %nj own.  To this %nh is vulnerable."
 %E
 %Cp Hea 00027
 "If you have been true to %d, you can draw on the power of
@@ -958,7 +956,7 @@ to hurt instead of heal."
 %E
 %Cp Hea 00033
 "Many times %n has caused trouble in these lands.  It is
-time that he was eradicated like the diseases he has caused."
+time that %nh was eradicated like the diseases %nh has caused."
 %E
 %Cp Hea 00034
 "With but one eye, %n should be easy to blind.  Remember this."
@@ -968,7 +966,7 @@ You stand before the entrance to %i.  Strange
 scratching noises come from within the building.
 
 The swampy ground around you seems to stink with disease.
-%E
+%E [You have reached %i but all is not well.]
 %Cp Hea 00036
 Once again you stand at the entrance to %i.
 %E
@@ -979,7 +977,7 @@ the words of %l had not prepared you for this.
 Steeling yourself against the wails of the ill that pierce your ears,
 you hurry on your task.  Maybe with %o you can
 heal them on your return, but not now.
-%E
+%E [You have reached the lair of %n.  Take %o away from %ni.]
 %Cp Hea 00041
 Once again, you %x the Isle of %n in the distance.
 %E
@@ -988,7 +986,7 @@ Once again, you %x the Isle of %n in the distance.
 
 "When I add your youth to mine, it will just make it easier for me
 to defeat %l."
-%E
+%E ["I will take your life, then defeat %l."]
 %Cp Hea 00051
 "Unlike your patients, you seem to keep coming back, %p!"
 %E
@@ -1004,7 +1002,7 @@ not going to live to escape this place."
 use %o!"
 %E
 %Cp Hea 00061
-"If I could strike %l, surrounded by his %gP, imagine what I
+"If I could strike %l, surrounded by %lj %gP, imagine what I
 can do to you here by yourself."
 %E
 %Cp Hea 00062
@@ -1036,37 +1034,38 @@ As you pick up %o, you feel its healing begin to
 warm your soul.  You curse Zeus for taking it from its rightful owner,
 but at least you hope that %l can put it to good use once
 again.
-%E
+%E [You feel the healing power of %o and should return it to %l.]
 %Cc Hea 00080
 The battered body of %n slumps to the ground and gasps
 out one last curse:
 
-    You have defeated me, %p, but I shall have my revenge.
-    How, I shall not say, but this curse shall be like a
-    cancer on you.
+    "You have defeated me, %p, but I shall have my revenge.
+    How, I shall not say, but this curse shall be like a cancer
+    on you."
 
 With that %n dies.
-%E
+%E [%nC curses you as %nh dies.]
 %Cc Hea 00081
-As soon as %l sees %o he summons his %gP.
+As soon as %l sees %o %lh summons %lj
+%gP.
 
 Gently, %l reaches out and touches %o.
 He instructs each of the assembled to do the same.  When everyone
-has finished he speaks to you.
+has finished %lh speaks to you.
 
-    Now that we have been replenished we can defeat this plague.  You must
+    "Now that we have been replenished we can defeat this plague.  You must
     take %o with you and replenish the worlds you have
     been called upon to travel next.  I wish you could ride Chiron to the
     end of your journey, but I need him to help me spread the cure.  Go
-    now and continue your journey.
-%E
+    now and continue your journey."
+%E [%l touches %o and tells %lj %gP to do so too, then tells you to take it with you.]
 %Cc Hea 00082
 %l cautiously handles %o while watching you.
 
 "You are its keeper now, and the time has come to resume your search
 for the Amulet.  %Z await your return through the
 magic portal which brought you here."
-%E
+%E [%l tells you to keep %o and return to %Z to search for the Amulet.]
 %Cp Hea 00090
 "You have again returned to us, %p.  We have done well in your
 absence, yes?  How fare you upon your quest for the Amulet?"
@@ -1077,7 +1076,7 @@ absence, yes?  How fare you upon your quest for the Amulet?"
 "Now, you should know that you must travel through the Elemental Planes
 to the Astral, and there return the Amulet to %d.  Go forth and
 may our prayers be as a wind upon your back."
-%E
+%E ["You have recovered the Amulet.  Travel to the Astral Plane and return it to %d."]
 #
 #	Knight
 #
@@ -3460,12 +3459,12 @@ essential in locating the Amulet of Yendor."
 #
 %Cc - 00060
 "You have betrayed all those who hold allegiance to %d, as you once did.
-My allegiance to %d holds fast and I cannot condone or accept what you 
+My allegiance to %d holds fast and I cannot condone or accept what you
 have done.
 
 Leave this place.  You shall never set foot at %H again.
-That which you seek is now lost forever, for without the Bell of Opening, 
-you will never be able to enter the place where he who has the Amulet 
+That which you seek is now lost forever, for without the Bell of Opening,
+you will never be able to enter the place where he who has the Amulet
 resides.
 
 Go now!  You are banished from this place.
