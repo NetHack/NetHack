@@ -883,6 +883,7 @@ register int fd;
     load_qtlist(); /* re-load the quest text info */
     /* Set up the vision internals, after levl[] data is loaded */
     /* but before docrt().					    */
+    reglyph_darkroom();
     vision_reset();
     vision_full_recalc = 1; /* recompute vision (not saved) */
 
