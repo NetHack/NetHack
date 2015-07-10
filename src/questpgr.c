@@ -1,4 +1,4 @@
-/* NetHack 3.6	questpgr.c	$NHDT-Date: 1432593742 2015/05/25 22:42:22 $  $NHDT-Branch: master $:$NHDT-Revision: 1.32 $ */
+/* NetHack 3.6	questpgr.c	$NHDT-Date: 1436515198 2015/07/10 07:59:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.33 $ */
 /*	Copyright 1991, M. Stephenson		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -230,10 +230,11 @@ char who,  /* 'd' => deity, 'l' => leader, 'n' => nemesis, 'o' => artifact */
      * Invalid subject (not d,l,n,o) yields neuter, singular result.
      *
      * For %o, treat all artifacts as neuter; some have plural names,
-     * which genders[] doesn't handle; cvt_buf[] already contains name
-     * and makesingular() understands how to handle "the foos of bar".
+     * which genders[] doesn't handle; cvt_buf[] already contains name.
      */
-    if (who == 'o' && strcmpi(cvt_buf, makesingular(cvt_buf))) {
+    if (who == 'o'
+        && (strstri(cvt_buf, "Eyes ")
+            || strcmpi(cvt_buf, makesingular(cvt_buf)))) {
         pnoun = (lwhich == 'h') ? "they" 
                 : (lwhich == 'i') ? "them"
                 : (lwhich == 'j') ? "their" : "?";
