@@ -1,4 +1,4 @@
-/* NetHack 3.6	rip.c	$NHDT-Date: 1432512770 2015/05/25 00:12:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.17 $ */
+/* NetHack 3.6	rip.c	$NHDT-Date: 1436753522 2015/07/13 02:12:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.18 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -55,8 +55,7 @@ static const char *rip_txt[] = {
     "         |                  |            |     Ascended     |",
     "         |       1001       |            |                  |",
     "      *  |     *  *  *      | *        * |      *  *  *     | *",
-    " _____)/\\|\\__//(\\/(/\\)/\\//\\/|_)________)/|\\\\_/_/(\\/(/\\)/\\/\\/"
-    "|_)____",
+    " _____)/\\|\\__//(\\/(/\\)/\\//\\/|_)________)/|\\\\_/_/(\\/(/\\)/\\/\\/|_)____",
     0
 };
 #define STONE_LINE_CENT 19 /* char[] element of center of stone face */

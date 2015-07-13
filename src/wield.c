@@ -1,4 +1,4 @@
-/* NetHack 3.6	wield.c	$NHDT-Date: 1432512768 2015/05/25 00:12:48 $  $NHDT-Branch: master $:$NHDT-Revision: 1.42 $ */
+/* NetHack 3.6	wield.c	$NHDT-Date: 1436753528 2015/07/13 02:12:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.43 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -429,8 +429,8 @@ const char *verb; /* "rub",&c */
                 hand = makeplural(hand);
             if (strstri(what, "pair of ") != 0)
                 more_than_1 = FALSE;
-            pline("Since your weapon is welded to your %s, you cannot %s %s "
-                  "%s.",
+            pline(
+               "Since your weapon is welded to your %s, you cannot %s %s %s.",
                   hand, verb, more_than_1 ? "those" : "that", xname(obj));
         } else {
             You_cant("do that.");

@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1433500549 2015/06/05 10:35:49 $  $NHDT-Branch: master $:$NHDT-Revision: 1.102 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1436753518 2015/07/13 02:11:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.103 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1625,8 +1625,8 @@ struct obj *otmp;
         /* Adjust the age; must be same as obj_timer_checks() for off ice*/
         age = monstermoves - otmp->age;
         retval += age * (ROT_ICE_ADJUSTMENT - 1) / ROT_ICE_ADJUSTMENT;
-        debugpline3("The %s age has ice modifications: otmp->age = %ld, "
-                    "returning %ld.",
+        debugpline3(
+          "The %s age has ice modifications: otmp->age = %ld, returning %ld.",
                     s_suffix(doname(otmp)), otmp->age, retval);
         debugpline1("Effective age of corpse: %ld.", monstermoves - retval);
     }

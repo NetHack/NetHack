@@ -1,4 +1,4 @@
-/* NetHack 3.6	dungeon.c	$NHDT-Date: 1436065584 2015/07/05 03:06:24 $  $NHDT-Branch: master $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.6	dungeon.c	$NHDT-Date: 1436753511 2015/07/13 02:11:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.61 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -116,11 +116,12 @@ dumpit()
                 br->type == BR_STAIR
                     ? "stair"
                     : br->type == BR_NO_END1
-                          ? "no end1"
-                          : br->type == BR_NO_END2
-                                ? "no end2"
-                                : br->type == BR_PORTAL ? "portal"
-                                                        : "unknown",
+                        ? "no end1"
+                        : br->type == BR_NO_END2
+                            ? "no end2"
+                            : br->type == BR_PORTAL
+                                ? "portal"
+                                : "unknown",
                 br->end1.dnum, br->end1.dlevel, br->end2.dnum,
                 br->end2.dlevel, br->end1_up ? "end1 up" : "end1 down");
     }
@@ -243,8 +244,8 @@ dlb *stream;
     int cnt;
 
     if ((cnt = dlb_fread(ptr, size, nitems, stream)) != nitems) {
-        panic("Premature EOF on dungeon description file!\r\nExpected %d "
-              "bytes - got %d.",
+        panic(
+  "Premature EOF on dungeon description file!\r\nExpected %d bytes - got %d.",
               (size * nitems), (size * cnt));
         terminate(EXIT_FAILURE);
     }

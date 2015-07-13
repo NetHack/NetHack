@@ -1,4 +1,4 @@
-/* NetHack 3.6	lock.c	$NHDT-Date: 1432512773 2015/05/25 00:12:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.6	lock.c	$NHDT-Date: 1436753515 2015/07/13 02:11:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.61 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -916,8 +916,8 @@ int x, y;
             msg = "The broken door reassembles and locks!";
             break;
         case D_NODOOR:
-            msg = "A cloud of dust springs up and assembles itself into a "
-                  "door!";
+            msg =
+               "A cloud of dust springs up and assembles itself into a door!";
             break;
         default:
             res = FALSE;

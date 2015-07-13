@@ -1,4 +1,4 @@
-/* NetHack 3.6	muse.c	$NHDT-Date: 1432512771 2015/05/25 00:12:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.63 $ */
+/* NetHack 3.6	muse.c	$NHDT-Date: 1436753520 2015/07/13 02:12:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.64 $ */
 /*	Copyright (C) 1990 by Ken Arromdee			   */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -838,8 +838,8 @@ struct monst *mtmp;
         if (Inhell && mon_has_amulet(mtmp) && !rn2(4)
             && (dunlev(&u.uz) < dunlevs_in_dungeon(&u.uz) - 3)) {
             if (vismon)
-                pline("As %s climbs the stairs, a mysterious force "
-                      "momentarily surrounds %s...",
+                pline(
+    "As %s climbs the stairs, a mysterious force momentarily surrounds %s...",
                       mon_nam(mtmp), mhim(mtmp));
             /* simpler than for the player; this will usually be
                the Wizard and he'll immediately go right to the

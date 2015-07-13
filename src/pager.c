@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1436234837 2015/07/07 02:07:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.78 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1436754893 2015/07/13 02:34:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.79 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1184,6 +1184,7 @@ docontact()
 {
     winid cwin = create_nhwindow(NHW_TEXT);
     char buf[BUFSZ];
+
     if (sysopt.support) {
         /*XXX overflow possibilities*/
         Sprintf(buf, "To contact local support, %s", sysopt.support);
@@ -1198,12 +1199,12 @@ docontact()
     }
     putstr(cwin, 0, "To contact the NetHack development team directly,");
     /*XXX overflow possibilities*/
-    Sprintf(buf, "see the Contact form on our website or email %s",
+    Sprintf(buf, "see the 'Contact' form on our website or email <%s>.",
             DEVTEAM_EMAIL);
     putstr(cwin, 0, buf);
     putstr(cwin, 0, "");
     putstr(cwin, 0, "For more information on NetHack, or to report a bug,");
-    Sprintf(buf, "visit our website %s", DEVTEAM_URL);
+    Sprintf(buf, "visit our website \"%s\".", DEVTEAM_URL);
     putstr(cwin, 0, buf);
     display_nhwindow(cwin, FALSE);
     destroy_nhwindow(cwin);

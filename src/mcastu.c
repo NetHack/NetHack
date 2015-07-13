@@ -1,4 +1,4 @@
-/* NetHack 3.6	mcastu.c	$NHDT-Date: 1432512772 2015/05/25 00:12:52 $  $NHDT-Branch: master $:$NHDT-Revision: 1.43 $ */
+/* NetHack 3.6	mcastu.c	$NHDT-Date: 1436753517 2015/07/13 02:11:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.44 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -212,8 +212,8 @@ boolean foundyou;
                 if (!is_undirected_spell(mattk->adtyp, spellnum)
                     || spell_would_be_useless(mtmp, mattk->adtyp, spellnum)) {
                     if (foundyou)
-                        impossible("spellcasting monster found you and "
-                                   "doesn't know it?");
+                        impossible(
+                       "spellcasting monster found you and doesn't know it?");
                     return 0;
                 }
                 break;
@@ -275,8 +275,8 @@ boolean foundyou;
     if (!foundyou) {
         dmg = 0;
         if (mattk->adtyp != AD_SPEL && mattk->adtyp != AD_CLRC) {
-            impossible("%s casting non-hand-to-hand version of hand-to-hand "
-                       "spell %d?",
+            impossible(
+              "%s casting non-hand-to-hand version of hand-to-hand spell %d?",
                        Monnam(mtmp), mattk->adtyp);
             return (0);
         }

@@ -1,4 +1,4 @@
-/* NetHack 3.6	wizard.c	$NHDT-Date: 1433457074 2015/06/04 22:31:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.38 $ */
+/* NetHack 3.6	wizard.c	$NHDT-Date: 1436753529 2015/07/13 02:12:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.39 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -77,8 +77,8 @@ amulet()
         if (mtmp->iswiz && mtmp->msleeping && !rn2(40)) {
             mtmp->msleeping = 0;
             if (distu(mtmp->mx, mtmp->my) > 2)
-                You("get the creepy feeling that somebody noticed your "
-                    "taking the Amulet.");
+                You(
+      "get the creepy feeling that somebody noticed your taking the Amulet.");
             return;
         }
     }

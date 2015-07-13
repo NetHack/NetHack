@@ -1,4 +1,4 @@
-/* NetHack 3.6	mail.c	$NHDT-Date: 1432512763 2015/05/25 00:12:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.19 $ */
+/* NetHack 3.6	mail.c	$NHDT-Date: 1436754892 2015/07/13 02:34:52 $  $NHDT-Branch: master $:$NHDT-Revision: 1.20 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -440,18 +440,18 @@ struct obj *otmp;
         "This mail complies with the Yendorian Anti-Spam Act (YASA)",
         "Please find enclosed a small token to represent your Owlbear",
         "**FR33 P0T10N 0F FULL H34L1NG**",
-        "Please return to sender (Asmodeus)", "Buy a potion of gain level "
-                                              "for only $19.99! Guaranteed "
-                                              "to be blessed!",
+        "Please return to sender (Asmodeus)",
+      "Buy a potion of gain level for only $19.99! Guaranteed to be blessed!",
         "Invitation: Visit the NetHack web site at http://www.nethack.org!"
     };
 
     /* XXX replace with more general substitution code and add local
      * contact message.  Also use DEVTEAM_URL */
     if (junk[0] == NULL) {
-#define BUGS_FORMAT "Report bugs to %s."
+#define BUGS_FORMAT "Report bugs to <%s>."
+        /* +2 from '%s' suffices as substitute for usual +1 for terminator */
         junk[0] = (char *) alloc(strlen(BUGS_FORMAT) + strlen(DEVTEAM_EMAIL));
-        sprintf(junk[0], DEVTEAM_EMAIL);
+        Sprintf(junk[0], BUGS_FORMAT, DEVTEAM_EMAIL);
 #undef BUGS_FORMAT
     }
     if (Blind) {

@@ -1,4 +1,4 @@
-/* NetHack 3.6	detect.c	$NHDT-Date: 1432512764 2015/05/25 00:12:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.58 $ */
+/* NetHack 3.6	detect.c	$NHDT-Date: 1436753510 2015/07/13 02:11:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.60 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -212,8 +212,8 @@ register struct obj *sobj;
             if (youmonst.data == &mons[PM_GOLD_GOLEM]) {
                 Sprintf(buf, "You feel like a million %s!", currency(2L));
             } else if (hidden_gold() || money_cnt(invent))
-                Strcpy(buf, "You feel worried about your future financial "
-                            "situation.");
+                Strcpy(buf,
+                   "You feel worried about your future financial situation.");
             else
                 Strcpy(buf, "You feel materially poor.");
             strange_feeling(sobj, buf);

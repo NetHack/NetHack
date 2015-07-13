@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1432512764 2015/05/25 00:12:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.150 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1436753514 2015/07/13 02:11:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.151 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -329,8 +329,8 @@ moverock()
                      && (!u.dx || !u.dy || (IS_ROCK(levl[u.ux][sy].typ)
                                             && IS_ROCK(levl[sx][u.uy].typ))))
                     || verysmall(youmonst.data))) {
-                pline("However, you can squeeze yourself into a small "
-                      "opening.");
+                pline(
+                   "However, you can squeeze yourself into a small opening.");
                 sokoban_guilt();
                 break;
             } else
@@ -360,9 +360,11 @@ xchar x, y;
 
     if (!boulder && IS_ROCK(lev->typ) && !may_dig(x, y)) {
         You("hurt your teeth on the %s.",
-            lev->typ == IRONBARS
+            (lev->typ == IRONBARS)
                 ? "bars"
-                : (IS_TREE(lev->typ) ? "tree" : "hard stone"));
+                : IS_TREE(lev->typ)
+                    ? "tree"
+                    : "hard stone");
         nomul(0);
         return 1;
     } else if (context.digging.pos.x != x || context.digging.pos.y != y
@@ -380,24 +382,30 @@ xchar x, y;
             (boulder || IS_TREE(lev->typ) || lev->typ == IRONBARS)
                 ? "on a"
                 : "a hole in the",
-            boulder ? "boulder" : IS_TREE(lev->typ)
-                                      ? "tree"
-                                      : IS_ROCK(lev->typ)
-                                            ? "rock"
-                                            : lev->typ == IRONBARS ? "bar"
-                                                                   : "door");
+            boulder
+                ? "boulder"
+                : IS_TREE(lev->typ)
+                    ? "tree"
+                    : IS_ROCK(lev->typ)
+                        ? "rock"
+                        : lev->typ == IRONBARS
+                            ? "bar"
+                            : "door");
         watch_dig((struct monst *) 0, x, y, FALSE);
         return 1;
     } else if ((context.digging.effort += (30 + u.udaminc)) <= 100) {
         if (flags.verbose)
             You("%s chewing on the %s.",
                 context.digging.chew ? "continue" : "begin",
-                boulder ? "boulder"
-                        : IS_TREE(lev->typ)
-                              ? "tree"
-                              : IS_ROCK(lev->typ)
-                                    ? "rock"
-                                    : lev->typ == IRONBARS ? "bars" : "door");
+                boulder
+                    ? "boulder"
+                    : IS_TREE(lev->typ)
+                        ? "tree"
+                        : IS_ROCK(lev->typ)
+                            ? "rock"
+                            : (lev->typ == IRONBARS)
+                                ? "bars"
+                                : "door");
         context.digging.chew = TRUE;
         watch_dig((struct monst *) 0, x, y, FALSE);
         return 1;
@@ -720,8 +728,8 @@ int mode;
             } else {
                 if (mode == DO_MOVE) {
                     if (amorphous(youmonst.data))
-                        You("try to ooze under the door, but can't squeeze "
-                            "your possessions through.");
+                        You(
+   "try to ooze under the door, but can't squeeze your possessions through.");
                     if (flags.autoopen && !context.run && !Confusion
                         && !Stunned && !Fumbling) {
                         context.door_opened = context.move =
@@ -1469,8 +1477,8 @@ domove()
                    (levl[x][y].typ == STONE)
                        ? "solid rock"
                        : glyph_is_cmap(glyph)
-                             ? the(defsyms[glyph_to_cmap(glyph)].explanation)
-                             : (const char *) "an unknown obstacle");
+                            ? the(defsyms[glyph_to_cmap(glyph)].explanation)
+                            : (const char *) "an unknown obstacle");
         /* note: 'solid' is misleadingly named and catches pools
            of water and lava as well as rock and walls */
         else

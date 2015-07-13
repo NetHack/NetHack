@@ -1,4 +1,4 @@
-/* NetHack 3.6	sit.c	$NHDT-Date: 1432512762 2015/05/25 00:12:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.49 $ */
+/* NetHack 3.6	sit.c	$NHDT-Date: 1436753523 2015/07/13 02:12:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.50 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -195,8 +195,9 @@ dosit()
                 } else
                     makewish();
                 break;
-            case 7: {
-                register int cnt = rnd(10);
+            case 7:
+              {
+                int cnt = rnd(10);
 
                 /* Magical voice not affected by deafness */
                 pline("A voice echoes:");
@@ -205,7 +206,7 @@ dosit()
                 while (cnt--)
                     (void) makemon(courtmon(), u.ux, u.uy, NO_MM_FLAGS);
                 break;
-            }
+              }
             case 8:
                 /* Magical voice not affected by deafness */
                 pline("A voice echoes:");
@@ -216,8 +217,8 @@ dosit()
             case 9:
                 /* Magical voice not affected by deafness */
                 pline("A voice echoes:");
-                verbalize("A curse upon thee for sitting upon this most holy "
-                          "throne!");
+                verbalize(
+                 "A curse upon thee for sitting upon this most holy throne!");
                 if (Luck > 0) {
                     make_blinded(Blinded + rn1(100, 250), TRUE);
                 } else
@@ -281,9 +282,10 @@ dosit()
         struct obj *uegg;
 
         if (!flags.female) {
-            pline(Hallucination ? "You may think you are a platypus but a "
-                                  "male still can't lay eggs!"
-                                : "Males can't lay eggs!");
+            pline("%s can't lay eggs!",
+                  Hallucination
+                      ? "You may think you are a platypus, but a male still"
+                      : "Males");
             return 0;
         } else if (u.uhunger < (int) objects[EGG].oc_nutrition) {
             You("don't have enough energy to lay an egg.");

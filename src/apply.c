@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1432512764 2015/05/25 00:12:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.199 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1436753497 2015/07/13 02:11:37 $  $NHDT-Branch: master $:$NHDT-Revision: 1.200 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3463,8 +3463,8 @@ doapply()
         if (flags.verbose)
             pline("In order to eat, use the 'e' command.");
         if (obj != uwep)
-            pline("Opening the tin will be much easier if you wield the tin "
-                  "opener.");
+            pline(
+          "Opening the tin will be much easier if you wield the tin opener.");
         goto xit;
 
     case FIGURINE:

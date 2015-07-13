@@ -1,4 +1,4 @@
-/* NetHack 3.6	mthrowu.c	$NHDT-Date: 1432512770 2015/05/25 00:12:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.55 $ */
+/* NetHack 3.6	mthrowu.c	$NHDT-Date: 1436753519 2015/07/13 02:11:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.56 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -352,8 +352,8 @@ struct obj *obj;         /* missile (or stack providing it) */
                     makeknown(singleobj->otyp);
                     dropy(singleobj);
                 } else {
-                    You("accept %s gift in the spirit in which it was "
-                        "intended.",
+                    You(
+                     "accept %s gift in the spirit in which it was intended.",
                         s_suffix(mon_nam(mon)));
                     (void) hold_another_object(
                         singleobj, "You catch, but drop, %s.",

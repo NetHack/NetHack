@@ -1,4 +1,4 @@
-/* NetHack 3.6	write.c	$NHDT-Date: 1432512764 2015/05/25 00:12:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $ */
+/* NetHack 3.6	write.c	$NHDT-Date: 1436753530 2015/07/13 02:12:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.14 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -292,8 +292,8 @@ found:
         You("%s to write that.", by_descr ? "fail" : "don't know how");
         /* scrolls disappear, spellbooks don't */
         if (paper->oclass == SPBOOK_CLASS) {
-            You("write in your best handwriting:  \"My Diary\", but it "
-                "quickly fades.");
+            You(
+      "write in your best handwriting:  \"My Diary\", but it quickly fades.");
             update_inventory(); /* pen charges */
         } else {
             if (by_descr) {

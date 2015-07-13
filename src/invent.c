@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1434421348 2015/06/16 02:22:28 $  $NHDT-Branch: master $:$NHDT-Revision: 1.167 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1436753515 2015/07/13 02:11:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.168 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1244,8 +1244,8 @@ register const char *let, *word;
              */
             if (allowcnt == 2 && cnt <= 0) {
                 if (cnt < 0 || !prezero)
-                    pline_The("LRS would be very interested to know you have "
-                              "that much.");
+                    pline_The(
+                  "LRS would be very interested to know you have that much.");
                 return (struct obj *) 0;
             }
         }
@@ -2535,8 +2535,8 @@ dotypeinv()
                 which = "known to be cursed";
                 break;
             case 'X':
-                You("have no objects whose blessed/uncursed/cursed status is "
-                    "unknown.");
+                You(
+          "have no objects whose blessed/uncursed/cursed status is unknown.");
                 break; /* better phrasing is desirable */
             default:
                 which = "such";
@@ -2733,17 +2733,24 @@ boolean picked_some;
             There("is %s object here.", picked_some ? "another" : "an");
         else
             There("are %s%s objects here.",
-                  (obj_cnt < 5) ? "a few" : (obj_cnt < 10) ? "several"
-                                                           : "many",
+                  (obj_cnt < 5)
+                      ? "a few"
+                      : (obj_cnt < 10)
+                          ? "several"
+                          : "many",
                   picked_some ? " more" : "");
         for (; otmp; otmp = otmp->nexthere)
             if (otmp->otyp == CORPSE && will_feel_cockatrice(otmp, FALSE)) {
                 pline("%s %s%s.",
-                      (obj_cnt > 1) ? "Including"
-                                    : (otmp->quan > 1L) ? "They're" : "It's",
+                      (obj_cnt > 1)
+                          ? "Including"
+                          : (otmp->quan > 1L)
+                              ? "They're"
+                              : "It's",
                       corpse_xname(otmp, (const char *) 0, CXN_ARTICLE),
-                      poly_when_stoned(youmonst.data) ? ""
-                                                      : ", unfortunately");
+                      poly_when_stoned(youmonst.data)
+                          ? ""
+                          : ", unfortunately");
                 feel_cockatrice(otmp, FALSE);
                 break;
             }

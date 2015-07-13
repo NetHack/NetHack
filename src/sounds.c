@@ -1,4 +1,4 @@
-/* NetHack 3.6	sounds.c	$NHDT-Date: 1434750452 2015/06/19 21:47:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.68 $ */
+/* NetHack 3.6	sounds.c	$NHDT-Date: 1436753524 2015/07/13 02:12:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.69 $ */
 /*	Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -567,13 +567,13 @@ register struct monst *mtmp;
                         isnight ? "!" : ".  Why do we not rest?");
                 verbl_msg = verbuf;
             } else {
-                Sprintf(
-                    verbuf, "%s%s", nightchild ? "Child of the night, " : "",
-                    midnight()
-                        ? "I can stand this craving no longer!"
-                        : isnight ? "I beg you, help me satisfy this growing "
-                                    "craving!"
-                                  : "I find myself growing a little weary.");
+                Sprintf(verbuf, "%s%s",
+                        nightchild ? "Child of the night, " : "",
+                        midnight()
+                         ? "I can stand this craving no longer!"
+                         : isnight
+                          ? "I beg you, help me satisfy this growing craving!"
+                          : "I find myself growing a little weary.");
                 verbl_msg = verbuf;
             }
         } else if (mtmp->mpeaceful) {
@@ -810,8 +810,8 @@ register struct monst *mtmp;
                         : "asks you about the One Ring.";
                 break;
             case PM_ARCHEOLOGIST:
-                pline_msg = "describes a recent article in \"Spelunker "
-                            "Today\" magazine.";
+                pline_msg =
+                "describes a recent article in \"Spelunker Today\" magazine.";
                 break;
             case PM_TOURIST:
                 verbl_msg = "Aloha.";

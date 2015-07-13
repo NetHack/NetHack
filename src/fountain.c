@@ -1,4 +1,4 @@
-/* NetHack 3.6	fountain.c	$NHDT-Date: 1432512767 2015/05/25 00:12:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.53 $ */
+/* NetHack 3.6	fountain.c	$NHDT-Date: 1436753513 2015/07/13 02:11:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.54 $ */
 /*	Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -372,8 +372,8 @@ register struct obj *obj;
         && !exist_artifact(LONG_SWORD, artiname(ART_EXCALIBUR))) {
         if (u.ualign.type != A_LAWFUL) {
             /* Ha!  Trying to cheat her. */
-            pline("A freezing mist rises from the water and envelopes the "
-                  "sword.");
+            pline(
+             "A freezing mist rises from the water and envelopes the sword.");
             pline_The("fountain disappears!");
             curse(obj);
             if (obj->spe > -6 && !rn2(3))
@@ -383,8 +383,8 @@ register struct obj *obj;
         } else {
             /* The lady of the lake acts! - Eric Backus */
             /* Be *REAL* nice */
-            pline("From the murky depths, a hand reaches up to bless the "
-                  "sword.");
+            pline(
+              "From the murky depths, a hand reaches up to bless the sword.");
             pline("As the hand retreats, the fountain disappears!");
             obj = oname(obj, artiname(ART_EXCALIBUR));
             discover_artifact(ART_EXCALIBUR);

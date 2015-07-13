@@ -1,4 +1,4 @@
-/* NetHack 3.6	engrave.c	$NHDT-Date: 1432512768 2015/05/25 00:12:48 $  $NHDT-Branch: master $:$NHDT-Revision: 1.56 $ */
+/* NetHack 3.6	engrave.c	$NHDT-Date: 1436753512 2015/07/13 02:11:52 $  $NHDT-Branch: master $:$NHDT-Revision: 1.57 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -169,9 +169,10 @@ int x, y;
 boolean up, check_pit;
 {
     You("can't reach the %s.",
-        up ? ceiling(x, y) : (check_pit && can_reach_floor(FALSE))
-                                 ? "bottom of the pit"
-                                 : surface(x, y));
+        up ? ceiling(x, y)
+           : (check_pit && can_reach_floor(FALSE))
+               ? "bottom of the pit"
+               : surface(x, y));
 }
 
 const char *
@@ -753,11 +754,11 @@ doengrave()
                         IS_GRAVE(levl[u.ux][u.uy].typ)
                             ? "Chips fly out from the headstone."
                             : is_ice(u.ux, u.uy)
-                                  ? "Ice chips fly up from the ice surface!"
-                                  : (level.locations[u.ux][u.uy].typ
-                                     == DRAWBRIDGE_DOWN)
-                                        ? "Splinters fly up from the bridge."
-                                        : "Gravel flies up from the floor.");
+                                ? "Ice chips fly up from the ice surface!"
+                                : (level.locations[u.ux][u.uy].typ
+                                   == DRAWBRIDGE_DOWN)
+                                    ? "Splinters fly up from the bridge."
+                                    : "Gravel flies up from the floor.");
                 else
                     Strcpy(post_engr_text, "You hear drilling!");
                 break;
@@ -905,8 +906,8 @@ doengrave()
         pline("%s %sturns to dust.", The(xname(otmp)),
               Blind ? "" : "glows violently, then ");
         if (!IS_GRAVE(levl[u.ux][u.uy].typ))
-            You("are not going to get anywhere trying to write in the %s "
-                "with your dust.",
+            You(
+    "are not going to get anywhere trying to write in the %s with your dust.",
                 is_ice(u.ux, u.uy) ? "frost" : "dust");
         useup(otmp);
         otmp = 0; /* wand is now gone */
@@ -947,11 +948,11 @@ doengrave()
                 || (oep->engr_type == MARK)) {
                 if (!Blind) {
                     You("wipe out the message that was %s here.",
-                        ((oep->engr_type == DUST)
-                             ? "written in the dust"
-                             : ((oep->engr_type == ENGR_BLOOD)
-                                    ? "scrawled in blood"
-                                    : "written")));
+                        (oep->engr_type == DUST)
+                            ? "written in the dust"
+                            : (oep->engr_type == ENGR_BLOOD)
+                                ? "scrawled in blood"
+                                : "written");
                     del_engr(oep);
                     oep = (struct engr *) 0;
                 } else
@@ -1102,10 +1103,9 @@ doengrave()
     case BURN:
         multi = -(len / 10);
         if (multi)
-            nomovemsg =
-                is_ice(u.ux, u.uy)
-                    ? "You finish melting your message into the ice."
-                    : "You finish burning your message into the floor.";
+            nomovemsg = is_ice(u.ux, u.uy)
+                          ? "You finish melting your message into the ice."
+                          : "You finish burning your message into the floor.";
         break;
     case MARK:
         multi = -(len / 10);

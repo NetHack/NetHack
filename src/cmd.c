@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1434507810 2015/06/17 02:23:30 $  $NHDT-Branch: master $:$NHDT-Revision: 1.196 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1436753509 2015/07/13 02:11:49 $  $NHDT-Branch: master $:$NHDT-Revision: 1.197 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -391,8 +391,8 @@ extcmd_via_menu() /* here after # - now show pick-list of possible commands */
                 }
                 if (++i > MAX_EXT_CMD) {
 #if defined(BETA)
-                    impossible("Exceeded %d extended commands in doextcmd() "
-                               "menu; 'extmenu' disabled.",
+                    impossible(
+      "Exceeded %d extended commands in doextcmd() menu; 'extmenu' disabled.",
                                MAX_EXT_CMD);
 #endif /* BETA */
                     iflags.extmenu = 0;
@@ -539,8 +539,8 @@ enter_explore_mode(VOID_ARGS)
         }
 #endif
 #endif
-        pline("Beware!  From explore mode there will be no return to normal "
-              "game.");
+        pline(
+        "Beware!  From explore mode there will be no return to normal game.");
         if (paranoid_query(ParanoidQuit,
                            "Do you want to enter explore mode?")) {
             clear_nhwindow(WIN_MESSAGE);

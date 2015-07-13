@@ -1,4 +1,4 @@
-/* NetHack 3.6	topten.c	$NHDT-Date: 1432512771 2015/05/25 00:12:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.35 $ */
+/* NetHack 3.6	topten.c	$NHDT-Date: 1436753525 2015/07/13 02:12:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.37 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -542,8 +542,8 @@ time_t when;
             {
                 char pbuf[BUFSZ];
                 topten_print("");
-                Sprintf(pbuf, "Since you were in %s mode, the score list "
-                              "will not be checked.",
+                Sprintf(pbuf,
+             "Since you were in %s mode, the score list will not be checked.",
                         wizard ? "wizard" : "discover");
                 topten_print(pbuf);
             }

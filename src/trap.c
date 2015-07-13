@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1432512773 2015/05/25 00:12:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.233 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1436753526 2015/07/13 02:12:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.237 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2356,8 +2356,8 @@ register struct monst *mtmp;
                     if (in_sight) {
                         seetrap(trap);
                         if (tt == TRAPDOOR)
-                            pline("A trap door opens, but %s doesn't fall "
-                                  "through.",
+                            pline(
+                            "A trap door opens, but %s doesn't fall through.",
                                   mon_nam(mtmp));
                         else /* (tt == HOLE) */
                             pline("%s doesn't fall through the hole.",

@@ -1,4 +1,4 @@
-/* NetHack 3.6	weapon.c	$NHDT-Date: 1432512762 2015/05/25 00:12:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.50 $ */
+/* NetHack 3.6	weapon.c	$NHDT-Date: 1436753527 2015/07/13 02:12:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.51 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -976,8 +976,8 @@ enhance_weapon_skill()
                          MENU_UNSELECTED);
             }
             if (maxxed_cnt > 0) {
-                Sprintf(buf, "(Skill%s flagged by \"#\" cannot be enhanced "
-                             "any further.)",
+                Sprintf(buf,
+                 "(Skill%s flagged by \"#\" cannot be enhanced any further.)",
                         plur(maxxed_cnt));
                 add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
                          MENU_UNSELECTED);
