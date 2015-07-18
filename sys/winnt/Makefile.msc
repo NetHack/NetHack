@@ -1,4 +1,4 @@
-# NetHack 3.6	Makefile.msc	$NHDT-Date: 1434321147 2015/06/14 22:32:27 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.94 $ */
+# NetHack 3.6	Makefile.msc	$NHDT-Date: 1437224566 2015/07/18 13:02:46 $  $NHDT-Branch: master $:$NHDT-Revision: 1.95 $ */
 #       Copyright (c) NetHack PC Development Team 1993-2015
 #
 #==============================================================================
@@ -200,7 +200,7 @@ cflags1=$(ccommon) $(cdebug)
 lflags1=$(lcommon) $(ldebug)
 !ELSE
 ldebug=
-cflags1=$(ccomon) $(crelease)
+cflags1=$(ccommon) $(crelease)
 lflags1=$(lcommon) $(ldebug)
 !ENDIF
 
