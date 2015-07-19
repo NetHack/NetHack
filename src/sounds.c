@@ -947,7 +947,7 @@ register struct monst *mtmp;
                and without quotation marks */
             char tmpbuf[BUFSZ];
             Sprintf(tmpbuf, "%s", verbl_msg);
-            pline(ucase(tmpbuf));
+            pline1(ucase(tmpbuf));
         } else {
             verbalize1(verbl_msg);
         }
