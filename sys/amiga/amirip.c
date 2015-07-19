@@ -245,6 +245,22 @@ time_t when;
     tomb_text("1935-1994");
     tomb_text("");
     tomb_text("Ascended");
+#elif defined(NH360_DEDICATION)
+    /* dedication */
+    cno = 1;
+    tomb_line = TEXT_TOP;
+    tomb_text("This release");
+    tomb_text("of NetHack");
+    tomb_text("is dedicated");
+    tomb_text("to the");
+    tomb_text("memory of");
+    tomb_text("");
+    tomb_text("Sir Terry");
+    tomb_text("Pratchett");
+    tomb_text("");
+    tomb_text("1948-2015");
+    tomb_text("");
+    tomb_text("Ascended");
 #endif
     /* Fade from black to full color */
     dofade(0, 16, 1);
