@@ -1,4 +1,4 @@
-/* NetHack 3.6	wield.c	$NHDT-Date: 1436753528 2015/07/13 02:12:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.43 $ */
+/* NetHack 3.6	wield.c	$NHDT-Date: 1437877186 2015/07/26 02:19:46 $  $NHDT-Branch: master $:$NHDT-Revision: 1.44 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -273,8 +273,7 @@ dowield()
         return (doswapweapon());
     else if (wep == uquiver)
         setuqwep((struct obj *) 0);
-    else if (wep->owornmask
-             & (W_ARMOR | W_RING | W_AMUL | W_TOOL | W_SADDLE)) {
+    else if (wep->owornmask & (W_ARMOR | W_ACCESSORY | W_SADDLE)) {
         You("cannot wield that!");
         return (0);
     }
@@ -370,8 +369,7 @@ dowieldquiver()
         pline("%s already being used as a weapon!",
               !is_plural(uwep) ? "That is" : "They are");
         return (0);
-    } else if (newquiver->owornmask
-               & (W_ARMOR | W_RING | W_AMUL | W_TOOL | W_SADDLE)) {
+    } else if (newquiver->owornmask & (W_ARMOR | W_ACCESSORY | W_SADDLE)) {
         You("cannot ready that!");
         return (0);
     } else {
@@ -416,7 +414,7 @@ const char *verb; /* "rub",&c */
     more_than_1 = (obj->quan > 1L || strstri(what, "pair of ") != 0
                    || strstri(what, "s of ") != 0);
 
-    if (obj->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL)) {
+    if (obj->owornmask & (W_ARMOR | W_ACCESSORY)) {
         You_cant("%s %s while wearing %s.", verb, yname(obj),
                  more_than_1 ? "them" : "it");
         return FALSE;

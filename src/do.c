@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1436057350 2015/07/05 00:49:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.146 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1437877173 2015/07/26 02:19:33 $  $NHDT-Branch: master $:$NHDT-Revision: 1.147 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -482,7 +482,7 @@ canletgo(obj, word)
 struct obj *obj;
 const char *word;
 {
-    if (obj->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL)) {
+    if (obj->owornmask & (W_ARMOR | W_ACCESSORY)) {
         if (*word)
             Norep("You cannot %s %s you are wearing.", word, something);
         return (FALSE);

@@ -1,4 +1,4 @@
-/* NetHack 3.6	prop.h	$NHDT-Date: 1432512777 2015/05/25 00:12:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
+/* NetHack 3.6	prop.h	$NHDT-Date: 1437877163 2015/07/26 02:19:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.16 $ */
 /* Copyright (c) 1989 Mike Threepoint				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -100,14 +100,18 @@ struct prop {
 #define W_WEP 0x00000100L     /* Wielded weapon */
 #define W_QUIVER 0x00000200L  /* Quiver for (f)iring ammo */
 #define W_SWAPWEP 0x00000400L /* Secondary weapon */
+#define W_WEAPON (W_WEP | W_SWAPWEP | W_QUIVER)
 #define W_ART 0x00001000L     /* Carrying artifact (not really worn) */
 #define W_ARTI 0x00002000L    /* Invoked artifact  (not really worn) */
-                              /* Amulets, rings, tools, and other items */
+/* Amulets, rings, tools, and other items */
 #define W_AMUL 0x00010000L    /* Amulet */
 #define W_RINGL 0x00020000L   /* Left ring */
 #define W_RINGR 0x00040000L   /* Right ring */
 #define W_RING (W_RINGL | W_RINGR)
 #define W_TOOL 0x00080000L   /* Eyewear */
+#define W_ACCESSORY (W_RING | W_AMUL | W_TOOL)
+    /* historical note: originally in slash'em, 'worn' saddle stayed in
+       hero's inventory; in nethack, it's kept in the steed's inventory */
 #define W_SADDLE 0x00100000L /* KMH -- For riding monsters */
 #define W_BALL 0x00200000L   /* Punishment ball */
 #define W_CHAIN 0x00400000L  /* Punishment chain */

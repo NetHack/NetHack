@@ -1,4 +1,4 @@
-/* NetHack 3.6	steal.c	$NHDT-Date: 1432512772 2015/05/25 00:12:52 $  $NHDT-Branch: master $:$NHDT-Revision: 1.59 $ */
+/* NetHack 3.6	steal.c	$NHDT-Date: 1437877184 2015/07/26 02:19:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.62 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -24,11 +24,12 @@ register struct obj *otmp;
                                         ? cloak_simple_name(otmp)
                                         : (otmp == uarmh)
                                               ? helm_simple_name(otmp)
-                                              : "armor");
+                                              : suit_simple_name(otmp));
 }
 
-long /* actually returns something that fits in an int */
-    somegold(lmoney)
+/* proportional subset of gold; return value actually fits in an int */
+long
+somegold(lmoney)
 long lmoney;
 {
 #ifdef LINT /* long conv. ok */
@@ -215,7 +216,7 @@ boolean unchain_ball; /* whether to unpunish or just unwield */
         Ring_gone(obj);
     } else if (obj->owornmask & W_TOOL) {
         Blindf_off(obj);
-    } else if (obj->owornmask & (W_WEP | W_SWAPWEP | W_QUIVER)) {
+    } else if (obj->owornmask & W_WEAPON) {
         if (obj == uwep)
             uwepgone();
         if (obj == uswapwep)
@@ -287,20 +288,17 @@ retry:
     for (otmp = invent; otmp; otmp = otmp->nobj)
         if ((!uarm || otmp != uarmc) && otmp != uskin
             && otmp->oclass != COIN_CLASS)
-            tmp += ((otmp->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL))
-                        ? 5
-                        : 1);
+            tmp += (otmp->owornmask & (W_ARMOR | W_ACCESSORY)) ? 5 : 1;
     if (!tmp)
         goto nothing_to_steal;
     tmp = rn2(tmp);
     for (otmp = invent; otmp; otmp = otmp->nobj)
         if ((!uarm || otmp != uarmc) && otmp != uskin
-            && otmp->oclass != COIN_CLASS)
-            if ((tmp -=
-                 ((otmp->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL))
-                      ? 5
-                      : 1)) < 0)
+            && otmp->oclass != COIN_CLASS) {
+            tmp -= (otmp->owornmask & (W_ARMOR | W_ACCESSORY)) ? 5 : 1;
+            if (tmp < 0)
                 break;
+        }
     if (!otmp) {
         impossible("Steal fails!");
         return (0);
@@ -374,7 +372,7 @@ gotobj:
     /* you're going to notice the theft... */
     stop_occupation();
 
-    if ((otmp->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL))) {
+    if (otmp->owornmask & (W_ARMOR | W_ACCESSORY)) {
         switch (otmp->oclass) {
         case TOOL_CLASS:
         case AMULET_CLASS:

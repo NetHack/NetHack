@@ -1,4 +1,4 @@
-/* NetHack 3.6	mondata.c	$NHDT-Date: 1433117881 2015/06/01 00:18:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.54 $ */
+/* NetHack 3.6	mondata.c	$NHDT-Date: 1437877181 2015/07/26 02:19:41 $  $NHDT-Branch: master $:$NHDT-Revision: 1.55 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -115,7 +115,7 @@ struct monst *mon;
         return TRUE;
     /* check for magic resistance granted by worn or carried items */
     o = is_you ? invent : mon->minvent;
-    slotmask = W_ARMOR | W_RING | W_AMUL | W_TOOL;
+    slotmask = W_ARMOR | W_ACCESSORY;
     if (!is_you || /* assumes monsters don't wield non-weapons */
         (uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep))))
         slotmask |= W_WEP;
@@ -153,7 +153,7 @@ struct monst *mon;
     if (o && o->oartifact && defends(AD_BLND, o))
         return TRUE;
     o = is_you ? invent : mon->minvent;
-    slotmask = W_ARMOR | W_RING | W_AMUL | W_TOOL;
+    slotmask = W_ARMOR | W_ACCESSORY;
     if (!is_you || /* assumes monsters don't wield non-weapons */
         (uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep))))
         slotmask |= W_WEP;

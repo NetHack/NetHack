@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1436753518 2015/07/13 02:11:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.103 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1437877180 2015/07/26 02:19:40 $  $NHDT-Branch: master $:$NHDT-Revision: 1.104 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2290,8 +2290,9 @@ struct obj *obj;
             ++n;
         allmask |= wearbits[i];
     }
-    if (n == 2 && carried(obj) && obj == uball && (owornmask & W_BALL) != 0L
-        && (owornmask & (W_WEP | W_SWAPWEP | W_QUIVER)) != 0L) {
+    if (n == 2 && carried(obj)
+        && obj == uball && (owornmask & W_BALL) != 0L
+        && (owornmask & W_WEAPON) != 0L) {
         /* chained ball can be wielded/alt-wielded/quivered; if so,
           pretend it's not chained in order to check the weapon pointer
           (we've already verified the ball pointer by successfully passing
@@ -2396,7 +2397,7 @@ struct obj *obj;
         if (owornmask & W_ARMOR) {
             if (obj->oclass != ARMOR_CLASS)
                 what = "armor";
-        } else if (owornmask & (W_WEP | W_SWAPWEP | W_QUIVER)) {
+        } else if (owornmask & W_WEAPON) {
             /* monsters don't maintain alternate weapon or quiver */
             if (mcarried(obj) && (owornmask & (W_SWAPWEP | W_QUIVER)) != 0L)
                 what = (owornmask & W_SWAPWEP) != 0L ? "monst alt weapon?"

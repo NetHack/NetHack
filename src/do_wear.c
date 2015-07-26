@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1433289458 2015/06/02 23:57:38 $  $NHDT-Branch: master $:$NHDT-Revision: 1.82 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1437877177 2015/07/26 02:19:37 $  $NHDT-Branch: master $:$NHDT-Revision: 1.83 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1069,7 +1069,7 @@ register struct obj *otmp;
     boolean already_blind = Blind, changed = FALSE;
 
     /* blindfold might be wielded; release it for wearing */
-    if (otmp->owornmask & (W_WEP | W_SWAPWEP | W_QUIVER))
+    if (otmp->owornmask & W_WEAPON)
         remove_worn_item(otmp, FALSE);
     setworn(otmp, W_TOOL);
     on_msg(otmp);
@@ -1414,7 +1414,7 @@ doremring()
         otmp = getobj(accessories, "remove");
     if (!otmp)
         return 0;
-    if (!(otmp->owornmask & (W_RING | W_AMUL | W_TOOL))) {
+    if (!(otmp->owornmask & W_ACCESSORY)) {
         You("are not wearing that.");
         return 0;
     }
@@ -1742,7 +1742,7 @@ dowear()
 
     otmp->known = 1; /* since AC is shown on the status line */
     /* if the armor is wielded, release it for wearing */
-    if (otmp->owornmask & (W_WEP | W_SWAPWEP | W_QUIVER))
+    if (otmp->owornmask & W_WEAPON)
         remove_worn_item(otmp, FALSE);
     setworn(otmp, mask);
     delay = -objects[otmp->otyp].oc_delay;
@@ -1781,13 +1781,13 @@ doputon()
         Your("%s%s are full, and you're already wearing an amulet and %s.",
              humanoid(youmonst.data) ? "ring-" : "",
              makeplural(body_part(FINGER)),
-             ublindf->otyp == LENSES ? "some lenses" : "a blindfold");
+             (ublindf->otyp == LENSES) ? "some lenses" : "a blindfold");
         return (0);
     }
     otmp = getobj(accessories, "put on");
     if (!otmp)
         return (0);
-    if (otmp->owornmask & (W_RING | W_AMUL | W_TOOL)) {
+    if (otmp->owornmask & W_ACCESSORY) {
         already_wearing(c_that_);
         return (0);
     }
@@ -1795,12 +1795,10 @@ doputon()
         weldmsg(otmp);
         return (0);
     }
-#if 0
-/* defer til Xxx_on(); various failures below now leave item wielded
- */
-	/* accessory might be wielded; release it for wearing */
-	if (otmp->owornmask & (W_WEP|W_SWAPWEP|W_QUIVER))
-		remove_worn_item(otmp, FALSE);
+#if 0 /* defer til Xxx_on(); various failures below now leave item wielded */
+    /* accessory might be wielded; release it for wearing */
+    if (otmp->owornmask & W_WEAPON)
+        remove_worn_item(otmp, FALSE);
 #endif
 
     if (otmp->oclass == RING_CLASS || otmp->otyp == MEAT_RING) {
@@ -2406,7 +2404,7 @@ doddoremarm()
            possibly combined with weapons */
         (void) strncpy(context.takeoff.disrobing, "disrobing", CONTEXTVERBSZ);
         /* specific activity when handling weapons only */
-        if (!(context.takeoff.mask & ~(W_WEP | W_SWAPWEP | W_QUIVER)))
+        if (!(context.takeoff.mask & ~W_WEAPON))
             (void) strncpy(context.takeoff.disrobing, "disarming",
                            CONTEXTVERBSZ);
         (void) take_off();

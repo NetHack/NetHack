@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitu.c	$NHDT-Date: 1432512772 2015/05/25 00:12:52 $  $NHDT-Branch: master $:$NHDT-Revision: 1.127 $ */
+/* NetHack 3.6	mhitu.c	$NHDT-Date: 1437877180 2015/07/26 02:19:40 $  $NHDT-Branch: master $:$NHDT-Revision: 1.128 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -813,7 +813,7 @@ struct monst *mon;
             continue;
 
         /* omit W_SWAPWEP+W_QUIVER; W_ART+W_ARTI handled by protects() */
-        wearmask = W_ARMOR | W_RING | W_AMUL | W_TOOL;
+        wearmask = W_ARMOR | W_ACCESSORY;
         if (o->oclass == WEAPON_CLASS || is_weptool(o))
             wearmask |= W_WEP;
         if (protects(o, ((o->owornmask & wearmask) != 0L) ? TRUE : FALSE))
@@ -827,9 +827,9 @@ struct monst *mon;
     } else if (mc < 1) {
         /* intrinsic Protection is weaker (play balance; obtaining divine
            protection is too easy); it confers minimum mc 1 instead of 0 */
-        if ((is_you && ((HProtection && u.ublessed) || u.uspellprot)) ||
+        if ((is_you && ((HProtection && u.ublessed) || u.uspellprot))
             /* aligned priests and angels have innate intrinsic Protection */
-            (mon->data == &mons[PM_ALIGNED_PRIEST] || is_minion(mon->data)))
+            || (mon->data == &mons[PM_ALIGNED_PRIEST] || is_minion(mon->data)))
             mc = 1;
     }
     return mc;

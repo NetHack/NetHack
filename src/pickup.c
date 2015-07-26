@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1434507811 2015/06/17 02:23:31 $  $NHDT-Branch: master $:$NHDT-Revision: 1.159 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1437877182 2015/07/26 02:19:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.160 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -437,9 +437,8 @@ boolean
 is_worn_by_type(otmp)
 register struct obj *otmp;
 {
-    return ((boolean)(!!(otmp->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL
-                                            | W_WEP | W_SWAPWEP | W_QUIVER)))
-            && (index(valid_menu_classes, otmp->oclass) != (char *) 0));
+    return (boolean) (!!(otmp->owornmask & (W_ARMOR | W_ACCESSORY | W_WEAPON))
+                      && index(valid_menu_classes, otmp->oclass) != 0);
 }
 
 /*
@@ -979,8 +978,7 @@ int how;               /* type of query */
         && !(qflags & BILLED_TYPES)) {
         for (curr = olist; curr; curr = FOLLOW(curr, qflags)) {
             if ((qflags & WORN_TYPES)
-                && !(curr->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL
-                                        | W_WEP | W_SWAPWEP | W_QUIVER)))
+                && !(curr->owornmask & (W_ARMOR | W_ACCESSORY | W_WEAPON)))
                 continue;
             break;
         }
@@ -1012,8 +1010,7 @@ int how;               /* type of query */
         for (curr = olist; curr; curr = FOLLOW(curr, qflags)) {
             if (curr->oclass == *pack) {
                 if ((qflags & WORN_TYPES)
-                    && !(curr->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL
-                                            | W_WEP | W_SWAPWEP | W_QUIVER)))
+                    && !(curr->owornmask & (W_ARMOR | W_ACCESSORY | W_WEAPON)))
                     continue;
                 if (!collected_type_name) {
                     any = zeroany;
@@ -1113,8 +1110,7 @@ int qflags;
         for (curr = olist; curr; curr = FOLLOW(curr, qflags)) {
             if (curr->oclass == *pack) {
                 if ((qflags & WORN_TYPES)
-                    && !(curr->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL
-                                            | W_WEP | W_SWAPWEP | W_QUIVER)))
+                    && !(curr->owornmask & (W_ARMOR | W_ACCESSORY | W_WEAPON)))
                     continue;
                 if (!counted_category) {
                     ccount++;
@@ -1938,7 +1934,7 @@ register struct obj *obj;
     } else if (obj == current_container) {
         pline("That would be an interesting topological exercise.");
         return 0;
-    } else if (obj->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL)) {
+    } else if (obj->owornmask & (W_ARMOR | W_ACCESSORY)) {
         Norep("You cannot %s %s you are wearing.",
               Icebox ? "refrigerate" : "stash", something);
         return 0;
