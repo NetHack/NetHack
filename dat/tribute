@@ -968,7 +968,7 @@ The city council countered it by offering twenty pence for every rat
 tail.  This did, for a week or two, reduce the number of rats--and then
 people were suddenly queueing up with tails, the city treasury was being
 drained, and no one seemed to be doing much work.  And there /still/
-seemed to be a lot of rats around.  Lord Vetenari had listened carefully
+seemed to be a lot of rats around.  Lord Vetinari had listened carefully
 while the problem was explained, and had solved the thing with one
 memorable phrase which said a lot about him, about the folly of bounty
 offers, and about the natural instinct of Ankh-Morporkians in any
@@ -1220,7 +1220,7 @@ followed by long periods of being dead."
 #       transcribed from some other edition based on quote marks used;
 #       a great number of very short paragraphs--it stretches a long way
 #       when using a blank line to separate one paragraph from another;
-#       one omitted bit is that after Granny suffles the deck of cards
+#       one omitted bit is that after Granny shuffles the deck of cards
 #       and deals two poker hands, Death swaps them, suggesting that
 #       he suspected her of cheating; initial transcription left off
 #       the most interesting bit, Death's wink at the end)
@@ -1484,7 +1484,7 @@ touching lips.
 %e passage
 %passage 2
 It was hard enough to kill a vampire. You could stake them down and turn
- them into dust and ten years later someone drops a drop of blood in the
+them into dust and ten years later someone drops a drop of blood in the
 wrong place and guess who's back?  They returned more times than raw
 broccoli. 
 
@@ -1678,7 +1678,7 @@ There's a fifth element, and generally it's called Surprise.
 # The actual text is probably only novella length.
 #
 %title The Last Hero (7)
-# p. 41 (end of 1st paragraph)
+# p. 41 (EOS edition)
 %passage 1
 Too many people, when listing all the perils to be found in the search
 for lost treasure or ancient wisdom, had forgotten to put at the top of
@@ -1686,7 +1686,7 @@ the list 'the man who arrived just before you'.
 
   [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
 %e passage
-# p. 5 (1st page of text, 4th & 5th paragraphs)
+# p. 5
 # second paragraph is a bit "on the nose" but is too good to leave out
 %passage 2
 The reason for the story was a mix of many things.  There was humanity's
@@ -1705,7 +1705,7 @@ or become really, really angry.
 
   [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
 %e passage
-# p. 19 (bottom 20%)
+# p. 19
 %passage 3
 'And they're /heroes/,' said Mr Betteridge of the Guild of Historians.
 
@@ -1723,7 +1723,7 @@ heroes.  You had civilisation, such as it was, and you had heroes.
 
   [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
 %e passage
-# p. 25 (2nd & 3rd fifths)
+# p. 25
 %passage 4
 They were, all of them, old men.  Their background conversation was
 a litany of complaints about feet, stomachs and backs.  They moved
@@ -1736,7 +1736,7 @@ the word 'fear'.  It was something that happened to other people.
 
   [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
 %e passage
-# p. 97 (middle)
+# p. 97
 %passage 5
 Captain Carrot saluted.  'Force is always the last resort, sir,' he said.
 
@@ -1779,7 +1779,7 @@ lucky guessing was what being a wizard was all about.
 
   [The Last Hero, written by Terry Pratchett, illustrated by Paul Kidby]
 %e passage
-# p. 146 (top)
+# p. 146
 %passage 7
 Evil Harry looked down and shuffled his feet, his face a battle between
 pride and relief.
@@ -2065,7 +2065,7 @@ that moment you had never known that you always wanted to do it...
 #
 #
 #
-%title Raising Steam (2)
+%title Raising Steam (8)
 %passage 1
 Yesterday you never thought about it and after today you 
 don't know what you would do without it. 
@@ -2080,13 +2080,103 @@ If you take enough precautions, you never need to take precautions.
 
   [Raising Steam, by Terry Pratchett]
 %e passage
+# p. 57 (Anchor Books edition)
+%passage 3
+Rhys Rhysson, Low King of the dwarfs, was a dwarf of keen intelligence,
+but he sometimes wondered why someone with that intelligence would go into
+dwarfish politics, let alone be King of the Dwarfs.  Lord Vetinari had it
+so easy he must hardly know he was born!  The King thought that humans
+were, well, reasonably sensible, whereas there was an old dwarf proverb
+which, translated, said, "Any three dwarfs having a sensible conversation
+will always end up having four points of view."
+
+  [Raising Steam, by Terry Pratchett]
+%e passage
+# p. 64
+%passage 4
+Curious, the Patrician thought, as Drumknott hurried away to dispatch a
+clacks to the editor of the /Times/, that people in Ankh-Morpork professed
+not to like change while at the same time fixating on every new
+entertainment and diversion that came their way.  There was nothing the
+mob liked better than novelty.  Lord Vetinari sighed again.  Did they
+actually think?  These days /everybody/ used the clacks, even little old
+ladies who used it to send him clacks messages complaining about all
+these newfangled ideas, totally missing the irony.  And in this doleful
+mood he ventured to wonder if they ever thought back to when things were
+just old-fangled or not fangled at all as against the modern day when
+fangled had reached its apogee.  Fangling was indeed, he thought, here
+to stay.  Then he wondered: had anyone ever thought of themselves as a
+fangler?
+
+  [Raising Steam, by Terry Pratchett]
+%e passage
+# p. 175 (third paragraph has a final sentence, but it's about 'grags'
+#         which wouldn't make any sense here where's no context about them)
+%passage 5
+"Mister Lipwig, you know what they say about dwarfs?"
+
+Moist looked blank.  "Very small people?"
+
+"'Two dwarfs is an argument, three dwarfs is a war,' Mister Lipwig.  It's
+squabble, squabble, squabble.  It's built into their culture.  [...]"
+
+  [Raising Steam, by Terry Pratchett]
+%e passage
+# p. 233 (second paragraph of a footnote)
+%passage 6
+There clearly has been magic at work in the Netherglades and its future as
+the pharmacopoeia of the world is being tested by Professor Rincewind of
+Unseen University.  A dispatch from him reveals that the juice pressed from
+a certain little yellow flower induces certainty in the patient for up to
+fifteen minutes.  About what they are certain they cannot specify, but the
+patient is, in that short time, completely certain about /everything/.  And
+further research has found that a floating water hyacinth yields in its
+juices total /un/certainty about anything for half a hour.  Philosophers
+are excited about the uses for these potions, and the search continues for
+a plant that combines the qualities of both, thereby being of great use to
+theologians.
+
+  [Raising Steam, by Terry Pratchett]
+%e passage
+# p. 288
+%passage 7
+The town of Big Cabbage, theoretically the last place any sensible person
+would want to visit, was nevertheless popular throughout the summer because
+of the attractions of Brassica World and the Cabbage Research Institute,
+whose students were the first to get a cabbage to a height of five hundred
+yards propelled entirely by its own juices.  Nobody asked why they felt it
+was necessary to do this, but that was science for you, and, of course,
+students.
+
+  [Raising Steam, by Terry Pratchett]
+%e passage
+# pp. 363-364 ("Of the Wheel the Spoke" is the goblin's formal name; perhaps
+#              a new name chosen or given after inventing the bicycle?)
+%passage 8
+A few weeks later, Drumknott persuaded Lord Vetinari to accompany him to
+the area behind the palace where a jungle of drain pipes emptied and
+several mismatched sheds, washhouses, and lean-tos housed some of the
+necessary functions without which a modern palace could not operate.(1)
+
+There was a young goblin waiting there, rather nervous, clasping what
+looked like two wheels held together by not very much.  The wheels were
+spinning.
+
+Durmknott cleared his throat.  "Show his lordship your new invention,
+Mister Of the Wheel the Spoke."
+
+(1) Frankly most palaces are just like this.  Their backsides do not bear
+looking at.
+
+  [Raising Steam, by Terry Pratchett]
+%e passage
 %e title
 %e section
 #-----------------------------------------------------
 # Used for interaction with Death.
 #
 %section Death
-%title Death Quotes (4)
+%title Death Quotes (6)
 %passage 1
 WHERE THE FIRST PRIMAL CELL WAS, THERE WAS I ALSO. WHERE MAN IS, THERE AM I. WHEN THE LAST LIFE CRAWLS UNDER FREEZING STARS, THERE WILL I BE.
 %e passage
@@ -2101,7 +2191,14 @@ THINK OF IT MORE AS BEING ... DIMESIONALLY DISADVANTAGED.
 %passage 4
 I MAY HAVE ALLOWED MYSELF SOME FLICKER OF EMOTION IN THE RECENT PAST, BUT I CAN GIVE IT UP ANY TIME I LIKE.
 %e passage
-# Not a direct quote, but a reference to Thief of Time and the fact that the player is War
+%passage 5
+# Not a direct quote, but a reference to Thief of Time and the fact that
+# the player is War
 HAVE YOU SPOKEN TO RONNIE LATELY?
+%e passage
+# Raising Steam, p. 180 (Anchor Books edition)
+%passage 6
+PLEASE DO NOT PANIC.  YOU ARE MERELY DEAD.
+%e passage
 %e title
 %e section
