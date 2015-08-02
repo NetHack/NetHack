@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1436232245 2015/07/07 01:24:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.181 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1438505682 2015/08/02 08:54:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.182 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -622,6 +622,9 @@ movemon()
         if (vision_full_recalc)
             vision_recalc(0); /* vision! */
 
+        /* reset obj bypasses before next monster moves */
+        if (context.bypasses)
+            clear_bypasses();
         if (minliquid(mtmp))
             continue;
 
@@ -665,6 +668,9 @@ movemon()
 
     if (any_light_source())
         vision_full_recalc = 1; /* in case a mon moved with a light source */
+    /* reset obj bypasses after last monster has moved */
+    if (context.bypasses)
+        clear_bypasses();
     dmonsfree();                /* remove all dead monsters */
 
     /* a monster may have levteleported player -dlc */

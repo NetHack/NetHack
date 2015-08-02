@@ -1,4 +1,4 @@
-/* NetHack 3.6	allmain.c	$NHDT-Date: 1432512767 2015/05/25 00:12:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.61 $ */
+/* NetHack 3.6	allmain.c	$NHDT-Date: 1438505671 2015/08/02 08:54:31 $  $NHDT-Branch: master $:$NHDT-Revision: 1.62 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -177,8 +177,6 @@ boolean resuming;
                     /* once-per-turn things go here */
                     /********************************/
 
-                    if (context.bypasses)
-                        clear_bypasses();
                     if (Glib)
                         glibr();
                     nh_timeout();
@@ -361,6 +359,8 @@ boolean resuming;
             /* once-per-hero-took-time things go here */
             /******************************************/
 
+            if (context.bypasses)
+                clear_bypasses();
             if ((u.uhave.amulet || Clairvoyant) && !In_endgame(&u.uz)
                 && !BClairvoyant && !(moves % 15) && !rn2(2))
                 do_vicinity_map();
