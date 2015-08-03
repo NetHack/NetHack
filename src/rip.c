@@ -18,7 +18,27 @@ STATIC_DCL void FDECL(center, (int, char *));
 
 #ifdef TEXT_TOMBSTONE
 
-#ifdef NH320_DEDICATION
+#ifndef NH320_DEDICATION
+/* A normal tombstone for end of game display. */
+static const char *rip_txt[] = {
+    "                       ----------",
+    "                      /          \\",
+    "                     /    REST    \\",
+    "                    /      IN      \\",
+    "                   /     PEACE      \\",
+    "                  /                  \\",
+    "                  |                  |", /* Name of player */
+    "                  |                  |", /* Amount of $ */
+    "                  |                  |", /* Type of death */
+    "                  |                  |", /* . */
+    "                  |                  |", /* . */
+    "                  |                  |", /* . */
+    "                  |       1001       |", /* Real year of death */
+    "                 *|     *  *  *      | *",
+    "        _________)/\\\\_//(\\/(/\\)/\\//\\/|_)_______", 0
+};
+#define STONE_LINE_CENT 28 /* char[] element of center of stone face */
+#else                      /* NH320_DEDICATION */
 /* NetHack 3.2.x displayed a dual tombstone as a tribute to Izchak. */
 static const char *rip_txt[] = {
     "              ----------                      ----------",
@@ -39,47 +59,7 @@ static const char *rip_txt[] = {
     0
 };
 #define STONE_LINE_CENT 19 /* char[] element of center of stone face */
-#elif defined(NH360_DEDICATION)
-static const char *rip_txt[] = {
-    "              ----------                      ----------",
-    "             /          \\                    /          \\",
-    "            /    REST    \\                  /    This    \\",
-    "           /      IN      \\                /  release of  \\",
-    "          /     PEACE      \\              /   NetHack is   \\",
-    "         /                  \\            /   dedicated to   \\",
-    "         |                  |            |  the memory of   |",
-    "         |                  |            |                  |",
-    "         |                  |            |    Sir Terry     |",
-    "         |                  |            |    Pratchett     |",
-    "         |                  |            |   1948 - 2015    |",
-    "         |                  |            |     Ascended     |",
-    "         |       1001       |            |                  |",
-    "      *  |     *  *  *      | *        * |      *  *  *     | *",
-    " _____)/\\|\\__//(\\/(/\\)/\\//\\/|_)________)/|\\\\_/_/(\\/(/\\)/\\/\\/|_)____",
-    0
-};
-#define STONE_LINE_CENT 19 /* char[] element of center of stone face */
-#else                      /* no dedication */
-/* A normal tombstone for end of game display. */
-static const char *rip_txt[] = {
-    "                       ----------",
-    "                      /          \\",
-    "                     /    REST    \\",
-    "                    /      IN      \\",
-    "                   /     PEACE      \\",
-    "                  /                  \\",
-    "                  |                  |", /* Name of player */
-    "                  |                  |", /* Amount of $ */
-    "                  |                  |", /* Type of death */
-    "                  |                  |", /* . */
-    "                  |                  |", /* . */
-    "                  |                  |", /* . */
-    "                  |       1001       |", /* Real year of death */
-    "                 *|     *  *  *      | *",
-    "        _________)/\\\\_//(\\/(/\\)/\\//\\/|_)_______", 0
-};
-#define STONE_LINE_CENT 28 /* char[] element of center of stone face */
-#endif                     /* no dedication */
+#endif                     /* NH320_DEDICATION */
 #define STONE_LINE_LEN                               \
     16               /* # chars that fit on one line \
                       * (note 1 ' ' border)          \
