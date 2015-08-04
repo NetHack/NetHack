@@ -785,9 +785,13 @@ game rather than with the `{\tt O}' command; see the section on options below.
 Pay your shopping bill.
 %.lp
 \item[\tb{P}]
-Put on a ring or other accessory (amulet, blindfold).\\
+Put on an accessory (ring, amulet, blindfold).\\
 %.lp ""
-Use the `{\tt W}' command to wear armor.
+This command may also be used to wear armor.  The prompt for
+which inventory item to use will only list accessories, but choosing
+an unlisted item of armor will attempt to wear it.
+(See the `{\tt W}' command below.  It lists armor as the inventory
+choices but will accept an accessory and attempt to put that on.)
 %.lp
 \item[\tb{\^{}P}]
 Repeat previous message.\\
@@ -802,22 +806,28 @@ Quaff (drink) something (potion, water, etc).
 Select an object for your quiver, quiver sack, or just generally at
 the ready (only one of these is available at a time).  You can then throw
 this (or one of these) using
-the `f' command.  (In versions prior to 3.3 this was the command to quit
-the game, which has now been moved to `{\tt \#quit}'.)
+the `f' command.\\
+%.lp ""
+(In versions prior to 3.3 this was the command to quit
+the game, which has been moved to ``{\tt \#quit}''.)
 %.lp
 \item[\tb{r}]
 Read a scroll or spellbook.
 %.lp
 \item[\tb{R}]
-Remove an accessory (ring, amulet, etc).\\
+Remove a worn accessory (ring, amulet, or blindfold).\\
 %.lp ""
 If you're wearing more than one, you'll be prompted for which one to
-remove.  If you're only wearing one, then by default it will be removed
+remove.  When you're only wearing one, then by default it will be removed
 without asking, but you can set the
 {\it paranoid\verb+_+confirmation\/}
 option to require a prompt.\\
 %.lp ""
-Use the `{\tt T}' command to take off armor.
+This command may also be used to take off armor.  The prompt for which
+inventory item to remove only lists worn accessories, but an item of
+worn armor can be chosen.
+(See the `{\tt T}' command below.  It lists armor as the inventory
+choices but will accept an accessory and attempt to remove it.)
 %.lp
 \item[\tb{\^{}R}]
 Redraw the screen.
@@ -837,12 +847,19 @@ Throw an object or shoot a projectile.
 Take off armor.\\
 %.lp ""
 If you're wearing more than one piece, you'll be prompted for which
-one to take off.  If you're only wearing one, then by default it will
+one to take off.  (Note that this treats a cloak covering a suit
+and/or a shirt, or a suit covering a shirt, as if the underlying items
+weren't there.)
+When you're only wearing one, then by default it will
 be taken off without asking, but you can set the
 {\it paranoid\verb+_+confirmation\/}
 option to require a prompt.\\
 %.lp ""
-Use the `{\tt R}' command to remove accessories.
+This command may also be used to remove accessories.  The prompt
+for which inventory item to take off only lists worn armor, but a worn
+accessory can be chosen.
+(See the `{\tt R}' command above.  It lists accessories as the inventory
+choices but will accept an item of armor and attempt to take it off.)
 %.lp
 \item[\tb{\^{}T}]
 Teleport, if you have the ability.
@@ -860,13 +877,17 @@ Wield weapon.\\
 {\tt w-} --- wield nothing, use your bare hands.\\
 %.ei
 %.ed
-Some characters can wield two weapons and once; use the ``{\tt \#twoweapon}''
-extended command to do so.
+Some characters can wield two weapons at once; use the `{\tt X}' command
+(or the ``{\tt \#twoweapon}'' extended command) to do so.
 %.lp
 \item[\tb{W}]
 Wear armor.\\
 %.lp ""
-Use the `{\tt P}' command to put on accessories.
+This command may also be used to put on an accessory (ring, amulet, or
+blindfold).  The prompt for which inventory item to use will only list
+armor, but choosing an unlisted accessory will attempt to put it on.
+(See the `{\tt P}' command above.  It lists accessories as the inventory
+choices but will accept an item of armor and attempt to wear it.)
 %.lp
 \item[\tb{x}]
 Exchange your wielded weapon with the item in your alternate weapon slot.\\
@@ -877,7 +898,11 @@ the exchange still takes place.
 %.lp
 \item[\tb{X}]
 Toggle two-weapon combat, if your character can do it.  Also available
-via the ``{\tt \#twoweapon}'' extended command
+via the ``{\tt \#twoweapon}'' extended command.\\
++.lp ""
++(In versions prior to 3.6 this was the command to switch from normal
++play to ``explore mode'', also known as ``discovery mode'', which has now
++been moved to ``{\tt \#explore}''.)
 %.lp
 \item[\tb{\^{}X}]
 Display basic information about your character.\\

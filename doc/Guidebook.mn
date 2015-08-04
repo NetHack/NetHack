@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: master $:$NHDT-Revision: 1.179 $ $NHDT-Date: 1435003374 2015/06/22 20:02:54 $
+.\" $NHDT-Branch: master $:$NHDT-Revision: 1.180 $ $NHDT-Date: 1438652308 2015/08/04 01:38:28 $
 .ds h0 "NetHack Guidebook
 .ds h1
 .ds h2 %
@@ -643,9 +643,13 @@ game rather than with the `O' command; see the section on options below.
 .lp p
 Pay your shopping bill.
 .lp P
-Put on a ring or other accessory (amulet, blindfold).
+Put on an accessory (ring, amulet, or blindfold).
 .lp ""
-Use the 'W' command to wear armor.
+This command may also be used to wear armor.  The prompt for
+which inventory item to use will only list accessories, but choosing
+an unlisted item of armor will attempt to wear it.
+(See the `W' command below.  It lists armor as the inventory
+choices but will accept an accessory and attempt to put that on.)
 .lp ^P
 Repeat previous message.
 .lp ""
@@ -659,20 +663,26 @@ Quaff (drink) something (potion, water, etc).
 Select an object for your quiver, quiver sack, or just generally at
 the ready (only one of these is available at a time).  You can then throw
 this (or one of these) using
-the `f' command.  (In versions prior to 3.3 this was the command to quit
-the game, which has now been moved to `#quit'.)
+the `f' command.
+.lp ""
+(In versions prior to 3.3 this was the command to quit
+the game, which has been moved to ``#quit''.)
 .lp r
 Read a scroll or spellbook.
 .lp R
-Remove an accessory (ring, amulet, etc).
+Remove a worn accessory (ring, amulet, or blindfold).
 .lp ""
 If you're wearing more than one, you'll be prompted for which one to
-remove.  If you're only wearing one, then by default it will be removed
+remove.  When you're only wearing one, then by default it will be removed
 without asking, but you can set the
 .op paranoid_confirmation
 option to require a prompt.
 .lp ""
-Use the 'T' command to take off armor.
+This command may also be used to take off armor.  The prompt for which
+inventory item to remove only lists worn accessories, but an item of
+worn armor can be chosen.
+(See the `T' command below.  It lists armor as the inventory
+choices but will accept an accessory and attempt to remove it.)
 .lp ^R
 Redraw the screen.
 .lp s
@@ -687,12 +697,19 @@ Throw an object or shoot a projectile.
 Take off armor.
 .lp ""
 If you're wearing more than one piece, you'll be prompted for which
-one to take off.  If you're only wearing one, then by default it will
+one to take off.  (Note that this treats a cloak covering a suit
+and/or a shirt, or a suit covering a shirt, as if the underlying items
+weren't there.)
+When you're only wearing one, then by default it will
 be taken off without asking, but you can set the
 .op paranoid_confirmation
 option to require a prompt.
 .lp ""
-Use the 'R' command to remove accessories.
+This command may also be used to remove accessories.  The prompt
+for which inventory item to take off only lists worn armor, but a worn
+accessory can be chosen.
+(See the `R' command above.  It lists accessories as the inventory
+choices but will accept an item of armor and attempt to take it off.)
 .lp ^T
 Teleport, if you have the ability.
 .lp v
@@ -706,12 +723,16 @@ Wield weapon.
 w- - wield nothing, use your bare hands.
 .ei
 .ed
-Some characters can wield two weapons and once; use the ``#twoweapon''
-extended command to do so.
+Some characters can wield two weapons at once; use the `X' command
+(or the ``#twoweapon'' extended command) to do so.
 .lp W
 Wear armor.
 .lp ""
-Use the 'P' command to put on accessories.
+This command may also be used to put on an accessory (ring, amulet, or
+blindfold).  The prompt for which inventory item to use will only list
+armor, but choosing an unlisted accessory will attempt to put it on.
+(See the `P' command above.  It lists accessories as the inventory
+choices but will accept an item of armor and attempt to wear it.)
 .lp x
 Exchange your wielded weapon with the item in your alternate weapon slot.
 .lp ""
@@ -720,7 +741,11 @@ two-weapon combat.  Note that if one of these slots is empty,
 the exchange still takes place.
 .lp X
 Toggle two-weapon combat, if your character can do it.  Also available
-via the ``#twoweapon'' extended command
+via the ``#twoweapon'' extended command.
+.lp ""
+(In versions prior to 3.6 this was the command to switch from normal
+play to "explore mode", also known as "discovery mode", which has now
+been moved to ``#explore''.)
 .lp ^X
 Display basic information about your character.
 .lp ""

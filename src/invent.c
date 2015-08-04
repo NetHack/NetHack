@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1437877178 2015/07/26 02:19:38 $  $NHDT-Branch: master $:$NHDT-Revision: 1.169 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1438652306 2015/08/04 01:38:26 $  $NHDT-Branch: master $:$NHDT-Revision: 1.170 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -977,11 +977,11 @@ register const char *let, *word;
         let++, allowall = TRUE;
     if (*let == ALLOW_NONE)
         let++, allownone = TRUE;
-    /* "ugly check" for reading fortune cookies, part 1 */
-    /* The normal 'ugly check' keeps the object on the inventory list.
+    /* "ugly check" for reading fortune cookies, part 1.
+     * The normal 'ugly check' keeps the object on the inventory list.
      * We don't want to do that for shirts/cookies, so the check for
      * them is handled a bit differently (and also requires that we set
-     * allowall in the caller)
+     * allowall in the caller).
      */
     if (allowall && !strcmp(word, "read"))
         allowall = FALSE;
@@ -1097,10 +1097,17 @@ register const char *let, *word;
              ) {
                 foo--;
             }
-            /* ugly check for unworn armor that can't be worn */
+            /* Third ugly check:  acceptable but not listed as likely
+             * candidates in the prompt or in the inventory subset if
+             * player responds with '?'.
+             */
             else if (
+             /* ugly check for unworn armor that can't be worn */
                 (putting_on(word) && *let == ARMOR_CLASS
                  && !canwearobj(otmp, &dummymask, FALSE))
+             /* or armor with 'P' or 'R' or accessory with 'W' or 'T' */
+             || ((putting_on(word) || taking_off(word))
+                 && ((*let == ARMOR_CLASS) ^ (otmp->oclass == ARMOR_CLASS)))
              /* or unsuitable items rubbed on known touchstone */
              || (!strncmp(word, "rub on the stone", 16)
                  && *let == GEM_CLASS && otmp->dknown
@@ -1310,6 +1317,9 @@ silly_thing(word, otmp)
 const char *word;
 struct obj *otmp;
 {
+#if 1 /* 'P','R' vs 'W','T' handling is obsolete */
+    nhUse(otmp);
+#else
     const char *s1, *s2, *s3, *what;
     int ocls = otmp->oclass, otyp = otmp->otyp;
 
@@ -1336,9 +1346,9 @@ struct obj *otmp;
         if (otyp == LENSES || is_gloves(otmp) || is_boots(otmp))
             what = "those";
         pline("Use the '%s' command to %s %s%s.", s1, s2, what, s3);
-    } else {
+    } else
+#endif
         pline(silly_thing_to, word);
-    }
 }
 
 STATIC_PTR int

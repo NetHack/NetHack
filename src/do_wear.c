@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1437877177 2015/07/26 02:19:37 $  $NHDT-Branch: master $:$NHDT-Revision: 1.83 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1438652304 2015/08/04 01:38:24 $  $NHDT-Branch: master $:$NHDT-Revision: 1.84 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -37,6 +37,9 @@ STATIC_PTR int FDECL(select_off, (struct obj *));
 STATIC_DCL struct obj *NDECL(do_takeoff);
 STATIC_PTR int NDECL(take_off);
 STATIC_DCL int FDECL(menu_remarm, (int));
+STATIC_DCL void FDECL(count_worn_stuff, (struct obj **, BOOLEAN_P));
+STATIC_PTR int FDECL(armor_or_accessory_off, (struct obj *));
+STATIC_PTR int FDECL(accessory_or_armor_on, (struct obj *));
 STATIC_DCL void FDECL(already_wearing, (const char *));
 STATIC_DCL void FDECL(already_wearing2, (const char *, const char *));
 
@@ -83,9 +86,9 @@ boolean on;
     if (on ? initial_don : context.takeoff.cancelled_don)
         return;
 
-    if (!oldprop &&  /* extrinsic stealth from something else */
-        !HStealth && /* intrinsic stealth */
-        !BStealth) { /* stealth blocked by something */
+    if (!oldprop /* extrinsic stealth from something else */
+        && !HStealth /* intrinsic stealth */
+        && !BStealth) { /* stealth blocked by something */
         if (obj->otyp == RIN_STEALTH)
             learnring(obj, TRUE);
         else
@@ -117,19 +120,21 @@ boolean on;
     if (on ? initial_don : context.takeoff.cancelled_don)
         return;
 
-    if (!oldprop && /* extrinsic displacement from something else */
-        !(u.uprops[DISPLACED].intrinsic) && /* (theoretical) */
-        !(u.uprops[DISPLACED].blocked) &&   /* (also theoretical) */
+    if (!oldprop /* extrinsic displacement from something else */
+        && !(u.uprops[DISPLACED].intrinsic) /* (theoretical) */
+        && !(u.uprops[DISPLACED].blocked) /* (also theoretical) */
         /* we don't use canseeself() here because it augments vision
            with touch, which isn't appropriate for deciding whether
            we'll notice that monsters have trouble spotting the hero */
-        ((!Blind &&      /* see anything */
-          !u.uswallow && /* see surroundings */
-          !Invisible) || /* see self */
-         /* actively sensing nearby monsters via telepathy or extended
-            monster detection overrides vision considerations because
-            hero also senses self in this situation */
-         (Unblind_telepat || (Blind_telepat && Blind) || Detect_monsters))) {
+        && ((!Blind         /* see anything */
+             && !u.uswallow /* see surroundings */
+             && !Invisible) /* see self */
+            /* actively sensing nearby monsters via telepathy or extended
+               monster detection overrides vision considerations because
+               hero also senses self in this situation */
+            || (Unblind_telepat
+                || (Blind_telepat && Blind)
+                || Detect_monsters))) {
         makeknown(obj->otyp);
 
         You_feel("that monsters%s have difficulty pinpointing your location.",
@@ -1180,9 +1185,11 @@ struct obj *obj; /* if null, do all worn items; otherwise just obj itself */
     initial_don = FALSE;
 }
 
-/* check whether the target object is currently being put on (or taken off) */
-boolean donning(otmp) /* also checks for doffing */
-register struct obj *otmp;
+/* check whether the target object is currently being put on (or taken off--
+   also checks for doffing) */
+boolean
+donning(otmp)
+struct obj *otmp;
 {
     /* long what = (occupation == take_off) ? context.takeoff.what : 0L; */
     long what = context.takeoff.what; /* if nonzero, occupation is implied */
@@ -1302,37 +1309,103 @@ struct obj *stolenobj; /* no message if stolenobj is already being doffing */
     return result;
 }
 
-static NEARDATA const char clothes[] = { ARMOR_CLASS, 0 };
-static NEARDATA const char accessories[] = { RING_CLASS, AMULET_CLASS,
-                                             TOOL_CLASS, FOOD_CLASS, 0 };
+/* both 'clothes' and 'accessories' now include both armor and accessories;
+   TOOL_CLASS is for eyewear, FOOD_CLASS is for MEAT_RING */
+static NEARDATA const char clothes[] = {
+    ARMOR_CLASS, RING_CLASS, AMULET_CLASS, TOOL_CLASS, FOOD_CLASS, 0
+};
+static NEARDATA const char accessories[] = {
+    RING_CLASS, AMULET_CLASS, TOOL_CLASS, FOOD_CLASS, ARMOR_CLASS, 0
+};
+STATIC_VAR NEARDATA int Narmorpieces, Naccessories;
+
+/* assign values to Narmorpieces and Naccessories */
+STATIC_OVL void
+count_worn_stuff(which, accessorizing)
+struct obj **which; /* caller wants this when count is 1 */
+boolean accessorizing;
+{
+    struct obj *otmp;
+
+    Narmorpieces = Naccessories = 0;
+
+#define MOREWORN(x,wtyp) do { if (x) { wtyp++; otmp = x; } } while (0)
+    otmp = 0;
+    MOREWORN(uarmh, Narmorpieces);
+    MOREWORN(uarms, Narmorpieces);
+    MOREWORN(uarmg, Narmorpieces);
+    MOREWORN(uarmf, Narmorpieces);
+    /* for cloak/suit/shirt, we only count the outermost item so that it
+       can be taken off without confirmation if final count ends up as 1 */
+    if (uarmc)
+        MOREWORN(uarmc, Narmorpieces);
+    else if (uarm)
+        MOREWORN(uarm, Narmorpieces);
+    else if (uarmu)
+        MOREWORN(uarmu, Narmorpieces);
+    if (!accessorizing)
+        *which = otmp; /* default item iff Narmorpieces is 1 */
+
+    otmp = 0;
+    MOREWORN(uleft, Naccessories);
+    MOREWORN(uright, Naccessories);
+    MOREWORN(uamul, Naccessories);
+    MOREWORN(ublindf, Naccessories);
+    if (accessorizing)
+        *which = otmp; /* default item iff Naccessories is 1 */
+#undef MOREWORN
+}
+
+/* take off one piece or armor or one accessory;
+   shared by dotakeoff('T') and doremring('R') */
+STATIC_OVL int
+armor_or_accessory_off(obj)
+struct obj *obj;
+{
+    if (!(obj->owornmask & (W_ARMOR | W_ACCESSORY))) {
+        You("are not wearing that.");
+        return 0;
+    }
+
+    reset_remarm(); /* clear context.takeoff.mask and context.takeoff.what */
+    (void) select_off(obj);
+    if (!context.takeoff.mask)
+        return 0;
+    /* none of armoroff()/Ring_/Amulet/Blindf_off() use context.takeoff.mask */
+    reset_remarm();
+
+    if (obj->owornmask & W_ARMOR) {
+        (void) armoroff(obj);
+    } else if (obj == uright || obj == uleft) {
+        /* Sometimes we want to give the off_msg before removing and
+         * sometimes after; for instance, "you were wearing a moonstone
+         * ring (on right hand)" is desired but "you were wearing a
+         * square amulet (being worn)" is not because of the redundant
+         * "being worn".
+         */
+        off_msg(obj);
+        Ring_off(obj);
+    } else if (obj == uamul) {
+        Amulet_off();
+        off_msg(obj);
+    } else if (obj == ublindf) {
+        Blindf_off(obj); /* does its own off_msg */
+    } else {
+        impossible("removing strange accessory?");
+        if (obj->owornmask)
+            remove_worn_item(obj, FALSE);
+    }
+    return 1;
+}
 
 /* the 'T' command */
 int
 dotakeoff()
 {
-    register struct obj *otmp = (struct obj *) 0;
-    int armorpieces = 0;
+    struct obj *otmp = (struct obj *) 0;
 
-#define MOREARM(x)     \
-    if (x) {           \
-        armorpieces++; \
-        otmp = x;      \
-    }
-    MOREARM(uarmh);
-    MOREARM(uarms);
-    MOREARM(uarmg);
-    MOREARM(uarmf);
-    if (uarmc) {
-        armorpieces++;
-        otmp = uarmc;
-    } else if (uarm) {
-        armorpieces++;
-        otmp = uarm;
-    } else if (uarmu) {
-        armorpieces++;
-        otmp = uarmu;
-    }
-    if (!armorpieces) {
+    count_worn_stuff(&otmp, FALSE);
+    if (!Narmorpieces && !Naccessories) {
         /* assert( GRAY_DRAGON_SCALES > YELLOW_DRAGON_SCALE_MAIL ); */
         if (uskin)
             pline_The("%s merged with your skin!",
@@ -1340,23 +1413,15 @@ dotakeoff()
                           ? "dragon scales are"
                           : "dragon scale mail is");
         else
-            pline("Not wearing any armor.%s",
-                  (iflags.cmdassist && (uleft || uright || uamul || ublindf))
-                      ? "  Use 'R' command to remove accessories."
-                      : "");
+            pline("Not wearing any armor or accessories.");
         return 0;
     }
-    if (armorpieces > 1 || ParanoidRemove)
+    if (Narmorpieces != 1 || ParanoidRemove)
         otmp = getobj(clothes, "take off");
     if (!otmp)
         return 0;
-    if (!(otmp->owornmask & W_ARMOR)) {
-        You("are not wearing that.");
-        return 0;
-    }
-    /* note: the `uskin' case shouldn't be able to happen here; dragons
-       can't wear any armor so will end up with `armorpieces == 0' above */
-    if (otmp == uskin || ((otmp == uarm) && uarmc)
+    if (otmp == uskin
+        || ((otmp == uarm) && uarmc)
         || ((otmp == uarmu) && (uarmc || uarm))) {
         char why[BUFSZ], what[BUFSZ];
 
@@ -1375,74 +1440,26 @@ dotakeoff()
         return 0;
     }
 
-    reset_remarm(); /* clear context.takeoff.mask and context.takeoff.what */
-    (void) select_off(otmp);
-    if (!context.takeoff.mask)
-        return 0;
-    reset_remarm(); /* armoroff() doesn't use context.takeoff.mask */
-
-    (void) armoroff(otmp);
-    return (1);
+    return armor_or_accessory_off(otmp);
 }
 
 /* the 'R' command */
 int
 doremring()
 {
-    register struct obj *otmp = 0;
-    int Accessories = 0;
+    struct obj *otmp = 0;
 
-#define MOREACC(x)     \
-    if (x) {           \
-        Accessories++; \
-        otmp = x;      \
+    count_worn_stuff(&otmp, TRUE);
+    if (!Naccessories && !Narmorpieces) {
+        pline("Not wearing any accessories or armor.");
+        return 0;
     }
-    MOREACC(uleft);
-    MOREACC(uright);
-    MOREACC(uamul);
-    MOREACC(ublindf);
-
-    if (!Accessories) {
-        pline("Not wearing any accessories.%s",
-              (iflags.cmdassist && (uarm || uarmc || uarmu || uarms || uarmh
-                                    || uarmg || uarmf))
-                  ? "  Use 'T' command to take off armor."
-                  : "");
-        return (0);
-    }
-    if (Accessories > 1 || ParanoidRemove)
+    if (Naccessories != 1 || ParanoidRemove)
         otmp = getobj(accessories, "remove");
     if (!otmp)
         return 0;
-    if (!(otmp->owornmask & W_ACCESSORY)) {
-        You("are not wearing that.");
-        return 0;
-    }
 
-    reset_remarm(); /* clear context.takeoff.mask and context.takeoff.what */
-    (void) select_off(otmp);
-    if (!context.takeoff.mask)
-        return 0;
-    reset_remarm(); /* not used by Ring_/Amulet_/Blindf_off() */
-
-    if (otmp == uright || otmp == uleft) {
-        /* Sometimes we want to give the off_msg before removing and
-         * sometimes after; for instance, "you were wearing a moonstone
-         * ring (on right hand)" is desired but "you were wearing a
-         * square amulet (being worn)" is not because of the redundant
-         * "being worn".
-         */
-        off_msg(otmp);
-        Ring_off(otmp);
-    } else if (otmp == uamul) {
-        Amulet_off();
-        off_msg(otmp);
-    } else if (otmp == ublindf) {
-        Blindf_off(otmp); /* does its own off_msg */
-    } else {
-        impossible("removing strange accessory?");
-    }
-    return (1);
+    return armor_or_accessory_off(otmp);
 }
 
 /* Check if something worn is cursed _and_ unremovable. */
@@ -1457,9 +1474,9 @@ register struct obj *otmp;
 
         You("can't.  %s cursed.", use_plural ? "They are" : "It is");
         otmp->bknown = TRUE;
-        return (1);
+        return 1;
     }
-    return (0);
+    return 0;
 }
 
 int
@@ -1516,7 +1533,7 @@ register struct obj *otmp;
         off_msg(otmp);
     }
     context.takeoff.mask = context.takeoff.what = 0L;
-    return (1);
+    return 1;
 }
 
 STATIC_OVL void
@@ -1549,12 +1566,16 @@ boolean noisy;
     int err = 0;
     const char *which;
 
-    which = is_cloak(otmp) ? c_cloak : is_shirt(otmp)
-                                           ? c_shirt
-                                           : is_suit(otmp) ? c_suit : 0;
-    if (which && cantweararm(youmonst.data) &&
+    which = is_cloak(otmp)
+                ? c_cloak
+                : is_shirt(otmp)
+                    ? c_shirt
+                    : is_suit(otmp)
+                        ? c_suit
+                        : 0;
+    if (which && cantweararm(youmonst.data)
         /* same exception for cloaks as used in m_dowear() */
-        (which != c_cloak || youmonst.data->msize != MZ_SMALL)
+        && (which != c_cloak || youmonst.data->msize != MZ_SMALL)
         && (racial_exception(&youmonst, otmp) < 1)) {
         if (noisy)
             pline_The("%s will not fit on your body.", which);
@@ -1703,202 +1724,226 @@ boolean noisy;
     return !err;
 }
 
+STATIC_OVL int
+accessory_or_armor_on(obj)
+struct obj *obj;
+{
+    long mask = 0L;
+    boolean armor, ring, eyewear;
+
+    if (obj->owornmask & (W_ACCESSORY | W_ARMOR)) {
+        already_wearing(c_that_);
+        return 0;
+    }
+    armor = (obj->oclass == ARMOR_CLASS);
+    ring = (obj->oclass == RING_CLASS || obj->otyp == MEAT_RING);
+    eyewear = (obj->otyp == BLINDFOLD || obj->otyp == TOWEL
+               || obj->otyp == LENSES);
+    /* checks which are performed prior to actually touching the item */
+    if (armor) {
+        if (!canwearobj(obj, &mask, TRUE))
+            return 0;
+
+        if (obj->otyp == HELM_OF_OPPOSITE_ALIGNMENT
+            && qstart_level.dnum == u.uz.dnum) { /* in quest */
+            if (u.ualignbase[A_CURRENT] == u.ualignbase[A_ORIGINAL])
+                You("narrowly avoid losing all chance at your goal.");
+            else /* converted */
+                You("are suddenly overcome with shame and change your mind.");
+            u.ublessed = 0; /* lose your god's protection */
+            makeknown(obj->otyp);
+            context.botl = 1; /*for AC after zeroing u.ublessed */
+            return 1;
+        }
+    } else {
+        /* accessory */
+        if (ring) {
+            char answer, qbuf[QBUFSZ];
+            int res = 0;
+
+            if (nolimbs(youmonst.data)) {
+                You("cannot make the ring stick to your body.");
+                return 0;
+            }
+            if (uleft && uright) {
+                There("are no more %s%s to fill.",
+                      humanoid(youmonst.data) ? "ring-" : "",
+                      makeplural(body_part(FINGER)));
+                return 0;
+            }
+            if (uleft) {
+                mask = RIGHT_RING;
+            } else if (uright) {
+                mask = LEFT_RING;
+            } else {
+                do {
+                    Sprintf(qbuf, "Which %s%s, Right or Left?",
+                            humanoid(youmonst.data) ? "ring-" : "",
+                            body_part(FINGER));
+                    answer = yn_function(qbuf, "rl", '\0');
+                    switch (answer) {
+                    case '\0':
+                        return 0;
+                    case 'l':
+                    case 'L':
+                        mask = LEFT_RING;
+                        break;
+                    case 'r':
+                    case 'R':
+                        mask = RIGHT_RING;
+                        break;
+                    }
+                } while (!mask);
+            }
+            if (uarmg && uarmg->cursed) {
+                res = !uarmg->bknown;
+                uarmg->bknown = 1;
+                You("cannot remove your gloves to put on the ring.");
+                return res; /* uses move iff we learned gloves are cursed */
+            }
+            if (uwep) {
+                res = !uwep->bknown; /* check this before calling welded() */
+                if ((mask == RIGHT_RING || bimanual(uwep)) && welded(uwep)) {
+                    const char *hand = body_part(HAND);
+
+                    /* welded will set bknown */
+                    if (bimanual(uwep))
+                        hand = makeplural(hand);
+                    You("cannot free your weapon %s to put on the ring.",
+                        hand);
+                    return res; /* uses move iff we learned weapon is cursed */
+                }
+            }
+        } else if (obj->oclass == AMULET_CLASS) {
+            if (uamul) {
+                already_wearing("an amulet");
+                return 0;
+            }
+        } else if (eyewear) {
+            if (ublindf) {
+                if (ublindf->otyp == TOWEL)
+                    Your("%s is already covered by a towel.",
+                         body_part(FACE));
+                else if (ublindf->otyp == BLINDFOLD) {
+                    if (obj->otyp == LENSES)
+                        already_wearing2("lenses", "a blindfold");
+                    else
+                        already_wearing("a blindfold");
+                } else if (ublindf->otyp == LENSES) {
+                    if (obj->otyp == BLINDFOLD)
+                        already_wearing2("a blindfold", "some lenses");
+                    else
+                        already_wearing("some lenses");
+                } else {
+                    already_wearing(something); /* ??? */
+                }
+                return 0;
+            }
+        } else {
+            /* neither armor nor accessory */
+            You_cant("wear that!");
+            return 0;
+        }
+    }
+
+    if (!retouch_object(&obj, FALSE))
+        return 1; /* costs a turn even though it didn't get worn */
+
+    if (armor) {
+        int delay;
+
+        obj->known = 1; /* since AC is shown on the status line */
+        /* if the armor is wielded, release it for wearing */
+        if (obj->owornmask & W_WEAPON)
+            remove_worn_item(obj, FALSE);
+        setworn(obj, mask);
+        delay = -objects[obj->otyp].oc_delay;
+        if (delay) {
+            nomul(delay);
+            multi_reason = "dressing up";
+            if (is_boots(obj))
+                afternmv = Boots_on;
+            if (is_helmet(obj))
+                afternmv = Helmet_on;
+            if (is_gloves(obj))
+                afternmv = Gloves_on;
+            if (obj == uarm)
+                afternmv = Armor_on;
+            nomovemsg = "You finish your dressing maneuver.";
+        } else {
+            if (is_cloak(obj))
+                (void) Cloak_on();
+            if (is_shield(obj))
+                (void) Shield_on();
+            if (is_shirt(obj))
+                (void) Shirt_on();
+            on_msg(obj);
+        }
+        context.takeoff.mask = context.takeoff.what = 0L;
+    } else { /* not armor */
+        boolean give_feedback = FALSE;
+
+        /* [releasing wielded accessory handled in Xxx_on()] */
+        if (ring) {
+            setworn(obj, mask);
+            Ring_on(obj);
+            give_feedback = TRUE;
+        } else if (obj->oclass == AMULET_CLASS) {
+            setworn(obj, W_AMUL);
+            Amulet_on();
+            /* no feedback here if amulet of change got used up */
+            give_feedback = (uamul != 0);
+        } else if (eyewear) {
+            /* setworn() handled by Blindf_on() */
+            Blindf_on(obj);
+            /* message handled by Blindf_on(); leave give_feedback False */
+        }
+        /* feedback for ring or for amulet other than 'change' */
+        if (give_feedback && is_worn(obj))
+            prinv((char *) 0, obj, 0L);
+    }
+    return 1;
+}
+
 /* the 'W' command */
 int
 dowear()
 {
     struct obj *otmp;
-    int delay;
-    long mask = 0;
 
-    /* cantweararm checks for suits of armor */
-    /* verysmall or nohands checks for shields, gloves, etc... */
+    /* cantweararm() checks for suits of armor, not what we want here;
+       verysmall() or nohands() checks for shields, gloves, etc... */
     if ((verysmall(youmonst.data) || nohands(youmonst.data))) {
         pline("Don't even bother.");
-        return (0);
+        return 0;
     }
-
+    if (uarm && uarmu && uarmc && uarmh && uarms && uarmg && uarmf
+        && uleft && uright && uamul && ublindf) {
+        /* 'W' message doesn't mention accessories */
+        You("are already wearing a full complement of armor.");
+        return 0;
+    }
     otmp = getobj(clothes, "wear");
-    if (!otmp)
-        return (0);
-
-    if (!canwearobj(otmp, &mask, TRUE))
-        return (0);
-
-    if (!retouch_object(&otmp, FALSE))
-        return 1; /* costs a turn even though it didn't get worn */
-
-    if (otmp->otyp == HELM_OF_OPPOSITE_ALIGNMENT
-        && qstart_level.dnum == u.uz.dnum) { /* in quest */
-        if (u.ualignbase[A_CURRENT] == u.ualignbase[A_ORIGINAL])
-            You("narrowly avoid losing all chance at your goal.");
-        else /* converted */
-            You("are suddenly overcome with shame and change your mind.");
-        u.ublessed = 0; /* lose your god's protection */
-        makeknown(otmp->otyp);
-        context.botl = 1;
-        return 1;
-    }
-
-    otmp->known = 1; /* since AC is shown on the status line */
-    /* if the armor is wielded, release it for wearing */
-    if (otmp->owornmask & W_WEAPON)
-        remove_worn_item(otmp, FALSE);
-    setworn(otmp, mask);
-    delay = -objects[otmp->otyp].oc_delay;
-    if (delay) {
-        nomul(delay);
-        multi_reason = "dressing up";
-        if (is_boots(otmp))
-            afternmv = Boots_on;
-        if (is_helmet(otmp))
-            afternmv = Helmet_on;
-        if (is_gloves(otmp))
-            afternmv = Gloves_on;
-        if (otmp == uarm)
-            afternmv = Armor_on;
-        nomovemsg = "You finish your dressing maneuver.";
-    } else {
-        if (is_cloak(otmp))
-            (void) Cloak_on();
-        if (is_shield(otmp))
-            (void) Shield_on();
-        if (is_shirt(otmp))
-            (void) Shirt_on();
-        on_msg(otmp);
-    }
-    context.takeoff.mask = context.takeoff.what = 0L;
-    return (1);
+    return otmp ? accessory_or_armor_on(otmp) : 0;
 }
 
+/* the 'P' command */
 int
 doputon()
 {
     struct obj *otmp;
-    long mask = 0L;
 
-    if (uleft && uright && uamul && ublindf) {
+    if (uleft && uright && uamul && ublindf
+        && uarm && uarmu && uarmc && uarmh && uarms && uarmg && uarmf) {
+        /* 'P' message doesn't mention armor */
         Your("%s%s are full, and you're already wearing an amulet and %s.",
              humanoid(youmonst.data) ? "ring-" : "",
              makeplural(body_part(FINGER)),
              (ublindf->otyp == LENSES) ? "some lenses" : "a blindfold");
-        return (0);
+        return 0;
     }
     otmp = getobj(accessories, "put on");
-    if (!otmp)
-        return (0);
-    if (otmp->owornmask & W_ACCESSORY) {
-        already_wearing(c_that_);
-        return (0);
-    }
-    if (welded(otmp)) {
-        weldmsg(otmp);
-        return (0);
-    }
-#if 0 /* defer til Xxx_on(); various failures below now leave item wielded */
-    /* accessory might be wielded; release it for wearing */
-    if (otmp->owornmask & W_WEAPON)
-        remove_worn_item(otmp, FALSE);
-#endif
-
-    if (otmp->oclass == RING_CLASS || otmp->otyp == MEAT_RING) {
-        if (nolimbs(youmonst.data)) {
-            You("cannot make the ring stick to your body.");
-            return (0);
-        }
-        if (uleft && uright) {
-            There("are no more %s%s to fill.",
-                  humanoid(youmonst.data) ? "ring-" : "",
-                  makeplural(body_part(FINGER)));
-            return (0);
-        }
-        if (uleft)
-            mask = RIGHT_RING;
-        else if (uright)
-            mask = LEFT_RING;
-        else
-            do {
-                char qbuf[QBUFSZ];
-                char answer;
-
-                Sprintf(qbuf, "Which %s%s, Right or Left?",
-                        humanoid(youmonst.data) ? "ring-" : "",
-                        body_part(FINGER));
-                if (!(answer = yn_function(qbuf, "rl", '\0')))
-                    return (0);
-                switch (answer) {
-                case 'l':
-                case 'L':
-                    mask = LEFT_RING;
-                    break;
-                case 'r':
-                case 'R':
-                    mask = RIGHT_RING;
-                    break;
-                }
-            } while (!mask);
-        if (uarmg && uarmg->cursed) {
-            uarmg->bknown = TRUE;
-            You("cannot remove your gloves to put on the ring.");
-            return (0);
-        }
-        if (welded(uwep) && bimanual(uwep)) {
-            /* welded will set bknown */
-            You("cannot free your weapon hands to put on the ring.");
-            return (0);
-        }
-        if (welded(uwep) && mask == RIGHT_RING) {
-            /* welded will set bknown */
-            You("cannot free your weapon hand to put on the ring.");
-            return (0);
-        }
-        if (!retouch_object(&otmp, FALSE))
-            return 1; /* costs a turn even though it didn't get worn */
-        setworn(otmp, mask);
-        Ring_on(otmp);
-    } else if (otmp->oclass == AMULET_CLASS) {
-        if (uamul) {
-            already_wearing("an amulet");
-            return (0);
-        }
-        if (!retouch_object(&otmp, FALSE))
-            return 1;
-        setworn(otmp, W_AMUL);
-        Amulet_on();
-        /* finished now if an amulet of change got used up */
-        if (!uamul)
-            return 1;
-    } else { /* it's a blindfold, towel, or lenses */
-        if (ublindf) {
-            if (ublindf->otyp == TOWEL)
-                Your("%s is already covered by a towel.", body_part(FACE));
-            else if (ublindf->otyp == BLINDFOLD) {
-                if (otmp->otyp == LENSES)
-                    already_wearing2("lenses", "a blindfold");
-                else
-                    already_wearing("a blindfold");
-            } else if (ublindf->otyp == LENSES) {
-                if (otmp->otyp == BLINDFOLD)
-                    already_wearing2("a blindfold", "some lenses");
-                else
-                    already_wearing("some lenses");
-            } else
-                already_wearing(something); /* ??? */
-            return (0);
-        }
-        if (otmp->otyp != BLINDFOLD && otmp->otyp != TOWEL
-            && otmp->otyp != LENSES) {
-            You_cant("wear that!");
-            return (0);
-        }
-        if (!retouch_object(&otmp, FALSE))
-            return 1;
-        Blindf_on(otmp);
-        return (1);
-    }
-    if (is_worn(otmp))
-        prinv((char *) 0, otmp, 0L);
-    return (1);
+    return otmp ? accessory_or_armor_on(otmp) : 0;
 }
 
 void
@@ -2046,7 +2091,7 @@ struct monst *victim;
     otmp = (victim == &youmonst) ? uarms : which_armor(victim, W_ARMS);
     if (otmp && (!otmph || !rn2(4)))
         otmph = otmp;
-    return (otmph);
+    return otmph;
 }
 
 /* used for praying to check and fix levitation trouble */
@@ -2206,7 +2251,7 @@ register struct obj *otmp;
     else
         impossible("select_off: %s???", doname(otmp));
 
-    return (0);
+    return 0;
 }
 
 STATIC_OVL struct obj *
@@ -2275,7 +2320,7 @@ do_takeoff()
         impossible("do_takeoff: taking off %lx", doff->what);
     }
 
-    return (otmp);
+    return otmp;
 }
 
 /* occupation callback for 'A' */
@@ -2290,7 +2335,7 @@ take_off(VOID_ARGS)
     if (doff->what) {
         if (doff->delay > 0) {
             doff->delay--;
-            return (1); /* still busy */
+            return 1; /* still busy */
         } else {
             if ((otmp = do_takeoff()))
                 off_msg(otmp);
@@ -2366,7 +2411,7 @@ take_off(VOID_ARGS)
         doff->delay--;
 
     set_occupation(take_off, doff->disrobing, 0);
-    return (1); /* get busy */
+    return 1; /* get busy */
 }
 
 /* clear saved context to avoid inappropriate resumption of interrupted 'A' */
@@ -2521,7 +2566,7 @@ register struct obj *atmp;
 
 #undef DESTROY_ARM
     stop_occupation();
-    return (1);
+    return 1;
 }
 
 void
