@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: master $:$NHDT-Revision: 1.180 $ $NHDT-Date: 1438652308 2015/08/04 01:38:28 $
+.\" $NHDT-Branch: master $:$NHDT-Revision: 1.181 $ $NHDT-Date: 1438735256 2015/08/05 00:40:56 $
 .ds h0 "NetHack Guidebook
 .ds h1
 .ds h2 %
@@ -58,16 +58,16 @@ A Guide to the Mazes of Menace
 .au
 Original version - Eric S. Raymond
 (Edited and expanded for 3.6 by Mike Stephenson and others)
-.hn 1
+.hu
 Preface - Version 3.6
-\fBThis version of the game is special in a particular way.  Near the end of 
-the development of 3.6, one of the significant inspirations for many of the 
-humorous and fun features found in the game, author \fBTerry Pratchett\fP, 
-passed away.  We have dedicated this version of the game in his memory.
 .pg
+This version of the game is special in a particular way.  Near the end of
+the development of 3.6, one of the significant inspirations for many of the 
+humorous and fun features found in the game, author \fITerry Pratchett\fP,
+passed away.  We have dedicated this version of the game in his memory.
 .hn 1
 Introduction
-
+.pg
 Recently, you have begun to find yourself unfulfilled and distant 
 in your daily occupation.  Strange dreams of prospecting, stealing, 
 crusading, and combat have haunted you in your sleep for many months, 
