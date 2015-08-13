@@ -1,29 +1,34 @@
 #
-# NetHack 3.6  linux $NHDT-Date: 1432512814 2015/05/25 00:13:34 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $
+# NetHack 3.5  linux $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+# NetHack 3.5  linux $Date: 2010/01/15 19:54:37 $  $Revision: 1.8 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details. 
 #
 #-PRE
 # Linux hints file
-# This hints file provides a single-user tty build for Linux, specifically
+# This hints file provides a chrooted build for Linux, specifically
 # for Ubuntu dapper.
+# Does not copy required libraries or termcap files into the chroot.
 
+COMPILEREVISION?=1
 
-#PREFIX=/usr
+# this is the chroot dir
 PREFIX=$(wildcard ~)/nh/install
-HACKDIR=$(PREFIX)/games/lib/$(GAME)dir
-SHELLDIR = $(PREFIX)/games
-INSTDIR=$(HACKDIR)
-VARDIR = $(HACKDIR)
 
+# this is the dir where NetHack is inside the chroot
+HACKDIR=/nh.$(shell date +%Y%m%d)-$(COMPILEREVISION)
+INSTDIR=$(PREFIX)$(HACKDIR)
+SHELLDIR=$(PREFIX)/games
+VARDIR=$(INSTDIR)/var
 
 
 POSTINSTALL=cp -n sys/unix/sysconf $(INSTDIR)/sysconf; $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf; chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
 
-CFLAGS=-g -O -I../include -DNOTPARMDECL $(CFLAGS1) -DDLB
 CFLAGS1=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
+CFLAGS=-g -O -I../include -DNOTPARMDECL $(CFLAGS1) -DDLB
 CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
 CFLAGS+=-DHACKDIR=\"$(HACKDIR)\"
+CFLAGS+=-DVAR_PLAYGROUND=\"$(HACKDIR)/var\"
 
 LINK=$(CC)
 # Only needed for GLIBC stack trace:

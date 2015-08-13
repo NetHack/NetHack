@@ -40,7 +40,7 @@ DIRPERM  = 0755
 # (if there is, you'll have to do the installation by hand or modify the
 # instructions)
 #HACKDIR  = $(PREFIX)/games/lib/$(GAME)dir
-VARDIR  = $(HACKDIR)
+#VARDIR  = $(HACKDIR)
 # Where nethack.sh in installed.  If this is not defined, the wrapper is not used.
 #SHELLDIR = $(PREFIX)/games
 
@@ -201,9 +201,9 @@ dofiles:
 		-e '}' 					\
 	  	-e '$$s/.*/nodlb/p' < dat/options` ;	\
 	$(MAKE) dofiles-$${target-nodlb}
-	(cd dat ; cp symbols $(HACKDIR) )
-	cp src/$(GAME) $(HACKDIR)
-	cp util/recover $(HACKDIR)
+	(cd dat ; cp symbols $(INSTDIR) )
+	cp src/$(GAME) $(INSTDIR)
+	cp util/recover $(INSTDIR)
 	-if test -n '$(SHELLDIR)'; then rm -f $(SHELLDIR)/$(GAME); fi
 	if test -n '$(SHELLDIR)'; then \
 		sed -e 's;/usr/games/lib/nethackdir;$(HACKDIR);' \
@@ -211,41 +211,41 @@ dofiles:
 		< sys/unix/nethack.sh \
 		> $(SHELLDIR)/$(GAME) ; fi
 # set up their permissions
-	-( cd $(HACKDIR) ; $(CHOWN) $(GAMEUID) $(GAME) recover ; \
+	-( cd $(INSTDIR) ; $(CHOWN) $(GAMEUID) $(GAME) recover ; \
 			$(CHGRP) $(GAMEGRP) $(GAME) recover )
-	chmod $(GAMEPERM) $(HACKDIR)/$(GAME)
-	chmod $(EXEPERM) $(HACKDIR)/recover
+	chmod $(GAMEPERM) $(INSTDIR)/$(GAME)
+	chmod $(EXEPERM) $(INSTDIR)/recover
 	-if test -n '$(SHELLDIR)'; then \
 		$(CHOWN) $(GAMEUID) $(SHELLDIR)/$(GAME); fi
 	if test -n '$(SHELLDIR)'; then \
 		$(CHGRP) $(GAMEGRP) $(SHELLDIR)/$(GAME); \
 		chmod $(EXEPERM) $(SHELLDIR)/$(GAME); fi
-	-( cd $(HACKDIR) ; $(CHOWN) $(GAMEUID) symbols ; \
+	-( cd $(INSTDIR) ; $(CHOWN) $(GAMEUID) symbols ; \
 			$(CHGRP) $(GAMEGRP) symbols ; \
 			chmod $(FILEPERM) symbols )
 
 dofiles-dlb: check-dlb
-	( cd dat ; cp nhdat $(DATNODLB) $(HACKDIR) )
+	( cd dat ; cp nhdat $(DATNODLB) $(INSTDIR) )
 # set up their permissions
-	-( cd $(HACKDIR) ; $(CHOWN) $(GAMEUID) nhdat $(DATNODLB) ; \
+	-( cd $(INSTDIR) ; $(CHOWN) $(GAMEUID) nhdat $(DATNODLB) ; \
 			$(CHGRP) $(GAMEGRP) nhdat $(DATNODLB) ; \
 			chmod $(FILEPERM) nhdat $(DATNODLB) )
 
 dofiles-nodlb:
 # copy over the game files
-	( cd dat ; cp $(DAT) $(HACKDIR) )
+	( cd dat ; cp $(DAT) $(INSTDIR) )
 # set up their permissions
-	-( cd $(HACKDIR) ; $(CHOWN) $(GAMEUID) $(DAT) ; \
+	-( cd $(INSTDIR) ; $(CHOWN) $(GAMEUID) $(DAT) ; \
 			$(CHGRP) $(GAMEGRP) $(DAT) ; \
 			chmod $(FILEPERM) $(DAT) )
 
 update: $(GAME) recover $(VARDAT) dungeon spec_levs
 #	(don't yank the old version out from under people who're playing it)
-	-mv $(HACKDIR)/$(GAME) $(HACKDIR)/$(GAME).old
+	-mv $(INSTDIR)/$(GAME) $(INSTDIR)/$(GAME).old
 #	quest.dat is also kept open and has the same problems over NFS
 #	(quest.dat may be inside nhdat if dlb is in use)
-	-mv $(HACKDIR)/quest.dat $(HACKDIR)/quest.dat.old
-	-mv $(HACKDIR)/nhdat $(HACKDIR)/nhdat.old
+	-mv $(INSTDIR)/quest.dat $(INSTDIR)/quest.dat.old
+	-mv $(INSTDIR)/nhdat $(INSTDIR)/nhdat.old
 # set up new versions of the game files
 	( $(MAKE) dofiles )
 # touch time-sensitive files
@@ -264,13 +264,13 @@ install: rootcheck $(GAME) recover $(VARDAT) dungeon spec_levs
 # not all mkdirs have -p; those that don't will create a -p directory
 	-if test -n '$(SHELLDIR)'; then \
 		mkdir -p $(SHELLDIR); fi
-	rm -rf $(HACKDIR) $(VARDIR)
-	-mkdir -p $(HACKDIR) $(VARDIR) $(VARDIR)/save
+	rm -rf $(INSTDIR) $(VARDIR)
+	-mkdir -p $(INSTDIR) $(VARDIR) $(VARDIR)/save
 	if test -d ./-p; then rmdir ./-p; fi
-	-$(CHOWN) $(GAMEUID) $(HACKDIR) $(VARDIR) $(VARDIR)/save
-	$(CHGRP) $(GAMEGRP) $(HACKDIR) $(VARDIR) $(VARDIR)/save
+	-$(CHOWN) $(GAMEUID) $(INSTDIR) $(VARDIR) $(VARDIR)/save
+	$(CHGRP) $(GAMEGRP) $(INSTDIR) $(VARDIR) $(VARDIR)/save
 # order counts here:
-	chmod $(DIRPERM) $(HACKDIR)
+	chmod $(DIRPERM) $(INSTDIR)
 	chmod $(VARDIRPERM) $(VARDIR) $(VARDIR)/save
 # set up the game files
 	( $(MAKE) dofiles )

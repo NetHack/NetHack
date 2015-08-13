@@ -12,6 +12,8 @@
 
 PREFIX=/usr
 HACKDIR=$(PREFIX)/games/lib/$(GAME)dir
+INSTDIR=$(HACKDIR)
+VARDIR=$(HACKDIR)
 SHELLDIR=$(PREFIX)/games
 
 CFLAGS=-O -I../include

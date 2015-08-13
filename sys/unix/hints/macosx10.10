@@ -99,7 +99,7 @@ WINOBJ += $(WINX11OBJ)
 WINLIB += $(WINX11LIB)
 LFLAGS=-L/usr/X11R6/lib
 VARDATND = x11tiles NetHack.ad pet_mark.xbm
-POSTINSTALL+= bdftopcf win/X11/nh10.bdf > $(HACKDIR)/nh10.pcf; (cd $(HACKDIR); mkfontdir);
+POSTINSTALL+= bdftopcf win/X11/nh10.bdf > $(INSTDIR)/nh10.pcf; (cd $(INSTDIR); mkfontdir);
 CFLAGS += -DX11_GRAPHICS -I/usr/X11R6/include
 endif	# WANT_WIN_X11
 
@@ -137,6 +137,8 @@ ifeq ($(GAMEUID),root)
 PREFIX:=/Library/NetHack
 SHELLDIR=/usr/local/bin
 HACKDIR=$(PREFIX)/nethackdir
+INSTDIR=$(HACKDIR)
+VARDIR=$(HACKDIR)
 CHOWN=chown
 CHGRP=chgrp
 # We run sgid so the game has access to both HACKDIR and user preferences.
@@ -145,6 +147,8 @@ else	# ! root
 PREFIX:=/Users/$(GAMEUID)
 SHELLDIR=$(PREFIX)/bin
 HACKDIR=$(PREFIX)/nethackdir
+INSTDIR=$(HACKDIR)
+VARDIR=$(HACKDIR)
 CHOWN=/usr/bin/true
 CHGRP=/usr/bin/true
 GAMEPERM = 0500
@@ -155,13 +159,15 @@ ROOTCHECK= [[ `id -u` == 0 ]] || ( echo "Must run install with sudo."; exit 1)
 # XXX it's nice we don't write over sysconf, but we've already erased it
 # make sure we have group GAMEUID and group GAMEGRP
 PREINSTALL= . sys/unix/hints/macosx.sh user2 $(GAMEUID); . sys/unix/hints/macosx.sh group2 $(GAMEGRP); mkdir $(SHELLDIR); chown $(GAMEUID) $(SHELLDIR)
-POSTINSTALL+= cp -n sys/unix/sysconf $(HACKDIR)/sysconf; $(CHOWN) $(GAMEUID) $(HACKDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(HACKDIR)/sysconf; chmod $(VARFILEPERM) $(HACKDIR)/sysconf;
+POSTINSTALL+= cp -n sys/unix/sysconf $(INSTDIR)/sysconf; $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf; chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
 CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
 else ifdef WANT_SOURCE_INSTALL
 PREFIX=$(abspath $(NHSROOT))
 # suppress nethack.sh
 #SHELLDIR=
 HACKDIR=$(PREFIX)/playground
+INSTDIR=$(HACKDIR)
+VARDIR=$(HACKDIR)
 CHOWN=/usr/bin/true
 CHGRP=/usr/bin/true
 GAMEPERM = 0700
@@ -174,6 +180,8 @@ else	# !WANT_SOURCE_INSTALL
 PREFIX:=$(wildcard ~)
 SHELLDIR=$(PREFIX)/bin
 HACKDIR=$(PREFIX)/nethackdir
+INSTDIR=$(HACKDIR)
+VARDIR=$(HACKDIR)
 CHOWN=/usr/bin/true
 CHGRP=/usr/bin/true
 GAMEPERM = 0700
@@ -183,7 +191,7 @@ ifdef WANT_WIN_X11
 # install nethack.rc as ~/.nethackrc if no ~/.nethackrc exists
 PREINSTALL= cp -n win/X11/nethack.rc ~/.nethackrc
 endif	# WANT_WIN_X11
-POSTINSTALL+= cp -n sys/unix/sysconf $(HACKDIR)/sysconf; $(CHOWN) $(GAMEUID) $(HACKDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(HACKDIR)/sysconf; chmod $(VARFILEPERM) $(HACKDIR)/sysconf;
+POSTINSTALL+= cp -n sys/unix/sysconf $(INSTDIR)/sysconf; $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf; chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
 CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
 endif	# !WANT_SOURCE_INSTALL
 
