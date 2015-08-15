@@ -1,4 +1,4 @@
-/* NetHack 3.6	artifact.c	$NHDT-Date: 1433060653 2015/05/31 08:24:13 $  $NHDT-Branch: master $:$NHDT-Revision: 1.91 $ */
+/* NetHack 3.6	artifact.c	$NHDT-Date: 1439605077 2015/08/15 02:17:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.92 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1541,8 +1541,9 @@ register struct obj *obj;
                 newlev.dlevel = dungeons[i].entry_lev;
             else
                 newlev.dlevel = dungeons[i].dunlev_ureached;
+
             if (u.uhave.amulet || In_endgame(&u.uz) || In_endgame(&newlev)
-                || newlev.dnum == u.uz.dnum) {
+                || newlev.dnum == u.uz.dnum || !next_to_u()) {
                 You_feel("very disoriented for a moment.");
             } else {
                 if (!Blind)
