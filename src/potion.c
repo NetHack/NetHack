@@ -1,4 +1,4 @@
-/* NetHack 3.6	potion.c	$NHDT-Date: 1433060654 2015/05/31 08:24:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.116 $ */
+/* NetHack 3.6	potion.c	$NHDT-Date: 1440120657 2015/08/21 01:30:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.117 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -115,7 +115,7 @@ int type;
     long old = Sick;
 
 #if 0
-	if (Unaware) talk = FALSE;
+    if (Unaware) talk = FALSE;
 #endif
 
     if (xtime > 0L) {
@@ -162,7 +162,7 @@ const char *msg;
     long old = Slimed;
 
 #if 0
-	if (Unaware) msg = 0;
+    if (Unaware) msg = 0;
 #endif
 
     if ((!xtime && old) || (xtime && !old)) {
@@ -186,7 +186,7 @@ const char *killername;
     long old = Stoned;
 
 #if 0
-	if (Unaware) msg = 0;
+    if (Unaware) msg = 0;
 #endif
 
     if ((!xtime && old) || (xtime && !old)) {
@@ -388,6 +388,34 @@ long mask; /* nonzero if resistance status should change by mask */
             pline(message, verb);
     }
     return changed;
+}
+
+void
+make_deaf(xtime, talk)
+long xtime;
+boolean talk;
+{
+    long old = HDeaf;
+    boolean toggled = FALSE;
+
+    if (Unaware)
+        talk = FALSE;
+
+    if (!xtime && old) {
+        if (talk)
+            You("can hear again.");
+        toggled = TRUE;
+    } else if (xtime && !old) {
+        if (talk)
+            You("are unable to hear anything.");
+        toggled = TRUE;
+    }
+    /* deafness isn't presently shown on status line, but
+       request a status update in case that changes someday */
+    if (toggled)
+        context.botl = TRUE;
+
+    set_itimeout(&HDeaf, xtime);
 }
 
 STATIC_OVL void

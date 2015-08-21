@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1434421365 2015/06/16 02:22:45 $  $NHDT-Branch: master $:$NHDT-Revision: 1.504 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1440120640 2015/08/21 01:30:40 $  $NHDT-Branch: master $:$NHDT-Revision: 1.506 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1795,6 +1795,7 @@ E void FDECL(make_slimed, (long, const char *));
 E void FDECL(make_stoned, (long, const char *, int, const char *));
 E void FDECL(make_vomiting, (long, BOOLEAN_P));
 E boolean FDECL(make_hallucinated, (long, BOOLEAN_P, long));
+E void FDECL(make_deaf, (long, BOOLEAN_P));
 E int NDECL(dodrink);
 E int FDECL(dopotion, (struct obj *));
 E int FDECL(peffects, (struct obj *));

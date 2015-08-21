@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1436753497 2015/07/13 02:11:37 $  $NHDT-Branch: master $:$NHDT-Revision: 1.200 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1440120650 2015/08/21 01:30:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.201 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1709,16 +1709,16 @@ void
 use_unicorn_horn(obj)
 struct obj *obj;
 {
-#define PROP_COUNT 6           /* number of properties we're dealing with */
+#define PROP_COUNT 7           /* number of properties we're dealing with */
 #define ATTR_COUNT (A_MAX * 3) /* number of attribute points we might fix */
     int idx, val, val_limit, trouble_count, unfixable_trbl, did_prop,
         did_attr;
     int trouble_list[PROP_COUNT + ATTR_COUNT];
 
     if (obj && obj->cursed) {
-        long lcount = (long) rnd(100);
+        long lcount = (long) rn1(90, 10);
 
-        switch (rn2(6)) {
+        switch (rn2(13) / 2) { /* case 6 is half as likely as the others */
         case 0:
             make_sick((Sick & TIMEOUT) ? (Sick & TIMEOUT) / 3L + 1L
                                        : (long) rn1(ACURR(A_CON), 20),
@@ -1743,6 +1743,11 @@ struct obj *obj;
             (void) make_hallucinated((HHallucination & TIMEOUT) + lcount,
                                      TRUE, 0L);
             break;
+        case 6:
+            if (Deaf) /* make_deaf() won't give feedback when already deaf */
+                pline("Nothing seems to happen.");
+            make_deaf((HDeaf & TIMEOUT) + lcount, TRUE);
+            break;
         }
         return;
     }
@@ -1754,7 +1759,7 @@ struct obj *obj;
 #define attr2trbl(Y) (Y)
 #define prop_trouble(X) trouble_list[trouble_count++] = prop2trbl(X)
 #define attr_trouble(Y) trouble_list[trouble_count++] = attr2trbl(Y)
-#define TimedTrouble(P) (((P) && !((P) & ~TIMEOUT)) ? ((P) &TIMEOUT) : 0L)
+#define TimedTrouble(P) (((P) && !((P) & ~TIMEOUT)) ? ((P) & TIMEOUT) : 0L)
 
     trouble_count = unfixable_trbl = did_prop = did_attr = 0;
 
@@ -1773,6 +1778,8 @@ struct obj *obj;
         prop_trouble(CONFUSION);
     if (TimedTrouble(HStun))
         prop_trouble(STUNNED);
+    if (TimedTrouble(HDeaf))
+        prop_trouble(DEAF);
 
     unfixable_trbl = unfixable_trouble_count(TRUE);
 
@@ -1815,10 +1822,10 @@ struct obj *obj;
     }
 
     /*
-     *		Chances for number of troubles to be fixed
-     *		 0	1      2      3      4	    5	   6	  7
-     *   blessed:  22.7%  22.7%  19.5%  15.4%  10.7%   5.7%   2.6%	 0.8%
-     *  uncursed:  35.4%  35.4%  22.9%   6.3%    0	    0	   0	  0
+     *  Chances for number of troubles to be fixed
+     *               0      1      2      3      4      5      6      7
+     *   blessed:  22.7%  22.7%  19.5%  15.4%  10.7%   5.7%   2.6%   0.8%
+     *  uncursed:  35.4%  35.4%  22.9%   6.3%    0      0      0      0
      */
     val_limit = rn2(d(2, (obj && obj->blessed) ? 4 : 2));
     if (val_limit > trouble_count)
@@ -1851,6 +1858,10 @@ struct obj *obj;
             break;
         case prop2trbl(STUNNED):
             make_stunned(0L, TRUE);
+            did_prop++;
+            break;
+        case prop2trbl(DEAF):
+            make_deaf(0L, TRUE);
             did_prop++;
             break;
         default:
@@ -1974,8 +1985,8 @@ long timeout;
             }
             break;
 #if 0
-		case OBJ_MIGRATING:
-		    break;
+        case OBJ_MIGRATING:
+            break;
 #endif
 
         default:
@@ -2503,20 +2514,19 @@ struct obj *obj;
 
     } else if (u.utrap && u.utraptype == TT_PIT) {
         /*
-         *     Assumptions:
+         * Assumptions:
          *
-         *	if you're in a pit
-         *		- you are attempting to get out of the pit
-         *		- or, if you are applying it towards a small
-         *		  monster then it is assumed that you are
-         *		  trying to hit it.
-         *	else if the monster is wielding a weapon
-         *		- you are attempting to disarm a monster
-         *	else
-         *		- you are attempting to hit the monster
+         * if you're in a pit
+         *    - you are attempting to get out of the pit
+         * or, if you are applying it towards a small monster
+         *    - then it is assumed that you are trying to hit it
+         * else if the monster is wielding a weapon
+         *    - you are attempting to disarm a monster
+         * else
+         *    - you are attempting to hit the monster.
          *
-         *	if you're confused (and thus off the mark)
-         *		- you only end up hitting.
+         * if you're confused (and thus off the mark)
+         *    - you only end up hitting.
          *
          */
         const char *wrapped_what = (char *) 0;
@@ -2599,25 +2609,25 @@ struct obj *obj;
                     stackobj(otmp);
                     break;
                 case 3:
-/* right to you */
 #if 0
-		    if (!rn2(25)) {
-			/* proficient with whip, but maybe not
-			   so proficient at catching weapons */
-			int hitu, hitvalu;
+                    /* right to you */
+                    if (!rn2(25)) {
+                        /* proficient with whip, but maybe not
+                           so proficient at catching weapons */
+                        int hitu, hitvalu;
 
-			hitvalu = 8 + otmp->spe;
-			hitu = thitu(hitvalu,
-				     dmgval(otmp, &youmonst),
-				     otmp, (char *)0);
-			if (hitu) {
-			    pline_The("%s hits you as you try to snatch it!",
-				the(onambuf));
-			}
-			place_object(otmp, u.ux, u.uy);
-			stackobj(otmp);
-			break;
-		    }
+                        hitvalu = 8 + otmp->spe;
+                        hitu = thitu(hitvalu,
+                                     dmgval(otmp, &youmonst),
+                                     otmp, (char *)0);
+                        if (hitu) {
+                            pline_The("%s hits you as you try to snatch it!",
+                                      the(onambuf));
+                        }
+                        place_object(otmp, u.ux, u.uy);
+                        stackobj(otmp);
+                        break;
+                    }
 #endif /* 0 */
                     /* right into your inventory */
                     You("snatch %s!", yname(otmp));
@@ -2754,20 +2764,20 @@ struct obj *obj;
     /* assert(obj == uwep); */
 
     /*
-* Calculate allowable range (pole's reach is always 2 steps):
-*	unskilled and basic: orthogonal direction, 4..4;
-*	skilled: as basic, plus knight's jump position, 4..5;
-*	expert: as skilled, plus diagonal, 4..8.
-*		...9...
-*		.85458.
-*		.52125.
-*		9410149
-*		.52125.
-*		.85458.
-*		...9...
-*	(Note: no roles in nethack can become expert or better
-*	for polearm skill; Yeoman in slash'em can become expert.)
-*/
+     * Calculate allowable range (pole's reach is always 2 steps):
+     *  unskilled and basic: orthogonal direction, 4..4;
+     *  skilled: as basic, plus knight's jump position, 4..5;
+     *  expert: as skilled, plus diagonal, 4..8.
+     *      ...9...
+     *      .85458.
+     *      .52125.
+     *      9410149
+     *      .52125.
+     *      .85458.
+     *      ...9...
+     *  (Note: no roles in nethack can become expert or better
+     *  for polearm skill; Yeoman in slash'em can become expert.)
+     */
     min_range = 4;
     typ = uwep_skill_type();
     if (typ == P_NONE || P_SKILL(typ) <= P_BASIC)
@@ -3400,9 +3410,9 @@ doapply()
         use_whistle(obj);
         break;
     case EUCALYPTUS_LEAF:
-        /* MRKR: Every Australian knows that a gum leaf makes an */
-        /*	 excellent whistle, especially if your pet is a  */
-        /*	 tame kangaroo named Skippy.			 */
+        /* MRKR: Every Australian knows that a gum leaf makes an excellent
+         * whistle, especially if your pet is a tame kangaroo named Skippy.
+         */
         if (obj->blessed) {
             use_magic_whistle(obj);
             /* sometimes the blessing will be worn off */
@@ -3535,8 +3545,7 @@ boolean is_horn;
         unfixable_trbl++;
     if (Slimed)
         unfixable_trbl++;
-    /* lycanthropy is not desirable, but it doesn't actually make you feel
-       bad */
+    /* lycanthropy is undesirable, but it doesn't actually make you feel bad */
 
     if (!is_horn || (Confusion & ~TIMEOUT))
         unfixable_trbl++;
@@ -3547,6 +3556,8 @@ boolean is_horn;
     if (!is_horn || (Vomiting & ~TIMEOUT))
         unfixable_trbl++;
     if (!is_horn || (HStun & ~TIMEOUT))
+        unfixable_trbl++;
+    if (!is_horn || (HDeaf & ~TIMEOUT))
         unfixable_trbl++;
 
     return unfixable_trbl;

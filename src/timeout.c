@@ -1,4 +1,4 @@
-/* NetHack 3.6	timeout.c	$NHDT-Date: 1432512765 2015/05/25 00:12:45 $  $NHDT-Branch: master $:$NHDT-Revision: 1.59 $ */
+/* NetHack 3.6	timeout.c	$NHDT-Date: 1440120659 2015/08/21 01:30:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.60 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -343,10 +343,10 @@ nh_timeout()
                     stop_occupation();
                 break;
             case DEAF:
-                if (!Deaf) {
-                    You("can hear again.");
+                set_itimeout(&HDeaf, 1L);
+                make_deaf(0L, TRUE);
+                if (!Deaf)
                     stop_occupation();
-                }
                 break;
             case INVIS:
                 newsym(u.ux, u.uy);

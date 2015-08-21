@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1432512769 2015/05/25 00:12:49 $  $NHDT-Branch: master $:$NHDT-Revision: 1.143 $ */
+/* NetHack 3.6	eat.c	$NHDT-Date: 1440120655 2015/08/21 01:30:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.144 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1460,11 +1460,13 @@ register struct obj *otmp;
     return;
 }
 
-int Hear_again(VOID_ARGS) /* called when waking up after fainting */
+/* called when waking up after fainting */
+int
+Hear_again(VOID_ARGS)
 {
     /* Chance of deafness going away while fainted/sleepeing/etc. */
     if (!rn2(2))
-        set_itimeout(&HDeaf, 0L);
+        make_deaf(0L, FALSE);
     return 0;
 }
 
