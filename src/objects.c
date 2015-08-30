@@ -851,6 +851,21 @@ SCROLL(None,                     "FOOBIE BLETCH",  1,   0, 100),
 SCROLL(None,                             "TEMOV",  1,   0, 100),
 SCROLL(None,                        "GARVEN DEH",  1,   0, 100),
 SCROLL(None,                           "READ ME",  1,   0, 100),
+SCROLL(None,                     "ETAOIN SHRDLU",  1,   0, 100),
+SCROLL(None,                       "LOREM IPSUM",  1,   0, 100),
+SCROLL(None,                             "FNORD",  1,   0, 100), /* Illuminati */
+SCROLL(None,                           "KO BATE",  1,   0, 100), /* Kurd Lasswitz */
+SCROLL(None,                     "ABRA KA DABRA",  1,   0, 100), /* traditional incantation */
+SCROLL(None,                      "ASHPD SODALG",  1,   0, 100), /* Portal */
+SCROLL(None,                           "ZLORFIK",  1,   0, 100), /* Zak McKracken */
+SCROLL(None,                     "GNIK SISI VLE",  1,   0, 100), /* Zak McKracken */
+SCROLL(None,                   "HAPAX LEGOMENON",  1,   0, 100),
+SCROLL(None,                 "EIRIS SAZUN IDISI",  1,   0, 100), /* Merseburg Incantations */
+SCROLL(None,                   "PHOL ENDE WODAN",  1,   0, 100), /* Merseburg Incantations */
+SCROLL(None,                             "GHOTI",  1,   0, 100), /* pronounced as 'fish', George Bernard Shaw */
+SCROLL(None,             "MAPIRO MAHAMA DIROMAT",  1,   0, 100), /* Wizardry */
+SCROLL(None,                 "VAS CORP BET MANI",  1,   0, 100), /* Ultima */
+SCROLL(None,                           "XOR OTA",  1,   0, 100), /* Aarne Haapakoski */
 /* these must come last because they have special descriptions
  */
 #ifdef MAIL
