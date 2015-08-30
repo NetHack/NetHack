@@ -2660,7 +2660,7 @@ const char *prompt; /* prompt to for menu */
     /* Reverse the list so that items are in correct order. */
     cw->mlist = reverse(cw->mlist);
 
-    /* Put the promt at the beginning of the menu. */
+    /* Put the prompt at the beginning of the menu. */
     if (prompt) {
         anything any;
 

@@ -57,7 +57,7 @@ static BOOL can_append_text(HWND hWnd, int attr, const char *text);
 /* check if text can be appended to the last line without wrapping */
 
 static BOOL more_prompt_check(HWND hWnd);
-/* check if "--more--" promt needs to be displayed */
+/* check if "--more--" prompt needs to be displayed */
 
 #ifdef USER_SOUNDS
 extern void play_sound_for_message(const char *str);
@@ -796,7 +796,7 @@ can_append_text(HWND hWnd, int attr, const char *text)
     return retval;
 }
 
-/* check if "--more--" promt needs to be displayed
+/* check if "--more--" prompt needs to be displayed
    basically, check if the lines not seen are going to find in the message
    window
 */
