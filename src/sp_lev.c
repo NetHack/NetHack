@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1433553490 2015/06/06 01:18:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.59 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1441753941 2015/09/08 23:12:21 $  $NHDT-Branch: master $:$NHDT-Revision: 1.60 $ */
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -4015,8 +4015,8 @@ struct opvar *ov;
         my = ((y1 + y2) / 2);
     } else {
         do {
-            dx = (rand() % rough) - (rough / 2);
-            dy = (rand() % rough) - (rough / 2);
+            dx = (Rand() % rough) - (rough / 2);
+            dy = (Rand() % rough) - (rough / 2);
             mx = ((x1 + x2) / 2) + dx;
             my = ((y1 + y2) / 2) + dy;
         } while ((mx > COLNO - 1 || mx < 0 || my < 0 || my > ROWNO - 1));

@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1434425313 2015/06/16 03:28:33 $  $NHDT-Branch: master $:$NHDT-Revision: 1.182 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1441753940 2015/09/08 23:12:20 $  $NHDT-Branch: master $:$NHDT-Revision: 1.183 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2323,6 +2323,7 @@ int src;
         }
         sysopt.panictrace_gdb = n;
     } else if (src == SET_IN_SYS && match_varname(buf, "GDBPATH", 7)) {
+#ifndef VMS /* VMS panictrace support doesn't use gdb or grep */
         if (!file_exists(bufp)) {
             raw_printf("File specified in GDBPATH does not exist.");
             return 0;
@@ -2330,7 +2331,9 @@ int src;
         if (sysopt.gdbpath)
             free(sysopt.gdbpath);
         sysopt.gdbpath = dupstr(bufp);
+#endif
     } else if (src == SET_IN_SYS && match_varname(buf, "GREPPATH", 7)) {
+#ifndef VMS /* VMS panictrace support doesn't use gdb or grep */
         if (!file_exists(bufp)) {
             raw_printf("File specified in GREPPATH does not exist.");
             return 0;
@@ -2338,6 +2341,7 @@ int src;
         if (sysopt.greppath)
             free(sysopt.greppath);
         sysopt.greppath = dupstr(bufp);
+#endif /* !VMS */
 #endif /* PANICTRACE */
 #endif /* SYSCF */
     } else if (match_varname(buf, "BOULDER", 3)) {
@@ -3289,10 +3293,22 @@ int ifd, ofd;
 void
 assure_syscf_file()
 {
-    /* All we really care about is the end result - can we read the file?
-     * So just check that directly. */
     int fd;
+
+    /*
+     * All we really care about is the end result - can we read the file?
+     * So just check that directly.
+     *
+     * Not tested on most of the old platforms (which don't attempt
+     * to implement SYSCF).
+     * Some ports don't like open()'s optional third argument;
+     * VMS overrides open() usage with a macro which requires it.
+     */
+#ifndef VMS
     fd = open(SYSCF_FILE, O_RDONLY);
+#else
+    fd = open(SYSCF_FILE, O_RDONLY, 0);
+#endif
     if (fd >= 0) {
         /* readable */
         close(fd);
