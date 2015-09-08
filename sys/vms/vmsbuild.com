@@ -221,6 +221,7 @@ $begin:
 $!
 $! miscellaneous special source file setup
 $!
+$ if f$search("pmatchregex.c").eqs."" then  copy [-.sys.share]pmatchregex.c []*.*
 $ if f$search("random.c").eqs."" then  copy [-.sys.share]random.c []*.*
 $ if f$search("tclib.c") .eqs."" then  copy [-.sys.share]tclib.c  []*.*
 $ if f$search("[-.util]lev_yacc.c").eqs."" then  @[-.sys.vms]spec_lev.com
@@ -255,7 +256,7 @@ $ set default [-.src]
 $! compile most of the source files:
 $ c_list = "decl,version,[-.sys.vms]vmsmain,[-.sys.vms]vmsunix" -
 	+ ",[-.sys.vms]vmstty,[-.sys.vms]vmsmail" -
-	+ ",[]random,[]tclib"	!copied from [-.sys.share]
+	+ ",[]random,[]tclib,[]pmatchregex"	!copied from [-.sys.share]
 $ gosub compile_list
 $ c_list = "[-.win.tty]getline,[-.win.tty]termcap" -
 	+ ",[-.win.tty]topl,[-.win.tty]wintty"

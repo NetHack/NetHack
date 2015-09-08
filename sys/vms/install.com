@@ -4,6 +4,10 @@ $ ! $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
 $ !
 $ ! Use vmsbuild.com to create nethack.exe, makedefs, and lev_comp *first*.
 $ !
+$ ! Note: this command procedure is also used by the top level Makefile
+$ ! if you build and install with MMS or MMK.  In that situation, only the
+$ ! Makefile will need any editing.
+$ !
 $ ! Edit this file to define gamedir & gameuic, or else invoke it with two
 $ ! command line parameters, as in:
 $ !	@[.sys.vms]install "disk$users:[games.nethack]" "games"
@@ -21,7 +25,7 @@ $	! note: all filespecs contain some punctuation,
 $	!	to avoid inadvertent logical name interaction
 $	play_files = "PERM.,RECORD.,LOGFILE.,PANICLOG."
 $	help_files = "HELP.,HH.,CMDHELP.,WIZHELP.,OPTHELP.,HISTORY.,LICENSE."
-$	data_files = "DATA.,RUMORS.,ORACLES.,OPTIONS.,QUEST.DAT"
+$	data_files = "DATA.,RUMORS.,ORACLES.,OPTIONS.,QUEST.DAT,TRIBUTE."
 $	guidebook  = "[.doc]Guidebook.txt"
 $	invoc_proc = "[.sys.vms]nethack.com"
 $	trmcp_file = "[.sys.share]termcap"
