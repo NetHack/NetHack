@@ -559,6 +559,7 @@ newgame()
     init_artifacts(); /* before u_init() in case $WIZKIT specifies
                        * any artifacts */
     u_init();
+    objects[WAN_NOTHING].oc_dir = (ubirthday % 2L) ? NODIR : IMMEDIATE;
 
 #ifndef NO_SIGNAL
     (void) signal(SIGINT, (SIG_RET_TYPE) done1);
