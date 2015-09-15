@@ -1,4 +1,4 @@
-/* NetHack 3.6	write.c	$NHDT-Date: 1436753530 2015/07/13 02:12:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.14 $ */
+/* NetHack 3.6	write.c	$NHDT-Date: 1442276267 2015/09/15 00:17:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -124,8 +124,11 @@ register struct obj *pen;
     /* get paper to write on */
     paper = getobj(write_on, "write on");
     if (!paper)
-        return (0);
-    typeword = (paper->oclass == SPBOOK_CLASS) ? "spellbook" : "scroll";
+        return 0;
+    /* can't write on a novel (unless/until it's been converted into a blank
+       spellbook), but we want messages saying so to avoid "spellbook" */
+    typeword = (paper->otyp == SPE_NOVEL) ? "book"
+               : (paper->oclass == SPBOOK_CLASS) ? "spellbook" : "scroll";
     if (Blind) {
         if (!paper->dknown) {
             You("don't know if that %s is blank or not.", typeword);
@@ -141,7 +144,7 @@ register struct obj *pen;
     if (paper->otyp != SCR_BLANK_PAPER && paper->otyp != SPE_BLANK_PAPER) {
         pline("That %s is not blank!", typeword);
         exercise(A_WIS, FALSE);
-        return (1);
+        return 1;
     }
 
     /* what to write */
@@ -149,7 +152,7 @@ register struct obj *pen;
     getlin(qbuf, namebuf);
     (void) mungspaces(namebuf); /* remove any excess whitespace */
     if (namebuf[0] == '\033' || !namebuf[0])
-        return (1);
+        return 1;
     nm = namebuf;
     if (!strncmpi(nm, "scroll ", 7))
         nm += 7;
