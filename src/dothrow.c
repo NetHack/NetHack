@@ -547,6 +547,7 @@ int x, y;
                 s = "bumping into a door";
             dmg = rnd(2 + *range);
             losehp(Maybe_Half_Phys(dmg), s, KILLED_BY);
+            wake_nearto(x,y, 10);
             return FALSE;
         }
         if (levl[x][y].typ == IRONBARS) {
@@ -554,12 +555,14 @@ int x, y;
             dmg = rnd(2 + *range);
             losehp(Maybe_Half_Phys(dmg), "crashing into iron bars",
                    KILLED_BY);
+            wake_nearto(x,y, 20);
             return FALSE;
         }
         if ((obj = sobj_at(BOULDER, x, y)) != 0) {
             You("bump into a %s.  Ouch!", xname(obj));
             dmg = rnd(2 + *range);
             losehp(Maybe_Half_Phys(dmg), "bumping into a boulder", KILLED_BY);
+            wake_nearto(x,y, 10);
             return FALSE;
         }
         if (!may_pass) {
@@ -568,6 +571,7 @@ int x, y;
             dmg = rnd(2 + *range);
             losehp(Maybe_Half_Phys(dmg), "touching the edge of the universe",
                    KILLED_BY);
+            wake_nearto(x,y, 10);
             return FALSE;
         }
         if ((u.ux - x) && (u.uy - y) && bad_rock(youmonst.data, u.ux, y)
@@ -581,6 +585,7 @@ int x, y;
                 dmg = rnd(2 + *range);
                 losehp(Maybe_Half_Phys(dmg), "wedging into a narrow crevice",
                        KILLED_BY);
+                wake_nearto(x,y, 10);
                 return FALSE;
             }
         }
@@ -589,6 +594,7 @@ int x, y;
     if ((mon = m_at(x, y)) != 0) {
         You("bump into %s.", a_monnam(mon));
         wakeup(mon);
+        wake_nearto(x,y, 10);
         return FALSE;
     }
     if ((u.ux - x) && (u.uy - y) && bad_rock(youmonst.data, u.ux, y)

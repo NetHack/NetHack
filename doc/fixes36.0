@@ -921,6 +921,7 @@ mimics wouldn't take on the form of "strange object"
 add an option to prevent omitting the uncursed status from inventory
 show prices when walking over the shop merchandise
 you shouldn't see Sting glow light blue if you're blind
+when jumping, bumping into something is noisy
 
 
 Platform- and/or Interface-Specific Fixes
