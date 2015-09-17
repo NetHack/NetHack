@@ -866,6 +866,7 @@ SCROLL(None,                             "GHOTI",  1,   0, 100), /* pronounced a
 SCROLL(None,             "MAPIRO MAHAMA DIROMAT",  1,   0, 100), /* Wizardry */
 SCROLL(None,                 "VAS CORP BET MANI",  1,   0, 100), /* Ultima */
 SCROLL(None,                           "XOR OTA",  1,   0, 100), /* Aarne Haapakoski */
+SCROLL(None,                "STRC PRST SKRZ KRK",  1,   0, 100), /* Czech and Slovak tongue-twister */
 /* these must come last because they have special descriptions
  */
 #ifdef MAIL
