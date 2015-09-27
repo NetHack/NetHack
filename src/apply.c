@@ -3065,8 +3065,9 @@ struct obj *obj;
     char confirm[QBUFSZ], buf[BUFSZ];
     boolean is_fragile = (!strcmp(OBJ_DESCR(objects[obj->otyp]), "balsa"));
 
-    if (yn(safe_qbuf(confirm, "Are you really sure you want to break ", "?",
-                     obj, yname, ysimple_name, "the wand")) == 'n')
+    if (!paranoid_query(ParanoidBreakwand,
+                       safe_qbuf(confirm, "Are you really sure you want to break ",
+                                 "?", obj, yname, ysimple_name, "the wand")))
         return 0;
 
     if (nohands(youmonst.data)) {

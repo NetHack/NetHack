@@ -68,6 +68,7 @@ struct flag {
 #define PARANOID_HIT 0x10
 #define PARANOID_PRAY 0x20
 #define PARANOID_REMOVE 0x40
+#define PARANOID_BREAKWAND 0x80
     int pickup_burden; /* maximum burden before prompt */
     int pile_limit;    /* controls feedback when walking over objects */
     char inv_order[MAXOCLASSES];
@@ -378,6 +379,8 @@ extern NEARDATA struct instance_flags iflags;
 /* remove: remove ('R') and takeoff ('T') commands prompt for an inventory
    item even when only one accessory or piece of armor is currently worn */
 #define ParanoidRemove ((flags.paranoia_bits & PARANOID_REMOVE) != 0)
+/* breakwand: Applying a wand */
+#define ParanoidBreakwand ((flags.paranoia_bits & PARANOID_BREAKWAND) != 0)
 
 /* command parsing, mainly dealing with number_pad handling;
    not saved and restored */

@@ -2271,6 +2271,8 @@ require "yes" rather than 'y' to confirm attacking a peaceful monster;
 .PL pray
 require 'y' to confirm an attempt to pray rather
 than immediately praying; on by default;
+.PL wand
+require "yes" rather than 'y' to confirm breaking a wand;
 .PL Remove
 require selection from inventory for 'R' and 'T'
 commands even when wearing just one applicable item.
