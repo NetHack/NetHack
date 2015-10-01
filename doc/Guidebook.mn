@@ -1940,23 +1940,28 @@ Customization options
 Here are explanations of what the various options do.
 Character strings that are too long may be truncated.
 Some of the options listed may be inactive in your dungeon.
+.pg
+Some options are persistent, and are saved and reloaded along with
+the game.  Changing a persistent option in the configuration file
+applies only to new games.
 .lp acoustics
 Enable messages about what your character hears (default on).
 Note that this has nothing to do with your computer's audio capabilities.
+Persistent.
 .lp align
 Your starting alignment (align:lawful, align:neutral,
 or align:chaotic).  You may specify just the first letter.
 The default is to randomly pick an appropriate alignment.
 If you prefix a `!' or ``no'' to the value, you can 
 exclude that alignment from being picked randomly.
-Cannot be set with the `O' command.
+Cannot be set with the `O' command.  Persistent.
 .lp autodig
 Automatically dig if you are wielding a digging tool and moving into a place
-that can be dug (default false).
+that can be dug (default false). Persistent.
 .lp autoopen
-Walking into a door attempts to open it (default true).
+Walking into a door attempts to open it (default true). Persistent.
 .lp "autopickup  "
-Automatically pick up things onto which you move (default on). 
+Automatically pick up things onto which you move (default on). Persistent.
 See
 .op pickup_types
 to refine the behavior.
@@ -1970,11 +1975,11 @@ into account the blessed/cursed status, enchantment, damage, or
 quality of the weapon; you are free to manually fill your quiver or quiver sack
 or make ready
 with the `Q' command instead.  If no weapon is found or the option is
-false, the `t' (throw) command is executed instead.  (default false)
+false, the `t' (throw) command is executed instead.  Persistent. (default false)
 .lp blind
-Start the character permanently blind. (default false)
+Start the character permanently blind.  Persistent. (default false)
 .lp bones
-Allow saving and loading bones files.  (default true)
+Allow saving and loading bones files.  Persistent. (default true)
 .lp boulder
 Set the character used to display boulders (default is rock class symbol).
 .lp catname
@@ -1987,7 +1992,7 @@ of specifying your role.  Normally only the first letter of
 the value is examined; the string ``random'' is an exception.
 .lp checkpoint
 Save game state after each level change, for possible recovery after
-program crash (default on).
+program crash (default on).  Persistent.
 .lp checkspace
 Check free disk space before writing files to disk (default on).
 You may have to turn this off if you have more than 2 GB free space
@@ -2001,14 +2006,15 @@ Have the game provide some additional command assistance for
 new players if it detects some anticipated mistakes (default on).
 .lp "confirm "
 Have user confirm attacks on pets, shopkeepers, and other
-peaceable creatures (default on).
+peaceable creatures (default on).  Persistent.
 .lp dark_room
-Show out-of-sight areas of lit rooms (default off).
+Show out-of-sight areas of lit rooms (default off).  Persistent.
 .lp disclose
 Controls what information the program reveals when the game ends.
 Value is a space separated list of prompting/category pairs
 (default is `\fBni na nv ng nc no\fP',
 prompt with default response of `\fBn\fP' for each candidate).
+Persistent.
 The possibilities are:
 .sd
 .si
@@ -2062,6 +2068,7 @@ Cannot be set with the `O' command.
 .lp fixinv
 An object's inventory letter sticks to it when it's dropped (default on).
 If this is off, dropping an object shifts all the remaining inventory letters.
+Persistent.
 .lp "fruit   "
 Name a fruit after something you enjoy eating (ex. ``fruit:mango'')
 (default ``slime mold'').  Basically a nostalgic whimsy that NetHack uses
@@ -2076,13 +2083,13 @@ options, the ``gender'' option will take precedence.
 The default is to randomly pick an appropriate gender.
 If you prefix a `!' or ``no'' to the value, you can 
 exclude that gender from being picked randomly.
-Cannot be set with the `O' command.
+Cannot be set with the `O' command.  Persistent.
 .lp "help    "
 If more information is available for an object looked at
 with the `/' command, ask if you want to see it (default on). Turning help
 off makes just looking at things faster, since you aren't interrupted with the
 ``More info?'' prompt, but it also means that you might miss some
-interesting and/or important information.
+interesting and/or important information.  Persistent.
 .lp hilite_pet
 Visually distinguish pets from similar animals (default off).
 The behavior of this option depends on the type of windowing you use.
@@ -2098,19 +2105,21 @@ on the top of the pile.
 Name your starting horse (ex. ``horsename:Trigger'').
 Cannot be set with the `O' command.
 .lp ignintr
-Ignore interrupt signals, including breaks (default off).
+Ignore interrupt signals, including breaks (default off).  Persistent.
 .lp implicit_uncursed
 Omit "uncursed" from inventory lists, if possible (default on).
 .lp legacy
 Display an introductory message when starting the game (default on).
+Persistent.
 .lp lit_corridor
 Show corridor squares seen by night vision or a light source held by your
-character as lit (default off).
+character as lit (default off).  Persistent.
 .lp lootabc
 Use the old `a', `b', and `c' keyboard shortcuts when
 looting, rather than the mnemonics `o', `i', and `b' (default off).
+Persistent.
 .lp "mail    "
-Enable mail delivery during the game (default on).
+Enable mail delivery during the game (default on).  Persistent.
 .lp "male    "
 An obsolete synonym for ``gender:male''.
 Cannot be set with the `O' command.
@@ -2136,6 +2145,7 @@ object classes rather than a character prompt, and then a menu of matching
 objects for selection.
 Partial skips the object class filtering and
 immediately displays a menu of all objects.
+Persistent.
 .lp menu_deselect_all
 Menu character accelerator to deselect all items in a menu.
 Implemented by the Amiga, Gem, X11 and tty ports.
@@ -2218,9 +2228,9 @@ Read the NetHack news file, if present (default on).
 Since the news is shown at the beginning of the game, there's no point
 in setting this with the `O' command.
 .lp nudist
-Start the character with no armor (default false).
+Start the character with no armor (default false).  Persistent.
 .lp "null    "
-Send padding nulls to the terminal (default on).
+Send padding nulls to the terminal (default on).  Persistent.
 .lp number_pad
 Use digit keys instead of letters to move (default 0 or off).
 Valid settings are:
@@ -2290,6 +2300,7 @@ such as ``paranoid_confirmation:attack pray Remove''.
 .lp perm_invent
 If true, always display your current inventory in a window.  This only
 makes sense for windowing system interfaces that implement this feature.
+Persistent.
 .lp pettype
 Specify the type of your initial pet, if you are playing a character class
 that uses multiple types of pets; or choose to have no initial pet at all.
@@ -2303,13 +2314,13 @@ Cannot be set with the `O' command.
 When you pick up an item that would exceed this encumbrance
 level (Unencumbered, Burdened, streSsed, straiNed, overTaxed,
 or overLoaded), you will be asked if you want to continue.
-(Default `S').
+(Default `S').  Persistent.
 .lp pickup_thrown
 If this option is on and
 .op autopickup
 is also on, try to pick up things that you threw, even if they aren't in
 .op pickup_types
-or match an autopickup exception.  Default is on.
+or match an autopickup exception.  Default is on.  Persistent.
 .lp pickup_types
 Specify the object types to be picked up when
 .op autopickup
@@ -2317,14 +2328,14 @@ is on.  Default is all types.  You can use
 .op autopickup_exception
 configuration file lines to further refine
 .op autopickup
-behavior.
+behavior.  Persistent.
 .lp pile_limit
 When walking across a pile of objects on the floor, threshold at which
 the message "there are few/several/many objects here" is given instead
 of showing a popup list of those objects.  A value of 0 means "no limit"
 (always list the objects); a value of 1 effectively means "never show
 the objects" since the pile size will always be at least that big;
-default value is 5.
+default value is 5.  Persistent.
 .lp playmode
 Values are `normal', `explore', or `debug'.
 Allows selection of explore mode (also known as discovery mode) or debug
@@ -2338,21 +2349,22 @@ Default is normal play.
 Using the `w' (wield) command when already wielding
 something pushes the old item into your alternate weapon slot (default off).
 Likewise for the `a' (apply) command if it causes the applied item to
-become wielded.
+become wielded.  Persistent.
 .lp "race    "
 Selects your race (for example, ``race:human'').  Default is random.
 If you prefix a `!' or ``no'' to the value, you can 
 exclude that race from being picked randomly.
-Cannot be set with the `O' command.
+Cannot be set with the `O' command.  Persistent.
 .lp rest_on_space
 Make the space bar a synonym for the `.' (rest) command (default off).
+Persistent.
 .lp "role    "
 Pick your type of character (ex. ``role:Samurai'');
 synonym for ``character''.  See ``name'' for an alternate method
 of specifying your role.  Normally only the first letter of the
 value is examined; `r' is an exception with ``Rogue'', ``Ranger'',
 and ``random'' values. If you prefix a `!' or ``no'' to the value, you can 
-exclude that role from being picked randomly.
+exclude that role from being picked randomly.  Persistent.
 .lp roguesymset
 This option may be used to select one of the named symbol sets found within
 ``symbols'' to alter the symbols displayed on the screen on the rogue level.
@@ -2378,26 +2390,30 @@ like walk, but pause briefly after each step.
 This option only affects the game's screen display, not the actual
 results of moving.  The default is `run'; versions prior to 3.4.1 
 used `teleport' only.  Whether or not the effect is noticeable will
-depend upon the window port used or on the type of terminal.
+depend upon the window port used or on the type of terminal.  Persistent.
 .lp safe_pet
-Prevent you from (knowingly) attacking your pets (default on).
+Prevent you from (knowingly) attacking your pets (default on).  Persistent.
 .lp scores
 Control what parts of the score list you are shown at the end (ex.
 ``scores:5 top scores/4 around my score/own scores'').  Only the first
 letter of each category (`t', `a', or `o') is necessary.
+Persistent.
 .lp showexp
 Show your accumulated experience points on bottom line (default off).
+Persistent.
 .lp showrace
 Display yourself as the glyph for your race, rather than the glyph
 for your role (default off).  Note that this setting affects only
 the appearance of the display, not the way the game treats you.
+Persistent.
 .lp showscore
 Show your approximate accumulated score on bottom line (default off).
+Persistent.
 .lp "silent  "
-Suppress terminal beeps (default on).
+Suppress terminal beeps (default on).  Persistent.
 .lp sortloot
 Controls the sorting behavior of the pickup lists for inventory
-and #loot commands and some others.
+and #loot commands and some others.  Persistent.
 The possible values are:
 .PS full
 .PL full
@@ -2410,11 +2426,12 @@ show lists the traditional way without sorting.
 .PE
 .lp sortpack
 Sort the pack contents by type when displaying inventory (default on).
+Persistent.
 .lp sparkle
 Display a sparkly effect when a monster (including yourself) is hit by an
-attack to which it is resistant (default on).
+attack to which it is resistant (default on).  Persistent.
 .lp standout
-Boldface monsters and ``\fB--More--\fP'' (default off).
+Boldface monsters and ``\fB--More--\fP'' (default off).  Persistent.
 .lp statushilites
 Enable coloring of status fields (default off).
 See ``Configuring Status Hilites'' for futher information.
@@ -2426,15 +2443,15 @@ and prior versions (ex. ``suppress_alert:3.3.1'').
 This option may be used to select one of the named symbol sets found within
 ``symbols'' to alter the symbols displayed on the screen.
 .lp "time    "
-Show the elapsed game time in turns on bottom line (default off).
+Show the elapsed game time in turns on bottom line (default off).  Persistent.
 .lp timed_delay
 When pausing momentarily for display effect, such as with explosions and
 moving objects, use a timer rather than sending extra characters to the
 screen.  (Applies to ``tty'' interface only; ``X11'' interface always
 uses a timer based delay.  The default is on if configured into the
-program.)
+program.)  Persistent.
 .lp tombstone
-Draw a tombstone graphic upon your death (default on).
+Draw a tombstone graphic upon your death (default on).  Persistent.
 .lp toptenwin
 Put the ending display in a NetHack window instead of on stdout (default off).
 Setting this option makes the score list visible when a windowing version
@@ -2443,9 +2460,9 @@ the score list around after game end on a terminal or emulating window.
 .lp travel
 Allow the travel command (default on).  Turning this option off will
 prevent the game from attempting unintended moves if you make inadvertent
-mouse clicks on the map window.
+mouse clicks on the map window.  Persistent.
 .lp verbose
-Provide more commentary during the game (default on).
+Provide more commentary during the game (default on).  Persistent.
 .lp windowtype
 Select which windowing system to use, such as ``tty'' or ``X11''
 (default depends on version).

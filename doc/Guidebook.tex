@@ -2340,11 +2340,17 @@ Here are explanations of what the various options do.
 Character strings that are too long may be truncated.
 Some of the options listed may be inactive in your dungeon.
 
+%.pg
+Some options are persistent, and are saved and reloaded along with
+the game.  Changing a persistent option in the configuration file
+applies only to new games.
+
 \blist{}
 %.lp
 \item[\ib{acoustics}]
 Enable messages about what your character hears (default on).
 Note that this has nothing to do with your computer's audio capabilities.
+Persistent.
 %.lp
 \item[\ib{align}]
 Your starting alignment ({\tt align:lawful}, {\tt align:neutral},
@@ -2352,17 +2358,17 @@ or {\tt align:chaotic}).  You may specify just the first letter.
 The default is to randomly pick an appropriate alignment.
 If you prefix `{\tt !}' or ``{\tt no}'' to the value, you can 
 exclude that alignment from being picked randomly.
-Cannot be set with the `{\tt O}' command.
+Cannot be set with the `{\tt O}' command.  Persistent.
 %.lp
 \item[\ib{autodig}]
 Automatically dig if you are wielding a digging tool and moving into a place
-that can be dug (default false).
+that can be dug (default false).  Persistent.
 %.lp
 \item[\ib{autoopen}]
-Walking into a door attempts to open it (default true).
+Walking into a door attempts to open it (default true).  Persistent.
 %.lp
 \item[\ib{autopickup}]
-Automatically pick up things onto which you move (default on).
+Automatically pick up things onto which you move (default on).  Persistent.
 See ``{\it pickup\verb+_+types\/}'' to refine the behavior.
 %.lp
 \item[\ib{autoquiver}]
@@ -2375,13 +2381,13 @@ into account the blessed/cursed status, enchantment, damage, or
 quality of the weapon; you are free to manually fill your quiver or quiver sack
 or make ready
 with the `Q' command instead.  If no weapon is found or the option is
-false, the `t' (throw) command is executed instead.  (default false)
+false, the `t' (throw) command is executed instead.  Persistent.  (default false)
 %.lp
 \item[\ib{blind}]
-Start the character permanently blind. (default false)
+Start the character permanently blind.  Persistent. (default false)
 %.lp
 \item[\ib{bones}]
-Allow saving and loading bones files.  (default true)
+Allow saving and loading bones files.  Persistent.  (default true)
 %.lp
 \item[\ib{boulder}]
 Set the character used to display boulders (default is rock class symbol).
@@ -2398,7 +2404,7 @@ the value is examined; the string ``{\tt random}'' is an exception.
 %.lp
 \item[\ib{checkpoint}]
 Save game state after each level change, for possible recovery after
-program crash (default on).
+program crash (default on).  Persistent.
 %.lp
 \item[\ib{checkspace}]
 Check free disk space before writing files to disk (default on).
@@ -2416,16 +2422,17 @@ players if it detects some anticipated mistakes (default on).
 %.lp
 \item[\ib{confirm}]
 Have user confirm attacks on pets, shopkeepers, and other
-peaceable creatures (default on).
+peaceable creatures (default on).  Persistent.
 %.lp
 %.lp
 \item[\ib{dark\verb+_+room}]
-Show out-of-sight areas of lit rooms (default off).
+Show out-of-sight areas of lit rooms (default off).  Persistent.
 \item[\ib{disclose}]
 Controls what information the program reveals when the game ends.
 Value is a space separated list of prompting/category pairs
 (default is `{\tt ni na nv ng nc no}',
 prompt with default response of `{\tt n}' for each candidate).
+Persistent.
 The possibilities are:
 
 %.sd
@@ -2484,6 +2491,7 @@ An obsolete synonym for ``{\tt gender:female}''.  Cannot be set with the
 \item[\ib{fixinv}]
 An object's inventory letter sticks to it when it's dropped (default on).
 If this is off, dropping an object shifts all the remaining inventory letters.
+Persistent.
 %.lp
 \item[\ib{fruit}]
 Name a fruit after something you enjoy eating (ex.\ ``{\tt fruit:mango}'')
@@ -2500,14 +2508,14 @@ options, the ``{\tt gender}'' option will take precedence.
 The default is to randomly pick an appropriate gender.
 If you prefix `{\tt !}' or ``{\tt no}'' to the value, you can 
 exclude that gender from being picked randomly. 
-Cannot be set with the `{\tt O}' command.
+Cannot be set with the `{\tt O}' command.  Persistent.
 %.lp
 \item[\ib{help}]
 If more information is available for an object looked at
 with the `{\tt /}' command, ask if you want to see it (default on).
 Turning help off makes just looking at things faster, since you aren't
 interrupted with the ``{\tt More info?}'' prompt, but it also means that you
-might miss some interesting and/or important information.
+might miss some interesting and/or important information.  Persistent.
 %.lp
 \item[\ib{hilite\verb+_+pet}]
 Visually distinguish pets from similar animals (default off).
@@ -2527,24 +2535,26 @@ Name your starting horse (ex.\ ``{\tt horsename:Trigger}'').
 Cannot be set with the `{\tt O}' command.
 %.lp
 \item[\ib{ignintr}]
-Ignore interrupt signals, including breaks (default off).
+Ignore interrupt signals, including breaks (default off).  Persistent.
 %.lp
 \item[\ib{implicit\verb+_+uncursed}]
 Omit ``uncursed'' from inventory lists, if possible (default on).
 %.lp
 \item[\ib{legacy}]
 Display an introductory message when starting the game (default on).
+Persistent.
 %.lp
 \item[\ib{lit\verb+_+corridor}]
 Show corridor squares seen by night vision or a light source held by your
-character as lit (default off).
+character as lit (default off).  Persistent.
 %.lp
 \item[\ib{lootabc}]
 Use the old `{\tt a}', `{\tt b}', and `{\tt c}' keyboard shortcuts when
 looting, rather than the mnemonics `{\tt o}', `{\tt i}', and `{\tt b}' (default off).
+Persistent.
 %.lp
 \item[\ib{mail}]
-Enable mail delivery during the game (default on).
+Enable mail delivery during the game (default on).  Persistent.
 %.lp
 \item[\ib{male}]
 An obsolete synonym for ``{\tt gender:male}''.  Cannot be set with the
@@ -2574,6 +2584,7 @@ object classes rather than a character prompt, and then a menu of matching
 objects for selection.
 Partial skips the object class filtering and
 immediately displays a menu of all objects.
+Persistent.
 \item[\ib{menu\verb+_+deselect\verb+_+all}]
 Menu character accelerator to deselect all items in a menu.
 Implemented by the Amiga, Gem, X11 and tty ports.
@@ -2663,10 +2674,10 @@ Since the news is shown at the beginning of the game, there's no point
 in setting this with the `{\tt O}' command.
 %.lp
 \item[\ib{nudist}]
-Start the character with no armor (default false).
+Start the character with no armor (default false).  Persistent.
 %.lp
 \item[\ib{null}]
-Send padding nulls to the terminal (default on).
+Send padding nulls to the terminal (default on).  Persistent.
 %.lp
 \item[\ib{number\verb+_+pad}]
 Use digit keys instead of letters to move (default 0 or off).\\
@@ -2750,6 +2761,7 @@ such as ``{\it par\-a\-noid\verb+_+con\-fir\-ma\-tion:attack~pray~Remove}''.
 \item[\ib{perm\verb+_+invent}]
 If true, always display your current inventory in a window.  This only
 makes sense for windowing system interfaces that implement this feature.
+Persistent.
 %.lp
 \item[\ib{pettype}]
 Specify the type of your initial pet, if you are playing a character class
@@ -2765,17 +2777,18 @@ Cannot be set with the `{\tt O}' command.
 When you pick up an item that would exceed this encumbrance
 level (Unencumbered, Burdened, streSsed, straiNed, overTaxed,
 or overLoaded), you will be asked if you want to continue.
-(Default `S').
+(Default `S').  Persistent.
 %.lp
 \item[\ib{pickup\verb+_+thrown}]
 If this option is on and ``{\it autopickup\/}'' is also on, try to pick up
 things that you threw, even if they aren't in ``{\it pickup\verb+_+types\/}'' or
-match an autopickup exception.  Default is on.
+match an autopickup exception.  Default is on.  Persistent.
 %.lp
 \item[\ib{pickup\verb+_+types}]
 Specify the object types to be picked up when ``{\it autopickup\/}'' 
 is on.  Default is all types.  You can use ``{\it autopickup\verb+_+exception\/}''
 configuration file lines to further refine ``{\it autopickup\/}'' behavior.
+Persistent.
 %.lp
 \item[\ib{pile\verb+_+limit}]
 When walking across a pile of objects on the floor, threshold at which
@@ -2783,7 +2796,7 @@ the message ``there are few/several/many objects here'' is given instead
 of showing a popup list of those objects.  A value of 0 means ``no limit''
 (always list the objects); a value of 1 effectively means ``never show
 the objects'' since the pile size will always be at least that big;
-default value is 5.
+default value is 5.  Persistent.
 %.lp
 \item[\ib{playmode}]
 Values are {\it normal\/}, {\it explore\/}, or {\it debug\/}.
@@ -2799,16 +2812,17 @@ Default is normal play.
 Using the `w' (wield) command when already wielding
 something pushes the old item into your alternate weapon slot (default off).
 Likewise for the `a' (apply) command if it causes the applied item to
-become wielded.
+become wielded.  Persistent.
 %.Ip
 \item[\ib{race}]
 Selects your race (for example, ``{\tt race:human}'').  Default is random.
 If you prefix `{\tt !}' or ``{\tt no}'' to the value, you can 
 exclude that race from being picked randomly. 
-Cannot be set with the `{\tt O}' command.
+Cannot be set with the `{\tt O}' command.  Persistent.
 %.lp
 \item[\ib{rest\verb+_+on\verb+_+space}]
 Make the space bar a synonym for the `{\tt .}' (rest) command (default off).
+Persistent.
 %.lp
 \item[\ib{role}]
 Pick your type of character (ex.\ ``{\tt role:Samurai}'');
@@ -2817,6 +2831,7 @@ of specifying your role.  Normally only the first letter of the
 value is examined; `r' is an exception with ``{\tt Rogue}'', {\tt Ranger}'',
 and ``{\tt random}'' values. If you prefix `{\tt !}' or ``{\tt no}'' to the 
 value, you can exclude that role from being picked randomly.
+Persistent.
 %.lp
 \item[\ib{roguesymset}]
 This option may be used to select one of the named symbol sets found within
@@ -2847,33 +2862,37 @@ The possible values are:
 This option only affects the game's screen display, not the actual
 results of moving.  The default is {\it run\/}; versions prior to 3.4.1 
 used {\it teleport\/} only.  Whether or not the effect is noticeable will
-depend upon the window port used or on the type of terminal.
+depend upon the window port used or on the type of terminal.  Persistent.
 %.lp
 \item[\ib{safe\verb+_+pet}]
-Prevent you from (knowingly) attacking your pets (default on).
+Prevent you from (knowingly) attacking your pets (default on).  Persistent.
 %.lp
 \item[\ib{scores}]
 Control what parts of the score list you are shown at the end (ex.\
 ``{\tt scores:5top scores/4around my score/own scores}'').  Only the first
 letter of each category (`{\tt t}', `{\tt a}' or `{\tt o}') is necessary.
+Persistent.
 %.lp
 \item[\ib{showexp}]
 Show your accumulated experience points on bottom line (default off).
+Persistent.
 %.lp
 \item[\ib{showrace}]
 Display yourself as the glyph for your race, rather than the glyph
 for your role (default off).  Note that this setting affects only
 the appearance of the display, not the way the game treats you.
+Persistent.
 %.lp
 \item[\ib{showscore}]
 Show your approximate accumulated score on bottom line (default off).
+Persistent.
 %.lp
 \item[\ib{silent}]
-Suppress terminal beeps (default on).
+Suppress terminal beeps (default on).  Persistent.
 %.lp
 \item[\ib{sortloot}]
 Controls the sorting behavior of pickup lists for inventory
-and \#loot commands and some others.
+and \#loot commands and some others.  Persistent.
 
 The possible values are:
 %.sd
@@ -2887,13 +2906,14 @@ The possible values are:
 %.lp
 \item[\ib{sortpack}]
 Sort the pack contents by type when displaying inventory (default on).
+Persistent.
 %.lp
 \item[\ib{sparkle}]
 Display a sparkly effect when a monster (including yourself) is hit by an
-attack to which it is resistant (default on).
+attack to which it is resistant (default on).  Persistent.
 %.lp
 \item[\ib{standout}]
-Boldface monsters and ``{\tt --More--}'' (default off).
+Boldface monsters and ``{\tt --More--}'' (default off).  Persistent.
 %.lp
 \item[\ib{statushilites}]
 Enable coloring of status fields (default off).
@@ -2909,17 +2929,17 @@ This option may be used to select one of the named symbol sets found within
 {\tt symbols} to alter the symbols displayed on the screen.
 %.lp
 \item[\ib{time}]
-Show the elapsed game time in turns on bottom line (default off).
+Show the elapsed game time in turns on bottom line (default off).  Persistent.
 %.lp
 \item[\ib{timed\verb+_+delay}]
 When pausing momentarily for display effect, such as with explosions and
 moving objects, use a timer rather than sending extra characters to the
 screen.  (Applies to ``tty'' interface only; ``X11'' interface always
 uses a timer based delay.  The default is on if configured into the
-program.)
+program.)  Persistent.
 %.lp
 \item[\ib{tombstone}]
-Draw a tombstone graphic upon your death (default on).
+Draw a tombstone graphic upon your death (default on).  Persistent.
 %.lp
 \item[\ib{toptenwin}]
 Put the ending display in a NetHack window instead of on stdout (default off).
@@ -2930,10 +2950,10 @@ the score list around after game end on a terminal or emulating window.
 \item[\ib{travel}]
 Allow the travel command (default on).  Turning this option off will
 prevent the game from attempting unintended moves if you make inadvertent
-mouse clicks on the map window.
+mouse clicks on the map window.  Persistent.
 %.lp
 \item[\ib{verbose}]
-Provide more commentary during the game (default on).
+Provide more commentary during the game (default on).  Persistent.
 %.lp
 \item[\ib{windowtype}]
 Select which windowing system to use, such as ``{\tt tty}'' or ``{\tt X11}''
