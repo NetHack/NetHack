@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1437877180 2015/07/26 02:19:40 $  $NHDT-Branch: master $:$NHDT-Revision: 1.104 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1444094263 2015/10/06 01:17:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.105 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2279,6 +2279,7 @@ struct obj *obj;
     char maskbuf[60];
     const char *what;
     unsigned long owornmask, allmask = 0L;
+    boolean embedded = FALSE;
     int i, n = 0;
 
     /* use owornmask for testing and bit twiddling, but use original
@@ -2289,6 +2290,15 @@ struct obj *obj;
         if ((owornmask & wearbits[i]) != 0L)
             ++n;
         allmask |= wearbits[i];
+    }
+    if (obj == uskin) {
+        /* embedded dragon scales have an extra bit set;
+           make sure it's set, then suppress it */
+        embedded = TRUE;
+        if ((owornmask & (W_ARM | I_SPECIAL)) == (W_ARM | I_SPECIAL))
+            owornmask &= ~I_SPECIAL;
+        else
+            n = 0,  owornmask = ~0; /* force insane_object("bogus") below */
     }
     if (n == 2 && carried(obj)
         && obj == uball && (owornmask & W_BALL) != 0L
@@ -2317,8 +2327,8 @@ struct obj *obj;
            with owornmask of W_foo is the object pointed to by ufoo */
         switch (owornmask) {
         case W_ARM:
-            if (obj != uarm)
-                what = "suit";
+            if (obj != (embedded ? uskin : uarm))
+                what = embedded ? "skin" : "suit";
             break;
         case W_ARMC:
             if (obj != uarmc)
@@ -2397,6 +2407,10 @@ struct obj *obj;
         if (owornmask & W_ARMOR) {
             if (obj->oclass != ARMOR_CLASS)
                 what = "armor";
+            /* 3.6: dragon scale mail reverts to dragon scales when
+               becoming embedded in poly'd hero's skin */
+            if (embedded && !Is_dragon_scales(obj))
+                what = "skin";
         } else if (owornmask & W_WEAPON) {
             /* monsters don't maintain alternate weapon or quiver */
             if (mcarried(obj) && (owornmask & (W_SWAPWEP | W_QUIVER)) != 0L)
