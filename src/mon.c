@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1438505682 2015/08/02 08:54:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.182 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1444095155 2015/10/06 01:32:35 $  $NHDT-Branch: master $:$NHDT-Revision: 1.183 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3357,7 +3357,7 @@ int damtype, dam;
 
     if (mon->data == &mons[PM_FLESH_GOLEM]) {
         if (damtype == AD_ELEC)
-            heal = dam / 6;
+            heal = (dam + 5) / 6;
         else if (damtype == AD_FIRE || damtype == AD_COLD)
             slow = 1;
     } else if (mon->data == &mons[PM_IRON_GOLEM]) {
@@ -3374,7 +3374,7 @@ int damtype, dam;
     }
     if (heal) {
         if (mon->mhp < mon->mhpmax) {
-            mon->mhp += dam;
+            mon->mhp += heal;
             if (mon->mhp > mon->mhpmax)
                 mon->mhp = mon->mhpmax;
             if (cansee(mon->mx, mon->my))
