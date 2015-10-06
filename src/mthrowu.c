@@ -282,10 +282,8 @@ struct obj *obj;         /* missile (or stack providing it) */
 
         /* not possibly_unwield, which checks the object's */
         /* location, not its existence */
-        if (MON_WEP(mon) == obj) {
+        if (MON_WEP(mon) == obj)
             setmnotwielded(mon, obj);
-            MON_NOWEP(mon);
-        }
         obj_extract_self(obj);
         singleobj = obj;
         obj = (struct obj *) 0;

@@ -1973,10 +1973,8 @@ long timeout; /* unused */
             stop_occupation();
         }
     } else if (obj->where == OBJ_MINVENT && obj->owornmask) {
-        if (obj == MON_WEP(obj->ocarry)) {
+        if (obj == MON_WEP(obj->ocarry))
             setmnotwielded(obj->ocarry, obj);
-            MON_NOWEP(obj->ocarry);
-        }
     } else if (obj->where == OBJ_MIGRATING) {
         /* clear destination flag so that obfree()'s check for
            freeing a worn object doesn't get a false hit */

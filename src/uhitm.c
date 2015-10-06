@@ -670,7 +670,6 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
                      * the percentage chance is (1/20)*(50/100).]
                      */
                     setmnotwielded(mon, monwep);
-                    MON_NOWEP(mon);
                     mon->weapon_check = NEED_WEAPON;
                     pline("%s from the force of your blow!",
                           Yobjnam2(monwep, "shatter"));
@@ -1349,10 +1348,8 @@ struct attack *mattk;
         obj_extract_self(otmp);
         if ((unwornmask = otmp->owornmask) != 0L) {
             mdef->misc_worn_check &= ~unwornmask;
-            if (otmp->owornmask & W_WEP) {
+            if (otmp->owornmask & W_WEP)
                 setmnotwielded(mdef, otmp);
-                MON_NOWEP(mdef);
-            }
             otmp->owornmask = 0L;
             update_mon_intrinsics(mdef, otmp, FALSE, FALSE);
 

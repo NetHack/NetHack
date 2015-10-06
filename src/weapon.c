@@ -582,7 +582,6 @@ boolean polyspot;
     }
     if (!attacktype(mon->data, AT_WEAP)) {
         setmnotwielded(mon, mw_tmp);
-        MON_NOWEP(mon);
         mon->weapon_check = NO_WEAPON_WANTED;
         obj_extract_self(obj);
         if (cansee(mon->mx, mon->my)) {
@@ -735,7 +734,6 @@ struct monst *mon;
 
     if (mwep) {
         setmnotwielded(mon, mwep);
-        MON_NOWEP(mon);
         mon->weapon_check = NEED_WEAPON;
     }
 }
@@ -1443,6 +1441,8 @@ register struct obj *obj;
                   s_suffix(mon_nam(mon)), mbodypart(mon, HAND),
                   otense(obj, "stop"));
     }
+    if (MON_WEP(mon) == obj)
+        MON_NOWEP(mon);
     obj->owornmask &= ~W_WEP;
 }
 

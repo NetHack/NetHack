@@ -2156,9 +2156,16 @@ struct monst *monlist;
 const char *mesg;
 {
     struct monst *mon;
-    struct obj *obj;
+    struct obj *obj, *mwep;
 
-    for (mon = monlist; mon; mon = mon->nmon)
+    for (mon = monlist; mon; mon = mon->nmon) {
+        mwep = MON_WEP(mon);
+        if (mwep) {
+            if (!mcarried(mwep))
+                insane_object(mwep, mfmt1, mesg, mon);
+            if (mwep->ocarry != mon)
+                insane_object(mwep, mfmt2, mesg, mon);
+        }
         for (obj = mon->minvent; obj; obj = obj->nobj) {
             if (obj->where != OBJ_MINVENT)
                 insane_object(obj, mfmt1, mesg, mon);
@@ -2166,6 +2173,7 @@ const char *mesg;
                 insane_object(obj, mfmt2, mesg, mon);
             check_contained(obj, mesg);
         }
+    }
 }
 
 /* This must stay consistent with the defines in obj.h. */
