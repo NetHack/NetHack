@@ -1,4 +1,4 @@
-/* NetHack 3.6	muse.c	$NHDT-Date: 1436753520 2015/07/13 02:12:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.64 $ */
+/* NetHack 3.6	muse.c	$NHDT-Date: 1444260722 2015/10/07 23:32:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.65 $ */
 /*	Copyright (C) 1990 by Ken Arromdee			   */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -14,9 +14,8 @@ boolean m_using = FALSE;
 
 /* Let monsters use magic items.  Arbitrary assumptions: Monsters only use
  * scrolls when they can see, monsters know when wands have 0 charges,
- * monsters
- * cannot recognize if items are cursed are not, monsters which are confused
- * don't know not to read scrolls, etc....
+ * monsters cannot recognize if items are cursed are not, monsters which
+ * are confused don't know not to read scrolls, etc....
  */
 
 STATIC_DCL struct permonst *FDECL(muse_newcham_mon, (struct monst *));
@@ -172,10 +171,10 @@ boolean self;
                                    <= (BOLT_LIM + 1) * (BOLT_LIM + 1))
                                       ? "nearby"
                                       : "distant");
-    } else if (self)
+    } else if (self) {
         pline("%s zaps %sself with %s!", Monnam(mtmp), mhim(mtmp),
               doname(otmp));
-    else {
+    } else {
         pline("%s zaps %s!", Monnam(mtmp), an(xname(otmp)));
         stop_occupation();
     }
@@ -211,10 +210,10 @@ struct obj *otmp;
     if (vismon)
         pline("%s reads %s!", Monnam(mtmp), onambuf);
     else
-        You_hear("%s reading %s.", x_monnam(mtmp, ARTICLE_A, (char *) 0,
-                                            (SUPPRESS_IT | SUPPRESS_INVISIBLE
-                                             | SUPPRESS_SADDLE),
-                                            FALSE),
+        You_hear("%s reading %s.",
+                 x_monnam(mtmp, ARTICLE_A, (char *) 0,
+                          (SUPPRESS_IT | SUPPRESS_INVISIBLE | SUPPRESS_SADDLE),
+                          FALSE),
                  onambuf);
 
     if (mtmp->mconf)
@@ -261,14 +260,12 @@ struct obj *otmp;
 #define MUSE_INNATE_TPT 9999
  * We cannot use this.  Since monsters get unlimited teleportation, if they
  * were allowed to teleport at will you could never catch them.  Instead,
- * assume they only teleport at random times, despite the inconsistency that
-if
- * you polymorph into one you teleport at will.
+ * assume they only teleport at random times, despite the inconsistency
+ * that if you polymorph into one you teleport at will.
  */
 
 /* Select a defensive item/action for a monster.  Returns TRUE iff one is
- * found.
- */
+   found. */
 boolean
 find_defensive(mtmp)
 struct monst *mtmp;
@@ -380,63 +377,87 @@ struct monst *mtmp;
         return FALSE;
     }
 
-    if (levl[x][y].typ == STAIRS && !stuck && !immobile) {
-        if (x == xdnstair && y == ydnstair && !is_floater(mtmp->data))
-            m.has_defense = MUSE_DOWNSTAIRS;
-        if (x == xupstair && y == yupstair && ledger_no(&u.uz) != 1)
-            /* Unfair to let the monsters leave the dungeon with the Amulet */
-            /* (or go to the endlevel since you also need it, to get there) */
-            m.has_defense = MUSE_UPSTAIRS;
-    } else if (levl[x][y].typ == LADDER && !stuck && !immobile) {
-        if (x == xupladder && y == yupladder)
+    if (stuck || immobile) {
+        ; /* fleeing by stairs or traps is not possible */
+    } else if (levl[x][y].typ == STAIRS) {
+        if (x == xdnstair && y == ydnstair) {
+            if (!is_floater(mtmp->data))
+                m.has_defense = MUSE_DOWNSTAIRS;
+        } else if (x == xupstair && y == yupstair) {
+            /* don't let monster leave the dungeon with the Amulet */
+            if (ledger_no(&u.uz) != 1)
+                m.has_defense = MUSE_UPSTAIRS;
+        } else if (sstairs.sx && x == sstairs.sx && y == sstairs.sy) {
+            if (sstairs.up || !is_floater(mtmp->data))
+                m.has_defense = MUSE_SSTAIRS;
+        }
+    } else if (levl[x][y].typ == LADDER) {
+        if (x == xupladder && y == yupladder) {
             m.has_defense = MUSE_UP_LADDER;
-        if (x == xdnladder && y == ydnladder && !is_floater(mtmp->data))
-            m.has_defense = MUSE_DN_LADDER;
-    } else if (sstairs.sx && sstairs.sx == x && sstairs.sy == y) {
-        m.has_defense = MUSE_SSTAIRS;
-    } else if (!stuck && !immobile) {
+        } else if (x == xdnladder && y == ydnladder) {
+            if (!is_floater(mtmp->data))
+                m.has_defense = MUSE_DN_LADDER;
+        } else if (sstairs.sx && x == sstairs.sx && y == sstairs.sy) {
+            if (sstairs.up || !is_floater(mtmp->data))
+                m.has_defense = MUSE_SSTAIRS;
+        }
+    } else {
         /* Note: trap doors take precedence over teleport traps. */
-        int xx, yy;
+        int xx, yy, i, locs[10][2];
+        boolean ignore_boulders = (verysmall(mtmp->data)
+                                   || throws_rocks(mtmp->data)
+                                   || passes_walls(mtmp->data)),
+            diag_ok = !NODIAG(monsndx(mtmp->data));
 
+        for (i = 0; i < 10; ++i) /* 10: 9 spots plus sentinel */
+            locs[i][0] = locs[i][1] = 0;
+        /* collect viable spots; monster's <mx,my> comes first */
+        locs[0][0] = x, locs[0][1] = y;
+        i = 1;
         for (xx = x - 1; xx <= x + 1; xx++)
             for (yy = y - 1; yy <= y + 1; yy++)
-                if (isok(xx, yy))
-                    if (xx != u.ux || yy != u.uy)
-                        if (mtmp->data != &mons[PM_GRID_BUG] || xx == x
-                            || yy == y)
-                            if ((xx == x && yy == y)
-                                || !level.monsters[xx][yy])
-                                if ((t = t_at(xx, yy)) != 0)
-                                    if ((verysmall(mtmp->data)
-                                         || throws_rocks(mtmp->data)
-                                         || passes_walls(mtmp->data))
-                                        || !sobj_at(BOULDER, xx, yy))
-                                        if (!onscary(xx, yy, mtmp)) {
-                                            if ((t->ttyp == TRAPDOOR
-                                                 || t->ttyp == HOLE)
-                                                && !is_floater(mtmp->data)
-                                                && !mtmp->isshk && !mtmp->isgd
-                                                && !mtmp->ispriest
-                                                && Can_fall_thru(&u.uz)) {
-                                                trapx = xx;
-                                                trapy = yy;
-                                                m.has_defense = MUSE_TRAPDOOR;
-                                            } else if (
-                                                t->ttyp == TELEP_TRAP
-                                                && m.has_defense
-                                                       != MUSE_TRAPDOOR) {
-                                                trapx = xx;
-                                                trapy = yy;
-                                                m.has_defense =
-                                                    MUSE_TELEPORT_TRAP;
-                                            }
-                                        }
+                if (isok(xx, yy) && (xx != x || yy != y)) {
+                    locs[i][0] = xx, locs[i][1] = yy;
+                    ++i;
+                }
+        /* look for a suitable trap among the viable spots */
+        for (i = 0; i < 10; ++i) {
+            xx = locs[i][0], yy = locs[i][1];
+            if (!xx)
+                break; /* we've run out of spots */
+            /* skip if it's hero's location
+               or a diagonal spot and monster can't move diagonally
+               or some other monster is there */
+            if ((xx == u.ux && yy == u.uy)
+                || (xx != x && yy != y && !diag_ok)
+                || (level.monsters[xx][yy] && !(xx == x && yy == y)))
+                continue;
+            /* skip if there's no trap or can't/won't move onto trap */
+            if ((t = t_at(xx, yy)) == 0
+                || (!ignore_boulders && sobj_at(BOULDER, xx, yy))
+                || onscary(xx, yy, mtmp))
+                continue;
+            /* use trap if it's the correct type */
+            if ((t->ttyp == TRAPDOOR || t->ttyp == HOLE)
+                && !is_floater(mtmp->data)
+                && !mtmp->isshk && !mtmp->isgd && !mtmp->ispriest
+                && Can_fall_thru(&u.uz)) {
+                trapx = xx;
+                trapy = yy;
+                m.has_defense = MUSE_TRAPDOOR;
+                break; /* no need to look at any other spots */
+            } else if (t->ttyp == TELEP_TRAP) {
+                trapx = xx;
+                trapy = yy;
+                m.has_defense = MUSE_TELEPORT_TRAP;
+            }
+        }
     }
 
     if (nohands(mtmp->data)) /* can't use objects */
         goto botm;
 
-    if (is_mercenary(mtmp->data) && (obj = m_carrying(mtmp, BUGLE))) {
+    if (is_mercenary(mtmp->data) && (obj = m_carrying(mtmp, BUGLE)) != 0) {
         int xx, yy;
         struct monst *mon;
 
@@ -444,15 +465,21 @@ struct monst *mtmp;
          * have the soldier play the bugle when it sees or
          * remembers soldiers nearby...
          */
-        for (xx = x - 3; xx <= x + 3; xx++)
-            for (yy = y - 3; yy <= y + 3; yy++)
-                if (isok(xx, yy))
-                    if ((mon = m_at(xx, yy)) && is_mercenary(mon->data)
-                        && mon->data != &mons[PM_GUARD]
-                        && (mon->msleeping || (!mon->mcanmove))) {
-                        m.defensive = obj;
-                        m.has_defense = MUSE_BUGLE;
-                    }
+        for (xx = x - 3; xx <= x + 3; xx++) {
+            for (yy = y - 3; yy <= y + 3; yy++) {
+                if (!isok(xx, yy) || (xx == x && yy == y))
+                    continue;
+                if ((mon = m_at(xx, yy)) != 0 && is_mercenary(mon->data)
+                    && mon->data != &mons[PM_GUARD]
+                    && (mon->msleeping || !mon->mcanmove)) {
+                    m.defensive = obj;
+                    m.has_defense = MUSE_BUGLE;
+                    goto toot; /* double break */
+                }
+            }
+        }
+    toot:
+        ;
     }
 
     /* use immediate physical escape prior to attempting magic */
@@ -465,9 +492,9 @@ struct monst *mtmp;
               || t->ttyp == BEAR_TRAP))
         t = 0; /* ok for monster to dig here */
 
-#define nomore(x)           \
-    if (m.has_defense == x) \
-        continue;
+#define nomore(x)       if (m.has_defense == x) continue;
+    /* selection could be improved by collecting all possibilities
+       into an array and then picking one at random */
     for (obj = mtmp->minvent; obj; obj = obj->nobj) {
         /* don't always use the same selection pattern */
         if (m.has_defense && !rn2(3))
@@ -560,7 +587,7 @@ struct monst *mtmp;
         }
     }
 botm:
-    return ((boolean)(!!m.has_defense));
+    return (boolean) !!m.has_defense;
 #undef nomore
 }
 
@@ -634,11 +661,7 @@ struct monst *mtmp;
                 mtmp->mtrapseen |= (1 << (TELEP_TRAP - 1));
             return 2;
         }
-        if ((
-#if 0
-			mon_has_amulet(mtmp) ||
-#endif
-                On_W_tower_level(&u.uz)) && !rn2(3)) {
+        if ((mon_has_amulet(mtmp) || On_W_tower_level(&u.uz)) && !rn2(3)) {
             if (vismon)
                 pline("%s seems disoriented for a moment.", Monnam(mtmp));
             return 2;
@@ -796,8 +819,8 @@ struct monst *mtmp;
             return 0;
         m_flee(mtmp);
         if (vis) {
-            struct trap *t;
-            t = t_at(trapx, trapy);
+            struct trap *t = t_at(trapx, trapy);
+
             pline("%s %s into a %s!", Monnam(mtmp),
                   makeplural(locomotion(mtmp->data, "jump")),
                   t->ttyp == TRAPDOOR ? "trap door" : "hole");
@@ -877,18 +900,13 @@ struct monst *mtmp;
         return 2;
     case MUSE_SSTAIRS:
         m_flee(mtmp);
-        /* the stairs leading up from the 1st level are */
-        /* regular stairs, not sstairs.			*/
-        if (sstairs.up) {
-            if (vismon)
-                pline("%s escapes upstairs!", Monnam(mtmp));
-            if (Inhell) {
-                migrate_to_level(mtmp, ledger_no(&sstairs.tolev), MIGR_RANDOM,
-                                 (coord *) 0);
-                return 2;
-            }
-        } else if (vismon)
-            pline("%s escapes downstairs!", Monnam(mtmp));
+        if (vismon)
+            pline("%s escapes %sstairs!", Monnam(mtmp),
+                  sstairs.up ? "up" : "down");
+        /* going from the Valley to Castle (Stronghold) has no sstairs
+           to target, but having sstairs.<sx,sy> == <0,0> will work the
+           same as specifying MIGR_RANDOM when mon_arrive() eventually
+           places the monster, so we can use MIGR_SSTAIRS unconditionally */
         migrate_to_level(mtmp, ledger_no(&sstairs.tolev), MIGR_SSTAIRS,
                          (coord *) 0);
         return 2;
@@ -897,10 +915,6 @@ struct monst *mtmp;
         if (vis) {
             pline("%s %s onto a teleport trap!", Monnam(mtmp),
                   makeplural(locomotion(mtmp->data, "jump")));
-            if (levl[trapx][trapy].typ == SCORR) {
-                levl[trapx][trapy].typ = CORR;
-                unblock_point(trapx, trapy);
-            }
             seetrap(t_at(trapx, trapy));
         }
         /*  don't use rloc_to() because worm tails must "move" */
@@ -1053,7 +1067,6 @@ find_offensive(mtmp)
 struct monst *mtmp;
 {
     register struct obj *obj;
-    boolean ranged_stuff = lined_up(mtmp);
     boolean reflection_skip = (Reflecting && rn2(2));
     struct obj *helmet = which_armor(mtmp, W_ARMH);
 
@@ -1066,18 +1079,19 @@ struct monst *mtmp;
         return FALSE;
     if (in_your_sanctuary(mtmp, 0, 0))
         return FALSE;
-    if (dmgtype(mtmp->data, AD_HEAL) && !uwep && !uarmu && !uarm && !uarmh
+    if (dmgtype(mtmp->data, AD_HEAL)
+        && !uwep && !uarmu && !uarm && !uarmh
         && !uarms && !uarmg && !uarmc && !uarmf)
         return FALSE;
-
-    if (!ranged_stuff)
+    /* all offensive items require orthogonal or diagonal targetting */
+    if (!lined_up(mtmp))
         return FALSE;
-#define nomore(x)           \
-    if (m.has_offense == x) \
-        continue;
+
+#define nomore(x)       if (m.has_offense == x) continue;
+    /* this picks the last viable item rather than prioritizing choices */
     for (obj = mtmp->minvent; obj; obj = obj->nobj) {
-        /* nomore(MUSE_WAN_DEATH); */
         if (!reflection_skip) {
+            nomore(MUSE_WAN_DEATH);
             if (obj->otyp == WAN_DEATH && obj->spe > 0) {
                 m.offensive = obj;
                 m.has_offense = MUSE_WAN_DEATH;
@@ -1150,7 +1164,7 @@ struct monst *mtmp;
         }
         /* we can safely put this scroll here since the locations that
          * are in a 1 square radius are a subset of the locations that
-         * are in wand range
+         * are in wand or throwing range (in other words, always lined_up())
          */
         nomore(MUSE_SCR_EARTH);
         if (obj->otyp == SCR_EARTH
@@ -1159,22 +1173,23 @@ struct monst *mtmp;
                 || noncorporeal(mtmp->data) || unsolid(mtmp->data)
                 || !rn2(10))
             && dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) <= 2
-            && mtmp->mcansee && haseyes(mtmp->data) && !Is_rogue_level(&u.uz)
+            && mtmp->mcansee && haseyes(mtmp->data)
+            && !Is_rogue_level(&u.uz)
             && (!In_endgame(&u.uz) || Is_earthlevel(&u.uz))) {
             m.offensive = obj;
             m.has_offense = MUSE_SCR_EARTH;
         }
 #if 0
-		nomore(MUSE_SCR_FIRE);
-		if (obj->otyp == SCR_FIRE && resists_fire(mtmp)
-		   && dist2(mtmp->mx,mtmp->my,mtmp->mux,mtmp->muy) <= 2
-		   && mtmp->mcansee && haseyes(mtmp->data)) {
-			m.offensive = obj;
-			m.has_offense = MUSE_SCR_FIRE;
-		}
-#endif
+        nomore(MUSE_SCR_FIRE);
+        if (obj->otyp == SCR_FIRE && resists_fire(mtmp)
+            && dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) <= 2
+            && mtmp->mcansee && haseyes(mtmp->data)) {
+            m.offensive = obj;
+            m.has_offense = MUSE_SCR_FIRE;
+        }
+#endif /* 0 */
     }
-    return ((boolean)(!!m.has_offense));
+    return (boolean) !!m.has_offense;
 #undef nomore
 }
 
@@ -1449,48 +1464,49 @@ struct monst *mtmp;
         return (mtmp->mhp <= 0) ? 1 : 2;
     }
 #if 0
-	case MUSE_SCR_FIRE:
-	      {
-		boolean vis = cansee(mtmp->mx, mtmp->my);
+    case MUSE_SCR_FIRE: {
+        boolean vis = cansee(mtmp->mx, mtmp->my);
 
-		mreadmsg(mtmp, otmp);
-		if (mtmp->mconf) {
-			if (vis)
-			    pline("Oh, what a pretty fire!");
-		} else {
-			struct monst *mtmp2;
-			int num;
+        mreadmsg(mtmp, otmp);
+        if (mtmp->mconf) {
+            if (vis)
+                pline("Oh, what a pretty fire!");
+        } else {
+            struct monst *mtmp2;
+            int num;
 
-			if (vis)
-			    pline_The("scroll erupts in a tower of flame!");
-			shieldeff(mtmp->mx, mtmp->my);
-			pline("%s is uninjured.", Monnam(mtmp));
-			(void) destroy_mitem(mtmp, SCROLL_CLASS, AD_FIRE);
-			(void) destroy_mitem(mtmp, SPBOOK_CLASS, AD_FIRE);
-			(void) destroy_mitem(mtmp, POTION_CLASS, AD_FIRE);
-			num = (2*(rn1(3, 3) + 2 * bcsign(otmp)) + 1)/3;
-			if (Fire_resistance)
-			    You("are not harmed.");
-			burn_away_slime();
-			if (Half_spell_damage) num = (num+1) / 2;
-			else losehp(num, "scroll of fire", KILLED_BY_AN);
-			for(mtmp2 = fmon; mtmp2; mtmp2 = mtmp2->nmon) {
-			   if(DEADMONSTER(mtmp2)) continue;
-			   if(mtmp == mtmp2) continue;
-			   if(dist2(mtmp2->mx,mtmp2->my,mtmp->mx,mtmp->my) < 3){
-				if (resists_fire(mtmp2)) continue;
-				mtmp2->mhp -= num;
-				if (resists_cold(mtmp2))
-				    mtmp2->mhp -= 3*num;
-				if(mtmp2->mhp < 1) {
-				    mondied(mtmp2);
-				    break;
-				}
-			    }
-			}
-		}
-		return 2;
-	      }
+            if (vis)
+                pline_The("scroll erupts in a tower of flame!");
+            shieldeff(mtmp->mx, mtmp->my);
+            pline("%s is uninjured.", Monnam(mtmp));
+            (void) destroy_mitem(mtmp, SCROLL_CLASS, AD_FIRE);
+            (void) destroy_mitem(mtmp, SPBOOK_CLASS, AD_FIRE);
+            (void) destroy_mitem(mtmp, POTION_CLASS, AD_FIRE);
+            num = (2 * (rn1(3, 3) + 2 * bcsign(otmp)) + 1) / 3;
+            if (Fire_resistance)
+                You("are not harmed.");
+            burn_away_slime();
+            if (Half_spell_damage)
+                num = (num + 1) / 2;
+            else
+                losehp(num, "scroll of fire", KILLED_BY_AN);
+            for (mtmp2 = fmon; mtmp2; mtmp2 = mtmp2->nmon) {
+                if (DEADMONSTER(mtmp2)) continue;
+                if (mtmp == mtmp2) continue;
+                if (dist2(mtmp2->mx, mtmp2->my, mtmp->mx, mtmp->my) < 3) {
+                    if (resists_fire(mtmp2)) continue;
+                    mtmp2->mhp -= num;
+                    if (resists_cold(mtmp2))
+                        mtmp2->mhp -= 3 * num;
+                    if (mtmp2->mhp < 1) {
+                        mondied(mtmp2);
+                        break;
+                    }
+                }
+            }
+        }
+        return 2;
+    }
 #endif /* 0 */
     case MUSE_POT_PARALYSIS:
     case MUSE_POT_BLINDNESS:
@@ -1586,7 +1602,7 @@ struct monst *mtmp;
     struct permonst *mdat = mtmp->data;
     int x = mtmp->mx, y = mtmp->my;
     struct trap *t;
-    int xx, yy;
+    int xx, yy, pmidx = NON_PM;
     boolean immobile = (mdat->mmove == 0);
     boolean stuck = (mtmp == u.ustuck);
 
@@ -1605,35 +1621,41 @@ struct monst *mtmp;
         return FALSE;
 
     if (!stuck && !immobile && (mtmp->cham == NON_PM)
-        && monstr[monsndx(mdat)] < 6) {
-        boolean ignore_boulders =
-            (verysmall(mdat) || throws_rocks(mdat) || passes_walls(mdat));
+        && monstr[(pmidx = monsndx(mdat))] < 6) {
+        boolean ignore_boulders = (verysmall(mdat) || throws_rocks(mdat)
+                                   || passes_walls(mdat)),
+            diag_ok = !NODIAG(pmidx);
+
         for (xx = x - 1; xx <= x + 1; xx++)
             for (yy = y - 1; yy <= y + 1; yy++)
-                if (isok(xx, yy) && (xx != u.ux || yy != u.uy))
-                    if (mdat != &mons[PM_GRID_BUG] || xx == x || yy == y)
-                        if (/* (xx==x && yy==y) || */ !level.monsters[xx][yy])
-                            if ((t = t_at(xx, yy)) != 0
-                                && (ignore_boulders
-                                    || !sobj_at(BOULDER, xx, yy))
-                                && !onscary(xx, yy, mtmp)) {
-                                if (t->ttyp == POLY_TRAP) {
-                                    trapx = xx;
-                                    trapy = yy;
-                                    m.has_misc = MUSE_POLY_TRAP;
-                                    return TRUE;
-                                }
-                            }
+                if (isok(xx, yy) && (xx != u.ux || yy != u.uy)
+                    && (diag_ok || xx == x || yy == y)
+                    && ((xx == x && yy == y) || !level.monsters[xx][yy]))
+                    if ((t = t_at(xx, yy)) != 0
+                        && (ignore_boulders || !sobj_at(BOULDER, xx, yy))
+                        && !onscary(xx, yy, mtmp)) {
+                        /* use trap if it's the correct type */
+                        if (t->ttyp == POLY_TRAP) {
+                            trapx = xx;
+                            trapy = yy;
+                            m.has_misc = MUSE_POLY_TRAP;
+                            return TRUE;
+                        }
+                    }
     }
     if (nohands(mdat))
         return 0;
 
-#define nomore(x)        \
-    if (m.has_misc == x) \
-        continue;
+#define nomore(x)       if (m.has_misc == x) continue
+    /*
+     * [bug?]  Choice of item is not prioritized; the last viable one
+     * in the monster's inventory will be chosen.
+     * 'nomore()' is nearly worthless because it only screens checking
+     * of duplicates when there is no alternate type in between them.
+     */
     for (obj = mtmp->minvent; obj; obj = obj->nobj) {
-        /* Monsters shouldn't recognize cursed items; this kludge is */
-        /* necessary to prevent serious problems though... */
+        /* Monsters shouldn't recognize cursed items; this kludge is
+           necessary to prevent serious problems though... */
         if (obj->otyp == POT_GAIN_LEVEL
             && (!obj->cursed
                 || (!mtmp->isgd && !mtmp->isshk && !mtmp->ispriest))) {
@@ -1695,7 +1717,7 @@ struct monst *mtmp;
             m.has_misc = MUSE_POT_POLYMORPH;
         }
     }
-    return ((boolean)(!!m.has_misc));
+    return (boolean) !!m.has_misc;
 #undef nomore
 }
 
@@ -1996,19 +2018,19 @@ struct obj *obj;
         return FALSE;
 
     if (typ == WAN_MAKE_INVISIBLE || typ == POT_INVISIBILITY)
-        return (boolean)(!mon->minvis && !mon->invis_blkd
-                         && !attacktype(mon->data, AT_GAZE));
+        return (boolean) (!mon->minvis && !mon->invis_blkd
+                          && !attacktype(mon->data, AT_GAZE));
     if (typ == WAN_SPEED_MONSTER || typ == POT_SPEED)
-        return (boolean)(mon->mspeed != MFAST);
+        return (boolean) (mon->mspeed != MFAST);
 
     switch (obj->oclass) {
     case WAND_CLASS:
         if (obj->spe <= 0)
             return FALSE;
         if (typ == WAN_DIGGING)
-            return (boolean)(!is_floater(mon->data));
+            return (boolean) !is_floater(mon->data);
         if (typ == WAN_POLYMORPH)
-            return (boolean)(monstr[monsndx(mon->data)] < 6);
+            return (boolean) (monstr[monsndx(mon->data)] < 6);
         if (objects[typ].oc_dir == RAY || typ == WAN_STRIKING
             || typ == WAN_TELEPORTATION || typ == WAN_CREATE_MONSTER)
             return TRUE;
@@ -2029,7 +2051,7 @@ struct obj *obj;
         break;
     case AMULET_CLASS:
         if (typ == AMULET_OF_LIFE_SAVING)
-            return (boolean)(!(nonliving(mon->data) || is_vampshifter(mon)));
+            return (boolean) !(nonliving(mon->data) || is_vampshifter(mon));
         if (typ == AMULET_OF_REFLECTION)
             return TRUE;
         break;
@@ -2037,22 +2059,22 @@ struct obj *obj;
         if (typ == PICK_AXE)
             return (boolean) needspick(mon->data);
         if (typ == UNICORN_HORN)
-            return (boolean)(!obj->cursed && !is_unicorn(mon->data));
+            return (boolean) (!obj->cursed && !is_unicorn(mon->data));
         if (typ == FROST_HORN || typ == FIRE_HORN)
             return (obj->spe > 0);
         break;
     case FOOD_CLASS:
         if (typ == CORPSE)
-            return (boolean)(
-                ((mon->misc_worn_check & W_ARMG)
-                 && touch_petrifies(&mons[obj->corpsenm]))
-                || (!resists_ston(mon) && cures_stoning(mon, obj, FALSE)));
+            return (boolean) (((mon->misc_worn_check & W_ARMG) != 0L
+                               && touch_petrifies(&mons[obj->corpsenm]))
+                              || (!resists_ston(mon)
+                                  && cures_stoning(mon, obj, FALSE)));
         if (typ == TIN)
-            return (boolean)(
-                mcould_eat_tin(mon)
-                && (!resists_ston(mon) && cures_stoning(mon, obj, TRUE)));
+            return (boolean) (mcould_eat_tin(mon)
+                              && (!resists_ston(mon)
+                                  && cures_stoning(mon, obj, TRUE)));
         if (typ == EGG)
-            return (boolean)(touch_petrifies(&mons[obj->corpsenm]));
+            return (boolean) touch_petrifies(&mons[obj->corpsenm]);
         break;
     default:
         break;
@@ -2249,10 +2271,10 @@ boolean tinok;
     if (obj->otyp != CORPSE && (obj->otyp != TIN || !tinok))
         return FALSE;
     /* corpse, or tin that mon can open */
-    return (boolean)(
-        obj->corpsenm == PM_LIZARD
-        || (acidic(&mons[obj->corpsenm])
-            && (obj->corpsenm != PM_GREEN_SLIME || slimeproof(mon->data))));
+    return (boolean) (obj->corpsenm == PM_LIZARD
+                      || (acidic(&mons[obj->corpsenm])
+                          && (obj->corpsenm != PM_GREEN_SLIME
+                              || slimeproof(mon->data))));
 }
 
 STATIC_OVL boolean

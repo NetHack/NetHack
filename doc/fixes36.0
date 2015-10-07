@@ -922,6 +922,8 @@ add an option to prevent omitting the uncursed status from inventory
 show prices when walking over the shop merchandise
 you shouldn't see Sting glow light blue if you're blind
 when jumping, bumping into something is noisy
+flesh golems hit by electricity healed by wrong amount
+fleeing monsters couldn't use stairs that lead to different dungeon branch
 
 
 Platform- and/or Interface-Specific Fixes
