@@ -1,4 +1,4 @@
-/* NetHack 3.6	mthrowu.c	$NHDT-Date: 1436753519 2015/07/13 02:11:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.56 $ */
+/* NetHack 3.6	mthrowu.c	$NHDT-Date: 1444258159 2015/10/07 22:49:19 $  $NHDT-Branch: master $:$NHDT-Revision: 1.58 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -86,7 +86,6 @@ const char *name; /* if null, then format `obj' */
  * dothrow.c (for consistency). --KAA
  * Returns 0 if object still exists (not destroyed).
  */
-
 STATIC_OVL int
 drop_throw(obj, ohit, x, y)
 register struct obj *obj;
@@ -671,7 +670,9 @@ struct monst *mtmp;
     nomul(0);
 }
 
-int spitmu(mtmp, mattk) /* monster spits substance at you */
+/* monster spits substance at you */
+int
+spitmu(mtmp, mattk)
 register struct monst *mtmp;
 register struct attack *mattk;
 {
@@ -709,7 +710,9 @@ register struct attack *mattk;
     return 0;
 }
 
-int breamu(mtmp, mattk) /* monster breathes at you (ranged) */
+/* monster breathes at you (ranged) */
+int
+breamu(mtmp, mattk)
 register struct monst *mtmp;
 register struct attack *mattk;
 {
@@ -789,7 +792,9 @@ int boulderhandling; /* 0=block, 1=ignore, 2=conditionally block */
     return FALSE;
 }
 
-boolean lined_up(mtmp) /* is mtmp in position to use ranged attack? */
+/* is mtmp in position to use ranged attack? */
+boolean
+lined_up(mtmp)
 register struct monst *mtmp;
 {
     boolean ignore_boulders;
@@ -800,14 +805,13 @@ register struct monst *mtmp;
                               && youmonst.m_ap_type != M_AP_MONSTER)))
         return FALSE;
 
-    ignore_boulders =
-        (throws_rocks(mtmp->data) || m_carrying(mtmp, WAN_STRIKING));
+    ignore_boulders = (throws_rocks(mtmp->data)
+                       || m_carrying(mtmp, WAN_STRIKING));
     return linedup(mtmp->mux, mtmp->muy, mtmp->mx, mtmp->my,
                    ignore_boulders ? 1 : 2);
 }
 
-/* Check if a monster is carrying a particular item.
- */
+/* check if a monster is carrying a particular item */
 struct obj *
 m_carrying(mtmp, type)
 struct monst *mtmp;
