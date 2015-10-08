@@ -1,4 +1,4 @@
-/* NetHack 3.6	spell.c	$NHDT-Date: 1434421353 2015/06/16 02:22:33 $  $NHDT-Branch: master $:$NHDT-Revision: 1.63 $ */
+/* NetHack 3.6	spell.c	$NHDT-Date: 1444295991 2015/10/08 09:19:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.64 $ */
 /*	Copyright (c) M. Stephenson 1988			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -720,10 +720,10 @@ int booktype;
 STATIC_OVL void
 cast_protection()
 {
-    int loglev = 0;
-    int l = u.ulevel;
-    int natac = u.uac - u.uspellprot;
-    int gain;
+    int l = u.ulevel, loglev = 0,
+        gain, natac = u.uac + u.uspellprot;
+    /* note: u.uspellprot is subtracted when find_ac() factors it into u.uac,
+       so adding here factors it back out (3.4.3,3.5 had this backwards) */
 
     /* loglev=log2(u.ulevel)+1 (1..5) */
     while (l) {
@@ -752,7 +752,8 @@ cast_protection()
      *     16-30   0    0,  5,  9, 11, 13, 14, 15
      *     16-30 -10    0,  5,  8,  9, 10
      */
-    gain = loglev - (int) u.uspellprot / (4 - min(3, (10 - natac) / 10));
+    natac = (10 - natac) / 10; /* convert to positive and scale down */
+    gain = loglev - (int) u.uspellprot / (4 - min(3, natac));
 
     if (gain > 0) {
         if (!Blind) {
@@ -763,28 +764,30 @@ cast_protection()
                 pline_The("%s haze around you becomes more dense.", hgolden);
             } else {
                 rmtyp = levl[u.ux][u.uy].typ;
-                atmosphere =
-                    u.uswallow
-                        ? ((u.ustuck->data == &mons[PM_FOG_CLOUD])
-                               ? "mist"
-                               : is_whirly(u.ustuck->data)
-                                     ? "maelstrom"
-                                     : is_animal(u.ustuck->data) ? "maw"
-                                                                 : "ooze")
-                        : u.uinwater ? "water" : (rmtyp == CLOUD)
-                                                     ? "cloud"
-                                                     : IS_TREE(rmtyp)
-                                                           ? "vegitation"
-                                                           : IS_STWALL(rmtyp)
-                                                                 ? "stone"
-                                                                 : "air";
+                atmosphere = u.uswallow
+                                ? ((u.ustuck->data == &mons[PM_FOG_CLOUD])
+                                   ? "mist"
+                                   : is_whirly(u.ustuck->data)
+                                      ? "maelstrom"
+                                      : is_animal(u.ustuck->data)
+                                         ? "maw"
+                                         : "ooze")
+                                : (u.uinwater
+                                   ? "water"
+                                   : (rmtyp == CLOUD)
+                                      ? "cloud"
+                                      : IS_TREE(rmtyp)
+                                         ? "vegitation"
+                                         : IS_STWALL(rmtyp)
+                                            ? "stone"
+                                            : "air");
                 pline_The("%s around you begins to shimmer with %s haze.",
                           atmosphere, an(hgolden));
             }
         }
         u.uspellprot += gain;
-        u.uspmtime =
-            P_SKILL(spell_skilltype(SPE_PROTECTION)) == P_EXPERT ? 20 : 10;
+        u.uspmtime = (P_SKILL(spell_skilltype(SPE_PROTECTION)) == P_EXPERT)
+                        ? 20 : 10;
         if (!u.usptime)
             u.usptime = u.uspmtime;
         find_ac();
