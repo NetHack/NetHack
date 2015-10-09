@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1431192759 2015/05/09 17:32:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.111 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1444352700 2015/10/09 01:05:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.116 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -28,7 +28,7 @@ STATIC_DCL void FDECL(forget, (int));
 STATIC_DCL int FDECL(maybe_tame, (struct monst *, struct obj *));
 STATIC_DCL boolean FDECL(is_valid_stinking_cloud_pos, (int, int, BOOLEAN_P));
 STATIC_DCL void FDECL(display_stinking_cloud_positions, (int));
-STATIC_PTR void FDECL(set_lit, (int, int, genericptr_t));
+STATIC_PTR void FDECL(set_lit, (int, int, genericptr));
 
 STATIC_OVL boolean
 learnscrolltyp(scrolltyp)
@@ -118,6 +118,7 @@ char *buf;
         "I'm not wearing any pants", "Down with the living!",
         "Pudding farmer", "Vegetarian",
     };
+
     Strcpy(buf, shirt_msgs[tshirt->o_id % SIZE(shirt_msgs)]);
     return erode_obj_text(tshirt, buf);
 }
@@ -135,6 +136,7 @@ char *buf;
         "If we weren't meant to eat animals, why are they made out of meat?",
         "If you don't like the food, I'll stab you",
     };
+
     Strcpy(buf, apron_msgs[apron->o_id % SIZE(apron_msgs)]);
     return erode_obj_text(apron, buf);
 }
@@ -196,6 +198,7 @@ doread()
             "Yendorian Express - Mithril Card",
             "Yendorian Express - Platinum Card", /* must be last */
         };
+
         if (Blind) {
             You("feel the embossed numbers:");
         } else {
@@ -252,6 +255,7 @@ doread()
             "Fruity Oaty",              /* Serenity */
             "Wonka Bar" /* Charlie and the Chocolate Factory */
         };
+
         if (Blind) {
             You_cant("feel any Braille writing.");
             return 0;
@@ -309,9 +313,9 @@ doread()
     if (scroll->otyp != SCR_BLANK_PAPER) {
         /* a few scroll feedback messages describe something happening
            to the scroll itself, so avoid "it disappears" for those */
-        nodisappear =
-            (scroll->otyp == SCR_FIRE
-             || (scroll->otyp == SCR_REMOVE_CURSE && scroll->cursed));
+        nodisappear = (scroll->otyp == SCR_FIRE
+                       || (scroll->otyp == SCR_REMOVE_CURSE
+                           && scroll->cursed));
         if (Blind)
             pline(nodisappear
                       ? "You %s the formula on the scroll."
@@ -340,7 +344,7 @@ doread()
         if (scroll->otyp != SCR_BLANK_PAPER)
             useup(scroll);
     }
-    return (1);
+    return 1;
 }
 
 STATIC_OVL void
@@ -375,8 +379,8 @@ register const char *color;
           Blind ? "" : " ", Blind ? "" : hcolor(color));
 }
 
-/* Is the object chargeable?  For purposes of inventory display; it is */
-/* possible to be able to charge things for which this returns FALSE. */
+/* Is the object chargeable?  For purposes of inventory display; it is
+   possible to be able to charge things for which this returns FALSE. */
 boolean
 is_chargeable(obj)
 struct obj *obj;
@@ -385,21 +389,19 @@ struct obj *obj;
         return TRUE;
     /* known && !oc_name_known is possible after amnesia/mind flayer */
     if (obj->oclass == RING_CLASS)
-        return (boolean)(
-            objects[obj->otyp].oc_charged
-            && (obj->known
-                || (obj->dknown && objects[obj->otyp].oc_name_known)));
+        return (boolean) (objects[obj->otyp].oc_charged
+                          && (obj->known
+                              || (obj->dknown
+                                  && objects[obj->otyp].oc_name_known)));
     if (is_weptool(obj)) /* specific check before general tools */
         return FALSE;
     if (obj->oclass == TOOL_CLASS)
-        return (boolean)(objects[obj->otyp].oc_charged);
+        return (boolean) objects[obj->otyp].oc_charged;
     return FALSE; /* why are weapons/armor considered charged anyway? */
 }
 
-/*
- * recharge an object; curse_bless is -1 if the recharging implement
- * was cursed, +1 if blessed, 0 otherwise.
- */
+/* recharge an object; curse_bless is -1 if the recharging implement
+   was cursed, +1 if blessed, 0 otherwise. */
 void
 recharge(obj, curse_bless)
 struct obj *obj;
@@ -422,17 +424,17 @@ int curse_bless;
 
         /*
          * Recharging might cause wands to explode.
-         *	v = number of previous recharges
-         *	      v = percentage chance to explode on this attempt
-         *		      v = cumulative odds for exploding
-         *	0 :   0       0
-         *	1 :   0.29    0.29
-         *	2 :   2.33    2.62
-         *	3 :   7.87   10.28
-         *	4 :  18.66   27.02
-         *	5 :  36.44   53.62
-         *	6 :  62.97   82.83
-         *	7 : 100     100
+         *      v = number of previous recharges
+         *            v = percentage chance to explode on this attempt
+         *                    v = cumulative odds for exploding
+         *      0 :   0       0
+         *      1 :   0.29    0.29
+         *      2 :   2.33    2.62
+         *      3 :   7.87   10.28
+         *      4 :  18.66   27.02
+         *      5 :  36.44   53.62
+         *      6 :  62.97   82.83
+         *      7 : 100     100
          */
         n = (int) obj->recharged;
         if (n > 0 && (obj->otyp == WAN_WISHING
@@ -464,8 +466,9 @@ int curse_bless;
             else
                 p_glow1(obj);
 #if 0 /*[shop price doesn't vary by charge count]*/
-		/* update shop bill to reflect new higher price */
-		if (obj->unpaid) alter_cost(obj, 0L);
+            /* update shop bill to reflect new higher price */
+            if (obj->unpaid)
+                alter_cost(obj, 0L);
 #endif
         }
 
@@ -485,6 +488,7 @@ int curse_bless;
             losehp(Maybe_Half_Phys(s), "exploding ring", KILLED_BY_AN);
         } else {
             long mask = is_on ? (obj == uleft ? LEFT_RING : RIGHT_RING) : 0L;
+
             pline("%s spins %sclockwise for a moment.", Yname2(obj),
                   s < 0 ? "counter" : "");
             if (s < 0)
@@ -584,9 +588,9 @@ int curse_bless;
             }
             break;
         case CRYSTAL_BALL:
-            if (is_cursed)
+            if (is_cursed) {
                 stripspe(obj);
-            else if (is_blessed) {
+            } else if (is_blessed) {
                 obj->spe = 6;
                 p_glow2(obj, NH_BLUE);
             } else {
@@ -600,9 +604,9 @@ int curse_bless;
         case HORN_OF_PLENTY:
         case BAG_OF_TRICKS:
         case CAN_OF_GREASE:
-            if (is_cursed)
+            if (is_cursed) {
                 stripspe(obj);
-            else if (is_blessed) {
+            } else if (is_blessed) {
                 if (obj->spe <= 10)
                     obj->spe += rn1(10, 6);
                 else
@@ -648,7 +652,7 @@ int curse_bless;
     }
 }
 
-/* Forget known information about this object class. */
+/* Forget known information about this object type. */
 STATIC_OVL void
 forget_single_object(obj_id)
 int obj_id;
@@ -668,13 +672,13 @@ int obj_id;
 /* Forget everything known about a particular object class. */
 STATIC_OVL void
 forget_objclass(oclass)
-	int oclass;
+int oclass;
 {
-	int i;
+    int i;
 
-	for (i=bases[oclass];
-		i < NUM_OBJECTS && objects[i].oc_class==oclass; i++)
-	    forget_single_object(i);
+    for (i = bases[oclass];
+         i < NUM_OBJECTS && objects[i].oc_class == oclass; i++)
+        forget_single_object(i);
 }
 #endif
 
@@ -811,13 +815,11 @@ int percent;
 /*
  * Forget some things (e.g. after reading a scroll of amnesia).  When called,
  * the following are always forgotten:
- *
  *	- felt ball & chain
  *	- traps
  *	- part (6 out of 7) of the map
  *
  * Other things are subject to flags:
- *
  *	howmuch & ALL_MAP	= forget whole map
  *	howmuch & ALL_SPELLS	= forget all spells
  */
@@ -900,6 +902,7 @@ int state;
     } else if (state == 1) {
         int x, y, dx, dy;
         int dist = 6;
+
         for (dx = -dist; dx <= dist; dx++)
             for (dy = -dist; dy <= dist; dy++) {
                 x = u.ux + dx;
@@ -1604,10 +1607,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 
 void
 drop_boulder_on_player(confused, helmet_protects, byu, skip_uswallow)
-boolean confused;
-boolean helmet_protects;
-boolean byu;
-boolean skip_uswallow;
+boolean confused, helmet_protects, byu, skip_uswallow;
 {
     int dmg;
     struct obj *otmp2;
@@ -1651,8 +1651,7 @@ boolean skip_uswallow;
 boolean
 drop_boulder_on_monster(x, y, confused, byu)
 int x, y;
-boolean confused;
-boolean byu;
+boolean confused, byu;
 {
     register struct obj *otmp2;
     register struct monst *mtmp;
@@ -1830,13 +1829,11 @@ struct obj *obj;
         for (otmp = invent; otmp; otmp = otmp->nobj)
             if (otmp->lamplit)
                 (void) snuff_lit(otmp);
-        if (Blind)
-            goto do_it;
-    } else {
-        if (Blind)
-            goto do_it;
+    } else { /* on */
         if (u.uswallow) {
-            if (is_animal(u.ustuck->data))
+            if (Blind)
+                ; /* no feedback */
+            else if (is_animal(u.ustuck->data))
                 pline("%s %s is lit.", s_suffix(Monnam(u.ustuck)),
                       mbodypart(u.ustuck, STOMACH));
             else if (is_whirly(u.ustuck->data))
@@ -1845,10 +1842,10 @@ struct obj *obj;
                 pline("%s glistens.", Monnam(u.ustuck));
             return;
         }
-        pline("A lit field surrounds you!");
+        if (!Blind)
+            pline("A lit field surrounds you!");
     }
 
-do_it:
     /* No-op in water - can only see the adjacent squares and that's it! */
     if (Underwater || Is_waterlevel(&u.uz))
         return;
@@ -1865,19 +1862,20 @@ do_it:
         /* rogue lighting must light the entire room */
         int rnum = levl[u.ux][u.uy].roomno - ROOMOFFSET;
         int rx, ry;
+
         if (rnum >= 0) {
             for (rx = rooms[rnum].lx - 1; rx <= rooms[rnum].hx + 1; rx++)
                 for (ry = rooms[rnum].ly - 1; ry <= rooms[rnum].hy + 1; ry++)
                     set_lit(rx, ry,
-                            (genericptr_t)(on ? &is_lit : (char *) 0));
+                            (genericptr_t) (on ? &is_lit : (char *) 0));
             rooms[rnum].rlit = on;
         }
         /* hallways remain dark on the rogue level */
     } else
-        do_clear_area(
-            u.ux, u.uy,
-            (obj && obj->oclass == SCROLL_CLASS && obj->blessed) ? 9 : 5,
-            set_lit, (genericptr_t)(on ? &is_lit : (char *) 0));
+        do_clear_area(u.ux, u.uy,
+                      (obj && obj->oclass == SCROLL_CLASS && obj->blessed)
+                         ? 9 : 5,
+                      set_lit, (genericptr_t) (on ? &is_lit : (char *) 0));
 
     /*
      *  If we are not blind, then force a redraw on all positions in sight
@@ -2221,8 +2219,9 @@ void
 punish(sobj)
 register struct obj *sobj;
 {
-    struct obj *reuse_ball =
-        (sobj && sobj->otyp == HEAVY_IRON_BALL) ? sobj : (struct obj *) 0;
+    struct obj *reuse_ball = (sobj && sobj->otyp == HEAVY_IRON_BALL)
+                                ? sobj : (struct obj *) 0;
+
     /* KMH -- Punishment is still okay when you are riding */
     if (!reuse_ball)
         You("are being punished for your misbehavior!");
@@ -2307,7 +2306,12 @@ struct obj *from_obj;
  *
  * Note:  when creating a monster by class letter, specifying the
  * "strange object" (']') symbol produces a random monster rather
- * than a mimic; this behavior quirk is useful so don't "fix" it...
+ * than a mimic.  This behavior quirk is useful so don't "fix" it
+ * (use 'm'--or "mimic"--to create a random mimic).
+ *
+ * Used in wizard mode only (for ^G command and for scroll or spell
+ * of create monster).  Once upon a time, an earlier incarnation of
+ * this code was also used for the scroll/spell in explore mode.
  */
 boolean
 create_particular()
