@@ -1816,13 +1816,13 @@ struct obj *obj;
         if (!Blind) {
             if (u.uswallow) {
                 pline("It seems even darker in here than before.");
-                return;
+            } else {
+                if (uwep && artifact_light(uwep) && uwep->lamplit)
+                    pline("Suddenly, the only light left comes from %s!",
+                          the(xname(uwep)));
+                else
+                    You("are surrounded by darkness!");
             }
-            if (uwep && artifact_light(uwep) && uwep->lamplit)
-                pline("Suddenly, the only light left comes from %s!",
-                      the(xname(uwep)));
-            else
-                You("are surrounded by darkness!");
         }
 
         /* the magic douses lamps, et al, too */
@@ -1840,14 +1840,12 @@ struct obj *obj;
                 pline("%s shines briefly.", Monnam(u.ustuck));
             else
                 pline("%s glistens.", Monnam(u.ustuck));
-            return;
-        }
-        if (!Blind)
+        } else if (!Blind)
             pline("A lit field surrounds you!");
     }
 
-    /* No-op in water - can only see the adjacent squares and that's it! */
-    if (Underwater || Is_waterlevel(&u.uz))
+    /* No-op when swallowed or in water */
+    if (u.uswallow || Underwater || Is_waterlevel(&u.uz))
         return;
     /*
      *  If we are darkening the room and the hero is punished but not
