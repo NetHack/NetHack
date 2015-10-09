@@ -407,6 +407,9 @@ womble
 # Fraggle Rock
 fraggle
 
+# dyslexia
+mock role
+
 # soundex and typos of monsters
 gloating eye
 flush golem
