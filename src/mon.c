@@ -39,6 +39,40 @@ const char *warnings[] = {
 };
 #endif /* 0 */
 
+
+void
+sanity_check_single_mon(mtmp, msg)
+struct monst *mtmp;
+const char *msg;
+{
+    if (DEADMONSTER(mtmp)) return;
+    if ((mtmp->data < &mons[LOW_PM]) || (mtmp->data >= &mons[NUMMONS]))
+        impossible("illegal mon data (%s)", msg);
+}
+
+void
+mon_sanity_check()
+{
+    int x,y;
+    struct monst *mtmp = fmon;
+
+    while (mtmp) {
+        sanity_check_single_mon(mtmp, "fmon");
+        mtmp = mtmp->nmon;
+    }
+    for (x = 0; x < COLNO; x++)
+        for (y = 0; y < ROWNO; y++)
+            if ((mtmp = m_at(x,y)) != 0)
+                sanity_check_single_mon(mtmp, "m_at");
+
+    mtmp = migrating_mons;
+    while (mtmp) {
+        sanity_check_single_mon(mtmp, "migr");
+        mtmp = mtmp->nmon;
+    }
+}
+
+
 /* convert the monster index of an undead to its living counterpart */
 int
 undead_to_corpse(mndx)
