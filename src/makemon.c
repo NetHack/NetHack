@@ -967,15 +967,19 @@ register int mmflags;
 
     /* if caller wants random location, do it here */
     if (x == 0 && y == 0) {
-        int tryct = 0; /* careful with bigrooms */
+        int tryct = 200; /* careful with bigrooms */
+        boolean good;
         struct monst fakemon;
 
         fakemon.data = ptr; /* set up for goodpos */
         do {
             x = rn1(COLNO - 3, 2);
             y = rn2(ROWNO);
-        } while (!goodpos(x, y, ptr ? &fakemon : (struct monst *) 0, gpflags)
-                 || (!in_mklev && tryct++ < 50 && cansee(x, y)));
+            if (!in_mklev && cansee(x,y)) tryct--;
+            good = goodpos(x, y, ptr ? &fakemon : (struct monst *) 0, gpflags);
+        } while (tryct && !good);
+        if (!good)
+            return ((struct monst *) 0);
     } else if (byyou && !in_mklev) {
         coord bypos;
 
