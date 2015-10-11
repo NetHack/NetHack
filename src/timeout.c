@@ -692,7 +692,7 @@ struct obj *figurine;
 STATIC_OVL void
 slip_or_trip()
 {
-    struct obj *otmp = vobj_at(u.ux, u.uy);
+    struct obj *otmp = vobj_at(u.ux, u.uy), *otmp2;
     const char *what;
     char buf[BUFSZ];
     boolean on_foot = TRUE;
@@ -716,9 +716,9 @@ slip_or_trip()
                                                              : "them")
                 : (otmp->dknown || !Blind)
                       ? doname(otmp)
-                      : ((otmp = sobj_at(ROCK, u.ux, u.uy)) == 0
+                      : ((otmp2 = sobj_at(ROCK, u.ux, u.uy)) == 0
                              ? something
-                             : (otmp->quan == 1L ? "a rock" : "some rocks"));
+                             : (otmp2->quan == 1L ? "a rock" : "some rocks"));
         if (Hallucination) {
             what = strcpy(buf, what);
             buf[0] = highc(buf[0]);
