@@ -1051,6 +1051,8 @@ register struct obj *otmp;
                 context.spbook.book = (struct obj *) 0;
             }
             otmp->where = OBJ_FREE; /* set to free so dealloc will work */
+            otmp->nobj = NULL;      /* nobj saved into otmp2 */
+            otmp->cobj = NULL;      /* contents handled above */
             otmp->timed = 0;        /* not timed any more */
             otmp->lamplit = 0;      /* caller handled lights */
             dealloc_obj(otmp);
@@ -1149,6 +1151,7 @@ register struct monst *mtmp;
                 context.polearm.m_id = mtmp->m_id;
                 context.polearm.hitmon = NULL;
             }
+            mtmp->nmon = NULL;  /* nmon saved into mtmp2 */
             dealloc_monst(mtmp);
         }
         mtmp = mtmp2;

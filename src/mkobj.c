@@ -1943,6 +1943,10 @@ struct obj *obj;
 {
     if (obj->where != OBJ_FREE)
         panic("dealloc_obj: obj not free");
+    if (obj->nobj)
+        panic("dealloc_obj with nobj");
+    if (obj->cobj)
+        panic("dealloc_obj with cobj");
 
     /* free up any timers attached to the object */
     if (obj->timed)

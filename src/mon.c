@@ -1426,6 +1426,7 @@ dmonsfree()
         freetmp = *mtmp;
         if (freetmp->mhp <= 0 && !freetmp->isgd) {
             *mtmp = freetmp->nmon;
+            freetmp->nmon = NULL;
             dealloc_monst(freetmp);
             count++;
         } else
@@ -1603,6 +1604,8 @@ void
 dealloc_monst(mon)
 struct monst *mon;
 {
+    if (mon->nmon)
+        panic("dealloc_monst with nmon");
     if (mon->mextra)
         dealloc_mextra(mon->mextra);
     free((genericptr_t) mon);
