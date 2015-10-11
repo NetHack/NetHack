@@ -2160,6 +2160,7 @@ const char *mesg;
     struct obj *obj, *mwep;
 
     for (mon = monlist; mon; mon = mon->nmon) {
+        if (DEADMONSTER(mon)) continue;
         mwep = MON_WEP(mon);
         if (mwep) {
             if (!mcarried(mwep))
