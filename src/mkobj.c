@@ -1812,6 +1812,7 @@ struct obj *obj, **head_ptr;
     if (!curr)
         panic("extract_nobj: object lost");
     obj->where = OBJ_FREE;
+    obj->nobj = NULL;
 }
 
 /*
