@@ -2342,13 +2342,15 @@ boolean move_other; /* make sure mtmp gets to x, y! so move m_at(x, y) */
         xchar oldx = othermon->mx, oldy = othermon->my;
 
         othermon->mx = othermon->my = 0;
-        if (!mnearto(othermon, x, y, FALSE)) {
+        (void) mnearto(othermon, x, y, FALSE);
+        if (othermon->mx == 0 && othermon->my == 0) {
+            /* reloc failed, dump monster into "limbo"
+               (aka migrate to current level) */
             othermon->mx = oldx;
             othermon->my = oldy;
-            return FALSE;
+            mdrop_special_objs(othermon);
+            migrate_to_level(othermon, ledger_no(&u.uz), MIGR_APPROX_XY, NULL);
         }
-        if (othermon->mx != x || othermon->my != y)
-            return TRUE;
     }
 
     return FALSE;
