@@ -944,6 +944,68 @@ newmextra()
     return mextra;
 }
 
+
+boolean
+makemon_rnd_goodpos(mon, gpflags, cc)
+struct monst *mon;
+unsigned gpflags;
+coord *cc;
+{
+    int tryct = 0;
+    int nx,ny;
+    boolean good;
+    do {
+        nx = rn1(COLNO - 3, 2);
+        ny = rn2(ROWNO);
+        if (!in_mklev && cansee(nx,ny)) good = FALSE;
+        else good = goodpos(nx, ny, mon, gpflags);
+    } while ((++tryct < 50) && !good);
+    if (!good) {
+        /* else go through all map positions, twice, first round
+           ignoring positions in sight, and pick first good one.
+           skip first round if we're in special level loader or blind */
+        int xofs = nx;
+        int yofs = ny;
+        int dx,dy;
+        int bl = (in_mklev || Blind) ? 1 : 0;
+        for ( ; bl < 2; bl++) {
+            for (dx = 0; dx < COLNO; dx++)
+                for (dy = 0; dy < ROWNO; dy++) {
+                    nx = ((dx + xofs) % (COLNO - 1)) + 1;
+                    ny = ((dy + yofs) % (ROWNO - 1)) + 1;
+                    if ((bl == 0) && cansee(nx,ny)) continue;
+                    if (goodpos(nx, ny, mon, gpflags))
+                        goto gotgood;
+                }
+            if (bl == 0 && (!mon || mon->data->mmove)) {
+                /* all map positions are visible (or not good),
+                   try to pick something logical */
+                if (dnstair.sx && !rn2(2)) {
+                    nx = dnstair.sx;
+                    ny = dnstair.sy;
+                } else if (upstair.sx && !rn2(2)) {
+                    nx = upstair.sx;
+                    ny = upstair.sy;
+                } else if (dnladder.sx && !rn2(2)) {
+                    nx = dnladder.sx;
+                    ny = dnladder.sy;
+                } else if (upladder.sx && !rn2(2)) {
+                    nx = upladder.sx;
+                    ny = upladder.sy;
+                }
+                if (goodpos(nx, ny, mon, gpflags))
+                    goto gotgood;
+            }
+        }
+    } else {
+    gotgood:
+        cc->x = nx;
+        cc->y = ny;
+        return TRUE;
+    }
+    return FALSE;
+}
+
 /*
  * called with [x,y] = coordinates;
  *	[0,0] means anyplace
@@ -967,19 +1029,14 @@ register int mmflags;
 
     /* if caller wants random location, do it here */
     if (x == 0 && y == 0) {
-        int tryct = 200; /* careful with bigrooms */
-        boolean good;
+        coord cc;
         struct monst fakemon;
 
         fakemon.data = ptr; /* set up for goodpos */
-        do {
-            x = rn1(COLNO - 3, 2);
-            y = rn2(ROWNO);
-            if (!in_mklev && cansee(x,y)) tryct--;
-            good = goodpos(x, y, ptr ? &fakemon : (struct monst *) 0, gpflags);
-        } while (tryct && !good);
-        if (!good)
+        if (!makemon_rnd_goodpos(ptr ? &fakemon : (struct monst *)0, gpflags, &cc))
             return ((struct monst *) 0);
+        x = cc.x;
+        y = cc.y;
     } else if (byyou && !in_mklev) {
         coord bypos;
 
