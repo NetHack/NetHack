@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1432937666 2015/05/29 22:14:26 $  $NHDT-Branch: master $:$NHDT-Revision: 1.74 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1444617209 2015/10/12 02:33:29 $  $NHDT-Branch: master $:$NHDT-Revision: 1.75 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1299,13 +1299,13 @@ const char *
 noveltitle(novidx)
 int *novidx;
 {
-    int j, k = SIZE(sir_Terry_novels) - 1;
+    int j, k = SIZE(sir_Terry_novels);
 
     j = rn2(k);
     if (novidx) {
         if (*novidx == -1)
             *novidx = j;
-        else if ((*novidx >= 0) && (*novidx <= k))
+        else if (*novidx >= 0 && *novidx < k)
             j = *novidx;
     }
     return sir_Terry_novels[j];
@@ -1319,16 +1319,20 @@ int *idx;
     int k;
 
     /* Take American or U.K. spelling of this one */
-    if (strcmpi(lookname, "The Color of Magic") == 0)
+    if (!strcmpi(The(lookname), "The Color of Magic"))
         lookname = sir_Terry_novels[0];
 
     for (k = 0; k < SIZE(sir_Terry_novels); ++k) {
-        if (strcmpi(lookname, sir_Terry_novels[k]) == 0) {
+        if (!strcmpi(lookname, sir_Terry_novels[k])
+            || !strcmpi(The(lookname), sir_Terry_novels[k])) {
             if (idx)
                 *idx = k;
             return sir_Terry_novels[k];
         }
     }
+    /* name not found; if novelidx is already set, override the name */
+    if (idx && *idx >= 0 && *idx < SIZE(sir_Terry_novels))
+        return sir_Terry_novels[*idx];
 
     return (const char *) 0;
 }

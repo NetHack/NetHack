@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1444094263 2015/10/06 01:17:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.105 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1444617220 2015/10/12 02:33:40 $  $NHDT-Branch: master $:$NHDT-Revision: 1.110 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -939,11 +939,10 @@ boolean artif;
         /* case TIN: */
         set_corpsenm(otmp, otmp->corpsenm);
         break;
-    case SPE_NOVEL: {
-        int novidx = -1;
-        otmp = oname(otmp, noveltitle(&novidx));
-        otmp->novelidx = novidx;
-    } break;
+    case SPE_NOVEL:
+        otmp->novelidx = -1; /* "none of the above"; will be changed */
+        otmp = oname(otmp, noveltitle(&otmp->novelidx));
+        break;
     }
 
     /* unique objects may have an associated artifact entry */

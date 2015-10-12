@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1433058272 2015/05/31 07:44:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.141 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1444617222 2015/10/12 02:33:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.143 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2568,12 +2568,10 @@ struct obj *no_wish;
         }
     }
     /*
-       otmp->spe is type schar; so we don't want spe to be any bigger or
-       smaller.
-       also, spe should always be positive  -- some cheaters may try to
-       confuse
-       atoi()
-    */
+     * otmp->spe is type schar, so we don't want spe to be any bigger or
+     * smaller.  Also, spe should always be positive --some cheaters may
+     * try to confuse atoi().
+     */
     if (spe < 0) {
         spesgn = -1; /* cheaters get what they deserve */
         spe = abs(spe);
@@ -2584,14 +2582,14 @@ struct obj *no_wish;
         rechrg = 7; /* recharge_limit */
 
     /* now we have the actual name, as delivered by xname, say
-        green potions called whisky
-        scrolls labeled "QWERTY"
-        egg
-        fortune cookies
-        very heavy iron ball named hoei
-        wand of wishing
-        elven cloak
-    */
+     *  green potions called whisky
+     *  scrolls labeled "QWERTY"
+     *  egg
+     *  fortune cookies
+     *  very heavy iron ball named hoei
+     *  wand of wishing
+     *  elven cloak
+     */
     if ((p = strstri(bp, " named ")) != 0) {
         *p = 0;
         name = p + 7;
@@ -3216,15 +3214,6 @@ typfnd:
         }
     }
 
-    if (typ && wizard) {
-        if (typ == SPE_NOVEL) {
-            if (name && !lookup_novel(name, (int *) 0)) {
-                pline("There's no novel by that name.");
-                return ((struct obj *) 0);
-            }
-        }
-    }
-
     /*
      * Create the object, then fine-tune it.
      */
@@ -3433,14 +3422,11 @@ typfnd:
 
         /* 3.6.0 tribute - fix up novel */
         if (otmp->otyp == SPE_NOVEL) {
-            int novidx = 0;
             const char *novelname;
 
-            novelname = lookup_novel(name, &novidx);
-            if (novelname) {
-                otmp->novelidx = novidx;
+            novelname = lookup_novel(name, &otmp->novelidx);
+            if (novelname)
                 name = novelname;
-            }
         }
 
         otmp = oname(otmp, name);

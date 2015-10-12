@@ -1,4 +1,4 @@
-/* NetHack 3.6	objects.c	$NHDT-Date: 1436052459 2015/07/04 23:27:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.43 $ */
+/* NetHack 3.6	objects.c	$NHDT-Date: 1444617222 2015/10/12 02:33:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.46 $ */
 /* Copyright (c) Mike Threepoint, 1989.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -977,7 +977,7 @@ SPELL("freeze sphere",   "hardcover",
 SPELL("blank paper", "plain", P_NONE, 18, 0, 0, 0, 0, HI_PAPER),
 /* tribute book for 3.6 */
 OBJECT(OBJ("novel", "paperback"),
-       BITS(0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, P_NONE, HI_PAPER),
+       BITS(0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, P_NONE, HI_PAPER),
        0, SPBOOK_CLASS, 0, 0, 0, 20, 0, 0, 0, 1, 20, CLR_BRIGHT_BLUE),
 /* a special, one of a kind, spellbook */
 OBJECT(OBJ("Book of the Dead", "papyrus"),
