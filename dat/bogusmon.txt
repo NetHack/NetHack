@@ -407,7 +407,7 @@ womble
 # Fraggle Rock
 fraggle
 
-# dyslexia
+# Spoonerism
 mock role
 
 # soundex and typos of monsters
