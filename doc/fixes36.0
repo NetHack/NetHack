@@ -1158,6 +1158,7 @@ stop travel or run when you get hungry
 debug-mode viewing of object weight
 prizes on various levels now protected by ?oSM scrolls as well as Elbereth
 regexes now use system libraries consistently for all pattern-matching systems
+wet towels deal more damage
 
 
 Platform- and/or Interface-Specific New Features

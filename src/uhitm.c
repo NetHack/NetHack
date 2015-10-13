@@ -925,6 +925,10 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
                     /* non-weapons can damage because of their weight */
                     /* (but not too much) */
                     tmp = obj->owt / 100;
+                    if (obj->otyp == TOWEL && obj->spe > 0) { /* wet towel */
+                        tmp += obj->spe;
+                        obj->spe--;
+                    }
                     if (tmp < 1)
                         tmp = 1;
                     else

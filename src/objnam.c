@@ -308,6 +308,8 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
     case TOOL_CLASS:
         if (typ == LENSES)
             Strcpy(buf, "pair of ");
+        else if (typ == TOWEL && obj->spe > 0)
+            Strcpy(buf, (obj->spe < 3) ? "moist " : "wet ");
 
         if (!dknown)
             Strcat(buf, dn ? dn : actualn);
@@ -2399,6 +2401,7 @@ struct obj *no_wish;
     int halfeaten, mntmp, contents;
     int islit, unlabeled, ishistoric, isdiluted, trapped;
     int tmp, tinv, tvariety;
+    int wetness;
     struct fruit *f;
     int ftype = context.current_fruit;
     char fruitbuf[BUFSZ];
@@ -2432,6 +2435,7 @@ struct obj *no_wish;
     contents = UNDEFINED;
     oclass = 0;
     actualn = dn = un = 0;
+    wetness = 0;
 
     if (!bp)
         goto any;
@@ -2472,6 +2476,12 @@ struct obj *no_wish;
         } else if (!strncmpi(bp, "blessed ", l = 8)
                    || !strncmpi(bp, "holy ", l = 5)) {
             blessed = 1;
+        } else if (!strncmpi(bp, "moist ", l = 6)
+                   || !strncmpi(bp, "wet ", l = 4)) {
+            if (!strncmpi(bp, "wet ", 4))
+                wetness = rn2(3) + 3;
+            else
+                wetness = rnd(2);
         } else if (!strncmpi(bp, "cursed ", l = 7)
                    || !strncmpi(bp, "unholy ", l = 7)) {
             iscursed = 1;
@@ -3273,6 +3283,9 @@ typfnd:
             otmp->corpsenm = NON_PM;
             otmp->spe = 1;
         }
+        break;
+    case TOWEL:
+        if (wetness) otmp->spe = wetness;
         break;
     case SLIME_MOLD:
         otmp->spe = ftype;

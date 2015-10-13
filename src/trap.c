@@ -3307,6 +3307,9 @@ boolean force;
 
     if (obj->otyp == CAN_OF_GREASE && obj->spe > 0) {
         return ER_NOTHING;
+    } else if (obj->otyp == TOWEL && obj->spe < 7) {
+        obj->spe = max(obj->spe, rn2(8));
+        return ER_NOTHING;
     } else if (obj->greased) {
         if (!rn2(2))
             obj->greased = 0;

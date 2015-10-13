@@ -87,6 +87,7 @@ int shotlimit;
         Sprintf(killer.name, "throwing %s bare-handed", killer_xname(obj));
         instapetrify(killer.name);
     }
+    if (obj->otyp == TOWEL && obj->spe > 0) obj->spe--;
     if (welded(obj)) {
         weldmsg(obj);
         return 1;

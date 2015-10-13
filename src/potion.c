@@ -1933,6 +1933,12 @@ dodip()
         return (1);
     }
 
+    if (potion->otyp == POT_WATER && obj->otyp == TOWEL) {
+        pline_The("towel soaks it up!");
+        /* wetting the towel already done via H2Opotion_dip */
+        goto poof;
+    }
+
     if (is_poisonable(obj)) {
         if (potion->otyp == POT_SICKNESS && !obj->opoisoned) {
             char buf[BUFSZ];

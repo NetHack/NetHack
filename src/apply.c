@@ -102,6 +102,7 @@ struct obj *obj;
             incr_itimeout(&Glib, rn1(10, 3));
             Your("%s %s!", makeplural(body_part(HAND)),
                  (old ? "are filthier than ever" : "get slimy"));
+            if (obj->spe > 0) obj->spe--;
             return 1;
         case 1:
             if (!ublindf) {
@@ -127,6 +128,7 @@ struct obj *obj;
                     dropx(saved_ublindf);
                 }
             }
+            if (obj->spe > 0) obj->spe--;
             return 1;
         case 0:
             break;
@@ -136,10 +138,12 @@ struct obj *obj;
     if (Glib) {
         Glib = 0;
         You("wipe off your %s.", makeplural(body_part(HAND)));
+        if (obj->spe > 0) obj->spe--;
         return 1;
     } else if (u.ucreamed) {
         Blinded -= u.ucreamed;
         u.ucreamed = 0;
+        if (obj->spe > 0) obj->spe--;
 
         if (!Blinded) {
             pline("You've got the glop off.");
