@@ -904,6 +904,7 @@ aligntyp g_align;
             pat_on_head = 1;
     } else {
         int action, prayer_luck;
+        int tryct = 0;
 
         /* Negative luck is normally impossible here (can_pray() forces
            prayer failure in that situation), but it's possible for
@@ -936,7 +937,8 @@ aligntyp g_align;
         case 3:
             fix_worst_trouble(trouble);
         case 2:
-            while ((trouble = in_trouble()) > 0)
+            /* arbitrary number of tries */
+            while ((trouble = in_trouble()) > 0 && (++tryct < 10))
                 fix_worst_trouble(trouble);
             break;
 
