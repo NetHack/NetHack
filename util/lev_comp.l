@@ -296,6 +296,7 @@ graveyard	{ savetoken(yytext); yylval.i=GRAVEYARD; return FLAG_TYPE; }
 icedpools	{ savetoken(yytext); yylval.i=ICEDPOOLS; return FLAG_TYPE; }
 solidify	{ savetoken(yytext); yylval.i=SOLIDIFY; return FLAG_TYPE; }
 corrmaze        { savetoken(yytext); yylval.i=CORRMAZE; return FLAG_TYPE; }
+inaccessibles   { savetoken(yytext); yylval.i=CHECK_INACCESSIBLES; return FLAG_TYPE; }
 [0-9]+d[0-9]+	{ char *p = strchr(yytext, 'd');
 		  savetoken(yytext);
 		  if (p) {

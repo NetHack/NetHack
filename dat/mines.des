@@ -639,6 +639,7 @@ ALTAR:(31,03),align[0],shrine
 # "Bustling Town" by Kelly Bailey
 #
 MAZE: "minetn-6",' '
+FLAGS: inaccessibles
 INIT_MAP:mines,'.','-',true,true,lit,true
 GEOMETRY:center,top
 MAP

@@ -30,6 +30,8 @@
                                  */
 #define SOLIDIFY 0x00000400L  /* outer areas are nondiggable & nonpasswall */
 #define CORRMAZE 0x00000800L  /* for maze levels only */
+#define CHECK_INACCESSIBLES 0x00001000L /* check for inaccessible areas and
+   generate ways to escape from them */
 
 /* different level layout initializers */
 #define LVLINIT_NONE 0
@@ -291,6 +293,7 @@ struct sp_coder {
     int n_subroom;
     boolean exit_script;
     int lvl_is_joined;
+    boolean check_inaccessibles;
 
     int opcode;          /* current opcode */
     struct opvar *opdat; /* current push data (req. opcode == SPO_PUSH) */

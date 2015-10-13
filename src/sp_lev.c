@@ -112,9 +112,9 @@ STATIC_DCL struct opvar *FDECL(selection_logical_oper,
 STATIC_DCL struct opvar *FDECL(selection_filter_mapchar,
                                (struct opvar *, struct opvar *));
 STATIC_DCL void FDECL(selection_filter_percent, (struct opvar *, int));
-STATIC_DCL int FDECL(selection_rndcoord, (struct opvar *, schar *, schar *));
+STATIC_DCL int FDECL(selection_rndcoord, (struct opvar *, schar *, schar *, boolean));
 STATIC_DCL void FDECL(selection_do_grow, (struct opvar *, int));
-STATIC_DCL void FDECL(selection_floodfill, (struct opvar *, int, int));
+STATIC_DCL void FDECL(selection_floodfill, (struct opvar *, int, int, boolean));
 STATIC_DCL void FDECL(selection_do_ellipse,
                       (struct opvar *, int, int, int, int, int));
 STATIC_DCL long FDECL(line_dist_coord, (long, long, long, long, long, long));
@@ -3163,6 +3163,8 @@ struct sp_coder *coder;
         coder->solidify = TRUE;
     if (lflags & CORRMAZE)
         level.flags.corrmaze = TRUE;
+    if (lflags & CHECK_INACCESSIBLES)
+        coder->check_inaccessibles = TRUE;
 
     opvar_free(flagdata);
 }
@@ -3645,9 +3647,10 @@ int percent;
 }
 
 int
-selection_rndcoord(ov, x, y)
+selection_rndcoord(ov, x, y, removeit)
 struct opvar *ov;
 schar *x, *y;
+boolean removeit;
 {
     int idx = 0;
     int c;
@@ -3666,6 +3669,7 @@ schar *x, *y;
                     if (!c) {
                         *x = dx;
                         *y = dy;
+                        if (removeit) selection_setpoint(dx, dy, ov, 0);
                         return 1;
                     }
                     c--;
@@ -3727,12 +3731,40 @@ int dir;
                 selection_setpoint(x, y, ov, 1);
 }
 
+int (*selection_flood_check_func)(int, int) = NULL;
+
 void
-selection_floodfill(ov, x, y)
+set_selection_floodfill_checker(f)
+int (*f)(int, int);
+{
+    selection_flood_check_func = f;
+}
+
+static schar floodfill_checker_match_under_typ;
+
+int
+floodfill_checker_match_under(x,y)
+int x,y;
+{
+    return (floodfill_checker_match_under_typ == levl[x][y].typ);
+}
+
+int
+floodfill_checker_match_accessible(x,y)
+int x,y;
+{
+    return (ACCESSIBLE(levl[x][y].typ)
+            || levl[x][y].typ == SDOOR
+            || levl[x][y].typ == SCORR);
+}
+
+void
+selection_floodfill(ov, x, y, diagonals)
 struct opvar *ov;
 int x, y;
+boolean diagonals;
 {
-    static const char nhFunc[] = "selection_floorfill";
+    static const char nhFunc[] = "selection_floodfill";
     struct opvar *tmp = selection_opvar(NULL);
 #define SEL_FLOOD_STACK (COLNO * ROWNO)
 #define SEL_FLOOD(nx, ny)                     \
@@ -3744,11 +3776,19 @@ int x, y;
         } else                                \
             panic(floodfill_stack_overrun);   \
     } while (0)
-    static const char floodfill_stack_overrun[] = "floorfill stack overrun";
+#define SEL_FLOOD_CHKDIR(mx,my,sel)                  \
+    if (isok((mx), (my))                             \
+        && (*selection_flood_check_func)((mx),(my))  \
+        && !selection_getpoint((mx), (my), (sel)))   \
+        SEL_FLOOD((mx), (my))
+    static const char floodfill_stack_overrun[] = "floodfill stack overrun";
     int idx = 0;
     xchar dx[SEL_FLOOD_STACK];
     xchar dy[SEL_FLOOD_STACK];
-    schar under = levl[x][y].typ;
+    if (selection_flood_check_func == NULL) {
+        opvar_free(tmp);
+        return;
+    }
     SEL_FLOOD(x, y);
     do {
         idx--;
@@ -3758,21 +3798,20 @@ int x, y;
             selection_setpoint(x, y, ov, 1);
             selection_setpoint(x, y, tmp, 1);
         }
-        if (isok(x + 1, y) && (levl[x + 1][y].typ == under)
-            && !selection_getpoint(x + 1, y, tmp))
-            SEL_FLOOD(x + 1, y);
-        if (isok(x - 1, y) && (levl[x - 1][y].typ == under)
-            && !selection_getpoint(x - 1, y, tmp))
-            SEL_FLOOD(x - 1, y);
-        if (isok(x, y + 1) && (levl[x][y + 1].typ == under)
-            && !selection_getpoint(x, y + 1, tmp))
-            SEL_FLOOD(x, y + 1);
-        if (isok(x, y - 1) && (levl[x][y - 1].typ == under)
-            && !selection_getpoint(x, y - 1, tmp))
-            SEL_FLOOD(x, y - 1);
+        SEL_FLOOD_CHKDIR((x + 1), y, tmp);
+        SEL_FLOOD_CHKDIR((x - 1), y, tmp);
+        SEL_FLOOD_CHKDIR(x, (y + 1), tmp);
+        SEL_FLOOD_CHKDIR(x, (y - 1), tmp);
+        if (diagonals) {
+            SEL_FLOOD_CHKDIR((x + 1), (y + 1), tmp);
+            SEL_FLOOD_CHKDIR((x - 1), (y - 1), tmp);
+            SEL_FLOOD_CHKDIR((x - 1), (y + 1), tmp);
+            SEL_FLOOD_CHKDIR((x + 1), (y - 1), tmp);
+        }
     } while (idx > 0);
 #undef SEL_FLOOD
 #undef SEL_FLOOD_STACK
+#undef SEL_FLOOD_CHKDIR
     opvar_free(tmp);
 }
 
@@ -4187,6 +4226,117 @@ struct sp_coder *coder;
     opvar_free(from_ter);
     opvar_free(to_ter);
     opvar_free(chance);
+}
+
+
+boolean
+generate_way_out_method(nx,ny, ov)
+int nx,ny;
+struct opvar *ov;
+{
+    static const char nhFunc[] = "generate_way_out_method";
+    const int escapeitems[] = { PICK_AXE,
+                                DWARVISH_MATTOCK,
+                                WAN_DIGGING,
+                                WAN_TELEPORTATION,
+                                SCR_TELEPORTATION,
+                                RIN_TELEPORTATION };
+    struct opvar *ov2 = selection_opvar(NULL), *ov3;
+    schar x, y;
+    boolean res = TRUE;
+    selection_floodfill(ov2, nx, ny, TRUE);
+    ov3 = opvar_clone(ov2);
+
+    /* try to make a secret door */
+    while (selection_rndcoord(ov3, &x, &y, TRUE)) {
+        if (isok(x+1, y) && !selection_getpoint(x+1, y, ov) && IS_WALL(levl[x+1][y].typ) &&
+            isok(x+2, y) &&  selection_getpoint(x+2, y, ov) && ACCESSIBLE(levl[x+2][y].typ)) {
+            levl[x+1][y].typ = SDOOR;
+            goto gotitdone;
+        }
+        if (isok(x-1, y) && !selection_getpoint(x-1, y, ov) && IS_WALL(levl[x-1][y].typ) &&
+            isok(x-2, y) &&  selection_getpoint(x-2, y, ov) && ACCESSIBLE(levl[x-2][y].typ)) {
+            levl[x-1][y].typ = SDOOR;
+            goto gotitdone;
+        }
+        if (isok(x, y+1) && !selection_getpoint(x, y+1, ov) && IS_WALL(levl[x][y+1].typ) &&
+            isok(x, y+2) &&  selection_getpoint(x, y+2, ov) && ACCESSIBLE(levl[x][y+2].typ)) {
+            levl[x][y+1].typ = SDOOR;
+            goto gotitdone;
+        }
+        if (isok(x, y-1) && !selection_getpoint(x, y-1, ov) && IS_WALL(levl[x][y-1].typ) &&
+            isok(x, y-2) &&  selection_getpoint(x, y-2, ov) && ACCESSIBLE(levl[x][y-2].typ)) {
+            levl[x][y-1].typ = SDOOR;
+            goto gotitdone;
+        }
+    }
+
+    /* try to make a hole or a trapdoor */
+    if (Can_fall_thru(&u.uz)) {
+        opvar_free(ov3);
+        ov3 = opvar_clone(ov2);
+        while (selection_rndcoord(ov3, &x, &y, TRUE)) {
+            if (maketrap(x,y, rn2(2) ? HOLE : TRAPDOOR))
+                goto gotitdone;
+        }
+    }
+
+    /* generate one of the escape items */
+    if (selection_rndcoord(ov2, &x, &y, FALSE)) {
+        mksobj_at(escapeitems[rn2(SIZE(escapeitems))], x, y, TRUE, FALSE);
+        goto gotitdone;
+    }
+
+    res = FALSE;
+ gotitdone:
+    opvar_free(ov2);
+    opvar_free(ov3);
+    return res;
+}
+
+
+void
+ensure_way_out()
+{
+    static const char nhFunc[] = "ensure_way_out";
+    struct opvar *ov = selection_opvar(NULL);
+    struct trap *ttmp = ftrap;
+    int x,y;
+    boolean ret = TRUE;
+
+    set_selection_floodfill_checker(floodfill_checker_match_accessible);
+
+    if (xupstair && !selection_getpoint(xupstair, yupstair, ov))
+        selection_floodfill(ov, xupstair, yupstair, TRUE);
+    if (xdnstair && !selection_getpoint(xdnstair, ydnstair, ov))
+        selection_floodfill(ov, xdnstair, ydnstair, TRUE);
+    if (xupladder && !selection_getpoint(xupladder, yupladder, ov))
+        selection_floodfill(ov, xupladder, yupladder, TRUE);
+    if (xdnladder && !selection_getpoint(xdnladder, ydnladder, ov))
+        selection_floodfill(ov, xdnladder, ydnladder, TRUE);
+
+    while (ttmp) {
+        if ((ttmp->ttyp == MAGIC_PORTAL || ttmp->ttyp == VIBRATING_SQUARE
+             || ttmp->ttyp == HOLE || ttmp->ttyp == TRAPDOOR)
+            && !selection_getpoint(ttmp->tx, ttmp->ty, ov))
+            selection_floodfill(ov, ttmp->tx, ttmp->ty, TRUE);
+        ttmp = ttmp->ntrap;
+    }
+
+    do {
+        ret = TRUE;
+        for (x = 0; x < COLNO; x++)
+            for (y = 0; y < ROWNO; y++)
+                if (ACCESSIBLE(levl[x][y].typ)
+                    && !selection_getpoint(x, y, ov)) {
+                    if (generate_way_out_method(x,y, ov))
+                        selection_floodfill(ov, x,y, TRUE);
+                    ret = FALSE;
+                    goto outhere;
+                }
+    outhere: ;
+    } while (!ret);
+    opvar_free(ov);
 }
 
 void
@@ -4977,6 +5127,7 @@ sp_lev *lvl;
     coder->stack = NULL;
     coder->premapped = FALSE;
     coder->solidify = FALSE;
+    coder->check_inaccessibles = FALSE;
     coder->croom = NULL;
     coder->n_subroom = 1;
     coder->exit_script = FALSE;
@@ -5509,7 +5660,9 @@ sp_lev *lvl;
             get_location_coord(&x, &y, ANY_LOC, coder->croom, OV_i(tmp));
             if (isok(x, y)) {
                 struct opvar *pt = selection_opvar(NULL);
-                selection_floodfill(pt, x, y);
+                set_selection_floodfill_checker(floodfill_checker_match_under);
+                floodfill_checker_match_under_typ = levl[x][y].typ;
+                selection_floodfill(pt, x, y, FALSE);
                 splev_stack_push(coder->stack, pt);
             }
             opvar_free(tmp);
@@ -5519,7 +5672,7 @@ sp_lev *lvl;
             schar x, y;
             if (!OV_pop_typ(pt, SPOVAR_SEL))
                 panic("no selection for rndcoord");
-            if (selection_rndcoord(pt, &x, &y)) {
+            if (selection_rndcoord(pt, &x, &y, FALSE)) {
                 x -= xstart;
                 y -= ystart;
             }
@@ -5589,6 +5742,9 @@ sp_lev *lvl;
     link_doors_rooms();
     fill_rooms();
     remove_boundary_syms();
+
+    if (coder->check_inaccessibles)
+        ensure_way_out();
     /* FIXME: Ideally, we want this call to only cover areas of the map
      * which were not inserted directly by the special level file (see
      * the insect legs on Baalzebub's level, for instance). Since that
