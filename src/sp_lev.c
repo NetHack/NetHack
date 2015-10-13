@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1441753941 2015/09/08 23:12:21 $  $NHDT-Branch: master $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1444774496 2015/10/13 22:14:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.62 $ */
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -32,17 +32,16 @@ STATIC_DCL boolean FDECL(m_bad_boulder_spot, (int, int));
 STATIC_DCL void FDECL(create_monster, (monster *, struct mkroom *));
 STATIC_DCL void FDECL(create_object, (object *, struct mkroom *));
 STATIC_DCL void FDECL(create_altar, (altar *, struct mkroom *));
-STATIC_DCL boolean
-FDECL(search_door, (struct mkroom *, xchar *, xchar *, XCHAR_P, int));
+STATIC_DCL boolean FDECL(search_door, (struct mkroom *,
+                                       xchar *, xchar *, XCHAR_P, int));
 STATIC_DCL void NDECL(fix_stair_rooms);
 STATIC_DCL void FDECL(create_corridor, (corridor *));
 STATIC_DCL void NDECL(count_features);
-
-STATIC_DCL boolean
-FDECL(create_subroom, (struct mkroom *, XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P,
-                       XCHAR_P, XCHAR_P));
-
-long FDECL(opvar_array_length, (struct sp_coder *));
+STATIC_DCL boolean FDECL(create_subroom, (struct mkroom *, XCHAR_P, XCHAR_P,
+                                          XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P));
+#if 0
+STATIC_DCL long FDECL(opvar_array_length, (struct sp_coder *));
+#endif /*0*/
 STATIC_DCL void NDECL(solidify_map);
 STATIC_DCL void FDECL(splev_stack_init, (struct splevstack *));
 STATIC_DCL void FDECL(splev_stack_done, (struct splevstack *));
@@ -112,9 +111,11 @@ STATIC_DCL struct opvar *FDECL(selection_logical_oper,
 STATIC_DCL struct opvar *FDECL(selection_filter_mapchar,
                                (struct opvar *, struct opvar *));
 STATIC_DCL void FDECL(selection_filter_percent, (struct opvar *, int));
-STATIC_DCL int FDECL(selection_rndcoord, (struct opvar *, schar *, schar *, boolean));
+STATIC_DCL int FDECL(selection_rndcoord, (struct opvar *, schar *, schar *,
+                                          BOOLEAN_P));
 STATIC_DCL void FDECL(selection_do_grow, (struct opvar *, int));
-STATIC_DCL void FDECL(selection_floodfill, (struct opvar *, int, int, boolean));
+STATIC_DCL void FDECL(selection_floodfill, (struct opvar *, int, int,
+                                            BOOLEAN_P));
 STATIC_DCL void FDECL(selection_do_ellipse,
                       (struct opvar *, int, int, int, int, int));
 STATIC_DCL long FDECL(line_dist_coord, (long, long, long, long, long, long));
@@ -167,9 +168,7 @@ STATIC_DCL void FDECL(spo_shuffle_array, (struct sp_coder *));
 #define Fgetc (schar) dlb_fgetc
 #define New(type) (type *) alloc(sizeof(type))
 #define NewTab(type, size) (type **) alloc(sizeof(type *) * (unsigned) size)
-#define Free(ptr) \
-    if (ptr)      \
-    free((genericptr_t)(ptr))
+#define Free(ptr) if (ptr) free((genericptr_t)(ptr))
 
 extern struct engr *head_engr;
 
@@ -3646,7 +3645,7 @@ int percent;
                 selection_setpoint(x, y, ov, 0);
 }
 
-int
+STATIC_OVL int
 selection_rndcoord(ov, x, y, removeit)
 struct opvar *ov;
 schar *x, *y;
@@ -3758,7 +3757,7 @@ int x,y;
             || levl[x][y].typ == SCORR);
 }
 
-void
+STATIC_OVL void
 selection_floodfill(ov, x, y, diagonals)
 struct opvar *ov;
 int x, y;
@@ -5041,9 +5040,11 @@ struct sp_coder *coder;
 
     opvar_free(vname);
     opvar_free(arraylen);
+
 }
 
-long
+#if 0
+STATIC_OVL long
 opvar_array_length(coder)
 struct sp_coder *coder;
 {
@@ -5078,6 +5079,7 @@ pass:
     opvar_free(vname);
     return len;
 }
+#endif /*0*/
 
 void
 spo_shuffle_array(coder)
