@@ -1,4 +1,4 @@
-/* NetHack 3.6	dothrow.c	$NHDT-Date: 1432512771 2015/05/25 00:12:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.103 $ */
+/* NetHack 3.6	dothrow.c	$NHDT-Date: 1444772016 2015/10/13 21:33:36 $  $NHDT-Branch: master $:$NHDT-Revision: 1.106 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -44,20 +44,41 @@ int shotlimit;
 
     /* ask "in what direction?" */
     if (!getdir((char *) 0)) {
-        /* obj might need to be merged back into the singular gold object */
-        freeinv(obj);
-        addinv(obj);
-        return (0);
+        /* No direction specified, so cancel the throw;
+         * might need to undo an object split.
+         * We used to use freeinv(obj),addinv(obj) here, but that can
+         * merge obj into another stack--usually quiver--even if it hadn't
+         * been split from there (possibly triggering a panic in addinv),
+         * and freeinv+addinv potentially has other side-effects.
+         *
+         * If obj came from splitobj(), it has been split from the item
+         * which precedes it in inventory and shares same inv letter.
+         * (This could get a false match if obj wasn't split from the
+         * preceding item and they're both using the overflow letter '#',
+         * but merging to have fewer '#' items should be a good thing,
+         * and we're not using addinv() so can't trigger its panic.)
+         */
+        for (otmp = invent; otmp; otmp = otmp->nobj)
+            if (otmp == obj) {
+                /* obj wasn't the result of splitobj, so we're done */
+                break;
+            } else if (otmp->nobj == obj) {
+                if (otmp->invlet == obj->invlet)
+                    (void) merged(&otmp, &obj);
+                /* found obj's preceding item, so no need to look further */
+                break;
+            }
+        return 0; /* no time passes */
     }
 
     /*
-      Throwing money is usually for getting rid of it when
-      a leprechaun approaches, or for bribing an oncoming
-      angry monster.  So throw the whole object.
-
-      If the money is in quiver, throw one coin at a time,
-      possibly using a sling.
-    */
+     * Throwing money is usually for getting rid of it when
+     * a leprechaun approaches, or for bribing an oncoming
+     * angry monster.  So throw the whole object.
+     *
+     * If the money is in quiver, throw one coin at a time,
+     * possibly using a sling.
+     */
     if (obj->oclass == COIN_CLASS && obj != uquiver)
         return (throw_gold(obj));
 
@@ -98,17 +119,18 @@ int shotlimit;
      */
     multishot = 1;
     skill = objects[obj->otyp].oc_skill;
-    if (obj->quan > 1L && /* no point checking if there's only 1 */
+    if (obj->quan > 1L /* no point checking if there's only 1 */
         /* ammo requires corresponding launcher be wielded */
-        (is_ammo(obj) ? matching_launcher(obj, uwep) :
-                      /* otherwise any stackable (non-ammo) weapon */
-             obj->oclass == WEAPON_CLASS) && !(Confusion || Stunned)) {
+        && (is_ammo(obj) ? matching_launcher(obj, uwep)
+                         /* otherwise any stackable (non-ammo) weapon */
+                         : obj->oclass == WEAPON_CLASS)
+        && !(Confusion || Stunned)) {
         /* some roles don't get a volley bonus until becoming expert */
         weakmultishot = (Role_if(PM_WIZARD) || Role_if(PM_PRIEST)
                          || (Role_if(PM_HEALER) && skill != P_KNIFE)
-                         || (Role_if(PM_TOURIST) && skill != -P_DART) ||
+                         || (Role_if(PM_TOURIST) && skill != -P_DART)
                          /* poor dexterity also inhibits multishot */
-                         Fumbling || ACURR(A_DEX) <= 6);
+                         || Fumbling || ACURR(A_DEX) <= 6);
 
         /* Bonus if the player is proficient in this weapon... */
         switch (P_SKILL(weapon_type(obj))) {
