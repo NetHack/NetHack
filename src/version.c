@@ -1,4 +1,4 @@
-/* NetHack 3.6	version.c	$NHDT-Date: 1434999940 2015/06/22 19:05:40 $  $NHDT-Branch: master $:$NHDT-Revision: 1.38 $ */
+/* NetHack 3.6	version.c	$NHDT-Date: 1444867101 2015/10/14 23:58:21 $  $NHDT-Branch: master $:$NHDT-Revision: 1.39 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -48,7 +48,7 @@ doversion()
 {
     char buf[BUFSZ];
 
-    pline1(getversionstring(buf));
+    pline("%s", getversionstring(buf));
     return 0;
 }
 
@@ -225,13 +225,12 @@ boolean complain;
         return FALSE;
     } else if (
 #ifndef IGNORED_FEATURES
-        version_data->feature_set != VERSION_FEATURES ||
+        version_data->feature_set != VERSION_FEATURES
 #else
         (version_data->feature_set & ~IGNORED_FEATURES)
             != (VERSION_FEATURES & ~IGNORED_FEATURES)
-        ||
 #endif
-        version_data->entity_count != VERSION_SANITY1
+        || version_data->entity_count != VERSION_SANITY1
         || version_data->struct_sizes1 != VERSION_SANITY2
         || version_data->struct_sizes2 != VERSION_SANITY3) {
         if (complain)
