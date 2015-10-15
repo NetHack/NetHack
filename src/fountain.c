@@ -1,4 +1,4 @@
-/* NetHack 3.6	fountain.c	$NHDT-Date: 1436753513 2015/07/13 02:11:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.54 $ */
+/* NetHack 3.6	fountain.c	$NHDT-Date: 1444937416 2015/10/15 19:30:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.55 $ */
 /*	Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -29,7 +29,9 @@ const char *what;
     You(umsg, what);
 }
 
-STATIC_OVL void dowatersnakes() /* Fountain of snakes! */
+/* Fountain of snakes! */
+STATIC_OVL void
+dowatersnakes()
 {
     register int num = rn1(5, 2);
     struct monst *mtmp;
@@ -42,20 +44,22 @@ STATIC_OVL void dowatersnakes() /* Fountain of snakes! */
             You_hear("%s hissing!", something);
         while (num-- > 0)
             if ((mtmp = makemon(&mons[PM_WATER_MOCCASIN], u.ux, u.uy,
-                                NO_MM_FLAGS)) && t_at(mtmp->mx, mtmp->my))
+                                NO_MM_FLAGS)) != 0
+                && t_at(mtmp->mx, mtmp->my))
                 (void) mintrap(mtmp);
     } else
         pline_The("fountain bubbles furiously for a moment, then calms.");
 }
 
-STATIC_OVL
-void dowaterdemon() /* Water demon */
+/* Water demon */
+STATIC_OVL void
+dowaterdemon()
 {
     struct monst *mtmp;
 
     if (!(mvitals[PM_WATER_DEMON].mvflags & G_GONE)) {
-        if ((mtmp =
-                 makemon(&mons[PM_WATER_DEMON], u.ux, u.uy, NO_MM_FLAGS))) {
+        if ((mtmp = makemon(&mons[PM_WATER_DEMON], u.ux, u.uy,
+                            NO_MM_FLAGS)) != 0) {
             if (!Blind)
                 You("unleash %s!", a_monnam(mtmp));
             else
@@ -75,12 +79,15 @@ void dowaterdemon() /* Water demon */
         pline_The("fountain bubbles furiously for a moment, then calms.");
 }
 
-STATIC_OVL void dowaternymph() /* Water Nymph */
+/* Water Nymph */
+STATIC_OVL void
+dowaternymph()
 {
     register struct monst *mtmp;
 
     if (!(mvitals[PM_WATER_NYMPH].mvflags & G_GONE)
-        && (mtmp = makemon(&mons[PM_WATER_NYMPH], u.ux, u.uy, NO_MM_FLAGS))) {
+        && (mtmp = makemon(&mons[PM_WATER_NYMPH], u.ux, u.uy,
+                           NO_MM_FLAGS)) != 0) {
         if (!Blind)
             You("attract %s!", a_monnam(mtmp));
         else
@@ -94,7 +101,9 @@ STATIC_OVL void dowaternymph() /* Water Nymph */
         You_hear("a loud pop.");
 }
 
-void dogushforth(drinking) /* Gushing forth along LOS from (u.ux, u.uy) */
+/* Gushing forth along LOS from (u.ux, u.uy) */
+void
+dogushforth(drinking)
 int drinking;
 {
     int madepool = 0;
@@ -139,7 +148,9 @@ genericptr_t poolcnt;
         newsym(x, y);
 }
 
-STATIC_OVL void dofindgem() /* Find a gem in the sparkling waters. */
+/* Find a gem in the sparkling waters. */
+STATIC_OVL void
+dofindgem()
 {
     if (!Blind)
         You("spot a gem in the sparkling waters!");
@@ -161,6 +172,7 @@ boolean isyou;
         && (!rn2(3) || FOUNTAIN_IS_WARNED(x, y))) {
         if (isyou && in_town(x, y) && !FOUNTAIN_IS_WARNED(x, y)) {
             struct monst *mtmp;
+
             SET_FOUNTAIN_WARNED(x, y);
             /* Warn about future fountain use. */
             for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
@@ -188,8 +200,8 @@ boolean isyou;
         levl[x][y].blessedftn = 0;
         if (cansee(x, y))
             pline_The("fountain dries up!");
-        /* The location is seen if the hero/monster is invisible */
-        /* or felt if the hero is blind.			 */
+        /* The location is seen if the hero/monster is invisible
+           or felt if the hero is blind. */
         newsym(x, y);
         level.flags.nfountains--;
         if (isyou && in_town(x, y))
@@ -243,23 +255,18 @@ drinkfountain()
     } else {
         switch (fate) {
         case 19: /* Self-knowledge */
-
             You_feel("self-knowledgeable...");
             display_nhwindow(WIN_MESSAGE, FALSE);
             enlightenment(MAGICENLIGHTENMENT, ENL_GAMEINPROGRESS);
             exercise(A_WIS, TRUE);
             pline_The("feeling subsides.");
             break;
-
         case 20: /* Foul water */
-
             pline_The("water is foul!  You gag and vomit.");
             morehungry(rn1(20, 11));
             vomit();
             break;
-
         case 21: /* Poisonous */
-
             pline_The("water is contaminated!");
             if (Poison_resistance) {
                 pline("Perhaps it is runoff from the nearby %s farm.",
@@ -271,16 +278,12 @@ drinkfountain()
             losehp(rnd(10), "contaminated water", KILLED_BY);
             exercise(A_CON, FALSE);
             break;
-
         case 22: /* Fountain of snakes! */
-
             dowatersnakes();
             break;
-
         case 23: /* Water demon */
             dowaterdemon();
             break;
-
         case 24: /* Curse an item */ {
             register struct obj *obj;
 
@@ -292,9 +295,7 @@ drinkfountain()
                     curse(obj);
             break;
         }
-
         case 25: /* See invisible */
-
             if (Blind) {
                 if (Invisible) {
                     You("feel transparent.");
@@ -310,25 +311,18 @@ drinkfountain()
             newsym(u.ux, u.uy);
             exercise(A_WIS, TRUE);
             break;
-
         case 26: /* See Monsters */
-
             (void) monster_detect((struct obj *) 0, 0);
             exercise(A_WIS, TRUE);
             break;
-
         case 27: /* Find a gem in the sparkling waters. */
-
             if (!FOUNTAIN_IS_LOOTED(u.ux, u.uy)) {
                 dofindgem();
                 break;
             }
-
         case 28: /* Water Nymph */
-
             dowaternymph();
             break;
-
         case 29: /* Scare */
         {
             register struct monst *mtmp;
@@ -341,14 +335,10 @@ drinkfountain()
             }
             break;
         }
-
         case 30: /* Gushing forth in this room */
-
             dogushforth(TRUE);
             break;
-
         default:
-
             pline("This tepid water is tasteless.");
             break;
         }
@@ -403,6 +393,7 @@ register struct obj *obj;
         return;
     } else {
         int er = water_damage(obj, NULL, TRUE);
+
         if (obj->otyp == POT_ACID
             && er != ER_DESTROYED) { /* Acid and water don't mix */
             useup(obj);
@@ -478,7 +469,6 @@ register struct obj *obj;
         }
         break;
     case 29: /* You see coins */
-
         /* We make fountains have more coins the closer you are to the
          * surface.  After all, there will have been more people going
          * by.	Just like a shopping mall!  Chris Woodbury  */
