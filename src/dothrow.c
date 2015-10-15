@@ -1231,10 +1231,13 @@ boolean
             tmp_at(DISP_END, 0);
             breakmsg(obj, cansee(bhitpos.x, bhitpos.y));
             breakobj(obj, bhitpos.x, bhitpos.y, TRUE, TRUE);
+            thrownobj = (struct obj *) 0;
             return;
         }
-        if (flooreffects(obj, bhitpos.x, bhitpos.y, "fall"))
+        if (flooreffects(obj, bhitpos.x, bhitpos.y, "fall")) {
+            thrownobj = (struct obj *) 0;
             return;
+        }
         obj_no_longer_held(obj);
         if (mon && mon->isshk && is_pick(obj)) {
             if (cansee(bhitpos.x, bhitpos.y))
