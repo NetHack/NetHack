@@ -811,7 +811,7 @@ int control;
              *   the glyph -- E.g. darken room spot, etc.
              * o If we now could see the location (yet the location is not
              *   lit), but previously we couldn't see the location, or vice
-             *   versa.  Update the spot because there there may be an infared
+             *   versa.  Update the spot because there there may be an infrared
              *   monster there.
              */
             else {

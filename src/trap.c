@@ -2856,7 +2856,7 @@ long hmask, emask; /* might cancel timeout */
                      * is based on air currents. This is
                      * consistent with that.
                      * The unexpected additional force of the
-                     * air currents once leviation
+                     * air currents once levitation
                      * ceases knocks you off your feet.
                      */
                     if (Hallucination)

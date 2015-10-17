@@ -640,7 +640,7 @@ register struct attack *mattk;
         (void) snuff_lit(obj);
 
     /*
-     *  All of this maniuplation is needed to keep the display correct.
+     *  All of this manipulation is needed to keep the display correct.
      *  There is a flush at the next pline().
      */
     ax = magr->mx;

@@ -1588,7 +1588,7 @@ register struct obj *otmp;
         }
 
         if (!mons[otmp->corpsenm].cnutrit) {
-            /* no nutrution: rots away, no message if you passed out */
+            /* no nutrition: rots away, no message if you passed out */
             if (!retcode)
                 pline_The("corpse rots away completely.");
             if (carried(otmp))

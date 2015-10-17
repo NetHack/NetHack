@@ -337,7 +337,7 @@ register struct monst *mtmp;
             }
     /* fall through :-) */
 
-    case STRAT_NONE: /* harrass */
+    case STRAT_NONE: /* harass */
         if (!rn2(!mtmp->mflee ? 5 : 33))
             mnexto(mtmp);
         return (0);

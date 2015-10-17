@@ -3046,7 +3046,7 @@ struct permonst *mdat;
 }
 
 /* make a chameleon take on another shape, or a polymorph target
-   (possibly self-infliced) become a different monster;
+   (possibly self-inflicted) become a different monster;
    returns 1 if it actually changes form */
 int
 newcham(mtmp, mdat, polyspot, msg)

@@ -1016,7 +1016,7 @@ acurrstr()
 
 /* when wearing (or taking off) an unID'd item, this routine is used
    to distinguish between observable +0 result and no-visible-effect
-   due to an attribute not being able to exceed maximum or minimun */
+   due to an attribute not being able to exceed maximum or minimum */
 boolean
 extremeattr(attrindx) /* does attrindx's value match its max or min? */
 int attrindx;

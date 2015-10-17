@@ -4130,7 +4130,7 @@ boolean altusage; /* some items have an "alternate" use with different cost */
     if (otmp->otyp == MAGIC_LAMP) { /* 1 */
         /* normal use (ie, as light source) of a magic lamp never
            degrades its value, but not charging anything would make
-           identifcation too easy; charge an amount comparable to
+           identification too easy; charge an amount comparable to
            what is charged for an ordinary lamp (don't bother with
            angry shk surchage) */
         if (!altusage)

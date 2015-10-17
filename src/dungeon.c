@@ -2473,7 +2473,7 @@ int reason; /* how hero died; used when disclosing end-of-game level */
     winid win;
     int lastdun = -1;
 
-    /* lazy intialization */
+    /* lazy initialization */
     (void) recalc_mapseen();
 
     win = create_nhwindow(NHW_MENU);

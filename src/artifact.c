@@ -2016,7 +2016,7 @@ int dropflag; /* 0==don't drop, 1==drop all, 2==drop weapon */
     /*
      * TODO?  Force off gloves if either or both rings are going to
      * become unworn; force off cloak [suit] before suit [shirt].
-     * The torso handling is hyphothetical; the case for gloves is
+     * The torso handling is hypothetical; the case for gloves is
      * not, due to the possibility of unwearing silver rings.
      */
 

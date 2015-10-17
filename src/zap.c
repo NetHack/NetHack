@@ -1375,11 +1375,11 @@ int id;
         otmp->corpsenm = NON_PM;
         otmp->spe = 0;
 
-        /* now change it into something layed by the hero */
+        /* now change it into something laid by the hero */
         while (tryct--) {
             mnum = can_be_hatched(random_monster());
             if (mnum != NON_PM && !dead_species(mnum, TRUE)) {
-                otmp->spe = 1;            /* layed by hero */
+                otmp->spe = 1;            /* laid by hero */
                 set_corpsenm(otmp, mnum); /* also sets hatch timer */
                 break;
             }
@@ -2388,7 +2388,7 @@ boolean ordinary;
         }
         /*
          * It is possible that we can now merge some inventory.
-         * Do a higly paranoid merge.  Restart from the beginning
+         * Do a highly paranoid merge.  Restart from the beginning
          * until no merges.
          */
         do {
@@ -2875,7 +2875,7 @@ int dmg; /* base amount to be adjusted by bonus or penalty */
 {
     int intell = ACURR(A_INT);
 
-    /* Punish low intellegence before low level else low intellegence
+    /* Punish low intelligence before low level else low intelligence
        gets punished only when high level */
     if (intell <= 9) {
         /* -3 penalty, but never reduce combined amount below 1

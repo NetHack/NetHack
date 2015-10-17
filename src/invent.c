@@ -1628,7 +1628,7 @@ nextclass:
                                      *	    otmp2 = otmp->nobj;
                                      *	    ...
                                      *	}
-                                     * is inadeqate here.  Use each object's bypass bit to keep
+                                     * is inadequate here.  Use each object's bypass bit to keep
                                      * track of which list elements have already been processed.
                                      */
     bypass_objlist(*objchn, FALSE); /* clear chain's bypass bits */
@@ -2718,7 +2718,7 @@ boolean picked_some;
                 drift ? "" : onwhat);
         }
         if (dfeature && !drift && !strcmp(dfeature, surface(u.ux, u.uy)))
-            dfeature = 0; /* ice already identifed */
+            dfeature = 0; /* ice already identified */
         if (!can_reach_floor(TRUE)) {
             pline("But you can't reach it!");
             return (0);

@@ -43,7 +43,7 @@ typedef struct stairway { /* basic stairway identifier */
 #define LR_UPTELE 5
 #define LR_DOWNTELE 6
 
-typedef struct dest_area { /* non-stairway level change indentifier */
+typedef struct dest_area { /* non-stairway level change identifier */
     xchar lx, ly;          /* "lower" left corner (near [0,0]) */
     xchar hx, hy;          /* "upper" right corner (near [COLNO,ROWNO]) */
     xchar nlx, nly;        /* outline of invalid area */

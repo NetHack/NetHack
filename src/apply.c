@@ -1395,7 +1395,7 @@ dorub()
             /* bones preparation:  perform the lamp transformation
                before releasing the djinni in case the latter turns out
                to be fatal (a hostile djinni has no chance to attack yet,
-               but an indebtted one who grants a wish might bestow an
+               but an indebted one who grants a wish might bestow an
                artifact which blasts the hero with lethal results) */
             uwep->otyp = OIL_LAMP;
             uwep->spe = 0; /* for safety */

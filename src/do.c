@@ -860,7 +860,7 @@ dodown()
         return 0;
     }
     /* Levitation might be blocked, but player can still use '>' to
-       turn off controlled levitaiton */
+       turn off controlled levitation */
     if (HLevitation || ELevitation) {
         if ((HLevitation & I_SPECIAL) || (ELevitation & W_ARTI)) {
             /* end controlled levitation */
