@@ -336,7 +336,7 @@ extern long __cdecl ftell(FILE *f);
 #endif
 
 /* leave - Windows CE defines leave as part of exception handling (__leave)
-   It confilicts with existing sources and since we don't use exceptions it is
+   It conflicts with existing sources and since we don't use exceptions it is
    safe
    to undefine it */
 #ifdef leave

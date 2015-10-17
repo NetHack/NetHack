@@ -72,7 +72,7 @@ boolean restore;
         }
 
         if (restore) {
-            /* artifact bookeeping needs to be done during
+            /* artifact bookkeeping needs to be done during
                restore; other fixups are done while saving */
             if (otmp->oartifact) {
                 if (exist_artifact(otmp->otyp, safe_oname(otmp))

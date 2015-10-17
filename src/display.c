@@ -1796,7 +1796,7 @@ int x, y, a, b, c, dd;
  * Return 'which' if position is implies an unfinshed exterior.  Return
  * zero otherwise.  Unfinished implies outer area is rock or a corridor.
  *
- * Things that are ambigious: lava
+ * Things that are ambiguous: lava
  */
 STATIC_OVL int
 check_pos(x, y, which)

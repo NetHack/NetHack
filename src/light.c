@@ -187,7 +187,7 @@ char **cs_rows;
                 if (ls->x == u.ux && ls->y == u.uy) {
                     /*
                      * If the light source is located at the hero, then
-                     * we can use the COULD_SEE bits already calcualted
+                     * we can use the COULD_SEE bits already calculated
                      * by the vision system.  More importantly than
                      * this optimization, is that it allows the vision
                      * system to correct problems with clear_path().
@@ -502,7 +502,7 @@ struct obj *obj;
                              || artifact_light(obj)));
 }
 
-/* copy the light source(s) attachted to src, and attach it/them to dest */
+/* copy the light source(s) attached to src, and attach it/them to dest */
 void
 obj_split_light_source(src, dest)
 struct obj *src, *dest;

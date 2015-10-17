@@ -176,7 +176,7 @@ struct text_info_t {
     int extra_width,        /* Sum of left and right border widths. */
         extra_height;       /* Sum of top and bottom border widths. */
     boolean blocked;        /*  */
-    boolean destroy_on_ack; /* Destroy this window when acknowleged. */
+    boolean destroy_on_ack; /* Destroy this window when acknowledged. */
 #ifdef GRAPHIC_TOMBSTONE
     boolean is_rip; /* This window needs a tombstone. */
 #endif

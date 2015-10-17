@@ -1202,7 +1202,7 @@ register int mmflags;
             mtmp->cham = mcham;
             /* Note: shapechanger's initial form used to be
                chosen here with rndmonst(), yielding a monster
-               which was approriate to the level's difficulty
+               which was appropriate to the level's difficulty
                but ignored the changer's usual type selection
                so would be inappropriate for vampshifters.
                Let newcham() pick the shape. */

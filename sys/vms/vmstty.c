@@ -243,7 +243,7 @@ vms_getchar()
  * a stalled input connection.  {For packetized environments,
  * cross plural(body_part(FINGER)) and hope for best. :-}
  *
- * This is needed to preserve compatability with SMG interface
+ * This is needed to preserve compatibility with SMG interface
  * for two reasons:
  *    1) retain support for arrow keys, and
  *    2) treat other VTxxx function keys as <esc> for aborting

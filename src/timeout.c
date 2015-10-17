@@ -616,7 +616,7 @@ long timeout;
 
         case OBJ_MINVENT:
             if (cansee_hatchspot) {
-                /* egg carring monster might be invisible */
+                /* egg carrying monster might be invisible */
                 if (canseemon(egg->ocarry)) {
                     Sprintf(carriedby, "%s pack",
                             s_suffix(a_monnam(egg->ocarry)));

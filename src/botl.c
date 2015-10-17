@@ -476,7 +476,7 @@ bot()
     blstats[idx][BL_GOLD].a.a_long = money_cnt(invent);
     /*
      * The tty port needs to display the current symbol for gold
-     * as a field header, so to accomodate that we pass gold with
+     * as a field header, so to accommodate that we pass gold with
      * that already included. If a window port needs to use the text
      * gold amount without the leading "$:" the port will have to
      * add 2 to the value pointer it was passed in status_update()

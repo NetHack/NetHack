@@ -1690,7 +1690,7 @@ static const char *const special_subjs[] = {
     /* note: "detect monsters" and "shape changers" are normally
        caught via "<something>(s) of <whatever>", but they can be
        wished for using the shorter form, so we include them here
-       to accomodate usage by makesingular during wishing */
+       to accommodate usage by makesingular during wishing */
 };
 
 /* return form of the verb (input plural) for present tense 3rd person subj */

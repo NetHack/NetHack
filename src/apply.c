@@ -1976,7 +1976,7 @@ long timeout;
             if (cansee_spot && !silent && !suppress_see) {
                 struct monst *mon;
                 mon = figurine->ocarry;
-                /* figurine carring monster might be invisible */
+                /* figurine carrying monster might be invisible */
                 if (canseemon(figurine->ocarry)) {
                     Sprintf(carriedby, "%s pack", s_suffix(a_monnam(mon)));
                 } else if (is_pool(mon->mx, mon->my))

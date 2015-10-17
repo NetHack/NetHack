@@ -70,7 +70,7 @@ E struct dgn_topology { /* special dungeon levels for speed */
     d_level d_mineend_level;
     d_level d_sokoend_level;
 } dungeon_topology;
-/* macros for accesing the dungeon levels by their old names */
+/* macros for accessing the dungeon levels by their old names */
 /* clang-format off */
 #define oracle_level            (dungeon_topology.d_oracle_level)
 #define bigroom_level           (dungeon_topology.d_bigroom_level)

@@ -188,7 +188,7 @@
 #define S_digbeam 69   /* dig beam symbol */
 #define S_flashbeam 70 /* camera flash symbol */
 #define S_boomleft 71  /* thrown boomerang, open left, e.g ')'    */
-#define S_boomright 72 /* thrown boomerand, open right, e.g. '('  */
+#define S_boomright 72 /* thrown boomerang, open right, e.g. '('  */
 #define S_ss1 73       /* 4 magic shield glyphs */
 #define S_ss2 74
 #define S_ss3 75

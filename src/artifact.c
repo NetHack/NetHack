@@ -1842,7 +1842,7 @@ int orc_count; /* new count (warn_obj_cnt is old count); -1 is a flag value */
             || uwep->oartifact == ART_ORCRIST
             || uwep->oartifact == ART_GRIMTOOTH)) {
         if (orc_count == -1 && warn_obj_cnt > 0) {
-            /* -1 means that blindess has just been toggled; give a
+            /* -1 means that blindness has just been toggled; give a
                'continue' message that eventual 'stop' message will match */
             pline("%s is %s.", bare_artifactname(uwep),
                   !Blind ? "glowing" : "quivering");

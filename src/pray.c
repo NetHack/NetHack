@@ -111,7 +111,7 @@ but that's really hard.
 #define on_shrine() ((levl[u.ux][u.uy].altarmask & AM_SHRINE) != 0)
 #define a_align(x, y) ((aligntyp) Amask2align(levl[x][y].altarmask & AM_MASK))
 
-/* criticially low hit points if hp <= 5 or hp <= maxhp/N for some N */
+/* critically low hit points if hp <= 5 or hp <= maxhp/N for some N */
 boolean
 critically_low_hp(only_if_injured)
 boolean only_if_injured; /* determines whether maxhp <= 5 matters */

@@ -649,8 +649,8 @@ register struct attack *mattk;
     dy = mdef->my;
     /*
      *  Leave the defender in the monster chain at it's current position,
-     *  but don't leave it on the screen.  Move the agressor to the def-
-     *  ender's position.
+     *  but don't leave it on the screen.  Move the aggressor to the
+     *  defender's position.
      */
     remove_monster(ax, ay);
     place_monster(magr, dx, dy);
@@ -706,7 +706,7 @@ register struct attack *mattk;
 
     result = mdamagem(magr, mdef, mattk);
 
-    /* Kill off agressor if it didn't die. */
+    /* Kill off aggressor if it didn't die. */
     if (!(result & MM_AGR_DIED)) {
         mondead(magr);
         if (magr->mhp > 0)

@@ -763,7 +763,7 @@ namefloorobj()
     /* note well: 'obj' might be as instance of STRANGE_OBJECT if target
        is a mimic; passing that to xname (directly or via simpleonames)
        would yield "glorkum" so we need to handle it explicitly; it will
-       alwlays fail the Hallucination test and pass the !callable test,
+       always fail the Hallucination test and pass the !callable test,
        resulting in the "can't be assigned a type name" message */
     Strcpy(buf, (obj->otyp != STRANGE_OBJECT)
                  ? simpleonames(obj)

@@ -270,7 +270,7 @@ popch()
 
 char
 pgetchar()
-{ /* curtesy of aeb@cwi.nl */
+{ /* courtesy of aeb@cwi.nl */
     register int ch;
 
     if (!(ch = popch()))
@@ -1435,7 +1435,7 @@ int final;
             (u.ualign.type != u.ualignbase[A_ORIGINAL])
                 ? "now "
                 :
-                /* athiest (ignored in very early game); lastly, normal case
+                /* atheist (ignored in very early game); lastly, normal case
                    */
                 (!u.uconduct.gnostic && moves > 1000L) ? "nominally " : "",
         u_gname());

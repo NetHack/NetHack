@@ -16,7 +16,7 @@
  * Order matters and are used in macros.
  * Positive values denote hand-to-hand weapons or launchers.
  * Negative values denote ammunition or missiles.
- * Update weapon.c if you ammend any skills.
+ * Update weapon.c if you amend any skills.
  * Also used for oc_subtyp.
  */
 #define P_DAGGER 1

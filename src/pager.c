@@ -108,7 +108,7 @@ struct obj **obj_p;
         if (mtmp && has_mcorpsenm(mtmp)) /* mimic as corpse/statue */
             otmp->corpsenm = MCORPSENM(mtmp);
     }
-    /* if located at adajcent spot, mark it as having been seen up close */
+    /* if located at adjacent spot, mark it as having been seen up close */
     if (otmp && distu(x, y) <= 2 && !Blind && !Hallucination)
         otmp->dknown = 1;
 
@@ -808,7 +808,7 @@ coord *click_cc;
             win = create_nhwindow(NHW_MENU);
             start_menu(win);
             any.a_char = '/';
-            /* 'y' and 'n' to keep backwards compatability with previous
+            /* 'y' and 'n' to keep backwards compatibility with previous
                versions: "Specify unknown object by cursor?" */
             add_menu(win, NO_GLYPH, &any,
                      flags.lootabc ? 0 : any.a_char, 'y', ATR_NONE,
