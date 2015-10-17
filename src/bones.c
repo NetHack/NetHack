@@ -480,7 +480,7 @@ make_bones:
     /* final resting place, used to decide when bones are discovered */
     newbones->frpx = u.ux, newbones->frpy = u.uy;
     newbones->bonesknown = FALSE;
-    /* if current character died on a bones level, the cememtery list
+    /* if current character died on a bones level, the cemetery list
        will have multiple entries, most recent (this dead hero) first */
     newbones->next = level.bonesinfo;
     level.bonesinfo = newbones;
