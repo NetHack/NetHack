@@ -51,7 +51,7 @@
  */
 
 /* #define USE_VARARGS */ /* use <varargs.h> instead of <stdarg.h> */
-/* #define USE_OLDARGS */ /* don't use any variable argument facilites */
+/* #define USE_OLDARGS */ /* don't use any variable argument facilities */
 
 #if defined(apollo) /* Apollos have stdarg(3) but not stdarg.h */
 #define USE_VARARGS

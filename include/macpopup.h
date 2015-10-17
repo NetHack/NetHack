@@ -1,5 +1,5 @@
 /* NetHack 3.6	macpopup.h	$NHDT-Date: 1432512781 2015/05/25 00:13:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
-/* Copyright (c) Nethack Develpment Team, 1999.		*/
+/* Copyright (c) Nethack Development Team, 1999.		*/
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef MACPOPUP_H

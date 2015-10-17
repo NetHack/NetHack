@@ -414,7 +414,7 @@ exerper()
             break;
         }
 
-        /* Encumberance Checks */
+        /* Encumbrance Checks */
         debugpline0("exerper: Encumber checks");
         switch (near_capacity()) {
         case MOD_ENCUMBER:

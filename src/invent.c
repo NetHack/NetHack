@@ -2808,7 +2808,7 @@ boolean picked_some;
     return (!!Blind);
 }
 
-/* explicilty look at what is here, including all objects */
+/* explicitly look at what is here, including all objects */
 int
 dolook()
 {

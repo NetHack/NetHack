@@ -2665,7 +2665,7 @@ boolean tinitial, tfrom_file;
     /* things to disclose at end of game */
     if (match_optname(opts, "disclose", 7, TRUE)) {
         /*
-         * The order that the end_disclore options are stored:
+         * The order that the end_disclose options are stored:
          *	inventory, attribs, vanquished, genocided,
          *	conduct, overview.
          * There is an array in flags:

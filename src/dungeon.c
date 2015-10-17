@@ -578,7 +578,7 @@ struct proto_dungeon *pd;
     for (i = 0; i <= MAXLEVEL; i++)
         map[i] = FALSE;
 
-    /* get base and range and set those entried to true */
+    /* get base and range and set those entries to true */
     count = level_range(lev->dlevel.dnum, pd->tmplevel[idx].lev.base,
                         pd->tmplevel[idx].lev.rand, pd->tmplevel[idx].chain,
                         pd, &start);
@@ -627,7 +627,7 @@ int d;
  * template.  Next pick one.  Then try to place the next level.  If
  * sucessful, we're done.  Otherwise, try another (and another) until
  * all possible places have been tried.  If all possible places have
- * been exausted, return false.
+ * been exhausted, return false.
  */
 STATIC_OVL boolean
 place_level(proto_index, pd)
@@ -2210,7 +2210,7 @@ recalc_mapseen()
     /* Should not happen in general, but possible if in the process
      * of being booted from the quest.  The mapseen object gets
      * removed during the expulsion but prior to leaving the level
-     * [Since quest explusion no longer deletes quest mapseen data,
+     * [Since quest expulsion no longer deletes quest mapseen data,
      * null return from find_mapseen() should now be impossible.]
      */
     if (!(mptr = find_mapseen(&u.uz)))

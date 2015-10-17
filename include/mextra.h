@@ -157,7 +157,7 @@ struct emin {
 
 struct edog {
     long droptime;            /* moment dog dropped object */
-    unsigned dropdist;        /* dist of drpped obj from @ */
+    unsigned dropdist;        /* dist of dropped obj from @ */
     int apport;               /* amount of training */
     long whistletime;         /* last time he whistled */
     long hungrytime;          /* will get hungry at this time */

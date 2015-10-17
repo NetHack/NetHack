@@ -1118,7 +1118,7 @@ doengrave()
             } else if (len > 1)
                 otmp->spe -= len >> 1;
             else
-                otmp->spe -= 1; /* Prevent infinite grafitti */
+                otmp->spe -= 1; /* Prevent infinite graffiti */
         }
         if (multi)
             nomovemsg = "You finish defacing the dungeon.";

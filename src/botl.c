@@ -610,7 +610,7 @@ bot()
      * if that isn't done, since it sets context.botlx when a menu or
      * text display obliterates the status line.
      *
-     * To work around it, we call status_update() with ficticious
+     * To work around it, we call status_update() with fictitious
      * index of BL_FLUSH (-1).
      */
     if (context.botlx && !updated)

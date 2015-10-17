@@ -180,7 +180,7 @@ struct linfo {
  * To be consistent, one can assume that this map is in the player's mind and
  * has no physical correspondence (eliminating illiteracy/blind/hands/hands
  * free
- * concerns.) Therefore, this map is not exaustive nor detailed ("some
+ * concerns.) Therefore, this map is not exhaustive nor detailed ("some
  * fountains").
  * This makes it also subject to player conditions (amnesia).
  */

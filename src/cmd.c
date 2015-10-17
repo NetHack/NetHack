@@ -1333,7 +1333,7 @@ int final; /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
 
     Strcpy(tmpbuf, plname);
     *tmpbuf = highc(*tmpbuf); /* same adjustment as bottom line */
-    /* as in background_enlighenment, when poly'd we need to use the saved
+    /* as in background_enlightenment, when poly'd we need to use the saved
        gender in u.mfemale rather than the current you-as-monster gender */
     Sprintf(buf, "%s the %s's attributes:", tmpbuf,
             ((Upolyd ? u.mfemale : flags.female) && urole.name.f)
@@ -1696,7 +1696,7 @@ int final;
         Sprintf(buf, "%s blind",
                 !haseyes(youmonst.data) ? "innately"
                 : u.uroleplay.blind ? "permanently"
-                  /* better phrasing desparately wanted... */
+                  /* better phrasing desperately wanted... */
                   : Blindfolded_only ? "deliberately"
                     : "temporarily");
         if (wizard && (Blinded & TIMEOUT) != 0L

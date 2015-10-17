@@ -65,7 +65,7 @@ void gnome_mark_synch(void);
 void gnome_wait_synch(void);
 void gnome_cliparound(int x, int y);
 /* The following function does the right thing.  The nethack
- * gnome_cliparound (which lacks the winid) simply calls this funtion.
+ * gnome_cliparound (which lacks the winid) simply calls this function.
 */
 void gnome_cliparound_proper(winid wid, int x, int y);
 void gnome_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph);

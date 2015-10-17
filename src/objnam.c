@@ -1832,7 +1832,7 @@ static const char *const as_is[] = {
        variant instead of attempting to support both. */
 };
 
-/* singularize/pluralize decisiions common to both makesingular & makeplural
+/* singularize/pluralize decisions common to both makesingular & makeplural
  */
 STATIC_OVL boolean
 singplur_lookup(basestr, endstring, to_plural, alt_as_is)

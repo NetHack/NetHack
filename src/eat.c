@@ -2290,7 +2290,7 @@ struct obj *otmp;
     return 0;
 }
 
-int doeat() /* generic "eat" command funtion (see cmd.c) */
+int doeat() /* generic "eat" command function (see cmd.c) */
 {
     struct obj *otmp;
     int basenutrit; /* nutrition of full item */

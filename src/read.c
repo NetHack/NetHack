@@ -837,7 +837,7 @@ int howmuch;
     if (!rn2(3))
         forget_levels(rn2(25));
 
-    /* 1 in 3 chance of forgeting some objects */
+    /* 1 in 3 chance of forgetting some objects */
     if (!rn2(3))
         forget_objects(rn2(25));
 

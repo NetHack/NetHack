@@ -337,7 +337,7 @@ struct monst *mon;
     }
 
     if (tmp > 0) {
-        /* It's debateable whether a rusted blunt instrument
+        /* It's debatable whether a rusted blunt instrument
            should do less damage than a pristine one, since
            it will hit with essentially the same impact, but
            there ought to some penalty for using damaged gear

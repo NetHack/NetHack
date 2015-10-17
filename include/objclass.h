@@ -13,7 +13,7 @@ struct objclass {
     char *oc_uname;     /* called by user */
     Bitfield(oc_name_known, 1);
     Bitfield(oc_merge, 1);      /* merge otherwise equal objects */
-    Bitfield(oc_uses_known, 1); /* obj->known affects full decription */
+    Bitfield(oc_uses_known, 1); /* obj->known affects full description */
                                 /* otherwise, obj->dknown and obj->bknown */
                                 /* tell all, and obj->known should always */
                                 /* be set for proper merging behavior */

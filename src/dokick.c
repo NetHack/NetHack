@@ -869,7 +869,7 @@ dokick()
     mtmp = isok(x, y) ? m_at(x, y) : 0;
     /* might not kick monster if it is hidden and becomes revealed,
        if it is peaceful and player declines to attack, or if the
-       hero passes out due to enbumbrance with low hp; context.move
+       hero passes out due to encumbrance with low hp; context.move
        will be 1 unless player declines to kick peaceful monster */
     if (mtmp) {
         oldglyph = glyph_at(x, y);

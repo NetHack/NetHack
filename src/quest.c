@@ -158,7 +158,7 @@ boolean talk;
 }
 
 /*
- * Expell the player to the stairs on the parent of the quest dungeon.
+ * Expel the player to the stairs on the parent of the quest dungeon.
  *
  * This assumes that the hero is currently _in_ the quest dungeon and that
  * there is a single branch to and from it.
