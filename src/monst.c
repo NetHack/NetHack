@@ -81,8 +81,8 @@ void NDECL(monst_init);
  *	* Use colors given in names wherever possible. If the class has `real'
  *	  members with strong color associations, use those.
  *
- *	* Favor `cool' colors for cold-resistent monsters, `warm' ones for
- *	  fire-resistent ones.
+ *	* Favor `cool' colors for cold-resistant monsters, `warm' ones for
+ *	  fire-resistant ones.
  *
  *	* Try to reserve purple (magenta) for powerful `ruler' monsters (queen
  *	  bee, kobold lord, &c.).

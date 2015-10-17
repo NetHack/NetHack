@@ -185,7 +185,7 @@
 #define DISP_END (-6)     /* Clean up. */
 #define DISP_FREEMEM (-7) /* Free all memory during exit only. */
 
-/* Total number of cmap indices in the sheild_static[] array. */
+/* Total number of cmap indices in the shield_static[] array. */
 #define SHIELD_COUNT 21
 
 /*

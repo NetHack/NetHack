@@ -1464,7 +1464,7 @@ register struct obj *otmp;
 int
 Hear_again(VOID_ARGS)
 {
-    /* Chance of deafness going away while fainted/sleepeing/etc. */
+    /* Chance of deafness going away while fainted/sleeping/etc. */
     if (!rn2(2))
         make_deaf(0L, FALSE);
     return 0;

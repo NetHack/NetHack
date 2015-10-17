@@ -5,7 +5,7 @@
 #include "hack.h"
 #include "tcap.h"
 
-/* Relevent header information in rm.h, objclass.h, and monsym.h. */
+/* Relevant header information in rm.h, objclass.h, and monsym.h. */
 
 #ifdef C
 #undef C

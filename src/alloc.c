@@ -62,7 +62,7 @@ long *alloc(lth) register unsigned int lth;
 
 /* A small pool of static formatting buffers.
  * PTRBUFSIZ:  We assume that pointers will be formatted as integers in
- * hexadecimal, requring at least 16+1 characters for each buffer to handle
+ * hexadecimal, requiring at least 16+1 characters for each buffer to handle
  * 64-bit systems, but the standard doesn't mandate that encoding and an
  * implementation could do something different for %p, so we make some
  * extra room.

@@ -521,7 +521,7 @@ int after, udist, whappr;
                 if (cursed_object_at(nx, ny)
                     && !(edog->mhpmax_penalty && otyp < MANFOOD))
                     continue;
-                /* skip completely unreacheable goals */
+                /* skip completely unreachable goals */
                 if (!could_reach_item(mtmp, nx, ny)
                     || !can_reach_location(mtmp, mtmp->mx, mtmp->my, nx, ny))
                     continue;

@@ -58,9 +58,9 @@ STATIC_DCL const char *FDECL(spelltypemnemonic, (int));
  *	Pri are very aware of healing magic through theological research
  *	Ran avoid magic, preferring to fight unseen and unheard
  *	Rog are moderately aware of magic through trickery
- *	Sam have limited magical awareness, prefering meditation to conjuring
+ *	Sam have limited magical awareness, preferring meditation to conjuring
  *	Tou are aware of magic from all the great films they have seen
- *	Val have limited magical awareness, prefering fighting
+ *	Val have limited magical awareness, preferring fighting
  *	Wiz are trained mages
  *
  *	The arms penalty is lessened for trained fighters Bar, Kni, Ran,
@@ -734,7 +734,7 @@ cast_protection()
     /* The more u.uspellprot you already have, the less you get,
      * and the better your natural ac, the less you get.
      *
-     *	LEVEL AC    SPELLPROT from sucessive SPE_PROTECTION casts
+     *	LEVEL AC    SPELLPROT from successive SPE_PROTECTION casts
      *      1     10    0,  1,  2,  3,  4
      *      1      0    0,  1,  2,  3
      *      1    -10    0,  1,  2

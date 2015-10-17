@@ -4132,7 +4132,7 @@ const char *prompt;
            query, we might be even more paranoid about all paranoia
            responses (ie, ParanoidConfirm is set) in which case we
            require "no" to reject in addition to "yes" to confirm
-           (except we won't loop if respose is ESC; it means no) */
+           (except we won't loop if response is ESC; it means no) */
         do {
             Sprintf(qbuf, "%s%s %s", promptprefix, prompt, responsetype);
             getlin(qbuf, ans);

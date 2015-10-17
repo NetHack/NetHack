@@ -2586,7 +2586,7 @@ boolean tinitial, tfrom_file;
             num = 0;
             while (*op) {
                 oc_sym = def_char_to_objclass(*op);
-                /* make sure all are valid obj symbols occuring once */
+                /* make sure all are valid obj symbols occurring once */
                 if (oc_sym != MAXOCLASSES
                     && !index(flags.pickup_types, oc_sym)) {
                     flags.pickup_types[num] = (char) oc_sym;

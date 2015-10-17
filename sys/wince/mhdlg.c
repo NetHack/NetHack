@@ -531,7 +531,7 @@ plselInitDialog(HWND hWnd)
 
 /* adjust role/race/alignment/gender list - filter out
    invalid combinations
-   changed_sel points to the list where selection occured
+   changed_sel points to the list where selection occurred
    (-1 if unknown)
 */
 void

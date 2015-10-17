@@ -38,7 +38,7 @@ int atyp, dtyp;
     return (struct attack *) 0;
 }
 
-/* does monster-type have a paricular type of attack */
+/* does monster-type have a particular type of attack */
 boolean
 attacktype(ptr, atyp)
 struct permonst *ptr;
@@ -405,7 +405,7 @@ boolean
 cantvomit(ptr)
 struct permonst *ptr;
 {
-    /* rats and mice are incapable of vomitting;
+    /* rats and mice are incapable of vomiting;
        which other creatures have the same limitation? */
     if (ptr->mlet == S_RODENT && ptr != &mons[PM_ROCK_MOLE]
         && ptr != &mons[PM_WOODCHUCK])

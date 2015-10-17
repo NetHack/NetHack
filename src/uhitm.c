@@ -1304,7 +1304,7 @@ struct obj *otmp;
 /*
  * Player uses theft attack against monster.
  *
- * If the target is wearing body armor, take all of its possesions;
+ * If the target is wearing body armor, take all of its possessions;
  * otherwise, take one object.  [Is this really the behavior we want?]
  */
 STATIC_OVL void

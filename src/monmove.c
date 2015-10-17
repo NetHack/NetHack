@@ -784,7 +784,7 @@ register int after;
               ty = STRAT_GOALY(mtmp->mstrategy);
         struct monst *intruder = m_at(tx, ty);
         /*
-         * if there's a monster on the object or in possesion of it,
+         * if there's a monster on the object or in possession of it,
          * attack it.
          */
         if ((dist2(mtmp->mx, mtmp->my, tx, ty) < 2) && intruder

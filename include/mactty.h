@@ -5,7 +5,7 @@
 /*
  * This header is the supported external interface for the "tty" window
  * package. This package sports care-free handling of "dumb" tty windows
- * (preferrably using monospaced fonts) - it does NOT remember the strings
+ * (preferably using monospaced fonts) - it does NOT remember the strings
  * sent to it; rather, it uses an offscreen bitmap.
  *
  * For best performance, make sure it is aligned on a 32-pixel boundary

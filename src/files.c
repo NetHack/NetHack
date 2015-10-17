@@ -3323,7 +3323,7 @@ assure_syscf_file()
 
 #ifdef DEBUG
 /* used by debugpline() to decide whether to issue a message
- * from a partiular source file; caller passes __FILE__ and we check
+ * from a particular source file; caller passes __FILE__ and we check
  * whether it is in the source file list supplied by SYSCF's DEBUGFILES
  *
  * pass FALSE to override wildcard matching; useful for files

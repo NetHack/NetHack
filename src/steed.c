@@ -576,7 +576,7 @@ int reason; /* Player was thrown off etc. */
              * instead
              * calling them first and calling pickup() afterwards.  But it
              * would take a lot of work to keep this change from having any
-             * unforseen side effects (for instance, you would no longer be
+             * unforeseen side effects (for instance, you would no longer be
              * able to walk onto a square with a hole, and autopickup before
              * falling into the hole).
              */

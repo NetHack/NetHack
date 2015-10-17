@@ -40,10 +40,10 @@ typedef struct {
     const char *leave_msg;      /* Message when leaving */
     long ttl;                   /* Time to live. -1 is forever */
     short expire_f;            /* Function to call when region's ttl expire */
-    short can_enter_f;         /* Function to call to check wether the player
+    short can_enter_f;         /* Function to call to check whether the player
                                   can, or can not, enter the region */
     short enter_f;             /* Function to call when the player enters*/
-    short can_leave_f;         /* Function to call to check wether the player
+    short can_leave_f;         /* Function to call to check whether the player
                                   can, or can not, leave the region */
     short leave_f;             /* Function to call when the player leaves */
     short inside_f;            /* Function to call every turn if player's

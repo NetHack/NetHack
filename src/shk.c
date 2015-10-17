@@ -1603,7 +1603,7 @@ int croaked; /* -1: escaped dungeon; 0: quit; 1: died */
     repo.shopkeeper = 0;
 
     /*
-     * Scan all shopkeepres on the level, to prioritize them:
+     * Scan all shopkeepers on the level, to prioritize them:
      * 1) keeper of shop hero is inside and who is owed money,
      * 2) keeper of shop hero is inside who isn't owed any money,
      * 3) other shk who is owed money, 4) other shk who is angry,
@@ -4132,7 +4132,7 @@ boolean altusage; /* some items have an "alternate" use with different cost */
            degrades its value, but not charging anything would make
            identification too easy; charge an amount comparable to
            what is charged for an ordinary lamp (don't bother with
-           angry shk surchage) */
+           angry shk surcharge) */
         if (!altusage)
             tmp = (long) objects[OIL_LAMP].oc_cost;
         else

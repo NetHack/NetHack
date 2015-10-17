@@ -102,7 +102,7 @@ boolean restore;
 
             /* strip user-supplied names */
             /* Statue and some corpse names are left intact,
-               presumeably in case they came from score file.
+               presumably in case they came from score file.
                [TODO: this ought to be done differently--names
                which came from such a source or came from any
                stoned or killed monster should be flagged in
@@ -193,7 +193,7 @@ char *namebuf;
     while (*namebuf) {
         c = *namebuf & 0177;
         if (c < ' ' || c == '\177') {
-            /* non-printable or undesireable */
+            /* non-printable or undesirable */
             *namebuf = '.';
         } else if (c != *namebuf) {
             /* expected to be printable if user wants such things */

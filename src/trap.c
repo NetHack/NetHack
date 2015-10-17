@@ -3783,7 +3783,7 @@ struct trap *ttmp;
             move_bc(0, bc, bx, by, cx, cy);
         /* marking the trap unseen forces dotrap() to treat it like a new
            discovery and prevents pickup() -> look_here() -> check_here()
-           from giving a redudant "there is a <trap> here" message when
+           from giving a redundant "there is a <trap> here" message when
            there are objects covering this trap */
         ttmp->tseen = 0; /* hack for check_here() */
         /* trigger the trap */

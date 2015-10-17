@@ -134,7 +134,7 @@ coord *startp;
      */
     if (Blind && !Blind_telepat) {
         if (!enexto(startp, u.ux, u.uy, (struct permonst *) 0))
-            return FALSE; /* no good posiitons */
+            return FALSE; /* no good positions */
         return TRUE;
     }
 
@@ -221,7 +221,7 @@ retry:
 STATIC_OVL boolean
 md_stop(stopp, startp)
 coord *stopp;  /* stopping position (we fill it in) */
-coord *startp; /* starting positon (read only) */
+coord *startp; /* starting position (read only) */
 {
     int x, y, distance, min_distance = -1;
 

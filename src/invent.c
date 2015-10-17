@@ -1991,7 +1991,7 @@ long *out_cnt;
     menu_item *selected;
     struct obj **oarray;
 
-    /* overriden by global flag */
+    /* overridden by global flag */
     if (flags.perm_invent) {
         win = (lets && *lets) ? local_win : WIN_INVEN;
         /* create the first time used */
@@ -2653,7 +2653,7 @@ char *buf;
    don't show them unless obj_cnt is 0 */
 int
 look_here(obj_cnt, picked_some)
-int obj_cnt; /* obj_cnt > 0 implies that autopickup is in progess */
+int obj_cnt; /* obj_cnt > 0 implies that autopickup is in progress */
 boolean picked_some;
 {
     struct obj *otmp;

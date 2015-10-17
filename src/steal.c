@@ -591,7 +591,7 @@ int ochance, achance; /* percent chance for ordinary item, artifact */
         }
         freeinv(obj);
     } else {
-        /* not carried; presumeably thrown or kicked */
+        /* not carried; presumably thrown or kicked */
         if (canspotmon(mon))
             pline("%s absorbs %s!", Monnam(mon), yname(obj));
     }

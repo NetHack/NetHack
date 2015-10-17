@@ -1233,7 +1233,7 @@ int *wt_before, *wt_after;
             verb = telekinesis ? "acquire" : "lift";
         }
     } else {
-        /* lint supppression */
+        /* lint suppression */
         *obj_nambuf = *where = '\0';
         verb = "";
     }

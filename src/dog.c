@@ -233,7 +233,7 @@ losedogs()
      * Last, place migrating monsters coming to this level.
      *
      * Hero might eventually be displaced (due to the third step, but
-     * occuring later), which is the main reason to do the second step
+     * occurring later), which is the main reason to do the second step
      * sooner (in turn necessitating the first step, rather than combining
      * the list scans with monster placement).
      */
@@ -793,7 +793,7 @@ register struct obj *obj;
                 || (acidic(fptr) && !resists_acid(mon))
                 || (poisonous(fptr) && !resists_poison(mon)))
                 return POISON;
-            /* turning into slime is preferrable to starvation */
+            /* turning into slime is preferable to starvation */
             else if (fptr == &mons[PM_GREEN_SLIME] && !slimeproof(mon->data))
                 return (starving ? ACCFOOD : POISON);
             else if (vegan(fptr))
@@ -987,7 +987,7 @@ boolean was_dead;
             }
         }
     } else {
-        /* chance it goes wild anyway - Pet Semetary */
+        /* chance it goes wild anyway - Pet Sematary */
         mtmp->mtame = rn2(mtmp->mtame + 1);
         if (!mtmp->mtame)
             mtmp->mpeaceful = rn2(2);

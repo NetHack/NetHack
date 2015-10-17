@@ -745,7 +745,7 @@ int doclose() /* try to close a door */
     }
 
     if (portcullis || !IS_DOOR(door->typ)) {
-        /* is_db_wall: closed porcullis */
+        /* is_db_wall: closed portcullis */
         if (is_db_wall(x, y) || door->typ == DRAWBRIDGE_UP)
             pline_The("drawbridge is already closed.");
         else if (portcullis || door->typ == DRAWBRIDGE_DOWN)

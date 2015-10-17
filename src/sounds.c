@@ -503,10 +503,10 @@ register struct monst *mtmp;
     if (is_silent(ptr))
         return (0);
 
-    /* leader might be poly'd; if he can still speak, give leader speach */
+    /* leader might be poly'd; if he can still speak, give leader speech */
     if (mtmp->m_id == quest_status.leader_m_id && msound > MS_ANIMAL)
         msound = MS_LEADER;
-    /* make sure it's your role's quest quardian; adjust if not */
+    /* make sure it's your role's quest guardian; adjust if not */
     else if (msound == MS_GUARDIAN && ptr != &mons[urole.guardnum])
         msound = mons[genus(monsndx(ptr), 1)].msound;
     /* some normally non-speaking types can/will speak if hero is similar */

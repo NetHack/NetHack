@@ -840,7 +840,7 @@ struct monst *mtmp;
     for (otmp = level.objects[mtmp->mx][mtmp->my]; otmp; otmp = otmp2) {
         otmp2 = otmp->nexthere;
 
-        /* touch senstive items */
+        /* touch sensitive items */
         if (otmp->otyp == CORPSE && is_rider(&mons[otmp->corpsenm])) {
             /* Rider corpse isn't just inedible; can't engulf it either */
             (void) revive_corpse(otmp);
@@ -3129,7 +3129,7 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
 #ifndef LINT
     mtmp->mhp = (int) (((long) hpn * (long) mtmp->mhp) / (long) hpd);
 #endif
-    /* sanity check (potentional overflow) */
+    /* sanity check (potential overflow) */
     if (mtmp->mhp < 0 || mtmp->mhp > mtmp->mhpmax)
         mtmp->mhp = mtmp->mhpmax;
     /* unlikely but not impossible; a 1HD creature with 1HP that changes

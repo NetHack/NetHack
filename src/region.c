@@ -469,7 +469,7 @@ xchar x, y;
 }
 
 /*
- * check wether a monster enters/leaves one or more region.
+ * check whether a monster enters/leaves one or more region.
 */
 boolean
 m_in_out_region(mon, x, y)
@@ -1022,7 +1022,7 @@ region_danger()
             /* completely harmless if you don't need to breathe */
             if (nonliving(youmonst.data) || Breathless)
                 continue;
-            /* minor inconvenience if you're posion resistant;
+            /* minor inconvenience if you're poison resistant;
                not harmful enough to be a prayer-level trouble */
             if (Poison_resistance)
                 continue;

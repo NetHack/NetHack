@@ -1701,7 +1701,7 @@ nopick:
  *                   object is going to break.
  *     breakmsg()  - which outputs a message about the breakage,
  *                   appropriate for that particular object. Should
- *                   only be called after a positve breaktest().
+ *                   only be called after a positive breaktest().
  *                   on the object and, if it going to be called,
  *                   it must be called before calling breakobj().
  *                   Calling breakmsg() is optional.

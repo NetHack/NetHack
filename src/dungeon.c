@@ -625,7 +625,7 @@ int d;
 /*
  * Place a level.  First, find the possible places on a dungeon map
  * template.  Next pick one.  Then try to place the next level.  If
- * sucessful, we're done.  Otherwise, try another (and another) until
+ * successful, we're done.  Otherwise, try another (and another) until
  * all possible places have been tried.  If all possible places have
  * been exhausted, return false.
  */
@@ -1548,7 +1548,7 @@ level_difficulty()
     } else {
         res = depth(&u.uz);
         /* depth() is the number of elevation units (levels) below
-           the theorhetical surface; in a builds-up branch, that value
+           the theoretical surface; in a builds-up branch, that value
            ends up making the harder to reach levels be treated as if
            they were easier; adjust for the extra effort involved in
            going down to the entrance and then up to the location */
@@ -2016,7 +2016,7 @@ int ledger_num;
         mptr->flags.forgot = 1;
         mptr->br = (branch *) 0;
 
-        /* custom names are erased, not just forgotten until revisted */
+        /* custom names are erased, not just forgotten until revisited */
         if (mptr->custom) {
             mptr->custom_lth = 0;
             free((genericptr_t) mptr->custom);
@@ -2380,7 +2380,7 @@ recalc_mapseen()
                     mptr->feat.naltar = count;
                 break;
             /*	An automatic annotation is added to the Castle and
-             *	to Fort Ludios once their struncture's main entrance
+             *	to Fort Ludios once their structure's main entrance
              *	has been seen (in person or via magic mapping).
              * DOOR: possibly a lowered drawbridge's open portcullis;
              * DBWALL: a raised drawbridge's "closed door";

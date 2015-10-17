@@ -279,7 +279,7 @@
  *    lacerations, bruises, crushed body parts, bleeding.
  *
  * The following were evaluated and determined _NOT_ to be
- * susceptable to Half_physical_damage protection:
+ * susceptible to Half_physical_damage protection:
  *   Being caught in a fireball                      [fire damage]
  *   Sitting in lava                                 [lava damage]
  *   Thrown potion (acid)                            [acid damage]

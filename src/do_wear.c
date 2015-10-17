@@ -2141,7 +2141,7 @@ register struct obj *otmp;
 
     if (!otmp)
         return 0;
-    *buf = '\0'; /* lint suppresion */
+    *buf = '\0'; /* lint suppression */
 
     /* special ring checks */
     if (otmp == uright || otmp == uleft) {

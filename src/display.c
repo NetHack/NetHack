@@ -424,7 +424,7 @@ register xchar worm_tail; /* mon is actually a worm tail */
         }
     }
 
-    /* If the mimic is unsucessfully mimicing something, display the monster
+    /* If the mimic is unsuccessfully mimicing something, display the monster
      */
     if (!mon_mimic || sensed) {
         int num;
@@ -552,7 +552,7 @@ xchar x, y;
             /*
              * An open room or water location.  Normally we wouldn't touch
              * this, but we have to get rid of remembered boulder symbols.
-             * This will only occur in rare occations when the hero goes
+             * This will only occur in rare occasions when the hero goes
              * blind and doesn't find a boulder where expected (something
              * came along and picked it up).  We know that there is not a
              * boulder at this location.  Show fountains, pools, etc.
@@ -1292,7 +1292,7 @@ docrt()
  */
 
 typedef struct {
-    xchar new; /* perhaps move this bit into the rm strucure. */
+    xchar new; /* perhaps move this bit into the rm structure. */
     int glyph;
 } gbuf_entry;
 
@@ -1793,7 +1793,7 @@ int x, y, a, b, c, dd;
 #endif /* WA_VERBOSE */
 
 /*
- * Return 'which' if position is implies an unfinshed exterior.  Return
+ * Return 'which' if position is implies an unfinished exterior.  Return
  * zero otherwise.  Unfinished implies outer area is rock or a corridor.
  *
  * Things that are ambiguous: lava

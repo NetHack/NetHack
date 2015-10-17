@@ -257,7 +257,7 @@ register struct monst *mtmp;
         return 0;
     } else {
         /* make sure that the demand is unmeetable if the monster
-           has the Amulet, preventing monster from being satisified
+           has the Amulet, preventing monster from being satisfied
            and removed from the game (along with said Amulet...) */
         if (mon_has_amulet(mtmp))
             demand = cash + (long) rn1(1000, 40);

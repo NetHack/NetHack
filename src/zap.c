@@ -80,7 +80,7 @@ const char *const flash_types[] =
  * changed; now such wands won't be discovered.  But if the type is
  * already discovered, then the individual wand whose effect was just
  * observed will be flagged as if seen.  [You already know wands of
- * striking; you zap "a wand" and observe striking effect (presumeably
+ * striking; you zap "a wand" and observe striking effect (presumably
  * by sound or touch); it'll become shown in inventory as "a wand of
  * striking".]
  *
@@ -4085,7 +4085,7 @@ const char *msg;
 #define MIN_ICE_TIME 50
 #define MAX_ICE_TIME 2000
 /*
- * Uusally start a melt_ice timer; sometimes the ice will become
+ * Usually start a melt_ice timer; sometimes the ice will become
  * permanent instead.
  */
 void
@@ -4947,7 +4947,7 @@ retry:
         if (!otmp)
             return; /* for safety; should never happen */
     } else if (otmp == &nothing) {
-        /* explicitly wished for "nothing", presumeably attempting
+        /* explicitly wished for "nothing", presumably attempting
            to retain wishless conduct */
         return;
     }

@@ -216,7 +216,7 @@ struct xwindow {
 #define NHW_NONE 0 /* Unallocated window type.  Must be	*/
 /* different from any other NHW_* type. */
 
-#define NO_CLICK 0 /* No click occured on the map window. Must */
+#define NO_CLICK 0 /* No click occurred on the map window. Must */
 /* be different than CLICK_1 and CLICK_2.   */
 
 #define DEFAULT_MESSAGE_WIDTH 60 /* width in chars of the message window */

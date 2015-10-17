@@ -784,7 +784,7 @@ boolean with_price;
         else if (!iflags.implicit_uncursed
             /* For most items with charges or +/-, if you know how many
              * charges are left or what the +/- is, then you must have
-             * totally identified the item, so "uncursed" is unneccesary,
+             * totally identified the item, so "uncursed" is unnecessary,
              * because an identified object not described as "blessed" or
              * "cursed" must be uncursed.
              *
@@ -949,7 +949,7 @@ boolean with_price;
             Sprintf(eos(bp), " (weapon in %s)", hand_s);
 
             if (warn_obj_cnt && obj == uwep && (EWarn_of_mon & W_WEP) != 0L) {
-                /* presumeably can be felt when blind */
+                /* presumably can be felt when blind */
                 Strcat(bp, " (glowing");
                 if (!Blind)
                     Sprintf(eos(bp), " %s", glow_color(obj->oartifact));
@@ -1069,7 +1069,7 @@ register struct obj *otmp;
  */
     if (otmp->rknown
         || (otmp->oclass != ARMOR_CLASS && otmp->oclass != WEAPON_CLASS
-            && !is_weptool(otmp) &&      /* (redunant) */
+            && !is_weptool(otmp) &&      /* (redundant) */
             otmp->oclass != BALL_CLASS)) /* (useless) */
         return FALSE;
     else /* lack of `rknown' only matters for vulnerable objects */
@@ -2635,9 +2635,9 @@ struct obj *no_wish;
     English either way.  See makeplural() for more on pair/pairs.
 
     We should only double count if the object in question is not
-    refered to as a "pair of".  E.g. We should double if the player
+    referred to as a "pair of".  E.g. We should double if the player
     types "pair of spears", but not if the player types "pair of
-    lenses".  Luckily (?) all objects that are refered to as pairs
+    lenses".  Luckily (?) all objects that are referred to as pairs
     -- boots, gloves, and lenses -- are also not mergable, so cnt is
     ignored anyway.
     */
@@ -2741,7 +2741,7 @@ struct obj *no_wish;
             *(bp + 2) = 'a';
 
         if ((p = strstri(bp, "armour")) != 0) {
-            /* skip past "armo", then copy remainer beyond "u" */
+            /* skip past "armo", then copy remainder beyond "u" */
             p += 4;
             while ((*p = *(p + 1)) != '\0')
                 ++p; /* self terminating */

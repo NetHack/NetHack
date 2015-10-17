@@ -41,7 +41,7 @@ static void select_offscreen_port(tty_record *record);
         return general_failure;
 
 /*
- * Simple macro for deciding wether we draw at once or delay
+ * Simple macro for deciding whether we draw at once or delay
  */
 #define DRAW_DIRECT (TA_ALWAYS_REFRESH & record->attribute[TTY_ATTRIB_FLAGS])
 

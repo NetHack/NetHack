@@ -11,7 +11,7 @@
 
 #include <windows.h>
 
-/* Detect the targe device */
+/* Detect the target device */
 #if defined(WIN32_PLATFORM_PSPC)
 #if _WIN32_WCE >= 300
 #define WIN_CE_POCKETPC

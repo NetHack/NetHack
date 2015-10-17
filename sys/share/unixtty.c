@@ -287,7 +287,7 @@ setftty()
     }
     if (!IS_7BIT(inittyb))
         curttyb.inputflags &= ~STRIPHI;
-    /* If an interrupt character is used, it will be overriden and
+    /* If an interrupt character is used, it will be overridden and
      * set to ^C.
      */
     if (intr_char != nonesuch && curttyb2.intr_sym != '\003') {

@@ -826,7 +826,7 @@ int mntmp;
     (void) encumber_msg();
 
     retouch_equipment(2);
-    /* this might trigger a recursize call to polymon() [stone golem
+    /* this might trigger a recursive call to polymon() [stone golem
        wielding cockatrice corpse and hit by stone-to-flesh, becomes
        flesh golem above, now gets transformed back into stone golem] */
     if (!uarmg)
@@ -893,7 +893,7 @@ break_armor()
             if (is_flimsy(otmp) && !donning(otmp)) {
                 char hornbuf[BUFSZ];
 
-                /* Future possiblities: This could damage/destroy helmet */
+                /* Future possibilities: This could damage/destroy helmet */
                 Sprintf(hornbuf, "horn%s", plur(num_horns(youmonst.data)));
                 Your("%s %s through %s.", hornbuf, vtense(hornbuf, "pierce"),
                      yname(otmp));

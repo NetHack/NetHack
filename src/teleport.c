@@ -98,7 +98,7 @@ unsigned gpflags;
  *
  * Attempt to find a good place for the given monster type in the closest
  * position to (xx,yy).  Do so in successive square rings around (xx,yy).
- * If there is more than one valid positon in the ring, choose one randomly.
+ * If there is more than one valid position in the ring, choose one randomly.
  * Return TRUE and the position chosen when successful, FALSE otherwise.
  */
 boolean
