@@ -721,12 +721,8 @@ int doclose() /* try to close a door */
     if (!isok(x, y))
         goto nodoor;
 
-    if ((mtmp = m_at(x, y)) && mtmp->m_ap_type == M_AP_FURNITURE
-        && (mtmp->mappearance == S_hcdoor || mtmp->mappearance == S_vcdoor)
-        && !Protection_from_shape_changers) {
-        stumble_onto_mimic(mtmp);
+    if (stumble_on_door_mimic(x, y))
         return (1);
-    }
 
     /* when choosing a direction is impaired, use a turn
        regardless of whether a door is successfully targetted */
