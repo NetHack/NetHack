@@ -228,6 +228,8 @@ tapeworm
 liger
 velociraptor
 corpulent porpoise
+quokka
+potoo
 
 # european cryptids
 wolpertinger
@@ -309,6 +311,11 @@ kitten prospecting robot
 guillemet
 solidus
 obelus
+dingbat
+bold face
+boustrophedon
+ligature
+rebus
 
 # Their actual character
 apostrophe golem
