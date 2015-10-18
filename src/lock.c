@@ -389,11 +389,7 @@ register struct obj *pick;
                 pline("I don't think %s would appreciate that.",
                       mon_nam(mtmp));
             return PICKLOCK_LEARNED_SOMETHING;
-        } else if (mtmp && mtmp->m_ap_type == M_AP_FURNITURE &&
-                   /* not IS_DOOR() here; for M_AP_FURNITURE, mappearance
-                      holds a map symbol rather than a topology type */
-                   (mtmp->mappearance == S_vcdoor
-                    || mtmp->mappearance == S_hcdoor)) {
+        } else if (mtmp && is_door_mappear(mtmp)) {
             /* "The door actually was a <mimic>!" */
             stumble_onto_mimic(mtmp);
             /* mimic might keep the key (50% chance, 10% for PYEC) */
@@ -539,8 +535,7 @@ stumble_on_door_mimic(x, y)
 int x, y;
 {
     struct monst *mtmp;
-    if ((mtmp = m_at(x, y)) && mtmp->m_ap_type == M_AP_FURNITURE
-        && (mtmp->mappearance == S_hcdoor || mtmp->mappearance == S_vcdoor)
+    if ((mtmp = m_at(x, y)) && is_door_mappear(mtmp)
         && !Protection_from_shape_changers) {
         stumble_onto_mimic(mtmp);
         return TRUE;

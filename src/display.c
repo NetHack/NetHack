@@ -1179,11 +1179,8 @@ set_mimic_blocking()
     for (mon = fmon; mon; mon = mon->nmon) {
         if (DEADMONSTER(mon))
             continue;
-        if (mon->minvis && ((mon->m_ap_type == M_AP_FURNITURE
-                             && (mon->mappearance == S_vcdoor
-                                 || mon->mappearance == S_hcdoor))
-                            || (mon->m_ap_type == M_AP_OBJECT
-                                && mon->mappearance == BOULDER))) {
+        if (mon->minvis && (is_door_mappear(mon)
+                            || is_obj_mappear(mon,BOULDER))) {
             if (See_invisible)
                 block_point(mon->mx, mon->my);
             else

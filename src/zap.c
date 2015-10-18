@@ -320,8 +320,7 @@ struct obj *otmp;
             }
             if (canseemon(mtmp)) {
                 if (disguised_mimic) {
-                    if (mtmp->m_ap_type == M_AP_OBJECT
-                        && mtmp->mappearance == STRANGE_OBJECT) {
+                    if (is_obj_mappear(mtmp,STRANGE_OBJECT)) {
                         /* it can do better now */
                         set_mimic_sym(mtmp);
                         newsym(mtmp->mx, mtmp->my);

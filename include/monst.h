@@ -159,4 +159,8 @@ struct monst {
 #define is_vampshifter(mon)                                      \
     ((mon)->cham == PM_VAMPIRE || (mon)->cham == PM_VAMPIRE_LORD \
      || (mon)->cham == PM_VLAD_THE_IMPALER)
+#define is_door_mappear(mon) ((mon)->m_ap_type == M_AP_FURNITURE \
+     && ((mon)->mappearance == S_hcdoor || (mon)->mappearance == S_vcdoor))
+#define is_obj_mappear(mon,otyp) ((mon)->m_ap_type == M_AP_OBJECT \
+     && (mon)->mappearance == (otyp))
 #endif /* MONST_H */

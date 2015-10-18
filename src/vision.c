@@ -178,11 +178,7 @@ register struct rm *lev;
 
     /* Mimics mimicing a door or boulder block light. */
     if ((mon = m_at(x, y)) && (!mon->minvis || See_invisible)
-        && ((mon->m_ap_type == M_AP_FURNITURE
-             && (mon->mappearance == S_hcdoor
-                 || mon->mappearance == S_vcdoor))
-            || (mon->m_ap_type == M_AP_OBJECT
-                && mon->mappearance == BOULDER)))
+        && (is_door_mappear(mon) || is_obj_mappear(mon,BOULDER)))
         return 1;
 
     return 0;

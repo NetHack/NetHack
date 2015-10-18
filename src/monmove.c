@@ -845,10 +845,8 @@ not_special:
 
         if (!mtmp->mcansee
             || (should_see && Invis && !perceives(ptr) && rn2(11))
-            || (youmonst.m_ap_type == M_AP_OBJECT
-                && youmonst.mappearance == STRANGE_OBJECT) || u.uundetected
-            || (youmonst.m_ap_type == M_AP_OBJECT
-                && youmonst.mappearance == GOLD_PIECE && !likes_gold(ptr))
+            || is_obj_mappear(&youmonst,STRANGE_OBJECT) || u.uundetected
+            || (is_obj_mappear(&youmonst,GOLD_PIECE) && !likes_gold(ptr))
             || (mtmp->mpeaceful && !mtmp->isshk) || /* allow shks to follow */
             ((monsndx(ptr) == PM_STALKER || ptr->mlet == S_BAT
               || ptr->mlet == S_LIGHT) && !rn2(3)))

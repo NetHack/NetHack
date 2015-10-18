@@ -161,13 +161,11 @@ eatmupdate()
     if (!eatmbuf || nomovemsg != eatmbuf)
         return;
 
-    if (youmonst.m_ap_type == M_AP_OBJECT && youmonst.mappearance == ORANGE
-        && !Hallucination) {
+    if (is_obj_mappear(&youmonst,ORANGE) && !Hallucination) {
         /* revert from hallucinatory to "normal" mimicking */
         altmsg = "You now prefer mimicking yourself.";
         altapp = GOLD_PIECE;
-    } else if (youmonst.m_ap_type == M_AP_OBJECT
-               && youmonst.mappearance == GOLD_PIECE && Hallucination) {
+    } else if (is_obj_mappear(&youmonst,GOLD_PIECE) && Hallucination) {
         /* won't happen; anything which might make immobilized
            hero begin hallucinating (black light attack, theft
            of Grayswandir) will terminate the mimicry first */

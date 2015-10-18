@@ -89,8 +89,7 @@ struct obj **obj_p;
     *obj_p = (struct obj *) 0;
     /* there might be a mimic here posing as an object */
     mtmp = m_at(x, y);
-    if (mtmp && mtmp->m_ap_type == M_AP_OBJECT
-        && mtmp->mappearance == (unsigned) glyphotyp)
+    if (mtmp && is_obj_mappear(mtmp, (unsigned) glyphotyp))
         otmp = 0;
     else
         mtmp = 0;

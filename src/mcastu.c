@@ -55,8 +55,7 @@ boolean undirected;
             point_msg = "all around, then curses";
         else if ((Invis && !perceives(mtmp->data)
                   && (mtmp->mux != u.ux || mtmp->muy != u.uy))
-                 || (youmonst.m_ap_type == M_AP_OBJECT
-                     && youmonst.mappearance == STRANGE_OBJECT)
+                 || is_obj_mappear(&youmonst, STRANGE_OBJECT)
                  || u.uundetected)
             point_msg = "and curses in your general direction";
         else if (Displaced && (mtmp->mux != u.ux || mtmp->muy != u.uy))
