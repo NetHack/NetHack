@@ -1,4 +1,4 @@
-/* NetHack 3.6	weapon.c	$NHDT-Date: 1436753527 2015/07/13 02:12:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.51 $ */
+/* NetHack 3.6	weapon.c	$NHDT-Date: 1445126431 2015/10/18 00:00:31 $  $NHDT-Branch: master $:$NHDT-Revision: 1.54 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -79,8 +79,9 @@ STATIC_DCL void FDECL(skill_advance, (int));
 static NEARDATA const char kebabable[] = { S_XORN, S_DRAGON, S_JABBERWOCK,
                                            S_NAGA, S_GIANT,  '\0' };
 
-/* weapon's skill category name for use as generalized description of weapon
- */
+/* weapon's skill category name for use as generalized description of weapon;
+   mostly used to shorten "you drop your <weapon>" messages when slippery
+   fingers or polymorph causes hero to involuntarily drop wielded weapon(s) */
 const char *
 weapon_descr(obj)
 struct obj *obj;
@@ -91,10 +92,12 @@ struct obj *obj;
     /* assorted special cases */
     switch (skill) {
     case P_NONE:
-        /* not a weapon: use item class name; override "food" for corpses,
-           tins, and eggs and "large rock" for statues and boulders */
+        /* not a weapon or weptool: use item class name;
+           override class name "food" for corpses, tins, and eggs,
+           "large rock" for statues and boulders, and "tool" for towels */
         descr = (obj->otyp == CORPSE || obj->otyp == TIN || obj->otyp == EGG
-                 || obj->otyp == STATUE || obj->otyp == BOULDER)
+                 || obj->otyp == STATUE || obj->otyp == BOULDER
+                 || obj->otyp == TOWEL)
                     ? OBJ_NAME(objects[obj->otyp])
                     : def_oc_syms[(int) obj->oclass].name;
         break;
@@ -102,13 +105,11 @@ struct obj *obj;
         if (is_ammo(obj))
             descr = (obj->otyp == ROCK || is_graystone(obj))
                         ? "stone"
-                        :
                         /* avoid "rock"; what about known glass? */
-                        (obj->oclass == GEM_CLASS)
+                        : (obj->oclass == GEM_CLASS)
                             ? "gem"
-                            :
                             /* in case somebody adds odd sling ammo */
-                            def_oc_syms[(int) obj->oclass].name;
+                            : def_oc_syms[(int) obj->oclass].name;
         break;
     case P_BOW:
         if (is_ammo(obj))
@@ -738,7 +739,9 @@ struct monst *mon;
     }
 }
 
-int abon() /* attack bonus for strength & dexterity */
+/* attack bonus for strength & dexterity */
+int
+abon()
 {
     int sbon;
     int str = ACURR(A_STR), dex = ACURR(A_DEX);
@@ -774,7 +777,9 @@ int abon() /* attack bonus for strength & dexterity */
         return (sbon + dex - 14);
 }
 
-int dbon() /* damage bonus for strength */
+/* damage bonus for strength */
+int
+dbon()
 {
     int str = ACURR(A_STR);
 
@@ -797,6 +802,67 @@ int dbon() /* damage bonus for strength */
         return (5); /* up to 18/99 */
     else
         return (6);
+}
+
+/* increase a towel's wetness */
+void
+wet_a_towel(obj, amt, verbose)
+struct obj *obj;
+int amt; /* positive: new value; negative: increment by -amt; zero: no-op */
+boolean verbose;
+{
+    int newspe = (amt <= 0) ? obj->spe - amt : amt;
+
+    /* new state is only reported if it's an increase */
+    if (newspe > obj->spe) {
+        if (verbose) {
+            const char *wetness = (newspe < 3)
+                                     ? (!obj->spe ? "damp" : "damper")
+                                     : (!obj->spe ? "wet" : "wetter");
+
+            if (carried(obj))
+                pline("%s gets %s.", Yobjnam2(obj, (const char *) 0),
+                      wetness);
+            else if (mcarried(obj) && canseemon(obj->ocarry))
+                pline("%s %s gets %s.", s_suffix(Monnam(obj->ocarry)),
+                      xname(obj), wetness);
+        }
+    }
+    obj->spe = min(newspe, 7);
+
+    /* if hero is wielding this towel, don't give "you begin bashing
+       with your wet towel" message on next attack with it */
+    if (obj == uwep)
+        unweapon = !is_wet_towel(obj);
+}
+
+/* decrease a towel's wetness */
+void
+dry_a_towel(obj, amt, verbose)
+struct obj *obj;
+int amt; /* positive: new value; negative: decrement by -amt; zero: no-op */
+boolean verbose;
+{
+    int newspe = (amt <= 0) ? obj->spe + amt : amt;
+
+    /* new state is only reported if it's a decrease */
+    if (newspe < obj->spe) {
+        if (verbose) {
+            if (carried(obj))
+                pline("%s dries%s.", Yobjnam2(obj, (const char *) 0),
+                      !newspe ? " out" : "");
+            else if (mcarried(obj) && canseemon(obj->ocarry))
+                pline("%s %s drie%s.", s_suffix(Monnam(obj->ocarry)),
+                      xname(obj), !newspe ? " out" : "");
+        }
+    }
+    newspe = min(newspe, 7);
+    obj->spe = max(newspe, 0);
+
+    /* if hero is wielding this towel and it is now dry, give "you begin
+       bashing with your towel" message on next attack with it */
+    if (obj == uwep)
+        unweapon = !is_wet_towel(obj);
 }
 
 /* copy the skill level name into the given buffer */

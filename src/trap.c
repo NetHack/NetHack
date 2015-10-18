@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1436753526 2015/07/13 02:12:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.237 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1445126429 2015/10/18 00:00:29 $  $NHDT-Branch: master $:$NHDT-Revision: 1.241 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -47,23 +47,38 @@ STATIC_VAR const char *const blindgas[6] = { "humid",   "odorless",
                                              "pungent", "chilling",
                                              "acrid",   "biting" };
 
-/* called when you're hit by fire (dofiretrap,buzz,zapyourself,explode) */
-boolean /* returns TRUE if hit on torso */
-    burnarmor(victim)
+/* called when you're hit by fire (dofiretrap,buzz,zapyourself,explode);
+   returns TRUE if hit on torso */
+boolean
+burnarmor(victim)
 struct monst *victim;
 {
     struct obj *item;
     char buf[BUFSZ];
-    int mat_idx;
+    int mat_idx, oldspe;
+    boolean hitting_u;
 
     if (!victim)
         return 0;
+    hitting_u = (victim == &youmonst);
+
+    /* burning damage may dry wet towel */
+    item = hitting_u ? carrying(TOWEL) : m_carrying(victim, TOWEL);
+    while (item) {
+        if (is_wet_towel(item)) {
+            oldspe = item->spe;
+            dry_a_towel(item, rn2(oldspe + 1), TRUE);
+            if (item->spe != oldspe)
+                break; /* stop once one towel has been affected */
+        }
+        item = item->nobj;
+    }
+
 #define burn_dmg(obj, descr) erode_obj(obj, descr, ERODE_BURN, EF_GREASE)
     while (1) {
         switch (rn2(5)) {
         case 0:
-            item =
-                (victim == &youmonst) ? uarmh : which_armor(victim, W_ARMH);
+            item = hitting_u ? uarmh : which_armor(victim, W_ARMH);
             if (item) {
                 mat_idx = objects[item->otyp].oc_material;
                 Sprintf(buf, "%s %s", materialnm[mat_idx],
@@ -73,45 +88,41 @@ struct monst *victim;
                 continue;
             break;
         case 1:
-            item =
-                (victim == &youmonst) ? uarmc : which_armor(victim, W_ARMC);
+            item = hitting_u ? uarmc : which_armor(victim, W_ARMC);
             if (item) {
                 (void) burn_dmg(item, cloak_simple_name(item));
                 return TRUE;
             }
-            item = (victim == &youmonst) ? uarm : which_armor(victim, W_ARM);
+            item = hitting_u ? uarm : which_armor(victim, W_ARM);
             if (item) {
                 (void) burn_dmg(item, xname(item));
                 return TRUE;
             }
-            item =
-                (victim == &youmonst) ? uarmu : which_armor(victim, W_ARMU);
+            item = hitting_u ? uarmu : which_armor(victim, W_ARMU);
             if (item)
                 (void) burn_dmg(item, "shirt");
             return TRUE;
         case 2:
-            item =
-                (victim == &youmonst) ? uarms : which_armor(victim, W_ARMS);
+            item = hitting_u ? uarms : which_armor(victim, W_ARMS);
             if (!burn_dmg(item, "wooden shield"))
                 continue;
             break;
         case 3:
-            item =
-                (victim == &youmonst) ? uarmg : which_armor(victim, W_ARMG);
+            item = hitting_u ? uarmg : which_armor(victim, W_ARMG);
             if (!burn_dmg(item, "gloves"))
                 continue;
             break;
         case 4:
-            item =
-                (victim == &youmonst) ? uarmf : which_armor(victim, W_ARMF);
+            item = hitting_u ? uarmf : which_armor(victim, W_ARMF);
             if (!burn_dmg(item, "boots"))
                 continue;
             break;
         }
         break; /* Out of while loop */
     }
-    return FALSE;
 #undef burn_dmg
+
+    return FALSE;
 }
 
 /* Generic erode-item function.
@@ -3308,7 +3319,7 @@ boolean force;
     if (obj->otyp == CAN_OF_GREASE && obj->spe > 0) {
         return ER_NOTHING;
     } else if (obj->otyp == TOWEL && obj->spe < 7) {
-        obj->spe = max(obj->spe, rn2(8));
+        wet_a_towel(obj, rnd(7), TRUE);
         return ER_NOTHING;
     } else if (obj->greased) {
         if (!rn2(2))

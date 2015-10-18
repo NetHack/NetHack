@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1440120640 2015/08/21 01:30:40 $  $NHDT-Branch: master $:$NHDT-Revision: 1.506 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1445126411 2015/10/18 00:00:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.508 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2574,6 +2574,8 @@ E void FDECL(mwepgone, (struct monst *));
 E int FDECL(mon_wield_item, (struct monst *));
 E int NDECL(abon);
 E int NDECL(dbon);
+E void FDECL(wet_a_towel, (struct obj *, int, BOOLEAN_P));
+E void FDECL(dry_a_towel, (struct obj *, int, BOOLEAN_P));
 E int NDECL(enhance_weapon_skill);
 E void FDECL(unrestrict_weapon_skill, (int));
 E void FDECL(use_skill, (int, int));

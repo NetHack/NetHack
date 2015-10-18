@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1444617222 2015/10/12 02:33:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.143 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1445126428 2015/10/18 00:00:28 $  $NHDT-Branch: master $:$NHDT-Revision: 1.148 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -308,7 +308,7 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
     case TOOL_CLASS:
         if (typ == LENSES)
             Strcpy(buf, "pair of ");
-        else if (typ == TOWEL && obj->spe > 0)
+        else if (is_wet_towel(obj))
             Strcpy(buf, (obj->spe < 3) ? "moist " : "wet ");
 
         if (!dknown)
@@ -323,10 +323,14 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
             Strcat(buf, dn ? dn : actualn);
         /* If we use an() here we'd have to remember never to use */
         /* it whenever calling doname() or xname(). */
-        if (typ == FIGURINE && omndx != NON_PM)
+        if (typ == FIGURINE && omndx != NON_PM) {
             Sprintf(eos(buf), " of a%s %s",
                     index(vowels, *mons[omndx].mname) ? "n" : "",
                     mons[omndx].mname);
+        } else if (is_wet_towel(obj)) {
+            if (wizard)
+                Sprintf(eos(buf), " (%d)", obj->spe);
+        }
         break;
     case ARMOR_CLASS:
         /* depends on order of the dragon scales objects */
@@ -3285,7 +3289,8 @@ typfnd:
         }
         break;
     case TOWEL:
-        if (wetness) otmp->spe = wetness;
+        if (wetness)
+            otmp->spe = wetness;
         break;
     case SLIME_MOLD:
         otmp->spe = ftype;

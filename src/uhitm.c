@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1432512769 2015/05/25 00:12:49 $  $NHDT-Branch: master $:$NHDT-Revision: 1.144 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1445126430 2015/10/18 00:00:30 $  $NHDT-Branch: master $:$NHDT-Revision: 1.148 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -785,7 +785,7 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
                     tmp = (obj->corpsenm >= LOW_PM ? mons[obj->corpsenm].msize
                                                    : 0) + 1;
                     break;
-                case EGG: {
+
 #define useup_eggs(o)                    \
     {                                    \
         if (thrown)                      \
@@ -794,6 +794,7 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
             useupall(o);                 \
         o = (struct obj *) 0;            \
     } /* now gone */
+                case EGG: {
                     long cnt = obj->quan;
 
                     tmp = 1; /* nominal physical damage */
@@ -925,9 +926,13 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
                     /* non-weapons can damage because of their weight */
                     /* (but not too much) */
                     tmp = obj->owt / 100;
-                    if (obj->otyp == TOWEL && obj->spe > 0) { /* wet towel */
+                    if (is_wet_towel(obj)) {
+                        /* wielded wet towel should probably use whip skill
+                           (but not by setting objects[TOWEL].oc_skill==P_WHIP
+                           because that would turn towel into a weptool) */
                         tmp += obj->spe;
-                        obj->spe--;
+                        if (rn2(obj->spe + 1)) /* usually lose some wetness */
+                            dry_a_towel(obj, -1, TRUE);
                     }
                     if (tmp < 1)
                         tmp = 1;
@@ -1075,11 +1080,10 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
             monflee(mon, 10 * rnd(tmp), FALSE, FALSE);
     }
     if ((mdat == &mons[PM_BLACK_PUDDING] || mdat == &mons[PM_BROWN_PUDDING])
-        &&
         /* pudding is alive and healthy enough to split */
-        mon->mhp > 1 && !mon->mcan &&
+        && mon->mhp > 1 && !mon->mcan
         /* iron weapon using melee or polearm hit */
-        obj && obj == uwep && objects[obj->otyp].oc_material == IRON
+        && obj && obj == uwep && objects[obj->otyp].oc_material == IRON
         && hand_to_hand) {
         if (clone_mon(mon, 0, 0)) {
             pline("%s divides as you hit it!", Monnam(mon));

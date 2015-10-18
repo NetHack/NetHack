@@ -1,4 +1,4 @@
-/* NetHack 3.6	obj.h	$NHDT-Date: 1432512782 2015/05/25 00:13:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.49 $ */
+/* NetHack 3.6	obj.h	$NHDT-Date: 1445126423 2015/10/18 00:00:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.50 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -187,6 +187,9 @@ struct obj {
      && objects[otmp->otyp].oc_skill <= -P_DART)
 #define is_weptool(o) \
     ((o)->oclass == TOOL_CLASS && objects[(o)->otyp].oc_skill != P_NONE)
+        /* towel is not a weptool:  spe isn't an enchantment, cursed towel
+           doesn't weld to hand, and twoweapon won't work with one */
+#define is_wet_towel(o) ((o)->otyp == TOWEL && (o)->spe > 0)
 #define bimanual(otmp)                                            \
     ((otmp->oclass == WEAPON_CLASS || otmp->oclass == TOOL_CLASS) \
      && objects[otmp->otyp].oc_bimanual)

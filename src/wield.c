@@ -1,4 +1,4 @@
-/* NetHack 3.6	wield.c	$NHDT-Date: 1437877186 2015/07/26 02:19:46 $  $NHDT-Branch: master $:$NHDT-Revision: 1.44 $ */
+/* NetHack 3.6	wield.c	$NHDT-Date: 1445126432 2015/10/18 00:00:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.45 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -23,7 +23,7 @@
  *     with the main weapon.  If the "pushweapon" option is set,
  *     the (w)ield command will also store the old weapon in the
  *     secondary slot.
- * 2.  Can be field with anything that will fit in the main weapon
+ * 2.  Can be filled with anything that will fit in the main weapon
  *     slot; that is, any type of item.
  * 3.  Is usually NOT considered to be carried in the hands.
  *     That would force too many checks among the main weapon,
@@ -45,6 +45,8 @@
  * 5.  Never conveys intrinsics.
  * 6.  Cursed items never weld; their effect is handled by the normal
  *     throwing code.
+ * 7.  The autoquiver option will fill it with something deemed
+ *     suitable if (f)ire is used when it's empty.
  *
  * No item may be in more than one of these slots.
  */
@@ -102,7 +104,7 @@ register struct obj *obj;
         unweapon = (obj->oclass == WEAPON_CLASS)
                        ? is_launcher(obj) || is_ammo(obj) || is_missile(obj)
                              || (is_pole(obj) && !u.usteed)
-                       : !is_weptool(obj);
+                       : !is_weptool(obj) && !is_wet_towel(obj);
     } else
         unweapon = TRUE; /* for "bare hands" message */
     update_inventory();
@@ -156,6 +158,7 @@ struct obj *wep;
         res++;
         if (will_weld(wep)) {
             const char *tmp = xname(wep), *thestr = "The ";
+
             if (strncmp(tmp, thestr, 4) && !strncmp(The(tmp), thestr, 4))
                 tmp = thestr;
             else
@@ -173,6 +176,7 @@ struct obj *wep;
              * say "weapon in hand", thus this kludge.
              */
             long dummy = wep->owornmask;
+
             wep->owornmask |= W_WEP;
             prinv((char *) 0, wep, 0L);
             wep->owornmask = dummy;
@@ -188,17 +192,15 @@ struct obj *wep;
                 pline("%s to shine %s!", Tobjnam(wep, "begin"),
                       arti_light_description(wep));
         }
-
 #if 0
-	    /* we'll get back to this someday, but it's not balanced yet */
-	    if (Race_if(PM_ELF) && !wep->oartifact &&
-			    objects[wep->otyp].oc_material == IRON) {
-		/* Elves are averse to wielding cold iron */
-		You("have an uneasy feeling about wielding cold iron.");
-		change_luck(-1);
-	    }
+        /* we'll get back to this someday, but it's not balanced yet */
+        if (Race_if(PM_ELF) && !wep->oartifact
+            && objects[wep->otyp].oc_material == IRON) {
+            /* Elves are averse to wielding cold iron */
+            You("have an uneasy feeling about wielding cold iron.");
+            change_luck(-1);
+        }
 #endif
-
         if (wep->unpaid) {
             struct monst *this_shkp;
 
@@ -256,7 +258,7 @@ dowield()
         return (0);
     else if (wep == uwep) {
         You("are already wielding that!");
-        if (is_weptool(wep))
+        if (is_weptool(wep) || is_wet_towel(wep))
             unweapon = FALSE; /* [see setuwep()] */
         return (0);
     } else if (welded(uwep)) {
@@ -394,9 +396,7 @@ dowieldquiver()
     return (0);
 }
 
-/* used for #rub and for applying pick-axe, whip, grappling hook, or polearm
- */
-/* (moved from apply.c) */
+/* used for #rub and for applying pick-axe, whip, grappling hook or polearm */
 boolean
 wield_tool(obj, verb)
 struct obj *obj;

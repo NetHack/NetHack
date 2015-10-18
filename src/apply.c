@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1440120650 2015/08/21 01:30:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.201 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1445126424 2015/10/18 00:00:24 $  $NHDT-Branch: master $:$NHDT-Revision: 1.206 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -88,6 +88,8 @@ STATIC_OVL int
 use_towel(obj)
 struct obj *obj;
 {
+    boolean drying_feedback = (obj == uwep);
+
     if (!freehand()) {
         You("have no free %s!", body_part(HAND));
         return 0;
@@ -102,7 +104,8 @@ struct obj *obj;
             incr_itimeout(&Glib, rn1(10, 3));
             Your("%s %s!", makeplural(body_part(HAND)),
                  (old ? "are filthier than ever" : "get slimy"));
-            if (obj->spe > 0) obj->spe--;
+            if (is_wet_towel(obj))
+                dry_a_towel(obj, -1, drying_feedback);
             return 1;
         case 1:
             if (!ublindf) {
@@ -128,7 +131,8 @@ struct obj *obj;
                     dropx(saved_ublindf);
                 }
             }
-            if (obj->spe > 0) obj->spe--;
+            if (is_wet_towel(obj))
+                dry_a_towel(obj, -1, drying_feedback);
             return 1;
         case 0:
             break;
@@ -138,13 +142,12 @@ struct obj *obj;
     if (Glib) {
         Glib = 0;
         You("wipe off your %s.", makeplural(body_part(HAND)));
-        if (obj->spe > 0) obj->spe--;
+        if (is_wet_towel(obj))
+            dry_a_towel(obj, -1, drying_feedback);
         return 1;
     } else if (u.ucreamed) {
         Blinded -= u.ucreamed;
         u.ucreamed = 0;
-        if (obj->spe > 0) obj->spe--;
-
         if (!Blinded) {
             pline("You've got the glop off.");
             if (!gulp_blnd_check()) {
@@ -154,6 +157,8 @@ struct obj *obj;
         } else {
             Your("%s feels clean now.", body_part(FACE));
         }
+        if (is_wet_towel(obj))
+            dry_a_towel(obj, -1, drying_feedback);
         return 1;
     }
 
