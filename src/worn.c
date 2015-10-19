@@ -1,4 +1,4 @@
-/* NetHack 3.6	worn.c	$NHDT-Date: 1432512772 2015/05/25 00:12:52 $  $NHDT-Branch: master $:$NHDT-Revision: 1.44 $ */
+/* NetHack 3.6	worn.c	$NHDT-Date: 1445214551 2015/10/19 00:29:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.45 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -691,17 +691,19 @@ clear_bypasses()
         if (otmp->bypass) {
             otmp->bypass = 0;
 /* bypass will have inhibited any stacking, but since it's
-   used for polymorph handling, the objects here probably
-   have been transformed and won't be stacked in the usual
-   manner afterwards; so don't bother with this */
+ * used for polymorph handling, the objects here probably
+ * have been transformed and won't be stacked in the usual
+ * manner afterwards; so don't bother with this.
+ * [Changing the fobj chain mid-traversal would also be risky.]
+ */
 #if 0
-		if (objects[otmp->otyp].oc_merge) {
-		    xchar ox, oy;
+            if (objects[otmp->otyp].oc_merge) {
+                xchar ox, oy;
 
-		    (void) get_obj_location(otmp, &ox, &oy, 0);
-		    stack_object(otmp);
-		    newsym(ox, oy);
-		}
+                (void) get_obj_location(otmp, &ox, &oy, 0);
+                stack_object(otmp);
+                newsym(ox, oy);
+            }
 #endif /*0*/
         }
     }
