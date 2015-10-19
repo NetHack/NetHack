@@ -1,4 +1,4 @@
-/* NetHack 3.6	allmain.c	$NHDT-Date: 1438505671 2015/08/02 08:54:31 $  $NHDT-Branch: master $:$NHDT-Revision: 1.62 $ */
+/* NetHack 3.6	allmain.c	$NHDT-Date: 1445215016 2015/10/19 00:36:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.65 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -376,6 +376,7 @@ boolean resuming;
         /* once-per-player-input things go here */
         /****************************************/
 
+        clear_splitobjs();
         find_ac();
         if (!context.mv || Blind) {
             /* redo monsters if hallu or wearing a helm of telepathy */

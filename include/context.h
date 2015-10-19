@@ -1,4 +1,4 @@
-/* NetHack 3.6	context.h	$NHDT-Date: 1434421363 2015/06/16 02:22:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.26 $ */
+/* NetHack 3.6	context.h	$NHDT-Date: 1445215010 2015/10/19 00:36:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.27 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -76,6 +76,11 @@ struct polearm_info {
     unsigned m_id;        /* monster id of hitmon, in save file */
 };
 
+struct obj_split {
+    unsigned parent_oid, /* set: splitobj(),         */
+             child_oid;  /* reset: clear_splitobjs() */
+};
+
 struct tribute_info {
     size_t tributesz;       /* make it possible to skip this in future */
     boolean enabled;        /* Do we have tributes turned on? */
@@ -117,6 +122,7 @@ struct context_info {
     struct takeoff_info takeoff;
     struct warntype_info warntype;
     struct polearm_info polearm;
+    struct obj_split objsplit; /* track most recently split object stack */
     struct tribute_info tribute;
 };
 

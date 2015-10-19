@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1444095155 2015/10/06 01:32:35 $  $NHDT-Branch: master $:$NHDT-Revision: 1.183 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1445215021 2015/10/19 00:37:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.190 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -659,6 +659,7 @@ movemon()
         /* reset obj bypasses before next monster moves */
         if (context.bypasses)
             clear_bypasses();
+        clear_splitobjs();
         if (minliquid(mtmp))
             continue;
 
@@ -705,7 +706,10 @@ movemon()
     /* reset obj bypasses after last monster has moved */
     if (context.bypasses)
         clear_bypasses();
-    dmonsfree();                /* remove all dead monsters */
+    clear_splitobjs();
+    /* remove dead monsters; dead vault guard will be left at <0,0>
+       if temporary corridor out of vault hasn't been removed yet */
+    dmonsfree();
 
     /* a monster may have levteleported player -dlc */
     if (u.utotype) {

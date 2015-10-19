@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1444617220 2015/10/12 02:33:40 $  $NHDT-Branch: master $:$NHDT-Revision: 1.110 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1445215021 2015/10/19 00:37:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.111 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -413,6 +413,9 @@ long num;
     obj->owt = weight(obj);
     otmp->quan = num;
     otmp->owt = weight(otmp); /* -= obj->owt ? */
+
+    context.objsplit.parent_oid = obj->o_id;
+    context.objsplit.child_oid = otmp->o_id;
     obj->nobj = otmp;
     /* Only set nexthere when on the floor, nexthere is also used */
     /* as a back pointer to the container object when contained. */
@@ -428,6 +431,85 @@ long num;
     if (obj_sheds_light(obj))
         obj_split_light_source(obj, otmp);
     return otmp;
+}
+
+/* try to find the stack obj was split from, then merge them back together;
+   returns the combined object if unsplit is successful, null otherwise */
+struct obj *
+unsplitobj(obj)
+struct obj *obj;
+{
+    unsigned target_oid = 0;
+    struct obj *oparent = 0, *ochild = 0, *list = 0;
+
+    /*
+     * We don't operate on floor objects (we're following o->nobj rather
+     * than o->nexthere), on free objects (don't know which list to use when
+     * looking for obj's parent or child), on bill objects (too complicated,
+     * not needed), or on buried or migrating objects (not needed).
+     * [This could be improved, but at present additional generality isn't
+     * necessary.]
+     */
+    switch (obj->where) {
+    case OBJ_FREE:
+    case OBJ_FLOOR:
+    case OBJ_ONBILL:
+    case OBJ_MIGRATING:
+    case OBJ_BURIED:
+    default:
+        return (struct obj *) 0;
+    case OBJ_INVENT:
+        list = invent;
+        break;
+    case OBJ_MINVENT:
+        list = obj->ocarry->minvent;
+        break;
+    case OBJ_CONTAINED:
+        list = obj->ocontainer->cobj;
+        break;
+    }
+
+    /* first try the expected case; obj is split from another stack */
+    if (obj->o_id == context.objsplit.child_oid) {
+        /* parent probably precedes child and will require list traversal */
+        ochild = obj;
+        target_oid = context.objsplit.parent_oid;
+        if (obj->nobj && obj->nobj->o_id == target_oid)
+            oparent = obj->nobj;
+    } else if (obj->o_id == context.objsplit.parent_oid) {
+        /* alternate scenario: another stack was split from obj;
+           child probably follows parent and will be found here */
+        oparent = obj;
+        target_oid = context.objsplit.child_oid;
+        if (obj->nobj && obj->nobj->o_id == target_oid)
+            ochild = obj->nobj;
+    }
+    /* if we have only half the split, scan obj's list to find other half */
+    if (ochild && !oparent) {
+        /* expected case */
+        for (obj = list; obj; obj = obj->nobj)
+            if (obj->o_id == target_oid) {
+                oparent = obj;
+                break;
+            }
+    } else if (oparent && !ochild) {
+        /* alternate scenario */
+        for (obj = list; obj; obj = obj->nobj)
+            if (obj->o_id == target_oid) {
+                ochild = obj;
+                break;
+            }
+    }
+    /* if we have both parent and child, try to merge them;
+       if successful, return the combined stack, otherwise return null */
+    return (oparent && ochild && merged(&oparent, &ochild)) ? oparent : 0;
+}
+
+/* reset splitobj()/unsplitobj() context */
+void
+clear_splitobjs()
+{
+    context.objsplit.parent_oid = context.objsplit.child_oid = 0;
 }
 
 /*

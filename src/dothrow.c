@@ -1,4 +1,4 @@
-/* NetHack 3.6	dothrow.c	$NHDT-Date: 1444772016 2015/10/13 21:33:36 $  $NHDT-Branch: master $:$NHDT-Revision: 1.106 $ */
+/* NetHack 3.6	dothrow.c	$NHDT-Date: 1445215018 2015/10/19 00:36:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.110 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -50,24 +50,10 @@ int shotlimit;
          * merge obj into another stack--usually quiver--even if it hadn't
          * been split from there (possibly triggering a panic in addinv),
          * and freeinv+addinv potentially has other side-effects.
-         *
-         * If obj came from splitobj(), it has been split from the item
-         * which precedes it in inventory and shares same inv letter.
-         * (This could get a false match if obj wasn't split from the
-         * preceding item and they're both using the overflow letter '#',
-         * but merging to have fewer '#' items should be a good thing,
-         * and we're not using addinv() so can't trigger its panic.)
          */
-        for (otmp = invent; otmp; otmp = otmp->nobj)
-            if (otmp == obj) {
-                /* obj wasn't the result of splitobj, so we're done */
-                break;
-            } else if (otmp->nobj == obj) {
-                if (otmp->invlet == obj->invlet)
-                    (void) merged(&otmp, &obj);
-                /* found obj's preceding item, so no need to look further */
-                break;
-            }
+        if (obj->o_id == context.objsplit.parent_oid
+            || obj->o_id == context.objsplit.child_oid)
+            (void) unsplitobj(obj);
         return 0; /* no time passes */
     }
 
@@ -108,11 +94,12 @@ int shotlimit;
         Sprintf(killer.name, "throwing %s bare-handed", killer_xname(obj));
         instapetrify(killer.name);
     }
-    if (obj->otyp == TOWEL && obj->spe > 0) obj->spe--;
     if (welded(obj)) {
         weldmsg(obj);
         return 1;
     }
+    if (is_wet_towel(obj))
+        dry_a_towel(obj, -1, FALSE);
 
     /* Multishot calculations
      * (potential volley of up to N missiles; default for N is 1)
@@ -310,12 +297,13 @@ autoquiver()
     for (otmp = invent; otmp; otmp = otmp->nobj) {
         if (otmp->owornmask || otmp->oartifact || !otmp->dknown) {
             ; /* Skip it */
-        } else if (otmp->otyp == ROCK ||
+        } else if (otmp->otyp == ROCK
                    /* seen rocks or known flint or known glass */
-                   (objects[otmp->otyp].oc_name_known && otmp->otyp == FLINT)
-                   || (objects[otmp->otyp].oc_name_known
-                       && otmp->oclass == GEM_CLASS
-                       && objects[otmp->otyp].oc_material == GLASS)) {
+                   || (otmp->otyp == FLINT
+                       && objects[otmp->otyp].oc_name_known)
+                   || (otmp->oclass == GEM_CLASS
+                       && objects[otmp->otyp].oc_material == GLASS
+                       && objects[otmp->otyp].oc_name_known)) {
             if (uslinging())
                 oammo = otmp;
             else if (ammo_and_launcher(otmp, uswapwep))
@@ -327,8 +315,7 @@ autoquiver()
                  player has to select them explicitly */
         } else if (is_ammo(otmp)) {
             if (ammo_and_launcher(otmp, uwep))
-                /* Ammo matched with launcher (bow and arrow, crossbow and
-                 * bolt) */
+                /* Ammo matched with launcher (bow+arrow, crossbow+bolt) */
                 oammo = otmp;
             else if (ammo_and_launcher(otmp, uswapwep))
                 altammo = otmp;

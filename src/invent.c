@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1438652306 2015/08/04 01:38:26 $  $NHDT-Branch: master $:$NHDT-Revision: 1.170 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1445215019 2015/10/19 00:36:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.174 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -345,16 +345,16 @@ struct obj **potmp, **pobj;
 }
 
 /*
-Adjust hero intrinsics as if this object was being added to the hero's
-inventory.  Called _before_ the object has been added to the hero's
-inventory.
-
-This is called when adding objects to the hero's inventory normally (via
-addinv) or when an object in the hero's inventory has been polymorphed
-in-place.
-
-It may be valid to merge this code with with addinv_core2().
-*/
+ * Adjust hero intrinsics as if this object was being added to the hero's
+ * inventory.  Called _before_ the object has been added to the hero's
+ * inventory.
+ *
+ * This is called when adding objects to the hero's inventory normally (via
+ * addinv) or when an object in the hero's inventory has been polymorphed
+ * in-place.
+ *
+ * It may be valid to merge this code with with addinv_core2().
+ */
 void
 addinv_core1(obj)
 struct obj *obj;
@@ -402,14 +402,14 @@ struct obj *obj;
 }
 
 /*
-Adjust hero intrinsics as if this object was being added to the hero's
-inventory.  Called _after_ the object has been added to the hero's
-inventory.
-
-This is called when adding objects to the hero's inventory normally (via
-addinv) or when an object in the hero's inventory has been polymorphed
-in-place.
-*/
+ * Adjust hero intrinsics as if this object was being added to the hero's
+ * inventory.  Called _after_ the object has been added to the hero's
+ * inventory.
+ *
+ * This is called when adding objects to the hero's inventory normally (via
+ * addinv) or when an object in the hero's inventory has been polymorphed
+ * in-place.
+ */
 void
 addinv_core2(obj)
 struct obj *obj;
@@ -422,9 +422,9 @@ struct obj *obj;
 }
 
 /*
-Add obj to the hero's inventory.  Make sure the object is "free".
-Adjust hero attributes as necessary.
-*/
+ * Add obj to the hero's inventory.  Make sure the object is "free".
+ * Adjust hero attributes as necessary.
+ */
 struct obj *
 addinv(obj)
 struct obj *obj;
@@ -621,12 +621,12 @@ boolean maybe_unpaid; /* false if caller handles shop billing */
 }
 
 /*
-Adjust hero's attributes as if this object was being removed from the
-hero's inventory.  This should only be called from freeinv() and
-where we are polymorphing an object already in the hero's inventory.
-
-Should think of a better name...
-*/
+ * Adjust hero's attributes as if this object was being removed from the
+ * hero's inventory.  This should only be called from freeinv() and
+ * where we are polymorphing an object already in the hero's inventory.
+ *
+ * Should think of a better name...
+ */
 void
 freeinv_core(obj)
 struct obj *obj;
@@ -783,25 +783,26 @@ static const char *const currencies[] = {
     "Hong Kong Luna Dollar", /* The Moon is a Harsh Mistress */
     "kongbuck",              /* Snow Crash */
     "nanite",                /* System Shock 2 */
-    "quatloo",               /* Sim City */
+    "quatloo",               /* Star Trek, Sim City */
     "simoleon",              /* Sim City */
     "solari",                /* Spaceballs */
     "spacebuck",             /* Spaceballs */
     "sporebuck",             /* Spore */
     "Triganic Pu",           /* The Hitchhiker's Guide to the Galaxy */
     "woolong",               /* Cowboy Bebop */
+    "zorkmid",               /* Zork, NetHack */
 };
 
 const char *
 currency(amount)
 long amount;
 {
-    if (amount == 1L)
-        return (Hallucination ? currencies[rn2(SIZE(currencies))]
-                              : "zorkmid");
-    else
-        return (Hallucination ? makeplural(currencies[rn2(SIZE(currencies))])
-                              : "zorkmids");
+    const char *res;
+
+    res = Hallucination ? currencies[rn2(SIZE(currencies))] : "zorkmid";
+    if (amount != 1L)
+        res = makeplural(res);
+    return res;
 }
 
 boolean
@@ -870,10 +871,10 @@ register int x, y;
     return ((struct obj *) 0);
 }
 
+/* compact a string of inventory letters by dashing runs of letters */
 STATIC_OVL void
 compactify(buf)
 register char *buf;
-/* compact a string of inventory letters by dashing runs of letters */
 {
     register int i1 = 1, i2 = 1;
     register char ilet, ilet1, ilet2;
@@ -1619,18 +1620,18 @@ nextclass:
     ilet = 'a' - 1;
     if (*objchn && (*objchn)->oclass == COIN_CLASS)
         ilet--;                     /* extra iteration */
-                                    /*
-                                     * Multiple Drop can change the invent chain while it operates
-                                     * (dropping a burning potion of oil while levitating creates
-                                     * an explosion which can destroy inventory items), so simple
-                                     * list traversal
-                                     *	for (otmp = *objchn; otmp; otmp = otmp2) {
-                                     *	    otmp2 = otmp->nobj;
-                                     *	    ...
-                                     *	}
-                                     * is inadequate here.  Use each object's bypass bit to keep
-                                     * track of which list elements have already been processed.
-                                     */
+    /*
+     * Multiple Drop can change the invent chain while it operates
+     * (dropping a burning potion of oil while levitating creates
+     * an explosion which can destroy inventory items), so simple
+     * list traversal
+     *	for (otmp = *objchn; otmp; otmp = otmp2) {
+     *	    otmp2 = otmp->nobj;
+     *	    ...
+     *	}
+     * is inadequate here.  Use each object's bypass bit to keep
+     * track of which list elements have already been processed.
+     */
     bypass_objlist(*objchn, FALSE); /* clear chain's bypass bits */
     while ((otmp = nxt_unbypassed_obj(*objchn)) != 0) {
         if (ilet == 'z')
@@ -3257,7 +3258,8 @@ reassign()
  *	user-assigned names, the 'count' portion being moved is
  *	effectively renamed so that it will merge with 'to' stack.
  */
-int doorganize() /* inventory organizer by Del Lamb */
+int
+doorganize() /* inventory organizer by Del Lamb */
 {
     struct obj *obj, *otmp, *splitting, *bumped;
     int ix, cur, trycnt;
@@ -3435,6 +3437,8 @@ int doorganize() /* inventory organizer by Del Lamb */
     prinv(adj_type, obj, 0L);
     if (bumped)
         prinv("Moving:", bumped, 0L);
+    if (splitting)
+        clear_splitobjs(); /* reset splitobj context */
     update_inventory();
     return (0);
 }

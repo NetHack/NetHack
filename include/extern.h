@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1445126411 2015/10/18 00:00:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.508 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1445215014 2015/10/19 00:36:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.509 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1214,6 +1214,8 @@ E struct obj *FDECL(mkobj, (CHAR_P, BOOLEAN_P));
 E int NDECL(rndmonnum);
 E boolean FDECL(bogon_is_pname, (CHAR_P));
 E struct obj *FDECL(splitobj, (struct obj *, long));
+E struct obj *FDECL(unsplitobj, (struct obj *));
+E void NDECL(clear_splitobjs);
 E void FDECL(replace_object, (struct obj *, struct obj *));
 E void FDECL(bill_dummy_object, (struct obj *));
 E void FDECL(costly_alteration, (struct obj *, int));
