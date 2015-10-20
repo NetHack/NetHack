@@ -3084,7 +3084,7 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
             /* for the first several tries we require upper-case on
                the rogue level (after that, we take whatever we get) */
             if (tryct > 15 && Is_rogue_level(&u.uz)
-                && !isupper((uchar) mdat->mlet))
+                && mdat && !isupper((uchar) mdat->mlet))
                 mdat = 0;
             if (mdat)
                 break;
