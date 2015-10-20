@@ -1,4 +1,4 @@
-/* NetHack 3.6	ball.c	$NHDT-Date: 1432512770 2015/05/25 00:12:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.26 $ */
+/* NetHack 3.6	ball.c	$NHDT-Date: 1445301116 2015/10/20 00:31:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.27 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -592,11 +592,11 @@ drag:
         return FALSE;
     }
 
-    if ((is_pool(uchain->ox, uchain->oy) &&
+    if ((is_pool(uchain->ox, uchain->oy)
          /* water not mere continuation of previous water */
-         (levl[uchain->ox][uchain->oy].typ == POOL
-          || !is_pool(uball->ox, uball->oy)
-          || levl[uball->ox][uball->oy].typ == POOL))
+         && (levl[uchain->ox][uchain->oy].typ == POOL
+             || !is_pool(uball->ox, uball->oy)
+             || levl[uball->ox][uball->oy].typ == POOL))
         || ((t = t_at(uchain->ox, uchain->oy))
             && (t->ttyp == PIT || t->ttyp == SPIKED_PIT || t->ttyp == HOLE
                 || t->ttyp == TRAPDOOR))) {

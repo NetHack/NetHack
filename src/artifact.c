@@ -1,4 +1,4 @@
-/* NetHack 3.6	artifact.c	$NHDT-Date: 1439605077 2015/08/15 02:17:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.92 $ */
+/* NetHack 3.6	artifact.c	$NHDT-Date: 1445301116 2015/10/20 00:31:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.95 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -151,9 +151,9 @@ aligntyp alignment; /* target alignment, or A_NONE */
 
         /* we're looking for an alignment-specific item
            suitable for hero's role+race */
-        if ((a->alignment == alignment || a->alignment == A_NONE) &&
+        if ((a->alignment == alignment || a->alignment == A_NONE)
             /* avoid enemies' equipment */
-            (a->race == NON_PM || !race_hostile(&mons[a->race]))) {
+            && (a->race == NON_PM || !race_hostile(&mons[a->race]))) {
             /* when a role-specific first choice is available, use it */
             if (Role_if(a->role)) {
                 /* make this be the only possibility in the list */
@@ -1165,9 +1165,9 @@ int dieroll; /* needed for Magicbane and vorpal blades */
         return FALSE;
     }
 
-    realizes_damage = (youdefend || vis ||
+    realizes_damage = (youdefend || vis
                        /* feel the effect even if not seen */
-                       (youattack && mdef == u.ustuck));
+                       || (youattack && mdef == u.ustuck));
 
     /* the four basic attacks: fire, cold, shock and missiles */
     if (attacks(AD_FIRE, otmp)) {
@@ -1944,11 +1944,11 @@ boolean drop_untouchable;
     boolean beingworn, carryeffect, invoked;
     long wearmask = ~(W_QUIVER | (u.twoweap ? 0L : W_SWAPWEP) | W_BALL);
 
-    beingworn = (obj->owornmask & wearmask) != 0L ||
-                /* some items in use don't have any wornmask setting */
-                (obj->oclass == TOOL_CLASS
-                 && (obj->lamplit || (obj->otyp == LEASH && obj->leashmon)
-                     || (Is_container(obj) && Has_contents(obj))));
+    beingworn = ((obj->owornmask & wearmask) != 0L
+                 /* some items in use don't have any wornmask setting */
+                 || (obj->oclass == TOOL_CLASS
+                     && (obj->lamplit || (obj->otyp == LEASH && obj->leashmon)
+                         || (Is_container(obj) && Has_contents(obj)))));
 
     if ((art = get_artifact(obj)) != 0) {
         carryeffect = (art->cary.adtyp || art->cspfx);

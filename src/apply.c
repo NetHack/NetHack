@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1445126424 2015/10/18 00:00:24 $  $NHDT-Branch: master $:$NHDT-Revision: 1.206 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1445301113 2015/10/20 00:31:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.207 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -916,9 +916,9 @@ struct obj *obj;
     } else if (!Blind) {
         if (mtmp->minvis && !See_invisible)
             ;
-        else if ((mtmp->minvis && !perceives(mtmp->data)) ||
+        else if ((mtmp->minvis && !perceives(mtmp->data))
                  /* redundant: can't get here if these are true */
-                 !haseyes(mtmp->data) || notonhead || !mtmp->mcansee)
+                 || !haseyes(mtmp->data) || notonhead || !mtmp->mcansee)
             pline("%s doesn't seem to notice %s reflection.", Monnam(mtmp),
                   mhis(mtmp));
         else
@@ -956,9 +956,9 @@ struct obj **optr;
 #ifdef AMIGA
         amii_speaker(obj, "ahdhgqeqdhehaqdqfhgw", AMII_MUFFLED_VOLUME);
 #endif
-        if (obj->cursed && !rn2(4) &&
+        if (obj->cursed && !rn2(4)
             /* note: once any of them are gone, we stop all of them */
-            !(mvitals[PM_WOOD_NYMPH].mvflags & G_GONE)
+            && !(mvitals[PM_WOOD_NYMPH].mvflags & G_GONE)
             && !(mvitals[PM_WATER_NYMPH].mvflags & G_GONE)
             && !(mvitals[PM_MOUNTAIN_NYMPH].mvflags & G_GONE)
             && (mtmp = makemon(mkclass(S_NYMPH, 0), u.ux, u.uy, NO_MINVENT))

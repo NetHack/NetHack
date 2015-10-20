@@ -1,4 +1,4 @@
-/* NetHack 3.6	dothrow.c	$NHDT-Date: 1445215018 2015/10/19 00:36:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.110 $ */
+/* NetHack 3.6	dothrow.c	$NHDT-Date: 1445301122 2015/10/20 00:32:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.111 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -850,13 +850,11 @@ boolean hitsroof;
         int blindinc;
 
         /* need to check for blindness result prior to destroying obj */
-        blindinc =
-            (otyp == CREAM_PIE || otyp == BLINDING_VENOM) &&
+        blindinc = ((otyp == CREAM_PIE || otyp == BLINDING_VENOM)
                     /* AT_WEAP is ok here even if attack type was AT_SPIT */
-                    can_blnd(&youmonst, &youmonst, AT_WEAP, obj)
-                ? rnd(25)
-                : 0;
-
+                    && can_blnd(&youmonst, &youmonst, AT_WEAP, obj))
+                       ? rnd(25)
+                       : 0;
         breakmsg(obj, !Blind);
         breakobj(obj, u.ux, u.uy, TRUE, TRUE);
         obj = 0; /* it's now gone */
@@ -949,12 +947,12 @@ STATIC_OVL boolean
 throwing_weapon(obj)
 struct obj *obj;
 {
-    return (is_missile(obj) || is_spear(obj) ||
-            /* daggers and knife (excludes scalpel) */
-            (is_blade(obj) && !is_sword(obj)
-             && (objects[obj->otyp].oc_dir & PIERCE)) ||
-            /* special cases [might want to add AXE] */
-            obj->otyp == WAR_HAMMER || obj->otyp == AKLYS);
+    return (boolean) (is_missile(obj) || is_spear(obj)
+                      /* daggers and knife (excludes scalpel) */
+                      || (is_blade(obj) && !is_sword(obj)
+                          && (objects[obj->otyp].oc_dir & PIERCE))
+                      /* special cases [might want to add AXE] */
+                      || obj->otyp == WAR_HAMMER || obj->otyp == AKLYS);
 }
 
 /* the currently thrown object is returning to you (not for boomerangs) */

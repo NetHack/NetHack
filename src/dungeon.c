@@ -1,4 +1,4 @@
-/* NetHack 3.6	dungeon.c	$NHDT-Date: 1436753511 2015/07/13 02:11:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.61 $ */
+/* NetHack 3.6	dungeon.c	$NHDT-Date: 1445301123 2015/10/20 00:32:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.65 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1607,10 +1607,10 @@ const char *nam;
     if ((slev = find_level(nam)) != 0) {
         dlev = slev->dlevel;
         idx = ledger_no(&dlev);
-        if ((dlev.dnum == u.uz.dnum ||
+        if ((dlev.dnum == u.uz.dnum
              /* within same branch, or else main dungeon <-> gehennom */
-             (u.uz.dnum == valley_level.dnum
-              && dlev.dnum == medusa_level.dnum)
+             || (u.uz.dnum == valley_level.dnum
+                 && dlev.dnum == medusa_level.dnum)
              || (u.uz.dnum == medusa_level.dnum
                  && dlev.dnum == valley_level.dnum))
             && (/* either wizard mode or else seen and not forgotten */

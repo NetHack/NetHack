@@ -1,4 +1,4 @@
-/* NetHack 3.6	dokick.c	$NHDT-Date: 1432512765 2015/05/25 00:12:45 $  $NHDT-Branch: master $:$NHDT-Revision: 1.99 $ */
+/* NetHack 3.6	dokick.c	$NHDT-Date: 1445301122 2015/10/20 00:32:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.101 $ */
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -912,10 +912,10 @@ dokick()
                was there before the kick */
             if (glyph != oldglyph && glyph_is_invisible(glyph))
                 show_glyph(x, y, oldglyph);
-        } else if (!canspotmon(mtmp) &&
+        } else if (!canspotmon(mtmp)
                    /* check <x,y>; monster that evades kick by jumping
                       to an unseen square doesn't leave an I behind */
-                   mtmp->mx == x && mtmp->my == y
+                   && mtmp->mx == x && mtmp->my == y
                    && !glyph_is_invisible(glyph)
                    && !(u.uswallow && mtmp == u.ustuck)) {
             map_invisible(x, y);

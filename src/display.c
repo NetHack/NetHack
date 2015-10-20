@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1434450195 2015/06/16 10:23:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.64 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1445301119 2015/10/20 00:31:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.76 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.					  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1741,8 +1741,8 @@ xchar x, y;
             if (lev->typ == CORR && idx == S_litcorr)
                 idx = S_corr;
             else if (idx == S_room)
-                idx = (flags.dark_room && iflags.use_color) ?
-                       (DARKROOMSYM) :  S_stone;
+                idx = (flags.dark_room && iflags.use_color)
+                         ? DARKROOMSYM : S_stone;
         }
 
         if (idx != S_room)
@@ -2195,19 +2195,19 @@ struct rm *lev;
             break;
         case WM_T_BL:
 #if 0  /* older method, fixed */
-			if (only(seenv, SV4|SV5)) {
-			    col = T_tlcorn;
-			} else if ((seenv & (SV0|SV1|SV2)) &&
-					only(seenv, SV0|SV1|SV2|SV6|SV7)) {
-			    col = T_hwall;
-			} else if (seenv & SV3 ||
-			    ((seenv & (SV0|SV1|SV2)) && (seenv & (SV4|SV5)))) {
-			    col = T_tdwall;
-			} else {
-			    if (seenv != SV6)
-				t_warn(lev);
-			    col = T_stone;
-			}
+            if (only(seenv, SV4|SV5)) {
+                col = T_tlcorn;
+            } else if ((seenv & (SV0|SV1|SV2))
+                       && only(seenv, SV0|SV1|SV2|SV6|SV7)) {
+                col = T_hwall;
+            } else if ((seenv & SV3)
+                       || ((seenv & (SV0|SV1|SV2)) && (seenv & (SV4|SV5)))) {
+                col = T_tdwall;
+            } else {
+                if (seenv != SV6)
+                    t_warn(lev);
+                col = T_stone;
+            }
 #endif /* 0 */
             if (only(seenv, SV4 | SV5))
                 col = T_tlcorn;
@@ -2221,19 +2221,19 @@ struct rm *lev;
             break;
         case WM_T_BR:
 #if 0  /* older method, fixed */
-			if (only(seenv, SV5|SV6)) {
-			    col = T_trcorn;
-			} else if ((seenv & (SV0|SV1|SV2)) &&
-					    only(seenv, SV0|SV1|SV2|SV3|SV4)) {
-			    col = T_hwall;
-			} else if (seenv & SV7 ||
-			    ((seenv & (SV0|SV1|SV2)) && (seenv & (SV5|SV6)))) {
-			    col = T_tdwall;
-			} else {
-			    if (seenv != SV4)
-				t_warn(lev);
-			    col = T_stone;
-			}
+            if (only(seenv, SV5|SV6)) {
+                col = T_trcorn;
+            } else if ((seenv & (SV0|SV1|SV2))
+                       && only(seenv, SV0|SV1|SV2|SV3|SV4)) {
+                col = T_hwall;
+            } else if ((seenv & SV7)
+                       || ((seenv & (SV0|SV1|SV2)) && (seenv & (SV5|SV6)))) {
+                col = T_tdwall;
+            } else {
+                if (seenv != SV4)
+                    t_warn(lev);
+                col = T_stone;
+            }
 #endif /* 0 */
             if (only(seenv, SV5 | SV6))
                 col = T_trcorn;

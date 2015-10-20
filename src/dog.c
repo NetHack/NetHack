@@ -1,4 +1,4 @@
-/* NetHack 3.6	dog.c	$NHDT-Date: 1432512767 2015/05/25 00:12:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.49 $ */
+/* NetHack 3.6	dog.c	$NHDT-Date: 1445301120 2015/10/20 00:32:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.51 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -592,11 +592,11 @@ boolean pets_only; /* true for ascension or final escape */
             mtmp->mfrozen = 0;
             mtmp->mcanmove = 1;
         }
-        if (((monnear(mtmp, u.ux, u.uy) && levl_follower(mtmp)) ||
+        if (((monnear(mtmp, u.ux, u.uy) && levl_follower(mtmp))
              /* the wiz will level t-port from anywhere to chase
                 the amulet; if you don't have it, will chase you
                 only if in range. -3. */
-             (u.uhave.amulet && mtmp->iswiz))
+             || (u.uhave.amulet && mtmp->iswiz))
             && ((!mtmp->msleeping && mtmp->mcanmove)
                 /* eg if level teleport or new trap, steed has no control
                    to avoid following */
@@ -911,9 +911,9 @@ register struct obj *obj;
             return FALSE;
     }
 
-    if (mtmp->mtame || !mtmp->mcanmove ||
+    if (mtmp->mtame || !mtmp->mcanmove
         /* monsters with conflicting structures cannot be tamed */
-        mtmp->isshk || mtmp->isgd || mtmp->ispriest || mtmp->isminion
+        || mtmp->isshk || mtmp->isgd || mtmp->ispriest || mtmp->isminion
         || is_covetous(mtmp->data) || is_human(mtmp->data)
         || (is_demon(mtmp->data) && !is_demon(youmonst.data))
         || (obj && dogfood(mtmp, obj) >= MANFOOD))

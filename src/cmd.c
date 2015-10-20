@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1436753509 2015/07/13 02:11:49 $  $NHDT-Branch: master $:$NHDT-Revision: 1.197 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1445301117 2015/10/20 00:31:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.202 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1041,14 +1041,12 @@ wiz_levltyp_legend(VOID_ARGS)
     for (i = 0; i < last / 2; ++i)
         for (j = i; j < last; j += last / 2) {
             dsc = levltyp[j];
-            c = !*dsc ? ' ' : !strncmp(dsc, "unreachable", 11)
-                                  ? '*'
-                                  :
-                                  /* same int-to-char conversion as
-                                     wiz_map_levltyp() */
-                                  (j < 10) ? '0' + j : (j < 36)
-                                                           ? 'a' + j - 10
-                                                           : 'A' + j - 36;
+            c = !*dsc ? ' '
+                   : !strncmp(dsc, "unreachable", 11) ? '*'
+                      /* same int-to-char conversion as wiz_map_levltyp() */
+                      : (j < 10) ? '0' + j
+                         : (j < 36) ? 'a' + j - 10
+                            : 'A' + j - 36;
             Sprintf(eos(buf), fmt, c, dsc);
             if (j > i) {
                 putstr(win, 0, buf);
@@ -1426,19 +1424,18 @@ int final;
     you_are(buf, "");
 
     /* report alignment (bypass you_are() in order to omit ending period) */
-    Sprintf(
-        buf, " %s%s%s, %son a mission for %s", You_, !final ? are : were,
-        align_str(u.ualign.type),
-        /* helm of opposite alignment (might hide conversion) */
-        (u.ualign.type != u.ualignbase[A_CURRENT]) ? "temporarily " :
-                                                   /* permanent conversion */
-            (u.ualign.type != u.ualignbase[A_ORIGINAL])
-                ? "now "
-                :
-                /* atheist (ignored in very early game); lastly, normal case
-                   */
-                (!u.uconduct.gnostic && moves > 1000L) ? "nominally " : "",
-        u_gname());
+    Sprintf(buf, " %s%s%s, %son a mission for %s",
+            You_, !final ? are : were,
+            align_str(u.ualign.type),
+            /* helm of opposite alignment (might hide conversion) */
+            (u.ualign.type != u.ualignbase[A_CURRENT]) ? "temporarily "
+               /* permanent conversion */
+               : (u.ualign.type != u.ualignbase[A_ORIGINAL]) ? "now "
+                  /* atheist (ignored in very early game) */
+                  : (!u.uconduct.gnostic && moves > 1000L) ? "nominally "
+                     /* lastly, normal case */
+                     : "",
+            u_gname());
     putstr(en_win, 0, buf);
     /* show the rest of this game's pantheon (finishes previous sentence)
        [appending "also Moloch" at the end would allow for straightforward
@@ -2075,12 +2072,11 @@ int final;
         if (Flying)
             enl_msg(You_, "would fly", "would have flown",
                     Levitation
-                        ? "if you weren't levitating"
-                        : (save_BFly == FROMOUTSIDE)
-                              ? if_surroundings_permitted
-                              :
-                              /* both surroundings and [latent] levitation */
-                              " if circumstances permitted",
+                       ? "if you weren't levitating"
+                       : (save_BFly == FROMOUTSIDE)
+                          ? if_surroundings_permitted
+                          /* both surroundings and [latent] levitation */
+                          : " if circumstances permitted",
                     "");
         BFlying = save_BFly;
     }
@@ -2307,100 +2303,105 @@ STATIC_DCL boolean NDECL(minimal_enlightenment);
 STATIC_OVL boolean
 minimal_enlightenment()
 {
-	winid tmpwin;
-	menu_item *selected;
-	anything any;
-	int genidx, n;
-	char buf[BUFSZ], buf2[BUFSZ];
-	static const char untabbed_fmtstr[] = "%-15s: %-12s";
-	static const char untabbed_deity_fmtstr[] = "%-17s%s";
-	static const char tabbed_fmtstr[] = "%s:\t%-12s";
-	static const char tabbed_deity_fmtstr[] = "%s\t%s";
-	static const char *fmtstr;
-	static const char *deity_fmtstr;
+    winid tmpwin;
+    menu_item *selected;
+    anything any;
+    int genidx, n;
+    char buf[BUFSZ], buf2[BUFSZ];
+    static const char untabbed_fmtstr[] = "%-15s: %-12s";
+    static const char untabbed_deity_fmtstr[] = "%-17s%s";
+    static const char tabbed_fmtstr[] = "%s:\t%-12s";
+    static const char tabbed_deity_fmtstr[] = "%s\t%s";
+    static const char *fmtstr;
+    static const char *deity_fmtstr;
 
-	fmtstr = iflags.menu_tab_sep ? tabbed_fmtstr : untabbed_fmtstr;
-	deity_fmtstr = iflags.menu_tab_sep ?
-			tabbed_deity_fmtstr : untabbed_deity_fmtstr; 
-	any = zeroany;
-	buf[0] = buf2[0] = '\0';
-	tmpwin = create_nhwindow(NHW_MENU);
-	start_menu(tmpwin);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings, "Starting", FALSE);
+    fmtstr = iflags.menu_tab_sep ? tabbed_fmtstr : untabbed_fmtstr;
+    deity_fmtstr = iflags.menu_tab_sep ? tabbed_deity_fmtstr
+                                       : untabbed_deity_fmtstr;
+    any = zeroany;
+    buf[0] = buf2[0] = '\0';
+    tmpwin = create_nhwindow(NHW_MENU);
+    start_menu(tmpwin);
+    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+             "Starting", FALSE);
 
-	/* Starting name, race, role, gender */
-	Sprintf(buf, fmtstr, "name", plname);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
-	Sprintf(buf, fmtstr, "race", urace.noun);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
-	Sprintf(buf, fmtstr, "role",
-		(flags.initgend && urole.name.f) ? urole.name.f : urole.name.m);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
-	Sprintf(buf, fmtstr, "gender", genders[flags.initgend].adj);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+    /* Starting name, race, role, gender */
+    Sprintf(buf, fmtstr, "name", plname);
+    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+    Sprintf(buf, fmtstr, "race", urace.noun);
+    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+    Sprintf(buf, fmtstr, "role",
+            (flags.initgend && urole.name.f) ? urole.name.f : urole.name.m);
+    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+    Sprintf(buf, fmtstr, "gender", genders[flags.initgend].adj);
+    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
 
-	/* Starting alignment */
-	Sprintf(buf, fmtstr, "alignment", align_str(u.ualignbase[A_ORIGINAL]));
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+    /* Starting alignment */
+    Sprintf(buf, fmtstr, "alignment", align_str(u.ualignbase[A_ORIGINAL]));
+    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
 
-	/* Current name, race, role, gender */
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", FALSE);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings, "Current", FALSE);
-	Sprintf(buf, fmtstr, "race", Upolyd ? youmonst.data->mname : urace.noun);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
-	if (Upolyd) {
-	    Sprintf(buf, fmtstr, "role (base)",
-		(u.mfemale && urole.name.f) ? urole.name.f : urole.name.m);
-	    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
-	} else {
-	    Sprintf(buf, fmtstr, "role",
-		(flags.female && urole.name.f) ? urole.name.f : urole.name.m);
-	    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
-	}
-	/* don't want poly_gender() here; it forces `2' for non-humanoids */
-	genidx = is_neuter(youmonst.data) ? 2 : flags.female;
-	Sprintf(buf, fmtstr, "gender", genders[genidx].adj);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
-	if (Upolyd && (int)u.mfemale != genidx) {
-	    Sprintf(buf, fmtstr, "gender (base)", genders[u.mfemale].adj);
-	    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
-	}
+    /* Current name, race, role, gender */
+    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", FALSE);
+    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+             "Current", FALSE);
+    Sprintf(buf, fmtstr, "race", Upolyd ? youmonst.data->mname : urace.noun);
+    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+    if (Upolyd) {
+        Sprintf(buf, fmtstr, "role (base)",
+                (u.mfemale && urole.name.f) ? urole.name.f
+                                            : urole.name.m);
+        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+    } else {
+        Sprintf(buf, fmtstr, "role",
+                (flags.female && urole.name.f) ? urole.name.f
+                                               : urole.name.m);
+        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+    }
+    /* don't want poly_gender() here; it forces `2' for non-humanoids */
+    genidx = is_neuter(youmonst.data) ? 2 : flags.female;
+    Sprintf(buf, fmtstr, "gender", genders[genidx].adj);
+    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+    if (Upolyd && (int)u.mfemale != genidx) {
+        Sprintf(buf, fmtstr, "gender (base)", genders[u.mfemale].adj);
+        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+    }
 
-	/* Current alignment */
-	Sprintf(buf, fmtstr, "alignment", align_str(u.ualign.type));
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+    /* Current alignment */
+    Sprintf(buf, fmtstr, "alignment", align_str(u.ualign.type));
+    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
 
-	/* Deity list */
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", FALSE);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings, "Deities", FALSE);
-	Sprintf(buf2, deity_fmtstr, align_gname(A_CHAOTIC),
-	    (u.ualignbase[A_ORIGINAL] == u.ualign.type
-		&& u.ualign.type == A_CHAOTIC) ? " (s,c)" :
-	    (u.ualignbase[A_ORIGINAL] == A_CHAOTIC)       ? " (s)" :
-	    (u.ualign.type   == A_CHAOTIC)       ? " (c)" : "");
-	Sprintf(buf, fmtstr, "Chaotic", buf2);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+    /* Deity list */
+    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", FALSE);
+    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+             "Deities", FALSE);
+    Sprintf(buf2, deity_fmtstr, align_gname(A_CHAOTIC),
+            (u.ualignbase[A_ORIGINAL] == u.ualign.type
+             && u.ualign.type == A_CHAOTIC)               ? " (s,c)"
+                : (u.ualignbase[A_ORIGINAL] == A_CHAOTIC) ? " (s)"
+                : (u.ualign.type   == A_CHAOTIC)          ? " (c)" : "");
+    Sprintf(buf, fmtstr, "Chaotic", buf2);
+    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
 
-	Sprintf(buf2, deity_fmtstr, align_gname(A_NEUTRAL),
-	    (u.ualignbase[A_ORIGINAL] == u.ualign.type
-		&& u.ualign.type == A_NEUTRAL) ? " (s,c)" :
-	    (u.ualignbase[A_ORIGINAL] == A_NEUTRAL)       ? " (s)" :
-	    (u.ualign.type   == A_NEUTRAL)       ? " (c)" : "");
-	Sprintf(buf, fmtstr, "Neutral", buf2);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+    Sprintf(buf2, deity_fmtstr, align_gname(A_NEUTRAL),
+            (u.ualignbase[A_ORIGINAL] == u.ualign.type
+             && u.ualign.type == A_NEUTRAL)               ? " (s,c)"
+                : (u.ualignbase[A_ORIGINAL] == A_NEUTRAL) ? " (s)"
+                : (u.ualign.type   == A_NEUTRAL)          ? " (c)" : "");
+    Sprintf(buf, fmtstr, "Neutral", buf2);
+    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
 
-	Sprintf(buf2, deity_fmtstr, align_gname(A_LAWFUL),
-	    (u.ualignbase[A_ORIGINAL] == u.ualign.type &&
-		u.ualign.type == A_LAWFUL)  ? " (s,c)" :
-	    (u.ualignbase[A_ORIGINAL] == A_LAWFUL)        ? " (s)" :
-	    (u.ualign.type   == A_LAWFUL)        ? " (c)" : "");
-	Sprintf(buf, fmtstr, "Lawful", buf2);
-	add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
+    Sprintf(buf2, deity_fmtstr, align_gname(A_LAWFUL),
+            (u.ualignbase[A_ORIGINAL] == u.ualign.type
+             && u.ualign.type == A_LAWFUL)                ? " (s,c)"
+                : (u.ualignbase[A_ORIGINAL] == A_LAWFUL)  ? " (s)"
+                : (u.ualign.type   == A_LAWFUL)           ? " (c)" : "");
+    Sprintf(buf, fmtstr, "Lawful", buf2);
+    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
 
-	end_menu(tmpwin, "Base Attributes");
-	n = select_menu(tmpwin, PICK_NONE, &selected);
-	destroy_nhwindow(tmpwin);
-	return (n != -1);
+    end_menu(tmpwin, "Base Attributes");
+    n = select_menu(tmpwin, PICK_NONE, &selected);
+    destroy_nhwindow(tmpwin);
+    return (boolean) (n != -1);
 }
 #endif /*0*/
 
@@ -3266,11 +3267,11 @@ register char *cmd;
     case '-':
         if (!Cmd.num_pad)
             break; /* else FALLTHRU */
-                   /* Effects of movement commands and invisible monsters:
-                    * m: always move onto space (even if 'I' remembered)
-                    * F: always attack space (even if 'I' not remembered)
-                    * normal movement: attack if 'I', move otherwise
-                    */
+    /* Effects of movement commands and invisible monsters:
+     * m: always move onto space (even if 'I' remembered)
+     * F: always attack space (even if 'I' not remembered)
+     * normal movement: attack if 'I', move otherwise.
+     */
     case 'F':
         if (movecmd(cmd[1])) {
             context.forcefight = 1;
@@ -3319,7 +3320,7 @@ register char *cmd;
             do_rush = TRUE;
             break;
         }
-    /*FALLTHRU*/
+        /*FALLTHRU*/
     default:
         if (movecmd(*cmd)) { /* ordinary movement */
             context.run = 0; /* only matters here if it was 8 */

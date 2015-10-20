@@ -1,4 +1,4 @@
-/* NetHack 3.6	dogmove.c	$NHDT-Date: 1432512765 2015/05/25 00:12:45 $  $NHDT-Branch: master $:$NHDT-Revision: 1.52 $ */
+/* NetHack 3.6	dogmove.c	$NHDT-Date: 1445301121 2015/10/20 00:32:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.55 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -427,9 +427,9 @@ int udist;
             ) {
             int edible = dogfood(mtmp, obj);
 
-            if ((edible <= CADAVER ||
+            if ((edible <= CADAVER
                  /* starving pet is more aggressive about eating */
-                 (edog->mhpmax_penalty && edible == ACCFOOD))
+                 || (edog->mhpmax_penalty && edible == ACCFOOD))
                 && could_reach_item(mtmp, obj->ox, obj->oy))
                 return dog_eat(mtmp, obj, omx, omy, FALSE);
 
@@ -700,11 +700,11 @@ register int after; /* this is extra fast monster movement */
         }
     }
 #if 0 /* [this is now handled in dochug()] */
-	if (!Conflict && !mtmp->mconf &&
-	    mtmp == u.ustuck && !sticks(youmonst.data)) {
-	    unstuck(mtmp);	/* swallowed case handled above */
-	    You("get released!");
-	}
+    if (!Conflict && !mtmp->mconf
+        && mtmp == u.ustuck && !sticks(youmonst.data)) {
+        unstuck(mtmp); /* swallowed case handled above */
+        You("get released!");
+    }
 #endif
     if (!nohands(mtmp->data) && !verysmall(mtmp->data)) {
         allowflags |= OPENDOOR;
@@ -784,9 +784,9 @@ register int after; /* this is extra fast monster movement */
 
             if ((mstatus & MM_HIT) && !(mstatus & MM_DEF_DIED) && rn2(4)
                 && mtmp2->mlstmv != monstermoves
-                && !onscary(mtmp->mx, mtmp->my, mtmp2) &&
+                && !onscary(mtmp->mx, mtmp->my, mtmp2)
                 /* monnear check needed: long worms hit on tail */
-                monnear(mtmp2, mtmp->mx, mtmp->my)) {
+                && monnear(mtmp2, mtmp->mx, mtmp->my)) {
                 mstatus = mattackm(mtmp2, mtmp); /* return attack */
                 if (mstatus & MM_DEF_DIED)
                     return 2;

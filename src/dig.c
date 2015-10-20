@@ -1,4 +1,4 @@
-/* NetHack 3.6	dig.c	$NHDT-Date: 1432512771 2015/05/25 00:12:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.95 $ */
+/* NetHack 3.6	dig.c	$NHDT-Date: 1445301118 2015/10/20 00:31:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.97 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -228,10 +228,10 @@ int x, y;
         if (verbose)
             There("isn't enough room to %s here.", verb);
         return (FALSE);
-    } else if (madeby == BY_OBJECT &&
+    } else if (madeby == BY_OBJECT
                /* the block against existing traps is mainly to
                   prevent broken wands from turning holes into pits */
-               (ttmp || is_pool_or_lava(x, y))) {
+               && (ttmp || is_pool_or_lava(x, y))) {
         /* digging by player handles pools separately */
         return FALSE;
     }
@@ -452,8 +452,8 @@ dig(VOID_ARGS)
 
             switch (rn2(2)) {
             case 0:
-                mtmp =
-                    makemon(&mons[PM_EARTH_ELEMENTAL], dpx, dpy, NO_MM_FLAGS);
+                mtmp = makemon(&mons[PM_EARTH_ELEMENTAL], dpx, dpy,
+                               NO_MM_FLAGS);
                 break;
             default:
                 mtmp = makemon(&mons[PM_XORN], dpx, dpy, NO_MM_FLAGS);
@@ -1162,11 +1162,11 @@ struct obj *obj;
         /* might escape trap and still be teetering at brink */
         if (!u.utrap)
             cant_reach_floor(u.ux, u.uy, FALSE, TRUE);
-    } else if (!ispick &&
+    } else if (!ispick
                /* can only dig down with an axe when doing so will
                   trigger or disarm a trap here */
-               (!trap
-                || (trap->ttyp != LANDMINE && trap->ttyp != BEAR_TRAP))) {
+               && (!trap || (trap->ttyp != LANDMINE
+                             && trap->ttyp != BEAR_TRAP))) {
         pline("%s merely scratches the %s.", Yobjnam2(obj, (char *) 0),
               surface(u.ux, u.uy));
         u_wipe_engr(3);
@@ -1999,20 +1999,20 @@ void
 bury_monst(mtmp)
 struct monst *mtmp;
 {
-	debugpline1("bury_monst: %s", mon_nam(mtmp));
-	if(canseemon(mtmp)) {
-	    if(is_flyer(mtmp->data) || is_floater(mtmp->data)) {
-		pline_The("%s opens up, but %s is not swallowed!",
-			surface(mtmp->mx, mtmp->my), mon_nam(mtmp));
-		return;
-	    } else
-	        pline_The("%s opens up and swallows %s!",
-			surface(mtmp->mx, mtmp->my), mon_nam(mtmp));
-	}
+    debugpline1("bury_monst: %s", mon_nam(mtmp));
+    if (canseemon(mtmp)) {
+        if (is_flyer(mtmp->data) || is_floater(mtmp->data)) {
+            pline_The("%s opens up, but %s is not swallowed!",
+                      surface(mtmp->mx, mtmp->my), mon_nam(mtmp));
+            return;
+        } else
+            pline_The("%s opens up and swallows %s!",
+                      surface(mtmp->mx, mtmp->my), mon_nam(mtmp));
+    }
 
-	mtmp->mburied = TRUE;
-	wakeup(mtmp);			/* at least give it a chance :-) */
-	newsym(mtmp->mx, mtmp->my);
+    mtmp->mburied = TRUE;
+    wakeup(mtmp);       /* at least give it a chance :-) */
+    newsym(mtmp->mx, mtmp->my);
 }
 
 void
@@ -2020,14 +2020,15 @@ bury_you()
 {
     debugpline0("bury_you");
     if (!Levitation && !Flying) {
-	if(u.uswallow)
+	if (u.uswallow)
 	    You_feel("a sensation like falling into a trap!");
 	else
 	    pline_The("%s opens beneath you and you fall in!",
-		  surface(u.ux, u.uy));
+                      surface(u.ux, u.uy));
 
 	u.uburied = TRUE;
-	if(!Strangled && !Breathless) Strangled = 6;
+	if (!Strangled && !Breathless)
+            Strangled = 6;
 	under_ground(1);
     }
 }
@@ -2035,61 +2036,63 @@ bury_you()
 void
 unearth_you()
 {
-	debugpline0("unearth_you");
-	u.uburied = FALSE;
-	under_ground(0);
-	if(!uamul || uamul->otyp != AMULET_OF_STRANGULATION)
-		Strangled = 0;
-	vision_recalc(0);
+    debugpline0("unearth_you");
+    u.uburied = FALSE;
+    under_ground(0);
+    if (!uamul || uamul->otyp != AMULET_OF_STRANGULATION)
+        Strangled = 0;
+    vision_recalc(0);
 }
 
 void
 escape_tomb()
 {
-	debugpline0("escape_tomb");
-	if ((Teleportation || can_teleport(youmonst.data)) &&
-	    (Teleport_control || rn2(3) < Luck+2)) {
-		You("attempt a teleport spell.");
-		(void) dotele();	/* calls unearth_you() */
-	} else if(u.uburied) { /* still buried after 'port attempt */
-		boolean good;
+    debugpline0("escape_tomb");
+    if ((Teleportation || can_teleport(youmonst.data))
+        && (Teleport_control || rn2(3) < Luck+2)) {
+        You("attempt a teleport spell.");
+        (void) dotele();        /* calls unearth_you() */
+    } else if (u.uburied) { /* still buried after 'port attempt */
+        boolean good;
 
-		if(amorphous(youmonst.data) || Passes_walls ||
-		   noncorporeal(youmonst.data) ||
-		   (unsolid(youmonst.data) &&
-			youmonst.data != &mons[PM_WATER_ELEMENTAL]) ||
-		   (tunnels(youmonst.data) && !needspick(youmonst.data))) {
+        if (amorphous(youmonst.data) || Passes_walls
+            || noncorporeal(youmonst.data)
+            || (unsolid(youmonst.data)
+                && youmonst.data != &mons[PM_WATER_ELEMENTAL])
+            || (tunnels(youmonst.data) && !needspick(youmonst.data))) {
+            You("%s up through the %s.",
+                (tunnels(youmonst.data) && !needspick(youmonst.data))
+                   ? "try to tunnel"
+                   : (amorphous(youmonst.data))
+                      ? "ooze"
+                      : "phase",
+                surface(u.ux, u.uy));
 
-		    You("%s up through the %s.",
-			(tunnels(youmonst.data) && !needspick(youmonst.data)) ?
-			 "try to tunnel" : (amorphous(youmonst.data)) ?
-			 "ooze" : "phase", surface(u.ux, u.uy));
-
-		    if(tunnels(youmonst.data) && !needspick(youmonst.data))
-			good = dighole(TRUE, FALSE, (coord *)0);
-		    else good = TRUE;
-		    if(good) unearth_you();
-		}
-	}
+            good = (tunnels(youmonst.data) && !needspick(youmonst.data))
+                      ? dighole(TRUE, FALSE, (coord *)0) : TRUE;
+            if (good)
+                unearth_you();
+        }
+    }
 }
 
 void
 bury_obj(otmp)
 struct obj *otmp;
 {
+    debugpline0("bury_obj");
+    if (cansee(otmp->ox, otmp->oy))
+        pline_The("objects on the %s tumble into a hole!",
+                  surface(otmp->ox, otmp->oy));
 
-	debugpline0("bury_obj");
-	if(cansee(otmp->ox, otmp->oy))
-	   pline_The("objects on the %s tumble into a hole!",
-		surface(otmp->ox, otmp->oy));
-
-	bury_objs(otmp->ox, otmp->oy);
+    bury_objs(otmp->ox, otmp->oy);
 }
-#endif
+#endif /*0*/
 
 #ifdef DEBUG
-int wiz_debug_cmd_bury() /* in this case, bury everything at your loc and
-                            around */
+/* bury everything at your loc and around */
+int
+wiz_debug_cmd_bury()
 {
     int x, y;
 

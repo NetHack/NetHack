@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1438652304 2015/08/04 01:38:24 $  $NHDT-Branch: master $:$NHDT-Revision: 1.84 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1445301119 2015/10/20 00:31:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.86 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -220,11 +220,11 @@ Boots_off(VOID_ARGS)
         break;
     case WATER_WALKING_BOOTS:
         /* check for lava since fireproofed boots make it viable */
-        if ((is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy)) && !Levitation
-            && !Flying && !is_clinger(youmonst.data)
-            && !context.takeoff.cancelled_don &&
+        if ((is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy))
+            && !Levitation && !Flying && !is_clinger(youmonst.data)
+            && !context.takeoff.cancelled_don
             /* avoid recursive call to lava_effects() */
-            !iflags.in_lava_effects) {
+            && !iflags.in_lava_effects) {
             /* make boots known in case you survive the drowning */
             makeknown(otyp);
             spoteffects(TRUE);
