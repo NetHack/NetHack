@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1445215019 2015/10/19 00:36:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.174 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1445388918 2015/10/21 00:55:18 $  $NHDT-Branch: master $:$NHDT-Revision: 1.175 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1114,9 +1114,9 @@ register const char *let, *word;
                  && *let == GEM_CLASS && otmp->dknown
                  && objects[otyp].oc_name_known)
              /* suppress corpses on astral, amulets elsewhere */
-             || (!strcmp(word, "sacrifice") &&
+             || (!strcmp(word, "sacrifice")
                  /* (!astral && amulet) || (astral && !amulet) */
-                 (!Is_astralevel(&u.uz) ^ (otmp->oclass != AMULET_CLASS)))
+                 && (!Is_astralevel(&u.uz) ^ (otmp->oclass != AMULET_CLASS)))
              /* suppress container being stashed into */
              || (!strcmp(word, "stash") && !ck_bag(otmp))
              /* worn armor or accessory covered by cursed worn armor */
@@ -3327,7 +3327,7 @@ doorganize() /* inventory organizer by Del Lamb */
     /* get 'to' slot to use as destination */
     Sprintf(qbuf, "Adjust letter to what [%s]%s?", buf,
             invent ? " (? see used letters)" : "");
-    for (trycnt = 1;; ++trycnt) {
+    for (trycnt = 1; ; ++trycnt) {
         let = yn_function(qbuf, (char *) 0, '\0');
         if (let == '?' || let == '*') {
             let = display_used_invlets(splitting ? obj->invlet : 0);
@@ -3336,11 +3336,11 @@ doorganize() /* inventory organizer by Del Lamb */
             if (let == '\033')
                 goto noadjust;
         }
-        if (index(quitchars, let) ||
+        if (index(quitchars, let)
             /* adjusting to same slot is meaningful since all
                compatible stacks get collected along the way,
                but splitting to same slot is not */
-            (splitting && let == obj->invlet)) {
+            || (splitting && let == obj->invlet)) {
         noadjust:
             if (splitting)
                 (void) merged(&splitting, &obj);

@@ -1,4 +1,4 @@
-/* NetHack 3.6	explode.c	$NHDT-Date: 1432512769 2015/05/25 00:12:49 $  $NHDT-Branch: master $:$NHDT-Revision: 1.42 $ */
+/* NetHack 3.6	explode.c	$NHDT-Date: 1445388916 2015/10/21 00:55:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.43 $ */
 /*	Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -55,8 +55,8 @@ int expltype;
             exploding_wand_typ = (short) type;
             /* most attack wands produce specific explosions;
                other types produce a generic magical explosion */
-            if (objects[type].oc_dir == RAY && type != WAN_DIGGING &&
-                type != WAN_SLEEP) {
+            if (objects[type].oc_dir == RAY
+                && type != WAN_DIGGING && type != WAN_SLEEP) {
                 type -= WAN_MAGIC_MISSILE;
                 if (type < 0 || type > 9) {
                     impossible("explode: wand has bad zap type (%d).", type);

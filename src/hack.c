@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1436753514 2015/07/13 02:11:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.151 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1445388917 2015/10/21 00:55:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.154 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1421,9 +1421,9 @@ domove()
     }
 
     /* specifying 'F' with no monster wastes a turn */
-    if (context.forcefight ||
+    if (context.forcefight
         /* remembered an 'I' && didn't use a move command */
-        (glyph_is_invisible(levl[x][y].glyph) && !context.nopick)) {
+        || (glyph_is_invisible(levl[x][y].glyph) && !context.nopick)) {
         struct obj *boulder = 0;
         boolean explo = (Upolyd && attacktype(youmonst.data, AT_EXPL)),
                 solid = !accessible(x, y);
@@ -1441,11 +1441,11 @@ domove()
 
             /* force fight at boulder/statue or wall/door while wielding
                pick:  start digging to break the boulder or wall */
-            if (context.forcefight &&
+            if (context.forcefight
                 /* can we dig? */
-                uwep && dig_typ(uwep, x, y) &&
+                && uwep && dig_typ(uwep, x, y)
                 /* should we dig? */
-                !glyph_is_invisible(glyph) && !glyph_is_monster(glyph)) {
+                && !glyph_is_invisible(glyph) && !glyph_is_monster(glyph)) {
                 (void) use_pick_axe2(uwep);
                 return;
             }
@@ -1884,11 +1884,11 @@ boolean pick;
     /* prevent recursion from affecting the hero all over again
        [hero poly'd to iron golem enters water here, drown() inflicts
        damage that triggers rehumanize() which calls spoteffects()...] */
-    if (inspoteffects && u.ux == spotloc.x && u.uy == spotloc.y &&
+    if (inspoteffects && u.ux == spotloc.x && u.uy == spotloc.y
         /* except when reason is transformed terrain (ice -> water) */
-        spotterrain == levl[u.ux][u.uy].typ &&
+        && spotterrain == levl[u.ux][u.uy].typ
         /* or transformed trap (land mine -> pit) */
-        (!spottrap || !trap || trap->ttyp == spottraptyp))
+        && (!spottrap || !trap || trap->ttyp == spottraptyp))
         return;
 
     ++inspoteffects;

@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1440120655 2015/08/21 01:30:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.144 $ */
+/* NetHack 3.6	eat.c	$NHDT-Date: 1445388914 2015/10/21 00:55:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.149 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -91,10 +91,10 @@ register struct obj *obj;
     if (metallivorous(youmonst.data) && is_metallic(obj)
         && (youmonst.data != &mons[PM_RUST_MONSTER] || is_rustprone(obj)))
         return TRUE;
-    if (u.umonnum == PM_GELATINOUS_CUBE && is_organic(obj) &&
+    if (u.umonnum == PM_GELATINOUS_CUBE && is_organic(obj)
         /* [g.cubes can eat containers and retain all contents
             as engulfed items, but poly'd player can't do that] */
-        !Has_contents(obj))
+        && !Has_contents(obj))
         return TRUE;
 
     /* return((boolean)(!!index(comestibles, obj->oclass))); */
@@ -601,12 +601,12 @@ boolean allowmsg;
         return FALSE;
     ate_brains = moves; /* ate_anything, not just brains... */
 
-    if (!CANNIBAL_ALLOWED() &&
+    if (!CANNIBAL_ALLOWED()
         /* non-cannibalistic heroes shouldn't eat own species ever
            and also shouldn't eat current species when polymorphed
            (even if having the form of something which doesn't care
            about cannibalism--hero's innate traits aren't altered) */
-        (your_race(fptr) || (Upolyd && same_race(youmonst.data, fptr)))) {
+        && (your_race(fptr) || (Upolyd && same_race(youmonst.data, fptr)))) {
         if (allowmsg) {
             if (Upolyd && your_race(fptr))
                 You("have a bad feeling deep inside.");
