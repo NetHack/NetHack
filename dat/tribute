@@ -3326,7 +3326,7 @@ betray 'em, quick as a wink.  'Cos that's villaining.'
 %title The Amazing Maurice and his Educated Rodents (1)
 %passage 1
 The important thing about adventures, thought Mr Bunnsy, was that they
-shouldn't be so long as to make you miss mealtimes. 
+shouldn't be so long as to make you miss mealtimes.
 
   [The Amazing Maurice and his Educated Rodents, by Terry Pratchett]
 %e passage
@@ -3334,9 +3334,129 @@ shouldn't be so long as to make you miss mealtimes.
 #
 #
 #
-%title Night Watch (1)
+%title Night Watch (7)
 %passage 1
 When Mister Safety Catch Is Not On, Mister Crossbow Is Not Your Friend.
+
+  [Night Watch, by Terry Pratchett]
+%e passage
+# pp. 2-4 (Harper Torch edition; omitted section describes how the student
+#          assassin, who has fallen off a booby-trapped shed roof into a
+#          cesspit, is on an assignment to try to get into position to
+#          target Vimes but not actually attack or try to kill him)
+%passage 2
+"You're a bit young to be sent on this contract, aren't you?" said Vimes.
+
+"Not a contract, sir," said Jocasta, still paddling.
+
+"Come now, Miss Wiggs.  The price on my head is at least--"
+
+"The Guild council put it in abeyance, sir," said the patient swimmer.
+"You're off the register.  They're not accepting contracts on you at
+present."
+
+[...]
+
+"And quite a few of the traps drop you into something deadly," said Vimes.
+
+"Lucky for me that I fell into this one, eh, sir?"
+
+"Oh, that one's deadly too," said Vimes.  "/Eventually/ deadly."  He
+sighed.  He really wanted to discourage this sort of thing but... they'd
+put him off the register?  It wasn't that he'd /liked/ being shot at by
+hooded figures in the temporary employ of his many and varied enemies,
+but he'd always looked at it as some kind of vote of confidence.  It
+showed that he was annoying the rich and arrogant people who ought to be
+annoyed.
+
+Besides, the Assassin's Guild was easy to outwit.  They had strict rules,
+which they followed quite honorably, and this was fine by Vimes, who, in
+certain practical matters, had no rules whatever.
+
+Off the register, eh?  The only other person not on it anymore, it was
+rumored, was Lord Vetinari, the Patrician.  The Assassins understood the
+political game in the city better than anyone, and if they took you off
+the register it was because they felt that your departure would not only
+spoil the game but also smash the board.
+
+  [Night Watch, by Terry Pratchett]
+%e passage
+# p. 12 (some trainee Watchmen have been taught a marching/running song by
+#        Sergeant Detritus, a troll; trolls count "one, two, many, lots"
+#        and evidently can't go any higher)
+%passage 3
+    "/Now we sing dis stupid song!/
+    /Sing it as we run along!/
+    /Why we sing dis we don't know!/
+    /We can't make der words rhyme prop'ly!/"
+    "Sound off!"
+        "/One!  Two!/"
+    "Sound off!"
+        "/Many!  Lots!/"
+    "Sound off!"
+        "/Er... what?/"
+
+  [Night Watch, by Terry Pratchett]
+%e passage
+# p. 137
+%passage 4
+Everyone was guilty of something.  Vimes knew that.  Every copper knew it.
+That was how you maintained your authority--everyone, talking to a copper,
+was secretly afraid you could see their guilty secret written on their
+forehead.  You couldn't, of course.  But neither were you supposed to drag
+someone off the street and smash their fingers with a hammer until they
+told you what it was.
+
+  [Night Watch, by Terry Pratchett]
+%e passage
+# p. 138 (passage starts mid-paragraph)
+%passage 5
+[...]  Doctor Lawn was wearing a face mask and holding a pair of very long
+tweezers in his hand.
+
+"Yes?"
+
+"I'm going out," said Vimes.  "Trouble?"
+
+"Not too bad.  Slidey Harris was unlucky at cards last night, that's all.
+Played the ace of hearts."
+
+"That's an unlucky card?"
+
+"It is if Big Tony knows he didn't deal it to you.  But I'll soon have it
+removed.  [...]"
+
+  [Night Watch, by Terry Pratchett]
+%e passage
+# p. 141 ('it' is a piece of paper concealed inside one of CMOT Dibbler's
+#         "meat" pies, partly eaten by Vimes but intended for someone else)
+%passage 6
+He unfolded it.  In smudged pencil, but still readable, it read:
+/Morphic Street, 9 o'clock tonight.  Password: Swordfish/.
+
+Swordfish?  Every password was "swordfish"!  Whenever anyone tried to
+think of a word that no one would ever guess, they /always/ chose
+"swordfish."  It was just one of those strange quirks of the human mind.
+
+  [Night Watch, by Terry Pratchett]
+%e passage
+# p. 345 (text actually has "worth more *that* AM$10,000"--obviously a typo)
+%passage 7
+There were rules.  When you had a Guild of Assassins, there had to be rules
+that everyone knew and that were never, ever broken.(1)
+
+An Assassin, a real Assassin, had to look like one--black clothes, hood,
+boots, and all.  If they could wear any clothes, any disguise, then what
+could anyone do but spend all day sitting in a small room with a loaded
+crossbow pointed at the door?
+
+And they couldn't kill a man incapable of defending himself (although a
+man worth more than AM$10,000 a year was considered automatically capable
+of defending himself or at least of employing people who were).
+
+And they had to give the target a chance.
+
+(1) Sometimes, admittedly, for a given value of "never."
 
   [Night Watch, by Terry Pratchett]
 %e passage
