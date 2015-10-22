@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1445215021 2015/10/19 00:37:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.190 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1445556873 2015/10/22 23:34:33 $  $NHDT-Branch: master $:$NHDT-Revision: 1.192 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -443,7 +443,7 @@ register struct monst *mtmp;
             dryup(mtmp->mx, mtmp->my, FALSE);
         if (inpool)
             water_damage_chain(mtmp->minvent, FALSE);
-        return (0);
+        return 0;
     } else if (mtmp->data == &mons[PM_IRON_GOLEM] && inpool && !rn2(5)) {
         int dam = d(2, 6);
 
@@ -982,9 +982,9 @@ register const char *str;
         /* Nymphs take everything.  Most monsters don't pick up corpses. */
         if (!str ? searches_for_item(mtmp, otmp)
                  : !!(index(str, otmp->oclass))) {
-            if (otmp->otyp == CORPSE && mtmp->data->mlet != S_NYMPH &&
+            if (otmp->otyp == CORPSE && mtmp->data->mlet != S_NYMPH
                 /* let a handful of corpse types thru to can_carry() */
-                !touch_petrifies(&mons[otmp->corpsenm])
+                && !touch_petrifies(&mons[otmp->corpsenm])
                 && otmp->corpsenm != PM_LIZARD
                 && !acidic(&mons[otmp->corpsenm]))
                 continue;
@@ -1062,7 +1062,7 @@ struct monst *mtmp;
 }
 
 /* for restricting monsters' object-pickup.
- * 
+ *
  * to support the new pet behavior, this now returns the max # of objects
  * that a given monster could pick up from a pile. frequently this will be
  * otmp->quan, but special cases for 'only one' now exist so.
@@ -1220,11 +1220,11 @@ nexttry: /* eels prefer the water, but if there is no water nearby,
                     || (IS_DOOR(nowtyp) && (levl[x][y].doormask & ~D_BROKEN))
                     || (IS_DOOR(ntyp) && (levl[nx][ny].doormask & ~D_BROKEN))
                     || ((IS_DOOR(nowtyp) || IS_DOOR(ntyp))
-                        && Is_rogue_level(&u.uz)) ||
+                        && Is_rogue_level(&u.uz))
                     /* mustn't pass between adjacent long worm segments,
                        but can attack that way */
-                    (m_at(x, ny) && m_at(nx, y) && worm_cross(x, y, nx, ny)
-                     && !m_at(nx, ny) && (nx != u.ux || ny != u.uy))))
+                    || (m_at(x, ny) && m_at(nx, y) && worm_cross(x, y, nx, ny)
+                        && !m_at(nx, ny) && (nx != u.ux || ny != u.uy))))
                 continue;
             if ((is_pool(nx, ny) == wantpool || poolok)
                 && (lavaok || !is_lava(nx, ny))) {
@@ -1886,7 +1886,7 @@ boolean was_swallowed; /* digestion */
             Sprintf(killer.name, "%s explosion", s_suffix(mdat->mname));
             killer.format = KILLED_BY_AN;
             explode(mon->mx, mon->my, -1, tmp, MON_EXPLODE, EXPL_NOXIOUS);
-            return (FALSE);
+            return FALSE;
         }
     }
 
@@ -2187,9 +2187,9 @@ int dest; /* dest==1, normal; dest==0, don't print message; dest==2, don't
             otmp = mkobj(RANDOM_CLASS, TRUE);
             /* don't create large objects from small monsters */
             otyp = otmp->otyp;
-            if (mdat->msize < MZ_HUMAN && otyp != FIGURINE &&
+            if (mdat->msize < MZ_HUMAN && otyp != FIGURINE
                 /* oc_big is also oc_bimanual and oc_bulky */
-                (otmp->owt > 30 || objects[otyp].oc_big)) {
+                && (otmp->owt > 30 || objects[otyp].oc_big)) {
                 delobj(otmp);
             } else if (!flooreffects(otmp, x, y, (dest & 1) ? "fall" : "")) {
                 place_object(otmp, x, y);
@@ -2330,9 +2330,9 @@ struct monst *mtmp;
     do {
         if (!enexto(&mm, u.ux, u.uy, ptr))
             return;
-        if (couldsee(mm.x, mm.y) &&
+        if (couldsee(mm.x, mm.y)
             /* don't move grid bugs diagonally */
-            (diagok || mm.x == mtmp->mx || mm.y == mtmp->my)) {
+            && (diagok || mm.x == mtmp->mx || mm.y == mtmp->my)) {
             rloc_to(mtmp, mm.x, mm.y);
             return;
         }
@@ -2535,8 +2535,8 @@ void
 seemimic(mtmp)
 register struct monst *mtmp;
 {
-    boolean is_blocker_appear = is_door_mappear(mtmp) ||
-        is_obj_mappear(mtmp, BOULDER);
+    boolean is_blocker_appear = (is_door_mappear(mtmp)
+                                 || is_obj_mappear(mtmp, BOULDER));
 
     if (has_mcorpsenm(mtmp))
         freemcorpsenm(mtmp);
@@ -2870,7 +2870,7 @@ int *mndx_p, monclass;
     /* basic vampires can't become wolves; any can become fog or bat
        (we don't enforce upper-case only for rogue level here) */
     if (*mndx_p == PM_WOLF)
-        return (mon->cham != PM_VAMPIRE);
+        return (boolean) (mon->cham != PM_VAMPIRE);
     if (*mndx_p == PM_FOG_CLOUD || *mndx_p == PM_VAMPIRE_BAT)
         return TRUE;
 
@@ -2895,7 +2895,7 @@ int *mndx_p, monclass;
         *mndx_p = NON_PM;
         break;
     }
-    return (*mndx_p != NON_PM);
+    return (boolean) (*mndx_p != NON_PM);
 }
 
 int

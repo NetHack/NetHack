@@ -1,4 +1,4 @@
-/* NetHack 3.6	mthrowu.c	$NHDT-Date: 1444258159 2015/10/07 22:49:19 $  $NHDT-Branch: master $:$NHDT-Revision: 1.58 $ */
+/* NetHack 3.6	mthrowu.c	$NHDT-Date: 1445556876 2015/10/22 23:34:36 $  $NHDT-Branch: master $:$NHDT-Revision: 1.59 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -579,9 +579,9 @@ struct monst *mtmp;
     multishot = 1;
     if (otmp->quan > 1L && /* no point checking if there's only 1 */
         /* ammo requires corresponding launcher be wielded */
-        (is_ammo(otmp) ? matching_launcher(otmp, mwep) :
+        (is_ammo(otmp) ? matching_launcher(otmp, mwep)
                        /* otherwise any stackable (non-ammo) weapon */
-             otmp->oclass == WEAPON_CLASS) && !mtmp->mconf) {
+                       : otmp->oclass == WEAPON_CLASS) && !mtmp->mconf) {
         int skill = (int) objects[otmp->otyp].oc_skill;
 
         /* Assumes lords are skilled, princes are expert */
@@ -609,7 +609,7 @@ struct monst *mtmp;
         case PM_NINJA:
             if (skill == -P_SHURIKEN || skill == -P_DART)
                 multishot++;
-        /*FALLTHRU*/
+            /*FALLTHRU*/
         case PM_SAMURAI:
             if (otmp->otyp == YA && mwep && mwep->otyp == YUMI)
                 multishot++;

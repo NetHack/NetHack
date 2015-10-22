@@ -1,4 +1,4 @@
-/* NetHack 3.6	priest.c	$NHDT-Date: 1432512764 2015/05/25 00:12:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.37 $ */
+/* NetHack 3.6	priest.c	$NHDT-Date: 1445556883 2015/10/22 23:34:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.40 $ */
 /* Copyright (c) Izchak Miller, Steve Linhart, 1989.		  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -56,7 +56,7 @@ register xchar omx, omy, gx, gy;
     struct obj *ib = (struct obj *) 0;
 
     if (omx == gx && omy == gy)
-        return (0);
+        return 0;
     if (mtmp->mconf) {
         avoid = FALSE;
         appr = 0;
@@ -128,9 +128,9 @@ pick_move:
             obj_extract_self(ib);
             (void) mpickobj(mtmp, ib);
         }
-        return (1);
+        return 1;
     }
-    return (0);
+    return 0;
 }
 
 char
@@ -141,8 +141,8 @@ register char *array;
 
     for (ptr = array; *ptr; ptr++)
         if (rooms[*ptr - ROOMOFFSET].rtype == TEMPLE)
-            return (*ptr);
-    return ('\0');
+            return *ptr;
+    return '\0';
 }
 
 STATIC_OVL boolean
@@ -150,9 +150,9 @@ histemple_at(priest, x, y)
 register struct monst *priest;
 register xchar x, y;
 {
-    return ((boolean)(priest && priest->ispriest
+    return (boolean) (priest && priest->ispriest
                       && (EPRI(priest)->shroom == *in_rooms(x, y, TEMPLE))
-                      && on_level(&(EPRI(priest)->shrlevel), &u.uz)));
+                      && on_level(&(EPRI(priest)->shrlevel), &u.uz));
 }
 
 boolean
@@ -184,7 +184,7 @@ register struct monst *priest;
     omy = priest->my;
 
     if (!histemple_at(priest, omx, omy))
-        return (-1);
+        return -1;
 
     temple = EPRI(priest)->shroom;
 
@@ -200,7 +200,7 @@ register struct monst *priest;
             if (Displaced)
                 Your("displaced image doesn't fool %s!", mon_nam(priest));
             (void) mattacku(priest);
-            return (0);
+            return 0;
         } else if (index(u.urooms, temple)) {
             /* chase player if inside temple & can see him */
             if (priest->mcansee && m_canseeu(priest)) {
@@ -212,8 +212,7 @@ register struct monst *priest;
     } else if (Invis)
         avoid = FALSE;
 
-    return (
-        move_special(priest, FALSE, TRUE, FALSE, avoid, omx, omy, gx, gy));
+    return move_special(priest, FALSE, TRUE, FALSE, avoid, omx, omy, gx, gy);
 }
 
 /* exclusively for mktemple() */
@@ -343,7 +342,7 @@ boolean
 p_coaligned(priest)
 struct monst *priest;
 {
-    return ((boolean)(u.ualign.type == mon_aligntyp(priest)));
+    return (boolean) (u.ualign.type == mon_aligntyp(priest));
 }
 
 STATIC_OVL boolean
@@ -359,8 +358,8 @@ struct monst *pri;
     lev = &levl[epri_p->shrpos.x][epri_p->shrpos.y];
     if (!IS_ALTAR(lev->typ) || !(lev->altarmask & AM_SHRINE))
         return FALSE;
-    return (boolean)(epri_p->shralign
-                     == (Amask2align(lev->altarmask & ~AM_SHRINE)));
+    return (boolean) (epri_p->shralign
+                      == (Amask2align(lev->altarmask & ~AM_SHRINE)));
 }
 
 struct monst *
@@ -374,7 +373,7 @@ char roomno;
             continue;
         if (mtmp->ispriest && (EPRI(mtmp)->shroom == roomno)
             && histemple_at(mtmp, mtmp->mx, mtmp->my))
-            return (mtmp);
+            return mtmp;
     }
     return (struct monst *) 0;
 }
@@ -609,14 +608,14 @@ register struct monst *priest;
                 verbalize("I bestow upon thee a blessing.");
                 incr_itimeout(&HClairvoyant, rn1(500, 500));
             }
-        } else if (offer < (u.ulevel * 600) &&
+        } else if (offer < (u.ulevel * 600)
                    /* u.ublessed is only active when Protection is
                       enabled via something other than worn gear
                       (theft by gremlin clears the intrinsic but not
                       its former magnitude, making it recoverable) */
-                   (!(HProtection & INTRINSIC)
-                    || (u.ublessed < 20
-                        && (u.ublessed < 9 || !rn2(u.ublessed))))) {
+                   && (!(HProtection & INTRINSIC)
+                       || (u.ublessed < 20
+                           && (u.ublessed < 9 || !rn2(u.ublessed))))) {
             verbalize("Thy devotion has been rewarded.");
             if (!(HProtection & INTRINSIC)) {
                 HProtection |= FROMOUTSIDE;
@@ -669,7 +668,7 @@ boolean peaceful;
     set_malign(roamer); /* peaceful may have changed */
 
     /* MORE TO COME */
-    return (roamer);
+    return roamer;
 }
 
 void
@@ -709,8 +708,8 @@ xchar x, y;
         return FALSE;
     if ((priest = findpriest(roomno)) == 0)
         return FALSE;
-    return (boolean)(has_shrine(priest) && p_coaligned(priest)
-                     && priest->mpeaceful);
+    return (boolean) (has_shrine(priest) && p_coaligned(priest)
+                      && priest->mpeaceful);
 }
 
 void ghod_hitsu(priest) /* when attacking "priest" in his temple */

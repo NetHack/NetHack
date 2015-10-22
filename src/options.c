@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1435002680 2015/06/22 19:51:20 $  $NHDT-Branch: master $:$NHDT-Revision: 1.222 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1445556879 2015/10/22 23:34:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.227 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -556,7 +556,8 @@ boolean val_allowed;
     int len = (int) strlen(user_string);
 
     if (val_allowed) {
-        const char *p = index(user_string, ':'), *q = index(user_string, '=');
+        const char *p = index(user_string, ':'),
+                   *q = index(user_string, '=');
 
         if (!p || (q && q < p))
             p = q;
@@ -566,7 +567,8 @@ boolean val_allowed;
             len = (int) (p - user_string);
     }
 
-    return (len >= min_length) && !strncmpi(opt_name, user_string, len);
+    return (boolean) (len >= min_length
+                      && !strncmpi(opt_name, user_string, len));
 }
 
 /* most environment variables will eventually be printed in an error
@@ -2896,8 +2898,9 @@ boolean tinitial, tfrom_file;
 
     /* WINCAP
      *
-     map_mode:[tiles|ascii4x6|ascii6x8|ascii8x8|ascii16x8|ascii7x12|ascii8x12|
-                    ascii16x12|ascii12x16|ascii10x18|fit_to_screen] */
+     *  map_mode:[tiles|ascii4x6|ascii6x8|ascii8x8|ascii16x8|ascii7x12|
+     *            ascii8x12|ascii16x12|ascii12x16|ascii10x18|fit_to_screen]
+     */
     fullname = "map_mode";
     if (match_optname(opts, fullname, sizeof("map_mode") - 1, TRUE)) {
         if (duplicate)
@@ -3727,7 +3730,7 @@ int numtotal;
         add_menu(tmpwin, NO_GLYPH, &any, action_titles[i].letr, 0, ATR_NONE,
                  tmpbuf,
 #if 0 /* this ought to work but doesn't... */
-			 (action_titles[i].letr == 'x') ? MENU_SELECTED :
+                 (action_titles[i].letr == 'x') ? MENU_SELECTED :
 #endif
                  MENU_UNSELECTED);
     }
@@ -5335,7 +5338,7 @@ struct wc_Opt wc_options[] = { { "ascii_map", WC_ASCII_MAP },
                                { "font_menu", WC_FONT_MENU },
                                { "font_message", WC_FONT_MESSAGE },
 #if 0
-	{"perm_invent",WC_PERM_INVENT},
+                               {"perm_invent", WC_PERM_INVENT},
 #endif
                                { "font_size_map", WC_FONTSIZ_MAP },
                                { "font_size_menu", WC_FONTSIZ_MENU },

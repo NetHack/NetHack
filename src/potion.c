@@ -1,4 +1,4 @@
-/* NetHack 3.6	potion.c	$NHDT-Date: 1440120657 2015/08/21 01:30:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.117 $ */
+/* NetHack 3.6	potion.c	$NHDT-Date: 1445556882 2015/10/22 23:34:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.119 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -453,18 +453,18 @@ dodrink()
         return 0;
     }
     /* Is there a fountain to drink from here? */
-    if (IS_FOUNTAIN(levl[u.ux][u.uy].typ) &&
+    if (IS_FOUNTAIN(levl[u.ux][u.uy].typ)
         /* not as low as floor level but similar restrictions apply */
-        can_reach_floor(FALSE)) {
+        && can_reach_floor(FALSE)) {
         if (yn("Drink from the fountain?") == 'y') {
             drinkfountain();
             return 1;
         }
     }
     /* Or a kitchen sink? */
-    if (IS_SINK(levl[u.ux][u.uy].typ) &&
+    if (IS_SINK(levl[u.ux][u.uy].typ)
         /* not as low as floor level but similar restrictions apply */
-        can_reach_floor(FALSE)) {
+        && can_reach_floor(FALSE)) {
         if (yn("Drink from the sink?") == 'y') {
             drinksink();
             return 1;
@@ -481,7 +481,7 @@ dodrink()
 
     otmp = getobj(beverages, "drink");
     if (!otmp)
-        return (0);
+        return 0;
 
     /* quan > 1 used to be left to useup(), but we need to force
        the current potion to be unworn, and don't want to do
@@ -506,13 +506,13 @@ dodrink()
             && !rn2(POTION_OCCUPANT_CHANCE(mvitals[PM_GHOST].born))) {
             ghost_from_bottle();
             useup(otmp);
-            return (1);
+            return 1;
         } else if (!strcmp(potion_descr, "smoky")
                    && !(mvitals[PM_DJINNI].mvflags & G_GONE)
                    && !rn2(POTION_OCCUPANT_CHANCE(mvitals[PM_DJINNI].born))) {
             djinni_from_bottle(otmp);
             useup(otmp);
-            return (1);
+            return 1;
         }
     }
     return dopotion(otmp);
@@ -527,7 +527,7 @@ register struct obj *otmp;
     otmp->in_use = TRUE;
     nothing = unkn = 0;
     if ((retval = peffects(otmp)) >= 0)
-        return (retval);
+        return retval;
 
     if (nothing) {
         unkn++;
@@ -542,7 +542,7 @@ register struct obj *otmp;
             docall(otmp);
     }
     useup(otmp);
-    return (1);
+    return 1;
 }
 
 int
@@ -792,13 +792,13 @@ register struct obj *otmp;
             break;
         }
         if (monster_detect(otmp, 0))
-            return (1); /* nothing detected */
+            return 1; /* nothing detected */
         exercise(A_WIS, TRUE);
         break;
     case POT_OBJECT_DETECTION:
     case SPE_DETECT_TREASURE:
         if (object_detect(otmp, 0))
-            return (1); /* nothing detected */
+            return 1; /* nothing detected */
         exercise(A_WIS, TRUE);
         break;
     case POT_SICKNESS:
@@ -1063,9 +1063,9 @@ register struct obj *otmp;
         break;
     default:
         impossible("What a funny potion! (%u)", otmp->otyp);
-        return (0);
+        return 0;
     }
-    return (-1);
+    return -1;
 }
 
 void
@@ -1438,14 +1438,14 @@ boolean your_fault;
         case POT_POLYMORPH:
             (void) bhitm(mon, obj);
             break;
-            /*
-                    case POT_GAIN_LEVEL:
-                    case POT_LEVITATION:
-                    case POT_FRUIT_JUICE:
-                    case POT_MONSTER_DETECTION:
-                    case POT_OBJECT_DETECTION:
-                            break;
-            */
+        /*
+        case POT_GAIN_LEVEL:
+        case POT_LEVITATION:
+        case POT_FRUIT_JUICE:
+        case POT_MONSTER_DETECTION:
+        case POT_OBJECT_DETECTION:
+            break;
+        */
         }
         if (angermon)
             wakeup(mon);
@@ -1743,7 +1743,7 @@ dodip()
     allowall[0] = ALL_CLASSES;
     allowall[1] = '\0';
     if (!(obj = getobj(allowall, "dip")))
-        return (0);
+        return 0;
     if (inaccessible_equipment(obj, "dip", FALSE))
         return 0;
 
@@ -1755,7 +1755,7 @@ dodip()
         Sprintf(qtoo, "%s the fountain?", qbuf);
         if (yn(upstart(qtoo)) == 'y') {
             dipfountain(obj);
-            return (1);
+            return 1;
         }
     } else if (is_pool(u.ux, u.uy)) {
         const char *pooltype = waterbody_name(u.ux, u.uy);
@@ -1831,7 +1831,7 @@ dodip()
             }
         }
         potion->in_use = FALSE; /* didn't go poof */
-        return (1);
+        return 1;
     } else if (obj->oclass == POTION_CLASS && obj->otyp != potion->otyp) {
         long amt = obj->quan;
 
@@ -1893,7 +1893,8 @@ dodip()
 
                 obj->otyp = otmp->otyp;
                 obfree(otmp, (struct obj *) 0);
-            } break;
+                break;
+            }
             default:
                 useupall(obj);
                 useup(potion);
@@ -1930,7 +1931,7 @@ dodip()
               otense(obj, "turn"),
               potion->odiluted ? hcolor(NH_ORANGE) : hcolor(NH_RED));
         potion->in_use = FALSE; /* didn't go poof */
-        return (1);
+        return 1;
     }
 
     if (potion->otyp == POT_WATER && obj->otyp == TOWEL) {
@@ -2088,11 +2089,11 @@ more_dips:
             hold_another_object(singlepotion, "You juggle and drop %s!",
                                 doname(singlepotion), (const char *) 0);
         update_inventory();
-        return (1);
+        return 1;
     }
 
     pline("Interesting...");
-    return (1);
+    return 1;
 
 poof:
     if (!objects[potion->otyp].oc_name_known

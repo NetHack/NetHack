@@ -1,4 +1,4 @@
-/* NetHack 3.6	muse.c	$NHDT-Date: 1444260722 2015/10/07 23:32:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.65 $ */
+/* NetHack 3.6	muse.c	$NHDT-Date: 1445556877 2015/10/22 23:34:37 $  $NHDT-Branch: master $:$NHDT-Revision: 1.66 $ */
 /*	Copyright (C) 1990 by Ken Arromdee			   */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -1663,16 +1663,17 @@ struct monst *mtmp;
             m.has_misc = MUSE_POT_GAIN_LEVEL;
         }
         nomore(MUSE_BULLWHIP);
-        if (obj->otyp == BULLWHIP && !mtmp->mpeaceful &&
+        if (obj->otyp == BULLWHIP && !mtmp->mpeaceful
             /* the random test prevents whip-wielding
                monster from attempting disarm every turn */
-            uwep && !rn2(5) && obj == MON_WEP(mtmp) &&
+            && uwep && !rn2(5) && obj == MON_WEP(mtmp)
             /* hero's location must be known and adjacent */
-            mtmp->mux == u.ux && mtmp->muy == u.uy
-            && distu(mtmp->mx, mtmp->my) <= 2 &&
+            && mtmp->mux == u.ux && mtmp->muy == u.uy
+            && distu(mtmp->mx, mtmp->my) <= 2
             /* don't bother if it can't work (this doesn't
                prevent cursed weapons from being targetted) */
-            (canletgo(uwep, "") || (u.twoweap && canletgo(uswapwep, "")))) {
+            && (canletgo(uwep, "")
+                || (u.twoweap && canletgo(uswapwep, "")))) {
             m.misc = obj;
             m.has_misc = MUSE_BULLWHIP;
         }

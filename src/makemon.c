@@ -1,4 +1,4 @@
-/* NetHack 3.6	makemon.c	$NHDT-Date: 1433457069 2015/06/04 22:31:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.92 $ */
+/* NetHack 3.6	makemon.c	$NHDT-Date: 1445556868 2015/10/22 23:34:28 $  $NHDT-Branch: master $:$NHDT-Revision: 1.99 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1084,11 +1084,11 @@ register int mmflags;
                 return ((struct monst *) 0); /* no more monsters! */
             }
             fakemon.data = ptr; /* set up for goodpos */
-        } while (++tryct <= 50 &&
+        } while (++tryct <= 50
                  /* in Sokoban, don't accept a giant on first try;
                     after that, boulder carriers are fair game */
-                 ((tryct == 1 && throws_rocks(ptr) && In_sokoban(&u.uz))
-                  || !goodpos(x, y, &fakemon, gpflags)));
+                 && ((tryct == 1 && throws_rocks(ptr) && In_sokoban(&u.uz))
+                     || !goodpos(x, y, &fakemon, gpflags)));
         mndx = monsndx(ptr);
     }
     (void) propagate(mndx, countbirth, FALSE);

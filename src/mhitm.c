@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitm.c	$NHDT-Date: 1432512766 2015/05/25 00:12:46 $  $NHDT-Branch: master $:$NHDT-Revision: 1.78 $ */
+/* NetHack 3.6	mhitm.c	$NHDT-Date: 1445556871 2015/10/22 23:34:31 $  $NHDT-Branch: master $:$NHDT-Revision: 1.81 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -610,9 +610,9 @@ struct monst *magr, *mdef;
     if (mdef == &youmonst)
         dx = u.ux, dy = u.uy;
     lev = &levl[dx][dy];
-    if (IS_ROCK(lev->typ) || closed_door(dx, dy) || IS_TREE(lev->typ) ||
+    if (IS_ROCK(lev->typ) || closed_door(dx, dy) || IS_TREE(lev->typ)
         /* not passes_bars(); engulfer isn't squeezing through */
-        (lev->typ == IRONBARS && !is_whirly(magr->data)))
+        || (lev->typ == IRONBARS && !is_whirly(magr->data)))
         return FALSE;
 
     return TRUE;

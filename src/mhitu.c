@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitu.c	$NHDT-Date: 1437877180 2015/07/26 02:19:40 $  $NHDT-Branch: master $:$NHDT-Revision: 1.128 $ */
+/* NetHack 3.6	mhitu.c	$NHDT-Date: 1445556872 2015/10/22 23:34:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.129 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -70,26 +70,28 @@ register struct attack *mattk;
         }
 }
 
-STATIC_OVL void missmu(mtmp, nearmiss, mattk) /* monster missed you */
-register struct monst *mtmp;
-register boolean nearmiss;
-register struct attack *mattk;
+/* monster missed you */
+STATIC_OVL void
+missmu(mtmp, nearmiss, mattk)
+struct monst *mtmp;
+boolean nearmiss;
+struct attack *mattk;
 {
     if (!canspotmon(mtmp))
         map_invisible(mtmp->mx, mtmp->my);
 
     if (could_seduce(mtmp, &youmonst, mattk) && !mtmp->mcan)
         pline("%s pretends to be friendly.", Monnam(mtmp));
-    else {
-        if (!flags.verbose || !nearmiss)
-            pline("%s misses.", Monnam(mtmp));
-        else
-            pline("%s just misses!", Monnam(mtmp));
-    }
+    else
+        pline("%s %smisses!", Monnam(mtmp),
+              (nearmiss && flags.verbose) ? "just " : "");
+
     stop_occupation();
 }
 
-STATIC_OVL void mswings(mtmp, otemp) /* monster swings obj */
+/* monster swings obj */
+STATIC_OVL void
+mswings(mtmp, otemp)
 struct monst *mtmp;
 struct obj *otemp;
 {
@@ -132,8 +134,9 @@ u_slow_down()
     exercise(A_DEX, FALSE);
 }
 
-STATIC_OVL void wildmiss(mtmp,
-                         mattk) /* monster attacked your displaced image */
+/* monster attacked your displaced image */
+STATIC_OVL void
+wildmiss(mtmp, mattk)
 register struct monst *mtmp;
 register struct attack *mattk;
 {
@@ -147,8 +150,8 @@ register struct attack *mattk;
         return;
     /* maybe it's attacking an image around the corner? */
 
-    compat = (mattk->adtyp == AD_SEDU || mattk->adtyp == AD_SSEX)
-             && could_seduce(mtmp, &youmonst, (struct attack *) 0);
+    compat = ((mattk->adtyp == AD_SEDU || mattk->adtyp == AD_SSEX)
+              && could_seduce(mtmp, &youmonst, (struct attack *) 0));
 
     if (!mtmp->mcansee || (Invis && !perceives(mtmp->data))) {
         const char *swings =
@@ -211,9 +214,8 @@ register struct attack *mattk;
 
 void
 expels(mtmp, mdat, message)
-register struct monst *mtmp;
-register struct permonst
-    *mdat; /* if mtmp is polymorphed, mdat != mtmp->data */
+struct monst *mtmp;
+struct permonst *mdat; /* if mtmp is polymorphed, mdat != mtmp->data */
 boolean message;
 {
     if (message) {
@@ -309,37 +311,37 @@ register struct monst *mtmp;
     if (!ranged)
         nomul(0);
     if (mtmp->mhp <= 0 || (Underwater && !is_swimmer(mtmp->data)))
-        return (0);
+        return 0;
 
     /* If swallowed, can only be affected by u.ustuck */
     if (u.uswallow) {
         if (mtmp != u.ustuck)
-            return (0);
+            return 0;
         u.ustuck->mux = u.ux;
         u.ustuck->muy = u.uy;
         range2 = 0;
         foundyou = 1;
         if (u.uinvulnerable)
-            return (0); /* stomachs can't hurt you! */
+            return 0; /* stomachs can't hurt you! */
     }
 
     else if (u.usteed) {
         if (mtmp == u.usteed)
             /* Your steed won't attack you */
-            return (0);
+            return 0;
         /* Orcs like to steal and eat horses and the like */
         if (!rn2(is_orc(mtmp->data) ? 2 : 4)
             && distu(mtmp->mx, mtmp->my) <= 2) {
             /* Attack your steed instead */
             i = mattackm(mtmp, u.usteed);
             if ((i & MM_AGR_DIED))
-                return (1);
+                return 1;
             /* make sure steed is still alive and within range */
             if ((i & MM_DEF_DIED) || !u.usteed
                 || distu(mtmp->mx, mtmp->my) > 2)
-                return (0);
+                return 0;
             /* Let your steed retaliate */
-            return (!!(mattackm(u.usteed, mtmp) & MM_DEF_DIED));
+            return !!(mattackm(u.usteed, mtmp) & MM_DEF_DIED);
         }
     }
 
@@ -357,11 +359,12 @@ register struct monst *mtmp;
                is eligible for placing hero; we assume that a
                removed monster remembers its old spot <mx,my> */
             remove_monster(mtmp->mx, mtmp->my);
-            if (!enexto(&cc, u.ux, u.uy, youmonst.data) ||
+            if (!enexto(&cc, u.ux, u.uy, youmonst.data)
                 /* a fish won't voluntarily swap positions
                    when it's in water and hero is over land */
-                (mtmp->data->mlet == S_EEL && is_pool(mtmp->mx, mtmp->my)
-                 && !is_pool(u.ux, u.uy))) {
+                || (mtmp->data->mlet == S_EEL
+                    && is_pool(mtmp->mx, mtmp->my)
+                    && !is_pool(u.ux, u.uy))) {
                 /* couldn't find any spot for hero; this used to
                    kill off attacker, but now we just give a "miss"
                    message and keep both mtmp and hero at their
@@ -388,7 +391,7 @@ register struct monst *mtmp;
             newsym(u.ux, u.uy);
 
             if (youmonst.data->mlet != S_PIERCER)
-                return (0); /* lurkers don't attack */
+                return 0; /* lurkers don't attack */
 
             obj = which_armor(mtmp, WORN_HELMET);
             if (obj && is_metallic(obj)) {
@@ -444,7 +447,7 @@ register struct monst *mtmp;
             }
             newsym(u.ux, u.uy);
         }
-        return (0);
+        return 0;
     }
 
     /* hero might be a mimic, concealed via #monster */
@@ -464,7 +467,7 @@ register struct monst *mtmp;
         youmonst.m_ap_type = M_AP_NOTHING;
         youmonst.mappearance = 0;
         newsym(u.ux, u.uy);
-        return (0);
+        return 0;
     }
 
     /* non-mimic hero might be mimicking an object after eating m corpse */
@@ -573,7 +576,7 @@ register struct monst *mtmp;
             else
                 You_feel("%s move nearby.", something);
         }
-        return (0);
+        return 0;
     }
 
     /* Unlike defensive stuff, don't let them use item _and_ attack. */
@@ -624,9 +627,8 @@ register struct monst *mtmp;
             break;
 
         case AT_GAZE: /* can affect you either ranged or not */
-                      /* Medusa gaze already operated through m_respond in
-                       * dochug(); don't gaze more than once per round.
-                       */
+            /* Medusa gaze already operated through m_respond in
+               dochug(); don't gaze more than once per round. */
             if (mdat != &mons[PM_MEDUSA])
                 sum[i] = gazemu(mtmp, mattk);
             break;
@@ -654,9 +656,9 @@ register struct monst *mtmp;
                     if (youseeit)
                         pline("%s lunges forward and recoils!", Monnam(mtmp));
                     else
-                        You_hear("a %s nearby.", is_whirly(mtmp->data)
-                                                     ? "rushing noise"
-                                                     : "splat");
+                        You_hear("a %s nearby.",
+                                 is_whirly(mtmp->data) ? "rushing noise"
+                                                       : "splat");
                 }
             }
             break;
@@ -683,8 +685,7 @@ register struct monst *mtmp;
                  */
                 if (mtmp->weapon_check == NEED_WEAPON || !MON_WEP(mtmp)) {
                     mtmp->weapon_check = NEED_HTH_WEAPON;
-                    /* mon_wield_item resets weapon_check as
-                     * appropriate */
+                    /* mon_wield_item resets weapon_check as appropriate */
                     if (mon_wield_item(mtmp) != 0)
                         break;
                 }
@@ -734,7 +735,7 @@ register struct monst *mtmp;
             break; /* attacker teleported, no more attacks */
         /* sum[i] == 0: unsuccessful attack */
     }
-    return (0);
+    return 0;
 }
 
 STATIC_OVL boolean
@@ -797,9 +798,9 @@ struct monst *mon;
     long wearmask;
     int armpro, mc = 0;
     boolean is_you = (mon == &youmonst),
-            gotprot = is_you ? (EProtection != 0L) :
+            gotprot = is_you ? (EProtection != 0L)
                              /* high priests have innate protection */
-                          (mon->data == &mons[PM_HIGH_PRIEST]);
+                             : (mon->data == &mons[PM_HIGH_PRIEST]);
 
     for (o = is_you ? invent : mon->minvent; o; o = o->nobj) {
         /* a_can field is only applicable for armor (which must be worn) */
@@ -1178,7 +1179,7 @@ register struct attack *mattk;
                             kformat = KILLED_BY;
                         }
                         make_stoned(5L, (char *) 0, kformat, kname);
-                        return (1);
+                        return 1;
                         /* done_in_by(mtmp, STONING); */
                     }
                 }
@@ -1632,8 +1633,9 @@ gulp_blnd_check()
     return FALSE;
 }
 
+/* monster swallows you, or damage if u.uswallow */
 STATIC_OVL int
-gulpmu(mtmp, mattk) /* monster swallows you, or damage if u.uswallow */
+gulpmu(mtmp, mattk)
 register struct monst *mtmp;
 register struct attack *mattk;
 {
@@ -1651,7 +1653,7 @@ register struct attack *mattk;
             return 0;
         if ((t && ((t->ttyp == PIT) || (t->ttyp == SPIKED_PIT)))
             && sobj_at(BOULDER, u.ux, u.uy))
-            return (0);
+            return 0;
 
         if (Punished)
             unplacebc(); /* ball&chain go away */
@@ -1730,7 +1732,7 @@ register struct attack *mattk;
     }
 
     if (mtmp != u.ustuck)
-        return (0);
+        return 0;
     if (u.uswldtim > 0)
         u.uswldtim -= 1;
 
@@ -1870,10 +1872,12 @@ register struct attack *mattk;
             pline("Obviously %s doesn't like your taste.", mon_nam(mtmp));
         expels(mtmp, mtmp->data, FALSE);
     }
-    return (1);
+    return 1;
 }
 
-STATIC_OVL int explmu(mtmp, mattk, ufound) /* monster explodes in your face */
+/* monster explodes in your face */
+STATIC_OVL int
+explmu(mtmp, mattk, ufound)
 register struct monst *mtmp;
 register struct attack *mattk;
 boolean ufound;
@@ -1881,7 +1885,7 @@ boolean ufound;
     boolean physical_damage = TRUE, kill_agr = TRUE;
 
     if (mtmp->mcan)
-        return (0);
+        return 0;
 
     if (!ufound)
         pline("%s explodes at a spot in %s!",
@@ -1969,7 +1973,9 @@ boolean ufound;
     return (mtmp->mhp > 0) ? 0 : 2;
 }
 
-int gazemu(mtmp, mattk) /* monster gazes at you */
+/* monster gazes at you */
+int
+gazemu(mtmp, mattk)
 register struct monst *mtmp;
 register struct attack *mattk;
 {
@@ -2175,10 +2181,12 @@ register struct attack *mattk;
                                      : (!rn2(2) ? "a bit " : "somewhat "),
               reactions[react]);
     }
-    return (0);
+    return 0;
 }
 
-void mdamageu(mtmp, n) /* mtmp hits you for n points damage */
+/* mtmp hits you for n points damage */
+void
+mdamageu(mtmp, n)
 register struct monst *mtmp;
 register int n;
 {
@@ -2207,7 +2215,7 @@ struct attack *mattk;
     xchar genagr, gendef;
 
     if (is_animal(magr->data))
-        return (0);
+        return 0;
     if (magr == &youmonst) {
         pagr = youmonst.data;
         agrinvis = (Invis != 0);
@@ -2527,18 +2535,18 @@ const char *str;
         Sprintf(hairbuf, "let me run my fingers through your %s",
                 body_part(HAIR));
         verbalize("Take off your %s; %s.", str,
-                  (obj == uarm) ? "let's get a little closer"
-                                : (obj == uarmc || obj == uarms)
-                                      ? "it's in the way"
-                                      : (obj == uarmf)
-                                            ? "let me rub your feet"
-                                            : (obj == uarmg)
-                                                  ? "they're too clumsy"
-                                                  : (obj == uarmu)
-                                                        ? "let me massage you"
-                                                        :
-                                                        /* obj == uarmh */
-                                                        hairbuf);
+                  (obj == uarm)
+                     ? "let's get a little closer"
+                     : (obj == uarmc || obj == uarms)
+                        ? "it's in the way"
+                        : (obj == uarmf)
+                           ? "let me rub your feet"
+                           : (obj == uarmg)
+                              ? "they're too clumsy"
+                              : (obj == uarmu)
+                                 ? "let me massage you"
+                                 /* obj == uarmh */
+                                 : hairbuf);
     }
     remove_worn_item(obj, TRUE);
 }
@@ -2597,7 +2605,7 @@ register struct attack *mattk;
                     && (wornitems & protector) != protector))) {
             if (poly_when_stoned(mtmp->data)) {
                 mon_to_stone(mtmp);
-                return (1);
+                return 1;
             }
             pline("%s turns to stone!", Monnam(mtmp));
             stoned = 1;
@@ -2613,7 +2621,7 @@ register struct attack *mattk;
             (void) drain_item(otmp);
             /* No message */
         }
-        return (1);
+        return 1;
     default:
         break;
     }
@@ -2739,7 +2747,7 @@ cloneu()
     mon->mhp = u.mh / 2;
     u.mh -= mon->mhp;
     context.botl = 1;
-    return (mon);
+    return mon;
 }
 
 /*mhitu.c*/

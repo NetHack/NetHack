@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1436754893 2015/07/13 02:34:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.79 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1445556880 2015/10/22 23:34:40 $  $NHDT-Branch: master $:$NHDT-Revision: 1.82 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1094,17 +1094,19 @@ doidtrap()
                     break;
             }
             tt = what_trap(tt);
-            pline(
-                "That is %s%s%s.",
-                an(defsyms[trap_to_defsym(tt)].explanation),
-                !trap->madeby_u
-                    ? ""
-                    : (tt == WEB) ? " woven" :
-                                  /* trap doors & spiked pits can't be made by
-                                     player, and should be considered at least
-                                     as much "set" as "dug" anyway */
-                          (tt == HOLE || tt == PIT) ? " dug" : " set",
-                !trap->madeby_u ? "" : " by you");
+            pline("That is %s%s%s.",
+                  an(defsyms[trap_to_defsym(tt)].explanation),
+                  !trap->madeby_u
+                     ? ""
+                     : (tt == WEB)
+                        ? " woven"
+                        /* trap doors & spiked pits can't be made by
+                           player, and should be considered at least
+                           as much "set" as "dug" anyway */
+                        : (tt == HOLE || tt == PIT)
+                           ? " dug"
+                           : " set",
+                  !trap->madeby_u ? "" : " by you");
             return 0;
         }
     pline("I can't see a trap there.");

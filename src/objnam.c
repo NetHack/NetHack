@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1445126428 2015/10/18 00:00:28 $  $NHDT-Branch: master $:$NHDT-Revision: 1.148 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1445556878 2015/10/22 23:34:38 $  $NHDT-Branch: master $:$NHDT-Revision: 1.149 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -64,11 +64,11 @@ register const char *pref;
 
     if (i > PREFIX) {
         impossible("PREFIX too short (for %d).", i);
-        return (s);
+        return s;
     }
     s -= i;
     (void) strncpy(s, pref, i); /* do not copy trailing 0 */
-    return (s);
+    return s;
 }
 
 /* manage a pool of BUFSZ buffers, so callers don't have to */
@@ -134,7 +134,7 @@ register int otyp;
             Sprintf(eos(buf), " called %s", un);
         if (dn)
             Sprintf(eos(buf), " (%s)", dn);
-        return (buf);
+        return buf;
     default:
         if (nn) {
             Strcpy(buf, actualn);
@@ -152,7 +152,7 @@ register int otyp;
             if (un)
                 Sprintf(eos(buf), " called %s", un);
         }
-        return (buf);
+        return buf;
     }
     /* here for ring/scroll/potion/wand */
     if (nn) {
@@ -165,7 +165,7 @@ register int otyp;
         Sprintf(eos(buf), " called %s", un);
     if (dn)
         Sprintf(eos(buf), " (%s)", dn);
-    return (buf);
+    return buf;
 }
 
 /* less verbose result than obj_typename(); either the actual name
@@ -551,7 +551,7 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
 
     if (!strncmpi(buf, "the ", 4))
         buf += 4;
-    return (buf);
+    return buf;
 }
 
 /* similar to simple_typename but minimal_xname operates on a particular
@@ -586,9 +586,8 @@ struct obj *obj;
     /* suppress known except for amulets (needed for fakes and real A-of-Y) */
     bareobj.known = (obj->oclass == AMULET_CLASS)
                         ? obj->known
-                        :
                         /* default is "on" for types which don't use it */
-                        !objects[otyp].oc_uses_known;
+                        : !objects[otyp].oc_uses_known;
     bareobj.quan = 1L;         /* don't want plural */
     bareobj.corpsenm = NON_PM; /* suppress statue and figurine details */
     /* but suppressing fruit details leads to "bad fruit #0"
@@ -635,8 +634,8 @@ register struct obj *obj;
     else if (obj->otyp == FAKE_AMULET_OF_YENDOR && !known)
         return TRUE; /* lie */
     else
-        return (boolean)(objects[obj->otyp].oc_unique
-                         && (known || obj->otyp == AMULET_OF_YENDOR));
+        return (boolean) (objects[obj->otyp].oc_unique
+                          && (known || obj->otyp == AMULET_OF_YENDOR));
 }
 
 /* should monster type be prefixed with "the"? (mostly used for corpses) */
@@ -760,19 +759,18 @@ boolean with_price;
         Strcpy(prefix, "a ");
 
     /* "empty" goes at the beginning, but item count goes at the end */
-    if (cknown &&
+    if (cknown
         /* bag of tricks: include "empty" prefix if it's known to
            be empty but its precise number of charges isn't known
            (when that is known, suffix of "(n:0)" will be appended,
            making the prefix be redundant; note that 'known' flag
            isn't set when emptiness gets discovered because then
            charging magic would yield known number of new charges) */
-        (obj->otyp == BAG_OF_TRICKS
+        && (obj->otyp == BAG_OF_TRICKS
              ? (obj->spe == 0 && !obj->known)
-             :
              /* not bag of tricks: empty if container which has no contents */
-             (Is_container(obj) || obj->otyp == STATUE)
-                 && !Has_contents(obj)))
+             : (Is_container(obj) || obj->otyp == STATUE)
+            && !Has_contents(obj)))
         Strcat(prefix, "empty ");
 
     if (bknown && obj->oclass != COIN_CLASS
@@ -1025,7 +1023,7 @@ boolean with_price;
         Sprintf(eos(bp), " (%d aum)", obj->owt);
     }
     bp = strprepend(bp, prefix);
-    return (bp);
+    return bp;
 }
 
 char *
@@ -1052,13 +1050,13 @@ register struct obj *otmp;
     if (otmp->oclass == COIN_CLASS)
         return FALSE; /* always fully ID'd */
     /* check fundamental ID hallmarks first */
-    if (!otmp->known || !otmp->dknown ||
+    if (!otmp->known || !otmp->dknown
 #ifdef MAIL
-        (!otmp->bknown && otmp->otyp != SCR_MAIL) ||
+        || (!otmp->bknown && otmp->otyp != SCR_MAIL)
 #else
-        !otmp->bknown ||
+        || !otmp->bknown
 #endif
-        !objects[otmp->otyp].oc_name_known)
+        || !objects[otmp->otyp].oc_name_known)
         return TRUE;
     if ((!otmp->cknown && (Is_container(otmp) || otmp->otyp == STATUE))
         || (!otmp->lknown && Is_box(otmp)))
@@ -1067,18 +1065,18 @@ register struct obj *otmp;
         return TRUE;
     /* otmp->rknown is the only item of interest if we reach here */
     /*
- *  Note:  if a revision ever allows scrolls to become fireproof or
- *  rings to become shockproof, this checking will need to be revised.
- *  `rknown' ID only matters if xname() will provide the info about it.
- */
+     *  Note:  if a revision ever allows scrolls to become fireproof or
+     *  rings to become shockproof, this checking will need to be revised.
+     *  `rknown' ID only matters if xname() will provide the info about it.
+     */
     if (otmp->rknown
         || (otmp->oclass != ARMOR_CLASS && otmp->oclass != WEAPON_CLASS
-            && !is_weptool(otmp) &&      /* (redundant) */
-            otmp->oclass != BALL_CLASS)) /* (useless) */
+            && !is_weptool(otmp)            /* (redundant) */
+            && otmp->oclass != BALL_CLASS)) /* (useless) */
         return FALSE;
     else /* lack of `rknown' only matters for vulnerable objects */
-        return (boolean)(is_rustprone(otmp) || is_corrodeable(otmp)
-                         || is_flammable(otmp));
+        return (boolean) (is_rustprone(otmp) || is_corrodeable(otmp)
+                          || is_flammable(otmp));
 }
 
 char *
@@ -1469,7 +1467,7 @@ register const char *verb;
         Strcat(bp, " ");
         Strcat(bp, otense(otmp, verb));
     }
-    return (bp);
+    return bp;
 }
 
 /* combine yname and aobjnam eg "your count cxname(otmp)" */
@@ -1502,7 +1500,7 @@ const char *verb;
     register char *s = yobjnam(obj, verb);
 
     *s = highc(*s);
-    return (s);
+    return s;
 }
 
 /* like aobjnam, but prepend "The", not count, and use xname */
@@ -1517,7 +1515,7 @@ register const char *verb;
         Strcat(bp, " ");
         Strcat(bp, otense(otmp, verb));
     }
-    return (bp);
+    return bp;
 }
 
 /* capitalized variant of doname() */
@@ -1528,7 +1526,7 @@ register struct obj *obj;
     register char *s = doname(obj);
 
     *s = highc(*s);
-    return (s);
+    return s;
 }
 
 /* returns "[your ]xname(obj)" or "Foobar's xname(obj)" or "the xname(obj)" */
@@ -1996,9 +1994,9 @@ const char *oldstr;
     }
 
     /* man/men ("Wiped out all cavemen.") */
-    if (len >= 3 && !strcmpi(spot - 2, "man") &&
+    if (len >= 3 && !strcmpi(spot - 2, "man")
         /* exclude shamans and humans */
-        (len < 6 || strcmpi(spot - 5, "shaman"))
+        && (len < 6 || strcmpi(spot - 5, "shaman"))
         && (len < 5 || strcmpi(spot - 4, "human"))) {
         Strcasecpy(spot - 1, "en");
         goto bottom;
@@ -2060,9 +2058,9 @@ const char *oldstr;
 
     /* Ends in z, x, s, ch, sh; add an "es" */
     if (index("zxs", lo_c)
-        || (len >= 2 && lo_c == 'h' && index("cs", lowc(*(spot - 1)))) ||
+        || (len >= 2 && lo_c == 'h' && index("cs", lowc(*(spot - 1))))
         /* Kludge to get "tomatoes" and "potatoes" right */
-        (len >= 4 && !strcmpi(spot - 2, "ato"))
+        || (len >= 4 && !strcmpi(spot - 2, "ato"))
         || (len >= 5 && !strcmpi(spot - 4, "dingo"))) {
         Strcasecpy(spot + 1, "es"); /* append es */
         goto bottom;
@@ -3090,7 +3088,7 @@ wiztrap:
                       (trap != MAGIC_PORTAL) ? "" : " to nowhere");
             } else
                 pline("Creation of %s failed.", an(tname));
-            return (&zeroobj);
+            return &zeroobj;
         }
 
         /* furniture and terrain */
@@ -3103,13 +3101,13 @@ wiztrap:
                 lev->blessedftn = 1;
             pline("A %sfountain.", lev->blessedftn ? "magic " : "");
             newsym(x, y);
-            return (&zeroobj);
+            return &zeroobj;
         }
         if (!BSTRCMPI(bp, p - 6, "throne")) {
             lev->typ = THRONE;
             pline("A throne.");
             newsym(x, y);
-            return (&zeroobj);
+            return &zeroobj;
         }
         if (!BSTRCMPI(bp, p - 4, "sink")) {
             lev->typ = SINK;
@@ -3155,7 +3153,7 @@ wiztrap:
             lev->altarmask = Align2amask(al);
             pline("%s altar.", An(align_str(al)));
             newsym(x, y);
-            return (&zeroobj);
+            return &zeroobj;
         }
 
         if (!BSTRCMPI(bp, p - 5, "grave")
@@ -3164,7 +3162,7 @@ wiztrap:
             pline("%s.", IS_GRAVE(lev->typ) ? "A grave"
                                             : "Can't place a grave here");
             newsym(x, y);
-            return (&zeroobj);
+            return &zeroobj;
         }
 
         if (!BSTRCMPI(bp, p - 4, "tree")) {
@@ -3223,7 +3221,7 @@ typfnd:
         default:
             /* catch any other non-wishable objects (venom) */
             if (objects[typ].oc_nowish)
-                return ((struct obj *) 0);
+                return (struct obj *) 0;
             break;
         }
     }
@@ -3477,7 +3475,7 @@ typfnd:
     if (very && otmp->otyp == HEAVY_IRON_BALL)
         otmp->owt += 160;
 
-    return (otmp);
+    return otmp;
 }
 
 int
@@ -3487,7 +3485,7 @@ int first, last;
     int i, x, sum = 0;
 
     if (first == last)
-        return (first);
+        return first;
     for (i = first; i <= last; i++)
         sum += objects[i].oc_prob;
     if (!sum) /* all zero */

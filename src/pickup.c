@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1437877182 2015/07/26 02:19:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.160 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1445556881 2015/10/22 23:34:41 $  $NHDT-Branch: master $:$NHDT-Revision: 1.162 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -314,7 +314,7 @@ struct obj *obj;
 {
     if (obj == uchain)
         return FALSE;
-    return (obj->quan >= val_for_n_or_more);
+    return (boolean) (obj->quan >= val_for_n_or_more);
 }
 
 /* list of valid menu classes for query_objlist() and allow_category callback
@@ -357,7 +357,7 @@ STATIC_OVL boolean
 all_but_uchain(obj)
 struct obj *obj;
 {
-    return (obj != uchain);
+    return (boolean) (obj != uchain);
 }
 
 /* query_objlist callback: return TRUE */
@@ -423,9 +423,9 @@ STATIC_OVL boolean
 allow_cat_no_uchain(obj)
 struct obj *obj;
 {
-    if ((obj != uchain) &&
-	(((index(valid_menu_classes,'u') != (char *)0) && obj->unpaid) ||
-	(index(valid_menu_classes, obj->oclass) != (char *)0)))
+    if (obj != uchain
+	&& ((index(valid_menu_classes,'u') && obj->unpaid)
+            || index(valid_menu_classes, obj->oclass)))
 	return TRUE;
     else
 	return FALSE;
@@ -483,7 +483,7 @@ int what; /* should be a long */
                            || (is_pool(u.ux, u.uy) && !Underwater)
                            || is_lava(u.ux, u.uy))) {
             read_engr_at(u.ux, u.uy);
-            return (0);
+            return 0;
         }
 
         /* no pickup if levitating & not on air or water level */
@@ -491,7 +491,7 @@ int what; /* should be a long */
             if ((multi && !context.run) || (autopickup && !flags.pickup)
                 || (ttmp && uteetering_at_seen_pit(ttmp)))
                 read_engr_at(u.ux, u.uy);
-            return (0);
+            return 0;
         }
         /* multi && !context.run means they are in the middle of some other
          * action, or possibly paralyzed, sleeping, etc.... and they just
@@ -499,14 +499,14 @@ int what; /* should be a long */
          */
         if ((multi && !context.run) || (autopickup && !flags.pickup)) {
             check_here(FALSE);
-            return (0);
+            return 0;
         }
         if (notake(youmonst.data)) {
             if (!autopickup)
                 You("are physically incapable of picking anything up.");
             else
                 check_here(FALSE);
-            return (0);
+            return 0;
         }
 
         /* if there's anything here, stop running */
@@ -598,7 +598,7 @@ int what; /* should be a long */
                                "pick up", objchain,
                                traverse_how == BY_NEXTHERE, &via_menu)) {
                 if (!via_menu)
-                    return (0);
+                    return 0;
                 n = query_objlist(
                     "Pick up what?", objchain,
                     traverse_how | (selective ? 0 : INVORDER_SORT),
@@ -1298,10 +1298,10 @@ boolean telekinesis;
         carry_count(obj, container, *cnt_p, telekinesis, &old_wt, &new_wt);
     if (*cnt_p < 1L) {
         result = -1; /* nothing lifted */
-    } else if (obj->oclass != COIN_CLASS &&
+    } else if (obj->oclass != COIN_CLASS
                /* [exception for gold coins will have to change
                    if silver/copper ones ever get implemented] */
-               inv_cnt(FALSE) >= 52 && !merge_choice(invent, obj)) {
+               && inv_cnt(FALSE) >= 52 && !merge_choice(invent, obj)) {
         Your("knapsack cannot accommodate any more items.");
         result = -1; /* nothing lifted */
     } else {
@@ -1498,7 +1498,7 @@ encumber_msg()
     }
 
     oldcap = newcap;
-    return (newcap);
+    return newcap;
 }
 
 /* Is there a container at x,y. Optional: return count of containers at x,y */
@@ -1681,7 +1681,7 @@ lootcont:
                                       cobj, doname, ansimpleoname,
                                       "a container"));
                     if (c == 'q')
-                        return (timepassed);
+                        return timepassed;
                     if (c == 'n')
                         continue;
                     anyfound = TRUE;
@@ -1750,7 +1750,7 @@ lootcont:
         You("%s %s to loot.", dont_find_anything,
             underfoot ? "here" : "there");
     }
-    return (timepassed);
+    return timepassed;
 }
 
 /* called when attempting to #loot while confused */
@@ -1854,15 +1854,14 @@ boolean *prev_loot;
         if ((c = yn_function(qbuf, ynqchars, 'n')) == 'y') {
             if (nolimbs(youmonst.data)) {
                 You_cant("do that without limbs."); /* not body_part(HAND) */
-                return (0);
+                return 0;
             }
             if (otmp->cursed) {
-                You("can't. The saddle seems to be stuck to %s.",
+                You("can't.  The saddle seems to be stuck to %s.",
                     x_monnam(mtmp, ARTICLE_THE, (char *) 0, SUPPRESS_SADDLE,
                              FALSE));
-
                 /* the attempt costs you time */
-                return (1);
+                return 1;
             }
             obj_extract_self(otmp);
             if ((unwornmask = otmp->owornmask) != 0L) {
@@ -1876,7 +1875,7 @@ boolean *prev_loot;
             if (prev_loot)
                 *prev_loot = TRUE;
         } else if (c == 'q') {
-            return (0);
+            return 0;
         }
     }
     /* 3.4.0 introduced the ability to pick things up from within swallower's

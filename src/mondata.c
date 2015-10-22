@@ -1,4 +1,4 @@
-/* NetHack 3.6	mondata.c	$NHDT-Date: 1437877181 2015/07/26 02:19:41 $  $NHDT-Branch: master $:$NHDT-Revision: 1.55 $ */
+/* NetHack 3.6	mondata.c	$NHDT-Date: 1445556874 2015/10/22 23:34:34 $  $NHDT-Branch: master $:$NHDT-Revision: 1.57 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -140,10 +140,10 @@ struct monst *mon;
     struct obj *o;
 
     if (is_you ? (Blind || Unaware)
-               : (mon->mblinded || !mon->mcansee || !haseyes(ptr) ||
+               : (mon->mblinded || !mon->mcansee || !haseyes(ptr)
                   /* BUG: temporary sleep sets mfrozen, but since
                           paralysis does too, we can't check it */
-                  mon->msleeping))
+                  || mon->msleeping))
         return TRUE;
     /* yellow light, Archon; !dust vortex, !cobra, !raven */
     if (dmgtype_fromattack(ptr, AD_BLND, AT_EXPL)
@@ -264,10 +264,10 @@ struct permonst *ptr;
     register int i, atyp;
     long atk_mask = (1L << AT_BREA) | (1L << AT_SPIT) | (1L << AT_GAZE);
 
-    /* was: (attacktype(ptr, AT_BREA) || attacktype(ptr, AT_WEAP) ||
-            attacktype(ptr, AT_SPIT) || attacktype(ptr, AT_GAZE) ||
-            attacktype(ptr, AT_MAGC));
-       but that's too slow -dlc
+    /* was: (attacktype(ptr, AT_BREA) || attacktype(ptr, AT_WEAP)
+     *       || attacktype(ptr, AT_SPIT) || attacktype(ptr, AT_GAZE)
+     *       || attacktype(ptr, AT_MAGC));
+     * but that's too slow -dlc
      */
     for (i = 0; i < NATTK; i++) {
         atyp = ptr->mattk[i].aatyp;
