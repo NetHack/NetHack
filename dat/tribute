@@ -3464,10 +3464,166 @@ And they had to give the target a chance.
 #
 #
 #
-%title The Wee Free Men (1)
+%title The Wee Free Men (9)
+# p. 100 (HarperTempest edition; quin==queen;
+#         this rallying cry occurs multiple times; p. 167 has "/Nae quin!
+#         Nae king!  Nae laird!  Nae master!  We willna be fooled again!/",
+#         p. 193 has same except that King and Quin are reversed and
+#         capitalized, p. 287 has "/Nae Quin!  Nae Laird!  Wee Fee Men!/")
 %passage 1
-"Nac Mac Feegle! The Wee Free Men! Nae king! Nae quin! Nae laird! We willna
-be fooled again!" 
+"Nac Mac Feegle!  The Wee Free Men!  Nae king!  Nae quin!  Nae laird!  Nae
+master!  /We willna be fooled again!/"
+
+  [The Wee Free Men, by Terry Pratchett]
+%e passage
+# pp. 18-19 (unlike in Lancre and its surrounding Ramtop mountains, witches
+#           are unwelcome in the Chalk; the first paragraph continues with
+#           mention of things Miss Tick doesn't carry, then things she does,
+#           ending with 'and, of course, a lucky charm.')
+%passage 2
+Miss Tick did not look like a witch.  Most witches don't, at least the ones
+who wander from place to place.  Looking like a witch can be dangerous when
+you walk among the uneducated.  [...]
+
+Everyone in the country carried lucky charms, and Miss Tick had worked out
+that if you didn't have one, people would suspect that you /were/ a witch.
+You had to be a bit cunning to be a witch.
+
+Miss Tick did have a pointy hat, but it was a stealth hat and pointed only
+when she wanted it to.
+
+The one thing in her bag that might have made anyone suspicious was a very
+small, grubby booklet entitled /An Introduction to Escapology, by the
+Great Williamson/.  If one of the risks of your job is being thrown into a
+pond with your hands tied together, then the ability to swim thirty yards
+underwater, fully clothed, plus the ability to lurk under the weeds
+breathing air through a hollow reed, count as nothing if you aren't also
+/amazingly/ good at knots.
+
+  [The Wee Free Men, by Terry Pratchett]
+%e passage
+# pp. 29-30 ('pune' is accurate; a mispronunciation of 'pun', as indicated
+#            by the footnote; one wonders how a nine year old farm girl knows
+#            how to pronounce 'mystique'...)
+%passage 3
+"My name," she said at last, "is Miss Tick.  And I /am/ a witch.  It's a
+good name for a witch, of course."
+
+"You mean blood-sucking parasite?" said Tiffany, wrinkling her forehead.
+
+"I'm sorry," said Miss Tick, coldly.
+
+"Ticks," said Tiffany.  "Sheep get them.  But if you use turpentine--"
+
+"I /meant/ that it /sounds/ like 'mystic,'" said Miss Tick.
+
+"Oh, you mean a pune, or play on words," said Tiffany.(1)  "In that case it
+would be even better if you were Miss /Teak/, a dense foreign wood, because
+that would sound like 'mystique,' or you could be Miss Take, which would--"
+
+"I can see we're going to get on like a house on fire," said Miss Tick.
+"There may be no survivors."
+
+(1) Tiffany had read lots of words in the dictionary that she'd never heard
+spoken, so she had to guess at how they were pronounced.
+
+  [The Wee Free Men, by Terry Pratchett]
+%e passage
+# pp. 64-65
+%passage 4
+There was a lot of mist around, but a few stars were visible overhead and
+there was a gibbous moon in the sky.  Tiffany knew it was gibbous because
+she'd read in the Almanack that /gibbous/ means what the moon looked like
+when it was just a bit fatter than half full, and so she made a point of
+paying attention to it around those times just so that she could say to
+herself, "Ah, I see the moon's very gibbous tonight."
+
+It's possible that this tells you more about Tiffany than she would want
+you to know.
+
+  [The Wee Free Men, by Terry Pratchett]
+%e passage
+# p. 159 (bigjob: pictsie term for human; 'heid', 'dinna', 'canna', 'noo',
+#         'aroound', and 'Tiffan' are accurate)
+%passage 5
+"[...]  Ye have the First Sight and the Second Thoughts, just like yer
+Granny.  That's rare in a bigjob."
+
+"Don't you mean Second Sight?" Tiffany asked.  "Like people who can see
+ghosts and stuff?"
+
+"Ach, no.  That's typical bigjob thinking.  /First Sight/ is when you can
+see what's really there, not what your heid tells you /ought/ to be there.
+Ye saw Jenny, ye saw the horseman, ye saw them as real thingies.  Second
+sight is dull sight, it's seeing only what you expect to see.  Most bigjobs
+ha' that.  Listen to me, because I'm fadin' noo and there's a lot you dinna
+ken.  Ye think this is the whole world?  That is a good thought for sheep
+and mortals who dinna open their eyes.  Because in truth there are more
+worlds than stars in the sky.  Understand?  They are everywhere, big and
+small, close as your skin.  They are /everywhere/.  Some ye can see an'
+some ye canna, but there are doors, Tiffan.  They might be a hill or a
+tree or a stone or a turn in the road, or they might e'en be a thought in
+yer heid, but they are there, all aroound ye.  You'll have to learn to see
+'em, because you walk among them and dinna know it.  And some of them...
+is poisonous."
+
+  [The Wee Free Men, by Terry Pratchett]
+%e passage
+# p. 193 (source text is all italics here; passage continues with the speakers
+#         getting in synch and shouting the cry from passage 1)
+%passage 6
+"They can tak' oour lives but they canna tak' oour troousers!"
+
+"Ye'll tak' the high road an' I'll tak' yer wallet!"
+
+"There can only be one t'ousand!"
+
+"Ach, stick it up yer trakkans!"
+
+  [The Wee Free Men, by Terry Pratchett]
+%e passage
+# p. 227 (also all italics; end of a reminiscence of Granny Aching by Tiffany)
+%passage 7
+"Them as can do has to do for them as can't.  And someone has to speak up
+for them as has no voices."
+
+  [The Wee Free Men, by Terry Pratchett]
+%e passage
+# p. 287 (like passage 6, this ties back to passage 1; the cry there is
+#         one of the things Tiffany hears)
+%passage 8
+Tiffany might have been the only person, in all the worlds that there are,
+to be happy to hear the sound of the Nac Mac Feegle.
+
+They poured out of the smashed nut.  Some were still wearing bow ties.
+Some were back in their kilts.  But they were all in a fighting mood and,
+to save time, were fighting with one another to get up to speed.
+
+  [The Wee Free Men, by Terry Pratchett]
+%e passage
+# pp. 313-314 (passage starts mid-paragraph; 'mebbe' and 'oour' are accurate)
+%passage 9
+"[...]  Can you bring Wentworth?"
+
+"Aye."
+
+"And you won't get lost or--or drunk or anything?"
+
+Rob Anybody looked offended.  "We ne'er get lost!" he said.  "We always ken
+where we are!  It's just sometimes mebbe we aren't sure where everything
+else is, but it's no' our fault if /everything else/ gets lost!  The Nac
+Mac Feegle never get lost!"
+
+"What about drunk?" said Tiffany, dragging Roland toward the lighthouse.
+
+"We've ne'er been lost in oour lives!  Is that no' the case, lads?" said
+Rob Anybody.  There was a murmur of resentful agreement.  "The words /lost/
+and /Nac Mac Feegle/ shouldna turn up in the same sentence!"
+
+"And drunk?" said Tiffany again, laying Roland down on the beach.
+
+"Gettin' lost is something that happens to other people!" declared Rob
+Anybody.  "I want to make that point perfectly clear!"
 
   [The Wee Free Men, by Terry Pratchett]
 %e passage
