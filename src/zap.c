@@ -3765,6 +3765,8 @@ const char *fltxt;
             if (otmp->owornmask) {
                 /* in case monster's life gets saved */
                 mon->misc_worn_check &= ~otmp->owornmask;
+                if (otmp->owornmask & W_WEP)
+                    setmnotwielded(mon, otmp);
                 /* also dismounts hero if this object is steed's saddle */
                 update_mon_intrinsics(mon, otmp, FALSE, TRUE);
                 otmp->owornmask = 0L;
