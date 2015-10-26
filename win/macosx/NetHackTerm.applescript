@@ -21,7 +21,7 @@ tell application "Terminal"
 	
 	activate
 	#open new window and run NetHack in it
-	do script with command "clear;sleep 1;/usr/games/bin/nethack;echo '(press RETURN to exit)';awk '{exit}';exit"
+	do script with command "clear;sleep 1;/usr/local/games/bin/nethack;echo '(press RETURN to exit)';awk '{exit}';exit"
 	set nhresult to result -- class is tab
 	set nhresrec to result as record
 	set nhreslist to result as list
