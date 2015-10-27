@@ -3069,6 +3069,7 @@ sanity_check()
     obj_sanity_check();
     timer_sanity_check();
     mon_sanity_check();
+    light_sources_sanity_check();
 }
 
 #ifdef DEBUG_MIGRATING_MONS

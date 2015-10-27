@@ -383,6 +383,31 @@ boolean write_it;
     return count;
 }
 
+void
+light_sources_sanity_check()
+{
+    light_source *ls;
+    unsigned int auint;
+
+    for (ls = light_base; ls; ls = ls->next) {
+        if (!ls->id.a_monst)
+            panic("insane light source: no id!");
+        if (ls->type == LS_OBJECT) {
+            struct obj *otmp = (struct obj *) ls->id.a_obj;
+            auint = otmp->o_id;
+            if (find_oid(auint) != otmp)
+                panic("insane light source: can't find obj #%u!", auint);
+        } else if (ls->type == LS_MONSTER) {
+            struct monst *mtmp = (struct monst *) ls->id.a_monst;
+            auint = mtmp->m_id;
+            if (find_mid(auint, FM_EVERYWHERE) != mtmp)
+                panic("insane light source: can't find mon #%u!", auint);
+        } else {
+            panic("insane light source: bad ls type %d", ls->type);
+        }
+    }
+}
+
 /* Write a light source structure to disk. */
 STATIC_OVL void
 write_ls(fd, ls)
