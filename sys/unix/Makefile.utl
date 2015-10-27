@@ -93,7 +93,7 @@ NHSROOT=..
 # CFLAGS = -g -I../include
 
 #CFLAGS = -O -I../include
-LFLAGS =
+#LFLAGS =
 
 LIBS =
  
