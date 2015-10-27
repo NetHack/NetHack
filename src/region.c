@@ -1,4 +1,4 @@
-/* NetHack 3.6	region.c	$NHDT-Date: 1432512774 2015/05/25 00:12:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.33 $ */
+/* NetHack 3.6	region.c	$NHDT-Date: 1445906843 2015/10/27 00:47:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.35 $ */
 /* Copyright (c) 1996 by Jean-Christophe Collet	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -831,8 +831,8 @@ genericptr_t p2;
     if (p2 == (genericptr_t)0) {		/* That means the player */
 	if (!Blind)
 		You("bump into %s. Ouch!",
-		    Hallucination ? "an invisible tree" :
-			"some kind of invisible wall");
+		    Hallucination ? "an invisible tree"
+                                  : "some kind of invisible wall");
 	else
 	    pline("Ouch!");
     } else {

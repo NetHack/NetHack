@@ -1,4 +1,4 @@
-/* NetHack 3.6	steal.c	$NHDT-Date: 1437877184 2015/07/26 02:19:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.62 $ */
+/* NetHack 3.6	steal.c	$NHDT-Date: 1445906866 2015/10/27 00:47:46 $  $NHDT-Branch: master $:$NHDT-Revision: 1.64 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -253,7 +253,7 @@ char *objnambuf;
         *objnambuf = '\0';
     /* the following is true if successful on first of two attacks. */
     if (!monnear(mtmp, u.ux, u.uy))
-        return (0);
+        return 0;
 
     /* food being eaten might already be used up but will not have
        been removed from inventory yet; we don't want to steal that,
@@ -269,7 +269,7 @@ char *objnambuf;
         else
             pline("%s tries to rob you, but there is nothing to steal!",
                   Monnam(mtmp));
-        return (1); /* let her flee */
+        return 1; /* let her flee */
     }
 
     monkey_business = is_animal(mtmp->data);
@@ -301,7 +301,7 @@ retry:
         }
     if (!otmp) {
         impossible("Steal fails!");
-        return (0);
+        return 0;
     }
     /* can't steal ring(s) while wearing gloves */
     if ((otmp == uleft || otmp == uright) && uarmg)
@@ -320,7 +320,7 @@ retry:
 
 gotobj:
     if (otmp->o_id == stealoid)
-        return (0);
+        return 0;
 
     if (otmp->otyp == BOULDER && !throws_rocks(mtmp->data)) {
         if (!retrycnt++)
@@ -337,10 +337,10 @@ gotobj:
         else if (otmp == uquiver || (otmp == uswapwep && !u.twoweap))
             ostuck = FALSE; /* not really worn; curse doesn't matter */
         else
-            ostuck = ((otmp->cursed && otmp->owornmask) ||
+            ostuck = ((otmp->cursed && otmp->owornmask)
                       /* nymphs can steal rings from under
                          cursed weapon but animals can't */
-                      (otmp == uright && welded(uwep))
+                      || (otmp == uright && welded(uwep))
                       || (otmp == uleft && welded(uwep) && bimanual(uwep)));
 
         if (ostuck || can_carry(mtmp, otmp) == 0) {
@@ -433,7 +433,7 @@ gotobj:
                     stealoid = otmp->o_id;
                     stealmid = mtmp->m_id;
                     afternmv = stealarm;
-                    return (0);
+                    return 0;
                 }
             }
             break;
@@ -463,7 +463,7 @@ gotobj:
         minstapetrify(mtmp, TRUE);
         return -1;
     }
-    return ((multi < 0) ? 0 : 1);
+    return (multi < 0) ? 0 : 1;
 }
 
 /* Returns 1 if otmp is free'd, 0 otherwise. */
@@ -617,11 +617,10 @@ boolean verbosely;
             /* don't charge for an owned saddle on dead steed (provided
                that the hero is within the same shop at the time) */
         } else if (mon->mtame && (obj->owornmask & W_SADDLE) && !obj->unpaid
-                   && costly_spot(omx, omy) &&
-                   /* being at a costly_spot guarantees lev->roomno is not 0
-                      */
-                   index(in_rooms(u.ux, u.uy, SHOPBASE),
-                         levl[omx][omy].roomno)) {
+                   && costly_spot(omx, omy)
+                   /* being at costly_spot guarantees lev->roomno is not 0 */
+                   && index(in_rooms(u.ux, u.uy, SHOPBASE),
+                            levl[omx][omy].roomno)) {
             obj->no_charge = 1;
         }
         /* this should be done even if the monster has died */

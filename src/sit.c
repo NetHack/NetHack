@@ -1,15 +1,18 @@
-/* NetHack 3.6	sit.c	$NHDT-Date: 1436753523 2015/07/13 02:12:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.50 $ */
+/* NetHack 3.6	sit.c	$NHDT-Date: 1445906863 2015/10/27 00:47:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.51 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 #include "artifact.h"
 
+
+/* take away the hero's money */
 void
 take_gold()
 {
     struct obj *otmp, *nobj;
     int lost_money = 0;
+
     for (otmp = invent; otmp; otmp = nobj) {
         nobj = otmp->nobj;
         if (otmp->oclass == COIN_CLASS) {
@@ -26,6 +29,7 @@ take_gold()
     }
 }
 
+/* #sit command */
 int
 dosit()
 {
@@ -35,7 +39,7 @@ dosit()
 
     if (u.usteed) {
         You("are already sitting on %s.", mon_nam(u.usteed));
-        return (0);
+        return 0;
     }
     if (u.uundetected && is_hider(youmonst.data) && u.umonnum != PM_TRAPPER)
         u.uundetected = 0; /* no longer on the ceiling */
@@ -60,9 +64,9 @@ dosit()
         goto in_water;
     }
 
-    if (OBJ_AT(u.ux, u.uy) &&
+    if (OBJ_AT(u.ux, u.uy)
         /* ensure we're not standing on the precipice */
-        !uteetering_at_seen_pit(trap)) {
+        && !uteetering_at_seen_pit(trap)) {
         register struct obj *obj;
 
         obj = level.objects[u.ux][u.uy];
@@ -306,10 +310,12 @@ dosit()
     } else {
         pline("Having fun sitting on the %s?", surface(u.ux, u.uy));
     }
-    return (1);
+    return 1;
 }
 
-void rndcurse() /* curse a few inventory items at random! */
+/* curse a few inventory items at random! */
+void
+rndcurse()
 {
     int nobj = 0;
     int cnt, onum;
@@ -377,7 +383,9 @@ void rndcurse() /* curse a few inventory items at random! */
     }
 }
 
-void attrcurse() /* remove a random INTRINSIC ability */
+/* remove a random INTRINSIC ability */
+void
+attrcurse()
 {
     switch (rnd(11)) {
     case 1:
@@ -438,6 +446,7 @@ void attrcurse() /* remove a random INTRINSIC ability */
             break;
         }
     case 10:
+        /* intrinsic protection is just disabled, not set back to 0 */
         if (HProtection & INTRINSIC) {
             HProtection &= ~INTRINSIC;
             You_feel("vulnerable.");

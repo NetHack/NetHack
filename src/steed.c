@@ -1,4 +1,4 @@
-/* NetHack 3.6	steed.c	$NHDT-Date: 1432512766 2015/05/25 00:12:46 $  $NHDT-Branch: master $:$NHDT-Revision: 1.45 $ */
+/* NetHack 3.6	steed.c	$NHDT-Date: 1445906867 2015/10/27 00:47:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.47 $ */
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -676,9 +676,9 @@ place_monster(mon, x, y)
 struct monst *mon;
 int x, y;
 {
-    if (mon == u.usteed ||
+    if (mon == u.usteed
         /* special case is for convoluted vault guard handling */
-        (DEADMONSTER(mon) && !(mon->isgd && x == 0 && y == 0))) {
+        || (DEADMONSTER(mon) && !(mon->isgd && x == 0 && y == 0))) {
         impossible("placing %s onto map?",
                    (mon == u.usteed) ? "steed" : "defunct monster");
         return;

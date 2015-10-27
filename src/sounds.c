@@ -1,4 +1,4 @@
-/* NetHack 3.6	sounds.c	$NHDT-Date: 1436753524 2015/07/13 02:12:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.69 $ */
+/* NetHack 3.6	sounds.c	$NHDT-Date: 1445906863 2015/10/27 00:47:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.72 $ */
 /*	Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -180,14 +180,14 @@ dosounds()
         for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
             if (DEADMONSTER(mtmp))
                 continue;
-            if (is_mercenary(mtmp->data) &&
+            if (is_mercenary(mtmp->data)
 #if 0 /* don't bother excluding these */
-		!strstri(mtmp->data->mname, "watch") &&
-		!strstri(mtmp->data->mname, "guard") &&
+		&& !strstri(mtmp->data->mname, "watch")
+		&& !strstri(mtmp->data->mname, "guard")
 #endif
-                mon_in_room(mtmp, BARRACKS) &&
+                && mon_in_room(mtmp, BARRACKS)
                 /* sleeping implies not-yet-disturbed (usually) */
-                (mtmp->msleeping || ++count > 5)) {
+                && (mtmp->msleeping || ++count > 5)) {
                 You_hear1(barracks_msg[rn2(3) + hallu]);
                 return;
             }
@@ -229,11 +229,11 @@ dosounds()
         for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
             if (DEADMONSTER(mtmp))
                 continue;
-            if (mtmp->ispriest && inhistemple(mtmp) &&
+            if (mtmp->ispriest && inhistemple(mtmp)
                 /* priest must be active */
-                mtmp->mcanmove && !mtmp->msleeping &&
+                && mtmp->mcanmove && !mtmp->msleeping
                 /* hero must be outside this temple */
-                temple_occupied(u.urooms) != EPRI(mtmp)->shroom)
+                && temple_occupied(u.urooms) != EPRI(mtmp)->shroom)
                 break;
         }
         if (mtmp) {
@@ -483,7 +483,7 @@ struct monst *mon;
     /* result depends upon whether map spot shows a gecko, which will
        be due to hallucination or to mimickery since mon isn't one */
     glyph = glyph_at(mon->mx, mon->my);
-    return (boolean)(glyph_to_mon(glyph) == PM_GECKO);
+    return (boolean) (glyph_to_mon(glyph) == PM_GECKO);
 }
 
 STATIC_OVL int
@@ -499,9 +499,9 @@ register struct monst *mtmp;
 
     /* presumably nearness and sleep checks have already been made */
     if (Deaf)
-        return (0);
+        return 0;
     if (is_silent(ptr))
-        return (0);
+        return 0;
 
     /* leader might be poly'd; if he can still speak, give leader speech */
     if (mtmp->m_id == quest_status.leader_m_id && msound > MS_ANIMAL)
@@ -904,29 +904,31 @@ register struct monst *mtmp;
                    };
         verbl_msg = mtmp->mpeaceful ? soldier_pax_msg[rn2(3)]
                                     : soldier_foe_msg[rn2(3)];
-    } break;
+        break;
+    }
     case MS_RIDER:
         /* 3.6.0 tribute */
-        if (ptr == &mons[PM_DEATH] &&
-            !context.tribute.Deathnotice && u_have_novel()) {
+        if (ptr == &mons[PM_DEATH]
+            && !context.tribute.Deathnotice && u_have_novel()) {
             struct obj *book = u_have_novel();
             const char *tribtitle = (char *)0;
 
             if (book) {
                 int novelidx = book->novelidx;
+
                 tribtitle = noveltitle(&novelidx);
             }
             if (tribtitle) {
                 Sprintf(verbuf, "Ah, so you have a copy of /%s/.", tribtitle);
                 /* no Death featured in these two, so exclude them */
-                if (!(strcmpi(tribtitle, "Snuff") == 0 ||                
-                      strcmpi(tribtitle, "The Wee Free Men") == 0))
+                if (!(strcmpi(tribtitle, "Snuff") == 0
+                      || strcmpi(tribtitle, "The Wee Free Men") == 0))
                     Strcat(verbuf, " I may have been misquoted there.");
                 verbl_msg = verbuf;
                 context.tribute.Deathnotice = 1;
             }
-        } else if (ptr == &mons[PM_DEATH] &&
-                    !rn2(2) && Death_quote(verbuf, BUFSZ)) {
+        } else if (ptr == &mons[PM_DEATH]
+                   && !rn2(2) && Death_quote(verbuf, BUFSZ)) {
                 verbl_msg = verbuf;
         }
         /* end of tribute addition */
@@ -952,9 +954,10 @@ register struct monst *mtmp;
             verbalize1(verbl_msg);
         }
     }
-    return (1);
+    return 1;
 }
 
+/* #chat command */
 int
 dotalk()
 {
@@ -967,29 +970,29 @@ dotalk()
 STATIC_OVL int
 dochat()
 {
-    register struct monst *mtmp;
-    register int tx, ty;
+    struct monst *mtmp;
+    int tx, ty;
     struct obj *otmp;
 
     if (is_silent(youmonst.data)) {
         pline("As %s, you cannot speak.", an(youmonst.data->mname));
-        return (0);
+        return 0;
     }
     if (Strangled) {
         You_cant("speak.  You're choking!");
-        return (0);
+        return 0;
     }
     if (u.uswallow) {
         pline("They won't hear you out there.");
-        return (0);
+        return 0;
     }
     if (Underwater) {
         Your("speech is unintelligible underwater.");
-        return (0);
+        return 0;
     }
     if (Deaf) {
         pline("How can you hold a conversation when you cannot hear?");
-        return (0);
+        return 0;
     }
 
     if (!Blind && (otmp = shop_object(u.ux, u.uy)) != (struct obj *) 0) {
@@ -998,73 +1001,67 @@ dochat()
            a shop, but that shouldn't matter much.  shop_object() returns an
            object iff inside a shop and the shopkeeper is present and willing
            (not angry) and able (not asleep) to speak and the position
-           contains
-           any objects other than just gold.
+           contains any objects other than just gold.
         */
         price_quote(otmp);
-        return (1);
+        return 1;
     }
 
     if (!getdir("Talk to whom? (in what direction)")) {
         /* decided not to chat */
-        return (0);
+        return 0;
     }
 
     if (u.usteed && u.dz > 0) {
         if (!u.usteed->mcanmove || u.usteed->msleeping) {
             pline("%s seems not to notice you.", Monnam(u.usteed));
-            return (1);
+            return 1;
         } else
-            return (domonnoise(u.usteed));
+            return domonnoise(u.usteed);
     }
 
     if (u.dz) {
         pline("They won't hear you %s there.", u.dz < 0 ? "up" : "down");
-        return (0);
+        return 0;
     }
 
     if (u.dx == 0 && u.dy == 0) {
         /*
-         * Let's not include this.  It raises all sorts of questions: can you
-         wear
+         * Let's not include this.
+         * It raises all sorts of questions: can you wear
          * 2 helmets, 2 amulets, 3 pairs of gloves or 6 rings as a marilith,
          * etc...  --KAA
-                if (u.umonnum == PM_ETTIN) {
-                    You("discover that your other head makes boring
-         conversation.");
-                    return(1);
-                }
-        */
+        if (u.umonnum == PM_ETTIN) {
+            You("discover that your other head makes boring conversation.");
+            return 1;
+        }
+         */
         pline("Talking to yourself is a bad habit for a dungeoneer.");
-        return (0);
+        return 0;
     }
 
     tx = u.ux + u.dx;
     ty = u.uy + u.dy;
 
     if (!isok(tx, ty))
-        return (0);
+        return 0;
 
     mtmp = m_at(tx, ty);
 
-    if ((!mtmp || mtmp->mundetected) && (otmp = vobj_at(tx, ty))
-        && otmp->otyp == STATUE) {
+    if ((!mtmp || mtmp->mundetected)
+        && (otmp = vobj_at(tx, ty)) != 0 && otmp->otyp == STATUE) {
         /* Talking to a statue */
-
         if (!Blind) {
-            if (Hallucination) {
-                /* if you're hallucinating, you can't tell it's a statue */
-                pline_The("%s seems not to notice you.", rndmonnam(NULL));
-            } else {
-                pline_The("statue seems not to notice you.");
-            }
+            pline_The("%s seems not to notice you.",
+                      /* if hallucinating, you can't tell it's a statue */
+                      Hallucination ? rndmonnam((char *) 0) : "statue");
         }
-        return (0);
+        return 0;
     }
 
     if (!mtmp || mtmp->mundetected || mtmp->m_ap_type == M_AP_FURNITURE
         || mtmp->m_ap_type == M_AP_OBJECT)
-        return (0);
+        return 0;
 
     /* sleeping monsters won't talk, except priests (who wake up) */
     if ((!mtmp->mcanmove || mtmp->msleeping) && !mtmp->ispriest) {
@@ -1072,7 +1069,7 @@ dochat()
            not noticing him and just not existing, so skip the message. */
         if (canspotmon(mtmp))
             pline("%s seems not to notice you.", Monnam(mtmp));
-        return (0);
+        return 0;
     }
 
     /* if this monster is waiting for something, prod it into action */
@@ -1082,7 +1079,7 @@ dochat()
         if (!canspotmon(mtmp))
             map_invisible(mtmp->mx, mtmp->my);
         pline("%s is eating noisily.", Monnam(mtmp));
-        return (0);
+        return 0;
     }
 
     return domonnoise(mtmp);

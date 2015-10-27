@@ -1,4 +1,4 @@
-/* NetHack 3.6	spell.c	$NHDT-Date: 1444295991 2015/10/08 09:19:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.64 $ */
+/* NetHack 3.6	spell.c	$NHDT-Date: 1445906865 2015/10/27 00:47:45 $  $NHDT-Branch: master $:$NHDT-Revision: 1.66 $ */
 /*	Copyright (c) M. Stephenson 1988			  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -49,8 +49,7 @@ STATIC_DCL const char *FDECL(spelltypemnemonic, (int));
  * Reasoning:
  *   spelbase, spelheal:
  *	Arc are aware of magic through historical research
- *	Bar abhor magic (Conan finds it "interferes with his animal
- *instincts")
+ *	Bar abhor magic (Conan finds it "interferes with his animal instincts")
  *	Cav are ignorant to magic
  *	Hea are very aware of healing magic through medical research
  *	Kni are moderately aware of healing from Paladin training
@@ -343,19 +342,19 @@ learn(VOID_ARGS)
         multi_reason = "reading a book";
         nomovemsg = 0;
         context.spbook.delay = 0;
-        return (0);
+        return 0;
     }
     if (context
             .spbook.delay) { /* not if (context.spbook.delay++), so at end
                                 delay == 0 */
         context.spbook.delay++;
-        return (1); /* still busy */
+        return 1; /* still busy */
     }
     exercise(A_WIS, TRUE); /* you're studying. */
     booktype = book->otyp;
     if (booktype == SPE_BOOK_OF_THE_DEAD) {
         deadbook(book);
-        return (0);
+        return 0;
     }
 
     Sprintf(splname,
@@ -419,7 +418,7 @@ learn(VOID_ARGS)
         check_unpaid(book);
     context.spbook.book = 0;
     context.spbook.o_id = 0;
-    return (0);
+    return 0;
 }
 
 int
@@ -453,20 +452,17 @@ register struct obj *spellbook;
     }
 
     if (context.spbook.delay && !confused && spellbook == context.spbook.book
-        &&
-        /* handle the sequence: start reading, get interrupted,
-           have context.spbook.book become erased somehow, resume reading it
-           */
-        booktype != SPE_BLANK_PAPER) {
-        You("continue your efforts to %s.", (booktype == SPE_NOVEL)
-                                                ? "read the novel"
-                                                : "memorize the spell");
+        /* handle the sequence: start reading, get interrupted, have
+           context.spbook.book become erased somehow, resume reading it */
+        && booktype != SPE_BLANK_PAPER) {
+        You("continue your efforts to %s.",
+            (booktype == SPE_NOVEL) ? "read the novel" : "memorize the spell");
     } else {
         /* KMH -- Simplified this code */
         if (booktype == SPE_BLANK_PAPER) {
             pline("This spellbook is all blank.");
             makeknown(booktype);
-            return (1);
+            return 1;
         }
 
         /* 3.6.0 tribute */
@@ -483,7 +479,7 @@ register struct obj *spellbook;
                     u.uevent.read_tribute = 1; /* only once */
                 }
             }
-            return (1);
+            return 1;
         }
 
         switch (objects[booktype].oc_level) {
@@ -529,7 +525,7 @@ register struct obj *spellbook;
                             (read_ability < 12 ? "very " : ""));
                     if (yn(qbuf) != 'y') {
                         spellbook->in_use = FALSE;
-                        return (1);
+                        return 1;
                     }
                 }
                 /* its up to random luck now */
@@ -555,7 +551,7 @@ register struct obj *spellbook;
                 useup(spellbook);
             } else
                 spellbook->in_use = FALSE;
-            return (1);
+            return 1;
         } else if (confused) {
             if (!confused_book(spellbook)) {
                 spellbook->in_use = FALSE;
@@ -564,7 +560,7 @@ register struct obj *spellbook;
             multi_reason = "reading a book";
             nomovemsg = 0;
             context.spbook.delay = 0;
-            return (1);
+            return 1;
         }
         spellbook->in_use = FALSE;
 
@@ -576,7 +572,7 @@ register struct obj *spellbook;
     if (context.spbook.book)
         context.spbook.o_id = context.spbook.book->o_id;
     set_occupation(learn, "studying", 0);
-    return (1);
+    return 1;
 }
 
 /* a spellbook has been destroyed or the character has changed levels;
@@ -714,7 +710,7 @@ int
 spell_skilltype(booktype)
 int booktype;
 {
-    return (objects[booktype].oc_skill);
+    return objects[booktype].oc_skill;
 }
 
 STATIC_OVL void
@@ -849,7 +845,7 @@ boolean atme;
         Your("knowledge of this spell is twisted.");
         pline("It invokes nightmarish images in your mind...");
         spell_backfire(spell);
-        return (0);
+        return 0;
     } else if (spellknow(spell) <= KEEN / 200) { /* 100 turns left */
         You("strain to recall the spell.");
     } else if (spellknow(spell) <= KEEN / 40) { /* 500 turns left */
@@ -863,16 +859,16 @@ boolean atme;
 
     if (u.uhunger <= 10 && spellid(spell) != SPE_DETECT_FOOD) {
         You("are too hungry to cast that spell.");
-        return (0);
+        return 0;
     } else if (ACURR(A_STR) < 4 && spellid(spell) != SPE_RESTORE_ABILITY) {
         You("lack the strength to cast spells.");
-        return (0);
+        return 0;
     } else if (check_capacity("Your concentration falters while carrying so "
                               "much stuff.")) {
-        return (1);
+        return 1;
     } else if (!freehand()) {
         Your("arms are not free to cast!");
-        return (0);
+        return 0;
     }
 
     if (u.uhave.amulet) {
@@ -881,7 +877,7 @@ boolean atme;
     }
     if (energy > u.uen) {
         You("don't have enough energy to cast that spell.");
-        return (0);
+        return 0;
     } else {
         if (spellid(spell) != SPE_DETECT_FOOD) {
             int hungr = energy * 2;
@@ -938,7 +934,7 @@ boolean atme;
         You("fail to cast the spell correctly.");
         u.uen -= energy / 2;
         context.botl = 1;
-        return (1);
+        return 1;
     }
 
     u.uen -= energy;
@@ -948,10 +944,10 @@ boolean atme;
     pseudo = mksobj(spellid(spell), FALSE, FALSE);
     pseudo->blessed = pseudo->cursed = 0;
     pseudo->quan = 20L; /* do not let useup get it */
-                        /*
-                         * Find the skill the hero has in a spell type category.
-                         * See spell_skilltype for categories.
-                         */
+    /*
+     * Find the skill the hero has in a spell type category.
+     * See spell_skilltype for categories.
+     */
     skill = spell_skilltype(pseudo->otyp);
     role_skill = P_SKILL(skill);
 
@@ -978,11 +974,12 @@ boolean atme;
                             losehp(damage, buf, NO_KILLER_PREFIX);
                         }
                     } else {
-                        explode(
-                            u.dx, u.dy, pseudo->otyp - SPE_MAGIC_MISSILE + 10,
-                            spell_damage_bonus(u.ulevel / 2 + 1), 0,
-                            (pseudo->otyp == SPE_CONE_OF_COLD) ? EXPL_FROSTY
-                                                               : EXPL_FIERY);
+                        explode(u.dx, u.dy,
+                                pseudo->otyp - SPE_MAGIC_MISSILE + 10,
+                                spell_damage_bonus(u.ulevel / 2 + 1), 0,
+                                (pseudo->otyp == SPE_CONE_OF_COLD)
+                                   ? EXPL_FROSTY
+                                   : EXPL_FIERY);
                     }
                     u.dx = cc.x + rnd(3) - 2;
                     u.dy = cc.y + rnd(3) - 2;
@@ -1100,14 +1097,14 @@ boolean atme;
     default:
         impossible("Unknown spell %d attempted.", spell);
         obfree(pseudo, (struct obj *) 0);
-        return (0);
+        return 0;
     }
 
     /* gain skill for successful cast */
     use_skill(skill, spellev(spell));
 
     obfree(pseudo, (struct obj *) 0); /* now, get rid of it */
-    return (1);
+    return 1;
 }
 
 /* Choose location where spell takes effect. */

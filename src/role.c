@@ -1,4 +1,4 @@
-/* NetHack 3.6	role.c	$NHDT-Date: 1434073671 2015/06/12 01:47:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.32 $ */
+/* NetHack 3.6	role.c	$NHDT-Date: 1445906861 2015/10/27 00:47:41 $  $NHDT-Branch: master $:$NHDT-Revision: 1.33 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -809,13 +809,13 @@ boolean
 validrole(rolenum)
 int rolenum;
 {
-    return (rolenum >= 0 && rolenum < SIZE(roles) - 1);
+    return (boolean) (rolenum >= 0 && rolenum < SIZE(roles) - 1);
 }
 
 int
 randrole()
 {
-    return (rn2(SIZE(roles) - 1));
+    return rn2(SIZE(roles) - 1);
 }
 
 STATIC_OVL int
@@ -871,8 +871,9 @@ validrace(rolenum, racenum)
 int rolenum, racenum;
 {
     /* Assumes validrole */
-    return (racenum >= 0 && racenum < SIZE(races) - 1
-            && (roles[rolenum].allow & races[racenum].allow & ROLE_RACEMASK));
+    return (boolean) (racenum >= 0 && racenum < SIZE(races) - 1
+                      && (roles[rolenum].allow & races[racenum].allow
+                          & ROLE_RACEMASK));
 }
 
 int
@@ -895,11 +896,11 @@ int rolenum;
             if (n)
                 n--;
             else
-                return (i);
+                return i;
         }
 
     /* This role has no permitted races? */
-    return (rn2(SIZE(races) - 1));
+    return rn2(SIZE(races) - 1);
 }
 
 int
@@ -936,9 +937,9 @@ validgend(rolenum, racenum, gendnum)
 int rolenum, racenum, gendnum;
 {
     /* Assumes validrole and validrace */
-    return (gendnum >= 0 && gendnum < ROLE_GENDERS
-            && (roles[rolenum].allow & races[racenum].allow
-                & genders[gendnum].allow & ROLE_GENDMASK));
+    return (boolean) (gendnum >= 0 && gendnum < ROLE_GENDERS
+                      && (roles[rolenum].allow & races[racenum].allow
+                          & genders[gendnum].allow & ROLE_GENDMASK));
 }
 
 int
@@ -962,11 +963,11 @@ int rolenum, racenum;
             if (n)
                 n--;
             else
-                return (i);
+                return i;
         }
 
     /* This role/race has no permitted genders? */
-    return (rn2(ROLE_GENDERS));
+    return rn2(ROLE_GENDERS);
 }
 
 int
@@ -1002,9 +1003,9 @@ validalign(rolenum, racenum, alignnum)
 int rolenum, racenum, alignnum;
 {
     /* Assumes validrole and validrace */
-    return (alignnum >= 0 && alignnum < ROLE_ALIGNS
-            && (roles[rolenum].allow & races[racenum].allow
-                & aligns[alignnum].allow & ROLE_ALIGNMASK));
+    return (boolean) (alignnum >= 0 && alignnum < ROLE_ALIGNS
+                      && (roles[rolenum].allow & races[racenum].allow
+                          & aligns[alignnum].allow & ROLE_ALIGNMASK));
 }
 
 int
@@ -1028,11 +1029,11 @@ int rolenum, racenum;
             if (n)
                 n--;
             else
-                return (i);
+                return i;
         }
 
     /* This role/race has no permitted alignments? */
-    return (rn2(ROLE_ALIGNS));
+    return rn2(ROLE_ALIGNS);
 }
 
 int
@@ -2121,23 +2122,21 @@ struct monst *mtmp;
 {
     switch (Role_switch) {
     case PM_KNIGHT:
-        return ("Salutations"); /* Olde English */
+        return "Salutations"; /* Olde English */
     case PM_SAMURAI:
-        return (mtmp && mtmp->data == &mons[PM_SHOPKEEPER]
+        return (mtmp && mtmp->data == &mons[PM_SHOPKEEPER])
                     ? "Irasshaimase"
-                    : "Konnichi wa"); /* Japanese */
+                    : "Konnichi wa"; /* Japanese */
     case PM_TOURIST:
-        return ("Aloha"); /* Hawaiian */
+        return "Aloha"; /* Hawaiian */
     case PM_VALKYRIE:
-        return (
+        return
 #ifdef MAIL
-            mtmp && mtmp->data == &mons[PM_MAIL_DAEMON]
-                ? "Hallo"
-                :
+               (mtmp && mtmp->data == &mons[PM_MAIL_DAEMON]) ? "Hallo" :
 #endif
-                "Velkommen"); /* Norse */
+               "Velkommen"; /* Norse */
     default:
-        return ("Hello");
+        return "Hello";
     }
 }
 
@@ -2146,15 +2145,15 @@ Goodbye()
 {
     switch (Role_switch) {
     case PM_KNIGHT:
-        return ("Fare thee well"); /* Olde English */
+        return "Fare thee well"; /* Olde English */
     case PM_SAMURAI:
-        return ("Sayonara"); /* Japanese */
+        return "Sayonara"; /* Japanese */
     case PM_TOURIST:
-        return ("Aloha"); /* Hawaiian */
+        return "Aloha"; /* Hawaiian */
     case PM_VALKYRIE:
-        return ("Farvel"); /* Norse */
+        return "Farvel"; /* Norse */
     default:
-        return ("Goodbye");
+        return "Goodbye";
     }
 }
 
