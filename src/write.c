@@ -1,4 +1,4 @@
-/* NetHack 3.6	write.c	$NHDT-Date: 1442276267 2015/09/15 00:17:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
+/* NetHack 3.6	write.c	$NHDT-Date: 1446078770 2015/10/29 00:32:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.16 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -20,8 +20,7 @@ register struct obj *otmp;
     switch (otmp->otyp) {
 #ifdef MAIL
     case SCR_MAIL:
-        return (2);
-/*		break; */
+        return 2;
 #endif
     case SCR_LIGHT:
     case SCR_GOLD_DETECTION:
@@ -30,39 +29,32 @@ register struct obj *otmp;
     case SCR_AMNESIA:
     case SCR_FIRE:
     case SCR_EARTH:
-        return (8);
-    /*		break; */
+        return 8;
     case SCR_DESTROY_ARMOR:
     case SCR_CREATE_MONSTER:
     case SCR_PUNISHMENT:
-        return (10);
-    /*		break; */
+        return 10;
     case SCR_CONFUSE_MONSTER:
-        return (12);
-    /*		break; */
+        return 12;
     case SCR_IDENTIFY:
-        return (14);
-    /*		break; */
+        return 14;
     case SCR_ENCHANT_ARMOR:
     case SCR_REMOVE_CURSE:
     case SCR_ENCHANT_WEAPON:
     case SCR_CHARGING:
-        return (16);
-    /*		break; */
+        return 16;
     case SCR_SCARE_MONSTER:
     case SCR_STINKING_CLOUD:
     case SCR_TAMING:
     case SCR_TELEPORTATION:
-        return (20);
-    /*		break; */
+        return 20;
     case SCR_GENOCIDE:
-        return (30);
-    /*		break; */
+        return 30;
     case SCR_BLANK_PAPER:
     default:
         impossible("You can't write such a weird scroll!");
     }
-    return (1000);
+    return 1000;
 }
 
 /* decide whether the hero knowns a particular scroll's label;
@@ -97,6 +89,7 @@ struct obj *objlist;
 
 static NEARDATA const char write_on[] = { SCROLL_CLASS, SPBOOK_CLASS, 0 };
 
+/* write -- applying a magic marker */
 int
 dowrite(pen)
 register struct obj *pen;
@@ -127,8 +120,11 @@ register struct obj *pen;
         return 0;
     /* can't write on a novel (unless/until it's been converted into a blank
        spellbook), but we want messages saying so to avoid "spellbook" */
-    typeword = (paper->otyp == SPE_NOVEL) ? "book"
-               : (paper->oclass == SPBOOK_CLASS) ? "spellbook" : "scroll";
+    typeword = (paper->otyp == SPE_NOVEL)
+                  ? "book"
+                  : (paper->oclass == SPBOOK_CLASS)
+                     ? "spellbook"
+                     : "scroll";
     if (Blind) {
         if (!paper->dknown) {
             You("don't know if that %s is blank or not.", typeword);
@@ -185,16 +181,18 @@ register struct obj *pen;
            entry, so we don't simply use first match with it;
            also, player might assign same name multiple times
            and if so, we choose one of those matches randomly */
-        if (objects[i].oc_uname && !strcmpi(objects[i].oc_uname, nm) &&
-            /* first match: chance incremented to 1,
-                 !rn2(1) is 1, we remember i;
-               second match: chance incremented to 2,
-                 !rn2(2) has 1/2 chance to replace i;
-               third match: chance incremented to 3,
-                 !rn2(3) has 1/3 chance to replace i
-                 and 2/3 chance to keep previous 50:50
-                 choice; so on for higher match counts */
-            !rn2(++deferralchance))
+        if (objects[i].oc_uname && !strcmpi(objects[i].oc_uname, nm)
+            /*
+             * First match: chance incremented to 1,
+             *   !rn2(1) is 1, we remember i;
+             * second match: chance incremented to 2,
+             *   !rn2(2) has 1/2 chance to replace i;
+             * third match: chance incremented to 3,
+             *   !rn2(3) has 1/3 chance to replace i
+             *   and 2/3 chance to keep previous 50:50
+             *   choice; so on for higher match counts.
+             */
+            && !rn2(++deferralchance))
             deferred = i;
     }
     /* writing by user-assigned name is same as by description:
@@ -238,7 +236,7 @@ found:
     if (pen->spe < basecost / 2) {
         Your("marker is too dry to write that!");
         obfree(new_obj, (struct obj *) 0);
-        return (1);
+        return 1;
     }
 
     /* we're really going to write now, so calculate cost
@@ -259,7 +257,7 @@ found:
             useup(paper);
         }
         obfree(new_obj, (struct obj *) 0);
-        return (1);
+        return 1;
     }
     pen->spe -= actualcost;
 
@@ -287,11 +285,11 @@ found:
      */
 
     /* if known, then either by-name or by-descr works */
-    if (!objects[new_obj->otyp].oc_name_known &&
+    if (!objects[new_obj->otyp].oc_name_known
         /* else if named, then only by-descr works */
-        !(by_descr && label_known(new_obj->otyp, invent)) &&
+        && !(by_descr && label_known(new_obj->otyp, invent))
         /* and Luck might override after both checks have failed */
-        rnl(Role_if(PM_WIZARD) ? 5 : 15)) {
+        && rnl(Role_if(PM_WIZARD) ? 5 : 15)) {
         You("%s to write that.", by_descr ? "fail" : "don't know how");
         /* scrolls disappear, spellbooks don't */
         if (paper->oclass == SPBOOK_CLASS) {
@@ -308,7 +306,7 @@ found:
             useup(paper);
         }
         obfree(new_obj, (struct obj *) 0);
-        return (1);
+        return 1;
     }
     /* can write scrolls when blind, but requires luck too;
        attempts to write books when blind are caught above */
@@ -342,7 +340,7 @@ found:
     new_obj =
         hold_another_object(new_obj, "Oops!  %s out of your grasp!",
                             The(aobjnam(new_obj, "slip")), (const char *) 0);
-    return (1);
+    return 1;
 }
 
 /* most book descriptions refer to cover appearance, so we can issue a
@@ -364,8 +362,8 @@ char *outbuf;
         "vellum",
         "cloth",
 #if 0
-	"canvas", "hardcover",	/* not used */
-	"papyrus",  /* not applicable--can't be produced via writing */
+        "canvas", "hardcover", /* not used */
+        "papyrus", /* not applicable--can't be produced via writing */
 #endif /*0*/
         0
     };

@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1431998738 2015/05/19 01:25:38 $  $NHDT-Branch: master $:$NHDT-Revision: 1.223 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1446078771 2015/10/29 00:32:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.230 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -110,16 +110,14 @@ struct obj *obj;
        so that casting a spell won't re-discover its forgotten book. */
     if (obj->oclass != SPBOOK_CLASS) {
         /* if type already discovered, treat this item has having been seen
-           even if the hero is currently blinded (skips redundant makeknown)
-           */
+           even if hero is currently blinded (skips redundant makeknown) */
         if (objects[obj->otyp].oc_name_known) {
             obj->dknown = 1; /* will usually be set already */
-            /* otherwise discover it if this item itself has been or can be
-             * seen */
+
+        /* otherwise discover it if item itself has been or can be seen */
         } else {
             /* in case it was picked up while blind and then zapped without
-               examining inventory after regaining sight (bypassing xname())
-               */
+               examining inventory after regaining sight (bypassing xname) */
             if (!Blind)
                 obj->dknown = 1;
             /* make the discovery iff we know what we're manipulating */
@@ -600,10 +598,10 @@ coord *cc;
  * get_container_location() returns the following information
  * about the outermost container:
  * loc argument gets set to:
- *	OBJ_INVENT	if in hero's inventory; return 0.
- *	OBJ_FLOOR	if on the floor; return 0.
- *	OBJ_BURIED	if buried; return 0.
- *	OBJ_MINVENT	if in monster's inventory; return monster.
+ *      OBJ_INVENT      if in hero's inventory; return 0.
+ *      OBJ_FLOOR       if on the floor; return 0.
+ *      OBJ_BURIED      if buried; return 0.
+ *      OBJ_MINVENT     if in monster's inventory; return monster.
  * container_nesting is updated with the nesting depth of the containers
  * if applicable.
  */
@@ -1002,13 +1000,14 @@ register struct obj *obj;
     boolean u_ring;
 
     /* Is this a charged/enchanted object? */
-    if (!obj || (!objects[obj->otyp].oc_charged && obj->oclass != WEAPON_CLASS
-                 && obj->oclass != ARMOR_CLASS && !is_weptool(obj))
+    if (!obj
+        || (!objects[obj->otyp].oc_charged && obj->oclass != WEAPON_CLASS
+            && obj->oclass != ARMOR_CLASS && !is_weptool(obj))
         || obj->spe <= 0)
-        return (FALSE);
+        return FALSE;
     if (defends(AD_DRLI, obj) || defends_when_carried(AD_DRLI, obj)
         || obj_resists(obj, 10, 90))
-        return (FALSE);
+        return FALSE;
 
     /* Charge for the cost of the object */
     costly_alteration(obj, COST_DRAIN);
@@ -1062,7 +1061,7 @@ register struct obj *obj;
     }
     if (carried(obj))
         update_inventory();
-    return (TRUE);
+    return TRUE;
 }
 
 boolean
@@ -1070,7 +1069,8 @@ obj_resists(obj, ochance, achance)
 struct obj *obj;
 int ochance, achance; /* percent chance for ordinary objects, artifacts */
 {
-    if (obj->otyp == AMULET_OF_YENDOR || obj->otyp == SPE_BOOK_OF_THE_DEAD
+    if (obj->otyp == AMULET_OF_YENDOR
+        || obj->otyp == SPE_BOOK_OF_THE_DEAD
         || obj->otyp == CANDELABRUM_OF_INVOCATION
         || obj->otyp == BELL_OF_OPENING
         || (obj->otyp == CORPSE && is_rider(&mons[obj->corpsenm]))) {
@@ -1078,7 +1078,7 @@ int ochance, achance; /* percent chance for ordinary objects, artifacts */
     } else {
         int chance = rn2(100);
 
-        return ((boolean)(chance < (obj->oartifact ? achance : ochance)));
+        return (boolean) (chance < (obj->oartifact ? achance : ochance));
     }
 }
 
@@ -1104,7 +1104,7 @@ struct obj *obj;
     if (obj->quan > 4L)
         zap_odds /= 2;
 
-    return ((boolean)(!rn2(zap_odds)));
+    return (boolean) !rn2(zap_odds);
 }
 
 /* Use up at least minwt number of things made of material mat.
@@ -1723,16 +1723,16 @@ struct obj *obj, *otmp;
          *             monster's inventory. They are not polymorphed
          *             either.
          * UNDEAD_TURNING - When an undead creature gets killed via
-         *	       undead turning, prevent its corpse from being
-         *	       immediately revived by the same effect.
+         *             undead turning, prevent its corpse from being
+         *             immediately revived by the same effect.
          * STONE_TO_FLESH - If a statue can't be revived, its
-         *	       contents get dropped before turning it into
-         *	       meat; prevent those contents from being hit.
+         *             contents get dropped before turning it into
+         *             meat; prevent those contents from being hit.
          * retouch_equipment() - bypass flag is used to track which
-         *	       items have been handled (bhito isn't involved).
+         *             items have been handled (bhito isn't involved).
          * menu_drop(), askchain() - inventory traversal where multiple
-         *	       Drop can alter the invent chain while traversal
-         *	       is in progress (bhito isn't involved).
+         *             Drop can alter the invent chain while traversal
+         *             is in progress (bhito isn't involved).
          *
          * The bypass bit on all objects is reset each turn, whenever
          * context.bypasses is set.
@@ -1969,7 +1969,7 @@ schar zz;
 
 /*
  * zappable - returns 1 if zap is available, 0 otherwise.
- *	      it removes a charge from the wand if zappable.
+ *            it removes a charge from the wand if zappable.
  * added by GAN 11/03/86
  */
 int
@@ -2054,6 +2054,7 @@ struct obj *otmp;
 
 static NEARDATA const char zap_syms[] = { WAND_CLASS, 0 };
 
+/* 'z' command (or 'y' if numbed_pad==-1) */
 int
 dozap()
 {
@@ -2061,10 +2062,10 @@ dozap()
     int damage;
 
     if (check_capacity((char *) 0))
-        return (0);
+        return 0;
     obj = getobj(zap_syms, "zap");
     if (!obj)
-        return (0);
+        return 0;
 
     check_unpaid(obj);
 
@@ -2074,7 +2075,7 @@ dozap()
     else if (obj->cursed && !rn2(WAND_BACKFIRE_CHANCE)) {
         backfire(obj); /* the wand blows up in your face! */
         exercise(A_STR, FALSE);
-        return (1);
+        return 1;
     } else if (!(objects[obj->otyp].oc_dir == NODIR) && !getdir((char *) 0)) {
         if (!Blind)
             pline("%s glows and fades.", The(xname(obj)));
@@ -2087,7 +2088,7 @@ dozap()
             losehp(Maybe_Half_Phys(damage), buf, NO_KILLER_PREFIX);
         }
     } else {
-        /*	Are we having fun yet?
+        /*      Are we having fun yet?
          * weffects -> buzz(obj->otyp) -> zhitm (temple priest) ->
          * attack -> hitum -> known_hitum -> ghod_hitsu ->
          * buzz(AD_ELEC) -> destroy_item(WAND_CLASS) ->
@@ -2103,7 +2104,7 @@ dozap()
         useup(obj);
     }
     update_inventory(); /* maybe used a charge */
-    return (1);
+    return 1;
 }
 
 int
@@ -2409,7 +2410,7 @@ boolean ordinary;
        that the wand itself has been seen */
     if (learn_it)
         learnwand(obj);
-    return (damage);
+    return damage;
 }
 
 /* called when poly'd hero uses breath attack against self */
@@ -2938,7 +2939,7 @@ int skill;
 
 const char *
 exclam(force)
-register int force;
+int force;
 {
     /* force == 0 occurs e.g. with sleep ray */
     /* note that large force is usual with wands so that !! would
@@ -2948,16 +2949,16 @@ register int force;
 
 void
 hit(str, mtmp, force)
-register const char *str;
-register struct monst *mtmp;
-register const char *force; /* usually either "." or "!" */
+const char *str;
+struct monst *mtmp;
+const char *force; /* usually either "." or "!" */
 {
     if ((!cansee(bhitpos.x, bhitpos.y) && !canspotmon(mtmp)
          && !(u.uswallow && mtmp == u.ustuck)) || !flags.verbose)
         pline("%s %s it.", The(str), vtense(str, "hit"));
     else
-        pline("%s %s %s%s", The(str), vtense(str, "hit"), mon_nam(mtmp),
-              force);
+        pline("%s %s %s%s", The(str), vtense(str, "hit"),
+              mon_nam(mtmp), force);
 }
 
 void
@@ -2985,13 +2986,12 @@ int range, *skipstart, *skipend;
 
 /*
  *  Called for the following distance effects:
- *	when a weapon is thrown (weapon == THROWN_WEAPON)
- *	when an object is kicked (KICKED_WEAPON)
- *	when an IMMEDIATE wand is zapped (ZAPPED_WAND)
- *	when a light beam is flashed (FLASHED_LIGHT)
- *	when a mirror is applied (INVIS_BEAM)
- *  A thrown/kicked object falls down at the end of its range or when a
- *monster
+ *      when a weapon is thrown (weapon == THROWN_WEAPON)
+ *      when an object is kicked (KICKED_WEAPON)
+ *      when an IMMEDIATE wand is zapped (ZAPPED_WAND)
+ *      when a light beam is flashed (FLASHED_LIGHT)
+ *      when a mirror is applied (INVIS_BEAM)
+ *  A thrown/kicked object falls down at end of its range or when a monster
  *  is hit.  The variable 'bhitpos' is set to the final position of the weapon
  *  thrown/zapped.  The ray of a wand may affect (by calling a provided
  *  function) several objects and monsters on its path.  The return value
@@ -3058,7 +3058,7 @@ struct obj **pobj; /* object tossed/used, set to NULL
         if (is_pick(obj) && inside_shop(x, y)
             && (mtmp = shkcatch(obj, x, y))) {
             tmp_at(DISP_END, 0);
-            return (mtmp);
+            return mtmp;
         }
 
         typ = levl[bhitpos.x][bhitpos.y].typ;
@@ -3323,7 +3323,7 @@ int dx, dy;
             mtmp = m_at(bhitpos.x, bhitpos.y);
             m_respond(mtmp);
             tmp_at(DISP_END, 0);
-            return (mtmp);
+            return mtmp;
         }
         if (!ZAP_POS(levl[bhitpos.x][bhitpos.y].typ)
             || closed_door(bhitpos.x, bhitpos.y)) {
@@ -3341,7 +3341,7 @@ int dx, dy;
             } else { /* we catch it */
                 tmp_at(DISP_END, 0);
                 You("skillfully catch the boomerang.");
-                return (&youmonst);
+                return &youmonst;
             }
         }
         tmp_at(bhitpos.x, bhitpos.y);
@@ -3360,8 +3360,9 @@ int dx, dy;
     return (struct monst *) 0;
 }
 
-/* used by buzz(); also used by munslime(muse.c) */
-int zhitm(mon, type, nd, ootmp) /* returns damage to mon */
+/* used by buzz(); also used by munslime(muse.c); returns damage to mon */
+int
+zhitm(mon, type, nd, ootmp)
 register struct monst *mon;
 register int type, nd;
 struct obj **ootmp; /* to return worn armor for caller to disintegrate */
@@ -3519,7 +3520,7 @@ struct obj **ootmp; /* to return worn armor for caller to disintegrate */
     debugpline3("zapped monster hp = %d (= %d - %d)", mon->mhp - tmp,
                 mon->mhp, tmp);
     mon->mhp -= tmp;
-    return (tmp);
+    return tmp;
 }
 
 STATIC_OVL void
@@ -3736,7 +3737,7 @@ int type; /* either hero cast spell type or 0 */
     /* very high armor protection does not achieve invulnerability */
     ac = AC_VALUE(ac);
 
-    return (3 - chance) < ac + spell_bonus;
+    return (3 - chance < ac + spell_bonus);
 }
 
 STATIC_OVL void
@@ -4023,17 +4024,17 @@ register int dx, dy;
         explode(sx, sy, type, d(12, 6), 0, EXPL_FIERY);
  get_out_buzz:
     if (shopdamage)
-        pay_for_damage(
-            abstype == ZT_FIRE
-                ? "burn away"
-                : abstype == ZT_COLD
-                      ? "shatter"
-                      :
-                      /* "damage" indicates wall rather than door */
-                      abstype == ZT_ACID ? "damage" : abstype == ZT_DEATH
-                                                          ? "disintegrate"
-                                                          : "destroy",
-            FALSE);
+        pay_for_damage(abstype == ZT_FIRE
+                          ? "burn away"
+                          : abstype == ZT_COLD
+                             ? "shatter"
+                             /* "damage" indicates wall rather than door */
+                             : abstype == ZT_ACID
+                             ? "damage"
+                                : abstype == ZT_DEATH
+                                   ? "disintegrate"
+                                   : "destroy",
+                       FALSE);
     bhitpos = save_bhitpos;
 }
 
@@ -4426,7 +4427,9 @@ short exploding_wand_typ;
     return rangemod;
 }
 
-void fracture_rock(obj)   /* fractured by pick-axe or wand of striking */
+/* fractured by pick-axe or wand of striking */
+void
+fracture_rock(obj)
 register struct obj *obj; /* no texts here! */
 {
     xchar x, y;
@@ -4494,13 +4497,13 @@ register struct obj *obj;
 
 /*
  * destroy_strings[dindx][0:singular,1:plural,2:killer_reason]
- *	[0] freezing potion
- *	[1] boiling potion other than oil
- *	[2] boiling potion of oil
- *	[3] burning scroll
- *	[4] burning spellbook
- *	[5] shocked ring
- *	[6] shocked wand
+ *      [0] freezing potion
+ *      [1] boiling potion other than oil
+ *      [2] boiling potion of oil
+ *      [3] burning scroll
+ *      [4] burning spellbook
+ *      [5] shocked ring
+ *      [6] shocked wand
  * (books, rings, and wands don't stack so don't need plural form;
  *  crumbling ring doesn't do damage so doesn't need killer reason)
  */
@@ -4606,7 +4609,7 @@ register int osym, dmgtyp;
                     break;
                 }
 #if 0
-                        if (obj == current_wand) { skip++; break; }
+                if (obj == current_wand) {  skip++;  break;  }
 #endif
                 dindx = 6;
                 dmg = rnd(10);
@@ -4781,7 +4784,7 @@ int osym, dmgtyp;
                 m_useup(mtmp, obj);
         }
     }
-    return (tmp);
+    return tmp;
 }
 
 int
@@ -4842,7 +4845,7 @@ int damage, tell;
                 killed(mtmp);
         }
     }
-    return (resisted);
+    return resisted;
 }
 
 #define MAXWISHTRY 5
@@ -4851,38 +4854,33 @@ STATIC_OVL void
 wishcmdassist(triesleft)
 int triesleft;
 {
-    static NEARDATA const char *wishinfo[] =
-        {
-          "Wish details:", "", "Enter the name of an object, such as "
-                               "\"potion of monster detection\",",
-          "\"scroll labeled README\", \"elven mithril-coat\", or "
-          "\"Grimtooth\"",
-          "(without the quotes).", "", "For object types which come in "
-                                       "stacks, you may specify a plural "
-                                       "name",
-          "such as \"potions of healing\", or specify a count, such as "
-          "\"1000 gold",
-          "pieces\", although that aspect of your wish might not be granted.",
-          "",
-          "You may also specify various prefix values which might be used to",
-          "modify the item, such as \"uncursed\" or \"rustproof\" or \"+1\".",
-          "Most modifiers shown when viewing your inventory can be "
-          "specified.",
-          "", "You may specify 'nothing' to explicitly decline this wish.", 0,
-        },
-                               preserve_wishless[] = "Doing so will preserve "
-                                                     "'wishless' conduct.",
-                               retry_info[] = "If you specify an "
-                                              "unrecognized object name %s%s "
-                                              "time%s,",
-                               retry_too[] =
-                                   "a randomly chosen item will be granted.",
-                               suppress_cmdassist[] =
-                                   "(Suppress this assistance with "
-                                   "!cmdassist in your config file.)",
-                               *cardinals[] = { "zero",  "one",  "two",
-                                                "three", "four", "five" },
-                               too_many[] = "too many";
+    static NEARDATA const char *
+        wishinfo[] = {
+  "Wish details:",
+  "",
+  "Enter the name of an object, such as \"potion of monster detection\",",
+  "\"scroll labeled README\", \"elven mithril-coat\", or \"Grimtooth\"",
+  "(without the quotes).",
+  "",
+  "For object types which come in stacks, you may specify a plural name",
+  "such as \"potions of healing\", or specify a count, such as \"1000 gold",
+  "pieces\", although that aspect of your wish might not be granted.",
+  "",
+  "You may also specify various prefix values which might be used to",
+  "modify the item, such as \"uncursed\" or \"rustproof\" or \"+1\".",
+  "Most modifiers shown when viewing your inventory can be specified.",
+  "",
+  "You may specify 'nothing' to explicitly decline this wish.",
+  0,
+    },
+        preserve_wishless[] = "Doing so will preserve 'wishless' conduct.",
+        retry_info[] =
+                    "If you specify an unrecognized object name %s%s time%s,",
+        retry_too[] = "a randomly chosen item will be granted.",
+        suppress_cmdassist[] =
+            "(Suppress this assistance with !cmdassist in your config file.)",
+        *cardinals[] = { "zero",  "one",  "two", "three", "four", "five" },
+        too_many[] = "too many";
     int i;
     winid win;
     char buf[BUFSZ];
@@ -4895,10 +4893,12 @@ int triesleft;
     if (!u.uconduct.wishes)
         putstr(win, 0, preserve_wishless);
     putstr(win, 0, "");
-    Sprintf(buf, retry_info, (triesleft >= 0 && triesleft < SIZE(cardinals))
-                                 ? cardinals[triesleft]
-                                 : too_many,
-            (triesleft < MAXWISHTRY) ? " more" : "", plur(triesleft));
+    Sprintf(buf, retry_info,
+            (triesleft >= 0 && triesleft < SIZE(cardinals))
+               ? cardinals[triesleft]
+               : too_many,
+            (triesleft < MAXWISHTRY) ? " more" : "",
+            plur(triesleft));
     putstr(win, 0, buf);
     putstr(win, 0, retry_too);
     putstr(win, 0, "");

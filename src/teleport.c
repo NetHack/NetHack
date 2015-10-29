@@ -1,4 +1,4 @@
-/* NetHack 3.6	teleport.c	$NHDT-Date: 1433014241 2015/05/30 19:30:41 $  $NHDT-Branch: master $:$NHDT-Revision: 1.59 $ */
+/* NetHack 3.6	teleport.c	$NHDT-Date: 1446078762 2015/10/29 00:32:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.61 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -387,7 +387,7 @@ boolean force_it;
     register struct obj *otmp;
 
     if (mtmp == u.usteed)
-        return (FALSE);
+        return FALSE;
 
     if (mtmp->mleashed) {
         otmp = get_mleash(mtmp);
@@ -528,7 +528,7 @@ dotele()
                         You("don't know that spell.");
                     else
                         You("are not able to teleport at will.");
-                    return (0);
+                    return 0;
                 }
             }
         }
@@ -559,9 +559,9 @@ dotele()
         if (castit) {
             exercise(A_WIS, TRUE);
             if (spelleffects(sp_no, TRUE))
-                return (1);
+                return 1;
             else if (!wizard)
-                return (0);
+                return 0;
         } else {
             u.uen -= energy;
             context.botl = 1;
@@ -576,11 +576,11 @@ dotele()
         (void) next_to_u();
     } else {
         You1(shudder_for_moment);
-        return (0);
+        return 0;
     }
     if (!trap)
         morehungry(100);
-    return (1);
+    return 1;
 }
 
 void
@@ -912,19 +912,19 @@ struct monst *mtmp;
     if (!xx) {
         /* no current location (migrating monster arrival) */
         if (dndest.nlx && On_W_tower_level(&u.uz))
-            return ((yy & 2) != 0)
-                   ^ /* inside xor not within */
-                   !within_bounded_area(x, y, dndest.nlx, dndest.nly,
-                                        dndest.nhx, dndest.nhy);
+            return (((yy & 2) != 0)
+                    /* inside xor not within */
+                    ^ !within_bounded_area(x, y, dndest.nlx, dndest.nly,
+                                           dndest.nhx, dndest.nhy));
         if (updest.lx && (yy & 1) != 0) /* moving up */
-            return (within_bounded_area(x, y, updest.lx, updest.ly, updest.hx,
-                                        updest.hy)
+            return (within_bounded_area(x, y, updest.lx, updest.ly,
+                                        updest.hx, updest.hy)
                     && (!updest.nlx
                         || !within_bounded_area(x, y, updest.nlx, updest.nly,
                                                 updest.nhx, updest.nhy)));
         if (dndest.lx && (yy & 1) == 0) /* moving down */
-            return (within_bounded_area(x, y, dndest.lx, dndest.ly, dndest.hx,
-                                        dndest.hy)
+            return (within_bounded_area(x, y, dndest.lx, dndest.ly,
+                                        dndest.hx, dndest.hy)
                     && (!dndest.nlx
                         || !within_bounded_area(x, y, dndest.nlx, dndest.nly,
                                                 dndest.nhx, dndest.nhy)));
@@ -1212,16 +1212,17 @@ register struct obj *obj;
              || (restricted_fall
                  && (!within_bounded_area(tx, ty, dndest.lx, dndest.ly,
                                           dndest.hx, dndest.hy)
-                     || (dndest.nlx && within_bounded_area(
-                                           tx, ty, dndest.nlx, dndest.nly,
-                                           dndest.nhx, dndest.nhy)))) ||
+                     || (dndest.nlx
+                         && within_bounded_area(tx, ty,
+                                                dndest.nlx, dndest.nly,
+                                                dndest.nhx, dndest.nhy))))
              /* on the Wizard Tower levels, objects inside should
                 stay inside and objects outside should stay outside */
-             (dndest.nlx && On_W_tower_level(&u.uz)
-              && within_bounded_area(tx, ty, dndest.nlx, dndest.nly,
-                                     dndest.nhx, dndest.nhy)
-                     != within_bounded_area(otx, oty, dndest.nlx, dndest.nly,
-                                            dndest.nhx, dndest.nhy)));
+             || (dndest.nlx && On_W_tower_level(&u.uz)
+                 && within_bounded_area(tx, ty, dndest.nlx, dndest.nly,
+                                        dndest.nhx, dndest.nhy)
+                    != within_bounded_area(otx, oty, dndest.nlx, dndest.nly,
+                                           dndest.nhx, dndest.nhy)));
 
     if (flooreffects(obj, tx, ty, "fall")) {
         return FALSE;

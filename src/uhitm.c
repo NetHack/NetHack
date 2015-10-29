@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1445126430 2015/10/18 00:00:30 $  $NHDT-Branch: master $:$NHDT-Revision: 1.148 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1446078766 2015/10/29 00:32:46 $  $NHDT-Branch: master $:$NHDT-Revision: 1.149 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -116,9 +116,9 @@ struct obj *wep; /* uwep for attack(), null for kick_monster() */
          * If the monster dies immediately from the blow, the 'I' will
          * not stay there, so the player will have suddenly forgotten
          * the square's contents for no apparent reason.
-        if (!canspotmon(mtmp) &&
-            !glyph_is_invisible(levl[bhitpos.x][bhitpos.y].glyph))
-                map_invisible(bhitpos.x, bhitpos.y);
+        if (!canspotmon(mtmp)
+            && !glyph_is_invisible(levl[bhitpos.x][bhitpos.y].glyph))
+            map_invisible(bhitpos.x, bhitpos.y);
          */
         return FALSE;
     }
@@ -139,9 +139,9 @@ struct obj *wep; /* uwep for attack(), null for kick_monster() */
         /* if it was an invisible mimic, treat it as if we stumbled
          * onto a visible mimic
          */
-        if (mtmp->m_ap_type && !Protection_from_shape_changers &&
+        if (mtmp->m_ap_type && !Protection_from_shape_changers
             /* applied pole-arm attack is too far to get stuck */
-            distu(mtmp->mx, mtmp->my) <= 2) {
+            && distu(mtmp->mx, mtmp->my) <= 2) {
             if (!u.ustuck && !mtmp->mflee && dmgtype(mtmp->data, AD_STCK))
                 u.ustuck = mtmp;
         }
@@ -157,7 +157,7 @@ struct obj *wep; /* uwep for attack(), null for kick_monster() */
          */
         if (glyph_is_invisible(levl[mtmp->mx][mtmp->my].glyph)) {
             seemimic(mtmp);
-            return (FALSE);
+            return FALSE;
         }
         stumble_onto_mimic(mtmp);
         return TRUE;
@@ -170,7 +170,7 @@ struct obj *wep; /* uwep for attack(), null for kick_monster() */
         newsym(mtmp->mx, mtmp->my);
         if (glyph_is_invisible(levl[mtmp->mx][mtmp->my].glyph)) {
             seemimic(mtmp);
-            return (FALSE);
+            return FALSE;
         }
         if (!((Blind ? Blind_telepat : Unblind_telepat) || Detect_monsters)) {
             struct obj *obj;
@@ -198,18 +198,18 @@ struct obj *wep; /* uwep for attack(), null for kick_monster() */
         /* Intelligent chaotic weapons (Stormbringer) want blood */
         if (wep && wep->oartifact == ART_STORMBRINGER) {
             override_confirmation = TRUE;
-            return (FALSE);
+            return FALSE;
         }
         if (canspotmon(mtmp)) {
             Sprintf(qbuf, "Really attack %s?", mon_nam(mtmp));
             if (!paranoid_query(ParanoidHit, qbuf)) {
                 context.move = 0;
-                return (TRUE);
+                return TRUE;
             }
         }
     }
 
-    return (FALSE);
+    return FALSE;
 }
 
 /*
@@ -350,13 +350,13 @@ register struct monst *mtmp;
                 Strcpy(buf, y_monnam(mtmp));
                 buf[0] = highc(buf[0]);
                 You("stop.  %s is in the way!", buf);
-                return (TRUE);
+                return TRUE;
             } else if ((mtmp->mfrozen || (!mtmp->mcanmove)
                         || (mtmp->data->mmove == 0)) && rn2(6)) {
                 pline("%s doesn't seem to move!", Monnam(mtmp));
-                return (TRUE);
+                return TRUE;
             } else
-                return (FALSE);
+                return FALSE;
         }
     }
 
@@ -368,7 +368,7 @@ register struct monst *mtmp;
     bhitpos.x = u.ux + u.dx;
     bhitpos.y = u.uy + u.dy;
     if (attack_checks(mtmp, uwep))
-        return (TRUE);
+        return TRUE;
 
     if (Upolyd && noattacks(youmonst.data)) {
         /* certain "pacifist" monsters don't attack */
@@ -377,9 +377,9 @@ register struct monst *mtmp;
         goto atk_done;
     }
 
-    if (check_capacity("You cannot fight while so heavily loaded.") ||
+    if (check_capacity("You cannot fight while so heavily loaded.")
         /* consume extra nutrition during combat; maybe pass out */
-        overexertion())
+        || overexertion())
         goto atk_done;
 
     if (u.twoweap && !can_twoweapon())
@@ -408,7 +408,7 @@ register struct monst *mtmp;
         && (m_move(mtmp, 0) == 2 || /* it died */
             mtmp->mx != u.ux + u.dx
             || mtmp->my != u.uy + u.dy)) /* it moved */
-        return (FALSE);
+        return FALSE;
 
     if (Upolyd)
         (void) hmonas(mtmp);
@@ -427,7 +427,7 @@ atk_done:
         && !(u.uswallow && mtmp == u.ustuck))
         map_invisible(u.ux + u.dx, u.uy + u.dy);
 
-    return (TRUE);
+    return TRUE;
 }
 
 /* really hit target monster; returns TRUE if it still lives */
@@ -483,7 +483,7 @@ struct attack *uattk;
                 cutworm(mon, x, y, weapon);
         }
     }
-    return (malive);
+    return malive;
 }
 
 /* hit target monster; returns TRUE if it still lives */
@@ -514,7 +514,7 @@ struct attack *uattk;
     if (wepbefore && !uwep)
         wep_was_destroyed = TRUE;
     (void) passive(mon, mhit, malive, AT_WEAP, wep_was_destroyed);
-    return (malive);
+    return malive;
 }
 
 boolean                    /* general "damage monster" routine */
@@ -558,9 +558,9 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
     boolean silvermsg = FALSE, silverobj = FALSE;
     boolean valid_weapon_attack = FALSE;
     boolean unarmed = !uwep && !uarm && !uarms;
-    boolean hand_to_hand = (thrown == HMON_MELEE ||
+    boolean hand_to_hand = (thrown == HMON_MELEE
                             /* not grapnels; applied implies uwep */
-                            (thrown == HMON_APPLIED && is_pole(uwep)));
+                            || (thrown == HMON_APPLIED && is_pole(uwep)));
     int jousting = 0;
     int wtype;
     struct obj *monwep;
@@ -602,14 +602,14 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
             || obj->oclass == GEM_CLASS) {
             /* is it not a melee weapon? */
             if (/* if you strike with a bow... */
-                is_launcher(obj) ||
+                is_launcher(obj)
                 /* or strike with a missile in your hand... */
-                (!thrown && (is_missile(obj) || is_ammo(obj))) ||
+                || (!thrown && (is_missile(obj) || is_ammo(obj)))
                 /* or use a pole at short range and not mounted... */
-                (!thrown && !u.usteed && is_pole(obj)) ||
+                || (!thrown && !u.usteed && is_pole(obj))
                 /* or throw a missile without the proper bow... */
-                (is_ammo(obj) && (thrown != HMON_THROWN
-                                  || !ammo_and_launcher(obj, uwep)))) {
+                || (is_ammo(obj) && (thrown != HMON_THROWN
+                                     || !ammo_and_launcher(obj, uwep)))) {
                 /* then do only 1-2 points of damage */
                 if (mdat == &mons[PM_SHADE] && !shade_glare(obj))
                     tmp = 0;
@@ -644,9 +644,9 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
                 valid_weapon_attack = (tmp > 1);
                 if (!valid_weapon_attack || mon == u.ustuck || u.twoweap) {
                     ; /* no special bonuses */
-                } else if (mon->mflee && Role_if(PM_ROGUE) && !Upolyd &&
+                } else if (mon->mflee && Role_if(PM_ROGUE) && !Upolyd
                            /* multi-shot throwing is too powerful here */
-                           hand_to_hand) {
+                           && hand_to_hand) {
                     You("strike %s from behind!", mon_nam(mon));
                     tmp += rnd(u.ulevel);
                     hittxt = TRUE;
@@ -759,9 +759,7 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
                         ysimple_name(obj));
                     release_camera_demon(obj, u.ux, u.uy);
                     useup(obj);
-                    return (TRUE);
-                    /*NOTREACHED*/
-                    break;
+                    return TRUE;
                 case CORPSE: /* fixed by polder@cs.vu.nl */
                     if (touch_petrifies(&mons[obj->corpsenm])) {
                         tmp = 1;
@@ -776,10 +774,10 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
                         if (resists_ston(mon))
                             break;
                         /* note: hp may be <= 0 even if munstoned==TRUE */
-                        return (boolean)(mon->mhp > 0);
+                        return (boolean) (mon->mhp > 0);
 #if 0
-			} else if (touch_petrifies(mdat)) {
-			    /* maybe turn the corpse into a statue? */
+                    } else if (touch_petrifies(mdat)) {
+                        ; /* maybe turn the corpse into a statue? */
 #endif
                     }
                     tmp = (obj->corpsenm >= LOW_PM ? mons[obj->corpsenm].msize
@@ -825,7 +823,7 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
                             minstapetrify(mon, TRUE);
                         if (resists_ston(mon))
                             break;
-                        return (boolean)(mon->mhp > 0);
+                        return (boolean) (mon->mhp > 0);
                     } else { /* ordinary egg(s) */
                         const char *eggp =
                             (obj->corpsenm != NON_PM && obj->known)
@@ -1403,7 +1401,7 @@ register struct attack *mattk;
         && u.umonnum != PM_SUCCUBUS && u.umonnum != PM_INCUBUS
         && u.umonnum != PM_BALROG) {
         demonpet();
-        return (0);
+        return 0;
     }
     switch (mattk->adtyp) {
     case AD_STUN:
@@ -1764,9 +1762,9 @@ register struct attack *mattk;
                 xkilled(mdef, 0);
         } else if (tmp)
             killed(mdef);
-        return (2);
+        return 2;
     }
-    return (1);
+    return 1;
 }
 
 STATIC_OVL int
@@ -1807,7 +1805,7 @@ register struct attack *mattk;
             mdef->mhp -= tmp;
             if (mdef->mhp <= 0) {
                 killed(mdef);
-                return (2);
+                return 2;
             }
         } else {
             shieldeff(mdef->mx, mdef->my);
@@ -1820,7 +1818,7 @@ register struct attack *mattk;
     default:
         break;
     }
-    return (1);
+    return 1;
 }
 
 STATIC_OVL void
@@ -1957,7 +1955,7 @@ register struct attack *mattk;
                         exercise(A_CON, TRUE);
                 }
                 end_engulf();
-                return (2);
+                return 2;
             case AD_PHYS:
                 if (youmonst.data == &mons[PM_FOG_CLOUD]) {
                     pline("%s is laden with your moisture.", Monnam(mdef));
@@ -2032,7 +2030,7 @@ register struct attack *mattk;
             if ((mdef->mhp -= dam) <= 0) {
                 killed(mdef);
                 if (mdef->mhp <= 0) /* not lifesaved */
-                    return (2);
+                    return 2;
             }
             You("%s %s!", is_animal(youmonst.data) ? "regurgitate" : "expel",
                 mon_nam(mdef));
@@ -2042,7 +2040,7 @@ register struct attack *mattk;
             }
         }
     }
-    return (0);
+    return 0;
 }
 
 void
@@ -2105,7 +2103,7 @@ register struct monst *mon;
                 sum[i] = dhit;
             /* might be a worm that gets cut in half */
             if (m_at(u.ux + u.dx, u.uy + u.dy) != mon)
-                return (boolean)(nsum != 0);
+                return (boolean) (nsum != 0);
             /* Do not print "You hit" message, since known_hitum
              * already did it.
              */
@@ -2247,7 +2245,7 @@ register struct monst *mon;
             rehumanize();
         }
         if (sum[i] == 2)
-            return ((boolean) passive(mon, 1, 0, mattk->aatyp, FALSE));
+            return (boolean) passive(mon, 1, 0, mattk->aatyp, FALSE);
         /* defender dead */
         else {
             (void) passive(mon, sum[i], 1, mattk->aatyp, FALSE);
@@ -2258,7 +2256,7 @@ register struct monst *mon;
         if (multi < 0)
             break; /* If paralyzed while attacking, i.e. floating eye */
     }
-    return ((boolean)(nsum != 0));
+    return (boolean) (nsum != 0);
 }
 
 /*	Special (passive) attacks on you by monsters done here.		*/

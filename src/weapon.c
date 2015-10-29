@@ -1,11 +1,11 @@
-/* NetHack 3.6	weapon.c	$NHDT-Date: 1445126431 2015/10/18 00:00:31 $  $NHDT-Branch: master $:$NHDT-Revision: 1.54 $ */
+/* NetHack 3.6	weapon.c	$NHDT-Date: 1446078767 2015/10/29 00:32:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.55 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
- *	This module contains code for calculation of "to hit" and damage
- *	bonuses for any given weapon used, as well as weapons selection
- *	code for monsters.
+ *      This module contains code for calculation of "to hit" and damage
+ *      bonuses for any given weapon used, as well as weapons selection
+ *      code for monsters.
  */
 #include "hack.h"
 
@@ -135,8 +135,8 @@ struct obj *obj;
 }
 
 /*
- *	hitval returns an integer representing the "to hit" bonuses
- *	of "otmp" against the monster.
+ *      hitval returns an integer representing the "to hit" bonuses
+ *      of "otmp" against the monster.
  */
 int
 hitval(otmp, mon)
@@ -150,10 +150,10 @@ struct monst *mon;
     if (Is_weapon)
         tmp += otmp->spe;
 
-    /*	Put weapon specific "to hit" bonuses in below:		*/
+    /* Put weapon specific "to hit" bonuses in below: */
     tmp += objects[otmp->otyp].oc_hitbon;
 
-    /*	Put weapon vs. monster type "to hit" bonuses in below:	*/
+    /* Put weapon vs. monster type "to hit" bonuses in below: */
 
     /* Blessed weapons used against undead or demons */
     if (Is_weapon && otmp->blessed
@@ -205,8 +205,8 @@ struct monst *mon;
  */
 
 /*
- *	dmgval returns an integer representing the damage bonuses
- *	of "otmp" against the monster.
+ *      dmgval returns an integer representing the damage bonuses
+ *      of "otmp" against the monster.
  */
 int
 dmgval(otmp, mon)
@@ -316,7 +316,7 @@ struct monst *mon;
         }
     }
 
-    /*	Put weapon vs. monster type damage bonuses in below:	*/
+    /* Put weapon vs. monster type damage bonuses in below: */
     if (Is_weapon || otmp->oclass == GEM_CLASS || otmp->oclass == BALL_CLASS
         || otmp->oclass == CHAIN_CLASS) {
         int bonus = 0;
@@ -348,13 +348,13 @@ struct monst *mon;
             tmp = 1;
     }
 
-    return (tmp);
+    return  tmp;
 }
 
 STATIC_DCL struct obj *FDECL(oselect, (struct monst *, int));
 #define Oselect(x)                      \
     if ((otmp = oselect(mtmp, x)) != 0) \
-        return (otmp);
+        return otmp;
 
 STATIC_OVL struct obj *
 oselect(mtmp, x)
@@ -365,10 +365,9 @@ int x;
 
     for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj) {
         if (otmp->otyp == x
-            &&
             /* never select non-cockatrice corpses */
-            !((x == CORPSE || x == EGG)
-              && !touch_petrifies(&mons[otmp->corpsenm]))
+            && !((x == CORPSE || x == EGG)
+                 && !touch_petrifies(&mons[otmp->corpsenm]))
             && (!otmp->oartifact || touch_artifact(otmp, mtmp)))
             return otmp;
     }
@@ -391,7 +390,9 @@ static NEARDATA const int pwep[] = { HALBERD,       BARDICHE, SPETUM,
 
 static struct obj *propellor;
 
-struct obj *select_rwep(mtmp) /* select a ranged weapon for the monster */
+/* select a ranged weapon for the monster */
+struct obj *
+select_rwep(mtmp)
 register struct monst *mtmp;
 {
     register struct obj *otmp;
@@ -497,7 +498,7 @@ register struct monst *mtmp;
                 /* Don't throw a cursed weapon-in-hand or an artifact */
                 if ((otmp = oselect(mtmp, rwep[i])) && !otmp->oartifact
                     && !(otmp == MON_WEP(mtmp) && mwelded(otmp)))
-                    return (otmp);
+                    return otmp;
             } else
                 for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj) {
                     if (otmp->otyp == LOADSTONE && !otmp->cursed)
@@ -523,8 +524,9 @@ static const NEARDATA short hwep[] = {
     SCALPEL, KNIFE, WORM_TOOTH
 };
 
+/* select a hand to hand weapon for the monster */
 struct obj *
-select_hwep(mtmp) /* select a hand to hand weapon for the monster */
+select_hwep(mtmp)
 register struct monst *mtmp;
 {
     register struct obj *otmp;
@@ -772,7 +774,7 @@ abon()
     else if (dex < 8)
         return (sbon - 1);
     else if (dex < 14)
-        return (sbon);
+        return sbon;
     else
         return (sbon + dex - 14);
 }
@@ -784,24 +786,24 @@ dbon()
     int str = ACURR(A_STR);
 
     if (Upolyd)
-        return (0);
+        return 0;
 
     if (str < 6)
-        return (-1);
+        return -1;
     else if (str < 16)
-        return (0);
+        return 0;
     else if (str < 18)
-        return (1);
+        return 1;
     else if (str == 18)
-        return (2); /* up to 18 */
+        return 2; /* up to 18 */
     else if (str <= STR18(75))
-        return (3); /* up to 18/75 */
+        return 3; /* up to 18/75 */
     else if (str <= STR18(90))
-        return (4); /* up to 18/90 */
+        return 4; /* up to 18/90 */
     else if (str < STR18(100))
-        return (5); /* up to 18/99 */
+        return 5; /* up to 18/99 */
     else
-        return (6);
+        return 6;
 }
 
 /* increase a towel's wetness */
@@ -909,19 +911,19 @@ int skill;
     int tmp = P_SKILL(skill);
 
     /* The more difficult the training, the more slots it takes.
-     *	unskilled -> basic	1
-     *	basic -> skilled	2
-     *	skilled -> expert	3
+     *  unskilled -> basic      1
+     *  basic -> skilled        2
+     *  skilled -> expert       3
      */
     if (skill <= P_LAST_WEAPON || skill == P_TWO_WEAPON_COMBAT)
         return tmp;
 
     /* Fewer slots used up for unarmed or martial.
-     *	unskilled -> basic	1
-     *	basic -> skilled	1
-     *	skilled -> expert	2
-     *	expert -> master	2
-     *	master -> grand master	3
+     *  unskilled -> basic      1
+     *  basic -> skilled        1
+     *  skilled -> expert       2
+     *  expert -> master        2
+     *  master -> grand master  3
      */
     return (tmp + 1) / 2;
 }
@@ -933,12 +935,17 @@ can_advance(skill, speedy)
 int skill;
 boolean speedy;
 {
-    return !P_RESTRICTED(skill) && P_SKILL(skill) < P_MAX_SKILL(skill)
-           && ((wizard && speedy)
-               || (P_ADVANCE(skill) >= (unsigned) practice_needed_to_advance(
-                                           P_SKILL(skill))
-                   && u.skills_advanced < P_SKILL_LIMIT
-                   && u.weapon_slots >= slots_required(skill)));
+    if (P_RESTRICTED(skill)
+        || P_SKILL(skill) >= P_MAX_SKILL(skill)
+        || u.skills_advanced >= P_SKILL_LIMIT)
+        return FALSE;
+
+    if (wizard && speedy)
+        return TRUE;
+
+    return (boolean) ((int) P_ADVANCE(skill)
+                      >= practice_needed_to_advance(P_SKILL(skill))
+                      && u.weapon_slots >= slots_required(skill));
 }
 
 /* return true if this skill could be advanced if more slots were available */
@@ -946,10 +953,13 @@ STATIC_OVL boolean
 could_advance(skill)
 int skill;
 {
-    return !P_RESTRICTED(skill) && P_SKILL(skill) < P_MAX_SKILL(skill)
-           && ((P_ADVANCE(skill)
-                    >= (unsigned) practice_needed_to_advance(P_SKILL(skill))
-                && u.skills_advanced < P_SKILL_LIMIT));
+    if (P_RESTRICTED(skill)
+        || P_SKILL(skill) >= P_MAX_SKILL(skill)
+        || u.skills_advanced >= P_SKILL_LIMIT)
+        return FALSE;
+
+    return (boolean) ((int) P_ADVANCE(skill)
+                      >= practice_needed_to_advance(P_SKILL(skill)));
 }
 
 /* return true if this skill has reached its maximum and there's been enough
@@ -958,9 +968,12 @@ STATIC_OVL boolean
 peaked_skill(skill)
 int skill;
 {
-    return !P_RESTRICTED(skill) && P_SKILL(skill) >= P_MAX_SKILL(skill)
-           && ((P_ADVANCE(skill)
-                >= (unsigned) practice_needed_to_advance(P_SKILL(skill))));
+    if (P_RESTRICTED(skill))
+        return FALSE;
+
+    return (boolean) (P_SKILL(skill) >= P_MAX_SKILL(skill)
+                      && ((int) P_ADVANCE(skill)
+                          >= practice_needed_to_advance(P_SKILL(skill))));
 }
 
 STATIC_OVL void
@@ -1186,8 +1199,7 @@ int n; /* number of slots to lose; normally one */
     int skill;
 
     while (--n >= 0) {
-        /* deduct first from unused slots, then from last placed slot, if any
-         */
+        /* deduct first from unused slots then from last placed one, if any */
         if (u.weapon_slots) {
             u.weapon_slots--;
         } else if (u.skills_advanced) {
@@ -1212,14 +1224,12 @@ struct obj *obj;
     int type;
 
     if (!obj)
-        /* Not using a weapon */
-        return (P_BARE_HANDED_COMBAT);
+        return P_BARE_HANDED_COMBAT; /* Not using a weapon */
     if (obj->oclass != WEAPON_CLASS && obj->oclass != TOOL_CLASS
         && obj->oclass != GEM_CLASS)
-        /* Not a weapon, weapon-tool, or ammo */
-        return (P_NONE);
+        return P_NONE; /* Not a weapon, weapon-tool, or ammo */
     type = objects[obj->otyp].oc_skill;
-    return ((type < 0) ? -type : type);
+    return (type < 0) ? -type : type;
 }
 
 int
@@ -1290,13 +1300,13 @@ struct obj *weapon;
         }
     } else if (type == P_BARE_HANDED_COMBAT) {
         /*
-         *	       b.h.  m.a.
-         *	unskl:	+1   n/a
-         *	basic:	+1    +3
-         *	skild:	+2    +4
-         *	exprt:	+2    +5
-         *	mastr:	+3    +6
-         *	grand:	+3    +7
+         *        b.h. m.a.
+         * unskl:  +1  n/a
+         * basic:  +1   +3
+         * skild:  +2   +4
+         * exprt:  +2   +5
+         * mastr:  +3   +6
+         * grand:  +3   +7
          */
         bonus = P_SKILL(type);
         bonus = max(bonus, P_UNSKILLED) - 1; /* unskilled => 0 */
@@ -1384,13 +1394,13 @@ struct obj *weapon;
         }
     } else if (type == P_BARE_HANDED_COMBAT) {
         /*
-         *	       b.h.  m.a.
-         *	unskl:	 0   n/a
-         *	basic:	+1    +3
-         *	skild:	+1    +4
-         *	exprt:	+2    +6
-         *	mastr:	+2    +7
-         *	grand:	+3    +9
+         *        b.h. m.a.
+         * unskl:   0  n/a
+         * basic:  +1   +3
+         * skild:  +1   +4
+         * exprt:  +2   +6
+         * mastr:  +2   +7
+         * grand:  +3   +9
          */
         bonus = P_SKILL(type);
         bonus = max(bonus, P_UNSKILLED) - 1; /* unskilled => 0 */

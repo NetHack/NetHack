@@ -1,11 +1,11 @@
-/* NetHack 3.6	wizard.c	$NHDT-Date: 1436753529 2015/07/13 02:12:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.39 $ */
+/* NetHack 3.6	wizard.c	$NHDT-Date: 1446078768 2015/10/29 00:32:48 $  $NHDT-Branch: master $:$NHDT-Revision: 1.42 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* wizard code - inspired by rogue code from Merlyn Leroy (digi-g!brian) */
-/*	       - heavily modified to give the wiz balls.  (genat!mike)   */
-/*	       - dewimped and given some maledictions. -3. */
-/*	       - generalized for 3.1 (mike@bullns.on01.bull.ca) */
+/*             - heavily modified to give the wiz balls.  (genat!mike)   */
+/*             - dewimped and given some maledictions. -3. */
+/*             - generalized for 3.1 (mike@bullns.on01.bull.ca) */
 
 #include "hack.h"
 #include "qtext.h"
@@ -47,8 +47,8 @@ amulet()
     struct obj *amu;
 
 #if 0 /* caller takes care of this check */
-	if (!u.uhave.amulet)
-		return;
+    if (!u.uhave.amulet)
+        return;
 #endif
     if ((((amu = uamul) != 0 && amu->otyp == AMULET_OF_YENDOR)
          || ((amu = uwep) != 0 && amu->otyp == AMULET_OF_YENDOR))
@@ -92,8 +92,8 @@ register struct monst *mtmp;
 
     for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
         if (otmp->otyp == AMULET_OF_YENDOR)
-            return (1);
-    return (0);
+            return 1;
+    return 0;
 }
 
 int
@@ -107,16 +107,16 @@ register struct monst *mtmp;
             || otmp->otyp == BELL_OF_OPENING
             || otmp->otyp == CANDELABRUM_OF_INVOCATION
             || otmp->otyp == SPE_BOOK_OF_THE_DEAD)
-            return (1);
-    return (0);
+            return 1;
+    return 0;
 }
 
 /*
- *	New for 3.1  Strategy / Tactics for the wiz, as well as other
- *	monsters that are "after" something (defined via mflag3).
+ *      New for 3.1  Strategy / Tactics for the wiz, as well as other
+ *      monsters that are "after" something (defined via mflag3).
  *
- *	The strategy section decides *what* the monster is going
- *	to attempt, the tactics section implements the decision.
+ *      The strategy section decides *what* the monster is going
+ *      to attempt, the tactics section implements the decision.
  */
 #define STRAT(w, x, y, typ)                            \
     ((unsigned long) (w) | ((unsigned long) (x) << 16) \
@@ -130,23 +130,23 @@ register int mask;
 {
     switch (mask) {
     case M3_WANTSAMUL:
-        return (AMULET_OF_YENDOR);
+        return AMULET_OF_YENDOR;
     case M3_WANTSBELL:
-        return (BELL_OF_OPENING);
+        return BELL_OF_OPENING;
     case M3_WANTSCAND:
-        return (CANDELABRUM_OF_INVOCATION);
+        return CANDELABRUM_OF_INVOCATION;
     case M3_WANTSBOOK:
-        return (SPE_BOOK_OF_THE_DEAD);
+        return SPE_BOOK_OF_THE_DEAD;
     default:
         break; /* 0 signifies quest artifact */
     }
-    return (0);
+    return 0;
 }
 
 /*
- *	If "otyp" is zero, it triggers a check for the quest_artifact,
- *	since bell, book, candle, and amulet are all objects, not really
- *	artifacts right now.	[MRS]
+ *      If "otyp" is zero, it triggers a check for the quest_artifact,
+ *      since bell, book, candle, and amulet are all objects, not really
+ *      artifacts right now.  [MRS]
  */
 STATIC_OVL boolean
 mon_has_arti(mtmp, otyp)
@@ -158,11 +158,11 @@ register short otyp;
     for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj) {
         if (otyp) {
             if (otmp->otyp == otyp)
-                return (1);
+                return 1;
         } else if (is_quest_artifact(otmp))
-            return (1);
+            return 1;
     }
-    return (0);
+    return 0;
 }
 
 STATIC_OVL struct monst *
@@ -176,9 +176,9 @@ register short otyp;
         /* no need for !DEADMONSTER check here since they have no inventory */
         if (mtmp2 != mtmp)
             if (mon_has_arti(mtmp2, otyp))
-                return (mtmp2);
+                return mtmp2;
 
-    return ((struct monst *) 0);
+    return (struct monst *) 0;
 }
 
 STATIC_OVL struct obj *
@@ -190,10 +190,10 @@ register short otyp;
     for (otmp = fobj; otmp; otmp = otmp->nobj)
         if (otyp) {
             if (otmp->otyp == otyp)
-                return (otmp);
+                return otmp;
         } else if (is_quest_artifact(otmp))
-            return (otmp);
-    return ((struct obj *) 0);
+            return otmp;
+    return (struct obj *) 0;
 }
 
 STATIC_OVL boolean
@@ -202,19 +202,19 @@ register int mask;
 {
     switch (mask) {
     case M3_WANTSAMUL:
-        return (boolean)(u.uhave.amulet);
+        return (boolean) u.uhave.amulet;
     case M3_WANTSBELL:
-        return (boolean)(u.uhave.bell);
+        return (boolean) u.uhave.bell;
     case M3_WANTSCAND:
-        return (boolean)(u.uhave.menorah);
+        return (boolean) u.uhave.menorah;
     case M3_WANTSBOOK:
-        return (boolean)(u.uhave.book);
+        return (boolean) u.uhave.book;
     case M3_WANTSARTI:
-        return (boolean)(u.uhave.questart);
+        return (boolean) u.uhave.questart;
     default:
         break;
     }
-    return (0);
+    return 0;
 }
 
 STATIC_OVL unsigned long
@@ -232,15 +232,15 @@ register struct monst *mtmp;
     otyp = which_arti(mask);
     if (!mon_has_arti(mtmp, otyp)) {
         if (you_have(mask))
-            return (STRAT(STRAT_PLAYER, u.ux, u.uy, mask));
+            return STRAT(STRAT_PLAYER, u.ux, u.uy, mask);
         else if ((otmp = on_ground(otyp)))
-            return (STRAT(STRAT_GROUND, otmp->ox, otmp->oy, mask));
-        else if ((mtmp2 = other_mon_has_arti(mtmp, otyp)) != 0 &&
+            return STRAT(STRAT_GROUND, otmp->ox, otmp->oy, mask);
+        else if ((mtmp2 = other_mon_has_arti(mtmp, otyp)) != 0
                  /* when seeking the Amulet, avoid targetting the Wizard
                     or temple priests (to protect Moloch's high priest) */
-                 (otyp != AMULET_OF_YENDOR
-                  || (!mtmp2->iswiz && !inhistemple(mtmp2))))
-            return (STRAT(STRAT_MONSTR, mtmp2->mx, mtmp2->my, mask));
+                 && (otyp != AMULET_OF_YENDOR
+                     || (!mtmp2->iswiz && !inhistemple(mtmp2))))
+            return STRAT(STRAT_MONSTR, mtmp2->mx, mtmp2->my, mask);
     }
     return (unsigned long) STRAT_NONE;
 }
@@ -251,24 +251,24 @@ register struct monst *mtmp;
 {
     unsigned long strat, dstrat;
 
-    if (!is_covetous(mtmp->data) ||
+    if (!is_covetous(mtmp->data)
         /* perhaps a shopkeeper has been polymorphed into a master
            lich; we don't want it teleporting to the stairs to heal
            because that will leave its shop untended */
-        (mtmp->isshk && inhishop(mtmp)) ||
+        || (mtmp->isshk && inhishop(mtmp))
         /* likewise for temple priests */
-        (mtmp->ispriest && inhistemple(mtmp)))
+        || (mtmp->ispriest && inhistemple(mtmp)))
         return (unsigned long) STRAT_NONE;
 
     switch ((mtmp->mhp * 3) / mtmp->mhpmax) { /* 0-3 */
 
     default:
     case 0: /* panic time - mtmp is almost snuffed */
-        return (unsigned long) (STRAT_HEAL);
+        return (unsigned long) STRAT_HEAL;
 
     case 1: /* the wiz is less cautious */
         if (mtmp->data != &mons[PM_WIZARD_OF_YENDOR])
-            return (unsigned long) (STRAT_HEAL);
+            return (unsigned long) STRAT_HEAL;
     /* else fall through */
 
     case 2:
@@ -282,29 +282,28 @@ register struct monst *mtmp;
 
     if (context.made_amulet)
         if ((strat = target_on(M3_WANTSAMUL, mtmp)) != STRAT_NONE)
-            return (strat);
+            return strat;
 
     if (u.uevent.invoked) { /* priorities change once gate opened */
-
         if ((strat = target_on(M3_WANTSARTI, mtmp)) != STRAT_NONE)
-            return (strat);
+            return strat;
         if ((strat = target_on(M3_WANTSBOOK, mtmp)) != STRAT_NONE)
-            return (strat);
+            return strat;
         if ((strat = target_on(M3_WANTSBELL, mtmp)) != STRAT_NONE)
-            return (strat);
+            return strat;
         if ((strat = target_on(M3_WANTSCAND, mtmp)) != STRAT_NONE)
-            return (strat);
+            return strat;
     } else {
         if ((strat = target_on(M3_WANTSBOOK, mtmp)) != STRAT_NONE)
-            return (strat);
+            return strat;
         if ((strat = target_on(M3_WANTSBELL, mtmp)) != STRAT_NONE)
-            return (strat);
+            return strat;
         if ((strat = target_on(M3_WANTSCAND, mtmp)) != STRAT_NONE)
-            return (strat);
+            return strat;
         if ((strat = target_on(M3_WANTSARTI, mtmp)) != STRAT_NONE)
-            return (strat);
+            return strat;
     }
-    return (dstrat);
+    return dstrat;
 }
 
 int
@@ -333,14 +332,14 @@ register struct monst *mtmp;
         if (distu(mtmp->mx, mtmp->my) > (BOLT_LIM * BOLT_LIM))
             if (mtmp->mhp <= mtmp->mhpmax - 8) {
                 mtmp->mhp += rnd(8);
-                return (1);
+                return 1;
             }
     /* fall through :-) */
 
     case STRAT_NONE: /* harass */
         if (!rn2(!mtmp->mflee ? 5 : 33))
             mnexto(mtmp);
-        return (0);
+        return 0;
 
     default: /* kill, maim, pillage! */
     {
@@ -350,12 +349,12 @@ register struct monst *mtmp;
         struct obj *otmp;
 
         if (!targ) { /* simply wants you to close */
-            return (0);
+            return 0;
         }
         if ((u.ux == tx && u.uy == ty) || where == STRAT_PLAYER) {
             /* player is standing on it (or has it) */
             mnexto(mtmp);
-            return (0);
+            return 0;
         }
         if (where == STRAT_GROUND) {
             if (!MON_AT(tx, ty) || (mtmp->mx == tx && mtmp->my == ty)) {
@@ -370,23 +369,23 @@ register struct monst *mtmp;
                                   : distant_name(otmp, doname));
                     obj_extract_self(otmp);
                     (void) mpickobj(mtmp, otmp);
-                    return (1);
+                    return 1;
                 } else
-                    return (0);
+                    return 0;
             } else {
                 /* a monster is standing on it - cause some trouble */
                 if (!rn2(5))
                     mnexto(mtmp);
-                return (0);
+                return 0;
             }
         } else { /* a monster has it - 'port beside it. */
             (void) mnearto(mtmp, tx, ty, FALSE);
-            return (0);
+            return 0;
         }
     }
     }
     /*NOTREACHED*/
-    return (0);
+    return 0;
 }
 
 void
@@ -505,7 +504,7 @@ struct monst *mcast;
     return count;
 }
 
-/*	Let's resurrect the wizard, for some unexpected fun.	*/
+/* Let's resurrect the wizard, for some unexpected fun. */
 void
 resurrect()
 {
@@ -525,9 +524,9 @@ resurrect()
         verb = "elude";
         mmtmp = &migrating_mons;
         while ((mtmp = *mmtmp) != 0) {
-            if (mtmp->iswiz &&
+            if (mtmp->iswiz
                 /* if he has the Amulet, he won't bring it to you */
-                !mon_has_amulet(mtmp)
+                && !mon_has_amulet(mtmp)
                 && (elapsed = monstermoves - mtmp->mlstmv) > 0L) {
                 mon_catchup_elapsed_time(mtmp, elapsed);
                 if (elapsed >= LARGEST_INT)
@@ -559,8 +558,8 @@ resurrect()
     }
 }
 
-/*	Here, we make trouble for the poor shmuck who actually	*/
-/*	managed to do in the Wizard.				*/
+/* Here, we make trouble for the poor shmuck who actually
+   managed to do in the Wizard. */
 void
 intervene()
 {

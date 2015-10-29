@@ -1,4 +1,4 @@
-/* NetHack 3.6	worm.c	$NHDT-Date: 1432512770 2015/05/25 00:12:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.16 $ */
+/* NetHack 3.6	worm.c	$NHDT-Date: 1446078769 2015/10/29 00:32:49 $  $NHDT-Branch: master $:$NHDT-Revision: 1.18 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -22,7 +22,7 @@ STATIC_DCL struct wseg *FDECL(create_worm_tail, (int));
 /*  Description of long worm implementation.
  *
  *  Each monst struct of the head of a tailed worm has a wormno set to
- *			1 <= wormno < MAX_NUM_WORMS
+ *                      1 <= wormno < MAX_NUM_WORMS
  *  If wormno == 0 this does not mean that the monster is not a worm,
  *  it just means that the monster does not have a long worm tail.
  *
@@ -35,25 +35,24 @@ STATIC_DCL struct wseg *FDECL(create_worm_tail, (int));
  *  singly threaded linked lists.  The wormno variable is used as an index
  *  for these segment arrays.
  *
- *  wtails:	The first (starting struct) of a linked list.  This points
- *		to the tail (last) segment of the worm.
+ *  wtails:     The first (starting struct) of a linked list.  This points
+ *              to the tail (last) segment of the worm.
  *
- *  wheads:	The last (end) of a linked list of segments.  This points to
- *		the segment that is at the same position as the real monster
- *		(the head).  Note that the segment that wheads[wormno] points
- *		to, is not displayed.  It is simply there to keep track of
- *		where the head came from, so that worm movement and display
- *are
- *		simplified later.
- *		Keeping the head segment of the worm at the end of the list
- *		of tail segments is an endless source of confusion, but it is
- *		necessary.
- *		From now on, we will use "start" and "end" to refer to the
- *		linked list and "head" and "tail" to refer to the worm.
+ *  wheads:     The last (end) of a linked list of segments.  This points to
+ *              the segment that is at the same position as the real monster
+ *              (the head).  Note that the segment that wheads[wormno] points
+ *              to, is not displayed.  It is simply there to keep track of
+ *              where the head came from, so that worm movement and display
+ *              are simplified later.
+ *              Keeping the head segment of the worm at the end of the list
+ *              of tail segments is an endless source of confusion, but it is
+ *              necessary.
+ *              From now on, we will use "start" and "end" to refer to the
+ *              linked list and "head" and "tail" to refer to the worm.
  *
  *  One final worm array is:
  *
- *  wgrowtime:	This tells us when to add another segment to the worm.
+ *  wgrowtime:  This tells us when to add another segment to the worm.
  *
  *  When a worm is moved, we add a new segment at the head, and delete the
  *  segment at the tail (unless we want it to grow).  This new head segment is
@@ -95,7 +94,7 @@ get_wormno()
         new_wormno++;
     }
 
-    return (0); /* level infested with worms */
+    return 0; /* level infested with worms */
 }
 
 /*
@@ -338,7 +337,7 @@ struct obj *weap;
     /* Normally 17-20 does */
 
     if (weap && is_blade(weap)) /* With a blade 1- 6 does not cut */
-        cut_chance += 10;       /*		7-20 does */
+        cut_chance += 10;       /*              7-20 does         */
 
     if (cut_chance < 17)
         return; /* not good enough */
@@ -672,24 +671,20 @@ register xchar *nx, *ny;
     *nx = x;
     *ny = y;
 
-    *nx += (x > 1 ?                   /* extreme left ? */
-                (x < COLNO ?          /* extreme right ? */
-                     (rn2(3) - 1)     /* neither so +1, 0, or -1 */
-                           : -rn2(2)) /* 0, or -1 */
-                  : rn2(2));          /* 0, or 1 */
+    *nx += (x > 1                     /* extreme left ? */
+              ? (x < COLNO            /* extreme right ? */
+                   ? (rn2(3) - 1)     /* neither so +1, 0, or -1 */
+                   : -rn2(2))         /* 0, or -1 */
+              : rn2(2));              /* 0, or 1 */
 
-    *ny +=
-        (*nx == x ? /* same kind of thing with y */
-             (y > 1 ? (y < ROWNO ? (rn2(2) ? 1 : -1) : -1) : 1)
-                  : (y > 1 ? (y < ROWNO ? (rn2(3) - 1) : -rn2(2)) : rn2(2)));
+    *ny += (*nx == x                  /* same kind of thing with y */
+              ? (y > 1 ? (y < ROWNO ? (rn2(2) ? 1 : -1) : -1) : 1)
+              : (y > 1 ? (y < ROWNO ? (rn2(3) - 1) : -rn2(2)) : rn2(2)));
 }
 
 /*  count_wsegs()
- *
- *  returns
- *  the number of visible segments that a worm has.
+ *  returns the number of visible segments that a worm has.
  */
-
 int
 count_wsegs(mtmp)
 struct monst *mtmp;
@@ -708,9 +703,7 @@ struct monst *mtmp;
 }
 
 /*  create_worm_tail()
- *
- *  will create a worm tail chain of (num_segs + 1) and return a pointer to
- * it.
+ *  will create a worm tail chain of (num_segs + 1) and return pointer to it.
  */
 STATIC_OVL
 struct wseg *
@@ -737,11 +730,10 @@ int num_segs;
         i++;
     }
 
-    return (new_tail);
+    return new_tail;
 }
 
 /*  worm_known()
- *
  *  Is any segment of this worm in viewing range?  Note: caller must check
  *  invisibility and telepathy (which should only show the head anyway).
  *  Mostly used in the canseemon() macro.
@@ -773,10 +765,10 @@ int x1, y1, x2, y2;
      * With digits representing relative sequence number of the segments,
      * returns true when testing between @ and ? (passes through worm's
      * body), false between @ and ! (stays on same side of worm).
-     *	.w1?..
-     *	..@2..
-     *	.65!3.
-     *	...4..
+     *  .w1?..
+     *  ..@2..
+     *  .65!3.
+     *  ...4..
      */
 
     if (distmin(x1, y1, x2, y2) != 1) {
@@ -802,9 +794,9 @@ int x1, y1, x2, y2;
         /* we don't know which of <x1,y2> or <x2,y1> we'll hit first, but
            whichever it is, they're consecutive iff next seg is the other */
         if (curr->wx == x1 && curr->wy == y2)
-            return (boolean)(wnxt->wx == x2 && wnxt->wy == y1);
+            return (boolean) (wnxt->wx == x2 && wnxt->wy == y1);
         if (curr->wx == x2 && curr->wy == y1)
-            return (boolean)(wnxt->wx == x1 && wnxt->wy == y2);
+            return (boolean) (wnxt->wx == x1 && wnxt->wy == y2);
     }
     /* should never reach here... */
     return FALSE;

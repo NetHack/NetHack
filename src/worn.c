@@ -1,4 +1,4 @@
-/* NetHack 3.6	worn.c	$NHDT-Date: 1445214551 2015/10/19 00:29:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.45 $ */
+/* NetHack 3.6	worn.c	$NHDT-Date: 1446078770 2015/10/29 00:32:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.46 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -658,7 +658,7 @@ long flag;
         for (obj = mon->minvent; obj; obj = obj->nobj)
             if (obj->owornmask & flag)
                 return obj;
-        return ((struct obj *) 0);
+        return (struct obj *) 0;
     }
 }
 
@@ -871,9 +871,9 @@ boolean polyspot;
         }
     }
     if (handless_or_tiny || has_horns(mdat)) {
-        if ((otmp = which_armor(mon, W_ARMH)) != 0 &&
+        if ((otmp = which_armor(mon, W_ARMH)) != 0
             /* flimsy test for horns matches polyself handling */
-            (handless_or_tiny || !is_flimsy(otmp))) {
+            && (handless_or_tiny || !is_flimsy(otmp))) {
             if (vis)
                 pline("%s helmet falls to the %s!", s_suffix(Monnam(mon)),
                       surface(mon->mx, mon->my));
@@ -942,9 +942,9 @@ struct obj *obj;
  * Exceptions to things based on race. Correctly checks polymorphed player
  *race.
  * Returns:
- *	 0 No exception, normal rules apply.
- * 	 1 If the race/object combination is acceptable.
- *	-1 If the race/object combination is unacceptable.
+ *       0 No exception, normal rules apply.
+ *       1 If the race/object combination is acceptable.
+ *      -1 If the race/object combination is unacceptable.
  */
 int
 racial_exception(mon, obj)
@@ -959,7 +959,7 @@ struct obj *obj;
         return 1;
     /* Unacceptable Exceptions: */
     /* Checks for object that certain races should never use go here */
-    /*	return -1; */
+    /*  return -1; */
 
     return 0;
 }
