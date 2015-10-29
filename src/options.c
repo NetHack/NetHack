@@ -3772,6 +3772,7 @@ boolean setinitial, setfromfile;
         menu_item *style_pick = (menu_item *) 0;
         tmpwin = create_nhwindow(NHW_MENU);
         start_menu(tmpwin);
+        any = zeroany;
         for (i = 0; i < SIZE(menutype); i++) {
             style_name = menutype[i];
             /* note: separate `style_name' variable used
