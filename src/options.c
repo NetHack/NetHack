@@ -4292,6 +4292,7 @@ boolean setinitial, setfromfile;
             Sprintf(fmtstr, "%%-%ds %%s", biggest + 5);
             tmpwin = create_nhwindow(NHW_MENU);
             start_menu(tmpwin);
+            any = zeroany;
             any.a_int = 1;
             add_menu(tmpwin, NO_GLYPH, &any, let++, 0, ATR_NONE,
                      "Default Symbols", MENU_UNSELECTED);
