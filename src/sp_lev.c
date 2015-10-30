@@ -5850,6 +5850,7 @@ sp_lev *lvl;
             coder->frame = tmpframe;
         } while (coder->frame);
     }
+    free(coder);
 
     return TRUE;
 }
