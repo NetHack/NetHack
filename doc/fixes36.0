@@ -929,6 +929,8 @@ casting spell of protection when previous casting(s) hadn't time out yet
 remaining monsters continued to move after hero conceptually left the level
 	when a monster knocked him onto a level-changing trap (this bug made
 	it be feasible--but not practical--to level teleport with the Amulet)
+#turn for non-priest/non-knight attempts to cast "turn undead" spell, but
+	was forcing the spell to target self rather than choose a direction
 
 
 Platform- and/or Interface-Specific Fixes

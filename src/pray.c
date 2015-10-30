@@ -1,4 +1,4 @@
-/* NetHack 3.6	pray.c	$NHDT-Date: 1445556883 2015/10/22 23:34:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.85 $ */
+/* NetHack 3.6	pray.c	$NHDT-Date: 1446191091 2015/10/30 07:44:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.86 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -37,9 +37,9 @@ STATIC_DCL boolean FDECL(blocked_boulder, (int, int));
  */
 
 /*
- *	Moloch, who dwells in Gehennom, is the "renegade" cruel god
- *	responsible for the theft of the Amulet from Marduk, the Creator.
- *	Moloch is unaligned.
+ *      Moloch, who dwells in Gehennom, is the "renegade" cruel god
+ *      responsible for the theft of the Amulet from Marduk, the Creator.
+ *      Moloch is unaligned.
  */
 static const char *Moloch = "Moloch";
 
@@ -91,20 +91,6 @@ static int p_type; /* (-1)-3: (-1)=really naughty, 3=really good */
 #define TROUBLE_CONFUSED (-10)
 #define TROUBLE_HALLUCINATION (-11)
 
-/* We could force rehumanize of polyselfed people, but we can't tell
-   unintentional shape changes from the other kind. Oh well.
-   3.4.2: make an exception if polymorphed into a form which lacks
-   hands; that's a case where the ramifications override this doubt.
- */
-
-/* Return 0 if nothing particular seems wrong, positive numbers for
-   serious trouble, and negative numbers for comparative annoyances. This
-   returns the worst problem. There may be others, and the gods may fix
-   more than one.
-
-This could get as bizarre as noting surrounding opponents, (or hostile dogs),
-but that's really hard.
- */
 
 #define ugod_is_angry() (u.ualign.record < 0)
 #define on_altar() IS_ALTAR(levl[u.ux][u.uy].typ)
@@ -154,6 +140,20 @@ boolean only_if_injured; /* determines whether maxhp <= 5 matters */
     return (boolean) (curhp <= 5 || curhp * divisor <= maxhp);
 }
 
+/*
+ * Return 0 if nothing particular seems wrong, positive numbers for
+ * serious trouble, and negative numbers for comparative annoyances.
+ * This returns the worst problem. There may be others, and the gods
+ * may fix more than one.
+ *
+ * This could get as bizarre as noting surrounding opponents, (or
+ * hostile dogs), but that's really hard.
+ *
+ * We could force rehumanize of polyselfed people, but we can't tell
+ * unintentional shape changes from the other kind. Oh well.
+ * 3.4.2: make an exception if polymorphed into a form which lacks
+ * hands; that's a case where the ramifications override this doubt.
+ */
 STATIC_OVL int
 in_trouble()
 {
@@ -310,7 +310,7 @@ worst_cursed_item()
 
 STATIC_OVL void
 fix_worst_trouble(trouble)
-register int trouble;
+int trouble;
 {
     int i;
     struct obj *otmp = 0;
@@ -344,7 +344,7 @@ register int trouble;
         break;
     case TROUBLE_STARVING:
         losestr(-1);
-    /* fall into... */
+        /*FALLTHRU*/
     case TROUBLE_HUNGRY:
         Your("%s feels content.", body_part(STOMACH));
         init_uhunger();
@@ -533,8 +533,8 @@ god_zaps_you(resp_god)
 aligntyp resp_god;
 {
     if (u.uswallow) {
-        pline("Suddenly a bolt of lightning comes down at you from the "
-              "heavens!");
+        pline(
+          "Suddenly a bolt of lightning comes down at you from the heavens!");
         pline("It strikes %s!", mon_nam(u.ustuck));
         if (!resists_elec(u.ustuck)) {
             pline("%s fries to a crisp!", Monnam(u.ustuck));
@@ -618,7 +618,7 @@ STATIC_OVL void
 angrygods(resp_god)
 aligntyp resp_god;
 {
-    register int maxanger;
+    int maxanger;
 
     if (Inhell)
         resp_god = A_NONE;
@@ -629,9 +629,9 @@ aligntyp resp_god;
     if (resp_god != u.ualign.type)
         maxanger = u.ualign.record / 2 + (Luck > 0 ? -Luck / 3 : -Luck);
     else
-        maxanger =
-            3 * u.ugangr
-            + ((Luck > 0 || u.ualign.record >= STRIDENT) ? -Luck / 3 : -Luck);
+        maxanger = 3 * u.ugangr + ((Luck > 0 || u.ualign.record >= STRIDENT)
+                                   ? -Luck / 3
+                                   : -Luck);
     if (maxanger < 1)
         maxanger = 1; /* possible if bad align & good luck */
     else if (maxanger > 15)
@@ -872,9 +872,9 @@ aligntyp g_align;
     int pat_on_head = 0, kick_on_butt;
 
     You_feel("that %s is %s.", align_gname(g_align),
-             u.ualign.record >= DEVOUT
+             (u.ualign.record >= DEVOUT)
                  ? Hallucination ? "pleased as punch" : "well-pleased"
-                 : u.ualign.record >= STRIDENT
+                 : (u.ualign.record >= STRIDENT)
                        ? Hallucination ? "ticklish" : "pleased"
                        : Hallucination ? "full" : "satisfied");
 
@@ -885,19 +885,20 @@ aligntyp g_align;
     } else if (u.ualign.record < 2 && trouble <= 0)
         adjalign(1);
 
-    /* depending on your luck & align level, the god you prayed to will:
-       - fix your worst problem if it's major.
-       - fix all your major problems.
-       - fix your worst problem if it's minor.
-       - fix all of your problems.
-       - do you a gratuitous favor.
-
-       if you make it to the the last category, you roll randomly again
-       to see what they do for you.
-
-       If your luck is at least 0, then you are guaranteed rescued
-       from your worst major problem. */
-
+    /*
+     * Depending on your luck & align level, the god you prayed to will:
+     *  - fix your worst problem if it's major;
+     *  - fix all your major problems;
+     *  - fix your worst problem if it's minor;
+     *  - fix all of your problems;
+     *  - do you a gratuitous favor.
+     *
+     * If you make it to the the last category, you roll randomly again
+     * to see what they do for you.
+     *
+     * If your luck is at least 0, then you are guaranteed rescued from
+     * your worst major problem.
+     */
     if (!trouble && u.ualign.record >= DEVOUT) {
         /* if hero was in trouble, but got better, no special favor */
         if (p_trouble == 0)
@@ -1193,6 +1194,7 @@ aligntyp g_align;
 const char *words;
 {
     const char *quot = "";
+
     if (words)
         quot = "\"";
     else
@@ -1270,16 +1272,15 @@ dosacrifice()
     otmp = floorfood("sacrifice", 1);
     if (!otmp)
         return 0;
-/*
-  Was based on nutritional value and aging behavior (< 50 moves).
-  Sacrificing a food ration got you max luck instantly, making the
-  gods as easy to please as an angry dog!
-
-  Now only accepts corpses, based on the game's evaluation of their
-  toughness.  Human and pet sacrifice, as well as sacrificing unicorns
-  of your alignment, is strongly discouraged.
- */
-
+    /*
+     * Was based on nutritional value and aging behavior (< 50 moves).
+     * Sacrificing a food ration got you max luck instantly, making the
+     * gods as easy to please as an angry dog!
+     *
+     * Now only accepts corpses, based on the game's evaluation of their
+     * toughness.  Human and pet sacrifice, as well as sacrificing unicorns
+     * of your alignment, is strongly discouraged.
+     */
 #define MAXVALUE 24 /* Highest corpse value (besides Wiz) */
 
     if (otmp->otyp == CORPSE) {
@@ -1376,11 +1377,11 @@ dosacrifice()
             else
                 useupf(otmp, 1L);
             return 1;
-        } else if (has_omonst(otmp) && ((mtmp = get_mtraits(otmp, FALSE))
-                                        != (struct monst *) 0)
+        } else if (has_omonst(otmp)
+                   && (mtmp = get_mtraits(otmp, FALSE)) != 0
                    && mtmp->mtame) {
-            /* mtmp is a temporary pointer to a tame monster's attributes,
-             * not a real monster */
+                /* mtmp is a temporary pointer to a tame monster's attributes,
+                 * not a real monster */
             pline("So this is how you repay loyalty?");
             adjalign(-3);
             value = -1;
@@ -1391,32 +1392,37 @@ dosacrifice()
         } else if (is_unicorn(ptr)) {
             int unicalign = sgn(ptr->maligntyp);
 
-            /* If same as altar, always a very bad action. */
             if (unicalign == altaralign) {
+                /* When same as altar, always a very bad action.
+                 */
                 pline("Such an action is an insult to %s!",
-                      (unicalign == A_CHAOTIC) ? "chaos" : unicalign
-                                                               ? "law"
-                                                               : "balance");
+                      (unicalign == A_CHAOTIC) ? "chaos"
+                         : unicalign ? "law" : "balance");
                 (void) adjattrib(A_WIS, -1, TRUE);
                 value = -5;
             } else if (u.ualign.type == altaralign) {
-                /* If different from altar, and altar is same as yours, */
-                /* it's a very good action */
+                /* When different from altar, and altar is same as yours,
+                 * it's a very good action.
+                 */
                 if (u.ualign.record < ALIGNLIM)
                     You_feel("appropriately %s.", align_str(u.ualign.type));
                 else
                     You_feel("you are thoroughly on the right path.");
                 adjalign(5);
                 value += 3;
-            } else
-                /* If sacrificing unicorn of your alignment to altar not of */
-                /* your alignment, your god gets angry and it's a conversion
-                   */
-                if (unicalign == u.ualign.type) {
+            } else if (unicalign == u.ualign.type) {
+                /* When sacrificing unicorn of your alignment to altar not of
+                 * your alignment, your god gets angry and it's a conversion.
+                 */
                 u.ualign.record = -1;
                 value = 1;
-            } else
+            } else {
+                /* Otherwise, unicorn's alignment is different from yours
+                 * and different from the altar's.  It's an ordinary (well,
+                 * with a bonus) sacrifice on a cross-aligned altar.
+                 */
                 value += 3;
+            }
         }
     } /* corpse */
 
@@ -1439,7 +1445,7 @@ dosacrifice()
                                : "ashamed");
             return 1;
         } else {
-            /* The final Test.	Did you win? */
+            /* The final Test.  Did you win? */
             if (uamul == otmp)
                 Amulet_off();
             u.uevent.ascended = 1;
@@ -1581,11 +1587,11 @@ dosacrifice()
                         | (Align2amask(u.ualign.type));
                     if (!Blind)
                         pline_The("altar glows %s.",
-                                  hcolor(u.ualign.type == A_LAWFUL
-                                             ? NH_WHITE
-                                             : u.ualign.type
-                                                   ? NH_BLACK
-                                                   : (const char *) "gray"));
+                                  hcolor((u.ualign.type == A_LAWFUL)
+                                            ? NH_WHITE
+                                            : u.ualign.type
+                                               ? NH_BLACK
+                                               : (const char *) "gray"));
 
                     if (rnl(u.ulevel) > 6 && u.ualign.record > 0
                         && rnd(u.ualign.record) > (3 * ALIGNLIM) / 4)
@@ -1610,8 +1616,8 @@ dosacrifice()
         consume_offering(otmp);
         /* OK, you get brownie points. */
         if (u.ugangr) {
-            u.ugangr -=
-                ((value * (u.ualign.type == A_CHAOTIC ? 2 : 3)) / MAXVALUE);
+            u.ugangr -= ((value * (u.ualign.type == A_CHAOTIC ? 2 : 3))
+                         / MAXVALUE);
             if (u.ugangr < 0)
                 u.ugangr = 0;
             if (u.ugangr != saved_anger) {
@@ -1704,8 +1710,7 @@ dosacrifice()
                         body_part(FOOT));
                 else
                     You(Hallucination
-                            ? "see crabgrass at your %s.  A funny thing in a "
-                              "dungeon."
+                    ? "see crabgrass at your %s.  A funny thing in a dungeon."
                             : "glimpse a four-leaf clover at your %s.",
                         makeplural(body_part(FOOT)));
             }
@@ -1741,10 +1746,10 @@ boolean praying; /* false means no messages should be given */
     else
         alignment = u.ualign.record;
 
-    if ((p_trouble > 0) ? (u.ublesscnt > 200) :     /* big trouble */
-            (p_trouble < 0) ? (u.ublesscnt > 100) : /* minor difficulties */
-                (u.ublesscnt > 0))                  /* not in trouble */
-        p_type = 0;                                 /* too soon... */
+    if ((p_trouble > 0) ? (u.ublesscnt > 200)      /* big trouble */
+           : (p_trouble < 0) ? (u.ublesscnt > 100) /* minor difficulties */
+              : (u.ublesscnt > 0))                 /* not in trouble */
+        p_type = 0;                     /* too soon... */
     else if ((int) Luck < 0 || u.ugangr || alignment < 0)
         p_type = 1; /* too naughty... */
     else /* alignment >= 0 */ {
@@ -1761,9 +1766,10 @@ boolean praying; /* false means no messages should be given */
        return value a non-deterministic approximation for enlightenment.
        This case should be uncommon enough to live with... */
 
-    return !praying ? (boolean)(p_type == 3 && !Inhell) : TRUE;
+    return !praying ? (boolean) (p_type == 3 && !Inhell) : TRUE;
 }
 
+/* #pray commmand */
 int
 dopray()
 {
@@ -1804,15 +1810,17 @@ dopray()
     return 1;
 }
 
-STATIC_PTR int prayer_done() /* M. Stephenson (1.0.3b) */
+STATIC_PTR int
+prayer_done() /* M. Stephenson (1.0.3b) */
 {
     aligntyp alignment = p_aligntyp;
 
     u.uinvulnerable = FALSE;
     if (p_type == -1) {
-        godvoice(alignment, alignment == A_LAWFUL
-                                ? "Vile creature, thou durst call upon me?"
-                                : "Walk no more, perversion of nature!");
+        godvoice(alignment,
+                 (alignment == A_LAWFUL)
+                    ? "Vile creature, thou durst call upon me?"
+                    : "Walk no more, perversion of nature!");
         You_feel("like you are falling apart.");
         /* KMH -- Gods have mastery over unchanging */
         rehumanize();
@@ -1857,27 +1865,30 @@ STATIC_PTR int prayer_done() /* M. Stephenson (1.0.3b) */
     return 1;
 }
 
+/* #turn command */
 int
 doturn()
-{ /* Knights & Priest(esse)s only please */
-
+{
+    /* Knights & Priest(esse)s only please */
     struct monst *mtmp, *mtmp2;
     int once, range, xlev;
 
     if (!Role_if(PM_PRIEST) && !Role_if(PM_KNIGHT)) {
-        /* Try to use turn undead spell. */
-        if (objects[SPE_TURN_UNDEAD].oc_name_known) {
-            register int sp_no;
-            for (sp_no = 0;
-                 sp_no < MAXSPELL && spl_book[sp_no].sp_id != NO_SPELL
-                 && spl_book[sp_no].sp_id != SPE_TURN_UNDEAD;
-                 sp_no++)
-                ;
+        /* Try to use the "turn undead" spell.
+         *
+         * This used to be based on whether hero knows the name of the
+         * turn undead spellbook, but it's possible to know--and be able
+         * to cast--the spell while having lost the book ID to amnesia.
+         * (It also used to tell spelleffects() to cast at self?)
+         */
+        int sp_no;
 
-            if (sp_no < MAXSPELL && spl_book[sp_no].sp_id == SPE_TURN_UNDEAD)
-                return spelleffects(sp_no, TRUE);
+        for (sp_no = 0; sp_no < MAXSPELL; ++sp_no) {
+            if (spl_book[sp_no].sp_id == NO_SPELL)
+                break;
+            else if (spl_book[sp_no].sp_id == SPE_TURN_UNDEAD)
+                return spelleffects(sp_no, FALSE);
         }
-
         You("don't know how to turn undead!");
         return 0;
     }
@@ -1885,13 +1896,12 @@ doturn()
 
     if ((u.ualign.type != A_CHAOTIC
          && (is_demon(youmonst.data) || is_undead(youmonst.data)))
-        || u.ugangr > 6 /* "Die, mortal!" */) {
+        || u.ugangr > 6) { /* "Die, mortal!" */
         pline("For some reason, %s seems to ignore you.", u_gname());
         aggravate();
         exercise(A_WIS, FALSE);
         return 0;
     }
-
     if (Inhell) {
         pline("Since you are in Gehennom, %s won't help you.", u_gname());
         aggravate();
@@ -1967,7 +1977,9 @@ a_gname()
     return a_gname_at(u.ux, u.uy);
 }
 
-const char *a_gname_at(x, y) /* returns the name of an altar's deity */
+/* returns the name of an altar's deity */
+const char *
+a_gname_at(x, y)
 xchar x, y;
 {
     if (!IS_ALTAR(levl[x][y].typ))
@@ -1976,7 +1988,9 @@ xchar x, y;
     return align_gname(a_align(x, y));
 }
 
-const char *u_gname() /* returns the name of the player's deity */
+/* returns the name of the hero's deity */
+const char *
+u_gname()
 {
     return align_gname(u.ualign.type);
 }
@@ -2135,12 +2149,15 @@ int dx, dy;
 
     switch (count) {
     case 0:
-        return FALSE; /* no boulders--not blocked */
+        /* no boulders--not blocked */
+        return FALSE;
     case 1:
-        break; /* possibly blocked depending on if it's pushable */
+        /* possibly blocked depending on if it's pushable */
+        break;
     default:
-        return TRUE; /* >1 boulder--blocked after they push the top
-   one; don't force them to push it first to find out */
+        /* more than one boulder--blocked after they push the top one;
+           don't force them to push it first to find out */
+        return TRUE;
     }
 
     if (!isok(u.ux + 2 * dx, u.uy + 2 * dy))
