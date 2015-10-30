@@ -1425,6 +1425,7 @@ struct monst *mtmp;
         /* don't use monster fields after killing it */
         boolean confused = (mtmp->mconf ? TRUE : FALSE);
         int mmx = mtmp->mx, mmy = mtmp->my;
+        boolean is_cursed = otmp->cursed;
 
         mreadmsg(mtmp, otmp);
         /* Identify the scroll */
@@ -1457,8 +1458,8 @@ struct monst *mtmp;
         }
         m_useup(mtmp, otmp);
         /* Attack the player */
-        if (distmin(mmx, mmy, u.ux, u.uy) == 1 && !otmp->cursed) {
-            drop_boulder_on_player(confused, !otmp->cursed, FALSE, TRUE);
+        if (distmin(mmx, mmy, u.ux, u.uy) == 1 && !is_cursed) {
+            drop_boulder_on_player(confused, !is_cursed, FALSE, TRUE);
         }
 
         return (mtmp->mhp <= 0) ? 1 : 2;
