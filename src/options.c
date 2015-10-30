@@ -4338,9 +4338,7 @@ boolean setinitial, setfromfile;
                         clear_symsetentry(which_set, TRUE);
 
                         /* transfer only the name of the symbol set */
-                        symset[which_set].name =
-                            (char *) alloc(strlen(sl->name) + 1);
-                        Strcpy(symset[which_set].name, sl->name);
+                        symset[which_set].name = dupstr(sl->name);
                         ready_to_switch = TRUE;
                         break;
                     }
