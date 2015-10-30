@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1445556873 2015/10/22 23:34:33 $  $NHDT-Branch: master $:$NHDT-Revision: 1.192 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1446166647 2015/10/30 00:57:27 $  $NHDT-Branch: master $:$NHDT-Revision: 1.193 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -631,12 +631,16 @@ movemon()
      */
 
     for (mtmp = fmon; mtmp; mtmp = nmtmp) {
+        /* end monster movement early if hero is flagged to leave the level */
+        if (u.utotype
 #ifdef SAFERHANGUP
-        if (program_state.done_hup) {
+            /* or if the program has lost contact with the user */
+            || program_state.done_hup
+#endif
+            ) {
             somebody_can_move = FALSE;
             break;
         }
-#endif
         nmtmp = mtmp->nmon;
         /* one dead monster needs to perform a move after death:
            vault guard whose temporary corridor is still on the map */

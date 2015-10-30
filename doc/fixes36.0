@@ -386,7 +386,7 @@ meditating monsters stop meditating when affected by something which wakes
 monsters capable of hiding can't do so when trapped or while holding you
 limit recursive calls to spoteffects (poly'd hero fell into water, reverted
 	to human because of it, fell into same water, then crawled out twice)
-ensure that the punishment ball and chain make it into the save file after being
+ensure that the punishment ball and chain make it into save file after being
 	temporarily orphaned from the normal chains in the swallowing code
 display the invisible monster glyph ('I') whenever an unseen monster forces
 	poly'd hero out of hiding
@@ -812,7 +812,7 @@ autosearch finds and transforms secret doors and corridors even while blind,
 fix message typo, "you sold some items inside <container> for N gold piecess"
 hangup save made during magic mapping or <foo> detection performed while
 	underwater could put hero on top of the water after restore
-fix bug preventing stone-resistant monsters w/o gloves from wielding cockatrices
+fix bug preventing stone-resistant monster w/o gloves from wielding cockatrice
 items conferring life drain resistance were affected by drain life spell
 'a'pply command could be used to recognize undiscovered potions of oil
 fix replacing an existing bones file in wizard mode [load?y, unlink?n, die?y,
@@ -907,11 +907,11 @@ when commands (D, A, object identify) mix object class filtering with BUCX
 	blessed scrolls rather than all scrolls plus blessed everything)
 bmask is stored with the objects on the Plane of Water to prevent segfault
 engraving on drawbridge with wand of digging should produce appropriate
-    message instead of referring to gravel
+	message instead of referring to gravel
 engraving Elbereth is less efficient as protection
 scare monster scroll now provides a better effect
 monsters without hands can no longer pick up piles of objects (with 
-    certain exceptions)
+	certain exceptions)
 uncursed enchant weapon now correctly fixes erosion
 scroll of earth messages cleaned up
 long worms can no longer be leashed
@@ -926,6 +926,9 @@ flesh golems hit by electricity healed by wrong amount
 fleeing monsters couldn't use stairs that lead to different dungeon branch
 casting spell of protection when previous casting(s) hadn't time out yet
 	miscalculated the new AC increment
+remaining monsters continued to move after hero conceptually left the level
+	when a monster knocked him onto a level-changing trap (this bug made
+	it be feasible--but not practical--to level teleport with the Amulet)
 
 
 Platform- and/or Interface-Specific Fixes
