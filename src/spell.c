@@ -1,5 +1,5 @@
-/* NetHack 3.6	spell.c	$NHDT-Date: 1445906865 2015/10/27 00:47:45 $  $NHDT-Branch: master $:$NHDT-Revision: 1.66 $ */
-/*	Copyright (c) M. Stephenson 1988			  */
+/* NetHack 3.6	spell.c	$NHDT-Date: 1446191879 2015/10/30 07:57:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.67 $ */
+/*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -48,48 +48,47 @@ STATIC_DCL const char *FDECL(spelltypemnemonic, (int));
  *
  * Reasoning:
  *   spelbase, spelheal:
- *	Arc are aware of magic through historical research
- *	Bar abhor magic (Conan finds it "interferes with his animal instincts")
- *	Cav are ignorant to magic
- *	Hea are very aware of healing magic through medical research
- *	Kni are moderately aware of healing from Paladin training
- *	Mon use magic to attack and defend in lieu of weapons and armor
- *	Pri are very aware of healing magic through theological research
- *	Ran avoid magic, preferring to fight unseen and unheard
- *	Rog are moderately aware of magic through trickery
- *	Sam have limited magical awareness, preferring meditation to conjuring
- *	Tou are aware of magic from all the great films they have seen
- *	Val have limited magical awareness, preferring fighting
- *	Wiz are trained mages
+ *      Arc are aware of magic through historical research
+ *      Bar abhor magic (Conan finds it "interferes with his animal instincts")
+ *      Cav are ignorant to magic
+ *      Hea are very aware of healing magic through medical research
+ *      Kni are moderately aware of healing from Paladin training
+ *      Mon use magic to attack and defend in lieu of weapons and armor
+ *      Pri are very aware of healing magic through theological research
+ *      Ran avoid magic, preferring to fight unseen and unheard
+ *      Rog are moderately aware of magic through trickery
+ *      Sam have limited magical awareness, preferring meditation to conjuring
+ *      Tou are aware of magic from all the great films they have seen
+ *      Val have limited magical awareness, preferring fighting
+ *      Wiz are trained mages
  *
- *	The arms penalty is lessened for trained fighters Bar, Kni, Ran,
- *	Sam, Val -
- *	the penalty is its metal interference, not encumbrance.
- *	The `spelspec' is a single spell which is fundamentally easier
- *	 for that role to cast.
+ *      The arms penalty is lessened for trained fighters Bar, Kni, Ran,
+ *      Sam, Val -- the penalty is its metal interference, not encumbrance.
+ *      The `spelspec' is a single spell which is fundamentally easier
+ *      for that role to cast.
  *
  *  spelspec, spelsbon:
- *	Arc map masters (SPE_MAGIC_MAPPING)
- *	Bar fugue/berserker (SPE_HASTE_SELF)
- *	Cav born to dig (SPE_DIG)
- *	Hea to heal (SPE_CURE_SICKNESS)
- *	Kni to turn back evil (SPE_TURN_UNDEAD)
- *	Mon to preserve their abilities (SPE_RESTORE_ABILITY)
- *	Pri to bless (SPE_REMOVE_CURSE)
- *	Ran to hide (SPE_INVISIBILITY)
- *	Rog to find loot (SPE_DETECT_TREASURE)
- *	Sam to be At One (SPE_CLAIRVOYANCE)
- *	Tou to smile (SPE_CHARM_MONSTER)
- *	Val control the cold (SPE_CONE_OF_COLD)
- *	Wiz all really, but SPE_MAGIC_MISSILE is their party trick
+ *      Arc map masters (SPE_MAGIC_MAPPING)
+ *      Bar fugue/berserker (SPE_HASTE_SELF)
+ *      Cav born to dig (SPE_DIG)
+ *      Hea to heal (SPE_CURE_SICKNESS)
+ *      Kni to turn back evil (SPE_TURN_UNDEAD)
+ *      Mon to preserve their abilities (SPE_RESTORE_ABILITY)
+ *      Pri to bless (SPE_REMOVE_CURSE)
+ *      Ran to hide (SPE_INVISIBILITY)
+ *      Rog to find loot (SPE_DETECT_TREASURE)
+ *      Sam to be At One (SPE_CLAIRVOYANCE)
+ *      Tou to smile (SPE_CHARM_MONSTER)
+ *      Val control the cold (SPE_CONE_OF_COLD)
+ *      Wiz all really, but SPE_MAGIC_MISSILE is their party trick
  *
- *	See percent_success() below for more comments.
+ *      See percent_success() below for more comments.
  *
  *  uarmbon, uarmsbon, uarmhbon, uarmgbon, uarmfbon:
- *	Fighters find body armour & shield a little less limiting.
- *	Headgear, Gauntlets and Footwear are not role-specific (but
- *	still have an effect, except helm of brilliance, which is designed
- *	to permit magic-use).
+ *      Fighters find body armour & shield a little less limiting.
+ *      Headgear, Gauntlets and Footwear are not role-specific (but
+ *      still have an effect, except helm of brilliance, which is designed
+ *      to permit magic-use).
  */
 
 #define uarmhbon 4 /* Metal helmets interfere with the mind */
@@ -730,7 +729,7 @@ cast_protection()
     /* The more u.uspellprot you already have, the less you get,
      * and the better your natural ac, the less you get.
      *
-     *	LEVEL AC    SPELLPROT from successive SPE_PROTECTION casts
+     *  LEVEL AC    SPELLPROT from successive SPE_PROTECTION casts
      *      1     10    0,  1,  2,  3,  4
      *      1      0    0,  1,  2,  3
      *      1    -10    0,  1,  2
@@ -1016,15 +1015,24 @@ boolean atme;
     case SPE_DRAIN_LIFE:
     case SPE_STONE_TO_FLESH:
         if (!(objects[pseudo->otyp].oc_dir == NODIR)) {
-            if (atme)
+            if (atme) {
                 u.dx = u.dy = u.dz = 0;
-            else if (!getdir((char *) 0)) {
+            } else if (!getdir((char *) 0)) {
                 /* getdir cancelled, re-use previous direction */
+                /*
+                 * FIXME:  reusing previous direction only makes sense
+                 * if there is an actual previous direction.  When there
+                 * isn't one, the spell gets cast at self which is rarely
+                 * what the player intended.  Unfortunately, the way
+                 * spelleffects() is organized means that aborting with
+                 * "nevermind" is not an option.
+                 */
                 pline_The("magical energy is released!");
             }
             if (!u.dx && !u.dy && !u.dz) {
                 if ((damage = zapyourself(pseudo, TRUE)) != 0) {
                     char buf[BUFSZ];
+
                     Sprintf(buf, "zapped %sself with a spell", uhim());
                     if (physical_damage)
                         damage = Maybe_Half_Phys(damage);
@@ -1208,8 +1216,8 @@ losespells()
             /* lose access to spell [i] */
             spellknow(i) = 0;
 #if 0
-	    /* also forget its book */
-	    forget_single_object(spellid(i));
+            /* also forget its book */
+            forget_single_object(spellid(i));
 #endif
             /* and abuse wisdom */
             exercise(A_WIS, FALSE);
@@ -1224,12 +1232,12 @@ losespells()
  * pairs of them becomes very tedious once the list reaches two pages.
  *
  * Possible extensions:
- *	provide means for player to control ordering of skill classes;
- *	provide means to supply value N such that first N entries stick
- *	while rest of list is being sorted;
- *	make chosen sort order be persistent such that when new spells
- *	are learned, they get inserted into sorted order rather than be
- *	appended to the end of the list?
+ *      provide means for player to control ordering of skill classes;
+ *      provide means to supply value N such that first N entries stick
+ *      while rest of list is being sorted;
+ *      make chosen sort order be persistent such that when new spells
+ *      are learned, they get inserted into sorted order rather than be
+ *      appended to the end of the list?
  */
 static const char *spl_sortchoices[] = {
     "by casting letter",
@@ -1264,10 +1272,10 @@ const genericptr vptr2;
     /*
      * gather up all of the possible parameters except spell name
      * in advance, even though some might not be needed:
-     *	indx? = spl_orderindx[] index into spl_book[];
-     *	otyp? = spl_book[] index into objects[];
-     *	levl? = spell level;
-     *	skil? = skill group aka spell class;
+     *  indx. = spl_orderindx[] index into spl_book[];
+     *  otyp. = spl_book[] index into objects[];
+     *  levl. = spell level;
+     *  skil. = skill group aka spell class.
      */
     int indx1 = *(int *) vptr1, indx2 = *(int *) vptr2,
         otyp1 = spl_book[indx1].sp_id, otyp2 = spl_book[indx2].sp_id,
@@ -1334,8 +1342,8 @@ sortspells()
 
     if (!spl_orderindx) {
         /* we haven't done any sorting yet; list is in casting order */
-        if (spl_sortmode == SORTBY_LETTER || /* default */
-            spl_sortmode == SORTRETAINORDER)
+        if (spl_sortmode == SORTBY_LETTER /* default */
+            || spl_sortmode == SORTRETAINORDER)
             return;
         /* allocate enough for full spellbook rather than just N spells */
         spl_orderindx = (int *) alloc(MAXSPELL * sizeof(int));
@@ -1417,8 +1425,8 @@ dovspell()
     if (spellid(0) == NO_SPELL) {
         You("don't know any spells right now.");
     } else {
-        while (
-            dospellmenu("Currently known spells", SPELLMENU_VIEW, &splnum)) {
+        while (dospellmenu("Currently known spells",
+                           SPELLMENU_VIEW, &splnum)) {
             if (splnum == SPELLMENU_SORT) {
                 if (spellsortmenu())
                     sortspells();

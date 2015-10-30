@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1445556878 2015/10/22 23:34:38 $  $NHDT-Branch: master $:$NHDT-Revision: 1.149 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1446191877 2015/10/30 07:57:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.150 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -186,7 +186,7 @@ int otyp;
 
 boolean
 obj_is_pname(obj)
-register struct obj *obj;
+struct obj *obj;
 {
     if (!obj->oartifact || !has_oname(obj))
         return FALSE;
@@ -206,7 +206,7 @@ register struct obj *obj;
  */
 char *
 distant_name(obj, func)
-register struct obj *obj;
+struct obj *obj;
 char *FDECL((*func), (OBJ_P));
 {
     char *str;
@@ -395,10 +395,13 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
         }
         if (Is_pudding(obj)) {
             Sprintf(buf, "%s%s",
-                    obj->owt < 100
-                        ? "small "
-                        : obj->owt > 500 ? "very large "
-                                         : obj->owt > 300 ? "large " : "",
+                    (obj->owt < 100)
+                       ? "small "
+                       : (obj->owt > 500)
+                          ? "very large "
+                          : (obj->owt > 300)
+                             ? "large "
+                             : "",
                     actualn);
             break;
         }
@@ -415,15 +418,16 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
         if (typ == STATUE && omndx != NON_PM)
             Sprintf(buf, "%s%s of %s%s",
                     (Role_if(PM_ARCHEOLOGIST) && (obj->spe & STATUE_HISTORIC))
-                        ? "historic "
-                        : "",
+                       ? "historic "
+                       : "",
                     actualn,
                     type_is_pname(&mons[omndx])
-                        ? ""
-                        : the_unique_pm(&mons[omndx])
-                              ? "the "
-                              : index(vowels, *mons[omndx].mname) ? "an "
-                                                                  : "a ",
+                       ? ""
+                       : the_unique_pm(&mons[omndx])
+                          ? "the "
+                          : index(vowels, *mons[omndx].mname)
+                             ? "an "
+                             : "a ",
                     mons[omndx].mname);
         else
             Strcpy(buf, actualn);
@@ -518,6 +522,7 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
         break;
     case GEM_CLASS: {
         const char *rock = (ocl->oc_material == MINERAL) ? "stone" : "gem";
+
         if (!dknown) {
             Strcpy(buf, rock);
         } else if (!nn) {
@@ -540,6 +545,7 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
 
     if (obj->otyp == T_SHIRT && program_state.gameover) {
         char tmpbuf[BUFSZ];
+
         Sprintf(eos(buf), " with text \"%s\"", tshirt_text(obj, tmpbuf));
     }
 
@@ -615,20 +621,22 @@ struct obj *obj;
     if (m_shot.n > 1 && m_shot.o == obj->otyp) {
         /* copy xname's result so that we can reuse its return buffer */
         Strcpy(tmpbuf, onm);
+        /* play it safe even though there's no risk of overflowing onm[] */
+        tmpbuf[BUFSZ - sizeof "the Nth "] = '\0';
         /* "the Nth arrow"; value will eventually be passed to an() or
            The(), both of which correctly handle this "the " prefix */
         Sprintf(onm, "the %d%s %s", m_shot.i, ordin(m_shot.i), tmpbuf);
     }
-
     return onm;
 }
 
 /* used for naming "the unique_item" instead of "a unique_item" */
 boolean
 the_unique_obj(obj)
-register struct obj *obj;
+struct obj *obj;
 {
     boolean known = (obj->known || iflags.override_ID);
+
     if (!obj->dknown && !iflags.override_ID)
         return FALSE;
     else if (obj->otyp == FAKE_AMULET_OF_YENDOR && !known)
@@ -702,12 +710,14 @@ char *prefix;
     }
     if (rknown && obj->oerodeproof)
         Strcat(prefix, iscrys
-                           ? "fixed "
-                           : is_rustprone(obj)
-                                 ? "rustproof "
-                                 : is_corrodeable(obj) ? "corrodeproof "
-                                                       : /* "stainless"? */
-                                       is_flammable(obj) ? "fireproof " : "");
+                          ? "fixed "
+                          : is_rustprone(obj)
+                             ? "rustproof "
+                             : is_corrodeable(obj)
+                                ? "corrodeproof " /* "stainless"? */
+                                : is_flammable(obj)
+                                   ? "fireproof "
+                                   : "");
 }
 
 static char *
@@ -719,10 +729,9 @@ boolean with_price;
     boolean known, cknown, bknown, lknown;
     int omndx = obj->corpsenm;
     char prefix[PREFIX];
-    char tmpbuf[PREFIX + 1];
-    /* when we have to add something at the start of prefix instead of the
-     * end (Strcat is used on the end)
-     */
+    char tmpbuf[PREFIX + 1]; /* for when we have to add something at
+                                the start of prefix instead of the
+                                end (Strcat is used on the end) */
     register char *bp = xname(obj);
 
     if (iflags.override_ID) {
@@ -745,18 +754,19 @@ boolean with_price;
         ispoisoned = TRUE;
     }
 
-    if (obj->quan != 1L)
+    if (obj->quan != 1L) {
         Sprintf(prefix, "%ld ", obj->quan);
-    else if (obj->otyp == CORPSE)
+    } else if (obj->otyp == CORPSE) {
         /* skip article prefix for corpses [else corpse_xname()
            would have to be taught how to strip it off again] */
         *prefix = '\0';
-    else if (obj_is_pname(obj) || the_unique_obj(obj)) {
+    } else if (obj_is_pname(obj) || the_unique_obj(obj)) {
         if (!strncmpi(bp, "the ", 4))
             bp += 4;
         Strcpy(prefix, "the ");
-    } else
+    } else {
         Strcpy(prefix, "a ");
+    }
 
     /* "empty" goes at the beginning, but item count goes at the end */
     if (cknown
@@ -919,7 +929,7 @@ boolean with_price;
         } else if (obj->otyp == EGG) {
 #if 0 /* corpses don't tell if they're stale either */
             if (known && stale_egg(obj))
-            Strcat(prefix, "stale ");
+                Strcat(prefix, "stale ");
 #endif
             if (omndx >= LOW_PM
                 && (known || (mvitals[omndx].mvflags & MV_KNOWS_EGG))) {
@@ -983,7 +993,6 @@ boolean with_price;
                 Strcat(bp, " (at the ready)");
                 break;
             }
-
         /* Small things and ammo not for a bow */
         case RING_CLASS:
         case AMULET_CLASS:
@@ -999,7 +1008,8 @@ boolean with_price;
     if (!iflags.suppress_price && is_unpaid(obj)) {
         long quotedprice = unpaid_cost(obj, TRUE);
 
-        Sprintf(eos(bp), " (%s, %ld %s)", obj->unpaid ? "unpaid" : "contents",
+        Sprintf(eos(bp), " (%s, %ld %s)",
+                obj->unpaid ? "unpaid" : "contents",
                 quotedprice, currency(quotedprice));
     } else if (with_price) {
         long price = get_cost_of_shop_item(obj);
@@ -1258,8 +1268,8 @@ struct obj *obj;
 char *
 short_oname(obj, func, altfunc, lenlimit)
 struct obj *obj;
-char *FDECL((*func), (OBJ_P)),   /* main formatting routine */
-    *FDECL((*altfunc), (OBJ_P)); /* alternate for shortest result */
+char *FDECL((*func), (OBJ_P)),    /* main formatting routine */
+     *FDECL((*altfunc), (OBJ_P)); /* alternate for shortest result */
 unsigned lenlimit;
 {
     struct obj save_obj;
@@ -1382,7 +1392,8 @@ char *
 An(str)
 const char *str;
 {
-    register char *tmp = an(str);
+    char *tmp = an(str);
+
     *tmp = highc(*tmp);
     return tmp;
 }
@@ -1411,10 +1422,10 @@ const char *str;
         int l;
 
         /* some objects have capitalized adjectives in their names */
-        if (((tmp = rindex(str, ' ')) || (tmp = rindex(str, '-')))
-            && (tmp[1] < 'A' || tmp[1] > 'Z'))
+        if (((tmp = rindex(str, ' ')) != 0 || (tmp = rindex(str, '-')) != 0)
+            && (tmp[1] < 'A' || tmp[1] > 'Z')) {
             insert_the = TRUE;
-        else if (tmp && index(str, ' ') < tmp) { /* has spaces */
+        } else if (tmp && index(str, ' ') < tmp) { /* has spaces */
             /* it needs an article if the name contains "of" */
             tmp = strstri(str, " of ");
             named = strstri(str, " named ");
@@ -1444,7 +1455,8 @@ char *
 The(str)
 const char *str;
 {
-    register char *tmp = the(str);
+    char *tmp = the(str);
+
     *tmp = highc(*tmp);
     return tmp;
 }
@@ -1452,17 +1464,16 @@ const char *str;
 /* returns "count cxname(otmp)" or just cxname(otmp) if count == 1 */
 char *
 aobjnam(otmp, verb)
-register struct obj *otmp;
-register const char *verb;
+struct obj *otmp;
+const char *verb;
 {
-    register char *bp = cxname(otmp);
     char prefix[PREFIX];
+    char *bp = cxname(otmp);
 
     if (otmp->quan != 1L) {
         Sprintf(prefix, "%ld ", otmp->quan);
         bp = strprepend(bp, prefix);
     }
-
     if (verb) {
         Strcat(bp, " ");
         Strcat(bp, otense(otmp, verb));
@@ -1487,7 +1498,6 @@ const char *verb;
 
         s = strncat(outbuf, s, space_left);
     }
-
     return s;
 }
 
@@ -1506,8 +1516,8 @@ const char *verb;
 /* like aobjnam, but prepend "The", not count, and use xname */
 char *
 Tobjnam(otmp, verb)
-register struct obj *otmp;
-register const char *verb;
+struct obj *otmp;
+const char *verb;
 {
     char *bp = The(xname(otmp));
 
@@ -1521,9 +1531,9 @@ register const char *verb;
 /* capitalized variant of doname() */
 char *
 Doname2(obj)
-register struct obj *obj;
+struct obj *obj;
 {
-    register char *s = doname(obj);
+    char *s = doname(obj);
 
     *s = highc(*s);
     return s;
@@ -1664,8 +1674,8 @@ static const char wrpsym[] = { WAND_CLASS,   RING_CLASS,   POTION_CLASS,
 /* return form of the verb (input plural) if xname(otmp) were the subject */
 char *
 otense(otmp, verb)
-register struct obj *otmp;
-register const char *verb;
+struct obj *otmp;
+const char *verb;
 {
     char *buf;
 
@@ -2127,8 +2137,8 @@ const char *oldstr;
             if (p >= bp + 3 && lowc(p[-3]) == 'i') { /* "ies" */
                 if (!BSTRCMPI(bp, p - 7, "cookies")
                     || !BSTRCMPI(bp, p - 4, "pies")
-                    || !BSTRCMPI(bp, p - 5, "mbies") || /* zombie */
-                    !BSTRCMPI(bp, p - 5, "yries"))      /* valkyrie */
+                    || !BSTRCMPI(bp, p - 5, "mbies") /* zombie */
+                    || !BSTRCMPI(bp, p - 5, "yries")) /* valkyrie */
                     goto mins;
                 Strcasecpy(p - 3, "y"); /* ies -> y */
                 goto bottom;
@@ -2144,14 +2154,14 @@ const char *oldstr;
                 goto bottom;
             }
             /* note: nurses, axes but boxes, wumpuses */
-            if (!BSTRCMPI(bp, p - 4, "eses") || !BSTRCMPI(bp, p - 4, "oxes")
-                ||                              /* boxes, foxes */
-                !BSTRCMPI(bp, p - 4, "nxes") || /* lynxes */
-                !BSTRCMPI(bp, p - 4, "ches") || !BSTRCMPI(bp, p - 4, "uses")
-                ||                               /* lotuses */
-                !BSTRCMPI(bp, p - 4, "sses") ||  /* priestesses */
-                !BSTRCMPI(bp, p - 5, "atoes") || /* tomatoes */
-                !BSTRCMPI(bp, p - 7, "dingoes")
+            if (!BSTRCMPI(bp, p - 4, "eses")
+                || !BSTRCMPI(bp, p - 4, "oxes") /* boxes, foxes */
+                || !BSTRCMPI(bp, p - 4, "nxes") /* lynxes */
+                || !BSTRCMPI(bp, p - 4, "ches")
+                || !BSTRCMPI(bp, p - 4, "uses") /* lotuses */
+                || !BSTRCMPI(bp, p - 4, "sses") /* priestesses */
+                || !BSTRCMPI(bp, p - 5, "atoes") /* tomatoes */
+                || !BSTRCMPI(bp, p - 7, "dingoes")
                 || !BSTRCMPI(bp, p - 7, "Aleaxes")) {
                 *(p - 2) = '\0'; /* drop es */
                 goto bottom;
@@ -2159,10 +2169,11 @@ const char *oldstr;
 
             /* ends in 's' but not 'es' */
         } else if (!BSTRCMPI(bp, p - 2, "us")) { /* lotus, fungus... */
-            if (BSTRCMPI(bp, p - 6, "tengus") && /* but not these... */
-                BSTRCMPI(bp, p - 7, "hezrous"))
+            if (BSTRCMPI(bp, p - 6, "tengus") /* but not these... */
+                && BSTRCMPI(bp, p - 7, "hezrous"))
                 goto bottom;
-        } else if (!BSTRCMPI(bp, p - 2, "ss") || !BSTRCMPI(bp, p - 5, " lens")
+        } else if (!BSTRCMPI(bp, p - 2, "ss")
+                   || !BSTRCMPI(bp, p - 5, " lens")
                    || (p - 4 == bp && !strcmpi(p - 4, "lens"))) {
             goto bottom;
         }
@@ -2273,7 +2284,7 @@ boolean retry_inverted; /* optional extra "of" handling */
             return fuzzymatch(buf, o_str, " -", TRUE);
         }
     } else if (strstri(o_str, "ability")) {
-        /* when presented with "foo of bar", make singular() used to
+        /* when presented with "foo of bar", makesingular() used to
            singularize both foo & bar, but now only does so for foo */
         /* catch "{potion(s),ring} of {gain,restore,sustain} abilities" */
         if ((p = strstri(u_str, "abilities")) != 0
@@ -3360,8 +3371,7 @@ typfnd:
             otmp->spe = ishistoric ? STATUE_HISTORIC : 0;
             break;
         case SCALE_MAIL:
-            /* Dragon mail - depends on the order of objects */
-            /*		 & dragons.			 */
+            /* Dragon mail - depends on the order of objects & dragons. */
             if (mntmp >= PM_GRAY_DRAGON && mntmp <= PM_YELLOW_DRAGON)
                 otmp->otyp = GRAY_DRAGON_SCALE_MAIL + mntmp - PM_GRAY_DRAGON;
             break;
@@ -3558,16 +3568,16 @@ helm_simple_name(helmet)
 struct obj *helmet;
 {
     /*
-     *	There is some wiggle room here; the result has been chosen
-     *	for consistency with the "protected by hard helmet" messages
-     *	given for various bonks on the head:  headgear that provides
-     *	such protection is a "helm", that which doesn't is a "hat".
+     *  There is some wiggle room here; the result has been chosen
+     *  for consistency with the "protected by hard helmet" messages
+     *  given for various bonks on the head:  headgear that provides
+     *  such protection is a "helm", that which doesn't is a "hat".
      *
-     *	    elven leather helm / leather hat	-> hat
-     *	    dwarvish iron helm / hard hat	-> helm
-     *	The rest are completely straightforward:
-     *	    fedora, cornuthaum, dunce cap	-> hat
-     *	    all other types of helmets		-> helm
+     *      elven leather helm / leather hat    -> hat
+     *      dwarvish iron helm / hard hat       -> helm
+     *  The rest are completely straightforward:
+     *      fedora, cornuthaum, dunce cap       -> hat
+     *      all other types of helmets          -> helm
      */
     return (helmet && !is_metallic(helmet)) ? "hat" : "helm";
 }

@@ -1,4 +1,4 @@
-/* NetHack 3.6	mklev.c	$NHDT-Date: 1431192767 2015/05/09 17:32:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.41 $ */
+/* NetHack 3.6	mklev.c	$NHDT-Date: 1446191876 2015/10/30 07:57:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.44 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -21,18 +21,16 @@ STATIC_DCL struct mkroom *FDECL(pos_to_room, (XCHAR_P, XCHAR_P));
 STATIC_DCL boolean FDECL(place_niche, (struct mkroom *, int *, int *, int *));
 STATIC_DCL void FDECL(makeniche, (int));
 STATIC_DCL void NDECL(make_niches);
-
-STATIC_PTR int FDECL(CFDECLSPEC do_comp,
-                     (const genericptr, const genericptr));
-
+STATIC_PTR int FDECL(CFDECLSPEC do_comp, (const genericptr,
+                                          const genericptr));
 STATIC_DCL void FDECL(dosdoor, (XCHAR_P, XCHAR_P, struct mkroom *, int));
 STATIC_DCL void FDECL(join, (int, int, BOOLEAN_P));
-STATIC_DCL void FDECL(do_room_or_subroom,
-                      (struct mkroom *, int, int, int, int, BOOLEAN_P,
-                       SCHAR_P, BOOLEAN_P, BOOLEAN_P));
+STATIC_DCL void FDECL(do_room_or_subroom, (struct mkroom *, int, int,
+                                           int, int, BOOLEAN_P,
+                                           SCHAR_P, BOOLEAN_P, BOOLEAN_P));
 STATIC_DCL void NDECL(makerooms);
-STATIC_DCL void FDECL(finddpos,
-                      (coord *, XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P));
+STATIC_DCL void FDECL(finddpos, (coord *, XCHAR_P, XCHAR_P,
+                                 XCHAR_P, XCHAR_P));
 STATIC_DCL void FDECL(mkinvpos, (XCHAR_P, XCHAR_P, int));
 STATIC_DCL void FDECL(mk_knox_portal, (XCHAR_P, XCHAR_P));
 
@@ -62,7 +60,7 @@ const genericptr vy;
     x = (const struct mkroom *) vx;
     y = (const struct mkroom *) vy;
     if (x->lx < y->lx)
-        return (-1);
+        return -1;
     return (x->lx > y->lx);
 #endif /* LINT */
 }
@@ -186,7 +184,7 @@ boolean is_room;
 
 void
 add_room(lowx, lowy, hix, hiy, lit, rtype, special)
-register int lowx, lowy, hix, hiy;
+int lowx, lowy, hix, hiy;
 boolean lit;
 schar rtype;
 boolean special;
@@ -204,7 +202,7 @@ boolean special;
 void
 add_subroom(proom, lowx, lowy, hix, hiy, lit, rtype, special)
 struct mkroom *proom;
-register int lowx, lowy, hix, hiy;
+int lowx, lowy, hix, hiy;
 boolean lit;
 schar rtype;
 boolean special;
@@ -384,10 +382,10 @@ register struct mkroom *aroom;
 STATIC_OVL void
 dosdoor(x, y, aroom, type)
 register xchar x, y;
-register struct mkroom *aroom;
-register int type;
+struct mkroom *aroom;
+int type;
 {
-    boolean shdoor = ((*in_rooms(x, y, SHOPBASE)) ? TRUE : FALSE);
+    boolean shdoor = *in_rooms(x, y, SHOPBASE) ? TRUE : FALSE;
 
     if (!IS_WALL(levl[x][y].typ)) /* avoid SDOORs on already made doors */
         type = DOOR;
@@ -404,15 +402,16 @@ register int type;
             if (levl[x][y].doormask != D_ISOPEN && !shdoor
                 && level_difficulty() >= 5 && !rn2(25))
                 levl[x][y].doormask |= D_TRAPPED;
-        } else
+        } else {
 #ifdef STUPID
             if (shdoor)
-            levl[x][y].doormask = D_ISOPEN;
-        else
-            levl[x][y].doormask = D_NODOOR;
+                levl[x][y].doormask = D_ISOPEN;
+            else
+                levl[x][y].doormask = D_NODOOR;
 #else
             levl[x][y].doormask = (shdoor ? D_ISOPEN : D_NODOOR);
 #endif
+        }
 
         /* also done in roguecorr(); doing it here first prevents
            making mimics in place of trapped doors on rogue level */
@@ -463,10 +462,11 @@ int *dy, *xx, *yy;
     }
     *xx = dd.x;
     *yy = dd.y;
-    return ((boolean)(
-        (isok(*xx, *yy + *dy) && levl[*xx][*yy + *dy].typ == STONE)
-        && (isok(*xx, *yy - *dy) && !IS_POOL(levl[*xx][*yy - *dy].typ)
-            && !IS_FURNITURE(levl[*xx][*yy - *dy].typ))));
+    return (boolean) ((isok(*xx, *yy + *dy)
+                       && levl[*xx][*yy + *dy].typ == STONE)
+                      && (isok(*xx, *yy - *dy)
+                          && !IS_POOL(levl[*xx][*yy - *dy].typ)
+                          && !IS_FURNITURE(levl[*xx][*yy - *dy].typ)));
 }
 
 /* there should be one of these per trap, in the same order as trap.h */
@@ -484,12 +484,12 @@ makeniche(trap_type)
 int trap_type;
 {
     register struct mkroom *aroom;
-    register struct rm *rm;
-    register int vct = 8;
+    struct rm *rm;
+    int vct = 8;
     int dy, xx, yy;
-    register struct trap *ttmp;
+    struct trap *ttmp;
 
-    if (doorindex < DOORMAX)
+    if (doorindex < DOORMAX) {
         while (vct--) {
             aroom = &rooms[rn2(nroom)];
             if (aroom->rtype != OROOM)
@@ -542,13 +542,13 @@ int trap_type;
             }
             return;
         }
+    }
 }
 
 STATIC_OVL void
 make_niches()
 {
-    register int ct = rnd((nroom >> 1) + 1), dep = depth(&u.uz);
-
+    int ct = rnd((nroom >> 1) + 1), dep = depth(&u.uz);
     boolean ltptr = (!level.flags.noteleport && dep > 15),
             vamp = (dep > 5 && dep < 25);
 
@@ -578,8 +578,8 @@ makevtele()
 STATIC_OVL void
 clear_level_structures()
 {
-    static struct rm zerorm = { cmap_to_glyph(S_stone), 0, 0, 0, 0, 0, 0, 0,
-                                0, 0 };
+    static struct rm zerorm = { cmap_to_glyph(S_stone),
+                                0, 0, 0, 0, 0, 0, 0, 0, 0 };
     register int x, y;
     register struct rm *lev;
 
@@ -587,16 +587,17 @@ clear_level_structures()
         lev = &levl[x][0];
         for (y = 0; y < ROWNO; y++) {
             *lev++ = zerorm;
-#ifdef MICROPORT_BUG
+            /*
+             * These used to be '#if MICROPORT_BUG',
+             * with use of memset(0) for '#if !MICROPORT_BUG' below,
+             * but memset is not appropriate for initializing pointers,
+             * so do these level.objects[][] and level.monsters[][]
+             * initializations unconditionally.
+             */
             level.objects[x][y] = (struct obj *) 0;
             level.monsters[x][y] = (struct monst *) 0;
-#endif
         }
     }
-#ifndef MICROPORT_BUG
-    (void) memset((genericptr_t) level.objects, 0, sizeof(level.objects));
-    (void) memset((genericptr_t) level.monsters, 0, sizeof(level.monsters));
-#endif
     level.objlist = (struct obj *) 0;
     level.buriedobjlist = (struct obj *) 0;
     level.monlist = (struct monst *) 0;
@@ -876,9 +877,9 @@ skip0:
 }
 
 /*
- *	Place deposits of minerals (gold and misc gems) in the stone
- *	surrounding the rooms on the map.
- *	Also place kelp in water.
+ *      Place deposits of minerals (gold and misc gems) in the stone
+ *      surrounding the rooms on the map.
+ *      Also place kelp in water.
  *      mineralize(-1, -1, -1, -1, FALSE); => "default" behaviour
  */
 void
@@ -1014,19 +1015,21 @@ mklev()
 
 void
 #ifdef SPECIALIZATION
-topologize(croom, do_ordinary) register struct mkroom *croom;
+topologize(croom, do_ordinary)
+struct mkroom *croom;
 boolean do_ordinary;
 #else
-topologize(croom) register struct mkroom *croom;
+topologize(croom)
+struct mkroom *croom;
 #endif
 {
     register int x, y, roomno = (int) ((croom - rooms) + ROOMOFFSET);
-    register int lowx = croom->lx, lowy = croom->ly;
-    register int hix = croom->hx, hiy = croom->hy;
+    int lowx = croom->lx, lowy = croom->ly;
+    int hix = croom->hx, hiy = croom->hy;
 #ifdef SPECIALIZATION
-    register schar rtype = croom->rtype;
+    schar rtype = croom->rtype;
 #endif
-    register int subindex, nsubrooms = croom->nsubrooms;
+    int subindex, nsubrooms = croom->nsubrooms;
 
     /* skip the room if already done; i.e. a shop handled out of order */
     /* also skip if this is non-rectangular (it _must_ be done already) */
@@ -1069,7 +1072,7 @@ topologize(croom) register struct mkroom *croom;
     /* subrooms */
     for (subindex = 0; subindex < nsubrooms; subindex++)
 #ifdef SPECIALIZATION
-        topologize(croom->sbrooms[subindex], (rtype != OROOM));
+        topologize(croom->sbrooms[subindex], (boolean) (rtype != OROOM));
 #else
         topologize(croom->sbrooms[subindex]);
 #endif
@@ -1213,9 +1216,9 @@ register xchar x, y;
 /* see whether it is allowable to create a door at [x,y] */
 int
 okdoor(x, y)
-register xchar x, y;
+xchar x, y;
 {
-    register boolean near_door = bydoor(x, y);
+    boolean near_door = bydoor(x, y);
 
     return ((levl[x][y].typ == HWALL || levl[x][y].typ == VWALL)
             && doorindex < DOORMAX && !near_door);
@@ -1223,8 +1226,8 @@ register xchar x, y;
 
 void
 dodoor(x, y, aroom)
-register int x, y;
-register struct mkroom *aroom;
+int x, y;
+struct mkroom *aroom;
 {
     if (doorindex >= DOORMAX) {
         impossible("DOORMAX exceeded?");
@@ -1238,17 +1241,17 @@ boolean
 occupied(x, y)
 register xchar x, y;
 {
-    return ((boolean)(t_at(x, y) || IS_FURNITURE(levl[x][y].typ)
+    return (boolean) (t_at(x, y) || IS_FURNITURE(levl[x][y].typ)
                       || is_lava(x, y) || is_pool(x, y)
-                      || invocation_pos(x, y)));
+                      || invocation_pos(x, y));
 }
 
 /* make a trap somewhere (in croom if mazeflag = 0 && !tm) */
 /* if tm != null, make trap at that location */
 void
 mktrap(num, mazeflag, croom, tm)
-register int num, mazeflag;
-register struct mkroom *croom;
+int num, mazeflag;
+struct mkroom *croom;
 coord *tm;
 {
     register int kind;
@@ -1401,11 +1404,10 @@ struct mkroom *croom;
     levl[x][y].ladder = up ? LA_UP : LA_DOWN;
 }
 
-STATIC_OVL
-void
+STATIC_OVL void
 mkfount(mazeflag, croom)
-register int mazeflag;
-register struct mkroom *croom;
+int mazeflag;
+struct mkroom *croom;
 {
     coord m;
     register int tryct = 0;
@@ -1430,7 +1432,7 @@ register struct mkroom *croom;
 
 STATIC_OVL void
 mksink(croom)
-register struct mkroom *croom;
+struct mkroom *croom;
 {
     coord m;
     register int tryct = 0;
@@ -1450,7 +1452,7 @@ register struct mkroom *croom;
 
 STATIC_OVL void
 mkaltar(croom)
-register struct mkroom *croom;
+struct mkroom *croom;
 {
     coord m;
     register int tryct = 0;
@@ -1518,6 +1520,7 @@ struct mkroom *croom;
 /* maze levels have slightly different constraints from normal levels */
 #define x_maze_min 2
 #define y_maze_min 2
+
 /*
  * Major level transmutation: add a set of stairs (to the Sanctum) after
  * an earthquake that leaves behind a a new topology, centered at inv_pos.
@@ -1623,9 +1626,8 @@ int dist;
         lev->lit = TRUE;
     lev->waslit = TRUE;
     lev->horizontal = FALSE;
-    viz_array[y][x] = (dist < 6) ? (IN_SIGHT | COULD_SEE)
-                                 : /* short-circuit vision recalc */
-                          COULD_SEE;
+    /* short-circuit vision recalc */
+    viz_array[y][x] = (dist < 6) ? (IN_SIGHT | COULD_SEE) : COULD_SEE;
 
     switch (dist) {
     case 1: /* fire traps */

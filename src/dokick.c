@@ -1,4 +1,4 @@
-/* NetHack 3.6	dokick.c	$NHDT-Date: 1445301122 2015/10/20 00:32:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.101 $ */
+/* NetHack 3.6	dokick.c	$NHDT-Date: 1446191875 2015/10/30 07:57:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.102 $ */
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -144,7 +144,7 @@ xchar x, y;
             mon = 0; /* don't kick after all */
         context.forcefight = save_forcefight;
     }
-    return (boolean)(mon != 0);
+    return (boolean) (mon != 0);
 }
 
 STATIC_OVL void
@@ -507,7 +507,7 @@ xchar x, y;
 
     if (Fumbling && !rn2(3)) {
         Your("clumsy kick missed.");
-        return (1);
+        return 1;
     }
 
     if (!uarmf && kickedobj->otyp == CORPSE
@@ -525,8 +525,8 @@ xchar x, y;
         }
     }
 
-    /* range < 2 means the object will not move.	*/
-    /* maybe dexterity should also figure here.     */
+    /* range < 2 means the object will not move.  */
+    /* maybe dexterity should also figure here.   */
     range = (int) ((ACURRSTR) / 2 - kickedobj->owt / 40);
 
     if (martial())
@@ -601,7 +601,7 @@ xchar x, y;
                 breakchestlock(kickedobj, FALSE);
                 if (otrp)
                     (void) chest_trap(kickedobj, LEG, FALSE);
-                return (1);
+                return 1;
             }
         } else {
             if (!rn2(3) || (martial() && !rn2(2))) {
@@ -609,11 +609,11 @@ xchar x, y;
                 kickedobj->lknown = 1;
                 if (otrp)
                     (void) chest_trap(kickedobj, LEG, FALSE);
-                return (1);
+                return 1;
             }
         }
         if (range < 2)
-            return (1);
+            return 1;
         /* else let it fall through to the next cases... */
     }
 
@@ -675,9 +675,9 @@ xchar x, y;
             && kickedobj->ocarry == mon)
             return 1; /* alert shk caught it */
         notonhead = (mon->mx != bhitpos.x || mon->my != bhitpos.y);
-        if (isgold ? ghitm(mon, kickedobj) : /* caught? */
-                thitmonst(mon, kickedobj))   /* hit && used up? */
-            return (1);
+        if (isgold ? ghitm(mon, kickedobj)      /* caught? */
+                   : thitmonst(mon, kickedobj)) /* hit && used up? */
+            return 1;
     }
 
     /* the object might have fallen down a hole;
@@ -702,7 +702,7 @@ xchar x, y;
     place_object(kickedobj, bhitpos.x, bhitpos.y);
     stackobj(kickedobj);
     newsym(kickedobj->ox, kickedobj->oy);
-    return (1);
+    return 1;
 }
 
 /* cause of death if kicking kills kicker */
@@ -816,9 +816,9 @@ dokick()
     }
 
     if (!getdir((char *) 0))
-        return (0);
+        return 0;
     if (!u.dx && !u.dy)
-        return (0);
+        return 0;
 
     x = u.ux + u.dx;
     y = u.uy + u.dy;
@@ -843,7 +843,7 @@ dokick()
             Your("feeble kick has no effect.");
             break;
         }
-        return (1);
+        return 1;
     } else if (u.utrap && u.utraptype == TT_PIT) {
         /* must be Passes_walls */
         You("kick at the side of the pit.");
@@ -862,7 +862,7 @@ dokick()
             && !IS_DOOR(levl[xx][yy].typ)
             && (!Is_airlevel(&u.uz) || !OBJ_AT(xx, yy))) {
             You("have nothing to brace yourself against.");
-            return (0);
+            return 0;
         }
     }
 
@@ -934,7 +934,7 @@ dokick()
                 range = 1;
             hurtle(-u.dx, -u.dy, range, TRUE);
         }
-        return (1);
+        return 1;
     }
     if (glyph_is_invisible(levl[x][y].glyph)) {
         unmap_object(x, y);
@@ -951,7 +951,7 @@ dokick()
         if (kick_object(x, y)) {
             if (Is_airlevel(&u.uz))
                 hurtle(-u.dx, -u.dy, 1, TRUE); /* assume it's light */
-            return (1);
+            return 1;
         }
         goto ouch;
     }
@@ -980,7 +980,7 @@ dokick()
                 if (maploc->doormask == D_ISOPEN
                     || maploc->doormask == D_NODOOR)
                     unblock_point(x, y); /* vision */
-                return (1);
+                return 1;
             } else
                 goto ouch;
         }
@@ -994,7 +994,7 @@ dokick()
                 else
                     newsym(x, y);
                 unblock_point(x, y); /* vision */
-                return (1);
+                return 1;
             } else
                 goto ouch;
         }
@@ -1013,7 +1013,7 @@ dokick()
                     newsym(x, y);
                 }
                 exercise(A_DEX, TRUE);
-                return (1);
+                return 1;
             } else if (Luck > 0 && !rn2(3) && !maploc->looted) {
                 (void) mkgold((long) rn1(201, 300), x, y);
                 i = Luck + 1;
@@ -1031,11 +1031,11 @@ dokick()
                 }
                 /* prevent endless milking */
                 maploc->looted = T_LOOTED;
-                return (1);
+                return 1;
             } else if (!rn2(4)) {
                 if (dunlev(&u.uz) < dunlevs_in_dungeon(&u.uz)) {
                     fall_through(FALSE);
-                    return (1);
+                    return 1;
                 } else
                     goto ouch;
             }
@@ -1049,7 +1049,7 @@ dokick()
                 goto ouch;
             altar_wrath(x, y);
             exercise(A_DEX, TRUE);
-            return (1);
+            return 1;
         }
         if (IS_FOUNTAIN(maploc->typ)) {
             if (Levitation)
@@ -1064,7 +1064,7 @@ dokick()
                     /* could cause short-lived fumbling here */
                 }
             exercise(A_DEX, TRUE);
-            return (1);
+            return 1;
         }
         if (IS_GRAVE(maploc->typ)) {
             if (Levitation)
@@ -1121,7 +1121,7 @@ dokick()
                 exercise(A_WIS, TRUE); /* discovered a new food source! */
                 newsym(x, y);
                 maploc->looted |= TREE_LOOTED;
-                return (1);
+                return 1;
             } else if (!(maploc->looted & TREE_SWARM)) {
                 int cnt = rnl(4) + 2;
                 int made = 0;
@@ -1139,7 +1139,7 @@ dokick()
                 else
                     You("smell stale honey.");
                 maploc->looted |= TREE_SWARM;
-                return (1);
+                return 1;
             }
             goto ouch;
         }
@@ -1157,7 +1157,7 @@ dokick()
                 else
                     pline("Klunk!");
                 exercise(A_DEX, TRUE);
-                return (1);
+                return 1;
             } else if (!(maploc->looted & S_LPUDDING) && !rn2(3)
                        && !(mvitals[PM_BLACK_PUDDING].mvflags & G_GONE)) {
                 if (Blind)
@@ -1169,7 +1169,7 @@ dokick()
                 exercise(A_DEX, TRUE);
                 newsym(x, y);
                 maploc->looted |= S_LPUDDING;
-                return (1);
+                return 1;
             } else if (!(maploc->looted & S_LDWASHER) && !rn2(3)
                        && !(mvitals[washerndx].mvflags & G_GONE)) {
                 /* can't resist... */
@@ -1178,7 +1178,7 @@ dokick()
                     newsym(x, y);
                 maploc->looted |= S_LDWASHER;
                 exercise(A_DEX, TRUE);
-                return (1);
+                return 1;
             } else if (!rn2(3)) {
                 pline("Flupp!  %s.",
                       (Blind ? "You hear a sloshing sound"
@@ -1192,7 +1192,7 @@ dokick()
                     exercise(A_WIS, TRUE); /* a discovery! */
                     maploc->looted |= S_LRING;
                 }
-                return (1);
+                return 1;
             }
             goto ouch;
         }
@@ -1220,7 +1220,7 @@ dokick()
             losehp(Maybe_Half_Phys(dmg), kickstr(buf), KILLED_BY);
             if (Is_airlevel(&u.uz) || Levitation)
                 hurtle(-u.dx, -u.dy, rn1(2, 4), TRUE); /* assume it's heavy */
-            return (1);
+            return 1;
         }
         goto dumb;
     }
@@ -1310,7 +1310,7 @@ dokick()
                 }
             }
     }
-    return (1);
+    return 1;
 }
 
 STATIC_OVL void
@@ -1489,12 +1489,12 @@ boolean shop_floor_obj;
     long n = 0L;
 
     if (!otmp)
-        return (FALSE);
+        return FALSE;
     if ((toloc = down_gate(x, y)) == MIGR_NOWHERE)
-        return (FALSE);
+        return FALSE;
     drop_to(&cc, toloc);
     if (!cc.y)
-        return (FALSE);
+        return FALSE;
 
     /* objects other than attached iron ball always fall down ladder,
        but have a chance of staying otherwise */
@@ -1526,7 +1526,7 @@ boolean shop_floor_obj;
     if (nodrop) {
         if (impact)
             impact_drop(otmp, x, y, 0);
-        return (FALSE);
+        return FALSE;
     }
 
     if (unpaid || shop_floor_obj) {
@@ -1593,7 +1593,7 @@ boolean shop_floor_obj;
         impact_drop(otmp, x, y, 0);
         newsym(x, y);
     }
-    return (TRUE);
+    return TRUE;
 }
 
 void

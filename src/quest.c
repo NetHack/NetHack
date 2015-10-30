@@ -1,5 +1,5 @@
-/* NetHack 3.6	quest.c	$NHDT-Date: 1432512771 2015/05/25 00:12:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.18 $ */
-/*	Copyright 1991, M. Stephenson		  */
+/* NetHack 3.6	quest.c	$NHDT-Date: 1446191878 2015/10/30 07:57:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.20 $ */
+/*      Copyright 1991, M. Stephenson             */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -119,14 +119,14 @@ struct obj *obj;
 boolean
 ok_to_quest()
 {
-    return ((boolean)((Qstat(got_quest) || Qstat(got_thanks)))
-            && (is_pure(FALSE) > 0));
+    return (boolean) ((Qstat(got_quest) || Qstat(got_thanks))
+                      && is_pure(FALSE) > 0);
 }
 
 STATIC_OVL boolean
 not_capable()
 {
-    return ((boolean)(u.ulevel < MIN_QUEST_LEVEL));
+    return (boolean) (u.ulevel < MIN_QUEST_LEVEL);
 }
 
 STATIC_OVL int
@@ -174,8 +174,8 @@ boolean seal;
 
     br = dungeon_branch("The Quest");
     dest = (br->end1.dnum == u.uz.dnum) ? &br->end2 : &br->end1;
-    portal_flag = u.uevent.qexpelled ? 0 : /* returned via artifact? */
-                      !seal ? 1 : -1;
+    portal_flag = u.uevent.qexpelled ? 0 /* returned via artifact? */
+                                     : !seal ? 1 : -1;
     schedule_goto(dest, FALSE, FALSE, portal_flag, (char *) 0, (char *) 0);
     if (seal) { /* remove the portal to the quest - sealing it off */
         int reexpelled = u.uevent.qexpelled;
@@ -232,25 +232,24 @@ struct obj *obj; /* quest artifact; possibly null if carrying Amulet */
 STATIC_OVL void
 chat_with_leader()
 {
-    /*	Rule 0:	Cheater checks.					*/
+    /*  Rule 0: Cheater checks. */
     if (u.uhave.questart && !Qstat(met_nemesis))
         Qstat(cheater) = TRUE;
 
-    /*	It is possible for you to get the amulet without completing
-     *	the quest.  If so, try to induce the player to quest.
+    /*  It is possible for you to get the amulet without completing
+     *  the quest.  If so, try to induce the player to quest.
      */
     if (Qstat(got_thanks)) {
-        /*	Rule 1:	You've gone back with/without the amulet.	*/
+        /* Rule 1: You've gone back with/without the amulet. */
         if (u.uhave.amulet)
             finish_quest((struct obj *) 0);
 
-        /*	Rule 2:	You've gone back before going for the amulet.	*/
+        /* Rule 2: You've gone back before going for the amulet. */
         else
             qt_pager(QT_POSTHANKS);
-    }
 
-    /*	Rule 3: You've got the artifact and are back to return it. */
-    else if (u.uhave.questart) {
+    /* Rule 3: You've got the artifact and are back to return it. */
+    } else if (u.uhave.questart) {
         struct obj *otmp;
 
         for (otmp = invent; otmp; otmp = otmp->nobj)
@@ -259,11 +258,11 @@ chat_with_leader()
 
         finish_quest(otmp);
 
-        /*	Rule 4: You haven't got the artifact yet.	*/
+    /* Rule 4: You haven't got the artifact yet. */
     } else if (Qstat(got_quest)) {
         qt_pager(rn1(10, QT_ENCOURAGE));
 
-        /*	Rule 5: You aren't yet acceptable - or are you? */
+    /* Rule 5: You aren't yet acceptable - or are you? */
     } else {
         if (!Qstat(met_leader)) {
             qt_pager(QT_FIRSTLEADER);
@@ -271,6 +270,7 @@ chat_with_leader()
             Qstat(not_ready) = 0;
         } else
             qt_pager(QT_NEXTLEADER);
+
         /* the quest leader might have passed through the portal into
            the regular dungeon; none of the remaining make sense there */
         if (!on_level(&u.uz, &qstart_level))
@@ -303,7 +303,7 @@ chat_with_leader()
 
 void
 leader_speaks(mtmp)
-register struct monst *mtmp;
+struct monst *mtmp;
 {
     /* maybe you attacked leader? */
     if (!mtmp->mpeaceful) {
@@ -325,7 +325,7 @@ register struct monst *mtmp;
 STATIC_OVL void
 chat_with_nemesis()
 {
-    /*	The nemesis will do most of the talking, but... */
+    /*  The nemesis will do most of the talking, but... */
     qt_pager(rn1(10, QT_DISCOURAGE));
     if (!Qstat(met_nemesis))
         Qstat(met_nemesis++);
@@ -356,7 +356,7 @@ nemesis_speaks()
 STATIC_OVL void
 chat_with_guardian()
 {
-    /*	These guys/gals really don't have much to say... */
+    /*  These guys/gals really don't have much to say... */
     if (u.uhave.questart && Qstat(killed_nemesis))
         qt_pager(rn1(5, QT_GUARDTALK2));
     else
@@ -365,7 +365,7 @@ chat_with_guardian()
 
 STATIC_OVL void
 prisoner_speaks(mtmp)
-register struct monst *mtmp;
+struct monst *mtmp;
 {
     if (mtmp->data == &mons[PM_PRISONER]
         && (mtmp->mstrategy & STRAT_WAITMASK)) {
@@ -407,7 +407,7 @@ register struct monst *mtmp;
 
 void
 quest_talk(mtmp)
-register struct monst *mtmp;
+struct monst *mtmp;
 {
     if (mtmp->m_id == Qstat(leader_m_id)) {
         leader_speaks(mtmp);
@@ -430,8 +430,8 @@ quest_stat_check(mtmp)
 struct monst *mtmp;
 {
     if (mtmp->data->msound == MS_NEMESIS)
-        Qstat(in_battle) =
-            (mtmp->mcanmove && !mtmp->msleeping && monnear(mtmp, u.ux, u.uy));
+        Qstat(in_battle) = (mtmp->mcanmove && !mtmp->msleeping
+                            && monnear(mtmp, u.ux, u.uy));
 }
 
 /*quest.c*/

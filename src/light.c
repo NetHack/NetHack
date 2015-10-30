@@ -1,6 +1,6 @@
-/* NetHack 3.6	light.c	$NHDT-Date: 1432512770 2015/05/25 00:12:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.25 $ */
-/* Copyright (c) Dean Luick, 1994					*/
-/* NetHack may be freely redistributed.  See license for details.	*/
+/* NetHack 3.6	light.c	$NHDT-Date: 1446191876 2015/10/30 07:57:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.28 $ */
+/* Copyright (c) Dean Luick, 1994                                       */
+/* NetHack may be freely redistributed.  See license for details.       */
 
 #include "hack.h"
 #include "lev.h" /* for checking save modes */
@@ -387,18 +387,20 @@ void
 light_sources_sanity_check()
 {
     light_source *ls;
+    struct monst *mtmp;
+    struct obj *otmp;
     unsigned int auint;
 
     for (ls = light_base; ls; ls = ls->next) {
         if (!ls->id.a_monst)
             panic("insane light source: no id!");
         if (ls->type == LS_OBJECT) {
-            struct obj *otmp = (struct obj *) ls->id.a_obj;
+            otmp = (struct obj *) ls->id.a_obj;
             auint = otmp->o_id;
             if (find_oid(auint) != otmp)
                 panic("insane light source: can't find obj #%u!", auint);
         } else if (ls->type == LS_MONSTER) {
-            struct monst *mtmp = (struct monst *) ls->id.a_monst;
+            mtmp = (struct monst *) ls->id.a_monst;
             auint = mtmp->m_id;
             if (find_mid(auint, FM_EVERYWHERE) != mtmp)
                 panic("insane light source: can't find mon #%u!", auint);
@@ -419,9 +421,9 @@ light_source *ls;
     struct monst *mtmp;
 
     if (ls->type == LS_OBJECT || ls->type == LS_MONSTER) {
-        if (ls->flags & LSF_NEEDS_FIXUP)
+        if (ls->flags & LSF_NEEDS_FIXUP) {
             bwrite(fd, (genericptr_t) ls, sizeof(light_source));
-        else {
+        } else {
             /* replace object pointer with id for write, then put back */
             arg_save = ls->id;
             if (ls->type == LS_OBJECT) {
@@ -467,7 +469,7 @@ struct obj *src, *dest;
 boolean
 any_light_source()
 {
-    return light_base != (light_source *) 0;
+    return (boolean) (light_base != (light_source *) 0);
 }
 
 /*
@@ -483,18 +485,17 @@ int x, y;
 
     for (ls = light_base; ls; ls = ls->next)
         /*
-        Is this position check valid??? Can I assume that the positions
-        will always be correct because the objects would have been
-        updated with the last vision update?  [Is that recent enough???]
-        */
+         * Is this position check valid??? Can I assume that the positions
+         * will always be correct because the objects would have been
+         * updated with the last vision update?  [Is that recent enough???]
+         */
         if (ls->type == LS_OBJECT && ls->x == x && ls->y == y) {
             obj = ls->id.a_obj;
             if (obj_is_burning(obj)) {
                 /* The only way to snuff Sunsword is to unwield it.  Darkness
                  * scrolls won't affect it.  (If we got here because it was
                  * dropped or thrown inside a monster, this won't matter
-                 * anyway
-                 * because it will go out when dropped.)
+                 * anyway because it will go out when dropped.)
                  */
                 if (artifact_light(obj))
                     continue;
@@ -523,8 +524,9 @@ boolean
 obj_is_burning(obj)
 struct obj *obj;
 {
-    return (obj->lamplit && (obj->otyp == MAGIC_LAMP || ignitable(obj)
-                             || artifact_light(obj)));
+    return (boolean) (obj->lamplit && (obj->otyp == MAGIC_LAMP
+                                       || ignitable(obj)
+                                       || artifact_light(obj)));
 }
 
 /* copy the light source(s) attached to src, and attach it/them to dest */
@@ -604,21 +606,21 @@ struct obj *obj;
 
     if (obj->otyp == CANDELABRUM_OF_INVOCATION) {
         /*
-         *	The special candelabrum emits more light than the
-         *	corresponding number of candles would.
-         *	 1..3 candles, range 2 (minimum range);
-         *	 4..6 candles, range 3 (normal lamp range);
-         *	    7 candles, range 4 (bright).
+         *      The special candelabrum emits more light than the
+         *      corresponding number of candles would.
+         *       1..3 candles, range 2 (minimum range);
+         *       4..6 candles, range 3 (normal lamp range);
+         *          7 candles, range 4 (bright).
          */
         radius = (obj->spe < 4) ? 2 : (obj->spe < 7) ? 3 : 4;
     } else if (Is_candle(obj)) {
         /*
-         *	Range is incremented by powers of 7 so that it will take
-         *	wizard mode quantities of candles to get more light than
-         *	from a lamp, without imposing an arbitrary limit.
-         *	 1..6   candles, range 2;
-         *	 7..48  candles, range 3;
-         *	49..342 candles, range 4; &c.
+         *      Range is incremented by powers of 7 so that it will take
+         *      wizard mode quantities of candles to get more light than
+         *      from a lamp, without imposing an arbitrary limit.
+         *       1..6   candles, range 2;
+         *       7..48  candles, range 3;
+         *      49..342 candles, range 4; &c.
          */
         long n = obj->quan;
 
@@ -697,14 +699,15 @@ wiz_light_sources()
             Sprintf(buf, "  %2d,%2d   %2d   0x%04x  %s  %s", ls->x, ls->y,
                     ls->range, ls->flags,
                     (ls->type == LS_OBJECT
-                         ? "obj"
-                         : ls->type == LS_MONSTER
-                               ? (mon_is_local(ls->id.a_monst)
-                                      ? "mon"
-                                      : (ls->id.a_monst == &youmonst) ? "you"
-                                                                      : "<m>")
-                               : /* migrating monster */
-                               "???"),
+                       ? "obj"
+                       : ls->type == LS_MONSTER
+                          ? (mon_is_local(ls->id.a_monst)
+                             ? "mon"
+                             : (ls->id.a_monst == &youmonst)
+                                ? "you"
+                                /* migrating monster */
+                                : "<m>")
+                          : "???"),
                     fmt_ptr(ls->id.a_void));
             putstr(win, 0, buf);
         }
