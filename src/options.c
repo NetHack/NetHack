@@ -3247,8 +3247,8 @@ boolean tinitial, tfrom_file;
         if (duplicate)
             complain_about_duplicate(opts, 1);
         if (!negated) {
-            if (symset[PRIMARY])
-                .name badflag = TRUE;
+            if (symset[PRIMARY].name)
+                badflag = TRUE;
             else {
                 symset[PRIMARY].name = (char *) alloc(strlen(fullname) + 1);
                 Strcpy(symset[PRIMARY].name, fullname);
