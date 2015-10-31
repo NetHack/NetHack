@@ -3472,7 +3472,7 @@ char sym;
     register const char *dp = index(Cmd.dirchars, sym);
 
     u.dz = 0;
-    if (!dp)
+    if (!dp || !*dp)
         return 0;
     u.dx = xdir[dp - Cmd.dirchars];
     u.dy = ydir[dp - Cmd.dirchars];
