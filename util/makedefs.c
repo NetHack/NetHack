@@ -950,11 +950,9 @@ const char *fname;
     ifp = getfp(DATA_TEMPLATE, "grep.tmp", RDTMODE);
 
     while ((line = fgetline(ifp)) != 0) {
-        if (line[0] == '#')
-            continue; /* discard comments */
-        if (line[0] == '\n')
-            continue; /* and empty lines */
-        (void) fputs(xcrypt(line), ofp);
+        if (line[0] != '#' && line[0] != '\n')
+            (void) fputs(xcrypt(line), ofp);
+        free(line);
     }
     Fclose(ifp);
     Fclose(ofp);
@@ -1026,11 +1024,16 @@ do_rumors()
             true_rumor_size, true_rumor_offset, false_rumor_count,
             false_rumor_size, false_rumor_offset, eof_offset);
     /* skip the temp file's dummy header */
-    if (!fgetline(tfp) || /* "Don't Edit" */
-        !fgetline(tfp)) { /* count,size,offset */
+    if (!(line = fgetline(tfp))) { /* "Don't Edit" */
         perror(tempfile);
         goto rumors_failure;
     }
+    free(line);
+    if (!(line = fgetline(tfp))) { /* count,size,offset */
+        perror(tempfile);
+        goto rumors_failure;
+    }
+    free(line);
     /* copy the rest of the temp file into the final output file */
     while ((line = fgetline(tfp)) != 0) {
         (void) fputs(line, ofp);
@@ -1653,8 +1656,10 @@ do_data()
     entry_cnt = line_cnt = 0;
     /* read through the input file and split it into two sections */
     while ((line = fgetline(ifp)) != 0) {
-        if (d_filter(line))
+        if (d_filter(line)) {
+            free(line);
             continue;
+        }
         if (*line > ' ') { /* got an entry name */
             /* first finish previous entry */
             if (line_cnt)
@@ -1820,11 +1825,15 @@ do_oracles()
     while ((line = fgetline(ifp)) != 0) {
         SpinCursor(3);
 
-        if (h_filter(line))
+        if (h_filter(line)) {
+            free(line);
             continue;
+        }
         if (!strncmp(line, "-----", 5)) {
-            if (!in_oracle)
+            if (!in_oracle) {
+                free(line);
                 continue;
+            }
             in_oracle = FALSE;
             oracle_cnt++;
             (void) fputs("---\n", tfp);
@@ -1950,9 +1959,12 @@ do_dungeon()
         SpinCursor(3);
 
         rcnt++;
-        if (line[0] == '#')
+        if (line[0] == '#') {
+            free(line);
             continue; /* discard comments */
+        }
         (void) fputs(line, ofp);
+        free(line);
     }
     Fclose(ifp);
     Fclose(ofp);
@@ -2425,9 +2437,10 @@ do_questtxt()
         qt_line++;
         if (qt_control(line))
             do_qt_control(line);
-        else if (qt_comment(line))
+        else if (qt_comment(line)) {
+            free(line);
             continue;
-        else
+        } else
             do_qt_text(line);
         free(line);
     }
@@ -2444,15 +2457,20 @@ do_questtxt()
             if (!in_msg)
                 summary_p = valid_qt_summary(line, FALSE);
             /* don't write anything unless we've got a summary */
-            if (!summary_p)
+            if (!summary_p) {
+                free(line);
                 continue;
+            }
             /* we have summary text; replace raw %E record with it */
             Strcpy(line, summary_p); /* (guaranteed to fit) */
-        } else if (qt_comment(line))
+        } else if (qt_comment(line)) {
+            free(line);
             continue;
+        }
         if (debug)
             Fprintf(stderr, "%ld: %s", ftell(stdout), line);
         (void) fputs(xcrypt(line), ofp);
+        free(line);
     }
     Fclose(ifp);
     Fclose(ofp);
