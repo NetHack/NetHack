@@ -705,6 +705,9 @@ register struct attack *mattk;
                     distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy), otmp);
             nomul(0);
             return 0;
+        } else {
+            obj_extract_self(otmp);
+            obfree(otmp, (struct obj *) 0);
         }
     }
     return 0;
