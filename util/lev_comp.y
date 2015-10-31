@@ -1518,6 +1518,7 @@ seen_trap_mask	: STRING
 		      int token = get_trap_type($1);
 		      if (token == ERR || token == 0)
 			  lc_error("Unknown trap type '%s'!", $1);
+                      Free($1);
 		      $$ = (1L << (token - 1));
 		  }
 		| ALL_ID
@@ -1532,7 +1533,7 @@ seen_trap_mask	: STRING
 
 		      if ((1L << (token - 1)) & $3)
 			  lc_error("Monster seen_traps, trap '%s' listed twice.", $1);
-
+                      Free($1);
 		      $$ = ((1L << (token - 1)) | $3);
 		  }
 		;
@@ -2205,6 +2206,7 @@ encodemonster	: STRING
                           $$ = -1;
                       } else
                           $$ = SP_MONST_PACK(m, def_monsyms[(int)mons[m].mlet].sym);
+                      Free($1);
                   }
                 | CHAR
                   {
@@ -2223,6 +2225,7 @@ encodemonster	: STRING
                           $$ = -1;
                       } else
                           $$ = SP_MONST_PACK(m, $2);
+                      Free($4);
                   }
                 | RANDOM_TYPE
                   {
@@ -2258,7 +2261,7 @@ encodeobj	: STRING
 			  $$ = -1;
 		      } else
 			  $$ = SP_OBJ_PACK(m, 1); /* obj class != 0 to force generation of a specific item */
-
+                      Free($1);
 		  }
 		| CHAR
 		  {
@@ -2277,6 +2280,7 @@ encodeobj	: STRING
 			  $$ = -1;
 		      } else
 			  $$ = SP_OBJ_PACK(m, $2);
+                      Free($4);
 		  }
 		| RANDOM_TYPE
 		  {
