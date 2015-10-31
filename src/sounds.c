@@ -16,8 +16,9 @@ struct monst *mon;
 int rmtyp;
 {
     int rno = levl[mon->mx][mon->my].roomno;
-
-    return rooms[rno - ROOMOFFSET].rtype == rmtyp;
+    if (rno >= ROOMOFFSET)
+        return rooms[rno - ROOMOFFSET].rtype == rmtyp;
+    return FALSE;
 }
 
 void
