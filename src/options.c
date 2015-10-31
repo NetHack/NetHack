@@ -1384,6 +1384,7 @@ char *pattern;
         else
             pline("%s: %s", re_error, regex_error_desc(tmp->regex));
         wait_synch();
+        regex_free(tmp->regex);
         free(tmp);
         return FALSE;
     }
@@ -1499,6 +1500,7 @@ int c, a;
         else
             pline("%s: %s", re_error, regex_error_desc(tmp->match));
         wait_synch();
+        regex_free(tmp->match);
         free(tmp);
         return FALSE;
     } else {
