@@ -5106,6 +5106,16 @@ const char *str;
     return;
 }
 
+boolean
+str_end_is(str, chkstr)
+char *str, *chkstr;
+{
+    int clen = strlen(chkstr);
+    if (strlen(str) >= clen)
+        return !strncmp(eos(str) - clen, chkstr, clen);
+    return FALSE;
+}
+
 /* Returns the fid of the fruit type; if that type already exists, it
  * returns the fid of that one; if it does not exist, it adds a new fruit
  * type to the chain and returns the new one.
@@ -5165,8 +5175,8 @@ struct fruit *replace_fruit;
                 && (!strcmp(str + 7, "spinach")
                     || name_to_mon(str + 7) >= LOW_PM))
             || !strcmp(str, "empty tin")
-            || ((!strncmp(eos(str) - 7, " corpse", 7)
-                 || !strncmp(eos(str) - 4, " egg", 4))
+            || ((str_end_is(str, " corpse")
+                 || str_end_is(str, " egg"))
                 && name_to_mon(str) >= LOW_PM)) {
             Strcpy(buf, pl_fruit);
             Strcpy(pl_fruit, "candied ");
