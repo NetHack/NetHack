@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1445556879 2015/10/22 23:34:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.227 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1446336796 2015/11/01 00:13:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.234 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -5104,16 +5104,6 @@ const char *str;
         free(buf), buf = 0;
     }
     return;
-}
-
-boolean
-str_end_is(str, chkstr)
-char *str, *chkstr;
-{
-    int clen = strlen(chkstr);
-    if (strlen(str) >= clen)
-        return !strncmp(eos(str) - clen, chkstr, clen);
-    return FALSE;
 }
 
 /* Returns the fid of the fruit type; if that type already exists, it

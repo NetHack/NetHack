@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1445215014 2015/10/19 00:36:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.509 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1446336781 2015/11/01 00:13:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.511 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -831,6 +831,7 @@ E char *FDECL(ucase, (char *));
 E char *FDECL(upstart, (char *));
 E char *FDECL(mungspaces, (char *));
 E char *FDECL(eos, (char *));
+E boolean FDECL(str_end_is, (const char *, const char *));
 E char *FDECL(strkitten, (char *, CHAR_P));
 E void FDECL(copynchars, (char *, const char *, int));
 E char FDECL(chrcasecpy, (int, int));

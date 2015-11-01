@@ -1,6 +1,6 @@
-/* NetHack 3.6	hacklib.c	$NHDT-Date: 1432723746 2015/05/27 10:49:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.43 $ */
+/* NetHack 3.6	hacklib.c	$NHDT-Date: 1446336792 2015/11/01 00:13:12 $  $NHDT-Branch: master $:$NHDT-Revision: 1.44 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
-/* Copyright (c) Robert Patrick Rankin, 1991		  */
+/* Copyright (c) Robert Patrick Rankin, 1991                      */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h" /* for config.h+extern.h */
@@ -19,6 +19,7 @@
         char *          upstart         (char *)
         char *          mungspaces      (char *)
         char *          eos             (char *)
+        boolean         str_end_is      (const char *, const char *)
         char *          strkitten       (char *,char)
         void            copynchars      (char *,const char *,int)
         char            chrcasecpy      (int,int)
@@ -167,6 +168,18 @@ register char *s;
     return s;
 }
 
+/* determine whether 'str' ends in 'chkstr' */
+boolean
+str_end_is(str, chkstr)
+const char *str, *chkstr;
+{
+    int clen = (int) strlen(chkstr);
+
+    if ((int) strlen(str) >= clen)
+        return (boolean) (!strncmp(eos((char *) str) - clen, chkstr, clen));
+    return FALSE;
+}
+
 /* append a character to a string (in place): strcat(s, {c,'\0'}); */
 char *
 strkitten(s, c)
@@ -203,8 +216,8 @@ chrcasecpy(oc, nc)
 int oc, nc;
 {
 #if 0 /* this will be necessary if we switch to <ctype.h> */
-    oc = (int)(unsigned char)oc;
-    nc = (int)(unsigned char)nc;
+    oc = (int) (unsigned char) oc;
+    nc = (int) (unsigned char) nc;
 #endif
     if ('a' <= oc && oc <= 'z') {
         /* old char is lower case; if new char is upper case, downcase it */
@@ -319,7 +332,9 @@ char *buf;
     return buf;
 }
 
-boolean onlyspace(s) /* is a string entirely whitespace? */
+/* is a string entirely whitespace? */
+boolean
+onlyspace(s)
 const char *s;
 {
     for (; *s; s++)
@@ -328,7 +343,9 @@ const char *s;
     return TRUE;
 }
 
-char *tabexpand(sbuf) /* expand tabs into proper number of spaces */
+/* expand tabs into proper number of spaces */
+char *
+tabexpand(sbuf)
 char *sbuf;
 {
     char buf[BUFSZ];
@@ -351,7 +368,9 @@ char *sbuf;
     return strcpy(sbuf, buf);
 }
 
-char *visctrl(c) /* make a displayable string from a character */
+/* make a displayable string from a character */
+char *
+visctrl(c)
 char c;
 {
     Static char ccc[3];
@@ -510,9 +529,10 @@ int x0, y0, x1, y1;
     return (boolean) (!dy || !dx || dy == dx || dy == -dx);
 }
 
-/* guts of pmatch(), pmatchi(), and pmatchz() */
+/* guts of pmatch(), pmatchi(), and pmatchz();
+   match a string against a pattern */
 static boolean
-pmatch_internal(patrn, strng, ci, sk) /* match a string against a pattern */
+pmatch_internal(patrn, strng, ci, sk)
 const char *patrn, *strng;
 boolean ci;     /* True => case-insensitive, False => case-sensitive */
 const char *sk; /* set of characters to skip */
