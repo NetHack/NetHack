@@ -3486,7 +3486,7 @@ doapply()
         res = use_towel(obj);
         break;
     case CRYSTAL_BALL:
-        use_crystal_ball(obj);
+        use_crystal_ball(&obj);
         break;
     case MAGIC_MARKER:
         res = dowrite(obj);
