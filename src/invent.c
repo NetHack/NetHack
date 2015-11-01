@@ -2097,6 +2097,7 @@ nextclass:
     end_menu(win, (char *) 0);
 
     n = select_menu(win, want_reply ? PICK_ONE : PICK_NONE, &selected);
+    destroy_nhwindow(win);
     if (n > 0) {
         ret = selected[0].item.a_char;
         if (out_cnt)
