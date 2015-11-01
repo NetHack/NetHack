@@ -1,4 +1,4 @@
-/* NetHack 3.6	bones.c	$NHDT-Date: 1432512767 2015/05/25 00:12:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.6	bones.c	$NHDT-Date: 1446369463 2015/11/01 09:17:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.65 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985,1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -25,14 +25,15 @@ d_level *lev;
     if (ledger_no(&save_dlevel))
         assign_level(lev, &save_dlevel);
 
-    return (boolean)(
-        ((sptr = Is_special(lev)) != 0 && !sptr->boneid)
-        || !dungeons[lev->dnum].boneid
-        /* no bones on the last or multiway branch levels */
-        /* in any dungeon (level 1 isn't multiway).       */
-        || Is_botlevel(lev) || (Is_branchlev(lev) && lev->dlevel > 1)
-        /* no bones in the invocation level               */
-        || (In_hell(lev) && lev->dlevel == dunlevs_in_dungeon(lev) - 1));
+    return (boolean) (((sptr = Is_special(lev)) != 0 && !sptr->boneid)
+                      || !dungeons[lev->dnum].boneid
+                      /* no bones on the last or multiway branch levels
+                         in any dungeon (level 1 isn't multiway) */
+                      || Is_botlevel(lev)
+                      || (Is_branchlev(lev) && lev->dlevel > 1)
+                      /* no bones in the invocation level */
+                      || (In_hell(lev)
+                          && lev->dlevel == dunlevs_in_dungeon(lev) - 1));
 }
 
 /* Call this function for each fruit object saved in the bones level: it marks
@@ -311,12 +312,12 @@ can_make_bones()
                 return FALSE;
     }
 
-    if (depth(&u.uz) <= 0 ||           /* bulletproofing for endgame */
-        (!rn2(1 + (depth(&u.uz) >> 2)) /* fewer ghosts on low levels */
-         && !wizard))
+    if (depth(&u.uz) <= 0                 /* bulletproofing for endgame */
+        || (!rn2(1 + (depth(&u.uz) >> 2)) /* fewer ghosts on low levels */
+            && !wizard))
         return FALSE;
     /* don't let multiple restarts generate multiple copies of objects
-     * in bones files */
+       in bones files */
     if (discover)
         return FALSE;
     return TRUE;
@@ -552,19 +553,19 @@ getbones()
     char c, *bonesid, oldbonesid[10];
 
     if (discover) /* save bones files for real games */
-        return (0);
+        return 0;
 
     if (!flags.bones)
-        return (0);
+        return 0;
     /* wizard check added by GAN 02/05/87 */
     if (rn2(3) /* only once in three times do we find bones */
         && !wizard)
-        return (0);
+        return 0;
     if (no_bones_level(&u.uz))
-        return (0);
+        return 0;
     fd = open_bonesfile(&u.uz, &bonesid);
     if (fd < 0)
-        return (0);
+        return 0;
 
     if (validate(fd, bones) != 0) {
         if (!wizard)
@@ -576,7 +577,7 @@ getbones()
             if (yn("Get bones?") == 'n') {
                 (void) nhclose(fd);
                 compress_bonesfile();
-                return (0);
+                return 0;
             }
         }
         mread(fd, (genericptr_t) &c, sizeof c); /* length incl. '\0' */
@@ -626,7 +627,7 @@ getbones()
     if (wizard) {
         if (yn("Unlink bones?") == 'n') {
             compress_bonesfile();
-            return (ok);
+            return ok;
         }
     }
     if (!delete_bonesfile(&u.uz)) {
@@ -637,9 +638,9 @@ getbones()
          * -- just generate a new level for those N-1 games.
          */
         /* pline("Cannot unlink bones."); */
-        return (0);
+        return 0;
     }
-    return (ok);
+    return ok;
 }
 
 /*bones.c*/

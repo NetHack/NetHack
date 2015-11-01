@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1445301113 2015/10/20 00:31:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.207 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1446369459 2015/11/01 09:17:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.208 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -32,8 +32,8 @@ STATIC_DCL int FDECL(use_pole, (struct obj *));
 STATIC_DCL int FDECL(use_cream_pie, (struct obj *));
 STATIC_DCL int FDECL(use_grapple, (struct obj *));
 STATIC_DCL int FDECL(do_break_wand, (struct obj *));
-STATIC_DCL boolean
-FDECL(figurine_location_checks, (struct obj *, coord *, BOOLEAN_P));
+STATIC_DCL boolean FDECL(figurine_location_checks, (struct obj *,
+                                                    coord *, BOOLEAN_P));
 STATIC_DCL void FDECL(add_class, (char *, CHAR_P));
 STATIC_DCL void FDECL(setapplyclasses, (char *));
 STATIC_DCL boolean FDECL(is_valid_jump_pos, (int, int, int, BOOLEAN_P));
@@ -50,18 +50,18 @@ STATIC_OVL int
 use_camera(obj)
 struct obj *obj;
 {
-    register struct monst *mtmp;
+    struct monst *mtmp;
 
     if (Underwater) {
         pline("Using your camera underwater would void the warranty.");
-        return (0);
+        return 0;
     }
     if (!getdir((char *) 0))
-        return (0);
+        return 0;
 
     if (obj->spe <= 0) {
         pline1(nothing_happens);
-        return (1);
+        return 1;
     }
     consume_obj_charge(obj, TRUE);
 
@@ -98,6 +98,7 @@ struct obj *obj;
         return 0;
     } else if (obj->cursed) {
         long old;
+
         switch (rn2(3)) {
         case 2:
             old = Glib;
@@ -492,24 +493,26 @@ struct obj *obj;
 
 boolean
 um_dist(x, y, n)
-register xchar x, y, n;
+xchar x, y, n;
 {
-    return ((boolean)(abs(u.ux - x) > n || abs(u.uy - y) > n));
+    return (boolean) (abs(u.ux - x) > n || abs(u.uy - y) > n);
 }
 
 int
 number_leashed()
 {
-    register int i = 0;
-    register struct obj *obj;
+    int i = 0;
+    struct obj *obj;
 
     for (obj = invent; obj; obj = obj->nobj)
         if (obj->otyp == LEASH && obj->leashmon != 0)
             i++;
-    return (i);
+    return i;
 }
 
-void o_unleash(otmp) /* otmp is about to be destroyed or stolen */
+/* otmp is about to be destroyed or stolen */
+void
+o_unleash(otmp)
 register struct obj *otmp;
 {
     register struct monst *mtmp;
@@ -520,7 +523,9 @@ register struct obj *otmp;
     otmp->leashmon = 0;
 }
 
-void m_unleash(mtmp, feedback) /* mtmp is about to die, or become untame */
+/* mtmp is about to die, or become untame */
+void
+m_unleash(mtmp, feedback)
 register struct monst *mtmp;
 boolean feedback;
 {
@@ -538,7 +543,9 @@ boolean feedback;
     mtmp->mleashed = 0;
 }
 
-void unleash_all() /* player is about to die (for bones) */
+/* player is about to die (for bones) */
+void
+unleash_all()
 {
     register struct obj *otmp;
     register struct monst *mtmp;
@@ -556,7 +563,7 @@ static boolean
 leashable(mtmp)
 struct monst *mtmp;
 {
-    return mtmp->mnum != PM_LONG_WORM;
+    return (boolean) (mtmp->mnum != PM_LONG_WORM);
 }
 
 /* ARGSUSED */
@@ -638,18 +645,20 @@ got_target:
     return;
 }
 
-struct obj *get_mleash(mtmp) /* assuming mtmp->mleashed has been checked */
-register struct monst *mtmp;
+/* assuming mtmp->mleashed has been checked */
+struct obj *
+get_mleash(mtmp)
+struct monst *mtmp;
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     otmp = invent;
     while (otmp) {
         if (otmp->otyp == LEASH && otmp->leashmon == (int) mtmp->m_id)
-            return (otmp);
+            return otmp;
         otmp = otmp->nobj;
     }
-    return ((struct obj *) 0);
+    return (struct obj *) 0;
 }
 
 boolean
@@ -669,7 +678,7 @@ next_to_u()
                     if (otmp->otyp == LEASH
                         && otmp->leashmon == (int) mtmp->m_id) {
                         if (otmp->cursed)
-                            return (FALSE);
+                            return FALSE;
                         You_feel("%s leash go slack.",
                                  (number_leashed() > 1) ? "a" : "the");
                         mtmp->mleashed = 0;
@@ -681,7 +690,7 @@ next_to_u()
     /* no pack mules for the Amulet */
     if (u.usteed && mon_has_amulet(u.usteed))
         return FALSE;
-    return (TRUE);
+    return TRUE;
 }
 
 void
@@ -756,9 +765,11 @@ register xchar x, y;
 const char *
 beautiful()
 {
-    return (ACURR(A_CHA) > 14)
-               ? (poly_gender() == 1 ? "beautiful" : "handsome")
-               : "ugly";
+    return ((ACURR(A_CHA) > 14)
+               ? ((poly_gender() == 1)
+                     ? "beautiful"
+                     : "handsome")
+               : "ugly");
 }
 
 #define WEAK 3 /* from eat.c */
@@ -1180,16 +1191,18 @@ struct obj **optr;
     }
 }
 
-boolean snuff_candle(otmp) /* call in drop, throw, and put in box, etc. */
-register struct obj *otmp;
+/* call in drop, throw, and put in box, etc. */
+boolean
+snuff_candle(otmp)
+struct obj *otmp;
 {
-    register boolean candle = Is_candle(otmp);
+    boolean candle = Is_candle(otmp);
 
     if ((candle || otmp->otyp == CANDELABRUM_OF_INVOCATION)
         && otmp->lamplit) {
         char buf[BUFSZ];
         xchar x, y;
-        register boolean many = candle ? otmp->quan > 1L : otmp->spe > 1;
+        boolean many = candle ? (otmp->quan > 1L) : (otmp->spe > 1);
 
         (void) get_obj_location(otmp, &x, &y, 0);
         if (otmp->where == OBJ_MINVENT ? cansee(x, y) : !Blind)
@@ -1197,9 +1210,9 @@ register struct obj *otmp;
                   (candle ? "" : "candelabrum's "), (many ? "s'" : "'s"),
                   (many ? "s are" : " is"));
         end_burn(otmp, TRUE);
-        return (TRUE);
+        return TRUE;
     }
-    return (FALSE);
+    return FALSE;
 }
 
 /* called when lit lamp is hit by water or put into a container or
@@ -1555,7 +1568,7 @@ int magic; /* 0=Physical, otherwise skill level */
         return 0;
     } else if (u.usteed && u.utrap) {
         pline("%s is stuck in a trap.", Monnam(u.usteed));
-        return (0);
+        return 0;
     }
 
     pline("Where do you want to jump?");
@@ -1644,9 +1657,9 @@ struct obj *corpse;
 
 STATIC_OVL void
 use_tinning_kit(obj)
-register struct obj *obj;
+struct obj *obj;
 {
-    register struct obj *corpse, *can;
+    struct obj *corpse, *can;
 
     /* This takes only 1 move.  If this is to be changed to take many
      * moves, we've got to deal with decaying corpses...
@@ -2692,12 +2705,11 @@ struct obj *obj;
     return 1;
 }
 
-static const char not_enough_room[] =
-    "There's not enough room here to use that.",
-                  where_to_hit[] = "Where do you want to hit?",
-                  cant_see_spot[] =
-                      "won't hit anything if you can't see that spot.",
-                  cant_reach[] = "can't reach that spot from here.";
+static const char
+    not_enough_room[] = "There's not enough room here to use that.",
+    where_to_hit[] = "Where do you want to hit?",
+    cant_see_spot[] = "won't hit anything if you can't see that spot.",
+    cant_reach[] = "can't reach that spot from here.";
 
 /* find pos of monster in range, if only one monster */
 boolean
@@ -2707,6 +2719,7 @@ int min_range, max_range;
 {
     struct monst *mtmp;
     struct monst *selmon = NULL;
+
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
         if (mtmp && !DEADMONSTER(mtmp) && !mtmp->mtame
             && cansee(mtmp->mx, mtmp->my)
@@ -2734,6 +2747,7 @@ int state;
         tmp_at(DISP_BEAM, cmap_to_glyph(S_goodpos));
     } else if (state == 1) {
         int x, y, dx, dy;
+
         for (dx = -4; dx <= 4; dx++)
             for (dy = -4; dy <= 4; dy++) {
                 x = dx + (int) u.ux;
@@ -2762,11 +2776,11 @@ struct obj *obj;
     /* Are you allowed to use the pole? */
     if (u.uswallow) {
         pline(not_enough_room);
-        return (0);
+        return 0;
     }
     if (obj != uwep) {
         if (!wield_tool(obj, "swing"))
-            return (0);
+            return 0;
         else
             res = 1;
     }
@@ -2817,14 +2831,14 @@ struct obj *obj;
     glyph = glyph_at(cc.x, cc.y);
     if (distu(cc.x, cc.y) > max_range) {
         pline("Too far!");
-        return (res);
+        return res;
     } else if (distu(cc.x, cc.y) < min_range) {
         pline("Too close!");
-        return (res);
+        return res;
     } else if (!cansee(cc.x, cc.y) && !glyph_is_monster(glyph)
                && !glyph_is_invisible(glyph) && !glyph_is_statue(glyph)) {
         You(cant_see_spot);
-        return (res);
+        return res;
     } else if (!couldsee(cc.x, cc.y)) { /* Eyes of the Overworld */
         You(cant_reach);
         return res;
@@ -2842,8 +2856,8 @@ struct obj *obj;
         check_caitiff(mtmp);
         notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
         (void) thitmonst(mtmp, uwep);
-    } else if (glyph_is_statue(glyph) && /* might be hallucinatory */
-               sobj_at(STATUE, bhitpos.x, bhitpos.y)) {
+    } else if (glyph_is_statue(glyph) /* might be hallucinatory */
+               && sobj_at(STATUE, bhitpos.x, bhitpos.y)) {
         struct trap *t = t_at(bhitpos.x, bhitpos.y);
 
         if (t && t->ttyp == STATUE_TRAP
@@ -2868,7 +2882,7 @@ struct obj *obj;
         You("miss; there is no one there to hit.");
     }
     u_wipe_engr(2); /* same as for melee or throwing */
-    return (1);
+    return 1;
 }
 
 STATIC_OVL int
@@ -2906,7 +2920,7 @@ struct obj *obj;
     costly_alteration(obj, COST_SPLAT);
     obj_extract_self(obj);
     delobj(obj);
-    return (0);
+    return 0;
 }
 
 STATIC_OVL int
@@ -2922,11 +2936,11 @@ struct obj *obj;
     /* Are you allowed to use the hook? */
     if (u.uswallow) {
         pline(not_enough_room);
-        return (0);
+        return 0;
     }
     if (obj != uwep) {
         if (!wield_tool(obj, "cast"))
-            return (0);
+            return 0;
         else
             res = 1;
     }
@@ -2949,10 +2963,10 @@ struct obj *obj;
         max_range = 8;
     if (distu(cc.x, cc.y) > max_range) {
         pline("Too far!");
-        return (res);
+        return res;
     } else if (!cansee(cc.x, cc.y)) {
         You(cant_see_spot);
-        return (res);
+        return res;
     } else if (!couldsee(cc.x, cc.y)) { /* Eyes of the Overworld */
         You(cant_reach);
         return res;
@@ -3005,7 +3019,7 @@ struct obj *obj;
             (void) pickup_object(otmp, 1L, FALSE);
             /* If pickup fails, leave it alone */
             newsym(cc.x, cc.y);
-            return (1);
+            return 1;
         }
         break;
     case 2: /* Monster */
@@ -3023,7 +3037,7 @@ struct obj *obj;
             You("pull in %s!", mon_nam(mtmp));
             mtmp->mundetected = 0;
             rloc_to(mtmp, cc.x, cc.y);
-            return (1);
+            return 1;
         } else if ((!bigmonst(mtmp->data) && !strongmonst(mtmp->data))
                    || rn2(4)) {
             flags.confirm = FALSE;
@@ -3031,7 +3045,7 @@ struct obj *obj;
             flags.confirm = save_confirm;
             check_caitiff(mtmp);
             (void) thitmonst(mtmp, uwep);
-            return (1);
+            return 1;
         }
     /* FALL THROUGH */
     case 3: /* Surface */
@@ -3042,18 +3056,18 @@ struct obj *obj;
             hurtle(sgn(cc.x - u.ux), sgn(cc.y - u.uy), 1, FALSE);
             spoteffects(TRUE);
         }
-        return (1);
+        return 1;
     default: /* Yourself (oops!) */
         if (P_SKILL(typ) <= P_BASIC) {
             You("hook yourself!");
             losehp(Maybe_Half_Phys(rn1(10, 10)), "a grappling hook",
                    KILLED_BY);
-            return (1);
+            return 1;
         }
         break;
     }
     pline1(nothing_happens);
-    return (1);
+    return 1;
 }
 
 #define BY_OBJECT ((struct monst *) 0)
@@ -3075,7 +3089,8 @@ struct obj *obj;
     boolean is_fragile = (!strcmp(OBJ_DESCR(objects[obj->otyp]), "balsa"));
 
     if (!paranoid_query(ParanoidBreakwand,
-                       safe_qbuf(confirm, "Are you really sure you want to break ",
+                       safe_qbuf(confirm,
+                                 "Are you really sure you want to break ",
                                  "?", obj, yname, ysimple_name, "the wand")))
         return 0;
 
@@ -3180,6 +3195,7 @@ struct obj *obj;
 
         if (obj->otyp == WAN_DIGGING) {
             schar typ;
+
             if (dig_check(BY_OBJECT, FALSE, x, y)) {
                 if (IS_WALL(levl[x][y].typ) || IS_DOOR(levl[x][y].typ)) {
                     /* normally, pits and holes don't anger guards, but they
@@ -3196,18 +3212,17 @@ struct obj *obj;
                 typ = fillholetyp(x, y, FALSE);
                 if (typ != ROOM) {
                     levl[x][y].typ = typ;
-                    liquid_flow(
-                        x, y, typ, t_at(x, y),
-                        fillmsg ? (char *) 0
-                                : "Some holes are quickly filled with %s!");
+                    liquid_flow(x, y, typ, t_at(x, y),
+                                fillmsg
+                                  ? (char *) 0
+                                  : "Some holes are quickly filled with %s!");
                     fillmsg = TRUE;
                 } else
-                    digactualhole(
-                        x, y, BY_OBJECT,
-                        (rn2(obj->spe) < 3
-                         || (!Can_dig_down(&u.uz) && !levl[x][y].candig))
-                            ? PIT
-                            : HOLE);
+                    digactualhole(x, y, BY_OBJECT, (rn2(obj->spe) < 3
+                                                    || (!Can_dig_down(&u.uz)
+                                                        && !levl[x][y].candig))
+                                                      ? PIT
+                                                      : HOLE);
             }
             continue;
         } else if (obj->otyp == WAN_CREATE_MONSTER) {
@@ -3335,6 +3350,7 @@ char class_list[];
         add_class(class_list, FOOD_CLASS);
 }
 
+/* the 'a' command */
 int
 doapply()
 {
@@ -3343,7 +3359,7 @@ doapply()
     char class_list[MAXOCLASSES + 2];
 
     if (check_capacity((char *) 0))
-        return (0);
+        return 0;
 
     setapplyclasses(class_list); /* tools[] */
     obj = getobj(class_list, "use or apply");
@@ -3363,14 +3379,15 @@ doapply()
         if (obj == ublindf) {
             if (!cursed(obj))
                 Blindf_off(obj);
-        } else if (!ublindf)
+        } else if (!ublindf) {
             Blindf_on(obj);
-        else
+        } else {
             You("are already %s.", ublindf->otyp == TOWEL
                                        ? "covered by a towel"
                                        : ublindf->otyp == BLINDFOLD
                                              ? "wearing a blindfold"
                                              : "wearing lenses");
+        }
         break;
     case CREAM_PIE:
         res = use_cream_pie(obj);

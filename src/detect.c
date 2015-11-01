@@ -1,4 +1,4 @@
-/* NetHack 3.6	detect.c	$NHDT-Date: 1436753510 2015/07/13 02:11:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.6	detect.c	$NHDT-Date: 1446369464 2015/11/01 09:17:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.61 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -44,8 +44,9 @@ char oclass;
     return (struct obj *) 0;
 }
 
-/* Recursively search obj for an object made of specified material and return
- * 1st found */
+/* Recursively search obj for an object made of specified material.
+ * Return first found.
+ */
 struct obj *
 o_material(obj, material)
 struct obj *obj;
@@ -85,10 +86,10 @@ struct obj *obj;
 STATIC_OVL boolean
 check_map_spot(x, y, oclass, material)
 int x, y;
-register char oclass;
+char oclass;
 unsigned material;
 {
-    register int glyph;
+    int glyph;
     register struct obj *otmp;
     register struct monst *mtmp;
 
@@ -96,14 +97,12 @@ unsigned material;
     if (glyph_is_object(glyph)) {
         /* there's some object shown here */
         if (oclass == ALL_CLASSES) {
-            return (
-                (boolean)(!(level.objects[x][y] || /* stale if nothing here */
-                            ((mtmp = m_at(x, y)) != 0 && (mtmp->minvent)))));
+            return (boolean) !(level.objects[x][y] /* stale if nothing here */
+                               || ((mtmp = m_at(x, y)) != 0 && mtmp->minvent));
         } else {
             if (material
                 && objects[glyph_to_obj(glyph)].oc_material == material) {
-                /* the object shown here is of interest because material
-                 * matches */
+                /* object shown here is of interest because material matches */
                 for (otmp = level.objects[x][y]; otmp; otmp = otmp->nexthere)
                     if (o_material(otmp, GOLD))
                         return FALSE;
@@ -117,8 +116,7 @@ unsigned material;
                 return TRUE;
             }
             if (oclass && objects[glyph_to_obj(glyph)].oc_class == oclass) {
-                /* the object shown here is of interest because its class
-                 * matches */
+                /* obj shown here is of interest because its class matches */
                 for (otmp = level.objects[x][y]; otmp; otmp = otmp->nexthere)
                     if (o_in(otmp, oclass))
                         return FALSE;
@@ -137,18 +135,18 @@ unsigned material;
 }
 
 /*
-   When doing detection, remove stale data from the map display (corpses
-   rotted away, objects carried away by monsters, etc) so that it won't
-   reappear after the detection has completed.  Return true if noticeable
-   change occurs.
+ * When doing detection, remove stale data from the map display (corpses
+ * rotted away, objects carried away by monsters, etc) so that it won't
+ * reappear after the detection has completed.  Return true if noticeable
+ * change occurs.
  */
 STATIC_OVL boolean
 clear_stale_map(oclass, material)
-register char oclass;
+char oclass;
 unsigned material;
 {
     register int zx, zy;
-    register boolean change_made = FALSE;
+    boolean change_made = FALSE;
 
     for (zx = 1; zx < COLNO; zx++)
         for (zy = 0; zy < ROWNO; zy++)
@@ -218,13 +216,13 @@ register struct obj *sobj;
                 Strcpy(buf, "You feel materially poor.");
             strange_feeling(sobj, buf);
         }
-        return (1);
+        return 1;
     }
     /* only under me - no separate display required */
     if (stale)
         docrt();
     You("notice some gold between your %s.", makeplural(body_part(FOOT)));
-    return (0);
+    return 0;
 
 outgoldmap:
     cls();
@@ -281,11 +279,11 @@ outgoldmap:
         under_water(2);
     if (u.uburied)
         under_ground(2);
-    return (0);
+    return 0;
 }
 
-/* returns 1 if nothing was detected		*/
-/* returns 0 if something was detected		*/
+/* returns 1 if nothing was detected   */
+/* returns 0 if something was detected */
 int
 food_detect(sobj)
 register struct obj *sobj;
@@ -333,9 +331,9 @@ register struct obj *sobj;
                         ? " then starts to tingle"
                         : "");
             if (sobj->blessed && !u.uedibility) {
-                boolean savebeginner =
-                    flags.beginner;     /* prevent non-delivery of */
-                flags.beginner = FALSE; /* 	message            */
+                boolean savebeginner = flags.beginner;
+
+                flags.beginner = FALSE; /* prevent non-delivery of message */
                 strange_feeling(sobj, buf);
                 flags.beginner = savebeginner;
                 u.uedibility = 1;
@@ -394,14 +392,14 @@ register struct obj *sobj;
         if (u.uburied)
             under_ground(2);
     }
-    return (0);
+    return 0;
 }
 
 /*
  * Used for scrolls, potions, spells, and crystal balls.  Returns:
  *
- *	1 - nothing was detected
- *	0 - something was detected
+ *      1 - nothing was detected
+ *      0 - something was detected
  */
 int
 object_detect(detector, class)
@@ -501,7 +499,7 @@ int class;            /* an object class, 0 for all */
     iflags.save_uinwater = u.uinwater, iflags.save_uburied = u.uburied;
     u.uinwater = u.uburied = 0;
     /*
-     *	Map all buried objects first.
+     *  Map all buried objects first.
      */
     for (obj = level.buriedobjlist; obj; obj = obj->nobj)
         if (!class || (otmp = o_in(obj, class))) {
@@ -726,10 +724,11 @@ int how; /* 1 for misleading map feedback */
     return result;
 }
 
-/* the detections are pulled out so they can	*/
-/* also be used in the crystal ball routine	*/
-/* returns 1 if nothing was detected		*/
-/* returns 0 if something was detected		*/
+/* the detections are pulled out so they can
+ * also be used in the crystal ball routine
+ * returns 1 if nothing was detected
+ * returns 0 if something was detected
+ */
 int
 trap_detect(sobj)
 register struct obj *sobj;
@@ -790,11 +789,11 @@ register struct obj *sobj;
 
         Sprintf(buf, "Your %s stop itching.", makeplural(body_part(TOE)));
         strange_feeling(sobj, buf);
-        return (1);
+        return 1;
     }
     /* traps exist, but only under me - no separate display required */
     Your("%s itch.", makeplural(body_part(TOE)));
-    return (0);
+    return 0;
 outtrapmap:
     cls();
 
@@ -835,7 +834,7 @@ outtrapmap:
         under_water(2);
     if (u.uburied)
         under_ground(2);
-    return (0);
+    return 0;
 }
 
 const char *
@@ -1248,12 +1247,14 @@ int findit() /* returns number of things found */
     int num = 0;
 
     if (u.uswallow)
-        return (0);
+        return 0;
     do_clear_area(u.ux, u.uy, BOLT_LIM, findone, (genericptr_t) &num);
-    return (num);
+    return num;
 }
 
-int openit() /* returns number of things found and opened */
+/* returns number of things found and opened */
+int
+openit()
 {
     int num = 0;
 
@@ -1265,11 +1266,11 @@ int openit() /* returns number of things found and opened */
                 pline("%s opens its mouth!", Monnam(u.ustuck));
         }
         expels(u.ustuck, u.ustuck->data, TRUE);
-        return (-1);
+        return -1;
     }
 
     do_clear_area(u.ux, u.uy, BOLT_LIM, openone, (genericptr_t) &num);
-    return (num);
+    return num;
 }
 
 /* callback hack for overriding vision in do_clear_area() */
@@ -1331,10 +1332,9 @@ register int aflag; /* intrinsic autosearch vs explicit searching */
         if (!aflag)
             pline("What are you looking for?  The exit?");
     } else {
-        int fund =
-            (uwep && uwep->oartifact && spec_ability(uwep, SPFX_SEARCH))
-                ? uwep->spe
-                : 0;
+        int fund = (uwep && uwep->oartifact
+                    && spec_ability(uwep, SPFX_SEARCH)) ? uwep->spe : 0;
+
         if (ublindf && ublindf->otyp == LENSES && !Blind)
             fund += 2; /* JDS: lenses help searching */
         if (fund > 5)
@@ -1343,99 +1343,95 @@ register int aflag; /* intrinsic autosearch vs explicit searching */
             for (y = u.uy - 1; y < u.uy + 2; y++) {
                 if (!isok(x, y))
                     continue;
-                if (x != u.ux || y != u.uy) {
-                    if (Blind && !aflag)
-                        feel_location(x, y);
-                    if (levl[x][y].typ == SDOOR) {
-                        if (rnl(7 - fund))
-                            continue;
-                        cvt_sdoor_to_door(&levl[x][y]); /* .typ = DOOR */
-                        exercise(A_WIS, TRUE);
-                        nomul(0);
-                        feel_location(x, y); /* make sure it shows up */
-                        You("find a hidden door.");
-                    } else if (levl[x][y].typ == SCORR) {
-                        if (rnl(7 - fund))
-                            continue;
-                        levl[x][y].typ = CORR;
-                        unblock_point(x, y); /* vision */
-                        exercise(A_WIS, TRUE);
-                        nomul(0);
-                        feel_location(x, y); /* make sure it shows up */
-                        You("find a hidden passage.");
-                    } else {
-                        /* Be careful not to find anything in an SCORR or
-                         * SDOOR */
-                        if ((mtmp = m_at(x, y)) && !aflag) {
-                            if (mtmp->m_ap_type) {
-                                seemimic(mtmp);
-                            find:
-                                exercise(A_WIS, TRUE);
-                                if (!canspotmon(mtmp)) {
-                                    if (glyph_is_invisible(
-                                            levl[x][y].glyph)) {
-                                        /* found invisible monster in a square
-                                         * which already has an 'I' in it.
-                                         * Logically, this should still take
-                                         * time and lead to a return(1), but
-                                         * if
-                                         * we did that the player would keep
-                                         * finding the same monster every
-                                         * turn.
-                                         */
-                                        continue;
-                                    } else {
-                                        You_feel("an unseen monster!");
-                                        map_invisible(x, y);
-                                    }
-                                } else if (!sensemon(mtmp))
-                                    You("find %s.", mtmp->mtame
-                                                        ? y_monnam(mtmp)
-                                                        : a_monnam(mtmp));
-                                return (1);
-                            }
+                if (x == u.ux && y == u.uy)
+                    continue;
+
+                if (Blind && !aflag)
+                    feel_location(x, y);
+                if (levl[x][y].typ == SDOOR) {
+                    if (rnl(7 - fund))
+                        continue;
+                    cvt_sdoor_to_door(&levl[x][y]); /* .typ = DOOR */
+                    exercise(A_WIS, TRUE);
+                    nomul(0);
+                    feel_location(x, y); /* make sure it shows up */
+                    You("find a hidden door.");
+                } else if (levl[x][y].typ == SCORR) {
+                    if (rnl(7 - fund))
+                        continue;
+                    levl[x][y].typ = CORR;
+                    unblock_point(x, y); /* vision */
+                    exercise(A_WIS, TRUE);
+                    nomul(0);
+                    feel_location(x, y); /* make sure it shows up */
+                    You("find a hidden passage.");
+                } else {
+                    /* Be careful not to find anything in an SCORR or SDOOR */
+                    if ((mtmp = m_at(x, y)) != 0 && !aflag) {
+                        if (mtmp->m_ap_type) {
+                            seemimic(mtmp);
+                        find:
+                            exercise(A_WIS, TRUE);
                             if (!canspotmon(mtmp)) {
-                                if (mtmp->mundetected
-                                    && (is_hider(mtmp->data)
-                                        || mtmp->data->mlet == S_EEL))
-                                    mtmp->mundetected = 0;
-                                newsym(x, y);
-                                goto find;
-                            }
+                                if (glyph_is_invisible(levl[x][y].glyph)) {
+                                    /* found invisible monster in a square
+                                     * which already has an 'I' in it.
+                                     * Logically, this should still take
+                                     * time and lead to a return(1), but
+                                     * if we did that the player would keep
+                                     * finding the same monster every turn.
+                                     */
+                                    continue;
+                                } else {
+                                    You_feel("an unseen monster!");
+                                    map_invisible(x, y);
+                                }
+                            } else if (!sensemon(mtmp))
+                                You("find %s.", mtmp->mtame
+                                                   ? y_monnam(mtmp)
+                                                   : a_monnam(mtmp));
+                            return 1;
                         }
-
-                        /* see if an invisible monster has moved--if Blind,
-                         * feel_location() already did it
-                         */
-                        if (!aflag && !mtmp && !Blind
-                            && glyph_is_invisible(levl[x][y].glyph)) {
-                            unmap_object(x, y);
+                        if (!canspotmon(mtmp)) {
+                            if (mtmp->mundetected
+                                && (is_hider(mtmp->data)
+                                    || mtmp->data->mlet == S_EEL))
+                                mtmp->mundetected = 0;
                             newsym(x, y);
+                            goto find;
                         }
+                    }
 
-                        if ((trap = t_at(x, y)) && !trap->tseen && !rnl(8)) {
-                            nomul(0);
+                    /* see if an invisible monster has moved--if Blind,
+                     * feel_location() already did it
+                     */
+                    if (!aflag && !mtmp && !Blind
+                        && glyph_is_invisible(levl[x][y].glyph)) {
+                        unmap_object(x, y);
+                        newsym(x, y);
+                    }
 
-                            if (trap->ttyp == STATUE_TRAP) {
-                                if (activate_statue_trap(trap, x, y, FALSE))
-                                    exercise(A_WIS, TRUE);
-                                return (1);
-                            } else {
-                                find_trap(trap);
-                            }
+                    if ((trap = t_at(x, y)) && !trap->tseen && !rnl(8)) {
+                        nomul(0);
+                        if (trap->ttyp == STATUE_TRAP) {
+                            if (activate_statue_trap(trap, x, y, FALSE))
+                                exercise(A_WIS, TRUE);
+                            return 1;
+                        } else {
+                            find_trap(trap);
                         }
                     }
                 }
             }
     }
-    return (1);
+    return 1;
 }
 
 /* the 's' command -- explicit searching */
 int
 dosearch()
 {
-    return (dosearch0(0));
+    return dosearch0(0);
 }
 
 /* Pre-map the sokoban levels */
@@ -1497,14 +1493,17 @@ int which_subset; /* when not full, whether to suppress objs and/or traps */
         for (x = 1; x < COLNO; x++)
             for (y = 0; y < ROWNO; y++) {
                 seenv = (full || level.flags.hero_memory)
-                       ? levl[x][y].seenv : cansee(x, y) ? SVALL : 0;
+                           ? levl[x][y].seenv : cansee(x, y) ? SVALL : 0;
                 if (full) {
                     levl[x][y].seenv = SVALL;
                     glyph = back_to_glyph(x, y);
                     levl[x][y].seenv = seenv;
                 } else {
-                    levl_glyph = level.flags.hero_memory ? levl[x][y].glyph
-                                : seenv ? back_to_glyph(x, y) : default_glyph;
+                    levl_glyph = level.flags.hero_memory
+                                    ? levl[x][y].glyph
+                                    : seenv
+                                       ? back_to_glyph(x, y)
+                                       : default_glyph;
                     /* glyph_at() returns the displayed glyph, which might
                        be a monster.  levl[][].glyph contains the remembered
                        glyph, which will never be a monster (unless it is
@@ -1556,9 +1555,11 @@ int which_subset; /* when not full, whether to suppress objs and/or traps */
                 }
                 show_glyph(x, y, glyph);
             }
+
         /* [TODO: highlight hero's location somehow] */
         u.uinwater = iflags.save_uinwater, u.uburied = iflags.save_uburied;
-        if (save_swallowed) u.uswallow = 1;
+        if (save_swallowed)
+            u.uswallow = 1;
         flush_screen(1);
         if (full) {
             Strcpy(buf, "underlying terrain");

@@ -1,4 +1,4 @@
-/* NetHack 3.6	dig.c	$NHDT-Date: 1446191874 2015/10/30 07:57:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.98 $ */
+/* NetHack 3.6	dig.c	$NHDT-Date: 1446369465 2015/11/01 09:17:45 $  $NHDT-Branch: master $:$NHDT-Revision: 1.99 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -152,19 +152,19 @@ xchar x, y;
     if (!ispick && !is_axe(otmp))
         return DIGTYP_UNDIGGABLE;
 
-    return (ispick && sobj_at(STATUE, x, y)
-                ? DIGTYP_STATUE
-                : ispick && sobj_at(BOULDER, x, y)
-                      ? DIGTYP_BOULDER
-                      : closed_door(x, y)
-                            ? DIGTYP_DOOR
-                            : IS_TREE(levl[x][y].typ)
-                                  ? (ispick ? DIGTYP_UNDIGGABLE : DIGTYP_TREE)
-                                  : ispick && IS_ROCK(levl[x][y].typ)
-                                            && (!level.flags.arboreal
-                                                || IS_WALL(levl[x][y].typ))
-                                        ? DIGTYP_ROCK
-                                        : DIGTYP_UNDIGGABLE);
+    return ((ispick && sobj_at(STATUE, x, y))
+               ? DIGTYP_STATUE
+               : (ispick && sobj_at(BOULDER, x, y))
+                  ? DIGTYP_BOULDER
+                  : closed_door(x, y)
+                     ? DIGTYP_DOOR
+                     : IS_TREE(levl[x][y].typ)
+                        ? (ispick ? DIGTYP_UNDIGGABLE : DIGTYP_TREE)
+                        : (ispick && IS_ROCK(levl[x][y].typ)
+                           && (!level.flags.arboreal
+                               || IS_WALL(levl[x][y].typ)))
+                           ? DIGTYP_ROCK
+                           : DIGTYP_UNDIGGABLE);
 }
 
 boolean
@@ -1013,7 +1013,6 @@ struct obj *obj;
 /* MRKR: use_pick_axe() is split in two to allow autodig to bypass */
 /*       the "In what direction do you want to dig?" query.        */
 /*       use_pick_axe2() uses the existing u.dx, u.dy and u.dz    */
-
 int
 use_pick_axe2(obj)
 struct obj *obj;
@@ -1596,8 +1595,7 @@ char *msg;
         return FALSE;
     if (!isok(cc->x, cc->y))
         return FALSE;
-    if (msg)
-        *msg = '\0';
+    *msg = '\0';
     room = &levl[cc->x][cc->y];
     ltyp = room->typ;
 
@@ -1626,21 +1624,21 @@ char *msg;
         /* "set of iron bars" */
         Strcpy(msg, "The bars go much deeper than your pit.");
 #if 0
-    } else if (is_lava(cc->x,cc->y)) {
-    } else if (is_ice(cc->x,cc->y)) {
-    } else if (is_pool(cc->x,cc->y)) {
+    } else if (is_lava(cc->x, cc->y)) {
+    } else if (is_ice(cc->x, cc->y)) {
+    } else if (is_pool(cc->x, cc->y)) {
     } else if (IS_GRAVE(ltyp)) {
 #endif
     } else if (IS_SINK(ltyp)) {
         Strcpy(msg, "A tangled mass of plumbing remains below the sink.");
         return FALSE;
-    } else if ((cc->x == xupladder && cc->y == yupladder) || /* "ladder up" */
-               (cc->x == xdnladder
-                && cc->y == ydnladder)) { /* "ladder down" */
+    } else if ((cc->x == xupladder && cc->y == yupladder) /* ladder up */
+               || (cc->x == xdnladder && cc->y == ydnladder)) { /* " down */
         Strcpy(msg, "The ladder is unaffected.");
         return FALSE;
     } else {
         const char *supporting = (const char *) 0;
+
         if (IS_FOUNTAIN(ltyp))
             supporting = "fountain";
         else if (IS_THRONE(ltyp))
@@ -1657,9 +1655,10 @@ char *msg;
                      && !sstairs.up))
             /* "staircase down" */
             supporting = "stairs";
-        else if ((ltyp == DRAWBRIDGE_DOWN) || /* "lowered drawbridge" */
-                 (ltyp == DBWALL))            /* "raised drawbridge" */
+        else if (ltyp == DRAWBRIDGE_DOWN   /* "lowered drawbridge" */
+                 || ltyp == DBWALL)        /* "raised drawbridge" */
             supporting = "drawbridge";
+
         if (supporting) {
             Sprintf(msg, "The %s%ssupporting structures remain intact.",
                     supporting ? s_suffix(supporting) : "",
@@ -1717,6 +1716,7 @@ coord *cc;
 {
     xchar check_x, check_y;
     struct obj *otmp, *otmp2;
+
     if (u.utraptype == TT_BURIEDBALL)
         for (otmp = level.buriedobjlist; otmp; otmp = otmp2) {
             otmp2 = otmp->nobj;
@@ -1793,8 +1793,8 @@ buried_ball_to_freedom()
     }
 }
 
-/* move objects from fobj/nexthere lists to buriedobjlist, keeping position */
-/* information */
+/* move objects from fobj/nexthere lists to buriedobjlist, keeping position
+   information */
 struct obj *
 bury_an_obj(otmp, dealloced)
 struct obj *otmp;
@@ -1895,9 +1895,9 @@ int x, y;
     for (otmp = level.buriedobjlist; otmp; otmp = otmp2) {
         otmp2 = otmp->nobj;
         if (otmp->ox == x && otmp->oy == y) {
-            if (bball && otmp == bball && u.utraptype == TT_BURIEDBALL)
+            if (bball && otmp == bball && u.utraptype == TT_BURIEDBALL) {
                 buried_ball_to_punishment();
-            else {
+            } else {
                 obj_extract_self(otmp);
                 if (otmp->timed)
                     (void) stop_timer(ROT_ORGANIC, obj_to_any(otmp));
