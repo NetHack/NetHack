@@ -101,5 +101,6 @@ regex_match(const char *s, struct nhregex *re)
 void
 regex_free(struct nhregex *re)
 {
+    regfree(&re->re);
     free(re);
 }
