@@ -1,7 +1,7 @@
 # NetHack 3.6.0 tribute to:
 #
 #         Sir Terence David John "Terry" Pratchett
-#              April 28, 1948 - March 12, 2015          
+#              April 28, 1948 - March 12, 2015
 # ("or until the ripples he caused in the world die away...")
 #
 #
@@ -301,8 +301,8 @@ ground like that.'
 #
 %title Reaper Man (4)
 %passage 1
-No one is actually dead until the ripples they cause in the world die away..
-. 
+No one is actually dead until the ripples they cause in the world die
+away...
 
   [Reaper Man, by Terry Pratchett]
 %e passage
@@ -3631,20 +3631,142 @@ Anybody.  "I want to make that point perfectly clear!"
 #
 #
 #
-%title Monstrous Regiment (1)
+%title Monstrous Regiment (8)
 %passage 1
-'How can you protect yourself by carrying a sword if 
-you don't know how to use it?'
+'How can you protect yourself by carrying a sword if you don't know how
+to use it?'
 
-'Not me, sir. Other people. They see the sword and 
-don't attack me,' said Maladict patiently.
+'Not me, sir.  Other people.  They see the sword and don't attack me,'
+said Maladict patiently.
 
 'Yes, but if they did, lad, you wouldn't be any good with it,' said the
-sergeant. 
+sergeant.
 
-'No, sir. I'd probably settle for just ripping their heads off, sir. 
-That's what I mean by protection, sir. Theirs, not mine. 
-And I'd get hell from the League if I did that, sir'
+'No, sir.  I'd probably settle for just ripping their heads off, sir.
+That's what I mean by protection, sir.  Theirs, not mine.  And I'd get
+hell from the League if I did that, sir.'
+
+  [Monstrous Regiment, by Terry Pratchett]
+%e passage
+# p. 6 (Harper Torch edition)
+%passage 2
+/There was always a war./  Usually they were border disputes, the national
+equivalent of complaining that the neighbor was letting their hedge grow
+too long.  Sometimes they were bigger.  Borogravia was a peace-loving
+country in the midst of treacherous, devious, warlike enemies.  They had
+to be treacherous, devious, and warlike, otherwise we wouldn't be fighting
+them, eh?  There was always a war.
+
+  [Monstrous Regiment, by Terry Pratchett]
+%e passage
+# pp. 115-116 (plural 'forests' is odd but accurate [1st sentence];
+#              so is 'knew' which ought to be 'known' [4th paragraph];
+#              9 '0's and 7 '0's are accurate too)
+%passage 3
+A pigeon rose over the forests, banked slightly, and headed straight for
+the valley of the Kneck.
+
+Even from here, the black stone bulk of the Keep was visible, rising above
+the sea of trees.  The pigeon sped on, one spark of purpose in the fresh
+new morning--
+
+--and squawked as darkness dropped from the sky, gripping it in talons of
+steel.  Buzzard and pigeon tumbled for a moment, and then the buzzard
+gained a little height and flapped onwards.
+
+The pigeon thought: 000000000.  But had it been more capable of coherent
+thought, and knew something about how birds of prey caught pigeons,(1) it
+might have wondered why it was being gripped so... kindly.  It was being
+held, not squeezed.  As it was, all it could think was 0000000!
+
+(1) And allowing for the fact that all pigeons who knew how birds of prey
+catch pigeons are dead, and therefore capable of slightly less thought
+than a living pigeon.
+
+  [Monstrous Regiment, by Terry Pratchett]
+%e passage
+# p. 131
+%passage 4
+"All the food's been taken but there's carrots and parsnips in a little
+garden down the hill a bit," Shufti said as they walked away.
+
+"It'd be s-stealing from the dead," said Wazzer.
+
+"Well, if they object they can hold on, can't they?" said Shufti.  "They're
+underground already!"
+
+  [Monstrous Regiment, by Terry Pratchett]
+%e passage
+# p. 160
+%passage 5
+"And there you have it, Sergeant Towering," said the lieutenant, turning
+to the prisoner.  "Of course, we all know there is some atrocious behavior
+in times of war, but it is not the sort of thing we would expect of a
+royal prince.(1)  If we are to be pursued because a gallant young soldier
+prevented matters from becoming even more disgusting, then so be it."
+
+(1) Lieutenant Blouse read only the more technical history books.
+
+  [Monstrous Regiment, by Terry Pratchett]
+%e passage
+# p. 176 (fire: almost certainly to make tea)
+%passage 6
+There are three things a soldier wants to do when there's a respite on the
+road.  One involves lighting a cigarette, one involves lighting a fire,
+and the other involves no flames at all but does, generally, require a
+tree.(1)
+
+(1) Technically, a tree is not required, but seems to be insisted upon for
+reasons of style.
+
+  [Monstrous Regiment, by Terry Pratchett]
+%e passage
+# p. 179 ('humor': American spelling is accurate)
+%passage 7
+Maladict dropped his crossbow, which fired straight up into the air,(1)
+and sat down with his head in his hands.
+
+(1) And failed to hit anything, especially a duck.  This is so unusual
+in situations like this that it must be reported under the new humor
+regulations.  If it had hit a duck, which quacked and landed on somebody's
+head, this would, of course, have been very droll and would certainly have
+been reported.  Instead, the arrow drifted in the breeze a little on the
+way and landed in an oak tree some thirty feet away, where it missed a
+squirrel.
+
+  [Monstrous Regiment, by Terry Pratchett]
+%e passage
+# p. 284 (soldiers disguised as washerwomen in order to sneak into an
+#         enemy-controlled castle have been put to work doing the laundry)
+%passage 8
+"Look at this, will you?" said Shufti, waving a sodden pair of men's long
+pants at her.  "They keep putting the colors in with the whites."
+
+"Well, so what?  These are /enemy/ long johns," said Polly.
+
+"Yes, but there's such a thing as doing it properly!  Look, they put in
+this red pair and all the others are going pink."
+
+"And?  I used to love pink when I was about seven."(1)
+
+"But pale pink?  On a man?"
+
+Polly looked at the next tub for a moment and patted Shufti on the shoulder.
+
+"Yes.  It is /very/ pale, isn't it?  You'd better find a couple more red
+items," she said.
+
+"But that'll make it even worse--" Shufti began.
+
+"That was an /order/, soldier," Polly whispered in her ear.  "And add some
+starch."
+
+"How much?"
+
+"All you can find."
+
+(1) It is an established fact that, despite everything society can do,
+girls of seven are magnetically attracted to the color pink.
 
   [Monstrous Regiment, by Terry Pratchett]
 %e passage
