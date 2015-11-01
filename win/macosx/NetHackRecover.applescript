@@ -19,7 +19,7 @@ if not canceled then
 		--set lastpos to lastpos + (length of "/nethackdir")
 		--set rawpath to (get text 1 through lastpos of mpath) & "/recover.pl"
 		--set safepath to the quoted form of rawpath
-		set safepath to the quoted form of "/usr/local/games/lib/nethackdir/recover.pl"
+		set safepath to the quoted form of "/Library/Nethack/nethackdir/recover.pl"
 	end considering
 	do shell script safepath
 	display dialog result with title "NetHackRecover Output"

@@ -39,7 +39,7 @@ if($try_perm){
 
 # run recover, but only if there is something that looks promising
 $recover = "./recover";
-$recover = "/usr/local/games/bin/recover" unless(-e $recover);
+$recover = "/usr/local/bin/recover" unless(-e $recover);
 
 $uid = $<;
 foreach ( <$uid*.0> ){

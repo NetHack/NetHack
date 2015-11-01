@@ -46,7 +46,7 @@ endif	# WANT_WIN_QT
 #	   administered this may not be what you (or your admin) want.
 #	   Consider a non-shared install (WANT_SHARE_INSTALL=0) instead.
 #	- 'make install' must be run as "sudo make install"    
-#WANT_SHARE_INSTALL=1
+WANT_SHARE_INSTALL=1
 GAMEUID  = $(USER)
 GAMEGRP  = games
 # build to run in the source tree - primarily for development.  Build with "make all"
@@ -143,7 +143,7 @@ GAMEPERM = 02755
 else	# ! root
 PREFIX:=/Users/$(GAMEUID)
 SHELLDIR=$(PREFIX)/bin
-HACKDIR=$(PREFIX)/nethackdir
+HACKDIR=$(PREFIX)/Library/NetHack/nethackdir
 CHOWN=/usr/bin/true
 CHGRP=/usr/bin/true
 GAMEPERM = 0500
@@ -186,6 +186,9 @@ POSTINSTALL+= cp -n sys/unix/sysconf $(HACKDIR)/sysconf; $(CHOWN) $(GAMEUID) $(H
 CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
 endif	# !WANT_SOURCE_INSTALL
 
+INSTDIR=$(HACKDIR)
+VARDIR=$(HACKDIR)
+
 
 # ~/Library/Preferences/NetHack Defaults
 # OPTIONS=name:player,number_pad,menustyle:partial,!time,showexp
@@ -211,8 +214,9 @@ PKGR=productbuild
 SVS=$(shell $(NHSROOT)/util/makedefs --svs)
 SVSDOT=$(shell $(NHSROOT)/util/makedefs --svs .)
 
-PKGROOT_UG	= PKGROOT/usr/local/games
-PKGROOT_UGLN	= PKGROOT/usr/local/games/lib/nethackdir
+PKGROOT_UG	= PKGROOT/$(PREFIX)
+PKGROOT_UGLN	= PKGROOT/$(HACKDIR)
+PKGROOT_BIN	= PKGROOT/$(SHELLDIR)
 build_tty_pkg:
 ifneq (,$(WANT_WIN_X11)$(WANT_WIN_QT))
 	-echo build_tty_pkg only works for a tty-only build
@@ -251,10 +255,10 @@ else
 build_package_root:
 	cd src/..       # make sure we are at TOP
 	rm -rf PKGROOT
-	mkdir -p $(PKGROOT_UG)/lib $(PKGROOT_UG)/bin $(PKGROOT_UG)/man/man6 $(PKGROOT_UG)/doc $(PKGROOT_UGLN)
-	install -p src/nethack $(PKGROOT_UG)/bin
+	mkdir -p $(PKGROOT_UG)/lib $(PKGROOT_BIN) $(PKGROOT_UG)/man/man6 $(PKGROOT_UG)/doc $(PKGROOT_UGLN)
+	install -p src/nethack $(PKGROOT_BIN)
 	# XXX should this be called nethackrecover?
-	install -p util/recover $(PKGROOT_UG)/bin
+	install -p util/recover $(PKGROOT_BIN)
 	install -p doc/nethack.6 $(PKGROOT_UG)/man/man6
 	install -p doc/recover.6 $(PKGROOT_UG)/man/man6
 	install -p doc/Guidebook $(PKGROOT_UG)/doc

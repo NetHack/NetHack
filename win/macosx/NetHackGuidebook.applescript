@@ -6,6 +6,6 @@
 # Display the Guidebook from the GUI.
 
 tell application "Finder"
-        open location "file:///usr/local/games/doc/NetHackGuidebook.pdf"
+        open location "file:///Library/Nethack/doc/NetHackGuidebook.pdf"
         delay 5
 end tell
