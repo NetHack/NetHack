@@ -788,6 +788,7 @@ makepicks:
         choice = (n > 0) ? selected[n - 1].item.a_int : (n == 0) ? 1 : -1;
         if (selected)
             free((genericptr_t) selected), selected = 0;
+        destroy_nhwindow(win);
 
         switch (choice) {
         default:          /* 'q' or ESC */
