@@ -210,7 +210,6 @@ ifdef MAKEFILE_TOP
 
 ifdef WANT_WIN_TTY
 DEVUTIL=/Developer/Applications/Utilities
-PKGR=productbuild
 SVS=$(shell $(NHSROOT)/util/makedefs --svs)
 SVSDOT=$(shell $(NHSROOT)/util/makedefs --svs .)
 
@@ -249,7 +248,10 @@ else
 	osacompile -o PKGROOT/Applications/NetHackGuidebook.app \
 		 win/macosx/NetHackGuidebook.applescript
 
-	$(PKGR) --root PKGROOT --product Info.plist --resources RESOURCES NetHack-$(SVS)-mac-Term.pkg
+	mkdir -p PKG
+	pkgbuild --root PKGROOT --identifier org.nethack.term --scripts PKGSCRIPTS PKG/NH-Term.pkg
+	productbuild --synthesize --product Info.plist --package PKG/NH-Term.pkg Distribution.xml
+	productbuild --distribution Distribution.xml --resources RESOURCES --package-path PKG NetHack-$(SVS)-mac-Term.pkg
 	hdiutil create -verbose -srcfolder NetHack-$(SVS)-mac-Term.pkg NetHack-$(SVS)-mac-Term.dmg
 
 build_package_root:
@@ -263,12 +265,31 @@ build_package_root:
 	install -p doc/recover.6 $(PKGROOT_UG)/man/man6
 	install -p doc/Guidebook $(PKGROOT_UG)/doc
 	install -p dat/nhdat $(PKGROOT_UGLN)
+	install -p sys/unix/sysconf $(PKGROOT_UGLN)
 	cd dat; install -p $(DATNODLB) ../$(PKGROOT_UGLN)
 # XXX these files should be somewhere else for good Mac form
 	touch $(PKGROOT_UGLN)/perm $(PKGROOT_UGLN)/record $(PKGROOT_UGLN)/logfile
-# XXX may need postinstall script to get perms right for sgid, etc.
 	mkdir $(PKGROOT_UGLN)/save
 # XXX what about a news file?
+
+	mkdir -p PKGSCRIPTS
+	echo '#!/bin/sh'                             >  PKGSCRIPTS/postinstall
+	echo $(CHOWN) -R $(GAMEUID) $(HACKDIR)       >> PKGSCRIPTS/postinstall
+	echo $(CHGRP) -R $(GAMEGRP) $(HACKDIR)       >> PKGSCRIPTS/postinstall
+	echo $(CHOWN) $(GAMEUID) $(SHELLDIR)/nethack >> PKGSCRIPTS/postinstall
+	echo $(CHGRP) $(GAMEGRP) $(SHELLDIR)/nethack >> PKGSCRIPTS/postinstall
+	echo $(CHOWN) $(GAMEUID) $(SHELLDIR)/recover >> PKGSCRIPTS/postinstall
+	echo $(CHGRP) $(GAMEGRP) $(SHELLDIR)/recover >> PKGSCRIPTS/postinstall
+	echo chmod $(VARDIRPERM)  $(HACKDIR)         >> PKGSCRIPTS/postinstall
+	echo chmod $(VARDIRPERM)  $(HACKDIR)/save    >> PKGSCRIPTS/postinstall
+	echo chmod $(FILEPERM)    $(HACKDIR)/nhdat   >> PKGSCRIPTS/postinstall
+	echo chmod $(VARFILEPERM) $(HACKDIR)/perm    >> PKGSCRIPTS/postinstall
+	echo chmod $(VARFILEPERM) $(HACKDIR)/record  >> PKGSCRIPTS/postinstall
+	echo chmod $(VARFILEPERM) $(HACKDIR)/sysconf >> PKGSCRIPTS/postinstall
+	echo chmod $(GAMEPERM)   $(SHELLDIR)/nethack >> PKGSCRIPTS/postinstall
+	echo chmod $(EXEPERM)    $(SHELLDIR)/recover >> PKGSCRIPTS/postinstall
+	chmod 0775 PKGSCRIPTS/postinstall
+
 endif	# end of build_tty_pkg
 endif	# WANT_WIN_TTY for packaging
 
