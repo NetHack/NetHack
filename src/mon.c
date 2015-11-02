@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1446166647 2015/10/30 00:57:27 $  $NHDT-Branch: master $:$NHDT-Revision: 1.193 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1446458009 2015/11/02 09:53:29 $  $NHDT-Branch: master $:$NHDT-Revision: 1.194 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -45,8 +45,9 @@ sanity_check_single_mon(mtmp, msg)
 struct monst *mtmp;
 const char *msg;
 {
-    if (DEADMONSTER(mtmp)) return;
-    if ((mtmp->data < &mons[LOW_PM]) || (mtmp->data >= &mons[NUMMONS]))
+    if (DEADMONSTER(mtmp))
+        return;
+    if (mtmp->data < &mons[LOW_PM] || mtmp->data >= &mons[NUMMONS])
         impossible("illegal mon data (%s)", msg);
 }
 
@@ -251,8 +252,8 @@ unsigned corpseflags;
     case PM_BLUE_DRAGON:
     case PM_GREEN_DRAGON:
     case PM_YELLOW_DRAGON:
-        /* Make dragon scales.  This assumes that the order of the */
-        /* dragons is the same as the order of the scales.	   */
+        /* Make dragon scales.  This assumes that the order of the
+           dragons is the same as the order of the scales. */
         if (!rn2(mtmp->mrevived ? 20 : 3)) {
             num = GRAY_DRAGON_SCALES + monsndx(mdat) - PM_GRAY_DRAGON;
             obj = mksobj_at(num, x, y, FALSE, FALSE);
@@ -384,7 +385,7 @@ unsigned corpseflags;
 
                 (void) bury_an_obj(obj, &dealloc);
                 newsym(x, y);
-                return (dealloc ? NULL : obj);
+                return dealloc ? (struct obj *) 0 : obj;
             }
         }
         break;
@@ -399,7 +400,7 @@ unsigned corpseflags;
     if (has_mname(mtmp))
         obj = oname(obj, MNAME(mtmp));
 
-    /* Avoid "It was hidden under a green mold corpse!"
+    /*  Avoid "It was hidden under a green mold corpse!"
      *  during Blind combat. An unseen monster referred to as "it"
      *  could be killed and leave a corpse.  If a hider then hid
      *  underneath it, you could be told the corpse type of a
@@ -534,8 +535,8 @@ struct monst *mon;
     int mmove = mon->data->mmove;
 
     /* Note: MSLOW's `+ 1' prevents slowed speed 1 getting reduced to 0;
-     *	     MFAST's `+ 2' prevents hasted speed 1 from becoming a no-op;
-     *	     both adjustments have negligible effect on higher speeds.
+     *       MFAST's `+ 2' prevents hasted speed 1 from becoming a no-op;
+     *       both adjustments have negligible effect on higher speeds.
      */
     if (mon->mspeed == MSLOW)
         mmove = (2 * mmove + 1) / 3;
@@ -649,7 +650,7 @@ movemon()
         if (DEADMONSTER(mtmp))
             continue;
 
-        /* Find a monster that we have not treated yet.	 */
+        /* Find a monster that we have not treated yet. */
         if (mtmp->movement < NORMAL_SPEED)
             continue;
 
@@ -977,7 +978,7 @@ register const char *str;
     register struct obj *otmp, *otmp2, *otmp3;
     int carryamt = 0;
 
-    /*	prevent shopkeepers from leaving the door of their shop */
+    /* prevent shopkeepers from leaving the door of their shop */
     if (mtmp->isshk && inhishop(mtmp))
         return FALSE;
 
@@ -1073,14 +1074,17 @@ struct monst *mtmp;
  *
  * this will probably cause very amusing behavior with pets and gold coins.
  *
- * TODO: allow picking up 2-N objects from a pile of N based on weight
+ * TODO: allow picking up 2-N objects from a pile of N based on weight.
+ *       Change from 'int' to 'long' to accomate big stacks of gold.
+ *       Right now we fake it by reporting a partial quantity, but the
+ *       likesgold handling m_move results in picking up the whole stack.
  */
 int
 can_carry(mtmp, otmp)
 struct monst *mtmp;
 struct obj *otmp;
 {
-    int otyp = otmp->otyp, newload = otmp->owt;
+    int iquan, otyp = otmp->otyp, newload = otmp->owt;
     struct permonst *mdat = mtmp->data;
     short nattk = 0;
 
@@ -1096,11 +1100,18 @@ struct obj *otmp;
         && (otyp != BELL_OF_OPENING || !is_covetous(mdat)))
         return 0;
 
+    /* hostile monsters who like gold will pick up the whole stack;
+       tame mosnters with hands will pick up the partial stack */
+    iquan = (otmp->quan > (long) LARGEST_INT)
+               ? 20000 + rn2(LARGEST_INT - 20000 + 1)
+               : (int) otmp->quan;
+
     /* monsters without hands can't pick up multiple objects at once
      * unless they have an engulfing attack
      *
-     * ...dragons, of course, can always carry gold pieces and gems somehow */
-    if (otmp->quan > 1) {
+     * ...dragons, of course, can always carry gold pieces and gems somehow
+     */
+    if (iquan > 1) {
         boolean glomper = FALSE;
 
         if (mtmp->data->mlet == S_DRAGON
@@ -1121,7 +1132,7 @@ struct obj *otmp;
     if (mtmp == u.usteed)
         return 0;
     if (mtmp->isshk)
-        return otmp->quan; /* no limit */
+        return iquan; /* no limit */
     if (mtmp->mpeaceful && !mtmp->mtame)
         return 0;
     /* otherwise players might find themselves obligated to violate
@@ -1130,16 +1141,16 @@ struct obj *otmp;
 
     /* special--boulder throwers carry unlimited amounts of boulders */
     if (throws_rocks(mdat) && otyp == BOULDER)
-        return otmp->quan;
+        return iquan;
 
     /* nymphs deal in stolen merchandise, but not boulders or statues */
     if (mdat->mlet == S_NYMPH)
-        return (otmp->oclass == ROCK_CLASS) ? 0 : otmp->quan;
+        return (otmp->oclass == ROCK_CLASS) ? 0 : iquan;
 
     if (curr_mon_load(mtmp) + newload > max_mon_load(mtmp))
         return 0;
 
-    return otmp->quan;
+    return iquan;
 }
 
 /* return number of acceptable neighbour positions */
@@ -1166,9 +1177,9 @@ long flag;
 
     nodiag = NODIAG(mdat - mons);
     wantpool = mdat->mlet == S_EEL;
-    poolok =
-        is_flyer(mdat) || is_clinger(mdat) || (is_swimmer(mdat) && !wantpool);
-    lavaok = is_flyer(mdat) || is_clinger(mdat) || likes_lava(mdat);
+    poolok = (is_flyer(mdat) || is_clinger(mdat)
+              || (is_swimmer(mdat) && !wantpool));
+    lavaok = (is_flyer(mdat) || is_clinger(mdat) || likes_lava(mdat));
     thrudoor = ((flag & (ALLOW_WALL | BUSTDOOR)) != 0L);
     if (flag & ALLOW_DIG) {
         struct obj *mw_tmp;
@@ -1373,7 +1384,7 @@ nexttry: /* eels prefer the water, but if there is no water nearby,
 STATIC_OVL long
 mm_aggression(magr, mdef)
 struct monst *magr, /* monster that is currently deciding where to move */
-    *mdef;          /* another monster which is next to it */
+             *mdef; /* another monster which is next to it */
 {
     /* supposedly purple worms are attracted to shrieking because they
        like to eat shriekers, so attack the latter when feasible */
@@ -1390,7 +1401,7 @@ struct monst *magr, /* monster that is currently deciding where to move */
 STATIC_OVL long
 mm_displacement(magr, mdef)
 struct monst *magr, /* monster that is currently deciding where to move */
-    *mdef;          /* another monster which is next to it */
+             *mdef; /* another monster which is next to it */
 {
     struct permonst *pa = magr->data, *pd = mdef->data;
 
@@ -2346,8 +2357,8 @@ struct monst *mtmp;
 /* mnearto()
  * Put monster near (or at) location if possible.
  * Returns:
- *	1 - if a monster was moved from x, y to put mtmp at x, y.
- *	0 - in most cases.
+ *      1 - if a monster was moved from x, y to put mtmp at x, y.
+ *      0 - in most cases.
  */
 boolean
 mnearto(mtmp, x, y, move_other)
@@ -2456,8 +2467,8 @@ struct monst *mtmp;
     }
 
     /* attacking your own quest leader will anger his or her guardians */
-    if (!context.mon_moving && /* should always be the case here */
-        mtmp->data == &mons[quest_info(MS_LEADER)]) {
+    if (!context.mon_moving /* should always be the case here */
+        && mtmp->data == &mons[quest_info(MS_LEADER)]) {
         struct monst *mon;
         struct permonst *q_guardian = &mons[quest_info(MS_GUARDIAN)];
         int got_mad = 0;
@@ -3341,7 +3352,7 @@ struct obj *obj_list;
 #if 0 /* not used */
         } else if (otmp->otyp == TIN) {
             if (dead_species(otmp->corpsenm, FALSE))
-                otmp->corpsenm = NON_PM;	/* empty tin */
+                otmp->corpsenm = NON_PM; /* empty tin */
         } else if (otmp->otyp == CORPSE) {
             if (dead_species(otmp->corpsenm, FALSE))
                 ; /* not yet implemented... */
@@ -3365,10 +3376,10 @@ kill_genocided_monsters()
      * their intended destinations, so possessions get deposited there.
      *
      * Chameleon handling:
-     *	1) if chameleons have been genocided, destroy them
-     *	   regardless of current form;
-     *	2) otherwise, force every chameleon which is imitating
-     *	   any genocided species to take on a new form.
+     *  1) if chameleons have been genocided, destroy them
+     *     regardless of current form;
+     *  2) otherwise, force every chameleon which is imitating
+     *     any genocided species to take on a new form.
      */
     for (mtmp = fmon; mtmp; mtmp = mtmp2) {
         mtmp2 = mtmp->nmon;
