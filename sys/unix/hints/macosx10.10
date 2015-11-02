@@ -46,7 +46,7 @@ endif	# WANT_WIN_QT
 #	   administered this may not be what you (or your admin) want.
 #	   Consider a non-shared install (WANT_SHARE_INSTALL=0) instead.
 #	- 'make install' must be run as "sudo make install"    
-WANT_SHARE_INSTALL=1
+#WANT_SHARE_INSTALL=1
 GAMEUID  = $(USER)
 GAMEGRP  = games
 # build to run in the source tree - primarily for development.  Build with "make all"
