@@ -268,26 +268,28 @@ build_package_root:
 	install -p sys/unix/sysconf $(PKGROOT_UGLN)
 	cd dat; install -p $(DATNODLB) ../$(PKGROOT_UGLN)
 # XXX these files should be somewhere else for good Mac form
-	touch $(PKGROOT_UGLN)/perm $(PKGROOT_UGLN)/record $(PKGROOT_UGLN)/logfile
+	touch $(PKGROOT_UGLN)/perm $(PKGROOT_UGLN)/record $(PKGROOT_UGLN)/logfile $(PKGROOT_UGLN)/xlogfile
 	mkdir $(PKGROOT_UGLN)/save
 # XXX what about a news file?
 
 	mkdir -p PKGSCRIPTS
-	echo '#!/bin/sh'                             >  PKGSCRIPTS/postinstall
-	echo $(CHOWN) -R $(GAMEUID) $(HACKDIR)       >> PKGSCRIPTS/postinstall
-	echo $(CHGRP) -R $(GAMEGRP) $(HACKDIR)       >> PKGSCRIPTS/postinstall
-	echo $(CHOWN) $(GAMEUID) $(SHELLDIR)/nethack >> PKGSCRIPTS/postinstall
-	echo $(CHGRP) $(GAMEGRP) $(SHELLDIR)/nethack >> PKGSCRIPTS/postinstall
-	echo $(CHOWN) $(GAMEUID) $(SHELLDIR)/recover >> PKGSCRIPTS/postinstall
-	echo $(CHGRP) $(GAMEGRP) $(SHELLDIR)/recover >> PKGSCRIPTS/postinstall
-	echo chmod $(VARDIRPERM)  $(HACKDIR)         >> PKGSCRIPTS/postinstall
-	echo chmod $(VARDIRPERM)  $(HACKDIR)/save    >> PKGSCRIPTS/postinstall
-	echo chmod $(FILEPERM)    $(HACKDIR)/nhdat   >> PKGSCRIPTS/postinstall
-	echo chmod $(VARFILEPERM) $(HACKDIR)/perm    >> PKGSCRIPTS/postinstall
-	echo chmod $(VARFILEPERM) $(HACKDIR)/record  >> PKGSCRIPTS/postinstall
-	echo chmod $(VARFILEPERM) $(HACKDIR)/sysconf >> PKGSCRIPTS/postinstall
-	echo chmod $(GAMEPERM)   $(SHELLDIR)/nethack >> PKGSCRIPTS/postinstall
-	echo chmod $(EXEPERM)    $(SHELLDIR)/recover >> PKGSCRIPTS/postinstall
+	echo '#!/bin/sh'                              >  PKGSCRIPTS/postinstall
+	echo $(CHOWN) -R $(GAMEUID) $(HACKDIR)        >> PKGSCRIPTS/postinstall
+	echo $(CHGRP) -R $(GAMEGRP) $(HACKDIR)        >> PKGSCRIPTS/postinstall
+	echo $(CHOWN) $(GAMEUID) $(SHELLDIR)/nethack  >> PKGSCRIPTS/postinstall
+	echo $(CHGRP) $(GAMEGRP) $(SHELLDIR)/nethack  >> PKGSCRIPTS/postinstall
+	echo $(CHOWN) $(GAMEUID) $(SHELLDIR)/recover  >> PKGSCRIPTS/postinstall
+	echo $(CHGRP) $(GAMEGRP) $(SHELLDIR)/recover  >> PKGSCRIPTS/postinstall
+	echo chmod $(VARDIRPERM)  $(HACKDIR)          >> PKGSCRIPTS/postinstall
+	echo chmod $(VARDIRPERM)  $(HACKDIR)/save     >> PKGSCRIPTS/postinstall
+	echo chmod $(FILEPERM)    $(HACKDIR)/nhdat    >> PKGSCRIPTS/postinstall
+	echo chmod $(VARFILEPERM) $(HACKDIR)/perm     >> PKGSCRIPTS/postinstall
+	echo chmod $(VARFILEPERM) $(HACKDIR)/record   >> PKGSCRIPTS/postinstall
+	echo chmod $(VARFILEPERM) $(HACKDIR)/logfile  >> PKGSCRIPTS/postinstall
+	echo chmod $(VARFILEPERM) $(HACKDIR)/xlogfile >> PKGSCRIPTS/postinstall
+	echo chmod $(VARFILEPERM) $(HACKDIR)/sysconf  >> PKGSCRIPTS/postinstall
+	echo chmod $(GAMEPERM)   $(SHELLDIR)/nethack  >> PKGSCRIPTS/postinstall
+	echo chmod $(EXEPERM)    $(SHELLDIR)/recover  >> PKGSCRIPTS/postinstall
 	chmod 0775 PKGSCRIPTS/postinstall
 
 endif	# end of build_tty_pkg
