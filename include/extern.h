@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1446336781 2015/11/01 00:13:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.511 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1446516834 2015/11/03 02:13:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.513 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -910,8 +910,8 @@ E boolean NDECL(wearing_armor);
 E boolean FDECL(is_worn, (struct obj *));
 E struct obj *FDECL(g_at, (int, int));
 E struct obj *FDECL(getobj, (const char *, const char *));
-E int FDECL(ggetobj,
-            (const char *, int (*)(OBJ_P), int, BOOLEAN_P, unsigned *));
+E int FDECL(ggetobj, (const char *, int (*)(OBJ_P), int,
+                      BOOLEAN_P, unsigned *));
 E int FDECL(askchain, (struct obj **, const char *, int, int (*)(OBJ_P),
                        int (*)(OBJ_P), int, const char *));
 E void FDECL(fully_identify_obj, (struct obj *));
@@ -945,6 +945,7 @@ E char *FDECL(let_to_name, (CHAR_P, BOOLEAN_P, BOOLEAN_P));
 E void NDECL(free_invbuf);
 E void NDECL(reassign);
 E int NDECL(doorganize);
+E void NDECL(free_pickinv_cache);
 E int FDECL(count_unpaid, (struct obj *));
 E int FDECL(count_buc, (struct obj *, int));
 E long FDECL(count_contents, (struct obj *, BOOLEAN_P, BOOLEAN_P, BOOLEAN_P));

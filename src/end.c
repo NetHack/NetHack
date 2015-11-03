@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1434408399 2015/06/15 22:46:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.100 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1446510332 2015/11/03 00:25:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.102 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -214,7 +214,7 @@ NH_panictrace_libc()
     for (x = 0; x < count; x++) {
         raw_printf("[%lu] %s", (unsigned long) x, info[x]);
     }
-    /* free(info);	Don't risk it. */
+    /* free(info);   -- Don't risk it. */
     return TRUE;
 #else
     return FALSE;
@@ -273,22 +273,23 @@ NH_panictrace_gdb()
 /*
  * The order of these needs to match the macros in hack.h.
  */
-static NEARDATA const char *deaths[] =
-    { /* the array of death */
-      "died", "choked", "poisoned", "starvation", "drowning", "burning",
-      "dissolving under the heat and pressure", "crushed", "turned to stone",
-      "turned into slime", "genocided", "panic", "trickery", "quit",
-      "escaped", "ascended"
-    };
+static NEARDATA const char *deaths[] = {
+    /* the array of death */
+    "died", "choked", "poisoned", "starvation", "drowning", "burning",
+    "dissolving under the heat and pressure", "crushed", "turned to stone",
+    "turned into slime", "genocided", "panic", "trickery", "quit",
+    "escaped", "ascended"
+};
 
-static NEARDATA const char *ends[] = { /* "when you..." */
-                                       "died", "choked", "were poisoned",
-                                       "starved", "drowned", "burned",
-                                       "dissolved in the lava",
-                                       "were crushed", "turned to stone",
-                                       "turned into slime", "were genocided",
-                                       "panicked", "were tricked", "quit",
-                                       "escaped", "ascended"
+static NEARDATA const char *ends[] = {
+    /* "when you %s" */
+    "died", "choked", "were poisoned",
+    "starved", "drowned", "burned",
+    "dissolved in the lava",
+    "were crushed", "turned to stone",
+    "turned into slime", "were genocided",
+    "panicked", "were tricked", "quit",
+    "escaped", "ascended"
 };
 
 static boolean Schroedingers_cat = FALSE;
@@ -366,8 +367,8 @@ done2()
 
 #ifndef NO_SIGNAL
 /*ARGSUSED*/
-STATIC_PTR void done_intr(
-    sig_unused) /* called as signal() handler, so sent at least one arg */
+STATIC_PTR void
+done_intr(sig_unused) /* called as signal() handler, so sent at least 1 arg */
 int sig_unused UNUSED;
 {
     done_stopprint++;
@@ -396,10 +397,11 @@ struct monst *mtmp;
 int how;
 {
     char buf[BUFSZ];
-    struct permonst *mptr = mtmp->data, *champtr = (mtmp->cham >= LOW_PM)
-                                                       ? &mons[mtmp->cham]
-                                                       : mptr;
-    boolean distorted = (boolean)(Hallucination && canspotmon(mtmp)),
+    struct permonst *mptr = mtmp->data,
+                    *champtr = ((mtmp->cham >= LOW_PM)
+                                   ? &mons[mtmp->cham]
+                                   : mptr);
+    boolean distorted = (boolean) (Hallucination && canspotmon(mtmp)),
             mimicker = (mtmp->m_ap_type == M_AP_MONSTER),
             imitator = (mptr != champtr || mimicker);
 
@@ -452,8 +454,9 @@ int how;
             Strcpy(shape, an(fakenm));
         /* omit "called" to avoid excessive verbosity */
         Sprintf(eos(buf),
-                alt ? "%s in %s form" : mimicker ? "%s disguised as %s"
-                                                 : "%s imitating %s",
+                alt ? "%s in %s form"
+                    : mimicker ? "%s disguised as %s"
+                               : "%s imitating %s",
                 realnm, shape);
         mptr = mtmp->data; /* reset for mimicker case */
     } else if (mptr == &mons[PM_GHOST]) {
@@ -462,9 +465,8 @@ int how;
             Sprintf(eos(buf), " of %s", MNAME(mtmp));
     } else if (mtmp->isshk) {
         const char *shknm = shkname(mtmp),
-                   *honorific = shkname_is_pname(mtmp) ? "" : mtmp->female
-                                                                  ? "Ms. "
-                                                                  : "Mr. ";
+                   *honorific = shkname_is_pname(mtmp) ? ""
+                                   : mtmp->female ? "Ms. " : "Mr. ";
 
         Sprintf(eos(buf), "%s%s, the shopkeeper", honorific, shknm);
         killer.format = KILLED_BY;
@@ -925,7 +927,7 @@ int how;
     }
 
 /*
- *	The game is now over...
+ *      The game is now over...
  */
 
 die:
@@ -1092,6 +1094,8 @@ die:
     /* clean up unneeded windows */
     if (have_windows) {
         wait_synch();
+        if (WIN_INVEN != WIN_ERR)
+            destroy_nhwindow(WIN_INVEN),  WIN_INVEN = WIN_ERR;
         display_nhwindow(WIN_MESSAGE, TRUE);
         destroy_nhwindow(WIN_MAP),  WIN_MAP = WIN_ERR;
 #ifndef STATUS_VIA_WINDOWPORT
@@ -1130,8 +1134,8 @@ die:
     }
 
     if (how == ESCAPED || how == ASCENDED) {
-        register struct monst *mtmp;
-        register struct obj *otmp;
+        struct monst *mtmp;
+        struct obj *otmp;
         register struct val_list *val;
         register int i;
 
