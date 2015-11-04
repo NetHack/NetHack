@@ -932,6 +932,9 @@ remaining monsters continued to move after hero conceptually left the level
 #turn for non-priest/non-knight attempts to cast "turn undead" spell, but
 	was forcing the spell to target self rather than choose a direction
 potions of gain energy are more useful for recovering hero's spell energy
+spellcasting attempt of any spell while stunned now always fails
+spellcasting attempt of expired spell while confused will increase confusion
+	duration rather than replace it
 
 
 Platform- and/or Interface-Specific Fixes

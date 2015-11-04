@@ -1,4 +1,4 @@
-/* NetHack 3.6	spell.c	$NHDT-Date: 1446191879 2015/10/30 07:57:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.67 $ */
+/* NetHack 3.6	spell.c	$NHDT-Date: 1446632870 2015/11/04 10:27:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.68 $ */
 /*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -30,9 +30,10 @@ STATIC_DCL boolean FDECL(cursed_book, (struct obj * bp));
 STATIC_DCL boolean FDECL(confused_book, (struct obj *));
 STATIC_DCL void FDECL(deadbook, (struct obj *));
 STATIC_PTR int NDECL(learn);
+STATIC_DCL boolean NDECL(rejectcasting);
 STATIC_DCL boolean FDECL(getspell, (int *));
-STATIC_PTR int FDECL(CFDECLSPEC spell_cmp,
-                     (const genericptr, const genericptr));
+STATIC_PTR int FDECL(CFDECLSPEC spell_cmp, (const genericptr,
+                                            const genericptr));
 STATIC_DCL void NDECL(sortspells);
 STATIC_DCL boolean NDECL(spellsortmenu);
 STATIC_DCL boolean FDECL(dospellmenu, (const char *, int, int *));
@@ -617,6 +618,29 @@ age_spells()
     return;
 }
 
+/* return True if spellcasting is inhibited;
+   only covers a small subset of reasons why casting won't work */
+STATIC_OVL boolean
+rejectcasting()
+{
+    /* rejections which take place before selecting a particular spell */
+    if (Stunned) {
+        You("are too impaired to cast a spell.");
+        return TRUE;
+    } else if (!freehand()) {
+        /* Note: !freehand() occurs when weapon and shield (or two-handed
+         * weapon) are welded to hands, so "arms" probably doesn't need
+         * to be makeplural(bodypart(ARM)).
+         *
+         * But why isn't lack of free arms (for gesturing) an issue when
+         * poly'd hero has no limbs?
+         */
+        Your("arms are not free to cast!");
+        return TRUE;
+    }
+    return FALSE;
+}
+
 /*
  * Return TRUE if a spell was picked, with the spell index in the return
  * parameter.  Otherwise return FALSE.
@@ -632,6 +656,9 @@ int *spell_no;
         You("don't know any spells right now.");
         return FALSE;
     }
+    if (rejectcasting())
+        return FALSE; /* no spell chosen */
+
     if (flags.menu_style == MENU_TRADITIONAL) {
         /* we know there is at least 1 known spell */
         for (nspells = 1; nspells < MAXSPELL && spellid(nspells) != NO_SPELL;
@@ -796,29 +823,37 @@ STATIC_OVL void
 spell_backfire(spell)
 int spell;
 {
-    long duration = (long) ((spellev(spell) + 1) * 3); /* 6..24 */
+    long duration = (long) ((spellev(spell) + 1) * 3), /* 6..24 */
+         old_stun = (HStun & TIMEOUT), old_conf = (HConfusion & TIMEOUT);
 
-    /* prior to 3.4.1, the only effect was confusion; it still predominates */
+    /* Prior to 3.4.1, only effect was confusion; it still predominates.
+     *
+     * 3.6.0: this used to override pre-existing confusion duration
+     * (cases 0..8) and pre-existing stun duration (cases 4..9);
+     * increase them instead.   (Hero can no longer cast spells while
+     * Stunned, so the potential increment to stun duration here is
+     * just hypothetical.)
+     */
     switch (rn2(10)) {
     case 0:
     case 1:
     case 2:
     case 3:
-        make_confused(duration, FALSE); /* 40% */
+        make_confused(old_conf + duration, FALSE); /* 40% */
         break;
     case 4:
     case 5:
     case 6:
-        make_confused(2L * duration / 3L, FALSE); /* 30% */
-        make_stunned(duration / 3L, FALSE);
+        make_confused(old_conf + 2L * duration / 3L, FALSE); /* 30% */
+        make_stunned(old_stun + duration / 3L, FALSE);
         break;
     case 7:
     case 8:
-        make_stunned(2L * duration / 3L, FALSE); /* 20% */
-        make_confused(duration / 3L, FALSE);
+        make_stunned(old_conf + 2L * duration / 3L, FALSE); /* 20% */
+        make_confused(old_stun + duration / 3L, FALSE);
         break;
     case 9:
-        make_stunned(duration, FALSE); /* 10% */
+        make_stunned(old_stun + duration, FALSE); /* 10% */
         break;
     }
     return;
@@ -837,6 +872,19 @@ boolean atme;
     coord cc;
 
     /*
+     * Reject attempting to cast while stunned or with no free hands.
+     * Already done in getspell() to stop casting before choosing
+     * which spell, but duplicated here for cases where spelleffects()
+     * gets called directly for ^T without intrinsic teleport capability
+     * or #turn for non-priest/non-knight.
+     * (There's no duplication of messages; when the rejection takes
+     * place in getspell(), we don't get called.)
+     */
+    if (rejectcasting()) {
+        return 0; /* no time elapses */
+    }
+
+    /*
      * Spell casting no longer affects knowledge of the spell. A
      * decrement of spell knowledge is done every turn.
      */
@@ -844,7 +892,7 @@ boolean atme;
         Your("knowledge of this spell is twisted.");
         pline("It invokes nightmarish images in your mind...");
         spell_backfire(spell);
-        return 0;
+        return 1;
     } else if (spellknow(spell) <= KEEN / 200) { /* 100 turns left */
         You("strain to recall the spell.");
     } else if (spellknow(spell) <= KEEN / 40) { /* 500 turns left */
@@ -862,12 +910,9 @@ boolean atme;
     } else if (ACURR(A_STR) < 4 && spellid(spell) != SPE_RESTORE_ABILITY) {
         You("lack the strength to cast spells.");
         return 0;
-    } else if (check_capacity("Your concentration falters while carrying so "
-                              "much stuff.")) {
+    } else if (check_capacity(
+                "Your concentration falters while carrying so much stuff.")) {
         return 1;
-    } else if (!freehand()) {
-        Your("arms are not free to cast!");
-        return 0;
     }
 
     if (u.uhave.amulet) {
