@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1446078765 2015/10/29 00:32:45 $  $NHDT-Branch: master $:$NHDT-Revision: 1.242 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1446604119 2015/11/04 02:28:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.243 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -17,14 +17,14 @@ STATIC_DCL int FDECL(disarm_holdingtrap, (struct trap *));
 STATIC_DCL int FDECL(disarm_landmine, (struct trap *));
 STATIC_DCL int FDECL(disarm_squeaky_board, (struct trap *));
 STATIC_DCL int FDECL(disarm_shooting_trap, (struct trap *, int));
-STATIC_DCL int FDECL(try_lift,
-                     (struct monst *, struct trap *, int, BOOLEAN_P));
+STATIC_DCL int FDECL(try_lift, (struct monst *, struct trap *, int,
+                                BOOLEAN_P));
 STATIC_DCL int FDECL(help_monster_out, (struct monst *, struct trap *));
-STATIC_DCL boolean
-FDECL(thitm, (int, struct monst *, struct obj *, int, BOOLEAN_P));
+STATIC_DCL boolean FDECL(thitm, (int, struct monst *, struct obj *, int,
+                                 BOOLEAN_P));
 STATIC_DCL void FDECL(launch_drop_spot, (struct obj *, XCHAR_P, XCHAR_P));
-STATIC_DCL int FDECL(mkroll_launch,
-                     (struct trap *, XCHAR_P, XCHAR_P, SHORT_P, long));
+STATIC_DCL int FDECL(mkroll_launch, (struct trap *, XCHAR_P, XCHAR_P,
+                                     SHORT_P, long));
 STATIC_DCL boolean FDECL(isclearpath, (coord *, int, SCHAR_P, SCHAR_P));
 STATIC_DCL char *FDECL(trapnote, (struct trap *, BOOLEAN_P));
 #if 0
@@ -32,8 +32,9 @@ STATIC_DCL void FDECL(join_adjacent_pits, (struct trap *));
 #endif
 STATIC_DCL void FDECL(clear_conjoined_pits, (struct trap *));
 STATIC_DCL int FDECL(steedintrap, (struct trap *, struct obj *));
-STATIC_DCL boolean
-FDECL(keep_saddle_with_steedcorpse, (unsigned, struct obj *, struct obj *));
+STATIC_DCL boolean FDECL(keep_saddle_with_steedcorpse, (unsigned,
+                                                        struct obj *,
+                                                        struct obj *));
 STATIC_DCL void NDECL(maybe_finish_sokoban);
 
 /* mintrap() should take a flags argument, but for time being we use this */
@@ -136,7 +137,7 @@ struct monst *victim;
 int
 erode_obj(otmp, ostr, type, ef_flags)
 register struct obj *otmp;
-register const char *ostr;
+const char *ostr;
 int type;
 int ef_flags;
 {
@@ -289,7 +290,7 @@ int ef_flags;
 boolean
 grease_protect(otmp, ostr, victim)
 register struct obj *otmp;
-register const char *ostr;
+const char *ostr;
 struct monst *victim;
 {
     static const char txt[] = "protected by the layer of grease!";
@@ -299,9 +300,9 @@ struct monst *victim;
         if (victim == &youmonst)
             Your("%s %s %s", ostr, vtense(ostr, "are"), txt);
         else if (vismon)
-            pline("%s's %s %s %s", Monnam(victim), ostr, vtense(ostr, "are"),
-                  txt);
-    } else if ((victim == &youmonst) || vismon) {
+            pline("%s's %s %s %s", Monnam(victim),
+                  ostr, vtense(ostr, "are"), txt);
+    } else if (victim == &youmonst || vismon) {
         pline("%s %s", Yobjnam2(otmp, "are"), txt);
     }
     if (!rn2(2)) {
@@ -321,13 +322,13 @@ register int x, y, typ;
 {
     register struct trap *ttmp;
     register struct rm *lev;
-    register boolean oldplace;
+    boolean oldplace;
 
     if ((ttmp = t_at(x, y)) != 0) {
         if (ttmp->ttyp == MAGIC_PORTAL || ttmp->ttyp == VIBRATING_SQUARE)
             return (struct trap *) 0;
         oldplace = TRUE;
-        if (u.utrap && (x == u.ux) && (y == u.uy)
+        if (u.utrap && x == u.ux && y == u.uy
             && ((u.utraptype == TT_BEARTRAP && typ != BEAR_TRAP)
                 || (u.utraptype == TT_WEB && typ != WEB)
                 || (u.utraptype == TT_PIT && typ != PIT
@@ -364,8 +365,7 @@ register int x, y, typ;
             ttmp->tnote = (short) rn2(12); /* all in use anyway */
         break;
     }
-    case STATUE_TRAP: /* create a "living" statue */
-    {
+    case STATUE_TRAP: { /* create a "living" statue */
         struct monst *mtmp;
         struct obj *otmp, *statue;
         struct permonst *mptr;
@@ -396,13 +396,13 @@ register int x, y, typ;
     case PIT:
     case SPIKED_PIT:
         ttmp->conjoined = 0;
-    /* fall through */
+        /*FALLTHRU*/
     case HOLE:
     case TRAPDOOR:
         lev = &levl[x][y];
         if (*in_rooms(x, y, SHOPBASE)
-            && ((typ == HOLE || typ == TRAPDOOR) || IS_DOOR(lev->typ)
-                || IS_WALL(lev->typ)))
+            && (typ == HOLE || typ == TRAPDOOR
+                || IS_DOOR(lev->typ) || IS_WALL(lev->typ)))
             add_damage(x, y, /* schedule repair */
                        ((IS_DOOR(lev->typ) || IS_WALL(lev->typ))
                         && !context.mon_moving)
@@ -411,7 +411,6 @@ register int x, y, typ;
         lev->doormask = 0;     /* subsumes altarmask, icedpool... */
         if (IS_ROOM(lev->typ)) /* && !IS_AIR(lev->typ) */
             lev->typ = ROOM;
-
         /*
          * some cases which can happen when digging
          * down while phazing thru solid areas
@@ -536,24 +535,24 @@ boolean td; /* td == TRUE : trap door or hole */
  *
  * The cause of animation is:
  *
- *	ANIMATE_NORMAL  - hero "finds" the monster
- *	ANIMATE_SHATTER - hero tries to destroy the statue
- *	ANIMATE_SPELL   - stone to flesh spell hits the statue
+ *      ANIMATE_NORMAL  - hero "finds" the monster
+ *      ANIMATE_SHATTER - hero tries to destroy the statue
+ *      ANIMATE_SPELL   - stone to flesh spell hits the statue
  *
  * Perhaps x, y is not needed if we can use get_obj_location() to find
  * the statue's location... ???
  *
  * Sequencing matters:
- *	create monster; if it fails, give up with statue intact;
- *	give "statue comes to life" message;
- *	if statue belongs to shop, have shk give "you owe" message;
- *	transfer statue contents to monster (after stolen_value());
- *	delete statue.
- *	[This ordering means that if the statue ends up wearing a cloak of
- *	 invisibility or a mummy wrapping, the visibility checks might be
- *	 wrong, but to avoid that we'd have to clone the statue contents
- *	 first in order to give them to the monster before checking their
- *	 shop status--it's not worth the hassle.]
+ *      create monster; if it fails, give up with statue intact;
+ *      give "statue comes to life" message;
+ *      if statue belongs to shop, have shk give "you owe" message;
+ *      transfer statue contents to monster (after stolen_value());
+ *      delete statue.
+ *      [This ordering means that if the statue ends up wearing a cloak of
+ *       invisibility or a mummy wrapping, the visibility checks might be
+ *       wrong, but to avoid that we'd have to clone the statue contents
+ *       first in order to give them to the monster before checking their
+ *       shop status--it's not worth the hassle.]
  */
 struct monst *
 animate_statue(statue, x, y, cause, fail_reason)
@@ -883,6 +882,7 @@ unsigned trflags;
             newsym(u.ux, u.uy);
         }
         break;
+
     case DART_TRAP:
         if (trap->once && trap->tseen && !rn2(15)) {
             You_hear("a soft click.");
@@ -916,6 +916,7 @@ unsigned trflags;
             newsym(u.ux, u.uy);
         }
         break;
+
     case ROCKTRAP:
         if (trap->once && trap->tseen && !rn2(15)) {
             pline("A trap door in %s opens, but nothing falls out!",
@@ -1172,6 +1173,7 @@ unsigned trflags;
             exercise(A_DEX, FALSE);
         }
         break;
+
     case HOLE:
     case TRAPDOOR:
         if (!Can_fall_thru(&u.uz)) {
@@ -1187,6 +1189,7 @@ unsigned trflags;
         seetrap(trap);
         tele_trap(trap);
         break;
+
     case LEVEL_TELEP:
         seetrap(trap);
         level_tele_trap(trap);
@@ -1419,6 +1422,7 @@ unsigned trflags;
         fill_pit(u.ux, u.uy);
         break;
     }
+
     case ROLLING_BOULDER_TRAP: {
         int style = ROLL | (trap->tseen ? LAUNCH_KNOWN : 0);
 
@@ -1432,10 +1436,12 @@ unsigned trflags;
         }
         break;
     }
+
     case MAGIC_PORTAL:
         feeltrap(trap);
         domagicportal(trap);
         break;
+
     case VIBRATING_SQUARE:
         seetrap(trap);
         /* messages handled elsewhere; the trap symbol is merely to mark the
@@ -2706,6 +2712,7 @@ boolean byplayer;
     }
 }
 
+/* start levitating */
 void
 float_up()
 {
@@ -2721,29 +2728,29 @@ float_up()
         } else {
             You("float up, only your %s is still stuck.", body_part(LEG));
         }
-    }
 #if 0
-	else if(Is_waterlevel(&u.uz))
-		pline("It feels as though you've lost some weight.");
+    } else if(Is_waterlevel(&u.uz)) {
+        pline("It feels as though you've lost some weight.");
 #endif
-    else if (u.uinwater)
+    } else if (u.uinwater) {
         spoteffects(TRUE);
-    else if (u.uswallow)
+    } else if (u.uswallow) {
         You(is_animal(u.ustuck->data) ? "float away from the %s."
                                       : "spiral up into %s.",
             is_animal(u.ustuck->data) ? surface(u.ux, u.uy)
                                       : mon_nam(u.ustuck));
-    else if (Hallucination)
+    } else if (Hallucination) {
         pline("Up, up, and awaaaay!  You're walking on air!");
-    else if (Is_airlevel(&u.uz))
+    } else if (Is_airlevel(&u.uz)) {
         You("gain control over your movements.");
-    else
+    } else {
         You("start to float in the air!");
+    }
     if (u.usteed && !is_floater(u.usteed->data)
         && !is_flyer(u.usteed->data)) {
-        if (Lev_at_will)
+        if (Lev_at_will) {
             pline("%s magically floats up!", Monnam(u.usteed));
-        else {
+        } else {
             You("cannot stay on %s.", mon_nam(u.usteed));
             dismount_steed(DISMOUNT_GENERIC);
         }
@@ -2768,6 +2775,7 @@ int x, y;
     }
 }
 
+/* stop levitating */
 int
 float_down(hmask, emask)
 long hmask, emask; /* might cancel timeout */
@@ -2843,20 +2851,18 @@ long hmask, emask; /* might cancel timeout */
     }
     if (!trap) {
         trap = t_at(u.ux, u.uy);
-        if (Is_airlevel(&u.uz))
+        if (Is_airlevel(&u.uz)) {
             You("begin to tumble in place.");
-        else if (Is_waterlevel(&u.uz) && !no_msg)
+        } else if (Is_waterlevel(&u.uz) && !no_msg) {
             You_feel("heavier.");
         /* u.uinwater msgs already in spoteffects()/drown() */
-        else if (!u.uinwater && !no_msg) {
+        } else if (!u.uinwater && !no_msg) {
             if (!(emask & W_SADDLE)) {
                 if (Sokoban && trap) {
-                    /* Justification elsewhere for Sokoban traps
-                     * is based on air currents. This is
-                     * consistent with that.
-                     * The unexpected additional force of the
-                     * air currents once levitation
-                     * ceases knocks you off your feet.
+                    /* Justification elsewhere for Sokoban traps is based
+                     * on air currents.  This is consistent with that.
+                     * The unexpected additional force of the air currents
+                     * once levitation ceases knocks you off your feet.
                      */
                     if (Hallucination)
                         pline("Bummer!  You've crashed.");
@@ -2869,12 +2875,14 @@ long hmask, emask; /* might cancel timeout */
                 } else if (u.usteed && (is_floater(u.usteed->data)
                                         || is_flyer(u.usteed->data))) {
                     You("settle more firmly in the saddle.");
-                } else if (Hallucination)
-                    pline("Bummer!  You've %s.", is_pool(u.ux, u.uy)
-                                                     ? "splashed down"
-                                                     : "hit the ground");
-                else
+                } else if (Hallucination) {
+                    pline("Bummer!  You've %s.",
+                          is_pool(u.ux, u.uy)
+                             ? "splashed down"
+                             : "hit the ground");
+                } else {
                     You("float gently to the %s.", surface(u.ux, u.uy));
+                }
             }
         }
     }
@@ -2882,8 +2890,7 @@ long hmask, emask; /* might cancel timeout */
     /* can't rely on u.uz0 for detecting trap door-induced level change;
        it gets changed to reflect the new level before we can check it */
     assign_level(&current_dungeon_level, &u.uz);
-
-    if (trap)
+    if (trap) {
         switch (trap->ttyp) {
         case STATUE_TRAP:
             break;
@@ -2896,7 +2903,7 @@ long hmask, emask; /* might cancel timeout */
             if (!u.utrap) /* not already in the trap */
                 dotrap(trap, 0);
         }
-
+    }
     if (!Is_airlevel(&u.uz) && !Is_waterlevel(&u.uz) && !u.uswallow
         /* falling through trap door calls goto_level,
            and goto_level does its own pickup() call */
@@ -3174,9 +3181,9 @@ xchar x, y;
         return TRUE;
     } else if (!force && (Luck + 5) > rn2(20)) {
         /*  chance per item of sustaining damage:
-          *	max luck (Luck==13):	10%
-          *	avg luck (Luck==0):	75%
-          *	awful luck (Luck<-4):  100%
+          *     max luck (Luck==13):    10%
+          *     avg luck (Luck==0):     75%
+          *     awful luck (Luck<-4):  100%
           */
         return FALSE;
     } else if (obj->oclass == SCROLL_CLASS || obj->oclass == SPBOOK_CLASS) {
@@ -3318,9 +3325,9 @@ boolean force;
         return ER_NOTHING;
     } else if (!force && (Luck + 5) > rn2(20)) {
         /*  chance per item of sustaining damage:
-            *	max luck:		10%
-            *	avg luck (Luck==0):	75%
-            *	awful luck (Luck<-4):  100%
+            *   max luck:               10%
+            *   avg luck (Luck==0):     75%
+            *   awful luck (Luck<-4):  100%
             */
         return ER_NOTHING;
     } else if (obj->oclass == SCROLL_CLASS) {
@@ -3492,9 +3499,8 @@ boolean *lostsome;
     return TRUE;
 }
 
-/*
- *  return(TRUE) == player relocated
- */
+
+/*  return TRUE iff player relocated */
 boolean
 drown()
 {
@@ -3577,9 +3583,9 @@ drown()
     }
     crawl_ok = FALSE;
     x = y = 0; /* lint suppression */
-               /* if sleeping, wake up now so that we don't crawl out of water
-                  while still asleep; we can't do that the same way that waking
-                  due to combat is handled; note unmul() clears u.usleep */
+    /* if sleeping, wake up now so that we don't crawl out of water
+       while still asleep; we can't do that the same way that waking
+       due to combat is handled; note unmul() clears u.usleep */
     if (u.usleep)
         unmul("Suddenly you wake up!");
     /* being doused will revive from fainting */
@@ -3649,7 +3655,7 @@ crawl:
 
 void
 drain_en(n)
-register int n;
+int n;
 {
     if (!u.uenmax) {
         /* energy is completely gone */
@@ -3671,7 +3677,9 @@ register int n;
     }
 }
 
-int dountrap() /* disarm a trap */
+/* disarm a trap */
+int
+dountrap()
 {
     if (near_capacity() >= HVY_ENCUMBER) {
         pline("You're too strained to do that.");
@@ -3843,6 +3851,7 @@ boolean force_failure;
                 } else if (ttype == WEB) {
                     if (!webmaker(youmonst.data)) {
                         struct trap *ttmp2 = maketrap(u.ux, u.uy, WEB);
+
                         if (ttmp2) {
                             pline_The(
                                 "webbing sticks to you. You're caught too!");
@@ -3893,7 +3902,8 @@ struct monst *mtmp;
     }
 }
 
-STATIC_OVL int disarm_holdingtrap(ttmp) /* Helge Hafting */
+STATIC_OVL int
+disarm_holdingtrap(ttmp) /* Helge Hafting */
 struct trap *ttmp;
 {
     struct monst *mtmp;
@@ -3925,7 +3935,8 @@ struct trap *ttmp;
     return 1;
 }
 
-STATIC_OVL int disarm_landmine(ttmp) /* Helge Hafting */
+STATIC_OVL int
+disarm_landmine(ttmp) /* Helge Hafting */
 struct trap *ttmp;
 {
     int fails = try_disarm(ttmp, FALSE);
@@ -3954,10 +3965,9 @@ struct trap *ttmp;
     if (!obj)
         return 0;
 
-    bad_tool =
-        (obj->cursed || ((obj->otyp != POT_OIL || obj->lamplit)
-                         && (obj->otyp != CAN_OF_GREASE || !obj->spe)));
-
+    bad_tool = (obj->cursed
+                || ((obj->otyp != POT_OIL || obj->lamplit)
+                    && (obj->otyp != CAN_OF_GREASE || !obj->spe)));
     fails = try_disarm(ttmp, bad_tool);
     if (fails < 2)
         return fails;
@@ -4814,11 +4824,11 @@ struct trap *trap;
         return FALSE;
 }
 
+/* Destroy a trap that emanates from the floor. */
 boolean
 delfloortrap(ttmp)
 register struct trap *ttmp;
 {
-    /* Destroy a trap that emanates from the floor. */
     /* some of these are arbitrary -dlc */
     if (ttmp && ((ttmp->ttyp == SQKY_BOARD) || (ttmp->ttyp == BEAR_TRAP)
                  || (ttmp->ttyp == LANDMINE) || (ttmp->ttyp == FIRE_TRAP)
@@ -4837,18 +4847,18 @@ register struct trap *ttmp;
         }
         deltrap(ttmp);
         return TRUE;
-    } else
-        return FALSE;
+    }
+    return FALSE;
 }
 
 /* used for doors (also tins).  can be used for anything else that opens. */
 void
 b_trapped(item, bodypart)
-register const char *item;
-register int bodypart;
+const char *item;
+int bodypart;
 {
-    register int lvl = level_difficulty();
-    int dmg = rnd(5 + (lvl < 5 ? lvl : 2 + lvl / 2));
+    int lvl = level_difficulty(),
+        dmg = rnd(5 + (lvl < 5 ? lvl : 2 + lvl / 2));
 
     pline("KABOOM!!  %s was booby-trapped!", The(item));
     wake_nearby();

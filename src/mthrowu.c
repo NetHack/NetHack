@@ -1,4 +1,4 @@
-/* NetHack 3.6	mthrowu.c	$NHDT-Date: 1445556876 2015/10/22 23:34:36 $  $NHDT-Branch: master $:$NHDT-Revision: 1.59 $ */
+/* NetHack 3.6	mthrowu.c	$NHDT-Date: 1446604116 2015/11/04 02:28:36 $  $NHDT-Branch: master $:$NHDT-Revision: 1.61 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -58,7 +58,7 @@ const char *name; /* if null, then format `obj' */
             pline("It misses.");
         else
             You("are almost hit by %s.", onm);
-        return (0);
+        return 0;
     } else {
         if (Blind || !flags.verbose)
             You("are hit%s", exclam(dam));
@@ -78,7 +78,7 @@ const char *name; /* if null, then format `obj' */
             losehp(dam, knm, kprefix); /* acid damage */
             exercise(A_STR, FALSE);
         }
-        return (1);
+        return 1;
     }
 }
 
@@ -138,7 +138,7 @@ struct obj *otmp;   /* missile; might be destroyed by drop_throw */
 int range;          /* how much farther will object travel if it misses */
                     /* Use -1 to signify to keep going even after hit, */
                     /* unless its gone (used for rolling_boulder_traps) */
-boolean verbose; /* give message(s) even when you can't see what happened */
+boolean verbose;    /* give message(s) even when you can't see what happened */
 {
     int damage, tmp;
     boolean vis, ismimic;
@@ -577,11 +577,13 @@ struct monst *mtmp;
 
     /* Multishot calculations */
     multishot = 1;
-    if (otmp->quan > 1L && /* no point checking if there's only 1 */
+    if (otmp->quan > 1L /* no point checking if there's only 1 */
         /* ammo requires corresponding launcher be wielded */
-        (is_ammo(otmp) ? matching_launcher(otmp, mwep)
-                       /* otherwise any stackable (non-ammo) weapon */
-                       : otmp->oclass == WEAPON_CLASS) && !mtmp->mconf) {
+        && (is_ammo(otmp)
+               ? matching_launcher(otmp, mwep)
+               /* otherwise any stackable (non-ammo) weapon */
+               : otmp->oclass == WEAPON_CLASS)
+        && !mtmp->mconf) {
         int skill = (int) objects[otmp->otyp].oc_skill;
 
         /* Assumes lords are skilled, princes are expert */
@@ -673,10 +675,10 @@ struct monst *mtmp;
 /* monster spits substance at you */
 int
 spitmu(mtmp, mattk)
-register struct monst *mtmp;
-register struct attack *mattk;
+struct monst *mtmp;
+struct attack *mattk;
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     if (mtmp->mcan) {
         if (!Deaf)
@@ -716,8 +718,8 @@ register struct attack *mattk;
 /* monster breathes at you (ranged) */
 int
 breamu(mtmp, mattk)
-register struct monst *mtmp;
-register struct attack *mattk;
+struct monst *mtmp;
+struct attack *mattk;
 {
     /* if new breath types are added, change AD_ACID to max type */
     int typ = (mattk->adtyp == AD_RBRE) ? rnd(AD_ACID) : mattk->adtyp;
@@ -730,7 +732,7 @@ register struct attack *mattk;
                 else
                     You_hear("a cough.");
             }
-            return (0);
+            return 0;
         }
         if (!mtmp->mspec_used && rn2(3)) {
             if ((typ >= AD_MAGM) && (typ <= AD_ACID)) {
@@ -751,7 +753,7 @@ register struct attack *mattk;
                 impossible("Breath weapon %d used", typ - 1);
         }
     }
-    return (1);
+    return 1;
 }
 
 boolean
@@ -761,8 +763,9 @@ int boulderhandling; /* 0=block, 1=ignore, 2=conditionally block */
 {
     int dx, dy, boulderspots;
 
-    tbx = ax - bx; /* These two values are set for use */
-    tby = ay - by; /* after successful return.	    */
+    /* These two values are set for use after successful return. */
+    tbx = ax - bx;
+    tby = ay - by;
 
     /* sometimes displacement makes a monster think that you're at its
        own location; prevent it from throwing and zapping in that case */
@@ -824,8 +827,8 @@ int type;
 
     for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
         if (otmp->otyp == type)
-            return (otmp);
-    return ((struct obj *) 0);
+            return otmp;
+    return (struct obj *) 0;
 }
 
 /* TRUE iff thrown/kicked/rolled object doesn't pass through iron bars */

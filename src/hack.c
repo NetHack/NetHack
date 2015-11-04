@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1445388917 2015/10/21 00:55:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.154 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1446604111 2015/11/04 02:28:31 $  $NHDT-Branch: master $:$NHDT-Revision: 1.155 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -91,7 +91,7 @@ const char *msg;
         /* else impossible? */
     }
 
-    return (revived);
+    return revived;
 }
 
 STATIC_OVL int
@@ -141,7 +141,7 @@ moverock()
             }
 
             if (revive_nasty(rx, ry, "You sense movement on the other side."))
-                return (-1);
+                return -1;
 
             if (mtmp && !noncorporeal(mtmp->data)
                 && (!mtmp->mtrapped
@@ -334,10 +334,10 @@ moverock()
                 sokoban_guilt();
                 break;
             } else
-                return (-1);
+                return -1;
         }
     }
-    return (0);
+    return 0;
 }
 
 /*
@@ -421,8 +421,8 @@ xchar x, y;
 
         /*
          *  The location could still block because of
-         *	1. More than one boulder
-         *	2. Boulder stuck in a wall/stone/door.
+         *      1. More than one boulder
+         *      2. Boulder stuck in a wall/stone/door.
          *
          *  [perhaps use does_block() below (from vision.c)]
          */
@@ -594,16 +594,16 @@ register xchar x, y;
 {
     struct rm *lev = &levl[x][y];
 
-    return (boolean)(!((IS_STWALL(lev->typ) || IS_TREE(lev->typ))
-                       && (lev->wall_info & W_NONDIGGABLE)));
+    return (boolean) !((IS_STWALL(lev->typ) || IS_TREE(lev->typ))
+                       && (lev->wall_info & W_NONDIGGABLE));
 }
 
 boolean
 may_passwall(x, y)
 register xchar x, y;
 {
-    return (boolean)(!(IS_STWALL(levl[x][y].typ)
-                       && (levl[x][y].wall_info & W_NONPASSWALL)));
+    return (boolean) !(IS_STWALL(levl[x][y].typ)
+                       && (levl[x][y].wall_info & W_NONPASSWALL));
 }
 
 boolean
@@ -611,11 +611,11 @@ bad_rock(mdat, x, y)
 struct permonst *mdat;
 register xchar x, y;
 {
-    return (
-        (boolean)((Sokoban && sobj_at(BOULDER, x, y))
-                  || (IS_ROCK(levl[x][y].typ)
-                      && (!tunnels(mdat) || needspick(mdat) || !may_dig(x, y))
-                      && !(passes_walls(mdat) && may_passwall(x, y)))));
+    return (boolean) ((Sokoban && sobj_at(BOULDER, x, y))
+                      || (IS_ROCK(levl[x][y].typ)
+                          && (!tunnels(mdat) || needspick(mdat)
+                              || !may_dig(x, y))
+                          && !(passes_walls(mdat) && may_passwall(x, y))));
 }
 
 /* caller has already decided that it's a tight diagonal; check whether a
@@ -652,8 +652,8 @@ boolean
 invocation_pos(x, y)
 xchar x, y;
 {
-    return (
-        (boolean)(Invocation_lev(&u.uz) && x == inv_pos.x && y == inv_pos.y));
+    return (boolean) (Invocation_lev(&u.uz)
+                      && x == inv_pos.x && y == inv_pos.y);
 }
 
 /* return TRUE if (dx,dy) is an OK place to move
@@ -1326,10 +1326,10 @@ domove()
                 u.ustuck = 0;
             } else {
                 /* If holder is asleep or paralyzed:
-                 *	37.5% chance of getting away,
-                 *	12.5% chance of waking/releasing it;
+                 *      37.5% chance of getting away,
+                 *      12.5% chance of waking/releasing it;
                  * otherwise:
-                 *	 7.5% chance of getting away.
+                 *       7.5% chance of getting away.
                  * [strength ought to be a factor]
                  * If holder is tame and there is no conflict,
                  * guaranteed escape.
@@ -1729,7 +1729,7 @@ overexertion()
             fall_asleep(-10, FALSE);
         }
     }
-    return (multi < 0); /* might have fainted (actually gone to sleep) */
+    return (boolean) (multi < 0); /* might have fainted (forced to sleep) */
 }
 
 void
@@ -2047,7 +2047,7 @@ register int typewanted;
 
     switch (rno = levl[x][y].roomno) {
     case NO_ROOM:
-        return (ptr);
+        return ptr;
     case SHARED:
         step = 2;
         break;
@@ -2057,7 +2057,7 @@ register int typewanted;
     default: /* i.e. a regular room # */
         if (goodtype(rno))
             *(--ptr) = rno;
-        return (ptr);
+        return ptr;
     }
 
     min_x = x - 1;
@@ -2094,7 +2094,7 @@ register int typewanted;
             && goodtype(rno))
             *(--ptr) = rno;
     }
-    return (ptr);
+    return ptr;
 }
 
 /* is (x,y) in a town? */
@@ -2311,7 +2311,7 @@ dopickup()
             } else
                 You("don't %s anything in here to pick up.",
                     Blind ? "feel" : "see");
-            return (1);
+            return 1;
         } else {
             int tmpcount = -count;
             return loot_mon(u.ustuck, &tmpcount, (boolean *) 0);
@@ -2321,20 +2321,20 @@ dopickup()
         if (Wwalking || is_floater(youmonst.data) || is_clinger(youmonst.data)
             || (Flying && !Breathless)) {
             You("cannot dive into the water to pick things up.");
-            return (0);
+            return 0;
         } else if (!Underwater) {
             You_cant("even see the bottom, let alone pick up %s.", something);
-            return (0);
+            return 0;
         }
     }
     if (is_lava(u.ux, u.uy)) {
         if (Wwalking || is_floater(youmonst.data) || is_clinger(youmonst.data)
             || (Flying && !Breathless)) {
             You_cant("reach the bottom to pick things up.");
-            return (0);
+            return 0;
         } else if (!likes_lava(youmonst.data)) {
             You("would burn to a crisp trying to pick things up.");
-            return (0);
+            return 0;
         }
     }
     if (!OBJ_AT(u.ux, u.uy)) {
@@ -2365,7 +2365,7 @@ dopickup()
         return 0;
     }
 
-    return (pickup(-count));
+    return pickup(-count);
 }
 
 /* stop running if we see something interesting */
@@ -2570,11 +2570,11 @@ monster_nearby()
                 && (!mtmp->mpeaceful || Hallucination)
                 && (!is_hider(mtmp->data) || !mtmp->mundetected)
                 && !noattacks(mtmp->data) && mtmp->mcanmove
-                && !mtmp->msleeping && /* aplvax!jcn */
-                !onscary(u.ux, u.uy, mtmp) && canspotmon(mtmp))
-                return (1);
+                && !mtmp->msleeping  /* aplvax!jcn */
+                && !onscary(u.ux, u.uy, mtmp) && canspotmon(mtmp))
+                return 1;
         }
-    return (0);
+    return 0;
 }
 
 void
@@ -2711,7 +2711,7 @@ weight_cap()
         if (carrcap < 0)
             carrcap = 0;
     }
-    return ((int) carrcap);
+    return (int) carrcap;
 }
 
 static int wc; /* current weight_cap(); valid after call to inv_weight() */
@@ -2793,7 +2793,7 @@ boolean incl_gold;
             ct++;
         otmp = otmp->nobj;
     }
-    return (ct);
+    return ct;
 }
 
 /* Counts the money in an object chain. */

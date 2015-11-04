@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1432512765 2015/05/25 00:12:45 $  $NHDT-Branch: master $:$NHDT-Revision: 1.38 $ */
+/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1446604114 2015/11/04 02:28:34 $  $NHDT-Branch: master $:$NHDT-Revision: 1.39 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -33,8 +33,8 @@ int x, y;
     if (!isok(x, y))
         return FALSE;
     type = levl[x][y].typ;
-    return (IS_WALL(type) || IS_DOOR(type) || type == SDOOR
-            || type == IRONBARS);
+    return (boolean) (IS_WALL(type) || IS_DOOR(type)
+                      || type == SDOOR || type == IRONBARS);
 }
 
 STATIC_OVL boolean
@@ -48,8 +48,9 @@ int x, y;
         return TRUE;
 
     type = levl[x][y].typ;
-    return (type == STONE || IS_WALL(type) || IS_DOOR(type) || type == SDOOR
-            || type == IRONBARS);
+    return (boolean) (type == STONE
+                      || IS_WALL(type) || IS_DOOR(type)
+                      || type == SDOOR || type == IRONBARS);
 }
 
 /* return TRUE if out of bounds, wall or rock */
@@ -57,7 +58,7 @@ STATIC_OVL boolean
 is_solid(x, y)
 int x, y;
 {
-    return (!isok(x, y) || IS_STWALL(levl[x][y].typ));
+    return (boolean) (!isok(x, y) || IS_STWALL(levl[x][y].typ));
 }
 
 /*
@@ -70,13 +71,13 @@ int x, y;
  * a wall, '.' a room, 'a' anything (we don't care), and our direction is
  * (0,1) - South or down - then:
  *
- *		a a a
- *		W x W		This would not extend a spine from x down
- *		W W W		(a corridor of walls is formed).
+ *              a a a
+ *              W x W           This would not extend a spine from x down
+ *              W W W           (a corridor of walls is formed).
  *
- *		a a a
- *		W x W		This would extend a spine from x down.
- *		. W W
+ *              a a a
+ *              W x W           This would extend a spine from x down.
+ *              . W W
  */
 STATIC_OVL int
 extend_spine(locale, wall_there, dx, dy)
@@ -90,15 +91,15 @@ int wall_there, dx, dy;
 
     if (wall_there) { /* wall in that direction */
         if (dx) {
-            if (locale[1][0] && locale[1][2] &&   /* EW are wall/stone */
-                locale[nx][0] && locale[nx][2]) { /* diag are wall/stone */
+            if (locale[1][0] && locale[1][2]         /* EW are wall/stone */
+                && locale[nx][0] && locale[nx][2]) { /* diag are wall/stone */
                 spine = 0;
             } else {
                 spine = 1;
             }
-        } else {                                  /* dy */
-            if (locale[0][1] && locale[2][1] &&   /* NS are wall/stone */
-                locale[0][ny] && locale[2][ny]) { /* diag are wall/stone */
+        } else { /* dy */
+            if (locale[0][1] && locale[2][1]         /* NS are wall/stone */
+                && locale[0][ny] && locale[2][ny]) { /* diag are wall/stone */
                 spine = 0;
             } else {
                 spine = 1;
@@ -125,11 +126,11 @@ int x1, y1, x2, y2;
     struct rm *lev;
     int bits;
     int locale[3][3]; /* rock or wall status surrounding positions */
-                      /*
-                       * Value 0 represents a free-standing wall.  It could be anything,
-                       * so even though this table says VWALL, we actually leave whatever
-                       * typ was there alone.
-                       */
+    /*
+     * Value 0 represents a free-standing wall.  It could be anything,
+     * so even though this table says VWALL, we actually leave whatever
+     * typ was there alone.
+     */
     static xchar spine_array[16] = { VWALL, HWALL,    HWALL,    HWALL,
                                      VWALL, TRCORNER, TLCORNER, TDWALL,
                                      VWALL, BRCORNER, BLCORNER, TUWALL,
@@ -198,12 +199,13 @@ register int dir;
     move(&x, &y, dir);
     if (x < 3 || y < 3 || x > x_maze_max || y > y_maze_max
         || levl[x][y].typ != 0)
-        return (FALSE);
-    return (TRUE);
+        return FALSE;
+    return TRUE;
 }
 
+/* find random starting point for maze generation */
 STATIC_OVL void
-maze0xy(cc) /* find random starting point for maze generation */
+maze0xy(cc)
 coord *cc;
 {
     cc->x = 3 + 2 * rn2((x_maze_max >> 1) - 1);
@@ -213,23 +215,24 @@ coord *cc;
 
 /*
  * Bad if:
- *	pos is occupied OR
- *	pos is inside restricted region (lx,ly,hx,hy) OR
- *	NOT (pos is corridor and a maze level OR pos is a room OR pos is air)
+ *      pos is occupied OR
+ *      pos is inside restricted region (lx,ly,hx,hy) OR
+ *      NOT (pos is corridor and a maze level OR pos is a room OR pos is air)
  */
 boolean
 bad_location(x, y, lx, ly, hx, hy)
 xchar x, y;
 xchar lx, ly, hx, hy;
 {
-    return (
-        (boolean)(occupied(x, y) || within_bounded_area(x, y, lx, ly, hx, hy)
-                  || !((levl[x][y].typ == CORR && level.flags.is_maze_lev)
-                       || levl[x][y].typ == ROOM || levl[x][y].typ == AIR)));
+    return (boolean) (occupied(x, y)
+                      || within_bounded_area(x, y, lx, ly, hx, hy)
+                      || !((levl[x][y].typ == CORR && level.flags.is_maze_lev)
+                           || levl[x][y].typ == ROOM
+                           || levl[x][y].typ == AIR));
 }
 
-/* pick a location in area (lx, ly, hx, hy) but not in (nlx, nly, nhx, nhy) */
-/* and place something (based on rtype) in that region */
+/* pick a location in area (lx, ly, hx, hy) but not in (nlx, nly, nhx, nhy)
+   and place something (based on rtype) in that region */
 void
 place_lregion(lx, ly, hx, hy, nlx, nly, nhx, nhy, rtype, lev)
 xchar lx, ly, hx, hy;
@@ -242,10 +245,10 @@ d_level *lev;
     xchar x, y;
 
     if (!lx) { /* default to whole level */
-               /*
-                * if there are rooms and this a branch, let place_branch choose
-                * the branch location (to avoid putting branches in corridors).
-                */
+        /*
+         * if there are rooms and this a branch, let place_branch choose
+         * the branch location (to avoid putting branches in corridors).
+         */
         if (rtype == LR_BRANCH && nroom) {
             place_branch(Is_branchlev(&u.uz), 0, 0);
             return;
@@ -312,7 +315,7 @@ d_level *lev;
             if (oneshot)
                 (void) rloc(m_at(x, y), FALSE);
             else
-                return (FALSE);
+                return FALSE;
         }
         u_on_newpos(x, y);
         break;
@@ -327,7 +330,7 @@ d_level *lev;
         place_branch(Is_branchlev(&u.uz), x, y);
         break;
     }
-    return (TRUE);
+    return TRUE;
 }
 
 static boolean was_waterlevel; /* ugh... this shouldn't be needed */
@@ -611,8 +614,8 @@ register const char *s;
             y = rn1(y_range, y_maze_min + INVPOS_Y_MARGIN + 1);
             /* we don't want it to be too near the stairs, nor
                to be on a spot that's already in use (wall|trap) */
-        } while (x == xupstair || y == yupstair || /*(direct line)*/
-                 abs(x - xupstair) == abs(y - yupstair)
+        } while (x == xupstair || y == yupstair /*(direct line)*/
+                 || abs(x - xupstair) == abs(y - yupstair)
                  || distmin(x, y, xupstair, yupstair) <= INVPOS_DISTANCE
                  || !SPACE_POS(levl[x][y].typ) || occupied(x, y));
         inv_pos.x = x;
@@ -767,8 +770,10 @@ register int dir;
     }
 }
 
-void mazexy(cc) /* find random point in generated corridors,
-                   so we don't create items in moats, bunkers, or walls */
+/* find random point in generated corridors,
+   so we don't create items in moats, bunkers, or walls */
+void
+mazexy(cc)
 coord *cc;
 {
     int cpt = 0;
@@ -796,8 +801,6 @@ coord *cc;
     return;
 }
 
-void
-bound_digging()
 /* put a non-diggable boundary around the initial portion of a level map.
  * assumes that no level will initially put things beyond the isok() range.
  *
@@ -808,6 +811,8 @@ bound_digging()
  * we can't bound unconditionally on one beyond the last line, because
  * that provides a window of abuse for wallified special levels
  */
+void
+bound_digging()
 {
     register int x, y;
     register unsigned typ;
@@ -892,11 +897,11 @@ bound_digging()
 
 void
 mkportal(x, y, todnum, todlevel)
-register xchar x, y, todnum, todlevel;
+xchar x, y, todnum, todlevel;
 {
-    /* a portal "trap" must be matched by a */
-    /* portal in the destination dungeon/dlevel */
-    register struct trap *ttmp = maketrap(x, y, MAGIC_PORTAL);
+    /* a portal "trap" must be matched by a
+       portal in the destination dungeon/dlevel */
+    struct trap *ttmp = maketrap(x, y, MAGIC_PORTAL);
 
     if (!ttmp) {
         impossible("portal on top of portal??");
@@ -914,6 +919,7 @@ fumaroles()
 {
     xchar n;
     boolean snd = FALSE, loud = FALSE;
+
     for (n = rn2(3) + 2; n; n--) {
         xchar x = rn1(COLNO - 4, 3);
         xchar y = rn1(ROWNO - 4, 3);
@@ -936,8 +942,10 @@ fumaroles()
  * other source files, but they are all so nicely encapsulated here.
  */
 
+#ifdef DEBUG
 /* to ease the work of debuggers at this stage */
 #define register
+#endif
 
 #define CONS_OBJ 0
 #define CONS_MON 1
@@ -985,7 +993,6 @@ movebubbles()
          * Pick up everything inside of a bubble then fill all bubble
          * locations.
          */
-
         for (b = up ? bbubbles : ebubbles; b; b = up ? b->next : b->prev) {
             if (b->cons)
                 panic("movebubbles: cons != null");
@@ -1084,7 +1091,6 @@ movebubbles()
      * all the junk that changes owners when bubbles overlap
      * would eventually end up in the last bubble in the chain.
      */
-
     up = !up;
     for (b = up ? bbubbles : ebubbles; b; b = up ? b->next : b->prev) {
         register int rx = rn2(3), ry = rn2(3);
@@ -1302,7 +1308,6 @@ register int x, y, n;
                  bm7[] = { 7, 4, 0x3e, 0x7f, 0x7f, 0x3e },
                  bm8[] = { 8, 4, 0x7e, 0xff, 0xff, 0x7e },
                  *bmask[] = { bm2, bm3, bm4, bm5, bm6, bm7, bm8 };
-
     register struct bubble *b;
 
     if (x >= bxmax || y >= bymax)
@@ -1367,7 +1372,7 @@ register boolean ini;
 
         /*
          * collision with level borders?
-         *	1 = horizontal border, 2 = vertical, 3 = corner
+         *      1 = horizontal border, 2 = vertical, 3 = corner
          */
         if (b->x <= bxmin)
             colli |= 2;

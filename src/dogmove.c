@@ -1,4 +1,4 @@
-/* NetHack 3.6	dogmove.c	$NHDT-Date: 1445301121 2015/10/20 00:32:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.55 $ */
+/* NetHack 3.6	dogmove.c	$NHDT-Date: 1446604109 2015/11/04 02:28:29 $  $NHDT-Branch: master $:$NHDT-Revision: 1.56 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -10,13 +10,10 @@ extern boolean notonhead;
 
 STATIC_DCL boolean FDECL(dog_hunger, (struct monst *, struct edog *));
 STATIC_DCL int FDECL(dog_invent, (struct monst *, struct edog *, int));
-STATIC_DCL int FDECL(dog_goal,
-                     (struct monst *, struct edog *, int, int, int));
-
+STATIC_DCL int FDECL(dog_goal, (struct monst *, struct edog *, int, int, int));
 STATIC_DCL boolean FDECL(can_reach_location, (struct monst *, XCHAR_P,
                                               XCHAR_P, XCHAR_P, XCHAR_P));
-STATIC_DCL boolean
-FDECL(could_reach_item, (struct monst *, XCHAR_P, XCHAR_P));
+STATIC_DCL boolean FDECL(could_reach_item, (struct monst *, XCHAR_P, XCHAR_P));
 STATIC_DCL void FDECL(quickmimic, (struct monst *));
 
 /* pick a carried item for pet to drop */
@@ -320,12 +317,13 @@ boolean devour;
     }
 
 #if 0 /* pet is eating, so slime recovery is not feasible... */
-	/* turning into slime might be cureable */
-	if (slimer && munslime(mtmp, FALSE)) {
-	    /* but the cure (fire directed at self) might be fatal */
-	    if (mtmp->mhp < 1) return 2;
-	    slimer = FALSE;	/* sliming is avoided, skip polymorph */
-	}
+    /* turning into slime might be cureable */
+    if (slimer && munslime(mtmp, FALSE)) {
+        /* but the cure (fire directed at self) might be fatal */
+        if (mtmp->mhp < 1)
+            return 2;
+        slimer = FALSE; /* sliming is avoided, skip polymorph */
+    }
 #endif
 
     if (poly || slimer) {
@@ -383,10 +381,10 @@ register struct edog *edog;
                 You_feel("%s for a moment.",
                          Hallucination ? "bummed" : "sad");
             mondied(mtmp);
-            return (TRUE);
+            return  TRUE;
         }
     }
-    return (FALSE);
+    return FALSE;
 }
 
 /* do something with object (drop, pick up, eat) at current position
@@ -402,7 +400,7 @@ int udist;
     struct obj *obj, *otmp;
 
     if (mtmp->msleeping || !mtmp->mcanmove)
-        return (0);
+        return 0;
 
     omx = mtmp->mx;
     omy = mtmp->my;
@@ -462,8 +460,7 @@ int udist;
 }
 
 /* set dog's goal -- gtyp, gx, gy
- * returns -1/0/1 (dog's desire to approach player) or -2 (abort move)
- */
+   returns -1/0/1 (dog's desire to approach player) or -2 (abort move) */
 STATIC_OVL int
 dog_goal(mtmp, edog, after, udist, whappr)
 register struct monst *mtmp;
@@ -478,7 +475,7 @@ int after, udist, whappr;
 
     /* Steeds don't move on their own will */
     if (mtmp == u.usteed)
-        return (-2);
+        return -2;
 
     omx = mtmp->mx;
     omy = mtmp->my;
@@ -535,7 +532,8 @@ int after, udist, whappr;
                            && !dog_has_minvent
                            && (!levl[omx][omy].lit || levl[u.ux][u.uy].lit)
                            && (otyp == MANFOOD || m_cansee(mtmp, nx, ny))
-                           && edog->apport > rn2(8) && can_carry(mtmp, obj) > 0) {
+                           && edog->apport > rn2(8)
+                           && can_carry(mtmp, obj) > 0) {
                     gx = nx;
                     gy = ny;
                     gtyp = APPORT;
@@ -550,7 +548,7 @@ int after, udist, whappr;
         gx = u.ux;
         gy = u.uy;
         if (after && udist <= 4 && gx == u.ux && gy == u.uy)
-            return (-2);
+            return -2;
         appr = (udist >= 9) ? 1 : (mtmp->mflee) ? -1 : 0;
         if (udist > 1) {
             if (!IS_ROOM(levl[u.ux][u.uy].typ) || !rn2(4) || whappr
@@ -645,19 +643,19 @@ register int after; /* this is extra fast monster movement */
     omx = mtmp->mx;
     omy = mtmp->my;
     if (has_edog && dog_hunger(mtmp, edog))
-        return (2); /* starved */
+        return 2; /* starved */
 
     udist = distu(omx, omy);
     /* Let steeds eat and maybe throw rider during Conflict */
     if (mtmp == u.usteed) {
         if (Conflict && !resist(mtmp, RING_CLASS, 0, 0)) {
             dismount_steed(DISMOUNT_THROWN);
-            return (1);
+            return 1;
         }
         udist = 1;
     } else if (!udist)
         /* maybe we tamed him while being swallowed --jgm */
-        return (0);
+        return 0;
 
     nix = omx; /* set before newdogpos */
     niy = omy;
@@ -678,7 +676,7 @@ register int after; /* this is extra fast monster movement */
     appr = dog_goal(mtmp, has_edog ? edog : (struct edog *) 0, after, udist,
                     whappr);
     if (appr == -2)
-        return (0);
+        return 0;
 
     allowflags = ALLOW_M | ALLOW_TRAPS | ALLOW_SSM | ALLOW_SANCT;
     if (passes_walls(mtmp->data))
@@ -716,8 +714,7 @@ register int after; /* this is extra fast monster movement */
     if (is_giant(mtmp->data))
         allowflags |= BUSTDOOR;
     if (tunnels(mtmp->data)
-        && !Is_rogue_level(&u.uz) /* same restriction as m_move() */
-        )
+        && !Is_rogue_level(&u.uz)) /* same restriction as m_move() */
         allowflags |= ALLOW_DIG;
     cnt = mfndpos(mtmp, poss, info, allowflags);
 
@@ -773,7 +770,7 @@ register int after; /* this is extra fast monster movement */
                 continue;
 
             if (after)
-                return (0); /* hit only once each move */
+                return 0; /* hit only once each move */
 
             notonhead = 0;
             mstatus = mattackm(mtmp, mtmp2);
@@ -803,13 +800,14 @@ register int after; /* this is extra fast monster movement */
             return 0;
         }
 
-        { /* Dog avoids harmful traps, but perhaps it has to pass one
-           * in order to follow player.  (Non-harmful traps do not
-           * have ALLOW_TRAPS in info[].)  The dog only avoids the
-           * trap if you've seen it, unlike enemies who avoid traps
-           * if they've seen some trap of that type sometime in the
-           * past.  (Neither behavior is really realistic.)
-           */
+        {
+            /* Dog avoids harmful traps, but perhaps it has to pass one
+             * in order to follow player.  (Non-harmful traps do not
+             * have ALLOW_TRAPS in info[].)  The dog only avoids the
+             * trap if you've seen it, unlike enemies who avoid traps
+             * if they've seen some trap of that type sometime in the
+             * past.  (Neither behavior is really realistic.)
+             */
             struct trap *trap;
 
             if ((info[i] & ALLOW_TRAPS) && (trap = t_at(nx, ny))) {
@@ -883,7 +881,7 @@ newdogpos:
                 m_unleash(mtmp, FALSE);
             }
             (void) mattacku(mtmp);
-            return (0);
+            return 0;
         }
         if (!m_in_out_region(mtmp, nix, niy))
             return 1;
@@ -956,7 +954,7 @@ newdogpos:
         newsym(cc.x, cc.y);
         set_apparxy(mtmp);
     }
-    return (1);
+    return 1;
 }
 
 /* check if a monster could pick up objects from a location */
@@ -974,11 +972,10 @@ xchar nx, ny;
 
 /* Hack to prevent a dog from being endlessly stuck near an object that
  * it can't reach, such as caught in a teleport scroll niche.  It recursively
- * checks to see if the squares in between are good.  The checking could be a
- * little smarter; a full check would probably be useful in m_move() too.
+ * checks to see if the squares in between are good.  The checking could be
+ * a little smarter; a full check would probably be useful in m_move() too.
  * Since the maximum food distance is 5, this should never be more than 5
- * calls
- * deep.
+ * calls deep.
  */
 STATIC_OVL boolean
 can_reach_location(mon, mx, my, fx, fy)

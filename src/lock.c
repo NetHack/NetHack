@@ -1,4 +1,4 @@
-/* NetHack 3.6	lock.c	$NHDT-Date: 1436753515 2015/07/13 02:11:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.61 $ */
+/* NetHack 3.6	lock.c	$NHDT-Date: 1446604112 2015/11/04 02:28:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.65 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -37,7 +37,7 @@ boolean
 picking_at(x, y)
 int x, y;
 {
-    return (boolean)(occupation == picklock && xlock.door == &levl[x][y]);
+    return (boolean) (occupation == picklock && xlock.door == &levl[x][y]);
 }
 
 /* produce an occupation string appropriate for the current activity */
@@ -66,8 +66,9 @@ lock_action()
         return xlock.box->otyp == CHEST ? actions[1] : actions[2];
 }
 
-STATIC_PTR
-int picklock(VOID_ARGS) /* try to open/close a lock */
+/* try to open/close a lock */
+STATIC_PTR int
+picklock(VOID_ARGS)
 {
     if (xlock.box) {
         if ((xlock.box->ox != u.ux) || (xlock.box->oy != u.uy)) {
@@ -97,7 +98,7 @@ int picklock(VOID_ARGS) /* try to open/close a lock */
     }
 
     if (rn2(100) >= xlock.chance)
-        return (1); /* still busy */
+        return 1; /* still busy */
 
     You("succeed in %s.", lock_action());
     if (xlock.door) {
@@ -175,8 +176,9 @@ boolean destroyit;
     }
 }
 
-STATIC_PTR
-int forcelock(VOID_ARGS) /* try to force a locked chest */
+/* try to force a locked chest */
+STATIC_PTR int
+forcelock(VOID_ARGS)
 {
     if ((xlock.box->ox != u.ux) || (xlock.box->oy != u.uy))
         return ((xlock.usedtime = 0)); /* you or it moved */
@@ -206,7 +208,7 @@ int forcelock(VOID_ARGS) /* try to force a locked chest */
         wake_nearby(); /* due to hammering on the container */
 
     if (rn2(100) >= xlock.chance)
-        return (1); /* still busy */
+        return 1; /* still busy */
 
     You("succeed in forcing the lock.");
     breakchestlock(xlock.box, (boolean)(!xlock.picktyp && !rn2(3)));
@@ -234,7 +236,7 @@ reset_pick()
 /* player is applying a key, lock pick, or credit card */
 int
 pick_lock(pick)
-register struct obj *pick;
+struct obj *pick;
 {
     int picktyp, c, ch;
     coord cc;
@@ -261,6 +263,7 @@ register struct obj *pick;
             return PICKLOCK_LEARNED_SOMETHING;
         } else {
             const char *action = lock_action();
+
             You("resume your attempt at %s.", action);
             set_occupation(picklock, action, 0);
             return PICKLOCK_DID_SOMETHING;
@@ -331,7 +334,7 @@ register struct obj *pick;
 
                 c = ynq(qbuf);
                 if (c == 'q')
-                    return (0);
+                    return 0;
                 if (c == 'n')
                     continue;
 
@@ -425,7 +428,7 @@ register struct obj *pick;
 
             c = yn(qbuf);
             if (c == 'n')
-                return (0);
+                return 0;
 
             switch (picktyp) {
             case CREDIT_CARD:
@@ -452,7 +455,9 @@ register struct obj *pick;
     return PICKLOCK_DID_SOMETHING;
 }
 
-int doforce() /* try to force a chest with your weapon */
+/* try to force a chest with your weapon */
+int
+doforce()
 {
     register struct obj *otmp;
     register int c, picktyp;
@@ -462,18 +467,18 @@ int doforce() /* try to force a chest with your weapon */
         You_cant("force anything from inside here.");
         return 0;
     }
-    if (!uwep || /* proper type test */
-        ((uwep->oclass == WEAPON_CLASS || is_weptool(uwep))
-             ? (objects[uwep->otyp].oc_skill < P_DAGGER
-                || objects[uwep->otyp].oc_skill == P_FLAIL
-                || objects[uwep->otyp].oc_skill > P_LANCE)
-             : uwep->oclass != ROCK_CLASS)) {
+    if (!uwep /* proper type test */
+        || ((uwep->oclass == WEAPON_CLASS || is_weptool(uwep))
+               ? (objects[uwep->otyp].oc_skill < P_DAGGER
+                  || objects[uwep->otyp].oc_skill == P_FLAIL
+                  || objects[uwep->otyp].oc_skill > P_LANCE)
+               : uwep->oclass != ROCK_CLASS)) {
         You_cant("force anything %s weapon.",
                  !uwep ? "when not wielding a"
                        : (uwep->oclass != WEAPON_CLASS && !is_weptool(uwep))
                              ? "without a proper"
                              : "with that");
-        return (0);
+        return 0;
     }
     if (!can_reach_floor(TRUE)) {
         cant_reach_floor(u.ux, u.uy, FALSE, TRUE);
@@ -484,7 +489,7 @@ int doforce() /* try to force a chest with your weapon */
     if (xlock.usedtime && xlock.box && picktyp == xlock.picktyp) {
         You("resume your attempt to force the lock.");
         set_occupation(forcelock, "forcing the lock", 0);
-        return (1);
+        return 1;
     }
 
     /* A lock is made only for the honest man, the thief will break it. */
@@ -503,7 +508,7 @@ int doforce() /* try to force a chest with your weapon */
 
             c = ynq(qbuf);
             if (c == 'q')
-                return (0);
+                return 0;
             if (c == 'n')
                 continue;
 
@@ -522,10 +527,12 @@ int doforce() /* try to force a chest with your weapon */
         set_occupation(forcelock, "forcing the lock", 0);
     else
         You("decide not to force the issue.");
-    return (1);
+    return 1;
 }
 
-int doopen() /* try to open a door */
+/* try to open a door */
+int
+doopen()
 {
     return doopen_indir(0, 0);
 }
@@ -535,6 +542,7 @@ stumble_on_door_mimic(x, y)
 int x, y;
 {
     struct monst *mtmp;
+
     if ((mtmp = m_at(x, y)) && is_door_mappear(mtmp)
         && !Protection_from_shape_changers) {
         stumble_onto_mimic(mtmp);
@@ -543,7 +551,9 @@ int x, y;
     return FALSE;
 }
 
-int doopen_indir(x, y) /* try to open a door in direction u.dx/u.dy */
+/* try to open a door in direction u.dx/u.dy */
+int
+doopen_indir(x, y)
 int x, y;
 {
     coord cc;
@@ -565,10 +575,10 @@ int x, y;
         cc.x = x;
         cc.y = y;
     } else if (!get_adjacent_loc((char *) 0, (char *) 0, u.ux, u.uy, &cc))
-        return (0);
+        return 0;
 
     if ((cc.x == u.ux) && (cc.y == u.uy))
-        return (0);
+        return 0;
 
     if (stumble_on_door_mimic(cc.x, cc.y))
         return 1;
@@ -647,11 +657,10 @@ int x, y;
         pline_The("door resists!");
     }
 
-    return (1);
+    return 1;
 }
 
-STATIC_OVL
-boolean
+STATIC_OVL boolean
 obstructed(x, y, quietly)
 register int x, y;
 boolean quietly;
@@ -674,22 +683,23 @@ boolean quietly;
         }
         if (!canspotmon(mtmp))
             map_invisible(x, y);
-        return (TRUE);
+        return TRUE;
     }
     if (OBJ_AT(x, y)) {
     objhere:
         if (!quietly)
             pline("%s's in the way.", Something);
-        return (TRUE);
+        return TRUE;
     }
-    return (FALSE);
+    return FALSE;
 }
 
-int doclose() /* try to close a door */
+/* try to close a door */
+int
+doclose()
 {
     register int x, y;
     register struct rm *door;
-    struct monst *mtmp;
     boolean portcullis;
     int res = 0;
 
@@ -704,20 +714,20 @@ int doclose() /* try to close a door */
     }
 
     if (!getdir((char *) 0))
-        return (0);
+        return 0;
 
     x = u.ux + u.dx;
     y = u.uy + u.dy;
     if ((x == u.ux) && (y == u.uy)) {
         You("are in the way!");
-        return (1);
+        return 1;
     }
 
     if (!isok(x, y))
         goto nodoor;
 
     if (stumble_on_door_mimic(x, y))
-        return (1);
+        return 1;
 
     /* when choosing a direction is impaired, use a turn
        regardless of whether a door is successfully targetted */
@@ -781,14 +791,16 @@ int doclose() /* try to close a door */
         }
     }
 
-    return (1);
+    return 1;
 }
 
-boolean                          /* box obj was hit with spell effect otmp */
-    boxlock(obj, otmp)           /* returns true if something happened */
-register struct obj *obj, *otmp; /* obj *is* a box */
+/* box obj was hit with spell or wand effect otmp;
+   returns true if something happened */
+boolean
+boxlock(obj, otmp)
+struct obj *obj, *otmp; /* obj *is* a box */
 {
-    register boolean res = 0;
+    boolean res = 0;
 
     switch (otmp->otyp) {
     case WAN_LOCKING:
@@ -828,8 +840,10 @@ register struct obj *obj, *otmp; /* obj *is* a box */
     return res;
 }
 
-boolean                  /* Door/secret door was hit with spell effect otmp */
-    doorlock(otmp, x, y) /* returns true if something happened */
+/* Door/secret door was hit with spell or wand effect otmp;
+   returns true if something happened */
+boolean
+doorlock(otmp, x, y)
 struct obj *otmp;
 int x, y;
 {

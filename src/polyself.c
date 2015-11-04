@@ -1,5 +1,5 @@
-/* NetHack 3.6	polyself.c	$NHDT-Date: 1432512772 2015/05/25 00:12:52 $  $NHDT-Branch: master $:$NHDT-Revision: 1.100 $ */
-/*	Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
+/* NetHack 3.6	polyself.c	$NHDT-Date: 1446604117 2015/11/04 02:28:37 $  $NHDT-Branch: master $:$NHDT-Revision: 1.102 $ */
+/*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -10,13 +10,13 @@
  * player polymorphed into a light-emitting monster.
  *
  * Transformation sequences:
- *		/-> polymon		    poly into monster form
+ *              /-> polymon                 poly into monster form
  *    polyself =
- *		\-> newman -> polyman	    fail to poly, get human form
+ *              \-> newman -> polyman       fail to poly, get human form
  *
- *    rehumanize -> polyman		    return to original form
+ *    rehumanize -> polyman                 return to original form
  *
- *    polymon (called directly)		    usually golem petrification
+ *    polymon (called directly)             usually golem petrification
  */
 
 #include "hack.h"
@@ -71,9 +71,9 @@ set_uasmon()
     }
     /* resists_magm() takes wielded, worn, and carried equipment into
        into account; cheat and duplicate its monster-specific part */
-    PROPSET(ANTIMAGIC,
-            (dmgtype(mdat, AD_MAGM) || mdat == &mons[PM_BABY_GRAY_DRAGON]
-             || dmgtype(mdat, AD_RBRE)));
+    PROPSET(ANTIMAGIC, (dmgtype(mdat, AD_MAGM)
+                        || mdat == &mons[PM_BABY_GRAY_DRAGON]
+                        || dmgtype(mdat, AD_RBRE)));
     PROPSET(SICK_RES, (mdat->mlet == S_FUNGUS || mdat == &mons[PM_GHOUL]));
 
     PROPSET(STUNNED, (mdat == &mons[PM_STALKER] || is_bat(mdat)));
@@ -119,9 +119,10 @@ STATIC_OVL void
 check_strangling(on)
 boolean on;
 {
-    if (on) { /* on -- maybe resume strangling */
-              /* when Strangled is already set, polymorphing from one
-                 vulnerable form into another causes the counter to be reset */
+    /* on -- maybe resume strangling */
+    if (on) {
+        /* when Strangled is already set, polymorphing from one
+           vulnerable form into another causes the counter to be reset */
         if (uamul && uamul->otyp == AMULET_OF_STRANGULATION
             && can_be_strangled(&youmonst)) {
             Your("%s %s your %s!", simpleonames(uamul),
@@ -130,7 +131,9 @@ boolean on;
             Strangled = 6L;
             makeknown(AMULET_OF_STRANGULATION);
         }
-    } else { /* off -- maybe block strangling */
+
+    /* off -- maybe block strangling */
+    } else {
         if (Strangled && !can_be_strangled(&youmonst)) {
             Strangled = 0L;
             You("are no longer being strangled.");
@@ -143,7 +146,7 @@ STATIC_OVL void
 polyman(fmt, arg)
 const char *fmt, *arg;
 {
-    boolean sticky = sticks(youmonst.data) && u.ustuck && !u.uswallow,
+    boolean sticky = (sticks(youmonst.data) && u.ustuck && !u.uswallow),
             was_mimicking = (youmonst.m_ap_type == M_AP_OBJECT);
     boolean was_blind = !!Blind;
 
@@ -218,10 +221,12 @@ change_sex()
        swap unintentionally makes `Upolyd' appear to be true */
     boolean already_polyd = (boolean) Upolyd;
 
-    /* Some monsters are always of one sex and their sex can't be changed */
-    /* succubi/incubi can change, but are handled below */
-    /* !already_polyd check necessary because is_male() and is_female()
-       are true if the player is a priest/priestess */
+    /* Some monsters are always of one sex and their sex can't be changed;
+     * Succubi/incubi can change, but are handled below.
+     *
+     * !already_polyd check necessary because is_male() and is_female()
+     * are true if the player is a priest/priestess.
+     */
     if (!already_polyd
         || (!is_male(youmonst.data) && !is_female(youmonst.data)
             && !is_neuter(youmonst.data)))
@@ -285,10 +290,11 @@ newman()
 
     /*
      * New hit points:
-     *	remove level-gain based HP from any extra HP accumulated
-     *	(the "extra" might actually be negative);
-     *	modify the extra, retaining {80%, 90%, 100%, or 110%};
-     *	add in newly generated set of level-gain HP.
+     *  remove level-gain based HP from any extra HP accumulated
+     *  (the "extra" might actually be negative);
+     *  modify the extra, retaining {80%, 90%, 100%, or 110%};
+     *  add in newly generated set of level-gain HP.
+     *
      * (This used to calculate new HP in direct proportion to old HP,
      * but that was subject to abuse:  accumulate a large amount of
      * extra HP, drain level down to 1, then polyself to level 2 or 3
@@ -569,8 +575,10 @@ made_change:
     }
 }
 
-/* (try to) make a mntmp monster out of the player */
-int polymon(mntmp) /* returns 1 if polymorph successful */
+/* (try to) make a mntmp monster out of the player;
+   returns 1 if polymorph successful */
+int
+polymon(mntmp)
 int mntmp;
 {
     boolean sticky = sticks(youmonst.data) && u.ustuck && !u.uswallow,
@@ -580,7 +588,7 @@ int mntmp;
     if (mvitals[mntmp].mvflags & G_GENOD) { /* allow G_EXTINCT */
         You_feel("rather %s-ish.", mons[mntmp].mname);
         exercise(A_WIS, TRUE);
-        return (0);
+        return 0;
     }
 
     /* KMH, conduct */
@@ -695,7 +703,7 @@ int mntmp;
     u.mh = u.mhmax;
 
     if (u.ulevel < mlvl) {
-/* Low level characters can't become high level monsters for long */
+        /* Low level characters can't become high level monsters for long */
 #ifdef DUMB
         /* DRS/NS 2.2.6 messes up -- Peter Kendell */
         int mtd = u.mtimedone, ulv = u.ulevel;
@@ -770,6 +778,7 @@ int mntmp;
         if (lays_eggs(youmonst.data) && flags.female)
             pline(use_thec, "sit", "lay an egg");
     }
+
     /* you now know what an egg of your type looks like */
     if (lays_eggs(youmonst.data)) {
         learn_egg_type(u.umonnum);
@@ -831,7 +840,7 @@ int mntmp;
        flesh golem above, now gets transformed back into stone golem] */
     if (!uarmg)
         selftouch(no_longer_petrify_resistant);
-    return (1);
+    return 1;
 }
 
 STATIC_OVL void
@@ -1035,17 +1044,17 @@ dobreathe()
 
     if (Strangled) {
         You_cant("breathe.  Sorry.");
-        return (0);
+        return 0;
     }
     if (u.uen < 15) {
         You("don't have enough energy to breathe!");
-        return (0);
+        return 0;
     }
     u.uen -= 15;
     context.botl = 1;
 
     if (!getdir((char *) 0))
-        return (0);
+        return 0;
 
     mattk = attacktype_fordmg(youmonst.data, AT_BREA, AD_ANY);
     if (!mattk)
@@ -1055,7 +1064,7 @@ dobreathe()
     else
         buzz((int) (20 + mattk->adtyp - 1), (int) mattk->damn, u.ux, u.uy,
              u.dx, u.dy);
-    return (1);
+    return 1;
 }
 
 int
@@ -1065,7 +1074,7 @@ dospit()
     struct attack *mattk;
 
     if (!getdir((char *) 0))
-        return (0);
+        return 0;
     mattk = attacktype_fordmg(youmonst.data, AT_SPIT, AD_ANY);
     if (!mattk) {
         impossible("bad spit attack?");
@@ -1085,7 +1094,7 @@ dospit()
         otmp->spe = 1; /* to indicate it's yours */
         throwit(otmp, 0L, FALSE);
     }
-    return (1);
+    return 1;
 }
 
 int
@@ -1095,13 +1104,13 @@ doremove()
         if (u.utrap && u.utraptype == TT_BURIEDBALL) {
             pline_The("ball and chain are buried firmly in the %s.",
                       surface(u.ux, u.uy));
-            return (0);
+            return 0;
         }
         You("are not chained to anything!");
-        return (0);
+        return 0;
     }
     unpunish();
-    return (1);
+    return 1;
 }
 
 int
@@ -1112,13 +1121,13 @@ dospinweb()
     if (Levitation || Is_airlevel(&u.uz) || Underwater
         || Is_waterlevel(&u.uz)) {
         You("must be on the ground to spin a web.");
-        return (0);
+        return 0;
     }
     if (u.uswallow) {
         You("release web fluid inside %s.", mon_nam(u.ustuck));
         if (is_animal(u.ustuck->data)) {
             expels(u.ustuck, u.ustuck->data, TRUE);
-            return (0);
+            return 0;
         }
         if (is_whirly(u.ustuck->data)) {
             int i;
@@ -1145,17 +1154,17 @@ dospinweb()
                 }
                 pline_The("web %sis swept away!", sweep);
             }
-            return (0);
+            return 0;
         } /* default: a nasty jelly-like creature */
         pline_The("web dissolves into %s.", mon_nam(u.ustuck));
-        return (0);
+        return 0;
     }
     if (u.utrap) {
         You("cannot spin webs while stuck in a trap.");
-        return (0);
+        return 0;
     }
     exercise(A_DEX, TRUE);
-    if (ttmp)
+    if (ttmp) {
         switch (ttmp->ttyp) {
         case PIT:
         case SPIKED_PIT:
@@ -1163,21 +1172,21 @@ dospinweb()
             deltrap(ttmp);
             bury_objs(u.ux, u.uy);
             newsym(u.ux, u.uy);
-            return (1);
+            return 1;
         case SQKY_BOARD:
             pline_The("squeaky board is muffled.");
             deltrap(ttmp);
             newsym(u.ux, u.uy);
-            return (1);
+            return 1;
         case TELEP_TRAP:
         case LEVEL_TELEP:
         case MAGIC_PORTAL:
         case VIBRATING_SQUARE:
             Your("webbing vanishes!");
-            return (0);
+            return 0;
         case WEB:
             You("make the web thicker.");
-            return (1);
+            return 1;
         case HOLE:
         case TRAPDOOR:
             You("web over the %s.",
@@ -1189,7 +1198,7 @@ dospinweb()
             You("spin a web, jamming the trigger.");
             deltrap(ttmp);
             newsym(u.ux, u.uy);
-            return (1);
+            return 1;
         case ARROW_TRAP:
         case DART_TRAP:
         case BEAR_TRAP:
@@ -1203,23 +1212,23 @@ dospinweb()
         case POLY_TRAP:
             You("have triggered a trap!");
             dotrap(ttmp, 0);
-            return (1);
+            return 1;
         default:
             impossible("Webbing over trap type %d?", ttmp->ttyp);
-            return (0);
+            return 0;
         }
-    else if (On_stairs(u.ux, u.uy)) {
+    } else if (On_stairs(u.ux, u.uy)) {
         /* cop out: don't let them hide the stairs */
         Your("web fails to impede access to the %s.",
              (levl[u.ux][u.uy].typ == STAIRS) ? "stairs" : "ladder");
-        return (1);
+        return 1;
     }
     ttmp = maketrap(u.ux, u.uy, WEB);
     if (ttmp) {
         ttmp->madeby_u = 1;
         feeltrap(ttmp);
     }
-    return (1);
+    return 1;
 }
 
 int
@@ -1228,7 +1237,7 @@ dosummon()
     int placeholder;
     if (u.uen < 10) {
         You("lack the energy to send forth a call for help!");
-        return (0);
+        return 0;
     }
     u.uen -= 10;
     context.botl = 1;
@@ -1237,7 +1246,7 @@ dosummon()
     exercise(A_WIS, TRUE);
     if (!were_summon(youmonst.data, TRUE, &placeholder, (char *) 0))
         pline("But none arrive.");
-    return (1);
+    return 1;
 }
 
 int
@@ -1269,7 +1278,7 @@ dogaze()
     }
     if (u.uen < 15) {
         You("lack the energy to use your special gaze!");
-        return (0);
+        return 0;
     }
     u.uen -= 15;
     context.botl = 1;
@@ -1279,12 +1288,12 @@ dogaze()
             continue;
         if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my)) {
             looked++;
-            if (Invis && !perceives(mtmp->data))
+            if (Invis && !perceives(mtmp->data)) {
                 pline("%s seems not to notice your gaze.", Monnam(mtmp));
-            else if (mtmp->minvis && !See_invisible)
+            } else if (mtmp->minvis && !See_invisible) {
                 You_cant("see where to gaze at %s.", Monnam(mtmp));
-            else if (mtmp->m_ap_type == M_AP_FURNITURE
-                     || mtmp->m_ap_type == M_AP_OBJECT) {
+            } else if (mtmp->m_ap_type == M_AP_FURNITURE
+                       || mtmp->m_ap_type == M_AP_OBJECT) {
                 looked--;
                 continue;
             } else if (flags.safe_dog && mtmp->mtame && !Confusion) {
@@ -1419,14 +1428,15 @@ dohide()
         u.uundetected = 0;
         return 0;
     }
-    if ((is_hider(youmonst.data) && !Flying) && /* floor hider */
-        (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz))) {
+    if ((is_hider(youmonst.data) && !Flying) /* floor hider */
+        && (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz))) {
         There("is nowhere to hide beneath you.");
         u.uundetected = 0;
         return 0;
     }
     /* TODO? inhibit floor hiding at furniture locations, or
-       else make youhiding() give smarter messages at such spots */
+     * else make youhiding() give smarter messages at such spots.
+     */
 
     if (u.uundetected || (ismimic && youmonst.m_ap_type != M_AP_NOTHING)) {
         youhiding(FALSE, 1); /* "you are already hiding" */
@@ -1448,6 +1458,7 @@ int
 dopoly()
 {
     struct permonst *savedat = youmonst.data;
+
     if (is_vampire(youmonst.data)) {
         polyself(2);
         if (savedat != youmonst.data) {
@@ -1455,7 +1466,7 @@ dopoly()
             newsym(u.ux, u.uy);
         }
     }
-    return (1);
+    return 1;
 }
 
 int
@@ -1465,7 +1476,7 @@ domindblast()
 
     if (u.uen < 10) {
         You("concentrate but lack the energy to maintain doing so.");
-        return (0);
+        return 0;
     }
     u.uen -= 10;
     context.botl = 1;
@@ -1668,8 +1679,8 @@ int part;
 int
 poly_gender()
 {
-    /* Returns gender of polymorphed player; 0/1=same meaning as flags.female,
-     * 2=none.
+    /* Returns gender of polymorphed player;
+     * 0/1=same meaning as flags.female, 2=none.
      */
     if (is_neuter(youmonst.data) || !humanoid(youmonst.data))
         return 2;
@@ -1681,6 +1692,7 @@ ugolemeffects(damtype, dam)
 int damtype, dam;
 {
     int heal = 0;
+
     /* We won't bother with "slow"/"haste" since players do not
      * have a monster-specific slow/haste so there is no way to
      * restore the old velocity once they are back to human.
@@ -1690,7 +1702,7 @@ int damtype, dam;
     switch (damtype) {
     case AD_ELEC:
         if (u.umonnum == PM_FLESH_GOLEM)
-            heal = dam / 6; /* Approx 1 per die */
+            heal = (dam + 5) / 6; /* Approx 1 per die */
         break;
     case AD_FIRE:
         if (u.umonnum == PM_IRON_GOLEM)
@@ -1719,9 +1731,9 @@ int atyp;
     case SILVER_DRAGON_SCALES:
         return PM_SILVER_DRAGON;
 #if 0 /* DEFERRED */
-	    case SHIMMERING_DRAGON_SCALE_MAIL:
-	    case SHIMMERING_DRAGON_SCALES:
-		return PM_SHIMMERING_DRAGON;
+    case SHIMMERING_DRAGON_SCALE_MAIL:
+    case SHIMMERING_DRAGON_SCALES:
+        return PM_SHIMMERING_DRAGON;
 #endif
     case RED_DRAGON_SCALE_MAIL:
     case RED_DRAGON_SCALES:
@@ -1757,6 +1769,7 @@ polysense(mptr)
 struct permonst *mptr;
 {
     short warnidx = 0;
+
     context.warntype.speciesidx = 0;
     context.warntype.species = 0;
     context.warntype.polyd = 0;

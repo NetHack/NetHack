@@ -1,10 +1,10 @@
-/* NetHack 3.6	mondata.c	$NHDT-Date: 1445556874 2015/10/22 23:34:34 $  $NHDT-Branch: master $:$NHDT-Revision: 1.57 $ */
+/* NetHack 3.6	mondata.c	$NHDT-Date: 1446604115 2015/11/04 02:28:35 $  $NHDT-Branch: master $:$NHDT-Revision: 1.58 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
-/*	These routines provide basic data for any type of monster. */
+/*      These routines provide basic data for any type of monster. */
 
 /* set up an individual monster's base type (initial creation, shapechange) */
 void
@@ -116,8 +116,8 @@ struct monst *mon;
     /* check for magic resistance granted by worn or carried items */
     o = is_you ? invent : mon->minvent;
     slotmask = W_ARMOR | W_ACCESSORY;
-    if (!is_you || /* assumes monsters don't wield non-weapons */
-        (uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep))))
+    if (!is_you /* assumes monsters don't wield non-weapons */
+        || (uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep))))
         slotmask |= W_WEP;
     if (is_you && u.twoweap)
         slotmask |= W_SWAPWEP;
@@ -154,8 +154,8 @@ struct monst *mon;
         return TRUE;
     o = is_you ? invent : mon->minvent;
     slotmask = W_ARMOR | W_ACCESSORY;
-    if (!is_you || /* assumes monsters don't wield non-weapons */
-        (uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep))))
+    if (!is_you /* assumes monsters don't wield non-weapons */
+        || (uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep))))
         slotmask |= W_WEP;
     if (is_you && u.twoweap)
         slotmask |= W_SWAPWEP;
@@ -937,7 +937,7 @@ static const short grownups[][2] = {
     { PM_BABY_GRAY_DRAGON, PM_GRAY_DRAGON },
     { PM_BABY_SILVER_DRAGON, PM_SILVER_DRAGON },
 #if 0 /* DEFERRED */
-	{PM_BABY_SHIMMERING_DRAGON, PM_SHIMMERING_DRAGON},
+    {PM_BABY_SHIMMERING_DRAGON, PM_SHIMMERING_DRAGON},
 #endif
     { PM_BABY_RED_DRAGON, PM_RED_DRAGON },
     { PM_BABY_WHITE_DRAGON, PM_WHITE_DRAGON },
@@ -1099,12 +1099,12 @@ struct attack *mattk;
 
 /*
  * Returns:
- *	True if monster is presumed to have a sense of smell.
- *	False if monster definitely does not have a sense of smell.
+ *      True if monster is presumed to have a sense of smell.
+ *      False if monster definitely does not have a sense of smell.
  *
- *	Do not base this on presence of a head or nose, since many
- *	creatures sense smells other ways (feelers, forked-tongues, etc.)
- *	We're assuming all insects can smell at a distance too.
+ * Do not base this on presence of a head or nose, since many
+ * creatures sense smells other ways (feelers, forked-tongues, etc.)
+ * We're assuming all insects can smell at a distance too.
  */
 boolean
 olfaction(mdat)

@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitm.c	$NHDT-Date: 1445556871 2015/10/22 23:34:31 $  $NHDT-Branch: master $:$NHDT-Revision: 1.81 $ */
+/* NetHack 3.6	mhitm.c	$NHDT-Date: 1446604113 2015/11/04 02:28:33 $  $NHDT-Branch: master $:$NHDT-Revision: 1.82 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -15,23 +15,23 @@ static const char brief_feeling[] =
     "have a %s feeling for a moment, then it passes.";
 
 STATIC_DCL char *FDECL(mon_nam_too, (char *, struct monst *, struct monst *));
-STATIC_DCL int FDECL(hitmm,
-                     (struct monst *, struct monst *, struct attack *));
-STATIC_DCL int FDECL(gazemm,
-                     (struct monst *, struct monst *, struct attack *));
-STATIC_DCL int FDECL(gulpmm,
-                     (struct monst *, struct monst *, struct attack *));
-STATIC_DCL int FDECL(explmm,
-                     (struct monst *, struct monst *, struct attack *));
-STATIC_DCL int FDECL(mdamagem,
-                     (struct monst *, struct monst *, struct attack *));
-STATIC_DCL void FDECL(mswingsm,
-                      (struct monst *, struct monst *, struct obj *));
+STATIC_DCL int FDECL(hitmm, (struct monst *, struct monst *,
+                             struct attack *));
+STATIC_DCL int FDECL(gazemm, (struct monst *, struct monst *,
+                              struct attack *));
+STATIC_DCL int FDECL(gulpmm, (struct monst *, struct monst *,
+                              struct attack *));
+STATIC_DCL int FDECL(explmm, (struct monst *, struct monst *,
+                              struct attack *));
+STATIC_DCL int FDECL(mdamagem, (struct monst *, struct monst *,
+                                struct attack *));
+STATIC_DCL void FDECL(mswingsm, (struct monst *, struct monst *,
+                                 struct obj *));
 STATIC_DCL void FDECL(noises, (struct monst *, struct attack *));
-STATIC_DCL void FDECL(missmm,
-                      (struct monst *, struct monst *, struct attack *));
-STATIC_DCL int FDECL(passivemm,
-                     (struct monst *, struct monst *, BOOLEAN_P, int));
+STATIC_DCL void FDECL(missmm, (struct monst *, struct monst *,
+                               struct attack *));
+STATIC_DCL int FDECL(passivemm, (struct monst *, struct monst *,
+                                 BOOLEAN_P, int));
 
 /* Needed for the special case of monsters wielding vorpal blades (rare).
  * If we use this a lot it should probably be a parameter to mdamagem()
@@ -109,8 +109,8 @@ struct attack *mattk;
  *  fightm()  -- fight some other monster
  *
  *  Returns:
- *	0 - Monster did nothing.
- *	1 - If the monster made an attack.  The monster might have died.
+ *      0 - Monster did nothing.
+ *      1 - If the monster made an attack.  The monster might have died.
  *
  *  There is an exception to the above.  If mtmp has the hero swallowed,
  *  then we report that the monster did nothing so it will continue to
@@ -126,12 +126,12 @@ register struct monst *mtmp;
 #endif
     /* perhaps the monster will resist Conflict */
     if (resist(mtmp, RING_CLASS, 0, 0))
-        return (0);
+        return 0;
 
     if (u.ustuck == mtmp) {
         /* perhaps we're holding it... */
         if (itsstuck(mtmp))
-            return (0);
+            return 0;
     }
     has_u_swallowed = (u.uswallow && (mtmp == u.ustuck));
 
@@ -162,10 +162,10 @@ register struct monst *mtmp;
 
                 if (result & MM_AGR_DIED)
                     return 1; /* mtmp died */
-                              /*
-                               *  If mtmp has the hero swallowed, lie and say there
-                               *  was no attack (this allows mtmp to digest the hero).
-                               */
+                /*
+                 * If mtmp has the hero swallowed, lie and say there
+                 * was no attack (this allows mtmp to digest the hero).
+                 */
                 if (has_u_swallowed)
                     return 0;
 
@@ -179,7 +179,7 @@ register struct monst *mtmp;
                     (void) mattackm(mon, mtmp); /* return attack */
                 }
 
-                return ((result & MM_HIT) ? 1 : 0);
+                return (result & MM_HIT) ? 1 : 0;
             }
         }
     }
@@ -188,7 +188,7 @@ register struct monst *mtmp;
 
 /*
  * mdisplacem() -- attacker moves defender out of the way;
- *		   returns same results as mattackm().
+ *                 returns same results as mattackm().
  */
 int
 mdisplacem(magr, mdef, quietly)
@@ -211,12 +211,12 @@ boolean quietly;
      * for pet displacement.
      */
     if (!rn2(7))
-        return (MM_MISS);
+        return MM_MISS;
 
     /* Grid bugs cannot displace at an angle. */
     if (pa == &mons[PM_GRID_BUG] && magr->mx != mdef->mx
         && magr->my != mdef->my)
-        return (MM_MISS);
+        return MM_MISS;
 
     /* undetected monster becomes un-hidden if it is displaced */
     if (mdef->mundetected)
@@ -269,19 +269,18 @@ boolean quietly;
 /*
  * mattackm() -- a monster attacks another monster.
  *
- *	    --------- aggressor died
- *	   /  ------- defender died
- *	  /  /  ----- defender was hit
- *	 /  /  /
- *	x  x  x
+ *          --------- aggressor died
+ *         /  ------- defender died
+ *        /  /  ----- defender was hit
+ *       /  /  /
+ *      x  x  x
  *
- *	0x4	MM_AGR_DIED
- *	0x2	MM_DEF_DIED
- *	0x1	MM_HIT
- *	0x0	MM_MISS
+ *      0x4     MM_AGR_DIED
+ *      0x2     MM_DEF_DIED
+ *      0x1     MM_HIT
+ *      0x0     MM_MISS
  *
  * Each successive attack has a lower probability of hitting.  Some rely on
- *the
  * success of previous attacks.  ** this doen't seem to be implemented -dl **
  *
  * In the case of exploding monsters, the monster dies as well.
@@ -300,16 +299,16 @@ register struct monst *magr, *mdef;
     struct permonst *pa, *pd;
 
     if (!magr || !mdef)
-        return (MM_MISS); /* mike@genat */
+        return MM_MISS; /* mike@genat */
     if (!magr->mcanmove || magr->msleeping)
-        return (MM_MISS);
+        return MM_MISS;
     pa = magr->data;
     pd = mdef->data;
 
     /* Grid bugs cannot attack at an angle. */
     if (pa == &mons[PM_GRID_BUG] && magr->mx != mdef->mx
         && magr->my != mdef->my)
-        return (MM_MISS);
+        return MM_MISS;
 
     /* Calculate the armour class differential. */
     tmp = find_mac(mdef) + magr->m_lev;
@@ -340,10 +339,10 @@ register struct monst *magr, *mdef;
     vis = (cansee(magr->mx, magr->my) && cansee(mdef->mx, mdef->my)
            && (canspotmon(magr) || canspotmon(mdef)));
 
-    /*	Set flag indicating monster has moved this turn.  Necessary since a
-     *	monster might get an attack out of sequence (i.e. before its move) in
-     *	some cases, in which case this still counts as its move for the round
-     *	and it shouldn't move again.
+    /* Set flag indicating monster has moved this turn.  Necessary since a
+     * monster might get an attack out of sequence (i.e. before its move) in
+     * some cases, in which case this still counts as its move for the round
+     * and it shouldn't move again.
      */
     magr->mlstmv = monstermoves;
 
@@ -368,7 +367,7 @@ register struct monst *magr, *mdef;
                     mswingsm(magr, mdef, otmp);
                 tmp += hitval(otmp, mdef);
             }
-        /* fall through */
+            /*FALLTHRU*/
         case AT_CLAW:
         case AT_KICK:
         case AT_BITE:
@@ -532,7 +531,8 @@ struct attack *mattk;
         }
     } else
         noises(magr, mattk);
-    return (mdamagem(magr, mdef, mattk));
+
+    return mdamagem(magr, mdef, mattk);
 }
 
 /* Returns the same values as mdamagem(). */
@@ -553,7 +553,7 @@ struct attack *mattk;
         || mdef->msleeping) {
         if (vis)
             pline("but nothing happens.");
-        return (MM_MISS);
+        return MM_MISS;
     }
     /* call mon_reflects 2x, first test, then, if visible, print message */
     if (magr->data == &mons[PM_MEDUSA] && mon_reflects(mdef, (char *) 0)) {
@@ -564,7 +564,7 @@ struct attack *mattk;
                 if (canseemon(magr))
                     (void) mon_reflects(
                         magr, "The gaze is reflected away by %s %s.");
-                return (MM_MISS);
+                return MM_MISS;
             }
             if (mdef->minvis && !perceives(magr->data)) {
                 if (canseemon(magr)) {
@@ -572,18 +572,18 @@ struct attack *mattk;
                           "reflected.",
                           Monnam(magr), mhis(magr));
                 }
-                return (MM_MISS);
+                return MM_MISS;
             }
             if (canseemon(magr))
                 pline("%s is turned to stone!", Monnam(magr));
             monstone(magr);
             if (magr->mhp > 0)
-                return (MM_MISS);
-            return (MM_AGR_DIED);
+                return MM_MISS;
+            return MM_AGR_DIED;
         }
     }
 
-    return (mdamagem(magr, mdef, mattk));
+    return mdamagem(magr, mdef, mattk);
 }
 
 /* return True if magr is allowed to swallow mdef, False otherwise */
@@ -663,11 +663,11 @@ register struct attack *mattk;
         == (MM_AGR_DIED | MM_DEF_DIED)) {
         ;                              /* both died -- do nothing  */
     } else if (status & MM_DEF_DIED) { /* defender died */
-                                       /*
-                                        *  Note:  remove_monster() was called in relmon(), wiping out
-                                        *  magr from level.monsters[mdef->mx][mdef->my].  We need to
-                                        *  put it back and display it.	-kd
-                                        */
+        /*
+         *  Note:  remove_monster() was called in relmon(), wiping out
+         *  magr from level.monsters[mdef->mx][mdef->my].  We need to
+         *  put it back and display it.  -kd
+         */
         place_monster(magr, dx, dy);
         newsym(dx, dy);
         /* aggressor moves to <dx,dy> and might encounter trouble there */
@@ -691,8 +691,8 @@ register struct attack *mattk;
 
 STATIC_OVL int
 explmm(magr, mdef, mattk)
-register struct monst *magr, *mdef;
-register struct attack *mattk;
+struct monst *magr, *mdef;
+struct attack *mattk;
 {
     int result;
 
@@ -734,8 +734,8 @@ register struct attack *mattk;
                      res = MM_MISS;
     boolean cancelled;
 
-    if ((touch_petrifies(pd) || /* or flesh_petrifies() */
-         (mattk->adtyp == AD_DGST && pd == &mons[PM_MEDUSA]))
+    if ((touch_petrifies(pd) /* or flesh_petrifies() */
+         || (mattk->adtyp == AD_DGST && pd == &mons[PM_MEDUSA]))
         && !resists_ston(magr)) {
         long protector = attk_protection((int) mattk->aatyp),
              wornitems = magr->misc_worn_check;
@@ -771,9 +771,9 @@ register struct attack *mattk;
         if (is_rider(pd)) {
             if (vis)
                 pline("%s %s!", Monnam(magr),
-                      pd == &mons[PM_FAMINE]
+                      (pd == &mons[PM_FAMINE])
                           ? "belches feebly, shrivels up and dies"
-                          : pd == &mons[PM_PESTILENCE]
+                          : (pd == &mons[PM_PESTILENCE])
                                 ? "coughs spasmodically and collapses"
                                 : "vomits violently and drops dead");
             mondied(magr);
@@ -1377,8 +1377,8 @@ struct monst *mon;
 
 void
 rustm(mdef, obj)
-register struct monst *mdef;
-register struct obj *obj;
+struct monst *mdef;
+struct obj *obj;
 {
     int dmgtyp;
 
@@ -1571,8 +1571,9 @@ xdrainenergym(mon, givemsg)
 struct monst *mon;
 boolean givemsg;
 {
-    if (mon->mspec_used < 20 && /* limit draining */
-        (attacktype(mon->data, AT_MAGC) || attacktype(mon->data, AT_BREA))) {
+    if (mon->mspec_used < 20 /* limit draining */
+        && (attacktype(mon->data, AT_MAGC)
+            || attacktype(mon->data, AT_BREA))) {
         mon->mspec_used += d(2, 2);
         if (givemsg)
             pline("%s seems lethargic.", Monnam(mon));

@@ -1,4 +1,4 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1445556875 2015/10/22 23:34:35 $  $NHDT-Branch: master $:$NHDT-Revision: 1.76 $ */
+/* NetHack 3.6	monmove.c	$NHDT-Date: 1446604115 2015/11/04 02:28:35 $  $NHDT-Branch: master $:$NHDT-Revision: 1.77 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -16,9 +16,10 @@ STATIC_DCL int FDECL(m_arrival, (struct monst *));
 STATIC_DCL boolean FDECL(stuff_prevents_passage, (struct monst *));
 STATIC_DCL int FDECL(vamp_shift, (struct monst *, struct permonst *));
 
-boolean /* TRUE : mtmp died */
-    mb_trapped(mtmp)
-register struct monst *mtmp;
+/* True if mtmp died */
+boolean
+mb_trapped(mtmp)
+struct monst *mtmp;
 {
     if (flags.verbose) {
         if (cansee(mtmp->mx, mtmp->my) && !Unaware)
@@ -68,8 +69,8 @@ register struct monst *mtmp;
 {
     int x, y;
 
-    if (mtmp->mpeaceful && in_town(u.ux + u.dx, u.uy + u.dy) && mtmp->mcansee
-        && m_canseeu(mtmp) && !rn2(3)) {
+    if (mtmp->mpeaceful && in_town(u.ux + u.dx, u.uy + u.dy)
+        && mtmp->mcansee && m_canseeu(mtmp) && !rn2(3)) {
         if (picking_lock(&x, &y) && IS_DOOR(levl[x][y].typ)
             && (levl[x][y].doormask & D_LOCKED)) {
             if (couldsee(mtmp->mx, mtmp->my)) {
@@ -94,7 +95,7 @@ int
 dochugw(mtmp)
 register struct monst *mtmp;
 {
-    register int x = mtmp->mx, y = mtmp->my;
+    int x = mtmp->mx, y = mtmp->my;
     boolean already_saw_mon = !occupation ? 0 : canspotmon(mtmp);
     int rd = dochug(mtmp);
 
@@ -102,13 +103,12 @@ register struct monst *mtmp;
     /* check whether hero notices monster and stops current activity */
     if (occupation && !rd && !Confusion && (!mtmp->mpeaceful || Hallucination)
         /* it's close enough to be a threat */
-        && distu(mtmp->mx, mtmp->my) <= (BOLT_LIM + 1) * (BOLT_LIM + 1)
+        && distu(x, y) <= (BOLT_LIM + 1) * (BOLT_LIM + 1)
         /* and either couldn't see it before, or it was too far away */
         && (!already_saw_mon || !couldsee(x, y)
             || distu(x, y) > (BOLT_LIM + 1) * (BOLT_LIM + 1))
         /* can see it now, or sense it and would normally see it */
-        && (canseemon(mtmp)
-            || (sensemon(mtmp) && couldsee(mtmp->mx, mtmp->my)))
+        && (canseemon(mtmp) || (sensemon(mtmp) && couldsee(x, y)))
         && mtmp->mcanmove && !noattacks(mtmp->data)
         && !onscary(u.ux, u.uy, mtmp))
         stop_occupation();
@@ -190,12 +190,12 @@ register struct monst *mtmp;
      * + Nymphs, jabberwocks, and leprechauns do not easily wake up.
      *
      * Wake up if:
-     *	in direct LOS						AND
-     *	within 10 squares					AND
-     *	not stealthy or (mon is an ettin and 9/10)		AND
-     *	(mon is not a nymph, jabberwock, or leprechaun) or 1/50	AND
-     *	Aggravate or mon is (dog or human) or
-     *	    (1/7 and mon is not mimicing furniture or object)
+     *  in direct LOS                                           AND
+     *  within 10 squares                                       AND
+     *  not stealthy or (mon is an ettin and 9/10)              AND
+     *  (mon is not a nymph, jabberwock, or leprechaun) or 1/50 AND
+     *  Aggravate or mon is (dog or human) or
+     *      (1/7 and mon is not mimicing furniture or object)
      */
     if (couldsee(mtmp->mx, mtmp->my) && distu(mtmp->mx, mtmp->my) <= 100
         && (!Stealth || (mtmp->data == &mons[PM_ETTIN] && rn2(10)))
@@ -338,7 +338,8 @@ register struct monst *mtmp;
     register int tmp = 0;
     int inrange, nearby, scared;
 
-    /*	Pre-movement adjustments	*/
+    /*  Pre-movement adjustments
+     */
 
     mdat = mtmp->data;
 
@@ -453,10 +454,10 @@ register struct monst *mtmp;
     }
 
     /* the watch will look around and see if you are up to no good :-) */
-    if (is_watch(mdat))
+    if (is_watch(mdat)) {
         watch_on_duty(mtmp);
 
-    else if (is_mind_flayer(mdat) && !rn2(20)) {
+    } else if (is_mind_flayer(mdat) && !rn2(20)) {
         struct monst *m2, *nmon = (struct monst *) 0;
 
         if (canseemon(mtmp))
@@ -532,7 +533,8 @@ toofar:
         }
     }
 
-    /*	Now the actual movement phase	*/
+    /*  Now the actual movement phase
+     */
 
     if (!nearby || mtmp->mflee || scared || mtmp->mconf || mtmp->mstun
         || (mtmp->minvis && !rn2(3))
@@ -604,7 +606,8 @@ toofar:
         }
     }
 
-    /*	Now, attack the player if possible - one attack set per monst	*/
+    /*  Now, attack the player if possible - one attack set per monst
+     */
 
     if (!mtmp->mpeaceful || (Conflict && !resist(mtmp, RING_CLASS, 0, 0))) {
         if (inrange && !noattacks(mdat) && u.uhp > 0 && !scared && tmp != 3)
@@ -629,8 +632,7 @@ static NEARDATA const char practical[] = { WEAPON_CLASS, ARMOR_CLASS,
                                            GEM_CLASS, FOOD_CLASS, 0 };
 static NEARDATA const char magical[] = { AMULET_CLASS, POTION_CLASS,
                                          SCROLL_CLASS, WAND_CLASS,
-                                         RING_CLASS,   SPBOOK_CLASS,
-                                         0 };
+                                         RING_CLASS,   SPBOOK_CLASS, 0 };
 static NEARDATA const char indigestion[] = { BALL_CLASS, ROCK_CLASS, 0 };
 static NEARDATA const char boulder_class[] = { ROCK_CLASS, 0 };
 static NEARDATA const char gem_class[] = { GEM_CLASS, 0 };
@@ -835,21 +837,21 @@ not_special:
     gx = mtmp->mux;
     gy = mtmp->muy;
     appr = mtmp->mflee ? -1 : 1;
-    if (mtmp->mconf || (u.uswallow && mtmp == u.ustuck))
+    if (mtmp->mconf || (u.uswallow && mtmp == u.ustuck)) {
         appr = 0;
-    else {
+    } else {
         struct obj *lepgold, *ygold;
-        boolean should_see =
-            (couldsee(omx, omy) && (levl[gx][gy].lit || !levl[omx][omy].lit)
-             && (dist2(omx, omy, gx, gy) <= 36));
+        boolean should_see = (couldsee(omx, omy)
+                              && (levl[gx][gy].lit || !levl[omx][omy].lit)
+                              && (dist2(omx, omy, gx, gy) <= 36));
 
         if (!mtmp->mcansee
             || (should_see && Invis && !perceives(ptr) && rn2(11))
             || is_obj_mappear(&youmonst,STRANGE_OBJECT) || u.uundetected
             || (is_obj_mappear(&youmonst,GOLD_PIECE) && !likes_gold(ptr))
-            || (mtmp->mpeaceful && !mtmp->isshk) || /* allow shks to follow */
-            ((monsndx(ptr) == PM_STALKER || ptr->mlet == S_BAT
-              || ptr->mlet == S_LIGHT) && !rn2(3)))
+            || (mtmp->mpeaceful && !mtmp->isshk) /* allow shks to follow */
+            || ((monsndx(ptr) == PM_STALKER || ptr->mlet == S_BAT
+                 || ptr->mlet == S_LIGHT) && !rn2(3)))
             appr = 0;
 
         if (monsndx(ptr) == PM_LEPRECHAUN && (appr == 1)
@@ -870,10 +872,9 @@ not_special:
     }
 
     if ((!mtmp->mpeaceful || !rn2(10)) && (!Is_rogue_level(&u.uz))) {
-        boolean in_line =
-            lined_up(mtmp)
-            && (distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy)
-                <= (throws_rocks(youmonst.data) ? 20 : ACURRSTR / 2 + 1));
+        boolean in_line = (lined_up(mtmp)
+               && (distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy)
+                   <= (throws_rocks(youmonst.data) ? 20 : ACURRSTR / 2 + 1)));
 
         if (appr != 1 || !in_line) {
             /* Monsters in combat won't pick stuff up, avoiding the
@@ -964,7 +965,7 @@ not_special:
                             && (!is_unicorn(ptr)
                                 || objects[otmp->otyp].oc_material == GEMSTONE)
                             /* Don't get stuck circling an Elbereth */
-                            && !(onscary(xx, yy, mtmp))) {
+                            && !onscary(xx, yy, mtmp)) {
                             minr = distmin(omx, omy, xx, yy);
                             oomx = min(COLNO - 1, omx + minr);
                             oomy = min(ROWNO - 1, omy + minr);
@@ -1122,8 +1123,7 @@ not_special:
          * nearby is set, we never call m_move unless it is a special case
          * (confused, stun, etc.)  The effect is that this ALLOW_U (and
          * mfndpos) has no effect for normal attacks, though it lets a
-         * confused
-         * monster attack you by accident.
+         * confused monster attack you by accident.
          */
         if (info[chi] & ALLOW_U) {
             nix = mtmp->mux;
@@ -1210,8 +1210,7 @@ postmov:
             /* open a door, or crash through it, if you can */
             if (IS_DOOR(levl[mtmp->mx][mtmp->my].typ)
                 && !passes_walls(ptr) /* doesn't need to open doors */
-                && !can_tunnel        /* taken care of below */
-                ) {
+                && !can_tunnel) {     /* taken care of below */
                 struct rm *here = &levl[mtmp->mx][mtmp->my];
                 boolean btrapped = (here->doormask & D_TRAPPED),
                         observeit = canseeit && canspotmon(mtmp);
@@ -1330,8 +1329,7 @@ postmov:
             /* recompute the likes tests, in case we polymorphed
              * or if the "likegold" case got taken above */
             if (setlikes) {
-                register int pctload =
-                    (curr_mon_load(mtmp) * 100) / max_mon_load(mtmp);
+                int pctload = (curr_mon_load(mtmp) * 100) / max_mon_load(mtmp);
 
                 /* look for gold or jewels nearby */
                 likegold = (likes_gold(ptr) && pctload < 95);
@@ -1517,11 +1515,12 @@ xchar x, y;
         /* Pets avoid cursed locations */
         if (cursed_object_at(x, y))
             return TRUE;
-    }
+
     /* Monsters avoid a trap if they've seen that type before */
-    else if (trap && rn2(40)
-             && (mtmp->mtrapseen & (1 << (trap->ttyp - 1))) != 0)
+    } else if (trap && rn2(40)
+               && (mtmp->mtrapseen & (1 << (trap->ttyp - 1))) != 0) {
         return TRUE;
+    }
 
     return FALSE;
 }
@@ -1594,6 +1593,7 @@ struct monst *mon;
 struct permonst *ptr;
 {
     int reslt = 0;
+
     if (mon->cham >= LOW_PM) {
         if (ptr == &mons[mon->cham])
             mon->cham = NON_PM;
