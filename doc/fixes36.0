@@ -931,6 +931,7 @@ remaining monsters continued to move after hero conceptually left the level
 	it be feasible--but not practical--to level teleport with the Amulet)
 #turn for non-priest/non-knight attempts to cast "turn undead" spell, but
 	was forcing the spell to target self rather than choose a direction
+potions of gain energy are more useful for recovering hero's spell energy
 
 
 Platform- and/or Interface-Specific Fixes
@@ -972,7 +973,8 @@ Windows, probably MSDOS and OS/2: attempting to use very first false rumor
 	of waiting until hero's next move
 winCE: disable processing of double-click messages if the first click
 	causes map to scroll
-winCE: help text windows close immediately after open (unhandled WM_KEYDOWN in mhtext.c)
+winCE: help text windows close immediately after open (unhandled WM_KEYDOWN
+	in mhtext.c)
 winCE: correct coordinates used by action button
 winCE: wrap/unwrap text option for text windows
 winCE: hardware keyboard detection
@@ -980,8 +982,8 @@ winCE: hide keypad when hardware keyboard is present
 winCE: backport message window highlighting from winnt port
 winCE: new icon with recommended image sizes
 pocketpc: menu window closes on up/down keys from first/last position
-win32gui: better handling of "more" prompt for messages that would have scrolled
-	off the window
+win32gui: better handling of "more" prompt for messages that would have
+	scrolled off the window
 win32gui: set correct checkmark on "Lock Windows" menu item on startup
 win32gui: redraw message window on resizing (it does not update properly otherwise)
 win32gui: fixed copy/paste error in read registry settings function
@@ -991,9 +993,9 @@ win32gui: made auto-arrange windows on/off option (it was reset automatically
 win32gui: fix a possible crash with AltGr-4 WM_KEYDOWN handling
 win32gui: use whatever alternate tile set is loaded in the menus
 win32tty: prevent early error messages from flashing by too fast and not seen
-win32tty: work around problem where display symbols were wrong or unrecognizable
-	on systems where the default language for non-Unicode programs was not 
-	set to "US English" - courtesy Ray Chason
+win32tty: work around problem where display symbols were wrong or
+	unrecognizable on systems where the default language for non-Unicode
+	programs was not set to "US English" - courtesy Ray Chason
 win32tty: work around problem where some characters did not show up if the
 	console code page was other than 437
 X11: support dynamic switching of map mode via tiled_map option
@@ -1044,12 +1046,12 @@ debug-mode viewing of fully identified object descriptions without
 	actually identifying the objects
 health-food store that stocks monk-appropriate foods in mine town when monk
 give more information about your attributes in debug mode
-polywarn to give intrinsic monster detection of limited species while polymorphed
-rocks can skip on the water sometimes allowing them to pass over water creatures
-vampires can now shapeshift into bats and fog clouds; the latter can be done at 
-	will to slip through locked doors
-shapeshifted vampire will transform back to vampire form after you defeat it and
-	continue to fight in its native form
+polywarn to give intrinsic monster detection of limited species while poly'd
+rocks can skip on water sometimes allowing them to pass over water creatures
+vampires can now shapeshift into bats and fog clouds; the latter can be done
+	at will to slip through locked doors
+shapeshifted vampire will transform back to vampire form after you defeat it
+	and continue to fight in its native form
 container lknown flag for locked/unlocked/broken awareness
 container cknown flag for container content awareness
 plname is stored in the save file on all platforms now
@@ -1075,7 +1077,7 @@ add atmospheric sound messages for temples
 sometimes give announcement message when monsters teleport to hero's vicinity
 obsolete config file keywords: GRAPHICS, OBJECTS, TRAPS, EFFECTS
 deprecated options: IBMGraphics, DECGraphics, boulder
-new options: symset, roguesymset for choosing a symbol set from the symbols file
+new options: symset, roguesymset for choosing a symbol set from  symbols file
 new config file keyword: SYMBOLS for overriding character symbol values by name
 opening magic frees from bear traps and webs, activates trap doors
 closing magic activates bear traps and webs
@@ -1153,9 +1155,9 @@ options to create the character blind or nudist
 moving clouds on the plane of air
 disclose extinct species alongside genocided ones
 a tribute to Terry Pratchett
-Some levels in Gehennom now use the old corridor-style maze instead of
-    the new room-style. Beelzebub's level always does this and the
-    "beetle legs" are restored.
+Some levels in Gehennom now use the old corridor-style maze instead of the
+	new room-style. Beelzebub's level always does this and the
+	"beetle legs" are restored.
 gnomes will occasionally have a candle
 stop travel or run when you get hungry
 'I' command can accept 'B','U','C',or 'X' as an alternative to normal object
