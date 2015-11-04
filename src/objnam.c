@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1446191877 2015/10/30 07:57:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.150 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1446634657 2015/11/04 10:57:37 $  $NHDT-Branch: master $:$NHDT-Revision: 1.151 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -619,13 +619,10 @@ struct obj *obj;
     char *onm = xname(obj);
 
     if (m_shot.n > 1 && m_shot.o == obj->otyp) {
-        /* copy xname's result so that we can reuse its return buffer */
-        Strcpy(tmpbuf, onm);
-        /* play it safe even though there's no risk of overflowing onm[] */
-        tmpbuf[BUFSZ - sizeof "the Nth "] = '\0';
         /* "the Nth arrow"; value will eventually be passed to an() or
            The(), both of which correctly handle this "the " prefix */
-        Sprintf(onm, "the %d%s %s", m_shot.i, ordin(m_shot.i), tmpbuf);
+        Sprintf(tmpbuf, "the %d%s ", m_shot.i, ordin(m_shot.i));
+        onm = strprepend(onm, tmpbuf);
     }
     return onm;
 }
