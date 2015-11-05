@@ -4428,6 +4428,7 @@ struct sp_coder *coder;
     }
     (void) memcpy(&lregions[num_lregions - 1], tmplregion,
                   sizeof(lev_region));
+    free(tmplregion);
 
     opvar_free(dx1);
     opvar_free(dy1);
