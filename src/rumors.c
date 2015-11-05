@@ -1,4 +1,4 @@
-/* NetHack 3.6	rumors.c	$NHDT-Date: 1432512762 2015/05/25 00:12:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.26 $ */
+/* NetHack 3.6	rumors.c	$NHDT-Date: 1446713640 2015/11/05 08:54:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.27 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -6,7 +6,7 @@
 #include "lev.h"
 #include "dlb.h"
 
-/*	[note: this comment is fairly old, but still accurate for 3.1]
+/*      [note: this comment is fairly old, but still accurate for 3.1]
  * Rumors have been entirely rewritten to speed up the access.  This is
  * essential when working from floppies.  Using fseek() the way that's done
  * here means rumors following longer rumors are output more often than those
@@ -15,7 +15,7 @@
  * this also happens with real fortune cookies.  -dgk
  */
 
-/*	3.5
+/*      3.5
  * The rumors file consists of a "do not edit" line, then a line containing
  * three sets of three counts (first two in decimal, third in hexadecimal).
  * The first set has the number of true rumors, the count in bytes for all
@@ -27,7 +27,7 @@
  * plus the size of the false rumors matches the offset for end-of-file.
  */
 
-/*	3.1	[now obsolete for rumors but still accurate for oracles]
+/*      3.1     [now obsolete for rumors but still accurate for oracles]
  * The rumors file consists of a "do not edit" line, a hexadecimal number
  * giving the number of bytes of useful/true rumors, followed by those
  * true rumors (one per line), followed by the useless/false/misleading/cute
@@ -115,9 +115,9 @@ boolean exclude_cookie;
                 }
             }
             /*
-             *	input:      1    0   -1
-             *	 rn2 \ +1  2=T  1=T  0=F
-             *	 adj./ +0  1=T  0=F -1=F
+             *  input:      1    0   -1
+             *   rn2 \ +1  2=T  1=T  0=F
+             *   adj./ +0  1=T  0=F -1=F
              */
             switch (adjtruth = truth + rn2(2)) {
             case 2: /*(might let a bogus input arg sneak thru)*/
@@ -425,8 +425,9 @@ boolean delphi;
     int oracle_idx;
     char xbuf[BUFSZ];
 
-    if (oracle_flg < 0 ||                    /* couldn't open ORACLEFILE */
-        (oracle_flg > 0 && oracle_cnt == 0)) /* oracles already exhausted */
+    /* early return if we couldn't open ORACLEFILE on previous attempt,
+       or if all the oracularities are already exhausted */
+    if (oracle_flg < 0 || (oracle_flg > 0 && oracle_cnt == 0))
         return;
 
     oracles = dlb_fopen(ORACLEFILE, "r");
@@ -439,8 +440,8 @@ boolean delphi;
             if (oracle_cnt == 0)
                 return;
         }
-        /* oracle_loc[0] is the special oracle;		*/
-        /* oracle_loc[1..oracle_cnt-1] are normal ones	*/
+        /* oracle_loc[0] is the special oracle;
+           oracle_loc[1..oracle_cnt-1] are normal ones */
         if (oracle_cnt <= 1 && !special)
             return; /*(shouldn't happen)*/
         oracle_idx = special ? 0 : rnd((int) oracle_cnt - 1);
@@ -450,11 +451,10 @@ boolean delphi;
 
         tmpwin = create_nhwindow(NHW_TEXT);
         if (delphi)
-            putstr(
-                tmpwin, 0,
-                special
-                    ? "The Oracle scornfully takes all your money and says:"
-                    : "The Oracle meditates for a moment and then intones:");
+            putstr(tmpwin, 0,
+                   special
+                     ? "The Oracle scornfully takes all your money and says:"
+                     : "The Oracle meditates for a moment and then intones:");
         else
             putstr(tmpwin, 0, "The message reads:");
         putstr(tmpwin, 0, "");
@@ -475,7 +475,7 @@ boolean delphi;
 
 int
 doconsult(oracl)
-register struct monst *oracl;
+struct monst *oracl;
 {
     long umoney;
     int u_pay, minor_cost = 50, major_cost = 500 + 50 * u.ulevel;
@@ -510,8 +510,8 @@ register struct monst *oracl;
         u_pay = minor_cost;
         break;
     case 'n':
-        if (umoney <= (long) minor_cost || /* don't even ask */
-            (oracle_cnt == 1 || oracle_flg < 0))
+        if (umoney <= (long) minor_cost /* don't even ask */
+            || (oracle_cnt == 1 || oracle_flg < 0))
             return 0;
         Sprintf(qbuf, "\"Then dost thou desire a major one?\" (%d %s)",
                 major_cost, currency((long) major_cost));
@@ -531,6 +531,7 @@ register struct monst *oracl;
         u.uevent.minor_oracle = TRUE;
     } else {
         boolean cheapskate = u_pay < major_cost;
+
         outoracle(cheapskate, TRUE);
         if (!cheapskate && !u.uevent.major_oracle)
             add_xpts = u_pay / (u.uevent.minor_oracle ? 25 : 10);

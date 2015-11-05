@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1446604119 2015/11/04 02:28:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.243 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1446713644 2015/11/05 08:54:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.244 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2436,9 +2436,9 @@ register struct monst *mtmp;
             /* fall though */
             default:
                 if (mptr->mlet == S_GIANT
+                    /* exclude baby dragons and relatively short worms */
                     || (mptr->mlet == S_DRAGON && extra_nasty(mptr))
-                    || /* excl. babies */
-                    (mtmp->wormno && count_wsegs(mtmp) > 5)) {
+                    || (mtmp->wormno && count_wsegs(mtmp) > 5)) {
                     tear_web = TRUE;
                 } else if (in_sight) {
                     pline("%s is caught in %s spider web.", Monnam(mtmp),

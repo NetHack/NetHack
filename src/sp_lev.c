@@ -1,5 +1,5 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1445906864 2015/10/27 00:47:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.63 $ */
-/*	Copyright (c) 1989 by Jean-Christophe Collet */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1446713642 2015/11/05 08:54:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.66 $ */
+/*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -235,7 +235,7 @@ struct splevstack *st;
     if (st) {
         int i;
 
-        if (st->stackdata && st->depth)
+        if (st->stackdata && st->depth) {
             for (i = 0; i < st->depth; i++) {
                 switch (st->stackdata[i]->spovartyp) {
                 default:
@@ -250,15 +250,14 @@ struct splevstack *st;
                 case SPOVAR_VARIABLE:
                 case SPOVAR_STRING:
                 case SPOVAR_SEL:
-                    if (st->stackdata[i]->vardata.str)
-                        Free(st->stackdata[i]->vardata.str);
+                    Free(st->stackdata[i]->vardata.str);
                     st->stackdata[i]->vardata.str = NULL;
                     break;
                 }
                 Free(st->stackdata[i]);
                 st->stackdata[i] = NULL;
             }
-
+        }
         Free(st->stackdata);
         st->stackdata = NULL;
         st->depth = st->depth_alloc = 0;
@@ -779,9 +778,9 @@ rndtrap()
 /*
  * Coordinates in special level files are handled specially:
  *
- *	if x or y is < 0, we generate a random coordinate.
- *	The "humidity" flag is used to insure that engravings aren't
- *	created underwater, or eels on dry land.
+ *      if x or y is < 0, we generate a random coordinate.
+ *      The "humidity" flag is used to insure that engravings aren't
+ *      created underwater, or eels on dry land.
  */
 STATIC_DCL boolean FDECL(is_ok_location, (SCHAR_P, SCHAR_P, int));
 
@@ -1777,7 +1776,7 @@ struct mkroom *croom;
                 * with what mkobj gave us! */
     }
 
-    /*	corpsenm is "empty" if -1, random if -2, otherwise specific */
+    /* corpsenm is "empty" if -1, random if -2, otherwise specific */
     if (o->corpsenm != NON_PM) {
         if (o->corpsenm == NON_PM - 1)
             set_corpsenm(otmp, rndmonnum());
@@ -3859,8 +3858,8 @@ int xc, yc, a, b, filled;
                 selection_setpoint(xc + x, yc - y, ov, 1);
                 selection_setpoint(xc - x, yc + y, ov, 1);
             }
-            if (t + b2 * x <= crit1 || /* e(x+1,y-1/2) <= 0 */
-                t + a2 * y <= crit3) { /* e(x+1/2,y) <= 0 */
+            if (t + b2 * x <= crit1       /* e(x+1,y-1/2) <= 0 */
+                || t + a2 * y <= crit3) { /* e(x+1/2,y) <= 0 */
                 x++;
                 dxt += d2xt;
                 t += dxt;
@@ -3879,8 +3878,8 @@ int xc, yc, a, b, filled;
         }
     } else {
         while (y >= 0 && x <= a) {
-            if (t + b2 * x <= crit1 || /* e(x+1,y-1/2) <= 0 */
-                t + a2 * y <= crit3) { /* e(x+1/2,y) <= 0 */
+            if (t + b2 * x <= crit1       /* e(x+1,y-1/2) <= 0 */
+                || t + a2 * y <= crit3) { /* e(x+1/2,y) <= 0 */
                 x++;
                 dxt += d2xt;
                 t += dxt;
@@ -5856,7 +5855,7 @@ sp_lev *lvl;
             coder->frame = tmpframe;
         } while (coder->frame);
     }
-    free(coder);
+    Free(coder);
 
     return TRUE;
 }

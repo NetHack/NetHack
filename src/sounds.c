@@ -1,5 +1,5 @@
-/* NetHack 3.6	sounds.c	$NHDT-Date: 1445906863 2015/10/27 00:47:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.72 $ */
-/*	Copyright (c) 1989 Janet Walz, Mike Threepoint */
+/* NetHack 3.6	sounds.c	$NHDT-Date: 1446713641 2015/11/05 08:54:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.74 $ */
+/*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -183,8 +183,8 @@ dosounds()
                 continue;
             if (is_mercenary(mtmp->data)
 #if 0 /* don't bother excluding these */
-		&& !strstri(mtmp->data->mname, "watch")
-		&& !strstri(mtmp->data->mname, "guard")
+                && !strstri(mtmp->data->mname, "watch")
+                && !strstri(mtmp->data->mname, "guard")
 #endif
                 && mon_in_room(mtmp, BARRACKS)
                 /* sleeping implies not-yet-disturbed (usually) */
@@ -511,9 +511,9 @@ register struct monst *mtmp;
     else if (msound == MS_GUARDIAN && ptr != &mons[urole.guardnum])
         msound = mons[genus(monsndx(ptr), 1)].msound;
     /* some normally non-speaking types can/will speak if hero is similar */
-    else if (msound == MS_ORC && /* note: MS_ORC is same as MS_GRUNT */
-             (same_race(ptr, youmonst.data) ||     /* current form, */
-              same_race(ptr, &mons[Race_switch]))) /* unpoly'd form */
+    else if (msound == MS_ORC         /* note: MS_ORC is same as MS_GRUNT */
+             && (same_race(ptr, youmonst.data)           /* current form, */
+                 || same_race(ptr, &mons[Race_switch]))) /* unpoly'd form */
         msound = MS_HUMANOID;
     /* silliness, with slight chance to interfere with shopping */
     else if (Hallucination && mon_is_gecko(mtmp))
@@ -742,8 +742,8 @@ register struct monst *mtmp;
             if (ptr != &mons[PM_PRISONER])
                 verbl_msg = "This will teach you not to disturb me!";
 #if 0
-		else
-		    verbl_msg = "??????????";
+            else
+                verbl_msg = "??????????";
 #endif
         }
         break;

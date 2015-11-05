@@ -1,4 +1,4 @@
-/* NetHack 3.6	steal.c	$NHDT-Date: 1445906866 2015/10/27 00:47:46 $  $NHDT-Branch: master $:$NHDT-Revision: 1.64 $ */
+/* NetHack 3.6	steal.c	$NHDT-Date: 1446713643 2015/11/05 08:54:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.65 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -57,12 +57,12 @@ long lmoney;
 }
 
 /*
-Find the first (and hopefully only) gold object in a chain.
-Used when leprechaun (or you as leprechaun) looks for
-someone else's gold.  Returns a pointer so the gold may
-be seized without further searching.
-May search containers too.
-Deals in gold only, as leprechauns don't care for lesser coins.
+ * Find the first (and hopefully only) gold object in a chain.
+ * Used when leprechaun (or you as leprechaun) looks for
+ * someone else's gold.  Returns a pointer so the gold may
+ * be seized without further searching.
+ * May search containers too.
+ * Deals in gold only, as leprechauns don't care for lesser coins.
 */
 struct obj *
 findgold(chain)
@@ -74,7 +74,7 @@ register struct obj *chain;
 }
 
 /*
-Steal gold coins only.  Leprechauns don't care for lesser coins.
+ * Steal gold coins only.  Leprechauns don't care for lesser coins.
 */
 void
 stealgold(mtmp)
@@ -121,6 +121,7 @@ register struct monst *mtmp;
         }
     } else if (ygold) {
         const int gold_price = objects[GOLD_PIECE].oc_cost;
+
         tmp = (somegold(money_cnt(invent)) + gold_price - 1) / gold_price;
         tmp = min(tmp, ygold->quan);
         if (tmp < ygold->quan)
@@ -484,8 +485,7 @@ register struct obj *otmp;
     /* don't want hidden light source inside the monster; assumes that
        engulfers won't have external inventories; whirly monsters cause
        the light to be extinguished rather than letting it shine thru */
-    if (otmp->lamplit && /* hack to avoid function calls for most objs */
-        obj_sheds_light(otmp) && attacktype(mtmp->data, AT_ENGL)) {
+    if (obj_sheds_light(otmp) && attacktype(mtmp->data, AT_ENGL)) {
         /* this is probably a burning object that you dropped or threw */
         if (u.uswallow && mtmp == u.ustuck && !Blind)
             pline("%s out.", Tobjnam(otmp, "go"));

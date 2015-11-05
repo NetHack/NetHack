@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1444352700 2015/10/09 01:05:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.116 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1446713638 2015/11/05 08:53:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.119 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -149,10 +149,10 @@ doread()
 
     known = FALSE;
     if (check_capacity((char *) 0))
-        return (0);
+        return 0;
     scroll = getobj(readable, "read");
     if (!scroll)
-        return (0);
+        return 0;
 
     /* outrumor has its own blindness check */
     if (scroll->otyp == FORTUNE_COOKIE) {
@@ -162,7 +162,7 @@ doread()
         if (!Blind)
             u.uconduct.literate++;
         useup(scroll);
-        return (1);
+        return 1;
     } else if (scroll->otyp == T_SHIRT || scroll->otyp == ALCHEMY_SMOCK) {
         char buf[BUFSZ];
         if (Blind) {
@@ -267,7 +267,7 @@ doread()
     } else if (scroll->oclass != SCROLL_CLASS
                && scroll->oclass != SPBOOK_CLASS) {
         pline(silly_thing_to, "read");
-        return (0);
+        return 0;
     } else if (Blind && (scroll->otyp != SPE_BOOK_OF_THE_DEAD)) {
         const char *what = 0;
         if (scroll->oclass == SPBOOK_CLASS)
@@ -276,7 +276,7 @@ doread()
             what = "formula on the scroll";
         if (what) {
             pline("Being blind, you cannot read the %s.", what);
-            return (0);
+            return 0;
         }
     }
 
@@ -307,7 +307,7 @@ doread()
         u.uconduct.literate++;
 
     if (scroll->oclass == SPBOOK_CLASS) {
-        return (study_book(scroll));
+        return study_book(scroll);
     }
     scroll->in_use = TRUE; /* scroll, not spellbook, now being read */
     if (scroll->otyp != SCR_BLANK_PAPER) {
@@ -815,13 +815,13 @@ int percent;
 /*
  * Forget some things (e.g. after reading a scroll of amnesia).  When called,
  * the following are always forgotten:
- *	- felt ball & chain
- *	- traps
- *	- part (6 out of 7) of the map
+ *      - felt ball & chain
+ *      - traps
+ *      - part (6 out of 7) of the map
  *
  * Other things are subject to flags:
- *	howmuch & ALL_MAP	= forget whole map
- *	howmuch & ALL_SPELLS	= forget all spells
+ *      howmuch & ALL_MAP       = forget whole map
+ *      howmuch & ALL_SPELLS    = forget all spells
  */
 STATIC_OVL void
 forget(howmuch)
@@ -929,8 +929,8 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 
     if (objects[otyp].oc_magic)
         exercise(A_WIS, TRUE);                       /* just for trying */
-    already_known = (sobj->oclass == SPBOOK_CLASS || /* spell */
-                     objects[otyp].oc_name_known);
+    already_known = (sobj->oclass == SPBOOK_CLASS /* spell */
+                     || objects[otyp].oc_name_known);
 
     switch (otyp) {
 #ifdef MAIL
@@ -1402,7 +1402,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             pline("This is an identify scroll.");
         if (!already_known)
             (void) learnscrolltyp(SCR_IDENTIFY);
-    /*FALLTHRU*/
+        /*FALLTHRU*/
     case SPE_IDENTIFY:
         cval = 1;
         if (sblessed || (!scursed && !rn2(5))) {
@@ -1427,10 +1427,9 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                 u.uen = 0;
             } else {
                 You_feel("charged up!");
-                if (u.uen < u.uenmax)
-                    u.uen = u.uenmax;
-                else
-                    u.uen = (u.uenmax += d(5, 4));
+                u.uen += d(sblessed ? 6 : 4, 4);
+                if (u.uen > u.uenmax)
+                    u.uenmax = u.uen;
             }
             context.botl = 1;
             break;
@@ -2024,8 +2023,8 @@ do_class_genocide()
                             || quest_info(MS_GUARDIAN) == i)
                         /* non-leader/nemesis/guardian role-specific monster
                            */
-                        && (i != PM_NINJA || /* nuisance */
-                            Role_if(PM_SAMURAI))) {
+                        && (i != PM_NINJA /* nuisance */
+                            || Role_if(PM_SAMURAI))) {
                         boolean named, uniq;
 
                         named = type_is_pname(&mons[i]) ? TRUE : FALSE;
@@ -2215,7 +2214,7 @@ int how;
 
 void
 punish(sobj)
-register struct obj *sobj;
+struct obj *sobj;
 {
     struct obj *reuse_ball = (sobj && sobj->otyp == HEAVY_IRON_BALL)
                                 ? sobj : (struct obj *) 0;
@@ -2257,9 +2256,10 @@ register struct obj *sobj;
     }
 }
 
+/* remove the ball and chain */
 void
 unpunish()
-{ /* remove the ball and chain */
+{
     struct obj *savechain = uchain;
 
     obj_extract_self(uchain);

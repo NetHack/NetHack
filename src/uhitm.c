@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1446078766 2015/10/29 00:32:46 $  $NHDT-Branch: master $:$NHDT-Revision: 1.149 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1446713645 2015/11/05 08:54:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.150 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -12,8 +12,8 @@ STATIC_DCL boolean FDECL(hitum, (struct monst *, struct attack *));
 STATIC_DCL boolean FDECL(hmon_hitmon, (struct monst *, struct obj *, int));
 STATIC_DCL int FDECL(joust, (struct monst *, struct obj *));
 STATIC_DCL void NDECL(demonpet);
-STATIC_DCL boolean
-FDECL(m_slips_free, (struct monst * mtmp, struct attack *mattk));
+STATIC_DCL boolean FDECL(m_slips_free, (struct monst * mtmp,
+                                        struct attack *mattk));
 STATIC_DCL int FDECL(explum, (struct monst *, struct attack *));
 STATIC_DCL void FDECL(start_engulf, (struct monst *));
 STATIC_DCL void NDECL(end_engulf);
@@ -305,8 +305,8 @@ int *attk_count, *role_roll_penalty;
     return tmp;
 }
 
-/* try to attack; return FALSE if monster evaded */
-/* u.dx and u.dy must be set */
+/* try to attack; return False if monster evaded;
+   u.dx and u.dy must be set */
 boolean
 attack(mtmp)
 register struct monst *mtmp;
@@ -405,8 +405,8 @@ register struct monst *mtmp;
     /* Is the "it died" check actually correct? */
     if (mdat->mlet == S_LEPRECHAUN && !mtmp->mfrozen && !mtmp->msleeping
         && !mtmp->mconf && mtmp->mcansee && !rn2(7)
-        && (m_move(mtmp, 0) == 2 || /* it died */
-            mtmp->mx != u.ux + u.dx
+        && (m_move(mtmp, 0) == 2 /* it died */
+            || mtmp->mx != u.ux + u.dx
             || mtmp->my != u.uy + u.dy)) /* it moved */
         return FALSE;
 
@@ -517,8 +517,9 @@ struct attack *uattk;
     return malive;
 }
 
-boolean                    /* general "damage monster" routine */
-    hmon(mon, obj, thrown) /* return TRUE if mon still alive */
+/* general "damage monster" routine; return True if mon still alive */
+boolean
+hmon(mon, obj, thrown)
 struct monst *mon;
 struct obj *obj;
 int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
@@ -876,6 +877,7 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
                         } else {
                             char *whom = mon_nam(mon);
                             char *what = The(xname(obj));
+
                             if (!thrown && obj->quan > 1L)
                                 what = An(singular(obj, xname));
                             /* note: s_suffix returns a modifiable buffer */
@@ -979,15 +981,13 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
 
     if (ispoisoned) {
         int nopoison = (10 - (obj->owt / 10));
+
         if (nopoison < 2)
             nopoison = 2;
-        if
-            Role_if(PM_SAMURAI)
-            {
-                You("dishonorably use a poisoned weapon!");
-                adjalign(-sgn(u.ualign.type));
-            }
-        else if ((u.ualign.type == A_LAWFUL) && (u.ualign.record > -10)) {
+        if (Role_if(PM_SAMURAI)) {
+            You("dishonorably use a poisoned weapon!");
+            adjalign(-sgn(u.ualign.type));
+        } else if (u.ualign.type == A_LAWFUL && u.ualign.record > -10) {
             You_feel("like an evil coward for using a poisoned weapon.");
             adjalign(-1);
         }
@@ -1010,8 +1010,8 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
         tmp = 0;
         if (mdat == &mons[PM_SHADE]) {
             if (!hittxt) {
-                const char *what =
-                    unconventional[0] ? unconventional : "attack";
+                const char *what = *unconventional ? unconventional : "attack";
+
                 Your("%s %s harmlessly through %s.", what,
                      vtense(what, "pass"), mon_nam(mon));
                 hittxt = TRUE;
@@ -1089,8 +1089,9 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
         }
     }
 
-    if (!hittxt && /*( thrown => obj exists )*/
-        (!destroyed || (thrown && m_shot.n > 1 && m_shot.o == obj->otyp))) {
+    if (!hittxt /*( thrown => obj exists )*/
+        && (!destroyed
+            || (thrown && m_shot.n > 1 && m_shot.o == obj->otyp))) {
         if (thrown)
             hit(mshot_xname(obj), mon, exclam(tmp));
         else if (!flags.verbose)
@@ -1174,7 +1175,8 @@ struct obj *obj;
      * 2) are dealt with properly by other routines
      *    when it comes to shades.
      */
-    if (obj->otyp == BOULDER || obj->otyp == HEAVY_IRON_BALL
+    if (obj->otyp == BOULDER
+        || obj->otyp == HEAVY_IRON_BALL
         || obj->otyp == IRON_CHAIN      /* dmgval handles those first three */
         || obj->otyp == MIRROR          /* silver in the reflective surface */
         || obj->otyp == CLOVE_OF_GARLIC /* causes shades to flee */
@@ -1227,9 +1229,10 @@ struct attack *mattk;
     return FALSE;
 }
 
-/* used when hitting a monster with a lance while mounted */
-STATIC_OVL int /* 1: joust hit; 0: ordinary hit; -1: joust but break lance */
-    joust(mon, obj)
+/* used when hitting a monster with a lance while mounted;
+   1: joust hit; 0: ordinary hit; -1: joust but break lance */
+STATIC_OVL int
+joust(mon, obj)
 struct monst *mon; /* target */
 struct obj *obj;   /* weapon */
 {
@@ -1289,11 +1292,10 @@ struct obj *otmp;
         || !touch_petrifies(&mons[otmp->corpsenm]) || Stone_resistance)
         return FALSE;
 
-/* no poly_when_stoned() critter has theft capability */
-#if 0
+#if 0   /* no poly_when_stoned() critter has theft capability */
     if (poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM)) {
-	display_nhwindow(WIN_MESSAGE, FALSE);	/* --More-- */
-	return TRUE;
+        display_nhwindow(WIN_MESSAGE, FALSE);   /* --More-- */
+        return TRUE;
     }
 #endif
 
@@ -1411,10 +1413,12 @@ register struct attack *mattk;
         mdef->mstun = 1;
         goto physical;
     case AD_LEGS:
-        /* if (u.ucancelled) { */
-        /*    tmp = 0;	    */
-        /*    break;	    */
-        /* }		    */
+#if 0
+        if (u.ucancelled) {
+            tmp = 0;
+            break;
+        }
+#endif
         goto physical;
     case AD_WERE: /* no special effect on monsters */
     case AD_HEAL: /* likewise */
@@ -2062,7 +2066,9 @@ boolean wouldhavehit;
         wakeup(mdef);
 }
 
-STATIC_OVL boolean hmonas(mon) /* attack monster as a monster. */
+/* attack monster as a monster. */
+STATIC_OVL boolean
+hmonas(mon)
 register struct monst *mon;
 {
     struct attack *mattk, alt_attk;
@@ -2078,11 +2084,9 @@ register struct monst *mon;
         use_weapon:
             /* Certain monsters don't use weapons when encountered as enemies,
              * but players who polymorph into them have hands or claws and
-             * thus
-             * should be able to use weapons.  This shouldn't prohibit the use
-             * of most special abilities, either.
-             * If a monster has multiple claw attacks, only one can use
-             * weapon.
+             * thus should be able to use weapons.  This shouldn't prohibit
+             * the use of most special abilities, either.
+             * If monster has multiple claw attacks, only one can use weapon.
              */
             weapon_used = TRUE;
             /* Potential problem: if the monster gets multiple weapon attacks,
@@ -2113,11 +2117,11 @@ register struct monst *mon;
         case AT_CLAW:
             if (uwep && !cantwield(youmonst.data) && !weapon_used)
                 goto use_weapon;
-        /*FALLTHRU*/
+            /*FALLTHRU*/
         case AT_TUCH:
             if (uwep && youmonst.data->mlet == S_LICH && !weapon_used)
                 goto use_weapon;
-        /*FALLTHRU*/
+            /*FALLTHRU*/
         case AT_KICK:
         case AT_BITE:
         case AT_STNG:
@@ -2259,8 +2263,8 @@ register struct monst *mon;
     return (boolean) (nsum != 0);
 }
 
-/*	Special (passive) attacks on you by monsters done here.		*/
-
+/*      Special (passive) attacks on you by monsters done here.
+ */
 int
 passive(mon, mhit, malive, aatyp, wep_was_destroyed)
 register struct monst *mon;
@@ -2286,8 +2290,8 @@ boolean wep_was_destroyed;
     else
         tmp = 0;
 
-    /*	These affect you even if they just died */
-
+    /*  These affect you even if they just died.
+     */
     switch (ptr->mattk[i].adtyp) {
     case AD_FIRE:
         if (mhit && !mon->mcan) {
@@ -2300,7 +2304,6 @@ boolean wep_was_destroyed;
                 passive_obj(mon, (struct obj *) 0, &(ptr->mattk[i]));
         }
         break;
-
     case AD_ACID:
         if (mhit && rn2(2)) {
             if (Blind || !flags.verbose)
@@ -2333,8 +2336,9 @@ boolean wep_was_destroyed;
             if (aatyp == AT_MAGC)
                 protector = W_ARMG;
 
-            if (protector == 0L || /* no protection */
-                (protector == W_ARMG && !uarmg && !uwep && !wep_was_destroyed)
+            if (protector == 0L /* no protection */
+                || (protector == W_ARMG && !uarmg
+                    && !uwep && !wep_was_destroyed)
                 || (protector == W_ARMF && !uarmf)
                 || (protector == W_ARMH && !uarmh)
                 || (protector == (W_ARMC | W_ARMG) && (!uarmc || !uarmg))) {
@@ -2398,8 +2402,8 @@ boolean wep_was_destroyed;
         break;
     }
 
-    /*	These only affect you if they still live */
-
+    /*  These only affect you if they still live.
+     */
     if (malive && !mon->mcan && rn2(3)) {
         switch (ptr->mattk[i].adtyp) {
         case AD_PLYS:
@@ -2409,16 +2413,16 @@ boolean wep_was_destroyed;
                 }
                 if (mon->mcansee) {
                     if (ureflects("%s gaze is reflected by your %s.",
-                                  s_suffix(Monnam(mon))))
+                                  s_suffix(Monnam(mon)))) {
                         ;
-                    else if (Free_action)
+                    } else if (Free_action) {
                         You("momentarily stiffen under %s gaze!",
                             s_suffix(mon_nam(mon)));
-                    else if (Hallucination && rn2(4))
+                    } else if (Hallucination && rn2(4)) {
                         pline("%s looks %s%s.", Monnam(mon),
                               !rn2(2) ? "" : "rather ",
                               !rn2(2) ? "numb" : "stupified");
-                    else {
+                    } else {
                         You("are frozen by %s gaze!", s_suffix(mon_nam(mon)));
                         nomul((ACURR(A_WIS) > 12 || rn2(4)) ? -tmp : -127);
                         multi_reason = "frozen by a monster's gaze";
@@ -2502,7 +2506,7 @@ register struct monst *mon;
 register struct obj *obj; /* null means pick uwep, uswapwep or uarmg */
 struct attack *mattk;     /* null means we find one internally */
 {
-    register struct permonst *ptr = mon->data;
+    struct permonst *ptr = mon->data;
     register int i;
 
     /* if caller hasn't specified an object, use uwep, uswapwep or uarmg */

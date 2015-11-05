@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1446078771 2015/10/29 00:32:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.230 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1446713647 2015/11/05 08:54:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.231 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -948,9 +948,9 @@ register struct obj *obj;
         || otyp == POT_SICKNESS
         || (otyp == POT_WATER && (obj->blessed || obj->cursed))) {
         if (obj->spe != ((obj->oclass == WAND_CLASS) ? -1 : 0)
-            && otyp != WAN_CANCELLATION && /* can't cancel cancellation */
-            otyp != MAGIC_LAMP && /* cancelling doesn't remove djinni */
-            otyp != CANDELABRUM_OF_INVOCATION) {
+            && otyp != WAN_CANCELLATION /* can't cancel cancellation */
+            && otyp != MAGIC_LAMP /* cancelling doesn't remove djinni */
+            && otyp != CANDELABRUM_OF_INVOCATION) {
             costly_alteration(obj, COST_CANCEL);
             obj->spe = (obj->oclass == WAND_CLASS) ? -1 : 0;
         }
@@ -1338,6 +1338,7 @@ int id;
 /* Actually more things use corpsenm but they polymorph differently */
 #define USES_CORPSENM(typ) \
     ((typ) == CORPSE || (typ) == STATUE || (typ) == FIGURINE)
+
         if (USES_CORPSENM(obj->otyp) && USES_CORPSENM(id))
             set_corpsenm(otmp, obj->corpsenm);
 #undef USES_CORPSENM
@@ -2653,7 +2654,7 @@ struct obj *obj; /* wand or spell */
     case WAN_STRIKING:
     case SPE_FORCE_BOLT:
         striking = TRUE;
-    /*FALLTHRU*/
+        /*FALLTHRU*/
     case WAN_LOCKING:
     case SPE_WIZARD_LOCK:
         /* down at open bridge or up or down at open portcullis */
@@ -3785,13 +3786,15 @@ const char *fltxt;
         xkilled(mon, 2);
 }
 
-/* type ==   0 to   9 : you shooting a wand */
-/* type ==  10 to  19 : you casting a spell */
-/* type ==  20 to  29 : you breathing as a monster */
-/* type == -10 to -19 : monster casting spell */
-/* type == -20 to -29 : monster breathing at you */
-/* type == -30 to -39 : monster shooting a wand */
-/* called with dx = dy = 0 with vertical bolts */
+/*
+ * type ==   0 to   9 : you shooting a wand
+ * type ==  10 to  19 : you casting a spell
+ * type ==  20 to  29 : you breathing as a monster
+ * type == -10 to -19 : monster casting spell
+ * type == -20 to -29 : monster breathing at you
+ * type == -30 to -39 : monster shooting a wand
+ * called with dx = dy = 0 with vertical bolts
+ */
 void
 buzz(type, nd, sx, sy, dx, dy)
 register int type, nd;
@@ -3804,7 +3807,7 @@ register int dx, dy;
     struct monst *mon;
     coord save_bhitpos;
     boolean shopdamage = FALSE;
-    register const char *fltxt;
+    const char *fltxt;
     struct obj *otmp;
     int spell_type;
 
@@ -4048,9 +4051,9 @@ const char *msg;
 
     if (!msg)
         msg = "The ice crackles and melts.";
-    if (lev->typ == DRAWBRIDGE_UP)
+    if (lev->typ == DRAWBRIDGE_UP) {
         lev->drawbridgemask &= ~DB_ICE; /* revert to DB_MOAT */
-    else {                              /* lev->typ == ICE */
+    } else { /* lev->typ == ICE */
 #ifdef STUPID
         if (lev->icedpool == ICED_POOL)
             lev->typ = POOL;
@@ -4135,8 +4138,8 @@ long timeout UNUSED;
     melt_ice(x, y, "Some ice melts away.");
 }
 
-/* Burn floor scrolls, evaporate pools, etc...  in a single square.  Used
- * both for normal bolts of fire, cold, etc... and for fireballs.
+/* Burn floor scrolls, evaporate pools, etc... in a single square.
+ * Used both for normal bolts of fire, cold, etc... and for fireballs.
  * Sets shopdamage to TRUE if a shop door is destroyed, and returns the
  * amount by which range is reduced (the latter is just ignored by fireballs)
  */
@@ -4169,6 +4172,7 @@ short exploding_wand_typ;
             melt_ice(x, y, (char *) 0);
         } else if (is_pool(x, y)) {
             const char *msgtxt = "You hear hissing gas.";
+
             if (lev->typ != POOL) { /* MOAT or DRAWBRIDGE_UP */
                 if (see_it)
                     msgtxt = "Some water evaporates.";
@@ -4323,8 +4327,8 @@ short exploding_wand_typ;
            (except on rogue level) */
         newsym(x, y);
         if (see_it)
-            pline("%s %s reveals a secret door.", yourzap ? "Your" : "The",
-                  zapverb);
+            pline("%s %s reveals a secret door.",
+                  yourzap ? "Your" : "The", zapverb);
         else if (Is_rogue_level(&u.uz))
             draft_message(FALSE); /* "You feel a draft." (open doorway) */
     }
@@ -4333,6 +4337,7 @@ short exploding_wand_typ;
     if (closed_door(x, y)) {
         int new_doormask = -1;
         const char *see_txt = 0, *sense_txt = 0, *hear_txt = 0;
+
         rangemod = -1000;
         switch (abstype) {
         case ZT_FIRE:
@@ -4523,9 +4528,9 @@ destroy_item(osym, dmgtyp)
 register int osym, dmgtyp;
 {
     register struct obj *obj, *obj2;
-    register int dmg, xresist, skip;
-    register long i, cnt, quan;
-    register int dindx;
+    int dmg, xresist, skip;
+    long i, cnt, quan;
+    int dindx;
     const char *mult;
     boolean physical_damage;
 
@@ -4957,17 +4962,20 @@ retry:
     u.uconduct.wishes++;
 
     if (otmp != &zeroobj) {
+        const char
+            *verb = ((Is_airlevel(&u.uz) || u.uinwater) ? "slip" : "drop"),
+            *oops_msg = (u.uswallow
+                         ? "Oops!  %s out of your reach!"
+                         : (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)
+                            || levl[u.ux][u.uy].typ < IRONBARS
+                            || levl[u.ux][u.uy].typ >= ICE)
+                            ? "Oops!  %s away from you!"
+                            : "Oops!  %s to the floor!");
+
         /* The(aobjnam()) is safe since otmp is unidentified -dlc */
-        (void) hold_another_object(
-            otmp, u.uswallow ? "Oops!  %s out of your reach!"
-                             : (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)
-                                || levl[u.ux][u.uy].typ < IRONBARS
-                                || levl[u.ux][u.uy].typ >= ICE)
-                                   ? "Oops!  %s away from you!"
-                                   : "Oops!  %s to the floor!",
-            The(aobjnam(otmp,
-                        Is_airlevel(&u.uz) || u.uinwater ? "slip" : "drop")),
-            (const char *) 0);
+        (void) hold_another_object(otmp, oops_msg,
+                                   The(aobjnam(otmp, verb)),
+                                   (const char *) 0);
         u.ublesscnt += rn1(100, 50); /* the gods take notice */
     }
 }
