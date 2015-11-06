@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1446713638 2015/11/05 08:53:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.119 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1446777536 2015/11/06 02:38:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.120 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1428,8 +1428,10 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             } else {
                 You_feel("charged up!");
                 u.uen += d(sblessed ? 6 : 4, 4);
-                if (u.uen > u.uenmax)
-                    u.uenmax = u.uen;
+                if (u.uen > u.uenmax) /* if current energy is already at   */
+                    u.uenmax = u.uen; /* or near maximum, increase maximum */
+                else
+                    u.uen = u.uenmax; /* otherwise restore current to max  */
             }
             context.botl = 1;
             break;
