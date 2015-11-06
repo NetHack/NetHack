@@ -1,4 +1,4 @@
-/* NetHack 3.6	makemon.c	$NHDT-Date: 1445556868 2015/10/22 23:34:28 $  $NHDT-Branch: master $:$NHDT-Revision: 1.99 $ */
+/* NetHack 3.6	makemon.c	$NHDT-Date: 1446808445 2015/11/06 11:14:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.100 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -33,7 +33,7 @@ extern const int monstr[];
 
 boolean
 is_home_elemental(ptr)
-register struct permonst *ptr;
+struct permonst *ptr;
 {
     if (ptr->mlet == S_ELEMENTAL)
         switch (monsndx(ptr)) {
@@ -54,10 +54,10 @@ register struct permonst *ptr;
  */
 STATIC_OVL boolean
 wrong_elem_type(ptr)
-register struct permonst *ptr;
+struct permonst *ptr;
 {
     if (ptr->mlet == S_ELEMENTAL) {
-        return ((boolean)(!is_home_elemental(ptr)));
+        return (boolean) !is_home_elemental(ptr);
     } else if (Is_earthlevel(&u.uz)) {
         /* no restrictions? */
     } else if (Is_waterlevel(&u.uz)) {
@@ -75,7 +75,9 @@ register struct permonst *ptr;
     return FALSE;
 }
 
-STATIC_OVL void m_initgrp(mtmp, x, y, n) /* make a group just like mtmp */
+/* make a group just like mtmp */
+STATIC_OVL void
+m_initgrp(mtmp, x, y, n)
 register struct monst *mtmp;
 register int x, y, n;
 {
@@ -165,18 +167,18 @@ register struct monst *mtmp;
     register struct permonst *ptr = mtmp->data;
     register int mm = monsndx(ptr);
     struct obj *otmp;
+    int bias, spe2, w1, w2;
 
     if (Is_rogue_level(&u.uz))
         return;
     /*
-     *	first a few special cases:
-     *
-     *		giants get a boulder to throw sometimes.
-     *		ettins get clubs
-     *		kobolds get darts to throw
-     *		centaurs get some sort of bow & arrows or bolts
-     *		soldiers get all sorts of things.
-     *		kops get clubs & cream pies.
+     *  First a few special cases:
+     *          giants get a boulder to throw sometimes
+     *          ettins get clubs
+     *          kobolds get darts to throw
+     *          centaurs get some sort of bow & arrows or bolts
+     *          soldiers get all sorts of things
+     *          kops get clubs & cream pies.
      */
     switch (ptr->mlet) {
     case S_GIANT:
@@ -185,7 +187,7 @@ register struct monst *mtmp;
         break;
     case S_HUMAN:
         if (is_mercenary(ptr)) {
-            int w1 = 0, w2 = 0;
+            w1 = w2 = 0;
             switch (mm) {
             case PM_WATCHMAN:
             case PM_SOLDIER:
@@ -272,8 +274,6 @@ register struct monst *mtmp;
 
     case S_ANGEL:
         if (humanoid(ptr)) {
-            int spe2;
-
             /* create minion stuff; can't use mongets */
             otmp = mksobj(LONG_SWORD, FALSE, FALSE);
 
@@ -336,9 +336,9 @@ register struct monst *mtmp;
             }
         }
         break;
-    case S_KOP: /* create Keystone Kops with cream pies to
-                 * throw. As suggested by KAA.	   [MRS]
-                 */
+    case S_KOP:
+        /* create Keystone Kops with cream pies to
+           throw. As suggested by KAA.     [MRS] */
         if (!rn2(4))
             m_initthrow(mtmp, CREAM_PIE, 2);
         if (!rn2(3))
@@ -347,8 +347,8 @@ register struct monst *mtmp;
     case S_ORC:
         if (rn2(2))
             (void) mongets(mtmp, ORCISH_HELM);
-        switch (mm != PM_ORC_CAPTAIN ? mm : rn2(2) ? PM_MORDOR_ORC
-                                                   : PM_URUK_HAI) {
+        switch ((mm != PM_ORC_CAPTAIN) ? mm
+                : rn2(2) ? PM_MORDOR_ORC : PM_URUK_HAI) {
         case PM_MORDOR_ORC:
             if (!rn2(3))
                 (void) mongets(mtmp, SCIMITAR);
@@ -458,15 +458,13 @@ register struct monst *mtmp;
          */
         if (!is_demon(ptr))
             break;
-    /* fall thru */
-    /*
-     *	Now the general case, Some chance of getting some type
-     *	of weapon for "normal" monsters.  Certain special types
-     *	of monsters will get a bonus chance or different selections.
-     */
-    default: {
-        int bias;
-
+        /*FALLTHRU*/
+    default:
+        /*
+         * Now the general case, some chance of getting some type
+         * of weapon for "normal" monsters.  Certain special types
+         * of monsters will get a bonus chance or different selections.
+         */
         bias = is_lord(ptr) + is_prince(ptr) * 2 + extra_nasty(ptr);
         switch (rnd(14 - (2 * bias))) {
         case 1:
@@ -502,8 +500,9 @@ register struct monst *mtmp;
         default:
             break;
         }
-    } break;
+        break;
     }
+
     if ((int) mtmp->m_lev > rn2(75))
         (void) mongets(mtmp, rnd_offensive_item(mtmp));
 }
@@ -518,6 +517,7 @@ struct monst *mtmp;
 long amount;
 {
     struct obj *gold = mksobj(GOLD_PIECE, FALSE, FALSE);
+
     gold->quan = amount;
     add_to_minv(mtmp, gold);
 }
@@ -529,11 +529,12 @@ register struct monst *mtmp;
     register int cnt;
     register struct obj *otmp;
     register struct permonst *ptr = mtmp->data;
+
     if (Is_rogue_level(&u.uz))
         return;
     /*
-     *	Soldiers get armour & rations - armour approximates their ac.
-     *	Nymphs may get mirror or potion of object detection.
+     *  Soldiers get armour & rations - armour approximates their ac.
+     *  Nymphs may get mirror or potion of object detection.
      */
     switch (ptr->mlet) {
     case S_HUMAN:
@@ -842,8 +843,7 @@ boolean ghostly;
 {
     boolean result;
     uchar lim = mbirth_limit(mndx);
-    boolean gone =
-        (mvitals[mndx].mvflags & G_GONE); /* genocided or extinct */
+    boolean gone = (mvitals[mndx].mvflags & G_GONE) != 0; /* geno'd|extinct */
 
     result = (((int) mvitals[mndx].born < lim) && !gone) ? TRUE : FALSE;
 
@@ -944,7 +944,6 @@ newmextra()
     return mextra;
 }
 
-
 boolean
 makemon_rnd_goodpos(mon, gpflags, cc)
 struct monst *mon;
@@ -954,12 +953,14 @@ coord *cc;
     int tryct = 0;
     int nx,ny;
     boolean good;
+
     do {
         nx = rn1(COLNO - 3, 2);
         ny = rn2(ROWNO);
-        if (!in_mklev && cansee(nx,ny)) good = FALSE;
-        else good = goodpos(nx, ny, mon, gpflags);
+        good = (!in_mklev && cansee(nx,ny)) ? FALSE
+                                            : goodpos(nx, ny, mon, gpflags);
     } while ((++tryct < 50) && !good);
+
     if (!good) {
         /* else go through all map positions, twice, first round
            ignoring positions in sight, and pick first good one.
@@ -968,12 +969,14 @@ coord *cc;
         int yofs = ny;
         int dx,dy;
         int bl = (in_mklev || Blind) ? 1 : 0;
+
         for ( ; bl < 2; bl++) {
             for (dx = 0; dx < COLNO; dx++)
                 for (dy = 0; dy < ROWNO; dy++) {
                     nx = ((dx + xofs) % (COLNO - 1)) + 1;
                     ny = ((dy + yofs) % (ROWNO - 1)) + 1;
-                    if ((bl == 0) && cansee(nx,ny)) continue;
+                    if (bl == 0 && cansee(nx,ny))
+                        continue;
                     if (goodpos(nx, ny, mon, gpflags))
                         goto gotgood;
                 }
@@ -1008,16 +1011,16 @@ coord *cc;
 
 /*
  * called with [x,y] = coordinates;
- *	[0,0] means anyplace
- *	[u.ux,u.uy] means: near player (if !in_mklev)
+ *      [0,0] means anyplace
+ *      [u.ux,u.uy] means: near player (if !in_mklev)
  *
- *	In case we make a monster group, only return the one at [x,y].
+ *      In case we make a monster group, only return the one at [x,y].
  */
 struct monst *
 makemon(ptr, x, y, mmflags)
 register struct permonst *ptr;
 register int x, y;
-register int mmflags;
+int mmflags;
 {
     register struct monst *mtmp;
     int mndx, mcham, ct, mitem;
@@ -1033,8 +1036,9 @@ register int mmflags;
         struct monst fakemon;
 
         fakemon.data = ptr; /* set up for goodpos */
-        if (!makemon_rnd_goodpos(ptr ? &fakemon : (struct monst *)0, gpflags, &cc))
-            return ((struct monst *) 0);
+        if (!makemon_rnd_goodpos(ptr ? &fakemon : (struct monst *)0,
+                                 gpflags, &cc))
+            return (struct monst *) 0;
         x = cc.x;
         y = cc.y;
     } else if (byyou && !in_mklev) {
@@ -1044,7 +1048,7 @@ register int mmflags;
             x = bypos.x;
             y = bypos.y;
         } else
-            return ((struct monst *) 0);
+            return (struct monst *) 0;
     }
 
     /* Does monster already exist at the position? */
@@ -1055,9 +1059,9 @@ register int mmflags;
                 x = bypos.x;
                 y = bypos.y;
             } else
-                return ((struct monst *) 0);
+                return (struct monst *) 0;
         } else
-            return ((struct monst *) 0);
+            return (struct monst *) 0;
     }
 
     if (ptr) {
@@ -1065,7 +1069,7 @@ register int mmflags;
         /* if you are to make a specific monster and it has
            already been genocided, return */
         if (mvitals[mndx].mvflags & G_GENOD)
-            return ((struct monst *) 0);
+            return (struct monst *) 0;
         if (wizard && (mvitals[mndx].mvflags & G_EXTINCT))
             debugpline1("Explicitly creating extinct monster %s.",
                         mons[mndx].mname);
@@ -1081,7 +1085,7 @@ register int mmflags;
         do {
             if (!(ptr = rndmonst())) {
                 debugpline0("Warning: no monster.");
-                return ((struct monst *) 0); /* no more monsters! */
+                return (struct monst *) 0; /* no more monsters! */
             }
             fakemon.data = ptr; /* set up for goodpos */
         } while (++tryct <= 50
@@ -1227,8 +1231,9 @@ register int mmflags;
         (void) mongets(mtmp, mitem);
 
     if (in_mklev) {
-        if (((is_ndemon(ptr)) || (mndx == PM_WUMPUS) || (mndx == PM_LONG_WORM)
-             || (mndx == PM_GIANT_EEL)) && !u.uhave.amulet && rn2(5))
+        if ((is_ndemon(ptr) || mndx == PM_WUMPUS
+             || mndx == PM_LONG_WORM || mndx == PM_GIANT_EEL)
+            && !u.uhave.amulet && rn2(5))
             mtmp->msleeping = TRUE;
     } else {
         if (byyou) {
@@ -1246,8 +1251,7 @@ register int mmflags;
     if (mndx == PM_LONG_WORM && (mtmp->wormno = get_wormno()) != 0)
 #else
     /* DICE 3.0 doesn't like assigning and comparing mtmp->wormno in the
-     * same expression.
-     */
+       same expression. */
     if (mndx == PM_LONG_WORM
         && (mtmp->wormno = get_wormno(), mtmp->wormno != 0))
 #endif
@@ -1310,7 +1314,7 @@ register int mmflags;
     if (!in_mklev)
         newsym(mtmp->mx, mtmp->my); /* make sure the mon shows up */
 
-    return (mtmp);
+    return mtmp;
 }
 
 int
@@ -1365,15 +1369,15 @@ int mndx;
     if (mvitals[mndx].mvflags & G_GONE)
         return TRUE;
     if (Inhell)
-        return (mons[mndx].maligntyp > A_NEUTRAL);
+        return (boolean) (mons[mndx].maligntyp > A_NEUTRAL);
     else
-        return ((mons[mndx].geno & G_HELL) != 0);
+        return (boolean) ((mons[mndx].geno & G_HELL) != 0);
 }
 
 /*
- *	shift the probability of a monster's generation by
- *	comparing the dungeon alignment and monster alignment.
- *	return an integer in the range of 0-5.
+ *      shift the probability of a monster's generation by
+ *      comparing the dungeon alignment and monster alignment.
+ *      return an integer in the range of 0-5.
  */
 STATIC_OVL int
 align_shift(ptr)
@@ -1446,11 +1450,9 @@ rndmonst()
         elemlevel = In_endgame(&u.uz) && !Is_astralevel(&u.uz);
 
         /*
-         *	Find out how many monsters exist in the range we have
-         *selected.
+         * Find out how many monsters exist in the range we have selected.
          */
-        /* (`mndx' initialized above) */
-        for (; mndx < SPECIAL_PM; mndx++) {
+        for ( ; mndx < SPECIAL_PM; mndx++) { /* (`mndx' initialized above) */
             ptr = &mons[mndx];
             rndmonst_state.mchoices[mndx] = 0;
             if (tooweak(mndx, minmlev) || toostrong(mndx, maxmlev))
@@ -1470,8 +1472,8 @@ rndmonst()
             rndmonst_state.mchoices[mndx] = (char) ct;
         }
         /*
-         *	    Possible modification:  if choice_count is "too low",
-         *	    expand minmlev..maxmlev range and try again.
+         *      Possible modification:  if choice_count is "too low",
+         *      expand minmlev..maxmlev range and try again.
          */
     } /* choice_count+mchoices[] recalc */
 
@@ -1482,7 +1484,7 @@ rndmonst()
     }
 
     /*
-     *	Now, select a monster at random.
+     *  Now, select a monster at random.
      */
     ct = rnd(rndmonst_state.choice_count);
     for (mndx = LOW_PM; mndx < SPECIAL_PM; mndx++)
@@ -1532,13 +1534,11 @@ int mndx, mvflagsmask, genomask;
     return TRUE;
 }
 
-/*	The routine below is used to make one of the multiple types
- *	of a given monster class.  The second parameter specifies a
- *	special casing bit mask to allow the normal genesis
- *	masks to be deactivated.  Returns 0 if no monsters
- *	in that class can be made.
+/* Make one of the multiple types of a given monster class.
+ * The second parameter specifies a special casing bit mask
+ * to allow the normal genesis masks to be deactivated.
+ * Returns Null if no monsters in that class can be made.
  */
-
 struct permonst *
 mkclass(class, spc)
 char class;
@@ -1550,10 +1550,10 @@ int spc;
     maxmlev = level_difficulty() >> 1;
     if (class < 1 || class >= MAXMCLASSES) {
         impossible("mkclass called with bad class!");
-        return ((struct permonst *) 0);
+        return (struct permonst *) 0;
     }
-    /*	Assumption #1:	monsters of a given class are contiguous in the
-     *			mons[] array.
+    /*  Assumption #1:  monsters of a given class are contiguous in the
+     *                  mons[] array.
      */
     for (first = LOW_PM; first < SPECIAL_PM; first++)
         if (mons[first].mlet == class)
@@ -1569,12 +1569,11 @@ int spc;
                 break;
             num += mons[last].geno & G_FREQ;
         }
-
     if (!num)
-        return ((struct permonst *) 0);
+        return (struct permonst *) 0;
 
-    /*	Assumption #2:	monsters of a given class are presented in ascending
-     *			order of strength.
+    /*  Assumption #2:  monsters of a given class are presented in ascending
+     *                  order of strength.
      */
     for (num = rnd(num); num > 0; first++)
         if (mk_gen_ok(first, G_GONE, mask)) {
@@ -1588,14 +1587,15 @@ int spc;
         }
     first--; /* correct an off-by-one error */
 
-    return (&mons[first]);
+    return &mons[first];
 }
 
 /* like mkclass(), but excludes difficulty considerations; used when
    player with polycontrol picks a class instead of a specific type;
    genocided types are avoided but extinct ones are acceptable; we don't
    check polyok() here--caller accepts some choices !polyok() would reject */
-int mkclass_poly(class)
+int
+mkclass_poly(class)
 int class;
 {
     register int first, last, num = 0;
@@ -1620,7 +1620,9 @@ int class;
     return first;
 }
 
-int adj_lev(ptr) /* adjust strength of monsters based on u.uz and u.ulevel */
+/* adjust strength of monsters based on u.uz and u.ulevel */
+int
+adj_lev(ptr)
 register struct permonst *ptr;
 {
     int tmp, tmp2;
@@ -1636,7 +1638,7 @@ register struct permonst *ptr;
     }
 
     if ((tmp = ptr->mlevel) > 49)
-        return (50); /* "special" demons/devils */
+        return 50; /* "special" demons/devils */
     tmp2 = (level_difficulty() - tmp);
     if (tmp2 < 0)
         tmp--; /* if mlevel > u.uz decrement tmp */
@@ -1653,8 +1655,10 @@ register struct permonst *ptr;
     return ((tmp > tmp2) ? tmp2 : (tmp > 0 ? tmp : 0)); /* 0 lower limit */
 }
 
+/* monster earned experience and will gain some hit points; it might also
+   grow into a bigger monster (baby to adult, soldier to officer, etc) */
 struct permonst *
-grow_up(mtmp, victim) /* `mtmp' might "grow up" into a bigger version */
+grow_up(mtmp, victim)
 struct monst *mtmp, *victim;
 {
     int oldtype, newtype, max_increase, cur_increase, lev_limit, hp_threshold;
@@ -1663,7 +1667,7 @@ struct monst *mtmp, *victim;
     /* monster died after killing enemy but before calling this function */
     /* currently possible if killing a gas spore */
     if (mtmp->mhp <= 0)
-        return ((struct permonst *) 0);
+        return (struct permonst *) 0;
 
     /* note:  none of the monsters with special hit point calculations
        have both little and big forms */
@@ -1674,12 +1678,12 @@ struct monst *mtmp, *victim;
 
     /* growth limits differ depending on method of advancement */
     if (victim) {                       /* killed a monster */
-                                        /*
-                                         * The HP threshold is the maximum number of hit points for the
-                                         * current level; once exceeded, a level will be gained.
-                                         * Possible bug: if somehow the hit points are already higher
-                                         * than that, monster will gain a level without any increase in HP.
-                                         */
+        /*
+         * The HP threshold is the maximum number of hit points for the
+         * current level; once exceeded, a level will be gained.
+         * Possible bug: if somehow the hit points are already higher
+         * than that, monster will gain a level without any increase in HP.
+         */
         hp_threshold = mtmp->m_lev * 8; /* normal limit */
         if (!mtmp->m_lev)
             hp_threshold = 4;
@@ -1755,7 +1759,7 @@ struct monst *mtmp, *victim;
 int
 mongets(mtmp, otyp)
 register struct monst *mtmp;
-register int otyp;
+int otyp;
 {
     register struct obj *otmp;
     int spe;
@@ -1800,9 +1804,9 @@ register int otyp;
 
         spe = otmp->spe;
         (void) mpickobj(mtmp, otmp); /* might free otmp */
-        return (spe);
-    } else
-        return (0);
+        return spe;
+    }
+    return 0;
 }
 
 int
@@ -1838,8 +1842,8 @@ int type;
 }
 
 /*
- *	Alignment vs. yours determines monster's attitude to you.
- *	( some "animal" types are co-aligned, but also hungry )
+ *      Alignment vs. yours determines monster's attitude to you.
+ *      (Some "animal" types are co-aligned, but also hungry.)
  */
 boolean
 peace_minded(ptr)
@@ -1872,15 +1876,15 @@ register struct permonst *ptr;
 
     /* minions are hostile to players that have strayed at all */
     if (is_minion(ptr))
-        return ((boolean)(u.ualign.record >= 0));
+        return (boolean) (u.ualign.record >= 0);
 
     /* Last case:  a chance of a co-aligned monster being
      * hostile.  This chance is greater if the player has strayed
      * (u.ualign.record negative) or the monster is not strongly aligned.
      */
-    return (
-        (boolean)(!!rn2(16 + (u.ualign.record < -15 ? -15 : u.ualign.record))
-                  && !!rn2(2 + abs(mal))));
+    return (boolean) (!!rn2(16 + (u.ualign.record < -15 ? -15
+                                                        : u.ualign.record))
+                      && !!rn2(2 + abs(mal)));
 }
 
 /* Set malign to have the proper effect on player alignment if monster is
@@ -1890,8 +1894,8 @@ register struct permonst *ptr;
  * greater than the bonus for killing a hostile monster to maintain balance.
  * Rules:
  *   it's bad to kill peaceful monsters, potentially worse to kill always-
- *	peaceful monsters
- *   it's never bad to kill a hostile monster, although it may not be good
+ *      peaceful monsters;
+ *   it's never bad to kill a hostile monster, although it may not be good.
  */
 void
 set_malign(mtmp)
@@ -2085,8 +2089,7 @@ register struct monst *mtmp;
     }
 }
 
-/* release a monster from a bag of tricks; return number of monsters created
- */
+/* release monster frome bag of tricks; return number of monsters created */
 int
 bagotricks(bag, tipping, seencount)
 struct obj *bag;

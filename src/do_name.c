@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1444617209 2015/10/12 02:33:29 $  $NHDT-Branch: master $:$NHDT-Revision: 1.75 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1446808440 2015/11/06 11:14:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.77 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -29,10 +29,11 @@ nextmbuf()
 /* function for getpos() to highlight desired map locations.
  * parameter value 0 = initialize, 1 = highlight, 2 = done
  */
-void (*getpos_hilitefunc)(int) = NULL;
+void FDECL((*getpos_hilitefunc), (int)) = (void FDECL((*), (int))) 0;
+
 void
 getpos_sethilite(f)
-void (*f)(int);
+void FDECL((*f), (int));
 {
     getpos_hilitefunc = f;
 }
@@ -244,8 +245,7 @@ const char *goal;
                                         || glyph_to_cmap(k) == S_darkroom
                                         || glyph_to_cmap(k) == S_corr
                                         || glyph_to_cmap(k) == S_litcorr)) {
-                                    /* what the hero remembers to be at tx,ty
-                                     */
+                                    /* what hero remembers to be at tx,ty */
                                     k = glyph_at(tx, ty);
                                 }
                                 if (glyph_is_cmap(k)
@@ -384,8 +384,7 @@ struct obj *obj;
 {
     if (has_oname(obj))
         return ONAME(obj);
-    else
-        return "";
+    return "";
 }
 
 /* historical note: this returns a monster pointer because it used to
@@ -718,8 +717,8 @@ register struct obj *obj;
     (void) mungspaces(buf);
     if (!*buf) {
         if (*str1) { /* had name, so possibly remove from disco[] */
-                     /* strip name first, for the update_inventory() call
-                        from undiscover_object() */
+            /* strip name first, for the update_inventory() call
+               from undiscover_object() */
             *str1 = (char *) 0;
             undiscover_object(obj->otyp);
         }
@@ -821,20 +820,20 @@ rndghostname()
     return rn2(7) ? ghostnames[rn2(SIZE(ghostnames))] : (const char *) plname;
 }
 
-/* Monster naming functions:
+/*
+ * Monster naming functions:
  * x_monnam is the generic monster-naming function.
- *		  seen	      unseen	   detected		  named
- * mon_nam:	the newt	it	the invisible orc	Fido
- * noit_mon_nam:the newt (as if detected) the invisible orc	Fido
- * l_monnam:	newt		it	invisible orc		dog called
- *fido
- * Monnam:	The newt	It	The invisible orc	Fido
- * noit_Monnam: The newt (as if detected) The invisible orc	Fido
- * Adjmonnam:	The poor newt	It	The poor invisible orc	The poor Fido
- * Amonnam:	A newt		It	An invisible orc	Fido
- * a_monnam:	a newt		it	an invisible orc	Fido
- * m_monnam:	newt		xan	orc			Fido
- * y_monnam:	your newt     your xan	your invisible orc	Fido
+ *                seen        unseen       detected               named
+ * mon_nam:     the newt        it      the invisible orc       Fido
+ * noit_mon_nam:the newt (as if detected) the invisible orc     Fido
+ * l_monnam:    newt            it      invisible orc           dog called Fido
+ * Monnam:      The newt        It      The invisible orc       Fido
+ * noit_Monnam: The newt (as if detected) The invisible orc     Fido
+ * Adjmonnam:   The poor newt   It      The poor invisible orc  The poor Fido
+ * Amonnam:     A newt          It      An invisible orc        Fido
+ * a_monnam:    a newt          it      an invisible orc        Fido
+ * m_monnam:    newt            xan     orc                     Fido
+ * y_monnam:    your newt     your xan  your invisible orc      Fido
  */
 
 /* Bug: if the monster is a priest or shopkeeper, not every one of these
@@ -953,6 +952,7 @@ boolean called;
     if (do_hallu) {
         char rnamecode;
         char *rname = rndmonnam(&rnamecode);
+
         Strcat(buf, rname);
         name_at_start = bogon_is_pname(rnamecode);
     } else if (has_mname(mtmp)) {
@@ -982,6 +982,7 @@ boolean called;
         }
     } else if (is_mplayer(mdat) && !In_endgame(&u.uz)) {
         char pbuf[BUFSZ];
+
         Strcpy(pbuf, rank_of((int) mtmp->m_lev, monsndx(mdat),
                              (boolean) mtmp->female));
         Strcat(buf, lcase(pbuf));
@@ -1015,7 +1016,7 @@ boolean called;
             Strcpy(buf, buf2);
             return buf;
         case ARTICLE_A:
-            return (an(buf));
+            return an(buf);
         case ARTICLE_NONE:
         default:
             return buf;
@@ -1025,18 +1026,18 @@ boolean called;
 
 char *
 l_monnam(mtmp)
-register struct monst *mtmp;
+struct monst *mtmp;
 {
-    return (x_monnam(mtmp, ARTICLE_NONE, (char *) 0,
-                     (has_mname(mtmp)) ? SUPPRESS_SADDLE : 0, TRUE));
+    return x_monnam(mtmp, ARTICLE_NONE, (char *) 0,
+                    (has_mname(mtmp)) ? SUPPRESS_SADDLE : 0, TRUE);
 }
 
 char *
 mon_nam(mtmp)
-register struct monst *mtmp;
+struct monst *mtmp;
 {
-    return (x_monnam(mtmp, ARTICLE_THE, (char *) 0,
-                     (has_mname(mtmp)) ? SUPPRESS_SADDLE : 0, FALSE));
+    return x_monnam(mtmp, ARTICLE_THE, (char *) 0,
+                    (has_mname(mtmp)) ? SUPPRESS_SADDLE : 0, FALSE);
 }
 
 /* print the name as if mon_nam() was called, but assume that the player
@@ -1045,32 +1046,32 @@ register struct monst *mtmp;
  */
 char *
 noit_mon_nam(mtmp)
-register struct monst *mtmp;
+struct monst *mtmp;
 {
-    return (x_monnam(mtmp, ARTICLE_THE, (char *) 0,
-                     (has_mname(mtmp)) ? (SUPPRESS_SADDLE | SUPPRESS_IT)
+    return x_monnam(mtmp, ARTICLE_THE, (char *) 0,
+                    (has_mname(mtmp)) ? (SUPPRESS_SADDLE | SUPPRESS_IT)
                                        : SUPPRESS_IT,
-                     FALSE));
+                    FALSE);
 }
 
 char *
 Monnam(mtmp)
-register struct monst *mtmp;
+struct monst *mtmp;
 {
     register char *bp = mon_nam(mtmp);
 
     *bp = highc(*bp);
-    return (bp);
+    return  bp;
 }
 
 char *
 noit_Monnam(mtmp)
-register struct monst *mtmp;
+struct monst *mtmp;
 {
     register char *bp = noit_mon_nam(mtmp);
 
     *bp = highc(*bp);
-    return (bp);
+    return  bp;
 }
 
 /* monster's own name */
@@ -1100,33 +1101,32 @@ struct monst *mtmp;
 
 char *
 Adjmonnam(mtmp, adj)
-register struct monst *mtmp;
-register const char *adj;
+struct monst *mtmp;
+const char *adj;
 {
-    register char *bp =
-        x_monnam(mtmp, ARTICLE_THE, adj,
-                 (has_mname(mtmp)) ? SUPPRESS_SADDLE : 0, FALSE);
+    char *bp = x_monnam(mtmp, ARTICLE_THE, adj,
+                        has_mname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE);
 
     *bp = highc(*bp);
-    return (bp);
+    return  bp;
 }
 
 char *
 a_monnam(mtmp)
-register struct monst *mtmp;
+struct monst *mtmp;
 {
     return x_monnam(mtmp, ARTICLE_A, (char *) 0,
-                    (has_mname(mtmp)) ? SUPPRESS_SADDLE : 0, FALSE);
+                    has_mname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE);
 }
 
 char *
 Amonnam(mtmp)
-register struct monst *mtmp;
+struct monst *mtmp;
 {
-    register char *bp = a_monnam(mtmp);
+    char *bp = a_monnam(mtmp);
 
     *bp = highc(*bp);
-    return (bp);
+    return  bp;
 }
 
 /* used for monster ID by the '/', ';', and 'C' commands to block remote
@@ -1170,7 +1170,6 @@ char *buf, *code;
     return mname;
 }
 
-#define BOGUSMONSIZE 100 /* arbitrary */
 /* return a random monster name, for hallucination */
 char *
 rndmonnam(code)
@@ -1179,6 +1178,7 @@ char *code;
     static char buf[BUFSZ];
     char *mname;
     int name;
+#define BOGUSMONSIZE 100 /* arbitrary */
 
     if (code)
         *code = '\0';
@@ -1194,8 +1194,8 @@ char *code;
         mname = strcpy(buf, mons[name].mname);
     }
     return mname;
-}
 #undef BOGUSMONSIZE
+}
 
 /* check bogusmon prefix to decide whether it's a personal name */
 boolean
@@ -1249,8 +1249,10 @@ const char *
 rndcolor()
 {
     int k = rn2(CLR_MAX);
+
     return Hallucination ? hcolor((char *) 0)
-                         : (k == NO_COLOR) ? "colorless" : c_obj_colors[k];
+                         : (k == NO_COLOR) ? "colorless"
+                                           : c_obj_colors[k];
 }
 
 /* Aliases for road-runner nemesis

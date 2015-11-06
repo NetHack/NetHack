@@ -1,4 +1,4 @@
-/* NetHack 3.6	lock.c	$NHDT-Date: 1446604112 2015/11/04 02:28:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.65 $ */
+/* NetHack 3.6	lock.c	$NHDT-Date: 1446808444 2015/11/06 11:14:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.66 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -45,10 +45,12 @@ STATIC_OVL const char *
 lock_action()
 {
     /* "unlocking"+2 == "locking" */
-    static const char *actions[] = { /* [0] */ "unlocking the door",
-                                     /* [1] */ "unlocking the chest",
-                                     /* [2] */ "unlocking the box",
-                                     /* [3] */ "picking the lock" };
+    static const char *actions[] = {
+        "unlocking the door",   /* [0] */
+        "unlocking the chest",  /* [1] */
+        "unlocking the box",    /* [2] */
+        "picking the lock"      /* [3] */
+    };
 
     /* if the target is currently unlocked, we're trying to lock it now */
     if (xlock.door && !(xlock.door->doormask & D_LOCKED))
@@ -191,7 +193,6 @@ forcelock(VOID_ARGS)
     }
 
     if (xlock.picktyp) { /* blade */
-
         if (rn2(1000 - (int) uwep->spe) > (992 - greatest_erosion(uwep) * 10)
             && !uwep->cursed && !obj_resists(uwep, 0, 99)) {
             /* for a +0 weapon, probability that it survives an unsuccessful
@@ -530,13 +531,6 @@ doforce()
     return 1;
 }
 
-/* try to open a door */
-int
-doopen()
-{
-    return doopen_indir(0, 0);
-}
-
 boolean
 stumble_on_door_mimic(x, y)
 int x, y;
@@ -549,6 +543,13 @@ int x, y;
         return TRUE;
     }
     return FALSE;
+}
+
+/* the 'O' command - try to open a door */
+int
+doopen()
+{
+    return doopen_indir(0, 0);
 }
 
 /* try to open a door in direction u.dx/u.dy */
@@ -694,7 +695,7 @@ boolean quietly;
     return FALSE;
 }
 
-/* try to close a door */
+/* the 'C' command - try to close a door */
 int
 doclose()
 {

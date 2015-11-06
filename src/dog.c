@@ -1,4 +1,4 @@
-/* NetHack 3.6	dog.c	$NHDT-Date: 1445301120 2015/10/20 00:32:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.51 $ */
+/* NetHack 3.6	dog.c	$NHDT-Date: 1446808440 2015/11/06 11:14:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.52 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -56,13 +56,13 @@ STATIC_OVL int
 pet_type()
 {
     if (urole.petnum != NON_PM)
-        return (urole.petnum);
+        return  urole.petnum;
     else if (preferred_pet == 'c')
-        return (PM_KITTEN);
+        return  PM_KITTEN;
     else if (preferred_pet == 'd')
-        return (PM_LITTLE_DOG);
+        return  PM_LITTLE_DOG;
     else
-        return (rn2(2) ? PM_KITTEN : PM_LITTLE_DOG);
+        return  rn2(2) ? PM_KITTEN : PM_LITTLE_DOG;
 }
 
 struct monst *
@@ -200,7 +200,7 @@ makedog()
         mtmp = christen_monst(mtmp, petname);
 
     initedog(mtmp);
-    return (mtmp);
+    return  mtmp;
 }
 
 /* record `last move time' for all monsters prior to level save so that
@@ -582,10 +582,10 @@ boolean pets_only; /* true for ascension or final escape */
         if (pets_only) {
             if (!mtmp->mtame)
                 continue; /* reject non-pets */
-                          /* don't block pets from accompanying hero's dungeon
-                             escape or ascension simply due to mundane trifles;
-                             unlike level change for steed, don't bother trying
-                             to achieve a normal trap escape first */
+            /* don't block pets from accompanying hero's dungeon
+               escape or ascension simply due to mundane trifles;
+               unlike level change for steed, don't bother trying
+               to achieve a normal trap escape first */
             mtmp->mtrapped = 0;
             mtmp->meating = 0;
             mtmp->msleeping = 0;
@@ -743,7 +743,7 @@ register struct obj *obj;
     boolean carni = carnivorous(mptr), herbi = herbivorous(mptr), starving;
 
     if (is_quest_artifact(obj) || obj_resists(obj, 0, 95))
-        return (obj->cursed ? TABU : APPORT);
+        return obj->cursed ? TABU : APPORT;
 
     switch (obj->oclass) {
     case FOOD_CLASS:
@@ -771,7 +771,9 @@ register struct obj *obj;
                         && fptr != &mons[PM_LIZARD]
                         && fptr != &mons[PM_LICHEN])
                            ? DOGFOOD
-                           : (starving && !vegan(fptr)) ? ACCFOOD : POISON;
+                           : (starving && !vegan(fptr))
+                              ? ACCFOOD
+                              : POISON;
             if (obj->otyp == EGG)
                 return stale_egg(obj) ? CADAVER : starving ? ACCFOOD : POISON;
             return TABU;
@@ -783,9 +785,9 @@ register struct obj *obj;
         case MEAT_RING:
         case MEAT_STICK:
         case HUGE_CHUNK_OF_MEAT:
-            return (carni ? DOGFOOD : MANFOOD);
+            return carni ? DOGFOOD : MANFOOD;
         case EGG:
-            return (carni ? CADAVER : MANFOOD);
+            return carni ? CADAVER : MANFOOD;
         case CORPSE:
             if ((peek_at_iced_corpse_age(obj) + 50L <= monstermoves
                  && obj->corpsenm != PM_LIZARD && obj->corpsenm != PM_LICHEN
@@ -795,57 +797,61 @@ register struct obj *obj;
                 return POISON;
             /* turning into slime is preferable to starvation */
             else if (fptr == &mons[PM_GREEN_SLIME] && !slimeproof(mon->data))
-                return (starving ? ACCFOOD : POISON);
+                return starving ? ACCFOOD : POISON;
             else if (vegan(fptr))
-                return (herbi ? CADAVER : MANFOOD);
+                return herbi ? CADAVER : MANFOOD;
             /* most humanoids will avoid cannibalism unless starving;
                arbitrary: elves won't eat other elves even then */
             else if (humanoid(mptr) && same_race(mptr, fptr)
                      && (!is_undead(mptr) && fptr->mlet != S_KOBOLD
                          && fptr->mlet != S_ORC && fptr->mlet != S_OGRE))
-                return ((starving && carni && !is_elf(mptr)) ? ACCFOOD
-                                                             : TABU);
+                return (starving && carni && !is_elf(mptr)) ? ACCFOOD : TABU;
             else
-                return (carni ? CADAVER : MANFOOD);
+                return carni ? CADAVER : MANFOOD;
         case CLOVE_OF_GARLIC:
-            return ((is_undead(mptr) || is_vampshifter(mon))
-                        ? TABU
-                        : ((herbi || starving) ? ACCFOOD : MANFOOD));
+            return (is_undead(mptr) || is_vampshifter(mon))
+                      ? TABU
+                      : (herbi || starving)
+                         ? ACCFOOD
+                         : MANFOOD;
         case TIN:
-            return (metallivorous(mptr) ? ACCFOOD : MANFOOD);
+            return metallivorous(mptr) ? ACCFOOD : MANFOOD;
         case APPLE:
         case CARROT:
-            return (herbi ? DOGFOOD : starving ? ACCFOOD : MANFOOD);
+            return herbi ? DOGFOOD : starving ? ACCFOOD : MANFOOD;
         case BANANA:
-            return ((mptr->mlet == S_YETI)
-                        ? DOGFOOD
-                        : ((herbi || starving) ? ACCFOOD : MANFOOD));
+            return (mptr->mlet == S_YETI)
+                      ? DOGFOOD
+                      : (herbi || starving)
+                         ? ACCFOOD
+                         : MANFOOD;
         default:
             if (starving)
                 return ACCFOOD;
-            return (obj->otyp > SLIME_MOLD ? (carni ? ACCFOOD : MANFOOD)
-                                           : (herbi ? ACCFOOD : MANFOOD));
+            return (obj->otyp > SLIME_MOLD) ? (carni ? ACCFOOD : MANFOOD)
+                                            : (herbi ? ACCFOOD : MANFOOD);
         }
     default:
         if (obj->otyp == AMULET_OF_STRANGULATION
             || obj->otyp == RIN_SLOW_DIGESTION)
             return TABU;
         if (mon_hates_silver(mon) && objects[obj->otyp].oc_material == SILVER)
-            return (TABU);
+            return TABU;
         if (mptr == &mons[PM_GELATINOUS_CUBE] && is_organic(obj))
-            return (ACCFOOD);
+            return ACCFOOD;
         if (metallivorous(mptr) && is_metallic(obj)
             && (is_rustprone(obj) || mptr != &mons[PM_RUST_MONSTER])) {
             /* Non-rustproofed ferrous based metals are preferred. */
-            return ((is_rustprone(obj) && !obj->oerodeproof) ? DOGFOOD
-                                                             : ACCFOOD);
+            return (is_rustprone(obj) && !obj->oerodeproof) ? DOGFOOD
+                                                            : ACCFOOD;
         }
-        if (!obj->cursed && obj->oclass != BALL_CLASS
+        if (!obj->cursed
+            && obj->oclass != BALL_CLASS
             && obj->oclass != CHAIN_CLASS)
-            return (APPORT);
-    /* fall into next case */
+            return APPORT;
+        /*FALLTHRU*/
     case ROCK_CLASS:
-        return (UNDEF);
+        return UNDEF;
     }
 }
 

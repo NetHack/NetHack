@@ -1,10 +1,10 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1445301119 2015/10/20 00:31:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.76 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1446808439 2015/11/06 11:13:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.77 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
-/* and Dave Cohrs, 1990.					  */
+/* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
- *			THE NEW DISPLAY CODE
+ *                      THE NEW DISPLAY CODE
  *
  * The old display code has been broken up into three parts: vision, display,
  * and drawing.  Vision decides what locations can and cannot be physically
@@ -30,15 +30,15 @@
  *
  * Display rules:
  *
- *	If the location is in sight, display in order:
- *		visible (or sensed) monsters
- *		visible objects
- *		known traps
- *		background
+ *      If the location is in sight, display in order:
+ *              visible (or sensed) monsters
+ *              visible objects
+ *              known traps
+ *              background
  *
- *	If the location is out of sight, display in order:
- *		sensed monsters (telepathy)
- *		memory
+ *      If the location is out of sight, display in order:
+ *              sensed monsters (telepathy)
+ *              memory
  *
  *
  *
@@ -97,24 +97,23 @@
  *
  * Parts of the rm structure that are used:
  *
- *	typ	- What is really there.
- *	glyph	- What the hero remembers.  This will never be a monster.
- *		  Monsters "float" above this.
- *	lit	- True if the position is lit.  An optimization for
- *		  lit/unlit rooms.
- *	waslit	- True if the position was *remembered* as lit.
- *	seenv	- A vector of bits representing the directions from which the
- *		  hero has seen this position.  The vector's primary use is
- *		  determining how walls are seen.  E.g. a wall sometimes looks
- *		  like stone on one side, but is seen as a wall from the
- *other.
- *		  Other uses are for unmapping detected objects and felt
- *		  locations, where we need to know if the hero has ever
- *		  seen the location.
- *	flags   - Additional information for the typ field.  Different for
- *		  each typ.
- *	horizontal - Indicates whether the wall or door is horizontal or
- *		     vertical.
+ *      typ     - What is really there.
+ *      glyph   - What the hero remembers.  This will never be a monster.
+ *                Monsters "float" above this.
+ *      lit     - True if the position is lit.  An optimization for
+ *                lit/unlit rooms.
+ *      waslit  - True if the position was *remembered* as lit.
+ *      seenv   - A vector of bits representing the directions from which the
+ *                hero has seen this position.  The vector's primary use is
+ *                determining how walls are seen.  E.g. a wall sometimes looks
+ *                like stone on one side, but is seen as wall from the other.
+ *                Other uses are for unmapping detected objects and felt
+ *                locations, where we need to know if the hero has ever
+ *                seen the location.
+ *      flags   - Additional information for the typ field.  Different for
+ *                each typ.
+ *      horizontal - Indicates whether the wall or door is horizontal or
+ *                vertical.
  */
 #include "hack.h"
 
@@ -180,7 +179,7 @@ int show;
  * The routines map_background(), map_object(), and map_trap() could just
  * as easily be:
  *
- *	map_glyph(x,y,glyph,show)
+ *      map_glyph(x,y,glyph,show)
  *
  * Which is called with the xx_to_glyph() in the call.  Then I can get
  * rid of 3 routines that don't do very much anyway.  And then stop
@@ -360,13 +359,13 @@ STATIC_OVL void
 display_monster(x, y, mon, sightflags, worm_tail)
 register xchar x, y;        /* display position */
 register struct monst *mon; /* monster to display */
-int sightflags;             /* 1 if the monster is physically seen */
-/* 2 if detected using Detect_monsters */
-register xchar worm_tail; /* mon is actually a worm tail */
+int sightflags;             /* 1 if the monster is physically seen;
+                               2 if detected using Detect_monsters */
+xchar worm_tail;            /* mon is actually a worm tail */
 {
-    register boolean mon_mimic = (mon->m_ap_type != M_AP_NOTHING);
-    register int sensed =
-        mon_mimic && (Protection_from_shape_changers || sensemon(mon));
+    boolean mon_mimic = (mon->m_ap_type != M_AP_NOTHING);
+    int sensed = (mon_mimic && (Protection_from_shape_changers
+                                || sensemon(mon)));
     /*
      * We must do the mimic check first.  If the mimic is mimicing something,
      * and the location is in sight, we have to change the hero's memory
@@ -405,8 +404,9 @@ register xchar worm_tail; /* mon is actually a worm tail */
         }
 
         case M_AP_OBJECT: {
-            struct obj obj; /* Make a fake object to send	*/
-                            /* to map_object().		*/
+            /* Make a fake object to send to map_object(). */
+            struct obj obj;
+
             obj = zeroobj;
             obj.ox = x;
             obj.oy = y;
@@ -520,8 +520,8 @@ xchar x, y;
     if (Underwater && !Is_waterlevel(&u.uz) && !is_pool(x, y))
         return;
 
-    /* Set the seen vector as if the hero had seen it.  It doesn't matter */
-    /* if the hero is levitating or not.				  */
+    /* Set the seen vector as if the hero had seen it.
+       It doesn't matter if the hero is levitating or not. */
     set_seenv(lev, u.ux, u.uy, x, y);
 
     if (!can_reach_floor(FALSE)) {
@@ -534,11 +534,11 @@ xchar x, y;
          *
          * Check (and display) in order:
          *
-         *	+ Stone, walls, and closed doors.
-         *	+ Boulders.  [see a boulder before a doorway]
-         *	+ Doors.
-         *	+ Room/water positions
-         *	+ Everything else (hallways!)
+         *      + Stone, walls, and closed doors.
+         *      + Boulders.  [see a boulder before a doorway]
+         *      + Doors.
+         *      + Room/water positions
+         *      + Everything else (hallways!)
          */
         if (IS_ROCK(lev->typ)
             || (IS_DOOR(lev->typ)
@@ -578,7 +578,8 @@ xchar x, y;
                 if (lev->typ != ROOM && lev->seenv) {
                     map_background(x, y, 1);
                 } else {
-                    lev->glyph = (flags.dark_room && iflags.use_color && !Is_rogue_level(&u.uz))
+                    lev->glyph = (flags.dark_room && iflags.use_color
+                                  && !Is_rogue_level(&u.uz))
                                      ? cmap_to_glyph(S_darkroom)
                                      : (lev->waslit ? cmap_to_glyph(S_room)
                                                     : cmap_to_glyph(S_stone));
@@ -587,7 +588,8 @@ xchar x, y;
             } else if ((lev->glyph >= cmap_to_glyph(S_stone)
                         && lev->glyph < cmap_to_glyph(S_darkroom))
                        || glyph_is_invisible(levl[x][y].glyph)) {
-                lev->glyph = (flags.dark_room && iflags.use_color && !Is_rogue_level(&u.uz))
+                lev->glyph = (flags.dark_room && iflags.use_color
+                              && !Is_rogue_level(&u.uz))
                                  ? cmap_to_glyph(S_darkroom)
                                  : (lev->waslit ? cmap_to_glyph(S_room)
                                                 : cmap_to_glyph(S_stone));
@@ -597,7 +599,7 @@ xchar x, y;
             /* We feel it (I think hallways are the only things left). */
             map_background(x, y, 1);
             /* Corridors are never felt as lit (unless remembered that way) */
-            /* (lit_corridor only).					    */
+            /* (lit_corridor only).                                         */
             if (lev->typ == CORR && lev->glyph == cmap_to_glyph(S_litcorr)
                 && !lev->waslit)
                 show_glyph(x, y, lev->glyph = cmap_to_glyph(S_corr));
@@ -697,7 +699,7 @@ register int x, y;
         /*
          * Don't use templit here:  E.g.
          *
-         *	lev->waslit = !!(lev->lit || templit(x,y));
+         *      lev->waslit = !!(lev->lit || templit(x,y));
          *
          * Otherwise we have the "light pool" problem, where non-permanently
          * lit areas just out of sight stay remembered as lit.  They should
@@ -749,30 +751,30 @@ register int x, y;
                 display_monster(x, y, mon,
                                 see_it ? PHYSICALLY_SEEN : DETECTED,
                                 worm_tail);
-            } else if (mon && mon_warning(mon) && !is_worm_tail(mon))
+            } else if (mon && mon_warning(mon) && !is_worm_tail(mon)) {
                 display_warning(mon);
-            else if (glyph_is_invisible(levl[x][y].glyph))
+            } else if (glyph_is_invisible(levl[x][y].glyph)) {
                 map_invisible(x, y);
-            else
-                _map_location(x, y, 1); /* map the location */
+            } else
+                _map_location(x, y, 1); /* map the location */\
         }
-    }
 
     /* Can't see the location. */
-    else {
+    } else {
         if (x == u.ux && y == u.uy) {
             feel_location(u.ux, u.uy); /* forces an update */
 
             if (canspotself())
                 display_self();
         } else if ((mon = m_at(x, y))
-                   && ((see_it =
-                            (tp_sensemon(mon) || MATCH_WARN_OF_MON(mon)
-                             || (see_with_infrared(mon) && mon_visible(mon))))
+                   && ((see_it = (tp_sensemon(mon) || MATCH_WARN_OF_MON(mon)
+                                  || (see_with_infrared(mon)
+                                      && mon_visible(mon))))
                        || Detect_monsters)) {
             /* Monsters are printed every time. */
             /* This also gets rid of any invisibility glyph */
-            display_monster(x, y, mon, see_it ? 0 : DETECTED, is_worm_tail(mon) ? TRUE : FALSE);
+            display_monster(x, y, mon, see_it ? 0 : DETECTED,
+                            is_worm_tail(mon) ? TRUE : FALSE);
         } else if ((mon = m_at(x, y)) && mon_warning(mon)
                    && !is_worm_tail(mon)) {
             display_warning(mon);
@@ -782,20 +784,20 @@ register int x, y;
          * If the location is remembered as being both dark (waslit is false)
          * and lit (glyph is a lit room or lit corridor) then it was either:
          *
-         *	(1) A dark location that the hero could see through night
-         *	    vision.
+         *      (1) A dark location that the hero could see through night
+         *          vision.
          *
-         *	(2) Darkened while out of the hero's sight.  This can happen
-         *	    when cursed scroll of light is read.
+         *      (2) Darkened while out of the hero's sight.  This can happen
+         *          when cursed scroll of light is read.
          *
          * In either case, we have to manually correct the hero's memory to
          * match waslit.  Deciding when to change waslit is non-trivial.
          *
          *  Note:  If flags.lit_corridor is set, then corridors act like room
-         *	   squares.  That is, they light up if in night vision range.
-         *	   If flags.lit_corridor is not set, then corridors will
-         *	   remain dark unless lit by a light spell and may darken
-         *	   again, as discussed above.
+         *         squares.  That is, they light up if in night vision range.
+         *         If flags.lit_corridor is not set, then corridors will
+         *         remain dark unless lit by a light spell and may darken
+         *         again, as discussed above.
          *
          * These checks and changes must be here and not in back_to_glyph().
          * They are dependent on the position being out of sight.
@@ -803,7 +805,8 @@ register int x, y;
         else if (Is_rogue_level(&u.uz)) {
             if (lev->glyph == cmap_to_glyph(S_litcorr) && lev->typ == CORR)
                 show_glyph(x, y, lev->glyph = cmap_to_glyph(S_corr));
-            else if (lev->glyph == cmap_to_glyph(S_room) && lev->typ == ROOM && !lev->waslit)
+            else if (lev->glyph == cmap_to_glyph(S_room) && lev->typ == ROOM
+                     && !lev->waslit)
                 show_glyph(x, y, lev->glyph = cmap_to_glyph(S_stone));
             else
                 goto show_mem;
@@ -856,20 +859,20 @@ xchar x, y;
  * but explode() wants to delay].
  *
  * Call:
- *	(DISP_BEAM,   glyph)	open, initialize glyph
- *	(DISP_FLASH,  glyph)	open, initialize glyph
- *	(DISP_ALWAYS, glyph)	open, initialize glyph
- *	(DISP_CHANGE, glyph)	change glyph
- *	(DISP_END,    0)	close & clean up (second argument doesn't
- *				matter)
- *	(DISP_FREEMEM, 0)	only used to prevent memory leak during
- *				exit)
- *	(x, y)			display the glyph at the location
+ *      (DISP_BEAM,   glyph)    open, initialize glyph
+ *      (DISP_FLASH,  glyph)    open, initialize glyph
+ *      (DISP_ALWAYS, glyph)    open, initialize glyph
+ *      (DISP_CHANGE, glyph)    change glyph
+ *      (DISP_END,    0)        close & clean up (second argument doesn't
+ *                              matter)
+ *      (DISP_FREEMEM, 0)       only used to prevent memory leak during
+ *                              exit)
+ *      (x, y)                  display the glyph at the location
  *
  * DISP_BEAM  - Display the given glyph at each location, but do not erase
- *		any until the close call.
+ *              any until the close call.
  * DISP_FLASH - Display the given glyph at each location, but erase the
- *		previous location's glyph.
+ *              previous location's glyph.
  * DISP_ALWAYS- Like DISP_FLASH, but vision is not taken into account.
  */
 
@@ -1063,19 +1066,20 @@ int mode;
     if (mode == 1 || dela) {
         cls();
         dela = FALSE;
-    }
+
     /* delayed full update */
-    else if (mode == 2) {
+    } else if (mode == 2) {
         dela = TRUE;
         return;
-    }
+
     /* limited update */
-    else {
+    } else {
         for (y = lasty - 1; y <= lasty + 1; y++)
             for (x = lastx - 1; x <= lastx + 1; x++)
                 if (isok(x, y))
                     show_glyph(x, y, cmap_to_glyph(S_stone));
     }
+
     for (x = u.ux - 1; x <= u.ux + 1; x++)
         for (y = u.uy - 1; y <= u.uy + 1; y++)
             if (isok(x, y) && is_pool(x, y)) {
@@ -1089,9 +1093,9 @@ int mode;
 }
 
 /*
- *	under_ground()
+ *      under_ground()
  *
- *	Very restricted display.  You can only see yourself.
+ *      Very restricted display.  You can only see yourself.
  */
 void
 under_ground(mode)
@@ -1107,15 +1111,16 @@ int mode;
     if (mode == 1 || dela) {
         cls();
         dela = FALSE;
-    }
+
     /* delayed full update */
-    else if (mode == 2) {
+    } else if (mode == 2) {
         dela = TRUE;
         return;
-    }
+
     /* limited update */
-    else
+    } else {
         newsym(u.ux, u.uy);
+    }
 }
 
 /* =========================================================================
@@ -1123,17 +1128,17 @@ int mode;
 
 /*
  * Loop through all of the monsters and update them.  Called when:
- *	+ going blind & telepathic
- *	+ regaining sight & telepathic
+ *      + going blind & telepathic
+ *      + regaining sight & telepathic
  *      + getting and losing infravision
- *	+ hallucinating
- *	+ doing a full screen redraw
- *	+ see invisible times out or a ring of see invisible is taken off
- *	+ when a potion of see invisible is quaffed or a ring of see
- *	  invisible is put on
- *	+ gaining telepathy when blind [givit() in eat.c, pleased() in pray.c]
- *	+ losing telepathy while blind [xkilled() in mon.c, attrcurse() in
- *	  sit.c]
+ *      + hallucinating
+ *      + doing a full screen redraw
+ *      + see invisible times out or a ring of see invisible is taken off
+ *      + when a potion of see invisible is quaffed or a ring of see
+ *        invisible is put on
+ *      + gaining telepathy when blind [givit() in eat.c, pleased() in pray.c]
+ *      + losing telepathy while blind [xkilled() in mon.c, attrcurse() in
+ *        sit.c]
  */
 void
 see_monsters()
@@ -1191,7 +1196,7 @@ set_mimic_blocking()
 
 /*
  * Loop through all of the object *locations* and update them.  Called when
- *	+ hallucinating.
+ *      + hallucinating.
  */
 void
 see_objects()
@@ -1451,7 +1456,7 @@ flush_screen(cursor_on_u)
 int cursor_on_u;
 {
     /* Prevent infinite loops on errors:
-     *	    flush_screen->print_glyph->impossible->pline->flush_screen
+     *      flush_screen->print_glyph->impossible->pline->flush_screen
      */
     static boolean flushing = 0;
     static boolean delay_flushing = 0;
@@ -1646,8 +1651,7 @@ int loc;
         impossible("swallow_to_glyph: bad swallow location");
         loc = S_sw_br;
     }
-    return ((int) (what_mon(mnum) << 3) | (loc - S_sw_tl))
-           + GLYPH_SWALLOW_OFF;
+    return ((int) (what_mon(mnum) << 3) | (loc - S_sw_tl)) + GLYPH_SWALLOW_OFF;
 }
 
 /*
@@ -1657,10 +1661,10 @@ int loc;
  * type has four glyphs, one for each of the symbols below.  The order of
  * the zap symbols [0-3] as defined in rm.h are:
  *
- *	|  S_vbeam	( 0, 1) or ( 0,-1)
- *	-  S_hbeam	( 1, 0) or (-1,	0)
- *	\  S_lslant	( 1, 1) or (-1,-1)
- *	/  S_rslant	(-1, 1) or ( 1,-1)
+ *      |  S_vbeam      ( 0, 1) or ( 0,-1)
+ *      -  S_hbeam      ( 1, 0) or (-1, 0)
+ *      \  S_lslant     ( 1, 1) or (-1,-1)
+ *      /  S_rslant     (-1, 1) or ( 1,-1)
  */
 int
 zapdir_to_glyph(dx, dy, beam_type)
@@ -1783,8 +1787,8 @@ error4(x, y, a, b, c, dd)
 int x, y, a, b, c, dd;
 {
     pline("set_wall_state: %s @ (%d,%d) %s%s%s%s",
-          type_to_name(levl[x][y].typ), x, y, a ? "1" : "", b ? "2" : "",
-          c ? "3" : "", dd ? "4" : "");
+          type_to_name(levl[x][y].typ), x, y,
+          a ? "1" : "", b ? "2" : "", c ? "3" : "", dd ? "4" : "");
     bad_count[levl[x][y].typ]++;
 }
 #endif /* WA_VERBOSE */

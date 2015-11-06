@@ -1,4 +1,4 @@
-/* NetHack 3.6	dungeon.c	$NHDT-Date: 1445301123 2015/10/20 00:32:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.65 $ */
+/* NetHack 3.6	dungeon.c	$NHDT-Date: 1446808442 2015/11/06 11:14:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.66 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -24,9 +24,10 @@ struct proto_dungeon {
     int n_brs;  /* number of tmpbranch entries */
 };
 
-int n_dgns;                             /* number of dungeons (also used   */
-                                        /*   in mklev.c and do.c)	   */
-static branch *branches = (branch *) 0; /* dungeon branch list		   */
+int n_dgns;     /* number of dungeons (also used in mklev.c and do.c) */
+static branch *branches = (branch *) 0;        /* dungeon branch list */
+
+mapseen *mapseenchn = (struct mapseen *) 0; /*DUNGEON_OVERVIEW*/
 
 struct lchoice {
     int idx;
@@ -40,15 +41,15 @@ static void FDECL(Fread, (genericptr_t, int, int, dlb *));
 STATIC_DCL xchar FDECL(dname_to_dnum, (const char *));
 STATIC_DCL int FDECL(find_branch, (const char *, struct proto_dungeon *));
 STATIC_DCL xchar FDECL(parent_dnum, (const char *, struct proto_dungeon *));
-STATIC_DCL int FDECL(level_range,
-                     (XCHAR_P, int, int, int, struct proto_dungeon *, int *));
+STATIC_DCL int FDECL(level_range, (XCHAR_P, int, int, int,
+                                   struct proto_dungeon *, int *));
 STATIC_DCL xchar FDECL(parent_dlevel, (const char *, struct proto_dungeon *));
 STATIC_DCL int FDECL(correct_branch_type, (struct tmpbranch *));
 STATIC_DCL branch *FDECL(add_branch, (int, int, struct proto_dungeon *));
 STATIC_DCL void FDECL(add_level, (s_level *));
 STATIC_DCL void FDECL(init_level, (int, int, struct proto_dungeon *));
-STATIC_DCL int FDECL(possible_places,
-                     (int, boolean *, struct proto_dungeon *));
+STATIC_DCL int FDECL(possible_places, (int, boolean *,
+                                       struct proto_dungeon *));
 STATIC_DCL xchar FDECL(pick_level, (boolean *, int));
 STATIC_DCL boolean FDECL(place_level, (int, struct proto_dungeon *));
 STATIC_DCL boolean FDECL(unplaced_floater, (struct dungeon *));
@@ -56,17 +57,15 @@ STATIC_DCL boolean FDECL(unreachable_level, (d_level *, BOOLEAN_P));
 STATIC_DCL void FDECL(tport_menu, (winid, char *, struct lchoice *, d_level *,
                                    BOOLEAN_P));
 STATIC_DCL const char *FDECL(br_string, (int));
-STATIC_DCL void FDECL(print_branch,
-                      (winid, int, int, int, BOOLEAN_P, struct lchoice *));
-
-mapseen *mapseenchn = (struct mapseen *) 0;
+STATIC_DCL void FDECL(print_branch, (winid, int, int, int, BOOLEAN_P,
+                                     struct lchoice *));
 STATIC_DCL mapseen *FDECL(load_mapseen, (int));
 STATIC_DCL void FDECL(save_mapseen, (int, mapseen *));
 STATIC_DCL mapseen *FDECL(find_mapseen, (d_level *));
 STATIC_DCL void FDECL(print_mapseen, (winid, mapseen *, int, int, BOOLEAN_P));
 STATIC_DCL boolean FDECL(interest_mapseen, (mapseen *));
-STATIC_DCL void FDECL(traverse_mapseenchn,
-                      (BOOLEAN_P, winid, int, int, int *));
+STATIC_DCL void FDECL(traverse_mapseenchn, (BOOLEAN_P, winid,
+                                            int, int, int *));
 STATIC_DCL const char *FDECL(seen_string, (XCHAR_P, const char *));
 STATIC_DCL const char *FDECL(br_string2, (branch *));
 STATIC_DCL const char *FDECL(endgamelevelname, (char *, int));
@@ -326,7 +325,7 @@ struct proto_dungeon *pd;
      */
     for (pdnum = 0; strcmp(pd->tmpdungeon[pdnum].name, s); pdnum++)
         if ((i -= pd->tmpdungeon[pdnum].branches) < 0)
-            return (pdnum);
+            return pdnum;
 
     panic("parent_dnum: couldn't resolve branch.");
     /*NOT REACHED*/
@@ -338,10 +337,10 @@ struct proto_dungeon *pd;
  * or dungeon entrance can occupy.
  *
  * Note: This follows the acouple (instead of the rcouple) rules for a
- *	 negative random component (randc < 0).  These rules are found
- *	 in dgn_comp.y.  The acouple [absolute couple] section says that
- *	 a negative random component means from the (adjusted) base to the
- *	 end of the dungeon.
+ *       negative random component (randc < 0).  These rules are found
+ *       in dgn_comp.y.  The acouple [absolute couple] section says that
+ *       a negative random component means from the (adjusted) base to the
+ *       end of the dungeon.
  */
 STATIC_OVL int
 level_range(dgn, base, randc, chain, pd, adjusted_base)
@@ -704,7 +703,9 @@ struct level_map {
                   { X_GOAL, &nemesis_level },
                   { "", (d_level *) 0 } };
 
-void init_dungeons() /* initialize the "dungeon" structs */
+/* initialize the "dungeon" structs */
+void
+init_dungeons()
 {
     dlb *dgn_file;
     register int i, cl = 0, cb = 0;
@@ -810,9 +811,9 @@ void init_dungeons() /* initialize the "dungeon" structs */
         /*
          * Set the entry level for this dungeon.  The pd.tmpdungeon entry
          * value means:
-         *		< 0	from bottom (-1 == bottom level)
-         *		  0	default (top)
-         *		> 0	actual level (1 = top)
+         *              < 0     from bottom (-1 == bottom level)
+         *                0     default (top)
+         *              > 0     actual level (1 = top)
          *
          * Note that the entry_lev field in the dungeon structure is
          * redundant.  It is used only here and in print_dungeon().
@@ -850,13 +851,13 @@ void init_dungeons() /* initialize the "dungeon" structs */
              * Calculate the depth of the top of the dungeon via
              * its branch.  First, the depth of the entry point:
              *
-             *	depth of branch from "parent" dungeon
-             *	+ -1 or 1 depending on a up or down stair or
-             *	  0 if portal
+             *  depth of branch from "parent" dungeon
+             *  + -1 or 1 depending on a up or down stair or
+             *    0 if portal
              *
              * Followed by the depth of the top of the dungeon:
              *
-             *	- (entry depth - 1)
+             *  - (entry depth - 1)
              *
              * We'll say that portals stay on the same depth.
              */
@@ -945,7 +946,7 @@ void init_dungeons() /* initialize the "dungeon" structs */
         }
     }
     /*
-     *	I hate hardwiring these names. :-(
+     *  I hate hardwiring these names. :-(
      */
     quest_dnum = dname_to_dnum("The Quest");
     sokoban_dnum = dname_to_dnum("Sokoban");
@@ -970,21 +971,25 @@ void init_dungeons() /* initialize the "dungeon" structs */
 #endif
 }
 
-xchar dunlev(lev) /* return the level number for lev in *this* dungeon */
+/* return the level number for lev in *this* dungeon */
+xchar
+dunlev(lev)
 d_level *lev;
 {
-    return (lev->dlevel);
+    return lev->dlevel;
 }
 
+/* return the lowest level number for *this* dungeon */
 xchar
-dunlevs_in_dungeon(lev) /* return the lowest level number for *this* dungeon*/
+dunlevs_in_dungeon(lev)
 d_level *lev;
 {
-    return (dungeons[lev->dnum].num_dunlevs);
+    return dungeons[lev->dnum].num_dunlevs;
 }
 
+/* return the lowest level explored in the game*/
 xchar
-deepest_lev_reached(noquest) /* return the lowest level explored in the game*/
+deepest_lev_reached(noquest)
 boolean noquest;
 {
     /* this function is used for three purposes: to provide a factor
@@ -1016,16 +1021,16 @@ boolean noquest;
         if (depth(&tmp) > ret)
             ret = depth(&tmp);
     }
-    return ((xchar) ret);
+    return (xchar) ret;
 }
 
 /* return a bookkeeping level number for purpose of comparisons and
- * save/restore */
+   save/restore */
 xchar
 ledger_no(lev)
 d_level *lev;
 {
-    return ((xchar)(lev->dlevel + dungeons[lev->dnum].ledger_start));
+    return (xchar) (lev->dlevel + dungeons[lev->dnum].ledger_start);
 }
 
 /*
@@ -1041,8 +1046,8 @@ d_level *lev;
 xchar
 maxledgerno()
 {
-    return (xchar)(dungeons[n_dgns - 1].ledger_start
-                   + dungeons[n_dgns - 1].num_dunlevs);
+    return (xchar) (dungeons[n_dgns - 1].ledger_start
+                    + dungeons[n_dgns - 1].num_dunlevs);
 }
 
 /* return the dungeon that this ledgerno exists in */
@@ -1068,11 +1073,12 @@ xchar
 ledger_to_dlev(ledgerno)
 xchar ledgerno;
 {
-    return (xchar)(ledgerno - dungeons[ledger_to_dnum(ledgerno)].ledger_start);
+    return (xchar) (ledgerno
+                    - dungeons[ledger_to_dnum(ledgerno)].ledger_start);
 }
 
-/* returns the depth of a level, in floors below the surface	*/
-/* (note levels in different dungeons can have the same depth).	*/
+/* returns the depth of a level, in floors below the surface
+   (note levels in different dungeons can have the same depth) */
 schar
 depth(lev)
 d_level *lev;
@@ -1085,8 +1091,8 @@ boolean
 on_level(lev1, lev2)
 d_level *lev1, *lev2;
 {
-    return (boolean) ((lev1->dnum == lev2->dnum)
-                      && (lev1->dlevel == lev2->dlevel));
+    return (boolean) (lev1->dnum == lev2->dnum
+                      && lev1->dlevel == lev2->dlevel);
 }
 
 /* is this level referenced in the special level chain? */
@@ -1098,7 +1104,7 @@ d_level *lev;
 
     for (levtmp = sp_levchn; levtmp; levtmp = levtmp->next)
         if (on_level(lev, &levtmp->dlevel))
-            return (levtmp);
+            return levtmp;
 
     return (s_level *) 0;
 }
@@ -1192,7 +1198,9 @@ int x, y;
         u.ux0 = u.ux, u.uy0 = u.uy;
 }
 
-void u_on_rndspot(upflag) /* place you on a random location */
+/* place you on a random location */
+void
+u_on_rndspot(upflag)
 int upflag;
 {
     int up = (upflag & 1), was_in_W_tower = (upflag & 2);
@@ -1220,7 +1228,9 @@ int upflag;
                       (d_level *) 0);
 }
 
-void u_on_sstairs(upflag) /* place you on the special staircase */
+/* place you on the special staircase */
+void
+u_on_sstairs(upflag)
 int upflag;
 {
     if (sstairs.sx)
@@ -1229,7 +1239,9 @@ int upflag;
         u_on_rndspot(upflag);
 }
 
-void u_on_upstairs() /* place you on upstairs (or special equivalent) */
+/* place you on upstairs (or special equivalent) */
+void
+u_on_upstairs()
 {
     if (xupstair)
         u_on_newpos(xupstair, yupstair);
@@ -1237,7 +1249,9 @@ void u_on_upstairs() /* place you on upstairs (or special equivalent) */
         u_on_sstairs(0); /* destination upstairs implies moving down */
 }
 
-void u_on_dnstairs() /* place you on dnstairs (or special equivalent) */
+/* place you on dnstairs (or special equivalent) */
+void
+u_on_dnstairs()
 {
     if (xdnstair)
         u_on_newpos(xdnstair, ydnstair);
@@ -1249,26 +1263,27 @@ boolean
 On_stairs(x, y)
 xchar x, y;
 {
-    return ((boolean)((x == xupstair && y == yupstair)
+    return (boolean) ((x == xupstair && y == yupstair)
                       || (x == xdnstair && y == ydnstair)
                       || (x == xdnladder && y == ydnladder)
                       || (x == xupladder && y == yupladder)
-                      || (x == sstairs.sx && y == sstairs.sy)));
+                      || (x == sstairs.sx && y == sstairs.sy));
 }
 
 boolean
 Is_botlevel(lev)
 d_level *lev;
 {
-    return ((boolean)(lev->dlevel == dungeons[lev->dnum].num_dunlevs));
+    return (boolean) (lev->dlevel == dungeons[lev->dnum].num_dunlevs);
 }
 
 boolean
 Can_dig_down(lev)
 d_level *lev;
 {
-    return ((boolean)(!level.flags.hardfloor && !Is_botlevel(lev)
-                      && !Invocation_lev(lev)));
+    return (boolean) (!level.flags.hardfloor
+                      && !Is_botlevel(lev)
+                      && !Invocation_lev(lev));
 }
 
 /*
@@ -1280,7 +1295,7 @@ boolean
 Can_fall_thru(lev)
 d_level *lev;
 {
-    return ((boolean)(Can_dig_down(lev) || Is_stronghold(lev)));
+    return (boolean) (Can_dig_down(lev) || Is_stronghold(lev));
 }
 
 /*
@@ -1299,9 +1314,10 @@ d_level *lev;
     if (In_endgame(lev) || In_sokoban(lev)
         || (Is_wiz1_level(lev) && In_W_tower(x, y, lev)))
         return FALSE;
-    return (boolean)(lev->dlevel > 1
-                     || (dungeons[lev->dnum].entry_lev == 1
-                         && ledger_no(lev) != 1 && sstairs.sx && sstairs.up));
+    return (boolean) (lev->dlevel > 1
+                      || (dungeons[lev->dnum].entry_lev == 1
+                          && ledger_no(lev) != 1
+                          && sstairs.sx && sstairs.up));
 }
 
 boolean
@@ -1309,7 +1325,7 @@ has_ceiling(lev)
 d_level *lev;
 {
     /* [what about level 1 of the quest?] */
-    return (!Is_airlevel(lev) && !Is_waterlevel(lev));
+    return (boolean) (!Is_airlevel(lev) && !Is_waterlevel(lev));
 }
 
 /*
@@ -1371,25 +1387,29 @@ int levnum;
     newlevel->dlevel = levnum;
 }
 
-boolean In_quest(lev) /* are you in the quest dungeon? */
+/* are you in the quest dungeon? */
+boolean
+In_quest(lev)
 d_level *lev;
 {
-    return ((boolean)(lev->dnum == quest_dnum));
+    return (boolean) (lev->dnum == quest_dnum);
 }
 
-boolean In_mines(lev) /* are you in the mines dungeon? */
+/* are you in the mines dungeon? */
+boolean
+In_mines(lev)
 d_level *lev;
 {
-    return ((boolean)(lev->dnum == mines_dnum));
+    return (boolean) (lev->dnum == mines_dnum);
 }
 
 /*
  * Return the branch for the given dungeon.
  *
  * This function assumes:
- *	+ This is not called with "Dungeons of Doom".
- *	+ There is only _one_ branch to a given dungeon.
- *	+ Field end2 is the "child" dungeon.
+ *      + This is not called with "Dungeons of Doom".
+ *      + There is only _one_ branch to a given dungeon.
+ *      + Field end2 is the "child" dungeon.
  */
 branch *
 dungeon_branch(s)
@@ -1426,25 +1446,30 @@ const char *s;
     branch *br;
 
     br = dungeon_branch(s);
-    return ((boolean)(on_level(&u.uz, &br->end1) ? TRUE : FALSE));
+    return on_level(&u.uz, &br->end1) ? TRUE : FALSE;
 }
 
-boolean In_V_tower(lev) /* is `lev' part of Vlad's tower? */
-d_level *lev;
-{
-    return ((boolean)(lev->dnum == tower_dnum));
-}
-
+/* is `lev' part of Vlad's tower? */
 boolean
-On_W_tower_level(lev) /* is `lev' a level containing the Wizard's tower? */
+In_V_tower(lev)
 d_level *lev;
 {
-    return (boolean)(Is_wiz1_level(lev) || Is_wiz2_level(lev)
-                     || Is_wiz3_level(lev));
+    return (boolean) (lev->dnum == tower_dnum);
 }
 
-boolean In_W_tower(x, y,
-                   lev) /* is <x,y> of `lev' inside the Wizard's tower? */
+/* is `lev' a level containing the Wizard's tower? */
+boolean
+On_W_tower_level(lev)
+d_level *lev;
+{
+    return (boolean) (Is_wiz1_level(lev)
+                      || Is_wiz2_level(lev)
+                      || Is_wiz3_level(lev));
+}
+
+/* is <x,y> of `lev' inside the Wizard's tower? */
+boolean
+In_W_tower(x, y, lev)
 int x, y;
 d_level *lev;
 {
@@ -1453,7 +1478,7 @@ d_level *lev;
     /*
      * Both of the exclusion regions for arriving via level teleport
      * (from above or below) define the tower's boundary.
-     *	assert( updest.nIJ == dndest.nIJ for I={l|h},J={x|y} );
+     *  assert( updest.nIJ == dndest.nIJ for I={l|h},J={x|y} );
      */
     if (dndest.nlx > 0)
         return (boolean) within_bounded_area(x, y, dndest.nlx, dndest.nly,
@@ -1463,20 +1488,26 @@ d_level *lev;
     return FALSE;
 }
 
-boolean In_hell(lev) /* are you in one of the Hell levels? */
+/* are you in one of the Hell levels? */
+boolean
+In_hell(lev)
 d_level *lev;
 {
-    return ((boolean)(dungeons[lev->dnum].flags.hellish));
+    return (boolean) (dungeons[lev->dnum].flags.hellish);
 }
 
-void find_hell(lev) /* sets *lev to be the gateway to Gehennom... */
+/* sets *lev to be the gateway to Gehennom... */
+void
+find_hell(lev)
 d_level *lev;
 {
     lev->dnum = valley_level.dnum;
     lev->dlevel = 1;
 }
 
-void goto_hell(at_stairs, falling) /* go directly to hell... */
+/* go directly to hell... */
+void
+goto_hell(at_stairs, falling)
 boolean at_stairs, falling;
 {
     d_level lev;
@@ -1485,14 +1516,18 @@ boolean at_stairs, falling;
     goto_level(&lev, at_stairs, falling, FALSE);
 }
 
-void assign_level(dest, src) /* equivalent to dest = source */
+/* equivalent to dest = source */
+void
+assign_level(dest, src)
 d_level *dest, *src;
 {
     dest->dnum = src->dnum;
     dest->dlevel = src->dlevel;
 }
 
-void assign_rnd_level(dest, src, range) /* dest = src + rn1(range) */
+/* dest = src + rn1(range) */
+void
+assign_rnd_level(dest, src, range)
 d_level *dest, *src;
 int range;
 {
@@ -1514,23 +1549,22 @@ int pct;
 
     if (lev && lev->flags.align)
         if (rn2(100) < pct)
-            return (lev->flags.align);
+            return lev->flags.align;
 
     if (dungeons[u.uz.dnum].flags.align)
         if (rn2(100) < pct)
-            return (dungeons[u.uz.dnum].flags.align);
+            return dungeons[u.uz.dnum].flags.align;
 
     al = rn2(3) - 1;
-    return (Align2amask(al));
+    return Align2amask(al);
 }
 
 boolean
 Invocation_lev(lev)
 d_level *lev;
 {
-    return (
-        (boolean)(In_hell(lev)
-                  && lev->dlevel == (dungeons[lev->dnum].num_dunlevs - 1)));
+    return (boolean) (In_hell(lev)
+                      && lev->dlevel == dungeons[lev->dnum].num_dunlevs - 1);
 }
 
 /* use instead of depth() wherever a degree of difficulty is made
@@ -2155,11 +2189,7 @@ d_level *lev;
 #define INTEREST(feat)                                                \
     ((feat).nfount || (feat).nsink || (feat).nthrone || (feat).naltar \
      || (feat).ngrave || (feat).ntree || (feat).nshop || (feat).ntemple)
-/*
-|| ((feat).water) || \
-((feat).ice) || \
-((feat).lava)
-*/
+  /* || (feat).water || (feat).ice || (feat).lava */
 
 /* returns true if this level has something interesting to print out */
 STATIC_OVL boolean
@@ -2187,14 +2217,16 @@ mapseen *mptr;
        have annotations or not, so that #overview doesn't become extremely
        sparse once the rest of the dungeon has been flagged as unreachable */
     if (In_endgame(&u.uz))
-        return In_endgame(&mptr->lev);
+        return (boolean) In_endgame(&mptr->lev);
     /* level is of interest if it has non-zero feature count or known bones
        or user annotation or known connection to another dungeon branch
        or is the furthest level reached in its branch */
-    return (INTEREST(mptr->feat) || (mptr->final_resting_place
-                                     && (mptr->flags.knownbones || wizard))
-            || mptr->custom || mptr->br
-            || mptr->lev.dlevel == dungeons[mptr->lev.dnum].dunlev_ureached);
+    return (boolean) (INTEREST(mptr->feat)
+                      || (mptr->final_resting_place
+                          && (mptr->flags.knownbones || wizard))
+                      || mptr->custom || mptr->br
+                      || (mptr->lev.dlevel
+                          == dungeons[mptr->lev.dnum].dunlev_ureached));
 }
 
 /* recalculate mapseen for the current level */
@@ -2329,20 +2361,23 @@ recalc_mapseen()
 
             switch (lastseentyp[x][y]) {
 #if 0
-	    case ICE:
-		count = mptr->feat.ice + 1;
-		if (count <= 3) mptr->feat.ice = count;
-		break;
-	    case POOL:
-	    case MOAT:
-	    case WATER:
-		count = mptr->feat.water + 1;
-		if (count <= 3) mptr->feat.water = count;
-		break;
-	    case LAVAPOOL:
-		count = mptr->feat.lava + 1;
-		if (count <= 3) mptr->feat.lava = count;
-		break;
+            case ICE:
+                count = mptr->feat.ice + 1;
+                if (count <= 3)
+                    mptr->feat.ice = count;
+                break;
+            case POOL:
+            case MOAT:
+            case WATER:
+                count = mptr->feat.water + 1;
+                if (count <= 3)
+                    mptr->feat.water = count;
+                break;
+            case LAVAPOOL:
+                count = mptr->feat.lava + 1;
+                if (count <= 3)
+                    mptr->feat.lava = count;
+                break;
 #endif
             case TREE:
                 count = mptr->feat.ntree + 1;
@@ -2379,16 +2414,16 @@ recalc_mapseen()
                 if (count <= 3)
                     mptr->feat.naltar = count;
                 break;
-            /*	An automatic annotation is added to the Castle and
-             *	to Fort Ludios once their structure's main entrance
-             *	has been seen (in person or via magic mapping).
+            /*  An automatic annotation is added to the Castle and
+             *  to Fort Ludios once their structure's main entrance
+             *  has been seen (in person or via magic mapping).
              * DOOR: possibly a lowered drawbridge's open portcullis;
              * DBWALL: a raised drawbridge's "closed door";
              * DRAWBRIDGE_DOWN: the span provided by lowered bridge,
-             *	with moat or other terrain hidden underneath;
+             *  with moat or other terrain hidden underneath;
              * DRAWBRIDGE_UP: moat in front of a raised drawbridge,
-             *	not recognizable as a bridge location unless/until
-             *	the adjacent DBWALL has been seen.
+             *  not recognizable as a bridge location unless/until
+             *  the adjacent DBWALL has been seen.
              */
             case DOOR:
                 if (is_drawbridge_wall(x, y) < 0)
@@ -2547,9 +2582,9 @@ branch *br;
     case BR_NO_END1:
         return "Connection";
     case BR_NO_END2:
-        return (br->end1_up) ? "One way stairs up" : "One way stairs down";
+        return br->end1_up ? "One way stairs up" : "One way stairs down";
     case BR_STAIR:
-        return (br->end1_up) ? "Stairs up" : "Stairs down";
+        return br->end1_up ? "Stairs up" : "Stairs down";
     }
 
     return "(unknown)";
@@ -2753,9 +2788,9 @@ boolean printdun;
         buf[0] = 0;
 
         i = 0; /* interest counter */
-               /* List interests in an order vaguely corresponding to
-                * how important they are.
-                */
+        /* List interests in an order vaguely corresponding to
+         * how important they are.
+         */
         if (mptr->feat.nshop > 0) {
             if (mptr->feat.nshop > 1)
                 ADDNTOBUF("shop", mptr->feat.nshop);
@@ -2780,9 +2815,9 @@ boolean printdun;
         ADDNTOBUF("grave", mptr->feat.ngrave);
         ADDNTOBUF("tree", mptr->feat.ntree);
 #if 0
-	ADDTOBUF("water", mptr->feat.water);
-	ADDTOBUF("lava", mptr->feat.lava);
-	ADDTOBUF("ice", mptr->feat.ice);
+        ADDTOBUF("water", mptr->feat.water);
+        ADDTOBUF("lava", mptr->feat.lava);
+        ADDTOBUF("ice", mptr->feat.ice);
 #endif
         /* capitalize afterwards */
         i = strlen(PREFIX);

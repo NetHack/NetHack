@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1446369459 2015/11/01 09:17:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.208 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1446808436 2015/11/06 11:13:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.210 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1471,7 +1471,7 @@ boolean showmsg;
     return TRUE;
 }
 
-int jumping_is_magic;
+static int jumping_is_magic;
 
 void
 display_jump_positions(state)
@@ -1481,6 +1481,7 @@ int state;
         tmp_at(DISP_BEAM, cmap_to_glyph(S_goodpos));
     } else if (state == 1) {
         int x, y, dx, dy;
+
         for (dx = -4; dx <= 4; dx++)
             for (dy = -4; dy <= 4; dy++) {
                 x = dx + (int) u.ux;
@@ -1508,8 +1509,7 @@ int magic; /* 0=Physical, otherwise skill level */
     } else if (!magic && !Jumping) {
         You_cant("jump very far.");
         return 0;
-        /* if steed is immobile, can't do physical jump but can do spell one
-         */
+    /* if steed is immobile, can't do physical jump but can do spell one */
     } else if (!magic && u.usteed && stucksteed(FALSE)) {
         /* stucksteed gave "<steed> won't move" message */
         return 0;
@@ -1587,7 +1587,8 @@ int magic; /* 0=Physical, otherwise skill level */
         if (u.utrap)
             switch (u.utraptype) {
             case TT_BEARTRAP: {
-                register long side = rn2(3) ? LEFT_SIDE : RIGHT_SIDE;
+                long side = rn2(3) ? LEFT_SIDE : RIGHT_SIDE;
+
                 You("rip yourself free of the bear trap!  Ouch!");
                 losehp(Maybe_Half_Phys(rnd(10)), "jumping out of a bear trap",
                        KILLED_BY);
@@ -2718,7 +2719,7 @@ coord *pos;
 int min_range, max_range;
 {
     struct monst *mtmp;
-    struct monst *selmon = NULL;
+    struct monst *selmon = (struct monst *) 0;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
         if (mtmp && !DEADMONSTER(mtmp) && !mtmp->mtame
@@ -3164,7 +3165,7 @@ struct obj *obj;
         /* we want this before the explosion instead of at the very end */
         pline("A wall of force smashes down around you!");
         dmg = d(1 + obj->spe, 6); /* normally 2d12 */
-                                  /*FALLTHRU*/
+        /*FALLTHRU*/
     case WAN_CANCELLATION:
     case WAN_POLYMORPH:
     case WAN_TELEPORTATION:

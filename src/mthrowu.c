@@ -1,4 +1,4 @@
-/* NetHack 3.6	mthrowu.c	$NHDT-Date: 1446604116 2015/11/04 02:28:36 $  $NHDT-Branch: master $:$NHDT-Revision: 1.61 $ */
+/* NetHack 3.6	mthrowu.c	$NHDT-Date: 1446808447 2015/11/06 11:14:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.62 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -135,9 +135,9 @@ int
 ohitmon(mtmp, otmp, range, verbose)
 struct monst *mtmp; /* accidental target, located at <bhitpos.x,.y> */
 struct obj *otmp;   /* missile; might be destroyed by drop_throw */
-int range;          /* how much farther will object travel if it misses */
-                    /* Use -1 to signify to keep going even after hit, */
-                    /* unless its gone (used for rolling_boulder_traps) */
+int range;          /* how much farther will object travel if it misses;
+                       use -1 to signify to keep going even after hit,
+                       unless it's gone (used for rolling_boulder_traps) */
 boolean verbose;    /* give message(s) even when you can't see what happened */
 {
     int damage, tmp;

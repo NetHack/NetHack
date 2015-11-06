@@ -1,4 +1,4 @@
-/* NetHack 3.6	dokick.c	$NHDT-Date: 1446191875 2015/10/30 07:57:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.102 $ */
+/* NetHack 3.6	dokick.c	$NHDT-Date: 1446808441 2015/11/06 11:14:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.103 $ */
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -17,8 +17,8 @@ static NEARDATA const char *gate_str;
 extern boolean notonhead; /* for long worms */
 
 STATIC_DCL void FDECL(kickdmg, (struct monst *, BOOLEAN_P));
-STATIC_DCL boolean
-FDECL(maybe_kick_monster, (struct monst *, XCHAR_P, XCHAR_P));
+STATIC_DCL boolean FDECL(maybe_kick_monster, (struct monst *,
+                                              XCHAR_P, XCHAR_P));
 STATIC_DCL void FDECL(kick_monster, (struct monst *, XCHAR_P, XCHAR_P));
 STATIC_DCL int FDECL(kick_object, (XCHAR_P, XCHAR_P));
 STATIC_DCL int FDECL(really_kick_object, (XCHAR_P, XCHAR_P));
@@ -1655,8 +1655,8 @@ boolean near_hero;
             if (!noscatter)
                 (void) scatter(nx, ny, rnd(2), 0, otmp);
         } else { /* random location */
-                 /* set dummy coordinates because there's no
-                    current position for rloco() to update */
+            /* set dummy coordinates because there's no
+               current position for rloco() to update */
             otmp->ox = otmp->oy = 0;
             if (rloco(otmp) && !nobreak && breaktest(otmp)) {
                 /* assume it broke before player arrived, no messages */

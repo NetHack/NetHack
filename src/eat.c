@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1446189655 2015/10/30 07:20:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.150 $ */
+/* NetHack 3.6	eat.c	$NHDT-Date: 1446808443 2015/11/06 11:14:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.151 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -563,9 +563,9 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
         /* caller handles Int and memory loss */
 
     } else { /* mhitm */
-             /*
-              * monster mind flayer is eating another monster's brain
-              */
+        /*
+         * monster mind flayer is eating another monster's brain
+         */
         if (mindless(pd)) {
             if (visflag)
                 pline("%s doesn't notice.", Monnam(mdef));
@@ -653,6 +653,7 @@ register int pm;
     case PM_KITTEN:
     case PM_HOUSECAT:
     case PM_LARGE_CAT:
+        /* cannibals are allowed to eat domestic animals without penalty */
         if (!CANNIBAL_ALLOWED()) {
             You_feel("that eating the %s was a bad idea.", mons[pm].mname);
             HAggravate_monster |= FROMOUTSIDE;
@@ -956,21 +957,20 @@ register int pm;
             HSee_invisible |= FROMOUTSIDE;
         }
         newsym(u.ux, u.uy);
-    /* fall into next case */
+        /*FALLTHRU*/
     case PM_YELLOW_LIGHT:
-    /* fall into next case */
     case PM_GIANT_BAT:
         make_stunned((HStun & TIMEOUT) + 30L, FALSE);
-    /* fall into next case */
+        /*FALLTHRU*/
     case PM_BAT:
         make_stunned((HStun & TIMEOUT) + 30L, FALSE);
         break;
     case PM_GIANT_MIMIC:
         tmp += 10;
-    /* fall into next case */
+        /*FALLTHRU*/
     case PM_LARGE_MIMIC:
         tmp += 20;
-    /* fall into next case */
+        /*FALLTHRU*/
     case PM_SMALL_MIMIC:
         tmp += 20;
         if (youmonst.data->mlet != S_MIMIC && !Unchanging) {
@@ -984,12 +984,11 @@ register int pm;
                 dismount_steed(DISMOUNT_FELL);
             nomul(-tmp);
             multi_reason = "pretending to be a pile of gold";
-            Sprintf(
-                buf,
-                Hallucination
-                    ? "You suddenly dread being peeled and mimic %s again!"
-                    : "You now prefer mimicking %s again.",
-                an(Upolyd ? youmonst.data->mname : urace.noun));
+            Sprintf(buf,
+                    Hallucination
+                       ? "You suddenly dread being peeled and mimic %s again!"
+                       : "You now prefer mimicking %s again.",
+                    an(Upolyd ? youmonst.data->mname : urace.noun));
             eatmbuf = dupstr(buf);
             nomovemsg = eatmbuf;
             afternmv = eatmdone;
@@ -1548,6 +1547,7 @@ struct obj *otmp;
 
     if (mnum != PM_ACID_BLOB && !stoneable && rotted > 5L) {
         boolean cannibal = maybe_cannibal(mnum, FALSE);
+
         pline("Ulch - that %s was tainted%s!",
               mons[mnum].mlet == S_FUNGUS
                   ? "fungoid vegetation"
@@ -1619,15 +1619,15 @@ struct obj *otmp;
         You("peck the eyeball with delight.");
     } else {
         /* [is this right?  omnivores end up always disliking the taste] */
-        boolean yummy =
-            (vegan(&mons[mnum])
-                 ? (!carnivorous(youmonst.data) && herbivorous(youmonst.data))
-                 : (carnivorous(youmonst.data)
-                    && !herbivorous(youmonst.data)));
+        boolean yummy = vegan(&mons[mnum])
+                           ? (!carnivorous(youmonst.data)
+                              && herbivorous(youmonst.data))
+                           : (carnivorous(youmonst.data)
+                              && !herbivorous(youmonst.data));
 
-        pline("%s%s %s!", type_is_pname(&mons[mnum])
-                              ? ""
-                              : the_unique_pm(&mons[mnum]) ? "The " : "This ",
+        pline("%s%s %s!",
+              type_is_pname(&mons[mnum])
+                 ? "" : the_unique_pm(&mons[mnum]) ? "The " : "This ",
               food_xname(otmp, FALSE),
               Hallucination
                   ? (yummy ? ((u.umonnum == PM_TIGER) ? "is gr-r-reat"
@@ -1886,8 +1886,9 @@ struct obj *otmp;
                     makeknown(typ);
                 }
                 break;
-            }
-            break;
+            } /* inner switch */
+            break; /* default case of outer switch */
+
         case RIN_ADORNMENT:
             accessory_has_effect(otmp);
             if (adjattrib(A_CHA, otmp->spe, -1))
@@ -1916,8 +1917,8 @@ struct obj *otmp;
         case RIN_PROTECTION:
             accessory_has_effect(otmp);
             HProtection |= FROMOUTSIDE;
-            u.ublessed =
-                bounded_increase(u.ublessed, otmp->spe, RIN_PROTECTION);
+            u.ublessed = bounded_increase(u.ublessed, otmp->spe,
+                                          RIN_PROTECTION);
             context.botl = 1;
             break;
         case RIN_FREE_ACTION:
@@ -1948,8 +1949,7 @@ struct obj *otmp;
             /* no message--this gives no permanent effect */
             choke(otmp);
             break;
-        case AMULET_OF_RESTFUL_SLEEP: /* another bad idea! */
-        {
+        case AMULET_OF_RESTFUL_SLEEP: { /* another bad idea! */
             long newnap = (long) rnd(100), oldnap = (HSleepy & TIMEOUT);
 
             if (!(HSleepy & FROMOUTSIDE))
@@ -1958,13 +1958,14 @@ struct obj *otmp;
             /* might also be wearing one; use shorter of two timeouts */
             if (newnap < oldnap || oldnap == 0L)
                 HSleepy = (HSleepy & ~TIMEOUT) | newnap;
-        } break;
+            break;
+        }
         case RIN_SUSTAIN_ABILITY:
         case AMULET_OF_LIFE_SAVING:
         case AMULET_OF_REFLECTION: /* nice try */
-                                   /* can't eat Amulet of Yendor or fakes,
-                                    * and no oc_prop even if you could -3.
-                                    */
+            /* can't eat Amulet of Yendor or fakes,
+             * and no oc_prop even if you could -3.
+             */
             break;
         }
     }
@@ -2171,12 +2172,12 @@ STATIC_OVL int
 edibility_prompts(otmp)
 struct obj *otmp;
 {
-    /* blessed food detection granted you a one-use
-       ability to detect food that is unfit for consumption
-       or dangerous and avoid it. */
-
-    char buf[BUFSZ], foodsmell[BUFSZ], it_or_they[QBUFSZ],
-        eat_it_anyway[QBUFSZ];
+    /* Blessed food detection grants hero a one-use
+     * ability to detect food that is unfit for consumption
+     * or dangerous and avoid it.
+     */
+    char buf[BUFSZ], foodsmell[BUFSZ],
+         it_or_they[QBUFSZ], eat_it_anyway[QBUFSZ];
     boolean cadaver = (otmp->otyp == CORPSE), stoneorslime = FALSE;
     int material = objects[otmp->otyp].oc_material, mnum = otmp->corpsenm;
     long rotted = 0L;
@@ -2210,7 +2211,6 @@ struct obj *otmp;
      * These problems with food should be checked in
      * order from most detrimental to least detrimental.
      */
-
     if (cadaver && mnum != PM_ACID_BLOB && rotted > 5L && !Sick_resistance) {
         /* Tainted meat */
         Sprintf(buf, "%s like %s could be tainted! %s", foodsmell, it_or_they,
@@ -2334,8 +2334,8 @@ doeat()
     if (u.uedibility) {
         int res = edibility_prompts(otmp);
         if (res) {
-            Your("%s stops tingling and your sense of smell returns to "
-                 "normal.",
+            Your(
+               "%s stops tingling and your sense of smell returns to normal.",
                  body_part(NOSE));
             u.uedibility = 0;
             if (res == 1)
@@ -2564,8 +2564,8 @@ doeat()
         /* possible if most has been eaten before */
         context.victual.nmod = 0;
     else if ((int) otmp->oeaten >= context.victual.reqtime)
-        context.victual.nmod =
-            -((int) otmp->oeaten / context.victual.reqtime);
+        context.victual.nmod = -((int) otmp->oeaten
+                                 / context.victual.reqtime);
     else
         context.victual.nmod = context.victual.reqtime % otmp->oeaten;
     context.victual.canchoke = (u.uhs == SATIATED);

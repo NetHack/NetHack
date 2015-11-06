@@ -1,4 +1,4 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1446604115 2015/11/04 02:28:35 $  $NHDT-Branch: master $:$NHDT-Revision: 1.77 $ */
+/* NetHack 3.6	monmove.c	$NHDT-Date: 1446808446 2015/11/06 11:14:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.78 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -567,17 +567,15 @@ toofar:
         if (tmp != 2)
             distfleeck(mtmp, &inrange, &nearby, &scared); /* recalc */
 
-        switch (tmp) {
+        switch (tmp) { /* for pets, cases 0 and 3 are equivalent */
         case 0: /* no movement, but it can still attack you */
         case 3: /* absolutely no movement */
-                /* for pets, case 0 and 3 are equivalent */
             /* vault guard might have vanished */
-            if (mtmp->isgd
-                && (mtmp->mhp < 1 || (mtmp->mx == 0 && mtmp->my == 0)))
+            if (mtmp->isgd && (mtmp->mhp < 1 || !mtmp->mx == 0))
                 return 1; /* behave as if it died */
-                          /* During hallucination, monster appearance should
-                           * still change - even if it doesn't move.
-                           */
+            /* During hallucination, monster appearance should
+             * still change - even if it doesn't move.
+             */
             if (Hallucination)
                 newsym(mtmp->mx, mtmp->my);
             break;

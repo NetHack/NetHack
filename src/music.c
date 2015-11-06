@@ -1,5 +1,5 @@
-/* NetHack 3.6	music.c	$NHDT-Date: 1432512773 2015/05/25 00:12:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.38 $ */
-/*	Copyright (c) 1989 by Jean-Christophe Collet */
+/* NetHack 3.6	music.c	$NHDT-Date: 1446808448 2015/11/06 11:14:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.40 $ */
+/*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -8,23 +8,22 @@
  *
  * Actually the list of instruments / effects is :
  *
- * (wooden) flute	may calm snakes if player has enough dexterity
- * magic flute		may put monsters to sleep:  area of effect depends
- *			on player level.
- * (tooled) horn	Will awaken monsters:  area of effect depends on
- *player
- *			level.  May also scare monsters.
- * fire horn		Acts like a wand of fire.
- * frost horn		Acts like a wand of cold.
- * bugle		Will awaken soldiers (if any):  area of effect depends
- *			on player level.
- * (wooden) harp	May calm nymph if player has enough dexterity.
- * magic harp		Charm monsters:  area of effect depends on player
- *			level.
- * (leather) drum	Will awaken monsters like the horn.
- * drum of earthquake	Will initiate an earthquake whose intensity depends
- *			on player level.  That is, it creates random pits
- *			called here chasms.
+ * (wooden) flute       may calm snakes if player has enough dexterity
+ * magic flute          may put monsters to sleep:  area of effect depends
+ *                      on player level.
+ * (tooled) horn        Will awaken monsters:  area of effect depends on
+ *                      player level.  May also scare monsters.
+ * fire horn            Acts like a wand of fire.
+ * frost horn           Acts like a wand of cold.
+ * bugle                Will awaken soldiers (if any):  area of effect depends
+ *                      on player level.
+ * (wooden) harp        May calm nymph if player has enough dexterity.
+ * magic harp           Charm monsters:  area of effect depends on player
+ *                      level.
+ * (leather) drum       Will awaken monsters like the horn.
+ * drum of earthquake   Will initiate an earthquake whose intensity depends
+ *                      on player level.  That is, it creates random pits
+ *                      called here chasms.
  */
 
 #include "hack.h"
@@ -73,7 +72,8 @@ int distance;
             mtmp->mcanmove = 1;
             mtmp->mfrozen = 0;
             /* may scare some monsters -- waiting monsters excluded */
-            if (!unique_corpstat(mtmp->data) && (mtmp->mstrategy & STRAT_WAITMASK) != 0)
+            if (!unique_corpstat(mtmp->data)
+                && (mtmp->mstrategy & STRAT_WAITMASK) != 0)
                 mtmp->mstrategy &= ~STRAT_WAITMASK;
             else if (distm < distance / 3
                      && !resist(mtmp, TOOL_CLASS, 0, NOTELL))
@@ -160,7 +160,7 @@ int distance;
             if (canseemon(mtmp))
                 pline(
                     "%s listens cheerfully to the music, then seems quieter.",
-                    Monnam(mtmp));
+                      Monnam(mtmp));
         }
     }
 }
@@ -195,7 +195,8 @@ struct monst *bugler; /* monster that played instrument */
             mtmp->mcanmove = 1;
             mtmp->mfrozen = 0;
             /* may scare some monsters -- waiting monsters excluded */
-            if (!unique_corpstat(mtmp->data) && (mtmp->mstrategy & STRAT_WAITMASK) != 0)
+            if (!unique_corpstat(mtmp->data)
+                && (mtmp->mstrategy & STRAT_WAITMASK) != 0)
                 mtmp->mstrategy &= ~STRAT_WAITMASK;
             else if (distm < distance / 3
                      && !resist(mtmp, TOOL_CLASS, 0, NOTELL))
@@ -207,7 +208,6 @@ struct monst *bugler; /* monster that played instrument */
 /* Charm monsters in range.  Note that they may resist the spell.
  * If swallowed, range is reduced to 0.
  */
-
 STATIC_OVL void
 charm_monsters(distance)
 int distance;
@@ -234,7 +234,6 @@ int distance;
 /* Generate earthquake :-) of desired force.
  * That is:  create random chasms (pits).
  */
-
 STATIC_OVL void
 do_earthquake(force)
 int force;
@@ -338,7 +337,6 @@ int force;
 
                     /* We have to check whether monsters or player
                        falls in a chasm... */
-
                     if (mtmp) {
                         if (!is_flyer(mtmp->data)
                             && !is_clinger(mtmp->data)) {
@@ -431,7 +429,6 @@ int force;
 /*
  * The player is trying to extract something from his/her instrument.
  */
-
 STATIC_OVL int
 do_improvisation(instr)
 struct obj *instr;
@@ -497,9 +494,9 @@ struct obj *instr;
             } else if (!u.dx && !u.dy && !u.dz) {
                 if ((damage = zapyourself(instr, TRUE)) != 0) {
                     char buf[BUFSZ];
+
                     Sprintf(buf, "using a magical horn on %sself", uhim());
-                    losehp(damage, buf, KILLED_BY); /* frost damage */
-                                                    /* fire damage */
+                    losehp(damage, buf, KILLED_BY); /* fire or frost damage */
                 }
             } else {
                 buzz((instr->otyp == FROST_HORN) ? AD_COLD - 1 : AD_FIRE - 1,
@@ -563,7 +560,6 @@ struct obj *instr;
 /*
  * So you want music...
  */
-
 int
 do_play_instrument(instr)
 struct obj *instr;
@@ -575,13 +571,13 @@ struct obj *instr;
 
     if (Underwater) {
         You_cant("play music underwater!");
-        return (0);
+        return 0;
     } else if ((instr->otyp == WOODEN_FLUTE || instr->otyp == MAGIC_FLUTE
                 || instr->otyp == TOOLED_HORN || instr->otyp == FROST_HORN
                 || instr->otyp == FIRE_HORN || instr->otyp == BUGLE)
                && !can_blow(&youmonst)) {
         You("are incapable of playing %s.", the(distant_name(instr, xname)));
-        return (0);
+        return 0;
     }
     if (instr->otyp != LEATHER_DRUM && instr->otyp != DRUM_OF_EARTHQUAKE) {
         c = ynq("Improvise?");
@@ -634,6 +630,7 @@ struct obj *instr;
         {
             char nbuf[20];
             int i;
+
             for (i = 0; buf[i] && i < 5; ++i) {
                 nbuf[i * 2] = buf[i];
                 nbuf[(i * 2) + 1] = 'h';
@@ -799,9 +796,9 @@ char *buf;
 
 #define noDEBUG
 
+/* emit tone of frequency hz for given number of ticks */
 STATIC_OVL void
 tone(hz, ticks)
-/* emit tone of frequency hz for given number of ticks */
 unsigned int hz, ticks;
 {
     ioctl(0, KDMKTONE, hz | ((ticks * 10) << 16));
@@ -811,9 +808,9 @@ unsigned int hz, ticks;
     nap(ticks * 10);
 }
 
+/* rest for given number of ticks */
 STATIC_OVL void
 rest(ticks)
-/* rest for given number of ticks */
 int ticks;
 {
     nap(ticks * 10);
@@ -852,8 +849,10 @@ char *buf;
     playstring(buf, strlen(buf));
 }
 
-#ifdef DEBUG
-main(argc, argv) char *argv[];
+#ifdef VPIX_DEBUG
+main(argc, argv)
+int argc;
+char *argv[];
 {
     if (argc == 2) {
         playinit();

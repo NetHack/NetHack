@@ -1,4 +1,4 @@
-/* NetHack 3.6	ball.c	$NHDT-Date: 1445301116 2015/10/20 00:31:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.27 $ */
+/* NetHack 3.6	ball.c	$NHDT-Date: 1446808438 2015/11/06 11:13:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.28 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -56,10 +56,10 @@ ballfall()
  *  To make this work, we have to mess with the hero's mind.  The rules for
  *  ball&chain are:
  *
- *	1. If the hero can see them, fine.
- *	2. If the hero can't see either, it isn't seen.
- *	3. If either is felt it is seen.
- *	4. If either is felt and moved, it disappears.
+ *      1. If the hero can see them, fine.
+ *      2. If the hero can't see either, it isn't seen.
+ *      3. If either is felt it is seen.
+ *      4. If either is felt and moved, it disappears.
  *
  *  If the hero can see, then when a move is done, the ball and chain are
  *  first picked up, the positions under them are corrected, then they
@@ -77,12 +77,12 @@ ballfall()
 
 /*
  * from you.h
- *	int u.bglyph		glyph under the ball
- *	int u.cglyph		glyph under the chain
- *	int u.bc_felt		mask for ball/chain being felt
- *	#define BC_BALL  0x01	bit mask in u.bc_felt for ball
- *	#define BC_CHAIN 0x02	bit mask in u.bc_felt for chain
- *	int u.bc_order		ball & chain order
+ *      int u.bglyph            glyph under the ball
+ *      int u.cglyph            glyph under the chain
+ *      int u.bc_felt           mask for ball/chain being felt
+ *      #define BC_BALL  0x01   bit mask in u.bc_felt for ball
+ *      #define BC_CHAIN 0x02   bit mask in u.bc_felt for chain
+ *      int u.bc_order          ball & chain order
  *
  * u.bc_felt is also manipulated in display.c and read.c, the others only
  * in this file.  None of these variables are valid unless the player is
@@ -479,7 +479,7 @@ boolean allow_drag;
                 && !already_in_rock) {
                 if (allow_drag) {
                     /* Avoid pathological case *if* not teleporting:
-                     *   0			    0_
+                     *   0                          0_
                      *   _X  move northeast  ----->  X@
                      *    @
                      */
@@ -487,9 +487,9 @@ boolean allow_drag;
                         && dist2(x, y, tempx, tempy) == 1)
                         SKIP_TO_DRAG;
                     /* Avoid pathological case *if* not teleporting:
-                     *    0			     0
+                     *    0                          0
                      *   _X  move east       ----->  X_
-                     *    @			      @
+                     *    @                           @
                      */
                     if (dist2(u.ux, u.uy, uball->ox, uball->oy) == 4
                         && dist2(x, y, tempx, tempy) == 2)
@@ -694,8 +694,9 @@ drop_ball(x, y)
 xchar x, y;
 {
     if (Blind) {
-        u.bc_order = bc_order(); /* get the order */
-                                 /* pick up glyph */
+        /* get the order */
+        u.bc_order = bc_order();
+        /* pick up glyph */
         u.bglyph = (u.bc_order) ? u.cglyph : levl[x][y].glyph;
     }
 
@@ -796,14 +797,13 @@ drag_down()
     uchar dragchance = 3;
 
     /*
-     *	Assume that the ball falls forward if:
+     *  Assume that the ball falls forward if:
      *
-     *	a) the character is wielding it, or
-     *	b) the character has both hands available to hold it (i.e. is
-     *	   not wielding any weapon), or
-     *	c) (perhaps) it falls forward out of his non-weapon hand
+     *  a) the character is wielding it, or
+     *  b) the character has both hands available to hold it (i.e. is
+     *     not wielding any weapon), or
+     *  c) (perhaps) it falls forward out of his non-weapon hand
      */
-
     forward = carried(uball) && (uwep == uball || !uwep || !rn2(3));
 
     if (carried(uball))
