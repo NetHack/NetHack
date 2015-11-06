@@ -2340,7 +2340,7 @@ recalc_mapseen()
      * we could track "features" and then update them all here, and keep
      * track of when new features are created or destroyed, but this
      * seemed the most elegant, despite adding more data to struct rm.
-     * [3.5.0: we're using lastseentyp[][] rather than level.locations
+     * [3.6.0: we're using lastseentyp[][] rather than level.locations
      * to track the features seen.]
      *
      * Although no current windowing systems (can) do this, this would add

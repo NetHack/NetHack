@@ -271,7 +271,7 @@ dothrow()
      * Prior to 3.3.0, command ``3t'' meant ``t(shoot) t(shoot) t(shoot)''
      * and took 3 turns.  Now it means ``t(shoot at most 3 missiles)''.
      *
-     * [3.5.0:  shot count setup has been moved into ok_to_throw().]
+     * [3.6.0:  shot count setup has been moved into ok_to_throw().]
      */
     if (!ok_to_throw(&shotlimit))
         return 0;

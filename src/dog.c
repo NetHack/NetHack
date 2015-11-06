@@ -856,7 +856,7 @@ register struct obj *obj;
 }
 
 /*
- * With the separate mextra structure added in 3.5.x this always
+ * With the separate mextra structure added in 3.6.x this always
  * operates on the original mtmp. It now returns TRUE if the taming
  * succeeded.
  */

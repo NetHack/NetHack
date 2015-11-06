@@ -15,7 +15,7 @@
  * this also happens with real fortune cookies.  -dgk
  */
 
-/*      3.5
+/*      3.6
  * The rumors file consists of a "do not edit" line, then a line containing
  * three sets of three counts (first two in decimal, third in hexadecimal).
  * The first set has the number of true rumors, the count in bytes for all

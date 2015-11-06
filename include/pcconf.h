@@ -17,7 +17,7 @@
  *     _MSC_VER is defined automatically by Microsoft C.
  *     __BORLANDC__ is defined automatically by Borland C.
  *     __SC__ is defined automatically by Symantec C.
- *	Note: 3.5.x was not verified with Symantec C.
+ *	Note: 3.6.x was not verified with Symantec C.
  */
 
 /*

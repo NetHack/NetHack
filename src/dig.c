@@ -1387,7 +1387,7 @@ zap_dig()
      * an ACCESSIBLE place.
      * Currently: dig for digdepth positions;
      * also down on request of Lennart Augustsson.
-     * 3.5.0: from a PIT: dig one adjacent pit.
+     * 3.6.0: from a PIT: dig one adjacent pit.
      */
 
     if (u.uswallow) {

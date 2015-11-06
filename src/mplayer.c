@@ -9,7 +9,7 @@ STATIC_DCL void FDECL(get_mplname, (struct monst *, char *));
 STATIC_DCL void FDECL(mk_mplayer_armor, (struct monst *, SHORT_P));
 
 /* These are the names of those who
- * contributed to the development of NetHack 3.2/3.3/3.4/3.5.
+ * contributed to the development of NetHack 3.2/3.3/3.4/3.6.
  *
  * Keep in alphabetical order within teams.
  * Same first name is entered once within each team.

@@ -1931,7 +1931,7 @@ char *str;
  * trying to get those right here.
  *
  * Also misused by muse.c to convert 1st person present verbs to 2nd person.
- * 3.5.0: made case-insensitive.
+ * 3.6.0: made case-insensitive.
  */
 char *
 makeplural(oldstr)
@@ -2096,7 +2096,7 @@ bottom:
  *
  * A lot of unique monsters have names ending in s; plural, or singular
  * from plural, doesn't make much sense for them so we don't bother trying.
- * 3.5.0: made case-insensitive.
+ * 3.6.0: made case-insensitive.
  */
 char *
 makesingular(oldstr)

@@ -202,7 +202,7 @@ int mndx;
     int mcham = NON_PM;
 
     /*
-     * As of 3.5.0 we just check M2_SHAPESHIFTER instead of having a
+     * As of 3.6.0 we just check M2_SHAPESHIFTER instead of having a
      * big switch statement with hardcoded shapeshifter types here.
      */
     if (mndx >= LOW_PM && is_shapeshifter(&mons[mndx]))
