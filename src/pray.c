@@ -1,4 +1,4 @@
-/* NetHack 3.6	pray.c	$NHDT-Date: 1446191091 2015/10/30 07:44:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.86 $ */
+/* NetHack 3.6	pray.c	$NHDT-Date: 1446854232 2015/11/06 23:57:12 $  $NHDT-Branch: master $:$NHDT-Revision: 1.87 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1017,8 +1017,8 @@ aligntyp g_align;
                     verbalize("Hark, %s!", youmonst.data->mlet == S_HUMAN
                                                ? "mortal"
                                                : "creature");
-                    verbalize("To enter the castle, thou must play the right "
-                              "tune!");
+                    verbalize(
+                       "To enter the castle, thou must play the right tune!");
                     u.uevent.uheard_tune++;
                     break;
                 } else if (u.uevent.uheard_tune < 2) {
@@ -1236,8 +1236,8 @@ register struct obj *otmp;
             Your("sacrifice puffs up, swelling bigger and bigger, and pops!");
             break;
         case 2:
-            Your("sacrifice collapses into a cloud of dancing particles and "
-                 "fades away!");
+            Your(
+     "sacrifice collapses into a cloud of dancing particles and fades away!");
             break;
         }
     else if (Blind && u.ualign.type == A_LAWFUL)
@@ -1328,8 +1328,8 @@ dosacrifice()
                 /* Human sacrifice on a chaotic or unaligned altar */
                 /* is equivalent to demon summoning */
                 if (altaralign == A_CHAOTIC && u.ualign.type != A_CHAOTIC) {
-                    pline("The blood floods the altar, which vanishes in %s "
-                          "cloud!",
+                    pline(
+                    "The blood floods the altar, which vanishes in %s cloud!",
                           an(hcolor(NH_BLACK)));
                     levl[u.ux][u.uy].typ = ROOM;
                     levl[u.ux][u.uy].altarmask = 0;
@@ -1484,12 +1484,12 @@ dosacrifice()
             } else { /* super big win */
                 adjalign(10);
                 u.uachieve.ascended = 1;
-                pline("An invisible choir sings, and you are bathed in "
-                      "radiance...");
+                pline(
+               "An invisible choir sings, and you are bathed in radiance...");
                 godvoice(altaralign, "Congratulations, mortal!");
                 display_nhwindow(WIN_MESSAGE, FALSE);
-                verbalize("In return for thy service, I grant thee the gift "
-                          "of Immortality!");
+                verbalize(
+          "In return for thy service, I grant thee the gift of Immortality!");
                 You("ascend to the status of Demigod%s...",
                     flags.female ? "dess" : "");
                 done(ASCENDED);

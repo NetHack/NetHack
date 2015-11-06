@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1446713640 2015/11/05 08:54:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.115 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1446854234 2015/11/06 23:57:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.116 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2834,8 +2834,8 @@ xchar x, y;
         if ((eshkp->robbed -= offer < 0L))
             eshkp->robbed = 0L;
         if (offer && !muteshk(shkp))
-            verbalize("Thank you for your contribution to restock this "
-                      "recently plundered shop.");
+            verbalize(
+  "Thank you for your contribution to restock this recently plundered shop.");
         subfrombill(obj, shkp);
         return;
     }
@@ -3012,16 +3012,13 @@ xchar x, y;
                 obj->no_charge = 1;
             subfrombill(obj, shkp);
             pay(-offer, shkp);
-            shk_names_obj(
-                shkp, obj,
-                (sell_how != SELL_NORMAL)
-                    ? (!ltmp && cltmp && only_partially_your_contents)
-                          ? "sold some items inside %s for %ld gold "
-                            "piece%s.%s"
-                          : "sold %s for %ld gold piece%s.%s"
-                    : "relinquish %s and receive %ld gold piece%s in "
-                      "compensation.%s",
-                offer, "");
+            shk_names_obj(shkp, obj,
+                          (sell_how != SELL_NORMAL)
+                           ? ((!ltmp && cltmp && only_partially_your_contents)
+                         ? "sold some items inside %s for %ld gold piece%s.%s"
+                         : "sold %s for %ld gold piece%s.%s")
+            : "relinquish %s and receive %ld gold piece%s in compensation.%s",
+                          offer, "");
             break;
         default:
             impossible("invalid sell response");

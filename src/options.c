@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1446808448 2015/11/06 11:14:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.235 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1446854231 2015/11/06 23:57:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.236 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -4084,7 +4084,7 @@ boolean setinitial, setfromfile;
             mttyp = query_msgtype();
             if (mttyp == -1)
                 goto msgtypes_again;
-	    if (!msgtype_add(mttyp, mtbuf)) {
+            if (!msgtype_add(mttyp, mtbuf)) {
                 pline("Error adding the message type.");
                 wait_synch();
                 goto msgtypes_again;
@@ -5017,8 +5017,7 @@ static const char *opt_intro[] = {
     "-- for example, $ DEFINE NETHACKOPTIONS \"noautopickup,fruit:kumquat\"",
 #endif
     "or press \"O\" while playing and use the menu.", "",
-    "Boolean options (which can be negated by prefixing them with '!' or "
-    "\"no\"):",
+ "Boolean options (which can be negated by prefixing them with '!' or \"no\"):",
     (char *) 0
 };
 

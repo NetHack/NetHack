@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitm.c	$NHDT-Date: 1446604113 2015/11/04 02:28:33 $  $NHDT-Branch: master $:$NHDT-Revision: 1.82 $ */
+/* NetHack 3.6	mhitm.c	$NHDT-Date: 1446854229 2015/11/06 23:57:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.83 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -568,8 +568,8 @@ struct attack *mattk;
             }
             if (mdef->minvis && !perceives(magr->data)) {
                 if (canseemon(magr)) {
-                    pline("%s doesn't seem to notice that %s gaze was "
-                          "reflected.",
+                    pline(
+                      "%s doesn't seem to notice that %s gaze was reflected.",
                           Monnam(magr), mhis(magr));
                 }
                 return MM_MISS;

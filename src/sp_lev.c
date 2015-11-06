@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1446713642 2015/11/05 08:54:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.66 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1446854235 2015/11/06 23:57:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.69 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1652,8 +1652,8 @@ struct mkroom *croom;
                 break;
             }
             default:
-                impossible("create_monster: unimplemented mon appear type "
-                           "[%d,\"%s\"]",
+                impossible(
+                  "create_monster: unimplemented mon appear type [%d,\"%s\"]",
                            m->appear, m->appear_as.str);
                 break;
             }
@@ -1841,8 +1841,8 @@ struct mkroom *croom;
                 remove_object(otmp);
                 if (mpickobj(invent_carrying_monster, otmp)) {
                     if (inuse > -1) {
-                        impossible("container given to monster was merged or "
-                                   "deallocated.");
+                        impossible(
+                     "container given to monster was merged or deallocated.");
                         for (ci = inuse; ci < container_idx - 1; ci++)
                             container_obj[ci] = container_obj[ci + 1];
                         container_obj[container_idx] = NULL;

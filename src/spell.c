@@ -1,4 +1,4 @@
-/* NetHack 3.6	spell.c	$NHDT-Date: 1446632870 2015/11/04 10:27:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.68 $ */
+/* NetHack 3.6	spell.c	$NHDT-Date: 1446854236 2015/11/06 23:57:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.70 $ */
 /*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -182,8 +182,8 @@ struct obj *spellbook;
 
     if (!rn2(3) && spellbook->otyp != SPE_BOOK_OF_THE_DEAD) {
         spellbook->in_use = TRUE; /* in case called from learn */
-        pline("Being confused you have difficulties in controlling your "
-              "actions.");
+        pline(
+         "Being confused you have difficulties in controlling your actions.");
         display_nhwindow(WIN_MESSAGE, FALSE);
         You("accidentally tear the spellbook to pieces.");
         if (!objects[spellbook->otyp].oc_name_known
@@ -387,9 +387,9 @@ learn(VOID_ARGS)
            known, in case amnesia made you forget the book */
         makeknown((int) booktype);
     } else { /* (spellid(i) == NO_SPELL) */
-             /* for a normal book, spestudied will be zero, but for
-                a polymorphed one, spestudied will be non-zero and
-                one less reading is available than when re-learning */
+        /* for a normal book, spestudied will be zero, but for
+           a polymorphed one, spestudied will be non-zero and
+           one less reading is available than when re-learning */
         if (book->spestudied >= MAX_SPELL_STUDY) {
             /* pre-used due to being the product of polymorph */
             pline("This spellbook is too faint to read even once.");
@@ -520,8 +520,8 @@ register struct obj *spellbook;
                 /* only wizards know if a spell is too difficult */
                 if (Role_if(PM_WIZARD) && read_ability < 20 && !confused) {
                     char qbuf[QBUFSZ];
-                    Sprintf(qbuf, "This spellbook is %sdifficult to "
-                                  "comprehend. Continue?",
+                    Sprintf(qbuf,
+                     "This spellbook is %sdifficult to comprehend. Continue?",
                             (read_ability < 12 ? "very " : ""));
                     if (yn(qbuf) != 'y') {
                         spellbook->in_use = FALSE;

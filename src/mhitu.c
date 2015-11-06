@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitu.c	$NHDT-Date: 1445556872 2015/10/22 23:34:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.129 $ */
+/* NetHack 3.6	mhitu.c	$NHDT-Date: 1446854230 2015/11/06 23:57:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.130 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -114,11 +114,9 @@ struct attack *mattk;
            it's better than "sting" when not a stinging attack... */
         return (!mwep || !mwep->opoisoned) ? "attack" : "weapon";
     } else {
-        return (mattk->aatyp == AT_TUCH)
-                   ? "contact"
-                   : (mattk->aatyp == AT_GAZE)
-                         ? "gaze"
-                         : (mattk->aatyp == AT_BITE) ? "bite" : "sting";
+        return (mattk->aatyp == AT_TUCH) ? "contact"
+                  : (mattk->aatyp == AT_GAZE) ? "gaze"
+                       : (mattk->aatyp == AT_BITE) ? "bite" : "sting";
     }
 }
 
@@ -281,12 +279,12 @@ struct attack *alt_attk_buf;
 
 /*
  * mattacku: monster attacks you
- *	returns 1 if monster dies (e.g. "yellow light"), 0 otherwise
- *	Note: if you're displaced or invisible the monster might attack the
- *		wrong position...
- *	Assumption: it's attacking you or an empty square; if there's another
- *		monster which it attacks by mistake, the caller had better
- *		take care of it...
+ *      returns 1 if monster dies (e.g. "yellow light"), 0 otherwise
+ *      Note: if you're displaced or invisible the monster might attack the
+ *              wrong position...
+ *      Assumption: it's attacking you or an empty square; if there's another
+ *              monster which it attacks by mistake, the caller had better
+ *              take care of it...
  */
 int
 mattacku(mtmp)
@@ -323,9 +321,8 @@ register struct monst *mtmp;
         foundyou = 1;
         if (u.uinvulnerable)
             return 0; /* stomachs can't hurt you! */
-    }
 
-    else if (u.usteed) {
+    } else if (u.usteed) {
         if (mtmp == u.usteed)
             /* Your steed won't attack you */
             return 0;
@@ -410,9 +407,9 @@ register struct monst *mtmp;
 
         } else {
             /* surface hider */
-            if (!youseeit)
+            if (!youseeit) {
                 pline("It tries to move where you are hiding.");
-            else {
+            } else {
                 /* Ugly kludge for eggs.  The message is phrased so as
                  * to be directed at the monster, not the player,
                  * which makes "laid by you" wrong.  For the
@@ -425,6 +422,7 @@ register struct monst *mtmp;
                     || (youmonst.data->mlet == S_EEL
                         && is_pool(u.ux, u.uy))) {
                     int save_spe = 0; /* suppress warning */
+
                     if (obj) {
                         save_spe = obj->spe;
                         if (obj->otyp == EGG)
@@ -433,11 +431,11 @@ register struct monst *mtmp;
                     if (youmonst.data->mlet == S_EEL
                         || u.umonnum == PM_TRAPPER)
                         pline(
-                            "Wait, %s!  There's a hidden %s named %s there!",
-                            m_monnam(mtmp), youmonst.data->mname, plname);
+                             "Wait, %s!  There's a hidden %s named %s there!",
+                              m_monnam(mtmp), youmonst.data->mname, plname);
                     else
-                        pline("Wait, %s!  There's a %s named %s hiding under "
-                              "%s!",
+                        pline(
+                          "Wait, %s!  There's a %s named %s hiding under %s!",
                               m_monnam(mtmp), youmonst.data->mname, plname,
                               doname(level.objects[u.ux][u.uy]));
                     if (obj)
@@ -486,6 +484,7 @@ register struct monst *mtmp;
                   plname);
         if (multi < 0) { /* this should always be the case */
             char buf[BUFSZ];
+
             Sprintf(buf, "You appear to be %s again.",
                     Upolyd ? (const char *) an(youmonst.data->mname)
                            : (const char *) "yourself");
@@ -494,7 +493,7 @@ register struct monst *mtmp;
         return 0;
     }
 
-    /*	Work out the armor class differential	*/
+    /*  Work out the armor class differential   */
     tmp = AC_VALUE(u.uac) + 10; /* tmp ~= 0 - 20 */
     tmp += mtmp->m_lev;
     if (multi < 0)
@@ -512,14 +511,14 @@ register struct monst *mtmp;
         newsym(mtmp->mx, mtmp->my);
     }
 
-    /*	Special demon handling code */
+    /*  Special demon handling code */
     if ((mtmp->cham == NON_PM) && is_demon(mdat) && !range2
         && mtmp->data != &mons[PM_BALROG] && mtmp->data != &mons[PM_SUCCUBUS]
         && mtmp->data != &mons[PM_INCUBUS])
         if (!mtmp->mcan && !rn2(13))
             (void) msummon(mtmp);
 
-    /*	Special lycanthrope handling code */
+    /*  Special lycanthrope handling code */
     if ((mtmp->cham == NON_PM) && is_were(mdat) && !range2) {
         if (is_human(mdat)) {
             if (!rn2(5 - (night() * 2)) && !mtmp->mcan)
@@ -838,9 +837,9 @@ struct monst *mon;
 
 /*
  * hitmu: monster hits you
- *	  returns 2 if monster dies (e.g. "yellow light"), 1 otherwise
- *	  3 if the monster lives but teleported/paralyzed, so it can't keep
- *	       attacking you
+ *        returns 2 if monster dies (e.g. "yellow light"), 1 otherwise
+ *        3 if the monster lives but teleported/paralyzed, so it can't keep
+ *             attacking you
  */
 STATIC_OVL int
 hitmu(mtmp, mattk)
@@ -857,8 +856,8 @@ register struct attack *mattk;
     if (!canspotmon(mtmp))
         map_invisible(mtmp->mx, mtmp->my);
 
-    /*	If the monster is undetected & hits you, you should know where
-     *	the attack came from.
+    /*  If the monster is undetected & hits you, you should know where
+     *  the attack came from.
      */
     if (mtmp->mundetected && (hides_under(mdat) || mdat->mlet == S_EEL)) {
         mtmp->mundetected = 0;
@@ -880,21 +879,20 @@ register struct attack *mattk;
         }
     }
 
-    /*	First determine the base damage done */
+    /*  First determine the base damage done */
     dmg = d((int) mattk->damn, (int) mattk->damd);
     if ((is_undead(mdat) || is_vampshifter(mtmp)) && midnight())
         dmg += d((int) mattk->damn, (int) mattk->damd); /* extra damage */
 
-    /*	Next a cancellation factor	*/
-    /*	Use uncancelled when the cancellation factor takes into account
-     *certain
-     *	armor's special magic protection.  Otherwise just use !mtmp->mcan.
+    /*  Next a cancellation factor.
+     *  Use uncancelled when cancellation factor takes into account certain
+     *  armor's special magic protection.  Otherwise just use !mtmp->mcan.
      */
     armpro = magic_negation(&youmonst);
     uncancelled = !mtmp->mcan && (rn2(10) >= 3 * armpro);
 
     permdmg = 0;
-    /*	Now, adjust damages via resistances or specific attacks */
+    /*  Now, adjust damages via resistances or specific attacks */
     switch (mattk->adtyp) {
     case AD_PHYS:
         if (mattk->aatyp == AT_HUGS && !sticks(youmonst.data)) {
@@ -1262,8 +1260,7 @@ register struct attack *mattk;
             pline("%s %s.", Monnam(mtmp),
                   mtmp->minvent
                       ? "brags about the goods some dungeon explorer provided"
-                      : "makes some remarks about how difficult theft is "
-                        "lately");
+                  : "makes some remarks about how difficult theft is lately");
             if (!tele_restrict(mtmp))
                 (void) rloc(mtmp, TRUE);
             return 3;
@@ -1440,7 +1437,7 @@ register struct attack *mattk;
                 pline("You're covered in acid, but it seems harmless.");
                 dmg = 0;
             } else {
-                pline("You're covered in acid!	It burns!");
+                pline("You're covered in acid!  It burns!");
                 exercise(A_STR, FALSE);
             }
         else
@@ -1551,8 +1548,8 @@ register struct attack *mattk;
     if (u.uhp < 1)
         done_in_by(mtmp, DIED);
 
-    /*	Negative armor class reduces damage done instead of fully protecting
-     *	against hits.
+    /*  Negative armor class reduces damage done instead of fully protecting
+     *  against hits.
      */
     if (dmg && u.uac < 0) {
         dmg -= rnd(-u.uac);
@@ -1572,11 +1569,11 @@ register struct attack *mattk;
             int lowerlimit, *hpmax_p;
             /*
              * Apply some of the damage to permanent hit points:
-             *	polymorphed	    100% against poly'd hpmax
-             *	hpmax > 25*lvl	    100% against normal hpmax
-             *	hpmax > 10*lvl	50..100%
-             *	hpmax >  5*lvl	25..75%
-             *	otherwise	 0..50%
+             *  polymorphed         100% against poly'd hpmax
+             *  hpmax > 25*lvl      100% against normal hpmax
+             *  hpmax > 10*lvl  50..100%
+             *  hpmax >  5*lvl  25..75%
+             *  otherwise        0..50%
              * Never reduces hpmax below 1 hit point per level.
              */
             permdmg = rn2(dmg / 2 + 1);
@@ -2026,8 +2023,8 @@ register struct attack *mattk;
                 break;
             if (!m_canseeu(mtmp)) { /* probably you're invisible */
                 if (useeit)
-                    pline("%s doesn't seem to notice that %s gaze was "
-                          "reflected.",
+                    pline(
+                      "%s doesn't seem to notice that %s gaze was reflected.",
                           Monnam(mtmp), mhis(mtmp));
                 break;
             }
@@ -2202,13 +2199,14 @@ register int n;
     }
 }
 
+/* returns 0 if seduction impossible,
+ *         1 if fine,
+ *         2 if wrong gender for nymph
+ */
 int
 could_seduce(magr, mdef, mattk)
 struct monst *magr, *mdef;
 struct attack *mattk;
-/* returns 0 if seduction impossible,
- *	   1 if fine,
- *	   2 if wrong gender for nymph */
 {
     register struct permonst *pagr;
     boolean agrinvis, defperc;
@@ -2327,10 +2325,9 @@ register struct monst *mon;
                     break; /* no point trying further rings */
             }
             if (rn2(20) < ACURR(A_CHA)) {
-                (void) safe_qbuf(
-                    qbuf, "\"That ",
-                    " looks pretty.  Would you wear it for me?\"", ring,
-                    xname, simpleonames, "ring");
+                (void) safe_qbuf(qbuf, "\"That ",
+                                " looks pretty.  Would you wear it for me?\"",
+                                 ring, xname, simpleonames, "ring");
                 makeknown(RIN_ADORNMENT);
                 if (yn(qbuf) == 'n')
                     continue;

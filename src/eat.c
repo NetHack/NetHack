@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1446808443 2015/11/06 11:14:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.151 $ */
+/* NetHack 3.6	eat.c	$NHDT-Date: 1446854226 2015/11/06 23:57:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.152 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2997,8 +2997,8 @@ struct obj *obj;
                       ? (long) mons[obj->corpsenm].cnutrit
                       : (long) objects[obj->otyp].oc_nutrition;
     if (uneaten_amt > full_amount) {
-        impossible("partly eaten food (%ld) more nutritious than untouched "
-                   "food (%ld)",
+        impossible(
+          "partly eaten food (%ld) more nutritious than untouched food (%ld)",
                    uneaten_amt, full_amount);
         uneaten_amt = full_amount;
     }

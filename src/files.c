@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1441753940 2015/09/08 23:12:20 $  $NHDT-Branch: master $:$NHDT-Revision: 1.183 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1446854228 2015/11/06 23:57:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.185 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -171,13 +171,13 @@ extern int n_dgns; /* from dungeon.c */
 #endif
 
 #ifdef SELECTSAVED
-STATIC_DCL int FDECL(strcmp_wrap, (const void *, const void *));
+STATIC_DCL int FDECL(CFDECLSPEC strcmp_wrap, (const void *, const void *));
 #endif
 STATIC_DCL char *FDECL(set_bonesfile_name, (char *, d_level *));
 STATIC_DCL char *NDECL(set_bonestemp_name);
 #ifdef COMPRESS
-STATIC_DCL void FDECL(redirect,
-                      (const char *, const char *, FILE *, BOOLEAN_P));
+STATIC_DCL void FDECL(redirect, (const char *, const char *, FILE *,
+                                 BOOLEAN_P));
 #endif
 #if defined(COMPRESS) || defined(ZLIB_COMP)
 STATIC_DCL void FDECL(docompress_file, (const char *, BOOLEAN_P));
@@ -208,25 +208,24 @@ STATIC_DCL int FDECL(open_levelfile_exclusively, (const char *, int, int));
  * fname_encode()
  *
  *   Args:
- *	legal		zero-terminated list of acceptable file name
- *characters
- *	quotechar	lead-in character used to quote illegal characters as
- *hex digits
- *	s		string to encode
- *	callerbuf	buffer to house result
- *	bufsz		size of callerbuf
+ *      legal       zero-terminated list of acceptable file name characters
+ *      quotechar   lead-in character used to quote illegal characters as
+ *                  hex digits
+ *      s           string to encode
+ *      callerbuf   buffer to house result
+ *      bufsz       size of callerbuf
  *
  *   Notes:
- *	The hex digits 0-9 and A-F are always part of the legal set due to
- *	their use in the encoding scheme, even if not explicitly included in
- *'legal'.
+ *      The hex digits 0-9 and A-F are always part of the legal set due to
+ *      their use in the encoding scheme, even if not explicitly included in
+ *      'legal'.
  *
  *   Sample:
- *	The following call:
- *	    (void)fname_encode("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
- *				'%', "This is a % test!", buf, 512);
- *	results in this encoding:
- *	    "This%20is%20a%20%25%20test%21"
+ *      The following call:
+ *  (void)fname_encode("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+ *                     '%', "This is a % test!", buf, 512);
+ *      results in this encoding:
+ *          "This%20is%20a%20%25%20test%21"
  */
 char *
 fname_encode(legal, quotechar, s, callerbuf, bufsz)
@@ -270,11 +269,11 @@ int bufsz;
  * fname_decode()
  *
  *   Args:
- *	quotechar	lead-in character used to quote illegal characters as
- *hex digits
- *	s		string to decode
- *	callerbuf	buffer to house result
- *	bufsz		size of callerbuf
+ *      quotechar   lead-in character used to quote illegal characters as
+ *                  hex digits
+ *      s           string to decode
+ *      callerbuf   buffer to house result
+ *      bufsz       size of callerbuf
  */
 char *
 fname_decode(quotechar, s, callerbuf, bufsz)
@@ -596,7 +595,8 @@ clearlocks()
 }
 
 #if defined(SELECTSAVED)
-STATIC_OVL int
+/* qsort comparison routine */
+STATIC_OVL int CFDECLSPEC
 strcmp_wrap(p, q)
 const void *p;
 const void *q;
@@ -649,6 +649,7 @@ void
 really_close()
 {
     int fd = lftrack.fd;
+
     lftrack.nethack_thinks_it_is_open = FALSE;
     lftrack.fd = -1;
     lftrack.oflag = 0;
@@ -670,6 +671,7 @@ int fd;
     return close(fd);
 }
 #else
+
 int
 nhclose(fd)
 int fd;
@@ -768,7 +770,7 @@ char errbuf[];
        denies some or all access to world.
      */
     (void) chmod(file, FCMASK | 007); /* allow other users full access */
-#endif                                /* VMS && !SECURE */
+#endif /* VMS && !SECURE */
 
     return fd;
 }
@@ -923,6 +925,7 @@ set_error_savefile()
 #ifdef VMS
     {
         char *semi_colon = rindex(SAVEF, ';');
+
         if (semi_colon)
             *semi_colon = '\0';
     }
@@ -954,11 +957,11 @@ create_savefile()
     fd = creat(fq_save, FCMASK);
 #endif
 #if defined(VMS) && !defined(SECURE)
-/*
-   Make sure the save file is owned by the current process.  That's
-   the default for non-privileged users, but for priv'd users the
-   file will be owned by the directory's owner instead of the user.
- */
+    /*
+       Make sure the save file is owned by the current process.  That's
+       the default for non-privileged users, but for priv'd users the
+       file will be owned by the directory's owner instead of the user.
+    */
 #undef getuid
     (void) chown(fq_save, getuid(), getgid());
 #define getuid() vms_getuid()
@@ -1056,17 +1059,18 @@ const char *filename;
 #else
 #define EXTSTR ""
 #endif
+
     if ( sscanf( filename, "%*[^/]/%d%63[^.]" EXTSTR, &uid, name ) == 2 ) {
 #undef EXTSTR
-    /* "_" most likely means " ", which certainly looks nicer */
-    for (k=0; name[k]; k++)
-        if ( name[k]=='_' )
-        name[k]=' ';
-    return dupstr(name);
+        /* "_" most likely means " ", which certainly looks nicer */
+        for (k=0; name[k]; k++)
+            if ( name[k] == '_' )
+                name[k] = ' ';
+        return dupstr(name);
     } else
 #endif /* UNIX && QT_GRAPHICS */
     {
-    return 0;
+        return 0;
     }
 /* --------- end of obsolete code ----*/
 #endif /* 0 - WAS STORE_PLNAME_IN_FILE*/
@@ -1125,6 +1129,7 @@ get_saved_games()
         closedir(dir);
         if (n > 0) {
             int i;
+
             if (!(dir = opendir(fqname("save", SAVEPREFIX, 0))))
                 return 0;
             result = (char **) alloc((n + 1) * sizeof(char *)); /* at most */
@@ -1133,12 +1138,14 @@ get_saved_games()
                 int uid;
                 char name[64]; /* more than PL_NSIZ */
                 struct dirent *entry = readdir(dir);
+
                 if (!entry)
                     break;
                 if (sscanf(entry->d_name, "%d%63s", &uid, name) == 2) {
                     if (uid == myuid) {
                         char filename[BUFSZ];
                         char *r;
+
                         Sprintf(filename, "save/%d%s", uid, name);
                         r = plname_from_file(filename);
                         if (r)
@@ -1158,7 +1165,7 @@ get_saved_games()
 
     if (j > 0) {
         if (j > 1)
-            qsort(result, j, sizeof(char *), strcmp_wrap);
+            qsort(result, j, sizeof (char *), strcmp_wrap);
         result[j] = 0;
         return result;
     } else if (result) { /* could happen if save files are obsolete */
@@ -1174,6 +1181,7 @@ char **saved;
 {
     if (saved) {
         int i = 0;
+
         while (saved[i])
             free((genericptr_t) saved[i++]);
         free((genericptr_t) saved);
@@ -1404,6 +1412,7 @@ char *cfn;
 #else
 #ifdef SAVE_EXTENSION
     char *bp = (char *) 0;
+
     strcpy(cfn, filename);
     if ((bp = strstri(cfn, SAVE_EXTENSION))) {
         strsubst(bp, SAVE_EXTENSION, ".saz");
@@ -1707,8 +1716,8 @@ int retryct;
             /* take a wild guess at the underlying cause */
             HUP perror(lockname);
             HUP raw_printf("Cannot lock %s.", filename);
-            HUP raw_printf("(Perhaps you are running NetHack from inside the "
-                           "distribution package?).");
+            HUP raw_printf(
+  "(Perhaps you are running NetHack from inside the distribution package?).");
             nesting--;
             return FALSE;
         default:
@@ -1884,9 +1893,9 @@ int src;
             (void) strncpy(lastconfigfile, filename, BUFSZ - 1);
         lastconfigfile[BUFSZ - 1] = '\0';
         if ((fp = fopenp(lastconfigfile, "r")) != (FILE *) 0)
-            return (fp);
+            return  fp;
         if ((fp = fopenp(filename, "r")) != (FILE *) 0) {
-            return (fp);
+            return  fp;
 #if defined(UNIX) || defined(VMS)
         } else {
             /* access() above probably caught most problems for UNIX */
@@ -1900,15 +1909,15 @@ int src;
 
 #if defined(MICRO) || defined(MAC) || defined(__BEOS__) || defined(WIN32)
     if ((fp = fopenp(fqname(configfile, CONFIGPREFIX, 0), "r")) != (FILE *) 0)
-        return (fp);
+        return fp;
     if ((fp = fopenp(configfile, "r")) != (FILE *) 0)
-        return (fp);
+        return fp;
 #ifdef MSDOS
     if ((fp = fopenp(fqname(backward_compat_configfile, CONFIGPREFIX, 0),
                      "r")) != (FILE *) 0)
-        return (fp);
+        return fp;
     if ((fp = fopenp(backward_compat_configfile, "r")) != (FILE *) 0)
-        return (fp);
+        return fp;
 #endif
 #else
 /* constructed full path names don't need fqname() */
@@ -1917,12 +1926,12 @@ int src;
                    BUFSZ - 1);
     lastconfigfile[BUFSZ - 1] = '\0';
     if ((fp = fopenp(lastconfigfile, "r")) != (FILE *) 0) {
-        return (fp);
+        return fp;
     }
     (void) strncpy(lastconfigfile, "sys$login:nethack.ini", BUFSZ - 1);
     lastconfigfile[BUFSZ - 1] = '\0';
     if ((fp = fopenp(lastconfigfile, "r")) != (FILE *) 0) {
-        return (fp);
+        return fp;
     }
 
     envp = nh_getenv("HOME");
@@ -1934,7 +1943,7 @@ int src;
     (void) strncpy(lastconfigfile, tmp_config, BUFSZ - 1);
     lastconfigfile[BUFSZ - 1] = '\0';
     if ((fp = fopenp(tmp_config, "r")) != (FILE *) 0)
-        return (fp);
+        return fp;
 #else /* should be only UNIX left */
     envp = nh_getenv("HOME");
     if (!envp)
@@ -1945,7 +1954,7 @@ int src;
     (void) strncpy(lastconfigfile, tmp_config, BUFSZ - 1);
     lastconfigfile[BUFSZ - 1] = '\0';
     if ((fp = fopenp(lastconfigfile, "r")) != (FILE *) 0)
-        return (fp);
+        return fp;
 #if defined(__APPLE__)
     /* try an alternative */
     if (envp) {
@@ -1954,13 +1963,13 @@ int src;
         (void) strncpy(lastconfigfile, tmp_config, BUFSZ - 1);
         lastconfigfile[BUFSZ - 1] = '\0';
         if ((fp = fopenp(lastconfigfile, "r")) != (FILE *) 0)
-            return (fp);
+            return fp;
         Sprintf(tmp_config, "%s/%s", envp,
                 "Library/Preferences/NetHack Defaults.txt");
         (void) strncpy(lastconfigfile, tmp_config, BUFSZ - 1);
         lastconfigfile[BUFSZ - 1] = '\0';
         if ((fp = fopenp(lastconfigfile, "r")) != (FILE *) 0)
-            return (fp);
+            return fp;
     }
 #endif
     if (errno != ENOENT) {
@@ -2135,7 +2144,7 @@ int src;
     } else if (match_varname(buf, "AUTOPICKUP_EXCEPTION", 5)) {
         add_autopickup_exception(bufp);
     } else if (match_varname(buf, "MSGTYPE", 7)) {
-	(void) msgtype_parse_add(bufp);
+        (void) msgtype_parse_add(bufp);
 #ifdef NOCWD_ASSUMPTIONS
     } else if (match_varname(buf, "HACKDIR", 4)) {
         adjust_prefix(bufp, HACKPREFIX);
@@ -2398,11 +2407,13 @@ int src;
     } else if (match_varname(buf, "DEPTH", 5)) {
         extern int amii_numcolors;
         int val = atoi(bufp);
+
         amii_numcolors = 1L << min(DEPTH, val);
 #ifdef SYSFLAGS
     } else if (match_varname(buf, "DRIPENS", 7)) {
         int i, val;
         char *t;
+
         for (i = 0, t = strtok(bufp, ",/"); t != (char *) 0;
              i < 20 && (t = strtok((char *) 0, ",/")), ++i) {
             sscanf(t, "%d", &val);
@@ -2411,6 +2422,7 @@ int src;
 #endif
     } else if (match_varname(buf, "SCREENMODE", 10)) {
         extern long amii_scrnmode;
+
         if (!stricmp(bufp, "req"))
             amii_scrnmode = 0xffffffff; /* Requester */
         else if (sscanf(bufp, "%x", &amii_scrnmode) != 1)
@@ -2418,6 +2430,7 @@ int src;
     } else if (match_varname(buf, "MSGPENS", 7)) {
         extern int amii_msgAPen, amii_msgBPen;
         char *t = strtok(bufp, ",/");
+
         if (t) {
             sscanf(t, "%d", &amii_msgAPen);
             if (t = strtok((char *) 0, ",/"))
@@ -2426,6 +2439,7 @@ int src;
     } else if (match_varname(buf, "TEXTPENS", 8)) {
         extern int amii_textAPen, amii_textBPen;
         char *t = strtok(bufp, ",/");
+
         if (t) {
             sscanf(t, "%d", &amii_textAPen);
             if (t = strtok((char *) 0, ",/"))
@@ -2434,6 +2448,7 @@ int src;
     } else if (match_varname(buf, "MENUPENS", 8)) {
         extern int amii_menuAPen, amii_menuBPen;
         char *t = strtok(bufp, ",/");
+
         if (t) {
             sscanf(t, "%d", &amii_menuAPen);
             if (t = strtok((char *) 0, ",/"))
@@ -2442,6 +2457,7 @@ int src;
     } else if (match_varname(buf, "STATUSPENS", 10)) {
         extern int amii_statAPen, amii_statBPen;
         char *t = strtok(bufp, ",/");
+
         if (t) {
             sscanf(t, "%d", &amii_statAPen);
             if (t = strtok((char *) 0, ",/"))
@@ -2450,6 +2466,7 @@ int src;
     } else if (match_varname(buf, "OTHERPENS", 9)) {
         extern int amii_otherAPen, amii_otherBPen;
         char *t = strtok(bufp, ",/");
+
         if (t) {
             sscanf(t, "%d", &amii_otherAPen);
             if (t = strtok((char *) 0, ",/"))
@@ -2497,18 +2514,22 @@ int src;
         /* These should move to wc_ options */
     } else if (match_varname(buf, "QT_TILEWIDTH", 12)) {
         extern char *qt_tilewidth;
+
         if (qt_tilewidth == NULL)
             qt_tilewidth = dupstr(bufp);
     } else if (match_varname(buf, "QT_TILEHEIGHT", 13)) {
         extern char *qt_tileheight;
+
         if (qt_tileheight == NULL)
             qt_tileheight = dupstr(bufp);
     } else if (match_varname(buf, "QT_FONTSIZE", 11)) {
         extern char *qt_fontsize;
+
         if (qt_fontsize == NULL)
             qt_fontsize = dupstr(bufp);
     } else if (match_varname(buf, "QT_COMPACT", 10)) {
         extern int qt_compact_mode;
+
         qt_compact_mode = atoi(bufp);
 #endif
     } else
@@ -2521,7 +2542,7 @@ boolean
 can_read_file(filename)
 const char *filename;
 {
-    return (access(filename, 4) == 0);
+    return (boolean) (access(filename, 4) == 0);
 }
 #endif /* USER_SOUNDS */
 
@@ -2544,8 +2565,7 @@ int src;
 #ifdef notyet
 /*
 XXX Don't call read() in parse_config_line, read as callback or reassemble
-line
-at this level.
+line at this level.
 OR: Forbid multiline stuff for alternate config sources.
 */
 #endif
@@ -2591,7 +2611,7 @@ fopen_wizkit_file()
     } else
 #endif
         if ((fp = fopenp(wizkit, "r")) != (FILE *) 0) {
-        return (fp);
+        return fp;
 #if defined(UNIX) || defined(VMS)
     } else {
         /* access() above probably caught most problems for UNIX */
@@ -2603,7 +2623,7 @@ fopen_wizkit_file()
 
 #if defined(MICRO) || defined(MAC) || defined(__BEOS__) || defined(WIN32)
     if ((fp = fopenp(fqname(wizkit, CONFIGPREFIX, 0), "r")) != (FILE *) 0)
-        return (fp);
+        return fp;
 #else
 #ifdef VMS
     envp = nh_getenv("HOME");
@@ -2612,7 +2632,7 @@ fopen_wizkit_file()
     else
         Sprintf(tmp_wizkit, "%s%s", "sys$login:", wizkit);
     if ((fp = fopenp(tmp_wizkit, "r")) != (FILE *) 0)
-        return (fp);
+        return fp;
 #else /* should be only UNIX left */
     envp = nh_getenv("HOME");
     if (envp)
@@ -2620,7 +2640,7 @@ fopen_wizkit_file()
     else
         Strcpy(tmp_wizkit, wizkit);
     if ((fp = fopenp(tmp_wizkit, "r")) != (FILE *) 0)
-        return (fp);
+        return fp;
     else if (errno != ENOENT) {
         /* e.g., problems when setuid NetHack can't search home
          * directory restricted to user */
@@ -2808,10 +2828,11 @@ int which_set;
            values from the file, so only do that */
         if (symp->range == SYM_CONTROL) {
             struct symsetentry *tmpsp;
+
             switch (symp->idx) {
             case 0:
                 tmpsp =
-                    (struct symsetentry *) alloc(sizeof(struct symsetentry));
+                    (struct symsetentry *) alloc(sizeof (struct symsetentry));
                 tmpsp->next = (struct symsetentry *) 0;
                 if (!symset_list) {
                     symset_list = tmpsp;
@@ -2911,6 +2932,7 @@ int which_set;
             case 5: /* restrictions: xxxx*/
                 if (chosen_symset_start) {
                     int n = 0;
+
                     while (known_restrictions[n]) {
                         if (!strcmpi(known_restrictions[n], bufp)) {
                             switch (n) {
@@ -3107,12 +3129,12 @@ recover_savefile()
         processed[lev] = 0;
 
     /* level 0 file contains:
-     *	pid of creating process (ignored here)
-     *	level number for current level of save file
-     *	name of save file nethack would have created
-     *	savefile info
-     *	player name
-     *	and game state
+     *  pid of creating process (ignored here)
+     *  level number for current level of save file
+     *  name of save file nethack would have created
+     *  savefile info
+     *  player name
+     *  and game state
      */
     gfd = open_levelfile(0, errbuf);
     if (gfd < 0) {
@@ -3120,15 +3142,16 @@ recover_savefile()
         return FALSE;
     }
     if (read(gfd, (genericptr_t) &hpid, sizeof hpid) != sizeof hpid) {
-        raw_printf("\nCheckpoint data incompletely written or subsequently "
-                   "clobbered. Recovery impossible.");
+        raw_printf("\n%s\n%s\n",
+            "Checkpoint data incompletely written or subsequently clobbered.",
+                   "Recovery impossible.");
         (void) nhclose(gfd);
         return FALSE;
     }
     if (read(gfd, (genericptr_t) &savelev, sizeof(savelev))
         != sizeof(savelev)) {
-        raw_printf("\nCheckpointing was not in effect for %s -- recovery "
-                   "impossible.\n",
+        raw_printf(
+         "\nCheckpointing was not in effect for %s -- recovery impossible.\n",
                    lock);
         (void) nhclose(gfd);
         return FALSE;
@@ -3147,12 +3170,12 @@ recover_savefile()
     }
 
     /* save file should contain:
-     *	version info
-     *	savefile info
-     *	player name
-     *	current level (including pets)
-     *	(non-level-based) game state
-     *	other levels
+     *  version info
+     *  savefile info
+     *  player name
+     *  current level (including pets)
+     *  (non-level-based) game state
+     *  other levels
      */
     set_savefile_name(TRUE);
     sfd = create_savefile();
@@ -3445,14 +3468,14 @@ char *nowin_buf;
 
     /*
      * Syntax (not case-sensitive):
-     *	%section books
+     *  %section books
      *
      * In the books section:
-     * 		%title booktitle(n)
-     *		where booktitle=book title
-     *		      (n)= total number of passages present for this title
-     *			%passage n
-     *			where n=sequential passage number
+     *    %title booktitle (n)
+     *          where booktitle=book title without quotes
+     *          (n)= total number of passages present for this title
+     *    %passage k
+     *          where k=sequential passage number
      *
      * %e ends the passage/book/section
      *    If in a passage, it marks the end of that passage.
@@ -3471,6 +3494,7 @@ char *nowin_buf;
         case '%':
             if (!strncmpi(&line[1], "section ", sizeof("section ") - 1)) {
                 char *st = &line[9]; /* 9 from "%section " */
+
                 scope = SECTIONSCOPE;
                 if (!strcmpi(st, tribsection))
                     matchedsection = TRUE;
@@ -3479,6 +3503,7 @@ char *nowin_buf;
             } else if (!strncmpi(&line[1], "title ", sizeof("title ") - 1)) {
                 char *st = &line[7]; /* 7 from "%title " */
                 char *p1, *p2;
+
                 if ((p1 = index(st, '(')) != 0) {
                     *p1++ = '\0';
                     (void) mungspaces(st);
@@ -3508,6 +3533,7 @@ char *nowin_buf;
                                  sizeof("passage ") - 1)) {
                 int passagenum = 0;
                 char *st = &line[9]; /* 9 from "%passage " */
+
                 while (*st == ' ' || *st == '\t')
                     st++;
                 if (*st && digit(*st) && (strlen(st) < 3))
@@ -3522,8 +3548,9 @@ char *nowin_buf;
                     }
                 }
             } else if (!strncmpi(&line[1], "e ", sizeof("e ") - 1)) {
-                if (matchedtitle && (scope == PASSAGESCOPE)
-                    && ((!nowin_buf && tribwin != WIN_ERR) || (nowin_buf && foundpassage)))
+                if (matchedtitle && scope == PASSAGESCOPE
+                    && ((!nowin_buf && tribwin != WIN_ERR)
+                        || (nowin_buf && foundpassage)))
                     goto cleanup;
                 if (scope == TITLESCOPE)
                     matchedtitle = FALSE;

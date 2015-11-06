@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1446777536 2015/11/06 02:38:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.120 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1446854233 2015/11/06 23:57:13 $  $NHDT-Branch: master $:$NHDT-Revision: 1.121 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -72,11 +72,9 @@ char *buf;
 {
     static const char *shirt_msgs[] = {
         /* Scott Bigham */
-        "I explored the Dungeons of Doom and all I got was this lousy "
-        "T-shirt!",
+      "I explored the Dungeons of Doom and all I got was this lousy T-shirt!",
         "Is that Mjollnir in your pocket or are you just happy to see me?",
-        "It's not the size of your sword, it's how #enhance'd you are with "
-        "it.",
+      "It's not the size of your sword, it's how #enhance'd you are with it.",
         "Madame Elvira's House O' Succubi Lifetime Customer",
         "Madame Elvira's House O' Succubi Employee of the Month",
         "Ludios Vault Guards Do It In Small, Dark Rooms",
@@ -104,8 +102,7 @@ char *buf;
         "I want to live forever or die in the attempt.", "Lichen Park",
         "LOST IN THOUGHT - please send search party", "Meat is Mordor",
         "Minetown Better Business Bureau", "Minetown Watch",
-        "Ms. Palm's House of Negotiable Affection -- A Very Reputable House "
-        "Of Disrepute",
+ "Ms. Palm's House of Negotiable Affection -- A Very Reputable House Of Disrepute",
         "Protection Racketeer", "Real men love Crom",
         "Somebody stole my Mojo!", "The Hellhound Gang", "The Werewolves",
         "They Might Be Storm Giants",
@@ -292,8 +289,9 @@ doread()
            maintained illiterate conduct so far, and this mail
            scroll didn't come from bones, ask for confirmation */
         if (!u.uconduct.literate) {
-            if (!scroll->spe && yn("Reading mail will violate \"illiterate\" "
-                                   "conduct.  Read anyway?") != 'y')
+            if (!scroll->spe && yn(
+             "Reading mail will violate \"illiterate\" conduct.  Read anyway?"
+                                   ) != 'y')
                 return 0;
         }
     }
@@ -937,8 +935,8 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
     case SCR_MAIL:
         known = TRUE;
         if (sobj->spe)
-            pline("This seems to be junk mail addressed to the finder of the "
-                  "Eye of Larn.");
+            pline(
+    "This seems to be junk mail addressed to the finder of the Eye of Larn.");
         /* note to the puzzled: the game Larn actually sends you junk
          * mail if you win!
          */
@@ -1494,8 +1492,8 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         if (Hallucination) /* Ommmmmm! */
             Your("mind releases itself from mundane concerns.");
         else if (!strncmpi(plname, "Maud", 4))
-            pline("As your mind turns inward on itself, you forget "
-                  "everything else.");
+            pline(
+          "As your mind turns inward on itself, you forget everything else.");
         else if (rn2(2))
             pline("Who was that Maud person anyway?");
         else
