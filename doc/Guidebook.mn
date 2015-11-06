@@ -2815,7 +2815,7 @@ An entry that maps a sound file to a user-specified message pattern.
 Each SOUND entry is broken down into the following parts:
 .PS "sound file"
 .PL MESG
-message window mapping (the only one supported in 3.5);
+message window mapping (the only one supported in 3.6);
 .PL pattern
 the pattern to match;
 .PL "sound file"
