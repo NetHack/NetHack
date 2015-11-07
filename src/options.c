@@ -3616,6 +3616,7 @@ doset()
 #ifdef STATUS_HILITES
     any.a_int = -2;
     get_status_hilites(buf2, 60);
+    if (!*buf2) Sprintf(buf2, "%s", "(none)");
     if (!iflags.menu_tab_sep)
         Sprintf(buf, fmtstr_doset_add_menu, any.a_int ? "" : "    ",
                 "status_hilites", buf2);
@@ -3667,7 +3668,7 @@ doset()
             } else if (opt_indx == -4) {
                     (void) special_handling("menucolors", setinitial,
                                             fromfile);
-                } else if (opt_indx == -5) {
+            } else if (opt_indx == -5) {
                     (void) special_handling("msgtype", setinitial, fromfile);
             } else if (opt_indx < boolcount) {
                 /* boolean option */
