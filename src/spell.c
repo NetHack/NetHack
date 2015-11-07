@@ -745,7 +745,8 @@ cast_protection()
     int l = u.ulevel, loglev = 0,
         gain, natac = u.uac + u.uspellprot;
     /* note: u.uspellprot is subtracted when find_ac() factors it into u.uac,
-       so adding here factors it back out (3.4.3,3.6 had this backwards) */
+       so adding here factors it back out
+       (versions prior to 3.6 had this backwards) */
 
     /* loglev=log2(u.ulevel)+1 (1..5) */
     while (l) {
