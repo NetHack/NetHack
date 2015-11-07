@@ -1,5 +1,5 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1433984834 2015/06/11 01:07:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.106 $ */
-/* Copyright (c) David Cohrs, 1991				  */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1446856765 2015/11/07 00:39:25 $  $NHDT-Branch: master $:$NHDT-Revision: 1.110 $ */
+/* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -157,7 +157,6 @@ STATIC_DCL void FDECL(process_text_window, (winid, struct WinDesc *));
 STATIC_DCL tty_menu_item *FDECL(reverse, (tty_menu_item *));
 STATIC_DCL const char *FDECL(compress_str, (const char *));
 STATIC_DCL void FDECL(tty_putsym, (winid, int, int, CHAR_P));
-STATIC_DCL char *FDECL(copy_of, (const char *));
 STATIC_DCL void FDECL(bail, (const char *)); /* __attribute__((noreturn)) */
 STATIC_DCL void FDECL(setup_rolemenu, (winid, BOOLEAN_P, int, int, int));
 STATIC_DCL void FDECL(setup_racemenu, (winid, BOOLEAN_P, int, int, int));
@@ -204,12 +203,12 @@ winch()
     }
 #endif
     getwindowsz();
-/* For long running events such as multi-page menus and
- * display_file(), we note the signal's occurance and
- * hope the code there decides to handle the situation
- * and reset the flag. There will be race conditions
- * when handling this - code handlers so it doesn't matter.
- */
+    /* For long running events such as multi-page menus and
+     * display_file(), we note the signal's occurance and
+     * hope the code there decides to handle the situation
+     * and reset the flag. There will be race conditions
+     * when handling this - code handlers so it doesn't matter.
+     */
 #ifdef notyet
     winch_seen = TRUE;
 #endif
@@ -727,21 +726,21 @@ makepicks:
     } while (ROLE < 0 || RACE < 0 || GEND < 0 || ALGN < 0);
 
     /*
-     *	Role, race, &c have now been determined;
-     *	ask for confirmation and maybe go back to choose all over again.
+     *  Role, race, &c have now been determined;
+     *  ask for confirmation and maybe go back to choose all over again.
      *
-     *	Uses ynaq for familiarity, although 'a' is usually a
-     *	superset of 'y' but here is an alternate form of 'n'.
-     *	Menu layout:
-     *	 title:  Is this ok? [ynaq]
-     *	 blank:
-     *	  text:  $name, $alignment $gender $race $role
-     *	 blank:
-     *	  menu:  y + yes; play
-     *		 n - no; pick again
-     *	 maybe:  a - no; rename hero
-     *		 q - quit
-     *		 (end)
+     *  Uses ynaq for familiarity, although 'a' is usually a
+     *  superset of 'y' but here is an alternate form of 'n'.
+     *  Menu layout:
+     *   title:  Is this ok? [ynaq]
+     *   blank:
+     *    text:  $name, $alignment $gender $race $role
+     *   blank:
+     *    menu:  y + yes; play
+     *           n - no; pick again
+     *   maybe:  a - no; rename hero
+     *           q - quit
+     *           (end)
      */
     getconfirmation = (pick4u != 'a' && !flags.randomall);
     while (getconfirmation) {
@@ -794,26 +793,25 @@ makepicks:
         default:          /* 'q' or ESC */
             goto give_up; /* quit */
             break;
-        case 3: /* 'a' */
-                /*
-                 * TODO: what, if anything, should be done if the name is
-                 * changed to or from "wizard" after port-specific startup
-                 * code has set flags.debug based on the original name?
-                 */
-            {
-                int saveROLE, saveRACE, saveGEND, saveALGN;
+        case 3: { /* 'a' */
+            /*
+             * TODO: what, if anything, should be done if the name is
+             * changed to or from "wizard" after port-specific startup
+             * code has set flags.debug based on the original name?
+             */
+            int saveROLE, saveRACE, saveGEND, saveALGN;
 
-                iflags.renameinprogress = TRUE;
-                /* plnamesuffix() can change any or all of ROLE, RACE,
-                   GEND, ALGN; we'll override that and honor only the name */
-                saveROLE = ROLE, saveRACE = RACE, saveGEND = GEND,
-                    saveALGN = ALGN;
-                *plname = '\0';
-                plnamesuffix(); /* calls askname() when plname[] is empty */
-                ROLE = saveROLE, RACE = saveRACE, GEND = saveGEND,
-                    ALGN = saveALGN;
-            }
+            iflags.renameinprogress = TRUE;
+            /* plnamesuffix() can change any or all of ROLE, RACE,
+               GEND, ALGN; we'll override that and honor only the name */
+            saveROLE = ROLE, saveRACE = RACE, saveGEND = GEND,
+                saveALGN = ALGN;
+            *plname = '\0';
+            plnamesuffix(); /* calls askname() when plname[] is empty */
+            ROLE = saveROLE, RACE = saveRACE, GEND = saveGEND,
+                ALGN = saveALGN;
             break; /* getconfirmation is still True */
+        }
         case 2:    /* 'n' */
             /* start fresh, but bypass "shall I pick everything for you?"
                step; any partial role selection via config file, command
@@ -1051,7 +1049,7 @@ tty_askname()
         switch (restore_menu(BASE_WINDOW)) {
         case -1:
             bail("Until next time then..."); /* quit */
-                                             /*NOTREACHED*/
+            /*NOTREACHED*/
         case 0:
             break; /* no game chosen; start new game */
         case 1:
@@ -1367,6 +1365,7 @@ boolean free_data;
     cw->maxrow = cw->maxcol = 0;
     if (cw->mlist) {
         tty_menu_item *temp;
+
         while ((temp = cw->mlist) != 0) {
             cw->mlist = cw->mlist->next;
             if (temp->str)
@@ -1494,6 +1493,7 @@ int lineno;
 tty_menu_item *item;
 {
     char ch = item->selected ? (item->count == -1L ? '+' : '#') : '-';
+
     tty_curs(window, 4, lineno);
     term_start_attr(item->attr);
     (void) putchar(ch);
@@ -1553,8 +1553,7 @@ char acc; /* group accelerator, 0 => all */
 }
 
 /*
- * Invert all entries that match the give group accelerator (or all if
- * zero).
+ * Invert all entries that match the give group accelerator (or all if zero).
  */
 STATIC_OVL void
 invert_all(window, page_start, page_end, acc)
@@ -1789,8 +1788,8 @@ struct WinDesc *cw;
              * item is selected.  If not selected, then
              * "0b" could mean:
              *
-             *	count starting zero:	"zero b's"
-             *	ignore starting zero:	"select b"
+             *  count starting zero:    "zero b's"
+             *  ignore starting zero:   "select b"
              *
              * At present I don't know which is better.
              */
@@ -2051,7 +2050,7 @@ boolean blocking; /* with ttys, all windows are blocking */
         break;
     case NHW_TEXT:
         cw->maxcol = ttyDisplay->cols; /* force full-screen mode */
-                                       /*FALLTHRU*/
+        /*FALLTHRU*/
     case NHW_MENU:
         cw->active = 1;
 #ifdef H2344_BROKEN
@@ -2332,7 +2331,7 @@ const char *str;
 
     switch (cw->type) {
     case NHW_MESSAGE:
-/* really do this later */
+        /* really do this later */
 #if defined(USER_SOUNDS) && defined(WIN32CON)
         play_sound_for_message(str);
 #endif
@@ -2373,7 +2372,7 @@ const char *str;
             cw->cury = (cw->cury + 1) % 2;
             cw->curx = 0;
 #ifdef STATUS_VIA_WINDOWPORT
-	}
+        }
 #endif
         break;
     case NHW_MAP:
@@ -2589,13 +2588,15 @@ boolean preselected;        /* item is marked as selected */
     if (str == (const char *) 0)
         return;
 
-    if (window == WIN_ERR || (cw = wins[window]) == (struct WinDesc *) 0
+    if (window == WIN_ERR
+        || (cw = wins[window]) == (struct WinDesc *) 0
         || cw->type != NHW_MENU)
         panic(winpanicstr, window);
 
     cw->nitems++;
     if (identifier->a_void) {
         int len = strlen(str);
+
         if (len >= BUFSZ) {
             /* We *think* everything's coming in off at most BUFSZ bufs... */
             impossible("Menu item too long (%d).", len);
@@ -2615,7 +2616,7 @@ boolean preselected;        /* item is marked as selected */
     item->selector = ch;
     item->gselector = gch;
     item->attr = attr;
-    item->str = copy_of(newstr);
+    item->str = dupstr(newstr ? newstr : "");
 
     item->next = cw->mlist;
     cw->mlist = item;
@@ -2718,9 +2719,9 @@ const char *prompt; /* prompt to for menu */
         /* produce the largest demo string */
         Sprintf(buf, "(%ld of %ld) ", cw->npages, cw->npages);
         len = strlen(buf);
-        cw->morestr = copy_of("");
+        cw->morestr = dupstr("");
     } else {
-        cw->morestr = copy_of("(end) ");
+        cw->morestr = dupstr("(end) ");
         len = strlen(cw->morestr);
     }
 
@@ -3045,7 +3046,7 @@ int glyph, bkglyph;
 
     /* must be after color check; term_end_color may turn off inverse too */
     if (((special & MG_PET) && iflags.hilite_pet)
-	|| ((special & MG_OBJPILE) && iflags.hilite_pile)
+        || ((special & MG_OBJPILE) && iflags.hilite_pile)
         || ((special & MG_DETECT) && iflags.use_inverse)) {
         term_start_attr(ATR_INVERSE);
         reverse_on = TRUE;
@@ -3131,10 +3132,9 @@ tty_nhgetch()
     if (WIN_MESSAGE != WIN_ERR && wins[WIN_MESSAGE])
         wins[WIN_MESSAGE]->flags &= ~WIN_STOP;
 #ifdef UNIX
-    i = ((++nesting == 1) ? tgetch() : (read(fileno(stdin),
-                                             (genericptr_t) &nestbuf, 1) == 1
-                                            ? (int) nestbuf
-                                            : EOF));
+    i = (++nesting == 1) ? tgetch()
+                         : (read(fileno(stdin), (genericptr_t) &nestbuf, 1)
+                            == 1) ? (int) nestbuf : EOF;
     --nesting;
 #else
     i = tgetch();
@@ -3207,23 +3207,7 @@ char *posbar;
 }
 #endif
 
-/*
- * Allocate a copy of the given string.  If null, return a string of
- * zero length.
- *
- * This is an exact duplicate of copy_of() in X11/winmenu.c.
- */
-STATIC_OVL char *
-copy_of(s)
-const char *s;
-{
-    if (!s)
-        s = "";
-    return strcpy((char *) alloc((unsigned) (strlen(s) + 1)), s);
-}
-
 #ifdef STATUS_VIA_WINDOWPORT
-
 /*
  * The following data structures come from the genl_ routines in
  * src/windows.c and as such are considered to be on the window-port
@@ -3283,30 +3267,29 @@ tty_status_init()
  *      -- the fldindex identifies which field is changing and
  *         is an integer index value from botl.h
  *      -- fldindex could be any one of the following from botl.h:
- *         BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, 
- *         BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX, 
- *         BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX, 
+ *         BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH,
+ *         BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX,
+ *         BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX,
  *         BL_LEVELDESC, BL_EXP, BL_CONDITION
  *      -- fldindex could also be BL_FLUSH (-1), which is not really
- *         a field index, but is a special trigger to tell the 
+ *         a field index, but is a special trigger to tell the
  *         windowport that it should redisplay all its status fields,
  *         even if no changes have been presented to it.
  *      -- ptr is usually a "char *", unless fldindex is BL_CONDITION.
  *         If fldindex is BL_CONDITION, then ptr is a long value with
  *         any or none of the following bits set (from botl.h):
- *              BL_MASK_BLIND		0x00000001L
- *              BL_MASK_CONF		0x00000002L
- *              BL_MASK_FOODPOIS	0x00000004L
- *              BL_MASK_ILL		0x00000008L
- *              BL_MASK_HALLU		0x00000010L
- *              BL_MASK_STUNNED		0x00000020L
- *              BL_MASK_SLIMED		0x00000040L
+ *              BL_MASK_BLIND           0x00000001L
+ *              BL_MASK_CONF            0x00000002L
+ *              BL_MASK_FOODPOIS        0x00000004L
+ *              BL_MASK_ILL             0x00000008L
+ *              BL_MASK_HALLU           0x00000010L
+ *              BL_MASK_STUNNED         0x00000020L
+ *              BL_MASK_SLIMED          0x00000040L
  *      -- The value passed for BL_GOLD includes a leading
- *         symbol for GOLD "$:nnn". If the window port needs to use 
- *         the textual gold amount without the leading "$:" the port 
+ *         symbol for GOLD "$:nnn". If the window port needs to use
+ *         the textual gold amount without the leading "$:" the port
  *         will have to add 2 to the passed "ptr" for the BL_GOLD case.
  */
- 
 void
 tty_status_update(fldidx, ptr, chg, percent)
 int fldidx, chg, percent;
@@ -3326,10 +3309,11 @@ genericptr_t ptr;
     static boolean beenhere = FALSE;
     enum statusfields fieldorder[2][15] = {
         { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
-          BL_SCORE, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH},
+          BL_SCORE, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH,
+          BL_FLUSH },
         { BL_LEVELDESC, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX,
           BL_AC, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER,
-          BL_CAP, BL_CONDITION, BL_FLUSH}
+          BL_CAP, BL_CONDITION, BL_FLUSH }
     };
 
     if (fldidx != BL_FLUSH) {
@@ -3383,8 +3367,8 @@ genericptr_t ptr;
            {
             int pct_th = 0;
             if (tty_status_hilites[fldidx].thresholdtype != ANY_INT) {
-                impossible("tty_status_update: unsupported percentage "
-                           "threshold type %d",
+                impossible(
+                "tty_status_update: unsupported percentage threshold type %d",
                            tty_status_hilites[fldidx].thresholdtype);
                 break;
             }
@@ -3418,8 +3402,8 @@ genericptr_t ptr;
                 c = (value & t->a_ulong) ? o : u;
                 break;
             default:
-                impossible("tty_status_update: unsupported absolute threshold "
-                       "type %d\n",
+                impossible(
+                "tty_status_update: unsupported absolute threshold type %d\n",
                        tty_status_hilites[fldidx].thresholdtype);
             break;
             }
@@ -3439,12 +3423,14 @@ genericptr_t ptr;
         newbot1[0] = '\0';
         for (i = 0; fieldorder[0][i] >= 0; ++i) {
             int idx1 = fieldorder[0][i];
+
             if (status_activefields[idx1])
                 Strcat(newbot1, status_vals[idx1]);
         }
         newbot2[0] = '\0';
         for (i = 0; fieldorder[1][i] >= 0; ++i) {
             int idx2 = fieldorder[1][i];
+
             if (status_activefields[idx2])
                 Strcat(newbot2, status_vals[idx2]);
         }
@@ -3460,7 +3446,8 @@ genericptr_t ptr;
     curs(WIN_STATUS, 1, 0);
     for (i = 0; fieldorder[0][i] != BL_FLUSH; ++i) {
         int fldidx1 = fieldorder[0][i];
-        if (status_activefields[fldidx1]) {
+
+v        if (status_activefields[fldidx1]) {
             if (tty_status_colors[fldidx1] < 0 &&
                     tty_status_colors[fldidx1] >= -3) {
                 /* attribute, not a color */
@@ -3483,6 +3470,7 @@ genericptr_t ptr;
     curs(WIN_STATUS, 1, 1);
     for (i = 0; fieldorder[1][i] != BL_FLUSH; ++i) {
         int fldidx2 = fieldorder[1][i];
+
         if (status_activefields[fldidx2]) {
             if (tty_status_colors[fldidx2] < 0 &&
                     tty_status_colors[fldidx2] >= -3) {
@@ -3498,7 +3486,7 @@ genericptr_t ptr;
                 if (fldidx2 == BL_GOLD) {
                     /* putmixed() due to GOLD glyph */
                    putmixed(WIN_STATUS, 0, status_vals[fldidx2]);
-		} else {
+                } else {
                    putstr(WIN_STATUS, 0, status_vals[fldidx2]);
                 }
                 if (tty_status_colors[fldidx2] != NO_COLOR)
@@ -3513,7 +3501,7 @@ genericptr_t ptr;
 
 #ifdef STATUS_HILITES
 /*
- *  status_threshold(int fldidx, int threshholdtype, anything threshold, 
+ *  status_threshold(int fldidx, int threshholdtype, anything threshold,
  *                   int behavior, int under, int over)
  *
  *        -- called when a hiliting preference is added, changed, or
@@ -3521,12 +3509,12 @@ genericptr_t ptr;
  *        -- the fldindex identifies which field is having its hiliting
  *           preference set. It is an integer index value from botl.h
  *        -- fldindex could be any one of the following from botl.h:
- *           BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, 
- *           BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX, 
- *           BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX, 
+ *           BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH,
+ *           BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX,
+ *           BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX,
  *           BL_LEVELDESC, BL_EXP, BL_CONDITION
  *        -- datatype is P_INT, P_UINT, P_LONG, or P_MASK.
- *        -- threshold is an "anything" union which can contain the 
+ *        -- threshold is an "anything" union which can contain the
  *           datatype value.
  *        -- behavior is used to define how threshold is used and can
  *           be BL_TH_NONE, BL_TH_VAL_PERCENTAGE, BL_TH_VAL_ABSOLUTE,
@@ -3536,23 +3524,22 @@ genericptr_t ptr;
  *           value. BL_TH_VAL_ABSOLUTE means that the threshold is an
  *           actual value. BL_TH_UPDOWN means that threshold is not
  *           used, and the two below/above hilite values indicate how
- *           to display something going down (under) or rising (over).		    
- *        -- under is the hilite attribute used if value is below the 
- *           threshold. The attribute can be BL_HILITE_NONE, 
- *           BL_HILITE_INVERSE, BL_HILITE_BOLD (-1, -2, or -3), or one 
- *           of the color indexes of CLR_BLACK, CLR_RED, CLR_GREEN, 
- *           CLR_BROWN, CLR_BLUE, CLR_MAGENTA, CLR_CYAN, CLR_GRAY, 
- *           CLR_ORANGE, CLR_BRIGHT_GREEN, CLR_YELLOW, CLR_BRIGHT_BLUE, 
+ *           to display something going down (under) or rising (over).
+ *        -- under is the hilite attribute used if value is below the
+ *           threshold. The attribute can be BL_HILITE_NONE,
+ *           BL_HILITE_INVERSE, BL_HILITE_BOLD (-1, -2, or -3), or one
+ *           of the color indexes of CLR_BLACK, CLR_RED, CLR_GREEN,
+ *           CLR_BROWN, CLR_BLUE, CLR_MAGENTA, CLR_CYAN, CLR_GRAY,
+ *           CLR_ORANGE, CLR_BRIGHT_GREEN, CLR_YELLOW, CLR_BRIGHT_BLUE,
  *           CLR_BRIGHT_MAGENTA, CLR_BRIGHT_CYAN, or CLR_WHITE (0 - 15).
- *        -- over is the hilite attribute used if value is at or above 
- *           the threshold. The attribute can be BL_HILITE_NONE, 
- *           BL_HILITE_INVERSE, BL_HILITE_BOLD (-1, -2, or -3), or one 
- *           of the color indexes of CLR_BLACK, CLR_RED, CLR_GREEN, 
- *           CLR_BROWN, CLR_BLUE, CLR_MAGENTA, CLR_CYAN, CLR_GRAY, 
- *           CLR_ORANGE, CLR_BRIGHT_GREEN, CLR_YELLOW, CLR_BRIGHT_BLUE, 
+ *        -- over is the hilite attribute used if value is at or above
+ *           the threshold. The attribute can be BL_HILITE_NONE,
+ *           BL_HILITE_INVERSE, BL_HILITE_BOLD (-1, -2, or -3), or one
+ *           of the color indexes of CLR_BLACK, CLR_RED, CLR_GREEN,
+ *           CLR_BROWN, CLR_BLUE, CLR_MAGENTA, CLR_CYAN, CLR_GRAY,
+ *           CLR_ORANGE, CLR_BRIGHT_GREEN, CLR_YELLOW, CLR_BRIGHT_BLUE,
  *           CLR_BRIGHT_MAGENTA, CLR_BRIGHT_CYAN, or CLR_WHITE (0 - 15).
  */
-
 void
 tty_status_threshold(fldidx, thresholdtype, threshold, behavior, under, over)
 int fldidx, thresholdtype;
@@ -3566,7 +3553,7 @@ anything threshold;
     tty_status_hilites[fldidx].over = over;
     return;
 }
- 
+
 #endif /* STATUS_HILITES */
 #endif /*STATUS_VIA_WINDOWPORT*/
 

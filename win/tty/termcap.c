@@ -1,4 +1,4 @@
-/* NetHack 3.6	termcap.c	$NHDT-Date: 1432512813 2015/05/25 00:13:33 $  $NHDT-Branch: master $:$NHDT-Revision: 1.21 $ */
+/* NetHack 3.6	termcap.c	$NHDT-Date: 1446856761 2015/11/07 00:39:21 $  $NHDT-Branch: master $:$NHDT-Revision: 1.22 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -7,7 +7,6 @@
 #if defined(TTY_GRAPHICS) && !defined(NO_TERMS)
 
 #include "wintty.h"
-
 #include "tcap.h"
 
 #ifdef MICROPORT_286_BUG
@@ -134,7 +133,7 @@ int *wid, *hgt;
 #endif
 #endif
         HO = "\033[H";
-        /*		nh_CD = "\033[J"; */
+        /*              nh_CD = "\033[J"; */
         CE = "\033[K"; /* the ANSI termcap */
 #ifndef TERMLIB
         nh_CM = "\033[%d;%dH";
@@ -262,7 +261,7 @@ int *wid, *hgt;
        CRMOD, and many output routines will have to be modified
        slightly. Let's leave that till the next release. */
     XD = Tgetstr("xd");
-    /* not:		XD = Tgetstr("do"); */
+    /* not:             XD = Tgetstr("do"); */
     if (!(nh_CM = Tgetstr("cm"))) {
         if (!UP && !HO)
             error("NetHack needs CM or UP or HO.");
@@ -286,9 +285,9 @@ int *wid, *hgt;
     KE = Tgetstr("ke"); /* keypad end (ordinary mode [ie, digits]) */
     MR = Tgetstr("mr"); /* reverse */
 #if 0
-	MB = Tgetstr("mb");	/* blink */
-	MD = Tgetstr("md");	/* boldface */
-	MH = Tgetstr("mh");	/* dim */
+    MB = Tgetstr("mb"); /* blink */
+    MD = Tgetstr("md"); /* boldface */
+    MH = Tgetstr("mh"); /* dim */
 #endif
     ME = Tgetstr("me"); /* turn off all attributes */
     if (!ME || (SE == nullstr))
@@ -394,12 +393,12 @@ tty_decgraphics_termcap_fixup()
     if (!KS)
         KS = appMode; /* ESC= (application keypad mode) */
     if (!KE)
-        KE = numMode; /* ESC> (numeric keypad mode)	  */
-                      /*
-                       * Select the line-drawing character set as the alternate font.
-                       * Do not select NA ASCII as the primary font since people may
-                       * reasonably be using the UK character set.
-                       */
+        KE = numMode; /* ESC> (numeric keypad mode) */
+    /*
+     * Select the line-drawing character set as the alternate font.
+     * Do not select NA ASCII as the primary font since people may
+     * reasonably be using the UK character set.
+     */
     if (SYMHANDLING(H_DEC))
         xputs("\033)0");
 #ifdef PC9800
@@ -544,14 +543,15 @@ int x, y;
         }
     }
     if ((int) ttyDisplay->curx < x) { /* Go to the right. */
-        if (!nh_ND)
+        if (!nh_ND) {
             cmov(x, y);
-        else /* bah */
+        } else { /* bah */
              /* should instead print what is there already */
             while ((int) ttyDisplay->curx < x) {
                 xputs(nh_ND);
                 ttyDisplay->curx++;
             }
+        }
     } else if ((int) ttyDisplay->curx > x) {
         while ((int) ttyDisplay->curx > x) { /* Go to the left. */
             xputs(BC);
@@ -598,13 +598,13 @@ const char *s;
 void
 cl_end()
 {
-    if (CE)
+    if (CE) {
         xputs(CE);
-    else { /* no-CE fix - free after Harold Rynes */
-           /* this looks terrible, especially on a slow terminal
-              but is better than nothing */
+    } else { /* no-CE fix - free after Harold Rynes */
         register int cx = ttyDisplay->curx + 1;
 
+        /* this looks terrible, especially on a slow terminal
+           but is better than nothing */
         while (cx < CO) {
             xputc(' ');
             cx++;
@@ -656,34 +656,39 @@ standoutend()
 void
 revbeg()
 {
-	if(MR) xputs(MR);
+    if (MR)
+        xputs(MR);
 }
 
 void
 boldbeg()
 {
-	if(MD) xputs(MD);
+    if (MD)
+        xputs(MD);
 }
 
 void
 blinkbeg()
 {
-	if(MB) xputs(MB);
+    if (MB)
+        xputs(MB);
 }
 
 void
 dimbeg()
-/* not in most termcap entries */
 {
-	if(MH) xputs(MH);
+    /* not in most termcap entries */
+    if (MH)
+        xputs(MH);
 }
 
 void
 m_end()
 {
-	if(ME) xputs(ME);
+    if (ME)
+        xputs(ME);
 }
-#endif
+#endif /*0*/
 
 void
 backsp()
@@ -1007,7 +1012,7 @@ int *fg, *bg;
 
     while (c < len) {
         if ((code = atoi(&str[c])) == 0) { /* reset */
-/* this also catches errors */
+            /* this also catches errors */
 #ifdef MICRO
             *fg = CLR_GRAY;
             *bg = CLR_BLACK;
@@ -1017,13 +1022,13 @@ int *fg, *bg;
         } else if (code == 1) { /* bold */
             *fg |= BRIGHT;
 #if 0
-	/* I doubt we'll ever resort to using blinking characters,
-	   unless we want a pulsing glow for something.  But, in case
-	   we do... - 3. */
-	    } else if (code == 5) { /* blinking */
-		*fg |= BLINK;
-	    } else if (code == 25) { /* stop blinking */
-		*fg &= ~BLINK;
+        /* I doubt we'll ever resort to using blinking characters,
+           unless we want a pulsing glow for something.  But, in case
+           we do... -3. */
+        } else if (code == 5) { /* blinking */
+            *fg |= BLINK;
+        } else if (code == 25) { /* stop blinking */
+            *fg &= ~BLINK;
 #endif
         } else if (code == 7 || code == 27) { /* reverse */
             code = *fg & ~BRIGHT;
