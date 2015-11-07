@@ -1,6 +1,6 @@
-/* NetHack 3.6	vision.c	$NHDT-Date: 1432512763 2015/05/25 00:12:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.23 $ */
-/* Copyright (c) Dean Luick, with acknowledgements to Dave Cohrs, 1990.	*/
-/* NetHack may be freely redistributed.  See license for details.	*/
+/* NetHack 3.6	vision.c	$NHDT-Date: 1446861773 2015/11/07 02:02:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.26 $ */
+/* Copyright (c) Dean Luick, with acknowledgements to Dave Cohrs, 1990. */
+/* NetHack may be freely redistributed.  See license for details.       */
 
 #include "hack.h"
 
@@ -16,11 +16,11 @@
  * offset on the same row as the source *is* included so we don't have to
  * make an extra check.  For example, a circle of radius 4 has offsets:
  *
- *				XXX	+2
- *				...X	+3
- *				....X	+4
- *				....X	+4
- *				@...X   +4
+ *              XXX     +2
+ *              ...X    +3
+ *              ....X   +4
+ *              ....X   +4
+ *              @...X   +4
  *
  */
 char circle_data[] = {
@@ -39,8 +39,7 @@ char circle_data[] = {
     /* 90*/ 13, 13, 13, 13, 12, 12, 12, 11, 10, 10, 9,  7,  6, 3,
     /*104*/ 14, 14, 14, 14, 13, 13, 13, 12, 12, 11, 10, 9,  8, 6, 3,
     /*119*/ 15, 15, 15, 15, 14, 14, 14, 13, 13, 12, 11, 10, 9, 8, 6, 3,
-    /*135*/ 16 /* should be MAX_RADIUS+1; used to terminate range loops -dlc
-                  */
+    /*135*/ 16 /* MAX_RADIUS+1; used to terminate range loops -dlc */
 };
 
 /*
@@ -74,10 +73,10 @@ char circle_start[] = {
 
 #if 0 /* (moved to decl.c) */
 /* True if we need to run a full vision recalculation. */
-boolean	vision_full_recalc = 0;
+boolean vision_full_recalc = 0;
 
 /* Pointers to the current vision array. */
-char	**viz_array;
+char    **viz_array;
 #endif
 char *viz_rmin, *viz_rmax; /* current vision cs bounds */
 
@@ -289,8 +288,8 @@ char **rmin, **rmax;
  * Set the "could see" and in sight bits so vision acts just like the old
  * rogue game:
  *
- *	+ If in a room, the hero can see to the room boundaries.
- *	+ The hero can always see adjacent squares.
+ *      + If in a room, the hero can see to the room boundaries.
+ *      + The hero can always see adjacent squares.
  *
  * We set the in_sight bit here as well to escape a bug that shows up
  * due to the one-sided lit wall hack.
@@ -367,17 +366,17 @@ STATIC_DCL int FDECL(new_angle, (struct rm *, unsigned char *, int, int));
  * see, then we want to extend a spine of the T to connect with the wall
  * that is beyond.  Example:
  *
- *	 Correct, but ugly			   Extend T spine
+ *       Correct, but ugly                         Extend T spine
  *
- *		| ...					| ...
- *		| ...	<-- wall beyond & floor -->	| ...
- *		| ...					| ...
- * Unseen   -->   ...					| ...
- * spine	+-...	<-- trwall & doorway	-->	+-...
- *		| ...					| ...
+ *              | ...                                   | ...
+ *              | ...   <-- wall beyond & floor -->     | ...
+ *              | ...                                   | ...
+ * Unseen   -->   ...                                   | ...
+ * spine        +-...   <-- trwall & doorway    -->     +-...
+ *              | ...                                   | ...
  *
  *
- *		   @	<-- hero		-->	   @
+ *                 @    <-- hero                -->        @
  *
  *
  * We fake the above check by only checking if the horizontal &
@@ -385,17 +384,17 @@ STATIC_DCL int FDECL(new_angle, (struct rm *, unsigned char *, int, int));
  * unblocked.  Then, _in general_ we can see beyond.  Generally,
  * this is good enough.
  *
- *	+ When this function is called we don't have all of the seen
- *	  information (we're doing a top down scan in vision_recalc).
- *	  We would need to scan once to set all IN_SIGHT and COULD_SEE
- *	  bits, then again to correctly set the seenv bits.
- *	+ I'm trying to make this as cheap as possible.  The display &
- *	  vision eat up too much CPU time.
+ *      + When this function is called we don't have all of the seen
+ *        information (we're doing a top down scan in vision_recalc).
+ *        We would need to scan once to set all IN_SIGHT and COULD_SEE
+ *        bits, then again to correctly set the seenv bits.
+ *      + I'm trying to make this as cheap as possible.  The display &
+ *        vision eat up too much CPU time.
  *
  *
  * Note:  Even as I write this, I'm still not convinced.  There are too
- *	  many exceptions.  I may have to bite the bullet and do more
- *	  checks.	- Dean 2/11/93
+ *        many exceptions.  I may have to bite the bullet and do more
+ *        checks.       - Dean 2/11/93
  */
 STATIC_OVL int
 new_angle(lev, sv, row, col)
@@ -471,32 +470,32 @@ int row, col;
  * can see.  (1) and (2) call this routine for synchronization purposes, (3)
  * calls this routine so it can operate correctly.
  *
- *	+ After the monster move, before input from the player. [moveloop()]
- *	+ At end of moveloop. [moveloop() ??? not sure why this is here]
- *	+ Right before something is printed. [pline()]
- *	+ Right before we do a vision based operation. [do_clear_area()]
- *	+ screen redraw, so we can renew all positions in sight. [docrt()]
- *	+ When toggling temporary blindness, in case additional events
- *	  impacted by vision occur during the same move [make_blinded()]
+ *      + After the monster move, before input from the player. [moveloop()]
+ *      + At end of moveloop. [moveloop() ??? not sure why this is here]
+ *      + Right before something is printed. [pline()]
+ *      + Right before we do a vision based operation. [do_clear_area()]
+ *      + screen redraw, so we can renew all positions in sight. [docrt()]
+ *      + When toggling temporary blindness, in case additional events
+ *        impacted by vision occur during the same move [make_blinded()]
  *
  * Control flag = 1.  An adjacent vision recalculation.  The hero has moved
  * one square.  Knowing this, it might be possible to optimize the vision
  * recalculation using the current knowledge.  This is presently unimplemented
  * and is treated as a control = 0 call.
  *
- *	+ Right after the hero moves. [domove()]
+ *      + Right after the hero moves. [domove()]
  *
  * Control flag = 2.  Turn off the vision system.  Nothing new will be
  * displayed, since nothing is seen.  This is usually done when you need
  * a newsym() run on all locations in sight, or on some locations but you
  * don't know which ones.
  *
- *	+ Before a screen redraw, so all positions are renewed. [docrt()]
- *	+ Right before the hero arrives on a new level. [goto_level()]
- *	+ Right after a scroll of light is read. [litroom()]
- *	+ After an option has changed that affects vision [parseoptions()]
- *	+ Right after the hero is swallowed. [gulpmu()]
- *	+ Just before bubbles are moved. [movebubbles()]
+ *      + Before a screen redraw, so all positions are renewed. [docrt()]
+ *      + Right before the hero arrives on a new level. [goto_level()]
+ *      + Right after a scroll of light is read. [litroom()]
+ *      + After an option has changed that affects vision [parseoptions()]
+ *      + Right after the hero is swallowed. [gulpmu()]
+ *      + Just before bubbles are moved. [movebubbles()]
  */
 void
 vision_recalc(control)
@@ -542,10 +541,10 @@ int control;
          * can see you, even if you can't see them.  Note that the current
          * setup allows:
          *
-         *	+ Monsters to see with the "new" vision, even on the rogue
-         *	  level.
+         *      + Monsters to see with the "new" vision, even on the rogue
+         *        level.
          *
-         *	+ Monsters can see you even when you're in a pit.
+         *      + Monsters can see you even when you're in a pit.
          */
         view_from(u.uy, u.ux, next_array, next_rmin, next_rmax, 0,
                   (void FDECL((*), (int, int, genericptr_t))) 0,
@@ -702,8 +701,8 @@ int control;
     /*
      * The main update loop.  Here we do two things:
      *
-     *	    + Set the IN_SIGHT bit for places that we could see and are lit.
-     *	    + Reset changed places.
+     *      + Set the IN_SIGHT bit for places that we could see and are lit.
+     *      + Reset changed places.
      *
      * There is one thing that make deciding what the hero can see
      * difficult:
@@ -712,8 +711,8 @@ int control;
      *      The worst offenders are doors.  Suppose a door to a lit room
      *      is closed.  It is lit on one side, but not on the other.  How
      *      do you know?  You have to check the closest adjacent position.
-     *	    Even so, that is not entirely correct.  But it seems close
-     *	    enough for now.
+     *      Even so, that is not entirely correct.  But it seems close
+     *      enough for now.
      */
     colbump[u.ux] = colbump[u.ux + 1] = 1;
     for (row = 0; row < ROWNO; row++) {
@@ -880,21 +879,19 @@ int x, y;
 }
 
 /*===========================================================================*\
- |									     |
- |	Everything below this line uses (y,x) instead of (x,y) --- the	     |
- |	algorithms are faster if they are less recursive and can scan	     |
- |	on a row longer.						     |
- |									     |
+ |                                                                           |
+ |      Everything below this line uses (y,x) instead of (x,y) --- the       |
+ |      algorithms are faster if they are less recursive and can scan        |
+ |      on a row longer.                                                     |
+ |                                                                           |
 \*===========================================================================*/
 
-/* =========================================================================
-*\
+/* ======================================================================== *\
                         Left and Right Pointer Updates
-\* =========================================================================
-*/
+\* ======================================================================== */
 
 /*
- *			LEFT and RIGHT pointer rules
+ *              LEFT and RIGHT pointer rules
  *
  *
  * **NOTE**  The rules changed on 4/4/90.  This comment reflects the
@@ -1117,12 +1114,12 @@ static genericptr_t varg;
 /*
  * Both Algorithms C and D use the following macros.
  *
- *      good_row(z)	  - Return TRUE if the argument is a legal row.
+ *      good_row(z)       - Return TRUE if the argument is a legal row.
  *      set_cs(rowp,col)  - Set the local could see array.
- *      set_min(z)	  - Save the min value of the argument and the current
- *			      row minimum.
- *      set_max(z)	  - Save the max value of the argument and the current
- *			      row maximum.
+ *      set_min(z)        - Save the min value of the argument and the current
+ *                            row minimum.
+ *      set_max(z)        - Save the max value of the argument and the current
+ *                            row maximum.
  *
  * The last three macros depend on having local pointers row_min, row_max,
  * and rowp being set correctly.
@@ -1131,19 +1128,19 @@ static genericptr_t varg;
 #define good_row(z) ((z) >= 0 && (z) < ROWNO)
 #define set_min(z)      \
     if (*row_min > (z)) \
-    *row_min = (z)
+        *row_min = (z)
 #define set_max(z)      \
     if (*row_max < (z)) \
-    *row_max = (z)
+        *row_max = (z)
 #define is_clear(row, col) viz_clear_rows[row][col]
 
 /*
- * clear_path()		expanded into 4 macros/functions:
+ * clear_path()         expanded into 4 macros/functions:
  *
- *	q1_path()
- *	q2_path()
- *	q3_path()
- *	q4_path()
+ *      q1_path()
+ *      q2_path()
+ *      q3_path()
+ *      q4_path()
  *
  * "Draw" a line from the start to the given location.  Stop if we hit
  * something that blocks light.  The start and finish points themselves are
@@ -1567,9 +1564,9 @@ int scol, srow, y2, x2;
 /*
  * Use vision tables to determine if there is a clear path from
  * (col1,row1) to (col2,row2).  This is used by:
- *		m_cansee()
- *		m_canseeu()
- *		do_light_sources()
+ *      m_cansee()
+ *      m_canseeu()
+ *      do_light_sources()
  */
 boolean
 clear_path(col1, row1, col2, row2)
@@ -1595,7 +1592,7 @@ int col1, row1, col2, row2;
 #ifdef MACRO_CPATH
 cleardone:
 #endif
-    return ((boolean) result);
+    return (boolean) result;
 }
 
 #ifdef VISION_TABLES
@@ -1854,12 +1851,12 @@ char *limits;       /* points at range limit for current row, or NULL */
 
         if (!viz_clear_rows[row][left]) {
             hit_stone = 1; /* use stone on this row as close block */
-                           /*
-                            * We can see all of the wall until the next open spot or the
-                            * start of the shadow caused by the far block (right).
-                            *
-                            * Can't see stone beyond the right mark.
-                            */
+            /*
+             * We can see all of the wall until the next open spot or the
+             * start of the shadow caused by the far block (right).
+             *
+             * Can't see stone beyond the right mark.
+             */
             if (loc_right > right_mark)
                 loc_right = right_mark;
 
@@ -2415,7 +2412,7 @@ char *limits;   /* points at range limit for current row, or NULL */
              * Check for boundary conditions.  We *need* check (2) to break
              * an infinite loop where:
              *
-             *		left == right_edge == right_mark == lim_max.
+             *           left == right_edge == right_mark == lim_max.
              *
              */
             if (left > lim_max)

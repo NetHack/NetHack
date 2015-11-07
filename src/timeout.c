@@ -1,4 +1,4 @@
-/* NetHack 3.6	timeout.c	$NHDT-Date: 1440120659 2015/08/21 01:30:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.6	timeout.c	$NHDT-Date: 1446861771 2015/11/07 02:02:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.63 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -43,8 +43,8 @@ stoned_dialogue()
             nomul(0);
         break;
     case 4: /* limbs stiffening */
-            /* just one move left to save oneself so quit fiddling around;
-               don't stop attempt to eat tin--might be lizard or acidic */
+        /* just one move left to save oneself so quit fiddling around;
+           don't stop attempt to eat tin--might be lizard or acidic */
         if (!Popeye(STONED))
             stop_occupation();
         if (multi > 0)
@@ -451,8 +451,8 @@ boolean wakeup_msg;
 }
 
 /* Attach an egg hatch timeout to the given egg.
- *	when = Time to hatch, usually only passed if re-creating an
- *	       existing hatch timer. Pass 0L for random hatch time.
+ *      when = Time to hatch, usually only passed if re-creating an
+ *             existing hatch timer. Pass 0L for random hatch time.
  */
 void
 attach_egg_hatch_timeout(egg, when)
@@ -546,33 +546,28 @@ long timeout;
             hatchcount -= i;
             egg->quan -= (long) hatchcount;
         }
-    }
 #if 0
-	/*
-	 * We could possibly hatch while migrating, but the code isn't
-	 * set up for it...
-	 */
-	else if (obj->where == OBJ_MIGRATING) {
-	    /*
-	    We can do several things.  The first ones that come to
-	    mind are:
-
-	    + Create the hatched monster then place it on the migrating
-	      mons list.  This is tough because all makemon() is made
-	      to place the monster as well.    Makemon() also doesn't
-	      lend itself well to splitting off a "not yet placed"
-	      subroutine.
-
-	    + Mark the egg as hatched, then place the monster when we
-	      place the migrating objects.
-
-	    + Or just kill any egg which gets sent to another level.
-	      Falling is the usual reason such transportation occurs.
-	    */
-	    cansee_hatchspot = FALSE;
-	    mon = ???
-	    }
+    /*
+     * We could possibly hatch while migrating, but the code isn't
+     * set up for it...
+     */
+    } else if (obj->where == OBJ_MIGRATING) {
+        /*
+         * We can do several things.  The first ones that come to
+         * mind are:
+         * + Create the hatched monster then place it on the migrating
+         *   mons list.  This is tough because all makemon() is made
+         *   to place the monster as well.  Makemon() also doesn't lend
+         *   itself well to splitting off a "not yet placed" subroutine.
+         * + Mark the egg as hatched, then place the monster when we
+         *   place the migrating objects.
+         * + Or just kill any egg which gets sent to another level.
+         *   Falling is the usual reason such transportation occurs.
+         */
+        cansee_hatchspot = FALSE;
+        mon = ???;
 #endif
+    }
 
     if (mon) {
         char monnambuf[BUFSZ], carriedby[BUFSZ];
@@ -630,8 +625,8 @@ long timeout;
             }
             break;
 #if 0
-		case OBJ_MIGRATING:
-		    break;
+        case OBJ_MIGRATING:
+            break;
 #endif
         default:
             impossible("egg hatched where? (%d)", (int) egg->where);
@@ -703,17 +698,16 @@ slip_or_trip()
         otmp = 0;
 
     if (otmp && on_foot) { /* trip over something in particular */
-                           /*
-                               If there is only one item, it will have just been named
-                               during the move, so refer to by via pronoun; otherwise,
-                               if the top item has been or can be seen, refer to it by
-                               name; if not, look for rocks to trip over; trip over
-                               anonymous "something" if there aren't any rocks.
-                            */
-        what =
-            (iflags.last_msg == PLNMSG_ONE_ITEM_HERE)
-                ? ((otmp->quan == 1L) ? "it" : Hallucination ? "they"
-                                                             : "them")
+        /*
+          If there is only one item, it will have just been named
+          during the move, so refer to by via pronoun; otherwise,
+          if the top item has been or can be seen, refer to it by
+          name; if not, look for rocks to trip over; trip over
+          anonymous "something" if there aren't any rocks.
+        */
+        what = (iflags.last_msg == PLNMSG_ONE_ITEM_HERE)
+                ? ((otmp->quan == 1L) ? "it"
+                      : Hallucination ? "they" : "them")
                 : (otmp->dknown || !Blind)
                       ? doname(otmp)
                       : ((otmp2 = sobj_at(ROCK, u.ux, u.uy)) == 0
@@ -1100,17 +1094,15 @@ long timeout;
  * a timer.
  *
  * Burn rules:
- *	potions of oil, lamps & candles:
- *		age = # of turns of fuel left
- *		spe = <unused>
- *
- *	magic lamps:
- *		age = <unused>
- *		spe = 0 not lightable, 1 lightable forever
- *
- *	candelabrum:
- *		age = # of turns of fuel left
- *		spe = # of candles
+ *      potions of oil, lamps & candles:
+ *              age = # of turns of fuel left
+ *              spe = <unused>
+ *      magic lamps:
+ *              age = <unused>
+ *              spe = 0 not lightable, 1 lightable forever
+ *      candelabrum:
+ *              age = # of turns of fuel left
+ *              spe = # of candles
  *
  * Once the burn begins, the age will be set to the amount of fuel
  * remaining _once_the_burn_finishes_.  If the burn is terminated
@@ -1314,56 +1306,55 @@ do_storms()
  * Interface:
  *
  * General:
- *	boolean start_timer(long timeout,short kind,short func_index,
- *							anything *arg)
- *		Start a timer of kind 'kind' that will expire at time
- *		monstermoves+'timeout'.  Call the function at 'func_index'
- *		in the timeout table using argument 'arg'.  Return TRUE if
- *		a timer was started.  This places the timer on a list ordered
- *		"sooner" to "later".  If an object, increment the object's
- *		timer count.
+ *  boolean start_timer(long timeout,short kind,short func_index,
+ *                      anything *arg)
+ *      Start a timer of kind 'kind' that will expire at time
+ *      monstermoves+'timeout'.  Call the function at 'func_index'
+ *      in the timeout table using argument 'arg'.  Return TRUE if
+ *      a timer was started.  This places the timer on a list ordered
+ *      "sooner" to "later".  If an object, increment the object's
+ *      timer count.
  *
- *	long stop_timer(short func_index, anything *arg)
- *		Stop a timer specified by the (func_index, arg) pair.  This
- *		assumes that such a pair is unique.  Return the time the
- *		timer would have gone off.  If no timer is found, return 0.
- *		If an object, decrement the object's timer count.
+ *  long stop_timer(short func_index, anything *arg)
+ *      Stop a timer specified by the (func_index, arg) pair.  This
+ *      assumes that such a pair is unique.  Return the time the
+ *      timer would have gone off.  If no timer is found, return 0.
+ *      If an object, decrement the object's timer count.
  *
- *	long peek_timer(short func_index, anything *arg)
- *		Return time specified timer will go off (0 if no such timer).
+ *  long peek_timer(short func_index, anything *arg)
+ *      Return time specified timer will go off (0 if no such timer).
  *
- *	void run_timers(void)
- *		Call timers that have timed out.
- *
+ *  void run_timers(void)
+ *      Call timers that have timed out.
  *
  * Save/Restore:
- *	void save_timers(int fd, int mode, int range)
- *		Save all timers of range 'range'.  Range is either global
- *		or local.  Global timers follow game play, local timers
- *		are saved with a level.  Object and monster timers are
- *		saved using their respective id's instead of pointers.
+ *  void save_timers(int fd, int mode, int range)
+ *      Save all timers of range 'range'.  Range is either global
+ *      or local.  Global timers follow game play, local timers
+ *      are saved with a level.  Object and monster timers are
+ *      saved using their respective id's instead of pointers.
  *
- *	void restore_timers(int fd, int range, boolean ghostly, long adjust)
- *		Restore timers of range 'range'.  If from a ghost pile,
- *		adjust the timeout by 'adjust'.  The object and monster
- *		ids are not restored until later.
+ *  void restore_timers(int fd, int range, boolean ghostly, long adjust)
+ *      Restore timers of range 'range'.  If from a ghost pile,
+ *      adjust the timeout by 'adjust'.  The object and monster
+ *      ids are not restored until later.
  *
- *	void relink_timers(boolean ghostly)
- *		Relink all object and monster timers that had been saved
- *		using their object's or monster's id number.
+ *  void relink_timers(boolean ghostly)
+ *      Relink all object and monster timers that had been saved
+ *      using their object's or monster's id number.
  *
  * Object Specific:
- *	void obj_move_timers(struct obj *src, struct obj *dest)
- *		Reassign all timers from src to dest.
+ *  void obj_move_timers(struct obj *src, struct obj *dest)
+ *      Reassign all timers from src to dest.
  *
- *	void obj_split_timers(struct obj *src, struct obj *dest)
- *		Duplicate all timers assigned to src and attach them to dest.
+ *  void obj_split_timers(struct obj *src, struct obj *dest)
+ *      Duplicate all timers assigned to src and attach them to dest.
  *
- *	void obj_stop_timers(struct obj *obj)
- *		Stop all timers attached to obj.
+ *  void obj_stop_timers(struct obj *obj)
+ *      Stop all timers attached to obj.
  *
- *	boolean obj_has_timer(struct obj *object, short timer_type)
- *		Check whether object has a timer of type timer_type.
+ *  boolean obj_has_timer(struct obj *object, short timer_type)
+ *      Check whether object has a timer of type timer_type.
  */
 
 STATIC_DCL const char *FDECL(kind_name, (SHORT_P));
@@ -1672,7 +1663,7 @@ short timer_type;
 {
     long timeout = peek_timer(timer_type, obj_to_any(object));
 
-    return (boolean)(timeout != 0L);
+    return (boolean) (timeout != 0L);
 }
 
 /*
@@ -1933,12 +1924,12 @@ boolean write_it;
  * timers.
  *
  * Global range:
- *		+ timeouts that follow the hero (global)
- *		+ timeouts that follow obj & monst that are migrating
+ *      + timeouts that follow the hero (global)
+ *      + timeouts that follow obj & monst that are migrating
  *
  * Level range:
- *		+ timeouts that are level specific (e.g. storms)
- *		+ timeouts that stay with the level (obj & monst)
+ *      + timeouts that are level specific (e.g. storms)
+ *      + timeouts that stay with the level (obj & monst)
  */
 void
 save_timers(fd, mode, range)

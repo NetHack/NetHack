@@ -1,4 +1,4 @@
-/* NetHack 3.6	potion.c	$NHDT-Date: 1446603164 2015/11/04 02:12:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.120 $ */
+/* NetHack 3.6	potion.c	$NHDT-Date: 1446861768 2015/11/07 02:02:48 $  $NHDT-Branch: master $:$NHDT-Revision: 1.121 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -623,7 +623,7 @@ register struct obj *otmp;
                 exercise(A_CON, TRUE);
                 if (u.ulycn >= LOW_PM)
                     you_unwere(TRUE); /* "Purified" */
-                                      /* make_confused(0L,TRUE); */
+                /* make_confused(0L, TRUE); */
             } else {
                 if (u.ualign.type == A_LAWFUL) {
                     pline("This burns like acid!");

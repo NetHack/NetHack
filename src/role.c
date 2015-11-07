@@ -1,4 +1,4 @@
-/* NetHack 3.6	role.c	$NHDT-Date: 1445906861 2015/10/27 00:47:41 $  $NHDT-Branch: master $:$NHDT-Revision: 1.33 $ */
+/* NetHack 3.6	role.c	$NHDT-Date: 1446861770 2015/11/07 02:02:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.34 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -34,9 +34,7 @@ const struct Role roles[] = {
         { "Speleologist", 0 },
         { "Collector", 0 },
         { "Curator", 0 } },
-      "Quetzalcoatl",
-      "Camaxtli",
-      "Huhetotl", /* Central American */
+      "Quetzalcoatl", "Camaxtli", "Huhetotl", /* Central American */
       "Arc",
       "the College of Archeology",
       "the Tomb of the Toltec Kings",
@@ -78,9 +76,7 @@ const struct Role roles[] = {
         { "Slayer", 0 },
         { "Chieftain", "Chieftainess" },
         { "Conqueror", "Conqueress" } },
-      "Mitra",
-      "Crom",
-      "Set", /* Hyborian */
+      "Mitra", "Crom", "Set", /* Hyborian */
       "Bar",
       "the Camp of the Duali Tribe",
       "the Duali Oasis",
@@ -122,9 +118,7 @@ const struct Role roles[] = {
         { "Nomad", 0 },
         { "Rover", 0 },
         { "Pioneer", 0 } },
-      "Anu",
-      "_Ishtar",
-      "Anshar", /* Babylonian */
+      "Anu", "_Ishtar", "Anshar", /* Babylonian */
       "Cav",
       "the Caves of the Ancestors",
       "the Dragon's Lair",
@@ -166,9 +160,7 @@ const struct Role roles[] = {
         { "Magister", "Magistra" },
         { "Physician", 0 },
         { "Chirurgeon", 0 } },
-      "_Athena",
-      "Hermes",
-      "Poseidon", /* Greek */
+      "_Athena", "Hermes", "Poseidon", /* Greek */
       "Hea",
       "the Temple of Epidaurus",
       "the Temple of Coeus",
@@ -209,9 +201,7 @@ const struct Role roles[] = {
         { "Chevalier", "Chevaliere" },
         { "Seignieur", "Dame" },
         { "Paladin", 0 } },
-      "Lugh",
-      "_Brigit",
-      "Manannan Mac Lir", /* Celtic */
+      "Lugh", "_Brigit", "Manannan Mac Lir", /* Celtic */
       "Kni",
       "Camelot Castle",
       "the Isle of Glass",
@@ -252,9 +242,7 @@ const struct Role roles[] = {
         { "Student of Winds", 0 },
         { "Student of Fire", 0 },
         { "Master", 0 } },
-      "Shan Lai Ching",
-      "Chih Sung-tzu",
-      "Huan Ti", /* Chinese */
+      "Shan Lai Ching", "Chih Sung-tzu", "Huan Ti", /* Chinese */
       "Mon",
       "the Monastery of Chan-Sune",
       "the Monastery of the Earth-Lord",
@@ -296,9 +284,7 @@ const struct Role roles[] = {
         { "Lama", 0 },
         { "Patriarch", "Matriarch" },
         { "High Priest", "High Priestess" } },
-      0,
-      0,
-      0, /* chosen randomly from among the other roles */
+      0, 0, 0, /* deities from a randomly chosen other role will be used */
       "Pri",
       "the Great Temple",
       "the Temple of Nalzok",
@@ -342,9 +328,7 @@ const struct Role roles[] = {
         { "Filcher", 0 },
         { "Magsman", "Magswoman" },
         { "Thief", 0 } },
-      "Issek",
-      "Mog",
-      "Kos", /* Nehwon */
+      "Issek", "Mog", "Kos", /* Nehwon */
       "Rog",
       "the Thieves' Guild Hall",
       "the Assassins' Guild Hall",
@@ -378,31 +362,28 @@ const struct Role roles[] = {
     { { "Ranger", 0 },
       {
 #if 0 /* OBSOLETE */
-	{"Edhel",       "Elleth"},
-	{"Edhel",       "Elleth"},      /* elf-maid */
-	{"Ohtar",       "Ohtie"},       /* warrior */
-	{"Kano",			/* commander (Q.) ['a] */
-			"Kanie"},	/* educated guess, until further research- SAC */
-	{"Arandur",			/* king's servant, minister (Q.) - guess */
-			"Aranduriel"},	/* educated guess */
-	{"Hir",         "Hiril"},       /* lord, lady (S.) ['ir] */
-	{"Aredhel",     "Arwen"},       /* noble elf, maiden (S.) */
-	{"Ernil",       "Elentariel"},  /* prince (S.), elf-maiden (Q.) */
-	{"Elentar",     "Elentari"},	/* Star-king, -queen (Q.) */
-	"Solonor Thelandira", "Aerdrie Faenya", "Lolth", /* Elven */
+        {"Edhel",   "Elleth"},
+        {"Edhel",   "Elleth"},         /* elf-maid */
+        {"Ohtar",   "Ohtie"},          /* warrior */
+        {"Kano",    "Kanie"},          /* commander (Q.) ['a] educated guess,
+                                          until further research- SAC */
+        {"Arandur"," Aranduriel"}, /* king's servant, minister (Q.) - guess */
+        {"Hir",         "Hiril"},      /* lord, lady (S.) ['ir] */
+        {"Aredhel",     "Arwen"},      /* noble elf, maiden (S.) */
+        {"Ernil",       "Elentariel"}, /* prince (S.), elf-maiden (Q.) */
+        {"Elentar",     "Elentari"},   /* Star-king, -queen (Q.) */
+        "Solonor Thelandira", "Aerdrie Faenya", "Lolth", /* Elven */
 #endif
-          { "Tenderfoot", 0 },
-          { "Lookout", 0 },
-          { "Trailblazer", 0 },
-          { "Reconnoiterer", "Reconnoiteress" },
-          { "Scout", 0 },
-          { "Arbalester", 0 }, /* One skilled at crossbows */
-          { "Archer", 0 },
-          { "Sharpshooter", 0 },
-          { "Marksman", "Markswoman" } },
-      "Mercury",
-      "_Venus",
-      "Mars", /* Roman/planets */
+        { "Tenderfoot", 0 },
+        { "Lookout", 0 },
+        { "Trailblazer", 0 },
+        { "Reconnoiterer", "Reconnoiteress" },
+        { "Scout", 0 },
+        { "Arbalester", 0 }, /* One skilled at crossbows */
+        { "Archer", 0 },
+        { "Sharpshooter", 0 },
+        { "Marksman", "Markswoman" } },
+      "Mercury", "_Venus", "Mars", /* Roman/planets */
       "Ran",
       "Orion's camp",
       "the cave of the wumpus",
@@ -444,9 +425,7 @@ const struct Role roles[] = {
         { "Daimyo", 0 },         /* a samurai lord */
         { "Kuge", 0 },           /* Noble of the Court */
         { "Shogun", 0 } },       /* supreme commander, warlord */
-      "_Amaterasu Omikami",
-      "Raijin",
-      "Susanowo", /* Japanese */
+      "_Amaterasu Omikami", "Raijin", "Susanowo", /* Japanese */
       "Sam",
       "the Castle of the Taro Clan",
       "the Shogun's Castle",
@@ -487,9 +466,7 @@ const struct Role roles[] = {
         { "Voyager", 0 },
         { "Explorer", 0 },
         { "Adventurer", 0 } },
-      "Blind Io",
-      "_The Lady",
-      "Offler", /* Discworld */
+      "Blind Io", "_The Lady", "Offler", /* Discworld */
       "Tou",
       "Ankh-Morpork",
       "the Thieves' Guild Hall",
@@ -530,9 +507,7 @@ const struct Role roles[] = {
         { "Hero", "Heroine" },
         { "Champion", 0 },
         { "Lord", "Lady" } },
-      "Tyr",
-      "Odin",
-      "Loki", /* Norse */
+      "Tyr", "Odin", "Loki", /* Norse */
       "Val",
       "the Shrine of Destiny",
       "the cave of Surtur",
@@ -573,9 +548,7 @@ const struct Role roles[] = {
         { "Necromancer", 0 },
         { "Wizard", 0 },
         { "Mage", 0 } },
-      "Ptah",
-      "Thoth",
-      "Anhur", /* Egyptian */
+      "Ptah", "Thoth", "Anhur", /* Egyptian */
       "Wiz",
       "the Lonely Tower",
       "the Tower of Darkness",
@@ -1787,7 +1760,7 @@ winid where;
             a = 1; /* aligns[neutral] */
         else if ((allowmask & ROLE_ALIGNMASK) == AM_CHAOTIC)
             a = 2; /* alings[chaotic] */
-                   /* [c never forces gender] */
+        /* [c never forces gender] */
     }
     /* [g and a don't constrain anything sufficiently
        to narrow something done to a single choice] */
@@ -1979,18 +1952,19 @@ winid where;
 }
 
 /*
- *	Special setup modifications here:
+ *      Special setup modifications here:
  *
- *	Unfortunately, this is going to have to be done
- *	on each newgame or restore, because you lose the permonst mods
- *	across a save/restore.  :-)
+ *      Unfortunately, this is going to have to be done
+ *      on each newgame or restore, because you lose the permonst mods
+ *      across a save/restore.  :-)
  *
- *	1 - The Rogue Leader is the Tourist Nemesis.
- *	2 - Priests start with a random alignment - convert the leader and
- *	    guardians here.
- *	3 - Elves can have one of two different leaders, but can't work it
- *	    out here because it requires hacking the level file data (see
- *	    sp_lev.c).
+ *      1 - The Rogue Leader is the Tourist Nemesis.
+ *      2 - Priests start with a random alignment - convert the leader and
+ *          guardians here.
+ *      3 - Priests also get their of deities from a randomly chosen role.
+ *      4 - [obsolete] Elves can have one of two different leaders,
+ *          but can't work it out here because it requires hacking the
+ *          level file data (see sp_lev.c).
  *
  * This code also replaces quest_init().
  */
@@ -2074,10 +2048,8 @@ role_init()
         pm->mflags3 |= M3_WANTSARTI | M3_WAITFORU;
         /* if gender is random, we choose it now instead of waiting
            until the nemesis monster is created */
-        quest_status.nemgend =
-            is_neuter(pm) ? 2 : is_female(pm) ? 1 : is_male(pm)
-                                                        ? 0
-                                                        : (rn2(100) < 50);
+        quest_status.nemgend = is_neuter(pm) ? 2 : is_female(pm) ? 1
+                                   : is_male(pm) ? 0 : (rn2(100) < 50);
     }
 
     /* Fix up the god names */

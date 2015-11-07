@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1446713647 2015/11/05 08:54:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.231 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1446861775 2015/11/07 02:02:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.232 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -344,8 +344,8 @@ struct obj *otmp;
         }
         break;
     case WAN_SLEEP: /* (broken wand) */
-                    /* [wakeup() doesn't rouse victims of temporary sleep,
-                        so it's okay to leave `wake' set to TRUE here] */
+        /* [wakeup() doesn't rouse victims of temporary sleep,
+           so it's okay to leave `wake' set to TRUE here] */
         reveal_invis = TRUE;
         if (sleep_monst(mtmp, d(1 + otmp->spe, 12), WAND_CLASS))
             slept_monst(mtmp);
@@ -355,6 +355,7 @@ struct obj *otmp;
     case SPE_STONE_TO_FLESH:
         if (monsndx(mtmp->data) == PM_STONE_GOLEM) {
             char *name = Monnam(mtmp);
+
             /* turn into flesh golem */
             if (newcham(mtmp, &mons[PM_FLESH_GOLEM], FALSE, FALSE)) {
                 if (canseemon(mtmp))
@@ -1669,7 +1670,7 @@ struct obj *obj;
         smell = TRUE;
         break;
     case WEAPON_CLASS: /* crysknife */
-                       /* fall through */
+        /*FALLTHRU*/
     default:
         res = 0;
         break;
@@ -2320,7 +2321,7 @@ boolean ordinary;
         You_feel("%sbetter.", obj->otyp == SPE_EXTRA_HEALING ? "much " : "");
         break;
     case WAN_LIGHT: /* (broken wand) */
-                    /* assert( !ordinary ); */
+        /* assert( !ordinary ); */
         damage = d(obj->spe, 25);
     case EXPENSIVE_CAMERA:
         if (!damage)
