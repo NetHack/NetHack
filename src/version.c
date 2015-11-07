@@ -1,4 +1,4 @@
-/* NetHack 3.6	version.c	$NHDT-Date: 1444867101 2015/10/14 23:58:21 $  $NHDT-Branch: master $:$NHDT-Revision: 1.39 $ */
+/* NetHack 3.6	version.c	$NHDT-Date: 1446887538 2015/11/07 09:12:18 $  $NHDT-Branch: master $:$NHDT-Revision: 1.40 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -113,12 +113,13 @@ doextversion()
 
             if (!rtadded) {
                 const char *catchphrase = ", and basic NetHack features.";
+
                 pd = strstri(buf, catchphrase);
                 if (pd) {
                     *pd = '\0';
                     insert_rtoptions(win, buf, &catchphrase[2]);
                     rtadded = TRUE; /* only do it once */
-		}
+               }
             }
             if (*buf)
                 putstr(win, 0, buf);
@@ -153,7 +154,7 @@ const char *finalphrase;
     int l, i;
     const char *s1 = 0, *s2 = 0, *s3 = 0, *s4 = 0;
 
-    if ((int)strlen(buf) >= (BUFSZ - 1))
+    if ((int) strlen(buf) >= (BUFSZ - 1))
         return;
 
     strcpy(rtbuf, buf);
@@ -169,9 +170,9 @@ const char *finalphrase;
             s3 = "";
             s4 = "";
         }
-        l = (int)strlen(rtbuf) + (int)strlen(s1) + (int)strlen(s2) +
-            (int)strlen(s3) + (int)strlen(s4) + 1;
-        if (l <= (COLNO - 5) && l < (BUFSZ-1)) {
+        l = (int) strlen(rtbuf) + (int) strlen(s1) + (int) strlen(s2)
+            + (int) strlen(s3) + (int) strlen(s4) + 1;
+        if (l <= (COLNO - 5) && l < (BUFSZ - 1)) {
             Strcat(rtbuf, s1);
             Strcat(rtbuf, s2);
             Strcat(rtbuf, s3);
@@ -180,16 +181,16 @@ const char *finalphrase;
             putstr(win, 0, rtbuf);
             if (i >= SIZE(rt_opts))
                 s1 = "";
-            l = (int)strlen(indent) + (int)strlen(s1) + (int)strlen(s2) +
-                (int)strlen(s3) + (int)strlen(s4) + 1;
-            if (l <= (COLNO -5) && l < (BUFSZ-1)) {
+            l = (int) strlen(indent) + (int) strlen(s1) + (int) strlen(s2)
+                + (int) strlen(s3) + (int) strlen(s4) + 1;
+            if (l <= (COLNO - 5) && l < (BUFSZ - 1)) {
                 Strcpy(rtbuf, indent);
                 Strcat(rtbuf, s1);
                 Strcat(rtbuf, s2);
                 Strcat(rtbuf, s3);
                 Strcat(rtbuf, s4);
             }
-	}
+        }
     }
 
     if (l)
@@ -202,7 +203,7 @@ boolean
 comp_times(filetime)
 long filetime;
 {
-    return ((boolean)(filetime < BUILD_TIME));
+    return (boolean) (filetime < BUILD_TIME);
 }
 #endif
 
@@ -273,8 +274,8 @@ store_version(fd)
 int fd;
 {
     static const struct version_info version_data = {
-        VERSION_NUMBER, VERSION_FEATURES, VERSION_SANITY1, VERSION_SANITY2,
-        VERSION_SANITY3
+        VERSION_NUMBER, VERSION_FEATURES,
+        VERSION_SANITY1, VERSION_SANITY2, VERSION_SANITY3
     };
 
     bufoff(fd);

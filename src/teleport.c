@@ -1,4 +1,4 @@
-/* NetHack 3.6	teleport.c	$NHDT-Date: 1446078762 2015/10/29 00:32:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.61 $ */
+/* NetHack 3.6	teleport.c	$NHDT-Date: 1446887535 2015/11/07 09:12:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.62 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -261,9 +261,9 @@ boolean allow_drag;
      * not allow_drag is true, because we are calling that function, not
      * to drag, but to move the chain.  *However* there are some dumb
      * special cases:
-     *    0				 0
+     *    0                          0
      *   _X  move east       ----->  X_
-     *    @				  @
+     *    @                           @
      * These are permissible if teleporting, but not if dragging.  As a
      * result, drag_ball() needs to know about allow_drag and might end
      * up dragging the ball anyway.  Also, drag_ball() might find that
@@ -357,7 +357,7 @@ boolean allow_drag;
     do {
         nux = rnd(COLNO - 1);
         nuy = rn2(ROWNO);
-    } while (!teleok(nux, nuy, (boolean)(tcnt > 200)) && ++tcnt <= 400);
+    } while (!teleok(nux, nuy, (boolean) (tcnt > 200)) && ++tcnt <= 400);
 
     if (tcnt <= 400) {
         teleds(nux, nuy, allow_drag);
@@ -1184,8 +1184,7 @@ int in_sight;
     return 0;
 }
 
-/* place object randomly, returns FALSE if it's gone (eg broken) as a result
- */
+/* place object randomly, returns False if it's gone (eg broken) */
 boolean
 rloco(obj)
 register struct obj *obj;

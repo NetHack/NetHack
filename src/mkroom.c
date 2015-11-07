@@ -1,17 +1,17 @@
-/* NetHack 3.6	mkroom.c	$NHDT-Date: 1432512772 2015/05/25 00:12:52 $  $NHDT-Branch: master $:$NHDT-Revision: 1.23 $ */
+/* NetHack 3.6	mkroom.c	$NHDT-Date: 1446887530 2015/11/07 09:12:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.24 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
  * Entry points:
- *	mkroom() -- make and stock a room of a given type
- *	nexttodoor() -- return TRUE if adjacent to a door
- *	has_dnstairs() -- return TRUE if given room has a down staircase
- *	has_upstairs() -- return TRUE if given room has an up staircase
- *	courtmon() -- generate a court monster
- *	save_rooms() -- save rooms into file fd
- *	rest_rooms() -- restore rooms from file fd
- *	cmap_to_type() -- convert S_xxx symbol to XXX topology code
+ *      mkroom() -- make and stock a room of a given type
+ *      nexttodoor() -- return TRUE if adjacent to a door
+ *      has_dnstairs() -- return TRUE if given room has a down staircase
+ *      has_upstairs() -- return TRUE if given room has an up staircase
+ *      courtmon() -- generate a court monster
+ *      save_rooms() -- save rooms into file fd
+ *      rest_rooms() -- restore rooms from file fd
+ *      cmap_to_type() -- convert S_xxx symbol to XXX topology code
  */
 
 #include "hack.h"
@@ -34,14 +34,15 @@ STATIC_OVL boolean
 isbig(sroom)
 register struct mkroom *sroom;
 {
-    register int area =
-        (sroom->hx - sroom->lx + 1) * (sroom->hy - sroom->ly + 1);
-    return ((boolean)(area > 20));
+    register int area = (sroom->hx - sroom->lx + 1)
+                        * (sroom->hy - sroom->ly + 1);
+
+    return (boolean) (area > 20);
 }
 
+/* make and stock a room of a given type */
 void
 mkroom(roomtype)
-/* make and stock a room of a given type */
 int roomtype;
 {
     if (roomtype >= SHOPBASE)
@@ -189,7 +190,7 @@ gottype:
     }
     sroom->rtype = SHOPBASE + i;
 
-/* set room bits before stocking the shop */
+    /* set room bits before stocking the shop */
 #ifdef SPECIALIZATION
     topologize(sroom, FALSE); /* doesn't matter - this is a special room */
 #else
@@ -200,10 +201,10 @@ gottype:
     stock_room(i, sroom);
 }
 
+/* pick an unused room, preferably with only one door */
 STATIC_OVL struct mkroom *
 pick_room(strict)
 register boolean strict;
-/* pick an unused room, preferably with only one door */
 {
     register struct mkroom *sroom;
     register int i = nroom;
@@ -283,6 +284,7 @@ struct mkroom *sroom;
         goldlim = 500 * level_difficulty();
         break;
     }
+
     for (sx = sroom->lx; sx <= sroom->hx; sx++)
         for (sy = sroom->ly; sy <= sroom->hy; sy++) {
             if (sroom->irregular) {
@@ -301,26 +303,24 @@ struct mkroom *sroom;
             /* don't place monster on explicitly placed throne */
             if (type == COURT && IS_THRONE(levl[sx][sy].typ))
                 continue;
-            mon = makemon(
-                (type == COURT)
-                    ? courtmon()
-                    : (type == BARRACKS)
-                          ? squadmon()
-                          : (type == MORGUE)
-                                ? morguemon()
-                                : (type == BEEHIVE)
-                                      ? (sx == tx && sy == ty
-                                             ? &mons[PM_QUEEN_BEE]
-                                             : &mons[PM_KILLER_BEE])
-                                      : (type == LEPREHALL)
-                                            ? &mons[PM_LEPRECHAUN]
-                                            : (type == COCKNEST)
-                                                  ? &mons[PM_COCKATRICE]
-                                                  : (type == ANTHOLE)
-                                                        ? antholemon()
-                                                        : (struct permonst
-                                                               *) 0,
-                sx, sy, NO_MM_FLAGS);
+            mon = makemon((type == COURT)
+                           ? courtmon()
+                           : (type == BARRACKS)
+                              ? squadmon()
+                              : (type == MORGUE)
+                                 ? morguemon()
+                                 : (type == BEEHIVE)
+                                     ? (sx == tx && sy == ty
+                                         ? &mons[PM_QUEEN_BEE]
+                                         : &mons[PM_KILLER_BEE])
+                                     : (type == LEPREHALL)
+                                         ? &mons[PM_LEPRECHAUN]
+                                         : (type == COCKNEST)
+                                             ? &mons[PM_COCKATRICE]
+                                             : (type == ANTHOLE)
+                                                 ? antholemon()
+                                                 : (struct permonst *) 0,
+                          sx, sy, NO_MM_FLAGS);
             if (mon) {
                 mon->msleeping = 1;
                 if (type == COURT && mon->mpeaceful) {
@@ -423,7 +423,8 @@ int mm_flags;
     while (cnt--) {
         mdat = morguemon();
         if (enexto(&cc, mm->x, mm->y, mdat)
-            && (!revive_corpses || !(otmp = sobj_at(CORPSE, cc.x, cc.y))
+            && (!revive_corpses
+                || !(otmp = sobj_at(CORPSE, cc.x, cc.y))
                 || !revive(otmp, FALSE)))
             (void) makemon(mdat, cc.x, cc.y, mm_flags);
     }
@@ -437,20 +438,21 @@ morguemon()
 
     if (hd > 10 && i < 10) {
         if (Inhell || In_endgame(&u.uz)) {
-            return (mkclass(S_DEMON, 0));
+            return mkclass(S_DEMON, 0);
         } else {
             int ndemon_res = ndemon(A_NONE);
             if (ndemon_res != NON_PM)
-                return (&mons[ndemon_res]);
+                return &mons[ndemon_res];
             /* else do what? As is, it will drop to ghost/wraith/zombie */
         }
     }
 
     if (hd > 8 && i > 85)
-        return (mkclass(S_VAMPIRE, 0));
+        return mkclass(S_VAMPIRE, 0);
 
-    return ((i < 20) ? &mons[PM_GHOST] : (i < 40) ? &mons[PM_WRAITH]
-                                                  : mkclass(S_ZOMBIE, 0));
+    return ((i < 20) ? &mons[PM_GHOST]
+                     : (i < 40) ? &mons[PM_WRAITH]
+                                : mkclass(S_ZOMBIE, 0));
 }
 
 struct permonst *
@@ -476,11 +478,13 @@ antholemon()
         }
         /* try again if chosen type has been genocided or used up */
     } while (++trycnt < 3 && (mvitals[mtyp].mvflags & G_GONE));
+
     return ((mvitals[mtyp].mvflags & G_GONE) ? (struct permonst *) 0
                                              : &mons[mtyp]);
 }
 
-STATIC_OVL void mkswamp() /* Michiel Huisjes & Fred de Wilde */
+STATIC_OVL void
+mkswamp() /* Michiel Huisjes & Fred de Wilde */
 {
     register struct mkroom *sroom;
     register int sx, sy, i, eelct = 0;
@@ -501,11 +505,12 @@ STATIC_OVL void mkswamp() /* Michiel Huisjes & Fred de Wilde */
                         levl[sx][sy].typ = POOL;
                         if (!eelct || !rn2(4)) {
                             /* mkclass() won't do, as we might get kraken */
-                            (void) makemon(
-                                rn2(5) ? &mons[PM_GIANT_EEL]
-                                       : rn2(2) ? &mons[PM_PIRANHA]
-                                                : &mons[PM_ELECTRIC_EEL],
-                                sx, sy, NO_MM_FLAGS);
+                            (void) makemon(rn2(5)
+                                              ? &mons[PM_GIANT_EEL]
+                                              : rn2(2)
+                                                 ? &mons[PM_PIRANHA]
+                                                 : &mons[PM_ELECTRIC_EEL],
+                                           sx, sy, NO_MM_FLAGS);
                             eelct++;
                         }
                     } else if (!rn2(4)) /* swamps tend to be moldy */
@@ -569,15 +574,16 @@ register int sx, sy;
 {
     register int dx, dy;
     register struct rm *lev;
+
     for (dx = -1; dx <= 1; dx++)
         for (dy = -1; dy <= 1; dy++) {
             if (!isok(sx + dx, sy + dy))
                 continue;
-            if (IS_DOOR((lev = &levl[sx + dx][sy + dy])->typ)
-                || lev->typ == SDOOR)
-                return (TRUE);
+            lev = &levl[sx + dx][sy + dy];
+            if (IS_DOOR(lev->typ) || lev->typ == SDOOR)
+                return TRUE;
         }
-    return (FALSE);
+    return FALSE;
 }
 
 boolean
@@ -587,7 +593,7 @@ register struct mkroom *sroom;
     if (sroom == dnstairs_room)
         return TRUE;
     if (sstairs.sx && !sstairs.up)
-        return ((boolean)(sroom == sstairs_room));
+        return (boolean) (sroom == sstairs_room);
     return FALSE;
 }
 
@@ -598,7 +604,7 @@ register struct mkroom *sroom;
     if (sroom == upstairs_room)
         return TRUE;
     if (sstairs.sx && sstairs.up)
-        return ((boolean)(sroom == sstairs_room));
+        return (boolean) (sroom == sstairs_room);
     return FALSE;
 }
 
@@ -621,8 +627,8 @@ inside_room(croom, x, y)
 struct mkroom *croom;
 xchar x, y;
 {
-    return ((boolean)(x >= croom->lx - 1 && x <= croom->hx + 1
-                      && y >= croom->ly - 1 && y <= croom->hy + 1));
+    return (boolean) (x >= croom->lx - 1 && x <= croom->hx + 1
+                      && y >= croom->ly - 1 && y <= croom->hy + 1);
 }
 
 boolean
@@ -682,7 +688,6 @@ coord *c;
  *		- ANY_SHOP
  *		- ANY_TYPE
  */
-
 struct mkroom *
 search_special(type)
 schar type;
@@ -706,24 +711,25 @@ struct permonst *
 courtmon()
 {
     int i = rn2(60) + rn2(3 * level_difficulty());
+
     if (i > 100)
-        return (mkclass(S_DRAGON, 0));
+        return mkclass(S_DRAGON, 0);
     else if (i > 95)
-        return (mkclass(S_GIANT, 0));
+        return mkclass(S_GIANT, 0);
     else if (i > 85)
-        return (mkclass(S_TROLL, 0));
+        return mkclass(S_TROLL, 0);
     else if (i > 75)
-        return (mkclass(S_CENTAUR, 0));
+        return mkclass(S_CENTAUR, 0);
     else if (i > 60)
-        return (mkclass(S_ORC, 0));
+        return mkclass(S_ORC, 0);
     else if (i > 45)
-        return (&mons[PM_BUGBEAR]);
+        return &mons[PM_BUGBEAR];
     else if (i > 30)
-        return (&mons[PM_HOBGOBLIN]);
+        return &mons[PM_HOBGOBLIN];
     else if (i > 15)
-        return (mkclass(S_GNOME, 0));
+        return mkclass(S_GNOME, 0);
     else
-        return (mkclass(S_KOBOLD, 0));
+        return mkclass(S_KOBOLD, 0);
 }
 
 #define NSTYPES (PM_CAPTAIN - PM_SOLDIER + 1)
@@ -736,7 +742,9 @@ static struct {
                          { PM_LIEUTENANT, 4 },
                          { PM_CAPTAIN, 1 } };
 
-STATIC_OVL struct permonst *squadmon() /* return soldier types. */
+/* return soldier types. */
+STATIC_OVL struct permonst *
+squadmon()
 {
     int sel_prob, i, cpro, mndx;
 
@@ -753,28 +761,28 @@ STATIC_OVL struct permonst *squadmon() /* return soldier types. */
     mndx = squadprob[rn2(NSTYPES)].pm;
 gotone:
     if (!(mvitals[mndx].mvflags & G_GONE))
-        return (&mons[mndx]);
+        return &mons[mndx];
     else
-        return ((struct permonst *) 0);
+        return (struct permonst *) 0;
 }
 
 /*
  * save_room : A recursive function that saves a room and its subrooms
  * (if any).
  */
-
 STATIC_OVL void
 save_room(fd, r)
 int fd;
 struct mkroom *r;
 {
     short i;
+
     /*
      * Well, I really should write only useful information instead
      * of writing the whole structure. That is I should not write
      * the subrooms pointers, but who cares ?
      */
-    bwrite(fd, (genericptr_t) r, sizeof(struct mkroom));
+    bwrite(fd, (genericptr_t) r, sizeof (struct mkroom));
     for (i = 0; i < r->nsubrooms; i++)
         save_room(fd, r->sbrooms[i]);
 }
@@ -782,7 +790,6 @@ struct mkroom *r;
 /*
  * save_rooms : Save all the rooms on disk!
  */
-
 void
 save_rooms(fd)
 int fd;
@@ -814,7 +821,6 @@ struct mkroom *r;
  * rest_rooms : That's for restoring rooms. Read the rooms structure from
  * the disk.
  */
-
 void
 rest_rooms(fd)
 int fd;

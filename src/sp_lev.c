@@ -1,17 +1,16 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1446854235 2015/11/06 23:57:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.69 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1446887534 2015/11/07 09:12:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.70 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
  * This file contains the various functions that are related to the special
  * levels.
- * It contains also the special level loader.
  *
+ * It contains also the special level loader.
  */
 
 #include "hack.h"
 #include "dlb.h"
-
 #include "sp_lev.h"
 
 #ifdef _MSC_VER
@@ -168,7 +167,7 @@ STATIC_DCL void FDECL(spo_shuffle_array, (struct sp_coder *));
 #define Fgetc (schar) dlb_fgetc
 #define New(type) (type *) alloc(sizeof(type))
 #define NewTab(type, size) (type **) alloc(sizeof(type *) * (unsigned) size)
-#define Free(ptr) if (ptr) free((genericptr_t)(ptr))
+#define Free(ptr) if (ptr) free((genericptr_t) (ptr))
 
 extern struct engr *head_engr;
 
@@ -386,7 +385,7 @@ struct opvar *
 opvar_new_region(x1,y1,x2,y2)
      int x1,y1,x2,y2;
 {
-    struct opvar *tmpov = (struct opvar *)alloc(sizeof(struct opvar));
+    struct opvar *tmpov = (struct opvar *)alloc(sizeof (struct opvar));
 
     tmpov->spovartyp = SPOVAR_REGION;
     tmpov->vardata.l = SP_REGION_PACK(x1,y1,x2,y2);
@@ -4415,7 +4414,8 @@ struct sp_coder *coder;
         /* realloc the lregion space to add the new one */
         lev_region *newl = (lev_region *) alloc(
             sizeof(lev_region) * (unsigned) (1 + num_lregions));
-        (void) memcpy((genericptr_t)(newl), (genericptr_t) lregions,
+
+        (void) memcpy((genericptr_t) (newl), (genericptr_t) lregions,
                       sizeof(lev_region) * num_lregions);
         Free(lregions);
         num_lregions++;

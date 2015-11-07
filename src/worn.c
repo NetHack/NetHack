@@ -1,4 +1,4 @@
-/* NetHack 3.6	worn.c	$NHDT-Date: 1446078770 2015/10/29 00:32:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.46 $ */
+/* NetHack 3.6	worn.c	$NHDT-Date: 1446887541 2015/11/07 09:12:21 $  $NHDT-Branch: master $:$NHDT-Revision: 1.47 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -346,7 +346,7 @@ boolean on, silently;
         default:
             if (which <= 8) { /* 1 thru 8 correspond to MR_xxx mask values */
                 /* FIRE,COLD,SLEEP,DISINT,SHOCK,POISON,ACID,STONE */
-                mask = (uchar)(1 << (which - 1));
+                mask = (uchar) (1 << (which - 1));
                 mon->mintrinsics |= (unsigned short) mask;
             }
             break;
@@ -372,7 +372,7 @@ boolean on, silently;
         case POISON_RES:
         case ACID_RES:
         case STONE_RES:
-            mask = (uchar)(1 << (which - 1));
+            mask = (uchar) (1 << (which - 1));
             /* If the monster doesn't have this resistance intrinsically,
                check whether any other worn item confers it.  Note that
                we don't currently check for anything conferred via simply
@@ -428,7 +428,9 @@ register struct monst *mon;
     return base;
 }
 
-/* weapons are handled separately; rings and eyewear aren't used by monsters
+/*
+ * weapons are handled separately;
+ * rings and eyewear aren't used by monsters
  */
 
 /* Wear the best object of each type that the monster has.  During creation,
@@ -690,12 +692,13 @@ clear_bypasses()
         nobj = otmp->nobj;
         if (otmp->bypass) {
             otmp->bypass = 0;
-/* bypass will have inhibited any stacking, but since it's
- * used for polymorph handling, the objects here probably
- * have been transformed and won't be stacked in the usual
- * manner afterwards; so don't bother with this.
- * [Changing the fobj chain mid-traversal would also be risky.]
- */
+
+            /* bypass will have inhibited any stacking, but since it's
+             * used for polymorph handling, the objects here probably
+             * have been transformed and won't be stacked in the usual
+             * manner afterwards; so don't bother with this.
+             * [Changing the fobj chain mid-traversal would also be risky.]
+             */
 #if 0
             if (objects[otmp->otyp].oc_merge) {
                 xchar ox, oy;
@@ -924,13 +927,14 @@ boolean polyspot;
 }
 
 /* bias a monster's preferences towards armor that has special benefits. */
-/* currently only does speed boots, but might be expanded if monsters get to
-   use more armor abilities */
 STATIC_OVL int
 extra_pref(mon, obj)
 struct monst *mon;
 struct obj *obj;
 {
+    /* currently only does speed boots, but might be expanded if monsters
+     * get to use more armor abilities
+     */
     if (obj) {
         if (obj->otyp == SPEED_BOOTS && mon->permspeed != MFAST)
             return 20;
@@ -939,8 +943,8 @@ struct obj *obj;
 }
 
 /*
- * Exceptions to things based on race. Correctly checks polymorphed player
- *race.
+ * Exceptions to things based on race.
+ * Correctly checks polymorphed player race.
  * Returns:
  *       0 No exception, normal rules apply.
  *       1 If the race/object combination is acceptable.

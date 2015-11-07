@@ -1,4 +1,4 @@
-/* NetHack 3.6	shknam.c	$NHDT-Date: 1432512765 2015/05/25 00:12:45 $  $NHDT-Branch: master $:$NHDT-Revision: 1.36 $ */
+/* NetHack 3.6	shknam.c	$NHDT-Date: 1446887533 2015/11/07 09:12:13 $  $NHDT-Branch: master $:$NHDT-Revision: 1.37 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,8 +9,8 @@
 STATIC_DCL boolean FDECL(veggy_item, (struct obj * obj, int));
 STATIC_DCL int NDECL(shkveg);
 STATIC_DCL void FDECL(mkveggy_at, (int, int));
-STATIC_DCL void FDECL(mkshobj_at,
-                      (const struct shclass *, int, int, BOOLEAN_P));
+STATIC_DCL void FDECL(mkshobj_at, (const struct shclass *, int, int,
+                                   BOOLEAN_P));
 STATIC_DCL void FDECL(nameshk, (struct monst *, const char *const *));
 STATIC_DCL int FDECL(shkinit, (const struct shclass *, struct mkroom *));
 
@@ -18,11 +18,11 @@ STATIC_DCL int FDECL(shkinit, (const struct shclass *, struct mkroom *));
 
 /*
  *  Name prefix codes:
- *	dash          -  female, personal name
- *	underscore    _  female, general name
- *	plus          +  male, personal name
- *	vertical bar  |  male, general name (implied for most of shktools)
- *	equals        =  gender not specified, personal name
+ *      dash          -  female, personal name
+ *      underscore    _  female, general name
+ *      plus          +  male, personal name
+ *      vertical bar  |  male, general name (implied for most of shktools)
+ *      equals        =  gender not specified, personal name
  *
  *  Personal names do not receive the honorific prefix "Mr." or "Ms.".
  */
@@ -336,6 +336,7 @@ const struct shclass shtypes[] = {
         { 3, -MAGIC_LAMP },
         { 5, -POT_OIL } },
       shklight },
+    /* sentinel */
     { (char *) 0,
       0,
       0,
@@ -350,18 +351,18 @@ const struct shclass shtypes[] = {
 void
 init_shop_selection()
 {
-	register int i, j, item_prob, shop_prob;
+    register int i, j, item_prob, shop_prob;
 
-	for (shop_prob = 0, i = 0; i < SIZE(shtypes); i++) {
-		shop_prob += shtypes[i].prob;
-		for (item_prob = 0, j = 0; j < SIZE(shtypes[0].iprobs); j++)
-			item_prob += shtypes[i].iprobs[j].iprob;
-		if (item_prob != 100)
-			panic("item probabilities total to %d for %s shops!",
-				item_prob, shtypes[i].name);
-	}
-	if (shop_prob != 100)
-		panic("shop probabilities total to %d!", shop_prob);
+    for (shop_prob = 0, i = 0; i < SIZE(shtypes); i++) {
+        shop_prob += shtypes[i].prob;
+        for (item_prob = 0, j = 0; j < SIZE(shtypes[0].iprobs); j++)
+            item_prob += shtypes[i].iprobs[j].iprob;
+        if (item_prob != 100)
+            panic("item probabilities total to %d for %s shops!",
+                  item_prob, shtypes[i].name);
+    }
+    if (shop_prob != 100)
+        panic("shop probabilities total to %d!", shop_prob);
 }
 #endif /*0*/
 
@@ -390,9 +391,10 @@ int otyp; /* used iff obj is null */
         if (objects[otyp].oc_material == VEGGY || otyp == EGG)
             return TRUE;
         if (otyp == TIN && corpsenm == NON_PM) /* implies obj is non-null */
-            return (obj->spe == 1);            /* 0 = empty, 1 = spinach */
+            return (boolean) (obj->spe == 1); /* 0 = empty, 1 = spinach */
         if (otyp == TIN || otyp == CORPSE)
-            return (corpsenm >= LOW_PM && vegetarian(&mons[corpsenm]));
+            return (boolean) (corpsenm >= LOW_PM
+                              && vegetarian(&mons[corpsenm]));
     }
     return FALSE;
 }
@@ -442,28 +444,29 @@ int sx, sy;
     return;
 }
 
+/* make an object of the appropriate type for a shop square */
 STATIC_OVL void
 mkshobj_at(shp, sx, sy, mkspecl)
-/* make an object of the appropriate type for a shop square */
 const struct shclass *shp;
 int sx, sy;
 boolean mkspecl;
 {
     struct monst *mtmp;
-    int atype;
     struct permonst *ptr;
+    int atype;
 
     /* 3.6.0 tribute */
     if (mkspecl && (!strcmp(shp->name, "rare books")
                     || !strcmp(shp->name, "second-hand bookstore"))) {
         struct obj *novel = mksobj_at(SPE_NOVEL, sx, sy, FALSE, FALSE);
+
         if (novel)
             context.tribute.bookstock = TRUE;
         return;
     }
 
     if (rn2(100) < depth(&u.uz) && !MON_AT(sx, sy)
-        && (ptr = mkclass(S_MIMIC, 0))
+        && (ptr = mkclass(S_MIMIC, 0)) != 0
         && (mtmp = makemon(ptr, sx, sy, NO_MM_FLAGS)) != 0) {
         /* note: makemon will set the mimic symbol to a shop item */
         if (rn2(10) >= depth(&u.uz)) {
@@ -579,8 +582,9 @@ struct monst *mtmp;
     mtmp->isshk = 0;
 }
 
-STATIC_OVL int shkinit(shp,
-                       sroom) /* create a new shopkeeper in the given room */
+/* create a new shopkeeper in the given room */
+STATIC_OVL int
+shkinit(shp, sroom)
 const struct shclass *shp;
 struct mkroom *sroom;
 {
@@ -638,7 +642,7 @@ struct mkroom *sroom;
             display_nhwindow(WIN_MESSAGE, FALSE);
         }
 #endif
-        return (-1);
+        return -1;
     }
 
     if (MON_AT(sx, sy))
@@ -646,13 +650,13 @@ struct mkroom *sroom;
 
     /* now initialize the shopkeeper monster structure */
     if (!(shk = makemon(&mons[PM_SHOPKEEPER], sx, sy, MM_ESHK)))
-        return (-1);
+        return -1;
     eshkp = ESHK(shk); /* makemon(...,MM_ESHK) allocates this */
     shk->isshk = shk->mpeaceful = 1;
     set_malign(shk);
     shk->msleeping = 0;
     shk->mtrapseen = ~0; /* we know all the traps already */
-    eshkp->shoproom = (schar)((sroom - rooms) + ROOMOFFSET);
+    eshkp->shoproom = (schar) ((sroom - rooms) + ROOMOFFSET);
     sroom->resident = shk;
     eshkp->shoptype = sroom->rtype;
     assign_level(&eshkp->shoplevel, &u.uz);
@@ -669,7 +673,7 @@ struct mkroom *sroom;
         (void) mongets(shk, TOUCHSTONE);
     nameshk(shk, shp->shknms);
 
-    return (sh);
+    return sh;
 }
 
 /* stock a newly-created room with objects */
@@ -694,11 +698,9 @@ register struct mkroom *sroom;
     if ((sh = shkinit(shp, sroom)) < 0)
         return;
 
-    /* make sure no doorways without doors, and no */
-    /* trapped doors, in shops.			   */
+    /* make sure no doorways without doors, and no trapped doors, in shops */
     sx = doors[sroom->fdoor].x;
     sy = doors[sroom->fdoor].y;
-
     if (levl[sx][sy].doormask == D_NODOOR) {
         levl[sx][sy].doormask = D_ISOPEN;
         newsym(sx, sy);
@@ -848,7 +850,7 @@ struct monst *mtmp;
 {
     const char *shknm = ESHK(mtmp)->shknam;
 
-    return (*shknm == '-' || *shknm == '+' || *shknm == '=');
+    return (boolean) (*shknm == '-' || *shknm == '+' || *shknm == '=');
 }
 
 boolean
@@ -869,7 +871,7 @@ boolean override_hallucination;
     /* skip "+" prefix */
     if (!letter(*shknm))
         ++shknm;
-    return !strcmp(shknm, "Izchak");
+    return (boolean) !strcmp(shknm, "Izchak");
 }
 
 /*shknam.c*/

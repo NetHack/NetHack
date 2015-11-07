@@ -1,4 +1,4 @@
-/* NetHack 3.6	wield.c	$NHDT-Date: 1446861774 2015/11/07 02:02:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.46 $ */
+/* NetHack 3.6	wield.c	$NHDT-Date: 1446887539 2015/11/07 09:12:19 $  $NHDT-Branch: master $:$NHDT-Revision: 1.47 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -611,7 +611,7 @@ register int amount;
         Sprintf(buf, "Your %s %s.", makeplural(body_part(HAND)),
                 (amount >= 0) ? "twitch" : "itch");
         strange_feeling(otmp, buf);
-        exercise(A_DEX, (boolean)(amount >= 0));
+        exercise(A_DEX, (boolean) (amount >= 0));
         return 0;
     }
 

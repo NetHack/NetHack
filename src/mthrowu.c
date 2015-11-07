@@ -1,4 +1,4 @@
-/* NetHack 3.6	mthrowu.c	$NHDT-Date: 1446808447 2015/11/06 11:14:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.62 $ */
+/* NetHack 3.6	mthrowu.c	$NHDT-Date: 1446887531 2015/11/07 09:12:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.63 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -230,10 +230,10 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
                 mondied(mtmp);
         }
 
-        if (can_blnd(
-                (struct monst *) 0, mtmp,
-                (uchar)(otmp->otyp == BLINDING_VENOM ? AT_SPIT : AT_WEAP),
-                otmp)) {
+        if (can_blnd((struct monst *) 0, mtmp,
+                     (uchar) (otmp->otyp == BLINDING_VENOM ? AT_SPIT
+                                                           : AT_WEAP),
+                     otmp)) {
             if (vis && mtmp->mcansee)
                 pline("%s is blinded by %s.", Monnam(mtmp), the(xname(otmp)));
             mtmp->mcansee = 0;
@@ -410,7 +410,7 @@ struct obj *obj;         /* missile (or stack providing it) */
                          (u.umortality > oldumort) ? 0 : 10, TRUE);
             }
             if (hitu && can_blnd((struct monst *) 0, &youmonst,
-                                 (uchar)(singleobj->otyp == BLINDING_VENOM
+                                 (uchar) (singleobj->otyp == BLINDING_VENOM
                                              ? AT_SPIT
                                              : AT_WEAP),
                                  singleobj)) {

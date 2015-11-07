@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1446713645 2015/11/05 08:54:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.150 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1446887537 2015/11/07 09:12:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.151 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -864,7 +864,7 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
                 case BLINDING_VENOM:
                     mon->msleeping = 0;
                     if (can_blnd(&youmonst, mon,
-                                 (uchar)(obj->otyp == BLINDING_VENOM
+                                 (uchar) (obj->otyp == BLINDING_VENOM
                                              ? AT_SPIT
                                              : AT_WEAP),
                                  obj)) {

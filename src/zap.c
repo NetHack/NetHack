@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1446861775 2015/11/07 02:02:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.232 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1446887542 2015/11/07 09:12:22 $  $NHDT-Branch: master $:$NHDT-Revision: 1.233 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -4133,8 +4133,8 @@ long timeout UNUSED;
     xchar x, y;
     long where = arg->a_long;
 
-    y = (xchar)(where & 0xFFFF);
-    x = (xchar)((where >> 16) & 0xFFFF);
+    y = (xchar) (where & 0xFFFF);
+    x = (xchar) ((where >> 16) & 0xFFFF);
     /* melt_ice does newsym when appropriate */
     melt_ice(x, y, "Some ice melts away.");
 }

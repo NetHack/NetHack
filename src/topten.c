@@ -1,4 +1,4 @@
-/* NetHack 3.6	topten.c	$NHDT-Date: 1436753525 2015/07/13 02:12:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.37 $ */
+/* NetHack 3.6	topten.c	$NHDT-Date: 1446887536 2015/11/07 09:12:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.38 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -11,8 +11,8 @@
 #endif
 
 #ifdef VMS
-/* We don't want to rewrite the whole file, because that entails	 */
-/* creating a new version which requires that the old one be deletable. */
+/* We don't want to rewrite the whole file, because that entails
+   creating a new version which requires that the old one be deletable. */
 #define UPDATE_RECORD_IN_PLACE
 #endif
 
@@ -28,8 +28,8 @@ static long final_fpos;
 
 #define done_stopprint program_state.stopprint
 
-#define newttentry() (struct toptenentry *) alloc(sizeof(struct toptenentry))
-#define dealloc_ttentry(ttent) free((genericptr_t)(ttent))
+#define newttentry() (struct toptenentry *) alloc(sizeof (struct toptenentry))
+#define dealloc_ttentry(ttent) free((genericptr_t) (ttent))
 #define NAMSZ 10
 #define DTHSZ 100
 #define ROLESZ 3
@@ -144,16 +144,23 @@ STATIC_OVL xchar
 observable_depth(lev)
 d_level *lev;
 {
-#if 0 /* if we ever randomize the order of the elemental planes, we \
-         must use a constant external representation in the record file */
-	if (In_endgame(lev)) {
-	    if (Is_astralevel(lev))	 return -5;
-	    else if (Is_waterlevel(lev)) return -4;
-	    else if (Is_firelevel(lev))	 return -3;
-	    else if (Is_airlevel(lev))	 return -2;
-	    else if (Is_earthlevel(lev)) return -1;
-	    else			 return 0;	/* ? */
-	} else
+#if 0
+    /* if we ever randomize the order of the elemental planes, we
+       must use a constant external representation in the record file */
+    if (In_endgame(lev)) {
+        if (Is_astralevel(lev))
+            return -5;
+        else if (Is_waterlevel(lev))
+            return -4;
+        else if (Is_firelevel(lev))
+            return -3;
+        else if (Is_airlevel(lev))
+            return -2;
+        else if (Is_earthlevel(lev))
+            return -1;
+        else
+            return 0; /* ? */
+    } else
 #endif
     return depth(lev);
 }
@@ -602,13 +609,12 @@ time_t when;
             if (rank0 < 0) {
                 rank0 = 0;
                 rank1 = rank;
-                HUP
-                {
+                HUP {
                     char pbuf[BUFSZ];
-                    Sprintf(
-                        pbuf,
+
+                    Sprintf(pbuf,
                         "You didn't beat your previous score of %ld points.",
-                        t1->points);
+                            t1->points);
                     topten_print(pbuf);
                     topten_print("");
                 }
@@ -643,10 +649,11 @@ time_t when;
 #endif /* UPDATE_RECORD_IN_PLACE */
         if (!done_stopprint)
             if (rank0 > 0) {
-                if (rank0 <= 10)
+                if (rank0 <= 10) {
                     topten_print("You made the top ten list!");
-                else {
+                } else {
                     char pbuf[BUFSZ];
+
                     Sprintf(pbuf,
                             "You reached the %d%s place on the top %d list.",
                             rank0, ordin(rank0), sysopt.entrymax);
@@ -1091,6 +1098,7 @@ char **argv;
 #ifdef AMIGA
     {
         extern winid amii_rawprwin;
+
         display_nhwindow(amii_rawprwin, 1);
         destroy_nhwindow(amii_rawprwin);
         amii_rawprwin = WIN_ERR;
@@ -1120,7 +1128,7 @@ boolean fem;
         return PM_RANGER;
 
     impossible("What weird role is this? (%s)", plch);
-    return (PM_HUMAN_MUMMY);
+    return  PM_HUMAN_MUMMY;
 }
 
 /*
@@ -1138,7 +1146,7 @@ struct obj *otmp;
     struct toptenentry tt_buf;
 
     if (!otmp)
-        return ((struct obj *) 0);
+        return (struct obj *) 0;
 
     rfile = fopen_datafile(RECORD, "r", SCOREPREFIX);
     if (!rfile) {
