@@ -97,7 +97,7 @@ WINSRC += $(WINX11SRC)
 WINOBJ += $(WINX11OBJ)
 WINLIB += $(WINX11LIB)
 LFLAGS=-L/opt/X11/lib
-VARDATND = x11tiles NetHack.ad pet_mark.xbm
+VARDATND = x11tiles NetHack.ad pet_mark.xbm pilemark.xbm
 POSTINSTALL+= bdftopcf win/X11/nh10.bdf > $(HACKDIR)/nh10.pcf; (cd $(HACKDIR); mkfontdir);
 CFLAGS += -DX11_GRAPHICS -I/opt/X11/include
 endif	# WANT_WIN_X11
