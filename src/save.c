@@ -1,4 +1,4 @@
-/* NetHack 3.6	save.c	$NHDT-Date: 1446516854 2015/11/03 02:14:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.91 $ */
+/* NetHack 3.6	save.c	$NHDT-Date: 1446892456 2015/11/07 10:34:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.92 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -157,7 +157,7 @@ dosave0()
     if (fd < 0) {
         HUP pline("Cannot open save file.");
         (void) delete_savefile(); /* ab@unido */
-        return (0);
+        return 0;
     }
 
     vision_recalc(2); /* shut down vision to prevent problems
@@ -251,7 +251,7 @@ dosave0()
             (void) delete_savefile();
             HUP Strcpy(killer.name, whynot);
             HUP done(TRICKED);
-            return (0);
+            return 0;
         }
         minit(); /* ZEROCOMP */
         getlev(ofd, hackpid, ltmp, FALSE);
@@ -270,7 +270,7 @@ dosave0()
     nh_compress(fq_save);
     /* this should probably come sooner... */
     program_state.something_worth_saving = 0;
-    return (1);
+    return 1;
 }
 
 STATIC_OVL void
@@ -499,7 +499,8 @@ int mode;
     bwrite(fd, (genericptr_t) &lev, sizeof(lev));
 #endif
     savecemetery(fd, mode, &level.bonesinfo);
-    savelevl(fd, (boolean)((sfsaveinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
+    savelevl(fd,
+             (boolean) ((sfsaveinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
     bwrite(fd, (genericptr_t) lastseentyp, sizeof(lastseentyp));
     bwrite(fd, (genericptr_t) &monstermoves, sizeof(monstermoves));
     bwrite(fd, (genericptr_t) &upstair, sizeof(stairway));
@@ -617,7 +618,8 @@ int fd;
     return;
 }
 
-void bflush(fd) /* flush run and buffer */
+/* flush run and buffer */
+void bflush(fd)
 register int fd;
 {
     (*saveprocs.save_bflush)(fd);
@@ -706,7 +708,7 @@ register unsigned num;
     } else
 #endif /* UNIX */
     {
-/* lint wants the 3rd arg of write to be an int; lint -p an unsigned */
+        /* lint wants 3rd arg of write to be an int; lint -p an unsigned */
 #if defined(BSD) || defined(ULTRIX) || defined(WIN32) || defined(_MSC_VER)
         failed = ((long) write(fd, loc, (int) num) != (long) num);
 #else /* e.g. SYSV, __TURBOC__ */
@@ -805,7 +807,9 @@ int fd;
     return;
 }
 
-STATIC_OVL void zerocomp_bflush(fd) /* flush run and buffer */
+/* flush run and buffer */
+STATIC_OVL void
+zerocomp_bflush(fd)
 register int fd;
 {
     bwritefd = fd;
@@ -1019,7 +1023,8 @@ register struct obj *otmp;
         if (Has_contents(otmp))
             saveobjchn(fd, otmp->cobj, mode);
         if (release_data(mode)) {
-            /*		if (otmp->oclass == FOOD_CLASS) food_disappears(otmp);
+            /*  if (otmp->oclass == FOOD_CLASS)
+             *      food_disappears(otmp);
              */
             /*
              * If these are on the floor, the discarding could
@@ -1041,7 +1046,8 @@ register struct obj *otmp;
                 /* invalidate the pointer; on reload it will get restored */
                 context.tin.tin = (struct obj *) 0;
             }
-            /*		if (otmp->oclass == SPBOOK_CLASS) book_disappears(otmp);
+            /*  if (otmp->oclass == SPBOOK_CLASS)
+             *      book_disappears(otmp);
              */
             if (otmp == context.spbook.book) {
                 /* Store the o_id of your spellbook */
@@ -1365,7 +1371,7 @@ freedynamicdata()
     freeobjchn(migrating_objs);
     freemonchn(migrating_mons);
     freemonchn(mydogs); /* ascension or dungeon escape */
-    /* freelevchn();	[folded into free_dungeons()] */
+    /* freelevchn();  --  [folded into free_dungeons()] */
     free_animals();
     free_oracles();
     freefruitchn();
@@ -1461,7 +1467,6 @@ copyfile(from, to)
 char *from, *to;
 {
 #ifdef TOS
-
     if (_copyfile(from, to))
         panic("Can't copy %s to %s", from, to);
 #else
@@ -1471,8 +1476,7 @@ char *from, *to;
 
     if ((fdfrom = open(from, O_RDONLY | O_BINARY, FCMASK)) < 0)
         panic("Can't copy from %s !?", from);
-    if ((fdto = open(to, O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, FCMASK))
-        < 0)
+    if ((fdto = open(to, O_WRONLY | O_BINARY | O_CREAT | O_TRUNC, FCMASK)) < 0)
         panic("Can't copy to %s", to);
     do {
         nfrom = read(fdfrom, buf, BUFSIZ);

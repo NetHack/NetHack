@@ -1,5 +1,5 @@
-/* NetHack 3.6	priest.c	$NHDT-Date: 1445556883 2015/10/22 23:34:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.40 $ */
-/* Copyright (c) Izchak Miller, Steve Linhart, 1989.		  */
+/* NetHack 3.6	priest.c	$NHDT-Date: 1446892452 2015/11/07 10:34:12 $  $NHDT-Branch: master $:$NHDT-Revision: 1.41 $ */
+/* Copyright (c) Izchak Miller, Steve Linhart, 1989.              */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -233,7 +233,7 @@ boolean sanctum; /* is it the seat of the high priest? */
     priest = makemon(&mons[sanctum ? PM_HIGH_PRIEST : PM_ALIGNED_PRIEST],
                      sx + 1, sy, MM_EPRI);
     if (priest) {
-        EPRI(priest)->shroom = (schar)((sroom - rooms) + ROOMOFFSET);
+        EPRI(priest)->shroom = (schar) ((sroom - rooms) + ROOMOFFSET);
         EPRI(priest)->shralign = Amask2align(levl[sx][sy].altarmask);
         EPRI(priest)->shrpos.x = sx;
         EPRI(priest)->shrpos.y = sy;
@@ -280,13 +280,13 @@ struct monst *mon;
 
 /*
  * Specially aligned monsters are named specially.
- *	- aligned priests with ispriest and high priests have shrines
- *		they retain ispriest and epri when polymorphed
- *	- aligned priests without ispriest are roamers
- *		they have isminion set and use emin rather than epri
- *	- minions do not have ispriest but have isminion and emin
- *	- caller needs to inhibit Hallucination if it wants to force
- *		the true name even when under that influence
+ *      - aligned priests with ispriest and high priests have shrines
+ *              they retain ispriest and epri when polymorphed
+ *      - aligned priests without ispriest are roamers
+ *              they have isminion set and use emin rather than epri
+ *      - minions do not have ispriest but have isminion and emin
+ *      - caller needs to inhibit Hallucination if it wants to force
+ *              the true name even when under that influence
  */
 char *
 priestname(mon, pname)
@@ -565,7 +565,7 @@ register struct monst *priest;
     if (priest->mpeaceful && *in_rooms(priest->mx, priest->my, TEMPLE)
         && !has_shrine(priest)) {
         verbalize(
-            "Begone!  Thou desecratest this holy place with thy presence.");
+              "Begone!  Thou desecratest this holy place with thy presence.");
         priest->mpeaceful = 0;
         return;
     }
@@ -593,11 +593,11 @@ register struct monst *priest;
             if (coaligned)
                 adjalign(-1);
         } else if (offer < (u.ulevel * 200)) {
-            if (money_cnt(invent) > (offer * 2L))
+            if (money_cnt(invent) > (offer * 2L)) {
                 verbalize("Cheapskate.");
-            else {
+            } else {
                 verbalize("I thank thee for thy contribution.");
-                /*  give player some token  */
+                /* give player some token */
                 exercise(A_WIS, TRUE);
             }
         } else if (offer < (u.ulevel * 400)) {
@@ -648,15 +648,15 @@ boolean peaceful;
     register boolean coaligned = (u.ualign.type == alignment);
 
 #if 0 /* this was due to permonst's pxlth field which is now gone */
-	if (ptr != &mons[PM_ALIGNED_PRIEST] && ptr != &mons[PM_ANGEL])
-		return((struct monst *)0);
+    if (ptr != &mons[PM_ALIGNED_PRIEST] && ptr != &mons[PM_ANGEL])
+        return (struct monst *) 0;
 #endif
 
     if (MON_AT(x, y))
         (void) rloc(m_at(x, y), FALSE); /* insurance */
 
     if (!(roamer = makemon(ptr, x, y, MM_ADJACENTOK | MM_EMIN)))
-        return ((struct monst *) 0);
+        return (struct monst *) 0;
 
     EMIN(roamer)->min_align = alignment;
     EMIN(roamer)->renegade = (coaligned && !peaceful);
@@ -712,7 +712,9 @@ xchar x, y;
                       && priest->mpeaceful);
 }
 
-void ghod_hitsu(priest) /* when attacking "priest" in his temple */
+/* when attacking "priest" in his temple */
+void
+ghod_hitsu(priest)
 struct monst *priest;
 {
     int x, y, ax, ay, roomno = (int) temple_occupied(u.urooms);
@@ -798,8 +800,8 @@ angry_priest()
          * If the altar has been destroyed or converted, let the
          * priest run loose.
          * (When it's just a conversion and there happens to be
-         *	a fresh corpse nearby, the priest ought to have an
-         *	opportunity to try converting it back; maybe someday...)
+         * a fresh corpse nearby, the priest ought to have an
+         * opportunity to try converting it back; maybe someday...)
          */
         lev = &levl[eprip->shrpos.x][eprip->shrpos.y];
         if (!IS_ALTAR(lev->typ)

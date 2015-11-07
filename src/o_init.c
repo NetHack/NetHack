@@ -1,4 +1,4 @@
-/* NetHack 3.6	o_init.c	$NHDT-Date: 1432512767 2015/05/25 00:12:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.18 $ */
+/* NetHack 3.6	o_init.c	$NHDT-Date: 1446892449 2015/11/07 10:34:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.20 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -279,7 +279,9 @@ find_skates()
     return -1; /* not 0, or caller would try again each move */
 }
 
-void oinit() /* level dependent initialization */
+/* level dependent initialization */
+void
+oinit()
 {
     setgemprobs(&u.uz);
 }
@@ -395,9 +397,9 @@ interesting_to_discover(i)
 register int i;
 {
     /* Pre-discovered objects are now printed with a '*' */
-    return ((boolean)(objects[i].oc_uname != (char *) 0
+    return (boolean) (objects[i].oc_uname != (char *) 0
                       || (objects[i].oc_name_known
-                          && OBJ_DESCR(objects[i]) != (char *) 0)));
+                          && OBJ_DESCR(objects[i]) != (char *) 0));
 }
 
 /* items that should stand out once they're known */
@@ -407,7 +409,8 @@ static short uniq_objs[] = {
 };
 
 /* the '\' command - show discovered object types */
-int dodiscovered() /* free after Robert Viduya */
+int
+dodiscovered() /* free after Robert Viduya */
 {
     register int i, dis;
     int ct = 0;
@@ -485,12 +488,11 @@ char *buf;
 int
 doclassdisco()
 {
-    static NEARDATA const char prompt[] =
-        "View discoveries for which sort of objects?",
-                               havent_discovered_any[] =
-                                   "haven't discovered any %s yet.",
-                               unique_items[] = "unique items",
-                               artifact_items[] = "artifacts";
+    static NEARDATA const char
+        prompt[] = "View discoveries for which sort of objects?",
+        havent_discovered_any[] = "haven't discovered any %s yet.",
+        unique_items[] = "unique items",
+        artifact_items[] = "artifacts";
     char *s, c, oclass, menulet, allclasses[MAXOCLASSES],
         discosyms[2 + MAXOCLASSES + 1], buf[BUFSZ];
     int i, ct, dis, xtras;

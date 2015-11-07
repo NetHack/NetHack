@@ -1,4 +1,4 @@
-/* NetHack 3.6	restore.c	$NHDT-Date: 1432536531 2015/05/25 06:48:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.99 $ */
+/* NetHack 3.6	restore.c	$NHDT-Date: 1446892455 2015/11/07 10:34:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.101 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -321,7 +321,7 @@ boolean ghostly, frozen;
         otmp2->nobj = 0;
     }
 
-    return (first);
+    return first;
 }
 
 /* restore one monster */
@@ -453,7 +453,7 @@ boolean ghostly;
         impossible("Restmonchn: error reading monchn.");
         mtmp2->nmon = 0;
     }
-    return (first);
+    return first;
 }
 
 STATIC_OVL struct fruit *
@@ -595,7 +595,7 @@ unsigned int *stuckid, *steedid;
 #ifdef SYSFLAGS
         sysflags = newgamesysflags;
 #endif
-        return (FALSE);
+        return FALSE;
     }
     /* in case hangup save occurred in midst of level change */
     assign_level(&u.uz0, &u.uz);
@@ -667,7 +667,7 @@ unsigned int *stuckid, *steedid;
     /* must come after all mons & objs are restored */
     relink_timers(FALSE);
     relink_light_sources(FALSE);
-    return (TRUE);
+    return TRUE;
 }
 
 /* update game state pointers to those valid for the current level (so we
@@ -774,7 +774,7 @@ register int fd;
         (void) nhclose(fd);
         (void) delete_savefile();
         restoring = FALSE;
-        return (0);
+        return 0;
     }
     restlevelstate(stuckid, steedid);
 #ifdef INSURANCE
@@ -782,7 +782,7 @@ register int fd;
 #endif
     rtmp = restlevelfile(fd, ledger_no(&u.uz));
     if (rtmp < 2)
-        return (rtmp); /* dorecover called recursively */
+        return rtmp; /* dorecover called recursively */
 
     /* these pointers won't be valid while we're processing the
      * other levels, but they'll be reset again by restlevelstate()
@@ -834,7 +834,7 @@ register int fd;
 #endif
         rtmp = restlevelfile(fd, ltmp);
         if (rtmp < 2)
-            return (rtmp); /* dorecover called recursively */
+            return rtmp; /* dorecover called recursively */
     }
     restoreprocs.mread_flags = 0;
 
@@ -876,13 +876,13 @@ register int fd;
     /* in_use processing must be after:
      *    + The inventory has been read so that freeinv() works.
      *    + The current level has been restored so billing information
-     *	is available.
+     *      is available.
      */
     inven_inuse(FALSE);
 
     load_qtlist(); /* re-load the quest text info */
-    /* Set up the vision internals, after levl[] data is loaded */
-    /* but before docrt().					    */
+    /* Set up the vision internals, after levl[] data is loaded
+       but before docrt(). */
     reglyph_darkroom();
     vision_reset();
     vision_full_recalc = 1; /* recompute vision (not saved) */
@@ -895,7 +895,7 @@ register int fd;
     /* Success! */
     welcome(FALSE);
     check_special_room(FALSE);
-    return (1);
+    return 1;
 }
 
 void
@@ -1021,7 +1021,7 @@ boolean ghostly;
     }
     restcemetery(fd, &level.bonesinfo);
     rest_levl(fd,
-              (boolean)((sfrestinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
+              (boolean) ((sfrestinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
     mread(fd, (genericptr_t) lastseentyp, sizeof(lastseentyp));
     mread(fd, (genericptr_t) &omoves, sizeof(omoves));
     elapsed = monstermoves - omoves;
@@ -1128,24 +1128,23 @@ boolean ghostly;
                 assign_level(&sstairs.tolev, &ltmp);
                 break;
             case BR_PORTAL: /* max of 1 portal per level */
-            {
-                register struct trap *ttmp;
-                for (ttmp = ftrap; ttmp; ttmp = ttmp->ntrap)
-                    if (ttmp->ttyp == MAGIC_PORTAL)
+                for (trap = ftrap; trap; trap = trap->ntrap)
+                    if (trap->ttyp == MAGIC_PORTAL)
                         break;
-                if (!ttmp)
+                if (!trap)
                     panic("getlev: need portal but none found");
-                assign_level(&ttmp->dst, &ltmp);
-            } break;
+                assign_level(&trap->dst, &ltmp);
+                break;
             }
         } else if (!br) {
+            struct trap *ttmp = 0;
+
             /* Remove any dangling portals. */
-            register struct trap *ttmp;
-            for (ttmp = ftrap; ttmp; ttmp = ttmp->ntrap)
-                if (ttmp->ttyp == MAGIC_PORTAL) {
-                    deltrap(ttmp);
-                    break; /* max of 1 portal/level */
-                }
+            for (trap = ftrap; trap; trap = ttmp) {
+                ttmp = trap->ntrap;
+                if (trap->ttyp == MAGIC_PORTAL)
+                    deltrap(trap);
+            }
         }
     }
 
@@ -1284,9 +1283,10 @@ boolean ghostly;
 }
 
 #ifdef SELECTSAVED
-/* put up a menu listing each character from this player's saved games */
+/* put up a menu listing each character from this player's saved games;
+   returns 1: use plname[], 0: new game, -1: quit */
 int
-restore_menu(bannerwin) /* returns 1: use plname[], 0: new game, -1: quit */
+restore_menu(bannerwin)
 winid bannerwin; /* if not WIN_ERR, clear window and show copyright in menu */
 {
     winid tmpwin;
@@ -1578,14 +1578,14 @@ register genericptr_t buf;
 register unsigned int len;
 {
     register int rlen;
-
 #if defined(BSD) || defined(ULTRIX)
-    rlen = read(fd, buf, (int) len);
-    if (rlen != len) {
+#define readLenType int
 #else /* e.g. SYSV, __TURBOC__ */
-    rlen = read(fd, buf, (unsigned) len);
-    if ((unsigned) rlen != len) {
+#define readLenType unsigned
 #endif
+
+    rlen = read(fd, buf, (readLenType) len);
+    if ((readLenType) rlen != (readLenType) len) {
         if (restoreprocs.mread_flags == 1) { /* means "return anyway" */
             restoreprocs.mread_flags = -1;
             return;

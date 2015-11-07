@@ -1,5 +1,5 @@
-/* NetHack 3.6	questpgr.c	$NHDT-Date: 1436515198 2015/07/10 07:59:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.33 $ */
-/*	Copyright 1991, M. Stephenson		  */
+/* NetHack 3.6	questpgr.c	$NHDT-Date: 1446892453 2015/11/07 10:34:13 $  $NHDT-Branch: master $:$NHDT-Revision: 1.34 $ */
+/*      Copyright 1991, M. Stephenson                             */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -39,8 +39,11 @@ static dlb *msg_file;
 /* used by ldrname() and neminame(), then copied into cvt_buf */
 static char nambuf[sizeof cvt_buf];
 
+/* dump the character msg list to check appearance;
+   build with DEBUG enabled and use DEBUGFILES=questpgr.c
+   in sysconf file or environment */
 static void
-dump_qtlist() /* dump the character msg list to check appearance */
+dump_qtlist()
 {
 #ifdef DEBUG
     struct qtmsg *msg;
@@ -52,7 +55,7 @@ dump_qtlist() /* dump the character msg list to check appearance */
         (void) dlb_fseek(msg_file, msg->offset, SEEK_SET);
         deliver_by_window(msg, NHW_MAP);
     }
-#endif /* !DEBUG */
+#endif /* DEBUG */
     return;
 }
 
@@ -89,7 +92,7 @@ long hdr_offset;
           msg_file);
 
     msg_list[n_msgs].msgnum = -1;
-    return (msg_list);
+    return msg_list;
 }
 
 void
@@ -155,21 +158,22 @@ int typ;
 {
     switch (typ) {
     case 0:
-        return (urole.questarti);
+        return urole.questarti;
     case MS_LEADER:
-        return (urole.ldrnum);
+        return urole.ldrnum;
     case MS_NEMESIS:
-        return (urole.neminum);
+        return urole.neminum;
     case MS_GUARDIAN:
-        return (urole.guardnum);
+        return urole.guardnum;
     default:
         impossible("quest_info(%d)", typ);
     }
     return 0;
 }
 
+/* return your role leader's name */
 const char *
-ldrname() /* return your role leader's name */
+ldrname()
 {
     int i = urole.ldrnum;
 
@@ -178,21 +182,23 @@ ldrname() /* return your role leader's name */
     return nambuf;
 }
 
+/* return your intermediate target string */
 STATIC_OVL const char *
-intermed() /* return your intermediate target string */
+intermed()
 {
-    return (urole.intermed);
+    return urole.intermed;
 }
 
 boolean
 is_quest_artifact(otmp)
 struct obj *otmp;
 {
-    return ((boolean)(otmp->oartifact == urole.questarti));
+    return (boolean) (otmp->oartifact == urole.questarti);
 }
 
+/* return your role nemesis' name */
 STATIC_OVL const char *
-neminame() /* return your role nemesis' name */
+neminame()
 {
     int i = urole.neminum;
 
@@ -206,13 +212,13 @@ guardname() /* return your role leader's guard monster name */
 {
     int i = urole.guardnum;
 
-    return (mons[i].mname);
+    return mons[i].mname;
 }
 
 STATIC_OVL const char *
 homebase() /* return your role leader's location */
 {
-    return (urole.homebase);
+    return urole.homebase;
 }
 
 /* replace deity, leader, nemesis, or artifact name with pronoun;
@@ -263,9 +269,9 @@ int msgnum;
 
     for (qt_msg = qtm_list; qt_msg->msgnum > 0; qt_msg++)
         if (qt_msg->msgnum == msgnum)
-            return (qt_msg);
+            return qt_msg;
 
-    return ((struct qtmsg *) 0);
+    return (struct qtmsg *) 0;
 }
 
 STATIC_OVL void
@@ -480,6 +486,7 @@ int how;
 #ifdef DEBUG
     if (qtdump) {
         char buf[BUFSZ];
+
         /* when dumping quest messages at startup, all of them are passed to
          * deliver_by_window(), even if normally given to deliver_by_pline()
          */
@@ -577,13 +584,13 @@ qt_montype()
     if (rn2(5)) {
         qpm = urole.enemy1num;
         if (qpm != NON_PM && rn2(5) && !(mvitals[qpm].mvflags & G_GENOD))
-            return (&mons[qpm]);
-        return (mkclass(urole.enemy1sym, 0));
+            return &mons[qpm];
+        return mkclass(urole.enemy1sym, 0);
     }
     qpm = urole.enemy2num;
     if (qpm != NON_PM && rn2(5) && !(mvitals[qpm].mvflags & G_GENOD))
-        return (&mons[qpm]);
-    return (mkclass(urole.enemy2sym, 0));
+        return &mons[qpm];
+    return mkclass(urole.enemy2sym, 0);
 }
 
 /* special levels can include a custom arrival message; display it */

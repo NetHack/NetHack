@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1445215021 2015/10/19 00:37:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.111 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1446892448 2015/11/07 10:34:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.112 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -6,8 +6,8 @@
 
 STATIC_DCL void FDECL(mkbox_cnts, (struct obj *));
 STATIC_DCL void FDECL(maybe_adjust_light, (struct obj *, int));
-STATIC_DCL void FDECL(obj_timer_checks,
-                      (struct obj *, XCHAR_P, XCHAR_P, int));
+STATIC_DCL void FDECL(obj_timer_checks, (struct obj *,
+                                         XCHAR_P, XCHAR_P, int));
 STATIC_DCL void FDECL(container_weight, (struct obj *));
 STATIC_DCL struct obj *FDECL(save_mtraits, (struct obj *, struct monst *));
 STATIC_DCL void FDECL(objlist_sanity, (struct obj *, int, const char *));
@@ -104,8 +104,8 @@ struct obj *otmp;
     if (!otmp->oextra)
         otmp->oextra = newoextra();
     if (!OMONST(otmp)) {
-        OMONST(otmp) = (struct monst *) alloc(sizeof(struct monst));
-        (void) memset((genericptr_t) OMONST(otmp), 0, sizeof(struct monst));
+        OMONST(otmp) = (struct monst *) alloc(sizeof (struct monst));
+        (void) memset((genericptr_t) OMONST(otmp), 0, sizeof (struct monst));
     }
 }
 
@@ -126,8 +126,8 @@ struct obj *otmp;
     if (!otmp->oextra)
         otmp->oextra = newoextra();
     if (!OMID(otmp)) {
-        OMID(otmp) = (unsigned *) alloc(sizeof(unsigned));
-        (void) memset((genericptr_t) OMID(otmp), 0, sizeof(unsigned));
+        OMID(otmp) = (unsigned *) alloc(sizeof (unsigned));
+        (void) memset((genericptr_t) OMID(otmp), 0, sizeof (unsigned));
     }
 }
 
@@ -148,8 +148,8 @@ struct obj *otmp;
     if (!otmp->oextra)
         otmp->oextra = newoextra();
     if (!OLONG(otmp)) {
-        OLONG(otmp) = (long *) alloc(sizeof(long));
-        (void) memset((genericptr_t) OLONG(otmp), 0, sizeof(long));
+        OLONG(otmp) = (long *) alloc(sizeof (long));
+        (void) memset((genericptr_t) OLONG(otmp), 0, sizeof (long));
     }
 }
 
@@ -195,7 +195,7 @@ boolean artif;
 
     otmp = mkobj(let, artif);
     place_object(otmp, x, y);
-    return (otmp);
+    return otmp;
 }
 
 struct obj *
@@ -207,7 +207,7 @@ boolean init, artif;
 
     otmp = mksobj(otyp, init, artif);
     place_object(otmp, x, y);
-    return (otmp);
+    return otmp;
 }
 
 struct obj *
@@ -218,11 +218,10 @@ boolean artif;
     int tprob, i, prob = rnd(1000);
 
     if (oclass == RANDOM_CLASS) {
-        const struct icp *iprobs =
-            (Is_rogue_level(&u.uz))
-                ? (const struct icp *) rogueprobs
-                : Inhell ? (const struct icp *) hellprobs
-                         : (const struct icp *) mkobjprobs;
+        const struct icp *iprobs = Is_rogue_level(&u.uz)
+                                   ? (const struct icp *) rogueprobs
+                                   : Inhell ? (const struct icp *) hellprobs
+                                            : (const struct icp *) mkobjprobs;
 
         for (tprob = rnd(100); (tprob -= iprobs->iprob) > 0; iprobs++)
             ;
@@ -236,7 +235,7 @@ boolean artif;
     if (objects[i].oc_class != oclass || !OBJ_NAME(objects[i]))
         panic("probtype error, oclass=%d i=%d", (int) oclass, i);
 
-    return (mksobj(i, TRUE, artif));
+    return mksobj(i, TRUE, artif);
 }
 
 STATIC_OVL void
@@ -321,7 +320,9 @@ struct obj *box;
     }
 }
 
-int rndmonnum() /* select a random, common monster type */
+/* select a random, common monster type */
+int
+rndmonnum()
 {
     register struct permonst *ptr;
     register int i;
@@ -330,7 +331,7 @@ int rndmonnum() /* select a random, common monster type */
     /* Plan A: get a level-appropriate common monster */
     ptr = rndmonst();
     if (ptr)
-        return (monsndx(ptr));
+        return monsndx(ptr);
 
     /* Plan B: get any common monster */
     excludeflags = G_UNIQ | G_NOGEN | (Inhell ? G_NOHELL : G_HELL);
@@ -339,7 +340,7 @@ int rndmonnum() /* select a random, common monster type */
         ptr = &mons[i];
     } while ((ptr->geno & excludeflags) != 0);
 
-    return (i);
+    return i;
 }
 
 void
@@ -1031,7 +1032,7 @@ boolean artif;
     if (objects[otyp].oc_unique && !otmp->oartifact)
         otmp = mk_artifact(otmp, (aligntyp) A_NONE);
     otmp->owt = weight(otmp);
-    return (otmp);
+    return otmp;
 }
 
 /*
@@ -1184,9 +1185,9 @@ int old_range;
 }
 
 /*
- *	bless(), curse(), unbless(), uncurse() -- any relevant message
- *	about glowing amber/black/&c should be delivered prior to calling
- *	these routines to make the actual curse/bless state change.
+ *      bless(), curse(), unbless(), uncurse() -- any relevant message
+ *      about glowing amber/black/&c should be delivered prior to calling
+ *      these routines to make the actual curse/bless state change.
  */
 
 void
@@ -1313,8 +1314,8 @@ register struct obj *otmp;
  *  and calculate the weight of any containers.
  *
  *  Note:  It is possible to end up with an incorrect weight if some part
- *	   of the code messes with a contained object and doesn't update the
- *	   container's weight.
+ *         of the code messes with a contained object and doesn't update the
+ *         container's weight.
  */
 int
 weight(obj)
@@ -1338,11 +1339,11 @@ register struct obj *obj;
          *  of the bag plus the weight of the bag's contents modified
          *  as follows:
          *
-         *	Bag status	Weight of contents
-         *	----------	------------------
-         *	cursed			2x
-         *	blessed			x/4 [rounded up: (x+3)/4]
-         *	otherwise		x/2 [rounded up: (x+1)/2]
+         *      Bag status      Weight of contents
+         *      ----------      ------------------
+         *      cursed                  2x
+         *      blessed                 x/4 [rounded up: (x+3)/4]
+         *      otherwise               x/2 [rounded up: (x+1)/2]
          *
          *  The macro DELTA_CWT in pickup.c also implements these
          *  weight equations.
@@ -1362,10 +1363,11 @@ register struct obj *obj;
         return wt;
     } else if (obj->oclass == FOOD_CLASS && obj->oeaten) {
         return eaten_stat((int) obj->quan * wt, obj);
-    } else if (obj->oclass == COIN_CLASS)
+    } else if (obj->oclass == COIN_CLASS) {
         return (int) ((obj->quan + 50L) / 100L);
-    else if (obj->otyp == HEAVY_IRON_BALL && obj->owt != 0)
-        return ((int) (obj->owt)); /* kludge for "very" heavy iron ball */
+    } else if (obj->otyp == HEAVY_IRON_BALL && obj->owt != 0) {
+        return (int) obj->owt; /* kludge for "very" heavy iron ball */
+    }
     return (wt ? wt * (int) obj->quan : ((int) obj->quan + 1) >> 1);
 }
 
@@ -1394,7 +1396,7 @@ int x, y;
         gold->quan = amount;
     }
     gold->owt = weight(gold);
-    return (gold);
+    return gold;
 }
 
 /* return TRUE if the corpse has special timing */
@@ -1407,7 +1409,7 @@ int x, y;
  * even if ptr passed as well, but ptr is always used for
  * the corpse type (corpsenm). That allows the corpse type
  * to be different from the original monster,
- *	i.e.  vampire -> human corpse
+ *      i.e.  vampire -> human corpse
  * yet still allow restoration of the original monster upon
  * resurrection.
  */
@@ -1455,7 +1457,7 @@ unsigned corpstatflags;
             }
         }
     }
-    return (otmp);
+    return otmp;
 }
 
 /*
@@ -1569,7 +1571,7 @@ register int x, y;
         if ((otmp2 = tt_oname(otmp)) != 0)
             otmp = otmp2;
     }
-    return (otmp);
+    return otmp;
 }
 
 /* make a new corpse or statue, uninitialized if a statue (i.e. no books) */
@@ -1587,7 +1589,7 @@ const char *nm;
     otmp = mkcorpstat(objtype, (struct monst *) 0, ptr, x, y, corpstatflags);
     if (nm)
         otmp = oname(otmp, nm);
-    return (otmp);
+    return otmp;
 }
 
 boolean
@@ -1607,7 +1609,7 @@ register struct obj *otmp;
     if (objects[otyp].oc_oprop == FIRE_RES || otyp == WAN_FIRE)
         return FALSE;
 
-    return ((boolean)((omat <= WOOD && omat != LIQUID) || omat == PLASTIC));
+    return (boolean) ((omat <= WOOD && omat != LIQUID) || omat == PLASTIC);
 }
 
 boolean
@@ -1616,8 +1618,8 @@ register struct obj *otmp;
 {
     int otyp = otmp->otyp;
 
-    return ((boolean)(objects[otyp].oc_material <= WOOD
-                      && objects[otyp].oc_material != LIQUID));
+    return (boolean) (objects[otyp].oc_material <= WOOD
+                      && objects[otyp].oc_material != LIQUID);
 }
 
 /*
@@ -1751,9 +1753,9 @@ int force; /* 0 = no force so do checks, <0 = force off, >0 force on */
             age = monstermoves - otmp->age;
             otmp->age = monstermoves - (age * ROT_ICE_ADJUSTMENT);
         }
-    }
+
     /* Check for corpses coming off ice */
-    else if ((force < 0) || (otmp->otyp == CORPSE && otmp->on_ice
+    } else if (force < 0 || (otmp->otyp == CORPSE && otmp->on_ice
                              && !((on_floor || buried) && is_ice(x, y)))) {
         tleft = stop_timer(action, obj_to_any(otmp));
         if (tleft == 0L) {
@@ -1774,6 +1776,7 @@ int force; /* 0 = no force so do checks, <0 = force off, >0 force on */
             otmp->age += age * (ROT_ICE_ADJUSTMENT - 1) / ROT_ICE_ADJUSTMENT;
         }
     }
+
     /* now re-start the timer with the appropriate modifications */
     if (restart_timer)
         (void) start_timer(tleft, TIMER_OBJECT, action, obj_to_any(otmp));
@@ -1829,14 +1832,14 @@ struct monst *mtmp;
  * Doesn't handle unwearing of objects in hero's or monsters' inventories.
  *
  * Object positions:
- *	OBJ_FREE	not on any list
- *	OBJ_FLOOR	fobj, level.locations[][] chains (use remove_object)
- *	OBJ_CONTAINED	cobj chain of container object
- *	OBJ_INVENT	hero's invent chain (use freeinv)
- *	OBJ_MINVENT	monster's invent chain
- *	OBJ_MIGRATING	migrating chain
- *	OBJ_BURIED	level.buriedobjs chain
- *	OBJ_ONBILL	on billobjs chain
+ *      OBJ_FREE        not on any list
+ *      OBJ_FLOOR       fobj, level.locations[][] chains (use remove_object)
+ *      OBJ_CONTAINED   cobj chain of container object
+ *      OBJ_INVENT      hero's invent chain (use freeinv)
+ *      OBJ_MINVENT     monster's invent chain
+ *      OBJ_MIGRATING   migrating chain
+ *      OBJ_BURIED      level.buriedobjs chain
+ *      OBJ_ONBILL      on billobjs chain
  */
 void
 obj_extract_self(obj)
@@ -1967,13 +1970,13 @@ struct obj *container, *obj;
     /* merge if possible */
     for (otmp = container->cobj; otmp; otmp = otmp->nobj)
         if (merged(&otmp, &obj))
-            return (otmp);
+            return otmp;
 
     obj->where = OBJ_CONTAINED;
     obj->ocontainer = container;
     obj->nobj = container->cobj;
     container->cobj = obj;
-    return (obj);
+    return obj;
 }
 
 void
@@ -2561,7 +2564,7 @@ struct obj *
 obj_nexto(otmp)
 struct obj *otmp;
 {
-    struct obj *otmp2 = NULL;
+    struct obj *otmp2 = (struct obj *) 0;
 
     if (otmp) {
         otmp2 = obj_nexto_xy(otmp->otyp, otmp->ox, otmp->oy, otmp->o_id);
@@ -2615,7 +2618,7 @@ unsigned oid;
             }
         }
     }
-    return NULL;
+    return (struct obj *) 0;
 }
 
 /*
@@ -2627,7 +2630,7 @@ struct obj *
 obj_absorb(obj1, obj2)
 struct obj **obj1, **obj2;
 {
-    struct obj *otmp1 = NULL, *otmp2 = NULL;
+    struct obj *otmp1 = (struct obj *) 0, *otmp2 = (struct obj *) 0;
     int extrawt = 0;
 
     /* don't let people dumb it up */
@@ -2642,13 +2645,13 @@ struct obj **obj1, **obj2;
             obj_extract_self(otmp2);
             newsym(otmp2->ox, otmp2->oy); /* in case of floor */
             dealloc_obj(otmp2);
-            *obj2 = NULL;
+            *obj2 = (struct obj *) 0;
             return otmp1;
         }
     }
 
     impossible("obj_absorb: not called with two actual objects");
-    return NULL;
+    return (struct obj *) 0;
 }
 
 /*
@@ -2660,7 +2663,7 @@ struct obj *
 obj_meld(obj1, obj2)
 struct obj **obj1, **obj2;
 {
-    struct obj *otmp1 = NULL, *otmp2 = NULL;
+    struct obj *otmp1 = (struct obj *) 0, *otmp2 = (struct obj *) 0;
 
     if (obj1 && obj2) {
         otmp1 = *obj1;
@@ -2674,7 +2677,7 @@ struct obj **obj1, **obj2;
     }
 
     impossible("obj_meld: not called with two actual objects");
-    return NULL;
+    return (struct obj *) 0;
 }
 
 /*mkobj.c*/

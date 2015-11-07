@@ -1,5 +1,5 @@
-/* NetHack 3.6	region.c	$NHDT-Date: 1445906843 2015/10/27 00:47:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.35 $ */
-/* Copyright (c) 1996 by Jean-Christophe Collet	 */
+/* NetHack 3.6	region.c	$NHDT-Date: 1446892454 2015/11/07 10:34:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.36 $ */
+/* Copyright (c) 1996 by Jean-Christophe Collet  */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -38,7 +38,7 @@ void FDECL(remove_region, (NhRegion *));
 void FDECL(replace_mon_regions, (struct monst *,struct monst *));
 void FDECL(remove_mon_from_regions, (struct monst *));
 NhRegion *FDECL(create_msg_region, (XCHAR_P,XCHAR_P,XCHAR_P,XCHAR_P,
-				    const char *,const char *));
+                                    const char *,const char *));
 boolean FDECL(enter_force_field, (genericptr,genericptr));
 NhRegion *FDECL(create_force_field, (XCHAR_P,XCHAR_P,int,long));
 #endif
@@ -58,7 +58,7 @@ inside_rect(r, x, y)
 NhRect *r;
 int x, y;
 {
-    return (x >= r->lx && x <= r->hx && y >= r->ly && y <= r->hy);
+    return (boolean) (x >= r->lx && x <= r->hx && y >= r->ly && y <= r->hy);
 }
 
 /*
@@ -248,15 +248,16 @@ NhRegion *reg;
     ret_reg->can_enter_f = reg->can_enter_f;
     ret_reg->leave_f = reg->leave_f;
     ret_reg->can_leave_f = reg->can_leave_f;
-    ret_reg->player_flags = reg->player_flags;	/* set/clear_hero_inside,&c*/
+    ret_reg->player_flags = reg->player_flags; /* set/clear_hero_inside,&c*/
     ret_reg->n_monst = reg->n_monst;
     if (reg->n_monst > 0) {
-	ret_reg->monsters = (unsigned int *)
-				alloc((sizeof (unsigned)) * reg->n_monst);
-	(void) memcpy((genericptr_t) ret_reg->monsters, (genericptr_t) reg->monsters,
-		      sizeof (unsigned) * reg->n_monst);
+        ret_reg->monsters = (unsigned int *)
+                                    alloc((sizeof (unsigned)) * reg->n_monst);
+        (void) memcpy((genericptr_t) ret_reg->monsters,
+                      (genericptr_t) reg->monsters,
+                      sizeof (unsigned) * reg->n_monst);
     } else
-	ret_reg->monsters = (unsigned int *)0;
+        ret_reg->monsters = (unsigned int *) 0;
     return ret_reg;
 }
 
@@ -565,10 +566,10 @@ struct monst *monold, *monnew;
     register int i;
 
     for (i = 0; i < n_regions; i++)
-	if (mon_in_region(regions[i], monold)) {
-	    remove_mon_from_reg(regions[i], monold);
-	    add_mon_to_reg(regions[i], monnew);
-	}
+        if (mon_in_region(regions[i], monold)) {
+            remove_mon_from_reg(regions[i], monold);
+            add_mon_to_reg(regions[i], monnew);
+        }
 }
 
 /*
@@ -581,8 +582,8 @@ struct monst *mon;
     register int i;
 
     for (i = 0; i < n_regions; i++)
-	if (mon_in_region(regions[i], mon))
-	    remove_mon_from_reg(regions[i], mon);
+        if (mon_in_region(regions[i], mon))
+            remove_mon_from_reg(regions[i], mon);
 }
 
 #endif /*0*/
@@ -786,9 +787,9 @@ NhRegion *reg;
 /* not yet used */
 
 /*--------------------------------------------------------------*
- *								*
- *			Create Region with just a message	*
- *								*
+ *                                                              *
+ *                      Create Region with just a message       *
+ *                                                              *
  *--------------------------------------------------------------*/
 
 NhRegion *
@@ -802,9 +803,9 @@ const char *msg_leave;
     NhRegion *reg = create_region((NhRect *) 0, 0);
 
     if (msg_enter)
-	reg->enter_msg = dupstr(msg_enter);
+        reg->enter_msg = dupstr(msg_enter);
     if (msg_leave)
-	reg->leave_msg = dupstr(msg_leave);
+        reg->leave_msg = dupstr(msg_leave);
     tmprect.lx = x;
     tmprect.ly = y;
     tmprect.hx = x + w;
@@ -816,9 +817,9 @@ const char *msg_leave;
 
 
 /*--------------------------------------------------------------*
- *								*
- *			Force Field Related Code		*
- *			(unused yet)				*
+ *                                                              *
+ *                      Force Field Related Cod                 *
+ *                      (unused yet)                            *
  *--------------------------------------------------------------*/
 
 boolean
@@ -828,17 +829,17 @@ genericptr_t p2;
 {
     struct monst *mtmp;
 
-    if (p2 == (genericptr_t)0) {		/* That means the player */
-	if (!Blind)
-		You("bump into %s. Ouch!",
-		    Hallucination ? "an invisible tree"
-                                  : "some kind of invisible wall");
-	else
-	    pline("Ouch!");
+    if (p2 == (genericptr_t) 0) { /* That means the player */
+        if (!Blind)
+            You("bump into %s. Ouch!",
+                Hallucination ? "an invisible tree"
+                              : "some kind of invisible wall");
+        else
+            pline("Ouch!");
     } else {
-	mtmp = (struct monst *) p2;
-	if (canseemon(mtmp))
-	    pline("%s bumps into %s!", Monnam(mtmp), something);
+        mtmp = (struct monst *) p2;
+        if (canseemon(mtmp))
+            pline("%s bumps into %s!", Monnam(mtmp), something);
     }
     return FALSE;
 }
@@ -861,15 +862,15 @@ long ttl;
     tmprect.ly = y - (radius - 1);
     tmprect.hy = y + (radius - 1);
     for (i = 0; i < nrect; i++) {
-	add_rect_to_reg(ff, &tmprect);
-	tmprect.lx--;
-	tmprect.hx++;
-	tmprect.ly++;
-	tmprect.hy--;
+        add_rect_to_reg(ff, &tmprect);
+        tmprect.lx--;
+        tmprect.hx++;
+        tmprect.ly++;
+        tmprect.hy--;
     }
     ff->ttl = ttl;
     if (!in_mklev && !context.mon_moving)
-	set_heros_fault(ff);		/* assume player has created it */
+        set_heros_fault(ff); /* assume player has created it */
  /* ff->can_enter_f = enter_force_field; */
  /* ff->can_leave_f = enter_force_field; */
     add_region(ff);
@@ -879,9 +880,9 @@ long ttl;
 #endif /*0*/
 
 /*--------------------------------------------------------------*
- *								*
- *			Gas cloud related code			*
- *								*
+ *                                                              *
+ *                      Gas cloud related code                  *
+ *                                                              *
  *--------------------------------------------------------------*/
 
 /*

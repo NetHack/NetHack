@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1446634657 2015/11/04 10:57:37 $  $NHDT-Branch: master $:$NHDT-Revision: 1.151 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1446892450 2015/11/07 10:34:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.153 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3652,7 +3652,7 @@ const char *lastR;
             if (qsuffix && len < lenlimit) {
                 (void) strncpy(&qbuf[len], qsuffix, lenlimit - len);
                 *endp = '\0';
-                /* len = (unsigned)strlen(qbuf); */
+                /* len = (unsigned) strlen(qbuf); */
             }
         }
     } else {

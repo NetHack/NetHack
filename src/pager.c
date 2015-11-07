@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1445556880 2015/10/22 23:34:40 $  $NHDT-Branch: master $:$NHDT-Revision: 1.82 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1446892451 2015/11/07 10:34:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.83 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -256,7 +256,7 @@ lookat(x, y, buf, monbuf)
 int x, y;
 char *buf, *monbuf;
 {
-    register struct monst *mtmp = (struct monst *) 0;
+    struct monst *mtmp = (struct monst *) 0;
     struct permonst *pm = (struct permonst *) 0;
     int glyph;
 
@@ -356,7 +356,7 @@ char *buf, *monbuf;
             break;
         }
 
-    return ((pm && !Hallucination) ? pm : (struct permonst *) 0);
+    return (pm && !Hallucination) ? pm : (struct permonst *) 0;
 }
 
 /*
@@ -365,9 +365,9 @@ char *buf, *monbuf;
  * with a character/glyph and flags.help is TRUE.
  *
  * NOTE: when (user_typed_name == FALSE), inp is considered read-only and
- *	 must not be changed directly, e.g. via lcase(). We want to force
- *	 lcase() for data.base lookup so that we can have a clean key.
- *	 Therefore, we create a copy of inp _just_ for data.base lookup.
+ *       must not be changed directly, e.g. via lcase(). We want to force
+ *       lcase() for data.base lookup so that we can have a clean key.
+ *       Therefore, we create a copy of inp _just_ for data.base lookup.
  */
 STATIC_OVL void
 checkfile(inp, pm, user_typed_name, without_asking)
@@ -581,7 +581,7 @@ const char **firstmatch;
      * "the interior of a monster".
      */
     if (u.uswallow && looked
-        && (is_swallow_sym(sym) || (int)showsyms[S_stone] == sym)) {
+        && (is_swallow_sym(sym) || (int) showsyms[S_stone] == sym)) {
         if (!found) {
             Sprintf(out_str, "%s%s", prefix, mon_interior);
             *firstmatch = mon_interior;
@@ -960,7 +960,7 @@ coord *click_cc;
                 char temp_buf[BUFSZ];
                 Strcpy(temp_buf, firstmatch);
                 checkfile(temp_buf, pm, FALSE,
-                          (boolean)(ans == LOOK_VERBOSE));
+                          (boolean) (ans == LOOK_VERBOSE));
             }
         } else {
             pline("I've never heard of such things.");
