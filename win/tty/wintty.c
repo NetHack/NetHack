@@ -3447,7 +3447,7 @@ genericptr_t ptr;
     for (i = 0; fieldorder[0][i] != BL_FLUSH; ++i) {
         int fldidx1 = fieldorder[0][i];
 
-v        if (status_activefields[fldidx1]) {
+        if (status_activefields[fldidx1]) {
             if (tty_status_colors[fldidx1] < 0 &&
                     tty_status_colors[fldidx1] >= -3) {
                 /* attribute, not a color */
