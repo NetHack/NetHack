@@ -1,5 +1,5 @@
-/* NetHack 3.6	drawing.c	$NHDT-Date: 1432512765 2015/05/25 00:12:45 $  $NHDT-Branch: master $:$NHDT-Revision: 1.45 $ */
-/* Copyright (c) NetHack Development Team 1992.			  */
+/* NetHack 3.6	drawing.c	$NHDT-Date: 1446975466 2015/11/08 09:37:46 $  $NHDT-Branch: master $:$NHDT-Revision: 1.48 $ */
+/* Copyright (c) NetHack Development Team 1992.                   */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -120,142 +120,140 @@ const struct class_sym def_monsyms[MAXMCLASSES] = {
 };
 
 const struct symdef def_warnsyms[WARNCOUNT] = {
-    { '0', "unknown creature causing you worry",
-      C(CLR_WHITE) }, /* white warning  */
-    { '1', "unknown creature causing you concern",
-      C(CLR_RED) }, /* pink warning   */
-    { '2', "unknown creature causing you anxiety",
-      C(CLR_RED) }, /* red warning    */
-    { '3', "unknown creature causing you disquiet",
-      C(CLR_RED) }, /* ruby warning   */
-    { '4', "unknown creature causing you alarm",
-      C(CLR_MAGENTA) }, /* purple warning */
-    { '5', "unknown creature causing you dread",
-      C(CLR_BRIGHT_MAGENTA) } /* black warning  */
+    /* white warning  */
+    { '0', "unknown creature causing you worry",    C(CLR_WHITE) },
+    /* pink warning   */
+    { '1', "unknown creature causing you concern",  C(CLR_RED) },
+    /* red warning    */
+    { '2', "unknown creature causing you anxiety",  C(CLR_RED) },
+    /* ruby warning   */
+    { '3', "unknown creature causing you disquiet", C(CLR_RED) },
+    /* purple warning */
+    { '4', "unknown creature causing you alarm",    C(CLR_MAGENTA) },
+    /* black warning  */
+    { '5', "unknown creature causing you dread",    C(CLR_BRIGHT_MAGENTA) },
 };
 
 /*
  *  Default screen symbols with explanations and colors.
  */
 const struct symdef defsyms[MAXPCHARS] = {
-    /* 0*/ { ' ', "dark part of a room", C(NO_COLOR) },  /* stone */
-    { '|', "wall", C(CLR_GRAY) },                        /* vwall */
-    { '-', "wall", C(CLR_GRAY) },                        /* hwall */
-    { '-', "wall", C(CLR_GRAY) },                        /* tlcorn */
-    { '-', "wall", C(CLR_GRAY) },                        /* trcorn */
-    { '-', "wall", C(CLR_GRAY) },                        /* blcorn */
-    { '-', "wall", C(CLR_GRAY) },                        /* brcorn */
-    { '-', "wall", C(CLR_GRAY) },                        /* crwall */
-    { '-', "wall", C(CLR_GRAY) },                        /* tuwall */
-    { '-', "wall", C(CLR_GRAY) },                        /* tdwall */
-    /*10*/ { '|', "wall", C(CLR_GRAY) },                 /* tlwall */
-    { '|', "wall", C(CLR_GRAY) },                        /* trwall */
-    { '.', "doorway", C(CLR_GRAY) },                     /* ndoor */
-    { '-', "open door", C(CLR_BROWN) },                  /* vodoor */
-    { '|', "open door", C(CLR_BROWN) },                  /* hodoor */
-    { '+', "closed door", C(CLR_BROWN) },                /* vcdoor */
-    { '+', "closed door", C(CLR_BROWN) },                /* hcdoor */
-    { '#', "iron bars", C(HI_METAL) },                   /* bars */
-    { '#', "tree", C(CLR_GREEN) },                       /* tree */
-    { '.', "floor of a room", C(CLR_GRAY) },             /* room */
-    /*20*/ { '.', "dark part of a room", C(CLR_BLACK) }, /* dark room */
-    { '#', "corridor", C(CLR_GRAY) },                    /* dark corr */
-    { '#', "lit corridor", C(CLR_GRAY) },   /* lit corr (see mapglyph.c) */
-    { '<', "staircase up", C(CLR_GRAY) },   /* upstair */
-    { '>', "staircase down", C(CLR_GRAY) }, /* dnstair */
-    { '<', "ladder up", C(CLR_BROWN) },     /* upladder */
-    { '>', "ladder down", C(CLR_BROWN) },   /* dnladder */
-    { '_', "altar", C(CLR_GRAY) },          /* altar */
-    { '|', "grave", C(CLR_GRAY) },          /* grave */
-    { '\\', "opulent throne", C(HI_GOLD) }, /* throne */
-    /*30*/ { '#', "sink", C(CLR_GRAY) },    /* sink */
-    { '{', "fountain", C(CLR_BLUE) },       /* fountain */
-    { '}', "water", C(CLR_BLUE) },          /* pool */
-    { '.', "ice", C(CLR_CYAN) },            /* ice */
-    { '}', "molten lava", C(CLR_RED) },     /* lava */
-    { '.', "lowered drawbridge", C(CLR_BROWN) },    /* vodbridge */
-    { '.', "lowered drawbridge", C(CLR_BROWN) },    /* hodbridge */
-    { '#', "raised drawbridge", C(CLR_BROWN) },     /* vcdbridge */
-    { '#', "raised drawbridge", C(CLR_BROWN) },     /* hcdbridge */
-    { ' ', "air", C(CLR_CYAN) },                    /* open air */
-    /*40*/ { '#', "cloud", C(CLR_GRAY) },           /* [part of] a cloud */
-    { '}', "water", C(CLR_BLUE) },                  /* under water */
-    { '^', "arrow trap", C(HI_METAL) },             /* trap */
-    { '^', "dart trap", C(HI_METAL) },              /* trap */
-    { '^', "falling rock trap", C(CLR_GRAY) },      /* trap */
-    { '^', "squeaky board", C(CLR_BROWN) },         /* trap */
-    { '^', "bear trap", C(HI_METAL) },              /* trap */
-    { '^', "land mine", C(CLR_RED) },               /* trap */
-    { '^', "rolling boulder trap", C(CLR_GRAY) },   /* trap */
-    { '^', "sleeping gas trap", C(HI_ZAP) },        /* trap */
-    /*50*/ { '^', "rust trap", C(CLR_BLUE) },       /* trap */
-    { '^', "fire trap", C(CLR_ORANGE) },            /* trap */
-    { '^', "pit", C(CLR_BLACK) },                   /* trap */
-    { '^', "spiked pit", C(CLR_BLACK) },            /* trap */
-    { '^', "hole", C(CLR_BROWN) },                  /* trap */
-    { '^', "trap door", C(CLR_BROWN) },             /* trap */
-    { '^', "teleportation trap", C(CLR_MAGENTA) },  /* trap */
-    { '^', "level teleporter", C(CLR_MAGENTA) },    /* trap */
-    { '^', "magic portal", C(CLR_BRIGHT_MAGENTA) }, /* trap */
-    { '"', "web", C(CLR_GRAY) },                    /* web */
-    /*60*/ { '^', "statue trap", C(CLR_GRAY) },     /* trap */
-    { '^', "magic trap", C(HI_ZAP) },               /* trap */
-    { '^', "anti-magic field", C(HI_ZAP) },         /* trap */
-    { '^', "polymorph trap", C(CLR_BRIGHT_GREEN) }, /* trap */
-    { '^', "vibrating square", C(CLR_YELLOW) },     /* trap */
-    { '|', "wall", C(CLR_GRAY) },                   /* vbeam */
-    { '-', "wall", C(CLR_GRAY) },                   /* hbeam */
-    { '\\', "wall", C(CLR_GRAY) },                  /* lslant */
-    { '/', "wall", C(CLR_GRAY) },                   /* rslant */
-    { '*', "", C(CLR_WHITE) },                      /* dig beam */
-    { '!', "", C(CLR_WHITE) },                      /* camera flash beam */
-    { ')', "", C(HI_WOOD) },                        /* boomerang open left */
-    /*70*/ { '(', "", C(HI_WOOD) },                 /* boomerang open right */
-    { '0', "", C(HI_ZAP) }, /* 4 magic shield symbols */
-    { '#', "", C(HI_ZAP) },
-    { '@', "", C(HI_ZAP) },
-    { '*', "", C(HI_ZAP) },
-    { '#', "poison cloud",
-      C(CLR_BRIGHT_GREEN) }, /* [part of] a poison cloud */
-    { '?', "valid position",
-      C(CLR_BRIGHT_GREEN) },           /* valid position for targeting */
-    { '/', "", C(CLR_GREEN) },         /* swallow top left	*/
-    { '-', "", C(CLR_GREEN) },         /* swallow top center	*/
-    { '\\', "", C(CLR_GREEN) },        /* swallow top right	*/
-    /*80*/ { '|', "", C(CLR_GREEN) },  /* swallow middle left	*/
-    { '|', "", C(CLR_GREEN) },         /* swallow middle right	*/
-    { '\\', "", C(CLR_GREEN) },        /* swallow bottom left	*/
-    { '-', "", C(CLR_GREEN) },         /* swallow bottom center*/
-    { '/', "", C(CLR_GREEN) },         /* swallow bottom right	*/
-    { '/', "", C(CLR_ORANGE) },        /* explosion top left     */
-    { '-', "", C(CLR_ORANGE) },        /* explosion top center   */
-    { '\\', "", C(CLR_ORANGE) },       /* explosion top right    */
-    { '|', "", C(CLR_ORANGE) },        /* explosion middle left  */
-    { ' ', "", C(CLR_ORANGE) },        /* explosion middle center*/
-    /*90*/ { '|', "", C(CLR_ORANGE) }, /* explosion middle right */
-    { '\\', "", C(CLR_ORANGE) },       /* explosion bottom left  */
-    { '-', "", C(CLR_ORANGE) },        /* explosion bottom center*/
-    { '/', "", C(CLR_ORANGE) },        /* explosion bottom right */
+/* 0*/ { ' ', "dark part of a room", C(NO_COLOR) },  /* stone */
+       { '|', "wall", C(CLR_GRAY) },                 /* vwall */
+       { '-', "wall", C(CLR_GRAY) },                 /* hwall */
+       { '-', "wall", C(CLR_GRAY) },                 /* tlcorn */
+       { '-', "wall", C(CLR_GRAY) },                 /* trcorn */
+       { '-', "wall", C(CLR_GRAY) },                 /* blcorn */
+       { '-', "wall", C(CLR_GRAY) },                 /* brcorn */
+       { '-', "wall", C(CLR_GRAY) },                 /* crwall */
+       { '-', "wall", C(CLR_GRAY) },                 /* tuwall */
+       { '-', "wall", C(CLR_GRAY) },                 /* tdwall */
+/*10*/ { '|', "wall", C(CLR_GRAY) },                 /* tlwall */
+       { '|', "wall", C(CLR_GRAY) },                 /* trwall */
+       { '.', "doorway", C(CLR_GRAY) },              /* ndoor */
+       { '-', "open door", C(CLR_BROWN) },           /* vodoor */
+       { '|', "open door", C(CLR_BROWN) },           /* hodoor */
+       { '+', "closed door", C(CLR_BROWN) },         /* vcdoor */
+       { '+', "closed door", C(CLR_BROWN) },         /* hcdoor */
+       { '#', "iron bars", C(HI_METAL) },            /* bars */
+       { '#', "tree", C(CLR_GREEN) },                /* tree */
+       { '.', "floor of a room", C(CLR_GRAY) },      /* room */
+/*20*/ { '.', "dark part of a room", C(CLR_BLACK) }, /* dark room */
+       { '#', "corridor", C(CLR_GRAY) },             /* dark corr */
+       { '#', "lit corridor", C(CLR_GRAY) },   /* lit corr (see mapglyph.c) */
+       { '<', "staircase up", C(CLR_GRAY) },         /* upstair */
+       { '>', "staircase down", C(CLR_GRAY) },       /* dnstair */
+       { '<', "ladder up", C(CLR_BROWN) },           /* upladder */
+       { '>', "ladder down", C(CLR_BROWN) },         /* dnladder */
+       { '_', "altar", C(CLR_GRAY) },                /* altar */
+       { '|', "grave", C(CLR_GRAY) },                /* grave */
+       { '\\', "opulent throne", C(HI_GOLD) },       /* throne */
+/*30*/ { '#', "sink", C(CLR_GRAY) },                 /* sink */
+       { '{', "fountain", C(CLR_BLUE) },             /* fountain */
+       { '}', "water", C(CLR_BLUE) },                /* pool */
+       { '.', "ice", C(CLR_CYAN) },                  /* ice */
+       { '}', "molten lava", C(CLR_RED) },           /* lava */
+       { '.', "lowered drawbridge", C(CLR_BROWN) },  /* vodbridge */
+       { '.', "lowered drawbridge", C(CLR_BROWN) },  /* hodbridge */
+       { '#', "raised drawbridge", C(CLR_BROWN) },   /* vcdbridge */
+       { '#', "raised drawbridge", C(CLR_BROWN) },   /* hcdbridge */
+       { ' ', "air", C(CLR_CYAN) },                  /* open air */
+/*40*/ { '#', "cloud", C(CLR_GRAY) },                /* [part of] a cloud */
+       { '}', "water", C(CLR_BLUE) },                /* under water */
+       { '^', "arrow trap", C(HI_METAL) },           /* trap */
+       { '^', "dart trap", C(HI_METAL) },            /* trap */
+       { '^', "falling rock trap", C(CLR_GRAY) },    /* trap */
+       { '^', "squeaky board", C(CLR_BROWN) },       /* trap */
+       { '^', "bear trap", C(HI_METAL) },            /* trap */
+       { '^', "land mine", C(CLR_RED) },             /* trap */
+       { '^', "rolling boulder trap", C(CLR_GRAY) }, /* trap */
+       { '^', "sleeping gas trap", C(HI_ZAP) },      /* trap */
+/*50*/ { '^', "rust trap", C(CLR_BLUE) },            /* trap */
+       { '^', "fire trap", C(CLR_ORANGE) },          /* trap */
+       { '^', "pit", C(CLR_BLACK) },                 /* trap */
+       { '^', "spiked pit", C(CLR_BLACK) },          /* trap */
+       { '^', "hole", C(CLR_BROWN) },                /* trap */
+       { '^', "trap door", C(CLR_BROWN) },           /* trap */
+       { '^', "teleportation trap", C(CLR_MAGENTA) },  /* trap */
+       { '^', "level teleporter", C(CLR_MAGENTA) },    /* trap */
+       { '^', "magic portal", C(CLR_BRIGHT_MAGENTA) }, /* trap */
+       { '"', "web", C(CLR_GRAY) },                    /* web */
+/*60*/ { '^', "statue trap", C(CLR_GRAY) },            /* trap */
+       { '^', "magic trap", C(HI_ZAP) },               /* trap */
+       { '^', "anti-magic field", C(HI_ZAP) },         /* trap */
+       { '^', "polymorph trap", C(CLR_BRIGHT_GREEN) }, /* trap */
+       { '^', "vibrating square", C(CLR_YELLOW) },     /* trap */
+       { '|', "wall", C(CLR_GRAY) },            /* vbeam */
+       { '-', "wall", C(CLR_GRAY) },            /* hbeam */
+       { '\\', "wall", C(CLR_GRAY) },           /* lslant */
+       { '/', "wall", C(CLR_GRAY) },            /* rslant */
+       { '*', "", C(CLR_WHITE) },               /* dig beam */
+       { '!', "", C(CLR_WHITE) },               /* camera flash beam */
+       { ')', "", C(HI_WOOD) },                 /* boomerang open left */
+/*70*/ { '(', "", C(HI_WOOD) },                 /* boomerang open right */
+       { '0', "", C(HI_ZAP) },                  /* 4 magic shield symbols */
+       { '#', "", C(HI_ZAP) },
+       { '@', "", C(HI_ZAP) },
+       { '*', "", C(HI_ZAP) },
+       { '#', "poison cloud", C(CLR_BRIGHT_GREEN) },   /* part of a cloud */
+       { '?', "valid position", C(CLR_BRIGHT_GREEN) }, /*  target position */
+       { '/', "", C(CLR_GREEN) },         /* swallow top left      */
+       { '-', "", C(CLR_GREEN) },         /* swallow top center    */
+       { '\\', "", C(CLR_GREEN) },        /* swallow top right     */
+/*80*/ { '|', "", C(CLR_GREEN) },         /* swallow middle left   */
+       { '|', "", C(CLR_GREEN) },         /* swallow middle right  */
+       { '\\', "", C(CLR_GREEN) },        /* swallow bottom left   */
+       { '-', "", C(CLR_GREEN) },         /* swallow bottom center */
+       { '/', "", C(CLR_GREEN) },         /* swallow bottom right  */
+       { '/', "", C(CLR_ORANGE) },        /* explosion top left     */
+       { '-', "", C(CLR_ORANGE) },        /* explosion top center   */
+       { '\\', "", C(CLR_ORANGE) },       /* explosion top right    */
+       { '|', "", C(CLR_ORANGE) },        /* explosion middle left  */
+       { ' ', "", C(CLR_ORANGE) },        /* explosion middle center*/
+/*90*/ { '|', "", C(CLR_ORANGE) },        /* explosion middle right */
+       { '\\', "", C(CLR_ORANGE) },       /* explosion bottom left  */
+       { '-', "", C(CLR_ORANGE) },        /* explosion bottom center*/
+       { '/', "", C(CLR_ORANGE) },        /* explosion bottom right */
 };
 
 /* default rogue level symbols */
 static const uchar def_r_oc_syms[MAXOCLASSES] = {
-    /* 0*/ '\0', ILLOBJ_SYM, WEAPON_SYM, ']', /* armor */
-    RING_SYM,
-    /* 5*/ ',',    /* amulet */
-    TOOL_SYM, ':', /* food */
-    POTION_SYM, SCROLL_SYM,
-    /*10*/ SPBOOK_SYM, WAND_SYM,
-    GEM_SYM, /* gold -- yes it's the same as gems */
-    GEM_SYM, ROCK_SYM,
-    /*15*/ BALL_SYM, CHAIN_SYM, VENOM_SYM
+/* 0*/ '\0', ILLOBJ_SYM, WEAPON_SYM, ']', /* armor */
+       RING_SYM,
+/* 5*/ ',',                     /* amulet */
+       TOOL_SYM, ':',           /* food */
+       POTION_SYM, SCROLL_SYM,
+/*10*/ SPBOOK_SYM, WAND_SYM,
+       GEM_SYM,                /* gold -- yes it's the same as gems */
+       GEM_SYM, ROCK_SYM,
+/*15*/ BALL_SYM, CHAIN_SYM, VENOM_SYM
 };
 
 #undef C
 
 #ifdef TERMLIB
 void NDECL((*decgraphics_mode_callback)) = 0; /* set in tty_start_screen() */
-#endif                                        /* TERMLIB */
+#endif /* TERMLIB */
 
 #ifdef PC9800
 void NDECL((*ibmgraphics_mode_callback)) = 0; /* set in tty_start_screen() */
@@ -330,7 +328,7 @@ char ch;
  *                     symbols from r_syms into showsyms.
  *
  *                     If arg is PRIMARY, this places the symbols
- *		       from l_monsyms into showsyms.
+ *                     from l_monsyms into showsyms.
  *
  * update_l_symset()
  *                     Update a member of the loadable (l_*) symbol set.
@@ -363,19 +361,17 @@ init_showsyms()
 
     for (i = 0; i < MAXPCHARS; i++)
         showsyms[i + SYM_OFF_P] = defsyms[i].sym;
-
     for (i = 0; i < MAXOCLASSES; i++)
         showsyms[i + SYM_OFF_O] = def_oc_syms[i].sym;
-
     for (i = 0; i < MAXMCLASSES; i++)
         showsyms[i + SYM_OFF_M] = def_monsyms[i].sym;
-
     for (i = 0; i < WARNCOUNT; i++)
         showsyms[i + SYM_OFF_W] = def_warnsyms[i].sym;
-
     for (i = 0; i < MAXOTHER; i++) {
         if (i == SYM_BOULDER)
-            showsyms[i + SYM_OFF_X] = iflags.bouldersym ? iflags.bouldersym : def_oc_syms[ROCK_CLASS].sym;
+            showsyms[i + SYM_OFF_X] = iflags.bouldersym
+                                        ? iflags.bouldersym
+                                        : def_oc_syms[ROCK_CLASS].sym;
         else if (i == SYM_INVISIBLE)
             showsyms[i + SYM_OFF_X] = DEF_INVISIBLE;
     }
@@ -389,19 +385,17 @@ init_l_symbols()
 
     for (i = 0; i < MAXPCHARS; i++)
         l_syms[i + SYM_OFF_P] = defsyms[i].sym;
-
     for (i = 0; i < MAXOCLASSES; i++)
         l_syms[i + SYM_OFF_O] = def_oc_syms[i].sym;
-
     for (i = 0; i < MAXMCLASSES; i++)
         l_syms[i + SYM_OFF_M] = def_monsyms[i].sym;
-
     for (i = 0; i < WARNCOUNT; i++)
         l_syms[i + SYM_OFF_W] = def_warnsyms[i].sym;
-
     for (i = 0; i < MAXOTHER; i++) {
         if (i == SYM_BOULDER)
-            l_syms[i + SYM_OFF_X] = iflags.bouldersym ? iflags.bouldersym : def_oc_syms[ROCK_CLASS].sym;
+            l_syms[i + SYM_OFF_X] = iflags.bouldersym
+                                      ? iflags.bouldersym
+                                      : def_oc_syms[ROCK_CLASS].sym;
         else if (i == SYM_INVISIBLE)
             l_syms[i + SYM_OFF_X] = DEF_INVISIBLE;
     }
@@ -424,25 +418,24 @@ init_r_symbols()
 
     for (i = 0; i < MAXOCLASSES; i++)
         r_syms[i + SYM_OFF_O] = def_r_oc_syms[i];
-
     for (i = 0; i < MAXMCLASSES; i++)
         r_syms[i + SYM_OFF_M] = def_monsyms[i].sym;
-
     for (i = 0; i < WARNCOUNT; i++)
         r_syms[i + SYM_OFF_W] = def_warnsyms[i].sym;
-
     for (i = 0; i < MAXOTHER; i++) {
         if (i == SYM_BOULDER)
-            r_syms[i + SYM_OFF_X] = iflags.bouldersym ? iflags.bouldersym : def_oc_syms[ROCK_CLASS].sym;
+            r_syms[i + SYM_OFF_X] = iflags.bouldersym
+                                      ? iflags.bouldersym
+                                      : def_oc_syms[ROCK_CLASS].sym;
         else if (i == SYM_INVISIBLE)
             r_syms[i + SYM_OFF_X] = DEF_INVISIBLE;
     }
 
     clear_symsetentry(ROGUESET, FALSE);
-    symset[ROGUESET].nocolor = 1; /* default on Rogue level is no color
-                                   * but some symbol sets can
-                                   * override that
-                                   */
+    /* default on Rogue level is no color
+     * but some symbol sets can override that
+     */
+    symset[ROGUESET].nocolor = 1;
 }
 
 void

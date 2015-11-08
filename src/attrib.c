@@ -1,5 +1,5 @@
-/* NetHack 3.6	attrib.c	$NHDT-Date: 1432512774 2015/05/25 00:12:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.46 $ */
-/*	Copyright 1988, 1989, 1990, 1992, M. Stephenson		  */
+/* NetHack 3.6	attrib.c	$NHDT-Date: 1446975460 2015/11/08 09:37:40 $  $NHDT-Branch: master $:$NHDT-Revision: 1.49 $ */
+/*      Copyright 1988, 1989, 1990, 1992, M. Stephenson           */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*  attribute modification routines. */
@@ -8,11 +8,12 @@
 #include <ctype.h>
 
 /* part of the output on gain or loss of attribute */
-static const char *const plusattr[] = { "strong", "smart", "wise",
-                                        "agile",  "tough", "charismatic" },
-                         *const minusattr[] = { "weak",    "stupid",
-                                                "foolish", "clumsy",
-                                                "fragile", "repulsive" };
+static const char
+    *const plusattr[] = { "strong", "smart", "wise",
+                          "agile",  "tough", "charismatic" },
+    *const minusattr[] = { "weak",    "stupid",
+                           "foolish", "clumsy",
+                           "fragile", "repulsive" };
 
 static const struct innate {
     schar ulevel;
@@ -360,13 +361,13 @@ boolean inc_or_dec;
 
     if (abs(AEXE(i)) < AVAL) {
         /*
-         *	Law of diminishing returns (Part I):
+         *      Law of diminishing returns (Part I):
          *
-         *	Gain is harder at higher attribute values.
-         *	79% at "3" --> 0% at "18"
-         *	Loss is even at all levels (50%).
+         *      Gain is harder at higher attribute values.
+         *      79% at "3" --> 0% at "18"
+         *      Loss is even at all levels (50%).
          *
-         *	Note: *YES* ACURR is the right one to use.
+         *      Note: *YES* ACURR is the right one to use.
          */
         AEXE(i) += (inc_or_dec) ? (rn2(19) > ACURR(i)) : -rn2(2);
         debugpline3("%s, %s AEXE = %d",
@@ -464,21 +465,21 @@ exerchk()
 {
     int i, ax, mod_val, lolim, hilim;
 
-    /*	Check out the periodic accumulations */
+    /*  Check out the periodic accumulations */
     exerper();
 
     if (moves >= context.next_attrib_check)
         debugpline1("exerchk: ready to test. multi = %d.", multi);
-    /*	Are we ready for a test?	*/
+    /*  Are we ready for a test? */
     if (moves >= context.next_attrib_check && !multi) {
         debugpline0("exerchk: testing.");
         /*
-         *	Law of diminishing returns (Part II):
+         *      Law of diminishing returns (Part II):
          *
-         *	The effects of "exercise" and "abuse" wear
-         *	off over time.  Even if you *don't* get an
-         *	increase/decrease, you lose some of the
-         *	accumulated effects.
+         *      The effects of "exercise" and "abuse" wear
+         *      off over time.  Even if you *don't* get an
+         *      increase/decrease, you lose some of the
+         *      accumulated effects.
          */
         for (i = 0; i < A_MAX; ++i) {
             ax = AEXE(i);
@@ -516,10 +517,10 @@ exerchk()
                                                                    : "???",
                         ax);
             /*
-             *	Law of diminishing returns (Part III):
+             *  Law of diminishing returns (Part III):
              *
-             *	You don't *always* gain by exercising.
-             *	[MRS 92/10/28 - Treat Wisdom specially for balance.]
+             *  You don't *always* gain by exercising.
+             *  [MRS 92/10/28 - Treat Wisdom specially for balance.]
              */
             if (rn2(AVAL) > ((i != A_WIS) ? (abs(ax) * 2 / 3) : abs(ax)))
                 goto nextattrib;
@@ -971,31 +972,30 @@ int x;
     register int tmp = (u.abon.a[x] + u.atemp.a[x] + u.acurr.a[x]);
 
     if (x == A_STR) {
-        if (uarmg && uarmg->otyp == GAUNTLETS_OF_POWER)
-            return (125);
+        if (tmp >= 125 || (uarmg && uarmg->otyp == GAUNTLETS_OF_POWER))
+            return (schar) 125;
+        else
 #ifdef WIN32_BUG
-        else
-            return (x = ((tmp >= 125) ? 125 : (tmp <= 3) ? 3 : tmp));
+            return (x = ((tmp <= 3) ? 3 : tmp));
 #else
-        else
-            return ((schar)((tmp >= 125) ? 125 : (tmp <= 3) ? 3 : tmp));
+        return (schar) ((tmp <= 3) ? 3 : tmp);
 #endif
     } else if (x == A_CHA) {
         if (tmp < 18
             && (youmonst.data->mlet == S_NYMPH || u.umonnum == PM_SUCCUBUS
                 || u.umonnum == PM_INCUBUS))
-            return 18;
+            return (schar) 18;
     } else if (x == A_INT || x == A_WIS) {
         /* yes, this may raise int/wis if player is sufficiently
          * stupid.  there are lower levels of cognition than "dunce".
          */
         if (uarmh && uarmh->otyp == DUNCE_CAP)
-            return (6);
+            return (schar) 6;
     }
 #ifdef WIN32_BUG
     return (x = ((tmp >= 25) ? 25 : (tmp <= 3) ? 3 : tmp));
 #else
-    return ((schar)((tmp >= 25) ? 25 : (tmp <= 3) ? 3 : tmp));
+    return (schar) ((tmp >= 25) ? 25 : (tmp <= 3) ? 3 : tmp);
 #endif
 }
 
@@ -1007,11 +1007,11 @@ acurrstr()
     register int str = ACURR(A_STR);
 
     if (str <= 18)
-        return ((schar) str);
+        return (schar) str;
     if (str <= 121)
-        return ((schar)(19 + str / 50)); /* map to 19-21 */
+        return (schar) (19 + str / 50); /* map to 19..21 */
     else
-        return ((schar)(str - 100));
+        return (schar) (min(str, 125) - 100); /* 22..25 */
 }
 
 /* when wearing (or taking off) an unID'd item, this routine is used
@@ -1043,13 +1043,12 @@ int attrindx;
 }
 
 /* avoid possible problems with alignment overflow, and provide a centralized
- * location for any future alignment limits
- */
+   location for any future alignment limits */
 void
 adjalign(n)
-register int n;
+int n;
 {
-    register int newalign = u.ualign.record + n;
+    int newalign = u.ualign.record + n;
 
     if (n < 0) {
         if (newalign < u.ualign.record)

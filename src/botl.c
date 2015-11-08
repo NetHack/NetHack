@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1435002677 2015/06/22 19:51:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.64 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1446975461 2015/11/08 09:37:41 $  $NHDT-Branch: master $:$NHDT-Revision: 1.67 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -24,6 +24,7 @@ bot1()
     char newbot1[MAXCO];
     register char *nb;
     register int i, j;
+
     Strcpy(newbot1, plname);
     if ('a' <= newbot1[0] && newbot1[0] <= 'z')
         newbot1[0] += 'A' - 'a';
@@ -73,6 +74,7 @@ bot1()
     curs(WIN_STATUS, 1, 0);
     putstr(WIN_STATUS, 0, newbot1);
 }
+
 STATIC_OVL void
 bot2()
 {
@@ -152,7 +154,7 @@ int
 rank_to_xlev(rank)
 int rank;
 {
-	return (rank <= 0) ? 1 : (rank <= 8) ? ((rank * 4) - 2) : 30;
+    return (rank <= 0) ? 1 : (rank <= 8) ? ((rank * 4) - 2) : 30;
 }
 #endif
 
@@ -175,23 +177,23 @@ boolean female;
     /* Find the rank */
     for (i = xlev_to_rank((int) lev); i >= 0; i--) {
         if (female && role->rank[i].f)
-            return (role->rank[i].f);
+            return role->rank[i].f;
         if (role->rank[i].m)
-            return (role->rank[i].m);
+            return role->rank[i].m;
     }
 
     /* Try the role name, instead */
     if (female && role->name.f)
-        return (role->name.f);
+        return role->name.f;
     else if (role->name.m)
-        return (role->name.m);
-    return ("Player");
+        return role->name.m;
+    return "Player";
 }
 
 STATIC_OVL const char *
 rank()
 {
-    return (rank_of(u.ulevel, Role_switch, flags.female));
+    return rank_of(u.ulevel, Role_switch, flags.female);
 }
 
 int
@@ -220,8 +222,8 @@ int *rank_indx, *title_length;
                     *rank_indx = j;
                 if (title_length)
                     *title_length = strlen(roles[i].rank[j].f);
-                return ((roles[i].femalenum != NON_PM) ? roles[i].femalenum
-                                                       : roles[i].malenum);
+                return (roles[i].femalenum != NON_PM) ? roles[i].femalenum
+                                                      : roles[i].malenum;
             }
         }
     return NON_PM;
@@ -251,14 +253,13 @@ botl_score()
     utotal = money_cnt(invent) + hidden_gold();
     if ((utotal -= u.umoney0) < 0L)
         utotal = 0L;
-    utotal +=
-        u.urexp + (50 * (deepest - 1))
-        + (deepest > 30 ? 10000 : deepest > 20 ? 1000 * (deepest - 20) : 0);
+    utotal += u.urexp + (50 * (deepest - 1))
+          + (deepest > 30 ? 10000 : deepest > 20 ? 1000 * (deepest - 20) : 0);
     if (utotal < u.urexp)
         utotal = LONG_MAX; /* wrap around */
     return utotal;
 }
-#endif
+#endif /* SCORE_ON_BOTL */
 
 /* provide the name of the current level for display by various ports */
 int
@@ -267,7 +268,7 @@ char *buf;
 {
     int ret = 1;
 
-    /* TODO:	Add in dungeon name */
+    /* TODO:    Add in dungeon name */
     if (Is_knox(&u.uz))
         Sprintf(buf, "%s ", dungeons[u.uz.dnum].dname);
     else if (In_quest(&u.uz))
@@ -304,35 +305,37 @@ STATIC_OVL int FDECL(percentage, (struct istat_s *, struct istat_s *));
 STATIC_OVL int FDECL(compare_blstats, (struct istat_s *, struct istat_s *));
 
 #ifdef STATUS_HILITES
-STATIC_DCL boolean FDECL(assign_hilite, (char *, char *, char *, char *, BOOLEAN_P));
+STATIC_DCL boolean FDECL(assign_hilite, (char *, char *, char *, char *,
+                                         BOOLEAN_P));
 STATIC_DCL const char *FDECL(clridx_to_s, (char *, int));
 #endif
 
 /* If entries are added to this, botl.h will require updating too */
 STATIC_DCL struct istat_s initblstats[MAXBLSTATS] = {
-        { 0L, ANY_STR,  {(genericptr_t)0L}, (char *)0, 80,  0, BL_TITLE},
-        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_STR},
-        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_DX},
-        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_CO},
-        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_IN},
-        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_WI},
-        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_CH},
-        { 0L, ANY_STR,  {(genericptr_t)0L}, (char *)0, 40,  0, BL_ALIGN},
-        { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 20,  0, BL_SCORE},
-        { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 20,  0, BL_CAP},
-        { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 30,  0, BL_GOLD},
-        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  BL_ENEMAX, BL_ENE},
-        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_ENEMAX},
-        { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 10,  0, BL_XP},
-        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_AC},
-        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_HD},
-        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 20,  0, BL_TIME},
-        { 0L, ANY_UINT, {(genericptr_t)0L}, (char *)0, 40,  0, BL_HUNGER},
-        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  BL_HPMAX, BL_HP},
-        { 0L, ANY_INT,  {(genericptr_t)0L}, (char *)0, 10,  0, BL_HPMAX},
-        { 0L, ANY_STR,  {(genericptr_t)0L}, (char *)0, 80,  0, BL_LEVELDESC},
-        { 0L, ANY_LONG, {(genericptr_t)0L}, (char *)0, 20,  0, BL_EXP},
-        { 0L, ANY_MASK32,{(genericptr_t)0L},(char *)0,  0,  0, BL_CONDITION}
+    { 0L, ANY_STR,  { (genericptr_t) 0 }, (char *) 0, 80,  0, BL_TITLE},
+    { 0L, ANY_INT,  { (genericptr_t) 0 }, (char *) 0, 10,  0, BL_STR},
+    { 0L, ANY_INT,  { (genericptr_t) 0 }, (char *) 0, 10,  0, BL_DX},
+    { 0L, ANY_INT,  { (genericptr_t) 0 }, (char *) 0, 10,  0, BL_CO},
+    { 0L, ANY_INT,  { (genericptr_t) 0 }, (char *) 0, 10,  0, BL_IN},
+    { 0L, ANY_INT,  { (genericptr_t) 0 }, (char *) 0, 10,  0, BL_WI},
+    { 0L, ANY_INT,  { (genericptr_t) 0 }, (char *) 0, 10,  0, BL_CH},
+    { 0L, ANY_STR,  { (genericptr_t) 0 }, (char *) 0, 40,  0, BL_ALIGN},
+    { 0L, ANY_LONG, { (genericptr_t) 0 }, (char *) 0, 20,  0, BL_SCORE},
+    { 0L, ANY_LONG, { (genericptr_t) 0 }, (char *) 0, 20,  0, BL_CAP},
+    { 0L, ANY_LONG, { (genericptr_t) 0 }, (char *) 0, 30,  0, BL_GOLD},
+    { 0L, ANY_INT,  { (genericptr_t) 0 }, (char *) 0, 10,  BL_ENEMAX, BL_ENE},
+    { 0L, ANY_INT,  { (genericptr_t) 0 }, (char *) 0, 10,  0, BL_ENEMAX},
+    { 0L, ANY_LONG, { (genericptr_t) 0 }, (char *) 0, 10,  0, BL_XP},
+    { 0L, ANY_INT,  { (genericptr_t) 0 }, (char *) 0, 10,  0, BL_AC},
+    { 0L, ANY_INT,  { (genericptr_t) 0 }, (char *) 0, 10,  0, BL_HD},
+    { 0L, ANY_INT,  { (genericptr_t) 0 }, (char *) 0, 20,  0, BL_TIME},
+    { 0L, ANY_UINT, { (genericptr_t) 0 }, (char *) 0, 40,  0, BL_HUNGER},
+    { 0L, ANY_INT,  { (genericptr_t) 0 }, (char *) 0, 10,  BL_HPMAX, BL_HP},
+    { 0L, ANY_INT,  { (genericptr_t) 0 }, (char *) 0, 10,  0, BL_HPMAX},
+    { 0L, ANY_STR,  { (genericptr_t) 0 }, (char *) 0, 80,  0, BL_LEVELDESC},
+    { 0L, ANY_LONG, { (genericptr_t) 0 }, (char *) 0, 20,  0, BL_EXP},
+    { 0L, ANY_MASK32,
+                    { (genericptr_t) 0 }, (char *) 0,  0,  0, BL_CONDITION}
 };
 
 static struct fieldid_t {
@@ -576,7 +579,8 @@ bot()
     for (i = 0; i < MAXBLSTATS; i++) {
         if (((i == BL_SCORE) && !flags.showscore)
             || ((i == BL_EXP) && !flags.showexp)
-            || ((i == BL_TIME) && !flags.time) || ((i == BL_HD) && !Upolyd)
+            || ((i == BL_TIME) && !flags.time)
+            || ((i == BL_HD) && !Upolyd)
             || ((i == BL_XP || i == BL_EXP) && Upolyd))
             continue;
         anytype = blstats[idx][i].anytype;
@@ -685,7 +689,7 @@ boolean
             fieldfmt = " S:%s";
             fieldname = "score";
             status_enablefield(fld, fieldname, fieldfmt,
-                                  (!flags.showscore) ? FALSE : TRUE);
+                               (!flags.showscore) ? FALSE : TRUE);
             break;
         case BL_CAP:
             fieldfmt = " %s";
@@ -764,7 +768,7 @@ boolean
         case BL_FLUSH:
         default:
             break;
-	}
+        }
     }
     update_all = TRUE;
 }
@@ -1134,7 +1138,7 @@ boolean from_configfile;
     threshold.a_void = 0;
 
     /* Example:
-     * 	hilite_status: hitpoints/10%/red/normal
+     *  hilite_status: hitpoints/10%/red/normal
      */
 
     /* field name to statusfield */
@@ -1505,11 +1509,12 @@ status_hilite_menu()
                 char prompt[QBUFSZ];
                 /* j == 0 below, j == 1 above */
                 menu_item *pick2 = (menu_item *) 0;
+
                 Sprintf(prompt, "Display how when %s?", j ? above : below);
                 tmpwin = create_nhwindow(NHW_MENU);
                 start_menu(tmpwin);
                 for (k = -3; k < CLR_MAX; ++k) {
-                    /*		    	if (k == -1) continue; */
+                    /* if (k == -1) continue; */
                     any = zeroany;
                     any.a_int = (k >= 0) ? k + 1 : k;
                     if (k > 0)

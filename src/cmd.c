@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1446369464 2015/11/01 09:17:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.205 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1446975462 2015/11/08 09:37:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.206 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -145,14 +145,14 @@ STATIC_PTR int NDECL(wiz_migrate_mons);
 #endif
 STATIC_DCL int FDECL(size_monst, (struct monst *));
 STATIC_DCL int FDECL(size_obj, (struct obj *));
-STATIC_DCL void FDECL(count_obj,
-                      (struct obj *, long *, long *, BOOLEAN_P, BOOLEAN_P));
-STATIC_DCL void FDECL(obj_chain,
-                      (winid, const char *, struct obj *, long *, long *));
-STATIC_DCL void FDECL(mon_invent_chain,
-                      (winid, const char *, struct monst *, long *, long *));
-STATIC_DCL void FDECL(mon_chain,
-                      (winid, const char *, struct monst *, long *, long *));
+STATIC_DCL void FDECL(count_obj, (struct obj *, long *, long *,
+                                  BOOLEAN_P, BOOLEAN_P));
+STATIC_DCL void FDECL(obj_chain, (winid, const char *, struct obj *,
+                                  long *, long *));
+STATIC_DCL void FDECL(mon_invent_chain, (winid, const char *, struct monst *,
+                                         long *, long *));
+STATIC_DCL void FDECL(mon_chain, (winid, const char *, struct monst *,
+                                  long *, long *));
 STATIC_DCL void FDECL(contained, (winid, const char *, long *, long *));
 STATIC_PTR int NDECL(wiz_show_stats);
 STATIC_DCL boolean FDECL(accept_menu_prefix, (int NDECL((*))));
@@ -269,13 +269,13 @@ popch()
 }
 
 char
-pgetchar()
-{ /* courtesy of aeb@cwi.nl */
+pgetchar() /* courtesy of aeb@cwi.nl */
+{
     register int ch;
 
     if (!(ch = popch()))
         ch = nhgetch();
-    return ((char) ch);
+    return (char) ch;
 }
 
 /* A ch == 0 resets the pushq */
@@ -306,8 +306,9 @@ char ch;
     return;
 }
 
+/* here after # - now read a full-word command */
 STATIC_PTR int
-doextcmd(VOID_ARGS) /* here after # - now read a full-word command */
+doextcmd(VOID_ARGS)
 {
     int idx, retval;
     int NDECL((*func));
@@ -361,9 +362,11 @@ doextlist(VOID_ARGS)
  * controlled via runtime option 'extmenu'.
  * ``# ?'' is counted towards the limit of the number of commands,
  * so we actually support MAX_EXT_CMD-1 "real" extended commands.
+ *
+ * Here after # - now show pick-list of possible commands.
  */
 int
-extcmd_via_menu() /* here after # - now show pick-list of possible commands */
+extcmd_via_menu()
 {
     const struct ext_func_tab *efp;
     menu_item *pick_list = (menu_item *) 0;
@@ -1169,8 +1172,10 @@ doterrain(VOID_ARGS)
      * n == 2: another entry was explicitly chosen, so skip preselected one.
      */
     which = (n < 0) ? -1 : (n == 0) ? 1 : sel[0].item.a_int;
-    if (n > 1 && which == 1) which = sel[1].item.a_int;
-    if (n > 0) free((genericptr_t)sel);
+    if (n > 1 && which == 1)
+        which = sel[1].item.a_int;
+    if (n > 0)
+        free((genericptr_t) sel);
 
     switch (which) {
     case 1: reveal_terrain(0, 0);   break; /* known map */
@@ -2367,7 +2372,7 @@ minimal_enlightenment()
     genidx = is_neuter(youmonst.data) ? 2 : flags.female;
     Sprintf(buf, fmtstr, "gender", genders[genidx].adj);
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
-    if (Upolyd && (int)u.mfemale != genidx) {
+    if (Upolyd && (int) u.mfemale != genidx) {
         Sprintf(buf, fmtstr, "gender (base)", genders[u.mfemale].adj);
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, FALSE);
     }

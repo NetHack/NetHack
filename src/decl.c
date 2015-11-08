@@ -1,4 +1,4 @@
-/* NetHack 3.6	decl.c	$NHDT-Date: 1432512771 2015/05/25 00:12:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.6	decl.c	$NHDT-Date: 1446975463 2015/11/08 09:37:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.62 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -33,8 +33,8 @@ int otg_temp; /* used by object_to_glyph() [otg] */
 NEARDATA int in_doagain = 0;
 
 /*
- *	The following structure will be initialized at startup time with
- *	the level numbers of some "important" things in the game.
+ *      The following structure will be initialized at startup time with
+ *      the level numbers of some "important" things in the game.
  */
 struct dgn_topology dungeon_topology = { DUMMY };
 
@@ -156,9 +156,10 @@ NEARDATA struct obj
     *ublindf = (struct obj *) 0, *uchain = (struct obj *) 0,
     *uball = (struct obj *) 0;
 /* some objects need special handling during destruction or placement */
-NEARDATA struct obj *current_wand = 0, /* wand currently zapped/applied */
-    *thrownobj = 0,                    /* object in flight due to throwing */
-        *kickedobj = 0;                /* object in flight due to kicking */
+NEARDATA struct obj
+    *current_wand = 0,  /* wand currently zapped/applied */
+    *thrownobj = 0,     /* object in flight due to throwing */
+    *kickedobj = 0;     /* object in flight due to kicking */
 
 #ifdef TEXTCOLOR
 /*
@@ -328,7 +329,7 @@ NEARDATA struct savefile_info sfrestinfo, sfsaveinfo = {
 #endif
 };
 
-struct plinemsg_type *plinemsg_types = NULL;
+struct plinemsg_type *plinemsg_types = (struct plinemsg_type *) 0;
 
 #ifdef PANICTRACE
 char *ARGV0;

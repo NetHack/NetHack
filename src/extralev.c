@@ -1,5 +1,5 @@
-/* NetHack 3.6	extralev.c	$NHDT-Date: 1432512765 2015/05/25 00:12:45 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
-/*	Copyright 1988, 1989 by Ken Arromdee				*/
+/* NetHack 3.6	extralev.c	$NHDT-Date: 1446975468 2015/11/08 09:37:48 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
+/*      Copyright 1988, 1989 by Ken Arromdee                      */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -206,22 +206,22 @@ void
 makeroguerooms()
 {
     register int x, y;
-/* Rogue levels are structured 3 by 3, with each section containing
- * a room or an intersection.  The minimum width is 2 each way.
- * One difference between these and "real" Rogue levels: real Rogue
- * uses 24 rows and NetHack only 23.  So we cheat a bit by making the
- * second row of rooms not as deep.
- *
- * Each normal space has 6/7 rows and 25 columns in which a room may
- * actually be placed.  Walls go from rows 0-5/6 and columns 0-24.
- * Not counting walls, the room may go in
- * rows 1-5 and columns 1-23 (numbering starting at 0).  A room
- * coordinate of this type may be converted to a level coordinate
- * by adding 1+28*x to the column, and 7*y to the row.  (The 1
- * is because column 0 isn't used [we only use 1-78]).
- * Room height may be 2-4 (2-5 on last row), length 2-23 (not
- * counting walls)
- */
+    /* Rogue levels are structured 3 by 3, with each section containing
+     * a room or an intersection.  The minimum width is 2 each way.
+     * One difference between these and "real" Rogue levels: real Rogue
+     * uses 24 rows and NetHack only 23.  So we cheat a bit by making the
+     * second row of rooms not as deep.
+     *
+     * Each normal space has 6/7 rows and 25 columns in which a room may
+     * actually be placed.  Walls go from rows 0-5/6 and columns 0-24.
+     * Not counting walls, the room may go in
+     * rows 1-5 and columns 1-23 (numbering starting at 0).  A room
+     * coordinate of this type may be converted to a level coordinate
+     * by adding 1+28*x to the column, and 7*y to the row.  (The 1
+     * is because column 0 isn't used [we only use 1-78]).
+     * Room height may be 2-4 (2-5 on last row), length 2-23 (not
+     * counting walls).
+     */
 #define here r[x][y]
 
     nroom = 0;

@@ -1,4 +1,4 @@
-/* NetHack 3.6	exper.c	$NHDT-Date: 1432512770 2015/05/25 00:12:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.25 $ */
+/* NetHack 3.6	exper.c	$NHDT-Date: 1446975467 2015/11/08 09:37:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.26 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -34,7 +34,7 @@ int en;
     case PM_VALKYRIE:
         return ((3 * en) / 4);
     default:
-        return (en);
+        return en;
     }
 }
 
@@ -68,7 +68,9 @@ newpw()
     return en;
 }
 
-int experience(mtmp, nk) /* return # of exp points for mtmp after nk killed */
+/* return # of exp points for mtmp after nk killed */
+int
+experience(mtmp, nk)
 register struct monst *mtmp;
 register int nk;
 {
@@ -77,15 +79,15 @@ register int nk;
 
     tmp = 1 + mtmp->m_lev * mtmp->m_lev;
 
-    /*	For higher ac values, give extra experience */
+    /*  For higher ac values, give extra experience */
     if ((i = find_mac(mtmp)) < 3)
         tmp += (7 - i) * ((i < 0) ? 2 : 1);
 
-    /*	For very fast monsters, give extra experience */
+    /*  For very fast monsters, give extra experience */
     if (ptr->mmove > NORMAL_SPEED)
         tmp += (ptr->mmove > (3 * NORMAL_SPEED / 2)) ? 5 : 3;
 
-    /*	For each "special" attack type give extra experience */
+    /*  For each "special" attack type give extra experience */
     for (i = 0; i < NATTK; i++) {
         tmp2 = ptr->mattk[i].aatyp;
         if (tmp2 > AT_BUTT) {
@@ -98,7 +100,7 @@ register int nk;
         }
     }
 
-    /*	For each "special" damage type give extra experience */
+    /*  For each "special" damage type give extra experience */
     for (i = 0; i < NATTK; i++) {
         tmp2 = ptr->mattk[i].adtyp;
         if (tmp2 > AD_PHYS && tmp2 < AD_BLND)
@@ -114,11 +116,11 @@ register int nk;
             tmp += 1000;
     }
 
-    /*	For certain "extra nasty" monsters, give even more */
+    /*  For certain "extra nasty" monsters, give even more */
     if (extra_nasty(ptr))
         tmp += (7 * mtmp->m_lev);
 
-    /*	For higher level monsters, an additional bonus is given */
+    /*  For higher level monsters, an additional bonus is given */
     if (mtmp->m_lev > 8)
         tmp += 50;
 
@@ -130,17 +132,17 @@ register int nk;
 
     if (mtmp->mrevived || mtmp->mcloned) {
         /*
-         *	Reduce experience awarded for repeated killings of
-         *	"the same monster".  Kill count includes all of this
-         *	monster's type which have been killed--including the
-         *	current monster--regardless of how they were created.
-         *	  1.. 20	full experience
-         *	 21.. 40	xp / 2
-         *	 41.. 80	xp / 4
-         *	 81..120	xp / 8
-         *	121..180	xp / 16
-         *	181..240	xp / 32
-         *	241..255+	xp / 64
+         *      Reduce experience awarded for repeated killings of
+         *      "the same monster".  Kill count includes all of this
+         *      monster's type which have been killed--including the
+         *      current monster--regardless of how they were created.
+         *        1.. 20        full experience
+         *       21.. 40        xp / 2
+         *       41.. 80        xp / 4
+         *       81..120        xp / 8
+         *      121..180        xp / 16
+         *      181..240        xp / 32
+         *      241..255+       xp / 64
          */
         for (i = 0, tmp2 = 20; nk > tmp2 && tmp > 1; ++i) {
             tmp = (tmp + 1) / 2;
@@ -256,7 +258,7 @@ newexplevel()
 void
 pluslvl(incr)
 boolean incr; /* true iff via incremental experience growth */
-{             /*	(false for potion of gain level)      */
+{             /*        (false for potion of gain level)    */
     int hpinc, eninc;
 
     if (!incr)

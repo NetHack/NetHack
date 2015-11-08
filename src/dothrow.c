@@ -1,4 +1,4 @@
-/* NetHack 3.6	dothrow.c	$NHDT-Date: 1445301122 2015/10/20 00:32:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.111 $ */
+/* NetHack 3.6	dothrow.c	$NHDT-Date: 1446975465 2015/11/08 09:37:45 $  $NHDT-Branch: master $:$NHDT-Revision: 1.113 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -12,8 +12,8 @@ STATIC_DCL void NDECL(autoquiver);
 STATIC_DCL int FDECL(gem_accept, (struct monst *, struct obj *));
 STATIC_DCL void FDECL(tmiss, (struct obj *, struct monst *, BOOLEAN_P));
 STATIC_DCL int FDECL(throw_gold, (struct obj *));
-STATIC_DCL void FDECL(check_shop_obj,
-                      (struct obj *, XCHAR_P, XCHAR_P, BOOLEAN_P));
+STATIC_DCL void FDECL(check_shop_obj, (struct obj *, XCHAR_P, XCHAR_P,
+                                       BOOLEAN_P));
 STATIC_DCL void FDECL(breakmsg, (struct obj *, BOOLEAN_P));
 STATIC_DCL boolean FDECL(toss_up, (struct obj *, BOOLEAN_P));
 STATIC_DCL boolean FDECL(throwing_weapon, (struct obj *));
@@ -66,22 +66,22 @@ int shotlimit;
      * possibly using a sling.
      */
     if (obj->oclass == COIN_CLASS && obj != uquiver)
-        return (throw_gold(obj));
+        return throw_gold(obj);
 
     if (!canletgo(obj, "throw"))
-        return (0);
+        return 0;
     if (obj->oartifact == ART_MJOLLNIR && obj != uwep) {
         pline("%s must be wielded before it can be thrown.", The(xname(obj)));
-        return (0);
+        return 0;
     }
     if ((obj->oartifact == ART_MJOLLNIR && ACURR(A_STR) < STR19(25))
         || (obj->otyp == BOULDER && !throws_rocks(youmonst.data))) {
         pline("It's too heavy.");
-        return (1);
+        return 1;
     }
     if (!u.dx && !u.dy && !u.dz) {
         You("cannot throw an object at yourself.");
-        return (0);
+        return 0;
     }
     u_wipe_engr(2);
     if (!uarmg && obj->otyp == CORPSE && touch_petrifies(&mons[obj->corpsenm])
@@ -516,12 +516,12 @@ genericptr_t arg;
  * your movements at the time.
  *
  * Possible additions/changes:
- *	o really attack monster if we hit one
- *	o set stunned if we hit a wall or door
- *	o reset nomul when we stop
- *	o creepy feeling if pass through monster (if ever implemented...)
- *	o bounce off walls
- *	o let jumps go over boulders
+ *      o really attack monster if we hit one
+ *      o set stunned if we hit a wall or door
+ *      o reset nomul when we stop
+ *      o creepy feeling if pass through monster (if ever implemented...)
+ *      o bounce off walls
+ *      o let jumps go over boulders
  */
 boolean
 hurtle_step(arg, x, y)
@@ -1449,7 +1449,7 @@ register struct obj *obj; /* thrownobj or kickedobj or uwep */
             }
             return 1; /* caller doesn't need to place it */
         }
-        return (0);
+        return 0;
     }
 
     if (obj->oclass == WEAPON_CLASS || is_weptool(obj)
@@ -1675,7 +1675,7 @@ nopick:
         pline1(buf);
     if (!tele_restrict(mon))
         (void) rloc(mon, TRUE);
-    return (ret);
+    return ret;
 }
 
 /*
@@ -1927,7 +1927,7 @@ struct obj *obj;
 
     if (!u.dx && !u.dy && !u.dz) {
         You("cannot throw gold at yourself.");
-        return (0);
+        return 0;
     }
     freeinv(obj);
     if (u.uswallow) {
@@ -1935,7 +1935,7 @@ struct obj *obj;
                                         : "%s into %s.",
               "The money disappears", mon_nam(u.ustuck));
         add_to_minv(u.ustuck, obj);
-        return (1);
+        return 1;
     }
 
     if (u.dz) {
@@ -1977,7 +1977,7 @@ struct obj *obj;
     }
 
     if (flooreffects(obj, bhitpos.x, bhitpos.y, "fall"))
-        return (1);
+        return 1;
     if (u.dz > 0)
         pline_The("gold hits the %s.", surface(bhitpos.x, bhitpos.y));
     place_object(obj, bhitpos.x, bhitpos.y);
@@ -1985,7 +1985,7 @@ struct obj *obj;
         sellobj(obj, bhitpos.x, bhitpos.y);
     stackobj(obj);
     newsym(bhitpos.x, bhitpos.y);
-    return (1);
+    return 1;
 }
 
 /*dothrow.c*/

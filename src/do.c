@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1437877173 2015/07/26 02:19:33 $  $NHDT-Branch: master $:$NHDT-Revision: 1.147 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1446975464 2015/11/08 09:37:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.149 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -223,7 +223,7 @@ const char *verb;
              * obj to null. */
             (void) obj_meld(&obj, &otmp);
         }
-        return (obj == NULL);
+        return (boolean) (obj == NULL);
     }
     return FALSE;
 }
@@ -265,8 +265,8 @@ register struct obj *obj;
         docall(obj);
 }
 
-/** Transforms the sink at the player's position into
- * a fountain, throne, altar or grave. */
+/* Transforms the sink at the player's position into
+   a fountain, throne, altar or grave. */
 STATIC_DCL void
 polymorph_sink()
 {
@@ -299,8 +299,8 @@ polymorph_sink()
     newsym(u.ux, u.uy);
 }
 
-/** Teleports the sink at the player's position.
- * @return TRUE if sink teleported */
+/* Teleports the sink at the player's position;
+   return True if sink teleported. */
 STATIC_DCL boolean
 teleport_sink()
 {
@@ -308,14 +308,16 @@ teleport_sink()
     int cnt = 0;
     struct trap *trp;
     struct engr *eng;
+
     do {
         cx = rnd(COLNO - 1);
         cy = rn2(ROWNO);
         trp = t_at(cx, cy);
         eng = engr_at(cx, cy);
     } while ((levl[cx][cy].typ != ROOM || trp || eng || cansee(cx, cy))
-             && (cnt++ < 200));
-    if ((levl[cx][cy].typ == ROOM) && !trp && !eng) {
+             && cnt++ < 200);
+
+    if (levl[cx][cy].typ == ROOM && !trp && !eng) {
         /* create sink at new position */
         levl[cx][cy].typ = SINK;
         levl[cx][cy].looted = levl[u.ux][u.uy].looted;
@@ -468,6 +470,7 @@ register struct obj *obj;
         trycall(obj);
     else if (!nosink)
         You_hear("the ring bouncing down the drainpipe.");
+
     if (!rn2(20) && !nosink) {
         pline_The("sink backs up, leaving %s.", doname(obj));
         obj->in_use = FALSE;
@@ -485,7 +488,7 @@ const char *word;
     if (obj->owornmask & (W_ARMOR | W_ACCESSORY)) {
         if (*word)
             Norep("You cannot %s %s you are wearing.", word, something);
-        return (FALSE);
+        return FALSE;
     }
     if (obj->otyp == LOADSTONE && obj->cursed) {
         /* getobj() kludge sets corpsenm to user's specified count
@@ -500,19 +503,19 @@ const char *word;
         }
         obj->corpsenm = 0; /* reset */
         obj->bknown = 1;
-        return (FALSE);
+        return FALSE;
     }
     if (obj->otyp == LEASH && obj->leashmon != 0) {
         if (*word)
             pline_The("leash is tied around your %s.", body_part(HAND));
-        return (FALSE);
+        return FALSE;
     }
     if (obj->owornmask & W_SADDLE) {
         if (*word)
             You("cannot %s %s you are sitting on.", word, something);
-        return (FALSE);
+        return FALSE;
     }
-    return (TRUE);
+    return TRUE;
 }
 
 STATIC_PTR int
@@ -520,13 +523,13 @@ drop(obj)
 register struct obj *obj;
 {
     if (!obj)
-        return (0);
+        return 0;
     if (!canletgo(obj, "drop"))
-        return (0);
+        return 0;
     if (obj == uwep) {
         if (welded(uwep)) {
             weldmsg(obj);
-            return (0);
+            return 0;
         }
         setuwep((struct obj *) 0);
     }
@@ -551,7 +554,7 @@ register struct obj *obj;
         if ((obj->oclass == RING_CLASS || obj->otyp == MEAT_RING)
             && IS_SINK(levl[u.ux][u.uy].typ)) {
             dosinkring(obj);
-            return (1);
+            return 1;
         }
         if (!can_reach_floor(TRUE)) {
             /* we might be levitating due to #invoke Heart of Ahriman;
@@ -570,13 +573,13 @@ register struct obj *obj;
             hitfloor(obj);
             if (levhack)
                 float_down(I_SPECIAL | TIMEOUT, W_ARTI | W_ART);
-            return (1);
+            return 1;
         }
         if (!IS_ALTAR(levl[u.ux][u.uy].typ) && flags.verbose)
             You("drop %s.", doname(obj));
     }
     dropx(obj);
-    return (1);
+    return 1;
 }
 
 /* dropx - take dropped item out of inventory;
@@ -776,10 +779,10 @@ int retry;
          * Dropping a burning potion of oil while levitating can cause
          * an explosion which might destroy some of hero's inventory,
          * so the old code
-         *	for (otmp = invent; otmp; otmp = otmp2) {
-         *	    otmp2 = otmp->nobj;
-         *	    n_dropped += drop(otmp);
-         *	}
+         *      for (otmp = invent; otmp; otmp = otmp2) {
+         *          otmp2 = otmp->nobj;
+         *          n_dropped += drop(otmp);
+         *      }
          * was unreliable and could lead to an "object lost" panic.
          *
          * Use the bypass bit to mark items already processed (hence
@@ -844,6 +847,7 @@ drop_done:
 /* on a ladder, used in goto_level */
 static NEARDATA boolean at_ladder = FALSE;
 
+/* the '>' command */
 int
 dodown()
 {
@@ -900,20 +904,20 @@ dodown()
         floating_above(stairs_down ? "stairs" : ladder_down
                                                     ? "ladder"
                                                     : surface(u.ux, u.uy));
-        return (0); /* didn't move */
+        return 0; /* didn't move */
     }
     if (!stairs_down && !ladder_down) {
         trap = t_at(u.ux, u.uy);
         if (trap && uteetering_at_seen_pit(trap)) {
             dotrap(trap, TOOKPLUNGE);
-            return (1);
+            return 1;
         } else if (!trap || (trap->ttyp != TRAPDOOR && trap->ttyp != HOLE)
                    || !Can_fall_thru(&u.uz) || !trap->tseen) {
             if (flags.autodig && !context.nopick && uwep && is_pick(uwep)) {
                 return use_pick_axe2(uwep);
             } else {
                 You_cant("go down here.");
-                return (0);
+                return 0;
             }
         }
     }
@@ -922,13 +926,13 @@ dodown()
             !u.uswallow ? "being held" : is_animal(u.ustuck->data)
                                              ? "swallowed"
                                              : "engulfed");
-        return (1);
+        return 1;
     }
     if (on_level(&valley_level, &u.uz) && !u.uevent.gehennom_entered) {
         You("are standing at the gate to Gehennom.");
         pline("Unspeakable cruelty and harm lurk down there.");
         if (yn("Are you sure you want to enter?") != 'y')
-            return (0);
+            return 0;
         else
             pline("So be it.");
         u.uevent.gehennom_entered = 1; /* don't ask again */
@@ -936,7 +940,7 @@ dodown()
 
     if (!next_to_u()) {
         You("are held back by your pet!");
-        return (0);
+        return 0;
     }
 
     if (trap)
@@ -946,13 +950,14 @@ dodown()
     if (trap && Is_stronghold(&u.uz)) {
         goto_hell(FALSE, TRUE);
     } else {
-        at_ladder = (boolean)(levl[u.ux][u.uy].typ == LADDER);
+        at_ladder = (boolean) (levl[u.ux][u.uy].typ == LADDER);
         next_level(!trap);
         at_ladder = FALSE;
     }
-    return (1);
+    return 1;
 }
 
+/* the '<' command */
 int
 doup()
 {
@@ -970,36 +975,36 @@ doup()
         && (!sstairs.sx || u.ux != sstairs.sx || u.uy != sstairs.sy
             || !sstairs.up)) {
         You_cant("go up here.");
-        return (0);
+        return 0;
     }
     if (stucksteed(TRUE)) {
-        return (0);
+        return 0;
     }
     if (u.ustuck) {
         You("are %s, and cannot go up.",
             !u.uswallow ? "being held" : is_animal(u.ustuck->data)
                                              ? "swallowed"
                                              : "engulfed");
-        return (1);
+        return 1;
     }
     if (near_capacity() > SLT_ENCUMBER) {
         /* No levitation check; inv_weight() already allows for it */
         Your("load is too heavy to climb the %s.",
              levl[u.ux][u.uy].typ == STAIRS ? "stairs" : "ladder");
-        return (1);
+        return 1;
     }
     if (ledger_no(&u.uz) == 1) {
         if (yn("Beware, there will be no return! Still climb?") != 'y')
-            return (0);
+            return 0;
     }
     if (!next_to_u()) {
         You("are held back by your pet!");
-        return (0);
+        return 0;
     }
-    at_ladder = (boolean)(levl[u.ux][u.uy].typ == LADDER);
+    at_ladder = (boolean) (levl[u.ux][u.uy].typ == LADDER);
     prev_level(TRUE);
     at_ladder = FALSE;
-    return (1);
+    return 1;
 }
 
 d_level save_dlevel = { 0, 0 };
@@ -1109,12 +1114,12 @@ boolean at_stairs, falling, portal;
      * due to overlooking the effect of the call to assign_rnd_lvl().)
      *
      * Odds for making it to the next level up, or of being sent down:
-     *	"up"    L      N      C
-     *	 +1   75.0   75.0   75.0
-     *	  0    6.25   8.33  12.5
-     *	 -1   11.46  12.50  12.5
-     *	 -2    5.21   4.17   0.0
-     *	 -3    2.08   0.0    0.0
+     *  "up"    L      N      C
+     *   +1   75.0   75.0   75.0
+     *    0    6.25   8.33  12.5
+     *   -1   11.46  12.50  12.5
+     *   -2    5.21   4.17   0.0
+     *   -3    2.08   0.0    0.0
      */
     if (Inhell && up && u.uhave.amulet && !newdungeon && !portal
         && (dunlev(&u.uz) < dunlevs_in_dungeon(&u.uz) - 3)) {
@@ -1521,8 +1526,8 @@ final_level()
     gain_guardian_angel();
 }
 
-static char *dfr_pre_msg = 0, /* pline() before level change */
-    *dfr_post_msg = 0;        /* pline() after level change */
+static char *dfr_pre_msg = 0,  /* pline() before level change */
+            *dfr_post_msg = 0; /* pline() after level change */
 
 /* change levels at the end of this turn, after monsters finish moving */
 void
@@ -1728,7 +1733,7 @@ long timeout UNUSED;
 int
 donull()
 {
-    return (1); /* Do nothing, but let other things happen */
+    return 1; /* Do nothing, but let other things happen */
 }
 
 STATIC_PTR int
@@ -1749,12 +1754,12 @@ wipeoff(VOID_ARGS)
             Blinded = 1;
             make_blinded(0L, TRUE);
         }
-        return (0);
+        return 0;
     } else if (!u.ucreamed) {
         Your("%s feels clean now.", body_part(FACE));
-        return (0);
+        return 0;
     }
-    return (1); /* still busy */
+    return 1; /* still busy */
 }
 
 int
@@ -1768,10 +1773,10 @@ dowipe()
         /* Not totally correct; what if they change back after now
          * but before they're finished wiping?
          */
-        return (1);
+        return 1;
     }
     Your("%s is already clean.", body_part(FACE));
-    return (1);
+    return 1;
 }
 
 void

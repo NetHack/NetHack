@@ -1,4 +1,4 @@
-/* NetHack 3.6	allmain.c	$NHDT-Date: 1445215016 2015/10/19 00:36:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.65 $ */
+/* NetHack 3.6	allmain.c	$NHDT-Date: 1446975459 2015/11/08 09:37:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.66 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -58,8 +58,7 @@ boolean resuming;
 
     if (!resuming) { /* new game */
         context.rndencode = rnd(9000);
-        set_wear(
-            (struct obj *) 0); /* for side-effects of worn starting gear */
+        set_wear((struct obj *) 0); /* for side-effects of starting gear */
         (void) pickup(1);      /* autopickup at initial location */
     } else {                   /* restore old game */
 #ifndef WIN32
@@ -516,10 +515,10 @@ display_gamewindows()
         SanePositions();
 #endif
 
-/*
- * The mac port is not DEPENDENT on the order of these
- * displays, but it looks a lot better this way...
- */
+    /*
+     * The mac port is not DEPENDENT on the order of these
+     * displays, but it looks a lot better this way...
+     */
 #ifndef STATUS_VIA_WINDOWPORT
     display_nhwindow(WIN_STATUS, FALSE);
 #endif
@@ -569,7 +568,7 @@ newgame()
         display_file(NEWS, FALSE);
 #endif
     load_qtlist();          /* load up the quest text info */
-    /*	quest_init();*/ /* Now part of role_init() */
+    /* quest_init();  --  Now part of role_init() */
 
     mklev();
     u_on_upstairs();

@@ -1,4 +1,4 @@
-/* NetHack 3.6	alloc.c	$NHDT-Date: 1432512771 2015/05/25 00:12:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
+/* NetHack 3.6	alloc.c	$NHDT-Date: 1446975460 2015/11/08 09:37:40 $  $NHDT-Branch: master $:$NHDT-Revision: 1.14 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -27,19 +27,20 @@ extern void
 VDECL(panic, (const char *, ...))
 PRINTF_F(1, 2);
 
-long *alloc(lth) register unsigned int lth;
+long *alloc(lth)
+register unsigned int lth;
 {
 #ifdef LINT
     /*
      * a ridiculous definition, suppressing
-     *	"possible pointer alignment problem" for (long *) malloc()
+     *  "possible pointer alignment problem" for (long *) malloc()
      * from lint
      */
     long dummy = ftell(stderr);
 
     if (lth)
         dummy = 0; /* make sure arg is used */
-    return (&dummy);
+    return &dummy;
 #else
     register genericptr_t ptr;
 
@@ -48,7 +49,7 @@ long *alloc(lth) register unsigned int lth;
     if (!ptr)
         panic("Memory allocation failure; cannot get %u bytes", lth);
 #endif
-    return ((long *) ptr);
+    return (long *) ptr;
 #endif
 }
 
