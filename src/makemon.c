@@ -1,4 +1,4 @@
-/* NetHack 3.6	makemon.c	$NHDT-Date: 1446808445 2015/11/06 11:14:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.100 $ */
+/* NetHack 3.6	makemon.c	$NHDT-Date: 1446955301 2015/11/08 04:01:41 $  $NHDT-Branch: master $:$NHDT-Revision: 1.101 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1274,7 +1274,7 @@ int mmflags;
 
         mtmp->isminion = 1;            /* make priest be a roamer */
         eminp->min_align = rn2(3) - 1; /* no A_NONE */
-        eminp->renegade = (boolean)((mmflags & MM_ANGRY) ? 1 : !rn2(3));
+        eminp->renegade = (boolean) ((mmflags & MM_ANGRY) ? 1 : !rn2(3));
         mtmp->mpeaceful = (eminp->min_align == u.ualign.type)
                               ? !eminp->renegade
                               : eminp->renegade;

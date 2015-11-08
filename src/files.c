@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1446854228 2015/11/06 23:57:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.185 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1446955299 2015/11/08 04:01:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.186 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3572,7 +3572,7 @@ char *nowin_buf;
                     putstr(tribwin, 0, line);
                     Strcpy(lastline, line);
                 } else if (nowin_buf) {
-                    if ((int)strlen(line) < bufsz-1)
+                    if ((int) strlen(line) < bufsz - 1)
                         Strcpy(nowin_buf, line);
                 }
             }

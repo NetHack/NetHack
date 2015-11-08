@@ -1,4 +1,4 @@
-/* NetHack 3.6	lock.c	$NHDT-Date: 1446808444 2015/11/06 11:14:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.66 $ */
+/* NetHack 3.6	lock.c	$NHDT-Date: 1446955300 2015/11/08 04:01:40 $  $NHDT-Branch: master $:$NHDT-Revision: 1.67 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -144,7 +144,7 @@ boolean destroyit;
         struct monst *shkp = (*u.ushops && costly_spot(u.ux, u.uy))
                                  ? shop_keeper(*u.ushops)
                                  : 0;
-        boolean costly = (boolean)(shkp != 0),
+        boolean costly = (boolean) (shkp != 0),
                 peaceful_shk = costly && (boolean) shkp->mpeaceful;
         long loss = 0L;
 
@@ -212,7 +212,7 @@ forcelock(VOID_ARGS)
         return 1; /* still busy */
 
     You("succeed in forcing the lock.");
-    breakchestlock(xlock.box, (boolean)(!xlock.picktyp && !rn2(3)));
+    breakchestlock(xlock.box, (boolean) (!xlock.picktyp && !rn2(3)));
 
     exercise((xlock.picktyp) ? A_DEX : A_STR, TRUE);
     return ((xlock.usedtime = 0));

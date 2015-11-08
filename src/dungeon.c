@@ -1,4 +1,4 @@
-/* NetHack 3.6	dungeon.c	$NHDT-Date: 1446808442 2015/11/06 11:14:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.66 $ */
+/* NetHack 3.6	dungeon.c	$NHDT-Date: 1446955297 2015/11/08 04:01:37 $  $NHDT-Branch: master $:$NHDT-Revision: 1.68 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2539,7 +2539,7 @@ int why, reason, *lastdun_p;
 
         /* only print out info for a level or a dungeon if interest */
         if (why > 0 || interest_mapseen(mptr)) {
-            showheader = (boolean)(mptr->lev.dnum != *lastdun_p);
+            showheader = (boolean) (mptr->lev.dnum != *lastdun_p);
             print_mapseen(win, mptr, why, reason, showheader);
             *lastdun_p = mptr->lev.dnum;
         }

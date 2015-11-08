@@ -1,5 +1,5 @@
-/* NetHack 3.6	explode.c	$NHDT-Date: 1445388916 2015/10/21 00:55:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.43 $ */
-/*	Copyright (C) 1990 by Ken Arromdee */
+/* NetHack 3.6	explode.c	$NHDT-Date: 1446955298 2015/11/08 04:01:38 $  $NHDT-Branch: master $:$NHDT-Revision: 1.44 $ */
+/*      Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -18,11 +18,11 @@ static int explosion[3][3] = { { S_explode1, S_explode4, S_explode7 },
  * these disadvantages....
  *
  * Important note about Half_physical_damage:
- *	Unlike losehp() , explode() makes the Half_physical_damage adjustments
- *	itself, so the caller should never have done that ahead of time.
- *	It has to be done this way because the damage value is applied to
- *	things beside the player. Care is taken within explode() to ensure
- *	that Half_physical_damage only affects the damage applied to the hero.
+ *      Unlike losehp(), explode() makes the Half_physical_damage adjustments
+ *      itself, so the caller should never have done that ahead of time.
+ *      It has to be done this way because the damage value is applied to
+ *      things beside the player. Care is taken within explode() to ensure
+ *      that Half_physical_damage only affects the damage applied to the hero.
  */
 void
 explode(x, y, type, dam, olet, expltype)
@@ -48,8 +48,8 @@ int expltype;
     short exploding_wand_typ = 0;
 
     if (olet == WAND_CLASS) { /* retributive strike */
-        /*  'type' is passed as (wand's object type * -1); save
-            object type and convert 'type' itself to zap-type */
+        /* 'type' is passed as (wand's object type * -1); save
+           object type and convert 'type' itself to zap-type */
         if (type < 0) {
             type = -type;
             exploding_wand_typ = (short) type;
@@ -100,9 +100,8 @@ int expltype;
             adtyp = AD_MAGM;
             break;
         case 1:
-            str = olet == BURNING_OIL ? "burning oil" : olet == SCROLL_CLASS
-                                                            ? "tower of flame"
-                                                            : "fireball";
+            str = (olet == BURNING_OIL) ? "burning oil"
+                     : (olet == SCROLL_CLASS) ? "tower of flame" : "fireball";
             /* fire damage, not physical damage */
             adtyp = AD_FIRE;
             break;
@@ -111,8 +110,8 @@ int expltype;
             adtyp = AD_COLD;
             break;
         case 4:
-            str =
-                (olet == WAND_CLASS) ? "death field" : "disintegration field";
+            str = (olet == WAND_CLASS) ? "death field"
+                                       : "disintegration field";
             adtyp = AD_DISN;
             break;
         case 5:
@@ -296,8 +295,8 @@ int expltype;
                     continue;
                 idamres = idamnonres = 0;
                 if (type >= 0 && !u.uswallow)
-                    (void) zap_over_floor((xchar)(i + x - 1),
-                                          (xchar)(j + y - 1), type,
+                    (void) zap_over_floor((xchar) (i + x - 1),
+                                          (xchar) (j + y - 1), type,
                                           &shopdamage, exploding_wand_typ);
 
                 mtmp = m_at(i + x - 1, j + y - 1);
@@ -520,31 +519,31 @@ int expltype;
 }
 
 struct scatter_chain {
-    struct scatter_chain *next; /* pointer to next scatter item	*/
-    struct obj *obj;            /* pointer to the object	*/
-    xchar ox;                   /* location of			*/
-    xchar oy;                   /*	item			*/
-    schar dx;                   /* direction of			*/
-    schar dy;                   /*	travel			*/
-    int range;                  /* range of object		*/
-    boolean stopped;            /* flag for in-motion/stopped	*/
+    struct scatter_chain *next; /* pointer to next scatter item */
+    struct obj *obj;            /* pointer to the object        */
+    xchar ox;                   /* location of                  */
+    xchar oy;                   /*      item                    */
+    schar dx;                   /* direction of                 */
+    schar dy;                   /*      travel                  */
+    int range;                  /* range of object              */
+    boolean stopped;            /* flag for in-motion/stopped   */
 };
 
 /*
  * scflags:
- *	VIS_EFFECTS	Add visual effects to display
- *	MAY_HITMON	Objects may hit monsters
- *	MAY_HITYOU	Objects may hit hero
- *	MAY_HIT		Objects may hit you or monsters
- *	MAY_DESTROY	Objects may be destroyed at random
- *	MAY_FRACTURE	Stone objects can be fractured (statues, boulders)
+ *      VIS_EFFECTS     Add visual effects to display
+ *      MAY_HITMON      Objects may hit monsters
+ *      MAY_HITYOU      Objects may hit hero
+ *      MAY_HIT         Objects may hit you or monsters
+ *      MAY_DESTROY     Objects may be destroyed at random
+ *      MAY_FRACTURE    Stone objects can be fractured (statues, boulders)
  */
 
 /* returns number of scattered objects */
 long
 scatter(sx, sy, blastforce, scflags, obj)
 int sx, sy;     /* location of objects to scatter */
-int blastforce; /* force behind the scattering	*/
+int blastforce; /* force behind the scattering */
 unsigned int scflags;
 struct obj *obj; /* only scatter this obj        */
 {

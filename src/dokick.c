@@ -1,4 +1,4 @@
-/* NetHack 3.6	dokick.c	$NHDT-Date: 1446808441 2015/11/06 11:14:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.103 $ */
+/* NetHack 3.6	dokick.c	$NHDT-Date: 1446955295 2015/11/08 04:01:35 $  $NHDT-Branch: master $:$NHDT-Revision: 1.104 $ */
 /* Copyright (c) Izchak Miller, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -213,13 +213,13 @@ xchar x, y;
             } else if (tmp > (kickdieroll = rnd(20))) {
                 You("kick %s.", mon_nam(mon));
                 sum = damageum(mon, uattk);
-                (void) passive(mon, (boolean)(sum > 0), (sum != 2), AT_KICK,
+                (void) passive(mon, (boolean) (sum > 0), (sum != 2), AT_KICK,
                                FALSE);
                 if (sum == 2)
                     break; /* Defender died */
             } else {
                 missum(mon, uattk, (tmp + armorpenalty > kickdieroll));
-                (void) passive(mon, 0, 1, AT_KICK, FALSE);
+                (void) passive(mon, FALSE, 1, AT_KICK, FALSE);
             }
         }
         return;

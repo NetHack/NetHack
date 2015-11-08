@@ -1,5 +1,5 @@
-/* NetHack 3.6	mapglyph.c	$NHDT-Date: 1432512766 2015/05/25 00:12:46 $  $NHDT-Branch: master $:$NHDT-Revision: 1.35 $ */
-/* Copyright (c) David Cohrs, 1991				  */
+/* NetHack 3.6	mapglyph.c	$NHDT-Date: 1446955302 2015/11/08 04:01:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.38 $ */
+/* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -67,14 +67,14 @@ unsigned *ospecial;
     unsigned special = 0;
     /* condense multiple tests in macro version down to single */
     boolean has_rogue_ibm_graphics = HAS_ROGUE_IBM_GRAPHICS;
-    boolean has_rogue_color =
-        (has_rogue_ibm_graphics && (symset[currentgraphics].nocolor == 0));
+    boolean has_rogue_color = (has_rogue_ibm_graphics
+                               && symset[currentgraphics].nocolor == 0);
 
     /*
      *  Map the glyph back to a character and color.
      *
      *  Warning:  For speed, this makes an assumption on the order of
-     *		  offsets.  The order is set in display.h.
+     *            offsets.  The order is set in display.h.
      */
     if ((offset = (glyph - GLYPH_STATUE_OFF)) >= 0) { /* a statue */
         idx = mons[offset].mlet + SYM_OFF_M;
@@ -83,10 +83,9 @@ unsigned *ospecial;
         else
             obj_color(STATUE);
         special |= MG_STATUE;
-	if (level.objects[x][y] && level.objects[x][y]->nexthere)
-	    special |= MG_OBJPILE;
-    } else if ((offset = (glyph - GLYPH_WARNING_OFF))
-               >= 0) { /* a warning flash */
+        if (level.objects[x][y] && level.objects[x][y]->nexthere)
+            special |= MG_OBJPILE;
+    } else if ((offset = (glyph - GLYPH_WARNING_OFF)) >= 0) { /* warn flash */
         idx = offset + SYM_OFF_W;
         if (has_rogue_color)
             color = NO_COLOR;
@@ -151,8 +150,9 @@ unsigned *ospecial;
             }
         } else
             obj_color(offset);
-	if (offset != BOULDER && level.objects[x][y] && level.objects[x][y]->nexthere)
-	    special |= MG_OBJPILE;
+        if (offset != BOULDER && level.objects[x][y]
+            && level.objects[x][y]->nexthere)
+            special |= MG_OBJPILE;
     } else if ((offset = (glyph - GLYPH_RIDDEN_OFF)) >= 0) { /* mon ridden */
         idx = mons[offset].mlet + SYM_OFF_M;
         if (has_rogue_color)
@@ -170,8 +170,8 @@ unsigned *ospecial;
         else
             mon_color(offset);
         special |= MG_CORPSE;
-	if (level.objects[x][y] && level.objects[x][y]->nexthere)
-	    special |= MG_OBJPILE;
+        if (level.objects[x][y] && level.objects[x][y]->nexthere)
+            special |= MG_OBJPILE;
     } else if ((offset = (glyph - GLYPH_DETECT_OFF)) >= 0) { /* mon detect */
         idx = mons[offset].mlet + SYM_OFF_M;
         if (has_rogue_color)
@@ -199,17 +199,16 @@ unsigned *ospecial;
         idx = mons[glyph].mlet + SYM_OFF_M;
         if (has_rogue_color && iflags.use_color) {
             if (x == u.ux && y == u.uy)
-                /* actually player should be yellow-on-gray if in a corridor
-                 */
+                /* actually player should be yellow-on-gray if in corridor */
                 color = CLR_YELLOW;
             else
                 color = NO_COLOR;
         } else {
             mon_color(glyph);
-/* special case the hero for `showrace' option */
 #ifdef TEXTCOLOR
-            if (iflags.use_color && x == u.ux && y == u.uy && flags.showrace
-                && !Upolyd)
+            /* special case the hero for `showrace' option */
+            if (iflags.use_color && x == u.ux && y == u.uy
+                && flags.showrace && !Upolyd)
                 color = HI_DOMESTIC;
 #endif
         }
@@ -235,6 +234,7 @@ encglyph(glyph)
 int glyph;
 {
     static char encbuf[20];
+
     Sprintf(encbuf, "\\G%04X%04X", context.rndencode, glyph);
     return encbuf;
 }
@@ -242,7 +242,7 @@ int glyph;
 /*
  * This differs from putstr() because the str parameter can
  * contain a sequence of characters representing:
- *        \GXXXXNNNN	a glyph value, encoded by encglyph().
+ *        \GXXXXNNNN    a glyph value, encoded by encglyph().
  *
  * For window ports that haven't yet written their own
  * XXX_putmixed() routine, this general one can be used.
@@ -260,6 +260,7 @@ const char *str;
     char buf[BUFSZ];
     const char *cp = str;
     char *put = buf;
+
     while (*cp) {
         if (*cp == '\\') {
             int rndchk = 0, so = 0, gv = 0, ch, oc, dcount;
@@ -288,18 +289,19 @@ const char *str;
                 }
                 break;
 #if 0
-		case 'S':	/* symbol offset */
-		    dcount = 0;
-		    for (++cp; *cp && (dp = index(hex, *cp)) && (dcount++ < 4); cp++)
-			rndchk = (int)((rndchk * 16) + ((int)(dp - hex) / 2));
-
-		    if (rndchk == context.rndencode) {
-			dcount = 0;
-		        for (; *cp && (dp = index(hex, *cp)) && (dcount++ < 2); cp++)
-			    so = (int)((so * 16) + ((int)(dp - hex) / 2));
-		    }
-		    *put++ = showsyms[so];
-		    break;
+            case 'S': /* symbol offset */
+                dcount = 0;
+                for (++cp; *cp && (dp = index(hex, *cp)) != 0 && dcount++ < 4;
+                     cp++)
+                    rndchk = (int) ((rndchk * 16) + ((int) (dp - hex) / 2));
+                if (rndchk == context.rndencode) {
+                    dcount = 0;
+                    for (; *cp && (dp = index(hex, *cp)) != 0 && dcount++ < 2;
+                         cp++)
+                        so = (int) ((so * 16) + ((int) (dp - hex) / 2));
+                }
+                *put++ = showsyms[so];
+                break;
 #endif
             case '\\':
                 break;

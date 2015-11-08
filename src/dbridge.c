@@ -1,5 +1,5 @@
-/* NetHack 3.6	dbridge.c	$NHDT-Date: 1432512770 2015/05/25 00:12:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.32 $ */
-/*	Copyright (c) 1989 by Jean-Christophe Collet		  */
+/* NetHack 3.6	dbridge.c	$NHDT-Date: 1446955279 2015/11/08 04:01:19 $  $NHDT-Branch: master $:$NHDT-Revision: 1.33 $ */
+/*      Copyright (c) 1989 by Jean-Christophe Collet              */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -143,22 +143,22 @@ int x, y;
 
     lev = &levl[x][y];
     if (lev->typ != DOOR && lev->typ != DBWALL)
-        return (-1);
+        return -1;
 
     if (IS_DRAWBRIDGE(levl[x + 1][y].typ)
         && (levl[x + 1][y].drawbridgemask & DB_DIR) == DB_WEST)
-        return (DB_WEST);
+        return DB_WEST;
     if (IS_DRAWBRIDGE(levl[x - 1][y].typ)
         && (levl[x - 1][y].drawbridgemask & DB_DIR) == DB_EAST)
-        return (DB_EAST);
+        return DB_EAST;
     if (IS_DRAWBRIDGE(levl[x][y - 1].typ)
         && (levl[x][y - 1].drawbridgemask & DB_DIR) == DB_SOUTH)
-        return (DB_SOUTH);
+        return DB_SOUTH;
     if (IS_DRAWBRIDGE(levl[x][y + 1].typ)
         && (levl[x][y + 1].drawbridgemask & DB_DIR) == DB_NORTH)
-        return (DB_NORTH);
+        return DB_NORTH;
 
-    return (-1);
+    return -1;
 }
 
 /*
@@ -170,7 +170,7 @@ boolean
 is_db_wall(x, y)
 int x, y;
 {
-    return ((boolean)(levl[x][y].typ == DBWALL));
+    return (boolean) (levl[x][y].typ == DBWALL);
 }
 
 /*
@@ -261,14 +261,14 @@ boolean flag;
         break;
     default:
         impossible("bad direction in create_drawbridge");
-    /* fall through */
+        /*FALLTHRU*/
     case DB_WEST:
         horiz = FALSE;
         x2--;
         break;
     }
     if (!IS_WALL(levl[x2][y2].typ))
-        return (FALSE);
+        return FALSE;
     if (flag) { /* We want the bridge open */
         levl[x][y].typ = DRAWBRIDGE_DOWN;
         levl[x2][y2].typ = DOOR;
@@ -284,7 +284,7 @@ boolean flag;
     levl[x][y].drawbridgemask = dir;
     if (lava)
         levl[x][y].drawbridgemask |= DB_LAVA;
-    return (TRUE);
+    return  TRUE;
 }
 
 struct entity {
@@ -312,8 +312,8 @@ int x, y;
 #ifdef D_DEBUG
     wait_synch();
 #endif
-    return ((entitycnt == ENTITIES) ? (struct entity *) 0
-                                    : &(occupants[entitycnt]));
+    return (entitycnt == ENTITIES) ? (struct entity *) 0
+                                   : &(occupants[entitycnt]);
 }
 
 STATIC_OVL void
@@ -372,7 +372,7 @@ STATIC_OVL const char *
 e_nam(etmp)
 struct entity *etmp;
 {
-    return (is_u(etmp) ? "you" : mon_nam(etmp->emon));
+    return is_u(etmp) ? "you" : mon_nam(etmp->emon);
 }
 
 /*
@@ -389,13 +389,13 @@ const char *verb;
 
     Strcpy(wholebuf, is_u(etmp) ? "You" : Monnam(etmp->emon));
     if (!*verb)
-        return (wholebuf);
+        return wholebuf;
     Strcat(wholebuf, " ");
     if (is_u(etmp))
         Strcat(wholebuf, verb);
     else
         Strcat(wholebuf, vtense((char *) 0, verb));
-    return (wholebuf);
+    return wholebuf;
 }
 
 /*
@@ -408,20 +408,22 @@ struct entity *etmp;
 int x, y;
 {
     if (noncorporeal(etmp->edata))
-        return (TRUE);
+        return TRUE;
     if (is_pool(x, y))
-        return (boolean)((is_u(etmp) && (Wwalking || Amphibious || Swimming
-                                         || Flying || Levitation))
-                         || is_swimmer(etmp->edata) || is_flyer(etmp->edata)
-                         || is_floater(etmp->edata));
+        return (boolean) ((is_u(etmp) && (Wwalking || Amphibious || Swimming
+                                          || Flying || Levitation))
+                          || is_swimmer(etmp->edata)
+                          || is_flyer(etmp->edata)
+                          || is_floater(etmp->edata));
     /* must force call to lava_effects in e_died if is_u */
     if (is_lava(x, y))
-        return (boolean)((is_u(etmp) && (Levitation || Flying))
-                         || likes_lava(etmp->edata) || is_flyer(etmp->edata));
+        return (boolean) ((is_u(etmp) && (Levitation || Flying))
+                          || likes_lava(etmp->edata)
+                          || is_flyer(etmp->edata));
     if (is_db_wall(x, y))
-        return (
-            (boolean)(is_u(etmp) ? Passes_walls : passes_walls(etmp->edata)));
-    return (TRUE);
+        return (boolean) (is_u(etmp) ? Passes_walls
+                          : passes_walls(etmp->edata));
+    return TRUE;
 }
 
 STATIC_OVL void
@@ -492,8 +494,8 @@ STATIC_OVL boolean
 automiss(etmp)
 struct entity *etmp;
 {
-    return (boolean)((is_u(etmp) ? Passes_walls : passes_walls(etmp->edata))
-                     || noncorporeal(etmp->edata));
+    return (boolean) ((is_u(etmp) ? Passes_walls : passes_walls(etmp->edata))
+                      || noncorporeal(etmp->edata));
 }
 
 /*
@@ -510,7 +512,7 @@ boolean chunks;
     if (chunks)
         debugpline0("Do chunks miss?");
     if (automiss(etmp))
-        return (TRUE);
+        return TRUE;
 
     if (is_flyer(etmp->edata)
         && (is_u(etmp) ? !Unaware
@@ -530,7 +532,7 @@ boolean chunks;
 
     debugpline1("Miss chance = %d (out of 8)", misses);
 
-    return ((boolean)((misses >= rnd(8)) ? TRUE : FALSE));
+    return (misses >= rnd(8)) ? TRUE : FALSE;
 }
 
 /*
@@ -546,7 +548,7 @@ struct entity *etmp;
     if (is_u(etmp) ? (Unaware || Fumbling)
                    : (!etmp->emon->mcanmove || etmp->emon->msleeping
                       || !etmp->edata->mmove || etmp->emon->wormno))
-        return (FALSE);
+        return FALSE;
 
     if (is_u(etmp) ? Confusion : etmp->emon->mconf)
         tmp -= 2;
@@ -558,7 +560,7 @@ struct entity *etmp;
         tmp -= 2; /* less room to maneuver */
 
     debugpline2("%s to jump (%d chances in 10)", E_phrase(etmp, "try"), tmp);
-    return ((boolean)((tmp >= rnd(10)) ? TRUE : FALSE));
+    return (tmp >= rnd(10)) ? TRUE : FALSE;
 }
 
 STATIC_OVL void
