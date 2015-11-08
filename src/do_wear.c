@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1445301119 2015/10/20 00:31:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.86 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1446975698 2015/11/08 09:41:38 $  $NHDT-Branch: master $:$NHDT-Revision: 1.87 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -570,19 +570,21 @@ Gloves_off(VOID_ARGS)
 STATIC_PTR int
 Shield_on(VOID_ARGS)
 {
-    /*
-        switch (uarms->otyp) {
-            case SMALL_SHIELD:
-            case ELVEN_SHIELD:
-            case URUK_HAI_SHIELD:
-            case ORCISH_SHIELD:
-            case DWARVISH_ROUNDSHIELD:
-            case LARGE_SHIELD:
-            case SHIELD_OF_REFLECTION:
-                    break;
-            default: impossible(unknown_type, c_shield, uarms->otyp);
-        }
-    */
+    /* no shield currently requires special handling when put on, but we
+       keep this uncommented in case somebody adds a new one which does */
+    switch (uarms->otyp) {
+    case SMALL_SHIELD:
+    case ELVEN_SHIELD:
+    case URUK_HAI_SHIELD:
+    case ORCISH_SHIELD:
+    case DWARVISH_ROUNDSHIELD:
+    case LARGE_SHIELD:
+    case SHIELD_OF_REFLECTION:
+        break;
+    default:
+        impossible(unknown_type, c_shield, uarms->otyp);
+    }
+
     return 0;
 }
 
@@ -590,19 +592,22 @@ int
 Shield_off(VOID_ARGS)
 {
     context.takeoff.mask &= ~W_ARMS;
-    /*
-        switch (uarms->otyp) {
-            case SMALL_SHIELD:
-            case ELVEN_SHIELD:
-            case URUK_HAI_SHIELD:
-            case ORCISH_SHIELD:
-            case DWARVISH_ROUNDSHIELD:
-            case LARGE_SHIELD:
-            case SHIELD_OF_REFLECTION:
-                    break;
-            default: impossible(unknown_type, c_shield, uarms->otyp);
-        }
-    */
+
+    /* no shield currently requires special handling when taken off, but we
+       keep this uncommented in case somebody adds a new one which does */
+    switch (uarms->otyp) {
+    case SMALL_SHIELD:
+    case ELVEN_SHIELD:
+    case URUK_HAI_SHIELD:
+    case ORCISH_SHIELD:
+    case DWARVISH_ROUNDSHIELD:
+    case LARGE_SHIELD:
+    case SHIELD_OF_REFLECTION:
+        break;
+    default:
+        impossible(unknown_type, c_shield, uarms->otyp);
+    }
+
     setworn((struct obj *) 0, W_ARMS);
     return 0;
 }
@@ -610,14 +615,16 @@ Shield_off(VOID_ARGS)
 STATIC_PTR int
 Shirt_on(VOID_ARGS)
 {
-    /*
-        switch (uarmu->otyp) {
-            case HAWAIIAN_SHIRT:
-            case T_SHIRT:
-                    break;
-            default: impossible(unknown_type, c_shirt, uarmu->otyp);
-        }
-    */
+    /* no shirt currently requires special handling when put on, but we
+       keep this uncommented in case somebody adds a new one which does */
+    switch (uarmu->otyp) {
+    case HAWAIIAN_SHIRT:
+    case T_SHIRT:
+        break;
+    default:
+        impossible(unknown_type, c_shirt, uarmu->otyp);
+    }
+
     return 0;
 }
 
@@ -625,23 +632,24 @@ int
 Shirt_off(VOID_ARGS)
 {
     context.takeoff.mask &= ~W_ARMU;
-    /*
-        switch (uarmu->otyp) {
-            case HAWAIIAN_SHIRT:
-            case T_SHIRT:
-                    break;
-            default: impossible(unknown_type, c_shirt, uarmu->otyp);
-        }
-    */
+
+    /* no shirt currently requires special handling when taken off, but we
+       keep this uncommented in case somebody adds a new one which does */
+    switch (uarmu->otyp) {
+    case HAWAIIAN_SHIRT:
+    case T_SHIRT:
+        break;
+    default:
+        impossible(unknown_type, c_shirt, uarmu->otyp);
+    }
+
     setworn((struct obj *) 0, W_ARMU);
     return 0;
 }
 
 /* This must be done in worn.c, because one of the possible intrinsics
- * conferred
- * is fire resistance, and we have to immediately set HFire_resistance in
- * worn.c
- * since worn.c will check it before returning.
+ * conferred is fire resistance, and we have to immediately set
+ * HFire_resistance in worn.c since worn.c will check it before returning.
  */
 STATIC_PTR
 int
@@ -811,8 +819,8 @@ boolean observed;
         else if (ring->dknown)
             makeknown(ringtype);
 #if 0 /* see learnwand() */
-	else
-	    ring->eknown = 1;
+        else
+            ring->eknown = 1;
 #endif
     }
 
@@ -1486,7 +1494,7 @@ register struct obj *otmp;
     register int delay = -objects[otmp->otyp].oc_delay;
 
     if (cursed(otmp))
-        return (0);
+        return 0;
     if (delay) {
         nomul(delay);
         multi_reason = "disrobing";
@@ -1946,11 +1954,13 @@ doputon()
     return otmp ? accessory_or_armor_on(otmp) : 0;
 }
 
+/* calculate current armor class */
 void
 find_ac()
 {
-    int uac = mons[u.umonnum].ac;
+    int uac = mons[u.umonnum].ac; /* base armor class for current form */
 
+    /* armor class from worn gear */
     if (uarm)
         uac -= ARM_BONUS(uarm);
     if (uarmc)
@@ -1969,11 +1979,22 @@ find_ac()
         uac -= uleft->spe;
     if (uright && uright->otyp == RIN_PROTECTION)
         uac -= uright->spe;
+
+    /* armor class from other sources */
     if (HProtection & INTRINSIC)
         uac -= u.ublessed;
     uac -= u.uspellprot;
+
+    /* [The magic binary numbers 127 and -128 should be replaced with the
+     * mystic decimal numbers 99 and -99 which require no explanation to
+     * the uninitiated and would cap the width of a status line value at
+     * one less character.]
+     */
     if (uac < -128)
         uac = -128; /* u.uac is an schar */
+    else if (uac > 127)
+        uac = 127; /* for completeness */
+
     if (uac != u.uac) {
         u.uac = uac;
         context.botl = 1;
