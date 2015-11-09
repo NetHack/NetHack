@@ -265,7 +265,7 @@ build_package_root:
 	install -p doc/recover.6 $(PKGROOT_UG)/man/man6
 	install -p doc/Guidebook $(PKGROOT_UG)/doc
 	install -p dat/nhdat $(PKGROOT_UGLN)
-	install -p sys/unix/sysconf $(PKGROOT_UGLN)
+	sed 's/^GDBPATH/#GDBPATH/' sys/unix/sysconf | sed 's/^GREPPATH=\/bin\/grep/GREPPATH=\/usr\/bin\/grep/' | sed 's/^PANICTRACE_GDB=[12]/PANICTRACE_GDB=0/' > $(PKGROOT_UGLN)/sysconf
 	cd dat; install -p $(DATNODLB) ../$(PKGROOT_UGLN)
 # XXX these files should be somewhere else for good Mac form
 	touch $(PKGROOT_UGLN)/perm $(PKGROOT_UGLN)/record $(PKGROOT_UGLN)/logfile $(PKGROOT_UGLN)/xlogfile
