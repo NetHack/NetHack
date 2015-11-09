@@ -242,7 +242,7 @@ else
 
 	# XXX integrate into Makefile.doc
 	(cd doc; cat Guidebook.mn | ../util/makedefs --grep --input - --output - \
-	| tbl tmac.n - | groff |ps2pdf - > Guidebook.pdf)
+	| tbl tmac.n - | groff | pstopdf -i -o Guidebook.pdf)
 	cp doc/Guidebook.pdf $(PKGROOT_UG)/doc/NetHackGuidebook.pdf
 
 	osacompile -o PKGROOT/Applications/NetHackGuidebook.app \
