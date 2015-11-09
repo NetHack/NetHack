@@ -401,19 +401,13 @@ register struct obj *obj;
     case SDOOR:
         You_hear(hollow_str, "door");
         cvt_sdoor_to_door(lev); /* ->typ = DOOR */
-        if (Blind)
-            feel_location(rx, ry);
-        else
-            newsym(rx, ry);
+        feel_newsym(rx, ry);
         return res;
     case SCORR:
         You_hear(hollow_str, "passage");
         lev->typ = CORR;
         unblock_point(rx, ry);
-        if (Blind)
-            feel_location(rx, ry);
-        else
-            newsym(rx, ry);
+        feel_newsym(rx, ry);
         return res;
     }
 

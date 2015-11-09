@@ -486,6 +486,23 @@ register struct monst *mon;
     show_glyph(x, y, glyph);
 }
 
+
+/*
+ * feel_newsym()
+ *
+ * When hero knows what happened to location, even when blind.
+ */
+void
+feel_newsym(x, y)
+xchar x, y;
+{
+    if (Blind)
+        feel_location(x, y);
+    else
+        newsym(x, y);
+}
+
+
 /*
  * feel_location()
  *

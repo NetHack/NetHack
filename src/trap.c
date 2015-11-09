@@ -760,10 +760,7 @@ boolean shatter;
         otmp = nxtobj(otmp, STATUE, TRUE);
     }
 
-    if (Blind)
-        feel_location(x, y);
-    else
-        newsym(x, y);
+    feel_newsym(x, y);
     return mtmp;
 }
 
