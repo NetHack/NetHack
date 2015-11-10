@@ -272,9 +272,10 @@ mnsel.uu        mnselcnt.uu     mnunsel.uu      mswproc.c
 petmark.uu      pilemark.uu     resource.h      rip.uu          splash.uu
 tiles.mak       winMS.h         winhack.c       winhack.rc
 (files for Visual Studio 2010 Express Edition builds)
-dgncomp.vcxproj  dgnstuff.vcxproj dgnstuff.mak     dlb_main.vcxproj levcomp.vcxproj
-levstuff.vcxproj levstuff.mak     makedefs.vcxproj NetHack.sln      uudecode.vcxproj
-NetHackW.vcxproj tile2bmp.vcxproj recover.vcxproj  tilemap.vcxproj  tiles.vcxproj
+dgncomp.vcxproj   dgnstuff.vcxproj  dgnstuff.mak      dlb_main.vcxproj
+levcomp.vcxproj   levstuff.vcxproj  levstuff.mak      makedefs.vcxproj
+NetHack.sln       uudecode.vcxproj  NetHackW.vcxproj  tile2bmp.vcxproj
+recover.vcxproj   tilemap.vcxproj   tiles.vcxproj
 
 This is a list of files produced by auxiliary programs.  They can all be
 regenerated from the files in the distribution.

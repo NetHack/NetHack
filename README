@@ -57,12 +57,14 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     for particular windowing environments.  Reading them, and the man pages,
     should answer most of your questions.
 
-    At the time of this release, NetHack 3.6 has been tested to run/compile on:
+    At the time of this release, NetHack 3.6 has been tested to run/compile
+    on:
 
         Intel Pentium or better (or clone) running Linux, BSDI, or 
                 Windows (XP through 8.1)
         Intel 80386 or greater (or clone) boxes running Linux, or BSDI
 	Mac OS X 10.9
+	OpenVMS (aka VMS) V8.4 on Alpha and on Integrity/Itanium/IA64
 
     Previous versions of NetHack were tested and known to run on the 
     following systems, but it is unknown if they can still build and 
@@ -107,8 +109,8 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
         Sun SPARC based machine running SunOS 4.x, Solaris 2.x, or Solaris 7
         Valid Logic Systems SCALD-System
 
-    Previous versions, using a cross-compiler hosted on another platform, such as 
-    win32, could also build the following from source:
+    Previous versions, using a cross-compiler hosted on another platform,
+    such as  win32, could also build the following from source:
         Pocket PC devices running Windows CE 3.0 and higher
         H/PC Pro devices running Windows CE 2.11 and higher
         Palm Size PC 1.1 devices running Windows CE 2.11
