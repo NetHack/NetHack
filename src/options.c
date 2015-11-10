@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1447124657 2015/11/10 03:04:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.238 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1447125615 2015/11/10 03:20:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.239 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -710,8 +710,10 @@ initoptions_init()
 #if defined(UNIX) || defined(VMS)
 #ifdef TTY_GRAPHICS
     /* detect whether a "vt" terminal can handle alternate charsets */
-    if ((opts = nh_getenv("TERM")) && !strncmpi(opts, "vt", 2) && AS && AE
-        && index(AS, '\016') && index(AE, '\017')) {
+    if ((opts = nh_getenv("TERM"))
+        /* [could also check "xterm" which emulates vtXXX by default] */
+        && !strncmpi(opts, "vt", 2)
+        && AS && AE && index(AS, '\016') && index(AE, '\017')) {
         if (!symset[PRIMARY].name)
             load_symset("DECGraphics", PRIMARY);
         switch_symbols(TRUE);
@@ -1057,9 +1059,9 @@ const char *optn;
     else
         flags.suppress_alert = fnv;
     if (rejectver) {
-        if (!initial)
+        if (!initial) {
             You_cant("disable new feature alerts for future versions.");
-        else {
+        } else {
             Sprintf(buf,
                     "\n%s=%s Invalid reference to a future version ignored",
                     optn, op);
@@ -1372,7 +1374,7 @@ int typ;
 char *pattern;
 {
     struct plinemsg_type *tmp
-        = (struct plinemsg_type *) alloc(sizeof (struct plinemsg_type));
+              = (struct plinemsg_type *) alloc(sizeof (struct plinemsg_type));
 
     if (!tmp)
         return FALSE;
@@ -1387,7 +1389,7 @@ char *pattern;
             pline("%s: %s", re_error, regex_error_desc(tmp->regex));
         wait_synch();
         regex_free(tmp->regex);
-        free(tmp);
+        free((genericptr_t) tmp);
         return FALSE;
     }
     tmp->pattern = dupstr(pattern);
@@ -1655,7 +1657,7 @@ boolean tinitial, tfrom_file;
 {
     register char *op;
     unsigned num;
-    boolean negated, duplicate;
+    boolean negated, val_negated, duplicate;
     int i;
     const char *fullname;
 
@@ -1730,10 +1732,10 @@ boolean tinitial, tfrom_file;
     /* align:string */
     fullname = "align";
     if (match_optname(opts, fullname, sizeof("align") - 1, TRUE)) {
-        if (negated)
+        if (negated) {
             bad_negation(fullname, FALSE);
-        else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
-            boolean val_negated = FALSE;
+        } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
+            val_negated = FALSE;
             while ((*op == '!') || !strncmpi(op, "no", 2)) {
                 if (*op == '!')
                     op++;
@@ -1758,10 +1760,10 @@ boolean tinitial, tfrom_file;
     fullname = "role";
     if (match_optname(opts, fullname, 4, TRUE)
         || match_optname(opts, (fullname = "character"), 4, TRUE)) {
-        if (negated)
+        if (negated) {
             bad_negation(fullname, FALSE);
-        else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
-            boolean val_negated = FALSE;
+        } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
+            val_negated = FALSE;
             while ((*op == '!') || !strncmpi(op, "no", 2)) {
                 if (*op == '!')
                     op++;
@@ -1787,10 +1789,10 @@ boolean tinitial, tfrom_file;
     /* race:string */
     fullname = "race";
     if (match_optname(opts, fullname, 4, TRUE)) {
-        if (negated)
+        if (negated) {
             bad_negation(fullname, FALSE);
-        else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
-            boolean val_negated = FALSE;
+        } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
+            val_negated = FALSE;
             while ((*op == '!') || !strncmpi(op, "no", 2)) {
                 if (*op == '!')
                     op++;
@@ -1816,10 +1818,10 @@ boolean tinitial, tfrom_file;
     /* gender:string */
     fullname = "gender";
     if (match_optname(opts, fullname, 4, TRUE)) {
-        if (negated)
+        if (negated) {
             bad_negation(fullname, FALSE);
-        else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
-            boolean val_negated = FALSE;
+        } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
+            val_negated = FALSE;
             while ((*op == '!') || !strncmpi(op, "no", 2)) {
                 if (*op == '!')
                     op++;
@@ -1968,11 +1970,10 @@ boolean tinitial, tfrom_file;
     if (match_optname(opts, fullname, 7, TRUE)) {
         if (duplicate)
             complain_about_duplicate(opts, 1);
-        if (negated)
+        if (negated) {
             bad_negation(fullname, FALSE);
-        else if ((op = string_for_opt(opts, FALSE)) != 0) {
-            symset[ROGUESET].name = (char *) alloc(strlen(op) + 1);
-            Strcpy(symset[ROGUESET].name, op);
+        } else if ((op = string_for_opt(opts, FALSE)) != 0) {
+            symset[ROGUESET].name = dupstr(op);
             if (!read_sym_file(ROGUESET)) {
                 clear_symsetentry(ROGUESET, TRUE);
                 raw_printf("Unable to load symbol set \"%s\" from \"%s\".",
@@ -1991,11 +1992,10 @@ boolean tinitial, tfrom_file;
     if (match_optname(opts, fullname, 6, TRUE)) {
         if (duplicate)
             complain_about_duplicate(opts, 1);
-        if (negated)
+        if (negated) {
             bad_negation(fullname, FALSE);
-        else if ((op = string_for_opt(opts, FALSE)) != 0) {
-            symset[PRIMARY].name = (char *) alloc(strlen(op) + 1);
-            Strcpy(symset[PRIMARY].name, op);
+        } else if ((op = string_for_opt(opts, FALSE)) != 0) {
+            symset[PRIMARY].name = dupstr(op);
             if (!read_sym_file(PRIMARY)) {
                 clear_symsetentry(PRIMARY, TRUE);
                 raw_printf("Unable to load symbol set \"%s\" from \"%s\".",
@@ -2370,9 +2370,9 @@ boolean tinitial, tfrom_file;
     if (match_optname(opts, fullname, 4, TRUE)) {
         if (duplicate)
             complain_about_duplicate(opts, 1);
-        if (negated)
+        if (negated) {
             bad_negation(fullname, FALSE);
-        else if ((op = string_for_opt(opts, negated))) {
+        } else if ((op = string_for_opt(opts, negated)) != 0) {
 #ifdef WIN32
             (void) strncpy(iflags.altkeyhandler, op, MAX_ALTKEYHANDLER - 5);
             load_keyboard_handler();
@@ -2973,9 +2973,9 @@ boolean tinitial, tfrom_file;
     fullname = "subkeyvalue";
     if (match_optname(opts, fullname, 5, TRUE)) {
         /* no duplicate complaint here */
-        if (negated)
+        if (negated) {
             bad_negation(fullname, FALSE);
-        else {
+        } else {
 #if defined(WIN32)
             op = string_for_opt(opts, 0);
             map_subkeyvalue(op);
@@ -3140,9 +3140,9 @@ boolean tinitial, tfrom_file;
         if (duplicate)
             complain_about_duplicate(opts, 1);
         if (match_optname(opts, fullname, (int) strlen(fullname), TRUE)) {
-            if (negated)
+            if (negated) {
                 bad_negation(fullname, FALSE);
-            else if ((op = string_for_opt(opts, FALSE)) != 0) {
+            } else if ((op = string_for_opt(opts, FALSE)) != 0) {
                 int j;
                 char c, op_buf[BUFSZ];
                 boolean isbad = FALSE;
@@ -3197,11 +3197,10 @@ boolean tinitial, tfrom_file;
             complain_about_duplicate(opts, 1);
         if (!negated) {
             /* There is no rogue level DECgraphics-specific set */
-            if (symset[PRIMARY].name)
+            if (symset[PRIMARY].name) {
                 badflag = TRUE;
-            else {
-                symset[PRIMARY].name = (char *) alloc(strlen(fullname) + 1);
-                Strcpy(symset[PRIMARY].name, fullname);
+            } else {
+                symset[PRIMARY].name = dupstr(fullname);
                 if (!read_sym_file(PRIMARY)) {
                     badflag = TRUE;
                     clear_symsetentry(PRIMARY, TRUE);
@@ -3224,13 +3223,12 @@ boolean tinitial, tfrom_file;
             complain_about_duplicate(opts, 1);
         if (!negated) {
             for (i = 0; i < NUM_GRAPHICS; ++i) {
-                if (symset[i].name)
+                if (symset[i].name) {
                     badflag = TRUE;
-                else {
+                } else {
                     if (i == ROGUESET)
                         sym_name = "RogueIBM";
-                    symset[i].name = (char *) alloc(strlen(sym_name) + 1);
-                    Strcpy(symset[i].name, sym_name);
+                    symset[i].name = dupstr(sym_name);
                     if (!read_sym_file(i)) {
                         badflag = TRUE;
                         clear_symsetentry(i, TRUE);
@@ -3258,11 +3256,10 @@ boolean tinitial, tfrom_file;
         if (duplicate)
             complain_about_duplicate(opts, 1);
         if (!negated) {
-            if (symset[PRIMARY].name)
+            if (symset[PRIMARY].name) {
                 badflag = TRUE;
-            else {
-                symset[PRIMARY].name = (char *) alloc(strlen(fullname) + 1);
-                Strcpy(symset[PRIMARY].name, fullname);
+            } else {
+                symset[PRIMARY].name = dupstr(fullname);
                 if (!read_sym_file(PRIMARY)) {
                     badflag = TRUE;
                     clear_symsetentry(PRIMARY, TRUE);
@@ -3355,9 +3352,8 @@ boolean tinitial, tfrom_file;
                        || (boolopt[i].addr) == &flags.showrace
                        || (boolopt[i].addr) == &iflags.hilite_pet) {
                 need_redraw = TRUE;
-            }
 #ifdef TEXTCOLOR
-            else if ((boolopt[i].addr) == &iflags.use_color) {
+            } else if ((boolopt[i].addr) == &iflags.use_color) {
                 need_redraw = TRUE;
 #ifdef TOS
                 if ((boolopt[i].addr) == &iflags.use_color && iflags.BIOS) {
@@ -3367,9 +3363,8 @@ boolean tinitial, tfrom_file;
                         set_colors();
                 }
 #endif
+#endif /* TEXTCOLOR */
             }
-#endif
-
             return;
         }
     }
@@ -3417,9 +3412,9 @@ void
 add_menu_cmd_alias(from_ch, to_ch)
 char from_ch, to_ch;
 {
-    if (n_menu_mapped >= MAX_MENU_MAPPED_CMDS)
+    if (n_menu_mapped >= MAX_MENU_MAPPED_CMDS) {
         pline("out of menu map space.");
-    else {
+    } else {
         mapped_menu_cmds[n_menu_mapped] = from_ch;
         mapped_menu_op[n_menu_mapped] = to_ch;
         n_menu_mapped++;
@@ -3604,19 +3599,20 @@ doset()
             }
     any.a_int = -4;
     Sprintf(buf2, n_currently_set, msgtype_count());
-    Sprintf(buf, fmtstr_doset_add_menu, any.a_int ? "" : "    ", "message types",
-            buf2);
+    Sprintf(buf, fmtstr_doset_add_menu, any.a_int ? "" : "    ",
+            "message types", buf2);
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
     any.a_int = -3;
     Sprintf(buf2, n_currently_set, count_menucolors());
-    Sprintf(buf, fmtstr_doset_add_menu, any.a_int ? "" : "    ", "menucolors",
-            buf2);
+    Sprintf(buf, fmtstr_doset_add_menu, any.a_int ? "" : "    ",
+            "menucolors", buf2);
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
 #ifdef STATUS_VIA_WINDOWPORT
 #ifdef STATUS_HILITES
     any.a_int = -2;
     get_status_hilites(buf2, 60);
-    if (!*buf2) Sprintf(buf2, "%s", "(none)");
+    if (!*buf2)
+        Sprintf(buf2, "%s", "(none)");
     if (!iflags.menu_tab_sep)
         Sprintf(buf, fmtstr_doset_add_menu, any.a_int ? "" : "    ",
                 "status_hilites", buf2);
@@ -3966,6 +3962,7 @@ boolean setinitial, setfromfile;
     } else if (!strcmp("sortloot", optname)) {
         const char *sortl_name;
         menu_item *sortl_pick = (menu_item *) 0;
+
         tmpwin = create_nhwindow(NHW_MENU);
         start_menu(tmpwin);
         any = zeroany;
@@ -4258,13 +4255,12 @@ boolean setinitial, setfromfile;
                || !strcmp("roguesymset", optname)) {
         menu_item *symset_pick = (menu_item *) 0;
         boolean primaryflag = (*optname == 's'),
-                rogueflag = (*optname == 'r'), ready_to_switch = FALSE,
+                rogueflag = (*optname == 'r'),
+                ready_to_switch = FALSE,
                 nothing_to_do = FALSE;
-        int res;
         char *symset_name, fmtstr[20];
         struct symsetentry *sl;
-        int setcount = 0;
-        int chosen = -2, which_set;
+        int res, which_set, setcount = 0, chosen = -2;
 
         if (rogueflag)
             which_set = ROGUESET;
@@ -4359,14 +4355,13 @@ boolean setinitial, setfromfile;
                     }
                     sl = sl->next;
                 }
-            }
-
-            else if (chosen == -1) {
+            } else if (chosen == -1) {
                 /* explicit selection of defaults */
                 /* free the now stale symset attributes */
-                if (symset_name)
+                if (symset_name) {
                     free((genericptr_t) symset_name);
-                symset_name = (char *) 0;
+                    symset_name = (char *) 0;
+                }
                 clear_symsetentry(which_set, TRUE);
             } else
                 nothing_to_do = TRUE;
@@ -4399,7 +4394,7 @@ boolean setinitial, setfromfile;
             return TRUE;
 
         if (!symset[which_set].name && symset_name)
-            symset[which_set].name = symset_name;
+            symset[which_set].name = symset_name; /* not dupstr() here */
 
         /* Set default symbols and clear the handling value */
         if (rogueflag)
@@ -4408,9 +4403,9 @@ boolean setinitial, setfromfile;
             init_l_symbols();
 
         if (symset[which_set].name) {
-            if (read_sym_file(which_set))
+            if (read_sym_file(which_set)) {
                 ready_to_switch = TRUE;
-            else {
+            } else {
                 clear_symsetentry(which_set, TRUE);
                 return TRUE;
             }
@@ -4586,9 +4581,9 @@ char *buf;
         Sprintf(buf, "%s", to_be_done);
     else if (!strcmp(optname, "menu_invert_all"))
         Sprintf(buf, "%s", to_be_done);
-    else if (!strcmp(optname, "menu_headings")) {
+    else if (!strcmp(optname, "menu_headings"))
         Sprintf(buf, "%s", attr2attrname(iflags.menu_headings));
-    } else if (!strcmp(optname, "menu_invert_page"))
+    else if (!strcmp(optname, "menu_invert_page"))
         Sprintf(buf, "%s", to_be_done);
     else if (!strcmp(optname, "menu_last_page"))
         Sprintf(buf, "%s", to_be_done);
@@ -4602,12 +4597,12 @@ char *buf;
         Sprintf(buf, "%s", to_be_done);
     else if (!strcmp(optname, "menu_select_page"))
         Sprintf(buf, "%s", to_be_done);
-    else if (!strcmp(optname, "monsters"))
+    else if (!strcmp(optname, "monsters")) {
         Sprintf(buf, "%s", to_be_done);
-    else if (!strcmp(optname, "msghistory"))
+    } else if (!strcmp(optname, "msghistory")) {
         Sprintf(buf, "%u", iflags.msg_history);
 #ifdef TTY_GRAPHICS
-    else if (!strcmp(optname, "msg_window"))
+    } else if (!strcmp(optname, "msg_window")) {
         Sprintf(buf, "%s", (iflags.prevmsg_window == 's')
                                ? "single"
                                : (iflags.prevmsg_window == 'c')
@@ -4616,9 +4611,9 @@ char *buf;
                                            ? "full"
                                            : "reversed");
 #endif
-    else if (!strcmp(optname, "name"))
+    } else if (!strcmp(optname, "name")) {
         Sprintf(buf, "%s", plname);
-    else if (!strcmp(optname, "number_pad")) {
+    } else if (!strcmp(optname, "number_pad")) {
         static const char *numpadmodes[] = {
             "0=off", "1=on", "2=on, MSDOS compatible",
             "3=on, phone-style layout",
@@ -4699,14 +4694,11 @@ char *buf;
         else
             Strcpy(buf, defopt);
     } else if (!strcmp(optname, "sortloot")) {
-        char *sortname = (char *) NULL;
-
-        for (i = 0; i < SIZE(sortltype) && sortname == (char *) NULL; i++) {
-            if (flags.sortloot == sortltype[i][0])
-                sortname = (char *) sortltype[i];
-        }
-        if (sortname != (char *) NULL)
-            Sprintf(buf, "%s", sortname);
+        for (i = 0; i < SIZE(sortltype); i++)
+            if (flags.sortloot == sortltype[i][0]) {
+                Strcpy(buf, sortltype[i]);
+                break;
+            }
     } else if (!strcmp(optname, "player_selection")) {
         Sprintf(buf, "%s", iflags.wc_player_selection ? "prompts" : "dialog");
 #ifdef MSDOS
@@ -4831,15 +4823,15 @@ const char *mapping;
         apehead = (grab) ? &iflags.autopickup_exceptions[AP_GRAB]
                          : &iflags.autopickup_exceptions[AP_LEAVE];
         ape = (struct autopickup_exception *) alloc(
-            sizeof(struct autopickup_exception));
+                                        sizeof (struct autopickup_exception));
         ape->regex = regex_init();
         if (!regex_compile(text2, ape->regex)) {
             raw_print("regex error in AUTOPICKUP_EXCEPTION");
             regex_free(ape->regex);
-            free(ape);
+            free((genericptr_t) ape);
             return 0;
         }
-        ape->pattern = (char *)alloc(strlen(text2) + 1);
+        ape->pattern = (char *) alloc(strlen(text2) + 1);
         strcpy(ape->pattern, text2);
         ape->grab = grab;
         ape->next = *apehead;
@@ -4861,14 +4853,15 @@ struct autopickup_exception *whichape;
     for (ape = iflags.autopickup_exceptions[chain]; ape;) {
         if (ape == whichape) {
             struct autopickup_exception *freeape = ape;
+
             ape = ape->next;
             if (prev)
                 prev->next = ape;
             else
                 iflags.autopickup_exceptions[chain] = ape;
             regex_free(freeape->regex);
-            free(freeape->pattern);
-            free(freeape);
+            free((genericptr_t) freeape->pattern);
+            free((genericptr_t) freeape);
         } else {
             prev = ape;
             ape = ape->next;
@@ -4907,9 +4900,9 @@ free_autopickup_exceptions()
     for (pass = AP_LEAVE; pass <= AP_GRAB; ++pass) {
         while ((ape = iflags.autopickup_exceptions[pass]) != 0) {
             regex_free(ape->regex);
-            free(ape->pattern);
+            free((genericptr_t) ape->pattern);
             iflags.autopickup_exceptions[pass] = ape->next;
-            free(ape);
+            free((genericptr_t) ape);
         }
     }
 }
@@ -4922,11 +4915,13 @@ int which_set;
 {
     clear_symsetentry(which_set, TRUE);
 
-    symset[which_set].name = (char *) alloc(strlen(s) + 1);
-    Strcpy(symset[which_set].name, s);
-    if (read_sym_file(which_set))
+    if (symset[which_set].name)
+        free((genericptr_t) symset[which_set].name);
+    symset[which_set].name = dupstr(s);
+
+    if (read_sym_file(which_set)) {
         switch_symbols(TRUE);
-    else {
+    } else {
         clear_symsetentry(which_set, TRUE);
         return 0;
     }
@@ -5115,7 +5110,7 @@ const char *str;
         Strcat(buf, ", ");
     } else {
         putstr(datawin, 0, str);
-        free(buf), buf = 0;
+        free((genericptr_t) buf), buf = 0;
     }
     return;
 }
@@ -5561,9 +5556,8 @@ char *fontname;
     }
     if (fn) {
         if (*fn)
-            free(*fn);
-        *fn = (char *) alloc(strlen(fontname) + 1);
-        Strcpy(*fn, fontname);
+            free((genericptr_t) *fn);
+        *fn = dupstr(fontname);
     }
     return;
 }
@@ -5649,15 +5643,13 @@ char *op;
             if (!strcmpi(wn, wnames[j]) || !strcmpi(wn, shortnames[j])) {
                 if (tfg && !strstri(tfg, " ")) {
                     if (*fgp[j])
-                        free(*fgp[j]);
-                    *fgp[j] = (char *) alloc(strlen(tfg) + 1);
-                    Strcpy(*fgp[j], tfg);
+                        free((genericptr_t) *fgp[j]);
+                    *fgp[j] = dupstr(tfg);
                 }
                 if (tbg && !strstri(tbg, " ")) {
                     if (*bgp[j])
-                        free(*bgp[j]);
-                    *bgp[j] = (char *) alloc(strlen(tbg) + 1);
-                    Strcpy(*bgp[j], tbg);
+                        free((genericptr_t) *bgp[j]);
+                    *bgp[j] = dupstr(tbg);
                 }
                 break;
             }
