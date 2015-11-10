@@ -6,7 +6,7 @@ from or not transferred to your system if you wish.
 
 .:
 (files in top directory)
-Files           Porting         README
+DEVEL           Files           Porting         README
 
 dat:
 (files for all versions)
@@ -352,6 +352,21 @@ dgn_lex.c       dgn_yacc.c      lev_lex.c       lev_yacc.c
 tiletxt.c
 (files generated for win32 at compile time)
 uudecode.exe
+
+DEVEL:
+(files for people developing changes to NetHack)
+DOTGIT			code_style.txt		nhgitset.pl
+Developer.txt		git_recipes.txt
+code_features.txt	hooksdir
+
+DEVEL/hooksdir:
+NHadd			nhsub			pre-auto-gc
+NHgithook.pm		post-applypatch		pre-commit
+NHsubst			post-checkout		pre-push
+NHtext			post-commit		pre-rebase
+TARGET			post-merge		prepare-commit-msg
+applypatch-msg		post-rewrite
+commit-msg		pre-applypatch
 
 .:
 (files for win32 that are moved into . at compile time)
