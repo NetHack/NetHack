@@ -4,7 +4,7 @@
  |___/\___|\_/\___|_\___/ .__/\___|_|  
                         |_|            
 
-$NHDT-Date: 1429884664 2015/04/24 14:11:04 $
+$NHDT-Date: 1447180052 2015/11/10 18:27:32 $
 
 Welcome to the NetHack Infrastructure Developer's Guide.
 
@@ -58,7 +58,8 @@ A. If you have never set up git on this machine before:
    You probably want to set up a credential cache.
 	Mac OS X:
 		git config --global credential.helper osxkeychain
-XXX windows
+	Windows:
+		git config --global credential.helper store
 XXX linux
 B. Specify the prefix for variable substitution:
    (This assumes you are not a member of DevTeam or any variant's development
