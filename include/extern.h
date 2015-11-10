@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1446516834 2015/11/03 02:13:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.513 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1447124656 2015/11/10 03:04:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.515 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1638,6 +1638,7 @@ E void FDECL(set_option_mod_status, (const char *, int));
 E int FDECL(add_autopickup_exception, (const char *));
 E void NDECL(free_autopickup_exceptions);
 E int FDECL(load_symset, (const char *, int));
+E void NDECL(free_symsets);
 E void FDECL(parsesymbols, (char *));
 E struct symparse *FDECL(match_sym, (char *));
 E void NDECL(set_playmode);

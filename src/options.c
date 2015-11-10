@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1446854231 2015/11/06 23:57:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.236 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1447124657 2015/11/10 03:04:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.238 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -4931,6 +4931,17 @@ int which_set;
         return 0;
     }
     return 1;
+}
+
+void
+free_symsets()
+{
+    clear_symsetentry(PRIMARY, TRUE);
+    clear_symsetentry(ROGUESET, TRUE);
+
+    /* symset_list is cleaned up as soon as it's used, so we shouldn't
+       have to anything about it here */
+    /* assert( symset_list == NULL ); */
 }
 
 /* Parse the value of a SYMBOLS line from a config file */

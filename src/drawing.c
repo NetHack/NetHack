@@ -1,4 +1,4 @@
-/* NetHack 3.6	drawing.c	$NHDT-Date: 1446975466 2015/11/08 09:37:46 $  $NHDT-Branch: master $:$NHDT-Revision: 1.48 $ */
+/* NetHack 3.6	drawing.c	$NHDT-Date: 1447124657 2015/11/10 03:04:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.49 $ */
 /* Copyright (c) NetHack Development Team 1992.                   */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -520,9 +520,7 @@ boolean name_too;
         free((genericptr_t) symset[which_set].desc);
     symset[which_set].desc = (char *) 0;
 
-    symset[which_set].nocolor = 0;
     symset[which_set].handling = H_UNK;
-    symset[which_set].desc = (char *) 0;
     symset[which_set].nocolor = 0;
     /* initialize restriction bits */
     symset[which_set].primary = 0;
