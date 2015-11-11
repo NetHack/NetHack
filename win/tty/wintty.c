@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1447234979 2015/11/11 09:42:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.112 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1447253778 2015/11/11 14:56:18 $  $NHDT-Branch: master $:$NHDT-Revision: 1.113 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3022,7 +3022,8 @@ void
 tty_print_glyph(window, x, y, glyph, bkglyph)
 winid window;
 xchar x, y;
-int glyph, bkglyph;
+int glyph;
+int bkglyph UNUSED;
 {
     int ch;
     boolean reverse_on = FALSE;
@@ -3312,22 +3313,22 @@ genericptr_t ptr;
     long cond, *condptr = (long *) ptr;
     register int i;
     char *text = (char *) ptr;
-   /* Mapping BL attributes to tty attributes
-    * BL_HILITE_NONE     -1 + 3 = 2 (statusattr[2])
-    * BL_HILITE_INVERSE  -2 + 3 = 1 (statusattr[1])
-    * BL_HILITE_BOLD     -3 + 3 = 0 (statusattr[0])
-    */
+    /* Mapping BL attributes to tty attributes
+     * BL_HILITE_NONE     -1 + 3 = 2 (statusattr[2])
+     * BL_HILITE_INVERSE  -2 + 3 = 1 (statusattr[1])
+     * BL_HILITE_BOLD     -3 + 3 = 0 (statusattr[0])
+     */
     int statusattr[] = {ATR_BOLD, ATR_INVERSE, ATR_NONE};
     int attridx = 0;
     long value = -1L;
     static boolean beenhere = FALSE;
     enum statusfields fieldorder[2][15] = {
         { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
-          BL_SCORE, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH,
-          BL_FLUSH },
+        BL_SCORE, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH,
+        BL_FLUSH },
         { BL_LEVELDESC, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX,
-          BL_AC, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER,
-          BL_CAP, BL_CONDITION, BL_FLUSH }
+        BL_AC, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER,
+        BL_CAP, BL_CONDITION, BL_FLUSH }
     };
 
     if (fldidx != BL_FLUSH) {
@@ -3356,14 +3357,13 @@ genericptr_t ptr;
         default:
             value = atol(text);
             Sprintf(status_vals[fldidx],
-                    status_fieldfmt[fldidx] ? status_fieldfmt[fldidx] :
-                    "%s", text);
+                status_fieldfmt[fldidx] ? status_fieldfmt[fldidx] :
+                "%s", text);
             break;
         }
-    }
 
 #ifdef STATUS_HILITES
-    switch (tty_status_hilites[fldidx].behavior) {
+        switch (tty_status_hilites[fldidx].behavior) {
         case BL_TH_NONE:
             tty_status_colors[fldidx] = NO_COLOR;
             break;
@@ -3378,23 +3378,23 @@ genericptr_t ptr;
             break;
 
         case BL_TH_VAL_PERCENTAGE:
-           {
+        {
             int pct_th = 0;
             if (tty_status_hilites[fldidx].thresholdtype != ANY_INT) {
                 impossible(
-                "tty_status_update: unsupported percentage threshold type %d",
-                           tty_status_hilites[fldidx].thresholdtype);
+                    "tty_status_update: unsupported percentage threshold type %d",
+                    tty_status_hilites[fldidx].thresholdtype);
                 break;
             }
             pct_th = tty_status_hilites[fldidx].threshold.a_int;
             tty_status_colors[fldidx] = (percent >= pct_th)
-                                  ? tty_status_hilites[fldidx].over
-                                  : tty_status_hilites[fldidx].under;
-           }
-           break;
+                ? tty_status_hilites[fldidx].over
+                : tty_status_hilites[fldidx].under;
+        }
+        break;
 
         case BL_TH_VAL_ABSOLUTE:
-           {
+        {
             int c = NO_COLOR;
             int o = tty_status_hilites[fldidx].over;
             int u = tty_status_hilites[fldidx].under;
@@ -3417,15 +3417,16 @@ genericptr_t ptr;
                 break;
             default:
                 impossible(
-                "tty_status_update: unsupported absolute threshold type %d\n",
-                       tty_status_hilites[fldidx].thresholdtype);
-            break;
+                    "tty_status_update: unsupported absolute threshold type %d\n",
+                    tty_status_hilites[fldidx].thresholdtype);
+                break;
             }
             tty_status_colors[fldidx] = c;
-           }
-           break;
-    }
+        }
+        break;
+        }
 #endif /* STATUS_HILITES */
+    }
 
     /* For now, this version copied from the genl_ version currently
      * updates everything on the display, everytime
