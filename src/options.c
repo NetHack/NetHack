@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1447125615 2015/11/10 03:20:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.239 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1447234076 2015/11/11 09:27:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.240 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3820,8 +3820,7 @@ boolean setinitial, setfromfile;
                could have toggled off preselected ones to end up with 0 */
             flags.paranoia_bits = 0;
             if (i > 0) {
-                /* at least one item set, either preselected or newly picked
-                 */
+                /* at least 1 item set, either preselected or newly picked */
                 while (--i >= 0)
                     flags.paranoia_bits |= paranoia_picks[i].item.a_int;
                 free((genericptr_t) paranoia_picks);
@@ -3831,6 +3830,7 @@ boolean setinitial, setfromfile;
     } else if (!strcmp("pickup_burden", optname)) {
         const char *burden_name, *burden_letters = "ubsntl";
         menu_item *burden_pick = (menu_item *) 0;
+
         tmpwin = create_nhwindow(NHW_MENU);
         start_menu(tmpwin);
         any = zeroany;
@@ -3918,6 +3918,7 @@ boolean setinitial, setfromfile;
     } else if (!strcmp("runmode", optname)) {
         const char *mode_name;
         menu_item *mode_pick = (menu_item *) 0;
+
         tmpwin = create_nhwindow(NHW_MENU);
         start_menu(tmpwin);
         any = zeroany;
@@ -3937,6 +3938,7 @@ boolean setinitial, setfromfile;
 #ifdef TTY_GRAPHICS
         /* by Christian W. Cooper */
         menu_item *window_pick = (menu_item *) 0;
+
         tmpwin = create_nhwindow(NHW_MENU);
         start_menu(tmpwin);
         any = zeroany;
@@ -4116,9 +4118,8 @@ boolean setinitial, setfromfile;
                 for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx)
                     free_one_msgtype(pick_list[pick_idx].item.a_int - 1
                                            - pick_idx);
+                free((genericptr_t) pick_list), pick_list = (menu_item *) 0;
             }
-            free((genericptr_t) pick_list);
-            pick_list = (menu_item *) 0;
             destroy_nhwindow(tmpwin);
             if (pick_cnt >= 0)
                 goto msgtypes_again;
@@ -4172,15 +4173,15 @@ boolean setinitial, setfromfile;
             Sprintf(mcbuf, "%s menu colors",
                     (opt_idx == 1) ? "List of" : "Remove which");
             end_menu(tmpwin, mcbuf);
-            pick_cnt = select_menu(
-                tmpwin, (opt_idx == 1) ? PICK_NONE : PICK_ANY, &pick_list);
+            pick_cnt = select_menu(tmpwin,
+                                   (opt_idx == 1) ? PICK_NONE : PICK_ANY,
+                                   &pick_list);
             if (pick_cnt > 0) {
                 for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx)
                     free_one_menu_coloring(pick_list[pick_idx].item.a_int - 1
                                            - pick_idx);
+                free((genericptr_t) pick_list), pick_list = (menu_item *) 0;
             }
-            free((genericptr_t) pick_list);
-            pick_list = (menu_item *) 0;
             destroy_nhwindow(tmpwin);
             if (pick_cnt >= 0)
                 goto menucolors_again;
@@ -4237,16 +4238,16 @@ boolean setinitial, setfromfile;
             Sprintf(apebuf, "%s autopickup exceptions",
                     (opt_idx == 1) ? "List of" : "Remove which");
             end_menu(tmpwin, apebuf);
-            pick_cnt = select_menu(
-                tmpwin, (opt_idx == 1) ? PICK_NONE : PICK_ANY, &pick_list);
+            pick_cnt = select_menu(tmpwin,
+                                   (opt_idx == 1) ? PICK_NONE : PICK_ANY,
+                                   &pick_list);
             if (pick_cnt > 0) {
                 for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx)
                     remove_autopickup_exception(
-                        (struct autopickup_exception *) pick_list[pick_idx]
-                            .item.a_void);
+                                         (struct autopickup_exception *)
+                                             pick_list[pick_idx].item.a_void);
+                free((genericptr_t) pick_list), pick_list = (menu_item *) 0;
             }
-            free((genericptr_t) pick_list);
-            pick_list = (menu_item *) 0;
             destroy_nhwindow(tmpwin);
             if (pick_cnt >= 0)
                 goto ape_again;
