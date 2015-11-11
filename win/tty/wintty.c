@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1446856765 2015/11/07 00:39:25 $  $NHDT-Branch: master $:$NHDT-Revision: 1.110 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1447234979 2015/11/11 09:42:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.112 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1192,14 +1192,28 @@ const char *str;
     /* Just forget any windows existed, since we're about to exit anyway.
      * Disable windows to avoid calls to window routines.
      */
-    for (i = 0; i < MAXWIN; i++)
-        if (wins[i] && (i != BASE_WINDOW)) {
+    for (i = 0; i < MAXWIN; i++) {
+        if (i == BASE_WINDOW)
+            continue; /* handle wins[BASE_WINDOW] last */
+        if (wins[i]) {
 #ifdef FREE_ALL_MEMORY
             free_window_info(wins[i], TRUE);
             free((genericptr_t) wins[i]);
 #endif
-            wins[i] = 0;
+            wins[i] = (struct WinDesc *) 0;
         }
+    }
+#ifdef FREE_ALL_MEMORY
+    if (BASE_WINDOW != WIN_ERR && wins[BASE_WINDOW]) {
+        free_window_info(wins[BASE_WINDOW], TRUE);
+        free((genericptr_t) wins[BASE_WINDOW]);
+        wins[BASE_WINDOW] = (struct WinDesc *) 0;
+        BASE_WINDOW = WIN_ERR;
+    }
+    free((genericptr_t) ttyDisplay);
+    ttyDisplay = (struct DisplayDesc *) 0;
+#endif
+
 #ifndef NO_TERMS    /*(until this gets added to the window interface)*/
     tty_shutdown(); /* cleanup termcap/terminfo/whatever */
 #endif

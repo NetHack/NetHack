@@ -1,4 +1,4 @@
-/* NetHack 3.6	termcap.c	$NHDT-Date: 1446856761 2015/11/07 00:39:21 $  $NHDT-Branch: master $:$NHDT-Revision: 1.22 $ */
+/* NetHack 3.6	termcap.c	$NHDT-Date: 1447234979 2015/11/11 09:42:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.23 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -30,8 +30,7 @@ static void NDECL(init_hilite);
 static void NDECL(kill_hilite);
 #endif
 
-/* (see tcap.h) -- nh_CM, nh_ND, nh_CD, nh_HI,nh_HE, nh_US,nh_UE,
-                        ul_hack */
+/* (see tcap.h) -- nh_CM, nh_ND, nh_CD, nh_HI,nh_HE, nh_US,nh_UE, ul_hack */
 struct tc_lcl_data tc_lcl_data = { 0, 0, 0, 0, 0, 0, 0, FALSE };
 
 STATIC_VAR char *HO, *CL, *CE, *UP, *XD, *BC, *SO, *SE, *TI, *TE;
@@ -44,6 +43,7 @@ STATIC_VAR char *MD;     /* may already be in use below */
 #endif
 
 #ifdef TERMLIB
+boolean dynamic_HIHE = FALSE;
 #ifdef TEXTCOLOR
 STATIC_VAR char *MD;
 #endif
@@ -152,9 +152,9 @@ int *wid, *hgt;
         nh_US = "\033[4m";
         MR = "\033[7m";
         TI = nh_HE = ME = SE = nh_UE = "\033[0m";
-/* strictly, SE should be 2, and nh_UE should be 24,
-   but we can't trust all ANSI emulators to be
-   that complete.  -3. */
+        /* strictly, SE should be 2, and nh_UE should be 24,
+           but we can't trust all ANSI emulators to be
+           that complete.  -3. */
 #ifndef MICRO
         AS = "\016";
         AE = "\017";
@@ -221,11 +221,11 @@ int *wid, *hgt;
 #else
     HO = Tgetstr("ho");
 #endif
-/*
- * LI and CO are set in ioctl.c via a TIOCGWINSZ if available.  If
- * the kernel has values for either we should use them rather than
- * the values from TERMCAP ...
- */
+    /*
+     * LI and CO are set in ioctl.c via a TIOCGWINSZ if available.  If
+     * the kernel has values for either we should use them rather than
+     * the values from TERMCAP ...
+     */
 #ifndef MICRO
     if (!CO)
         CO = tgetnum("co");
@@ -233,18 +233,17 @@ int *wid, *hgt;
         LI = tgetnum("li");
 #else
 #if defined(TOS) && defined(__GNUC__)
-    if (!strcmp(term, "builtin"))
+    if (!strcmp(term, "builtin")) {
         get_scr_size();
-    else {
+    } else
 #endif
+    {
         CO = tgetnum("co");
         LI = tgetnum("li");
         if (!LI || !CO) /* if we don't override it */
             get_scr_size();
-#if defined(TOS) && defined(__GNUC__)
     }
-#endif
-#endif
+#endif /* ?MICRO */
 #ifdef CLIPPING
     if (CO < COLNO || LI < ROWNO + 3)
         setclipped();
@@ -298,16 +297,14 @@ int *wid, *hgt;
      * pager as a string - so how can you send it NULs???
      *  -jsb
      */
-    nh_HI = (char *) alloc((unsigned) (strlen(SO) + 1));
-    nh_HE = (char *) alloc((unsigned) (strlen(ME) + 1));
-    i = 0;
-    while (digit(SO[i]))
-        i++;
-    Strcpy(nh_HI, &SO[i]);
-    i = 0;
-    while (digit(ME[i]))
-        i++;
-    Strcpy(nh_HE, &ME[i]);
+    for (i = 0; digit(SO[i]); ++i)
+        continue;
+    nh_HI = dupstr(&SO[i]);
+    for (i = 0; digit(ME[i]); ++i)
+        continue;
+    nh_HE = dupstr(&ME[i]);
+    dynamic_HIHE = TRUE;
+
     AS = Tgetstr("as");
     AE = Tgetstr("ae");
     nh_CD = Tgetstr("cd");
@@ -340,10 +337,17 @@ int *wid, *hgt;
 void
 tty_shutdown()
 {
-#if defined(TEXTCOLOR) && defined(TERMLIB)
+    /* we only attempt to clean up a few individual termcap variables */
+#ifdef TERMLIB
+#ifdef TEXTCOLOR
     kill_hilite();
 #endif
-    /* we don't attempt to clean up individual termcap variables [yet?] */
+    if (dynamic_HIHE) {
+        free((genericptr_t) nh_HI), nh_HI = (char *) 0;
+        free((genericptr_t) nh_HE), nh_HE = (char *) 0;
+        dynamic_HIHE = FALSE;
+    }
+#endif
     return;
 }
 
@@ -570,7 +574,8 @@ register int x, y;
 }
 
 /* See note above. xputc() is a special function. */
-void xputc(c)
+void
+xputc(c)
 #if defined(apollo)
     int c;
 #else
@@ -758,7 +763,7 @@ tty_delay_output()
 #else /* MICRO */
     /* BUG: if the padding character is visible, as it is on the 5620
        then this looks terrible. */
-    if (flags.null)
+    if (flags.null) {
 #ifdef TERMINFO
 /* cbosgd!cbcephus!pds for SYS V R2 */
 #ifdef NHSTDC
@@ -774,7 +779,7 @@ tty_delay_output()
 #endif
 #endif
 
-    else if (ospeed > 0 && ospeed < SIZE(tmspc10) && nh_CM) {
+    } else if (ospeed > 0 && ospeed < SIZE(tmspc10) && nh_CM) {
         /* delay by sending cm(here) an appropriate number of times */
         register int cmlen =
             strlen(tgoto(nh_CM, ttyDisplay->curx, ttyDisplay->cury));
@@ -788,13 +793,15 @@ tty_delay_output()
 #endif /* MICRO */
 }
 
-void cl_eos() /* free after Robert Viduya */
-{             /* must only be called with curx = 1 */
-
-    if (nh_CD)
+/* must only be called with curx = 1 */
+void
+cl_eos() /* free after Robert Viduya */
+{
+    if (nh_CD) {
         xputs(nh_CD);
-    else {
+    } else {
         register int cy = ttyDisplay->cury + 1;
+
         while (cy <= LI - 2) {
             cl_end();
             xputc('\n');
