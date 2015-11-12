@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - for building nethack itself.
-#	NetHack 3.6	Makefile.src	$NHDT-Date: 1432512790 2015/05/25 00:13:10 $	$NHDT-Branch: master $:$NHDT-Revision: 1.26 $
+#	NetHack 3.6	Makefile.src	$NHDT-Date: 1447314365 2015/11/12 07:46:05 $	$NHDT-Branch: master $:$NHDT-Revision: 1.27 $
 
 #  Copy this file to [.src]Makefile. and then edit it as needed.
 #  The default configuration is for building with DEC C (aka Compaq C).
@@ -392,7 +392,7 @@ dogmove.obj :	dogmove.c $(HACK_H) $(INC)mfndpos.h
 dokick.obj :	dokick.c $(HACK_H)
 dothrow.obj :	dothrow.c $(HACK_H)
 drawing.obj :	drawing.c $(HACK_H) $(INC)tcap.h
-dungeon.obj :	dungeon.c $(HACK_H) $(INC)dgn_file.h $(INC)dlb.h
+dungeon.obj :	dungeon.c $(HACK_H) $(INC)dgn_file.h $(INC)dlb.h $(INC)lev.h
 eat.obj :	eat.c $(HACK_H)
 end.obj :	end.c $(HACK_H) $(INC)lev.h $(INC)dlb.h
 engrave.obj :	engrave.c $(HACK_H) $(INC)lev.h

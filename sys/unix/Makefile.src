@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.6  Makefile.src	$NHDT-Date: 1434446945 2015/06/16 09:29:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.44 $
+# NetHack 3.6  Makefile.src	$NHDT-Date: 1447313972 2015/11/12 07:39:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.45 $
 
 # Root of source tree:
 NHSROOT=..
@@ -750,7 +750,8 @@ dogmove.o: dogmove.c $(HACK_H) ../include/mfndpos.h
 dokick.o: dokick.c $(HACK_H)
 dothrow.o: dothrow.c $(HACK_H)
 drawing.o: drawing.c $(HACK_H) ../include/tcap.h
-dungeon.o: dungeon.c $(HACK_H) ../include/dgn_file.h ../include/dlb.h
+dungeon.o: dungeon.c $(HACK_H) ../include/dgn_file.h ../include/dlb.h \
+		../include/lev.h
 eat.o: eat.c $(HACK_H)
 end.o: end.c $(HACK_H) ../include/lev.h ../include/dlb.h
 engrave.o: engrave.c $(HACK_H) ../include/lev.h
