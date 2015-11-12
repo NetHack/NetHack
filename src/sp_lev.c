@@ -471,6 +471,7 @@ opvar_var_conversion(coder, ov)
 struct sp_coder *coder;
 struct opvar *ov;
 {
+    static const char nhFunc[] = "opvar_var_conversion";
     struct splev_var *tmp;
     struct opvar *tmpov;
     struct opvar *array_idx = NULL;
@@ -483,14 +484,14 @@ struct opvar *ov;
     while (tmp) {
         if (!strcmp(tmp->name, OV_s(ov))) {
             if ((tmp->svtyp & SPOVAR_ARRAY)) {
-                array_idx = opvar_var_conversion(
-                    coder, splev_stack_pop(coder->stack));
+                array_idx = opvar_var_conversion(coder, splev_stack_pop(coder->stack));
                 if (!array_idx || OV_typ(array_idx) != SPOVAR_INT)
                     panic("array idx not an int");
                 if (tmp->array_len < 1)
                     panic("array len < 1");
                 OV_i(array_idx) = (OV_i(array_idx) % tmp->array_len);
                 tmpov = opvar_clone(tmp->data.arrayvalues[OV_i(array_idx)]);
+                opvar_free(array_idx);
                 return tmpov;
             } else {
                 tmpov = opvar_clone(tmp->data.value);
@@ -525,15 +526,21 @@ splev_stack_getdat(coder, typ)
 struct sp_coder *coder;
 xchar typ;
 {
+    static const char nhFunc[] = "splev_stack_getdat";
     if (coder && coder->stack) {
         struct opvar *tmp = splev_stack_pop(coder->stack);
+        struct opvar *ret = NULL;
 
         if (!tmp)
             panic("no value type %i in stack.", typ);
-        if (tmp->spovartyp == SPOVAR_VARIABLE)
-            tmp = opvar_var_conversion(coder, tmp);
+        if (tmp->spovartyp == SPOVAR_VARIABLE) {
+            ret = opvar_var_conversion(coder, tmp);
+            opvar_free(tmp);
+            tmp = ret;
+        }
         if (tmp->spovartyp == typ)
             return tmp;
+        else opvar_free(tmp);
     }
     return NULL;
 }
@@ -542,10 +549,14 @@ struct opvar *
 splev_stack_getdat_any(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "splev_stack_getdat_any";
     if (coder && coder->stack) {
         struct opvar *tmp = splev_stack_pop(coder->stack);
-        if (tmp && tmp->spovartyp == SPOVAR_VARIABLE)
-            tmp = opvar_var_conversion(coder, tmp);
+        if (tmp && tmp->spovartyp == SPOVAR_VARIABLE) {
+            struct opvar *ret = opvar_var_conversion(coder, tmp);
+            opvar_free(tmp);
+            return ret;
+        }
         return tmp;
     }
     return NULL;
@@ -4736,6 +4747,7 @@ struct sp_coder *coder;
         break;
     }
     opvar_free(r);
+    opvar_free(typ);
 }
 
 void
