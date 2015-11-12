@@ -1,4 +1,4 @@
-/* NetHack 3.6	objects.c	$NHDT-Date: 1444617222 2015/10/12 02:33:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.46 $ */
+/* NetHack 3.6	objects.c	$NHDT-Date: 1447306896 2015/11/12 05:41:36 $  $NHDT-Branch: master $:$NHDT-Revision: 1.48 $ */
 /* Copyright (c) Mike Threepoint, 1989.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -847,6 +847,7 @@ SCROLL("punishment",            "VE FORBRYDERNE",  1,  15, 300),
 SCROLL("charging",                "HACKEM MUCHE",  1,  15, 300),
 SCROLL("stinking cloud",             "VELOX NEB",  1,  15, 300),
 /* extra descriptions, shuffled into use at start of new game */
+/* Code in win/share/tilemap.c depends on SCR_STINKING_CLOUD preceding these */
 SCROLL(None,                     "FOOBIE BLETCH",  1,   0, 100),
 SCROLL(None,                             "TEMOV",  1,   0, 100),
 SCROLL(None,                        "GARVEN DEH",  1,   0, 100),
