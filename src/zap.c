@@ -2979,7 +2979,8 @@ STATIC_OVL void
 skiprange(range, skipstart, skipend)
 int range, *skipstart, *skipend;
 {
-    int tmp = range - (rnd(range / 4));
+    int tr = (range / 4);
+    int tmp = range - ((tr > 0) ? rnd(tr) : 0);
     *skipstart = tmp;
     *skipend = tmp - ((tmp / 4) * rnd(3));
     if (*skipend >= tmp)
