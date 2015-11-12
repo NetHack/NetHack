@@ -1142,6 +1142,7 @@ DOOR:closed,(73,5)
 DOOR:closed,(2,15)
 MAZEWALK:(36,8),west
 STAIR:(42,8),up
+WALLIFY
 
 # Objects
 OBJECT:('*',"diamond"),random

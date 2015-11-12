@@ -4736,9 +4736,9 @@ struct sp_coder *coder;
         dy1 = (xchar) SP_REGION_Y1(OV_i(r));
         dx2 = (xchar) SP_REGION_X2(OV_i(r));
         dy2 = (xchar) SP_REGION_Y2(OV_i(r));
-        wallify_map(dx1 < 0 ? xstart : dx1, dy1 < 0 ? ystart : dy1,
-                    dx2 < 0 ? xstart + xsize : dx2,
-                    dy2 < 0 ? ystart + ysize : dy2);
+        wallify_map(dx1 < 0 ? (xstart-1) : dx1, dy1 < 0 ? (ystart-1) : dy1,
+                    dx2 < 0 ? (xstart + xsize + 1) : dx2,
+                    dy2 < 0 ? (ystart + ysize + 1) : dy2);
         break;
     case 1:
         if (!OV_pop_typ(r, SPOVAR_SEL))
