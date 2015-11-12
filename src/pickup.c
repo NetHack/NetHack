@@ -144,7 +144,7 @@ struct obj *objs;
 boolean here;
 int *menu_on_demand;
 {
-    char ilets[20], inbuf[BUFSZ];
+    char ilets[30], inbuf[BUFSZ]; /* FIXME: hardcoded ilets[] length */
     int iletct, oclassct;
     boolean not_everything;
     char qbuf[QBUFSZ];
