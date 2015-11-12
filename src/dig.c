@@ -1983,7 +1983,8 @@ long timeout;
         if (mtmp && !OBJ_AT(x, y) && mtmp->mundetected
             && hides_under(mtmp->data)) {
             mtmp->mundetected = 0;
-        }
+        } else if (x == u.ux && y == u.uy && u.uundetected && hides_under(youmonst.data))
+            (void) hideunder(&youmonst);
         newsym(x, y);
     } else if (in_invent)
         update_inventory();
