@@ -1161,10 +1161,9 @@ boolean
         ; /* missile has already been handled */
     } else if (u.uswallow) {
         /* ball is not picked up by monster */
-        if (obj != uball) {
+        if (obj != uball)
             (void) mpickobj(u.ustuck, obj);
-            thrownobj = (struct obj *) 0;
-        }
+        thrownobj = (struct obj *) 0;
     } else {
         /* the code following might become part of dropy() */
         if (obj->oartifact == ART_MJOLLNIR && Role_if(PM_VALKYRIE)
