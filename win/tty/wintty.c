@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1447253778 2015/11/11 14:56:18 $  $NHDT-Branch: master $:$NHDT-Revision: 1.113 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1447405953 2015/11/13 09:12:33 $  $NHDT-Branch: master $:$NHDT-Revision: 1.114 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1312,9 +1312,10 @@ int type;
         newwin->datlen =
             (short *) alloc(sizeof(short) * (unsigned) newwin->maxrow);
         if (newwin->maxcol) {
+            /* WIN_STATUS */
             for (i = 0; i < newwin->maxrow; i++) {
                 newwin->data[i] = (char *) alloc((unsigned) newwin->maxcol);
-                newwin->datlen[i] = newwin->maxcol;
+                newwin->datlen[i] = (short) newwin->maxcol;
             }
         } else {
             for (i = 0; i < newwin->maxrow; i++) {
@@ -2031,6 +2032,7 @@ winid window;
 boolean blocking; /* with ttys, all windows are blocking */
 {
     register struct WinDesc *cw = 0;
+    short s_maxcol;
 
     if (window == WIN_ERR || (cw = wins[window]) == (struct WinDesc *) 0)
         panic(winpanicstr, window);
@@ -2067,15 +2069,18 @@ boolean blocking; /* with ttys, all windows are blocking */
         /*FALLTHRU*/
     case NHW_MENU:
         cw->active = 1;
+        /* cw->maxcol is a long, but its value is constrained to
+           be <= ttyDisplay->cols, so is sure to fit within a short */
+        s_maxcol = (short) cw->maxcol;
 #ifdef H2344_BROKEN
         cw->offx = (cw->type == NHW_TEXT)
                        ? 0
                        : min(min(82, ttyDisplay->cols / 2),
-                             ttyDisplay->cols - cw->maxcol - 1);
+                             ttyDisplay->cols - s_maxcol - 1);
 #else
         /* avoid converting to uchar before calculations are finished */
-        cw->offx = (uchar)(int) max(
-            (int) 10, (int) (ttyDisplay->cols - cw->maxcol - 1));
+        cw->offx = (uchar) max((int) 10,
+                               (int) (ttyDisplay->cols - s_maxcol - 1));
 #endif
         if (cw->offx < 0)
             cw->offx = 0;
@@ -3318,17 +3323,17 @@ genericptr_t ptr;
      * BL_HILITE_INVERSE  -2 + 3 = 1 (statusattr[1])
      * BL_HILITE_BOLD     -3 + 3 = 0 (statusattr[0])
      */
-    int statusattr[] = {ATR_BOLD, ATR_INVERSE, ATR_NONE};
+    int statusattr[] = { ATR_BOLD, ATR_INVERSE, ATR_NONE };
     int attridx = 0;
     long value = -1L;
     static boolean beenhere = FALSE;
     enum statusfields fieldorder[2][15] = {
         { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
-        BL_SCORE, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH,
-        BL_FLUSH },
+          BL_SCORE, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH,
+          BL_FLUSH },
         { BL_LEVELDESC, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX,
-        BL_AC, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER,
-        BL_CAP, BL_CONDITION, BL_FLUSH }
+          BL_AC, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER,
+          BL_CAP, BL_CONDITION, BL_FLUSH }
     };
 
     if (fldidx != BL_FLUSH) {
@@ -3357,8 +3362,8 @@ genericptr_t ptr;
         default:
             value = atol(text);
             Sprintf(status_vals[fldidx],
-                status_fieldfmt[fldidx] ? status_fieldfmt[fldidx] :
-                "%s", text);
+                    status_fieldfmt[fldidx] ? status_fieldfmt[fldidx] : "%s",
+                    text);
             break;
         }
 
@@ -3367,7 +3372,6 @@ genericptr_t ptr;
         case BL_TH_NONE:
             tty_status_colors[fldidx] = NO_COLOR;
             break;
-
         case BL_TH_UPDOWN:
             if (chg > 0)
                 tty_status_colors[fldidx] = tty_status_hilites[fldidx].over;
@@ -3376,29 +3380,27 @@ genericptr_t ptr;
             else
                 tty_status_colors[fldidx] = NO_COLOR;
             break;
-
-        case BL_TH_VAL_PERCENTAGE:
-        {
+        case BL_TH_VAL_PERCENTAGE:  {
             int pct_th = 0;
+
             if (tty_status_hilites[fldidx].thresholdtype != ANY_INT) {
                 impossible(
-                    "tty_status_update: unsupported percentage threshold type %d",
-                    tty_status_hilites[fldidx].thresholdtype);
-                break;
+                "tty_status_update: unsupported percentage threshold type %d",
+                           tty_status_hilites[fldidx].thresholdtype);
+            } else {
+                pct_th = tty_status_hilites[fldidx].threshold.a_int;
+                tty_status_colors[fldidx] = (percent >= pct_th)
+                                           ? tty_status_hilites[fldidx].over
+                                           : tty_status_hilites[fldidx].under;
             }
-            pct_th = tty_status_hilites[fldidx].threshold.a_int;
-            tty_status_colors[fldidx] = (percent >= pct_th)
-                ? tty_status_hilites[fldidx].over
-                : tty_status_hilites[fldidx].under;
+            break;
         }
-        break;
-
-        case BL_TH_VAL_ABSOLUTE:
-        {
+        case BL_TH_VAL_ABSOLUTE: {
             int c = NO_COLOR;
             int o = tty_status_hilites[fldidx].over;
             int u = tty_status_hilites[fldidx].under;
             anything *t = &tty_status_hilites[fldidx].threshold;
+
             switch (tty_status_hilites[fldidx].thresholdtype) {
             case ANY_LONG:
                 c = (value >= t->a_long) ? o : u;
@@ -3417,14 +3419,14 @@ genericptr_t ptr;
                 break;
             default:
                 impossible(
-                    "tty_status_update: unsupported absolute threshold type %d\n",
-                    tty_status_hilites[fldidx].thresholdtype);
+                "tty_status_update: unsupported absolute threshold type %d\n",
+                           tty_status_hilites[fldidx].thresholdtype);
                 break;
             }
             tty_status_colors[fldidx] = c;
-        }
-        break;
-        }
+            break;
+        } /* case */
+        } /* switch */
 #endif /* STATUS_HILITES */
     }
 
