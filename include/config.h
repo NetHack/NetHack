@@ -400,19 +400,7 @@ typedef unsigned char uchar;
 #endif
 #endif
 
-/*
- * Section 4:  THE FUN STUFF!!!
- *
- * Conditional compilation of special options are controlled here.
- * If you define the following flags, you will add not only to the
- * complexity of the game but also to the size of the load module.
- */
 
-/* display features */
-/* dungeon features */
-/* dungeon levels */
-/* monsters & objects */
-/* I/O */
 #if !defined(MAC)
 #if !defined(NOCLIPPING)
 #define CLIPPING /* allow smaller screens -- ERS */
@@ -421,10 +409,9 @@ typedef unsigned char uchar;
 
 #define DOAGAIN '\001' /* ^A, the "redo" key used in cmd.c and getline.c */
 
-/* #define SCORE_ON_BOTL */ /* added by Gary Erickson (erickson@ucivax) */
 
 /*
- * Section 5:  EXPERIMENTAL STUFF
+ * Section 4:  EXPERIMENTAL STUFF
  *
  * Conditional compilation of new or experimental options are controlled here.
  * Enable any of these at your own risk -- there are almost certainly
@@ -434,8 +421,12 @@ typedef unsigned char uchar;
 /* #define STATUS_VIA_WINDOWPORT */ /* re-work of the status line updating process */
 /* #define STATUS_HILITES       */ /* support hilites of status fields */
 /* #define WINCHAIN*/               /* stacked window systems */
+/* #define SCORE_ON_BOTL */ /* show estimated score on status line */
+#define FREE_ALL_MEMORY            /* free all memory at exit */
+/* #define DEBUG_MIGRATING_MONS */ /* add a wizard-mode command to help debug
+                                      migrating monsters */
 
-/* End of Section 5 */
+/* End of Section 4 */
 
 #include "global.h" /* Define everything else according to choices above */
 
