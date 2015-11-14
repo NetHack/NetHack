@@ -422,7 +422,7 @@ int mm_flags;
 
     while (cnt--) {
         mdat = morguemon();
-        if (enexto(&cc, mm->x, mm->y, mdat)
+        if (mdat && enexto(&cc, mm->x, mm->y, mdat)
             && (!revive_corpses
                 || !(otmp = sobj_at(CORPSE, cc.x, cc.y))
                 || !revive(otmp, FALSE)))

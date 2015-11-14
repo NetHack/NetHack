@@ -448,7 +448,7 @@ int psflags;
                             || mntmp == urole.femalenum)) {
                 const char *pm_name;
 
-                /* mkclass_ploy() can pick a !polyok()
+                /* mkclass_poly() can pick a !polyok()
                    candidate; if so, usually try again */
                 if (class) {
                     if (rn2(3) || --tryct > 0)
