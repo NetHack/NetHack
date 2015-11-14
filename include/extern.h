@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1447124656 2015/11/10 03:04:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.515 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1447475941 2015/11/14 04:39:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.516 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1070,6 +1070,7 @@ E int FDECL(monhp_per_lvl, (struct monst *));
 E void FDECL(newmonhp, (struct monst *, int));
 E struct mextra *NDECL(newmextra);
 E void FDECL(copy_mextra, (struct monst *, struct monst *));
+E void FDECL(dealloc_mextra, (struct monst *));
 E struct monst *FDECL(makemon, (struct permonst *, int, int, int));
 E boolean FDECL(create_critters, (int, struct permonst *, BOOLEAN_P));
 E struct permonst *NDECL(rndmonst);
@@ -1203,7 +1204,7 @@ E const char *FDECL(waterbody_name, (XCHAR_P, XCHAR_P));
 
 E struct oextra *NDECL(newoextra);
 E void FDECL(copy_oextra, (struct obj *, struct obj *));
-E void FDECL(dealloc_oextra, (struct oextra *));
+E void FDECL(dealloc_oextra, (struct obj *));
 E void FDECL(newomonst, (struct obj *));
 E void FDECL(free_omonst, (struct obj *));
 E void FDECL(newomid, (struct obj *));
