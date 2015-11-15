@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1447405953 2015/11/13 09:12:33 $  $NHDT-Branch: master $:$NHDT-Revision: 1.114 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1447630543 2015/11/15 23:35:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.115 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1189,9 +1189,10 @@ const char *str;
     winid i;
 
     tty_suspend_nhwindows(str);
-    /* Just forget any windows existed, since we're about to exit anyway.
+    /*
      * Disable windows to avoid calls to window routines.
      */
+    free_pickinv_cache(); /* reset its state as well as tear down window */
     for (i = 0; i < MAXWIN; i++) {
         if (i == BASE_WINDOW)
             continue; /* handle wins[BASE_WINDOW] last */
@@ -1203,6 +1204,10 @@ const char *str;
             wins[i] = (struct WinDesc *) 0;
         }
     }
+    WIN_MAP = WIN_MESSAGE = WIN_INVEN = WIN_ERR; /* these are all gone now */
+#ifndef STATUS_VIA_WINDOWPORT
+    WIN_STATUS = WIN_ERR;
+#endif
 #ifdef FREE_ALL_MEMORY
     if (BASE_WINDOW != WIN_ERR && wins[BASE_WINDOW]) {
         free_window_info(wins[BASE_WINDOW], TRUE);
