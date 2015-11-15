@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1446510332 2015/11/03 00:25:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.102 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1447576343 2015/11/15 08:32:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.103 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1094,6 +1094,7 @@ die:
     /* clean up unneeded windows */
     if (have_windows) {
         wait_synch();
+        free_pickinv_cache(); /* extra persistent window if perm_invent */
         if (WIN_INVEN != WIN_ERR)
             destroy_nhwindow(WIN_INVEN),  WIN_INVEN = WIN_ERR;
         display_nhwindow(WIN_MESSAGE, TRUE);
@@ -1122,13 +1123,12 @@ die:
     }
 
     if (!done_stopprint) {
-        Sprintf(
-            pbuf, "%s %s the %s...", Goodbye(), plname,
-            how != ASCENDED
-                ? (const char *) ((flags.female && urole.name.f)
+        Sprintf(pbuf, "%s %s the %s...", Goodbye(), plname,
+                (how != ASCENDED)
+                 ? (const char *) ((flags.female && urole.name.f)
                                       ? urole.name.f
                                       : urole.name.m)
-                : (const char *) (flags.female ? "Demigoddess" : "Demigod"));
+                 : (const char *) (flags.female ? "Demigoddess" : "Demigod"));
         putstr(endwin, 0, pbuf);
         putstr(endwin, 0, "");
     }
@@ -1254,10 +1254,9 @@ die:
         putstr(endwin, 0, pbuf);
     }
     if (!done_stopprint) {
-        Sprintf(
-            pbuf,
+        Sprintf(pbuf,
             "You were level %d with a maximum of %d hit point%s when you %s.",
-            u.ulevel, u.uhpmax, plur(u.uhpmax), ends[how]);
+                u.ulevel, u.uhpmax, plur(u.uhpmax), ends[how]);
         putstr(endwin, 0, pbuf);
         putstr(endwin, 0, "");
     }
