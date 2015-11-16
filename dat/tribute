@@ -4109,26 +4109,31 @@ is theft, except mine.
 #
 #
 #
-%title Thud! (2)
+%title Thud! (7)
+# p. 39 (Harper Torch edition; passage starts mid-paragraph; speaker is Nobby)
 %passage 1
-Why bother with a cunning plan when a simple one will do?
+"Why mess about with a cunning plan when a simple one will do?"
 
   [Thud!, by Terry Pratchett]
 %e passage
+# pp. 334-336 (originally transcribed from some other edition)
 %passage 2
-#submitted by Boudewijn
-He wanted to sleep. He'd never felt this tired before. 
-Vimes slumped to his knees, and then fell sideways on to the sand.
-When he forced open his eyes he saw pale stars above him, and had once
-again the sensation that there was someone else present.
-He turned his head, wincing at the stab of pain, and saw a small but 
-brightly lit folding chair on the sand. A robed figure was reclining 
-in it, reading a book. A scythe was stuck in the sand beside it.
-A white skeletal hand turned a page.
+He wanted to sleep.  He'd never felt this tired before.  Vimes slumped to
+his knees, and then fell sideways on to the sand.
+
+When he forced his eyes open, he saw pale stars above him, and had, once
+again, the sensation that there was someone else present.
+
+He turned his head, wincing at the stab of pain, and saw a small but
+brightly lit folding chair on the sand.  A robed figure was reclining in
+it, reading a book.  A scythe was stuck in the sand beside it.
+
+A white, skeletal hand turned a page.
+
 'You'll be Death, then?' said Vimes, after a while.
 
-AH. MISTER VIMES, ASTUTE AS EVER. GOT IT IN ONE, said Death, shutting 
-the book on his finger to keep the place.
+AH, MISTER VIMES, ASTUTE AS EVER.  GOT IT IN ONE, said Death, shutting the
+book on his finger to keep the place.
 
 'I've seen you before.'
 
@@ -4136,42 +4141,122 @@ I HAVE WALKED WITH YOU MANY TIMES, MISTER VIMES.
 
 'And this is /it/, is it?'
 
-HAS IT NEVER STRUCK YOU THAT THE CONCEPT OF A WRITTEN NARRATIVE IS
-SOMEWHAT STRANGE? said Death.
+HAS IT NEVER STRUCK YOU THAT THE CONCEPT OF A WRITTEN NARRATIVE IS SOMEWHAT
+STRANGE? said Death.
 
 Vimes could tell when people were trying to avoid something they really
 didn't want to say, and it was happening here.
-'Is it?' he insisted. 'Is this it? This time I die?'
+
+'Is it?' he insisted.  'Is this it?  This time I die?'
 
 COULD BE.
 
-'Could be? What sort of answer is that?' said Vimes.
+'Could be?  What sort of answer is that?' said Vimes.
 
-A VERY ACCURATE ONE. YOU SEE, YOU ARE HAVING A NEAR DEATH EXPERIENCE,
-WHICH INESCAPABLY MEANS THAT I MUST UNDERGO A NEAR VIMES EXPERIENCE. 
-DON'T MIND ME. CARRY ON WHATEVER YOU WERE DOING. I HAVE A BOOK.
+A VERY ACCURATE ONE.  YOU SEE, YOU ARE HAVING A NEAR-DEATH EXPERIENCE,
+WHICH INESCAPABLY MEANS THAT I MUST UNDERGO A NEAR-/VIMES/ EXPERIENCE.
+DON'T MIND ME.  CARRY ON WITH WHATEVER YOU WERE DOING.  I HAVE A BOOK.
 
-Vimes rolled over on to his stomach, gritted his teeth and pushed 
-himself on to his hands and knees again. He managed a few yards before 
-slumping back down. He heard the sound of a chair being moved. 
+Vimes rolled over on to his stomach, gritted his teeth, and pushed himself
+on to his hands and knees again.  He managed a few yards before slumping
+back down.
+
+He heard the sound of a chair being moved.
+
 'Shouldn't you be somewhere else?' he said.
 
 I AM, said Death, sitting down again.
-  
+
 'But you're here!'
-  
-AS WELL. Death turned a page and, for a person without breath, managed
-a pretty good sigh. IT APPEARS THAT THE BUTLER DID IT.
+
+AS WELL. Death turned a page and, for a person without breath, managed a
+pretty good sigh.  IT APPEARS THAT THE BUTLER DID IT.
 
 'Did what?'
 
-IT IS A MADE-UP STORY. VERY STRANGE. ALL ONE NEEDS TO DO IS TURN TO THE
-LAST PAGE AND THE ANSWER IS THERE. WHAT, THEREFORE, IS THE POINT OF 
+IT IS A MADE-UP STORY.  VERY STRANGE.  ALL ONE NEEDS TO DO IS TURN TO THE
+LAST PAGE AND THE ANSWER IS THERE.  WHAT, THEREFORE, IS THE POINT OF
 DELIBERATEDLY NOT KNOWING?
 
-It sounded like gibberish to Vimes, so he ignored it. Some of the aches
-had gone, although his head still hammered. There was an empty feeling,
-everywhere. He just wanted to sleep.
+It sounded like gibberish to Vimes, so he ignored it.  Some of the aches
+had gone, although his head still hammered.  There was an empty feeling
+everywhere.  He just wanted to sleep.
+
+  [Thud!, by Terry Pratchett]
+%e passage
+# pp. 225-226
+%passage 3
+And I'm going home, Vimes repeated to himself.  Everyone wants something
+from Vimes, even though I'm not the sharpest knife in the drawer.  Hell,
+I'm probably a spoon.  Well I'm going to be Vimes, and Vimes reads
+/Where's My Cow?/ to Young Sam at six o'clock.  With the noises done right.
+
+  [Thud!, by Terry Pratchett]
+%e passage
+# pp. 261-262
+%passage 4
+Fred Colon peered through the bars.  He was, on the whole, a pretty good
+jailer; he always had a pot of tea on the go, he was, as a general rule,
+amiably disposed to most people, he was too slow to be easily fooled, and
+he kept the cell keys in a box in the bottom drawer of his desk, a long
+way out of reach of any stick, hand, dog, cunningly thrown belt, or
+trained Klatchian monkey spider.(1)
+
+(1) Making Fred Colon possibly unique in the annals of jail history.
+
+  [Thud!, by Terry Pratchett]
+%e passage
+# p. 287 (American spelling of 'theater' is accurate [Harper Torch edition])
+%passage 5
+Brushing aside cobwebs with one hand and holding up a lantern with the
+other, Sybil led the way past boxes of MEN'S BOOTS, VARIOUS; RISIBLE
+PUPPETS, STRING & GLOVE; MODEL THEATER AND SCENERY.  Maybe that was the
+reason for their wealth: they bought things that were built to last, and
+now they seldom had to buy anything at all.  Except food, of course, and
+even then Vimes would not have been surprised to see boxes labeled APPLE
+CORES, VARIOUS, or LEFTOVERS, NEED EATING UP.(1)
+
+(1) That was a phrase of Sybil's that got to him.  She'd announce at lunch,
+"we must have the pork tonight, it needs eating up."  Vimes never had an
+actual problem with this, because he'd been raised to eat what was put in
+front of him, and do it quickly, too, before someone else snatched it away.
+He was just puzzled at the suggestion that he was there to do the food a
+favor.
+
+  [Thud!, by Terry Pratchett]
+%e passage
+# pp. 296-297
+%passage 6
+"Tell me Drumknott, are you a betting man at all?"
+
+"I have been know to have the occasional 'little flutter,' sir."
+
+"Given, then, a contest between an invisible and very powerful quasidemonic
+/thing/ of pure vengence on the one hand, and the commander on the other,
+where would you wager, say... one dollar?"
+
+"I wouldn't, sir.  That looks like one that would go to the judges."
+
+"Yes," said Vetinari, staring thoughtfully at the closed door.  "Yes,
+/indeed/."
+
+  [Thud!, by Terry Pratchett]
+%e passage
+# p. 351 ('teeth-aching' probably ought to have been 'teeth-achingly')
+%passage 7
+Vimes reached up and took a mug of water from Angua.  It was teeth-aching
+cold and the best drink he'd ever tasted.  And his mind worked fast, flying
+in emergency supplies of common sense, as human minds do, to construct a
+huge anchor in sanity and prove that what happened hadn't really happened
+and, if it had happened, hadn't happened very much.
+
+It was all mystic, that's what it was.  Oh, it /might/ all be true, but how
+could you ever tell?  You had to stick to the things you can see.  And you
+had to keep reminding yourself of that, too.
+
+Yeah, that was it.  What had really happened, eh?  A few signs?  Well,
+anything can look like you want it to, if you're worried and confused
+enough, yes?  A sheep can look like a cow, right?  Ha!
 
   [Thud!, by Terry Pratchett]
 %e passage
