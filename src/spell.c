@@ -1,4 +1,4 @@
-/* NetHack 3.6	spell.c	$NHDT-Date: 1446854236 2015/11/06 23:57:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.70 $ */
+/* NetHack 3.6	spell.c	$NHDT-Date: 1447653429 2015/11/16 05:57:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.72 $ */
 /*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -469,7 +469,9 @@ register struct obj *spellbook;
         if (booktype == SPE_NOVEL) {
             /* Obtain current Terry Pratchett book title */
             const char *tribtitle = noveltitle(&spellbook->novelidx);
-            if (read_tribute("books", tribtitle, 0, (char *)0, 0)) {
+
+            if (read_tribute("books", tribtitle, 0, (char *) 0, 0,
+                             spellbook->o_id)) {
                 u.uconduct.literate++;
                 check_unpaid(spellbook);
                 if (!u.uevent.read_tribute) {

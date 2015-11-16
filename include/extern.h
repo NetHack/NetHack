@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1447475941 2015/11/14 04:39:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.516 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1447653422 2015/11/16 05:57:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.517 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -766,7 +766,8 @@ E void NDECL(really_close);
 #ifdef DEBUG
 E boolean FDECL(debugcore, (const char *, BOOLEAN_P));
 #endif
-E boolean FDECL(read_tribute, (const char *, const char *, int, char *, int));
+E boolean FDECL(read_tribute, (const char *, const char *, int,
+                               char *, int, unsigned));
 E boolean FDECL(Death_quote, (char *, int));
 
 /* ### fountain.c ### */

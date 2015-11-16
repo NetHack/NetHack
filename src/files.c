@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1446955299 2015/11/08 04:01:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.186 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1447653425 2015/11/16 05:57:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.187 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3421,20 +3421,55 @@ boolean wildcards;
 /* ----------  BEGIN TRIBUTE ----------- */
 
 /* 3.6 tribute code
- *
- * Returns TRUE if you were able to read something.
- *
  */
 
 #define SECTIONSCOPE 1
 #define TITLESCOPE 2
 #define PASSAGESCOPE 3
 
+#define MAXPASSAGES SIZE(context.novel.pasg) /* 30 */
+
+static int FDECL(choose_passage, (int, unsigned));
+
+/* choose a random passage that hasn't been chosen yet; once all have
+   been chosen, reset the tracking to make all passages available again */
+static int
+choose_passage(passagecnt, oid)
+int passagecnt; /* total of available passages, 1..MAXPASSAGES */
+unsigned oid; /* book.o_id, used to determine whether re-reading same book */
+{
+    int idx, res;
+
+    if (passagecnt < 1)
+        return 0;
+    if (passagecnt > MAXPASSAGES)
+        passagecnt = MAXPASSAGES;
+
+    /* if a different book or we've used up all the passages already,
+       reset in order to have all 'passagecnt' passages available */
+    if (oid != context.novel.id || context.novel.count == 0) {
+        context.novel.id = oid;
+        context.novel.count = passagecnt;
+        for (idx = 0; idx < MAXPASSAGES; idx++)
+            context.novel.pasg[idx] = (xchar) ((idx < passagecnt) ? idx + 1
+                                                                  : 0);
+    }
+
+    idx = rn2(context.novel.count);
+    res = (int) context.novel.pasg[idx];
+    /* move the last slot's passage index into the slot just used
+       and reduce the number of passages available */
+    context.novel.pasg[idx] = context.novel.pasg[--context.novel.count];
+    return res;
+}
+
+/* Returns True if you were able to read something. */
 boolean
-read_tribute(tribsection, tribtitle, tribpassage, nowin_buf, bufsz)
+read_tribute(tribsection, tribtitle, tribpassage, nowin_buf, bufsz, oid)
 const char *tribsection, *tribtitle;
 int tribpassage, bufsz;
 char *nowin_buf;
+unsigned oid; /* book identifier */
 {
     dlb *fp;
     char *endp;
@@ -3510,22 +3545,17 @@ char *nowin_buf;
                     if ((p2 = index(p1, ')')) != 0) {
                         *p2 = '\0';
                         passagecnt = atoi(p1);
-                        /* sanity check here caps #passages at 50 */
-                        if ((passagecnt > 0) && (passagecnt < 50)) {
-                            scope = TITLESCOPE;
-                            if (matchedsection && !strcmpi(st, tribtitle)) {
-                                matchedtitle = TRUE;
-                                if (!tribpassage) {
-                                    targetpassage = rnd(passagecnt);
-                                } else {
-                                    if (tribpassage <= passagecnt)
-                                        targetpassage = tribpassage;
-                                    else
-                                        targetpassage = 0;
-                                }
-                            } else {
-                                matchedtitle = FALSE;
-                            }
+                        if (passagecnt > MAXPASSAGES)
+                            passagecnt = MAXPASSAGES;
+                        scope = TITLESCOPE;
+                        if (matchedsection && !strcmpi(st, tribtitle)) {
+                            matchedtitle = TRUE;
+                            targetpassage = !tribpassage
+                                             ? choose_passage(passagecnt, oid)
+                                             : (tribpassage <= passagecnt)
+                                                ? tribpassage : 0;
+                        } else {
+                            matchedtitle = FALSE;
                         }
                     }
                 }
@@ -3610,8 +3640,11 @@ Death_quote(buf, bufsz)
 char *buf;
 int bufsz;
 {
-    return read_tribute("Death", "Death Quotes", 0, buf, bufsz);
+    unsigned death_oid = 1; /* chance of oid #1 being a novel is negligible */
+
+    return read_tribute("Death", "Death Quotes", 0, buf, bufsz, death_oid);
 }
+
 /* ----------  END TRIBUTE ----------- */
 
 /*files.c*/
