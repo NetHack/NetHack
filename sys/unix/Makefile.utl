@@ -1,5 +1,5 @@
 #	Makefile for NetHack's utility programs.
-# NetHack 3.6  Makefile.utl	$NHDT-Date: 1432512789 2015/05/25 00:13:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.22 $
+# NetHack 3.6  Makefile.utl	$NHDT-Date: 1447758555 2015/11/17 11:09:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.24 $
 
 # Root of source tree:
 NHSROOT=..
@@ -23,7 +23,7 @@ NHSROOT=..
 #	For Bull DPX/2 systems at B.O.S. 2.0 or higher use the following:
 #
 # CC = gcc -ansi -D_BULL_SOURCE -D_XOPEN_SOURCE -D_POSIX_SOURCE
-# 
+#
 #	If you are using GCC 2.2.2 or higher on a DPX/2, just use:
 #
 # CC = gcc -ansi
@@ -96,7 +96,7 @@ NHSROOT=..
 #LFLAGS =
 
 LIBS =
- 
+
 # If you are cross-compiling, you must use this:
 #OBJDIR = .
 # otherwise, you can save a little bit of disk space with this:
@@ -109,7 +109,7 @@ LEX      = lex
 # YACC     = bison -y
 # YACC     = byacc
 # LEX      = flex
- 
+
 # these are the names of the output files from YACC/LEX. Under MS-DOS
 # and similar systems, they may differ
 YTABC = y.tab.c
@@ -256,7 +256,7 @@ dgn_yacc.o:  dgn_yacc.c $(CONFIG_H) ../include/dgn_file.h ../include/date.h
 dgn_main.o:  dgn_main.c $(CONFIG_H) ../include/dlb.h
 
 # see dgn_comp.l for WEIRD_LEX discussion
-dgn_lex.o:   dgn_lex.c $(CONFIG.H) ../include/dgn_comp.h ../include/dgn_file.h
+dgn_lex.o:   dgn_lex.c $(CONFIG_H) ../include/dgn_comp.h ../include/dgn_file.h
 	@echo $(CC) -c $(CFLAGS) dgn_lex.c
 	@$(CC) -c $(CFLAGS) -DWEIRD_LEX=`egrep -c _cplusplus dgn_lex.c` dgn_lex.c
 
