@@ -1,6 +1,6 @@
-/* NetHack 3.6	mactty.h	$NHDT-Date: 1432512775 2015/05/25 00:12:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
-/* Copyright (c) Jon W{tte 1993.					*/
-/* NetHack may be freely redistributed.  See license for details.	*/
+/* NetHack 3.6	mactty.h	$NHDT-Date: 1447755970 2015/11/17 10:26:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
+/* Copyright (c) Jon W{tte 1993.                                        */
+/* NetHack may be freely redistributed.  See license for details.       */
 
 /*
  * This header is the supported external interface for the "tty" window
@@ -72,14 +72,14 @@
 #define CHAR_BLANK ((char) 32)
 #define CHAR_DELETE ((char) 127)
 
-extern char
-    game_active; /* flag to window rendering routines not to use ppat */
-                 /*
-                  * If you want some fancy operations that not a normal TTY device normally
-                  * supports, use EXTENDED_SUPPORT. For frames, area erases and area scrolls,
-                  * plus bitmap graphics - RESOLUTION DEPENDENT, be sure to call
-                  * get_tty_metrics and use those limits.
-                  */
+extern char game_active; /* flag to window rendering routines
+                            not to use ppat */
+/*
+ * If you want some fancy operations that not a normal TTY device normally
+ * supports, use EXTENDED_SUPPORT. For frames, area erases and area scrolls,
+ * plus bitmap graphics - RESOLUTION DEPENDENT, be sure to call
+ * get_tty_metrics and use those limits.
+ */
 #define EXTENDED_SUPPORT 0
 /*
  * if you print a lot of single characters, accumulating each one in a
@@ -174,8 +174,7 @@ typedef enum tty_attrib {
 
 /*
  * Use this macro to cast a function pointer to a tty attribute; this will
- * help
- * portability to systems where a function pointer doesn't fit in a long
+ * help portability to systems where a function pointer doesn't fit in a long
  */
 #define TA_ATTRIB_FUNC(x) ((long) (x))
 

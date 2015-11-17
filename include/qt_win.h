@@ -1,4 +1,4 @@
-// NetHack 3.6	qt_win.h	$NHDT-Date: 1433806580 2015/06/08 23:36:20 $  $NHDT-Branch: master $:$NHDT-Revision: 1.16 $
+// NetHack 3.6	qt_win.h	$NHDT-Date: 1447755972 2015/11/17 10:26:12 $  $NHDT-Branch: master $:$NHDT-Revision: 1.17 $
 // Copyright (c) Warwick Allison, 1999.
 // NetHack may be freely redistributed.  See license for details.
 //
@@ -863,7 +863,8 @@ class NetHackQtBind : NetHackQtBindBase
 
     static void qt_cliparound(int x, int y);
     static void qt_cliparound_window(winid wid, int x, int y);
-    static void qt_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph);
+    static void qt_print_glyph(winid wid, XCHAR_P x, XCHAR_P y,
+                               int glyph, int bkglyph);
     static void qt_raw_print(const char *str);
     static void qt_raw_print_bold(const char *str);
     static int qt_nhgetch();

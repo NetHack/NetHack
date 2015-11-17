@@ -1,4 +1,4 @@
-/* NetHack 3.6	macwin.h	$NHDT-Date: 1432512779 2015/05/25 00:12:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
+/* NetHack 3.6	macwin.h	$NHDT-Date: 1447755970 2015/11/17 10:26:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -27,7 +27,8 @@ typedef pascal void (*UserItemProcPtr)(WindowPtr theWindow, short itemNo);
 typedef UserItemProcPtr UserItemUPP;
 #define NewUserItemProc(p) (UserItemUPP)(p)
 
-typedef pascal void (*ControlActionProcPtr)(ControlHandle theControl, short partCode);
+typedef pascal void (*ControlActionProcPtr)(ControlHandle theControl,
+                                            short partCode);
 typedef ControlActionProcPtr ControlActionUPP;
 #define NewControlActionProc(p) (ControlActionUPP)(p)
 

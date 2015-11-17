@@ -1,4 +1,4 @@
-/* NetHack 3.6	unixconf.h	$NHDT-Date: 1432512778 2015/05/25 00:12:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.23 $ */
+/* NetHack 3.6	unixconf.h	$NHDT-Date: 1447755973 2015/11/17 10:26:13 $  $NHDT-Branch: master $:$NHDT-Revision: 1.24 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -8,13 +8,13 @@
 
 /*
  * Some include files are in a different place under SYSV
- *	BSD		   SYSV
- * <sys/time.h>		<time.h>
- * <sgtty.h>		<termio.h>
+ *      BSD                SYSV
+ * <sys/time.h>         <time.h>
+ * <sgtty.h>            <termio.h>
  *
  * Some routines are called differently
- * index		strchr
- * rindex		strrchr
+ * index                strchr
+ * rindex               strrchr
  *
  */
 
@@ -46,18 +46,17 @@
                         * job control (note that AIX is SYSV otherwise)
                         * Also define this for AIX 3.2 */
 
-#define TERMINFO          /* uses terminfo rather than termcap */
-                          /* Should be defined for most SYSV, SVR4 (including
-                           * Solaris 2+), HPUX, and Linux systems.  In
-                           * particular, it should NOT be defined for the UNIXPC
-                           * unless you remove the use of the shared library in
-                           * the Makefile */
-#define TEXTCOLOR         /* Use System V r3.2 terminfo color support */
-                          /* and/or ANSI color support on termcap systems */
-                          /* and/or X11 color */
-#define POSIX_JOB_CONTROL /* use System V / Solaris 2.x / POSIX job control \
-                             */
-/* (e.g., VSUSP) */
+#define TERMINFO       /* uses terminfo rather than termcap */
+                       /* Should be defined for most SYSV, SVR4 (including
+                        * Solaris 2+), HPUX, and Linux systems.  In
+                        * particular, it should NOT be defined for the UNIXPC
+                        * unless you remove the use of the shared library in
+                        * the Makefile */
+#define TEXTCOLOR      /* Use System V r3.2 terminfo color support
+                        * and/or ANSI color support on termcap systems
+                        * and/or X11 color */
+#define POSIX_JOB_CONTROL /* use System V / Solaris 2.x / POSIX job control
+                           * (e.g., VSUSP) */
 #define POSIX_TYPES /* use POSIX types for system calls and termios */
                     /* Define for many recent OS releases, including
                      * those with specific defines (since types are
@@ -92,7 +91,7 @@
  * which does not allow hard links.  If NO_FILE_LINKS is defined, lock files
  * will be created in LOCKDIR using open() instead of in the playground using
  * link().
- *		Ralf Brown, 7/26/89 (from v2.3 hack of 10/10/88)
+ *              Ralf Brown, 7/26/89 (from v2.3 hack of 10/10/88)
  */
 
 /* #define NO_FILE_LINKS */                       /* if no hard links */
@@ -109,8 +108,8 @@
  * If defined, it can be overridden by the environment variable PAGER.
  * Hack will use its internal pager if DEF_PAGER is not defined.
  * (This might be preferable for security reasons.)
- * #define DEF_PAGER	".../mydir/mypager"
  */
+/* #define DEF_PAGER ".../mydir/mypager" */
 
 /*
  * Define PORT_HELP to be the name of the port-specfic help file.
@@ -148,9 +147,8 @@
  * (another directory).  MAILBOX is the element that will be added on to
  * the user's home directory path to generate the Mailbox path - just in
  * case other Andrew sites do it differently from CMU.
- *
- *		dan lovinger
- *		dl2n+@andrew.cmu.edu (dec 19 1989)
+ *              dan lovinger
+ *              dl2n+@andrew.cmu.edu (dec 19 1989)
  */
 
 /* #define AMS */ /* use Andrew message system for mail */
@@ -158,8 +156,7 @@
 /* NO_MAILREADER is for kerberos authenticating filesystems where it is
  * essentially impossible to securely exec child processes, like mail
  * readers, when the game is running under a special token.
- *
- *	       dan
+ *              dan
  */
 
 /* #define NO_MAILREADER */ /* have mail daemon just tell player of mail */
