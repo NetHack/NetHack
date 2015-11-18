@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1446887534 2015/11/07 09:12:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.70 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1447836300 2015/11/18 08:45:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.73 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -18,7 +18,7 @@
 #pragma warning(disable : 4244)
 #endif
 
-typedef void (*select_iter_func)(int, int, genericptr_t);
+typedef void FDECL((*select_iter_func), (int, int, genericptr_t));
 
 extern void FDECL(mkmap, (lev_init *));
 
@@ -484,7 +484,8 @@ struct opvar *ov;
     while (tmp) {
         if (!strcmp(tmp->name, OV_s(ov))) {
             if ((tmp->svtyp & SPOVAR_ARRAY)) {
-                array_idx = opvar_var_conversion(coder, splev_stack_pop(coder->stack));
+                array_idx = opvar_var_conversion(coder,
+                                               splev_stack_pop(coder->stack));
                 if (!array_idx || OV_typ(array_idx) != SPOVAR_INT)
                     panic("array idx not an int");
                 if (tmp->array_len < 1)
@@ -3797,7 +3798,7 @@ boolean diagonals;
     } while (0)
 #define SEL_FLOOD_CHKDIR(mx,my,sel)                  \
     if (isok((mx), (my))                             \
-        && (*selection_flood_check_func)((mx),(my))  \
+        && (*selection_flood_check_func)((mx), (my)) \
         && !selection_getpoint((mx), (my), (sel)))   \
         SEL_FLOOD((mx), (my))
     static const char floodfill_stack_overrun[] = "floodfill stack overrun";
