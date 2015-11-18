@@ -1,18 +1,18 @@
-/* NetHack 3.6	winmap.c	$NHDT-Date: 1435002689 2015/06/22 19:51:29 $  $NHDT-Branch: master $:$NHDT-Revision: 1.24 $ */
-/* Copyright (c) Dean Luick, 1992				  */
+/* NetHack 3.6	winmap.c	$NHDT-Date: 1447844616 2015/11/18 11:03:36 $  $NHDT-Branch: master $:$NHDT-Revision: 1.25 $ */
+/* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
  * This file contains:
- *	+ global functions print_glyph() and cliparound()
- *	+ the map window routines
- *	+ the char and pointer input routines
+ *      + global functions print_glyph() and cliparound()
+ *      + the map window routines
+ *      + the char and pointer input routines
  *
  * Notes:
- *	+ We don't really have a good way to get the compiled ROWNO and
- *	  COLNO as defaults.  They are hardwired to the current "correct"
- *	  values in the Window widget.  I am _not_ in favor of including
- *	  some nethack include file for Window.c.
+ *      + We don't really have a good way to get the compiled ROWNO and
+ *        COLNO as defaults.  They are hardwired to the current "correct"
+ *        values in the Window widget.  I am _not_ in favor of including
+ *        some nethack include file for Window.c.
  */
 
 #ifndef SYSV
@@ -58,8 +58,8 @@ extern int total_tiles_used;
 static boolean FDECL(init_tiles, (struct xwindow *));
 static void FDECL(set_button_values, (Widget, int, int, unsigned));
 static void FDECL(map_check_size_change, (struct xwindow *));
-static void FDECL(map_update,
-                  (struct xwindow *, int, int, int, int, BOOLEAN_P));
+static void FDECL(map_update, (struct xwindow *, int, int, int, int,
+                               BOOLEAN_P));
 static void FDECL(init_text, (struct xwindow *));
 static void FDECL(map_exposed, (Widget, XtPointer, XtPointer));
 static void FDECL(set_gc, (Widget, Font, const char *, Pixel, GC *, GC *));
@@ -67,14 +67,14 @@ static void FDECL(get_text_gc, (struct xwindow *, Font));
 static void FDECL(get_char_info, (struct xwindow *));
 static void FDECL(display_cursor, (struct xwindow *));
 
-/* Global functions ========================================================
- */
+/* Global functions ======================================================= */
 
 void
 X11_print_glyph(window, x, y, glyph, bkglyph)
 winid window;
 xchar x, y;
-int glyph, bkglyph;
+int glyph;
+int bkglyph UNUSED;
 {
     struct map_info_t *map_info;
     boolean update_bbox = FALSE;
@@ -104,6 +104,7 @@ int glyph, bkglyph;
 #ifdef TEXTCOLOR
         register unsigned char *co_ptr;
 #endif
+
         /* map glyph to character and color */
         (void) mapglyph(glyph, &och, &color, &special, x, y);
         ch = (uchar) och;
@@ -156,8 +157,7 @@ int x, y;
 }
 #endif /* CLIPPING */
 
-/* End global functions ====================================================
- */
+/* End global functions =================================================== */
 
 #include "tile2x11.h"
 
@@ -199,6 +199,7 @@ Pixel colorpixel;
                              &annotation->bitmap, &annotation->hotx,
                              &annotation->hoty)) {
         char buf[BUFSZ];
+
         Sprintf(buf, "Failed to load %s", filename);
         X11_raw_print(buf);
     }
@@ -327,10 +328,9 @@ struct xwindow *wp;
     /* assume a fixed number of tiles per row */
     if (tile_image->width % TILES_PER_ROW != 0
         || tile_image->width <= TILES_PER_ROW) {
-        Sprintf(
-            buf,
-            "%s is not a multiple of %d (number of tiles/row) pixels wide",
-            appResources.tile_file, TILES_PER_ROW);
+        Sprintf(buf,
+               "%s is not a multiple of %d (number of tiles/row) pixels wide",
+                appResources.tile_file, TILES_PER_ROW);
         X11_raw_print(buf);
         XDestroyImage(tile_image);
         tile_image = 0;
@@ -348,7 +348,7 @@ struct xwindow *wp;
     }
     tile_width = image_width / TILES_PER_ROW;
     tile_height = image_height / (tile_count / TILES_PER_ROW);
-#else
+#else /* !USE_XPM */
     /* any less than 16 colours makes tiles useless */
     ddepth = DefaultDepthOfScreen(screen);
     if (ddepth < 4) {
@@ -377,11 +377,11 @@ struct xwindow *wp;
         result = FALSE;
         goto tiledone;
     }
-
 #ifdef VERBOSE
-    fprintf(stderr, "X11 tile file:\n    version %ld\n    ncolors %ld\n    "
-                    "tile width %ld\n    tile height %ld\n    per row %ld\n  "
-                    "  ntiles %ld\n",
+    fprintf(stderr, "\
+X11 tile file:\n    version %ld\n    ncolors %ld\n    \
+tile width %ld\n    tile height %ld\n    per row %ld\n    \
+ntiles %ld\n",
             header.version, header.ncolors, header.tile_width,
             header.tile_height, header.per_row, header.ntiles);
 #endif
@@ -458,15 +458,15 @@ struct xwindow *wp;
     else
         bitmap_pad = 8;
 
-    tile_image =
-        XCreateImage(dpy, DefaultVisualOfScreen(screen), ddepth, /* depth */
-                     ZPixmap,                                    /* format */
-                     0,                                          /* offset */
-                     0,                                          /* data */
-                     image_width,                                /* width */
-                     image_height,                               /* height */
-                     bitmap_pad,                                 /* bit pad */
-                     0); /* bytes_per_line */
+    tile_image = XCreateImage(dpy, DefaultVisualOfScreen(screen),
+                              ddepth,           /* depth */
+                              ZPixmap,          /* format */
+                              0,                /* offset */
+                              (char *) 0,       /* data */
+                              image_width,      /* width */
+                              image_height,     /* height */
+                              bitmap_pad,       /* bit pad */
+                              0);               /* bytes_per_line */
 
     if (!tile_image)
         impossible("init_tiles: insufficient memory to create image");
@@ -499,9 +499,9 @@ struct xwindow *wp;
             for (x = 0; x < (int) image_width; x++, tb++)
                 XPutPixel(tile_image, x, y, colors[*tb].pixel);
     }
-#endif /* USE_XPM */
+#endif /* ?USE_XPM */
 
-/* fake an inverted tile by drawing a border around the edges */
+    /* fake an inverted tile by drawing a border around the edges */
 #ifdef USE_WHITE
     /* use white or black as the border */
     mask = GCFunction | GCForeground | GCGraphicsExposures;
@@ -872,7 +872,7 @@ struct xwindow *wp;
         /* changed map display mode, re-display the full map */
         (void) memset((genericptr_t) map_info->t_start, (char) 0,
                       sizeof(map_info->t_start));
-        (void) memset((genericptr_t) map_info->t_stop, (char) COLNO - 1,
+        (void) memset((genericptr_t) map_info->t_stop, (char) (COLNO - 1),
                       sizeof(map_info->t_stop));
         map_info->is_tile = iflags.wc_tiled_map && !Is_rogue_level(&u.uz);
         XClearWindow(XtDisplay(wp->w), XtWindow(wp->w));
@@ -911,9 +911,8 @@ static void
 map_all_stone(map_info)
 struct map_info_t *map_info;
 {
-    int x,y;
-    unsigned short *sp, stone;
-    stone = cmap_to_glyph(S_stone);
+    int x, y;
+    unsigned short stone = cmap_to_glyph(S_stone);
 
     for (x = 0; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++) {
@@ -1122,8 +1121,8 @@ unsigned int button;
         click_y = y / map_info->text_map.square_height;
     }
 
-    /* The values can be out of range if the map window has been resized */
-    /* to be larger than the max size.					 */
+    /* The values can be out of range if the map window has been resized
+       to be larger than the max size. */
     if (click_x >= COLNO)
         click_x = COLNO - 1;
     if (click_y >= ROWNO)
@@ -1202,8 +1201,8 @@ XtPointer widget_data; /* expose event from Window widget */
            t_width, start_row, stop_row, start_col, stop_col);
 #endif
 
-    /* Out of range values are possible if the map window is resized to be */
-    /* bigger than the largest expected value.				   */
+    /* Out of range values are possible if the map window is resized to be
+       bigger than the largest expected value. */
     if (stop_row >= ROWNO)
         stop_row = ROWNO - 1;
     if (stop_col >= COLNO)
@@ -1294,8 +1293,9 @@ boolean inverted;
                     XSetClipMask(dpy, tile_map->black_gc,
                                  pile_annotation.bitmap);
                     XCopyPlane(dpy, pile_annotation.bitmap, XtWindow(wp->w),
-                               tile_map->black_gc, 0, 0, pile_annotation.width,
-                               pile_annotation.height, dest_x, dest_y, 1);
+                               tile_map->black_gc, 0, 0,
+                               pile_annotation.width, pile_annotation.height,
+                               dest_x, dest_y, 1);
                     XSetClipOrigin(dpy, tile_map->black_gc, 0, 0);
                     XSetClipMask(dpy, tile_map->black_gc, None);
                     XSetForeground(dpy, tile_map->black_gc,
@@ -1305,19 +1305,20 @@ boolean inverted;
         }
 
         if (inverted) {
-            XDrawRectangle(
-                XtDisplay(wp->w), XtWindow(wp->w),
+            XDrawRectangle(XtDisplay(wp->w), XtWindow(wp->w),
 #ifdef USE_WHITE
-                /* kludge for white square... */
-                tile_map->glyphs[start_row][start_col].glyph == cmap_to_glyph(S_ice)
-                    ? tile_map->black_gc
-                    : tile_map->white_gc,
+                           /* kludge for white square... */
+                           (tile_map->glyphs[start_row][start_col].glyph
+                            == cmap_to_glyph(S_ice))
+                                 ? tile_map->black_gc
+                                 : tile_map->white_gc,
 #else
-                tile_map->white_gc,
+                           tile_map->white_gc,
 #endif
-                start_col * tile_map->square_width,
-                start_row * tile_map->square_height,
-                tile_map->square_width - 1, tile_map->square_height - 1);
+                           start_col * tile_map->square_width,
+                           start_row * tile_map->square_height,
+                           tile_map->square_width - 1,
+                           tile_map->square_height - 1);
         }
     } else {
         struct text_map_info_t *text_map = &map_info->text_map;
@@ -1366,20 +1367,22 @@ boolean inverted;
         {
             int win_row, win_xstart;
 
-            /* We always start at the same x window position and have	*/
-            /* the same character count.				*/
+            /* We always start at the same x window position and have
+               the same character count. */
             win_xstart = text_map->square_lbearing
                          + (win_start_col * text_map->square_width);
             count = stop_col - start_col + 1;
 
             for (row = start_row, win_row = win_start_row; row <= stop_row;
                  row++, win_row++) {
-                XDrawImageString(
-                    XtDisplay(wp->w), XtWindow(wp->w),
-                    inverted ? text_map->inv_copy_gc : text_map->copy_gc,
-                    win_xstart, text_map->square_ascent
+                XDrawImageString(XtDisplay(wp->w), XtWindow(wp->w),
+                                 inverted ? text_map->inv_copy_gc
+                                          : text_map->copy_gc,
+                                 win_xstart,
+                                 text_map->square_ascent
                                     + (win_row * text_map->square_height),
-                    (char *) &(text_map->text[row][start_col]), count);
+                                 (char *) &(text_map->text[row][start_col]),
+                                 count);
             }
         }
     }
@@ -1432,7 +1435,7 @@ static char map_translations[] = "#override\n\
  <Key>Right: scroll(6)\n\
  <Key>Up: scroll(8)\n\
  <Key>Down: scroll(2)\n\
- <Key>:		input()	\
+ <Key>: input() \
 ";
 
 /*
@@ -1463,8 +1466,9 @@ Widget parent;
         XtSetArg(args[num_args], XtNinput, False);
         num_args++;
 
-        wp->popup = parent = XtCreatePopupShell(
-            "nethack", topLevelShellWidgetClass, toplevel, args, num_args);
+        wp->popup = parent = XtCreatePopupShell("nethack",
+                                                topLevelShellWidgetClass,
+                                                toplevel, args, num_args);
         /*
          * If we're here, then this is an auxiliary map window.  If we're
          * cancelled via a delete window message, we should just pop down.
@@ -1476,18 +1480,20 @@ Widget parent;
     num_args++;
     XtSetArg(args[num_args], XtNallowVert, True);
     num_args++;
-    /* XtSetArg(args[num_args], XtNforceBars,  True);	num_args++; */
+#if 0
+    XtSetArg(args[num_args], XtNforceBars,  True);
+    num_args++;
+#endif
     XtSetArg(args[num_args], XtNuseBottom, True);
     num_args++;
     XtSetArg(args[num_args], XtNtranslations,
              XtParseTranslationTable(map_translations));
     num_args++;
-    viewport = XtCreateManagedWidget(
-        "map_viewport",      /* name */
-        viewportWidgetClass, /* widget class from Window.h */
-        parent,              /* parent widget */
-        args,                /* set some values */
-        num_args);           /* number of values to set */
+    viewport = XtCreateManagedWidget("map_viewport",                /* name */
+                                     viewportWidgetClass,  /* from Window.h */
+                                     parent,               /* parent widget */
+                                     args,               /* set some values */
+                                     num_args);  /* number of values to set */
 
     /*
      * Create a map window.  We need to set the width and height to some
@@ -1607,13 +1613,15 @@ struct xwindow *wp;
 }
 
 boolean exit_x_event; /* exit condition for the event loop */
-/*******
+
+#if 0   /*******/
+void
 pkey(k)
-    int k;
+int k;
 {
-    printf("key = '%s%c'\n", (k<32) ? "^":"", (k<32) ? '@'+k : k);
+    printf("key = '%s%c'\n", (k < 32) ? "^" : "", (k < 32) ? '@' + k : k);
 }
-******/
+#endif  /***0***/
 
 /*
  * Main X event loop.  Here we accept and dispatch X events.  We only exit
@@ -1650,6 +1658,7 @@ int exit_condition;
         switch (exit_condition) {
         case EXIT_ON_SENT_EVENT: {
             XAnyEvent *any = (XAnyEvent *) &event;
+
             if (any->send_event) {
                 retval = 0;
                 keep_going = FALSE;

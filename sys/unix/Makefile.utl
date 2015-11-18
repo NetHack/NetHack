@@ -1,5 +1,5 @@
 #	Makefile for NetHack's utility programs.
-# NetHack 3.6  Makefile.utl	$NHDT-Date: 1447758555 2015/11/17 11:09:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.24 $
+# NetHack 3.6  Makefile.utl	$NHDT-Date: 1447844579 2015/11/18 11:02:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.25 $
 
 # Root of source tree:
 NHSROOT=..
@@ -373,6 +373,11 @@ bitmfile.o: ../win/gem/bitmfile.c ../include/bitmfile.h
 tile2beos.o: ../win/BeOS/tile2beos.cpp $(HACK_H) ../include/tile.h
 	$(CXX) $(CFLAGS) -c ../win/BeOS/tile2beos.cpp
 
+tileedit: tileedit.cpp $(TEXT_IO)
+	$(QTDIR)/bin/moc -o tileedit.moc tileedit.h
+	$(CC) -o tileedit -I../include -I$(QTDIR)/include -L$(QTDIR)/lib \
+		tileedit.cpp $(TEXT_IO) -lqt
+
 # using dependencies like
 #	../src/foo::
 #		@( cd ../src ; $(MAKE) foo )
@@ -416,8 +421,5 @@ spotless: clean
 	-rm -f ../include/lev_comp.h ../include/dgn_comp.h
 	-rm -f ../include/tile.h tiletxt.c
 	-rm -f makedefs lev_comp dgn_comp recover dlb
-	-rm -f gif2txt txt2ppm tile2x11 tile2img.ttp xpm2img.ttp tilemap
-
-tileedit: tileedit.cpp $(TEXT_IO)
-	$(QTDIR)/bin/moc -o tileedit.moc tileedit.h
-	$(CC) -o tileedit -I../include -I$(QTDIR)/include -L$(QTDIR)/lib tileedit.cpp $(TEXT_IO) -lqt
+	-rm -f gif2txt txt2ppm tile2x11 tile2img.ttp xpm2img.ttp \
+		tilemap tileedit

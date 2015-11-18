@@ -1,4 +1,4 @@
-/* NetHack 3.6	bemain.c	$NHDT-Date: 1432512791 2015/05/25 00:13:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.17 $ */
+/* NetHack 3.6	bemain.c	$NHDT-Date: 1447844549 2015/11/18 11:02:29 $  $NHDT-Branch: master $:$NHDT-Revision: 1.18 $ */
 /* Copyright (c) Dean Luick, 1996. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -66,10 +66,10 @@ MAIN(int argc, char **argv)
 
     display_gamewindows();
 
-/*
- * First, try to find and restore a save file for specified character.
- * We'll return here if new game player_selection() renames the hero.
- */
+    /*
+     * First, try to find and restore a save file for specified character.
+     * We'll return here if new game player_selection() renames the hero.
+     */
 attempt_restore:
     if ((fd = restore_saved_game()) >= 0) {
 #ifdef NEWS
@@ -167,7 +167,6 @@ process_options(int argc, char **argv)
         case 'D':
             wizard = TRUE, discover = FALSE;
             break;
-        /* otherwise fall thru to discover */
         case 'X':
             discover = TRUE, wizard = FALSE;
             break;
@@ -268,6 +267,7 @@ authorize_wizard_mode()
  * do anything extra.
  */
 void nethack_exit(int status);
+
 void
 nethack_exit(int status)
 {
