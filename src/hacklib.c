@@ -8,7 +8,7 @@
     Assorted 'small' utility routines.  They're virtually independent of
     NetHack, except that rounddiv may call panic().  setrandom calls one
     of srandom(), srand48(), or srand() depending upon configuration.
-                  
+
       return type     routine name    argument type(s)
         boolean         digit           (char)
         boolean         letter          (char)

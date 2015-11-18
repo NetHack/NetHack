@@ -64,8 +64,10 @@ lock_action()
         return actions[3]; /* same as lock_pick */
     else if (xlock.door)
         return actions[0]; /* "unlocking the door" */
-    else
+    else if (xlock.box)
         return xlock.box->otyp == CHEST ? actions[1] : actions[2];
+    else
+        return actions[3];
 }
 
 /* try to open/close a lock */
@@ -648,10 +650,7 @@ int x, y;
                 add_damage(cc.x, cc.y, 0L);
         } else
             door->doormask = D_ISOPEN;
-        if (Blind)
-            feel_location(cc.x, cc.y); /* the hero knows she opened it  */
-        else
-            newsym(cc.x, cc.y);
+        feel_newsym(cc.x, cc.y); /* the hero knows she opened it */
         unblock_point(cc.x, cc.y); /* vision: new see through there */
     } else {
         exercise(A_STR, TRUE);
@@ -781,10 +780,7 @@ doclose()
             || rn2(25) < (ACURRSTR + ACURR(A_DEX) + ACURR(A_CON)) / 3) {
             pline_The("door closes.");
             door->doormask = D_CLOSED;
-            if (Blind)
-                feel_location(x, y); /* the hero knows she closed it */
-            else
-                newsym(x, y);
+            feel_newsym(x, y); /* the hero knows she closed it */
             block_point(x, y); /* vision:  no longer see there */
         } else {
             exercise(A_STR, TRUE);

@@ -1464,7 +1464,7 @@ struct permonst _mons2[] = {
         M2_HOSTILE | M2_STRONG | M2_NASTY | M2_COLLECT, M3_INFRAVISIBLE,
         CLR_ORANGE),
 #if 0 /* DEFERRED */
-    MON("vorpal jabberwock", S_JABBERWOCK,       
+    MON("vorpal jabberwock", S_JABBERWOCK,
 	LVL(20, 12, -2, 50, 0), (G_GENO | 1),
 	A(ATTK(AT_BITE, AD_PHYS, 3, 10), ATTK(AT_BITE, AD_PHYS, 3, 10),
 	  ATTK(AT_CLAW, AD_PHYS, 3, 10), ATTK(AT_CLAW, AD_PHYS, 3, 10),

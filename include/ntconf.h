@@ -1,4 +1,4 @@
-/* NetHack 3.6	ntconf.h	$NHDT-Date: 1432512777 2015/05/25 00:12:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.47 $ */
+/* NetHack 3.6	ntconf.h	$NHDT-Date: 1447424077 2015/11/13 14:14:37 $  $NHDT-Branch: master $:$NHDT-Revision: 1.48 $ */
 /* Copyright (c) NetHack PC Development Team 1993, 1994.  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -107,11 +107,12 @@ extern void FDECL(interject, (int));
 #ifdef YYPREFIX
 #pragma warning(disable : 4102) /* unreferenced label */
 #endif
-#if 0
-#pragma warning(disable : 4018) /* signed/unsigned mismatch */
-#pragma warning(disable : 4305) /* init, conv from 'const int' to 'char' */
+#ifdef __cplusplus
+/* suppress a warning in cppregex.cpp */
+#pragma warning(disable : 4101) /* unreferenced local variable */
 #endif
-#endif
+#endif /* _MSC_VER */
+
 
 #define RUNTIME_PORT_ID /* trigger run-time port identification for \
                          * identification of exe CPU architecture   \
@@ -186,10 +187,6 @@ extern void FDECL(interject, (int));
 #if defined(DLB)
 #define FILENAME_CMP stricmp /* case insensitive */
 #endif
-
-#if 0
-extern char levels[], bones[], permbones[],
-#endif /* 0 */
 
 /* this was part of the MICRO stuff in the past */
 extern const char *alllevels, *allbones;

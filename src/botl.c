@@ -643,7 +643,7 @@ boolean
     }
     for (i = 0; i < MAXBLSTATS; ++i) {
         enum statusfields fld = initblstats[i].fld;
-        
+
         switch (fld) {
         case BL_TITLE:
             fieldfmt = "%s";

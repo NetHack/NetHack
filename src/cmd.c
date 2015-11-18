@@ -385,7 +385,6 @@ extcmd_via_menu()
     biggest = 0;
     while (!ret) {
         i = n = 0;
-        accelerator = 0;
         any = zeroany;
         /* populate choices */
         for (efp = extcmdlist; efp->ef_txt; efp++) {
@@ -421,7 +420,7 @@ extcmd_via_menu()
         /* otherwise... */
         win = create_nhwindow(NHW_MENU);
         start_menu(win);
-        prevaccelerator = 0;
+        accelerator = prevaccelerator = 0;
         acount = 0;
         for (i = 0; choices[i]; ++i) {
             accelerator = choices[i]->ef_txt[matchlevel];
@@ -1769,7 +1768,7 @@ int final;
         /* when mounted, Wounded_legs applies to steed rather than to
            hero; we only report steed's wounded legs in wizard mode */
         if (u.usteed) { /* not `Riding' here */
-            if (wizard) {
+            if (wizard && steedname) {
                 Strcpy(buf, steedname);
                 *buf = highc(*buf);
                 enl_msg(buf, " has", " had", " wounded legs", "");

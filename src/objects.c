@@ -1,5 +1,5 @@
-/* NetHack 3.6	objects.c	$NHDT-Date: 1444617222 2015/10/12 02:33:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.46 $ */
-/* Copyright (c) Mike Threepoint, 1989.				  */
+/* NetHack 3.6	objects.c	$NHDT-Date: 1447313395 2015/11/12 07:29:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.49 $ */
+/* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -846,33 +846,40 @@ SCROLL("earth",                          "KIRJE",  1,  18, 200),
 SCROLL("punishment",            "VE FORBRYDERNE",  1,  15, 300),
 SCROLL("charging",                "HACKEM MUCHE",  1,  15, 300),
 SCROLL("stinking cloud",             "VELOX NEB",  1,  15, 300),
-/* extra descriptions, shuffled into use at start of new game */
-SCROLL(None,                     "FOOBIE BLETCH",  1,   0, 100),
-SCROLL(None,                             "TEMOV",  1,   0, 100),
-SCROLL(None,                        "GARVEN DEH",  1,   0, 100),
-SCROLL(None,                           "READ ME",  1,   0, 100),
-SCROLL(None,                     "ETAOIN SHRDLU",  1,   0, 100),
-SCROLL(None,                       "LOREM IPSUM",  1,   0, 100),
-SCROLL(None,                             "FNORD",  1,   0, 100), /* Illuminati */
-SCROLL(None,                           "KO BATE",  1,   0, 100), /* Kurd Lasswitz */
-SCROLL(None,                     "ABRA KA DABRA",  1,   0, 100), /* traditional incantation */
-SCROLL(None,                      "ASHPD SODALG",  1,   0, 100), /* Portal */
-SCROLL(None,                           "ZLORFIK",  1,   0, 100), /* Zak McKracken */
-SCROLL(None,                     "GNIK SISI VLE",  1,   0, 100), /* Zak McKracken */
-SCROLL(None,                   "HAPAX LEGOMENON",  1,   0, 100),
-SCROLL(None,                 "EIRIS SAZUN IDISI",  1,   0, 100), /* Merseburg Incantations */
-SCROLL(None,                   "PHOL ENDE WODAN",  1,   0, 100), /* Merseburg Incantations */
-SCROLL(None,                             "GHOTI",  1,   0, 100), /* pronounced as 'fish', George Bernard Shaw */
-SCROLL(None,             "MAPIRO MAHAMA DIROMAT",  1,   0, 100), /* Wizardry */
-SCROLL(None,                 "VAS CORP BET MANI",  1,   0, 100), /* Ultima */
-SCROLL(None,                           "XOR OTA",  1,   0, 100), /* Aarne Haapakoski */
-SCROLL(None,                "STRC PRST SKRZ KRK",  1,   0, 100), /* Czech and Slovak tongue-twister */
-/* these must come last because they have special descriptions
- */
+    /* Extra descriptions, shuffled into use at start of new game.
+     * Code in win/share/tilemap.c depends on SCR_STINKING_CLOUD preceding
+     * these and on how many of them there are.  If a real scroll gets added
+     * after stinking cloud or the number of extra descriptions changes,
+     * tilemap.c must be modified to match.
+     */
+SCROLL(None,      "FOOBIE BLETCH",  1,   0, 100),
+SCROLL(None,              "TEMOV",  1,   0, 100),
+SCROLL(None,         "GARVEN DEH",  1,   0, 100),
+SCROLL(None,            "READ ME",  1,   0, 100),
+SCROLL(None,      "ETAOIN SHRDLU",  1,   0, 100),
+SCROLL(None,        "LOREM IPSUM",  1,   0, 100),
+SCROLL(None,              "FNORD",  1,   0, 100), /* Illuminati */
+SCROLL(None,            "KO BATE",  1,   0, 100), /* Kurd Lasswitz */
+SCROLL(None,      "ABRA KA DABRA",  1,   0, 100), /* traditional incantation */
+SCROLL(None,       "ASHPD SODALG",  1,   0, 100), /* Portal */
+SCROLL(None,            "ZLORFIK",  1,   0, 100), /* Zak McKracken */
+SCROLL(None,      "GNIK SISI VLE",  1,   0, 100), /* Zak McKracken */
+SCROLL(None,    "HAPAX LEGOMENON",  1,   0, 100),
+SCROLL(None,  "EIRIS SAZUN IDISI",  1,   0, 100), /* Merseburg Incantations */
+SCROLL(None,    "PHOL ENDE WODAN",  1,   0, 100), /* Merseburg Incantations */
+SCROLL(None,              "GHOTI",  1,   0, 100), /* pronounced as 'fish',
+                                                        George Bernard Shaw */
+SCROLL(None, "MAPIRO MAHAMA DIROMAT", 1, 0, 100), /* Wizardry */
+SCROLL(None,  "VAS CORP BET MANI",  1,   0, 100), /* Ultima */
+SCROLL(None,            "XOR OTA",  1,   0, 100), /* Aarne Haapakoski */
+SCROLL(None, "STRC PRST SKRZ KRK",  1,   0, 100), /* Czech and Slovak
+                                                        tongue-twister */
+    /* These must come last because they have special fixed descriptions.
+     */
 #ifdef MAIL
-SCROLL("mail", "stamped", 0, 0, 0),
+SCROLL("mail",          "stamped",  0,   0,   0),
 #endif
-SCROLL("blank paper", "unlabeled", 0, 28, 60),
+SCROLL("blank paper", "unlabeled",  0,  28,  60),
 #undef SCROLL
 
 /* spellbooks ... */

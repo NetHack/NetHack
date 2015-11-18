@@ -271,7 +271,10 @@ STATIC_OVL void
 recalc_wt()
 {
     struct obj *piece = context.victual.piece;
-
+    if (!piece) {
+        impossible("recalc_wt without piece");
+        return;
+    }
     debugpline1("Old weight = %d", piece->owt);
     debugpline2("Used time = %d, Req'd time = %d", context.victual.usedtime,
                 context.victual.reqtime);

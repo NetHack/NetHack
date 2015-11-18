@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1446856765 2015/11/07 00:39:25 $  $NHDT-Branch: master $:$NHDT-Revision: 1.110 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1447630543 2015/11/15 23:35:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.115 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1189,17 +1189,36 @@ const char *str;
     winid i;
 
     tty_suspend_nhwindows(str);
-    /* Just forget any windows existed, since we're about to exit anyway.
+    /*
      * Disable windows to avoid calls to window routines.
      */
-    for (i = 0; i < MAXWIN; i++)
-        if (wins[i] && (i != BASE_WINDOW)) {
+    free_pickinv_cache(); /* reset its state as well as tear down window */
+    for (i = 0; i < MAXWIN; i++) {
+        if (i == BASE_WINDOW)
+            continue; /* handle wins[BASE_WINDOW] last */
+        if (wins[i]) {
 #ifdef FREE_ALL_MEMORY
             free_window_info(wins[i], TRUE);
             free((genericptr_t) wins[i]);
 #endif
-            wins[i] = 0;
+            wins[i] = (struct WinDesc *) 0;
         }
+    }
+    WIN_MAP = WIN_MESSAGE = WIN_INVEN = WIN_ERR; /* these are all gone now */
+#ifndef STATUS_VIA_WINDOWPORT
+    WIN_STATUS = WIN_ERR;
+#endif
+#ifdef FREE_ALL_MEMORY
+    if (BASE_WINDOW != WIN_ERR && wins[BASE_WINDOW]) {
+        free_window_info(wins[BASE_WINDOW], TRUE);
+        free((genericptr_t) wins[BASE_WINDOW]);
+        wins[BASE_WINDOW] = (struct WinDesc *) 0;
+        BASE_WINDOW = WIN_ERR;
+    }
+    free((genericptr_t) ttyDisplay);
+    ttyDisplay = (struct DisplayDesc *) 0;
+#endif
+
 #ifndef NO_TERMS    /*(until this gets added to the window interface)*/
     tty_shutdown(); /* cleanup termcap/terminfo/whatever */
 #endif
@@ -1298,9 +1317,10 @@ int type;
         newwin->datlen =
             (short *) alloc(sizeof(short) * (unsigned) newwin->maxrow);
         if (newwin->maxcol) {
+            /* WIN_STATUS */
             for (i = 0; i < newwin->maxrow; i++) {
                 newwin->data[i] = (char *) alloc((unsigned) newwin->maxcol);
-                newwin->datlen[i] = newwin->maxcol;
+                newwin->datlen[i] = (short) newwin->maxcol;
             }
         } else {
             for (i = 0; i < newwin->maxrow; i++) {
@@ -2017,6 +2037,7 @@ winid window;
 boolean blocking; /* with ttys, all windows are blocking */
 {
     register struct WinDesc *cw = 0;
+    short s_maxcol;
 
     if (window == WIN_ERR || (cw = wins[window]) == (struct WinDesc *) 0)
         panic(winpanicstr, window);
@@ -2053,15 +2074,18 @@ boolean blocking; /* with ttys, all windows are blocking */
         /*FALLTHRU*/
     case NHW_MENU:
         cw->active = 1;
+        /* cw->maxcol is a long, but its value is constrained to
+           be <= ttyDisplay->cols, so is sure to fit within a short */
+        s_maxcol = (short) cw->maxcol;
 #ifdef H2344_BROKEN
         cw->offx = (cw->type == NHW_TEXT)
                        ? 0
                        : min(min(82, ttyDisplay->cols / 2),
-                             ttyDisplay->cols - cw->maxcol - 1);
+                             ttyDisplay->cols - s_maxcol - 1);
 #else
         /* avoid converting to uchar before calculations are finished */
-        cw->offx = (uchar)(int) max(
-            (int) 10, (int) (ttyDisplay->cols - cw->maxcol - 1));
+        cw->offx = (uchar) max((int) 10,
+                               (int) (ttyDisplay->cols - s_maxcol - 1));
 #endif
         if (cw->offx < 0)
             cw->offx = 0;
@@ -3008,7 +3032,8 @@ void
 tty_print_glyph(window, x, y, glyph, bkglyph)
 winid window;
 xchar x, y;
-int glyph, bkglyph;
+int glyph;
+int bkglyph UNUSED;
 {
     int ch;
     boolean reverse_on = FALSE;
@@ -3298,12 +3323,12 @@ genericptr_t ptr;
     long cond, *condptr = (long *) ptr;
     register int i;
     char *text = (char *) ptr;
-   /* Mapping BL attributes to tty attributes
-    * BL_HILITE_NONE     -1 + 3 = 2 (statusattr[2])
-    * BL_HILITE_INVERSE  -2 + 3 = 1 (statusattr[1])
-    * BL_HILITE_BOLD     -3 + 3 = 0 (statusattr[0])
-    */
-    int statusattr[] = {ATR_BOLD, ATR_INVERSE, ATR_NONE};
+    /* Mapping BL attributes to tty attributes
+     * BL_HILITE_NONE     -1 + 3 = 2 (statusattr[2])
+     * BL_HILITE_INVERSE  -2 + 3 = 1 (statusattr[1])
+     * BL_HILITE_BOLD     -3 + 3 = 0 (statusattr[0])
+     */
+    int statusattr[] = { ATR_BOLD, ATR_INVERSE, ATR_NONE };
     int attridx = 0;
     long value = -1L;
     static boolean beenhere = FALSE;
@@ -3342,18 +3367,16 @@ genericptr_t ptr;
         default:
             value = atol(text);
             Sprintf(status_vals[fldidx],
-                    status_fieldfmt[fldidx] ? status_fieldfmt[fldidx] :
-                    "%s", text);
+                    status_fieldfmt[fldidx] ? status_fieldfmt[fldidx] : "%s",
+                    text);
             break;
         }
-    }
 
 #ifdef STATUS_HILITES
-    switch (tty_status_hilites[fldidx].behavior) {
+        switch (tty_status_hilites[fldidx].behavior) {
         case BL_TH_NONE:
             tty_status_colors[fldidx] = NO_COLOR;
             break;
-
         case BL_TH_UPDOWN:
             if (chg > 0)
                 tty_status_colors[fldidx] = tty_status_hilites[fldidx].over;
@@ -3362,29 +3385,27 @@ genericptr_t ptr;
             else
                 tty_status_colors[fldidx] = NO_COLOR;
             break;
-
-        case BL_TH_VAL_PERCENTAGE:
-           {
+        case BL_TH_VAL_PERCENTAGE:  {
             int pct_th = 0;
+
             if (tty_status_hilites[fldidx].thresholdtype != ANY_INT) {
                 impossible(
                 "tty_status_update: unsupported percentage threshold type %d",
                            tty_status_hilites[fldidx].thresholdtype);
-                break;
+            } else {
+                pct_th = tty_status_hilites[fldidx].threshold.a_int;
+                tty_status_colors[fldidx] = (percent >= pct_th)
+                                           ? tty_status_hilites[fldidx].over
+                                           : tty_status_hilites[fldidx].under;
             }
-            pct_th = tty_status_hilites[fldidx].threshold.a_int;
-            tty_status_colors[fldidx] = (percent >= pct_th)
-                                  ? tty_status_hilites[fldidx].over
-                                  : tty_status_hilites[fldidx].under;
-           }
-           break;
-
-        case BL_TH_VAL_ABSOLUTE:
-           {
+            break;
+        }
+        case BL_TH_VAL_ABSOLUTE: {
             int c = NO_COLOR;
             int o = tty_status_hilites[fldidx].over;
             int u = tty_status_hilites[fldidx].under;
             anything *t = &tty_status_hilites[fldidx].threshold;
+
             switch (tty_status_hilites[fldidx].thresholdtype) {
             case ANY_LONG:
                 c = (value >= t->a_long) ? o : u;
@@ -3404,14 +3425,15 @@ genericptr_t ptr;
             default:
                 impossible(
                 "tty_status_update: unsupported absolute threshold type %d\n",
-                       tty_status_hilites[fldidx].thresholdtype);
-            break;
+                           tty_status_hilites[fldidx].thresholdtype);
+                break;
             }
             tty_status_colors[fldidx] = c;
-           }
-           break;
-    }
+            break;
+        } /* case */
+        } /* switch */
 #endif /* STATUS_HILITES */
+    }
 
     /* For now, this version copied from the genl_ version currently
      * updates everything on the display, everytime

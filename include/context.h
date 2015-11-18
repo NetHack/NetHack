@@ -1,4 +1,4 @@
-/* NetHack 3.6	context.h	$NHDT-Date: 1445215010 2015/10/19 00:36:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.27 $ */
+/* NetHack 3.6	context.h	$NHDT-Date: 1447653421 2015/11/16 05:57:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.28 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -90,6 +90,12 @@ struct tribute_info {
     /* 30 free bits */
 };
 
+struct novel_tracking { /* for choosing random passage when reading novel */
+    unsigned id;        /* novel oid from previous passage selection */
+    int count;          /* number of passage indices available in pasg[] */
+    xchar pasg[30];     /* pasg[0..count] are passage indices */
+};
+
 struct context_info {
     unsigned ident;         /* social security number for each monster */
     unsigned no_of_wizards; /* 0, 1 or 2 (wizard and his shadow) */
@@ -124,6 +130,7 @@ struct context_info {
     struct polearm_info polearm;
     struct obj_split objsplit; /* track most recently split object stack */
     struct tribute_info tribute;
+    struct novel_tracking novel;
 };
 
 extern NEARDATA struct context_info context;

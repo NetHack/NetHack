@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1446887534 2015/11/07 09:12:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.70 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1447836300 2015/11/18 08:45:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.73 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -18,7 +18,7 @@
 #pragma warning(disable : 4244)
 #endif
 
-typedef void (*select_iter_func)(int, int, genericptr_t);
+typedef void FDECL((*select_iter_func), (int, int, genericptr_t));
 
 extern void FDECL(mkmap, (lev_init *));
 
@@ -471,6 +471,7 @@ opvar_var_conversion(coder, ov)
 struct sp_coder *coder;
 struct opvar *ov;
 {
+    static const char nhFunc[] = "opvar_var_conversion";
     struct splev_var *tmp;
     struct opvar *tmpov;
     struct opvar *array_idx = NULL;
@@ -483,14 +484,15 @@ struct opvar *ov;
     while (tmp) {
         if (!strcmp(tmp->name, OV_s(ov))) {
             if ((tmp->svtyp & SPOVAR_ARRAY)) {
-                array_idx = opvar_var_conversion(
-                    coder, splev_stack_pop(coder->stack));
+                array_idx = opvar_var_conversion(coder,
+                                               splev_stack_pop(coder->stack));
                 if (!array_idx || OV_typ(array_idx) != SPOVAR_INT)
                     panic("array idx not an int");
                 if (tmp->array_len < 1)
                     panic("array len < 1");
                 OV_i(array_idx) = (OV_i(array_idx) % tmp->array_len);
                 tmpov = opvar_clone(tmp->data.arrayvalues[OV_i(array_idx)]);
+                opvar_free(array_idx);
                 return tmpov;
             } else {
                 tmpov = opvar_clone(tmp->data.value);
@@ -525,15 +527,21 @@ splev_stack_getdat(coder, typ)
 struct sp_coder *coder;
 xchar typ;
 {
+    static const char nhFunc[] = "splev_stack_getdat";
     if (coder && coder->stack) {
         struct opvar *tmp = splev_stack_pop(coder->stack);
+        struct opvar *ret = NULL;
 
         if (!tmp)
             panic("no value type %i in stack.", typ);
-        if (tmp->spovartyp == SPOVAR_VARIABLE)
-            tmp = opvar_var_conversion(coder, tmp);
+        if (tmp->spovartyp == SPOVAR_VARIABLE) {
+            ret = opvar_var_conversion(coder, tmp);
+            opvar_free(tmp);
+            tmp = ret;
+        }
         if (tmp->spovartyp == typ)
             return tmp;
+        else opvar_free(tmp);
     }
     return NULL;
 }
@@ -542,10 +550,14 @@ struct opvar *
 splev_stack_getdat_any(coder)
 struct sp_coder *coder;
 {
+    static const char nhFunc[] = "splev_stack_getdat_any";
     if (coder && coder->stack) {
         struct opvar *tmp = splev_stack_pop(coder->stack);
-        if (tmp && tmp->spovartyp == SPOVAR_VARIABLE)
-            tmp = opvar_var_conversion(coder, tmp);
+        if (tmp && tmp->spovartyp == SPOVAR_VARIABLE) {
+            struct opvar *ret = opvar_var_conversion(coder, tmp);
+            opvar_free(tmp);
+            return ret;
+        }
         return tmp;
     }
     return NULL;
@@ -963,6 +975,9 @@ packed_coord pos;
 {
     schar try_x, try_y;
     register int trycnt = 0;
+
+    if (!x || !y)
+        panic("get_free_room_loc: x or y is null");
 
     get_location_coord(&try_x, &try_y, DRY, croom, pos);
     if (levl[try_x][try_y].typ != ROOM) {
@@ -3786,7 +3801,7 @@ boolean diagonals;
     } while (0)
 #define SEL_FLOOD_CHKDIR(mx,my,sel)                  \
     if (isok((mx), (my))                             \
-        && (*selection_flood_check_func)((mx),(my))  \
+        && (*selection_flood_check_func)((mx), (my)) \
         && !selection_getpoint((mx), (my), (sel)))   \
         SEL_FLOOD((mx), (my))
     static const char floodfill_stack_overrun[] = "floodfill stack overrun";
@@ -4725,9 +4740,9 @@ struct sp_coder *coder;
         dy1 = (xchar) SP_REGION_Y1(OV_i(r));
         dx2 = (xchar) SP_REGION_X2(OV_i(r));
         dy2 = (xchar) SP_REGION_Y2(OV_i(r));
-        wallify_map(dx1 < 0 ? xstart : dx1, dy1 < 0 ? ystart : dy1,
-                    dx2 < 0 ? xstart + xsize : dx2,
-                    dy2 < 0 ? ystart + ysize : dy2);
+        wallify_map(dx1 < 0 ? (xstart-1) : dx1, dy1 < 0 ? (ystart-1) : dy1,
+                    dx2 < 0 ? (xstart + xsize + 1) : dx2,
+                    dy2 < 0 ? (ystart + ysize + 1) : dy2);
         break;
     case 1:
         if (!OV_pop_typ(r, SPOVAR_SEL))
@@ -4736,6 +4751,7 @@ struct sp_coder *coder;
         break;
     }
     opvar_free(r);
+    opvar_free(typ);
 }
 
 void

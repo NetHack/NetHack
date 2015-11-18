@@ -1,12 +1,15 @@
-/* NetHack 3.6  makedefs.c  $NHDT-Date: 1434151372 2015/06/12 23:22:52 $  $NHDT-Branch: master $:$NHDT-Revision: 1.103 $ */
+/* NetHack 3.6  makedefs.c  $NHDT-Date: 1447062431 2015/11/09 09:47:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.105 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
-/* Copyright (c) M. Stephenson, 1990, 1991.			  */
-/* Copyright (c) Dean Luick, 1990.				  */
+/* Copyright (c) M. Stephenson, 1990, 1991.                       */
+/* Copyright (c) Dean Luick, 1990.                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #define MAKEDEFS_C /* use to conditionally include file sections */
 
 #include "config.h"
+#ifdef MONITOR_HEAP
+#undef free /* makedefs doesn't use the alloc and free in src/alloc.c */
+#endif
 #include "permonst.h"
 #include "objclass.h"
 #include "monsym.h"
@@ -228,8 +231,8 @@ main(void)
 
     if (buf[0] == '-' && buf[1] == '-') {
 #if 0
-	split up buf into words
-	do_ext_makedefs(fakeargc, fakeargv);
+        split up buf into words
+        do_ext_makedefs(fakeargc, fakeargv);
 #else
         printf("extended makedefs not implemented for Mac OS9\n");
         exit(EXIT_FAILURE);
@@ -589,12 +592,12 @@ do_ext_makedefs(int argc, char **argv)
   existing lines in the docs look like that)
 
  Control lines:
- ^^	a line starting with a (single) literal caret
- ^#	a comment - the line is ignored
- ^?ID	if defined(ID)
- ^!ID	if !defined(ID)
- ^:	else
- ^.	endif
+ ^^     a line starting with a (single) literal caret
+ ^#     a comment - the line is ignored
+ ^?ID   if defined(ID)
+ ^!ID   if !defined(ID)
+ ^:     else
+ ^.     endif
 
 */
 #define GREP_MAGIC '^'
@@ -891,6 +894,7 @@ unsigned long old_rumor_offset;
            we ameliorate the latter by padding the shortest lines,
            increasing the chance of the random seek landing in them */
         int len = (int) strlen(line);
+
         if (len <= PAD_RUMORS_TO) {
             char *base = index(line, '\n');
             /* this is only safe because fgetline() overallocates */
@@ -903,8 +907,8 @@ unsigned long old_rumor_offset;
 #endif
         (*rumor_count)++;
 #if 0
-	/*[if we forced binary output, this would be sufficient]*/
-	*rumor_size += strlen(line);	/* includes newline */
+        /*[if we forced binary output, this would be sufficient]*/
+        *rumor_size += strlen(line); /* includes newline */
 #endif
         (void) fputs(xcrypt(line), tfp);
         free(line);
@@ -1204,8 +1208,8 @@ const char *build_date;
             version_string(versbuf, "."), PORT_ID, subbuf, &build_date[4]);
 #if 0
     Sprintf(outbuf, "%s NetHack%s %s Copyright 1985-%s (built %s)",
-	    PORT_ID, subbuf, version_string(versbuf,"."), RELEASE_YEAR,
-	    &build_date[4]);
+            PORT_ID, subbuf, version_string(versbuf,"."), RELEASE_YEAR,
+            &build_date[4]);
 #endif
     return outbuf;
 }
@@ -1593,21 +1597,21 @@ char *line;
 /*
  *
      New format (v3.1) of 'data' file which allows much faster lookups [pr]
-"do not edit"		first record is a comment line
-01234567		hexadecimal formatted offset to text area
-name-a			first name of interest
-123,4			offset to name's text, and number of lines for it
-name-b			next name of interest
-name-c			multiple names which share same description also
-456,7			share a single offset,count line
-.			sentinel to mark end of names
-789,0			dummy record containing offset, count of EOF
-text-a			4 lines of descriptive text for name-a
-text-a			at file position 0x01234567L + 123L
+"do not edit"           first record is a comment line
+01234567                hexadecimal formatted offset to text area
+name-a                  first name of interest
+123,4                   offset to name's text, and number of lines for it
+name-b                  next name of interest
+name-c                  multiple names which share same description also
+456,7                   share a single offset,count line
+.                       sentinel to mark end of names
+789,0                   dummy record containing offset, count of EOF
+text-a                  4 lines of descriptive text for name-a
+text-a                  at file position 0x01234567L + 123L
 text-a
 text-a
-text-b/text-c		7 lines of text for names-b and -c
-text-b/text-c		at fseek(0x01234567L + 456L)
+text-b/text-c           7 lines of text for names-b and -c
+text-b/text-c           at fseek(0x01234567L + 456L)
 ...
  *
  */
@@ -1985,7 +1989,7 @@ register struct permonst *ptr;
             return TRUE;
     }
 
-    return (FALSE);
+    return FALSE;
 }
 
 /* This routine is designed to return an integer value which represents
@@ -2001,22 +2005,22 @@ struct permonst *ptr;
     if (tmp > 49) /* special fixed hp monster */
         tmp = 2 * (tmp - 6) / 4;
 
-    /*	For creation in groups */
+    /*  For creation in groups */
     n = (!!(ptr->geno & G_SGROUP));
     n += (!!(ptr->geno & G_LGROUP)) << 1;
 
-    /*	For ranged attacks */
+    /*  For ranged attacks */
     if (ranged_attk(ptr))
         n++;
 
-    /*	For higher ac values */
+    /*  For higher ac values */
     n += (ptr->ac < 4);
     n += (ptr->ac < 0);
 
-    /*	For very fast monsters */
+    /*  For very fast monsters */
     n += (ptr->mmove >= 18);
 
-    /*	For each attack and "special" attack */
+    /*  For each attack and "special" attack */
     for (i = 0; i < NATTK; i++) {
         tmp2 = ptr->mattk[i].aatyp;
         n += (tmp2 > 0);
@@ -2024,7 +2028,7 @@ struct permonst *ptr;
         n += (tmp2 == AT_WEAP && (ptr->mflags2 & M2_STRONG));
     }
 
-    /*	For each "special" damage type */
+    /*  For each "special" damage type */
     for (i = 0; i < NATTK; i++) {
         tmp2 = ptr->mattk[i].adtyp;
         if ((tmp2 == AD_DRLI) || (tmp2 == AD_STON) || (tmp2 == AD_DRST)
@@ -2035,13 +2039,12 @@ struct permonst *ptr;
         n += ((int) (ptr->mattk[i].damd * ptr->mattk[i].damn) > 23);
     }
 
-    /*	Leprechauns are special cases.  They have many hit dice so they
-            can hit and are hard to kill, but they don't really do much
-       damage. */
+    /*  Leprechauns are special cases.  They have many hit dice so they can
+        hit and are hard to kill, but they don't really do much damage. */
     if (!strcmp(ptr->mname, "leprechaun"))
         n -= 2;
 
-    /*	Finally, adjust the monster level  0 <= n <= 24 (approx.) */
+    /*  Finally, adjust the monster level  0 <= n <= 24 (approx.) */
     if (n == 0)
         tmp--;
     else if (n >= 6)
@@ -2049,7 +2052,7 @@ struct permonst *ptr;
     else
         tmp += (n / 3 + 1);
 
-    return ((tmp >= 0) ? tmp : 0);
+    return (tmp >= 0) ? tmp : 0;
 }
 
 void
@@ -2134,7 +2137,7 @@ do_permonst()
     return;
 }
 
-/*	Start of Quest text file processing. */
+/*      Start of Quest text file processing. */
 #include "qtext.h"
 
 static struct qthdr qt_hdr;
@@ -2151,15 +2154,15 @@ qt_comment(s)
 char *s;
 {
     if (s[0] == '#')
-        return (TRUE);
-    return ((boolean)(!in_msg && strlen(s) == NO_MSG));
+        return  TRUE;
+    return (boolean) (!in_msg && strlen(s) == NO_MSG);
 }
 
 static boolean
 qt_control(s)
 char *s;
 {
-    return ((boolean)(s[0] == '%' && (s[1] == 'C' || s[1] == 'E')));
+    return (boolean) (s[0] == '%' && (s[1] == 'C' || s[1] == 'E'));
 }
 
 static int
@@ -2170,9 +2173,9 @@ char *code;
 
     for (i = 0; i < qt_hdr.n_hdr; i++)
         if (!strncmp(code, qt_hdr.id[i], LEN_HDR))
-            return (++i);
+            return ++i;
 
-    return (0);
+    return 0;
 }
 
 static boolean
@@ -2181,13 +2184,13 @@ char *code;
 {
     if (qt_hdr.n_hdr >= N_HDR) {
         Fprintf(stderr, OUT_OF_HEADERS, qt_line);
-        return (FALSE);
+        return FALSE;
     }
 
     strncpy(&qt_hdr.id[qt_hdr.n_hdr][0], code, LEN_HDR);
     msg_hdr[qt_hdr.n_hdr].n_msg = 0;
     qt_hdr.offset[qt_hdr.n_hdr++] = 0L;
-    return (TRUE);
+    return TRUE;
 }
 
 static boolean
@@ -2198,9 +2201,9 @@ int num, id;
 
     for (i = 0; i < msg_hdr[num].n_msg; i++)
         if (msg_hdr[num].qt_msg[i].msgnum == id)
-            return (TRUE);
+            return TRUE;
 
-    return (FALSE);
+    return FALSE;
 }
 
 static void
@@ -2364,7 +2367,7 @@ put_qt_hdrs()
     int i;
 
     /*
-     *	The main header record.
+     *  The main header record.
      */
     if (debug)
         Fprintf(stderr, "%ld: header info.\n", ftell(ofp));
@@ -2380,7 +2383,7 @@ put_qt_hdrs()
     }
 
     /*
-     *	The individual class headers.
+     *  The individual class headers.
      */
     for (i = 0; i < qt_hdr.n_hdr; i++) {
         if (debug)
@@ -2392,10 +2395,12 @@ put_qt_hdrs()
                       sizeof(struct qtmsg), msg_hdr[i].n_msg, ofp);
         if (debug) {
             int j;
+
             for (j = 0; j < msg_hdr[i].n_msg; j++) {
-                Fprintf(
-                    stderr, "msg %d @ %ld (%ld)", msg_hdr[i].qt_msg[j].msgnum,
-                    msg_hdr[i].qt_msg[j].offset, msg_hdr[i].qt_msg[j].size);
+                Fprintf(stderr, "msg %d @ %ld (%ld)",
+                        msg_hdr[i].qt_msg[j].msgnum,
+                        msg_hdr[i].qt_msg[j].offset,
+                        msg_hdr[i].qt_msg[j].size);
                 if (msg_hdr[i].qt_msg[j].summary_size)
                     Fprintf(stderr, " [%ld]",
                             msg_hdr[i].qt_msg[j].summary_size);

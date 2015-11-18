@@ -81,10 +81,7 @@ boolean waslit, rockit;
     lev->typ = (rockit ? STONE : ROOM);
     if (dist >= 3)
         impossible("mkcavepos called with dist %d", dist);
-    if (Blind)
-        feel_location(x, y);
-    else
-        newsym(x, y);
+    feel_newsym(x, y);
 }
 
 STATIC_OVL void
@@ -437,10 +434,7 @@ dig(VOID_ARGS)
 
         if (!does_block(dpx, dpy, &levl[dpx][dpy]))
             unblock_point(dpx, dpy); /* vision:  can see through */
-        if (Blind)
-            feel_location(dpx, dpy);
-        else
-            newsym(dpx, dpy);
+        feel_newsym(dpx, dpy);
         if (digtxt && !context.digging.quiet)
             pline1(digtxt); /* after newsym */
         if (dmgtxt)
@@ -1989,7 +1983,8 @@ long timeout;
         if (mtmp && !OBJ_AT(x, y) && mtmp->mundetected
             && hides_under(mtmp->data)) {
             mtmp->mundetected = 0;
-        }
+        } else if (x == u.ux && y == u.uy && u.uundetected && hides_under(youmonst.data))
+            (void) hideunder(&youmonst);
         newsym(x, y);
     } else if (in_invent)
         update_inventory();

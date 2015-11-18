@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1446887542 2015/11/07 09:12:22 $  $NHDT-Branch: master $:$NHDT-Revision: 1.233 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1447475947 2015/11/14 04:39:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.235 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2979,7 +2979,8 @@ STATIC_OVL void
 skiprange(range, skipstart, skipend)
 int range, *skipstart, *skipend;
 {
-    int tmp = range - (rnd(range / 4));
+    int tr = (range / 4);
+    int tmp = range - ((tr > 0) ? rnd(tr) : 0);
     *skipstart = tmp;
     *skipend = tmp - ((tmp / 4) * rnd(3));
     if (*skipend >= tmp)
@@ -4461,9 +4462,8 @@ register struct obj *obj; /* no texts here! */
     obj->owt = weight(obj);
     obj->dknown = obj->bknown = obj->rknown = 0;
     obj->known = objects[obj->otyp].oc_uses_known ? 0 : 1;
-    if (obj->oextra)
-        dealloc_oextra(obj->oextra);
-    obj->oextra = (struct oextra *) 0;
+    dealloc_oextra(obj);
+
     if (obj->where == OBJ_FLOOR) {
         obj_extract_self(obj); /* move rocks back on top */
         place_object(obj, obj->ox, obj->oy);

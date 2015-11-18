@@ -1,4 +1,4 @@
-/* NetHack 3.6	tilemap.c	$NHDT-Date: 1432512803 2015/05/25 00:13:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.24 $ */
+/* NetHack 3.6	tilemap.c	$NHDT-Date: 1447306925 2015/11/12 05:42:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.25 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -27,6 +27,8 @@ extern void FDECL(exit, (int));
 #define MON_GLYPH 1
 #define OBJ_GLYPH 2
 #define OTH_GLYPH 3 /* fortunately unnecessary */
+
+#define EXTRA_SCROLL_DESCR_COUNT ((SCR_BLANK_PAPER - SCR_STINKING_CLOUD) - 1)
 
 /* note that the ifdefs here should be the opposite sense from monst.c/
  * objects.c/rm.h
@@ -64,7 +66,7 @@ struct conditionals {
  * don't know what a slime mold should look like when renamed anyway
  */
 #ifndef MAIL
-    { OBJ_GLYPH, SCR_STINKING_CLOUD + 4, "stamped / mail" },
+    { OBJ_GLYPH, SCR_STINKING_CLOUD + EXTRA_SCROLL_DESCR_COUNT, "stamped / mail" },
 #endif
     { 0, 0, 0 }
 };

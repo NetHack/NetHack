@@ -797,7 +797,7 @@ gcrownu()
     case A_NEUTRAL:
         if (class_gift != STRANGE_OBJECT) {
             ; /* already got bonus above */
-        } else if (in_hand) {
+        } else if (obj && in_hand) {
             Your("%s goes snicker-snack!", xname(obj));
             obj->dknown = TRUE;
         } else if (!already_exists) {
@@ -819,7 +819,7 @@ gcrownu()
         Sprintf(swordbuf, "%s sword", hcolor(NH_BLACK));
         if (class_gift != STRANGE_OBJECT) {
             ; /* already got bonus above */
-        } else if (in_hand) {
+        } else if (obj && in_hand) {
             Your("%s hums ominously!", swordbuf);
             obj->dknown = TRUE;
         } else if (!already_exists) {

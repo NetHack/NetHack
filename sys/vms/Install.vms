@@ -5,18 +5,10 @@
 0.  Please read this entire file before trying to build or install
     NetHack, then read it again!
 
-1.  Building NetHack requires a C compiler (either Compaq C, DEC C,
-    VAX C, or GNU C) and VMS version V4.6 or later (but see note #9).
-    This release has been tested with Compaq C V6.4 on Alpha/VMS V7.3-1
-    and with VAX C V3.2 and GNU C 2.7.1 on VAX/VMS V5.5-2.  The build
-    procedure (vmsbuild.com) should not need to be modified; it accepts
-    an option for selecting the compiler, and it can detect different
-    versions which might require specific command qualifiers.  Versions
-    of VAXC earlier than V2.3 will produce many warning messages (about
-    200 per source file; over to 25,000 total!), but NetHack has been
-    verified to compile, link, and execute correctly when built with VAXC
-    V2.2 using vmsbuild.com.  There is also a set of Makefiles suitable for
-    use with MMS or MMK; they may or may not work with other make utilities.
+1.  Build testing was done using a recent version of HP C (aka Compaq C
+    aka--and more widely known as--DEC C).  Older versions of DEC C will
+    probably work too.  Ancient VAX C probably will not.  The set of
+    Makefiles are known to be out of date; use vmsbuild.com instead.
 
 2.  Make sure all the NetHack files are in the appropriate directory
     structure.  You should set up a directory--referred to as "top" below
@@ -43,6 +35,7 @@
         [.sys   .os2]   -- OS/2
         [.sys   .share   .sounds] -- AIFF format audio files
         [.sys   .unix]  -- guess :-)
+	[.sys   .unit    .hints] -- configuration data for setup.sh
         [.sys   .wince] -- Windows CE
         [.sys   .wince   .ceinc] -- more WinCE
         [.sys   .wince   .ceinc   .sys] -- ditto
@@ -136,10 +129,11 @@
 
 Notes:
 
-1.  Save files and bones files from 3.4.x and earlier versions 
-    will not work with 3.5.0. The scoreboard file (RECORD) from 
-    3.4.x or 3.3.x will work; one from version 3.2.x is a slightly different 
-    format but should be compatible.
+0.  Versions 3.5.0 was never publicly released.
+
+1.  Save files and bones files from 3.4.x and earlier versions
+    will not work with 3.6.0. The scoreboard file (RECORD) from
+    3.4.x or 3.3.x will work.
 
 2.  To specify user-preference options in your environment, define the
     logical name NETHACKOPTIONS to have the value of a quoted string
@@ -174,7 +168,9 @@ Notes:
     placed in the playground directory by install.com.  Also, an example
     configuration file can be found in [.win.X11]nethack.rc.)
 
-3.  Instead of using vmsbuild.com to compile and link everything, you can
+3.  [As mentioned above, the set of Makefiles is out of date so disregard
+    this note....]
+    Instead of using vmsbuild.com to compile and link everything, you can
     use the set of Makefiles found in the vms subdirectory, provided you
     have an appropriate and compatible make utility.  They've been tested
     using MMK, a freeware clone of Digital's MMS.  There are five of them,
@@ -477,3 +473,4 @@ Notes:
     and the C compiler used.
 
 20-OCT-2003
+minimally updated 9-NOV-2015...

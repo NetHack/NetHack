@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1446892448 2015/11/07 10:34:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.112 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1447475943 2015/11/14 04:39:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.113 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -79,21 +79,25 @@ newoextra()
 }
 
 void
-dealloc_oextra(x)
-struct oextra *x;
+dealloc_oextra(o)
+struct obj *o;
 {
+    struct oextra *x = o->oextra;
+
     if (x) {
         if (x->oname)
             free((genericptr_t) x->oname);
         if (x->omonst)
-            free((genericptr_t) x->omonst);
+            free_omonst(o);     /* 'o' rather than 'x' */
         if (x->omid)
             free((genericptr_t) x->omid);
         if (x->olong)
             free((genericptr_t) x->olong);
         if (x->omailcmd)
             free((genericptr_t) x->omailcmd);
+
         free((genericptr_t) x);
+        o->oextra = (struct oextra *) 0;
     }
 }
 
@@ -104,8 +108,13 @@ struct obj *otmp;
     if (!otmp->oextra)
         otmp->oextra = newoextra();
     if (!OMONST(otmp)) {
-        OMONST(otmp) = (struct monst *) alloc(sizeof (struct monst));
-        (void) memset((genericptr_t) OMONST(otmp), 0, sizeof (struct monst));
+        struct monst *m = newmonst();
+
+        /* newmonst() allocates memory but doesn't initialize anything */
+        (void) memset((genericptr_t) m, 0, sizeof (struct monst));
+        m->mextra = (struct mextra *) 0;
+        m->nmon = (struct monst *) 0;
+        OMONST(otmp) = m;
     }
 }
 
@@ -113,9 +122,15 @@ void
 free_omonst(otmp)
 struct obj *otmp;
 {
-    if (otmp->oextra && OMONST(otmp)) {
-        free((genericptr_t) OMONST(otmp));
-        OMONST(otmp) = (struct monst *) 0;
+    if (otmp->oextra) {
+        struct monst *m = OMONST(otmp);
+
+        if (m) {
+            if (m->mextra)
+                dealloc_mextra(m);
+            free((genericptr_t) m);
+            OMONST(otmp) = (struct monst *) 0;
+        }
     }
 }
 
@@ -1511,6 +1526,7 @@ struct monst *mtmp;
         newomonst(obj);
     if (has_omonst(obj)) {
         struct monst *mtmp2 = OMONST(obj);
+
         *mtmp2 = *mtmp;
         mtmp2->mextra = (struct mextra *) 0;
         if (mtmp->data)
@@ -2053,7 +2069,7 @@ struct obj *obj;
         kickedobj = 0;
 
     if (obj->oextra)
-        dealloc_oextra(obj->oextra);
+        dealloc_oextra(obj);
     free((genericptr_t) obj);
 }
 

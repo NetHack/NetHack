@@ -490,12 +490,14 @@ int
 dotele()
 {
     struct trap *trap;
+    boolean trap_once = FALSE;
 
     trap = t_at(u.ux, u.uy);
     if (trap && (!trap->tseen || trap->ttyp != TELEP_TRAP))
         trap = 0;
 
     if (trap) {
+        trap_once = trap->once; /* trap may get deleted, save this */
         if (trap->once) {
             pline("This is a vault teleport, usable once only.");
             if (yn("Jump in?") == 'n')
@@ -569,7 +571,7 @@ dotele()
     }
 
     if (next_to_u()) {
-        if (trap && trap->once)
+        if (trap && trap_once)
             vault_tele();
         else
             tele();

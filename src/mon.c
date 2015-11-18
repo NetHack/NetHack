@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1446458009 2015/11/02 09:53:29 $  $NHDT-Branch: master $:$NHDT-Revision: 1.194 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1447475944 2015/11/14 04:39:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.196 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -18,7 +18,6 @@ STATIC_DCL long FDECL(mm_aggression, (struct monst *, struct monst *));
 STATIC_DCL long FDECL(mm_displacement, (struct monst *, struct monst *));
 STATIC_DCL int NDECL(pick_animal);
 STATIC_DCL void FDECL(kill_eggs, (struct obj *));
-STATIC_DCL void FDECL(dealloc_mextra, (struct mextra *));
 STATIC_DCL int FDECL(pickvampshape, (struct monst *));
 STATIC_DCL boolean FDECL(isspecmon, (struct monst *));
 STATIC_DCL boolean FDECL(validspecmon, (struct monst *, int));
@@ -391,6 +390,8 @@ unsigned corpseflags;
         break;
     }
     /* All special cases should precede the G_NOCORPSE check */
+
+    if (!obj) return NULL;
 
     /* if polymorph or undead turning has killed this monster,
        prevent the same attack beam from hitting its corpse */
@@ -1597,10 +1598,12 @@ struct monst *mtmp2, *mtmp1;
         MCORPSENM(mtmp2) = MCORPSENM(mtmp1);
 }
 
-STATIC_OVL void
-dealloc_mextra(x)
-struct mextra *x;
+void
+dealloc_mextra(m)
+struct monst *m;
 {
+    struct mextra *x = m->mextra;
+
     if (x) {
         if (x->mname)
             free((genericptr_t) x->mname);
@@ -1615,7 +1618,9 @@ struct mextra *x;
         if (x->edog)
             free((genericptr_t) x->edog);
         /* [no action needed for x->mcorpsenm] */
+
         free((genericptr_t) x);
+        m->mextra = (struct mextra *) 0;
     }
 }
 
@@ -1626,7 +1631,7 @@ struct monst *mon;
     if (mon->nmon)
         panic("dealloc_monst with nmon");
     if (mon->mextra)
-        dealloc_mextra(mon->mextra);
+        dealloc_mextra(mon);
     free((genericptr_t) mon);
 }
 

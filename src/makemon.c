@@ -2089,7 +2089,7 @@ register struct monst *mtmp;
     }
 }
 
-/* release monster frome bag of tricks; return number of monsters created */
+/* release monster from bag of tricks; return number of monsters created */
 int
 bagotricks(bag, tipping, seencount)
 struct obj *bag;

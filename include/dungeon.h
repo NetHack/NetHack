@@ -1,4 +1,4 @@
-/* NetHack 3.6	dungeon.h	$NHDT-Date: 1436065581 2015/07/05 03:06:21 $  $NHDT-Branch: master $:$NHDT-Revision: 1.21 $ */
+/* NetHack 3.6	dungeon.h	$NHDT-Date: 1447755969 2015/11/17 10:26:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.24 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -79,12 +79,10 @@ typedef struct branch {
 
 /* branch types */
 #define BR_STAIR 0   /* "Regular" connection, 2 staircases. */
-#define BR_NO_END1 1 /* "Regular" connection.  However, no stair from  */
-                     /*	end1 to end2.  There is a stair from end2 */
-                     /*	to end1.				  */
-#define BR_NO_END2 2 /* "Regular" connection.  However, no stair from  */
-                     /*	end2 to end1.  There is a stair from end1 */
-                     /*	to end2.				  */
+#define BR_NO_END1 1 /* "Regular" connection.  However, no stair from
+                        end1 to end2.  There is a stair from end2 to end1. */
+#define BR_NO_END2 2 /* "Regular" connection.  However, no stair from
+                        end2 to end1.  There is a stair from end1 to end2. */
 #define BR_PORTAL 3  /* Connection by magic portals (traps) */
 
 /* A particular dungeon contains num_dunlevs d_levels with dlevel 1..
@@ -153,11 +151,9 @@ struct linfo {
 #define VISITED 0x01      /* hero has visited this level */
 #define FORGOTTEN 0x02    /* hero will forget this level when reached */
 #define LFILE_EXISTS 0x04 /* a level file exists for this level */
-                          /*
-                           * Note:  VISITED and LFILE_EXISTS are currently almost always set at the
-                           * same time.  However they _mean_ different things.
-                           */
-
+        /* Note:  VISITED and LFILE_EXISTS are currently almost always
+         * set at the same time.  However they _mean_ different things.
+         */
 #ifdef MFLOPPY
 #define FROMPERM 1 /* for ramdisk use */
 #define TOPERM 2   /* for ramdisk use */
@@ -171,18 +167,15 @@ struct linfo {
 
 /* types and structures for dungeon map recording
  *
- * It is designed to eliminate the need for an external notes file for some of
- * the more mundane dungeon elements.  "Where was the last altar I passed?"
- * etc...
+ * It is designed to eliminate the need for an external notes file for some
+ * mundane dungeon elements.  "Where was the last altar I passed?" etc...
  * Presumably the character can remember this sort of thing even if, months
  * later in real time picking up an old save game, I can't.
  *
  * To be consistent, one can assume that this map is in the player's mind and
  * has no physical correspondence (eliminating illiteracy/blind/hands/hands
- * free
- * concerns.) Therefore, this map is not exhaustive nor detailed ("some
- * fountains").
- * This makes it also subject to player conditions (amnesia).
+ * free concerns).  Therefore, this map is not exhaustive nor detailed ("some
+ * fountains").  This makes it also subject to player conditions (amnesia).
  */
 
 /* Because clearly Nethack needs more ways to specify alignment */

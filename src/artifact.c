@@ -1404,7 +1404,10 @@ arti_invoke(obj)
 struct obj *obj;
 {
     register const struct artifact *oart = get_artifact(obj);
-
+    if (!obj) {
+        impossible("arti_invoke without obj");
+        return 0;
+    }
     if (!oart || !oart->inv_prop) {
         if (obj->otyp == CRYSTAL_BALL)
             use_crystal_ball(&obj);

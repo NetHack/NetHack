@@ -760,10 +760,7 @@ boolean shatter;
         otmp = nxtobj(otmp, STATUE, TRUE);
     }
 
-    if (Blind)
-        feel_location(x, y);
-    else
-        newsym(x, y);
+    feel_newsym(x, y);
     return mtmp;
 }
 
@@ -3767,7 +3764,7 @@ STATIC_OVL void
 move_into_trap(ttmp)
 struct trap *ttmp;
 {
-    int bc;
+    int bc = 0;
     xchar x = ttmp->tx, y = ttmp->ty, bx, by, cx, cy;
     boolean unused;
 

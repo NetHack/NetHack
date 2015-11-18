@@ -973,10 +973,7 @@ dokick()
                 } else if (maploc->doormask != D_NODOOR
                            && !(maploc->doormask & D_LOCKED))
                     maploc->doormask = D_ISOPEN;
-                if (Blind)
-                    feel_location(x, y); /* we know it's gone */
-                else
-                    newsym(x, y);
+                feel_newsym(x, y); /* we know it's gone */
                 if (maploc->doormask == D_ISOPEN
                     || maploc->doormask == D_NODOOR)
                     unblock_point(x, y); /* vision */
@@ -989,10 +986,7 @@ dokick()
                 pline("Crash!  You kick open a secret passage!");
                 exercise(A_DEX, TRUE);
                 maploc->typ = CORR;
-                if (Blind)
-                    feel_location(x, y); /* we know it's gone */
-                else
-                    newsym(x, y);
+                feel_newsym(x, y); /* we know it's gone */
                 unblock_point(x, y); /* vision */
                 return 1;
             } else
@@ -1267,10 +1261,7 @@ dokick()
             exercise(A_STR, TRUE);
             maploc->doormask = D_BROKEN;
         }
-        if (Blind)
-            feel_location(x, y); /* we know we broke it */
-        else
-            newsym(x, y);
+        feel_newsym(x, y); /* we know we broke it */
         unblock_point(x, y); /* vision */
         if (shopdoor) {
             add_damage(x, y, 400L);

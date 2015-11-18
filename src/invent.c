@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1446516832 2015/11/03 02:13:52 $  $NHDT-Branch: master $:$NHDT-Revision: 1.178 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1447576348 2015/11/15 08:32:28 $  $NHDT-Branch: master $:$NHDT-Revision: 1.179 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1985,7 +1985,6 @@ struct obj *list, **last_found;
    then regrown to full inventory, possibly being resized in the process */
 static winid cached_pickinv_win = WIN_ERR;
 
-/* #ifdef FREE_ALL_MEMORY */
 void
 free_pickinv_cache()
 {
@@ -1994,7 +1993,6 @@ free_pickinv_cache()
         cached_pickinv_win = WIN_ERR;
     }
 }
-/* #endif */
 
 /*
  * Internal function used by display_inventory and getobj that can display

@@ -17,3 +17,6 @@ gif2txt
 txt2ppm
 tile2img.ttp
 xpm2ppm.ttp
+# dev tool for analyzing data collected by nethack's #define MONITOR_HEAP
+heaputil
+heaputil.c

@@ -1,4 +1,4 @@
-/* NetHack 3.6	objclass.h	$NHDT-Date: 1432512779 2015/05/25 00:12:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $ */
+/* NetHack 3.6	objclass.h	$NHDT-Date: 1447755971 2015/11/17 10:26:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -31,8 +31,8 @@ struct objclass {
 
     Bitfield(oc_dir, 2);
 #define NODIR 1     /* for wands/spells: non-directional */
-#define IMMEDIATE 2 /*		     directional */
-#define RAY 3       /*		     zap beams */
+#define IMMEDIATE 2 /*               directional */
+#define RAY 3       /*               zap beams */
 
 #define PIERCE 1 /* for weapons & tools used as weapons */
 #define SLASH 2  /* (latter includes iron ball & chain) */
@@ -151,17 +151,17 @@ extern NEARDATA struct objdescr obj_descr[];
 #define VENOM_CLASS 17
 #define MAXOCLASSES 18
 
-#define ALLOW_COUNT (MAXOCLASSES + 1) /* Can be used in the object class */
-#define ALL_CLASSES (MAXOCLASSES + 2) /* input to getobj(). */
-#define ALLOW_NONE (MAXOCLASSES + 3) /*				   */
+#define ALLOW_COUNT (MAXOCLASSES + 1) /* Can be used in the object class    */
+#define ALL_CLASSES (MAXOCLASSES + 2) /* input to getobj().                 */
+#define ALLOW_NONE  (MAXOCLASSES + 3)
 
-#define BURNING_OIL (MAXOCLASSES + 1) /* Can be used as input to explode. */
-#define MON_EXPLODE (MAXOCLASSES + 2) /* Exploding monster (e.g. gas spore) \
-                                         */
+#define BURNING_OIL (MAXOCLASSES + 1) /* Can be used as input to explode.   */
+#define MON_EXPLODE (MAXOCLASSES + 2) /* Exploding monster (e.g. gas spore) */
 
 #if 0 /* moved to decl.h so that makedefs.c won't see them */
-extern const struct class_sym def_oc_syms[MAXOCLASSES];	/* default class symbols */
-extern uchar oc_syms[MAXOCLASSES];		/* current class symbols */
+extern const struct class_sym
+        def_oc_syms[MAXOCLASSES];       /* default class symbols */
+extern uchar oc_syms[MAXOCLASSES];      /* current class symbols */
 #endif
 
 /* Default definitions of all object-symbols (must match classes above). */

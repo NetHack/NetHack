@@ -6,7 +6,7 @@ from or not transferred to your system if you wish.
 
 .:
 (files in top directory)
-Files           Porting         README
+DEVEL           Files           Porting         README
 
 dat:
 (files for all versions)
@@ -272,9 +272,10 @@ mnsel.uu        mnselcnt.uu     mnunsel.uu      mswproc.c
 petmark.uu      pilemark.uu     resource.h      rip.uu          splash.uu
 tiles.mak       winMS.h         winhack.c       winhack.rc
 (files for Visual Studio 2010 Express Edition builds)
-dgncomp.vcxproj  dgnstuff.vcxproj dgnstuff.mak     dlb_main.vcxproj levcomp.vcxproj
-levstuff.vcxproj levstuff.mak     makedefs.vcxproj NetHack.sln      uudecode.vcxproj
-NetHackW.vcxproj tile2bmp.vcxproj recover.vcxproj  tilemap.vcxproj  tiles.vcxproj
+dgncomp.vcxproj   dgnstuff.vcxproj  dgnstuff.mak      dlb_main.vcxproj
+levcomp.vcxproj   levstuff.vcxproj  levstuff.mak      makedefs.vcxproj
+NetHack.sln       uudecode.vcxproj  NetHackW.vcxproj  tile2bmp.vcxproj
+recover.vcxproj   tilemap.vcxproj   tiles.vcxproj
 
 This is a list of files produced by auxiliary programs.  They can all be
 regenerated from the files in the distribution.
@@ -351,6 +352,21 @@ dgn_lex.c       dgn_yacc.c      lev_lex.c       lev_yacc.c
 tiletxt.c
 (files generated for win32 at compile time)
 uudecode.exe
+
+DEVEL:
+(files for people developing changes to NetHack)
+DOTGIT			code_style.txt		nhgitset.pl
+Developer.txt		git_recipes.txt
+code_features.txt	hooksdir
+
+DEVEL/hooksdir:
+NHadd			nhsub			pre-auto-gc
+NHgithook.pm		post-applypatch		pre-commit
+NHsubst			post-checkout		pre-push
+NHtext			post-commit		pre-rebase
+TARGET			post-merge		prepare-commit-msg
+applypatch-msg		post-rewrite
+commit-msg		pre-applypatch
 
 .:
 (files for win32 that are moved into . at compile time)

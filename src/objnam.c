@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1446892450 2015/11/07 10:34:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.153 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1447490776 2015/11/14 08:46:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.154 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2364,6 +2364,13 @@ struct alt_spellings {
     { "grappling iron", GRAPPLING_HOOK },
     { "grapnel", GRAPPLING_HOOK },
     { "grapple", GRAPPLING_HOOK },
+    /* normally we wouldn't have to worry about unnecessary <space>, but
+       " stone" will get stripped off, preventing a wishymatch; that actually
+       lets "flint stone" be a match, so we also accept bogus "flintstone" */
+    { "luck stone", LUCKSTONE },
+    { "load stone", LOADSTONE },
+    { "touch stone", TOUCHSTONE },
+    { "flintstone", FLINT },
     { (const char *) 0, 0 },
 };
 
@@ -2429,7 +2436,6 @@ struct obj *no_wish;
      * "2 3 alarm chilis".  Currently this isn't allowed; options.c
      * automatically sticks 'candied' in front of such names.
      */
-
     char oclass;
     char *un, *dn, *actualn;
     const char *name = 0;
@@ -2556,35 +2562,44 @@ struct obj *no_wish;
     }
     if (!cnt)
         cnt = 1; /* %% what with "gems" etc. ? */
-    if (strlen(bp) > 1) {
-        if ((p = rindex(bp, '(')) != 0) {
-            if (p > bp && p[-1] == ' ')
-                p[-1] = 0;
-            else
-                *p = 0;
-            p++;
-            if (!strcmpi(p, "lit)")) {
-                islit = 1;
-            } else {
+    if (strlen(bp) > 1 && (p = rindex(bp, '(')) != 0) {
+        boolean keeptrailingchars = TRUE;
+
+        p[(p > bp && p[-1] == ' ') ? -1 : 0] = '\0'; /*terminate bp */
+        ++p; /* advance past '(' */
+        if (!strncmpi(p, "lit)", 4)) {
+            islit = 1;
+            p += 4 - 1; /* point at ')' */
+        } else {
+            spe = atoi(p);
+            while (digit(*p))
+                p++;
+            if (*p == ':') {
+                p++;
+                rechrg = spe;
                 spe = atoi(p);
                 while (digit(*p))
                     p++;
-                if (*p == ':') {
-                    p++;
-                    rechrg = spe;
-                    spe = atoi(p);
-                    while (digit(*p))
-                        p++;
-                }
-                if (*p != ')') {
-                    spe = rechrg = 0;
-                } else {
-                    spesgn = 1;
-                    p++;
-                    if (*p)
-                        Strcat(bp, p);
-                }
             }
+            if (*p != ')') {
+                spe = rechrg = 0;
+                /* mis-matched parentheses; rest of string will be ignored
+                 * [probably we should restore everything back to '('
+                 * instead since it might be part of "named ..."]
+                 */
+                keeptrailingchars = FALSE;
+            } else {
+                spesgn = 1;
+            }
+        }
+        if (keeptrailingchars) {
+            char *pp = eos(bp);
+
+            /* 'pp' points at 'pb's terminating '\0',
+               'p' points at ')' and will be incremented past it */
+            do {
+                *pp++ = *++p;
+            } while (*p);
         }
     }
     /*
@@ -2892,8 +2907,8 @@ retry:
             goto typfnd;
         }
 
-    if (!BSTRCMPI(bp, p - 6, " stone")) {
-        p[-6] = 0;
+    if (!BSTRCMPI(bp, p - 6, " stone") || !BSTRCMPI(bp, p - 4, " gem")) {
+        p[!strcmpi(p - 4, " gem") ? -4 : -6] = '\0';
         oclass = GEM_CLASS;
         dn = actualn = bp;
         goto srch;
@@ -2918,8 +2933,9 @@ retry:
                 goto typfnd;
             else
                 typ = 0; /* somebody changed objects[]? punt */
-        } else {         /* try to construct canonical form */
+        } else { /* try to construct canonical form */
             char tbuf[BUFSZ];
+
             Strcpy(tbuf, "worthless piece of ");
             Strcat(tbuf, g); /* assume it starts with the color */
             Strcpy(bp, tbuf);
@@ -2967,6 +2983,7 @@ srch:
     }
     if (actualn) {
         struct Jitem *j = Japanese_items;
+
         while (j->item) {
             if (actualn && !strcmpi(actualn, j->name)) {
                 typ = j->item;

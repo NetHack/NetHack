@@ -1,4 +1,4 @@
-/* NetHack 3.6	tradstdc.h	$NHDT-Date: 1432512778 2015/05/25 00:12:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.24 $ */
+/* NetHack 3.6	tradstdc.h	$NHDT-Date: 1447755973 2015/11/17 10:26:13 $  $NHDT-Branch: master $:$NHDT-Revision: 1.26 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -44,7 +44,7 @@
  * USE_STDARG means use the ANSI <stdarg.h> facilities (only ANSI compilers
  * should do this, and only if the library supports it).
  * USE_VARARGS means use the <varargs.h> facilities.  Again, this should only
- * be done if the library supports it.	ANSI is *not* required for this.
+ * be done if the library supports it.  ANSI is *not* required for this.
  * Otherwise, the kludgy old methods are used.
  * The defaults are USE_STDARG for ANSI compilers, and USE_OLDARGS for
  * others.
@@ -64,24 +64,24 @@
 #endif
 
 #ifdef NEED_VARARGS /* only define these if necessary */
-                    /*
-                     * These have changed since 3.4.3.  VA_END() now provides an explicit
-                     * closing brace to complement VA_DECL()'s hidden opening brace, so code
-                     * started with VA_DECL() needs an extra opening brace to complement
-                     * the explicit final closing brace.  This was done so that the source
-                     * would look less strange, where VA_DECL() appeared to introduce a
-                     * function whose opening brace was missing; there are now visible and
-                     * invisible braces at beginning and end.  Sample usage:
-                    void foo VA_DECL(int, arg)  --macro expansion has a hidden opening brace
-                    {  --new, explicit opening brace (actually introduces a nested block)
-                      VA_START(bar);
-                      ...code for foo...
-                      VA_END();  --expansion now provides a closing brace for the nested block
-                    }  --existing closing brace, still pairs with the hidden one in VA_DECL()
-                     * Reading the code--or using source browsing tools which match braces--
-                     * results in seeing a matched set of braces.  Usage of VA_END() is
-                     * potentially trickier, but nethack uses it in a straightforward manner.
-                     */
+/*
+ * These have changed since 3.4.3.  VA_END() now provides an explicit
+ * closing brace to complement VA_DECL()'s hidden opening brace, so code
+ * started with VA_DECL() needs an extra opening brace to complement
+ * the explicit final closing brace.  This was done so that the source
+ * would look less strange, where VA_DECL() appeared to introduce a
+ * function whose opening brace was missing; there are now visible and
+ * invisible braces at beginning and end.  Sample usage:
+ void foo VA_DECL(int, arg)  --macro expansion has a hidden opening brace
+ {  --new, explicit opening brace (actually introduces a nested block)
+ VA_START(bar);
+ ...code for foo...
+ VA_END();  --expansion now provides a closing brace for the nested block
+ }  --existing closing brace, still pairs with the hidden one in VA_DECL()
+ * Reading the code--or using source browsing tools which match braces--
+ * results in seeing a matched set of braces.  Usage of VA_END() is
+ * potentially trickier, but nethack uses it in a straightforward manner.
+ */
 
 #ifdef USE_STDARG
 #include <stdarg.h>
@@ -104,6 +104,7 @@
 #define _VA_LIST_ /* prevents multiple def in stdio.h */
 #endif
 #else
+
 #ifdef USE_VARARGS
 #include <varargs.h>
 #define VA_DECL(typ1, var1) \
@@ -125,6 +126,8 @@
     va_end(the_args); \
     }
 #else
+
+/*USE_OLDARGS*/
 #define VA_ARGS arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
 #define VA_DECL(typ1, var1)                                             \
     (var1, VA_ARGS) typ1 var1;                                          \
@@ -137,10 +140,15 @@
     {
 #define VA_START(x)
 #define VA_INIT(var1, typ1)
-/* this is inherently risky, and should only be attempted as a
+/* This is inherently risky, and should only be attempted as a
    very last resort; manipulating arguments which haven't actually
    been passed may or may not cause severe trouble depending on
-   the function-calling/argument-passing mechanism being used */
+   the function-calling/argument-passing mechanism being used.
+
+   [nethack's core doesn't use VA_NEXT() so doesn't use VA_SHIFT()
+   either, and this definition is just retained for completeness.
+   lev_comp does use VA_NEXT(), but it passes all 'argX' arguments.]
+ */
 #define VA_SHIFT()                                                    \
     (arg1 = arg2, arg2 = arg3, arg3 = arg4, arg4 = arg5, arg5 = arg6, \
      arg6 = arg7, arg7 = arg8, arg8 = arg9)

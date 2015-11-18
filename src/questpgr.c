@@ -241,7 +241,7 @@ char who,  /* 'd' => deity, 'l' => leader, 'n' => nemesis, 'o' => artifact */
     if (who == 'o'
         && (strstri(cvt_buf, "Eyes ")
             || strcmpi(cvt_buf, makesingular(cvt_buf)))) {
-        pnoun = (lwhich == 'h') ? "they" 
+        pnoun = (lwhich == 'h') ? "they"
                 : (lwhich == 'i') ? "them"
                 : (lwhich == 'j') ? "their" : "?";
     } else {

@@ -1,4 +1,4 @@
-/* NetHack 3.6	sys.c	$NHDT-Date: 1432512769 2015/05/25 00:12:49 $  $NHDT-Branch: master $:$NHDT-Revision: 1.33 $ */
+/* NetHack 3.6	sys.c	$NHDT-Date: 1447118472 2015/11/10 01:21:12 $  $NHDT-Branch: master $:$NHDT-Revision: 1.34 $ */
 /* Copyright (c) Kenneth Lorber, Kensington, Maryland, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -6,9 +6,11 @@
 
 #ifndef SYSCF
 /* !SYSCF configurations need '#define DEBUGFILES "foo.c bar.c"'
-   to enable debugging feedback for source files foo.c and bar.c;
-   to activate debugpline(), set an appropriate value and uncomment */
+ * to enable debugging feedback for source files foo.c and bar.c;
+ * to activate debugpline(), set an appropriate value and uncomment
+ */
 /* # define DEBUGFILES "*" */
+
 /* note: DEBUGFILES value here or in sysconf.DEBUGFILES can be overridden
    at runtime by setting up a value for "DEBUGFILES" in the environment */
 #endif
@@ -18,21 +20,21 @@ struct sysopt sysopt;
 void
 sys_early_init()
 {
-    sysopt.support = NULL;
-    sysopt.recover = NULL;
+    sysopt.support = (char *) 0;
+    sysopt.recover = (char *) 0;
 #ifdef SYSCF
-    sysopt.wizards = NULL;
+    sysopt.wizards = (char *) 0;
 #else
     sysopt.wizards = dupstr(WIZARD_NAME);
 #endif
 #if defined(SYSCF) || !defined(DEBUGFILES)
-    sysopt.debugfiles = NULL;
+    sysopt.debugfiles = (char *) 0;
 #else
     sysopt.debugfiles = dupstr(DEBUGFILES);
 #endif
     sysopt.env_dbgfl = 0; /* haven't checked getenv("DEBUGFILES") yet */
-    sysopt.shellers = NULL;
-    sysopt.explorers = NULL;
+    sysopt.shellers = (char *) 0;
+    sysopt.explorers = (char *) 0;
     sysopt.maxplayers = 0; /* XXX eventually replace MAX_NR_OF_PLAYERS */
 
     /* record file */
@@ -72,25 +74,31 @@ sys_early_init()
     sysopt.check_save_uid = 1;
     sysopt.seduce = 1; /* if it's compiled in, default to on */
     sysopt_seduce_set(sysopt.seduce);
+    return;
 }
 
 void
 sysopt_release()
 {
     if (sysopt.support)
-        free(sysopt.support), sysopt.support = NULL;
+        free(sysopt.support), sysopt.support = (char *) 0;
     if (sysopt.recover)
-        free(sysopt.recover), sysopt.recover = NULL;
+        free(sysopt.recover), sysopt.recover = (char *) 0;
     if (sysopt.wizards)
-        free(sysopt.wizards), sysopt.wizards = NULL;
+        free(sysopt.wizards), sysopt.wizards = (char *) 0;
+    if (sysopt.explorers)
+        free(sysopt.explorers), sysopt.explorers = (char *) 0;
+    if (sysopt.shellers)
+        free(sysopt.shellers), sysopt.shellers = (char *) 0;
     if (sysopt.debugfiles)
-        free(sysopt.debugfiles), sysopt.debugfiles = NULL;
+        free(sysopt.debugfiles), sysopt.debugfiles = (char *) 0;
 #ifdef PANICTRACE
     if (sysopt.gdbpath)
-        free(sysopt.gdbpath), sysopt.gdbpath = NULL;
+        free(sysopt.gdbpath), sysopt.gdbpath = (char *) 0;
     if (sysopt.greppath)
-        free(sysopt.greppath), sysopt.greppath = NULL;
+        free(sysopt.greppath), sysopt.greppath = (char *) 0;
 #endif
+    return;
 }
 
 extern struct attack sa_yes[NATTK];
@@ -102,8 +110,12 @@ int val;
 {
     struct attack *setval = val ? sa_yes : sa_no;
     int x;
+
     for (x = 0; x < NATTK; x++) {
         mons[PM_INCUBUS].mattk[x] = setval[x];
         mons[PM_SUCCUBUS].mattk[x] = setval[x];
     }
+    return;
 }
+
+/*sys.c*/

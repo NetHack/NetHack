@@ -959,7 +959,7 @@ int otyp;
         break;
     }
 
-    while (skills->skill != P_NONE) {
+    while (skills && skills->skill != P_NONE) {
         if (skills->skill == this_skill)
             return FALSE;
         ++skills;

@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1446516834 2015/11/03 02:13:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.513 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1447653422 2015/11/16 05:57:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.517 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -306,6 +306,7 @@ E void FDECL(map_object, (struct obj *, int));
 E void FDECL(map_invisible, (XCHAR_P, XCHAR_P));
 E void FDECL(unmap_object, (int, int));
 E void FDECL(map_location, (int, int, int));
+E void FDECL(feel_newsym, (XCHAR_P, XCHAR_P));
 E void FDECL(feel_location, (XCHAR_P, XCHAR_P));
 E void FDECL(newsym, (int, int));
 E void FDECL(shieldeff, (XCHAR_P, XCHAR_P));
@@ -765,7 +766,8 @@ E void NDECL(really_close);
 #ifdef DEBUG
 E boolean FDECL(debugcore, (const char *, BOOLEAN_P));
 #endif
-E boolean FDECL(read_tribute, (const char *, const char *, int, char *, int));
+E boolean FDECL(read_tribute, (const char *, const char *, int,
+                               char *, int, unsigned));
 E boolean FDECL(Death_quote, (char *, int));
 
 /* ### fountain.c ### */
@@ -1069,6 +1071,7 @@ E int FDECL(monhp_per_lvl, (struct monst *));
 E void FDECL(newmonhp, (struct monst *, int));
 E struct mextra *NDECL(newmextra);
 E void FDECL(copy_mextra, (struct monst *, struct monst *));
+E void FDECL(dealloc_mextra, (struct monst *));
 E struct monst *FDECL(makemon, (struct permonst *, int, int, int));
 E boolean FDECL(create_critters, (int, struct permonst *, BOOLEAN_P));
 E struct permonst *NDECL(rndmonst);
@@ -1202,7 +1205,7 @@ E const char *FDECL(waterbody_name, (XCHAR_P, XCHAR_P));
 
 E struct oextra *NDECL(newoextra);
 E void FDECL(copy_oextra, (struct obj *, struct obj *));
-E void FDECL(dealloc_oextra, (struct oextra *));
+E void FDECL(dealloc_oextra, (struct obj *));
 E void FDECL(newomonst, (struct obj *));
 E void FDECL(free_omonst, (struct obj *));
 E void FDECL(newomid, (struct obj *));
@@ -1637,6 +1640,7 @@ E void FDECL(set_option_mod_status, (const char *, int));
 E int FDECL(add_autopickup_exception, (const char *));
 E void NDECL(free_autopickup_exceptions);
 E int FDECL(load_symset, (const char *, int));
+E void NDECL(free_symsets);
 E void FDECL(parsesymbols, (char *));
 E struct symparse *FDECL(match_sym, (char *));
 E void NDECL(set_playmode);

@@ -1291,10 +1291,7 @@ struct trap *trap;
 
     trap->tseen = 1;
     exercise(A_WIS, TRUE);
-    if (Blind)
-        feel_location(trap->tx, trap->ty);
-    else
-        newsym(trap->tx, trap->ty);
+    feel_newsym(trap->tx, trap->ty);
 
     if (levl[trap->tx][trap->ty].glyph != trap_to_glyph(trap)) {
         /* There's too much clutter to see your find otherwise */

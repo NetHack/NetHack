@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.6  Makefile.top	$NHDT-Date: 1432512789 2015/05/25 00:13:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.29 $
+# NetHack 3.6  Makefile.top	$NHDT-Date: 1447844578 2015/11/18 11:02:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.32 $
 
 # Root of source tree:
 NHSROOT=.
@@ -46,14 +46,14 @@ DIRPERM  = 0755
 
 # per discussion in Install.X11 and Install.Qt
 #VARDATND = 
-# VARDATND = x11tiles NetHack.ad pet_mark.xbm
-# VARDATND = x11tiles NetHack.ad pet_mark.xbm rip.xpm
+# VARDATND = x11tiles NetHack.ad pet_mark.xbm pilemark.xpm
+# VARDATND = x11tiles NetHack.ad pet_mark.xbm pilemark.xpm rip.xpm
 # for Atari/Gem
 # VARDATND = nh16.img title.img GEM_RSC.RSC rip.img
 # for BeOS
 # VARDATND = beostiles
 # for Gnome
-# VARDATND = x11tiles pet_mark.xbm rip.xpm mapbg.xpm
+# VARDATND = x11tiles pet_mark.xbm pilemark.xpm rip.xpm mapbg.xpm
 
 VARDATD = bogusmon data engrave epitaph oracles options quest.dat rumors
 VARDAT = $(VARDATD) $(VARDATND)

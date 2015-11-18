@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.6  Makefile.dat	$NHDT-Date: 1432512788 2015/05/25 00:13:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $
+# NetHack 3.6  Makefile.dat	$NHDT-Date: 1447844574 2015/11/18 11:02:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.18 $
 
 # Root of source tree:
 NHSROOT=..
@@ -35,12 +35,15 @@ x11tiles: ../util/tile2x11 ../win/share/monsters.txt ../win/share/objects.txt \
 	../util/tile2x11 ../win/share/monsters.txt ../win/share/objects.txt \
 				../win/share/other.txt
 
-beostiles: ../util/tile2beos ../win/share/monsters.txt ../win/share/objects.txt \
+beostiles: ../util/tile2beos ../win/share/monsters.txt \
+				../win/share/objects.txt \
 				../win/share/other.txt
-	../util/tile2beos ../win/share/monsters.txt ../win/share/objects.txt \
+	../util/tile2beos ../win/share/monsters.txt \
+				../win/share/objects.txt \
 				../win/share/other.txt
 
-nhtiles.bmp: ../util/tile2bmp ../win/share/monsters.txt ../win/share/objects.txt \
+nhtiles.bmp: ../util/tile2bmp ../win/share/monsters.txt \
+				../win/share/objects.txt \
 				../win/share/other.txt
 	../util/tile2bmp $@
 
