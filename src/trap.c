@@ -3764,7 +3764,7 @@ STATIC_OVL void
 move_into_trap(ttmp)
 struct trap *ttmp;
 {
-    int bc;
+    int bc = 0;
     xchar x = ttmp->tx, y = ttmp->ty, bx, by, cx, cy;
     boolean unused;
 

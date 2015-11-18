@@ -627,7 +627,7 @@ boolean taken;
 {
     char c = 0, defquery;
     char qbuf[QBUFSZ];
-    boolean ask;
+    boolean ask = FALSE;
 
     if (invent && !done_stopprint) {
         if (taken)

@@ -64,8 +64,10 @@ lock_action()
         return actions[3]; /* same as lock_pick */
     else if (xlock.door)
         return actions[0]; /* "unlocking the door" */
-    else
+    else if (xlock.box)
         return xlock.box->otyp == CHEST ? actions[1] : actions[2];
+    else
+        return actions[3];
 }
 
 /* try to open/close a lock */

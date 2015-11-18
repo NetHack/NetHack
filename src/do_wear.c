@@ -1123,6 +1123,10 @@ register struct obj *otmp;
 {
     boolean was_blind = Blind, changed = FALSE;
 
+    if (!otmp) {
+        impossible("Blindf_off without otmp");
+        return;
+    }
     context.takeoff.mask &= ~W_TOOL;
     setworn((struct obj *) 0, otmp->owornmask);
     off_msg(otmp);

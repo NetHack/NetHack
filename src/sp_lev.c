@@ -976,6 +976,9 @@ packed_coord pos;
     schar try_x, try_y;
     register int trycnt = 0;
 
+    if (!x || !y)
+        panic("get_free_room_loc: x or y is null");
+
     get_location_coord(&try_x, &try_y, DRY, croom, pos);
     if (levl[try_x][try_y].typ != ROOM) {
         do {

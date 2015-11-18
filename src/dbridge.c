@@ -388,7 +388,7 @@ const char *verb;
     static char wholebuf[80];
 
     Strcpy(wholebuf, is_u(etmp) ? "You" : Monnam(etmp->emon));
-    if (!*verb)
+    if (!verb || !*verb)
         return wholebuf;
     Strcat(wholebuf, " ");
     if (is_u(etmp))
