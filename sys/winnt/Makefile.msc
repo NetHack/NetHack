@@ -1,4 +1,4 @@
-# NetHack 3.6	Makefile.msc	$NHDT-Date: 1447904466 2015/11/19 03:41:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.96 $ */
+# NetHack 3.6	Makefile.msc	$NHDT-Date: 1447906352 2015/11/19 04:12:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.97 $ */
 #       Copyright (c) NetHack PC Development Team 1993-2015
 #
 #==============================================================================
@@ -61,10 +61,10 @@ VSVER=0000		#untested version
 !IF ($(VSVER) >= 2013)
 #
 # 64 bit
-TARGET_CPU=x64
+#TARGET_CPU=x64
 #
 # 32 bit
-#TARGET_CPU=x86
+TARGET_CPU=x86
 
 !ELSE
 # For VS2010 use "setenv /x86" or "setenv /x64" before invoking make process
