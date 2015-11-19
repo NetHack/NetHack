@@ -1,4 +1,4 @@
-# NetHack 3.6	Makefile.msc	$NHDT-Date: 1447906352 2015/11/19 04:12:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.97 $ */
+# NetHack 3.6	Makefile.msc	$NHDT-Date: 1447937935 2015/11/19 12:58:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.98 $ */
 #       Copyright (c) NetHack PC Development Team 1993-2015
 #
 #==============================================================================
@@ -39,6 +39,8 @@
 VSVER=2015
 !ELSEIF "$(_NMAKE_VER)" == "12.00.21005.1"
 VSVER=2013
+!ELSEIF "$(_NMAKE_VER)" == "11.00.50727.1"
+VSVER=2012
 !ELSEIF "$(_NMAKE_VER)" == "10.00.40219.01"
 VSVER=2010
 !ELSE
@@ -58,7 +60,7 @@ VSVER=0000		#untested version
 # 1. 32-bit or 64-bit? (comment/uncomment appropriate TARGET_CPU line)
 #
 
-!IF ($(VSVER) >= 2013)
+!IF ($(VSVER) >= 2012)
 #
 # 64 bit
 #TARGET_CPU=x64
@@ -215,10 +217,7 @@ cflags = $(cflags1) -D_AMD64_=1 -DWIN64 -D_WIN64  -DWIN32 -D_WIN32 -W4
 scall  =
 !ENDIF
 
-!IF "$(_NMAKE_VER)" == "10.00.40219.01"
-cflags = $(cflags:-W4=-W3)
-!ENDIF
-!IF "$(_NMAKE_VER)" == "12.00.21005.1"
+!IF ($(VSVER) >= 2012)
 cflags = $(cflags:-W4=-W3)
 !ENDIF
 
@@ -232,12 +231,14 @@ cflags = $(cflags:-W4=-W3)
 !IF "$(TARGET_CPU)" == "x86"
 DLLENTRY = @12
 EXEVER=5.01
+MACHINE=/MACHINE:X86
 !ENDIF
 
 # declarations for use on AMD64 systems
 !IF "$(TARGET_CPU)" == "x64"
 DLLENTRY =
 EXEVER=5.02
+MACHINE=/MACHINE:X64
 !ENDIF
 
 # for Windows applications
@@ -261,7 +262,7 @@ INCLDIR= /I..\include
 #==========================================
 
 cflagsBuild = $(cflags) $(INCLDIR) $(WINPFLAG) $(DLBFLG)
-lflagsBuild = $(lflags) $(conlibs)
+lflagsBuild = $(lflags) $(conlibs) $(MACHINE)
 
 #==========================================
 # - Game build
