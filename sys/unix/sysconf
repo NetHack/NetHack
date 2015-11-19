@@ -1,29 +1,39 @@
-#
 # NetHack 3.6 sysconf $NHDT-Date$ $NHDT-Branch$:$NHDT-Revision$
 #
 # Sample sysconf file.
 # The sysconf file is only used if NetHack is compiled with SYSCF defined.
-# This file uses the same syntax as nethack.cf.
+# It can be used to augment or override certain settings compiled into the
+# program.
+#
+# This file can also be used to set local system defaults for run-time
+# options, using the same syntax as an individual user's ./nethackrc file.
 
-# Which users can use WIZARD (debugging) mode (the -D flag).
+# Which users can use debug mode (aka wizard mode; accessed via '-D' command
+# line flag or OPTIONS=playmode:debug in the runtime options config file).
 # A value of * allows anyone to enter debugging mode.
 WIZARDS=root games
 
-# Users allowed to use the ! (shell escape) command or to suspend the game.
-# Uses the same syntax as the WIZARDS option above.
+# Which users can use explore mode (aka discover mode; accessed via '-X'
+# command line flag or OPTIONS=playmode:explore in runtime options file or
+# via '#exploremode' command during normal play).  Same syntax as WIZARDS.
+EXPLORERS=*
+
+# Users allowed to use the '!' (shell escape) and '^Z' (suspend process)
+# commands to temporarily leave the game and enter a shell process.
+# (To resume play, use the shell command 'exit' (for most shells) to
+# return from '!' or the shell command 'fg' to return from '^Z'.
+# For the typical multi-user system where players have access to a shell
+# prompt when logged in and run the game from their own username, a value
+# of 'SHELLERS=*' is appropriate.  However, some inexperienced players
+# occasionally get stuck outside the game by accidentally typing '!' or
+# '^Z' during play and not knowing how to go back.)
+# Uses the same syntax as the WIZARDS and EXPLORERS options above.
 #SHELLERS=
 
 # Show debugging information originating from these source files.
 # Use '*' for all, or list source files separated by spaces.
-# Only available if game has been compiled with DEBUG.
-#DEBUGFILES=*
-
-# Users allowed to use #exploremode. Same syntax as WIZARDS above.
-EXPLORERS=*
-
-# Show debugging information originating from these source files.
-# Use '*' for all, or list source files separated by spaces.
-# Only available if game has been compiled with DEBUG.
+# Only available if game has been compiled with DEBUG, and can be
+# overridden via DEBUGFILES environment variable.
 #DEBUGFILES=*
 
 # Limit the number of simultaneous games (see also nethack.sh).
@@ -36,7 +46,8 @@ MAXPLAYERS=10
 # If not null, displayed at the end of a panic-save sequence.
 #RECOVER=Run the recover program.
 
-# Uncomment the next line to disable the SEDUCE option.
+# Uncomment the next line to disable the SEDUCE option, causing succubi and
+# incubi to use nypmhs' charm behavior rather than their own seduce behavior.
 #SEDUCE=0
 
 # Uncomment to disable savefile UID checking.
@@ -69,3 +80,11 @@ GREPPATH=/bin/grep
 # 2 - high priority.  Non-zero priority methods are tried in order.
 PANICTRACE_GDB=1
 PANICTRACE_LIBC=2
+
+# Ordinary run-time options can be set here to override the builtin-in
+# default values.  Unlike the SYSCF values above, individual users can
+# still choose their own option settings via NETHACKOPTIONS in their
+# environment or via ~/.nethackrc run-time configuration file.
+#OPTIONS=!autopickup,fruit:tomato,symset:DECgraphics
+
+#eof

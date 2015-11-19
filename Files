@@ -169,8 +169,8 @@ sys/unix:
 (files for UNIX versions)
 Install.unx     Makefile.dat    Makefile.doc    Makefile.src    Makefile.top
 Makefile.utl    README.linux    depend.awk      mkmkfile.sh     nethack.sh
-setup.sh        unixmain.c      unixres.c       unixunix.c
-(files for replacement cpp, apparently only needed by some UNIX systems)
+setup.sh        sysconf         unixmain.c      unixres.c       unixunix.c
+(files for replacement cpp, only needed by some ancient UNIX systems)
 cpp1.shr        cpp2.shr        cpp3.shr
 (file for sound driver for 386 UNIX)
 snd86unx.shr
@@ -211,8 +211,8 @@ sys/winnt:
 (files for Windows 9x, NT and Windows2000 version)
 Install.nt      Makefile.gcc    Makefile.msc    console.rc      defaults.nh
 nethack.def     nh340key.c      nhdefkey.c      nhico.uu        nhraykey.c
-nhsetup.bat     ntsound.c       nttty.c         porthelp        win32api.h
-winnt.c
+nhsetup.bat     ntsound.c       nttty.c         porthelp        sysconf
+win32api.h      winnt.c
 
 util:
 (files for all versions)
