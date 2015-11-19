@@ -5,7 +5,7 @@
                        NetHack 3.6 on a Windows system
          (Windows 7/8.x/10 or later only. XP may work but is untested)
          ==============================================================
-          Last revision: $NHDT-Date: 1434806470 2015/06/20 13:21:10 $
+          Last revision: $NHDT-Date: 1447977434 2015/11/19 23:57:14 $
 
 Credit for the porting of NetHack to the Win32 Console Subsystem goes to 
 the NT Porting Team started by Michael Allison.
@@ -73,21 +73,32 @@ USING VISUAL C'S IDE."
 | BUILDING FROM THE COMMAND LINE |
 \--------------------------------/
 
-You can built two different versions of NetHack for Win32 from the
-command line:
+Two different versions of NetHack will be build for Win32 from the
+command line using the Makefile approach:
     A tty port utilizing the Win32 Console I/O subsystem, Console
         NetHack;
     A Win32 native port built on the Windows API, Graphical NetHack or
         NetHackW.
 
 The executable for Console NetHack will be named NetHack.exe. The
-executable for Graphical NetHack will be named NetHackW.exe. You can opt
-to build both; they will be able to use the same datafiles, save files
-and bones files.
+executable for Graphical NetHack will be named NetHackW.exe. The 
+Makefile configuration will build both; NetHackW.exe and NetHack.exe
+will be able to use the same datafiles, save files and bones files.
+
+Since the last official release of NetHack, compilers and computer 
+architectures have evolved and you can now choose whether to build
+a 32-bit x86 version, or a 64-bit x64 version.  The default Makefile
+is set up for a 32-bit x86 version, but that's only because it will 
+run on the most number of existing Windows environments.
+
+NetHack's save files and bones files in the 3.6.0 release have not 
+evolved enough to allow them to interchange between the 32-bit version 
+and the 64-bit version (or between different platforms). Hopefully
+that will change in an upcoming release.
 
 I. Dispelling the Myths:
 
-    Compiling NetHack for Win32 is not as easy as it sounds, nor as hard
+    Compiling NetHack for Windows is not as easy as it sounds, nor as hard
     as it looks, however it will behoove you to read this entire section 
     through before beginning the task.
 
@@ -126,9 +137,40 @@ Setting Up
                  Select
                      Visual Studio Command Prompt 2013
  
+    Once you are at a command prompt, you can use one of the 
+    following sets of commands to prepare your environment for 
+    building:
+
+    For a 32-bit x86 build (like the official binary):
+        cd "\Program Files (x86)\Microsoft Visual Studio 12.0\VC"
+        vcvarsall x86
+
+    For a 64-bit x64 build:
+        cd "\Program Files (x86)\Microsoft Visual Studio 12.0\VC"
+        vcvarsall x86_amd64
+
+      -----------------------------------------------------------
+      vcvarsall.bat | Compiler   | Build-computer | Build output
+      argument      |            | architecture   | architecture
+      --------------+------------+----------------+--------------
+      X86           | x86 32-bit | x86, x64       | x86
+                    | native     |                |
+      --------------+------------+----------------+--------------
+      x86_amd64     | x64 on x86 | x86, x64       | x64
+                    | cross      |                |
+      --------------+------------+----------------+--------------
+      amd64         | x64 64-bit | x64            | x64
+                    | native     |                |
+      --------------+------------+----------------+--------------
+      amd64_x86     | x86 on     | x64            | x86
+                    | x64 cross  |                |
+      -----------------------------------------------------------
 
     For the GCC Makefile, add <mingw>\bin to your path, where <mingw> 
     is your MinGW root directory.).
+
+    Change your current directory to src subfolder of the nethack tree.
+        cd src
 
 2.  Make sure all the NetHack files are in the appropriate directory
     structure.  You should have a main directory with subdirectories
@@ -191,16 +233,8 @@ Setting Up
     You may include all or as few of the special game features as you
     wish (they are located last in the file).
 
-4.  Edit your Makefile. 
-
-    For building Console NetHack, ensure that GRAPHICAL is set to "N",
-    or commented out. For building Graphical NetHack, set GRAPHICAL to
-    "Y".
-
-    Optional step:
-        If you elected not to use the high-quality BSD random number
-        routines by commenting out RANDOM in ntconf.h, comment out (or
-        set equal to nothing) the RANDOM macro in your Makefile.
+4.  Edit your Makefile if you wish, but it is not required unless
+    you are altering the build options.
 
     If you are recompiling after patching your sources, or if you got
     your files from somewhere other than the official distribution,
@@ -212,15 +246,11 @@ Compiling
 
 5.  Now that everything is set up...
 
-    For Visual Studio 2013 Express, as mentioned above, the installation should 
-    have placed a command prompt option on the Start menus that is properly configured
-    for building: 
-        From
-               Start | All Programs | Microsoft Visual Studio 2013 Express
-        Select
-               Visual Studio Command Prompt 2013
-	Change your current directory to the NetHack src directory.
-	Issue this command:
+    For Visual Studio 2013 Express, as mentioned above, you should now be
+    at the command prompt to carry out the build and your current 
+    directory should be the src subdirectory in the NetHack source tree.
+
+    In the src subdirectory, issue this command:
 	        nmake install
 
     For GCC:
