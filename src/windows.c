@@ -1,4 +1,4 @@
-/* NetHack 3.6	windows.c	$NHDT-Date: 1433806591 2015/06/08 23:36:31 $  $NHDT-Branch: master $:$NHDT-Revision: 1.34 $ */
+/* NetHack 3.6	windows.c	$NHDT-Date: 1448013599 2015/11/20 09:59:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.35 $ */
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -7,8 +7,8 @@
 #include "wintty.h"
 #endif
 #ifdef X11_GRAPHICS
-/* cannot just blindly include winX.h without including all of X11 stuff */
-/* and must get the order of include files right.  Don't bother */
+/* Cannot just blindly include winX.h without including all of X11 stuff
+   and must get the order of include files right.  Don't bother. */
 extern struct window_procs X11_procs;
 extern void FDECL(win_X11_init, (int));
 #endif
@@ -27,7 +27,7 @@ extern void FDECL(be_win_init, (int));
 FAIL /* be_win_init doesn't exist? XXX*/
 #endif
 #ifdef AMIGA_INTUITION
-    extern struct window_procs amii_procs;
+extern struct window_procs amii_procs;
 extern struct window_procs amiv_procs;
 extern void FDECL(ami_wininit_data, (int));
 #endif
@@ -155,7 +155,7 @@ wl_addtail(struct winlink *wl)
     p->nextlink = wl;
     return;
 }
-#endif
+#endif /* WINCHAIN */
 
 static struct win_choices *last_winchoice = 0;
 
@@ -191,8 +191,7 @@ const char *s;
             return &winchoices[i];
         }
     }
-
-    return NULL;
+    return (struct win_choices *) 0;
 }
 #endif
 
@@ -348,7 +347,7 @@ commit_windowchain()
         p = np; /* assignment, not proof */
     }
 }
-#endif
+#endif /* WINCHAIN */
 
 /*
  * tty_message_menu() provides a means to get feedback from the
@@ -401,23 +400,24 @@ genl_putmsghistory(msg, is_restoring)
 const char *msg;
 boolean is_restoring;
 {
-/* window ports can provide
-   their own putmsghistory() routine to
-   load message history from a saved game.
-   The routine is called repeatedly from
-   the core restore routine, starting with
-   the oldest saved message first, and
-   finishing with the latest.
-   The window port routine is expected to
-   load the message recall buffers in such
-   a way that the ordering is preserved.
-   The window port routine should make no
-   assumptions about how many messages are
-   forthcoming, nor should it assume that
-   another message will follow this one,
-   so it should keep all pointers/indexes
-   intact at the end of each call.
- */
+    /* window ports can provide
+       their own putmsghistory() routine to
+       load message history from a saved game.
+       The routine is called repeatedly from
+       the core restore routine, starting with
+       the oldest saved message first, and
+       finishing with the latest.
+       The window port routine is expected to
+       load the message recall buffers in such
+       a way that the ordering is preserved.
+       The window port routine should make no
+       assumptions about how many messages are
+       forthcoming, nor should it assume that
+       another message will follow this one,
+       so it should keep all pointers/indexes
+       intact at the end of each call.
+    */
+
     /* this doesn't provide for reloading the message window with the
        previous session's messages upon restore, but it does put the quest
        message summary lines there by treating them as ordinary messages */
@@ -470,7 +470,8 @@ static void FDECL(hup_void_fdecl_winid, (winid));
 static void FDECL(hup_void_fdecl_constchar_p, (const char *));
 
 static struct window_procs hup_procs = {
-    "hup", 0L, 0L, hup_init_nhwindows, hup_void_ndecl, /* player_selection */
+    "hup", 0L, 0L, hup_init_nhwindows,
+    hup_void_ndecl,                                    /* player_selection */
     hup_void_ndecl,                                    /* askname */
     hup_void_ndecl,                                    /* get_nh_event */
     hup_exit_nhwindows, hup_void_fdecl_constchar_p,    /* suspend_nhwindows */
@@ -480,39 +481,39 @@ static struct window_procs hup_procs = {
     hup_curs, hup_putstr, hup_putstr,                  /* putmixed */
     hup_display_file, hup_void_fdecl_winid,            /* start_menu */
     hup_add_menu, hup_end_menu, hup_select_menu, genl_message_menu,
-    hup_void_ndecl, /* update_inventory */
-    hup_void_ndecl, /* mark_synch */
-    hup_void_ndecl, /* wait_synch */
+    hup_void_ndecl,                                    /* update_inventory */
+    hup_void_ndecl,                                    /* mark_synch */
+    hup_void_ndecl,                                    /* wait_synch */
 #ifdef CLIPPING
     hup_cliparound,
 #endif
 #ifdef POSITIONBAR
-    (void FDECL(
-        (*), (char *))) hup_void_fdecl_constchar_p, /* update_positionbar */
+    (void FDECL((*), (char *))) hup_void_fdecl_constchar_p,
+                                                      /* update_positionbar */
 #endif
     hup_print_glyph,
-    hup_void_fdecl_constchar_p,                 /* raw_print */
-    hup_void_fdecl_constchar_p,                 /* raw_print_bold */
-    hup_nhgetch, hup_nh_poskey, hup_void_ndecl, /* nhbell  */
-    hup_int_ndecl,                              /* doprev_message */
-    hup_yn_function, hup_getlin, hup_int_ndecl, /* get_ext_cmd */
-    hup_void_fdecl_int,                         /* number_pad */
-    hup_void_ndecl,                             /* delay_output  */
+    hup_void_fdecl_constchar_p,                       /* raw_print */
+    hup_void_fdecl_constchar_p,                       /* raw_print_bold */
+    hup_nhgetch, hup_nh_poskey, hup_void_ndecl,       /* nhbell  */
+    hup_int_ndecl,                                    /* doprev_message */
+    hup_yn_function, hup_getlin, hup_int_ndecl,       /* get_ext_cmd */
+    hup_void_fdecl_int,                               /* number_pad */
+    hup_void_ndecl,                                   /* delay_output  */
 #ifdef CHANGE_COLOR
     hup_change_color,
 #ifdef MAC
-    hup_void_fdecl_int, /* change_background */
+    hup_void_fdecl_int,                               /* change_background */
     hup_set_font_name,
 #endif
     hup_get_color_string,
-#endif              /* CHANGE_COLOR */
-    hup_void_ndecl, /* start_screen */
-    hup_void_ndecl, /* end_screen */
+#endif /* CHANGE_COLOR */
+    hup_void_ndecl,                                   /* start_screen */
+    hup_void_ndecl,                                   /* end_screen */
     hup_outrip, genl_preference_update, genl_getmsghistory,
     genl_putmsghistory,
 #ifdef STATUS_VIA_WINDOWPORT
-    hup_void_ndecl, /* status_init */
-    hup_void_ndecl, /* status_finish */
+    hup_void_ndecl,                                   /* status_init */
+    hup_void_ndecl,                                   /* status_finish */
     genl_status_enablefield, hup_status_update,
 #ifdef STATUS_HILITES
     genl_status_threshold,
@@ -801,9 +802,9 @@ const char *string UNUSED;
 
 #ifdef STATUS_VIA_WINDOWPORT
 
-/*****************************************************************************/
-/* genl backward compat stuff                                                */
-/*****************************************************************************/
+/****************************************************************************/
+/* genl backward compat stuff                                               */
+/****************************************************************************/
 
 const char *status_fieldnm[MAXBLSTATS];
 const char *status_fieldfmt[MAXBLSTATS];
@@ -864,10 +865,11 @@ genericptr_t ptr;
 
     enum statusfields fieldorder[2][15] = {
         { BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
-          BL_SCORE, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH},
+          BL_SCORE, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH,
+          BL_FLUSH },
         { BL_LEVELDESC, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX,
           BL_AC, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER,
-          BL_CAP, BL_CONDITION, BL_FLUSH}
+          BL_CAP, BL_CONDITION, BL_FLUSH }
     };
 
     if (idx != BL_FLUSH) {
@@ -893,7 +895,8 @@ genericptr_t ptr;
                 Strcat(status_vals[idx], " Slime");
             break;
         default:
-            Sprintf(status_vals[idx], status_fieldfmt[idx] ? status_fieldfmt[idx] : "%s", text);
+            Sprintf(status_vals[idx],
+                    status_fieldfmt[idx] ? status_fieldfmt[idx] : "%s", text);
             break;
         }
     }

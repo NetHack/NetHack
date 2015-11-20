@@ -1,4 +1,4 @@
-/* NetHack 3.6	topten.c	$NHDT-Date: 1446887536 2015/11/07 09:12:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.38 $ */
+/* NetHack 3.6	topten.c	$NHDT-Date: 1448013597 2015/11/20 09:59:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.39 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -103,12 +103,12 @@ int how;
     switch (killer.format) {
     default:
         impossible("bad killer format? (%d)", killer.format);
-    /*FALLTHRU*/
+        /*FALLTHRU*/
     case NO_KILLER_PREFIX:
         break;
     case KILLED_BY_AN:
         kname = an(kname);
-    /*FALLTHRU*/
+        /*FALLTHRU*/
     case KILLED_BY:
         (void) strncat(buf, killed_by_prefix[how], siz - 1);
         l = strlen(buf);
@@ -325,7 +325,8 @@ struct toptenentry *tt;
             buf, /* (already includes separator) */
             XLOG_SEP, plname, XLOG_SEP, tt->death);
     if (multi)
-        Fprintf(rfile, "%cwhile=%s", XLOG_SEP, multi_reason ? multi_reason : "helpless");
+        Fprintf(rfile, "%cwhile=%s", XLOG_SEP,
+                multi_reason ? multi_reason : "helpless");
     Fprintf(rfile, "%cconduct=0x%lx%cturns=%ld%cachieve=0x%lx", XLOG_SEP,
             encodeconduct(), XLOG_SEP, moves, XLOG_SEP, encodeachieve());
     Fprintf(rfile, "%crealtime=%ld%cstarttime=%ld%cendtime=%ld", XLOG_SEP,
@@ -458,11 +459,11 @@ time_t when;
     FILE *xlfile;
 #endif /* XLOGFILE */
 
-/* Under DICE 3.0, this crashes the system consistently, apparently due to
- * corruption of *rfile somewhere.  Until I figure this out, just cut out
- * topten support entirely - at least then the game exits cleanly.  --AC
- */
 #ifdef _DCC
+    /* Under DICE 3.0, this crashes the system consistently, apparently due to
+     * corruption of *rfile somewhere.  Until I figure this out, just cut out
+     * topten support entirely - at least then the game exits cleanly.  --AC
+     */
     return;
 #endif
 
@@ -489,17 +490,17 @@ time_t when;
     /* create a new 'topten' entry */
     t0_used = FALSE;
     t0 = newttentry();
+    t0->ver_major = VERSION_MAJOR;
+    t0->ver_minor = VERSION_MINOR;
+    t0->patchlevel = PATCHLEVEL;
+    t0->points = u.urexp;
+    t0->deathdnum = u.uz.dnum;
     /* deepest_lev_reached() is in terms of depth(), and reporting the
      * deepest level reached in the dungeon death occurred in doesn't
      * seem right, so we have to report the death level in depth() terms
      * as well (which also seems reasonable since that's all the player
      * sees on the screen anyway)
      */
-    t0->ver_major = VERSION_MAJOR;
-    t0->ver_minor = VERSION_MINOR;
-    t0->patchlevel = PATCHLEVEL;
-    t0->points = u.urexp;
-    t0->deathdnum = u.uz.dnum;
     t0->deathlev = observable_depth(&u.uz);
     t0->maxlvl = deepest_lev_reached(TRUE);
     t0->hp = u.uhp;
@@ -545,8 +546,7 @@ time_t when;
 
     if (wizard || discover) {
         if (how != PANICKED)
-            HUP
-            {
+            HUP {
                 char pbuf[BUFSZ];
                 topten_print("");
                 Sprintf(pbuf,
@@ -711,6 +711,7 @@ time_t when;
         t1->ver_major = t1->ver_minor = t1->patchlevel = 0;
         t1->uid = t1->deathdnum = t1->deathlev = 0;
         t1->maxlvl = t1->hp = t1->maxhp = t1->deaths = 0;
+        t1->uid = 0;
         t1->plrole[0] = t1->plrace[0] = t1->plgend[0] = t1->plalign[0] = '-';
         t1->plrole[1] = t1->plrace[1] = t1->plgend[1] = t1->plalign[1] = 0;
         t1->birthdate = t1->deathdate = yyyymmdd((time_t) 0L);
@@ -989,6 +990,7 @@ char **argv;
 #ifdef AMIGA
     {
         extern winid amii_rawprwin;
+
         init_nhwindows(&argc, argv);
         amii_rawprwin = create_nhwindow(NHW_TEXT);
     }

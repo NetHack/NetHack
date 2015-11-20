@@ -1,4 +1,4 @@
-/* NetHack 3.6	vision.c	$NHDT-Date: 1446861773 2015/11/07 02:02:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.26 $ */
+/* NetHack 3.6	vision.c	$NHDT-Date: 1448013598 2015/11/20 09:59:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.27 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Dave Cohrs, 1990. */
 /* NetHack may be freely redistributed.  See license for details.       */
 
@@ -65,7 +65,7 @@ char circle_start[] = {
     /*15*/ 119,
 };
 
-/*===========================================================================*/
+/*==========================================================================*/
 /* Vision (arbitrary line of sight)
  * =========================================*/
 
@@ -97,9 +97,9 @@ static char right_ptrs[ROWNO][COLNO];
 STATIC_DCL void FDECL(fill_point, (int, int));
 STATIC_DCL void FDECL(dig_point, (int, int));
 STATIC_DCL void NDECL(view_init);
-STATIC_DCL void FDECL(view_from,
-                      (int, int, char **, char *, char *, int,
-                       void (*)(int, int, genericptr_t), genericptr_t));
+STATIC_DCL void FDECL(view_from, (int, int, char **, char *, char *, int,
+                                  void (*)(int, int, genericptr_t),
+                                  genericptr_t));
 STATIC_DCL void FDECL(get_unused_cs, (char ***, char **, char **));
 STATIC_DCL void FDECL(rogue_vision, (char **, char *, char *));
 
@@ -140,8 +140,8 @@ vision_init()
 
 #ifdef VISION_TABLES
     /* Note:  this initializer doesn't do anything except guarantee that
-              we're linked properly.
-    */
+     *        we're linked properly.
+     */
     vis_tab_init();
 #endif
 }
@@ -349,7 +349,7 @@ char *rmin, *rmax;
     }
 }
 
-    /*#define EXTEND_SPINE*/ /* possibly better looking wall-angle */
+/*#define EXTEND_SPINE*/ /* possibly better looking wall-angle */
 
 #ifdef EXTEND_SPINE
 
@@ -534,7 +534,7 @@ int control;
     /* You see nothing, nothing can see you --- if swallowed or refreshing. */
     if (u.uswallow || control == 2) {
         /* do nothing -- get_unused_cs() nulls out the new work area */
-
+        ;
     } else if (Blind) {
         /*
          * Calculate the could_see array even when blind so that monsters
@@ -594,10 +594,9 @@ int control;
                     next_rmax[row] = max(next_rmax[row], col);
                     next_array[row][col] = IN_SIGHT | COULD_SEE;
                 }
-        }
 
         /* if in a pit, just update for immediate locations */
-        else if (u.utrap && u.utraptype == TT_PIT) {
+        } else if (u.utrap && u.utraptype == TT_PIT) {
             for (row = u.uy - 1; row <= u.uy + 1; row++) {
                 if (row < 0)
                     continue;
@@ -741,9 +740,8 @@ int control;
                 /* Update pos if previously not in sight or new angle. */
                 if (!(old_row[col] & IN_SIGHT) || oldseenv != lev->seenv)
                     newsym(col, row);
-            }
 
-            else if ((next_row[col] & COULD_SEE)
+            } else if ((next_row[col] & COULD_SEE)
                      && (lev->lit || (next_row[col] & TEMP_LIT))) {
                 /*
                  * We see this position because it is lit.
@@ -795,7 +793,7 @@ int control;
                  */
                 lev->waslit = 0; /* remember lit condition */
                 newsym(col, row);
-            }
+
             /*
              * At this point we know that the row position is *not* in normal
              * sight.  That is, the position is could be seen, but is dark
@@ -806,10 +804,10 @@ int control;
              *   the glyph -- E.g. darken room spot, etc.
              * o If we now could see the location (yet the location is not
              *   lit), but previously we couldn't see the location, or vice
-             *   versa.  Update the spot because there there may be an infrared
-             *   monster there.
+             *   versa.  Update the spot because there there may be an
+             *   infrared monster there.
              */
-            else {
+            } else {
             not_in_sight:
                 if ((old_row[col] & IN_SIGHT)
                     || ((next_row[col] & COULD_SEE)
@@ -878,17 +876,17 @@ int x, y;
         vision_full_recalc = 1;
 }
 
-/*===========================================================================*\
- |                                                                           |
- |      Everything below this line uses (y,x) instead of (x,y) --- the       |
- |      algorithms are faster if they are less recursive and can scan        |
- |      on a row longer.                                                     |
- |                                                                           |
-\*===========================================================================*/
+/*==========================================================================*\
+ |                                                                          |
+ |      Everything below this line uses (y,x) instead of (x,y) --- the      |
+ |      algorithms are faster if they are less recursive and can scan       |
+ |      on a row longer.                                                    |
+ |                                                                          |
+\*==========================================================================*/
 
-/* ======================================================================== *\
+/* ======================================================================= *\
                         Left and Right Pointer Updates
-\* ======================================================================== */
+\* ======================================================================= */
 
 /*
  *              LEFT and RIGHT pointer rules
@@ -956,12 +954,11 @@ int row, col;
             for (i = left_ptrs[row][COLNO - 2]; i < COLNO - 1; i++)
                 right_ptrs[row][i] = COLNO - 2;
         }
-    }
 
     /*
      * At this point, we know we aren't on the boundaries.
      */
-    else if (viz_clear[row][col - 1] && viz_clear[row][col + 1]) {
+    } else if (viz_clear[row][col - 1] && viz_clear[row][col + 1]) {
         /* Both sides clear */
         for (i = left_ptrs[row][col - 1]; i <= col; i++) {
             if (!viz_clear[row][i])
@@ -1038,12 +1035,11 @@ int row, col;
             for (i = left_ptrs[row][COLNO - 2]; i < COLNO - 1; i++)
                 right_ptrs[row][i] = COLNO - 1;
         }
-    }
 
     /*
      * Else we know that we are not on an edge.
      */
-    else if (viz_clear[row][col - 1] && viz_clear[row][col + 1]) {
+    } else if (viz_clear[row][col - 1] && viz_clear[row][col + 1]) {
         /* Both sides clear */
         for (i = left_ptrs[row][col - 1] + 1; i <= col; i++)
             right_ptrs[row][i] = col;
@@ -1093,8 +1089,8 @@ int row, col;
     }
 }
 
-/*===========================================================================*/
-/*===========================================================================*/
+/*==========================================================================*/
+/*==========================================================================*/
 /* Use either algorithm C or D.  See the config.h for more details.
  * =========*/
 
@@ -1355,7 +1351,7 @@ static genericptr_t varg;
         result = 1;                                  \
     }
 
-#else /* quadrants are really functions */
+#else /* !MACRO_CPATH -- quadrants are really functions */
 
 STATIC_DCL int FDECL(_q1_path, (int, int, int, int));
 STATIC_DCL int FDECL(_q2_path, (int, int, int, int));
@@ -1559,7 +1555,7 @@ int scol, srow, y2, x2;
     return 1;
 }
 
-#endif /* quadrants are functions */
+#endif /* ?MACRO_CPATH */
 
 /*
  * Use vision tables to determine if there is a clear path from
@@ -1596,10 +1592,10 @@ cleardone:
 }
 
 #ifdef VISION_TABLES
-/*===========================================================================*\
+/*==========================================================================*\
                             GENERAL LINE OF SIGHT
                                 Algorithm D
-\*===========================================================================*/
+\*==========================================================================*/
 
 /*
  * Indicate caller for the shadow routines.
@@ -1616,8 +1612,8 @@ cleardone:
 static close2d *close_dy[CLOSE_MAX_BC_DY];
 static far2d *far_dy[FAR_MAX_BC_DY];
 
-STATIC_DCL void FDECL(right_side,
-                      (int, int, int, int, int, int, int, char *));
+STATIC_DCL void FDECL(right_side,  (int, int, int, int, int,
+                                    int, int, char *));
 STATIC_DCL void FDECL(left_side, (int, int, int, int, int, int, int, char *));
 STATIC_DCL int FDECL(close_shadow, (int, int, int, int));
 STATIC_DCL int FDECL(far_shadow, (int, int, int, int));
@@ -1966,12 +1962,12 @@ char *limits;       /* points at range limit for current row, or NULL */
             hit_stone = 1;
 
             left = loc_right + 1;
-        }
+
         /*
          * The opening extends beyond the right mark.  This means that
          * the next far block is the current far block.
          */
-        else {
+        } else {
             if (vis_func) {
                 for (i = left; i <= right_shadow; i++)
                     (*vis_func)(i, row, varg);
@@ -2169,9 +2165,9 @@ char *limits;
 
             hit_stone = 1; /* needed for walls of width 1 */
             right = loc_left - 1;
-        }
+
         /*  The opening extends beyond the left mark. */
-        else {
+        } else {
             if (vis_func) {
                 for (i = left_shadow; i <= right; i++)
                     (*vis_func)(i, row, varg);
@@ -2292,10 +2288,10 @@ genericptr_t arg;
 
 #else /*===== End of algorithm D =====*/
 
-/*===========================================================================*\
+/*==========================================================================*\
                             GENERAL LINE OF SIGHT
                                 Algorithm C
-\*===========================================================================*/
+\*==========================================================================*/
 
 /*
  * Defines local to Algorithm C.
@@ -2418,9 +2414,9 @@ char *limits;   /* points at range limit for current row, or NULL */
             if (left > lim_max)
                 return;            /* check (1) */
             if (left == lim_max) { /* check (2) */
-                if (vis_func)
+                if (vis_func) {
                     (*vis_func)(lim_max, row, varg);
-                else {
+                } else {
                     set_cs(rowp, lim_max);
                     set_max(lim_max);
                 }
@@ -2483,10 +2479,10 @@ char *limits;   /* points at range limit for current row, or NULL */
             if (right > lim_max)
                 right = lim_max;
             /* set the bits */
-            if (vis_func)
+            if (vis_func) {
                 for (i = left; i <= right; i++)
                     (*vis_func)(i, row, varg);
-            else {
+            } else {
                 for (i = left; i <= right; i++)
                     set_cs(rowp, i);
                 set_min(left);
@@ -2579,9 +2575,9 @@ char *limits;
             if (right < lim_min)
                 return;
             if (right == lim_min) {
-                if (vis_func)
+                if (vis_func) {
                     (*vis_func)(lim_min, row, varg);
-                else {
+                } else {
                     set_cs(rowp, lim_min);
                     set_min(lim_min);
                 }
@@ -2618,10 +2614,10 @@ char *limits;
 
             if (left < lim_min)
                 left = lim_min;
-            if (vis_func)
+            if (vis_func) {
                 for (i = left; i <= right; i++)
                     (*vis_func)(i, row, varg);
-            else {
+            } else {
                 for (i = left; i <= right; i++)
                     set_cs(rowp, i);
                 set_min(left);
@@ -2754,10 +2750,10 @@ void FDECL((*func), (int, int, genericptr_t));
 genericptr_t arg;
 {
     /* If not centered on hero, do the hard work of figuring the area */
-    if (scol != u.ux || srow != u.uy)
+    if (scol != u.ux || srow != u.uy) {
         view_from(srow, scol, (char **) 0, (char *) 0, (char *) 0, range,
                   func, arg);
-    else {
+    } else {
         register int x;
         int y, min_x, max_x, max_y, offset;
         char *limits;

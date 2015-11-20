@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1446604114 2015/11/04 02:28:34 $  $NHDT-Branch: master $:$NHDT-Revision: 1.39 $ */
+/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1448013594 2015/11/20 09:59:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.41 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -16,13 +16,24 @@ STATIC_DCL boolean FDECL(is_solid, (int, int));
 STATIC_DCL int FDECL(extend_spine, (int[3][3], int, int, int));
 STATIC_DCL boolean FDECL(okay, (int, int, int));
 STATIC_DCL void FDECL(maze0xy, (coord *));
-STATIC_DCL boolean
-FDECL(put_lregion_here, (XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P,
-                         XCHAR_P, BOOLEAN_P, d_level *));
+STATIC_DCL boolean FDECL(put_lregion_here, (XCHAR_P, XCHAR_P, XCHAR_P,
+                                            XCHAR_P, XCHAR_P, XCHAR_P,
+                                            XCHAR_P, BOOLEAN_P, d_level *));
 STATIC_DCL void NDECL(fixup_special);
-STATIC_DCL void FDECL(move, (int *, int *, int));
 STATIC_DCL void NDECL(setup_waterlevel);
 STATIC_DCL void NDECL(unsetup_waterlevel);
+
+/* adjust a coordinate one step in the specified direction */
+#define mz_move(X, Y, dir) \
+    do {                                                         \
+        switch (dir) {                                           \
+        case 0:  --(Y);  break;                                  \
+        case 1:  (X)++;  break;                                  \
+        case 2:  (Y)++;  break;                                  \
+        case 3:  --(X);  break;                                  \
+        default: panic("mz_move: bad direction %d", dir);        \
+        }                                                        \
+    } while (0)
 
 STATIC_OVL boolean
 iswall(x, y)
@@ -195,8 +206,8 @@ okay(x, y, dir)
 int x, y;
 register int dir;
 {
-    move(&x, &y, dir);
-    move(&x, &y, dir);
+    mz_move(x, y, dir);
+    mz_move(x, y, dir);
     if (x < 3 || y < 3 || x > x_maze_max || y > y_maze_max
         || levl[x][y].typ != 0)
         return FALSE;
@@ -697,9 +708,9 @@ schar typ;
             pos--;
         else {
             dir = dirs[rn2(q)];
-            move(&x, &y, dir);
+            mz_move(x, y, dir);
             levl[x][y].typ = typ;
-            move(&x, &y, dir);
+            mz_move(x, y, dir);
             pos++;
             if (pos > CELLS)
                 panic("Overflow in walkfrom");
@@ -708,7 +719,7 @@ schar typ;
         }
     }
 }
-#else
+#else /* !MICRO */
 
 void
 walkfrom(x, y, typ)
@@ -739,36 +750,13 @@ schar typ;
         if (!q)
             return;
         dir = dirs[rn2(q)];
-        move(&x, &y, dir);
+        mz_move(x, y, dir);
         levl[x][y].typ = typ;
-        move(&x, &y, dir);
+        mz_move(x, y, dir);
         walkfrom(x, y, typ);
     }
 }
-#endif /* MICRO */
-
-STATIC_OVL void
-move(x, y, dir)
-register int *x, *y;
-register int dir;
-{
-    switch (dir) {
-    case 0:
-        --(*y);
-        break;
-    case 1:
-        (*x)++;
-        break;
-    case 2:
-        (*y)++;
-        break;
-    case 3:
-        --(*x);
-        break;
-    default:
-        panic("move: bad direction");
-    }
-}
+#endif /* ?MICRO */
 
 /* find random point in generated corridors,
    so we don't create items in moats, bunkers, or walls */
