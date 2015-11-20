@@ -5,7 +5,7 @@
                        NetHack 3.6 on a Windows system
          (Windows 7/8.x/10 or later only. XP may work but is untested)
          ==============================================================
-          Last revision: $NHDT-Date: 1447977434 2015/11/19 23:57:14 $
+          Last revision: $NHDT-Date: 1447979316 2015/11/20 00:28:36 $
 
 Credit for the porting of NetHack to the Win32 Console Subsystem goes to 
 the NT Porting Team started by Michael Allison.
@@ -18,9 +18,8 @@ The PC Windows porting team consisting of Michael Allison, David Cohrs,
 Alex Kompel, Dion Nicolaas, Yitzhak Sapir, and Janet Walz maintained the 
 tty and graphical win32 versions of NetHack 3.6.0.
 
-You can build either the TTY version of NetHack or the Windows Graphical 
-version.  In either case you can use one of the following build
-environments:
+You can build a TTY version of NetHack and a Windows Graphical 
+version.  You can use one of the following build environments:
 
   o A copy of Microsoft Visual Studio 2013 Express
     The current NetHack code has not been tested with earlier versions 
@@ -73,7 +72,7 @@ USING VISUAL C'S IDE."
 | BUILDING FROM THE COMMAND LINE |
 \--------------------------------/
 
-Two different versions of NetHack will be build for Win32 from the
+Two different versions of NetHack will be built for Windows from the
 command line using the Makefile approach:
     A tty port utilizing the Win32 Console I/O subsystem, Console
         NetHack;
@@ -129,17 +128,18 @@ Setting Up
     all the necessary environment variables for the compiler environment
     are set correctly. 
 
-    For Visual Studio 2013 Express, the installation should have placed 
-    a command prompt option on the Start menus that is properly configured
-    for building: 
+    Visual Studio 2013 Express
+
+    The installation should have placed a command prompt option on the 
+    Start menus that is properly configured for building: 
                  From
                      Start | All Programs | Microsoft Visual Studio 2013 Express
                  Select
                      Visual Studio Command Prompt 2013
  
-    Once you are at a command prompt, you can use one of the 
-    following sets of commands to prepare your environment for 
-    building:
+    Anyway, once you are at a command prompt (cmd.exe) regardless of how you
+    got there, you can use one of the following sets of commands to prepare 
+    your environment for building:
 
     For a 32-bit x86 build (like the official binary):
         cd "\Program Files (x86)\Microsoft Visual Studio 12.0\VC"
@@ -166,10 +166,36 @@ Setting Up
                     | x64 cross  |                |
       -----------------------------------------------------------
 
+    Change your current directory to src subfolder of the nethack 
+    source tree.
+        cd src
+
+    At this time, if you are determined to build an x64 version
+    with the Microsoft Visual Studio 2013 compilter,
+    one extra NetHack-specific step is needed. Edit the Makefile in the src 
+    directory and change this in the section marked as 1.:
+           #
+           # 64 bit
+           #TARGET_CPU=x64
+           #
+           # 32 bit
+           TARGET_CPU=x86
+    to this:
+           #
+           # 64 bit
+           TARGET_CPU=x64
+           #
+           # 32 bit
+           #TARGET_CPU=x86
+    
+
+    GCC 
+
     For the GCC Makefile, add <mingw>\bin to your path, where <mingw> 
     is your MinGW root directory.).
 
-    Change your current directory to src subfolder of the nethack tree.
+    Change your current directory to src subfolder of the nethack 
+    source tree.
         cd src
 
 2.  Make sure all the NetHack files are in the appropriate directory
