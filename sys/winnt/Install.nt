@@ -5,7 +5,7 @@
                        NetHack 3.6 on a Windows system
          (Windows 7/8.x/10 or later only. XP may work but is untested)
          ==============================================================
-          Last revision: $NHDT-Date: 1447979316 2015/11/20 00:28:36 $
+          Last revision: $NHDT-Date: 1447979773 2015/11/20 00:36:13 $
 
 Credit for the porting of NetHack to the Win32 Console Subsystem goes to 
 the NT Porting Team started by Michael Allison.
@@ -166,12 +166,12 @@ Setting Up
                     | x64 cross  |                |
       -----------------------------------------------------------
 
-    Change your current directory to src subfolder of the nethack 
+    Change your current directory to the src subfolder of the nethack 
     source tree.
         cd src
 
     At this time, if you are determined to build an x64 version
-    with the Microsoft Visual Studio 2013 compilter,
+    with the Microsoft Visual Studio 2013 compiler,
     one extra NetHack-specific step is needed. Edit the Makefile in the src 
     directory and change this in the section marked as 1.:
            #
