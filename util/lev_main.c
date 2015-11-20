@@ -1294,11 +1294,13 @@ genericptr_t dat;
         lc_error("Unknown opcode '%d'", opc);
 
     tmp = (_opcode *) alloc(sizeof(_opcode) * (nop + 1));
-    if (sp->opcodes && nop) {
+    if (sp->opcodes && nop && tmp) {
         (void) memcpy(tmp, sp->opcodes, sizeof(_opcode) * nop);
         free(sp->opcodes);
-    } else if (!tmp)
+    } else if (!tmp) {
         lc_error("Could not alloc opcode space");
+        return;
+    }
 
     sp->opcodes = tmp;
 
