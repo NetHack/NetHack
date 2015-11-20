@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1446854233 2015/11/06 23:57:13 $  $NHDT-Branch: master $:$NHDT-Revision: 1.121 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1447987787 2015/11/20 02:49:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.123 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -739,17 +739,20 @@ int percent;
         return;
     }
 
+    indices[0] = 0; /* lint suppression */
     for (count = 0, i = 1; i < NUM_OBJECTS; i++)
         if (OBJ_DESCR(objects[i])
             && (objects[i].oc_name_known || objects[i].oc_uname))
             indices[count++] = i;
 
-    randomize(indices, count);
+    if (count > 0) {
+        randomize(indices, count);
 
-    /* forget first % of randomized indices */
-    count = ((count * percent) + rn2(100)) / 100;
-    for (i = 0; i < count; i++)
-        forget_single_object(indices[i]);
+        /* forget first % of randomized indices */
+        count = ((count * percent) + rn2(100)) / 100;
+        for (i = 0; i < count; i++)
+            forget_single_object(indices[i]);
+    }
 }
 
 /* Forget some or all of map (depends on parameters). */
@@ -815,6 +818,7 @@ int percent;
      * shift the forgetting elsewhere by fiddling with percent
      * instead of forgetting fewer levels.
      */
+    indices[0] = 0; /* lint suppression */
     for (count = 0, i = 0; i <= maxl; i++)
         if ((level_info[i].flags & VISITED)
             && !(level_info[i].flags & FORGOTTEN) && i != this_lev) {
@@ -827,13 +831,15 @@ int percent;
     if (percent > 100)
         percent = 100;
 
-    randomize(indices, count);
+    if (count > 0) {
+        randomize(indices, count);
 
-    /* forget first % of randomized indices */
-    count = ((count * percent) + 50) / 100;
-    for (i = 0; i < count; i++) {
-        level_info[indices[i]].flags |= FORGOTTEN;
-        forget_mapseen(indices[i]);
+        /* forget first % of randomized indices */
+        count = ((count * percent) + 50) / 100;
+        for (i = 0; i < count; i++) {
+            level_info[indices[i]].flags |= FORGOTTEN;
+            forget_mapseen(indices[i]);
+        }
     }
 }
 
