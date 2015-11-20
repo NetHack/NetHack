@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1446975461 2015/11/08 09:37:41 $  $NHDT-Branch: master $:$NHDT-Revision: 1.67 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1447978683 2015/11/20 00:18:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.69 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -48,7 +48,7 @@ bot1()
 
     Sprintf(nb = eos(nb), "  ");
     i = mrank_sz + 15;
-    j = (nb + 2) - newbot1; /* aka strlen(newbot1) but less computation */
+    j = (int) ((nb + 2) - newbot1); /* strlen(newbot1) but less computation */
     if ((i - j) > 0)
         Sprintf(nb = eos(nb), "%*s", i - j, " "); /* pad with spaces */
     if (ACURR(A_STR) > 18) {
@@ -1036,9 +1036,9 @@ struct istat_s *bl, *maxbl;
 
 #ifdef STATUS_HILITES
 
-/*****************************************************************************/
+/****************************************************************************/
 /* Core status hiliting support */
-/*****************************************************************************/
+/****************************************************************************/
 
 struct hilite_s {
     boolean set;
