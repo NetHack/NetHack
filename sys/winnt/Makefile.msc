@@ -1,4 +1,4 @@
-# NetHack 3.6	Makefile.msc	$NHDT-Date: 1447990545 2015/11/20 03:35:45 $  $NHDT-Branch: master $:$NHDT-Revision: 1.99 $ */
+# NetHack 3.6	Makefile.msc	$NHDT-Date: 1447992736 2015/11/20 04:12:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.100 $ */
 #       Copyright (c) NetHack PC Development Team 1993-2015
 #
 #==============================================================================
@@ -282,9 +282,6 @@ DLB =
 # This section creates shorthand macros for many objects
 # referenced later on in the Makefile.
 #
-
-DEFFILE = $(MSWSYS)\$(GAME).def
-
 #
 # Shorten up the location for some files
 #
@@ -547,9 +544,10 @@ $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
 	if exist $(DAT)\symbols copy $(DAT)\symbols $(GAMEDIR)
 	if exist $(DOC)\guidebook.txt copy $(DOC)\guidebook.txt $(GAMEDIR)\Guidebook.txt
 	if exist $(DOC)\nethack.txt copy $(DOC)\nethack.txt $(GAMEDIR)\NetHack.txt
-	@if exist $(O)$(GAME).PDB copy $(O)$(GAME).pdb $(GAMEDIR)\$(GAME).pdb
-	@if exist $(GAMEDIR)\$(GAME).PDB echo NOTE: You may want to remove $(GAMEDIR:\=/)\$(GAME:\=/).pdb to conserve space
+	@if exist $(GAMEDIR)\NetHack.PDB echo NOTE: You may want to remove $(GAMEDIR:\=/)/NetHack.PDB to conserve space
+	@if exist $(GAMEDIR)\NetHackW.PDB echo NOTE: You may want to remove $(GAMEDIR:\=/)/NetHackW.PDB to conserve space
 	-copy $(MSWSYS)\defaults.nh   $(GAMEDIR)\defaults.nh
+	-if not exist $(GAMEDIR)\record. goto>$(GAMEDIR)\record.
 	echo install done > $@
 
 #	copy $(MSWSYS)\winnt.hlp    $(GAMEDIR)
@@ -672,7 +670,6 @@ $(GAMEDIR)\NetHack.exe : $(O)gamedir.tag $(O)tile.o $(O)nttty.o $(O)guistub.o \
 		$(O)console.res
 <<
 	@if exist $(O)install.tag del $(O)install.tag
-	@if exist $(GAMEDIR)\$(GAME).bak del $(GAMEDIR)\$(GAME).bak
 
 # NetHackW
 # full tty linkage libs:
@@ -695,7 +692,6 @@ $(GAMEDIR)\NetHackW.exe : $(O)gamedir.tag $(O)tile.o $(O)ttystub.o \
 		$(O)winhack.res
 <<
 	@if exist $(O)install.tag del $(O)install.tag
-	@if exist $(GAMEDIR)\$(GAME).bak del $(GAMEDIR)\$(GAME).bak
 
 $(O)gamedir.tag:
 	@if not exist $(GAMEDIR)\*.* echo creating directory $(GAMEDIR:\=/)
