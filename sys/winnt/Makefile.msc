@@ -1,4 +1,4 @@
-# NetHack 3.6	Makefile.msc	$NHDT-Date: 1447937935 2015/11/19 12:58:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.98 $ */
+# NetHack 3.6	Makefile.msc	$NHDT-Date: 1447990545 2015/11/20 03:35:45 $  $NHDT-Branch: master $:$NHDT-Revision: 1.99 $ */
 #       Copyright (c) NetHack PC Development Team 1993-2015
 #
 #==============================================================================
@@ -548,7 +548,7 @@ $(O)install.tag: 	$(DAT)\data	$(DAT)\rumors	 $(DAT)\dungeon \
 	if exist $(DOC)\guidebook.txt copy $(DOC)\guidebook.txt $(GAMEDIR)\Guidebook.txt
 	if exist $(DOC)\nethack.txt copy $(DOC)\nethack.txt $(GAMEDIR)\NetHack.txt
 	@if exist $(O)$(GAME).PDB copy $(O)$(GAME).pdb $(GAMEDIR)\$(GAME).pdb
-	@if exist $(GAMEDIR)\$(GAME).PDB echo NOTE: You may want to remove $(GAMEDIR)\$(GAME).pdb to conserve space
+	@if exist $(GAMEDIR)\$(GAME).PDB echo NOTE: You may want to remove $(GAMEDIR:\=/)\$(GAME:\=/).pdb to conserve space
 	-copy $(MSWSYS)\defaults.nh   $(GAMEDIR)\defaults.nh
 	echo install done > $@
 
@@ -661,7 +661,7 @@ GAMEOBJ=$(GAMEOBJ:^ =^
 $(GAMEDIR)\NetHack.exe : $(O)gamedir.tag $(O)tile.o $(O)nttty.o $(O)guistub.o \
 			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)console.res $(KEYDLLS)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
-	@echo   Linking $@ ...
+        @echo Linking $(@:\=/)
 	$(link) $(lflagsBuild) $(conlflags) /STACK:2048 /PDB:$(GAMEDIR)\$(@B).PDB /MAP:$(O)$(@B).MAP \
 		$(LIBS) $(conlibs) -out:$@ @<<$(@B).lnk
 		$(GAMEOBJ)
@@ -685,7 +685,7 @@ $(GAMEDIR)\NetHack.exe : $(O)gamedir.tag $(O)tile.o $(O)nttty.o $(O)guistub.o \
 $(GAMEDIR)\NetHackW.exe : $(O)gamedir.tag $(O)tile.o $(O)ttystub.o \
 			$(ALLOBJ) $(TTYOBJ) $(GUIOBJ) $(O)winhack.res $(O)gamedir.tag $(KEYDLLS)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
-	@echo   Linking $@
+	@echo   Linking $(@:\=/)
 	$(link) $(lflagsBuild) $(guilflags) /STACK:2048 /PDB:$(GAMEDIR)\$(@B).PDB \
 		/MAP:$(O)$(@B).MAP $(LIBS) $(guilibs) $(COMCTRL) -out:$@ @<<$(@B).lnk
 		$(GAMEOBJ)
@@ -698,7 +698,7 @@ $(GAMEDIR)\NetHackW.exe : $(O)gamedir.tag $(O)tile.o $(O)ttystub.o \
 	@if exist $(GAMEDIR)\$(GAME).bak del $(GAMEDIR)\$(GAME).bak
 
 $(O)gamedir.tag:
-	@if not exist $(GAMEDIR)\*.* echo creating directory $(GAMEDIR)
+	@if not exist $(GAMEDIR)\*.* echo creating directory $(GAMEDIR:\=/)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo directory created > $@
 
@@ -716,7 +716,7 @@ $(O)nhdefkey.def:
 ! ENDIF
 
 $(GAMEDIR)\nhdefkey.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
-	@echo Linking $@
+	@echo Linking $(@:\=/)
 	@$(link) $(ldebug) /RELEASE /DLL user32.lib \
 		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" /DEF:$(O)$(@B).def \
 		/IMPLIB:$(O)$(@B).lib -out:$@ $(O)$(@B).o
@@ -735,7 +735,7 @@ $(O)nh340key.def:
 ! ENDIF
 
 $(GAMEDIR)\nh340key.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
-	@echo Linking $@
+	@echo Linking $(@:\=/)
 	@$(link) $(ldebug) /RELEASE /NOLOGO /DLL user32.lib \
 		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" /DEF:$(O)$(@B).def \
 		/IMPLIB:$(O)$(@B).lib -out:$@ $(O)$(@B).o
@@ -754,7 +754,7 @@ $(O)nhraykey.def:
 ! ENDIF
 
 $(GAMEDIR)\nhraykey.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
-	@echo Linking $@
+	@echo Linking $(@:\=/)
 	@$(link) $(ldebug) /RELEASE /NOLOGO /DLL user32.lib \
 		/PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).map" /DEF:$(O)$(@B).def \
 		/IMPLIB:$(O)$(@B).lib -out:$@ $(O)$(@B).o
@@ -767,20 +767,20 @@ $(GAMEDIR)\nhraykey.dll : $(O)$(@B).o $(O)gamedir.tag $(O)$(@B).def
 # Makedefs Stuff
 #==========================================
 $(U)nhsizes.exe: $(O)nhsizes.o
-	@echo Linking $@
+	@echo Linking $(@:\=/)
 	$(link) $(lflagsBuild) -out:$@ $(O)nhsizes.o $(O)panic.o $(O)alloc.o
 
 $(O)nhsizes.o: $(CONFIG_H) nhsizes.c
 	@$(cc) $(cflagsBuild) -Fo$@ nhsizes.c
 
 $(U)makedefs.exe:	$(MAKEOBJS)
-	@echo Linking $@
+	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(MAKEOBJS)
 
 $(O)makedefs.o: $(CONFIG_H)	$(INCL)\monattk.h $(INCL)\monflag.h   $(INCL)\objclass.h \
 		 $(INCL)\monsym.h    $(INCL)\qtext.h	$(INCL)\patchlevel.h \
 		 $(U)makedefs.c
-	@if not exist $(OBJ)\*.* echo creating directory $(OBJ)
+	@if not exist $(OBJ)\*.* echo creating directory $(OBJ:\=/)
 	@if not exist $(OBJ)\*.* mkdir $(OBJ)
 	@$(cc) $(cflagsBuild) -Fo$@ $(U)makedefs.c
 
@@ -823,7 +823,7 @@ $(DAT)\bogusmon: $(DAT)\bogusmon.txt $(U)makedefs.exe
 #==========================================
 
 $(U)uudecode.exe: $(O)uudecode.o
-	@echo Linking $@
+	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)uudecode.o
 
 $(O)uudecode.o: $(SSYS)\uudecode.c
@@ -895,7 +895,7 @@ $(O)lev_main.o:	$(U)lev_main.c $(HACK_H) $(SP_LEV_H)
 	@$(cc) $(cflagsBuild) -Fo$@ $(U)lev_main.c
 
 $(U)levcomp.exe: $(LEVCOMPOBJS)
-	@echo Linking $@
+	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
  		$(LEVCOMPOBJS:^	=^
 		)
@@ -921,7 +921,7 @@ $(O)dgn_main.o:	$(HACK_H) $(U)dgn_main.c
 	@$(cc) $(cflagsBuild) -Fo$@ $(U)dgn_main.c
 
 $(U)dgncomp.exe: $(DGNCOMPOBJS)
-    	@echo Linking $@
+    	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(DGNCOMPOBJS:^	=^
 		)
@@ -932,7 +932,7 @@ $(U)dgncomp.exe: $(DGNCOMPOBJS)
 #=================================================
 
 $(O)obj.tag:
-	@if not exist $(OBJ)\*.* echo creating directory $(OBJ)
+	@if not exist $(OBJ)\*.* echo creating directory $(OBJ:\=/)
 	@if not exist $(OBJ)\*.* mkdir $(OBJ)
 	@echo directory created >$@
 
@@ -977,7 +977,7 @@ $(INCL)\win32api.h: $(MSWSYS)\win32api.h
 #==========================================
 
 $(U)dlb_main.exe: $(DLBOBJ) $(O)dlb.o
-	@echo Linking $@
+	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(O)dlb_main.o
 		$(O)dlb.o
@@ -1028,7 +1028,7 @@ nhdat:	$(U)dlb_main.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) \
 #==========================================
 
 $(U)recover.exe: $(RECOVOBJS)
-	@echo Linking $@
+	@echo Linking $(@:\=/)
 	$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(RECOVOBJS)
 
 $(O)recover.o: $(CONFIG_H) $(U)recover.c $(INCL)\win32api.h
@@ -1039,11 +1039,11 @@ $(O)recover.o: $(CONFIG_H) $(U)recover.c $(INCL)\win32api.h
 #==========================================
 
 $(SRC)\tile.c: $(U)tilemap.exe
-	@echo A new $@ has been created
+	@echo A new $(@:\=/) has been created
 	@$(U)tilemap
 
 $(U)tilemap.exe: $(O)tilemap.o
-	@echo Linking $@
+	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ $(O)tilemap.o
 
 $(O)tilemap.o: $(WSHR)\tilemap.c $(HACK_H)
@@ -1075,7 +1075,7 @@ $(O)tilete32.o: $(WSHR)\tiletext.c  $(CONFIG_H) $(TILE_H)
 #==========================================
 
 $(U)gif2txt.exe: $(GIFREADERS) $(TEXT_IO)
-    	@echo Linking $@
+    	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(GIFREADERS:^	=^
 		)
@@ -1084,7 +1084,7 @@ $(U)gif2txt.exe: $(GIFREADERS) $(TEXT_IO)
 <<
 
 $(U)gif2tx32.exe: $(GIFREADERS32) $(TEXT_IO32)
-    	@echo Linking $@
+    	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(GIFREADERS32:^	=^
 		)
@@ -1093,7 +1093,7 @@ $(U)gif2tx32.exe: $(GIFREADERS32) $(TEXT_IO32)
 <<
 
 $(U)txt2ppm.exe: $(PPMWRITERS) $(TEXT_IO)
-    	@echo Linking $@
+    	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(PPMWRITERS:^	=^
 		)
@@ -1110,7 +1110,7 @@ $(TILEBMP16): $(TILEUTIL16) $(TILEFILES)
 
 
 $(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXT_IO)
-    	@echo Linking $@
+    	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(O)tile2bmp.o
 		$(TEXT_IO:^  =^
@@ -1118,7 +1118,7 @@ $(U)tile2bmp.exe: $(O)tile2bmp.o $(TEXT_IO)
 <<
 
 $(U)til2bm32.exe: $(O)til2bm32.o $(TEXT_IO32)
-    	@echo Linking $@
+    	@echo Linking $(@:\=/)
 	@$(link) $(lflagsBuild) /PDB:"$(O)$(@B).PDB" /MAP:"$(O)$(@B).MAP" -out:$@ @<<$(@B).lnk
 		$(O)til2bm32.o
 		$(TEXT_IO32:^  =^
