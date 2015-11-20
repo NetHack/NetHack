@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1447475947 2015/11/14 04:39:07 $  $NHDT-Branch: master $:$NHDT-Revision: 1.235 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1447987787 2015/11/20 02:49:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.236 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3322,8 +3322,7 @@ int dx, dy;
         dy = ydir[i];
         bhitpos.x += dx;
         bhitpos.y += dy;
-        if (MON_AT(bhitpos.x, bhitpos.y)) {
-            mtmp = m_at(bhitpos.x, bhitpos.y);
+        if ((mtmp = m_at(bhitpos.x, bhitpos.y)) != 0) {
             m_respond(mtmp);
             tmp_at(DISP_END, 0);
             return mtmp;

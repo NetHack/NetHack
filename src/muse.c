@@ -1,5 +1,5 @@
-/* NetHack 3.6	muse.c	$NHDT-Date: 1445556877 2015/10/22 23:34:37 $  $NHDT-Branch: master $:$NHDT-Revision: 1.66 $ */
-/*	Copyright (C) 1990 by Ken Arromdee			   */
+/* NetHack 3.6	muse.c	$NHDT-Date: 1447987786 2015/11/20 02:49:46 $  $NHDT-Branch: master $:$NHDT-Revision: 1.68 $ */
+/*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
 
 /*
@@ -24,17 +24,17 @@ STATIC_DCL void FDECL(mzapmsg, (struct monst *, struct obj *, BOOLEAN_P));
 STATIC_DCL void FDECL(mreadmsg, (struct monst *, struct obj *));
 STATIC_DCL void FDECL(mquaffmsg, (struct monst *, struct obj *));
 STATIC_PTR int FDECL(mbhitm, (struct monst *, struct obj *));
-STATIC_DCL void FDECL(mbhit,
-                      (struct monst *, int, int FDECL((*), (MONST_P, OBJ_P)),
-                       int FDECL((*), (OBJ_P, OBJ_P)), struct obj *));
+STATIC_DCL void FDECL(mbhit, (struct monst *, int,
+                              int FDECL((*), (MONST_P, OBJ_P)),
+                              int FDECL((*), (OBJ_P, OBJ_P)), struct obj *));
 STATIC_DCL void FDECL(you_aggravate, (struct monst *));
-STATIC_DCL void FDECL(mon_consume_unstone,
-                      (struct monst *, struct obj *, BOOLEAN_P, BOOLEAN_P));
-STATIC_DCL boolean
-FDECL(cures_stoning, (struct monst *, struct obj *, BOOLEAN_P));
+STATIC_DCL void FDECL(mon_consume_unstone, (struct monst *, struct obj *,
+                                            BOOLEAN_P, BOOLEAN_P));
+STATIC_DCL boolean FDECL(cures_stoning, (struct monst *, struct obj *,
+                                         BOOLEAN_P));
 STATIC_DCL boolean FDECL(mcould_eat_tin, (struct monst *));
-STATIC_DCL boolean
-FDECL(muse_unslime, (struct monst *, struct obj *, BOOLEAN_P));
+STATIC_DCL boolean FDECL(muse_unslime, (struct monst *, struct obj *,
+                                        BOOLEAN_P));
 STATIC_DCL int FDECL(cures_sliming, (struct monst *, struct obj *));
 STATIC_DCL boolean FDECL(green_mon, (struct monst *));
 
@@ -48,17 +48,16 @@ static struct musable {
      */
 } m;
 static int trapx, trapy;
-static boolean zap_oseen;
-/* for wands which use mbhitm and are zapped at players.  We usually
- * want an oseen local to the function, but this is impossible since the
- * function mbhitm has to be compatible with the normal zap routines,
- * and those routines don't remember who zapped the wand.
- */
+static boolean zap_oseen; /* for wands which use mbhitm and are zapped at
+                           * players.  We usually want an oseen local to
+                           * the function, but this is impossible since the
+                           * function mbhitm has to be compatible with the
+                           * normal zap routines, and those routines don't
+                           * remember who zapped the wand. */
 
 /* Any preliminary checks which may result in the monster being unable to use
  * the item.  Returns 0 if nothing happened, 2 if the monster can't do
- * anything
- * (i.e. it teleported) and 1 if it's dead.
+ * anything (i.e. it teleported) and 1 if it's dead.
  */
 STATIC_OVL int
 precheck(mon, obj)
@@ -93,12 +92,11 @@ struct obj *obj;
                     if (vis) {
                         pline(
                             "As %s opens the bottle, an enormous %s emerges!",
-                            mon_nam(mon),
-                            Hallucination ? rndmonnam(NULL)
-                                          : (const char *) "ghost");
-                        pline(
-                            "%s is frightened to death, and unable to move.",
-                            Monnam(mon));
+                              mon_nam(mon),
+                              Hallucination ? rndmonnam(NULL)
+                                            : (const char *) "ghost");
+                        pline("%s is frightened to death, and unable to move.",
+                              Monnam(mon));
                     }
                     paralyze_monst(mon, 3);
                 }
@@ -1312,8 +1310,7 @@ struct obj *obj;                     /* 2nd arg to fhitm/fhito */
         if (bhitpos.x == u.ux && bhitpos.y == u.uy) {
             (*fhitm)(&youmonst, obj);
             range -= 3;
-        } else if (MON_AT(bhitpos.x, bhitpos.y)) {
-            mtmp = m_at(bhitpos.x, bhitpos.y);
+        } else if ((mtmp = m_at(bhitpos.x, bhitpos.y)) != 0) {
             if (cansee(bhitpos.x, bhitpos.y) && !canspotmon(mtmp))
                 map_invisible(bhitpos.x, bhitpos.y);
             (*fhitm)(mtmp, obj);
