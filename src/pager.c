@@ -18,6 +18,7 @@ STATIC_DCL void FDECL(checkfile, (char *, struct permonst *,
                                   BOOLEAN_P, BOOLEAN_P));
 STATIC_DCL void FDECL(look_all, (BOOLEAN_P,BOOLEAN_P));
 STATIC_DCL boolean FDECL(help_menu, (int *));
+STATIC_DCL void NDECL(docontact);
 #ifdef PORT_HELP
 extern void NDECL(port_help);
 #endif
@@ -378,7 +379,7 @@ boolean user_typed_name, without_asking;
     dlb *fp;
     char buf[BUFSZ], newstr[BUFSZ];
     char *ep, *dbase_str;
-    unsigned long txt_offset;
+    unsigned long txt_offset = 0L;
     int chk_skip;
     boolean found_in_file = FALSE, skipping_entry = FALSE;
     winid datawin = WIN_ERR;

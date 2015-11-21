@@ -18,6 +18,7 @@ static NEARDATA const char readable[] = { ALL_CLASSES, SCROLL_CLASS,
 static const char all_count[] = { ALLOW_COUNT, ALL_CLASSES, 0 };
 
 STATIC_DCL boolean FDECL(learnscrolltyp, (SHORT_P));
+STATIC_DCL char * FDECL(erode_obj_text, (struct obj *, char *));
 STATIC_DCL void NDECL(do_class_genocide);
 STATIC_DCL void FDECL(stripspe, (struct obj *));
 STATIC_DCL void FDECL(p_glow1, (struct obj *));

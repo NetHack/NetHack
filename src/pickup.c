@@ -41,6 +41,7 @@ STATIC_DCL int FDECL(container_at, (int, int, BOOLEAN_P));
 STATIC_DCL boolean FDECL(able_to_loot, (int, int, BOOLEAN_P));
 STATIC_DCL boolean NDECL(reverse_loot);
 STATIC_DCL boolean FDECL(mon_beside, (int, int));
+STATIC_DCL int FDECL(do_loot_cont, (struct obj **));
 STATIC_DCL void FDECL(tipcontainer, (struct obj *));
 
 /* define for query_objlist() and autopickup() */
