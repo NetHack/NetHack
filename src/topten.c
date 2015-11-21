@@ -1,4 +1,4 @@
-/* NetHack 3.6	topten.c	$NHDT-Date: 1448013597 2015/11/20 09:59:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.39 $ */
+/* NetHack 3.6	topten.c	$NHDT-Date: 1448117546 2015/11/21 14:52:26 $  $NHDT-Branch: master $:$NHDT-Revision: 1.40 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -711,7 +711,6 @@ time_t when;
         t1->ver_major = t1->ver_minor = t1->patchlevel = 0;
         t1->uid = t1->deathdnum = t1->deathlev = 0;
         t1->maxlvl = t1->hp = t1->maxhp = t1->deaths = 0;
-        t1->uid = 0;
         t1->plrole[0] = t1->plrace[0] = t1->plgend[0] = t1->plalign[0] = '-';
         t1->plrole[1] = t1->plrace[1] = t1->plgend[1] = t1->plalign[1] = 0;
         t1->birthdate = t1->deathdate = yyyymmdd((time_t) 0L);
