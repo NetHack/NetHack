@@ -843,8 +843,8 @@ int mode;
 #ifdef DEBUG
 static boolean trav_debug = FALSE;
 
-int wiz_debug_cmd_traveldisplay() /* in this case, toggle display of travel
-                                     debug info */
+/* in this case, toggle display of travel debug info */
+int wiz_debug_cmd_traveldisplay()
 {
     trav_debug = !trav_debug;
     return 0;
@@ -1207,8 +1207,9 @@ domove()
     struct trap *trap = NULL;
     int wtcap;
     boolean on_ice;
-    xchar chainx, chainy, ballx, bally; /* ball&chain new positions */
-    int bc_control;                     /* control for ball&chain */
+    xchar chainx = 0, chainy = 0,
+          ballx = 0, bally = 0;         /* ball&chain new positions */
+    int bc_control = 0;                 /* control for ball&chain */
     boolean cause_delay = FALSE;        /* dragging ball will skip a move */
 
     u_wipe_engr(rnd(5));

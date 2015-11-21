@@ -512,9 +512,14 @@ STATIC_DCL const char *FDECL(attr2attrname, (int));
 STATIC_DCL int NDECL(query_color);
 STATIC_DCL int NDECL(query_msgtype);
 STATIC_DCL int FDECL(query_attr, (const char *));
+STATIC_DCL const char * FDECL(msgtype2name, (int));
+STATIC_DCL boolean FDECL(msgtype_add, (int, char *));
+STATIC_DCL void FDECL(free_one_msgtype, (int));
+STATIC_DCL int NDECL(msgtype_count);
 STATIC_DCL boolean FDECL(add_menu_coloring_parsed, (char *, int, int));
 STATIC_DCL void FDECL(free_one_menu_coloring, (int));
 STATIC_DCL int NDECL(count_menucolors);
+STATIC_DCL int FDECL(handle_add_list_remove, (char *, int));
 
 void
 reglyph_darkroom()
@@ -3492,7 +3497,7 @@ int
 doset()
 {
     char buf[BUFSZ], buf2[BUFSZ];
-    int i, pass, boolcount, pick_cnt, pick_idx, opt_indx;
+    int i = 0, pass, boolcount, pick_cnt, pick_idx, opt_indx;
     boolean *bool_p;
     winid tmpwin;
     anything any;

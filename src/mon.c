@@ -13,6 +13,7 @@
 
 STATIC_VAR boolean vamp_rise_msg;
 
+STATIC_DCL void FDECL(sanity_check_single_mon, (struct monst *, const char *));
 STATIC_DCL boolean FDECL(restrap, (struct monst *));
 STATIC_DCL long FDECL(mm_aggression, (struct monst *, struct monst *));
 STATIC_DCL long FDECL(mm_displacement, (struct monst *, struct monst *));
@@ -2725,8 +2726,8 @@ struct monst *mon;
     }
 }
 
-short *animal_list = 0; /* list of PM values for animal monsters */
-int animal_list_count;
+static short *animal_list = 0; /* list of PM values for animal monsters */
+static int animal_list_count;
 
 void
 mon_animal_list(construct)

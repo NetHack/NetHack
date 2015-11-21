@@ -797,6 +797,9 @@ E boolean FDECL(bad_rock, (struct permonst *, XCHAR_P, XCHAR_P));
 E int FDECL(cant_squeeze_thru, (struct monst *));
 E boolean FDECL(invocation_pos, (XCHAR_P, XCHAR_P));
 E boolean FDECL(test_move, (int, int, int, int, int));
+#ifdef DEBUG
+E int NDECL(wiz_debug_cmd_traveldisplay);
+#endif
 E boolean NDECL(u_rooted);
 E void NDECL(domove);
 E boolean NDECL(overexertion);
