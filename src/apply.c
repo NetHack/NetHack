@@ -2731,8 +2731,8 @@ int min_range, max_range;
     return TRUE;
 }
 
-int polearm_range_min = -1;
-int polearm_range_max = -1;
+static int polearm_range_min = -1;
+static int polearm_range_max = -1;
 
 void
 display_polearm_positions(state)
