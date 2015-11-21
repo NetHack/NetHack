@@ -1,4 +1,4 @@
-/* NetHack 3.6	lev_main.c	$NHDT-Date: 1432512786 2015/05/25 00:13:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.41 $ */
+/* NetHack 3.6	lev_main.c	$NHDT-Date: 1448074107 2015/11/21 02:48:27 $  $NHDT-Branch: master $:$NHDT-Revision: 1.43 $ */
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -63,7 +63,7 @@
 #define NewTab(type, size) (type **) alloc(sizeof(type *) * size)
 #define Free(ptr) \
     if (ptr)      \
-    free((genericptr_t)(ptr))
+        free((genericptr_t)(ptr))
 /* write() returns a signed value but its size argument is unsigned;
    types might be int and unsigned or ssize_t and size_t; casting
    to long should be safe for all permutations (even if size_t is
@@ -257,8 +257,8 @@ char **argv;
     argv = mac_argv;
 #endif
     /* Note:  these initializers don't do anything except guarantee that
-            we're linked properly.
-    */
+     *        we're linked properly.
+     */
     monst_init();
     objects_init();
     decl_init();
@@ -385,7 +385,8 @@ va_list the_args;
 
 #define lc_vpline lc_pline
 
-void lc_pline
+void
+lc_pline
 VA_DECL(const char *, line)
 #endif /* USE_STDARG | USE_VARARG */
 {   /* opening brace for lc_vpline, nested block for USE_OLDARGS lc_pline */
@@ -420,7 +421,8 @@ VA_DECL(const char *, line)
 }
 
 /*VARARGS1*/
-void lc_error
+void
+lc_error
 VA_DECL(const char *, line)
 {
     VA_START(line);
@@ -432,7 +434,8 @@ VA_DECL(const char *, line)
 }
 
 /*VARARGS1*/
-void lc_warning
+void
+lc_warning
 VA_DECL(const char *, line)
 {
     VA_START(line);
@@ -722,6 +725,7 @@ sp_lev *splev;
 {
     struct lc_breakdef *tmp = break_list;
     struct lc_breakdef *prv = NULL;
+
     while (tmp) {
         if (tmp->break_depth == allow_break_statements) {
             struct lc_breakdef *nxt = tmp->next;
@@ -748,6 +752,7 @@ sp_lev *splev;
 long i;
 {
     struct lc_breakdef *tmp = New(struct lc_breakdef);
+
     tmp->breakpoint = New(struct opvar);
     tmp->break_depth = allow_break_statements;
     tmp->next = break_list;
@@ -763,6 +768,7 @@ long addr;
 char *name;
 {
     struct lc_funcdefs *f = New(struct lc_funcdefs);
+
     if (!f) {
         lc_error("Could not alloc function definition for '%s'.", name);
         return NULL;
@@ -785,6 +791,7 @@ struct lc_funcdefs *fchain;
     struct lc_funcdefs *tmp = fchain;
     struct lc_funcdefs *nxt;
     struct lc_funcdefs_parm *tmpparam;
+
     while (tmp) {
         nxt = tmp->next;
         Free(tmp->name);
@@ -806,6 +813,7 @@ struct lc_funcdefs *f;
     int i = 0;
     struct lc_funcdefs_parm *fp = f->params;
     char *tmp = (char *) alloc((f->n_params) + 1);
+
     if (!tmp)
         return NULL;
     while (fp) {
@@ -841,6 +849,7 @@ long typ;
 char *name;
 {
     struct lc_vardefs *f = New(struct lc_vardefs);
+
     if (!f) {
         lc_error("Could not alloc variable definition for '%s'.", name);
         return NULL;
@@ -858,6 +867,7 @@ struct lc_vardefs *fchain;
 {
     struct lc_vardefs *tmp = fchain;
     struct lc_vardefs *nxt;
+
     while (tmp) {
         if (be_verbose && (tmp->n_used == 0))
             lc_warning("Unused variable '%s'", tmp->name);
@@ -895,8 +905,8 @@ long spovar;
     static char buf[2][128];
     const char *n = NULL;
     int is_array = (spovar & SPOVAR_ARRAY);
-    spovar &= ~SPOVAR_ARRAY;
 
+    spovar &= ~SPOVAR_ARRAY;
     switch (spovar) {
     default:
         lc_error("spovar2str(%ld)", spovar);
@@ -939,7 +949,8 @@ struct lc_vardefs *vd;
 char *varname;
 {
     struct lc_vardefs *tmp;
-    if ((tmp = vardef_defined(vd, varname, 1)))
+
+    if ((tmp = vardef_defined(vd, varname, 1)) != 0)
         tmp->n_used++;
 }
 
@@ -950,7 +961,8 @@ char *varname;
 long vartype;
 {
     struct lc_vardefs *tmp;
-    if ((tmp = vardef_defined(vd, varname, 1))) {
+
+    if ((tmp = vardef_defined(vd, varname, 1)) != 0) {
         if (tmp->var_type != vartype)
             lc_error("Trying to use variable '%s' as %s, when it is %s.",
                      varname, spovar2str(vartype), spovar2str(tmp->var_type));
@@ -965,7 +977,8 @@ char *varname;
 long vartype;
 {
     struct lc_vardefs *tmp;
-    if ((tmp = vardef_defined(vd, varname, 1))) {
+
+    if ((tmp = vardef_defined(vd, varname, 1)) != 0) {
         if (tmp->var_type != vartype)
             lc_error("Trying to redefine variable '%s' as %s, when it is %s.",
                      varname, spovar2str(vartype), spovar2str(tmp->var_type));
@@ -1007,8 +1020,16 @@ struct opvar *ov;
 {
     if (ov) {
         struct opvar *tmpov = (struct opvar *) alloc(sizeof(struct opvar));
-        if (!tmpov)
+
+        if (!tmpov) { /* lint suppression */
+            /*NOTREACHED*/
+#if 0
+            /* not possible; alloc() never returns Null */
             panic("could not alloc opvar struct");
+            /*NOTREACHED*/
+#endif
+            return (struct opvar *) 0;
+        }
         switch (ov->spovartyp) {
         case SPOVAR_COORD:
         case SPOVAR_REGION:
@@ -1030,11 +1051,11 @@ struct opvar *ov;
         } break;
         default: {
             lc_error("Unknown opvar_clone value type (%d)!", ov->spovartyp);
-        }
-        }
+        } /* default */
+        } /* switch */
         return tmpov;
     }
-    return NULL;
+    return (struct opvar *) 0;
 }
 
 void
@@ -1043,6 +1064,7 @@ sp_lev *splev;
 sp_lev *from_splev;
 {
     int i;
+
     if (splev && from_splev)
         for (i = 0; i < from_splev->n_opcodes; i++)
             add_opcode(splev, from_splev->opcodes[i].opcode,
@@ -1055,6 +1077,7 @@ sp_lev **splev;
 char *ldfname;
 {
     struct lc_funcdefs *f;
+
     if (index(ldfname, '.'))
         lc_error("Invalid dot ('.') in level name '%s'.", ldfname);
     if ((int) strlen(ldfname) > 14)
@@ -1294,14 +1317,19 @@ genericptr_t dat;
         lc_error("Unknown opcode '%d'", opc);
 
     tmp = (_opcode *) alloc(sizeof(_opcode) * (nop + 1));
-    if (sp->opcodes && nop && tmp) {
-        (void) memcpy(tmp, sp->opcodes, sizeof(_opcode) * nop);
-        free(sp->opcodes);
-    } else if (!tmp) {
+    if (!tmp) { /* lint suppression */
+        /*NOTREACHED*/
+#if 0
+        /* not possible; alloc() never returns Null */
         lc_error("Could not alloc opcode space");
+#endif
         return;
     }
 
+    if (sp->opcodes && nop) {
+        (void) memcpy(tmp, sp->opcodes, sizeof(_opcode) * nop);
+        free(sp->opcodes);
+    }
     sp->opcodes = tmp;
 
     sp->opcodes[nop].opcode = opc;
@@ -1536,14 +1564,17 @@ case_insensitive_comp(s1, s2)
 const char *s1;
 const char *s2;
 {
-    unsigned char u1, u2;
+    uchar u1, u2;
 
     for (;; s1++, s2++) {
-        u1 = tolower((unsigned char) *s1);
-        u2 = tolower((unsigned char) *s2);
-        if ((u1 == '\0') || (u1 != u2)) {
+        u1 = (uchar) *s1;
+        if (isupper(u1))
+            u1 = tolower(u1);
+        u2 = (uchar) *s2;
+        if (isupper(u2))
+            u2 = tolower(u2);
+        if (u1 == '\0' || u1 != u2)
             break;
-        }
     }
     return u1 - u2;
 }
@@ -1585,32 +1616,6 @@ volatile
 #ifdef DEFINE_OSPEED
 short ospeed;
 #endif
-#ifndef STRNCMPI
-char lowc(c) /* force 'c' into lowercase */
-char c;
-{
-    return ((char) (('A' <= c && c <= 'Z') ? (c | 040) : c));
-}
-
-int strncmpi(s1, s2, n) /* case insensitive counted string comparison */
-register const char *s1, *s2;
-register int n; /*(should probably be size_t, which is usually unsigned)*/
-{               /*{ aka strncasecmp }*/
-    register char t1, t2;
-
-    while (n--) {
-        if (!*s2)
-            return (*s1 != 0); /* s1 >= s2 */
-        else if (!*s1)
-            return -1; /* s1  < s2 */
-        t1 = lowc(*s1++);
-        t2 = lowc(*s2++);
-        if (t1 != t2)
-            return (t1 > t2) ? 1 : -1;
-    }
-    return 0; /* s1 == s2 */
-}
-#endif /* STRNCMPI */
 #endif /* STRICT_REF_DEF */
 
 /*lev_main.c*/

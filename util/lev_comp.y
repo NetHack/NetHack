@@ -1,5 +1,5 @@
 %{
-/* NetHack 3.6  lev_comp.y	$NHDT-Date: 1432512785 2015/05/25 00:13:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.16 $ */
+/* NetHack 3.6  lev_comp.y	$NHDT-Date: 1448074095 2015/11/21 02:48:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.18 $ */
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1562,8 +1562,10 @@ object_detail	: OBJECT_ID ':' object_desc
 
 object_desc	: object_or_var object_infos
 		  {
-		      if (( $2 & 0x4000) && in_container_obj) lc_error("Object cannot have a coord when contained.");
-		      else if (!( $2 & 0x4000) && !in_container_obj) lc_error("Object needs a coord when not contained.");
+		      if (( $2 & 0x4000) && in_container_obj)
+                          lc_error("Object cannot have a coord when contained.");
+		      else if (!( $2 & 0x4000) && !in_container_obj)
+                          lc_error("Object needs a coord when not contained.");
 		  }
 		;
 
