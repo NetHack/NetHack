@@ -21,7 +21,7 @@ STATIC_DCL void FDECL(finish_map,
 STATIC_DCL void FDECL(remove_room, (unsigned));
 void FDECL(mkmap, (lev_init *));
 
-char *new_locations;
+static char *new_locations;
 int min_rx, max_rx, min_ry, max_ry; /* rectangle bounds for regions */
 static int n_loc_filled;
 
