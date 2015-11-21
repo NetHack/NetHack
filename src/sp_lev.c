@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1447836300 2015/11/18 08:45:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.73 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1448094343 2015/11/21 08:25:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.75 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -23,8 +23,8 @@ typedef void FDECL((*select_iter_func), (int, int, genericptr_t));
 extern void FDECL(mkmap, (lev_init *));
 
 STATIC_DCL void FDECL(get_room_loc, (schar *, schar *, struct mkroom *));
-STATIC_DCL void FDECL(get_free_room_loc,
-                      (schar *, schar *, struct mkroom *, packed_coord));
+STATIC_DCL void FDECL(get_free_room_loc, (schar *, schar *,
+                                          struct mkroom *, packed_coord));
 STATIC_DCL void FDECL(create_trap, (trap *, struct mkroom *));
 STATIC_DCL int FDECL(noncoalignment, (ALIGNTYP_P));
 STATIC_DCL boolean FDECL(m_bad_boulder_spot, (int, int));
@@ -975,9 +975,6 @@ packed_coord pos;
 {
     schar try_x, try_y;
     register int trycnt = 0;
-
-    if (!x || !y)
-        panic("get_free_room_loc: x or y is null");
 
     get_location_coord(&try_x, &try_y, DRY, croom, pos);
     if (levl[try_x][try_y].typ != ROOM) {

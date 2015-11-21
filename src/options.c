@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1447234076 2015/11/11 09:27:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.240 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1448094341 2015/11/21 08:25:41 $  $NHDT-Branch: master $:$NHDT-Revision: 1.241 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1015,20 +1015,19 @@ warning_opts(opts, optype)
 register char *opts;
 const char *optype;
 {
-    uchar translate[MAXPCHARS + 1];
+    uchar translate[WARNCOUNT];
     int length, i;
 
     if (!(opts = string_for_env_opt(optype, opts, FALSE)))
         return;
     escapes(opts, opts);
 
-    length = strlen(opts);
-    if (length > WARNCOUNT)
-        length = WARNCOUNT;
+    length = (int) strlen(opts);
     /* match the form obtained from PC configuration files */
-    for (i = 0; i < length; i++)
-        translate[i] = (((i < WARNCOUNT) && opts[i]) ? (uchar) opts[i]
-                                                     : def_warnsyms[i].sym);
+    for (i = 0; i < WARNCOUNT; i++)
+        translate[i] = (i >= length) ? 0
+                                     : opts[i] ? (uchar) opts[i]
+                                               : def_warnsyms[i].sym;
     assign_warnings(translate);
 }
 

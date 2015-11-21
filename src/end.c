@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1447576343 2015/11/15 08:32:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.103 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1448094339 2015/11/21 08:25:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.105 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -588,14 +588,15 @@ int category;
 char *defquery;
 {
     int idx;
-    char *dop = index(disclosure_options, category);
+    char *dop;
 
-    if (dop && defquery) {
+    *defquery = 'n';
+    if ((dop = index(disclosure_options, category)) != 0) {
         idx = (int) (dop - disclosure_options);
-        if (idx < 0 || idx > (NUM_DISCLOSURE_OPTIONS - 1)) {
+        if (idx < 0 || idx >= NUM_DISCLOSURE_OPTIONS) {
             impossible(
-                "should_query_disclose_option: bad disclosure index %d %c",
-                idx, category);
+                   "should_query_disclose_option: bad disclosure index %d %c",
+                       idx, category);
             *defquery = DISCLOSE_PROMPT_DEFAULT_YES;
             return TRUE;
         }
@@ -613,10 +614,7 @@ char *defquery;
             return TRUE;
         }
     }
-    if (defquery)
-        impossible("should_query_disclose_option: bad category %c", category);
-    else
-        impossible("should_query_disclose_option: null defquery");
+    impossible("should_query_disclose_option: bad category %c", category);
     return TRUE;
 }
 
@@ -625,7 +623,7 @@ disclose(how, taken)
 int how;
 boolean taken;
 {
-    char c = 0, defquery;
+    char c = '\0', defquery;
     char qbuf[QBUFSZ];
     boolean ask = FALSE;
 
@@ -1432,8 +1430,8 @@ boolean ask;
      */
     if (ntypes != 0) {
         c = ask ? yn_function(
-                      "Do you want an account of creatures vanquished?",
-                      ynqchars, defquery)
+                            "Do you want an account of creatures vanquished?",
+                              ynqchars, defquery)
                 : defquery;
         if (c == 'q')
             done_stopprint++;
@@ -1611,7 +1609,6 @@ int id;
         if (k->id == id)
             break;
     }
-
     return k;
 }
 

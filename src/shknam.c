@@ -1,4 +1,4 @@
-/* NetHack 3.6	shknam.c	$NHDT-Date: 1446887533 2015/11/07 09:12:13 $  $NHDT-Branch: master $:$NHDT-Revision: 1.37 $ */
+/* NetHack 3.6	shknam.c	$NHDT-Date: 1448094342 2015/11/21 08:25:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.38 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -186,10 +186,9 @@ static const char *const shkhealthfoods[] = {
 
 /*
  * To add new shop types, all that is necessary is to edit the shtypes[]
- * array.
- * See mkroom.h for the structure definition.  Typically, you'll have to lower
- * some or all of the probability fields in old entries to free up some
- * percentage for the new type.
+ * array.  See mkroom.h for the structure definition.  Typically, you'll
+ * have to lower some or all of the probability fields in old entries to
+ * free up some percentage for the new type.
  *
  * The placement type field is not yet used but will be in the near future.
  *
@@ -200,7 +199,6 @@ static const char *const shkhealthfoods[] = {
  * In the latter case, prepend it with a unary minus so the code can know
  * (by testing the sign) whether to use mkobj() or mksobj().
  */
-
 const struct shclass shtypes[] = {
     { "general store",
       RANDOM_CLASS,
@@ -407,6 +405,7 @@ shkveg()
     int ok[NUM_OBJECTS];
 
     j = maxprob = 0;
+    ok[0] = 0; /* lint suppression */
     for (i = bases[(int) oclass]; i < NUM_OBJECTS; ++i) {
         if (objects[i].oc_class != oclass)
             break;
@@ -735,7 +734,8 @@ register struct mkroom *sroom;
         for (sx = sroom->lx; sx <= sroom->hx; sx++)
             for (sy = sroom->ly; sy <= sroom->hy; sy++) {
                 if (sroom->irregular) {
-                    if (levl[sx][sy].edge || (int) levl[sx][sy].roomno != rmno
+                    if (levl[sx][sy].edge
+                        || (int) levl[sx][sy].roomno != rmno
                         || distmin(sx, sy, doors[sh].x, doors[sh].y) <= 1)
                         continue;
                 } else if ((sx == sroom->lx && doors[sh].x == sx - 1)
@@ -752,7 +752,8 @@ register struct mkroom *sroom;
     for (sx = sroom->lx; sx <= sroom->hx; sx++)
         for (sy = sroom->ly; sy <= sroom->hy; sy++) {
             if (sroom->irregular) {
-                if (levl[sx][sy].edge || (int) levl[sx][sy].roomno != rmno
+                if (levl[sx][sy].edge
+                    || (int) levl[sx][sy].roomno != rmno
                     || distmin(sx, sy, doors[sh].x, doors[sh].y) <= 1)
                     continue;
             } else if ((sx == sroom->lx && doors[sh].x == sx - 1)

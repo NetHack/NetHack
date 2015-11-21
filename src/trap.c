@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1448073071 2015/11/21 02:31:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.247 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1448094344 2015/11/21 08:25:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.248 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3781,6 +3781,7 @@ struct trap *ttmp;
     xchar x = ttmp->tx, y = ttmp->ty, bx, by, cx, cy;
     boolean unused;
 
+    bx = by = cx = cy = 0; /* lint suppression */
     /* we know there's no monster in the way, and we're not trapped */
     if (!Punished
         || drag_ball(x, y, &bc, &bx, &by, &cx, &cy, &unused, TRUE)) {
