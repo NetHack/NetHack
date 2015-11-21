@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1446713644 2015/11/05 08:54:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.244 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1448073071 2015/11/21 02:31:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.247 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -320,6 +320,7 @@ struct trap *
 maketrap(x, y, typ)
 register int x, y, typ;
 {
+    static union vlaunchinfo zero_vl;
     register struct trap *ttmp;
     register struct rm *lev;
     boolean oldplace;
@@ -334,35 +335,39 @@ register int x, y, typ;
                 || (u.utraptype == TT_PIT && typ != PIT
                     && typ != SPIKED_PIT)))
             u.utrap = 0;
+        /* old <tx,ty> remain valid */
     } else {
         oldplace = FALSE;
         ttmp = newtrap();
+        ttmp->ntrap = 0;
         ttmp->tx = x;
         ttmp->ty = y;
-        ttmp->launch.x = -1; /* force error if used before set */
-        ttmp->launch.y = -1;
     }
+    /* [re-]initialize all fields except ntrap (handled below) and <tx,ty> */
+    ttmp->vl = zero_vl;
+    ttmp->launch.x = ttmp->launch.y = -1; /* force error if used before set */
+    ttmp->dst.dnum = ttmp->dst.dlevel = -1;
+    ttmp->madeby_u = 0;
+    ttmp->once = 0;
+    ttmp->tseen = (typ == HOLE); /* hide non-holes */
     ttmp->ttyp = typ;
+
     switch (typ) {
     case SQKY_BOARD: {
         int tavail[12], tpick[12], tcnt = 0, k;
         struct trap *t;
 
         for (k = 0; k < 12; ++k)
-            tavail[k] = 0;
+            tavail[k] = tpick[k] = 0;
         for (t = ftrap; t; t = t->ntrap)
             if (t->ttyp == SQKY_BOARD && t != ttmp)
                 tavail[t->tnote] = 1;
-
-        /* Now populate tpick with the available indexes */
-        for (k = 0; k < 12; ++k) {
+        /* now populate tpick[] with the available indices */
+        for (k = 0; k < 12; ++k)
             if (tavail[k] == 0)
                 tpick[tcnt++] = k;
-        }
-        if (tcnt > 0)
-            ttmp->tnote = (short) tpick[rn2(tcnt)];
-        else
-            ttmp->tnote = (short) rn2(12); /* all in use anyway */
+        /* choose an unused note; if all are in use, pick a random one */
+        ttmp->tnote = (short) ((tcnt > 0) ? tpick[rn2(tcnt)] : rn2(12));
         break;
     }
     case STATUE_TRAP: { /* create a "living" statue */
@@ -375,8 +380,8 @@ register int x, y, typ;
             mptr = &mons[rndmonnum()];
         } while (--trycount > 0 && is_unicorn(mptr)
                  && sgn(u.ualign.type) == sgn(mptr->maligntyp));
-        statue =
-            mkcorpstat(STATUE, (struct monst *) 0, mptr, x, y, CORPSTAT_NONE);
+        statue = mkcorpstat(STATUE, (struct monst *) 0, mptr, x, y,
+                            CORPSTAT_NONE);
         mtmp = makemon(&mons[statue->corpsenm], 0, 0, MM_NOCOUNTBIRTH);
         if (!mtmp)
             break; /* should never happen */
@@ -425,11 +430,7 @@ register int x, y, typ;
         unearth_objs(x, y);
         break;
     }
-    ttmp->tseen = (ttmp->ttyp == HOLE); /* hide non-holes */
-    ttmp->once = 0;
-    ttmp->madeby_u = 0;
-    ttmp->dst.dnum = -1;
-    ttmp->dst.dlevel = -1;
+
     if (!oldplace) {
         ttmp->ntrap = ftrap;
         ftrap = ttmp;
@@ -523,6 +524,7 @@ boolean td; /* td == TRUE : trap door or hole */
     if (!td)
         Sprintf(msgbuf, "The hole in the %s above you closes up.",
                 ceiling(u.ux, u.uy));
+
     schedule_goto(&dtmp, FALSE, TRUE, 0, (char *) 0,
                   !td ? msgbuf : (char *) 0);
 }
@@ -774,6 +776,7 @@ struct obj *objchn, *saddle;
     while (objchn) {
         if (objchn->otyp == CORPSE && has_omonst(objchn)) {
             struct monst *mtmp = OMONST(objchn);
+
             if (mtmp->m_id == steed_mid) {
                 /* move saddle */
                 xchar x, y;
@@ -812,8 +815,8 @@ unsigned trflags;
     nomul(0);
 
     /* KMH -- You can't escape the Sokoban level traps */
-    if (Sokoban && (ttype == PIT || ttype == SPIKED_PIT || ttype == HOLE
-                    || ttype == TRAPDOOR)) {
+    if (Sokoban && (ttype == PIT || ttype == SPIKED_PIT
+                    || ttype == HOLE || ttype == TRAPDOOR)) {
         /* The "air currents" message is still appropriate -- even when
          * the hero isn't flying or levitating -- because it conveys the
          * reason why the player cannot escape the trap with a dexterity
@@ -867,9 +870,9 @@ unsigned trflags;
         otmp->quan = 1L;
         otmp->owt = weight(otmp);
         otmp->opoisoned = 0;
-        if (u.usteed && !rn2(2) && steedintrap(trap, otmp)) /* nothing */
+        if (u.usteed && !rn2(2) && steedintrap(trap, otmp)) { /* nothing */
             ;
-        else if (thitu(8, dmgval(otmp, &youmonst), otmp, "arrow")) {
+        } else if (thitu(8, dmgval(otmp, &youmonst), otmp, "arrow")) {
             obfree(otmp, (struct obj *) 0);
         } else {
             place_object(otmp, u.ux, u.uy);
@@ -896,9 +899,9 @@ unsigned trflags;
         if (!rn2(6))
             otmp->opoisoned = 1;
         oldumort = u.umortality;
-        if (u.usteed && !rn2(2) && steedintrap(trap, otmp)) /* nothing */
+        if (u.usteed && !rn2(2) && steedintrap(trap, otmp)) { /* nothing */
             ;
-        else if (thitu(7, dmgval(otmp, &youmonst), otmp, "little dart")) {
+        } else if (thitu(7, dmgval(otmp, &youmonst), otmp, "little dart")) {
             if (otmp->opoisoned)
                 poisoned("dart", A_CON, "little dart",
                          /* if damage triggered life-saving,
@@ -1097,6 +1100,7 @@ unsigned trflags;
         }
         if (!Sokoban) {
             char verbbuf[BUFSZ];
+
             if (u.usteed) {
                 if ((trflags & RECURSIVETRAP) != 0)
                     Sprintf(verbbuf, "and %s fall",
@@ -1119,10 +1123,12 @@ unsigned trflags;
             && In_quest(&u.uz) && Is_qlocate(&u.uz)) {
             pline("Fortunately it has a bottom after all...");
             trap->once = 1;
-        } else if (u.umonnum == PM_PIT_VIPER || u.umonnum == PM_PIT_FIEND)
+        } else if (u.umonnum == PM_PIT_VIPER || u.umonnum == PM_PIT_FIEND) {
             pline("How pitiful.  Isn't that the pits?");
+        }
         if (ttype == SPIKED_PIT) {
             const char *predicament = "on a set of sharp iron spikes";
+
             if (u.usteed) {
                 pline("%s %s %s!",
                       upstart(x_monnam(u.usteed, steed_article, "poor",
@@ -1302,8 +1308,9 @@ unsigned trflags;
             Your("body absorbs some of the magical energy!");
             u.uen = (u.uenmax += 2);
             break;
-        } else
+        } else {
             domagictrap();
+        }
         (void) steedintrap(trap, (struct obj *) 0);
         break;
 
@@ -1346,6 +1353,7 @@ unsigned trflags;
 
     case POLY_TRAP: {
         char verbbuf[BUFSZ];
+
         seetrap(trap);
         if (u.usteed)
             Sprintf(verbbuf, "lead %s",
@@ -1372,6 +1380,7 @@ unsigned trflags;
     case LANDMINE: {
         unsigned steed_mid = 0;
         struct obj *saddle = 0;
+
         if ((Levitation || Flying) && !forcetrap) {
             if (!already_seen && rn2(3))
                 break;
@@ -1440,7 +1449,7 @@ unsigned trflags;
         break;
 
     case VIBRATING_SQUARE:
-        seetrap(trap);
+        feeltrap(trap);
         /* messages handled elsewhere; the trap symbol is merely to mark the
          * square for future reference */
         break;
@@ -1461,6 +1470,7 @@ boolean noprefix;
         *tnnames[12] = { "C note",  "D flat", "D note",  "E flat",
                          "E note",  "F note", "F sharp", "G note",
                          "G sharp", "A note", "B flat",  "B note" };
+
     tnbuf[0] = '\0';
     tn = tnnames[trap->tnote];
     if (!noprefix)
@@ -1518,9 +1528,9 @@ struct obj *otmp;
         break;
     case PIT:
     case SPIKED_PIT:
-        trapkilled =
-            (steed->mhp <= 0 || thitm(0, steed, (struct obj *) 0,
-                                      rnd((tt == PIT) ? 6 : 10), FALSE));
+        trapkilled = (steed->mhp <= 0
+                      || thitm(0, steed, (struct obj *) 0,
+                               rnd((tt == PIT) ? 6 : 10), FALSE));
         steedhit = TRUE;
         break;
     case POLY_TRAP:
@@ -1950,6 +1960,7 @@ long ocount;
             success = isclearpath(&cc, distance, dx, dy);
         if (ttmp->ttyp == ROLLING_BOULDER_TRAP) {
             boolean success_otherway;
+
             bcc.x = x;
             bcc.y = y;
             success_otherway = isclearpath(&bcc, distance, -(dx), -(dy));
@@ -2527,6 +2538,7 @@ register struct monst *mtmp;
                 break; /* monsters usually don't set it off */
             if (is_flyer(mptr)) {
                 boolean already_seen = trap->tseen;
+
                 if (in_sight && !already_seen) {
                     pline("A trigger appears in a pile of soil below %s.",
                           mon_nam(mtmp));
@@ -2726,7 +2738,7 @@ float_up()
             You("float up, only your %s is still stuck.", body_part(LEG));
         }
 #if 0
-    } else if(Is_waterlevel(&u.uz)) {
+    } else if (Is_waterlevel(&u.uz)) {
         pline("It feels as though you've lost some weight.");
 #endif
     } else if (u.uinwater) {
@@ -2895,7 +2907,7 @@ long hmask, emask; /* might cancel timeout */
         case TRAPDOOR:
             if (!Can_fall_thru(&u.uz) || u.ustuck)
                 break;
-        /* fall into next case */
+            /*FALLTHRU*/
         default:
             if (!u.utrap) /* not already in the trap */
                 dotrap(trap, 0);
@@ -3206,7 +3218,8 @@ xchar x, y;
         setnotworn(obj);
         delobj(obj);
         return TRUE;
-    } else if (erode_obj(obj, NULL, ERODE_BURN, EF_DESTROY) == ER_DESTROYED) {
+    } else if (erode_obj(obj, (char *) 0, ERODE_BURN, EF_DESTROY)
+               == ER_DESTROYED) {
         return TRUE;
     }
     return FALSE;
@@ -3251,7 +3264,7 @@ struct obj *obj;
     vismon = victim && (victim != &youmonst) && canseemon(victim);
 
     if (obj->greased) {
-        grease_protect(obj, NULL, victim);
+        grease_protect(obj, (char *) 0, victim);
     } else if (obj->oclass == SCROLL_CLASS && obj->otyp != SCR_BLANK_PAPER) {
         if (obj->otyp != SCR_BLANK_PAPER
 #ifdef MAIL
@@ -3270,7 +3283,7 @@ struct obj *obj;
         obj->spe = 0;
         obj->dknown = 0;
     } else
-        erode_obj(obj, NULL, ERODE_CORRODE, EF_GREASE | EF_VERBOSE);
+        erode_obj(obj, (char *) 0, ERODE_CORRODE, EF_GREASE | EF_VERBOSE);
 }
 
 /* context for water_damage(), managed by water_damage_chain();
@@ -3437,7 +3450,7 @@ boolean here;
 
     for (; obj; obj = otmp) {
         otmp = here ? obj->nexthere : obj->nobj;
-        water_damage(obj, NULL, FALSE);
+        water_damage(obj, (char *) 0, FALSE);
     }
 
     /* reset acid context */
@@ -3746,7 +3759,7 @@ boolean bury_it;
     place_object(otmp, ttmp->tx, ttmp->ty);
     if (bury_it) {
         /* magical digging first disarms this trap, then will unearth it */
-        (void) bury_an_obj(otmp, NULL);
+        (void) bury_an_obj(otmp, (boolean *) 0);
     } else {
         /* Sell your own traps only... */
         if (ttmp->madeby_u)
@@ -4064,9 +4077,9 @@ struct trap *ttmp;
         You("grab the trapped %s using your bare %s.", mtmp->data->mname,
             makeplural(body_part(HAND)));
 
-        if (poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM))
+        if (poly_when_stoned(youmonst.data) && polymon(PM_STONE_GOLEM)) {
             display_nhwindow(WIN_MESSAGE, FALSE);
-        else {
+        } else {
             char kbuf[BUFSZ];
 
             Sprintf(kbuf, "trying to help %s out of a pit",
@@ -5024,9 +5037,9 @@ lava_effects()
         iflags.in_lava_effects--;
 
         /* s/he died... */
-        boil_away =
-            (u.umonnum == PM_WATER_ELEMENTAL || u.umonnum == PM_STEAM_VORTEX
-             || u.umonnum == PM_FOG_CLOUD);
+        boil_away = (u.umonnum == PM_WATER_ELEMENTAL
+                     || u.umonnum == PM_STEAM_VORTEX
+                     || u.umonnum == PM_FOG_CLOUD);
         for (;;) {
             u.uhp = -1;
             /* killer format and name are reconstructed every iteration
