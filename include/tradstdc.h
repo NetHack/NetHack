@@ -1,4 +1,4 @@
-/* NetHack 3.6	tradstdc.h	$NHDT-Date: 1447755973 2015/11/17 10:26:13 $  $NHDT-Branch: master $:$NHDT-Revision: 1.26 $ */
+/* NetHack 3.6	tradstdc.h	$NHDT-Date: 1448210011 2015/11/22 16:33:31 $  $NHDT-Branch: master $:$NHDT-Revision: 1.27 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -385,6 +385,7 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #endif
 #if __GNUC__ >= 3
 #define UNUSED __attribute__((unused))
+#define NORETURN __attribute__((noreturn))
 #endif
 #endif
 
@@ -393,6 +394,9 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #endif
 #ifndef UNUSED
 #define UNUSED
+#endif
+#ifndef NORETURN
+#define NORETURN
 #endif
 
 #endif /* TRADSTDC_H */

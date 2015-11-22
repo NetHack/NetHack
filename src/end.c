@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1448094339 2015/11/21 08:25:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.105 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1448210011 2015/11/22 16:33:31 $  $NHDT-Branch: master $:$NHDT-Revision: 1.107 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -47,6 +47,7 @@ STATIC_DCL void FDECL(disclose, (int, BOOLEAN_P));
 STATIC_DCL void FDECL(get_valuables, (struct obj *));
 STATIC_DCL void FDECL(sort_valuables, (struct valuable_data *, int));
 STATIC_DCL void FDECL(artifact_score, (struct obj *, BOOLEAN_P, winid));
+STATIC_DCL void FDECL(really_done, (int)) NORETURN;
 STATIC_DCL boolean FDECL(odds_and_ends, (struct obj *, int));
 STATIC_DCL void FDECL(savelife, (int));
 STATIC_DCL void FDECL(list_vanquished, (CHAR_P, BOOLEAN_P));
@@ -535,23 +536,25 @@ VA_DECL(const char *, str)
         raw_print("\nError save file being written.\n");
 #else
     if (!wizard) {
+        const char *maybe_rebuild = !program_state.something_worth_saving
+                                      ? "."
+                                      : " and it may be possible to rebuild.";
+        char *tmp = 0;
+
         if (sysopt.support)
             raw_printf("To report this error, %s%s", sysopt.support,
-                       !program_state.something_worth_saving
-                           ? "."
-                           : " and it may be possible to rebuild.");
-        else if (sysopt.wizards) {
-            char *tmp = build_english_list(sysopt.wizards);
+                       maybe_rebuild);
+        else if (sysopt.wizards && strcmp(sysopt.wizards, "*") != 0
+                   /* this is risky; panic might be due to malloc failure */
+                   && (tmp = build_english_list(sysopt.wizards)) != 0)
             raw_printf("To report this error, contact %s%s", tmp,
-                       !program_state.something_worth_saving
-                           ? "."
-                           : " and it may be possible to rebuild.");
-            free(tmp);
-        } else
+                       maybe_rebuild);
+        else
             raw_printf("Report error to \"%s\"%s", WIZARD_NAME,
-                       !program_state.something_worth_saving
-                           ? "."
-                           : " and it may be possible to rebuild.");
+                       maybe_rebuild);
+
+        if (tmp)
+            free((genericptr_t) tmp);
     }
 #endif
     /* XXX can we move this above the prints?  Then we'd be able to
@@ -568,6 +571,7 @@ VA_DECL(const char *, str)
 #endif
     {
         char buf[BUFSZ];
+
         Vsprintf(buf, str, VA_ARGS);
         raw_print(buf);
         paniclog("panic", buf);
@@ -580,7 +584,7 @@ VA_DECL(const char *, str)
         NH_abort(); /* generate core dump */
 #endif
     VA_END();
-    done(PANICKED);
+    really_done(PANICKED);
 }
 
 STATIC_OVL boolean
@@ -862,15 +866,6 @@ void
 done(how)
 int how;
 {
-    boolean taken;
-    char pbuf[BUFSZ];
-    winid endwin = WIN_ERR;
-    boolean bones_ok, have_windows = iflags.window_inited;
-    struct obj *corpse = (struct obj *) 0;
-    time_t endtime;
-    long umoney;
-    long tmp;
-
     if (how == TRICKED) {
         if (killer.name[0]) {
             paniclog("trickery", killer.name);
@@ -882,8 +877,6 @@ int how;
         }
     }
 
-    /* pbuf: holds Sprintf'd output for raw_print and putstr
-     */
     if (how == ASCENDED || (!killer.name[0] && how == GENOCIDED))
         killer.format = NO_KILLER_PREFIX;
     /* Avoid killed by "a" burning or "a" starvation */
@@ -907,34 +900,48 @@ int how;
 
         (void) adjattrib(A_CON, -1, TRUE);
         savelife(how);
-        if (how == GENOCIDED)
+        if (how == GENOCIDED) {
             pline("Unfortunately you are still genocided...");
-        else {
+        } else {
             killer.name[0] = 0;
             killer.format = 0;
             return;
         }
     }
-    if ((wizard || discover) && (how <= GENOCIDED)) {
-        if (paranoid_query(ParanoidDie, "Die?"))
-            goto die;
+    if ((wizard || discover) && (how <= GENOCIDED) &&
+        !paranoid_query(ParanoidDie, "Die?")) {
         pline("OK, so you don't %s.", (how == CHOKING) ? "choke" : "die");
         savelife(how);
         killer.name[0] = 0;
         killer.format = 0;
         return;
     }
+    really_done(how);
+}
 
-/*
- *      The game is now over...
- */
+/* separated from done() in order to specify the __noreturn__ attribute */
+STATIC_OVL void
+really_done(how)
+int how;
+{
+    boolean taken;
+    char pbuf[BUFSZ];
+    winid endwin = WIN_ERR;
+    boolean bones_ok, have_windows = iflags.window_inited;
+    struct obj *corpse = (struct obj *) 0;
+    time_t endtime;
+    long umoney;
+    long tmp;
 
-die:
+    /*
+     *  The game is now over...
+     */
     program_state.gameover = 1;
     /* in case of a subsequent panic(), there's no point trying to save */
     program_state.something_worth_saving = 0;
     /* render vision subsystem inoperative */
     iflags.vision_inited = 0;
+
     /* might have been killed while using a disposable item, so make sure
        it's gone prior to inventory disclosure and creation of bones data */
     inven_inuse(TRUE);
@@ -1039,6 +1046,7 @@ die:
         formatkiller(eos(pbuf), sizeof pbuf - strlen(pbuf), how);
         make_grave(u.ux, u.uy, pbuf);
     }
+    pbuf[0] = '\0'; /* clear grave text; also lint suppression */
 
     /* calculate score, before creating bones [container gold] */
     {
@@ -1388,6 +1396,11 @@ int status;
     }
 
 #ifdef VMS
+    /*
+     *  This is liable to draw a warning if compiled with gcc, but it's
+     *  more important to flag panic() -> really_done() -> terminate()
+     *  as __noreturn__ then to avoid the warning.
+     */
     /* don't call exit() if already executing within an exit handler;
        that would cancel any other pending user-mode handlers */
     if (program_state.exiting)

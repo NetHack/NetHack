@@ -1,10 +1,10 @@
-/* NetHack 3.6	panic.c	$NHDT-Date: 1432512785 2015/05/25 00:13:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
+/* NetHack 3.6	panic.c	$NHDT-Date: 1448210012 2015/11/22 16:33:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
- *	This code was adapted from the code in end.c to run in a standalone
- *	mode for the makedefs / drg code.
+ *      This code was adapted from the code in end.c to run in a standalone
+ *      mode for the makedefs / drg code.
  */
 
 #define NEED_VARARGS
@@ -43,7 +43,6 @@ VA_DECL(char *, str)
 #endif
     VA_END();
     exit(EXIT_FAILURE); /* redundant */
-    return;
 }
 
 #ifdef ALLOCA_HACK

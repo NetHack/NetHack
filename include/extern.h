@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1447653422 2015/11/16 05:57:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.517 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1448210010 2015/11/22 16:33:30 $  $NHDT-Branch: master $:$NHDT-Revision: 1.519 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -636,12 +636,12 @@ E void FDECL(done_intr, (int));
 #endif
 E void FDECL(done_in_by, (struct monst *, int));
 #endif /* !MAKEDEFS_C && !LEV_LEX_C */
-E void VDECL(panic, (const char *, ...)) PRINTF_F(1, 2);
+E void VDECL(panic, (const char *, ...)) PRINTF_F(1, 2) NORETURN;
 #if !defined(MAKEDEFS_C) && !defined(LEV_LEX_C)
 E void FDECL(done, (int));
-E void FDECL(container_contents,
-             (struct obj *, BOOLEAN_P, BOOLEAN_P, BOOLEAN_P));
-E void FDECL(terminate, (int));
+E void FDECL(container_contents, (struct obj *, BOOLEAN_P,
+                                  BOOLEAN_P, BOOLEAN_P));
+E void FDECL(terminate, (int)) NORETURN;
 E int NDECL(dovanquished);
 E int NDECL(num_genocides);
 E void FDECL(delayed_killer, (int, int, const char *));
@@ -2526,8 +2526,8 @@ E boolean NDECL(authorize_wizard_mode);
 
 /* ### vmsmisc.c ### */
 
-E void NDECL(vms_abort);
-E void FDECL(vms_exit, (int));
+E void NDECL(vms_abort) NORETURN;
+E void FDECL(vms_exit, (int)) NORETURN;
 #ifdef PANICTRACE
 E void FDECL(vms_traceback, (int));
 #endif
