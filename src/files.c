@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1447653425 2015/11/16 05:57:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.187 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1448209568 2015/11/22 16:26:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.188 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1353,7 +1353,7 @@ boolean uncomp;
          * messages are being written on top of the screen, but at least
          * the user can read them.
          */
-        if (istty) {
+        if (istty && iflags.window_inited) {
             clear_nhwindow(WIN_MESSAGE);
             more();
             /* No way to know if this is feasible */
