@@ -1,4 +1,4 @@
-/* NetHack 3.6	mapglyph.c	$NHDT-Date: 1446955302 2015/11/08 04:01:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.38 $ */
+/* NetHack 3.6	mapglyph.c	$NHDT-Date: 1448175698 2015/11/22 07:01:38 $  $NHDT-Branch: master $:$NHDT-Revision: 1.40 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -122,16 +122,16 @@ unsigned *ospecial;
                 color = CLR_GREEN;
             else
                 color = NO_COLOR;
-        } else
 #ifdef TEXTCOLOR
-            /* provide a visible difference if normal and lit corridor
-             * use the same symbol */
-            if (iflags.use_color && offset == S_litcorr
-                && showsyms[idx] == showsyms[S_corr + SYM_OFF_P])
+        /* provide a visible difference if normal and lit corridor
+         * use the same symbol */
+        } else if (iflags.use_color && offset == S_litcorr
+                   && showsyms[idx] == showsyms[S_corr + SYM_OFF_P]) {
             color = CLR_WHITE;
-        else
 #endif
+        } else {
             cmap_color(offset);
+        }
     } else if ((offset = (glyph - GLYPH_OBJ_OFF)) >= 0) { /* object */
         idx = objects[offset].oc_class + SYM_OFF_O;
         if (offset == BOULDER)
@@ -257,32 +257,38 @@ winid window;
 int attr;
 const char *str;
 {
+    static const char hex[] = "00112233445566778899aAbBcCdDeEfF";
     char buf[BUFSZ];
     const char *cp = str;
     char *put = buf;
 
     while (*cp) {
         if (*cp == '\\') {
-            int rndchk = 0, so = 0, gv = 0, ch, oc, dcount;
-            unsigned os;
-            const char *dp, *hex = "00112233445566778899aAbBcCdDeEfF";
-            const char *save_cp = cp;
+            int rndchk, dcount, so, gv, ch = 0, oc = 0;
+            unsigned os = 0;
+            const char *dp, *save_cp;
 
-            cp++;
+            save_cp = cp++;
             switch (*cp) {
             case 'G': /* glyph value \GXXXXNNNN*/
-                dcount = 0;
-                for (++cp; *cp && (dp = index(hex, *cp)) && (dcount++ < 4);
-                     cp++)
-                    rndchk = (int) ((rndchk * 16) + ((int) (dp - hex) / 2));
-
+                rndchk = dcount = 0;
+                for (++cp; *cp && ++dcount <= 4; ++cp)
+                    if ((dp = index(hex, *cp)) != 0)
+                        rndchk = (rndchk * 16) + ((int) (dp - hex) / 2);
+                    else
+                        break;
                 if (rndchk == context.rndencode) {
-                    dcount = 0;
-                    for (; *cp && (dp = index(hex, *cp)) && (dcount++ < 4);
-                         cp++)
-                        gv = (int) ((gv * 16) + ((int) (dp - hex) / 2));
+                    gv = dcount = 0;
+                    for (; *cp && ++dcount <= 4; ++cp)
+                        if ((dp = index(hex, *cp)) != 0)
+                            gv = (gv * 16) + ((int) (dp - hex) / 2);
+                        else
+                            break;
                     so = mapglyph(gv, &ch, &oc, &os, 0, 0);
                     *put++ = showsyms[so];
+                    /* 'cp' is ready for the next loop iteration and '*cp'
+                       should not be copied at the end of this iteration */
+                    continue;
                 } else {
                     /* possible forgery - leave it the way it is */
                     cp = save_cp;
@@ -290,15 +296,19 @@ const char *str;
                 break;
 #if 0
             case 'S': /* symbol offset */
-                dcount = 0;
-                for (++cp; *cp && (dp = index(hex, *cp)) != 0 && dcount++ < 4;
-                     cp++)
-                    rndchk = (int) ((rndchk * 16) + ((int) (dp - hex) / 2));
+                so = rndchk = dcount = 0;
+                for (++cp; *cp && ++dcount <= 4; ++cp)
+                    if ((dp = index(hex, *cp)) != 0)
+                        rndchk = (rndchk * 16) + ((int) (dp - hex) / 2);
+                    else
+                        break;
                 if (rndchk == context.rndencode) {
                     dcount = 0;
-                    for (; *cp && (dp = index(hex, *cp)) != 0 && dcount++ < 2;
-                         cp++)
-                        so = (int) ((so * 16) + ((int) (dp - hex) / 2));
+                    for (; *cp && ++dcount <= 2; ++cp)
+                        if ((dp = index(hex, *cp)) != 0)
+                            so = (so * 16) + ((int) (dp - hex) / 2);
+                        else
+                            break;
                 }
                 *put++ = showsyms[so];
                 break;
@@ -313,4 +323,5 @@ const char *str;
     /* now send it to the normal putstr */
     putstr(window, attr, buf);
 }
+
 /*mapglyph.c*/
