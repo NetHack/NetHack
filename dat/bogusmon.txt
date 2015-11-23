@@ -417,6 +417,12 @@ fraggle
 # Spoonerism
 mock role
 
+# Truly scary things
+clown
+mime
+peddler
+haggler
+
 # soundex and typos of monsters
 gloating eye
 flush golem
