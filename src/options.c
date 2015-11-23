@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1448094341 2015/11/21 08:25:41 $  $NHDT-Branch: master $:$NHDT-Revision: 1.241 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1448241657 2015/11/23 01:20:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.243 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -519,7 +519,7 @@ STATIC_DCL int NDECL(msgtype_count);
 STATIC_DCL boolean FDECL(add_menu_coloring_parsed, (char *, int, int));
 STATIC_DCL void FDECL(free_one_menu_coloring, (int));
 STATIC_DCL int NDECL(count_menucolors);
-STATIC_DCL int FDECL(handle_add_list_remove, (char *, int));
+STATIC_DCL int FDECL(handle_add_list_remove, (const char *, int));
 
 void
 reglyph_darkroom()
@@ -611,6 +611,10 @@ initoptions()
         raw_printf("Error(s) found in SYSCF_FILE, quitting.");
         terminate(EXIT_FAILURE);
     }
+    /*
+     * TODO [maybe]: parse the sysopt entries which are space-separated
+     * lists of usernames into arrays with one name per element.
+     */
 #endif
 #endif
     initoptions_finish();
@@ -3711,7 +3715,7 @@ doset()
 
 int
 handle_add_list_remove(optname, numtotal)
-char *optname;
+const char *optname;
 int numtotal;
 {
     winid tmpwin;
