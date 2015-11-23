@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1446892451 2015/11/07 10:34:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.83 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1448241783 2015/11/23 01:23:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.85 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -29,6 +29,7 @@ is_swallow_sym(c)
 int c;
 {
     int i;
+
     for (i = S_sw_tl; i <= S_sw_br; i++)
         if ((int) showsyms[i] == c)
             return TRUE;
@@ -313,6 +314,7 @@ char *buf, *monbuf;
         look_at_object(buf, x, y, glyph); /* fill in buf[] */
     } else if (glyph_is_trap(glyph)) {
         int tnum = what_trap(glyph_to_trap(glyph));
+
         Strcpy(buf, defsyms[trap_to_defsym(tnum)].explanation);
     } else if (!glyph_is_cmap(glyph)) {
         Strcpy(buf, "unexplored area");
@@ -959,6 +961,7 @@ coord *click_cc;
                 && (ans == LOOK_VERBOSE || (flags.help && !quick))
                 && !clicklook) {
                 char temp_buf[BUFSZ];
+
                 Strcpy(temp_buf, firstmatch);
                 checkfile(temp_buf, pm, FALSE,
                           (boolean) (ans == LOOK_VERBOSE));
@@ -1192,10 +1195,9 @@ docontact()
         Sprintf(buf, "To contact local support, %s", sysopt.support);
         putstr(cwin, 0, buf);
         putstr(cwin, 0, "");
-    } else if (sysopt.wizards) {
-        char *tmp = build_english_list(sysopt.wizards);
-        Sprintf(buf, "To contact local support, contact %s.", tmp);
-        free(tmp);
+    } else if (sysopt.fmtd_wizard_list) { /* formatted SYSCF WIZARDS */
+        Sprintf(buf, "To contact local support, contact %s.",
+                sysopt.fmtd_wizard_list);
         putstr(cwin, 0, buf);
         putstr(cwin, 0, "");
     }

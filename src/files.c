@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1448209568 2015/11/22 16:26:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.188 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1448241781 2015/11/23 01:23:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.189 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2227,15 +2227,23 @@ int src;
 #ifdef SYSCF
     } else if (src == SET_IN_SYS && match_varname(buf, "WIZARDS", 7)) {
         if (sysopt.wizards)
-            free(sysopt.wizards);
+            free((genericptr_t) sysopt.wizards);
         sysopt.wizards = dupstr(bufp);
+        if (strlen(sysopt.wizards) && strcmp(sysopt.wizards, "*")) {
+            /* pre-format WIZARDS list now; it's displayed during a panic
+               and since that panic might be due to running out of memory,
+               we don't want to risk attempting to allocate any memory then */
+            if (sysopt.fmtd_wizard_list)
+                free((genericptr_t) sysopt.fmtd_wizard_list);
+            sysopt.fmtd_wizard_list = build_english_list(sysopt.wizards);
+        }
     } else if (src == SET_IN_SYS && match_varname(buf, "SHELLERS", 8)) {
         if (sysopt.shellers)
-            free(sysopt.shellers);
+            free((genericptr_t) sysopt.shellers);
         sysopt.shellers = dupstr(bufp);
     } else if (src == SET_IN_SYS && match_varname(buf, "EXPLORERS", 7)) {
         if (sysopt.explorers)
-            free(sysopt.explorers);
+            free((genericptr_t) sysopt.explorers);
         sysopt.explorers = dupstr(bufp);
     } else if (src == SET_IN_SYS && match_varname(buf, "DEBUGFILES", 5)) {
         /* if showdebug() has already been called (perhaps we've added
@@ -2243,16 +2251,16 @@ int src;
            a value for getenv("DEBUGFILES"), don't override that */
         if (sysopt.env_dbgfl == 0) {
             if (sysopt.debugfiles)
-                free(sysopt.debugfiles);
+                free((genericptr_t) sysopt.debugfiles);
             sysopt.debugfiles = dupstr(bufp);
         }
     } else if (src == SET_IN_SYS && match_varname(buf, "SUPPORT", 7)) {
         if (sysopt.support)
-            free(sysopt.support);
+            free((genericptr_t) sysopt.support);
         sysopt.support = dupstr(bufp);
     } else if (src == SET_IN_SYS && match_varname(buf, "RECOVER", 7)) {
         if (sysopt.recover)
-            free(sysopt.recover);
+            free((genericptr_t) sysopt.recover);
         sysopt.recover = dupstr(bufp);
     } else if (src == SET_IN_SYS
                && match_varname(buf, "CHECK_SAVE_UID", 14)) {
@@ -2338,7 +2346,7 @@ int src;
             return 0;
         }
         if (sysopt.gdbpath)
-            free(sysopt.gdbpath);
+            free((genericptr_t) sysopt.gdbpath);
         sysopt.gdbpath = dupstr(bufp);
 #endif
     } else if (src == SET_IN_SYS && match_varname(buf, "GREPPATH", 7)) {
@@ -2348,7 +2356,7 @@ int src;
             return 0;
         }
         if (sysopt.greppath)
-            free(sysopt.greppath);
+            free((genericptr_t) sysopt.greppath);
         sysopt.greppath = dupstr(bufp);
 #endif /* !VMS */
 #endif /* PANICTRACE */
@@ -3369,7 +3377,7 @@ boolean wildcards;
            is valid and doesn't pose any sort of overflow risk here] */
         if ((p = getenv("DEBUGFILES")) != 0) {
             if (sysopt.debugfiles)
-                free(sysopt.debugfiles);
+                free((genericptr_t) sysopt.debugfiles);
             sysopt.debugfiles = dupstr(p);
             sysopt.env_dbgfl = 1;
         } else

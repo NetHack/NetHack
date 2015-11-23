@@ -1,4 +1,4 @@
-/* NetHack 3.6	sys.c	$NHDT-Date: 1447118472 2015/11/10 01:21:12 $  $NHDT-Branch: master $:$NHDT-Revision: 1.34 $ */
+/* NetHack 3.6	sys.c	$NHDT-Date: 1448241785 2015/11/23 01:23:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.35 $ */
 /* Copyright (c) Kenneth Lorber, Kensington, Maryland, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -81,23 +81,29 @@ void
 sysopt_release()
 {
     if (sysopt.support)
-        free(sysopt.support), sysopt.support = (char *) 0;
+        free((genericptr_t) sysopt.support), sysopt.support = (char *) 0;
     if (sysopt.recover)
-        free(sysopt.recover), sysopt.recover = (char *) 0;
+        free((genericptr_t) sysopt.recover), sysopt.recover = (char *) 0;
     if (sysopt.wizards)
-        free(sysopt.wizards), sysopt.wizards = (char *) 0;
+        free((genericptr_t) sysopt.wizards), sysopt.wizards = (char *) 0;
     if (sysopt.explorers)
-        free(sysopt.explorers), sysopt.explorers = (char *) 0;
+        free((genericptr_t) sysopt.explorers), sysopt.explorers = (char *) 0;
     if (sysopt.shellers)
-        free(sysopt.shellers), sysopt.shellers = (char *) 0;
+        free((genericptr_t) sysopt.shellers), sysopt.shellers = (char *) 0;
     if (sysopt.debugfiles)
-        free(sysopt.debugfiles), sysopt.debugfiles = (char *) 0;
+        free((genericptr_t) sysopt.debugfiles),
+        sysopt.debugfiles = (char *) 0;
 #ifdef PANICTRACE
     if (sysopt.gdbpath)
-        free(sysopt.gdbpath), sysopt.gdbpath = (char *) 0;
+        free((genericptr_t) sysopt.gdbpath), sysopt.gdbpath = (char *) 0;
     if (sysopt.greppath)
-        free(sysopt.greppath), sysopt.greppath = (char *) 0;
+        free((genericptr_t) sysopt.greppath), sysopt.greppath = (char *) 0;
 #endif
+    /* this one's last because it might be used in panic feedback, although
+       none of the preceding ones are likely to trigger a controlled panic */
+    if (sysopt.fmtd_wizard_list)
+        free((genericptr_t) sysopt.fmtd_wizard_list),
+        sysopt.fmtd_wizard_list = (char *) 0;
     return;
 }
 

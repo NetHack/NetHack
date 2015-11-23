@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1448210011 2015/11/22 16:33:31 $  $NHDT-Branch: master $:$NHDT-Revision: 1.107 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1448241780 2015/11/23 01:23:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.108 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -537,24 +537,18 @@ VA_DECL(const char *, str)
 #else
     if (!wizard) {
         const char *maybe_rebuild = !program_state.something_worth_saving
-                                      ? "."
-                                      : " and it may be possible to rebuild.";
-        char *tmp = 0;
+                                     ? "."
+                                     : "\nand it may be possible to rebuild.";
 
         if (sysopt.support)
             raw_printf("To report this error, %s%s", sysopt.support,
                        maybe_rebuild);
-        else if (sysopt.wizards && strcmp(sysopt.wizards, "*") != 0
-                   /* this is risky; panic might be due to malloc failure */
-                   && (tmp = build_english_list(sysopt.wizards)) != 0)
-            raw_printf("To report this error, contact %s%s", tmp,
-                       maybe_rebuild);
+        else if (sysopt.fmtd_wizard_list) /* formatted SYSCF WIZARDS */
+            raw_printf("To report this error, contact %s%s",
+                       sysopt.fmtd_wizard_list, maybe_rebuild);
         else
             raw_printf("Report error to \"%s\"%s", WIZARD_NAME,
                        maybe_rebuild);
-
-        if (tmp)
-            free((genericptr_t) tmp);
     }
 #endif
     /* XXX can we move this above the prints?  Then we'd be able to
