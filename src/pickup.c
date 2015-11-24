@@ -1597,7 +1597,9 @@ struct obj **cobjp;
     return use_container(cobjp, 0);
 }
 
-int doloot() /* loot a container on the floor or loot saddle from mon. */
+/* loot a container on the floor or loot saddle from mon. */
+int
+doloot()
 {
     struct obj *cobj, *nobj;
     register int c = -1;
