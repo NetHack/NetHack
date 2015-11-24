@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1448241781 2015/11/23 01:23:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.189 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1448323244 2015/11/24 00:00:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.190 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -171,7 +171,7 @@ extern int n_dgns; /* from dungeon.c */
 #endif
 
 #ifdef SELECTSAVED
-STATIC_DCL int FDECL(CFDECLSPEC strcmp_wrap, (const void *, const void *));
+STATIC_PTR int FDECL(CFDECLSPEC strcmp_wrap, (const void *, const void *));
 #endif
 STATIC_DCL char *FDECL(set_bonesfile_name, (char *, d_level *));
 STATIC_DCL char *NDECL(set_bonestemp_name);
