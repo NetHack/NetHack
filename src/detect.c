@@ -1243,7 +1243,9 @@ genericptr_t num;
     }
 }
 
-int findit() /* returns number of things found */
+/* returns number of things found */
+int
+findit()
 {
     int num = 0;
 

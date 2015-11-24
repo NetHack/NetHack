@@ -1492,7 +1492,9 @@ char *from, *to;
 #endif /* TOS */
 }
 
-void co_false() /* see comment in bones.c */
+/* see comment in bones.c */
+void
+co_false()
 {
     count_only = FALSE;
     return;
