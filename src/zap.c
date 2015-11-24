@@ -704,6 +704,13 @@ boolean by_hero;
             x = xy.x, y = xy.y;
     }
 
+    if (mons[montype].mlet == S_EEL && !IS_POOL(levl[x][y].typ)) {
+        if (by_hero && cansee(x,y))
+            pline("%s twitches feebly.",
+                upstart(corpse_xname(corpse, (const char *) 0, CXN_PFX_THE)));
+        return (struct monst *) 0;
+    }
+
     if (cant_revive(&montype, TRUE, corpse)) {
         /* make a zombie or doppelganger instead */
         /* note: montype has changed; mptr keeps old value for newcham() */
