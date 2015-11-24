@@ -1,4 +1,4 @@
-# NetHack 3.6	quest.txt	$NHDT-Date: 1436515718 2015/07/10 08:08:38 $  $NHDT-Branch: master $:$NHDT-Revision: 1.29 $
+# NetHack 3.6	quest.txt	$NHDT-Date: 1448376372 2015/11/24 14:46:12 $  $NHDT-Branch: master $:$NHDT-Revision: 1.30 $
 #	Copyright (c) 1991 by M. Stephenson
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -1573,7 +1573,7 @@ stand open, are closed.  Strange human shapes shamble around
 outside.
 
 You realize that %l needs your assistance!
-%E
+%E [You are at %H; the doors are closed.  %lC needs your help!]
 %Cp Pri 00002
 Once again, you stand before %H.
 %E
@@ -1616,7 +1616,7 @@ the final time you come here.
 A great blow has befallen our order; perhaps you can help us.
 First, however, I must determine if you are prepared for this
 great challenge."
-%E
+%E [You have returned and we need your help.  Are you ready?]
 %Cp Pri 00016
 "Again, my %S, you stand before me.  Are you ready now to help us?"
 %E
@@ -1628,12 +1628,12 @@ great challenge."
 teachings of %d?  Begone from this temple.  You are no longer
 %sa to this order.  We will pray to %d for other assistance,
 as you have failed us utterly."
-%E
+%E [You are a heretic who has deviated from the teachings of %d.]
 %Cc Pri 00019
 "Alas, %p, it is not yet to be.  A mere %r could never
 withstand the might of %n.  Go forth, again into the world, and return
 when you have attained the post of %R."
-%E
+%E [%rA cannot withstand %n.  Come back when you are %Ra.]
 %Cc Pri 00020
 "This is terrible, %p.  You have deviated from the true path!
 You know that %d requires the most strident devotion of this
@@ -1641,7 +1641,7 @@ order.  The %shood must stand for utmost piety.
 
 "Go from here, atone for your sins against %d.  Return only when
 you have purified yourself."
-%E
+%E [You have deviated from the path.  Return when you have purified yourself.]
 %Cc Pri 00021
 "Yes, %p.  You are truly ready now.  Attend to me and I shall
 tell you of what has transpired:
@@ -1660,7 +1660,7 @@ to %ns lair.  If you can manage to defeat %n and return
 undead that befoul the land.
 
 "Go with %d as your guide, %p."
-%E
+%E [%nC invaded %H and captured %o.  Defeat %ni and retrive %oh.]
 %Cp Pri 00025
 "You can prevail, if you rely on %d."
 %E
@@ -1698,8 +1698,8 @@ that seem to get thicker closer to the center.  You sense the presence of
 undead in larger numbers than you have ever encountered before.
 
 You remember the descriptions of %i, given to you by
-%lC.  It is ahead that you will find %ns trail.
-%E
+%l.  It is ahead that you will find %ns trail.
+%E [You have found %i.  The trail to %n lies ahead.]
 %Cp Pri 00036
 Again, you stand before %i.
 %E
@@ -1708,18 +1708,18 @@ The stench of brimstone is all about you, and the shrieks and moans
 of tortured souls assault your psyche.
 
 Ahead, there is a small clearing amidst the bubbling pits of lava...
-%E
+%E [The stench of brimstone surrounds you, the shrieks and moans are endless.]
 %Cp Pri 00041
 Again, you have invaded %ns domain.
 %E
 %Cc Pri 00050
-"Ah, so %lC has sent another %g to retrieve
+"Ah, so %l has sent another %gC to retrieve
 %o.
 
-"No, I see you are no %g.  Perhaps I shall have some fun today
+"No, I see you are no %gC.  Perhaps I shall have some fun today
 after all.  Prepare to die, %r!  You shall never regain
 %o."
-%E
+%E [%lC has sent you, but you are no %gC.  I shall destroy you.]
 %Cp Pri 00051
 "So, %r.  Again you challenge me."
 %E
@@ -1766,22 +1766,22 @@ As you pick up %o, you feel the essence of
 easily defeat his plans.
 
 You sense a message from %d.  Though not verbal, you
-get the impression that you must return to %lC as soon
+get the impression that you must return to %l as soon
 as possible.
-%E
+%E [You feel %d as you pick up %o; return %oh to %l.]
 %Cc Pri 00080
 You feel a wrenching shift in the ether as %ns body dissolves
 into a cloud of noxious gas.
 
 Suddenly, a voice booms out:
 
-    Thou hast defeated the least of my minions, %r.
+    "Thou hast defeated the least of my minions, %r.
     Know now that Moloch is aware of thy presence.
     As for thee, %n, I shall deal with thy failure
-    at my leisure.
+    at my leisure."
 
 You then hear the voice of %n, screaming in terror...
-%E
+%E [%nC dies.  Moloch is aware of you and angry at %n.]
 %Cc Pri 00081
 "You have returned, %p.  And with %o, I see.
 Congratulations.
@@ -1792,14 +1792,14 @@ a minion of %d.  %d commands that you retain
 of Yendor.
 
 "Go forth, and let %d guide your steps."
-%E
+%E [Congraulations, %p.  Keep %o; go and recover the Amulet.]
 %Cc Pri 00082
-%l reiterates that %o is yours now.
+%lC reiterates that %o is yours now.
 
 "The time has come to resume your search for the Amulet.
 %Z await your return through the magic portal
 that brought you here."
-%E
+%E [%oC is yours now.  Return to %Z and find the Amulet.]
 %Cp Pri 00090
 "Welcome back, %p.  How is your quest for the Amulet going?"
 %E
@@ -1808,17 +1808,18 @@ that brought you here."
 you must take the amulet, and sacrifice it on %ds altar on
 the Astral Plane.  I suspect that I shall never see you again in this
 life, but I hope to at %ds feet."
-%E
+%E [Take the Amulet to the Astral Plane and offer it on %ds altar.]
 #
 #	Ranger
 #
+# [Ran 00001: what if centaurs have been genocided?]
 %Cc Ran 00001
 You arrive in familiar surroundings.  In the distance, you %x the
 ancient forest grove, the place of worship to %d.
 
 Something is wrong, though.  Surrounding the grove are centaurs!
 And they've noticed you!
-%E
+%E [The ancient forest grove is surrounded by centaurs.]
 %Cp Ran 00002
 Once again, you stand before %H.
 %E
@@ -1862,7 +1863,7 @@ distraction of leatherwings."
 
 "We have great need of you.  But first, I must see if you have the
 required abilities to take on this responsibility."
-%E
+%E [You have returned, %p.  We need your help.  Are you ready?]
 %Cp Ran 00016
 "Once again, %p, you stand in our midst.  Are you ready now?"
 %E
@@ -1874,19 +1875,19 @@ required abilities to take on this responsibility."
 and weaken the power we have raised in this grove as a result!
 
 "Begone!  We renounce your %shood with us!  You are an outcast now!"
-%E
+%E [You are not sufficiently %a.  We renounce your %shood.]
 %Cc Ran 00019
 "%p, you are yet too inexperienced to withstand the demands of that
 which we need you to do.  %RA might just be able to do this thing.
 
 "Return to us when you have learned more, my %S."
-%E
+%E [You are too inexperienced.  Come back when you are %Ra.]
 %Cc Ran 00020
 "You have strayed, %p!  You know that %d requires that
 we maintain a pure devotion to things %a!
 
 "You must go from us.  Return when you have purified yourself."
-%E
+%E [You are not sufficiently %a.  Come back when you have purified yourself.]
 %Cc Ran 00021
 "You are indeed ready, %p.  I shall tell you what has transpired,
 and why we so desperately need your help:
@@ -1897,8 +1898,8 @@ leader is now only a figurehead, and serves %n.
 
 "During our last gathering of worship here, we were beset by hordes of
 hostile centaurs, as you witnessed.  In the first onslaught a group,
-headed by %n %niself, managed to breach the grove and
-steal %o.
+headed by %n %niself, managed to breach the grove and steal
+%o.
 
 "Since then, we have been besieged.  We do not know how much longer
 we will be able to maintain our magical barriers.
@@ -1909,7 +1910,7 @@ underground cavern of %n.  He has always coveted
 %o, and will surely keep it.
 
 "Recover %o for us, %p!  Only then will %d be safe."
-%E
+%E [%nC has stolen %o.  Infiltrate %i and retrieve %oh for us.]
 %Cp Ran 00025
 "It is rumored that the Forest and Mountain Centaurs have resolved
 their ancient feud and now band together against us."
@@ -1953,15 +1954,16 @@ pits or using up your limited supply of arrows.  Good luck.
 
 You are in room 9 of the cave.  There are tunnels to rooms
 5, 8, and 10.
-*rustle* *rustle* (must be bats nearby)
+*rustle* *rustle* (must be bats nearby.)
 *sniff* (I can smell the evil wumpus nearby!)
-%E
+%E [This is %i.  There are bats nearby.  Beware the wumpus!]
 %Cc Ran 00036
 Once again, you descend into %i.
 
-*whoosh* (I feel a draft from some pits).
-*rustle* *rustle* (must be bats nearby)
-%E
+*whoosh* (I feel a draft from some pits.)
+*rustle* *rustle* (must be bats nearby.)
+%E [You are in %i.  There are pits.  There are bats nearby.]
+# [Ran 00040: 'hear a sound' but hero might be deaf.]
 %Cc Ran 00040
 You descend into a weird place, in which roughly cut cave-like walls
 join with smooth, finished ones, as if someone was in the midst of
@@ -1969,7 +1971,7 @@ finishing off the construction of a subterranean complex.
 
 Off in the distance, you hear a sound like the clattering of many
 hooves on rock.
-%E
+%E [You descend into a subterranean complex.  Hooves clatter in the distance.]
 %Cp Ran 00041
 Once again, you enter the distorted castle of %n.
 %E
@@ -1977,7 +1979,7 @@ Once again, you enter the distorted castle of %n.
 "So, %c.  %lC has sent you to recover %o.
 
 "Well, I shall keep that bauble.  It pleases me.  You, %c, shall die."
-%E
+%E [You have come to recover %o, but I shall keep %oh and you shall die.]
 %Cp Ran 00051
 "Back again, eh?  Well, a mere %r is no threat to me!  Die, %c!"
 %E
@@ -2025,13 +2027,13 @@ your %sp against their enemies for so long.
 
 You must now return it to %l without delay -- their lives depend
 on your speed.
-%E
+%E [You pick up %o and feel power.  It's time to return %oh to %l.]
 %Cc Ran 00080
 %nC collapses to the ground, cursing you and %l, then says:
 
-    You have defeated me, %r!  But I curse you one final time, with my
-    dying breath!  You shall die before you leave my castle!
-%E
+    "You have defeated me, %r!  But I curse you one final time, with
+    my dying breath!  You shall die before you leave my castle!"
+%E [%nC curses you as %nh dies.]
 %Cc Ran 00081
 "%pC!  You have succeeded!  I feared it was not possible!
 
@@ -2043,7 +2045,7 @@ for %d before that happens, we will be eternally safe.
 
 "Take %o with you.  It will aid in your quest for
 the Amulet."
-%E
+%E [You have succeeded.  Take %o with you as you go to find the Amulet.]
 # assumes The Longbow of Diana
 %Cc Ran 00082
 %l flexs %o reverently.
@@ -2052,7 +2054,7 @@ the Amulet."
 You are its keeper now, and the time has come to resume your
 search for the Amulet.  %Z await your return
 through the magic portal that brought you here."
-%E
+%E [You are the keeper of %o now.  Go and find the Amulet.]
 %Cp Ran 00090
 "Welcome, %p.  How have you fared on your quest for the Amulet
 of Yendor?"
@@ -2068,7 +2070,7 @@ the Astral Plane, where the primary circle of %d resides.
 When you reach the temple, sacrifice the Amulet to %d.
 
 "Thus will you fulfill your destiny."
-%E
+%E [You have the Amulet!  Take it to the Astral Plane and offer it to %d.]
 #
 #	Rogue (with apologies to all Norsk speakers -dean)
 #
