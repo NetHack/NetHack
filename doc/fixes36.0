@@ -935,6 +935,7 @@ potions of gain energy are more useful for recovering hero's spell energy
 spellcasting attempt of any spell while stunned now always fails
 spellcasting attempt of expired spell while confused will increase confusion
 	duration rather than replace it
+add ways to get out of inaccessible niches in one of the minetown layouts
 
 
 Platform- and/or Interface-Specific Fixes
@@ -1141,9 +1142,9 @@ dipping multiple potions in another potion may only dip part of their stack
 make being inside a stinking cloud (when not immune or resistant) become a
 	major trouble which is fixable by prayer
 introduce some variation in monster movement rates
-Add database entry for shuriken and make it match throwing star
-Add database entry for fedora
-Add database entry for land mine
+add database entry for shuriken and make it match throwing star
+add database entries for fedora, land mine, cream pie, bullwhip, blue jelly,
+	and boomerang
 change command X to twoweapon toggle
 pressing @ when cursor positioning moves cursor on top of hero
 pressing # when cursor positioning toggles automatic description of features
@@ -1158,7 +1159,7 @@ options to create the character blind or nudist
 moving clouds on the plane of air
 disclose extinct species alongside genocided ones
 a tribute to Terry Pratchett
-Some levels in Gehennom now use the old corridor-style maze instead of the
+some levels in Gehennom now use the old corridor-style maze instead of the
 	new room-style. Beelzebub's level always does this and the
 	"beetle legs" are restored.
 gnomes will occasionally have a candle
