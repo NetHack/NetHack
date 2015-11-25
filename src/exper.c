@@ -181,7 +181,9 @@ register int exper, rexp;
         flags.beginner = 0;
 }
 
-void losexp(drainer) /* e.g., hit by drain life attack */
+/* e.g., hit by drain life attack */
+void
+losexp(drainer)
 const char *drainer; /* cause of death, if drain should be fatal */
 {
     register int num;

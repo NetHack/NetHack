@@ -619,7 +619,8 @@ int fd;
 }
 
 /* flush run and buffer */
-void bflush(fd)
+void
+bflush(fd)
 register int fd;
 {
     (*saveprocs.save_bflush)(fd);

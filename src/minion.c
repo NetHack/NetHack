@@ -45,7 +45,9 @@ boolean spotted; /* seen|sensed vs all */
     return count;
 }
 
-int msummon(mon) /* mon summons a monster */
+/* mon summons a monster */
+int
+msummon(mon)
 struct monst *mon;
 {
     struct permonst *ptr;
@@ -205,7 +207,9 @@ boolean talk;
 
 #define Athome (Inhell && (mtmp->cham == NON_PM))
 
-int demon_talk(mtmp) /* returns 1 if it won't attack. */
+/* returns 1 if it won't attack. */
+int
+demon_talk(mtmp)
 register struct monst *mtmp;
 {
     long cash, demand, offer;

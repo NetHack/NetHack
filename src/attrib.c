@@ -171,7 +171,9 @@ boolean givemsg;
                      givemsg ? -1 : 1);
 }
 
-void losestr(num) /* may kill you; cause may be poison or monster like 'a' */
+/* may kill you; cause may be poison or monster like 'a' */
+void
+losestr(num)
 register int num;
 {
     int ustr = ABASE(A_STR) - num;

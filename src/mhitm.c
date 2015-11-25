@@ -116,7 +116,9 @@ struct attack *mattk;
  *  then we report that the monster did nothing so it will continue to
  *  digest the hero.
  */
-int fightm(mtmp) /* have monsters fight each other */
+ /* have monsters fight each other */
+int
+fightm(mtmp)
 register struct monst *mtmp;
 {
     register struct monst *mon, *nmon;

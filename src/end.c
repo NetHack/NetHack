@@ -382,7 +382,9 @@ int sig_unused UNUSED;
 }
 
 #if defined(UNIX) || defined(VMS) || defined(__EMX__)
-static void done_hangup(sig) /* signal() handler */
+/* signal() handler */
+static void
+done_hangup(sig)
 int sig;
 {
     program_state.done_hup++;

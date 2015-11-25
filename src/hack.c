@@ -1795,8 +1795,10 @@ switch_terrain()
 
 /* extracted from spoteffects; called by spoteffects to check for entering or
    leaving a pool of water/lava, and by moveloop to check for staying on one
-   */
-boolean pooleffects(newspot) /* returns true to skip rest of spoteffects */
+
+   returns true to skip rest of spoteffects */
+boolean
+pooleffects(newspot)
 boolean newspot;             /* true if called by spoteffects */
 {
     /* check for leaving water */

@@ -94,7 +94,8 @@ register int x;
 }
 
 /* d(N,X) == NdX == dX+dX+...+dX N times; n <= d(n,x) <= (n*x) */
-int d(n, x)
+int
+d(n, x)
 register int n, x;
 {
     register int tmp = n;

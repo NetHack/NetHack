@@ -835,7 +835,9 @@ int spellnum;
 /* convert 1..10 to 0..9; add 10 for second group (spell casting) */
 #define ad_to_typ(k) (10 + (int) k - 1)
 
-int buzzmu(mtmp, mattk) /* monster uses spell (ranged) */
+/* monster uses spell (ranged) */
+int
+buzzmu(mtmp, mattk)
 register struct monst *mtmp;
 register struct attack *mattk;
 {
