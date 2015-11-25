@@ -225,7 +225,7 @@ once you've passed the Valley, drawbridge tune is no longer a prayer reward
 fix up grammar and punctuation in variants of shopkeeper's price message
 regression, bug fixed in 3.4.1 reintroduced in 3.4.3:  Sunsword continued to
 	emit light after monster who was wielding got killed
-weaken "farming" strategy
+weaken "farming" strategies
 don't suppress corpse if you kill your own steed
 fix typo in tourist quest leader's greeting
 fix grammar for graveyard sounds when polymorphed
