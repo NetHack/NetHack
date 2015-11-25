@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1448094344 2015/11/21 08:25:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.248 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1448492213 2015/11/25 22:56:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.249 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -336,6 +336,10 @@ register int x, y, typ;
                     && typ != SPIKED_PIT)))
             u.utrap = 0;
         /* old <tx,ty> remain valid */
+    } else if (IS_FURNITURE(levl[x][y].typ)) {
+        /* no trap on top of furniture (caller usually screens the
+           location to inhibit this, but wizard mode wishing doesn't) */
+        return (struct trap *) 0;
     } else {
         oldplace = FALSE;
         ttmp = newtrap();
