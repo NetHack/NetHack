@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1448241783 2015/11/23 01:23:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.85 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1448482543 2015/11/25 20:15:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.86 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -563,14 +563,11 @@ const char **firstmatch;
         unsigned os;
 
         glyph = glyph_at(cc.x, cc.y);
-
-        /* Convert the glyph at the selected position to a symbol. */
+        /* Convert glyph at selected position to a symbol for use below. */
         (void) mapglyph(glyph, &sym, &oc, &os, cc.x, cc.y);
-    }
 
-    if (looked)
         Sprintf(prefix, "%s        ", encglyph(glyph));
-    else
+    } else
         Sprintf(prefix, "%c        ", sym);
 
     /*
@@ -650,7 +647,7 @@ const char **firstmatch;
 #define is_cmap_drawbridge(i) ((i) >= S_vodbridge && (i) <= S_hcdbridge)
 
     /* Now check for graphics symbols */
-    alt_i = (sym == (looked ? showsyms[0] : defsyms[0].sym)) ? 0 : 2+1;
+    alt_i = (sym == (looked ? showsyms[0] : defsyms[0].sym)) ? 0 : (2 + 1);
     for (hit_trap = FALSE, i = 0; i < MAXPCHARS; i++) {
         /* when sym is the default background character, we process
            i == 0 three times: unexplored, stone, dark part of a room */
@@ -685,10 +682,15 @@ const char **firstmatch;
                 *firstmatch = x_str;
                 found++;
             } else if (!u.uswallow && !(hit_trap && is_cmap_trap(i))
-                       && !(found >= 3 && is_cmap_drawbridge(i))) {
-                found += append_str(out_str,
-                                    article == 2 ? the(x_str)
-                                    : article == 1 ? an(x_str) : x_str);
+                       && !(found >= 3 && is_cmap_drawbridge(i))
+                       /* don't mention vibrating square outside of Gehennom
+                          unless this happens to be one (hallucination?) */
+                       && (i != S_vibrating_square || Inhell
+                           || (looked && glyph_is_trap(glyph)
+                               && glyph_to_trap(glyph) == VIBRATING_SQUARE))) {
+                found += append_str(out_str, (article == 2) ? the(x_str)
+                                             : (article == 1) ? an(x_str)
+                                               : x_str);
                 if (is_cmap_trap(i))
                     hit_trap = TRUE;
             }
