@@ -1,4 +1,4 @@
-/* NetHack 3.6	polyself.c	$NHDT-Date: 1446604117 2015/11/04 02:28:37 $  $NHDT-Branch: master $:$NHDT-Revision: 1.102 $ */
+/* NetHack 3.6	polyself.c	$NHDT-Date: 1448496566 2015/11/26 00:09:26 $  $NHDT-Branch: master $:$NHDT-Revision: 1.104 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1610,15 +1610,31 @@ int part;
     };
     struct permonst *mptr = mon->data;
 
-    if (part == HAND || part == HANDED) { /* some special cases */
-        if (mptr->mlet == S_DOG || mptr->mlet == S_FELINE
-            || mptr->mlet == S_YETI)
-            return part == HAND ? "paw" : "pawed";
-        if (humanoid(mptr) && attacktype(mptr, AT_CLAW)
-            && !index(not_claws, mptr->mlet) && mptr != &mons[PM_STONE_GOLEM]
-            && mptr != &mons[PM_INCUBUS] && mptr != &mons[PM_SUCCUBUS])
-            return part == HAND ? "claw" : "clawed";
+    /* some special cases */
+    if (mptr->mlet == S_DOG || mptr->mlet == S_FELINE
+        || mptr->mlet == S_RODENT || mptr == &mons[PM_OWLBEAR]) {
+        switch (part) {
+        case HAND:
+            return "paw";
+        case HANDED:
+            return "pawed";
+        case FOOT:
+            return "rear paw";
+        case ARM:
+        case LEG:
+            return horse_parts[part]; /* "foreleg", "rear leg" */
+        default:
+            break; /* for other parts, use animal_parts[] below */
+        }
+    } else if (mptr->mlet == S_YETI) { /* excl. owlbear due to 'if' above */
+        /* opposable thumbs, hence "hands", "arms", "legs", &c */
+        return humanoid_parts[part]; /* yeti/sasquatch, monkey/ape */
     }
+    if ((part == HAND || part == HANDED)
+        && (humanoid(mptr) && attacktype(mptr, AT_CLAW)
+            && !index(not_claws, mptr->mlet) && mptr != &mons[PM_STONE_GOLEM]
+            && mptr != &mons[PM_INCUBUS] && mptr != &mons[PM_SUCCUBUS]))
+        return (part == HAND) ? "claw" : "clawed";
     if ((mptr == &mons[PM_MUMAK] || mptr == &mons[PM_MASTODON])
         && part == NOSE)
         return "trunk";
