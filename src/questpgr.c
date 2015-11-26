@@ -1,4 +1,4 @@
-/* NetHack 3.6	questpgr.c	$NHDT-Date: 1446892453 2015/11/07 10:34:13 $  $NHDT-Branch: master $:$NHDT-Revision: 1.34 $ */
+/* NetHack 3.6	questpgr.c	$NHDT-Date: 1448541043 2015/11/26 12:30:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.36 $ */
 /*      Copyright 1991, M. Stephenson                             */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -83,12 +83,12 @@ long hdr_offset;
     (void) dlb_fseek(msg_file, hdr_offset, SEEK_SET);
     Fread(&n_msgs, sizeof(int), 1, msg_file);
     msg_list = (struct qtmsg *) alloc((unsigned) (n_msgs + 1)
-                                      * sizeof(struct qtmsg));
+                                      * sizeof (struct qtmsg));
 
     /*
      * Load up the list.
      */
-    Fread((genericptr_t) msg_list, n_msgs * sizeof(struct qtmsg), 1,
+    Fread((genericptr_t) msg_list, n_msgs * sizeof (struct qtmsg), 1,
           msg_file);
 
     msg_list[n_msgs].msgnum = -1;
@@ -111,9 +111,9 @@ load_qtlist()
      * each header.
      */
 
-    Fread(&n_classes, sizeof(int), 1, msg_file);
-    Fread(&qt_classes[0][0], sizeof(char) * LEN_HDR, n_classes, msg_file);
-    Fread(qt_offsets, sizeof(long), n_classes, msg_file);
+    Fread(&n_classes, sizeof (int), 1, msg_file);
+    Fread(&qt_classes[0][0], sizeof (char) * LEN_HDR, n_classes, msg_file);
+    Fread(qt_offsets, sizeof (long), n_classes, msg_file);
 
     /*
      * Now construct the message lists for quick reference later
@@ -505,12 +505,22 @@ int how;
     destroy_nhwindow(datawin);
 
     /* block messages delivered by window aren't kept in message history
-       but can have a one-line summary which is put there for ^P recall */
+       but have a one-line summary which is put there for ^P recall */
+    *out_line = '\0';
     if (qt_msg->summary_size) {
         (void) dlb_fgets(in_line, sizeof in_line, msg_file);
         convert_line(in_line, out_line);
-        putmsghistory(out_line, FALSE);
+#ifdef BETA
+    } else if (qt_msg->delivery == 'c') { /* skip for 'qtdump' of 'p' */
+        /* delivery 'c' and !summary_size, summary expected but not present;
+           this doesn't prefix the number with role code vs 'general'
+           but should be good enough for summary verification purposes */
+        Sprintf(out_line, "[missing block message summary for #%05d]",
+                qt_msg->msgnum);
+#endif
     }
+    if (*out_line)
+        putmsghistory(out_line, FALSE);
 }
 
 boolean
