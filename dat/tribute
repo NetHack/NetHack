@@ -4543,7 +4543,7 @@ helmet, especially if someone was hitting /you/ with a sword.
 %e passage
 # p. 177 (originally transcribed from some other edition; Harper edition
 #         uses American spelling for "armor")
-#        [some off-duty Watchman moonlight as bank security guards]
+#        [some off-duty Watchmen moonlight as bank security guards]
 %passage 2
 The Watch armor he'd lifted from the bank's locker room fitted like a
 glove.  He'd have preferred it to fit like a helmet and breastplate.
@@ -4701,7 +4701,7 @@ trumps utility every time.
 
   [Making Money, by Terry Pratchett]
 %e passage
-# p. 218
+# p. 218 (the Cabinet of Curiosity)
 %passage 9
 "All right, then," said Moist, "/what does it do/?"
 
@@ -4742,7 +4742,7 @@ firmly.  [...]
 
   [Making Money, by Terry Pratchett]
 %e passage
-# p. 247 (it's a spirit summoned by Dr. Hicks that is describing the risk)
+# p. 247 (it's a spirit summoned by Dr. Hicks that is describing the art/risk)
 %passage 11
 "Necromancy is a fine art?" said Moist.
 
@@ -4839,11 +4839,256 @@ One by one, they sat down.(1)
 #
 #
 #
-%title Unseen Academicals (1)
+%title Unseen Academicals (12)
+# p. 68 (Harper edition)
 %passage 1
-Be one of the crowd? It went against everything a wizard stood for, 
-and a wizard would not stand for anything if he could sit down for it, 
+Be one of the crowd?  It went against everything a wizard stood for,
+and a wizard would not stand for anything if he could sit down for it,
 but even sitting down, you had to stand out.
+
+  [Unseen Academicals, by Terry Pratchett]
+%e passage
+# p. 1 (footnote, so "(1)" ought to be "(2)", but somebody would complain...)
+%passage 2
+Technically, the city of Ankh-Morpork is a Tyranny, which is not always
+the same thing as a monarchy, and in fact even the post of Tyrant has been
+somewhat redefined by the incumbent, Lord Vetinari, as the only form of
+democracy that works.  Everyone is entitled to vote, unless disqualified
+by reason of age or not being Lord Vetinari.
+
+And yet it does work.  This has annoyed a number of people who feel,
+somehow, that it should not work, and who want a monarch instead, thus
+replacing a man who has achieved his position by cunning, a deep
+understanding of the realities of the human psyche, breathtaking
+diplomancy, a certain prowess with the stiletto dagger, and, all agree,
+a mind like a finely balanced circular saw, with a man who has got there
+by being born.(1)
+
+However, the crown has hung on anyway, as crowns do--on the Post Office
+and the Royal Bank and the Mint and, not least, in the sprawling,
+brawling, squalling consciousness of the city itself.  Lots of things
+live in that darkness.  There are all kinds of darkness, and all kinds
+of things can be found in them, imprisoned, banished, lost or hidden.
+Sometimes they escape.  Sometimes they simply fall out.  Sometimes they
+just can't take it any more.
+
+(1) A third proposition, that the city be governed by a choice of
+respectable members of the community who would promise not to give
+themselves airs or betray the public trust at every turn, was instantly
+the subject of music hall jokes all over the city.
+
+  [Unseen Academicals, by Terry Pratchett]
+%e passage
+# p. 16
+%passage 3
+A wizard could do what he liked in his own study, and in the old days that
+had largely meant smoking anything he fancied and farting hugely without
+apologizing.  These days it meant building out into a congruent set of
+dimensions.  Even the Archchancellor was doing it, which made it hard for
+Ponder to protest:  he had half a mile of trout stream in his bathroom,
+and claimed that messin' about in his study was what kept a wizard out
+of mischief.  And, as everyone knew, it did.  It generally got him into
+trouble instead.
+
+  [Unseen Academicals, by Terry Pratchett]
+%e passage
+# p. 18 (Ridcully is furious at the former Dean, who left UU to become a
+#        rival [Arch-]Chancellor at Brazeneck University in Pseudopolis)
+%passage 4
+"Remuneration?  Since when did a wizard work for wages?  We are pure
+academics, Mister Stibbons!  We do not care for mere money!"
+
+Unfortunately, Ponder was a clear logical thinker who, in times of mental
+confusion, fell back on reason and honesty, which, when dealing with an
+angry Archchancellor, were, to use the proper academic term, unhelpful.
+And he neglected to think strategically, always a mistake when talking to
+fellow academics, and as a result made the mistake of employing, as at
+this point, common sense.
+
+"That's because we never actually pay for anything very much," he said,
+"and if anyone needs any petty cash they just help themselves from the
+big jar--"
+
+"We are part of the very fabric of the university, Mister Stibbons!  We
+take only what we require!  We do not seek wealth!  And most certainly
+we do not accept a 'post of vital importance which includes an attractive
+package of remuneration,' whatever the hells that means, 'and other
+benefits including a generous pension!'  A pension, mark you!  When has a
+wizard ever retired?"
+
+  [Unseen Academicals, by Terry Pratchett]
+%e passage
+# p. 19 (She: plump Glenda; Her: fashion-model-to-be Juliet)
+%passage 5
+She was, in fact, quite a pleasant looking girl, even if her bosom had
+clearly been intended for a girl two feet taller; but she was not Her.(1)
+
+(1) The Egregious Professor of Grammar and Usage would have corrected
+this to "she was not she," which would have caused the Professor of Logic
+to spit out his drink.
+
+  [Unseen Academicals, by Terry Pratchett]
+%e passage
+# p. 48 (He: Nutt, a key element of the story who doesn't figure in any
+#        of the other selected passages...)
+%passage 6
+He'd tried wandering around the other cellars, but there was nothing much
+happening at night, and people gave him funny looks.  Ladyship did not
+rule here.  But wizards are a messy lot and nobody tidied up much and
+lived to tell the tale, so all sorts of old storerooms and junk-filled
+workshops became his for the use of.  And there was so much for a lad with
+keen night vision to find.  He had already seen some luminous spoon ants
+carrying a fork, and, to his surprise, the forgotten mazes were home to
+that very rare indoorovore, the Uncommon Sock Eater.  There were some
+things living up in the pipes, too, which periodically murmured "Awk! Awk!"
+Who knew what strange monsters made there home here?
+
+  [Unseen Academicals, by Terry Pratchett]
+%e passage
+# p. 58
+%passage 7
+Truth is female, since truth is beauty rather than handsomeness; this,
+Ridcully reflected as the Council grumbled in, would certainly explain
+the saying that a lie could run around the world before Truth got its,
+correction, /her/ boots on, and since she would have to choose which
+pair--the idea that any woman in the position to choose would have just
+one pair of boots being beyond rational belief.  Indeed, as a goddess she
+would have lots of shoes, and thus many choices:  comfy shoes for home
+truths, hobnail boots for unpleasant truths, simple clogs for universal
+truths and possibly some kind of slipper for self-evident truth.  More
+important right now was what kind of truth he was going to have to impart
+to his colleagues, and he decided not on the whole truth, but instead on
+nothing but the truth, which dispensed with the need for honesty.
+
+  [Unseen Academicals, by Terry Pratchett]
+%e passage
+# p. 166 (see "the wrong sort of question" passage from /Making Money/
+#         for a description of the Cabinet; items removed from it have to
+#         be returned within 14:14 hours or they're drawn back magically;
+#         student in question had removed a sandwich and then eaten it)
+%passage 8
+"Yes, sir?" said Ponder wearily.
+
+"Promote him.  Whatever level he is, move him up one."
+
+"I think that'll send the wrong kind of signal," Ponder tried.
+
+"On the contrary, Mister Stibbons.  It will send exactly the right kind of
+message to the student body."
+
+"But he disobeyed an express order, may I point out?"
+
+"That's right.  He showed independent thinking and a certain amount of
+pluck, and in the course of so doing added valuable data to our
+understanding of the Cabinet."
+
+"But he might have destroyed the whole university, sir."
+
+"Right, in which case he would have been vigorously disciplined, if we'd
+been able to find anything left of him.  But he didn't and he was lucky
+and we need lucky wizards.  Promote him, on the direct order of me, not
+pp'd at all.  Incidentally, how loud were his screams?"
+
+  [Unseen Academicals, by Terry Pratchett]
+%e passage
+# p. 192-193 ('pants': underpants; 'football': soccer ;-)
+%passage 9
+"You will arrange yourself into two teams, set up goals, and strive to win!
+No man will leave the field of play unless injured!  The hands are not to
+be used, is that clear?  Any questions?"  A hand went up.  Ridcully sought
+the attached face.
+
+"Ah, Rincewind," he said, and, because he was not a determinedly unpleasant
+man, amended this to, "Professor Rincewind, of course."
+
+"I would like permission to fetch a note from my mother, sir."
+
+Ridcully sighed.  "Rincewind, you once informed me, to my everlasting
+puzzlement, that you never knew your mother because she ran away before
+you were born.  Distinctly remember writing it down in my diary.  Would
+you like another try?"
+
+"Permission to go and find my mother?"
+
+Ridcully hesitated.  The Professor of Cruel and Unusual Geography had no
+students and no real duties other than to stay out of trouble.  Although
+Ridcully would never admit it, it was against all reason an emeritus
+position.  Rincewind was a coward and an unwitting clown, but he had
+several times saved the world in slightly puzzling circumstances.  He was
+a luck sink, the Archchancellor decided, doomed to being a lightning rod
+for the fates so that everyone else didn't have to.  Such a person was
+worth all his meals and laundry (including an above-average level of
+soiled pants) and a bucket of coal every day even if he was, in Ridcully's
+opinion, a bit of a whiner.  However, he was fast, and therefore useful.
+
+"Look," said Rincewind, "a mysterious urn turns up and suddenly it's all
+about football.  That bodes.  It means that something bad is going to
+happen."
+
+"Come now, it could be something wonderful," Ridcully protested.
+
+Rincewind appeared to give this due consideration.  "Could be wonderful,
+will be dreadful.  Sorry, that's how it goes."
+
+"This is Unseen University, Rincewind.  What is there to fear?" Ridcully
+said.  "Apart from me, of course.  Good heavens, this is a sport."  He
+raised his voice.  "Arrange yourselves into two teams and play football!"
+
+  [Unseen Academicals, by Terry Pratchett]
+%e passage
+# p. 268 (passage starts mid-paragraph; Glenda is cleaning UU's Night Kitchen)
+%passage 10
+[...]  If you wanted a job done properly, you had to do it yourself.
+Juliet's verison of cleanliness was next to godliness, which was to say
+it was erratic, past all understanding and seldom seen.
+
+  [Unseen Academicals, by Terry Pratchett]
+%e passage
+# pp. 358-359
+%passage 11
+"Well, big day, lads!" said Ridcully.  "Looks like there's going to be a
+nice day for it as well.  They're all over there waiting for us to give
+them a show.  I want you to approach this in the best traditions of Unseen
+University sportsmanship, which is to cheat whenever you are unobserved,
+though I fear that the chance of anyone being unobserved today is remote.
+But in any case, I want you to give it one hundred and ten percent."
+
+"Excuse me, Archchancellor," said Ponder Stibbons.  "I understand the
+sense of what you are saying, but there is only one hundred percent."
+
+"Well, they could give it one hundred and ten percent if they tried
+harder," said Ridcully.
+
+"Well, yes and no, sir.  But, in fact, that would mean that you had just
+made the one hundred percent bigger while it would still be one hundred
+percent.  Besides, there is only so fast a man can run, only so high a man
+can jump.  I just wanted to make the point."
+
+"Good point, well made," said Ridcully, dismissing it instantly.  [...]
+
+  [Unseen Academicals, by Terry Pratchett]
+%e passage
+# p. 363 (more lyrics occur later on; they're generally about using
+#         economics to conquer any opposition)
+%passage 12
+The singing of the National Anthem was always a ragged affair, the good
+people of Ankh-Morpork feeling that it was unpatriotic to sing songs about
+how patriotic you were, taking the view that someone singing a song about
+how patriotic they were was either up to something or a Head of State.(1)
+
+An additional problem today lay in the acoustics of the arena, which were
+rather too good, coupled with the fact that the speed of sound at one end
+of the stadium was slightly offbeat compared with the other end, a
+drawback exacerbated when both sides tried to recover the gap.
+
+These acoustical anomalies did not count for much if you were standing
+next to Mustrum Ridcully, as the Archchancellor was one of those gentleman
+who will sing it beautifully, correctly enunciated and very, very loudly.
+
+"'When dragons belch and hippos flee, my thoughts, Ankh-Morpork, are of
+thee.'" he began.
+
+(1) i.e., up to something.
 
   [Unseen Academicals, by Terry Pratchett]
 %e passage
