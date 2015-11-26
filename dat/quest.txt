@@ -1,4 +1,4 @@
-# NetHack 3.6	quest.txt	$NHDT-Date: 1448376372 2015/11/24 14:46:12 $  $NHDT-Branch: master $:$NHDT-Revision: 1.30 $
+# NetHack 3.6	quest.txt	$NHDT-Date: 1448525426 2015/11/26 08:10:26 $  $NHDT-Branch: master $:$NHDT-Revision: 1.31 $
 #	Copyright (c) 1991 by M. Stephenson
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -2078,7 +2078,7 @@ When you reach the temple, sacrifice the Amulet to %d.
 Unexpectedly, you find yourself back in Ransmannsby, where you trained to
 be a thief.  Quickly you make the guild sign, hoping that you AND word
 of your arrival reach %ls den.
-%E
+%E [You are in Ransmannsby, where you trained.  Find %l.]
 %Cp Rog 00002
 Once again, you find yourself back in Ransmannsby.  Fond memories are
 replaced by fear, knowing that %l is waiting for you.
@@ -2127,12 +2127,12 @@ fallen behind in your dues.  I should kill you as an example to these
 other worthless cutpurses, but I have a better plan.  If you are ready
 maybe you could work off your back dues by performing a little job for
 me.  Let us just see if you are ready..."
-%E
-%Cp Rog 00016
+%E [You owe back dues to your guild.  You can pay them off if you're up to the job.]
+%Cc Rog 00016
 "Well, I didn't expect to see you back.  It shows that you are either stupid,
 or you are finally ready to accept my offer.  Let us hope for your sake it
 isn't stupidity that brings you back."
-%E
+%E [Are you stupid or are you ready?]
 %Cp Rog 00017
 "Did you perhaps mistake me for some other %lt?  You must
 think me as stupid as your behavior.  I warn you not to try my patience."
@@ -2144,19 +2144,19 @@ charge.  Wrong.  DEAD WRONG!"
 
 Your sudden shift in surroundings prevents you from hearing the end
 of %ls curse.
-%E
+%E [You must go.]
 %Cc Rog 00019
 "In the time that you've been gone you've only been able to master the
 arts of %ra?  I've trained ten times again as many %Rp
 in that time.  Maybe I should send one of them, no?  Where would that
 leave you, %p?  Oh yeah, I remember, I was going to kill you!"
-%E
+%E [%rA is not adequately trained to handle this job.]
 %Cc Rog 00020
 "Maybe I should chain you to my perch here for a while.  Perhaps watching
 real %a men at work will bring some sense back to you.  I don't
 think I could stand the sight of you for that long though.  Come back
 when you can be trusted to act properly."
-%E
+%E [Come back when you are really %a.]
 %Cc Rog 00021
 "Will everyone not going to retrieve %o from that
 jerk, %n, take one step backwards.  Good choice,
@@ -2167,7 +2167,7 @@ are too valuable to me.
 has %o.  You are going to get %o
 and bring it back to me.  So simple an assignment even you can understand
 it."
-%E
+%E [Get %o from %n and bring it to %l.]
 %Cp Rog 00025
 "You don't seem to understand,
 %o isn't here so neither should you be!"
@@ -2198,41 +2198,37 @@ and I have your key!"
 "We're almost out of hell-hound chow, so why don't you just get moving!"
 %E
 %Cp Rog 00034
-"You know, %o isn't going to come when you
-whistle.  You must get it yourself."
+"You know, %o isn't going to come when you whistle.  You must get it yourself."
 %E
-%Cc Rog 00035
-Those damn little hairs tell you that you are nearer to
-%o.
+%Cp Rog 00035
+Those damn little hairs tell you that you are nearer to %o.
 %E
 %Cp Rog 00036
-Not wanting to face %l without having stolen
-%o, you continue.
+Not wanting to face %l without having stolen %o, you continue.
 %E
 %Cc Rog 00040
 You feel a great swelling up of courage, sensing the presence of
 %o.  Or is it fear?
-%E
+%E [You sense %o.]
 %Cp Rog 00041
 The hairs on the back of your neck whisper -- it's fear.
 %E
-%Cc Rog 00050
-"Ah!  You must be %ls ... er, `hero'.  A pleasure
-to meet you."
+%Cp Rog 00050
+"Ah!  You must be %ls ... er, `hero'.  A pleasure to meet you."
 %E
 %Cp Rog 00051
 "We meet again.  Please reconsider your actions."
 %E
-%Cp Rog 00052
+%Cc Rog 00052
 "Surely, %p, you have learned that you cannot trust any bargains
 that %l has made.  I can show you how to continue on
 your quest without having to run into him again."
-%E
-%Cp Rog 00053
+%E [You cannot trust %l.]
+%Cc Rog 00053
 "Please, think for a moment about what you are doing.  Do you truly
 believe that %d would want %l to have
 %o?"
-%E
+%E [%lC should not have %o.]
 %Cp Rog 00060
 "May I suggest a compromise.  Are you interested in gold or gems?"
 %E
@@ -2249,8 +2245,7 @@ believe that %d would want %l to have
 "It is a shame that we are not meeting under more pleasant circumstances."
 %E
 %Cp Rog 00065
-"I was once like you are now, %p.  Believe in me -- our way
-is better."
+"I was once like you are now, %p.  Believe in me -- our way is better."
 %E
 %Cp Rog 00066
 "Stay with me, and I will make you %os guardian."
@@ -2270,7 +2265,7 @@ As you pick up %o, the hairs on the back of your
 neck fall out.  At once you realize why %n was
 willing to die to keep it out of %ls hands.  Somehow
 you know that you must do likewise.
-%E
+%E [You pick up %o and know that %l should not have it.]
 %Cc Rog 00080
 "I know what you are thinking, %p.  It is not too late for you
 to use %o wisely.  For the sake of your guild
@@ -2278,7 +2273,7 @@ to use %o wisely.  For the sake of your guild
 
 You sit and wait for death to come for %n, and then you
 brace yourself for your next meeting with %l!
-%E
+%E [Before dying, %n tells you to use the %o wisely.]
 %Cc Rog 00081
 "Well, I'll be damned.  You got it.  I am proud of you, a fine %r
 you've turned out to be.
@@ -2290,28 +2285,28 @@ That is a better deal than I offered %n.
 
 "But, you see what happened to %n when he refused.
 Don't make me find another to send after you this time."
-%E
+%E [Take %o with you and go.]
 # assumes Master Key of Thievery (small object)
 %Cc Rog 00082
-%l seems tempted to swap %o for
+%lC seems tempted to swap %o for
 the mundane one you detect in his pocket, but noticing your alertness,
 evidently chickens out.
 
 "Go filch the Amulet before someone else beats you to it.
 %Z are back the way you came, through the magic portal."
-%E
+%E [Take %o and acquire the Amulet.]
 %Cc Rog 00090
 "Quite the little thief, aren't we, %p.  Can I interest you in a
-swap for %o.  Look around, anything in the keep
+swap for %o?  Look around, anything in the keep
 is yours for the asking."
-%E
+%E [How about trading %o for something?]
 %Cc Rog 00091
 "I see that with your abilities, and my brains, we could rule this world.
 
 "All that we would need to be all-powerful is for you to take that little
 trinket you've got there up to the Astral Plane.  From there, %d will
 show you what to do with it.  Once that's done, we will be invincible!"
-%E
+%E [Take the Amulet to the Astral Plane and find %ds temple.]
 #
 #	Samurai
 #
@@ -2325,17 +2320,17 @@ wandering freely; where are the samurai of your daimyo, %l?
 
 You quickly say a prayer to Izanagi and Izanami and walk towards
 town.
-%E
+%E [The banner of %n flies above town.  What has happened to %l?]
 %Cp Sam 00002
 Once again, you are back at %H.
 %E
-%Cp Sam 00003
+%Cc Sam 00003
 You are back at %H.
 
 Instantly you sense a subtle change in your karma.  You seem to know that
 if you do not succeed in your quest, %n will have destroyed
 the kami of %H before you return again.
-%E
+%E [%HC is threatened by %n.]
 %Cp Sam 00005
 "To succeed, you must walk like a butterfly on the wind."
 %E
@@ -2370,35 +2365,36 @@ the kami of %H before you return again.
 "Ah, %p-san, it is good to see you again.  I need someone who can
 lead my samurai against %n.  If you are ready, you will be
 that person."
-%E
+%E [%lC needs someone to lead %lj samurai against %n.  Are you ready?]
 %Cp Sam 00016
 "Once again, %p-san, you kneel before me.  Are you yet capable of
 being my vassal?"
 %E
-%Cp Sam 00017
+# [Sam 00017: This summary is definitely a poor one.]
+%Cc Sam 00017
 "You begin to test my matsu, %p-san.
 If you cannot determine what I want in a samurai, how can I rely on you
 to figure out what I need from a samurai?"
-%E
+%E [Are you truely a samurai?]
 %Cc Sam 00018
 "You are no longer my samurai, %p.
 
 "Hara-kiri is denied.  You are ordered to shave your head and then to
 become a monk.  Your fief and family are forfeit.  Wakarimasu ka?"
-%E
+%E [Leave and do not come back.]
 %Cc Sam 00019
 "%p-san, you have learned well and honored your family.
 I require the skills of %Ra in order to defeat %n.
 Go and seek out teachers.  Learn what they have learned.  When you
 are ready, return to me."
-%E
+%E [I require %Ra to defeat %n.  Return when you are ready.]
 %Cc Sam 00020
 "%p-san, you would do better to join the kyokaku.
 
 "You have skills, but until you can call upon the bushido to know when and
 how to use them you are not samurai.  When you can think %a and
 act %a then return."
-%E
+%E [When you can think %a and act %a then return.]
 %Cc Sam 00021
 "Domo %p-san, indeed you are ready.  I can now tell you what
 it is that I require of you.
@@ -2416,7 +2412,7 @@ emperor's property.  Be quick!  The emperor will be here for the
 cha-no-you in 5 sticks.
 
 "Wakarimasu ka?"
-%E
+%E [You must enter %i, then regain %o from %n.]
 %Cp Sam 00025
 "To defeat %n you must overcome the seven emotions:
 hate, adoration, joy, anxiety, anger, grief, and fear."
@@ -2448,7 +2444,7 @@ hate, adoration, joy, anxiety, anger, grief, and fear."
 %Cp Sam 00034
 "Sharpen your swords and your wits for the task before you."
 %E
-%Cc Sam 00035
+%Cp Sam 00035
 You instinctively reach for your swords.  You do not recognize the
 lay of this land, but you know that your teki are everywhere.
 %E
@@ -2462,12 +2458,12 @@ In your mind, you hear the taunts of %n.
 You become like the rice plant and bend to the ground, offering a
 prayer to %d.  But when the wind has passed, you stand
 proudly again.  Putting your kami in the hands of fate, you advance.
-%E
+%E [You feel the taunts %n, but after offering a prayer to %d, you proceed.]
 %Cp Sam 00041
 As you arrive once again at the home of %n, your thoughts
 turn only to %o.
 %E
-%Cc Sam 00050
+%Cp Sam 00050
 "Ah, so it is to be you, %p-san.  I offer you seppuku.
 I will be your second if you wish."
 %E
@@ -2520,7 +2516,7 @@ As you pick up %o, you feel the strength of its karma.
 You realize at once why so many good samurai had to die to defend it.
 You are humbled knowing that you hold one of the artifacts of the
 sun goddess.
-%E
+%E [You feel the power of %o and are humbled.]
 %Cc Sam 00080
 Your healing skills tell you that %ns wounds are mortal.
 
@@ -2530,26 +2526,26 @@ man's dishonor prevents you from giving the final blow.
 
 You order that his unwashed head be given to the crows and his body
 thrown into the sea.
-%E
+%E [%nC dies without honor.]
 %Cc Sam 00081
 As you bow before %l, he welcomes you:
 
-    You have brought your family great honor, %p-sama.
+    "You have brought your family great honor, %p-sama.
 
-    While you have been gone the emperor's advisors have discovered in
+    "While you have been gone the emperor's advisors have discovered in
     the ancient texts that the karma of the samurai who seeks to recover
-    the amulet and the karma of %o are joined
+    the Amulet and the karma of %o are joined
     as the seasons join to make a year.
 
-    Because you have shown such fidelity, the emperor requests
+    "Because you have shown such fidelity, the emperor requests
     that you take leave of other obligations and continue on the
     road that fate has set your feet upon.  I would consider it
     an honor if you would allow me to watch your household until
-    you return with the amulet.
+    you return with the Amulet."
 
 With that, %l bows, and places his sword atop
 %o.
-%E
+%E [The emperor wants you to take %o and recover the Amulet.]
 %Cc Sam 00082
 %l holds %o tightly for a moment, then returns
 his gaze to you.
@@ -2557,10 +2553,12 @@ his gaze to you.
 "The time is ripe to recover the Amulet.  Return to %Z
 through the magic portal that transported you here so that you may
 achieve the destiny which awaits you."
-%E
+%E [Take %o, return to %Z, and recover the Amulet.]
 %Cp Sam 00090
 %lC bows.  "%p-sama, tell us of your search for the Amulet."
 %E
+# [Sam 00091: most other roles give more explicit directions for the
+#  feedback here, so this summary does that too.]
 %Cc Sam 00091
 "Ah, %p-sama.  You have wasted your efforts returning home.
 Now that you are in possession of the Amulet, you are honor-bound to
@@ -2568,7 +2566,7 @@ finish the quest you have undertaken.  There will be plenty of time
 for saki and stories when you have finished.
 
 "Go now, and may our prayers be a wind at your back."
-%E
+%E [Take the Amulet to the Astral Plane to finish your task.]
 #
 #	Tourist
 #
@@ -2581,7 +2579,7 @@ left.  The town is dark and quiet.  There are no sounds coming from
 behind the town walls, and no campfires burning in the fields.  As a
 matter of fact, you do not %x any movement in the fields at all, and
 the crops seem as though they have been untended for many weeks.
-%E
+%E [You find yourself back at %H, but the quiet is ominous.]
 %Cp Tou 00002
 Once again, you are back at %H.
 %E
@@ -2626,26 +2624,24 @@ As you can %x, we are desperately in need of your talents.  Someone must
 defeat %n if our town is to become what it once was.
 
 "Let me see if you are ready to be that someone."
-%E
+%E [Someone must defeat %n.  Are your ready?]
 %Cp Tou 00016
-"Things are getting worse, %p.
-I hope that this time you are ready."
+"Things are getting worse, %p.  I hope that this time you are ready."
 %E
 %Cp Tou 00017
-"I hope that for the sake of %H you have prepared
-yourself this time."
+"I hope that for the sake of %H you have prepared yourself this time."
 %E
 %Cc Tou 00018
 "It is too late, %p.  You are not even worthy to die amongst us.
 Leave %H and never return."
-%E
+%E [Leave %H and never return.]
 %Cc Tou 00019
 "There is still too much that you have to learn before you can undertake
 the next step.  Return to us as a proven %R, and perhaps then
 you will be ready.
 
 "Go back now, and may the teachings of %d serve you well."
-%E
+%E [Return when you are %Ra.]
 %Cc Tou 00020
 "It would be an affront to %d to have one not true to the
 %a path undertake her bidding.
@@ -2653,7 +2649,7 @@ you will be ready.
 "You must not return to us until you have purified yourself of these
 bad influences on your actions.  Remember, only by following the %a
 path can you hope to overcome the obstacles you will face."
-%E
+%E [You are not sufficiently %a.  Return when you are.]
 %Cc Tou 00021
 "You have indeed proven yourself a worthy %c, %p.
 
@@ -2669,7 +2665,7 @@ and recover %o.
 "Do not be distracted on your quest.  If you do not return quickly I fear
 that all will be lost.  Let us both pray now that %d will guide you
 and keep you safe."
-%E
+%E [Enter %i and recover %o from %n.]
 %Cp Tou 00025
 "Do not be fooled by the false promises of %n."
 %E
@@ -2706,11 +2702,11 @@ and you may be able to defeat him."
 %Cc Tou 00035
 Only your faith in %d keeps you from trembling.  You %x
 the handiwork of %ns henchlings everywhere.
-%E
+%E [You %x the handiwork of %ns henchlings.]
 %Cp Tou 00036
 You know that this time you must find and destroy %n.
 %E
-%Cc Tou 00040
+%Cp Tou 00040
 You sense the presence of %o.
 %E
 %Cp Tou 00041
@@ -2725,7 +2721,7 @@ You gain confidence, knowing that you may soon be united with
 try and defeat me.  When this day is over, I will have you enslaved
 in the mines where you will rue the day that you ever entered
 %i."
-%E
+%E [%rA will not defeat me.]
 %Cp Tou 00051
 "I let you live the last time because it gave me pleasure.
 This time I will destroy you, %p."
@@ -2736,15 +2732,14 @@ This time I will destroy you, %p."
 
 "If you do not run away now, I will inflict so much suffering on you that
 %l will feel guilty for ever having sent his %S to me!"
-%E
+%E [Run away or you will suffer severely.]
 %Cc Tou 00053
 "You fool.  You do not know how to call upon the powers of
 %o.
 
 "Return it to me and I will teach you how to use it, and together we
-will rule %H.  But do so now, as my patience
-grows thin."
-%E
+will rule %H.  But do so now, as my patience grows thin."
+%E [Return %o to me and we will rule %H.]
 %Cp Tou 00060
 "I defeated %l and I will defeat you, %p."
 %E
@@ -2771,8 +2766,7 @@ hope to defeat me."
 "%nC has never been defeated, NEVER!"
 %E
 %Cp Tou 00068
-"Are you truly the best %H has to send against me?
-I pity %l."
+"Are you truly the best %H has to send against me?  I pity %l."
 %E
 %Cp Tou 00069
 "How do you spell %p?  I want to ensure the marker on your grave is
@@ -2782,33 +2776,35 @@ correct as a warning to your %sp."
 As you pick up %o, you feel a great
 weight has been lifted from your shoulders.  Your only thoughts are
 to quickly return to %H and find %l.
-%E
+%E [You pick up %o and feel relief.  Return it to %l.]
 %Cc Tou 00080
 You turn in the direction of %n.  As his earthly body begins
 to vanish before your eyes, you hear him curse:
 
-    You shall never be rid of me, %p!
-    I will find you where ever you go and regain what is rightly mine.
-%E
+    "You shall never be rid of me, %p!
+    I will find you where ever you go and regain what is rightly mine."
+%E [%nC curses at you as %nh dies.]
 %Cc Tou 00081
 As %l detects the presence of %o,
 he almost smiles for the first time in many a full moon.
 
 As he looks up from %o he says:
 
-    You have recovered %o.  You are its
+    "You have recovered %o.  You are its
     owner now, but not its master.  Let it work with you as you continue
     your journey.  With its help, and %d to guide you on the
-    %a path, you may yet recover the Amulet of Yendor.
-%E
+    %a path, you may yet recover the Amulet of Yendor."
+%E [Take %o and with %ds guidance, recover the Amulet.]
 %Cc Tou 00082
-"%oC is yours now.  %Z await your
-return through the magic portal that brought you here."
-%E
+"%oC is yours now.  %Z
+await your return through the magic portal that brought you here."
+%E [Keep %o and return to %Z through the portal.]
 %Cp Tou 00090
 "I could not be more proud than if you were my own %S, %p!
 Tell me of your adventures in quest of the Amulet of Yendor."
 %E
+# [Tou 00091: like Sam 00091, the directions about what to do next are
+#  missing, so make the summary be a little bit more explicit.]
 %Cc Tou 00091
 "Stand back and let me look at you, %p.
 Now that you have recovered the Amulet of Yendor, I'm afraid living
@@ -2818,7 +2814,7 @@ out your days in %H would seem pretty tame.
 our oral history foretells for you.  Forever more, though, your name shall
 be spoken by the %gP with awe.  You are truly an inspiration to your
 %sp!"
-%E
+%E [You have the Amulet.  Take it to the Astral Plane to finish your task.]
 #
 #	Valkyrie
 #
