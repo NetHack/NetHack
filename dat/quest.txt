@@ -1,4 +1,4 @@
-# NetHack 3.6	quest.txt	$NHDT-Date: 1448525426 2015/11/26 08:10:26 $  $NHDT-Branch: master $:$NHDT-Revision: 1.31 $
+# NetHack 3.6	quest.txt	$NHDT-Date: 1448540693 2015/11/26 12:24:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.32 $
 #	Copyright (c) 1991 by M. Stephenson
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -2387,7 +2387,7 @@ become a monk.  Your fief and family are forfeit.  Wakarimasu ka?"
 I require the skills of %Ra in order to defeat %n.
 Go and seek out teachers.  Learn what they have learned.  When you
 are ready, return to me."
-%E [I require %Ra to defeat %n.  Return when you are ready.]
+%E ["I require %Ra to defeat %n.  Return when you are ready."]
 %Cc Sam 00020
 "%p-san, you would do better to join the kyokaku.
 
@@ -2739,7 +2739,7 @@ This time I will destroy you, %p."
 
 "Return it to me and I will teach you how to use it, and together we
 will rule %H.  But do so now, as my patience grows thin."
-%E [Return %o to me and we will rule %H.]
+%E ["Return %o to me and we will rule %H."]
 %Cp Tou 00060
 "I defeated %l and I will defeat you, %p."
 %E
@@ -2827,7 +2827,7 @@ In places, the snow and ice have been melted into steaming pools of
 water.  Fumaroles and pools of bubbling lava surround the hill.
 The stench of sulphur is carried through the air, and you %x creatures
 that should not be able to live in this environment moving towards you.
-%E
+%E [You arrive below %H.  Something is wrong; there is lava present.]
 %Cp Val 00002
 Once again, you are near the abode of %l.
 %E
@@ -2871,7 +2871,7 @@ at last.  We are in dire need of your aid, but I must determine if you
 are yet ready for such an undertaking.
 
 "Let me read your fate..."
-%E
+%E [We need your aid.  Are you ready?]
 %Cp Val 00016
 "Let me read the future for you now, %p, perhaps you have managed to
 change it enough..."
@@ -2884,40 +2884,38 @@ made changes to become ready for this task..."
 "No, %p.  Your fate is sealed.  I must cast about for another
 champion.  Begone from my presence, and never return.  Know this, that
 you shall never succeed in this life, and Valhalla is denied to you."
-%E
+%E ["Begone from my presence and never return."]
 %Cc Val 00019
 "I see you and %n fighting, %p.  But you are not prepared and
 shall die at %ns hand if you proceed.  No.  This will not do.
-Go back out into the world, and grow more experienced at the ways of
-war.  Only when you have returned %Ra will you be able to defeat
-%n."
-%E
+Go back out into the world, and grow more experienced at the ways of war.
+Only when you have returned %Ra will you be able to defeat %n."
+%E [Come back when you are %Ra.]
 %Cc Val 00020
 "NO!  This is terrible.  I see you becoming an ally of %n, and
 leading his armies in the final great battles.  This must not come to
 pass!  You have strayed from the %a path.  You must purge yourself,
 and return here only when you have regained a state of purity."
-%E
+%E [You have strayed from the %a path.  Return after you purify yourself.]
 %Cc Val 00021
-"It is not clear, %p, for my sight is limited without
-%o.  But it is now likely that you can defeat %n,
-and recover %o.
+"It is not clear, %p, for my sight is limited without our relic.
+But it is now likely that you can defeat %n, and recover
+%o.
 
 "A short time ago, %n and his minions attacked this place.  They
-opened the huge volcanic vents you %x about the hill, and attacked.
-I knew that this was to come to pass, and had asked %d for a group
-of %gP to help defend this place.  The few you %x here are the
-mightiest of Valhalla's own, and are all that are left of one hundred
-%d sent.
+opened the huge volcanic vents you %x about the hill, and attacked.  I knew
+that this was to come to pass, and had asked %d for a group of %gP
+to help defend this place.  The few you %x here are the  mightiest of
+Valhalla's own, and are all that are left of one hundred %d sent.
 
-"Despite the great and glorious battle we fought, %n managed at last
-to steal %o.  This has upset the balance of the universe, and
-unless %o is returned into my care, %n may start Ragnarok.
+"Despite the great and glorious battle we fought, %n managed at
+last to steal %o.  This has upset the balance of the universe,
+and unless %oh is returned into my care, %n may start Ragnarok.
 
 "You must find the entrance to %i.  Travel downward
 from there and you will find %ns lair.  Defeat him and
 return %o to me."
-%E
+%E [Find %i; defeat %n; return with %o.]
 %Cp Val 00025
 "Go with the blessings of %d."
 %E
@@ -2955,7 +2953,7 @@ The ice and snow gives way to a valley floor.  You %x ahead of you
 a huge round hill surrounded by pools of lava.  This then is the entrance
 to %i.  It looks like you're not going to get in without
 a fight though.
-%E
+%E [This is the entrace to %i.]
 %Cp Val 00036
 Once again, you stand before the entrance to %i.
 %E
@@ -2963,18 +2961,17 @@ Once again, you stand before the entrance to %i.
 Through clouds of sulphurous gasses, you %x a rock palisade
 surrounded with a moat of bubbling lava.  You remember the description
 from something that %l said.  This is the lair of %n.
-%E
+%E [This is the lair of %n.]
 %Cp Val 00041
 Once again, you stand in sight of %ns lair.
 %E
 %Cc Val 00050
 "So!  %lC has finally sent %ca to challenge me!
 
-"I thought that mastering %o would enable me to challenge %d,
-but it has shown me that first I must kill you!
-So come, little %s.  Once I defeat you, I can at last begin
-the final battle with %d."
-%E
+"I thought that mastering %o would enable me to challenge
+%d, but it has shown me that first I must kill you!  So come, little
+%s.  Once I defeat you, I can at last begin the final battle with %d."
+%E ["%oC has shown me that I must kill you."]
 %Cp Val 00051
 "Again you challenge me, %r.  Good.  I will kill you now."
 %E
@@ -3019,17 +3016,17 @@ Do you really think that one %c can stand against me?"
 As you pick up %o, your mind is suddenly filled with images,
 and you perceive all of the possibilities of each potential choice you
 could make.  As you begin to control and channel your thoughts, you
-realize that you must return %o to %lC immediately.
-%E
+realize that you must return %o to %l immediately.
+%E [You must return %o to %l.]
 %Cc Val 00080
 A look of surprise and horror appears on %ns face.
 
-    No!!!  %o has lied to me!  I have been misled!
+    "No!!!  %o has lied to me!  I have been misled!"
 
 Suddenly, %n grasps his head and screams in agony, then dies.
-%E
+%E [%nC dies.]
 %Cc Val 00081
-As you approach, %lC rises and touches %o.
+As you approach, %l rises and touches %o.
 
 "You may take %o with you, %p.  I have removed from
 it the power to foretell the future, for that power no mortal should
@@ -3037,14 +3034,14 @@ have.  Its other abilities, however, you have at your disposal.
 
 "You must now begin in %ds name to search for the Amulet of Yendor.
 May your steps be guided by %d, my %S."
-%E
+%E [Take %o.  Search for the Amulet.]
 # assumes Orb of Fate (glass object)
 %Cc Val 00082
 "Careful, %p!  %oC might break, and that would be
 a tragic loss.  You are its keeper now, and the time has come to
 resume your search for the Amulet.  %Z await your
 return through the magic portal that brought you here."
-%E
+%E [You are %os keeper now.  Return through the portal and find the Amulet.]
 %Cp Val 00090
 "Greetings, %p.  I have not been able to pay as much attention to
 your search for the Amulet as I have wished.  How do you fare?"
@@ -3057,7 +3054,7 @@ Plane.  There you must offer the Amulet to %d.
 
 "Go now, my %S.  I cannot tell you your fate, as the power of the
 Amulet interferes with mine.  I hope for your success."
-%E
+%E [Take the Amulet to %ds temple on the Astral Plane and offer it.]
 #
 #	Wizard
 #
@@ -3072,7 +3069,7 @@ the shadows.
 
 Your teacher would never allow such unaesthetic forms to surround the
 tower...  unless something were dreadfully wrong!
-%E
+%E [You have arrived at %ls tower but something is very wrong.]
 %Cp Wiz 00002
 Once again, you are back at %H.
 %E
@@ -3087,8 +3084,7 @@ You have an odd feeling this may be the last time you ever come here.
 "Ah, the spell to create the magic portal worked.  Outstanding!"
 %E
 %Cp Wiz 00007
-"Hurry!  %lC may not survive that casting of the
-portal spell!!"
+"Hurry!  %lC may not survive that casting of the portal spell!"
 %E
 %Cp Wiz 00008
 "The spells of %n were just too powerful for us to withstand."
@@ -3119,7 +3115,7 @@ Yes, I see that you have come a long way since you went out into the
 world, leaving the safe confines of this tower.  However, I must first
 determine if you have all of the skills required to take on the task
 I require of you."
-%E
+%E [You have come a long way, but are you ready for the task I require?]
 %Cp Wiz 00016
 "Well, %p, you have returned.  Perhaps you are now ready..."
 %E
@@ -3130,13 +3126,13 @@ I certainly hope that you are truly ready this time!"
 %Cc Wiz 00018
 "You fool, %p!  Why did I waste all of those years teaching you
 the esoteric arts?  Get out of here!  I shall find another."
-%E
+%E ["Get out of here!"]
 %Cc Wiz 00019
 "Alas, %p, you have not yet shown your proficiency as a worthy
 spellcaster.  As %ra, you would surely be overcome in the challenge
 ahead.  Go, now, expand your horizons, and return when you have attained
 renown as %Ra."
-%E
+%E [Go; return when you are %Ra.]
 %Cc Wiz 00020
 "You amaze me, %p!  How many times did I tell you that the way of a mage
 is an exacting one.  One must use the world with care, lest one leave it
@@ -3144,7 +3140,7 @@ in ruins and simplify the task of %n.
 
 "You must go back and show your worthiness.  Do not return until you are
 truly ready for this quest.  May %d guide you in this task."
-%E
+%E [Go; come back when you are worthy of %d.]
 %Cc Wiz 00021
 "Yes, %p, you truly are ready for this dire task.  Listen,
 carefully, for what I tell you now will be of vital importance.
@@ -3155,10 +3151,9 @@ under attack by the forces of %n.  As you know, we thought
 not the case.
 
 "%nC sent an army of abominations against us.  Among them was a
-minion, mindless and ensorcelled, and thus, in the confusion, it was able
-to penetrate our defenses.  Alas, this creature has stolen
-%o and I fear it has delivered %o
-to %n.
+minion, mindless and ensorcelled, and thus, in the confusion, it was
+able to penetrate our defenses.  Alas, this creature has stolen
+%o and I fear has delivered %oh to %n.
 
 "Over the years, I had woven most of my power into this amulet, and thus,
 without it, I have but a shadow of my former power, and I fear that I
@@ -3168,7 +3163,7 @@ shall soon perish.
 find and overcome %n, and return %o to me.
 
 "Go now, with %d, and complete this quest before it is too late."
-%E
+%E [Travel to %i; overcome %n; return with %o.]
 %Cp Wiz 00025
 "Beware, for %n is immune to most magical attacks."
 %E
@@ -3200,13 +3195,13 @@ destroy %n."
 %Cp Wiz 00034
 "You will know when %o is near.  Proceed with care!"
 %E
-%Cc Wiz 00035
+%Cp Wiz 00035
 Wisps of fog swirl nearby.  You feel that %ns lair is close.
 %E
 %Cp Wiz 00036
 You believe that you may once again invade %i.
 %E
-%Cc Wiz 00040
+%Cp Wiz 00040
 You feel your mentor's presence; perhaps %o is nearby.
 %E
 %Cp Wiz 00041
@@ -3214,25 +3209,24 @@ The aura of %o tingles at the edge of your perception.
 %E
 %Cc Wiz 00050
 "Ah, I recognize you, %p.  So, %l has sent you to steal
-%o from me, hmmm?  Well, %l is a
-fool to send such a mental weakling against me.
+%o from me, hmmm?  Well, %lh is a fool to send such
+a mental weakling against me.
 
 "Your destruction, however, should make for good sport.  In the end, you
 shall beg me to kill you!"
-%E
+%E ["Your destruction should make for good sport."]
 %Cc Wiz 00051
 "How nice of you to return, %p!  I enjoyed our last meeting.  Are you
 still hungry for more pain?
 
-"Come!  Your soul, like %o, shall soon be mine to
-command."
-%E
+"Come!  Your soul, like %o, shall soon be mine to command."
+%E ["Your soul shall soon be mine to command."]
 %Cp Wiz 00052
 "I'm sure that your perseverance shall be the subject of innumerable
 ballads, but you shall not be around to hear them, I fear!"
 %E
 %Cp Wiz 00053
-"Thief!  %o belongs to me, now.  I shall feed
+"Thief!  %oC belongs to me, now.  I shall feed
 your living flesh to my minions."
 %E
 %Cp Wiz 00060
@@ -3242,8 +3236,7 @@ your living flesh to my minions."
 "When you are defeated, your torment will last for a thousand years."
 %E
 %Cp Wiz 00062
-"After your downfall, %p, I shall devour %l
-for dessert!"
+"After your downfall, %p, I shall devour %l for dessert!"
 %E
 %Cp Wiz 00063
 "Are you ready yet to beg for mercy?  I could be lenient..."
@@ -3269,37 +3262,36 @@ for dessert!"
 %Cc Wiz 00070
 As you touch %o, its comforting power infuses you
 with new energy.  You feel as if you can detect others' thoughts flowing
-through it.  Although you yearn to wear %o
-and attack the Wizard of Yendor, you know you must return it to its
-rightful owner, %l.
-%E
+through it.  Although you yearn to wear %o and
+attack the Wizard of Yendor, you know you must return it to its rightful
+owner, %l.
+%E [You feel %os power and know you should return %oh to %l.]
 %Cc Wiz 00080
 %nC, whose body begins to shrivel up, croaks out:
 
-    I shall haunt your progress until the end of time.  A thousand
-    curses on you and %l.
+    "I shall haunt your progress until the end of time.  A thousand
+    curses on you and %l."
 
 Then, the body bursts into a cloud of choking dust, and blows away.
-%E
+%E [%nC curses you as %nh dies.]
 %Cc Wiz 00081
 %lC notices %o in your possession,
 beams at you and says:
 
-    I knew you could defeat %n and retrieve
+    "I knew you could defeat %n and retrieve
     %o.  We shall never forget this
     brave service.
 
-    Take %o with you in your quest for
-    the Amulet of Yendor.  I can sense that it has attuned
-    %oiself to you already.
+    "Take %oh with you in your quest for the Amulet of Yendor.
+    I can sense that it has attuned %oiself to you already.
 
-    May %d guide you in your quest, and keep you from harm.
-%E
+    "May %d guide you in your quest, and keep you from harm."
+%E [Take %o with you in your quest for the Amulet.]
 %Cc Wiz 00082
 "You are the keeper of %o now.  It is time to
 recover the /other/ Amulet.  %Z await your return through
 the magic portal which brought you here."
-%E
+%E [Keep %o, return through the portal to %Z; find the other Amulet.]
 %Cp Wiz 00090
 "Come near, my %S, and share your adventures with me.
 So, have you succeeded in your quest for the Amulet of Yendor?"
@@ -3309,12 +3301,12 @@ So, have you succeeded in your quest for the Amulet of Yendor?"
 in defeating the Wizard of Yendor and his minions, it would be you.
 
 "Go now, and take the Amulet to the Astral Plane.  Once there, present
-the Amulet on the altar of %d.  Along the way you shall pass through the
-four Elemental Planes.  These planes are like nothing you have ever
+the Amulet on the altar of %d.  Along the way you shall pass through
+the four Elemental Planes.  These planes are like nothing you have ever
 experienced before, so be prepared!
 
 "For this you were born, %s!  I am very proud of you."
-%E
+%E [Take the Amulet to %ds altar on the Astral Plane.]
 #
 #	General
 #
