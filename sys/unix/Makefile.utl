@@ -1,5 +1,5 @@
 #	Makefile for NetHack's utility programs.
-# NetHack 3.6  Makefile.utl	$NHDT-Date: 1447844579 2015/11/18 11:02:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.25 $
+# NetHack 3.6  Makefile.utl	$NHDT-Date: 1448711183 2015/11/28 11:46:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.26 $
 
 # Root of source tree:
 NHSROOT=..
@@ -230,16 +230,18 @@ lev_lex.o:   lev_lex.c $(HACK_H) ../include/lev_comp.h ../include/sp_lev.h
 	@echo $(CC) -c $(CFLAGS) lev_lex.c
 	@$(CC) -c $(CFLAGS) -DWEIRD_LEX=`egrep -c _cplusplus lev_lex.c` lev_lex.c
 
+# '$(YACC) -d' generates both $(YTABC) and $(YTABH) in one run
 ../include/lev_comp.h: lev_yacc.c
 
 lev_yacc.c: lev_comp.y
 	$(YACC) $(YACCDIST) -d lev_comp.y
-	mv $(YTABC) lev_yacc.c
-	mv $(YTABH) ../include/lev_comp.h
+	sed -e 's#"$(YTABC)"#"$@"#' $(YTABC) > $@ && rm $(YTABC)
+	sed -e 's#"$(YTABH)"#"lev_comp.h"#' $(YTABH) > ../include/lev_comp.h \
+		&& rm $(YTABH)
 
 lev_lex.c: lev_comp.l
 	$(LEX) $(FLEXDIST) lev_comp.l
-	mv $(LEXYYC) lev_lex.c
+	sed -e 's#"$(LEXYYC)"#"$@"#' $(LEXYYC) > $@ && rm $(LEXYYC)
 
 # with all of extern.h's functions to complain about, we drown in
 # 'defined but not used' without -u
@@ -260,17 +262,18 @@ dgn_lex.o:   dgn_lex.c $(CONFIG_H) ../include/dgn_comp.h ../include/dgn_file.h
 	@echo $(CC) -c $(CFLAGS) dgn_lex.c
 	@$(CC) -c $(CFLAGS) -DWEIRD_LEX=`egrep -c _cplusplus dgn_lex.c` dgn_lex.c
 
-
+# '$(YACC) -d' generates both $(YTABC) and $(YTABH) in one run
 ../include/dgn_comp.h: dgn_yacc.c
 
 dgn_yacc.c: dgn_comp.y
 	$(YACC) $(YACCDIST) -d dgn_comp.y
-	mv $(YTABC) dgn_yacc.c
-	mv $(YTABH) ../include/dgn_comp.h
+	sed -e 's#"$(YTABC)"#"$@"#' $(YTABC) > $@ && rm $(YTABC)
+	sed -e 's#"$(YTABH)"#"dgn_comp.h"#' $(YTABH) > ../include/dgn_comp.h \
+		&& rm $(YTABH)
 
 dgn_lex.c: dgn_comp.l
 	$(LEX) $(FLEXDIST) dgn_comp.l
-	mv $(LEXYYC) dgn_lex.c
+	sed -e 's#"$(LEXYYC)"#"$@"#' $(LEXYYC) > $@ && rm $(LEXYYC)
 
 # with all of extern.h's functions to complain about, we drown in
 # 'defined but not used' without -u
@@ -409,6 +412,25 @@ $(HACK_H): $(CONFIG_H)
 	@( cd ../src ; $(MAKE) $(HACK_H) )
 $(CONFIG_H): ../include/config.h
 	@( cd ../src ; $(MAKE) $(CONFIG_H) )
+
+# 'make dist' => put generated lex and yacc sources into place for distribution
+SYSSHARE=../sys/share/
+$(SYSSHARE)lev_lex.c: lev_lex.c
+	cp lev_lex.c $@
+$(SYSSHARE)lev_yacc.c: lev_yacc.c
+	cp lev_yacc.c $@
+$(SYSSHARE)lev_comp.h: ../include/lev_comp.h
+	cp ../include/lev_comp.h $@
+$(SYSSHARE)dgn_lex.c: dgn_lex.c
+	cp dgn_lex.c $@
+$(SYSSHARE)dgn_yacc.c: dgn_yacc.c
+	cp dgn_yacc.c $@
+$(SYSSHARE)dgn_comp.h: ../include/dgn_comp.h
+	cp ../include/dgn_comp.h $@
+
+dist:	$(SYSSHARE)lev_lex.c $(SYSSHARE)lev_yacc.c $(SYSSHARE)lev_comp.h \
+	$(SYSSHARE)dgn_lex.c $(SYSSHARE)dgn_yacc.c $(SYSSHARE)dgn_comp.h
+	@echo 'pre-generated lex and yacc sources are in place in sys/share'
 
 tags: $(UTILSRCS)
 	@ctags -tw $(UTILSRCS)
