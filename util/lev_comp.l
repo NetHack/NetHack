@@ -1,5 +1,5 @@
 %{
-/* NetHack 3.6  lev_comp.l	$NHDT-Date: 1432512785 2015/05/25 00:13:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.19 $ */
+/* NetHack 3.6  lev_comp.l	$NHDT-Date: 1448710678 2015/11/28 11:37:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.21 $ */
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -53,7 +53,11 @@ void FDECL(yyoutput, (int));
 int FDECL(yyunput, (int));
 int FDECL(yyoutput, (int));
 # endif
-#endif	/* !FLEX_SCANNER && !FLEXHACK_SCANNER */
+
+#else	/* !FLEX_SCANNER && !FLEXHACK_SCANNER */
+/* most recent flex allows suppressing yyunput() altogether when not needed */
+#define YY_NO_UNPUT
+#endif
 
 #ifdef FLEX_SCANNER
 #define YY_MALLOC_DECL \
@@ -96,7 +100,7 @@ FILE *orig_yyin = NULL;
 #define ST_RETF(y, x) do { savetoken(yytext); y; return x; } while (0);
 
 %}
-%e 1500
+%e 2000
 %p 5000
 %n 700
 %s MAPC
@@ -114,14 +118,15 @@ FILE *orig_yyin = NULL;
 		  int len = yyleng;
 		  savetoken(yytext);
 		  /* convert \r\n to \n */
-		  if (len >= 2 && yytext[len - 2] == '\r') len -= 1;
+		  if (len >= 2 && yytext[len - 2] == '\r')
+		      len -= 1;
 		  (void) strncpy(map + map_cnt, yytext, len);
 		  map_cnt += len;
 		  map[map_cnt - 1] = '\n';
 		  map[map_cnt] = '\0';
 		  newline();
 		}
-^[ \t]*#.*\n		{ savetoken(yytext); newline(); }
+^[ \t]*#.*\n	{ savetoken(yytext); newline(); }
 MESSAGE		ST_RET(MESSAGE_ID);
 NOMAP		ST_RET(NOMAP_ID);
 MAZE		ST_RET(MAZE_ID);
@@ -287,7 +292,7 @@ cursed		{ savetoken(yytext); yylval.i=3; return CURSE_TYPE; }
 noteleport	{ savetoken(yytext); yylval.i=NOTELEPORT; return FLAG_TYPE; }
 hardfloor	{ savetoken(yytext); yylval.i=HARDFLOOR; return FLAG_TYPE; }
 nommap		{ savetoken(yytext); yylval.i=NOMMAP; return FLAG_TYPE; }
-arboreal	{ savetoken(yytext); yylval.i=ARBOREAL; return FLAG_TYPE; }	/* KMH */
+arboreal	{ savetoken(yytext); yylval.i=ARBOREAL; return FLAG_TYPE; } /* KMH */
 shortsighted	{ savetoken(yytext); yylval.i=SHORTSIGHTED; return FLAG_TYPE; }
 mazelevel	{ savetoken(yytext); yylval.i=MAZELEVEL; return FLAG_TYPE; }
 premapped	{ savetoken(yytext); yylval.i=PREMAPPED; return FLAG_TYPE; }
@@ -297,14 +302,15 @@ icedpools	{ savetoken(yytext); yylval.i=ICEDPOOLS; return FLAG_TYPE; }
 solidify	{ savetoken(yytext); yylval.i=SOLIDIFY; return FLAG_TYPE; }
 corrmaze        { savetoken(yytext); yylval.i=CORRMAZE; return FLAG_TYPE; }
 inaccessibles   { savetoken(yytext); yylval.i=CHECK_INACCESSIBLES; return FLAG_TYPE; }
-[0-9]+d[0-9]+	{ char *p = strchr(yytext, 'd');
+[0-9]+d[0-9]+	{ char *p = index(yytext, 'd');
 		  savetoken(yytext);
 		  if (p) {
-			*p = '\0';
-			p++;
-			yylval.dice.num=atoi(yytext);
-			yylval.dice.die=atoi(p);
-		  } else { yylval.dice.num = yylval.dice.die = 1; }
+			*p++ = '\0';
+			yylval.dice.num = atoi(yytext);
+			yylval.dice.die = atoi(p);
+		  } else {
+			yylval.dice.num = yylval.dice.die = 1;
+		  }
 		  return DICE;
 		}
 \[\ *[0-9]+\%\ *\] { savetoken(yytext); yylval.i = atoi(yytext + 1);
@@ -319,9 +325,8 @@ inaccessibles   { savetoken(yytext); yylval.i=CHECK_INACCESSIBLES; return FLAG_T
 		  return SPERCENT; }
 [0-9]+		{ savetoken(yytext); yylval.i=atoi(yytext); return INTEGER; }
 \"[^"]*\"	{ savetoken(yytext);
-		  yytext[yyleng-1] = 0; /* Discard the trailing \" */
-		  yylval.map = (char *) alloc(strlen(yytext+1)+1);
-		  Strcpy(yylval.map, yytext+1); /* Discard the first \" */
+		  yytext[yyleng - 1] = '\0'; /* discard the trailing \" */
+		  yylval.map = dupstr(yytext + 1); /* skip the first \" */
 		  return STRING; }
 \$[a-zA-Z_]+	{ savetoken(yytext); return handle_varstring_check(); }
 "=="		{ savetoken(yytext); yylval.i = SPO_JE; return COMPARE_TYPE; }
@@ -339,77 +344,91 @@ inaccessibles   { savetoken(yytext); yylval.i=CHECK_INACCESSIBLES; return FLAG_T
 .		{ savetoken(yytext); return yytext[0]; }
 %%
 #ifdef	AMIGA
-long *alloc(n)
-	unsigned n;
+long *
+alloc(n)
+    unsigned n;
 {
-	return ((long *)malloc (n));
+    return (long *) malloc(n);
 }
 #endif
 
 /* routine to switch to another input file; needed for flex */
-void init_yyin( input_f )
+void
+init_yyin( input_f )
 FILE *input_f;
 {
 #if defined(FLEX_SCANNER) || defined(FLEXHACK_SCANNER)
-	if (yyin)
-	    yyrestart(input_f);
-	else
+    if (yyin)
+        yyrestart(input_f);
+    else
 #endif
-	    yyin = input_f;
-	    if (!orig_yyin) orig_yyin = yyin;
+        yyin = input_f;
+
+    if (!orig_yyin)
+        orig_yyin = yyin;
 }
 /* analogous routine (for completeness) */
-void init_yyout( output_f )
+void
+init_yyout( output_f )
 FILE *output_f;
 {
-	yyout = output_f;
+    yyout = output_f;
 }
 
 long
 handle_varstring_check()
 {
-  struct lc_vardefs *vd;
-  yylval.map = (char *) alloc(strlen(yytext)+1);
-  Strcpy(yylval.map, yytext);
-  if ((vd = vardef_defined(variable_definitions, yytext, 1))) {
-     long l = vd->var_type;
-     long a = ((l & SPOVAR_ARRAY) == SPOVAR_ARRAY);
-     l = (l & ~SPOVAR_ARRAY);
-     if (l == SPOVAR_INT) return (a ? VARSTRING_INT_ARRAY : VARSTRING_INT);
-     if (l == SPOVAR_STRING) return (a ? VARSTRING_STRING_ARRAY : VARSTRING_STRING);
-     if (l == SPOVAR_VARIABLE) return (a ? VARSTRING_VAR_ARRAY : VARSTRING_VAR);
-     if (l == SPOVAR_COORD) return (a ? VARSTRING_COORD_ARRAY : VARSTRING_COORD);
-     if (l == SPOVAR_REGION) return (a ? VARSTRING_REGION_ARRAY : VARSTRING_REGION);
-     if (l == SPOVAR_MAPCHAR) return (a ? VARSTRING_MAPCHAR_ARRAY : VARSTRING_MAPCHAR);
-     if (l == SPOVAR_MONST) return (a ? VARSTRING_MONST_ARRAY : VARSTRING_MONST);
-     if (l == SPOVAR_OBJ) return (a ? VARSTRING_OBJ_ARRAY : VARSTRING_OBJ);
-     if (l == SPOVAR_SEL) return (a ? VARSTRING_SEL_ARRAY : VARSTRING_SEL);
-  }
-  return VARSTRING;
-}
+    struct lc_vardefs *vd;
 
+    yylval.map = dupstr(yytext);
+    if ((vd = vardef_defined(variable_definitions, yytext, 1)) != 0) {
+        long l = vd->var_type;
+        int a = ((l & SPOVAR_ARRAY) == SPOVAR_ARRAY);
+
+        l &= ~SPOVAR_ARRAY;
+        if (l == SPOVAR_INT)
+	    return (a ? VARSTRING_INT_ARRAY : VARSTRING_INT);
+        if (l == SPOVAR_STRING)
+	    return (a ? VARSTRING_STRING_ARRAY : VARSTRING_STRING);
+        if (l == SPOVAR_VARIABLE)
+	    return (a ? VARSTRING_VAR_ARRAY : VARSTRING_VAR);
+        if (l == SPOVAR_COORD)
+	    return (a ? VARSTRING_COORD_ARRAY : VARSTRING_COORD);
+        if (l == SPOVAR_REGION)
+	    return (a ? VARSTRING_REGION_ARRAY : VARSTRING_REGION);
+        if (l == SPOVAR_MAPCHAR)
+	    return (a ? VARSTRING_MAPCHAR_ARRAY : VARSTRING_MAPCHAR);
+        if (l == SPOVAR_MONST)
+	    return (a ? VARSTRING_MONST_ARRAY : VARSTRING_MONST);
+        if (l == SPOVAR_OBJ)
+	    return (a ? VARSTRING_OBJ_ARRAY : VARSTRING_OBJ);
+        if (l == SPOVAR_SEL)
+	    return (a ? VARSTRING_SEL_ARRAY : VARSTRING_SEL);
+    }
+    return VARSTRING;
+}
 
 void
 newline()
 {
-  nh_line_number++;
-  token_start_pos = 0;
-  memset(curr_token, 0, 512);
+    nh_line_number++;
+    token_start_pos = 0;
+    (void) memset((genericptr_t) curr_token, 0, 512);
 }
 
 void
 savetoken(s)
 char *s;
 {
-   sprintf(curr_token, "%s", s);
-   advancepos(s);
+    Sprintf(curr_token, "%s", s);
+    advancepos(s);
 }
 
 void
 advancepos(s)
 char *s;
 {
-   token_start_pos += strlen(s);
+    token_start_pos += strlen(s);
 }
 
 /*lev_comp.l*/
