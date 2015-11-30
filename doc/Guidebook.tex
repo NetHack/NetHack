@@ -1023,6 +1023,11 @@ are displayed.
 ``{\tt \#adjust}'' can also be used to split a stack of objects; when
 choosing the item to adjust, enter a count prior to its letter.
 %.lp
+\item[\tb{\#annotate}]
+Allows you to specify one line of text to associate with the current
+dungeon level.  All levels with annotations are displayed by the
+``{\tt \#overview}'' command.
+%.lp
 \item[\tb{\#chat}]
 Talk to someone.
 %.lp
@@ -1062,6 +1067,14 @@ Offer a sacrifice to the gods.\\
 You'll need to find an altar to have any chance at success.
 Corpses of recently killed monsters are the fodder of choice.
 %.lp
+\item[\tb{\#overview}]
+Display information you've discovered about the dungeon.  Any visited
+level (unless forgotten due to amnesia) with an annotation is included,
+and many things (altars, thrones, fountains, and so on; extra stairs
+leading to another dungeon branch) trigger an automatic annotation.
+If dungeon overview is chosen during end-of-game disclosure, every visited
+level will be included regardless of annotations.
+%.lp
 \item[\tb{\#pray}]
 Pray to the gods for help.\\
 %.lp ""
@@ -1084,7 +1097,7 @@ response of `{\tt y}' acknowledges that intent.  You can set the
 option to require a response of ``{\tt yes}'' instead.
 %.lp
 \item[\tb{\#ride}]
-Ride (or stop riding) a monster.
+Ride (or stop riding) a saddled creature.
 %.lp
 \item[\tb{\#rub}]
 Rub a lamp or a stone.
@@ -1146,7 +1159,7 @@ option to have nethack combine them into meta\+key.
 {\tt\#adjust}
 %.lp
 \item[\tb{M-A}]
-{\tt\#annotate} (if supported)
+{\tt\#annotate}
 %.lp
 \item[\tb{M-c}]
 {\tt\#chat}
@@ -1182,7 +1195,7 @@ option to have nethack combine them into meta\+key.
 {\tt\#offer}
 %.lp
 \item[\tb{M-O}]
-{\tt\#overview} (if supported)
+{\tt\#overview}
 %.lp
 \item[\tb{M-p}]
 {\tt\#pray}
@@ -1194,7 +1207,7 @@ option to have nethack combine them into meta\+key.
 {\tt\#rub}
 %.lp
 \item[\tb{M-R}]
-{\tt\#ride} (if supported)
+{\tt\#ride}
 %.lp
 \item[\tb{M-s}]
 {\tt\#sit}

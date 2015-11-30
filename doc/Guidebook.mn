@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: master $:$NHDT-Revision: 1.186 $ $NHDT-Date: 1448917136 2015/11/30 20:58:56 $
+.\" $NHDT-Branch: master $:$NHDT-Revision: 1.187 $ $NHDT-Date: 1448920179 2015/11/30 21:49:39 $
 .ds h0 "NetHack Guidebook
 .ds h1
 .ds h2 %
@@ -846,6 +846,10 @@ or that it will appear in a particular location when inventory listings
 are displayed.
 ``#adjust'' can also be used to split a stack of objects; when
 choosing the item to adjust, enter a count prior to its letter.
+.lp #annotate
+Allows you to specify one line of text to associate with the current
+dungeon level.  All levels with annotations are displayed by the
+``#overview'' command.
 .lp #chat
 Talk to someone.
 .lp #conduct
@@ -874,6 +878,13 @@ Offer a sacrifice to the gods.
 .lp ""
 You'll need to find an altar to have any chance at success.
 Corpses of recently killed monsters are the fodder of choice.
+.lp #overview
+Display information you've discovered about the dungeon.  Any visited
+level (unless forgotten due to amnesia) with an annotation is included,
+and many things (altars, thrones, fountains, and so on; extra stairs
+leading to another dungeon branch) trigger an automatic annotation.
+If dungeon overview is chosen during end-of-game disclosure, every visited
+level will be included regardless of annotations.
 .lp #pray
 Pray to the gods for help.
 .lp ""
@@ -894,7 +905,7 @@ response of 'y' acknowledges that intent.  You can set the
 .op paranoid_confirmation
 option to require a response of "yes" instead.
 .lp #ride
-Ride (or stop riding) a monster.
+Ride (or stop riding) a saddled creature.
 .lp "#rub "
 Rub a lamp or a stone.
 .lp "#sit "
@@ -943,7 +954,7 @@ option to have nethack combine them into meta+key.
 .lp M-a
 #adjust
 .lp M-A
-#annotate (if supported)
+#annotate
 .lp M-c
 #chat
 .lp M-C
@@ -967,7 +978,7 @@ option to have nethack combine them into meta+key.
 .lp M-o
 #offer
 .lp M-O
-#overview (if supported)
+#overview
 .lp M-p
 #pray
 .lp M-q
@@ -975,7 +986,7 @@ option to have nethack combine them into meta+key.
 .lp M-r
 #rub
 .lp M-R
-#ride (if supported)
+#ride
 .lp M-s
 #sit
 .lp M-t
