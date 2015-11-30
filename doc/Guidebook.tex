@@ -1607,6 +1607,10 @@ by the presence of the word ``cursed'', ``uncursed'' or ``blessed'' in the
 description of the item.
 In some cases ``uncursed'' will be omitted as being redundant when
 enough other information is displayed.
+The
+{\it implicit\verb+_+uncursed\/}
+option can be used to control this; toggle it off to have ``uncursed''
+be displayed even when that can be deduced from other attributes.
 
 %.hn 2
 \subsection*{Weapons (`{\tt )}')}
@@ -3373,6 +3377,13 @@ on the same line will be shown in red color and underlined.
 You can have multiple MENUCOLOR entries in your config file,
 and the last MENUCOLOR-line in your config file that matches
 a menu line will be used for the line.
+
+%.pg
+Note that if you intend to have one or more color specifications match
+" uncursed ", you will probably want to turn the
+{\it implicit\verb+_+uncursed\/}
+option off so that all items known to be uncursed are actually
+displayed with the ``uncursed'' description.
 
 %.lp
 %.hn 2
