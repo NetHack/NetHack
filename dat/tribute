@@ -5096,23 +5096,166 @@ thee.'" he began.
 #
 #
 #
-%title I Shall Wear Midnight (2)
+%title I Shall Wear Midnight (13)
+# p. 447 (Harper edition; this passage is a quote from the "Authur's Note",
+#         three extra pages after the conclusion of the story; there is a
+#         similar, slightly shorter version of this in the text on p. 236,
+#         where it's preceded by "The past needs to be remembered." but
+#         lacks the final 'going wrong' sentence)
 %passage 1
-It is important that we know where we come from, 
-because if you do not know where you come from, 
-then you don't know where you are, 
-and if you don't know where you are, 
-you don't know where you're going. 
-
-And if you don't know where you're going, you're probably going wrong.
+It is important that we know where we come from, because if you do not
+know where you come from, then you don't know where you are, and if you
+don't know where you are, you don't know where you're going.  And if you
+don't know where you're going, you're probably going wrong.
 
   [I Shall Wear Midnight, by Terry Pratchett]
 %e passage
+# pp. 429-430 (passage starts mid-paragraph and ends mid-paragraph)
 %passage 2
-There have been times, lately, when I dearly wished that I 
-could change the past. Well, I can't, but I can change the 
-present, so that when it becomes the past it will turn out 
-to be a past worth having.
+"[...]  There have been times, lately, when I dearly wished that I could
+change the past.  Well, I can't, but I can change the present, so that
+when it becomes the past it will turn out to be a past worth having. [...]"
+
+  [I Shall Wear Midnight, by Terry Pratchett]
+%e passage
+# p. 2 (passage starts mid-paragraph; scene is a village fair)
+%passage 3
+[...]  And so here, [...], you heard the permanent scream of, well,
+everyone.  It was called having fun.  The only people not making any noise
+were the thieves and pickpockets, who went about their business with
+commendable silence, and they didn't come near Tiffany; who would pick a
+witch's pocket?  You would be lucky to get all your fingers back.  At
+least, that's what they feared, and a sensible witch would encourage them
+in this fear.
+
+  [I Shall Wear Midnight, by Terry Pratchett]
+%e passage
+# p. 61
+%passage 4
+/The hare runs into the fire./
+
+Had she seen that written down anywhere?  Had she heard it as part of a
+song?  A nursery rhyme?  What had the hare got to do with anything?  But
+she was a witch, after all, and there was a job to do.  Mysterious omens
+could wait.  Witches knew that mysterious omens were around all the time.
+The world was always very nearly drowning in mysterious omens.  You just
+had to pick the one that was convenient.
+
+  [I Shall Wear Midnight, by Terry Pratchett]
+%e passage
+# p. 64
+%passage 5
+That was the thing about thoughts.  They thought themselves, and then
+dropped into your head in the hope that you would think so too.  You had
+to slap them down, thoughts like that; they would take a witch over if she
+let them.  And then it would all break down, and nothing would be left but
+the cackling.
+
+  [I Shall Wear Midnight, by Terry Pratchett]
+%e passage
+# p. 65 (passage starts mid-paragraph)
+%passage 6
+"[...]  It just so happens that I was passing by, ye ken, and not
+following ye at all.  One of them coincidences."
+
+"There have been a lot of those coincidences lately," said Tiffany.
+
+"Aye," said Rob, grinning, "it must be another coincidence."
+
+  [I Shall Wear Midnight, by Terry Pratchett]
+%e passage
+# pp. 179-180
+%passage 7
+Tiffany cleared her throat.  "Well," she said, "I suppose Rob Anybody would
+tell you that there are times when promises should be kept and times when
+promises should be broken, and it takes a Feegle to know the difference."
+
+Mrs. Proust grinned hugely.  "You could almost be from the city, Miss
+Tiffany Aching."
+
+  [I Shall Wear Midnight, by Terry Pratchett]
+%e passage
+# p. 183 (Wee Mad Arthur is a member of the Ankh-Morpork Watch; he was a
+#         foundling raised by gnomes and didn't know he was a Feegle until
+#         he met with the ones accompanying Tiffany)
+%passage 8
+Despite himself, Wee Mad Arthur was grinning.  "Have you boys got no shame?"
+
+Rob Anybody matched him grin for grin.  "I couldna say," he replied, "but
+if we have, it probably belonged tae somebody else."
+
+  [I Shall Wear Midnight, by Terry Pratchett]
+%e passage
+# p. 219 (footnote)
+%passage 9
+There is a lot of folklore about equestrian statues, especially the ones
+with riders on them.  There is said to be a code in the number and
+placement of the horse's hooves:  If one of the horse's hooves is in the
+air, the rider was wounded in battle; two legs in the air means that the
+rider was killed in battle; three legs in the air indicates that the
+rider got lost on the way to the battle; and four legs in the air means
+that the sculptor was very, very clever.  Five legs in the air means that
+there's probably at least one other horse standing behind the one you're
+looking at; and the rider lying on the ground with his horse lying on top
+of him with all four legs in the air means that the rider was either a
+very incompetent horseman or owned a very bad-tempered horse.
+
+  [I Shall Wear Midnight, by Terry Pratchett]
+%e passage
+# p. 318 (passage starts mid-paragraph and ends mid-paragraph)
+%passage 10
+[...]  "Knowledge is power, power is energy, energy is matter, matter is
+mass, and mass changes time and space." [...]
+
+  [I Shall Wear Midnight, by Terry Pratchett]
+%e passage
+# p. 362 (passage starts mid-paragraph; speaker is Preston, a castle guard;
+#         quote is a parody of J.R.R.Tolkien's "Do not meddle in the affairs
+#         of wizards, for they are subtle, and quick to anger.")
+%passage 11
+[...]  "My granny said, 'Don't meddle in the affairs of witches because
+they clout you around the ear.'"
+
+  [I Shall Wear Midnight, by Terry Pratchett]
+%e passage
+# pp. 386-387 (Tiffany is trying to rescue some witches from a castle roof)
+%passage 12
+Tiffany crawled a little farther, well aware of the sheer drop an inch
+away from her hand.  "Preston has gone to fetch a rope.  Do you have a
+broomstick?"
+
+"A sheep crashed into it," said Mrs. Proust.
+
+Tiffany could just make her out now.  "You crashed into a sheep in
+/the air/?"
+
+"Maybe it was a cow, or something.  What are those things that go
+/snuffle snuffle/?"
+
+"You ran into a flying hedgehog?"
+
+"No, as it happened.  We were down low, looking for a bush for Mrs.
+Happenstance."  There was a sigh in the gloom.  "It's because of her
+trouble, poor soul.  We've stopped at a lot of bushes on the way here,
+believe me!  And do you know what?  Inside every single one of them is
+something that stings, bites, kicks, screams, howls, squelches, farts
+enormously, goes all spiky, tries to knock you over, or does an enormous
+pile of poo!  Haven't you people up here ever heard of porcelain?"
+
+Tiffany was taken aback.  "Well, yes, but not in the fields!"
+
+"They would be all the better for it," said Mrs. Proust.  "I've ruined
+a decent pair of boots, I have."
+
+  [I Shall Wear Midnight, by Terry Pratchett]
+%e passage
+# p. 442 (passage starts mid-paragraph; see /The Wee Free Men/;
+#         'underrr' and 'ag-rreeeed' are accurate; 'arr-angement' is
+#         hyphenated to span lines--it's just a guess that it would have
+#         been hyphenated anyway)
+%passage 13
+"Nae king, nae quin, nae laird!  One baron--and underrr mutually
+ag-rreeeed arr-angement, ye ken!"
 
   [I Shall Wear Midnight, by Terry Pratchett]
 %e passage
