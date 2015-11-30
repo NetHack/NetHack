@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1447987787 2015/11/20 02:49:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.123 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1448862378 2015/11/30 05:46:18 $  $NHDT-Branch: master $:$NHDT-Revision: 1.125 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -776,6 +776,8 @@ int howmuch;
                 levl[zx][zy].glyph = cmap_to_glyph(S_stone);
                 lastseentyp[zx][zy] = STONE;
             }
+    /* forget overview data for this level */
+    forget_mapseen(ledger_no(&u.uz));
 }
 
 /* Forget all traps on the level. */

@@ -1,4 +1,4 @@
-/* NetHack 3.6	dungeon.c	$NHDT-Date: 1446955297 2015/11/08 04:01:37 $  $NHDT-Branch: master $:$NHDT-Revision: 1.68 $ */
+/* NetHack 3.6	dungeon.c	$NHDT-Date: 1448862377 2015/11/30 05:46:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.69 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1979,6 +1979,7 @@ get_annotation(lev)
 d_level *lev;
 {
     mapseen *mptr;
+
     if ((mptr = find_mapseen(lev)))
         return mptr->custom;
     return NULL;
@@ -2405,7 +2406,10 @@ recalc_mapseen()
                     mptr->feat.ngrave = count;
                 break;
             case ALTAR:
-                atmp = Amask2msa(levl[x][y].altarmask);
+                atmp = (Is_astralevel(&u.uz)
+                        && (levl[x][y].seenv & SVALL) != SVALL)
+                         ? MSA_NONE
+                         : Amask2msa(levl[x][y].altarmask);
                 if (!mptr->feat.naltar)
                     mptr->feat.msalign = atmp;
                 else if (mptr->feat.msalign != atmp)
