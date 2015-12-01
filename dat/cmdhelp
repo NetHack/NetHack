@@ -102,7 +102,7 @@ $       Count your gold
 M-?     Display extended command help (if the platform allows this)
 M-2     Toggle two-weapon combat (unless number_pad is enabled)
 M-a     Adjust inventory letters
-M-A     Annotate: supply a name for the current dungeon level (if supported)
+M-A     Annotate: supply a name for the current dungeon level
 M-c     Talk to someone
 M-C     Conduct: list voluntary challenges you have maintained
 M-d     Dip an object into something
@@ -114,11 +114,11 @@ M-l     Loot a box on the floor
 M-m     Use a monster's special ability
 M-n     Name a monster, an individual object, or a type of object
 M-o     Offer a sacrifice to the gods
-M-O     Overview: show a summary of the explored dungeon (if supported)
+M-O     Overview: show a summary of the explored dungeon
 M-p     Pray to the gods for help
 M-q     Quit
 M-r     Rub a lamp
-M-R     Ride: mount or dismount a saddled steed (if supported)
+M-R     Ride: mount or dismount a saddled steed
 M-s     Sit down
 M-t     Turn undead
 M-T     Tip: empty a container
