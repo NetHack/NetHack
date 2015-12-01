@@ -1,14 +1,16 @@
-               Instructions for Installing NetHack 3.6.0
+               Instructions for Building and Installing NetHack 3.6.0
                      on a VMS (aka OpenVMS) system
                =========================================
 
 0.  Please read this entire file before trying to build or install
     NetHack, then read it again!
 
-1.  Build testing was done using a recent version of HP C (aka Compaq C
-    aka--and more widely known as--DEC C).  Older versions of DEC C will
-    probably work too.  Ancient VAX C probably will not.  The set of
-    Makefiles are known to be out of date; use vmsbuild.com instead.
+1.  NetHack 3.6 was built and tested on OpenVMS on both the Integrity
+    and Alpha platform using the HP C V7.3 for OpenVMS compiler.  While
+    not tested, older versions of DEC C will most likely work as compatibility
+    with older systems is a goal of the VMS porting team.   Unfortunatly,
+    ancient VAX C probably will no longer work.  The set of Makefiles provided
+    are known to be out of date; use vmsbuild.com instead.
 
 2.  Make sure all the NetHack files are in the appropriate directory
     structure.  You should set up a directory--referred to as "top" below
@@ -49,8 +51,8 @@
                            or later and MIT's Athena Widget set
     You must arrange things in this structure or the supplied procedures
     and instructions in this file will not work properly.  Several DCL
-    command files are present in the [.sys.vms] subdirectory and won't
-    work as intended if they're moved elsewhere.  The file called Files
+    command files are present in the [.sys.vms] subdirectory and will not
+    work as intended if they are moved elsewhere.  The file called Files
     in the top directory contains lists of everything that should be in
     each subdirectory, including things that are constructed as NetHack
     is being built.
@@ -72,19 +74,22 @@
 4.  If you have the programming utilities lex or flex and yacc or bison,
     you may edit the procedure [.sys.vms]spec_lev.com and execute it to
     process several source files for NetHack's special level and dungeon
-    compilers.  If you don't modify spec_lev.com, it will copy some
-    pre-processed versions of the appropriate files (dgn_lex.c, lev_lex.c,
+    compilers.  If you use the version of these utilities from the OpenVMS
+    freeware CD you will have to remove the include <stdlib.h> that yacc
+    places at the top of each file.  The provided spec_lev.com will default
+    to copy pre-processed versions of the appropriate files (dgn_lex.c, lev_lex.c,
     dgn_yacc.c, lev_yacc.c, dgn_comp.h, and lev_comp.h) from [.sys.share]
     into [.util]*.c and [.include]*.h.
-       $ @[.SYS.VMS]SPEC_LEV            ![OPTIONAL]
-    If you perform this step, do it prior to executing vmsbuild.com; if
-    you don't perform this step, vmsbuild.com will do so for you.
+    If you choose to modify spec_lev.com, you want to run and test your
+    changes prior to executing vmsbuild.com; otherwise, vmsbuild.com will
+    do so for you and the results might not be what you expect.
 
 5.  To build NETHACK.EXE and its auxiliary programs, execute the
     following DCL command:
        $ @[.SYS.VMS]VMSBUILD          !defaults to CC, either VAXC or DECC
     or $ @[.SYS.VMS]VMSBUILD "GNUC"   !force "GCC"
-    It can take quite a bit of time for a full build to complete.
+    It can take quite a bit of time for a full build to complete.  Around
+    an hour on a Alphastation 200 and 5 minutes on a modern IA64 system.
     vmsbuild.com will display some feedback as it executes; generally
     this will be the name of each source file that's about to be compiled
     or the name of the executable that has just been linked.
