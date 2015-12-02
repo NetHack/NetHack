@@ -1,4 +1,4 @@
-/* NetHack 3.6	makemon.c	$NHDT-Date: 1446955301 2015/11/08 04:01:41 $  $NHDT-Branch: master $:$NHDT-Revision: 1.101 $ */
+/* NetHack 3.6	makemon.c	$NHDT-Date: 1449052582 2015/12/02 10:36:22 $  $NHDT-Branch: master $:$NHDT-Revision: 1.104 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1036,6 +1036,7 @@ int mmflags;
         coord cc;
         struct monst fakemon;
 
+        cc.x = cc.y = 0; /* lint suppression */
         fakemon.data = ptr; /* set up for goodpos */
         if (!makemon_rnd_goodpos(ptr ? &fakemon : (struct monst *)0,
                                  gpflags, &cc))

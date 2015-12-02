@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1447630543 2015/11/15 23:35:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.115 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1449052583 2015/12/02 10:36:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.116 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1652,6 +1652,7 @@ struct WinDesc *cw;
                     *rp = '\0'; /* re-terminate for index() */
                 }
     }
+    resp_len = 0; /* lint suppression */
 
     /* loop until finished */
     while (!finished) {
