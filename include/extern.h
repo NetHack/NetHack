@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1448210010 2015/11/22 16:33:30 $  $NHDT-Branch: master $:$NHDT-Revision: 1.519 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1449051498 2015/12/02 10:18:18 $  $NHDT-Branch: master $:$NHDT-Revision: 1.520 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -507,9 +507,8 @@ E void FDECL(release_camera_demon, (struct obj *, XCHAR_P, XCHAR_P));
 E void FDECL(breakobj,
              (struct obj *, XCHAR_P, XCHAR_P, BOOLEAN_P, BOOLEAN_P));
 E boolean FDECL(breaktest, (struct obj *));
-E boolean
-FDECL(walk_path,
-      (coord *, coord *, boolean (*)(genericptr_t, int, int), genericptr_t));
+E boolean FDECL(walk_path, (coord *, coord *,
+                            boolean (*)(genericptr, int, int), genericptr_t));
 E boolean FDECL(hurtle_step, (genericptr_t, int, int));
 
 /* ### drawing.c ### */
@@ -1182,8 +1181,9 @@ E void FDECL(mineralize, (int, int, int, int, BOOLEAN_P));
 
 /* ### mkmap.c ### */
 
-void FDECL(flood_fill_rm, (int, int, int, BOOLEAN_P, BOOLEAN_P));
-void FDECL(remove_rooms, (int, int, int, int));
+E void FDECL(flood_fill_rm, (int, int, int, BOOLEAN_P, BOOLEAN_P));
+E void FDECL(remove_rooms, (int, int, int, int));
+/* E void FDECL(mkmap, (lev_init *)); -- need sp_lev.h for lev_init */
 
 /* ### mkmaze.c ### */
 
@@ -1193,8 +1193,8 @@ E void FDECL(makemaz, (const char *));
 E void FDECL(mazexy, (coord *));
 E void NDECL(bound_digging);
 E void FDECL(mkportal, (XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P));
-E boolean
-FDECL(bad_location, (XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P));
+E boolean FDECL(bad_location, (XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P,
+                               XCHAR_P, XCHAR_P));
 E void FDECL(place_lregion, (XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P,
                              XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P, d_level *));
 E void NDECL(fumaroles);
@@ -2490,8 +2490,8 @@ E void FDECL(vision_recalc, (int));
 E void FDECL(block_point, (int, int));
 E void FDECL(unblock_point, (int, int));
 E boolean FDECL(clear_path, (int, int, int, int));
-E void FDECL(do_clear_area,
-             (int, int, int, void (*)(int, int, genericptr_t), genericptr_t));
+E void FDECL(do_clear_area, (int, int, int,
+                             void (*)(int, int, genericptr), genericptr_t));
 E unsigned FDECL(howmonseen, (struct monst *));
 
 #ifdef VMS
