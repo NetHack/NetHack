@@ -26,6 +26,7 @@ $	!	to avoid inadvertent logical name interaction
 $	play_files = "PERM.,RECORD.,LOGFILE.,PANICLOG."
 $	help_files = "HELP.,HH.,CMDHELP.,WIZHELP.,OPTHELP.,HISTORY.,LICENSE."
 $	data_files = "DATA.,RUMORS.,ORACLES.,OPTIONS.,QUEST.DAT,TRIBUTE."
+$	sysconf_file = "[.sys.vms]sysconf"
 $	guidebook  = "[.doc]Guidebook.txt"
 $	invoc_proc = "[.sys.vms]nethack.com"
 $	trmcp_file = "[.sys.share]termcap"
@@ -228,6 +229,17 @@ $ if f$search("''gamedir'termcap").nes."" then  goto skip_termcap
 $	milestone "(termcap)"
 $ call copy_file 'trmcp_file' 'gamedir'termcap "r"
 $skip_termcap:
+$ if p3.nes."" then  exit
+$!
+$! provide template sysconf file (needed if nethack is built w/ SYSCF enabled)
+$make_sysconf:
+$ if f$search(sysconf_file).eqs."" then  goto skip_sysconf
+$ if f$search("''gamedir'sysconf_file").nes."" then  goto skip_sysconf
+$       milestone "(sysconf)"
+$ call copy_file 'sysconf_file' 'gamedir'sysconf "r"
+$!	owner should be able to manually edit sysconf; others shouldn't
+$ set file/Prot=(s:rwd,o:rwd,g:r,w:r) 'gamedir'sysconf
+$skip_sysconf:
 $ if p3.nes."" then  exit
 $!
 $! done
