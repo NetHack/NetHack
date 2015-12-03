@@ -1,4 +1,4 @@
-/* NetHack 3.6	pcmain.c	$NHDT-Date: 1434999947 2015/06/22 19:05:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.65 $ */
+/* NetHack 3.6	pcmain.c	$NHDT-Date: 1449116934 2015/12/03 04:28:54 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.66 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -123,6 +123,7 @@ char *argv[];
     boolean resuming = FALSE; /* assume new game */
 
 #ifdef _MSC_VER
+# ifdef DEBUG
     /* set these appropriately for VS debugging */
     _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
     _CrtSetReportMode(_CRT_ERROR,
@@ -132,6 +133,7 @@ char *argv[];
 /* use STDERR by default
 _CrtSetReportFile(_CRT_ERROR, _CRTDBG_FILE_STDERR);
 _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
+# endif
 #endif
 
 #if defined(__BORLANDC__) && !defined(_WIN32)
