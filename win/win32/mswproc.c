@@ -1,4 +1,4 @@
-/* NetHack 3.6	mswproc.c	$NHDT-Date: 1433806620 2015/06/08 23:37:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.90 $ */
+/* NetHack 3.6	mswproc.c	$NHDT-Date: 1449116317 2015/12/03 04:18:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.93 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -31,9 +31,11 @@
 
 #define NHTRACE_LOG "nhtrace.log"
 
-#ifdef _DEBUG
+#ifdef DEBUG
+# ifdef _DEBUG
 static FILE* _s_debugfp = NULL;
 extern void logDebug(const char *fmt, ...);
+# endif
 #else
 void
 logDebug(const char *fmt, ...)
