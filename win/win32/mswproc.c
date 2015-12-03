@@ -1,4 +1,4 @@
-/* NetHack 3.6	mswproc.c	$NHDT-Date: 1449116317 2015/12/03 04:18:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.93 $ */
+/* NetHack 3.6	mswproc.c	$NHDT-Date: 1449116670 2015/12/03 04:24:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.94 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -134,11 +134,13 @@ mswin_init_nhwindows(int *argc, char **argv)
     UNREFERENCED_PARAMETER(argc);
     UNREFERENCED_PARAMETER(argv);
 
-#ifdef _DEBUG
+#ifdef DEBUG
+# ifdef _DEBUG
     if (showdebug(NHTRACE_LOG) && !_s_debugfp) {
         /* truncate trace file */
         _s_debugfp = fopen(NHTRACE_LOG, "w");
     }
+# endif
 #endif
     logDebug("mswin_init_nhwindows()\n");
 
@@ -2194,7 +2196,8 @@ mswin_popup_destroy(HWND hWnd)
     SetFocus(GetNHApp()->hMainWnd);
 }
 
-#ifdef _DEBUG
+#ifdef DEBUG
+# ifdef _DEBUG
 #include <stdarg.h>
 
 void
@@ -2210,7 +2213,7 @@ logDebug(const char *fmt, ...)
     va_end(args);
     fflush(_s_debugfp);
 }
-
+# endif
 #endif
 
 /* Reading and writing settings from the registry. */
