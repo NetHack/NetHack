@@ -1,4 +1,4 @@
-/* NetHack 3.6	bones.c	$NHDT-Date: 1446369463 2015/11/01 09:17:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.65 $ */
+/* NetHack 3.6	bones.c	$NHDT-Date: 1449269914 2015/12/04 22:58:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.66 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985,1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -608,9 +608,10 @@ getbones()
                 if (has_mname(mtmp))
                     sanitize_name(MNAME(mtmp));
                 if (mtmp->mhpmax == DEFUNCT_MONSTER) {
-                    if (wizard)
+                    if (wizard) {
                         debugpline1("Removing defunct monster %s from bones.",
                                     mtmp->data->mname);
+                    }
                     mongone(mtmp);
                 } else
                     /* to correctly reset named artifacts on the level */

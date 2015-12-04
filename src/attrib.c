@@ -1,4 +1,4 @@
-/* NetHack 3.6	attrib.c	$NHDT-Date: 1446975460 2015/11/08 09:37:40 $  $NHDT-Branch: master $:$NHDT-Revision: 1.49 $ */
+/* NetHack 3.6	attrib.c	$NHDT-Date: 1449269911 2015/12/04 22:58:31 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.51 $ */
 /*      Copyright 1988, 1989, 1990, 1992, M. Stephenson           */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -470,8 +470,9 @@ exerchk()
     /*  Check out the periodic accumulations */
     exerper();
 
-    if (moves >= context.next_attrib_check)
+    if (moves >= context.next_attrib_check) {
         debugpline1("exerchk: ready to test. multi = %d.", multi);
+    }
     /*  Are we ready for a test? */
     if (moves >= context.next_attrib_check && !multi) {
         debugpline0("exerchk: testing.");
@@ -515,8 +516,9 @@ exerchk()
                                               ? "Dex"
                                               : (i == A_CON)
                                                     ? "Con"
-                                                    : (i == A_CHA) ? "Cha?"
-                                                                   : "???",
+                                                    : (i == A_CHA)
+                                                          ? "Cha?"
+                                                          : "???",
                         ax);
             /*
              *  Law of diminishing returns (Part III):

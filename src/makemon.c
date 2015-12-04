@@ -1,4 +1,4 @@
-/* NetHack 3.6	makemon.c	$NHDT-Date: 1449052582 2015/12/02 10:36:22 $  $NHDT-Branch: master $:$NHDT-Revision: 1.104 $ */
+/* NetHack 3.6	makemon.c	$NHDT-Date: 1449269917 2015/12/04 22:58:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.105 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -857,9 +857,10 @@ boolean ghostly;
         mvitals[mndx].born++;
     if ((int) mvitals[mndx].born >= lim && !(mons[mndx].geno & G_NOGEN)
         && !(mvitals[mndx].mvflags & G_EXTINCT)) {
-        if (wizard)
+        if (wizard) {
             debugpline1("Automatically extinguished %s.",
                         makeplural(mons[mndx].mname));
+        }
         mvitals[mndx].mvflags |= G_EXTINCT;
         reset_rndmonst(mndx);
     }
@@ -1072,9 +1073,10 @@ int mmflags;
            already been genocided, return */
         if (mvitals[mndx].mvflags & G_GENOD)
             return (struct monst *) 0;
-        if (wizard && (mvitals[mndx].mvflags & G_EXTINCT))
+        if (wizard && (mvitals[mndx].mvflags & G_EXTINCT)) {
             debugpline1("Explicitly creating extinct monster %s.",
                         mons[mndx].mname);
+        }
     } else {
         /* make a random (common) monster that can survive here.
          * (the special levels ask for random monsters at specific

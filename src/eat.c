@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1446854226 2015/11/06 23:57:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.152 $ */
+/* NetHack 3.6	eat.c	$NHDT-Date: 1449269916 2015/12/04 22:58:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.154 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -728,56 +728,57 @@ register struct permonst *ptr;
 {
     int res = 0;
 
+#ifdef DEBUG
+#define ifdebugresist(Msg)      \
+    do {                        \
+        if (res)                \
+            debugpline0(Msg);   \
+    } while (0)
+#else
+#define ifdebugresist(Msg) /*empty*/
+#endif
     switch (type) {
     case FIRE_RES:
         res = (ptr->mconveys & MR_FIRE) != 0;
-        if (res)
-            debugpline0("can get fire resistance");
+        ifdebugresist("can get fire resistance");
         break;
     case SLEEP_RES:
         res = (ptr->mconveys & MR_SLEEP) != 0;
-        if (res)
-            debugpline0("can get sleep resistance");
+        ifdebugresist("can get sleep resistance");
         break;
     case COLD_RES:
         res = (ptr->mconveys & MR_COLD) != 0;
-        if (res)
-            debugpline0("can get cold resistance");
+        ifdebugresist("can get cold resistance");
         break;
     case DISINT_RES:
         res = (ptr->mconveys & MR_DISINT) != 0;
-        if (res)
-            debugpline0("can get disintegration resistance");
+        ifdebugresist("can get disintegration resistance");
         break;
     case SHOCK_RES: /* shock (electricity) resistance */
         res = (ptr->mconveys & MR_ELEC) != 0;
-        if (res)
-            debugpline0("can get shock resistance");
+        ifdebugresist("can get shock resistance");
         break;
     case POISON_RES:
         res = (ptr->mconveys & MR_POISON) != 0;
-        if (res)
-            debugpline0("can get poison resistance");
+        ifdebugresist("can get poison resistance");
         break;
     case TELEPORT:
         res = can_teleport(ptr);
-        if (res)
-            debugpline0("can get teleport");
+        ifdebugresist("can get teleport");
         break;
     case TELEPORT_CONTROL:
         res = control_teleport(ptr);
-        if (res)
-            debugpline0("can get teleport control");
+        ifdebugresist("can get teleport control");
         break;
     case TELEPAT:
         res = telepathic(ptr);
-        if (res)
-            debugpline0("can get telepathy");
+        ifdebugresist("can get telepathy");
         break;
     default:
         /* res stays 0 */
         break;
     }
+#undef ifdebugresist
     return res;
 }
 
