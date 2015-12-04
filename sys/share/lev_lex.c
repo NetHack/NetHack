@@ -33,7 +33,7 @@
 #if defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
 
 /* C99 says to define __STDC_LIMIT_MACROS before including stdint.h,
- * if you want the limit (max/min) macros for int types. 
+ * if you want the limit (max/min) macros for int types.
  */
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS 1
@@ -50,7 +50,7 @@ typedef uint32_t flex_uint32_t;
 typedef signed char flex_int8_t;
 typedef short int flex_int16_t;
 typedef int flex_int32_t;
-typedef unsigned char flex_uint8_t; 
+typedef unsigned char flex_uint8_t;
 typedef unsigned short int flex_uint16_t;
 typedef unsigned int flex_uint32_t;
 
@@ -167,7 +167,7 @@ extern FILE *yyin, *yyout;
 #define EOB_ACT_LAST_MATCH 2
 
     #define YY_LESS_LINENO(n)
-    
+
 /* Return all but the first "n" matched characters back to the input stream. */
 #define yyless(n) \
 	do \
@@ -224,7 +224,7 @@ struct yy_buffer_state
 
     int yy_bs_lineno; /**< The line count. */
     int yy_bs_column; /**< The column count. */
-    
+
 	/* Whether to try to fill the input buffer when we reach the
 	 * end of it.
 	 */
@@ -1089,9 +1089,7 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "lev_comp.l"
-#line 2 "lev_comp.l"
-/* NetHack 3.6  lev_comp.l	$NHDT-Date: 1448710678 2015/11/28 11:37:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.21 $ */
+/* NetHack 3.6  lev_comp.l	$NHDT-Date: 1449233107 2015/12/04 12:45:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.22 $ */
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1191,9 +1189,6 @@ FILE *orig_yyin = NULL;
 #define ST_RET(x) do { savetoken(yytext); return x; } while (0);
 #define ST_RETF(y, x) do { savetoken(yytext); y; return x; } while (0);
 
-
-#line 1196 "lev_lex.c"
-
 #define INITIAL 0
 #define MAPC 1
 
@@ -1253,7 +1248,7 @@ extern int yywrap (void );
 #endif
 
     static void yyunput (int c,char *buf_ptr  );
-    
+
 #ifndef yytext_ptr
 static void yy_flex_strncpy (char *,yyconst char *,int );
 #endif
@@ -1377,10 +1372,6 @@ YY_DECL
 	register yy_state_type yy_current_state;
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
-    
-#line 107 "lev_comp.l"
-
-#line 1384 "lev_lex.c"
 
 	if ( !(yy_init) )
 		{
@@ -1466,7 +1457,6 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 108 "lev_comp.l"
 {
 		  savetoken(yytext);
 		  BEGIN(INITIAL);
@@ -1480,7 +1470,6 @@ YY_RULE_SETUP
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 117 "lev_comp.l"
 {
 		  int len = yyleng;
 		  savetoken(yytext);
@@ -1497,888 +1486,711 @@ YY_RULE_SETUP
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 129 "lev_comp.l"
 { savetoken(yytext); newline(); }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 130 "lev_comp.l"
 ST_RET(MESSAGE_ID);
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 131 "lev_comp.l"
 ST_RET(NOMAP_ID);
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 132 "lev_comp.l"
 ST_RET(MAZE_ID);
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 133 "lev_comp.l"
 ST_RET(LEVEL_ID);
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 134 "lev_comp.l"
 ST_RET(LEV_INIT_ID);
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 135 "lev_comp.l"
 ST_RET(MAZE_GRID_ID);
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 136 "lev_comp.l"
 ST_RET(SOLID_FILL_ID);
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 137 "lev_comp.l"
 ST_RET(MINES_ID);
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 138 "lev_comp.l"
 ST_RET(ROGUELEV_ID);
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 139 "lev_comp.l"
 ST_RET(FLAGS_ID);
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 140 "lev_comp.l"
 ST_RET(GEOMETRY_ID);
 	YY_BREAK
 case 15:
 /* rule 15 can match eol */
 YY_RULE_SETUP
-#line 141 "lev_comp.l"
 { savetoken(yytext); BEGIN(MAPC); newline(); }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 142 "lev_comp.l"
 ST_RET(object_ID);
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 143 "lev_comp.l"
 ST_RET(OBJECT_ID);
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 144 "lev_comp.l"
 ST_RET(COBJECT_ID);
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 145 "lev_comp.l"
 ST_RET(MONSTER_ID);
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 146 "lev_comp.l"
 ST_RET(monster_ID);
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 147 "lev_comp.l"
 ST_RET(TRAP_ID);
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 148 "lev_comp.l"
 ST_RET(DOOR_ID);
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 149 "lev_comp.l"
 ST_RET(ROOMDOOR_ID);
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 150 "lev_comp.l"
 ST_RET(DRAWBRIDGE_ID);
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 151 "lev_comp.l"
 ST_RET(MAZEWALK_ID);
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 152 "lev_comp.l"
 ST_RET(WALLIFY_ID);
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 153 "lev_comp.l"
 ST_RET(REGION_ID);
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 154 "lev_comp.l"
 ST_RET(ALTAR_ID);
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 155 "lev_comp.l"
 ST_RET(LADDER_ID);
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 156 "lev_comp.l"
 ST_RET(STAIR_ID);
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 157 "lev_comp.l"
 ST_RET(PORTAL_ID);
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 158 "lev_comp.l"
 ST_RET(TELEPRT_ID);
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 159 "lev_comp.l"
 ST_RET(BRANCH_ID);
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 160 "lev_comp.l"
 ST_RET(FOUNTAIN_ID);
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 161 "lev_comp.l"
 ST_RET(SINK_ID);
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 162 "lev_comp.l"
 ST_RET(POOL_ID);
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 163 "lev_comp.l"
 ST_RET(NON_DIGGABLE_ID);
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 164 "lev_comp.l"
 ST_RET(NON_PASSWALL_ID);
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 165 "lev_comp.l"
 ST_RET(IF_ID);
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 166 "lev_comp.l"
 ST_RET(ELSE_ID);
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 167 "lev_comp.l"
 ST_RET(EXIT_ID);
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 168 "lev_comp.l"
 ST_RET(ROOM_ID);
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 169 "lev_comp.l"
 ST_RET(SUBROOM_ID);
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 170 "lev_comp.l"
 ST_RET(RAND_CORRIDOR_ID);
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 171 "lev_comp.l"
 ST_RET(CORRIDOR_ID);
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 172 "lev_comp.l"
 ST_RET(TERRAIN_ID);
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 173 "lev_comp.l"
 ST_RET(terrain_ID);
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 174 "lev_comp.l"
 ST_RET(REPLACE_TERRAIN_ID);
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 175 "lev_comp.l"
 ST_RET(GOLD_ID);
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 176 "lev_comp.l"
 ST_RET(GRAVE_ID);
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 177 "lev_comp.l"
 ST_RET(ENGRAVING_ID);
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 178 "lev_comp.l"
 ST_RET(MINERALIZE_ID);
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 179 "lev_comp.l"
 ST_RET(NAME_ID);
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 180 "lev_comp.l"
 ST_RET(FOR_ID);
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 181 "lev_comp.l"
 ST_RET(TO_ID);
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 182 "lev_comp.l"
 ST_RET(LOOP_ID);
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 183 "lev_comp.l"
 ST_RET(SWITCH_ID);
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 184 "lev_comp.l"
 ST_RET(CASE_ID);
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 185 "lev_comp.l"
 ST_RET(BREAK_ID);
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 186 "lev_comp.l"
 ST_RET(DEFAULT_ID);
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 187 "lev_comp.l"
 ST_RET(FUNCTION_ID);
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 188 "lev_comp.l"
 ST_RET(SHUFFLE_ID);
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 189 "lev_comp.l"
 ST_RET(MONTYPE_ID);
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 190 "lev_comp.l"
 ST_RET(selection_ID);
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 191 "lev_comp.l"
 ST_RET(rect_ID);
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 192 "lev_comp.l"
 ST_RET(fillrect_ID);
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 193 "lev_comp.l"
 ST_RET(line_ID);
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 194 "lev_comp.l"
 ST_RET(randline_ID);
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 195 "lev_comp.l"
 ST_RET(grow_ID);
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 196 "lev_comp.l"
 ST_RET(flood_ID);
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 197 "lev_comp.l"
 ST_RET(rndcoord_ID);
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 198 "lev_comp.l"
 ST_RET(circle_ID);
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 199 "lev_comp.l"
 ST_RET(ellipse_ID);
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 200 "lev_comp.l"
 ST_RET(filter_ID);
 	YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 201 "lev_comp.l"
 ST_RET(gradient_ID);
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 202 "lev_comp.l"
 ST_RET(complement_ID);
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 203 "lev_comp.l"
 { savetoken(yytext); yylval.i=SEL_GRADIENT_RADIAL;  return GRADIENT_TYPE; }
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 204 "lev_comp.l"
 { savetoken(yytext); yylval.i=SEL_GRADIENT_SQUARE;  return GRADIENT_TYPE; }
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 205 "lev_comp.l"
 { savetoken(yytext); yylval.i=DRY;  return HUMIDITY_TYPE; }
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 206 "lev_comp.l"
 { savetoken(yytext); yylval.i=WET;  return HUMIDITY_TYPE; }
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 207 "lev_comp.l"
 { savetoken(yytext); yylval.i=HOT;  return HUMIDITY_TYPE; }
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 208 "lev_comp.l"
 { savetoken(yytext); yylval.i=SOLID;  return HUMIDITY_TYPE; }
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 209 "lev_comp.l"
 { savetoken(yytext); yylval.i=ANY_LOC;  return HUMIDITY_TYPE; }
 	YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 210 "lev_comp.l"
 ST_RET(LEV);
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 211 "lev_comp.l"
 ST_RET(QUANTITY_ID);
 	YY_BREAK
 case 86:
 YY_RULE_SETUP
-#line 212 "lev_comp.l"
 ST_RET(BURIED_ID);
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 213 "lev_comp.l"
 ST_RET(ERODED_ID);
 	YY_BREAK
 case 88:
 YY_RULE_SETUP
-#line 214 "lev_comp.l"
 ST_RET(ERODEPROOF_ID);
 	YY_BREAK
 case 89:
 YY_RULE_SETUP
-#line 215 "lev_comp.l"
 { savetoken(yytext); yylval.i=1; return TRAPPED_STATE; }
 	YY_BREAK
 case 90:
 YY_RULE_SETUP
-#line 216 "lev_comp.l"
 { savetoken(yytext); yylval.i=0; return TRAPPED_STATE; }
 	YY_BREAK
 case 91:
 YY_RULE_SETUP
-#line 217 "lev_comp.l"
 ST_RET(RECHARGED_ID);
 	YY_BREAK
 case 92:
 YY_RULE_SETUP
-#line 218 "lev_comp.l"
 ST_RET(INVIS_ID);
 	YY_BREAK
 case 93:
 YY_RULE_SETUP
-#line 219 "lev_comp.l"
 ST_RET(GREASED_ID);
 	YY_BREAK
 case 94:
 YY_RULE_SETUP
-#line 220 "lev_comp.l"
 ST_RET(FEMALE_ID);
 	YY_BREAK
 case 95:
 YY_RULE_SETUP
-#line 221 "lev_comp.l"
 ST_RET(CANCELLED_ID);
 	YY_BREAK
 case 96:
 YY_RULE_SETUP
-#line 222 "lev_comp.l"
 ST_RET(REVIVED_ID);
 	YY_BREAK
 case 97:
 YY_RULE_SETUP
-#line 223 "lev_comp.l"
 ST_RET(AVENGE_ID);
 	YY_BREAK
 case 98:
 YY_RULE_SETUP
-#line 224 "lev_comp.l"
 ST_RET(FLEEING_ID);
 	YY_BREAK
 case 99:
 YY_RULE_SETUP
-#line 225 "lev_comp.l"
 ST_RET(BLINDED_ID);
 	YY_BREAK
 case 100:
 YY_RULE_SETUP
-#line 226 "lev_comp.l"
 ST_RET(PARALYZED_ID);
 	YY_BREAK
 case 101:
 YY_RULE_SETUP
-#line 227 "lev_comp.l"
 ST_RET(STUNNED_ID);
 	YY_BREAK
 case 102:
 YY_RULE_SETUP
-#line 228 "lev_comp.l"
 ST_RET(CONFUSED_ID);
 	YY_BREAK
 case 103:
 YY_RULE_SETUP
-#line 229 "lev_comp.l"
 ST_RET(SEENTRAPS_ID);
 	YY_BREAK
 case 104:
 YY_RULE_SETUP
-#line 230 "lev_comp.l"
 ST_RET(ALL_ID);
 	YY_BREAK
 case 105:
 YY_RULE_SETUP
-#line 231 "lev_comp.l"
 ST_RETF((yylval.i=1), HORIZ_OR_VERT);
 	YY_BREAK
 case 106:
 YY_RULE_SETUP
-#line 232 "lev_comp.l"
 { savetoken(yytext); yylval.i=2; return HORIZ_OR_VERT; }
 	YY_BREAK
 case 107:
 YY_RULE_SETUP
-#line 233 "lev_comp.l"
 { savetoken(yytext); yylval.i=D_ISOPEN; return DOOR_STATE; }
 	YY_BREAK
 case 108:
 YY_RULE_SETUP
-#line 234 "lev_comp.l"
 { savetoken(yytext); yylval.i=D_CLOSED; return DOOR_STATE; }
 	YY_BREAK
 case 109:
 YY_RULE_SETUP
-#line 235 "lev_comp.l"
 { savetoken(yytext); yylval.i=D_LOCKED; return DOOR_STATE; }
 	YY_BREAK
 case 110:
 YY_RULE_SETUP
-#line 236 "lev_comp.l"
 { savetoken(yytext); yylval.i=D_NODOOR; return DOOR_STATE; }
 	YY_BREAK
 case 111:
 YY_RULE_SETUP
-#line 237 "lev_comp.l"
 { savetoken(yytext); yylval.i=D_BROKEN; return DOOR_STATE; }
 	YY_BREAK
 case 112:
 YY_RULE_SETUP
-#line 238 "lev_comp.l"
 { savetoken(yytext); yylval.i=D_SECRET; return DOOR_STATE; }
 	YY_BREAK
 case 113:
 YY_RULE_SETUP
-#line 239 "lev_comp.l"
 { savetoken(yytext); yylval.i=W_NORTH; return DIRECTION; }
 	YY_BREAK
 case 114:
 YY_RULE_SETUP
-#line 240 "lev_comp.l"
 { savetoken(yytext); yylval.i=W_EAST; return DIRECTION; }
 	YY_BREAK
 case 115:
 YY_RULE_SETUP
-#line 241 "lev_comp.l"
 { savetoken(yytext); yylval.i=W_SOUTH; return DIRECTION; }
 	YY_BREAK
 case 116:
 YY_RULE_SETUP
-#line 242 "lev_comp.l"
 { savetoken(yytext); yylval.i=W_WEST; return DIRECTION; }
 	YY_BREAK
 case 117:
 YY_RULE_SETUP
-#line 243 "lev_comp.l"
 { savetoken(yytext); yylval.i = -1; return RANDOM_TYPE; }
 	YY_BREAK
 case 118:
 YY_RULE_SETUP
-#line 244 "lev_comp.l"
 { savetoken(yytext); yylval.i = -1; return RANDOM_TYPE_BRACKET; }
 	YY_BREAK
 case 119:
 YY_RULE_SETUP
-#line 245 "lev_comp.l"
 { savetoken(yytext); yylval.i = -2; return NONE; }
 	YY_BREAK
 case 120:
 YY_RULE_SETUP
-#line 246 "lev_comp.l"
 ST_RET(A_REGISTER);
 	YY_BREAK
 case 121:
 YY_RULE_SETUP
-#line 247 "lev_comp.l"
 { savetoken(yytext); yylval.i=1; return LEFT_OR_RIGHT; }
 	YY_BREAK
 case 122:
 YY_RULE_SETUP
-#line 248 "lev_comp.l"
 { savetoken(yytext); yylval.i=2; return LEFT_OR_RIGHT; }
 	YY_BREAK
 case 123:
 YY_RULE_SETUP
-#line 249 "lev_comp.l"
 { savetoken(yytext); yylval.i=3; return CENTER; }
 	YY_BREAK
 case 124:
 YY_RULE_SETUP
-#line 250 "lev_comp.l"
 { savetoken(yytext); yylval.i=4; return LEFT_OR_RIGHT; }
 	YY_BREAK
 case 125:
 YY_RULE_SETUP
-#line 251 "lev_comp.l"
 { savetoken(yytext); yylval.i=5; return LEFT_OR_RIGHT; }
 	YY_BREAK
 case 126:
 YY_RULE_SETUP
-#line 252 "lev_comp.l"
 { savetoken(yytext); yylval.i=1; return TOP_OR_BOT; }
 	YY_BREAK
 case 127:
 YY_RULE_SETUP
-#line 253 "lev_comp.l"
 { savetoken(yytext); yylval.i=5; return TOP_OR_BOT; }
 	YY_BREAK
 case 128:
 YY_RULE_SETUP
-#line 254 "lev_comp.l"
 { savetoken(yytext); yylval.i=1; return LIGHT_STATE; }
 	YY_BREAK
 case 129:
 YY_RULE_SETUP
-#line 255 "lev_comp.l"
 { savetoken(yytext); yylval.i=0; return LIGHT_STATE; }
 	YY_BREAK
 case 130:
 YY_RULE_SETUP
-#line 256 "lev_comp.l"
 { savetoken(yytext); yylval.i=1; return FILLING; }
 	YY_BREAK
 case 131:
 YY_RULE_SETUP
-#line 257 "lev_comp.l"
 { savetoken(yytext); yylval.i=0; return FILLING; }
 	YY_BREAK
 case 132:
 YY_RULE_SETUP
-#line 258 "lev_comp.l"
 { savetoken(yytext); yylval.i=0; return IRREGULAR; }
 	YY_BREAK
 case 133:
 YY_RULE_SETUP
-#line 259 "lev_comp.l"
 { savetoken(yytext); yylval.i=1; return IRREGULAR; }
 	YY_BREAK
 case 134:
 YY_RULE_SETUP
-#line 260 "lev_comp.l"
 { savetoken(yytext); yylval.i=1; return JOINED; }
 	YY_BREAK
 case 135:
 YY_RULE_SETUP
-#line 261 "lev_comp.l"
 { savetoken(yytext); yylval.i=0; return JOINED; }
 	YY_BREAK
 case 136:
 YY_RULE_SETUP
-#line 262 "lev_comp.l"
 { savetoken(yytext); yylval.i=1; return LIMITED; }
 	YY_BREAK
 case 137:
 YY_RULE_SETUP
-#line 263 "lev_comp.l"
 { savetoken(yytext); yylval.i=0; return LIMITED; }
 	YY_BREAK
 case 138:
 YY_RULE_SETUP
-#line 264 "lev_comp.l"
 { savetoken(yytext); yylval.i= AM_NONE; return ALIGNMENT; }
 	YY_BREAK
 case 139:
 YY_RULE_SETUP
-#line 265 "lev_comp.l"
 { savetoken(yytext); yylval.i= AM_LAWFUL; return ALIGNMENT; }
 	YY_BREAK
 case 140:
 YY_RULE_SETUP
-#line 266 "lev_comp.l"
 { savetoken(yytext); yylval.i= AM_NEUTRAL; return ALIGNMENT; }
 	YY_BREAK
 case 141:
 YY_RULE_SETUP
-#line 267 "lev_comp.l"
 { savetoken(yytext); yylval.i= AM_CHAOTIC; return ALIGNMENT; }
 	YY_BREAK
 case 142:
 YY_RULE_SETUP
-#line 268 "lev_comp.l"
 { savetoken(yytext); yylval.i= AM_SPLEV_CO; return ALIGNMENT; }
 	YY_BREAK
 case 143:
 YY_RULE_SETUP
-#line 269 "lev_comp.l"
 { savetoken(yytext); yylval.i= AM_SPLEV_NONCO; return ALIGNMENT; }
 	YY_BREAK
 case 144:
 YY_RULE_SETUP
-#line 270 "lev_comp.l"
 { savetoken(yytext); yylval.i=1; return MON_ATTITUDE; }
 	YY_BREAK
 case 145:
 YY_RULE_SETUP
-#line 271 "lev_comp.l"
 { savetoken(yytext); yylval.i=0; return MON_ATTITUDE; }
 	YY_BREAK
 case 146:
 YY_RULE_SETUP
-#line 272 "lev_comp.l"
 { savetoken(yytext); yylval.i=1; return MON_ALERTNESS; }
 	YY_BREAK
 case 147:
 YY_RULE_SETUP
-#line 273 "lev_comp.l"
 { savetoken(yytext); yylval.i=0; return MON_ALERTNESS; }
 	YY_BREAK
 case 148:
 YY_RULE_SETUP
-#line 274 "lev_comp.l"
 { savetoken(yytext); yylval.i= M_AP_FURNITURE; return MON_APPEARANCE; }
 	YY_BREAK
 case 149:
 YY_RULE_SETUP
-#line 275 "lev_comp.l"
 { savetoken(yytext); yylval.i= M_AP_MONSTER;   return MON_APPEARANCE; }
 	YY_BREAK
 case 150:
 YY_RULE_SETUP
-#line 276 "lev_comp.l"
 { savetoken(yytext); yylval.i= M_AP_OBJECT;    return MON_APPEARANCE; }
 	YY_BREAK
 case 151:
 YY_RULE_SETUP
-#line 277 "lev_comp.l"
 { savetoken(yytext); yylval.i=2; return ALTAR_TYPE; }
 	YY_BREAK
 case 152:
 YY_RULE_SETUP
-#line 278 "lev_comp.l"
 { savetoken(yytext); yylval.i=1; return ALTAR_TYPE; }
 	YY_BREAK
 case 153:
 YY_RULE_SETUP
-#line 279 "lev_comp.l"
 { savetoken(yytext); yylval.i=0; return ALTAR_TYPE; }
 	YY_BREAK
 case 154:
 YY_RULE_SETUP
-#line 280 "lev_comp.l"
 { savetoken(yytext); yylval.i=1; return UP_OR_DOWN; }
 	YY_BREAK
 case 155:
 YY_RULE_SETUP
-#line 281 "lev_comp.l"
 { savetoken(yytext); yylval.i=0; return UP_OR_DOWN; }
 	YY_BREAK
 case 156:
 YY_RULE_SETUP
-#line 282 "lev_comp.l"
 { savetoken(yytext); yylval.i=0; return BOOLEAN; }
 	YY_BREAK
 case 157:
 YY_RULE_SETUP
-#line 283 "lev_comp.l"
 { savetoken(yytext); yylval.i=1; return BOOLEAN; }
 	YY_BREAK
 case 158:
 YY_RULE_SETUP
-#line 284 "lev_comp.l"
 { savetoken(yytext); yylval.i=DUST; return ENGRAVING_TYPE; }
 	YY_BREAK
 case 159:
 YY_RULE_SETUP
-#line 285 "lev_comp.l"
 { savetoken(yytext); yylval.i=ENGRAVE; return ENGRAVING_TYPE; }
 	YY_BREAK
 case 160:
 YY_RULE_SETUP
-#line 286 "lev_comp.l"
 { savetoken(yytext); yylval.i=BURN; return ENGRAVING_TYPE; }
 	YY_BREAK
 case 161:
 YY_RULE_SETUP
-#line 287 "lev_comp.l"
 { savetoken(yytext); yylval.i=MARK; return ENGRAVING_TYPE; }
 	YY_BREAK
 case 162:
 YY_RULE_SETUP
-#line 288 "lev_comp.l"
 { savetoken(yytext); yylval.i=ENGR_BLOOD; return ENGRAVING_TYPE; }
 	YY_BREAK
 case 163:
 YY_RULE_SETUP
-#line 289 "lev_comp.l"
 { savetoken(yytext); yylval.i=1; return CURSE_TYPE; }
 	YY_BREAK
 case 164:
 YY_RULE_SETUP
-#line 290 "lev_comp.l"
 { savetoken(yytext); yylval.i=2; return CURSE_TYPE; }
 	YY_BREAK
 case 165:
 YY_RULE_SETUP
-#line 291 "lev_comp.l"
 { savetoken(yytext); yylval.i=3; return CURSE_TYPE; }
 	YY_BREAK
 case 166:
 YY_RULE_SETUP
-#line 292 "lev_comp.l"
 { savetoken(yytext); yylval.i=NOTELEPORT; return FLAG_TYPE; }
 	YY_BREAK
 case 167:
 YY_RULE_SETUP
-#line 293 "lev_comp.l"
 { savetoken(yytext); yylval.i=HARDFLOOR; return FLAG_TYPE; }
 	YY_BREAK
 case 168:
 YY_RULE_SETUP
-#line 294 "lev_comp.l"
 { savetoken(yytext); yylval.i=NOMMAP; return FLAG_TYPE; }
 	YY_BREAK
 case 169:
 YY_RULE_SETUP
-#line 295 "lev_comp.l"
 { savetoken(yytext); yylval.i=ARBOREAL; return FLAG_TYPE; } /* KMH */
 	YY_BREAK
 case 170:
 YY_RULE_SETUP
-#line 296 "lev_comp.l"
 { savetoken(yytext); yylval.i=SHORTSIGHTED; return FLAG_TYPE; }
 	YY_BREAK
 case 171:
 YY_RULE_SETUP
-#line 297 "lev_comp.l"
 { savetoken(yytext); yylval.i=MAZELEVEL; return FLAG_TYPE; }
 	YY_BREAK
 case 172:
 YY_RULE_SETUP
-#line 298 "lev_comp.l"
 { savetoken(yytext); yylval.i=PREMAPPED; return FLAG_TYPE; }
 	YY_BREAK
 case 173:
 YY_RULE_SETUP
-#line 299 "lev_comp.l"
 { savetoken(yytext); yylval.i=SHROUD; return FLAG_TYPE; }
 	YY_BREAK
 case 174:
 YY_RULE_SETUP
-#line 300 "lev_comp.l"
 { savetoken(yytext); yylval.i=GRAVEYARD; return FLAG_TYPE; }
 	YY_BREAK
 case 175:
 YY_RULE_SETUP
-#line 301 "lev_comp.l"
 { savetoken(yytext); yylval.i=ICEDPOOLS; return FLAG_TYPE; }
 	YY_BREAK
 case 176:
 YY_RULE_SETUP
-#line 302 "lev_comp.l"
 { savetoken(yytext); yylval.i=SOLIDIFY; return FLAG_TYPE; }
 	YY_BREAK
 case 177:
 YY_RULE_SETUP
-#line 303 "lev_comp.l"
 { savetoken(yytext); yylval.i=CORRMAZE; return FLAG_TYPE; }
 	YY_BREAK
 case 178:
 YY_RULE_SETUP
-#line 304 "lev_comp.l"
 { savetoken(yytext); yylval.i=CHECK_INACCESSIBLES; return FLAG_TYPE; }
 	YY_BREAK
 case 179:
 YY_RULE_SETUP
-#line 305 "lev_comp.l"
 { char *p = index(yytext, 'd');
 		  savetoken(yytext);
 		  if (p) {
@@ -2393,7 +2205,6 @@ YY_RULE_SETUP
 	YY_BREAK
 case 180:
 YY_RULE_SETUP
-#line 316 "lev_comp.l"
 { savetoken(yytext); yylval.i = atoi(yytext + 1);
 		     if (yylval.i < 0 || yylval.i > 100)
 			lc_error("Unexpected percentile '%li%%'", yylval.i);
@@ -2401,17 +2212,14 @@ YY_RULE_SETUP
 	YY_BREAK
 case 181:
 YY_RULE_SETUP
-#line 320 "lev_comp.l"
 { savetoken(yytext); yylval.i=atoi(yytext); return MINUS_INTEGER; }
 	YY_BREAK
 case 182:
 YY_RULE_SETUP
-#line 321 "lev_comp.l"
 { savetoken(yytext); yylval.i=atoi(yytext); return PLUS_INTEGER; }
 	YY_BREAK
 case 183:
 YY_RULE_SETUP
-#line 322 "lev_comp.l"
 { savetoken(yytext); yylval.i = atoi(yytext);
 		  if (yylval.i < 0 || yylval.i > 100)
 		     lc_error("Unexpected percentile '%li%%'", yylval.i);
@@ -2419,13 +2227,11 @@ YY_RULE_SETUP
 	YY_BREAK
 case 184:
 YY_RULE_SETUP
-#line 326 "lev_comp.l"
 { savetoken(yytext); yylval.i=atoi(yytext); return INTEGER; }
 	YY_BREAK
 case 185:
 /* rule 185 can match eol */
 YY_RULE_SETUP
-#line 327 "lev_comp.l"
 { savetoken(yytext);
 		  yytext[yyleng - 1] = '\0'; /* discard the trailing \" */
 		  yylval.map = dupstr(yytext + 1); /* skip the first \" */
@@ -2433,81 +2239,65 @@ YY_RULE_SETUP
 	YY_BREAK
 case 186:
 YY_RULE_SETUP
-#line 331 "lev_comp.l"
 { savetoken(yytext); return handle_varstring_check(); }
 	YY_BREAK
 case 187:
 YY_RULE_SETUP
-#line 332 "lev_comp.l"
 { savetoken(yytext); yylval.i = SPO_JE; return COMPARE_TYPE; }
 	YY_BREAK
 case 188:
 YY_RULE_SETUP
-#line 333 "lev_comp.l"
 { savetoken(yytext); yylval.i = SPO_JNE; return COMPARE_TYPE; }
 	YY_BREAK
 case 189:
 YY_RULE_SETUP
-#line 334 "lev_comp.l"
 { savetoken(yytext); yylval.i = SPO_JNE; return COMPARE_TYPE; }
 	YY_BREAK
 case 190:
 YY_RULE_SETUP
-#line 335 "lev_comp.l"
 { savetoken(yytext); yylval.i = SPO_JLE; return COMPARE_TYPE; }
 	YY_BREAK
 case 191:
 YY_RULE_SETUP
-#line 336 "lev_comp.l"
 { savetoken(yytext); yylval.i = SPO_JGE; return COMPARE_TYPE; }
 	YY_BREAK
 case 192:
 YY_RULE_SETUP
-#line 337 "lev_comp.l"
 { savetoken(yytext); yylval.i = SPO_JL; return COMPARE_TYPE; }
 	YY_BREAK
 case 193:
 YY_RULE_SETUP
-#line 338 "lev_comp.l"
 { savetoken(yytext); yylval.i = SPO_JG; return COMPARE_TYPE; }
 	YY_BREAK
 case 194:
 /* rule 194 can match eol */
 YY_RULE_SETUP
-#line 339 "lev_comp.l"
 { newline(); }
 	YY_BREAK
 case 195:
 YY_RULE_SETUP
-#line 340 "lev_comp.l"
 { advancepos(yytext); }
 	YY_BREAK
 case 196:
 YY_RULE_SETUP
-#line 341 "lev_comp.l"
 { savetoken(yytext); yylval.i = yytext[2]; return CHAR; }
 	YY_BREAK
 case 197:
 YY_RULE_SETUP
-#line 342 "lev_comp.l"
 { savetoken(yytext); yylval.i = yytext[1]; return CHAR; }
 	YY_BREAK
 case 198:
 YY_RULE_SETUP
-#line 343 "lev_comp.l"
 ST_RET(UNKNOWN_TYPE);
 	YY_BREAK
 case 199:
 YY_RULE_SETUP
-#line 344 "lev_comp.l"
 { savetoken(yytext); return yytext[0]; }
 	YY_BREAK
 case 200:
 YY_RULE_SETUP
-#line 345 "lev_comp.l"
 ECHO;
 	YY_BREAK
-#line 2511 "lev_lex.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(MAPC):
 	yyterminate();
@@ -2786,7 +2576,7 @@ static int yy_get_next_buffer (void)
 {
 	register yy_state_type yy_current_state;
 	register char *yy_cp;
-    
+
 	yy_current_state = (yy_start);
 	yy_current_state += YY_AT_BOL();
 
@@ -2841,7 +2631,7 @@ static int yy_get_next_buffer (void)
     static void yyunput (int c, register char * yy_bp )
 {
 	register char *yy_cp;
-    
+
     yy_cp = (yy_c_buf_p);
 
 	/* undo effects of setting up yytext */
@@ -2884,7 +2674,7 @@ static int yy_get_next_buffer (void)
 
 {
 	int c;
-    
+
 	*(yy_c_buf_p) = (yy_hold_char);
 
 	if ( *(yy_c_buf_p) == YY_END_OF_BUFFER_CHAR )
@@ -2953,12 +2743,12 @@ static int yy_get_next_buffer (void)
 
 /** Immediately switch to a different input stream.
  * @param input_file A readable stream.
- * 
+ *
  * @note This function does not reset the start condition to @c INITIAL .
  */
     void yyrestart  (FILE * input_file )
 {
-    
+
 	if ( ! YY_CURRENT_BUFFER ){
         yyensure_buffer_stack ();
 		YY_CURRENT_BUFFER_LVALUE =
@@ -2971,11 +2761,11 @@ static int yy_get_next_buffer (void)
 
 /** Switch to a different input buffer.
  * @param new_buffer The new input buffer.
- * 
+ *
  */
     void yy_switch_to_buffer  (YY_BUFFER_STATE  new_buffer )
 {
-    
+
 	/* TODO. We should be able to replace this entire function body
 	 * with
 	 *		yypop_buffer_state();
@@ -3015,13 +2805,13 @@ static void yy_load_buffer_state  (void)
 /** Allocate and initialize an input buffer state.
  * @param file A readable stream.
  * @param size The character buffer size in bytes. When in doubt, use @c YY_BUF_SIZE.
- * 
+ *
  * @return the allocated buffer state.
  */
     YY_BUFFER_STATE yy_create_buffer  (FILE * file, int  size )
 {
 	YY_BUFFER_STATE b;
-    
+
 	b = (YY_BUFFER_STATE) yyalloc(sizeof( struct yy_buffer_state )  );
 	if ( ! b )
 		YY_FATAL_ERROR( "out of dynamic memory in yy_create_buffer()" );
@@ -3044,11 +2834,11 @@ static void yy_load_buffer_state  (void)
 
 /** Destroy the buffer.
  * @param b a buffer created with yy_create_buffer()
- * 
+ *
  */
     void yy_delete_buffer (YY_BUFFER_STATE  b )
 {
-    
+
 	if ( ! b )
 		return;
 
@@ -3069,7 +2859,7 @@ static void yy_load_buffer_state  (void)
 
 {
 	int oerrno = errno;
-    
+
 	yy_flush_buffer(b );
 
 	b->yy_input_file = file;
@@ -3085,13 +2875,13 @@ static void yy_load_buffer_state  (void)
     }
 
         b->yy_is_interactive = file ? (isatty( fileno(file) ) > 0) : 0;
-    
+
 	errno = oerrno;
 }
 
 /** Discard all buffered characters. On the next scan, YY_INPUT will be called.
  * @param b the buffer state to be flushed, usually @c YY_CURRENT_BUFFER.
- * 
+ *
  */
     void yy_flush_buffer (YY_BUFFER_STATE  b )
 {
@@ -3120,7 +2910,7 @@ static void yy_load_buffer_state  (void)
  *  the current state. This function will allocate the stack
  *  if necessary.
  *  @param new_buffer The new state.
- *  
+ *
  */
 void yypush_buffer_state (YY_BUFFER_STATE new_buffer )
 {
@@ -3150,7 +2940,7 @@ void yypush_buffer_state (YY_BUFFER_STATE new_buffer )
 
 /** Removes and deletes the top of the stack, if present.
  *  The next element becomes the new top.
- *  
+ *
  */
 void yypop_buffer_state (void)
 {
@@ -3174,7 +2964,7 @@ void yypop_buffer_state (void)
 static void yyensure_buffer_stack (void)
 {
 	yy_size_t num_to_alloc;
-    
+
 	if (!(yy_buffer_stack)) {
 
 		/* First allocation is just for 2 elements, since we don't know if this
@@ -3187,7 +2977,7 @@ static void yyensure_buffer_stack (void)
 								);
 		if ( ! (yy_buffer_stack) )
 			YY_FATAL_ERROR( "out of dynamic memory in yyensure_buffer_stack()" );
-								  
+								
 		memset((yy_buffer_stack), 0, num_to_alloc * sizeof(struct yy_buffer_state*));
 				
 		(yy_buffer_stack_max) = num_to_alloc;
@@ -3217,13 +3007,13 @@ static void yyensure_buffer_stack (void)
 /** Setup the input buffer state to scan directly from a user-specified character buffer.
  * @param base the character buffer
  * @param size the size in bytes of the character buffer
- * 
- * @return the newly allocated buffer state object. 
+ *
+ * @return the newly allocated buffer state object.
  */
 YY_BUFFER_STATE yy_scan_buffer  (char * base, yy_size_t  size )
 {
 	YY_BUFFER_STATE b;
-    
+
 	if ( size < 2 ||
 	     base[size-2] != YY_END_OF_BUFFER_CHAR ||
 	     base[size-1] != YY_END_OF_BUFFER_CHAR )
@@ -3252,14 +3042,14 @@ YY_BUFFER_STATE yy_scan_buffer  (char * base, yy_size_t  size )
 /** Setup the input buffer state to scan a string. The next call to yylex() will
  * scan from a @e copy of @a str.
  * @param yystr a NUL-terminated string to scan
- * 
+ *
  * @return the newly allocated buffer state object.
  * @note If you want to scan bytes that may contain NUL values, then use
  *       yy_scan_bytes() instead.
  */
 YY_BUFFER_STATE yy_scan_string (yyconst char * yystr )
 {
-    
+
 	return yy_scan_bytes(yystr,strlen(yystr) );
 }
 
@@ -3267,7 +3057,7 @@ YY_BUFFER_STATE yy_scan_string (yyconst char * yystr )
  * scan from a @e copy of @a bytes.
  * @param yybytes the byte buffer to scan
  * @param _yybytes_len the number of bytes in the buffer pointed to by @a bytes.
- * 
+ *
  * @return the newly allocated buffer state object.
  */
 YY_BUFFER_STATE yy_scan_bytes  (yyconst char * yybytes, yy_size_t  _yybytes_len )
@@ -3276,7 +3066,7 @@ YY_BUFFER_STATE yy_scan_bytes  (yyconst char * yybytes, yy_size_t  _yybytes_len 
 	char *buf;
 	yy_size_t n;
 	int i;
-    
+
 	/* Get memory for full buffer, including space for trailing EOB's. */
 	n = _yybytes_len + 2;
 	buf = (char *) yyalloc(n  );
@@ -3330,16 +3120,16 @@ static void yy_fatal_error (yyconst char* msg )
 /* Accessor  methods (get/set functions) to struct members. */
 
 /** Get the current line number.
- * 
+ *
  */
 int yyget_lineno  (void)
 {
-        
+
     return yylineno;
 }
 
 /** Get the input stream.
- * 
+ *
  */
 FILE *yyget_in  (void)
 {
@@ -3347,7 +3137,7 @@ FILE *yyget_in  (void)
 }
 
 /** Get the output stream.
- * 
+ *
  */
 FILE *yyget_out  (void)
 {
@@ -3355,7 +3145,7 @@ FILE *yyget_out  (void)
 }
 
 /** Get the length of the current token.
- * 
+ *
  */
 yy_size_t yyget_leng  (void)
 {
@@ -3363,7 +3153,7 @@ yy_size_t yyget_leng  (void)
 }
 
 /** Get the current token.
- * 
+ *
  */
 
 char *yyget_text  (void)
@@ -3373,18 +3163,18 @@ char *yyget_text  (void)
 
 /** Set the current line number.
  * @param line_number
- * 
+ *
  */
 void yyset_lineno (int  line_number )
 {
-    
+
     yylineno = line_number;
 }
 
 /** Set the input stream. This does not discard the current
  * input buffer.
  * @param in_str A readable stream.
- * 
+ *
  * @see yy_switch_to_buffer
  */
 void yyset_in (FILE *  in_str )
@@ -3438,7 +3228,7 @@ static int yy_init_globals (void)
 /* yylex_destroy is for both reentrant and non-reentrant scanners. */
 int yylex_destroy  (void)
 {
-    
+
     /* Pop the buffer stack, destroying each element. */
 	while(YY_CURRENT_BUFFER){
 		yy_delete_buffer(YY_CURRENT_BUFFER  );
@@ -3504,9 +3294,6 @@ void yyfree (void * ptr )
 }
 
 #define YYTABLES_NAME "yytables"
-
-#line 345 "lev_comp.l"
-
 
 #ifdef	AMIGA
 long *
