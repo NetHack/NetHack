@@ -2320,28 +2320,27 @@ int src;
             return 0;
         }
         sysopt.tt_oname_maxrank = n;
+#ifdef PANICTRACE
     } else if (src == SET_IN_SYS
                && match_varname(buf, "PANICTRACE_LIBC", 15)) {
-#if defined(PANICTRACE) && defined(PANICTRACE_LIBC)
+#ifdef PANICTRACE_LIBC
         n = atoi(bufp);
         if (n < 0 || n > 2) {
             raw_printf("Illegal value in PANICTRACE_LIBC (not 0,1,2).");
             return 0;
         }
         sysopt.panictrace_libc = n;
-#endif
+#endif /* PANICTRACE_LIBC */
     } else if (src == SET_IN_SYS
                && match_varname(buf, "PANICTRACE_GDB", 14)) {
-#ifdef PANICTRACE
         n = atoi(bufp);
         if (n < 0 || n > 2) {
             raw_printf("Illegal value in PANICTRACE_GDB (not 0,1,2).");
             return 0;
         }
         sysopt.panictrace_gdb = n;
-#endif
     } else if (src == SET_IN_SYS && match_varname(buf, "GDBPATH", 7)) {
-#if defined(PANICTRACE) && !defined(VMS) /* VMS panictrace support doesn't use gdb or grep */
+#ifndef VMS /* VMS panictrace support doesn't use gdb or grep */
         if (!file_exists(bufp)) {
             raw_printf("File specified in GDBPATH does not exist.");
             return 0;
@@ -2351,7 +2350,7 @@ int src;
         sysopt.gdbpath = dupstr(bufp);
 #endif
     } else if (src == SET_IN_SYS && match_varname(buf, "GREPPATH", 7)) {
-#if defined(PANICTRACE) && !defined(VMS) /* VMS panictrace support doesn't use gdb or grep */
+#ifndef VMS /* VMS panictrace support doesn't use gdb or grep */
         if (!file_exists(bufp)) {
             raw_printf("File specified in GREPPATH does not exist.");
             return 0;
@@ -2359,7 +2358,8 @@ int src;
         if (sysopt.greppath)
             free((genericptr_t) sysopt.greppath);
         sysopt.greppath = dupstr(bufp);
-#endif
+#endif /* !VMS */
+#endif /* PANICTRACE */
 #endif /* SYSCF */
     } else if (match_varname(buf, "BOULDER", 3)) {
         (void) get_uchars(fp, buf, bufp, &iflags.bouldersym, TRUE, 1,
