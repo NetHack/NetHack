@@ -1,4 +1,4 @@
-/* NetHack 3.6	lint.h	$NHDT-Date: 1430897871 2015/05/06 07:37:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.0 $ */
+/* NetHack 3.6	lint.h	$NHDT-Date: 1449269910 2015/12/04 22:58:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.3 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -36,19 +36,21 @@ extern unsigned nhUse_dummy;
 #ifdef DEBUG
 #define showdebug(file) debugcore(file, TRUE)
 #define explicitdebug(file) debugcore(file, FALSE)
-#define ifdebug(stmt)            \
-    do {                         \
-        if (showdebug(__FILE__)) \
-            stmt;                \
+#define ifdebug(stmt)                   \
+    do {                                \
+        if (showdebug(__FILE__)) {      \
+            stmt;                       \
+        }                               \
     } while (0)
 #ifdef _MSC_VER
 /* if we have microsoft's C runtime we can use these instead */
 #include <crtdbg.h>
-#define crtdebug(stmt)           \
-    do {                         \
-        if (showdebug(__FILE__)) \
-            stmt;                \
-        _RPT0(_CRT_WARN, "\n");  \
+#define crtdebug(stmt)                  \
+    do {                                \
+        if (showdebug(__FILE__)) {      \
+            stmt;                       \
+        }                               \
+        _RPT0(_CRT_WARN, "\n");         \
     } while (0)
 #define debugpline0(str) crtdebug(_RPT0(_CRT_WARN, str))
 #define debugpline1(fmt, arg) crtdebug(_RPT1(_CRT_WARN, fmt, arg))

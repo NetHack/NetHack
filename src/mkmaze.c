@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1448013594 2015/11/20 09:59:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.41 $ */
+/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1449269918 2015/12/04 22:58:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.42 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -616,9 +616,10 @@ register const char *s;
             y_range = y_maze_max - y_maze_min - 2 * INVPOS_Y_MARGIN - 1;
 
         if (x_range <= INVPOS_X_MARGIN || y_range <= INVPOS_Y_MARGIN
-            || (x_range * y_range) <= (INVPOS_DISTANCE * INVPOS_DISTANCE))
-            debugpline2("inv_pos: maze is too small! (%d x %d)", x_maze_max,
-                        y_maze_max);
+            || (x_range * y_range) <= (INVPOS_DISTANCE * INVPOS_DISTANCE)) {
+            debugpline2("inv_pos: maze is too small! (%d x %d)",
+                        x_maze_max, y_maze_max);
+        }
         inv_pos.x = inv_pos.y = 0; /*{occupied() => invocation_pos()}*/
         do {
             x = rn1(x_range, x_maze_min + INVPOS_X_MARGIN + 1);
