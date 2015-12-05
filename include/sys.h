@@ -1,4 +1,4 @@
-/* NetHack 3.6	sys.h	$NHDT-Date: 1448241778 2015/11/23 01:22:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.26 $ */
+/* NetHack 3.6	sys.h	$NHDT-Date: 1449296291 2015/12/05 06:18:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.27 $ */
 /* Copyright (c) Kenneth Lorber, Kensington, Maryland, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -20,23 +20,21 @@ struct sysopt {
                        * -1: getenv() didn't find a value for DEBUGFILES.
                        */
     int maxplayers;
+    int seduce;
+    int check_save_uid; /* restoring savefile checks UID? */
+
     /* record file */
     int persmax;
     int pers_is_uid;
     int entrymax;
     int pointsmin;
     int tt_oname_maxrank;
-#ifdef PANICTRACE
+
     /* panic options */
     char *gdbpath;
     char *greppath;
     int panictrace_gdb;
-#ifdef PANICTRACE_LIBC
     int panictrace_libc;
-#endif
-#endif
-    int seduce;
-    int check_save_uid; /* restoring savefile checks UID? */
 };
 
 extern struct sysopt sysopt;
