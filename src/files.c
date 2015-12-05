@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1448323244 2015/11/24 00:00:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.190 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1449283964 2015/12/05 02:52:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.191 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2559,7 +2559,7 @@ read_config_file(filename, src)
 const char *filename;
 int src;
 {
-    char buf[4 * BUFSZ];
+    char buf[4 * BUFSZ], *p;
     FILE *fp;
     boolean rv = TRUE; /* assume successful parse */
 
@@ -2577,8 +2577,16 @@ line at this level.
 OR: Forbid multiline stuff for alternate config sources.
 */
 #endif
+        if ((p = index(buf, '\n')) != 0)
+            *p = '\0';
         if (!parse_config_line(fp, buf, src)) {
-            raw_printf("Bad option line:  \"%.50s\"", buf);
+            static const char badoptionline[] = "Bad option line: \"%s\"";
+
+            /* truncate buffer if it's long; this is actually conservative */
+            if (strlen(buf) > BUFSZ - sizeof badoptionline)
+                buf[BUFSZ - sizeof badoptionline] = '\0';
+
+            raw_printf(badoptionline, buf);
             wait_synch();
             rv = FALSE;
         }
