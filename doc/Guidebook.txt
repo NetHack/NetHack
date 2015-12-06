@@ -126,7 +126,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -192,7 +192,7 @@
           thing  (including other orcs).  Above all others, Orcs hate Elves
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -258,7 +258,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -324,7 +324,7 @@
                Intelligence affects your ability to cast  spells  and  read
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -390,7 +390,7 @@
                ical attacks.  Many dungeons show only your experience level
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -456,7 +456,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -522,7 +522,7 @@
           additional information, for example a direction, or an object  to
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -588,7 +588,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -654,7 +654,7 @@
                click takes place on  a  location  other  than  the  current
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -720,7 +720,7 @@
                     E- - write in the dust with your fingers.
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -786,7 +786,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -852,7 +852,7 @@
                off.)
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -918,7 +918,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -984,7 +984,7 @@
           (R)UNIX is a registered trademark of AT&T.
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -1050,7 +1050,7 @@
                ster form).
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -1116,7 +1116,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -1182,7 +1182,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -1248,7 +1248,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -1314,7 +1314,7 @@
           the player gets stuck; however, they will lower your luck.
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -1380,7 +1380,7 @@
           needs  to  be  compatible with the type of merchandise carried by
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -1446,7 +1446,7 @@
           which is just a space will remove any prior name.
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -1512,7 +1512,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -1578,7 +1578,7 @@
           your condition.
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -1644,7 +1644,7 @@
           distinguished  in  your  inventory  by  the  presence of the word
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -1710,7 +1710,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -1776,7 +1776,7 @@
           in the same direction; if the first  ones  kill  a  monster,  the
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -1842,7 +1842,7 @@
           one is considered secondary.  The most noticeable  difference  is
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -1908,7 +1908,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -1974,7 +1974,7 @@
           ancient wizards for their amusement value (ex.  ``READ  ME,''  or
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -2040,7 +2040,7 @@
           such an explosion starts out very small and increases  each  time
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -2106,7 +2106,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -2172,7 +2172,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -2238,7 +2238,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -2304,7 +2304,7 @@
           that  playing  Monk  or  Priest  characters  should  violate this
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -2370,7 +2370,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -2436,7 +2436,7 @@
           ent  operating systems, but NETHACKOPTIONS can also be set to the
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -2502,7 +2502,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -2568,7 +2568,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -2634,7 +2634,7 @@
             Name  a  fruit  after   something   you   enjoy   eating   (ex.
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -2700,7 +2700,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -2766,7 +2766,7 @@
             Controls  how  the  headings in a menu are highlighted.  Values
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -2832,7 +2832,7 @@
                  r - full window reversed, newest message first.
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -2898,7 +2898,7 @@
             A  space  separated list of specific situations where alternate
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -2964,7 +2964,7 @@
             Specify the object types to be picked up when autopickup is on.
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -3030,7 +3030,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -3096,7 +3096,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -3162,7 +3162,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -3228,7 +3228,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -3294,7 +3294,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -3360,7 +3360,7 @@
             NetHack   should   display   windows   with    the    specified
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -3426,7 +3426,7 @@
             proof  input  (MS-DOS sometimes treats `^P' as a printer toggle
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -3492,7 +3492,7 @@
           file, you can define patterns to be  checked  when  the  game  is
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -3558,7 +3558,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -3624,7 +3624,7 @@
             file,  and  the  last  MENUCOLOR-line  in your config file that
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -3690,7 +3690,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -3756,7 +3756,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -3822,7 +3822,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -3888,7 +3888,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -3954,7 +3954,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -4020,7 +4020,7 @@
           in the same format as the traditional per-user configuration file
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -4086,7 +4086,7 @@
           list,  or better your previous score, you will be inserted in the
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -4152,7 +4152,7 @@
           in falling back to explore mode instead.
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -4218,7 +4218,7 @@
           Day,  Timo Hakulinen, Steve Linhart, Dean Luick, Pat Rankin, Eric
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -4284,7 +4284,7 @@
           wick  Allison  improved  the spell casting system with the Wizard
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -4350,7 +4350,7 @@
           face  for  the  Windows  port.   Alex  Kompel  also contributed a
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -4416,7 +4416,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -4482,7 +4482,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
@@ -4548,7 +4548,7 @@
 
 
 
-          NetHack 3.6                                         June 22, 2015
+          NetHack 3.6                                      December 7, 2015
 
 
 
