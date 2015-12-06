@@ -129,13 +129,13 @@ sys/os2:
 Install.os2     Makefile.os2    nhpmico.uu      os2.c
 
 sys/share:
-(files for MSDOS and OS/2 versions)
+(files for MSDOS and OS/2 versions - untested for 3.6.0)
 Makefile.lib    termcap.uu
-(file for MSDOS, OS/2, NT, Amiga, and Atari versions)
+(file for MSDOS, OS/2, NT, Amiga, and Atari versions - untested for 3.6.0)
 pcmain.c
-(files for MSDOS, OS/2, NT, and Atari versions)
+(files for MSDOS, OS/2, NT, and Atari versions - untested for 3.6.0)
 pcsys.c         pcunix.c
-(file for MSDOS, OS/2, and Atari versions)
+(file for MSDOS, OS/2, and Atari versions - untested for 3.6.0)
 NetHack.cnf     pctty.c
 (files for UNIX and Be versions)
 ioctl.c         unixtty.c
@@ -202,15 +202,15 @@ resource.h      winMS.h         winhack.c       winhack.rc      winhcksp.rc
 winmain.c
 
 sys/wince/ceinc:
-(header files for Windows CE and PocketPC)
+(header files for Windows CE and PocketPC - untested for 3.6.0)
 assert.h        errno.h         fcntl.h
 
 sys/wince/ceinc/sys:
-(sys/stat.h for Windows CE and PocketPC)
+(sys/stat.h for Windows CE and PocketPC - untested for 3.6.0)
 stat.h
 
 sys/winnt:
-(files for Windows 9x, NT and Windows2000 version)
+(files for Windows 7/8.x/10 version)
 Install.nt      Makefile.gcc    Makefile.msc    console.rc      defaults.nh
 nethack.def     nh340key.c      nhdefkey.c      nhico.uu        nhraykey.c
 nhsetup.bat     ntsound.c       nttty.c         porthelp        stubs.c
@@ -242,13 +242,13 @@ win/chain:
 wc_chainin.c    wc_chainout.c   wc_trace.c
 
 win/gem:
-(files for GEM versions)
+(files for GEM versions - untested for 3.6.0)
 Install.gem     bitmfile.c      gem_rsc.uu      gem_rso.uu      gr_rect.c
 gr_rect.h       load_img.c      tile2img.c      title.uu        wingem.c
 wingem1.c       xpm2img.c
 
 win/gnome:
-(files for GNOME versions)
+(files for GNOME versions - untested for 3.6.0)
 README          gn_xpms.h       gnaskstr.c      gnaskstr.h      gnbind.c
 gnbind.h        gnglyph.c       gnglyph.h       gnmain.c        gnmain.h
 gnmap.c         gnmap.h         gnmenu.c        gnmenu.h        gnmesg.c
