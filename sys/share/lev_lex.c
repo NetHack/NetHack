@@ -1022,7 +1022,7 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-/* NetHack 3.6  lev_comp.l	$NHDT-Date: 1449385344 2015/12/06 07:02:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.24 $ */
+/* NetHack 3.6  lev_comp.l	$NHDT-Date: 1449431380 2015/12/06 19:49:40 $  $NHDT-Branch: master $:$NHDT-Revision: 1.27 $ */
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2341,6 +2341,7 @@ case YY_STATE_EOF(MAPC):
 			"fatal flex scanner internal error--no action found" );
 	} /* end of action switch */
 		} /* end of scanning one token */
+	} /* end of user's declarations */
 } /* end of yylex */
 
 /* yy_get_next_buffer - try to read in a new buffer
@@ -2974,7 +2975,7 @@ YY_BUFFER_STATE yy_scan_bytes (yybytes,_yybytes_len )
 	YY_BUFFER_STATE b;
 	char *buf;
 	yy_size_t n;
-	int i;
+	yy_size_t i;
 
 	/* Get memory for full buffer, including space for trailing EOB's. */
 	n = _yybytes_len + 2;
