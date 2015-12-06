@@ -1,11 +1,11 @@
-.\" $NHDT-Branch: master $:$NHDT-Revision: 1.187 $ $NHDT-Date: 1448920179 2015/11/30 21:49:39 $
+.\" $NHDT-Branch: master $:$NHDT-Revision: 1.188 $ $NHDT-Date: 1449420465 2015/12/06 16:47:45 $
 .ds h0 "NetHack Guidebook
 .ds h1
 .ds h2 %
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "June 22, 2015
+.ds f2 "December 7, 2015
 .\" labeled paragraph start (should be part of tmac.n, but I don't want to
 .\" make changes to that file)
 .\" .PS word
