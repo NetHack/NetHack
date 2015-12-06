@@ -1,4 +1,4 @@
-/* NetHack 3.6	global.h	$NHDT-Date: 1432512780 2015/05/25 00:13:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.44 $ */
+/* NetHack 3.6	global.h	$NHDT-Date: 1449116298 2015/12/03 04:18:18 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.46 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -7,9 +7,9 @@
 
 #include <stdio.h>
 
-#define BETA /* development or beta testing [MRS] */
+/* #define BETA */ /* development or beta testing [MRS] */
 
-#define DEBUG
+/* #define DEBUG */
 
 /*
  * Files expected to exist in the playground directory.

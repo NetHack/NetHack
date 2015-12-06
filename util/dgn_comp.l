@@ -1,5 +1,5 @@
 %{
-/* NetHack 3.6  dgn_comp.l	$NHDT-Date: 1448710672 2015/11/28 11:37:52 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
+/* NetHack 3.6  dgn_comp.l	$NHDT-Date: 1449385184 2015/12/06 06:59:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.12 $ */
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /*	Copyright (c) 1990 by M. Stephenson	     */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -61,12 +61,13 @@ int FDECL(yyoutput, (int));
 #define YY_NO_UNPUT
 #endif
 
-#ifdef FLEX_SCANNER
-#define YY_MALLOC_DECL \
-	       genericptr_t FDECL(malloc, (size_t)); \
-	       genericptr_t FDECL(realloc, (genericptr_t,size_t));
+#if defined(FLEX_SCANNER) || defined(FLEXHACK_SCANNER)
+/* older flex wants this */
+#define YY_MALLOC_DECL  genericptr_t FDECL(malloc, (size_t)); \
+                        genericptr_t FDECL(realloc, (genericptr_t, size_t));
+/* newer flex assumes <stdlib.h> so needs this in case it's been suppressed */
+YY_MALLOC_DECL
 #endif
-
 
 void FDECL(init_yyin, (FILE *));
 void FDECL(init_yyout, (FILE *));
@@ -74,7 +75,6 @@ void FDECL(init_yyout, (FILE *));
 /* this doesn't always get put in dgn_comp.h
  * (esp. when using older versions of bison)
  */
-
 extern YYSTYPE yylval;
 
 int nh_line_number = 1;
@@ -131,6 +131,7 @@ FILE *input_f;
 #endif
         yyin = input_f;
 }
+
 /* analogous routine (for completeness) */
 void
 init_yyout( output_f )

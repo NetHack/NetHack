@@ -1,4 +1,4 @@
-/* NetHack 3.6	dbridge.c	$NHDT-Date: 1446955279 2015/11/08 04:01:19 $  $NHDT-Branch: master $:$NHDT-Revision: 1.33 $ */
+/* NetHack 3.6	dbridge.c	$NHDT-Date: 1449269914 2015/12/04 22:58:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.35 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet              */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -509,8 +509,9 @@ boolean chunks;
 {
     int misses;
 
-    if (chunks)
+    if (chunks) {
         debugpline0("Do chunks miss?");
+    }
     if (automiss(etmp))
         return TRUE;
 
@@ -590,13 +591,14 @@ struct entity *etmp;
         return;
     }
     if (e_missed(etmp, FALSE)) {
-        if (at_portcullis)
+        if (at_portcullis) {
             pline_The("portcullis misses %s!", e_nam(etmp));
-        else
+        } else {
             debugpline1("The drawbridge misses %s!", e_nam(etmp));
-        if (e_survives_at(etmp, oldx, oldy))
+        }
+        if (e_survives_at(etmp, oldx, oldy)) {
             return;
-        else {
+        } else {
             debugpline0("Mon can't survive here");
             if (at_portcullis)
                 must_jump = TRUE;
@@ -978,10 +980,11 @@ int x, y;
                     pline("%s hit by a huge chunk of metal!",
                           E_phrase(etmp1, "are"));
             } else {
-                if (!Deaf && !is_u(etmp1) && !is_pool(x, y))
+                if (!Deaf && !is_u(etmp1) && !is_pool(x, y)) {
                     You_hear("a crushing sound.");
-                else
+                } else {
                     debugpline1("%s from shrapnel", E_phrase(etmp1, "die"));
+                }
             }
             killer.format = KILLED_BY_AN;
             Strcpy(killer.name, "collapsing drawbridge");

@@ -1,4 +1,4 @@
-/* NetHack 3.6	mswproc.c	$NHDT-Date: 1449116947 2015/12/03 04:29:07 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.93 $ */
+/* NetHack 3.6	mswproc.c	$NHDT-Date: 1449116670 2015/12/03 04:24:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.94 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 

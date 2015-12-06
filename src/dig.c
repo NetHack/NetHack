@@ -1,4 +1,4 @@
-/* NetHack 3.6	dig.c	$NHDT-Date: 1446369465 2015/11/01 09:17:45 $  $NHDT-Branch: master $:$NHDT-Revision: 1.99 $ */
+/* NetHack 3.6	dig.c	$NHDT-Date: 1449269915 2015/12/04 22:58:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.103 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1864,8 +1864,9 @@ int x, y;
 {
     struct obj *otmp, *otmp2;
 
-    if (level.objects[x][y] != (struct obj *) 0)
+    if (level.objects[x][y] != (struct obj *) 0) {
         debugpline2("bury_objs: at <%d,%d>", x, y);
+    }
     for (otmp = level.objects[x][y]; otmp; otmp = otmp2)
         otmp2 = bury_an_obj(otmp, (boolean *) 0);
 

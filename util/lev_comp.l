@@ -1,5 +1,5 @@
 %{
-/* NetHack 3.6  lev_comp.l	$NHDT-Date: 1448710678 2015/11/28 11:37:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.21 $ */
+/* NetHack 3.6  lev_comp.l	$NHDT-Date: 1449385191 2015/12/06 06:59:51 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.22 $ */
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -59,10 +59,12 @@ int FDECL(yyoutput, (int));
 #define YY_NO_UNPUT
 #endif
 
-#ifdef FLEX_SCANNER
-#define YY_MALLOC_DECL \
-	      genericptr_t FDECL(malloc, (size_t)); \
-	      genericptr_t FDECL(realloc, (genericptr_t,size_t));
+#if defined(FLEX_SCANNER) || defined(FLEXHACK_SCANNER)
+/* older flex wants this */
+#define YY_MALLOC_DECL  genericptr_t FDECL(malloc, (size_t)); \
+                        genericptr_t FDECL(realloc, (genericptr_t, size_t));
+/* newer flex assumes <stdlib.h> so needs this in case it's been suppressed */
+YY_MALLOC_DECL
 #endif
 
 void FDECL(init_yyin, (FILE *));

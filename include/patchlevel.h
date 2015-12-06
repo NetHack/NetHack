@@ -36,8 +36,12 @@
 /* Version 3.6.x */
 
 /*
- *  NetHack 3.6.0, June NN, NNNN
+ *  NetHack 3.6.0, December 7, 2015
  *
+ *  Hundreds of bug fixes.
+ *  Some code reorganization.
+ *  Some new features.
+ *  Variations of some community patches rolled in.
  */
 
 /****************************************************************************/

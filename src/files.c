@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1448323244 2015/11/24 00:00:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.190 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1449296293 2015/12/05 06:18:13 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.192 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2224,6 +2224,7 @@ int src;
         (void) strncpy(dogname, bufp, PL_PSIZ - 1);
     } else if (match_varname(buf, "CATNAME", 3)) {
         (void) strncpy(catname, bufp, PL_PSIZ - 1);
+
 #ifdef SYSCF
     } else if (src == SET_IN_SYS && match_varname(buf, "WIZARDS", 7)) {
         if (sysopt.wizards)
@@ -2249,7 +2250,7 @@ int src;
         /* if showdebug() has already been called (perhaps we've added
            some debugpline() calls to option processing) and has found
            a value for getenv("DEBUGFILES"), don't override that */
-        if (sysopt.env_dbgfl == 0) {
+        if (sysopt.env_dbgfl <= 0) {
             if (sysopt.debugfiles)
                 free((genericptr_t) sysopt.debugfiles);
             sysopt.debugfiles = dupstr(bufp);
@@ -2320,47 +2321,50 @@ int src;
             return 0;
         }
         sysopt.tt_oname_maxrank = n;
-#ifdef PANICTRACE
+
+    /* SYSCF PANICTRACE options */
     } else if (src == SET_IN_SYS
                && match_varname(buf, "PANICTRACE_LIBC", 15)) {
-#ifdef PANICTRACE_LIBC
         n = atoi(bufp);
+#if defined(PANICTRACE) && defined(PANICTRACE_LIBC)
         if (n < 0 || n > 2) {
             raw_printf("Illegal value in PANICTRACE_LIBC (not 0,1,2).");
             return 0;
         }
+#endif
         sysopt.panictrace_libc = n;
-#endif /* PANICTRACE_LIBC */
     } else if (src == SET_IN_SYS
                && match_varname(buf, "PANICTRACE_GDB", 14)) {
         n = atoi(bufp);
+#if defined(PANICTRACE)
         if (n < 0 || n > 2) {
             raw_printf("Illegal value in PANICTRACE_GDB (not 0,1,2).");
             return 0;
         }
+#endif
         sysopt.panictrace_gdb = n;
     } else if (src == SET_IN_SYS && match_varname(buf, "GDBPATH", 7)) {
-#ifndef VMS /* VMS panictrace support doesn't use gdb or grep */
+#if defined(PANICTRACE) && !defined(VMS)
         if (!file_exists(bufp)) {
             raw_printf("File specified in GDBPATH does not exist.");
             return 0;
         }
+#endif
         if (sysopt.gdbpath)
             free((genericptr_t) sysopt.gdbpath);
         sysopt.gdbpath = dupstr(bufp);
-#endif
     } else if (src == SET_IN_SYS && match_varname(buf, "GREPPATH", 7)) {
-#ifndef VMS /* VMS panictrace support doesn't use gdb or grep */
+#if defined(PANICTRACE) && !defined(VMS)
         if (!file_exists(bufp)) {
             raw_printf("File specified in GREPPATH does not exist.");
             return 0;
         }
+#endif
         if (sysopt.greppath)
             free((genericptr_t) sysopt.greppath);
         sysopt.greppath = dupstr(bufp);
-#endif /* !VMS */
-#endif /* PANICTRACE */
 #endif /* SYSCF */
+
     } else if (match_varname(buf, "BOULDER", 3)) {
         (void) get_uchars(fp, buf, bufp, &iflags.bouldersym, TRUE, 1,
                           "BOULDER");
@@ -2559,7 +2563,7 @@ read_config_file(filename, src)
 const char *filename;
 int src;
 {
-    char buf[4 * BUFSZ];
+    char buf[4 * BUFSZ], *p;
     FILE *fp;
     boolean rv = TRUE; /* assume successful parse */
 
@@ -2577,8 +2581,16 @@ line at this level.
 OR: Forbid multiline stuff for alternate config sources.
 */
 #endif
+        if ((p = index(buf, '\n')) != 0)
+            *p = '\0';
         if (!parse_config_line(fp, buf, src)) {
-            raw_printf("Bad option line:  \"%.50s\"", buf);
+            static const char badoptionline[] = "Bad option line: \"%s\"";
+
+            /* truncate buffer if it's long; this is actually conservative */
+            if (strlen(buf) > BUFSZ - sizeof badoptionline)
+                buf[BUFSZ - sizeof badoptionline] = '\0';
+
+            raw_printf(badoptionline, buf);
             wait_synch();
             rv = FALSE;
         }

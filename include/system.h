@@ -1,4 +1,4 @@
-/* NetHack 3.6	system.h	$NHDT-Date: 1432512775 2015/05/25 00:12:55 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
+/* NetHack 3.6	system.h	$NHDT-Date: 1449269772 2015/12/04 22:56:12 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.12 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -514,8 +514,9 @@ E char *FDECL(tgetstr, (const char *, char **));
 E char *FDECL(tgoto, (const char *, int, int));
 #endif
 
-#ifdef ALLOC_C
+#if defined(ALLOC_C) || defined(MAKEDEFS_C)
 E genericptr_t FDECL(malloc, (size_t));
+E genericptr_t FDECL(realloc, (genericptr_t, size_t));
 #endif
 
 /* time functions */

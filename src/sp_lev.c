@@ -1,4 +1,4 @@
-/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1449051497 2015/12/02 10:18:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.76 $ */
+/* NetHack 3.6	sp_lev.c	$NHDT-Date: 1449269920 2015/12/04 22:58:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.77 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1033,8 +1033,9 @@ chk:
         lev = &levl[x][y];
         for (; y <= ymax; y++) {
             if (lev++->typ) {
-                if (!vault)
+                if (!vault) {
                     debugpline2("strange area [%d,%d] in check_room.", x, y);
+                }
                 if (!rn2(3))
                     return FALSE;
                 if (x < *lowx)

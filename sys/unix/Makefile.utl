@@ -1,5 +1,5 @@
 #	Makefile for NetHack's utility programs.
-# NetHack 3.6  Makefile.utl	$NHDT-Date: 1448711183 2015/11/28 11:46:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.26 $
+# NetHack 3.6  Makefile.utl	$NHDT-Date: 1449386560 2015/12/06 07:22:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.27 $
 
 # Root of source tree:
 NHSROOT=..
@@ -235,13 +235,19 @@ lev_lex.o:   lev_lex.c $(HACK_H) ../include/lev_comp.h ../include/sp_lev.h
 
 lev_yacc.c: lev_comp.y
 	$(YACC) $(YACCDIST) -d lev_comp.y
-	sed -e 's#"$(YTABC)"#"$@"#' $(YTABC) > $@ && rm $(YTABC)
+	sed -e 's#"$(YTABC)"#"$@"#' -e 's#$(YTABC):#$@:#' $(YTABC) > $@ \
+		&& rm $(YTABC)
 	sed -e 's#"$(YTABH)"#"lev_comp.h"#' $(YTABH) > ../include/lev_comp.h \
 		&& rm $(YTABH)
 
 lev_lex.c: lev_comp.l
 	$(LEX) $(FLEXDIST) lev_comp.l
-	sed -e 's#"$(LEXYYC)"#"$@"#' $(LEXYYC) > $@ && rm $(LEXYYC)
+	sed -e 's#"$(LEXYYC)"#"$@"#' -e 's#  *$$##' $(LEXYYC) > $@ \
+		&& rm $(LEXYYC)
+#	note: flex code construction using m4 macros results in some trailing
+#	spaces; <space><space><star> is basic RE substitute for <space><plus>
+#	and we don't bother stripping trailing tabs because that gets messy;
+#	make expands <dollar><dollar> into <dollar> which is RE end-of-line.
 
 # with all of extern.h's functions to complain about, we drown in
 # 'defined but not used' without -u
@@ -267,13 +273,16 @@ dgn_lex.o:   dgn_lex.c $(CONFIG_H) ../include/dgn_comp.h ../include/dgn_file.h
 
 dgn_yacc.c: dgn_comp.y
 	$(YACC) $(YACCDIST) -d dgn_comp.y
-	sed -e 's#"$(YTABC)"#"$@"#' $(YTABC) > $@ && rm $(YTABC)
+	sed -e 's#"$(YTABC)"#"$@"#' -e 's#$(YTABC):#$@:#' $(YTABC) > $@ \
+		&& rm $(YTABC)
 	sed -e 's#"$(YTABH)"#"dgn_comp.h"#' $(YTABH) > ../include/dgn_comp.h \
 		&& rm $(YTABH)
 
 dgn_lex.c: dgn_comp.l
 	$(LEX) $(FLEXDIST) dgn_comp.l
-	sed -e 's#"$(LEXYYC)"#"$@"#' $(LEXYYC) > $@ && rm $(LEXYYC)
+	sed -e 's#"$(LEXYYC)"#"$@"#' -e 's#  *$$##' $(LEXYYC) > $@ \
+		&& rm $(LEXYYC)
+#	note: <space><space><star> is basic RE substitute for <space><plus>
 
 # with all of extern.h's functions to complain about, we drown in
 # 'defined but not used' without -u
