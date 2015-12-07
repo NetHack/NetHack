@@ -182,11 +182,11 @@ linux           linux-chroot    linux-x11       macosx          macosx10.5
 macosx10.7      macosx.sh       macosx10.10     unix
 
 sys/vms:
-(files for VMS version - untested for 3.6.0)
+(files for VMS version)
 Install.vms     Makefile.dat    Makefile.doc    Makefile.src    Makefile.top
 Makefile.utl    install.com     lev_lex.h       nethack.com     oldcrtl.c
-spec_lev.com    vmsbuild.com    vmsfiles.c      vmsmail.c       vmsmain.c
-vmsmisc.c       vmstty.c        vmsunix.c
+spec_lev.com    sysconf         vmsbuild.com    vmsfiles.c      vmsmail.c
+vmsmain.c       vmsmisc.c       vmstty.c        vmsunix.c
 
 sys/wince:
 (files for Windows CE and PocketPC - untested for 3.6.0)

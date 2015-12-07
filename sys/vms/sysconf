@@ -1,6 +1,6 @@
 # NetHack 3.6 sysconf $NHDT-Date$ $NHDT-Branch$:$NHDT-Revision$
 #
-# Sample sysconf file.
+# Sample sysconf file for VMS.
 # The sysconf file is only used if NetHack is compiled with SYSCF defined.
 # It can be used to augment or override certain settings compiled into the
 # program.
@@ -8,30 +8,20 @@
 # This file can also be used to set local system defaults for run-time
 # options, using the same syntax as an individual user's ./nethackrc file.
 
-# Which users can use debug mode (aka wizard mode; accessed via '-D' command
-# line flag or OPTIONS=playmode:debug in the runtime options config file).
-# A value of * allows anyone to enter debugging mode.
-WIZARDS=root games
-
-# Which users can use explore mode (aka discover mode; accessed via '-X'
-# command line flag or OPTIONS=playmode:explore in runtime options file or
-# via '#exploremode' command during normal play).  Same syntax as WIZARDS.
-EXPLORERS=*
-
-# Users allowed to use the '!' (shell escape) and '^Z' (suspend process)
-# commands to temporarily leave the game and enter a shell process.
-# (To resume play, use the shell command 'exit' (for most shells) to
-# return from '!' or the shell command 'fg' to return from '^Z'.
-# For the typical multi-user system where players have access to a shell
-# prompt when logged in and run the game from their own username, a value
-# of 'SHELLERS=*' is appropriate.  However, some inexperienced players
-# occasionally get stuck outside the game by accidentally typing '!' or
-# '^Z' during play and not knowing how to go back.)
-# Uses the same syntax as the WIZARDS and EXPLORERS options above.
+# The options which take a space-separated list of usernames haven't been
+# implemented for VMS.
+#WIZARDS=
+#EXPLORERS=*
 #SHELLERS=
 
-# Limit the number of simultaneous games (see also nethack.sh).
-MAXPLAYERS=10
+# Limit the number of simultaneous games.  (Setting a limit has a side-effect
+# of changing the file names for the games in progress.  With no limit, they
+# are named NNNcccccc.*, when NNN is a decimal formatting of the users's UIC
+# value (group * 65536 + member; orinarily formatted as a pair of numbers
+# expressed in octal, [group,member]) and cccccc is the character name.
+# With a limit, they are named Llock.*, where L is a single letter.)
+# Limit is documented to be 25 even though 26 is easily feasible....
+#MAXPLAYERS=10
 
 # If not null, added to string "To get local support, " in the support
 # information help.
@@ -72,21 +62,20 @@ MAXPLAYERS=10
 # Try to get more info in case of a program bug or crash.  Only used
 # if the program is built with the PANICTRACE compile-time option enabled.
 # By default PANICTRACE is enabled if BETA is defined, otherwise disabled.
-# Using GDB can get more information and works on more systems but requires
-# 'gdb' be available; using LIBC only works if NetHack is linked with a
-# libc that supports the backtrace(3) API.  Both require certain compilation
-# options.  See src/end.c and sys/unix/hints/* for more information.
-GDBPATH=/usr/bin/gdb
-GREPPATH=/bin/grep
-# Values are priorities: 0 - do not use this method, 1 - low priority,
-# 2 - high priority.  Non-zero priority methods are tried in order.
+# (GDBPATH, GREPPATH, and PANICTRACE_LIBC aren't used on VMS.
+# PANICTRACE_GDB is repurposed, with nothing to do with 'gdb'.
+# Values are 1: show traceback and exit, 2: show traceback and
+# remain in debugger.)
 PANICTRACE_GDB=1
-PANICTRACE_LIBC=2
+#GDBPATH=
+#GREPPATH=
+#PANICTRACE_LIBC=
+#--
 
 # Ordinary run-time options can be set here to override the builtin-in
 # default values.  Unlike the SYSCF values above, individual users can
 # still choose their own option settings via NETHACKOPTIONS in their
-# environment or via ~/.nethackrc run-time configuration file.
+# environment or via sys$login:nethack.ini run-time configuration file.
 #OPTIONS=!autopickup,fruit:tomato,symset:DECgraphics
 
 #eof
