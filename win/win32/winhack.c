@@ -1,4 +1,4 @@
-/* NetHack 3.6    winhack.c    $NHDT-Date: 1434803624 2015/06/20 12:33:44 $  $NHDT-Branch: win32-x64-working $:$NHDT-Revision: 1.43 $ */
+/* NetHack 3.6    winhack.c    $NHDT-Date: 1449488876 2015/12/07 11:47:56 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.44 $ */
 /* Copyright (C) 2001 by Alex Kompel      */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -87,6 +87,8 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
     UNREFERENCED_PARAMETER(nCmdShow);
+
+    sys_early_init();
 
     /* ensure that we don't access violate on a panic() */
     windowprocs.win_raw_print = mswin_raw_print;
