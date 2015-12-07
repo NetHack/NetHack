@@ -238,7 +238,7 @@ winX.c          winmap.c        winmenu.c       winmesg.c       winmisc.c
 winstat.c       wintext.c       winval.c
 
 win/chain:
-(files for win/chain)
+(files for stacking window systems)
 wc_chainin.c    wc_chainout.c   wc_trace.c
 
 win/gem:
