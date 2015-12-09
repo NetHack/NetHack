@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1447987787 2015/11/20 02:49:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.236 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1449669396 2015/12/09 13:56:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.238 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -758,15 +758,22 @@ boolean by_hero;
         if (costly_spot(x, y))
             shkp = shop_keeper(*in_rooms(x, y, SHOPBASE));
 
-        if (cansee(x, y))
-            pline(
-                "%s glows iridescently.",
-                upstart(corpse_xname(corpse, (const char *) 0, CXN_PFX_THE)));
-        else if (shkp)
+        if (cansee(x, y)) {
+            char buf[BUFSZ];
+            unsigned pfx = CXN_PFX_THE;
+
+            Strcpy(buf, (corpse->quan > 1L) ? "one of " : "");
+            if (carried(corpse) && !corpse->unpaid) {
+                Strcat(buf, "your ");
+                pfx = CXN_NO_PFX;
+            }
+            Strcat(buf, corpse_xname(corpse, (const char *) 0, pfx));
+            pline("%s glows iridescently.", upstart(buf));
+        } else if (shkp) {
             /* need some prior description of the corpse since
                stolen_value() will refer to the object as "it" */
             pline("A corpse is resuscitated.");
-
+        }
         /* don't charge for shopkeeper's own corpse if we just revived him */
         if (shkp && mtmp != shkp)
             (void) stolen_value(corpse, x, y, (boolean) shkp->mpeaceful,
