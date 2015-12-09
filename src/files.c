@@ -2279,7 +2279,7 @@ int src;
     } else if (src == SET_IN_SYS && match_varname(buf, "MAXPLAYERS", 10)) {
         n = atoi(bufp);
         /* XXX to get more than 25, need to rewrite all lock code */
-        if (n < 1 || n > 25) {
+        if (n < 0 || n > 25) {
             raw_printf("Illegal value in MAXPLAYERS (maximum is 25).");
             return 0;
         }
