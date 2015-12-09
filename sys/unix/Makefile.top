@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.6  Makefile.top	$NHDT-Date: 1447844578 2015/11/18 11:02:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.32 $
+# NetHack 3.6  Makefile.top	$NHDT-Date: 1449621572 2015/12/09 00:39:32 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.33 $
 
 # Root of source tree:
 NHSROOT=.
@@ -46,14 +46,14 @@ DIRPERM  = 0755
 
 # per discussion in Install.X11 and Install.Qt
 #VARDATND = 
-# VARDATND = x11tiles NetHack.ad pet_mark.xbm pilemark.xpm
-# VARDATND = x11tiles NetHack.ad pet_mark.xbm pilemark.xpm rip.xpm
+# VARDATND = x11tiles NetHack.ad pet_mark.xbm pilemark.xbm
+# VARDATND = x11tiles NetHack.ad pet_mark.xbm pilemark.xbm rip.xpm
 # for Atari/Gem
 # VARDATND = nh16.img title.img GEM_RSC.RSC rip.img
 # for BeOS
 # VARDATND = beostiles
 # for Gnome
-# VARDATND = x11tiles pet_mark.xbm pilemark.xpm rip.xpm mapbg.xpm
+# VARDATND = x11tiles pet_mark.xbm pilemark.xbm rip.xpm mapbg.xpm
 
 VARDATD = bogusmon data engrave epitaph oracles options quest.dat rumors
 VARDAT = $(VARDATD) $(VARDATND)
@@ -85,7 +85,7 @@ SPEC_LEVS = asmodeus.lev baalz.lev bigrm-*.lev castle.lev fakewiz?.lev \
 	astral.lev air.lev earth.lev fire.lev water.lev
 QUEST_LEVS = ???-goal.lev ???-fil?.lev ???-loca.lev ???-strt.lev
 
-DATNODLB = $(VARDATND) license
+DATNODLB = $(VARDATND) license symbols
 DATDLB = $(DATHELP) dungeon tribute $(SPEC_LEVS) $(QUEST_LEVS) $(VARDATD)
 DAT = $(DATNODLB) $(DATDLB)
 
@@ -201,7 +201,6 @@ dofiles:
 		-e '}' 					\
 	  	-e '$$s/.*/nodlb/p' < dat/options` ;	\
 	$(MAKE) dofiles-$${target-nodlb}
-	(cd dat ; cp symbols $(INSTDIR) )
 	cp src/$(GAME) $(INSTDIR)
 	cp util/recover $(INSTDIR)
 	-if test -n '$(SHELLDIR)'; then rm -f $(SHELLDIR)/$(GAME); fi
@@ -220,9 +219,6 @@ dofiles:
 	if test -n '$(SHELLDIR)'; then \
 		$(CHGRP) $(GAMEGRP) $(SHELLDIR)/$(GAME); \
 		chmod $(EXEPERM) $(SHELLDIR)/$(GAME); fi
-	-( cd $(INSTDIR) ; $(CHOWN) $(GAMEUID) symbols ; \
-			$(CHGRP) $(GAMEGRP) symbols ; \
-			chmod $(FILEPERM) symbols )
 
 dofiles-dlb: check-dlb
 	( cd dat ; cp nhdat $(DATNODLB) $(INSTDIR) )
