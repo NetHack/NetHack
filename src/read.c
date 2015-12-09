@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1448862378 2015/11/30 05:46:18 $  $NHDT-Branch: master $:$NHDT-Revision: 1.125 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1449645144 2015/12/09 07:12:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.126 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2111,6 +2111,10 @@ int how;
     } else {
         for (i = 0;; i++) {
             if (i >= 5) {
+                /* cursed effect => no free pass (unless rndmonst() fails) */
+                if (!(how & REALLY) && (ptr = rndmonst()) != 0)
+                    break;
+
                 pline1(thats_enough_tries);
                 return;
             }
@@ -2118,16 +2122,13 @@ int how;
                    buf);
             (void) mungspaces(buf);
             /* choosing "none" preserves genocideless conduct */
-            if (!strcmpi(buf, "none") || !strcmpi(buf, "nothing")) {
+            if (*buf == '\033' || !strcmpi(buf, "none")
+                || !strcmpi(buf, "nothing")) {
                 /* ... but no free pass if cursed */
-                if (!(how & REALLY)) {
-                    ptr = rndmonst();
-                    if (!ptr)
-                        return; /* no message, like normal case */
-                    mndx = monsndx(ptr);
+                if (!(how & REALLY) && (ptr = rndmonst()) != 0)
                     break; /* remaining checks don't apply */
-                } else
-                    return;
+
+                return;
             }
 
             mndx = name_to_mon(buf);
@@ -2151,11 +2152,12 @@ int how;
 
             if (!(ptr->geno & G_GENO)) {
                 if (!Deaf) {
-                    /* fixme: unconditional "caverns" will be silly in some
-                     * circumstances */
+                    /* FIXME: unconditional "caverns" will be silly in some
+                     * circumstances.  Who's speaking?  Divine pronouncements
+                     * aren't supposed to be hampered by deafness....
+                     */
                     if (flags.verbose)
-                        pline(
-                            "A thunderous voice booms through the caverns:");
+                        pline("A thunderous voice booms through the caverns:");
                     verbalize("No, mortal!  That will not be done.");
                 }
                 continue;
@@ -2165,6 +2167,7 @@ int how;
                 killplayer++;
             break;
         }
+        mndx = monsndx(ptr); /* needed for the 'no free pass' cases */
     }
 
     which = "all ";
