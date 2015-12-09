@@ -1022,7 +1022,7 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-/* NetHack 3.6  lev_comp.l	$NHDT-Date: 1449431380 2015/12/06 19:49:40 $  $NHDT-Branch: master $:$NHDT-Revision: 1.27 $ */
+/* NetHack 3.6  lev_comp.l	$NHDT-Date: 1449615116 2015/12/08 22:51:56 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.25 $ */
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2390,41 +2390,37 @@ static int yy_get_next_buffer ()
          */
         YY_CURRENT_BUFFER_LVALUE->yy_n_chars = (yy_n_chars) = 0;
     } else {
-        yy_size_t num_to_read =
-                YY_CURRENT_BUFFER_LVALUE->yy_buf_size - number_to_move - 1;
+        yy_size_t num_to_read;
+        /* just a shorter name for the current buffer */
+        YY_BUFFER_STATE b = YY_CURRENT_BUFFER_LVALUE;
 
-        while (num_to_read <= 0) {
+            /* [pr] This could probably be (b->yy_buf_size < number_to_move)
+             * since the allocated size is actually b->yy_buf_size + 2.
+             * The old code calculated num_to_read above (with same formula
+             * as is used below), then used (num_to_read <= 0) here, which
+             * got broken when num_to_read was changed to an unsigned type. */
+        while (b->yy_buf_size <= number_to_move + 1) {
             /* Not enough room in the buffer - grow it. */
 
-            /* just a shorter name for the current buffer */
-            YY_BUFFER_STATE b = YY_CURRENT_BUFFER_LVALUE;
             int yy_c_buf_p_offset = (int) ((yy_c_buf_p) - b->yy_ch_buf);
 
             if ( b->yy_is_our_buffer ) {
-                yy_size_t new_size = b->yy_buf_size * 2;
-
-                if ( new_size <= 0 )
-                    b->yy_buf_size += b->yy_buf_size / 8;
-                else
-                    b->yy_buf_size *= 2;
-
+                b->yy_buf_size += b->yy_buf_size / 4;
                 b->yy_ch_buf = (char *)
-                /* Include room in for 2 EOB chars. */
-                yyrealloc((void *) b->yy_ch_buf,b->yy_buf_size + 2 );
+                         /* Include room in for 2 EOB chars. */
+                         yyrealloc((void *) b->yy_ch_buf,b->yy_buf_size + 2 );
             } else
                 /* Can't grow it, we don't own it. */
                 b->yy_ch_buf = 0;
 
             if (! b->yy_ch_buf)
-                YY_FATAL_ERROR("fatal error - scanner input buffer overflow" );
+                YY_FATAL_ERROR("fatal error - scanner input buffer overflow");
 
             (yy_c_buf_p) = &b->yy_ch_buf[yy_c_buf_p_offset];
 
-            num_to_read = YY_CURRENT_BUFFER_LVALUE->yy_buf_size -
-                                number_to_move - 1;
-
         }
 
+        num_to_read = b->yy_buf_size - number_to_move - 1;
         if ( num_to_read > YY_READ_BUF_SIZE )
             num_to_read = YY_READ_BUF_SIZE;
 
@@ -2713,6 +2709,8 @@ YY_BUFFER_STATE yy_create_buffer (file,size )
 	b = (YY_BUFFER_STATE) yyalloc(sizeof( struct yy_buffer_state )  );
 	if ( ! b )
 		YY_FATAL_ERROR( "out of dynamic memory in yy_create_buffer()" );
+        if (!size)
+            size = YY_BUF_SIZE;
 
 	b->yy_buf_size = (yy_size_t)size;
 
