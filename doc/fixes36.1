@@ -15,7 +15,8 @@ Platform- and/or Interface-Specific Fixes
 -----------------------------------------
 unix/X11: in top level Makefile, some commented out definitions of VARDATND
 	misspelled pilemark.xbm (as pilemark.xpm)
-win32gui: missing sys_early_init() call could result in "rnd(0) attempted"
+win32gui: getversionstring() was overflowing the provided Help About buffer
+win32gui: guard against buffer overflow in in mswin_getlin()
 MacOSX: initial binary release was built from out of date source code that
 	had 'BETA' and 'DEBUG' inappropriately enabled
 X11: core bug for '`' (backtick) command was only noticed by X11 interface,
