@@ -1,0 +1,35 @@
+$NHDT-Branch$:$NHDT-Revision$ $NHDT-Date$
+
+General Fixes and Modified Features
+-----------------------------------
+doc/*.6 man pages and corresponding doc/*.txt text copies were out of date
+data.base entry for "lava" had wrong first name for Don Woods' attribution
+cursed genocide of "none" sent in monsters, but "that's enough tries" didn't
+
+
+Platform- and/or Interface-Specific Fixes
+-----------------------------------------
+unix/X11: in top level Makefile, some commented out definitions of VARDATND
+	misspelled pilemark.xbm (as pilemark.xpm)
+win32gui: missing sys_early_init() call could result in "rnd(0) attempted"
+MacOSX: initial binary release was built from out of date source code that
+	had 'BETA' and 'DEBUG' inappropriately enabled
+X11: core bug for '`' (backtick) command was only noticed by X11 interface,
+	which issued impossible message "add_menu: called before start_menu"
+
+
+General New Features
+--------------------
+
+
+Platform- and/or Interface-Specific New Features
+------------------------------------------------
+
+
+NetHack Community Patches (or Variation) Included
+-------------------------------------------------
+
+
+Code Cleanup and Reorganization
+-------------------------------
+
