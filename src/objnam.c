@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1447490776 2015/11/14 08:46:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.154 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1449740045 2015/12/10 09:34:05 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.155 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -197,12 +197,13 @@ struct obj *obj;
     return TRUE;
 }
 
+/* used by distant_name() to pass extra information to xname_flags();
+   it would be much cleaner if this were a parameter, but that would
+   require all of the xname() and doname() calls to be modified */
+static int distantname = 0;
+
 /* Give the name of an object seen at a distance.  Unlike xname/doname,
- * we don't want to set dknown if it's not set already.  The kludge used is
- * to temporarily set Blind so that xname() skips the dknown setting.  This
- * assumes that we don't want to do this too often; if this function becomes
- * frequently used, it'd probably be better to pass a parameter to xname()
- * or doname() instead.
+ * we don't want to set dknown if it's not set already.
  */
 char *
 distant_name(obj, func)
@@ -211,10 +212,17 @@ char *FDECL((*func), (OBJ_P));
 {
     char *str;
 
-    long save_Blinded = Blinded;
-    Blinded = 1;
+    /* 3.6.1: this used to save Blind, set it, make the call, then restore
+     * the saved value; but the Eyes of the Overworld override blindness
+     * and let characters wearing them get dknown set for distant items.
+     *
+     * TODO? if the hero is wearing those Eyes, figure out whether the
+     * object is within X-ray radius and only treat it as distant when
+     * beyond that radius.  Logic is iffy but result might be interesting.
+     */
+    ++distantname;
     str = (*func)(obj);
-    Blinded = save_Blinded;
+    --distantname;
     return str;
 }
 
@@ -271,7 +279,7 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
      */
     if (!nn && ocl->oc_uses_known && ocl->oc_unique)
         obj->known = 0;
-    if (!Blind)
+    if (!Blind && !distantname)
         obj->dknown = TRUE;
     if (Role_if(PM_PRIEST))
         obj->bknown = TRUE;
