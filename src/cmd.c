@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1446975462 2015/11/08 09:37:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.206 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1449736557 2015/12/10 08:35:57 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.208 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2245,8 +2245,10 @@ int final;
         }
     }
 
-    /* named fruit debugging (doesn't really belong here...) */
-    if (wizard) {
+#ifdef DEBUG
+    /* named fruit debugging (doesn't really belong here...); to enable,
+       include 'fruit' in DEBUGFILES list (even though it isn't a file...) */
+    if (wizard && explicitdebug("fruit")) {
         int fcount = 0;
         struct fruit *f;
         char buf2[BUFSZ];
@@ -2260,6 +2262,7 @@ int final;
         Sprintf(buf, "%d", flags.made_fruit);
         enl_msg("The made fruit flag ", "is ", "was ", buf, "");
     }
+#endif
 
     {
         const char *p;
