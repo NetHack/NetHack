@@ -1,4 +1,4 @@
-/* NetHack 3.6	mswproc.c	$NHDT-Date: 1449116670 2015/12/03 04:24:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.94 $ */
+/* NetHack 3.6	mswproc.c	$NHDT-Date: 1449751720 2015/12/10 12:48:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.95 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -12,6 +12,7 @@
 #include "func_tab.h" /* for extended commands */
 #include "winMS.h"
 #include <assert.h>
+#include <mmsystem.h>
 #include "mhmap.h"
 #include "mhstatus.h"
 #include "mhtext.h"
@@ -1640,6 +1641,8 @@ mswin_getlin(const char *question, char *input)
                     if (len > 0)
                         len--;
                     input[len] = '\0';
+                } else if (len>=(BUFSZ-1)) {
+                    PlaySound((LPCSTR)SND_ALIAS_SYSTEMEXCLAMATION, NULL, SND_ALIAS_ID|SND_ASYNC);
                 } else {
                     input[len++] = c;
                     input[len] = '\0';

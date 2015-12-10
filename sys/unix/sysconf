@@ -31,6 +31,12 @@ EXPLORERS=*
 #SHELLERS=
 
 # Limit the number of simultaneous games (see also nethack.sh).
+# Valid values are 0-25.
+# Commenting this out or setting the value to 0 constructs lock files
+# with UID and playername, so each user may have one game at a time,
+# but number of different players is not limited.
+# Setting this to any other value constructs the lock files with
+# letter and "lock" (eg. alock, block, ...)
 MAXPLAYERS=10
 
 # If not null, added to string "To get local support, " in the support

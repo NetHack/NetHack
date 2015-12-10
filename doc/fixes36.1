@@ -2,10 +2,25 @@ $NHDT-Branch$:$NHDT-Revision$ $NHDT-Date$
 
 General Fixes and Modified Features
 -----------------------------------
+doc/*.6 man pages and corresponding doc/*.txt text copies were out of date
+data.base entry for "lava" had wrong first name for Don Woods' attribution
+cursed genocide of "none" sent in monsters, but "that's enough tries" didn't
+update MAXPLAYERS documentation in sysconf file and allow 0 for it
+wizard mode: don't include feedback about named fruit for ^X and enlightenment
+looking at distant objects while wearing the Eyes of the Overworld made their
+	up-close descriptions known when not intended
 
 
 Platform- and/or Interface-Specific Fixes
 -----------------------------------------
+unix/X11: in top level Makefile, some commented out definitions of VARDATND
+	misspelled pilemark.xbm (as pilemark.xpm)
+win32gui: getversionstring() was overflowing the provided Help About buffer
+win32gui: guard against buffer overflow in in mswin_getlin()
+MacOSX: initial binary release was built from out of date source code that
+	had 'BETA' and 'DEBUG' inappropriately enabled
+X11: core bug for '`' (backtick) command was only noticed by X11 interface,
+	which issued impossible message "add_menu: called before start_menu"
 
 
 General New Features
