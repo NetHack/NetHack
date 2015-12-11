@@ -2139,8 +2139,6 @@ int src;
         ++bufp; /* skip '='; parseoptions() handles spaces */
 
         parseoptions(bufp, TRUE, TRUE);
-        if (plname[0])      /* If a name was given */
-            plnamesuffix(); /* set the character class */
     } else if (match_varname(buf, "AUTOPICKUP_EXCEPTION", 5)) {
         add_autopickup_exception(bufp);
     } else if (match_varname(buf, "MSGTYPE", 7)) {
@@ -2215,7 +2213,6 @@ int src;
 
     } else if (match_varname(buf, "NAME", 4)) {
         (void) strncpy(plname, bufp, PL_NSIZ - 1);
-        plnamesuffix();
     } else if (match_varname(buf, "ROLE", 4)
                || match_varname(buf, "CHARACTER", 4)) {
         if ((len = str2role(bufp)) >= 0)
