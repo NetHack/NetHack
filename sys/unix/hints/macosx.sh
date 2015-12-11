@@ -91,6 +91,15 @@ xgroup2)
 	fi
 	;;
 
+xeditsysconf)
+	sed   's/^GDBPATH/#GDBPATH/' $2 \
+	| sed 's/^GREPPATH=\/bin\/grep/GREPPATH=\/usr\/bin\/grep/' \
+	| sed 's/^PANICTRACE_GDB=[12]/PANICTRACE_GDB=0/' \
+	| sed 's/^#OPTIONS=.*/&\
+OPTIONS=!use_darkgray/' \
+	> $3
+	;;
+
 #% dscl localhost -read /Search/Groups/wheel
 # AppleMetaNodeLocation: /Local/Default
 # GeneratedUID: ABCDEFAB-CDEF-ABCD-EFAB-CDEF00000000
