@@ -1,4 +1,4 @@
-/* NetHack 3.6	muse.c	$NHDT-Date: 1447987786 2015/11/20 02:49:46 $  $NHDT-Branch: master $:$NHDT-Revision: 1.68 $ */
+/* NetHack 3.6	muse.c	$NHDT-Date: 1449799863 2015/12/11 02:11:03 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.69 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -138,12 +138,19 @@ struct obj *obj;
         && !rn2(WAND_BACKFIRE_CHANCE)) {
         int dam = d(obj->spe + 2, 6);
 
-        if (!Deaf) {
-            if (vis)
-                pline("%s zaps %s, which suddenly explodes!", Monnam(mon),
-                      an(xname(obj)));
-            else
-                You_hear("a zap and an explosion in the distance.");
+        /* 3.6.1: no Deaf filter; 'if' message doesn't warrant it, 'else'
+           message doesn't need it since Your_hear() has one of its own */
+        if (vis) {
+            pline("%s zaps %s, which suddenly explodes!", Monnam(mon),
+                  an(xname(obj)));
+        } else {
+            /* same near/far threshold as mzapmsg() */
+            int range = couldsee(mon->mx, mon->my) /* 9 or 5 */
+                           ? (BOLT_LIM + 1) : (BOLT_LIM - 3);
+
+            You_hear("a zap and an explosion %s.",
+                     (distu(mon->mx, mon->my) <= range * range)
+                        ? "nearby" : "in the distance");
         }
         m_useup(mon, obj);
         if (mon->mhp <= dam) {
@@ -164,11 +171,11 @@ struct obj *otmp;
 boolean self;
 {
     if (!canseemon(mtmp)) {
-        if (!Deaf)
-            You_hear("a %s zap.", (distu(mtmp->mx, mtmp->my)
-                                   <= (BOLT_LIM + 1) * (BOLT_LIM + 1))
-                                      ? "nearby"
-                                      : "distant");
+        int range = couldsee(mtmp->mx, mtmp->my) /* 9 or 5 */
+                       ? (BOLT_LIM + 1) : (BOLT_LIM - 3);
+
+        You_hear("a %s zap.", (distu(mtmp->mx, mtmp->my) <= range * range)
+                                 ? "nearby" : "distant");
     } else if (self) {
         pline("%s zaps %sself with %s!", Monnam(mtmp), mhim(mtmp),
               doname(otmp));
