@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1448241657 2015/11/23 01:20:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.243 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1449830206 2015/12/11 10:36:46 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.244 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2010,7 +2010,7 @@ boolean tinitial, tfrom_file;
                            op, SYMBOLS);
                 wait_synch();
             } else {
-                switch_symbols(TRUE);
+                switch_symbols(symset[PRIMARY].name != (char *) 0);
                 need_redraw = TRUE;
             }
         }

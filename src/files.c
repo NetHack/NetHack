@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1449296293 2015/12/05 06:18:13 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.192 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1449830204 2015/12/11 10:36:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.194 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2783,8 +2783,17 @@ int which_set;
         }
     }
     (void) fclose(fp);
-    if (!chosen_symset_end && !chosen_symset_start)
+    if (!chosen_symset_start && !chosen_symset_end) {
+        /* name caller put in symset[which_set].name was not found;
+           if it looks like "Default symbols", null it out and return
+           success to use the default; otherwise, return failure */
+        if (symset[which_set].name
+            && (fuzzymatch(symset[which_set].name, "Default symbols",
+                           " -_", TRUE)
+                || !strcmpi(symset[which_set].name, "default")))
+            clear_symsetentry(which_set, TRUE);
         return (symset[which_set].name == 0) ? 1 : 0;
+    }
     if (!chosen_symset_end) {
         raw_printf("Missing finish for symset \"%s\"",
                    symset[which_set].name ? symset[which_set].name
