@@ -1,4 +1,4 @@
-/* NetHack 3.6	vmstty.c	$NHDT-Date: 1432512790 2015/05/25 00:13:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
+/* NetHack 3.6	vmstty.c	$NHDT-Date: 1449801743 2015/12/11 02:42:23 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.17 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 /* tty.c - (VMS) version */
@@ -24,7 +24,7 @@
 #define TT$M_NOBRDCST 0x00020000    /* disable broadcast messages, but  */
 #define TT2$M_BRDCSTMBX 0x00000010  /* catch them in associated mailbox */
 #define TT2$M_APP_KEYPAD 0x00800000 /* application vs numeric keypad mode */
-#endif                              /* __GNUC__ */
+#endif /* __GNUC__ */
 #ifdef USE_QIO_INPUT
 #include <ssdef.h>
 #endif
@@ -44,7 +44,7 @@ static void NDECL(resettty);
 
 #define vms_ok(sts) ((sts) &1)
 #define META(c) ((c) | 0x80) /* 8th bit */
-#define CTRL(c) ((c) &0x1F)
+#define CTRL(c) ((c) & 0x1F)
 #define CMASK(c) (1 << CTRL(c))
 #define LIB$M_CLI_CTRLT CMASK('T') /* 0x00100000 */
 #define LIB$M_CLI_CTRLY CMASK('Y') /* 0x02000000 */
@@ -221,10 +221,10 @@ vms_getchar()
         }
     } else {
         /* abnormal input--either SMG didn't initialize properly or
-           vms_getchar() has been called recursively (via SIGINT handler).
+         * vms_getchar() has been called recursively (via SIGINT handler).
          */
         if (kb != 0)               /* must have been a recursive call */
-            smg$cancel_input(&kb); /*  from an interrupt handler	   */
+            smg$cancel_input(&kb); /*  from an interrupt handler      */
         key = getchar();
     }
     --recurse;
@@ -247,7 +247,7 @@ vms_getchar()
  * for two reasons:
  *    1) retain support for arrow keys, and
  *    2) treat other VTxxx function keys as <esc> for aborting
- *	various NetHack prompts.
+ *      various NetHack prompts.
  * The second reason is compelling; otherwise remaining chars of
  * an escape sequence get treated as inappropriate user commands.
  *
@@ -257,26 +257,25 @@ vms_getchar()
 /*=
      -- Summary of VTxxx-style keyboards and transmitted escape sequences. --
 Keypad codes are prefixed by 7 bit (\033 O) or 8 bit SS3:
-        keypad:  PF1 PF2 PF3 PF4       codes:	P   Q	R   S
-                  7   8   9   -			w   x	y   m
-                  4   5   6   .			t   u	v   n
-                  1   2   3  :en-:		q   r	s  : :
-                 ...0...  ,  :ter:	       ...p...	l  :M:
+        keypad:  PF1 PF2 PF3 PF4       codes:   P   Q   R   S
+                  7   8   9   -                 w   x   y   m
+                  4   5   6   .                 t   u   v   n
+                  1   2   3  :en-:              q   r   s  : :
+                 ...0...  ,  :ter:             ...p...  l  :M:
 Arrows are prefixed by either SS3 or CSI (either 7 or 8 bit), depending on
 whether the terminal is in application or numeric mode (ditto for PF keys):
-        arrows: <up> <dwn> <lft> <rgt>		A   B	D   C
-Additional function keys (vk201/vk401) generate CSI nn ~ (nn is 1 or 2
-digits):
+        arrows: <up> <dwn> <lft> <rgt>          A   B   D   C
+Additional function keys (vk201/vk401) generate CSI nn ~ (nn is 1 or 2 digits):
     vk201 keys:  F6 F7 F8 F9 F10   F11 F12 F13 F14  Help Do   F17 F18 F19 F20
    'nn' digits:  17 18 19 20 21    23  24  25  26    28  29   31  32  33  34
-     alternate:  ^C		   ^[  ^H  ^J		(when in VT100 mode)
-   edit keypad: <fnd> <ins> <rmv>     digits:	1   2	3
-                <sel> <prv> <nxt>		4   5	6
+     alternate:  ^C                ^[  ^H  ^J           (when in VT100 mode)
+   edit keypad: <fnd> <ins> <rmv>     digits:   1   2   3
+                <sel> <prv> <nxt>               4   5   6
 VT52 mode:  arrows and PF keys send ESCx where x is in A-D or P-S.
 =*/
 
 static const char *arrow_or_PF = "ABCDPQRS", /* suffix char */
-    *smg_keypad_codes = "PQRSpqrstuvwxyMmlnABDC";
+                  *smg_keypad_codes = "PQRSpqrstuvwxyMmlnABDC";
 /* PF1..PF4,KP0..KP9,enter,dash,comma,dot,up-arrow,down,left,right */
 /* Ultimate return value is (index into smg_keypad_codes[] + 256). */
 
@@ -310,6 +309,7 @@ register int c;
     if (vms_ok(sts) || sts == SS$_TIMEOUT) {
         register int cnt = iosb.trm_offset + iosb.trm_siz + inc;
         register char *p = seq_buf;
+
         if (c == ESC) /* check for 7-bit vt100/ANSI, or vt52 */
             if (*p == '[' || *p == 'O')
                 c = META(CTRL(*p++)), cnt--;
@@ -317,6 +317,7 @@ register int c;
                 c = SS3; /*CSI*/
         if (cnt > 0 && (c == SS3 || (c == CSI && strchr(arrow_or_PF, *p)))) {
             register char *q = strchr(smg_keypad_codes, *p);
+
             if (q)
                 result = 256 + (q - smg_keypad_codes);
             p++, --cnt; /* one more char consumed */
@@ -334,6 +335,7 @@ register int c;
                 }; /* note: there are several missing nn in CSI nn ~ values */
             int nn;
             char *q;
+
             *(p + cnt) = '\0'; /* terminate string */
             q = strchr(p, '~');
             if (q && sscanf(p, "%d~", &nn) == 1) {
@@ -373,7 +375,9 @@ setctty()
     }
 }
 
-static void resettty() /* atexit() routine */
+/* atexit() routine */
+static void
+resettty()
 {
     if (settty_needed) {
         bombing = TRUE; /* don't clear screen; preserve traceback info */
@@ -451,7 +455,8 @@ const char *s;
         disable_broadcast_trapping();
 #if 0  /* let SMG's exit handler do the cleanup (as per doc) */
 /* #ifndef USE_QIO_INPUT */
-	if (kb)  smg$delete_virtual_keyboard(&kb),  kb = 0;
+        if (kb)
+            smg$delete_virtual_keyboard(&kb),  kb = 0;
 #endif /* 0 (!USE_QIO_INPUT) */
         if (ctrl_mask)
             (void) lib$enable_ctrl(&ctrl_mask, 0);
@@ -502,12 +507,16 @@ setftty()
     settty_needed = TRUE;
 }
 
-void intron() /* enable kbd interupts if enabled when game started */
+/* enable kbd interupts if enabled when game started */
+void
+intron()
 {
     intr_char = CTRL('C');
 }
 
-void introff() /* disable kbd interrupts if required*/
+/* disable kbd interrupts if required*/
+void
+introff()
 {
     intr_char = 0;
 }

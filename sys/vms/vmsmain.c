@@ -1,4 +1,4 @@
-/* NetHack 3.6	vmsmain.c	$NHDT-Date: 1432512790 2015/05/25 00:13:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.31 $ */
+/* NetHack 3.6	vmsmain.c	$NHDT-Date: 1449801742 2015/12/11 02:42:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.32 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 /* main.c - VMS NetHack */
@@ -18,7 +18,7 @@ static void NDECL(byebye);
 #define vms_handler_type unsigned int
 #endif
 extern void FDECL(VAXC$ESTABLISH,
-                  (vms_handler_type (*) (genericptr_t, genericptr_t)));
+                         (vms_handler_type (*) (genericptr_t, genericptr_t)));
 static vms_handler_type FDECL(vms_handler, (genericptr_t, genericptr_t));
 #include <ssdef.h> /* system service status codes */
 #endif
@@ -54,13 +54,13 @@ char *argv[];
     choose_windows(DEFAULT_WINDOW_SYS);
 
 #ifdef CHDIR /* otherwise no chdir() */
-             /*
-              * See if we must change directory to the playground.
-              * (Perhaps hack is installed with privs and playground is
-              *  inaccessible for the player.)
-              * The logical name HACKDIR is overridden by a
-              *  -d command line option (must be the first option given)
-              */
+    /*
+     * See if we must change directory to the playground.
+     * (Perhaps hack is installed with privs and playground is
+     *  inaccessible for the player.)
+     * The logical name HACKDIR is overridden by a
+     *  -d command line option (must be the first option given)
+     */
     dir = nh_getenv("NETHACKDIR");
     if (!dir)
         dir = nh_getenv("HACKDIR");
@@ -225,7 +225,7 @@ attempt_restore:
     moveloop(resuming);
     exit(EXIT_SUCCESS);
     /*NOTREACHED*/
-    return (0);
+    return 0;
 }
 
 static void
@@ -357,8 +357,8 @@ static void
 whoami()
 {
     /*
-     * Who am i? Algorithm: 1. Use name as specified in NETHACKOPTIONS
-     *			2. Use lowercase of $USER  (if 1. fails)
+     * Who am i? Algorithm: 1. Use name as specified in NETHACKOPTIONS;
+     *                      2. Use lowercase of $USER (if 1. fails).
      * The resulting name is overridden by command line options.
      * If everything fails, or if the resulting name is some generic
      * account like "games" then eventually we'll ask him.
@@ -404,8 +404,8 @@ byebye()
 /* Condition handler to prevent byebye's hangup simulation
    from saving the game after a fatal error has occurred.  */
 /*ARGSUSED*/
-static vms_handler_type            /* should be `unsigned long', but the -*/
-    vms_handler(sigargs, mechargs) /*+ prototype in <signal.h> is screwed */
+static vms_handler_type         /* should be `unsigned long', but the -*/
+vms_handler(sigargs, mechargs)  /*+ prototype in <signal.h> is screwed */
 genericptr_t sigargs, mechargs; /* [0] is argc, [1..argc] are the real args */
 {
     unsigned long condition = ((unsigned long *) sigargs)[1];
@@ -416,7 +416,7 @@ genericptr_t sigargs, mechargs; /* [0] is argc, [1..argc] are the real args */
         program_state.done_hup = TRUE; /* pretend hangup has been attempted */
 #ifndef BETA
         if (wizard)
-#endif               /* !BETA */
+#endif
             abort(); /* enter the debugger */
     }
     return SS$_RESIGNAL;
@@ -441,10 +441,6 @@ port_help()
     display_file(PORT_HELP, TRUE);
 }
 #endif /* PORT_HELP */
-
-/* for KR1ED config, WIZARD is 0 or 1 and WIZARD_NAME is a string;
-   for usual config, WIZARD is the string and vmsconf.h forces WIZARD_NAME
-   to match it, avoiding need to test which one to use in string ops */
 
 /* validate wizard mode if player has requested access to it */
 boolean
