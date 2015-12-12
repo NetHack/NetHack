@@ -141,7 +141,7 @@ ROOTCHECK= [[ `id -u` == 0 ]] || ( echo "Must run install with sudo."; exit 1)
 # XXX it's nice we don't write over sysconf, but we've already erased it
 # make sure we have group GAMEUID and group GAMEGRP
 PREINSTALL= . sys/unix/hints/macosx.sh user2 $(GAMEUID); . sys/unix/hints/macosx.sh group2 $(GAMEGRP); mkdir $(SHELLDIR); chown $(GAMEUID) $(SHELLDIR)
-POSTINSTALL+= cp -n sys/unix/sysconf $(INSTDIR)/sysconf; $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf; chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
+POSTINSTALL+= sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(INSTDIR)/sysconf; $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf; chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
 CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
 else ifdef WANT_SOURCE_INSTALL
 PREFIX=$(abspath $(NHSROOT))
@@ -172,7 +172,7 @@ ifdef WANT_WIN_X11
 # install nethack.rc as ~/.nethackrc if no ~/.nethackrc exists
 PREINSTALL= cp -n win/X11/nethack.rc ~/.nethackrc
 endif	# WANT_WIN_X11
-POSTINSTALL+= cp -n sys/unix/sysconf $(INSTDIR)/sysconf; $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf; chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
+POSTINSTALL+= sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(INSTDIR)/sysconf; $(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf; $(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf; chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
 CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
 endif	# !WANT_SOURCE_INSTALL
 

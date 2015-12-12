@@ -92,12 +92,16 @@ xgroup2)
 	;;
 
 xeditsysconf)
-	sed   's/^GDBPATH/#GDBPATH/' $2 \
-	| sed 's/^GREPPATH=\/bin\/grep/GREPPATH=\/usr\/bin\/grep/' \
-	| sed 's/^PANICTRACE_GDB=[12]/PANICTRACE_GDB=0/' \
-	| sed 's/^#OPTIONS=.*/&\
+	src=$2
+	dest=$3
+	if ! [ -e $dest ]; then
+		sed   's/^GDBPATH/#GDBPATH/' $src \
+		| sed 's/^GREPPATH=\/bin\/grep/GREPPATH=\/usr\/bin\/grep/' \
+		| sed 's/^PANICTRACE_GDB=[12]/PANICTRACE_GDB=0/' \
+		| sed 's/^#OPTIONS=.*/&\
 OPTIONS=!use_darkgray/' \
-	> $3
+		> $dest
+	fi
 	;;
 
 #% dscl localhost -read /Search/Groups/wheel
