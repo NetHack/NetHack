@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1449269918 2015/12/04 22:58:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.199 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1449908726 2015/12/12 08:25:26 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.200 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1741,7 +1741,8 @@ register struct monst *mtmp;
         int x = mtmp->mx, y = mtmp->my;
 
         /* this only happens if shapeshifted */
-        if (mndx >= LOW_PM && mndx != monsndx(mtmp->data)) {
+        if (mndx >= LOW_PM && mndx != monsndx(mtmp->data)
+            && !(mvitals[mndx].mvflags & G_GENOD)) {
             char buf[BUFSZ];
             boolean in_door = (amorphous(mtmp->data)
                                && closed_door(mtmp->mx, mtmp->my)),
