@@ -1,4 +1,4 @@
-/* NetHack 3.6	nttty.c	$NHDT-Date: 1431737067 2015/05/16 00:44:27 $  $NHDT-Branch: master $:$NHDT-Revision: 1.63 $ */
+/* NetHack 3.6	nttty.c	$NHDT-Date: 1449893262 2015/12/12 04:07:42 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.64 $ */
 /* Copyright (c) NetHack PC Development Team 1993    */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -258,6 +258,8 @@ int mode;
     DWORD cmode;
     long mask;
 
+    GUILaunched = 0;
+
     try :
         /* The following lines of code were suggested by
          * Bob Landau of Microsoft WIN32 Developer support,
@@ -265,14 +267,10 @@ int mode;
          * we were launched from the command prompt, or from
          * the NT program manager. M. Allison
          */
-        hStdOut
-        = GetStdHandle(STD_OUTPUT_HANDLE);
+    hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+
     if (hStdOut) {
         GetConsoleScreenBufferInfo(hStdOut, &origcsbi);
-        GUILaunched = ((origcsbi.dwCursorPosition.X == 0)
-                       && (origcsbi.dwCursorPosition.Y == 0));
-        if ((origcsbi.dwSize.X <= 0) || (origcsbi.dwSize.Y <= 0))
-            GUILaunched = 0;
     } else if (mode) {
         HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
         HANDLE hStdIn = GetStdHandle(STD_INPUT_HANDLE);
@@ -286,10 +284,14 @@ int mode;
             freopen("CON", "r", stdin);
         }
         mode = 0;
-        goto try
-            ;
-    } else
+        goto try;
+    } else {
         return;
+    }
+
+    /* Obtain handles for the standard Console I/O devices */
+    hConIn = GetStdHandle(STD_INPUT_HANDLE);
+    hConOut = GetStdHandle(STD_OUTPUT_HANDLE);
 
     load_keyboard_handler();
     /* Initialize the function pointer that points to
@@ -297,9 +299,6 @@ int mode;
     */
     nt_kbhit = nttty_kbhit;
 
-    /* Obtain handles for the standard Console I/O devices */
-    hConIn = GetStdHandle(STD_INPUT_HANDLE);
-    hConOut = GetStdHandle(STD_OUTPUT_HANDLE);
 #if 0
 	hConIn = CreateFile("CONIN$",
 			GENERIC_READ |GENERIC_WRITE,

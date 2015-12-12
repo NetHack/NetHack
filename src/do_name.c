@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1446808440 2015/11/06 11:14:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.77 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1449914085 2015/12/12 09:54:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.78 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -504,6 +504,16 @@ register struct obj *obj;
     /* strip leading and trailing spaces; unnames item if all spaces */
     (void) mungspaces(buf);
 
+    /*
+     * We don't violate illiteracy conduct here, although it is
+     * arguable that we should for anything other than "X".  Doing so
+     * would make attaching player's notes to hero's inventory have an
+     * in-game effect, which may or may not be the correct thing to do.
+     *
+     * We do violate illiteracy in oname() if player creates Sting or
+     * Orcrist, clearly being literate (no pun intended...).
+     */
+
     /* relax restrictions over proper capitalization for artifacts */
     if ((aname = artifact_name(buf, &objtyp)) != 0 && objtyp == obj->otyp)
         Strcpy(buf, aname);
@@ -573,6 +583,8 @@ const char *name;
         /* if obj is owned by a shop, increase your bill */
         if (obj->unpaid)
             alter_cost(obj, 0L);
+        /* violate illiteracy conduct since successfully wrote arti-name */
+        u.uconduct.literate++;
     }
     if (carried(obj))
         update_inventory();

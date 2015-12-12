@@ -9,6 +9,12 @@ update MAXPLAYERS documentation in sysconf file and allow 0 for it
 wizard mode: don't include feedback about named fruit for ^X and enlightenment
 looking at distant objects while wearing the Eyes of the Overworld made their
 	up-close descriptions known when not intended
+message when cursed wand zapped by a monster happens to explode was suppressed
+	if hero was deaf, even though that message has no audible component
+support explicit 'symset:default' and 'symset:Default symbols' in options
+crash during startup if player name set as 'player' in defaults
+any existing vampire shape-shifted into critter (fog cloud, bat, wolf) became
+	an unkillable critter if vampires were genocided
 
 
 Platform- and/or Interface-Specific Fixes
@@ -25,6 +31,7 @@ X11: core bug for '`' (backtick) command was only noticed by X11 interface,
 
 General New Features
 --------------------
+naming Sting or Orcrist now breaks illiterate conduct
 
 
 Platform- and/or Interface-Specific New Features
@@ -37,4 +44,3 @@ NetHack Community Patches (or Variation) Included
 
 Code Cleanup and Reorganization
 -------------------------------
-
