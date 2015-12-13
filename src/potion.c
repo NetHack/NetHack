@@ -1,4 +1,4 @@
-/* NetHack 3.6	potion.c	$NHDT-Date: 1446861768 2015/11/07 02:02:48 $  $NHDT-Branch: master $:$NHDT-Revision: 1.121 $ */
+/* NetHack 3.6	potion.c	$NHDT-Date: 1449977945 2015/12/13 03:39:05 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.122 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1759,6 +1759,7 @@ dodip()
     char allowall[2];
     short mixture;
     char qbuf[QBUFSZ], qtoo[QBUFSZ];
+    const char *shortestname; /* last resort obj name for prompt */
 
     allowall[0] = ALL_CLASSES;
     allowall[1] = '\0';
@@ -1767,13 +1768,13 @@ dodip()
     if (inaccessible_equipment(obj, "dip", FALSE))
         return 0;
 
-    Sprintf(qbuf, "dip %s into", thesimpleoname(obj));
+    shortestname = is_plural(obj) ? "them" : "it";
     here = levl[u.ux][u.uy].typ;
     /* Is there a fountain to dip into here? */
     if (IS_FOUNTAIN(here)) {
         /* "Dip <the object> into the fountain?" */
-        Sprintf(qtoo, "%s the fountain?", qbuf);
-        if (yn(upstart(qtoo)) == 'y') {
+        if (yn(safe_qbuf(qbuf, "Dip ", " into the fountain?", obj,
+                         doname, thesimpleoname, shortestname)) == 'y') {
             dipfountain(obj);
             return 1;
         }
@@ -1781,8 +1782,9 @@ dodip()
         const char *pooltype = waterbody_name(u.ux, u.uy);
 
         /* "Dip <the object> into the {pool, moat, &c}?" */
-        Sprintf(qtoo, "%s the %s?", qbuf, pooltype);
-        if (yn(upstart(qtoo)) == 'y') {
+        Sprintf(qtoo, " into the %s?", pooltype);
+        if (yn(safe_qbuf(qbuf, "Dip ", qtoo, obj,
+                         doname, thesimpleoname, shortestname)) == 'y') {
             if (Levitation) {
                 floating_above(pooltype);
             } else if (u.usteed && !is_swimmer(u.usteed->data)
@@ -1799,6 +1801,9 @@ dodip()
     }
 
     /* "What do you want to dip <the object> into?" */
+    Strcpy(qbuf, safe_qbuf(qtoo, "What do you want to dip ", " into?", obj,
+                           doname, thesimpleoname, shortestname)
+                 + sizeof "What do you want to " - sizeof "");
     potion = getobj(beverages, qbuf); /* "dip into" */
     if (!potion)
         return 0;
