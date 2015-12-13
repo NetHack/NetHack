@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1449645144 2015/12/09 07:12:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.126 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1449972474 2015/12/13 02:07:54 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.127 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1050,9 +1050,12 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             useup(otmp);
             break;
         }
-        s = scursed ? -1 : otmp->spe >= 9
-                               ? (rn2(otmp->spe) == 0)
-                               : sblessed ? rnd(3 - otmp->spe / 3) : 1;
+        s = scursed ? -1
+                    : (otmp->spe >= 9)
+                       ? (rn2(otmp->spe) == 0)
+                       : sblessed
+                          ? rnd(3 - otmp->spe / 3)
+                          : 1;
         if (s >= 0 && Is_dragon_scales(otmp)) {
             /* dragon scales get turned into dragon scale mail */
             pline("%s merges and hardens!", Yname2(otmp));
@@ -1075,8 +1078,8 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
               s == 0 ? "violently " : "",
               otense(otmp, Blind ? "vibrate" : "glow"),
               (!Blind && !same_color) ? " " : "",
-              (Blind || same_color) ? ""
-                                    : hcolor(scursed ? NH_BLACK : NH_SILVER),
+              (Blind || same_color)
+                 ? "" : hcolor(scursed ? NH_BLACK : NH_SILVER),
               (s * s > 1) ? "while" : "moment");
         /* [this cost handling will need updating if shop pricing is
            ever changed to care about curse/bless status of armor] */
@@ -1086,6 +1089,8 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             curse(otmp);
         else if (sblessed && !otmp->blessed)
             bless(otmp);
+        else if (!scursed && otmp->cursed)
+            uncurse(otmp);
         if (s) {
             otmp->spe += s;
             adj_abon(otmp, s);
