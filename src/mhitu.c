@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitu.c	$NHDT-Date: 1446854230 2015/11/06 23:57:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.130 $ */
+/* NetHack 3.6	mhitu.c	$NHDT-Date: 1450016149 2015/12/13 14:15:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.131 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -827,7 +827,7 @@ struct monst *mon;
     } else if (mc < 1) {
         /* intrinsic Protection is weaker (play balance; obtaining divine
            protection is too easy); it confers minimum mc 1 instead of 0 */
-        if ((is_you && ((HProtection && u.ublessed) || u.uspellprot))
+        if ((is_you && ((HProtection && u.ublessed > 0) || u.uspellprot))
             /* aligned priests and angels have innate intrinsic Protection */
             || (mon->data == &mons[PM_ALIGNED_PRIEST] || is_minion(mon->data)))
             mc = 1;
