@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1449740045 2015/12/10 09:34:05 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.155 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1449975408 2015/12/13 02:56:48 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.156 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1874,6 +1874,15 @@ const char *const *alt_as_is; /* another set like as_is[] */
         }
     }
 
+    /* avoid false hit on one_off[].plur == "lice";
+       if more of these turn up, one_off[] entries will need to flagged
+       as to which are whole words and which are matchable as suffices
+       then matching in the loop below will end up becoming more complex */
+    if (!strcmpi(basestr, "slice")) {
+        if (to_plural)
+            (void) strkitten(basestr, 's');
+        return TRUE;
+    }
     for (sp = one_off; sp->sing; sp++) {
         /* check whether endstring already matches */
         same = to_plural ? sp->plur : sp->sing;
