@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1449914085 2015/12/12 09:54:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.78 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1449982602 2015/12/13 04:56:42 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.79 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -463,7 +463,7 @@ do_mname()
     /* unique monsters have their own specific names or titles;
        shopkeepers, temple priests and other minions use alternate
        name formatting routines which ignore any user-supplied name */
-    if (mtmp->data->geno & G_UNIQ)
+    if ((mtmp->data->geno & G_UNIQ) && !mtmp->ispriest)
         pline("%s doesn't like being called names!", upstart(monnambuf));
     else if (mtmp->isshk
              && !(Deaf || mtmp->msleeping || !mtmp->mcanmove
