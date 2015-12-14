@@ -1,4 +1,4 @@
-/* NetHack 3.6	dogmove.c	$NHDT-Date: 1446604109 2015/11/04 02:28:29 $  $NHDT-Branch: master $:$NHDT-Revision: 1.56 $ */
+/* NetHack 3.6	dogmove.c	$NHDT-Date: 1450061092 2015/12/14 02:44:52 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.57 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1094,8 +1094,8 @@ struct monst *mtmp;
            (on the other hand, perhaps you're sensing a brief glimpse
            of its mind as it changes form) */
         newsym(mtmp->mx, mtmp->my);
-        You("%s %s appear where %s was!",
-            cansee(mtmp->mx, mtmp->my) ? "see" : "sense",
+        You("%s %s %sappear%s where %s was!",
+            cansee(mtmp->mx, mtmp->my) ? "see" : "sense that",
             (mtmp->m_ap_type == M_AP_FURNITURE)
                 ? an(defsyms[mtmp->mappearance].explanation)
                 : (mtmp->m_ap_type == M_AP_OBJECT
@@ -1107,6 +1107,8 @@ struct monst *mtmp;
                             : (mtmp->m_ap_type == M_AP_MONSTER)
                                   ? an(mons[mtmp->mappearance].mname)
                                   : something,
+            cansee(mtmp->mx, mtmp->my) ? "" : "has ",
+            cansee(mtmp->mx, mtmp->my) ? "" : "ed",
             buf);
         display_nhwindow(WIN_MAP, TRUE);
     }
