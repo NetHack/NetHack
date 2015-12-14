@@ -1,5 +1,5 @@
-.TH RECOVER 6 "7 December 2015"
-.\" NetHack 3.6  recover.6	$NHDT-Date: 1449616497 2015/12/08 23:14:57 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.7 $
+.TH RECOVER 6 "9 January 1993"
+.\" NetHack 3.6  recover.6	$NHDT-Date: 1450129883 2015/12/14 21:51:23 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.8 $
 .UC 4
 .SH NAME
 recover \- recover a NetHack game interrupted by disaster
@@ -34,11 +34,26 @@ It overrides the value from NETHACKDIR, HACKDIR, or the directory
 specified by the game administrator during compilation
 (usually /usr/games/lib/nethackdir).
 .PP
+^?ALLDOCS
 For recovery to be possible,
-the run-time option
+.I nethack
+must have been compiled with the INSURANCE option, and the run-time option
 .I checkpoint
-must have been on.
-.PP
+must also have been on.
+^:
+^?INSURANCE
+For recovery to be possible,
+.I nethack
+must have been compiled with the INSURANCE option (this configuration was),
+and the run-time option
+.I checkpoint
+must also have been on.
+^:
+This configuration of
+.I nethack
+was created without support for recovery.
+^.
+^.
 NetHack normally writes out files for levels as the player leaves them,
 so they will be ready for return visits.
 When checkpointing, NetHack also writes out the level entered and
