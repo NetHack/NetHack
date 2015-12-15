@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1449982602 2015/12/13 04:56:42 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.79 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1450178550 2015/12/15 11:22:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.80 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -54,7 +54,7 @@ const char *goal;
     putstr(tmpwin, 0, "Use [HJKL] to move the cursor 8 units at a time.");
     putstr(tmpwin, 0, "Or enter a background symbol (ex. <).");
     putstr(tmpwin, 0, "Use @ to move the cursor on yourself.");
-    if (getpos_hilitefunc != NULL)
+    if (getpos_hilitefunc)
         putstr(tmpwin, 0, "Use $ to display valid locations.");
     putstr(tmpwin, 0, "Use # to toggle automatic description.");
     /* disgusting hack; the alternate selection characters work for any
@@ -197,7 +197,7 @@ const char *goal;
             /* update message window to reflect that we're still targetting */
             show_goal_msg = TRUE;
             msg_given = TRUE;
-        } else if ((c == '$') && (getpos_hilitefunc != NULL)) {
+        } else if (c == '$' && getpos_hilitefunc) {
             if (!hilite_state) {
                 (*getpos_hilitefunc)(0);
                 (*getpos_hilitefunc)(1);
@@ -307,7 +307,7 @@ const char *goal;
         clear_nhwindow(WIN_MESSAGE);
     ccp->x = cx;
     ccp->y = cy;
-    getpos_hilitefunc = NULL;
+    getpos_hilitefunc = (void FDECL((*), (int))) 0;
     return result;
 }
 
