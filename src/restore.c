@@ -1,4 +1,4 @@
-/* NetHack 3.6	restore.c	$NHDT-Date: 1446892455 2015/11/07 10:34:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.101 $ */
+/* NetHack 3.6	restore.c	$NHDT-Date: 1450231174 2015/12/16 01:59:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.102 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -568,13 +568,10 @@ unsigned int *stuckid, *steedid;
     foo = time_from_yyyymmddhhmmss(timebuf);
 
     ReadTimebuf(ubirthday);
-    mread(fd, &urealtime.realtime, sizeof(urealtime.realtime));
-    ReadTimebuf(urealtime.restored);
-#if defined(BSD) && !defined(POSIX_TYPES)
-    (void) time((long *) &urealtime.restored);
-#else
-    (void) time(&urealtime.restored);
-#endif
+    mread(fd, &urealtime.realtime, sizeof urealtime.realtime);
+    ReadTimebuf(urealtime.start_timing); /** [not used] **/
+    /* current time is the time to use for next urealtime.realtime update */
+    urealtime.start_timing = getnow();
 
     set_uasmon();
 #ifdef CLIPPING
