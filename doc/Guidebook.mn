@@ -1,11 +1,11 @@
-.\" $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.189 $ $NHDT-Date: 1450187428 2015/12/15 13:50:28 $
+.\" $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.191 $ $NHDT-Date: 1450306152 2015/12/16 22:49:12 $
 .ds h0 "NetHack Guidebook
 .ds h1
 .ds h2 %
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "December 15, 2015
+.ds f2 "December 16, 2015
 .\" labeled paragraph start (should be part of tmac.n, but I don't want to
 .\" make changes to that file)
 .\" .PS word
@@ -3485,15 +3485,22 @@ with some of the beloved community patches. Many bugs were fixed and a
 large amount of code was restructured.
 .pg
 \fBThe development team, as well as \fBSteve VanDevender\fP and 
-\fBKevin Smolkowski\fP ensured that NetHack 3.6.0 continued to operate on 
+\fBKevin Smolkowski\fP ensured that NetHack 3.6 continued to operate on 
 various Unix flavors and maintained the X11 interface. 
 .pg
 \fBKen Lorber\fP, \fBHaoyang Wang\fP, \fBPat Rankin\fP, and \fBDean Luick\fP 
-maintained the port of NetHack 3.6.0 for Mac.
+maintained the port of NetHack 3.6 for Mac.
 .pg
 \fBMichael Allison\fP, \fBDerek S. Ray\fP, \fBYitzhak Sapir\fP, 
 \fBAlex Kompel\fP, and \fBDion Nicolaas\fP maintained the port of 
-NetHack 3.6.0 for Microsoft Windows.
+NetHack 3.6 for Microsoft Windows.
+.pg
+The 3.6 development team consisting of
+\fBMichael Allison\fP, \fBWarwick Allison\fP, \fBKen Arromdee\fP,
+\fBDavid Cohrs\fP, \fBJessie Collet\fP, \fBSean Hunt\fP, 
+\fBPasi Kallinen\fP, \fBKen Lorber\fP, \fBDean Luick\fP, \fBPat Rankin\fP, 
+\fBMike Stephenson\fP, \fBDerek S. Ray\fP, \fBJanet Walz\fP, and \fBPaul Winner\fP
+released 3.6.1 as a bug fix release in January 2016.
 .pg
 The official NetHack web site is maintained by \fBKen Lorber\fP at http://www.nethack.org/.
 .pg

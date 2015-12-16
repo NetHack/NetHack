@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1447576348 2015/11/15 08:32:28 $  $NHDT-Branch: master $:$NHDT-Revision: 1.179 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1450306195 2015/12/16 22:49:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.180 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -820,7 +820,7 @@ have_lizard()
     return FALSE;
 }
 
-/* 3.6.0 tribute */
+/* 3.6 tribute */
 struct obj *
 u_have_novel()
 {

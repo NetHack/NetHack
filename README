@@ -1,13 +1,13 @@
-                NetHack 3.6.0 -- General information
+                NetHack 3.6.1 -- General information
 
 NetHack 3.6 is an enhancement to the dungeon exploration game NetHack.
 It is a distant descendent of Rogue and Hack, and a direct descendent of
 NetHack 3.4. In order to avoid confusion with interim development code 
 that was posted online in 2014 by others, there is no NetHack 3.5 release.
 
-NetHack 3.6.0 contains some code reorganization, new features, and bugfixes.
+NetHack 3.6.1 contains several dozen bugfixes.
 
-The file doc/fixes36.0 in the source distribution has a full list of each. 
+The file doc/fixes36.1 in the source distribution has a full list of each. 
 The text in there was written for the development team's own use and is 
 provided "as is", so please do not ask us to further explain the entries 
 in that file. Some entries might be considered "spoilers", particularly
