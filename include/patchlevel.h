@@ -1,4 +1,4 @@
-/* NetHack 3.6	patchlevel.h	$NHDT-Date: 1450306182 2015/12/16 22:49:42 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.114 $ */
+/* NetHack 3.6	patchlevel.h	$NHDT-Date: 1450306740 2015/12/16 22:59:00 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.115 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -30,7 +30,7 @@
  * PP = patch level, ee = edit level, L = literal suffix "L",
  * with all four numbers specified as two hexadecimal digits.
  */
-#define VERSION_COMPATIBILITY 0x03060000L
+#define VERSION_COMPATIBILITY 0x03060002L
 
 /****************************************************************************/
 /* Version 3.6.x */
