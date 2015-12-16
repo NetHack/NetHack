@@ -1970,6 +1970,9 @@ The default is to randomly pick an appropriate alignment.
 If you prefix a `!' or ``no'' to the value, you can 
 exclude that alignment from being picked randomly.
 Cannot be set with the `O' command.  Persistent.
+.lp autodescribe
+Automatically describe the terrain under cursor when asked to get a location
+on the map.
 .lp autodig
 Automatically dig if you are wielding a digging tool and moving into a place
 that can be dug (default false). Persistent.

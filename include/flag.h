@@ -212,6 +212,7 @@ struct instance_flags {
     boolean use_status_hilites;   /* use color in status line */
     boolean use_background_glyph; /* use background glyph when appropriate */
     boolean hilite_pile;          /* mark piles of objects with a hilite */
+    boolean autodescribe;     /* autodescribe mode in getpos() */
 #if 0
 	boolean  DECgraphics;	/* use DEC VT-xxx extended character set */
 	boolean  IBMgraphics;	/* use IBM extended character set */

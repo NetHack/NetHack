@@ -80,7 +80,6 @@ const char *goal;
     int cx, cy, i, c;
     int sidx, tx, ty;
     boolean msg_given = TRUE; /* clear message window by default */
-    boolean auto_msg = FALSE;
     boolean show_goal_msg = FALSE;
     static const char pick_chars[] = ".,;:";
     const char *cp;
@@ -108,7 +107,7 @@ const char *goal;
             curs(WIN_MAP, cx, cy);
             flush_screen(0);
             show_goal_msg = FALSE;
-        } else if (auto_msg && !msg_given && !hilite_state) {
+        } else if (iflags.autodescribe && !msg_given && !hilite_state) {
             coord cc;
             int sym = 0;
             char tmpbuf[BUFSZ];
@@ -132,7 +131,7 @@ const char *goal;
             flush_screen(0);
         }
 
-        if (auto_msg)
+        if (iflags.autodescribe)
             msg_given = FALSE;
 
         if (c == '\033') {
@@ -205,11 +204,11 @@ const char *goal;
             }
             goto nxtc;
         } else if (c == '#') {
-            auto_msg = !auto_msg;
+            iflags.autodescribe = !iflags.autodescribe;
             pline("Automatic description %sis %s.",
                   flags.verbose ? "of features under cursor " : "",
-                  auto_msg ? "on" : "off");
-            if (!auto_msg)
+                  iflags.autodescribe ? "on" : "off");
+            if (!iflags.autodescribe)
                 show_goal_msg = TRUE;
             msg_given = TRUE;
             goto nxtc;
