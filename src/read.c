@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1449972474 2015/12/13 02:07:54 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.127 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1450261365 2015/12/16 10:22:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.128 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -970,12 +970,16 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
 #ifdef MAIL
     case SCR_MAIL:
         known = TRUE;
-        if (sobj->spe)
+        if (sobj->spe == 2)
+            /* "stamped scroll" created via magic marker--without a stamp */
+            pline("This scroll is marked \"postage due\".");
+        else if (sobj->spe)
+            /* scroll of mail obtained from bones file or from wishing;
+             * note to the puzzled: the game Larn actually sends you junk
+             * mail if you win!
+             */
             pline(
     "This seems to be junk mail addressed to the finder of the Eye of Larn.");
-        /* note to the puzzled: the game Larn actually sends you junk
-         * mail if you win!
-         */
         else
             readmail(sobj);
         break;

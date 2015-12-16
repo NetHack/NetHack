@@ -1,4 +1,4 @@
-/* NetHack 3.6	mail.c	$NHDT-Date: 1436754892 2015/07/13 02:34:52 $  $NHDT-Branch: master $:$NHDT-Revision: 1.20 $ */
+/* NetHack 3.6	mail.c	$NHDT-Date: 1450261364 2015/12/16 10:22:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.22 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -11,25 +11,24 @@
  * Notify user when new mail has arrived.  Idea by Merlyn Leroy.
  *
  * The mail daemon can move with less than usual restraint.  It can:
- *	- move diagonally from a door
- *	- use secret and closed doors
- *	- run through a monster ("Gangway!", etc.)
- *	- run over pools & traps
+ *      - move diagonally from a door
+ *      - use secret and closed doors
+ *      - run through a monster ("Gangway!", etc.)
+ *      - run over pools & traps
  *
  * Possible extensions:
- *	- Open the file MAIL and do fstat instead of stat for efficiency.
- *	  (But sh uses stat, so this cannot be too bad.)
- *	- Examine the mail and produce a scroll of mail named "From somebody".
- *	- Invoke MAILREADER in such a way that only this single letter is
- *read.
- *	- Do something to the text when the scroll is enchanted or cancelled.
- *	- Make the daemon always appear at a stairwell, and have it find a
- *	  path to the hero.
+ *      - Open the file MAIL and do fstat instead of stat for efficiency.
+ *        (But sh uses stat, so this cannot be too bad.)
+ *      - Examine the mail and produce a scroll of mail named "From somebody".
+ *      - Invoke MAILREADER in such a way that only this single mail is read.
+ *      - Do something to the text when the scroll is enchanted or cancelled.
+ *      - Make the daemon always appear at a stairwell, and have it find a
+ *        path to the hero.
  *
  * Note by Olaf Seibert: On the Amiga, we usually don't get mail.  So we go
- *			 through most of the effects at 'random' moments.
+ *                       through most of the effects at 'random' moments.
  * Note by Paul Winner:  The MSDOS port also 'fakes' the mail daemon at
- *			 random intervals.
+ *                       random intervals.
  */
 
 STATIC_DCL boolean FDECL(md_start, (coord *));
@@ -418,9 +417,9 @@ ckmailstatus()
         return;
     }
     if (--mustgetmail <= 0) {
-        static struct mail_info deliver = { MSG_MAIL,
-                                            "I have some mail for you", 0,
-                                            0 };
+        static struct mail_info deliver = {
+            MSG_MAIL, "I have some mail for you", 0, 0
+        };
         newmail(&deliver);
         mustgetmail = -1;
     }
@@ -429,7 +428,7 @@ ckmailstatus()
 /*ARGSUSED*/
 void
 readmail(otmp)
-struct obj *otmp;
+struct obj *otmp UNUSED;
 {
     static char *junk[] = {
         NULL, /* placeholder for "Report bugs to <devteam@nethack.org>.", */
@@ -502,7 +501,7 @@ ckmailstatus()
 /*ARGSUSED*/
 void
 readmail(otmp)
-struct obj *otmp;
+struct obj *otmp UNUSED;
 {
 #ifdef DEF_MAILREADER /* This implies that UNIX is defined */
     register const char *mr = 0;
@@ -518,8 +517,8 @@ struct obj *otmp;
 #else
 #ifndef AMS /* AMS mailboxes are directories */
     display_file(mailbox, TRUE);
-#endif      /* AMS */
-#endif      /* DEF_MAILREADER */
+#endif /* AMS */
+#endif /* DEF_MAILREADER */
 
     /* get new stat; not entirely correct: there is a small time
        window where we do not see new mail */
@@ -585,6 +584,8 @@ struct obj *otmp;
         vms_doshell(cmd, TRUE);
         (void) sleep(1);
     }
+#else
+    nhUse(otmp);
 #endif /* SHELL */
 }
 
