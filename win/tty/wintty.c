@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1450320157 2015/12/17 02:42:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.117 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1450363024 2015/12/17 14:37:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.118 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -331,14 +331,25 @@ void
 tty_player_selection()
 {
     int i, k, n, choice, nextpick;
-    boolean getconfirmation;
+    boolean getconfirmation, picksomething;
     char pick4u = 'n';
     char pbuf[QBUFSZ], plbuf[QBUFSZ];
     winid win;
     anything any;
     menu_item *selected = 0;
 
-    if (flags.randomall) {
+    /* Used to avoid "Is this ok?" if player has already specified all
+     * four facets of role.
+     * Note that rigid_role_checks might force any unspecified facets to
+     * have a specific value, but that will still require confirmation;
+     * player can specify the forced ones if avoiding that is demanded.
+     */
+    picksomething = (ROLE == ROLE_NONE || RACE == ROLE_NONE
+                     || GEND == ROLE_NONE || ALGN == ROLE_NONE);
+    /* Used for '-@';
+     * choose randomly without asking for all unspecified facets.
+     */
+    if (flags.randomall && picksomething) {
         if (ROLE == ROLE_NONE)
             ROLE = ROLE_RANDOM;
         if (RACE == ROLE_NONE)
@@ -349,7 +360,8 @@ tty_player_selection()
             ALGN = ROLE_RANDOM;
     }
 
-    /* prevent an unnecessary prompt */
+    /* prevent unnecessary prompting if role forces race (samurai) or gender
+       (valkyrie) or alignment (rogue), or race forces alignment (orc), &c */
     rigid_role_checks();
 
     /* Should we randomly pick for the player? */
@@ -742,7 +754,7 @@ makepicks:
      *           q - quit
      *           (end)
      */
-    getconfirmation = (pick4u != 'a' && !flags.randomall);
+    getconfirmation = (picksomething && pick4u != 'a' && !flags.randomall);
     while (getconfirmation) {
         tty_clear_nhwindow(BASE_WINDOW);
         role_selection_prolog(ROLE_NONE, BASE_WINDOW);
