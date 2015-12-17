@@ -1,4 +1,4 @@
-/* NetHack 3.6	role.c	$NHDT-Date: 1446861770 2015/11/07 02:02:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.34 $ */
+/* NetHack 3.6	role.c	$NHDT-Date: 1450320155 2015/12/17 02:42:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.35 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1927,7 +1927,7 @@ winid where;
         any.a_int = 0;
         /* use four spaces of padding to fake a grayed out menu choice */
         Sprintf(buf, "%4s%s forces %s", "", constrainer, forcedvalue);
-        add_menu(where, NO_GLYPH, &any, ' ', 0, ATR_NONE, buf,
+        add_menu(where, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
                  MENU_UNSELECTED);
     } else if (what) {
         any.a_int = RS_menu_arg(which);
