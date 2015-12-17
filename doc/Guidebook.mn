@@ -2671,7 +2671,8 @@ Regular expressions are normally POSIX extended regular expressions. It is
 possible to compile NetHack without regular expression support on a platform
 where there is no regular expression library. While this is not true of any
 modern platform, if your NetHack was built this way, patterns are instead glob
-patterns.
+patterns. This applies to Autopickup exceptions, Message types, Menu colors,
+and User sounds.
 .hn 2
 Configuring Autopickup Exceptions
 .pg
