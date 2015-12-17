@@ -1,4 +1,4 @@
-/* NetHack 3.6	save.c	$NHDT-Date: 1448241784 2015/11/23 01:23:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.95 $ */
+/* NetHack 3.6	save.c	$NHDT-Date: 1450231175 2015/12/16 01:59:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.98 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -289,12 +289,15 @@ register int fd, mode;
 #ifdef SYSFLAGS
     bwrite(fd, (genericptr_t) &sysflags, sizeof(struct sysflag));
 #endif
-    urealtime.realtime += (long) (getnow() - urealtime.restored);
+    urealtime.finish_time = getnow();
+    urealtime.realtime += (long) (urealtime.finish_time
+                                  - urealtime.start_timing);
     bwrite(fd, (genericptr_t) &u, sizeof(struct you));
     bwrite(fd, yyyymmddhhmmss(ubirthday), 14);
-    bwrite(fd, (genericptr_t) &urealtime.realtime,
-           sizeof(urealtime.realtime));
-    bwrite(fd, yyyymmddhhmmss(urealtime.restored), 14);
+    bwrite(fd, (genericptr_t) &urealtime.realtime, sizeof urealtime.realtime);
+    bwrite(fd, yyyymmddhhmmss(urealtime.start_timing), 14);  /** Why? **/
+    /* this is the value to use for the next update of urealtime.realtime */
+    urealtime.start_timing = urealtime.finish_time;
     save_killers(fd, mode);
 
     /* must come before migrating_objs and migrating_mons are freed */

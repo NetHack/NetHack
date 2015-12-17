@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1449914085 2015/12/12 09:54:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.78 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1450178550 2015/12/15 11:22:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.80 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -54,7 +54,7 @@ const char *goal;
     putstr(tmpwin, 0, "Use [HJKL] to move the cursor 8 units at a time.");
     putstr(tmpwin, 0, "Or enter a background symbol (ex. <).");
     putstr(tmpwin, 0, "Use @ to move the cursor on yourself.");
-    if (getpos_hilitefunc != NULL)
+    if (getpos_hilitefunc)
         putstr(tmpwin, 0, "Use $ to display valid locations.");
     putstr(tmpwin, 0, "Use # to toggle automatic description.");
     /* disgusting hack; the alternate selection characters work for any
@@ -80,7 +80,6 @@ const char *goal;
     int cx, cy, i, c;
     int sidx, tx, ty;
     boolean msg_given = TRUE; /* clear message window by default */
-    boolean auto_msg = FALSE;
     boolean show_goal_msg = FALSE;
     static const char pick_chars[] = ".,;:";
     const char *cp;
@@ -108,7 +107,7 @@ const char *goal;
             curs(WIN_MAP, cx, cy);
             flush_screen(0);
             show_goal_msg = FALSE;
-        } else if (auto_msg && !msg_given && !hilite_state) {
+        } else if (iflags.autodescribe && !msg_given && !hilite_state) {
             coord cc;
             int sym = 0;
             char tmpbuf[BUFSZ];
@@ -132,7 +131,7 @@ const char *goal;
             flush_screen(0);
         }
 
-        if (auto_msg)
+        if (iflags.autodescribe)
             msg_given = FALSE;
 
         if (c == '\033') {
@@ -197,7 +196,7 @@ const char *goal;
             /* update message window to reflect that we're still targetting */
             show_goal_msg = TRUE;
             msg_given = TRUE;
-        } else if ((c == '$') && (getpos_hilitefunc != NULL)) {
+        } else if (c == '$' && getpos_hilitefunc) {
             if (!hilite_state) {
                 (*getpos_hilitefunc)(0);
                 (*getpos_hilitefunc)(1);
@@ -205,11 +204,11 @@ const char *goal;
             }
             goto nxtc;
         } else if (c == '#') {
-            auto_msg = !auto_msg;
+            iflags.autodescribe = !iflags.autodescribe;
             pline("Automatic description %sis %s.",
                   flags.verbose ? "of features under cursor " : "",
-                  auto_msg ? "on" : "off");
-            if (!auto_msg)
+                  iflags.autodescribe ? "on" : "off");
+            if (!iflags.autodescribe)
                 show_goal_msg = TRUE;
             msg_given = TRUE;
             goto nxtc;
@@ -307,7 +306,7 @@ const char *goal;
         clear_nhwindow(WIN_MESSAGE);
     ccp->x = cx;
     ccp->y = cy;
-    getpos_hilitefunc = NULL;
+    getpos_hilitefunc = (void FDECL((*), (int))) 0;
     return result;
 }
 
@@ -463,7 +462,7 @@ do_mname()
     /* unique monsters have their own specific names or titles;
        shopkeepers, temple priests and other minions use alternate
        name formatting routines which ignore any user-supplied name */
-    if (mtmp->data->geno & G_UNIQ)
+    if ((mtmp->data->geno & G_UNIQ) && !mtmp->ispriest)
         pline("%s doesn't like being called names!", upstart(monnambuf));
     else if (mtmp->isshk
              && !(Deaf || mtmp->msleeping || !mtmp->mcanmove

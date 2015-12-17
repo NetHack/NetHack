@@ -1,4 +1,4 @@
-/* NetHack 3.6	you.h	$NHDT-Date: 1432512782 2015/05/25 00:13:02 $  $NHDT-Branch: master $:$NHDT-Revision: 1.29 $ */
+/* NetHack 3.6	you.h	$NHDT-Date: 1450231172 2015/12/16 01:59:32 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.30 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -68,10 +68,11 @@ struct u_achieve {
 };
 
 struct u_realtime {
-    long
-        realtime; /* actual playing time up until the last restore, seconds */
-    time_t restored; /* time the game was started or restored */
-    time_t endtime;
+    long   realtime;     /* accumulated playing time in seconds */
+    time_t start_timing; /* time game was started or restored or 'realtime'
+                            was last updated (savegamestate for checkpoint) */
+    time_t finish_time;  /* end of 'realtime' interval: time of save or
+                            end of game; used for topten/logfile/xlogfile */
 };
 
 /* KMH, conduct --

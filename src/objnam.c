@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1449740045 2015/12/10 09:34:05 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.155 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1450306207 2015/12/16 22:50:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.158 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1874,6 +1874,15 @@ const char *const *alt_as_is; /* another set like as_is[] */
         }
     }
 
+    /* avoid false hit on one_off[].plur == "lice";
+       if more of these turn up, one_off[] entries will need to flagged
+       as to which are whole words and which are matchable as suffices
+       then matching in the loop below will end up becoming more complex */
+    if (!strcmpi(basestr, "slice")) {
+        if (to_plural)
+            (void) strkitten(basestr, 's');
+        return TRUE;
+    }
     for (sp = one_off; sp->sing; sp++) {
         /* check whether endstring already matches */
         same = to_plural ? sp->plur : sp->sing;
@@ -3336,6 +3345,8 @@ typfnd:
         break;
 #ifdef MAIL
     case SCR_MAIL:
+        /* 0: delivered in-game via external event (or randomly for fake mail);
+           1: from bones or wishing; 2: written with marker */
         otmp->spe = 1;
         break;
 #endif
@@ -3468,7 +3479,7 @@ typfnd:
         if (aname && objtyp == otmp->otyp)
             name = aname;
 
-        /* 3.6.0 tribute - fix up novel */
+        /* 3.6 tribute - fix up novel */
         if (otmp->otyp == SPE_NOVEL) {
             const char *novelname;
 

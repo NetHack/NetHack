@@ -1,4 +1,4 @@
-/* NetHack 3.6	hacklib.c	$NHDT-Date: 1446336792 2015/11/01 00:13:12 $  $NHDT-Branch: master $:$NHDT-Revision: 1.44 $ */
+/* NetHack 3.6	hacklib.c	$NHDT-Date: 1450178551 2015/12/15 11:22:31 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.46 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) Robert Patrick Rankin, 1991                      */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -373,20 +373,24 @@ char *
 visctrl(c)
 char c;
 {
-    Static char ccc[3];
+    Static char ccc[5];
+    register int i = 0;
 
-    c &= 0177;
-    ccc[2] = '\0';
-    if (c < 040) {
-        ccc[0] = '^';
-        ccc[1] = c | 0100; /* letter */
-    } else if (c == 0177) {
-        ccc[0] = '^';
-        ccc[1] = c & ~0100; /* '?' */
-    } else {
-        ccc[0] = c; /* printable character */
-        ccc[1] = '\0';
+    if ((uchar) c & 0200) {
+        ccc[i++] = 'M';
+        ccc[i++] = '-';
     }
+    c &= 0177;
+    if (c < 040) {
+        ccc[i++] = '^';
+        ccc[i++] = c | 0100; /* letter */
+    } else if (c == 0177) {
+        ccc[i++] = '^';
+        ccc[i++] = c & ~0100; /* '?' */
+    } else {
+        ccc[i++] = c; /* printable character */
+    }
+    ccc[i] = '\0';
     return ccc;
 }
 

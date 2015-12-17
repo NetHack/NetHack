@@ -1,4 +1,4 @@
-/* NetHack 3.6	spell.c	$NHDT-Date: 1447653429 2015/11/16 05:57:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.72 $ */
+/* NetHack 3.6	spell.c	$NHDT-Date: 1450306224 2015/12/16 22:50:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.74 $ */
 /*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -430,7 +430,7 @@ register struct obj *spellbook;
     boolean too_hard = FALSE;
 
     /* attempting to read dull book may make hero fall asleep */
-    if (!confused && booktype != SPE_BLANK_PAPER
+    if (!confused && !Sleep_resistance
         && !strcmp(OBJ_DESCR(objects[booktype]), "dull")) {
         const char *eyes;
         int dullbook = rnd(25) - ACURR(A_WIS);
@@ -465,7 +465,7 @@ register struct obj *spellbook;
             return 1;
         }
 
-        /* 3.6.0 tribute */
+        /* 3.6 tribute */
         if (booktype == SPE_NOVEL) {
             /* Obtain current Terry Pratchett book title */
             const char *tribtitle = noveltitle(&spellbook->novelidx);

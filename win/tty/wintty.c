@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1449052583 2015/12/02 10:36:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.116 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1450320157 2015/12/17 02:42:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.117 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -418,7 +418,7 @@ makepicks:
                     /* add miscellaneous menu entries */
                     role_menu_extra(ROLE_RANDOM, win);
                     any.a_int = 0; /* separator, not a choice */
-                    add_menu(win, NO_GLYPH, &any, ' ', 0, ATR_NONE, "",
+                    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
                              MENU_UNSELECTED);
                     role_menu_extra(RS_RACE, win);
                     role_menu_extra(RS_GENDER, win);
@@ -502,7 +502,7 @@ makepicks:
                         /* add miscellaneous menu entries */
                         role_menu_extra(ROLE_RANDOM, win);
                         any.a_int = 0; /* separator, not a choice */
-                        add_menu(win, NO_GLYPH, &any, ' ', 0, ATR_NONE, "",
+                        add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
                                  MENU_UNSELECTED);
                         role_menu_extra(RS_ROLE, win);
                         role_menu_extra(RS_GENDER, win);
@@ -591,7 +591,7 @@ makepicks:
                         /* add miscellaneous menu entries */
                         role_menu_extra(ROLE_RANDOM, win);
                         any.a_int = 0; /* separator, not a choice */
-                        add_menu(win, NO_GLYPH, &any, ' ', 0, ATR_NONE, "",
+                        add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
                                  MENU_UNSELECTED);
                         role_menu_extra(RS_ROLE, win);
                         role_menu_extra(RS_RACE, win);
@@ -676,7 +676,7 @@ makepicks:
                         setup_algnmenu(win, TRUE, ROLE, RACE, GEND);
                         role_menu_extra(ROLE_RANDOM, win);
                         any.a_int = 0; /* separator, not a choice */
-                        add_menu(win, NO_GLYPH, &any, ' ', 0, ATR_NONE, "",
+                        add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
                                  MENU_UNSELECTED);
                         role_menu_extra(RS_ROLE, win);
                         role_menu_extra(RS_RACE, win);
@@ -760,11 +760,11 @@ makepicks:
                 races[RACE].adj,
                 (GEND == 1 && roles[ROLE].name.f) ? roles[ROLE].name.f
                                                   : roles[ROLE].name.m);
-        add_menu(win, NO_GLYPH, &any, ' ', 0, ATR_NONE, pbuf,
+        add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, pbuf,
                  MENU_UNSELECTED);
         /* blank separator */
         any.a_int = 0;
-        add_menu(win, NO_GLYPH, &any, ' ', 0, ATR_NONE, "", MENU_UNSELECTED);
+        add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
         /* [ynaq] menu choices */
         any.a_int = 1;
         add_menu(win, NO_GLYPH, &any, 'y', 0, ATR_NONE, "Yes; start game",

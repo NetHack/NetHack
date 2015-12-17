@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1448241780 2015/11/23 01:23:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.108 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1450231174 2015/12/16 01:59:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.110 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -951,8 +951,8 @@ int how;
     /* remember time of death here instead of having bones, rip, and
        topten figure it out separately and possibly getting different
        time or even day if player is slow responding to --More-- */
-    endtime = getnow();
-    urealtime.realtime += (long) (endtime - urealtime.restored);
+    urealtime.finish_time = endtime = getnow();
+    urealtime.realtime += (long) (endtime - urealtime.start_timing);
 
     /* Sometimes you die on the first move.  Life's not fair.
      * On those rare occasions you get hosed immediately, go out

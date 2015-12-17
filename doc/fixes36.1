@@ -15,10 +15,33 @@ support explicit 'symset:default' and 'symset:Default symbols' in options
 crash during startup if player name set as 'player' in defaults
 any existing vampire shape-shifted into critter (fog cloud, bat, wolf) became
 	an unkillable critter if vampires were genocided
+unlike in previous versions, an uncursed scroll of enchant armor failed to
+	uncurse the piece of armor being enchanted (change was unintentional)
+slice of {pizza,cake,&} pluralized as "slouse of ..." due to false match
+	with "lice" (discovered pre-3.6.0-release)
+change dipping prompt to not ignore 'called' and 'named' attributes of item
+	to be dipped
+avoid 'the unlabeled {scroll,spellbook} fades' when blank item is hit by water
+wrong message given when high priest on astral plane rejects being assigned a
+	name (got the one for unique monsters instead of the one for priests)
+negative intrinsic protection shouldn't confer MC=1, "you are warded" (not
+	possible from divine protection but is possible from eating rings)
+make a slight adjustment to the quickmimic() sense wording
+fix typo in passage 1 of The Colour of Magic
+falling asleep when reading dull spellbook ignored sleep resistance
+getpos() complaint about invalid movement keystroke didn't describe meta-chars
+	accurately
+'realtime' value in xlogfile was incorrect if 'checkpoint' option was active
+make a previously-discovered scroll written with marker while blind have its
+	label known so it can be read while blind
+#name or C for discoveries list that spanned multiple pages would exit on
+	space instead of advancing to next page (workaround: use '>' instead)
 
 
 Platform- and/or Interface-Specific Fixes
 -----------------------------------------
+tty: M-N gave "Unknown command 'M-" with "'." finishing the sentence on the
+	line below it, leaving bogus '.' displayed on the top row of the map
 unix/X11: in top level Makefile, some commented out definitions of VARDATND
 	misspelled pilemark.xbm (as pilemark.xpm)
 win32gui: getversionstring() was overflowing the provided Help About buffer
@@ -32,6 +55,7 @@ X11: core bug for '`' (backtick) command was only noticed by X11 interface,
 General New Features
 --------------------
 naming Sting or Orcrist now breaks illiterate conduct
+different feedback for reading a scroll of mail created by writing with marker
 
 
 Platform- and/or Interface-Specific New Features

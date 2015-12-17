@@ -1,4 +1,4 @@
-/* NetHack 3.6	o_init.c	$NHDT-Date: 1449588093 2015/12/08 15:21:33 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.21 $ */
+/* NetHack 3.6	o_init.c	$NHDT-Date: 1450318588 2015/12/17 02:16:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.22 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -688,8 +688,8 @@ rename_disco()
 
             if (oclass != prev_class) {
                 any.a_int = 0;
-                add_menu(tmpwin, NO_GLYPH, &any, ' ', iflags.menu_headings,
-                         ATR_NONE, let_to_name(oclass, FALSE, FALSE),
+                add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+                         let_to_name(oclass, FALSE, FALSE),
                          MENU_UNSELECTED);
                 prev_class = oclass;
             }

@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1449736557 2015/12/10 08:35:57 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.208 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1450178549 2015/12/15 11:22:29 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.209 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -107,7 +107,7 @@ extern int NDECL(dowield);            /**/
 extern int NDECL(dowieldquiver);      /**/
 extern int NDECL(dozap);              /**/
 extern int NDECL(doorganize);         /**/
-#endif                                /* DUMB */
+#endif /* DUMB */
 
 static int NDECL(dosuspend_core); /**/
 
@@ -3402,15 +3402,8 @@ register char *cmd;
         register const struct func_tab *tlist;
         int res, NDECL((*func));
 
-#if 0
-        /* obsolete - scan through the cmdlist array looking for *cmd */
-        for (tlist = cmdlist; tlist->f_char; tlist++) {
-            if ((*cmd & 0xff) != (tlist->f_char & 0xff))
-                continue;
-#else
         /* current - use *cmd to directly index cmdlist array */
         if ((tlist = Cmd.commands[*cmd & 0xff]) != 0) {
-#endif
             if (u.uburied && !tlist->can_if_buried) {
                 You_cant("do that while you are buried!");
                 res = 0;
@@ -3433,23 +3426,13 @@ register char *cmd;
     }
 
     if (bad_command) {
-        char expcmd[10];
-        register char c, *cp = expcmd;
+        char expcmd[20]; /* we expect 'cmd' to point to 1 or 2 chars */
+        register char c;
 
-        while ((c = *cmd++) != '\0'
-               && (int) (cp - expcmd) < (int) (sizeof expcmd - 3)) {
-            if (c >= 040 && c < 0177) {
-                *cp++ = c;
-            } else if (c & 0200) {
-                *cp++ = 'M';
-                *cp++ = '-';
-                *cp++ = c & ~0200;
-            } else {
-                *cp++ = '^';
-                *cp++ = c ^ 0100;
-            }
-        }
-        *cp = '\0';
+        expcmd[0] = '\0';
+        while ((c = *cmd++) != '\0')
+            Strcat(expcmd, visctrl(c)); /* add 1..4 chars plus terminator */
+
         if (!prefix_seen || !iflags.cmdassist
             || !help_dir(0, "Invalid direction key!"))
             Norep("Unknown command '%s'.", expcmd);
@@ -3587,10 +3570,9 @@ retry:
         if (!index(quitchars, dirsym)) {
             help_requested = (dirsym == '?');
             if (help_requested || iflags.cmdassist) {
-                did_help =
-                    help_dir((s && *s == '^') ? dirsym : 0,
-                             help_requested ? (const char *) 0
-                                            : "Invalid direction key!");
+                did_help = help_dir((s && *s == '^') ? dirsym : 0,
+                                    help_requested ? (const char *) 0
+                                                  : "Invalid direction key!");
                 if (help_requested)
                     goto retry;
             }
@@ -4121,14 +4103,14 @@ char def;
     iflags.last_msg = PLNMSG_UNKNOWN; /* most recent pline is clobbered */
 
     /* maximum acceptable length is QBUFSZ-1 */
-    if (strlen(query) < QBUFSZ)
-        return (*windowprocs.win_yn_function)(query, resp, def);
-
-    /* caller shouldn't have passed anything this long */
-    paniclog("Query truncated: ", query);
-    (void) strncpy(qbuf, query, QBUFSZ - 1 - 3);
-    Strcpy(&qbuf[QBUFSZ - 1 - 3], "...");
-    return (*windowprocs.win_yn_function)(qbuf, resp, def);
+    if (strlen(query) >= QBUFSZ) {
+        /* caller shouldn't have passed anything this long */
+        paniclog("Query truncated: ", query);
+        (void) strncpy(qbuf, query, QBUFSZ - 1 - 3);
+        Strcpy(&qbuf[QBUFSZ - 1 - 3], "...");
+        query = qbuf;
+    }
+    return (*windowprocs.win_yn_function)(query, resp, def);
 }
 
 /* for paranoid_confirm:quit,die,attack prompting */

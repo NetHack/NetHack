@@ -5,7 +5,7 @@
                        NetHack 3.6 on a Windows system
          (Windows 7/8.x/10 or later only. XP may work but is untested)
          ==============================================================
-          Last revision: $NHDT-Date: 1447979773 2015/11/20 00:36:13 $
+          Last revision: $NHDT-Date: 1450306349 2015/12/16 22:52:29 $
 
 Credit for the porting of NetHack to the Win32 Console Subsystem goes to 
 the NT Porting Team started by Michael Allison.
@@ -16,7 +16,7 @@ contributed the port.
 
 The PC Windows porting team consisting of Michael Allison, David Cohrs, 
 Alex Kompel, Dion Nicolaas, Yitzhak Sapir, and Janet Walz maintained the 
-tty and graphical win32 versions of NetHack 3.6.0.
+tty and graphical win32 versions of NetHack 3.6.1.
 
 You can build a TTY version of NetHack and a Windows Graphical 
 version.  You can use one of the following build environments:
@@ -90,7 +90,7 @@ a 32-bit x86 version, or a 64-bit x64 version.  The default Makefile
 is set up for a 32-bit x86 version, but that's only because it will 
 run on the most number of existing Windows environments.
 
-NetHack's save files and bones files in the 3.6.0 release have not 
+NetHack's save files and bones files in the 3.6.1 release have not 
 evolved enough to allow them to interchange between the 32-bit version 
 and the 64-bit version (or between different platforms). Hopefully
 that will change in an upcoming release.
@@ -508,10 +508,10 @@ II. Executing the game
     If you will be running it by launching it from a shortcut, just use
     the following information when setting up the shortcut.
 
-        Description      :  NetHack 3.6.0 Console version
+        Description      :  NetHack 3.6.1 Console version
         Command Line     :  C:\NETHACK\BINARY\NETHACK.EXE
 
-        Description      :  NetHack 3.6.0 Graphical Interface
+        Description      :  NetHack 3.6.1 Graphical Interface
          Command Line     :  C:\NETHACK\BINARY\NETHACKW.EXE
 
    (changing the directory to the appropriate one of course)

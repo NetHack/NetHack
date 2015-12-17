@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1448492213 2015/11/25 22:56:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.249 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1449977947 2015/12/13 03:39:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.250 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3345,10 +3345,11 @@ boolean force;
             */
         return ER_NOTHING;
     } else if (obj->oclass == SCROLL_CLASS) {
+        if (obj->otyp == SCR_BLANK_PAPER
 #ifdef MAIL
-        if (obj->otyp == SCR_MAIL)
-            return 0;
+            || obj->otyp == SCR_MAIL
 #endif
+           ) return 0;
         if (carried(obj))
             pline("Your %s %s.", ostr, vtense(ostr, "fade"));
 
@@ -3362,8 +3363,9 @@ boolean force;
         if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
             pline("Steam rises from %s.", the(xname(obj)));
             return 0;
+        } else if (obj->otyp == SPE_BLANK_PAPER) {
+            return 0;
         }
-
         if (carried(obj))
             pline("Your %s %s.", ostr, vtense(ostr, "fade"));
 

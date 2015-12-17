@@ -1,5 +1,5 @@
 \documentstyle[titlepage,longtable]{article}
-% NetHack 3.6  Guidebook.tex $NHDT-Date: 1431192762 2015/05/09 17:32:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.60 $ */
+% NetHack 3.6  Guidebook.tex $NHDT-Date: 1431192762 2015/12/16 17:32:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.60 $ */
 %+% we're still limping along in LaTeX 2.09 compatibility mode
 %-%\documentclass{article}
 %-%\usepackage{hyperref} % before longtable
@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.6 by Mike Stephenson and others)}
-\date{December 7, 2015}
+\date{December 16, 2015}
 
 \maketitle
 
@@ -2377,6 +2377,10 @@ If you prefix `{\tt !}' or ``{\tt no}'' to the value, you can
 exclude that alignment from being picked randomly.
 Cannot be set with the `{\tt O}' command.  Persistent.
 %.lp
+\item[\ib{autodescribe}]
+Automatically describe the terrain under cursor when asked to get a location
+on the map.
+%.lp
 \item[\ib{autodig}]
 Automatically dig if you are wielding a digging tool and moving into a place
 that can be dug (default false).  Persistent.
@@ -2944,6 +2948,7 @@ and prior versions (ex.\ ``{\tt suppress\verb+_+alert:3.3.1}'')
 \item[\ib{symset}]
 This option may be used to select one of the named symbol sets found within
 {\tt symbols} to alter the symbols displayed on the screen.
+Use ``{\tt symset:default}'' to explicitly select the default symbols.
 %.lp
 \item[\ib{time}]
 Show the elapsed game time in turns on bottom line (default off).  Persistent.
@@ -3223,7 +3228,8 @@ Regular expressions are normally POSIX extended regular expressions. It is
 possible to compile NetHack without regular expression support on a platform where
 there is no regular expression library. While this is not true of any modern
 platform, if your NetHack was built this way, patterns are instead glob
-patterns.
+patterns. This applies to Autopickup exceptions, Message types, Menu colors,
+and User sounds.
 
 %.hn 2
 \subsection*{Configuring Autopickup Exceptions}
@@ -4180,22 +4186,30 @@ version merges work done by the development team since the previous release
 with some of the beloved community patches. Many bugs were fixed and a 
 large amount of code was restructured.
 
-
 %.pg
 \medskip
 The development team, as well as {\it Steve VanDevender} and 
-{\it Kevin Smolkowski} ensured that NetHack 3.6.0 continued to operate on 
+{\it Kevin Smolkowski} ensured that NetHack 3.6 continued to operate on 
 various Unix flavors and maintained the X11 interface. 
 
 %.pg
 {\it Ken Lorber}, {\it Haoyang Wang}, {\it Pat Rankin}, and {\it Dean Luick} 
-maintained the port of NetHack 3.6.0 for Mac.
+maintained the port of NetHack 3.6 for Mac.
 
 %.pg
 \medskip
 {\it Michael Allison}, {\it Derek S. Ray}, {\it Yitzhak Sapir}, 
 {\it Alex Kompel}, and {\it Dion Nicolaas} maintained the port of 
-NetHack 3.6.0 for Microsoft Windows.
+NetHack 3.6 for Microsoft Windows.
+
+%.pg
+\medskip
+The 3.6 development team consisting of
+{\it Michael Allison}, {\it Warwick Allison}, {\it Ken Arromdee},
+{\it David Cohrs}, {\it Jessie Collet}, {\it Sean Hunt}, 
+{\it Pasi Kallinen}, {\it Ken Lorber}, {\it Dean Luick}, {\it Pat Rankin}, 
+{\it Mike Stephenson}, {\it Derek S. Ray}, {\it Janet Walz}, and {\it Paul Winner}
+released 3.6.1 as a bug fix release in January 2016.
 
 %.pg
 \medskip

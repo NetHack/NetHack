@@ -1,4 +1,4 @@
-/* NetHack 3.6	topten.c	$NHDT-Date: 1448117546 2015/11/21 14:52:26 $  $NHDT-Branch: master $:$NHDT-Revision: 1.40 $ */
+/* NetHack 3.6	topten.c	$NHDT-Date: 1450231176 2015/12/16 01:59:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.41 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -330,8 +330,8 @@ struct toptenentry *tt;
     Fprintf(rfile, "%cconduct=0x%lx%cturns=%ld%cachieve=0x%lx", XLOG_SEP,
             encodeconduct(), XLOG_SEP, moves, XLOG_SEP, encodeachieve());
     Fprintf(rfile, "%crealtime=%ld%cstarttime=%ld%cendtime=%ld", XLOG_SEP,
-            (long) urealtime.realtime, XLOG_SEP, (long) ubirthday, XLOG_SEP,
-            (long) urealtime.endtime);
+            (long) urealtime.realtime, XLOG_SEP,
+            (long) ubirthday, XLOG_SEP, (long) urealtime.finish_time);
     Fprintf(rfile, "%cgender0=%s%calign0=%s", XLOG_SEP,
             genders[flags.initgend].filecode, XLOG_SEP,
             aligns[1 - u.ualignbase[A_ORIGINAL]].filecode);
@@ -516,7 +516,6 @@ time_t when;
     t0->birthdate = yyyymmdd(ubirthday);
     t0->deathdate = yyyymmdd(when);
     t0->tt_next = 0;
-    urealtime.endtime = when;
 #ifdef UPDATE_RECORD_IN_PLACE
     t0->fpos = -1L;
 #endif

@@ -1,4 +1,4 @@
-/* NetHack 3.6	allmain.c	$NHDT-Date: 1446975459 2015/11/08 09:37:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.66 $ */
+/* NetHack 3.6	allmain.c	$NHDT-Date: 1450231173 2015/12/16 01:59:33 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.67 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -587,17 +587,12 @@ newgame()
         com_pager(1);
     }
 
+    urealtime.realtime = 0L;
+    urealtime.start_timing = getnow();
 #ifdef INSURANCE
     save_currentstate();
 #endif
     program_state.something_worth_saving++; /* useful data now exists */
-
-    urealtime.realtime = 0L;
-#if defined(BSD) && !defined(POSIX_TYPES)
-    (void) time((long *) &urealtime.restored);
-#else
-    (void) time(&urealtime.restored);
-#endif
 
     /* Success! */
     welcome(TRUE);

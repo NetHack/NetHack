@@ -184,25 +184,30 @@ with some of the beloved community patches.  Many bugs were fixed and some
 code was restructured.
 
 The development team, as well as Steve VanDevender and Kevin Smolkowski
-ensured that NetHack 3.6.0 continued to operate on various Unix flavors
+ensured that NetHack 3.6 continued to operate on various Unix flavors
 as well as maintaining the X11 interface.
 
 Ken Lorber, Haoyang Wang, Pat Rankin, and Dean Luick maintained the port
-of NetHack 3.6.0 for Mac.
+of NetHack 3.6 for Mac.
 
 Michael Allison, Derek S. Ray, Yitzhak Sapir, Alex Kompel, Dion Nicolaas,
-and David Cohrs maintained the port of NetHack 3.6.0 for Microsoft Windows.
+and David Cohrs maintained the port of NetHack 3.6 for Microsoft Windows.
 
-Pat Rankin attempted to keep the VMS port running for NetHack 3.6.0,
+Pat Rankin attempted to keep the VMS port running for NetHack 3.6,
 hindered by limited access.  Kevin Smolkowski has updated and tested it
 for the most recent version of OpenVMS (V8.4 as of this writing) on Alpha
 and Integrity (aka Itanium aka IA64) but not VAX.
 
-This version of the game is special in a particular way.  Near the end of
-the development of 3.6, one of the significant inspirations for many of
+The 3.6 version of the game is special in a particular way.  Near the end of
+the development of 3.6.0, one of the significant inspirations for many of
 the humorous and fun features found in the game, author Terry Pratchett,
-passed away.  This version of the game includes a tribute to him.
+passed away.  The 3.6 version of the game includes a tribute to him.
 
+The 3.6 development team consisting of Michael Allison, Warwick Allison, 
+Ken Arromdee, David Cohrs, Jessie Collet, Sean Hunt, Pasi Kallinen, 
+Ken Lorber, Dean Luick, Pat Rankin, Derek Ray, Mike Stephenson, 
+Janet Walz,  and Paul Winner released 3.6.1 as a bug fix release in 
+January 2016.
 
 An official NetHack web site continues to be maintained by Ken Lorber at
 http://www.nethack.org/.
