@@ -163,38 +163,6 @@ align      Your starting alignment (align:lawful, align:neutral,
            or align:chaotic).  You may specify just the first letter.  [RANDOM]
 catname    the name of your first cat  [NONE]
 dogname    the name of your first dog  [NONE]
-dungeon    a list of symbols to be used in place of the default ones for
-           drawing the dungeon.
-           The symbols are subjected to a fair amount of processing, so
-           that you can use C-style escapes such as \n or \081 as well as
-           indicate control characters by ^x or meta characters by \Mx.
-           As usual, \ can force the next character to be taken literally.
-           Since many of the default symbols are overloaded, they are
-           given here by name instead of symbol, with some added notes:
-           stone                               (solid rock, normally ' ')
-           vwall hwall tlcorn trcorn blcorn brcorn      (room boundaries)
-           crwall tuwall tdwall tlwall trwall (wallified maze characters)
-           nodoor vodoor hodoor      (no, vertical, horizontal open door)
-           vcdoor hcdoor               (vertical, horizontal closed door)
-           ironbars tree room darkcorr litcorr
-           upstair dnstair upladder dnladder
-           altar grave throne sink fountain pool ice lava
-           vodbridge hodbridge     (vertical, horizontal open drawbridge)
-           vcdbridge hcdbridge   (vertical, horizontal closed drawbridge)
-           air cloud water
-           default:  \ |--------||.-|++##.##<><>_\\#{}.}..##\ #}
-effects    like dungeon, but for special effects symbols
-           vbeam hbeam lslant rslant                  (generic zap beams)
-           digbeam flashbeam      (special beams for digging and cameras)
-           boomleft boomright                                (boomerangs)
-           ss1 ss2 ss3 ss4                           (shielding sequence)
-           sw_topl, sw_topm, sw_topr,                  (swallow, top row)
-           sw_midl, sw_midr,            (swallow, middle row [no center])
-           sw_botl, sw_botm, sw_botr                (swallow, bottom row)
-           extl extm extr                      (explosion matrix top row)
-           exml exmm exmr                   (explosion matrix middle row)
-           exbl exbm exbr                   (explosion matrix bottom row)
-           default:  |-\\/*!)(0#@*/-\\||\\-//-\\|\ |\\-/
 gender     Your starting gender (gender:male or gender:female).
            You may specify just the first letter.  Although you can
            still denote your gender using the "male" and "female"
@@ -215,14 +183,9 @@ menu_*     create single character accelerators for menu commands.  Below
            menu_search        search for a menu item [:](gxta)
            menu_select_all    select all items in a menu [.](gxta)
            menu_select_page   select all items on this menu page [,](gta)
-monsters   like dungeon, but for monster symbols
-           default:  abcdefghijklmnopqrstuvwxyz
-                     ABCDEFGHIJKLMNOPQRSTUVWXYZ@\ \\&;:~]
 msghistory number of top line messages to save [20]
 name       the name of your character  [obtained by asking the system or
            the player]
-objects    like dungeon, but for object symbols
-           default:  ])[="(%!?+/$*`0_.
 pettype    your preferred type of pet (cat or dog), if your character
            class uses both types; or none for no pet  [RANDOM]
 playmode   normal play or non-scoring explore mode or debug mode  [normal]
@@ -234,13 +197,6 @@ role       Your starting role (e.g., role:Barbarian, role:Valk).
            as possible.  You can also still denote your role by
            appending it to the "name" option (e.g., name:Vic-V), but the
            "role" option will take precedence.  [RANDOM]
-traps      like dungeon, but for trap symbols
-           arrow_trap dart_trap falling_rock_trap squeaky_board
-           bear_trap land_mine rolling_boulder_trap sleeping_gas_trap
-           rust_trap fire_trap pit spiked_pit hole trap_door
-           teleportation_trap level_teleporter magic_portal web statue_trap
-           magic_trap anti_magic_trap polymorph_trap
-           default:  ^^^^^^^^^^^^^^^^^"^^^^
 
 windowtype windowing system to be used  [depends on operating system]
 
@@ -254,5 +210,4 @@ msg_window the type of message window to use:
 
 Some sample options lists are:
 !autopickup,!tombstone,name:Gandalf,scores:own/3 top/2 around
-female,nonews,dogname:Rover,dungeon: |--------||.-|++.##<><>_\\#{}.}..## #}
-rest_on_space,!verbose,menustyle:traditional
+female,nonews,dogname:Rover,rest_on_space,!verbose,menustyle:traditional
