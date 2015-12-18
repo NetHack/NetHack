@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1450460999 2015/12/18 17:49:59 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.210 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1450473780 2015/12/18 21:23:00 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.211 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1133,6 +1133,8 @@ wiz_intrinsic(VOID_ARGS)
         if (n >= 1) {
             i = pick_list[0].item.a_int-1;
             free((genericptr_t) pick_list);
+        } else {
+            return 0;
         }
 
         if (!strcmp(intrinsics[i],"deafness")) {
