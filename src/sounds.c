@@ -1,4 +1,4 @@
-/* NetHack 3.6	sounds.c	$NHDT-Date: 1450461007 2015/12/18 17:50:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.76 $ */
+/* NetHack 3.6	sounds.c	$NHDT-Date: 1450461632 2015/12/18 18:00:32 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.77 $ */
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -397,7 +397,7 @@ register struct monst *mtmp;
             yelp_verb = (!Deaf) ? "snarl" : "bluff";
             break;
         case MS_SQEEK:
-            yelp_verb = (!Deaf) ? "squeal" : "quivers";
+            yelp_verb = (!Deaf) ? "squeal" : "quiver";
             break;
         case MS_SQAWK:
             yelp_verb = (!Deaf) ? "screak" : "thrash";
