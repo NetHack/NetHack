@@ -1,4 +1,4 @@
-/* NetHack 3.6	makemon.c	$NHDT-Date: 1449269917 2015/12/04 22:58:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.105 $ */
+/* NetHack 3.6	makemon.c	$NHDT-Date: 1450451931 2015/12/18 15:18:51 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.106 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -598,6 +598,8 @@ register struct monst *mtmp;
                 mac += 1 + mongets(mtmp, LEATHER_GLOVES);
             else if (mac < 10 && rn2(2))
                 mac += 1 + mongets(mtmp, LEATHER_CLOAK);
+
+            nhUse(mac); /* suppress 'dead increment' from static analyzer */
 
             if (ptr != &mons[PM_GUARD] && ptr != &mons[PM_WATCHMAN]
                 && ptr != &mons[PM_WATCH_CAPTAIN]) {
