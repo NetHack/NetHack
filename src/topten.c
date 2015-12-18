@@ -1,4 +1,4 @@
-/* NetHack 3.6	topten.c	$NHDT-Date: 1450432761 2015/12/18 09:59:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.43 $ */
+/* NetHack 3.6	topten.c	$NHDT-Date: 1450451497 2015/12/18 15:11:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.44 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -65,8 +65,7 @@ STATIC_DCL void FDECL(discardexcess, (FILE *));
 STATIC_DCL void FDECL(readentry, (FILE *, struct toptenentry *));
 STATIC_DCL void FDECL(writeentry, (FILE *, struct toptenentry *));
 #ifdef XLOGFILE
-STATIC_DCL void FDECL(writexlentry, (FILE *, struct toptenentry *));
-STATIC_DCL char *FDECL(shortdeath, (char *, char *));
+STATIC_DCL void FDECL(writexlentry, (FILE *, struct toptenentry *, int));
 STATIC_DCL long NDECL(encodexlogflags);
 STATIC_DCL long NDECL(encodeconduct);
 STATIC_DCL long NDECL(encodeachieve);
@@ -316,9 +315,10 @@ struct toptenentry *tt;
 
 /* as tab is never used in eg. plname or death, no need to mangle those. */
 STATIC_OVL void
-writexlentry(rfile, tt)
+writexlentry(rfile, tt, how)
 FILE *rfile;
 struct toptenentry *tt;
+int how;
 {
 #define Fprintf (void) fprintf
 #define XLOG_SEP '\t' /* xlogfile field separator. */
@@ -337,9 +337,11 @@ struct toptenentry *tt;
     Sprintf(buf, "%crole=%s%crace=%s%cgender=%s%calign=%s", XLOG_SEP,
             tt->plrole, XLOG_SEP, tt->plrace, XLOG_SEP, tt->plgend, XLOG_SEP,
             tt->plalign);
+    /* make a copy of death reason that doesn't include ", while helpless" */
+    formatkiller(tmpbuf, sizeof tmpbuf, how, FALSE);
     Fprintf(rfile, "%s%cname=%s%cdeath=%s",
             buf, /* (already includes separator) */
-            XLOG_SEP, plname, XLOG_SEP, shortdeath(tmpbuf, tt->death));
+            XLOG_SEP, plname, XLOG_SEP, tmpbuf);
     if (multi)
         Fprintf(rfile, "%cwhile=%s", XLOG_SEP,
                 multi_reason ? multi_reason : "helpless");
@@ -354,20 +356,6 @@ struct toptenentry *tt;
     Fprintf(rfile, "%cflags=0x%lx", XLOG_SEP, encodexlogflags());
     Fprintf(rfile, "\n");
 #undef XLOG_SEP
-}
-
-/* used to strip ", while helpless" so xlogfile can show that separately
-   in case formatkiller() ending up truncating ", while "+multi_reason */
-STATIC_OVL char *
-shortdeath(outbuf, deathstring)
-char *outbuf, *deathstring;
-{
-    char *p;
-
-    Strcpy(outbuf, deathstring);
-    if ((p = strstr(outbuf, ", while")) != 0)
-        *p = '\0';
-    return outbuf;
 }
 
 STATIC_OVL long
@@ -568,7 +556,7 @@ time_t when;
         if (!(xlfile = fopen_datafile(XLOGFILE, "a", SCOREPREFIX))) {
             HUP raw_print("Cannot open extended log file!");
         } else {
-            writexlentry(xlfile, t0);
+            writexlentry(xlfile, t0, how);
             (void) fclose(xlfile);
         }
         unlock_file(XLOGFILE);
@@ -579,6 +567,7 @@ time_t when;
         if (how != PANICKED)
             HUP {
                 char pbuf[BUFSZ];
+
                 topten_print("");
                 Sprintf(pbuf,
              "Since you were in %s mode, the score list will not be checked.",
