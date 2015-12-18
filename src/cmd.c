@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1450178549 2015/12/15 11:22:29 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.209 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1450460999 2015/12/18 17:49:59 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.210 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -122,6 +122,7 @@ STATIC_PTR int NDECL(dotravel);
 STATIC_PTR int NDECL(doterrain);
 STATIC_PTR int NDECL(wiz_wish);
 STATIC_PTR int NDECL(wiz_identify);
+STATIC_PTR int NDECL(wiz_intrinsic);
 STATIC_PTR int NDECL(wiz_map);
 STATIC_PTR int NDECL(wiz_genesis);
 STATIC_PTR int NDECL(wiz_where);
@@ -1099,6 +1100,48 @@ wiz_smell(VOID_ARGS)
         } else
             pline("That is not a monster.");
     } while (TRUE);
+    return 0;
+}
+
+/* #wizinstrinsic command to set some intrinsics for testing */
+STATIC_PTR int
+wiz_intrinsic(VOID_ARGS)
+{
+    if (wizard) {
+        winid win;
+        anything any;
+        int i, n, accelerator;
+        menu_item *pick_list = (menu_item *) 0;
+
+        static const char *const intrinsics[] = {
+            "deafness",
+        };
+
+        win = create_nhwindow(NHW_MENU);
+        start_menu(win);
+        accelerator = 0;
+
+        for (i = 0; i < SIZE(intrinsics); ++i) {
+            accelerator = intrinsics[i][0];
+            any.a_int = i + 1;
+            add_menu(win, NO_GLYPH, &any, accelerator, 0, ATR_NONE, intrinsics[i], FALSE);
+        }
+        end_menu(win, "Which intrinsic?");
+        n = select_menu(win, PICK_ONE, &pick_list);
+        destroy_nhwindow(win);
+
+        if (n >= 1) {
+            i = pick_list[0].item.a_int-1;
+            free((genericptr_t) pick_list);
+        }
+
+        if (!strcmp(intrinsics[i],"deafness")) {
+            You("go deaf.");
+            incr_itimeout(&HDeaf, 30);
+        }
+    } else
+        pline("Unavailable command '%s'.",
+              visctrl((int) cmd_from_func(wiz_intrinsic)));
     return 0;
 }
 
@@ -2771,6 +2814,7 @@ struct ext_func_tab extcmdlist[] = {
     { (char *) 0, (char *) 0, donull, TRUE }, /* vanquished */
     { (char *) 0, (char *) 0, donull, TRUE }, /* vision */
     { (char *) 0, (char *) 0, donull, TRUE }, /* wizsmell */
+    { (char *) 0, (char *) 0, donull, TRUE }, /* wizintrinsic */
 #ifdef DEBUG
     { (char *) 0, (char *) 0, donull, TRUE }, /* wizdebug_traveldisplay */
     { (char *) 0, (char *) 0, donull, TRUE }, /* wizdebug_bury */
@@ -2800,6 +2844,7 @@ static const struct ext_func_tab debug_extcmdlist[] = {
     { "vanquished", "list vanquished monsters", dovanquished, TRUE },
     { "vision", "show vision array", wiz_show_vision, TRUE },
     { "wizsmell", "smell monster", wiz_smell, TRUE },
+    { "wizintrinsic", "set intrinsic", wiz_intrinsic, TRUE },
 #ifdef DEBUG
     { "wizdebug_traveldisplay", "wizard debug: toggle travel display",
       wiz_debug_cmd_traveldisplay, TRUE },

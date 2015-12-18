@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1449977947 2015/12/13 03:39:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.250 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1450461008 2015/12/18 17:50:08 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.251 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3048,6 +3048,7 @@ domagictrap()
         /* Most of the time, it creates some monsters. */
         register int cnt = rnd(4);
 
+        /* blindness effects */
         if (!resists_blnd(&youmonst)) {
             You("are momentarily blinded by a flash of light!");
             make_blinded((long) rn1(5, 10), FALSE);
@@ -3055,9 +3056,17 @@ domagictrap()
                 Your1(vision_clears);
         } else if (!Blind) {
             You_see("a flash of light!");
-        } else
+        }
+
+        /* deafness effects */
+        if (!Deaf) {
             You_hear("a deafening roar!");
-        incr_itimeout(&HDeaf, rn1(20, 30));
+            incr_itimeout(&HDeaf, rn1(20, 30));
+        } else {
+            /* magic vibrations still hit you */
+            You_feel("rankled.");
+            incr_itimeout(&HDeaf, rn1(5, 15));
+        }
         while (cnt--)
             (void) makemon((struct permonst *) 0, u.ux, u.uy, NO_MM_FLAGS);
     } else
