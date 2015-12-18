@@ -1,4 +1,4 @@
-/* NetHack 3.6	topten.c	$NHDT-Date: 1450231176 2015/12/16 01:59:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.41 $ */
+/* NetHack 3.6	topten.c	$NHDT-Date: 1450410548 2015/12/18 03:49:08 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.42 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -64,10 +64,13 @@ STATIC_DCL void FDECL(outentry, (int, struct toptenentry *, BOOLEAN_P));
 STATIC_DCL void FDECL(discardexcess, (FILE *));
 STATIC_DCL void FDECL(readentry, (FILE *, struct toptenentry *));
 STATIC_DCL void FDECL(writeentry, (FILE *, struct toptenentry *));
+#ifdef XLOGFILE
 STATIC_DCL void FDECL(writexlentry, (FILE *, struct toptenentry *));
+STATIC_DCL char *FDECL(shortdeath, (char *, char *));
 STATIC_DCL long NDECL(encodexlogflags);
 STATIC_DCL long NDECL(encodeconduct);
 STATIC_DCL long NDECL(encodeachieve);
+#endif
 STATIC_DCL void FDECL(free_ttlist, (struct toptenentry *));
 STATIC_DCL int FDECL(classmon, (char *, BOOLEAN_P));
 STATIC_DCL int FDECL(score_wanted, (BOOLEAN_P, int, struct toptenentry *, int,
@@ -118,6 +121,17 @@ int how;
     /* we're writing into buf[0] (after possibly advancing buf) rather than
        appending, but strncat() appends a terminator and strncpy() doesn't */
     (void) strncat(buf, kname, siz - 1);
+
+    if (multi) {
+        siz -= strlen(buf);
+        buf = eos(buf);
+        /* X <= siz: 'sizeof "string"' includes 1 for '\0' terminator */
+        if (multi_reason && strlen(multi_reason) + sizeof ", while " <= siz)
+            Sprintf(buf, ", while %s", multi_reason);
+        else if (sizeof ", while helpless" <= siz)
+            Strcpy(buf, ", while helpless");
+        /* else extra death info won't fit, so leave it out */
+    }
 }
 
 STATIC_OVL void
@@ -269,10 +283,10 @@ struct toptenentry *tt;
     static const char fmt33[] = "%s %s %s %s "; /* role,race,gndr,algn */
 #ifndef NO_SCAN_BRACK
     static const char fmt0[] = "%d.%d.%d %ld %d %d %d %d %d %d %ld %ld %d ";
-    static const char fmtX[] = "%s,%s%s%s\n";
+    static const char fmtX[] = "%s,%s\n";
 #else /* NO_SCAN_BRACK */
     static const char fmt0[] = "%d %d %d %ld %d %d %d %d %d %d %ld %ld %d ";
-    static const char fmtX[] = "%s %s%s%s\n";
+    static const char fmtX[] = "%s %s\n";
 
     nsb_mung_line(tt->name);
     nsb_mung_line(tt->death);
@@ -288,15 +302,15 @@ struct toptenentry *tt;
         (void) fprintf(rfile, fmt33, tt->plrole, tt->plrace, tt->plgend,
                        tt->plalign);
     (void) fprintf(rfile, fmtX, onlyspace(tt->name) ? "_" : tt->name,
-                   tt->death,
-                   (multi ? ", while " : ""),
-                   (multi ? (multi_reason ? multi_reason : "helpless") : ""));
+                   tt->death);
 
 #ifdef NO_SCAN_BRACK
     nsb_unmung_line(tt->name);
     nsb_unmung_line(tt->death);
 #endif
 }
+
+#ifdef XLOGFILE
 
 /* as tab is never used in eg. plname or death, no need to mangle those. */
 STATIC_OVL void
@@ -306,7 +320,7 @@ struct toptenentry *tt;
 {
 #define Fprintf (void) fprintf
 #define XLOG_SEP '\t' /* xlogfile field separator. */
-    char buf[BUFSZ];
+    char buf[BUFSZ], tmpbuf[DTHSZ + 1];
 
     Sprintf(buf, "version=%d.%d.%d", tt->ver_major, tt->ver_minor,
             tt->patchlevel);
@@ -323,7 +337,7 @@ struct toptenentry *tt;
             tt->plalign);
     Fprintf(rfile, "%s%cname=%s%cdeath=%s",
             buf, /* (already includes separator) */
-            XLOG_SEP, plname, XLOG_SEP, tt->death);
+            XLOG_SEP, plname, XLOG_SEP, shortdeath(tmpbuf, tt->death));
     if (multi)
         Fprintf(rfile, "%cwhile=%s", XLOG_SEP,
                 multi_reason ? multi_reason : "helpless");
@@ -338,6 +352,20 @@ struct toptenentry *tt;
     Fprintf(rfile, "%cflags=0x%lx", XLOG_SEP, encodexlogflags());
     Fprintf(rfile, "\n");
 #undef XLOG_SEP
+}
+
+/* used to strip ", while helpless" so xlogfile can show that separately
+   in case formatkiller() ending up truncating ", while "+multi_reason */
+STATIC_OVL char *
+shortdeath(outbuf, deathstring)
+char *outbuf, *deathstring;
+{
+    char *p;
+
+    Strcpy(outbuf, deathstring);
+    if ((p = strstr(outbuf, ", while")) != 0)
+        *p = '\0';
+    return outbuf;
 }
 
 STATIC_OVL long
@@ -424,6 +452,8 @@ encodeachieve()
 
     return r;
 }
+
+#endif /* XLOGFILE */
 
 STATIC_OVL void
 free_ttlist(tt)
