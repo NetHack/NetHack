@@ -1,4 +1,4 @@
-/* NetHack 3.6	topten.c	$NHDT-Date: 1450410548 2015/12/18 03:49:08 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.42 $ */
+/* NetHack 3.6	topten.c	$NHDT-Date: 1450432761 2015/12/18 09:59:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.43 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -84,10 +84,11 @@ static winid toptenwin = WIN_ERR;
 
 /* "killed by",&c ["an"] 'killer.name' */
 void
-formatkiller(buf, siz, how)
+formatkiller(buf, siz, how, incl_helpless)
 char *buf;
 unsigned siz;
 int how;
+boolean incl_helpless;
 {
     static NEARDATA const char *const killed_by_prefix[] = {
         /* DIED, CHOKING, POISONING, STARVING, */
@@ -122,12 +123,13 @@ int how;
        appending, but strncat() appends a terminator and strncpy() doesn't */
     (void) strncat(buf, kname, siz - 1);
 
-    if (multi) {
+    if (incl_helpless && multi) {
         siz -= strlen(buf);
         buf = eos(buf);
         /* X <= siz: 'sizeof "string"' includes 1 for '\0' terminator */
         if (multi_reason && strlen(multi_reason) + sizeof ", while " <= siz)
             Sprintf(buf, ", while %s", multi_reason);
+        /* either multi_reason wasn't specified or wouldn't fit */
         else if (sizeof ", while helpless" <= siz)
             Strcpy(buf, ", while helpless");
         /* else extra death info won't fit, so leave it out */
@@ -542,7 +544,7 @@ time_t when;
     copynchars(t0->plgend, genders[flags.female].filecode, ROLESZ);
     copynchars(t0->plalign, aligns[1 - u.ualign.type].filecode, ROLESZ);
     copynchars(t0->name, plname, NAMSZ);
-    formatkiller(t0->death, sizeof t0->death, how);
+    formatkiller(t0->death, sizeof t0->death, how, TRUE);
     t0->birthdate = yyyymmdd(ubirthday);
     t0->deathdate = yyyymmdd(when);
     t0->tt_next = 0;

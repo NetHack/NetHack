@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1450231174 2015/12/16 01:59:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.110 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1450432758 2015/12/18 09:59:18 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.111 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1039,7 +1039,7 @@ int how;
         }
         corpse = mk_named_object(CORPSE, &mons[mnum], u.ux, u.uy, plname);
         Sprintf(pbuf, "%s, ", plname);
-        formatkiller(eos(pbuf), sizeof pbuf - strlen(pbuf), how);
+        formatkiller(eos(pbuf), sizeof pbuf - strlen(pbuf), how, TRUE);
         make_grave(u.ux, u.uy, pbuf);
     }
     pbuf[0] = '\0'; /* clear grave text; also lint suppression */

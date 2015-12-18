@@ -1,4 +1,4 @@
-/* NetHack 3.6	rip.c	$NHDT-Date: 1450410547 2015/12/18 03:49:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.21 $ */
+/* NetHack 3.6	rip.c	$NHDT-Date: 1450432760 2015/12/18 09:59:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.22 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -91,7 +91,7 @@ time_t when;
 {
     register char **dp;
     register char *dpx;
-    char buf[BUFSZ], *p;
+    char buf[BUFSZ];
     long year;
     register int x;
     int line;
@@ -112,10 +112,7 @@ time_t when;
     center(GOLD_LINE, buf);
 
     /* Put together death description */
-    formatkiller(buf, sizeof buf, how);
-    /* strip ", while helpless" to keep reason shorter */
-    if ((p = strstr(buf, ", while")) != 0)
-        *p = '\0';
+    formatkiller(buf, sizeof buf, how, FALSE);
 
     /* Put death type on stone */
     for (line = DEATH_LINE, dpx = buf; line < YEAR_LINE; line++) {

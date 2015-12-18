@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1449051498 2015/12/02 10:18:18 $  $NHDT-Branch: master $:$NHDT-Revision: 1.520 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1450432755 2015/12/18 09:59:15 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.521 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2293,7 +2293,7 @@ E void NDECL(timer_sanity_check);
 
 /* ### topten.c ### */
 
-E void FDECL(formatkiller, (char *, unsigned, int));
+E void FDECL(formatkiller, (char *, unsigned, int, BOOLEAN_P));
 E void FDECL(topten, (int, time_t));
 E void FDECL(prscore, (int, char **));
 E struct obj *FDECL(tt_oname, (struct obj *));
