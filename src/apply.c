@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1446808436 2015/11/06 11:13:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.210 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1450481050 2015/12/18 23:24:10 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.214 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -237,6 +237,13 @@ int rx, ry, *resp;
     } else if (corpse) {
         boolean here = (rx == u.ux && ry == u.uy),
                 one = (corpse->quan == 1L && !more_corpses), reviver = FALSE;
+        int visglyph, corpseglyph;
+
+        visglyph = glyph_at(rx, ry);
+        corpseglyph = obj_to_glyph(corpse);
+
+        if (Blind && (visglyph != corpseglyph))
+            map_object(corpse, TRUE);
 
         if (Role_if(PM_HEALER)) {
             /* ok to reset `corpse' here; we're done with it */

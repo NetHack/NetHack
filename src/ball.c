@@ -1,4 +1,4 @@
-/* NetHack 3.6	ball.c	$NHDT-Date: 1446808438 2015/11/06 11:13:58 $  $NHDT-Branch: master $:$NHDT-Revision: 1.28 $ */
+/* NetHack 3.6	ball.c	$NHDT-Date: 1450402033 2015/12/18 01:27:13 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.29 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -808,6 +808,9 @@ drag_down()
 
     if (carried(uball))
         You("lose your grip on the iron ball.");
+
+    cls();  /* previous level is still displayed although you
+               went down the stairs. Avoids bug C343-20 */
 
     if (forward) {
         if (rn2(6)) {

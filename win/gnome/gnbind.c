@@ -1,4 +1,4 @@
-/* NetHack 3.6	gnbind.c	$NHDT-Date: 1433806614 2015/06/08 23:36:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.32 $ */
+/* NetHack 3.6	gnbind.c	$NHDT-Date: 1450453305 2015/12/18 15:41:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.33 $ */
 /* Copyright (C) 1998 by Erik Andersen <andersee@debian.org> */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1182,7 +1182,7 @@ gnome_outrip(winid wid, int how, time_t when)
     Strcat(ripString, buf);
 
     /* Put together death description */
-    formatkiller(buf, sizeof buf, how);
+    formatkiller(buf, sizeof buf, how, FALSE);
 
     /* Put death type on stone */
     Strcat(ripString, buf);

@@ -1,4 +1,4 @@
-/* NetHack 3.6	dungeon.c	$NHDT-Date: 1448862377 2015/11/30 05:46:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.69 $ */
+/* NetHack 3.6	dungeon.c	$NHDT-Date: 1450432757 2015/12/18 09:59:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.70 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2895,7 +2895,7 @@ boolean printdun;
             if (died_here) {
                 /* disclosure occurs before bones creation, so listing dead
                    hero here doesn't give away whether bones are produced */
-                formatkiller(tmpbuf, sizeof tmpbuf, how);
+                formatkiller(tmpbuf, sizeof tmpbuf, how, TRUE);
                 /* rephrase a few death reasons to work with "you" */
                 (void) strsubst(tmpbuf, " himself", " yourself");
                 (void) strsubst(tmpbuf, " herself", " yourself");

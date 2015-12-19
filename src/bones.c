@@ -1,4 +1,4 @@
-/* NetHack 3.6	bones.c	$NHDT-Date: 1450261363 2015/12/16 10:22:43 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.67 $ */
+/* NetHack 3.6	bones.c	$NHDT-Date: 1450432756 2015/12/18 09:59:16 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.68 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985,1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -479,7 +479,7 @@ make_bones:
     Sprintf(newbones->who, "%s-%.3s-%.3s-%.3s-%.3s", plname, urole.filecode,
             urace.filecode, genders[flags.female].filecode,
             aligns[1 - u.ualign.type].filecode);
-    formatkiller(newbones->how, sizeof newbones->how, how);
+    formatkiller(newbones->how, sizeof newbones->how, how, TRUE);
     Strcpy(newbones->when, yyyymmddhhmmss(when));
     /* final resting place, used to decide when bones are discovered */
     newbones->frpx = u.ux, newbones->frpy = u.uy;

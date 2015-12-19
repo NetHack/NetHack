@@ -1221,14 +1221,20 @@ static const struct {
     { "magenta", CLR_MAGENTA },
     { "cyan", CLR_CYAN },
     { "gray", CLR_GRAY },
-    { "grey", CLR_GRAY },
     { "orange", CLR_ORANGE },
     { "light green", CLR_BRIGHT_GREEN },
     { "yellow", CLR_YELLOW },
     { "light blue", CLR_BRIGHT_BLUE },
     { "light magenta", CLR_BRIGHT_MAGENTA },
     { "light cyan", CLR_BRIGHT_CYAN },
-    { "white", CLR_WHITE }
+    { "white", CLR_WHITE },
+    { NULL, CLR_BLACK }, /* everything after this is an alias */
+    { "grey", CLR_GRAY },
+    { "bright red", CLR_ORANGE },
+    { "bright green", CLR_BRIGHT_GREEN },
+    { "bright blue", CLR_BRIGHT_BLUE },
+    { "bright magenta", CLR_BRIGHT_MAGENTA },
+    { "bright cyan", CLR_BRIGHT_CYAN }
 };
 
 static const struct {
@@ -1250,7 +1256,7 @@ int clr;
     int i;
 
     for (i = 0; i < SIZE(colornames); i++)
-        if (colornames[i].color == clr)
+        if (colornames[i].name && colornames[i].color == clr)
             return colornames[i].name;
     return (char *) 0;
 }
@@ -1279,8 +1285,8 @@ query_color()
     start_menu(tmpwin);
     any = zeroany;
     for (i = 0; i < SIZE(colornames); i++) {
-        if (!strcmp(colornames[i].name, "grey"))
-            continue;
+        if (!colornames[i].name)
+            break;
         any.a_int = i + 1;
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, colornames[i].name,
                  MENU_UNSELECTED);
@@ -1547,7 +1553,8 @@ char *str;
        (also junk like "_l i-gh_t---b l u e" but we won't worry about that);
        also copes with trailing space; mungspaces removed any leading space */
     for (i = 0; i < SIZE(colornames); i++)
-        if (fuzzymatch(tmps, colornames[i].name, " -_", TRUE)) {
+        if (colornames[i].name
+            && fuzzymatch(tmps, colornames[i].name, " -_", TRUE)) {
             c = colornames[i].color;
             break;
         }

@@ -36,12 +36,23 @@ make a previously-discovered scroll written with marker while blind have its
 	label known so it can be read while blind
 #name or C for discoveries list that spanned multiple pages would exit on
 	space instead of advancing to next page (workaround: use '>' instead)
+don't show the old level when you die going down the stairs because of an
+        iron ball
+new high score with ", while helpless" attribute appended would erroneously
+	result in ", while helpless" being appended to all scores
+allow bright aliases for colors in menucolors
+make MAXPLAYERS option in sysconf accept 0 value
+avoid hearing yelps when you are deaf
+make corpse visible if stethoscope told you about it being there
+sceptre of might database entry word change
 
 
 Platform- and/or Interface-Specific Fixes
 -----------------------------------------
 tty: M-N gave "Unknown command 'M-" with "'." finishing the sentence on the
 	line below it, leaving bogus '.' displayed on the top row of the map
+tty: specifying all four of role, race, gender, and alignment still prompted
+	for confirmation with "Is this ok?" before starting play
 unix/X11: in top level Makefile, some commented out definitions of VARDATND
 	misspelled pilemark.xbm (as pilemark.xpm)
 win32gui: getversionstring() was overflowing the provided Help About buffer
@@ -56,6 +67,7 @@ General New Features
 --------------------
 naming Sting or Orcrist now breaks illiterate conduct
 different feedback for reading a scroll of mail created by writing with marker
+wizard mode #wizintrinsic
 
 
 Platform- and/or Interface-Specific New Features
