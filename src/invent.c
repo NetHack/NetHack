@@ -1099,6 +1099,7 @@ register const char *let, *word;
                  && (otmp->otyp != HORN_OF_PLENTY || !otmp->dknown
                      || !objects[HORN_OF_PLENTY].oc_name_known))
              || (!strcmp(word, "charge") && !is_chargeable(otmp))
+             || (!strcmp(word, "open") && otyp != TIN)
              || (!strcmp(word, "call") && !objtyp_is_callable(otyp))
              ) {
                 foo--;

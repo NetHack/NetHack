@@ -604,6 +604,7 @@ E void NDECL(init_uhunger);
 E int NDECL(Hear_again);
 E void NDECL(reset_eat);
 E int NDECL(doeat);
+E int FDECL(use_tin_opener, (struct obj *));
 E void NDECL(gethungry);
 E void FDECL(morehungry, (int));
 E void FDECL(lesshungry, (int));

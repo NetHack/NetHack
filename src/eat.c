@@ -2579,6 +2579,34 @@ doeat()
     return 1;
 }
 
+int
+use_tin_opener(obj)
+register struct obj *obj;
+{
+    register struct obj *otmp;
+    int res = 0;
+
+    if (!carrying(TIN)) {
+        You("have no tin to open.");
+        return 0;
+    }
+
+    if (obj != uwep) {
+        if (obj->cursed && obj->bknown) {
+            char qbuf[QBUFSZ];
+            (void) safe_qbuf(qbuf, "Really wield ", "?", obj, doname, ansimpleoname, "that");
+            if (ynq(qbuf) != 'y') return 0;
+        }
+	if (!wield_tool(obj, "use")) return 0;
+	else res = 1;
+    }
+
+    otmp = getobj((const char *)comestibles, "open");
+    if (!otmp) return 0;
+    start_tin(otmp);
+    return(1);
+}
+
 /* Take a single bite from a piece of food, checking for choking and
  * modifying usedtime.  Returns 1 if they choked and survived, 0 otherwise.
  */
