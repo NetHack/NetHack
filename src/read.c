@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1450483329 2015/12/19 00:02:09 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.129 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1450490118 2015/12/19 01:55:18 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.130 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -171,7 +171,6 @@ doread()
 {
     register struct obj *scroll;
     boolean confused, nodisappear;
-    boolean pronounced_not_read = FALSE;
 
     known = FALSE;
     if (check_capacity((char *) 0))
@@ -300,8 +299,6 @@ doread()
             what = "mystic runes";
         else if (!scroll->dknown)
             what = "formula on the scroll";
-        else if (scroll->dknown)
-            pronounced_not_read = TRUE;
         if (what) {
             pline("Being blind, you cannot read the %s.", what);
             return 0;
@@ -332,7 +329,7 @@ doread()
     /* Novel conduct is handled in read_tribute so exclude it too*/
     if (scroll->otyp != SPE_BOOK_OF_THE_DEAD
         && scroll->otyp != SPE_BLANK_PAPER && scroll->otyp != SCR_BLANK_PAPER
-        && scroll->otyp != SPE_NOVEL && !pronounced_not_read)
+        && scroll->otyp != SPE_NOVEL)
         u.uconduct.literate++;
 
     if (scroll->oclass == SPBOOK_CLASS) {
