@@ -1,4 +1,4 @@
-/* NetHack 3.6	wield.c	$NHDT-Date: 1446887539 2015/11/07 09:12:19 $  $NHDT-Branch: master $:$NHDT-Revision: 1.47 $ */
+/* NetHack 3.6	wield.c	$NHDT-Date: 1450577672 2015/12/20 02:14:32 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.48 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -608,9 +608,22 @@ register int amount;
     if (!uwep || (uwep->oclass != WEAPON_CLASS && !is_weptool(uwep))) {
         char buf[BUFSZ];
 
-        Sprintf(buf, "Your %s %s.", makeplural(body_part(HAND)),
-                (amount >= 0) ? "twitch" : "itch");
-        strange_feeling(otmp, buf);
+        if (amount >= 0 && uwep && will_weld(uwep)) { /* cursed tin opener */
+            if (!Blind) {
+                Sprintf(buf, "%s with %s aura.",
+                        Yobjnam2(uwep, "glow"), an(hcolor(NH_AMBER)));
+                uwep->bknown = !Hallucination;
+            } else {
+                /* cursed tin opener is wielded in right hand */
+                Sprintf(buf, "Your right %s tingles.", body_part(HAND));
+            }
+            uncurse(uwep);
+            update_inventory();
+        } else {
+            Sprintf(buf, "Your %s %s.", makeplural(body_part(HAND)),
+                    (amount >= 0) ? "twitch" : "itch");
+        }
+        strange_feeling(otmp, buf); /* pline()+docall()+useup() */
         exercise(A_DEX, (boolean) (amount >= 0));
         return 0;
     }
