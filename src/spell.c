@@ -1,4 +1,4 @@
-/* NetHack 3.6	spell.c	$NHDT-Date: 1450306224 2015/12/16 22:50:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.74 $ */
+/* NetHack 3.6	spell.c	$NHDT-Date: 1450584420 2015/12/20 04:07:00 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.75 $ */
 /*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -474,6 +474,7 @@ register struct obj *spellbook;
                              spellbook->o_id)) {
                 u.uconduct.literate++;
                 check_unpaid(spellbook);
+                makeknown(booktype);
                 if (!u.uevent.read_tribute) {
                     /* give bonus of 20 xp and 4*20+0 pts */
                     more_experienced(20, 0);
