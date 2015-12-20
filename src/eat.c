@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1449269916 2015/12/04 22:58:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.154 $ */
+/* NetHack 3.6	eat.c	$NHDT-Date: 1450573885 2015/12/20 01:11:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.156 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2581,9 +2581,9 @@ doeat()
 
 int
 use_tin_opener(obj)
-register struct obj *obj;
+struct obj *obj;
 {
-    register struct obj *otmp;
+    struct obj *otmp;
     int res = 0;
 
     if (!carrying(TIN)) {
@@ -2594,17 +2594,22 @@ register struct obj *obj;
     if (obj != uwep) {
         if (obj->cursed && obj->bknown) {
             char qbuf[QBUFSZ];
-            (void) safe_qbuf(qbuf, "Really wield ", "?", obj, doname, ansimpleoname, "that");
-            if (ynq(qbuf) != 'y') return 0;
+
+            if (ynq(safe_qbuf(qbuf, "Really wield ", "?",
+                              obj, doname, thesimpleoname, "that")) != 'y')
+                return 0;
         }
-	if (!wield_tool(obj, "use")) return 0;
-	else res = 1;
+	if (!wield_tool(obj, "use"))
+            return 0;
+        res = 1;
     }
 
-    otmp = getobj((const char *)comestibles, "open");
-    if (!otmp) return 0;
+    otmp = getobj(comestibles, "open");
+    if (!otmp)
+        return res;
+
     start_tin(otmp);
-    return(1);
+    return 1;
 }
 
 /* Take a single bite from a piece of food, checking for choking and
