@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1446854234 2015/11/06 23:57:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.116 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1450604649 2015/12/20 09:44:09 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.117 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -383,9 +383,8 @@ register xchar x, y;
 
     rno = levl[x][y].roomno;
     if ((rno < ROOMOFFSET) || levl[x][y].edge || !IS_SHOP(rno - ROOMOFFSET))
-        return NO_ROOM;
-    else
-        return rno;
+        rno = NO_ROOM;
+    return rno;
 }
 
 void
@@ -773,21 +772,18 @@ register char rmno;
 
 boolean
 tended_shop(sroom)
-register struct mkroom *sroom;
+struct mkroom *sroom;
 {
-    register struct monst *mtmp = sroom->resident;
+    struct monst *mtmp = sroom->resident;
 
-    if (!mtmp)
-        return FALSE;
-    else
-        return (boolean) inhishop(mtmp);
+    return !mtmp ? FALSE : (boolean) inhishop(mtmp);
 }
 
 STATIC_OVL struct bill_x *
 onbill(obj, shkp, silent)
-register struct obj *obj;
-register struct monst *shkp;
-register boolean silent;
+struct obj *obj;
+struct monst *shkp;
+boolean silent;
 {
     if (shkp) {
         register struct bill_x *bp = ESHK(shkp)->bill_p;
@@ -1131,12 +1127,13 @@ register xchar ox, oy;
     hot_pursuit(shkp);
 }
 
-STATIC_VAR const char no_money[] = "Moreover, you%s have no money.";
-STATIC_VAR const char not_enough_money[] =
-    "Besides, you don't have enough to interest %s.";
+STATIC_VAR const char
+        no_money[] = "Moreover, you%s have no money.",
+        not_enough_money[] = "Besides, you don't have enough to interest %s.";
 
+/* delivers the cheapest item on the list */
 STATIC_OVL long
-cheapest_item(shkp) /* delivers the cheapest item on the list */
+cheapest_item(shkp)
 register struct monst *shkp;
 {
     register int ct = ESHK(shkp)->billct;
@@ -1348,6 +1345,7 @@ proceed:
         long dtmp = eshkp->debit;
         long loan = eshkp->loan;
         char sbuf[BUFSZ];
+
         umoney = money_cnt(invent);
         Sprintf(sbuf, "You owe %s %ld %s ", shkname(shkp), dtmp,
                 currency(dtmp));
@@ -1394,6 +1392,7 @@ proceed:
     if (eshkp->billct) {
         register boolean itemize;
         int iprompt;
+
         umoney = money_cnt(invent);
         if (!umoney && !eshkp->credit) {
             You("%shave no money or credit%s.",
@@ -2122,7 +2121,7 @@ boolean quietly;
                               (7 - obj->spe), (obj->spe > 0) ? " more" : "",
                               plur(7 - obj->spe));
                 /* [what if hero is already carrying enough candles?
-                   should Izchak explain how to attach them instead] */
+                   should Izchak explain how to attach them instead?] */
             } else {
                 verbalize("I won't stock that.  Take it out of here!");
             }
