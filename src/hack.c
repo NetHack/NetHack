@@ -1370,8 +1370,9 @@ domove()
         }
 
         mtmp = m_at(x, y);
-        if (mtmp) {
+        if (mtmp && !is_safepet(mtmp)) {
             /* Don't attack if you're running, and can see it */
+            /* It's fine to displace pets, though */
             /* We should never get here if forcefight */
             if (context.run && ((!Blind && mon_visible(mtmp)
                                  && ((mtmp->m_ap_type != M_AP_FURNITURE
@@ -1393,7 +1394,10 @@ domove()
 
     /* attack monster */
     if (mtmp) {
-        nomul(0);
+        /* don't stop travel when displacing pets; if the
+           displace fails for some reason, attack() in uhitm.c
+           will stop travel rather than domove */
+        if (!is_safepet(mtmp) || context.forcefight) nomul(0);
         /* only attack if we know it's there */
         /* or if we used the 'F' command to fight blindly */
         /* or if it hides_under, in which case we call attack() to print
@@ -1409,7 +1413,7 @@ domove()
          * attack_check(), which still wastes a turn, but prints a
          * different message and makes the player remember the monster.
          */
-        if (context.nopick
+        if (context.nopick && !context.travel
             && (canspotmon(mtmp) || glyph_is_invisible(levl[x][y].glyph))) {
             if (mtmp->m_ap_type && !Protection_from_shape_changers
                 && !sensemon(mtmp))
@@ -2415,7 +2419,7 @@ lookaround()
                 && mtmp->m_ap_type != M_AP_OBJECT
                 && (!mtmp->minvis || See_invisible) && !mtmp->mundetected) {
                 if ((context.run != 1 && !mtmp->mtame)
-                    || (x == u.ux + u.dx && y == u.uy + u.dy))
+                    || (x == u.ux + u.dx && y == u.uy + u.dy && !context.travel))
                     goto stop;
             }
 
@@ -2678,6 +2682,8 @@ boolean k_format;
     u.uhp -= n;
     if (u.uhp > u.uhpmax)
         u.uhpmax = u.uhp; /* perhaps n was negative */
+    else
+        context.travel = context.travel1 = context.mv = context.run = 0;
     context.botl = 1;
     if (u.uhp < 1) {
         killer.format = k_format;
