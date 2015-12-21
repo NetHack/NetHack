@@ -1,4 +1,4 @@
-/* NetHack 3.6	potion.c	$NHDT-Date: 1450660662 2015/12/21 01:17:42 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.123 $ */
+/* NetHack 3.6	potion.c	$NHDT-Date: 1450667491 2015/12/21 03:11:31 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.124 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1754,6 +1754,7 @@ register struct obj *o1, *o2;
 int
 dodip()
 {
+    static const char Dip_[] = "Dip ", into_the_something[] = " into the %s?";
     register struct obj *potion, *obj;
     struct obj *singlepotion;
     uchar here;
@@ -1773,19 +1774,28 @@ dodip()
     here = levl[u.ux][u.uy].typ;
     /* Is there a fountain to dip into here? */
     if (IS_FOUNTAIN(here)) {
+        Sprintf(qtoo, into_the_something, "fountain");
+        if (flags.verbose)
+            (void) safe_qbuf(qbuf, Dip_, qtoo, obj,
+                             doname, thesimpleoname, shortestname);
+        else
+            Sprintf(qbuf, "%s%s%s", Dip_, shortestname, qtoo);
         /* "Dip <the object> into the fountain?" */
-        if (yn(safe_qbuf(qbuf, "Dip ", " into the fountain?", obj,
-                         doname, thesimpleoname, shortestname)) == 'y') {
+        if (yn(qbuf) == 'y') {
             dipfountain(obj);
             return 1;
         }
     } else if (is_pool(u.ux, u.uy)) {
         const char *pooltype = waterbody_name(u.ux, u.uy);
 
+        Sprintf(qtoo, into_the_something, pooltype);
+        if (flags.verbose)
+            (void) safe_qbuf(qbuf, Dip_, qtoo, obj,
+                             doname, thesimpleoname, shortestname);
+        else
+            Sprintf(qbuf, "%s%s%s", Dip_, shortestname, qtoo);
         /* "Dip <the object> into the {pool, moat, &c}?" */
-        Sprintf(qtoo, " into the %s?", pooltype);
-        if (yn(safe_qbuf(qbuf, "Dip ", qtoo, obj,
-                         doname, thesimpleoname, shortestname)) == 'y') {
+        if (yn(qbuf) == 'y') {
             if (Levitation) {
                 floating_above(pooltype);
             } else if (u.usteed && !is_swimmer(u.usteed->data)
@@ -1802,10 +1812,19 @@ dodip()
     }
 
     /* "What do you want to dip <the object> into?" */
-    Strcpy(qbuf, safe_qbuf(qtoo, "What do you want to dip ", " into?", obj,
-                           doname, thesimpleoname, shortestname)
-                 + sizeof "What do you want to " - sizeof "");
-    potion = getobj(beverages, qbuf); /* "dip into" */
+    if (flags.verbose) {
+        /* "What do you want to " is getobj()'s prefix, "dip " is ours */
+        Strcpy(qbuf, safe_qbuf(qtoo, "What do you want to dip ", " into?",
+                               obj, doname, thesimpleoname, shortestname)
+                     /* skip getobj()'s prefix when assigning to qbuf */
+                     + sizeof "What do you want to " - sizeof "");
+        /* we needed the '?' in " into?" so that safe_qbuf() was working
+           with the right overall length, but now we need to take the '?'
+           off because getobj() is going to append one */
+        *(eos(qbuf) - 1) = '\0';
+    } else
+        Sprintf(qbuf, "dip %s into", shortestname);
+    potion = getobj(beverages, qbuf); /* qbuf[] == "dip <obj> into" */
     if (!potion)
         return 0;
     if (potion == obj && potion->quan == 1L) {
