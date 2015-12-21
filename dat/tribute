@@ -5283,18 +5283,19 @@ that moment you had never known that you always wanted to do it...
 #
 #
 #
-%title Raising Steam (8)
+%title Raising Steam (13)
+# p. 281 (Anchor Books edition; passage starts mid-paragraph)
 %passage 1
-Yesterday you never thought about it and after today you 
-don't know what you would do without it. 
-
-That was what the technology was doing. 
+[...]  And yesterday you never thought about it and after today you don't
+know what you would do without it.  That was what the technology was doing.
 It was your slave but, in a sense, it might be the other way round.
 
   [Raising Steam, by Terry Pratchett]
 %e passage
+# p. 358 (passage starts mid-paragraph and ends mid-paragraph; quote is
+#         attributed to Lord Vetinari but he's not present in the scene)
 %passage 2
-If you take enough precautions, you never need to take precautions.
+"If you take enough precautions, you never need to take precautions."
 
   [Raising Steam, by Terry Pratchett]
 %e passage
@@ -5388,22 +5389,88 @@ looking at.
 
   [Raising Steam, by Terry Pratchett]
 %e passage
+##
+# passages 9..13 added after 3.6.0's release
+##
+# pp. 20-21
+%passage 9
+Moist Von Lipwig had done some heavy work once and couldn't see any future
+in it, but he could look at it for hours, provided other people were doing
+it, of course, and clearly some of them liked what they were doing, and so
+he shrugged and felt happy that Crisp was happy being a handyman whilst
+Moist was happy not picking up anything that was heavier than a glass.
+After all, his work was unseen and depended on words, which were
+fortunately not very heavy and didn't need grease.  In his career as a
+crook they had served him well and now he felt somewhat smug at using them
+to the benefit of the citizenry.
+
+There was a difference between a banker and a crook, there really was, and
+although it was very, very teeny Moist felt that he should point out that
+it did exist and, besides, Lord Vetinari always had his eye on him.
+
+So everybody was happy and Moist went to work in very clean clothes and
+with a very clean conscience.
+
+  [Raising Steam, by Terry Pratchett]
+%e passage
+# p. 22
+%passage 10
+Harry, red-faced and impatient, looked over his desk and said to him, "Lad,
+time is money and I'm a busy man.  You told Nancy down on reception that
+you've got something I might like.  Now stop fidgeting and look me in the
+face square like.  If you're another chancer wanting to bamboozle me I'll
+have you down the Effing stairs(1) before you know it."
+
+(1) The wonderfully colored oak wood of the Effing Forest was much in
+demand for high-class joinery.
+
+  [Raising Steam, by Terry Pratchett]
+%e passage
+# p. 80
+%passage 11
+Moist knew about the zeitgeist, he tasted it in the wind, and sometimes it
+allowed him to play with it.  He understood it, and now it hinted at speed,
+escape, something wonderfully new, the very bones of the land awakening,
+and suddenly it seemed to cry out for motion, new horizons, faraway places,
+/anywhere that is not here/!  No doubt about it, the railway was going to
+turn coal into gold.
+
+  [Raising Steam, by Terry Pratchett]
+%e passage
+# p. 195 (passage starts mid-paragraph and ends mid-paragraph)
+%passage 12
+And the trouble with madness was that the mad didn't know they were mad.
+
+  [Raising Steam, by Terry Pratchett]
+%e passage
+# p. 284 (passage starts mid-paragraph; speaker is Cmdr Vimes of the Watch)
+%passage 13
+"[...]  That's the trouble, you see.  When you've had hatred on your tongue
+for such a long time, you don't know how to spit it out."
+
+  [Raising Steam, by Terry Pratchett]
+%e passage
 %e title
+#
+#
+#
 %title The Shepherd's Crown (1)
 %passage 1
 'It's an inconvenience, true enough, and I don't like it at all, but I
 know that you do it for everyone, Mister Death. Is there any other way?'
 
-NO, THERE ISN'T, I'M AFRAID. WE ARE ALL FLOATING IN THE WINDS OF TIME. 
-BUT YOUR CANDLE, MISTRESS WEATHERWAX, WILL FLICKER FOR SOME TIME BEFORE 
-IT GOES OUT -- A LITTLE REWARD FOR A LIFE WELL LIVED. FOR I CAN SEE THE 
-BALANCE AND YOU HAVE LEFT THE WORLD MUCH BETTER THAN YOU FOUND IT, AND 
-IF YOU ASK ME, said Death, NOBODY COULD DO ANY BETTER THAN THAT. . . 
+NO, THERE ISN'T, I'M AFRAID. WE ARE ALL FLOATING IN THE WINDS OF TIME.
+BUT YOUR CANDLE, MISTRESS WEATHERWAX, WILL FLICKER FOR SOME TIME BEFORE
+IT GOES OUT -- A LITTLE REWARD FOR A LIFE WELL LIVED. FOR I CAN SEE THE
+BALANCE AND YOU HAVE LEFT THE WORLD MUCH BETTER THAN YOU FOUND IT, AND
+IF YOU ASK ME, said Death, NOBODY COULD DO ANY BETTER THAN THAT...
 
   [The Shepherd's Crown, by Terry Pratchett]
 %e passage
 %e title
+#
 %e section
+#
 #-----------------------------------------------------
 # Used for interaction with Death.
 #
