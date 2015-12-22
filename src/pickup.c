@@ -720,7 +720,12 @@ menu_item **pick_list; /* list of objects and counts to pick up */
 
     /* first count the number of eligible items */
     for (n = 0, curr = olist; curr; curr = FOLLOW(curr, follow)) {
-        pickit = (!*otypes || index(otypes, curr->oclass));
+        /* pick if in pickup_types and not unpaid item in shop */
+        pickit = ((!*otypes || index(otypes, curr->oclass))
+                  && !(curr->where == OBJ_FLOOR
+                       && !curr->no_charge
+                       && isok(curr->ox, curr->oy)
+                       && costly_spot(curr->ox, curr->oy)));
         /* check for "always pick up */
         if (!pickit)
             pickit = is_autopickup_exception(curr, TRUE);
