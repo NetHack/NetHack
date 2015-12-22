@@ -2157,7 +2157,7 @@ register struct monst *shkp;
                 tmp = (obj->otyp % (6 - shkp->m_id % 3));
                 tmp = (tmp + 3) * obj->quan;
             }
-        } else if (tmp > 1L && !rn2(4))
+        } else if (tmp > 1L && !(shkp->m_id % 4))
             multiplier *= 3L, divisor *= 4L;
     }
 
