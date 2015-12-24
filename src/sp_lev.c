@@ -1823,8 +1823,8 @@ struct mkroom *croom;
         otmp->obroken = 1;
         otmp->olocked = 0; /* obj generation may set */
     }
-    if (o->trapped)
-        otmp->otrapped = 1;
+    if (o->trapped == 0 || o->trapped == 1)
+        otmp->otrapped = o->trapped;
     if (o->greased)
         otmp->greased = 1;
 #ifdef INVISIBLE_OBJECTS
@@ -3023,7 +3023,7 @@ struct sp_coder *coder;
     tmpobj.lit = 0;
     tmpobj.eroded = 0;
     tmpobj.locked = 0;
-    tmpobj.trapped = 0;
+    tmpobj.trapped = -1;
     tmpobj.recharged = 0;
     tmpobj.invis = 0;
     tmpobj.greased = 0;
