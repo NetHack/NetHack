@@ -3298,7 +3298,7 @@ boolean tinitial, tfrom_file;
      * options list
      */
     for (i = 0; boolopt[i].name; i++) {
-        if (match_optname(opts, boolopt[i].name, 3, FALSE)) {
+        if (match_optname(opts, boolopt[i].name, 3, TRUE)) {
             /* options that don't exist */
             if (!boolopt[i].addr) {
                 if (!initial && !negated)
@@ -3310,6 +3310,23 @@ boolean tinitial, tfrom_file;
             if (!initial && (boolopt[i].optflags == SET_IN_FILE)) {
                 rejectoption(boolopt[i].name);
                 return;
+            }
+
+            op = string_for_opt(opts, TRUE);
+
+            if (op) {
+                if (negated) {
+                    badoption(opts);
+                    return;
+                }
+                if (!strcmp(op, "true") || !strcmp(op, "yes"))
+                    negated = FALSE;
+                else if (!strcmp(op, "false") || !strcmp(op, "no"))
+                    negated = TRUE;
+                else {
+                    badoption(opts);
+                    return;
+                }
             }
 
             *(boolopt[i].addr) = !negated;
