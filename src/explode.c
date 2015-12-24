@@ -1,4 +1,4 @@
-/* NetHack 3.6	explode.c	$NHDT-Date: 1446955298 2015/11/08 04:01:38 $  $NHDT-Branch: master $:$NHDT-Revision: 1.44 $ */
+/* NetHack 3.6	explode.c	$NHDT-Date: 1450915435 2015/12/24 00:03:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.45 $ */
 /*      Copyright (C) 1990 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -311,12 +311,13 @@ int expltype;
                        so avoid any which begins with a capital letter) */
                     do {
                         Sprintf(hallu_buf, "%s explosion",
-                                s_suffix(rndmonnam(NULL)));
+                                s_suffix(rndmonnam((char *) 0)));
                     } while (*hallu_buf != lowc(*hallu_buf));
                     str = hallu_buf;
                 }
                 if (u.uswallow && mtmp == u.ustuck) {
-                    const char *adj = NULL;
+                    const char *adj = (char *) 0;
+
                     if (is_animal(u.ustuck->data)) {
                         switch (adtyp) {
                         case AD_FIRE:
@@ -431,7 +432,7 @@ int expltype;
             if (do_hallu) { /* (see explanation above) */
                 do {
                     Sprintf(hallu_buf, "%s explosion",
-                            s_suffix(rndmonnam(NULL)));
+                            s_suffix(rndmonnam((char *) 0)));
                 } while (*hallu_buf != lowc(*hallu_buf));
                 str = hallu_buf;
             }
@@ -468,9 +469,8 @@ int expltype;
                 rehumanize();
             } else {
                 if (olet == MON_EXPLODE) {
-                    /* killer handled by caller */
-                    if (generic)
-                        killer.name[0] = 0;
+                    if (generic) /* explosion was unseen; str=="explosion", */
+                        ;        /* killer.name=="gas spore's explosion"    */
                     else if (str != killer.name && str != hallu_buf)
                         Strcpy(killer.name, str);
                     killer.format = KILLED_BY_AN;
@@ -486,8 +486,7 @@ int expltype;
                     Strcpy(killer.name, str);
                 }
                 if (iflags.last_msg == PLNMSG_CAUGHT_IN_EXPLOSION
-                    || iflags.last_msg
-                           == PLNMSG_TOWER_OF_FLAME) /*seffects()*/
+                    || iflags.last_msg == PLNMSG_TOWER_OF_FLAME) /*seffects()*/
                     pline("It is fatal.");
                 else
                     pline_The("%s is fatal.", str);
