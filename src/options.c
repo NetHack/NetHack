@@ -3402,6 +3402,12 @@ boolean tinitial, tfrom_file;
         }
     }
 
+    /* Is it a symbol? */
+    if (strstr(opts, "S_") == opts && parsesymbols(opts)) {
+        switch_symbols(TRUE);
+        return;
+    }
+
     /* out of valid options */
     badoption(opts);
 }
@@ -4974,7 +4980,7 @@ free_symsets()
 }
 
 /* Parse the value of a SYMBOLS line from a config file */
-void
+boolean
 parsesymbols(opts)
 register char *opts;
 {
@@ -4984,7 +4990,7 @@ register char *opts;
 
     if ((op = index(opts, ',')) != 0) {
         *op++ = 0;
-        parsesymbols(op);
+        if (!parsesymbols(op)) return FALSE;
     }
 
     /* S_sample:string */
@@ -4993,7 +4999,7 @@ register char *opts;
     if (!strval)
         strval = index(opts, '=');
     if (!strval)
-        return;
+        return FALSE;
     *strval++ = '\0';
 
     /* strip leading and trailing white space from symname and strval */
@@ -5002,12 +5008,13 @@ register char *opts;
 
     symp = match_sym(symname);
     if (!symp)
-        return;
+        return FALSE;
 
     if (symp->range && symp->range != SYM_CONTROL) {
         val = sym_val(strval);
         update_l_symset(symp, val);
     }
+    return TRUE;
 }
 
 struct symparse *

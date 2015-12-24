@@ -2386,7 +2386,10 @@ int src;
                     *op = '\0';
             }
             /* parse here */
-            parsesymbols(bufp);
+            if (!parsesymbols(bufp)) {
+                raw_printf("Error in SYMBOLS definition '%s'.\n", bufp);
+                wait_synch();
+            }
             if (morelines) {
                 do {
                     *symbuf = '\0';
