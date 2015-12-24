@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1450306207 2015/12/16 22:50:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.158 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1450584419 2015/12/20 04:06:59 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.159 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -120,7 +120,12 @@ register int otyp;
         Strcpy(buf, "wand");
         break;
     case SPBOOK_CLASS:
-        Strcpy(buf, "spellbook");
+        if (otyp != SPE_NOVEL) {
+            Strcpy(buf, "spellbook");
+        } else {
+            Strcpy(buf, !nn ? "book" : "novel");
+            nn = 0;
+        }
         break;
     case RING_CLASS:
         Strcpy(buf, "ring");

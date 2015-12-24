@@ -1,4 +1,4 @@
-/* NetHack 3.6	unixtty.c	$NHDT-Date: 1432512788 2015/05/25 00:13:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.19 $ */
+/* NetHack 3.6	unixtty.c	$NHDT-Date: 1450916700 2015/12/24 00:25:00 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.21 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -335,6 +335,9 @@ int sco_flag_console = 0;
 int sco_map_valid = -1;
 unsigned char sco_chanmap_buf[BSIZE];
 
+#if defined(TTY_GRAPHICS) && defined(TEXTCOLOR)
+extern int NDECL(has_colors);
+#endif
 void NDECL(sco_mapon);
 void NDECL(sco_mapoff);
 void NDECL(check_sco_console);
@@ -399,6 +402,9 @@ init_sco_cons()
 
 int linux_flag_console = 0;
 
+#if defined(TTY_GRAPHICS) && defined(TEXTCOLOR)
+extern int NDECL(has_colors);
+#endif
 void NDECL(linux_mapon);
 void NDECL(linux_mapoff);
 void NDECL(check_linux_console);

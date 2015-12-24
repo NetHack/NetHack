@@ -657,7 +657,7 @@ xchar x, y;
 }
 
 /* return TRUE if (dx,dy) is an OK place to move
- * mode is one of DO_MOVE, TEST_MOVE or TEST_TRAV
+ * mode is one of DO_MOVE, TEST_MOVE, TEST_TRAV, or TEST_TRAP
  */
 boolean
 test_move(ux, uy, dx, dy, mode)
@@ -747,7 +747,7 @@ int mode;
                         } else
                             pline("That door is closed.");
                     }
-                } else if (mode == TEST_TRAV)
+                } else if (mode == TEST_TRAV || mode == TEST_TRAP)
                     goto testdiag;
                 return FALSE;
             }
@@ -790,14 +790,18 @@ int mode;
     /* Pick travel path that does not require crossing a trap.
      * Avoid water and lava using the usual running rules.
      * (but not u.ux/u.uy because findtravelpath walks toward u.ux/u.uy) */
-    if (context.run == 8 && mode != DO_MOVE && (x != u.ux || y != u.uy)) {
+    if (context.run == 8
+        && (mode == TEST_MOVE || mode == TEST_TRAP)
+        && (x != u.ux || y != u.uy)) {
         struct trap *t = t_at(x, y);
 
         if ((t && t->tseen)
             || (!Levitation && !Flying && !is_clinger(youmonst.data)
                 && is_pool_or_lava(x, y) && levl[x][y].seenv))
-            return FALSE;
+            return (mode == TEST_TRAP);
     }
+
+    if (mode == TEST_TRAP) return FALSE; /* do not move through traps */
 
     ust = &levl[ux][uy];
 
@@ -915,6 +919,7 @@ boolean guess;
                 static int ordered[] = { 0, 2, 4, 6, 1, 3, 5, 7 };
                 /* no diagonal movement for grid bugs */
                 int dirmax = NODIAG(u.umonnum) ? 4 : 8;
+                boolean alreadyrepeated = FALSE;
 
                 for (dir = 0; dir < dirmax; ++dir) {
                     int nx = x + xdir[ordered[dir]];
@@ -923,14 +928,18 @@ boolean guess;
                     if (!isok(nx, ny))
                         continue;
                     if ((!Passes_walls && !can_ooze(&youmonst)
-                         && closed_door(x, y)) || sobj_at(BOULDER, x, y)) {
+                         && closed_door(x, y)) || sobj_at(BOULDER, x, y)
+                        || test_move(x, y, nx-x, ny-y, TEST_TRAP)) {
                         /* closed doors and boulders usually
                          * cause a delay, so prefer another path */
                         if (travel[x][y] > radius - 3) {
-                            travelstepx[1 - set][nn] = x;
-                            travelstepy[1 - set][nn] = y;
-                            /* don't change travel matrix! */
-                            nn++;
+                            if (!alreadyrepeated) {
+                                travelstepx[1 - set][nn] = x;
+                                travelstepy[1 - set][nn] = y;
+                                /* don't change travel matrix! */
+                                nn++;
+                                alreadyrepeated = TRUE;
+                            }
                             continue;
                         }
                     }
@@ -1361,8 +1370,9 @@ domove()
         }
 
         mtmp = m_at(x, y);
-        if (mtmp) {
+        if (mtmp && !is_safepet(mtmp)) {
             /* Don't attack if you're running, and can see it */
+            /* It's fine to displace pets, though */
             /* We should never get here if forcefight */
             if (context.run && ((!Blind && mon_visible(mtmp)
                                  && ((mtmp->m_ap_type != M_AP_FURNITURE
@@ -1384,7 +1394,10 @@ domove()
 
     /* attack monster */
     if (mtmp) {
-        nomul(0);
+        /* don't stop travel when displacing pets; if the
+           displace fails for some reason, attack() in uhitm.c
+           will stop travel rather than domove */
+        if (!is_safepet(mtmp) || context.forcefight) nomul(0);
         /* only attack if we know it's there */
         /* or if we used the 'F' command to fight blindly */
         /* or if it hides_under, in which case we call attack() to print
@@ -1400,7 +1413,7 @@ domove()
          * attack_check(), which still wastes a turn, but prints a
          * different message and makes the player remember the monster.
          */
-        if (context.nopick
+        if (context.nopick && !context.travel
             && (canspotmon(mtmp) || glyph_is_invisible(levl[x][y].glyph))) {
             if (mtmp->m_ap_type && !Protection_from_shape_changers
                 && !sensemon(mtmp))
@@ -2406,7 +2419,7 @@ lookaround()
                 && mtmp->m_ap_type != M_AP_OBJECT
                 && (!mtmp->minvis || See_invisible) && !mtmp->mundetected) {
                 if ((context.run != 1 && !mtmp->mtame)
-                    || (x == u.ux + u.dx && y == u.uy + u.dy))
+                    || (x == u.ux + u.dx && y == u.uy + u.dy && !context.travel))
                     goto stop;
             }
 
@@ -2669,6 +2682,8 @@ boolean k_format;
     u.uhp -= n;
     if (u.uhp > u.uhpmax)
         u.uhpmax = u.uhp; /* perhaps n was negative */
+    else
+        context.travel = context.travel1 = context.mv = context.run = 0;
     context.botl = 1;
     if (u.uhp < 1) {
         killer.format = k_format;

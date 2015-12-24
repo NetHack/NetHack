@@ -1,4 +1,4 @@
-/* NetHack 3.6	potion.c	$NHDT-Date: 1449977945 2015/12/13 03:39:05 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.122 $ */
+/* NetHack 3.6	potion.c	$NHDT-Date: 1450667491 2015/12/21 03:11:31 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.124 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1725,6 +1725,7 @@ register struct obj *o1, *o2;
         switch (o2->otyp) {
         case POT_SICKNESS:
             return POT_SICKNESS;
+        case POT_ENLIGHTENMENT:
         case POT_SPEED:
             return POT_BOOZE;
         case POT_GAIN_LEVEL:
@@ -1746,13 +1747,14 @@ register struct obj *o1, *o2;
         break;
     }
 
-    return 0;
+    return STRANGE_OBJECT;
 }
 
 /* #dip command */
 int
 dodip()
 {
+    static const char Dip_[] = "Dip ", into_the_something[] = " into the %s?";
     register struct obj *potion, *obj;
     struct obj *singlepotion;
     uchar here;
@@ -1772,19 +1774,28 @@ dodip()
     here = levl[u.ux][u.uy].typ;
     /* Is there a fountain to dip into here? */
     if (IS_FOUNTAIN(here)) {
+        Sprintf(qtoo, into_the_something, "fountain");
+        if (flags.verbose)
+            (void) safe_qbuf(qbuf, Dip_, qtoo, obj,
+                             doname, thesimpleoname, shortestname);
+        else
+            Sprintf(qbuf, "%s%s%s", Dip_, shortestname, qtoo);
         /* "Dip <the object> into the fountain?" */
-        if (yn(safe_qbuf(qbuf, "Dip ", " into the fountain?", obj,
-                         doname, thesimpleoname, shortestname)) == 'y') {
+        if (yn(qbuf) == 'y') {
             dipfountain(obj);
             return 1;
         }
     } else if (is_pool(u.ux, u.uy)) {
         const char *pooltype = waterbody_name(u.ux, u.uy);
 
+        Sprintf(qtoo, into_the_something, pooltype);
+        if (flags.verbose)
+            (void) safe_qbuf(qbuf, Dip_, qtoo, obj,
+                             doname, thesimpleoname, shortestname);
+        else
+            Sprintf(qbuf, "%s%s%s", Dip_, shortestname, qtoo);
         /* "Dip <the object> into the {pool, moat, &c}?" */
-        Sprintf(qtoo, " into the %s?", pooltype);
-        if (yn(safe_qbuf(qbuf, "Dip ", qtoo, obj,
-                         doname, thesimpleoname, shortestname)) == 'y') {
+        if (yn(qbuf) == 'y') {
             if (Levitation) {
                 floating_above(pooltype);
             } else if (u.usteed && !is_swimmer(u.usteed->data)
@@ -1801,10 +1812,19 @@ dodip()
     }
 
     /* "What do you want to dip <the object> into?" */
-    Strcpy(qbuf, safe_qbuf(qtoo, "What do you want to dip ", " into?", obj,
-                           doname, thesimpleoname, shortestname)
-                 + sizeof "What do you want to " - sizeof "");
-    potion = getobj(beverages, qbuf); /* "dip into" */
+    if (flags.verbose) {
+        /* "What do you want to " is getobj()'s prefix, "dip " is ours */
+        Strcpy(qbuf, safe_qbuf(qtoo, "What do you want to dip ", " into?",
+                               obj, doname, thesimpleoname, shortestname)
+                     /* skip getobj()'s prefix when assigning to qbuf */
+                     + sizeof "What do you want to " - sizeof "");
+        /* we needed the '?' in " into?" so that safe_qbuf() was working
+           with the right overall length, but now we need to take the '?'
+           off because getobj() is going to append one */
+        *(eos(qbuf) - 1) = '\0';
+    } else
+        Sprintf(qbuf, "dip %s into", shortestname);
+    potion = getobj(beverages, qbuf); /* qbuf[] == "dip <obj> into" */
     if (!potion)
         return 0;
     if (potion == obj && potion->quan == 1L) {
@@ -1859,19 +1879,25 @@ dodip()
         potion->in_use = FALSE; /* didn't go poof */
         return 1;
     } else if (obj->oclass == POTION_CLASS && obj->otyp != potion->otyp) {
-        long amt = obj->quan;
+        int amt = (int) obj->quan;
+        boolean magic;
 
-        Strcpy(qbuf, "The");
-        if (amt > (objects[potion->otyp].oc_magic ? 2L : 9L)) {
+        mixture = mixtype(obj, potion);
+
+        magic = (mixture != STRANGE_OBJECT) ? objects[mixture].oc_magic
+            : (objects[obj->otyp].oc_magic || objects[potion->otyp].oc_magic);
+        Strcpy(qbuf, "The"); /* assume full stack */
+        if (amt > (magic ? 3 : 7)) {
             /* trying to dip multiple potions will usually affect only a
-               subset; pick an amount between 2 and min(N,9), inclusive */
-            amt -= 1L;
-            do {
-                amt = (long) rnd((int) amt);
-            } while (amt >= 9L);
-            amt += 1L;
-            if (amt < obj->quan) {
-                obj = splitobj(obj, amt);
+               subset; pick an amount between 3 and 8, inclusive, for magic
+               potion result, between 7 and N for non-magic */
+            if (magic)
+                amt = rnd(min(amt, 8) - (3 - 1)) + (3 - 1); /* 1..6 + 2 */
+            else
+                amt = rnd(amt - (7 - 1)) + (7 - 1); /* 1..(N-6) + 6 */
+
+            if ((long) amt < obj->quan) {
+                obj = splitobj(obj, (long) amt);
                 Sprintf(qbuf, "%ld of the", obj->quan);
             }
         }
@@ -1894,7 +1920,7 @@ dodip()
                 potionbreathe(obj);
             useupall(obj);
             useup(potion);
-            losehp((int) (amt + rnd(9)), /* not physical damage */
+            losehp(amt + rnd(9), /* not physical damage */
                    "alchemic blast", KILLED_BY_AN);
             return 1;
         }
@@ -1903,7 +1929,7 @@ dodip()
         if (Blind || Hallucination)
             obj->dknown = 0;
 
-        if ((mixture = mixtype(obj, potion)) != 0) {
+        if (mixture != STRANGE_OBJECT) {
             obj->otyp = mixture;
         } else {
             switch (obj->odiluted ? 1 : rnd(8)) {
@@ -2065,7 +2091,7 @@ more_dips:
 
     potion->in_use = FALSE; /* didn't go poof */
     if ((obj->otyp == UNICORN_HORN || obj->otyp == AMETHYST)
-        && (mixture = mixtype(obj, potion)) != 0) {
+        && (mixture = mixtype(obj, potion)) != STRANGE_OBJECT) {
         char oldbuf[BUFSZ], newbuf[BUFSZ];
         short old_otyp = potion->otyp;
         boolean old_dknown = FALSE;

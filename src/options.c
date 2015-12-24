@@ -3298,7 +3298,7 @@ boolean tinitial, tfrom_file;
      * options list
      */
     for (i = 0; boolopt[i].name; i++) {
-        if (match_optname(opts, boolopt[i].name, 3, FALSE)) {
+        if (match_optname(opts, boolopt[i].name, 3, TRUE)) {
             /* options that don't exist */
             if (!boolopt[i].addr) {
                 if (!initial && !negated)
@@ -3310,6 +3310,23 @@ boolean tinitial, tfrom_file;
             if (!initial && (boolopt[i].optflags == SET_IN_FILE)) {
                 rejectoption(boolopt[i].name);
                 return;
+            }
+
+            op = string_for_opt(opts, TRUE);
+
+            if (op) {
+                if (negated) {
+                    badoption(opts);
+                    return;
+                }
+                if (!strcmp(op, "true") || !strcmp(op, "yes"))
+                    negated = FALSE;
+                else if (!strcmp(op, "false") || !strcmp(op, "no"))
+                    negated = TRUE;
+                else {
+                    badoption(opts);
+                    return;
+                }
             }
 
             *(boolopt[i].addr) = !negated;
@@ -3383,6 +3400,12 @@ boolean tinitial, tfrom_file;
             }
             return;
         }
+    }
+
+    /* Is it a symbol? */
+    if (strstr(opts, "S_") == opts && parsesymbols(opts)) {
+        switch_symbols(TRUE);
+        return;
     }
 
     /* out of valid options */
@@ -4957,7 +4980,7 @@ free_symsets()
 }
 
 /* Parse the value of a SYMBOLS line from a config file */
-void
+boolean
 parsesymbols(opts)
 register char *opts;
 {
@@ -4967,7 +4990,7 @@ register char *opts;
 
     if ((op = index(opts, ',')) != 0) {
         *op++ = 0;
-        parsesymbols(op);
+        if (!parsesymbols(op)) return FALSE;
     }
 
     /* S_sample:string */
@@ -4976,7 +4999,7 @@ register char *opts;
     if (!strval)
         strval = index(opts, '=');
     if (!strval)
-        return;
+        return FALSE;
     *strval++ = '\0';
 
     /* strip leading and trailing white space from symname and strval */
@@ -4985,12 +5008,13 @@ register char *opts;
 
     symp = match_sym(symname);
     if (!symp)
-        return;
+        return FALSE;
 
     if (symp->range && symp->range != SYM_CONTROL) {
         val = sym_val(strval);
         update_l_symset(symp, val);
     }
+    return TRUE;
 }
 
 struct symparse *

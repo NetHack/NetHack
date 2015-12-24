@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1450490118 2015/12/19 01:55:18 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.130 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1450577673 2015/12/20 02:14:33 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.131 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1237,6 +1237,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
         } else {
             for (obj = invent; obj; obj = obj->nobj) {
                 long wornmask;
+
                 /* gold isn't subject to cursing and blessing */
                 if (obj->oclass == COIN_CLASS)
                     continue;
@@ -1269,8 +1270,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
                 if (sblessed || wornmask || obj->otyp == LOADSTONE
                     || (obj->otyp == LEASH && obj->leashmon)) {
                     /* water price varies by curse/bless status */
-                    boolean shop_h2o =
-                        (obj->unpaid && obj->otyp == POT_WATER);
+                    boolean shop_h2o = (obj->unpaid && obj->otyp == POT_WATER);
 
                     if (confused) {
                         blessorcurse(obj, 2);
@@ -1340,13 +1340,11 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             uwep->oerodeproof = new_erodeproof ? 1 : 0;
             break;
         }
-        if (!chwepon(sobj,
-                     scursed
-                         ? -1
-                         : !uwep ? 1 : (uwep->spe >= 9)
-                                           ? !rn2(uwep->spe)
-                                           : sblessed ? rnd(3 - uwep->spe / 3)
-                                                      : 1))
+        if (!chwepon(sobj, scursed ? -1
+                             : !uwep ? 1
+                               : (uwep->spe >= 9) ? !rn2(uwep->spe)
+                                 : sblessed ? rnd(3 - uwep->spe / 3)
+                                   : 1))
             sobj = 0; /* nothing enchanted: strange_feeling -> useup */
         break;
     case SCR_TAMING:
@@ -1387,7 +1385,8 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             if (vis_results > 0)
                 known = TRUE;
         }
-    } break;
+        break;
+    }
     case SCR_GENOCIDE:
         if (!already_known)
             You("have found a scroll of genocide!");

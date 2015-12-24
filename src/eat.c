@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1449269916 2015/12/04 22:58:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.154 $ */
+/* NetHack 3.6	eat.c	$NHDT-Date: 1450573885 2015/12/20 01:11:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.156 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2576,6 +2576,39 @@ doeat()
 
     if (!dont_start)
         start_eating(otmp);
+    return 1;
+}
+
+int
+use_tin_opener(obj)
+struct obj *obj;
+{
+    struct obj *otmp;
+    int res = 0;
+
+    if (!carrying(TIN)) {
+        You("have no tin to open.");
+        return 0;
+    }
+
+    if (obj != uwep) {
+        if (obj->cursed && obj->bknown) {
+            char qbuf[QBUFSZ];
+
+            if (ynq(safe_qbuf(qbuf, "Really wield ", "?",
+                              obj, doname, thesimpleoname, "that")) != 'y')
+                return 0;
+        }
+	if (!wield_tool(obj, "use"))
+            return 0;
+        res = 1;
+    }
+
+    otmp = getobj(comestibles, "open");
+    if (!otmp)
+        return res;
+
+    start_tin(otmp);
     return 1;
 }
 

@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1450481050 2015/12/18 23:24:10 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.214 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1450582748 2015/12/20 03:39:08 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.217 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1501,6 +1501,17 @@ jump(magic)
 int magic; /* 0=Physical, otherwise skill level */
 {
     coord cc;
+
+    /* attempt "jumping" spell if hero has no innate jumping ability */
+    if (!magic && !Jumping) {
+        int sp_no;
+
+        for (sp_no = 0; sp_no < MAXSPELL; ++sp_no)
+            if (spl_book[sp_no].sp_id == NO_SPELL)
+                break;
+            else if (spl_book[sp_no].sp_id == SPE_JUMPING)
+                return spelleffects(sp_no, FALSE);
+    }
 
     if (!magic && (nolimbs(youmonst.data) || slithy(youmonst.data))) {
         /* normally (nolimbs || slithy) implies !Jumping,
@@ -3494,18 +3505,8 @@ doapply()
         res = dowrite(obj);
         break;
     case TIN_OPENER:
-        if (!carrying(TIN)) {
-            You("have no tin to open.");
-            goto xit;
-        }
-        You("cannot open a tin without eating or discarding its contents.");
-        if (flags.verbose)
-            pline("In order to eat, use the 'e' command.");
-        if (obj != uwep)
-            pline(
-          "Opening the tin will be much easier if you wield the tin opener.");
-        goto xit;
-
+        res = use_tin_opener(obj);
+        break;
     case FIGURINE:
         use_figurine(&obj);
         break;
@@ -3547,7 +3548,6 @@ doapply()
             break;
         }
         pline("Sorry, I don't know how to use that.");
-    xit:
         nomul(0);
         return 0;
     }

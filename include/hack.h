@@ -277,6 +277,7 @@ NEARDATA extern coord bhitpos; /* place where throw or zap hits or stops */
 #define DO_MOVE 0   /* really doing the move */
 #define TEST_MOVE 1 /* test a normal move (move there next) */
 #define TEST_TRAV 2 /* test a future travel location */
+#define TEST_TRAP 3 /* check if a future travel loc is a trap */
 
 /*** some utility macros ***/
 #define yn(query) yn_function(query, ynchars, 'n')

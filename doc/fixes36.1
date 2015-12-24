@@ -45,6 +45,18 @@ make MAXPLAYERS option in sysconf accept 0 value
 avoid hearing yelps when you are deaf
 make corpse visible if stethoscope told you about it being there
 sceptre of might database entry word change
+avoid "spellbook of novel" on discoveries list after object ID of novel
+add novel to discoveries list after reading one
+putting gold into hero-owned container on shop floor gave free credit
+stack splitting for dipping large quantities of potions was done poorly
+dipping fruit juice into enlightenment gave different result than the inverse
+make travel walk up to a trap and stop when the trap blocks the only
+	way forward, instead of trying to go straight line
+travel will displace pets rather than stop
+do not autopickup unpaid items in shops
+death due an unseen gas spore's explosion resulted in "killed by a died"
+allow optional parameter "true", "yes", "false", or "no" for boolean options
+actually make the castle chest not trapped
 
 
 Platform- and/or Interface-Specific Fixes
@@ -55,6 +67,7 @@ tty: specifying all four of role, race, gender, and alignment still prompted
 	for confirmation with "Is this ok?" before starting play
 unix/X11: in top level Makefile, some commented out definitions of VARDATND
 	misspelled pilemark.xbm (as pilemark.xpm)
+unix/tty: fix compile warning about 'has_colors' for some configurations
 win32gui: getversionstring() was overflowing the provided Help About buffer
 win32gui: guard against buffer overflow in in mswin_getlin()
 MacOSX: initial binary release was built from out of date source code that
@@ -68,6 +81,10 @@ General New Features
 naming Sting or Orcrist now breaks illiterate conduct
 different feedback for reading a scroll of mail created by writing with marker
 wizard mode #wizintrinsic
+reading non-cursed scroll of enchant weapon uncurses welded tin opener
+if hero has no jumping ability but knows the jumping spell, the #jump command
+	will attempt to cast the spell
+additional passages for Raising Steam
 
 
 Platform- and/or Interface-Specific New Features
@@ -76,6 +93,7 @@ Platform- and/or Interface-Specific New Features
 
 NetHack Community Patches (or Variation) Included
 -------------------------------------------------
+Malcolm Ryan's improved tin opener
 
 
 Code Cleanup and Reorganization
