@@ -5,7 +5,7 @@ General Fixes and Modified Features
 doc/*.6 man pages and corresponding doc/*.txt text copies were out of date
 data.base entry for "lava" had wrong first name for Don Woods' attribution
 cursed genocide of "none" sent in monsters, but "that's enough tries" didn't
-update MAXPLAYERS documentation in sysconf file and allow 0 for it
+update MAXPLAYERS documentation in sysconf file and accept 0 for 'no limit'
 wizard mode: don't include feedback about named fruit for ^X and enlightenment
 looking at distant objects while wearing the Eyes of the Overworld made their
 	up-close descriptions known when not intended
@@ -41,7 +41,6 @@ don't show the old level when you die going down the stairs because of an
 new high score with ", while helpless" attribute appended would erroneously
 	result in ", while helpless" being appended to all scores
 allow bright aliases for colors in menucolors
-make MAXPLAYERS option in sysconf accept 0 value
 avoid hearing yelps when you are deaf
 make corpse visible if stethoscope told you about it being there
 sceptre of might database entry word change
@@ -65,6 +64,7 @@ rehumanizing after being poly'd into vampire left hero with ability to sense
 Warn_of_mon wouldn't have been able to sense giant ants if any creature were
 	to have that ability, caused by using 0 instead of NON_PM for 'none'
 tone down energy vortex's drain energy attack
+fix message typo if tame mind flayer dies trying to eat Medusa's brains
 
 
 Platform- and/or Interface-Specific Fixes

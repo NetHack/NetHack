@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1450573885 2015/12/20 01:11:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.156 $ */
+/* NetHack 3.6	eat.c	$NHDT-Date: 1451086430 2015/12/25 23:33:50 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.157 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -494,7 +494,7 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
             } else {
                 if (magr->mtame && !visflag)
                     /* parallels mhitm.c's brief_feeling */
-                    You("have a sad thought for a moment, then is passes.");
+                    You("have a sad thought for a moment, then it passes.");
                 return MM_AGR_DIED;
             }
         }
