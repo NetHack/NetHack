@@ -1,4 +1,4 @@
-/* NetHack 3.6	attrib.c	$NHDT-Date: 1449269911 2015/12/04 22:58:31 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.51 $ */
+/* NetHack 3.6	attrib.c	$NHDT-Date: 1451081651 2015/12/25 22:14:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.52 $ */
 /*      Copyright 1988, 1989, 1990, 1992, M. Stephenson           */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -707,31 +707,46 @@ long frommask;
     return (struct innate *) 0;
 }
 
-/*
- * returns 1 if FROMRACE or FROMEXPER and exper level == 1
- * returns 2 if FROMEXPER and exper level > 1
- * otherwise returns 0
- */
+/* reasons for innate ability */
+#define FROM_NONE 0
+#define FROM_ROLE 1 /* from experience at level 1 */
+#define FROM_RACE 2
+#define FROM_EXP  3 /* from experience for some level > 1 */
+#define FROM_FORM 4
+
+
+/* check whether particular ability has been obtained via innate attribute */
 STATIC_OVL int
 innately(ability)
 long *ability;
 {
     const struct innate *iptr;
 
+    if ((iptr = check_innate_abil(ability, FROMEXPER)) != 0)
+        return (iptr->ulevel == 1) ? FROM_ROLE : FROM_EXP;
     if ((iptr = check_innate_abil(ability, FROMRACE)) != 0)
-        return 1;
-    else if ((iptr = check_innate_abil(ability, FROMEXPER)) != 0)
-        return (iptr->ulevel == 1) ? 1 : 2;
-    return 0;
+        return FROM_RACE;
+    if ((*ability & FROMFORM) != 0L)
+        return FROM_FORM;
+   return FROM_NONE;
 }
 
 int
 is_innate(propidx)
 int propidx;
 {
+    int innateness = innately(&u.uprops[propidx].intrinsic);
+
+    if (innateness != FROM_NONE)
+        return innateness;
+    if (propidx == JUMPING && Role_if(PM_KNIGHT)
+        /* knight has intrinsic jumping, but extrinsic is more versatile so
+           ignore innateness if equipment is going to claim responsibility */
+        && !u.uprops[propidx].extrinsic)
+        return FROM_ROLE;
     if (propidx == BLINDED && !haseyes(youmonst.data))
-        return 1;
-    return innately(&u.uprops[propidx].intrinsic);
+        return FROM_FORM;
+    return FROM_NONE;
 }
 
 char *
@@ -750,14 +765,16 @@ int propidx; /* special cases can have negative values */
         if (propidx >= 0) {
             char *p;
             struct obj *obj = (struct obj *) 0;
-            int innate = is_innate(propidx);
+            int innateness = is_innate(propidx);
 
-            if (innate == 2)
+            if (innateness == FROM_EXP)
                 Strcpy(buf, " because of your experience");
-            else if (innate == 1)
+            else if (innateness == FROM_FORM)
+                Strcpy(buf, " from current creature form");
+            else if (innateness == FROM_ROLE || innateness == FROM_RACE)
                 Strcpy(buf, " innately");
             else if (wizard
-                     && (obj = what_gives(&u.uprops[propidx].extrinsic)))
+                     && (obj = what_gives(&u.uprops[propidx].extrinsic)) != 0)
                 Sprintf(buf, because_of, obj->oartifact
                                              ? bare_artifactname(obj)
                                              : ysimple_name(obj));
