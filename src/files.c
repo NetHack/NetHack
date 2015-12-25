@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1449830204 2015/12/11 10:36:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.194 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1451001643 2015/12/25 00:00:43 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.197 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2581,8 +2581,12 @@ line at this level.
 OR: Forbid multiline stuff for alternate config sources.
 */
 #endif
-        if ((p = index(buf, '\n')) != 0)
-            *p = '\0';
+        if ((p = index(buf, '\n')) != 0) {
+            /* in case file has CR+LF format on non-CR+LF platform */
+            if (p > buf && *(p - 1) == '\r')
+                --p;
+            *p = '\0'; /* strip newline */
+        }
         if (!parse_config_line(fp, buf, src)) {
             static const char badoptionline[] = "Bad option line: \"%s\"";
 
