@@ -476,7 +476,7 @@ boolean user_typed_name, without_asking;
             } else if (!skipping_entry) {
                 if (!(ep = index(buf, '\n')))
                     goto bad_data_file;
-                *ep = 0;
+                (void) strip_newline((ep > buf) ? ep - 1 : ep);
                 /* if we match a key that begins with "~", skip this entry */
                 chk_skip = (*buf == '~') ? 1 : 0;
                 if (pmatch(&buf[chk_skip], dbase_str)
@@ -524,8 +524,7 @@ boolean user_typed_name, without_asking;
             for (i = 0; i < entry_count; i++) {
                 if (!dlb_fgets(buf, BUFSZ, fp))
                     goto bad_data_file;
-                if ((ep = index(buf, '\n')) != 0)
-                    *ep = 0;
+                (void) strip_newline(buf);
                 if (index(buf + 1, '\t') != 0)
                     (void) tabexpand(buf + 1);
                 putstr(datawin, 0, buf + 1);
@@ -1126,7 +1125,7 @@ char *cbuf;
 {
     dlb *fp;
     char bufr[BUFSZ];
-    register char *buf = &bufr[6], *ep, ctrl, meta;
+    register char *buf = &bufr[6], ctrl, meta;
 
     fp = dlb_fopen(CMDHELPFILE, "r");
     if (!fp) {
@@ -1140,9 +1139,7 @@ char *cbuf;
         if ((ctrl && *buf == '^' && *(buf + 1) == ctrl)
             || (meta && *buf == 'M' && *(buf + 1) == '-'
                 && *(buf + 2) == meta) || *buf == q) {
-            ep = index(buf, '\n');
-            if (ep)
-                *ep = 0;
+            (void) strip_newline(buf);
             if (ctrl && buf[2] == '\t') {
                 buf = bufr + 1;
                 (void) strncpy(buf, "^?      ", 8);

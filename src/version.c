@@ -57,7 +57,7 @@ int
 doextversion()
 {
     dlb *f;
-    char *cr, *pd, buf[BUFSZ];
+    char *pd, buf[BUFSZ];
     winid win = create_nhwindow(NHW_TEXT);
     boolean rtadded = FALSE;
 
@@ -94,10 +94,7 @@ doextversion()
         boolean prolog = TRUE; /* to skip indented program name */
 
         while (dlb_fgets(buf, BUFSZ, f)) {
-            if ((cr = index(buf, '\n')) != 0)
-                *cr = 0;
-            if ((cr = index(buf, '\r')) != 0)
-                *cr = 0;
+            (void) strip_newline(buf);
             if (index(buf, '\t') != 0)
                 (void) tabexpand(buf);
 

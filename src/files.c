@@ -2563,7 +2563,7 @@ read_config_file(filename, src)
 const char *filename;
 int src;
 {
-    char buf[4 * BUFSZ], *p;
+    char buf[4 * BUFSZ];
     FILE *fp;
     boolean rv = TRUE; /* assume successful parse */
 
@@ -2581,13 +2581,7 @@ line at this level.
 OR: Forbid multiline stuff for alternate config sources.
 */
 #endif
-        if ((p = index(buf, '\n')) != 0) {
-            /* in case file has CR+LF format on non-CR+LF platform */
-            if (p > buf && *(p - 1) == '\r')
-                --p;
-            *p = '\0'; /* strip newline */
-        }
-        if (!parse_config_line(fp, buf, src)) {
+        if (!parse_config_line(fp, strip_newline(buf), src)) {
             static const char badoptionline[] = "Bad option line: \"%s\"";
 
             /* truncate buffer if it's long; this is actually conservative */
@@ -3505,7 +3499,6 @@ char *nowin_buf;
 unsigned oid; /* book identifier */
 {
     dlb *fp;
-    char *endp;
     char line[BUFSZ], lastline[BUFSZ];
 
     int scope = 0;
@@ -3556,18 +3549,14 @@ unsigned oid; /* book identifier */
     *line = *lastline = '\0';
     while (dlb_fgets(line, sizeof line, fp) != 0) {
         linect++;
-        if ((endp = index(line, '\n')) != 0)
-            *endp = 0;
+        (void) strip_newline(line);
         switch (line[0]) {
         case '%':
             if (!strncmpi(&line[1], "section ", sizeof("section ") - 1)) {
                 char *st = &line[9]; /* 9 from "%section " */
 
                 scope = SECTIONSCOPE;
-                if (!strcmpi(st, tribsection))
-                    matchedsection = TRUE;
-                else
-                    matchedsection = FALSE;
+                matchedsection = !strcmpi(st, tribsection) ? TRUE : FALSE;
             } else if (!strncmpi(&line[1], "title ", sizeof("title ") - 1)) {
                 char *st = &line[7]; /* 7 from "%title " */
                 char *p1, *p2;
