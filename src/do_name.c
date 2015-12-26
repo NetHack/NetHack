@@ -7,6 +7,7 @@
 STATIC_DCL char *NDECL(nextmbuf);
 STATIC_DCL void FDECL(getpos_help, (BOOLEAN_P, const char *));
 STATIC_DCL void NDECL(do_mname);
+STATIC_DCL boolean FDECL(alreadynamed, (struct monst *, char *, char *));
 STATIC_DCL void FDECL(do_oname, (struct obj *));
 STATIC_DCL void NDECL(namefloorobj);
 STATIC_DCL char *FDECL(bogusmon, (char *,char *));
@@ -409,15 +410,45 @@ const char *name;
     return mtmp;
 }
 
+/* check whether user-supplied name matches or nearly matches an unnameable
+   monster's name; if so, give an alternate reject message for do_mname() */
+STATIC_OVL boolean
+alreadynamed(mtmp, monnambuf, usrbuf)
+struct monst *mtmp;
+char *monnambuf, *usrbuf;
+{
+    char pronounbuf[10], *p;
+
+    if (fuzzymatch(usrbuf, monnambuf, " -_", TRUE)
+        /* catch trying to name "the Oracle" as "Oracle" */
+        || (!strncmpi(monnambuf, "the ", 4)
+            && fuzzymatch(usrbuf, monnambuf + 4, " -_", TRUE))
+        /* catch trying to name "invisible Orcus" as "Orcus" */
+        || ((p = strstri(monnambuf, "invisible ")) != 0
+            && fuzzymatch(usrbuf, p + 10, " -_", TRUE))
+        /* catch trying to name "the {priest,Angel} of Crom" as "Crom" */
+        || ((p = strstri(monnambuf, " of ")) != 0
+            && fuzzymatch(usrbuf, p + 4, " -_", TRUE))) {
+        pline("%s is already called %s.",
+              upstart(strcpy(pronounbuf, mhe(mtmp))), monnambuf);
+        return TRUE;
+    } else if (mtmp->data == &mons[PM_JUIBLEX]
+               && strstri(monnambuf, "Juiblex")
+               && !strcmpi(usrbuf, "Jubilex")) {
+        pline("%s doesn't like being called %s.", upstart(monnambuf), usrbuf);
+        return TRUE;
+    }
+    return FALSE;
+}
+
 /* allow player to assign a name to some chosen monster */
 STATIC_OVL void
 do_mname()
 {
-    char buf[BUFSZ], monnambuf[BUFSZ];
+    char buf[BUFSZ], monnambuf[BUFSZ], qbuf[QBUFSZ];
     coord cc;
-    register int cx, cy;
-    register struct monst *mtmp;
-    char qbuf[QBUFSZ];
+    int cx, cy;
+    struct monst *mtmp = 0;
 
     if (Hallucination) {
         You("would never recognize it anyway.");
@@ -431,9 +462,9 @@ do_mname()
     cy = cc.y;
 
     if (cx == u.ux && cy == u.uy) {
-        if (u.usteed && canspotmon(u.usteed))
+        if (u.usteed && canspotmon(u.usteed)) {
             mtmp = u.usteed;
-        else {
+        } else {
             pline("This %s creature is called %s and cannot be renamed.",
                   beautiful(), plname);
             return;
@@ -459,18 +490,25 @@ do_mname()
     /* strip leading and trailing spaces; unnames monster if all spaces */
     (void) mungspaces(buf);
 
-    /* unique monsters have their own specific names or titles;
-       shopkeepers, temple priests and other minions use alternate
-       name formatting routines which ignore any user-supplied name */
-    if ((mtmp->data->geno & G_UNIQ) && !mtmp->ispriest)
-        pline("%s doesn't like being called names!", upstart(monnambuf));
-    else if (mtmp->isshk
-             && !(Deaf || mtmp->msleeping || !mtmp->mcanmove
-                  || mtmp->data->msound <= MS_ANIMAL))
-        verbalize("I'm %s, not %s.", shkname(mtmp), buf);
-    else if (mtmp->ispriest || mtmp->isminion || mtmp->isshk)
-        pline("%s will not accept the name %s.", upstart(monnambuf), buf);
-    else
+    /* Unique monsters have their own specific names or titles.
+     * Shopkeepers, temple priests and other minions use alternate
+     * name formatting routines which ignore any user-supplied name.
+     *
+     * Don't say the name is being rejected if it happens to match
+     * the existing name.
+     */
+    if ((mtmp->data->geno & G_UNIQ) && !mtmp->ispriest) {
+        if (!alreadynamed(mtmp, monnambuf, buf))
+            pline("%s doesn't like being called names!", upstart(monnambuf));
+    } else if (mtmp->isshk
+               && !(Deaf || mtmp->msleeping || !mtmp->mcanmove
+                    || mtmp->data->msound <= MS_ANIMAL)) {
+        if (!alreadynamed(mtmp, monnambuf, buf))
+            verbalize("I'm %s, not %s.", shkname(mtmp), buf);
+    } else if (mtmp->ispriest || mtmp->isminion || mtmp->isshk) {
+        if (!alreadynamed(mtmp, monnambuf, buf))
+            pline("%s will not accept the name %s.", upstart(monnambuf), buf);
+    } else
         (void) christen_monst(mtmp, buf);
 }
 
