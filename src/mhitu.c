@@ -1248,7 +1248,7 @@ register struct attack *mattk;
             && !Protection_from_shape_changers && !defends(AD_WERE, uwep)) {
             You_feel("feverish.");
             exercise(A_CON, FALSE);
-            u.ulycn = monsndx(mdat);
+            set_ulycn(monsndx(mdat));
             retouch_equipment(2);
         }
         break;

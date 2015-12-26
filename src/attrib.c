@@ -770,7 +770,9 @@ int propidx; /* special cases can have negative values */
             if (innateness == FROM_EXP)
                 Strcpy(buf, " because of your experience");
             else if (innateness == FROM_FORM)
-                Strcpy(buf, " from current creature form");
+                Strcpy(buf, (u.ulycn >= LOW_PM)
+                               ? " due to your lycanthropy"
+                               : " from current creature form");
             else if (innateness == FROM_ROLE || innateness == FROM_RACE)
                 Strcpy(buf, " innately");
             else if (wizard

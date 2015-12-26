@@ -903,7 +903,7 @@ cpostfx(pm)
 register int pm;
 {
     register int tmp = 0;
-    boolean catch_lycanthropy = FALSE;
+    int catch_lycanthropy = NON_PM;
 
     /* in case `afternmv' didn't get called for previously mimicking
        gold, clean up now to avoid `eatmbuf' memory leak */
@@ -931,16 +931,13 @@ register int pm;
         pluslvl(FALSE);
         break;
     case PM_HUMAN_WERERAT:
-        catch_lycanthropy = TRUE;
-        u.ulycn = PM_WERERAT;
+        catch_lycanthropy = PM_WERERAT;
         break;
     case PM_HUMAN_WEREJACKAL:
-        catch_lycanthropy = TRUE;
-        u.ulycn = PM_WEREJACKAL;
+        catch_lycanthropy = PM_WEREJACKAL;
         break;
     case PM_HUMAN_WEREWOLF:
-        catch_lycanthropy = TRUE;
-        u.ulycn = PM_WEREWOLF;
+        catch_lycanthropy = PM_WEREWOLF;
         break;
     case PM_NURSE:
         if (Upolyd)
@@ -1096,12 +1093,14 @@ register int pm;
             gainstr((struct obj *) 0, 0, TRUE);
         else if (tmp > 0)
             givit(tmp, ptr);
-    } break;
-    }
+        break;
+    } /* default case */
+    } /* switch */
 
-    if (catch_lycanthropy)
+    if (catch_lycanthropy >= LOW_PM) {
+        set_ulycn(catch_lycanthropy);
         retouch_equipment(2);
-
+    }
     return;
 }
 

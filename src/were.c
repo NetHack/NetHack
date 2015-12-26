@@ -37,6 +37,8 @@ register struct monst *mon;
     } else if (!rn2(30) || Protection_from_shape_changers) {
         new_were(mon); /* change back into human form */
     }
+    /* update innate intrinsics (mainly Drain_resistance) */
+    set_uasmon(); /* new_were() doesn't do this */
 }
 
 int
@@ -118,15 +120,15 @@ register struct monst *mon;
     possibly_unwield(mon, FALSE);
 }
 
-int were_summon(ptr, yours, visible,
-                genbuf) /* were-creature (even you) summons a horde */
-register struct permonst *ptr;
-register boolean yours;
+/* were-creature (even you) summons a horde */
+int were_summon(ptr, yours, visible, genbuf)
+struct permonst *ptr;
+boolean yours;
 int *visible; /* number of visible helpers created */
 char *genbuf;
 {
-    register int i, typ, pm = monsndx(ptr);
-    register struct monst *mtmp;
+    int i, typ, pm = monsndx(ptr);
+    struct monst *mtmp;
     int total = 0;
 
     *visible = 0;
@@ -194,11 +196,21 @@ boolean purify;
 
     if (purify) {
         You_feel("purified.");
-        u.ulycn = NON_PM; /* cure lycanthropy */
+        set_ulycn(NON_PM); /* cure lycanthropy */
     }
     if (!Unchanging && is_were(youmonst.data)
         && (!controllable_poly || yn("Remain in beast form?") == 'n'))
         rehumanize();
+}
+
+/* lycanthropy is being caught or cured, but no shape change is involved */
+void
+set_ulycn(which)
+int which;
+{
+    u.ulycn = which;
+    /* add or remove lycanthrope's innate intrinsics (Drain_resistance) */
+    set_uasmon();
 }
 
 /*were.c*/

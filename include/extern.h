@@ -2609,6 +2609,7 @@ E void FDECL(new_were, (struct monst *));
 E int FDECL(were_summon, (struct permonst *, BOOLEAN_P, int *, char *));
 E void NDECL(you_were);
 E void FDECL(you_unwere, (BOOLEAN_P));
+E void FDECL(set_ulycn, (int));
 
 /* ### wield.c ### */
 
