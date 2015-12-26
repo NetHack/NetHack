@@ -2386,6 +2386,7 @@ struct alt_spellings {
     { "grappling iron", GRAPPLING_HOOK },
     { "grapnel", GRAPPLING_HOOK },
     { "grapple", GRAPPLING_HOOK },
+    { "protection from shape shifters", RIN_PROTECTION_FROM_SHAPE_CHAN },
     /* normally we wouldn't have to worry about unnecessary <space>, but
        " stone" will get stripped off, preventing a wishymatch; that actually
        lets "flint stone" be a match, so we also accept bogus "flintstone" */
