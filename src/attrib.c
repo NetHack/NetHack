@@ -1,4 +1,4 @@
-/* NetHack 3.6	attrib.c	$NHDT-Date: 1451081651 2015/12/25 22:14:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.52 $ */
+/* NetHack 3.6	attrib.c	$NHDT-Date: 1451111134 2015/12/26 06:25:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.54 $ */
 /*      Copyright 1988, 1989, 1990, 1992, M. Stephenson           */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -83,10 +83,21 @@ static const struct innate {
                  { 0, 0, 0, 0 } },
 
   /* Intrinsics conferred by race */
-    elf_abil[] = { { 4, &(HSleep_resistance), "awake", "tired" },
-                   { 0, 0, 0, 0 } },
+  dwa_abil[] = { { 1, &HInfravision, "", "" },
+                 { 0, 0, 0, 0 } },
 
-  orc_abil[] = { { 1, &(HPoison_resistance), "", "" }, { 0, 0, 0, 0 } };
+  elf_abil[] = { { 1, &HInfravision, "", "" },
+                 { 4, &HSleep_resistance, "awake", "tired" },
+                 { 0, 0, 0, 0 } },
+
+  gno_abil[] = { { 1, &HInfravision, "", "" },
+                 { 0, 0, 0, 0 } },
+
+  orc_abil[] = { { 1, &HInfravision, "", "" },
+                 { 1, &HPoison_resistance, "", "" },
+                 { 0, 0, 0, 0 } },
+
+  hum_abil[] = { { 0, 0, 0, 0 } };
 
 STATIC_DCL void NDECL(exerper);
 STATIC_DCL void FDECL(postadjabil, (long *));
@@ -686,15 +697,19 @@ long frommask;
         }
     else if (frommask == FROMRACE)
         switch (Race_switch) {
+        case PM_DWARF:
+            abil = dwa_abil;
+            break;
         case PM_ELF:
             abil = elf_abil;
+            break;
+        case PM_GNOME:
+            abil = gno_abil;
             break;
         case PM_ORC:
             abil = orc_abil;
             break;
         case PM_HUMAN:
-        case PM_DWARF:
-        case PM_GNOME:
         default:
             break;
         }
@@ -713,6 +728,7 @@ long frommask;
 #define FROM_RACE 2
 #define FROM_EXP  3 /* from experience for some level > 1 */
 #define FROM_FORM 4
+#define FROM_LYCN 5
 
 
 /* check whether particular ability has been obtained via innate attribute */
@@ -728,16 +744,19 @@ long *ability;
         return FROM_RACE;
     if ((*ability & FROMFORM) != 0L)
         return FROM_FORM;
-   return FROM_NONE;
+    return FROM_NONE;
 }
 
 int
 is_innate(propidx)
 int propidx;
 {
-    int innateness = innately(&u.uprops[propidx].intrinsic);
+    int innateness;
 
-    if (innateness != FROM_NONE)
+    /* innately() would report FROM_FORM for this; caller wants specificity */
+    if (propidx == DRAIN_RES && u.ulycn >= LOW_PM)
+        return FROM_LYCN;
+    if ((innateness = innately(&u.uprops[propidx].intrinsic)) != FROM_NONE)
         return innateness;
     if (propidx == JUMPING && Role_if(PM_KNIGHT)
         /* knight has intrinsic jumping, but extrinsic is more versatile so
@@ -769,10 +788,10 @@ int propidx; /* special cases can have negative values */
 
             if (innateness == FROM_EXP)
                 Strcpy(buf, " because of your experience");
+            else if (innateness == FROM_LYCN)
+                Strcpy(buf, " due to your lycanthropy");
             else if (innateness == FROM_FORM)
-                Strcpy(buf, (u.ulycn >= LOW_PM)
-                               ? " due to your lycanthropy"
-                               : " from current creature form");
+                Strcpy(buf, " from current creature form");
             else if (innateness == FROM_ROLE || innateness == FROM_RACE)
                 Strcpy(buf, " innately");
             else if (wizard
