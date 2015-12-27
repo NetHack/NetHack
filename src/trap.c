@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1450461008 2015/12/18 17:50:08 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.251 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1451176031 2015/12/27 00:27:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.252 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2661,6 +2661,8 @@ boolean byplayer;
         mon_to_stone(mon);
         return;
     }
+    if (!vamp_stone(mon))
+        return;
 
     /* give a "<mon> is slowing down" message and also remove
        intrinsic speed (comparable to similar effect on the hero) */
