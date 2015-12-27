@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1450432755 2015/12/18 09:59:15 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.521 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1451174855 2015/12/27 00:07:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.526 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1351,6 +1351,7 @@ E void FDECL(golemeffects, (struct monst *, int, int));
 E boolean FDECL(angry_guards, (BOOLEAN_P));
 E void NDECL(pacify_guards);
 E void FDECL(decide_to_shapeshift, (struct monst *, int));
+E boolean FDECL(vamp_stone, (struct monst *));
 
 /* ### mondata.c ### */
 
