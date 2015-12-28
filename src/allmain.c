@@ -1,4 +1,4 @@
-/* NetHack 3.6	allmain.c	$NHDT-Date: 1450231173 2015/12/16 01:59:33 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.67 $ */
+/* NetHack 3.6	allmain.c	$NHDT-Date: 1451344214 2015/12/28 23:10:14 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.68 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -296,10 +296,7 @@ boolean resuming;
                             change = 2;
                         if (change && !Unchanging) {
                             if (multi >= 0) {
-                                if (occupation)
-                                    stop_occupation();
-                                else
-                                    nomul(0);
+                                stop_occupation();
                                 if (change == 1)
                                     polyself(0);
                                 else
@@ -491,6 +488,8 @@ stop_occupation()
         context.botl = 1; /* in case u.uhs changed */
         nomul(0);
         pushch(0);
+    } else if (multi >= 0) {
+        nomul(0);
     }
 }
 
