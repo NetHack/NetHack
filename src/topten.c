@@ -1171,25 +1171,19 @@ boolean fem;
 
 /*
  * Get a random player name and class from the high score list,
- * and attach them to an object (for statues or morgue corpses).
  */
-struct obj *
-tt_oname(otmp)
-struct obj *otmp;
+struct toptenentry *
+get_rnd_toptenentry()
 {
-    int rank;
-    register int i;
-    register struct toptenentry *tt;
+    int rank, i;
     FILE *rfile;
-    struct toptenentry tt_buf;
-
-    if (!otmp)
-        return (struct obj *) 0;
+    register struct toptenentry *tt;
+    static struct toptenentry tt_buf;
 
     rfile = fopen_datafile(RECORD, "r", SCOREPREFIX);
     if (!rfile) {
         impossible("Cannot open record file!");
-        return (struct obj *) 0;
+        return NULL;
     }
 
     tt = &tt_buf;
@@ -1207,13 +1201,34 @@ pickentry:
             rewind(rfile);
             goto pickentry;
         }
-        otmp = (struct obj *) 0;
-    } else {
-        set_corpsenm(otmp, classmon(tt->plrole, (tt->plgend[0] == 'F')));
-        otmp = oname(otmp, tt->name);
+        tt = NULL;
     }
 
     (void) fclose(rfile);
+    return tt;
+}
+
+
+/*
+ * Attach random player name and class from high score list
+ * to an object (for statues or morgue corpses).
+ */
+struct obj *
+tt_oname(otmp)
+struct obj *otmp;
+{
+    struct toptenentry *tt;
+    if (!otmp)
+        return (struct obj *) 0;
+
+    tt = get_rnd_toptenentry();
+
+    if (!tt)
+        return (struct obj *) 0;
+
+    set_corpsenm(otmp, classmon(tt->plrole, (tt->plgend[0] == 'F')));
+    otmp = oname(otmp, tt->name);
+
     return otmp;
 }
 
