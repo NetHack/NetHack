@@ -100,9 +100,9 @@ boolean incl_helpless;
         "", "", "", "", ""
     };
     unsigned l;
-    char *kname = killer.name;
+    char c, *kname = killer.name;
 
-    buf[0] = '\0'; /* so strncat() can find the end */
+    buf[0] = '\0'; /* lint suppression */
     switch (killer.format) {
     default:
         impossible("bad killer format? (%d)", killer.format);
@@ -118,13 +118,30 @@ boolean incl_helpless;
         buf += l, siz -= l;
         break;
     }
-    /* we're writing into buf[0] (after possibly advancing buf) rather than
-       appending, but strncat() appends a terminator and strncpy() doesn't */
-    (void) strncat(buf, kname, siz - 1);
+    /* Copy kname into buf[].
+     * Object names and named fruit have already been sanitized, but
+     * monsters can have "called 'arbitrary text'" attached to them,
+     * so make sure that that text can't confuse field splitting when
+     * record, logfile, or xlogfile is re-read at some later point.
+     */
+    while (--siz > 0) {
+        c = *kname++;
+        if (c == ',')
+            c = ';';
+        /* 'xlogfile' doesn't really need protection for '=', but
+           fixrecord.awk for corrupted 3.6.0 'record' does (only
+           if using xlogfile rather than logfile to repair record) */
+        else if (c == '=')
+            c = '_';
+        /* tab is not possible due to use of mungspaces() when naming;
+           it would disrupt xlogfile parsing if it were present */
+        else if (c == '\t')
+            c = ' ';
+        *buf++ = c;
+    }
+    *buf = '\0';
 
     if (incl_helpless && multi) {
-        siz -= strlen(buf);
-        buf = eos(buf);
         /* X <= siz: 'sizeof "string"' includes 1 for '\0' terminator */
         if (multi_reason && strlen(multi_reason) + sizeof ", while " <= siz)
             Sprintf(buf, ", while %s", multi_reason);
