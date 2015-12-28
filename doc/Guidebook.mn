@@ -1947,8 +1947,27 @@ option.
 There is a section of this Guidebook that discusses that.
 .pg
 The default name of the configuration file varies on different
-operating systems, but NETHACKOPTIONS can also be set to
-the full name of a file you want to use (possibly preceded by an `@').
+operating systems. On DOS and Windows, it is ``defaults.nh''
+in the same folder as nethack.exe or nethackW.exe. On Unix, linux
+and Mac OS X it is ``.nethackrc'' in the user's home directory.
+NETHACKOPTIONS can also be set to the full name of a file you
+want to use (possibly preceded by an `@').
+.pg
+Here is a short example of config file contents:
+.sd
+\fB# Set your character's role, race, gender, and alignment.\fP
+\fBOPTIONS=role:Valkyrie, race:Human, gender:female, align:lawful\fP
+
+\fB# Turn on autopickup, and set automatically picked up object types\fP
+\fBOPTIONS=autopickup,pickup_types:$"=/!?+\fP
+\fB# Show colored text if possible\fP
+\fBOPTIONS=color\fP
+\fB# Show lit corridors differently\fP
+\fBOPTIONS=lit_corridor\fP
+
+\fB# No startup splash screen. Windows GUI only.\fP
+\fBOPTIONS=!splash_screen\fP
+.ed
 .hn 2
 Customization options
 .pg
