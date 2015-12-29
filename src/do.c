@@ -270,6 +270,8 @@ register struct obj *obj;
 STATIC_DCL void
 polymorph_sink()
 {
+    uchar sym = S_sink;
+
     if (levl[u.ux][u.uy].typ != SINK)
         return;
 
@@ -278,24 +280,33 @@ polymorph_sink()
     switch (rn2(4)) {
     default:
     case 0:
+        sym = S_fountain;
         levl[u.ux][u.uy].typ = FOUNTAIN;
         level.flags.nfountains++;
         break;
     case 1:
+        sym = S_throne;
         levl[u.ux][u.uy].typ = THRONE;
         break;
     case 2:
+        sym = S_altar;
         levl[u.ux][u.uy].typ = ALTAR;
         levl[u.ux][u.uy].altarmask = Align2amask(rn2((int) A_LAWFUL + 2) - 1);
         break;
     case 3:
+        sym = S_room;
         levl[u.ux][u.uy].typ = ROOM;
         make_grave(u.ux, u.uy, (char *) 0);
+        if (levl[u.ux][u.uy].typ == GRAVE)
+            sym = S_grave;
         break;
     }
-    pline_The("sink transforms into %s!", (levl[u.ux][u.uy].typ == THRONE)
-                                              ? "a throne"
-                                              : an(surface(u.ux, u.uy)));
+    /* give message even if blind; we know we're not levitating,
+       so can feel the outcome even if we can't directly see it */
+    if (levl[u.ux][u.uy].typ != ROOM)
+        pline_The("sink transforms into %s!", an(defsyms[sym].explanation));
+    else
+        pline_The("sink vanishes.");
     newsym(u.ux, u.uy);
 }
 
@@ -407,11 +418,24 @@ register struct obj *obj;
         /* Not the same as aggravate monster; besides, it's obvious. */
         pline("Several flies buzz around the sink.");
         break;
+    case RIN_TELEPORTATION:
+        nosink = teleport_sink();
+        /* give message even if blind; we know we're not levitating,
+           so can feel the outcome even if we can't directly see it */
+        pline_The("sink %svanishes.", nosink ? "" : "momentarily ");
+        ideed = FALSE;
+        break;
+    case RIN_POLYMORPH:
+        polymorph_sink();
+        nosink = TRUE;
+        /* for S_room case, same message as for teleportation is given */
+        ideed = (levl[u.ux][u.uy].typ != ROOM);
+        break;
     default:
         ideed = FALSE;
         break;
     }
-    if (!Blind && !ideed && obj->otyp != RIN_HUNGER) {
+    if (!Blind && !ideed) {
         ideed = TRUE;
         switch (obj->otyp) { /* effects that need eyes */
         case RIN_ADORNMENT:
@@ -449,20 +473,14 @@ register struct obj *obj;
         case RIN_WARNING:
             pline_The("sink glows %s for a moment.", hcolor(NH_WHITE));
             break;
-        case RIN_TELEPORTATION:
-            nosink = teleport_sink();
-            pline_The("sink %svanishes.", nosink ? "" : "momentarily ");
-            break;
         case RIN_TELEPORT_CONTROL:
             pline_The("sink looks like it is being beamed aboard somewhere.");
             break;
-        case RIN_POLYMORPH:
-            polymorph_sink();
-            nosink = TRUE;
-            break;
         case RIN_POLYMORPH_CONTROL:
             pline_The(
-                "sink momentarily looks like a regularly erupting geyser.");
+                  "sink momentarily looks like a regularly erupting geyser.");
+            break;
+        default:
             break;
         }
     }
