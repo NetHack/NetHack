@@ -127,7 +127,7 @@ int x, y, glyph;
 
     if (otmp) {
         Strcpy(buf, (otmp->otyp != STRANGE_OBJECT)
-                     ? distant_name(otmp, xname)
+                     ? distant_name(otmp, doname)
                      : obj_descr[STRANGE_OBJECT].oc_name);
         if (fakeobj)
             dealloc_obj(otmp), otmp = 0;
