@@ -1585,7 +1585,8 @@ struct mkroom *croom;
          * eventually be expanded.
          */
         if (m->appear_as.str
-            && ((mtmp->data->mlet == S_MIMIC) || mtmp->cham)) {
+            && ((mtmp->data->mlet == S_MIMIC) || mtmp->cham)
+            && !Protection_from_shape_changers) {
             int i;
 
             switch (m->appear) {

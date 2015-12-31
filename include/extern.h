@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1450432755 2015/12/18 09:59:15 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.521 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1451174855 2015/12/27 00:07:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.526 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -835,6 +835,7 @@ E char *FDECL(lcase, (char *));
 E char *FDECL(ucase, (char *));
 E char *FDECL(upstart, (char *));
 E char *FDECL(mungspaces, (char *));
+E char *FDECL(strip_newline, (char *));
 E char *FDECL(eos, (char *));
 E boolean FDECL(str_end_is, (const char *, const char *));
 E char *FDECL(strkitten, (char *, CHAR_P));
@@ -1350,6 +1351,7 @@ E void FDECL(golemeffects, (struct monst *, int, int));
 E boolean FDECL(angry_guards, (BOOLEAN_P));
 E void NDECL(pacify_guards);
 E void FDECL(decide_to_shapeshift, (struct monst *, int));
+E boolean FDECL(vamp_stone, (struct monst *));
 
 /* ### mondata.c ### */
 
@@ -2297,6 +2299,7 @@ E void NDECL(timer_sanity_check);
 E void FDECL(formatkiller, (char *, unsigned, int, BOOLEAN_P));
 E void FDECL(topten, (int, time_t));
 E void FDECL(prscore, (int, char **));
+E struct toptenentry *NDECL(get_rnd_toptenentry);
 E struct obj *FDECL(tt_oname, (struct obj *));
 
 /* ### track.c ### */
@@ -2609,6 +2612,7 @@ E void FDECL(new_were, (struct monst *));
 E int FDECL(were_summon, (struct permonst *, BOOLEAN_P, int *, char *));
 E void NDECL(you_were);
 E void FDECL(you_unwere, (BOOLEAN_P));
+E void FDECL(set_ulycn, (int));
 
 /* ### wield.c ### */
 

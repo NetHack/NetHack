@@ -318,9 +318,7 @@ struct savefile_info {
 #define PL_NSIZ 32 /* name of player, ghost, shopkeeper */
 #define PL_CSIZ 32 /* sizeof pl_character */
 #define PL_FSIZ 32 /* fruit name */
-#define PL_PSIZ                              \
-    63 /* player-given names for pets, other \
-        * monsters, objects */
+#define PL_PSIZ 63 /* player-given names for pets, other monsters, objects */
 
 #define MAXDUNGEON 16 /* current maximum number of dungeons */
 #define MAXLEVEL 32   /* max number of levels in one dungeon */

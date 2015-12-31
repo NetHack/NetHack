@@ -18,6 +18,7 @@
         char *          ucase           (char *)
         char *          upstart         (char *)
         char *          mungspaces      (char *)
+        char *          strip_newline   (char *)
         char *          eos             (char *)
         boolean         str_end_is      (const char *, const char *)
         char *          strkitten       (char *,char)
@@ -156,6 +157,21 @@ char *bp;
         p2--;
     *p2 = '\0';
     return bp;
+}
+
+/* remove \n from end of line; remove \r too if one is there */
+char *
+strip_newline(str)
+char *str;
+{
+    char *p = index(str, '\n');
+
+    if (p) {
+        if (p > str && *(p - 1) == '\r')
+            --p;
+        *p = '\0';
+    }
+    return str;
 }
 
 /* return the end of a string (pointing at '\0') */

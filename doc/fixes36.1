@@ -5,7 +5,7 @@ General Fixes and Modified Features
 doc/*.6 man pages and corresponding doc/*.txt text copies were out of date
 data.base entry for "lava" had wrong first name for Don Woods' attribution
 cursed genocide of "none" sent in monsters, but "that's enough tries" didn't
-update MAXPLAYERS documentation in sysconf file and allow 0 for it
+update MAXPLAYERS documentation in sysconf file and accept 0 for 'no limit'
 wizard mode: don't include feedback about named fruit for ^X and enlightenment
 looking at distant objects while wearing the Eyes of the Overworld made their
 	up-close descriptions known when not intended
@@ -41,7 +41,6 @@ don't show the old level when you die going down the stairs because of an
 new high score with ", while helpless" attribute appended would erroneously
 	result in ", while helpless" being appended to all scores
 allow bright aliases for colors in menucolors
-make MAXPLAYERS option in sysconf accept 0 value
 avoid hearing yelps when you are deaf
 make corpse visible if stethoscope told you about it being there
 sceptre of might database entry word change
@@ -57,6 +56,27 @@ do not autopickup unpaid items in shops
 death due an unseen gas spore's explosion resulted in "killed by a died"
 allow optional parameter "true", "yes", "false", or "no" for boolean options
 actually make the castle chest not trapped
+level-drain resistance wasn't shown during enlightenment if it was conferred
+	by worn/wielded equipment or by lycanthropy
+wizard mode enlightenment now shows more reasons for various intrinsics
+rehumanizing after being poly'd into vampire left hero with ability to sense
+	humans and elves
+Warn_of_mon wouldn't have been able to sense giant ants if any creature were
+	to have that ability, caused by using 0 instead of NON_PM for 'none'
+tone down energy vortex's drain energy attack
+fix message typo if tame mind flayer dies trying to eat Medusa's brains
+use alternate rejection message if attempting to name an unnameable monster
+	with the name it already has
+cockatrice corpse no longer leaves multiple statues for shape-shifted vampire
+alter name of monster causing hero's death if name contains characters that
+	could cause confusion when using record, logfile, or xlogfile later
+teleporting or polymorphing a sink via ring drop shouldn't depend upon being
+	able to see it happen
+change "unlockable chest" to "broken chest" so that it won't be misunderstood
+	("capable of being unlocked" vs intended "not capable of being locked")
+use doname instead of xname when using '/' or ';' to look at objects on map
+when a pet moves reluctantly, name the top item of the pile it is reluctant
+	to step on if the hero sees or remembers any object(s) at that spot
 
 
 Platform- and/or Interface-Specific Fixes
@@ -68,12 +88,17 @@ tty: specifying all four of role, race, gender, and alignment still prompted
 unix/X11: in top level Makefile, some commented out definitions of VARDATND
 	misspelled pilemark.xbm (as pilemark.xpm)
 unix/tty: fix compile warning about 'has_colors' for some configurations
+unix: options file with CR+LF line ends and an invalid option line resulted in
+	"ad option line: "whatever-the-line-was
+	because embedded carriage return character changed cursor's position
 win32gui: getversionstring() was overflowing the provided Help About buffer
 win32gui: guard against buffer overflow in in mswin_getlin()
 MacOSX: initial binary release was built from out of date source code that
 	had 'BETA' and 'DEBUG' inappropriately enabled
-X11: core bug for '`' (backtick) command was only noticed by X11 interface,
-	which issued impossible message "add_menu: called before start_menu"
+MacOSX: force TIMED_DELAY build option on so that 'runmode' run-time option
+	is functional
+X11: core bug for '`' (backtick) and #terrain commands was only noticed by
+	X11 interface: impossible "add_menu: called before start_menu"
 
 
 General New Features
@@ -84,7 +109,7 @@ wizard mode #wizintrinsic
 reading non-cursed scroll of enchant weapon uncurses welded tin opener
 if hero has no jumping ability but knows the jumping spell, the #jump command
 	will attempt to cast the spell
-additional passages for Raising Steam
+additional tribute passages for Snuff and for Raising Steam
 
 
 Platform- and/or Interface-Specific New Features

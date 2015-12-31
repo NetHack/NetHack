@@ -708,7 +708,7 @@ LOOP [28] {
   MONSTER:random,random
 }
 
-MAZEWALK:(4, 2), south
+MAZEWALK:(4, 2), south, false
 
 # Stairs up, not in the fog maze
 STAIR:(00,00,70,18),(02,03,68,15),up

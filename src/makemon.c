@@ -1988,7 +1988,7 @@ register struct monst *mtmp;
     struct obj *otmp;
     int mx, my;
 
-    if (!mtmp)
+    if (!mtmp || Protection_from_shape_changers)
         return;
     mx = mtmp->mx;
     my = mtmp->my;

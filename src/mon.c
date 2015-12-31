@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1449908726 2015/12/12 08:25:26 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.200 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1451176552 2015/12/27 00:35:52 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.202 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2311,6 +2311,65 @@ struct monst *mtmp;
         impossible("Can't polystone %s!", a_monnam(mtmp));
 }
 
+boolean
+vamp_stone(mtmp)
+struct monst *mtmp;
+{
+    if (is_vampshifter(mtmp)) {
+        int mndx = mtmp->cham;
+        int x = mtmp->mx, y = mtmp->my;
+
+        /* this only happens if shapeshifted */
+        if (mndx >= LOW_PM && mndx != monsndx(mtmp->data)
+            && !(mvitals[mndx].mvflags & G_GENOD)) {
+            char buf[BUFSZ];
+            boolean in_door = (amorphous(mtmp->data)
+                               && closed_door(mtmp->mx, mtmp->my));
+
+            /* construct a format string before transformation */
+            Sprintf(buf, "The lapidifying %s %s %s",
+                    x_monnam(mtmp, ARTICLE_NONE, (char *) 0,
+                             SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION
+                                 | SUPPRESS_INVISIBLE | SUPPRESS_IT,
+                             FALSE),
+                    amorphous(mtmp->data) ? "coalesces on the" :
+                     is_flyer(mtmp->data) ? "drops to the" : "writhes on the",
+                    surface(x,y));
+            mtmp->mcanmove = 1;
+            mtmp->mfrozen = 0;
+            if (mtmp->mhpmax <= 0)
+                mtmp->mhpmax = 10;
+            mtmp->mhp = mtmp->mhpmax;
+            /* this can happen if previously a fog cloud */
+            if (u.uswallow && (mtmp == u.ustuck))
+                expels(mtmp, mtmp->data, FALSE);
+            if (in_door) {
+                coord new_xy;
+
+                if (enexto(&new_xy, mtmp->mx, mtmp->my, &mons[mndx])) {
+                    rloc_to(mtmp, new_xy.x, new_xy.y);
+                }
+            }
+            if (canspotmon(mtmp)) {
+                pline("%s!", buf);
+                display_nhwindow(WIN_MESSAGE, FALSE);
+            }
+            newcham(mtmp, &mons[mndx], FALSE, FALSE);
+            if (mtmp->data == &mons[mndx])
+                mtmp->cham = NON_PM;
+            else
+                mtmp->cham = mndx;
+            if (canspotmon(mtmp)) {
+                    pline("%s rises from the %s with renewed agility!",
+                            Amonnam(mtmp), surface(mtmp->mx, mtmp->my));
+            }
+            newsym(mtmp->mx, mtmp->my);
+            return FALSE;   /* didn't petrify */
+   	}
+    }
+    return TRUE;
+}
+
 /* make monster mtmp next to you (if possible);
    might place monst on far side of a wall or boulder */
 void
@@ -3184,8 +3243,17 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
                 /* Does mdat care? */
                 if (!noncorporeal(mdat) && !amorphous(mdat)
                     && !is_whirly(mdat) && (mdat != &mons[PM_YELLOW_LIGHT])) {
-                    You("break out of %s%s!", mon_nam(mtmp),
-                        (is_animal(mdat) ? "'s stomach" : ""));
+                    char msgtrail[BUFSZ];
+
+                    if (is_vampshifter(mtmp)) {
+                        Strcpy(msgtrail, " that had been shapeshifted");
+                    } else if (is_animal(mdat)) {
+                        Strcpy(msgtrail, "'s stomach");
+                    } else {
+                        msgtrail[0] = '\0';
+                    }
+
+                    You("break out of %s%s!", mon_nam(mtmp), msgtrail);
                     mtmp->mhp = 1; /* almost dead */
                 }
                 expels(mtmp, olddata, FALSE);

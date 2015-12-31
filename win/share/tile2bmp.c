@@ -1,4 +1,4 @@
-/* NetHack 3.6	tile2bmp.c	$NHDT-Date: 1431192770 2015/05/09 17:32:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.14 $ */
+/* NetHack 3.6	tile2bmp.c	$NHDT-Date: 1451442061 2015/12/30 02:21:01 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.15 $ */
 /*   Copyright (c) NetHack PC Development Team 1995                 */
 /*   NetHack may be freely redistributed.  See license for details. */
 
@@ -16,6 +16,21 @@
 #include "tile.h"
 #ifndef __GNUC__
 #include "win32api.h"
+#endif
+
+#include <stdint.h>
+#if defined(UINT32_MAX) && defined(INT32_MAX) && defined(UINT16_MAX)
+#define UINT8 uint8_t
+#define UINT16 uint16_t
+#define UINT32 uint32_t
+#define INT32 int32_t
+#else
+# ifdef _MSC_VER
+#define UINT8 unsigned char
+#define UINT16 unsigned short
+#define UINT32 unsigned long
+#define INT32 long
+# endif
 #endif
 
 #if (TILE_X == 32)
@@ -61,8 +76,8 @@ leshort(short x)
 #endif
 }
 
-static long
-lelong(long x)
+static INT32
+lelong(INT32 x)
 {
 #ifdef __BIG_ENDIAN__
     return ((x & 0xff) << 24) | ((x & 0xff00) << 8) | ((x >> 8) & 0xff00)
@@ -74,37 +89,35 @@ lelong(long x)
 
 #ifdef __GNUC__
 typedef struct tagBMIH {
-    unsigned long biSize;
-    long biWidth;
-    long biHeight;
-    unsigned short biPlanes;
-    unsigned short biBitCount;
-    unsigned long biCompression;
-    unsigned long biSizeImage;
-    long biXPelsPerMeter;
-    long biYPelsPerMeter;
-    unsigned long biClrUsed;
-    unsigned long biClrImportant;
+    UINT32 biSize;
+    INT32 biWidth;
+    INT32 biHeight;
+    UINT16 biPlanes;
+    UINT16 biBitCount;
+    UINT32 biCompression;
+    UINT32 biSizeImage;
+    INT32 biXPelsPerMeter;
+    INT32 biYPelsPerMeter;
+    UINT32 biClrUsed;
+    UINT32 biClrImportant;
 } PACK BITMAPINFOHEADER;
 
 typedef struct tagBMFH {
-    unsigned short bfType;
-    unsigned long bfSize;
-    unsigned short bfReserved1;
-    unsigned short bfReserved2;
-    unsigned long bfOffBits;
+    UINT16 bfType;
+    UINT32 bfSize;
+    UINT16 bfReserved1;
+    UINT16 bfReserved2;
+    UINT32 bfOffBits;
 } PACK BITMAPFILEHEADER;
 
 typedef struct tagRGBQ {
-    unsigned char rgbBlue;
-    unsigned char rgbGreen;
-    unsigned char rgbRed;
-    unsigned char rgbReserved;
+    UINT8 rgbBlue;
+    UINT8 rgbGreen;
+    UINT8 rgbRed;
+    UINT8 rgbReserved;
 } PACK RGBQUAD;
-#define UINT unsigned int
-#define DWORD unsigned long
-#define LONG long
-#define WORD unsigned short
+#define DWORD UINT32
+#define WORD UINT16
 #define BI_RGB 0L
 #define BI_RLE8 1L
 #define BI_RLE4 2L
@@ -256,8 +269,8 @@ BITMAPFILEHEADER *pbmfh;
 {
     pbmfh->bfType = leshort(0x4D42);
     pbmfh->bfSize = lelong(BMPFILESIZE);
-    pbmfh->bfReserved1 = (UINT) 0;
-    pbmfh->bfReserved2 = (UINT) 0;
+    pbmfh->bfReserved1 = (UINT32) 0;
+    pbmfh->bfReserved2 = (UINT32) 0;
     pbmfh->bfOffBits = lelong(sizeof(bmp.bmfh) + sizeof(bmp.bmih)
                               + (RGBQUAD_COUNT * sizeof(RGBQUAD)));
 }

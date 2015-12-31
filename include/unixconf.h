@@ -1,4 +1,4 @@
-/* NetHack 3.6	unixconf.h	$NHDT-Date: 1447755973 2015/11/17 10:26:13 $  $NHDT-Branch: master $:$NHDT-Revision: 1.24 $ */
+/* NetHack 3.6	unixconf.h	$NHDT-Date: 1451342112 2015/12/28 22:35:12 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.25 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -129,6 +129,9 @@
  * a fine-grained timer.
  */
 /* #define TIMED_DELAY */ /* usleep() */
+#endif
+#if defined(MACOSX) && !defined(TIMED_DELAY)
+#define TIMED_DELAY
 #endif
 
 /*

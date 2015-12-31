@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1450573885 2015/12/20 01:11:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.156 $ */
+/* NetHack 3.6	eat.c	$NHDT-Date: 1451086430 2015/12/25 23:33:50 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.157 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -494,7 +494,7 @@ int *dmg_p; /* for dishing out extra damage in lieu of Int loss */
             } else {
                 if (magr->mtame && !visflag)
                     /* parallels mhitm.c's brief_feeling */
-                    You("have a sad thought for a moment, then is passes.");
+                    You("have a sad thought for a moment, then it passes.");
                 return MM_AGR_DIED;
             }
         }
@@ -903,7 +903,7 @@ cpostfx(pm)
 register int pm;
 {
     register int tmp = 0;
-    boolean catch_lycanthropy = FALSE;
+    int catch_lycanthropy = NON_PM;
 
     /* in case `afternmv' didn't get called for previously mimicking
        gold, clean up now to avoid `eatmbuf' memory leak */
@@ -931,16 +931,13 @@ register int pm;
         pluslvl(FALSE);
         break;
     case PM_HUMAN_WERERAT:
-        catch_lycanthropy = TRUE;
-        u.ulycn = PM_WERERAT;
+        catch_lycanthropy = PM_WERERAT;
         break;
     case PM_HUMAN_WEREJACKAL:
-        catch_lycanthropy = TRUE;
-        u.ulycn = PM_WEREJACKAL;
+        catch_lycanthropy = PM_WEREJACKAL;
         break;
     case PM_HUMAN_WEREWOLF:
-        catch_lycanthropy = TRUE;
-        u.ulycn = PM_WEREWOLF;
+        catch_lycanthropy = PM_WEREWOLF;
         break;
     case PM_NURSE:
         if (Upolyd)
@@ -1096,12 +1093,14 @@ register int pm;
             gainstr((struct obj *) 0, 0, TRUE);
         else if (tmp > 0)
             givit(tmp, ptr);
-    } break;
-    }
+        break;
+    } /* default case */
+    } /* switch */
 
-    if (catch_lycanthropy)
+    if (catch_lycanthropy >= LOW_PM) {
+        set_ulycn(catch_lycanthropy);
         retouch_equipment(2);
-
+    }
     return;
 }
 

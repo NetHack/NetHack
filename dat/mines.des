@@ -1140,7 +1140,7 @@ DOOR:closed,(37,8)
 DOOR:closed,(47,8)
 DOOR:closed,(73,5)
 DOOR:closed,(2,15)
-MAZEWALK:(36,8),west
+MAZEWALK:(36,8),west,false
 STAIR:(42,8),up
 WALLIFY
 

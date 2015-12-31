@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1450473780 2015/12/18 21:23:00 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.211 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1451082253 2015/12/25 22:24:13 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.212 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1176,6 +1176,7 @@ doterrain(VOID_ARGS)
      *  a legend for the levl[][].typ codes dump
      */
     men = create_nhwindow(NHW_MENU);
+    start_menu(men);
     any = zeroany;
     any.a_int = 1;
     add_menu(men, NO_GLYPH, &any, 0, 0, ATR_NONE,
@@ -2040,7 +2041,7 @@ int final;
                                             : "certain monsters");
         you_are(buf, "");
     }
-    if (Warn_of_mon && context.warntype.speciesidx) {
+    if (Warn_of_mon && context.warntype.speciesidx >= LOW_PM) {
         Sprintf(buf, "aware of the presence of %s",
                 makeplural(mons[context.warntype.speciesidx].mname));
         you_are(buf, from_what(WARN_OF_MON));

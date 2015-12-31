@@ -1,4 +1,4 @@
-/* NetHack 3.6	attrib.c	$NHDT-Date: 1449269911 2015/12/04 22:58:31 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.51 $ */
+/* NetHack 3.6	attrib.c	$NHDT-Date: 1451111134 2015/12/26 06:25:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.54 $ */
 /*      Copyright 1988, 1989, 1990, 1992, M. Stephenson           */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -83,10 +83,21 @@ static const struct innate {
                  { 0, 0, 0, 0 } },
 
   /* Intrinsics conferred by race */
-    elf_abil[] = { { 4, &(HSleep_resistance), "awake", "tired" },
-                   { 0, 0, 0, 0 } },
+  dwa_abil[] = { { 1, &HInfravision, "", "" },
+                 { 0, 0, 0, 0 } },
 
-  orc_abil[] = { { 1, &(HPoison_resistance), "", "" }, { 0, 0, 0, 0 } };
+  elf_abil[] = { { 1, &HInfravision, "", "" },
+                 { 4, &HSleep_resistance, "awake", "tired" },
+                 { 0, 0, 0, 0 } },
+
+  gno_abil[] = { { 1, &HInfravision, "", "" },
+                 { 0, 0, 0, 0 } },
+
+  orc_abil[] = { { 1, &HInfravision, "", "" },
+                 { 1, &HPoison_resistance, "", "" },
+                 { 0, 0, 0, 0 } },
+
+  hum_abil[] = { { 0, 0, 0, 0 } };
 
 STATIC_DCL void NDECL(exerper);
 STATIC_DCL void FDECL(postadjabil, (long *));
@@ -686,15 +697,19 @@ long frommask;
         }
     else if (frommask == FROMRACE)
         switch (Race_switch) {
+        case PM_DWARF:
+            abil = dwa_abil;
+            break;
         case PM_ELF:
             abil = elf_abil;
+            break;
+        case PM_GNOME:
+            abil = gno_abil;
             break;
         case PM_ORC:
             abil = orc_abil;
             break;
         case PM_HUMAN:
-        case PM_DWARF:
-        case PM_GNOME:
         default:
             break;
         }
@@ -707,31 +722,50 @@ long frommask;
     return (struct innate *) 0;
 }
 
-/*
- * returns 1 if FROMRACE or FROMEXPER and exper level == 1
- * returns 2 if FROMEXPER and exper level > 1
- * otherwise returns 0
- */
+/* reasons for innate ability */
+#define FROM_NONE 0
+#define FROM_ROLE 1 /* from experience at level 1 */
+#define FROM_RACE 2
+#define FROM_EXP  3 /* from experience for some level > 1 */
+#define FROM_FORM 4
+#define FROM_LYCN 5
+
+
+/* check whether particular ability has been obtained via innate attribute */
 STATIC_OVL int
 innately(ability)
 long *ability;
 {
     const struct innate *iptr;
 
+    if ((iptr = check_innate_abil(ability, FROMEXPER)) != 0)
+        return (iptr->ulevel == 1) ? FROM_ROLE : FROM_EXP;
     if ((iptr = check_innate_abil(ability, FROMRACE)) != 0)
-        return 1;
-    else if ((iptr = check_innate_abil(ability, FROMEXPER)) != 0)
-        return (iptr->ulevel == 1) ? 1 : 2;
-    return 0;
+        return FROM_RACE;
+    if ((*ability & FROMFORM) != 0L)
+        return FROM_FORM;
+    return FROM_NONE;
 }
 
 int
 is_innate(propidx)
 int propidx;
 {
+    int innateness;
+
+    /* innately() would report FROM_FORM for this; caller wants specificity */
+    if (propidx == DRAIN_RES && u.ulycn >= LOW_PM)
+        return FROM_LYCN;
+    if ((innateness = innately(&u.uprops[propidx].intrinsic)) != FROM_NONE)
+        return innateness;
+    if (propidx == JUMPING && Role_if(PM_KNIGHT)
+        /* knight has intrinsic jumping, but extrinsic is more versatile so
+           ignore innateness if equipment is going to claim responsibility */
+        && !u.uprops[propidx].extrinsic)
+        return FROM_ROLE;
     if (propidx == BLINDED && !haseyes(youmonst.data))
-        return 1;
-    return innately(&u.uprops[propidx].intrinsic);
+        return FROM_FORM;
+    return FROM_NONE;
 }
 
 char *
@@ -750,14 +784,18 @@ int propidx; /* special cases can have negative values */
         if (propidx >= 0) {
             char *p;
             struct obj *obj = (struct obj *) 0;
-            int innate = is_innate(propidx);
+            int innateness = is_innate(propidx);
 
-            if (innate == 2)
+            if (innateness == FROM_EXP)
                 Strcpy(buf, " because of your experience");
-            else if (innate == 1)
+            else if (innateness == FROM_LYCN)
+                Strcpy(buf, " due to your lycanthropy");
+            else if (innateness == FROM_FORM)
+                Strcpy(buf, " from current creature form");
+            else if (innateness == FROM_ROLE || innateness == FROM_RACE)
                 Strcpy(buf, " innately");
             else if (wizard
-                     && (obj = what_gives(&u.uprops[propidx].extrinsic)))
+                     && (obj = what_gives(&u.uprops[propidx].extrinsic)) != 0)
                 Sprintf(buf, because_of, obj->oartifact
                                              ? bare_artifactname(obj)
                                              : ysimple_name(obj));

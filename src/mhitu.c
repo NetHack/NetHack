@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitu.c	$NHDT-Date: 1450016149 2015/12/13 14:15:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.131 $ */
+/* NetHack 3.6	mhitu.c	$NHDT-Date: 1451084422 2015/12/25 23:00:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.132 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -273,6 +273,26 @@ struct attack *alt_attk_buf;
         *alt_attk_buf = *attk;
         attk = alt_attk_buf;
         attk->adtyp = AD_STUN;
+
+    /* make drain-energy damage be somewhat in proportion to energy */
+    } else if (attk->adtyp == AD_DREN) {
+        int ulev = max(u.ulevel, 6);
+
+        *alt_attk_buf = *attk;
+        attk = alt_attk_buf;
+        /* 3.6.0 used 4d6 but since energy drain came out of max energy
+           once current energy was gone, that tended to have a severe
+           effect on low energy characters; it's now 2d6 with ajustments */
+        if (u.uen <= 5 * ulev && attk->damn > 1) {
+            attk->damn -= 1; /* low energy: 2d6 -> 1d6 */
+            if (u.uenmax <= 2 * ulev && attk->damd > 3)
+                attk->damd -= 3; /* very low energy: 1d6 -> 1d3 */
+        } else if (u.uen > 12 * ulev) {
+            attk->damn += 1; /* high energy: 2d6 -> 3d6 */
+            if (u.uenmax > 20 * ulev)
+                attk->damd += 3; /* very high energy: 3d6 -> 3d9 */
+            /* note: 3d9 is slightly higher than previous 4d6 */
+        }
     }
     return attk;
 }
@@ -1228,7 +1248,7 @@ register struct attack *mattk;
             && !Protection_from_shape_changers && !defends(AD_WERE, uwep)) {
             You_feel("feverish.");
             exercise(A_CON, FALSE);
-            u.ulycn = monsndx(mdat);
+            set_ulycn(monsndx(mdat));
             retouch_equipment(2);
         }
         break;
@@ -1450,7 +1470,7 @@ register struct attack *mattk;
         break;
     case AD_DREN:
         hitmsg(mtmp, mattk);
-        if (uncancelled && !rn2(4))
+        if (uncancelled && !rn2(4)) /* 25% chance */
             drain_en(dmg);
         dmg = 0;
         break;
@@ -1840,7 +1860,7 @@ register struct attack *mattk;
         break;
     case AD_DREN:
         /* AC magic cancellation doesn't help when engulfed */
-        if (!mtmp->mcan && rn2(4))
+        if (!mtmp->mcan && rn2(4)) /* 75% chance */
             drain_en(tmp);
         tmp = 0;
         break;

@@ -604,7 +604,7 @@ register struct obj *otmp;
                          makeplural(mons[u.ulycn].mname));
                     if (youmonst.data == &mons[u.ulycn])
                         you_unwere(FALSE);
-                    u.ulycn = NON_PM; /* cure lycanthropy */
+                    set_ulycn(NON_PM); /* cure lycanthropy */
                 }
                 losehp(Maybe_Half_Phys(d(2, 6)), "potion of holy water",
                        KILLED_BY_AN);
