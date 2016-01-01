@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1450584419 2015/12/20 04:06:59 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.159 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1451683056 2016/01/01 21:17:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.162 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1042,7 +1042,7 @@ boolean with_price;
 
     /* show weight for items (debug tourist info)
      * aum is stolen from Crawl's "Arbitrary Unit of Measure" */
-    if (wizard) {
+    if (wizard && iflags.wizweight) {
         Sprintf(eos(bp), " (%d aum)", obj->owt);
     }
     bp = strprepend(bp, prefix);

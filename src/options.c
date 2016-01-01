@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1449830206 2015/12/11 10:36:46 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.244 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1451683057 2016/01/01 21:17:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.249 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -147,7 +147,7 @@ static struct Bool_Opt {
     { "mention_walls", &iflags.mention_walls, FALSE, SET_IN_GAME },
     { "menucolors", &iflags.use_menu_color, FALSE, SET_IN_GAME },
     /* for menu debugging only*/
-    { "menu_tab_sep", &iflags.menu_tab_sep, FALSE, SET_IN_GAME },
+    { "menu_tab_sep", &iflags.menu_tab_sep, FALSE, SET_IN_WIZGAME },
     { "menu_objsyms", &iflags.menu_head_objsym, FALSE, SET_IN_GAME },
     { "mouse_support", &iflags.wc_mouse_support, TRUE, DISP_IN_GAME }, /*WC*/
 #ifdef NEWS
@@ -183,7 +183,7 @@ static struct Bool_Opt {
       DISP_IN_GAME },
 #endif
     { "safe_pet", &flags.safe_dog, TRUE, SET_IN_GAME },
-    { "sanity_check", &iflags.sanity_check, FALSE, SET_IN_GAME },
+    { "sanity_check", &iflags.sanity_check, FALSE, SET_IN_WIZGAME },
     { "selectsaved", &iflags.wc2_selectsaved, TRUE, DISP_IN_GAME }, /*WC*/
     { "showexp", &flags.showexp, FALSE, SET_IN_GAME },
     { "showrace", &flags.showrace, FALSE, SET_IN_GAME },
@@ -220,6 +220,7 @@ static struct Bool_Opt {
     { "use_inverse", &iflags.wc_inverse, FALSE, SET_IN_GAME }, /*WC*/
 #endif
     { "verbose", &flags.verbose, TRUE, SET_IN_GAME },
+    { "wizweight", &iflags.wizweight, FALSE, SET_IN_WIZGAME },
     { "wraptext", &iflags.wc2_wraptext, FALSE, SET_IN_GAME },
 #ifdef ZEROCOMP
     { "zerocomp", &iflags.zerocomp,
@@ -3554,12 +3555,11 @@ doset()
         for (i = 0; boolopt[i].name; i++)
             if ((bool_p = boolopt[i].addr) != 0
                 && ((boolopt[i].optflags == DISP_IN_GAME && pass == 0)
-                    || (boolopt[i].optflags == SET_IN_GAME && pass == 1))) {
+                    || (boolopt[i].optflags == SET_IN_GAME && pass == 1)
+                    || (boolopt[i].optflags == SET_IN_WIZGAME && pass == 1 && wizard))) {
                 if (bool_p == &flags.female)
                     continue; /* obsolete */
-                if (bool_p == &iflags.sanity_check && !wizard)
-                    continue;
-                if (bool_p == &iflags.menu_tab_sep && !wizard)
+                if (boolopt[i].optflags == SET_IN_WIZGAME && !wizard)
                     continue;
                 if (is_wc_option(boolopt[i].name)
                     && !wc_supported(boolopt[i].name))
@@ -3595,7 +3595,7 @@ doset()
     else
 #endif
         startpass = DISP_IN_GAME;
-    endpass = SET_IN_GAME;
+    endpass = (wizard) ? SET_IN_WIZGAME : SET_IN_GAME;
 
     /* spin through the options to find the biggest name
        and adjust the format string accordingly if needed */

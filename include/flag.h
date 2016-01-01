@@ -1,4 +1,4 @@
-/* NetHack 3.6	flag.h	$NHDT-Date: 1435002669 2015/06/22 19:51:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.89 $ */
+/* NetHack 3.6	flag.h	$NHDT-Date: 1451683047 2016/01/01 21:17:27 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.93 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -259,6 +259,7 @@ struct instance_flags {
     boolean lan_mail;         /* mail is initialized */
     boolean lan_mail_fetched; /* mail is awaiting display */
 #endif
+    boolean wizweight;        /* display weight of everything in wizard mode */
     /*
      * Window capability support.
      */
