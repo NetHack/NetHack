@@ -51,6 +51,10 @@ static char ec_chars[EC_NCHARS];
 static Time ec_time;
 
 static const char extended_command_translations[] = "#override\n\
+     <Key>Left: scroll(4)\n\
+     <Key>Right: scroll(6)\n\
+     <Key>Up: scroll(8)\n\
+     <Key>Down: scroll(2)\n\
      <Key>: ec_key()";
 
 static const char player_select_translations[] = "#override\n\
