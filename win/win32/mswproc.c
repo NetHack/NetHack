@@ -1,4 +1,4 @@
-/* NetHack 3.6	mswproc.c	$NHDT-Date: 1450453307 2015/12/18 15:41:47 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.97 $ */
+/* NetHack 3.6	mswproc.c	$NHDT-Date: 1451611595 2016/01/01 01:26:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.98 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -37,7 +37,9 @@
 static FILE* _s_debugfp = NULL;
 extern void logDebug(const char *fmt, ...);
 # endif
-#else
+#endif
+
+#ifndef _DEBUG
 void
 logDebug(const char *fmt, ...)
 {
