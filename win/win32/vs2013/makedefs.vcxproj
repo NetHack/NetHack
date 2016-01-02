@@ -145,6 +145,9 @@ echo ..\util\makedefs.exe -d
 echo Generating rumors
 echo ..\util\makedefs.exe -r
 ..\util\makedefs.exe -r
+echo Generating ..\dat\engrave, ..\dat\epitaph, ..\dat\bogusmon
+echo ..\util\makedefs.exe -s
+..\util\makedefs.exe -s
 echo Generating quests
 echo ..\util\makedefs.exe -q
 ..\util\makedefs.exe -q
@@ -223,6 +226,9 @@ echo ..\util\makedefs.exe -d
 echo Generating rumors
 echo ..\util\makedefs.exe -r
 ..\util\makedefs.exe -r
+echo Generating ..\dat\engrave, ..\dat\epitaph, ..\dat\bogusmon
+echo ..\util\makedefs.exe -s
+..\util\makedefs.exe -s
 echo Generating quests
 echo ..\util\makedefs.exe -q
 ..\util\makedefs.exe -q
@@ -304,6 +310,9 @@ echo ..\util\makedefs.exe -d
 echo Generating rumors
 echo ..\util\makedefs.exe -r
 ..\util\makedefs.exe -r
+echo Generating ..\dat\engrave, ..\dat\epitaph, ..\dat\bogusmon
+echo ..\util\makedefs.exe -s
+..\util\makedefs.exe -s
 echo Generating quests
 echo ..\util\makedefs.exe -q
 ..\util\makedefs.exe -q
@@ -383,6 +392,9 @@ echo ..\util\makedefs.exe -d
 echo Generating rumors
 echo ..\util\makedefs.exe -r
 ..\util\makedefs.exe -r
+echo Generating ..\dat\engrave, ..\dat\epitaph, ..\dat\bogusmon
+echo ..\util\makedefs.exe -s
+..\util\makedefs.exe -s
 echo Generating quests
 echo ..\util\makedefs.exe -q
 ..\util\makedefs.exe -q

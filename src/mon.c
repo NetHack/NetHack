@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1451176552 2015/12/27 00:35:52 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.202 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1451664800 2016/01/01 16:13:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.203 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3141,7 +3141,7 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
     int hpn, hpd;
     int mndx, tryct;
     struct permonst *olddata = mtmp->data;
-    char oldname[BUFSZ], newname[BUFSZ];
+    char oldname[BUFSZ], l_oldname[BUFSZ], newname[BUFSZ];
 
     /* Riders are immune to polymorph and green slime */
     if (is_rider(mtmp->data))
@@ -3153,6 +3153,9 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
                                  SUPPRESS_SADDLE, FALSE));
         oldname[0] = highc(oldname[0]);
     }
+    /* we need this one whether msg is true or not */
+    Strcpy(l_oldname, x_monnam(mtmp, ARTICLE_THE, (char *) 0,
+                (has_mname(mtmp)) ? SUPPRESS_SADDLE : 0, FALSE));
 
     /* mdat = 0 -> caller wants a random monster shape */
     if (mdat == 0) {
@@ -3246,14 +3249,19 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
                     char msgtrail[BUFSZ];
 
                     if (is_vampshifter(mtmp)) {
-                        Strcpy(msgtrail, " that had been shapeshifted");
+                        Sprintf(msgtrail, " which was a shapeshifted %s",
+                                m_monnam(mtmp));
                     } else if (is_animal(mdat)) {
                         Strcpy(msgtrail, "'s stomach");
                     } else {
                         msgtrail[0] = '\0';
                     }
 
-                    You("break out of %s%s!", mon_nam(mtmp), msgtrail);
+                    /* Do this even if msg is FALSE */
+                    You("%s %s%s!",
+                        (amorphous(olddata) || is_whirly(olddata)) ?
+                            "emerge from" : "break out of",
+                        l_oldname, msgtrail);
                     mtmp->mhp = 1; /* almost dead */
                 }
                 expels(mtmp, olddata, FALSE);

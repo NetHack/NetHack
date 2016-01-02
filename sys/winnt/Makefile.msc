@@ -806,14 +806,6 @@ $(INCL)\vis_tab.h: $(U)makedefs.exe
 $(SRC)\vis_tab.c: $(U)makedefs.exe
 	$(U)makedefs -z
 
-$(DAT)\engrave: $(DAT)\engrave.txt $(U)makedefs.exe
-	..\util\makedefs -s
-$(DAT)\epitaph: $(DAT)\epitaph.txt $(U)makedefs.exe
-	..\util\makedefs -s
-$(DAT)\bogusmon: $(DAT)\bogusmon.txt $(U)makedefs.exe
-	..\util\makedefs -s
-
-
 #==========================================
 # uudecode utility and uuencoded targets
 #==========================================
@@ -1268,6 +1260,15 @@ $(DAT)\quest.dat: $(O)utility.tag  $(DAT)\quest.txt
 
 $(DAT)\oracles: $(O)utility.tag    $(DAT)\oracles.txt
 	$(U)makedefs -h
+
+$(DAT)\engrave: $(DAT)\engrave.txt $(U)makedefs.exe
+	$(U)makedefs -s
+
+$(DAT)\epitaph: $(DAT)\epitaph.txt $(U)makedefs.exe
+	$(U)makedefs -s
+
+$(DAT)\bogusmon: $(DAT)\bogusmon.txt $(U)makedefs.exe
+	$(U)makedefs -s
 
 $(DAT)\dungeon: $(O)utility.tag  $(DAT)\dungeon.def
 	$(U)makedefs -e

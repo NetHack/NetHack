@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1451001643 2015/12/25 00:00:43 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.197 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1451697801 2016/01/02 01:23:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.199 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3355,7 +3355,11 @@ assure_syscf_file()
      * VMS overrides open() usage with a macro which requires it.
      */
 #ifndef VMS
+# if defined(NOCWD_ASSUMPTIONS) && defined(WIN32)
+    fd = open(fqname(SYSCF_FILE, SYSCONFPREFIX, 0), O_RDONLY);
+# else
     fd = open(SYSCF_FILE, O_RDONLY);
+# endif
 #else
     fd = open(SYSCF_FILE, O_RDONLY, 0);
 #endif

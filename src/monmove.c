@@ -1,4 +1,4 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1446808446 2015/11/06 11:14:06 $  $NHDT-Branch: master $:$NHDT-Revision: 1.78 $ */
+/* NetHack 3.6	monmove.c	$NHDT-Date: 1451664819 2016/01/01 16:13:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.79 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -14,7 +14,7 @@ STATIC_DCL void FDECL(release_hero, (struct monst *));
 STATIC_DCL void FDECL(distfleeck, (struct monst *, int *, int *, int *));
 STATIC_DCL int FDECL(m_arrival, (struct monst *));
 STATIC_DCL boolean FDECL(stuff_prevents_passage, (struct monst *));
-STATIC_DCL int FDECL(vamp_shift, (struct monst *, struct permonst *));
+STATIC_DCL int FDECL(vamp_shift, (struct monst *, struct permonst *, BOOLEAN_P));
 
 /* True if mtmp died */
 boolean
@@ -1216,7 +1216,7 @@ postmov:
                 if (here->doormask & (D_LOCKED | D_CLOSED)
                     && (amorphous(ptr)
                         || (!amorphous(ptr) && can_fog(mtmp)
-                            && vamp_shift(mtmp, &mons[PM_FOG_CLOUD])))) {
+                            && vamp_shift(mtmp, &mons[PM_FOG_CLOUD],canspotmon(mtmp))))) {
                     if (flags.verbose && canseemon(mtmp))
                         pline("%s %s under the door.", Monnam(mtmp),
                               (ptr == &mons[PM_FOG_CLOUD]
@@ -1586,12 +1586,19 @@ struct monst *mtmp;
 }
 
 STATIC_OVL int
-vamp_shift(mon, ptr)
+vamp_shift(mon, ptr, domsg)
 struct monst *mon;
 struct permonst *ptr;
+boolean domsg;
 {
     int reslt = 0;
+    char fmtstr[BUFSZ];
 
+    if (domsg) {
+        Sprintf(fmtstr, "You %s %%s where %s was.",
+                sensemon(mon) ? "now detect" : "observe",
+                an(m_monnam(mon)));
+    }
     if (mon->cham >= LOW_PM) {
         if (ptr == &mons[mon->cham])
             mon->cham = NON_PM;
@@ -1599,6 +1606,9 @@ struct permonst *ptr;
     } else if (mon->cham == NON_PM && ptr != mon->data) {
         mon->cham = monsndx(mon->data);
         reslt = newcham(mon, ptr, FALSE, FALSE);
+    }
+    if (reslt && domsg) {
+        pline(fmtstr, an(m_monnam(mon)));
     }
     return reslt;
 }

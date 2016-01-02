@@ -18,6 +18,7 @@
 #include <X11/Xaw/Command.h>
 #include <X11/Xaw/Form.h>
 #include <X11/Xaw/Label.h>
+#include <X11/Xaw/Viewport.h>
 #include <X11/Xaw/Cardinals.h>
 #include <X11/Xos.h> /* for index() */
 #include <X11/Xatom.h>
@@ -50,6 +51,10 @@ static char ec_chars[EC_NCHARS];
 static Time ec_time;
 
 static const char extended_command_translations[] = "#override\n\
+     <Key>Left: scroll(4)\n\
+     <Key>Right: scroll(6)\n\
+     <Key>Up: scroll(8)\n\
+     <Key>Down: scroll(2)\n\
      <Key>: ec_key()";
 
 static const char player_select_translations[] = "#override\n\
@@ -844,7 +849,7 @@ Widget **command_widgets;
 XtCallbackProc name_callback;
 Widget *formp; /* return */
 {
-    Widget popup, form, label, above, left, right;
+    Widget popup, form, label, above, left, right, view;
     Widget *commands, *curr;
     int i;
     Arg args[8];
@@ -864,17 +869,23 @@ Widget *formp; /* return */
         popup, XtParseTranslationTable("<Message>WM_PROTOCOLS: ec_delete()"));
 
     num_args = 0;
+    XtSetArg(args[num_args], XtNforceBars, False); num_args++;
+    XtSetArg(args[num_args], XtNallowVert, True); num_args++;
+    view = XtCreateManagedWidget("menuformview", viewportWidgetClass, popup,
+                                 args, num_args);
+
+    num_args = 0;
     XtSetArg(args[num_args], XtNtranslations,
              XtParseTranslationTable(popup_translations));
     num_args++;
-    *formp = form = XtCreateManagedWidget("menuform", formWidgetClass, popup,
+    *formp = form = XtCreateManagedWidget("menuform", formWidgetClass, view,
                                           args, num_args);
 
     /* Get the default distance between objects in the form widget. */
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNdefaultDistance), &distance);
     num_args++;
-    XtGetValues(form, args, num_args);
+    XtGetValues(view, args, num_args);
 
     /*
      * Create the label.
