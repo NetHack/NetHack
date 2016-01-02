@@ -1,4 +1,4 @@
-/* NetHack 3.6	pcmain.c	$NHDT-Date: 1449893255 2015/12/12 04:07:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.67 $ */
+/* NetHack 3.6	pcmain.c	$NHDT-Date: 1451697809 2016/01/02 01:23:29 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.68 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -178,7 +178,33 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     if (dir == (char *) 0)
         dir = exepath(argv[0]);
 #endif
-    if (dir != (char *) 0) {
+#ifdef _MSC_VER
+    if (IsDebuggerPresent()) {
+        static char exepath[_MAX_PATH];
+        /* check if we're running under the debugger so we can get to the right folder anyway */
+        if (dir != (char *)0) {
+            char *top = (char *)0;
+
+            if (strlen(dir) < (_MAX_PATH - 1))
+                strcpy(exepath, dir);
+            top = strstr(exepath, "\\build\\.\\Debug");
+            if (!top) top = strstr(exepath, "\\build\\.\\Release");
+            if (top) {
+                *top = '\0';
+                if (strlen(exepath) < (_MAX_PATH - (strlen("\\binary\\") + 1))) {
+                    Strcat(exepath, "\\binary\\");
+                    if (strlen(exepath) < (PATHLEN - 1)) {
+                        dir = exepath;
+                    }
+                }
+            }
+        }
+    }
+#endif
+    if (dir != (char *)0) {
+        int fd;
+        boolean have_syscf = FALSE;
+
         (void) strncpy(hackdir, dir, PATHLEN - 1);
         hackdir[PATHLEN - 1] = '\0';
 #ifdef NOCWD_ASSUMPTIONS
@@ -203,6 +229,34 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
                     Strcpy(fqn_prefix[SYSCONFPREFIX], envp);
                     append_slash(fqn_prefix[SYSCONFPREFIX]);
                     Strcat(fqn_prefix[SYSCONFPREFIX], "NetHack\\");
+                }
+            }
+
+            /* okay so we have the overriding and definitive locaton
+            for sysconf, but only in the event that there is not a 
+            sysconf file there (for whatever reason), check a secondary
+            location rather than abort. */
+
+            /* Is there a SYSCF_FILE there? */
+            fd = open(fqname(SYSCF_FILE, SYSCONFPREFIX, 0), O_RDONLY);
+            if (fd >= 0) {
+                /* readable */
+                close(fd);
+                have_syscf = TRUE;
+            }
+
+            if (!have_syscf) {
+                /* No SYSCF_FILE where there should be one, and
+                   without an installer, a user may not be able
+                   to place one there. So, let's try somewhere else... */
+                fqn_prefix[SYSCONFPREFIX] = fqn_prefix[0];
+
+                /* Is there a SYSCF_FILE there? */
+                fd = open(fqname(SYSCF_FILE, SYSCONFPREFIX, 0), O_RDONLY);
+                if (fd >= 0) {
+                    /* readable */
+                    close(fd);
+                    have_syscf = TRUE;
                 }
             }
 
