@@ -139,6 +139,8 @@ echo decoding splash (splash.uu to splash.bmp)
 ..\..\util\uudecode.exe splash.uu
 echo decoding tombstone (rip.uu to rip.bmp)
 ..\..\util\uudecode.exe rip.uu
+echo decoding record (record.uu to record.)
+..\..\util\uudecode.exe record.uu
 chdir ..\..\binary
 </Command>
     </PostBuildEvent>
@@ -200,6 +202,8 @@ echo decoding splash (splash.uu to splash.bmp)
 ..\..\util\uudecode.exe splash.uu
 echo decoding tombstone (rip.uu to rip.bmp)
 ..\..\util\uudecode.exe rip.uu
+echo decoding record (record.uu to record.)
+..\..\util\uudecode.exe record.uu
 chdir ..\..\binary
 </Command>
     </PostBuildEvent>
@@ -264,6 +268,8 @@ echo decoding splash (splash.uu to splash.bmp)
 ..\..\util\uudecode.exe splash.uu
 echo decoding tombstone (rip.uu to rip.bmp)
 ..\..\util\uudecode.exe rip.uu
+echo decoding record (record.uu to record.)
+..\..\util\uudecode.exe record.uu
 chdir ..\..\binary
 </Command>
     </PostBuildEvent>
@@ -326,6 +332,8 @@ echo decoding splash (splash.uu to splash.bmp)
 ..\..\util\uudecode.exe splash.uu
 echo decoding tombstone (rip.uu to rip.bmp)
 ..\..\util\uudecode.exe rip.uu
+echo decoding record (record.uu to record.)
+..\..\util\uudecode.exe record.uu
 chdir ..\..\binary
 </Command>
     </PostBuildEvent>
