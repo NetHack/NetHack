@@ -152,6 +152,8 @@ struct obj *otmp;
     /* fall through */
     case SPE_FORCE_BOLT:
         reveal_invis = TRUE;
+        if (disguised_mimic)
+            seemimic(mtmp);
         if (resists_magm(mtmp)) { /* match effect on player */
             shieldeff(mtmp->mx, mtmp->my);
             pline("Boing!");
@@ -171,6 +173,8 @@ struct obj *otmp;
     case WAN_SLOW_MONSTER:
     case SPE_SLOW_MONSTER:
         if (!resist(mtmp, otmp->oclass, 0, NOTELL)) {
+            if (disguised_mimic)
+                seemimic(mtmp);
             mon_adjust_speed(mtmp, -1, otmp);
             m_dowear(mtmp, FALSE); /* might want speed boots */
             if (u.uswallow && (mtmp == u.ustuck) && is_whirly(mtmp->data)) {
@@ -182,6 +186,8 @@ struct obj *otmp;
         break;
     case WAN_SPEED_MONSTER:
         if (!resist(mtmp, otmp->oclass, 0, NOTELL)) {
+            if (disguised_mimic)
+                seemimic(mtmp);
             mon_adjust_speed(mtmp, 1, otmp);
             m_dowear(mtmp, FALSE); /* might want speed boots */
         }
@@ -239,16 +245,22 @@ struct obj *otmp;
         break;
     case WAN_CANCELLATION:
     case SPE_CANCELLATION:
+        if (disguised_mimic)
+            seemimic(mtmp);
         (void) cancel_monst(mtmp, otmp, TRUE, TRUE, FALSE);
         break;
     case WAN_TELEPORTATION:
     case SPE_TELEPORT_AWAY:
+        if (disguised_mimic)
+            seemimic(mtmp);
         reveal_invis = !u_teleport_mon(mtmp, TRUE);
         break;
     case WAN_MAKE_INVISIBLE: {
         int oldinvis = mtmp->minvis;
         char nambuf[BUFSZ];
 
+        if (disguised_mimic)
+            seemimic(mtmp);
         /* format monster's name before altering its visibility */
         Strcpy(nambuf, Monnam(mtmp));
         mon_set_minvis(mtmp);
@@ -368,6 +380,8 @@ struct obj *otmp;
             wake = FALSE;
         break;
     case SPE_DRAIN_LIFE:
+        if (disguised_mimic)
+            seemimic(mtmp);
         dmg = monhp_per_lvl(mtmp);
         if (dbldam)
             dmg *= 2;
