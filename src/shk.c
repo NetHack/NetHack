@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1450604649 2015/12/20 09:44:09 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.117 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1451838768 2016/01/03 16:32:48 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.119 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -759,13 +759,26 @@ register char rmno;
         rmno >= ROOMOFFSET ? rooms[rmno - ROOMOFFSET].resident : 0;
 
     if (shkp) {
-        if (NOTANGRY(shkp)) {
-            if (ESHK(shkp)->surcharge)
-                pacify_shk(shkp);
+        if (has_eshk(shkp)) {
+            if (NOTANGRY(shkp)) {
+                if (ESHK(shkp)->surcharge)
+                    pacify_shk(shkp);
+            } else {
+                if (!ESHK(shkp)->surcharge)
+                    rile_shk(shkp);
+            }
         } else {
-            if (!ESHK(shkp)->surcharge)
-                rile_shk(shkp);
-        }
+            /* would have segfaulted on ESHK dereference previously */
+            impossible(
+             "shopkeeper career change? (rmno=%d, ROOMOFFSET=%d, mnum=%d, %s)",
+                (int)rmno, ROOMOFFSET, shkp->mnum,
+                has_mname(shkp) ? MNAME(shkp) : "anonymous"
+            );
+
+            /* not sure if this is appropriate, because it does nothing to
+               correct the underlying rooms[].resident issue but... */
+            return (struct monst *)0;
+	}
     }
     return shkp;
 }
