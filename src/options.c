@@ -3487,6 +3487,7 @@ char ch;
 
 static char fmtstr_doset_add_menu[] = "%s%-15s [%s]   ";
 static char fmtstr_doset_add_menu_tab[] = "%s\t[%s]";
+static char n_currently_set[] = "(%d currently set)";
 
 STATIC_OVL void
 doset_add_menu(win, option, indexoffset)
@@ -3528,6 +3529,38 @@ int indexoffset;    /* value to add to index in compopt[], or zero
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
 }
 
+STATIC_OVL void
+opts_add_others(win, name, id, bufx, nset)
+winid win;
+char *name;
+int id;
+char *bufx;
+int nset;
+{
+    char buf[BUFSZ], buf2[BUFSZ];
+    anything any = zeroany;
+    any.a_int = id;
+    if (!bufx)
+        Sprintf(buf2, n_currently_set, nset);
+    else
+        Sprintf(buf2, "%s", bufx);
+    if (!iflags.menu_tab_sep)
+        Sprintf(buf, fmtstr_doset_add_menu, any.a_int ? "" : "    ",
+                name, buf2);
+    else
+        Sprintf(buf, fmtstr_doset_add_menu_tab, name, buf2);
+    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
+}
+
+enum opt_other_enums {
+    OPT_OTHER_MSGTYPE = -4,
+    OPT_OTHER_MENUCOLOR = -3,
+    OPT_OTHER_STATHILITE = -2,
+    OPT_OTHER_APEXC = -1
+    /* these must be < 0 */
+};
+
+
 /* Changing options via menu by Per Liboriussen */
 int
 doset()
@@ -3541,7 +3574,6 @@ doset()
     int indexoffset, startpass, endpass;
     boolean setinitial = FALSE, fromfile = FALSE;
     int biggest_name = 0;
-    const char *n_currently_set = "(%d currently set)";
 
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin);
@@ -3636,35 +3668,27 @@ doset()
                     doset_add_menu(tmpwin, compopt[i].name,
                                    (pass == DISP_IN_GAME) ? 0 : indexoffset);
             }
-    any.a_int = -4;
-    Sprintf(buf2, n_currently_set, msgtype_count());
-    Sprintf(buf, fmtstr_doset_add_menu, any.a_int ? "" : "    ",
-            "message types", buf2);
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
-    any.a_int = -3;
-    Sprintf(buf2, n_currently_set, count_menucolors());
-    Sprintf(buf, fmtstr_doset_add_menu, any.a_int ? "" : "    ",
-            "menucolors", buf2);
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
+
+    any = zeroany;
+    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
+    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+             "Other settings:",
+             MENU_UNSELECTED);
+
+    opts_add_others(tmpwin, "autopickup exceptions", OPT_OTHER_APEXC,
+                    NULL, count_ape_maps((int *) 0, (int *) 0));
+    opts_add_others(tmpwin, "menucolors", OPT_OTHER_MENUCOLOR,
+                    NULL, count_menucolors());
+    opts_add_others(tmpwin, "message types", OPT_OTHER_MSGTYPE,
+                    NULL, msgtype_count());
 #ifdef STATUS_VIA_WINDOWPORT
 #ifdef STATUS_HILITES
-    any.a_int = -2;
     get_status_hilites(buf2, 60);
     if (!*buf2)
         Sprintf(buf2, "%s", "(none)");
-    if (!iflags.menu_tab_sep)
-        Sprintf(buf, fmtstr_doset_add_menu, any.a_int ? "" : "    ",
-                "status_hilites", buf2);
-    else
-        Sprintf(buf, fmtstr_doset_add_menu_tab, "status_hilites", buf2);
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
+    opts_add_others(tmpwin, "status_hilites", OPT_OTHER_STATHILITE, buf2, 0);
 #endif
 #endif
-    any.a_int = -1;
-    Sprintf(buf2, n_currently_set, count_ape_maps((int *) 0, (int *) 0));
-    Sprintf(buf, fmtstr_doset_add_menu, any.a_int ? "" : "    ",
-            "autopickup exceptions", buf2);
-    add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
 #ifdef PREFIXES_IN_USE
     any = zeroany;
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
@@ -3684,14 +3708,13 @@ doset()
          */
         for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx) {
             opt_indx = pick_list[pick_idx].item.a_int - 1;
-            if (opt_indx == -2) {
-                /* -2 due to -1 offset for select_menu() */
+            if (opt_indx < -1) opt_indx++; /* -1 offset for select_menu() */
+            if (opt_indx == OPT_OTHER_APEXC) {
                 (void) special_handling("autopickup_exception", setinitial,
                                         fromfile);
 #ifdef STATUS_VIA_WINDOWPORT
 #ifdef STATUS_HILITES
-            } else if (opt_indx == -3) {
-                /* -3 due to -1 offset for select_menu() */
+            } else if (opt_indx == OPT_OTHER_STATHILITE) {
                 if (!status_hilite_menu()) {
                     pline("Bad status hilite(s) specified.");
                 } else {
@@ -3700,10 +3723,10 @@ doset()
                 }
 #endif
 #endif
-            } else if (opt_indx == -4) {
+            } else if (opt_indx == OPT_OTHER_MENUCOLOR) {
                     (void) special_handling("menucolors", setinitial,
                                             fromfile);
-            } else if (opt_indx == -5) {
+            } else if (opt_indx == OPT_OTHER_MSGTYPE) {
                     (void) special_handling("msgtype", setinitial, fromfile);
             } else if (opt_indx < boolcount) {
                 /* boolean option */

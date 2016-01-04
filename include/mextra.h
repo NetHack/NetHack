@@ -1,4 +1,4 @@
-/* NetHack 3.6	mextra.h	$NHDT-Date: 1432512781 2015/05/25 00:13:01 $  $NHDT-Branch: master $:$NHDT-Revision: 1.16 $ */
+/* NetHack 3.6	mextra.h	$NHDT-Date: 1451836000 2016/01/03 15:46:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.18 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -190,6 +190,11 @@ struct mextra {
 #define MCORPSENM(mon) ((mon)->mextra->mcorpsenm)
 
 #define has_mname(mon) ((mon)->mextra && MNAME(mon))
+#define has_egd(mon)   ((mon)->mextra && EGD(mon))
+#define has_epri(mon)  ((mon)->mextra && EPRI(mon))
+#define has_eshk(mon)  ((mon)->mextra && ESHK(mon))
+#define has_emin(mon)  ((mon)->mextra && EMIN(mon))
+#define has_edog(mon)  ((mon)->mextra && EDOG(mon))
 #define has_mcorpsenm(mon) ((mon)->mextra && MCORPSENM(mon) != NON_PM)
 
 #endif /* MEXTRA_H */
