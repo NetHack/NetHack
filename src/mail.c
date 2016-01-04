@@ -502,35 +502,50 @@ ckmailstatus()
     }
 }
 
-#ifdef SIMPLE_MAIL
+#if defined(SIMPLE_MAIL) || defined(SERVER_ADMIN_MSG)
 void
-read_simplemail()
+read_simplemail(mbox, adminmsg)
+char *mbox;
+boolean adminmsg;
 {
-    FILE* mb = fopen(mailbox, "r");
-    char curline[102], *msg;
+    FILE* mb = fopen(mbox, "r");
+    char curline[128], *msg;
     boolean seen_one_already = FALSE;
+#ifdef SIMPLE_MAIL
     struct flock fl = { 0 };
-
-    fl.l_type = F_RDLCK;
-    fl.l_whence = SEEK_SET;
-    fl.l_start = 0;
-    fl.l_len = 0;
+#endif
+    const char *msgfrom = adminmsg
+        ? "The voice of %s booms through the caverns:"
+        : "This message is from '%s'.";
 
     if (!mb)
         goto bail;
 
+#ifdef SIMPLE_MAIL
+    fl.l_type = F_RDLCK;
+    fl.l_whence = SEEK_SET;
+    fl.l_start = 0;
+    fl.l_len = 0;
+    errno = 0;
+#endif
+
     /* Allow this call to block. */
-    if (fcntl (fileno (mb), F_SETLKW, &fl) == -1)
+    if (!adminmsg
+#ifdef SIMPLE_MAIL
+        && fcntl (fileno (mb), F_SETLKW, &fl) == -1
+#endif
+        )
         goto bail;
 
-    errno = 0;
-    while (fgets(curline, 102, mb) != NULL) {
-        fl.l_type = F_UNLCK;
-        fcntl (fileno(mb), F_UNLCK, &fl);
-
-        pline("There is a%s message on this scroll.",
-              seen_one_already ? "nother" : "");
-
+    while (fgets(curline, 128, mb) != NULL) {
+        if (!adminmsg) {
+#ifdef SIMPLE_MAIL
+            fl.l_type = F_UNLCK;
+            fcntl (fileno(mb), F_UNLCK, &fl);
+#endif
+            pline("There is a%s message on this scroll.",
+                  seen_one_already ? "nother" : "");
+        }
         msg = strchr(curline, ':');
 
         if (!msg)
@@ -538,27 +553,60 @@ read_simplemail()
 
         *msg = '\0';
         msg++;
-
-        pline("This message is from '%s'.", curline);
-
         msg[strlen(msg) - 1] = '\0'; /* kill newline */
-        pline ("It reads: \"%s\".", msg);
+
+        pline(msgfrom, curline);
+        if (adminmsg)
+            verbalize(msg);
+        else
+            pline("It reads: \"%s\".", msg);
 
         seen_one_already = TRUE;
+#ifdef SIMPLE_MAIL
         errno = 0;
-
-        fl.l_type = F_RDLCK;
-        fcntl(fileno(mb), F_SETLKW, &fl);
+        if (!adminmsg) {
+            fl.l_type = F_RDLCK;
+            fcntl(fileno(mb), F_SETLKW, &fl);
+        }
+#endif
     }
 
-    fl.l_type = F_UNLCK;
-    fcntl(fileno(mb), F_UNLCK, &fl);
+#ifdef SIMPLE_MAIL
+    if (!adminmsg) {
+        fl.l_type = F_UNLCK;
+        fcntl(fileno(mb), F_UNLCK, &fl);
+    }
+#endif
     fclose(mb);
-    unlink(mailbox);
+    if (adminmsg)
+        display_nhwindow(WIN_MESSAGE, TRUE);
+    else
+        unlink(mailbox);
+    return;
 bail:
-    pline("It appears to be all gibberish."); /* bail out _professionally_ */
+    /* bail out _professionally_ */
+    if (!adminmsg)
+        pline("It appears to be all gibberish.");
 }
 #endif /* SIMPLE_MAIL */
+
+void
+ck_server_admin_msg()
+{
+#ifdef SERVER_ADMIN_MSG
+    static struct stat ost,nst;
+    static long lastchk = 0;
+
+    if (moves < lastchk + SERVER_ADMIN_MSG_CKFREQ) return;
+    lastchk = moves;
+
+    if (!stat(SERVER_ADMIN_MSG, &nst)) {
+        if (nst.st_mtime > ost.st_mtime)
+            read_simplemail(SERVER_ADMIN_MSG, TRUE);
+        ost.st_mtime = nst.st_mtime;
+    }
+#endif /* SERVER_ADMIN_MSG */
+}
 
 /*ARGSUSED*/
 void
@@ -569,7 +617,7 @@ struct obj *otmp UNUSED;
     register const char *mr = 0;
 #endif /* DEF_MAILREADER */
 #ifdef SIMPLE_MAIL
-    read_simplemail();
+    read_simplemail(mailbox, FALSE);
     return;
 #endif /* SIMPLE_MAIL */
 #ifdef DEF_MAILREADER /* This implies that UNIX is defined */

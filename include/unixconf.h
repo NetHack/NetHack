@@ -193,7 +193,9 @@
 
 /* If SIMPLE_MAIL is defined, the mail spool file format is
    "sender:message", one mail per line, and mails are
-   read within game, from demon-delivered mail scrolls */
+   read within game, from demon-delivered mail scrolls.
+   The mail spool file will be deleted once the player
+   has read the message. */
 /* #define SIMPLE_MAIL */
 
 #ifndef MAILCKFREQ
@@ -202,6 +204,16 @@
 #endif
 
 #endif /* MAIL */
+
+/* If SERVER_ADMIN_MSG is defined and the file exists, players get
+   a message from the user defined in the file.  The file format
+   is "sender:message" all in one line. */
+/* #define SERVER_ADMIN_MSG "adminmsg" */
+#ifndef SERVER_ADMIN_MSG_CKFREQ
+/* How often admin message file is checked for new messages, in turns */
+#define SERVER_ADMIN_MSG_CKFREQ 25
+#endif
+
 
 /*
  * Some terminals or terminal emulators send two character sequence "ESC c"

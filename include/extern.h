@@ -1062,6 +1062,7 @@ E void FDECL(nocmov, (int x, int y));
 #ifdef UNIX
 E void NDECL(getmailstatus);
 #endif
+E void NDECL(ck_server_admin_msg);
 E void NDECL(ckmailstatus);
 E void FDECL(readmail, (struct obj *));
 #endif /* MAIL */
