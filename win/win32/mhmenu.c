@@ -119,15 +119,7 @@ mswin_init_menu_window(int type)
     /* Set window caption */
     SetWindowText(ret, "Menu/Text");
 
-    if (!GetNHApp()->bWindowsLocked) {
-        DWORD style;
-        style = GetWindowLong(ret, GWL_STYLE);
-        style |= WS_CAPTION;
-        SetWindowLong(ret, GWL_STYLE, style);
-        SetWindowPos(ret, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE
-                                                | SWP_NOZORDER
-                                                | SWP_FRAMECHANGED);
-    }
+    mswin_apply_window_style(ret);
 
     SetMenuType(ret, type);
     return ret;
@@ -155,7 +147,7 @@ mswin_menu_window_select_menu(HWND hWnd, int how, MENU_ITEM_P **_selected,
         activate = TRUE;
     }
 
-    data->is_active = activate;
+    data->is_active = activate && !GetNHApp()->regNetHackMode;
 
     /* set menu type */
     SetMenuListType(hWnd, how);
@@ -485,7 +477,12 @@ MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                                  : SYSCLR_TO_BRUSH(DEFAULT_COLOR_BG_TEXT));
         }
     }
-        return FALSE;
+    return FALSE;
+
+    case WM_CTLCOLORDLG:
+        return (INT_PTR)(text_bg_brush
+                            ? text_bg_brush
+                            : SYSCLR_TO_BRUSH(DEFAULT_COLOR_BG_TEXT));
 
     case WM_DESTROY:
         if (data) {
@@ -801,17 +798,17 @@ SetMenuListType(HWND hWnd, int how)
 
     switch (how) {
     case PICK_NONE:
-        dwStyles = WS_VISIBLE | WS_TABSTOP | WS_BORDER | WS_CHILD | WS_VSCROLL
+        dwStyles = WS_VISIBLE | WS_TABSTOP | WS_CHILD | WS_VSCROLL
                    | WS_HSCROLL | LVS_REPORT | LVS_OWNERDRAWFIXED
                    | LVS_SINGLESEL;
         break;
     case PICK_ONE:
-        dwStyles = WS_VISIBLE | WS_TABSTOP | WS_BORDER | WS_CHILD | WS_VSCROLL
+        dwStyles = WS_VISIBLE | WS_TABSTOP | WS_CHILD | WS_VSCROLL
                    | WS_HSCROLL | LVS_REPORT | LVS_OWNERDRAWFIXED
                    | LVS_SINGLESEL;
         break;
     case PICK_ANY:
-        dwStyles = WS_VISIBLE | WS_TABSTOP | WS_BORDER | WS_CHILD | WS_VSCROLL
+        dwStyles = WS_VISIBLE | WS_TABSTOP | WS_CHILD | WS_VSCROLL
                    | WS_HSCROLL | LVS_REPORT | LVS_OWNERDRAWFIXED
                    | LVS_SINGLESEL;
         break;

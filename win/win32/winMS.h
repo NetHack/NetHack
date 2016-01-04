@@ -201,6 +201,7 @@ void mswin_write_reg(void);
 
 void mswin_get_window_placement(int type, LPRECT rt);
 void mswin_update_window_placement(int type, LPRECT rt);
+void mswin_apply_window_style(HWND hwnd);
 
 int NHMessageBox(HWND hWnd, LPCTSTR text, UINT type);
 

@@ -34,6 +34,7 @@ static int menuid2mapmode(int menuid);
 static int mapmode2menuid(int map_mode);
 static void nhlock_windows(BOOL lock);
 static char *nh_compose_ascii_screenshot();
+static void mswin_apply_window_style_all();
 // returns strdup() created pointer - callee assumes the ownership
 
 HWND
@@ -711,11 +712,12 @@ mswin_layout_main_window(HWND changed_child)
             /* kludge - inventory window should have its own type (same as
                menu-text
                as a matter of fact) */
-            if (flags.perm_invent && i == WIN_INVEN)
+            if (flags.perm_invent && i == WIN_INVEN) {
                 mswin_get_window_placement(NHW_INVEN, &rt);
-            else
+            } else {
                 mswin_get_window_placement(GetNHApp()->windowlist[i].type,
                                            &rt);
+            }
 
             MoveWindow(GetNHApp()->windowlist[i].win, rt.left, rt.top,
                        rt.right - rt.left, rt.bottom - rt.top, TRUE);
@@ -879,6 +881,7 @@ onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
     case IDM_NHMODE: {
         GetNHApp()->regNetHackMode = GetNHApp()->regNetHackMode ? 0 : 1;
         mswin_menu_check_intf_mode();
+        mswin_apply_window_style_all();
         break;
     }
     case IDM_CLEARSETTINGS: {
@@ -1099,29 +1102,50 @@ mapmode2menuid(int map_mode)
 void
 nhlock_windows(BOOL lock)
 {
-    int i;
-
-    /* go through the windows list and adjust sizes */
-    for (i = 0; i < MAXWINDOWS; i++) {
-        if (IsWindow(GetNHApp()->windowlist[i].win)
-            && !GetNHApp()->windowlist[i].dead) {
-            DWORD style;
-            style = GetWindowLong(GetNHApp()->windowlist[i].win, GWL_STYLE);
-            if (lock)
-                style &= ~WS_CAPTION;
-            else
-                style |= WS_CAPTION;
-            SetWindowLong(GetNHApp()->windowlist[i].win, GWL_STYLE, style);
-            SetWindowPos(GetNHApp()->windowlist[i].win, NULL, 0, 0, 0, 0,
-                         SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER
-                             | SWP_FRAMECHANGED);
-        }
-    }
-
     /* update menu */
     GetNHApp()->bWindowsLocked = lock;
     CheckMenuItem(GetMenu(GetNHApp()->hMainWnd), IDM_SETTING_LOCKWINDOWS,
                   MF_BYCOMMAND | (lock ? MF_CHECKED : MF_UNCHECKED));
+
+    /* restyle windows */
+    mswin_apply_window_style_all();
+}
+
+void
+mswin_apply_window_style(HWND hwnd) {
+    DWORD style = 0, exstyle = 0;
+
+    style = GetWindowLong(hwnd, GWL_STYLE);
+    exstyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+
+    if( !GetNHApp()->bWindowsLocked ) {
+        style = WS_CHILD|WS_CLIPSIBLINGS|WS_CAPTION|WS_SIZEBOX|(style & (WS_VISIBLE|WS_VSCROLL|WS_HSCROLL));
+        exstyle = WS_EX_WINDOWEDGE;
+    } else if (GetNHApp()->regNetHackMode) {
+        /* do away borders */
+        style = WS_CHILD|WS_CLIPSIBLINGS|(style & (WS_VISIBLE|WS_VSCROLL|WS_HSCROLL));
+        exstyle = 0;
+    } else {
+        style = WS_CHILD|WS_CLIPSIBLINGS|WS_THICKFRAME|(style & (WS_VISIBLE|WS_VSCROLL|WS_HSCROLL));
+        exstyle = WS_EX_WINDOWEDGE;
+    }
+
+    SetWindowLong(hwnd, GWL_STYLE, style);
+    SetWindowLong(hwnd, GWL_EXSTYLE, exstyle);
+    SetWindowPos(hwnd, NULL, 0, 0, 0, 0,
+                 SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED | SWP_NOCOPYBITS);
+}
+
+void
+mswin_apply_window_style_all() {
+    int i;
+    for (i = 0; i < MAXWINDOWS; i++) {
+        if (IsWindow(GetNHApp()->windowlist[i].win)
+            && !GetNHApp()->windowlist[i].dead) {
+            mswin_apply_window_style(GetNHApp()->windowlist[i].win);
+        }
+    }
+    mswin_layout_main_window(NULL);
 }
 
 // returns strdup() created pointer - callee assumes the ownership
