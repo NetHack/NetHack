@@ -5,6 +5,10 @@
 #include "hack.h"
 
 #ifdef MAIL
+#ifdef SIMPLE_MAIL
+# include <fcntl.h>
+# include <errno.h>
+#endif /* SIMPLE_MAIL */
 #include "mail.h"
 
 /*
@@ -498,6 +502,64 @@ ckmailstatus()
     }
 }
 
+#ifdef SIMPLE_MAIL
+void
+read_simplemail()
+{
+    FILE* mb = fopen(mailbox, "r");
+    char curline[102], *msg;
+    boolean seen_one_already = FALSE;
+    struct flock fl = { 0 };
+
+    fl.l_type = F_RDLCK;
+    fl.l_whence = SEEK_SET;
+    fl.l_start = 0;
+    fl.l_len = 0;
+
+    if (!mb)
+        goto bail;
+
+    /* Allow this call to block. */
+    if (fcntl (fileno (mb), F_SETLKW, &fl) == -1)
+        goto bail;
+
+    errno = 0;
+    while (fgets(curline, 102, mb) != NULL) {
+        fl.l_type = F_UNLCK;
+        fcntl (fileno(mb), F_UNLCK, &fl);
+
+        pline("There is a%s message on this scroll.",
+              seen_one_already ? "nother" : "");
+
+        msg = strchr(curline, ':');
+
+        if (!msg)
+            goto bail;
+
+        *msg = '\0';
+        msg++;
+
+        pline("This message is from '%s'.", curline);
+
+        msg[strlen(msg) - 1] = '\0'; /* kill newline */
+        pline ("It reads: \"%s\".", msg);
+
+        seen_one_already = TRUE;
+        errno = 0;
+
+        fl.l_type = F_RDLCK;
+        fcntl(fileno(mb), F_SETLKW, &fl);
+    }
+
+    fl.l_type = F_UNLCK;
+    fcntl(fileno(mb), F_UNLCK, &fl);
+    fclose(mb);
+    unlink(mailbox);
+bail:
+    pline("It appears to be all gibberish."); /* bail out _professionally_ */
+}
+#endif /* SIMPLE_MAIL */
+
 /*ARGSUSED*/
 void
 readmail(otmp)
@@ -505,7 +567,12 @@ struct obj *otmp UNUSED;
 {
 #ifdef DEF_MAILREADER /* This implies that UNIX is defined */
     register const char *mr = 0;
-
+#endif /* DEF_MAILREADER */
+#ifdef SIMPLE_MAIL
+    read_simplemail();
+    return;
+#endif /* SIMPLE_MAIL */
+#ifdef DEF_MAILREADER /* This implies that UNIX is defined */
     display_nhwindow(WIN_MESSAGE, FALSE);
     if (!(mr = nh_getenv("MAILREADER")))
         mr = DEF_MAILREADER;

@@ -191,7 +191,16 @@
 #endif
 #endif
 
+/* If SIMPLE_MAIL is defined, the mail spool file format is
+   "sender:message", one mail per line, and mails are
+   read within game, from demon-delivered mail scrolls */
+/* #define SIMPLE_MAIL */
+
+#ifndef MAILCKFREQ
+/* How often mail spool file is checked for new messages, in turns */
 #define MAILCKFREQ 50
+#endif
+
 #endif /* MAIL */
 
 /*
