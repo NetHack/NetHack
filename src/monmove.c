@@ -1,4 +1,4 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1451664819 2016/01/01 16:13:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.79 $ */
+/* NetHack 3.6	monmove.c	$NHDT-Date: 1451866935 2016/01/04 00:22:15 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.80 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -571,7 +571,7 @@ toofar:
         case 0: /* no movement, but it can still attack you */
         case 3: /* absolutely no movement */
             /* vault guard might have vanished */
-            if (mtmp->isgd && (mtmp->mhp < 1 || !mtmp->mx == 0))
+            if (mtmp->isgd && (mtmp->mhp < 1 || mtmp->mx == 0))
                 return 1; /* behave as if it died */
             /* During hallucination, monster appearance should
              * still change - even if it doesn't move.
