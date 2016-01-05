@@ -434,6 +434,7 @@ struct obj *obj;
 {
     struct obj *otmp, *prev;
     int saved_otyp = (int) obj->otyp; /* for panic */
+    boolean obj_was_thrown;
 
     if (obj->where != OBJ_FREE)
         panic("addinv: obj not free");
@@ -442,6 +443,7 @@ struct obj *obj;
     obj->no_charge = 0; /* should not be set in hero's invent */
     if (Has_contents(obj))
         picked_container(obj); /* clear no_charge */
+    obj_was_thrown = obj->was_thrown;
     obj->was_thrown = 0;       /* not meaningful for invent */
 
     addinv_core1(obj);
@@ -476,6 +478,9 @@ struct obj *obj;
     }
     obj->where = OBJ_INVENT;
 
+    /* fill empty quiver if obj was thrown */
+    if (flags.pickup_thrown && !uquiver && obj_was_thrown)
+        setuqwep(obj);
 added:
     addinv_core2(obj);
     carry_obj_effects(obj); /* carrying affects the obj */
