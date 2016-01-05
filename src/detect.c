@@ -1363,7 +1363,7 @@ register int aflag; /* intrinsic autosearch vs explicit searching */
                     unblock_point(x, y); /* vision */
                     exercise(A_WIS, TRUE);
                     nomul(0);
-                    feel_location(x, y); /* make sure it shows up */
+                    feel_newsym(x, y); /* make sure it shows up */
                     You("find a hidden passage.");
                 } else {
                     /* Be careful not to find anything in an SCORR or SDOOR */
@@ -1553,6 +1553,8 @@ int which_subset; /* when not full, whether to suppress objs and/or traps */
                         }
                     }
                 }
+                if (glyph == cmap_to_glyph(S_darkroom))
+                    glyph = cmap_to_glyph(S_room); /* FIXME: dirty hack */
                 show_glyph(x, y, glyph);
             }
 
