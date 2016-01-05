@@ -1653,6 +1653,8 @@ struct permonst *mptr; /* reflects mtmp->data _prior_ to mtmp's death */
     remove_monster(mtmp->mx, mtmp->my);
     if (emits_light(mptr))
         del_light_source(LS_MONSTER, monst_to_any(mtmp));
+    if (mtmp->m_ap_type)
+        seemimic(mtmp);
     newsym(mtmp->mx, mtmp->my);
     unstuck(mtmp);
     fill_pit(mtmp->mx, mtmp->my);
