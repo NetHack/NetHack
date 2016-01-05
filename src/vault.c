@@ -1,4 +1,4 @@
-/* NetHack 3.6	vault.c	$NHDT-Date: 1446078792 2015/10/29 00:33:12 $  $NHDT-Branch: master $:$NHDT-Revision: 1.39 $ */
+/* NetHack 3.6	vault.c	$NHDT-Date: 1451962301 2016/01/05 02:51:41 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.40 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -342,7 +342,7 @@ invault()
         newsym(guard->mx, guard->my);
         if (u.uswallow) {
             /* can't interrogate hero, don't interrogate engulfer */
-            verbalize("What's going on here?");
+            if (!Deaf) verbalize("What's going on here?");
             if (gsensed)
                 pline_The("other presence vanishes.");
             mongone(guard);
@@ -351,8 +351,8 @@ invault()
         if (youmonst.m_ap_type == M_AP_OBJECT || u.uundetected) {
             if (youmonst.m_ap_type == M_AP_OBJECT
                 && youmonst.mappearance != GOLD_PIECE)
-                verbalize("Hey! Who left that %s in here?",
-                          mimic_obj_name(&youmonst));
+                if (!Deaf) verbalize("Hey! Who left that %s in here?",
+                                    mimic_obj_name(&youmonst));
             /* You're mimicking some object or you're hidden. */
             pline("Puzzled, %s turns around and leaves.", mhe(guard));
             mongone(guard);
@@ -362,7 +362,10 @@ invault()
             /* [we ought to record whether this this message has already
                been given in order to vary it upon repeat visits, but
                discarding the monster and its egd data renders that hard] */
-            verbalize("I'll be back when you're ready to speak to me!");
+            if (Deaf)
+                pline("%s huffs and turns to leave.", noit_Monnam(guard));
+            else
+                verbalize("I'll be back when you're ready to speak to me!");
             mongone(guard);
             return;
         }
@@ -374,7 +377,8 @@ invault()
         }
         trycount = 5;
         do {
-            getlin("\"Hello stranger, who are you?\" -", buf);
+            getlin(Deaf ? "You are required to sign in with your name. -" :
+                    "\"Hello stranger, who are you?\" -", buf);
             (void) mungspaces(buf);
         } while (!letter(buf[0]) && --trycount > 0);
 
@@ -387,12 +391,22 @@ invault()
         if (!strcmpi(buf, "Croesus") || !strcmpi(buf, "Kroisos")
             || !strcmpi(buf, "Creosote")) {
             if (!mvitals[PM_CROESUS].died) {
-                verbalize(
+                if (Deaf) {
+                    if (!Blind) pline("%s waves goodbye.", noit_Monnam(guard));
+                } else {
+                    verbalize(
                     "Oh, yes, of course.  Sorry to have disturbed you.");
+                }
                 mongone(guard);
             } else {
                 setmangry(guard);
-                verbalize("Back from the dead, are you?  I'll remedy that!");
+                if (Deaf) {
+                   if (!Blind)
+                        pline("%s mouths something and looks very angry!",
+                            noit_Monnam(guard));
+		} else {
+                   verbalize("Back from the dead, are you?  I'll remedy that!");
+		}
                 /* don't want guard to waste next turn wielding a weapon */
                 if (!MON_WEP(guard)) {
                     guard->weapon_check = NEED_HTH_WEAPON;
@@ -401,18 +415,37 @@ invault()
             }
             return;
         }
-        verbalize("I don't know you.");
+        if (Deaf)
+            pline("%s doesn't %srecognize you.", noit_Monnam(guard),
+                    (Blind) ? "" : "appear to ");
+        else
+            verbalize("I don't know you.");
         umoney = money_cnt(invent);
-        if (Deaf) {
-            ;
-        } else if (!umoney && !hidden_gold()) {
-            verbalize("Please follow me.");
+        if (!umoney && !hidden_gold()) {
+            if (Deaf)
+                pline("%s stomps%s.", noit_Monnam(guard),
+                        (Blind) ? "" : " and beckons");
+            else
+                verbalize("Please follow me.");
         } else {
-            if (!umoney)
-                verbalize("You have hidden gold.");
-            verbalize(
-                "Most likely all your gold was stolen from this vault.");
-            verbalize("Please drop that gold and follow me.");
+            if (!umoney) {
+                if (Deaf) {
+                    if (!Blind)
+                        pline("%s glares at you%s.", noit_Monnam(guard),
+                            invent ? "r stuff" : "");
+                } else {
+                   verbalize("You have hidden gold.");
+		}
+            }
+            if (Deaf) {
+                if (!Blind)
+                    pline("%s holds out %s palm and beckons with %s other hand.",
+                        noit_Monnam(guard), mhis(guard), mhis(guard));
+	    } else {
+                verbalize(
+                    "Most likely all your gold was stolen from this vault.");
+                verbalize("Please drop that gold and follow me.");
+	    }
         }
         EGD(guard)->gdx = gx;
         EGD(guard)->gdy = gy;
@@ -578,8 +611,9 @@ register struct monst *grd;
         return -1; /* teleported guard - treat as monster */
 
     if (egrd->witness) {
-        verbalize("How dare you %s that gold, scoundrel!",
-                  (egrd->witness & GD_EATGOLD) ? "consume" : "destroy");
+        if (!Deaf)
+            verbalize("How dare you %s that gold, scoundrel!",
+                      (egrd->witness & GD_EATGOLD) ? "consume" : "destroy");
         egrd->witness = 0;
         grd->mpeaceful = 0;
         return -1;
@@ -655,12 +689,22 @@ register struct monst *grd;
             }
             if (egrd->warncnt < 6) {
                 egrd->warncnt = 6;
-                if (!Deaf)
+                if (Deaf) {
+                    if (!Blind)
+                        pline("%s holds out %s palm demandingly!",
+                              noit_Monnam(grd), mhis(grd));
+                } else {
                     verbalize("Drop all your gold, scoundrel!");
+		}
                 return 0;
             } else {
-                if (!Deaf)
+                if (Deaf) {
+                    if (!Blind)
+                        pline("%s rubs %s hands with enraged delight!",
+                                noit_Monnam(grd), mhis(grd));
+                } else {
                     verbalize("So be it, rogue!");
+		}
                 grd->mpeaceful = 0;
                 return -1;
             }
