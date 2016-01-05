@@ -1,4 +1,4 @@
-/* NetHack 3.6	mail.c	$NHDT-Date: 1450261364 2015/12/16 10:22:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.22 $ */
+/* NetHack 3.6	mail.c	$NHDT-Date: 1451955080 2016/01/05 00:51:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.25 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -470,6 +470,8 @@ struct obj *otmp UNUSED;
 void
 ckmailstatus()
 {
+    ck_server_admin_msg();
+
     if (!mailbox || u.uswallow || !flags.biff
 #ifdef MAILCKFREQ
         || moves < laststattime + MAILCKFREQ

@@ -1,4 +1,4 @@
-/* NetHack 3.6	allmain.c	$NHDT-Date: 1451344214 2015/12/28 23:10:14 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.68 $ */
+/* NetHack 3.6	allmain.c	$NHDT-Date: 1451955079 2016/01/05 00:51:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.70 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -455,7 +455,6 @@ boolean resuming;
                 rhack(save_cm);
             }
         } else if (multi == 0) {
-            ck_server_admin_msg();
 #ifdef MAIL
             ckmailstatus();
 #endif

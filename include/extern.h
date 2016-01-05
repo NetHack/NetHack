@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1451174855 2015/12/27 00:07:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.526 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1451955077 2016/01/05 00:51:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.530 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1061,8 +1061,8 @@ E void FDECL(nocmov, (int x, int y));
 #ifdef MAIL
 #ifdef UNIX
 E void NDECL(getmailstatus);
-#endif
 E void NDECL(ck_server_admin_msg);
+#endif
 E void NDECL(ckmailstatus);
 E void FDECL(readmail, (struct obj *));
 #endif /* MAIL */
