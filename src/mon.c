@@ -2616,8 +2616,7 @@ void
 seemimic(mtmp)
 register struct monst *mtmp;
 {
-    boolean is_blocker_appear = (is_door_mappear(mtmp)
-                                 || is_obj_mappear(mtmp, BOULDER));
+    boolean is_blocker_appear = (is_lightblocker_mappear(mtmp));
 
     if (has_mcorpsenm(mtmp))
         freemcorpsenm(mtmp);
