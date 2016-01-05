@@ -827,6 +827,9 @@ int mode;
         } else if (mode == TEST_TRAV) {
             struct obj *obj;
 
+            /* never travel through boulders in Sokoban */
+            if (Sokoban) return FALSE;
+
             /* don't pick two boulders in a row, unless there's a way thru */
             if (sobj_at(BOULDER, ux, uy) && !Sokoban) {
                 if (!Passes_walls
