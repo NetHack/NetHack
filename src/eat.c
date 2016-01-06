@@ -1431,6 +1431,8 @@ struct obj *otmp;
         case ELVEN_DAGGER:
         case ORCISH_DAGGER:
         case ATHAME:
+        case KNIFE:
+        case STILETTO:
         case CRYSKNIFE:
             tmp = 3;
             break;
