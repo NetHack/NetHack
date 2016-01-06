@@ -19,7 +19,6 @@ STATIC_DCL void FDECL(maze0xy, (coord *));
 STATIC_DCL boolean FDECL(put_lregion_here, (XCHAR_P, XCHAR_P, XCHAR_P,
                                             XCHAR_P, XCHAR_P, XCHAR_P,
                                             XCHAR_P, BOOLEAN_P, d_level *));
-STATIC_DCL void NDECL(fixup_special);
 STATIC_DCL void NDECL(setup_waterlevel);
 STATIC_DCL void NDECL(unsetup_waterlevel);
 
@@ -362,7 +361,7 @@ d_level *lev;
 static boolean was_waterlevel; /* ugh... this shouldn't be needed */
 
 /* this is special stuff that the level compiler cannot (yet) handle */
-STATIC_OVL void
+void
 fixup_special()
 {
     register lev_region *r = lregions;
@@ -577,7 +576,6 @@ register const char *s;
     if (*protofile) {
         Strcat(protofile, LEV_EXT);
         if (load_special(protofile)) {
-            fixup_special();
             /* some levels can end up with monsters
                on dead mon list, including light source monsters */
             dmonsfree();

@@ -5863,10 +5863,15 @@ sp_lev *lvl;
 
     count_features();
 
-    if (coder->premapped)
-        sokoban_detect();
     if (coder->solidify)
         solidify_map();
+
+    /* This must be done before sokoban_detect(),
+     * otherwise branch stairs won't be premapped. */
+    fixup_special();
+
+    if (coder->premapped)
+        sokoban_detect();
 
     if (coder->frame) {
         struct sp_frame *tmpframe;
