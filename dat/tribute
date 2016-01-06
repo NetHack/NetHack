@@ -573,7 +573,7 @@ according its victims the dignity of hatred.  It wouldn't even notice them.
 #
 #
 #
-%title Equal Rites (9)
+%title Equal Rites (10)
 # p. 118 (Signet edition; passage starts mid-sentence and ends mid-paragraph)
 %passage 1
 [...] it is well known that a vital ingredient of success is not knowing
@@ -650,11 +650,7 @@ rewrite them so that they don't apply to you.
 
   [Equal Rites, by Terry Pratchett]
 %e passage
-# pp. 119-120 ("what is happening here?" actually omits "is" but
-#              must be a typo--fixed here to avoid bug reports;
-#              'broomstick' is Esk's disguised wizard's staff;
-#              passage continues with questions about destination and
-#              why go overland when the river goes to the same place)
+# pp. 119-120 (next passage is a direct continuation of this one)
 %passage 7
 The town was smaller than Ohulan, and very different because it lay on the
 junction of three trade routes quite apart from the river itself.  It was
@@ -678,6 +674,13 @@ nevertheless, there were still people misguided enough to endure all this,
 plus long nights in uncomfortable surroundings, merely to get their hands
 on perfectly ordinary large boxes of jewels.
 
+  [Equal Rites, by Terry Pratchett]
+%e passage
+# pp. 120-121 (this passage is a direct continuation of preceding one;
+#              "I said, what is happening here?" actually omits "is"
+#              but must be a typo--fixed here to avoid bug reports;
+#              'broomstick' is Esk's disguised wizard's staff)
+%passage 8
 So a town like Zemphis was the place where caravans split, mingled and
 came together again, as dozens of merchants and travellers banded together
 for protection against the socially disadvantaged on the trails ahead.
@@ -704,10 +707,32 @@ He explained about the caravans.  The child nodded.
 
 "Precisely."
 
+"Where to?"
+
+"All sorts of places.  Sto Lat, Pseudopolis... Ankh-Morpork, of course...."
+
+"But the river goes there," said Esk, reasonably.  "Barges.  The Zoons."
+
+"Ah, yes," said the merchant, "but they charge high prices and they can't
+carry everything and, anyway, no one trusts them much."
+
+"But they're very honest!"
+
+"Huh, yes," he said.  "But you know what they say:  never trust an honest
+man."  He smiled knowingly.
+
+"Who says that?"
+
+"They do.  You know.  People," he said, a certain uneasiness entering his
+voice.
+
+"Oh," said Esk.  She thought about it.  "They must be very silly," she said
+primly.  "Thank you, anyway."
+
   [Equal Rites, by Terry Pratchett]
 %e passage
 # pp. 127-128 (this time broomstick is Granny's defective witch's broomstick)
-%passage 8
+%passage 9
 The broomstick lay between two trestles.  Granny Weatherwax sat on a rock
 outcrop while a dwarf half her height, wearing an apron that was a mass of
 pockets, walked around the broom and occasionally poked it.
@@ -759,7 +784,7 @@ back of his skull.
   [Equal Rites, by Terry Pratchett]
 %e passage
 # p. 185 (actually uses four periods to mark a sentence ending in a elipsis)
-%passage 9
+%passage 10
 There may be universes where librarianship is considered a peaceful sort of
 occupation, and where the risks are limited to large volumes falling off
 the shelves on to one's head, but the keeper of a /magic/ library is no job
