@@ -3864,6 +3864,57 @@ int x, y, mod;
     return cmd;
 }
 
+char
+get_count(allowchars, inkey, max, count)
+char *allowchars;
+char inkey;
+long max;
+long *count;
+{
+    char qbuf[QBUFSZ];
+    int key;
+    long cnt = 0;
+    boolean backspaced = FALSE;
+    char *ret;
+    for (;;) {
+        if (inkey) {
+            key = inkey;
+            inkey = '\0';
+        } else
+            key = readchar();
+        if (digit(key)) {
+            cnt = 10L * cnt + (long)(key - '0');
+        } else if (key == '\b') {
+            cnt = cnt / 10;
+            backspaced = TRUE;
+        } else if (key == '\033') {
+            return '\033';
+        } else if (allowchars) {
+            if (ret = index(allowchars, key)) {
+                *count = cnt;
+                return *ret;
+            }
+        } else {
+            *count = cnt;
+            return key;
+        }
+        if (max && (cnt > max))
+            cnt = max;
+        if (cnt > 9 || backspaced) {
+            clear_nhwindow(WIN_MESSAGE);
+            if (backspaced && !cnt)
+                Sprintf(qbuf, "Count: ");
+            else {
+                Sprintf(qbuf, "Count: %d", cnt);
+                backspaced = FALSE;
+            }
+            pline1(qbuf);
+            mark_synch();
+        }
+    }
+}
+
+
 STATIC_OVL char *
 parse()
 {
@@ -3883,35 +3934,11 @@ parse()
 #ifdef ALTMETA
     alt_esc = iflags.altmeta; /* readchar() hack */
 #endif
-    if (!Cmd.num_pad || (foo = readchar()) == 'n')
-        for (;;) {
-            foo = readchar();
-            if ((foo >= '0' && foo <= '9') || (foo == '\b')) {
-                if (foo >= '0' && foo <= '9')
-                    multi = 10 * multi + foo - '0';
-                else {
-                    multi = multi / 10;
-                    backspaced = TRUE;
-                }
-                if (multi < 0 || multi >= LARGEST_INT)
-                    multi = LARGEST_INT;
-                if (multi > 9 || backspaced) {
-                    clear_nhwindow(WIN_MESSAGE);
-                    if (backspaced && !multi)
-                        Sprintf(in_line, "Count: ");
-                    else {
-                        Sprintf(in_line, "Count: %d", multi);
-                        backspaced = FALSE;
-                    }
-                    pline1(in_line);
-                    mark_synch();
-                }
-                last_multi = multi;
-                if (!multi && foo == '0')
-                    prezero = TRUE;
-            } else
-                break; /* not a digit */
-        }
+    if (!Cmd.num_pad || (foo = readchar()) == 'n') {
+        long tmpmulti = multi;
+        foo = get_count(NULL, '\0', LARGEST_INT, &tmpmulti);
+        last_multi = multi = tmpmulti;
+    }
 #ifdef ALTMETA
     alt_esc = FALSE; /* readchar() reset */
 #endif
