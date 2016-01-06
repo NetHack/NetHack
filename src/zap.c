@@ -3103,6 +3103,7 @@ struct obj **pobj; /* object tossed/used, set to NULL
         /* iron bars will block anything big enough */
         if ((weapon == THROWN_WEAPON || weapon == KICKED_WEAPON)
             && typ == IRONBARS && hits_bars(pobj, x - ddx, y - ddy,
+                                            bhitpos.x, bhitpos.y,
                                             point_blank ? 0 : !rn2(5), 1)) {
             /* caveat: obj might now be null... */
             obj = *pobj;

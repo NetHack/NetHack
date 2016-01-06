@@ -1437,6 +1437,19 @@ domove()
         }
     }
 
+    if (context.forcefight && levl[x][y].typ == IRONBARS && uwep) {
+        struct obj *obj = uwep;
+        if (breaktest(obj)) {
+            if (obj->quan > 1L)
+                obj = splitobj(obj, 1L);
+            else
+                setuwep((struct obj *)0);
+            freeinv(obj);
+        }
+        hit_bars(&obj, u.ux, u.uy, x, y, TRUE, TRUE);
+        return;
+    }
+
     /* specifying 'F' with no monster wastes a turn */
     if (context.forcefight
         /* remembered an 'I' && didn't use a move command */

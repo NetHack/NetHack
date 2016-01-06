@@ -1889,7 +1889,9 @@ int style;
         if (dist > 0 && isok(bhitpos.x + dx, bhitpos.y + dy)
             && levl[bhitpos.x + dx][bhitpos.y + dy].typ == IRONBARS) {
             x2 = bhitpos.x, y2 = bhitpos.y; /* object stops here */
-            if (hits_bars(&singleobj, x2, y2, !rn2(20), 0)) {
+            if (hits_bars(&singleobj,
+                          x2, y2, x2+dx, y2+dy,
+                          !rn2(20), 0)) {
                 if (!singleobj) {
                     used_up = TRUE;
                     launch_drop_spot((struct obj *) 0, 0, 0);
