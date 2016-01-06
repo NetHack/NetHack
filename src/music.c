@@ -426,6 +426,23 @@ int force;
         }
 }
 
+const char *
+generic_lvl_desc()
+{
+    if (Is_astralevel(&u.uz))
+        return "astral plane";
+    else if (In_endgame(&u.uz))
+        return "plane";
+    else if (Is_sanctum(&u.uz))
+        return "sanctum";
+    else if (In_sokoban(&u.uz))
+        return "puzzle";
+    else if (In_V_tower(&u.uz))
+        return "tower";
+    else
+        return "dungeon";
+}
+
 /*
  * The player is trying to extract something from his/her instrument.
  */
@@ -537,7 +554,8 @@ struct obj *instr;
             consume_obj_charge(instr, TRUE);
 
             You("produce a heavy, thunderous rolling!");
-            pline_The("entire dungeon is shaking around you!");
+            pline_The("entire %s is shaking around you!",
+                      generic_lvl_desc());
             do_earthquake((u.ulevel - 1) / 3 + 1);
             /* shake up monsters in a much larger radius... */
             awaken_monsters(ROWNO * COLNO);
