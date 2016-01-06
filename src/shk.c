@@ -3118,8 +3118,6 @@ quit:
     return 0;
 }
 
-#define HUNGRY 2
-
 STATIC_OVL long
 getprice(obj, shk_buying)
 register struct obj *obj;
