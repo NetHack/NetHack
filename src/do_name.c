@@ -55,6 +55,7 @@ const char *goal;
     putstr(tmpwin, 0, "Use [HJKL] to move the cursor 8 units at a time.");
     putstr(tmpwin, 0, "Or enter a background symbol (ex. <).");
     putstr(tmpwin, 0, "Use @ to move the cursor on yourself.");
+    putstr(tmpwin, 0, "Use m or M to move the cursor on monster.");
     if (getpos_hilitefunc)
         putstr(tmpwin, 0, "Use $ to display valid locations.");
     putstr(tmpwin, 0, "Use # to toggle automatic description.");
@@ -71,6 +72,25 @@ const char *goal;
     destroy_nhwindow(tmpwin);
 }
 
+static int
+cmp_coord_distu(a, b)
+const void *a;
+const void *b;
+{
+    const coord *c1 = a;
+    const coord *c2 = b;
+    int dx, dy, dist1, dist2;
+
+    dx = u.ux - c1->x;
+    dy = u.uy - c1->y;
+    dist1 = dx * dx + dy * dy;
+    dx = u.ux - c2->x;
+    dy = u.uy - c2->y;
+    dist2 = dx * dx + dy * dy;
+
+    return dist1 - dist2;
+}
+
 int
 getpos(ccp, force, goal)
 coord *ccp;
@@ -85,6 +105,9 @@ const char *goal;
     static const char pick_chars[] = ".,;:";
     const char *cp;
     boolean hilite_state = FALSE;
+    coord *monarr = NULL;
+    int moncount = 0;
+    int monidx = 0;
 
     if (!goal)
         goal = "desired location";
@@ -217,6 +240,43 @@ const char *goal;
             cx = u.ux;
             cy = u.uy;
             goto nxtc;
+        } else if (c == 'm' || c == 'M') {
+            if (!monarr) {
+                moncount = 0;
+                monidx = 0;
+                struct monst *mtmp = fmon;
+                while (mtmp) {
+                    if (canspotmon(mtmp)
+                        && (mtmp->mx != u.ux && mtmp->my != u.uy))
+                        moncount++;
+                    mtmp = mtmp->nmon;
+                }
+                monarr = (coord *)alloc(sizeof(coord) * moncount);
+                mtmp = fmon;
+                while (mtmp) {
+                    if (canspotmon(mtmp)
+                        && (mtmp->mx != u.ux && mtmp->my != u.uy)) {
+                        monarr[monidx].x = mtmp->mx;
+                        monarr[monidx].y = mtmp->my;
+                        monidx++;
+                    }
+                    mtmp = mtmp->nmon;
+                }
+                qsort(monarr, moncount, sizeof(coord), cmp_coord_distu);
+                /* ready this for first increment/decrement to change to zero */
+                monidx = (c == 'm') ? -1 : 1;
+            }
+            if (moncount) {
+                if (c == 'm')
+                    monidx = (monidx + 1) % moncount;
+                else {
+                    monidx--;
+                    if (monidx < 0) monidx = moncount-1;
+                }
+                cx = monarr[monidx].x;
+                cy = monarr[monidx].y;
+                goto nxtc;
+            }
         } else {
             if (!index(quitchars, c)) {
                 char matching[MAXPCHARS];
@@ -307,6 +367,8 @@ const char *goal;
         clear_nhwindow(WIN_MESSAGE);
     ccp->x = cx;
     ccp->y = cy;
+    if (monarr)
+        free(monarr);
     getpos_hilitefunc = (void FDECL((*), (int))) 0;
     return result;
 }
