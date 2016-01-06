@@ -376,7 +376,7 @@ invault()
         do {
             getlin("\"Hello stranger, who are you?\" -", buf);
             (void) mungspaces(buf);
-        } while (!letter(buf[0]) && --trycount > 0);
+        } while (!buf[0] && --trycount > 0);
 
         if (u.ualign.type == A_LAWFUL
             /* ignore trailing text, in case player includes rank */
