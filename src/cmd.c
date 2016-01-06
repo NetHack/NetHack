@@ -3874,6 +3874,7 @@ parse()
 #endif
     register int foo;
     boolean prezero = FALSE;
+    boolean backspaced = FALSE;
 
     multi = 0;
     context.move = 1;
@@ -3885,13 +3886,23 @@ parse()
     if (!Cmd.num_pad || (foo = readchar()) == 'n')
         for (;;) {
             foo = readchar();
-            if (foo >= '0' && foo <= '9') {
-                multi = 10 * multi + foo - '0';
+            if ((foo >= '0' && foo <= '9') || (foo == '\b')) {
+                if (foo >= '0' && foo <= '9')
+                    multi = 10 * multi + foo - '0';
+                else {
+                    multi = multi / 10;
+                    backspaced = TRUE;
+                }
                 if (multi < 0 || multi >= LARGEST_INT)
                     multi = LARGEST_INT;
-                if (multi > 9) {
+                if (multi > 9 || backspaced) {
                     clear_nhwindow(WIN_MESSAGE);
-                    Sprintf(in_line, "Count: %d", multi);
+                    if (backspaced && !multi)
+                        Sprintf(in_line, "Count: ");
+                    else {
+                        Sprintf(in_line, "Count: %d", multi);
+                        backspaced = FALSE;
+                    }
                     pline1(in_line);
                     mark_synch();
                 }
