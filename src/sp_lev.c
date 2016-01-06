@@ -1873,11 +1873,12 @@ struct mkroom *croom;
                 }
             }
         } else {
+            struct obj *cobj = container_obj[container_idx - 1];
             remove_object(otmp);
-            if (container_obj[container_idx - 1])
-                (void) add_to_container(container_obj[container_idx - 1],
-                                        otmp);
-            else {
+            if (cobj) {
+                (void) add_to_container(cobj, otmp);
+                cobj->owt = weight(cobj);
+            } else {
                 obj_extract_self(otmp);
                 obfree(otmp, NULL);
                 return;
