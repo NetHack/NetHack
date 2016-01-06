@@ -2368,7 +2368,13 @@ boolean ordinary;
         }
         if (u.utrap) { /* escape web or bear trap */
             (void) openholdingtrap(&youmonst, &learn_it);
-        } else { /* trigger previously escaped trapdoor */
+        } else {
+            struct obj *otmp;
+            /* unlock carried boxes */
+            for (otmp = invent; otmp; otmp = otmp->nobj)
+                if (Is_box(otmp))
+                    (void) boxlock(otmp, obj);
+            /* trigger previously escaped trapdoor */
             (void) openfallingtrap(&youmonst, TRUE, &learn_it);
         }
         break;
