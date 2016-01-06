@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1451955077 2016/01/05 00:51:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.530 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1452123455 2016/01/06 23:37:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.535 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -204,7 +204,7 @@ E int FDECL(isok, (int, int));
 E int FDECL(get_adjacent_loc,
             (const char *, const char *, XCHAR_P, XCHAR_P, coord *));
 E const char *FDECL(click_to_cmd, (int, int, int));
-E char FDECL(get_count, (char *, char, long, long *));
+E char FDECL(get_count, (char *, CHAR_P, long, long *));
 #ifdef HANGUPHANDLING
 E void FDECL(hangup, (int));
 E void NDECL(end_of_input);
@@ -1501,9 +1501,9 @@ E boolean FDECL(lined_up, (struct monst *));
 E struct obj *FDECL(m_carrying, (struct monst *, int));
 E void FDECL(m_useupall, (struct monst *, struct obj *));
 E void FDECL(m_useup, (struct monst *, struct obj *));
-E void FDECL(m_throw,
-             (struct monst *, int, int, int, int, int, struct obj *));
-E void FDECL(hit_bars, (struct obj **, int, int, int, int, boolean, boolean));
+E void FDECL(m_throw, (struct monst *, int, int, int, int, int, struct obj *));
+E void FDECL(hit_bars, (struct obj **, int, int, int, int,
+                        BOOLEAN_P, BOOLEAN_P));
 E boolean FDECL(hits_bars, (struct obj **, int, int, int, int, int, int));
 
 /* ### muse.c ### */

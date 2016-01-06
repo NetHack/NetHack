@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1451082253 2015/12/25 22:24:13 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.212 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1452123457 2016/01/06 23:37:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.216 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3865,53 +3865,56 @@ int x, y, mod;
 }
 
 char
-get_count(allowchars, inkey, max, count)
+get_count(allowchars, inkey, maxcount, count)
 char *allowchars;
 char inkey;
-long max;
+long maxcount;
 long *count;
 {
     char qbuf[QBUFSZ];
     int key;
-    long cnt = 0;
+    long cnt = 0L;
     boolean backspaced = FALSE;
-    char *ret;
+    /* this should be done in port code so that we have erase_char
+       and kill_char available; we can at least fake erase_char */
+#define STANDBY_erase_char '\177'
+
     for (;;) {
         if (inkey) {
             key = inkey;
             inkey = '\0';
         } else
             key = readchar();
+
         if (digit(key)) {
-            cnt = 10L * cnt + (long)(key - '0');
-        } else if (key == '\b') {
+            cnt = 10L * cnt + (long) (key - '0');
+            if (cnt < 0)
+                cnt = 0;
+            else if (maxcount > 0 && cnt > maxcount)
+                cnt = maxcount;
+        } else if (key == '\b' || key == STANDBY_erase_char) {
             cnt = cnt / 10;
             backspaced = TRUE;
         } else if (key == '\033') {
-            return '\033';
-        } else if (allowchars) {
-            if (ret = index(allowchars, key)) {
-                *count = cnt;
-                return *ret;
-            }
-        } else {
+            break;
+        } else if (!allowchars || index(allowchars, key)) {
             *count = cnt;
-            return key;
+            break;
         }
-        if (max && (cnt > max))
-            cnt = max;
+
         if (cnt > 9 || backspaced) {
             clear_nhwindow(WIN_MESSAGE);
-            if (backspaced && !cnt)
+            if (backspaced && !cnt) {
                 Sprintf(qbuf, "Count: ");
-            else {
-                Sprintf(qbuf, "Count: %d", cnt);
+            } else {
+                Sprintf(qbuf, "Count: %ld", cnt);
                 backspaced = FALSE;
             }
             pline1(qbuf);
             mark_synch();
         }
     }
+    return key;
 }
 
 
@@ -3925,7 +3928,6 @@ parse()
 #endif
     register int foo;
     boolean prezero = FALSE;
-    boolean backspaced = FALSE;
 
     multi = 0;
     context.move = 1;
@@ -3936,6 +3938,7 @@ parse()
 #endif
     if (!Cmd.num_pad || (foo = readchar()) == 'n') {
         long tmpmulti = multi;
+
         foo = get_count(NULL, '\0', LARGEST_INT, &tmpmulti);
         last_multi = multi = tmpmulti;
     }
