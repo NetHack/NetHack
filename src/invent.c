@@ -2182,7 +2182,7 @@ char avoidlet;
         }
         end_menu(win, "Inventory letters used:");
 
-        n = select_menu(win, PICK_NONE, &selected);
+        n = select_menu(win, PICK_ONE, &selected);
         if (n > 0) {
             ret = selected[0].item.a_char;
             free((genericptr_t) selected);
