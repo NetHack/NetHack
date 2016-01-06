@@ -3533,7 +3533,7 @@ typfnd:
     }
     otmp->owt = weight(otmp);
     if (very && otmp->otyp == HEAVY_IRON_BALL)
-        otmp->owt += 160;
+        otmp->owt += IRON_BALL_W_INCR;
 
     return otmp;
 }
