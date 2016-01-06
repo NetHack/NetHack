@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1450178550 2015/12/15 11:22:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.80 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1452064740 2016/01/06 07:19:00 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.84 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -6,6 +6,8 @@
 
 STATIC_DCL char *NDECL(nextmbuf);
 STATIC_DCL void FDECL(getpos_help, (BOOLEAN_P, const char *));
+STATIC_DCL int FDECL(CFDECLSPEC cmp_coord_distu, (const void *,
+                                                  const void *));
 STATIC_DCL void NDECL(do_mname);
 STATIC_DCL boolean FDECL(alreadynamed, (struct monst *, char *, char *));
 STATIC_DCL void FDECL(do_oname, (struct obj *));
@@ -30,7 +32,7 @@ nextmbuf()
 /* function for getpos() to highlight desired map locations.
  * parameter value 0 = initialize, 1 = highlight, 2 = done
  */
-void FDECL((*getpos_hilitefunc), (int)) = (void FDECL((*), (int))) 0;
+static void FDECL((*getpos_hilitefunc), (int)) = (void FDECL((*), (int))) 0;
 
 void
 getpos_sethilite(f)
@@ -55,7 +57,7 @@ const char *goal;
     putstr(tmpwin, 0, "Use [HJKL] to move the cursor 8 units at a time.");
     putstr(tmpwin, 0, "Or enter a background symbol (ex. <).");
     putstr(tmpwin, 0, "Use @ to move the cursor on yourself.");
-    putstr(tmpwin, 0, "Use m or M to move the cursor on monster.");
+    putstr(tmpwin, 0, "Use m or M to move the cursor to next monster.");
     if (getpos_hilitefunc)
         putstr(tmpwin, 0, "Use $ to display valid locations.");
     putstr(tmpwin, 0, "Use # to toggle automatic description.");
@@ -72,23 +74,23 @@ const char *goal;
     destroy_nhwindow(tmpwin);
 }
 
-static int
+STATIC_OVL int
 cmp_coord_distu(a, b)
 const void *a;
 const void *b;
 {
     const coord *c1 = a;
     const coord *c2 = b;
-    int dx, dy, dist1, dist2;
+    int dx, dy, dist_1, dist_2;
 
     dx = u.ux - c1->x;
     dy = u.uy - c1->y;
-    dist1 = dx * dx + dy * dy;
+    dist_1 = dx * dx + dy * dy;
     dx = u.ux - c2->x;
     dy = u.uy - c2->y;
-    dist2 = dx * dx + dy * dy;
+    dist_2 = dx * dx + dy * dy;
 
-    return dist1 - dist2;
+    return dist_1 - dist_2;
 }
 
 int
@@ -215,7 +217,7 @@ const char *goal;
         if (c == '?' || redraw_cmd(c)) {
             if (c == '?')
                 getpos_help(force, goal);
-            else         /* ^R */
+            else /* ^R */
                 docrt(); /* redraw */
             /* update message window to reflect that we're still targetting */
             show_goal_msg = TRUE;
@@ -242,36 +244,35 @@ const char *goal;
             goto nxtc;
         } else if (c == 'm' || c == 'M') {
             if (!monarr) {
+                struct monst *mtmp;
+
                 moncount = 0;
-                monidx = 0;
-                struct monst *mtmp = fmon;
-                while (mtmp) {
+                for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
                     if (canspotmon(mtmp)
-                        && (mtmp->mx != u.ux && mtmp->my != u.uy))
+                        && (mtmp->mx != u.ux || mtmp->my != u.uy))
                         moncount++;
-                    mtmp = mtmp->nmon;
                 }
-                monarr = (coord *)alloc(sizeof(coord) * moncount);
-                mtmp = fmon;
-                while (mtmp) {
+                /* moncount + 1: always allocate a non-zero amount */
+                monarr = (coord *) alloc(sizeof (coord) * (moncount + 1));
+                monidx = 0;
+                for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
                     if (canspotmon(mtmp)
-                        && (mtmp->mx != u.ux && mtmp->my != u.uy)) {
+                        && (mtmp->mx != u.ux || mtmp->my != u.uy)) {
                         monarr[monidx].x = mtmp->mx;
                         monarr[monidx].y = mtmp->my;
                         monidx++;
                     }
-                    mtmp = mtmp->nmon;
                 }
-                qsort(monarr, moncount, sizeof(coord), cmp_coord_distu);
-                /* ready this for first increment/decrement to change to zero */
+                qsort(monarr, moncount, sizeof (coord), cmp_coord_distu);
+                /* ready for first increment/decrement to change to zero */
                 monidx = (c == 'm') ? -1 : 1;
             }
             if (moncount) {
-                if (c == 'm')
+                if (c == 'm') {
                     monidx = (monidx + 1) % moncount;
-                else {
-                    monidx--;
-                    if (monidx < 0) monidx = moncount-1;
+                } else {
+                    if (--monidx < 0)
+                        monidx = moncount - 1;
                 }
                 cx = monarr[monidx].x;
                 cy = monarr[monidx].y;
@@ -281,6 +282,7 @@ const char *goal;
             if (!index(quitchars, c)) {
                 char matching[MAXPCHARS];
                 int pass, lo_x, lo_y, hi_x, hi_y, k = 0;
+
                 (void) memset((genericptr_t) matching, 0, sizeof matching);
                 for (sidx = 1; sidx < MAXPCHARS; sidx++)
                     if (c == defsyms[sidx].sym || c == (int) showsyms[sidx])
@@ -368,7 +370,7 @@ const char *goal;
     ccp->x = cx;
     ccp->y = cy;
     if (monarr)
-        free(monarr);
+        free((genericptr_t) monarr);
     getpos_hilitefunc = (void FDECL((*), (int))) 0;
     return result;
 }
