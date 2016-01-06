@@ -244,24 +244,28 @@ const char *goal;
             goto nxtc;
         } else if (c == 'm' || c == 'M') {
             if (!monarr) {
-                struct monst *mtmp;
+                int x,y,s;
 
                 moncount = 0;
-                for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-                    if (canspotmon(mtmp)
-                        && (mtmp->mx != u.ux || mtmp->my != u.uy))
-                        moncount++;
-                }
-                /* moncount + 1: always allocate a non-zero amount */
-                monarr = (coord *) alloc(sizeof (coord) * (moncount + 1));
-                monidx = 0;
-                for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-                    if (canspotmon(mtmp)
-                        && (mtmp->mx != u.ux || mtmp->my != u.uy)) {
-                        monarr[monidx].x = mtmp->mx;
-                        monarr[monidx].y = mtmp->my;
-                        monidx++;
+                for (s = 0; s < 2; s++) {
+                    if (s) {
+                        /* moncount + 1: always allocate a non-zero amount */
+                        monarr = (coord *) alloc(sizeof (coord) * (moncount + 1));
+                        monidx = 0;
                     }
+                    if (!s || s && moncount)
+                        for (x = 0; x < COLNO; x++)
+                            for (y = 0; y < ROWNO; y++)
+                                if (glyph_is_monster(glyph_at(x,y))
+                                    && !(x == u.ux && y == u.uy)) {
+                                    if (!s)
+                                        moncount++;
+                                    else {
+                                        monarr[monidx].x = x;
+                                        monarr[monidx].y = y;
+                                        monidx++;
+                                    }
+                                }
                 }
                 qsort(monarr, moncount, sizeof (coord), cmp_coord_distu);
                 /* ready for first increment/decrement to change to zero */
