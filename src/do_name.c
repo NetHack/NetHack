@@ -8,6 +8,7 @@ STATIC_DCL char *NDECL(nextmbuf);
 STATIC_DCL void FDECL(getpos_help, (BOOLEAN_P, const char *));
 STATIC_DCL int FDECL(CFDECLSPEC cmp_coord_distu, (const void *,
                                                   const void *));
+STATIC_OVL void FDECL(gather_locs, (coord **, int *, BOOLEAN_P));
 STATIC_DCL void NDECL(do_mname);
 STATIC_DCL boolean FDECL(alreadynamed, (struct monst *, char *, char *));
 STATIC_DCL void FDECL(do_oname, (struct obj *));
@@ -58,6 +59,7 @@ const char *goal;
     putstr(tmpwin, 0, "Or enter a background symbol (ex. <).");
     putstr(tmpwin, 0, "Use @ to move the cursor on yourself.");
     putstr(tmpwin, 0, "Use m or M to move the cursor to next monster.");
+    putstr(tmpwin, 0, "Use o or O to move the cursor to next object.");
     if (getpos_hilitefunc)
         putstr(tmpwin, 0, "Use $ to display valid locations.");
     putstr(tmpwin, 0, "Use # to toggle automatic description.");
@@ -93,6 +95,61 @@ const void *b;
     return dist_1 - dist_2;
 }
 
+/* gather locations for monsters or objects shown on the map */
+STATIC_OVL void
+gather_locs(arr_p, cnt_p, do_mons)
+coord **arr_p;
+int *cnt_p;
+boolean do_mons;
+{
+    int x, y, pass, glyph, idx;
+
+    *cnt_p = idx = 0;
+    for (pass = 0; pass < 2; pass++) {
+        if (pass) {
+            /* *cnt_p + 1: always allocate a non-zero amount */
+            *arr_p = (coord *) alloc(sizeof (coord) * (*cnt_p + 1));
+            if (!*cnt_p) {
+                /* needed for caller's mon[0].x,.y==u.ux,.uy check */
+                (*arr_p)[0].x = (*arr_p)[0].y = 0;
+                break;
+            }
+        }
+        for (x = 1; x < COLNO; x++)
+            for (y = 0; y < ROWNO; y++) {
+                glyph = glyph_at(x, y);
+                if (do_mons) {
+                    /* unlike '/M', this skips monsters revealed by
+                     * warning glyphs and remembered invisible ones;
+                     * TODO: skip worm tails
+                     */
+                    if (glyph_is_monster(glyph)) {
+                        if (!pass) {
+                            ++*cnt_p;
+                        } else {
+                            (*arr_p)[idx].x = x;
+                            (*arr_p)[idx].y = y;
+                            ++idx;
+                        }
+                    }
+                } else { /* objects */
+                    /* TODO: skip boulders and rocks */
+                    if (glyph_is_object(glyph)) {
+                        if (!pass) {
+                            ++*cnt_p;
+                        } else {
+                            (*arr_p)[idx].x = x;
+                            (*arr_p)[idx].y = y;
+                            ++idx;
+                        }
+                    }
+                }
+            }
+    } /* pass */
+    if (*cnt_p)
+        qsort(*arr_p, *cnt_p, sizeof (coord), cmp_coord_distu);
+}
+
 int
 getpos(ccp, force, goal)
 coord *ccp;
@@ -107,9 +164,8 @@ const char *goal;
     static const char pick_chars[] = ".,;:";
     const char *cp;
     boolean hilite_state = FALSE;
-    coord *monarr = NULL;
-    int moncount = 0;
-    int monidx = 0;
+    coord *monarr = (coord *) 0, *objarr = (coord *) 0;
+    int moncount = 0, monidx = 0, objcount = 0, objidx = 0;
 
     if (!goal)
         goal = "desired location";
@@ -244,32 +300,15 @@ const char *goal;
             goto nxtc;
         } else if (c == 'm' || c == 'M') {
             if (!monarr) {
-                int x,y,s;
-
-                moncount = 0;
-                for (s = 0; s < 2; s++) {
-                    if (s) {
-                        /* moncount + 1: always allocate a non-zero amount */
-                        monarr = (coord *) alloc(sizeof (coord) * (moncount + 1));
-                        monidx = 0;
-                    }
-                    if (!s || s && moncount)
-                        for (x = 0; x < COLNO; x++)
-                            for (y = 0; y < ROWNO; y++)
-                                if (glyph_is_monster(glyph_at(x,y))
-                                    && !(x == u.ux && y == u.uy)) {
-                                    if (!s)
-                                        moncount++;
-                                    else {
-                                        monarr[monidx].x = x;
-                                        monarr[monidx].y = y;
-                                        monidx++;
-                                    }
-                                }
-                }
-                qsort(monarr, moncount, sizeof (coord), cmp_coord_distu);
-                /* ready for first increment/decrement to change to zero */
-                monidx = (c == 'm') ? -1 : 1;
+                gather_locs(&monarr, &moncount, TRUE);
+                /* when hero is first element (always, unless unseen),
+                   we want first increment to reach 1 (nearest aside
+                   from hero) or first decrement to reach moncount-1
+                   (farthest); if hero is not first element, we want
+                   first increment to end up with 0 (nearest monster),
+                   first decrement should still choose moncount-1 */
+                monidx = (monarr[0].x == u.ux && monarr[0].y == u.uy) ? 0
+                         : (c == 'm') ? -1 : 0;
             }
             if (moncount) {
                 if (c == 'm') {
@@ -280,6 +319,24 @@ const char *goal;
                 }
                 cx = monarr[monidx].x;
                 cy = monarr[monidx].y;
+                goto nxtc;
+            }
+        } else if (c == 'o' || c == 'O') {
+            if (!objarr) {
+                gather_locs(&objarr, &objcount, FALSE);
+                /* ready for first increment to change to zero
+                   or first decrement to change to objcount-1 */
+                objidx = (c == 'o') ? -1 : 0;
+            }
+            if (objcount) {
+                if (c == 'o') {
+                    objidx = (objidx + 1) % objcount;
+                } else {
+                    if (--objidx < 0)
+                        objidx = objcount - 1;
+                }
+                cx = objarr[objidx].x;
+                cy = objarr[objidx].y;
                 goto nxtc;
             }
         } else {
@@ -375,6 +432,8 @@ const char *goal;
     ccp->y = cy;
     if (monarr)
         free((genericptr_t) monarr);
+    if (objarr)
+        free((genericptr_t) objarr);
     getpos_hilitefunc = (void FDECL((*), (int))) 0;
     return result;
 }

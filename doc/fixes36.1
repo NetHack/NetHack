@@ -87,20 +87,14 @@ requiver pickup_thrown objects if quiver is empty
 make mimics mimicing walls or trees also block light
 stepping onto lava destroyed non-fireproof water walking boots but left other
 	vulnerable boot types intact
-allow moving cursor to monsters with 'm' and 'M' when asked for map location
 fix death reason when eating tainted glob of <monster> (not corpse)
 use appropriate place name for drum of earthquake shakes
 fix unmapped branch stairs on sokoban level
 redraw map when hilite_pile is toggled to display the highlighting
 make commands that accept a count prefix for item selection
 	show "Count:" like command repeating does
-allow picking a used inventory letter from menu when #adjusting
-zapping wand of opening at yourself, unlock carried boxes
-dissolve iron bars by force-fighting with wielded potion of acid
-poison breath leaves a trail of poison gas
 make vault guard accept names starting with number
 fix weight of containers in special levels
-allow knife and stiletto as possible tin opening tools
 make the raven medusa level shortsighted
 fix possible segfault in lev_comp when map was too tall
 
@@ -134,10 +128,17 @@ General New Features
 --------------------
 naming Sting or Orcrist now breaks illiterate conduct
 different feedback for reading a scroll of mail created by writing with marker
-wizard mode #wizintrinsic
 reading non-cursed scroll of enchant weapon uncurses welded tin opener
 if hero has no jumping ability but knows the jumping spell, the #jump command
 	will attempt to cast the spell
+allow moving cursor to monsters with 'm' (nearest first) and 'M' (furthest
+	first) when asked for map location, or to objects with 'o' and 'O'
+allow picking a used inventory letter from menu when #adjusting
+zapping wand of opening at yourself, unlock carried boxes
+dissolve iron bars by force-fighting with wielded potion of acid
+poison breath leaves a trail of poison gas
+allow knife and stiletto as possible tin opening tools
+wizard mode #wizintrinsic command
 additional tribute passages for The Colour of Magic, The Light Fantastic,
 	Equal Rites, Snuff, and Raising Steam
 compile-time options SIMPLE_MAIL and SERVER_ADMIN_MSG for public server use
