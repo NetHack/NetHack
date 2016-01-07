@@ -1351,7 +1351,7 @@ sp_lev *sp;
     register char *s1, *s2;
     int max_len = 0;
     int max_hig = 0;
-    char *tmpmap[ROWNO];
+    char *tmpmap[MAP_Y_LIM+1];
     int dx, dy;
     char *mbuf;
 
@@ -1378,6 +1378,8 @@ sp_lev *sp;
 
     /* Then parse it now */
     while (map && *map) {
+        if (max_hig > MAP_Y_LIM)
+            break;
         tmpmap[max_hig] = (char *) alloc(max_len);
         s1 = index(map, '\n');
         if (s1) {

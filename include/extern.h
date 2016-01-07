@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1451174855 2015/12/27 00:07:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.526 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1452123455 2016/01/06 23:37:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.535 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -204,6 +204,7 @@ E int FDECL(isok, (int, int));
 E int FDECL(get_adjacent_loc,
             (const char *, const char *, XCHAR_P, XCHAR_P, coord *));
 E const char *FDECL(click_to_cmd, (int, int, int));
+E char FDECL(get_count, (char *, CHAR_P, long, long *));
 #ifdef HANGUPHANDLING
 E void FDECL(hangup, (int));
 E void NDECL(end_of_input);
@@ -498,6 +499,7 @@ E void FDECL(endmultishot, (BOOLEAN_P));
 E void FDECL(hitfloor, (struct obj *));
 E void FDECL(hurtle, (int, int, int, BOOLEAN_P));
 E void FDECL(mhurtle, (struct monst *, int, int, int));
+E boolean FDECL(throwing_weapon, (struct obj *));
 E void FDECL(throwit, (struct obj *, long, BOOLEAN_P));
 E int FDECL(omon_adj, (struct monst *, struct obj *, BOOLEAN_P));
 E int FDECL(thitmonst, (struct monst *, struct obj *));
@@ -1061,6 +1063,7 @@ E void FDECL(nocmov, (int x, int y));
 #ifdef MAIL
 #ifdef UNIX
 E void NDECL(getmailstatus);
+E void NDECL(ck_server_admin_msg);
 #endif
 E void NDECL(ckmailstatus);
 E void FDECL(readmail, (struct obj *));
@@ -1200,6 +1203,7 @@ E boolean FDECL(bad_location, (XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P,
                                XCHAR_P, XCHAR_P));
 E void FDECL(place_lregion, (XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P,
                              XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P, d_level *));
+E void NDECL(fixup_special);
 E void NDECL(fumaroles);
 E void NDECL(movebubbles);
 E void NDECL(water_friction);
@@ -1497,9 +1501,10 @@ E boolean FDECL(lined_up, (struct monst *));
 E struct obj *FDECL(m_carrying, (struct monst *, int));
 E void FDECL(m_useupall, (struct monst *, struct obj *));
 E void FDECL(m_useup, (struct monst *, struct obj *));
-E void FDECL(m_throw,
-             (struct monst *, int, int, int, int, int, struct obj *));
-E boolean FDECL(hits_bars, (struct obj **, int, int, int, int));
+E void FDECL(m_throw, (struct monst *, int, int, int, int, int, struct obj *));
+E void FDECL(hit_bars, (struct obj **, int, int, int, int,
+                        BOOLEAN_P, BOOLEAN_P));
+E boolean FDECL(hits_bars, (struct obj **, int, int, int, int, int, int));
 
 /* ### muse.c ### */
 

@@ -218,7 +218,7 @@ MONSTER:random,random
 
 
 LEVEL:"medusa-3"
-FLAGS: noteleport,mazelevel
+FLAGS: noteleport,mazelevel,shortsighted
 INIT_MAP:solidfill,' '
 GEOMETRY:center,center
 #

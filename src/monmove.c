@@ -271,6 +271,8 @@ boolean fleemsg;
         }
         mtmp->mflee = 1;
     }
+    /* ignore recently-stepped spaces when made to flee */
+    memset(mtmp->mtrack, 0, sizeof(mtmp->mtrack));
 }
 
 STATIC_OVL void

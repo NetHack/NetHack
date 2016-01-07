@@ -1653,6 +1653,8 @@ struct permonst *mptr; /* reflects mtmp->data _prior_ to mtmp's death */
     remove_monster(mtmp->mx, mtmp->my);
     if (emits_light(mptr))
         del_light_source(LS_MONSTER, monst_to_any(mtmp));
+    if (mtmp->m_ap_type)
+        seemimic(mtmp);
     newsym(mtmp->mx, mtmp->my);
     unstuck(mtmp);
     fill_pit(mtmp->mx, mtmp->my);
@@ -2616,8 +2618,7 @@ void
 seemimic(mtmp)
 register struct monst *mtmp;
 {
-    boolean is_blocker_appear = (is_door_mappear(mtmp)
-                                 || is_obj_mappear(mtmp, BOULDER));
+    boolean is_blocker_appear = (is_lightblocker_mappear(mtmp));
 
     if (has_mcorpsenm(mtmp))
         freemcorpsenm(mtmp);

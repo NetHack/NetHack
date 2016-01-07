@@ -434,6 +434,7 @@ struct obj *obj;
 {
     struct obj *otmp, *prev;
     int saved_otyp = (int) obj->otyp; /* for panic */
+    boolean obj_was_thrown;
 
     if (obj->where != OBJ_FREE)
         panic("addinv: obj not free");
@@ -442,6 +443,7 @@ struct obj *obj;
     obj->no_charge = 0; /* should not be set in hero's invent */
     if (Has_contents(obj))
         picked_container(obj); /* clear no_charge */
+    obj_was_thrown = obj->was_thrown;
     obj->was_thrown = 0;       /* not meaningful for invent */
 
     addinv_core1(obj);
@@ -476,6 +478,10 @@ struct obj *obj;
     }
     obj->where = OBJ_INVENT;
 
+    /* fill empty quiver if obj was thrown */
+    if (flags.pickup_thrown && !uquiver && obj_was_thrown
+        && (throwing_weapon(obj) || is_ammo(obj)))
+        setuqwep(obj);
 added:
     addinv_core2(obj);
     carry_obj_effects(obj); /* carrying affects the obj */
@@ -964,8 +970,8 @@ register const char *let, *word;
     boolean allownone = FALSE;
     boolean useboulder = FALSE;
     xchar foox = 0;
-    long cnt, prevcnt;
-    boolean prezero;
+    long cnt;
+    boolean cntgiven = FALSE;
     long dummymask;
 
     if (*let == ALLOW_COUNT)
@@ -1157,9 +1163,7 @@ register const char *let, *word;
     }
     for (;;) {
         cnt = 0;
-        if (allowcnt == 2)
-            allowcnt = 1; /* abort previous count */
-        prezero = FALSE;
+        cntgiven = FALSE;
         if (!buf[0]) {
             Sprintf(qbuf, "What do you want to %s? [*]", word);
         } else {
@@ -1169,28 +1173,17 @@ register const char *let, *word;
             ilet = readchar();
         else
             ilet = yn_function(qbuf, (char *) 0, '\0');
-        if (digit(ilet) && !allowcnt) {
-            pline("No count allowed with this command.");
-            continue;
-        }
-        if (ilet == '0')
-            prezero = TRUE;
-        while (digit(ilet)) {
-            if (ilet != '?' && ilet != '*')
-                savech(ilet);
-            /* accumulate unless cnt has overflowed */
-            if (allowcnt < 3) {
-                prevcnt = cnt;
-                cnt = 10L * cnt + (long) (ilet - '0');
-                /* signal presence of cnt */
-                allowcnt = (cnt >= prevcnt) ? 2 : 3;
+        if (digit(ilet)) {
+            long tmpcnt = 0;
+            if (!allowcnt) {
+                pline("No count allowed with this command.");
+                continue;
             }
-            ilet = readchar();
-        }
-        if (allowcnt == 3) {
-            /* overflow detected; force cnt to be invalid */
-            cnt = -1L;
-            allowcnt = 2;
+            ilet = get_count(NULL, ilet, LARGEST_INT, &tmpcnt);
+            if (tmpcnt) {
+                cnt = tmpcnt;
+                cntgiven = TRUE;
+            }
         }
         if (index(quitchars, ilet)) {
             if (flags.verbose)
@@ -1231,9 +1224,7 @@ register const char *let, *word;
                 continue;
             if (allowcnt && ctmp >= 0) {
                 cnt = ctmp;
-                if (!cnt)
-                    prezero = TRUE;
-                allowcnt = 2;
+                cntgiven = TRUE;
             }
             if (ilet == '\033') {
                 if (flags.verbose)
@@ -1261,23 +1252,21 @@ register const char *let, *word;
              * to your money supply.  The LRS is the tax bureau
              * from Larn.
              */
-            if (allowcnt == 2 && cnt <= 0) {
-                if (cnt < 0 || !prezero)
+            if (cntgiven && cnt <= 0) {
+                if (cnt < 0)
                     pline_The(
                   "LRS would be very interested to know you have that much.");
                 return (struct obj *) 0;
             }
         }
-        if (allowcnt == 2 && !strcmp(word, "throw")) {
+        if (cntgiven && !strcmp(word, "throw")) {
             /* permit counts for throwing gold, but don't accept
              * counts for other things since the throw code will
              * split off a single item anyway */
-            if (ilet != def_oc_syms[COIN_CLASS].sym
-                && !(otmp && otmp->oclass == COIN_CLASS))
-                allowcnt = 1;
-            if (cnt == 0 && prezero)
+            if (cnt == 0)
                 return (struct obj *) 0;
-            if (cnt > 1) {
+            if (cnt > 1 && (ilet != def_oc_syms[COIN_CLASS].sym
+                && !(otmp && otmp->oclass == COIN_CLASS))) {
                 You("can only throw one item at a time.");
                 continue;
             }
@@ -1305,7 +1294,7 @@ register const char *let, *word;
         silly_thing(word, otmp);
         return (struct obj *) 0;
     }
-    if (allowcnt == 2) { /* cnt given */
+    if (cntgiven) {
         if (cnt == 0)
             return (struct obj *) 0;
         if (cnt != otmp->quan) {
@@ -2193,7 +2182,7 @@ char avoidlet;
         }
         end_menu(win, "Inventory letters used:");
 
-        n = select_menu(win, PICK_NONE, &selected);
+        n = select_menu(win, PICK_ONE, &selected);
         if (n > 0) {
             ret = selected[0].item.a_char;
             free((genericptr_t) selected);

@@ -2368,7 +2368,13 @@ boolean ordinary;
         }
         if (u.utrap) { /* escape web or bear trap */
             (void) openholdingtrap(&youmonst, &learn_it);
-        } else { /* trigger previously escaped trapdoor */
+        } else {
+            struct obj *otmp;
+            /* unlock carried boxes */
+            for (otmp = invent; otmp; otmp = otmp->nobj)
+                if (Is_box(otmp))
+                    (void) boxlock(otmp, obj);
+            /* trigger previously escaped trapdoor */
             (void) openfallingtrap(&youmonst, TRUE, &learn_it);
         }
         break;
@@ -3097,6 +3103,7 @@ struct obj **pobj; /* object tossed/used, set to NULL
         /* iron bars will block anything big enough */
         if ((weapon == THROWN_WEAPON || weapon == KICKED_WEAPON)
             && typ == IRONBARS && hits_bars(pobj, x - ddx, y - ddy,
+                                            bhitpos.x, bhitpos.y,
                                             point_blank ? 0 : !rn2(5), 1)) {
             /* caveat: obj might now be null... */
             obj = *pobj;
@@ -4304,6 +4311,10 @@ short exploding_wand_typ;
             }
         }
         break; /* ZT_COLD */
+
+    case ZT_POISON_GAS:
+        (void) create_gas_cloud(x, y, 1, 8);
+        break;
 
     case ZT_ACID:
         if (lev->typ == IRONBARS) {

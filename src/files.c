@@ -3120,6 +3120,11 @@ const char *reason; /* explanation */
         program_state.in_paniclog = 1;
         lfile = fopen_datafile(PANICLOG, "a", TROUBLEPREFIX);
         if (lfile) {
+#ifdef PANICLOG_FMT2
+            (void) fprintf(lfile, "%ld %s: %s %s\n",
+                           ubirthday, (plname ? plname : "(none)"),
+                           type, reason);
+#else
             time_t now = getnow();
             int uid = getuid();
             char playmode = wizard ? 'D' : discover ? 'X' : '-';
@@ -3127,6 +3132,7 @@ const char *reason; /* explanation */
             (void) fprintf(lfile, "%s %08ld %06ld %d %c: %s %s\n",
                            version_string(buf), yyyymmdd(now), hhmmss(now),
                            uid, playmode, type, reason);
+#endif /* !PANICLOG_FMT2 */
             (void) fclose(lfile);
         }
         program_state.in_paniclog = 0;
