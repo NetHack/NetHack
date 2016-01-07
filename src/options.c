@@ -3384,6 +3384,7 @@ boolean tinitial, tfrom_file;
                     need_redraw = TRUE; /* darkroom refresh */
             } else if ((boolopt[i].addr) == &iflags.use_inverse
                        || (boolopt[i].addr) == &flags.showrace
+                       || (boolopt[i].addr) == &iflags.hilite_pile
                        || (boolopt[i].addr) == &iflags.hilite_pet) {
                 need_redraw = TRUE;
 #ifdef TEXTCOLOR

@@ -1873,11 +1873,12 @@ struct mkroom *croom;
                 }
             }
         } else {
+            struct obj *cobj = container_obj[container_idx - 1];
             remove_object(otmp);
-            if (container_obj[container_idx - 1])
-                (void) add_to_container(container_obj[container_idx - 1],
-                                        otmp);
-            else {
+            if (cobj) {
+                (void) add_to_container(cobj, otmp);
+                cobj->owt = weight(cobj);
+            } else {
                 obj_extract_self(otmp);
                 obfree(otmp, NULL);
                 return;
@@ -5863,10 +5864,15 @@ sp_lev *lvl;
 
     count_features();
 
-    if (coder->premapped)
-        sokoban_detect();
     if (coder->solidify)
         solidify_map();
+
+    /* This must be done before sokoban_detect(),
+     * otherwise branch stairs won't be premapped. */
+    fixup_special();
+
+    if (coder->premapped)
+        sokoban_detect();
 
     if (coder->frame) {
         struct sp_frame *tmpframe;

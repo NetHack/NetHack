@@ -441,7 +441,8 @@ makepicks:
                     Strcpy(pbuf, "Pick a role or profession");
                     end_menu(win, pbuf);
                     n = select_menu(win, PICK_ONE, &selected);
-                    choice = (n == 1) ? selected[0].item.a_int : ROLE_NONE;
+                    choice = (n == 1) ? selected[0].item.a_int
+                           : (n == 0) ? ROLE_RANDOM : ROLE_NONE;
                     if (selected)
                         free((genericptr_t) selected), selected = 0;
                     destroy_nhwindow(win);
@@ -526,7 +527,7 @@ makepicks:
                         end_menu(win, pbuf);
                         n = select_menu(win, PICK_ONE, &selected);
                         choice = (n == 1) ? selected[0].item.a_int
-                                          : ROLE_NONE;
+                               : (n == 0) ? ROLE_RANDOM : ROLE_NONE;
                         if (selected)
                             free((genericptr_t) selected), selected = 0;
                         destroy_nhwindow(win);
@@ -615,7 +616,7 @@ makepicks:
                         end_menu(win, pbuf);
                         n = select_menu(win, PICK_ONE, &selected);
                         choice = (n == 1) ? selected[0].item.a_int
-                                          : ROLE_NONE;
+                               : (n == 0) ? ROLE_RANDOM : ROLE_NONE;
                         if (selected)
                             free((genericptr_t) selected), selected = 0;
                         destroy_nhwindow(win);
@@ -700,7 +701,7 @@ makepicks:
                         end_menu(win, pbuf);
                         n = select_menu(win, PICK_ONE, &selected);
                         choice = (n == 1) ? selected[0].item.a_int
-                                          : ROLE_NONE;
+                               : (n == 0) ? ROLE_RANDOM : ROLE_NONE;
                         if (selected)
                             free((genericptr_t) selected), selected = 0;
                         destroy_nhwindow(win);

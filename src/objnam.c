@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1451683056 2016/01/01 21:17:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.162 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1452043772 2016/01/06 01:29:32 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.163 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1102,6 +1102,8 @@ register struct obj *otmp;
                           || is_flammable(otmp));
 }
 
+/* format a corpse name (xname() omits monster type; doname() calls us);
+   eatcorpse() also uses us for death reason when eating tainted glob */
 char *
 corpse_xname(otmp, adjective, cxn_flags)
 struct obj *otmp;
@@ -1118,10 +1120,14 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
             /* include "an" for "an ogre corpse */
         any_prefix = (cxn_flags & CXN_ARTICLE) != 0,
             /* leave off suffix (do_name() appends "corpse" itself) */
-        omit_corpse = (cxn_flags & CXN_NOCORPSE) != 0, possessive = FALSE;
+        omit_corpse = (cxn_flags & CXN_NOCORPSE) != 0,
+        possessive = FALSE,
+        glob = (otmp->otyp != CORPSE && otmp->globby);
     const char *mname;
 
-    if (omndx == NON_PM) { /* paranoia */
+    if (glob) {
+        mname = OBJ_NAME(objects[otmp->otyp]); /* "glob of <monster>" */
+    } else if (omndx == NON_PM) { /* paranoia */
         mname = "thing";
         /* [Possible enhancement:  check whether corpse has monster traits
             attached in order to use priestname() for priests and minions.] */
@@ -1172,7 +1178,9 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
             any_prefix = FALSE;
     }
 
-    if (!omit_corpse) {
+    if (glob) {
+        ; /* omit_corpse doesn't apply; quantity is always 1 */
+    } else if (!omit_corpse) {
         Strcat(nambuf, " corpse");
         /* makeplural(nambuf) => append "s" to "corpse" */
         if (otmp->quan > 1L && !ignore_quan) {
@@ -3525,7 +3533,7 @@ typfnd:
     }
     otmp->owt = weight(otmp);
     if (very && otmp->otyp == HEAVY_IRON_BALL)
-        otmp->owt += 160;
+        otmp->owt += IRON_BALL_W_INCR;
 
     return otmp;
 }

@@ -773,8 +773,6 @@ beautiful()
                : "ugly");
 }
 
-#define WEAK 3 /* from eat.c */
-
 static const char look_str[] = "look %s.";
 
 STATIC_OVL int
