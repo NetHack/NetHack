@@ -2218,6 +2218,10 @@ Default '>'.
 .lp menu_objsyms
 Show object symbols in menu headings in menus where
 the object symbols act as menu accelerators (default off).
+.lp menu_overlay
+Do not clear the screen before drawing menus, and align
+menus to the right edge of the screen. Only for the tty port.
+(default on)
 .lp menu_previous_page 
 Menu character accelerator to goto the previous menu page.
 Implemented by the Amiga, Gem and tty ports.

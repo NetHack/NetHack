@@ -149,6 +149,11 @@ static struct Bool_Opt {
     /* for menu debugging only*/
     { "menu_tab_sep", &iflags.menu_tab_sep, FALSE, SET_IN_WIZGAME },
     { "menu_objsyms", &iflags.menu_head_objsym, FALSE, SET_IN_GAME },
+#ifdef TTY_GRAPHICS
+    { "menu_overlay", &iflags.menu_overlay, TRUE, SET_IN_GAME },
+#else
+    { "menu_overlay", (boolean *) 0, FALSE, SET_IN_FILE },
+#endif
     { "mouse_support", &iflags.wc_mouse_support, TRUE, DISP_IN_GAME }, /*WC*/
 #ifdef NEWS
     { "news", &iflags.news, TRUE, DISP_IN_GAME },

@@ -22,6 +22,7 @@ implicit_uncursed  omit "uncursed" from inventory, if possible    [TRUE]
 legacy         print introductory message                         [TRUE]
 lit_corridor   show a dark corridor as lit if in sight            [FALSE]
 lootabc        use a/b/c rather than o/i/b when looting           [FALSE]
+menu_overlay   overlay menus on the screen and align to right     [TRUE]
 mail           enable the mail daemon                             [TRUE]
 null           allow nulls to be sent to your terminal            [TRUE]
                try turning this option off (forcing NetHack to use its own

@@ -2108,13 +2108,15 @@ boolean blocking; /* with ttys, all windows are blocking */
         if (ttyDisplay->toplin == 1)
             tty_display_nhwindow(WIN_MESSAGE, TRUE);
 #ifdef H2344_BROKEN
-        if (cw->maxrow >= (int) ttyDisplay->rows)
+        if (cw->maxrow >= (int) ttyDisplay->rows
+            || !iflags.menu_overlay)
 #else
-        if (cw->offx == 10 || cw->maxrow >= (int) ttyDisplay->rows)
+        if (cw->offx == 10 || cw->maxrow >= (int) ttyDisplay->rows
+            || !iflags.menu_overlay)
 #endif
         {
             cw->offx = 0;
-            if (cw->offy) {
+            if (cw->offy || iflags.menu_overlay) {
                 tty_curs(window, 1, 0);
                 cl_eos();
             } else
