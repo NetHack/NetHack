@@ -83,22 +83,22 @@ VA_DECL(const char *, line)
         iflags.last_msg = PLNMSG_UNKNOWN;
         return;
     }
-#ifndef MAC
-    if (no_repeat && !strcmp(line, toplines))
+
+    msgtyp = msgtype_type(line, no_repeat);
+    if (msgtyp == MSGTYP_NOSHOW
+        || (msgtyp == MSGTYP_NOREP && !strcmp(line, prevmsg)))
         return;
-#endif /* MAC */
     if (vision_full_recalc)
         vision_recalc(0);
     if (u.ux)
         flush_screen(1); /* %% */
-    msgtyp = msgtype_type(line);
-    if (msgtyp == MSGTYP_NOSHOW) return;
-    if (msgtyp == MSGTYP_NOREP && !strcmp(line, prevmsg)) return;
+
     putstr(WIN_MESSAGE, 0, line);
     /* this gets cleared after every pline message */
     iflags.last_msg = PLNMSG_UNKNOWN;
-    strncpy(prevmsg, line, BUFSZ);
-    if (msgtyp == MSGTYP_STOP) display_nhwindow(WIN_MESSAGE, TRUE); /* --more-- */
+    strncpy(prevmsg, line, BUFSZ), prevmsg[BUFSZ - 1] = '\0';
+    if (msgtyp == MSGTYP_STOP)
+        display_nhwindow(WIN_MESSAGE, TRUE); /* --more-- */
 
 #if !(defined(USE_STDARG) || defined(USE_VARARGS))
     /* provide closing brace for the nested block

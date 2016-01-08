@@ -1455,8 +1455,9 @@ int idx; /* 0 .. */
 }
 
 int
-msgtype_type(msg)
+msgtype_type(msg, norepeat)
 const char *msg;
+boolean norepeat; /* called from Norep(via pline) */
 {
     struct plinemsg_type *tmp = plinemsg_types;
 
@@ -1465,7 +1466,7 @@ const char *msg;
             return tmp->msgtype;
         tmp = tmp->next;
     }
-    return MSGTYP_NORMAL;
+    return norepeat ? MSGTYP_NOREP : MSGTYP_NORMAL;
 }
 
 int
