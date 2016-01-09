@@ -1172,6 +1172,9 @@ long flag;
     boolean wantpool, poolok, lavaok, nodiag;
     boolean rockok = FALSE, treeok = FALSE, thrudoor;
     int maxx, maxy;
+    boolean poisongas_ok, in_poisongas;
+    NhRegion *gas_reg;
+    int gas_glyph = cmap_to_glyph(S_poisoncloud);
 
     x = mon->mx;
     y = mon->my;
@@ -1183,6 +1186,11 @@ long flag;
               || (is_swimmer(mdat) && !wantpool));
     lavaok = (is_flyer(mdat) || is_clinger(mdat) || likes_lava(mdat));
     thrudoor = ((flag & (ALLOW_WALL | BUSTDOOR)) != 0L);
+    poisongas_ok = ((nonliving(mdat) || is_vampshifter(mon)
+                     || breathless(mdat)) || resists_poison(mon));
+    in_poisongas = ((gas_reg = visible_region_at(x,y)) != 0
+                    && gas_reg->glyph == gas_glyph);
+
     if (flag & ALLOW_DIG) {
         struct obj *mw_tmp;
 
@@ -1230,6 +1238,11 @@ nexttry: /* eels prefer the water, but if there is no water nearby,
                 && (((levl[nx][ny].doormask & D_CLOSED) && !(flag & OPENDOOR))
                     || ((levl[nx][ny].doormask & D_LOCKED)
                         && !(flag & UNLOCKDOOR))) && !thrudoor)
+                continue;
+            /* avoid poison gas? */
+            if (!poisongas_ok && !in_poisongas
+                && (gas_reg = visible_region_at(nx,ny)) != 0
+                && gas_reg->glyph == gas_glyph)
                 continue;
             /* first diagonal checks (tight squeezes handled below) */
             if (nx != x && ny != y
