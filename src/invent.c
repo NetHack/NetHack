@@ -2880,33 +2880,51 @@ mergable(otmp, obj)
 register struct obj *otmp, *obj;
 {
     int objnamelth = 0, otmpnamelth = 0;
+
     if (obj == otmp)
         return FALSE; /* already the same object */
     if (obj->otyp != otmp->otyp)
+        return FALSE; /* different types */
+    if (obj->nomerge) /* explicitly marked to prevent merge */
         return FALSE;
+
     /* coins of the same kind will always merge */
     if (obj->oclass == COIN_CLASS)
         return TRUE;
+
     if (obj->unpaid != otmp->unpaid || obj->spe != otmp->spe
         || obj->dknown != otmp->dknown
-        || (obj->bknown != otmp->bknown && !Role_if(PM_PRIEST))
         || obj->cursed != otmp->cursed || obj->blessed != otmp->blessed
         || obj->no_charge != otmp->no_charge || obj->obroken != otmp->obroken
         || obj->otrapped != otmp->otrapped || obj->lamplit != otmp->lamplit
-        || obj->greased != otmp->greased || obj->oeroded != otmp->oeroded
-        || obj->oeroded2 != otmp->oeroded2 || obj->bypass != otmp->bypass)
+        || obj->bypass != otmp->bypass)
         return FALSE;
 
-    if (obj->nomerge) /* explicitly marked to prevent merge */
+    if (obj->oclass == FOOD_CLASS
+        && (obj->oeaten != otmp->oeaten || obj->orotten != otmp->orotten))
+        return FALSE;
+
+    if (obj->globby) {
+        /* globs won't merge if they have different bless/curse
+           state, but will merge non-bknown with bknown */
+        if (obj->bknown != otmp->bknown)
+            obj->bknown = otmp->bknown = 0;
+        if (obj->rknown != otmp->rknown)
+            obj->rknown = otmp->rknown = 0;
+        if (obj->greased != otmp->greased)
+            obj->greased = otmp->greased = 0;
+        /* checks beyond this point aren't applicable to globs */
+        return TRUE;
+    }
+
+    if ((obj->bknown != otmp->bknown && !Role_if(PM_PRIEST))
+        || obj->oeroded != otmp->oeroded || obj->oeroded2 != otmp->oeroded2
+        || obj->greased != otmp->greased)
         return FALSE;
 
     if ((obj->oclass == WEAPON_CLASS || obj->oclass == ARMOR_CLASS)
         && (obj->oerodeproof != otmp->oerodeproof
             || obj->rknown != otmp->rknown))
-        return FALSE;
-
-    if (obj->oclass == FOOD_CLASS
-        && (obj->oeaten != otmp->oeaten || obj->orotten != otmp->orotten))
         return FALSE;
 
     if (obj->otyp == CORPSE || obj->otyp == EGG || obj->otyp == TIN) {
@@ -3413,6 +3431,7 @@ doorganize() /* inventory organizer by Del Lamb */
                    names, strip off the name of the one being moved */
                 if (olth && !obj->oartifact && !mergable(otmp, obj)) {
                     char *holdname = ONAME(obj);
+
                     ONAME(obj) = (char *) 0;
                     /* restore name iff merging is still not possible */
                     if (!mergable(otmp, obj)) {
