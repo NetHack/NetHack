@@ -860,12 +860,16 @@ See the section below entitled ``Conduct'' for details.
 Dip an object into something.
 .lp #enhance
 Advance or check weapon and spell skills.
+.lp #exploremode
+Enter the explore mode.
 .lp #force
 Force a lock.
 .lp #invoke
 Invoke an object's special powers.
 .lp #jump
 Jump to another location.
+.lp #kick
+Kick something.
 .lp #loot
 Loot a box or bag on the floor beneath you, or the saddle 
 from a steed standing next to you.
