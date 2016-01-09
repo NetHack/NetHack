@@ -3157,8 +3157,9 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
     struct permonst *olddata = mtmp->data;
     char oldname[BUFSZ], l_oldname[BUFSZ], newname[BUFSZ];
 
-    /* Riders are immune to polymorph and green slime */
-    if (is_rider(mtmp->data))
+    /* Riders are immune to polymorph and green slime
+       (but apparent Rider might actually be a doppelganger) */
+    if (is_rider(mtmp->data) && mtmp->cham == NON_PM)
         return 0;
 
     if (msg) {
