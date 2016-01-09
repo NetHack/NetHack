@@ -306,11 +306,49 @@ register struct monst *mtmp;
     return dstrat;
 }
 
+void
+choose_stairs(sx, sy)
+xchar *sx;
+xchar *sy;
+{
+    xchar x = 0, y = 0;
+
+    if (builds_up(&u.uz)) {
+        if (xdnstair) {
+            x = xdnstair;
+            y = ydnstair;
+        } else if (xdnladder) {
+            x = xdnladder;
+            y = ydnladder;
+        }
+    } else {
+        if (xupstair) {
+            x = xupstair;
+            y = yupstair;
+        } else if (xupladder) {
+            x = xupladder;
+            y = yupladder;
+        }
+    }
+
+    if (!x && sstairs.sx) {
+        x = sstairs.sx;
+        y = sstairs.sy;
+    }
+
+    if (x && y) {
+        *sx = x;
+        *sy = y;
+    }
+
+}
+
 int
 tactics(mtmp)
 register struct monst *mtmp;
 {
     unsigned long strat = strategy(mtmp);
+    xchar sx, sy;
 
     mtmp->mstrategy =
         (mtmp->mstrategy & (STRAT_WAITMASK | STRAT_APPEARMSG)) | strat;
@@ -318,15 +356,14 @@ register struct monst *mtmp;
     switch (strat) {
     case STRAT_HEAL: /* hide and recover */
         /* if wounded, hole up on or near the stairs (to block them) */
-        /* unless, of course, there are no stairs (e.g. endlevel) */
+        choose_stairs(&sx, &sy);
         mtmp->mavenge = 1; /* covetous monsters attack while fleeing */
         if (In_W_tower(mtmp->mx, mtmp->my, &u.uz)
-            || (mtmp->iswiz && !xupstair && !mon_has_amulet(mtmp))) {
+            || (mtmp->iswiz && !sx && !mon_has_amulet(mtmp))) {
             if (!rn2(3 + mtmp->mhp / 10))
                 (void) rloc(mtmp, TRUE);
-        } else if (xupstair
-                   && (mtmp->mx != xupstair || mtmp->my != yupstair)) {
-            (void) mnearto(mtmp, xupstair, yupstair, TRUE);
+        } else if (sx && (mtmp->mx != sx || mtmp->my != sy)) {
+            (void) mnearto(mtmp, sx, sy, TRUE);
         }
         /* if you're not around, cast healing spells */
         if (distu(mtmp->mx, mtmp->my) > (BOLT_LIM * BOLT_LIM))
