@@ -1875,10 +1875,14 @@ struct obj *obj, *otmp;
                         You_hear("a crumbling sound.");
                 }
             } else {
+                int oox = obj->ox;
+                int ooy = obj->oy;
                 if (context.mon_moving
                         ? !breaks(obj, obj->ox, obj->oy)
                         : !hero_breaks(obj, obj->ox, obj->oy, FALSE))
                     maybelearnit = FALSE; /* nothing broke */
+                else
+                    newsym_force(oox,ooy);
                 res = 0;
             }
             if (maybelearnit)
