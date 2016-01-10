@@ -3212,7 +3212,7 @@ const char *str;
 int
 tty_nhgetch()
 {
-    int i, tmp;
+    int i;
 #ifdef UNIX
     /* kludge alert: Some Unix variants return funny values if getc()
      * is called, interrupted, and then called again.  There
@@ -3247,10 +3247,12 @@ tty_nhgetch()
     if (ttyDisplay && ttyDisplay->toplin == 1)
         ttyDisplay->toplin = 2;
 #ifdef TTY_TILES_ESCCODES
-    /* hack to force output of the window select code */
-    tmp = vt_tile_current_window;
-    vt_tile_current_window++;
-    print_vt_code2(AVTC_SELECT_WINDOW, tmp);
+    {
+        /* hack to force output of the window select code */
+        int tmp = vt_tile_current_window;
+        vt_tile_current_window++;
+        print_vt_code2(AVTC_SELECT_WINDOW, tmp);
+    }
 #endif /* TTY_TILES_ESCCODES */
     return i;
 }
