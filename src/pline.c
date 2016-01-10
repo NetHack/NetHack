@@ -10,6 +10,9 @@ static boolean no_repeat = FALSE;
 static char prevmsg[BUFSZ];
 
 static char *FDECL(You_buf, (int));
+#if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
+static void FDECL(execplinehandler, (const char *));
+#endif
 
 /*VARARGS1*/
 /* Note that these declarations rely on knowledge of the internals
@@ -94,6 +97,11 @@ VA_DECL(const char *, line)
         flush_screen(1); /* %% */
 
     putstr(WIN_MESSAGE, 0, line);
+
+#if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
+    execplinehandler(line);
+#endif
+
     /* this gets cleared after every pline message */
     iflags.last_msg = PLNMSG_UNKNOWN;
     strncpy(prevmsg, line, BUFSZ), prevmsg[BUFSZ - 1] = '\0';
@@ -584,5 +592,43 @@ struct obj *otmp2;
         You_hear("a faint sloshing sound.");
     }
 }
+
+#if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
+static boolean use_pline_handler = TRUE;
+static void
+execplinehandler(line)
+const char *line;
+{
+    int f;
+    const char *args[3];
+    char *env;
+
+    if (!use_pline_handler)
+        return;
+
+    if (!(env = nh_getenv("NETHACK_MSGHANDLER"))) {
+        use_pline_handler = FALSE;
+        return;
+    }
+
+    f = fork();
+    if (f == 0) { /* child */
+        args[0] = env;
+        args[1] = line;
+        args[2] = NULL;
+        (void) setgid(getgid());
+        (void) setuid(getuid());
+        (void) execv(args[0], (char *const *) args);
+        perror((char *) 0);
+        (void) fprintf(stderr, "Exec to message handler %s failed.\n",
+                       env);
+        terminate(EXIT_FAILURE);
+    } else if (f == -1) {
+        perror((char *) 0);
+        use_pline_handler = FALSE;
+        pline("Fork to message handler failed.");
+    }
+}
+#endif /* defined(POSIX_TYPES) || defined(__GNUC__) */
 
 /*pline.c*/

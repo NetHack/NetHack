@@ -1350,6 +1350,9 @@ static const char *build_opts[] = {
 #ifdef HOLD_LOCKFILE_OPEN
     "exclusive lock on level 0 file",
 #endif
+#if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
+    "external program as a message handler",
+#endif
 #ifdef LOGFILE
     "log file",
 #endif

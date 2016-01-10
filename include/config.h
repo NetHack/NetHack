@@ -466,6 +466,12 @@ typedef unsigned char uchar;
  * Note that gnome-terminal at least doesn't work with this. */
 /* #define TTY_TILES_ESCCODES */
 
+/* NetHack will execute an external program whenever a new message-window
+ * message is shown.  The program to execute is given in environment variable
+ * NETHACK_MSGHANDLER.  It will get the message as the only parameter.
+ * Only available with POSIX_TYPES or GNU C */
+/* #define MSGHANDLER */
+
 /* #define STATUS_VIA_WINDOWPORT */ /* re-work of the status line
                                        updating process */
 /* #define STATUS_HILITES */        /* support hilites of status fields */
