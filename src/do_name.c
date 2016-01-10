@@ -103,6 +103,7 @@ int *cnt_p;
 boolean do_mons;
 {
     int x, y, pass, glyph, idx;
+    boolean wantedloc;
 
     *cnt_p = idx = 0;
     for (pass = 0; pass < 2; pass++) {
@@ -118,31 +119,19 @@ boolean do_mons;
         for (x = 1; x < COLNO; x++)
             for (y = 0; y < ROWNO; y++) {
                 glyph = glyph_at(x, y);
-                if (do_mons) {
-                    /* unlike '/M', this skips monsters revealed by
-                     * warning glyphs and remembered invisible ones;
-                     * TODO: skip worm tails
-                     */
-                    if (glyph_is_monster(glyph)) {
-                        if (!pass) {
-                            ++*cnt_p;
-                        } else {
-                            (*arr_p)[idx].x = x;
-                            (*arr_p)[idx].y = y;
-                            ++idx;
-                        }
-                    }
-                } else { /* objects */
-                    /* TODO: skip boulders and rocks */
-                    if (glyph_is_object(glyph)) {
-                        if (!pass) {
-                            ++*cnt_p;
-                        } else {
-                            (*arr_p)[idx].x = x;
-                            (*arr_p)[idx].y = y;
-                            ++idx;
-                        }
-                    }
+                /* unlike '/M', this skips monsters revealed by
+                 * warning glyphs and remembered invisible ones;
+                 * TODO: skip worm tails, boulders and rocks
+                 */
+                wantedloc = (do_mons && glyph_is_monster(glyph)
+                           || !do_mons && glyph_is_object(glyph));
+                if (!wantedloc) continue;
+                if (!pass) {
+                    ++*cnt_p;
+                } else {
+                    (*arr_p)[idx].x = x;
+                    (*arr_p)[idx].y = y;
+                    ++idx;
                 }
             }
     } /* pass */
