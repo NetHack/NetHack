@@ -260,6 +260,9 @@ struct instance_flags {
     boolean lan_mail;         /* mail is initialized */
     boolean lan_mail_fetched; /* mail is awaiting display */
 #endif
+#ifdef TTY_TILES_ESCCODES
+    boolean vt_tiledata;     /* output console codes for tile support in TTY */
+#endif
     boolean wizweight;        /* display weight of everything in wizard mode */
     /*
      * Window capability support.

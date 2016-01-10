@@ -225,6 +225,11 @@ static struct Bool_Opt {
     { "use_inverse", &iflags.wc_inverse, FALSE, SET_IN_GAME }, /*WC*/
 #endif
     { "verbose", &flags.verbose, TRUE, SET_IN_GAME },
+#ifdef TTY_TILES_ESCCODES
+    { "vt_tiledata", &iflags.vt_tiledata, FALSE, SET_IN_FILE },
+#else
+    { "vt_tiledata", (boolean *) 0, FALSE, SET_IN_FILE },
+#endif
     { "wizweight", &iflags.wizweight, FALSE, SET_IN_WIZGAME },
     { "wraptext", &iflags.wc2_wraptext, FALSE, SET_IN_GAME },
 #ifdef ZEROCOMP

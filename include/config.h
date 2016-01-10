@@ -439,6 +439,33 @@ typedef unsigned char uchar;
  * bugs left here.
  */
 
+/* TTY_TILES_ESCCODES: Enable output of special console escape codes
+ * which act as hints for external programs such as EbonHack.
+ *
+ * Only for TTY_GRAPHICS.
+ *
+ * All of the escape codes are in the format ESC [ N z, where N can be
+ * one or more positive integer values, separated by semicolons.
+ * For example ESC [ 1 ; 0 ; 120 z
+ *
+ * Possible codes are:
+ *  ESC [ 1 ; 0 ; n ; m z   Start a glyph (aka a tile) number n, with flags m
+ *  ESC [ 1 ; 1 z           End a glyph.
+ *  ESC [ 1 ; 2 ; n z       Select a window n to output to.
+ *  ESC [ 1 ; 3 z           End of data. NetHack has finished sending data,
+ *                          and is waiting for input.
+ *
+ * Whenever NetHack outputs anything, it will first output the "select window"
+ * code. Whenever NetHack outputs a tile, it will first output the "start
+ * glyph" code, then the escape codes for color and the glyph character
+ * itself, and then the "end glyph" code.
+ *
+ * To compile NetHack with this, add tile.c to WINSRC and tile.o to WINOBJ
+ * in the hints file or Makefile.
+ * Set boolean option vt_tiledata in your config file to turn this on.
+ * Note that gnome-terminal at least doesn't work with this. */
+/* #define TTY_TILES_ESCCODES */
+
 /* #define STATUS_VIA_WINDOWPORT */ /* re-work of the status line
                                        updating process */
 /* #define STATUS_HILITES */        /* support hilites of status fields */
@@ -458,6 +485,12 @@ typedef unsigned char uchar;
 #define FREE_ALL_MEMORY             /* free all memory at exit */
 
 /* End of Section 4 */
+
+#ifdef TTY_TILES_ESCCODES
+# ifndef USE_TILES
+#  define USE_TILES
+# endif
+#endif
 
 #include "global.h" /* Define everything else according to choices above */
 

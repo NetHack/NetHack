@@ -1323,6 +1323,9 @@ static const char *build_opts[] = {
 #ifdef TEXTCOLOR
     "color",
 #endif
+#ifdef TTY_TILES_ESCCODES
+    "console escape codes for tile hinting",
+#endif
 #ifdef COM_COMPL
     "command line completion",
 #endif

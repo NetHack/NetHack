@@ -37,6 +37,15 @@ extern void msmsg(const char *, ...);
 #endif
 #endif
 
+#ifdef TTY_TILES_ESCCODES
+extern short glyph2tile[];
+#define TILE_ANSI_COMMAND 'z'
+#define AVTC_GLYPH_START   0
+#define AVTC_GLYPH_END     1
+#define AVTC_SELECT_WINDOW 2
+#define AVTC_INLINE_SYNC   3
+#endif
+
 extern char mapped_menu_cmds[]; /* from options.c */
 
 /* this is only needed until tty_status_* routines are written */
@@ -174,6 +183,36 @@ static const char default_menu_cmds[] = {
     MENU_INVERT_ALL,    MENU_SELECT_PAGE, MENU_UNSELECT_PAGE,
     MENU_INVERT_PAGE,   MENU_SEARCH,      0 /* null terminator */
 };
+
+#ifdef TTY_TILES_ESCCODES
+static int vt_tile_current_window = -2;
+
+void
+print_vt_code(i, c, d)
+int i, c, d;
+{
+    if (iflags.vt_tiledata) {
+        if (c >= 0) {
+            if (i == AVTC_SELECT_WINDOW) {
+                if (c == vt_tile_current_window) return;
+                vt_tile_current_window = c;
+            }
+            if (d >= 0)
+                printf("\033[1;%d;%d;%d%c", i, c, d, TILE_ANSI_COMMAND);
+            else
+                printf("\033[1;%d;%d%c", i, c, TILE_ANSI_COMMAND);
+        } else {
+            printf("\033[1;%d%c", i, TILE_ANSI_COMMAND);
+        }
+    }
+}
+#else
+# define print_vt_code(i, c, d) ;
+#endif /* !TTY_TILES_ESCCODES */
+#define print_vt_code1(i)     print_vt_code((i), -1, -1)
+#define print_vt_code2(i,c)   print_vt_code((i), (c), -1)
+#define print_vt_code3(i,c,d) print_vt_code((i), (c), (d))
+
 
 /* clean up and quit */
 STATIC_OVL void
@@ -1427,6 +1466,8 @@ winid window;
         panic(winpanicstr, window);
     ttyDisplay->lastwin = window;
 
+    print_vt_code2(AVTC_SELECT_WINDOW, window);
+
     switch (cw->type) {
     case NHW_MESSAGE:
         if (ttyDisplay->toplin) {
@@ -2060,6 +2101,8 @@ boolean blocking; /* with ttys, all windows are blocking */
     ttyDisplay->lastwin = window;
     ttyDisplay->rawprint = 0;
 
+    print_vt_code2(AVTC_SELECT_WINDOW, window);
+
     switch (cw->type) {
     case NHW_MESSAGE:
         if (ttyDisplay->toplin == 1) {
@@ -2145,6 +2188,8 @@ winid window;
     if (window == WIN_ERR || (cw = wins[window]) == (struct WinDesc *) 0)
         panic(winpanicstr, window);
 
+    print_vt_code2(AVTC_SELECT_WINDOW, window);
+
     switch (cw->type) {
     case NHW_MESSAGE:
         if (ttyDisplay->toplin)
@@ -2213,6 +2258,8 @@ register int x, y; /* not xchar: perhaps xchar is unsigned and
     if (window == WIN_ERR || (cw = wins[window]) == (struct WinDesc *) 0)
         panic(winpanicstr, window);
     ttyDisplay->lastwin = window;
+
+    print_vt_code2(AVTC_SELECT_WINDOW, window);
 
 #if defined(USE_TILES) && defined(MSDOS)
     adjust_cursor_flags(cw);
@@ -2302,6 +2349,8 @@ char ch;
     if (window == WIN_ERR || (cw = wins[window]) == (struct WinDesc *) 0)
         panic(winpanicstr, window);
 
+    print_vt_code2(AVTC_SELECT_WINDOW, window);
+
     switch (cw->type) {
     case NHW_STATUS:
     case NHW_MAP:
@@ -2368,6 +2417,8 @@ const char *str;
         str = compress_str(str);
 
     ttyDisplay->lastwin = window;
+
+    print_vt_code2(AVTC_SELECT_WINDOW, window);
 
     switch (cw->type) {
     case NHW_MESSAGE:
@@ -3065,8 +3116,12 @@ int bkglyph UNUSED;
     /* map glyph to character and color */
     (void) mapglyph(glyph, &ch, &color, &special, x, y);
 
+    print_vt_code2(AVTC_SELECT_WINDOW, window);
+
     /* Move the cursor. */
     tty_curs(window, x, y);
+
+    print_vt_code3(AVTC_GLYPH_START, glyph2tile[glyph], special);
 
 #ifndef NO_TERMS
     if (ul_hack && ch == '_') { /* non-destructive underscore */
@@ -3111,6 +3166,8 @@ int bkglyph UNUSED;
 #endif
     }
 
+    print_vt_code1(AVTC_GLYPH_END);
+
     wins[window]->curx++; /* one character over */
     ttyDisplay->curx++;   /* the real cursor moved too */
 }
@@ -3121,6 +3178,7 @@ const char *str;
 {
     if (ttyDisplay)
         ttyDisplay->rawprint++;
+    print_vt_code2(AVTC_SELECT_WINDOW, NHW_BASE);
 #if defined(MICRO) || defined(WIN32CON)
     msmsg("%s\n", str);
 #else
@@ -3135,6 +3193,7 @@ const char *str;
 {
     if (ttyDisplay)
         ttyDisplay->rawprint++;
+    print_vt_code2(AVTC_SELECT_WINDOW, NHW_BASE);
     term_start_raw_bold();
 #if defined(MICRO) || defined(WIN32CON)
     msmsg("%s", str);
@@ -3153,7 +3212,7 @@ const char *str;
 int
 tty_nhgetch()
 {
-    int i;
+    int i, tmp;
 #ifdef UNIX
     /* kludge alert: Some Unix variants return funny values if getc()
      * is called, interrupted, and then called again.  There
@@ -3164,6 +3223,7 @@ tty_nhgetch()
     char nestbuf;
 #endif
 
+    print_vt_code1(AVTC_INLINE_SYNC);
     (void) fflush(stdout);
     /* Note: if raw_print() and wait_synch() get called to report terminal
      * initialization problems, then wins[] and ttyDisplay might not be
@@ -3186,6 +3246,12 @@ tty_nhgetch()
         i = '\033'; /* same for EOF */
     if (ttyDisplay && ttyDisplay->toplin == 1)
         ttyDisplay->toplin = 2;
+#ifdef TTY_TILES_ESCCODES
+    /* hack to force output of the window select code */
+    tmp = vt_tile_current_window;
+    vt_tile_current_window++;
+    print_vt_code2(AVTC_SELECT_WINDOW, tmp);
+#endif /* TTY_TILES_ESCCODES */
     return i;
 }
 
