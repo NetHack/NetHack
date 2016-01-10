@@ -348,7 +348,7 @@ tactics(mtmp)
 register struct monst *mtmp;
 {
     unsigned long strat = strategy(mtmp);
-    xchar sx, sy;
+    xchar sx = 0, sy = 0;
 
     mtmp->mstrategy =
         (mtmp->mstrategy & (STRAT_WAITMASK | STRAT_APPEARMSG)) | strat;
