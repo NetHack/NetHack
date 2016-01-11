@@ -149,6 +149,34 @@ boolean do_mons;
     } /* pass */
 }
 
+char *
+dxdy_to_dist_descr(dx,dy)
+int dx,dy;
+{
+    static char buf[QBUFSZ];
+    int d;
+    if (!dx && !dy)
+        Sprintf(buf, "here");
+    else if ((d = xytod(dx,dy)) != -1)
+        Sprintf(buf, "%s", directionname(d));
+    else {
+        char tmp[QBUFSZ];
+        buf[0] = '\0';
+        if (dy) {
+            Sprintf(tmp, "%i%c", abs(dy), (dy > 0) ? 's' : 'n');
+            Strcat(buf, tmp);
+        }
+        if (dy && dx)
+            Strcat(buf, ",");
+        if (dx) {
+            Sprintf(tmp, "%i%c", abs(dx), (dx > 0) ? 'e' : 'w');
+            Strcat(buf, tmp);
+        }
+    }
+    return buf;
+}
+
+
 int
 getpos(ccp, force, goal)
 coord *ccp;
@@ -192,12 +220,27 @@ const char *goal;
             coord cc;
             int sym = 0;
             char tmpbuf[BUFSZ];
+            char outbuf[BUFSZ];
             const char *firstmatch = NULL;
+            int dx,dy;
 
             cc.x = cx;
             cc.y = cy;
             if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch)) {
-                pline1(firstmatch);
+                outbuf[0] = '\0';
+                switch (iflags.getpos_coords) {
+                default:
+                    break;
+                case GPCOORDS_CARTESIAN:
+                    dx = cc.x - u.ux;
+                    dy = cc.y - u.uy;
+                    Sprintf(outbuf, " (%s)", dxdy_to_dist_descr(dx,dy));
+                    break;
+                case GPCOORDS_ABSOLUTE:
+                    Sprintf(outbuf, " (%d,%d)", cc.x,cc.y);
+                    break;
+                }
+                pline("%s%s", firstmatch, outbuf);
                 curs(WIN_MAP, cx, cy);
                 flush_screen(0);
             }

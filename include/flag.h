@@ -167,6 +167,11 @@ struct sysflag {
  *
  */
 
+/* values for iflags.getpos_coords */
+#define GPCOORDS_NONE      'n'
+#define GPCOORDS_ABSOLUTE  'a'
+#define GPCOORDS_CARTESIAN 'c'
+
 struct instance_flags {
     /* stuff that really isn't option or platform related. They are
      * set and cleared during the game to control the internal
@@ -185,6 +190,7 @@ struct instance_flags {
     boolean mon_polycontrol; /* debug: control monster polymorphs */
     /* stuff that is related to options and/or user or platform preferences */
     unsigned msg_history; /* hint: # of top lines to save */
+    int getpos_coords;    /* show coordinates when getting cursor position */
     int menu_headings;    /* ATR for menu headings */
     int *opt_booldup;     /* for duplication of boolean opts in config file */
     int *opt_compdup; /* for duplication of compound opts in config file */
