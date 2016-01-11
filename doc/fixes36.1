@@ -88,6 +88,7 @@ make mimics mimicing walls or trees also block light
 stepping onto lava destroyed non-fireproof water walking boots but left other
 	vulnerable boot types intact
 fix death reason when eating tainted glob of <monster> (not corpse)
+fix death reason when petrified (avoid redundant 'while getting stoned')
 use appropriate place name for drum of earthquake shakes
 fix unmapped branch stairs on sokoban level
 redraw map when hilite_pile is toggled to display the highlighting
@@ -97,6 +98,17 @@ make vault guard accept names starting with number
 fix weight of containers in special levels
 make the raven medusa level shortsighted
 fix possible segfault in lev_comp when map was too tall
+fix "the ice is bridged with ice" when freezing castle's moat or Medusa's sea
+make monsters and pets avoid poison gas clouds if it would damage them
+covetous monsters may choose to teleport to downstairs or ladders
+doppelganger posing as Rider would never change shape
+since doppelganger posing as Rider could never revert to innate form,
+	protection from shape changers turned it into genuine Rider
+don't create globs of ooze/slime/pudding with bknown flag set so pre-known to
+	be "uncursed"
+do allow globs with same curse/bless state to merge even when that state is
+	known for one and unknown for the other; result will have bknown clear
+fix pile mark after killing a monster carrying a potion which is destroyed
 
 
 Platform- and/or Interface-Specific Fixes
@@ -105,7 +117,7 @@ tty: M-N gave "Unknown command 'M-" with "'." finishing the sentence on the
 	line below it, leaving bogus '.' displayed on the top row of the map
 tty: specifying all four of role, race, gender, and alignment still prompted
 	for confirmation with "Is this ok?" before starting play
-tty: responding with <return> or <enter> duing role, race, &c selection
+tty: responding with <return> or <enter> during role, race, &c selection
 	behaved same as <escape> to quit; now it will pick [random] instead
 unix/X11: in top level Makefile, some commented out definitions of VARDATND
 	misspelled pilemark.xbm (as pilemark.xpm)
@@ -142,10 +154,17 @@ wizard mode #wizintrinsic command
 additional tribute passages for The Colour of Magic, The Light Fantastic,
 	Equal Rites, Snuff, and Raising Steam
 compile-time options SIMPLE_MAIL and SERVER_ADMIN_MSG for public server use
+database entries for Cleaver, Sunsword, Frost and Fire brands, and
+	polymorph trap
+allow showing coordinates when picking a position on the map and
+	autodescribe option is on
 
 
 Platform- and/or Interface-Specific New Features
 ------------------------------------------------
+tty: menu_overlay -option to clear screen and align menus to left
+tty: compile-time option to output escape codes for tile data hints
+unix: compile-time option MSGHANDLER to pass messages to external program
 
 
 NetHack Community Patches (or Variation) Included

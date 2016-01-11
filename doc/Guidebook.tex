@@ -1042,6 +1042,9 @@ Dip an object into something.
 \item[\tb{\#enhance}]
 Advance or check weapon and spell skills.
 %.lp
+\item[\tb{\#exploremode}]
+Enter the explore mode.
+%.lp
 \item[\tb{\#force}]
 Force a lock.
 %.lp
@@ -1050,6 +1053,9 @@ Invoke an object's special powers.
 %.lp
 \item[\tb{\#jump}]
 Jump to another location.
+%.lp
+\item[\tb{\#kick}]
+Kick something.
 %.lp
 \item[\tb{\#loot}]
 Loot a box or bag on the floor beneath you, or the saddle 
@@ -2553,6 +2559,12 @@ If you prefix `{\tt !}' or ``{\tt no}'' to the value, you can
 exclude that gender from being picked randomly. 
 Cannot be set with the `{\tt O}' command.  Persistent.
 %.lp
+\item[\ib{getpos\verb+_+coord}]
+When using the `{\tt /}' command to look around on the map with
+``{\tt autodescribe}'' on, display coordinates after the description.
+The value specified should be the first letter of one of the following:
+absolute, cartesian, or none.  Default is none.
+%.lp
 \item[\ib{help}]
 If more information is available for an object looked at
 with the `{\tt /}' command, ask if you want to see it (default on).
@@ -2664,6 +2676,10 @@ Default `\verb+>+'.
 \item[\ib{menu\verb+_+objsyms}]
 Show object symbols in menu headings in menus where
 the object symbols act as menu accelerators (default off).
+\item[\ib{menu\verb+_+overlay}]
+Do not clear the screen before drawing menus, and align
+menus to the right edge of the screen. Only for the tty port.
+(default on)
 \item[\ib{menu\verb+_+previous\verb+_+page}]
 Menu character accelerator to goto the previous menu page.
 Implemented by the Amiga, Gem and tty ports.

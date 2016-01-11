@@ -149,6 +149,11 @@ static struct Bool_Opt {
     /* for menu debugging only*/
     { "menu_tab_sep", &iflags.menu_tab_sep, FALSE, SET_IN_WIZGAME },
     { "menu_objsyms", &iflags.menu_head_objsym, FALSE, SET_IN_GAME },
+#ifdef TTY_GRAPHICS
+    { "menu_overlay", &iflags.menu_overlay, TRUE, SET_IN_GAME },
+#else
+    { "menu_overlay", (boolean *) 0, FALSE, SET_IN_FILE },
+#endif
     { "mouse_support", &iflags.wc_mouse_support, TRUE, DISP_IN_GAME }, /*WC*/
 #ifdef NEWS
     { "news", &iflags.news, TRUE, DISP_IN_GAME },
@@ -220,6 +225,11 @@ static struct Bool_Opt {
     { "use_inverse", &iflags.wc_inverse, FALSE, SET_IN_GAME }, /*WC*/
 #endif
     { "verbose", &flags.verbose, TRUE, SET_IN_GAME },
+#ifdef TTY_TILES_ESCCODES
+    { "vt_tiledata", &iflags.vt_tiledata, FALSE, SET_IN_FILE },
+#else
+    { "vt_tiledata", (boolean *) 0, FALSE, SET_IN_FILE },
+#endif
     { "wizweight", &iflags.wizweight, FALSE, SET_IN_WIZGAME },
     { "wraptext", &iflags.wc2_wraptext, FALSE, SET_IN_GAME },
 #ifdef ZEROCOMP
@@ -284,6 +294,7 @@ static struct Comp_Opt {
       DISP_IN_GAME }, /*WC*/
     { "fruit", "the name of a fruit you enjoy eating", PL_FSIZ, SET_IN_GAME },
     { "gender", "your starting gender (male or female)", 8, DISP_IN_GAME },
+    { "getpos_coord", "show coordinates when getting cursor position", 1, SET_IN_GAME },
     { "horsename", "the name of your (first) horse (e.g., horsename:Silver)",
       PL_PSIZ, DISP_IN_GAME },
     { "map_mode", "map display mode under Windows", 20, DISP_IN_GAME }, /*WC*/
@@ -675,6 +686,7 @@ initoptions_init()
     iflags.prevmsg_window = 's';
 #endif
     iflags.menu_headings = ATR_INVERSE;
+    iflags.getpos_coords = GPCOORDS_NONE;
 
     /* hero's role, race, &c haven't been chosen yet */
     flags.initrole = flags.initrace = flags.initgend = flags.initalign =
@@ -1455,8 +1467,9 @@ int idx; /* 0 .. */
 }
 
 int
-msgtype_type(msg)
+msgtype_type(msg, norepeat)
 const char *msg;
+boolean norepeat; /* called from Norep(via pline) */
 {
     struct plinemsg_type *tmp = plinemsg_types;
 
@@ -1465,7 +1478,7 @@ const char *msg;
             return tmp->msgtype;
         tmp = tmp->next;
     }
-    return MSGTYP_NORMAL;
+    return norepeat ? MSGTYP_NOREP : MSGTYP_NORMAL;
 }
 
 int
@@ -2318,6 +2331,24 @@ boolean tinitial, tfrom_file;
          * no fruit option at all.  Also, we don't want people
          * setting multiple fruits in their options.)
          */
+        return;
+    }
+
+    fullname = "getpos_coord";
+    if (match_optname(opts, fullname, 6, TRUE)) {
+        if (duplicate)
+            complain_about_duplicate(opts, 1);
+        if (negated) {
+            iflags.getpos_coords = GPCOORDS_NONE;
+            return;
+        } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
+            if (tolower(*op) == GPCOORDS_NONE
+                || tolower(*op) == GPCOORDS_CARTESIAN
+                || tolower(*op) == GPCOORDS_ABSOLUTE) {
+                iflags.getpos_coords = tolower(*op);
+            } else
+                badoption(opts);
+        }
         return;
     }
 
@@ -3997,6 +4028,27 @@ boolean setinitial, setfromfile;
             free((genericptr_t) mode_pick);
         }
         destroy_nhwindow(tmpwin);
+    } else if (!strcmp("getpos_coord", optname)) {
+        menu_item *window_pick = (menu_item *) 0;
+
+        tmpwin = create_nhwindow(NHW_MENU);
+        start_menu(tmpwin);
+        any = zeroany;
+        any.a_char = GPCOORDS_ABSOLUTE;
+        add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_ABSOLUTE,
+                 0, ATR_NONE, "absolute", MENU_UNSELECTED);
+        any.a_char = GPCOORDS_CARTESIAN;
+        add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_CARTESIAN,
+                 0, ATR_NONE, "cartesian", MENU_UNSELECTED);
+        any.a_char = GPCOORDS_NONE;
+        add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_NONE,
+                 0, ATR_NONE, "none", MENU_UNSELECTED);
+        end_menu(tmpwin, "Select coordinate display when picking a position:");
+        if (select_menu(tmpwin, PICK_ONE, &window_pick) > 0) {
+            iflags.getpos_coords = window_pick->item.a_char;
+            free((genericptr_t) window_pick);
+        }
+        destroy_nhwindow(tmpwin);
     } else if (!strcmp("msg_window", optname)) {
 #ifdef TTY_GRAPHICS
         /* by Christian W. Cooper */
@@ -4744,6 +4796,11 @@ char *buf;
         Sprintf(buf, "%s", rolestring(flags.initrole, roles, name.m));
     } else if (!strcmp(optname, "runmode")) {
         Sprintf(buf, "%s", runmodes[flags.runmode]);
+    } else if (!strcmp(optname, "getpos_coord")) {
+        Sprintf(buf, "%s",
+                (iflags.getpos_coords == GPCOORDS_ABSOLUTE) ? "absolute"
+                : (iflags.getpos_coords == GPCOORDS_CARTESIAN) ? "cartesian"
+                : "none");
     } else if (!strcmp(optname, "scores")) {
         Sprintf(buf, "%d top/%d around%s", flags.end_top, flags.end_around,
                 flags.end_own ? "/own" : "");

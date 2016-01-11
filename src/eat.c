@@ -2838,14 +2838,14 @@ boolean incr;
                 /* stop what you're doing, then faint */
                 stop_occupation();
                 You("faint from lack of food.");
-                if (!Levitation)
-                    selftouch("Falling, you");
                 incr_itimeout(&HDeaf, duration);
                 nomul(-duration);
                 multi_reason = "fainted from lack of food";
                 nomovemsg = "You regain consciousness.";
                 afternmv = unfaint;
                 newhs = FAINTED;
+                if (!Levitation)
+                    selftouch("Falling, you");
             }
         } else if (u.uhunger < -(int) (200 + 20 * ACURR(A_CON))) {
             u.uhs = STARVED;

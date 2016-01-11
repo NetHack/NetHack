@@ -503,6 +503,42 @@ int how;
     return;
 }
 
+/* some special cases for overriding while-helpless reason */
+static const struct {
+    int why, unmulti;
+    const char *exclude, *include;
+} death_fixups[] = {
+    /* "petrified by <foo>, while getting stoned" -- "while getting stoned"
+       prevented any last-second recovery, but it was not the cause of
+       "petrified by <foo>" */
+    { STONING, 1, "getting stoned", (char *) 0 },
+    /* "died of starvation, while fainted from lack of food" is accurate
+       but sounds a fairly silly (and doesn't actually appear unless you
+       splice together death and while-helpless from xlogfile) */
+    { STARVING, 0, "fainted from lack of food", "fainted" },
+};
+
+/* clear away while-helpless when the cause of death caused that
+   helplessness (ie, "petrified by <foo> while getting stoned") */
+STATIC_DCL void
+fixup_death(how)
+int how;
+{
+    int i;
+
+    for (i = 0; i < SIZE(death_fixups); ++i)
+        if (death_fixups[i].why == how
+            && !strcmp(death_fixups[i].exclude, multi_reason)) {
+            if (death_fixups[i].include) /* substitute an alternate reason */
+                multi_reason = death_fixups[i].include;
+            else /* remove the helplessness reason */
+                multi_reason = (char *) 0;
+            if (death_fixups[i].unmulti) /* possibly hide helplessness */
+                multi = 0L;
+            break;
+        }
+}
+
 #if defined(WIN32) && !defined(SYSCF)
 #define NOTIFY_NETHACK_BUGS
 #endif
@@ -1001,6 +1037,8 @@ int how;
     }
     if (how == ESCAPED || how == PANICKED)
         killer.format = NO_KILLER_PREFIX;
+
+    fixup_death(how); /* actually, fixup multi_reason */
 
     if (how != PANICKED) {
         /* these affect score and/or bones, but avoid them during panic */

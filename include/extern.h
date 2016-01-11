@@ -310,6 +310,7 @@ E void FDECL(map_location, (int, int, int));
 E void FDECL(feel_newsym, (XCHAR_P, XCHAR_P));
 E void FDECL(feel_location, (XCHAR_P, XCHAR_P));
 E void FDECL(newsym, (int, int));
+E void FDECL(newsym_force, (int, int));
 E void FDECL(shieldeff, (XCHAR_P, XCHAR_P));
 E void FDECL(tmp_at, (int, int));
 E void FDECL(swallowed, (int));
@@ -1662,7 +1663,7 @@ E boolean FDECL(add_menu_coloring, (char *));
 E boolean FDECL(get_menu_coloring, (char *, int *, int *));
 E void NDECL(free_menu_coloring);
 E boolean FDECL(msgtype_parse_add, (char *));
-E int FDECL(msgtype_type, (const char *));
+E int FDECL(msgtype_type, (const char *, BOOLEAN_P));
 E void NDECL(msgtype_free);
 
 /* ### pager.c ### */

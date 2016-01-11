@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1452064740 2016/01/06 07:19:00 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.84 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1452465671 2016/01/10 22:41:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.88 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -102,53 +102,80 @@ coord **arr_p;
 int *cnt_p;
 boolean do_mons;
 {
-    int x, y, pass, glyph, idx;
+    int x, y, pass, glyph, idx,
+        tail = (do_mons ? monnum_to_glyph(PM_LONG_WORM_TAIL) : 0),
+        boulder = (!do_mons ? objnum_to_glyph(BOULDER) : 0),
+        rock = (!do_mons ? objnum_to_glyph(ROCK) : 0);
 
+    /*
+     * We always include the hero's location even if there is no monster
+     * (invisible hero without see invisible) or object (usual case)
+     * displayed there.  That way, the count will always be at least 1,
+     * and player has a visual indicator (cursor returns to hero's spot)
+     * highlighting when successive 'm's or 'o's have cycled all the way
+     * through all monsters or objects.
+     *
+     * Hero's spot will always sort to array[0] because it will always
+     * be the shortest distance (namely, 0 units) away from <u.ux,u.uy>.
+     */
     *cnt_p = idx = 0;
     for (pass = 0; pass < 2; pass++) {
-        if (pass) {
-            /* *cnt_p + 1: always allocate a non-zero amount */
-            *arr_p = (coord *) alloc(sizeof (coord) * (*cnt_p + 1));
-            if (!*cnt_p) {
-                /* needed for caller's mon[0].x,.y==u.ux,.uy check */
-                (*arr_p)[0].x = (*arr_p)[0].y = 0;
-                break;
-            }
-        }
         for (x = 1; x < COLNO; x++)
             for (y = 0; y < ROWNO; y++) {
+                /* TODO: if glyph is a pile glyph, convert to ordinary one
+                 *       in order to keep tail/boulder/rock check simple.
+                 */
                 glyph = glyph_at(x, y);
-                if (do_mons) {
-                    /* unlike '/M', this skips monsters revealed by
-                     * warning glyphs and remembered invisible ones;
-                     * TODO: skip worm tails
-                     */
-                    if (glyph_is_monster(glyph)) {
-                        if (!pass) {
-                            ++*cnt_p;
-                        } else {
-                            (*arr_p)[idx].x = x;
-                            (*arr_p)[idx].y = y;
-                            ++idx;
-                        }
-                    }
-                } else { /* objects */
-                    /* TODO: skip boulders and rocks */
-                    if (glyph_is_object(glyph)) {
-                        if (!pass) {
-                            ++*cnt_p;
-                        } else {
-                            (*arr_p)[idx].x = x;
-                            (*arr_p)[idx].y = y;
-                            ++idx;
-                        }
+                /* unlike '/M', this skips monsters revealed by
+                   warning glyphs and remembered invisible ones */
+                if ((x == u.ux && y == u.uy)
+                    || (do_mons ? (glyph_is_monster(glyph) && glyph != tail)
+                                : (glyph_is_object(glyph)
+                                   && glyph != boulder && glyph != rock))) {
+                    if (!pass) {
+                        ++*cnt_p;
+                    } else {
+                        (*arr_p)[idx].x = x;
+                        (*arr_p)[idx].y = y;
+                        ++idx;
                     }
                 }
             }
+
+        if (!pass) /* end of first pass */
+            *arr_p = (coord *) alloc(sizeof (coord) * *cnt_p);
+        else /* end of second pass */
+            qsort(*arr_p, *cnt_p, sizeof (coord), cmp_coord_distu);
     } /* pass */
-    if (*cnt_p)
-        qsort(*arr_p, *cnt_p, sizeof (coord), cmp_coord_distu);
 }
+
+char *
+dxdy_to_dist_descr(dx,dy)
+int dx,dy;
+{
+    static char buf[QBUFSZ];
+    int d;
+    if (!dx && !dy)
+        Sprintf(buf, "here");
+    else if ((d = xytod(dx,dy)) != -1)
+        Sprintf(buf, "%s", directionname(d));
+    else {
+        char tmp[QBUFSZ];
+        buf[0] = '\0';
+        if (dy) {
+            Sprintf(tmp, "%i%c", abs(dy), (dy > 0) ? 's' : 'n');
+            Strcat(buf, tmp);
+        }
+        if (dy && dx)
+            Strcat(buf, ",");
+        if (dx) {
+            Sprintf(tmp, "%i%c", abs(dx), (dx > 0) ? 'e' : 'w');
+            Strcat(buf, tmp);
+        }
+    }
+    return buf;
+}
+
 
 int
 getpos(ccp, force, goal)
@@ -193,12 +220,27 @@ const char *goal;
             coord cc;
             int sym = 0;
             char tmpbuf[BUFSZ];
+            char outbuf[BUFSZ];
             const char *firstmatch = NULL;
+            int dx,dy;
 
             cc.x = cx;
             cc.y = cy;
             if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch)) {
-                pline1(firstmatch);
+                outbuf[0] = '\0';
+                switch (iflags.getpos_coords) {
+                default:
+                    break;
+                case GPCOORDS_CARTESIAN:
+                    dx = cc.x - u.ux;
+                    dy = cc.y - u.uy;
+                    Sprintf(outbuf, " (%s)", dxdy_to_dist_descr(dx,dy));
+                    break;
+                case GPCOORDS_ABSOLUTE:
+                    Sprintf(outbuf, " (%d,%d)", cc.x,cc.y);
+                    break;
+                }
+                pline("%s%s", firstmatch, outbuf);
                 curs(WIN_MAP, cx, cy);
                 flush_screen(0);
             }
@@ -294,51 +336,41 @@ const char *goal;
                 show_goal_msg = TRUE;
             msg_given = TRUE;
             goto nxtc;
-        } else if (c == '@') {
+        } else if (c == '@') { /* return to hero's spot */
+            /* reset 'm','M' and 'o','O'; otherwise, there's no way for player
+               to achieve that except by manually cycling through all spots */
+            monidx = objidx = 0;
             cx = u.ux;
             cy = u.uy;
             goto nxtc;
-        } else if (c == 'm' || c == 'M') {
+        } else if (c == 'm' || c == 'M') { /* nearest or farthest monster */
             if (!monarr) {
                 gather_locs(&monarr, &moncount, TRUE);
-                /* when hero is first element (always, unless unseen),
-                   we want first increment to reach 1 (nearest aside
-                   from hero) or first decrement to reach moncount-1
-                   (farthest); if hero is not first element, we want
-                   first increment to end up with 0 (nearest monster),
-                   first decrement should still choose moncount-1 */
-                monidx = (monarr[0].x == u.ux && monarr[0].y == u.uy) ? 0
-                         : (c == 'm') ? -1 : 0;
+                monidx = 0; /* monarr[0] is hero's spot */
             }
-            if (moncount) {
-                if (c == 'm') {
-                    monidx = (monidx + 1) % moncount;
-                } else {
-                    if (--monidx < 0)
-                        monidx = moncount - 1;
-                }
-                cx = monarr[monidx].x;
-                cy = monarr[monidx].y;
-                goto nxtc;
+            if (c == 'm') {
+                monidx = (monidx + 1) % moncount;
+            } else {
+                if (--monidx < 0)
+                    monidx = moncount - 1;
             }
-        } else if (c == 'o' || c == 'O') {
+            cx = monarr[monidx].x;
+            cy = monarr[monidx].y;
+            goto nxtc;
+        } else if (c == 'o' || c == 'O') { /* nearest or farthest object */
             if (!objarr) {
                 gather_locs(&objarr, &objcount, FALSE);
-                /* ready for first increment to change to zero
-                   or first decrement to change to objcount-1 */
-                objidx = (c == 'o') ? -1 : 0;
+                objidx = 0; /* objarr[0] is hero's spot */
             }
-            if (objcount) {
-                if (c == 'o') {
-                    objidx = (objidx + 1) % objcount;
-                } else {
-                    if (--objidx < 0)
-                        objidx = objcount - 1;
-                }
-                cx = objarr[objidx].x;
-                cy = objarr[objidx].y;
-                goto nxtc;
+            if (c == 'o') {
+                objidx = (objidx + 1) % objcount;
+            } else {
+                if (--objidx < 0)
+                    objidx = objcount - 1;
             }
+            cx = objarr[objidx].x;
+            cy = objarr[objidx].y;
+            goto nxtc;
         } else {
             if (!index(quitchars, c)) {
                 char matching[MAXPCHARS];

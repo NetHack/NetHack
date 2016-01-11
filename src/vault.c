@@ -1,4 +1,4 @@
-/* NetHack 3.6	vault.c	$NHDT-Date: 1451962301 2016/01/05 02:51:41 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.40 $ */
+/* NetHack 3.6	vault.c	$NHDT-Date: 1452132199 2016/01/07 02:03:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.42 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -377,7 +377,7 @@ invault()
         }
         trycount = 5;
         do {
-            getlin(Deaf ? "You are required to sign in with your name. -" :
+            getlin(Deaf ? "You are required to supply your name. -" :
                     "\"Hello stranger, who are you?\" -", buf);
             (void) mungspaces(buf);
         } while (!buf[0] && --trycount > 0);

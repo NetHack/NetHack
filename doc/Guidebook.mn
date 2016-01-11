@@ -860,12 +860,16 @@ See the section below entitled ``Conduct'' for details.
 Dip an object into something.
 .lp #enhance
 Advance or check weapon and spell skills.
+.lp #exploremode
+Enter the explore mode.
 .lp #force
 Force a lock.
 .lp #invoke
 Invoke an object's special powers.
 .lp #jump
 Jump to another location.
+.lp #kick
+Kick something.
 .lp #loot
 Loot a box or bag on the floor beneath you, or the saddle 
 from a steed standing next to you.
@@ -2121,6 +2125,11 @@ The default is to randomly pick an appropriate gender.
 If you prefix a `!' or ``no'' to the value, you can 
 exclude that gender from being picked randomly.
 Cannot be set with the `O' command.  Persistent.
+.lp getpos_coord
+When using the `/' command to look around on the map with
+``autodescribe'' on, display coordinates after the description.
+The value specified should be the first letter of one of the following:
+absolute, cartesian, or none.  Default is none.
 .lp "help    "
 If more information is available for an object looked at
 with the `/' command, ask if you want to see it (default on). Turning help
@@ -2218,6 +2227,10 @@ Default '>'.
 .lp menu_objsyms
 Show object symbols in menu headings in menus where
 the object symbols act as menu accelerators (default off).
+.lp menu_overlay
+Do not clear the screen before drawing menus, and align
+menus to the right edge of the screen. Only for the tty port.
+(default on)
 .lp menu_previous_page 
 Menu character accelerator to goto the previous menu page.
 Implemented by the Amiga, Gem and tty ports.

@@ -1875,10 +1875,14 @@ struct obj *obj, *otmp;
                         You_hear("a crumbling sound.");
                 }
             } else {
+                int oox = obj->ox;
+                int ooy = obj->oy;
                 if (context.mon_moving
                         ? !breaks(obj, obj->ox, obj->oy)
                         : !hero_breaks(obj, obj->ox, obj->oy, FALSE))
                     maybelearnit = FALSE; /* nothing broke */
+                else
+                    newsym_force(oox,ooy);
                 res = 0;
             }
             if (maybelearnit)
@@ -4234,8 +4238,8 @@ short exploding_wand_typ;
 
     case ZT_COLD:
         if (is_pool(x, y) || is_lava(x, y)) {
-            boolean lava = is_lava(x, y);
-            boolean moat = is_moat(x, y);
+            boolean lava = is_lava(x, y),
+                    moat = is_moat(x, y);
 
             if (lev->typ == WATER) {
                 /* For now, don't let WATER freeze. */
@@ -4245,23 +4249,25 @@ short exploding_wand_typ;
                     You_hear("a soft crackling.");
                 rangemod -= 1000; /* stop */
             } else {
+                char buf[BUFSZ];
+
+                Strcpy(buf, waterbody_name(x, y)); /* for MOAT */
                 rangemod -= 3;
                 if (lev->typ == DRAWBRIDGE_UP) {
                     lev->drawbridgemask &= ~DB_UNDER; /* clear lava */
                     lev->drawbridgemask |= (lava ? DB_FLOOR : DB_ICE);
                 } else {
                     if (!lava)
-                        lev->icedpool =
-                            (lev->typ == POOL ? ICED_POOL : ICED_MOAT);
-                    lev->typ = (lava ? ROOM : ICE);
+                        lev->icedpool = (lev->typ == POOL) ? ICED_POOL
+                                                           : ICED_MOAT;
+                    lev->typ = lava ? ROOM : ICE;
                 }
                 bury_objs(x, y);
                 if (see_it) {
                     if (lava)
                         Norep("The lava cools and solidifies.");
                     else if (moat)
-                        Norep("The %s is bridged with ice!",
-                              waterbody_name(x, y));
+                        Norep("The %s is bridged with ice!", buf);
                     else
                         Norep("The water freezes.");
                     newsym(x, y);

@@ -167,6 +167,11 @@ struct sysflag {
  *
  */
 
+/* values for iflags.getpos_coords */
+#define GPCOORDS_NONE      'n'
+#define GPCOORDS_ABSOLUTE  'a'
+#define GPCOORDS_CARTESIAN 'c'
+
 struct instance_flags {
     /* stuff that really isn't option or platform related. They are
      * set and cleared during the game to control the internal
@@ -185,6 +190,7 @@ struct instance_flags {
     boolean mon_polycontrol; /* debug: control monster polymorphs */
     /* stuff that is related to options and/or user or platform preferences */
     unsigned msg_history; /* hint: # of top lines to save */
+    int getpos_coords;    /* show coordinates when getting cursor position */
     int menu_headings;    /* ATR for menu headings */
     int *opt_booldup;     /* for duplication of boolean opts in config file */
     int *opt_compdup; /* for duplication of compound opts in config file */
@@ -199,6 +205,7 @@ struct instance_flags {
     boolean mention_walls;    /* give feedback when bumping walls */
     boolean menu_tab_sep;     /* Use tabs to separate option menu fields */
     boolean menu_head_objsym; /* Show obj symbol in menu headings */
+    boolean menu_overlay;     /* Draw menus over the map */
     boolean menu_requested;   /* Flag for overloaded use of 'm' prefix
                                * on some non-move commands */
     boolean renameallowed;    /* can change hero name during role selection */
@@ -258,6 +265,9 @@ struct instance_flags {
 #ifdef LAN_FEATURES
     boolean lan_mail;         /* mail is initialized */
     boolean lan_mail_fetched; /* mail is awaiting display */
+#endif
+#ifdef TTY_TILES_ESCCODES
+    boolean vt_tiledata;     /* output console codes for tile support in TTY */
 #endif
     boolean wizweight;        /* display weight of everything in wizard mode */
     /*

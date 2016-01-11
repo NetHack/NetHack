@@ -2777,6 +2777,7 @@ struct ext_func_tab extcmdlist[] = {
     { "force", "force a lock", doforce, FALSE },
     { "invoke", "invoke an object's powers", doinvoke, TRUE },
     { "jump", "jump to a location", dojump, FALSE },
+    { "kick", "kick something", dokick, FALSE },
     { "loot", "loot a box on the floor", doloot, FALSE },
     { "monster", "use a monster's special ability", domonability, TRUE },
     { "name", "name a monster or an object", docallcmd, TRUE },

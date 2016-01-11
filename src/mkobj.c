@@ -819,11 +819,9 @@ boolean artif;
             }
             if (Is_pudding(otmp)) {
                 otmp->globby = 1;
-                otmp->known = otmp->bknown = otmp->rknown = otmp->dknown = 1;
-                otmp->corpsenm =
-                    PM_GRAY_OOZE + (otmp->otyp - GLOB_OF_GRAY_OOZE);
-                /* this ensures that they don't fail merging because of
-                 * BUC status or other irrelevancies */
+                otmp->known = otmp->dknown = 1;
+                otmp->corpsenm = PM_GRAY_OOZE
+                                 + (otmp->otyp - GLOB_OF_GRAY_OOZE);
             } else {
                 if (otmp->otyp != CORPSE && otmp->otyp != MEAT_RING
                     && otmp->otyp != KELP_FROND && !rn2(6)) {
