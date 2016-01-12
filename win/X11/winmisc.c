@@ -1,11 +1,11 @@
-/* NetHack 3.6	winmisc.c	$NHDT-Date: 1432512807 2015/05/25 00:13:27 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
-/* Copyright (c) Dean Luick, 1992				  */
+/* NetHack 3.6	winmisc.c	$NHDT-Date: 1452593730 2016/01/12 10:15:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.15 $ */
+/* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
  * Misc. popup windows: player selection and extended commands.
  *
- *	+ Global functions: player_selection() and get_ext_cmd().
+ *      + Global functions: player_selection() and get_ext_cmd().
  */
 
 #ifndef SYSV
@@ -727,6 +727,9 @@ Cardinal *num_params;
     if (ch == '\0') { /* don't accept nul char/modifier event */
         /* don't beep */
         return;
+    } else if (ch == '?') {
+        extend_help();
+        return;
     } else if (index("\033\n\r", ch)) {
         if (ch == '\033') {
             /* unselect while still visible */
@@ -745,8 +748,14 @@ Cardinal *num_params;
         return;
     }
 
-    /* too much time has elapsed */
-    if ((xkey->time - ec_time) > 500)
+    /*
+     * If too much time has elapsed, treat current key as starting a new
+     * choice, otherwise it is a continuation of the choice in progress.
+     * Extra letters might be needed to disambiguate between choices
+     * ("ride" vs "rub", for instance), or player may just be typing in
+     * the whole word.
+     */
+    if ((xkey->time - ec_time) > 2500) /* 2.5 seconds */
         ec_active = FALSE;
 
     if (!ec_active) {
@@ -816,21 +825,21 @@ init_extended_commands_popup()
 /*
  * Create a popup widget of the following form:
  *
- *		      popup_label
- *		----------- ------------
- *		|left_name| |right_name|
- *		----------- ------------
- *		------------------------
- *		|	name1	       |
- *		------------------------
- *		------------------------
- *		|	name2	       |
- *		------------------------
- *			  .
- *			  .
- *		------------------------
- *		|	nameN	       |
- *		------------------------
+ *                    popup_label
+ *              ----------- ------------
+ *              |left_name| |right_name|
+ *              ----------- ------------
+ *              ------------------------
+ *              |       name1          |
+ *              ------------------------
+ *              ------------------------
+ *              |       name2          |
+ *              ------------------------
+ *                        .
+ *                        .
+ *              ------------------------
+ *              |       nameN          |
+ *              ------------------------
  */
 static Widget
 make_menu(popup_name, popup_label, popup_translations, left_name,
@@ -854,15 +863,14 @@ Widget *formp; /* return */
     int i;
     Arg args[8];
     Cardinal num_args;
-    Dimension width, max_width;
+    Dimension width, other_width, max_width, border_width,
+              height, cumulative_height, screen_height;
     int distance, skip;
 
-    commands = (Widget *) alloc((unsigned) num_names * sizeof(Widget));
+    commands = (Widget *) alloc((unsigned) num_names * sizeof (Widget));
 
     num_args = 0;
-    XtSetArg(args[num_args], XtNallowShellResize, True);
-    num_args++;
-
+    XtSetArg(args[num_args], XtNallowShellResize, True); num_args++;
     popup = XtCreatePopupShell(popup_name, transientShellWidgetClass,
                                toplevel, args, num_args);
     XtOverrideTranslations(
@@ -871,60 +879,71 @@ Widget *formp; /* return */
     num_args = 0;
     XtSetArg(args[num_args], XtNforceBars, False); num_args++;
     XtSetArg(args[num_args], XtNallowVert, True); num_args++;
+    XtSetArg(args[num_args], XtNtranslations,
+             XtParseTranslationTable(popup_translations)); num_args++;
     view = XtCreateManagedWidget("menuformview", viewportWidgetClass, popup,
                                  args, num_args);
 
     num_args = 0;
-    XtSetArg(args[num_args], XtNtranslations,
-             XtParseTranslationTable(popup_translations));
-    num_args++;
     *formp = form = XtCreateManagedWidget("menuform", formWidgetClass, view,
                                           args, num_args);
 
-    /* Get the default distance between objects in the form widget. */
+    /*
+     * Get the default distance between objects in the viewport widget.
+     * (Something is fishy here:  'distance' ends up being 0 but there
+     * is a non-zero gap between the borders of the internal widgets.
+     * It matches exactly the default value of 4 for defaultDistance.)
+     */
     num_args = 0;
-    XtSetArg(args[num_args], nhStr(XtNdefaultDistance), &distance);
-    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNdefaultDistance), &distance); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNborderWidth), &border_width); num_args++;
     XtGetValues(view, args, num_args);
+    if (!distance)
+        distance = 4;
 
     /*
      * Create the label.
      */
     num_args = 0;
-    XtSetArg(args[num_args], XtNborderWidth, 0);
-    num_args++;
+    XtSetArg(args[num_args], XtNborderWidth, 0); num_args++;
     label = XtCreateManagedWidget(popup_label, labelWidgetClass, form, args,
                                   num_args);
+
+    cumulative_height = 0;
+    XtSetArg(args[0], XtNheight, &height);
+    XtGetValues(label, args, ONE);
+    cumulative_height += distance + height; /* no border for label */
 
     /*
      * Create the left button.
      */
     num_args = 0;
-    XtSetArg(args[num_args], nhStr(XtNfromVert), label);
-    num_args++;
-    /*
-        XtSetArg(args[num_args], nhStr(XtNshapeStyle),
-                                    XmuShapeRoundedRectangle);	num_args++;
-    */
+    XtSetArg(args[num_args], nhStr(XtNfromVert), label); num_args++;
+#if 0
+    XtSetArg(args[num_args], nhStr(XtNshapeStyle),
+                              XmuShapeRoundedRectangle); num_args++;
+#endif
     left = XtCreateManagedWidget(left_name, commandWidgetClass, form, args,
                                  num_args);
     XtAddCallback(left, XtNcallback, left_callback, (XtPointer) 0);
-    skip = 3 * distance; /* triple the spacing */
-    if (!skip)
-        skip = 3;
+    skip = (distance < 4) ? 8 : 2 * distance;
+
+    num_args = 0;
+    XtSetArg(args[0], XtNheight, &height);
+    XtGetValues(left, args, ONE);
+    cumulative_height += distance + height + 2 * border_width;
 
     /*
      * Create right button.
      */
     num_args = 0;
-    XtSetArg(args[num_args], nhStr(XtNfromHoriz), left);
-    num_args++;
-    XtSetArg(args[num_args], nhStr(XtNfromVert), label);
-    num_args++;
-    /*
-        XtSetArg(args[num_args], nhStr(XtNshapeStyle),
-                                    XmuShapeRoundedRectangle);	num_args++;
-    */
+    XtSetArg(args[num_args], nhStr(XtNfromHoriz), left); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNhorizDistance), skip); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNfromVert), label); num_args++;
+#if 0
+    XtSetArg(args[num_args], nhStr(XtNshapeStyle),
+                              XmuShapeRoundedRectangle); num_args++;
+#endif
     right = XtCreateManagedWidget(right_name, commandWidgetClass, form, args,
                                   num_args);
     XtAddCallback(right, XtNcallback, right_callback, (XtPointer) 0);
@@ -939,29 +958,33 @@ Widget *formp; /* return */
         if (!widget_names[i])
             continue;
         num_args = 0;
-        XtSetArg(args[num_args], nhStr(XtNfromVert), above);
-        num_args++;
+        XtSetArg(args[num_args], nhStr(XtNfromVert), above); num_args++;
         if (above == left) {
             /* if first, we are farther apart */
-            XtSetArg(args[num_args], nhStr(XtNvertDistance), skip);
-            num_args++;
-        }
+            XtSetArg(args[num_args], nhStr(XtNvertDistance), skip); num_args++;
+            cumulative_height += skip;
+        } else
+            cumulative_height += distance;
+        cumulative_height += height + 2 * border_width;
 
         *curr = XtCreateManagedWidget(widget_names[i], commandWidgetClass,
                                       form, args, num_args);
         XtAddCallback(*curr, XtNcallback, name_callback, (XtPointer) i);
         above = *curr++;
     }
+    cumulative_height += distance; /* space at bottom of form */
 
     /*
-     * Now find the largest width.  Start with the width dismiss + help
-     * buttons, since they are adjacent.
+     * Now find the largest width.  Start with width of left + right buttons
+     * ('dismiss' + 'help' or 'quit' + 'random'), since they are adjacent.
      */
     XtSetArg(args[0], XtNwidth, &max_width);
     XtGetValues(left, args, ONE);
     XtSetArg(args[0], XtNwidth, &width);
     XtGetValues(right, args, ONE);
-    max_width = max_width + width + distance;
+    /* doesn't count leftmost 'distance + border_width' and
+       rightmost 'border_width + distance' since all entries have those */
+    max_width = max_width + border_width + skip + border_width + width;
 
     /* Next, the title. */
     XtSetArg(args[0], XtNwidth, &width);
@@ -978,6 +1001,40 @@ Widget *formp; /* return */
         if (width > max_width)
             max_width = width;
         curr++;
+    }
+
+    /*
+     * Re-do the two side-by-side widgets to take up half the width each.
+     *
+     * With max_width and skip both having even values, we never have to
+     * tweak left or right to maybe be one pixel wider than the other.
+     */
+    if (max_width % 2)
+        ++max_width;
+    XtSetArg(args[0], XtNwidth, &width);
+    XtGetValues(left, args, ONE);
+    XtSetArg(args[0], XtNwidth, &other_width);
+    XtGetValues(right, args, ONE);
+    if (width + border_width + skip / 2 < max_width / 2
+        && other_width + border_width + skip / 2 < max_width / 2) {
+        /* both are narrower than half */
+        width = other_width = max_width / 2 - border_width - skip / 2;
+        XtSetArg(args[0], XtNwidth, width);
+        XtSetValues(left, args, ONE);
+        XtSetArg(args[0], XtNwidth, other_width);
+        XtSetValues(right, args, ONE);
+    } else if (width + border_width + skip / 2 < max_width / 2) {
+        /* 'other_width' (right) is half or more */
+        width = max_width - other_width - 2 * border_width - skip;
+        XtSetArg(args[0], XtNwidth, width);
+        XtSetValues(left, args, ONE);
+    } else if (other_width + border_width + skip / 2 < max_width / 2) {
+        /* 'width' (left) is half or more */
+        other_width = max_width - width - 2 * border_width - skip;
+        XtSetArg(args[0], XtNwidth, other_width);
+        XtSetValues(right, args, ONE);
+    } else {
+        ; /* both are exactly half... */
     }
 
     /*
@@ -999,6 +1056,31 @@ Widget *formp; /* return */
     else
         free((char *) commands);
 
+    /*
+     * We actually want height of topmost background window, which
+     * may or may not be the root window.
+     *
+     * On OSX, screen height includes the space taken up by the
+     * desktop title bar, which isn't accessible to applications
+     * unless the preference settings for X11 are changed to force
+     * full-screen mode (so by default, this 'screen_height' value
+     * ends up being bigger than the available size...).
+     */
+    screen_height = XHeightOfScreen(XtScreen(popup));
+
+    /*
+     * If the menu's complete height is too big for the display,
+     * forcing the height to be smaller will cause the vertical
+     * scroll bar (enabled but not forced above) to be included.
+     */
+    if (cumulative_height >= screen_height) {
+        /* trial and error:  25 is a guesstimate for scrollbar width on
+           width adjustment and for title bar height on height adjustment */
+        num_args = 0;
+        XtSetArg(args[num_args], XtNwidth, max_width + 25); num_args++;
+        XtSetArg(args[num_args], XtNheight, screen_height - 25); num_args++;
+        XtSetValues(popup, args, num_args);
+    }
     XtRealizeWidget(popup);
     XSetWMProtocols(XtDisplay(popup), XtWindow(popup), &wm_delete_window, 1);
 
