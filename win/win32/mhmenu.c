@@ -169,7 +169,7 @@ mswin_menu_window_select_menu(HWND hWnd, int how, MENU_ITEM_P **_selected,
                     if (next_char > 'z')
                         next_char = 'A';
                     else if (next_char > 'Z')
-                        break;
+                        next_char = 'a';
 
                     data->menu.items[i].accelerator = next_char;
                 }
@@ -1441,7 +1441,11 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
         if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')
             || is_accelerator) {
             if (data->how == PICK_ANY || data->how == PICK_ONE) {
-                for (i = 0; i < data->menu.size; i++) {
+                topIndex = ListView_GetTopIndex(hwndList);
+                if( topIndex < 0 || topIndex > data->menu.size ) break; // impossible?
+                int iter = topIndex;
+                do {
+                    i = iter % data->menu.size;
                     if (data->menu.items[i].accelerator == ch) {
                         if (data->how == PICK_ANY) {
                             SelectMenuItem(
@@ -1459,7 +1463,7 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
                             return -2;
                         }
                     }
-                }
+                } while( (++iter % data->menu.size) != topIndex ); 
             }
         }
         break;
