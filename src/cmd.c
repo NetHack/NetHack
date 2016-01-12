@@ -3893,7 +3893,7 @@ long *count;
                 cnt = 0;
             else if (maxcount > 0 && cnt > maxcount)
                 cnt = maxcount;
-        } else if (key == '\b' || key == STANDBY_erase_char) {
+        } else if (cnt && (key == '\b' || key == STANDBY_erase_char)) {
             cnt = cnt / 10;
             backspaced = TRUE;
         } else if (key == '\033') {
