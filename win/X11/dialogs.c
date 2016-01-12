@@ -1,25 +1,24 @@
 /*
  * Copyright 1991 University of Wisconsin-Madison
  *
- * Permission to use, copy, modify, distribute, and sell this software and its
- * documentation for any purpose is hereby granted without fee, provided that
- * the above copyright notice appear in all copies and that both that
+ * Permission to use, copy, modify, distribute, and sell this software and
+ * its documentation for any purpose is hereby granted without fee, provided
+ * that the above copyright notice appear in all copies and that both that
  * copyright notice and this permission notice appear in supporting
- * documentation, and that the name of the University of Wisconsin-Madison not
- * be used in advertising or publicity pertaining to distribution of the
+ * documentation, and that the name of the University of Wisconsin-Madison
+ * not be used in advertising or publicity pertaining to distribution of the
  * software without specific, written prior permission.  The University of
  * Wisconsin-Madison makes no representations about the suitability of this
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *
- * THE UNIVERSITY OF WISCONSIN-MADISON DISCLAIMS ALL WARRANTIES WITH REGARD TO
- * THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * THE UNIVERSITY OF WISCONSIN-MADISON DISCLAIMS ALL WARRANTIES WITH REGARD
+ * TO THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS, IN NO EVENT SHALL THE UNIVERSITY OF WISCONSIN-MADISON BE LIABLE
- *FOR
- * ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
- * CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
- * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
  * Author:  Tim Theisen             Department of Computer Sciences
  *          tim@cs.wisc.edu         University of Wisconsin-Madison
@@ -32,24 +31,24 @@
  *
  *    + Make the cancel button optional.
  *    + Put an #ifdef SPECIAL_CMAP around code to fix a colormap bug.
- *	We don't need it here.
+ *      We don't need it here.
  *    + Add the function positionpopup() from another part of ghostview
- *	to this code.
+ *      to this code.
  *
  * Modified 2/93, Various.
  *    + Added workaround for SYSV include problem.
  *    + Changed the default width response text widget to be as wide as the
- *	window itself.  Suggestion from David E. Wexelblat, dwex@goblin.org.
+ *      window itself.  Suggestion from David E. Wexelblat, dwex@goblin.org.
  *
  * Modified 5/2015, anonymous.
  *    + Include nethack's lint.h to get nhStr() macro.
  *    + Use nhStr() on string literals (or macros from <X11/StringDefs.h>
- *	that hide string literals) to cast away implicit 'const' in order
- *	to suppress "warning: assignment discards qualifers from pointer
- *	target type" issued by 'gcc -Wwrite-strings' as used by nethack.
- *	(For this file, always the second parameter to XtSetArg().)
+ *      that hide string literals) to cast away implicit 'const' in order
+ *      to suppress "warning: assignment discards qualifers from pointer
+ *      target type" issued by 'gcc -Wwrite-strings' as used by nethack.
+ *      (For this file, always the second parameter to XtSetArg().)
  *
- * $NHDT-Date: 1432512808 2015/05/25 00:13:28 $  $NHDT-Branch: master $:$NHDT-Revision: 1.6 $
+ * $NHDT-Date: 1452594032 2016/01/12 10:20:32 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.7 $
  */
 
 #ifndef SYSV
@@ -85,10 +84,10 @@ static const char cancel_accelerators[] = "#override\n\
      :<Ctrl>[: set() notify() unset()\n"; /* for keyboards w/o an ESC */
 
 /* Create a dialog widget.  It is just a form widget with
- *	a label prompt
- *	a text response
- *	an okay button
- *	an optional cancel button
+ *      a label prompt
+ *      a text response
+ *      an okay button
+ *      an optional cancel button
  */
 Widget
 CreateDialog(parent, name, okay_callback, cancel_callback)
