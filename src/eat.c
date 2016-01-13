@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1451086430 2015/12/25 23:33:50 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.157 $ */
+/* NetHack 3.6	eat.c	$NHDT-Date: 1452660191 2016/01/13 04:43:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.161 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1479,8 +1479,10 @@ int
 Hear_again(VOID_ARGS)
 {
     /* Chance of deafness going away while fainted/sleeping/etc. */
-    if (!rn2(2))
+    if (!rn2(2)) {
         make_deaf(0L, FALSE);
+        context.botl = TRUE;
+    }
     return 0;
 }
 
@@ -1514,6 +1516,7 @@ struct obj *obj;
             where = (u.usteed) ? "saddle" : surface(u.ux, u.uy);
         pline_The("world spins and %s %s.", what, where);
         incr_itimeout(&HDeaf, duration);
+        context.botl = TRUE;
         nomul(-duration);
         multi_reason = "unconscious from rotten food";
         nomovemsg = "You are conscious again.";
@@ -2839,6 +2842,7 @@ boolean incr;
                 stop_occupation();
                 You("faint from lack of food.");
                 incr_itimeout(&HDeaf, duration);
+                context.botl = TRUE;
                 nomul(-duration);
                 multi_reason = "fainted from lack of food";
                 nomovemsg = "You regain consciousness.";

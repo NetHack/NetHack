@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1452123457 2016/01/06 23:37:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.216 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1452660189 2016/01/13 04:43:09 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.219 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1140,6 +1140,7 @@ wiz_intrinsic(VOID_ARGS)
         if (!strcmp(intrinsics[i],"deafness")) {
             You("go deaf.");
             incr_itimeout(&HDeaf, 30);
+            context.botl = TRUE;
         }
     } else
         pline("Unavailable command '%s'.",

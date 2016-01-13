@@ -1,4 +1,4 @@
-/* NetHack 3.6	potion.c	$NHDT-Date: 1450667491 2015/12/21 03:11:31 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.124 $ */
+/* NetHack 3.6	potion.c	$NHDT-Date: 1452660195 2016/01/13 04:43:15 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.126 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -410,8 +410,7 @@ boolean talk;
             You("are unable to hear anything.");
         toggled = TRUE;
     }
-    /* deafness isn't presently shown on status line, but
-       request a status update in case that changes someday */
+    /* request a status update */
     if (toggled)
         context.botl = TRUE;
 

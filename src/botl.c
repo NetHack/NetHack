@@ -1,4 +1,4 @@
-/* NetHack 3.6	botl.c	$NHDT-Date: 1447978683 2015/11/20 00:18:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.69 $ */
+/* NetHack 3.6	botl.c	$NHDT-Date: 1452660188 2016/01/13 04:43:08 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.70 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -122,6 +122,8 @@ bot2()
         Sprintf(nb = eos(nb), " Hallu");
     if (Slimed)
         Sprintf(nb = eos(nb), " Slime");
+    if (Deaf)
+        Sprintf(nb = eos(nb), " Df");
     if (cap > UNENCUMBERED)
         Sprintf(nb = eos(nb), " %s", enc_stat[cap]);
     curs(WIN_STATUS, 1, 1);
@@ -542,6 +544,11 @@ bot()
         blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_BLIND;
     else
         blstats[idx][BL_CONDITION].a.a_ulong &= ~BL_MASK_BLIND;
+
+    if (Deaf)
+        blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_DEAF;
+    else
+        blstats[idx][BL_CONDITION].a.a_ulong &= ~BL_MASK_DEAF;
 
     if (Confusion)
         blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_CONF;

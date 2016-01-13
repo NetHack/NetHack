@@ -1,4 +1,4 @@
-/* NetHack 3.6  botl.h  $NHDT-Date: 1433105378 2015/05/31 20:49:38 $  $NHDT-Branch: status_hilite $:$NHDT-Revision: 1.14 $ */
+/* NetHack 3.6  botl.h  $NHDT-Date: 1452660165 2016/01/13 04:42:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.15 $ */
 /* Copyright (c) Michael Allison, 2003                            */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -69,6 +69,7 @@ BL_EXP, BL_CONDITION };
 #define BL_MASK_HALLU           0x00000010L
 #define BL_MASK_STUNNED         0x00000020L
 #define BL_MASK_SLIMED          0x00000040L
+#define BL_MASK_DEAF            0x00000080L
 /* clang-format on */
 
 #define REASSESS_ONLY TRUE
