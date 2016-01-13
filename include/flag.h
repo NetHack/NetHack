@@ -168,9 +168,9 @@ struct sysflag {
  */
 
 /* values for iflags.getpos_coords */
-#define GPCOORDS_NONE      'n'
-#define GPCOORDS_ABSOLUTE  'a'
-#define GPCOORDS_CARTESIAN 'c'
+#define GPCOORDS_NONE    'n'
+#define GPCOORDS_MAP     'm'
+#define GPCOORDS_COMPASS 'c'
 
 struct instance_flags {
     /* stuff that really isn't option or platform related. They are

@@ -172,10 +172,9 @@ int dx, dy;
         if (dy) {
             if (abs(dy) > 9999)
                 dy = sgn(dy) * 9999;
-            Sprintf(eos(buf), "%d%c", abs(dy), (dy > 0) ? 's' : 'n');
+            Sprintf(eos(buf), "%d%c%s", abs(dy), (dy > 0) ? 's' : 'n',
+                    dx ? "," : "");
         }
-        if (dy && dx)
-            strkitten(buf, ',');
         if (dx) {
             if (abs(dx) > 9999)
                 dx = sgn(dx) * 9999;
@@ -201,12 +200,12 @@ int cx, cy;
         switch (iflags.getpos_coords) {
         default:
             break;
-        case GPCOORDS_CARTESIAN:
+        case GPCOORDS_COMPASS:
             dx = cc.x - u.ux;
             dy = cc.y - u.uy;
             Sprintf(tmpbuf, " (%s)", dxdy_to_dist_descr(dx, dy));
             break;
-        case GPCOORDS_ABSOLUTE:
+        case GPCOORDS_MAP:
             Sprintf(tmpbuf, " (%d,%d)", cc.x, cc.y);
             break;
         }

@@ -2343,8 +2343,8 @@ boolean tinitial, tfrom_file;
             return;
         } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
             if (tolower(*op) == GPCOORDS_NONE
-                || tolower(*op) == GPCOORDS_CARTESIAN
-                || tolower(*op) == GPCOORDS_ABSOLUTE) {
+                || tolower(*op) == GPCOORDS_COMPASS
+                || tolower(*op) == GPCOORDS_MAP) {
                 iflags.getpos_coords = tolower(*op);
             } else
                 badoption(opts);
@@ -4034,12 +4034,12 @@ boolean setinitial, setfromfile;
         tmpwin = create_nhwindow(NHW_MENU);
         start_menu(tmpwin);
         any = zeroany;
-        any.a_char = GPCOORDS_ABSOLUTE;
-        add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_ABSOLUTE,
-                 0, ATR_NONE, "absolute", MENU_UNSELECTED);
-        any.a_char = GPCOORDS_CARTESIAN;
-        add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_CARTESIAN,
-                 0, ATR_NONE, "cartesian", MENU_UNSELECTED);
+        any.a_char = GPCOORDS_COMPASS;
+        add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_COMPASS,
+                 0, ATR_NONE, "compass", MENU_UNSELECTED);
+        any.a_char = GPCOORDS_MAP;
+        add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_MAP,
+                 0, ATR_NONE, "map", MENU_UNSELECTED);
         any.a_char = GPCOORDS_NONE;
         add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_NONE,
                  0, ATR_NONE, "none", MENU_UNSELECTED);
@@ -4798,8 +4798,8 @@ char *buf;
         Sprintf(buf, "%s", runmodes[flags.runmode]);
     } else if (!strcmp(optname, "getpos_coord")) {
         Sprintf(buf, "%s",
-                (iflags.getpos_coords == GPCOORDS_ABSOLUTE) ? "absolute"
-                : (iflags.getpos_coords == GPCOORDS_CARTESIAN) ? "cartesian"
+                (iflags.getpos_coords == GPCOORDS_MAP) ? "map"
+                : (iflags.getpos_coords == GPCOORDS_COMPASS) ? "compass"
                 : "none");
     } else if (!strcmp(optname, "scores")) {
         Sprintf(buf, "%d top/%d around%s", flags.end_top, flags.end_around,
