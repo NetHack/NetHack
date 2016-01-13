@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1450306195 2015/12/16 22:49:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.180 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1452650438 2016/01/13 02:00:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.188 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1325,7 +1325,7 @@ struct obj *otmp;
 #if 1 /* 'P','R' vs 'W','T' handling is obsolete */
     nhUse(otmp);
 #else
-    const char *s1, *s2, *s3, *what;
+    const char *s1, *s2, *s3;
     int ocls = otmp->oclass, otyp = otmp->otyp;
 
     s1 = s2 = s3 = 0;
@@ -1344,14 +1344,10 @@ struct obj *otmp;
         else if (!strcmp(word, "take off"))
             s1 = "R", s2 = "remove", s3 = "";
     }
-    if (s1) {
-        what = "that";
-        /* quantity for armor and accessory objects is always 1,
-           but some things should be referred to as plural */
-        if (otyp == LENSES || is_gloves(otmp) || is_boots(otmp))
-            what = "those";
-        pline("Use the '%s' command to %s %s%s.", s1, s2, what, s3);
-    } else
+    if (s1)
+        pline("Use the '%s' command to %s %s%s.", s1, s2,
+              !is_plural(otmp) ? "that" : "those", s3);
+    else
 #endif
         pline(silly_thing_to, word);
 }
