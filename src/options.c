@@ -1274,6 +1274,26 @@ int clr;
     return (char *) 0;
 }
 
+int
+match_str2clr(str)
+char *str;
+{
+    int i, c = NO_COLOR;
+
+    /* allow "lightblue", "light blue", and "light-blue" to match "light blue"
+       (also junk like "_l i-gh_t---b l u e" but we won't worry about that);
+       also copes with trailing space; mungspaces removed any leading space */
+    for (i = 0; i < SIZE(colornames); i++)
+        if (colornames[i].name
+            && fuzzymatch(str, colornames[i].name, " -_", TRUE)) {
+            c = colornames[i].color;
+            break;
+        }
+    if (i == SIZE(colornames) && (*str >= '0' && *str <= '9'))
+        c = atoi(str);
+    return c;
+}
+
 const char *
 attr2attrname(attr)
 int attr;
@@ -1563,19 +1583,8 @@ char *str;
     if ((amp = index(tmps, '&')) != 0)
         *amp = '\0';
 
-    /* allow "lightblue", "light blue", and "light-blue" to match "light blue"
-       (also junk like "_l i-gh_t---b l u e" but we won't worry about that);
-       also copes with trailing space; mungspaces removed any leading space */
-    for (i = 0; i < SIZE(colornames); i++)
-        if (colornames[i].name
-            && fuzzymatch(tmps, colornames[i].name, " -_", TRUE)) {
-            c = colornames[i].color;
-            break;
-        }
-    if (i == SIZE(colornames) && (*tmps >= '0' && *tmps <= '9'))
-        c = atoi(tmps);
-
-    if (c > 15)
+    c = match_str2clr(tmps);
+    if (c >= CLR_MAX)
         return FALSE;
 
     if (amp) {

@@ -1214,21 +1214,10 @@ boolean from_configfile;
         } else if (strcmpi(how, "normal") == 0) {
             normal[i] = TRUE;
         } else {
-            int k;
-            char colorname[BUFSZ];
-            for (k = 0; k < CLR_MAX; ++k) {
-                /* we have to make a copy to change space to dash */
-                (void) strcpy(colorname, c_obj_colors[k]);
-                for (tmp = index(colorname, ' '); tmp;
-                     tmp = index(colorname, ' '))
-                    *tmp = '-';
-                if (strcmpi(how, colorname) == 0) {
-                    coloridx[i] = k;
-                    break;
-                }
-            }
+            int k = match_str2clr(how);
             if (k >= CLR_MAX)
                 return FALSE;
+            coloridx[i] = k;
         }
     }
 

@@ -1659,6 +1659,7 @@ E struct symparse *FDECL(match_sym, (char *));
 E void NDECL(set_playmode);
 E int FDECL(sym_val, (char *));
 E const char *FDECL(clr2colorname, (int));
+E int FDECL(match_str2clr, (char *));
 E boolean FDECL(add_menu_coloring, (char *));
 E boolean FDECL(get_menu_coloring, (char *, int *, int *));
 E void NDECL(free_menu_coloring);
