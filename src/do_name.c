@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1452465671 2016/01/10 22:41:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.88 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1452669022 2016/01/13 07:10:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.90 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -8,7 +8,8 @@ STATIC_DCL char *NDECL(nextmbuf);
 STATIC_DCL void FDECL(getpos_help, (BOOLEAN_P, const char *));
 STATIC_DCL int FDECL(CFDECLSPEC cmp_coord_distu, (const void *,
                                                   const void *));
-STATIC_OVL void FDECL(gather_locs, (coord **, int *, BOOLEAN_P));
+STATIC_DCL void FDECL(gather_locs, (coord **, int *, BOOLEAN_P));
+STATIC_DCL void FDECL(auto_describe, (int, int));
 STATIC_DCL void NDECL(do_mname);
 STATIC_DCL boolean FDECL(alreadynamed, (struct monst *, char *, char *));
 STATIC_DCL void FDECL(do_oname, (struct obj *));
@@ -143,39 +144,74 @@ boolean do_mons;
             }
 
         if (!pass) /* end of first pass */
-            *arr_p = (coord *) alloc(sizeof (coord) * *cnt_p);
+            *arr_p = (coord *) alloc(*cnt_p * sizeof (coord));
         else /* end of second pass */
             qsort(*arr_p, *cnt_p, sizeof (coord), cmp_coord_distu);
     } /* pass */
 }
 
 char *
-dxdy_to_dist_descr(dx,dy)
-int dx,dy;
+dxdy_to_dist_descr(dx, dy)
+int dx, dy;
 {
-    static char buf[QBUFSZ];
-    int d;
-    if (!dx && !dy)
+    /* [12] suffices, but guard against long translation for direction-name */
+    static char buf[20];
+    int dst;
+
+    if (!dx && !dy) {
         Sprintf(buf, "here");
-    else if ((d = xytod(dx,dy)) != -1)
-        Sprintf(buf, "%s", directionname(d));
-    else {
-        char tmp[QBUFSZ];
+    } else if ((dst = xytod(dx, dy)) != -1) {
+        /* explicit direction; 'one step' is implicit */
+        Sprintf(buf, "%s", directionname(dst));
+    } else {
         buf[0] = '\0';
+        /* 9999: protect buf[] against overflow caused by invalid values */
         if (dy) {
-            Sprintf(tmp, "%i%c", abs(dy), (dy > 0) ? 's' : 'n');
-            Strcat(buf, tmp);
+            if (abs(dy) > 9999)
+                dy = sgn(dy) * 9999;
+            Sprintf(eos(buf), "%d%c", abs(dy), (dy > 0) ? 's' : 'n');
         }
         if (dy && dx)
-            Strcat(buf, ",");
+            strkitten(buf, ',');
         if (dx) {
-            Sprintf(tmp, "%i%c", abs(dx), (dx > 0) ? 'e' : 'w');
-            Strcat(buf, tmp);
+            if (abs(dx) > 9999)
+                dx = sgn(dx) * 9999;
+            Sprintf(eos(buf), "%d%c", abs(dx), (dx > 0) ? 'e' : 'w');
         }
     }
     return buf;
 }
 
+STATIC_OVL void
+auto_describe(cx, cy)
+int cx, cy;
+{
+    coord cc;
+    int sym = 0, dx, dy;
+    char tmpbuf[BUFSZ];
+    const char *firstmatch = "unknown";
+
+    cc.x = cx;
+    cc.y = cy;
+    if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch)) {
+        tmpbuf[0] = '\0';
+        switch (iflags.getpos_coords) {
+        default:
+            break;
+        case GPCOORDS_CARTESIAN:
+            dx = cc.x - u.ux;
+            dy = cc.y - u.uy;
+            Sprintf(tmpbuf, " (%s)", dxdy_to_dist_descr(dx, dy));
+            break;
+        case GPCOORDS_ABSOLUTE:
+            Sprintf(tmpbuf, " (%d,%d)", cc.x, cc.y);
+            break;
+        }
+        pline("%s%s", firstmatch, tmpbuf);
+        curs(WIN_MAP, cx, cy);
+        flush_screen(0);
+    }
+}
 
 int
 getpos(ccp, force, goal)
@@ -217,33 +253,7 @@ const char *goal;
             flush_screen(0);
             show_goal_msg = FALSE;
         } else if (iflags.autodescribe && !msg_given && !hilite_state) {
-            coord cc;
-            int sym = 0;
-            char tmpbuf[BUFSZ];
-            char outbuf[BUFSZ];
-            const char *firstmatch = NULL;
-            int dx,dy;
-
-            cc.x = cx;
-            cc.y = cy;
-            if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch)) {
-                outbuf[0] = '\0';
-                switch (iflags.getpos_coords) {
-                default:
-                    break;
-                case GPCOORDS_CARTESIAN:
-                    dx = cc.x - u.ux;
-                    dy = cc.y - u.uy;
-                    Sprintf(outbuf, " (%s)", dxdy_to_dist_descr(dx,dy));
-                    break;
-                case GPCOORDS_ABSOLUTE:
-                    Sprintf(outbuf, " (%d,%d)", cc.x,cc.y);
-                    break;
-                }
-                pline("%s%s", firstmatch, outbuf);
-                curs(WIN_MAP, cx, cy);
-                flush_screen(0);
-            }
+            auto_describe(cx, cy);
         }
 
         c = nh_poskey(&tx, &ty, &sidx);
