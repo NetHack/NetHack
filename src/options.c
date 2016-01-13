@@ -1242,6 +1242,11 @@ static const struct {
     { "light cyan", CLR_BRIGHT_CYAN },
     { "white", CLR_WHITE },
     { NULL, CLR_BLACK }, /* everything after this is an alias */
+    { "transparent", NO_COLOR },
+    { "nocolor", NO_COLOR },
+    { "purple", CLR_MAGENTA },
+    { "light purple", CLR_BRIGHT_MAGENTA },
+    { "bright purple", CLR_BRIGHT_MAGENTA },
     { "grey", CLR_GRAY },
     { "bright red", CLR_ORANGE },
     { "bright green", CLR_BRIGHT_GREEN },
