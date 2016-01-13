@@ -1134,6 +1134,9 @@ register const char *let, *word;
              /* worn armor or accessory covered by cursed worn armor */
              || (taking_off(word)
                  && inaccessible_equipment(otmp, (const char *) 0, TRUE))
+             || (!strcmp(word, "write on")
+                 && (!(otyp == SCR_BLANK_PAPER || otyp == SPE_BLANK_PAPER)
+                     || !otmp->dknown || !objects[otyp].oc_name_known))
              ) {
                 /* acceptable but not listed as likely candidate */
                 foo--;
@@ -1160,6 +1163,11 @@ register const char *let, *word;
     if (!foo && !allowall && !allownone) {
         You("don't have anything %sto %s.", foox ? "else " : "", word);
         return (struct obj *) 0;
+    } else if (!strcmp(word, "write on")) { /* ugly check for magic marker */
+        /* we wanted all scrolls and books in altlets[], but that came with
+           'allowall' which we don't want since it prevents "silly thing"
+           result if anything other than scroll or spellbook is chosen */
+        allowall = FALSE;
     }
     for (;;) {
         cnt = 0;
