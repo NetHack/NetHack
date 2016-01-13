@@ -88,10 +88,13 @@ const void *b;
 
     dx = u.ux - c1->x;
     dy = u.uy - c1->y;
-    dist_1 = dx * dx + dy * dy;
+    dist_1 = max(abs(dx), abs(dy));
     dx = u.ux - c2->x;
     dy = u.uy - c2->y;
-    dist_2 = dx * dx + dy * dy;
+    dist_2 = max(abs(dx), abs(dy));
+
+    if (dist_1 == dist_2)
+        return (c1->y != c2->y) ? (c1->y - c2->y) : (c1->x - c2->x);
 
     return dist_1 - dist_2;
 }
