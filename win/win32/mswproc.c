@@ -1980,6 +1980,11 @@ mswin_preference_update(const char *pref)
         mswin_layout_main_window(NULL);
         return;
     }
+
+    if (stricmp(pref, "perm_invent") == 0) {
+        mswin_update_inventory();
+        return;
+    }
 }
 
 #define TEXT_BUFFER_SIZE 4096
