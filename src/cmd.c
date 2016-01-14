@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1451082253 2015/12/25 22:24:13 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.212 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1452660189 2016/01/13 04:43:09 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.219 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1140,6 +1140,7 @@ wiz_intrinsic(VOID_ARGS)
         if (!strcmp(intrinsics[i],"deafness")) {
             You("go deaf.");
             incr_itimeout(&HDeaf, 30);
+            context.botl = TRUE;
         }
     } else
         pline("Unavailable command '%s'.",
@@ -2777,6 +2778,7 @@ struct ext_func_tab extcmdlist[] = {
     { "force", "force a lock", doforce, FALSE },
     { "invoke", "invoke an object's powers", doinvoke, TRUE },
     { "jump", "jump to a location", dojump, FALSE },
+    { "kick", "kick something", dokick, FALSE },
     { "loot", "loot a box on the floor", doloot, FALSE },
     { "monster", "use a monster's special ability", domonability, TRUE },
     { "name", "name a monster or an object", docallcmd, TRUE },
@@ -3864,6 +3866,60 @@ int x, y, mod;
     return cmd;
 }
 
+char
+get_count(allowchars, inkey, maxcount, count)
+char *allowchars;
+char inkey;
+long maxcount;
+long *count;
+{
+    char qbuf[QBUFSZ];
+    int key;
+    long cnt = 0L;
+    boolean backspaced = FALSE;
+    /* this should be done in port code so that we have erase_char
+       and kill_char available; we can at least fake erase_char */
+#define STANDBY_erase_char '\177'
+
+    for (;;) {
+        if (inkey) {
+            key = inkey;
+            inkey = '\0';
+        } else
+            key = readchar();
+
+        if (digit(key)) {
+            cnt = 10L * cnt + (long) (key - '0');
+            if (cnt < 0)
+                cnt = 0;
+            else if (maxcount > 0 && cnt > maxcount)
+                cnt = maxcount;
+        } else if (cnt && (key == '\b' || key == STANDBY_erase_char)) {
+            cnt = cnt / 10;
+            backspaced = TRUE;
+        } else if (key == '\033') {
+            break;
+        } else if (!allowchars || index(allowchars, key)) {
+            *count = cnt;
+            break;
+        }
+
+        if (cnt > 9 || backspaced) {
+            clear_nhwindow(WIN_MESSAGE);
+            if (backspaced && !cnt) {
+                Sprintf(qbuf, "Count: ");
+            } else {
+                Sprintf(qbuf, "Count: %ld", cnt);
+                backspaced = FALSE;
+            }
+            pline1(qbuf);
+            mark_synch();
+        }
+    }
+    return key;
+}
+
+
 STATIC_OVL char *
 parse()
 {
@@ -3882,25 +3938,12 @@ parse()
 #ifdef ALTMETA
     alt_esc = iflags.altmeta; /* readchar() hack */
 #endif
-    if (!Cmd.num_pad || (foo = readchar()) == 'n')
-        for (;;) {
-            foo = readchar();
-            if (foo >= '0' && foo <= '9') {
-                multi = 10 * multi + foo - '0';
-                if (multi < 0 || multi >= LARGEST_INT)
-                    multi = LARGEST_INT;
-                if (multi > 9) {
-                    clear_nhwindow(WIN_MESSAGE);
-                    Sprintf(in_line, "Count: %d", multi);
-                    pline1(in_line);
-                    mark_synch();
-                }
-                last_multi = multi;
-                if (!multi && foo == '0')
-                    prezero = TRUE;
-            } else
-                break; /* not a digit */
-        }
+    if (!Cmd.num_pad || (foo = readchar()) == 'n') {
+        long tmpmulti = multi;
+
+        foo = get_count(NULL, '\0', LARGEST_INT, &tmpmulti);
+        last_multi = multi = tmpmulti;
+    }
 #ifdef ALTMETA
     alt_esc = FALSE; /* readchar() reset */
 #endif

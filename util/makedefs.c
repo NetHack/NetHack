@@ -1323,6 +1323,9 @@ static const char *build_opts[] = {
 #ifdef TEXTCOLOR
     "color",
 #endif
+#ifdef TTY_TILES_ESCCODES
+    "console escape codes for tile hinting",
+#endif
 #ifdef COM_COMPL
     "command line completion",
 #endif
@@ -1346,6 +1349,9 @@ static const char *build_opts[] = {
 #endif
 #ifdef HOLD_LOCKFILE_OPEN
     "exclusive lock on level 0 file",
+#endif
+#if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
+    "external program as a message handler",
 #endif
 #ifdef LOGFILE
     "log file",

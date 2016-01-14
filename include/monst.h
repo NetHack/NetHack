@@ -159,6 +159,16 @@ struct monst {
 #define is_vampshifter(mon)                                      \
     ((mon)->cham == PM_VAMPIRE || (mon)->cham == PM_VAMPIRE_LORD \
      || (mon)->cham == PM_VLAD_THE_IMPALER)
+
+/* mimic appearances that block vision/light */
+#define is_lightblocker_mappear(mon)                    \
+    (is_obj_mappear(mon, BOULDER) ||                    \
+     ((mon)->m_ap_type == M_AP_FURNITURE                \
+      && ((mon)->mappearance == S_hcdoor                \
+          || (mon)->mappearance == S_vcdoor             \
+          || (mon)->mappearance < S_ndoor /* = walls */ \
+          || (mon)->mappearance == S_tree)))
+
 #define is_door_mappear(mon) ((mon)->m_ap_type == M_AP_FURNITURE \
      && ((mon)->mappearance == S_hcdoor || (mon)->mappearance == S_vcdoor))
 #define is_obj_mappear(mon,otyp) ((mon)->m_ap_type == M_AP_OBJECT \

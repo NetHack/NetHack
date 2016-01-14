@@ -1,4 +1,4 @@
-/* NetHack 3.6	timeout.c	$NHDT-Date: 1446861771 2015/11/07 02:02:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.63 $ */
+/* NetHack 3.6	timeout.c	$NHDT-Date: 1452660198 2016/01/13 04:43:18 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.64 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -345,6 +345,7 @@ nh_timeout()
             case DEAF:
                 set_itimeout(&HDeaf, 1L);
                 make_deaf(0L, TRUE);
+                context.botl = TRUE;
                 if (!Deaf)
                     stop_occupation();
                 break;
@@ -443,6 +444,7 @@ boolean wakeup_msg;
         /* caller can follow with a direct call to Hear_again() if
            there's a need to override this when wakeup_msg is true */
         incr_itimeout(&HDeaf, how_long);
+        context.botl = TRUE;
         afternmv = Hear_again; /* this won't give any messages */
     }
     /* early wakeup from combat won't be possible until next monster turn */
@@ -1288,6 +1290,7 @@ do_storms()
         /* Even if already deaf, we sense the thunder's vibrations. */
         pline("Kaboom!!!  Boom!!  Boom!!");
         incr_itimeout(&HDeaf, rn1(20, 30));
+        context.botl = TRUE;
         if (!u.uinvulnerable) {
             stop_occupation();
             nomul(-3);

@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1450582748 2015/12/20 03:39:08 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.217 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1452660177 2016/01/13 04:42:57 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.219 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -772,8 +772,6 @@ beautiful()
                      : "handsome")
                : "ugly");
 }
-
-#define WEAK 3 /* from eat.c */
 
 static const char look_str[] = "look %s.";
 
@@ -1782,6 +1780,7 @@ struct obj *obj;
             if (Deaf) /* make_deaf() won't give feedback when already deaf */
                 pline("Nothing seems to happen.");
             make_deaf((HDeaf & TIMEOUT) + lcount, TRUE);
+            context.botl = TRUE;
             break;
         }
         return;

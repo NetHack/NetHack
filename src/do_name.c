@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_name.c	$NHDT-Date: 1450178550 2015/12/15 11:22:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.80 $ */
+/* NetHack 3.6	do_name.c	$NHDT-Date: 1452669022 2016/01/13 07:10:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.90 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -6,6 +6,10 @@
 
 STATIC_DCL char *NDECL(nextmbuf);
 STATIC_DCL void FDECL(getpos_help, (BOOLEAN_P, const char *));
+STATIC_DCL int FDECL(CFDECLSPEC cmp_coord_distu, (const void *,
+                                                  const void *));
+STATIC_DCL void FDECL(gather_locs, (coord **, int *, BOOLEAN_P));
+STATIC_DCL void FDECL(auto_describe, (int, int));
 STATIC_DCL void NDECL(do_mname);
 STATIC_DCL boolean FDECL(alreadynamed, (struct monst *, char *, char *));
 STATIC_DCL void FDECL(do_oname, (struct obj *));
@@ -30,7 +34,7 @@ nextmbuf()
 /* function for getpos() to highlight desired map locations.
  * parameter value 0 = initialize, 1 = highlight, 2 = done
  */
-void FDECL((*getpos_hilitefunc), (int)) = (void FDECL((*), (int))) 0;
+static void FDECL((*getpos_hilitefunc), (int)) = (void FDECL((*), (int))) 0;
 
 void
 getpos_sethilite(f)
@@ -55,6 +59,8 @@ const char *goal;
     putstr(tmpwin, 0, "Use [HJKL] to move the cursor 8 units at a time.");
     putstr(tmpwin, 0, "Or enter a background symbol (ex. <).");
     putstr(tmpwin, 0, "Use @ to move the cursor on yourself.");
+    putstr(tmpwin, 0, "Use m or M to move the cursor to next monster.");
+    putstr(tmpwin, 0, "Use o or O to move the cursor to next object.");
     if (getpos_hilitefunc)
         putstr(tmpwin, 0, "Use $ to display valid locations.");
     putstr(tmpwin, 0, "Use # to toggle automatic description.");
@@ -71,6 +77,144 @@ const char *goal;
     destroy_nhwindow(tmpwin);
 }
 
+STATIC_OVL int
+cmp_coord_distu(a, b)
+const void *a;
+const void *b;
+{
+    const coord *c1 = a;
+    const coord *c2 = b;
+    int dx, dy, dist_1, dist_2;
+
+    dx = u.ux - c1->x;
+    dy = u.uy - c1->y;
+    dist_1 = max(abs(dx), abs(dy));
+    dx = u.ux - c2->x;
+    dy = u.uy - c2->y;
+    dist_2 = max(abs(dx), abs(dy));
+
+    if (dist_1 == dist_2)
+        return (c1->y != c2->y) ? (c1->y - c2->y) : (c1->x - c2->x);
+
+    return dist_1 - dist_2;
+}
+
+/* gather locations for monsters or objects shown on the map */
+STATIC_OVL void
+gather_locs(arr_p, cnt_p, do_mons)
+coord **arr_p;
+int *cnt_p;
+boolean do_mons;
+{
+    int x, y, pass, glyph, idx,
+        tail = (do_mons ? monnum_to_glyph(PM_LONG_WORM_TAIL) : 0),
+        boulder = (!do_mons ? objnum_to_glyph(BOULDER) : 0),
+        rock = (!do_mons ? objnum_to_glyph(ROCK) : 0);
+
+    /*
+     * We always include the hero's location even if there is no monster
+     * (invisible hero without see invisible) or object (usual case)
+     * displayed there.  That way, the count will always be at least 1,
+     * and player has a visual indicator (cursor returns to hero's spot)
+     * highlighting when successive 'm's or 'o's have cycled all the way
+     * through all monsters or objects.
+     *
+     * Hero's spot will always sort to array[0] because it will always
+     * be the shortest distance (namely, 0 units) away from <u.ux,u.uy>.
+     */
+    *cnt_p = idx = 0;
+    for (pass = 0; pass < 2; pass++) {
+        for (x = 1; x < COLNO; x++)
+            for (y = 0; y < ROWNO; y++) {
+                /* TODO: if glyph is a pile glyph, convert to ordinary one
+                 *       in order to keep tail/boulder/rock check simple.
+                 */
+                glyph = glyph_at(x, y);
+                /* unlike '/M', this skips monsters revealed by
+                   warning glyphs and remembered invisible ones */
+                if ((x == u.ux && y == u.uy)
+                    || (do_mons ? (glyph_is_monster(glyph) && glyph != tail)
+                                : (glyph_is_object(glyph)
+                                   && glyph != boulder && glyph != rock))) {
+                    if (!pass) {
+                        ++*cnt_p;
+                    } else {
+                        (*arr_p)[idx].x = x;
+                        (*arr_p)[idx].y = y;
+                        ++idx;
+                    }
+                }
+            }
+
+        if (!pass) /* end of first pass */
+            *arr_p = (coord *) alloc(*cnt_p * sizeof (coord));
+        else /* end of second pass */
+            qsort(*arr_p, *cnt_p, sizeof (coord), cmp_coord_distu);
+    } /* pass */
+}
+
+char *
+dxdy_to_dist_descr(dx, dy)
+int dx, dy;
+{
+    /* [12] suffices, but guard against long translation for direction-name */
+    static char buf[20];
+    int dst;
+
+    if (!dx && !dy) {
+        Sprintf(buf, "here");
+    } else if ((dst = xytod(dx, dy)) != -1) {
+        /* explicit direction; 'one step' is implicit */
+        Sprintf(buf, "%s", directionname(dst));
+    } else {
+        buf[0] = '\0';
+        /* 9999: protect buf[] against overflow caused by invalid values */
+        if (dy) {
+            if (abs(dy) > 9999)
+                dy = sgn(dy) * 9999;
+            Sprintf(eos(buf), "%d%c%s", abs(dy), (dy > 0) ? 's' : 'n',
+                    dx ? "," : "");
+        }
+        if (dx) {
+            if (abs(dx) > 9999)
+                dx = sgn(dx) * 9999;
+            Sprintf(eos(buf), "%d%c", abs(dx), (dx > 0) ? 'e' : 'w');
+        }
+    }
+    return buf;
+}
+
+STATIC_OVL void
+auto_describe(cx, cy)
+int cx, cy;
+{
+    coord cc;
+    int sym = 0, dx, dy;
+    char tmpbuf[BUFSZ];
+    const char *firstmatch = "unknown";
+
+    cc.x = cx;
+    cc.y = cy;
+    if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch)) {
+        tmpbuf[0] = '\0';
+        switch (iflags.getpos_coords) {
+        default:
+            break;
+        case GPCOORDS_COMPASS:
+            dx = cc.x - u.ux;
+            dy = cc.y - u.uy;
+            Sprintf(tmpbuf, " (%s)", dxdy_to_dist_descr(dx, dy));
+            break;
+        case GPCOORDS_MAP:
+            Sprintf(tmpbuf, " (%d,%d)", cc.x, cc.y);
+            break;
+        }
+        pline("%s%s", firstmatch, tmpbuf);
+        curs(WIN_MAP, cx, cy);
+        flush_screen(0);
+    }
+}
+
 int
 getpos(ccp, force, goal)
 coord *ccp;
@@ -85,6 +229,8 @@ const char *goal;
     static const char pick_chars[] = ".,;:";
     const char *cp;
     boolean hilite_state = FALSE;
+    coord *monarr = (coord *) 0, *objarr = (coord *) 0;
+    int moncount = 0, monidx = 0, objcount = 0, objidx = 0;
 
     if (!goal)
         goal = "desired location";
@@ -109,18 +255,7 @@ const char *goal;
             flush_screen(0);
             show_goal_msg = FALSE;
         } else if (iflags.autodescribe && !msg_given && !hilite_state) {
-            coord cc;
-            int sym = 0;
-            char tmpbuf[BUFSZ];
-            const char *firstmatch = NULL;
-
-            cc.x = cx;
-            cc.y = cy;
-            if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch)) {
-                pline1(firstmatch);
-                curs(WIN_MAP, cx, cy);
-                flush_screen(0);
-            }
+            auto_describe(cx, cy);
         }
 
         c = nh_poskey(&tx, &ty, &sidx);
@@ -192,7 +327,7 @@ const char *goal;
         if (c == '?' || redraw_cmd(c)) {
             if (c == '?')
                 getpos_help(force, goal);
-            else         /* ^R */
+            else /* ^R */
                 docrt(); /* redraw */
             /* update message window to reflect that we're still targetting */
             show_goal_msg = TRUE;
@@ -213,14 +348,46 @@ const char *goal;
                 show_goal_msg = TRUE;
             msg_given = TRUE;
             goto nxtc;
-        } else if (c == '@') {
+        } else if (c == '@') { /* return to hero's spot */
+            /* reset 'm','M' and 'o','O'; otherwise, there's no way for player
+               to achieve that except by manually cycling through all spots */
+            monidx = objidx = 0;
             cx = u.ux;
             cy = u.uy;
+            goto nxtc;
+        } else if (c == 'm' || c == 'M') { /* nearest or farthest monster */
+            if (!monarr) {
+                gather_locs(&monarr, &moncount, TRUE);
+                monidx = 0; /* monarr[0] is hero's spot */
+            }
+            if (c == 'm') {
+                monidx = (monidx + 1) % moncount;
+            } else {
+                if (--monidx < 0)
+                    monidx = moncount - 1;
+            }
+            cx = monarr[monidx].x;
+            cy = monarr[monidx].y;
+            goto nxtc;
+        } else if (c == 'o' || c == 'O') { /* nearest or farthest object */
+            if (!objarr) {
+                gather_locs(&objarr, &objcount, FALSE);
+                objidx = 0; /* objarr[0] is hero's spot */
+            }
+            if (c == 'o') {
+                objidx = (objidx + 1) % objcount;
+            } else {
+                if (--objidx < 0)
+                    objidx = objcount - 1;
+            }
+            cx = objarr[objidx].x;
+            cy = objarr[objidx].y;
             goto nxtc;
         } else {
             if (!index(quitchars, c)) {
                 char matching[MAXPCHARS];
                 int pass, lo_x, lo_y, hi_x, hi_y, k = 0;
+
                 (void) memset((genericptr_t) matching, 0, sizeof matching);
                 for (sidx = 1; sidx < MAXPCHARS; sidx++)
                     if (c == defsyms[sidx].sym || c == (int) showsyms[sidx])
@@ -307,6 +474,10 @@ const char *goal;
         clear_nhwindow(WIN_MESSAGE);
     ccp->x = cx;
     ccp->y = cy;
+    if (monarr)
+        free((genericptr_t) monarr);
+    if (objarr)
+        free((genericptr_t) objarr);
     getpos_hilitefunc = (void FDECL((*), (int))) 0;
     return result;
 }

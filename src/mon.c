@@ -1172,6 +1172,9 @@ long flag;
     boolean wantpool, poolok, lavaok, nodiag;
     boolean rockok = FALSE, treeok = FALSE, thrudoor;
     int maxx, maxy;
+    boolean poisongas_ok, in_poisongas;
+    NhRegion *gas_reg;
+    int gas_glyph = cmap_to_glyph(S_poisoncloud);
 
     x = mon->mx;
     y = mon->my;
@@ -1183,6 +1186,11 @@ long flag;
               || (is_swimmer(mdat) && !wantpool));
     lavaok = (is_flyer(mdat) || is_clinger(mdat) || likes_lava(mdat));
     thrudoor = ((flag & (ALLOW_WALL | BUSTDOOR)) != 0L);
+    poisongas_ok = ((nonliving(mdat) || is_vampshifter(mon)
+                     || breathless(mdat)) || resists_poison(mon));
+    in_poisongas = ((gas_reg = visible_region_at(x,y)) != 0
+                    && gas_reg->glyph == gas_glyph);
+
     if (flag & ALLOW_DIG) {
         struct obj *mw_tmp;
 
@@ -1230,6 +1238,11 @@ nexttry: /* eels prefer the water, but if there is no water nearby,
                 && (((levl[nx][ny].doormask & D_CLOSED) && !(flag & OPENDOOR))
                     || ((levl[nx][ny].doormask & D_LOCKED)
                         && !(flag & UNLOCKDOOR))) && !thrudoor)
+                continue;
+            /* avoid poison gas? */
+            if (!poisongas_ok && !in_poisongas
+                && (gas_reg = visible_region_at(nx,ny)) != 0
+                && gas_reg->glyph == gas_glyph)
                 continue;
             /* first diagonal checks (tight squeezes handled below) */
             if (nx != x && ny != y
@@ -1653,6 +1666,8 @@ struct permonst *mptr; /* reflects mtmp->data _prior_ to mtmp's death */
     remove_monster(mtmp->mx, mtmp->my);
     if (emits_light(mptr))
         del_light_source(LS_MONSTER, monst_to_any(mtmp));
+    if (mtmp->m_ap_type)
+        seemimic(mtmp);
     newsym(mtmp->mx, mtmp->my);
     unstuck(mtmp);
     fill_pit(mtmp->mx, mtmp->my);
@@ -2616,8 +2631,7 @@ void
 seemimic(mtmp)
 register struct monst *mtmp;
 {
-    boolean is_blocker_appear = (is_door_mappear(mtmp)
-                                 || is_obj_mappear(mtmp, BOULDER));
+    boolean is_blocker_appear = (is_lightblocker_mappear(mtmp));
 
     if (has_mcorpsenm(mtmp))
         freemcorpsenm(mtmp);
@@ -3143,8 +3157,9 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
     struct permonst *olddata = mtmp->data;
     char oldname[BUFSZ], l_oldname[BUFSZ], newname[BUFSZ];
 
-    /* Riders are immune to polymorph and green slime */
-    if (is_rider(mtmp->data))
+    /* Riders are immune to polymorph and green slime
+       (but apparent Rider might actually be a doppelganger) */
+    if (is_rider(mtmp->data) && mtmp->cham == NON_PM)
         return 0;
 
     if (msg) {

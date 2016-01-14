@@ -285,7 +285,7 @@ boolean force;      /* Quietly force this animal */
     }
     if (!can_saddle(mtmp) || !can_ride(mtmp)) {
         You_cant("ride such a creature.");
-        return (0);
+        return FALSE;
     }
 
     /* Is the player impaired? */
@@ -332,7 +332,8 @@ boolean force;      /* Quietly force this animal */
     u.usteed = mtmp;
     remove_monster(mtmp->mx, mtmp->my);
     teleds(mtmp->mx, mtmp->my, TRUE);
-    return (TRUE);
+    context.botl = TRUE;
+    return TRUE;
 }
 
 /* You and your steed have moved */
@@ -610,11 +611,11 @@ int reason; /* Player was thrown off etc. */
         in_steed_dismounting = TRUE;
         (void) float_down(0L, W_SADDLE);
         in_steed_dismounting = FALSE;
-        context.botl = 1;
+        context.botl = TRUE;
         (void) encumber_msg();
         vision_full_recalc = 1;
     } else
-        context.botl = 1;
+        context.botl = TRUE;
     /* polearms behave differently when not mounted */
     if (uwep && is_pole(uwep))
         unweapon = TRUE;

@@ -325,8 +325,7 @@ boolean with_you;
     xyflags = mtmp->mtrack[0].y;
     xlocale = mtmp->mtrack[1].x;
     ylocale = mtmp->mtrack[1].y;
-    mtmp->mtrack[0].x = mtmp->mtrack[0].y = 0;
-    mtmp->mtrack[1].x = mtmp->mtrack[1].y = 0;
+    memset(mtmp->mtrack, 0, sizeof(mtmp->mtrack));
 
     if (mtmp == u.usteed)
         return; /* don't place steed on the map */

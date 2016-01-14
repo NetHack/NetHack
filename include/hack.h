@@ -29,6 +29,9 @@
 #define EXT_ENCUMBER 4 /* Overtaxed */
 #define OVERLOADED 5   /* Overloaded */
 
+/* weight increment of heavy iron ball */
+#define IRON_BALL_W_INCR 160
+
 /* hunger states - see hu_stat in eat.c */
 #define SATIATED 0
 #define NOT_HUNGRY 1

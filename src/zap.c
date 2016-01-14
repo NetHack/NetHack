@@ -1875,10 +1875,14 @@ struct obj *obj, *otmp;
                         You_hear("a crumbling sound.");
                 }
             } else {
+                int oox = obj->ox;
+                int ooy = obj->oy;
                 if (context.mon_moving
                         ? !breaks(obj, obj->ox, obj->oy)
                         : !hero_breaks(obj, obj->ox, obj->oy, FALSE))
                     maybelearnit = FALSE; /* nothing broke */
+                else
+                    newsym_force(oox,ooy);
                 res = 0;
             }
             if (maybelearnit)
@@ -2368,7 +2372,13 @@ boolean ordinary;
         }
         if (u.utrap) { /* escape web or bear trap */
             (void) openholdingtrap(&youmonst, &learn_it);
-        } else { /* trigger previously escaped trapdoor */
+        } else {
+            struct obj *otmp;
+            /* unlock carried boxes */
+            for (otmp = invent; otmp; otmp = otmp->nobj)
+                if (Is_box(otmp))
+                    (void) boxlock(otmp, obj);
+            /* trigger previously escaped trapdoor */
             (void) openfallingtrap(&youmonst, TRUE, &learn_it);
         }
         break;
@@ -3097,6 +3107,7 @@ struct obj **pobj; /* object tossed/used, set to NULL
         /* iron bars will block anything big enough */
         if ((weapon == THROWN_WEAPON || weapon == KICKED_WEAPON)
             && typ == IRONBARS && hits_bars(pobj, x - ddx, y - ddy,
+                                            bhitpos.x, bhitpos.y,
                                             point_blank ? 0 : !rn2(5), 1)) {
             /* caveat: obj might now be null... */
             obj = *pobj;
@@ -4227,8 +4238,8 @@ short exploding_wand_typ;
 
     case ZT_COLD:
         if (is_pool(x, y) || is_lava(x, y)) {
-            boolean lava = is_lava(x, y);
-            boolean moat = is_moat(x, y);
+            boolean lava = is_lava(x, y),
+                    moat = is_moat(x, y);
 
             if (lev->typ == WATER) {
                 /* For now, don't let WATER freeze. */
@@ -4238,23 +4249,25 @@ short exploding_wand_typ;
                     You_hear("a soft crackling.");
                 rangemod -= 1000; /* stop */
             } else {
+                char buf[BUFSZ];
+
+                Strcpy(buf, waterbody_name(x, y)); /* for MOAT */
                 rangemod -= 3;
                 if (lev->typ == DRAWBRIDGE_UP) {
                     lev->drawbridgemask &= ~DB_UNDER; /* clear lava */
                     lev->drawbridgemask |= (lava ? DB_FLOOR : DB_ICE);
                 } else {
                     if (!lava)
-                        lev->icedpool =
-                            (lev->typ == POOL ? ICED_POOL : ICED_MOAT);
-                    lev->typ = (lava ? ROOM : ICE);
+                        lev->icedpool = (lev->typ == POOL) ? ICED_POOL
+                                                           : ICED_MOAT;
+                    lev->typ = lava ? ROOM : ICE;
                 }
                 bury_objs(x, y);
                 if (see_it) {
                     if (lava)
                         Norep("The lava cools and solidifies.");
                     else if (moat)
-                        Norep("The %s is bridged with ice!",
-                              waterbody_name(x, y));
+                        Norep("The %s is bridged with ice!", buf);
                     else
                         Norep("The water freezes.");
                     newsym(x, y);
@@ -4304,6 +4317,10 @@ short exploding_wand_typ;
             }
         }
         break; /* ZT_COLD */
+
+    case ZT_POISON_GAS:
+        (void) create_gas_cloud(x, y, 1, 8);
+        break;
 
     case ZT_ACID:
         if (lev->typ == IRONBARS) {

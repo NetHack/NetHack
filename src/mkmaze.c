@@ -19,7 +19,6 @@ STATIC_DCL void FDECL(maze0xy, (coord *));
 STATIC_DCL boolean FDECL(put_lregion_here, (XCHAR_P, XCHAR_P, XCHAR_P,
                                             XCHAR_P, XCHAR_P, XCHAR_P,
                                             XCHAR_P, BOOLEAN_P, d_level *));
-STATIC_DCL void NDECL(fixup_special);
 STATIC_DCL void NDECL(setup_waterlevel);
 STATIC_DCL void NDECL(unsetup_waterlevel);
 
@@ -123,13 +122,9 @@ int wall_there, dx, dy;
     return spine;
 }
 
-/*
- * Wall cleanup.  This function has two purposes: (1) remove walls that
- * are totally surrounded by stone - they are redundant.  (2) correct
- * the types so that they extend and connect to each other.
- */
+/* Remove walls totally surrounded by stone */
 void
-wallification(x1, y1, x2, y2)
+wall_cleanup(x1, y1, x2, y2)
 int x1, y1, x2, y2;
 {
     uchar type;
@@ -138,9 +133,9 @@ int x1, y1, x2, y2;
 
     /* sanity check on incoming variables */
     if (x1 < 0 || x2 >= COLNO || x1 > x2 || y1 < 0 || y2 >= ROWNO || y1 > y2)
-        panic("wallification: bad bounds (%d,%d) to (%d,%d)", x1, y1, x2, y2);
+        panic("wall_cleanup: bad bounds (%d,%d) to (%d,%d)", x1, y1, x2, y2);
 
-    /* Step 1: change walls surrounded by rock to rock. */
+    /* change walls surrounded by rock to rock. */
     for (x = x1; x <= x2; x++)
         for (y = y1; y <= y2; y++) {
             lev = &levl[x][y];
@@ -153,10 +148,9 @@ int x1, y1, x2, y2;
                     lev->typ = STONE;
             }
         }
-
-    fix_wall_spines(x1,y1,x2,y2);
 }
 
+/* Correct wall types so they extend and connect to each other */
 void
 fix_wall_spines(x1, y1, x2, y2)
 int x1, y1, x2, y2;
@@ -181,11 +175,7 @@ int x1, y1, x2, y2;
     if (x1<0 || x2>=COLNO || x1>x2 || y1<0 || y2>=ROWNO || y1>y2)
         panic("wall_extends: bad bounds (%d,%d) to (%d,%d)",x1,y1,x2,y2);
 
-    /*
-     * Step 2: set the correct wall type.  We can't combine steps
-     * 1 and 2 into a single sweep because we depend on knowing if
-     * the surrounding positions are stone.
-     */
+    /* set the correct wall type. */
     for (x = x1; x <= x2; x++)
         for (y = y1; y <= y2; y++) {
             lev = &levl[x][y];
@@ -215,6 +205,14 @@ int x1, y1, x2, y2;
             if (bits)
                 lev->typ = spine_array[bits];
         }
+}
+
+void
+wallification(x1, y1, x2, y2)
+int x1, y1, x2, y2;
+{
+    wall_cleanup(x1,y1,x2,y2);
+    fix_wall_spines(x1,y1,x2,y2);
 }
 
 STATIC_OVL boolean
@@ -363,7 +361,7 @@ d_level *lev;
 static boolean was_waterlevel; /* ugh... this shouldn't be needed */
 
 /* this is special stuff that the level compiler cannot (yet) handle */
-STATIC_OVL void
+void
 fixup_special()
 {
     register lev_region *r = lregions;
@@ -578,7 +576,6 @@ register const char *s;
     if (*protofile) {
         Strcat(protofile, LEV_EXT);
         if (load_special(protofile)) {
-            fixup_special();
             /* some levels can end up with monsters
                on dead mon list, including light source monsters */
             dmonsfree();

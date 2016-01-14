@@ -1201,8 +1201,7 @@ set_mimic_blocking()
     for (mon = fmon; mon; mon = mon->nmon) {
         if (DEADMONSTER(mon))
             continue;
-        if (mon->minvis && (is_door_mappear(mon)
-                            || is_obj_mappear(mon,BOULDER))) {
+        if (mon->minvis && is_lightblocker_mappear(mon)) {
             if (See_invisible)
                 block_point(mon->mx, mon->my);
             else
@@ -1318,6 +1317,21 @@ typedef struct {
 static gbuf_entry gbuf[ROWNO][COLNO];
 static char gbuf_start[ROWNO];
 static char gbuf_stop[ROWNO];
+
+/* FIXME: This is a dirty hack, because newsym() doesn't distinguish
+ * between object piles and single objects, it doesn't mark the location
+ * for update. */
+void
+newsym_force(x, y)
+register int x, y;
+{
+    newsym(x,y);
+    gbuf[y][x].new = 1;
+    if (gbuf_start[y] > x)
+        gbuf_start[y] = x;
+    if (gbuf_stop[y] < x)
+        gbuf_stop[y] = x;
+}
 
 /*
  * Store the glyph in the 3rd screen for later flushing.

@@ -1,4 +1,4 @@
-/* NetHack 3.6	music.c	$NHDT-Date: 1446808448 2015/11/06 11:14:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.40 $ */
+/* NetHack 3.6	music.c	$NHDT-Date: 1452660194 2016/01/13 04:43:14 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.42 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -426,6 +426,23 @@ int force;
         }
 }
 
+const char *
+generic_lvl_desc()
+{
+    if (Is_astralevel(&u.uz))
+        return "astral plane";
+    else if (In_endgame(&u.uz))
+        return "plane";
+    else if (Is_sanctum(&u.uz))
+        return "sanctum";
+    else if (In_sokoban(&u.uz))
+        return "puzzle";
+    else if (In_V_tower(&u.uz))
+        return "tower";
+    else
+        return "dungeon";
+}
+
 /*
  * The player is trying to extract something from his/her instrument.
  */
@@ -537,7 +554,8 @@ struct obj *instr;
             consume_obj_charge(instr, TRUE);
 
             You("produce a heavy, thunderous rolling!");
-            pline_The("entire dungeon is shaking around you!");
+            pline_The("entire %s is shaking around you!",
+                      generic_lvl_desc());
             do_earthquake((u.ulevel - 1) / 3 + 1);
             /* shake up monsters in a much larger radius... */
             awaken_monsters(ROWNO * COLNO);
@@ -549,6 +567,7 @@ struct obj *instr;
         awaken_monsters(u.ulevel * 40);
         incr_itimeout(&HDeaf, rn1(20, 30));
         exercise(A_WIS, FALSE);
+        context.botl = TRUE;
         break;
     default:
         impossible("What a weird instrument (%d)!", instr->otyp);

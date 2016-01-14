@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1451176031 2015/12/27 00:27:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.252 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1452660199 2016/01/13 04:43:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.255 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1889,7 +1889,9 @@ int style;
         if (dist > 0 && isok(bhitpos.x + dx, bhitpos.y + dy)
             && levl[bhitpos.x + dx][bhitpos.y + dy].typ == IRONBARS) {
             x2 = bhitpos.x, y2 = bhitpos.y; /* object stops here */
-            if (hits_bars(&singleobj, x2, y2, !rn2(20), 0)) {
+            if (hits_bars(&singleobj,
+                          x2, y2, x2+dx, y2+dy,
+                          !rn2(20), 0)) {
                 if (!singleobj) {
                     used_up = TRUE;
                     launch_drop_spot((struct obj *) 0, 0, 0);
@@ -2731,6 +2733,7 @@ boolean byplayer;
 void
 float_up()
 {
+    context.botl = TRUE;
     if (u.utrap) {
         if (u.utraptype == TT_PIT) {
             u.utrap = 0;
@@ -2809,6 +2812,7 @@ long hmask, emask; /* might cancel timeout */
         float_vs_flight(); /* before nomul() rather than after */
         return 0;
     }
+    context.botl = TRUE;
     nomul(0); /* stop running or resting */
     if (BFlying) {
         /* controlled flight no longer overridden by levitation */
@@ -3064,10 +3068,12 @@ domagictrap()
         if (!Deaf) {
             You_hear("a deafening roar!");
             incr_itimeout(&HDeaf, rn1(20, 30));
+            context.botl = TRUE;
         } else {
             /* magic vibrations still hit you */
             You_feel("rankled.");
             incr_itimeout(&HDeaf, rn1(5, 15));
+            context.botl = TRUE;
         }
         while (cnt--)
             (void) makemon((struct permonst *) 0, u.ux, u.uy, NO_MM_FLAGS);
@@ -4999,13 +5005,13 @@ lava_effects()
                 && objects[obj->otyp].oc_oprop != FIRE_RES
                 && obj->otyp != SCR_FIRE && obj->otyp != SPE_FIREBALL
                 && !obj_resists(obj, 0, 0)) /* for invocation items */
-                obj->in_use = TRUE;
+                obj->in_use = 1;
 
     /* Check whether we should burn away boots *first* so we know whether to
      * make the player sink into the lava. Assumption: water walking only
      * comes from boots.
      */
-    if (Wwalking && uarmf && is_organic(uarmf) && !uarmf->oerodeproof) {
+    if (uarmf && is_organic(uarmf) && !uarmf->oerodeproof) {
         obj = uarmf;
         pline("%s into flame!", Yobjnam2(obj, "burst"));
         iflags.in_lava_effects++; /* (see above) */
@@ -5119,6 +5125,9 @@ sink_into_lava()
             You("sink below the surface and die.");
             burn_away_slime(); /* add insult to injury? */
             done(DISSOLVED);
+            /* can only get here via life-saving; try to get away from lava */
+            u.utrap = 0;
+            (void) safe_teleds(TRUE);
         } else if (!u.umoved) {
             /* can't fully turn into slime while in lava, but might not
                have it be burned away until you've come awfully close */

@@ -1,4 +1,4 @@
-/* NetHack 3.6	potion.c	$NHDT-Date: 1450667491 2015/12/21 03:11:31 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.124 $ */
+/* NetHack 3.6	potion.c	$NHDT-Date: 1452660195 2016/01/13 04:43:15 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.126 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -165,12 +165,12 @@ const char *msg;
     if (Unaware)
         msg = 0;
 #endif
-    if ((!xtime && old) || (xtime && !old)) {
+    set_itimeout(&Slimed, xtime);
+    if ((xtime != 0L) ^ (old != 0L)) {
+        context.botl = TRUE;
         if (msg)
             pline1(msg);
-        context.botl = 1;
     }
-    set_itimeout(&Slimed, xtime);
     if (!Slimed)
         dealloc_killer(find_delayed_killer(SLIMED));
 }
@@ -189,12 +189,12 @@ const char *killername;
     if (Unaware)
         msg = 0;
 #endif
-    if ((!xtime && old) || (xtime && !old)) {
+    set_itimeout(&Stoned, xtime);
+    if ((xtime != 0L) ^ (old != 0L)) {
+        context.botl = TRUE;
         if (msg)
             pline1(msg);
-        /* context.botl = 1;   --- Stoned is not a status line item */
     }
-    set_itimeout(&Stoned, xtime);
     if (!Stoned)
         dealloc_killer(find_delayed_killer(STONED));
     else if (!old)
@@ -211,11 +211,11 @@ boolean talk;
     if (Unaware)
         talk = FALSE;
 
+    set_itimeout(&Vomiting, xtime);
+    context.botl = TRUE;
     if (!xtime && old)
         if (talk)
             You_feel("much less nauseated now.");
-
-    set_itimeout(&Vomiting, xtime);
 }
 
 static const char vismsg[] = "vision seems to %s for a moment but is %s now.";
@@ -292,7 +292,7 @@ boolean talk;
     set_itimeout(&Blinded, xtime);
 
     if (u_could_see ^ can_see_now) { /* one or the other but not both */
-        context.botl = 1;
+        context.botl = TRUE;
         vision_full_recalc = 1; /* blindness just got toggled */
         /* this vision recalculation used to be deferred until
            moveloop(), but that made it possible for vision
@@ -383,7 +383,7 @@ long mask; /* nonzero if resistance status should change by mask */
         (eg. Qt windowport's equipped items display) */
         update_inventory();
 
-        context.botl = 1;
+        context.botl = TRUE;
         if (talk)
             pline(message, verb);
     }
@@ -396,26 +396,16 @@ long xtime;
 boolean talk;
 {
     long old = HDeaf;
-    boolean toggled = FALSE;
 
     if (Unaware)
         talk = FALSE;
 
-    if (!xtime && old) {
-        if (talk)
-            You("can hear again.");
-        toggled = TRUE;
-    } else if (xtime && !old) {
-        if (talk)
-            You("are unable to hear anything.");
-        toggled = TRUE;
-    }
-    /* deafness isn't presently shown on status line, but
-       request a status update in case that changes someday */
-    if (toggled)
-        context.botl = TRUE;
-
     set_itimeout(&HDeaf, xtime);
+    if ((xtime != 0L) ^ (old != 0L)) {
+        context.botl = TRUE;
+        if (talk)
+            You(old ? "can hear again." : "are unable to hear anything.");
+    }
 }
 
 STATIC_OVL void

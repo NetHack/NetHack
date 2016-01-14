@@ -114,6 +114,7 @@ float_vs_flight()
         BFlying |= I_SPECIAL;
     else
         BFlying &= ~I_SPECIAL;
+    context.botl = TRUE;
 }
 
 /* for changing into form that's immune to strangulation */
@@ -127,10 +128,11 @@ boolean on;
            vulnerable form into another causes the counter to be reset */
         if (uamul && uamul->otyp == AMULET_OF_STRANGULATION
             && can_be_strangled(&youmonst)) {
+            Strangled = 6L;
+            context.botl = TRUE;
             Your("%s %s your %s!", simpleonames(uamul),
                  Strangled ? "still constricts" : "begins constricting",
                  body_part(NECK)); /* "throat" */
-            Strangled = 6L;
             makeknown(AMULET_OF_STRANGULATION);
         }
 
@@ -138,6 +140,7 @@ boolean on;
     } else {
         if (Strangled && !can_be_strangled(&youmonst)) {
             Strangled = 0L;
+            context.botl = TRUE;
             You("are no longer being strangled.");
         }
     }
