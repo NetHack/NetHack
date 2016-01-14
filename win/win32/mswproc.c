@@ -2819,18 +2819,23 @@ status_update(int fldindex, genericptr_t ptr, int chg, int percentage)
                 -- ptr is usually a "char *", unless fldindex is BL_CONDITION.
                    If fldindex is BL_CONDITION, then ptr is a long value with
                    any or none of the following bits set (from botl.h):
-                        BL_MASK_BLIND		0x00000001L
-                        BL_MASK_CONF		0x00000002L
-                        BL_MASK_FOODPOIS	0x00000004L
-                        BL_MASK_ILL		0x00000008L
-                        BL_MASK_HALLU		0x00000010L
-                        BL_MASK_STUNNED		0x00000020L
-                        BL_MASK_SLIMED		0x00000040L
-                -- The value passed for BL_GOLD includes a leading
-                   symbol for GOLD "$:nnn". If the window port needs to use
-                   the textual gold amount without the leading "$:" the port
-                   will have to add 2 to the passed "ptr" for the BL_GOLD
-case.
+                        BL_MASK_STONE           0x00000001L
+                        BL_MASK_SLIME           0x00000002L
+                        BL_MASK_STRNGL          0x00000004L
+                        BL_MASK_FOODPOIS        0x00000008L
+                        BL_MASK_TERMILL         0x00000010L
+                        BL_MASK_BLIND           0x00000020L
+                        BL_MASK_DEAF            0x00000040L
+                        BL_MASK_STUN            0x00000080L
+                        BL_MASK_CONF            0x00000100L
+                        BL_MASK_HALLU           0x00000200L
+                        BL_MASK_LEV             0x00000400L
+                        BL_MASK_FLY             0x00000800L
+                        BL_MASK_RIDE            0x00001000L
+                -- The value passed for BL_GOLD includes an encoded leading
+                   symbol for GOLD "\GXXXXNNNN:nnn". If window port needs
+                   textual gold amount without the leading "$:" the port will
+                   have to skip past ':' in passed "ptr" for the BL_GOLD case.
 */
 void
 mswin_status_update(int idx, genericptr_t ptr, int chg, int percent)
@@ -2851,20 +2856,32 @@ mswin_status_update(int idx, genericptr_t ptr, int chg, int percent)
         case BL_CONDITION: {
             cond = *condptr;
             *_status_vals[idx] = '\0';
-            if (cond & BL_MASK_BLIND)
-                Strcat(_status_vals[idx], " Blind");
-            if (cond & BL_MASK_CONF)
-                Strcat(_status_vals[idx], " Conf");
+            if (cond & BL_MASK_STONE)
+                Strcat(_status_vals[idx], " Stone");
+            if (cond & BL_MASK_SLIME)
+                Strcat(_status_vals[idx], " Slime");
+            if (cond & BL_MASK_STRNGL)
+                Strcat(_status_vals[idx], " Strngl");
             if (cond & BL_MASK_FOODPOIS)
                 Strcat(_status_vals[idx], " FoodPois");
-            if (cond & BL_MASK_ILL)
-                Strcat(_status_vals[idx], " Ill");
-            if (cond & BL_MASK_STUNNED)
+            if (cond & BL_MASK_TERMILL)
+                Strcat(_status_vals[idx], " TermIll");
+            if (cond & BL_MASK_BLIND)
+                Strcat(_status_vals[idx], " Blind");
+            if (cond & BL_MASK_DEAF)
+                Strcat(_status_vals[idx], " Deaf");
+            if (cond & BL_MASK_STUN)
                 Strcat(_status_vals[idx], " Stun");
+            if (cond & BL_MASK_CONF)
+                Strcat(_status_vals[idx], " Conf");
             if (cond & BL_MASK_HALLU)
                 Strcat(_status_vals[idx], " Hallu");
-            if (cond & BL_MASK_SLIMED)
-                Strcat(_status_vals[idx], " Slime");
+            if (cond & BL_MASK_LEV)
+                Strcat(_status_vals[idx], " Lev");
+            if (cond & BL_MASK_FLY)
+                Strcat(_status_vals[idx], " Fly");
+            if (cond & BL_MASK_RIDE)
+                Strcat(_status_vals[idx], " Ride");
             value = cond;
         } break;
         case BL_GOLD: {

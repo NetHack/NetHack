@@ -78,54 +78,135 @@ bot1()
 STATIC_OVL void
 bot2()
 {
-    char newbot2[MAXCO];
+    char newbot2[MAXCO], /* MAXCO: botl.h */
+         /* dungeon location (and gold), hero health (HP, PW, AC),
+            experience (HD if poly'd, else Exp level and maybe Exp points),
+            time (in moves), varying number of status conditions */
+         dloc[QBUFSZ], hlth[QBUFSZ], expr[QBUFSZ], tmmv[QBUFSZ], cond[QBUFSZ];
     register char *nb;
-    int hp, hpmax;
-    int cap = near_capacity();
+    unsigned dln, dx, hln, xln, tln, cln;
+    int hp, hpmax, cap;
+    long money;
 
+    /*
+     * Various min(x,9999)'s are to avoid having excessive values
+     * violate the field width assumptions in botl.h and should not
+     * impact normal play [not too sure about limiting spell power
+     * to 3 digits].  Particularly 64-bit long for gold which could
+     * require many more digits if someone figures out a way to get
+     * and carry a really large (or negative) amount of it.
+     * Turn counter is also long, but we'll risk that.
+     */
+
+    /* dungeon location plus gold */
+    (void) describe_level(dloc); /* includes at least one trailing space */
+    if ((money = money_cnt(invent)) < 0L)
+        money = 0L; /* ought to issue impossible() and then discard gold */
+    Sprintf(eos(dloc), "%s:%-2ld",
+            encglyph(objnum_to_glyph(GOLD_PIECE)), min(money, 999999L));
+    dln = strlen(dloc);
+    /* '$' encoded as \GXXXXNNNN is 9 chars longer than display will need */
+    dx = strstri(dloc, "\\G") ? 9 : 0;
+
+    /* health and armor class (has trailing space for AC 0..9) */
     hp = Upolyd ? u.mh : u.uhp;
     hpmax = Upolyd ? u.mhmax : u.uhpmax;
-
     if (hp < 0)
         hp = 0;
-    (void) describe_level(newbot2);
-    Sprintf(nb = eos(newbot2), "%s:%-2ld HP:%d(%d) Pw:%d(%d) AC:%-2d",
-            encglyph(objnum_to_glyph(GOLD_PIECE)), money_cnt(invent), hp,
-            hpmax, u.uen, u.uenmax, u.uac);
+    Sprintf(hlth, "HP:%d(%d) Pw:%d(%d) AC:%-2d",
+            min(hp, 9999), min(hpmax, 9999),
+            min(u.uen, 999), min(u.uenmax, 999), u.uac);
+    hln = strlen(hlth);
 
+    /* experience */
     if (Upolyd)
-        Sprintf(nb = eos(nb), " HD:%d", mons[u.umonnum].mlevel);
+        Sprintf(expr, "HD:%d", mons[u.umonnum].mlevel);
     else if (flags.showexp)
-        Sprintf(nb = eos(nb), " Xp:%u/%-1ld", u.ulevel, u.uexp);
+        Sprintf(expr, "Xp:%u/%-1ld", u.ulevel, u.uexp);
     else
-        Sprintf(nb = eos(nb), " Exp:%u", u.ulevel);
+        Sprintf(expr, "Exp:%u", u.ulevel);
+    xln = strlen(expr);
 
+    /* time/move counter */
     if (flags.time)
-        Sprintf(nb = eos(nb), " T:%ld", moves);
-    if (strcmp(hu_stat[u.uhs], "        ")) {
-        Sprintf(nb = eos(nb), " ");
-        Strcat(newbot2, hu_stat[u.uhs]);
-    }
-    if (Confusion)
-        Sprintf(nb = eos(nb), " Conf");
+        Sprintf(tmmv, "T:%ld", moves);
+    else
+        tmmv[0] = '\0';
+    tln = strlen(tmmv);
+
+    /* status conditions; worst ones first */
+    cond[0] = '\0'; /* once non-empty, cond will have a leading space */
+    nb = cond;
+    /*
+     * Stoned, Slimed, Strangled, and both types of Sick are all fatal
+     * unless remedied before timeout expires.  Should we order them by
+     * shortest time left?  [Probably not worth the effort, since it's
+     * unusual for more than one of them to apply at a time.]
+     */
+    if (Stoned)
+        Strcpy(nb = eos(nb), " Stone");
+    if (Slimed)
+        Strcpy(nb = eos(nb), " Slime");
+    if (Strangled)
+        Strcpy(nb = eos(nb), " Strngl");
     if (Sick) {
         if (u.usick_type & SICK_VOMITABLE)
-            Sprintf(nb = eos(nb), " FoodPois");
+            Strcpy(nb = eos(nb), " FoodPois");
         if (u.usick_type & SICK_NONVOMITABLE)
-            Sprintf(nb = eos(nb), " Ill");
+            Strcpy(nb = eos(nb), " TermIll");
     }
-    if (Blind)
-        Sprintf(nb = eos(nb), " Blind");
-    if (Stunned)
-        Sprintf(nb = eos(nb), " Stun");
-    if (Hallucination)
-        Sprintf(nb = eos(nb), " Hallu");
-    if (Slimed)
-        Sprintf(nb = eos(nb), " Slime");
-    if (Deaf)
-        Sprintf(nb = eos(nb), " Df");
-    if (cap > UNENCUMBERED)
+    if (u.uhs != NOT_HUNGRY)
+        Sprintf(nb = eos(nb), " %s", hu_stat[u.uhs]);
+    if ((cap = near_capacity()) > UNENCUMBERED)
         Sprintf(nb = eos(nb), " %s", enc_stat[cap]);
+    if (Blind)
+        Strcpy(nb = eos(nb), " Blind");
+    if (Deaf)
+        Strcpy(nb = eos(nb), " Deaf");
+    if (Stunned)
+        Strcpy(nb = eos(nb), " Stun");
+    if (Confusion)
+        Strcpy(nb = eos(nb), " Conf");
+    if (Hallucination)
+        Strcpy(nb = eos(nb), " Hallu");
+    /* levitation and flying are mutually exclusive; riding is not */
+    if (Levitation)
+        Strcpy(nb = eos(nb), " Lev");
+    if (Flying)
+        Strcpy(nb = eos(nb), " Fly");
+    if (u.usteed)
+        Strcpy(nb = eos(nb), " Ride");
+    cln = strlen(cond);
+
+    /*
+     * Put the pieces together.  If they all fit, keep the traditional
+     * sequence.  Otherwise, move least important parts to the end in
+     * case the interface side of things has to truncate.  Note that
+     * dloc[] contains '$' encoded in ten character sequence \GXXXXNNNN
+     * so we want to test its display length rather than buffer length.
+     *
+     * We don't have an actual display limit here, so have to go by the
+     * width of the map.  Since we're reordering rather than truncating,
+     * wider displays can still show wider status than the map if the
+     * interface supports that.
+     */
+    if ((dln - dx) + 1 + hln + 1 + xln + 1 + tln + 1 + cln <= COLNO) {
+        Sprintf(newbot2, "%s %s %s %s %s", dloc, hlth, expr, tmmv, cond);
+    } else {
+        if (dln + 1 + hln + 1 + xln + 1 + tln + 1 + cln + 1 > MAXCO) {
+            panic("bot2: second status line exceeds MAXCO (%u > %d)",
+                  (dln + 1 + hln + 1 + xln + 1 + tln + 1 + cln + 1), MAXCO);
+        } else if ((dln - dx) + 1 + hln + 1 + xln + 1 + cln <= COLNO) {
+            Sprintf(newbot2, "%s %s %s %s %s", dloc, hlth, expr, cond, tmmv);
+        } else if ((dln - dx) + 1 + hln + 1 + cln <= COLNO) {
+            Sprintf(newbot2, "%s %s %s %s %s", dloc, hlth, cond, expr, tmmv);
+        } else {
+            Sprintf(newbot2, "%s %s %s %s %s", hlth, cond, dloc, expr, tmmv);
+        }
+        /* only two or three consecutive spaces available to squeeze out */
+        mungspaces(newbot2);
+    }
+
     curs(WIN_STATUS, 1, 1);
     putmixed(WIN_STATUS, 0, newbot2);
 }
@@ -302,11 +383,10 @@ struct istat_s {
 
 STATIC_DCL void NDECL(init_blstats);
 STATIC_DCL char *FDECL(anything_to_s, (char *, anything *, int));
-STATIC_DCL void FDECL(s_to_anything, (anything *, char *, int));
 STATIC_OVL int FDECL(percentage, (struct istat_s *, struct istat_s *));
 STATIC_OVL int FDECL(compare_blstats, (struct istat_s *, struct istat_s *));
-
 #ifdef STATUS_HILITES
+STATIC_DCL void FDECL(s_to_anything, (anything *, char *, int));
 STATIC_DCL boolean FDECL(assign_hilite, (char *, char *, char *, char *,
                                          BOOLEAN_P));
 STATIC_DCL const char *FDECL(clridx_to_s, (char *, int));
@@ -340,35 +420,6 @@ STATIC_DCL struct istat_s initblstats[MAXBLSTATS] = {
                     { (genericptr_t) 0 }, (char *) 0,  0,  0, BL_CONDITION}
 };
 
-static struct fieldid_t {
-        const char *fieldname;
-        enum statusfields fldid;
-} fieldids[] = {
-        {"title",               BL_TITLE},
-        {"strength",            BL_STR},
-        {"dexterity",           BL_DX},
-        {"constitution",        BL_CO},
-        {"intelligence",        BL_IN},
-        {"wisdom",              BL_WI},
-        {"charisma",            BL_CH},
-        {"alignment",           BL_ALIGN},
-        {"score",               BL_SCORE},
-        {"carrying-capacity",   BL_CAP},
-        {"gold",                BL_GOLD},
-        {"power",               BL_ENE},
-        {"power-max",           BL_ENEMAX},
-        {"experience-level",    BL_XP},
-        {"armor-class",         BL_AC},
-        {"HD",                  BL_HD},
-        {"time",                BL_TIME},
-        {"hunger",              BL_HUNGER},
-        {"hitpoints",           BL_HP},
-        {"hitpoints-max",       BL_HPMAX},
-        {"dungeon-level",       BL_LEVELDESC},
-        {"experience",          BL_EXP},
-        {"condition",           BL_CONDITION},
-};
-
 struct istat_s blstats[2][MAXBLSTATS];
 static boolean blinit = FALSE, update_all = FALSE;
 
@@ -378,11 +429,11 @@ bot()
     char buf[BUFSZ];
     register char *nb;
     static int idx = 0, idx_p, idxmax;
-    boolean updated = FALSE;
     unsigned anytype;
+    long money;
     int i, pc, chg, cap;
     struct istat_s *curr, *prev;
-    boolean valset[MAXBLSTATS], chgval = FALSE;
+    boolean valset[MAXBLSTATS], chgval = FALSE, updated = FALSE;
 
     if (!blinit)
         panic("bot before init.");
@@ -392,41 +443,35 @@ bot()
         return;
     }
 
-    cap = near_capacity();
     idx_p = idx;
     idx = 1 - idx; /* 0 -> 1, 1 -> 0 */
 
     /* clear the "value set" indicators */
-    (void) memset((genericptr_t) valset, 0, MAXBLSTATS * sizeof(boolean));
+    (void) memset((genericptr_t) valset, 0, MAXBLSTATS * sizeof (boolean));
+
+    /*
+     * Note: min(x,9999) - we enforce the same maximum on hp, maxhp,
+     * pw, maxpw, and gold as basic status formatting so that the two
+     * modes of status display don't produce different information.
+     */
 
     /*
      *  Player name and title.
      */
-    buf[0] = '\0';
-    Strcpy(buf, plname);
-    if ('a' <= buf[0] && buf[0] <= 'z')
-        buf[0] += 'A' - 'a';
-    buf[10] = 0;
-    Sprintf(nb = eos(buf), " the ");
+    Strcpy(nb = buf, plname);
+    nb[0] = highc(nb[0]);
+    nb[10] = '\0';
+    Sprintf(nb = eos(nb), " the ");
     if (Upolyd) {
-        char mbot[BUFSZ];
-        int k = 0;
-
-        Strcpy(mbot, mons[u.umonnum].mname);
-        while (mbot[k] != 0) {
-            if ((k == 0 || (k > 0 && mbot[k - 1] == ' ')) && 'a' <= mbot[k]
-                && mbot[k] <= 'z')
-                mbot[k] += 'A' - 'a';
-            k++;
-        }
-        Sprintf1(nb = eos(nb), mbot);
+        for (i = 0, nb = strcpy(eos(nb), mons[u.umonnum].mname); nb[i]; i++)
+            if (i == 0 || nb[i - 1] == ' ')
+                nb[i] = highc(nb[i]);
     } else
-        Sprintf1(nb = eos(nb), rank());
+        Strcpy(nb = eos(nb), rank());
     Sprintf(blstats[idx][BL_TITLE].val, "%-29s", buf);
     valset[BL_TITLE] = TRUE; /* indicate val already set */
 
     /* Strength */
-
     buf[0] = '\0';
     blstats[idx][BL_STR].a.a_int = ACURR(A_STR);
     if (ACURR(A_STR) > 18) {
@@ -442,7 +487,6 @@ bot()
     valset[BL_STR] = TRUE; /* indicate val already set */
 
     /*  Dexterity, constitution, intelligence, wisdom, charisma. */
-
     blstats[idx][BL_DX].a.a_int = ACURR(A_DEX);
     blstats[idx][BL_CO].a.a_int = ACURR(A_CON);
     blstats[idx][BL_IN].a.a_int = ACURR(A_INT);
@@ -450,135 +494,119 @@ bot()
     blstats[idx][BL_CH].a.a_int = ACURR(A_CHA);
 
     /* Alignment */
-
-    Strcpy(blstats[idx][BL_ALIGN].val,
-           (u.ualign.type == A_CHAOTIC)
-               ? "Chaotic"
-               : (u.ualign.type == A_NEUTRAL) ? "Neutral" : "Lawful");
+    Strcpy(blstats[idx][BL_ALIGN].val, (u.ualign.type == A_CHAOTIC)
+                                          ? "Chaotic"
+                                          : (u.ualign.type == A_NEUTRAL)
+                                               ? "Neutral"
+                                               : "Lawful");
 
     /* Score */
-
     blstats[idx][BL_SCORE].a.a_long =
 #ifdef SCORE_ON_BOTL
-        botl_score();
+        botl_score()
 #else
-        0;
+        0L
 #endif
-    /*  Hit points  */
+        ;
 
-    blstats[idx][BL_HP].a.a_int = Upolyd ? u.mh : u.uhp;
-    blstats[idx][BL_HPMAX].a.a_int = Upolyd ? u.mhmax : u.uhpmax;
-    if (blstats[idx][BL_HP].a.a_int < 0)
-        blstats[idx][BL_HP].a.a_int = 0;
+    /*  Hit points  */
+    i = Upolyd ? u.mh : u.uhp;
+    if (i < 0)
+        i = 0;
+    blstats[idx][BL_HP].a.a_int = min(i, 9999);
+    i = Upolyd ? u.mhmax : u.uhpmax;
+    blstats[idx][BL_HPMAX].a.a_int = min(i, 9999);
 
     /*  Dungeon level. */
-
     (void) describe_level(blstats[idx][BL_LEVELDESC].val);
     valset[BL_LEVELDESC] = TRUE; /* indicate val already set */
 
     /* Gold */
-
-    blstats[idx][BL_GOLD].a.a_long = money_cnt(invent);
+    if ((money = money_cnt(invent)) < 0L)
+        money = 0L; /* ought to issue impossible() and then discard gold */
+    blstats[idx][BL_GOLD].a.a_long = min(money, 999999L);
     /*
      * The tty port needs to display the current symbol for gold
      * as a field header, so to accommodate that we pass gold with
      * that already included. If a window port needs to use the text
      * gold amount without the leading "$:" the port will have to
-     * add 2 to the value pointer it was passed in status_update()
+     * skip past ':' to the value pointer it was passed in status_update()
      * for the BL_GOLD case.
      *
      * Another quirk of BL_GOLD is that the field display may have
      * changed if a new symbol set was loaded, or we entered or left
      * the rogue level.
+     *
+     * The currency prefix is encoded as ten character \GXXXXNNNN
+     * sequence.
      */
-
     Sprintf(blstats[idx][BL_GOLD].val, "%s:%ld",
             encglyph(objnum_to_glyph(GOLD_PIECE)),
             blstats[idx][BL_GOLD].a.a_long);
     valset[BL_GOLD] = TRUE; /* indicate val already set */
 
     /* Power (magical energy) */
-
-    blstats[idx][BL_ENE].a.a_int = u.uen;
-    blstats[idx][BL_ENEMAX].a.a_int = u.uenmax;
+    blstats[idx][BL_ENE].a.a_int = min(u.uen, 999);
+    blstats[idx][BL_ENEMAX].a.a_int = min(u.uenmax, 999);
 
     /* Armor class */
-
     blstats[idx][BL_AC].a.a_int = u.uac;
 
     /* Monster level (if Upolyd) */
-
-    if (Upolyd)
-        blstats[idx][BL_HD].a.a_int = mons[u.umonnum].mlevel;
-    else
-        blstats[idx][BL_HD].a.a_int = 0;
+    blstats[idx][BL_HD].a.a_int = Upolyd ? mons[u.umonnum].mlevel : 0;
 
     /* Experience */
-
     blstats[idx][BL_XP].a.a_int = u.ulevel;
     blstats[idx][BL_EXP].a.a_int = u.uexp;
 
     /* Time (moves) */
-
     blstats[idx][BL_TIME].a.a_long = moves;
 
     /* Hunger */
-
     blstats[idx][BL_HUNGER].a.a_uint = u.uhs;
-    *(blstats[idx][BL_HUNGER].val) = '\0';
-    if (strcmp(hu_stat[u.uhs], "        ") != 0)
-        Strcpy(blstats[idx][BL_HUNGER].val, hu_stat[u.uhs]);
+    Strcpy(blstats[idx][BL_HUNGER].val,
+           (u.uhs != NOT_HUNGRY) ? hu_stat[u.uhs] : "");
     valset[BL_HUNGER] = TRUE;
 
     /* Carrying capacity */
-
-    *(blstats[idx][BL_CAP].val) = '\0';
+    cap = near_capacity();
     blstats[idx][BL_CAP].a.a_int = cap;
-    if (cap > UNENCUMBERED)
-        Strcpy(blstats[idx][BL_CAP].val, enc_stat[cap]);
+    Strcpy(blstats[idx][BL_CAP].val,
+           (cap > UNENCUMBERED) ? enc_stat[cap] : "");
     valset[BL_CAP] = TRUE;
 
     /* Conditions */
-
+    blstats[idx][BL_CONDITION].a.a_ulong = 0L;
+    if (Stoned)
+        blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_STONE;
+    if (Slimed)
+        blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_SLIME;
+    if (Strangled)
+        blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_STRNGL;
+    if (Sick && (u.usick_type & SICK_VOMITABLE) != 0)
+        blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_FOODPOIS;
+    if (Sick && (u.usick_type & SICK_NONVOMITABLE) != 0)
+        blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_TERMILL;
+    /*
+     * basic formatting puts hunger status and encumbrance here
+     */
     if (Blind)
         blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_BLIND;
-    else
-        blstats[idx][BL_CONDITION].a.a_ulong &= ~BL_MASK_BLIND;
-
     if (Deaf)
         blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_DEAF;
-    else
-        blstats[idx][BL_CONDITION].a.a_ulong &= ~BL_MASK_DEAF;
-
+    if (Stunned)
+        blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_STUN;
     if (Confusion)
         blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_CONF;
-    else
-        blstats[idx][BL_CONDITION].a.a_ulong &= ~BL_MASK_CONF;
-
-    if (Sick && u.usick_type & SICK_VOMITABLE)
-        blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_FOODPOIS;
-    else
-        blstats[idx][BL_CONDITION].a.a_ulong &= ~BL_MASK_FOODPOIS;
-
-    if (Sick && u.usick_type & SICK_NONVOMITABLE)
-        blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_ILL;
-    else
-        blstats[idx][BL_CONDITION].a.a_ulong &= ~BL_MASK_ILL;
-
     if (Hallucination)
         blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_HALLU;
-    else
-        blstats[idx][BL_CONDITION].a.a_ulong &= ~BL_MASK_HALLU;
-
-    if (Stunned)
-        blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_STUNNED;
-    else
-        blstats[idx][BL_CONDITION].a.a_ulong &= ~BL_MASK_STUNNED;
-
-    if (Slimed)
-        blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_SLIMED;
-    else
-        blstats[idx][BL_CONDITION].a.a_ulong &= ~BL_MASK_SLIMED;
+    /* levitation and flying are mututally exclusive */
+    if (Levitation)
+        blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_LEV;
+    if (Flying)
+        blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_FLY;
+    if (u.usteed)
+        blstats[idx][BL_CONDITION].a.a_ulong |= BL_MASK_RIDE;
 
     /*
      *  Now pass the changed values to window port.
@@ -594,10 +622,11 @@ bot()
         curr = &blstats[idx][i];
         prev = &blstats[idx_p][i];
         chg = 0;
-        if (update_all || ((chg = compare_blstats(prev, curr)) != 0)
-            || ((chgval = (valset[i] && strcmp(blstats[idx][i].val,
-                                               blstats[idx_p][i].val)))
-                != 0)) {
+        if (update_all
+            || ((chg = compare_blstats(prev, curr)) != 0)
+            || ((chgval = (valset[i]
+                           && strcmp(blstats[idx][i].val,
+                                     blstats[idx_p][i].val))) != 0)) {
             idxmax = blstats[idx][i].idxmax;
             pc = (idxmax) ? percentage(curr, &blstats[idx][idxmax]) : 0;
             if (!valset[i])
@@ -606,9 +635,8 @@ bot()
                 status_update(i, (genericptr_t) curr->val,
                               valset[i] ? chgval : chg, pc);
             } else {
-                status_update(i,
-                              /* send pointer to mask */
-                              (genericptr_t) &curr->a.a_ulong, chg, 0);
+                /* send pointer to mask */
+                status_update(i, (genericptr_t) &curr->a.a_ulong, chg, 0);
             }
             updated = TRUE;
         }
@@ -637,8 +665,8 @@ boolean
     reassessment; /* TRUE = just reassess fields w/o other initialization*/
 {
     int i;
-    const char *fieldfmt = (const char *)0;
-    const char *fieldname = (const char *)0;
+    const char *fieldfmt = (const char *) 0;
+    const char *fieldname = (const char *) 0;
 
     if (!reassessment) {
         init_blstats();
@@ -868,6 +896,8 @@ int anytype;
     return buf;
 }
 
+#ifdef STATUS_HILITES
+
 STATIC_OVL void
 s_to_anything(a, buf, anytype)
 anything *a;
@@ -915,6 +945,8 @@ int anytype;
     }
     return;
 }
+
+#endif
 
 STATIC_OVL int
 compare_blstats(bl1, bl2)
@@ -1047,6 +1079,35 @@ struct istat_s *bl, *maxbl;
 /* Core status hiliting support */
 /****************************************************************************/
 
+static struct fieldid_t {
+    const char *fieldname;
+    enum statusfields fldid;
+} fieldids[] = {
+    {"title",               BL_TITLE},
+    {"strength",            BL_STR},
+    {"dexterity",           BL_DX},
+    {"constitution",        BL_CO},
+    {"intelligence",        BL_IN},
+    {"wisdom",              BL_WI},
+    {"charisma",            BL_CH},
+    {"alignment",           BL_ALIGN},
+    {"score",               BL_SCORE},
+    {"carrying-capacity",   BL_CAP},
+    {"gold",                BL_GOLD},
+    {"power",               BL_ENE},
+    {"power-max",           BL_ENEMAX},
+    {"experience-level",    BL_XP},
+    {"armor-class",         BL_AC},
+    {"HD",                  BL_HD},
+    {"time",                BL_TIME},
+    {"hunger",              BL_HUNGER},
+    {"hitpoints",           BL_HP},
+    {"hitpoints-max",       BL_HPMAX},
+    {"dungeon-level",       BL_LEVELDESC},
+    {"experience",          BL_EXP},
+    {"condition",           BL_CONDITION},
+};
+
 struct hilite_s {
     boolean set;
     unsigned anytype;
@@ -1118,6 +1179,7 @@ boolean from_configfile;
 {
     int i;
     anything it;
+
     it = zeroany;
     for (i = 0; i < MAXBLSTATS; ++i) {
         (void) memset((genericptr_t) &status_hilites[i], 0,
@@ -1196,15 +1258,11 @@ boolean from_configfile;
 
     /* actions */
     for (i = 0; i < 2; ++i) {
-        if (!i)
-            how = sc;
-        else
-            how = sd;
+        how = !i ? sc : sd;
         if (!how) {
             if (!i)
                 return FALSE;
-            else
-                break; /* sc is mandatory; sd is not */
+            break; /* sc is mandatory; sd is not */
         }
 
         if (strcmpi(how, "bold") == 0) {
@@ -1215,6 +1273,7 @@ boolean from_configfile;
             normal[i] = TRUE;
         } else {
             int k = match_str2clr(how);
+
             if (k >= CLR_MAX)
                 return FALSE;
             coloridx[i] = k;
@@ -1271,10 +1330,10 @@ boolean all;
     for (idx = 0; idx < MAXBLSTATS; ++idx) {
         if (status_hilites[idx].set)
             status_threshold(idx, status_hilites[idx].anytype,
-                            status_hilites[idx].threshold,
-                            status_hilites[idx].behavior,
-                            status_hilites[idx].coloridx[0],
-                            status_hilites[idx].coloridx[1]);
+                             status_hilites[idx].threshold,
+                             status_hilites[idx].behavior,
+                             status_hilites[idx].coloridx[0],
+                             status_hilites[idx].coloridx[1]);
         else
             status_threshold(idx, blstats[0][idx].anytype, it, 0, 0, 0);
 
@@ -1358,6 +1417,7 @@ int bufsiz;
                         text = "normal";
                 } else {
                     char *blank;
+
                     (void) strcpy(colorname, c_obj_colors[coloridx]);
                     for (blank = index(colorname, ' '); blank;
                          blank = index(colorname, ' '))
@@ -1434,6 +1494,7 @@ status_hilite_menu()
     for (i = 0; i < MAXBLSTATS; i++) {
         if (field_picks[i]) {
             menu_item *pick = (menu_item *) 0;
+
             Sprintf(buf, "Threshold behavior options for %s:",
                     fieldids[i].fieldname);
             tmpwin = create_nhwindow(NHW_MENU);

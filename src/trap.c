@@ -2733,6 +2733,7 @@ boolean byplayer;
 void
 float_up()
 {
+    context.botl = TRUE;
     if (u.utrap) {
         if (u.utraptype == TT_PIT) {
             u.utrap = 0;
@@ -2811,6 +2812,7 @@ long hmask, emask; /* might cancel timeout */
         float_vs_flight(); /* before nomul() rather than after */
         return 0;
     }
+    context.botl = TRUE;
     nomul(0); /* stop running or resting */
     if (BFlying) {
         /* controlled flight no longer overridden by levitation */

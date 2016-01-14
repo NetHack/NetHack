@@ -9,14 +9,22 @@
  * than COLNO
  *
  * longest practical second status line at the moment is
- *	Astral Plane $:12345 HP:700(700) Pw:111(111) AC:-127 Xp:30/123456789
- *	T:123456 Satiated Conf FoodPois Ill Blind Stun Hallu Overloaded
- * -- or somewhat over 130 characters
+Astral Plane \GXXXXNNNN:123456 HP:1000(1000) Pw:111(111) AC:-127
+ Xp:30/123456789 T:123456  Stone Slime Strngl FoodPois TermIll
+ Satiated Overloaded Blind Deaf Stun Conf Hallu Lev Ride
+ * -- or a bit under 185 characters.  '$' gets encoded even when it
+ * could be used as-is.  The first five status conditions are fatal
+ * so it's rare to have more than one at a time.
+ *
+ * When the full line is wider than the map, the basic status line
+ * formatting will move less important fields to the end, so if/when
+ * truncation is necessary, it will chop off the least significant
+ * information.
  */
-#if COLNO <= 140
-#define MAXCO 160
+#if COLNO <= 160
+#define MAXCO 200
 #else
-#define MAXCO (COLNO + 20)
+#define MAXCO (COLNO + 40)
 #endif
 
 #ifdef STATUS_VIA_WINDOWPORT
@@ -53,23 +61,28 @@ enum statusfields { BL_FLUSH = -1, BL_TITLE = 0, BL_STR, BL_DX, BL_CO, BL_IN,
 BL_WI, BL_CH, BL_ALIGN, BL_SCORE, BL_CAP, BL_GOLD, BL_ENE, BL_ENEMAX,
 BL_XP, BL_AC, BL_HD, BL_TIME, BL_HUNGER, BL_HP, BL_HPMAX, BL_LEVELDESC,
 BL_EXP, BL_CONDITION };
+#endif
 #define MAXBLSTATS      BL_CONDITION+1
 
 #define BEFORE  0
 #define NOW     1
-#endif
 
 /* Boolean condition bits for the condition mask */
 
 /* clang-format off */
-#define BL_MASK_BLIND           0x00000001L
-#define BL_MASK_CONF            0x00000002L
-#define BL_MASK_FOODPOIS        0x00000004L
-#define BL_MASK_ILL             0x00000008L
-#define BL_MASK_HALLU           0x00000010L
-#define BL_MASK_STUNNED         0x00000020L
-#define BL_MASK_SLIMED          0x00000040L
-#define BL_MASK_DEAF            0x00000080L
+#define BL_MASK_STONE           0x00000001L
+#define BL_MASK_SLIME           0x00000002L
+#define BL_MASK_STRNGL          0x00000004L
+#define BL_MASK_FOODPOIS        0x00000008L
+#define BL_MASK_TERMILL         0x00000010L
+#define BL_MASK_BLIND           0x00000020L
+#define BL_MASK_DEAF            0x00000040L
+#define BL_MASK_STUN            0x00000080L
+#define BL_MASK_CONF            0x00000100L
+#define BL_MASK_HALLU           0x00000200L
+#define BL_MASK_LEV             0x00000400L
+#define BL_MASK_FLY             0x00000800L
+#define BL_MASK_RIDE            0x00001000L
 /* clang-format on */
 
 #define REASSESS_ONLY TRUE

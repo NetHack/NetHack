@@ -751,8 +751,9 @@ hup_get_color_string(VOID_ARGS)
 /*ARGSUSED*/
 static void
 hup_status_update(idx, ptr, chg, percent)
-int idx UNUSED, chg UNUSED, percent UNUSED;
+int idx UNUSED;
 genericptr_t ptr UNUSED;
+int chg UNUSED, percent UNUSED;
 {
     return;
 }
@@ -855,8 +856,9 @@ boolean enable;
 
 void
 genl_status_update(idx, ptr, chg, percent)
-int idx, chg, percent;
+int idx;
 genericptr_t ptr;
+int chg UNUSED, percent UNUSED;
 {
     char newbot1[MAXCO], newbot2[MAXCO];
     long cond, *condptr = (long *) ptr;
@@ -879,20 +881,32 @@ genericptr_t ptr;
         case BL_CONDITION:
             cond = *condptr;
             *status_vals[idx] = '\0';
-            if (cond & BL_MASK_BLIND)
-                Strcat(status_vals[idx], " Blind");
-            if (cond & BL_MASK_CONF)
-                Strcat(status_vals[idx], " Conf");
+            if (cond & BL_MASK_STONE)
+                Strcat(status_vals[idx], " Stone");
+            if (cond & BL_MASK_SLIME)
+                Strcat(status_vals[idx], " Slime");
+            if (cond & BL_MASK_STRNGL)
+                Strcat(status_vals[idx], " Strngl");
             if (cond & BL_MASK_FOODPOIS)
                 Strcat(status_vals[idx], " FoodPois");
-            if (cond & BL_MASK_ILL)
-                Strcat(status_vals[idx], " Ill");
-            if (cond & BL_MASK_STUNNED)
+            if (cond & BL_MASK_TERMILL)
+                Strcat(status_vals[idx], " TermIll");
+            if (cond & BL_MASK_BLIND)
+                Strcat(status_vals[idx], " Blind");
+            if (cond & BL_MASK_DEAF)
+                Strcat(status_vals[idx], " Deaf");
+            if (cond & BL_MASK_STUN)
                 Strcat(status_vals[idx], " Stun");
+            if (cond & BL_MASK_CONF)
+                Strcat(status_vals[idx], " Conf");
             if (cond & BL_MASK_HALLU)
                 Strcat(status_vals[idx], " Hallu");
-            if (cond & BL_MASK_SLIMED)
-                Strcat(status_vals[idx], " Slime");
+            if (cond & BL_MASK_LEV)
+                Strcat(status_vals[idx], " Lev");
+            if (cond & BL_MASK_FLY)
+                Strcat(status_vals[idx], " Fly");
+            if (cond & BL_MASK_RIDE)
+                Strcat(status_vals[idx], " Ride");
             break;
         default:
             Sprintf(status_vals[idx],

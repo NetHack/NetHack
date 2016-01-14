@@ -3387,17 +3387,23 @@ tty_status_init()
  *      -- ptr is usually a "char *", unless fldindex is BL_CONDITION.
  *         If fldindex is BL_CONDITION, then ptr is a long value with
  *         any or none of the following bits set (from botl.h):
- *              BL_MASK_BLIND           0x00000001L
- *              BL_MASK_CONF            0x00000002L
- *              BL_MASK_FOODPOIS        0x00000004L
- *              BL_MASK_ILL             0x00000008L
- *              BL_MASK_HALLU           0x00000010L
- *              BL_MASK_STUNNED         0x00000020L
- *              BL_MASK_SLIMED          0x00000040L
- *      -- The value passed for BL_GOLD includes a leading
- *         symbol for GOLD "$:nnn". If the window port needs to use
- *         the textual gold amount without the leading "$:" the port
- *         will have to add 2 to the passed "ptr" for the BL_GOLD case.
+ *              BL_MASK_STONE           0x00000001L
+ *              BL_MASK_SLIME           0x00000002L
+ *              BL_MASK_STRNGL          0x00000004L
+ *              BL_MASK_FOODPOIS        0x00000008L
+ *              BL_MASK_TERMILL         0x00000010L
+ *              BL_MASK_BLIND           0x00000020L
+ *              BL_MASK_DEAF            0x00000040L
+ *              BL_MASK_STUN            0x00000080L
+ *              BL_MASK_CONF            0x00000100L
+ *              BL_MASK_HALLU           0x00000200L
+ *              BL_MASK_LEV             0x00000400L
+ *              BL_MASK_FLY             0x00000800L
+ *              BL_MASK_RIDE            0x00001000L
+ *      -- The value passed for BL_GOLD includes an encoded leading
+ *         symbol for GOLD "\GXXXXNNNN:nnn". If the window port needs to use
+ *         the textual gold amount without the leading "$:" the port will
+ *         have to skip past ':' in the passed "ptr" for the BL_GOLD case.
  */
 void
 tty_status_update(fldidx, ptr, chg, percent)
@@ -3412,8 +3418,6 @@ genericptr_t ptr;
      * BL_HILITE_INVERSE  -2 + 3 = 1 (statusattr[1])
      * BL_HILITE_BOLD     -3 + 3 = 0 (statusattr[0])
      */
-    int statusattr[] = { ATR_BOLD, ATR_INVERSE, ATR_NONE };
-    int attridx = 0;
     long value = -1L;
     static boolean beenhere = FALSE;
     enum statusfields fieldorder[2][15] = {
@@ -3424,6 +3428,13 @@ genericptr_t ptr;
           BL_AC, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER,
           BL_CAP, BL_CONDITION, BL_FLUSH }
     };
+#ifdef STATUS_HILITES
+    static int statusattr[] = { ATR_BOLD, ATR_INVERSE, ATR_NONE };
+    int attridx = 0;
+#else
+    nhUse(chg);
+    nhUse(percent);
+#endif
 
     if (fldidx != BL_FLUSH) {
         if (!status_activefields[fldidx])
@@ -3432,20 +3443,32 @@ genericptr_t ptr;
         case BL_CONDITION:
             cond = *condptr;
             *status_vals[fldidx] = '\0';
-            if (cond & BL_MASK_BLIND)
-                Strcat(status_vals[fldidx], " Blind");
-            if (cond & BL_MASK_CONF)
-                Strcat(status_vals[fldidx], " Conf");
+            if (cond & BL_MASK_STONE)
+                Strcat(status_vals[fldidx], " Stone");
+            if (cond & BL_MASK_SLIME)
+                Strcat(status_vals[fldidx], " Slime");
+            if (cond & BL_MASK_STRNGL)
+                Strcat(status_vals[fldidx], " Strngl");
             if (cond & BL_MASK_FOODPOIS)
                 Strcat(status_vals[fldidx], " FoodPois");
-            if (cond & BL_MASK_ILL)
-                Strcat(status_vals[fldidx], " Ill");
-            if (cond & BL_MASK_STUNNED)
+            if (cond & BL_MASK_TERMILL)
+                Strcat(status_vals[fldidx], " TermIll");
+            if (cond & BL_MASK_BLIND)
+                Strcat(status_vals[fldidx], " Blind");
+            if (cond & BL_MASK_DEAF)
+                Strcat(status_vals[fldidx], " Deaf");
+            if (cond & BL_MASK_STUN)
                 Strcat(status_vals[fldidx], " Stun");
+            if (cond & BL_MASK_CONF)
+                Strcat(status_vals[fldidx], " Conf");
             if (cond & BL_MASK_HALLU)
                 Strcat(status_vals[fldidx], " Hallu");
-            if (cond & BL_MASK_SLIMED)
-                Strcat(status_vals[fldidx], " Slime");
+            if (cond & BL_MASK_LEV)
+                Strcat(status_vals[fldidx], " Lev");
+            if (cond & BL_MASK_FLY)
+                Strcat(status_vals[fldidx], " Fly");
+            if (cond & BL_MASK_RIDE)
+                Strcat(status_vals[fldidx], " Ride");
             value = cond;
             break;
         default:
@@ -3554,23 +3577,26 @@ genericptr_t ptr;
         int fldidx1 = fieldorder[0][i];
 
         if (status_activefields[fldidx1]) {
-            if (tty_status_colors[fldidx1] < 0 &&
-                    tty_status_colors[fldidx1] >= -3) {
+#ifdef STATUS_HILITES
+            if (tty_status_colors[fldidx1] < 0
+                && tty_status_colors[fldidx1] >= -3) {
                 /* attribute, not a color */
                 attridx = tty_status_colors[fldidx1] + 3;
                 term_start_attr(statusattr[attridx]);
                 putstr(WIN_STATUS, 0, status_vals[fldidx1]);
                 term_end_attr(statusattr[attridx]);
+            } else
 #ifdef TEXTCOLOR
-            } else if (tty_status_colors[fldidx1] != CLR_MAX) {
+            if (tty_status_colors[fldidx1] != CLR_MAX) {
                 if (tty_status_colors[fldidx1] != NO_COLOR)
                     term_start_color(tty_status_colors[fldidx1]);
                 putstr(WIN_STATUS, 0, status_vals[fldidx1]);
                 if (tty_status_colors[fldidx1] != NO_COLOR)
                     term_end_color();
-#endif
             } else
-                putstr(WIN_STATUS, 0, status_vals[fldidx1]);
+#endif
+#endif /* STATUS_HILITES */
+            putstr(WIN_STATUS, 0, status_vals[fldidx1]);
         }
     }
     curs(WIN_STATUS, 1, 1);
@@ -3578,28 +3604,31 @@ genericptr_t ptr;
         int fldidx2 = fieldorder[1][i];
 
         if (status_activefields[fldidx2]) {
-            if (tty_status_colors[fldidx2] < 0 &&
-                    tty_status_colors[fldidx2] >= -3) {
+#ifdef STATUS_HILITES
+            if (tty_status_colors[fldidx2] < 0
+                && tty_status_colors[fldidx2] >= -3) {
                 /* attribute, not a color */
                 attridx = tty_status_colors[fldidx2] + 3;
                 term_start_attr(statusattr[attridx]);
                 putstr(WIN_STATUS, 0, status_vals[fldidx2]);
                 term_end_attr(statusattr[attridx]);
+            } else
 #ifdef TEXTCOLOR
-            } else if (tty_status_colors[fldidx2] != CLR_MAX) {
+            if (tty_status_colors[fldidx2] != CLR_MAX) {
                 if (tty_status_colors[fldidx2] != NO_COLOR)
                     term_start_color(tty_status_colors[fldidx2]);
                 if (fldidx2 == BL_GOLD) {
                     /* putmixed() due to GOLD glyph */
-                   putmixed(WIN_STATUS, 0, status_vals[fldidx2]);
+                    putmixed(WIN_STATUS, 0, status_vals[fldidx2]);
                 } else {
-                   putstr(WIN_STATUS, 0, status_vals[fldidx2]);
+                    putstr(WIN_STATUS, 0, status_vals[fldidx2]);
                 }
                 if (tty_status_colors[fldidx2] != NO_COLOR)
                     term_end_color();
-#endif
             } else
-                putstr(WIN_STATUS, 0, status_vals[fldidx2]);
+#endif
+#endif /* STATUS_HILITES */
+            putstr(WIN_STATUS, 0, status_vals[fldidx2]);
         }
     }
     return;
