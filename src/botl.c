@@ -652,7 +652,8 @@ bot()
      * To work around it, we call status_update() with fictitious
      * index of BL_FLUSH (-1).
      */
-    if (context.botlx && !updated)
+    if ((context.botlx && !updated)
+        || windowprocs.win_status_update == genl_status_update)
         status_update(BL_FLUSH, (genericptr_t) 0, 0, 0);
 
     context.botl = context.botlx = 0;
@@ -796,7 +797,7 @@ boolean
                                   (!flags.showexp || Upolyd) ? FALSE : TRUE);
             break;
         case BL_CONDITION:
-            fieldfmt = "%S";
+            fieldfmt = "%s";
             fieldname = "condition";
             status_enablefield(fld, fieldname, fieldfmt, TRUE);
             break;
