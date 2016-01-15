@@ -623,6 +623,7 @@ int x, y;
     flush_screen(1);
 
     if (levl[x][y].typ == WATER && Is_waterlevel(&u.uz)) {
+        multi = 0;
         drown();
         return FALSE;
     }
