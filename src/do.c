@@ -919,7 +919,13 @@ dodown()
                 ladder_down =
                     (glyph_to_cmap(levl[u.ux][u.uy].glyph) == S_dnladder);
         }
-        floating_above(stairs_down ? "stairs" : ladder_down
+        if (Is_airlevel(&u.uz))
+            You("are floating in the %s.", surface(u.ux, u.uy));
+        else if (Is_waterlevel(&u.uz))
+            You("are floating in %s.",
+                is_pool(u.ux, u.uy) ? "the water" : "a bubble of air");
+        else
+            floating_above(stairs_down ? "stairs" : ladder_down
                                                     ? "ladder"
                                                     : surface(u.ux, u.uy));
         return 0; /* didn't move */
