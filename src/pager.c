@@ -316,6 +316,9 @@ char *buf, *monbuf;
         int tnum = what_trap(glyph_to_trap(glyph));
 
         Strcpy(buf, defsyms[trap_to_defsym(tnum)].explanation);
+    } else if (glyph_is_warning(glyph)) {
+        int warnindx = glyph_to_warning(glyph);
+        Strcpy(buf, def_warnsyms[warnindx].explanation);
     } else if (!glyph_is_cmap(glyph)) {
         Strcpy(buf, "unexplored area");
     } else
