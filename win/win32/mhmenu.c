@@ -1021,7 +1021,8 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
             if (iflags.use_menu_color
                 && (menucolr = get_menu_coloring(item->str, &color, &attr))) {
-                /* TODO: use attr too */
+                SelectObject(lpdis->hDC, 
+                             mswin_get_font(NHW_MENU, attr, lpdis->hDC, FALSE));
                 if (color != NO_COLOR)
                     SetTextColor(lpdis->hDC, nhcolor_to_RGB(color));
             }
