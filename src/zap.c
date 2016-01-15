@@ -831,7 +831,7 @@ boolean by_hero;
     }
 
     /* monster retains its name */
-    if (has_oname(corpse))
+    if (has_oname(corpse) && !unique_corpstat(mtmp->data))
         mtmp = christen_monst(mtmp, ONAME(corpse));
     /* partially eaten corpse yields wounded monster */
     if (corpse->oeaten)
