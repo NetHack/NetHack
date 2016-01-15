@@ -51,15 +51,6 @@ mswin_init_text_window()
 
     /* Set window caption */
     SetWindowText(ret, "Text");
-    if (!GetNHApp()->bWindowsLocked) {
-        DWORD style;
-        style = GetWindowLong(ret, GWL_STYLE);
-        style |= WS_CAPTION;
-        SetWindowLong(ret, GWL_STYLE, style);
-        SetWindowPos(ret, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE
-                                                | SWP_NOZORDER
-                                                | SWP_FRAMECHANGED);
-    }
 
     /* create and set window data */
     data = (PNHTextWindow) malloc(sizeof(NHTextWindow));
@@ -67,6 +58,9 @@ mswin_init_text_window()
         panic("out of memory");
     ZeroMemory(data, sizeof(NHTextWindow));
     SetWindowLongPtr(ret, GWLP_USERDATA, (LONG_PTR) data);
+
+    mswin_apply_window_style(ret);
+
     return ret;
 }
 
@@ -239,20 +233,35 @@ LayoutText(HWND hWnd)
     /* get window coordinates */
     GetClientRect(hWnd, &clrt);
 
-    /* set window placements */
-    GetWindowRect(btn_ok, &rt);
-    sz_ok.cx = clrt.right - clrt.left;
-    sz_ok.cy = rt.bottom - rt.top;
-    pt_ok.x = clrt.left;
-    pt_ok.y = clrt.bottom - sz_ok.cy;
+    if( !GetNHApp()->regNetHackMode ) {
+        /* set window placements */
+        GetWindowRect(btn_ok, &rt);
+        sz_ok.cx = clrt.right - clrt.left;
+        sz_ok.cy = rt.bottom - rt.top;
+        pt_ok.x = clrt.left;
+        pt_ok.y = clrt.bottom - sz_ok.cy;
 
-    pt_elem.x = clrt.left;
-    pt_elem.y = clrt.top;
-    sz_elem.cx = clrt.right - clrt.left;
-    sz_elem.cy = pt_ok.y;
+        pt_elem.x = clrt.left;
+        pt_elem.y = clrt.top;
+        sz_elem.cx = clrt.right - clrt.left;
+        sz_elem.cy = pt_ok.y;
 
-    MoveWindow(text, pt_elem.x, pt_elem.y, sz_elem.cx, sz_elem.cy, TRUE);
-    MoveWindow(btn_ok, pt_ok.x, pt_ok.y, sz_ok.cx, sz_ok.cy, TRUE);
+        MoveWindow(text, pt_elem.x, pt_elem.y, sz_elem.cx, sz_elem.cy, TRUE);
+        MoveWindow(btn_ok, pt_ok.x, pt_ok.y, sz_ok.cx, sz_ok.cy, TRUE);
+    } else {
+        sz_ok.cx = sz_ok.cy = 0;
+
+        pt_ok.x = pt_ok.y = 0;
+        pt_elem.x = clrt.left;
+        pt_elem.y = clrt.top;
+
+        sz_elem.cx = clrt.right - clrt.left;
+        sz_elem.cy = clrt.bottom - clrt.top;
+
+        ShowWindow(btn_ok, SW_HIDE);
+        MoveWindow(text, pt_elem.x, pt_elem.y, sz_elem.cx, sz_elem.cy, TRUE );
+    }
+    mswin_apply_window_style(text);
 }
 
 /* Edit box hook */
