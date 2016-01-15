@@ -621,6 +621,12 @@ int x, y;
     newsym(ox, oy);    /* update old position */
     vision_recalc(1);  /* update for new position */
     flush_screen(1);
+
+    if (levl[x][y].typ == WATER && Is_waterlevel(&u.uz)) {
+        drown();
+        return FALSE;
+    }
+
     /* FIXME:
      * Each trap should really trigger on the recoil if
      * it would trigger during normal movement. However,
