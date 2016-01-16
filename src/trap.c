@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1452660199 2016/01/13 04:43:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.255 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1452919834 2016/01/16 04:50:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.259 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1757,8 +1757,8 @@ int style;
         if ((mtmp = m_at(bhitpos.x, bhitpos.y)) != 0) {
             if (otyp == BOULDER && throws_rocks(mtmp->data)) {
                 if (rn2(3)) {
-		    if (cansee(bhitpos.x, bhitpos.y))
-			pline("%s snatches the boulder.", Monnam(mtmp));
+                    if (cansee(bhitpos.x, bhitpos.y))
+                        pline("%s snatches the boulder.", Monnam(mtmp));
                     singleobj->otrapped = 0;
                     (void) mpickobj(mtmp, singleobj);
                     used_up = TRUE;
