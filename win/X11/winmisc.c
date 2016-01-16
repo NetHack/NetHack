@@ -716,6 +716,7 @@ Cardinal *num_params;
 {
     char ch;
     int i;
+    int pass;
     XKeyEvent *xkey = (XKeyEvent *) event;
 
     nhUse(w);
@@ -768,20 +769,31 @@ Cardinal *num_params;
     if (ec_nchars >= EC_NCHARS)
         ec_nchars = EC_NCHARS - 1; /* don't overflow */
 
-    for (i = 0; extcmdlist[i].ef_txt; i++) {
-        if (extcmdlist[i].ef_txt[0] == '?')
-            continue;
-
-        if (!strncmp(ec_chars, extcmdlist[i].ef_txt, ec_nchars)) {
-            if (extended_command_selected != i) {
-                /* I should use set() and unset() actions, but how do */
-                /* I send the an action to the widget? */
-                if (extended_command_selected >= 0)
-                    swap_fg_bg(extended_commands[extended_command_selected]);
-                extended_command_selected = i;
+    for (pass = 0; pass < 2; pass++) {
+        if (pass == 1) {
+            /* first pass finished, but no matching command was found */
+            /* start a new one with the last char entered */
+            if (extended_command_selected >= 0)
                 swap_fg_bg(extended_commands[extended_command_selected]);
+            extended_command_selected = -1; /* dismiss */
+            ec_chars[0] = ec_chars[ec_nchars-1];
+            ec_nchars = 1;
+        }
+        for (i = 0; extcmdlist[i].ef_txt; i++) {
+            if (extcmdlist[i].ef_txt[0] == '?')
+                continue;
+
+            if (!strncmp(ec_chars, extcmdlist[i].ef_txt, ec_nchars)) {
+                if (extended_command_selected != i) {
+                    /* I should use set() and unset() actions, but how do */
+                    /* I send the an action to the widget? */
+                    if (extended_command_selected >= 0)
+                        swap_fg_bg(extended_commands[extended_command_selected]);
+                    extended_command_selected = i;
+                    swap_fg_bg(extended_commands[extended_command_selected]);
+                }
+                return;
             }
-            break;
         }
     }
 }
