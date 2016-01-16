@@ -1,4 +1,4 @@
-! $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+! $NHDT-Date: 1452920161 2016/01/16 04:56:01 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.9 $
 
 ! The display_file, tombstone, and menu windows are all formatted assuming
 ! a fixed width font.  Text windows may or may not be formatted as above.
@@ -87,7 +87,10 @@ NetHack*slow: True
 
 ! Parts of the fancy status display.
 !
-NetHack*status_condition.borderWidth:	0
+NetHack*status_condition1.borderWidth:	0
+NetHack*status_condition2.borderWidth:	0
+NetHack*status_condition3.borderWidth:	0
+NetHack*status_leftover.borderWidth:	0
 NetHack*status_info*borderWidth:	0
 
 ! Sample color screen entries.
@@ -106,12 +109,19 @@ NetHack*status_info*background:		wheat
 NetHack*status_info.background:		wheat
 NetHack*status_attributes*foreground:	black
 NetHack*status_attributes*background:	white
-NetHack*status_condition*foreground:	red
-NetHack*status_condition*background:	wheat
+NetHack*status_condition1*foreground:	red
+NetHack*status_condition1*background:	wheat
+NetHack*status_condition2*foreground:	black
+NetHack*status_condition2*background:	wheat
+NetHack*status_condition3*foreground:	black
+NetHack*status_condition3*background:	wheat
 NetHack*Scrollbar*foreground:		Sienna
 NetHack*Scrollbar*background:		wheat
 NetHack*status_info*showGrip:		False
 NetHack*status_attributes*showGrip:	False
+NetHack*status_condition1*showGrip:	False
+NetHack*status_condition2*showGrip:	False
+NetHack*status_condition3*showGrip:	False
 
 NetHack*player_selection*random.borderColor:	blue
 NetHack*player_selection*random.borderWidth:    2

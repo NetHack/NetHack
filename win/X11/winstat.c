@@ -1,4 +1,4 @@
-/* NetHack 3.6	winstat.c	$NHDT-Date: 1432512808 2015/05/25 00:13:28 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
+/* NetHack 3.6	winstat.c	$NHDT-Date: 1452920162 2016/01/16 04:56:02 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.16 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -196,8 +196,8 @@ struct X_status_value {
     Widget w;           /* widget of name/value pair */
     long last_value;    /* value displayed */
     int turn_count;     /* last time the value changed */
-    boolean set;        /* if hilighed */
-    boolean after_init; /* don't hilight on first change (init) */
+    boolean set;        /* if highlighted */
+    boolean after_init; /* don't highlight on first change (init) */
 };
 
 /* valid type values */
@@ -211,43 +211,56 @@ static const char *FDECL(width_string, (int));
 static void FDECL(create_widget, (Widget, struct X_status_value *, int));
 static void FDECL(get_widths, (struct X_status_value *, int *, int *));
 static void FDECL(set_widths, (struct X_status_value *, int, int));
-static Widget FDECL(init_column,
-                    (const char *, Widget, Widget, Widget, int *));
+static Widget FDECL(init_column, (const char *, Widget, Widget, Widget,
+                                  int *));
+static void NDECL(fixup_cond_widths);
 static Widget FDECL(init_info_form, (Widget, Widget, Widget));
 
 /*
  * Form entry storage indices.
  */
-#define F_STR 0
-#define F_DEX 1
-#define F_CON 2
-#define F_INT 3
-#define F_WIS 4
-#define F_CHA 5
+#define F_DUMMY     0
+#define F_STR       1
+#define F_DEX       2
+#define F_CON       3
+#define F_INT       4
+#define F_WIS       5
+#define F_CHA       6
 
-#define F_NAME 6
-#define F_DLEVEL 7
-#define F_GOLD 8
-#define F_HP 9
-#define F_MAXHP 10
-#define F_POWER 11
-#define F_MAXPOWER 12
-#define F_AC 13
-#define F_LEVEL 14
-#define F_EXP 15
-#define F_ALIGN 16
-#define F_TIME 17
-#define F_SCORE 18
+#define F_NAME      7
+#define F_DLEVEL    8
+#define F_GOLD      9
+#define F_HP       10
+#define F_MAXHP    11
+#define F_POWER    12
+#define F_MAXPOWER 13
+#define F_AC       14
+#define F_LEVEL    15
+#define F_EXP      16
+#define F_ALIGN    17
+#define F_TIME     18
+#define F_SCORE    19
 
-#define F_HUNGER 19
-#define F_CONFUSED 20
-#define F_SICK 21
-#define F_BLIND 22
-#define F_STUNNED 23
-#define F_HALLU 24
-#define F_ENCUMBER 25
+/* status conditions grouped by columns; tty orders these differently */
+#define F_STONE    20
+#define F_SLIME    21
+#define F_STRNGL   22
+#define F_FOODPOIS 23
+#define F_TERMILL  24
 
-#define NUM_STATS 26
+#define F_HUNGER   25
+#define F_ENCUMBER 26
+#define F_LEV      27
+#define F_FLY      28
+#define F_RIDE     29
+
+#define F_BLIND    30
+#define F_DEAF     31
+#define F_STUN     32
+#define F_CONF     33
+#define F_HALLU    34
+
+#define NUM_STATS 35
 
 /*
  * Notes:
@@ -256,34 +269,46 @@ static Widget FDECL(init_info_form, (Widget, Widget, Widget));
  * + Blank value is 0 and should never change.
  */
 static struct X_status_value shown_stats[NUM_STATS] = {
-    { "Strength", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE }, /* 0*/
+    { "", SV_NAME, (Widget) 0, -1, 0, FALSE, FALSE }, /* 0*/
+
+    { "Strength", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
     { "Dexterity", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
     { "Constitution", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
     { "Intelligence", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
-    { "Wisdom", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
-    { "Charisma", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE }, /* 5*/
+    { "Wisdom", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE }, /* 5*/
+    { "Charisma", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
 
     { "", SV_LABEL, (Widget) 0, -1, 0, FALSE, FALSE }, /* name */
     { "", SV_LABEL, (Widget) 0, -1, 0, FALSE, FALSE }, /* dlvl */
     { "Gold", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
-    { "Hit Points", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
-    { "Max HP", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE }, /*10*/
+    { "Hit Points", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE }, /*10*/
+    { "Max HP", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
     { "Power", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
     { "Max Power", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
     { "Armor Class", SV_VALUE, (Widget) 0, 256, 0, FALSE, FALSE },
-    { "Level", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
-    { "Experience", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE }, /*15*/
+    { "Level", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE }, /*15*/
+    { "Experience", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
     { "Alignment", SV_VALUE, (Widget) 0, -2, 0, FALSE, FALSE },
     { "Time", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
     { "Score", SV_VALUE, (Widget) 0, -1, 0, FALSE, FALSE },
 
-    { "", SV_NAME, (Widget) 0, -1, 0, FALSE, TRUE },        /* hunger*/
-    { "Confused", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE }, /*20*/
-    { "", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE },         /* sick */
-    { "Blind", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE },
+    { "Petrifying", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE }, /*20*/
+    { "Slimed", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE },
+    { "Strangled", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE },
+    { "Food Pois", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE },
+    { "Term Ill", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE },
+
+    { "", SV_NAME, (Widget) 0, -1, 0, FALSE, TRUE }, /*25*/     /* hunger */
+    { "", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE },             /*encumbr */
+    { "Levitating", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE },
+    { "Flying", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE },
+    { "Riding", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE },
+
+    { "Blind", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE }, /*30*/
+    { "Deaf", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE },
     { "Stunned", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE },
+    { "Confused", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE },
     { "Hallucinating", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE },
-    { "", SV_NAME, (Widget) 0, 0, 0, FALSE, TRUE }, /*encumbr*/
 };
 
 /*
@@ -345,19 +370,16 @@ long new_value;
     if (attr_rec->type == SV_LABEL) {
         if (attr_rec == &shown_stats[F_NAME]) {
             Strcpy(buf, plname);
-            if ('a' <= buf[0] && buf[0] <= 'z')
-                buf[0] += 'A' - 'a';
+            buf[0] = highc(buf[0]);
             Strcat(buf, " the ");
-            if (u.mtimedone) {
+            if (Upolyd) {
                 char mname[BUFSZ];
-                int k = 0;
+                int k;
 
                 Strcpy(mname, mons[u.umonnum].mname);
-                while (mname[k] != 0) {
-                    if ((k == 0 || (k > 0 && mname[k - 1] == ' '))
-                        && 'a' <= mname[k] && mname[k] <= 'z')
-                        mname[k] += 'A' - 'a';
-                    k++;
+                for (k = 0; mname[k] != '\0'; k++) {
+                    if (k == 0 || mname[k - 1] == ' ')
+                        mname[k] = highc(mname[k]);
                 }
                 Strcat(buf, mname);
             } else
@@ -394,18 +416,6 @@ long new_value;
             XtSetArg(args[0], XtNlabel, hu_stat[new_value]);
         } else if (attr_rec == &shown_stats[F_ENCUMBER]) {
             XtSetArg(args[0], XtNlabel, enc_stat[new_value]);
-        } else if (attr_rec == &shown_stats[F_SICK]) {
-            buf[0] = 0;
-            if (Sick) {
-                if (u.usick_type & SICK_VOMITABLE)
-                    Strcat(buf, "FoodPois");
-                if (u.usick_type & SICK_NONVOMITABLE) {
-                    if (u.usick_type & SICK_VOMITABLE)
-                        Strcat(buf, " ");
-                    Strcat(buf, "Ill");
-                }
-            }
-            XtSetArg(args[0], XtNlabel, buf);
         } else if (new_value) {
             XtSetArg(args[0], XtNlabel, attr_rec->name);
         } else {
@@ -480,11 +490,11 @@ long new_value;
         else if (attr_rec == &shown_stats[F_LEVEL]) {
             static boolean lev_was_poly = FALSE;
 
-            if (u.mtimedone && !lev_was_poly) {
+            if (Upolyd && !lev_was_poly) {
                 force_update = TRUE;
                 set_name(attr_rec->w, "HD");
                 lev_was_poly = TRUE;
-            } else if (!u.mtimedone && lev_was_poly) {
+            } else if (Upolyd && lev_was_poly) {
                 force_update = TRUE;
                 set_name(attr_rec->w, shown_stats[F_LEVEL].name);
                 lev_was_poly = FALSE;
@@ -492,17 +502,17 @@ long new_value;
         } else if (attr_rec == &shown_stats[F_EXP]) {
             static boolean exp_was_poly = FALSE;
 
-            if (u.mtimedone && !exp_was_poly) {
+            if (Upolyd && !exp_was_poly) {
                 force_update = TRUE;
                 set_name(attr_rec->w, "");
                 set_value(attr_rec->w, "");
                 exp_was_poly = TRUE;
-            } else if (!u.mtimedone && exp_was_poly) {
+            } else if (Upolyd && exp_was_poly) {
                 force_update = TRUE;
                 set_name(attr_rec->w, shown_stats[F_EXP].name);
                 exp_was_poly = FALSE;
             }
-            if (u.mtimedone)
+            if (Upolyd)
                 return; /* no display for exp when poly */
         }
 
@@ -564,10 +574,13 @@ long new_value;
  *	name, attributes, alignment, score
  *
  * Information on the second line:
- *	dlvl, gold, hp, power, ac, {level & exp or HD **}
- *	status (hunger, conf, halu, stun, sick, blind), time, encumbrance
+ *	dlvl, gold, hp, power, ac, {level & exp or HD **}, time,
+ *	status * (stone, slime, strngl, foodpois, termill,
+ *                hunger, encumbrance, lev, fly, ride,
+ *                blind, deaf, stun, conf, hallu)
  *
- * [**] HD is shown instead of level and exp if mtimedone is non-zero.
+ *  [*] order of status fields is different on tty.
+ * [**] HD is shown instead of level and exp if Upolyd.
  */
 static void
 update_fancy_status(wp)
@@ -582,6 +595,9 @@ struct xwindow *wp;
 
     for (i = 0, sv = shown_stats; i < NUM_STATS; i++, sv++) {
         switch (i) {
+        case F_DUMMY:
+            val = 0L;
+            break;
         case F_STR:
             val = (long) ACURR(A_STR);
             break;
@@ -608,23 +624,49 @@ struct xwindow *wp;
         case F_HUNGER:
             val = (long) u.uhs;
             break;
-        case F_CONFUSED:
-            val = (long) Confusion ? 1L : 0L;
-            break;
-        case F_SICK:
-            val = (long) Sick ? (long) u.usick_type : 0L;
-            break;
-        case F_BLIND:
-            val = (long) Blind ? 1L : 0L;
-            break;
-        case F_STUNNED:
-            val = (long) Stunned ? 1L : 0L;
-            break;
-        case F_HALLU:
-            val = (long) Hallucination ? 1L : 0L;
-            break;
         case F_ENCUMBER:
             val = (long) near_capacity();
+            break;
+        case F_LEV:
+            val = Levitation ? 1L : 0L;
+            break;
+        case F_FLY:
+            val = Flying ? 1L : 0L;
+            break;
+        case F_RIDE:
+            val = u.usteed ? 1L : 0L;
+            break;
+        /* fatal status conditions */
+        case F_STONE:
+            val = Stoned ? 1L : 0L;
+            break;
+        case F_SLIME:
+            val = Slimed ? 1L : 0L;
+            break;
+        case F_STRNGL:
+            val = Strangled ? 1L : 0L;
+            break;
+        case F_FOODPOIS:
+            val = (Sick && (u.usick_type & SICK_VOMITABLE)) ? 1L : 0L;
+            break;
+        case F_TERMILL:
+            val = (Sick && (u.usick_type & SICK_NONVOMITABLE)) ? 1L : 0L;
+            break;
+        /* non-fatal status conditions */
+        case F_BLIND:
+            val = Blind ? 1L : 0L;
+            break;
+        case F_DEAF:
+            val = Deaf ? 1L : 0L;
+            break;
+        case F_STUN:
+            val = Stunned ? 1L : 0L;
+            break;
+        case F_CONF:
+            val = Confusion ? 1L : 0L;
+            break;
+        case F_HALLU:
+            val = Hallucination ? 1L : 0L;
             break;
 
         case F_NAME:
@@ -635,13 +677,15 @@ struct xwindow *wp;
             break; /* special */
         case F_GOLD:
             val = money_cnt(invent);
+            if (val < 0L)
+                val = 0L; /* ought to issue impossible() and discard gold */
             break;
         case F_HP:
-            val = (long) (u.mtimedone ? (u.mh > 0 ? u.mh : 0)
-                                      : (u.uhp > 0 ? u.uhp : 0));
+            val = (long) (Upolyd ? (u.mh > 0 ? u.mh : 0)
+                                 : (u.uhp > 0 ? u.uhp : 0));
             break;
         case F_MAXHP:
-            val = (long) (u.mtimedone ? u.mhmax : u.uhpmax);
+            val = (long) (Upolyd ? u.mhmax : u.uhpmax);
             break;
         case F_POWER:
             val = (long) u.uen;
@@ -653,7 +697,7 @@ struct xwindow *wp;
             val = (long) u.uac;
             break;
         case F_LEVEL:
-            val = (long) (u.mtimedone ? mons[u.umonnum].mlevel : u.ulevel);
+            val = (long) (Upolyd ? mons[u.umonnum].mlevel : u.ulevel);
             break;
         case F_EXP:
             val = flags.showexp ? u.uexp : 0L;
@@ -664,15 +708,13 @@ struct xwindow *wp;
         case F_TIME:
             val = flags.time ? (long) moves : 0L;
             break;
+        case F_SCORE:
 #ifdef SCORE_ON_BOTL
-        case F_SCORE:
             val = flags.showscore ? botl_score() : 0L;
-            break;
 #else
-        case F_SCORE:
             val = 0L;
-            break;
 #endif
+            break;
         default: {
             /*
              * There is a possible infinite loop that occurs with:
@@ -683,15 +725,16 @@ struct xwindow *wp;
              * Break out with this.
              */
             static boolean active = FALSE;
+
             if (!active) {
                 active = TRUE;
                 impossible("update_other: unknown shown value");
                 active = FALSE;
             }
-            val = 0;
+            val = 0L;
             break;
-        }
-        }
+        } /* default */
+        } /* switch */
         update_val(sv, val);
     }
 }
@@ -728,6 +771,9 @@ width_string(sv_index)
 int sv_index;
 {
     switch (sv_index) {
+    case F_DUMMY:
+        return " ";
+
     case F_STR:
         return "018/**";
     case F_DEX:
@@ -738,19 +784,24 @@ int sv_index;
         return "088"; /* all but str never get bigger */
 
     case F_HUNGER:
-        return shown_stats[F_HUNGER].name;
-    case F_CONFUSED:
-        return shown_stats[F_CONFUSED].name;
-    case F_SICK:
-        return shown_stats[F_SICK].name;
-    case F_BLIND:
-        return shown_stats[F_BLIND].name;
-    case F_STUNNED:
-        return shown_stats[F_STUNNED].name;
-    case F_HALLU:
-        return shown_stats[F_HALLU].name;
+        return "Satiated";
     case F_ENCUMBER:
-        return shown_stats[F_ENCUMBER].name;
+        return "Overloaded";
+
+    case F_LEV:
+    case F_FLY:
+    case F_RIDE:
+    case F_STONE:
+    case F_SLIME:
+    case F_STRNGL:
+    case F_FOODPOIS:
+    case F_TERMILL:
+    case F_BLIND:
+    case F_DEAF:
+    case F_STUN:
+    case F_CONF:
+    case F_HALLU:
+        return shown_stats[sv_index].name;
 
     case F_NAME:
     case F_DLEVEL:
@@ -760,20 +811,20 @@ int sv_index;
         return "9999";
     case F_POWER:
     case F_MAXPOWER:
-        return "999";
+        return "9999";
     case F_AC:
-        return "-99";
+        return "-127";
     case F_LEVEL:
         return "99";
     case F_GOLD:
+        /* strongest hero can pick up roughly 30% of this much */
+        return "999999"; /* same limit as tty */
     case F_EXP:
-        return "4294967295"; /* max ulong */
+    case F_TIME:
+    case F_SCORE:
+        return "123456789"; /* a tenth digit will still fit legibly */
     case F_ALIGN:
         return "Neutral";
-    case F_TIME:
-        return "4294967295"; /* max ulong */
-    case F_SCORE:
-        return "4294967295"; /* max ulong */
     }
     impossible("width_string: unknown index %d\n", sv_index);
     return "";
@@ -804,16 +855,17 @@ int sv_index;
         num_args++;
         XtSetArg(args[num_args], XtNinternalHeight, 0);
         num_args++;
-        sv->w =
-            XtCreateManagedWidget(sv_index == F_NAME ? "name" : "dlevel",
-                                  labelWidgetClass, parent, args, num_args);
+        sv->w = XtCreateManagedWidget((sv_index == F_NAME)
+                                         ? "name"
+                                         : "dlevel",
+                                      labelWidgetClass, parent,
+                                      args, num_args);
         break;
     case SV_NAME:
         num_args = 0;
-        XtSetArg(args[num_args], XtNborderWidth, 0);
-        num_args++;
-        XtSetArg(args[num_args], XtNinternalHeight, 0);
-        num_args++;
+        XtSetArg(args[0], XtNlabel, width_string(sv_index)); num_args++;
+        XtSetArg(args[num_args], XtNborderWidth, 0); num_args++;
+        XtSetArg(args[num_args], XtNinternalHeight, 0); num_args++;
         sv->w = XtCreateManagedWidget(sv->name, labelWidgetClass, parent,
                                       args, num_args);
         break;
@@ -823,7 +875,7 @@ int sv_index;
 }
 
 /*
- * Get current width of value.  width2p is only valid for SV_LABEL types.
+ * Get current width of value.  width2p is only valid for SV_VALUE types.
  */
 static void
 get_widths(sv, width1p, width2p)
@@ -896,8 +948,8 @@ int *col_indices;
     }
     XtSetArg(args[num_args], nhStr(XtNdefaultDistance), 0);
     num_args++;
-    form =
-        XtCreateManagedWidget(name, formWidgetClass, parent, args, num_args);
+    form = XtCreateManagedWidget(name, formWidgetClass, parent,
+                                 args, num_args);
 
     max_width1 = max_width2 = 0;
     for (ip = col_indices; *ip >= 0; ip++) {
@@ -932,17 +984,29 @@ int *col_indices;
  * indicates the end of the column.  The two numbers after that are used
  * to store widths that are calculated at run-time.
  */
-static int attrib_indices[] = { F_STR, F_DEX, F_CON, F_INT, F_WIS,
-                                F_CHA, -1,    0,     0 };
-static int status_indices[] = { F_HUNGER,  F_CONFUSED, F_SICK,     F_BLIND,
-                                F_STUNNED, F_HALLU,    F_ENCUMBER, -1,
-                                0,         0 };
+static int attrib_indices[] = { F_STR, F_DEX, F_CON, F_INT, F_WIS, F_CHA,
+                                -1, 0, 0 };
+/* including F_DUMMY makes the three status condition columns evenly
+   spaced with regard to the adjacent characteristics (Str,Dex,&c) column;
+   we lose track of the Widget pointer for them, each use clobbering the
+   one before, leaving the one from leftover_indices[]; since they're never
+   updated, that shouldn't matter */
+static int status_indices[3][9] = { { F_STONE, F_SLIME, F_STRNGL,
+                                      F_FOODPOIS, F_TERMILL, F_DUMMY,
+                                      -1, 0, 0 },
+                                    { F_HUNGER, F_ENCUMBER,
+                                      F_LEV, F_FLY, F_RIDE, F_DUMMY,
+                                      -1, 0, 0 },
+                                    { F_BLIND, F_DEAF, F_STUN,
+                                      F_CONF, F_HALLU, F_DUMMY,
+                                      -1, 0, 0 } };
+/* used to fill up the empty space to right of 3rd status condition column */
+static int leftover_indices[] = { F_DUMMY, -1, 0, 0 };
 
-static int col2_indices[] = { F_MAXHP,    F_ALIGN, F_TIME, F_EXP,
-                              F_MAXPOWER, -1,      0,      0 };
-static int col1_indices[] = { F_HP,    F_AC, F_GOLD, F_LEVEL, F_POWER,
-                              F_SCORE, -1,   0,      0 };
-
+static int col1_indices[] = { F_HP,    F_POWER,    F_AC,    F_LEVEL, F_GOLD,
+                              F_SCORE, -1, 0, 0 };
+static int col2_indices[] = { F_MAXHP, F_MAXPOWER, F_ALIGN, F_EXP,   F_TIME,
+                              -1, 0, 0 };
 /*
  * Produce a form that looks like the following:
  *
@@ -953,6 +1017,8 @@ static int col1_indices[] = { F_HP,    F_AC, F_GOLD, F_LEVEL, F_POWER,
  *    .		    .
  *    .		    .
  * col1_indices[n]	col2_indices[n]
+ *
+ * TODO:  increase the space between the two columns.
  */
 static Widget
 init_info_form(parent, top, left)
@@ -1014,6 +1080,40 @@ Widget parent, top, left;
     return form;
 }
 
+/* give the three status condition columns the same width */
+static void
+fixup_cond_widths()
+{
+    int pass, i, *ip, w1, w2;
+
+    w1 = w2 = 0;
+    for (pass = 1; pass <= 2; ++pass) { /* two passes... */
+        for (i = 0; i < 3; i++) { /* three columns */
+            for (ip = status_indices[i]; *ip != -1; ++ip) { /* X fields */
+                /* pass 1: find -1;  pass 2: update field widths, find -1 */
+                if (pass == 2)
+                    set_widths(&shown_stats[*ip], w1, w2);
+            }
+            /* found -1; the two slots beyond it contain column widths */
+            if (pass == 1) { /* pass 1: collect maxima */
+                if (ip[1] > w1)
+                    w1 = ip[1];
+                if (ip[2] > w2)
+                    w2 = ip[2];
+            } else { /* pass 2: update column widths with maxima */
+                ip[1] = w1;
+                ip[2] = w2;
+            }
+        }
+        /* ascetics:  expand the maximum width to make cond columns wider */
+        if (pass == 1) {
+            w1 += 20;
+            if (w2 > 0)
+                w2 += 20;
+        }
+    }
+}
+
 /*
  * Create the layout for the fancy status.  Return a form widget that
  * contains everything.
@@ -1026,6 +1126,8 @@ Widget parent, top;
     Widget w;
     Arg args[8];
     Cardinal num_args;
+    char buf[32];
+    int i;
 
     num_args = 0;
     if (top != (Widget) 0) {
@@ -1043,8 +1145,13 @@ Widget parent, top;
 
     w = init_info_form(form, (Widget) 0, (Widget) 0);
     w = init_column("status_attributes", form, (Widget) 0, w, attrib_indices);
-    (void) init_column("status_condition", form, (Widget) 0, w,
-                       status_indices);
+    for (i = 0; i < 3; i++) {
+        Sprintf(buf, "status_condition%d", i + 1);
+        w = init_column(buf, form, (Widget) 0, w, status_indices[i]);
+    }
+    fixup_cond_widths(); /* make all 3 status_conditionN columns same width */
+    w = init_column("status_leftover", form, (Widget) 0, w, leftover_indices);
+    nhUse(w);
     return form;
 }
 
