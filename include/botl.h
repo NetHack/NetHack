@@ -9,10 +9,10 @@
  * than COLNO
  *
  * longest practical second status line at the moment is
-Astral Plane \GXXXXNNNN:123456 HP:1000(1000) Pw:111(111) AC:-127
+Astral Plane \GXXXXNNNN:123456 HP:1234(1234) Pw:1234(1234) AC:-127
  Xp:30/123456789 T:123456  Stone Slime Strngl FoodPois TermIll
  Satiated Overloaded Blind Deaf Stun Conf Hallu Lev Ride
- * -- or a bit under 185 characters.  '$' gets encoded even when it
+ * -- or about 185 characters.  '$' gets encoded even when it
  * could be used as-is.  The first five status conditions are fatal
  * so it's rare to have more than one at a time.
  *
