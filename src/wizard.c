@@ -425,13 +425,39 @@ register struct monst *mtmp;
     return 0;
 }
 
+/* are there any monsters mon could aggravate? */
+boolean
+has_aggravatables(mon)
+struct monst *mon;
+{
+    struct monst *mtmp;
+    boolean in_w_tower = In_W_tower(mon->mx, mon->my, &u.uz);
+
+    if (in_w_tower != In_W_tower(u.ux, u.uy, &u.uz))
+        return FALSE;
+
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+        if (DEADMONSTER(mtmp))
+            continue;
+        if (in_w_tower != In_W_tower(mtmp->mx, mtmp->my, &u.uz))
+            continue;
+        if ((mtmp->mstrategy & STRAT_WAITFORU) != 0
+            || mtmp->msleeping || !mtmp->mcanmove)
+            return TRUE;
+    }
+    return FALSE;
+}
+
 void
 aggravate()
 {
     register struct monst *mtmp;
+    boolean in_w_tower = In_W_tower(u.ux, u.uy, &u.uz);
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp))
+            continue;
+        if (in_w_tower != In_W_tower(mtmp->mx, mtmp->my, &u.uz))
             continue;
         mtmp->mstrategy &= ~(STRAT_WAITFORU | STRAT_APPEARMSG);
         mtmp->msleeping = 0;
