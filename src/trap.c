@@ -1757,7 +1757,8 @@ int style;
         if ((mtmp = m_at(bhitpos.x, bhitpos.y)) != 0) {
             if (otyp == BOULDER && throws_rocks(mtmp->data)) {
                 if (rn2(3)) {
-                    pline("%s snatches the boulder.", Monnam(mtmp));
+		    if (cansee(bhitpos.x, bhitpos.y))
+			pline("%s snatches the boulder.", Monnam(mtmp));
                     singleobj->otrapped = 0;
                     (void) mpickobj(mtmp, singleobj);
                     used_up = TRUE;
