@@ -911,30 +911,30 @@ register struct monst *mtmp;
     case MS_RIDER: {
         const char *tribtitle;
         struct obj *book = 0;
+        boolean ms_Death = (ptr == &mons[PM_DEATH]);
 
-        /* 3.6.0 tribute */
-        if (ptr == &mons[PM_DEATH] && !context.tribute.Deathnotice
+        /* 3.6 tribute */
+        if (ms_Death && !context.tribute.Deathnotice
             && (book = u_have_novel()) != 0) {
             if ((tribtitle = noveltitle(&book->novelidx)) != 0) {
                 Sprintf(verbuf, "Ah, so you have a copy of /%s/.", tribtitle);
                 /* no Death featured in these two, so exclude them */
-                if (!strcmpi(tribtitle, "Snuff")
-                    || !strcmpi(tribtitle, "The Wee Free Men"))
+                if (strcmpi(tribtitle, "Snuff")
+                    && strcmpi(tribtitle, "The Wee Free Men"))
                     Strcat(verbuf, "  I may have been misquoted there.");
                 verbl_msg = verbuf;
             }
             context.tribute.Deathnotice = 1;
-        } else if (ptr == &mons[PM_DEATH] && rn2(3)
-                   && Death_quote(verbuf, BUFSZ)) {
-                verbl_msg = verbuf;
-
+        } else if (ms_Death && rn2(3) && Death_quote(verbuf, sizeof verbuf)) {
+            verbl_msg = verbuf;
         /* end of tribute addition */
-        } else if (ptr == &mons[PM_DEATH] && !rn2(10)) {
+
+        } else if (ms_Death && !rn2(10)) {
             pline_msg = "is busy reading a copy of Sandman #8.";
         } else
             verbl_msg = "Who do you think you are, War?";
         break;
-    } /* MS_RIDER */
+    } /* case MS_RIDER */
     } /* switch */
 
     if (pline_msg) {
@@ -942,6 +942,7 @@ register struct monst *mtmp;
     } else if (mtmp->mcan && verbl_msg_mcan) {
         verbalize1(verbl_msg_mcan);
     } else if (verbl_msg) {
+        /* more 3.6 tribute */
         if (ptr == &mons[PM_DEATH]) {
             /* Death talks in CAPITAL LETTERS
                and without quotation marks */
