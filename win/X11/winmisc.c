@@ -18,6 +18,7 @@
 #include <X11/Xaw/Command.h>
 #include <X11/Xaw/Form.h>
 #include <X11/Xaw/Label.h>
+#include <X11/Xaw/Scrollbar.h>
 #include <X11/Xaw/Viewport.h>
 #include <X11/Xaw/Cardinals.h>
 #include <X11/Xos.h> /* for index() */
@@ -706,6 +707,60 @@ ec_dismiss()
     exit_x_event = TRUE; /* leave event loop */
 }
 
+void
+ec_scroll_to_view()
+{
+    Arg args[3];
+    Cardinal num_args;
+    Position y, h; /* ext cmd label y and height */
+    Widget viewport, scrollbar, tmpw;
+    float s_shown, s_top; /* scrollbar pos */
+    float s_min, s_max;
+    Position vh; /* viewport height */
+
+    if (extended_command_selected < 0)
+        return;
+
+    /* get selected ext command label y position and height */
+    num_args = 0;
+    XtSetArg(args[num_args], XtNy, &y); num_args++;
+    XtSetArg(args[num_args], XtNheight, &h); num_args++;
+    XtGetValues(extended_commands[extended_command_selected], args, num_args);
+
+    /* get viewport and scrollbar widgets */
+    tmpw = extended_commands[extended_command_selected];
+    viewport = XtParent(tmpw);
+    do {
+        tmpw = XtParent(tmpw);
+        scrollbar = XtNameToWidget(tmpw, "*vertical");
+    } while (!scrollbar && tmpw);
+
+    if (scrollbar && viewport) {
+        /* get viewport height */
+        num_args = 0;
+        XtSetArg(args[num_args], XtNheight, &vh); num_args++;
+        XtGetValues(viewport, args, num_args);
+
+        /* get scrollbar "height" and "top" position; floats between 0-1 */
+        num_args = 0;
+        XtSetArg(args[num_args], XtNshown, &s_shown); num_args++;
+        XtSetArg(args[num_args], XtNtopOfThumb, &s_top); num_args++;
+        XtGetValues(scrollbar, args, num_args);
+
+        s_min = s_top * vh;
+        s_max = (s_top + s_shown) * vh;
+
+        /* scroll if outside the view */
+        if ((int)y <= (int)s_min) {
+            s_min = (float)(y / (float)vh);
+            XtCallCallbacks(scrollbar, XtNjumpProc, &s_min);
+        } else if ((int)(y + h) >= (int)s_max) {
+            s_min = (float)((y+h) / (float)vh) - s_shown;
+            XtCallCallbacks(scrollbar, XtNjumpProc, &s_min);
+        }
+    }
+}
+
 /* ARGSUSED */
 void
 ec_key(w, event, params, num_params)
@@ -792,6 +847,7 @@ Cardinal *num_params;
                     extended_command_selected = i;
                     swap_fg_bg(extended_commands[extended_command_selected]);
                 }
+                ec_scroll_to_view();
                 return;
             }
         }
