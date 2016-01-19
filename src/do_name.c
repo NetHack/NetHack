@@ -74,6 +74,16 @@ const char *goal;
     Sprintf(sbuf, "Type a .%s when you are at the right place.",
             doing_what_is ? " or , or ; or :" : "");
     putstr(tmpwin, 0, sbuf);
+    if (doing_what_is) {
+        putstr(tmpwin, 0,
+        "  : describe current spot, show 'more info', move to another spot.");
+        Sprintf(sbuf, "  . describe current spot,%s move to another spot;",
+                flags.help ? " prompt if 'more info'," : "");
+        putstr(tmpwin, 0, sbuf);
+        putstr(tmpwin, 0, "  , describe current spot, move to another spot;");
+        putstr(tmpwin, 0,
+               "  ; describe current spot, stop looking at things;");
+    }
     if (!force)
         putstr(tmpwin, 0, "Type Space or Escape when you're done.");
     putstr(tmpwin, 0, "");
