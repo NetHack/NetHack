@@ -2686,6 +2686,7 @@ boolean picked_some;
     skip_objects = (flags.pile_limit > 0 && obj_cnt >= flags.pile_limit);
     if (u.uswallow && u.ustuck) {
         struct monst *mtmp = u.ustuck;
+
         Sprintf(fbuf, "Contents of %s %s", s_suffix(mon_nam(mtmp)),
                 mbodypart(mtmp, STOMACH));
         /* Skip "Contents of " by using fbuf index 12 */
@@ -2829,6 +2830,7 @@ boolean picked_some;
 int
 dolook()
 {
+    iflags.last_msg = PLNMSG_NOREP_OVERRIDE;
     return look_here(0, FALSE);
 }
 

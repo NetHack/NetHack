@@ -363,11 +363,13 @@ extern NEARDATA struct sysflag sysflags;
 extern NEARDATA struct instance_flags iflags;
 
 /* last_msg values */
-#define PLNMSG_UNKNOWN 0             /* arbitrary */
-#define PLNMSG_ONE_ITEM_HERE 1       /* "you see <single item> here" */
-#define PLNMSG_TOWER_OF_FLAME 2      /* scroll of fire */
+#define PLNMSG_NOSHO_OVERRIDE    (-2)
+#define PLNMSG_NOREP_OVERRIDE    (-1)
+#define PLNMSG_UNKNOWN             0 /* arbitrary */
+#define PLNMSG_ONE_ITEM_HERE       1 /* "you see <single item> here" */
+#define PLNMSG_TOWER_OF_FLAME      2 /* scroll of fire */
 #define PLNMSG_CAUGHT_IN_EXPLOSION 3 /* explode() feedback */
-#define PLNMSG_OBJ_GLOWS 4           /* "the <obj> glows <color>" */
+#define PLNMSG_OBJ_GLOWS           4 /* "the <obj> glows <color>" */
 
 /* runmode options */
 #define RUN_TPORT 0 /* don't update display until movement stops */
