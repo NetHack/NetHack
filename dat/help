@@ -77,8 +77,10 @@ b j n   1 2 3           g<dir>:   run in direction <dir> until something
 Commands:
         NetHack knows the following commands:
         ?       Help menu.
-        /       Tell what a symbol represents.  You may choose to specify
-                a location or give a symbol argument.
+        /       What-is, tell what a symbol represents.  You may choose to
+                specify a location or give a symbol argument.  Enabling the
+                autodescribe option will give information about the symbol
+                at each location you move the cursor onto.
         &       Tell what a command does.
         <       Go up a staircase (if you are standing on it).
         >       Go down a staircase (if you are standing on it).

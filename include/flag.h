@@ -171,6 +171,7 @@ struct sysflag {
 #define GPCOORDS_NONE    'n'
 #define GPCOORDS_MAP     'm'
 #define GPCOORDS_COMPASS 'c'
+#define GPCOORDS_SCREEN  's'
 
 struct instance_flags {
     /* stuff that really isn't option or platform related. They are

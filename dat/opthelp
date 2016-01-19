@@ -157,6 +157,13 @@ suppress_alert disable various version-specific warnings about changes
               for the 'Q' command that quitting is now done via #quit
               (e.g., use suppress_alert:3.3.1 to stop that and any other
               notifications added in that version or earlier) default: [(none)]
+whatis_coord  controls whether to include map coordinates when autodescribe
+              is active for the '/' and ';' commands.  Value is the first
+              letter of one of
+              compass -- ('east' or '3s' or '2n,4w')
+              map     -- <x,y>        (map column x=0 is not used)
+              screen  -- [row,column] (row is offset to match tty usage)
+              none    -- no coordinates shown; default: [n]
 
 Compound options which may be set only on startup are:
 

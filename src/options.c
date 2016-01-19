@@ -294,7 +294,6 @@ static struct Comp_Opt {
       DISP_IN_GAME }, /*WC*/
     { "fruit", "the name of a fruit you enjoy eating", PL_FSIZ, SET_IN_GAME },
     { "gender", "your starting gender (male or female)", 8, DISP_IN_GAME },
-    { "getpos_coord", "show coordinates when getting cursor position", 1, SET_IN_GAME },
     { "horsename", "the name of your (first) horse (e.g., horsename:Silver)",
       PL_PSIZ, DISP_IN_GAME },
     { "map_mode", "map display mode under Windows", 20, DISP_IN_GAME }, /*WC*/
@@ -377,6 +376,9 @@ static struct Comp_Opt {
     { "roguesymset",
       "load a set of rogue display symbols from the symbols file", 70,
       SET_IN_GAME },
+#ifdef WIN32
+    { "subkeyvalue", "override keystroke value", 7, SET_IN_FILE },
+#endif
     { "suppress_alert", "suppress alerts about version-specific features", 8,
       SET_IN_GAME },
     { "tile_width", "width of tiles", 20, DISP_IN_GAME },   /*WC*/
@@ -395,9 +397,8 @@ static struct Comp_Opt {
     { "videoshades", "gray shades to map to black/gray/white", 32,
       DISP_IN_GAME },
 #endif
-#ifdef WIN32
-    { "subkeyvalue", "override keystroke value", 7, SET_IN_FILE },
-#endif
+    { "whatis_coord", "show coordinates when auto-describing cursor position",
+      1, SET_IN_GAME },
     { "windowcolors", "the foreground/background colors of windows", /*WC*/
       80, DISP_IN_GAME },
     { "windowtype", "windowing system to use", WINTYPELEN, DISP_IN_GAME },
@@ -2348,7 +2349,7 @@ boolean tinitial, tfrom_file;
         return;
     }
 
-    fullname = "getpos_coord";
+    fullname = "whatis_coord";
     if (match_optname(opts, fullname, 6, TRUE)) {
         if (duplicate)
             complain_about_duplicate(opts, 1);
@@ -2356,11 +2357,13 @@ boolean tinitial, tfrom_file;
             iflags.getpos_coords = GPCOORDS_NONE;
             return;
         } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
-            if (tolower(*op) == GPCOORDS_NONE
-                || tolower(*op) == GPCOORDS_COMPASS
-                || tolower(*op) == GPCOORDS_MAP) {
-                iflags.getpos_coords = tolower(*op);
-            } else
+            static char gpcoords[] = { GPCOORDS_NONE, GPCOORDS_COMPASS,
+                                       GPCOORDS_MAP, GPCOORDS_SCREEN, '\0' };
+            char c = lowc(*op);
+
+            if (c && index(gpcoords, c))
+                iflags.getpos_coords = c;
+            else
                 badoption(opts);
         }
         return;
@@ -4042,24 +4045,55 @@ boolean setinitial, setfromfile;
             free((genericptr_t) mode_pick);
         }
         destroy_nhwindow(tmpwin);
-    } else if (!strcmp("getpos_coord", optname)) {
+    } else if (!strcmp("whatis_coord", optname)) {
         menu_item *window_pick = (menu_item *) 0;
+        int pick_cnt;
+        char gp = iflags.getpos_coords;
 
         tmpwin = create_nhwindow(NHW_MENU);
         start_menu(tmpwin);
         any = zeroany;
         any.a_char = GPCOORDS_COMPASS;
         add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_COMPASS,
-                 0, ATR_NONE, "compass", MENU_UNSELECTED);
+                 0, ATR_NONE, "compass ('east' or '3s' or '2n,4w')",
+                 (gp == GPCOORDS_COMPASS) ? MENU_SELECTED : MENU_UNSELECTED);
         any.a_char = GPCOORDS_MAP;
         add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_MAP,
-                 0, ATR_NONE, "map", MENU_UNSELECTED);
+                 0, ATR_NONE, "map <x,y>",
+                 (gp == GPCOORDS_MAP) ? MENU_SELECTED : MENU_UNSELECTED);
+        any.a_char = GPCOORDS_SCREEN;
+        add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_SCREEN,
+                 0, ATR_NONE, "screen [row,column]",
+                 (gp == GPCOORDS_SCREEN) ? MENU_SELECTED : MENU_UNSELECTED);
         any.a_char = GPCOORDS_NONE;
         add_menu(tmpwin, NO_GLYPH, &any, GPCOORDS_NONE,
-                 0, ATR_NONE, "none", MENU_UNSELECTED);
-        end_menu(tmpwin, "Select coordinate display when picking a position:");
-        if (select_menu(tmpwin, PICK_ONE, &window_pick) > 0) {
-            iflags.getpos_coords = window_pick->item.a_char;
+                 0, ATR_NONE, "none (no coordinates displayed)",
+                 (gp == GPCOORDS_NONE) ? MENU_SELECTED : MENU_UNSELECTED);
+        any.a_long = 0L;
+        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
+        Sprintf(buf, "map: upper-left: <%d,%d>, lower-right: <%d,%d>%s",
+                1, 0, COLNO - 1, ROWNO - 1,
+                flags.verbose ? "; column 0 unused, off left edge" : "");
+        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
+        if (strcmp(windowprocs.name, "tty"))
+            add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
+       "screen: row is offset to accommodate tty interface's use of top line",
+                     MENU_UNSELECTED);
+        Sprintf(buf, "screen: upper-left: [%02d,%02d], lower-right: [%d,%d]%s",
+                0 + 2, 1, ROWNO - 1 + 2, COLNO - 1,
+#if COLNO == 80
+                flags.verbose ? "; column 80 is not used" :
+#endif
+                "");
+        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
+        end_menu(tmpwin,
+            "Select coordinate display when auto-describing a map position:");
+        if ((pick_cnt = select_menu(tmpwin, PICK_ONE, &window_pick)) > 0) {
+            iflags.getpos_coords = window_pick[0].item.a_char;
+            /* PICK_ONE doesn't unselect preselected entry when
+               selecting another one */
+            if (pick_cnt > 1 && iflags.getpos_coords == gp)
+                iflags.getpos_coords = window_pick[1].item.a_char;
             free((genericptr_t) window_pick);
         }
         destroy_nhwindow(tmpwin);
@@ -4810,10 +4844,11 @@ char *buf;
         Sprintf(buf, "%s", rolestring(flags.initrole, roles, name.m));
     } else if (!strcmp(optname, "runmode")) {
         Sprintf(buf, "%s", runmodes[flags.runmode]);
-    } else if (!strcmp(optname, "getpos_coord")) {
+    } else if (!strcmp(optname, "whatis_coord")) {
         Sprintf(buf, "%s",
                 (iflags.getpos_coords == GPCOORDS_MAP) ? "map"
                 : (iflags.getpos_coords == GPCOORDS_COMPASS) ? "compass"
+                : (iflags.getpos_coords == GPCOORDS_SCREEN) ? "screen"
                 : "none");
     } else if (!strcmp(optname, "scores")) {
         Sprintf(buf, "%d top/%d around%s", flags.end_top, flags.end_around,

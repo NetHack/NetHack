@@ -987,12 +987,7 @@ boolean do_mons; /* True => monsters, False => objects */
 {
     winid win;
     int x, y, lo_x, lo_y, hi_x, hi_y, glyph, count = 0;
-    char buf[BUFSZ], outbuf[BUFSZ], coordbuf[12], fmt[12]; /* "%02d,%02d" */
-
-    /* row,column orientation rather than cartesian x,y */
-    Sprintf(fmt, "%%%sd,%%%sd",
-            (ROWNO <= 100) ? "02" : (ROWNO <= 1000) ? "03" : "",
-            (COLNO <= 100) ? "02" : (COLNO <= 1000) ? "03" : "");
+    char lookbuf[BUFSZ], outbuf[BUFSZ];
 
     win = create_nhwindow(NHW_TEXT);
     lo_y = nearby ? max(u.uy - BOLT_LIM, 0) : 0;
@@ -1001,7 +996,7 @@ boolean do_mons; /* True => monsters, False => objects */
     hi_x = nearby ? min(u.ux + BOLT_LIM, COLNO - 1) : COLNO - 1;
     for (y = lo_y; y <= hi_y; y++) {
         for (x = lo_x; x <= hi_x; x++) {
-            buf[0] = '\0';
+            lookbuf[0] = '\0';
             glyph = glyph_at(x, y);
             if (do_mons) {
                 if (glyph_is_monster(glyph)) {
@@ -1010,49 +1005,56 @@ boolean do_mons; /* True => monsters, False => objects */
                     bhitpos.x = x; /* [is this actually necessary?] */
                     bhitpos.y = y;
                     if (x == u.ux && y == u.uy && canspotself()) {
-                        (void) self_lookat(buf);
+                        (void) self_lookat(lookbuf);
                         ++count;
                     } else if ((mtmp = m_at(x, y)) != 0) {
-                        look_at_monster(buf, (char *) 0, mtmp, x, y);
+                        look_at_monster(lookbuf, (char *) 0, mtmp, x, y);
                         ++count;
                     }
                 } else if (glyph_is_invisible(glyph)) {
                     /* remembered, unseen, creature */
-                    Strcpy(buf, invisexplain);
+                    Strcpy(lookbuf, invisexplain);
                     ++count;
                 } else if (glyph_is_warning(glyph)) {
                     int warnindx = glyph_to_warning(glyph);
 
-                    Strcpy(buf, def_warnsyms[warnindx].explanation);
+                    Strcpy(lookbuf, def_warnsyms[warnindx].explanation);
                     ++count;
                 }
             } else { /* !do_mons */
                 if (glyph_is_object(glyph)) {
-                    look_at_object(buf, x, y, glyph);
+                    look_at_object(lookbuf, x, y, glyph);
                     ++count;
                 }
             }
-            if (*buf) {
-                if (count == 1) {
-                    char which[12];
+            if (*lookbuf) {
+                char coordbuf[20], which[12], cmode;
 
+                cmode = (iflags.getpos_coords != GPCOORDS_NONE)
+                           ? iflags.getpos_coords : GPCOORDS_MAP;
+                if (count == 1) {
                     Strcpy(which, do_mons ? "monsters" : "objects");
-                    if (nearby) {
-                        Sprintf(coordbuf, fmt, u.uy, u.ux);
+                    if (nearby)
                         Sprintf(outbuf, "%s currently shown near %s:",
-                                upstart(which), coordbuf);
-                    } else
+                                upstart(which),
+                                (cmode != GPCOORDS_COMPASS)
+                                  ? coord_desc(u.ux, u.uy, coordbuf, cmode)
+                                  : !canspotself() ? "your position" : "you");
+                    else
                         Sprintf(outbuf, "All %s currently shown on the map:",
                                 which);
                     putstr(win, 0, outbuf);
                     putstr(win, 0, "");
                 }
-                Sprintf(coordbuf, fmt, y, x);
-                /* prefix: "C  row,column  " */
-                Sprintf(outbuf, "%s  %s  ", encglyph(glyph), coordbuf);
+                /* prefix: "coords  C  " where 'C' is mon or obj symbol */
+                Sprintf(outbuf, (cmode == GPCOORDS_SCREEN) ? "%s  "
+                                  : (cmode == GPCOORDS_MAP) ? "%8s  "
+                                      : "%12s  ",
+                        coord_desc(x, y, coordbuf, cmode));
+                Sprintf(eos(outbuf), "%s  ", encglyph(glyph));
                 /* guard against potential overflow */
-                buf[sizeof buf - 1 - strlen(outbuf)] = '\0';
-                Strcat(outbuf, buf);
+                lookbuf[sizeof lookbuf - 1 - strlen(outbuf)] = '\0';
+                Strcat(outbuf, lookbuf);
                 putmixed(win, 0, outbuf);
             }
         }
