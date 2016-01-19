@@ -342,14 +342,37 @@ show only your experience level here.
 The number of turns elapsed so far, displayed if you have the
 .op time
 option set.
-.lp "Hunger status
-Your current hunger status, ranging from \fBSatiated\fP down to
-\fBFainting\fP.  If your hunger status is normal, it is not displayed.
-.pg
-Additional status flags may appear after the hunger status:  \fBConf\fP
-when you're confused, \fBFoodPois\fP or \fBIll\fP
-when sick, \fBBlind\fP when you can't
-see, \fBStun\fP when stunned, and \fBHallu\fP when hallucinating.
+.lp Status
+Hunger:
+your current hunger status.
+Values are \fBSatiated\fP, \fBNot Hungry\fP (or \fBNormal\fP),
+\fBHungry\fP, \fBWeak\fP, and \fBFainting\fP.
+.\" not mentioned: Fainted
+Not shown when \fBNormal\fP.
+.lp ""
+Encumbrance:
+an indication of how what your are carrying affects your ability to move.
+Values are \fBUnencumbered\fP, \fBEncumbered\fP, \fBStressed\fP,
+\fBStrained\fP, \fBOvertaxed\fP, and \fBOverloaded\fP.
+Not shown when \fBUnencumbered\fP.
+.lp ""
+Fatal conditions:
+\fBStone\fP (aka \fBPetrifying\fP, turning to stone),
+\fBSlime\fP (turning into green slime),
+\fBStrngl\fP (being strangled),
+\fBFoodPois\fP (suffering from acute food poisoning),
+\fBTermIll\fP (suffering from a terminal illness).
+.lp ""
+Non-fatal conditions:
+\fBBlind\fP (can't see), \fBDeaf\fP (can't hear),
+\fBStun\fB (stunned), \fBConf\fP (confused), \fBHallu\fP (hallucinating).
+.lp ""
+Movement modifiers:
+\fBLev\fP (levitating), \fBFly\fP (flying), \fBRide\fP (riding).
+.lp ""
+Other conditions and modifiers exist, but there isn't enough room to
+display them with the other status fields.  The `^X' command shows
+all relevant status conditions.
 .hn 2
 The message line (top)
 .pg
@@ -429,8 +452,8 @@ of the Mazes of Menace.  Watch out, they can be nasty and vicious.
 Sometimes, however, they can be helpful.
 .lp I
 This marks the last known location of an invisible or otherwise unseen
-monster.  Note that the monster could have moved.  The 'F' and 'm' commands
-may be useful here.
+monster.  Note that the monster could have moved.
+The `F' and `m' commands may be useful here.
 .pg
 You need not memorize all these symbols; you can ask the game what any
 symbol represents with the `/' command (see the next section for

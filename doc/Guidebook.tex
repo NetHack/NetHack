@@ -405,16 +405,42 @@ show only your experience level here.
 The number of turns elapsed so far, displayed if you have the
 {\it time\/} option set.
 %.lp
-\item[\bb{Hunger Status}]
-Your current hunger status, ranging from %
-{\it Satiated\/} down to {\it Fainting}.  If your hunger status is normal,
-it is not displayed.
-%.pg
-Additional status flags may appear after the hunger status:
-{\it Conf\/} when you're confused, {\it FoodPois\/} or {\it Ill\/}
-when sick, {\it Blind\/}
-when you can't see, {\it Stun\/} when stunned, and {\it Hallu\/} when
-hallucinating.
+\item[\bb{Status}]
+Hunger:
+your current hunger status.
+Values are {\it Satiated}, {\it Not~Hungry\/} (or {\it Normal\/}),
+{\it Hungry}, {\it Weak}, and {\it Fainting}.
+%.\" not mentioned: Fainted
+Not shown when {\it Normal}.
+
+%.lp ""
+Encumbrance:
+an indication of how what your are carrying affects your ability to move.
+Values are {\it Unencumbered}, {\it Encumbered}, {\it Stressed},
+{\it Strained}, {\it Overtaxed}, and {\it Overloaded}.
+Not shown when {\it Unencumbered}.
+
+%.lp ""
+Fatal~conditions:
+{\it Stone\/} (aka {\it Petrifying}, turning to stone),
+{\it Slime\/} (turning into green slime),
+{\it Strngl\/} (being strangled),
+{\it FoodPois\/} (suffering from acute food poisoning),
+{\it TermIll\/} (suffering from a terminal illness).
+
+%.lp ""
+Non-fatal~conditions:
+{\it Blind\/} (can't see), {\it Deaf\/} (can't hear),
+{\it Stun\/} (stunned), {\it Conf\/} (confused), {\it Hallu\/} (hallucinating).
+
+%.lp ""
+Movement~modifiers:
+{\it Lev\/} (levitating), {\it Fly\/} (flying), {\it Ride\/} (riding).
+
+%.lp ""
+Other conditions and modifiers exist, but there isn't enough room to
+display them with the other status fields.  The `{\tt \^{}X}' command shows
+all relevant status conditions.
 \elist
 
 %.hn 2
@@ -529,8 +555,8 @@ Sometimes, however, they can be helpful.
 %.lp
 \item[\tb{I}]
 This marks the last known location of an invisible or otherwise unseen
-monster.  Note that the monster could have moved.  The `F' and `m' commands
-may be useful here.
+monster.  Note that the monster could have moved.
+The `{\tt F}' and `{\tt m}' commands may be useful here.
 
 \elist
 %.pg
