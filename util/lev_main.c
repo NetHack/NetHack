@@ -1,5 +1,5 @@
 /* NetHack 3.6	lev_main.c	$NHDT-Date: 1448074107 2015/11/21 02:48:27 $  $NHDT-Branch: master $:$NHDT-Revision: 1.43 $ */
-/*	Copyright (c) 1989 by Jean-Christophe Collet */
+/*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -939,7 +939,7 @@ long spovar;
 
     togl = ((togl + 1) % 2);
 
-    snprintf(buf[togl], 127, "%s%s", n, (is_array ? " array" : ""));
+    Sprintf(buf[togl], "%s%s", n, (is_array ? " array" : ""));
     return buf[togl];
 }
 

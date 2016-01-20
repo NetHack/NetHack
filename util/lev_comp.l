@@ -102,9 +102,9 @@ FILE *orig_yyin = NULL;
 #define ST_RETF(y, x) do { savetoken(yytext); y; return x; } while (0);
 
 %}
-%e 2000
-%p 5000
-%n 700
+%e 2500
+%p 10000
+%n 1500
 %s MAPC
 %%
 <MAPC>ENDMAP	{
