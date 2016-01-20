@@ -2830,8 +2830,16 @@ boolean picked_some;
 int
 dolook()
 {
-    iflags.last_msg = PLNMSG_NOREP_OVERRIDE;
-    return look_here(0, FALSE);
+    int res;
+
+    /* don't let
+       MSGTYPE={norep,noshow} "You see here"
+       interfere with feedback from the look-here command */
+    hide_unhide_msgtypes(TRUE, MSGTYP_MASK_REP_SHOW);
+    res = look_here(0, FALSE);
+    /* restore normal msgtype handling */
+    hide_unhide_msgtypes(FALSE, MSGTYP_MASK_REP_SHOW);
+    return res;
 }
 
 boolean

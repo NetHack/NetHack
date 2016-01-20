@@ -1641,8 +1641,8 @@ E int NDECL(dotogglepickup);
 E void NDECL(option_help);
 E void FDECL(next_opt, (winid, const char *));
 E int FDECL(fruitadd, (char *, struct fruit *));
-E int FDECL(choose_classes_menu,
-            (const char *, int, BOOLEAN_P, char *, char *));
+E int FDECL(choose_classes_menu, (const char *, int, BOOLEAN_P,
+                                  char *, char *));
 E void FDECL(add_menu_cmd_alias, (CHAR_P, CHAR_P));
 E char FDECL(map_menu_cmd, (CHAR_P));
 E void FDECL(assign_warnings, (uchar *));
@@ -1666,6 +1666,7 @@ E boolean FDECL(get_menu_coloring, (char *, int *, int *));
 E void NDECL(free_menu_coloring);
 E boolean FDECL(msgtype_parse_add, (char *));
 E int FDECL(msgtype_type, (const char *, BOOLEAN_P));
+E void FDECL(hide_unhide_msgtypes, (BOOLEAN_P, int));
 E void NDECL(msgtype_free);
 
 /* ### pager.c ### */

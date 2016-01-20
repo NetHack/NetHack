@@ -1500,11 +1500,33 @@ boolean norepeat; /* called from Norep(via pline) */
     struct plinemsg_type *tmp = plinemsg_types;
 
     while (tmp) {
+        /* we don't exclude entries with negative msgtype values
+           because then the msg might end up matching a later pattern */
         if (regex_match(msg, tmp->regex))
             return tmp->msgtype;
         tmp = tmp->next;
     }
     return norepeat ? MSGTYP_NOREP : MSGTYP_NORMAL;
+}
+
+/* negate one or more types of messages so that their type handling will
+   be disabled or re-enabled; MSGTYPE_NORMAL (value 0) is not affected */
+void
+hide_unhide_msgtypes(hide, hide_mask)
+boolean hide;
+int hide_mask;
+{
+    struct plinemsg_type *tmp;
+    int mt;
+
+    /* negative msgtype value won't be recognized by pline, so does nothing */
+    for (tmp = plinemsg_types; tmp; tmp = tmp->next) {
+        mt = tmp->msgtype;
+        if (!hide)
+            mt = -mt; /* unhide: negate negative, yielding positive */
+        if (mt > 0 && ((1 << mt) & hide_mask))
+            tmp->msgtype = -tmp->msgtype;
+    }
 }
 
 int

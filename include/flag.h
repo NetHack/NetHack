@@ -363,13 +363,18 @@ extern NEARDATA struct sysflag sysflags;
 extern NEARDATA struct instance_flags iflags;
 
 /* last_msg values */
-#define PLNMSG_NOSHO_OVERRIDE    (-2)
-#define PLNMSG_NOREP_OVERRIDE    (-1)
 #define PLNMSG_UNKNOWN             0 /* arbitrary */
 #define PLNMSG_ONE_ITEM_HERE       1 /* "you see <single item> here" */
 #define PLNMSG_TOWER_OF_FLAME      2 /* scroll of fire */
 #define PLNMSG_CAUGHT_IN_EXPLOSION 3 /* explode() feedback */
 #define PLNMSG_OBJ_GLOWS           4 /* "the <obj> glows <color>" */
+    /* Usage:
+     *  pline("some message");
+     *    pline: vsprintf + putstr + iflags.last_msg = PLNMSG_UNKNOWN;
+     *  iflags.last_msg = PLNMSG_some_message;
+     * and subsequent code can adjust the next message if it is affected
+     * by some_message.  The next message will clear iflags.last_msg.
+     */
 
 /* runmode options */
 #define RUN_TPORT 0 /* don't update display until movement stops */

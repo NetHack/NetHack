@@ -87,26 +87,9 @@ VA_DECL(const char *, line)
         return;
     }
 
-    /*
-     * Normally the sequence is
-     *  caller: pline("some message");
-     *   pline: vsprintf + putstr + iflags.last_msg = PLNMSG_UNKNOWN;
-     *  caller: iflags.last_msg = PLNMSG_some_message;
-     * and subsequent code can adjust the next message if it is
-     * affected by some_message.
-     *
-     * But some callers can use last_msg to control handling of next
-     * message
-     *  caller: iflags.last_msg = PLNMSG_NOREP_OVERRIDE;
-     *  caller: pline("another message");
-     * to force another_message to be delivered even if is a repeat
-     * and user's MSGTYPE settings have classified it as don't-repeat.
-     */
-
     msgtyp = msgtype_type(line, no_repeat);
-    if ((msgtyp == MSGTYP_NOSHOW && iflags.last_msg != PLNMSG_NOSHO_OVERRIDE)
-        || (msgtyp == MSGTYP_NOREP && iflags.last_msg != PLNMSG_NOREP_OVERRIDE
-            && !strcmp(line, prevmsg)))
+    if (msgtyp == MSGTYP_NOSHOW
+        || (msgtyp == MSGTYP_NOREP && !strcmp(line, prevmsg)))
         return;
     if (vision_full_recalc)
         vision_recalc(0);
