@@ -113,12 +113,13 @@ static const char *const shkweapons[] = {
 
 static const char *const shktools[] = {
     /* Spmi */
-    "Ymla", "Eed-morra", "Cubask", "Nieb", "Bnowr Falr", "Telloc Cyaj",
+    "Ymla", "Eed-morra", "Elan Lapinski", "Cubask", "Nieb", "Bnowr Falr",
     "Sperc", "Noskcirdneh", "Yawolloh", "Hyeghu", "Niskal", "Trahnil",
     "Htargcm", "Enrobwem", "Kachzi Rellim", "Regien", "Donmyar", "Yelpur",
-    "Nosnehpets", "Stewe", "Renrut", "-Zlaw", "Nosalnef", "Rewuorb",
-    "Rellenk", "Yad", "Cire Htims", "Y-crad", "Nenilukah", "Corsh", "Aned",
-    "Niknar", "Lapu", "Lechaim", "Rebrol-nek", "AlliWar Wickson", "Oguhmk",
+    "Nosnehpets", "Stewe", "Renrut", "Senna Hut", "-Zlaw", "Nosalnef",
+    "Rewuorb", "Rellenk", "Yad", "Cire Htims", "Y-crad", "Nenilukah",
+    "Corsh", "Aned", "Dark Eery", "Niknar", "Lapu", "Lechaim",
+    "Rebrol-nek", "AlliWar Wickson", "Oguhmk", "Telloc Cyaj",
 #ifdef OVERLAY
     "Erreip", "Nehpets", "Mron", "Snivek", "Kahztiy",
 #endif
