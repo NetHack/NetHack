@@ -1,4 +1,4 @@
-/* NetHack 3.6	winX.h	$NHDT-Date: 1433806583 2015/06/08 23:36:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
+/* NetHack 3.6	winX.h	$NHDT-Date: 1453447524 2016/01/22 07:25:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.19 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -280,7 +280,7 @@ E Widget
 FDECL(CreateDialog, (Widget, String, XtCallbackProc, XtCallbackProc));
 E void FDECL(SetDialogPrompt, (Widget, String));
 E String FDECL(GetDialogResponse, (Widget));
-E void FDECL(SetDialogResponse, (Widget, String));
+E void FDECL(SetDialogResponse, (Widget, String, unsigned));
 E void FDECL(positionpopup, (Widget, BOOLEAN_P));
 
 /* ### winX.c ### */
