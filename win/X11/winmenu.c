@@ -1,4 +1,4 @@
-/* NetHack 3.6	winmenu.c	$NHDT-Date: 1432512809 2015/05/25 00:13:29 $  $NHDT-Branch: master $:$NHDT-Revision: 1.12 $ */
+/* NetHack 3.6	winmenu.c	$NHDT-Date: 1453448854 2016/01/22 07:47:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.13 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -739,10 +739,10 @@ menu_item **menu_list;
     Cardinal num_args;
     String *ptr;
     int retval;
-    Dimension v_pixel_width, v_pixel_height;
+    Dimension v_pixel_width, v_pixel_height, lblwidth[6], maxlblwidth;
     boolean labeled;
-    Widget viewport_widget, form, label, ok, cancel, all, none, invert,
-        search;
+    Widget viewport_widget, form, label,
+           ok, cancel, all, none, invert, search, lblwidget[6];
     Boolean sens;
 #ifdef USE_FWF
     Boolean *boolp;
@@ -866,6 +866,7 @@ menu_item **menu_list;
         /*
          * Create ok, cancel, all, none, invert, and search buttons..
          */
+        maxlblwidth = 0;
         num_args = 0;
         XtSetArg(args[num_args], nhStr(XtNfromVert), label);
         num_args++;
@@ -880,6 +881,10 @@ menu_item **menu_list;
         ok = XtCreateManagedWidget("OK", commandWidgetClass, form, args,
                                    num_args);
         XtAddCallback(ok, XtNcallback, menu_ok, (XtPointer) wp);
+        XtSetArg(args[0], XtNwidth, &lblwidth[0]);
+        XtGetValues(lblwidget[0] = ok, args, ONE);
+        if (lblwidth[0] > maxlblwidth)
+            maxlblwidth = lblwidth[0];
 
         num_args = 0;
         XtSetArg(args[num_args], nhStr(XtNfromVert), label);
@@ -899,6 +904,10 @@ menu_item **menu_list;
         cancel = XtCreateManagedWidget("cancel", commandWidgetClass, form,
                                        args, num_args);
         XtAddCallback(cancel, XtNcallback, menu_cancel, (XtPointer) wp);
+        XtSetArg(args[0], XtNwidth, &lblwidth[1]);
+        XtGetValues(lblwidget[1] = cancel, args, ONE);
+        if (lblwidth[1] > maxlblwidth)
+            maxlblwidth = lblwidth[1];
 
         sens = (how == PICK_ANY);
         num_args = 0;
@@ -919,6 +928,10 @@ menu_item **menu_list;
         all = XtCreateManagedWidget("all", commandWidgetClass, form, args,
                                     num_args);
         XtAddCallback(all, XtNcallback, menu_all, (XtPointer) wp);
+        XtSetArg(args[0], XtNwidth, &lblwidth[2]);
+        XtGetValues(lblwidget[2] = all, args, ONE);
+        if (lblwidth[2] > maxlblwidth)
+            maxlblwidth = lblwidth[2];
 
         num_args = 0;
         XtSetArg(args[num_args], nhStr(XtNfromVert), label);
@@ -938,6 +951,10 @@ menu_item **menu_list;
         none = XtCreateManagedWidget("none", commandWidgetClass, form, args,
                                      num_args);
         XtAddCallback(none, XtNcallback, menu_none, (XtPointer) wp);
+        XtSetArg(args[0], XtNwidth, &lblwidth[3]);
+        XtGetValues(lblwidget[3] = none, args, ONE);
+        if (lblwidth[3] > maxlblwidth)
+            maxlblwidth = lblwidth[3];
 
         num_args = 0;
         XtSetArg(args[num_args], nhStr(XtNfromVert), label);
@@ -957,6 +974,10 @@ menu_item **menu_list;
         invert = XtCreateManagedWidget("invert", commandWidgetClass, form,
                                        args, num_args);
         XtAddCallback(invert, XtNcallback, menu_invert, (XtPointer) wp);
+        XtSetArg(args[0], XtNwidth, &lblwidth[4]);
+        XtGetValues(lblwidget[4] = invert, args, ONE);
+        if (lblwidth[4] > maxlblwidth)
+            maxlblwidth = lblwidth[4];
 
         num_args = 0;
         XtSetArg(args[num_args], nhStr(XtNfromVert), label);
@@ -976,6 +997,20 @@ menu_item **menu_list;
         search = XtCreateManagedWidget("search", commandWidgetClass, form,
                                        args, num_args);
         XtAddCallback(search, XtNcallback, menu_search, (XtPointer) wp);
+        XtSetArg(args[0], XtNwidth, &lblwidth[5]);
+        XtGetValues(lblwidget[5] = search, args, ONE);
+        if (lblwidth[5] > maxlblwidth)
+            maxlblwidth = lblwidth[5];
+
+        /* make all buttons be the same width */
+        {
+            int i;
+
+            XtSetArg(args[0], XtNwidth, maxlblwidth);
+            for (i = 0; i < 6; ++i)
+                if (lblwidth[i] < maxlblwidth)
+                    XtSetValues(lblwidget[i], args, ONE);
+        }
 
         num_args = 0;
         XtSetArg(args[num_args], nhStr(XtNallowVert), True);
@@ -986,10 +1021,9 @@ menu_item **menu_list;
         num_args++;
         XtSetArg(args[num_args], nhStr(XtNuseRight), True);
         num_args++;
-        /*
-                XtSetArg(args[num_args], nhStr(XtNforceBars), True);
-           num_args++;
-        */
+#if 0
+        XtSetArg(args[num_args], nhStr(XtNforceBars), True); num_args++;
+#endif
         XtSetArg(args[num_args], nhStr(XtNfromVert), all);
         num_args++;
         XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop);
