@@ -1,4 +1,4 @@
-/* NetHack 3.6	winX.c	$NHDT-Date: 1432512808 2015/05/25 00:13:28 $  $NHDT-Branch: master $:$NHDT-Revision: 1.33 $ */
+/* NetHack 3.6	winX.c	$NHDT-Date: 1453446819 2016/01/22 07:13:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.35 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1294,7 +1294,7 @@ X11_askname()
                           (XtCallbackProc) 0);
 
     SetDialogPrompt(dialog, nhStr("What is your name?")); /* set prompt */
-    SetDialogResponse(dialog, nhStr("")); /* set default answer */
+    SetDialogResponse(dialog, nhStr(""), PL_NSIZ); /* set default answer */
 
     XtRealizeWidget(popup);
     positionpopup(popup, TRUE); /* center,bottom */
@@ -1396,11 +1396,12 @@ char *input;
 
         XtSetArg(args[0], XtNallowShellResize, True);
 
-        getline_popup = XtCreatePopupShell(
-            "getline", transientShellWidgetClass, toplevel, args, ONE);
-        XtOverrideTranslations(
-            getline_popup, XtParseTranslationTable(
-                               "<Message>WM_PROTOCOLS: getline_delete()"));
+        getline_popup = XtCreatePopupShell("getline",
+                                           transientShellWidgetClass,
+                                           toplevel, args, ONE);
+        XtOverrideTranslations(getline_popup,
+                               XtParseTranslationTable(
+                                  "<Message>WM_PROTOCOLS: getline_delete()"));
 
         getline_dialog = CreateDialog(getline_popup, nhStr("dialog"),
                                       done_button, abort_button);
@@ -1410,7 +1411,7 @@ char *input;
                         &wm_delete_window, 1);
     }
     SetDialogPrompt(getline_dialog, (String) question); /* set prompt */
-    SetDialogResponse(getline_dialog, nhStr("")); /* set default answer */
+    SetDialogResponse(getline_dialog, nhStr(""), 60); /* set default answer */
     positionpopup(getline_popup, TRUE);           /* center,bottom */
 
     nh_XtPopup(getline_popup, (int) XtGrabExclusive, getline_dialog);

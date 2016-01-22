@@ -48,7 +48,13 @@
  *      target type" issued by 'gcc -Wwrite-strings' as used by nethack.
  *      (For this file, always the second parameter to XtSetArg().)
  *
- * $NHDT-Date: 1452594032 2016/01/12 10:20:32 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.7 $
+ * Modified 1/2016, Pat Rankin.
+ *    + Added minimum width argument to SetDialogResponse() so that the
+ *      text entry widget can be forced to wider than the default response.
+ *    + Make 'okay' button same width as 'cancel', and both wider than
+ *      default by a small arbitrary amount.
+ *
+ * $NHDT-Date: 1453446809 2016/01/22 07:13:29 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.8 $
  */
 
 #ifndef SYSV
@@ -99,6 +105,7 @@ XtCallbackProc cancel_callback;
     Widget form, prompt, response, okay, cancel;
     Arg args[20];
     Cardinal num_args;
+    Dimension owidth, cwidth;
 
     num_args = 0;
 #ifdef SPECIAL_CMAP
@@ -191,6 +198,8 @@ XtCallbackProc cancel_callback;
     okay = XtCreateManagedWidget("okay", commandWidgetClass, form, args,
                                  num_args);
     XtAddCallback(okay, XtNcallback, okay_callback, form);
+    XtSetArg(args[0], XtNwidth, &owidth);
+    XtGetValues(okay, args, ONE);
 
     /* Only create cancel button if there is a callback for it. */
     if (cancel_callback) {
@@ -224,7 +233,18 @@ XtCallbackProc cancel_callback;
                                        args, num_args);
         XtAddCallback(cancel, XtNcallback, cancel_callback, form);
         XtInstallAccelerators(response, cancel);
-    }
+        XtSetArg(args[0], XtNwidth, &cwidth);
+        XtGetValues(cancel, args, ONE);
+        /* widen the cancel button */
+        cwidth += 25;
+        XtSetArg(args[0], XtNwidth, cwidth);
+        XtSetValues(cancel, args, ONE);
+    } else
+        cwidth = owidth + 25;
+
+    /* make okay button same width as cancel, or widen it if no cancel */
+    XtSetArg(args[0], XtNwidth, cwidth);
+    XtSetValues(okay, args, ONE);
 
     XtInstallAccelerators(response, okay);
     XtSetKeyboardFocus(form, response);
@@ -279,18 +299,21 @@ Widget w;
     return XtNewString(s);
 }
 
-#define max(a, b) (((a) > (b)) ? (a) : (b))
 /* set the default reponse */
 void
-SetDialogResponse(w, s)
+SetDialogResponse(w, s, ln)
 Widget w;
 String s;
+unsigned ln;
 {
     Arg args[4];
     Widget response;
     XFontStruct *font;
     Dimension width, nwidth, leftMargin, rightMargin;
+    unsigned s_len = strlen(s);
 
+    if (s_len < ln)
+        s_len = ln;
     response = XtNameToWidget(w, "response");
     XtSetArg(args[0], nhStr(XtNfont), &font);
     XtSetArg(args[1], nhStr(XtNleftMargin), &leftMargin);
@@ -298,7 +321,7 @@ String s;
     XtSetArg(args[3], nhStr(XtNwidth), &width);
     XtGetValues(response, args, FOUR);
     /* width includes margins as per Xaw documentation */
-    nwidth = (font->max_bounds.width * strlen(s)) + leftMargin + rightMargin;
+    nwidth = font->max_bounds.width * (s_len + 1) + leftMargin + rightMargin;
     if (nwidth < width)
         nwidth = width;
 
@@ -395,3 +418,5 @@ boolean bottom; /* position y on bottom? */
     XSetWMNormalHints(XtDisplay(w), XtWindow(w), hints);
     XFree(hints);
 }
+
+/*dialogs.c*/
