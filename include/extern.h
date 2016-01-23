@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1452123455 2016/01/06 23:37:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.535 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1453514592 2016/01/23 02:03:12 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.542 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2025,7 +2025,7 @@ E char *FDECL(build_plselection_prompt, (char *, int, int, int, int, int));
 E char *FDECL(root_plselection_prompt, (char *, int, int, int, int, int));
 E void NDECL(plnamesuffix);
 E void FDECL(role_selection_prolog, (int, winid));
-E void FDECL(role_menu_extra, (int, winid));
+E void FDECL(role_menu_extra, (int, winid, BOOLEAN_P));
 E void NDECL(role_init);
 E const char *FDECL(Hello, (struct monst *));
 E const char *NDECL(Goodbye);
