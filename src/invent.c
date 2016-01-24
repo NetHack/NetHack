@@ -1131,9 +1131,10 @@ register const char *let, *word;
                  && (!Is_astralevel(&u.uz) ^ (otmp->oclass != AMULET_CLASS)))
              /* suppress container being stashed into */
              || (!strcmp(word, "stash") && !ck_bag(otmp))
-             /* worn armor or accessory covered by cursed worn armor */
+             /* worn armor (shirt, suit) covered by worn armor (suit, cloak)
+                or accessory (ring) covered by cursed worn armor (gloves) */
              || (taking_off(word)
-                 && inaccessible_equipment(otmp, (const char *) 0, TRUE))
+                 && inaccessible_equipment(otmp, (const char *) 0, FALSE))
              || (!strcmp(word, "write on")
                  && (!(otyp == SCR_BLANK_PAPER || otyp == SPE_BLANK_PAPER)
                      || !otmp->dknown || !objects[otyp].oc_name_known))
