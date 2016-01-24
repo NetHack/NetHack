@@ -3205,6 +3205,9 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
     } else if (mvitals[monsndx(mdat)].mvflags & G_GENOD)
         return 0; /* passed in mdat is genocided */
 
+    if (mdat == mtmp->data)
+        return 0; /* still the same monster */
+
     mgender_from_permonst(mtmp, mdat);
 
     if (In_endgame(&u.uz) && is_mplayer(olddata) && has_mname(mtmp)) {
@@ -3219,9 +3222,6 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
         if (p)
             *p = '\0';
     }
-
-    if (mdat == mtmp->data)
-        return 0; /* still the same monster */
 
     if (mtmp->wormno) { /* throw tail away */
         wormgone(mtmp);
@@ -3336,6 +3336,12 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
         if (save_mname)
             MNAME(mtmp) = save_mname;
     }
+
+    /* when polymorph trap/wand/potion produces a vampire, turn in into
+       a full-fledged vampshifter unless shape-changing is blocked */
+    if (mtmp->cham == NON_PM && mdat->mlet == S_VAMPIRE
+        && !Protection_from_shape_changers)
+        mtmp->cham = pm_to_cham(monsndx(mdat));
 
     possibly_unwield(mtmp, polyspot); /* might lose use of weapon */
     mon_break_armor(mtmp, polyspot);
