@@ -1109,11 +1109,12 @@ boolean at_stairs, falling, portal;
 {
     int fd, l_idx;
     xchar new_ledger;
-    boolean cant_go_back, up = (depth(newlevel) < depth(&u.uz)),
-                          newdungeon = (u.uz.dnum != newlevel->dnum),
-                          was_in_W_tower = In_W_tower(u.ux, u.uy, &u.uz),
-                          familiar = FALSE;
-    boolean new = FALSE; /* made a new level? */
+    boolean cant_go_back, great_effort,
+            up = (depth(newlevel) < depth(&u.uz)),
+            newdungeon = (u.uz.dnum != newlevel->dnum),
+            was_in_W_tower = In_W_tower(u.ux, u.uy, &u.uz),
+            familiar = FALSE,
+            new = FALSE; /* made a new level? */
     struct monst *mtmp;
     char whynot[BUFSZ];
     char *annotation;
@@ -1314,11 +1315,13 @@ boolean at_stairs, falling, portal;
                 u_on_dnstairs();
             /* you climb up the {stairs|ladder};
                fly up the stairs; fly up along the ladder */
-            pline("%s %s up%s the %s.",
-                  (Punished && !Levitation) ? "With great effort you" : "You",
-                  Flying ? "fly" : "climb",
-                  (Flying && at_ladder) ? " along" : "",
-                  at_ladder ? "ladder" : "stairs");
+            great_effort = (Punished && !Levitation);
+            if (flags.verbose || great_effort)
+                pline("%s %s up%s the %s.",
+                      great_effort ? "With great effort, you" : "You",
+                      Flying ? "fly" : "climb",
+                      (Flying && at_ladder) ? " along" : "",
+                      at_ladder ? "ladder" : "stairs");
         } else { /* down */
             if (at_ladder)
                 u_on_newpos(xupladder, yupladder);
@@ -1332,8 +1335,8 @@ boolean at_stairs, falling, portal;
                 if (flags.verbose)
                     You("fly down %s.",
                         at_ladder ? "along the ladder" : "the stairs");
-            } else if (near_capacity() > UNENCUMBERED || Punished
-                       || Fumbling) {
+            } else if (near_capacity() > UNENCUMBERED
+                       || Punished || Fumbling) {
                 You("fall down the %s.", at_ladder ? "ladder" : "stairs");
                 if (Punished) {
                     drag_down();
