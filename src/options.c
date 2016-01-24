@@ -3556,10 +3556,11 @@ char ch;
 #define OPTIONS_HEADING "NETHACKOPTIONS"
 #endif
 
-static char fmtstr_doset_add_menu[] = "%s%-15s [%s]   ";
-static char fmtstr_doset_add_menu_tab[] = "%s\t[%s]";
+static char fmtstr_doset[] = "%s%-15s [%s]   ";
+static char fmtstr_doset_tab[] = "%s\t[%s]";
 static char n_currently_set[] = "(%d currently set)";
 
+/* doset('O' command) menu entries for compound options */
 STATIC_OVL void
 doset_add_menu(win, option, indexoffset)
 winid win;          /* window to add to */
@@ -3593,10 +3594,10 @@ int indexoffset;    /* value to add to index in compopt[], or zero
     }
     /* "    " replaces "a - " -- assumes menus follow that style */
     if (!iflags.menu_tab_sep)
-        Sprintf(buf, fmtstr_doset_add_menu, any.a_int ? "" : "    ", option,
+        Sprintf(buf, fmtstr_doset, any.a_int ? "" : "    ", option,
                 value);
     else
-        Sprintf(buf, fmtstr_doset_add_menu_tab, option, value);
+        Sprintf(buf, fmtstr_doset_tab, option, value);
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
 }
 
@@ -3616,10 +3617,10 @@ int nset;
     else
         Sprintf(buf2, "%s", bufx);
     if (!iflags.menu_tab_sep)
-        Sprintf(buf, fmtstr_doset_add_menu, any.a_int ? "" : "    ",
+        Sprintf(buf, fmtstr_doset, any.a_int ? "" : "    ",
                 name, buf2);
     else
-        Sprintf(buf, fmtstr_doset_add_menu_tab, name, buf2);
+        Sprintf(buf, fmtstr_doset_tab, name, buf2);
     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
 }
 
@@ -3631,23 +3632,80 @@ enum opt_other_enums {
     /* these must be < 0 */
 };
 
+/* presently only used when determining longest option name */
+static struct other_opts {
+    const char *name;
+    int optflags;
+    enum opt_other_enums code;
+} othropt[] = {
+    { "autopickup exceptions", SET_IN_GAME, OPT_OTHER_APEXC },
+    { "menucolors", SET_IN_GAME, OPT_OTHER_MENUCOLOR },
+    { "message types", SET_IN_GAME, OPT_OTHER_MSGTYPE },
+#ifdef STATUS_VIA_WINDOWPORT
+#ifdef STATUS_HILITES
+    { "status_hilites", SET_IN_GAME, OPT_OTHER_STATHILITE },
+#endif
+#endif
+    { (char *) 0, 0, (enum opt_other_enums) 0 },
+};
 
-/* Changing options via menu by Per Liboriussen */
+/* the 'O' command */
 int
-doset()
+doset() /* changing options via menu by Per Liboriussen */
 {
+    static boolean made_fmtstr = FALSE;
     char buf[BUFSZ], buf2[BUFSZ];
+    const char *name;
     int i = 0, pass, boolcount, pick_cnt, pick_idx, opt_indx;
     boolean *bool_p;
     winid tmpwin;
     anything any;
     menu_item *pick_list;
-    int indexoffset, startpass, endpass;
+    int indexoffset, startpass, endpass, optflags;
     boolean setinitial = FALSE, fromfile = FALSE;
-    int biggest_name = 0;
+    unsigned longest_name_len;
 
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin);
+
+#ifdef notyet /* SYSCF */
+    /* XXX I think this is still fragile.  Fixing initial/from_file and/or
+       changing the SET_* etc to bitmaps will let me make this better. */
+    if (wizard)
+        startpass = SET_IN_SYS;
+    else
+#endif
+        startpass = DISP_IN_GAME;
+    endpass = (wizard) ? SET_IN_WIZGAME : SET_IN_GAME;
+
+    if (!made_fmtstr && !iflags.menu_tab_sep) {
+        /* spin through the options to find the longest name
+           and adjust the format string accordingly */
+        longest_name_len = 0;
+        for (pass = 0; pass <= 2; pass++)
+            for (i = 0; (name = ((pass == 0)
+                                 ? boolopt[i].name
+                                 : (pass == 1)
+                                   ? compopt[i].name
+                                   : othropt[i].name)) != 0; i++) {
+                if (pass == 0 && !boolopt[i].addr)
+                    continue;
+                optflags = (pass == 0) ? boolopt[i].optflags
+                                       : (pass == 1)
+                                         ? compopt[i].optflags
+                                         : othropt[i].optflags;
+                if (optflags < startpass || optflags > endpass)
+                    continue;
+                if ((is_wc_option(name) && !wc_supported(name))
+                    || (is_wc2_option(name) && !wc2_supported(name)))
+                    continue;
+
+                if (strlen(name) > longest_name_len)
+                    longest_name_len = strlen(name);
+            }
+        Sprintf(fmtstr_doset, "%%s%%-%us [%%s]", longest_name_len);
+        made_fmtstr = TRUE;
+    }
 
     any = zeroany;
     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
@@ -3655,28 +3713,25 @@ doset()
     any.a_int = 0;
     /* first list any other non-modifiable booleans, then modifiable ones */
     for (pass = 0; pass <= 1; pass++)
-        for (i = 0; boolopt[i].name; i++)
+        for (i = 0; (name = boolopt[i].name) != 0; i++)
             if ((bool_p = boolopt[i].addr) != 0
-                && ((boolopt[i].optflags == DISP_IN_GAME && pass == 0)
-                    || (boolopt[i].optflags == SET_IN_GAME && pass == 1)
-                    || (boolopt[i].optflags == SET_IN_WIZGAME && pass == 1 && wizard))) {
+                && ((boolopt[i].optflags <= DISP_IN_GAME && pass == 0)
+                    || (boolopt[i].optflags >= SET_IN_GAME && pass == 1))) {
                 if (bool_p == &flags.female)
                     continue; /* obsolete */
                 if (boolopt[i].optflags == SET_IN_WIZGAME && !wizard)
                     continue;
-                if (is_wc_option(boolopt[i].name)
-                    && !wc_supported(boolopt[i].name))
+                if ((is_wc_option(name) && !wc_supported(name))
+                    || (is_wc2_option(name) && !wc2_supported(name)))
                     continue;
-                if (is_wc2_option(boolopt[i].name)
-                    && !wc2_supported(boolopt[i].name))
-                    continue;
+
                 any.a_int = (pass == 0) ? 0 : i + 1;
                 if (!iflags.menu_tab_sep)
-                    Sprintf(buf, "%s%-17s [%s]", pass == 0 ? "    " : "",
-                            boolopt[i].name, *bool_p ? "true" : "false");
+                    Sprintf(buf, fmtstr_doset, (pass == 0) ? "    " : "",
+                            name, *bool_p ? "true" : "false");
                 else
-                    Sprintf(buf, "%s\t[%s]", boolopt[i].name,
-                            *bool_p ? "true" : "false");
+                    Sprintf(buf, fmtstr_doset_tab,
+                            name, *bool_p ? "true" : "false");
                 add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf,
                          MENU_UNSELECTED);
             }
@@ -3689,55 +3744,27 @@ doset()
              "Compounds (selecting will prompt for new value):",
              MENU_UNSELECTED);
 
-#ifdef notyet /* SYSCF */
-    /* XXX I think this is still fragile.  Fixing initial/from_file and/or
-     changing
-     the SET_* etc to bitmaps will let me make this better. */
-    if (wizard)
-        startpass = SET_IN_SYS;
-    else
-#endif
-        startpass = DISP_IN_GAME;
-    endpass = (wizard) ? SET_IN_WIZGAME : SET_IN_GAME;
-
-    /* spin through the options to find the biggest name
-       and adjust the format string accordingly if needed */
-    biggest_name = 0;
-    for (i = 0; compopt[i].name; i++)
-        if (compopt[i].optflags >= startpass && compopt[i].optflags <= endpass
-            && strlen(compopt[i].name) > (unsigned) biggest_name)
-            biggest_name = (int) strlen(compopt[i].name);
-    if (biggest_name > 30)
-        biggest_name = 30;
-    if (!iflags.menu_tab_sep)
-        Sprintf(fmtstr_doset_add_menu, "%%s%%-%ds [%%s]", biggest_name);
-
-    /* deliberately put `playmode', `name', `role', `race', `gender' first
-       (also alignment if anything ever comes before it in compopt[]) */
+    /* deliberately put playmode, name, role+race+gender+align first */
     doset_add_menu(tmpwin, "playmode", 0);
     doset_add_menu(tmpwin, "name", 0);
     doset_add_menu(tmpwin, "role", 0);
     doset_add_menu(tmpwin, "race", 0);
     doset_add_menu(tmpwin, "gender", 0);
+    doset_add_menu(tmpwin, "align", 0);
 
     for (pass = startpass; pass <= endpass; pass++)
-        for (i = 0; compopt[i].name; i++)
+        for (i = 0; (name = compopt[i].name) != 0; i++)
             if (compopt[i].optflags == pass) {
-                if (!strcmp(compopt[i].name, "playmode")
-                    || !strcmp(compopt[i].name, "name")
-                    || !strcmp(compopt[i].name, "role")
-                    || !strcmp(compopt[i].name, "race")
-                    || !strcmp(compopt[i].name, "gender"))
+                if (!strcmp(name, "playmode")  || !strcmp(name, "name")
+                    || !strcmp(name, "role")   || !strcmp(name, "race")
+                    || !strcmp(name, "gender") || !strcmp(name, "align"))
                     continue;
-                else if (is_wc_option(compopt[i].name)
-                         && !wc_supported(compopt[i].name))
+                if ((is_wc_option(name) && !wc_supported(name))
+                    || (is_wc2_option(name) && !wc2_supported(name)))
                     continue;
-                else if (is_wc2_option(compopt[i].name)
-                         && !wc2_supported(compopt[i].name))
-                    continue;
-                else
-                    doset_add_menu(tmpwin, compopt[i].name,
-                                   (pass == DISP_IN_GAME) ? 0 : indexoffset);
+
+                doset_add_menu(tmpwin, name,
+                               (pass == DISP_IN_GAME) ? 0 : indexoffset);
             }
 
     any = zeroany;
