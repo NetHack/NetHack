@@ -4630,8 +4630,8 @@ register int osym, dmgtyp;
                 break;
             case FOOD_CLASS:
                 if (obj->otyp == GLOB_OF_GREEN_SLIME) {
-                    dindx = obj->owt / 20;
-                    dmg = 1;
+                    dindx = 1; /* boil and explode */
+                    dmg = (obj->owt + 19) / 20;
                 } else {
                     skip++;
                 }
@@ -4708,6 +4708,8 @@ register int osym, dmgtyp;
                     const char *how = destroy_strings[dindx][2];
                     boolean one = (cnt == 1L);
 
+                    if (dmgtyp == AD_FIRE && osym == FOOD_CLASS)
+                        how = "exploding glob of slime";
                     if (physical_damage)
                         dmg = Maybe_Half_Phys(dmg);
                     losehp(dmg, one ? how : (const char *) makeplural(how),
@@ -4779,8 +4781,8 @@ int osym, dmgtyp;
                 break;
             case FOOD_CLASS:
                 if (obj->otyp == GLOB_OF_GREEN_SLIME) {
-                    dindx = obj->owt / 20;
-                    tmp++;
+                    dindx = 1; /* boil and explode */
+                    tmp += (obj->owt + 19) / 20;
                 } else {
                     skip++;
                 }
