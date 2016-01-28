@@ -953,6 +953,8 @@ Widget *formp; /* return */
                                  args, num_args);
 
     num_args = 0;
+    XtSetArg(args[num_args], XtNtranslations,
+             XtParseTranslationTable(popup_translations)); num_args++;
     *formp = form = XtCreateManagedWidget("menuform", formWidgetClass, view,
                                           args, num_args);
 
