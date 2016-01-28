@@ -2533,7 +2533,9 @@ struct attack *mattk;     /* null means we find one internally */
 
     switch (mattk->adtyp) {
     case AD_FIRE:
-        if (!rn2(6) && !mon->mcan) {
+        if (!rn2(6) && !mon->mcan
+            /* steam vortex: fire resist applies, fire damage doesn't */
+            && mon->data != &mons[PM_STEAM_VORTEX]) {
             (void) erode_obj(obj, NULL, ERODE_BURN, EF_NONE);
         }
         break;

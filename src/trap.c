@@ -141,24 +141,22 @@ const char *ostr;
 int type;
 int ef_flags;
 {
-    static NEARDATA const char *const action[] = { "smoulder", "rust", "rot",
-                                                   "corrode" };
-    static NEARDATA const char *const msg[] = { "burnt", "rusted", "rotten",
-                                                "corroded" };
-    boolean vulnerable = FALSE;
-    boolean is_primary = TRUE;
-    boolean check_grease = ef_flags & EF_GREASE;
-    boolean print = ef_flags & EF_VERBOSE;
-    int erosion;
+    static NEARDATA const char
+        *const action[] = { "smoulder", "rust", "rot", "corrode" },
+        *const msg[] = { "burnt", "rusted", "rotten", "corroded" },
+        *const bythe[] = { "heat", "oxidation", "decay", "corrosion" };
+    boolean vulnerable = FALSE, is_primary = TRUE,
+            check_grease = (ef_flags & EF_GREASE) ? TRUE : FALSE,
+            print = (ef_flags & EF_VERBOSE) ? TRUE : FALSE,
+            uvictim, vismon, visobj;
+    int erosion, cost_type;
     struct monst *victim;
-    boolean vismon;
-    boolean visobj;
-    int cost_type;
 
     if (!otmp)
         return ER_NOTHING;
 
     victim = carried(otmp) ? &youmonst : mcarried(otmp) ? otmp->ocarry : NULL;
+    uvictim = (victim == &youmonst);
     vismon = victim && (victim != &youmonst) && canseemon(victim);
     /* Is bhitpos correct here? Ugh. */
     visobj = !victim && cansee(bhitpos.x, bhitpos.y);
@@ -192,35 +190,32 @@ int ef_flags;
 
     if (!ostr)
         ostr = cxname(otmp);
+    /* 'visobj' messages insert "the"; probably ought to switch to the() */
+    if (visobj && !(uvictim || vismon) && !strncmpi(ostr, "the ", 4))
+        ostr += 4;
 
     if (check_grease && otmp->greased) {
         grease_protect(otmp, ostr, victim);
         return ER_GREASED;
     } else if (!vulnerable || (otmp->oerodeproof && otmp->rknown)) {
-        if (print && flags.verbose) {
-            if (victim == &youmonst)
-                Your("%s %s not affected.", ostr, vtense(ostr, "are"));
-            else if (vismon)
-                pline("%s %s %s not affected.", s_suffix(Monnam(victim)),
-                      ostr, vtense(ostr, "are"));
-        }
+        if (flags.verbose && print && (uvictim || vismon))
+            pline("%s %s %s not affected by %s.",
+                  uvictim ? "Your" : s_suffix(Monnam(victim)),
+                  ostr, vtense(ostr, "are"), bythe[type]);
         return ER_NOTHING;
     } else if (otmp->oerodeproof || (otmp->blessed && !rnl(4))) {
-        if (flags.verbose && (print || otmp->oerodeproof)) {
-            if (victim == &youmonst)
-                pline("Somehow, your %s %s not affected.", ostr,
-                      vtense(ostr, "are"));
-            else if (vismon)
-                pline("Somehow, %s %s %s not affected.",
-                      s_suffix(mon_nam(victim)), ostr, vtense(ostr, "are"));
-            else if (visobj)
-                pline("Somehow, the %s %s not affected.", ostr,
-                      vtense(ostr, "are"));
-        }
+        if (flags.verbose && (print || otmp->oerodeproof)
+            && (uvictim || vismon || visobj))
+            pline("Somehow, %s %s %s not affected by the %s.",
+                  uvictim ? "your"
+                          : !vismon ? "the" /* visobj */
+                                    : s_suffix(mon_nam(victim)),
+                  ostr, vtense(ostr, "are"), bythe[type]);
         /* We assume here that if the object is protected because it
          * is blessed, it still shows some minor signs of wear, and
          * the hero can distinguish this from an object that is
-         * actually proof against damage. */
+         * actually proof against damage.
+         */
         if (otmp->oerodeproof) {
             otmp->rknown = TRUE;
             if (victim == &youmonst)
@@ -233,13 +228,12 @@ int ef_flags;
                                  ? " completely"
                                  : erosion ? " further" : "";
 
-        if (victim == &youmonst)
-            Your("%s %s%s!", ostr, vtense(ostr, action[type]), adverb);
-        else if (vismon)
-            pline("%s %s %s%s!", s_suffix(Monnam(victim)), ostr,
-                  vtense(ostr, action[type]), adverb);
-        else if (visobj)
-            pline("The %s %s%s!", ostr, vtense(ostr, action[type]), adverb);
+        if (uvictim || vismon || visobj)
+            pline("%s %s %s%s!",
+                  uvictim ? "Your"
+                          : !vismon ? "The" /* visobj */
+                                    : s_suffix(Monnam(victim)),
+                  ostr, vtense(ostr, action[type]), adverb);
 
         if (ef_flags & EF_PAY)
             costly_alteration(otmp, cost_type);
@@ -254,13 +248,12 @@ int ef_flags;
 
         return ER_DAMAGED;
     } else if (ef_flags & EF_DESTROY) {
-        if (victim == &youmonst)
-            Your("%s %s away!", ostr, vtense(ostr, action[type]));
-        else if (vismon)
-            pline("%s %s %s away!", s_suffix(Monnam(victim)), ostr,
-                  vtense(ostr, action[type]));
-        else if (visobj)
-            pline("The %s %s away!", ostr, vtense(ostr, action[type]));
+        if (uvictim || vismon || visobj)
+            pline("%s %s %s away!",
+                  uvictim ? "Your"
+                          : !vismon ? "The" /* visobj */
+                                    : s_suffix(Monnam(victim)),
+                  ostr, vtense(ostr, action[type]));
 
         if (ef_flags & EF_PAY)
             costly_alteration(otmp, cost_type);
@@ -270,15 +263,13 @@ int ef_flags;
         return ER_DESTROYED;
     } else {
         if (flags.verbose && print) {
-            if (victim == &youmonst)
-                Your("%s %s completely %s.", ostr,
-                     vtense(ostr, Blind ? "feel" : "look"), msg[type]);
-            else if (vismon)
-                pline("%s %s %s completely %s.", s_suffix(Monnam(victim)),
+            if (uvictim)
+                Your("%s %s completely %s.",
+                     ostr, vtense(ostr, Blind ? "feel" : "look"), msg[type]);
+            else if (vismon || visobj)
+                pline("%s %s %s completely %s.",
+                      !vismon ? "The" : s_suffix(Monnam(victim)),
                       ostr, vtense(ostr, "look"), msg[type]);
-            else if (visobj)
-                pline("The %s %s completely %s.", ostr, vtense(ostr, "look"),
-                      msg[type]);
         }
         return ER_NOTHING;
     }

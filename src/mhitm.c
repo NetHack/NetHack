@@ -1382,20 +1382,24 @@ rustm(mdef, obj)
 struct monst *mdef;
 struct obj *obj;
 {
-    int dmgtyp;
+    int dmgtyp = -1, chance = 1;
 
     if (!mdef || !obj)
         return; /* just in case */
-    /* AD_ACID is handled in passivemm */
-    if (dmgtype(mdef->data, AD_CORR))
+    /* AD_ACID and AD_ENCH are handled in passivemm() and passiveum() */
+    if (dmgtype(mdef->data, AD_CORR)) {
         dmgtyp = ERODE_CORRODE;
-    else if (dmgtype(mdef->data, AD_RUST))
+    } else if (dmgtype(mdef->data, AD_RUST)) {
         dmgtyp = ERODE_RUST;
-    else if (dmgtype(mdef->data, AD_FIRE))
+    } else if (dmgtype(mdef->data, AD_FIRE)
+               /* steam vortex: fire resist applies, fire damage doesn't */
+               && mdef->data != &mons[PM_STEAM_VORTEX]) {
         dmgtyp = ERODE_BURN;
-    else
-        return;
-    (void) erode_obj(obj, NULL, dmgtyp, EF_GREASE | EF_VERBOSE);
+        chance = 6;
+    }
+
+    if (dmgtyp >= 0 && !rn2(chance))
+        (void) erode_obj(obj, (char *) 0, dmgtyp, EF_GREASE | EF_VERBOSE);
 }
 
 STATIC_OVL void
