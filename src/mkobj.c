@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1454033600 2016/01/29 02:13:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.116 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1454061995 2016/01/29 10:06:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.117 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2642,7 +2642,8 @@ obj_absorb(obj1, obj2)
 struct obj **obj1, **obj2;
 {
     struct obj *otmp1, *otmp2;
-    int extrawt;
+    int o1wt, o2wt;
+    long agetmp;
 
     /* don't let people dumb it up */
     if (obj1 && obj2) {
@@ -2657,10 +2658,18 @@ struct obj **obj1, **obj2;
                 otmp1->greased = otmp2->greased = 0;
             if (otmp1->orotten || otmp2->orotten)
                 otmp1->orotten = otmp2->orotten = 1;
-            extrawt = otmp2->oeaten ? otmp2->oeaten : otmp2->owt;
-            otmp1->owt += extrawt;
-            otmp1->oeaten += otmp1->oeaten ? extrawt : 0;
-            otmp1->quan = 1;
+            o1wt = otmp1->oeaten ? otmp1->oeaten : otmp1->owt;
+            o2wt = otmp2->oeaten ? otmp2->oeaten : otmp2->owt;
+            /* averaging the relative ages is less likely to overflow
+               than averaging the absolute ages directly */
+            agetmp = (((moves - otmp1->age) * o1wt
+                       + (moves - otmp2->age) * o2wt)
+                      / (o1wt + o2wt));
+            otmp1->age = moves - agetmp; /* conv. relative back to absolute */
+            otmp1->owt += o2wt;
+            if (otmp1->oeaten)
+                otmp1->oeaten += o2wt;
+            otmp1->quan = 1L;
             obj_extract_self(otmp2);
             newsym(otmp2->ox, otmp2->oy); /* in case of floor */
             dealloc_obj(otmp2);

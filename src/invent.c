@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1454033599 2016/01/29 02:13:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.192 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1454061993 2016/01/29 10:06:33 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.193 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -270,9 +270,11 @@ struct obj **potmp, **pobj;
          *
          * Don't do the age manipulation if lit.  We would need
          * to stop the burn on both items, then merge the age,
-         * then restart the burn.
+         * then restart the burn.  Glob ages are averaged in the
+         * absorb routine, which uses weight rather than quantity
+         * to adjust for proportion (glob quantity is always 1).
          */
-        if (!obj->lamplit)
+        if (!obj->lamplit && !obj->globby)
             otmp->age = ((otmp->age * otmp->quan) + (obj->age * obj->quan))
                         / (otmp->quan + obj->quan);
 
@@ -331,9 +333,8 @@ struct obj **potmp, **pobj;
 #endif /*0*/
         }
 
-        /* handle puddings a bit differently; absorption will
-         * free the other object automatically so we can just
-         * return out from here.  */
+        /* handle puddings a bit differently; absorption will free the
+           other object automatically so we can just return out from here */
         if (obj->globby) {
             pudding_merge_message(otmp, obj);
             obj_absorb(potmp, pobj);
