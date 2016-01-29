@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1447475943 2015/11/14 04:39:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.113 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1454033600 2016/01/29 02:13:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.116 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2578,15 +2578,10 @@ struct obj *
 obj_nexto(otmp)
 struct obj *otmp;
 {
-    struct obj *otmp2 = (struct obj *) 0;
-
-    if (otmp) {
-        otmp2 = obj_nexto_xy(otmp->otyp, otmp->ox, otmp->oy, otmp->o_id);
-    } else {
+    if (!otmp)
         impossible("obj_nexto: wasn't given an object to check");
-    }
 
-    return otmp2;
+    return obj_nexto_xy(otmp, otmp->ox, otmp->oy, TRUE);
 }
 
 /*
@@ -2598,23 +2593,26 @@ struct obj *otmp;
  * reliably predict which one we want to 'find' first
  */
 struct obj *
-obj_nexto_xy(otyp, x, y, oid)
-int otyp, x, y;
-unsigned oid;
+obj_nexto_xy(obj, x, y, recurs)
+struct obj *obj;
+int x, y;
+boolean recurs;
 {
     struct obj *otmp;
-    int fx, fy, ex, ey;
+    int fx, fy, ex, ey, otyp = obj->otyp;
     short dx, dy;
 
     /* check under our "feet" first */
     otmp = sobj_at(otyp, x, y);
     while (otmp) {
         /* don't be clever and find ourselves */
-        if (otmp->o_id != oid) {
+        if (otmp != obj && mergable(otmp, obj))
             return otmp;
-        }
         otmp = nxtobj(otmp, otyp, TRUE);
     }
+
+    if (!recurs)
+        return (struct obj *) 0;
 
     /* search in a random order */
     dx = (rn2(2) ? -1 : 1);
@@ -2626,9 +2624,8 @@ unsigned oid;
         for (fy = ey; abs(fy - ey) < 3; fy += dy) {
             /* 0, 0 was checked above */
             if (isok(fx, fy) && (fx != x || fy != y)) {
-                if ((otmp = sobj_at(otyp, fx, fy)) != 0) {
+                if ((otmp = obj_nexto_xy(obj, fx, fy, FALSE)) != 0)
                     return otmp;
-                }
             }
         }
     }
@@ -2644,14 +2641,22 @@ struct obj *
 obj_absorb(obj1, obj2)
 struct obj **obj1, **obj2;
 {
-    struct obj *otmp1 = (struct obj *) 0, *otmp2 = (struct obj *) 0;
-    int extrawt = 0;
+    struct obj *otmp1, *otmp2;
+    int extrawt;
 
     /* don't let people dumb it up */
     if (obj1 && obj2) {
         otmp1 = *obj1;
         otmp2 = *obj2;
-        if (otmp1 && otmp2) {
+        if (otmp1 && otmp2 && otmp1 != otmp2) {
+            if (otmp1->bknown != otmp2->bknown)
+                otmp1->bknown = otmp2->bknown = 0;
+            if (otmp1->rknown != otmp2->rknown)
+                otmp1->rknown = otmp2->rknown = 0;
+            if (otmp1->greased != otmp2->greased)
+                otmp1->greased = otmp2->greased = 0;
+            if (otmp1->orotten || otmp2->orotten)
+                otmp1->orotten = otmp2->orotten = 1;
             extrawt = otmp2->oeaten ? otmp2->oeaten : otmp2->owt;
             otmp1->owt += extrawt;
             otmp1->oeaten += otmp1->oeaten ? extrawt : 0;
@@ -2677,13 +2682,14 @@ struct obj *
 obj_meld(obj1, obj2)
 struct obj **obj1, **obj2;
 {
-    struct obj *otmp1 = (struct obj *) 0, *otmp2 = (struct obj *) 0;
+    struct obj *otmp1, *otmp2;
 
     if (obj1 && obj2) {
         otmp1 = *obj1;
         otmp2 = *obj2;
-        if (otmp1 && otmp2) {
-            if (otmp1->owt > otmp2->owt || rn2(2)) {
+        if (otmp1 && otmp2 && otmp1 != otmp2) {
+            if (otmp1->owt > otmp2->owt
+                || (otmp1->owt == otmp2->owt && rn2(2))) {
                 return obj_absorb(obj1, obj2);
             }
             return obj_absorb(obj2, obj1);

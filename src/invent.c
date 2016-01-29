@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1452650438 2016/01/13 02:00:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.188 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1454033599 2016/01/29 02:13:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.192 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,7 +9,6 @@
 
 STATIC_DCL int FDECL(CFDECLSPEC sortloot_cmp, (struct obj *, struct obj *));
 STATIC_DCL void NDECL(reorder_invent);
-STATIC_DCL boolean FDECL(mergable, (struct obj *, struct obj *));
 STATIC_DCL void FDECL(noarmor, (BOOLEAN_P));
 STATIC_DCL void FDECL(invdisp_nothing, (const char *, const char *));
 STATIC_DCL boolean FDECL(worn_wield_only, (struct obj *));
@@ -335,7 +334,7 @@ struct obj **potmp, **pobj;
         /* handle puddings a bit differently; absorption will
          * free the other object automatically so we can just
          * return out from here.  */
-        if (Is_pudding(obj)) {
+        if (obj->globby) {
             pudding_merge_message(otmp, obj);
             obj_absorb(potmp, pobj);
             return 1;
@@ -2889,8 +2888,8 @@ struct obj *obj;
     return;
 }
 
-/* returns TRUE if obj  & otmp can be merged */
-STATIC_OVL boolean
+/* returns TRUE if obj & otmp can be merged; used in invent.c and mkobj.c */
+boolean
 mergable(otmp, obj)
 register struct obj *otmp, *obj;
 {
@@ -2908,31 +2907,24 @@ register struct obj *otmp, *obj;
         return TRUE;
 
     if (obj->unpaid != otmp->unpaid || obj->spe != otmp->spe
-        || obj->dknown != otmp->dknown
         || obj->cursed != otmp->cursed || obj->blessed != otmp->blessed
         || obj->no_charge != otmp->no_charge || obj->obroken != otmp->obroken
         || obj->otrapped != otmp->otrapped || obj->lamplit != otmp->lamplit
         || obj->bypass != otmp->bypass)
         return FALSE;
 
+    if (obj->globby)
+        return TRUE;
+    /* Checks beyond this point either aren't applicable to globs
+     * or don't inhibit their merger.
+     */
+
     if (obj->oclass == FOOD_CLASS
         && (obj->oeaten != otmp->oeaten || obj->orotten != otmp->orotten))
         return FALSE;
 
-    if (obj->globby) {
-        /* globs won't merge if they have different bless/curse
-           state, but will merge non-bknown with bknown */
-        if (obj->bknown != otmp->bknown)
-            obj->bknown = otmp->bknown = 0;
-        if (obj->rknown != otmp->rknown)
-            obj->rknown = otmp->rknown = 0;
-        if (obj->greased != otmp->greased)
-            obj->greased = otmp->greased = 0;
-        /* checks beyond this point aren't applicable to globs */
-        return TRUE;
-    }
-
-    if ((obj->bknown != otmp->bknown && !Role_if(PM_PRIEST))
+    if (obj->dknown != otmp->dknown
+        || (obj->bknown != otmp->bknown && !Role_if(PM_PRIEST))
         || obj->oeroded != otmp->oeroded || obj->oeroded2 != otmp->oeroded2
         || obj->greased != otmp->greased)
         return FALSE;

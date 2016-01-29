@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1446975464 2015/11/08 09:37:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.149 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1454033599 2016/01/29 02:13:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.153 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -215,15 +215,13 @@ const char *verb;
                   otense(obj, "tumble"), the_your[t->madeby_u]);
     } else if (obj->globby) {
         /* Globby things like puddings might stick together */
-        while (obj
-               && (otmp = obj_nexto_xy(obj->otyp, x, y, obj->o_id))
-                      != (struct obj *) 0) {
+        while (obj && (otmp = obj_nexto_xy(obj, x, y, TRUE)) != 0) {
             pudding_merge_message(obj, otmp);
             /* intentionally not getting the melded object; obj_meld may set
              * obj to null. */
             (void) obj_meld(&obj, &otmp);
         }
-        return (boolean) (obj == NULL);
+        return (boolean) !obj;
     }
     return FALSE;
 }

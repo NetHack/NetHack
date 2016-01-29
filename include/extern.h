@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1453514592 2016/01/23 02:03:12 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.542 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1454033598 2016/01/29 02:13:18 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.543 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -943,6 +943,7 @@ E int NDECL(dolook);
 E boolean FDECL(will_feel_cockatrice, (struct obj *, BOOLEAN_P));
 E void FDECL(feel_cockatrice, (struct obj *, BOOLEAN_P));
 E void FDECL(stackobj, (struct obj *));
+E boolean FDECL(mergable, (struct obj *, struct obj *));
 E int NDECL(doprgold);
 E int NDECL(doprwep);
 E int NDECL(doprarm);
@@ -1275,7 +1276,7 @@ E long FDECL(peek_at_iced_corpse_age, (struct obj *));
 E int FDECL(hornoplenty, (struct obj *, BOOLEAN_P));
 E void NDECL(obj_sanity_check);
 E struct obj *FDECL(obj_nexto, (struct obj *));
-E struct obj *FDECL(obj_nexto_xy, (int, int, int, unsigned));
+E struct obj *FDECL(obj_nexto_xy, (struct obj *, int, int, BOOLEAN_P));
 E struct obj *FDECL(obj_absorb, (struct obj **, struct obj **));
 E struct obj *FDECL(obj_meld, (struct obj **, struct obj **));
 
