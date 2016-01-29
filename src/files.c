@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1452992318 2016/01/17 00:58:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.201 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1454035130 2016/01/29 02:38:50 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.202 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2100,7 +2100,7 @@ int src;
 #ifdef SYSCF
     int n;
 #endif
-    char *bufp, *altp, buf[BUFSZ];
+    char *bufp, *altp, buf[4 * BUFSZ];
     uchar translate[MAXPCHARS];
     int len;
 
