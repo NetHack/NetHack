@@ -1722,7 +1722,7 @@ int croaked;
     /* shopkeeper is peaceful, nothing stolen, nothing owed. */
     if (roomno == eshkp->shoproom && inhishop(shkp) && !eshkp->billct
         && !eshkp->robbed && !eshkp->debit && NOTANGRY(shkp)
-        && !eshkp->following) {
+        && !eshkp->following && u.ugrave_arise < LOW_PM) {
         taken = (invent != 0);
         if (taken)
             pline("%s gratefully inherits all your possessions.",
