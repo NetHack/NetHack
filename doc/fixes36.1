@@ -88,8 +88,7 @@ requiver pickup_thrown objects if quiver is empty
 make mimics mimicing walls or trees also block light
 stepping onto lava destroyed non-fireproof water walking boots but left other
 	vulnerable boot types intact
-fix eating messages which referred to globs as corpses
-fix death reason when eating tainted glob of <monster> (not corpse)
+damage and death reasons when eating globs referred to them as corpses
 fix death reason when petrified (avoid redundant 'while getting stoned')
 use appropriate place name for drum of earthquake shakes
 fix unmapped branch stairs on sokoban level
@@ -113,8 +112,9 @@ do allow globs with same curse/bless state to merge even when that state is
 make glob merging on floor behave the same as glob merging in inventory
 track age of merged globs
 support globs for edibility temporary intrinsic
-handle eating partly eaten glob that has increased in weight since prior eat
 restore ability to gain intrinsics from black puddings (pass globs to cpostfx)
+eating tainted black pudding (glob in 3.6.0, corpse in 3.4.x and 3.3.x)
+	referred to it as "meat" (because it's not vegetarian food)
 fix pile mark after killing a monster carrying a potion which is destroyed
 don't list suit as likely candidate for Take-off if cloak blocks it
 only list known blank scrolls and known blank spellbooks as likely candidates
