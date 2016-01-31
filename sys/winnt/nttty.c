@@ -1,4 +1,4 @@
-/* NetHack 3.6	nttty.c	$NHDT-Date: 1454281677 2016/01/31 23:07:57 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.65 $ */
+/* NetHack 3.6	nttty.c	$NHDT-Date: 1454282169 2016/01/31 23:16:09 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.66 $ */
 /* Copyright (c) NetHack PC Development Team 1993    */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -734,7 +734,7 @@ int
 has_color(int color)
 {
 #ifdef TEXTCOLOR
-    if ((color >= 0) || (color < CLR_MAX))
+    if ((color >= 0) && (color < CLR_MAX))
         return 1;
 #else
     if ((color == CLR_BLACK) || (color == CLR_WHITE))
