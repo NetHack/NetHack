@@ -38,11 +38,12 @@
 static Widget extended_command_popup = 0;
 static Widget extended_command_form;
 static Widget *extended_commands = 0;
-static int extended_command_selected; /* index of the selected command; */
+static int extended_cmd_selected; /* index of the selected command; */
 static int ps_selected;               /* index of selected role */
 #define PS_RANDOM (-50)
 #define PS_QUIT (-75)
-static const char ps_randchars[] = "*@";
+/* 'r' for random won't work for role but will for race, gender, alignment */
+static const char ps_randchars[] = "*@\n\rrR";
 static const char ps_quitchars[] = "\033qQ";
 
 #define EC_NCHARS 32
@@ -591,7 +592,7 @@ X11_get_ext_cmd()
         initialized = True;
     }
 
-    extended_command_selected = -1; /* reset selected value */
+    extended_cmd_selected = -1; /* reset selected value */
 
     positionpopup(extended_command_popup, FALSE); /* center on cursor */
     nh_XtPopup(extended_command_popup, (int) XtGrabExclusive,
@@ -600,7 +601,7 @@ X11_get_ext_cmd()
     /* The callbacks will enable the event loop exit. */
     (void) x_event(EXIT_ON_EXIT);
 
-    return extended_command_selected;
+    return extended_cmd_selected;
 }
 
 /* End global functions =====================================================
@@ -619,19 +620,19 @@ XtPointer client_data, call_data;
     nhUse(w);
     nhUse(call_data);
 
-    if (extended_command_selected != selected) {
+    if (extended_cmd_selected != selected) {
         /* visibly deselect old one */
-        if (extended_command_selected >= 0)
-            swap_fg_bg(extended_commands[extended_command_selected]);
+        if (extended_cmd_selected >= 0)
+            swap_fg_bg(extended_commands[extended_cmd_selected]);
 
         /* select new one */
         swap_fg_bg(extended_commands[selected]);
-        extended_command_selected = selected;
+        extended_cmd_selected = selected;
     }
 
     nh_XtPopdown(extended_command_popup);
     /* reset colors while popped down */
-    swap_fg_bg(extended_commands[extended_command_selected]);
+    swap_fg_bg(extended_commands[extended_cmd_selected]);
     ec_active = FALSE;
     exit_x_event = TRUE; /* leave event loop */
 }
@@ -699,9 +700,9 @@ static void
 ec_dismiss()
 {
     /* unselect while still visible */
-    if (extended_command_selected >= 0)
-        swap_fg_bg(extended_commands[extended_command_selected]);
-    extended_command_selected = -1; /* dismiss */
+    if (extended_cmd_selected >= 0)
+        swap_fg_bg(extended_commands[extended_cmd_selected]);
+    extended_cmd_selected = -1; /* dismiss */
     nh_XtPopdown(extended_command_popup);
     ec_active = FALSE;
     exit_x_event = TRUE; /* leave event loop */
@@ -718,17 +719,17 @@ ec_scroll_to_view()
     float s_min, s_max;
     Position vh; /* viewport height */
 
-    if (extended_command_selected < 0)
+    if (extended_cmd_selected < 0)
         return;
 
     /* get selected ext command label y position and height */
     num_args = 0;
     XtSetArg(args[num_args], XtNy, &y); num_args++;
     XtSetArg(args[num_args], XtNheight, &h); num_args++;
-    XtGetValues(extended_commands[extended_command_selected], args, num_args);
+    XtGetValues(extended_commands[extended_cmd_selected], args, num_args);
 
     /* get viewport and scrollbar widgets */
-    tmpw = extended_commands[extended_command_selected];
+    tmpw = extended_commands[extended_cmd_selected];
     viewport = XtParent(tmpw);
     do {
         tmpw = XtParent(tmpw);
@@ -744,7 +745,7 @@ ec_scroll_to_view()
         /* get scrollbar "height" and "top" position; floats between 0-1 */
         num_args = 0;
         XtSetArg(args[num_args], XtNshown, &s_shown); num_args++;
-        XtSetArg(args[num_args], XtNtopOfThumb, &s_top); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNtopOfThumb), &s_top); num_args++;
         XtGetValues(scrollbar, args, num_args);
 
         s_min = s_top * vh;
@@ -789,15 +790,15 @@ Cardinal *num_params;
     } else if (index("\033\n\r", ch)) {
         if (ch == '\033') {
             /* unselect while still visible */
-            if (extended_command_selected >= 0)
-                swap_fg_bg(extended_commands[extended_command_selected]);
-            extended_command_selected = -1; /* dismiss */
+            if (extended_cmd_selected >= 0)
+                swap_fg_bg(extended_commands[extended_cmd_selected]);
+            extended_cmd_selected = -1; /* dismiss */
         }
 
         nh_XtPopdown(extended_command_popup);
         /* unselect while invisible */
-        if (extended_command_selected >= 0)
-            swap_fg_bg(extended_commands[extended_command_selected]);
+        if (extended_cmd_selected >= 0)
+            swap_fg_bg(extended_commands[extended_cmd_selected]);
 
         exit_x_event = TRUE; /* leave event loop */
         ec_active = FALSE;
@@ -811,7 +812,7 @@ Cardinal *num_params;
      * ("ride" vs "rub", for instance), or player may just be typing in
      * the whole word.
      */
-    if ((xkey->time - ec_time) > 2500) /* 2.5 seconds */
+    if (ec_active && (xkey->time - ec_time) > 2500) /* 2.5 seconds */
         ec_active = FALSE;
 
     if (!ec_active) {
@@ -828,9 +829,9 @@ Cardinal *num_params;
         if (pass == 1) {
             /* first pass finished, but no matching command was found */
             /* start a new one with the last char entered */
-            if (extended_command_selected >= 0)
-                swap_fg_bg(extended_commands[extended_command_selected]);
-            extended_command_selected = -1; /* dismiss */
+            if (extended_cmd_selected >= 0)
+                swap_fg_bg(extended_commands[extended_cmd_selected]);
+            extended_cmd_selected = -1; /* dismiss */
             ec_chars[0] = ec_chars[ec_nchars-1];
             ec_nchars = 1;
         }
@@ -839,13 +840,13 @@ Cardinal *num_params;
                 continue;
 
             if (!strncmp(ec_chars, extcmdlist[i].ef_txt, ec_nchars)) {
-                if (extended_command_selected != i) {
+                if (extended_cmd_selected != i) {
                     /* I should use set() and unset() actions, but how do */
                     /* I send the an action to the widget? */
-                    if (extended_command_selected >= 0)
-                        swap_fg_bg(extended_commands[extended_command_selected]);
-                    extended_command_selected = i;
-                    swap_fg_bg(extended_commands[extended_command_selected]);
+                    if (extended_cmd_selected >= 0)
+                        swap_fg_bg(extended_commands[extended_cmd_selected]);
+                    extended_cmd_selected = i;
+                    swap_fg_bg(extended_commands[extended_cmd_selected]);
                 }
                 ec_scroll_to_view();
                 return;
@@ -1153,6 +1154,10 @@ Widget *formp; /* return */
     }
     XtRealizeWidget(popup);
     XSetWMProtocols(XtDisplay(popup), XtWindow(popup), &wm_delete_window, 1);
+
+    /* during role selection, highlight "random" as pre-selected choice */
+    if (right_callback == ps_random && index(ps_randchars, '\n'))
+        swap_fg_bg(right);
 
     return popup;
 }

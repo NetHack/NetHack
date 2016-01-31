@@ -1,5 +1,5 @@
 /* NetHack 3.6	winX.h	$NHDT-Date: 1453447524 2016/01/22 07:25:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.19 $ */
-/* Copyright (c) Dean Luick, 1992				  */
+/* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -52,7 +52,7 @@ struct text_map_info_t {
 
     int square_width,  /* Saved font information so      */
         square_height, /*   we can calculate the correct */
-        square_ascent, /*   placement of changes.	  */
+        square_ascent, /*   placement of changes.        */
         square_lbearing;
 };
 
@@ -70,7 +70,7 @@ struct tile_map_info_t {
 
     int square_width,  /* Saved tile information so      */
         square_height, /*   we can calculate the correct */
-        square_ascent, /*   placement of changes.	  */
+        square_ascent, /*   placement of changes.        */
         square_lbearing;
 };
 
@@ -101,16 +101,16 @@ struct mesg_info_t {
     struct line_element *head;       /* head of circular line queue */
     struct line_element *line_here;  /* current drawn line position */
     struct line_element *last_pause; /* point to the line after the prev */
-    /*     bottom of screen			*/
+                                     /*     bottom of screen             */
     struct line_element *last_pause_head; /* pointer to head of previous */
-    /* turn					*/
+                                          /* turn                        */
     GC gc;           /* GC for text drawing */
     int char_width,  /* Saved font information so we can  */
         char_height, /*   calculate the correct placement */
-        char_ascent, /*   of changes.		     */
+        char_ascent, /*   of changes.                     */
         char_lbearing;
-    Dimension viewport_width, /* Saved viewport size, so we can adjust */
-        viewport_height;      /*   the slider on a resize.		 */
+    Dimension viewport_width,  /* Saved viewport size, so we can adjust */
+              viewport_height; /*   the slider on a resize.             */
     Boolean dirty;            /* Lines have been added to the window. */
 };
 
@@ -132,6 +132,7 @@ typedef struct x11_mi {
     char *str;           /* The text of the item. */
     int attr;            /* Attribute for the line. */
     boolean selected;    /* Been selected? */
+    boolean preselected; /*   in advance?  */
     char selector;       /* Char used to select this entry. */
     char gselector;      /* Group selector. */
 } x11_menu_item;
@@ -145,7 +146,7 @@ struct menu {
     String *list_pointer; /* String list. */
     Boolean *sensitive;   /* Active list. */
     char curr_selector;   /* Next keyboard accelerator to assign, */
-    /*   if 0, then we're out.		*/
+                          /*   if 0, then we're out.              */
 };
 
 struct menu_info_t {
@@ -213,19 +214,19 @@ struct xwindow {
 
 #define MAX_WINDOWS 20 /* max number of open windows */
 
-#define NHW_NONE 0 /* Unallocated window type.  Must be	*/
-/* different from any other NHW_* type. */
+#define NHW_NONE 0 /* Unallocated window type.  Must be    */
+                   /* different from any other NHW_* type. */
 
 #define NO_CLICK 0 /* No click occurred on the map window. Must */
-/* be different than CLICK_1 and CLICK_2.   */
+                   /* be different than CLICK_1 and CLICK_2.    */
 
 #define DEFAULT_MESSAGE_WIDTH 60 /* width in chars of the message window */
 
-#define DISPLAY_FILE_SIZE 35 /* Max number of lines in the default	*/
-/* file display window.			*/
+#define DISPLAY_FILE_SIZE 35 /* Max number of lines in the default */
+                             /* file display window.               */
 
 #define MAX_KEY_STRING 64 /* String size for converting a keypress */
-/* event into a character(s)		 */
+                          /* event into a character(s)             */
 
 #define DEFAULT_LINES_DISPLAYED 12 /* # of lines displayed message window */
 #define MAX_HISTORY 60             /* max history saved on message window */
