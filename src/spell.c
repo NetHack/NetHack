@@ -120,6 +120,7 @@ STATIC_OVL boolean
 cursed_book(bp)
 struct obj *bp;
 {
+    boolean was_in_use;
     int lev = objects[bp->otyp].oc_level;
     int dmg = 0;
 
@@ -149,11 +150,12 @@ struct obj *bp;
             break;
         }
         /* temp disable in_use; death should not destroy the book */
+        was_in_use = bp->in_use;
         bp->in_use = FALSE;
         losestr(Poison_resistance ? rn1(2, 1) : rn1(4, 3));
         losehp(rnd(Poison_resistance ? 6 : 10), "contact-poisoned spellbook",
                KILLED_BY_AN);
-        bp->in_use = TRUE;
+        bp->in_use = was_in_use;
         break;
     case 6:
         if (Antimagic) {
@@ -322,6 +324,17 @@ struct obj *book2;
     return;
 }
 
+/* 'book' has just become cursed; if we're reading it and realize it is
+   now cursed, interrupt */
+void
+book_cursed(book)
+struct obj *book;
+{
+    if (occupation == learn && context.spbook.book == book
+        && book->cursed && book->bknown && multi >= 0)
+        stop_occupation();
+}
+
 STATIC_PTR int
 learn(VOID_ARGS)
 {
@@ -344,9 +357,8 @@ learn(VOID_ARGS)
         context.spbook.delay = 0;
         return 0;
     }
-    if (context
-            .spbook.delay) { /* not if (context.spbook.delay++), so at end
-                                delay == 0 */
+    if (context.spbook.delay) {
+        /* not if (context.spbook.delay++), so at end delay == 0 */
         context.spbook.delay++;
         return 1; /* still busy */
     }
@@ -516,15 +528,16 @@ register struct obj *spellbook;
                 too_hard = TRUE;
             } else {
                 /* uncursed - chance to fail */
-                int read_ability =
-                    ACURR(A_INT) + 4 + u.ulevel / 2
-                    - 2 * objects[booktype].oc_level
-                    + ((ublindf && ublindf->otyp == LENSES) ? 2 : 0);
+                int read_ability = ACURR(A_INT) + 4 + u.ulevel / 2
+                                   - 2 * objects[booktype].oc_level
+                             + ((ublindf && ublindf->otyp == LENSES) ? 2 : 0);
+
                 /* only wizards know if a spell is too difficult */
                 if (Role_if(PM_WIZARD) && read_ability < 20 && !confused) {
                     char qbuf[QBUFSZ];
+
                     Sprintf(qbuf,
-                     "This spellbook is %sdifficult to comprehend. Continue?",
+                    "This spellbook is %sdifficult to comprehend.  Continue?",
                             (read_ability < 12 ? "very " : ""));
                     if (yn(qbuf) != 'y') {
                         spellbook->in_use = FALSE;

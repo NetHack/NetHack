@@ -1247,12 +1247,14 @@ void
 curse(otmp)
 register struct obj *otmp;
 {
+    unsigned already_cursed;
     int old_light = 0;
 
     if (otmp->oclass == COIN_CLASS)
         return;
     if (otmp->lamplit)
         old_light = arti_light_radius(otmp);
+    already_cursed = otmp->cursed;
     otmp->blessed = 0;
     otmp->cursed = 1;
     /* welded two-handed weapon interferes with some armor removal */
@@ -1263,14 +1265,18 @@ register struct obj *otmp;
     if (otmp == uswapwep && u.twoweap)
         drop_uswapwep();
     /* some cursed items need immediate updating */
-    if (carried(otmp) && confers_luck(otmp))
+    if (carried(otmp) && confers_luck(otmp)) {
         set_moreluck();
-    else if (otmp->otyp == BAG_OF_HOLDING)
+    } else if (otmp->otyp == BAG_OF_HOLDING) {
         otmp->owt = weight(otmp);
-    else if (otmp->otyp == FIGURINE) {
+    } else if (otmp->otyp == FIGURINE) {
         if (otmp->corpsenm != NON_PM && !dead_species(otmp->corpsenm, TRUE)
             && (carried(otmp) || mcarried(otmp)))
             attach_fig_transform_timeout(otmp);
+    } else if (otmp->oclass == SPBOOK_CLASS) {
+        /* if book hero is reading becomes cursed, interrupt */
+        if (!already_cursed)
+            book_cursed(otmp);
     }
     if (otmp->lamplit)
         maybe_adjust_light(otmp, old_light);

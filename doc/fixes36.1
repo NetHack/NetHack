@@ -139,6 +139,11 @@ monsters fleeing up the upstairs on level 1 were supposed to escape the
 monster hitting fire-dealing monster with weapon triggered passive damage to
 	weapon every time, when hero doing so only had 1/6 chance per hit
 hitting steam vortex with flammable weapon would damage the weapon with fire
+if a non-cursed spellbook being read becomes cursed and hero recognizes that
+	(bknown is set), interrupt reading
+if a non-cursed spellbook being read becomes cursed and hero doesn't notice,
+	don't leave it flagged as in-use (hence to be deleted during the
+	next save/restore cycle) if contact-poison cursed book effect occurs
 
 
 Platform- and/or Interface-Specific Fixes

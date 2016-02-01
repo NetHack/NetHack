@@ -2197,6 +2197,7 @@ E boolean FDECL(load_special, (const char *));
 
 /* ### spell.c ### */
 
+E void FDECL(book_cursed, (struct obj *));
 #ifdef USE_TRAMPOLI
 E int NDECL(learn);
 #endif
