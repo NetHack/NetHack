@@ -4388,7 +4388,7 @@ void
 spo_levregion(coder)
 struct sp_coder *coder;
 {
-    static const char nhFunc[] = "spot_levregion";
+    static const char nhFunc[] = "spo_levregion";
     struct opvar *rname, *padding, *rtype, *del_islev, *dy2, *dx2, *dy1, *dx1,
         *in_islev, *iy2, *ix2, *iy1, *ix1;
 
