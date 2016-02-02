@@ -1,4 +1,4 @@
-/* NetHack 3.6	nttty.c	$NHDT-Date: 1454282169 2016/01/31 23:16:09 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.66 $ */
+/* NetHack 3.6	nttty.c	$NHDT-Date: 1454381842 2016/02/02 02:57:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.67 $ */
 /* Copyright (c) NetHack PC Development Team 1993    */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -69,6 +69,7 @@ extern int redirect_stdout;
 int GUILaunched;
 /* Flag for whether unicode is supported */
 static boolean has_unicode;
+static boolean init_ttycolor_completed;
 #ifdef PORT_DEBUG
 static boolean display_cursor_info = FALSE;
 #endif
@@ -727,6 +728,7 @@ init_ttycolor()
     ttycolors_inv[CLR_BRIGHT_CYAN] = BACKGROUND_GREEN | BACKGROUND_BLUE | BACKGROUND_INTENSITY;
     ttycolors_inv[CLR_WHITE]       = BACKGROUND_GREEN | BACKGROUND_BLUE | BACKGROUND_RED
                                        | BACKGROUND_INTENSITY;
+    init_ttycolor_completed = TRUE;
 }
 #endif /* TEXTCOLOR */
 
@@ -1025,6 +1027,9 @@ VA_DECL(const char *, fmt)
     if (redirect_stdout)
         fprintf(stdout, "%s", buf);
     else {
+        if(!init_ttycolor_completed)
+            init_ttycolor();
+
         xputs(buf);
         if (ttyDisplay)
             curs(BASE_WINDOW, console.cursor.X + 1, console.cursor.Y);
