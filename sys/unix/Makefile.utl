@@ -1,5 +1,5 @@
 #	Makefile for NetHack's utility programs.
-# NetHack 3.6  Makefile.utl	$NHDT-Date: 1449386560 2015/12/06 07:22:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.27 $
+# NetHack 3.6  Makefile.utl	$NHDT-Date: 1454376585 2016/02/02 01:29:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.28 $
 
 # Root of source tree:
 NHSROOT=..
@@ -310,7 +310,7 @@ dlb_main.o: dlb_main.c $(CONFIG_H) ../include/dlb.h ../include/date.h
 
 #	dependencies for tile utilities
 #
-TEXT_IO = tiletext.o tiletxt.o $(ONAMING)
+TEXT_IO = tiletext.o tiletxt.o $(OALLOC) $(ONAMING)
 GIFREADERS = gifread.o $(OALLOC)
 PPMWRITERS = ppmwrite.o $(OALLOC)
 
