@@ -1,4 +1,4 @@
-/* NetHack 3.6	winmap.c	$NHDT-Date: 1447844616 2015/11/18 11:03:36 $  $NHDT-Branch: master $:$NHDT-Revision: 1.25 $ */
+/* NetHack 3.6	winmap.c	$NHDT-Date: 1454455161 2016/02/02 23:19:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.26 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -235,6 +235,11 @@ post_process_tiles()
               tile_image, 0, 0, 0, 0, /* src, dest top left */
               width, height);
 
+#ifdef MONITOR_HEAP
+    /* if we let XDestroyImage() handle it, our tracking will be off */
+    if (tile_image->data)
+        free((genericptr_t) tile_image->data), tile_image->data = 0;
+#endif
     XDestroyImage(tile_image); /* data bytes free'd also */
     tile_image = 0;
 
@@ -1610,6 +1615,11 @@ struct xwindow *wp;
                          (XtPointer) 0);
     else
         wp->type = NHW_NONE; /* allow re-use */
+
+    /* when map goes away, presumably we're exiting, so get rid of the
+       cached extended commands menu (if we aren't actually exiting, it
+       will get recreated if needed again) */
+    release_extended_cmds();
 }
 
 boolean exit_x_event; /* exit condition for the event loop */

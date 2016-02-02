@@ -1,4 +1,4 @@
-/* NetHack 3.6	winX.h	$NHDT-Date: 1453447524 2016/01/22 07:25:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.19 $ */
+/* NetHack 3.6	winX.h	$NHDT-Date: 1454455159 2016/02/02 23:19:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.21 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -331,6 +331,7 @@ E void FDECL(algn_key,
 E void FDECL(ec_delete, (Widget, XEvent *, String *, Cardinal *));
 E void FDECL(ec_key, (Widget, XEvent *, String *,
                       Cardinal *)); /* extended command action */
+E void NDECL(release_extended_cmds);
 
 /* ### winstatus.c ### */
 E void FDECL(create_status_window, (struct xwindow *, BOOLEAN_P, Widget));

@@ -1,4 +1,4 @@
-/* NetHack 3.6	winmisc.c	$NHDT-Date: 1452593730 2016/01/12 10:15:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.15 $ */
+/* NetHack 3.6	winmisc.c	$NHDT-Date: 1454455162 2016/02/02 23:19:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.20 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -585,12 +585,8 @@ X11_player_selection()
 int
 X11_get_ext_cmd()
 {
-    static Boolean initialized = False;
-
-    if (!initialized) {
+    if (!extended_commands)
         init_extended_commands_popup();
-        initialized = True;
-    }
 
     extended_cmd_selected = -1; /* reset selected value */
 
@@ -602,6 +598,15 @@ X11_get_ext_cmd()
     (void) x_event(EXIT_ON_EXIT);
 
     return extended_cmd_selected;
+}
+
+void
+release_extended_cmds()
+{
+    if (extended_commands) {
+        XtDestroyWidget(extended_command_popup);
+        free((genericptr_t) extended_commands), extended_commands = 0;
+    }
 }
 
 /* End global functions =====================================================
@@ -1161,3 +1166,5 @@ Widget *formp; /* return */
 
     return popup;
 }
+
+/*winmisc.c*/
