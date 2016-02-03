@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1451838768 2016/01/03 16:32:48 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.119 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1454485431 2016/02/03 07:43:51 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.122 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1030,7 +1030,7 @@ boolean verbosely;
     if (!shkp->mcanmove || shkp->msleeping) {
         /* greed induced recovery... */
         if (verbosely && canspotmon(shkp))
-            pline("%s %s.", Monnam(shkp),
+            pline("%s %s.", Shknam(shkp),
                   shkp->msleeping ? "wakes up" : "can move again");
         shkp->msleeping = 0;
         shkp->mfrozen = 0;
@@ -1055,7 +1055,7 @@ register boolean silentkops;
         char shk_nam[BUFSZ];
         boolean vanished = canseemon(shkp);
 
-        Strcpy(shk_nam, mon_nam(shkp));
+        Strcpy(shk_nam, shkname(shkp));
         if (on_level(&eshkp->shoplevel, &u.uz)) {
             home_shk(shkp, FALSE);
             /* didn't disappear if shk can still be seen */
@@ -1077,7 +1077,7 @@ register boolean silentkops;
         if (vanished)
             pline("Satisfied, %s suddenly disappears!", shk_nam);
     } else if (wasmad)
-        pline("%s calms down.", Monnam(shkp));
+        pline("%s calms down.", Shknam(shkp));
 
     make_happy_shoppers(silentkops);
 }
@@ -1105,17 +1105,16 @@ register struct monst *shkp;
     ESHK(shkp)->following = 1;
 }
 
-/* used when the shkp is teleported or falls (ox == 0) out of his shop,
- * or when the player is not on a costly_spot and he
- * damages something inside the shop.  these conditions
- * must be checked by the calling function.
- */
+/* Used when the shkp is teleported or falls (ox == 0) out of his shop, or
+   when the player is not on a costly_spot and he damages something inside
+   the shop.  These conditions must be checked by the calling function. */
+/*ARGSUSED*/
 void
 make_angry_shk(shkp, ox, oy)
-register struct monst *shkp;
-register xchar ox, oy;
+struct monst *shkp;
+xchar ox UNUSED; /* <ox,oy> predate 'noit_Monnam()', let alone Shknam() */
+xchar oy UNUSED;
 {
-    xchar sx, sy;
     struct eshk *eshkp = ESHK(shkp);
 
     /* all pending shop transactions are now "past due" */
@@ -1128,15 +1127,7 @@ register xchar ox, oy;
         setpaid(shkp);
     }
 
-    /* If you just used a wand of teleportation to send the shk away, you
-       might not be able to see her any more.  Monnam would yield "it",
-       which makes this message look pretty silly, so temporarily restore
-       her original location during the call to Monnam. */
-    sx = shkp->mx, sy = shkp->my;
-    if (isok(ox, oy) && cansee(ox, oy) && !cansee(sx, sy))
-        shkp->mx = ox, shkp->my = oy;
-    pline("%s %s!", Monnam(shkp), !ANGRY(shkp) ? "gets angry" : "is furious");
-    shkp->mx = sx, shkp->my = sy;
+    pline("%s %s!", Shknam(shkp), !ANGRY(shkp) ? "gets angry" : "is furious");
     hot_pursuit(shkp);
 }
 
@@ -1219,7 +1210,7 @@ dopay()
                 break;
         if (shkp != resident && distu(shkp->mx, shkp->my) > 2) {
             pline("%s is not near enough to receive your payment.",
-                  Monnam(shkp));
+                  Shknam(shkp));
             return 0;
         }
     } else {
@@ -1243,6 +1234,10 @@ dopay()
             return 0;
         }
         mtmp = m_at(cx, cy);
+        if (!cansee(cx, cy) && (!mtmp || !canspotmon(mtmp))) {
+            You("can't %s anyone there.", !Blind ? "see" : "sense");
+            return 0;
+        }
         if (!mtmp) {
             There("is no one there to receive your payment.");
             return 0;
@@ -1252,7 +1247,7 @@ dopay()
             return 0;
         }
         if (mtmp != resident && distu(mtmp->mx, mtmp->my) > 2) {
-            pline("%s is too far to receive your payment.", Monnam(mtmp));
+            pline("%s is too far to receive your payment.", Shknam(mtmp));
             return 0;
         }
         shkp = mtmp;
@@ -1271,7 +1266,7 @@ proceed:
         rouse_shk(shkp, TRUE);
 
     if (!shkp->mcanmove || shkp->msleeping) { /* still asleep/paralyzed */
-        pline("%s %s.", Monnam(shkp),
+        pline("%s %s.", Shknam(shkp),
               rn2(2) ? "seems to be napping" : "doesn't respond");
         return 0;
     }
@@ -1279,7 +1274,7 @@ proceed:
     if (shkp != resident && NOTANGRY(shkp)) {
         umoney = money_cnt(invent);
         if (!ltmp)
-            You("do not owe %s anything.", mon_nam(shkp));
+            You("do not owe %s anything.", shkname(shkp));
         else if (!umoney) {
             You("%shave no money.", stashed_gold ? "seem to " : "");
             if (stashed_gold)
@@ -1329,7 +1324,7 @@ proceed:
         } else {
             /* shopkeeper is angry, but has not been robbed --
              * door broken, attacked, etc. */
-            pline("%s is after your hide, not your money!", Monnam(shkp));
+            pline("%s is after your hide, not your money!", Shknam(shkp));
             if (umoney < 1000L) {
                 if (!umoney)
                     pline(no_money, stashed_gold ? " seem to" : "");
@@ -1709,7 +1704,7 @@ int croaked;
             if (has_head(shkp->data) && !rn2(2))
                 Sprintf(takes, ", shakes %s %s,", mhis(shkp),
                         mbodypart(shkp, HEAD));
-            pline("%s %slooks at your corpse%s and %s.", Monnam(shkp),
+            pline("%s %slooks at your corpse%s and %s.", Shknam(shkp),
                   (!shkp->mcanmove || shkp->msleeping) ? "wakes up, " : "",
                   takes, !inhishop(shkp) ? "disappears" : "sighs");
         }
@@ -1764,10 +1759,10 @@ int croaked;
         } else {
             money2mon(shkp, loss);
             context.botl = 1;
-            pline("%s %s the %ld %s %sowed %s.", Monnam(shkp), takes, loss,
-                  currency(loss),
+            pline("%s %s the %ld %s %sowed %s.", Shknam(shkp),
+                  takes, loss, currency(loss),
                   strncmp(eshkp->customer, plname, PL_NSIZ) ? "" : "you ",
-                  shkp->female ? "her" : "him");
+                  mhim(shkp));
             /* shopkeeper has now been paid in full */
             pacify_shk(shkp);
             eshkp->following = 0;
@@ -2458,7 +2453,7 @@ boolean ininv, dummy, silent;
         char buf[BUFSZ];
 
         if (!ltmp) {
-            pline("%s has no interest in %s.", Monnam(shkp), the(xname(obj)));
+            pline("%s has no interest in %s.", Shknam(shkp), the(xname(obj)));
             return;
         }
         if (!ininv) {
@@ -2491,7 +2486,7 @@ boolean ininv, dummy, silent;
                       (contentscount && obj->unpaid) ? and_its_contents : "",
                       ltmp, currency(ltmp), (obj->quan > 1L) ? " each" : "");
         else
-            pline("%s does not notice.", Monnam(shkp));
+            pline("%s does not notice.", Shknam(shkp));
     }
 }
 
@@ -2727,19 +2722,19 @@ boolean peaceful, silent;
                 still = "still ";
             }
             if (obj->oclass == COIN_CLASS)
-                You("%sowe %s %ld %s!", still, mon_nam(shkp), value,
+                You("%sowe %s %ld %s!", still, shkname(shkp), value,
                     currency(value));
             else
-                You("%sowe %s %ld %s for %s!", still, mon_nam(shkp), value,
-                    currency(value), obj->quan > 1L ? "them" : "it");
+                You("%sowe %s %ld %s for %s!", still, shkname(shkp),
+                    value, currency(value), (obj->quan > 1L) ? "them" : "it");
         }
     } else {
         ESHK(shkp)->robbed += value;
 
         if (!silent) {
-            if (cansee(shkp->mx, shkp->my)) {
-                Norep("%s booms: \"%s, you are a thief!\"", Monnam(shkp),
-                      plname);
+            if (canseemon(shkp)) {
+                Norep("%s booms: \"%s, you are a thief!\"",
+                      Shknam(shkp), plname);
             } else
                 Norep("You hear a scream, \"Thief!\"");
         }
@@ -2823,7 +2818,7 @@ xchar x, y;
 
         if (!unpaid && (sell_how != SELL_DONTSELL)
             && !special_stock(obj, shkp, FALSE))
-            pline("%s seems uninterested.", Monnam(shkp));
+            pline("%s seems uninterested.", Shknam(shkp));
         return;
     }
 
@@ -2900,7 +2895,7 @@ xchar x, y;
         || offer == 0L || (obj->oclass == FOOD_CLASS && obj->oeaten)
         || (Is_candle(obj)
             && obj->age < 20L * (long) objects[obj->otyp].oc_cost)) {
-        pline("%s seems uninterested%s.", Monnam(shkp),
+        pline("%s seems uninterested%s.", Shknam(shkp),
               cgold ? " in the rest" : "");
         if (container)
             dropped_container(obj, shkp, FALSE);
@@ -3179,7 +3174,7 @@ register xchar x, y;
         if (mnearto(shkp, x, y, TRUE) && !muteshk(shkp))
             verbalize("Out of my way, scum!");
         if (cansee(x, y)) {
-            pline("%s nimbly%s catches %s.", Monnam(shkp),
+            pline("%s nimbly%s catches %s.", Shknam(shkp),
                   (x == shkp->mx && y == shkp->my) ? "" : " reaches over and",
                   the(xname(obj)));
             if (!canspotmon(shkp))
@@ -3517,7 +3512,7 @@ register struct monst *shkp;
                                           || (omx == u.ux || omy == u.uy))) {
         if (ANGRY(shkp) || (Conflict && !resist(shkp, RING_CLASS, 0, 0))) {
             if (Displaced)
-                Your("displaced image doesn't fool %s!", mon_nam(shkp));
+                Your("displaced image doesn't fool %s!", shkname(shkp));
             (void) mattacku(shkp);
             return 0;
         }
@@ -3536,7 +3531,7 @@ register struct monst *shkp;
                 followmsg = moves;
                 if (!rn2(9)) {
                     pline("%s doesn't like customers who don't pay.",
-                          Monnam(shkp));
+                          Shknam(shkp));
                     rile_shk(shkp);
                 }
             }
@@ -4063,6 +4058,7 @@ struct monst *shkp;
 {
     struct eshk *eshk;
     long shkmoney;
+
     if (!shkp->isshk) {
         /* The monster type is shopkeeper, but this monster is
            not actually a shk, which could happen if someone

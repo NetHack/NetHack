@@ -1,4 +1,4 @@
-/* NetHack 3.6	shknam.c	$NHDT-Date: 1450306213 2015/12/16 22:50:13 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.39 $ */
+/* NetHack 3.6	shknam.c	$NHDT-Date: 1454485432 2016/02/03 07:43:52 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.41 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -815,35 +815,64 @@ int type;
     return shp->iprobs[i].itype;
 }
 
-const char *
+/* version of shkname() for beginning of sentence */
+char *
+Shknam(mtmp)
+struct monst *mtmp;
+{
+    char *nam = shkname(mtmp);
+
+    /* 'nam[]' is almost certainly already capitalized, but be sure */
+    nam[0] = highc(nam[0]);
+    return nam;
+}
+
+/* shopkeeper's name, without any visibility constraint; if hallucinating,
+   will yield some other shopkeeper's name (not necessarily one residing
+   in the current game's dungeon, or who keeps same type of shop) */
+char *
 shkname(mtmp)
 struct monst *mtmp;
 {
-    const char *shknm = ESHK(mtmp)->shknam;
+    char *nam;
+    unsigned save_isshk = mtmp->isshk;
 
-    if (Hallucination && !program_state.gameover) {
-        const char *const *nlp;
-        int num;
+    mtmp->isshk = 0; /* don't want mon_nam() calling shkname() */
+    /* get a modifiable name buffer along with fallback result */
+    nam = noit_mon_nam(mtmp);
+    mtmp->isshk = save_isshk;
 
-        /* count the number of non-unique shop types;
-           pick one randomly, ignoring shop generation probabilities;
-           pick a name at random from that shop type's list */
-        for (num = 0; num < SIZE(shtypes); num++)
-            if (shtypes[num].prob == 0)
-                break;
-        if (num > 0) {
-            nlp = shtypes[rn2(num)].shknms;
-            for (num = 0; nlp[num]; num++)
-                continue;
-            if (num > 0)
-                shknm = nlp[rn2(num)];
+    if (!mtmp->isshk) {
+        impossible("shkname: \"%s\" is not a shopkeeper.", nam);
+    } else if (!has_eshk(mtmp)) {
+        panic("shkname: shopkeeper \"%s\" lacks 'eshk' data.", nam);
+    } else {
+        const char *shknm = ESHK(mtmp)->shknam;
+
+        if (Hallucination && !program_state.gameover) {
+            const char *const *nlp;
+            int num;
+
+            /* count the number of non-unique shop types;
+               pick one randomly, ignoring shop generation probabilities;
+               pick a name at random from that shop type's list */
+            for (num = 0; num < SIZE(shtypes); num++)
+                if (shtypes[num].prob == 0)
+                    break;
+            if (num > 0) {
+                nlp = shtypes[rn2(num)].shknms;
+                for (num = 0; nlp[num]; num++)
+                    continue;
+                if (num > 0)
+                    shknm = nlp[rn2(num)];
+            }
         }
+        /* strip prefix if present */
+        if (!letter(*shknm))
+            ++shknm;
+        Strcpy(nam, shknm);
     }
-
-    /* strip prefix if present */
-    if (!letter(*shknm))
-        ++shknm;
-    return shknm;
+    return nam;
 }
 
 boolean

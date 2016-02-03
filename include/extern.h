@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1454033598 2016/01/29 02:13:18 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.543 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1454485430 2016/02/03 07:43:50 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.545 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2147,7 +2147,8 @@ E void FDECL(free_eshk, (struct monst *));
 E void FDECL(stock_room, (int, struct mkroom *));
 E boolean FDECL(saleable, (struct monst *, struct obj *));
 E int FDECL(get_shop_item, (int));
-E const char *FDECL(shkname, (struct monst *));
+E char *FDECL(Shknam, (struct monst *));
+E char *FDECL(shkname, (struct monst *));
 E boolean FDECL(shkname_is_pname, (struct monst *));
 E boolean FDECL(is_izchak, (struct monst *, BOOLEAN_P));
 
