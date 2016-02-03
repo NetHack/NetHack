@@ -1,4 +1,4 @@
-/* NetHack 3.6	tilemap.c	$NHDT-Date: 1454464776 2016/02/03 01:59:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.26 $ */
+/* NetHack 3.6	tilemap.c	$NHDT-Date: 1454498706 2016/02/03 11:25:06 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.27 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -620,8 +620,8 @@ int idx;
 const char *encountered, *expected;
 {
     if (idx >= 0 && idx < SIZE(altlabels)) {
-        if (!strcmpi(altlabels[idx].expectedlabel, expected)) {
-            if (!strcmpi(altlabels[idx].betterlabel, encountered))
+        if (!strcmp(altlabels[idx].expectedlabel, expected)) {
+            if (!strcmp(altlabels[idx].betterlabel, encountered))
                 return TRUE;
         }
     }
