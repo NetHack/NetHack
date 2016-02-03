@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1452919834 2016/01/16 04:50:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.259 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1454528963 2016/02/03 19:49:23 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.261 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2412,10 +2412,12 @@ register struct monst *mtmp;
                 break;
             if (amorphous(mptr) || is_whirly(mptr) || unsolid(mptr)) {
                 if (acidic(mptr) || mptr == &mons[PM_GELATINOUS_CUBE]
-                    || mptr == &mons[PM_FIRE_ELEMENTAL]) {
+                    || mptr == &mons[PM_FIRE_ELEMENTAL]
+                    || mptr == &mons[PM_FIRE_VORTEX]) {
                     if (in_sight)
                         pline("%s %s %s spider web!", Monnam(mtmp),
-                              (mptr == &mons[PM_FIRE_ELEMENTAL])
+                              (mptr == &mons[PM_FIRE_ELEMENTAL]
+                               || mptr == &mons[PM_FIRE_VORTEX])
                                   ? "burns"
                                   : "dissolves",
                               a_your[trap->madeby_u]);

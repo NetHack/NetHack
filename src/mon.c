@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1453371163 2016/01/21 10:12:43 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.208 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1454528962 2016/02/03 19:49:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.210 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1368,7 +1368,8 @@ nexttry: /* eels prefer the water, but if there is no water nearby,
                         && (ttmp->ttyp != FIRE_TRAP || !resists_fire(mon))
                         && (ttmp->ttyp != SQKY_BOARD || !is_flyer(mdat))
                         && (ttmp->ttyp != WEB
-                            || (!amorphous(mdat) && !webmaker(mdat)))
+                            || (!amorphous(mdat) && !webmaker(mdat)
+                                && !is_whirly(mdat) && !unsolid(mdat)))
                         && (ttmp->ttyp != ANTI_MAGIC || !resists_magm(mon))) {
                         if (!(flag & ALLOW_TRAPS)) {
                             if (mon->mtrapseen & (1L << (ttmp->ttyp - 1)))
