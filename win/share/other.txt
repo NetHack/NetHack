@@ -388,7 +388,7 @@ Z = (195, 195, 195)
   ...JJJJ.J.JJJA..
   ................
 }
-# tile 19 (room)
+# tile 19 (floor of a room)
 {
   ................
   ................
@@ -407,7 +407,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 20 (darkroom)
+# tile 20 (dark part of a room)
 {
   .A.A.A.A.A.A.A.A
   A.A.A.A.A.A.A.A.
@@ -464,7 +464,7 @@ Z = (195, 195, 195)
   ................
   ................
 }
-# tile 23 (up stairs)
+# tile 23 (staircase up)
 {
   AAAAAAAAAAAAAA.A
   AADJJJJJJJJJDA.A
@@ -483,7 +483,7 @@ Z = (195, 195, 195)
   AAAAAAAAAAAAAA.A
   AAAAAAAAAAAAAAAA
 }
-# tile 24 (down stairs)
+# tile 24 (staircase down)
 {
   AAAAAAAAAAAAAA.A
   AADJJJJJJJJJDA.A
@@ -502,7 +502,7 @@ Z = (195, 195, 195)
   AAAAAAAAAAAAAA.A
   AAAAAAAAAAAAAAAA
 }
-# tile 25 (up ladder)
+# tile 25 (ladder up)
 {
   ADAAAAAAAAAAAD.A
   AADAAAANAAAADA.A
@@ -521,7 +521,7 @@ Z = (195, 195, 195)
   AAAAAAAAAAAAAA.A
   AAAAAAAAAAAAAAAA
 }
-# tile 26 (down ladder)
+# tile 26 (ladder down)
 {
   ADAAAAAAAAAAAD.A
   AADAAAANAAAADA.A
@@ -673,7 +673,7 @@ Z = (195, 195, 195)
   NNNNNNNNNNNNNNNN
   NNNNNNNNNNNNNNNN
 }
-# tile 34 (lava)
+# tile 34 (molten lava)
 {
   DDDDDDCDDDDDDDDD
   DDDDDCDKDDDDDDDD
@@ -1205,7 +1205,7 @@ Z = (195, 195, 195)
   ......AAAAA.....
   ................
 }
-# tile 62 (anti magic trap)
+# tile 62 (anti-magic field)
 {
   ................
   ......DDDDD.....
