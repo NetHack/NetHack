@@ -1,4 +1,4 @@
-/* NetHack 3.6	tilemap.c	$NHDT-Date: 1447306925 2015/11/12 05:42:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.25 $ */
+/* NetHack 3.6	tilemap.c	$NHDT-Date: 1454464776 2016/02/03 01:59:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.26 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -12,6 +12,7 @@
 const char *FDECL(tilename, (int, int));
 void NDECL(init_tilemap);
 void FDECL(process_substitutions, (FILE *));
+boolean FDECL(acceptable_tilename, (int, const char *, const char *));
 
 #if defined(MICRO) || defined(WIN32)
 #undef exit
@@ -509,3 +510,121 @@ main()
 }
 
 #endif /* TILETEXT */
+
+struct {
+    int idx;
+    const char *betterlabel;
+    const char *expectedlabel;
+} altlabels[] = {
+    {0, "dark part of a room", "dark part of a room"}, 
+    {1, "vertical wall", "wall"}, 
+    {2, "horizontal wall", "wall"}, 
+    {3, "top left corner wall", "wall"}, 
+    {4, "top right corner wall", "wall"}, 
+    {5, "bottom left corner wall", "wall"}, 
+    {6, "bottom right corner wall", "wall"}, 
+    {7, "cross wall", "wall"}, 
+    {8, "tuwall", "wall"}, 
+    {9, "tdwall", "wall"}, 
+    {10, "tlwall", "wall"}, 
+    {11, "trwall", "wall"}, 
+    {12, "no door", "doorway"}, 
+    {13, "vertical open door", "open door"}, 
+    {14, "horizontal open door", "open door"}, 
+    {15, "vertical closed door", "closed door"}, 
+    {16, "horizontal closed door", "closed door"}, 
+    {17, "iron bars", "iron bars"}, 
+    {18, "tree", "tree"}, 
+    {19, "room", "floor of a room"}, 
+    {20, "darkroom", "dark part of a room"}, 
+    {21, "corridor", "corridor"}, 
+    {22, "lit corridor", "lit corridor"}, 
+    {23, "up stairs", "staircase up"}, 
+    {24, "down stairs", "staircase down"}, 
+    {25, "up ladder", "ladder up"}, 
+    {26, "down ladder", "ladder down"}, 
+    {27, "altar", "altar"}, 
+    {28, "grave", "grave"}, 
+    {29, "throne", "opulent throne"}, 
+    {30, "sink", "sink"}, 
+    {31, "fountain", "fountain"}, 
+    {32, "pool", "water"}, 
+    {33, "ice", "ice"}, 
+    {34, "lava", "molten lava"}, 
+    {35, "vertical open drawbridge", "lowered drawbridge"}, 
+    {36, "horizontal open drawbridge", "lowered drawbridge"}, 
+    {37, "vertical closed drawbridge", "raised drawbridge"}, 
+    {38, "horizontal closed drawbridge", "raised drawbridge"}, 
+    {39, "air", "air"}, 
+    {40, "cloud", "cloud"}, 
+    {41, "water", "water"}, 
+    {42, "arrow trap", "arrow trap"}, 
+    {43, "dart trap", "dart trap"}, 
+    {44, "falling rock trap", "falling rock trap"}, 
+    {45, "squeaky board", "squeaky board"}, 
+    {46, "bear trap", "bear trap"}, 
+    {47, "land mine", "land mine"}, 
+    {48, "rolling boulder trap", "rolling boulder trap"}, 
+    {49, "sleeping gas trap", "sleeping gas trap"}, 
+    {50, "rust trap", "rust trap"}, 
+    {51, "fire trap", "fire trap"}, 
+    {52, "pit", "pit"}, 
+    {53, "spiked pit", "spiked pit"}, 
+    {54, "hole", "hole"}, 
+    {55, "trap door", "trap door"}, 
+    {56, "teleportation trap", "teleportation trap"}, 
+    {57, "level teleporter", "level teleporter"}, 
+    {58, "magic portal", "magic portal"}, 
+    {59, "web", "web"}, 
+    {60, "statue trap", "statue trap"}, 
+    {61, "magic trap", "magic trap"}, 
+    {62, "anti magic trap", "anti-magic field"}, 
+    {63, "polymorph trap", "polymorph trap"}, 
+    {64, "vibrating square", "vibrating square"}, 
+    {65, "vertical beam", "wall"}, 
+    {66, "horizontal beam", "wall"}, 
+    {67, "left slant beam", "wall"}, 
+    {68, "right slant beam", "wall"}, 
+    {69, "dig beam", "cmap 69"}, 
+    {70, "flash beam", "cmap 70"}, 
+    {71, "boom left", "cmap 71"}, 
+    {72, "boom right", "cmap 72"}, 
+    {73, "shield1", "cmap 73"}, 
+    {74, "shield2", "cmap 74"}, 
+    {75, "shield3", "cmap 75"}, 
+    {76, "shield4", "cmap 76"}, 
+    {77, "poison cloud", "poison cloud"}, 
+    {78, "valid position", "valid position"}, 
+    {79, "swallow top left", "cmap 79"}, 
+    {80, "swallow top center", "cmap 80"}, 
+    {81, "swallow top right", "cmap 81"}, 
+    {82, "swallow middle left", "cmap 82"}, 
+    {83, "swallow middle right", "cmap 83"}, 
+    {84, "swallow bottom left ", "cmap 84"}, 
+    {85, "swallow bottom center", "cmap 85"}, 
+    {86, "swallow bottom right", "cmap 86"}, 
+    {87, "explosion top left", "explosion dark 0"}, 
+    {88, "explosion top centre", "explosion dark 1"}, 
+    {89, "explosion top right", "explosion dark 2"}, 
+    {90, "explosion middle left", "explosion dark 3"}, 
+    {91, "explosion middle center", "explosion dark 4"}, 
+    {92, "explosion middle right", "explosion dark 5"}, 
+    {93, "explosion bottom left", "explosion dark 6"}, 
+    {94, "explosion bottom center", "explosion dark 7"}, 
+    {95, "explosion bottom right", "explosion dark 8"},
+};
+
+boolean
+acceptable_tilename(idx, encountered, expected)
+int idx;
+const char *encountered, *expected;
+{
+    if (idx >= 0 && idx < SIZE(altlabels)) {
+        if (!strcmpi(altlabels[idx].expectedlabel, expected)) {
+            if (!strcmpi(altlabels[idx].betterlabel, encountered))
+                return TRUE;
+        }
+    }
+    return FALSE;
+}
+

@@ -1,4 +1,4 @@
-/* NetHack 3.6	tiletext.c	$NHDT-Date: 1432512803 2015/05/25 00:13:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $ */
+/* NetHack 3.6	tiletext.c	$NHDT-Date: 1454464783 2016/02/03 01:59:43 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.12 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "config.h"
@@ -26,6 +26,7 @@ static const char *text_sets[] = { "monsters.txt", "objects.txt",
 #endif
 
 extern const char *FDECL(tilename, (int, int));
+extern boolean FDECL(acceptable_tilename, (int, const char *, const char *));
 static void FDECL(read_text_colormap, (FILE *));
 static boolean FDECL(write_text_colormap, (FILE *));
 static boolean FDECL(read_txttile, (FILE *, pixel (*)[TILE_X]));
@@ -110,7 +111,7 @@ pixel (*pixels)[TILE_X];
          * change when tiles are added
          */
         p = tilename(tile_set, tile_set_indx);
-        if (p && strcmp(p, buf)) {
+        if (p && strcmp(p, buf) && !acceptable_tilename(tile_set_indx,buf,p)) {
             Fprintf(stderr, "warning: for tile %d (numbered %d) of %s,\n",
                     tile_set_indx, i, text_sets[tile_set - 1]);
             Fprintf(stderr, "\tfound '%s' while expecting '%s'\n", buf, p);
