@@ -1,4 +1,4 @@
-/* NetHack 3.6	lint.h	$NHDT-Date: 1449269910 2015/12/04 22:58:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.3 $ */
+/* NetHack 3.6	lint.h	$NHDT-Date: 1454571508 2016/02/04 07:38:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.4 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -22,7 +22,7 @@
 /* force an unused function argument to become used in an arbitrary
    manner in order to suppress warning about unused function arguments;
    viable for scalar and pointer arguments */
-#define nhUse(arg) nhUse_dummy += (unsigned) arg;
+#define nhUse(arg) nhUse_dummy += (unsigned) !(arg)
 extern unsigned nhUse_dummy;
 #else
 #define nhUse(arg) /*empty*/

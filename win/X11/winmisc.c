@@ -1,4 +1,4 @@
-/* NetHack 3.6	winmisc.c	$NHDT-Date: 1454455162 2016/02/02 23:19:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.20 $ */
+/* NetHack 3.6	winmisc.c	$NHDT-Date: 1454571527 2016/02/04 07:38:47 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.21 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -118,7 +118,7 @@ XtPointer client_data, call_data;
     nhUse(w);
     nhUse(call_data);
 
-    ps_selected = (int) client_data;
+    ps_selected = (int) (ptrdiff_t) client_data;
     exit_x_event = TRUE; /* leave event loop */
 }
 
@@ -620,7 +620,7 @@ extend_select(w, client_data, call_data)
 Widget w;
 XtPointer client_data, call_data;
 {
-    int selected = (int) client_data;
+    int selected = (int) (ptrdiff_t) client_data;
 
     nhUse(w);
     nhUse(call_data);
@@ -1045,7 +1045,8 @@ Widget *formp; /* return */
 
         *curr = XtCreateManagedWidget(widget_names[i], commandWidgetClass,
                                       form, args, num_args);
-        XtAddCallback(*curr, XtNcallback, name_callback, (XtPointer) i);
+        XtAddCallback(*curr, XtNcallback, name_callback,
+                      (XtPointer) (ptrdiff_t) i);
         above = *curr++;
     }
     cumulative_height += distance; /* space at bottom of form */

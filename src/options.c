@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1451683057 2016/01/01 21:17:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.249 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1454571526 2016/02/04 07:38:46 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.262 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -4128,13 +4128,16 @@ boolean setinitial, setfromfile;
             add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE,
        "screen: row is offset to accommodate tty interface's use of top line",
                      MENU_UNSELECTED);
-        Sprintf(buf, "screen: upper-left: [%02d,%02d], lower-right: [%d,%d]%s",
-                0 + 2, 1, ROWNO - 1 + 2, COLNO - 1,
 #if COLNO == 80
-                flags.verbose ? "; column 80 is not used" :
+#define COL80ARG flags.verbose ? "; column 80 is not used" : ""
+#else
+#define COL80ARG ""
 #endif
-                "");
+        Sprintf(buf, "screen: upper-left: [%02d,%02d], lower-right: [%d,%d]%s",
+                0 + 2, 1, ROWNO - 1 + 2, COLNO - 1, COL80ARG);
+#undef COL80ARG
         add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, buf, MENU_UNSELECTED);
+        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
         end_menu(tmpwin,
             "Select coordinate display when auto-describing a map position:");
         if ((pick_cnt = select_menu(tmpwin, PICK_ONE, &window_pick)) > 0) {
