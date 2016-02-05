@@ -2362,22 +2362,34 @@ boolean
 create_particular()
 {
     char buf[BUFSZ], *bufp, monclass;
+    char *tmpp;
     int which, tryct, i, firstchoice = NON_PM;
     struct permonst *whichpm = NULL;
     struct monst *mtmp;
     boolean madeany = FALSE;
     boolean maketame, makepeaceful, makehostile;
     boolean randmonst = FALSE;
+    boolean saddled = FALSE;
+    boolean invisible = FALSE;
 
     tryct = 5;
     do {
         monclass = MAXMCLASSES;
         which = urole.malenum; /* an arbitrary index into mons[] */
         maketame = makepeaceful = makehostile = FALSE;
+        saddled = invisible = FALSE;
         getlin("Create what kind of monster? [type the name or symbol]", buf);
         bufp = mungspaces(buf);
         if (*bufp == '\033')
             return FALSE;
+        if ((tmpp = strstri(bufp, "saddled ")) != 0) {
+            saddled = TRUE;
+            memset(tmpp, ' ', sizeof("saddled ")-1);
+        }
+        if ((tmpp = strstri(bufp, "invisible ")) != 0) {
+            invisible = TRUE;
+            memset(tmpp, ' ', sizeof("invisible ")-1);
+        }
         /* allow the initial disposition to be specified */
         if (!strncmpi(bufp, "tame ", 5)) {
             bufp += 5;
@@ -2443,6 +2455,16 @@ create_particular()
                 mtmp->mpeaceful = makepeaceful ? 1 : 0;
                 set_malign(mtmp);
             }
+            if (saddled && can_saddle(mtmp) && !which_armor(mtmp, W_SADDLE)) {
+                struct obj *otmp = mksobj(SADDLE, TRUE, FALSE);
+                (void) mpickobj(mtmp, otmp);
+                mtmp->misc_worn_check |= W_SADDLE;
+                otmp->owornmask = W_SADDLE;
+                otmp->leashmon = mtmp->m_id;
+                update_mon_intrinsics(mtmp, otmp, TRUE, FALSE);
+            }
+            if (invisible)
+                mon_set_minvis(mtmp);
             madeany = TRUE;
             /* in case we got a doppelganger instead of what was asked
                for, make it start out looking like what was asked for */
