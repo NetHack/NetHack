@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1454061992 2016/01/29 10:06:32 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.162 $ */
+/* NetHack 3.6	eat.c	$NHDT-Date: 1454715969 2016/02/05 23:46:09 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.163 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -312,7 +312,7 @@ struct obj *otmp;
         costly_alteration(otmp, COST_BITE);
         otmp->oeaten = (otmp->otyp == CORPSE) ? mons[otmp->corpsenm].cnutrit
                            : otmp->globby ? otmp->owt
-                               : objects[otmp->otyp].oc_nutrition;
+                               : (unsigned) objects[otmp->otyp].oc_nutrition;
     }
 
     if (carried(otmp)) {
@@ -2558,7 +2558,7 @@ doeat()
     /* re-calc the nutrition */
     basenutrit = (otmp->otyp == CORPSE) ? mons[otmp->corpsenm].cnutrit
                      : otmp->globby ? otmp->owt
-                         : objects[otmp->otyp].oc_nutrition;
+                         : (unsigned) objects[otmp->otyp].oc_nutrition;
 
     debugpline3(
      "before rounddiv: victual.reqtime == %d, oeaten == %d, basenutrit == %d",
@@ -3042,9 +3042,9 @@ struct obj *obj;
     long uneaten_amt, full_amount;
 
     uneaten_amt = (long) obj->oeaten;
-    full_amount = (obj->otyp == CORPSE) ? (long) mons[obj->corpsenm].cnutrit
-                      : obj->globby ? obj->owt
-                          : (long) objects[obj->otyp].oc_nutrition;
+    full_amount = (long) ((obj->otyp == CORPSE) ? mons[obj->corpsenm].cnutrit
+                            : obj->globby ? obj->owt
+                               : (unsigned) objects[obj->otyp].oc_nutrition);
     if (uneaten_amt > full_amount) {
         impossible(
           "partly eaten food (%ld) more nutritious than untouched food (%ld)",

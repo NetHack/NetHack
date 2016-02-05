@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1454061995 2016/01/29 10:06:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.117 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1454715975 2016/02/05 23:46:15 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.119 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1342,6 +1342,11 @@ register struct obj *obj;
 {
     int wt = objects[obj->otyp].oc_weight;
 
+    /* glob absorpsion means that merging globs accumulates weight while
+       quantity stays 1, so update 'wt' to reflect that, unless owt is 0,
+       when we assume this is a brand new glob so use objects[].oc_weight */
+    if (obj->globby && obj->owt > 0)
+        wt = obj->owt;
     if (SchroedingersBox(obj))
         wt += mons[PM_HOUSECAT].cwt;
     if (Is_container(obj) || obj->otyp == STATUE) {
