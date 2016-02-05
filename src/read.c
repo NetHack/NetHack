@@ -2457,11 +2457,7 @@ create_particular()
             }
             if (saddled && can_saddle(mtmp) && !which_armor(mtmp, W_SADDLE)) {
                 struct obj *otmp = mksobj(SADDLE, TRUE, FALSE);
-                (void) mpickobj(mtmp, otmp);
-                mtmp->misc_worn_check |= W_SADDLE;
-                otmp->owornmask = W_SADDLE;
-                otmp->leashmon = mtmp->m_id;
-                update_mon_intrinsics(mtmp, otmp, TRUE, FALSE);
+                put_saddle_on_mon(otmp, mtmp);
             }
             if (invisible)
                 mon_set_minvis(mtmp);
