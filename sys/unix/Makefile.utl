@@ -1,5 +1,5 @@
 #	Makefile for NetHack's utility programs.
-# NetHack 3.6  Makefile.utl	$NHDT-Date: 1454376585 2016/02/02 01:29:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.28 $
+# NetHack 3.6  Makefile.utl	$NHDT-Date: 1454712070 2016/02/05 22:41:10 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.29 $
 
 # Root of source tree:
 NHSROOT=..
@@ -351,12 +351,12 @@ tilemap: tilemap.o
 tiletext.o: ../win/share/tiletext.c $(CONFIG_H) ../include/tile.h
 	$(CC) $(CFLAGS) -c ../win/share/tiletext.c
 tiletxt.c: ./Makefile
-	echo '/* alternate compilation for tilemap.c to create tiletxt.o' > tiletxt.c
-	echo '   that does not rely on "cc -c -o tiletxt.o tilemap.c"'	 >> tiletxt.c
-	echo '   since many pre-POSIX compilers did not support that */' >> tiletxt.c
+	@echo '/* alternate compilation for tilemap.c to create tiletxt.o' > tiletxt.c
+	@echo '   that does not rely on "cc -c -o tiletxt.o tilemap.c"'	 >> tiletxt.c
+	@echo '   since many pre-POSIX compilers did not support that */' >> tiletxt.c
 	echo '#define TILETEXT'			 >> tiletxt.c
 	echo '#include "../win/share/tilemap.c"' >> tiletxt.c
-	echo '/*tiletxt.c*/'			 >> tiletxt.c
+	@echo '/*tiletxt.c*/'			 >> tiletxt.c
 tiletxt.o: tiletxt.c ../win/share/tilemap.c $(HACK_H)
 	$(CC) $(CFLAGS) -c tiletxt.c
 tilemap.o: ../win/share/tilemap.c $(HACK_H)
@@ -413,7 +413,7 @@ $(OBJDIR)/monst.o: ../src/monst.c $(CONFIG_H)
 	$(CC) $(CFLAGS) -c ../src/monst.c -o $@
 $(OBJDIR)/objects.o: ../src/objects.c $(CONFIG_H)
 	$(CC) $(CFLAGS) -c ../src/objects.c -o $@
-$(OBJDIR)/dlb.o: ../src/dlb.c $(HACK_H) ../include/dlb.h
+$(OBJDIR)/dlb.o: ../src/dlb.c $(CONFIG_H) ../include/dlb.h
 	$(CC) $(CFLAGS) -c ../src/dlb.c -o $@
 
 # make sure hack.h dependencies get transitive information
