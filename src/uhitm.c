@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1446887537 2015/11/07 09:12:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.151 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1454664302 2016/02/05 09:25:02 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.154 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1082,8 +1082,13 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
     if ((mdat == &mons[PM_BLACK_PUDDING] || mdat == &mons[PM_BROWN_PUDDING])
         /* pudding is alive and healthy enough to split */
         && mon->mhp > 1 && !mon->mcan
-        /* iron weapon using melee or polearm hit */
-        && obj && obj == uwep && objects[obj->otyp].oc_material == IRON
+        /* iron weapon using melee or polearm hit [3.6.1: metal weapon too] */
+        && obj && obj == uwep
+        && ((objects[obj->otyp].oc_material == IRON
+             /* allow scalpel and tsurugi to split puddings */
+             || objects[obj->otyp].oc_material == METAL)
+            /* but not bashing with darts, arrows or ya */
+            && !(is_ammo(obj) || is_missile(obj)))
         && hand_to_hand) {
         if (clone_mon(mon, 0, 0)) {
             pline("%s divides as you hit it!", Monnam(mon));
