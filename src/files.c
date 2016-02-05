@@ -2264,6 +2264,10 @@ int src;
                && match_varname(buf, "CHECK_SAVE_UID", 14)) {
         n = atoi(bufp);
         sysopt.check_save_uid = n;
+    } else if (src == SET_IN_SYS
+               && match_varname(buf, "CHECK_PLNAME", 12)) {
+        n = atoi(bufp);
+        sysopt.check_plname = n;
     } else if (match_varname(buf, "SEDUCE", 6)) {
         n = !!atoi(bufp); /* XXX this could be tighter */
         /* allow anyone to turn it off, but only sysconf to turn it on*/
