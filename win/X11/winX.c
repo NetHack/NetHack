@@ -1,4 +1,4 @@
-/* NetHack 3.6	winX.c	$NHDT-Date: 1454810422 2016/02/07 02:00:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.37 $ */
+/* NetHack 3.6	winX.c	$NHDT-Date: 1454834200 2016/02/07 08:36:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.38 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -138,22 +138,31 @@ struct window_procs X11_procs = {
 /*
  * Local functions.
  */
-static void FDECL(dismiss_file, (Widget, XEvent *, String *, Cardinal *));
-static void FDECL(delete_file, (Widget, XEvent *, String *, Cardinal *));
-static void FDECL(yn_key, (Widget, XEvent *, String *, Cardinal *));
-static void FDECL(yn_delete, (Widget, XEvent *, String *, Cardinal *));
-static void FDECL(askname_delete, (Widget, XEvent *, String *, Cardinal *));
-static void FDECL(getline_delete, (Widget, XEvent *, String *, Cardinal *));
-static void NDECL(release_getline_widgets);
-static void FDECL(X11_hangup, (Widget, XEvent *, String *, Cardinal *));
-static void NDECL(release_yn_widgets);
-static int FDECL(input_event, (int));
-static void FDECL(win_visible, (Widget, XtPointer, XEvent *, Boolean *));
-static void NDECL(init_standard_windows);
+static winid NDECL(find_free_window);
+static void FDECL(nhFreePixel, (XtAppContext, XrmValuePtr, XtPointer,
+                                XrmValuePtr, Cardinal *));
+static void NDECL(load_default_resources);
+static void NDECL(release_default_resources);
 #ifdef X11_HANGUP_SIGNAL
 static void FDECL(X11_sig, (int));
 static void FDECL(X11_sig_cb, (XtPointer, XtSignalId *));
 #endif
+static void FDECL(d_timeout, (XtPointer, XtIntervalId *));
+static void FDECL(X11_hangup, (Widget, XEvent *, String *, Cardinal *));
+static void FDECL(askname_delete, (Widget, XEvent *, String *, Cardinal *));
+static void FDECL(askname_done, (Widget, XtPointer, XtPointer));
+static void FDECL(done_button, (Widget, XtPointer, XtPointer));
+static void FDECL(getline_delete, (Widget, XEvent *, String *, Cardinal *));
+static void FDECL(abort_button, (Widget, XtPointer, XtPointer));
+static void NDECL(release_getline_widgets);
+static void FDECL(delete_file, (Widget, XEvent *, String *, Cardinal *));
+static void FDECL(dismiss_file, (Widget, XEvent *, String *, Cardinal *));
+static void FDECL(yn_delete, (Widget, XEvent *, String *, Cardinal *));
+static void FDECL(yn_key, (Widget, XEvent *, String *, Cardinal *));
+static void NDECL(release_yn_widgets);
+static int FDECL(input_event, (int));
+static void FDECL(win_visible, (Widget, XtPointer, XEvent *, Boolean *));
+static void NDECL(init_standard_windows);
 
 /*
  * Local variables.
@@ -474,8 +483,77 @@ Widget w;
 #endif
 }
 
-/* Global Functions ========================================================
- */
+static String *default_resource_data = 0; /* NULL-terminated array */
+
+/* read the template NetHack.ad into default_resource_data[] to supply
+   fallback resources to XtAppInitialize() */
+static void
+load_default_resources()
+{
+    FILE *fp;
+    String inbuf;
+    unsigned insiz, linelen, longlen, numlines;
+    boolean comment = FALSE; /* lint suppression */
+
+    /*
+     * Running nethack via the shell script adds $HACKDIR to the path used
+     * by X to find resources, but running it directly doesn't.  So, if we
+     * can find the template file for NetHack.ad in the current directory,
+     * load its contents into memory so that the application startup call
+     * in X11_init_nhwindows() can use them as fallback resources.
+     */
+    fp = fopen("./NetHack.ad", "r");
+    if (!fp)
+        return;
+
+    /* measure the file without retaining its contents */
+    insiz = BUFSIZ; /* stdio BUFSIZ, not nethack BUFSZ */
+    inbuf = (String) alloc(insiz);
+    linelen = longlen = 0;
+    numlines = 0;
+    while (fgets(inbuf, insiz, fp)) {
+        if (!linelen) /* inbuf has start of record; treat empty as comment */
+            comment = (*inbuf == '!' || *inbuf == '\n');
+        linelen += strlen(inbuf);
+        if (!index(inbuf, '\n'))
+            continue;
+        if (linelen > longlen)
+            longlen = linelen;
+        linelen = 0;
+        if (!comment)
+            ++numlines;
+    }
+    free((genericptr_t) inbuf);
+    insiz = longlen + 1;
+    inbuf = (String) alloc(insiz);
+    ++numlines; /* room for terminator */
+    default_resource_data = (String *) alloc(numlines * sizeof (String));
+
+    /* now read the file into the array */
+    (void) rewind(fp);
+    numlines = 0;
+    while (fgets(inbuf, insiz, fp)) {
+        if (*inbuf != '!' && *inbuf != '\n')
+            default_resource_data[numlines++] = dupstr(inbuf);
+    }
+    default_resource_data[numlines] = (String) 0;
+    (void) fclose(fp);
+    free((genericptr_t) inbuf);
+}
+
+static void
+release_default_resources()
+{
+    if (default_resource_data) {
+        unsigned idx;
+
+        for (idx = 0; default_resource_data[idx]; idx++)
+            free((genericptr_t) default_resource_data[idx]);
+        free((genericptr_t) default_resource_data), default_resource_data = 0;
+    }
+}
+
+/* Global Functions ======================================================= */
 void
 X11_raw_print(str)
 const char *str;
@@ -930,8 +1008,7 @@ time_t when;
 }
 #endif
 
-/* init and exit nhwindows -------------------------------------------------
- */
+/* init and exit nhwindows ------------------------------------------------ */
 
 XtAppContext app_context;     /* context of application */
 Widget toplevel = (Widget) 0; /* toplevel widget */
@@ -1023,6 +1100,8 @@ char **argv;
     /* add another option that can be set */
     set_wc_option_mod_status(WC_TILED_MAP, SET_IN_GAME);
 
+    load_default_resources(); /* create default_resource_data[] */
+
     /*
      * setuid hack: make sure that if nethack is setuid, to use real uid
      * when opening X11 connections, in case the user is using xauth, since
@@ -1038,15 +1117,10 @@ char **argv;
     num_args = 0;
     XtSetArg(args[num_args], XtNallowShellResize, True); num_args++;
 
-    /*
-     * TODO?  Find and load NetHack.ad (installation puts a template copy
-     * in the playground directory) if the server doesn't already have it.
-     */
-
     toplevel = XtAppInitialize(&app_context, "NetHack",     /* application  */
                                (XrmOptionDescList) 0, 0,    /* options list */
                                argcp, (String *) argv,      /* command line */
-                               (String *) 0,          /* fallback resources */
+                               default_resource_data, /* fallback resources */
                                (ArgList) args, num_args);
     XtOverrideTranslations(toplevel,
               XtParseTranslationTable("<Message>WM_PROTOCOLS: X11_hangup()"));
@@ -1097,6 +1171,8 @@ char **argv;
     (void) seteuid(savuid);
 
     x_inited = TRUE; /* X is now initialized */
+
+    release_default_resources();
 
     /* Display the startup banner in the message window. */
     for (i = 1; i <= 4 + 2; ++i) /* (values beyond 4 yield blank lines) */
@@ -1169,8 +1245,7 @@ XtSignalId *id;
 }
 #endif
 
-/* delay_output ------------------------------------------------------------
- */
+/* delay_output ----------------------------------------------------------- */
 
 /*
  * Timeout callback for delay_output().  Send a fake message to the map
@@ -1216,8 +1291,7 @@ X11_delay_output()
     (void) x_event(EXIT_ON_SENT_EVENT);
 }
 
-/* X11_hangup --------------------------------------------------------------
- */
+/* X11_hangup ------------------------------------------------------------- */
 /* ARGSUSED */
 static void
 X11_hangup(w, event, params, num_params)
@@ -1235,8 +1309,7 @@ Cardinal *num_params;
     exit_x_event = TRUE;
 }
 
-/* askname -----------------------------------------------------------------
- */
+/* askname ---------------------------------------------------------------- */
 /* ARGSUSED */
 static void
 askname_delete(w, event, params, num_params)
@@ -1322,8 +1395,7 @@ X11_askname()
     XtDestroyWidget(popup);
 }
 
-/* getline -----------------------------------------------------------------
- */
+/* getline ---------------------------------------------------------------- */
 /* This uses Tim Theisen's dialog widget set (from GhostView). */
 
 static Widget getline_popup, getline_dialog;
@@ -1448,8 +1520,7 @@ char *input;
     (void) x_event(EXIT_ON_EXIT);
 }
 
-/* Display file ------------------------------------------------------------
- */
+/* Display file ----------------------------------------------------------- */
 static const char display_translations[] = "#override\n\
      <Key>q: dismiss_file()\n\
      <Key>Escape: dismiss_file()\n\
@@ -1606,8 +1677,7 @@ boolean complain;
     free(textlines);
 }
 
-/* yn_function -------------------------------------------------------------
- */
+/* yn_function ------------------------------------------------------------ */
 /* (not threaded) */
 
 static const char *yn_quitchars = " \n\r";
@@ -1908,8 +1978,7 @@ const char *pref;
     }
 }
 
-/* End global functions ====================================================
- */
+/* End global functions =================================================== */
 
 /*
  * Before we wait for input via nhgetch() and nh_poskey(), we need to
