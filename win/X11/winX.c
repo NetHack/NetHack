@@ -1,4 +1,4 @@
-/* NetHack 3.6	winX.c	$NHDT-Date: 1454637315 2016/02/05 01:55:15 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.36 $ */
+/* NetHack 3.6	winX.c	$NHDT-Date: 1454810422 2016/02/07 02:00:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.37 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1836,6 +1836,7 @@ char def;            /* default response if user hits <space> or <return> */
          * handler and reset its label to be the prompt text (below).
          */
         input_func = yn_key;
+        swap_fg_bg(yn_label); /* highlight the prompt line */
     } else if (!yn_label) {
         /*
          * Not 'slow'; create a persistent widget that will be popped up
@@ -1887,6 +1888,7 @@ char def;            /* default response if user hits <space> or <return> */
         num_args = 0;
         XtSetArg(args[num_args], XtNlabel, " "); num_args++;
         XtSetValues(yn_label, args, num_args);
+        swap_fg_bg(yn_label); /* un-highlight the prompt line */
     } else {
         nh_XtPopdown(yn_popup); /* this removes the event grab */
     }
@@ -2027,6 +2029,9 @@ init_standard_windows()
         XtSetArg(args[num_args], nhStr(XtNresizable), True); num_args++;
         XtSetArg(args[num_args], nhStr(XtNlabel), " "); num_args++;
         XtSetValues(yn_label, args, num_args);
+        /* switch foreground and background so that the prompt line looks
+           like part of the map */
+        swap_fg_bg(yn_label);
     }
 
     /*
