@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1454571526 2016/02/04 07:38:46 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.262 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1454979782 2016/02/09 01:03:02 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.263 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3390,11 +3390,11 @@ boolean tinitial, tfrom_file;
                     badoption(opts);
                     return;
                 }
-                if (!strcmp(op, "true") || !strcmp(op, "yes"))
+                if (!strcmp(op, "true") || !strcmp(op, "yes")) {
                     negated = FALSE;
-                else if (!strcmp(op, "false") || !strcmp(op, "no"))
+                } else if (!strcmp(op, "false") || !strcmp(op, "no")) {
                     negated = TRUE;
-                else {
+                } else {
                     badoption(opts);
                     return;
                 }
@@ -3405,42 +3405,32 @@ boolean tinitial, tfrom_file;
             /* 0 means boolean opts */
             if (duplicate_opt_detection(boolopt[i].name, 0))
                 complain_about_duplicate(boolopt[i].name, 0);
-
 #ifdef RLECOMP
-            if ((boolopt[i].addr) == &iflags.rlecomp) {
-                if (*boolopt[i].addr)
-                    set_savepref("rlecomp");
-                else
-                    set_savepref("!rlecomp");
-            }
+            if (boolopt[i].addr == &iflags.rlecomp)
+                set_savepref(iflags.rlecomp ? "rlecomp" : "!rlecomp");
 #endif
 #ifdef ZEROCOMP
-            if ((boolopt[i].addr) == &iflags.zerocomp) {
-                if (*boolopt[i].addr)
-                    set_savepref("zerocomp");
-                else
-                    set_savepref("externalcomp");
-            }
+            if (boolopt[i].addr == &iflags.zerocomp)
+                set_savepref(iflags.zerocomp ? "zerocomp" : "externalcomp");
 #endif
             /* only do processing below if setting with doset() */
             if (initial)
                 return;
 
-            if ((boolopt[i].addr) == &flags.time
-                || (boolopt[i].addr) == &flags.showexp
+            if (boolopt[i].addr == &flags.time
 #ifdef SCORE_ON_BOTL
-                || (boolopt[i].addr) == &flags.showscore
+                || boolopt[i].addr == &flags.showscore
 #endif
-                ) {
+                || boolopt[i].addr == &flags.showexp) {
 #ifdef STATUS_VIA_WINDOWPORT
                 status_initialize(REASSESS_ONLY);
 #endif
                 context.botl = TRUE;
-            } else if ((boolopt[i].addr) == &flags.invlet_constant) {
+            } else if (boolopt[i].addr == &flags.invlet_constant) {
                 if (flags.invlet_constant)
                     reassign();
-            } else if (((boolopt[i].addr) == &flags.lit_corridor)
-                       || ((boolopt[i].addr) == &flags.dark_room)) {
+            } else if (boolopt[i].addr == &flags.lit_corridor
+                       || boolopt[i].addr == &flags.dark_room) {
                 /*
                  * All corridor squares seen via night vision or
                  * candles & lamps change.  Update them by calling
@@ -3452,16 +3442,17 @@ boolean tinitial, tfrom_file;
                 vision_full_recalc = 1; /* delayed recalc */
                 if (iflags.use_color)
                     need_redraw = TRUE; /* darkroom refresh */
-            } else if ((boolopt[i].addr) == &iflags.use_inverse
-                       || (boolopt[i].addr) == &flags.showrace
-                       || (boolopt[i].addr) == &iflags.hilite_pile
-                       || (boolopt[i].addr) == &iflags.hilite_pet) {
+            } else if (boolopt[i].addr == &iflags.wc_tiled_map
+                       || boolopt[i].addr == &flags.showrace
+                       || boolopt[i].addr == &iflags.use_inverse
+                       || boolopt[i].addr == &iflags.hilite_pile
+                       || boolopt[i].addr == &iflags.hilite_pet) {
                 need_redraw = TRUE;
 #ifdef TEXTCOLOR
-            } else if ((boolopt[i].addr) == &iflags.use_color) {
+            } else if (boolopt[i].addr == &iflags.use_color) {
                 need_redraw = TRUE;
 #ifdef TOS
-                if ((boolopt[i].addr) == &iflags.use_color && iflags.BIOS) {
+                if (iflags.BIOS) {
                     if (colors_changed)
                         restore_colors();
                     else
