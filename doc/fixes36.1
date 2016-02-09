@@ -179,8 +179,7 @@ X11: enable a scroll bar in menu windows
 X11: support pre-selected entries in menu windows
 X11: make the extended command menu be easier to use and look a little nicer
 X11: make the getline text entry widget display a bigger text entry area
-unix: add CHECK_PLNAME-option to sysconf to make WIZARDS, EXPLORERS, and
-	SHELLERS check player name instead of user's login name
+X11: color didn't work when the map was displayed as text rather than tiles
 
 
 General New Features
@@ -215,6 +214,11 @@ Platform- and/or Interface-Specific New Features
 tty: menu_overlay -option to clear screen and align menus to left
 tty: compile-time option to output escape codes for tile data hints
 unix: compile-time option MSGHANDLER to pass messages to external program
+unix: add CHECK_PLNAME-option to sysconf to make WIZARDS, EXPLORERS, and
+	SHELLERS check player's character name instead of login name
+X11: new NetHack*highlight_prompt resource to control whether the persistent
+	prompt line between the map and message windows for the NetHack*slow
+	configuration will be highlighted when it's expecting input
 
 
 NetHack Community Patches (or Variation) Included
