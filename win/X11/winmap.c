@@ -1,4 +1,4 @@
-/* NetHack 3.6	winmap.c	$NHDT-Date: 1454455161 2016/02/02 23:19:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.26 $ */
+/* NetHack 3.6	winmap.c	$NHDT-Date: 1454977918 2016/02/09 00:31:58 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.27 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -883,6 +883,7 @@ struct xwindow *wp;
         XClearWindow(XtDisplay(wp->w), XtWindow(wp->w));
         set_map_size(wp, COLNO, ROWNO);
         check_cursor_visibility(wp);
+        highlight_yn(TRUE); /* change fg/bg to match map */
     } else if (wp->prevx != wp->cursx || wp->prevy != wp->cursy) {
         register unsigned int x = wp->prevx, y = wp->prevy;
 

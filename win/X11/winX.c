@@ -1,4 +1,4 @@
-/* NetHack 3.6	winX.c	$NHDT-Date: 1454834200 2016/02/07 08:36:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.38 $ */
+/* NetHack 3.6	winX.c	$NHDT-Date: 1454977918 2016/02/09 00:31:58 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.39 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -501,6 +501,8 @@ load_default_resources()
      * can find the template file for NetHack.ad in the current directory,
      * load its contents into memory so that the application startup call
      * in X11_init_nhwindows() can use them as fallback resources.
+     *
+     * No attempt to support the 'include' directive has been made.
      */
     fp = fopen("./NetHack.ad", "r");
     if (!fp)
@@ -1048,6 +1050,9 @@ static XtResource resources[] = {
     { nhStr("message_line"), nhStr("Message_line"), XtRBoolean,
       sizeof(Boolean), XtOffset(AppResources *, message_line), XtRString,
       nhStr("False") },
+    { nhStr("highlight_prompt"), nhStr("Highlight_prompt"), XtRBoolean,
+      sizeof(Boolean), XtOffset(AppResources *, highlight_prompt), XtRString,
+      nhStr("True") },
     { nhStr("double_tile_size"), nhStr("Double_tile_size"), XtRBoolean,
       sizeof(Boolean), XtOffset(AppResources *, double_tile_size), XtRString,
       nhStr("False") },
@@ -1906,7 +1911,7 @@ char def;            /* default response if user hits <space> or <return> */
          * handler and reset its label to be the prompt text (below).
          */
         input_func = yn_key;
-        swap_fg_bg(yn_label); /* highlight the prompt line */
+        highlight_yn(FALSE); /* expose yn_label as separate from map */
     } else if (!yn_label) {
         /*
          * Not 'slow'; create a persistent widget that will be popped up
@@ -1958,7 +1963,7 @@ char def;            /* default response if user hits <space> or <return> */
         num_args = 0;
         XtSetArg(args[num_args], XtNlabel, " "); num_args++;
         XtSetValues(yn_label, args, num_args);
-        swap_fg_bg(yn_label); /* un-highlight the prompt line */
+        highlight_yn(FALSE); /* disguise yn_label as part of map */
     } else {
         nh_XtPopdown(yn_popup); /* this removes the event grab */
     }
@@ -2036,6 +2041,40 @@ Boolean *flag; /* continue_to_dispatch flag not used */
     }
 }
 
+/* if 'slow' and 'highlight_prompt', set the yn_label widget to look like
+   part of the map when idle or to invert background and foreground when
+   a prompt is active */
+void
+highlight_yn(init)
+boolean init;
+{
+    struct xwindow *xmap;
+
+    if (!appResources.slow || !appResources.highlight_prompt)
+        return;
+
+    /* first time through, WIN_MAP isn't fully initiialized yet */
+    xmap = ((map_win != WIN_ERR) ? &window_list[map_win]
+               : (WIN_MAP != WIN_ERR) ? &window_list[WIN_MAP] : 0);
+
+    if (init && xmap) {
+        Arg args[2];
+        XGCValues vals;
+        unsigned long fg_bg = (GCForeground | GCBackground);
+        GC gc = (xmap->map_information->is_tile
+                    ? xmap->map_information->tile_map.white_gc
+                    : xmap->map_information->text_map.copy_gc);
+
+        (void) memset((genericptr_t) &vals, 0, sizeof vals);
+        if (XGetGCValues(XtDisplay(xmap->w), gc, fg_bg, &vals)) {
+            XtSetArg(args[0], XtNforeground, vals.foreground);
+            XtSetArg(args[1], XtNbackground, vals.background);
+            XtSetValues(yn_label, args, TWO);
+        }
+    } else
+        swap_fg_bg(yn_label);
+}
+
 /*
  * Set up the playing console.  This has three major parts:  the
  * message window, the map, and the status window.
@@ -2098,9 +2137,6 @@ init_standard_windows()
         XtSetArg(args[num_args], nhStr(XtNresizable), True); num_args++;
         XtSetArg(args[num_args], nhStr(XtNlabel), " "); num_args++;
         XtSetValues(yn_label, args, num_args);
-        /* switch foreground and background so that the prompt line looks
-           like part of the map */
-        swap_fg_bg(yn_label);
     }
 
     /*
@@ -2240,6 +2276,8 @@ init_standard_windows()
 
     /* attempt to catch fatal X11 errors before the program quits */
     (void) XtAppSetErrorHandler(app_context, (XtErrorHandler) hangup);
+
+    highlight_yn(TRUE); /* switch foreground and background */
 
     /* We can now print to the message window. */
     iflags.window_inited = 1;

@@ -1,4 +1,4 @@
-! $NHDT-Date: 1452920161 2016/01/16 04:56:01 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.9 $
+! $NHDT-Date: 1454977917 2016/02/09 00:31:57 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.10 $
 
 ! The display_file, tombstone, and menu windows are all formatted assuming
 ! a fixed width font.  Text windows may or may not be formatted as above.
@@ -67,6 +67,13 @@ NetHack*message*translations:	<KeyPress>: input()
 ! If True, the default, a popup for single character prompts such as y/n
 ! questions is _not_ used.
 NetHack*slow: True
+
+! If 'slow' is True, setting 'highlight_prompt' to True will cause the line
+! between map and message display that's used for prompting to be "hidden"
+! as part of the map when no prompt is active, then invert foreground and
+! background to stand out when a prompt is issued and waiting for a response.
+! If 'slow' is False, 'highlight_prompt' will have no effect.
+NetHack*highlight_prompt: True
 
 ! The number of lines the message window will show without scrolling.
 !NetHack*message_lines: 12

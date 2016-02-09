@@ -1,4 +1,4 @@
-/* NetHack 3.6	winX.h	$NHDT-Date: 1454455159 2016/02/02 23:19:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.21 $ */
+/* NetHack 3.6	winX.h	$NHDT-Date: 1454977916 2016/02/09 00:31:56 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.22 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -244,9 +244,10 @@ E boolean exit_x_event;     /* exit condition for event loop */
 E int click_x, click_y, click_button, updated_inventory;
 
 typedef struct {
-    Boolean slow;
-    Boolean autofocus;
-    Boolean message_line;
+    Boolean slow;             /* issue prompts between map and message wins */
+    Boolean autofocus;        /* grab pointer focus for popup windows */
+    Boolean message_line;     /* separate current turn mesgs from prev ones */
+    Boolean highlight_prompt; /* if 'slow', highlight yn prompts */
     Boolean double_tile_size; /* double tile size */
     String tile_file;         /* name of file to open for tiles */
     String icon;              /* name of desired icon */
@@ -290,6 +291,7 @@ E Boolean FDECL(nhApproxColor, (Screen *, Colormap, char *, XColor *));
 E Dimension FDECL(nhFontHeight, (Widget));
 E char FDECL(key_event_to_char, (XKeyEvent *));
 E void FDECL(msgkey, (Widget, XtPointer, XEvent *));
+E void FDECL(highlight_yn, (BOOLEAN_P));
 E void FDECL(nh_XtPopup, (Widget, int, Widget));
 E void FDECL(nh_XtPopdown, (Widget));
 E void FDECL(win_X11_init, (int));
