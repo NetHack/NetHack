@@ -1,4 +1,4 @@
-/* NetHack 3.6	dothrow.c	$NHDT-Date: 1446975465 2015/11/08 09:37:45 $  $NHDT-Branch: master $:$NHDT-Revision: 1.113 $ */
+/* NetHack 3.6	dothrow.c	$NHDT-Date: 1455140444 2016/02/10 21:40:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.118 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -613,6 +613,17 @@ int x, y;
             You("come to an abrupt halt!");
             return FALSE;
         }
+    }
+
+    /* Caller has already determined that dragging the ball is allowed */
+    if (Punished && uball->where == OBJ_FLOOR) {
+        int bc_control;
+        xchar ballx, bally, chainx, chainy;
+        boolean cause_delay;
+
+        if (drag_ball(x, y, &bc_control, &ballx, &bally, &chainx,
+                      &chainy, &cause_delay, TRUE))
+            move_bc(0, bc_control, ballx, bally, chainx, chainy);
     }
 
     ox = u.ux;

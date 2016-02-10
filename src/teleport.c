@@ -1,4 +1,4 @@
-/* NetHack 3.6	teleport.c	$NHDT-Date: 1446887535 2015/11/07 09:12:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.62 $ */
+/* NetHack 3.6	teleport.c	$NHDT-Date: 1455140444 2016/02/10 21:40:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.66 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -252,7 +252,7 @@ boolean allow_drag;
         /* unearth it */
         buried_ball_to_punishment();
     }
-    ball_active = (Punished && uball->where != OBJ_FREE),
+    ball_active = (Punished && uball->where != OBJ_FREE);
     ball_still_in_range = FALSE;
 
     /* If they have to move the ball, then drag if allow_drag is true;

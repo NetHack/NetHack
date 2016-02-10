@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1452660177 2016/01/13 04:42:57 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.219 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1455140802 2016/02/10 21:46:42 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.220 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1645,7 +1645,11 @@ int magic; /* 0=Physical, otherwise skill level */
         if (range < temp)
             range = temp;
         (void) walk_path(&uc, &cc, hurtle_step, (genericptr_t) &range);
-        teleds(cc.x, cc.y, TRUE);
+        /* hurtle_step results in (u.ux, u.uy) == (cc.x, cc.y) and usually
+         * moves the ball if punished, but does not handle all the effects
+         * of landing on the final position.
+         */
+        teleds(cc.x, cc.y, FALSE);
         sokoban_guilt();
         nomul(-1);
         multi_reason = "jumping around";
