@@ -126,7 +126,9 @@ filing a bug report from our "Contact Us" web page at:
 
 A public repository of the latest NetHack code that we've made
 available can be obtained via git here:
-    <FIXME>
+    https://github.com/NetHack/NetHack
+      or
+    https://sourceforge.net/p/nethack/NetHack/
 
 When sending correspondence, please observe the following:
 o Please be sure to include your machine type, OS, and patchlevel.
