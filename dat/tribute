@@ -1960,26 +1960,202 @@ took a desparate stab at it--"you're Home Economics!"
 %e title
 #
 #
+# The original publication of /Eric/ featured extensive illustrations by
+# Josh Kirby but the mass-market paperback edition contains none of them
+# and omits his name.  In the Harper Torch edition, the list of other
+# books by the same auther has "Eric (with Josh Kirby)" even though the
+# copyright and title pages of that very book do not mention him.
 #
-%title Eric (2)
+%title Eric (9)
+# pp. 3-4 (Harper Torch edition)
 %passage 1
-No enemies had ever taken Ankh-Morpork. Well, /technically/ they had, quite
- often; the city welcomed free-spending barbarian invaders, but somehow the
- puzzled raiders always found, after a few days, that they didn't own their
- own horses any more, and within a couple of months they were just another
-minority group with its own graffiti and food shops. 
+No enemies had ever taken Ankh-Morpork.  Well, /technically/ they had,
+quite often; the city welcomed free-spending barbarian invaders, but
+somehow the puzzled raiders always found, after a few days, that they
+didn't own their own horses anymore, and within a couple of months they
+were just another minority group with its own graffiti and food shops.
 
   [Eric, by Terry Pratchett]
 %e passage
+# p. 195
 %passage 2
-Rincewind looked down at the broad steps they were climbing. They were
- something of a novelty; each one was built out of large stone letters. The
- one he was just stepping on to, for example, read: I Meant It For The Best.
+"I can see blue sky!" said Eric.  "Where do you think we'll come out?" he
+added.  "And when?"
+
+"Anywhere," said Rincewind.  "Anytime."
+
+He looked down at the broad steps they were climbing.  They were something
+of a novelty; each one was built out of large stone letters.  The one he
+was just stepping on to, for example, read: I Meant It For The Best.
+
 The next one was: I Thought You'd Like It.
+
 Eric was standing on: For The Sake Of The Children.
-'Weird, isn't it?' he said. 'Why do it like this?'
-'I think they're meant to be good intentions,' said Rincewind. This was a
-road to hell, and demons were, after all, traditionalists. 
+
+'Weird, isn't it?' he said.  'Why do it like this?'
+
+'I think they're meant to be good intentions,' said Rincewind.  This was a
+road to Hell, and demons were, after all, traditionalists.
+
+  [Eric, by Terry Pratchett]
+%e passage
+# pp. 9-10 (passage has an interesting start but not much of a finish...)
+%passage 3
+"It's a haunting," he ventured.  "Some short of ghost, maybe.  A bell, book
+and candle job."
+
+The Bursar sighed.  "We tried that, Archchancellor."
+
+The Archchancellor leaned toward him.
+
+"Eh?" he said.
+
+"I /said/, we tried that, Archchancellor," said the Bursar loudly,
+directing his voice at the old man's ear.  "After dinner, you remember?
+We used Humptemper's /Names of the Ants/ and rang Old Tom."(1)
+
+"Did we, indeed.  Worked, did it?"
+
+"/No/, Archchancellor."
+
+"Eh?"
+
+(1) Old Tom was the single cracked bronze bell in the University bell
+tower.  The clapper dropped out shortly after it was cast, but the bell
+still tolled out some tremendously sonorous silences every hour.
+
+  [Eric, by Terry Pratchett]
+%e passage
+# pp. 14-15 (the top wizards have performed the Rite of AshkEnte)
+%passage 4
+Death pointedly picked invisible particles off the edge of his scythe.
+
+The Archchancellor cupped a gnarled hand over his ear.
+
+"What'd he say?  Who's the fella with the stick?"
+
+"It's Death, Archchancellor," said the Bursar patiently.
+
+"Eh?"
+
+"It's Death, sir.  /You/ know."
+
+"Tell him we don't want any," said the old wizard, waving his stick.
+
+The Bursar sighed.  "We summoned him, Archchancellor."
+
+"Is it?  What'd we go and do that for?  Bloody silly thing to do."
+
+The Bursar gave Death an embarrassed grin.  He was on the point of asking
+him to excuse the Archchancellor on account of age, but realized that this
+would in the circumstances be a complete waste of breath.
+
+"Are we talking about the wizard Rincewind?  The one with the--" the Bursar
+gave a shudder-- "horrible Luggage on legs?  But he got blown up when there
+was all that business with the sourcerer, didn't he?"(1)
+
+INTO THE DUNGEON DIMENSIONS.  AND NOW HE IS TRYING TO GET BACK HOME.
+
+(1) The Bursar was referring obliquely to the difficult occasion when the
+University very nearly caused the end of the world, and would in fact have
+done so had it not been for a chain of events involving Rincewind, a magic
+carpet and a half-brick in a sock.  (See /Sourcery/.)  The whole affair
+was very embarrassing to wizards, as it always is to people who find out
+afterward that they were on the wrong side all along,(2) and it is
+remarkable how many of the University's senior staff were now adamant that
+at the time they had been off sick, visiting their aunt, or doing research
+with the door locked while humming loudly and had had no idea of what was
+going on outside.  There had been some desultory talk about putting up a
+statue to Rincewind but, by the curious alchemy that tends to apply in
+these sensitive issues, this quickly became a plaque, then a note on the
+Role of Honor, and finally a motion of censure for being improperly dressed.
+
+(2) ie, the one that lost.
+
+  [Eric, by Terry Pratchett]
+%e passage
+# p. 34
+%passage 5
+"Not that he was particularly successful.  It was all a bit trial and
+wossname."
+
+"I thought you said great big scaly--"
+
+"Oh, /yes/.  But that wasn't what he was after.  He was trying to conjure
+up a succubus."  It should be impossible to leer when all you've got is a
+beak, but the parrot managed it.  "That's a female demon what comes in the
+night and makes mad passionate wossn--"
+
+"I've heard of them," said Rincewind.  "Bloody dangerous things."
+
+The parrot put its head on one side.  "It never worked.  All he ever got
+was a neuralger."
+
+"What's that?"
+
+"It's a demon that comes and has a headache at you."
+
+  [Eric, by Terry Pratchett]
+%e passage
+# p. 35 (passage is a footnote)
+%passage 6
+Demons and their Hell are quite different from the Dungeon Dimensions,
+those endlass parallel wastelands outside space and time.  The sad, mad
+Things in the Dungeon Dimensions have no understanding of the world but
+simply crave light and shape and try to warm themselves by the fires of
+reality, clustering around it with about the same effect--if they ever
+broke through--as an ocean trying to warm itself around a candle.  Whereas
+demons belong to the same space-time wossname, more or less, as humans,
+and have a deep and abiding interest in humanity's day-to-day affairs.
+Interestingly enough, the gods of the Disc have never bothered much about
+judging the souls of the dead, so people can only go to hell if that's
+where they believe, in their deepest heart, that they deserve to go.
+Which they won't do if they don't know about it.  This explains why it is
+important to shoot missionaries on sight.
+
+  [Eric, by Terry Pratchett]
+%e passage
+# p. 153
+%passage 7
+"Multiple exclamation marks," he went on, shaking his head, "are a sure
+sign of a diseased mind."
+
+  [Eric, by Terry Pratchett]
+%e passage
+# pp. 178-179 (Ponce da Quirm, encoutered in hell)
+%passage 8
+"So you didn't find the Fountain of Youth, then," he said, feeling that he
+should make some conversation.
+
+"Oh, but I did," said da Quirm earnestly.  "A clear spring, deep in the
+jungle.  It was very impressive.  I had a good long drink, too.  Or draft,
+which I think is the more appropriate word.
+
+"And--?" said Rincewind.
+
+"It definitely worked.  Yes.  For a while there I could definitely feel
+myself getting younger.
+
+"But--" Rincewind waved a vague hand to take in da Quirm, the treadmill,
+the towering circles of the Pit.
+
+"Ah," said the old man.  "Of course, that's the really annoying bit.  I'd
+read so much about the Fountain, and you'd have thought someone in all
+those books would have mentioned the really vital thing about the water,
+wouldn't you?"
+
+"Which was--?"
+
+"/Boil it first./  Says it all, doesn't it?  Terrible shame, really."
+
+  [Eric, by Terry Pratchett]
+%e passage
+# p. 179
+%passage 9
+The Luggage trotted down the great spiral road that linked the circles of
+the Pit.  Even if conditions had been normal it probably would not have
+attracted much attention.  If anything, it was rather less astonishing
+than most of the denizens.
 
   [Eric, by Terry Pratchett]
 %e passage
@@ -7444,7 +7620,7 @@ IF YOU ASK ME, said Death, NOBODY COULD DO ANY BETTER THAN THAT...
 # Death Quotes are always one line, and '%e passage' can be omitted.
 #
 %section Death
-%title Death Quotes (23)
+%title Death Quotes (24)
 %passage 1
 WHERE THE FIRST PRIMAL CELL WAS, THERE WAS I ALSO. WHERE MAN IS, THERE AM I.  WHEN THE LAST LIFE CRAWLS UNDER FREEZING STARS, THERE WILL I BE.
 %e passage
@@ -7528,6 +7704,9 @@ DON'T LET IT UPSET YOU.
 # Pyramids, p. 57 (ROC edition)
 %passage 23
 I CAN SEE THAT YOU HAVE GOT A LOT TO THINK ABOUT.
+# Eric, p. 134
+%passage 24
+PERHAPS IT'S TIME TO CALL IT A DAY.
 %e title
 %e section
 #
