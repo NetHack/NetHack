@@ -1,4 +1,4 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1453371163 2016/01/21 10:12:43 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.83 $ */
+/* NetHack 3.6	monmove.c	$NHDT-Date: 1455402384 2016/02/13 22:26:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.84 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -56,11 +56,24 @@ mon_yells(mon, shout)
 struct monst *mon;
 const char *shout;
 {
-    if (canspotmon(mon))
-        pline("%s yells:", Amonnam(mon));
-    else
-        You_hear("someone yell:");
-    verbalize1(shout);
+    if (Deaf) {
+        if (canspotmon(mon))
+            /* Sidenote on "A watchman angrily waves her arms!"
+             * Female being called watchman is correct (career name).
+             */
+            pline("%s angrily %s %s %s!",
+                Amonnam(mon),
+                nolimbs(mon->data) ? "shakes" : "waves",
+                mhis(mon),
+                nolimbs(mon->data) ? mbodypart(mon, HEAD)
+                                   : makeplural(mbodypart(mon, ARM)));
+    } else {
+        if (canspotmon(mon))
+            pline("%s yells:", Amonnam(mon));
+        else
+            You_hear("someone yell:");
+        verbalize1(shout);
+    }
 }
 
 STATIC_OVL void

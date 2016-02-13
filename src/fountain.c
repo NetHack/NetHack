@@ -1,4 +1,4 @@
-/* NetHack 3.6	fountain.c	$NHDT-Date: 1444937416 2015/10/15 19:30:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.55 $ */
+/* NetHack 3.6	fountain.c	$NHDT-Date: 1455402364 2016/02/13 22:26:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.56 $ */
 /*	Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -180,8 +180,18 @@ boolean isyou;
                     continue;
                 if (is_watch(mtmp->data) && couldsee(mtmp->mx, mtmp->my)
                     && mtmp->mpeaceful) {
-                    pline("%s yells:", Amonnam(mtmp));
-                    verbalize("Hey, stop using that fountain!");
+                    if (!Deaf) {
+                        pline("%s yells:", Amonnam(mtmp));
+                        verbalize("Hey, stop using that fountain!");
+                    } else {
+                        pline("%s earnestly %s %s %s!",
+                              Amonnam(mtmp),
+                              nolimbs(mtmp->data) ? "shakes" : "waves",
+                              mhis(mtmp),
+                              nolimbs(mtmp->data)
+                                      ? mbodypart(mtmp, HEAD)
+                                      : makeplural(mbodypart(mtmp, ARM)));
+                    }
                     break;
                 }
             }
