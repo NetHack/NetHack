@@ -1,4 +1,4 @@
-/* NetHack 3.6	potion.c	$NHDT-Date: 1452660195 2016/01/13 04:43:15 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.126 $ */
+/* NetHack 3.6	potion.c	$NHDT-Date: 1455407631 2016/02/13 23:53:51 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.129 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1744,7 +1744,7 @@ register struct obj *o1, *o2;
 int
 dodip()
 {
-    static const char Dip_[] = "Dip ", into_the_something[] = " into the %s?";
+    static const char Dip_[] = "Dip ";
     register struct obj *potion, *obj;
     struct obj *singlepotion;
     uchar here;
@@ -1778,9 +1778,8 @@ dodip()
     here = levl[u.ux][u.uy].typ;
     /* Is there a fountain to dip into here? */
     if (IS_FOUNTAIN(here)) {
-        Sprintf(qbuf, "%s%s%s%s", Dip_,
-                flags.verbose ? obuf : shortestname,
-                into_the_something, "fountain");
+        Sprintf(qbuf, "%s%s into the fountain?", Dip_,
+                flags.verbose ? obuf : shortestname);
         /* "Dip <the object> into the fountain?" */
         if (yn(qbuf) == 'y') {
             dipfountain(obj);
@@ -1789,9 +1788,8 @@ dodip()
     } else if (is_pool(u.ux, u.uy)) {
         const char *pooltype = waterbody_name(u.ux, u.uy);
 
-        Sprintf(qbuf, "%s%s%s%s", Dip_,
-                flags.verbose ? obuf : shortestname,
-                into_the_something, pooltype);
+        Sprintf(qbuf, "%s%s into the %s?", Dip_,
+                flags.verbose ? obuf : shortestname, pooltype);
         /* "Dip <the object> into the {pool, moat, &c}?" */
         if (yn(qbuf) == 'y') {
             if (Levitation) {
