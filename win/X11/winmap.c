@@ -1,4 +1,4 @@
-/* NetHack 3.6	winmap.c	$NHDT-Date: 1454986883 2016/02/09 03:01:23 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.28 $ */
+/* NetHack 3.6	winmap.c	$NHDT-Date: 1455389908 2016/02/13 18:58:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.29 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -151,8 +151,10 @@ int bkglyph UNUSED;
 /*ARGSUSED*/
 void
 X11_cliparound(x, y)
-int x, y;
+int x UNUSED;
+int y UNUSED;
 {
+    return;
 }
 #endif /* CLIPPING */
 

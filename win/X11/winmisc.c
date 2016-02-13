@@ -1,4 +1,4 @@
-/* NetHack 3.6	winmisc.c	$NHDT-Date: 1454571527 2016/02/04 07:38:47 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.21 $ */
+/* NetHack 3.6	winmisc.c	$NHDT-Date: 1455389908 2016/02/13 18:58:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.22 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -68,16 +68,19 @@ static const char gend_select_translations[] = "#override\n\
 static const char algn_select_translations[] = "#override\n\
      <Key>: algn_key()";
 
-static void FDECL(popup_delete, (Widget, XEvent *, String *, Cardinal *));
-static void NDECL(ec_dismiss);
-static Widget FDECL(make_menu,
-                    (const char *, const char *, const char *, const char *,
-                     XtCallbackProc, const char *, XtCallbackProc, int,
-                     const char **, Widget **, XtCallbackProc, Widget *));
-static void NDECL(init_extended_commands_popup);
 static void FDECL(ps_quit, (Widget, XtPointer, XtPointer));
 static void FDECL(ps_random, (Widget, XtPointer, XtPointer));
 static void FDECL(ps_select, (Widget, XtPointer, XtPointer));
+static void FDECL(extend_select, (Widget, XtPointer, XtPointer));
+static void FDECL(extend_dismiss, (Widget, XtPointer, XtPointer));
+static void FDECL(extend_help, (Widget, XtPointer, XtPointer));
+static void FDECL(popup_delete, (Widget, XEvent *, String *, Cardinal *));
+static void NDECL(ec_dismiss);
+static void NDECL(init_extended_commands_popup);
+static Widget FDECL(make_menu, (const char *, const char *, const char *,
+                                const char *, XtCallbackProc, const char *,
+                                XtCallbackProc, int, const char **,
+                                Widget **, XtCallbackProc, Widget *));
 
 /* Player Selection --------------------------------------------------------
  */
@@ -790,7 +793,7 @@ Cardinal *num_params;
         /* don't beep */
         return;
     } else if (ch == '?') {
-        extend_help();
+        extend_help((Widget) 0, (XtPointer) 0, (XtPointer) 0);
         return;
     } else if (index("\033\n\r", ch)) {
         if (ch == '\033') {

@@ -1,4 +1,4 @@
-/* NetHack 3.6	winX.c	$NHDT-Date: 1454977918 2016/02/09 00:31:58 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.39 $ */
+/* NetHack 3.6	winX.c	$NHDT-Date: 1455389907 2016/02/13 18:58:27 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.40 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -225,10 +225,12 @@ find_free_window()
  * This is an attempt to find some close readonly cell and use it.
  */
 XtConvertArgRec const nhcolorConvertArgs[] = {
-    { XtWidgetBaseOffset, (XtPointer) XtOffset(Widget, core.screen),
-      sizeof(Screen *) },
-    { XtWidgetBaseOffset, (XtPointer) XtOffset(Widget, core.colormap),
-      sizeof(Colormap) }
+    { XtWidgetBaseOffset,
+      (XtPointer) (ptrdiff_t) XtOffset(Widget, core.screen),
+      sizeof (Screen *) },
+    { XtWidgetBaseOffset,
+      (XtPointer) (ptrdiff_t) XtOffset(Widget, core.colormap),
+      sizeof (Colormap) }
 };
 
 #define done(type, value)                             \
