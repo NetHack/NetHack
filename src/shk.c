@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1455402387 2016/02/13 22:26:27 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.123 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1455403704 2016/02/13 22:48:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.124 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -643,7 +643,7 @@ char *enterstring;
                               : "Leave the %s%s outside.",
                           tool, plur(cnt));
             else
-                pline("%s %s to let you in with a %s%s.",
+                pline("%s %s to let you in with your %s%s.",
                         Shknam(shkp),
                         NOTANGRY(shkp) ? "is hesitant" : "refuses",
                         tool, plur(cnt));
