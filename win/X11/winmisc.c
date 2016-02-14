@@ -1,4 +1,4 @@
-/* NetHack 3.6	winmisc.c	$NHDT-Date: 1455389908 2016/02/13 18:58:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.22 $ */
+/* NetHack 3.6	winmisc.c	$NHDT-Date: 1455415590 2016/02/14 02:06:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.23 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1154,11 +1154,18 @@ Widget *formp; /* return */
      * scroll bar (enabled but not forced above) to be included.
      */
     if (cumulative_height >= screen_height) {
-        /* trial and error:  25 is a guesstimate for scrollbar width on
-           width adjustment and for title bar height on height adjustment */
+        /* trial and error:
+           25 is a guesstimate for scrollbar width on width adjustment;
+           75 is for cumulative height of 3 title bars (desktop,
+           application, and popup) on height adjustment; that will be
+           bigger than needed if the popup can overlap the application's
+           title bar or if there is no desktop title bar; this ought to
+           be deriveable on the fly, or at least user-controlled by a
+           resource, but for now it's hardcoded--user can manually
+           resize if sufficiently motivated... */
         num_args = 0;
         XtSetArg(args[num_args], XtNwidth, max_width + 25); num_args++;
-        XtSetArg(args[num_args], XtNheight, screen_height - 25); num_args++;
+        XtSetArg(args[num_args], XtNheight, screen_height - 75); num_args++;
         XtSetValues(popup, args, num_args);
     }
     XtRealizeWidget(popup);
