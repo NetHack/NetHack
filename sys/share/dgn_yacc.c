@@ -11,7 +11,7 @@
 #define yyerrok (yyerrflag=0)
 #define YYRECOVERING (yyerrflag!=0)
 #define YYPREFIX "yy"
-/* NetHack 3.6  dgn_comp.y	$NHDT-Date: 1453249313 2016/01/20 00:21:53 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.12 $ */
+/* NetHack 3.6  dgn_comp.y	$NHDT-Date: 1455415237 2016/02/14 02:00:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.13 $ */
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /*	Copyright (c) 1990 by M. Stephenson				  */
 /* NetHack may be freely redistributed.  See license for details. */

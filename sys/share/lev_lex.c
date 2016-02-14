@@ -35,6 +35,8 @@ typedef unsigned short int flex_uint16_t;
 
 #define yyconst const
 
+#define FDECL_dummy /*empty*/
+
 /* Returned upon end-of-file. */
 #define YY_NULL 0
 
@@ -217,27 +219,27 @@ static int yy_start = 0;	/* start state number */
  */
 static int yy_did_buffer_switch_on_eof;
 
-void yyrestart FDECL(, (FILE *input_file  ));
-void yy_switch_to_buffer FDECL(, (YY_BUFFER_STATE new_buffer  ));
-YY_BUFFER_STATE yy_create_buffer FDECL(, (FILE *file,int size  ));
-void yy_delete_buffer FDECL(, (YY_BUFFER_STATE b  ));
-void yy_flush_buffer FDECL(, (YY_BUFFER_STATE b  ));
-void yypush_buffer_state FDECL(, (YY_BUFFER_STATE new_buffer  ));
-void yypop_buffer_state FDECL(, (void ));
+void yyrestart FDECL(FDECL_dummy, (FILE *input_file  ));
+void yy_switch_to_buffer FDECL(FDECL_dummy, (YY_BUFFER_STATE new_buffer  ));
+YY_BUFFER_STATE yy_create_buffer FDECL(FDECL_dummy, (FILE *file,int size  ));
+void yy_delete_buffer FDECL(FDECL_dummy, (YY_BUFFER_STATE b  ));
+void yy_flush_buffer FDECL(FDECL_dummy, (YY_BUFFER_STATE b  ));
+void yypush_buffer_state FDECL(FDECL_dummy, (YY_BUFFER_STATE new_buffer  ));
+void yypop_buffer_state FDECL(FDECL_dummy, (void ));
 
-static void yyensure_buffer_stack FDECL(, (void ));
-static void yy_load_buffer_state FDECL(, (void ));
-static void yy_init_buffer FDECL(, (YY_BUFFER_STATE b,FILE *file  ));
+static void yyensure_buffer_stack FDECL(FDECL_dummy, (void ));
+static void yy_load_buffer_state FDECL(FDECL_dummy, (void ));
+static void yy_init_buffer FDECL(FDECL_dummy, (YY_BUFFER_STATE b,FILE *file  ));
 
 #define YY_FLUSH_BUFFER yy_flush_buffer(YY_CURRENT_BUFFER )
 
-YY_BUFFER_STATE yy_scan_buffer FDECL(, (char *base,yy_size_t size  ));
-YY_BUFFER_STATE yy_scan_string FDECL(, (yyconst char *yy_str  ));
-YY_BUFFER_STATE yy_scan_bytes FDECL(, (yyconst char *bytes,yy_size_t len  ));
+YY_BUFFER_STATE yy_scan_buffer FDECL(FDECL_dummy, (char *base,yy_size_t size  ));
+YY_BUFFER_STATE yy_scan_string FDECL(FDECL_dummy, (yyconst char *yy_str  ));
+YY_BUFFER_STATE yy_scan_bytes FDECL(FDECL_dummy, (yyconst char *bytes,yy_size_t len  ));
 
-void *yyalloc FDECL(, (yy_size_t  ));
-void *yyrealloc FDECL(, (void *,yy_size_t  ));
-void yyfree FDECL(, (void *  ));
+void *yyalloc FDECL(FDECL_dummy, (yy_size_t  ));
+void *yyrealloc FDECL(FDECL_dummy, (void *,yy_size_t  ));
+void yyfree FDECL(FDECL_dummy, (void *  ));
 
 #define yy_new_buffer yy_create_buffer
 #define yy_set_interactive(is_interactive) \
@@ -278,10 +280,10 @@ extern char *yytext;
 #endif
 #define yytext_ptr yytext
 
-static yy_state_type yy_get_previous_state FDECL(, (void ));
-static yy_state_type yy_try_NUL_trans FDECL(, (yy_state_type current_state  ));
-static int yy_get_next_buffer FDECL(, (void ));
-static void yy_fatal_error FDECL(, (yyconst char msg[]  )) NORETURN;
+static yy_state_type yy_get_previous_state FDECL(FDECL_dummy, (void ));
+static yy_state_type yy_try_NUL_trans FDECL(FDECL_dummy, (yy_state_type current_state  ));
+static int yy_get_next_buffer FDECL(FDECL_dummy, (void ));
+static void yy_fatal_error FDECL(FDECL_dummy, (yyconst char msg[]  )) NORETURN;
 
 /* Done after the current pattern has been matched and before the
  * corresponding action - sets up yytext.
@@ -1022,7 +1024,7 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-/* NetHack 3.6  lev_comp.l	$NHDT-Date: 1453249313 2016/01/20 00:21:53 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.26 $ */
+/* NetHack 3.6  lev_comp.l	$NHDT-Date: 1455415237 2016/02/14 02:00:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.27 $ */
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1080,6 +1082,7 @@ int FDECL(yyoutput, (int));
 #else	/* !FLEX_SCANNER && !FLEXHACK_SCANNER */
 /* most recent flex allows suppressing yyunput() altogether when not needed */
 #define YY_NO_UNPUT
+#define YY_NO_INPUT
 #endif
 
 #if defined(FLEX_SCANNER) || defined(FLEXHACK_SCANNER)
@@ -1134,44 +1137,44 @@ FILE *orig_yyin = NULL;
 /* Accessor methods to globals.
    These are made visible to non-reentrant scanners for convenience. */
 
-int yylex_destroy FDECL(, (void ));
-int yyget_debug FDECL(, (void ));
-void yyset_debug FDECL(, (int debug_flag  ));
-YY_EXTRA_TYPE yyget_extra FDECL(, (void ));
-void yyset_extra FDECL(, (YY_EXTRA_TYPE user_defined  ));
-FILE *yyget_in FDECL(, (void ));
-void yyset_in  FDECL(, (FILE * _in_str  ));
-FILE *yyget_out FDECL(, (void ));
-void yyset_out  FDECL(, (FILE * _out_str  ));
-yy_size_t yyget_leng FDECL(, (void ));
-char *yyget_text FDECL(, (void ));
-int yyget_lineno FDECL(, (void ));
-void yyset_lineno FDECL(, (int _line_number  ));
+int yylex_destroy FDECL(FDECL_dummy, (void ));
+int yyget_debug FDECL(FDECL_dummy, (void ));
+void yyset_debug FDECL(FDECL_dummy, (int debug_flag  ));
+YY_EXTRA_TYPE yyget_extra FDECL(FDECL_dummy, (void ));
+void yyset_extra FDECL(FDECL_dummy, (YY_EXTRA_TYPE user_defined  ));
+FILE *yyget_in FDECL(FDECL_dummy, (void ));
+void yyset_in  FDECL(FDECL_dummy, (FILE * _in_str  ));
+FILE *yyget_out FDECL(FDECL_dummy, (void ));
+void yyset_out  FDECL(FDECL_dummy, (FILE * _out_str  ));
+yy_size_t yyget_leng FDECL(FDECL_dummy, (void ));
+char *yyget_text FDECL(FDECL_dummy, (void ));
+int yyget_lineno FDECL(FDECL_dummy, (void ));
+void yyset_lineno FDECL(FDECL_dummy, (int _line_number  ));
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
  */
 
 #ifndef YY_SKIP_YYWRAP
-extern int yywrap FDECL(, (void ));
+extern int yywrap FDECL(FDECL_dummy, (void ));
 #endif
 
 #ifndef YY_NO_UNPUT
 
-static void yyunput FDECL(, (int c,char *buf_ptr  ));
+static void yyunput FDECL(FDECL_dummy, (int c,char *buf_ptr  ));
 #endif
 
 #ifndef yytext_ptr
-static void yy_flex_strncpy FDECL(, (char *,yyconst char *,int ));
+static void yy_flex_strncpy FDECL(FDECL_dummy, (char *,yyconst char *,int ));
 #endif
 
 #ifdef YY_NEED_STRLEN
-static int yy_flex_strlen FDECL(, (yyconst char * ));
+static int yy_flex_strlen FDECL(FDECL_dummy, (yyconst char * ));
 #endif
 
 #ifndef YY_NO_INPUT
 
-static int input FDECL(, (void ));
+static int input FDECL(FDECL_dummy, (void ));
 
 #endif
 
@@ -1252,7 +1255,7 @@ static int input FDECL(, (void ));
 #ifndef YY_DECL
 #define YY_DECL_IS_OURS 1
 
-extern int yylex FDECL(, (void));
+extern int yylex FDECL(FDECL_dummy, (void));
 
 #define YY_DECL int yylex ()
 #endif /* !YY_DECL */
