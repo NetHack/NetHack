@@ -1,4 +1,4 @@
-/* NetHack 3.6	engrave.c	$NHDT-Date: 1445388915 2015/10/21 00:55:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.59 $ */
+/* NetHack 3.6	engrave.c	$NHDT-Date: 1455491569 2016/02/14 23:12:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.60 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -732,16 +732,18 @@ doengrave()
                     doknown = TRUE;
                 }
                 Strcpy(post_engr_text,
-                       Blind
+                       (Blind && !Deaf)
                           ? "You hear drilling!"
-                          : IS_GRAVE(levl[u.ux][u.uy].typ)
-                             ? "Chips fly out from the headstone."
-                             : is_ice(u.ux, u.uy)
-                                ? "Ice chips fly up from the ice surface!"
-                                : (level.locations[u.ux][u.uy].typ
-                                   == DRAWBRIDGE_DOWN)
-                                   ? "Splinters fly up from the bridge."
-                                   : "Gravel flies up from the floor.");
+                          : Blind
+                             ? "You feel tremors."
+                             : IS_GRAVE(levl[u.ux][u.uy].typ)
+                                 ? "Chips fly out from the headstone."
+                                 : is_ice(u.ux, u.uy)
+                                    ? "Ice chips fly up from the ice surface!"
+                                    : (level.locations[u.ux][u.uy].typ
+                                       == DRAWBRIDGE_DOWN)
+                                       ? "Splinters fly up from the bridge."
+                                       : "Gravel flies up from the floor.");
                 break;
             /* type = BURN wands */
             case WAN_FIRE:
@@ -767,7 +769,9 @@ doengrave()
                     Strcpy(post_engr_text, "Lightning arcs from the wand.");
                     doblind = TRUE;
                 } else
-                    Strcpy(post_engr_text, "You hear crackling!");
+                    Strcpy(post_engr_text, !Deaf
+                                ? "You hear crackling!"
+                                : "Your hair stands up!");
                 break;
 
             /* type = MARK wands */
