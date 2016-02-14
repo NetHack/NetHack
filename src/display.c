@@ -466,16 +466,10 @@ display_warning(mon)
 register struct monst *mon;
 {
     int x = mon->mx, y = mon->my;
-    int wl = (int) (mon->m_lev / 4);
     int glyph;
 
     if (mon_warning(mon)) {
-        if (wl > WARNCOUNT - 1)
-            wl = WARNCOUNT - 1;
-        /* 3.4.1: this really ought to be rn2(WARNCOUNT), but value "0"
-           isn't handled correctly by the what_is routine so avoid it */
-        if (Hallucination)
-            wl = rn1(WARNCOUNT - 1, 1);
+        int wl = Hallucination ? rn1(WARNCOUNT - 1, 1) : warning_of(mon);
         glyph = warning_to_glyph(wl);
     } else if (MATCH_WARN_OF_MON(mon)) {
         glyph = mon_to_glyph(mon);
@@ -484,6 +478,18 @@ register struct monst *mon;
         return;
     }
     show_glyph(x, y, glyph);
+}
+
+int
+warning_of(mon)
+struct monst *mon;
+{
+    int wl = 0, tmp = 0;
+    if (mon_warning(mon)) {
+        tmp = (int) (mon->m_lev / 4);    /* match display.h */
+        wl = (tmp > WARNCOUNT - 1) ? WARNCOUNT - 1 : tmp;
+    }
+    return wl;
 }
 
 
