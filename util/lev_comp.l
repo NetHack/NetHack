@@ -1,5 +1,5 @@
 %{
-/* NetHack 3.6  lev_comp.l	$NHDT-Date: 1449385191 2015/12/06 06:59:51 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.22 $ */
+/* NetHack 3.6  lev_comp.l	$NHDT-Date: 1455415007 2016/02/14 01:56:47 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.24 $ */
 /*	Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -57,6 +57,7 @@ int FDECL(yyoutput, (int));
 #else	/* !FLEX_SCANNER && !FLEXHACK_SCANNER */
 /* most recent flex allows suppressing yyunput() altogether when not needed */
 #define YY_NO_UNPUT
+#define YY_NO_INPUT
 #endif
 
 #if defined(FLEX_SCANNER) || defined(FLEXHACK_SCANNER)
