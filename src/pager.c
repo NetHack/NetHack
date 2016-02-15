@@ -382,11 +382,11 @@ struct permonst *pm;
 boolean user_typed_name, without_asking;
 {
     dlb *fp;
-    char buf[BUFSZ], newstr[BUFSZ];
+    char buf[BUFSZ], newstr[BUFSZ], givenname[BUFSZ];
     char *ep, *dbase_str;
     unsigned long txt_offset = 0L;
-    int chk_skip;
-    boolean found_in_file = FALSE, skipping_entry = FALSE;
+    int chk_skip, pass = 1;
+    boolean found_in_file = FALSE, skipping_entry = FALSE, yes_to_moreinfo;
     winid datawin = WIN_ERR;
 
     fp = dlb_fopen(DATAFILE, "r");
@@ -441,8 +441,13 @@ boolean user_typed_name, without_asking;
 
         if ((ep = strstri(dbase_str, " named ")) != 0)
             alt = ep + 7;
-        else
-            ep = strstri(dbase_str, " called ");
+        else if ((ep = strstri(dbase_str, " called ")) != 0) {
+            if (strlen(ep + 8) < BUFSZ - 1) {
+                Strcpy(givenname, ep + 8);
+                givenname[BUFSZ-1] = '\0';
+                alt = &givenname[0];
+            }
+        }
         if (!ep)
             ep = strstri(dbase_str, ", ");
         if (ep && ep > dbase_str)
@@ -459,85 +464,107 @@ boolean user_typed_name, without_asking;
         if (!alt)
             alt = makesingular(dbase_str);
 
-        /* skip first record; read second */
-        txt_offset = 0L;
-        if (!dlb_fgets(buf, BUFSZ, fp) || !dlb_fgets(buf, BUFSZ, fp)) {
-            impossible("can't read 'data' file");
-            (void) dlb_fclose(fp);
-            return;
-        } else if (sscanf(buf, "%8lx\n", &txt_offset) < 1 || txt_offset == 0L)
-            goto bad_data_file;
+        if (!strcmp(alt, dbase_str))
+            pass = 0;
 
-        /* look for the appropriate entry */
-        while (dlb_fgets(buf, BUFSZ, fp)) {
-            if (*buf == '.')
-                break; /* we passed last entry without success */
+        for (; pass >= 0; pass--) {
+            txt_offset = 0L;
+            if (dlb_fseek(fp, txt_offset, SEEK_SET) < 0 ) {
+                impossible("can't get to start of 'data' file");
+                dlb_fclose(fp);
+                return;
+            }
+            /* skip first record; read second */
+            if (!dlb_fgets(buf, BUFSZ, fp) || !dlb_fgets(buf, BUFSZ, fp)) {
+                impossible("can't read 'data' file");
+                (void) dlb_fclose(fp);
+                return;
+            } else if (sscanf(buf, "%8lx\n", &txt_offset) < 1 || txt_offset == 0L)
+                goto bad_data_file;
 
-            if (digit(*buf)) {
-                /* a number indicates the end of current entry */
-                skipping_entry = FALSE;
-            } else if (!skipping_entry) {
-                if (!(ep = index(buf, '\n')))
-                    goto bad_data_file;
-                (void) strip_newline((ep > buf) ? ep - 1 : ep);
-                /* if we match a key that begins with "~", skip this entry */
-                chk_skip = (*buf == '~') ? 1 : 0;
-                if (pmatch(&buf[chk_skip], dbase_str)
-                    || (alt && pmatch(&buf[chk_skip], alt))) {
-                    if (chk_skip) {
-                        skipping_entry = TRUE;
-                        continue;
-                    } else {
-                        found_in_file = TRUE;
-                        break;
+            /* look for the appropriate entry */
+            while (dlb_fgets(buf, BUFSZ, fp)) {
+                if (*buf == '.')
+                    break; /* we passed last entry without success */
+
+                if (digit(*buf)) {
+                    /* a number indicates the end of current entry */
+                    skipping_entry = FALSE;
+                } else if (!skipping_entry) {
+                    if (!(ep = index(buf, '\n')))
+                        goto bad_data_file;
+                    (void) strip_newline((ep > buf) ? ep - 1 : ep);
+                    /* if we match a key that begins with "~", skip this entry */
+                    chk_skip = (*buf == '~') ? 1 : 0;
+                    if ((pass == 0 && pmatch(&buf[chk_skip], dbase_str)) ||
+                        (pass == 1 && alt && pmatch(&buf[chk_skip], alt))) {
+                        if (chk_skip) {
+                            skipping_entry = TRUE;
+                            continue;
+                        } else {
+                            found_in_file = TRUE;
+                            break;
+                        }
                     }
                 }
             }
+            if (found_in_file) {
+                long entry_offset;
+                int entry_count;
+                int i;
+
+                /* skip over other possible matches for the info */
+                do {
+                    if (!dlb_fgets(buf, BUFSZ, fp))
+                        goto bad_data_file;
+                } while (!digit(*buf));
+                if (sscanf(buf, "%ld,%d\n", &entry_offset, &entry_count) < 2) {
+                bad_data_file:
+                    impossible("'data' file in wrong format or corrupted");
+                    /* window will exist if we came here from below via 'goto' */
+                    if (datawin != WIN_ERR)
+                        destroy_nhwindow(datawin);
+                    (void) dlb_fclose(fp);
+                    return;
+                }
+
+                yes_to_moreinfo = FALSE;
+                if (!user_typed_name && !without_asking) {
+                    unsigned maxt = strlen("More info about \"\"?");
+                    char *entrytext = pass ? alt : dbase_str;
+                    char question[BUFSZ];
+                    if (strlen(entrytext) < BUFSZ - maxt) {
+                        Strcpy(question, "More info about \"");
+                        Strcat(question, entrytext);
+                        Strcat(question, "\"?");
+                    }
+                    if (yn(question) == 'y')
+                        yes_to_moreinfo = TRUE;
+		}
+
+                if (user_typed_name || without_asking || yes_to_moreinfo) {
+                    if (dlb_fseek(fp,
+                        (long) txt_offset + entry_offset, SEEK_SET) < 0) {
+                        pline("? Seek error on 'data' file!");
+                        (void) dlb_fclose(fp);
+                        return;
+                    }
+                    datawin = create_nhwindow(NHW_MENU);
+                    for (i = 0; i < entry_count; i++) {
+                        if (!dlb_fgets(buf, BUFSZ, fp))
+                            goto bad_data_file;
+                        (void) strip_newline(buf);
+                        if (index(buf + 1, '\t') != 0)
+                            (void) tabexpand(buf + 1);
+                        putstr(datawin, 0, buf + 1);
+                    }
+                    display_nhwindow(datawin, FALSE);
+                    destroy_nhwindow(datawin);
+                }
+            } else if (user_typed_name && pass == 0)
+                pline("I don't have any information on those things.");
         }
     }
-
-    if (found_in_file) {
-        long entry_offset;
-        int entry_count;
-        int i;
-
-        /* skip over other possible matches for the info */
-        do {
-            if (!dlb_fgets(buf, BUFSZ, fp))
-                goto bad_data_file;
-        } while (!digit(*buf));
-        if (sscanf(buf, "%ld,%d\n", &entry_offset, &entry_count) < 2) {
-        bad_data_file:
-            impossible("'data' file in wrong format or corrupted");
-            /* window will exist if we came here from below via 'goto' */
-            if (datawin != WIN_ERR)
-                destroy_nhwindow(datawin);
-            (void) dlb_fclose(fp);
-            return;
-        }
-
-        if (user_typed_name || without_asking || yn("More info?") == 'y') {
-            if (dlb_fseek(fp, (long) txt_offset + entry_offset, SEEK_SET)
-                < 0) {
-                pline("? Seek error on 'data' file!");
-                (void) dlb_fclose(fp);
-                return;
-            }
-            datawin = create_nhwindow(NHW_MENU);
-            for (i = 0; i < entry_count; i++) {
-                if (!dlb_fgets(buf, BUFSZ, fp))
-                    goto bad_data_file;
-                (void) strip_newline(buf);
-                if (index(buf + 1, '\t') != 0)
-                    (void) tabexpand(buf + 1);
-                putstr(datawin, 0, buf + 1);
-            }
-            display_nhwindow(datawin, FALSE);
-            destroy_nhwindow(datawin);
-        }
-    } else if (user_typed_name)
-        pline("I don't have any information on those things.");
-
     (void) dlb_fclose(fp);
 }
 
