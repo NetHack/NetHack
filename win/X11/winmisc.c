@@ -1,4 +1,4 @@
-/* NetHack 3.6	winmisc.c	$NHDT-Date: 1455415590 2016/02/14 02:06:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.23 $ */
+/* NetHack 3.6	winmisc.c	$NHDT-Date: 1455526714 2016/02/15 08:58:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.24 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -76,6 +76,7 @@ static void FDECL(extend_dismiss, (Widget, XtPointer, XtPointer));
 static void FDECL(extend_help, (Widget, XtPointer, XtPointer));
 static void FDECL(popup_delete, (Widget, XEvent *, String *, Cardinal *));
 static void NDECL(ec_dismiss);
+static void FDECL(ec_scroll_to_view, (int));
 static void NDECL(init_extended_commands_popup);
 static Widget FDECL(make_menu, (const char *, const char *, const char *,
                                 const char *, XtCallbackProc, const char *,
@@ -592,6 +593,7 @@ X11_get_ext_cmd()
         init_extended_commands_popup();
 
     extended_cmd_selected = -1; /* reset selected value */
+    ec_scroll_to_view(-1); /* force scroll bar to top */
 
     positionpopup(extended_command_popup, FALSE); /* center on cursor */
     nh_XtPopup(extended_command_popup, (int) XtGrabExclusive,
@@ -716,39 +718,87 @@ ec_dismiss()
     exit_x_event = TRUE; /* leave event loop */
 }
 
-void
-ec_scroll_to_view()
+/* scroll the extended command menu if necessary
+   so that choices extended_cmd_selected through ec_indx will be visible */
+static void
+ec_scroll_to_view(ec_indx)
+int ec_indx; /* might be greater than extended_cmd_selected */
 {
-    Arg args[3];
-    Cardinal num_args;
-    Position y, h; /* ext cmd label y and height */
     Widget viewport, scrollbar, tmpw;
+    Arg args[5];
+    Cardinal num_args;
+    Position lo_y, hi_y; /* ext cmd label y */
     float s_shown, s_top; /* scrollbar pos */
     float s_min, s_max;
-    Position vh; /* viewport height */
+    Dimension h, hh, wh, vh; /* widget and viewport heights */
+    Dimension border_width;
+    int distance;
+    boolean force_top = (ec_indx < 0);
 
-    if (extended_cmd_selected < 0)
-        return;
+    /*
+     * If the extended command menu needs to be scrolled in order to move
+     * either the highlighted entry (extended_cmd_selected) or the target
+     * entry (ec_indx) into view, we want to make both end up visible.
+     * [Highligthed one is the first matching entry when the user types
+     * something, such as "adjust" after typing 'a', and will be chosen
+     * by pressing <return>.  Target entry is one past the last matching
+     * entry (or last matching entry itself if at end of command list),
+     * showing the user the other potential matches so far.]
+     *
+     * If that's not possible (maybe menu has been resized so that it's
+     * too small), the highlighted entry takes precedence and the target
+     * will be decremented until close enough to fit.
+     */
 
-    /* get selected ext command label y position and height */
-    num_args = 0;
-    XtSetArg(args[num_args], XtNy, &y); num_args++;
-    XtSetArg(args[num_args], XtNheight, &h); num_args++;
-    XtGetValues(extended_commands[extended_cmd_selected], args, num_args);
+    if (force_top)
+        ec_indx = 0;
 
     /* get viewport and scrollbar widgets */
-    tmpw = extended_commands[extended_cmd_selected];
+    tmpw = extended_commands[ec_indx];
     viewport = XtParent(tmpw);
     do {
-        tmpw = XtParent(tmpw);
         scrollbar = XtNameToWidget(tmpw, "*vertical");
-    } while (!scrollbar && tmpw);
+        if (scrollbar)
+            break;
+        tmpw = XtParent(tmpw);
+    } while (tmpw);
 
     if (scrollbar && viewport) {
-        /* get viewport height */
+        /* get selected ext command label y position and height */
         num_args = 0;
-        XtSetArg(args[num_args], XtNheight, &vh); num_args++;
-        XtGetValues(viewport, args, num_args);
+        XtSetArg(args[num_args], XtNy, &hi_y); num_args++;
+        XtSetArg(args[num_args], XtNheight, &h); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNborderWidth), &border_width);
+                                                                   num_args++;
+        XtSetArg(args[num_args], nhStr(XtNdefaultDistance), &distance);
+                                                                   num_args++;
+        XtGetValues(extended_commands[ec_indx], args, num_args);
+        if (distance < 1 || distance > 32766) /* defaultDistance is weird */
+            distance = 4;
+        /* vertical distance between top of one command widget and the next */
+        hh = h + distance + 2 * border_width;
+        /* location of the highlighted entry, if any */
+        if (extended_cmd_selected >= 0) {
+            XtSetArg(args[0], XtNy, &lo_y);
+            XtGetValues(extended_commands[extended_cmd_selected], args, ONE);
+        } else
+            lo_y = hi_y;
+
+        /* get menu widget and viewport heights */
+        XtSetArg(args[0], XtNheight, &wh);
+        XtGetValues(tmpw, args, ONE);
+        XtSetArg(args[0], XtNheight, &vh);
+        XtGetValues(viewport, args, ONE);
+
+        /* widget might be too small if it has been resized or
+           there are a very large number of ambiguous choices */
+        if (hi_y - lo_y > wh) {
+            ec_indx = extended_cmd_selected;
+            if (wh > hh)
+                ec_indx += (wh / hh);
+            XtSetArg(args[0], XtNy, &hi_y);
+            XtGetValues(extended_commands[ec_indx], args, num_args);
+        }
 
         /* get scrollbar "height" and "top" position; floats between 0-1 */
         num_args = 0;
@@ -760,11 +810,14 @@ ec_scroll_to_view()
         s_max = (s_top + s_shown) * vh;
 
         /* scroll if outside the view */
-        if ((int)y <= (int)s_min) {
-            s_min = (float)(y / (float)vh);
+        if (force_top) {
+            s_min = 0.0;
             XtCallCallbacks(scrollbar, XtNjumpProc, &s_min);
-        } else if ((int)(y + h) >= (int)s_max) {
-            s_min = (float)((y+h) / (float)vh) - s_shown;
+        } else if ((int) lo_y <= (int) s_min) {
+            s_min = (float) (lo_y / (float) vh);
+            XtCallCallbacks(scrollbar, XtNjumpProc, &s_min);
+        } else if ((int) (hi_y + h) >= (int) s_max) {
+            s_min = (float) ((hi_y + h) / (float) vh) - s_shown;
             XtCallCallbacks(scrollbar, XtNjumpProc, &s_min);
         }
     }
@@ -856,7 +909,17 @@ Cardinal *num_params;
                     extended_cmd_selected = i;
                     swap_fg_bg(extended_commands[extended_cmd_selected]);
                 }
-                ec_scroll_to_view();
+                /* advance to one past last matching entry, so that all
+                   ambiguous choices, plus one to show thare aren't any
+                   more such, will scroll into view */
+                do {
+                    if (!extcmdlist[i + 1].ef_txt
+                        || *extcmdlist[i + 1].ef_txt == '?')
+                        break; /* end of list */
+                    ++i;
+                } while (!strncmp(ec_chars, extcmdlist[i].ef_txt, ec_nchars));
+
+                ec_scroll_to_view(i);
                 return;
             }
         }
@@ -977,7 +1040,7 @@ Widget *formp; /* return */
     XtSetArg(args[num_args], nhStr(XtNdefaultDistance), &distance); num_args++;
     XtSetArg(args[num_args], nhStr(XtNborderWidth), &border_width); num_args++;
     XtGetValues(view, args, num_args);
-    if (!distance)
+    if (distance < 1 || distance > 32766)
         distance = 4;
 
     /*
