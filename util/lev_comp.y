@@ -1,5 +1,5 @@
 %{
-/* NetHack 3.6  lev_comp.y	$NHDT-Date: 1448074095 2015/11/21 02:48:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.18 $ */
+/* NetHack 3.6  lev_comp.y	$NHDT-Date: 1455745464 2016/02/17 21:44:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.20 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2380,16 +2380,23 @@ func_param_part	: any_var_or_arr ':' func_param_type
 		      } else if (!tmp) {
 			  lc_error("Could not alloc function params.");
 		      } else {
-			  long vt;
+			  long vt = 0L;
+
 			  tmp->name = strdup($1);
 			  tmp->parmtype = (char) $3;
 			  tmp->next = curr_function->params;
 			  curr_function->params = tmp;
 			  curr_function->n_params++;
 			  switch (tmp->parmtype) {
-			  case 'i': vt = SPOVAR_INT; break;
-			  case 's': vt = SPOVAR_STRING; break;
-			  default: lc_error("Unknown func param conversion."); break;
+			  case 'i':
+                              vt = SPOVAR_INT;
+                              break;
+			  case 's':
+                              vt = SPOVAR_STRING;
+                              break;
+			  default:
+                              lc_error("Unknown func param conversion.");
+                              break;
 			  }
 			  variable_definitions = add_vardef_type(
 							 variable_definitions,
