@@ -1,5 +1,5 @@
 #!/bin/sh
-# NetHack 3.6  macosx.sh $NHDT-Date: 1455397108 2016/02/13 20:58:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.14 $
+# NetHack 3.6  macosx.sh $NHDT-Date: 1455747518 2016/02/17 22:18:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.15 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -97,10 +97,11 @@ xeditsysconf)
 	# we should traverse the elements of $PATH instead
 	if [ -f /usr/bin/gdb ]; then
 	    gdbpath='GDBPATH=/usr/bin/gdb' #traditional location
+	elif [ -f /opt/local/bin/ggdb ]; then
+	    gdbpath='GDBPATH=/opt/local/bin/ggdb' #macports gdb
 	elif [ -f /Developer/usr/bin/gdb ]; then
+	    # this one seems to be broken with Xcode 5.1.1 on Mountain Lion
 	    gdbpath='GDBPATH=/Developer/usr/bin/gdb' #recent Xcode tools
-	elif [ -f /opt/local/bin/gdb ]; then
-	    gdbpath='GDBPATH=/opt/local/bin/gdb' #macports
 	else
 	    gdbpath='#GDBPATH' #none of the above
 	fi
