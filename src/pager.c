@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1455672994 2016/02/17 01:36:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.92 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1455674291 2016/02/17 01:58:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.93 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -106,11 +106,13 @@ char *outbuf;
                               : an(obj_descr[STRANGE_OBJECT].oc_name));
             if (fakeobj)
                 dealloc_obj(otmp);
-        } else if (mon->m_ap_type == M_AP_MONSTER && altmon) {
-            Strcat(outbuf, an(mons[mon->mappearance].mname));
         } else {
             Strcat(outbuf, something);
         }
+    } else if (mon->m_ap_type == M_AP_MONSTER) {
+        if (altmon)
+            Sprintf(outbuf, ", masquerading as %s",
+                    an(mons[mon->mappearance].mname));
     } else if (mon->mundetected) {
         Strcpy(outbuf, ", hiding");
         if (hides_under(mon->data)) {
