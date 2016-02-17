@@ -1172,6 +1172,11 @@ debug-mode viewing of object weight
 prizes on various levels now protected by ?oSM scrolls as well as Elbereth
 regexes now use system libraries consistently for all pattern-matching systems
 wet towels deal more damage
+'P' and 'W' commands work on both accessories and armor but treat different
+	types of items to be likely candidates when prompting for an item
+'R' and 'T' commands also work on both accessories and armor; setting the
+	Remove/Takeoff category for the paranoid_confirm option will be needed
+	if user wants to stick with just one command for all worn items
 
 
 Platform- and/or Interface-Specific New Features
