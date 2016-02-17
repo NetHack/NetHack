@@ -1,5 +1,5 @@
 %{
-/* NetHack 3.6  lev_comp.y	$NHDT-Date: 1455745464 2016/02/17 21:44:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.20 $ */
+/* NetHack 3.6  lev_comp.y	$NHDT-Date: 1455746893 2016/02/17 22:08:13 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.21 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2380,7 +2380,7 @@ func_param_part	: any_var_or_arr ':' func_param_type
 		      } else if (!tmp) {
 			  lc_error("Could not alloc function params.");
 		      } else {
-			  long vt = 0L;
+			  long vt = SPOVAR_NULL;
 
 			  tmp->name = strdup($1);
 			  tmp->parmtype = (char) $3;
