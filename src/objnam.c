@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1452043772 2016/01/06 01:29:32 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.163 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1455672990 2016/02/17 01:36:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.165 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3636,12 +3636,11 @@ const char *
 mimic_obj_name(mtmp)
 struct monst *mtmp;
 {
-    if (mtmp->m_ap_type == M_AP_OBJECT
-        && mtmp->mappearance != STRANGE_OBJECT) {
-        int idx = objects[mtmp->mappearance].oc_descr_idx;
+    if (mtmp->m_ap_type == M_AP_OBJECT) {
         if (mtmp->mappearance == GOLD_PIECE)
             return "gold";
-        return obj_descr[idx].oc_name;
+        if (mtmp->mappearance != STRANGE_OBJECT)
+            return simple_typename(mtmp->mappearance);
     }
     return "whatcha-may-callit";
 }

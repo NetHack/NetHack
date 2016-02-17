@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1454485430 2016/02/03 07:43:50 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.545 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1455672983 2016/02/17 01:36:23 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.548 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1675,7 +1675,11 @@ E void NDECL(msgtype_free);
 /* ### pager.c ### */
 
 E char *FDECL(self_lookat, (char *));
+E void FDECL(mhidden_description, (struct monst *, BOOLEAN_P, char *));
 E boolean FDECL(object_from_map, (int,int,int,struct obj **));
+E int FDECL(do_screen_description, (coord, BOOLEAN_P, int, char *,
+                                    const char **));
+E int FDECL(do_look, (int, coord *));
 E int NDECL(dowhatis);
 E int NDECL(doquickwhatis);
 E int NDECL(doidtrap);
@@ -1683,9 +1687,6 @@ E int NDECL(dowhatdoes);
 E char *FDECL(dowhatdoes_core, (CHAR_P, char *));
 E int NDECL(dohelp);
 E int NDECL(dohistory);
-E int FDECL(do_screen_description,
-            (coord, BOOLEAN_P, int, char *, const char **));
-E int FDECL(do_look, (int, coord *));
 
 /* ### pcmain.c ### */
 
