@@ -11,7 +11,7 @@
 #define yyerrok (yyerrflag=0)
 #define YYRECOVERING (yyerrflag!=0)
 #define YYPREFIX "yy"
-/* NetHack 3.6  lev_comp.y	$NHDT-Date: 1455415238 2016/02/14 02:00:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.21 $ */
+/* NetHack 3.6  lev_comp.y	$NHDT-Date: 1455747019 2016/02/17 22:10:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.22 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -4609,16 +4609,23 @@ case 355:
 		      } else if (!tmp) {
 			  lc_error("Could not alloc function params.");
 		      } else {
-			  long vt;
+			  long vt = SPOVAR_NULL;
+
 			  tmp->name = strdup(yyvsp[-2].map);
 			  tmp->parmtype = (char) yyvsp[0].i;
 			  tmp->next = curr_function->params;
 			  curr_function->params = tmp;
 			  curr_function->n_params++;
 			  switch (tmp->parmtype) {
-			  case 'i': vt = SPOVAR_INT; break;
-			  case 's': vt = SPOVAR_STRING; break;
-			  default: lc_error("Unknown func param conversion."); break;
+			  case 'i':
+                              vt = SPOVAR_INT;
+                              break;
+			  case 's':
+                              vt = SPOVAR_STRING;
+                              break;
+			  default:
+                              lc_error("Unknown func param conversion.");
+                              break;
 			  }
 			  variable_definitions = add_vardef_type(
 							 variable_definitions,
