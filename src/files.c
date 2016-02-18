@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1454035130 2016/01/29 02:38:50 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.202 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1455835581 2016/02/18 22:46:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.204 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3468,7 +3468,7 @@ boolean wildcards;
 #define TITLESCOPE 2
 #define PASSAGESCOPE 3
 
-#define MAXPASSAGES SIZE(context.novel.pasg) /* 30 */
+#define MAXPASSAGES SIZE(context.novel.pasg) /* 20 */
 
 static int FDECL(choose_passage, (int, unsigned));
 
@@ -3476,24 +3476,35 @@ static int FDECL(choose_passage, (int, unsigned));
    been chosen, reset the tracking to make all passages available again */
 static int
 choose_passage(passagecnt, oid)
-int passagecnt; /* total of available passages, 1..MAXPASSAGES */
+int passagecnt; /* total of available passages */
 unsigned oid; /* book.o_id, used to determine whether re-reading same book */
 {
     int idx, res;
 
     if (passagecnt < 1)
         return 0;
-    if (passagecnt > MAXPASSAGES)
-        passagecnt = MAXPASSAGES;
 
     /* if a different book or we've used up all the passages already,
        reset in order to have all 'passagecnt' passages available */
     if (oid != context.novel.id || context.novel.count == 0) {
+        int i, range = passagecnt, limit = MAXPASSAGES;
+
         context.novel.id = oid;
-        context.novel.count = passagecnt;
-        for (idx = 0; idx < MAXPASSAGES; idx++)
-            context.novel.pasg[idx] = (xchar) ((idx < passagecnt) ? idx + 1
-                                                                  : 0);
+        if (range <= limit) {
+            /* collect all of the N indices */
+            context.novel.count = passagecnt;
+            for (idx = 0; idx < MAXPASSAGES; idx++)
+                context.novel.pasg[idx] = (xchar) ((idx < passagecnt)
+                                                   ? idx + 1 : 0);
+        } else {
+            /* collect MAXPASSAGES of the N indices */
+            context.novel.count = MAXPASSAGES;
+            for (idx = i = 0; i < passagecnt; ++i, --range)
+                if (range > 0 && rn2(range) < limit) {
+                    context.novel.pasg[idx++] = (xchar) (i + 1);
+                    --limit;
+                }
+        }
     }
 
     idx = rn2(context.novel.count);
@@ -3584,8 +3595,6 @@ unsigned oid; /* book identifier */
                     if ((p2 = index(p1, ')')) != 0) {
                         *p2 = '\0';
                         passagecnt = atoi(p1);
-                        if (passagecnt > MAXPASSAGES)
-                            passagecnt = MAXPASSAGES;
                         scope = TITLESCOPE;
                         if (matchedsection && !strcmpi(st, tribtitle)) {
                             matchedtitle = TRUE;
