@@ -897,8 +897,8 @@ arts on the unsuspecting."
 %Cc Hea 00019
 "Alas, %p, you are yet too inexperienced to deal with the rigors
 of such a task.  You must be able to draw on the knowledge of botany,
-vetenary, and alchemy before I can send you on this quest with good
-conscience.
+alchemy and veterinary practices before I can send you on this quest 
+with good conscience.
 
 "Return when you wear %Ra's caduceus."
 %E [You are too inexperienced.  Return when you are %Ra.]
