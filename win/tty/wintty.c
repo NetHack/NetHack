@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1450363024 2015/12/17 14:37:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.118 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1453514601 2016/01/23 02:03:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.124 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -467,21 +467,35 @@ makepicks:
                     /* populate the menu with role choices */
                     setup_rolemenu(win, TRUE, RACE, GEND, ALGN);
                     /* add miscellaneous menu entries */
-                    role_menu_extra(ROLE_RANDOM, win);
+                    role_menu_extra(ROLE_RANDOM, win, TRUE);
                     any.a_int = 0; /* separator, not a choice */
                     add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
                              MENU_UNSELECTED);
-                    role_menu_extra(RS_RACE, win);
-                    role_menu_extra(RS_GENDER, win);
-                    role_menu_extra(RS_ALGNMNT, win);
+                    role_menu_extra(RS_RACE, win, FALSE);
+                    role_menu_extra(RS_GENDER, win, FALSE);
+                    role_menu_extra(RS_ALGNMNT, win, FALSE);
                     if (gotrolefilter())
-                        role_menu_extra(RS_filter, win);
-                    role_menu_extra(ROLE_NONE, win); /* quit */
+                        role_menu_extra(RS_filter, win, FALSE);
+                    role_menu_extra(ROLE_NONE, win, FALSE); /* quit */
                     Strcpy(pbuf, "Pick a role or profession");
                     end_menu(win, pbuf);
                     n = select_menu(win, PICK_ONE, &selected);
-                    choice = (n == 1) ? selected[0].item.a_int
-                           : (n == 0) ? ROLE_RANDOM : ROLE_NONE;
+                    /*
+                     * PICK_ONE with preselected choice behaves strangely:
+                     *  n == -1 -- <escape>, so use quit choice;
+                     *  n ==  0 -- explicitly chose preselected entry,
+                     *             toggling it off, so use it;
+                     *  n ==  1 -- implicitly chose preselected entry
+                     *             with <space> or <return>;
+                     *  n ==  2 -- explicitly chose a different entry, so
+                     *             both it and preselected one are in list.
+                     */
+                    if (n > 0) {
+                        choice = selected[0].item.a_int;
+                        if (n > 1 && choice == ROLE_RANDOM)
+                            choice = selected[1].item.a_int;
+                    } else
+                        choice = (n == 0) ? ROLE_RANDOM : ROLE_NONE;
                     if (selected)
                         free((genericptr_t) selected), selected = 0;
                     destroy_nhwindow(win);
@@ -552,21 +566,25 @@ makepicks:
                         /* populate the menu with role choices */
                         setup_racemenu(win, TRUE, ROLE, GEND, ALGN);
                         /* add miscellaneous menu entries */
-                        role_menu_extra(ROLE_RANDOM, win);
+                        role_menu_extra(ROLE_RANDOM, win, TRUE);
                         any.a_int = 0; /* separator, not a choice */
                         add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
                                  MENU_UNSELECTED);
-                        role_menu_extra(RS_ROLE, win);
-                        role_menu_extra(RS_GENDER, win);
-                        role_menu_extra(RS_ALGNMNT, win);
+                        role_menu_extra(RS_ROLE, win, FALSE);
+                        role_menu_extra(RS_GENDER, win, FALSE);
+                        role_menu_extra(RS_ALGNMNT, win, FALSE);
                         if (gotrolefilter())
-                            role_menu_extra(RS_filter, win);
-                        role_menu_extra(ROLE_NONE, win); /* quit */
+                            role_menu_extra(RS_filter, win, FALSE);
+                        role_menu_extra(ROLE_NONE, win, FALSE); /* quit */
                         Strcpy(pbuf, "Pick a race or species");
                         end_menu(win, pbuf);
                         n = select_menu(win, PICK_ONE, &selected);
-                        choice = (n == 1) ? selected[0].item.a_int
-                               : (n == 0) ? ROLE_RANDOM : ROLE_NONE;
+                        if (n > 0) {
+                            choice = selected[0].item.a_int;
+                            if (n > 1 && choice == ROLE_RANDOM)
+                                choice = selected[1].item.a_int;
+                        } else
+                            choice = (n == 0) ? ROLE_RANDOM : ROLE_NONE;
                         if (selected)
                             free((genericptr_t) selected), selected = 0;
                         destroy_nhwindow(win);
@@ -641,21 +659,25 @@ makepicks:
                         /* populate the menu with gender choices */
                         setup_gendmenu(win, TRUE, ROLE, RACE, ALGN);
                         /* add miscellaneous menu entries */
-                        role_menu_extra(ROLE_RANDOM, win);
+                        role_menu_extra(ROLE_RANDOM, win, TRUE);
                         any.a_int = 0; /* separator, not a choice */
                         add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
                                  MENU_UNSELECTED);
-                        role_menu_extra(RS_ROLE, win);
-                        role_menu_extra(RS_RACE, win);
-                        role_menu_extra(RS_ALGNMNT, win);
+                        role_menu_extra(RS_ROLE, win, FALSE);
+                        role_menu_extra(RS_RACE, win, FALSE);
+                        role_menu_extra(RS_ALGNMNT, win, FALSE);
                         if (gotrolefilter())
-                            role_menu_extra(RS_filter, win);
-                        role_menu_extra(ROLE_NONE, win); /* quit */
+                            role_menu_extra(RS_filter, win, FALSE);
+                        role_menu_extra(ROLE_NONE, win, FALSE); /* quit */
                         Strcpy(pbuf, "Pick a gender or sex");
                         end_menu(win, pbuf);
                         n = select_menu(win, PICK_ONE, &selected);
-                        choice = (n == 1) ? selected[0].item.a_int
-                               : (n == 0) ? ROLE_RANDOM : ROLE_NONE;
+                        if (n > 0) {
+                            choice = selected[0].item.a_int;
+                            if (n > 1 && choice == ROLE_RANDOM)
+                                choice = selected[1].item.a_int;
+                        } else
+                            choice = (n == 0) ? ROLE_RANDOM : ROLE_NONE;
                         if (selected)
                             free((genericptr_t) selected), selected = 0;
                         destroy_nhwindow(win);
@@ -726,21 +748,25 @@ makepicks:
                         start_menu(win);
                         any = zeroany; /* zero out all bits */
                         setup_algnmenu(win, TRUE, ROLE, RACE, GEND);
-                        role_menu_extra(ROLE_RANDOM, win);
+                        role_menu_extra(ROLE_RANDOM, win, TRUE);
                         any.a_int = 0; /* separator, not a choice */
                         add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "",
                                  MENU_UNSELECTED);
-                        role_menu_extra(RS_ROLE, win);
-                        role_menu_extra(RS_RACE, win);
-                        role_menu_extra(RS_GENDER, win);
+                        role_menu_extra(RS_ROLE, win, FALSE);
+                        role_menu_extra(RS_RACE, win, FALSE);
+                        role_menu_extra(RS_GENDER, win, FALSE);
                         if (gotrolefilter())
-                            role_menu_extra(RS_filter, win);
-                        role_menu_extra(ROLE_NONE, win); /* quit */
+                            role_menu_extra(RS_filter, win, FALSE);
+                        role_menu_extra(ROLE_NONE, win, FALSE); /* quit */
                         Strcpy(pbuf, "Pick an alignment or creed");
                         end_menu(win, pbuf);
                         n = select_menu(win, PICK_ONE, &selected);
-                        choice = (n == 1) ? selected[0].item.a_int
-                               : (n == 0) ? ROLE_RANDOM : ROLE_NONE;
+                        if (n > 0) {
+                            choice = selected[0].item.a_int;
+                            if (n > 1 && choice == ROLE_RANDOM)
+                                choice = selected[1].item.a_int;
+                        } else
+                            choice = (n == 0) ? ROLE_RANDOM : ROLE_NONE;
                         if (selected)
                             free((genericptr_t) selected), selected = 0;
                         destroy_nhwindow(win);

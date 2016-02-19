@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1446975464 2015/11/08 09:37:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.149 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1454033599 2016/01/29 02:13:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.153 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -215,15 +215,13 @@ const char *verb;
                   otense(obj, "tumble"), the_your[t->madeby_u]);
     } else if (obj->globby) {
         /* Globby things like puddings might stick together */
-        while (obj
-               && (otmp = obj_nexto_xy(obj->otyp, x, y, obj->o_id))
-                      != (struct obj *) 0) {
+        while (obj && (otmp = obj_nexto_xy(obj, x, y, TRUE)) != 0) {
             pudding_merge_message(obj, otmp);
             /* intentionally not getting the melded object; obj_meld may set
              * obj to null. */
             (void) obj_meld(&obj, &otmp);
         }
-        return (boolean) (obj == NULL);
+        return (boolean) !obj;
     }
     return FALSE;
 }
@@ -919,7 +917,13 @@ dodown()
                 ladder_down =
                     (glyph_to_cmap(levl[u.ux][u.uy].glyph) == S_dnladder);
         }
-        floating_above(stairs_down ? "stairs" : ladder_down
+        if (Is_airlevel(&u.uz))
+            You("are floating in the %s.", surface(u.ux, u.uy));
+        else if (Is_waterlevel(&u.uz))
+            You("are floating in %s.",
+                is_pool(u.ux, u.uy) ? "the water" : "a bubble of air");
+        else
+            floating_above(stairs_down ? "stairs" : ladder_down
                                                     ? "ladder"
                                                     : surface(u.ux, u.uy));
         return 0; /* didn't move */
@@ -1103,11 +1107,12 @@ boolean at_stairs, falling, portal;
 {
     int fd, l_idx;
     xchar new_ledger;
-    boolean cant_go_back, up = (depth(newlevel) < depth(&u.uz)),
-                          newdungeon = (u.uz.dnum != newlevel->dnum),
-                          was_in_W_tower = In_W_tower(u.ux, u.uy, &u.uz),
-                          familiar = FALSE;
-    boolean new = FALSE; /* made a new level? */
+    boolean cant_go_back, great_effort,
+            up = (depth(newlevel) < depth(&u.uz)),
+            newdungeon = (u.uz.dnum != newlevel->dnum),
+            was_in_W_tower = In_W_tower(u.ux, u.uy, &u.uz),
+            familiar = FALSE,
+            new = FALSE; /* made a new level? */
     struct monst *mtmp;
     char whynot[BUFSZ];
     char *annotation;
@@ -1308,11 +1313,13 @@ boolean at_stairs, falling, portal;
                 u_on_dnstairs();
             /* you climb up the {stairs|ladder};
                fly up the stairs; fly up along the ladder */
-            pline("%s %s up%s the %s.",
-                  (Punished && !Levitation) ? "With great effort you" : "You",
-                  Flying ? "fly" : "climb",
-                  (Flying && at_ladder) ? " along" : "",
-                  at_ladder ? "ladder" : "stairs");
+            great_effort = (Punished && !Levitation);
+            if (flags.verbose || great_effort)
+                pline("%s %s up%s the %s.",
+                      great_effort ? "With great effort, you" : "You",
+                      Flying ? "fly" : "climb",
+                      (Flying && at_ladder) ? " along" : "",
+                      at_ladder ? "ladder" : "stairs");
         } else { /* down */
             if (at_ladder)
                 u_on_newpos(xupladder, yupladder);
@@ -1326,8 +1333,8 @@ boolean at_stairs, falling, portal;
                 if (flags.verbose)
                     You("fly down %s.",
                         at_ladder ? "along the ladder" : "the stairs");
-            } else if (near_capacity() > UNENCUMBERED || Punished
-                       || Fumbling) {
+            } else if (near_capacity() > UNENCUMBERED
+                       || Punished || Fumbling) {
                 You("fall down the %s.", at_ladder ? "ladder" : "stairs");
                 if (Punished) {
                     drag_down();

@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.6 by Mike Stephenson and others)}
-\date{December 16, 2015}
+\date{January 18, 2016}
 
 \maketitle
 
@@ -405,16 +405,42 @@ show only your experience level here.
 The number of turns elapsed so far, displayed if you have the
 {\it time\/} option set.
 %.lp
-\item[\bb{Hunger Status}]
-Your current hunger status, ranging from %
-{\it Satiated\/} down to {\it Fainting}.  If your hunger status is normal,
-it is not displayed.
-%.pg
-Additional status flags may appear after the hunger status:
-{\it Conf\/} when you're confused, {\it FoodPois\/} or {\it Ill\/}
-when sick, {\it Blind\/}
-when you can't see, {\it Stun\/} when stunned, and {\it Hallu\/} when
-hallucinating.
+\item[\bb{Status}]
+Hunger:
+your current hunger status.
+Values are {\it Satiated}, {\it Not~Hungry\/} (or {\it Normal\/}),
+{\it Hungry}, {\it Weak}, and {\it Fainting}.
+%.\" not mentioned: Fainted
+Not shown when {\it Normal}.
+
+%.lp ""
+Encumbrance:
+an indication of how what your are carrying affects your ability to move.
+Values are {\it Unencumbered}, {\it Encumbered}, {\it Stressed},
+{\it Strained}, {\it Overtaxed}, and {\it Overloaded}.
+Not shown when {\it Unencumbered}.
+
+%.lp ""
+Fatal~conditions:
+{\it Stone\/} (aka {\it Petrifying}, turning to stone),
+{\it Slime\/} (turning into green slime),
+{\it Strngl\/} (being strangled),
+{\it FoodPois\/} (suffering from acute food poisoning),
+{\it TermIll\/} (suffering from a terminal illness).
+
+%.lp ""
+Non-fatal~conditions:
+{\it Blind\/} (can't see), {\it Deaf\/} (can't hear),
+{\it Stun\/} (stunned), {\it Conf\/} (confused), {\it Hallu\/} (hallucinating).
+
+%.lp ""
+Movement~modifiers:
+{\it Lev\/} (levitating), {\it Fly\/} (flying), {\it Ride\/} (riding).
+
+%.lp ""
+Other conditions and modifiers exist, but there isn't enough room to
+display them with the other status fields.  The `{\tt \^{}X}' command shows
+all relevant status conditions.
 \elist
 
 %.hn 2
@@ -529,8 +555,8 @@ Sometimes, however, they can be helpful.
 %.lp
 \item[\tb{I}]
 This marks the last known location of an invisible or otherwise unseen
-monster.  Note that the monster could have moved.  The `F' and `m' commands
-may be useful here.
+monster.  Note that the monster could have moved.
+The `{\tt F}' and `{\tt m}' commands may be useful here.
 
 \elist
 %.pg
@@ -586,24 +612,44 @@ helpful texts.  Here are the commands for your reference:
 Help menu:  display one of several help texts available.
 %.lp
 \item[\tb{/}]
-Tell what a symbol represents.  You may choose to specify a location
+The {\tt what-is} command, to
+tell what a symbol represents.  You may choose to specify a location
 or type a symbol (or even a whole word) to explain.
 Specifying a location is done by moving the cursor to a particular spot
 on the map and then pressing one of `{\tt .}', `{\tt ,}', `{\tt ;}',
 or `{\tt :}'.  `{\tt .}' will explain the symbol at the chosen location,
+information, then let you pick another location;
 conditionally check for ``{\tt More info?}'' depending upon whether the
-{\it help\/}
+`{\it help\/}'
 option is on, and then you will be asked to pick another location;
 `{\tt ,}' will explain the symbol but skip any additional
-information; `{\tt ;}' will skip additional info and also not bother asking
+`{\tt ;}' will skip additional info and also not bother asking
 you to choose another location to examine; `{\tt :}' will show additional
 info, if any, without asking for confirmation.  When picking a location,
 pressing the {\tt ESC} key will terminate this command, or pressing `{\tt ?}'
 will give a brief reminder about how it works.
 
-%.pg
+%.lp ""
+If the
+{\it autodescribe\/}
+option is on, a short description of what you see at each location is
+shown as you move the cursor.  Typing `{\tt #}' while picking a location will
+toggle that option on or off.
+The
+{\it whatis\verb+_+coord\/}
+option controls whether the short description includes map coordinates.
+
+%.lp ""
 Specifying a name rather than a location
 always gives any additional information available about that name.
+
+%.lp ""
+You may also request a description of nearby monsters,
+all monsters currently displayed, nearby objects, or all objects.
+The
+{\it whatis\verb+_+coord\/}
+option controls which format of map coordinate is included with their
+descriptions.
 %.lp
 \item[\tb{\&}]
 Tell what a command does.
@@ -802,7 +848,7 @@ choices but will accept an accessory and attempt to put that on.)
 Repeat previous message.\\
 %.lp ""
 Subsequent {\tt \^{}P}'s repeat earlier messages.
-The behavior can be varied via the {\it msg\verb+_+window} option.
+The behavior can be varied via the {\it msg\verb+_+window\/} option.
 %.lp
 \item[\tb{q}]
 Quaff (drink) something (potion, water, etc).
@@ -2407,7 +2453,9 @@ Cannot be set with the `{\tt O}' command.  Persistent.
 %.lp
 \item[\ib{autodescribe}]
 Automatically describe the terrain under cursor when asked to get a location
-on the map.
+on the map.  The
+{\it whatis\verb+_+coord\/}
+option controls whether the description includes map coordinates.
 %.lp
 \item[\ib{autodig}]
 Automatically dig if you are wielding a digging tool and moving into a place
@@ -2548,7 +2596,7 @@ Name a fruit after something you enjoy eating (ex.\ ``{\tt fruit:mango}'')
 {\it NetHack\/} uses from time to time.  You should set this to something you
 find more appetizing than slime mold.  Apples, oranges, pears, bananas, and
 melons already exist in {\it NetHack}, so don't use those.
-%.Ip
+%.lp
 \item[\ib{gender}]
 Your starting gender ({\tt gender:male} or {\tt gender:female}).
 You may specify just the first letter.  Although you can
@@ -2558,12 +2606,6 @@ The default is to randomly pick an appropriate gender.
 If you prefix `{\tt !}' or ``{\tt no}'' to the value, you can 
 exclude that gender from being picked randomly. 
 Cannot be set with the `{\tt O}' command.  Persistent.
-%.lp
-\item[\ib{getpos\verb+_+coord}]
-When using the `{\tt /}' command to look around on the map with
-``{\tt autodescribe}'' on, display coordinates after the description.
-The value specified should be the first letter of one of the following:
-compass, map, or none.  Default is none.
 %.lp
 \item[\ib{help}]
 If more information is available for an object looked at
@@ -3014,6 +3056,32 @@ mouse clicks on the map window.  Persistent.
 %.lp
 \item[\ib{verbose}]
 Provide more commentary during the game (default on).  Persistent.
+%.lp
+\item[\ib{whatis\verb+_+coord}]
+When using the `{\tt /}' or `{\tt ;}' commands to look around on the map with
+``{\tt autodescribe}''
+on, display coordinates after the description.
+Also works in other situations where you are asked to pick a location.
+
+%.lp ""
+The possibile settings are:
+
+%.sd
+%.si
+{\tt c} --- \verb#compass ('east' or '3s' or '2n,4w')#;
+{\tt m} --- \verb#map <x,y> (map column x=0 is not used)#;
+{\tt s} --- \verb#screen [row,column] (row is offset to match tty usage)#;
+{\tt n} --- \verb#none (no coordinates shown) [default]#.
+%.ei
+%.ed
+
+%.lp ""
++The
+{\it whatis\verb+_+coord\/}
+option is also used with
+the `{\tt /m}', `{\tt /M}', `{\tt /o}', and `{\tt /O}' sub-commands
+of `{\tt /}',
+where the `{\it none\/}' setting is overridden with `{\it map}'.
 %.lp
 \item[\ib{windowtype}]
 Select which windowing system to use, such as ``{\tt tty}'' or ``{\tt X11}''
@@ -3836,6 +3904,10 @@ A string explaining how to recover a game on this system (no default value).
 \item[\ib{SEDUCE}]
 0 or 1 to disable or enable, respectively, the SEDUCE option (see the source)
 for details on this function.
+%.lp
+\item[\ib{CHECK\verb+_+PLNAME}]
+Setting this to 1 will make the EXPLORERS, WIZARDS, and SHELLERS check
+for the player name instead of the user's login name.
 %.lp
 \item[\ib{CHECK\verb+_+SAVE\verb+_+UID}]
 0 or 1 to disable or enable, respectively, the UID checking for savefiles.

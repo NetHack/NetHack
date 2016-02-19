@@ -798,20 +798,11 @@ int spellnum;
             return TRUE;
         /* aggravation (global wakeup) when everyone is already active */
         if (spellnum == MGC_AGGRAVATION) {
-            struct monst *nxtmon;
-
-            for (nxtmon = fmon; nxtmon; nxtmon = nxtmon->nmon) {
-                if (DEADMONSTER(nxtmon))
-                    continue;
-                if ((nxtmon->mstrategy & STRAT_WAITFORU) != 0
-                    || nxtmon->msleeping || !nxtmon->mcanmove)
-                    break;
-            }
             /* if nothing needs to be awakened then this spell is useless
                but caster might not realize that [chance to pick it then
                must be very small otherwise caller's many retry attempts
                will eventually end up picking it too often] */
-            if (!nxtmon)
+            if (!has_aggravatables(mtmp))
                 return rn2(100) ? TRUE : FALSE;
         }
     } else if (adtyp == AD_CLRC) {

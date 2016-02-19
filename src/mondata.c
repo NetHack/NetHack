@@ -13,6 +13,8 @@ struct monst *mon;
 struct permonst *ptr;
 int flag;
 {
+    int new_speed, old_speed = mon->data ? mon->data->mmove : 0;
+
     mon->data = ptr;
     if (flag == -1)
         return; /* "don't care" */
@@ -21,6 +23,15 @@ int flag;
         mon->mintrinsics |= (ptr->mresists & 0x00FF);
     else
         mon->mintrinsics = (ptr->mresists & 0x00FF);
+
+    if (mon->movement) { /* same adjustment as poly'd hero undergoes */
+        new_speed = ptr->mmove;
+        /* prorate unused movement if new form is slower so that
+           it doesn't get extra moves leftover from previous form;
+           if new form is faster, leave unused movement as is */
+        if (new_speed < old_speed)
+            mon->movement = new_speed * mon->movement / old_speed;
+    }
     return;
 }
 

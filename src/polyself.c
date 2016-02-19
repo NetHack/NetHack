@@ -42,6 +42,7 @@ void
 set_uasmon()
 {
     struct permonst *mdat = &mons[u.umonnum];
+    int new_speed, old_speed = youmonst.data ? youmonst.data->mmove : 0;
 
     set_mon_data(&youmonst, mdat, 0);
 
@@ -92,16 +93,23 @@ set_uasmon()
     PROPSET(PASSES_WALLS, passes_walls(mdat));
     PROPSET(REGENERATION, regenerates(mdat));
     PROPSET(REFLECTING, (mdat == &mons[PM_SILVER_DRAGON]));
+#undef PROPSET
 
     float_vs_flight(); /* maybe toggle (BFlying & I_SPECIAL) */
+    polysense();
 
-#undef PROPSET
+    if (youmonst.movement) {
+        new_speed = mdat->mmove;
+        /* prorate unused movement if new form is slower so that
+           it doesn't get extra moves leftover from previous form;
+           if new form is faster, leave unused movement as is */
+        if (new_speed < old_speed)
+            youmonst.movement = new_speed * youmonst.movement / old_speed;
+    }
 
 #ifdef STATUS_VIA_WINDOWPORT
     status_initialize(REASSESS_ONLY);
 #endif
-
-    polysense();
 }
 
 /* Levitation overrides Flying; set or clear BFlying|I_SPECIAL */

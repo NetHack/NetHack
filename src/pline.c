@@ -1,4 +1,4 @@
-/* NetHack 3.6	pline.c	$NHDT-Date: 1432512770 2015/05/25 00:12:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.42 $ */
+/* NetHack 3.6	pline.c	$NHDT-Date: 1455672995 2016/02/17 01:36:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.48 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -406,17 +406,8 @@ register struct monst *mtmp;
         Strcat(info, ", eating");
     /* a stethoscope exposes mimic before getting here so this
        won't be relevant for it, but wand of probing doesn't */
-    if (mtmp->m_ap_type)
-        Sprintf(eos(info), ", mimicking %s",
-                (mtmp->m_ap_type == M_AP_FURNITURE)
-                    ? an(defsyms[mtmp->mappearance].explanation)
-                    : (mtmp->m_ap_type == M_AP_OBJECT)
-                          ? ((mtmp->mappearance == GOLD_PIECE)
-                                 ? "gold"
-                                 : an(simple_typename(mtmp->mappearance)))
-                          : (mtmp->m_ap_type == M_AP_MONSTER)
-                                ? an(mons[mtmp->mappearance].mname)
-                                : something); /* impossible... */
+    if (mtmp->mundetected || mtmp->m_ap_type)
+        mhidden_description(mtmp, TRUE, eos(info));
     if (mtmp->mcan)
         Strcat(info, ", cancelled");
     if (mtmp->mconf)
@@ -445,8 +436,6 @@ register struct monst *mtmp;
         Strcat(info, mtmp->mspeed == MFAST ? ", fast" : mtmp->mspeed == MSLOW
                                                             ? ", slow"
                                                             : ", ???? speed");
-    if (mtmp->mundetected)
-        Strcat(info, ", concealed");
     if (mtmp->minvis)
         Strcat(info, ", invisible");
     if (mtmp == u.ustuck)

@@ -1,4 +1,4 @@
-/* NetHack 3.6	potion.c	$NHDT-Date: 1452660195 2016/01/13 04:43:15 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.126 $ */
+/* NetHack 3.6	potion.c	$NHDT-Date: 1455407631 2016/02/13 23:53:51 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.129 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1744,13 +1744,13 @@ register struct obj *o1, *o2;
 int
 dodip()
 {
-    static const char Dip_[] = "Dip ", into_the_something[] = " into the %s?";
+    static const char Dip_[] = "Dip ";
     register struct obj *potion, *obj;
     struct obj *singlepotion;
     uchar here;
     char allowall[2];
     short mixture;
-    char qbuf[QBUFSZ], qtoo[QBUFSZ];
+    char qbuf[QBUFSZ], obuf[QBUFSZ];
     const char *shortestname; /* last resort obj name for prompt */
 
     allowall[0] = ALL_CLASSES;
@@ -1761,15 +1761,25 @@ dodip()
         return 0;
 
     shortestname = is_plural(obj) ? "them" : "it";
+    /*
+     * Bypass safe_qbuf() since it doesn't handle varying suffix without
+     * an awful lot of support work.  Format the object once, even though
+     * the fountain and pool prompts offer a lot more room for it.
+     * 3.6.0 used thesimpleoname() unconditionally, which posed no risk
+     * of buffer overflow but drew bug reports because it omits user-
+     * supplied type name.
+     * getobj: "What do you want to dip <the object> into? [xyz or ?*] "
+     */
+    Strcpy(obuf, short_oname(obj, doname, thesimpleoname,
+                             /* 128 - (24 + 54 + 1) leaves 49 for <object> */
+                             QBUFSZ - sizeof "What do you want to dip \
+ into? [abdeghjkmnpqstvwyzBCEFHIKLNOQRTUWXZ#-# or ?*] "));
+
     here = levl[u.ux][u.uy].typ;
     /* Is there a fountain to dip into here? */
     if (IS_FOUNTAIN(here)) {
-        Sprintf(qtoo, into_the_something, "fountain");
-        if (flags.verbose)
-            (void) safe_qbuf(qbuf, Dip_, qtoo, obj,
-                             doname, thesimpleoname, shortestname);
-        else
-            Sprintf(qbuf, "%s%s%s", Dip_, shortestname, qtoo);
+        Sprintf(qbuf, "%s%s into the fountain?", Dip_,
+                flags.verbose ? obuf : shortestname);
         /* "Dip <the object> into the fountain?" */
         if (yn(qbuf) == 'y') {
             dipfountain(obj);
@@ -1778,12 +1788,8 @@ dodip()
     } else if (is_pool(u.ux, u.uy)) {
         const char *pooltype = waterbody_name(u.ux, u.uy);
 
-        Sprintf(qtoo, into_the_something, pooltype);
-        if (flags.verbose)
-            (void) safe_qbuf(qbuf, Dip_, qtoo, obj,
-                             doname, thesimpleoname, shortestname);
-        else
-            Sprintf(qbuf, "%s%s%s", Dip_, shortestname, qtoo);
+        Sprintf(qbuf, "%s%s into the %s?", Dip_,
+                flags.verbose ? obuf : shortestname, pooltype);
         /* "Dip <the object> into the {pool, moat, &c}?" */
         if (yn(qbuf) == 'y') {
             if (Levitation) {
@@ -1801,20 +1807,9 @@ dodip()
         }
     }
 
-    /* "What do you want to dip <the object> into?" */
-    if (flags.verbose) {
-        /* "What do you want to " is getobj()'s prefix, "dip " is ours */
-        Strcpy(qbuf, safe_qbuf(qtoo, "What do you want to dip ", " into?",
-                               obj, doname, thesimpleoname, shortestname)
-                     /* skip getobj()'s prefix when assigning to qbuf */
-                     + sizeof "What do you want to " - sizeof "");
-        /* we needed the '?' in " into?" so that safe_qbuf() was working
-           with the right overall length, but now we need to take the '?'
-           off because getobj() is going to append one */
-        *(eos(qbuf) - 1) = '\0';
-    } else
-        Sprintf(qbuf, "dip %s into", shortestname);
-    potion = getobj(beverages, qbuf); /* qbuf[] == "dip <obj> into" */
+    /* "What do you want to dip <the object> into? [xyz or ?*] " */
+    Sprintf(qbuf, "dip %s into", flags.verbose ? obuf : shortestname);
+    potion = getobj(beverages, qbuf);
     if (!potion)
         return 0;
     if (potion == obj && potion->quan == 1L) {

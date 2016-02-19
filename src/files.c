@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1451697801 2016/01/02 01:23:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.199 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1455835581 2016/02/18 22:46:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.204 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2100,7 +2100,7 @@ int src;
 #ifdef SYSCF
     int n;
 #endif
-    char *bufp, *altp, buf[BUFSZ];
+    char *bufp, *altp, buf[4 * BUFSZ];
     uchar translate[MAXPCHARS];
     int len;
 
@@ -2264,6 +2264,10 @@ int src;
                && match_varname(buf, "CHECK_SAVE_UID", 14)) {
         n = atoi(bufp);
         sysopt.check_save_uid = n;
+    } else if (src == SET_IN_SYS
+               && match_varname(buf, "CHECK_PLNAME", 12)) {
+        n = atoi(bufp);
+        sysopt.check_plname = n;
     } else if (match_varname(buf, "SEDUCE", 6)) {
         n = !!atoi(bufp); /* XXX this could be tighter */
         /* allow anyone to turn it off, but only sysconf to turn it on*/
@@ -3464,7 +3468,7 @@ boolean wildcards;
 #define TITLESCOPE 2
 #define PASSAGESCOPE 3
 
-#define MAXPASSAGES SIZE(context.novel.pasg) /* 30 */
+#define MAXPASSAGES SIZE(context.novel.pasg) /* 20 */
 
 static int FDECL(choose_passage, (int, unsigned));
 
@@ -3472,24 +3476,35 @@ static int FDECL(choose_passage, (int, unsigned));
    been chosen, reset the tracking to make all passages available again */
 static int
 choose_passage(passagecnt, oid)
-int passagecnt; /* total of available passages, 1..MAXPASSAGES */
+int passagecnt; /* total of available passages */
 unsigned oid; /* book.o_id, used to determine whether re-reading same book */
 {
     int idx, res;
 
     if (passagecnt < 1)
         return 0;
-    if (passagecnt > MAXPASSAGES)
-        passagecnt = MAXPASSAGES;
 
     /* if a different book or we've used up all the passages already,
        reset in order to have all 'passagecnt' passages available */
     if (oid != context.novel.id || context.novel.count == 0) {
+        int i, range = passagecnt, limit = MAXPASSAGES;
+
         context.novel.id = oid;
-        context.novel.count = passagecnt;
-        for (idx = 0; idx < MAXPASSAGES; idx++)
-            context.novel.pasg[idx] = (xchar) ((idx < passagecnt) ? idx + 1
-                                                                  : 0);
+        if (range <= limit) {
+            /* collect all of the N indices */
+            context.novel.count = passagecnt;
+            for (idx = 0; idx < MAXPASSAGES; idx++)
+                context.novel.pasg[idx] = (xchar) ((idx < passagecnt)
+                                                   ? idx + 1 : 0);
+        } else {
+            /* collect MAXPASSAGES of the N indices */
+            context.novel.count = MAXPASSAGES;
+            for (idx = i = 0; i < passagecnt; ++i, --range)
+                if (range > 0 && rn2(range) < limit) {
+                    context.novel.pasg[idx++] = (xchar) (i + 1);
+                    --limit;
+                }
+        }
     }
 
     idx = rn2(context.novel.count);
@@ -3518,6 +3533,9 @@ unsigned oid; /* book identifier */
     winid tribwin = WIN_ERR;
     boolean grasped = FALSE;
     boolean foundpassage = FALSE;
+
+    if (nowin_buf)
+        *nowin_buf = '\0';
 
     /* check for mandatories */
     if (!tribsection || !tribtitle) {
@@ -3562,12 +3580,12 @@ unsigned oid; /* book identifier */
         (void) strip_newline(line);
         switch (line[0]) {
         case '%':
-            if (!strncmpi(&line[1], "section ", sizeof("section ") - 1)) {
+            if (!strncmpi(&line[1], "section ", sizeof "section " - 1)) {
                 char *st = &line[9]; /* 9 from "%section " */
 
                 scope = SECTIONSCOPE;
                 matchedsection = !strcmpi(st, tribsection) ? TRUE : FALSE;
-            } else if (!strncmpi(&line[1], "title ", sizeof("title ") - 1)) {
+            } else if (!strncmpi(&line[1], "title ", sizeof "title " - 1)) {
                 char *st = &line[7]; /* 7 from "%title " */
                 char *p1, *p2;
 
@@ -3577,8 +3595,6 @@ unsigned oid; /* book identifier */
                     if ((p2 = index(p1, ')')) != 0) {
                         *p2 = '\0';
                         passagecnt = atoi(p1);
-                        if (passagecnt > MAXPASSAGES)
-                            passagecnt = MAXPASSAGES;
                         scope = TITLESCOPE;
                         if (matchedsection && !strcmpi(st, tribtitle)) {
                             matchedtitle = TRUE;
@@ -3592,27 +3608,25 @@ unsigned oid; /* book identifier */
                     }
                 }
             } else if (!strncmpi(&line[1], "passage ",
-                                 sizeof("passage ") - 1)) {
+                                 sizeof "passage " - 1)) {
                 int passagenum = 0;
                 char *st = &line[9]; /* 9 from "%passage " */
 
-                while (*st == ' ' || *st == '\t')
-                    st++;
-                if (*st && digit(*st) && (strlen(st) < 3))
-                    passagenum = atoi(st);
-                if (passagenum && (passagenum <= passagecnt)) {
+                mungspaces(st);
+                passagenum = atoi(st);
+                if (passagenum > 0 && passagenum <= passagecnt) {
                     scope = PASSAGESCOPE;
-                    if (matchedtitle && (passagenum == targetpassage)) {
-                        if (!nowin_buf)
+                    if (matchedtitle && passagenum == targetpassage) {
+                        foundpassage = TRUE;
+                        if (!nowin_buf) {
                             tribwin = create_nhwindow(NHW_MENU);
-                        else
-                            foundpassage = TRUE;
+                            if (tribwin == WIN_ERR)
+                                goto cleanup;
+                        }
                     }
                 }
-            } else if (!strncmpi(&line[1], "e ", sizeof("e ") - 1)) {
-                if (matchedtitle && scope == PASSAGESCOPE
-                    && ((!nowin_buf && tribwin != WIN_ERR)
-                        || (nowin_buf && foundpassage)))
+            } else if (!strncmpi(&line[1], "e ", sizeof "e " - 1)) {
+                if (foundpassage)
                     goto cleanup;
                 if (scope == TITLESCOPE)
                     matchedtitle = FALSE;
@@ -3629,13 +3643,16 @@ unsigned oid; /* book identifier */
             /* comment only, next! */
             break;
         default:
-            if (matchedtitle && scope == PASSAGESCOPE) {
-                if (!nowin_buf && tribwin != WIN_ERR) {
+            if (foundpassage) {
+                if (!nowin_buf) {
+                    /* outputting multi-line passage to text window */
                     putstr(tribwin, 0, line);
-                    Strcpy(lastline, line);
-                } else if (nowin_buf) {
-                    if ((int) strlen(line) < bufsz - 1)
-                        Strcpy(nowin_buf, line);
+                    if (*line)
+                        Strcpy(lastline, line);
+                } else {
+                    /* fetching one-line passage into buffer */
+                    copynchars(nowin_buf, line, bufsz - 1);
+                    goto cleanup; /* don't wait for "%e passage" */
                 }
             }
         }
@@ -3643,26 +3660,30 @@ unsigned oid; /* book identifier */
 
 cleanup:
     (void) dlb_fclose(fp);
-    if (!nowin_buf && tribwin != WIN_ERR) {
-        if (matchedtitle && scope == PASSAGESCOPE) {
-            display_nhwindow(tribwin, FALSE);
-            /* put the final attribution line into message history,
-               analogous to the summary line from long quest messages */
-            if (index(lastline, '['))
-                mungspaces(lastline); /* to remove leading spaces */
-            else /* construct one if necessary */
-                Sprintf(lastline, "[%s, by Terry Pratchett]", tribtitle);
-            putmsghistory(lastline, FALSE);
-        }
-        destroy_nhwindow(tribwin);
-        tribwin = WIN_ERR;
-        grasped = TRUE;
+    if (nowin_buf) {
+        /* one-line buffer */
+        grasped = *nowin_buf ? TRUE : FALSE;
     } else {
-        if (!nowin_buf)
-            pline("It seems to be %s of \"%s\"!", badtranslation, tribtitle);
-        else
-            if (foundpassage)
+        if (tribwin != WIN_ERR) { /* implies 'foundpassage' */
+            /* multi-line window, normal case;
+               if lastline is empty, there were no non-empty lines between
+               "%passage n" and "%e passage" so we leave 'grasped' False */
+            if (*lastline) {
+                display_nhwindow(tribwin, FALSE);
+                /* put the final attribution line into message history,
+                   analogous to the summary line from long quest messages */
+                if (index(lastline, '['))
+                    mungspaces(lastline); /* to remove leading spaces */
+                else /* construct one if necessary */
+                    Sprintf(lastline, "[%s, by Terry Pratchett]", tribtitle);
+                putmsghistory(lastline, FALSE);
                 grasped = TRUE;
+            }
+            destroy_nhwindow(tribwin);
+        }
+        if (!grasped)
+            /* multi-line window, problem */
+            pline("It seems to be %s of \"%s\"!", badtranslation, tribtitle);
     }
     return grasped;
 }

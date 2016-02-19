@@ -28,7 +28,7 @@ S       save    save the game (to be continued later) and exit
 !       sh      escape to some SHELL (if allowed)
 ^Z      suspend suspend the game (independent of your current suspend char)
 O       options set options
-/       whatis  tell what a map symbol represents
+/       what-is tell what a map symbol represents
 \       known   display list of what's been discovered
 v       version display version number
 V       history display game history

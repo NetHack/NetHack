@@ -11,8 +11,8 @@
 #define yyerrok (yyerrflag=0)
 #define YYRECOVERING (yyerrflag!=0)
 #define YYPREFIX "yy"
-/* NetHack 3.6  lev_comp.y	$NHDT-Date: 1449233826 2015/12/04 12:57:06 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.19 $ */
-/*	Copyright (c) 1989 by Jean-Christophe Collet */
+/* NetHack 3.6  lev_comp.y	$NHDT-Date: 1455747019 2016/02/17 22:10:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.22 $ */
+/*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -30,27 +30,27 @@
  * and AIX will still see the directive.
  */
 #ifdef _AIX
- #pragma alloca		/* keep leading space! */
+ #pragma alloca         /* keep leading space! */
 #endif
 
 #define SPEC_LEV    /* for USE_OLDARGS (sp_lev.h) */
 #include "hack.h"
 #include "sp_lev.h"
 
-#define ERR		(-1)
+#define ERR             (-1)
 /* many types of things are put in chars for transference to NetHack.
  * since some systems will use signed chars, limit everybody to the
  * same number for portability.
  */
-#define MAX_OF_TYPE	128
+#define MAX_OF_TYPE     128
 
-#define MAX_NESTED_IFS	20
+#define MAX_NESTED_IFS   20
 #define MAX_SWITCH_CASES 20
 
-#define New(type)		\
-	(type *) memset((genericptr_t)alloc(sizeof(type)), 0, sizeof(type))
-#define NewTab(type, size)	(type **) alloc(sizeof(type *) * size)
-#define Free(ptr)		free((genericptr_t)ptr)
+#define New(type) \
+        (type *) memset((genericptr_t) alloc(sizeof (type)), 0, sizeof (type))
+#define NewTab(type, size)      (type **) alloc(sizeof (type *) * size)
+#define Free(ptr)               free((genericptr_t) ptr)
 
 extern void VDECL(lc_error, (const char *, ...));
 extern void VDECL(lc_warning, (const char *, ...));
@@ -70,22 +70,24 @@ extern char FDECL(what_map_char, (CHAR_P));
 extern void FDECL(scan_map, (char *, sp_lev *));
 extern void FDECL(add_opcode, (sp_lev *, int, genericptr_t));
 extern genericptr_t FDECL(get_last_opcode_data1, (sp_lev *, int));
-extern genericptr_t FDECL(get_last_opcode_data2, (sp_lev *, int,int));
+extern genericptr_t FDECL(get_last_opcode_data2, (sp_lev *, int, int));
 extern boolean FDECL(check_subrooms, (sp_lev *));
 extern boolean FDECL(write_level_file, (char *,sp_lev *));
 extern struct opvar *FDECL(set_opvar_int, (struct opvar *, long));
 extern void VDECL(add_opvars, (sp_lev *, const char *, ...));
 extern void FDECL(start_level_def, (sp_lev * *, char *));
 
-extern struct lc_funcdefs *FDECL(funcdef_new,(long,char *));
-extern void FDECL(funcdef_free_all,(struct lc_funcdefs *));
-extern struct lc_funcdefs *FDECL(funcdef_defined,(struct lc_funcdefs *,char *, int));
+extern struct lc_funcdefs *FDECL(funcdef_new, (long,char *));
+extern void FDECL(funcdef_free_all, (struct lc_funcdefs *));
+extern struct lc_funcdefs *FDECL(funcdef_defined, (struct lc_funcdefs *,
+                                                   char *, int));
 extern char *FDECL(funcdef_paramtypes, (struct lc_funcdefs *));
 extern char *FDECL(decode_parm_str, (char *));
 
-extern struct lc_vardefs *FDECL(vardef_new,(long,char *));
-extern void FDECL(vardef_free_all,(struct lc_vardefs *));
-extern struct lc_vardefs *FDECL(vardef_defined,(struct lc_vardefs *,char *, int));
+extern struct lc_vardefs *FDECL(vardef_new, (long,char *));
+extern void FDECL(vardef_free_all, (struct lc_vardefs *));
+extern struct lc_vardefs *FDECL(vardef_defined, (struct lc_vardefs *,
+                                                 char *, int));
 
 extern void NDECL(break_stmt_start);
 extern void FDECL(break_stmt_end, (sp_lev *));
@@ -95,13 +97,14 @@ extern void FDECL(splev_add_from, (sp_lev *, sp_lev *));
 
 extern void FDECL(check_vardef_type, (struct lc_vardefs *, char *, long));
 extern void FDECL(vardef_used, (struct lc_vardefs *, char *));
-extern struct lc_vardefs *FDECL(add_vardef_type, (struct lc_vardefs *, char *, long));
+extern struct lc_vardefs *FDECL(add_vardef_type, (struct lc_vardefs *,
+                                                  char *, long));
 
 extern int FDECL(reverse_jmp_opcode, (int));
 
 struct coord {
-	long x;
-	long y;
+    long x;
+    long y;
 };
 
 struct forloopdef {
@@ -3222,7 +3225,7 @@ case 148:
 		      }
 
 		      /* first, define a variable for the for-loop end value */
-		      snprintf(buf, 255, "%s end", yyvsp[-4].map);
+		      Sprintf(buf, "%s end", yyvsp[-4].map);
 		      /* the value of which is already in stack (the 2nd math_expr) */
 		      add_opvars(splev, "iso", VA_PASS3(0, buf, SPO_VAR_INIT));
 
@@ -3232,7 +3235,7 @@ case 148:
 		      add_opvars(splev, "iso", VA_PASS3(0, yyvsp[-4].map, SPO_VAR_INIT));
 
 		      /* calculate value for the loop "step" variable */
-		      snprintf(buf2, 255, "%s step", yyvsp[-4].map);
+		      Sprintf(buf2, "%s step", yyvsp[-4].map);
 		      /* end - start */
 		      add_opvars(splev, "vvo",
 				 VA_PASS3(buf, yyvsp[-4].map, SPO_MATH_SUB));
@@ -3258,9 +3261,10 @@ break;
 case 150:
 {
 		      char buf[256], buf2[256];
+
 		      n_forloops--;
-		      snprintf(buf, 255, "%s step", forloop_list[n_forloops].varname);
-		      snprintf(buf2, 255, "%s end", forloop_list[n_forloops].varname);
+		      Sprintf(buf, "%s step", forloop_list[n_forloops].varname);
+		      Sprintf(buf2, "%s end", forloop_list[n_forloops].varname);
 		      /* compare for-loop var to end value */
 		      add_opvars(splev, "vvo",
 				 VA_PASS3(forloop_list[n_forloops].varname,
@@ -3993,8 +3997,8 @@ case 253:
 		      add_opvars(splev, "iiiii iiiii iiso",
 				 VA_PASS14(yyvsp[-4].lregn.x1, yyvsp[-4].lregn.y1, yyvsp[-4].lregn.x2, yyvsp[-4].lregn.y2, yyvsp[-4].lregn.area,
 					   yyvsp[-2].lregn.x1, yyvsp[-2].lregn.y1, yyvsp[-2].lregn.x2, yyvsp[-2].lregn.y2, yyvsp[-2].lregn.area,
-				      (long)((yyvsp[0].i) ? LR_UPSTAIR : LR_DOWNSTAIR),
-					   0, (char *)0, SPO_LEVREGION));
+				     (long) ((yyvsp[0].i) ? LR_UPSTAIR : LR_DOWNSTAIR),
+					   0, (char *) 0, SPO_LEVREGION));
 		  }
 break;
 case 254:
@@ -4025,8 +4029,8 @@ case 256:
 		      add_opvars(splev, "iiiii iiiii iiso",
 				 VA_PASS14(yyvsp[-2].lregn.x1, yyvsp[-2].lregn.y1, yyvsp[-2].lregn.x2, yyvsp[-2].lregn.y2, yyvsp[-2].lregn.area,
 					   yyvsp[0].lregn.x1, yyvsp[0].lregn.y1, yyvsp[0].lregn.x2, yyvsp[0].lregn.y2, yyvsp[0].lregn.area,
-					   (long)LR_BRANCH, 0,
-					   (char *)0, SPO_LEVREGION));
+					   (long) LR_BRANCH, 0,
+					   (char *) 0, SPO_LEVREGION));
 		  }
 break;
 case 257:
@@ -4421,7 +4425,8 @@ case 329:
                           lc_error("Unknown monster \"%s\"!", yyvsp[0].map);
                           yyval.i = -1;
                       } else
-                          yyval.i = SP_MONST_PACK(m, def_monsyms[(int)mons[m].mlet].sym);
+                          yyval.i = SP_MONST_PACK(m,
+                                         def_monsyms[(int) mons[m].mlet].sym);
                       Free(yyvsp[0].map);
                   }
 break;
@@ -4604,16 +4609,23 @@ case 355:
 		      } else if (!tmp) {
 			  lc_error("Could not alloc function params.");
 		      } else {
-			  long vt;
+			  long vt = SPOVAR_NULL;
+
 			  tmp->name = strdup(yyvsp[-2].map);
 			  tmp->parmtype = (char) yyvsp[0].i;
 			  tmp->next = curr_function->params;
 			  curr_function->params = tmp;
 			  curr_function->n_params++;
 			  switch (tmp->parmtype) {
-			  case 'i': vt = SPOVAR_INT; break;
-			  case 's': vt = SPOVAR_STRING; break;
-			  default: lc_error("Unknown func param conversion."); break;
+			  case 'i':
+                              vt = SPOVAR_INT;
+                              break;
+			  case 's':
+                              vt = SPOVAR_STRING;
+                              break;
+			  default:
+                              lc_error("Unknown func param conversion.");
+                              break;
 			  }
 			  variable_definitions = add_vardef_type(
 							 variable_definitions,
@@ -4643,7 +4655,7 @@ break;
 case 363:
 {
 			      long len = strlen( yyvsp[-2].map );
-			      char *tmp = (char *)alloc(len + 2);
+			      char *tmp = (char *) alloc(len + 2);
 			      sprintf(tmp, "%c%s", (char) yyvsp[0].i, yyvsp[-2].map );
 			      Free( yyvsp[-2].map );
 			      yyval.map = tmp;
@@ -4810,13 +4822,21 @@ break;
 case 404:
 {
 			if (yyvsp[-7].i <= 0 || yyvsp[-7].i >= COLNO)
-			    lc_error("Region (%li,%li,%li,%li) out of level range (x1)!", yyvsp[-7].i, yyvsp[-5].i, yyvsp[-3].i, yyvsp[-1].i);
+			    lc_error(
+                          "Region (%ld,%ld,%ld,%ld) out of level range (x1)!",
+                                     yyvsp[-7].i, yyvsp[-5].i, yyvsp[-3].i, yyvsp[-1].i);
 			else if (yyvsp[-5].i < 0 || yyvsp[-5].i >= ROWNO)
-			    lc_error("Region (%li,%li,%li,%li) out of level range (y1)!", yyvsp[-7].i, yyvsp[-5].i, yyvsp[-3].i, yyvsp[-1].i);
+			    lc_error(
+                          "Region (%ld,%ld,%ld,%ld) out of level range (y1)!",
+                                     yyvsp[-7].i, yyvsp[-5].i, yyvsp[-3].i, yyvsp[-1].i);
 			else if (yyvsp[-3].i <= 0 || yyvsp[-3].i >= COLNO)
-			    lc_error("Region (%li,%li,%li,%li) out of level range (x2)!", yyvsp[-7].i, yyvsp[-5].i, yyvsp[-3].i, yyvsp[-1].i);
+			    lc_error(
+                          "Region (%ld,%ld,%ld,%ld) out of level range (x2)!",
+                                     yyvsp[-7].i, yyvsp[-5].i, yyvsp[-3].i, yyvsp[-1].i);
 			else if (yyvsp[-1].i < 0 || yyvsp[-1].i >= ROWNO)
-			    lc_error("Region (%li,%li,%li,%li) out of level range (y2)!", yyvsp[-7].i, yyvsp[-5].i, yyvsp[-3].i, yyvsp[-1].i);
+			    lc_error(
+                          "Region (%ld,%ld,%ld,%ld) out of level range (y2)!",
+                                     yyvsp[-7].i, yyvsp[-5].i, yyvsp[-3].i, yyvsp[-1].i);
 			yyval.lregn.x1 = yyvsp[-7].i;
 			yyval.lregn.y1 = yyvsp[-5].i;
 			yyval.lregn.x2 = yyvsp[-3].i;
@@ -4828,14 +4848,22 @@ case 405:
 {
 /* This series of if statements is a hack for MSC 5.1.  It seems that its
    tiny little brain cannot compile if these are all one big if statement. */
-			if (yyvsp[-7].i < 0 || yyvsp[-7].i > (int)max_x_map)
-			    lc_error("Region (%li,%li,%li,%li) out of map range (x1)!", yyvsp[-7].i, yyvsp[-5].i, yyvsp[-3].i, yyvsp[-1].i);
-			else if (yyvsp[-5].i < 0 || yyvsp[-5].i > (int)max_y_map)
-			    lc_error("Region (%li,%li,%li,%li) out of map range (y1)!", yyvsp[-7].i, yyvsp[-5].i, yyvsp[-3].i, yyvsp[-1].i);
-			else if (yyvsp[-3].i < 0 || yyvsp[-3].i > (int)max_x_map)
-			    lc_error("Region (%li,%li,%li,%li) out of map range (x2)!", yyvsp[-7].i, yyvsp[-5].i, yyvsp[-3].i, yyvsp[-1].i);
-			else if (yyvsp[-1].i < 0 || yyvsp[-1].i > (int)max_y_map)
-			    lc_error("Region (%li,%li,%li,%li) out of map range (y2)!", yyvsp[-7].i, yyvsp[-5].i, yyvsp[-3].i, yyvsp[-1].i);
+			if (yyvsp[-7].i < 0 || yyvsp[-7].i > (int) max_x_map)
+			    lc_error(
+                            "Region (%ld,%ld,%ld,%ld) out of map range (x1)!",
+                                     yyvsp[-7].i, yyvsp[-5].i, yyvsp[-3].i, yyvsp[-1].i);
+			else if (yyvsp[-5].i < 0 || yyvsp[-5].i > (int) max_y_map)
+			    lc_error(
+                            "Region (%ld,%ld,%ld,%ld) out of map range (y1)!",
+                                     yyvsp[-7].i, yyvsp[-5].i, yyvsp[-3].i, yyvsp[-1].i);
+			else if (yyvsp[-3].i < 0 || yyvsp[-3].i > (int) max_x_map)
+			    lc_error(
+                            "Region (%ld,%ld,%ld,%ld) out of map range (x2)!",
+                                     yyvsp[-7].i, yyvsp[-5].i, yyvsp[-3].i, yyvsp[-1].i);
+			else if (yyvsp[-1].i < 0 || yyvsp[-1].i > (int) max_y_map)
+			    lc_error(
+                            "Region (%ld,%ld,%ld,%ld) out of map range (y2)!",
+                                     yyvsp[-7].i, yyvsp[-5].i, yyvsp[-3].i, yyvsp[-1].i);
 			yyval.lregn.area = 0;
 			yyval.lregn.x1 = yyvsp[-7].i;
 			yyval.lregn.y1 = yyvsp[-5].i;

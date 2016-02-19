@@ -89,6 +89,8 @@ mswin_init_map_window()
     /* Set window caption */
     SetWindowText(ret, "Map");
 
+    mswin_apply_window_style(ret);
+
     return ret;
 }
 

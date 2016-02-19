@@ -1,4 +1,4 @@
-/* NetHack 3.6	sounds.c	$NHDT-Date: 1450461632 2015/12/18 18:00:32 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.77 $ */
+/* NetHack 3.6	sounds.c	$NHDT-Date: 1452992329 2016/01/17 00:58:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.78 $ */
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -494,7 +494,7 @@ register struct monst *mtmp;
     char verbuf[BUFSZ];
     register const char *pline_msg = 0, /* Monnam(mtmp) will be prepended */
         *verbl_msg = 0,                 /* verbalize() */
-            *verbl_msg_mcan = 0;        /* verbalize() if cancelled */
+        *verbl_msg_mcan = 0;            /* verbalize() if cancelled */
     struct permonst *ptr = mtmp->data;
     int msound = ptr->msound;
 
@@ -824,6 +824,7 @@ register struct monst *mtmp;
         break;
     case MS_SEDUCE: {
         int swval;
+
         if (SYSOPT_SEDUCE) {
             if (ptr->mlet != S_NYMPH
                 && could_seduce(mtmp, &youmonst, (struct attack *) 0) == 1) {
@@ -907,50 +908,47 @@ register struct monst *mtmp;
                                     : soldier_foe_msg[rn2(3)];
         break;
     }
-    case MS_RIDER:
+    case MS_RIDER: {
+        const char *tribtitle;
+        struct obj *book = 0;
+        boolean ms_Death = (ptr == &mons[PM_DEATH]);
+
         /* 3.6 tribute */
-        if (ptr == &mons[PM_DEATH]
-            && !context.tribute.Deathnotice && u_have_novel()) {
-            struct obj *book = u_have_novel();
-            const char *tribtitle = (char *)0;
-
-            if (book) {
-                int novelidx = book->novelidx;
-
-                tribtitle = noveltitle(&novelidx);
-            }
-            if (tribtitle) {
+        if (ms_Death && !context.tribute.Deathnotice
+            && (book = u_have_novel()) != 0) {
+            if ((tribtitle = noveltitle(&book->novelidx)) != 0) {
                 Sprintf(verbuf, "Ah, so you have a copy of /%s/.", tribtitle);
                 /* no Death featured in these two, so exclude them */
-                if (!(strcmpi(tribtitle, "Snuff") == 0
-                      || strcmpi(tribtitle, "The Wee Free Men") == 0))
-                    Strcat(verbuf, " I may have been misquoted there.");
+                if (strcmpi(tribtitle, "Snuff")
+                    && strcmpi(tribtitle, "The Wee Free Men"))
+                    Strcat(verbuf, "  I may have been misquoted there.");
                 verbl_msg = verbuf;
-                context.tribute.Deathnotice = 1;
             }
-        } else if (ptr == &mons[PM_DEATH]
-                   && !rn2(2) && Death_quote(verbuf, BUFSZ)) {
-                verbl_msg = verbuf;
-        }
+            context.tribute.Deathnotice = 1;
+        } else if (ms_Death && rn2(3) && Death_quote(verbuf, sizeof verbuf)) {
+            verbl_msg = verbuf;
         /* end of tribute addition */
-        else if (ptr == &mons[PM_DEATH] && !rn2(10))
+
+        } else if (ms_Death && !rn2(10)) {
             pline_msg = "is busy reading a copy of Sandman #8.";
-        else
+        } else
             verbl_msg = "Who do you think you are, War?";
         break;
-    }
+    } /* case MS_RIDER */
+    } /* switch */
 
-    if (pline_msg)
+    if (pline_msg) {
         pline("%s %s", Monnam(mtmp), pline_msg);
-    else if (mtmp->mcan && verbl_msg_mcan)
+    } else if (mtmp->mcan && verbl_msg_mcan) {
         verbalize1(verbl_msg_mcan);
-    else if (verbl_msg) {
+    } else if (verbl_msg) {
+        /* more 3.6 tribute */
         if (ptr == &mons[PM_DEATH]) {
             /* Death talks in CAPITAL LETTERS
                and without quotation marks */
             char tmpbuf[BUFSZ];
-            Sprintf(tmpbuf, "%s", verbl_msg);
-            pline1(ucase(tmpbuf));
+
+            pline1(ucase(strcpy(tmpbuf, verbl_msg)));
         } else {
             verbalize1(verbl_msg);
         }

@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1452650438 2016/01/13 02:00:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.188 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1454061993 2016/01/29 10:06:33 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.193 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -9,7 +9,6 @@
 
 STATIC_DCL int FDECL(CFDECLSPEC sortloot_cmp, (struct obj *, struct obj *));
 STATIC_DCL void NDECL(reorder_invent);
-STATIC_DCL boolean FDECL(mergable, (struct obj *, struct obj *));
 STATIC_DCL void FDECL(noarmor, (BOOLEAN_P));
 STATIC_DCL void FDECL(invdisp_nothing, (const char *, const char *));
 STATIC_DCL boolean FDECL(worn_wield_only, (struct obj *));
@@ -271,9 +270,11 @@ struct obj **potmp, **pobj;
          *
          * Don't do the age manipulation if lit.  We would need
          * to stop the burn on both items, then merge the age,
-         * then restart the burn.
+         * then restart the burn.  Glob ages are averaged in the
+         * absorb routine, which uses weight rather than quantity
+         * to adjust for proportion (glob quantity is always 1).
          */
-        if (!obj->lamplit)
+        if (!obj->lamplit && !obj->globby)
             otmp->age = ((otmp->age * otmp->quan) + (obj->age * obj->quan))
                         / (otmp->quan + obj->quan);
 
@@ -332,10 +333,9 @@ struct obj **potmp, **pobj;
 #endif /*0*/
         }
 
-        /* handle puddings a bit differently; absorption will
-         * free the other object automatically so we can just
-         * return out from here.  */
-        if (Is_pudding(obj)) {
+        /* handle puddings a bit differently; absorption will free the
+           other object automatically so we can just return out from here */
+        if (obj->globby) {
             pudding_merge_message(otmp, obj);
             obj_absorb(potmp, pobj);
             return 1;
@@ -1131,9 +1131,10 @@ register const char *let, *word;
                  && (!Is_astralevel(&u.uz) ^ (otmp->oclass != AMULET_CLASS)))
              /* suppress container being stashed into */
              || (!strcmp(word, "stash") && !ck_bag(otmp))
-             /* worn armor or accessory covered by cursed worn armor */
+             /* worn armor (shirt, suit) covered by worn armor (suit, cloak)
+                or accessory (ring) covered by cursed worn armor (gloves) */
              || (taking_off(word)
-                 && inaccessible_equipment(otmp, (const char *) 0, TRUE))
+                 && inaccessible_equipment(otmp, (const char *) 0, FALSE))
              || (!strcmp(word, "write on")
                  && (!(otyp == SCR_BLANK_PAPER || otyp == SPE_BLANK_PAPER)
                      || !otmp->dknown || !objects[otyp].oc_name_known))
@@ -2686,6 +2687,7 @@ boolean picked_some;
     skip_objects = (flags.pile_limit > 0 && obj_cnt >= flags.pile_limit);
     if (u.uswallow && u.ustuck) {
         struct monst *mtmp = u.ustuck;
+
         Sprintf(fbuf, "Contents of %s %s", s_suffix(mon_nam(mtmp)),
                 mbodypart(mtmp, STOMACH));
         /* Skip "Contents of " by using fbuf index 12 */
@@ -2829,7 +2831,16 @@ boolean picked_some;
 int
 dolook()
 {
-    return look_here(0, FALSE);
+    int res;
+
+    /* don't let
+       MSGTYPE={norep,noshow} "You see here"
+       interfere with feedback from the look-here command */
+    hide_unhide_msgtypes(TRUE, MSGTYP_MASK_REP_SHOW);
+    res = look_here(0, FALSE);
+    /* restore normal msgtype handling */
+    hide_unhide_msgtypes(FALSE, MSGTYP_MASK_REP_SHOW);
+    return res;
 }
 
 boolean
@@ -2878,8 +2889,8 @@ struct obj *obj;
     return;
 }
 
-/* returns TRUE if obj  & otmp can be merged */
-STATIC_OVL boolean
+/* returns TRUE if obj & otmp can be merged; used in invent.c and mkobj.c */
+boolean
 mergable(otmp, obj)
 register struct obj *otmp, *obj;
 {
@@ -2897,31 +2908,24 @@ register struct obj *otmp, *obj;
         return TRUE;
 
     if (obj->unpaid != otmp->unpaid || obj->spe != otmp->spe
-        || obj->dknown != otmp->dknown
         || obj->cursed != otmp->cursed || obj->blessed != otmp->blessed
         || obj->no_charge != otmp->no_charge || obj->obroken != otmp->obroken
         || obj->otrapped != otmp->otrapped || obj->lamplit != otmp->lamplit
         || obj->bypass != otmp->bypass)
         return FALSE;
 
+    if (obj->globby)
+        return TRUE;
+    /* Checks beyond this point either aren't applicable to globs
+     * or don't inhibit their merger.
+     */
+
     if (obj->oclass == FOOD_CLASS
         && (obj->oeaten != otmp->oeaten || obj->orotten != otmp->orotten))
         return FALSE;
 
-    if (obj->globby) {
-        /* globs won't merge if they have different bless/curse
-           state, but will merge non-bknown with bknown */
-        if (obj->bknown != otmp->bknown)
-            obj->bknown = otmp->bknown = 0;
-        if (obj->rknown != otmp->rknown)
-            obj->rknown = otmp->rknown = 0;
-        if (obj->greased != otmp->greased)
-            obj->greased = otmp->greased = 0;
-        /* checks beyond this point aren't applicable to globs */
-        return TRUE;
-    }
-
-    if ((obj->bknown != otmp->bknown && !Role_if(PM_PRIEST))
+    if (obj->dknown != otmp->dknown
+        || (obj->bknown != otmp->bknown && !Role_if(PM_PRIEST))
         || obj->oeroded != otmp->oeroded || obj->oeroded2 != otmp->oeroded2
         || obj->greased != otmp->greased)
         return FALSE;

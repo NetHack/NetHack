@@ -210,7 +210,7 @@ mswin_init_nhwindows(int *argc, char **argv)
      */
     iflags.toptenwin = 1;
     set_option_mod_status("toptenwin", SET_IN_FILE);
-    set_option_mod_status("perm_invent", SET_IN_FILE);
+    //set_option_mod_status("perm_invent", SET_IN_FILE);
 
     /* initialize map tiles bitmap */
     initMapTiles();
@@ -1980,6 +1980,11 @@ mswin_preference_update(const char *pref)
         mswin_layout_main_window(NULL);
         return;
     }
+
+    if (stricmp(pref, "perm_invent") == 0) {
+        mswin_update_inventory();
+        return;
+    }
 }
 
 #define TEXT_BUFFER_SIZE 4096
@@ -2279,7 +2284,7 @@ mswin_read_reg()
        is
        read from the registry, so these defaults apply. */
     GetNHApp()->saveRegistrySettings = 1; /* Normally, we always save */
-    GetNHApp()->regNetHackMode = 0;
+    GetNHApp()->regNetHackMode = TRUE;
 
     if (RegOpenKeyEx(HKEY_CURRENT_USER, keystring, 0, KEY_READ, &key)
         != ERROR_SUCCESS)

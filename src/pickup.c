@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1450604648 2015/12/20 09:44:08 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.167 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1453591408 2016/01/23 23:23:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.169 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -30,6 +30,7 @@ STATIC_DCL int FDECL(lift_object, (struct obj *, struct obj *, long *,
 STATIC_DCL boolean FDECL(mbag_explodes, (struct obj *, int));
 STATIC_PTR int FDECL(in_container, (struct obj *));
 STATIC_PTR int FDECL(out_container, (struct obj *));
+STATIC_DCL void FDECL(removed_from_icebox, (struct obj *));
 STATIC_DCL long FDECL(mbag_item_gone, (int, struct obj *));
 STATIC_DCL void FDECL(observe_quantum_cat, (struct obj *));
 STATIC_DCL void NDECL(explain_container_prompt);
@@ -2117,12 +2118,8 @@ register struct obj *obj;
     obj_extract_self(obj);
     current_container->owt = weight(current_container);
 
-    if (Icebox && !age_is_relative(obj)) {
-        obj->age = monstermoves - obj->age; /* actual age */
-        if (obj->otyp == CORPSE)
-            start_corpse_timeout(obj);
-    }
-    /* simulated point of time */
+    if (Icebox)
+        removed_from_icebox(obj);
 
     if (!obj->unpaid && !carried(current_container)
         && costly_spot(current_container->ox, current_container->oy)) {
@@ -2145,6 +2142,18 @@ register struct obj *obj;
         bot(); /* update character's gold piece count immediately */
     }
     return 1;
+}
+
+/* taking a corpse out of an ice box needs a couple of adjustments */
+STATIC_OVL void
+removed_from_icebox(obj)
+struct obj *obj;
+{
+    if (!age_is_relative(obj)) {
+        obj->age = monstermoves - obj->age; /* actual age */
+        if (obj->otyp == CORPSE)
+            start_corpse_timeout(obj);
+    }
 }
 
 /* an object inside a cursed bag of holding is being destroyed */
@@ -2903,7 +2912,7 @@ struct obj *box; /* or bag */
         if (!Has_contents(box)) /* evidently a live cat came out */
             /* container type of "large box" is inferred */
             pline("%sbox is now empty.", Shk_Your(yourbuf, box));
-        else /* holds cat corpse or other random stuff */
+        else /* holds cat corpse */
             empty_it = TRUE;
         box->cknown = 1;
     } else if (!Has_contents(box)) {
@@ -2930,7 +2939,10 @@ struct obj *box; /* or bag */
         for (otmp = box->cobj; otmp; otmp = nobj) {
             nobj = otmp->nobj;
             obj_extract_self(otmp);
-            if (cursed_mbag && !rn2(13)) {
+
+            if (box->otyp == ICE_BOX) {
+                removed_from_icebox(otmp); /* resume rotting for corpse */
+            } else if (cursed_mbag && !rn2(13)) {
                 loss += mbag_item_gone(held, otmp);
                 /* abbreviated drop format is no longer appropriate */
                 verbose = TRUE;

@@ -1,5 +1,5 @@
-/* NetHack 3.6	winX.c	$NHDT-Date: 1432512808 2015/05/25 00:13:28 $  $NHDT-Branch: master $:$NHDT-Revision: 1.33 $ */
-/* Copyright (c) Dean Luick, 1992				  */
+/* NetHack 3.6	winX.c	$NHDT-Date: 1455389907 2016/02/13 18:58:27 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.40 $ */
+/* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -138,30 +138,40 @@ struct window_procs X11_procs = {
 /*
  * Local functions.
  */
-static void FDECL(dismiss_file, (Widget, XEvent *, String *, Cardinal *));
-static void FDECL(delete_file, (Widget, XEvent *, String *, Cardinal *));
-static void FDECL(yn_key, (Widget, XEvent *, String *, Cardinal *));
-static void FDECL(yn_delete, (Widget, XEvent *, String *, Cardinal *));
-static void FDECL(askname_delete, (Widget, XEvent *, String *, Cardinal *));
-static void FDECL(getline_delete, (Widget, XEvent *, String *, Cardinal *));
-static void FDECL(X11_hangup, (Widget, XEvent *, String *, Cardinal *));
-static int FDECL(input_event, (int));
-static void FDECL(win_visible, (Widget, XtPointer, XEvent *, Boolean *));
-static void NDECL(init_standard_windows);
+static winid NDECL(find_free_window);
+static void FDECL(nhFreePixel, (XtAppContext, XrmValuePtr, XtPointer,
+                                XrmValuePtr, Cardinal *));
+static void NDECL(load_default_resources);
+static void NDECL(release_default_resources);
 #ifdef X11_HANGUP_SIGNAL
 static void FDECL(X11_sig, (int));
 static void FDECL(X11_sig_cb, (XtPointer, XtSignalId *));
 #endif
+static void FDECL(d_timeout, (XtPointer, XtIntervalId *));
+static void FDECL(X11_hangup, (Widget, XEvent *, String *, Cardinal *));
+static void FDECL(askname_delete, (Widget, XEvent *, String *, Cardinal *));
+static void FDECL(askname_done, (Widget, XtPointer, XtPointer));
+static void FDECL(done_button, (Widget, XtPointer, XtPointer));
+static void FDECL(getline_delete, (Widget, XEvent *, String *, Cardinal *));
+static void FDECL(abort_button, (Widget, XtPointer, XtPointer));
+static void NDECL(release_getline_widgets);
+static void FDECL(delete_file, (Widget, XEvent *, String *, Cardinal *));
+static void FDECL(dismiss_file, (Widget, XEvent *, String *, Cardinal *));
+static void FDECL(yn_delete, (Widget, XEvent *, String *, Cardinal *));
+static void FDECL(yn_key, (Widget, XEvent *, String *, Cardinal *));
+static void NDECL(release_yn_widgets);
+static int FDECL(input_event, (int));
+static void FDECL(win_visible, (Widget, XtPointer, XEvent *, Boolean *));
+static void NDECL(init_standard_windows);
 
 /*
  * Local variables.
  */
-static boolean x_inited = FALSE;    /* TRUE if window system is set up. */
-static winid message_win = WIN_ERR, /* These are the winids of the	    */
-    map_win = WIN_ERR,              /*   message, map, and status	    */
-    status_win = WIN_ERR;           /*   windows, when they are created */
-                                    /*   in init_windows().		    */
-static Pixmap icon_pixmap = None;   /* Pixmap for icon.		    */
+static boolean x_inited = FALSE;    /* TRUE if window system is set up.     */
+static winid message_win = WIN_ERR, /* These are the winids of the message, */
+             map_win = WIN_ERR,     /*   map, and status windows, when they */
+             status_win = WIN_ERR;  /*   are created in init_windows().     */
+static Pixmap icon_pixmap = None;   /* Pixmap for icon.                     */
 
 /*
  * Find the window structure that corresponds to the given widget.  Note
@@ -174,8 +184,10 @@ Widget w;
     int windex;
     struct xwindow *wp;
 
-    /* Search to find the corresponding window.  Look at the main widget, */
-    /* popup, the parent of the main widget, then parent of the widget. */
+    /*
+     * Search to find the corresponding window.  Look at the main widget,
+     * popup, the parent of the main widget, then parent of the widget.
+     */
     for (windex = 0, wp = window_list; windex < MAX_WINDOWS; windex++, wp++)
         if (wp->type != NHW_NONE && (wp->w == w || wp->popup == w
                                      || (wp->w && (XtParent(wp->w)) == w)
@@ -213,10 +225,12 @@ find_free_window()
  * This is an attempt to find some close readonly cell and use it.
  */
 XtConvertArgRec const nhcolorConvertArgs[] = {
-    { XtWidgetBaseOffset, (XtPointer) XtOffset(Widget, core.screen),
-      sizeof(Screen *) },
-    { XtWidgetBaseOffset, (XtPointer) XtOffset(Widget, core.colormap),
-      sizeof(Colormap) }
+    { XtWidgetBaseOffset,
+      (XtPointer) (ptrdiff_t) XtOffset(Widget, core.screen),
+      sizeof (Screen *) },
+    { XtWidgetBaseOffset,
+      (XtPointer) (ptrdiff_t) XtOffset(Widget, core.colormap),
+      sizeof (Colormap) }
 };
 
 #define done(type, value)                             \
@@ -237,9 +251,9 @@ XtConvertArgRec const nhcolorConvertArgs[] = {
     }
 
 /*
- * Find a color that approximates the color named in "str".  The "str" color
- * may be a color name ("red") or number ("#7f0000").  If str == NULL, then
- * "color" is assumed to contain the RGB color wanted.
+ * Find a color that approximates the color named in "str".
+ * The "str" color may be a color name ("red") or number ("#7f0000").
+ * If str is Null, then "color" is assumed to contain the RGB color wanted.
  * The approximate color found is returned in color as well.
  * Return True if something close was found.
  */
@@ -257,8 +271,8 @@ XColor *color;     /* the X color structure; changed only if successful */
     register int i, j;
     register long tdiff;
 
-    /* if the screen doesn't have a big colormap, don't waste our time */
-    /* or if it's huge, and _some_ match should have been possible */
+    /* if the screen doesn't have a big colormap, don't waste our time
+       or if it's huge, and _some_ match should have been possible */
     if ((ncells = CellsOfScreen(screen)) < 256 || ncells > 4096)
         return False;
 
@@ -277,9 +291,9 @@ XColor *color;     /* the X color structure; changed only if successful */
         XQueryColors(DisplayOfScreen(screen), colormap, table, ncells);
     }
 
-/* go thru cells and look for the one with smallest diff */
+/* go thru cells and look for the one with smallest diff        */
 /* diff is calculated abs(reddiff)+abs(greendiff)+abs(bluediff) */
-/* a more knowledgeable color person might improve this -dlc */
+/* a more knowledgeable color person might improve this -dlc    */
 try_again:
     for (i = 0; i < ncells; i++) {
         if (table[i].flags == tmp.flags) {
@@ -339,10 +353,10 @@ XtPointer *closure_ret;
     Cardinal num_params = 1;
 
     if (*num_args != 2) {
-        XtAppWarningMsg(
-            app, "wrongParameters", "cvtStringToPixel", "XtToolkitError",
-            "String to pixel conversion needs screen and colormap arguments",
-            (String *) 0, (Cardinal *) 0);
+        XtAppWarningMsg(app, "wrongParameters",
+                        "cvtStringToPixel", "XtToolkitError",
+             "String to pixel conversion needs screen and colormap arguments",
+                        (String *) 0, (Cardinal *) 0);
         return False;
     }
 
@@ -426,10 +440,9 @@ Cardinal *num_args;
     Colormap colormap;
 
     if (*num_args != 2) {
-        XtAppWarningMsg(
-            app, "wrongParameters", "freePixel", "XtToolkitError",
-            "Freeing a pixel requires screen and colormap arguments",
-            (String *) 0, (Cardinal *) 0);
+        XtAppWarningMsg(app, "wrongParameters", "freePixel", "XtToolkitError",
+                     "Freeing a pixel requires screen and colormap arguments",
+                        (String *) 0, (Cardinal *) 0);
         return;
     }
 
@@ -445,9 +458,11 @@ Cardinal *num_args;
 /* [ALI] Utility function to ask Xaw for font height, since the previous
  * assumption of ascent + descent is not always valid.
  */
-Dimension nhFontHeight(w) Widget w;
-#ifdef _XawTextSink_h
+Dimension
+nhFontHeight(w)
+Widget w;
 {
+#ifdef _XawTextSink_h
     Widget sink;
     XawTextPosition pos = 0;
     int resWidth, resHeight;
@@ -458,9 +473,7 @@ Dimension nhFontHeight(w) Widget w;
 
     XawTextSinkFindPosition(sink, pos, 0, 0, 0, &pos, &resWidth, &resHeight);
     return resHeight;
-}
 #else
-{
     XFontStruct *fs;
     Arg args[1];
 
@@ -469,11 +482,82 @@ Dimension nhFontHeight(w) Widget w;
 
     /* Assume font height is ascent + descent. */
     return = fs->ascent + fs->descent;
-}
 #endif
+}
 
-/* Global Functions ========================================================
- */
+static String *default_resource_data = 0; /* NULL-terminated array */
+
+/* read the template NetHack.ad into default_resource_data[] to supply
+   fallback resources to XtAppInitialize() */
+static void
+load_default_resources()
+{
+    FILE *fp;
+    String inbuf;
+    unsigned insiz, linelen, longlen, numlines;
+    boolean comment = FALSE; /* lint suppression */
+
+    /*
+     * Running nethack via the shell script adds $HACKDIR to the path used
+     * by X to find resources, but running it directly doesn't.  So, if we
+     * can find the template file for NetHack.ad in the current directory,
+     * load its contents into memory so that the application startup call
+     * in X11_init_nhwindows() can use them as fallback resources.
+     *
+     * No attempt to support the 'include' directive has been made.
+     */
+    fp = fopen("./NetHack.ad", "r");
+    if (!fp)
+        return;
+
+    /* measure the file without retaining its contents */
+    insiz = BUFSIZ; /* stdio BUFSIZ, not nethack BUFSZ */
+    inbuf = (String) alloc(insiz);
+    linelen = longlen = 0;
+    numlines = 0;
+    while (fgets(inbuf, insiz, fp)) {
+        if (!linelen) /* inbuf has start of record; treat empty as comment */
+            comment = (*inbuf == '!' || *inbuf == '\n');
+        linelen += strlen(inbuf);
+        if (!index(inbuf, '\n'))
+            continue;
+        if (linelen > longlen)
+            longlen = linelen;
+        linelen = 0;
+        if (!comment)
+            ++numlines;
+    }
+    free((genericptr_t) inbuf);
+    insiz = longlen + 1;
+    inbuf = (String) alloc(insiz);
+    ++numlines; /* room for terminator */
+    default_resource_data = (String *) alloc(numlines * sizeof (String));
+
+    /* now read the file into the array */
+    (void) rewind(fp);
+    numlines = 0;
+    while (fgets(inbuf, insiz, fp)) {
+        if (*inbuf != '!' && *inbuf != '\n')
+            default_resource_data[numlines++] = dupstr(inbuf);
+    }
+    default_resource_data[numlines] = (String) 0;
+    (void) fclose(fp);
+    free((genericptr_t) inbuf);
+}
+
+static void
+release_default_resources()
+{
+    if (default_resource_data) {
+        unsigned idx;
+
+        for (idx = 0; default_resource_data[idx]; idx++)
+            free((genericptr_t) default_resource_data[idx]);
+        free((genericptr_t) default_resource_data), default_resource_data = 0;
+    }
+}
+
+/* Global Functions ======================================================= */
 void
 X11_raw_print(str)
 const char *str;
@@ -715,19 +799,20 @@ boolean blocking;
         if (wp->popup)
             nh_XtPopup(wp->popup, (int) XtGrabNone, wp->w);
         display_map_window(wp); /* flush map */
-                                /*
-                                 * We need to flush the message window here due to the way the tty
-                                 * port is set up.  To flush a window, you need to call this
-                                 * routine.  However, the tty port _pauses_ with a --more-- if we
-                                 * do a display_nhwindow(WIN_MESSAGE, FALSE).  Thus, we can't call
-                                 * display_nhwindow(WIN_MESSAGE,FALSE) in parse() because then we
-                                 * get a --more-- after every line.
-                                 *
-                                 * Perhaps the window document should mention that when the map
-                                 * is flushed, everything on the three main windows should be
-                                 * flushed.  Note: we don't need to flush the status window
-                                 * because we don't buffer changes.
-                                 */
+
+        /*
+         * We need to flush the message window here due to the way the tty
+         * port is set up.  To flush a window, you need to call this
+         * routine.  However, the tty port _pauses_ with a --more-- if we
+         * do a display_nhwindow(WIN_MESSAGE, FALSE).  Thus, we can't call
+         * display_nhwindow(WIN_MESSAGE,FALSE) in parse() because then we
+         * get a --more-- after every line.
+         *
+         * Perhaps the window document should mention that when the map
+         * is flushed, everything on the three main windows should be
+         * flushed.  Note: we don't need to flush the status window
+         * because we don't buffer changes.
+         */
         if (WIN_MESSAGE != WIN_ERR)
             display_message_window(&window_list[WIN_MESSAGE]);
         if (blocking)
@@ -882,7 +967,8 @@ const char *str;
 
 /* Under X, we don't need to initialize the number pad. */
 /* ARGSUSED */
-void X11_number_pad(state) /* called from options.c */
+void
+X11_number_pad(state) /* called from options.c */
 int state;
 {
     nhUse(state);
@@ -890,16 +976,19 @@ int state;
     return;
 }
 
+/* called from setftty() in unixtty.c */
 void
 X11_start_screen()
 {
     return;
-} /* called from setftty() in unixtty.c */
+}
+
+/* called from settty() in unixtty.c */
 void
 X11_end_screen()
 {
     return;
-} /* called from settty() in unixtty.c */
+}
 
 #ifdef GRAPHIC_TOMBSTONE
 void
@@ -923,8 +1012,7 @@ time_t when;
 }
 #endif
 
-/* init and exit nhwindows -------------------------------------------------
- */
+/* init and exit nhwindows ------------------------------------------------ */
 
 XtAppContext app_context;     /* context of application */
 Widget toplevel = (Widget) 0; /* toplevel widget */
@@ -935,8 +1023,7 @@ static XtActionsRec actions[] = {
     { nhStr("delete_file"), delete_file },   /* file delete-window */
     { nhStr("dismiss_text"), dismiss_text }, /* text widget button action */
     { nhStr("delete_text"), delete_text },   /* text widget delete action */
-    { nhStr("key_dismiss_text"),
-      key_dismiss_text }, /* text widget key action */
+    { nhStr("key_dismiss_text"), key_dismiss_text }, /* text key action   */
 #ifdef GRAPHIC_TOMBSTONE
     { nhStr("rip_dismiss_text"), rip_dismiss_text }, /* rip in text widget */
 #endif
@@ -965,6 +1052,9 @@ static XtResource resources[] = {
     { nhStr("message_line"), nhStr("Message_line"), XtRBoolean,
       sizeof(Boolean), XtOffset(AppResources *, message_line), XtRString,
       nhStr("False") },
+    { nhStr("highlight_prompt"), nhStr("Highlight_prompt"), XtRBoolean,
+      sizeof(Boolean), XtOffset(AppResources *, highlight_prompt), XtRString,
+      nhStr("True") },
     { nhStr("double_tile_size"), nhStr("Double_tile_size"), XtRBoolean,
       sizeof(Boolean), XtOffset(AppResources *, double_tile_size), XtRString,
       nhStr("False") },
@@ -1017,6 +1107,8 @@ char **argv;
     /* add another option that can be set */
     set_wc_option_mod_status(WC_TILED_MAP, SET_IN_GAME);
 
+    load_default_resources(); /* create default_resource_data[] */
+
     /*
      * setuid hack: make sure that if nethack is setuid, to use real uid
      * when opening X11 connections, in case the user is using xauth, since
@@ -1030,19 +1122,17 @@ char **argv;
     XSetIOErrorHandler((XIOErrorHandler) hangup);
 
     num_args = 0;
-    XtSetArg(args[num_args], XtNallowShellResize, True);
-    num_args++;
-    toplevel =
-        XtAppInitialize(&app_context, "NetHack",  /* application class */
-                        (XrmOptionDescList) 0, 0, /* options list */
-                        argcp, (String *) argv,   /* command line args */
-                        (String *) 0,             /* fallback resources */
-                        (ArgList) args, num_args);
-    XtOverrideTranslations(
-        toplevel,
-        XtParseTranslationTable("<Message>WM_PROTOCOLS: X11_hangup()"));
+    XtSetArg(args[num_args], XtNallowShellResize, True); num_args++;
 
-/* We don't need to realize the top level widget. */
+    toplevel = XtAppInitialize(&app_context, "NetHack",     /* application  */
+                               (XrmOptionDescList) 0, 0,    /* options list */
+                               argcp, (String *) argv,      /* command line */
+                               default_resource_data, /* fallback resources */
+                               (ArgList) args, num_args);
+    XtOverrideTranslations(toplevel,
+              XtParseTranslationTable("<Message>WM_PROTOCOLS: X11_hangup()"));
+
+    /* We don't need to realize the top level widget. */
 
 #ifdef TEXTCOLOR
     /* add new color converter to deal with overused colormaps */
@@ -1089,6 +1179,8 @@ char **argv;
 
     x_inited = TRUE; /* X is now initialized */
 
+    release_default_resources();
+
     /* Display the startup banner in the message window. */
     for (i = 1; i <= 4 + 2; ++i) /* (values beyond 4 yield blank lines) */
         X11_putstr(WIN_MESSAGE, 0, copyright_banner_line(i));
@@ -1123,10 +1215,14 @@ const char *dummy;
         X11_destroy_nhwindow(WIN_MAP);
     if (WIN_MESSAGE != WIN_ERR)
         X11_destroy_nhwindow(WIN_MESSAGE);
+
+    release_getline_widgets();
+    release_yn_widgets();
 }
 
 #ifdef X11_HANGUP_SIGNAL
-static void X11_sig(sig) /* Unix signal handler */
+static void
+X11_sig(sig) /* Unix signal handler */
 int sig;
 {
     XtNoticeSignal(X11_sig_id);
@@ -1156,8 +1252,7 @@ XtSignalId *id;
 }
 #endif
 
-/* delay_output ------------------------------------------------------------
- */
+/* delay_output ----------------------------------------------------------- */
 
 /*
  * Timeout callback for delay_output().  Send a fake message to the map
@@ -1203,8 +1298,7 @@ X11_delay_output()
     (void) x_event(EXIT_ON_SENT_EVENT);
 }
 
-/* X11_hangup --------------------------------------------------------------
- */
+/* X11_hangup ------------------------------------------------------------- */
 /* ARGSUSED */
 static void
 X11_hangup(w, event, params, num_params)
@@ -1222,8 +1316,7 @@ Cardinal *num_params;
     exit_x_event = TRUE;
 }
 
-/* askname -----------------------------------------------------------------
- */
+/* askname ---------------------------------------------------------------- */
 /* ARGSUSED */
 static void
 askname_delete(w, event, params, num_params)
@@ -1249,7 +1342,7 @@ Widget w;
 XtPointer client_data;
 XtPointer call_data;
 {
-    int len;
+    unsigned len;
     char *s;
     Widget dialog = (Widget) client_data;
 
@@ -1258,15 +1351,15 @@ XtPointer call_data;
 
     s = (char *) GetDialogResponse(dialog);
 
-    len = (int) strlen(s);
+    len = strlen(s);
     if (len == 0) {
         X11_nhbell();
         return;
     }
 
     /* Truncate name if necessary */
-    if (len >= (int) sizeof(plname) - 1)
-        len = (int) sizeof(plname) - 1;
+    if (len >= sizeof plname - 1)
+        len = sizeof plname - 1;
 
     (void) strncpy(plname, s, len);
     plname[len] = '\0';
@@ -1276,6 +1369,8 @@ XtPointer call_data;
     exit_x_event = TRUE;
 }
 
+/* ask player for character's name to replace generic name "player" (or other
+   values; see config.h) after 'nethack -u player' or OPTIONS=name:player */
 void
 X11_askname()
 {
@@ -1286,15 +1381,14 @@ X11_askname()
 
     popup = XtCreatePopupShell("askname", transientShellWidgetClass, toplevel,
                                args, ONE);
-    XtOverrideTranslations(
-        popup,
-        XtParseTranslationTable("<Message>WM_PROTOCOLS: askname_delete()"));
+    XtOverrideTranslations(popup,
+          XtParseTranslationTable("<Message>WM_PROTOCOLS: askname_delete()"));
 
     dialog = CreateDialog(popup, nhStr("dialog"), askname_done,
                           (XtCallbackProc) 0);
 
     SetDialogPrompt(dialog, nhStr("What is your name?")); /* set prompt */
-    SetDialogResponse(dialog, nhStr("")); /* set default answer */
+    SetDialogResponse(dialog, nhStr(""), PL_NSIZ); /* set default answer */
 
     XtRealizeWidget(popup);
     positionpopup(popup, TRUE); /* center,bottom */
@@ -1303,10 +1397,12 @@ X11_askname()
 
     /* The callback will enable the event loop exit. */
     (void) x_event(EXIT_ON_EXIT);
+
+    XtDestroyWidget(dialog);
+    XtDestroyWidget(popup);
 }
 
-/* getline -----------------------------------------------------------------
- */
+/* getline ---------------------------------------------------------------- */
 /* This uses Tim Theisen's dialog widget set (from GhostView). */
 
 static Widget getline_popup, getline_dialog;
@@ -1379,28 +1475,34 @@ XtPointer call_data;
     exit_x_event = TRUE;
 }
 
+static void
+release_getline_widgets()
+{
+    if (getline_dialog)
+        XtDestroyWidget(getline_dialog), getline_dialog = (Widget) 0;
+    if (getline_popup)
+        XtDestroyWidget(getline_popup), getline_popup = (Widget) 0;
+}
+
 void
 X11_getlin(question, input)
 const char *question;
 char *input;
 {
-    static boolean need_to_init = True;
-
     getline_input = input;
 
     flush_screen(1);
-    if (need_to_init) {
+    if (!getline_popup) {
         Arg args[1];
-
-        need_to_init = False;
 
         XtSetArg(args[0], XtNallowShellResize, True);
 
-        getline_popup = XtCreatePopupShell(
-            "getline", transientShellWidgetClass, toplevel, args, ONE);
-        XtOverrideTranslations(
-            getline_popup, XtParseTranslationTable(
-                               "<Message>WM_PROTOCOLS: getline_delete()"));
+        getline_popup = XtCreatePopupShell("getline",
+                                           transientShellWidgetClass,
+                                           toplevel, args, ONE);
+        XtOverrideTranslations(getline_popup,
+                               XtParseTranslationTable(
+                                  "<Message>WM_PROTOCOLS: getline_delete()"));
 
         getline_dialog = CreateDialog(getline_popup, nhStr("dialog"),
                                       done_button, abort_button);
@@ -1410,7 +1512,13 @@ char *input;
                         &wm_delete_window, 1);
     }
     SetDialogPrompt(getline_dialog, (String) question); /* set prompt */
-    SetDialogResponse(getline_dialog, nhStr("")); /* set default answer */
+    /* 60:  make the answer widget be wide enough to hold 60 characters,
+       or the length of the prompt string, whichever is bigger.  User's
+       response can be longer--when limit is reached, value-so-far will
+       slide left hiding some chars at the beginning of the response but
+       making room to type more.  [Prior to 3.6.1, width wasn't specifiable
+       and answer box always got sized to match the width of the prompt.] */
+    SetDialogResponse(getline_dialog, nhStr(""), 60); /* set default answer */
     positionpopup(getline_popup, TRUE);           /* center,bottom */
 
     nh_XtPopup(getline_popup, (int) XtGrabExclusive, getline_dialog);
@@ -1419,8 +1527,7 @@ char *input;
     (void) x_event(EXIT_ON_EXIT);
 }
 
-/* Display file ------------------------------------------------------------
- */
+/* Display file ----------------------------------------------------------- */
 static const char display_translations[] = "#override\n\
      <Key>q: dismiss_file()\n\
      <Key>Escape: dismiss_file()\n\
@@ -1477,7 +1584,7 @@ boolean complain;
 #define LLEN 128
     char line[LLEN];
     int num_lines;
-    char *textlines;
+    char *textlines, *bp;
     int charcount;
 
     /* Use the port-independent file opener to see if the file exists. */
@@ -1486,7 +1593,6 @@ boolean complain;
     if (!fp) {
         if (complain)
             pline("Cannot open %s.  Sorry.", str);
-
         return; /* it doesn't exist, ignore */
     }
 
@@ -1519,56 +1625,45 @@ boolean complain;
 
     fp = dlb_fopen(str, RDTMODE);
 
+    bp = textlines;
     while (dlb_fgets(line, LLEN, fp)) {
-        (void) strcat(textlines, line);
+        Strcpy((bp = eos(bp)), line);
     }
 
     (void) dlb_fclose(fp);
 
     num_args = 0;
-    XtSetArg(args[num_args], nhStr(XtNtitle), str);
-    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNtitle), str); num_args++;
 
     popup = XtCreatePopupShell("display_file", topLevelShellWidgetClass,
                                toplevel, args, num_args);
-    XtOverrideTranslations(
-        popup,
+    XtOverrideTranslations(popup,
         XtParseTranslationTable("<Message>WM_PROTOCOLS: delete_file()"));
 
     num_args = 0;
     XtSetArg(args[num_args], nhStr(XtNscrollHorizontal),
-             XawtextScrollWhenNeeded);
-    num_args++;
+             XawtextScrollWhenNeeded); num_args++;
     XtSetArg(args[num_args], nhStr(XtNscrollVertical), XawtextScrollAlways);
-    num_args++;
-    XtSetArg(args[num_args], nhStr(XtNtype), XawAsciiString);
-    num_args++;
-    XtSetArg(args[num_args], nhStr(XtNstring), textlines);
-    num_args++;
-    XtSetArg(args[num_args], nhStr(XtNdisplayCaret), False);
-    num_args++;
+                                                                   num_args++;
+    XtSetArg(args[num_args], nhStr(XtNtype), XawAsciiString); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNstring), textlines); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNdisplayCaret), False); num_args++;
     XtSetArg(args[num_args], nhStr(XtNtranslations),
-             XtParseTranslationTable(display_translations));
-    num_args++;
+             XtParseTranslationTable(display_translations)); num_args++;
 
-    dispfile =
-        XtCreateManagedWidget("text",                      /* name */
-                              asciiTextWidgetClass, popup, /* parent widget */
-                              args,      /* set some values */
-                              num_args); /* number of values to set */
+    dispfile = XtCreateManagedWidget("text",                      /* name */
+                                     asciiTextWidgetClass, popup, /* parent */
+                                     args, num_args);
 
     /* Get font and border information. */
     num_args = 0;
-    XtSetArg(args[num_args], nhStr(XtNfont), &fs);
-    num_args++;
-    XtSetArg(args[num_args], nhStr(XtNtopMargin), &top_margin);
-    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNfont), &fs); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNtopMargin), &top_margin); num_args++;
     XtSetArg(args[num_args], nhStr(XtNbottomMargin), &bottom_margin);
-    num_args++;
-    XtSetArg(args[num_args], nhStr(XtNleftMargin), &left_margin);
-    num_args++;
+                                                                   num_args++;
+    XtSetArg(args[num_args], nhStr(XtNleftMargin), &left_margin); num_args++;
     XtSetArg(args[num_args], nhStr(XtNrightMargin), &right_margin);
-    num_args++;
+                                                                   num_args++;
     XtGetValues(dispfile, args, num_args);
 
     /*
@@ -1581,18 +1676,15 @@ boolean complain;
 
     /* Set the new width and height. */
     num_args = 0;
-    XtSetArg(args[num_args], XtNwidth, new_width);
-    num_args++;
-    XtSetArg(args[num_args], XtNheight, new_height);
-    num_args++;
+    XtSetArg(args[num_args], XtNwidth, new_width); num_args++;
+    XtSetArg(args[num_args], XtNheight, new_height); num_args++;
     XtSetValues(dispfile, args, num_args);
 
     nh_XtPopup(popup, (int) XtGrabNone, (Widget) 0);
     free(textlines);
 }
 
-/* yn_function -------------------------------------------------------------
- */
+/* yn_function ------------------------------------------------------------ */
 /* (not threaded) */
 
 static const char *yn_quitchars = " \n\r";
@@ -1730,21 +1822,32 @@ Cardinal *num_params;
     exit_x_event = TRUE; /* exit our event handler */
 }
 
+/* called at exit time */
+static void
+release_yn_widgets()
+{
+    if (yn_label)
+        XtDestroyWidget(yn_label), yn_label = (Widget) 0;
+    if (yn_popup)
+        XtDestroyWidget(yn_popup), yn_popup = (Widget) 0;
+}
+
+/* X11-specific edition of yn_function(), the routine called by the core
+   to show a prompt and get a single keystroke answer, often 'y' vs 'n' */
 char
 X11_yn_function(ques, choices, def)
 const char *ques;
-const char *choices;
-char def;
+const char *choices; /* string of possible response chars; any char if Null */
+char def;            /* default response if user hits <space> or <return> */
 {
-    static Boolean need_to_init = True;
     char buf[BUFSZ];
     Arg args[4];
     Cardinal num_args;
 
     yn_choices = choices; /* set up globals for callback to use */
     yn_def = def;
-    yn_preserve_case =
-        !choices; /* preserve when arbitrary response allowed */
+    yn_preserve_case = !choices; /* preserve case when an arbitrary
+                                    response is allowed */
 
     /*
      * This is sort of a kludge.  There are quite a few places in the main
@@ -1781,8 +1884,9 @@ char def;
         Strcat(buf, " ");
 
         /* escape maps to 'q' or 'n' or default, in that order */
-        yn_esc_map =
-            (index(choices, 'q') ? 'q' : (index(choices, 'n') ? 'n' : def));
+        yn_esc_map = (index(choices, 'q') ? 'q'
+                      : index(choices, 'n') ? 'n'
+                        : def);
     } else {
         if ((int) (1 + strlen(ques) + 1) >= BUFSZ)
             panic("X11_yn_function:  question too long");
@@ -1790,20 +1894,41 @@ char def;
         Strcat(buf, " ");
     }
 
-    if (!appResources.slow && need_to_init) {
-        need_to_init = False;
+    /*
+     * The 'slow' resource is misleadingly named.  When it is True, we
+     * re-use the same one-line widget above the map for all yn prompt
+     * responses instead of re-using a popup widget for each one.  It's
+     * crucial for client/server configs where the server is slow putting
+     * up a popup or requires click-to-focus to respond to the popup, but
+     * is also useful for players who just want to be able to look at the
+     * same location to read questions they're being asked to answer.
+     */
 
+    if (appResources.slow) {
+        /*
+         * 'slow':  the yn_label widget was created when the map and
+         * status widgets were, and is positioned between them.  It
+         * will persist until end of game.  All we need to do for
+         * yn_function is direct keystroke input to the yn response
+         * handler and reset its label to be the prompt text (below).
+         */
+        input_func = yn_key;
+        highlight_yn(FALSE); /* expose yn_label as separate from map */
+    } else if (!yn_label) {
+        /*
+         * Not 'slow'; create a persistent widget that will be popped up
+         * as needed, then down again, and last until end of game.  The
+         * associated yn_label widget is used to track whether it exists.
+         */
         XtSetArg(args[0], XtNallowShellResize, True);
         yn_popup = XtCreatePopupShell("query", transientShellWidgetClass,
                                       toplevel, args, ONE);
-        XtOverrideTranslations(
-            yn_popup,
-            XtParseTranslationTable("<Message>WM_PROTOCOLS: yn_delete()"));
+        XtOverrideTranslations(yn_popup,
+               XtParseTranslationTable("<Message>WM_PROTOCOLS: yn_delete()"));
 
         num_args = 0;
         XtSetArg(args[num_args], XtNtranslations,
-                 XtParseTranslationTable(yn_translations));
-        num_args++;
+                 XtParseTranslationTable(yn_translations)); num_args++;
         yn_label = XtCreateManagedWidget("yn_label", labelWidgetClass,
                                          yn_popup, args, num_args);
 
@@ -1812,12 +1937,9 @@ char def;
                         &wm_delete_window, 1);
     }
 
-    if (appResources.slow)
-        input_func = yn_key;
-
+    /* set the label of the yn widget to be the prompt text */
     num_args = 0;
-    XtSetArg(args[num_args], XtNlabel, buf);
-    num_args++;
+    XtSetArg(args[num_args], XtNlabel, buf); num_args++;
     XtSetValues(yn_label, args, num_args);
 
     if (!appResources.slow) {
@@ -1826,8 +1948,7 @@ char def;
          * need to set the label twice to get the size to change.
          */
         num_args = 0;
-        XtSetArg(args[num_args], XtNlabel, buf);
-        num_args++;
+        XtSetArg(args[num_args], XtNlabel, buf); num_args++;
         XtSetValues(yn_label, args, num_args);
 
         positionpopup(yn_popup, TRUE);
@@ -1835,14 +1956,16 @@ char def;
     }
 
     yn_getting_num = FALSE;
-    (void) x_event(EXIT_ON_EXIT);
+    (void) x_event(EXIT_ON_EXIT); /* get keystroke(s) */
 
     if (appResources.slow) {
+        /* keystrokes now belong to the map */
         input_func = 0;
+        /* erase the prompt */
         num_args = 0;
-        XtSetArg(args[num_args], XtNlabel, " ");
-        num_args++;
+        XtSetArg(args[num_args], XtNlabel, " "); num_args++;
         XtSetValues(yn_label, args, num_args);
+        highlight_yn(FALSE); /* disguise yn_label as part of map */
     } else {
         nh_XtPopdown(yn_popup); /* this removes the event grab */
     }
@@ -1850,7 +1973,8 @@ char def;
     return yn_return;
 }
 
-/*ARGSUSED*/
+/* used when processing window-capability-specific run-time options;
+   we support toggling tiles on and off via iflags.wc_tiled_map */
 void
 X11_preference_update(pref)
 const char *pref;
@@ -1861,8 +1985,7 @@ const char *pref;
     }
 }
 
-/* End global functions ====================================================
- */
+/* End global functions =================================================== */
 
 /*
  * Before we wait for input via nhgetch() and nh_poskey(), we need to
@@ -1897,8 +2020,10 @@ XEvent *event;
     map_input(window_list[WIN_MAP].w, event, (String *) 0, &num);
 }
 
+/* only called for autofocus */
 /*ARGSUSED*/
-static void win_visible(w, data, event, flag) /* only called for autofocus */
+static void
+win_visible(w, data, event, flag)
 Widget w;
 XtPointer data; /* client_data not used */
 XEvent *event;
@@ -1918,9 +2043,48 @@ Boolean *flag; /* continue_to_dispatch flag not used */
     }
 }
 
+/* if 'slow' and 'highlight_prompt', set the yn_label widget to look like
+   part of the map when idle or to invert background and foreground when
+   a prompt is active */
+void
+highlight_yn(init)
+boolean init;
+{
+    struct xwindow *xmap;
+
+    if (!appResources.slow || !appResources.highlight_prompt)
+        return;
+
+    /* first time through, WIN_MAP isn't fully initiialized yet */
+    xmap = ((map_win != WIN_ERR) ? &window_list[map_win]
+               : (WIN_MAP != WIN_ERR) ? &window_list[WIN_MAP] : 0);
+
+    if (init && xmap) {
+        Arg args[2];
+        XGCValues vals;
+        unsigned long fg_bg = (GCForeground | GCBackground);
+        GC gc = (xmap->map_information->is_tile
+                    ? xmap->map_information->tile_map.white_gc
+                    : xmap->map_information->text_map.copy_gc);
+
+        (void) memset((genericptr_t) &vals, 0, sizeof vals);
+        if (XGetGCValues(XtDisplay(xmap->w), gc, fg_bg, &vals)) {
+            XtSetArg(args[0], XtNforeground, vals.foreground);
+            XtSetArg(args[1], XtNbackground, vals.background);
+            XtSetValues(yn_label, args, TWO);
+        }
+    } else
+        swap_fg_bg(yn_label);
+}
+
 /*
  * Set up the playing console.  This has three major parts:  the
  * message window, the map, and the status window.
+ *
+ * For configs specifying the 'slow' resource, the yn_label widget
+ * is placed above the map and below the message window.  Prompts
+ * requiring a single character response are displayed there rather
+ * than using a popup.
  */
 static void
 init_standard_windows()
@@ -1933,8 +2097,7 @@ init_standard_windows()
     struct xwindow *wp;
 
     num_args = 0;
-    XtSetArg(args[num_args], XtNallowShellResize, True);
-    num_args++;
+    XtSetArg(args[num_args], XtNallowShellResize, True); num_args++;
     form = XtCreateManagedWidget("nethack", panedWidgetClass, toplevel, args,
                                  num_args);
 
@@ -1957,30 +2120,24 @@ init_standard_windows()
 
     /* Tell the form that contains it that resizes are OK. */
     num_args = 0;
-    XtSetArg(args[num_args], nhStr(XtNresizable), True);
-    num_args++;
-    XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft);
-    num_args++;
-    XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop);
-    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNresizable), True); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNtop), XtChainTop); num_args++;
     XtSetValues(message_viewport, args, num_args);
 
     if (appResources.slow) {
         num_args = 0;
         XtSetArg(args[num_args], XtNtranslations,
-                 XtParseTranslationTable(yn_translations));
-        num_args++;
+                 XtParseTranslationTable(yn_translations)); num_args++;
         yn_label = XtCreateManagedWidget("yn_label", labelWidgetClass, form,
                                          args, num_args);
         num_args = 0;
         XtSetArg(args[num_args], nhStr(XtNfromVert), message_viewport);
-        num_args++;
+                                                                   num_args++;
         XtSetArg(args[num_args], nhStr(XtNjustify), XtJustifyLeft);
-        num_args++;
-        XtSetArg(args[num_args], nhStr(XtNresizable), True);
-        num_args++;
-        XtSetArg(args[num_args], nhStr(XtNlabel), " ");
-        num_args++;
+                                                                  num_args++;
+        XtSetArg(args[num_args], nhStr(XtNresizable), True); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNlabel), " "); num_args++;
         XtSetValues(yn_label, args, num_args);
     }
 
@@ -1998,14 +2155,12 @@ init_standard_windows()
     /* Chain beneath message_viewport or yn window. */
     num_args = 0;
     if (appResources.slow) {
-        XtSetArg(args[num_args], nhStr(XtNfromVert), yn_label);
-        num_args++;
+        XtSetArg(args[num_args], nhStr(XtNfromVert), yn_label); num_args++;
     } else {
         XtSetArg(args[num_args], nhStr(XtNfromVert), message_viewport);
-        num_args++;
+                                                                   num_args++;
     }
-    XtSetArg(args[num_args], nhStr(XtNbottom), XtChainBottom);
-    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNbottom), XtChainBottom); num_args++;
     XtSetValues(map_viewport, args, num_args);
 
     /* Create the status window, with the form as it's parent. */
@@ -2024,16 +2179,11 @@ init_standard_windows()
      * will never expand or contract.
      */
     num_args = 0;
-    XtSetArg(args[num_args], nhStr(XtNfromVert), map_viewport);
-    num_args++;
-    XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft);
-    num_args++;
-    XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft);
-    num_args++;
-    XtSetArg(args[num_args], nhStr(XtNtop), XtChainBottom);
-    num_args++;
-    XtSetArg(args[num_args], nhStr(XtNbottom), XtChainBottom);
-    num_args++;
+    XtSetArg(args[num_args], nhStr(XtNfromVert), map_viewport); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNleft), XtChainLeft); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNright), XtChainLeft); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNtop), XtChainBottom); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNbottom), XtChainBottom); num_args++;
     XtSetValues(status, args, num_args);
 
     /*
@@ -2045,8 +2195,8 @@ init_standard_windows()
      */
     /* XtSetMappedWhenManaged(toplevel, False); */
     XtRealizeWidget(toplevel);
-    wm_delete_window =
-        XInternAtom(XtDisplay(toplevel), "WM_DELETE_WINDOW", False);
+    wm_delete_window = XInternAtom(XtDisplay(toplevel),
+                                   "WM_DELETE_WINDOW", False);
     XSetWMProtocols(XtDisplay(toplevel), XtWindow(toplevel),
                     &wm_delete_window, 1);
 
@@ -2129,6 +2279,8 @@ init_standard_windows()
     /* attempt to catch fatal X11 errors before the program quits */
     (void) XtAppSetErrorHandler(app_context, (XtErrorHandler) hangup);
 
+    highlight_yn(TRUE); /* switch foreground and background */
+
     /* We can now print to the message window. */
     iflags.window_inited = 1;
 }
@@ -2169,8 +2321,7 @@ int dir;
      * libXmu.sa.4.0, but not in libXmu.so.4.0.  Rather than fiddle with
      * static linking, we do this.
      */
-    if (rn2(2) > 2) {
-        /* i.e., FALSE that an optimizer probably can't find */
+    if (rn2(2) > 2) { /* i.e., FALSE that an optimizer probably can't find */
         get_wmShellWidgetClass();
         get_applicationShellWidgetClass();
     }
@@ -2210,6 +2361,7 @@ Cardinal *num_params;
         /* Perhaps the widget enclosing this has scrollbars (could use while)
          */
         Widget parent = XtParent(viewport);
+
         if (parent) {
             horiz_sb = XtNameToWidget(parent, "horizontal");
             vert_sb = XtNameToWidget(parent, "vertical");

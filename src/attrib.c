@@ -1,4 +1,4 @@
-/* NetHack 3.6	attrib.c	$NHDT-Date: 1451111134 2015/12/26 06:25:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.54 $ */
+/* NetHack 3.6	attrib.c	$NHDT-Date: 1455357587 2016/02/13 09:59:47 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.55 $ */
 /*      Copyright 1988, 1989, 1990, 1992, M. Stephenson           */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -710,6 +710,8 @@ long frommask;
             abil = orc_abil;
             break;
         case PM_HUMAN:
+            abil = hum_abil;
+            break;
         default:
             break;
         }

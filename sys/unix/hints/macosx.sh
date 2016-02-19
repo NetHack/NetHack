@@ -1,5 +1,5 @@
 #!/bin/sh
-# NetHack 3.6  macosx.sh $NHDT-Date: 1432512814 2015/05/25 00:13:34 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $
+# NetHack 3.6  macosx.sh $NHDT-Date: 1455747518 2016/02/17 22:18:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.15 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -94,13 +94,32 @@ xgroup2)
 xeditsysconf)
 	src=$2
 	dest=$3
+	# we should traverse the elements of $PATH instead
+	if [ -f /usr/bin/gdb ]; then
+	    gdbpath='GDBPATH=/usr/bin/gdb' #traditional location
+	elif [ -f /opt/local/bin/ggdb ]; then
+	    gdbpath='GDBPATH=/opt/local/bin/ggdb' #macports gdb
+	elif [ -f /Developer/usr/bin/gdb ]; then
+	    # this one seems to be broken with Xcode 5.1.1 on Mountain Lion
+	    gdbpath='GDBPATH=/Developer/usr/bin/gdb' #recent Xcode tools
+	else
+	    gdbpath='#GDBPATH' #none of the above
+	fi
+	if [ -f /bin/grep ]; then
+	    greppath='GREPPATH=/bin/grep'
+	elif [ -f /usr/bin/grep ]; then
+	    greppath='GREPPATH=/usr/bin/grep'
+	else
+	    greppath='#GREPPATH'
+	fi
+	# PANICTRACE_GDB value should only be replaced if gdbpath is '#GDBPATH'
 	if ! [ -e $dest ]; then
-		sed   's/^GDBPATH/#GDBPATH/' $src \
-		| sed 's/^GREPPATH=\/bin\/grep/GREPPATH=\/usr\/bin\/grep/' \
-		| sed 's/^PANICTRACE_GDB=[12]/PANICTRACE_GDB=0/' \
-		| sed 's/^#OPTIONS=.*/&\
+		sed -e "s:^GDBPATH=.*:$gdbpath:" \
+		    -e "s:^GREPPATH=.*:$greppath:" \
+		    -e 's/^PANICTRACE_GDB=[12]/PANICTRACE_GDB=0/' \
+		    -e 's/^#OPTIONS=.*/&\
 OPTIONS=!use_darkgray/' \
-		> $dest
+		    $src > $dest
 	fi
 	;;
 

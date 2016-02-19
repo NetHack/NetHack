@@ -389,9 +389,7 @@ struct monst *mtmp;
             if (!is_floater(mtmp->data))
                 m.has_defense = MUSE_DOWNSTAIRS;
         } else if (x == xupstair && y == yupstair) {
-            /* don't let monster leave the dungeon with the Amulet */
-            if (ledger_no(&u.uz) != 1)
-                m.has_defense = MUSE_UPSTAIRS;
+            m.has_defense = MUSE_UPSTAIRS;
         } else if (sstairs.sx && x == sstairs.sx && y == sstairs.sy) {
             if (sstairs.up || !is_floater(mtmp->data))
                 m.has_defense = MUSE_SSTAIRS;
@@ -848,21 +846,9 @@ struct monst *mtmp;
                          (coord *) 0);
         return 2;
     case MUSE_UPSTAIRS:
-        /* Monsters without amulets escape the dungeon and are
-         * gone for good when they leave up the up stairs.
-         * Monsters with amulets would reach the endlevel,
-         * which we cannot allow since that would leave the
-         * player stranded.
-         */
-        if (ledger_no(&u.uz) == 1) {
-            if (mon_has_special(mtmp))
-                return 0;
-            if (vismon)
-                pline("%s escapes the dungeon!", Monnam(mtmp));
-            mongone(mtmp);
-            return 2;
-        }
         m_flee(mtmp);
+        if (ledger_no(&u.uz) == 1)
+            goto escape; /* impossible; level 1 upstairs are SSTAIRS */
         if (Inhell && mon_has_amulet(mtmp) && !rn2(4)
             && (dunlev(&u.uz) < dunlevs_in_dungeon(&u.uz) - 3)) {
             if (vismon)
@@ -905,6 +891,22 @@ struct monst *mtmp;
         return 2;
     case MUSE_SSTAIRS:
         m_flee(mtmp);
+        if (ledger_no(&u.uz) == 1) {
+        escape:
+            /* Monsters without the Amulet escape the dungeon and
+             * are gone for good when they leave up the up stairs.
+             * A monster with the Amulet would leave it behind
+             * (mongone -> mdrop_special_objs) but we force any
+             * monster who manages to acquire it or the invocation
+             * tools to stick around instead of letting it escape.
+             */
+            if (mon_has_special(mtmp))
+                return 0;
+            if (vismon)
+                pline("%s escapes the dungeon!", Monnam(mtmp));
+            mongone(mtmp);
+            return 2;
+        }
         if (vismon)
             pline("%s escapes %sstairs!", Monnam(mtmp),
                   sstairs.up ? "up" : "down");

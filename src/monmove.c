@@ -1,4 +1,4 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1451866935 2016/01/04 00:22:15 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.80 $ */
+/* NetHack 3.6	monmove.c	$NHDT-Date: 1455402384 2016/02/13 22:26:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.84 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -56,11 +56,24 @@ mon_yells(mon, shout)
 struct monst *mon;
 const char *shout;
 {
-    if (canspotmon(mon))
-        pline("%s yells:", Amonnam(mon));
-    else
-        You_hear("someone yell:");
-    verbalize1(shout);
+    if (Deaf) {
+        if (canspotmon(mon))
+            /* Sidenote on "A watchman angrily waves her arms!"
+             * Female being called watchman is correct (career name).
+             */
+            pline("%s angrily %s %s %s!",
+                Amonnam(mon),
+                nolimbs(mon->data) ? "shakes" : "waves",
+                mhis(mon),
+                nolimbs(mon->data) ? mbodypart(mon, HEAD)
+                                   : makeplural(mbodypart(mon, ARM)));
+    } else {
+        if (canspotmon(mon))
+            pline("%s yells:", Amonnam(mon));
+        else
+            You_hear("someone yell:");
+        verbalize1(shout);
+    }
 }
 
 STATIC_OVL void
@@ -1023,9 +1036,7 @@ not_special:
         flag |= ALLOW_DIG;
     if (is_human(ptr) || ptr == &mons[PM_MINOTAUR])
         flag |= ALLOW_SSM;
-    if (is_undead(ptr) && ptr->mlet != S_GHOST)
-        flag |= NOGARLIC;
-    if (is_vampshifter(mtmp))
+    if ((is_undead(ptr) && ptr->mlet != S_GHOST) || is_vampshifter(mtmp))
         flag |= NOGARLIC;
     if (throws_rocks(ptr))
         flag |= ALLOW_ROCK;
@@ -1215,10 +1226,11 @@ postmov:
                 boolean btrapped = (here->doormask & D_TRAPPED),
                         observeit = canseeit && canspotmon(mtmp);
 
-                if (here->doormask & (D_LOCKED | D_CLOSED)
+                if ((here->doormask & (D_LOCKED | D_CLOSED)) != 0
                     && (amorphous(ptr)
-                        || (!amorphous(ptr) && can_fog(mtmp)
-                            && vamp_shift(mtmp, &mons[PM_FOG_CLOUD],canspotmon(mtmp))))) {
+                        || (can_fog(mtmp)
+                            && vamp_shift(mtmp, &mons[PM_FOG_CLOUD],
+                                          canspotmon(mtmp))))) {
                     if (flags.verbose && canseemon(mtmp))
                         pline("%s %s under the door.", Monnam(mtmp),
                               (ptr == &mons[PM_FOG_CLOUD]
@@ -1581,7 +1593,7 @@ boolean
 can_fog(mtmp)
 struct monst *mtmp;
 {
-    if ((is_vampshifter(mtmp) || mtmp->data->mlet == S_VAMPIRE)
+    if (!(mvitals[PM_FOG_CLOUD].mvflags & G_GENOD) && is_vampshifter(mtmp)
         && !Protection_from_shape_changers && !stuff_prevents_passage(mtmp))
         return TRUE;
     return FALSE;
@@ -1601,12 +1613,11 @@ boolean domsg;
                 sensemon(mon) ? "now detect" : "observe",
                 an(m_monnam(mon)));
     }
-    if (mon->cham >= LOW_PM) {
-        if (ptr == &mons[mon->cham])
-            mon->cham = NON_PM;
-        reslt = newcham(mon, ptr, FALSE, FALSE);
-    } else if (mon->cham == NON_PM && ptr != mon->data) {
-        mon->cham = monsndx(mon->data);
+    if (mon->data == ptr) {
+        /* already right shape */
+        reslt = 1;
+        domsg = FALSE;
+    } else if (is_vampshifter(mon)) {
         reslt = newcham(mon, ptr, FALSE, FALSE);
     }
     if (reslt && domsg) {

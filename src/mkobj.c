@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1447475943 2015/11/14 04:39:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.113 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1454715975 2016/02/05 23:46:15 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.119 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1247,12 +1247,14 @@ void
 curse(otmp)
 register struct obj *otmp;
 {
+    unsigned already_cursed;
     int old_light = 0;
 
     if (otmp->oclass == COIN_CLASS)
         return;
     if (otmp->lamplit)
         old_light = arti_light_radius(otmp);
+    already_cursed = otmp->cursed;
     otmp->blessed = 0;
     otmp->cursed = 1;
     /* welded two-handed weapon interferes with some armor removal */
@@ -1263,14 +1265,18 @@ register struct obj *otmp;
     if (otmp == uswapwep && u.twoweap)
         drop_uswapwep();
     /* some cursed items need immediate updating */
-    if (carried(otmp) && confers_luck(otmp))
+    if (carried(otmp) && confers_luck(otmp)) {
         set_moreluck();
-    else if (otmp->otyp == BAG_OF_HOLDING)
+    } else if (otmp->otyp == BAG_OF_HOLDING) {
         otmp->owt = weight(otmp);
-    else if (otmp->otyp == FIGURINE) {
+    } else if (otmp->otyp == FIGURINE) {
         if (otmp->corpsenm != NON_PM && !dead_species(otmp->corpsenm, TRUE)
             && (carried(otmp) || mcarried(otmp)))
             attach_fig_transform_timeout(otmp);
+    } else if (otmp->oclass == SPBOOK_CLASS) {
+        /* if book hero is reading becomes cursed, interrupt */
+        if (!already_cursed)
+            book_cursed(otmp);
     }
     if (otmp->lamplit)
         maybe_adjust_light(otmp, old_light);
@@ -1336,6 +1342,11 @@ register struct obj *obj;
 {
     int wt = objects[obj->otyp].oc_weight;
 
+    /* glob absorpsion means that merging globs accumulates weight while
+       quantity stays 1, so update 'wt' to reflect that, unless owt is 0,
+       when we assume this is a brand new glob so use objects[].oc_weight */
+    if (obj->globby && obj->owt > 0)
+        wt = obj->owt;
     if (SchroedingersBox(obj))
         wt += mons[PM_HOUSECAT].cwt;
     if (Is_container(obj) || obj->otyp == STATUE) {
@@ -2578,15 +2589,10 @@ struct obj *
 obj_nexto(otmp)
 struct obj *otmp;
 {
-    struct obj *otmp2 = (struct obj *) 0;
-
-    if (otmp) {
-        otmp2 = obj_nexto_xy(otmp->otyp, otmp->ox, otmp->oy, otmp->o_id);
-    } else {
+    if (!otmp)
         impossible("obj_nexto: wasn't given an object to check");
-    }
 
-    return otmp2;
+    return obj_nexto_xy(otmp, otmp->ox, otmp->oy, TRUE);
 }
 
 /*
@@ -2598,23 +2604,26 @@ struct obj *otmp;
  * reliably predict which one we want to 'find' first
  */
 struct obj *
-obj_nexto_xy(otyp, x, y, oid)
-int otyp, x, y;
-unsigned oid;
+obj_nexto_xy(obj, x, y, recurs)
+struct obj *obj;
+int x, y;
+boolean recurs;
 {
     struct obj *otmp;
-    int fx, fy, ex, ey;
+    int fx, fy, ex, ey, otyp = obj->otyp;
     short dx, dy;
 
     /* check under our "feet" first */
     otmp = sobj_at(otyp, x, y);
     while (otmp) {
         /* don't be clever and find ourselves */
-        if (otmp->o_id != oid) {
+        if (otmp != obj && mergable(otmp, obj))
             return otmp;
-        }
         otmp = nxtobj(otmp, otyp, TRUE);
     }
+
+    if (!recurs)
+        return (struct obj *) 0;
 
     /* search in a random order */
     dx = (rn2(2) ? -1 : 1);
@@ -2626,9 +2635,8 @@ unsigned oid;
         for (fy = ey; abs(fy - ey) < 3; fy += dy) {
             /* 0, 0 was checked above */
             if (isok(fx, fy) && (fx != x || fy != y)) {
-                if ((otmp = sobj_at(otyp, fx, fy)) != 0) {
+                if ((otmp = obj_nexto_xy(obj, fx, fy, FALSE)) != 0)
                     return otmp;
-                }
             }
         }
     }
@@ -2644,18 +2652,35 @@ struct obj *
 obj_absorb(obj1, obj2)
 struct obj **obj1, **obj2;
 {
-    struct obj *otmp1 = (struct obj *) 0, *otmp2 = (struct obj *) 0;
-    int extrawt = 0;
+    struct obj *otmp1, *otmp2;
+    int o1wt, o2wt;
+    long agetmp;
 
     /* don't let people dumb it up */
     if (obj1 && obj2) {
         otmp1 = *obj1;
         otmp2 = *obj2;
-        if (otmp1 && otmp2) {
-            extrawt = otmp2->oeaten ? otmp2->oeaten : otmp2->owt;
-            otmp1->owt += extrawt;
-            otmp1->oeaten += otmp1->oeaten ? extrawt : 0;
-            otmp1->quan = 1;
+        if (otmp1 && otmp2 && otmp1 != otmp2) {
+            if (otmp1->bknown != otmp2->bknown)
+                otmp1->bknown = otmp2->bknown = 0;
+            if (otmp1->rknown != otmp2->rknown)
+                otmp1->rknown = otmp2->rknown = 0;
+            if (otmp1->greased != otmp2->greased)
+                otmp1->greased = otmp2->greased = 0;
+            if (otmp1->orotten || otmp2->orotten)
+                otmp1->orotten = otmp2->orotten = 1;
+            o1wt = otmp1->oeaten ? otmp1->oeaten : otmp1->owt;
+            o2wt = otmp2->oeaten ? otmp2->oeaten : otmp2->owt;
+            /* averaging the relative ages is less likely to overflow
+               than averaging the absolute ages directly */
+            agetmp = (((moves - otmp1->age) * o1wt
+                       + (moves - otmp2->age) * o2wt)
+                      / (o1wt + o2wt));
+            otmp1->age = moves - agetmp; /* conv. relative back to absolute */
+            otmp1->owt += o2wt;
+            if (otmp1->oeaten)
+                otmp1->oeaten += o2wt;
+            otmp1->quan = 1L;
             obj_extract_self(otmp2);
             newsym(otmp2->ox, otmp2->oy); /* in case of floor */
             dealloc_obj(otmp2);
@@ -2677,13 +2702,14 @@ struct obj *
 obj_meld(obj1, obj2)
 struct obj **obj1, **obj2;
 {
-    struct obj *otmp1 = (struct obj *) 0, *otmp2 = (struct obj *) 0;
+    struct obj *otmp1, *otmp2;
 
     if (obj1 && obj2) {
         otmp1 = *obj1;
         otmp2 = *obj2;
-        if (otmp1 && otmp2) {
-            if (otmp1->owt > otmp2->owt || rn2(2)) {
+        if (otmp1 && otmp2 && otmp1 != otmp2) {
+            if (otmp1->owt > otmp2->owt
+                || (otmp1->owt == otmp2->owt && rn2(2))) {
                 return obj_absorb(obj1, obj2);
             }
             return obj_absorb(obj2, obj1);

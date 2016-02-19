@@ -406,6 +406,8 @@ struct plinemsg_type {
 #define MSGTYP_NOREP    1
 #define MSGTYP_NOSHOW   2
 #define MSGTYP_STOP     3
+/* bitmask for callers of hide_unhide_msgtypes() */
+#define MSGTYP_MASK_REP_SHOW ((1 << MSGTYP_NOREP) | (1 << MSGTYP_NOSHOW))
 
 E struct plinemsg_type *plinemsg_types;
 

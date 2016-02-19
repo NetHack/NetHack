@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1452123455 2016/01/06 23:37:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.535 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1455672983 2016/02/17 01:36:23 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.548 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -256,6 +256,7 @@ E int NDECL(findit);
 E int NDECL(openit);
 E boolean FDECL(detecting, (void (*)(int, int, genericptr)));
 E void FDECL(find_trap, (struct trap *));
+E void NDECL(warnreveal);
 E int FDECL(dosearch0, (int));
 E int NDECL(dosearch);
 E void NDECL(sokoban_detect);
@@ -333,6 +334,7 @@ E int FDECL(zapdir_to_glyph, (int, int, int));
 E int FDECL(glyph_at, (XCHAR_P, XCHAR_P));
 E void NDECL(set_wall_state);
 E void FDECL(unset_seenv, (struct rm *, int, int, int, int));
+E int FDECL(warning_of, (struct monst *));
 
 /* ### do.c ### */
 
@@ -368,6 +370,7 @@ E void NDECL(heal_legs);
 
 /* ### do_name.c ### */
 
+E char *FDECL(coord_desc, (int, int, char *, CHAR_P));
 E int FDECL(getpos, (coord *, BOOLEAN_P, const char *));
 E void FDECL(getpos_sethilite, (void (*f)(int)));
 E void FDECL(new_mname, (struct monst *, int));
@@ -942,6 +945,7 @@ E int NDECL(dolook);
 E boolean FDECL(will_feel_cockatrice, (struct obj *, BOOLEAN_P));
 E void FDECL(feel_cockatrice, (struct obj *, BOOLEAN_P));
 E void FDECL(stackobj, (struct obj *));
+E boolean FDECL(mergable, (struct obj *, struct obj *));
 E int NDECL(doprgold);
 E int NDECL(doprwep);
 E int NDECL(doprarm);
@@ -1274,7 +1278,7 @@ E long FDECL(peek_at_iced_corpse_age, (struct obj *));
 E int FDECL(hornoplenty, (struct obj *, BOOLEAN_P));
 E void NDECL(obj_sanity_check);
 E struct obj *FDECL(obj_nexto, (struct obj *));
-E struct obj *FDECL(obj_nexto_xy, (int, int, int, unsigned));
+E struct obj *FDECL(obj_nexto_xy, (struct obj *, int, int, BOOLEAN_P));
 E struct obj *FDECL(obj_absorb, (struct obj **, struct obj **));
 E struct obj *FDECL(obj_meld, (struct obj **, struct obj **));
 
@@ -1640,8 +1644,8 @@ E int NDECL(dotogglepickup);
 E void NDECL(option_help);
 E void FDECL(next_opt, (winid, const char *));
 E int FDECL(fruitadd, (char *, struct fruit *));
-E int FDECL(choose_classes_menu,
-            (const char *, int, BOOLEAN_P, char *, char *));
+E int FDECL(choose_classes_menu, (const char *, int, BOOLEAN_P,
+                                  char *, char *));
 E void FDECL(add_menu_cmd_alias, (CHAR_P, CHAR_P));
 E char FDECL(map_menu_cmd, (CHAR_P));
 E void FDECL(assign_warnings, (uchar *));
@@ -1665,12 +1669,17 @@ E boolean FDECL(get_menu_coloring, (char *, int *, int *));
 E void NDECL(free_menu_coloring);
 E boolean FDECL(msgtype_parse_add, (char *));
 E int FDECL(msgtype_type, (const char *, BOOLEAN_P));
+E void FDECL(hide_unhide_msgtypes, (BOOLEAN_P, int));
 E void NDECL(msgtype_free);
 
 /* ### pager.c ### */
 
 E char *FDECL(self_lookat, (char *));
+E void FDECL(mhidden_description, (struct monst *, BOOLEAN_P, char *));
 E boolean FDECL(object_from_map, (int,int,int,struct obj **));
+E int FDECL(do_screen_description, (coord, BOOLEAN_P, int, char *,
+                                    const char **));
+E int FDECL(do_look, (int, coord *));
 E int NDECL(dowhatis);
 E int NDECL(doquickwhatis);
 E int NDECL(doidtrap);
@@ -1678,9 +1687,6 @@ E int NDECL(dowhatdoes);
 E char *FDECL(dowhatdoes_core, (CHAR_P, char *));
 E int NDECL(dohelp);
 E int NDECL(dohistory);
-E int FDECL(do_screen_description,
-            (coord, BOOLEAN_P, int, char *, const char **));
-E int FDECL(do_look, (int, coord *));
 
 /* ### pcmain.c ### */
 
@@ -2023,7 +2029,7 @@ E char *FDECL(build_plselection_prompt, (char *, int, int, int, int, int));
 E char *FDECL(root_plselection_prompt, (char *, int, int, int, int, int));
 E void NDECL(plnamesuffix);
 E void FDECL(role_selection_prolog, (int, winid));
-E void FDECL(role_menu_extra, (int, winid));
+E void FDECL(role_menu_extra, (int, winid, BOOLEAN_P));
 E void NDECL(role_init);
 E const char *FDECL(Hello, (struct monst *));
 E const char *NDECL(Goodbye);
@@ -2144,7 +2150,8 @@ E void FDECL(free_eshk, (struct monst *));
 E void FDECL(stock_room, (int, struct mkroom *));
 E boolean FDECL(saleable, (struct monst *, struct obj *));
 E int FDECL(get_shop_item, (int));
-E const char *FDECL(shkname, (struct monst *));
+E char *FDECL(Shknam, (struct monst *));
+E char *FDECL(shkname, (struct monst *));
 E boolean FDECL(shkname_is_pname, (struct monst *));
 E boolean FDECL(is_izchak, (struct monst *, BOOLEAN_P));
 
@@ -2194,6 +2201,7 @@ E boolean FDECL(load_special, (const char *));
 
 /* ### spell.c ### */
 
+E void FDECL(book_cursed, (struct obj *));
 #ifdef USE_TRAMPOLI
 E int NDECL(learn);
 #endif
@@ -2230,6 +2238,7 @@ E struct obj *FDECL(findgold, (struct obj *));
 E void NDECL(rider_cant_reach);
 E boolean FDECL(can_saddle, (struct monst *));
 E int FDECL(use_saddle, (struct obj *));
+E void FDECL(put_saddle_on_mon, (struct obj *, struct monst *));
 E boolean FDECL(can_ride, (struct monst *));
 E int NDECL(doride);
 E boolean FDECL(mount_steed, (struct monst *, BOOLEAN_P));
@@ -2677,6 +2686,7 @@ E void NDECL(amulet);
 E int FDECL(mon_has_amulet, (struct monst *));
 E int FDECL(mon_has_special, (struct monst *));
 E int FDECL(tactics, (struct monst *));
+E boolean FDECL(has_aggravatables, (struct monst *));
 E void NDECL(aggravate);
 E void NDECL(clonewiz);
 E int NDECL(pick_nasty);

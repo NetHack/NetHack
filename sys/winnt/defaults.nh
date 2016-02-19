@@ -100,6 +100,10 @@ OPTIONS=hilite_pet,!toptenwin
 # window, windowframe, windowtext.
 #OPTIONS=windowcolors:status windowtext/window message windowtext/window
 
+# "Nethack mode" colors
+OPTIONS=windowcolors:status white/#000000 message white/#000000 text white/#000000 menu white/#000000 menutext white/#000000
+OPTIONS=vary_msgcount:1
+
 # *** LOCATIONS ***
 # IMPORTANT: If you change any of these locations, the directories they
 # point at must exist.  NetHack will not create them for you.

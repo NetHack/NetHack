@@ -1,4 +1,4 @@
-/* NetHack 3.6	tilemap.c	$NHDT-Date: 1447306925 2015/11/12 05:42:05 $  $NHDT-Branch: master $:$NHDT-Revision: 1.25 $ */
+/* NetHack 3.6	tilemap.c	$NHDT-Date: 1454502429 2016/02/03 12:27:09 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.28 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -12,6 +12,7 @@
 const char *FDECL(tilename, (int, int));
 void NDECL(init_tilemap);
 void FDECL(process_substitutions, (FILE *));
+boolean FDECL(acceptable_tilename, (int, const char *, const char *));
 
 #if defined(MICRO) || defined(WIN32)
 #undef exit
@@ -509,3 +510,121 @@ main()
 }
 
 #endif /* TILETEXT */
+
+struct {
+    int idx;
+    const char *betterlabel;
+    const char *expectedlabel;
+} altlabels[] = {
+{S_stone,    "dark part of a room", "dark part of a room"},
+{S_vwall,    "vertical wall", "wall"},
+{S_hwall,    "horizontal wall", "wall"},
+{S_tlcorn,   "top left corner wall", "wall"},
+{S_trcorn,   "top right corner wall", "wall"},
+{S_blcorn,   "bottom left corner wall", "wall"},
+{S_brcorn,   "bottom right corner wall", "wall"},
+{S_crwall,   "cross wall", "wall"},
+{S_tuwall,   "tuwall", "wall"},
+{S_tdwall,   "tdwall", "wall"},
+{S_tlwall,   "tlwall", "wall"},
+{S_trwall,   "trwall", "wall"},
+{S_ndoor,    "no door", "doorway"},
+{S_vodoor,   "vertical open door", "open door"},
+{S_hodoor,   "horizontal open door", "open door"},
+{S_vcdoor,   "vertical closed door", "closed door"},
+{S_hcdoor,   "horizontal closed door", "closed door"},
+{S_bars,     "iron bars", "iron bars"},
+{S_tree,     "tree", "tree"},
+{S_room,     "room", "floor of a room"},
+{S_darkroom, "darkroom", "dark part of a room"},
+{S_corr,     "corridor", "corridor"},
+{S_litcorr,  "lit corridor", "lit corridor"},
+{S_upstair,  "up stairs", "staircase up"},
+{S_dnstair,  "down stairs", "staircase down"},
+{S_upladder, "up ladder", "ladder up"},
+{S_dnladder, "down ladder", "ladder down"},
+{S_altar,    "altar", "altar"},
+{S_grave,    "grave", "grave"},
+{S_throne,   "throne", "opulent throne"},
+{S_sink,     "sink", "sink"},
+{S_fountain, "fountain", "fountain"},
+{S_pool,     "pool", "water"},
+{S_ice,      "ice", "ice"},
+{S_lava,     "lava", "molten lava"},
+{S_vodbridge, "vertical open drawbridge", "lowered drawbridge"},
+{S_hodbridge, "horizontal open drawbridge", "lowered drawbridge"},
+{S_vcdbridge, "vertical closed drawbridge", "raised drawbridge"},
+{S_hcdbridge, "horizontal closed drawbridge", "raised drawbridge"},
+{S_air,      "air", "air"},
+{S_cloud,    "cloud", "cloud"},
+{S_water,    "water", "water"},
+{S_arrow_trap,           "arrow trap", "arrow trap"},
+{S_dart_trap,            "dart trap", "dart trap"},
+{S_falling_rock_trap,    "falling rock trap", "falling rock trap"},
+{S_squeaky_board,        "squeaky board", "squeaky board"},
+{S_bear_trap,            "bear trap", "bear trap"},
+{S_land_mine,            "land mine", "land mine"},
+{S_rolling_boulder_trap, "rolling boulder trap", "rolling boulder trap"},
+{S_sleeping_gas_trap,    "sleeping gas trap", "sleeping gas trap"},
+{S_rust_trap,            "rust trap", "rust trap"},
+{S_fire_trap,            "fire trap", "fire trap"},
+{S_pit,                  "pit", "pit"},
+{S_spiked_pit,           "spiked pit", "spiked pit"},
+{S_hole,                 "hole", "hole"},
+{S_trap_door,            "trap door", "trap door"},
+{S_teleportation_trap,   "teleportation trap", "teleportation trap"},
+{S_level_teleporter,     "level teleporter", "level teleporter"},
+{S_magic_portal,         "magic portal", "magic portal"},
+{S_web,                  "web", "web"},
+{S_statue_trap,          "statue trap", "statue trap"},
+{S_magic_trap,           "magic trap", "magic trap"},
+{S_anti_magic_trap,      "anti magic trap", "anti-magic field"},
+{S_polymorph_trap,       "polymorph trap", "polymorph trap"},
+{S_vibrating_square,     "vibrating square", "vibrating square"},
+{S_vbeam,    "vertical beam", "wall"},
+{S_hbeam,    "horizontal beam", "wall"},
+{S_lslant,   "left slant beam", "wall"},
+{S_rslant,   "right slant beam", "wall"},
+{S_digbeam,  "dig beam", "cmap 69"},
+{S_flashbeam, "flash beam", "cmap 70"},
+{S_boomleft, "boom left", "cmap 71"},
+{S_boomright, "boom right", "cmap 72"},
+{S_ss1,      "shield1", "cmap 73"},
+{S_ss2,      "shield2", "cmap 74"},
+{S_ss3,      "shield3", "cmap 75"},
+{S_ss4,      "shield4", "cmap 76"},
+{S_poisoncloud, "poison cloud", "poison cloud"},
+{S_goodpos,  "valid position", "valid position"},
+{S_sw_tl,    "swallow top left", "cmap 79"},
+{S_sw_tc,    "swallow top center", "cmap 80"},
+{S_sw_tr,    "swallow top right", "cmap 81"},
+{S_sw_ml,    "swallow middle left", "cmap 82"},
+{S_sw_mr,    "swallow middle right", "cmap 83"},
+{S_sw_bl,    "swallow bottom left ", "cmap 84"},
+{S_sw_bc,    "swallow bottom center", "cmap 85"},
+{S_sw_br,    "swallow bottom right", "cmap 86"},
+{S_explode1, "explosion top left", "explosion dark 0"},
+{S_explode2, "explosion top centre", "explosion dark 1"},
+{S_explode3, "explosion top right", "explosion dark 2"},
+{S_explode4, "explosion middle left", "explosion dark 3"},
+{S_explode5, "explosion middle center", "explosion dark 4"},
+{S_explode6, "explosion middle right", "explosion dark 5"},
+{S_explode7, "explosion bottom left", "explosion dark 6"},
+{S_explode8, "explosion bottom center", "explosion dark 7"},
+{S_explode9, "explosion bottom right", "explosion dark 8"},
+};
+
+boolean
+acceptable_tilename(idx, encountered, expected)
+int idx;
+const char *encountered, *expected;
+{
+    if (idx >= 0 && idx < SIZE(altlabels)) {
+        if (!strcmp(altlabels[idx].expectedlabel, expected)) {
+            if (!strcmp(altlabels[idx].betterlabel, encountered))
+                return TRUE;
+        }
+    }
+    return FALSE;
+}
+

@@ -1,4 +1,4 @@
-/* NetHack 3.6  makedefs.c  $NHDT-Date: 1447062431 2015/11/09 09:47:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.105 $ */
+/* NetHack 3.6  makedefs.c  $NHDT-Date: 1455357861 2016/02/13 10:04:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.109 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
 /* Copyright (c) Dean Luick, 1990.                                */
@@ -52,7 +52,7 @@
 #endif
 
 #if defined(UNIX) && !defined(LINT) && !defined(GCC_WARN)
-static const char SCCS_Id[] = "@(#)makedefs.c\t3.5\t2004/02/01";
+static const char SCCS_Id[] = "@(#)makedefs.c\t3.6\t2016/02/12";
 #endif
 
 /* names of files to be generated */
@@ -164,6 +164,12 @@ void NDECL(do_vision);
 extern void NDECL(monst_init);   /* monst.c */
 extern void NDECL(objects_init); /* objects.c */
 
+static void NDECL(link_sanity_check);
+static char *FDECL(name_file, (const char *, const char *));
+static void FDECL(delete_file, (const char *template, const char *));
+static FILE *FDECL(getfp, (const char *, const char *, const char *));
+static void FDECL(do_ext_makedefs, (int, char **));
+
 static void NDECL(make_version);
 static char *FDECL(version_string, (char *, const char *));
 static char *FDECL(version_id_string, (char *, const char *));
@@ -177,7 +183,6 @@ static boolean FDECL(h_filter, (char *));
 static boolean FDECL(ranged_attk, (struct permonst *));
 static int FDECL(mstrength, (struct permonst *));
 static void NDECL(build_savebones_compat_string);
-static void FDECL(do_ext_makedefs, (int, char **));
 static void NDECL(windowing_sanity);
 
 static boolean FDECL(qt_comment, (char *));
@@ -368,10 +373,11 @@ char *options;
 }
 
 static char namebuf[1000];
+
 static char *
 name_file(template, tag)
-char *template;
-char *tag;
+const char *template;
+const char *tag;
 {
     Sprintf(namebuf, template, tag);
     return namebuf;
@@ -379,21 +385,23 @@ char *tag;
 
 static void
 delete_file(template, tag)
-char *template;
-char *tag;
+const char *template;
+const char *tag;
 {
     char *name = name_file(template, tag);
+
     Unlink(name);
 }
 
 static FILE *
 getfp(template, tag, mode)
-char *template;
-char *tag;
-char *mode;
+const char *template;
+const char *tag;
+const char *mode;
 {
     char *name = name_file(template, tag);
     FILE *rv = fopen(name, mode);
+
     if (!rv) {
         Fprintf(stderr, "Can't open '%s'.\n", name);
         exit(EXIT_FAILURE);
@@ -413,10 +421,26 @@ struct grep_var {
 /* struct grep_var grep_vars[] and TODO_* constants in include file: */
 #include "mdgrep.h"
 
-static void NDECL(do_grep);
 static void NDECL(do_grep_showvars);
-static struct grep_var *FDECL(grepsearch, (char *));
+static struct grep_var *FDECL(grepsearch, (const char *));
+static int FDECL(grep_check_id, (const char *));
+static void FDECL(grep_show_wstack, (const char *));
+static char *FDECL(do_grep_control, (char *));
+static void NDECL(do_grep);
+static void FDECL(grep0, (FILE *, FILE *));
+
 static int grep_trace = 0;
+
+#define IS_OPTION(str) if (!strcmp(&argv[0][2], str))
+#define CONTINUE    \
+    argv++, argc--; \
+    continue
+#define CONSUME                              \
+    argv++, argc--;                          \
+    if (argc == 0) {                         \
+        Fprintf(stderr, "missing option\n"); \
+        exit(EXIT_FAILURE);                  \
+    }
 
 static void
 do_ext_makedefs(int argc, char **argv)
@@ -435,22 +459,11 @@ do_ext_makedefs(int argc, char **argv)
             Fprintf(stderr, "Can't mix - and -- options.\n");
             exit(EXIT_FAILURE);
         }
-#define IS_OPTION(str) if (!strcmp(&argv[0][2], str))
-#define CONTINUE    \
-    argv++, argc--; \
-    continue
-#define CONSUME                              \
-    argv++, argc--;                          \
-    if (argc == 0) {                         \
-        Fprintf(stderr, "missing option\n"); \
-        exit(EXIT_FAILURE);                  \
-    }
-        IS_OPTION("svs")
-        {
-            /* short version string for packaging - note
-             * no \n */
+        IS_OPTION("svs") {
+            /* short version string for packaging - note no \n */
             char buf[100];
             char delim[10];
+
             argv++; /* not CONSUME */
             delim[0] = '\0';
             if (argv[0])
@@ -458,19 +471,16 @@ do_ext_makedefs(int argc, char **argv)
             Fprintf(stdout, "%s", version_string(buf, delim));
             exit(EXIT_SUCCESS);
         }
-        IS_OPTION("debug")
-        {
+        IS_OPTION("debug") {
             debug = TRUE;
             CONTINUE;
         }
-        IS_OPTION("make")
-        {
+        IS_OPTION("make") {
             CONSUME;
             do_makedefs(argv[0]);
             exit(EXIT_SUCCESS);
         }
-        IS_OPTION("input")
-        {
+        IS_OPTION("input") {
             CONSUME;
             if (!strcmp(argv[0], "-")) {
                 inputfp = stdin;
@@ -483,8 +493,7 @@ do_ext_makedefs(int argc, char **argv)
             }
             CONTINUE;
         }
-        IS_OPTION("output")
-        {
+        IS_OPTION("output") {
             CONSUME;
             if (!strcmp(argv[0], "-")) {
                 outputfp = stdout;
@@ -497,8 +506,7 @@ do_ext_makedefs(int argc, char **argv)
             }
             CONTINUE;
         }
-        IS_OPTION("grep")
-        {
+        IS_OPTION("grep") {
             if (todo) {
                 Fprintf(stderr, "Can't do grep and something else.\n");
                 exit(EXIT_FAILURE);
@@ -506,19 +514,17 @@ do_ext_makedefs(int argc, char **argv)
             todo = TODO_GREP;
             CONTINUE;
         }
-        IS_OPTION("grep-showvars")
-        {
+        IS_OPTION("grep-showvars") {
             do_grep_showvars();
             exit(EXIT_SUCCESS);
         }
-        IS_OPTION("grep-trace")
-        {
+        IS_OPTION("grep-trace") {
             grep_trace = 1;
             CONTINUE;
         }
-        IS_OPTION("grep-define")
-        {
+        IS_OPTION("grep-define") {
             struct grep_var *p;
+
             CONSUME;
             p = grepsearch(argv[0]);
             if (p) {
@@ -529,9 +535,9 @@ do_ext_makedefs(int argc, char **argv)
             }
             CONTINUE;
         }
-        IS_OPTION("grep-undef")
-        {
+        IS_OPTION("grep-undef") {
             struct grep_var *p;
+
             CONSUME;
             p = grepsearch(argv[0]);
             if (p) {
@@ -543,11 +549,9 @@ do_ext_makedefs(int argc, char **argv)
             CONTINUE;
         }
 #ifdef notyet
-        IS_OPTION("help")
-        {
+        IS_OPTION("help") {
         }
 #endif
-#undef IS_OPTION
         Fprintf(stderr, "Unknown option '%s'.\n", argv[0]);
         exit(EXIT_FAILURE);
     }
@@ -568,6 +572,10 @@ do_ext_makedefs(int argc, char **argv)
         break;
     }
 }
+
+#undef IS_OPTION
+#undef CONTINUE
+#undef CONSUME
 
 /*
  Filtering syntax:
@@ -619,6 +627,7 @@ static void
 do_grep_showvars()
 {
     int x;
+
     for (x = 0; x < SIZE(grep_vars) - 1; x++) {
         printf("%d\t%s\n", grep_vars[x].is_defined, grep_vars[x].name);
     }
@@ -626,10 +635,11 @@ do_grep_showvars()
 
 static struct grep_var *
 grepsearch(name)
-char *name;
+const char *name;
 {
     /* XXX make into binary search */
     int x = 0;
+
     while (x < SIZE(grep_vars) - 1) {
         if (!strcmp(grep_vars[x].name, name))
             return &grep_vars[x];
@@ -640,9 +650,10 @@ char *name;
 
 static int
 grep_check_id(id)
-char *id;
+const char *id;
 {
     struct grep_var *rv;
+
     while (*id && isspace(*id))
         id++;
     if (!*id) {
@@ -669,7 +680,7 @@ char *id;
 
 static void
 grep_show_wstack(tag)
-char *tag;
+const char *tag;
 {
     int x;
 
@@ -743,6 +754,7 @@ char *buf;
         return buf0;
     default: {
         char str[10];
+
         if (isprint(buf[0])) {
             str[0] = buf[0];
             str[1] = '\0';
@@ -1404,6 +1416,15 @@ static const char *build_opts[] = {
 #endif
 #ifdef SHELL
     "shell command",
+#endif
+#ifdef STATUS_VIA_WINDOWPORT
+# ifdef STATUS_HILITES
+    "status via windowport with highlighting",
+# else
+    "status via windowport without highlighting",
+# endif
+#else
+    "traditional status display",
 #endif
 #ifdef SUSPEND
     "suspend command",

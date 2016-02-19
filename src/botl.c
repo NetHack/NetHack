@@ -91,10 +91,9 @@ bot2()
     /*
      * Various min(x,9999)'s are to avoid having excessive values
      * violate the field width assumptions in botl.h and should not
-     * impact normal play [not too sure about limiting spell power
-     * to 3 digits].  Particularly 64-bit long for gold which could
-     * require many more digits if someone figures out a way to get
-     * and carry a really large (or negative) amount of it.
+     * impact normal play.  Particularly 64-bit long for gold which
+     * could require many more digits if someone figures out a way
+     * to get and carry a really large (or negative) amount of it.
      * Turn counter is also long, but we'll risk that.
      */
 
@@ -102,7 +101,7 @@ bot2()
     (void) describe_level(dloc); /* includes at least one trailing space */
     if ((money = money_cnt(invent)) < 0L)
         money = 0L; /* ought to issue impossible() and then discard gold */
-    Sprintf(eos(dloc), "%s:%-2ld",
+    Sprintf(eos(dloc), "%s:%-2ld", /* strongest hero can lift ~300000 gold */
             encglyph(objnum_to_glyph(GOLD_PIECE)), min(money, 999999L));
     dln = strlen(dloc);
     /* '$' encoded as \GXXXXNNNN is 9 chars longer than display will need */
@@ -115,7 +114,7 @@ bot2()
         hp = 0;
     Sprintf(hlth, "HP:%d(%d) Pw:%d(%d) AC:%-2d",
             min(hp, 9999), min(hpmax, 9999),
-            min(u.uen, 999), min(u.uenmax, 999), u.uac);
+            min(u.uen, 9999), min(u.uenmax, 9999), u.uac);
     hln = strlen(hlth);
 
     /* experience */
@@ -546,8 +545,8 @@ bot()
     valset[BL_GOLD] = TRUE; /* indicate val already set */
 
     /* Power (magical energy) */
-    blstats[idx][BL_ENE].a.a_int = min(u.uen, 999);
-    blstats[idx][BL_ENEMAX].a.a_int = min(u.uenmax, 999);
+    blstats[idx][BL_ENE].a.a_int = min(u.uen, 9999);
+    blstats[idx][BL_ENEMAX].a.a_int = min(u.uenmax, 9999);
 
     /* Armor class */
     blstats[idx][BL_AC].a.a_int = u.uac;
@@ -652,7 +651,8 @@ bot()
      * To work around it, we call status_update() with fictitious
      * index of BL_FLUSH (-1).
      */
-    if (context.botlx && !updated)
+    if ((context.botlx && !updated)
+        || windowprocs.win_status_update == genl_status_update)
         status_update(BL_FLUSH, (genericptr_t) 0, 0, 0);
 
     context.botl = context.botlx = 0;
@@ -796,7 +796,7 @@ boolean
                                   (!flags.showexp || Upolyd) ? FALSE : TRUE);
             break;
         case BL_CONDITION:
-            fieldfmt = "%S";
+            fieldfmt = "%s";
             fieldname = "condition";
             status_enablefield(fld, fieldname, fieldfmt, TRUE);
             break;

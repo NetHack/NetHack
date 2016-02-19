@@ -308,6 +308,8 @@ boolean resuming;
 
                     if (Searching && multi >= 0)
                         (void) dosearch0(1);
+                    if (Warning)
+                        warnreveal();
                     dosounds();
                     do_storms();
                     gethungry();

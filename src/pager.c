@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1448482543 2015/11/25 20:15:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.86 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1455674291 2016/02/17 01:58:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.93 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -75,6 +75,62 @@ char *outbuf;
     if (u.usteed)
         Sprintf(eos(outbuf), ", mounted on %s", y_monnam(u.usteed));
     return outbuf;
+}
+
+/* describe a hidden monster; used for look_at during extended monster
+   detection and for probing */
+void
+mhidden_description(mon, altmon, outbuf)
+struct monst *mon;
+boolean altmon; /* for probing: if mimicking a monster, say so */
+char *outbuf;
+{
+    struct obj *otmp;
+    boolean fakeobj;
+    int x = mon->mx, y = mon->my, glyph = levl[x][y].glyph;
+
+    *outbuf = '\0';
+    if (mon->m_ap_type == M_AP_FURNITURE
+        || mon->m_ap_type == M_AP_OBJECT) {
+        Strcpy(outbuf, ", mimicking ");
+        if (mon->m_ap_type == M_AP_FURNITURE) {
+            Strcat(outbuf, an(defsyms[mon->mappearance].explanation));
+        } else if (mon->m_ap_type == M_AP_OBJECT
+                   /* remembered glyph, not glyph_at() which is 'mon' */
+                   && glyph_is_object(glyph)) {
+        objfrommap:
+            otmp = (struct obj *) 0;
+            fakeobj = object_from_map(glyph, x, y, &otmp);
+            Strcat(outbuf, (otmp && otmp->otyp != STRANGE_OBJECT)
+                              ? ansimpleoname(otmp)
+                              : an(obj_descr[STRANGE_OBJECT].oc_name));
+            if (fakeobj)
+                dealloc_obj(otmp);
+        } else {
+            Strcat(outbuf, something);
+        }
+    } else if (mon->m_ap_type == M_AP_MONSTER) {
+        if (altmon)
+            Sprintf(outbuf, ", masquerading as %s",
+                    an(mons[mon->mappearance].mname));
+    } else if (mon->mundetected) {
+        Strcpy(outbuf, ", hiding");
+        if (hides_under(mon->data)) {
+            Strcat(outbuf, " under ");
+            /* remembered glyph, not glyph_at() which is 'mon' */
+            if (glyph_is_object(glyph))
+                goto objfrommap;
+            Strcat(outbuf, something);
+        } else if (is_hider(mon->data)) {
+            Sprintf(eos(outbuf), " on the %s",
+                    (is_flyer(mon->data) || mon->data->mlet == S_PIERCER)
+                       ? "ceiling"
+                       : surface(x, y)); /* trapper */
+        } else {
+            if (mon->data->mlet == S_EEL && is_pool(x, y))
+                Strcat(outbuf, " in murky water");
+        }
+    }
 }
 
 /* extracted from lookat(); also used by namefloorobj() */
@@ -156,11 +212,9 @@ int x, y;
     char *name, monnambuf[BUFSZ];
     boolean accurate = !Hallucination;
 
-    if (mtmp->data == &mons[PM_COYOTE] && accurate)
-        name = coyotename(mtmp, monnambuf);
-    else
-        name = distant_monnam(mtmp, ARTICLE_NONE, monnambuf);
-
+    name = (mtmp->data == &mons[PM_COYOTE] && accurate)
+              ? coyotename(mtmp, monnambuf)
+              : distant_monnam(mtmp, ARTICLE_NONE, monnambuf);
     Sprintf(buf, "%s%s%s",
             (mtmp->mx != x || mtmp->my != y)
                 ? ((mtmp->isshk && accurate) ? "tail of " : "tail of a ")
@@ -186,6 +240,11 @@ int x, y;
             Sprintf(eos(buf), ", trapped in %s",
                     an(defsyms[trap_to_defsym(tt)].explanation));
     }
+
+    /* we know the hero sees a monster at this location, but if it's shown
+       due to persistant monster detection he might remember something else */
+    if (mtmp->mundetected || mtmp->m_ap_type)
+        mhidden_description(mtmp, FALSE, eos(buf));
 
     if (monbuf) {
         unsigned how_seen = howmonseen(mtmp);
@@ -316,6 +375,9 @@ char *buf, *monbuf;
         int tnum = what_trap(glyph_to_trap(glyph));
 
         Strcpy(buf, defsyms[trap_to_defsym(tnum)].explanation);
+    } else if (glyph_is_warning(glyph)) {
+        int warnindx = glyph_to_warning(glyph);
+        Strcpy(buf, def_warnsyms[warnindx].explanation);
     } else if (!glyph_is_cmap(glyph)) {
         Strcpy(buf, "unexplored area");
     } else
@@ -379,11 +441,11 @@ struct permonst *pm;
 boolean user_typed_name, without_asking;
 {
     dlb *fp;
-    char buf[BUFSZ], newstr[BUFSZ];
+    char buf[BUFSZ], newstr[BUFSZ], givenname[BUFSZ];
     char *ep, *dbase_str;
     unsigned long txt_offset = 0L;
-    int chk_skip;
-    boolean found_in_file = FALSE, skipping_entry = FALSE;
+    int chk_skip, pass = 1;
+    boolean found_in_file = FALSE, skipping_entry = FALSE, yes_to_moreinfo;
     winid datawin = WIN_ERR;
 
     fp = dlb_fopen(DATAFILE, "r");
@@ -438,8 +500,13 @@ boolean user_typed_name, without_asking;
 
         if ((ep = strstri(dbase_str, " named ")) != 0)
             alt = ep + 7;
-        else
-            ep = strstri(dbase_str, " called ");
+        else if ((ep = strstri(dbase_str, " called ")) != 0) {
+            if (strlen(ep + 8) < BUFSZ - 1) {
+                Strcpy(givenname, ep + 8);
+                givenname[BUFSZ-1] = '\0';
+                alt = &givenname[0];
+            }
+        }
         if (!ep)
             ep = strstri(dbase_str, ", ");
         if (ep && ep > dbase_str)
@@ -456,85 +523,108 @@ boolean user_typed_name, without_asking;
         if (!alt)
             alt = makesingular(dbase_str);
 
-        /* skip first record; read second */
-        txt_offset = 0L;
-        if (!dlb_fgets(buf, BUFSZ, fp) || !dlb_fgets(buf, BUFSZ, fp)) {
-            impossible("can't read 'data' file");
-            (void) dlb_fclose(fp);
-            return;
-        } else if (sscanf(buf, "%8lx\n", &txt_offset) < 1 || txt_offset == 0L)
-            goto bad_data_file;
+        if (!strcmp(alt, dbase_str))
+            pass = 0;
 
-        /* look for the appropriate entry */
-        while (dlb_fgets(buf, BUFSZ, fp)) {
-            if (*buf == '.')
-                break; /* we passed last entry without success */
+        for (; pass >= 0; pass--) {
+            txt_offset = 0L;
+            if (dlb_fseek(fp, txt_offset, SEEK_SET) < 0 ) {
+                impossible("can't get to start of 'data' file");
+                dlb_fclose(fp);
+                return;
+            }
+            /* skip first record; read second */
+            if (!dlb_fgets(buf, BUFSZ, fp) || !dlb_fgets(buf, BUFSZ, fp)) {
+                impossible("can't read 'data' file");
+                (void) dlb_fclose(fp);
+                return;
+            } else if (sscanf(buf, "%8lx\n", &txt_offset) < 1
+                       || txt_offset == 0L)
+                goto bad_data_file;
 
-            if (digit(*buf)) {
-                /* a number indicates the end of current entry */
-                skipping_entry = FALSE;
-            } else if (!skipping_entry) {
-                if (!(ep = index(buf, '\n')))
-                    goto bad_data_file;
-                (void) strip_newline((ep > buf) ? ep - 1 : ep);
-                /* if we match a key that begins with "~", skip this entry */
-                chk_skip = (*buf == '~') ? 1 : 0;
-                if (pmatch(&buf[chk_skip], dbase_str)
-                    || (alt && pmatch(&buf[chk_skip], alt))) {
-                    if (chk_skip) {
-                        skipping_entry = TRUE;
-                        continue;
-                    } else {
-                        found_in_file = TRUE;
-                        break;
+            /* look for the appropriate entry */
+            while (dlb_fgets(buf, BUFSZ, fp)) {
+                if (*buf == '.')
+                    break; /* we passed last entry without success */
+
+                if (digit(*buf)) {
+                    /* a number indicates the end of current entry */
+                    skipping_entry = FALSE;
+                } else if (!skipping_entry) {
+                    if (!(ep = index(buf, '\n')))
+                        goto bad_data_file;
+                    (void) strip_newline((ep > buf) ? ep - 1 : ep);
+                    /* if we match a key that begins with "~", skip this entry */
+                    chk_skip = (*buf == '~') ? 1 : 0;
+                    if ((pass == 0 && pmatch(&buf[chk_skip], dbase_str)) ||
+                        (pass == 1 && alt && pmatch(&buf[chk_skip], alt))) {
+                        if (chk_skip) {
+                            skipping_entry = TRUE;
+                            continue;
+                        } else {
+                            found_in_file = TRUE;
+                            break;
+                        }
                     }
                 }
             }
+            if (found_in_file) {
+                long entry_offset;
+                int entry_count;
+                int i;
+
+                /* skip over other possible matches for the info */
+                do {
+                    if (!dlb_fgets(buf, BUFSZ, fp))
+                        goto bad_data_file;
+                } while (!digit(*buf));
+                if (sscanf(buf, "%ld,%d\n", &entry_offset, &entry_count) < 2) {
+                bad_data_file:
+                    impossible("'data' file in wrong format or corrupted");
+                    /* window will exist if we came here from below via 'goto' */
+                    if (datawin != WIN_ERR)
+                        destroy_nhwindow(datawin);
+                    (void) dlb_fclose(fp);
+                    return;
+                }
+
+                yes_to_moreinfo = FALSE;
+                if (!user_typed_name && !without_asking) {
+                    unsigned maxt = strlen("More info about \"\"?");
+                    char *entrytext = pass ? alt : dbase_str;
+                    char question[BUFSZ];
+                    if (strlen(entrytext) < BUFSZ - maxt) {
+                        Strcpy(question, "More info about \"");
+                        Strcat(question, entrytext);
+                        Strcat(question, "\"?");
+                    }
+                    if (yn(question) == 'y')
+                        yes_to_moreinfo = TRUE;
+		}
+
+                if (user_typed_name || without_asking || yes_to_moreinfo) {
+                    if (dlb_fseek(fp,
+                        (long) txt_offset + entry_offset, SEEK_SET) < 0) {
+                        pline("? Seek error on 'data' file!");
+                        (void) dlb_fclose(fp);
+                        return;
+                    }
+                    datawin = create_nhwindow(NHW_MENU);
+                    for (i = 0; i < entry_count; i++) {
+                        if (!dlb_fgets(buf, BUFSZ, fp))
+                            goto bad_data_file;
+                        (void) strip_newline(buf);
+                        if (index(buf + 1, '\t') != 0)
+                            (void) tabexpand(buf + 1);
+                        putstr(datawin, 0, buf + 1);
+                    }
+                    display_nhwindow(datawin, FALSE);
+                    destroy_nhwindow(datawin);
+                }
+            } else if (user_typed_name && pass == 0)
+                pline("I don't have any information on those things.");
         }
     }
-
-    if (found_in_file) {
-        long entry_offset;
-        int entry_count;
-        int i;
-
-        /* skip over other possible matches for the info */
-        do {
-            if (!dlb_fgets(buf, BUFSZ, fp))
-                goto bad_data_file;
-        } while (!digit(*buf));
-        if (sscanf(buf, "%ld,%d\n", &entry_offset, &entry_count) < 2) {
-        bad_data_file:
-            impossible("'data' file in wrong format or corrupted");
-            /* window will exist if we came here from below via 'goto' */
-            if (datawin != WIN_ERR)
-                destroy_nhwindow(datawin);
-            (void) dlb_fclose(fp);
-            return;
-        }
-
-        if (user_typed_name || without_asking || yn("More info?") == 'y') {
-            if (dlb_fseek(fp, (long) txt_offset + entry_offset, SEEK_SET)
-                < 0) {
-                pline("? Seek error on 'data' file!");
-                (void) dlb_fclose(fp);
-                return;
-            }
-            datawin = create_nhwindow(NHW_MENU);
-            for (i = 0; i < entry_count; i++) {
-                if (!dlb_fgets(buf, BUFSZ, fp))
-                    goto bad_data_file;
-                (void) strip_newline(buf);
-                if (index(buf + 1, '\t') != 0)
-                    (void) tabexpand(buf + 1);
-                putstr(datawin, 0, buf + 1);
-            }
-            display_nhwindow(datawin, FALSE);
-            destroy_nhwindow(datawin);
-        }
-    } else if (user_typed_name)
-        pline("I don't have any information on those things.");
-
     (void) dlb_fclose(fp);
 }
 
@@ -984,12 +1074,7 @@ boolean do_mons; /* True => monsters, False => objects */
 {
     winid win;
     int x, y, lo_x, lo_y, hi_x, hi_y, glyph, count = 0;
-    char buf[BUFSZ], outbuf[BUFSZ], coordbuf[12], fmt[12]; /* "%02d,%02d" */
-
-    /* row,column orientation rather than cartesian x,y */
-    Sprintf(fmt, "%%%sd,%%%sd",
-            (ROWNO <= 100) ? "02" : (ROWNO <= 1000) ? "03" : "",
-            (COLNO <= 100) ? "02" : (COLNO <= 1000) ? "03" : "");
+    char lookbuf[BUFSZ], outbuf[BUFSZ];
 
     win = create_nhwindow(NHW_TEXT);
     lo_y = nearby ? max(u.uy - BOLT_LIM, 0) : 0;
@@ -998,7 +1083,7 @@ boolean do_mons; /* True => monsters, False => objects */
     hi_x = nearby ? min(u.ux + BOLT_LIM, COLNO - 1) : COLNO - 1;
     for (y = lo_y; y <= hi_y; y++) {
         for (x = lo_x; x <= hi_x; x++) {
-            buf[0] = '\0';
+            lookbuf[0] = '\0';
             glyph = glyph_at(x, y);
             if (do_mons) {
                 if (glyph_is_monster(glyph)) {
@@ -1007,49 +1092,56 @@ boolean do_mons; /* True => monsters, False => objects */
                     bhitpos.x = x; /* [is this actually necessary?] */
                     bhitpos.y = y;
                     if (x == u.ux && y == u.uy && canspotself()) {
-                        (void) self_lookat(buf);
+                        (void) self_lookat(lookbuf);
                         ++count;
                     } else if ((mtmp = m_at(x, y)) != 0) {
-                        look_at_monster(buf, (char *) 0, mtmp, x, y);
+                        look_at_monster(lookbuf, (char *) 0, mtmp, x, y);
                         ++count;
                     }
                 } else if (glyph_is_invisible(glyph)) {
                     /* remembered, unseen, creature */
-                    Strcpy(buf, invisexplain);
+                    Strcpy(lookbuf, invisexplain);
                     ++count;
                 } else if (glyph_is_warning(glyph)) {
                     int warnindx = glyph_to_warning(glyph);
 
-                    Strcpy(buf, def_warnsyms[warnindx].explanation);
+                    Strcpy(lookbuf, def_warnsyms[warnindx].explanation);
                     ++count;
                 }
             } else { /* !do_mons */
                 if (glyph_is_object(glyph)) {
-                    look_at_object(buf, x, y, glyph);
+                    look_at_object(lookbuf, x, y, glyph);
                     ++count;
                 }
             }
-            if (*buf) {
-                if (count == 1) {
-                    char which[12];
+            if (*lookbuf) {
+                char coordbuf[20], which[12], cmode;
 
+                cmode = (iflags.getpos_coords != GPCOORDS_NONE)
+                           ? iflags.getpos_coords : GPCOORDS_MAP;
+                if (count == 1) {
                     Strcpy(which, do_mons ? "monsters" : "objects");
-                    if (nearby) {
-                        Sprintf(coordbuf, fmt, u.uy, u.ux);
+                    if (nearby)
                         Sprintf(outbuf, "%s currently shown near %s:",
-                                upstart(which), coordbuf);
-                    } else
+                                upstart(which),
+                                (cmode != GPCOORDS_COMPASS)
+                                  ? coord_desc(u.ux, u.uy, coordbuf, cmode)
+                                  : !canspotself() ? "your position" : "you");
+                    else
                         Sprintf(outbuf, "All %s currently shown on the map:",
                                 which);
                     putstr(win, 0, outbuf);
                     putstr(win, 0, "");
                 }
-                Sprintf(coordbuf, fmt, y, x);
-                /* prefix: "C  row,column  " */
-                Sprintf(outbuf, "%s  %s  ", encglyph(glyph), coordbuf);
+                /* prefix: "coords  C  " where 'C' is mon or obj symbol */
+                Sprintf(outbuf, (cmode == GPCOORDS_SCREEN) ? "%s  "
+                                  : (cmode == GPCOORDS_MAP) ? "%8s  "
+                                      : "%12s  ",
+                        coord_desc(x, y, coordbuf, cmode));
+                Sprintf(eos(outbuf), "%s  ", encglyph(glyph));
                 /* guard against potential overflow */
-                buf[sizeof buf - 1 - strlen(outbuf)] = '\0';
-                Strcat(outbuf, buf);
+                lookbuf[sizeof lookbuf - 1 - strlen(outbuf)] = '\0';
+                Strcat(outbuf, lookbuf);
                 putmixed(win, 0, outbuf);
             }
         }

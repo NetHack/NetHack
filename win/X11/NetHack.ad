@@ -1,4 +1,4 @@
-! $NHDT-Date$  $NHDT-Branch$:$NHDT-Revision$
+! $NHDT-Date: 1454977917 2016/02/09 00:31:57 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.10 $
 
 ! The display_file, tombstone, and menu windows are all formatted assuming
 ! a fixed width font.  Text windows may or may not be formatted as above.
@@ -68,6 +68,13 @@ NetHack*message*translations:	<KeyPress>: input()
 ! questions is _not_ used.
 NetHack*slow: True
 
+! If 'slow' is True, setting 'highlight_prompt' to True will cause the line
+! between map and message display that's used for prompting to be "hidden"
+! as part of the map when no prompt is active, then invert foreground and
+! background to stand out when a prompt is issued and waiting for a response.
+! If 'slow' is False, 'highlight_prompt' will have no effect.
+NetHack*highlight_prompt: True
+
 ! The number of lines the message window will show without scrolling.
 !NetHack*message_lines: 12
 !
@@ -87,7 +94,10 @@ NetHack*slow: True
 
 ! Parts of the fancy status display.
 !
-NetHack*status_condition.borderWidth:	0
+NetHack*status_condition1.borderWidth:	0
+NetHack*status_condition2.borderWidth:	0
+NetHack*status_condition3.borderWidth:	0
+NetHack*status_leftover.borderWidth:	0
 NetHack*status_info*borderWidth:	0
 
 ! Sample color screen entries.
@@ -106,12 +116,19 @@ NetHack*status_info*background:		wheat
 NetHack*status_info.background:		wheat
 NetHack*status_attributes*foreground:	black
 NetHack*status_attributes*background:	white
-NetHack*status_condition*foreground:	red
-NetHack*status_condition*background:	wheat
+NetHack*status_condition1*foreground:	red
+NetHack*status_condition1*background:	wheat
+NetHack*status_condition2*foreground:	black
+NetHack*status_condition2*background:	wheat
+NetHack*status_condition3*foreground:	black
+NetHack*status_condition3*background:	wheat
 NetHack*Scrollbar*foreground:		Sienna
 NetHack*Scrollbar*background:		wheat
 NetHack*status_info*showGrip:		False
 NetHack*status_attributes*showGrip:	False
+NetHack*status_condition1*showGrip:	False
+NetHack*status_condition2*showGrip:	False
+NetHack*status_condition3*showGrip:	False
 
 NetHack*player_selection*random.borderColor:	blue
 NetHack*player_selection*random.borderWidth:    2

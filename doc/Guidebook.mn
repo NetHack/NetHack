@@ -5,7 +5,7 @@
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "December 16, 2015
+.ds f2 "January 18, 2016
 .\" labeled paragraph start (should be part of tmac.n, but I don't want to
 .\" make changes to that file)
 .\" .PS word
@@ -342,14 +342,37 @@ show only your experience level here.
 The number of turns elapsed so far, displayed if you have the
 .op time
 option set.
-.lp "Hunger status
-Your current hunger status, ranging from \fBSatiated\fP down to
-\fBFainting\fP.  If your hunger status is normal, it is not displayed.
-.pg
-Additional status flags may appear after the hunger status:  \fBConf\fP
-when you're confused, \fBFoodPois\fP or \fBIll\fP
-when sick, \fBBlind\fP when you can't
-see, \fBStun\fP when stunned, and \fBHallu\fP when hallucinating.
+.lp Status
+Hunger:
+your current hunger status.
+Values are \fBSatiated\fP, \fBNot Hungry\fP (or \fBNormal\fP),
+\fBHungry\fP, \fBWeak\fP, and \fBFainting\fP.
+.\" not mentioned: Fainted
+Not shown when \fBNormal\fP.
+.lp ""
+Encumbrance:
+an indication of how what your are carrying affects your ability to move.
+Values are \fBUnencumbered\fP, \fBEncumbered\fP, \fBStressed\fP,
+\fBStrained\fP, \fBOvertaxed\fP, and \fBOverloaded\fP.
+Not shown when \fBUnencumbered\fP.
+.lp ""
+Fatal conditions:
+\fBStone\fP (aka \fBPetrifying\fP, turning to stone),
+\fBSlime\fP (turning into green slime),
+\fBStrngl\fP (being strangled),
+\fBFoodPois\fP (suffering from acute food poisoning),
+\fBTermIll\fP (suffering from a terminal illness).
+.lp ""
+Non-fatal conditions:
+\fBBlind\fP (can't see), \fBDeaf\fP (can't hear),
+\fBStun\fB (stunned), \fBConf\fP (confused), \fBHallu\fP (hallucinating).
+.lp ""
+Movement modifiers:
+\fBLev\fP (levitating), \fBFly\fP (flying), \fBRide\fP (riding).
+.lp ""
+Other conditions and modifiers exist, but there isn't enough room to
+display them with the other status fields.  The `^X' command shows
+all relevant status conditions.
 .hn 2
 The message line (top)
 .pg
@@ -429,8 +452,8 @@ of the Mazes of Menace.  Watch out, they can be nasty and vicious.
 Sometimes, however, they can be helpful.
 .lp I
 This marks the last known location of an invisible or otherwise unseen
-monster.  Note that the monster could have moved.  The 'F' and 'm' commands
-may be useful here.
+monster.  Note that the monster could have moved.
+The `F' and `m' commands may be useful here.
 .pg
 You need not memorize all these symbols; you can ask the game what any
 symbol represents with the `/' command (see the next section for
@@ -476,7 +499,8 @@ helpful texts.  Here are the commands for your reference:
 .lp ?
 Help menu:  display one of several help texts available.
 .lp /
-Tell what a symbol represents.  You may choose to specify a location
+The ``what-is'' command, to
+tell what a symbol represents.  You may choose to specify a location
 or type a symbol (or even a whole word) to explain.
 Specifying a location is done by moving the cursor to a particular spot
 on the map and then pressing one of `.', `,', `;',
@@ -485,14 +509,31 @@ conditionally check for ``More info?'' depending upon whether the
 .op help
 option is on, and then you will be asked to pick another location;
 `,' will explain the symbol but skip any additional
-information; `;' will skip additional info and also not bother asking
+information, then let you pick another location;
+`;' will skip additional info and also not bother asking
 you to choose another location to examine; `:' will show additional
 info, if any, without asking for confirmation.  When picking a location,
 pressing the ESC key will terminate this command, or pressing `?'
 will give a brief reminder about how it works.
-.pg
+.lp ""
+If the
+.op autodescribe
+option is on, a short description of what you see at each location is
+shown as you move the cursor.  Typing `#' while picking a location will
+toggle that option on or off.
+The
+.op whatis_coord
+option controls whether the short description includes map coordinates.
+.lp ""
 Specifying a name rather than a location
 always gives any additional information available about that name.
+.lp ""
+You may also request a description of nearby monsters,
+all monsters currently displayed, nearby objects, or all objects.
+The
+.op whatis_coord
+option controls which format of map coordinate is included with their
+descriptions.
 .lp &
 Tell what a command does.
 .lp <
@@ -1995,7 +2036,9 @@ exclude that alignment from being picked randomly.
 Cannot be set with the `O' command.  Persistent.
 .lp autodescribe
 Automatically describe the terrain under cursor when asked to get a location
-on the map.
+on the map.  The
+.op whatis_coord
+option controls whether the description includes map coordinates.
 .lp autodig
 Automatically dig if you are wielding a digging tool and moving into a place
 that can be dug (default false). Persistent.
@@ -2125,11 +2168,6 @@ The default is to randomly pick an appropriate gender.
 If you prefix a `!' or ``no'' to the value, you can 
 exclude that gender from being picked randomly.
 Cannot be set with the `O' command.  Persistent.
-.lp getpos_coord
-When using the `/' command to look around on the map with
-``autodescribe'' on, display coordinates after the description.
-The value specified should be the first letter of one of the following:
-compass, map, or none.  Default is none.
 .lp "help    "
 If more information is available for an object looked at
 with the `/' command, ask if you want to see it (default on). Turning help
@@ -2514,6 +2552,27 @@ prevent the game from attempting unintended moves if you make inadvertent
 mouse clicks on the map window.  Persistent.
 .lp verbose
 Provide more commentary during the game (default on).  Persistent.
+.lp whatis_coord
+When using the `/' or `;' commands to look around on the map with
+.op autodescribe
+on, display coordinates after the description.
+Also works in other situations where you are asked to pick a location.
+.lp ""
+The possibile settings are:
+.sd
+.si
+.CC c "compass ('east' or '3s' or '2n,4w');"
+.CC m "map <x,y> (map column x=0 is not used);"
+.CC s "screen [row,column] (row is offset to match tty usage);"
+.CC n "none (no coordinates shown) [default]."
+.ei
+.ed
+.lp ""
+The
+.op whatis_coord
+option is also used with
+the `/m', `/M', `/o', and `/O' sub-commands of `/',
+where the `none' setting is overridden with `map'.
 .lp windowtype
 Select which windowing system to use, such as ``tty'' or ``X11''
 (default depends on version).
@@ -3216,6 +3275,10 @@ A string explaining how to recover a game on this system (no default value).
 SEDUCE
 0 or 1 to disable or enable, respectively, the SEDUCE option (see the source
 for details on this function).
+.lp
+CHECK_PLNAME
+Setting this to 1 will make the EXPLORERS, WIZARDS, and SHELLERS check
+for the player name instead of the user's login name.
 .lp
 CHECK_SAVE_UID
 0 or 1 to disable or enable, respectively, the UID checking for savefiles.

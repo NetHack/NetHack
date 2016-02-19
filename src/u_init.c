@@ -1,4 +1,4 @@
-/* NetHack 3.6	u_init.c	$NHDT-Date: 1446861772 2015/11/07 02:02:52 $  $NHDT-Branch: master $:$NHDT-Revision: 1.35 $ */
+/* NetHack 3.6	u_init.c	$NHDT-Date: 1454660565 2016/02/05 08:22:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.37 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -270,7 +270,8 @@ static const struct def_skill Skill_B[] = {
     { P_SPEAR, P_SKILLED },
     { P_TRIDENT, P_SKILLED },
     { P_BOW, P_BASIC },
-    { P_ATTACK_SPELL, P_SKILLED },
+    { P_ATTACK_SPELL, P_BASIC },
+    { P_ESCAPE_SPELL, P_BASIC }, /* special spell is haste self */
     { P_RIDING, P_BASIC },
     { P_TWO_WEAPON_COMBAT, P_BASIC },
     { P_BARE_HANDED_COMBAT, P_MASTER },
@@ -458,7 +459,8 @@ static const struct def_skill Skill_S[] = {
     { P_LANCE, P_SKILLED },
     { P_BOW, P_EXPERT },
     { P_SHURIKEN, P_EXPERT },
-    { P_ATTACK_SPELL, P_SKILLED },
+    { P_ATTACK_SPELL, P_BASIC },
+    { P_DIVINATION_SPELL, P_BASIC }, /* special spell is clairvoyance */
     { P_CLERIC_SPELL, P_SKILLED },
     { P_RIDING, P_SKILLED },
     { P_TWO_WEAPON_COMBAT, P_EXPERT },

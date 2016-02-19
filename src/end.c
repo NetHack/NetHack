@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1450432758 2015/12/18 09:59:18 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.111 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1454571522 2016/02/04 07:38:42 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.114 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -182,9 +182,9 @@ NH_abort()
         gdb_prio++;
 
     if (gdb_prio > libc_prio) {
-        NH_panictrace_gdb() || (libc_prio && NH_panictrace_libc());
+        (void) (NH_panictrace_gdb() || (libc_prio && NH_panictrace_libc()));
     } else {
-        NH_panictrace_libc() || (gdb_prio && NH_panictrace_gdb());
+        (void) (NH_panictrace_libc() || (gdb_prio && NH_panictrace_gdb()));
     }
 
 #else /* VMS */
@@ -526,17 +526,19 @@ int how;
 {
     int i;
 
-    for (i = 0; i < SIZE(death_fixups); ++i)
-        if (death_fixups[i].why == how
-            && !strcmp(death_fixups[i].exclude, multi_reason)) {
-            if (death_fixups[i].include) /* substitute an alternate reason */
-                multi_reason = death_fixups[i].include;
-            else /* remove the helplessness reason */
-                multi_reason = (char *) 0;
-            if (death_fixups[i].unmulti) /* possibly hide helplessness */
-                multi = 0L;
-            break;
-        }
+    if (multi_reason) {
+        for (i = 0; i < SIZE(death_fixups); ++i)
+            if (death_fixups[i].why == how
+                && !strcmp(death_fixups[i].exclude, multi_reason)) {
+                if (death_fixups[i].include) /* substitute alternate reason */
+                    multi_reason = death_fixups[i].include;
+                else /* remove the helplessness reason */
+                    multi_reason = (char *) 0;
+                if (death_fixups[i].unmulti) /* possibly hide helplessness */
+                    multi = 0L;
+                break;
+            }
+    }
 }
 
 #if defined(WIN32) && !defined(SYSCF)

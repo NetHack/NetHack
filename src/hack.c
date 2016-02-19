@@ -620,9 +620,10 @@ register xchar x, y;
 
 /* caller has already decided that it's a tight diagonal; check whether a
    monster--who might be the hero--can fit through, and if not then return
-   the reason why:  1: can't fit, 2: possessions won't fit, 3: sokoban */
-int /* returns 0 if we can squeeze through */
-    cant_squeeze_thru(mon)
+   the reason why:  1: can't fit, 2: possessions won't fit, 3: sokoban
+   returns 0 if we can squeeze through */
+int
+cant_squeeze_thru(mon)
 struct monst *mon;
 {
     int amt;

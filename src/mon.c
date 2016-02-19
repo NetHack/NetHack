@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1451664800 2016/01/01 16:13:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.203 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1454528962 2016/02/03 19:49:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.210 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -588,12 +588,10 @@ mcalcdistress()
         mon_regen(mtmp, FALSE);
 
         /* possibly polymorph shapechangers and lycanthropes */
-        if (mtmp->cham >= LOW_PM) {
-            if (is_vampshifter(mtmp) || mtmp->data->mlet == S_VAMPIRE)
-                decide_to_shapeshift(mtmp, 0);
-            else if (!rn2(6))
-                (void) newcham(mtmp, (struct permonst *) 0, FALSE, FALSE);
-        }
+        if (mtmp->cham >= LOW_PM)
+            decide_to_shapeshift(mtmp, (canspotmon(mtmp)
+                                        || (u.uswallow && mtmp == u.ustuck))
+                                          ? SHIFT_MSG : 0);
         were_change(mtmp);
 
         /* gradually time out temporary problems */
@@ -1370,7 +1368,8 @@ nexttry: /* eels prefer the water, but if there is no water nearby,
                         && (ttmp->ttyp != FIRE_TRAP || !resists_fire(mon))
                         && (ttmp->ttyp != SQKY_BOARD || !is_flyer(mdat))
                         && (ttmp->ttyp != WEB
-                            || (!amorphous(mdat) && !webmaker(mdat)))
+                            || (!amorphous(mdat) && !webmaker(mdat)
+                                && !is_whirly(mdat) && !unsolid(mdat)))
                         && (ttmp->ttyp != ANTI_MAGIC || !resists_magm(mon))) {
                         if (!(flag & ALLOW_TRAPS)) {
                             if (mon->mtrapseen & (1L << (ttmp->ttyp - 1)))
@@ -2859,30 +2858,39 @@ int shiftflags;
         || ((shiftflags & SHIFT_SEENMSG) && sensemon(mon)))
         msg = TRUE;
 
-    if (is_vampshifter(mon)) {
+    if (!is_vampshifter(mon)) {
+        /* regular shapeshifter */
+        if (!rn2(6))
+            (void) newcham(mon, (struct permonst *) 0, FALSE, msg);
+    } else {
         /* The vampire has to be in good health (mhp) to maintain
          * its shifted form.
-             *
+         *
          * If we're shifted and getting low on hp, maybe shift back.
          * If we're not already shifted and in good health, maybe shift.
          */
-        if ((mon->mhp <= mon->mhpmax / 6) && rn2(4) && (mon->cham >= LOW_PM))
-            (void) newcham(mon, &mons[mon->cham], FALSE, msg);
-    } else if (mon->data->mlet == S_VAMPIRE && mon->cham == NON_PM && !rn2(6)
-               && (mon->mhp > mon->mhpmax - ((mon->mhpmax / 10) + 1))) {
-        (void) newcham(mon, (struct permonst *) 0, FALSE, msg);
+        if (mon->data->mlet != S_VAMPIRE) {
+            if ((mon->mhp <= (mon->mhpmax + 5) / 6) && rn2(4)
+                && mon->cham >= LOW_PM)
+                (void) newcham(mon, &mons[mon->cham], FALSE, msg);
+        } else {
+            if (mon->mhp >= 9 * mon->mhpmax / 10 && !rn2(6)
+                && (!canseemon(mon)
+                    || distu(mon->mx, mon->my) > BOLT_LIM * BOLT_LIM))
+                (void) newcham(mon, (struct permonst *) 0, FALSE, msg);
+        }
+        /* override the 10% chance for sex change */
+        ptr = mon->data;
+        if (!is_male(ptr) && !is_female(ptr) && !is_neuter(ptr))
+            mon->female = was_female;
     }
-    /* override the 10% chance for sex change */
-    ptr = mon->data;
-    if (!is_male(ptr) && !is_female(ptr) && !is_neuter(ptr))
-        mon->female = was_female;
 }
 
 STATIC_OVL int
 pickvampshape(mon)
 struct monst *mon;
 {
-    int mndx = mon->cham;
+    int mndx = mon->cham, wolfchance = 10;
     /* avoid picking monsters with lowercase display symbols ('d' for wolf
        and 'v' for fog cloud) on rogue level*/
     boolean uppercase_only = Is_rogue_level(&u.uz);
@@ -2892,9 +2900,10 @@ struct monst *mon;
         /* ensure Vlad can keep carrying the Candelabrum */
         if (mon_has_special(mon))
             break; /* leave mndx as is */
+        wolfchance = 3;
     /*FALLTHRU*/
     case PM_VAMPIRE_LORD: /* vampire lord or Vlad can become wolf */
-        if (!rn2(10) && !uppercase_only) {
+        if (!rn2(wolfchance) && !uppercase_only) {
             mndx = PM_WOLF;
             break;
         }
@@ -3045,13 +3054,17 @@ struct monst *mon;
       }
         break;
     }
+
     /* for debugging: allow control of polymorphed monster */
     if (wizard && iflags.mon_polycontrol) {
         char pprompt[BUFSZ], buf[BUFSZ];
         int monclass;
 
-        Sprintf(pprompt, "Change %s @ <%d,%d> into what kind of monster?",
-                noit_mon_nam(mon), (int) mon->mx, (int) mon->my);
+        Sprintf(pprompt, "Change %s @ %s into what kind of monster?",
+                noit_mon_nam(mon),
+                coord_desc((int) mon->mx, (int) mon->my, buf,
+                           (iflags.getpos_coords != GPCOORDS_NONE)
+                              ? iflags.getpos_coords : GPCOORDS_MAP));
         tryct = 5;
         do {
             monclass = 0;
@@ -3193,6 +3206,9 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
     } else if (mvitals[monsndx(mdat)].mvflags & G_GENOD)
         return 0; /* passed in mdat is genocided */
 
+    if (mdat == mtmp->data)
+        return 0; /* still the same monster */
+
     mgender_from_permonst(mtmp, mdat);
 
     if (In_endgame(&u.uz) && is_mplayer(olddata) && has_mname(mtmp)) {
@@ -3207,9 +3223,6 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
         if (p)
             *p = '\0';
     }
-
-    if (mdat == mtmp->data)
-        return 0; /* still the same monster */
 
     if (mtmp->wormno) { /* throw tail away */
         wormgone(mtmp);
@@ -3274,9 +3287,10 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
 
                     /* Do this even if msg is FALSE */
                     You("%s %s%s!",
-                        (amorphous(olddata) || is_whirly(olddata)) ?
-                            "emerge from" : "break out of",
+                        (amorphous(olddata) || is_whirly(olddata))
+                            ? "emerge from" : "break out of",
                         l_oldname, msgtrail);
+                    msg = FALSE; /* message has been given */
                     mtmp->mhp = 1; /* almost dead */
                 }
                 expels(mtmp, olddata, FALSE);
@@ -3323,6 +3337,12 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
         if (save_mname)
             MNAME(mtmp) = save_mname;
     }
+
+    /* when polymorph trap/wand/potion produces a vampire, turn in into
+       a full-fledged vampshifter unless shape-changing is blocked */
+    if (mtmp->cham == NON_PM && mdat->mlet == S_VAMPIRE
+        && !Protection_from_shape_changers)
+        mtmp->cham = pm_to_cham(monsndx(mdat));
 
     possibly_unwield(mtmp, polyspot); /* might lose use of weapon */
     mon_break_armor(mtmp, polyspot);

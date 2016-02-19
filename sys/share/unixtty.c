@@ -335,9 +335,6 @@ int sco_flag_console = 0;
 int sco_map_valid = -1;
 unsigned char sco_chanmap_buf[BSIZE];
 
-#if defined(TTY_GRAPHICS) && defined(TEXTCOLOR)
-extern int NDECL(has_colors);
-#endif
 void NDECL(sco_mapon);
 void NDECL(sco_mapoff);
 void NDECL(check_sco_console);
@@ -402,9 +399,6 @@ init_sco_cons()
 
 int linux_flag_console = 0;
 
-#if defined(TTY_GRAPHICS) && defined(TEXTCOLOR)
-extern int NDECL(has_colors);
-#endif
 void NDECL(linux_mapon);
 void NDECL(linux_mapoff);
 void NDECL(check_linux_console);

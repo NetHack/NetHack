@@ -13,6 +13,7 @@ message when cursed wand zapped by a monster happens to explode was suppressed
 	if hero was deaf, even though that message has no audible component
 support explicit 'symset:default' and 'symset:Default symbols' in options
 crash during startup if player name set as 'player' in defaults
+crash during startup if defaults file has a long line
 any existing vampire shape-shifted into critter (fog cloud, bat, wolf) became
 	an unkillable critter if vampires were genocided
 unlike in previous versions, an uncursed scroll of enchant armor failed to
@@ -87,7 +88,7 @@ requiver pickup_thrown objects if quiver is empty
 make mimics mimicing walls or trees also block light
 stepping onto lava destroyed non-fireproof water walking boots but left other
 	vulnerable boot types intact
-fix death reason when eating tainted glob of <monster> (not corpse)
+damage and death reasons when eating globs referred to them as corpses
 fix death reason when petrified (avoid redundant 'while getting stoned')
 use appropriate place name for drum of earthquake shakes
 fix unmapped branch stairs on sokoban level
@@ -108,10 +109,60 @@ don't create globs of ooze/slime/pudding with bknown flag set so pre-known to
 	be "uncursed"
 do allow globs with same curse/bless state to merge even when that state is
 	known for one and unknown for the other; result will have bknown clear
+make glob merging on floor behave the same as glob merging in inventory
+track age of merged globs
+support globs for edibility temporary intrinsic
+restore ability to gain intrinsics from black puddings (pass globs to cpostfx)
+eating tainted black pudding (glob in 3.6.0, corpse in 3.4.x and 3.3.x)
+	referred to it as "meat" (because it's not vegetarian food)
 fix pile mark after killing a monster carrying a potion which is destroyed
+don't list suit as likely candidate for Take-off if cloak blocks it
 only list known blank scrolls and known blank spellbooks as likely candidates
 	when choosing an item to write on for applied magic marker
 make status hilites use same color names as menucolors
+limit monster spell aggravate monsters to either outside or inside of the
+	Wizard's tower
+prevent revived unique from inheriting a user-defined name
+make hurtling out of water bubble on the Plane of Water handle entering water
+fix floor descriptions on the Planes when levitating
+fix warning glyph description when monster symbol coincided the warning symbol
+allow the same color names for status hilites and menucolors
+override MSGTYPE=norep while executing the ':' command
+if a chameleon took vampire form, it would stop periodically changing shape
+corpses obtained from tipping an ice box wouldn't rot away
+suppress "you climb up the stairs" message if verbose option is off
+physical damage from mind flayer attack was being inflicted twice
+adjust pending movement points when polymorphing into a slower creature
+damage inflicted by burning glob of green slime gave wrong messages
+monsters fleeing up the upstairs on level 1 were supposed to escape the
+	dungeon but ended up arriving on Plane of Earth
+monster hitting fire-dealing monster with weapon triggered passive damage to
+	weapon every time, when hero doing so only had 1/6 chance per hit
+hitting steam vortex with flammable weapon would damage the weapon with fire
+if a non-cursed spellbook being read becomes cursed and hero recognizes that
+	(bknown is set), interrupt reading
+if a non-cursed spellbook being read becomes cursed and hero doesn't notice,
+	don't leave it flagged as in-use (hence to be deleted during the
+	next save/restore cycle) if contact-poison cursed book effect occurs
+stolen_value, used when breaking shop items from outside the shop among other
+	times, could describe the shopkeeper as "it" when not seen
+when two or more shopkeepers were visible at once, 'p' command could be used
+	to probe map for locations of other shopkeepers and arbitrary monsters
+vortexes and other unsolid monsters need not avoid webs
+barbarian and samurai can achieve basic in their special spell's skill
+scalpel and tsurugi can now split puddings; bashing with darts or arrows can't
+jumping while punished could leave ball and chain in the wrong place
+improve Deaf message handling for the minetown watch and shops
+issues with Warning when you're adjacent to an undetected hider; clearly you
+	are aware a monster is present so this causes you to search it out
+allow lookup of names like Hachi when selecting monsters from the map
+lookup "More Info?" prompt will now tell you what it will look for on 'y'
+using 'R' on armor would bypass some restrictions imposed by 'T' (inner layer
+	could be taken off from under outer layer, embedded scales could be
+	attempted but triggered "select_off" impossible)
+when examining hidden monsters (probing, persistent monster detection), tell
+	how they're hidden (under an object, on the ceiling, etc)
+some quest text corrections
 
 
 Platform- and/or Interface-Specific Fixes
@@ -124,12 +175,12 @@ tty: responding with <return> or <enter> during role, race, &c selection
 	behaved same as <escape> to quit; now it will pick [random] instead
 unix/X11: in top level Makefile, some commented out definitions of VARDATND
 	misspelled pilemark.xbm (as pilemark.xpm)
-unix/tty: fix compile warning about 'has_colors' for some configurations
 unix: options file with CR+LF line ends and an invalid option line resulted in
 	"ad option line: "whatever-the-line-was
 	because embedded carriage return character changed cursor's position
 win32gui: getversionstring() was overflowing the provided Help About buffer
 win32gui: guard against buffer overflow in in mswin_getlin()
+win32gui: handle menu_color attribute
 MacOSX: initial binary release was built from out of date source code that
 	had 'BETA' and 'DEBUG' inappropriately enabled
 MacOSX: force TIMED_DELAY build option on so that 'runmode' run-time option
@@ -137,6 +188,10 @@ MacOSX: force TIMED_DELAY build option on so that 'runmode' run-time option
 X11: core bug for '`' (backtick) and #terrain commands was only noticed by
 	X11 interface: impossible "add_menu: called before start_menu"
 X11: enable a scroll bar in menu windows
+X11: support pre-selected entries in menu windows
+X11: make the extended command menu be easier to use and look a little nicer
+X11: make the getline text entry widget display a bigger text entry area
+X11: color didn't work when the map was displayed as text rather than tiles
 
 
 General New Features
@@ -155,13 +210,16 @@ poison breath leaves a trail of poison gas
 allow knife and stiletto as possible tin opening tools
 wizard mode #wizintrinsic command
 additional tribute passages for The Colour of Magic, The Light Fantastic,
-	Equal Rites, Mort, Snuff, and Raising Steam
+	Equal Rites, Mort, Sourcery, Wyrd Sisters, Pyramids, Guards! Guards!,
+	Eric, Moving Pictures, Reaper Man, Snuff, and Raising Steam
 compile-time options SIMPLE_MAIL and SERVER_ADMIN_MSG for public server use
 database entries for Cleaver, Sunsword, Frost and Fire brands, and
 	polymorph trap
 allow showing coordinates when picking a position on the map and
 	autodescribe option is on
 new status line conditions Stone Strngl Deaf Lev Fly Ride
+allow some extra color name aliases for menucolors and status hilites
+add extended command #kick
 
 
 Platform- and/or Interface-Specific New Features
@@ -169,6 +227,11 @@ Platform- and/or Interface-Specific New Features
 tty: menu_overlay -option to clear screen and align menus to left
 tty: compile-time option to output escape codes for tile data hints
 unix: compile-time option MSGHANDLER to pass messages to external program
+unix: add CHECK_PLNAME-option to sysconf to make WIZARDS, EXPLORERS, and
+	SHELLERS check player's character name instead of login name
+X11: new NetHack*highlight_prompt resource to control whether the persistent
+	prompt line between the map and message windows for the NetHack*slow
+	configuration will be highlighted when it's expecting input
 
 
 NetHack Community Patches (or Variation) Included

@@ -1,4 +1,4 @@
-/* NetHack 3.6	winmisc.c	$NHDT-Date: 1452593730 2016/01/12 10:15:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.15 $ */
+/* NetHack 3.6	winmisc.c	$NHDT-Date: 1455526714 2016/02/15 08:58:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.24 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -18,6 +18,7 @@
 #include <X11/Xaw/Command.h>
 #include <X11/Xaw/Form.h>
 #include <X11/Xaw/Label.h>
+#include <X11/Xaw/Scrollbar.h>
 #include <X11/Xaw/Viewport.h>
 #include <X11/Xaw/Cardinals.h>
 #include <X11/Xos.h> /* for index() */
@@ -37,11 +38,12 @@
 static Widget extended_command_popup = 0;
 static Widget extended_command_form;
 static Widget *extended_commands = 0;
-static int extended_command_selected; /* index of the selected command; */
+static int extended_cmd_selected; /* index of the selected command; */
 static int ps_selected;               /* index of selected role */
 #define PS_RANDOM (-50)
 #define PS_QUIT (-75)
-static const char ps_randchars[] = "*@";
+/* 'r' for random won't work for role but will for race, gender, alignment */
+static const char ps_randchars[] = "*@\n\rrR";
 static const char ps_quitchars[] = "\033qQ";
 
 #define EC_NCHARS 32
@@ -66,16 +68,20 @@ static const char gend_select_translations[] = "#override\n\
 static const char algn_select_translations[] = "#override\n\
      <Key>: algn_key()";
 
-static void FDECL(popup_delete, (Widget, XEvent *, String *, Cardinal *));
-static void NDECL(ec_dismiss);
-static Widget FDECL(make_menu,
-                    (const char *, const char *, const char *, const char *,
-                     XtCallbackProc, const char *, XtCallbackProc, int,
-                     const char **, Widget **, XtCallbackProc, Widget *));
-static void NDECL(init_extended_commands_popup);
 static void FDECL(ps_quit, (Widget, XtPointer, XtPointer));
 static void FDECL(ps_random, (Widget, XtPointer, XtPointer));
 static void FDECL(ps_select, (Widget, XtPointer, XtPointer));
+static void FDECL(extend_select, (Widget, XtPointer, XtPointer));
+static void FDECL(extend_dismiss, (Widget, XtPointer, XtPointer));
+static void FDECL(extend_help, (Widget, XtPointer, XtPointer));
+static void FDECL(popup_delete, (Widget, XEvent *, String *, Cardinal *));
+static void NDECL(ec_dismiss);
+static void FDECL(ec_scroll_to_view, (int));
+static void NDECL(init_extended_commands_popup);
+static Widget FDECL(make_menu, (const char *, const char *, const char *,
+                                const char *, XtCallbackProc, const char *,
+                                XtCallbackProc, int, const char **,
+                                Widget **, XtCallbackProc, Widget *));
 
 /* Player Selection --------------------------------------------------------
  */
@@ -116,7 +122,7 @@ XtPointer client_data, call_data;
     nhUse(w);
     nhUse(call_data);
 
-    ps_selected = (int) client_data;
+    ps_selected = (int) (ptrdiff_t) client_data;
     exit_x_event = TRUE; /* leave event loop */
 }
 
@@ -583,14 +589,11 @@ X11_player_selection()
 int
 X11_get_ext_cmd()
 {
-    static Boolean initialized = False;
-
-    if (!initialized) {
+    if (!extended_commands)
         init_extended_commands_popup();
-        initialized = True;
-    }
 
-    extended_command_selected = -1; /* reset selected value */
+    extended_cmd_selected = -1; /* reset selected value */
+    ec_scroll_to_view(-1); /* force scroll bar to top */
 
     positionpopup(extended_command_popup, FALSE); /* center on cursor */
     nh_XtPopup(extended_command_popup, (int) XtGrabExclusive,
@@ -599,7 +602,16 @@ X11_get_ext_cmd()
     /* The callbacks will enable the event loop exit. */
     (void) x_event(EXIT_ON_EXIT);
 
-    return extended_command_selected;
+    return extended_cmd_selected;
+}
+
+void
+release_extended_cmds()
+{
+    if (extended_commands) {
+        XtDestroyWidget(extended_command_popup);
+        free((genericptr_t) extended_commands), extended_commands = 0;
+    }
 }
 
 /* End global functions =====================================================
@@ -613,24 +625,24 @@ extend_select(w, client_data, call_data)
 Widget w;
 XtPointer client_data, call_data;
 {
-    int selected = (int) client_data;
+    int selected = (int) (ptrdiff_t) client_data;
 
     nhUse(w);
     nhUse(call_data);
 
-    if (extended_command_selected != selected) {
+    if (extended_cmd_selected != selected) {
         /* visibly deselect old one */
-        if (extended_command_selected >= 0)
-            swap_fg_bg(extended_commands[extended_command_selected]);
+        if (extended_cmd_selected >= 0)
+            swap_fg_bg(extended_commands[extended_cmd_selected]);
 
         /* select new one */
         swap_fg_bg(extended_commands[selected]);
-        extended_command_selected = selected;
+        extended_cmd_selected = selected;
     }
 
     nh_XtPopdown(extended_command_popup);
     /* reset colors while popped down */
-    swap_fg_bg(extended_commands[extended_command_selected]);
+    swap_fg_bg(extended_commands[extended_cmd_selected]);
     ec_active = FALSE;
     exit_x_event = TRUE; /* leave event loop */
 }
@@ -698,12 +710,117 @@ static void
 ec_dismiss()
 {
     /* unselect while still visible */
-    if (extended_command_selected >= 0)
-        swap_fg_bg(extended_commands[extended_command_selected]);
-    extended_command_selected = -1; /* dismiss */
+    if (extended_cmd_selected >= 0)
+        swap_fg_bg(extended_commands[extended_cmd_selected]);
+    extended_cmd_selected = -1; /* dismiss */
     nh_XtPopdown(extended_command_popup);
     ec_active = FALSE;
     exit_x_event = TRUE; /* leave event loop */
+}
+
+/* scroll the extended command menu if necessary
+   so that choices extended_cmd_selected through ec_indx will be visible */
+static void
+ec_scroll_to_view(ec_indx)
+int ec_indx; /* might be greater than extended_cmd_selected */
+{
+    Widget viewport, scrollbar, tmpw;
+    Arg args[5];
+    Cardinal num_args;
+    Position lo_y, hi_y; /* ext cmd label y */
+    float s_shown, s_top; /* scrollbar pos */
+    float s_min, s_max;
+    Dimension h, hh, wh, vh; /* widget and viewport heights */
+    Dimension border_width;
+    int distance;
+    boolean force_top = (ec_indx < 0);
+
+    /*
+     * If the extended command menu needs to be scrolled in order to move
+     * either the highlighted entry (extended_cmd_selected) or the target
+     * entry (ec_indx) into view, we want to make both end up visible.
+     * [Highligthed one is the first matching entry when the user types
+     * something, such as "adjust" after typing 'a', and will be chosen
+     * by pressing <return>.  Target entry is one past the last matching
+     * entry (or last matching entry itself if at end of command list),
+     * showing the user the other potential matches so far.]
+     *
+     * If that's not possible (maybe menu has been resized so that it's
+     * too small), the highlighted entry takes precedence and the target
+     * will be decremented until close enough to fit.
+     */
+
+    if (force_top)
+        ec_indx = 0;
+
+    /* get viewport and scrollbar widgets */
+    tmpw = extended_commands[ec_indx];
+    viewport = XtParent(tmpw);
+    do {
+        scrollbar = XtNameToWidget(tmpw, "*vertical");
+        if (scrollbar)
+            break;
+        tmpw = XtParent(tmpw);
+    } while (tmpw);
+
+    if (scrollbar && viewport) {
+        /* get selected ext command label y position and height */
+        num_args = 0;
+        XtSetArg(args[num_args], XtNy, &hi_y); num_args++;
+        XtSetArg(args[num_args], XtNheight, &h); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNborderWidth), &border_width);
+                                                                   num_args++;
+        XtSetArg(args[num_args], nhStr(XtNdefaultDistance), &distance);
+                                                                   num_args++;
+        XtGetValues(extended_commands[ec_indx], args, num_args);
+        if (distance < 1 || distance > 32766) /* defaultDistance is weird */
+            distance = 4;
+        /* vertical distance between top of one command widget and the next */
+        hh = h + distance + 2 * border_width;
+        /* location of the highlighted entry, if any */
+        if (extended_cmd_selected >= 0) {
+            XtSetArg(args[0], XtNy, &lo_y);
+            XtGetValues(extended_commands[extended_cmd_selected], args, ONE);
+        } else
+            lo_y = hi_y;
+
+        /* get menu widget and viewport heights */
+        XtSetArg(args[0], XtNheight, &wh);
+        XtGetValues(tmpw, args, ONE);
+        XtSetArg(args[0], XtNheight, &vh);
+        XtGetValues(viewport, args, ONE);
+
+        /* widget might be too small if it has been resized or
+           there are a very large number of ambiguous choices */
+        if (hi_y - lo_y > wh) {
+            ec_indx = extended_cmd_selected;
+            if (wh > hh)
+                ec_indx += (wh / hh);
+            XtSetArg(args[0], XtNy, &hi_y);
+            XtGetValues(extended_commands[ec_indx], args, num_args);
+        }
+
+        /* get scrollbar "height" and "top" position; floats between 0-1 */
+        num_args = 0;
+        XtSetArg(args[num_args], XtNshown, &s_shown); num_args++;
+        XtSetArg(args[num_args], nhStr(XtNtopOfThumb), &s_top); num_args++;
+        XtGetValues(scrollbar, args, num_args);
+
+        s_min = s_top * vh;
+        s_max = (s_top + s_shown) * vh;
+
+        /* scroll if outside the view */
+        if (force_top) {
+            s_min = 0.0;
+            XtCallCallbacks(scrollbar, XtNjumpProc, &s_min);
+        } else if ((int) lo_y <= (int) s_min) {
+            s_min = (float) (lo_y / (float) vh);
+            XtCallCallbacks(scrollbar, XtNjumpProc, &s_min);
+        } else if ((int) (hi_y + h) >= (int) s_max) {
+            s_min = (float) ((hi_y + h) / (float) vh) - s_shown;
+            XtCallCallbacks(scrollbar, XtNjumpProc, &s_min);
+        }
+    }
 }
 
 /* ARGSUSED */
@@ -716,6 +833,7 @@ Cardinal *num_params;
 {
     char ch;
     int i;
+    int pass;
     XKeyEvent *xkey = (XKeyEvent *) event;
 
     nhUse(w);
@@ -728,20 +846,20 @@ Cardinal *num_params;
         /* don't beep */
         return;
     } else if (ch == '?') {
-        extend_help();
+        extend_help((Widget) 0, (XtPointer) 0, (XtPointer) 0);
         return;
     } else if (index("\033\n\r", ch)) {
         if (ch == '\033') {
             /* unselect while still visible */
-            if (extended_command_selected >= 0)
-                swap_fg_bg(extended_commands[extended_command_selected]);
-            extended_command_selected = -1; /* dismiss */
+            if (extended_cmd_selected >= 0)
+                swap_fg_bg(extended_commands[extended_cmd_selected]);
+            extended_cmd_selected = -1; /* dismiss */
         }
 
         nh_XtPopdown(extended_command_popup);
         /* unselect while invisible */
-        if (extended_command_selected >= 0)
-            swap_fg_bg(extended_commands[extended_command_selected]);
+        if (extended_cmd_selected >= 0)
+            swap_fg_bg(extended_commands[extended_cmd_selected]);
 
         exit_x_event = TRUE; /* leave event loop */
         ec_active = FALSE;
@@ -755,7 +873,7 @@ Cardinal *num_params;
      * ("ride" vs "rub", for instance), or player may just be typing in
      * the whole word.
      */
-    if ((xkey->time - ec_time) > 2500) /* 2.5 seconds */
+    if (ec_active && (xkey->time - ec_time) > 2500) /* 2.5 seconds */
         ec_active = FALSE;
 
     if (!ec_active) {
@@ -768,20 +886,42 @@ Cardinal *num_params;
     if (ec_nchars >= EC_NCHARS)
         ec_nchars = EC_NCHARS - 1; /* don't overflow */
 
-    for (i = 0; extcmdlist[i].ef_txt; i++) {
-        if (extcmdlist[i].ef_txt[0] == '?')
-            continue;
+    for (pass = 0; pass < 2; pass++) {
+        if (pass == 1) {
+            /* first pass finished, but no matching command was found */
+            /* start a new one with the last char entered */
+            if (extended_cmd_selected >= 0)
+                swap_fg_bg(extended_commands[extended_cmd_selected]);
+            extended_cmd_selected = -1; /* dismiss */
+            ec_chars[0] = ec_chars[ec_nchars-1];
+            ec_nchars = 1;
+        }
+        for (i = 0; extcmdlist[i].ef_txt; i++) {
+            if (extcmdlist[i].ef_txt[0] == '?')
+                continue;
 
-        if (!strncmp(ec_chars, extcmdlist[i].ef_txt, ec_nchars)) {
-            if (extended_command_selected != i) {
-                /* I should use set() and unset() actions, but how do */
-                /* I send the an action to the widget? */
-                if (extended_command_selected >= 0)
-                    swap_fg_bg(extended_commands[extended_command_selected]);
-                extended_command_selected = i;
-                swap_fg_bg(extended_commands[extended_command_selected]);
+            if (!strncmp(ec_chars, extcmdlist[i].ef_txt, ec_nchars)) {
+                if (extended_cmd_selected != i) {
+                    /* I should use set() and unset() actions, but how do */
+                    /* I send the an action to the widget? */
+                    if (extended_cmd_selected >= 0)
+                        swap_fg_bg(extended_commands[extended_cmd_selected]);
+                    extended_cmd_selected = i;
+                    swap_fg_bg(extended_commands[extended_cmd_selected]);
+                }
+                /* advance to one past last matching entry, so that all
+                   ambiguous choices, plus one to show thare aren't any
+                   more such, will scroll into view */
+                do {
+                    if (!extcmdlist[i + 1].ef_txt
+                        || *extcmdlist[i + 1].ef_txt == '?')
+                        break; /* end of list */
+                    ++i;
+                } while (!strncmp(ec_chars, extcmdlist[i].ef_txt, ec_nchars));
+
+                ec_scroll_to_view(i);
+                return;
             }
-            break;
         }
     }
 }
@@ -885,6 +1025,8 @@ Widget *formp; /* return */
                                  args, num_args);
 
     num_args = 0;
+    XtSetArg(args[num_args], XtNtranslations,
+             XtParseTranslationTable(popup_translations)); num_args++;
     *formp = form = XtCreateManagedWidget("menuform", formWidgetClass, view,
                                           args, num_args);
 
@@ -898,7 +1040,7 @@ Widget *formp; /* return */
     XtSetArg(args[num_args], nhStr(XtNdefaultDistance), &distance); num_args++;
     XtSetArg(args[num_args], nhStr(XtNborderWidth), &border_width); num_args++;
     XtGetValues(view, args, num_args);
-    if (!distance)
+    if (distance < 1 || distance > 32766)
         distance = 4;
 
     /*
@@ -969,7 +1111,8 @@ Widget *formp; /* return */
 
         *curr = XtCreateManagedWidget(widget_names[i], commandWidgetClass,
                                       form, args, num_args);
-        XtAddCallback(*curr, XtNcallback, name_callback, (XtPointer) i);
+        XtAddCallback(*curr, XtNcallback, name_callback,
+                      (XtPointer) (ptrdiff_t) i);
         above = *curr++;
     }
     cumulative_height += distance; /* space at bottom of form */
@@ -1074,15 +1217,28 @@ Widget *formp; /* return */
      * scroll bar (enabled but not forced above) to be included.
      */
     if (cumulative_height >= screen_height) {
-        /* trial and error:  25 is a guesstimate for scrollbar width on
-           width adjustment and for title bar height on height adjustment */
+        /* trial and error:
+           25 is a guesstimate for scrollbar width on width adjustment;
+           75 is for cumulative height of 3 title bars (desktop,
+           application, and popup) on height adjustment; that will be
+           bigger than needed if the popup can overlap the application's
+           title bar or if there is no desktop title bar; this ought to
+           be deriveable on the fly, or at least user-controlled by a
+           resource, but for now it's hardcoded--user can manually
+           resize if sufficiently motivated... */
         num_args = 0;
         XtSetArg(args[num_args], XtNwidth, max_width + 25); num_args++;
-        XtSetArg(args[num_args], XtNheight, screen_height - 25); num_args++;
+        XtSetArg(args[num_args], XtNheight, screen_height - 75); num_args++;
         XtSetValues(popup, args, num_args);
     }
     XtRealizeWidget(popup);
     XSetWMProtocols(XtDisplay(popup), XtWindow(popup), &wm_delete_window, 1);
 
+    /* during role selection, highlight "random" as pre-selected choice */
+    if (right_callback == ps_random && index(ps_randchars, '\n'))
+        swap_fg_bg(right);
+
     return popup;
 }
+
+/*winmisc.c*/

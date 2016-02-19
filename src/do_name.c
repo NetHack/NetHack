@@ -64,12 +64,26 @@ const char *goal;
     if (getpos_hilitefunc)
         putstr(tmpwin, 0, "Use $ to display valid locations.");
     putstr(tmpwin, 0, "Use # to toggle automatic description.");
+    if (iflags.cmdassist) /* assisting the '/' command, I suppose... */
+        putstr(tmpwin, 0, (iflags.getpos_coords == GPCOORDS_NONE)
+        ? "(Set 'whatis_coord' option to include coordinates with '#' text.)"
+        : "(Reset 'whatis_coord' option to omit coordinates from '#' text.)");
     /* disgusting hack; the alternate selection characters work for any
        getpos call, but they only matter for dowhatis (and doquickwhatis) */
     doing_what_is = (goal == what_is_an_unknown_object);
     Sprintf(sbuf, "Type a .%s when you are at the right place.",
             doing_what_is ? " or , or ; or :" : "");
     putstr(tmpwin, 0, sbuf);
+    if (doing_what_is) {
+        putstr(tmpwin, 0,
+        "  : describe current spot, show 'more info', move to another spot.");
+        Sprintf(sbuf, "  . describe current spot,%s move to another spot;",
+                flags.help ? " prompt if 'more info'," : "");
+        putstr(tmpwin, 0, sbuf);
+        putstr(tmpwin, 0, "  , describe current spot, move to another spot;");
+        putstr(tmpwin, 0,
+               "  ; describe current spot, stop looking at things;");
+    }
     if (!force)
         putstr(tmpwin, 0, "Type Space or Escape when you're done.");
     putstr(tmpwin, 0, "");
@@ -184,32 +198,61 @@ int dx, dy;
     return buf;
 }
 
+/* coordinate formatting for 'whatis_coord' option */
+char *
+coord_desc(x, y, outbuf, cmode)
+int x, y;
+char *outbuf, cmode;
+{
+    static char screen_fmt[16]; /* [12] suffices: "[%02d,%02d]" */
+    int dx, dy;
+
+    outbuf[0] = '\0';
+    switch (cmode) {
+    default:
+        break;
+    case GPCOORDS_COMPASS:
+        /* "east", "3s", "2n,4w" */
+        dx = x - u.ux;
+        dy = y - u.uy;
+        Sprintf(outbuf, "(%s)", dxdy_to_dist_descr(dx, dy));
+        break;
+    case GPCOORDS_MAP: /* x,y */
+        /* upper left corner of map is <1,0>;
+           with default COLNO,ROWNO lower right corner is <79,20> */
+        Sprintf(outbuf, "<%d,%d>", x, y);
+        break;
+    case GPCOORDS_SCREEN: /* y+2,x */
+        /* for normal map sizes, force a fixed-width formatting so that
+           /m, /M, /o, and /O output lines up cleanly; map sizes bigger
+           than Nx999 or 999xM will still work, but not line up like normal
+           when displayed in a column setting */
+        if (!*screen_fmt)
+            Sprintf(screen_fmt, "[%%%sd,%%%sd]",
+                    (ROWNO - 1 + 2 < 100) ? "02" :  "03",
+                    (COLNO - 1 < 100) ? "02" : "03");
+        /* map line 0 is screen row 2;
+           map column 0 isn't used, map column 1 is screen column 1 */
+        Sprintf(outbuf, screen_fmt, y + 2, x);
+        break;
+    }
+    return outbuf;
+}
+
 STATIC_OVL void
 auto_describe(cx, cy)
 int cx, cy;
 {
     coord cc;
-    int sym = 0, dx, dy;
+    int sym = 0;
     char tmpbuf[BUFSZ];
     const char *firstmatch = "unknown";
 
     cc.x = cx;
     cc.y = cy;
     if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch)) {
-        tmpbuf[0] = '\0';
-        switch (iflags.getpos_coords) {
-        default:
-            break;
-        case GPCOORDS_COMPASS:
-            dx = cc.x - u.ux;
-            dy = cc.y - u.uy;
-            Sprintf(tmpbuf, " (%s)", dxdy_to_dist_descr(dx, dy));
-            break;
-        case GPCOORDS_MAP:
-            Sprintf(tmpbuf, " (%d,%d)", cc.x, cc.y);
-            break;
-        }
-        pline("%s%s", firstmatch, tmpbuf);
+        (void) coord_desc(cx, cy, tmpbuf, iflags.getpos_coords);
+        pline("%s%s%s", firstmatch, *tmpbuf ? " " : "", tmpbuf);
         curs(WIN_MAP, cx, cy);
         flush_screen(0);
     }
