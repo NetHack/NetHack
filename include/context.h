@@ -1,4 +1,4 @@
-/* NetHack 3.6	context.h	$NHDT-Date: 1455835579 2016/02/18 22:46:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.29 $ */
+/* NetHack 3.6	context.h	$NHDT-Date: 1455907260 2016/02/19 18:41:00 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.30 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -93,10 +93,10 @@ struct tribute_info {
 struct novel_tracking { /* for choosing random passage when reading novel */
     unsigned id;        /* novel oid from previous passage selection */
     int count;          /* number of passage indices available in pasg[] */
-    xchar pasg[20];     /* pasg[0..count-1] are passage indices */
-    /* tribute file is allowed to have more than 20 passages for a novel;
-       if it does, reading will first choose a random subset of 20 of them;
-       reading all 20 or switching to a different novel and then back again
+    xchar pasg[30];     /* pasg[0..count-1] are passage indices */
+    /* tribute file is allowed to have more than 30 passages for a novel;
+       if it does, reading will first choose a random subset of 30 of them;
+       reading all 30 or switching to a different novel and then back again
        will pick a new subset, independent of previous ones so might not
        contain all--or even any--of the ones left out of the prior subset;
        chatting with Death works the same as reading a novel except that
