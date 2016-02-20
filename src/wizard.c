@@ -1,4 +1,4 @@
-/* NetHack 3.6	wizard.c	$NHDT-Date: 1446078768 2015/10/29 00:32:48 $  $NHDT-Branch: master $:$NHDT-Revision: 1.42 $ */
+/* NetHack 3.6	wizard.c	$NHDT-Date: 1455934524 2016/02/20 02:15:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.46 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -505,17 +505,19 @@ pick_nasty()
     return res;
 }
 
-/* create some nasty monsters, aligned or neutral with the caster */
-/* a null caster defaults to a chaotic caster (e.g. the wizard) */
+/* create some nasty monsters, aligned with the caster or neutral; chaotic
+   and unaligned are treated as equivalent; default caster is chaotic */
 int
 nasty(mcast)
 struct monst *mcast;
 {
     register struct monst *mtmp;
-    register int i, j, tmp;
+    register int i, j;
     int castalign = (mcast ? sgn(mcast->data->maligntyp) : -1);
     coord bypos;
-    int count, census;
+    int count, census, tmp;
+
+#define MAXNASTIES 8 /* more than this can be created if any come in groups */
 
     /* some candidates may be created in groups, so simple count
        of non-null makemon() return is inadequate */
@@ -526,8 +528,7 @@ struct monst *mcast;
     } else {
         count = 0;
         tmp = (u.ulevel > 3) ? u.ulevel / 3 : 1; /* just in case -- rph */
-        /* if we don't have a casting monster, the nasties appear around you
-         */
+        /* if we don't have a casting monster, nasties appear around you */
         bypos.x = u.ux;
         bypos.y = u.uy;
         for (i = rnd(tmp); i > 0; --i)
@@ -542,9 +543,8 @@ struct monst *mcast;
                 } while (mcast && attacktype(&mons[makeindex], AT_MAGC)
                          && monstr[makeindex] >= monstr[mcast->mnum]);
                 /* do this after picking the monster to place */
-                if (mcast
-                    && !enexto(&bypos, mcast->mux, mcast->muy,
-                               &mons[makeindex]))
+                if (mcast && !enexto(&bypos, mcast->mux, mcast->muy,
+                                     &mons[makeindex]))
                     continue;
                 if ((mtmp = makemon(&mons[makeindex], bypos.x, bypos.y,
                                     NO_MM_FLAGS)) != 0) {
@@ -554,8 +554,8 @@ struct monst *mcast;
                     mtmp = makemon((struct permonst *) 0, bypos.x, bypos.y,
                                    NO_MM_FLAGS);
                 if (mtmp) {
-                    count++;
-                    if (mtmp->data->maligntyp == 0
+                    if (++count >= MAXNASTIES
+                        || mtmp->data->maligntyp == 0
                         || sgn(mtmp->data->maligntyp) == castalign)
                         break;
                 }
