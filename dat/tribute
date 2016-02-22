@@ -311,7 +311,7 @@ comfortable--"
 
   [The Colour of Magic, by Terry Pratchett]
 %e passage
-# p. 228-229 (passage starts mid-paragraph)
+# pp. 228-229 (passage starts mid-paragraph)
 %passage 14
 [...]  She was the Goddess Who Must Not Be Named; those who sought her
 never found her, yet she was known to come to the aid of those in greatest
@@ -962,7 +962,7 @@ racehorse."
 
   [Mort, by Terry Pratchett]
 %e passage
-# p. 139-140 (passage ends mid-sentence)
+# pp. 139-140 (passage ends mid-sentence)
 %passage 7
 "You don't know much about monarchy, do you?" said Keli.
 
@@ -983,8 +983,8 @@ appeal to my better nature under this here crusty exterior," he added,
 
   [Mort, by Terry Pratchett]
 %e passage
-# p. 159-160 (Death has come to an employment agency--a new concept in
-#             Ankh-Morpork--looking for a job)
+# pp. 159-160 (Death has come to an employment agency--a new concept in
+#              Ankh-Morpork--looking for a job)
 %passage 9
 "And what was your previous position?"
 
@@ -1091,8 +1091,8 @@ MANY HAVE, said Death evenly.
 
   [Sourcery, by Terry Pratchett]
 %e passage
-# p. 40-41 (text has 'the moment and the words' which is obviously a typo;
-#           it might have intended 'that' for 'and'; we just drop 'and')
+# pp. 40-41 (text has 'the moment and the words' which is obviously a typo;
+#            it might have intended 'that' for 'and'; we just drop 'and')
 %passage 4
 The thief, as will become apparent, was a special type of thief.  This
 thief was an artist of theft.  Other thieves merely stole everything that
@@ -1117,10 +1117,10 @@ words were out of your mouth.
 
   [Sourcery, by Terry Pratchett]
 %e passage
-# p. 63-64 ('Compleet', 'Majik', 'enterr', 'physycal', 'hys', 'bodie',
-#           'Destinie', 'Deathe', 'werre', 'nowe', 'menne', 'Ende',
-#           'Worlde', 'hadd', 'bee', 'goddes', 'ould', 'Apocralypse',
-#           'legende', 'thee': all accurate; 'ould' may be a typo...)
+# pp. 63-64 ('Compleet', 'Majik', 'enterr', 'physycal', 'hys', 'bodie',
+#            'Destinie', 'Deathe', 'werre', 'nowe', 'menne', 'Ende',
+#            'Worlde', 'hadd', 'bee', 'goddes', 'ould', 'Apocralypse',
+#            'legende', 'thee': all accurate; 'ould' may be a typo...)
 %passage 5
 It was deathly quiet in the Library.  The books were no longer frantic.
 They'd passed through their fear and out into the calm waters of abject
@@ -1150,7 +1150,7 @@ his head.
 
   [Sourcery, by Terry Pratchett]
 %e passage
-# p. 71-72
+# pp. 71-72
 %passage 6
 The current Patrician, head of the extremely rich and powerful Vetinari
 family, was thin, tall and apparently as cold-blooded as a dead penguin.
@@ -1211,7 +1211,7 @@ He looked down at his feet.
 
   [Sourcery, by Terry Pratchett]
 %e passage
-# p. 141-142 (Rincewind and Nijel have just entered a harem)
+# pp. 141-142 (Rincewind and Nijel have just entered a harem)
 %passage 9
 Rincewind had eyes for none of this.  [...] they were swamped by the
 considerably bigger flood of panic at the sight of four guards turning
@@ -1235,7 +1235,7 @@ would never quite forget to the end of this life.
 
   [Sourcery, by Terry Pratchett]
 %e passage
-# p. 198-199
+# pp. 198-199
 %passage 10
 The astro-philosophers of Krull once succeeded in proving conclusively
 that all places are one place and that the distance between them is an
@@ -1936,8 +1936,8 @@ The orangutan threw a complex salute and swung away into the darkness.
 
   [Guards! Guards!, by Terry Pratchett]
 %e passage
-# p. 299-300 + 325 (final part comes quite a bit later; Carrot is trying to
-#                   alert oblivious Sergeant Colon that the dragon is coming)
+# pp. 299-300 + 325 (final part comes quite a bit later; Carrot is trying to
+#                    alert oblivious Sergeant Colon that the dragon is coming)
 %passage 14
 "This is what it comes to!" muttered Colon.  "Decent women can't walk down
 the street without being eaten!  Right, you bastards, you're... you're
@@ -2315,8 +2315,8 @@ said Victor.
 
   [Moving Pictures, by Terry Pratchett]
 %e passage
-# p. 111-112 ('dis', 'ort', 'yore', 'finking', 'mayonnaisey', 'specialitay',
-#             'de lar mayson' all accurate)
+# pp. 111-112 ('dis', 'ort', 'yore', 'finking', 'mayonnaisey', 'specialitay',
+#              'de lar mayson' all accurate)
 %passage 10
 Borgle's commissary had decided to experiment with salads tonight.  The
 nearest salad growing district was thirty slow miles away.
@@ -2566,7 +2566,7 @@ He heard the voices stop.  There was the sound of feet hurrying away.
 
   [Reaper Man, by Terry Pratchett]
 %e passage
-# p. 81-82 (things have stopped dying because Death is no longer on the job)
+# pp. 81-82 (things have stopped dying because Death is no longer on the job)
 %passage 10
 Everything that exists, yearns to live.  That's what the cycle of life is
 all about.  That's the engine that drives the great biological pumps of
@@ -2654,10 +2654,270 @@ Rush off, or course,  But slowly.
 #
 #
 #
-%title Witches Abroad (1)
+%title Witches Abroad (14)
+# p. 92 (ROC edition)
 %passage 1
 Vampires have risen from the dead, the grave and the crypt, but have never
 managed it from the cat.
+
+  [Witches Abroad, by Terry Pratchett]
+%e passage
+# pp. 12-13
+%passage 2
+Desiderata Hollow was making her will.
+
+When Desiderata Hollow was a girl, her grandmother had given her four
+important pieces of advice to guide her young footsteps on the unexpectedly
+twisting pathway of life.
+
+They were:
+
+Never trust a dog with orange eyebrows,
+
+Always get the young man's name and address,
+
+Never get between two mirrors,
+
+And always wear completely clean underwear every day because you never knew
+when you were going to be knocked down and killed by a runaway horse and if
+people found you had unsatisfactory underwear on, you'd die of shame.
+
+And then Desiderata grew up to become a witch.  And one of the minor
+benefits of being a witch is that you know exactly when you're going to die
+and can wear what underwear you like.(1)
+
+That had been eighty years earlier, when the idea of knowing exactly when
+you were going to die had seemed quite attractive because secretly, of
+course, you knew you were going to live forever.
+
+That was then.
+
+And this was now.
+
+Forever didn't seem to last as long these days as once it did.
+
+(1) Which explains a lot about witches.
+
+  [Witches Abroad, by Terry Pratchett]
+%e passage
+# p. 64 (passage ends mid-paragraph)
+%passage 3
+"You know," said Nanny, investigating the recesses of the basket, "whenever
+I deals with dwarfs, the phrase 'Duck's arse' swims across my mind."
+
+"Mean little devils.  You should see the prices they tries to charge me
+when I takes my broom to be repaired," said Granny.
+
+"Yes, but you never pay," said Magrat.
+
+"That's not the point," said Granny Weatherwax.  "They shouldn't be allowed
+to charge that sort of money.  That's thievin', that is."
+
+"I don't see how it can be thieving if you don't pay anyway," said Magrat.
+
+"I never pay for anything," said Granny.  [...]
+
+  [Witches Abroad, by Terry Pratchett]
+%e passage
+# p. 93 (passage is a footnote)
+%passage 4
+Nanny Ogg sent a number of cards home to her family, not a single one of
+which got back before she did.  This is traditional, and happens everywhere
+in the universe.
+
+  [Witches Abroad, by Terry Pratchett]
+%e passage
+# pp. 118-119 (Magrat has been teaching herself martial arts via books)
+%passage 5
+"Lobsang Dibbler says sometimes you have to lose in order to win," said
+Magrat.
+
+"Sounds daft to me," said Nanny.  "That's Yen Buddhism, is it?"
+
+"No.  They're the ones who say you have to have lots of money to win," said
+Magrat.(1)  "In the Path of the Scorpion, the way to win is to lose every
+fight except the last one.  You use the enemy's strength against himself."
+
+"What, you get him to hit himself, sort of thing?" said Nanny.  "Sounds
+daft."
+
+(1) The Yen Buddhists are the richest religious sect in the universe.  They
+hold that the accumulation of money is a great evil and burden to the soul.
+They therefore, regardless of personal hazard, see it as their unpleasant
+duty to acquire as much as possible to reduce the risk to innocent people.
+
+  [Witches Abroad, by Terry Pratchett]
+%e passage
+# p. 131
+%passage 6
+They had breakfast in a forest clearing.  It was grilled pumpkin.  The dwarf
+bread was brought out for inspection.  But it was miraculous, the dwarf
+bread.  No one ever went hungry when they had some dwarf bread to avoid.
+You only had to look at it for a moment, and instantly you could think of
+dozens of things you'd rather eat.  Your boots for example.  Mountains.  Raw
+sheep.  Your own foot.
+
+  [Witches Abroad, by Terry Pratchett]
+%e passage
+# pp. 194-195 ("he just" is accurate; cockerel == adolescent rooster)
+%passage 7
+"This is Legba, a dark and dangerous spirit," said Mrs. Gogol.  She leaned
+closer and spoke out of the corner of her mouth.  "Between you and me, he
+just a big black cockerel.  But you know how it is."
+
+"It pays to advertise," Nanny agreed.  "This is Greebo.  Between you and me,
+he's a fiend from hell."
+
+"Well, he's a cat," said Mrs. Gogol, generously.  "It's only to be expected."
+
+  [Witches Abroad, by Terry Pratchett]
+%e passage
+# p. 218
+%passage 8
+"/And/ still a bit of the wedding cake," said the first coachman.  "Ain't
+you et that up yet?"
+
+"We have it every night," said the undercoachman.
+
+The shed shook with the ensuing laughter.  It is a universal fact that any
+innocent comment made by any recently married young member of any workforce
+is an instant trigger for coarse merriment among his or her older and more
+cynical colleagues.  This happens even if everyone concerned has nine legs
+and lives at the bottom of an ocean of ammonia on a huge cold planet.  It's
+just one of those things.
+
+  [Witches Abroad, by Terry Pratchett]
+%e passage
+# p. 228
+%passage 9
+"You ought to be more adventurous, Granny," said Magrat.
+
+"I ain't against adventure, in moderation," said Granny, "but not when I'm
+eatin'."
+
+  [Witches Abroad, by Terry Pratchett]
+%e passage
+# pp. 263-264 (Nanny is trying to stop an elaborate clock; despite damage
+#              inflicted on it, it goes on to announce midnight [early])
+%passage 10
+Let's see thought Nanny.  This bit is connected to that bit, this one turns,
+that one turns /faster/, this spiky bit wobbles backwards and forwards...
+
+Oh, well.  Just twist the first thing you can grab, as the High Priest said
+to the vestal virgin.(1)
+
+Nanny Ogg spat on her hands, gripped the largest cog-wheel, and twisted.
+
+It carried on turning, pulling her with it.
+
+Blimey.  Oh, well...
+
+Then she did was neither Granny Weatherwax nor Magrat would have dreamed of
+doing in the circumstances.  But Nanny Ogg's voyages on the sea of
+intersexual dalliance had gone rather further than twice around the
+lighthouse, and she saw nothing demeaning in getting a man to help her.
+
+She simpered at Casanunda.
+
+"Things would be a lot more comfortable in our little /pie-de-terre/ if you
+could just push this little wheel around a bit," she said.  "I'm sure /you/
+could manage it," she added.
+
+"Oh, no problem, good lady," said Casanunda.  He reached up with one hand.
+Dwarfs are immensely strong for their size.  The wheel seemed to offer him
+no resistance at all.
+
+Somewhere in the mechanism something resisted for a moment and then went
+/clonk/.  Big wheels turned reluctantly.  Little wheels screamed on their
+axles.  A small important piece flew out and pinged off of Casanunda's
+small bullet head.
+
+And must faster than nature had ever intended, the hands sped around the
+face.
+
+(1) This is the last line to a Discworld joke lost, alas, to posterity.
+
+  [Witches Abroad, by Terry Pratchett]
+%e passage
+# p. 265 ('pate' has a couple of accent marks which can't be rendered in ascii)
+%passage 11
+There are various forms of voodoo in the multiverse, because it's a
+religion that can be put together from any ingredients that happen to be
+lying around.  And all of them try, in some way, to call a god into the body
+of a human being.
+
+That was stupid, Mrs. Gogol thought.  That was dangerous.
+
+Mrs. Gogol's voodoo worked the other way about.  What was a god?  A focus of
+belief.  If people believed, a god began to grow.  Feebly at first, but if
+the swamp taught anything, it taught patience.  Anything could be the focus
+of a god.  A handful of feathers with a red ribbon around them, a hat and
+coat on a couple of sticks... anything.  Because when all people had was
+practically nothing, then anything could be almost everything.  And then you
+fed it, and lulled it, like a goose heading for pate, and let the power grow
+very slowly, and when the time was ripe you opened the path... backwards.
+A human could ride the god, rather than the other way around.  There would
+be a price to pay later, but there always was.  In Mrs. Gogol's experience,
+everyone ended up dying.
+
+  [Witches Abroad, by Terry Pratchett]
+%e passage
+# p. 270 (Greebo has been temporarily transformed--polymorphed?--into a human)
+%passage 12
+Greebo wasn't a happy cat.  [...]
+
+Then he'd smelled the kitchen.  Cats gravitate to kitchens like rocks
+gravitate to gravity.
+
+  [Witches Abroad, by Terry Pratchett]
+%e passage
+# p. 282 (Casanunda the dwarf is Discworld's Casanova; he appears again in
+#         /Lords and Ladies/)
+%passage 13
+"How come you're in the palace guard, Casanunda?"
+
+"Soldier of fortune takes whatever jobs are going, Mrs. Ogg," said Casanunda
+earestly.
+
+"But all the rest of 'em are six foot tall and you're--of the shorter
+persuasion."
+
+"I lied about my height, Mrs. Ogg.  I'm a world-famous liar."
+
+"Is that true?"
+
+"No."
+
+"What about you being the world's greatest lover?"
+
+There was silence for a while.
+
+"Well, maybe I'm only No. 2," said Casanunda.  "But I try harder."
+
+  [Witches Abroad, by Terry Pratchett]
+%e passage
+# pp. 285-286 (Greebo is still in human form)
+%passage 14
+Greebo leapt.
+
+Cats are like witches.  They don't fight to kill, but to win.  There is a
+difference.  There's no point in killing an opponent.  That way, they won't
+know they've lost, and to be a real winner you have to have an opponent who
+is beaten and knows it.  There's no triumph over a corpse, but a beaten
+opponent, who will remain beaten every day for the remainder of their sad
+and wretched life, is something to treasure.
+
+Cats do not, of course, rationise this far.  They just like to send someone
+limping off minus a tail and a few square inches of fur.
+
+Greebo's technique was unscientific and wouldn't have stood a chance against
+any decent swordsmanship, but on his side was the fact that it is almost
+impossible to develop decent swordsmanship when you seem to have run into a
+food mixer that is biting your ear off.
+
+The witches watched with interest.
+
+"I think we can leave him now," said Nanny.  "I think he's having fun."
 
   [Witches Abroad, by Terry Pratchett]
 %e passage
@@ -5015,8 +5275,8 @@ comp-lic-ated documents."
 
   [Carpe Jugulum, by Terry Pratchett]
 %e passage
-# p. 336-337 (the plot is driven by the actions of a family of vampyres
-#             who do mostly cooperate with each other)
+# pp. 336-337 (the plot is driven by the actions of a family of vampyres
+#              who do mostly cooperate with each other)
 %passage 7
 Vampires are not naturally cooperative creatures.  It's not in their nature.
 Every other vampire is a rival for the next meal.  In fact, the ideal
@@ -5344,8 +5604,8 @@ man!"
 
   [Thief of Time, by Terry Pratchett]
 %e passage
-# p. 74-75 (the novices didn't know that the little old man known as Sweeper
-#    	    is actually Lu-Tze; see passage 3 regarding Rule One)
+# pp. 74-75 (the novices didn't know that the little old man known as Sweeper
+#            is actually Lu-Tze; see passage 3 regarding Rule One)
 %passage 4
 One day a group of senior novices, for mischief, kicked over the little
 shrine that Lu-Tze kept beside his sleeping mat.
@@ -6645,9 +6905,9 @@ Treason than met the eye.
 
   [Wintersmith, by Terry Pratchett]
 %e passage
-# p. 53-54 (in Carpe Jugulum, most of the lore [for humans] about how to kill
-#           vampires had been written by long-lived/long-not-defunct vampires
-#           [meaning that it was deliberately full of inaccuracies...])
+# pp. 53-54 (in Carpe Jugulum, most of the lore [for humans] about how to kill
+#            vampires had been written by long-lived/long-not-defunct vampires
+#            [meaning that it was deliberately full of inaccuracies...])
 %passage 6
 It was in fact Miss Tick who had written /Witch Hunting for Dumb People/,
 and she made sure that copies of it found their way into those areas where
@@ -6663,7 +6923,7 @@ even underwater.
 
   [Wintersmith, by Terry Pratchett]
 %e passage
-# p. 55-56
+# pp. 55-56
 %passage 7
 Working quickly, she emptied her pockets and started a shamble.
 
@@ -6728,8 +6988,8 @@ dark art.  It was just so /hard/.
 
   [Wintersmith, by Terry Pratchett]
 %e passage
-# p. 126-127 (passage starts mid-paragraph;
-#             witches know in advance when they're going to die)
+# pp. 126-127 (passage starts mid-paragraph;
+#              witches know in advance when they're going to die)
 %passage 10
 "[...]  We shall hold the funeral tomorrow afternoon."
 
@@ -6756,8 +7016,8 @@ witches is an "argument."
 
   [Wintersmith, by Terry Pratchett]
 %e passage
-# p. 174-175  (passage starts mid-paragraph; last paragraph continues, but
-#         changes topic so abruptly Tiffany gasps; 'rumbustious' is accurate)
+# pp. 174-175 (passage starts mid-paragraph; last paragraph continues, but
+#          changes topic so abruptly Tiffany gasps; 'rumbustious' is accurate)
 %passage 12
 "[...]  And now I shall tell you something vitally important.  It is the
 secret of my long life."
@@ -6813,7 +7073,7 @@ as good as she ought to be.
 
   [Wintersmith, by Terry Pratchett]
 %e passage
-# p. 360-361 ('wurds' is accurate)
+# pp. 360-361 ('wurds' is accurate)
 %passage 15
 "An heroic effect, Mr. Anybody," said Granny.  "The first thing a hero must
 conquer is his fear, and when it comes to fightin', the Nac Mac Feegle
@@ -6824,7 +7084,7 @@ o' wurds!"
 
   [Wintersmith, by Terry Pratchett]
 %e passage
-# p. 398-399 ("Chumsfanleigh" is pronounced "Chuffley")
+# pp. 398-399 ("Chumsfanleigh" is pronounced "Chuffley")
 %passage 16
 At the back of the Feegles' chalk pit, more chalk had been carved out of
 the wall to make a tunnel about five feet high and perhaps as long.
@@ -7314,7 +7574,7 @@ pp'd at all.  Incidentally, how loud were his screams?"
 
   [Unseen Academicals, by Terry Pratchett]
 %e passage
-# p. 192-193 ('pants': underpants; 'football': soccer ;-)
+# pp. 192-193 ('pants': underpants; 'football': soccer ;-)
 %passage 9
 "You will arrange yourself into two teams, set up goals, and strive to win!
 No man will leave the field of play unless injured!  The hands are not to
@@ -8040,7 +8300,7 @@ IF YOU ASK ME, said Death, NOBODY COULD DO ANY BETTER THAN THAT...
 # Death Quotes are always one line, and '%e passage' can be omitted.
 #
 %section Death
-%title Death Quotes (30)
+%title Death Quotes (31)
 %passage 1
 WHERE THE FIRST PRIMAL CELL WAS, THERE WAS I ALSO. WHERE MAN IS, THERE AM I.  WHEN THE LAST LIFE CRAWLS UNDER FREEZING STARS, THERE WILL I BE.
 %e passage
@@ -8145,6 +8405,10 @@ JUST BECAUSE SOMETHING IS A METAPHORE DOESN'T MEAN IT CAN'T BE REAL.
 # p. 334
 %passage 30
 I AM ALWAYS ALONE.  BUT JUST NOW I WANT TO BE ALONE BY MYSELF.
+# Witches Abroad, p. 298 (Death's explanation why he didn't come for zombie 12
+#                         years earlier:  YOU STOPPED LIVING.  YOU NEVER DIED.)
+%passage 31
+I HAD AN APPOINTMENT WITH YOU TONIGHT.
 %e title
 %e section
 #
