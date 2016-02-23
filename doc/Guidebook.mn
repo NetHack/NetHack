@@ -1,11 +1,11 @@
-.\" $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.202 $ $NHDT-Date: 1456187657 2016/02/23 00:34:17 $
+.\" $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.203 $ $NHDT-Date: 1456192371 2016/02/23 01:52:51 $
 .ds h0 "NetHack Guidebook
 .ds h1
 .ds h2 %
 .ds vr "NetHack 3.6
 .ds f0 "\*(vr
 .ds f1
-.ds f2 "January 18, 2016
+.ds f2 "February 22, 2016
 .\" labeled paragraph start (should be part of tmac.n, but I don't want to
 .\" make changes to that file)
 .\" .PS word
@@ -295,6 +295,9 @@ do other tasks requiring agility or manipulation of objects.
 .lp Constitution
 Constitution affects your ability to recover from injuries and other
 strains on your stamina.
+When strength is low or modest, consitution also affects how much you
+can carry.  With sufficiently high strength, the contribution to
+carrying capacity from your constitution no longer matters.
 .lp Intelligence
 Intelligence affects your ability to cast spells and read spellbooks.
 .lp Wisdom
@@ -1308,7 +1311,8 @@ you what you just picked up.
 As you add items to your inventory, you also add the weight of that object
 to your load.  The amount that you can carry depends on your strength and
 your constitution.  The
-stronger you are, the less the additional load will affect you.  There comes
+stronger and sturdier
+you are, the less the additional load will affect you.  There comes
 a point, though, when the weight of all of that stuff you are carrying around
 with you through the dungeon will encumber you.  Your reactions
 will get slower and you'll burn calories faster, requiring food more frequently
@@ -1579,6 +1583,7 @@ elven mithril-coat	5
 chain mail	5
 orcish chain mail	6
 scale mail	6
+dragon scales	7
 studded leather armor	7
 ring mail	7
 orcish ring mail	8
@@ -1674,10 +1679,12 @@ The command to drink a potion is `q' (quaff).
 .hn 2
 Wands (`/')
 .pg
-Magic wands usually have multiple magical charges.  Some wands are
-directional\(emyou must give a direction in which to zap them.  You can also
+Wands usually have multiple magical charges.
+Some types of wands require a direction in which to zap them.
+You can also
 zap them at yourself (just give a `.' or `s' for the direction). Be warned,
-however, for this is often unwise.  Other wands are nondirectional\(emthey
+however, for this is often unwise.
+Other types of wands
 don't require a direction.  The number of charges in a wand is random and
 decreases by one whenever you use it.
 .pg
@@ -1733,16 +1740,18 @@ energy and the time required in casting.
 .pg
 Casting a spell calls forth magical energies and focuses them with
 your naked mind.  Some of the magical energy released comes from within
-you, and casting several spells in a row may tire you.
+you.
+Casting temporarily drains your magical power, which will slowly be
+recovered, and causes you to need additional food.
 Casting of spells also requires practice.  With practice, your
 skill in each category of spell casting will improve.  Over time, however,
 your memory of each spell will dim, and you will need to relearn it.
 .pg
-Some spells are
-directional\(emyou must give a direction in which to cast them.  You can also
-cast them at yourself (just give a `.' or `s' for the direction). Be warned,
-however, for this is often unwise.  Other spells are nondirectional\(emthey
-don't require a direction.
+Some spells require a direction in which to cast them, similar to wands.
+To cast one at yourself, just give a `.' or `s' for the direction.
+A few spells require you to pick a target location rather than just specify
+a particular direction.
+Other spells don't require any direction or target.
 .pg
 Just as weapons are divided into groups in which a character can become
 proficient (to varying degrees), spells are similarly grouped.
@@ -1818,6 +1827,9 @@ heavy.  It is rumored that some statues are not what they seem.
 .pg
 Very large humanoids (giants and their ilk) have been known to use boulders
 as weapons.
+.pg
+For some configurations of the program, statues are no longer shown as `\`'
+but by the letter representing the monster they depict instead.
 .hn 2
 Gold (`$')
 .pg
@@ -2034,7 +2046,7 @@ Persistent.
 Your starting alignment (align:lawful, align:neutral,
 or align:chaotic).  You may specify just the first letter.
 The default is to randomly pick an appropriate alignment.
-If you prefix a `!' or ``no'' to the value, you can
+If you prefix the value with `!' or ``no'', you will
 exclude that alignment from being picked randomly.
 Cannot be set with the `O' command.  Persistent.
 .lp autodescribe
@@ -2069,22 +2081,26 @@ Start the character permanently blind.  Persistent. (default false)
 .lp bones
 Allow saving and loading bones files.  Persistent. (default true)
 .lp boulder
-Set the character used to display boulders (default is rock class symbol).
+Set the character used to display boulders (default is the ``large rock''
+class symbol, `\`').
 .lp catname
 Name your starting cat (ex. ``catname:Morris'').
 Cannot be set with the `O' command.
 .lp character
-Pick your type of character (ex. ``character:Monk'');
-synonym for ``role''.  See ``name'' for an alternate method
-of specifying your role.  Normally only the first letter of
-the value is examined; the string ``random'' is an exception.
+Synonym for ``role'' to pick the type of your character
+(ex. ``character:Monk'').
+See
+.op role
+for more details.
 .lp checkpoint
 Save game state after each level change, for possible recovery after
 program crash (default on).  Persistent.
 .lp checkspace
 Check free disk space before writing files to disk (default on).
 You may have to turn this off if you have more than 2 GB free space
-on the partition used for your save and level files.
+on the partition used for your save and level files
+(because too much space might overflow the calculation and end up
+looking like insufficient space).
 Only applies when MFLOPPY was defined during compilation.
 .lp clicklook
 Allows looking at things on the screen by navigating the mouse
@@ -2169,7 +2185,7 @@ You may specify just the first letter.  Although you can
 still denote your gender using the ``male'' and ``female''
 options, the ``gender'' option will take precedence.
 The default is to randomly pick an appropriate gender.
-If you prefix a `!' or ``no'' to the value, you can
+If you prefix the value with `!' or ``no'', you will
 exclude that gender from being picked randomly.
 Cannot be set with the `O' command.  Persistent.
 .lp "help    "
@@ -2444,7 +2460,7 @@ Likewise for the `a' (apply) command if it causes the applied item to
 become wielded.  Persistent.
 .lp "race    "
 Selects your race (for example, ``race:human'').  Default is random.
-If you prefix a `!' or ``no'' to the value, you can
+If you prefix the value with `!' or ``no'', you will
 exclude that race from being picked randomly.
 Cannot be set with the `O' command.  Persistent.
 .lp rest_on_space
@@ -2455,8 +2471,10 @@ Pick your type of character (ex. ``role:Samurai'');
 synonym for ``character''.  See ``name'' for an alternate method
 of specifying your role.  Normally only the first letter of the
 value is examined; `r' is an exception with ``Rogue'', ``Ranger'',
-and ``random'' values. If you prefix a `!' or ``no'' to the value, you can
-exclude that role from being picked randomly.  Persistent.
+and ``random'' values.
+If you prefix the value with `!' or ``no'', you will
+exclude that role from being picked randomly.
+Cannot be set with the `O' command.  Persistent.
 .lp roguesymset
 This option may be used to select one of the named symbol sets found within
 ``symbols'' to alter the symbols displayed on the screen on the rogue level.
@@ -3253,59 +3271,55 @@ The options recognized in this file are listed below.  Any option not
 set uses a compiled-in default (which may not be appropriate for your
 system).
 .pg
+.\"  '\ =\ Word'  follow each option name with space+equals+space+first
+.\"               word of sentence in a way that won't have spaces inserted
+.\"               there if that line is padded from left to right;
+.\"               essentially, "OPTION = Word" becomes one token as far
+.\"               as filling and justifying are concerned
 .lp
-WIZARDS
-A space-separated list of user names who are allowed to play in wizard
+WIZARDS\ =\ A space-separated list of user names who are allowed to
+play in wizard
 mode (the debugging mode, not the magic-using role).  A value of a single
 asterisk (*) allows anyone to start a game in wizard mode.
 .lp
-SHELLERS
-A list of users who are allowed to use the shell escape command (!).  The
+SHELLERS\ =\ A list of users who are allowed to use the shell
+escape command (!).  The syntax is the same as WIZARDS.
+.lp
+EXPLORERS\ =\ A list of users who are allowed to use the explore mode.  The
 syntax is the same as WIZARDS.
 .lp
-EXPLORERS
-A list of users who are allowed to use the explore mode.  The
-syntax is the same as WIZARDS.
+MAXPLAYERS\ =\ Limit the maximum number of games that can be running
+at the same time.
 .lp
-MAXPLAYERS
-Limit the maximum number of games that can be running at the same time.
+SUPPORT\ =\ A string explaining how to get local support (no default value).
 .lp
-SUPPORT
-A string explaining how to get local support (no default value).
+RECOVER\ =\ A string explaining how to recover a game on this system
+(no default value).
 .lp
-RECOVER
-A string explaining how to recover a game on this system (no default value).
+SEDUCE\ =\ 0 or 1 to disable or enable, respectively, the SEDUCE option.
+When disabled, incubi and succubi behave like nymphs.
 .lp
-SEDUCE
-0 or 1 to disable or enable, respectively, the SEDUCE option (see the source
-for details on this function).
+CHECK_PLNAME\ =\ Setting this to 1 will make the EXPLORERS, WIZARDS, and
+SHELLERS check for the player name instead of the user's login name.
 .lp
-CHECK_PLNAME
-Setting this to 1 will make the EXPLORERS, WIZARDS, and SHELLERS check
-for the player name instead of the user's login name.
-.lp
-CHECK_SAVE_UID
-0 or 1 to disable or enable, respectively, the UID checking for savefiles.
+CHECK_SAVE_UID\ =\ 0 or 1 to disable or enable, respectively, the UID
+(used identification number) checking for save files (to verify that the
+user who is restoring is the same one who saved).
 .pg
 The following options affect the score file:
 .pg
 .lp
-PERSMAX
-Maximum number of entries for one person.
+PERSMAX\ =\ Maximum number of entries for one person.
 .lp
-ENTRYMAX
-Maximum number of entries in the score file.
+ENTRYMAX\ =\ Maximum number of entries in the score file.
 .lp
-POINTSMIN
-Minimum number of points to get an entry in the score file.
+POINTSMIN\ =\ Minimum number of points to get an entry in the score file.
 .lp
-PERS_IS_UID
-0 or 1 to use user names or numeric userids, respectively, to identify
-unique people for the score file.
+PERS_IS_UID\ =\ 0 or 1 to use user names or numeric userids, respectively,
+to identify unique people for the score file.
 .lp
-MAX_STATUENAME_RANK
-Maximum number of score file entries to use for random statue names
-(default is 10).
+MAX_STATUENAME_RANK\ =\ Maximum number of score file entries to use for
+random statue names (default is 10).
 .hn 1
 Scoring
 .pg
