@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1456304571 2016/02/24 09:02:51 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.194 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1456354616 2016/02/24 22:56:56 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.195 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2053,8 +2053,12 @@ long *out_cnt;
     n = (flags.perm_invent && !lets && !want_reply) ? 2
         : lets ? (int) strlen(lets)
                : !invent ? 0 : !invent->nobj ? 1 : 2;
-    if (xtra_choice || (iflags.override_ID && n == 1))
+    /* for xtra_choice, there's another 'item' not included in initial 'n';
+       for !lets (full invent) and for override_ID (wizard mode identify),
+       skip message_menu handling of single item even if item count was 1 */
+    if (xtra_choice || (n == 1 && (!lets || iflags.override_ID)))
         ++n;
+
     if (n == 0) {
         pline("Not carrying anything.");
         return 0;
@@ -2064,7 +2068,7 @@ long *out_cnt;
     if (!flags.invlet_constant)
         reassign();
 
-    if (n == 1 && (lets || xtra_choice)) {
+    if (n == 1) {
         /* when only one item of interest, use pline instead of menus;
            we actually use a fake message-line menu in order to allow
            the user to perform selection at the --More-- prompt for tty */
@@ -2090,7 +2094,9 @@ long *out_cnt;
         return ret;
     }
 
-    /* count the number of items (previous count of 0,1,more is obsolete) */
+    /* count the number of items (preliminary count of 0,1,more was 'more'
+       and is now obsolete); we have at least 2 items or want to behave as
+       if we do (full invent and wiz_identify use this even for 1 item) */
     for (n = 0, otmp = invent; otmp; otmp = otmp->nobj)
         if (!lets || !*lets || index(lets, otmp->invlet))
             n++;
@@ -2125,12 +2131,11 @@ long *out_cnt;
     }
 nextclass:
     classcount = 0;
-    any = zeroany; /* set all bits to zero */
     for (i = 0; i < n; i++) {
         otmp = oarray[i];
-        ilet = otmp->invlet;
-        any = zeroany; /* zero */
         if (!flags.sortpack || otmp->oclass == *invlet) {
+            any = zeroany; /* all bits zero */
+            ilet = otmp->invlet;
             if (flags.sortpack && !classcount) {
                 add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
                          let_to_name(*invlet, FALSE,
