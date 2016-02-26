@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1455140802 2016/02/10 21:46:42 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.220 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1456526104 2016/02/26 22:35:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.221 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1966,8 +1966,8 @@ long timeout;
     if (mtmp) {
         char and_vanish[BUFSZ];
         struct obj *mshelter = level.objects[mtmp->mx][mtmp->my];
-        Sprintf(monnambuf, "%s", an(m_monnam(mtmp)));
 
+        Sprintf(monnambuf, "%s", an(m_monnam(mtmp)));
         and_vanish[0] = '\0';
         if ((mtmp->minvis && !See_invisible)
             || (mtmp->data->mlet == S_MIMIC
@@ -2009,11 +2009,13 @@ long timeout;
         case OBJ_MINVENT:
             if (cansee_spot && !silent && !suppress_see) {
                 struct monst *mon;
+
                 mon = figurine->ocarry;
                 /* figurine carrying monster might be invisible */
-                if (canseemon(figurine->ocarry)) {
+                if (canseemon(figurine->ocarry)
+                    && (!mon->wormno || cansee(mon->mx, mon->my)))
                     Sprintf(carriedby, "%s pack", s_suffix(a_monnam(mon)));
-                } else if (is_pool(mon->mx, mon->my))
+                else if (is_pool(mon->mx, mon->my))
                     Strcpy(carriedby, "empty water");
                 else
                     Strcpy(carriedby, "thin air");
