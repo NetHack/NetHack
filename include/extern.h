@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1455672983 2016/02/17 01:36:23 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.548 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1456528594 2016/02/26 23:16:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.549 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2715,6 +2715,7 @@ E void FDECL(place_worm_tail_randomly, (struct monst *, XCHAR_P, XCHAR_P));
 E int FDECL(count_wsegs, (struct monst *));
 E boolean FDECL(worm_known, (struct monst *));
 E boolean FDECL(worm_cross, (int, int, int, int));
+E int FDECL(wseg_at, (struct monst *, int, int));
 
 /* ### worn.c ### */
 
