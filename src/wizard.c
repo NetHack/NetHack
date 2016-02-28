@@ -1,4 +1,4 @@
-/* NetHack 3.6	wizard.c	$NHDT-Date: 1456185030 2016/02/22 23:50:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.47 $ */
+/* NetHack 3.6	wizard.c	$NHDT-Date: 1456618999 2016/02/28 00:23:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.48 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -119,7 +119,8 @@ register struct monst *mtmp;
     register struct obj *otmp;
 
     for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
-        if (otmp->otyp == AMULET_OF_YENDOR || is_quest_artifact(otmp)
+        if (otmp->otyp == AMULET_OF_YENDOR
+            || any_quest_artifact(otmp)
             || otmp->otyp == BELL_OF_OPENING
             || otmp->otyp == CANDELABRUM_OF_INVOCATION
             || otmp->otyp == SPE_BOOK_OF_THE_DEAD)
@@ -175,7 +176,7 @@ register short otyp;
         if (otyp) {
             if (otmp->otyp == otyp)
                 return 1;
-        } else if (is_quest_artifact(otmp))
+        } else if (any_quest_artifact(otmp))
             return 1;
     }
     return 0;
@@ -207,7 +208,7 @@ register short otyp;
         if (otyp) {
             if (otmp->otyp == otyp)
                 return otmp;
-        } else if (is_quest_artifact(otmp))
+        } else if (any_quest_artifact(otmp))
             return otmp;
     return (struct obj *) 0;
 }

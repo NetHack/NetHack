@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitu.c	$NHDT-Date: 1451084422 2015/12/25 23:00:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.132 $ */
+/* NetHack 3.6	mhitu.c	$NHDT-Date: 1456618997 2016/02/28 00:23:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.135 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1321,11 +1321,11 @@ register struct attack *mattk;
 
     case AD_SAMU:
         hitmsg(mtmp, mattk);
-        /* when the Wiz hits, 1/20 steals the amulet */
-        if (u.uhave.amulet || u.uhave.bell || u.uhave.book || u.uhave.menorah
-            || u.uhave.questart) /* carrying the Quest Artifact */
-            if (!rn2(20))
-                stealamulet(mtmp);
+        /* when the Wizard or quest nemesis hits, there's a 1/20 chance
+           to steal a quest artifact (any, not just the one for the hero's
+           own role) or the Amulet or one of the invocation tools */
+        if (!rn2(20))
+            stealamulet(mtmp);
         break;
 
     case AD_TLPT:
