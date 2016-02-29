@@ -12,55 +12,53 @@
 /*
  *  Adding new mextra structures:
  *
- *	 1. Add the structure definition and any required macros in this file
- *	    above the mextra struct.
- *	 2. Add a pointer to your new struct to the mextra struct in this
- *file.
- *	 3. Add a referencing macro at the bottom of this file after the
- *mextra
- *	    struct (see MNAME, EGD, EPRI, ESHK, EMIN, or EDOG for examples).
- *	 4. Create a newXX(mtmp) function and possibly a free_XX(mtmp)
- *function
- *	    in an appropriate new or existing source file and add a prototype
- *	    for it to include/extern.h.
+ *       1. Add the structure definition and any required macros in this
+ *          file above the mextra struct.
+ *       2. Add a pointer to your new struct to the mextra struct in this
+ *          file.
+ *       3. Add a referencing macro at bottom of this file after the mextra
+ *          struct (see MNAME, EGD, EPRI, ESHK, EMIN, or EDOG for examples).
+ *       4. Create a newXX(mtmp) function and possibly a free_XX(mtmp)
+ *          function in an appropriate new or existing source file and add
+ *          a prototype for it to include/extern.h.
  *
- *		void FDECL(newXX, (struct monst *));
- *	        void FDECL(free_XX, (struct monst *));
+ *              void FDECL(newXX, (struct monst *));
+ *              void FDECL(free_XX, (struct monst *));
  *
- *	          void
- *	          newXX(mtmp)
- *	          struct monst *mtmp;
- *	          {
- *	              if (!mtmp->mextra) mtmp->mextra = newmextra();
- *	              if (!XX(mtmp)) {
- *	                  XX(mtmp) = (struct XX *)alloc(sizeof(struct XX));
- *	                  (void) memset((genericptr_t) XX(mtmp),
- *	                             0, sizeof(struct XX));
- *	              }
- *	          }
+ *              void
+ *              newXX(mtmp)
+ *              struct monst *mtmp;
+ *              {
+ *                  if (!mtmp->mextra)
+ *                      mtmp->mextra = newmextra();
+ *                  if (!XX(mtmp)) {
+ *                      XX(mtmp) = (struct XX *) alloc(sizeof (struct XX));
+ *                      (void) memset((genericptr_t) XX(mtmp),
+ *                                    0, sizeof (struct XX));
+ *                  }
+ *              }
  *
- *	 5. Consider adding a new makemon flag MM_XX flag to include/hack.h
- *and
- *	    a corresponding change to makemon() if you require your structure
- *	    to be added at monster creation time. Initialize your struct
- *	    after a successful return from makemon().
+ *       5. Consider adding a new makemon flag MM_XX flag to include/hack.h
+ *          and a corresponding change to makemon() if you require your
+ *          structure to be added at monster creation time.  Initialize your
+ *          struct after a successful return from makemon().
  *
- *	     src/makemon.c:  if (mmflags & MM_XX) newXX(mtmp);
- *	     your new code:  mon = makemon(&mons[mnum], x, y, MM_XX);
+ *              src/makemon.c:  if (mmflags & MM_XX) newXX(mtmp);
+ *              your new code:  mon = makemon(&mons[mnum], x, y, MM_XX);
  *
- *	 6. Adjust size_monst() in src/cmd.c appropriately.
- *	 7. Adjust dealloc_mextra() in src/mon.c to clean up
- *	    properly during monst deallocation.
- *	 8. Adjust copy_mextra() in src/mon.c to make duplicate
- *	    copies of your struct or data on another monst struct.
- *	 9. Adjust restmon() in src/restore.c to deal with your
- *	    struct or data during a restore.
- *	10. Adjust savemon() in src/save.c to deal with your
- *	    struct or data during a save.
+ *       6. Adjust size_monst() in src/cmd.c appropriately.
+ *       7. Adjust dealloc_mextra() in src/mon.c to clean up
+ *          properly during monst deallocation.
+ *       8. Adjust copy_mextra() in src/mon.c to make duplicate
+ *          copies of your struct or data on another monst struct.
+ *       9. Adjust restmon() in src/restore.c to deal with your
+ *          struct or data during a restore.
+ *      10. Adjust savemon() in src/save.c to deal with your
+ *          struct or data during a save.
  */
 
 /***
- **	formerly vault.h -- vault guard extension
+ **     formerly vault.h -- vault guard extension
  */
 #define FCSIZ (ROWNO + COLNO)
 #define GD_EATGOLD 0x01
@@ -84,7 +82,7 @@ struct egd {
 };
 
 /***
- **	formerly epri.h -- temple priest extension
+ **     formerly epri.h -- temple priest extension
  */
 struct epri {
     aligntyp shralign; /* alignment of priest's shrine */
@@ -100,7 +98,7 @@ struct epri {
    (and emin extension) */
 
 /***
- **	formerly eshk.h -- shopkeeper extension
+ **     formerly eshk.h -- shopkeeper extension
  */
 #define REPAIR_DELAY 5 /* minimum delay between shop damage & repair */
 #define BILLSZ 200
@@ -135,7 +133,7 @@ struct eshk {
 };
 
 /***
- **	formerly emin.h -- minion extension
+ **     formerly emin.h -- minion extension
  */
 struct emin {
     aligntyp min_align; /* alignment of minion */
@@ -143,17 +141,17 @@ struct emin {
 };
 
 /***
- **	formerly edog.h -- pet extension
+ **     formerly edog.h -- pet extension
  */
-/*	various types of pet food, the lower, the better liked */
+/*      various types of pet food, the lower, the better liked */
 #define DOGFOOD 0
 #define CADAVER 1
 #define ACCFOOD 2
 #define MANFOOD 3
-#define APPORT 4
-#define POISON 5
-#define UNDEF 6
-#define TABU 7
+#define APPORT  4
+#define POISON  5
+#define UNDEF   6
+#define TABU    7
 
 struct edog {
     long droptime;            /* moment dog dropped object */
@@ -169,7 +167,7 @@ struct edog {
 };
 
 /***
- **	mextra.h -- collection of all monster extensions
+ **     mextra.h -- collection of all monster extensions
  */
 struct mextra {
     char *mname;

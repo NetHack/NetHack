@@ -751,11 +751,12 @@ register struct monst *mtmp;
             verbalize("%s %s!",
                       random_malediction[rn2(SIZE(random_malediction))],
                       random_insult[rn2(SIZE(random_insult))]);
-    } else if (is_lminion(mtmp)) {
+    } else if (is_lminion(mtmp)
+               && !(mtmp->isminion && EMIN(mtmp)->renegade)) {
         com_pager(rn2(QTN_ANGELIC - 1 + (Hallucination ? 1 : 0))
                   + QT_ANGELIC);
     } else {
-        if (!rn2(5))
+        if (!rn2(is_minion(mtmp->data) ? 100 : 5))
             pline("%s casts aspersions on your ancestry.", Monnam(mtmp));
         else
             com_pager(rn2(QTN_DEMONIC) + QT_DEMONIC);
