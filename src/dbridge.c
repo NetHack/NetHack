@@ -34,8 +34,7 @@ STATIC_DCL boolean FDECL(e_jumps, (struct entity *));
 STATIC_DCL void FDECL(do_entity, (struct entity *));
 
 boolean
-is_pool(x, y)
-int x, y;
+is_pool(int x, int y)
 {
     schar ltyp;
 
@@ -51,8 +50,7 @@ int x, y;
 }
 
 boolean
-is_lava(x, y)
-int x, y;
+is_lava(int x, int y)
 {
     schar ltyp;
 
@@ -67,8 +65,7 @@ int x, y;
 }
 
 boolean
-is_pool_or_lava(x, y)
-int x, y;
+is_pool_or_lava(int x, int y)
 {
     if (is_pool(x, y) || is_lava(x, y))
         return TRUE;
@@ -77,8 +74,7 @@ int x, y;
 }
 
 boolean
-is_ice(x, y)
-int x, y;
+is_ice(int x, int y)
 {
     schar ltyp;
 
@@ -92,8 +88,7 @@ int x, y;
 }
 
 boolean
-is_moat(x, y)
-int x, y;
+is_moat(int x, int y)
 {
     schar ltyp;
 
@@ -109,8 +104,7 @@ int x, y;
 }
 
 schar
-db_under_typ(mask)
-int mask;
+db_under_typ(int mask)
 {
     switch (mask & DB_UNDER) {
     case DB_ICE:
@@ -136,8 +130,7 @@ int mask;
  */
 
 int
-is_drawbridge_wall(x, y)
-int x, y;
+is_drawbridge_wall(int x, int y)
 {
     struct rm *lev;
 
@@ -167,8 +160,7 @@ int x, y;
  * (instead of UP or DOWN, as with is_drawbridge_wall).
  */
 boolean
-is_db_wall(x, y)
-int x, y;
+is_db_wall(int x, int y)
 {
     return (boolean) (levl[x][y].typ == DBWALL);
 }
@@ -178,8 +170,7 @@ int x, y;
  * a drawbridge or drawbridge wall.
  */
 boolean
-find_drawbridge(x, y)
-int *x, *y;
+find_drawbridge(int *x, int *y)
 {
     int dir;
 
@@ -210,8 +201,7 @@ int *x, *y;
  * Find the drawbridge wall associated with a drawbridge.
  */
 STATIC_OVL void
-get_wall_for_db(x, y)
-int *x, *y;
+get_wall_for_db(int *x, int *y)
 {
     switch (levl[*x][*y].drawbridgemask & DB_DIR) {
     case DB_NORTH:
@@ -236,9 +226,7 @@ int *x, *y;
  */
 
 boolean
-create_drawbridge(x, y, dir, flag)
-int x, y, dir;
-boolean flag;
+create_drawbridge(int x, int y, int dir, boolean flag)
 {
     int x2, y2;
     boolean horiz;
@@ -299,8 +287,7 @@ static NEARDATA struct entity occupants[ENTITIES];
 
 STATIC_OVL
 struct entity *
-e_at(x, y)
-int x, y;
+e_at(int x, int y)
 {
     int entitycnt;
 
@@ -317,10 +304,7 @@ int x, y;
 }
 
 STATIC_OVL void
-m_to_e(mtmp, x, y, etmp)
-struct monst *mtmp;
-int x, y;
-struct entity *etmp;
+m_to_e(struct monst *mtmp, int x, int y, struct entity *etmp)
 {
     etmp->emon = mtmp;
     if (mtmp) {
@@ -335,8 +319,7 @@ struct entity *etmp;
 }
 
 STATIC_OVL void
-u_to_e(etmp)
-struct entity *etmp;
+u_to_e(struct entity *etmp)
 {
     etmp->emon = &youmonst;
     etmp->ex = u.ux;
@@ -345,9 +328,7 @@ struct entity *etmp;
 }
 
 STATIC_OVL void
-set_entity(x, y, etmp)
-int x, y;
-struct entity *etmp;
+set_entity(int x, int y, struct entity *etmp)
 {
     if ((x == u.ux) && (y == u.uy))
         u_to_e(etmp);
@@ -369,8 +350,7 @@ struct entity *etmp;
 /* #define e_strg(etmp, func) (is_u(etmp)? (char *)0 : func(etmp->emon)) */
 
 STATIC_OVL const char *
-e_nam(etmp)
-struct entity *etmp;
+e_nam(struct entity *etmp)
 {
     return is_u(etmp) ? "you" : mon_nam(etmp->emon);
 }
@@ -381,9 +361,7 @@ struct entity *etmp;
  */
 
 STATIC_OVL const char *
-E_phrase(etmp, verb)
-struct entity *etmp;
-const char *verb;
+E_phrase(struct entity *etmp, const char *verb)
 {
     static char wholebuf[80];
 
@@ -403,9 +381,7 @@ const char *verb;
  */
 
 STATIC_OVL boolean
-e_survives_at(etmp, x, y)
-struct entity *etmp;
-int x, y;
+e_survives_at(struct entity *etmp, int x, int y)
 {
     if (noncorporeal(etmp->edata))
         return TRUE;
@@ -427,9 +403,7 @@ int x, y;
 }
 
 STATIC_OVL void
-e_died(etmp, dest, how)
-struct entity *etmp;
-int dest, how;
+e_died(struct entity *etmp, int dest, int how)
 {
     if (is_u(etmp)) {
         if (how == DROWNING) {
@@ -491,8 +465,7 @@ int dest, how;
  */
 
 STATIC_OVL boolean
-automiss(etmp)
-struct entity *etmp;
+automiss(struct entity *etmp)
 {
     return (boolean) ((is_u(etmp) ? Passes_walls : passes_walls(etmp->edata))
                       || noncorporeal(etmp->edata));
@@ -503,9 +476,7 @@ struct entity *etmp;
  */
 
 STATIC_OVL boolean
-e_missed(etmp, chunks)
-struct entity *etmp;
-boolean chunks;
+e_missed(struct entity *etmp, boolean chunks)
 {
     int misses;
 
@@ -541,8 +512,7 @@ boolean chunks;
  */
 
 STATIC_OVL boolean
-e_jumps(etmp)
-struct entity *etmp;
+e_jumps(struct entity *etmp)
 {
     int tmp = 4; /* out of 10 */
 
@@ -565,8 +535,7 @@ struct entity *etmp;
 }
 
 STATIC_OVL void
-do_entity(etmp)
-struct entity *etmp;
+do_entity(struct entity *etmp)
 {
     int newx, newy, at_portcullis, oldx, oldy;
     boolean must_jump = FALSE, relocates = FALSE, e_inview;
@@ -766,8 +735,7 @@ struct entity *etmp;
  */
 
 void
-close_drawbridge(x, y)
-int x, y;
+close_drawbridge(int x, int y)
 {
     register struct rm *lev1, *lev2;
     struct trap *t;
@@ -828,8 +796,7 @@ int x, y;
  */
 
 void
-open_drawbridge(x, y)
-int x, y;
+open_drawbridge(int x, int y)
 {
     register struct rm *lev1, *lev2;
     struct trap *t;
@@ -875,8 +842,7 @@ int x, y;
  */
 
 void
-destroy_drawbridge(x, y)
-int x, y;
+destroy_drawbridge(int x, int y)
 {
     register struct rm *lev1, *lev2;
     struct trap *t;

@@ -24,9 +24,7 @@ STATIC_PTR void FDECL(openone, (int, int, genericptr_t));
 /* Recursively search obj for an object in class oclass and return 1st found
  */
 struct obj *
-o_in(obj, oclass)
-struct obj *obj;
-char oclass;
+o_in(struct obj *obj, char oclass)
 {
     register struct obj *otmp;
     struct obj *temp;
@@ -48,9 +46,7 @@ char oclass;
  * Return first found.
  */
 struct obj *
-o_material(obj, material)
-struct obj *obj;
-unsigned material;
+o_material(struct obj *obj, unsigned material)
 {
     register struct obj *otmp;
     struct obj *temp;
@@ -70,8 +66,7 @@ unsigned material;
 }
 
 STATIC_OVL void
-do_dknown_of(obj)
-struct obj *obj;
+do_dknown_of(struct obj *obj)
 {
     struct obj *otmp;
 
@@ -84,10 +79,7 @@ struct obj *obj;
 
 /* Check whether the location has an outdated object displayed on it. */
 STATIC_OVL boolean
-check_map_spot(x, y, oclass, material)
-int x, y;
-char oclass;
-unsigned material;
+check_map_spot(int x, int y, char oclass, unsigned material)
 {
     int glyph;
     register struct obj *otmp;
@@ -141,9 +133,7 @@ unsigned material;
  * change occurs.
  */
 STATIC_OVL boolean
-clear_stale_map(oclass, material)
-char oclass;
-unsigned material;
+clear_stale_map(char oclass, unsigned material)
 {
     register int zx, zy;
     boolean change_made = FALSE;
@@ -160,8 +150,7 @@ unsigned material;
 
 /* look for gold, on the floor or in monsters' possession */
 int
-gold_detect(sobj)
-register struct obj *sobj;
+gold_detect(register struct obj *sobj)
 {
     register struct obj *obj;
     register struct monst *mtmp;
@@ -285,8 +274,7 @@ outgoldmap:
 /* returns 1 if nothing was detected   */
 /* returns 0 if something was detected */
 int
-food_detect(sobj)
-register struct obj *sobj;
+food_detect(register struct obj *sobj)
 {
     register struct obj *obj;
     register struct monst *mtmp;
@@ -402,9 +390,8 @@ register struct obj *sobj;
  *      0 - something was detected
  */
 int
-object_detect(detector, class)
-struct obj *detector; /* object doing the detecting */
-int class;            /* an object class, 0 for all */
+object_detect(struct obj *detector, /* object doing the detecting */
+              int class)            /* an object class, 0 for all */
 {
     register int x, y;
     char stuff[BUFSZ];
@@ -596,9 +583,8 @@ int class;            /* an object class, 0 for all */
  * Returns 0 if something was detected.
  */
 int
-monster_detect(otmp, mclass)
-register struct obj *otmp; /* detecting object (if any) */
-int mclass;                /* monster class, 0 for all */
+monster_detect(register struct obj *otmp,   /* detecting object (if any) */
+               int mclass)                  /* monster class, 0 for all */
 {
     register struct monst *mtmp;
     int mcnt = 0;
@@ -663,10 +649,7 @@ int mclass;                /* monster class, 0 for all */
 }
 
 STATIC_OVL void
-sense_trap(trap, x, y, src_cursed)
-struct trap *trap;
-xchar x, y;
-int src_cursed;
+sense_trap(struct trap *trap, xchar x, xchar y, int src_cursed)
 {
     if (Hallucination || src_cursed) {
         struct obj obj; /* fake object */
@@ -702,10 +685,8 @@ int src_cursed;
    2 if found at some other spot, 3 if both, 0 otherwise; optionally
    update the map to show where such traps were found */
 STATIC_OVL int
-detect_obj_traps(objlist, show_them, how)
-struct obj *objlist;
-boolean show_them;
-int how; /* 1 for misleading map feedback */
+detect_obj_traps(struct obj *objlist, boolean show_them,
+                 int how) /* 1 for misleading map feedback */
 {
     struct obj *otmp;
     xchar x, y;
@@ -730,8 +711,7 @@ int how; /* 1 for misleading map feedback */
  * returns 0 if something was detected
  */
 int
-trap_detect(sobj)
-register struct obj *sobj;
+trap_detect(register struct obj *sobj)
 /* sobj is null if crystal ball, *scroll if gold detection scroll */
 {
     register struct trap *ttmp;
@@ -838,8 +818,7 @@ outtrapmap:
 }
 
 const char *
-level_distance(where)
-d_level *where;
+level_distance(d_level *where)
 {
     register schar ll = depth(&u.uz) - depth(where);
     register boolean indun = (u.uz.dnum == where->dnum);
@@ -891,8 +870,7 @@ static const struct {
 };
 
 void
-use_crystal_ball(optr)
-struct obj **optr;
+use_crystal_ball(struct obj **optr)
 {
     char ch;
     int oops;
@@ -1034,8 +1012,7 @@ struct obj **optr;
 }
 
 STATIC_OVL void
-show_map_spot(x, y)
-register int x, y;
+show_map_spot(register int x, register int y)
 {
     struct rm *lev;
     struct trap *t;
@@ -1119,8 +1096,7 @@ do_vicinity_map()
 
 /* convert a secret door into a normal door */
 void
-cvt_sdoor_to_door(lev)
-struct rm *lev;
+cvt_sdoor_to_door(struct rm *lev)
 {
     int newmask = lev->doormask & ~WM_MASK;
 
@@ -1137,9 +1113,7 @@ struct rm *lev;
 }
 
 STATIC_PTR void
-findone(zx, zy, num)
-int zx, zy;
-genericptr_t num;
+findone(int zx, int zy, genericptr_t num)
 {
     register struct trap *ttmp;
     register struct monst *mtmp;
@@ -1182,9 +1156,7 @@ genericptr_t num;
 }
 
 STATIC_PTR void
-openone(zx, zy, num)
-int zx, zy;
-genericptr_t num;
+openone(int zx, int zy, genericptr_t num)
 {
     register struct trap *ttmp;
     register struct obj *otmp;
@@ -1278,15 +1250,13 @@ openit()
 
 /* callback hack for overriding vision in do_clear_area() */
 boolean
-detecting(func)
-void FDECL((*func), (int, int, genericptr_t));
+detecting(void FDECL((*func), (int, int, genericptr_t)))
 {
     return (func == findone || func == openone);
 }
 
 void
-find_trap(trap)
-struct trap *trap;
+find_trap(struct trap *trap)
 {
     int tt = what_trap(trap->ttyp);
     boolean cleared = FALSE;
@@ -1312,8 +1282,7 @@ struct trap *trap;
 }
 
 int
-dosearch0(aflag)
-register int aflag; /* intrinsic autosearch vs explicit searching */
+dosearch0(register int aflag) /* intrinsic autosearch vs explicit searching */
 {
 #ifdef GCC_BUG
     /* some versions of gcc seriously muck up nested loops. if you get strange
@@ -1465,9 +1434,8 @@ sokoban_detect()
 /* idea from crawl; show known portion of map without any monsters,
    objects, or traps occluding the view of the underlying terrain */
 void
-reveal_terrain(full, which_subset)
-int full; /* wizard|explore modes allow player to request full map */
-int which_subset; /* when not full, whether to suppress objs and/or traps */
+reveal_terrain(int full,            /* wizard|explore modes allow player to request full map */
+               int which_subset)    /* when not full, whether to suppress objs and/or traps */
 {
     if ((Hallucination || Stunned || Confusion) && !full) {
         You("are too disoriented for this.");

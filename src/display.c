@@ -147,9 +147,7 @@ STATIC_DCL int FDECL(wall_angle, (struct rm *));
  * attention to and correct unexplored, lit ROOM and CORR spots.
  */
 void
-magic_map_background(x, y, show)
-xchar x, y;
-int show;
+magic_map_background(xchar x, xchar y, int show)
 {
     int glyph = back_to_glyph(x, y); /* assumes hero can see x,y */
     struct rm *lev = &levl[x][y];
@@ -197,9 +195,7 @@ int show;
  * the hero can physically see the location.  Update the screen if directed.
  */
 void
-map_background(x, y, show)
-register xchar x, y;
-register int show;
+map_background(register xchar x, register xchar y, register int show)
 {
     register int glyph = back_to_glyph(x, y);
 
@@ -216,9 +212,7 @@ register int show;
  * hero can physically see the location.
  */
 void
-map_trap(trap, show)
-register struct trap *trap;
-register int show;
+map_trap(register struct trap *trap, register int show)
 {
     register int x = trap->tx, y = trap->ty;
     register int glyph = trap_to_glyph(trap);
@@ -236,9 +230,7 @@ register int show;
  * see the location of the object.  Update the screen if directed.
  */
 void
-map_object(obj, show)
-register struct obj *obj;
-register int show;
+map_object(register struct obj *obj, register int show)
 {
     register int x = obj->ox, y = obj->oy;
     register int glyph = obj_to_glyph(obj);
@@ -267,8 +259,7 @@ register int show;
  * by newsym() if necessary.
  */
 void
-map_invisible(x, y)
-register xchar x, y;
+map_invisible(register xchar x, register xchar y)
 {
     if (x != u.ux || y != u.uy) { /* don't display I at hero's location */
         if (level.flags.hero_memory)
@@ -287,8 +278,7 @@ register xchar x, y;
  * to call newsym().
  */
 void
-unmap_object(x, y)
-register int x, y;
+unmap_object(register int x, register int y)
 {
     register struct trap *trap;
 
@@ -334,8 +324,7 @@ register int x, y;
     }
 
 void
-map_location(x, y, show)
-int x, y, show;
+map_location(int x, int y, int show)
 {
     _map_location(x, y, show);
 }
@@ -356,12 +345,11 @@ int x, y, show;
  *
  */
 STATIC_OVL void
-display_monster(x, y, mon, sightflags, worm_tail)
-register xchar x, y;        /* display position */
-register struct monst *mon; /* monster to display */
-int sightflags;             /* 1 if the monster is physically seen;
-                               2 if detected using Detect_monsters */
-xchar worm_tail;            /* mon is actually a worm tail */
+display_monster(register xchar x, register xchar y, /* display position */
+                register struct monst *mon,         /* monster to display */
+                int sightflags,                     /* 1 if the monster is physically seen;
+                                                     2 if detected using Detect_monsters */
+                xchar worm_tail)                    /* mon is actually a worm tail */
 {
     boolean mon_mimic = (mon->m_ap_type != M_AP_NOTHING);
     int sensed = (mon_mimic && (Protection_from_shape_changers
@@ -462,8 +450,7 @@ xchar worm_tail;            /* mon is actually a worm tail */
  * Do not call for worm tails.
  */
 STATIC_OVL void
-display_warning(mon)
-register struct monst *mon;
+display_warning(register struct monst *mon)
 {
     int x = mon->mx, y = mon->my;
     int wl = (int) (mon->m_lev / 4);
@@ -493,8 +480,7 @@ register struct monst *mon;
  * When hero knows what happened to location, even when blind.
  */
 void
-feel_newsym(x, y)
-xchar x, y;
+feel_newsym(xchar x, xchar y)
 {
     if (Blind)
         feel_location(x, y);
@@ -514,8 +500,7 @@ xchar x, y;
  * searching only finds one monster per turn so we must check that separately.
  */
 void
-feel_location(x, y)
-xchar x, y;
+feel_location(xchar x, xchar y)
 {
     struct rm *lev;
     struct obj *boulder;
@@ -673,8 +658,7 @@ xchar x, y;
  * Possibly put a new glyph at the given location.
  */
 void
-newsym(x, y)
-register int x, y;
+newsym(register int x, register int y)
 {
     register struct monst *mon;
     register struct rm *lev = &(levl[x][y]);
@@ -851,8 +835,7 @@ register int x, y;
  * pulled into a platform dependent routine for fancier graphics if desired.
  */
 void
-shieldeff(x, y)
-xchar x, y;
+shieldeff(xchar x, xchar y)
 {
     register int i;
 
@@ -904,8 +887,7 @@ static struct tmp_glyph {
 } tgfirst;
 
 void
-tmp_at(x, y)
-int x, y;
+tmp_at(int x, int y)
 {
     static struct tmp_glyph *tglyph = (struct tmp_glyph *) 0;
     struct tmp_glyph *tmp;
@@ -1005,8 +987,7 @@ int x, y;
  * being swallowed.
  */
 void
-swallowed(first)
-int first;
+swallowed(int first)
 {
     static xchar lastx, lasty; /* last swallowed position */
     int swallower, left_ok, rght_ok;
@@ -1068,8 +1049,7 @@ int first;
  * except when in water level.  Special routines exist for that.
  */
 void
-under_water(mode)
-int mode;
+under_water(int mode)
 {
     static xchar lastx, lasty;
     static boolean dela;
@@ -1115,8 +1095,7 @@ int mode;
  *      Very restricted display.  You can only see yourself.
  */
 void
-under_ground(mode)
-int mode;
+under_ground(int mode)
 {
     static boolean dela;
 
@@ -1323,8 +1302,7 @@ static char gbuf_stop[ROWNO];
  * Store the glyph in the 3rd screen for later flushing.
  */
 void
-show_glyph(x, y, glyph)
-int x, y, glyph;
+show_glyph(int x, int y, int glyph)
 {
     /*
      * Check for bad positions and glyphs.
@@ -1439,8 +1417,7 @@ clear_glyph_buffer()
  * Assumes that the indicated positions are filled with S_stone glyphs.
  */
 void
-row_refresh(start, stop, y)
-int start, stop, y;
+row_refresh(int start, int stop, int y)
 {
     register int x;
 
@@ -1469,8 +1446,7 @@ cls()
  * Synch the third screen with the display.
  */
 void
-flush_screen(cursor_on_u)
-int cursor_on_u;
+flush_screen(int cursor_on_u)
 {
     /* Prevent infinite loops on errors:
      *      flush_screen->print_glyph->impossible->pline->flush_screen
@@ -1528,8 +1504,7 @@ int cursor_on_u;
  * variables.
  */
 int
-back_to_glyph(x, y)
-xchar x, y;
+back_to_glyph(xchar x, xchar y)
 {
     int idx;
     struct rm *ptr = &(levl[x][y]);
@@ -1660,9 +1635,7 @@ xchar x, y;
  * a random monster in swallowed() and don't use what_mon() here.
  */
 STATIC_OVL int
-swallow_to_glyph(mnum, loc)
-int mnum;
-int loc;
+swallow_to_glyph(int mnum, int loc)
 {
     if (loc < S_sw_tl || S_sw_br < loc) {
         impossible("swallow_to_glyph: bad swallow location");
@@ -1684,9 +1657,7 @@ int loc;
  *      /  S_rslant     (-1, 1) or ( 1,-1)
  */
 int
-zapdir_to_glyph(dx, dy, beam_type)
-register int dx, dy;
-int beam_type;
+zapdir_to_glyph(register int dx, register int dy, int beam_type)
 {
     if (beam_type >= NUM_ZAP) {
         impossible("zapdir_to_glyph:  illegal beam type");
@@ -1703,8 +1674,7 @@ int beam_type;
  * structure, so we must check the "third screen".
  */
 int
-glyph_at(x, y)
-xchar x, y;
+glyph_at(xchar x, xchar y)
 {
     if (x < 0 || y < 0 || x >= COLNO || y >= ROWNO)
         return cmap_to_glyph(S_room); /* XXX */
@@ -1722,8 +1692,7 @@ xchar x, y;
  */
 
 STATIC_OVL int
-get_bk_glyph(x,y)
-xchar x, y;
+get_bk_glyph(xchar x, xchar y)
 {
     int idx, bkglyph = NO_GLYPH;
     struct rm *lev = &levl[x][y];
@@ -1793,15 +1762,13 @@ static const char *type_names[MAX_TYPE] = {
 };
 
 static const char *
-type_to_name(type)
-int type;
+type_to_name(int type)
 {
     return (type < 0 || type >= MAX_TYPE) ? "unknown" : type_names[type];
 }
 
 static void
-error4(x, y, a, b, c, dd)
-int x, y, a, b, c, dd;
+error4(int x, int y, int a, int b, int c, int dd)
 {
     pline("set_wall_state: %s @ (%d,%d) %s%s%s%s",
           type_to_name(levl[x][y].typ), x, y,
@@ -1817,8 +1784,7 @@ int x, y, a, b, c, dd;
  * Things that are ambiguous: lava
  */
 STATIC_OVL int
-check_pos(x, y, which)
-int x, y, which;
+check_pos(int x, int y, int which)
 {
     int type;
     if (!isok(x, y))
@@ -1833,8 +1799,7 @@ int x, y, which;
 /*ARGSUSED*/
 #ifdef WA_VERBOSE
 STATIC_OVL boolean
-more_than_one(x, y, a, b, c)
-int x, y, a, b, c;
+more_than_one(int x, int y, int a, int b, int c)
 {
     if ((a && (b | c)) || (b && (a | c)) || (c && (a | b))) {
         error4(x, y, a, b, c, 0);
@@ -1849,9 +1814,8 @@ int x, y, a, b, c;
 
 /* Return the wall mode for a T wall. */
 STATIC_OVL int
-set_twall(x0, y0, x1, y1, x2, y2, x3, y3)
-int x0, y0; /* used #if WA_VERBOSE */
-int x1, y1, x2, y2, x3, y3;
+set_twall(int x0, int y0, /* used #if WA_VERBOSE */
+          int x1, int y1, int x2, int y2, int x3, int y3)
 {
     int wmode, is_1, is_2, is_3;
 
@@ -1871,8 +1835,7 @@ int x1, y1, x2, y2, x3, y3;
 
 /* Return wall mode for a horizontal or vertical wall. */
 STATIC_OVL int
-set_wall(x, y, horiz)
-int x, y, horiz;
+set_wall(int x, int y, int horiz)
 {
     int wmode, is_1, is_2;
 
@@ -1893,8 +1856,7 @@ int x, y, horiz;
 
 /* Return a wall mode for a corner wall. (x4,y4) is the "inner" position. */
 STATIC_OVL int
-set_corn(x1, y1, x2, y2, x3, y3, x4, y4)
-int x1, y1, x2, y2, x3, y3, x4, y4;
+set_corn(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)
 {
     int wmode, is_1, is_2, is_3, is_4;
 
@@ -1922,8 +1884,7 @@ int x1, y1, x2, y2, x3, y3, x4, y4;
 
 /* Return mode for a crosswall. */
 STATIC_OVL int
-set_crosswall(x, y)
-int x, y;
+set_crosswall(int x, int y)
 {
     int wmode, is_1, is_2, is_3, is_4;
 
@@ -2046,9 +2007,7 @@ unsigned char seenv_matrix[3][3] = { { SV2, SV1, SV0 },
 
 /* Set the seen vector of lev as if seen from (x0,y0) to (x,y). */
 STATIC_OVL void
-set_seenv(lev, x0, y0, x, y)
-struct rm *lev;
-int x0, y0, x, y; /* from, to */
+set_seenv(struct rm *lev, int x0, int y0, int x, int y)/* from, to */
 {
     int dx = x - x0, dy = y0 - y;
 
@@ -2058,9 +2017,8 @@ int x0, y0, x, y; /* from, to */
 /* Called by blackout(vault.c) when vault guard removes temporary corridor,
    turning spot <x0,y0> back into stone; <x1,y1> is an adjacent spot. */
 void
-unset_seenv(lev, x0, y0, x1, y1)
-struct rm *lev;     /* &levl[x1][y1] */
-int x0, y0, x1, y1; /* from, to; abs(x1-x0)==1 && abs(y0-y1)==1 */
+unset_seenv(struct rm *lev,                 /* &levl[x1][y1] */
+            int x0, int y0, int x1, int y1) /* from, to; abs(x1-x0)==1 && abs(y0-y1)==1 */
 {
     int dx = x1 - x0, dy = y0 - y1;
 
@@ -2126,8 +2084,7 @@ static const int cross_matrix[4][6] = {
 
 /* Print out a T wall warning and all interesting info. */
 STATIC_OVL void
-t_warn(lev)
-struct rm *lev;
+t_warn(struct rm *lev)
 {
     static const char warn_str[] = "wall_angle: %s: case %d: seenv = 0x%x";
     const char *wname;
@@ -2159,8 +2116,7 @@ struct rm *lev;
  * seen vector (SV).
  */
 STATIC_OVL int
-wall_angle(lev)
-struct rm *lev;
+wall_angle(struct rm *lev)
 {
     register unsigned int seenv = lev->seenv & 0xff;
     const int *row;

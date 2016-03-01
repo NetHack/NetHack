@@ -42,10 +42,7 @@ rm_waslit()
  * immediately after the effect is complete.
  */
 STATIC_OVL void
-mkcavepos(x, y, dist, waslit, rockit)
-xchar x, y;
-int dist;
-boolean waslit, rockit;
+mkcavepos(xchar x, xchar y, int dist, boolean waslit, boolean rockit)
 {
     register struct rm *lev;
 
@@ -85,8 +82,7 @@ boolean waslit, rockit;
 }
 
 STATIC_OVL void
-mkcavearea(rockit)
-register boolean rockit;
+mkcavearea(register boolean rockit)
 {
     int dist;
     xchar xmin = u.ux, xmax = u.ux;
@@ -137,9 +133,7 @@ register boolean rockit;
 
 /* When digging into location <x,y>, what are you actually digging into? */
 int
-dig_typ(otmp, x, y)
-struct obj *otmp;
-xchar x, y;
+dig_typ(struct obj *otmp, xchar x, xchar y)
 {
     boolean ispick;
 
@@ -177,10 +171,7 @@ is_digging()
 #define BY_OBJECT ((struct monst *) 0)
 
 boolean
-dig_check(madeby, verbose, x, y)
-struct monst *madeby;
-boolean verbose;
-int x, y;
+dig_check(struct monst *madeby, boolean verbose, int x, int y)
 {
     struct trap *ttmp = t_at(x, y);
     const char *verb =
@@ -500,9 +491,8 @@ holetime()
 
 /* Return typ of liquid to fill a hole with, or ROOM, if no liquid nearby */
 schar
-fillholetyp(x, y, fill_if_any)
-int x, y;
-boolean fill_if_any; /* force filling if it exists at all */
+fillholetyp(int x, int y,
+            boolean fill_if_any) /* force filling if it exists at all */
 {
     register int x1, y1;
     int lo_x = max(1, x - 1), hi_x = min(x + 1, COLNO - 1),
@@ -535,10 +525,7 @@ boolean fill_if_any; /* force filling if it exists at all */
 }
 
 void
-digactualhole(x, y, madeby, ttyp)
-register int x, y;
-struct monst *madeby;
-int ttyp;
+digactualhole(register int x, register int y, struct monst *madeby, int ttyp)
 {
     struct obj *oldobjs, *newobjs;
     register struct trap *ttmp;
@@ -721,11 +708,7 @@ int ttyp;
  * in apply.c.
  */
 void
-liquid_flow(x, y, typ, ttmp, fillmsg)
-xchar x, y;
-schar typ;
-struct trap *ttmp;
-const char *fillmsg;
+liquid_flow(xchar x, xchar y, schar typ, struct trap *ttmp, const char *fillmsg)
 {
     boolean u_spot = (x == u.ux && y == u.uy);
 
@@ -746,9 +729,7 @@ const char *fillmsg;
 
 /* return TRUE if digging succeeded, FALSE otherwise */
 boolean
-dighole(pit_only, by_magic, cc)
-boolean pit_only, by_magic;
-coord *cc;
+dighole(boolean pit_only, boolean by_magic, coord *cc)
 {
     register struct trap *ttmp;
     struct rm *lev;
@@ -881,8 +862,7 @@ coord *cc;
 }
 
 STATIC_OVL void
-dig_up_grave(cc)
-coord *cc;
+dig_up_grave(coord *cc)
 {
     struct obj *otmp;
     xchar dig_x, dig_y;
@@ -942,8 +922,7 @@ coord *cc;
 }
 
 int
-use_pick_axe(obj)
-struct obj *obj;
+use_pick_axe(struct obj *obj)
 {
     const char *sdp, *verb;
     char *dsp, dirsyms[12], qbuf[BUFSZ];
@@ -1008,8 +987,7 @@ struct obj *obj;
 /*       the "In what direction do you want to dig?" query.        */
 /*       use_pick_axe2() uses the existing u.dx, u.dy and u.dz    */
 int
-use_pick_axe2(obj)
-struct obj *obj;
+use_pick_axe2(struct obj *obj)
 {
     register int rx, ry;
     register struct rm *lev;
@@ -1191,10 +1169,7 @@ struct obj *obj;
  * zap == TRUE if wand/spell of digging, FALSE otherwise (chewing)
  */
 void
-watch_dig(mtmp, x, y, zap)
-struct monst *mtmp;
-xchar x, y;
-boolean zap;
+watch_dig(struct monst *mtmp, xchar x, xchar y, boolean zap)
 {
     struct rm *lev = &levl[x][y];
 
@@ -1237,8 +1212,7 @@ boolean zap;
 
 /* Return TRUE if monster died, FALSE otherwise.  Called from m_move(). */
 boolean
-mdig_tunnel(mtmp)
-register struct monst *mtmp;
+mdig_tunnel(register struct monst *mtmp)
 {
     register struct rm *here;
     int pile = rnd(12);
@@ -1320,8 +1294,7 @@ register struct monst *mtmp;
 /* draft refers to air currents, but can be a pun on "draft" as conscription
    for military service (probably not a good pun if it has to be explained) */
 void
-draft_message(unexpected)
-boolean unexpected;
+draft_message(boolean unexpected)
 {
     /*
      * [Bug or TODO?  Have caller pass coordinates and use the travel
@@ -1576,9 +1549,7 @@ zap_dig()
  * down in the pit.
  */
 STATIC_OVL int
-adj_pit_checks(cc, msg)
-coord *cc;
-char *msg;
+adj_pit_checks(coord *cc, char *msg)
 {
     int ltyp;
     struct rm *room;
@@ -1667,9 +1638,7 @@ char *msg;
  * Ensure that all conjoined pits fill up.
  */
 STATIC_OVL void
-pit_flow(trap, filltyp)
-struct trap *trap;
-schar filltyp;
+pit_flow(struct trap *trap, schar filltyp)
 {
     if (trap && (filltyp != ROOM)
         && (trap->ttyp == PIT || trap->ttyp == SPIKED_PIT)) {
@@ -1705,8 +1674,7 @@ schar filltyp;
 }
 
 struct obj *
-buried_ball(cc)
-coord *cc;
+buried_ball(coord *cc)
 {
     xchar check_x, check_y;
     struct obj *otmp, *otmp2;
@@ -1790,9 +1758,7 @@ buried_ball_to_freedom()
 /* move objects from fobj/nexthere lists to buriedobjlist, keeping position
    information */
 struct obj *
-bury_an_obj(otmp, dealloced)
-struct obj *otmp;
-boolean *dealloced;
+bury_an_obj(struct obj *otmp, boolean *dealloced)
 {
     struct obj *otmp2;
     boolean under_ice;
@@ -1859,8 +1825,7 @@ boolean *dealloced;
 }
 
 void
-bury_objs(x, y)
-int x, y;
+bury_objs(int x, int y)
 {
     struct obj *otmp, *otmp2;
 
@@ -1877,8 +1842,7 @@ int x, y;
 
 /* move objects from buriedobjlist to fobj/nexthere lists */
 void
-unearth_objs(x, y)
-int x, y;
+unearth_objs(int x, int y)
 {
     struct obj *otmp, *otmp2, *bball;
     coord cc;
@@ -1916,9 +1880,7 @@ int x, y;
  */
 /* ARGSUSED */
 void
-rot_organic(arg, timeout)
-anything *arg;
-long timeout UNUSED;
+rot_organic(anything *arg, long timeout UNUSED)
 {
     struct obj *obj = arg->a_obj;
 
@@ -1939,9 +1901,7 @@ long timeout UNUSED;
  * Called when a corpse has rotted completely away.
  */
 void
-rot_corpse(arg, timeout)
-anything *arg;
-long timeout;
+rot_corpse(anything *arg, long timeout)
 {
     xchar x = 0, y = 0;
     struct obj *obj = arg->a_obj;
@@ -1993,8 +1953,7 @@ long timeout;
 
 #if 0
 void
-bury_monst(mtmp)
-struct monst *mtmp;
+bury_monst(struct monst *mtmp)
 {
     debugpline1("bury_monst: %s", mon_nam(mtmp));
     if (canseemon(mtmp)) {
@@ -2074,8 +2033,7 @@ escape_tomb()
 }
 
 void
-bury_obj(otmp)
-struct obj *otmp;
+bury_obj(struct obj *otmp)
 {
     debugpline0("bury_obj");
     if (cansee(otmp->ox, otmp->oy))

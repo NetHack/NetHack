@@ -280,8 +280,7 @@ pgetchar() /* courtesy of aeb@cwi.nl */
 
 /* A ch == 0 resets the pushq */
 void
-pushch(ch)
-char ch;
+pushch(char ch)
 {
     if (!ch)
         phead = ptail = 0;
@@ -294,8 +293,7 @@ char ch;
  * replaying a previous command.
  */
 void
-savech(ch)
-char ch;
+savech(char ch)
 {
     if (!in_doagain) {
         if (!ch)
@@ -1208,8 +1206,7 @@ static const char have_been[] = "have been ", have_never[] = "have never ",
     enl_msg(You_, have, (const char *) "", something, "")
 
 static void
-enlght_line(start, middle, end, ps)
-const char *start, *middle, *end, *ps;
+enlght_line(const char *start, const char *middle, const char *end, const char *ps)
 {
     char buf[BUFSZ];
 
@@ -1219,10 +1216,7 @@ const char *start, *middle, *end, *ps;
 
 /* format increased chance to hit or damage or defense (Protection) */
 static char *
-enlght_combatinc(inctyp, incamt, final, outbuf)
-const char *inctyp;
-int incamt, final;
-char *outbuf;
+enlght_combatinc(const char *inctyp, int incamt, int final, char *outbuf)
 {
     const char *modif, *bonus;
     boolean invrt;
@@ -1259,9 +1253,7 @@ char *outbuf;
 
 /* report half physical or half spell damage */
 STATIC_OVL void
-enlght_halfdmg(category, final)
-int category;
-int final;
+enlght_halfdmg(int category, int final)
 {
     const char *category_name;
     char buf[BUFSZ];
@@ -1296,8 +1288,7 @@ walking_on_water()
    confers the target property; item must have been seen and its type
    discovered but it doesn't necessarily have to be fully identified */
 STATIC_OVL boolean
-cause_known(propindx)
-int propindx; /* index of a property which can be conveyed by worn item */
+cause_known(int propindx) /* index of a property which can be conveyed by worn item */
 {
     register struct obj *o;
     long mask = W_ARMOR | W_AMUL | W_RING | W_TOOL;
@@ -1316,9 +1307,8 @@ int propindx; /* index of a property which can be conveyed by worn item */
 
 /* format a characteristic value, accommodating Strength's strangeness */
 STATIC_OVL char *
-attrval(attrindx, attrvalue, resultbuf)
-int attrindx, attrvalue;
-char resultbuf[]; /* should be at least [7] to hold "18/100\0" */
+attrval(int attrindx, int attrvalue,
+        char resultbuf[])/* should be at least [7] to hold "18/100\0" */
 {
     if (attrindx != A_STR || attrvalue <= 18)
         Sprintf(resultbuf, "%d", attrvalue);
@@ -1330,9 +1320,8 @@ char resultbuf[]; /* should be at least [7] to hold "18/100\0" */
 }
 
 void
-enlightenment(mode, final)
-int mode;  /* BASICENLIGHTENMENT | MAGICENLIGHTENMENT (| both) */
-int final; /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
+enlightenment(int mode,     /* BASICENLIGHTENMENT | MAGICENLIGHTENMENT (| both) */
+              int final)    /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
 {
     char buf[BUFSZ], tmpbuf[BUFSZ];
 
@@ -1375,9 +1364,7 @@ int final; /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
 /*ARGSUSED*/
 /* display role, race, alignment and such to en_win */
 STATIC_OVL void
-background_enlightenment(unused_mode, final)
-int unused_mode UNUSED;
-int final;
+background_enlightenment(int unused_mode UNUSED, int final)
 {
     const char *role_titl, *rank_titl;
     int innategend, difgend, difalgn;
@@ -1484,9 +1471,7 @@ int final;
 
 /* characteristics: expanded version of bottom line strength, dexterity, &c */
 STATIC_OVL void
-characteristics_enlightenment(mode, final)
-int mode;
-int final;
+characteristics_enlightenment(int mode, int final)
 {
     putstr(en_win, 0, ""); /* separator after background */
     putstr(en_win, 0,
@@ -1503,8 +1488,7 @@ int final;
 
 /* display one attribute value for characteristics_enlightenment() */
 STATIC_OVL void
-one_characteristic(mode, final, attrindx)
-int mode, final, attrindx;
+one_characteristic(int mode, int final, int attrindx)
 {
     boolean hide_innate_value = FALSE, interesting_alimit;
     int acurrent, abase, apeak, alimit;
@@ -1601,9 +1585,7 @@ int mode, final, attrindx;
 
 /* status: selected obvious capabilities, assorted troubles */
 STATIC_OVL void
-status_enlightenment(mode, final)
-int mode;
-int final;
+status_enlightenment(int mode, int final)
 {
     boolean magic = (mode & MAGICENLIGHTENMENT) ? TRUE : FALSE;
     int cap;
@@ -1879,9 +1861,7 @@ int final;
 
 /* attributes: intrinsics and the like, other non-obvious capabilities */
 void
-attributes_enlightenment(unused_mode, final)
-int unused_mode UNUSED;
-int final;
+attributes_enlightenment(int unused_mode UNUSED, int final)
 {
     static NEARDATA const char if_surroundings_permitted[] =
         " if surroundings permitted";
@@ -2430,9 +2410,8 @@ doattributes(VOID_ARGS)
 }
 
 void
-youhiding(via_enlghtmt, msgflag)
-boolean via_enlghtmt; /* englightment line vs topl message */
-int msgflag;          /* for variant message phrasing */
+youhiding(boolean via_enlghtmt, /* englightment line vs topl message */
+          int msgflag)          /* for variant message phrasing */
 {
     char *bp, buf[BUFSZ];
 
@@ -2499,8 +2478,7 @@ doconduct(VOID_ARGS)
 }
 
 void
-show_conduct(final)
-int final;
+show_conduct(int final)
 {
     char buf[BUFSZ];
     int ngenocided;
@@ -2841,8 +2819,7 @@ add_debug_extended_commands()
 }
 
 STATIC_OVL char
-cmd_from_func(fn)
-int NDECL((*fn));
+cmd_from_func(int NDECL((*fn)))
 {
     int i;
     for (i = 0; i < SIZE(cmdlist); ++i)
@@ -2856,8 +2833,7 @@ static const char count_str[] = "                   count  bytes";
 static const char separator[] = "------------------ -----  ------";
 
 STATIC_OVL int
-size_obj(otmp)
-struct obj *otmp;
+size_obj(struct obj *otmp)
 {
     int sz = (int) sizeof(struct obj);
 
@@ -2878,12 +2854,7 @@ struct obj *otmp;
 }
 
 STATIC_OVL void
-count_obj(chain, total_count, total_size, top, recurse)
-struct obj *chain;
-long *total_count;
-long *total_size;
-boolean top;
-boolean recurse;
+count_obj(struct obj *chain, long *total_count, long *total_size, boolean top, boolean recurse)
 {
     long count, size;
     struct obj *obj;
@@ -2901,12 +2872,7 @@ boolean recurse;
 }
 
 STATIC_OVL void
-obj_chain(win, src, chain, total_count, total_size)
-winid win;
-const char *src;
-struct obj *chain;
-long *total_count;
-long *total_size;
+obj_chain(winid win, const char *src, struct obj *chain, long *total_count, long *total_size)
 {
     char buf[BUFSZ];
     long count = 0, size = 0;
@@ -2919,12 +2885,7 @@ long *total_size;
 }
 
 STATIC_OVL void
-mon_invent_chain(win, src, chain, total_count, total_size)
-winid win;
-const char *src;
-struct monst *chain;
-long *total_count;
-long *total_size;
+mon_invent_chain(winid win, const char *src, struct monst *chain, long *total_count, long *total_size)
 {
     char buf[BUFSZ];
     long count = 0, size = 0;
@@ -2939,11 +2900,7 @@ long *total_size;
 }
 
 STATIC_OVL void
-contained(win, src, total_count, total_size)
-winid win;
-const char *src;
-long *total_count;
-long *total_size;
+contained(winid win, const char *src, long *total_count, long *total_size)
 {
     char buf[BUFSZ];
     long count = 0, size = 0;
@@ -2968,8 +2925,7 @@ long *total_size;
 }
 
 STATIC_OVL int
-size_monst(mtmp)
-struct monst *mtmp;
+size_monst(struct monst *mtmp)
 {
     int sz = (int) sizeof(struct monst);
 
@@ -2993,12 +2949,7 @@ struct monst *mtmp;
 }
 
 STATIC_OVL void
-mon_chain(win, src, chain, total_count, total_size)
-winid win;
-const char *src;
-struct monst *chain;
-long *total_count;
-long *total_size;
+mon_chain(winid win, const char *src, struct monst *chain, long *total_count, long *total_size)
 {
     char buf[BUFSZ];
     long count, size;
@@ -3118,8 +3069,7 @@ wiz_migrate_mons()
 
 /* called at startup and after number_pad is twiddled */
 void
-reset_commands(initial)
-boolean initial;
+reset_commands(boolean initial)
 {
     static const char sdir[] = "hykulnjb><",
                       sdir_swap_yz[] = "hzkulnjb><",
@@ -3211,8 +3161,7 @@ boolean initial;
 }
 
 STATIC_OVL boolean
-accept_menu_prefix(cmd_func)
-int NDECL((*cmd_func));
+accept_menu_prefix(int NDECL((*cmd_func)))
 {
     if (cmd_func == dopickup || cmd_func == dotip
         || cmd_func == doextcmd || cmd_func == doextlist)
@@ -3221,8 +3170,7 @@ int NDECL((*cmd_func));
 }
 
 void
-rhack(cmd)
-register char *cmd;
+rhack(register char *cmd)
 {
     boolean do_walk, do_rush, prefix_seen, bad_command,
         firsttime = (cmd == 0);
@@ -3459,8 +3407,7 @@ register char *cmd;
 
 /* convert an x,y pair into a direction code */
 int
-xytod(x, y)
-schar x, y;
+xytod(schar x, schar y)
 {
     register int dd;
 
@@ -3472,9 +3419,7 @@ schar x, y;
 
 /* convert a direction code into an x,y pair */
 void
-dtoxy(cc, dd)
-coord *cc;
-register int dd;
+dtoxy(coord *cc, register int dd)
 {
     cc->x = xdir[dd];
     cc->y = ydir[dd];
@@ -3483,8 +3428,7 @@ register int dd;
 
 /* also sets u.dz, but returns false for <> */
 int
-movecmd(sym)
-char sym;
+movecmd(char sym)
 {
     register const char *dp = index(Cmd.dirchars, sym);
 
@@ -3514,8 +3458,7 @@ dxdy_moveok()
 
 /* decide whether a character (user input keystroke) requests screen repaint */
 boolean
-redraw_cmd(c)
-char c;
+redraw_cmd(char c)
 {
     return (boolean) (c == C('r') || (Cmd.num_pad && c == C('l')));
 }
@@ -3531,10 +3474,7 @@ char c;
  * Returns non-zero if coordinates in cc are valid.
  */
 int
-get_adjacent_loc(prompt, emsg, x, y, cc)
-const char *prompt, *emsg;
-xchar x, y;
-coord *cc;
+get_adjacent_loc(const char *prompt, const char *emsg, xchar x, xchar y, coord *cc)
 {
     xchar new_x, new_y;
     if (!getdir(prompt)) {
@@ -3555,8 +3495,7 @@ coord *cc;
 }
 
 int
-getdir(s)
-const char *s;
+getdir(const char *s)
 {
     char dirsym;
     int is_mov;
@@ -3605,9 +3544,7 @@ retry:
 }
 
 STATIC_OVL boolean
-help_dir(sym, msg)
-char sym;
-const char *msg;
+help_dir(char sym, const char *msg)
 {
     char ctrl;
     winid win;
@@ -3691,8 +3628,7 @@ confdir()
 }
 
 const char *
-directionname(dir)
-int dir;
+directionname(int dir)
 {
     static NEARDATA const char *const dirnames[] = {
         "west",      "northwest", "north",     "northeast", "east",
@@ -3705,8 +3641,7 @@ int dir;
 }
 
 int
-isok(x, y)
-register int x, y;
+isok(register int x, register int y)
 {
     /* x corresponds to curx, so x==1 is the first column. Ach. %% */
     return x >= 1 && x <= COLNO - 1 && y >= 0 && y <= ROWNO - 1;
@@ -3718,8 +3653,7 @@ static NEARDATA int last_multi;
  * convert a MAP window position into a movecmd
  */
 const char *
-click_to_cmd(x, y, mod)
-int x, y, mod;
+click_to_cmd(int x, int y, int mod)
 {
     int dir;
     static char cmd[4];
@@ -3931,8 +3865,7 @@ parse()
    the return value so we should be safe using `void' unconditionally */
 /*ARGUSED*/
 void
-hangup(sig_unused) /* called as signal() handler, so sent at least one arg */
-int sig_unused UNUSED;
+hangup(int sig_unused UNUSED) /* called as signal() handler, so sent at least one arg */
 {
     if (program_state.exiting)
         program_state.in_moveloop = 0;
@@ -4109,9 +4042,7 @@ wiz_port_debug()
  *   window port causing a buffer overflow there.
  */
 char
-yn_function(query, resp, def)
-const char *query, *resp;
-char def;
+yn_function(const char *query, const char *resp, char def)
 {
     char qbuf[QBUFSZ];
 
@@ -4130,9 +4061,7 @@ char def;
 
 /* for paranoid_confirm:quit,die,attack prompting */
 boolean
-paranoid_query(be_paranoid, prompt)
-boolean be_paranoid;
-const char *prompt;
+paranoid_query(boolean be_paranoid, const char *prompt)
 {
     boolean confirmed_ok;
 
