@@ -27,9 +27,7 @@ STATIC_DCL void FDECL(miniwalk, (int, int));
 
 STATIC_OVL
 void
-roguejoin(x1, y1, x2, y2, horiz)
-int x1, y1, x2, y2;
-int horiz;
+roguejoin(int x1, int y1, int x2, int y2, int horiz)
 {
     register int x, y, middle;
     if (horiz) {
@@ -53,8 +51,7 @@ int horiz;
 
 STATIC_OVL
 void
-roguecorr(x, y, dir)
-int x, y, dir;
+roguecorr(int x, int y, int dir)
 {
     register int fromx, fromy, tox, toy;
 
@@ -149,8 +146,7 @@ int x, y, dir;
 /* Modified walkfrom() from mkmaze.c */
 STATIC_OVL
 void
-miniwalk(x, y)
-int x, y;
+miniwalk(int x, int y)
 {
     register int q, dir;
     int dirs[4];
@@ -287,8 +283,7 @@ makeroguerooms()
 }
 
 void
-corr(x, y)
-int x, y;
+corr(int x, int y)
 {
     if (rn2(50)) {
         levl[x][y].typ = CORR;

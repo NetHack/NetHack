@@ -9,8 +9,7 @@ STATIC_DCL long FDECL(newuexp, (int));
 STATIC_DCL int FDECL(enermod, (int));
 
 STATIC_OVL long
-newuexp(lev)
-int lev;
+newuexp(int lev)
 {
     if (lev < 10)
         return (10L * (1L << lev));
@@ -20,8 +19,7 @@ int lev;
 }
 
 STATIC_OVL int
-enermod(en)
-int en;
+enermod(int en)
 {
     switch (Role_switch) {
     case PM_PRIEST:
@@ -70,9 +68,7 @@ newpw()
 
 /* return # of exp points for mtmp after nk killed */
 int
-experience(mtmp, nk)
-register struct monst *mtmp;
-register int nk;
+experience(register struct monst *mtmp, register int nk)
 {
     register struct permonst *ptr = mtmp->data;
     int i, tmp, tmp2;
@@ -156,8 +152,7 @@ register int nk;
 }
 
 void
-more_experienced(exper, rexp)
-register int exper, rexp;
+more_experienced(register int exper, register int rexp)
 {
     long newexp = u.uexp + exper;
     long rexpincr = 4 * exper + rexp;
@@ -183,8 +178,7 @@ register int exper, rexp;
 
 /* e.g., hit by drain life attack */
 void
-losexp(drainer)
-const char *drainer; /* cause of death, if drain should be fatal */
+losexp(const char *drainer) /* cause of death, if drain should be fatal */
 {
     register int num;
 
@@ -258,9 +252,8 @@ newexplevel()
 }
 
 void
-pluslvl(incr)
-boolean incr; /* true iff via incremental experience growth */
-{             /*        (false for potion of gain level)    */
+pluslvl(boolean incr) /* true iff via incremental experience growth */
+{                     /*        (false for potion of gain level)    */
     int hpinc, eninc;
 
     if (!incr)
@@ -306,8 +299,7 @@ boolean incr; /* true iff via incremental experience growth */
    experience level:  base number of points needed to reach the current
    level plus a random portion of what it takes to get to the next level */
 long
-rndexp(gaining)
-boolean gaining; /* gaining XP via potion vs setting XP for polyself */
+rndexp(boolean gaining) /* gaining XP via potion vs setting XP for polyself */
 {
     long minexp, maxexp, diff, factor, result;
 

@@ -25,12 +25,11 @@ static int explosion[3][3] = { { S_explode1, S_explode4, S_explode7 },
  *      that Half_physical_damage only affects the damage applied to the hero.
  */
 void
-explode(x, y, type, dam, olet, expltype)
-int x, y;
-int type; /* the same as in zap.c; passes -(wand typ) for some WAND_CLASS */
-int dam;
-char olet;
-int expltype;
+explode(int x, int y,
+        int type, /* the same as in zap.c; passes -(wand typ) for some WAND_CLASS */
+        int dam,
+        char olet,
+        int expltype)
 {
     int i, j, k, damu = dam;
     boolean starting = 1;
@@ -541,11 +540,10 @@ struct scatter_chain {
 
 /* returns number of scattered objects */
 long
-scatter(sx, sy, blastforce, scflags, obj)
-int sx, sy;     /* location of objects to scatter */
-int blastforce; /* force behind the scattering */
-unsigned int scflags;
-struct obj *obj; /* only scatter this obj        */
+scatter(int sx, int sy,     /* location of objects to scatter */
+        int blastforce,     /* force behind the scattering */
+        unsigned int scflags,
+        struct obj *obj)    /* only scatter this obj        */
 {
     register struct obj *otmp;
     register int tmp;
@@ -711,8 +709,7 @@ struct obj *obj; /* only scatter this obj        */
  * For now, just perform a "regular" explosion.
  */
 void
-splatter_burning_oil(x, y)
-int x, y;
+splatter_burning_oil(int x, int y)
 {
 /* ZT_SPELL(ZT_FIRE) = ZT_SPELL(AD_FIRE-1) = 10+(2-1) = 11 */
 #define ZT_SPELL_O_FIRE 11 /* value kludge, see zap.c */
@@ -722,9 +719,7 @@ int x, y;
 /* lit potion of oil is exploding; extinguish it as a light source before
    possibly killing the hero and attempting to save bones */
 void
-explode_oil(obj, x, y)
-struct obj *obj;
-int x, y;
+explode_oil(struct obj *obj, int x, int y)
 {
     if (!obj->lamplit)
         impossible("exploding unlit oil");

@@ -15,8 +15,7 @@ STATIC_DCL void NDECL(dofindgem);
 /* used when trying to dip in or drink from fountain or sink or pool while
    levitating above it, or when trying to move downwards in that state */
 void
-floating_above(what)
-const char *what;
+floating_above(const char *what)
 {
     const char *umsg = "are floating high above the %s.";
 
@@ -103,8 +102,7 @@ dowaternymph()
 
 /* Gushing forth along LOS from (u.ux, u.uy) */
 void
-dogushforth(drinking)
-int drinking;
+dogushforth(int drinking)
 {
     int madepool = 0;
 
@@ -118,9 +116,7 @@ int drinking;
 }
 
 STATIC_PTR void
-gush(x, y, poolcnt)
-int x, y;
-genericptr_t poolcnt;
+gush(int x, int y, genericptr_t poolcnt)
 {
     register struct monst *mtmp;
     register struct trap *ttmp;
@@ -164,9 +160,7 @@ dofindgem()
 }
 
 void
-dryup(x, y, isyou)
-xchar x, y;
-boolean isyou;
+dryup(xchar x, xchar y, boolean isyou)
 {
     if (IS_FOUNTAIN(levl[x][y].typ)
         && (!rn2(3) || FOUNTAIN_IS_WARNED(x, y))) {
@@ -347,8 +341,7 @@ drinkfountain()
 }
 
 void
-dipfountain(obj)
-register struct obj *obj;
+dipfountain(register struct obj *obj)
 {
     if (Levitation) {
         floating_above("fountain");
@@ -490,8 +483,7 @@ register struct obj *obj;
 }
 
 void
-breaksink(x, y)
-int x, y;
+breaksink(int x, int y)
 {
     if (cansee(x, y) || (x == u.ux && y == u.uy))
         pline_The("pipes break!  Water spurts out!");

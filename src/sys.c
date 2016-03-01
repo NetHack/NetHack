@@ -111,8 +111,7 @@ extern struct attack sa_yes[NATTK];
 extern struct attack sa_no[NATTK];
 
 void
-sysopt_seduce_set(val)
-int val;
+sysopt_seduce_set(int val)
 {
     struct attack *setval = val ? sa_yes : sa_no;
     int x;
