@@ -28,9 +28,7 @@ STATIC_DCL void FDECL(hitmsg, (struct monst *, struct attack *));
 static int dieroll;
 
 STATIC_OVL void
-hitmsg(mtmp, mattk)
-register struct monst *mtmp;
-register struct attack *mattk;
+hitmsg(register struct monst *mtmp, register struct attack *mattk)
 {
     int compat;
 
@@ -72,10 +70,7 @@ register struct attack *mattk;
 
 /* monster missed you */
 STATIC_OVL void
-missmu(mtmp, nearmiss, mattk)
-struct monst *mtmp;
-boolean nearmiss;
-struct attack *mattk;
+missmu(struct monst *mtmp, boolean nearmiss, struct attack *mattk)
 {
     if (!canspotmon(mtmp))
         map_invisible(mtmp->mx, mtmp->my);
@@ -91,9 +86,7 @@ struct attack *mattk;
 
 /* monster swings obj */
 STATIC_OVL void
-mswings(mtmp, otemp)
-struct monst *mtmp;
-struct obj *otemp;
+mswings(struct monst *mtmp, struct obj *otemp)
 {
     if (flags.verbose && !Blind && mon_visible(mtmp)) {
         pline("%s %s %s%s %s.", Monnam(mtmp),
@@ -104,9 +97,7 @@ struct obj *otemp;
 
 /* return how a poison attack was delivered */
 const char *
-mpoisons_subj(mtmp, mattk)
-struct monst *mtmp;
-struct attack *mattk;
+mpoisons_subj(struct monst *mtmp, struct attack *mattk)
 {
     if (mattk->aatyp == AT_WEAP) {
         struct obj *mwep = (mtmp == &youmonst) ? uwep : MON_WEP(mtmp);
@@ -134,9 +125,7 @@ u_slow_down()
 
 /* monster attacked your displaced image */
 STATIC_OVL void
-wildmiss(mtmp, mattk)
-register struct monst *mtmp;
-register struct attack *mattk;
+wildmiss(register struct monst *mtmp, register struct attack *mattk)
 {
     int compat;
 
@@ -211,10 +200,9 @@ register struct attack *mattk;
 }
 
 void
-expels(mtmp, mdat, message)
-struct monst *mtmp;
-struct permonst *mdat; /* if mtmp is polymorphed, mdat != mtmp->data */
-boolean message;
+expels(struct monst *mtmp,
+       struct permonst *mdat, /* if mtmp is polymorphed, mdat != mtmp->data */
+       boolean message)
 {
     if (message) {
         if (is_animal(mdat))
@@ -256,10 +244,7 @@ boolean message;
 
 /* select a monster's next attack, possibly substituting for its usual one */
 struct attack *
-getmattk(mptr, indx, prev_result, alt_attk_buf)
-struct permonst *mptr;
-int indx, prev_result[];
-struct attack *alt_attk_buf;
+getmattk(struct permonst *mptr, int indx, int prev_result[], struct attack *alt_attk_buf)
 {
     struct attack *attk = &mptr->mattk[indx];
 
@@ -287,8 +272,7 @@ struct attack *alt_attk_buf;
  *              take care of it...
  */
 int
-mattacku(mtmp)
-register struct monst *mtmp;
+mattacku(register struct monst *mtmp)
 {
     struct attack *mattk, alt_attk;
     int i, j, tmp, sum[NATTK];
@@ -738,8 +722,7 @@ register struct monst *mtmp;
 }
 
 STATIC_OVL boolean
-diseasemu(mdat)
-struct permonst *mdat;
+diseasemu(struct permonst *mdat)
 {
     if (Sick_resistance) {
         You_feel("a slight illness.");
@@ -753,9 +736,7 @@ struct permonst *mdat;
 
 /* check whether slippery clothing protects from hug or wrap attack */
 STATIC_OVL boolean
-u_slip_free(mtmp, mattk)
-struct monst *mtmp;
-struct attack *mattk;
+u_slip_free(struct monst *mtmp, struct attack *mattk)
 {
     struct obj *obj = (uarmc ? uarmc : uarm);
 
@@ -790,8 +771,7 @@ struct attack *mattk;
 
 /* armor that sufficiently covers the body might be able to block magic */
 int
-magic_negation(mon)
-struct monst *mon;
+magic_negation(struct monst *mon)
 {
     struct obj *o;
     long wearmask;
@@ -842,9 +822,7 @@ struct monst *mon;
  *             attacking you
  */
 STATIC_OVL int
-hitmu(mtmp, mattk)
-register struct monst *mtmp;
-register struct attack *mattk;
+hitmu(register struct monst *mtmp, register struct attack *mattk)
 {
     register struct permonst *mdat = mtmp->data;
     register int uncancelled, ptmp;
@@ -1632,9 +1610,7 @@ gulp_blnd_check()
 
 /* monster swallows you, or damage if u.uswallow */
 STATIC_OVL int
-gulpmu(mtmp, mattk)
-register struct monst *mtmp;
-register struct attack *mattk;
+gulpmu(register struct monst *mtmp, register struct attack *mattk)
 {
     struct trap *t = t_at(u.ux, u.uy);
     int tmp = d((int) mattk->damn, (int) mattk->damd);
@@ -1874,10 +1850,7 @@ register struct attack *mattk;
 
 /* monster explodes in your face */
 STATIC_OVL int
-explmu(mtmp, mattk, ufound)
-register struct monst *mtmp;
-register struct attack *mattk;
-boolean ufound;
+explmu(register struct monst *mtmp, register struct attack *mattk, boolean ufound)
 {
     boolean physical_damage = TRUE, kill_agr = TRUE;
 
@@ -1972,9 +1945,7 @@ boolean ufound;
 
 /* monster gazes at you */
 int
-gazemu(mtmp, mattk)
-register struct monst *mtmp;
-register struct attack *mattk;
+gazemu(register struct monst *mtmp, register struct attack *mattk)
 {
     static const char *const reactions[] = {
         "confused",              /* [0] */
@@ -2183,9 +2154,7 @@ register struct attack *mattk;
 
 /* mtmp hits you for n points damage */
 void
-mdamageu(mtmp, n)
-register struct monst *mtmp;
-register int n;
+mdamageu(register struct monst *mtmp, register int n)
 {
     context.botl = 1;
     if (Upolyd) {
@@ -2204,9 +2173,7 @@ register int n;
  *         2 if wrong gender for nymph
  */
 int
-could_seduce(magr, mdef, mattk)
-struct monst *magr, *mdef;
-struct attack *mattk;
+could_seduce(struct monst *magr, struct monst *mdef, struct attack *mattk)
 {
     register struct permonst *pagr;
     boolean agrinvis, defperc;
@@ -2248,8 +2215,7 @@ struct attack *mattk;
 
 /* Returns 1 if monster teleported */
 int
-doseduce(mon)
-register struct monst *mon;
+doseduce(register struct monst *mon)
 {
     register struct obj *ring, *nring;
     boolean fem = (mon->data == &mons[PM_SUCCUBUS]); /* otherwise incubus */
@@ -2512,9 +2478,7 @@ register struct monst *mon;
 }
 
 STATIC_OVL void
-mayberem(obj, str)
-register struct obj *obj;
-const char *str;
+mayberem(register struct obj *obj, const char *str)
 {
     char qbuf[QBUFSZ];
 
@@ -2549,10 +2513,7 @@ const char *str;
 }
 
 STATIC_OVL int
-passiveum(olduasmon, mtmp, mattk)
-struct permonst *olduasmon;
-register struct monst *mtmp;
-register struct attack *mattk;
+passiveum(struct permonst *olduasmon, register struct monst *mtmp, register struct attack *mattk)
 {
     int i, tmp;
 

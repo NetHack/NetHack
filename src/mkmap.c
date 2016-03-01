@@ -26,8 +26,7 @@ int min_rx, max_rx, min_ry, max_ry; /* rectangle bounds for regions */
 static int n_loc_filled;
 
 STATIC_OVL void
-init_map(bg_typ)
-schar bg_typ;
+init_map(schar bg_typ)
 {
     register int i, j;
 
@@ -37,8 +36,7 @@ schar bg_typ;
 }
 
 STATIC_OVL void
-init_fill(bg_typ, fg_typ)
-schar bg_typ, fg_typ;
+init_fill(schar bg_typ, schar fg_typ)
 {
     register int i, j;
     long limit, count;
@@ -56,9 +54,7 @@ schar bg_typ, fg_typ;
 }
 
 STATIC_OVL schar
-get_map(col, row, bg_typ)
-int col, row;
-schar bg_typ;
+get_map(int col, int row, schar bg_typ)
 {
     if (col <= 0 || row < 0 || col > WIDTH || row >= HEIGHT)
         return bg_typ;
@@ -69,8 +65,7 @@ static int dirs[16] = { -1, -1 /**/, -1, 0 /**/,  -1, 1 /**/, 0, -1 /**/,
                         0,  1 /**/,  1,  -1 /**/, 1,  0 /**/, 1, 1 };
 
 STATIC_OVL void
-pass_one(bg_typ, fg_typ)
-schar bg_typ, fg_typ;
+pass_one(schar bg_typ, schar fg_typ)
 {
     register int i, j;
     short count, dr;
@@ -103,8 +98,7 @@ schar bg_typ, fg_typ;
 #define new_loc(i, j) *(new_locations + ((j) * (WIDTH + 1)) + (i))
 
 STATIC_OVL void
-pass_two(bg_typ, fg_typ)
-schar bg_typ, fg_typ;
+pass_two(schar bg_typ, schar fg_typ)
 {
     register int i, j;
     short count, dr;
@@ -127,8 +121,7 @@ schar bg_typ, fg_typ;
 }
 
 STATIC_OVL void
-pass_three(bg_typ, fg_typ)
-schar bg_typ, fg_typ;
+pass_three(schar bg_typ, schar fg_typ)
 {
     register int i, j;
     short count, dr;
@@ -157,12 +150,7 @@ schar bg_typ, fg_typ;
  * exactly matching levl[sx][sy].typ and walls are included as well.
  */
 void
-flood_fill_rm(sx, sy, rmno, lit, anyroom)
-int sx;
-register int sy;
-register int rmno;
-boolean lit;
-boolean anyroom;
+flood_fill_rm(int sx, register int sy, register int rmno, boolean lit, boolean anyroom)
 {
     register int i;
     int nx;
@@ -270,8 +258,7 @@ wallify_map()
 }
 
 STATIC_OVL void
-join_map(bg_typ, fg_typ)
-schar bg_typ, fg_typ;
+join_map(schar bg_typ, schar fg_typ)
 {
     register struct mkroom *croom, *croom2;
 
@@ -343,9 +330,7 @@ joinm:
 }
 
 STATIC_OVL void
-finish_map(fg_typ, bg_typ, lit, walled, icedpools)
-schar fg_typ, bg_typ;
-boolean lit, walled, icedpools;
+finish_map(schar fg_typ, schar bg_typ, boolean lit, boolean walled, boolean icedpools)
 {
     int i, j;
 
@@ -384,8 +369,7 @@ boolean lit, walled, icedpools;
  * region are all set.
  */
 void
-remove_rooms(lx, ly, hx, hy)
-int lx, ly, hx, hy;
+remove_rooms(int lx, int ly, int hx, int hy)
 {
     int i;
     struct mkroom *croom;
@@ -416,8 +400,7 @@ int lx, ly, hx, hy;
  * Currently handles only the removal of rooms that have no subrooms.
  */
 STATIC_OVL void
-remove_room(roomno)
-unsigned roomno;
+remove_room(unsigned roomno)
 {
     struct mkroom *croom = &rooms[roomno];
     struct mkroom *maxroom = &rooms[--nroom];
@@ -449,8 +432,7 @@ unsigned roomno;
 #define N_P3_ITER 2 /* tune map smoothing via this value */
 
 void
-mkmap(init_lev)
-lev_init *init_lev;
+mkmap(lev_init *init_lev)
 {
     schar bg_typ = init_lev->bg, fg_typ = init_lev->fg;
     boolean smooth = init_lev->smoothed, join = init_lev->joined;

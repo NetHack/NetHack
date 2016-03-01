@@ -119,8 +119,7 @@ getmailstatus()
  * from newmail() and newphone().
  */
 STATIC_OVL boolean
-md_start(startp)
-coord *startp;
+md_start(coord *startp)
 {
     coord testcc;     /* scratch coordinates */
     int row;          /* current row we are checking */
@@ -219,9 +218,8 @@ retry:
  * its point randomly, which is not what we want.
  */
 STATIC_OVL boolean
-md_stop(stopp, startp)
-coord *stopp;  /* stopping position (we fill it in) */
-coord *startp; /* starting position (read only) */
+md_stop(coord *stopp,   /* stopping position (we fill it in) */
+        coord *startp)  /* starting position (read only) */
 {
     int x, y, distance, min_distance = -1;
 
@@ -260,9 +258,8 @@ static NEARDATA const char *mail_text[] = { "Gangway!", "Look out!",
  * TRUE otherwise.
  */
 STATIC_OVL boolean
-md_rush(md, tx, ty)
-struct monst *md;
-register int tx, ty; /* destination of mail daemon */
+md_rush(struct monst *md,
+        register int tx, register int ty) /* destination of mail daemon */
 {
     struct monst *mon;            /* displaced monster */
     register int dx, dy;          /* direction counters */
@@ -359,8 +356,7 @@ register int tx, ty; /* destination of mail daemon */
 /* Deliver a scroll of mail. */
 /*ARGSUSED*/
 STATIC_OVL void
-newmail(info)
-struct mail_info *info;
+newmail(struct mail_info *info)
 {
     struct monst *md;
     coord start, stop;
@@ -428,8 +424,7 @@ ckmailstatus()
 
 /*ARGSUSED*/
 void
-readmail(otmp)
-struct obj *otmp;
+readmail(struct obj *otmp)
 {
     static char *junk[] = {
         NULL, /* placeholder for "Report bugs to <devteam@nethack.org>.", */
@@ -501,8 +496,7 @@ ckmailstatus()
 
 /*ARGSUSED*/
 void
-readmail(otmp)
-struct obj *otmp;
+readmail(struct obj *otmp)
 {
 #ifdef DEF_MAILREADER /* This implies that UNIX is defined */
     register const char *mr = 0;
@@ -552,8 +546,7 @@ ckmailstatus()
 }
 
 void
-readmail(otmp)
-struct obj *otmp;
+readmail(struct obj *otmp)
 {
 #ifdef SHELL /* can't access mail reader without spawning subprocess */
     const char *txt, *cmd;

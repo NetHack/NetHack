@@ -5,8 +5,7 @@
 #include "hack.h"
 
 void
-newemin(mtmp)
-struct monst *mtmp;
+newemin(struct monst *mtmp)
 {
     if (!mtmp->mextra)
         mtmp->mextra = newmextra();
@@ -17,8 +16,7 @@ struct monst *mtmp;
 }
 
 void
-free_emin(mtmp)
-struct monst *mtmp;
+free_emin(struct monst *mtmp)
 {
     if (mtmp->mextra && EMIN(mtmp)) {
         free((genericptr_t) EMIN(mtmp));
@@ -29,8 +27,7 @@ struct monst *mtmp;
 
 /* count the number of monsters on the level */
 int
-monster_census(spotted)
-boolean spotted; /* seen|sensed vs all */
+monster_census(boolean spotted) /* seen|sensed vs all */
 {
     struct monst *mtmp;
     int count = 0;
@@ -47,8 +44,7 @@ boolean spotted; /* seen|sensed vs all */
 
 /* mon summons a monster */
 int
-msummon(mon)
-struct monst *mon;
+msummon(struct monst *mon)
 {
     struct permonst *ptr;
     int dtype = NON_PM, cnt = 0, result = 0, census;
@@ -147,9 +143,7 @@ struct monst *mon;
 }
 
 void
-summon_minion(alignment, talk)
-aligntyp alignment;
-boolean talk;
+summon_minion(aligntyp alignment, boolean talk)
 {
     register struct monst *mon;
     int mnum;
@@ -209,8 +203,7 @@ boolean talk;
 
 /* returns 1 if it won't attack. */
 int
-demon_talk(mtmp)
-register struct monst *mtmp;
+demon_talk(register struct monst *mtmp)
 {
     long cash, demand, offer;
 
@@ -287,8 +280,7 @@ register struct monst *mtmp;
 }
 
 long
-bribe(mtmp)
-struct monst *mtmp;
+bribe(struct monst *mtmp)
 {
     char buf[BUFSZ];
     long offer;
@@ -318,8 +310,7 @@ struct monst *mtmp;
 }
 
 int
-dprince(atyp)
-aligntyp atyp;
+dprince(aligntyp atyp)
 {
     int tryct, pm;
 
@@ -333,8 +324,7 @@ aligntyp atyp;
 }
 
 int
-dlord(atyp)
-aligntyp atyp;
+dlord(aligntyp atyp)
 {
     int tryct, pm;
 
@@ -373,8 +363,7 @@ lminion()
 }
 
 int
-ndemon(atyp)
-aligntyp atyp;
+ndemon(aligntyp atyp)
 {
     int tryct;
     struct permonst *ptr;
@@ -391,8 +380,7 @@ aligntyp atyp;
 
 /* guardian angel has been affected by conflict so is abandoning hero */
 void
-lose_guardian_angel(mon)
-struct monst *mon; /* if null, angel hasn't been created yet */
+lose_guardian_angel(struct monst *mon) /* if null, angel hasn't been created yet */
 {
     coord mm;
     int i;

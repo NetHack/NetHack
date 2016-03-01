@@ -42,9 +42,7 @@ static int dieroll;
 /* returns mon_nam(mon) relative to other_mon; normal name unless they're
    the same, in which case the reference is to {him|her|it} self */
 STATIC_OVL char *
-mon_nam_too(outbuf, mon, other_mon)
-char *outbuf;
-struct monst *mon, *other_mon;
+mon_nam_too(char *outbuf, struct monst *mon, struct monst *other_mon)
 {
     Strcpy(outbuf, mon_nam(mon));
     if (mon == other_mon)
@@ -63,9 +61,7 @@ struct monst *mon, *other_mon;
 }
 
 STATIC_OVL void
-noises(magr, mattk)
-register struct monst *magr;
-register struct attack *mattk;
+noises(register struct monst *magr, register struct attack *mattk)
 {
     boolean farq = (distu(magr->mx, magr->my) > 15);
 
@@ -80,9 +76,7 @@ register struct attack *mattk;
 
 STATIC_OVL
 void
-missmm(magr, mdef, mattk)
-register struct monst *magr, *mdef;
-struct attack *mattk;
+missmm(register struct monst *magr, register struct monst *mdef, struct attack *mattk)
 {
     const char *fmt;
     char buf[BUFSZ], mdef_name[BUFSZ];
@@ -118,8 +112,7 @@ struct attack *mattk;
  */
  /* have monsters fight each other */
 int
-fightm(mtmp)
-register struct monst *mtmp;
+fightm(register struct monst *mtmp)
 {
     register struct monst *mon, *nmon;
     int result, has_u_swallowed;
@@ -193,9 +186,7 @@ register struct monst *mtmp;
  *                 returns same results as mattackm().
  */
 int
-mdisplacem(magr, mdef, quietly)
-register struct monst *magr, *mdef;
-boolean quietly;
+mdisplacem(register struct monst *magr, register struct monst *mdef, boolean quietly)
 {
     struct permonst *pa, *pd;
     int tx, ty, fx, fy;
@@ -288,8 +279,7 @@ boolean quietly;
  * In the case of exploding monsters, the monster dies as well.
  */
 int
-mattackm(magr, mdef)
-register struct monst *magr, *mdef;
+mattackm(register struct monst *magr, register struct monst *mdef)
 {
     int i,          /* loop counter */
         tmp,        /* amour class difference */
@@ -480,9 +470,7 @@ register struct monst *magr, *mdef;
 
 /* Returns the result of mdamagem(). */
 STATIC_OVL int
-hitmm(magr, mdef, mattk)
-register struct monst *magr, *mdef;
-struct attack *mattk;
+hitmm(register struct monst *magr, register struct monst *mdef, struct attack *mattk)
 {
     if (vis) {
         int compat;
@@ -539,9 +527,7 @@ struct attack *mattk;
 
 /* Returns the same values as mdamagem(). */
 STATIC_OVL int
-gazemm(magr, mdef, mattk)
-register struct monst *magr, *mdef;
-struct attack *mattk;
+gazemm(register struct monst *magr, register struct monst *mdef, struct attack *mattk)
 {
     char buf[BUFSZ];
 
@@ -590,8 +576,7 @@ struct attack *mattk;
 
 /* return True if magr is allowed to swallow mdef, False otherwise */
 boolean
-engulf_target(magr, mdef)
-struct monst *magr, *mdef;
+engulf_target(struct monst *magr, struct monst *mdef)
 {
     struct rm *lev;
     int dx, dy;
@@ -622,9 +607,7 @@ struct monst *magr, *mdef;
 
 /* Returns the same values as mattackm(). */
 STATIC_OVL int
-gulpmm(magr, mdef, mattk)
-register struct monst *magr, *mdef;
-register struct attack *mattk;
+gulpmm(register struct monst *magr, register struct monst *mdef, register struct attack *mattk)
 {
     xchar ax, ay, dx, dy;
     int status;
@@ -692,9 +675,7 @@ register struct attack *mattk;
 }
 
 STATIC_OVL int
-explmm(magr, mdef, mattk)
-struct monst *magr, *mdef;
-struct attack *mattk;
+explmm(struct monst *magr, struct monst *mdef, struct attack *mattk)
 {
     int result;
 
@@ -725,9 +706,7 @@ struct attack *mattk;
  *  See comment at top of mattackm(), for return values.
  */
 STATIC_OVL int
-mdamagem(magr, mdef, mattk)
-register struct monst *magr, *mdef;
-register struct attack *mattk;
+mdamagem(register struct monst *magr, register struct monst *mdef, register struct attack *mattk)
 {
     struct obj *obj;
     char buf[BUFSZ];
@@ -1329,9 +1308,7 @@ register struct attack *mattk;
 }
 
 void
-paralyze_monst(mon, amt)
-struct monst *mon;
-int amt;
+paralyze_monst(struct monst *mon, int amt)
 {
     if (amt > 127)
         amt = 127;
@@ -1344,9 +1321,7 @@ int amt;
 
 /* `mon' is hit by a sleep attack; return 1 if it's affected, 0 otherwise */
 int
-sleep_monst(mon, amt, how)
-struct monst *mon;
-int amt, how;
+sleep_monst(struct monst *mon, int amt, int how)
 {
     if (resists_sleep(mon)
         || (how >= 0 && resist(mon, (char) how, 0, NOTELL))) {
@@ -1367,8 +1342,7 @@ int amt, how;
 
 /* sleeping grabber releases, engulfer doesn't; don't use for paralysis! */
 void
-slept_monst(mon)
-struct monst *mon;
+slept_monst(struct monst *mon)
 {
     if ((mon->msleeping || !mon->mcanmove) && mon == u.ustuck
         && !sticks(youmonst.data) && !u.uswallow) {
@@ -1378,9 +1352,7 @@ struct monst *mon;
 }
 
 void
-rustm(mdef, obj)
-struct monst *mdef;
-struct obj *obj;
+rustm(struct monst *mdef, struct obj *obj)
 {
     int dmgtyp;
 
@@ -1399,9 +1371,7 @@ struct obj *obj;
 }
 
 STATIC_OVL void
-mswingsm(magr, mdef, otemp)
-struct monst *magr, *mdef;
-struct obj *otemp;
+mswingsm(struct monst *magr, struct monst *mdef, struct obj *otemp)
 {
     if (flags.verbose && !Blind && mon_visible(magr)) {
         pline("%s %s %s%s %s at %s.", Monnam(magr),
@@ -1416,10 +1386,8 @@ struct obj *otemp;
  * handled above.  Returns same values as mattackm.
  */
 STATIC_OVL int
-passivemm(magr, mdef, mhit, mdead)
-register struct monst *magr, *mdef;
-boolean mhit;
-int mdead;
+passivemm(register struct monst *magr, register struct monst *mdef,
+          boolean mhit, int mdead)
 {
     register struct permonst *mddat = mdef->data;
     register struct permonst *madat = magr->data;
@@ -1569,9 +1537,7 @@ assess_dmg:
 
 /* hero or monster has successfully hit target mon with drain energy attack */
 void
-xdrainenergym(mon, givemsg)
-struct monst *mon;
-boolean givemsg;
+xdrainenergym(struct monst *mon, boolean givemsg)
 {
     if (mon->mspec_used < 20 /* limit draining */
         && (attacktype(mon->data, AT_MAGC)
@@ -1585,8 +1551,7 @@ boolean givemsg;
 /* "aggressive defense"; what type of armor prevents specified attack
    from touching its target? */
 long
-attk_protection(aatyp)
-int aatyp;
+attk_protection(int aatyp)
 {
     long w_mask = 0L;
 

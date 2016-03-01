@@ -56,10 +56,7 @@ static int explcolors[] = {
 
 /*ARGSUSED*/
 int
-mapglyph(glyph, ochar, ocolor, ospecial, x, y)
-int glyph, *ocolor, x, y;
-int *ochar;
-unsigned *ospecial;
+mapglyph(int glyph, int *ochar, int *ocolor, unsigned *ospecial, int x, int y)
 {
     register int offset, idx;
     int color = NO_COLOR;
@@ -230,8 +227,7 @@ unsigned *ospecial;
 }
 
 char *
-encglyph(glyph)
-int glyph;
+encglyph(int glyph)
 {
     static char encbuf[20];
 
@@ -252,10 +248,7 @@ int glyph;
  */
 
 void
-genl_putmixed(window, attr, str)
-winid window;
-int attr;
-const char *str;
+genl_putmixed(winid window, int attr, const char *str)
 {
     static const char hex[] = "00112233445566778899aAbBcCdDeEfF";
     char buf[BUFSZ];
