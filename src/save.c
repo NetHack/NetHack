@@ -31,11 +31,11 @@ STATIC_DCL void FDECL(savetrapchn, (int, struct trap *, int));
 STATIC_DCL void FDECL(savegamestate, (int, int));
 STATIC_OVL void FDECL(save_msghistory, (int, int));
 #ifdef MFLOPPY
-STATIC_DCL void FDECL(savelev0, (int, XCHAR_P, int));
+STATIC_DCL void FDECL(savelev0, (int, xchar, int));
 STATIC_DCL boolean NDECL(swapout_oldest);
 STATIC_DCL void FDECL(copyfile, (char *, char *));
 #endif /* MFLOPPY */
-STATIC_DCL void FDECL(savelevl, (int fd, BOOLEAN_P));
+STATIC_DCL void FDECL(savelevl, (int fd, boolean));
 STATIC_DCL void FDECL(def_bufon, (int));
 STATIC_DCL void FDECL(def_bufoff, (int));
 STATIC_DCL void FDECL(def_bflush, (int));

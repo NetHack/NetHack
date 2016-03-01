@@ -9,7 +9,7 @@
 #define ALGN_SINNED (-4) /* worse than strayed (-1..-3) */
 #define ALGN_PIOUS 14    /* better than fervent (9..13) */
 
-STATIC_DCL boolean FDECL(histemple_at, (struct monst *, XCHAR_P, XCHAR_P));
+STATIC_DCL boolean FDECL(histemple_at, (struct monst *, xchar, xchar));
 STATIC_DCL boolean FDECL(has_shrine, (struct monst *));
 
 void

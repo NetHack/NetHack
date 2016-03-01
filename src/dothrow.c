@@ -10,12 +10,12 @@ STATIC_DCL int FDECL(throw_obj, (struct obj *, int));
 STATIC_DCL boolean FDECL(ok_to_throw, (int *));
 STATIC_DCL void NDECL(autoquiver);
 STATIC_DCL int FDECL(gem_accept, (struct monst *, struct obj *));
-STATIC_DCL void FDECL(tmiss, (struct obj *, struct monst *, BOOLEAN_P));
+STATIC_DCL void FDECL(tmiss, (struct obj *, struct monst *, boolean));
 STATIC_DCL int FDECL(throw_gold, (struct obj *));
-STATIC_DCL void FDECL(check_shop_obj, (struct obj *, XCHAR_P, XCHAR_P,
-                                       BOOLEAN_P));
-STATIC_DCL void FDECL(breakmsg, (struct obj *, BOOLEAN_P));
-STATIC_DCL boolean FDECL(toss_up, (struct obj *, BOOLEAN_P));
+STATIC_DCL void FDECL(check_shop_obj, (struct obj *, xchar, xchar,
+                                       boolean));
+STATIC_DCL void FDECL(breakmsg, (struct obj *, boolean));
+STATIC_DCL boolean FDECL(toss_up, (struct obj *, boolean));
 STATIC_DCL boolean FDECL(throwing_weapon, (struct obj *));
 STATIC_DCL void FDECL(sho_obj_return_to_u, (struct obj * obj));
 STATIC_DCL boolean FDECL(mhurtle_step, (genericptr_t, int, int));

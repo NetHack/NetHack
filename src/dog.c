@@ -7,8 +7,7 @@
 STATIC_DCL int NDECL(pet_type);
 
 void
-newedog(mtmp)
-struct monst *mtmp;
+newedog(struct monst *mtmp)
 {
     if (!mtmp->mextra)
         mtmp->mextra = newmextra();
@@ -19,8 +18,7 @@ struct monst *mtmp;
 }
 
 void
-free_edog(mtmp)
-struct monst *mtmp;
+free_edog(struct monst *mtmp)
 {
     if (mtmp->mextra && EDOG(mtmp)) {
         free((genericptr_t) EDOG(mtmp));
@@ -30,8 +28,7 @@ struct monst *mtmp;
 }
 
 void
-initedog(mtmp)
-register struct monst *mtmp;
+initedog(register struct monst *mtmp)
 {
     mtmp->mtame = is_domestic(mtmp->data) ? 10 : 5;
     mtmp->mpeaceful = 1;
@@ -66,10 +63,7 @@ pet_type()
 }
 
 struct monst *
-make_familiar(otmp, x, y, quietly)
-register struct obj *otmp;
-xchar x, y;
-boolean quietly;
+make_familiar(register struct obj *otmp, xchar x, xchar y, boolean quietly)
 {
     struct permonst *pm;
     struct monst *mtmp = 0;
@@ -293,9 +287,7 @@ losedogs()
 
 /* called from resurrect() in addition to losedogs() */
 void
-mon_arrive(mtmp, with_you)
-struct monst *mtmp;
-boolean with_you;
+mon_arrive(struct monst *mtmp, boolean with_you)
 {
     struct trap *t;
     xchar xlocale, ylocale, xyloc, xyflags, wander;
@@ -566,9 +558,9 @@ long nmv; /* number of moves */
 }
 
 /* called when you move to another level */
+/* true for ascension or final escape */
 void
-keepdogs(pets_only)
-boolean pets_only; /* true for ascension or final escape */
+keepdogs(boolean pets_only)
 {
     register struct monst *mtmp, *mtmp2;
     register struct obj *obj;
@@ -676,12 +668,11 @@ boolean pets_only; /* true for ascension or final escape */
     }
 }
 
+/* destination level */
+/* MIGR_xxx destination xy location: */
+/* optional destination coordinates */
 void
-migrate_to_level(mtmp, tolev, xyloc, cc)
-register struct monst *mtmp;
-xchar tolev; /* destination level */
-xchar xyloc; /* MIGR_xxx destination xy location: */
-coord *cc;   /* optional destination coordinates */
+migrate_to_level(register struct monst *mtmp, xchar tolev, xchar xyloc, coord *cc)
 {
     register struct obj *obj;
     d_level new_lev;
@@ -957,9 +948,7 @@ register struct obj *obj;
  * If the pet wasn't abused and was very tame, it might revive tame.
  */
 void
-wary_dog(mtmp, was_dead)
-struct monst *mtmp;
-boolean was_dead;
+wary_dog(struct monst *mtmp, boolean was_dead)
 {
     struct edog *edog;
     boolean quietly = was_dead;

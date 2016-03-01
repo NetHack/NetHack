@@ -26,21 +26,21 @@ STATIC_DCL void FDECL(def_mread, (int, genericptr_t, unsigned int));
 
 STATIC_DCL void NDECL(find_lev_obj);
 STATIC_DCL void FDECL(restlevchn, (int));
-STATIC_DCL void FDECL(restdamage, (int, BOOLEAN_P));
+STATIC_DCL void FDECL(restdamage, (int, boolean));
 STATIC_DCL void FDECL(restobj, (int, struct obj *));
-STATIC_DCL struct obj *FDECL(restobjchn, (int, BOOLEAN_P, BOOLEAN_P));
+STATIC_DCL struct obj *FDECL(restobjchn, (int, boolean, boolean));
 STATIC_OVL void FDECL(restmon, (int, struct monst *));
-STATIC_DCL struct monst *FDECL(restmonchn, (int, BOOLEAN_P));
+STATIC_DCL struct monst *FDECL(restmonchn, (int, boolean));
 STATIC_DCL struct fruit *FDECL(loadfruitchn, (int));
 STATIC_DCL void FDECL(freefruitchn, (struct fruit *));
 STATIC_DCL void FDECL(ghostfruit, (struct obj *));
 STATIC_DCL boolean
 FDECL(restgamestate, (int, unsigned int *, unsigned int *));
 STATIC_DCL void FDECL(restlevelstate, (unsigned int, unsigned int));
-STATIC_DCL int FDECL(restlevelfile, (int, XCHAR_P));
+STATIC_DCL int FDECL(restlevelfile, (int, xchar));
 STATIC_OVL void FDECL(restore_msghistory, (int));
-STATIC_DCL void FDECL(reset_oattached_mids, (BOOLEAN_P));
-STATIC_DCL void FDECL(rest_levl, (int, BOOLEAN_P));
+STATIC_DCL void FDECL(reset_oattached_mids, (boolean));
+STATIC_DCL void FDECL(rest_levl, (int, boolean));
 
 static struct restore_procs {
     const char *name;

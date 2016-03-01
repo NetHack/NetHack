@@ -20,7 +20,7 @@ char *dirname(char *str);
 void amii_putstr(winid window, int attr, const char *str);
 void outmore(struct amii_WinDesc *cw);
 void outsubstr(struct amii_WinDesc *cw, char *str, int len, int fudge);
-void amii_putsym(winid st, int i, int y, CHAR_P c);
+void amii_putsym(winid st, int i, int y, char c);
 void amii_addtopl(const char *s);
 void TextSpaces(struct RastPort *rp, int nr);
 void amii_remember_topl(void);
@@ -40,8 +40,8 @@ void amii_getret(void);
 
 /* winmenu.c */
 void amii_start_menu(winid window);
-void FDECL(amii_add_menu, (winid, int, const anything *, CHAR_P, CHAR_P, int,
-                           const char *, BOOLEAN_P));
+void FDECL(amii_add_menu, (winid, int, const anything *, char, char, int,
+                           const char *, boolean));
 void FDECL(amii_end_menu, (winid, const char *));
 int FDECL(amii_select_menu, (winid, int, menu_item **));
 int DoMenuScroll(int win, int blocking, int how, menu_item **);

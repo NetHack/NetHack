@@ -10,14 +10,14 @@
 #define NUMOBUF 12
 
 STATIC_DCL char *FDECL(strprepend, (char *, const char *));
-STATIC_DCL short FDECL(rnd_otyp_by_wpnskill, (SCHAR_P));
-STATIC_DCL boolean FDECL(wishymatch, (const char *, const char *, BOOLEAN_P));
+STATIC_DCL short FDECL(rnd_otyp_by_wpnskill, (schar));
+STATIC_DCL boolean FDECL(wishymatch, (const char *, const char *, boolean));
 STATIC_DCL char *NDECL(nextobuf);
 STATIC_DCL void FDECL(releaseobuf, (char *));
 STATIC_DCL char *FDECL(minimal_xname, (struct obj *));
 STATIC_DCL void FDECL(add_erosion_words, (struct obj *, char *));
 STATIC_DCL boolean
-FDECL(singplur_lookup, (char *, char *, BOOLEAN_P, const char *const *));
+FDECL(singplur_lookup, (char *, char *, boolean, const char *const *));
 STATIC_DCL char *FDECL(singplur_compound, (char *));
 STATIC_DCL char *FDECL(xname_flags, (struct obj *, unsigned));
 

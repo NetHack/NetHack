@@ -63,18 +63,18 @@ E void FDECL(Gem_suspend_nhwindows, (const char *));
 E void NDECL(Gem_resume_nhwindows);
 E winid FDECL(Gem_create_nhwindow, (int));
 E void FDECL(Gem_clear_nhwindow, (winid));
-E void FDECL(Gem_display_nhwindow, (winid, BOOLEAN_P));
+E void FDECL(Gem_display_nhwindow, (winid, boolean));
 E void FDECL(Gem_dismiss_nhwindow, (winid));
 E void FDECL(Gem_destroy_nhwindow, (winid));
 E void FDECL(Gem_curs, (winid, int, int));
 E void FDECL(Gem_putstr, (winid, int, const char *));
-E void FDECL(Gem_display_file, (const char *, BOOLEAN_P));
+E void FDECL(Gem_display_file, (const char *, boolean));
 E void FDECL(Gem_start_menu, (winid));
-E void FDECL(Gem_add_menu, (winid, int, const ANY_P *, CHAR_P, CHAR_P, int,
-                            const char *, BOOLEAN_P));
+E void FDECL(Gem_add_menu, (winid, int, const ANY_P *, char, char, int,
+                            const char *, boolean));
 E void FDECL(Gem_end_menu, (winid, const char *));
 E int FDECL(Gem_select_menu, (winid, int, MENU_ITEM_P **));
-E char FDECL(Gem_message_menu, (CHAR_P, int, const char *));
+E char FDECL(Gem_message_menu, (char, int, const char *));
 E void NDECL(Gem_update_inventory);
 E void NDECL(Gem_mark_synch);
 E void NDECL(Gem_wait_synch);
@@ -84,14 +84,14 @@ E void FDECL(Gem_cliparound, (int, int));
 #ifdef POSITIONBAR
 E void FDECL(Gem_update_positionbar, (char *));
 #endif
-E void FDECL(Gem_print_glyph, (winid, XCHAR_P, XCHAR_P, int, int));
+E void FDECL(Gem_print_glyph, (winid, xchar, xchar, int, int));
 E void FDECL(Gem_raw_print, (const char *));
 E void FDECL(Gem_raw_print_bold, (const char *));
 E int NDECL(Gem_nhgetch);
 E int FDECL(Gem_nh_poskey, (int *, int *, int *));
 E void NDECL(Gem_nhbell);
 E int NDECL(Gem_doprev_message);
-E char FDECL(Gem_yn_function, (const char *, const char *, CHAR_P));
+E char FDECL(Gem_yn_function, (const char *, const char *, char));
 E void FDECL(Gem_getlin, (const char *, char *));
 E int NDECL(Gem_get_ext_cmd);
 E void FDECL(Gem_number_pad, (int));

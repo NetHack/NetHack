@@ -7,7 +7,7 @@
 STATIC_DCL void FDECL(mkbox_cnts, (struct obj *));
 STATIC_DCL void FDECL(maybe_adjust_light, (struct obj *, int));
 STATIC_DCL void FDECL(obj_timer_checks, (struct obj *,
-                                         XCHAR_P, XCHAR_P, int));
+                                         xchar, xchar, int));
 STATIC_DCL void FDECL(container_weight, (struct obj *));
 STATIC_DCL struct obj *FDECL(save_mtraits, (struct obj *, struct monst *));
 STATIC_DCL void FDECL(objlist_sanity, (struct obj *, int, const char *));

@@ -10,7 +10,7 @@ STATIC_DCL boolean FDECL(veggy_item, (struct obj * obj, int));
 STATIC_DCL int NDECL(shkveg);
 STATIC_DCL void FDECL(mkveggy_at, (int, int));
 STATIC_DCL void FDECL(mkshobj_at, (const struct shclass *, int, int,
-                                   BOOLEAN_P));
+                                   boolean));
 STATIC_DCL void FDECL(nameshk, (struct monst *, const char *const *));
 STATIC_DCL int FDECL(shkinit, (const struct shclass *, struct mkroom *));
 

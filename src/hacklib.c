@@ -65,7 +65,7 @@
 #endif
 
 static boolean FDECL(pmatch_internal, (const char *, const char *,
-                                       BOOLEAN_P, const char *));
+                                       boolean, const char *));
 
 /* is 'c' a digit? */
 boolean

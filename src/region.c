@@ -37,10 +37,10 @@ void FDECL(remove_region, (NhRegion *));
 #if 0
 void FDECL(replace_mon_regions, (struct monst *,struct monst *));
 void FDECL(remove_mon_from_regions, (struct monst *));
-NhRegion *FDECL(create_msg_region, (XCHAR_P,XCHAR_P,XCHAR_P,XCHAR_P,
+NhRegion *FDECL(create_msg_region, (xchar,xchar,xchar,xchar,
                                     const char *,const char *));
 boolean FDECL(enter_force_field, (genericptr,genericptr));
-NhRegion *FDECL(create_force_field, (XCHAR_P,XCHAR_P,int,long));
+NhRegion *FDECL(create_force_field, (xchar,xchar,int,long));
 #endif
 
 STATIC_DCL void FDECL(reset_region_mids, (NhRegion *));

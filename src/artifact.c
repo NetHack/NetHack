@@ -24,10 +24,10 @@ STATIC_DCL int FDECL(spec_applies, (const struct artifact *, struct monst *));
 STATIC_DCL int FDECL(arti_invoke, (struct obj *));
 STATIC_DCL boolean
 FDECL(Mb_hit, (struct monst * magr, struct monst *mdef, struct obj *, int *,
-               int, BOOLEAN_P, char *));
+               int, boolean, char *));
 STATIC_DCL unsigned long FDECL(abil_to_spfx, (long *));
 STATIC_DCL uchar FDECL(abil_to_adtyp, (long *));
-STATIC_DCL boolean FDECL(untouchable, (struct obj *, BOOLEAN_P));
+STATIC_DCL boolean FDECL(untouchable, (struct obj *, boolean));
 
 /* The amount added to the victim's total hit points to insure that the
    victim will be killed even after damage bonus/penalty adjustments.

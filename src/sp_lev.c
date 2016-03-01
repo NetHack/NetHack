@@ -43,12 +43,12 @@ STATIC_DCL struct opvar *FDECL(opvar_var_conversion, (struct sp_coder *,
 STATIC_DCL struct splev_var *FDECL(opvar_var_defined, (struct sp_coder *,
                                                        char *));
 STATIC_DCL struct opvar *FDECL(splev_stack_getdat, (struct sp_coder *,
-                                                    XCHAR_P));
+                                                    xchar));
 STATIC_DCL struct opvar *FDECL(splev_stack_getdat_any, (struct sp_coder *));
 STATIC_DCL void FDECL(variable_list_del, (struct splev_var *));
-STATIC_DCL void FDECL(lvlfill_maze_grid, (int, int, int, int, SCHAR_P));
-STATIC_DCL void FDECL(lvlfill_solid, (SCHAR_P, SCHAR_P));
-STATIC_DCL void FDECL(set_wall_property, (XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P,
+STATIC_DCL void FDECL(lvlfill_maze_grid, (int, int, int, int, schar));
+STATIC_DCL void FDECL(lvlfill_solid, (schar, schar));
+STATIC_DCL void FDECL(set_wall_property, (xchar, xchar, xchar, xchar,
                                           int));
 STATIC_DCL void NDECL(shuffle_alignments);
 STATIC_DCL void NDECL(count_features);
@@ -59,15 +59,15 @@ STATIC_DCL void NDECL(fill_rooms);
 STATIC_DCL int NDECL(rnddoor);
 STATIC_DCL int NDECL(rndtrap);
 STATIC_DCL void FDECL(get_location, (schar *, schar *, int, struct mkroom *));
-STATIC_DCL boolean FDECL(is_ok_location, (SCHAR_P, SCHAR_P, int));
+STATIC_DCL boolean FDECL(is_ok_location, (schar, schar, int));
 STATIC_DCL unpacked_coord FDECL(get_unpacked_coord, (long, int));
 STATIC_DCL void FDECL(get_location_coord, (schar *, schar *, int,
                                            struct mkroom *, long));
 STATIC_DCL void FDECL(get_room_loc, (schar *, schar *, struct mkroom *));
 STATIC_DCL void FDECL(get_free_room_loc, (schar *, schar *,
                                           struct mkroom *, packed_coord));
-STATIC_DCL boolean FDECL(create_subroom, (struct mkroom *, XCHAR_P, XCHAR_P,
-                                          XCHAR_P, XCHAR_P, XCHAR_P, XCHAR_P));
+STATIC_DCL boolean FDECL(create_subroom, (struct mkroom *, xchar, xchar,
+                                          xchar, xchar, xchar, xchar));
 STATIC_DCL void FDECL(create_door, (room_door *, struct mkroom *));
 STATIC_DCL void FDECL(create_trap, (trap *, struct mkroom *));
 STATIC_DCL int FDECL(noncoalignment, (ALIGNTYP_P));
@@ -77,7 +77,7 @@ STATIC_DCL void FDECL(create_object, (object *, struct mkroom *));
 STATIC_DCL void FDECL(create_altar, (altar *, struct mkroom *));
 STATIC_DCL void FDECL(replace_terrain, (replaceterrain *, struct mkroom *));
 STATIC_DCL boolean FDECL(search_door, (struct mkroom *,
-                                       xchar *, xchar *, XCHAR_P, int));
+                                       xchar *, xchar *, xchar, int));
 STATIC_DCL void NDECL(fix_stair_rooms);
 STATIC_DCL void FDECL(create_corridor, (corridor *));
 STATIC_DCL struct mkroom *FDECL(build_room, (room *, struct mkroom *));
@@ -115,30 +115,30 @@ STATIC_DCL void FDECL(spo_gold, (struct sp_coder *));
 STATIC_DCL void FDECL(spo_corridor, (struct sp_coder *));
 STATIC_DCL struct opvar *FDECL(selection_opvar, (char *));
 STATIC_DCL xchar FDECL(selection_getpoint, (int, int, struct opvar *));
-STATIC_DCL void FDECL(selection_setpoint, (int, int, struct opvar *, XCHAR_P));
+STATIC_DCL void FDECL(selection_setpoint, (int, int, struct opvar *, xchar));
 STATIC_DCL struct opvar *FDECL(selection_not, (struct opvar *));
 STATIC_DCL struct opvar *FDECL(selection_logical_oper, (struct opvar *,
-                                                     struct opvar *, CHAR_P));
+                                                     struct opvar *, char));
 STATIC_DCL struct opvar *FDECL(selection_filter_mapchar, (struct opvar *,
                                                           struct opvar *));
 STATIC_DCL void FDECL(selection_filter_percent, (struct opvar *, int));
 STATIC_DCL int FDECL(selection_rndcoord, (struct opvar *, schar *, schar *,
-                                          BOOLEAN_P));
+                                          boolean));
 STATIC_DCL void FDECL(selection_do_grow, (struct opvar *, int));
 STATIC_DCL void FDECL(set_selection_floodfillchk, (int FDECL((*), (int,int))));
 STATIC_DCL int FDECL(floodfillchk_match_under, (int, int));
 STATIC_DCL int FDECL(floodfillchk_match_accessible, (int, int));
 STATIC_DCL void FDECL(selection_floodfill, (struct opvar *, int, int,
-                                            BOOLEAN_P));
+                                            boolean));
 STATIC_DCL void FDECL(selection_do_ellipse, (struct opvar *, int, int,
                                              int, int, int));
 STATIC_DCL long FDECL(line_dist_coord, (long, long, long, long, long, long));
 STATIC_DCL void FDECL(selection_do_gradient, (struct opvar *, long, long, long,
                                               long, long, long, long, long));
-STATIC_DCL void FDECL(selection_do_line, (SCHAR_P, SCHAR_P, SCHAR_P, SCHAR_P,
+STATIC_DCL void FDECL(selection_do_line, (schar, schar, schar, schar,
                                           struct opvar *));
-STATIC_DCL void FDECL(selection_do_randline, (SCHAR_P, SCHAR_P, SCHAR_P,
-                                              SCHAR_P, SCHAR_P, SCHAR_P,
+STATIC_DCL void FDECL(selection_do_randline, (schar, schar, schar,
+                                              schar, schar, schar,
                                               struct opvar *));
 STATIC_DCL void FDECL(selection_iterate, (struct opvar *, select_iter_func,
                                           genericptr_t));

@@ -31,7 +31,7 @@ STATIC_DCL void FDECL(noises, (struct monst *, struct attack *));
 STATIC_DCL void FDECL(missmm, (struct monst *, struct monst *,
                                struct attack *));
 STATIC_DCL int FDECL(passivemm, (struct monst *, struct monst *,
-                                 BOOLEAN_P, int));
+                                 boolean, int));
 
 /* Needed for the special case of monsters wielding vorpal blades (rare).
  * If we use this a lot it should probably be a parameter to mdamagem()

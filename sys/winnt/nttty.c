@@ -23,7 +23,7 @@
 void FDECL(cmov, (int, int));
 void FDECL(nocmov, (int, int));
 int FDECL(process_keystroke,
-          (INPUT_RECORD *, boolean *, BOOLEAN_P numberpad, int portdebug));
+          (INPUT_RECORD *, boolean *, boolean numberpad, int portdebug));
 
 /*
  * The following WIN32 Console API routines are used in this file.
@@ -72,11 +72,11 @@ extern boolean getreturn_enabled; /* from sys/share/pcsys.c */
 
 /* dynamic keystroke handling .DLL support */
 typedef int(__stdcall *PROCESS_KEYSTROKE)(HANDLE, INPUT_RECORD *, boolean *,
-                                          BOOLEAN_P, int);
+                                          boolean, int);
 
 typedef int(__stdcall *NHKBHIT)(HANDLE, INPUT_RECORD *);
 
-typedef int(__stdcall *CHECKINPUT)(HANDLE, INPUT_RECORD *, DWORD *, BOOLEAN_P,
+typedef int(__stdcall *CHECKINPUT)(HANDLE, INPUT_RECORD *, DWORD *, boolean,
                                    int, int *, coord *);
 
 typedef int(__stdcall *SOURCEWHERE)(char **);

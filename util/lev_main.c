@@ -85,14 +85,14 @@ int FDECL(main, (int, char **));
 void FDECL(yyerror, (const char *));
 void FDECL(yywarning, (const char *));
 int NDECL(yywrap);
-int FDECL(get_floor_type, (CHAR_P));
+int FDECL(get_floor_type, (char));
 int FDECL(get_room_type, (char *));
 int FDECL(get_trap_type, (char *));
-int FDECL(get_monster_id, (char *, CHAR_P));
-int FDECL(get_object_id, (char *, CHAR_P));
-boolean FDECL(check_monster_char, (CHAR_P));
-boolean FDECL(check_object_char, (CHAR_P));
-char FDECL(what_map_char, (CHAR_P));
+int FDECL(get_monster_id, (char *, char));
+int FDECL(get_object_id, (char *, char));
+boolean FDECL(check_monster_char, (char));
+boolean FDECL(check_object_char, (char));
+char FDECL(what_map_char, (char));
 void FDECL(scan_map, (char *, sp_lev *));
 boolean NDECL(check_subrooms);
 boolean FDECL(write_level_file, (char *, sp_lev *));
@@ -122,7 +122,7 @@ static int FDECL(case_insensitive_comp, (const char *, const char *));
 void VDECL(lc_pline, (const char *, ...));
 void VDECL(lc_error, (const char *, ...));
 void VDECL(lc_warning, (const char *, ...));
-char *FDECL(decode_parm_chr, (CHAR_P));
+char *FDECL(decode_parm_chr, (char));
 char *FDECL(decode_parm_str, (char *));
 struct opvar *FDECL(set_opvar_int, (struct opvar *, long));
 struct opvar *FDECL(set_opvar_coord, (struct opvar *, long));
@@ -331,8 +331,7 @@ const char *s;
  * Just display a warning (that is : a non fatal error)
  */
 void
-yywarning(s)
-const char *s;
+yywarning(const char *s)
 {
     (void) fprintf(stderr, "%s: line %d : WARNING : %s\n", fname,
                    nh_line_number, s);
@@ -447,8 +446,7 @@ VA_DECL(const char *, line)
 }
 
 char *
-decode_parm_chr(chr)
-char chr;
+decode_parm_chr(char chr)
 {
     static char buf[32];
 
@@ -955,10 +953,7 @@ char *varname;
 }
 
 void
-check_vardef_type(vd, varname, vartype)
-struct lc_vardefs *vd;
-char *varname;
-long vartype;
+check_vardef_type(struct lc_vardefs *vd, char *varname, long vartype)
 {
     struct lc_vardefs *tmp;
 
@@ -971,10 +966,7 @@ long vartype;
 }
 
 struct lc_vardefs *
-add_vardef_type(vd, varname, vartype)
-struct lc_vardefs *vd;
-char *varname;
-long vartype;
+add_vardef_type(struct lc_vardefs *vd, char *varname, long vartype)
 {
     struct lc_vardefs *tmp;
 
@@ -991,8 +983,7 @@ long vartype;
 }
 
 int
-reverse_jmp_opcode(opcode)
-int opcode;
+reverse_jmp_opcode(int opcode)
 {
     switch (opcode) {
     case SPO_JE:
@@ -1015,8 +1006,7 @@ int opcode;
 
 /* basically copied from src/sp_lev.c */
 struct opvar *
-opvar_clone(ov)
-struct opvar *ov;
+opvar_clone(struct opvar *ov)
 {
     if (ov) {
         struct opvar *tmpov = (struct opvar *) alloc(sizeof(struct opvar));
@@ -1059,9 +1049,7 @@ struct opvar *ov;
 }
 
 void
-splev_add_from(splev, from_splev)
-sp_lev *splev;
-sp_lev *from_splev;
+splev_add_from(sp_lev *splev, sp_lev *from_splev)
 {
     int i;
 
@@ -1072,9 +1060,7 @@ sp_lev *from_splev;
 }
 
 void
-start_level_def(splev, ldfname)
-sp_lev **splev;
-char *ldfname;
+start_level_def(sp_lev **splev, char *ldfname)
 {
     struct lc_funcdefs *f;
 
@@ -1099,8 +1085,7 @@ char *ldfname;
  * Find the type of floor, knowing its char representation.
  */
 int
-get_floor_type(c)
-char c;
+get_floor_type(char c)
 {
     int val;
 
@@ -1117,8 +1102,7 @@ char c;
  * Find the type of a room in the table, knowing its name.
  */
 int
-get_room_type(s)
-char *s;
+get_room_type(char *s)
 {
     register int i;
 
@@ -1133,8 +1117,7 @@ char *s;
  * Find the type of a trap in the table, knowing its name.
  */
 int
-get_trap_type(s)
-char *s;
+get_trap_type(char *s)
 {
     register int i;
 
@@ -1149,9 +1132,7 @@ char *s;
  * Find the index of a monster in the table, knowing its name.
  */
 int
-get_monster_id(s, c)
-char *s;
-char c;
+get_monster_id(char *s, char c)
 {
     register int i, class;
 
@@ -1180,9 +1161,7 @@ char c;
  * Find the index of an object in the table, knowing its name.
  */
 int
-get_object_id(s, c)
-char *s;
-char c; /* class */
+get_object_id(char *s, char c /* class */)
 {
     int i, class;
     const char *objname;
@@ -1231,8 +1210,7 @@ init_obj_classes()
  * Is the character 'c' a valid monster class ?
  */
 boolean
-check_monster_char(c)
-char c;
+check_monster_char(char c)
 {
     return (def_char_to_monclass(c) != MAXMCLASSES);
 }
@@ -1241,8 +1219,7 @@ char c;
  * Is the character 'c' a valid object class ?
  */
 boolean
-check_object_char(c)
-char c;
+check_object_char(char c)
 {
     return (def_char_to_objclass(c) != MAXOCLASSES);
 }
@@ -1251,8 +1228,7 @@ char c;
  * Convert .des map letter into floor type.
  */
 char
-what_map_char(c)
-char c;
+what_map_char(char c)
 {
     SpinCursor(3);
     switch (c) {

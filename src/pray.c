@@ -14,11 +14,11 @@ STATIC_DCL void NDECL(gcrownu);
 STATIC_DCL void FDECL(pleased, (ALIGNTYP_P));
 STATIC_DCL void FDECL(godvoice, (ALIGNTYP_P, const char *));
 STATIC_DCL void FDECL(god_zaps_you, (ALIGNTYP_P));
-STATIC_DCL void FDECL(fry_by_god, (ALIGNTYP_P, BOOLEAN_P));
+STATIC_DCL void FDECL(fry_by_god, (ALIGNTYP_P, boolean));
 STATIC_DCL void FDECL(gods_angry, (ALIGNTYP_P));
 STATIC_DCL void FDECL(gods_upset, (ALIGNTYP_P));
 STATIC_DCL void FDECL(consume_offering, (struct obj *));
-STATIC_DCL boolean FDECL(water_prayer, (BOOLEAN_P));
+STATIC_DCL boolean FDECL(water_prayer, (boolean));
 STATIC_DCL boolean FDECL(blocked_boulder, (int, int));
 
 /* simplify a few tests */

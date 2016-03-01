@@ -8,14 +8,14 @@
 
 STATIC_DCL void NDECL(maybe_wail);
 STATIC_DCL int NDECL(moverock);
-STATIC_DCL int FDECL(still_chewing, (XCHAR_P, XCHAR_P));
+STATIC_DCL int FDECL(still_chewing, (xchar, xchar));
 STATIC_DCL void NDECL(dosinkfall);
-STATIC_DCL boolean FDECL(findtravelpath, (BOOLEAN_P));
+STATIC_DCL boolean FDECL(findtravelpath, (boolean));
 STATIC_DCL boolean FDECL(trapmove, (int, int, struct trap *));
 STATIC_DCL void NDECL(switch_terrain);
 STATIC_DCL struct monst *FDECL(monstinroom, (struct permonst *, int));
 STATIC_DCL boolean FDECL(doorless_door, (int, int));
-STATIC_DCL void FDECL(move_update, (BOOLEAN_P));
+STATIC_DCL void FDECL(move_update, (boolean));
 
 #define IS_SHOP(x) (rooms[x].rtype >= SHOPBASE)
 

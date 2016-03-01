@@ -17,7 +17,7 @@ static NEARDATA const char readable[] = { ALL_CLASSES, SCROLL_CLASS,
                                           SPBOOK_CLASS, 0 };
 static const char all_count[] = { ALLOW_COUNT, ALL_CLASSES, 0 };
 
-STATIC_DCL boolean FDECL(learnscrolltyp, (SHORT_P));
+STATIC_DCL boolean FDECL(learnscrolltyp, (short));
 STATIC_DCL char * FDECL(erode_obj_text, (struct obj *, char *));
 STATIC_DCL void NDECL(do_class_genocide);
 STATIC_DCL void FDECL(stripspe, (struct obj *));
@@ -27,7 +27,7 @@ STATIC_DCL void FDECL(randomize, (int *, int));
 STATIC_DCL void FDECL(forget_single_object, (int));
 STATIC_DCL void FDECL(forget, (int));
 STATIC_DCL int FDECL(maybe_tame, (struct monst *, struct obj *));
-STATIC_DCL boolean FDECL(is_valid_stinking_cloud_pos, (int, int, BOOLEAN_P));
+STATIC_DCL boolean FDECL(is_valid_stinking_cloud_pos, (int, int, boolean));
 STATIC_DCL void FDECL(display_stinking_cloud_positions, (int));
 STATIC_PTR void FDECL(set_lit, (int, int, genericptr));
 

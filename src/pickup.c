@@ -10,12 +10,12 @@
 
 #define CONTAINED_SYM '>' /* from invent.c */
 
-STATIC_DCL void FDECL(simple_look, (struct obj *, BOOLEAN_P));
+STATIC_DCL void FDECL(simple_look, (struct obj *, boolean));
 STATIC_DCL boolean
 FDECL(query_classes, (char *, boolean *, boolean *, const char *,
-                      struct obj *, BOOLEAN_P, int *));
-STATIC_DCL boolean FDECL(fatal_corpse_mistake, (struct obj *, BOOLEAN_P));
-STATIC_DCL void FDECL(check_here, (BOOLEAN_P));
+                      struct obj *, boolean, int *));
+STATIC_DCL boolean FDECL(fatal_corpse_mistake, (struct obj *, boolean));
+STATIC_DCL void FDECL(check_here, (boolean));
 STATIC_DCL boolean FDECL(n_or_more, (struct obj *));
 STATIC_DCL boolean FDECL(all_but_uchain, (struct obj *));
 #if 0 /* not used */
@@ -24,21 +24,21 @@ STATIC_DCL boolean FDECL(allow_cat_no_uchain, (struct obj *));
 STATIC_DCL int FDECL(autopick, (struct obj *, int, menu_item **));
 STATIC_DCL int FDECL(count_categories, (struct obj *, int));
 STATIC_DCL long FDECL(carry_count, (struct obj *, struct obj *, long,
-                                    BOOLEAN_P, int *, int *));
+                                    boolean, int *, int *));
 STATIC_DCL int FDECL(lift_object,
-                     (struct obj *, struct obj *, long *, BOOLEAN_P));
+                     (struct obj *, struct obj *, long *, boolean));
 STATIC_DCL boolean FDECL(mbag_explodes, (struct obj *, int));
 STATIC_PTR int FDECL(in_container, (struct obj *));
 STATIC_PTR int FDECL(out_container, (struct obj *));
 STATIC_DCL long FDECL(mbag_item_gone, (int, struct obj *));
 STATIC_DCL void FDECL(observe_quantum_cat, (struct obj *));
 STATIC_DCL void NDECL(explain_container_prompt);
-STATIC_DCL int FDECL(traditional_loot, (BOOLEAN_P));
-STATIC_DCL int FDECL(menu_loot, (int, BOOLEAN_P));
-STATIC_DCL char FDECL(in_or_out_menu, (const char *, struct obj *, BOOLEAN_P,
-                                       BOOLEAN_P, BOOLEAN_P));
-STATIC_DCL int FDECL(container_at, (int, int, BOOLEAN_P));
-STATIC_DCL boolean FDECL(able_to_loot, (int, int, BOOLEAN_P));
+STATIC_DCL int FDECL(traditional_loot, (boolean));
+STATIC_DCL int FDECL(menu_loot, (int, boolean));
+STATIC_DCL char FDECL(in_or_out_menu, (const char *, struct obj *, boolean,
+                                       boolean, boolean));
+STATIC_DCL int FDECL(container_at, (int, int, boolean));
+STATIC_DCL boolean FDECL(able_to_loot, (int, int, boolean));
 STATIC_DCL boolean NDECL(reverse_loot);
 STATIC_DCL boolean FDECL(mon_beside, (int, int));
 STATIC_DCL int FDECL(do_loot_cont, (struct obj **));

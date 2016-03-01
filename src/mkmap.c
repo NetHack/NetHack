@@ -8,16 +8,16 @@
 #define HEIGHT (ROWNO - 1)
 #define WIDTH (COLNO - 2)
 
-STATIC_DCL void FDECL(init_map, (SCHAR_P));
-STATIC_DCL void FDECL(init_fill, (SCHAR_P, SCHAR_P));
-STATIC_DCL schar FDECL(get_map, (int, int, SCHAR_P));
-STATIC_DCL void FDECL(pass_one, (SCHAR_P, SCHAR_P));
-STATIC_DCL void FDECL(pass_two, (SCHAR_P, SCHAR_P));
-STATIC_DCL void FDECL(pass_three, (SCHAR_P, SCHAR_P));
+STATIC_DCL void FDECL(init_map, (schar));
+STATIC_DCL void FDECL(init_fill, (schar, schar));
+STATIC_DCL schar FDECL(get_map, (int, int, schar));
+STATIC_DCL void FDECL(pass_one, (schar, schar));
+STATIC_DCL void FDECL(pass_two, (schar, schar));
+STATIC_DCL void FDECL(pass_three, (schar, schar));
 STATIC_DCL void NDECL(wallify_map);
-STATIC_DCL void FDECL(join_map, (SCHAR_P, SCHAR_P));
+STATIC_DCL void FDECL(join_map, (schar, schar));
 STATIC_DCL void FDECL(finish_map,
-                      (SCHAR_P, SCHAR_P, BOOLEAN_P, BOOLEAN_P, BOOLEAN_P));
+                      (schar, schar, boolean, boolean, boolean));
 STATIC_DCL void FDECL(remove_room, (unsigned));
 void FDECL(mkmap, (lev_init *));
 

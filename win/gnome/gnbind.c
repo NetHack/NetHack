@@ -505,7 +505,7 @@ gnome_clear_nhwindow(winid wid)
                    --more--, if necessary, in the tty window-port.
 */
 void
-gnome_display_nhwindow(winid wid, BOOLEAN_P block)
+gnome_display_nhwindow(winid wid, boolean block)
 {
     if (gnome_windowlist[wid].win != NULL) {
         gtk_signal_emit(GTK_OBJECT(gnome_windowlist[wid].win),
@@ -583,7 +583,7 @@ gnome_putstr(winid wid, int attr, const char *text)
                    iff complain is TRUE.
 */
 void
-gnome_display_file(const char *filename, BOOLEAN_P must_exist)
+gnome_display_file(const char *filename, boolean must_exist)
 {
     /* Strange -- for some reason it makes us create a new text window
      * instead of reusing any existing ones -- perhaps we can work out
@@ -715,8 +715,8 @@ identifier
 */
 void
 gnome_add_menu(winid wid, int glyph, const ANY_P *identifier,
-               CHAR_P accelerator, CHAR_P group_accel, int attr,
-               const char *str, BOOLEAN_P presel)
+               char accelerator, char group_accel, int attr,
+               const char *str, boolean presel)
 {
     GHackMenuItem item;
     item.glyph = glyph;
@@ -856,7 +856,7 @@ print_glyph(window, x, y, glyph, bkglyph)
                    a 1-1 map between glyphs and distinct things on the map).
 */
 void
-gnome_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph)
+gnome_print_glyph(winid wid, xchar x, xchar y, int glyph, int bkglyph)
 {
     if (wid != -1 && gnome_windowlist[wid].win != NULL) {
         GdkImlibImage *im;
@@ -1026,7 +1026,7 @@ char yn_function(const char *ques, const char *choices, char default)
                    ports might use a popup.
 */
 char
-gnome_yn_function(const char *question, const char *choices, CHAR_P def)
+gnome_yn_function(const char *question, const char *choices, char def)
 {
     int ch;
     int result = -1;

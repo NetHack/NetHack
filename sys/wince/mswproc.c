@@ -796,7 +796,7 @@ mswin_clear_nhwindow(winid wid)
                    --more--, if necessary, in the tty window-port.
 */
 void
-mswin_display_nhwindow(winid wid, BOOLEAN_P block)
+mswin_display_nhwindow(winid wid, boolean block)
 {
     logDebug("mswin_display_nhwindow(%d, %d)\n", wid, block);
     if (GetNHApp()->windowlist[wid].win != NULL) {
@@ -967,7 +967,7 @@ mswin_putstr_ex(winid wid, int attr, const char *text, boolean app)
                    iff complain is TRUE.
 */
 void
-mswin_display_file(const char *filename, BOOLEAN_P must_exist)
+mswin_display_file(const char *filename, boolean must_exist)
 {
     dlb *f;
     TCHAR wbuf[BUFSZ];
@@ -1061,8 +1061,8 @@ identifier
 */
 void
 mswin_add_menu(winid wid, int glyph, const ANY_P *identifier,
-               CHAR_P accelerator, CHAR_P group_accel, int attr,
-               const char *str, BOOLEAN_P presel)
+               char accelerator, char group_accel, int attr,
+               const char *str, boolean presel)
 {
     logDebug("mswin_add_menu(%d, %d, %p, %c, %c, %d, %s, %d)\n", wid, glyph,
              identifier, (char) accelerator, (char) group_accel, attr, str,
@@ -1212,7 +1212,7 @@ print_glyph(window, x, y, glyph, bkglyph)
                    a 1-1 map between glyphs and distinct things on the map).
 */
 void
-mswin_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph)
+mswin_print_glyph(winid wid, xchar x, xchar y, int glyph, int bkglyph)
 {
     logDebug("mswin_print_glyph(%d, %d, %d, %d, %d)\n", wid, x, y, glyph, bkglyph);
 
@@ -1366,7 +1366,7 @@ char yn_function(const char *ques, const char *choices, char default)
                    ports might use a popup.
 */
 char
-mswin_yn_function(const char *question, const char *choices, CHAR_P def)
+mswin_yn_function(const char *question, const char *choices, char def)
 {
     int result = -1;
     char ch;

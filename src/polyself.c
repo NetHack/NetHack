@@ -21,7 +21,7 @@
 
 #include "hack.h"
 
-STATIC_DCL void FDECL(check_strangling, (BOOLEAN_P));
+STATIC_DCL void FDECL(check_strangling, (boolean));
 STATIC_DCL void FDECL(polyman, (const char *, const char *));
 STATIC_DCL void NDECL(break_armor);
 STATIC_DCL void FDECL(drop_weapon, (int));

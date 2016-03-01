@@ -41,7 +41,7 @@ static void FDECL(Fread, (genericptr_t, int, int, dlb *));
 STATIC_DCL xchar FDECL(dname_to_dnum, (const char *));
 STATIC_DCL int FDECL(find_branch, (const char *, struct proto_dungeon *));
 STATIC_DCL xchar FDECL(parent_dnum, (const char *, struct proto_dungeon *));
-STATIC_DCL int FDECL(level_range, (XCHAR_P, int, int, int,
+STATIC_DCL int FDECL(level_range, (xchar, int, int, int,
                                    struct proto_dungeon *, int *));
 STATIC_DCL xchar FDECL(parent_dlevel, (const char *, struct proto_dungeon *));
 STATIC_DCL int FDECL(correct_branch_type, (struct tmpbranch *));
@@ -53,20 +53,20 @@ STATIC_DCL int FDECL(possible_places, (int, boolean *,
 STATIC_DCL xchar FDECL(pick_level, (boolean *, int));
 STATIC_DCL boolean FDECL(place_level, (int, struct proto_dungeon *));
 STATIC_DCL boolean FDECL(unplaced_floater, (struct dungeon *));
-STATIC_DCL boolean FDECL(unreachable_level, (d_level *, BOOLEAN_P));
+STATIC_DCL boolean FDECL(unreachable_level, (d_level *, boolean));
 STATIC_DCL void FDECL(tport_menu, (winid, char *, struct lchoice *, d_level *,
-                                   BOOLEAN_P));
+                                   boolean));
 STATIC_DCL const char *FDECL(br_string, (int));
-STATIC_DCL void FDECL(print_branch, (winid, int, int, int, BOOLEAN_P,
+STATIC_DCL void FDECL(print_branch, (winid, int, int, int, boolean,
                                      struct lchoice *));
 STATIC_DCL mapseen *FDECL(load_mapseen, (int));
 STATIC_DCL void FDECL(save_mapseen, (int, mapseen *));
 STATIC_DCL mapseen *FDECL(find_mapseen, (d_level *));
-STATIC_DCL void FDECL(print_mapseen, (winid, mapseen *, int, int, BOOLEAN_P));
+STATIC_DCL void FDECL(print_mapseen, (winid, mapseen *, int, int, boolean));
 STATIC_DCL boolean FDECL(interest_mapseen, (mapseen *));
-STATIC_DCL void FDECL(traverse_mapseenchn, (BOOLEAN_P, winid,
+STATIC_DCL void FDECL(traverse_mapseenchn, (boolean, winid,
                                             int, int, int *));
-STATIC_DCL const char *FDECL(seen_string, (XCHAR_P, const char *));
+STATIC_DCL const char *FDECL(seen_string, (xchar, const char *));
 STATIC_DCL const char *FDECL(br_string2, (branch *));
 STATIC_DCL const char *FDECL(endgamelevelname, (char *, int));
 STATIC_DCL const char *FDECL(shop_string, (int));

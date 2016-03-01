@@ -13,9 +13,9 @@
 extern const int monstr[];
 
 STATIC_DCL short FDECL(which_arti, (int));
-STATIC_DCL boolean FDECL(mon_has_arti, (struct monst *, SHORT_P));
-STATIC_DCL struct monst *FDECL(other_mon_has_arti, (struct monst *, SHORT_P));
-STATIC_DCL struct obj *FDECL(on_ground, (SHORT_P));
+STATIC_DCL boolean FDECL(mon_has_arti, (struct monst *, short));
+STATIC_DCL struct monst *FDECL(other_mon_has_arti, (struct monst *, short));
+STATIC_DCL struct obj *FDECL(on_ground, (short));
 STATIC_DCL boolean FDECL(you_have, (int));
 STATIC_DCL unsigned long FDECL(target_on, (int, struct monst *));
 STATIC_DCL unsigned long FDECL(strategy, (struct monst *));

@@ -17,7 +17,7 @@
 #include "hack.h"
 
 STATIC_DCL boolean FDECL(isbig, (struct mkroom *));
-STATIC_DCL struct mkroom *FDECL(pick_room, (BOOLEAN_P));
+STATIC_DCL struct mkroom *FDECL(pick_room, (boolean));
 STATIC_DCL void NDECL(mkshop), FDECL(mkzoo, (int)), NDECL(mkswamp);
 STATIC_DCL void NDECL(mktemple);
 STATIC_DCL coord *FDECL(shrine_pos, (int));

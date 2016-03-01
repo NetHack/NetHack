@@ -5,7 +5,7 @@
 #include "hack.h"
 
 STATIC_DCL char *NDECL(nextmbuf);
-STATIC_DCL void FDECL(getpos_help, (BOOLEAN_P, const char *));
+STATIC_DCL void FDECL(getpos_help, (boolean, const char *));
 STATIC_DCL void NDECL(do_mname);
 STATIC_DCL void FDECL(do_oname, (struct obj *));
 STATIC_DCL void NDECL(namefloorobj);

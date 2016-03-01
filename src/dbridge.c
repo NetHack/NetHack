@@ -29,7 +29,7 @@ STATIC_DCL const char *FDECL(E_phrase, (struct entity *, const char *));
 STATIC_DCL boolean FDECL(e_survives_at, (struct entity *, int, int));
 STATIC_DCL void FDECL(e_died, (struct entity *, int, int));
 STATIC_DCL boolean FDECL(automiss, (struct entity *));
-STATIC_DCL boolean FDECL(e_missed, (struct entity *, BOOLEAN_P));
+STATIC_DCL boolean FDECL(e_missed, (struct entity *, boolean));
 STATIC_DCL boolean FDECL(e_jumps, (struct entity *));
 STATIC_DCL void FDECL(do_entity, (struct entity *));
 

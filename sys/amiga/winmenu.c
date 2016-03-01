@@ -64,7 +64,7 @@ register char ch;
 register char gch;
 register int attr;
 register const char *str;
-register BOOLEAN_P preselected;
+register boolean preselected;
 {
     register struct amii_WinDesc *cw;
     amii_menu_item *mip;

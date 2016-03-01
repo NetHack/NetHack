@@ -385,7 +385,7 @@ void
 amii_putsym(st, i, y, c)
 winid st;
 int i, y;
-CHAR_P c;
+char c;
 {
     amii_curs(st, i, y);
     Text(amii_wins[st]->win->RPort, &c, 1);

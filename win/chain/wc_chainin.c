@@ -124,7 +124,7 @@ winid window;
 void
 chainin_display_nhwindow(window, blocking)
 winid window;
-BOOLEAN_P blocking;
+boolean blocking;
 {
     (*cibase->nprocs->win_display_nhwindow)(cibase->ndata, window, blocking);
 }

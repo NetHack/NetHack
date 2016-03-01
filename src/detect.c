@@ -13,10 +13,10 @@
 extern boolean known; /* from read.c */
 
 STATIC_DCL void FDECL(do_dknown_of, (struct obj *));
-STATIC_DCL boolean FDECL(check_map_spot, (int, int, CHAR_P, unsigned));
-STATIC_DCL boolean FDECL(clear_stale_map, (CHAR_P, unsigned));
-STATIC_DCL void FDECL(sense_trap, (struct trap *, XCHAR_P, XCHAR_P, int));
-STATIC_DCL int FDECL(detect_obj_traps, (struct obj *, BOOLEAN_P, int));
+STATIC_DCL boolean FDECL(check_map_spot, (int, int, char, unsigned));
+STATIC_DCL boolean FDECL(clear_stale_map, (char, unsigned));
+STATIC_DCL void FDECL(sense_trap, (struct trap *, xchar, xchar, int));
+STATIC_DCL int FDECL(detect_obj_traps, (struct obj *, boolean, int));
 STATIC_DCL void FDECL(show_map_spot, (int, int));
 STATIC_PTR void FDECL(findone, (int, int, genericptr_t));
 STATIC_PTR void FDECL(openone, (int, int, genericptr_t));

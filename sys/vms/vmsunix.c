@@ -38,8 +38,8 @@ int FDECL(vmsexeini, (const void *, const void *, const unsigned char *));
 static int FDECL(veryold, (int));
 static char *NDECL(verify_term);
 #if defined(SHELL) || defined(SUSPEND)
-static void FDECL(hack_escape, (BOOLEAN_P, const char *));
-static void FDECL(hack_resume, (BOOLEAN_P));
+static void FDECL(hack_escape, (boolean, const char *));
+static void FDECL(hack_resume, (boolean));
 #endif
 
 static int

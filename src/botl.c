@@ -306,7 +306,7 @@ STATIC_OVL int FDECL(compare_blstats, (struct istat_s *, struct istat_s *));
 
 #ifdef STATUS_HILITES
 STATIC_DCL boolean FDECL(assign_hilite, (char *, char *, char *, char *,
-                                         BOOLEAN_P));
+                                         boolean));
 STATIC_DCL const char *FDECL(clridx_to_s, (char *, int));
 #endif
 

@@ -16,7 +16,7 @@ STATIC_VAR NEARDATA struct xlock_s {
 } xlock;
 
 STATIC_DCL const char *NDECL(lock_action);
-STATIC_DCL boolean FDECL(obstructed, (int, int, BOOLEAN_P));
+STATIC_DCL boolean FDECL(obstructed, (int, int, boolean));
 STATIC_DCL void FDECL(chest_shatter_msg, (struct obj *));
 
 boolean

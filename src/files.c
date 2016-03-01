@@ -177,10 +177,10 @@ STATIC_DCL char *FDECL(set_bonesfile_name, (char *, d_level *));
 STATIC_DCL char *NDECL(set_bonestemp_name);
 #ifdef COMPRESS
 STATIC_DCL void FDECL(redirect, (const char *, const char *, FILE *,
-                                 BOOLEAN_P));
+                                 boolean));
 #endif
 #if defined(COMPRESS) || defined(ZLIB_COMP)
-STATIC_DCL void FDECL(docompress_file, (const char *, BOOLEAN_P));
+STATIC_DCL void FDECL(docompress_file, (const char *, boolean));
 #endif
 #if defined(ZLIB_COMP)
 STATIC_DCL boolean FDECL(make_compressed_name, (const char *, char *));
@@ -189,7 +189,7 @@ STATIC_DCL boolean FDECL(make_compressed_name, (const char *, char *));
 STATIC_DCL char *FDECL(make_lockname, (const char *, char *));
 #endif
 STATIC_DCL FILE *FDECL(fopen_config_file, (const char *, int));
-STATIC_DCL int FDECL(get_uchars, (FILE *, char *, char *, uchar *, BOOLEAN_P,
+STATIC_DCL int FDECL(get_uchars, (FILE *, char *, char *, uchar *, boolean,
                                   int, const char *));
 int FDECL(parse_config_line, (FILE *, char *, int));
 STATIC_DCL FILE *NDECL(fopen_sym_file);

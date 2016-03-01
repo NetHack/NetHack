@@ -220,13 +220,13 @@ E void NDECL(mac_get_nh_event);
 E void FDECL(mac_exit_nhwindows, (const char *));
 E winid FDECL(mac_create_nhwindow, (int));
 E void FDECL(mac_clear_nhwindow, (winid));
-E void FDECL(mac_display_nhwindow, (winid, BOOLEAN_P));
+E void FDECL(mac_display_nhwindow, (winid, boolean));
 E void FDECL(mac_destroy_nhwindow, (winid));
 E void FDECL(mac_curs, (winid, int, int));
 E void FDECL(mac_putstr, (winid, int, const char *));
 E void FDECL(mac_start_menu, (winid));
-E void FDECL(mac_add_menu, (winid, int, const anything *, CHAR_P, CHAR_P, int,
-                            const char *, BOOLEAN_P));
+E void FDECL(mac_add_menu, (winid, int, const anything *, char, char, int,
+                            const char *, boolean));
 E void FDECL(mac_end_menu, (winid, const char *));
 E int FDECL(mac_select_menu, (winid, int, menu_item **));
 #ifdef CLIPPING
@@ -235,7 +235,7 @@ E void FDECL(mac_cliparound, (int, int));
 E int NDECL(mac_nhgetch);
 E int FDECL(mac_nh_poskey, (int *, int *, int *));
 E int NDECL(mac_doprev_message);
-E char FDECL(mac_yn_function, (const char *, const char *, CHAR_P));
+E char FDECL(mac_yn_function, (const char *, const char *, char));
 E void FDECL(mac_getlin, (const char *, char *));
 E int NDECL(mac_get_ext_cmd);
 E void FDECL(mac_number_pad, (int));

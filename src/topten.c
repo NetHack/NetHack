@@ -60,7 +60,7 @@ STATIC_DCL void FDECL(topten_print, (const char *));
 STATIC_DCL void FDECL(topten_print_bold, (const char *));
 STATIC_DCL xchar FDECL(observable_depth, (d_level *));
 STATIC_DCL void NDECL(outheader);
-STATIC_DCL void FDECL(outentry, (int, struct toptenentry *, BOOLEAN_P));
+STATIC_DCL void FDECL(outentry, (int, struct toptenentry *, boolean));
 STATIC_DCL void FDECL(discardexcess, (FILE *));
 STATIC_DCL void FDECL(readentry, (FILE *, struct toptenentry *));
 STATIC_DCL void FDECL(writeentry, (FILE *, struct toptenentry *));
@@ -69,8 +69,8 @@ STATIC_DCL long NDECL(encodexlogflags);
 STATIC_DCL long NDECL(encodeconduct);
 STATIC_DCL long NDECL(encodeachieve);
 STATIC_DCL void FDECL(free_ttlist, (struct toptenentry *));
-STATIC_DCL int FDECL(classmon, (char *, BOOLEAN_P));
-STATIC_DCL int FDECL(score_wanted, (BOOLEAN_P, int, struct toptenentry *, int,
+STATIC_DCL int FDECL(classmon, (char *, boolean));
+STATIC_DCL int FDECL(score_wanted, (boolean, int, struct toptenentry *, int,
                                     const char **, int));
 #ifdef NO_SCAN_BRACK
 STATIC_DCL void FDECL(nsb_mung_line, (char *));

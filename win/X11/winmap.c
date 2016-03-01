@@ -59,7 +59,7 @@ static boolean FDECL(init_tiles, (struct xwindow *));
 static void FDECL(set_button_values, (Widget, int, int, unsigned));
 static void FDECL(map_check_size_change, (struct xwindow *));
 static void FDECL(map_update, (struct xwindow *, int, int, int, int,
-                               BOOLEAN_P));
+                               boolean));
 static void FDECL(init_text, (struct xwindow *));
 static void FDECL(map_exposed, (Widget, XtPointer, XtPointer));
 static void FDECL(set_gc, (Widget, Font, const char *, Pixel, GC *, GC *));

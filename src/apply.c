@@ -33,10 +33,10 @@ STATIC_DCL int FDECL(use_cream_pie, (struct obj *));
 STATIC_DCL int FDECL(use_grapple, (struct obj *));
 STATIC_DCL int FDECL(do_break_wand, (struct obj *));
 STATIC_DCL boolean FDECL(figurine_location_checks, (struct obj *,
-                                                    coord *, BOOLEAN_P));
-STATIC_DCL void FDECL(add_class, (char *, CHAR_P));
+                                                    coord *, boolean));
+STATIC_DCL void FDECL(add_class, (char *, char));
 STATIC_DCL void FDECL(setapplyclasses, (char *));
-STATIC_DCL boolean FDECL(is_valid_jump_pos, (int, int, int, BOOLEAN_P));
+STATIC_DCL boolean FDECL(is_valid_jump_pos, (int, int, int, boolean));
 STATIC_DCL boolean FDECL(find_poleable_mon, (coord *, int, int));
 
 #ifdef AMIGA

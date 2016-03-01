@@ -43,15 +43,15 @@ STATIC_PTR void FDECL(done_intr, (int));
 static void FDECL(done_hangup, (int));
 #endif
 #endif
-STATIC_DCL void FDECL(disclose, (int, BOOLEAN_P));
+STATIC_DCL void FDECL(disclose, (int, boolean));
 STATIC_DCL void FDECL(get_valuables, (struct obj *));
 STATIC_DCL void FDECL(sort_valuables, (struct valuable_data *, int));
-STATIC_DCL void FDECL(artifact_score, (struct obj *, BOOLEAN_P, winid));
+STATIC_DCL void FDECL(artifact_score, (struct obj *, boolean, winid));
 STATIC_DCL void FDECL(really_done, (int)) NORETURN;
 STATIC_DCL boolean FDECL(odds_and_ends, (struct obj *, int));
 STATIC_DCL void FDECL(savelife, (int));
-STATIC_DCL void FDECL(list_vanquished, (CHAR_P, BOOLEAN_P));
-STATIC_DCL void FDECL(list_genocided, (CHAR_P, BOOLEAN_P));
+STATIC_DCL void FDECL(list_vanquished, (char, boolean));
+STATIC_DCL void FDECL(list_genocided, (char, boolean));
 STATIC_DCL boolean FDECL(should_query_disclose_option, (int, char *));
 STATIC_DCL int NDECL(num_extinct);
 

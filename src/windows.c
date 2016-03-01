@@ -433,22 +433,22 @@ boolean is_restoring;
  */
 
 static int NDECL(hup_nhgetch);
-static char FDECL(hup_yn_function, (const char *, const char *, CHAR_P));
+static char FDECL(hup_yn_function, (const char *, const char *, char));
 static int FDECL(hup_nh_poskey, (int *, int *, int *));
 static void FDECL(hup_getlin, (const char *, char *));
 static void FDECL(hup_init_nhwindows, (int *, char **));
 static void FDECL(hup_exit_nhwindows, (const char *));
 static winid FDECL(hup_create_nhwindow, (int));
 static int FDECL(hup_select_menu, (winid, int, MENU_ITEM_P **));
-static void FDECL(hup_add_menu, (winid, int, const anything *, CHAR_P, CHAR_P,
-                                 int, const char *, BOOLEAN_P));
+static void FDECL(hup_add_menu, (winid, int, const anything *, char, char,
+                                 int, const char *, boolean));
 static void FDECL(hup_end_menu, (winid, const char *));
 static void FDECL(hup_putstr, (winid, int, const char *));
-static void FDECL(hup_print_glyph, (winid, XCHAR_P, XCHAR_P, int, int));
+static void FDECL(hup_print_glyph, (winid, xchar, xchar, int, int));
 static void FDECL(hup_outrip, (winid, int, time_t));
 static void FDECL(hup_curs, (winid, int, int));
-static void FDECL(hup_display_nhwindow, (winid, BOOLEAN_P));
-static void FDECL(hup_display_file, (const char *, BOOLEAN_P));
+static void FDECL(hup_display_nhwindow, (winid, boolean));
+static void FDECL(hup_display_file, (const char *, boolean));
 #ifdef CLIPPING
 static void FDECL(hup_cliparound, (int, int));
 #endif
@@ -528,7 +528,7 @@ static void FDECL((*previnterface_exit_nhwindows), (const char *)) = 0;
 void
 nhwindows_hangup()
 {
-    char *FDECL((*previnterface_getmsghistory), (BOOLEAN_P)) = 0;
+    char *FDECL((*previnterface_getmsghistory), (boolean)) = 0;
 
 #ifdef ALTMETA
     /* command processor shouldn't look for 2nd char after seeing ESC */

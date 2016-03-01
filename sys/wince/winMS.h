@@ -122,30 +122,30 @@ void mswin_suspend_nhwindows(const char *);
 void mswin_resume_nhwindows(void);
 winid mswin_create_nhwindow(int type);
 void mswin_clear_nhwindow(winid wid);
-void mswin_display_nhwindow(winid wid, BOOLEAN_P block);
+void mswin_display_nhwindow(winid wid, boolean block);
 void mswin_destroy_nhwindow(winid wid);
 void mswin_curs(winid wid, int x, int y);
 void mswin_putstr(winid wid, int attr, const char *text);
 void mswin_putstr_ex(winid wid, int attr, const char *text, boolean append);
-void mswin_display_file(const char *filename, BOOLEAN_P must_exist);
+void mswin_display_file(const char *filename, boolean must_exist);
 void mswin_start_menu(winid wid);
 void mswin_add_menu(winid wid, int glyph, const ANY_P *identifier,
-                    CHAR_P accelerator, CHAR_P group_accel, int attr,
-                    const char *str, BOOLEAN_P presel);
+                    char accelerator, char group_accel, int attr,
+                    const char *str, boolean presel);
 void mswin_end_menu(winid wid, const char *prompt);
 int mswin_select_menu(winid wid, int how, MENU_ITEM_P **selected);
 void mswin_update_inventory(void);
 void mswin_mark_synch(void);
 void mswin_wait_synch(void);
 void mswin_cliparound(int x, int y);
-void mswin_print_glyph(winid wid, XCHAR_P x, XCHAR_P y, int glyph, int bkglyph);
+void mswin_print_glyph(winid wid, xchar x, xchar y, int glyph, int bkglyph);
 void mswin_raw_print(const char *str);
 void mswin_raw_print_bold(const char *str);
 int mswin_nhgetch(void);
 int mswin_nh_poskey(int *x, int *y, int *mod);
 void mswin_nhbell(void);
 int mswin_doprev_message(void);
-char mswin_yn_function(const char *question, const char *choices, CHAR_P def);
+char mswin_yn_function(const char *question, const char *choices, char def);
 void mswin_getlin(const char *question, char *input);
 int mswin_get_ext_cmd(void);
 void mswin_number_pad(int state);

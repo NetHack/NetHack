@@ -103,12 +103,12 @@ E void NDECL(tty_shutdown);
 #if defined(apollo)
 /* Apollos don't widen old-style function definitions properly -- they try to
  * be smart and use the prototype, or some such strangeness.  So we have to
- * define UNWIDENDED_PROTOTYPES (in tradstdc.h), which makes CHAR_P below a
+ * define UNWIDENDED_PROTOTYPES (in tradstdc.h), which makes char below a
  * char.  But the tputs termcap call was compiled as if xputc's argument
  * actually would be expanded.	So here, we have to make an exception. */
 E void FDECL(xputc, (int));
 #else
-E void FDECL(xputc, (CHAR_P));
+E void FDECL(xputc, (char));
 #endif
 E void FDECL(xputs, (const char *));
 #if defined(SCREEN_VGA) || defined(SCREEN_8514)
@@ -174,18 +174,18 @@ E void FDECL(tty_suspend_nhwindows, (const char *));
 E void NDECL(tty_resume_nhwindows);
 E winid FDECL(tty_create_nhwindow, (int));
 E void FDECL(tty_clear_nhwindow, (winid));
-E void FDECL(tty_display_nhwindow, (winid, BOOLEAN_P));
+E void FDECL(tty_display_nhwindow, (winid, boolean));
 E void FDECL(tty_dismiss_nhwindow, (winid));
 E void FDECL(tty_destroy_nhwindow, (winid));
 E void FDECL(tty_curs, (winid, int, int));
 E void FDECL(tty_putstr, (winid, int, const char *));
-E void FDECL(tty_display_file, (const char *, BOOLEAN_P));
+E void FDECL(tty_display_file, (const char *, boolean));
 E void FDECL(tty_start_menu, (winid));
-E void FDECL(tty_add_menu, (winid, int, const ANY_P *, CHAR_P, CHAR_P, int,
-                            const char *, BOOLEAN_P));
+E void FDECL(tty_add_menu, (winid, int, const ANY_P *, char, char, int,
+                            const char *, boolean));
 E void FDECL(tty_end_menu, (winid, const char *));
 E int FDECL(tty_select_menu, (winid, int, MENU_ITEM_P **));
-E char FDECL(tty_message_menu, (CHAR_P, int, const char *));
+E char FDECL(tty_message_menu, (char, int, const char *));
 E void NDECL(tty_update_inventory);
 E void NDECL(tty_mark_synch);
 E void NDECL(tty_wait_synch);
@@ -195,14 +195,14 @@ E void FDECL(tty_cliparound, (int, int));
 #ifdef POSITIONBAR
 E void FDECL(tty_update_positionbar, (char *));
 #endif
-E void FDECL(tty_print_glyph, (winid, XCHAR_P, XCHAR_P, int, int));
+E void FDECL(tty_print_glyph, (winid, xchar, xchar, int, int));
 E void FDECL(tty_raw_print, (const char *));
 E void FDECL(tty_raw_print_bold, (const char *));
 E int NDECL(tty_nhgetch);
 E int FDECL(tty_nh_poskey, (int *, int *, int *));
 E void NDECL(tty_nhbell);
 E int NDECL(tty_doprev_message);
-E char FDECL(tty_yn_function, (const char *, const char *, CHAR_P));
+E char FDECL(tty_yn_function, (const char *, const char *, char));
 E void FDECL(tty_getlin, (const char *, char *));
 E int NDECL(tty_get_ext_cmd);
 E void FDECL(tty_number_pad, (int));
@@ -229,8 +229,8 @@ E void NDECL(tty_end_screen);
 
 E void FDECL(genl_outrip, (winid, int, time_t));
 
-E char *FDECL(tty_getmsghistory, (BOOLEAN_P));
-E void FDECL(tty_putmsghistory, (const char *, BOOLEAN_P));
+E char *FDECL(tty_getmsghistory, (boolean));
+E void FDECL(tty_putmsghistory, (const char *, boolean));
 
 #ifdef NO_TERMS
 #ifdef MAC

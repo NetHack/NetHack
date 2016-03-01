@@ -16,7 +16,7 @@ STATIC_PTR int NDECL(wipeoff);
 STATIC_DCL int FDECL(menu_drop, (int));
 STATIC_DCL int NDECL(currentlevel_rewrite);
 STATIC_DCL void NDECL(final_level);
-/* static boolean FDECL(badspot, (XCHAR_P,XCHAR_P)); */
+/* static boolean FDECL(badspot, (xchar,xchar)); */
 
 extern int n_dgns; /* number of dungeons, from dungeon.c */
 

@@ -24,18 +24,18 @@ struct window_procs {
     void NDECL((*win_resume_nhwindows));
     winid FDECL((*win_create_nhwindow), (int));
     void FDECL((*win_clear_nhwindow), (winid));
-    void FDECL((*win_display_nhwindow), (winid, BOOLEAN_P));
+    void FDECL((*win_display_nhwindow), (winid, boolean));
     void FDECL((*win_destroy_nhwindow), (winid));
     void FDECL((*win_curs), (winid, int, int));
     void FDECL((*win_putstr), (winid, int, const char *));
     void FDECL((*win_putmixed), (winid, int, const char *));
-    void FDECL((*win_display_file), (const char *, BOOLEAN_P));
+    void FDECL((*win_display_file), (const char *, boolean));
     void FDECL((*win_start_menu), (winid));
-    void FDECL((*win_add_menu), (winid, int, const ANY_P *, CHAR_P, CHAR_P,
-                                 int, const char *, BOOLEAN_P));
+    void FDECL((*win_add_menu), (winid, int, const ANY_P *, char, char,
+                                 int, const char *, boolean));
     void FDECL((*win_end_menu), (winid, const char *));
     int FDECL((*win_select_menu), (winid, int, MENU_ITEM_P **));
-    char FDECL((*win_message_menu), (CHAR_P, int, const char *));
+    char FDECL((*win_message_menu), (char, int, const char *));
     void NDECL((*win_update_inventory));
     void NDECL((*win_mark_synch));
     void NDECL((*win_wait_synch));
@@ -45,14 +45,14 @@ struct window_procs {
 #ifdef POSITIONBAR
     void FDECL((*win_update_positionbar), (char *));
 #endif
-    void FDECL((*win_print_glyph), (winid, XCHAR_P, XCHAR_P, int, int));
+    void FDECL((*win_print_glyph), (winid, xchar, xchar, int, int));
     void FDECL((*win_raw_print), (const char *));
     void FDECL((*win_raw_print_bold), (const char *));
     int NDECL((*win_nhgetch));
     int FDECL((*win_nh_poskey), (int *, int *, int *));
     void NDECL((*win_nhbell));
     int NDECL((*win_doprev_message));
-    char FDECL((*win_yn_function), (const char *, const char *, CHAR_P));
+    char FDECL((*win_yn_function), (const char *, const char *, char));
     void FDECL((*win_getlin), (const char *, char *));
     int NDECL((*win_get_ext_cmd));
     void FDECL((*win_number_pad), (int));
@@ -72,13 +72,13 @@ struct window_procs {
 
     void FDECL((*win_outrip), (winid, int, time_t));
     void FDECL((*win_preference_update), (const char *));
-    char *FDECL((*win_getmsghistory), (BOOLEAN_P));
-    void FDECL((*win_putmsghistory), (const char *, BOOLEAN_P));
+    char *FDECL((*win_getmsghistory), (boolean));
+    void FDECL((*win_putmsghistory), (const char *, boolean));
 #ifdef STATUS_VIA_WINDOWPORT
     void NDECL((*win_status_init));
     void NDECL((*win_status_finish));
     void FDECL((*win_status_enablefield),
-               (int, const char *, const char *, BOOLEAN_P));
+               (int, const char *, const char *, boolean));
     void FDECL((*win_status_update), (int, genericptr_t, int, int));
 #ifdef STATUS_HILITES
     void FDECL((*win_status_threshold), (int, int, anything, int, int, int));
@@ -332,18 +332,18 @@ struct chain_procs {
     void FDECL((*win_resume_nhwindows), (CARGS));
     winid FDECL((*win_create_nhwindow), (CARGS, int));
     void FDECL((*win_clear_nhwindow), (CARGS, winid));
-    void FDECL((*win_display_nhwindow), (CARGS, winid, BOOLEAN_P));
+    void FDECL((*win_display_nhwindow), (CARGS, winid, boolean));
     void FDECL((*win_destroy_nhwindow), (CARGS, winid));
     void FDECL((*win_curs), (CARGS, winid, int, int));
     void FDECL((*win_putstr), (CARGS, winid, int, const char *));
     void FDECL((*win_putmixed), (CARGS, winid, int, const char *));
-    void FDECL((*win_display_file), (CARGS, const char *, BOOLEAN_P));
+    void FDECL((*win_display_file), (CARGS, const char *, boolean));
     void FDECL((*win_start_menu), (CARGS, winid));
-    void FDECL((*win_add_menu), (CARGS, winid, int, const ANY_P *, CHAR_P,
-                                 CHAR_P, int, const char *, BOOLEAN_P));
+    void FDECL((*win_add_menu), (CARGS, winid, int, const ANY_P *, char,
+                                 char, int, const char *, boolean));
     void FDECL((*win_end_menu), (CARGS, winid, const char *));
     int FDECL((*win_select_menu), (CARGS, winid, int, MENU_ITEM_P **));
-    char FDECL((*win_message_menu), (CARGS, CHAR_P, int, const char *));
+    char FDECL((*win_message_menu), (CARGS, char, int, const char *));
     void FDECL((*win_update_inventory), (CARGS));
     void FDECL((*win_mark_synch), (CARGS));
     void FDECL((*win_wait_synch), (CARGS));
@@ -353,7 +353,7 @@ struct chain_procs {
 #ifdef POSITIONBAR
     void FDECL((*win_update_positionbar), (CARGS, char *));
 #endif
-    void FDECL((*win_print_glyph), (CARGS, winid, XCHAR_P, XCHAR_P, int, int));
+    void FDECL((*win_print_glyph), (CARGS, winid, xchar, xchar, int, int));
     void FDECL((*win_raw_print), (CARGS, const char *));
     void FDECL((*win_raw_print_bold), (CARGS, const char *));
     int FDECL((*win_nhgetch), (CARGS));
@@ -361,7 +361,7 @@ struct chain_procs {
     void FDECL((*win_nhbell), (CARGS));
     int FDECL((*win_doprev_message), (CARGS));
     char FDECL((*win_yn_function),
-               (CARGS, const char *, const char *, CHAR_P));
+               (CARGS, const char *, const char *, char));
     void FDECL((*win_getlin), (CARGS, const char *, char *));
     int FDECL((*win_get_ext_cmd), (CARGS));
     void FDECL((*win_number_pad), (CARGS, int));
@@ -381,13 +381,13 @@ struct chain_procs {
 
     void FDECL((*win_outrip), (CARGS, winid, int, time_t));
     void FDECL((*win_preference_update), (CARGS, const char *));
-    char *FDECL((*win_getmsghistory), (CARGS, BOOLEAN_P));
-    void FDECL((*win_putmsghistory), (CARGS, const char *, BOOLEAN_P));
+    char *FDECL((*win_getmsghistory), (CARGS, boolean));
+    void FDECL((*win_putmsghistory), (CARGS, const char *, boolean));
 #ifdef STATUS_VIA_WINDOWPORT
     void FDECL((*win_status_init), (CARGS));
     void FDECL((*win_status_finish), (CARGS));
     void FDECL((*win_status_enablefield),
-               (CARGS, int, const char *, const char *, BOOLEAN_P));
+               (CARGS, int, const char *, const char *, boolean));
     void FDECL((*win_status_update), (CARGS, int, genericptr_t, int, int));
 #ifdef STATUS_HILITES
     void FDECL((*win_status_threshold),

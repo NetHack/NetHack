@@ -13,7 +13,7 @@ STATIC_DCL long FDECL(itimeout, (long));
 STATIC_DCL long FDECL(itimeout_incr, (long, int));
 STATIC_DCL void NDECL(ghost_from_bottle);
 STATIC_DCL boolean
-FDECL(H2Opotion_dip, (struct obj *, struct obj *, BOOLEAN_P, const char *));
+FDECL(H2Opotion_dip, (struct obj *, struct obj *, boolean, const char *));
 STATIC_DCL short FDECL(mixtype, (struct obj *, struct obj *));
 
 /* force `val' to be within valid range for intrinsic timeout value */

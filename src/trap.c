@@ -11,22 +11,22 @@ STATIC_DCL void NDECL(domagictrap);
 STATIC_DCL boolean FDECL(emergency_disrobe, (boolean *));
 STATIC_DCL int FDECL(untrap_prob, (struct trap *));
 STATIC_DCL void FDECL(move_into_trap, (struct trap *));
-STATIC_DCL int FDECL(try_disarm, (struct trap *, BOOLEAN_P));
+STATIC_DCL int FDECL(try_disarm, (struct trap *, boolean));
 STATIC_DCL void FDECL(reward_untrap, (struct trap *, struct monst *));
 STATIC_DCL int FDECL(disarm_holdingtrap, (struct trap *));
 STATIC_DCL int FDECL(disarm_landmine, (struct trap *));
 STATIC_DCL int FDECL(disarm_squeaky_board, (struct trap *));
 STATIC_DCL int FDECL(disarm_shooting_trap, (struct trap *, int));
 STATIC_DCL int FDECL(try_lift, (struct monst *, struct trap *, int,
-                                BOOLEAN_P));
+                                boolean));
 STATIC_DCL int FDECL(help_monster_out, (struct monst *, struct trap *));
 STATIC_DCL boolean FDECL(thitm, (int, struct monst *, struct obj *, int,
-                                 BOOLEAN_P));
-STATIC_DCL void FDECL(launch_drop_spot, (struct obj *, XCHAR_P, XCHAR_P));
-STATIC_DCL int FDECL(mkroll_launch, (struct trap *, XCHAR_P, XCHAR_P,
-                                     SHORT_P, long));
-STATIC_DCL boolean FDECL(isclearpath, (coord *, int, SCHAR_P, SCHAR_P));
-STATIC_DCL char *FDECL(trapnote, (struct trap *, BOOLEAN_P));
+                                 boolean));
+STATIC_DCL void FDECL(launch_drop_spot, (struct obj *, xchar, xchar));
+STATIC_DCL int FDECL(mkroll_launch, (struct trap *, xchar, xchar,
+                                     short, long));
+STATIC_DCL boolean FDECL(isclearpath, (coord *, int, schar, schar));
+STATIC_DCL char *FDECL(trapnote, (struct trap *, boolean));
 #if 0
 STATIC_DCL void FDECL(join_adjacent_pits, (struct trap *));
 #endif

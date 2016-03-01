@@ -12,7 +12,7 @@ extern long bytes_counted;
 
 STATIC_DCL boolean FDECL(no_bones_level, (d_level *));
 STATIC_DCL void FDECL(goodfruit, (int));
-STATIC_DCL void FDECL(resetobjs, (struct obj *, BOOLEAN_P));
+STATIC_DCL void FDECL(resetobjs, (struct obj *, boolean));
 STATIC_DCL boolean FDECL(fixuporacle, (struct monst *));
 
 STATIC_OVL boolean

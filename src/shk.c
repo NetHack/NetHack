@@ -11,8 +11,8 @@
 #define PAY_BROKE (-2)
 
 STATIC_DCL void FDECL(makekops, (coord *));
-STATIC_DCL void FDECL(call_kops, (struct monst *, BOOLEAN_P));
-STATIC_DCL void FDECL(kops_gone, (BOOLEAN_P));
+STATIC_DCL void FDECL(call_kops, (struct monst *, boolean));
+STATIC_DCL void FDECL(kops_gone, (boolean));
 
 #define NOTANGRY(mon) ((mon)->mpeaceful)
 #define ANGRY(mon) (!NOTANGRY(mon))
@@ -33,8 +33,8 @@ STATIC_DCL void FDECL(setpaid, (struct monst *));
 STATIC_DCL long FDECL(addupbill, (struct monst *));
 STATIC_DCL void FDECL(pacify_shk, (struct monst *));
 STATIC_DCL struct bill_x *FDECL(onbill, (struct obj *, struct monst *,
-                                         BOOLEAN_P));
-STATIC_DCL struct monst *FDECL(next_shkp, (struct monst *, BOOLEAN_P));
+                                         boolean));
+STATIC_DCL struct monst *FDECL(next_shkp, (struct monst *, boolean));
 STATIC_DCL long FDECL(shop_debt, (struct eshk *));
 STATIC_DCL char *FDECL(shk_owns, (char *, struct obj *));
 STATIC_DCL char *FDECL(mon_owns, (char *, struct obj *));
@@ -45,13 +45,13 @@ STATIC_DCL long FDECL(get_cost, (struct obj *, struct monst *));
 STATIC_DCL long FDECL(set_cost, (struct obj *, struct monst *));
 STATIC_DCL const char *FDECL(shk_embellish, (struct obj *, long));
 STATIC_DCL long FDECL(cost_per_charge, (struct monst *, struct obj *,
-                                        BOOLEAN_P));
+                                        boolean));
 STATIC_DCL long FDECL(cheapest_item, (struct monst *));
 STATIC_DCL int FDECL(dopayobj, (struct monst *, struct bill_x *,
-                                struct obj **, int, BOOLEAN_P));
+                                struct obj **, int, boolean));
 STATIC_DCL long FDECL(stolen_container, (struct obj *, struct monst *,
-                                         long, BOOLEAN_P));
-STATIC_DCL long FDECL(getprice, (struct obj *, BOOLEAN_P));
+                                         long, boolean));
+STATIC_DCL long FDECL(getprice, (struct obj *, boolean));
 STATIC_DCL void FDECL(shk_names_obj, (struct monst *, struct obj *,
                                       const char *, long, const char *));
 STATIC_DCL struct obj *FDECL(bp_to_obj, (struct bill_x *));
@@ -59,21 +59,21 @@ STATIC_DCL boolean FDECL(inherits, (struct monst *, int, int));
 STATIC_DCL void FDECL(set_repo_loc, (struct monst *));
 STATIC_DCL boolean NDECL(angry_shk_exists);
 STATIC_DCL void FDECL(rile_shk, (struct monst *));
-STATIC_DCL void FDECL(rouse_shk, (struct monst *, BOOLEAN_P));
-STATIC_DCL void FDECL(remove_damage, (struct monst *, BOOLEAN_P));
+STATIC_DCL void FDECL(rouse_shk, (struct monst *, boolean));
+STATIC_DCL void FDECL(remove_damage, (struct monst *, boolean));
 STATIC_DCL void FDECL(sub_one_frombill, (struct obj *, struct monst *));
-STATIC_DCL void FDECL(add_one_tobill, (struct obj *, BOOLEAN_P,
+STATIC_DCL void FDECL(add_one_tobill, (struct obj *, boolean,
                                        struct monst *));
 STATIC_DCL void FDECL(dropped_container, (struct obj *, struct monst *,
-                                          BOOLEAN_P));
+                                          boolean));
 STATIC_DCL void FDECL(add_to_billobjs, (struct obj *));
-STATIC_DCL void FDECL(bill_box_content, (struct obj *, BOOLEAN_P, BOOLEAN_P,
+STATIC_DCL void FDECL(bill_box_content, (struct obj *, boolean, boolean,
                                          struct monst *));
 STATIC_DCL boolean FDECL(rob_shop, (struct monst *));
 STATIC_DCL void FDECL(deserted_shop, (char *));
 STATIC_DCL boolean FDECL(special_stock, (struct obj *, struct monst *,
-                                         BOOLEAN_P));
-STATIC_DCL const char *FDECL(cad, (BOOLEAN_P));
+                                         boolean));
+STATIC_DCL const char *FDECL(cad, (boolean));
 
 /*
         invariants: obj->unpaid iff onbill(obj) [unless bp->useup]

@@ -62,7 +62,7 @@ int skill;
                                               : "fighting ");
 }
 
-STATIC_DCL boolean FDECL(can_advance, (int, BOOLEAN_P));
+STATIC_DCL boolean FDECL(can_advance, (int, boolean));
 STATIC_DCL boolean FDECL(could_advance, (int));
 STATIC_DCL boolean FDECL(peaked_skill, (int));
 STATIC_DCL int FDECL(slots_required, (int));

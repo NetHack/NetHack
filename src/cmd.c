@@ -146,7 +146,7 @@ STATIC_PTR int NDECL(wiz_migrate_mons);
 STATIC_DCL int FDECL(size_monst, (struct monst *));
 STATIC_DCL int FDECL(size_obj, (struct obj *));
 STATIC_DCL void FDECL(count_obj, (struct obj *, long *, long *,
-                                  BOOLEAN_P, BOOLEAN_P));
+                                  boolean, boolean));
 STATIC_DCL void FDECL(obj_chain, (winid, const char *, struct obj *,
                                   long *, long *));
 STATIC_DCL void FDECL(mon_invent_chain, (winid, const char *, struct monst *,
@@ -181,7 +181,7 @@ static const char *readchar_queue = "";
 static coord clicklook_cc;
 
 STATIC_DCL char *NDECL(parse);
-STATIC_DCL boolean FDECL(help_dir, (CHAR_P, const char *));
+STATIC_DCL boolean FDECL(help_dir, (char, const char *));
 
 STATIC_PTR int
 doprev_message(VOID_ARGS)

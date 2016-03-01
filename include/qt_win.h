@@ -846,15 +846,15 @@ class NetHackQtBind : NetHackQtBindBase
     static void qt_resume_nhwindows();
     static winid qt_create_nhwindow(int type);
     static void qt_clear_nhwindow(winid wid);
-    static void qt_display_nhwindow(winid wid, BOOLEAN_P block);
+    static void qt_display_nhwindow(winid wid, boolean block);
     static void qt_destroy_nhwindow(winid wid);
     static void qt_curs(winid wid, int x, int y);
     static void qt_putstr(winid wid, int attr, const char *text);
-    static void qt_display_file(const char *filename, BOOLEAN_P must_exist);
+    static void qt_display_file(const char *filename, boolean must_exist);
     static void qt_start_menu(winid wid);
     static void qt_add_menu(winid wid, int glyph, const ANY_P *identifier,
-                            CHAR_P ch, CHAR_P gch, int attr, const char *str,
-                            BOOLEAN_P presel);
+                            char ch, char gch, int attr, const char *str,
+                            boolean presel);
     static void qt_end_menu(winid wid, const char *prompt);
     static int qt_select_menu(winid wid, int how, MENU_ITEM_P **menu_list);
     static void qt_update_inventory();
@@ -863,7 +863,7 @@ class NetHackQtBind : NetHackQtBindBase
 
     static void qt_cliparound(int x, int y);
     static void qt_cliparound_window(winid wid, int x, int y);
-    static void qt_print_glyph(winid wid, XCHAR_P x, XCHAR_P y,
+    static void qt_print_glyph(winid wid, xchar x, xchar y,
                                int glyph, int bkglyph);
     static void qt_raw_print(const char *str);
     static void qt_raw_print_bold(const char *str);
@@ -872,7 +872,7 @@ class NetHackQtBind : NetHackQtBindBase
     static void qt_nhbell();
     static int qt_doprev_message();
     static char qt_yn_function(const char *question, const char *choices,
-                               CHAR_P def);
+                               char def);
     static void qt_getlin(const char *prompt, char *line);
     static int qt_get_ext_cmd();
     static void qt_number_pad(int);

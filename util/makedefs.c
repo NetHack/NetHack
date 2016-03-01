@@ -186,7 +186,7 @@ static int FDECL(get_hdr, (char *));
 static boolean FDECL(new_id, (char *));
 static boolean FDECL(known_msg, (int, int));
 static void FDECL(new_msg, (char *, int, int));
-static char *FDECL(valid_qt_summary, (char *, BOOLEAN_P));
+static char *FDECL(valid_qt_summary, (char *, boolean));
 static void FDECL(do_qt_control, (char *));
 static void FDECL(do_qt_text, (char *));
 static void NDECL(adjust_qt_hdrs);
@@ -2207,9 +2207,7 @@ int num, id;
 }
 
 static void
-new_msg(s, num, id)
-char *s;
-int num, id;
+new_msg(char *s, int num, int id)
 {
     struct qtmsg *qt_msg;
 
@@ -2227,10 +2225,10 @@ int num, id;
 
 /* check %E record for "[summary text]" that nethack can stuff into the
    message history buffer when delivering text via window instead of pline */
+/* end record: "%E" optionally followed by " [summary]" */
+/* curr_msg is valid iff this is True */
 static char *
-valid_qt_summary(s, parsing)
-char *s;         /* end record: "%E" optionally followed by " [summary]" */
-boolean parsing; /* curr_msg is valid iff this is True */
+valid_qt_summary(char *s, boolean parsing)
 {
     static char summary[BUFSZ];
     char *p;

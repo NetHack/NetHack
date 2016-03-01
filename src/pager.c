@@ -15,8 +15,8 @@ STATIC_DCL void FDECL(look_at_monster, (char *, char *,
                                         struct monst *, int, int));
 STATIC_DCL struct permonst *FDECL(lookat, (int, int, char *, char *));
 STATIC_DCL void FDECL(checkfile, (char *, struct permonst *,
-                                  BOOLEAN_P, BOOLEAN_P));
-STATIC_DCL void FDECL(look_all, (BOOLEAN_P,BOOLEAN_P));
+                                  boolean, boolean));
+STATIC_DCL void FDECL(look_all, (boolean,boolean));
 STATIC_DCL boolean FDECL(help_menu, (int *));
 STATIC_DCL void NDECL(docontact);
 #ifdef PORT_HELP

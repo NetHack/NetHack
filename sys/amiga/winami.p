@@ -24,7 +24,7 @@ char FDECL(amii_yn_function, (const char * , const char * , char ));
 void FDECL(amii_addtopl, (const char *));
 void FDECL(TextSpaces, (struct RastPort * , int ));
 void FDECL(amii_putstr, (winid  , int  , const char *));
-void FDECL(amii_putsym, (winid  , int  , int  , CHAR_P ));
+void FDECL(amii_putsym, (winid  , int  , int  , char ));
 void FDECL(amii_clear_nhwindow, (winid ));
 void FDECL(amii_exit_nhwindows, (const char *));
 int FDECL(amii_nh_poskey, (int * , int * , int *));

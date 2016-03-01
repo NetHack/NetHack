@@ -14,7 +14,7 @@ struct trobj {
 
 STATIC_DCL void FDECL(ini_inv, (struct trobj *));
 STATIC_DCL void FDECL(knows_object, (int));
-STATIC_DCL void FDECL(knows_class, (CHAR_P));
+STATIC_DCL void FDECL(knows_class, (char));
 STATIC_DCL boolean FDECL(restricted_spell_discipline, (int));
 
 #define UNDEF_TYP 0

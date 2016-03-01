@@ -25,7 +25,7 @@
 #define spellet(spell) \
     ((char) ((spell < 26) ? ('a' + spell) : ('A' + spell - 26)))
 
-STATIC_DCL int FDECL(spell_let_to_idx, (CHAR_P));
+STATIC_DCL int FDECL(spell_let_to_idx, (char));
 STATIC_DCL boolean FDECL(cursed_book, (struct obj * bp));
 STATIC_DCL boolean FDECL(confused_book, (struct obj *));
 STATIC_DCL void FDECL(deadbook, (struct obj *));

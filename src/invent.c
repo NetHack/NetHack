@@ -10,7 +10,7 @@
 STATIC_DCL int FDECL(CFDECLSPEC sortloot_cmp, (struct obj *, struct obj *));
 STATIC_DCL void NDECL(reorder_invent);
 STATIC_DCL boolean FDECL(mergable, (struct obj *, struct obj *));
-STATIC_DCL void FDECL(noarmor, (BOOLEAN_P));
+STATIC_DCL void FDECL(noarmor, (boolean));
 STATIC_DCL void FDECL(invdisp_nothing, (const char *, const char *));
 STATIC_DCL boolean FDECL(worn_wield_only, (struct obj *));
 STATIC_DCL boolean FDECL(only_here, (struct obj *));
@@ -22,8 +22,8 @@ STATIC_PTR int FDECL(ckunpaid, (struct obj *));
 STATIC_PTR int FDECL(ckvalidcat, (struct obj *));
 STATIC_PTR char *FDECL(safeq_xprname, (struct obj *));
 STATIC_PTR char *FDECL(safeq_shortxprname, (struct obj *));
-STATIC_DCL char FDECL(display_pickinv, (const char *, BOOLEAN_P, long *));
-STATIC_DCL char FDECL(display_used_invlets, (CHAR_P));
+STATIC_DCL char FDECL(display_pickinv, (const char *, boolean, long *));
+STATIC_DCL char FDECL(display_used_invlets, (char));
 STATIC_DCL void FDECL(tally_BUCX,
                       (struct obj *, int *, int *, int *, int *, int *));
 STATIC_DCL boolean FDECL(this_type_only, (struct obj *));
