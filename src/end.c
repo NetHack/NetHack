@@ -130,8 +130,7 @@ int sig_unused UNUSED;
 }
 
 void
-panictrace_setsignals(set)
-boolean set;
+panictrace_setsignals(boolean set)
 {
 #define SETSIGNAL(sig) \
     (void) signal(sig, set ? (SIG_RET_TYPE) panictrace_handler : SIG_DFL);
@@ -298,8 +297,7 @@ static boolean Schroedingers_cat = FALSE;
 
 /*ARGSUSED*/
 void
-done1(sig_unused) /* called as signal() handler, so sent at least one arg */
-int sig_unused UNUSED;
+done1(int sig_unused UNUSED) /* called as signal() handler, so sent at least one arg */
 {
 #ifndef NO_SIGNAL
     (void) signal(SIGINT, SIG_IGN);
@@ -370,8 +368,7 @@ done2()
 #ifndef NO_SIGNAL
 /*ARGSUSED*/
 STATIC_PTR void
-done_intr(sig_unused) /* called as signal() handler, so sent at least 1 arg */
-int sig_unused UNUSED;
+done_intr(int sig_unused UNUSED) /* called as signal() handler, so sent at least 1 arg */
 {
     done_stopprint++;
     (void) signal(SIGINT, SIG_IGN);
@@ -384,8 +381,7 @@ int sig_unused UNUSED;
 #if defined(UNIX) || defined(VMS) || defined(__EMX__)
 /* signal() handler */
 static void
-done_hangup(sig)
-int sig;
+done_hangup(int sig)
 {
     program_state.done_hup++;
     sethanguphandler((void FDECL((*), (int) )) SIG_IGN);
@@ -396,9 +392,7 @@ int sig;
 #endif /* NO_SIGNAL */
 
 void
-done_in_by(mtmp, how)
-struct monst *mtmp;
-int how;
+done_in_by(struct monst *mtmp, int how)
 {
     char buf[BUFSZ];
     struct permonst *mptr = mtmp->data,
@@ -584,9 +578,7 @@ VA_DECL(const char *, str)
 }
 
 STATIC_OVL boolean
-should_query_disclose_option(category, defquery)
-int category;
-char *defquery;
+should_query_disclose_option(int category, char *defquery)
 {
     int idx;
     char *dop;
@@ -620,9 +612,7 @@ char *defquery;
 }
 
 STATIC_OVL void
-disclose(how, taken)
-int how;
-boolean taken;
+disclose(int how, boolean taken)
 {
     char c = '\0', defquery;
     char qbuf[QBUFSZ];
@@ -701,8 +691,7 @@ boolean taken;
 
 /* try to get the player back in a viable state after being killed */
 STATIC_OVL void
-savelife(how)
-int how;
+savelife(int how)
 {
     int uhpmin = max(2 * u.ulevel, 10);
 
@@ -740,8 +729,7 @@ int how;
  * intact.
  */
 STATIC_OVL void
-get_valuables(list)
-struct obj *list; /* inventory or container contents */
+get_valuables(struct obj *list) /* inventory or container contents */
 {
     register struct obj *obj;
     register int i;
@@ -775,9 +763,8 @@ struct obj *list; /* inventory or container contents */
  *  as easily use qsort, but we don't care about efficiency here.
  */
 STATIC_OVL void
-sort_valuables(list, size)
-struct valuable_data list[];
-int size; /* max value is less than 20 */
+sort_valuables(struct valuable_data list[],
+               int size) /* max value is less than 20 */
 {
     register int i, j;
     struct valuable_data ltmp;
@@ -801,9 +788,7 @@ int size; /* max value is less than 20 */
 #define CAT_CHECK 2
 
 STATIC_OVL boolean
-odds_and_ends(list, what)
-struct obj *list;
-int what;
+odds_and_ends(struct obj *list, int what)
 {
     struct obj *otmp;
     for (otmp = list; otmp; otmp = otmp->nobj) {
@@ -822,10 +807,9 @@ int what;
 
 /* called twice; first to calculate total, then to list relevant items */
 STATIC_OVL void
-artifact_score(list, counting, endwin)
-struct obj *list;
-boolean counting; /* true => add up points; false => display them */
-winid endwin;
+artifact_score(struct obj *list,
+               boolean counting, /* true => add up points; false => display them */
+               winid endwin)
 {
     char pbuf[BUFSZ];
     struct obj *otmp;
@@ -859,8 +843,7 @@ winid endwin;
 
 /* Be careful not to call panic from here! */
 void
-done(how)
-int how;
+done(int how)
 {
     if (how == TRICKED) {
         if (killer.name[0]) {
@@ -917,8 +900,7 @@ int how;
 
 /* separated from done() in order to specify the __noreturn__ attribute */
 STATIC_OVL void
-really_done(how)
-int how;
+really_done(int how)
 {
     boolean taken;
     char pbuf[BUFSZ];
@@ -1284,9 +1266,8 @@ int how;
 }
 
 void
-container_contents(list, identified, all_containers, reportempty)
-struct obj *list;
-boolean identified, all_containers, reportempty;
+container_contents(struct obj *list, boolean identified,
+                   boolean all_containers, boolean reportempty)
 {
     register struct obj *box, *obj;
     struct obj **oarray;
@@ -1377,8 +1358,7 @@ boolean identified, all_containers, reportempty;
 
 /* should be called with either EXIT_SUCCESS or EXIT_FAILURE */
 void
-terminate(status)
-int status;
+terminate(int status)
 {
     program_state.in_moveloop = 0; /* won't be returning to normal play */
 #ifdef MAC
@@ -1415,9 +1395,7 @@ dovanquished()
 }
 
 STATIC_OVL void
-list_vanquished(defquery, ask)
-char defquery;
-boolean ask;
+list_vanquished(char defquery, boolean ask)
 {
     register int i, lev;
     int ntypes = 0, max_lev = 0, nkilled;
@@ -1528,9 +1506,7 @@ num_extinct()
 }
 
 STATIC_OVL void
-list_genocided(defquery, ask)
-char defquery;
-boolean ask;
+list_genocided(char defquery, boolean ask)
 {
     register int i;
     int ngenocided, nextinct;
@@ -1589,10 +1565,7 @@ boolean ask;
 
 /* set a delayed killer, ensure non-delayed killer is cleared out */
 void
-delayed_killer(id, format, killername)
-int id;
-int format;
-const char *killername;
+delayed_killer(int id, int format, const char *killername)
 {
     struct kinfo *k = find_delayed_killer(id);
 
@@ -1610,8 +1583,7 @@ const char *killername;
 }
 
 struct kinfo *
-find_delayed_killer(id)
-int id;
+find_delayed_killer(int id)
 {
     struct kinfo *k;
 
@@ -1623,8 +1595,7 @@ int id;
 }
 
 void
-dealloc_killer(kptr)
-struct kinfo *kptr;
+dealloc_killer(struct kinfo *kptr)
 {
     struct kinfo *prev = &killer, *k;
 
@@ -1645,9 +1616,7 @@ struct kinfo *kptr;
 }
 
 void
-save_killers(fd, mode)
-int fd;
-int mode;
+save_killers(int fd, int mode)
 {
     struct kinfo *kptr;
 
@@ -1666,8 +1635,7 @@ int mode;
 }
 
 void
-restore_killers(fd)
-int fd;
+restore_killers(int fd)
 {
     struct kinfo *kptr;
 
@@ -1680,8 +1648,7 @@ int fd;
 }
 
 static int
-wordcount(p)
-char *p;
+wordcount(char *p)
 {
     int words = 0;
 
@@ -1697,8 +1664,7 @@ char *p;
 }
 
 static void
-bel_copy1(inp, out)
-char **inp, *out;
+bel_copy1(char **inp, char *out)
 {
     char *in = *inp;
 
@@ -1712,8 +1678,7 @@ char **inp, *out;
 }
 
 char *
-build_english_list(in)
-char *in;
+build_english_list(char *in)
 {
     char *out, *p = in;
     int len = (int) strlen(p), words = wordcount(p);

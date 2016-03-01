@@ -18,8 +18,7 @@ STATIC_DCL void FDECL(quickmimic, (struct monst *));
 
 /* pick a carried item for pet to drop */
 struct obj *
-droppables(mon)
-struct monst *mon;
+droppables(struct monst *mon)
 {
     struct obj *obj, *wep, dummy, *pickaxe, *unihorn, *key;
 
@@ -122,8 +121,7 @@ STATIC_VAR xchar gtyp, gx, gy; /* type and position of dog's current goal */
 STATIC_PTR void FDECL(wantdoor, (int, int, genericptr_t));
 
 boolean
-cursed_object_at(x, y)
-int x, y;
+cursed_object_at(int x, int y)
 {
     struct obj *otmp;
 
@@ -134,9 +132,7 @@ int x, y;
 }
 
 int
-dog_nutrition(mtmp, obj)
-struct monst *mtmp;
-struct obj *obj;
+dog_nutrition(struct monst *mtmp, struct obj *obj)
 {
     int nutrit;
 
@@ -198,11 +194,10 @@ struct obj *obj;
 
 /* returns 2 if pet dies, otherwise 1 */
 int
-dog_eat(mtmp, obj, x, y, devour)
-register struct monst *mtmp;
-register struct obj *obj; /* if unpaid, then thrown or kicked by hero */
-int x, y; /* dog's starting location, might be different from current */
-boolean devour;
+dog_eat(register struct monst *mtmp,
+        register struct obj *obj,   /* if unpaid, then thrown or kicked by hero */
+        int x, int y,               /* dog's starting location, might be different from current */
+        boolean devour)
 {
     register struct edog *edog = EDOG(mtmp);
     boolean poly, grow, heal, slimer, deadmimic;
@@ -346,9 +341,7 @@ boolean devour;
 
 /* hunger effects -- returns TRUE on starvation */
 STATIC_OVL boolean
-dog_hunger(mtmp, edog)
-register struct monst *mtmp;
-register struct edog *edog;
+dog_hunger(register struct monst *mtmp, register struct edog *edog)
 {
     if (monstermoves > edog->hungrytime + 500) {
         if (!carnivorous(mtmp->data) && !herbivorous(mtmp->data)) {
@@ -391,10 +384,7 @@ register struct edog *edog;
  * returns 1 if object eaten (since that counts as dog's move), 2 if died
  */
 STATIC_OVL int
-dog_invent(mtmp, edog, udist)
-register struct monst *mtmp;
-register struct edog *edog;
-int udist;
+dog_invent(register struct monst *mtmp, register struct edog *edog, int udist)
 {
     register int omx, omy, carryamt = 0;
     struct obj *obj, *otmp;
@@ -462,10 +452,7 @@ int udist;
 /* set dog's goal -- gtyp, gx, gy
    returns -1/0/1 (dog's desire to approach player) or -2 (abort move) */
 STATIC_OVL int
-dog_goal(mtmp, edog, after, udist, whappr)
-register struct monst *mtmp;
-struct edog *edog;
-int after, udist, whappr;
+dog_goal(register struct monst *mtmp, struct edog *edog, int after, int udist, int whappr)
 {
     register int omx, omy;
     boolean in_masters_sight, dog_has_minvent;
@@ -611,9 +598,8 @@ int after, udist, whappr;
 
 /* return 0 (no move), 1 (move) or 2 (dead) */
 int
-dog_move(mtmp, after)
-register struct monst *mtmp;
-register int after; /* this is extra fast monster movement */
+dog_move(register struct monst *mtmp,
+         register int after) /* this is extra fast monster movement */
 {
     int omx, omy; /* original mtmp position */
     int appr, whappr, udist;
@@ -959,9 +945,7 @@ newdogpos:
 
 /* check if a monster could pick up objects from a location */
 STATIC_OVL boolean
-could_reach_item(mon, nx, ny)
-struct monst *mon;
-xchar nx, ny;
+could_reach_item(struct monst *mon, xchar nx, xchar ny)
 {
     if ((!is_pool(nx, ny) || is_swimmer(mon->data))
         && (!is_lava(nx, ny) || likes_lava(mon->data))
@@ -978,9 +962,7 @@ xchar nx, ny;
  * calls deep.
  */
 STATIC_OVL boolean
-can_reach_location(mon, mx, my, fx, fy)
-struct monst *mon;
-xchar mx, my, fx, fy;
+can_reach_location(struct monst *mon, xchar mx, xchar my, xchar fx, xchar fy)
 {
     int i, j;
     int dist;
@@ -1014,9 +996,7 @@ xchar mx, my, fx, fy;
 
 /*ARGSUSED*/ /* do_clear_area client */
 STATIC_PTR void
-wantdoor(x, y, distance)
-int x, y;
-genericptr_t distance;
+wantdoor(int x, int y, genericptr_t distance)
 {
     int ndist;
 
@@ -1047,8 +1027,7 @@ static struct qmchoices {
 };
 
 void
-finish_meating(mtmp)
-struct monst *mtmp;
+finish_meating(struct monst *mtmp)
 {
     mtmp->meating = 0;
     if (mtmp->m_ap_type && mtmp->mappearance && mtmp->cham == NON_PM) {
@@ -1060,8 +1039,7 @@ struct monst *mtmp;
 }
 
 STATIC_OVL void
-quickmimic(mtmp)
-struct monst *mtmp;
+quickmimic(struct monst *mtmp)
 {
     int idx = 0, trycnt = 5, spotted;
     char buf[BUFSZ];

@@ -460,9 +460,8 @@ mon_arrive(struct monst *mtmp, boolean with_you)
 
 /* heal monster for time spent elsewhere */
 void
-mon_catchup_elapsed_time(mtmp, nmv)
-struct monst *mtmp;
-long nmv; /* number of moves */
+mon_catchup_elapsed_time(struct monst *mtmp,
+                         long nmv)/* number of moves */
 {
     int imv = 0; /* avoid zillions of casts and lint warnings */
 
@@ -726,9 +725,7 @@ migrate_to_level(register struct monst *mtmp, xchar tolev, xchar xyloc, coord *c
 /* return quality of food; the lower the better */
 /* fungi will eat even tainted food */
 int
-dogfood(mon, obj)
-struct monst *mon;
-register struct obj *obj;
+dogfood(struct monst *mon, register struct obj *obj)
 {
     struct permonst *mptr = mon->data, *fptr = 0;
     boolean carni = carnivorous(mptr), herbi = herbivorous(mptr), starving;
@@ -852,9 +849,7 @@ register struct obj *obj;
  * succeeded.
  */
 boolean
-tamedog(mtmp, obj)
-register struct monst *mtmp;
-register struct obj *obj;
+tamedog(register struct monst *mtmp, register struct obj *obj)
 {
     /* The Wiz, Medusa and the quest nemeses aren't even made peaceful. */
     if (mtmp->iswiz || mtmp->data == &mons[PM_MEDUSA]
@@ -1017,8 +1012,7 @@ wary_dog(struct monst *mtmp, boolean was_dead)
 }
 
 void
-abuse_dog(mtmp)
-struct monst *mtmp;
+abuse_dog(struct monst *mtmp)
 {
     if (!mtmp->mtame)
         return;

@@ -266,8 +266,7 @@ void NDECL((*ascgraphics_mode_callback)) = 0; /* set in tty_start_screen() */
  * objnam.c, options.c, pickup.c, sp_lev.c, lev_main.c, and tilemap.c.
  */
 int
-def_char_to_objclass(ch)
-char ch;
+def_char_to_objclass(char ch)
 {
     int i;
     for (i = 1; i < MAXOCLASSES; i++)
@@ -282,8 +281,7 @@ char ch;
  * Used in detect.c, options.c, read.c, sp_lev.c, and lev_main.c
  */
 int
-def_char_to_monclass(ch)
-char ch;
+def_char_to_monclass(char ch)
 {
     int i;
     for (i = 1; i < MAXMCLASSES; i++)
@@ -439,8 +437,7 @@ init_r_symbols()
 }
 
 void
-assign_graphics(whichset)
-int whichset;
+assign_graphics(int whichset)
 {
     register int i;
 
@@ -473,8 +470,7 @@ int whichset;
 }
 
 void
-switch_symbols(nondefault)
-int nondefault;
+switch_symbols(int nondefault)
 {
     register int i;
 
@@ -496,25 +492,19 @@ int nondefault;
 }
 
 void
-update_l_symset(symp, val)
-struct symparse *symp;
-int val;
+update_l_symset(struct symparse *symp, int val)
 {
     l_syms[symp->idx] = val;
 }
 
 void
-update_r_symset(symp, val)
-struct symparse *symp;
-int val;
+update_r_symset(struct symparse *symp, int val)
 {
     r_syms[symp->idx] = val;
 }
 
 void
-clear_symsetentry(which_set, name_too)
-int which_set;
-boolean name_too;
+clear_symsetentry(int which_set, boolean name_too)
 {
     if (symset[which_set].desc)
         free((genericptr_t) symset[which_set].desc);
