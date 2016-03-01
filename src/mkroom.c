@@ -31,8 +31,7 @@ STATIC_DCL void FDECL(rest_room, (int, struct mkroom *));
 extern const struct shclass shtypes[]; /* defined in shknam.c */
 
 STATIC_OVL boolean
-isbig(sroom)
-register struct mkroom *sroom;
+isbig(register struct mkroom *sroom)
 {
     register int area = (sroom->hx - sroom->lx + 1)
                         * (sroom->hy - sroom->ly + 1);
@@ -42,8 +41,7 @@ register struct mkroom *sroom;
 
 /* make and stock a room of a given type */
 void
-mkroom(roomtype)
-int roomtype;
+mkroom(int roomtype)
 {
     if (roomtype >= SHOPBASE)
         mkshop(); /* someday, we should be able to specify shop type */
@@ -203,8 +201,7 @@ gottype:
 
 /* pick an unused room, preferably with only one door */
 STATIC_OVL struct mkroom *
-pick_room(strict)
-register boolean strict;
+pick_room(register boolean strict)
 {
     register struct mkroom *sroom;
     register int i = nroom;
@@ -228,8 +225,7 @@ register boolean strict;
 }
 
 STATIC_OVL void
-mkzoo(type)
-int type;
+mkzoo(int type)
 {
     register struct mkroom *sroom;
 
@@ -240,8 +236,7 @@ int type;
 }
 
 void
-fill_zoo(sroom)
-struct mkroom *sroom;
+fill_zoo(struct mkroom *sroom)
 {
     struct monst *mon;
     register int sx, sy, i;
@@ -410,10 +405,7 @@ struct mkroom *sroom;
 
 /* make a swarm of undead around mm */
 void
-mkundead(mm, revive_corpses, mm_flags)
-coord *mm;
-boolean revive_corpses;
-int mm_flags;
+mkundead(coord *mm, boolean revive_corpses, int mm_flags)
 {
     int cnt = (level_difficulty() + 1) / 10 + rnd(5);
     struct permonst *mdat;
@@ -522,8 +514,7 @@ mkswamp() /* Michiel Huisjes & Fred de Wilde */
 }
 
 STATIC_OVL coord *
-shrine_pos(roomno)
-int roomno;
+shrine_pos(int roomno)
 {
     static coord buf;
     int delta;
@@ -569,8 +560,7 @@ mktemple()
 }
 
 boolean
-nexttodoor(sx, sy)
-register int sx, sy;
+nexttodoor(register int sx, register int sy)
 {
     register int dx, dy;
     register struct rm *lev;
@@ -587,8 +577,7 @@ register int sx, sy;
 }
 
 boolean
-has_dnstairs(sroom)
-register struct mkroom *sroom;
+has_dnstairs(register struct mkroom *sroom)
 {
     if (sroom == dnstairs_room)
         return TRUE;
@@ -598,8 +587,7 @@ register struct mkroom *sroom;
 }
 
 boolean
-has_upstairs(sroom)
-register struct mkroom *sroom;
+has_upstairs(register struct mkroom *sroom)
 {
     if (sroom == upstairs_room)
         return TRUE;
@@ -609,32 +597,26 @@ register struct mkroom *sroom;
 }
 
 int
-somex(croom)
-register struct mkroom *croom;
+somex(register struct mkroom *croom)
 {
     return rn1(croom->hx - croom->lx + 1, croom->lx);
 }
 
 int
-somey(croom)
-register struct mkroom *croom;
+somey(register struct mkroom *croom)
 {
     return rn1(croom->hy - croom->ly + 1, croom->ly);
 }
 
 boolean
-inside_room(croom, x, y)
-struct mkroom *croom;
-xchar x, y;
+inside_room(struct mkroom *croom, xchar x, xchar y)
 {
     return (boolean) (x >= croom->lx - 1 && x <= croom->hx + 1
                       && y >= croom->ly - 1 && y <= croom->hy + 1);
 }
 
 boolean
-somexy(croom, c)
-struct mkroom *croom;
-coord *c;
+somexy(struct mkroom *croom, coord *c)
 {
     int try_cnt = 0;
     int i;
@@ -689,8 +671,7 @@ coord *c;
  *		- ANY_TYPE
  */
 struct mkroom *
-search_special(type)
-schar type;
+search_special(schar type)
 {
     register struct mkroom *croom;
 
@@ -771,9 +752,7 @@ gotone:
  * (if any).
  */
 STATIC_OVL void
-save_room(fd, r)
-int fd;
-struct mkroom *r;
+save_room(int fd, struct mkroom *r)
 {
     short i;
 
@@ -791,8 +770,7 @@ struct mkroom *r;
  * save_rooms : Save all the rooms on disk!
  */
 void
-save_rooms(fd)
-int fd;
+save_rooms(int fd)
 {
     short i;
 
@@ -803,9 +781,7 @@ int fd;
 }
 
 STATIC_OVL void
-rest_room(fd, r)
-int fd;
-struct mkroom *r;
+rest_room(int fd, struct mkroom *r)
 {
     short i;
 
@@ -822,8 +798,7 @@ struct mkroom *r;
  * the disk.
  */
 void
-rest_rooms(fd)
-int fd;
+rest_rooms(int fd)
 {
     short i;
 
@@ -840,8 +815,7 @@ int fd;
 /* convert a display symbol for terrain into topology type;
    used for remembered terrain when mimics pose as furniture */
 int
-cmap_to_type(sym)
-int sym;
+cmap_to_type(int sym)
 {
     int typ = STONE; /* catchall */
 
