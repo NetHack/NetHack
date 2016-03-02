@@ -18,8 +18,7 @@ extern int NDECL(rand);
 
 /* 0 <= rn2(x) < x */
 int
-rn2(x)
-register int x;
+rn2(register int x)
 {
 #ifdef BETA
     if (x <= 0) {
@@ -36,8 +35,7 @@ register int x;
 /* 0 <= rnl(x) < x; sometimes subtracting Luck;
    good luck approaches 0, bad luck approaches (x-1) */
 int
-rnl(x)
-register int x;
+rnl(register int x)
 {
     register int i, adjustment;
 
@@ -80,8 +78,7 @@ register int x;
 
 /* 1 <= rnd(x) <= x */
 int
-rnd(x)
-register int x;
+rnd(register int x)
 {
 #ifdef BETA
     if (x <= 0) {
@@ -95,8 +92,7 @@ register int x;
 
 /* d(N,X) == NdX == dX+dX+...+dX N times; n <= d(n,x) <= (n*x) */
 int
-d(n, x)
-register int n, x;
+d(register int n, register int x)
 {
     register int tmp = n;
 
@@ -113,8 +109,7 @@ register int n, x;
 
 /* 1 <= rne(x) <= max(u.ulevel/3,5) */
 int
-rne(x)
-register int x;
+rne(register int x)
 {
     register int tmp, utmp;
 
@@ -136,8 +131,7 @@ register int x;
 
 /* rnz: everyone's favorite! */
 int
-rnz(i)
-int i;
+rnz(int i)
 {
 #ifdef LINT
     int x = i;

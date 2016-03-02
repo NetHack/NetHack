@@ -124,8 +124,7 @@ find_lev_obj()
  * infamous "HUP" cheat) get used up here.
  */
 void
-inven_inuse(quietly)
-boolean quietly;
+inven_inuse(boolean quietly)
 {
     register struct obj *otmp, *otmp2;
 
@@ -140,8 +139,7 @@ boolean quietly;
 }
 
 STATIC_OVL void
-restlevchn(fd)
-register int fd;
+restlevchn(register int fd)
 {
     int cnt;
     s_level *tmplev, *x;
@@ -163,9 +161,7 @@ register int fd;
 }
 
 STATIC_OVL void
-restdamage(fd, ghostly)
-int fd;
-boolean ghostly;
+restdamage(int fd, boolean ghostly)
 {
     int counter;
     struct damage *tmp_dam;
@@ -207,9 +203,7 @@ boolean ghostly;
 
 /* restore one object */
 STATIC_OVL void
-restobj(fd, otmp)
-int fd;
-struct obj *otmp;
+restobj(int fd, struct obj *otmp)
 {
     int buflen;
 
@@ -261,9 +255,7 @@ struct obj *otmp;
 }
 
 STATIC_OVL struct obj *
-restobjchn(fd, ghostly, frozen)
-register int fd;
-boolean ghostly, frozen;
+restobjchn(register int fd, boolean ghostly, boolean frozen)
 {
     register struct obj *otmp, *otmp2 = 0;
     register struct obj *first = (struct obj *) 0;
@@ -326,9 +318,7 @@ boolean ghostly, frozen;
 
 /* restore one monster */
 STATIC_OVL void
-restmon(fd, mtmp)
-int fd;
-struct monst *mtmp;
+restmon(int fd, struct monst *mtmp)
 {
     int buflen;
 
@@ -383,9 +373,7 @@ struct monst *mtmp;
 }
 
 STATIC_OVL struct monst *
-restmonchn(fd, ghostly)
-register int fd;
-boolean ghostly;
+restmonchn(register int fd, boolean ghostly)
 {
     register struct monst *mtmp, *mtmp2 = 0;
     register struct monst *first = (struct monst *) 0;
@@ -457,8 +445,7 @@ boolean ghostly;
 }
 
 STATIC_OVL struct fruit *
-loadfruitchn(fd)
-int fd;
+loadfruitchn(int fd)
 {
     register struct fruit *flist, *fnext;
 
@@ -473,8 +460,7 @@ int fd;
 }
 
 STATIC_OVL void
-freefruitchn(flist)
-register struct fruit *flist;
+freefruitchn(register struct fruit *flist)
 {
     register struct fruit *fnext;
 
@@ -486,8 +472,7 @@ register struct fruit *flist;
 }
 
 STATIC_OVL void
-ghostfruit(otmp)
-register struct obj *otmp;
+ghostfruit(register struct obj *otmp)
 {
     register struct fruit *oldf;
 
@@ -509,9 +494,7 @@ register struct obj *otmp;
 
 STATIC_OVL
 boolean
-restgamestate(fd, stuckid, steedid)
-register int fd;
-unsigned int *stuckid, *steedid;
+restgamestate(register int fd, unsigned int *stuckid, unsigned int *steedid)
 {
     struct flag newgameflags;
 #ifdef SYSFLAGS
@@ -674,8 +657,7 @@ unsigned int *stuckid, *steedid;
  * don't dereference a wild u.ustuck when saving the game state, for instance)
  */
 STATIC_OVL void
-restlevelstate(stuckid, steedid)
-unsigned int stuckid, steedid;
+restlevelstate(unsigned int stuckid, unsigned int steedid)
 {
     register struct monst *mtmp;
 
@@ -700,9 +682,8 @@ unsigned int stuckid, steedid;
 
 /*ARGSUSED*/
 STATIC_OVL int
-restlevelfile(fd, ltmp)
-int fd; /* fd used in MFLOPPY only */
-xchar ltmp;
+restlevelfile(int fd, /* fd used in MFLOPPY only */
+              xchar ltmp)
 {
     int nfd;
     char whynot[BUFSZ];
@@ -757,8 +738,7 @@ xchar ltmp;
 }
 
 int
-dorecover(fd)
-register int fd;
+dorecover(register int fd)
 {
     unsigned int stuckid = 0, steedid = 0; /* not a register */
     xchar ltmp;
@@ -899,9 +879,7 @@ register int fd;
 }
 
 void
-restcemetery(fd, cemeteryaddr)
-int fd;
-struct cemetery **cemeteryaddr;
+restcemetery(int fd, struct cemetery **cemeteryaddr)
 {
     struct cemetery *bonesinfo, **bonesaddr;
     int flag;
@@ -922,9 +900,7 @@ struct cemetery **cemeteryaddr;
 
 /*ARGSUSED*/
 STATIC_OVL void
-rest_levl(fd, rlecomp)
-int fd;
-boolean rlecomp;
+rest_levl(int fd, boolean rlecomp)
 {
 #ifdef RLECOMP
     short i, j;
@@ -959,8 +935,7 @@ boolean rlecomp;
 }
 
 void
-trickery(reason)
-char *reason;
+trickery(char *reason)
 {
     pline("Strange, this map is not as I remember it.");
     pline("Somebody is trying some trickery here...");
@@ -970,10 +945,7 @@ char *reason;
 }
 
 void
-getlev(fd, pid, lev, ghostly)
-int fd, pid;
-xchar lev;
-boolean ghostly;
+getlev(int fd, int pid, xchar lev, boolean ghostly)
 {
     register struct trap *trap;
     register struct monst *mtmp;
@@ -1158,9 +1130,7 @@ boolean ghostly;
 }
 
 void
-get_plname_from_file(fd, plbuf)
-int fd;
-char *plbuf;
+get_plname_from_file(int fd, char *plbuf)
 {
     int pltmpsiz = 0;
     (void) read(fd, (genericptr_t) &pltmpsiz, sizeof(pltmpsiz));
@@ -1169,8 +1139,7 @@ char *plbuf;
 }
 
 STATIC_OVL void
-restore_msghistory(fd)
-register int fd;
+restore_msghistory(register int fd)
 {
     int msgsize, msgcount = 0;
     char msg[BUFSZ];
@@ -1206,8 +1175,7 @@ clear_id_mapping()
 
 /* Add a mapping to the ID map. */
 STATIC_OVL void
-add_id_mapping(gid, nid)
-unsigned gid, nid;
+add_id_mapping(unsigned gid, unsigned nid)
 {
     int idx;
 
@@ -1231,8 +1199,7 @@ unsigned gid, nid;
  * ID.
  */
 boolean
-lookup_id_mapping(gid, nidp)
-unsigned gid, *nidp;
+lookup_id_mapping(unsigned gid, unsigned *nidp)
 {
     int i;
     struct bucket *curr;
@@ -1258,8 +1225,7 @@ unsigned gid, *nidp;
 }
 
 STATIC_OVL void
-reset_oattached_mids(ghostly)
-boolean ghostly;
+reset_oattached_mids(boolean ghostly)
 {
     struct obj *otmp;
     unsigned oldid, nid;
@@ -1286,8 +1252,7 @@ boolean ghostly;
 /* put up a menu listing each character from this player's saved games;
    returns 1: use plname[], 0: new game, -1: quit */
 int
-restore_menu(bannerwin)
-winid bannerwin; /* if not WIN_ERR, clear window and show copyright in menu */
+restore_menu(winid bannerwin) /* if not WIN_ERR, clear window and show copyright in menu */
 {
     winid tmpwin;
     anything any;
@@ -1361,10 +1326,7 @@ minit()
 }
 
 void
-mread(fd, buf, len)
-register int fd;
-register genericptr_t buf;
-register unsigned int len;
+mread(register int fd, register genericptr_t buf, register unsigned int len)
 {
     (*restoreprocs.restore_mread)(fd, buf, len);
     return;
@@ -1378,9 +1340,7 @@ register unsigned int len;
    Return -1 if it failed for some unknown reason.
  */
 int
-validate(fd, name)
-int fd;
-const char *name;
+validate(int fd, const char *name)
 {
     int rlen;
     struct savefile_info sfi;
@@ -1469,8 +1429,7 @@ reset_restpref()
 }
 
 void
-set_restpref(suitename)
-const char *suitename;
+set_restpref(const char *suitename)
 {
     if (!strcmpi(suitename, "externalcomp")) {
         restoreprocs.name = "externalcomp";
@@ -1537,10 +1496,7 @@ zerocomp_minit()
 }
 
 STATIC_OVL void
-zerocomp_mread(fd, buf, len)
-int fd;
-genericptr_t buf;
-register unsigned len;
+zerocomp_mread(int fd, genericptr_t buf, register unsigned len)
 {
     /*register int readlen = 0;*/
     if (fd < 0)
@@ -1572,10 +1528,7 @@ def_minit()
 }
 
 STATIC_OVL void
-def_mread(fd, buf, len)
-register int fd;
-register genericptr_t buf;
-register unsigned int len;
+def_mread(register int fd, register genericptr_t buf, register unsigned int len)
 {
     register int rlen;
 #if defined(BSD) || defined(ULTRIX)
