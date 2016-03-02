@@ -25,8 +25,7 @@ extern void NDECL(port_help);
 
 /* Returns "true" for characters that could represent a monster's stomach. */
 STATIC_OVL boolean
-is_swallow_sym(c)
-int c;
+is_swallow_sym(int c)
 {
     int i;
 
@@ -42,9 +41,7 @@ int c;
  * It is expected that buf is of size BUFSZ.
  */
 STATIC_OVL int
-append_str(buf, new_str)
-char *buf;
-const char *new_str;
+append_str(char *buf, const char *new_str)
 {
     int space_left; /* space remaining in buf */
 
@@ -59,8 +56,7 @@ const char *new_str;
 
 /* shared by monster probing (via query_objlist!) as well as lookat() */
 char *
-self_lookat(outbuf)
-char *outbuf;
+self_lookat(char *outbuf)
 {
     char race[QBUFSZ];
 
@@ -79,9 +75,7 @@ char *outbuf;
 
 /* extracted from lookat(); also used by namefloorobj() */
 boolean
-object_from_map(glyph, x, y, obj_p)
-int glyph, x, y;
-struct obj **obj_p;
+object_from_map(int glyph, int x, int y, struct obj **obj_p)
 {
     boolean fakeobj = FALSE;
     struct monst *mtmp;
@@ -118,9 +112,8 @@ struct obj **obj_p;
 }
 
 STATIC_OVL void
-look_at_object(buf, x, y, glyph)
-char *buf; /* output buffer */
-int x, y, glyph;
+look_at_object(char *buf, /* output buffer */
+               int x, int y, int glyph)
 {
     struct obj *otmp = 0;
     boolean fakeobj = object_from_map(glyph, x, y, &otmp);
@@ -148,10 +141,10 @@ int x, y, glyph;
 }
 
 STATIC_OVL void
-look_at_monster(buf, monbuf, mtmp, x, y)
-char *buf, *monbuf; /* buf: output, monbuf: optional output */
-struct monst *mtmp;
-int x, y;
+look_at_monster(char *buf,      /* output */
+                char *monbuf,   /* optional output */
+                struct monst *mtmp,
+                int x, int y)
 {
     char *name, monnambuf[BUFSZ];
     boolean accurate = !Hallucination;
@@ -254,9 +247,7 @@ int x, y;
  * If not hallucinating and the glyph is a monster, also monster data.
  */
 STATIC_OVL struct permonst *
-lookat(x, y, buf, monbuf)
-int x, y;
-char *buf, *monbuf;
+lookat(int x, int y, char *buf, char *monbuf)
 {
     struct monst *mtmp = (struct monst *) 0;
     struct permonst *pm = (struct permonst *) 0;
@@ -373,10 +364,7 @@ char *buf, *monbuf;
  *       Therefore, we create a copy of inp _just_ for data.base lookup.
  */
 STATIC_OVL void
-checkfile(inp, pm, user_typed_name, without_asking)
-char *inp;
-struct permonst *pm;
-boolean user_typed_name, without_asking;
+checkfile(char *inp, struct permonst *pm, boolean user_typed_name, boolean without_asking)
 {
     dlb *fp;
     char buf[BUFSZ], newstr[BUFSZ];
@@ -540,12 +528,7 @@ boolean user_typed_name, without_asking;
 }
 
 int
-do_screen_description(cc, looked, sym, out_str, firstmatch)
-coord cc;
-boolean looked;
-int sym;
-char *out_str;
-const char **firstmatch;
+do_screen_description(coord cc, boolean looked, int sym, char *out_str, const char **firstmatch)
 {
     boolean need_to_look = FALSE;
     int glyph = NO_GLYPH;
@@ -781,9 +764,7 @@ const char **firstmatch;
 const char what_is_an_unknown_object[] = "an unknown object";
 
 int
-do_look(mode, click_cc)
-int mode;
-coord *click_cc;
+do_look(int mode, coord *click_cc)
 {
     boolean quick = (mode == 1); /* use cursor; don't search for "more info" */
     boolean clicklook = (mode == 2); /* right mouse-click method */
@@ -979,9 +960,8 @@ coord *click_cc;
 }
 
 STATIC_OVL void
-look_all(nearby, do_mons)
-boolean nearby; /* True => within BOLTLIM, False => entire map */
-boolean do_mons; /* True => monsters, False => objects */
+look_all(boolean nearby, /* True => within BOLTLIM, False => entire map */
+         boolean do_mons)/* True => monsters, False => objects */
 {
     winid win;
     int x, y, lo_x, lo_y, hi_x, hi_y, glyph, count = 0;
@@ -1120,9 +1100,7 @@ doidtrap()
 }
 
 char *
-dowhatdoes_core(q, cbuf)
-char q;
-char *cbuf;
+dowhatdoes_core(char q, char *cbuf)
 {
     dlb *fp;
     char bufr[BUFSZ];
@@ -1240,8 +1218,7 @@ static const char *help_menu_items[] = {
 };
 
 STATIC_OVL boolean
-help_menu(sel)
-int *sel;
+help_menu(int *sel)
 {
     winid tmpwin = create_nhwindow(NHW_MENU);
 #ifdef PORT_HELP
