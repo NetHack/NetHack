@@ -45,9 +45,7 @@ static boolean wiz_error_flag = FALSE;
 static struct passwd *NDECL(get_unix_pw);
 
 int
-main(argc, argv)
-int argc;
-char *argv[];
+main(int argc, char *argv[])
 {
     register int fd;
 #ifdef CHDIR
@@ -323,9 +321,7 @@ attempt_restore:
 }
 
 static void
-process_options(argc, argv)
-int argc;
-char *argv[];
+process_options(int argc, char *argv[])
 {
     int i, l;
 
@@ -437,9 +433,7 @@ char *argv[];
 
 #ifdef CHDIR
 static void
-chdirx(dir, wr)
-const char *dir;
-boolean wr;
+chdirx(const char *dir, boolean wr)
 {
     if (dir /* User specified directory? */
 #ifdef HACKDIR
@@ -527,8 +521,7 @@ whoami()
 }
 
 void
-sethanguphandler(handler)
-void FDECL((*handler), (int));
+sethanguphandler(void FDECL((*handler), (int)))
 {
 #ifdef SA_RESTART
     /* don't want reads to restart.  If SA_RESTART is defined, we know
@@ -599,8 +592,7 @@ wd_message()
  * be room for the /
  */
 void
-append_slash(name)
-char *name;
+append_slash(char *name)
 {
     char *ptr;
 
@@ -615,8 +607,7 @@ char *name;
 }
 
 boolean
-check_user_string(optstr)
-char *optstr;
+check_user_string(char *optstr)
 {
     struct passwd *pw = get_unix_pw();
     int pwlen;

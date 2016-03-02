@@ -77,8 +77,7 @@ STATIC_VAR char tgotobuf[20];
 #endif /* TERMLIB */
 
 void
-tty_startup(wid, hgt)
-int *wid, *hgt;
+tty_startup(int *wid, int *hgt)
 {
     register int i;
 #ifdef TERMLIB
@@ -352,8 +351,7 @@ tty_shutdown()
 }
 
 void
-tty_number_pad(state)
-int state;
+tty_number_pad(int state)
 {
     switch (state) {
     case -1: /* activate keypad mode (escape sequences) */
@@ -515,8 +513,7 @@ tty_end_screen()
    in trampoli.[ch]. */
 
 void
-nocmov(x, y)
-int x, y;
+nocmov(int x, int y)
 {
     if ((int) ttyDisplay->cury > y) {
         if (UP) {
@@ -565,8 +562,7 @@ int x, y;
 }
 
 void
-cmov(x, y)
-register int x, y;
+cmov(register int x, register int y)
 {
     xputs(tgoto(nh_CM, x, y));
     ttyDisplay->cury = y;
@@ -575,19 +571,17 @@ register int x, y;
 
 /* See note above. xputc() is a special function. */
 void
-xputc(c)
 #if defined(apollo)
-    int c;
+xputc(int c)
 #else
-    char c;
+xputc(char c)
 #endif
 {
     (void) putchar(c);
 }
 
 void
-xputs(s)
-const char *s;
+xputs(const char *s)
 {
 #ifndef TERMLIB
     (void) fputs(s, stdout);
@@ -997,9 +991,7 @@ kill_hilite()
 #ifndef TOS
 /* find the foreground and background colors set by nh_HI or nh_HE */
 static void
-analyze_seq(str, fg, bg)
-char *str;
-int *fg, *bg;
+analyze_seq(char *str, int *fg, int *bg)
 {
     register int c, code;
     int len;
@@ -1164,8 +1156,7 @@ kill_hilite()
 static char nulstr[] = "";
 
 static char *
-s_atr2str(n)
-int n;
+s_atr2str(int n)
 {
     switch (n) {
     case ATR_ULINE:
@@ -1185,8 +1176,7 @@ int n;
 }
 
 static char *
-e_atr2str(n)
-int n;
+e_atr2str(int n)
 {
     switch (n) {
     case ATR_ULINE:
@@ -1202,8 +1192,7 @@ int n;
 }
 
 void
-term_start_attr(attr)
-int attr;
+term_start_attr(int attr)
 {
     if (attr) {
         xputs(s_atr2str(attr));
@@ -1211,8 +1200,7 @@ int attr;
 }
 
 void
-term_end_attr(attr)
-int attr;
+term_end_attr(int attr)
 {
     if (attr) {
         xputs(e_atr2str(attr));
@@ -1240,15 +1228,13 @@ term_end_color()
 }
 
 void
-term_start_color(color)
-int color;
+term_start_color(int color)
 {
     xputs(hilites[color]);
 }
 
 int
-has_color(color)
-int color;
+has_color(int color)
 {
 #ifdef X11_GRAPHICS
     /* XXX has_color() should be added to windowprocs */

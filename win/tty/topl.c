@@ -126,8 +126,7 @@ tty_doprev_message()
 }
 
 STATIC_OVL void
-redotoplin(str)
-const char *str;
+redotoplin(const char *str)
 {
     int otoplin = ttyDisplay->toplin;
     home();
@@ -168,8 +167,7 @@ remember_topl()
 }
 
 void
-addtopl(s)
-const char *s;
+addtopl(const char *s)
 {
     register struct WinDesc *cw = wins[WIN_MESSAGE];
 
@@ -219,8 +217,7 @@ more()
 }
 
 void
-update_topl(bp)
-register const char *bp;
+update_topl(register const char *bp)
 {
     register char *tl, *otl;
     register int n0;
@@ -272,8 +269,7 @@ register const char *bp;
 
 STATIC_OVL
 void
-topl_putsym(c)
-char c;
+topl_putsym(char c)
 {
     register struct WinDesc *cw = wins[WIN_MESSAGE];
 
@@ -314,16 +310,14 @@ char c;
 }
 
 void
-putsyms(str)
-const char *str;
+putsyms(const char *str)
 {
     while (*str)
         topl_putsym(*str++);
 }
 
 STATIC_OVL void
-removetopl(n)
-register int n;
+removetopl(register int n)
 {
     /* assume addtopl() has been done, so ttyDisplay->toplin is already set */
     while (n-- > 0)
@@ -333,9 +327,7 @@ register int n;
 extern char erase_char; /* from xxxtty.c; don't need kill_char */
 
 char
-tty_yn_function(query, resp, def)
-const char *query, *resp;
-char def;
+tty_yn_function(const char *query, const char *resp, char def)
 /*
  *   Generic yes/no function. 'def' is the default (returned by space or
  *   return; 'esc' returns 'q', or 'n', or the default, depending on
@@ -513,8 +505,7 @@ static char **snapshot_mesgs = 0;
 /* collect currently available message history data into a sequential array;
    optionally, purge that data from the active circular buffer set as we go */
 STATIC_OVL void
-msghistory_snapshot(purge)
-boolean purge; /* clear message history buffer as we copy it */
+msghistory_snapshot(boolean purge) /* clear message history buffer as we copy it */
 {
     char *mesg;
     int i, inidx, outidx;
@@ -559,8 +550,7 @@ boolean purge; /* clear message history buffer as we copy it */
 
 /* release memory allocated to message history snapshot */
 STATIC_OVL void
-free_msghistory_snapshot(purged)
-boolean purged; /* True: took history's pointers, False: just cloned them */
+free_msghistory_snapshot(boolean purged) /* True: took history's pointers, False: just cloned them */
 {
     if (snapshot_mesgs) {
         /* snapshot pointers are no longer in use */
@@ -590,8 +580,7 @@ boolean purged; /* True: took history's pointers, False: just cloned them */
  * included among the output of the subsequent calls.
  */
 char *
-tty_getmsghistory(init)
-boolean init;
+tty_getmsghistory(boolean init)
 {
     static int nxtidx;
     char *nextmesg;
@@ -631,9 +620,7 @@ boolean init;
  * message history for ^P recall without having displayed it.
  */
 void
-tty_putmsghistory(msg, restoring_msghist)
-const char *msg;
-boolean restoring_msghist;
+tty_putmsghistory(const char *msg, boolean restoring_msghist)
 {
     static boolean initd = FALSE;
     int idx;

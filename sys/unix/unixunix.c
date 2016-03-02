@@ -30,8 +30,7 @@ static struct stat buf;
 
 /* see whether we should throw away this xlock file */
 static int
-veryold(fd)
-int fd;
+veryold(int fd)
 {
     time_t date;
 
@@ -207,8 +206,7 @@ gotlock:
     }
 }
 
-void regularize(s) /* normalize file name - we don't like .'s, /'s, spaces */
-register char *s;
+void regularize(register char *s) /* normalize file name - we don't like .'s, /'s, spaces */
 {
     register char *lp;
 
@@ -242,8 +240,7 @@ register char *s;
 #include <poll.h>
 
 void
-msleep(msec)
-unsigned msec; /* milliseconds */
+msleep(unsigned msec) /* milliseconds */
 {
     struct pollfd unused;
     int msecs = msec; /* poll API is signed */
@@ -280,8 +277,7 @@ dosh()
 
 #if defined(SHELL) || defined(DEF_PAGER) || defined(DEF_MAILREADER)
 int
-child(wt)
-int wt;
+child(int wt)
 {
     register int f;
     suspend_nhwindows((char *) 0); /* also calls end_screen() */
@@ -338,8 +334,7 @@ extern int FDECL(nh_getresgid, (gid_t *, gid_t *, gid_t *));
 extern gid_t NDECL(nh_getgid);
 extern gid_t NDECL(nh_getegid);
 
-int(getresuid)(ruid, euid, suid)
-uid_t *ruid, *euid, *suid;
+int(getresuid)(uid_t *ruid, uid_t *euid, uid_t *suid)
 {
     return nh_getresuid(ruid, euid, suid);
 }
@@ -354,8 +349,7 @@ uid_t(geteuid)()
     return nh_geteuid();
 }
 
-int(getresgid)(rgid, egid, sgid)
-gid_t *rgid, *egid, *sgid;
+int(getresgid)(gid_t *rgid, gid_t *egid, gid_t *sgid)
 {
     return nh_getresgid(rgid, egid, sgid);
 }
