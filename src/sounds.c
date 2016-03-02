@@ -11,9 +11,7 @@ STATIC_DCL int FDECL(mon_in_room, (struct monst *, int));
 
 /* this easily could be a macro, but it might overtax dumb compilers */
 STATIC_OVL int
-mon_in_room(mon, rmtyp)
-struct monst *mon;
-int rmtyp;
+mon_in_room(struct monst *mon, int rmtyp)
 {
     int rno = levl[mon->mx][mon->my].roomno;
     if (rno >= ROOMOFFSET)
@@ -307,8 +305,7 @@ static const char *const h_sounds[] = {
 };
 
 const char *
-growl_sound(mtmp)
-register struct monst *mtmp;
+growl_sound(register struct monst *mtmp)
 {
     const char *ret;
 
@@ -350,8 +347,7 @@ register struct monst *mtmp;
 
 /* the sounds of a seriously abused pet, including player attacking it */
 void
-growl(mtmp)
-register struct monst *mtmp;
+growl(register struct monst *mtmp)
 {
     register const char *growl_verb = 0;
 
@@ -373,8 +369,7 @@ register struct monst *mtmp;
 
 /* the sounds of mistreated pets */
 void
-yelp(mtmp)
-register struct monst *mtmp;
+yelp(register struct monst *mtmp)
 {
     register const char *yelp_verb = 0;
 
@@ -416,8 +411,7 @@ register struct monst *mtmp;
 
 /* the sounds of distressed pets */
 void
-whimper(mtmp)
-register struct monst *mtmp;
+whimper(register struct monst *mtmp)
 {
     register const char *whimper_verb = 0;
 
@@ -450,8 +444,7 @@ register struct monst *mtmp;
 
 /* pet makes "I'm hungry" noises */
 void
-beg(mtmp)
-register struct monst *mtmp;
+beg(register struct monst *mtmp)
 {
     if (mtmp->msleeping || !mtmp->mcanmove
         || !(carnivorous(mtmp->data) || herbivorous(mtmp->data)))
@@ -469,8 +462,7 @@ register struct monst *mtmp;
 
 /* return True if mon is a gecko or seems to look like one (hallucination) */
 STATIC_OVL boolean
-mon_is_gecko(mon)
-struct monst *mon;
+mon_is_gecko(struct monst *mon)
 {
     int glyph;
 
@@ -488,8 +480,7 @@ struct monst *mon;
 }
 
 STATIC_OVL int
-domonnoise(mtmp)
-register struct monst *mtmp;
+domonnoise(register struct monst *mtmp)
 {
     char verbuf[BUFSZ];
     register const char *pline_msg = 0, /* Monnam(mtmp) will be prepended */
@@ -1103,8 +1094,7 @@ char *sounddir = ".";
 
 /* adds a sound file mapping, returns 0 on failure, 1 on success */
 int
-add_sound_mapping(mapping)
-const char *mapping;
+add_sound_mapping(const char *mapping)
 {
     char text[256];
     char filename[256];
@@ -1151,8 +1141,7 @@ const char *mapping;
 }
 
 void
-play_sound_for_message(msg)
-const char *msg;
+play_sound_for_message(const char *msg)
 {
     audio_mapping *cursor = soundmap;
 

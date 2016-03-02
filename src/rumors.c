@@ -55,8 +55,7 @@ static unsigned oracle_cnt = 0;
 static unsigned long *oracle_loc = 0;
 
 STATIC_OVL void
-init_rumors(fp)
-dlb *fp;
+init_rumors(dlb *fp)
 {
     static const char rumors_header[] = "%d,%ld,%lx;%d,%ld,%lx;0,0,%lx\n";
     int true_count, false_count; /* in file but not used here */
@@ -86,10 +85,9 @@ dlb *fp;
  * of them contain such references anyway.
  */
 char *
-getrumor(truth, rumor_buf, exclude_cookie)
-int truth; /* 1=true, -1=false, 0=either */
-char *rumor_buf;
-boolean exclude_cookie;
+getrumor(int truth, /* 1=true, -1=false, 0=either */
+         char *rumor_buf,
+         boolean exclude_cookie)
 {
     dlb *rumors;
     long tidbit, beginning;
@@ -278,9 +276,7 @@ rumor_check()
 
 /* Gets a random line of text from file 'fname', and returns it. */
 char *
-get_rnd_text(fname, buf)
-const char *fname;
-char *buf;
+get_rnd_text(const char *fname, char *buf)
 {
     dlb *fh;
 
@@ -319,9 +315,8 @@ char *buf;
 }
 
 void
-outrumor(truth, mechanism)
-int truth; /* 1=true, -1=false, 0=either */
-int mechanism;
+outrumor(int truth, /* 1=true, -1=false, 0=either */
+         int mechanism)
 {
     static const char fortune_msg[] =
         "This cookie has a scrap of paper inside.";
@@ -364,8 +359,7 @@ int mechanism;
 }
 
 STATIC_OVL void
-init_oracles(fp)
-dlb *fp;
+init_oracles(dlb *fp)
 {
     register int i;
     char line[BUFSZ];
@@ -386,8 +380,7 @@ dlb *fp;
 }
 
 void
-save_oracles(fd, mode)
-int fd, mode;
+save_oracles(int fd, int mode)
 {
     if (perform_bwrite(mode)) {
         bwrite(fd, (genericptr_t) &oracle_cnt, sizeof oracle_cnt);
@@ -403,8 +396,7 @@ int fd, mode;
 }
 
 void
-restore_oracles(fd)
-int fd;
+restore_oracles(int fd)
 {
     mread(fd, (genericptr_t) &oracle_cnt, sizeof oracle_cnt);
     if (oracle_cnt) {
@@ -415,9 +407,7 @@ int fd;
 }
 
 void
-outoracle(special, delphi)
-boolean special;
-boolean delphi;
+outoracle(boolean special, boolean delphi)
 {
     char line[COLNO];
     char *endp;
@@ -474,8 +464,7 @@ boolean delphi;
 }
 
 int
-doconsult(oracl)
-struct monst *oracl;
+doconsult(struct monst *oracl)
 {
     long umoney;
     int u_pay, minor_cost = 50, major_cost = 500 + 50 * u.ulevel;
