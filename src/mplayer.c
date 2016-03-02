@@ -67,9 +67,7 @@ dev_name()
 }
 
 STATIC_OVL void
-get_mplname(mtmp, nam)
-register struct monst *mtmp;
-char *nam;
+get_mplname(register struct monst *mtmp, char *nam)
 {
     boolean fmlkind = is_female(mtmp->data);
     const char *devnam;
@@ -92,9 +90,7 @@ char *nam;
 }
 
 STATIC_OVL void
-mk_mplayer_armor(mon, typ)
-struct monst *mon;
-short typ;
+mk_mplayer_armor(struct monst *mon, short typ)
 {
     struct obj *obj;
 
@@ -116,10 +112,7 @@ short typ;
 }
 
 struct monst *
-mk_mplayer(ptr, x, y, special)
-register struct permonst *ptr;
-xchar x, y;
-register boolean special;
+mk_mplayer(register struct permonst *ptr, xchar x, xchar y, register boolean special)
 {
     register struct monst *mtmp;
     char nam[PL_NSIZ];
@@ -324,9 +317,7 @@ register boolean special;
  * fill up the overflow.
  */
 void
-create_mplayers(num, special)
-register int num;
-boolean special;
+create_mplayers(register int num, boolean special)
 {
     int pm, x, y;
     struct monst fakemon;
@@ -354,8 +345,7 @@ boolean special;
 }
 
 void
-mplayer_talk(mtmp)
-register struct monst *mtmp;
+mplayer_talk(register struct monst *mtmp)
 {
     static const char *same_class_msg[3] =
         {
