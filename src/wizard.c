@@ -85,8 +85,7 @@ amulet()
 }
 
 int
-mon_has_amulet(mtmp)
-register struct monst *mtmp;
+mon_has_amulet(register struct monst *mtmp)
 {
     register struct obj *otmp;
 
@@ -97,8 +96,7 @@ register struct monst *mtmp;
 }
 
 int
-mon_has_special(mtmp)
-register struct monst *mtmp;
+mon_has_special(register struct monst *mtmp)
 {
     register struct obj *otmp;
 
@@ -125,8 +123,7 @@ register struct monst *mtmp;
 #define M_Wants(mask) (mtmp->data->mflags3 & (mask))
 
 STATIC_OVL short
-which_arti(mask)
-register int mask;
+which_arti(register int mask)
 {
     switch (mask) {
     case M3_WANTSAMUL:
@@ -149,9 +146,7 @@ register int mask;
  *      artifacts right now.  [MRS]
  */
 STATIC_OVL boolean
-mon_has_arti(mtmp, otyp)
-register struct monst *mtmp;
-register short otyp;
+mon_has_arti(register struct monst *mtmp, register short otyp)
 {
     register struct obj *otmp;
 
@@ -166,9 +161,7 @@ register short otyp;
 }
 
 STATIC_OVL struct monst *
-other_mon_has_arti(mtmp, otyp)
-register struct monst *mtmp;
-register short otyp;
+other_mon_has_arti(register struct monst *mtmp, register short otyp)
 {
     register struct monst *mtmp2;
 
@@ -182,8 +175,7 @@ register short otyp;
 }
 
 STATIC_OVL struct obj *
-on_ground(otyp)
-register short otyp;
+on_ground(register short otyp)
 {
     register struct obj *otmp;
 
@@ -197,8 +189,7 @@ register short otyp;
 }
 
 STATIC_OVL boolean
-you_have(mask)
-register int mask;
+you_have(register int mask)
 {
     switch (mask) {
     case M3_WANTSAMUL:
@@ -218,9 +209,7 @@ register int mask;
 }
 
 STATIC_OVL unsigned long
-target_on(mask, mtmp)
-register int mask;
-register struct monst *mtmp;
+target_on(register int mask, register struct monst *mtmp)
 {
     register short otyp;
     register struct obj *otmp;
@@ -246,8 +235,7 @@ register struct monst *mtmp;
 }
 
 STATIC_OVL unsigned long
-strategy(mtmp)
-register struct monst *mtmp;
+strategy(register struct monst *mtmp)
 {
     unsigned long strat, dstrat;
 
@@ -307,8 +295,7 @@ register struct monst *mtmp;
 }
 
 int
-tactics(mtmp)
-register struct monst *mtmp;
+tactics(register struct monst *mtmp)
 {
     unsigned long strat = strategy(mtmp);
 
@@ -445,8 +432,7 @@ pick_nasty()
 /* create some nasty monsters, aligned or neutral with the caster */
 /* a null caster defaults to a chaotic caster (e.g. the wizard) */
 int
-nasty(mcast)
-struct monst *mcast;
+nasty(struct monst *mcast)
 {
     register struct monst *mtmp;
     register int i, j, tmp;
@@ -619,8 +605,7 @@ const char *const random_malediction[] = {
 
 /* Insult or intimidate the player */
 void
-cuss(mtmp)
-register struct monst *mtmp;
+cuss(register struct monst *mtmp)
 {
     if (Deaf)
         return;

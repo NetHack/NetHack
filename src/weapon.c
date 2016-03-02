@@ -51,8 +51,7 @@ STATIC_VAR NEARDATA const char *const barehands_or_martial[] = {
 };
 
 STATIC_OVL void
-give_may_advance_msg(skill)
-int skill;
+give_may_advance_msg(int skill)
 {
     You_feel("more confident in your %sskills.",
              skill == P_NONE ? "" : skill <= P_LAST_WEAPON
@@ -83,8 +82,7 @@ static NEARDATA const char kebabable[] = { S_XORN, S_DRAGON, S_JABBERWOCK,
    mostly used to shorten "you drop your <weapon>" messages when slippery
    fingers or polymorph causes hero to involuntarily drop wielded weapon(s) */
 const char *
-weapon_descr(obj)
-struct obj *obj;
+weapon_descr(struct obj *obj)
 {
     int skill = weapon_type(obj);
     const char *descr = P_NAME(skill);
@@ -139,9 +137,7 @@ struct obj *obj;
  *      of "otmp" against the monster.
  */
 int
-hitval(otmp, mon)
-struct obj *otmp;
-struct monst *mon;
+hitval(struct obj *otmp, struct monst *mon)
 {
     int tmp = 0;
     struct permonst *ptr = mon->data;
@@ -209,9 +205,7 @@ struct monst *mon;
  *      of "otmp" against the monster.
  */
 int
-dmgval(otmp, mon)
-struct obj *otmp;
-struct monst *mon;
+dmgval(struct obj *otmp, struct monst *mon)
 {
     int tmp = 0, otyp = otmp->otyp;
     struct permonst *ptr = mon->data;
@@ -357,9 +351,7 @@ STATIC_DCL struct obj *FDECL(oselect, (struct monst *, int));
         return otmp;
 
 STATIC_OVL struct obj *
-oselect(mtmp, x)
-struct monst *mtmp;
-int x;
+oselect(struct monst *mtmp, int x)
 {
     struct obj *otmp;
 
@@ -392,8 +384,7 @@ static struct obj *propellor;
 
 /* select a ranged weapon for the monster */
 struct obj *
-select_rwep(mtmp)
-register struct monst *mtmp;
+select_rwep(register struct monst *mtmp)
 {
     register struct obj *otmp;
     struct obj *mwep;
@@ -526,8 +517,7 @@ static const NEARDATA short hwep[] = {
 
 /* select a hand to hand weapon for the monster */
 struct obj *
-select_hwep(mtmp)
-register struct monst *mtmp;
+select_hwep(register struct monst *mtmp)
 {
     register struct obj *otmp;
     register int i;
@@ -567,9 +557,7 @@ register struct monst *mtmp;
  * otherwise never unwield stuff on their own.  Might print message.
  */
 void
-possibly_unwield(mon, polyspot)
-struct monst *mon;
-boolean polyspot;
+possibly_unwield(struct monst *mon, boolean polyspot)
 {
     struct obj *obj, *mw_tmp;
 
@@ -622,8 +610,7 @@ boolean polyspot;
  * Returns 1 if the monster took time to do it, 0 if it did not.
  */
 int
-mon_wield_item(mon)
-register struct monst *mon;
+mon_wield_item(register struct monst *mon)
 {
     struct obj *obj;
 
@@ -730,8 +717,7 @@ register struct monst *mon;
 
 /* force monster to stop wielding current weapon, if any */
 void
-mwepgone(mon)
-struct monst *mon;
+mwepgone(struct monst *mon)
 {
     struct obj *mwep = MON_WEP(mon);
 
@@ -808,10 +794,9 @@ dbon()
 
 /* increase a towel's wetness */
 void
-wet_a_towel(obj, amt, verbose)
-struct obj *obj;
-int amt; /* positive: new value; negative: increment by -amt; zero: no-op */
-boolean verbose;
+wet_a_towel(struct obj *obj,
+            int amt, /* positive: new value; negative: increment by -amt; zero: no-op */
+            boolean verbose)
 {
     int newspe = (amt <= 0) ? obj->spe - amt : amt;
 
@@ -840,10 +825,9 @@ boolean verbose;
 
 /* decrease a towel's wetness */
 void
-dry_a_towel(obj, amt, verbose)
-struct obj *obj;
-int amt; /* positive: new value; negative: decrement by -amt; zero: no-op */
-boolean verbose;
+dry_a_towel(struct obj *obj,
+            int amt, /* positive: new value; negative: decrement by -amt; zero: no-op */
+            boolean verbose)
 {
     int newspe = (amt <= 0) ? obj->spe + amt : amt;
 
@@ -869,9 +853,7 @@ boolean verbose;
 
 /* copy the skill level name into the given buffer */
 STATIC_OVL char *
-skill_level_name(skill, buf)
-int skill;
-char *buf;
+skill_level_name(int skill, char *buf)
 {
     const char *ptr;
 
@@ -905,8 +887,7 @@ char *buf;
 
 /* return the # of slots required to advance the skill */
 STATIC_OVL int
-slots_required(skill)
-int skill;
+slots_required(int skill)
 {
     int tmp = P_SKILL(skill);
 
@@ -931,9 +912,7 @@ int skill;
 /* return true if this skill can be advanced */
 /*ARGSUSED*/
 STATIC_OVL boolean
-can_advance(skill, speedy)
-int skill;
-boolean speedy;
+can_advance(int skill, boolean speedy)
 {
     if (P_RESTRICTED(skill)
         || P_SKILL(skill) >= P_MAX_SKILL(skill)
@@ -950,8 +929,7 @@ boolean speedy;
 
 /* return true if this skill could be advanced if more slots were available */
 STATIC_OVL boolean
-could_advance(skill)
-int skill;
+could_advance(int skill)
 {
     if (P_RESTRICTED(skill)
         || P_SKILL(skill) >= P_MAX_SKILL(skill)
@@ -965,8 +943,7 @@ int skill;
 /* return true if this skill has reached its maximum and there's been enough
    practice to become eligible for the next step if that had been possible */
 STATIC_OVL boolean
-peaked_skill(skill)
-int skill;
+peaked_skill(int skill)
 {
     if (P_RESTRICTED(skill))
         return FALSE;
@@ -977,8 +954,7 @@ int skill;
 }
 
 STATIC_OVL void
-skill_advance(skill)
-int skill;
+skill_advance(int skill)
 {
     u.weapon_slots -= slots_required(skill);
     P_SKILL(skill)++;
@@ -1150,8 +1126,8 @@ enhance_weapon_skill()
  * function may be called with with P_NONE.  Used in pray.c.
  */
 void
-unrestrict_weapon_skill(skill)
-int skill;
+unrestrict_weapon_skill(int skill)
+
 {
     if (skill < P_NUM_SKILLS && P_RESTRICTED(skill)) {
         P_SKILL(skill) = P_UNSKILLED;
@@ -1161,9 +1137,7 @@ int skill;
 }
 
 void
-use_skill(skill, degree)
-int skill;
-int degree;
+use_skill(int skill, int degree)
 {
     boolean advance_before;
 
@@ -1176,8 +1150,7 @@ int degree;
 }
 
 void
-add_weapon_skill(n)
-int n; /* number of slots to gain; normally one */
+add_weapon_skill(int n) /* number of slots to gain; normally one */
 {
     int i, before, after;
 
@@ -1193,8 +1166,7 @@ int n; /* number of slots to gain; normally one */
 }
 
 void
-lose_weapon_skill(n)
-int n; /* number of slots to lose; normally one */
+lose_weapon_skill(int n) /* number of slots to lose; normally one */
 {
     int skill;
 
@@ -1217,8 +1189,7 @@ int n; /* number of slots to lose; normally one */
 }
 
 int
-weapon_type(obj)
-struct obj *obj;
+weapon_type(struct obj *obj)
 {
     /* KMH -- now uses the object table */
     int type;
@@ -1245,8 +1216,7 @@ uwep_skill_type()
  * Treat restricted weapons as unskilled.
  */
 int
-weapon_hit_bonus(weapon)
-struct obj *weapon;
+weapon_hit_bonus(struct obj *weapon)
 {
     int type, wep_type, skill, bonus = 0;
     static const char bad_skill[] = "weapon_hit_bonus: bad skill %d";
@@ -1340,8 +1310,7 @@ struct obj *weapon;
  * Treat restricted weapons as unskilled.
  */
 int
-weapon_dam_bonus(weapon)
-struct obj *weapon;
+weapon_dam_bonus(struct obj *weapon)
 {
     int type, wep_type, skill, bonus = 0;
 
@@ -1434,8 +1403,7 @@ struct obj *weapon;
  * maximums.
  */
 void
-skill_init(class_skill)
-const struct def_skill *class_skill;
+skill_init(const struct def_skill *class_skill)
 {
     struct obj *obj;
     int skmax, skill;
@@ -1504,9 +1472,7 @@ const struct def_skill *class_skill;
 }
 
 void
-setmnotwielded(mon, obj)
-register struct monst *mon;
-register struct obj *obj;
+setmnotwielded(register struct monst *mon, register struct obj *obj)
 {
     if (!obj)
         return;

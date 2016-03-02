@@ -5,8 +5,7 @@
 #include "hack.h"
 
 void
-were_change(mon)
-register struct monst *mon;
+were_change(register struct monst *mon)
 {
     if (!is_were(mon->data))
         return;
@@ -40,8 +39,7 @@ register struct monst *mon;
 }
 
 int
-counter_were(pm)
-int pm;
+counter_were(int pm)
 {
     switch (pm) {
     case PM_WEREWOLF:
@@ -63,8 +61,7 @@ int pm;
 
 /* convert monsters similar to werecritters into appropriate werebeast */
 int
-were_beastie(pm)
-int pm;
+were_beastie(int pm)
 {
     switch (pm) {
     case PM_WERERAT:
@@ -89,8 +86,7 @@ int pm;
 }
 
 void
-new_were(mon)
-register struct monst *mon;
+new_were(register struct monst *mon)
 {
     register int pm;
 
@@ -118,12 +114,10 @@ register struct monst *mon;
     possibly_unwield(mon, FALSE);
 }
 
-int were_summon(ptr, yours, visible,
-                genbuf) /* were-creature (even you) summons a horde */
-register struct permonst *ptr;
-register boolean yours;
-int *visible; /* number of visible helpers created */
-char *genbuf;
+int were_summon(register struct permonst *ptr,
+                register boolean yours,
+                int *visible,/* number of visible helpers created */
+                char *genbuf) /* were-creature (even you) summons a horde */
 {
     register int i, typ, pm = monsndx(ptr);
     register struct monst *mtmp;
@@ -187,8 +181,7 @@ you_were()
 }
 
 void
-you_unwere(purify)
-boolean purify;
+you_unwere(boolean purify)
 {
     boolean controllable_poly = Polymorph_control && !(Stunned || Unaware);
 

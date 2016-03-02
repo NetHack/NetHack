@@ -173,16 +173,14 @@ genl_can_suspend_yes(VOID_ARGS)
 
 STATIC_OVL
 void
-def_raw_print(s)
-const char *s;
+def_raw_print(const char *s)
 {
     puts(s);
 }
 
 #ifdef WINCHAIN
 static struct win_choices *
-win_choices_find(s)
-const char *s;
+win_choices_find(const char *s)
 {
     register int i;
 
@@ -196,8 +194,7 @@ const char *s;
 #endif
 
 void
-choose_windows(s)
-const char *s;
+choose_windows(const char *s)
 {
     register int i;
 
@@ -246,8 +243,7 @@ const char *s;
 
 #ifdef WINCHAIN
 void
-addto_windowchain(s)
-const char *s;
+addto_windowchain(const char *s)
 {
     register int i;
 
@@ -355,10 +351,7 @@ commit_windowchain()
  */
 /*ARGSUSED*/
 char
-genl_message_menu(let, how, mesg)
-char let UNUSED;
-int how UNUSED;
-const char *mesg;
+genl_message_menu(char let UNUSED, int how UNUSED, const char *mesg)
 {
     pline("%s", mesg);
     return 0;
@@ -366,8 +359,7 @@ const char *mesg;
 
 /*ARGSUSED*/
 void
-genl_preference_update(pref)
-const char *pref UNUSED;
+genl_preference_update(const char *pref UNUSED)
 {
     /* window ports are expected to provide
        their own preference update routine
@@ -378,8 +370,7 @@ const char *pref UNUSED;
 }
 
 char *
-genl_getmsghistory(init)
-boolean init UNUSED;
+genl_getmsghistory(boolean init UNUSED)
 {
     /* window ports can provide
        their own getmsghistory() routine to
@@ -396,9 +387,7 @@ boolean init UNUSED;
 }
 
 void
-genl_putmsghistory(msg, is_restoring)
-const char *msg;
-boolean is_restoring;
+genl_putmsghistory(const char *msg, boolean is_restoring)
 {
     /* window ports can provide
        their own putmsghistory() routine to
@@ -554,8 +543,7 @@ nhwindows_hangup()
 }
 
 static void
-hup_exit_nhwindows(lastgasp)
-const char *lastgasp;
+hup_exit_nhwindows(const char *lastgasp)
 {
     /* core has called exit_nhwindows(); call the previous interface's
        shutdown routine now; xxx_exit_nhwindows() needs to call other
@@ -576,9 +564,7 @@ hup_nhgetch(VOID_ARGS)
 
 /*ARGSUSED*/
 static char
-hup_yn_function(prompt, resp, deflt)
-const char *prompt UNUSED, *resp UNUSED;
-char deflt;
+hup_yn_function(const char *prompt UNUSED, const char *resp UNUSED, char deflt)
 {
     if (!deflt)
         deflt = '\033';
@@ -587,124 +573,91 @@ char deflt;
 
 /*ARGSUSED*/
 static int
-hup_nh_poskey(x, y, mod)
-int *x UNUSED, *y UNUSED, *mod UNUSED;
+hup_nh_poskey(int *x UNUSED, int *y UNUSED, int *mod UNUSED)
 {
     return '\033';
 }
 
 /*ARGSUSED*/
 static void
-hup_getlin(prompt, outbuf)
-const char *prompt UNUSED;
-char *outbuf;
+hup_getlin(const char *prompt UNUSED, char *outbuf)
 {
     Strcpy(outbuf, "\033");
 }
 
 /*ARGSUSED*/
 static void
-hup_init_nhwindows(argc_p, argv)
-int *argc_p UNUSED;
-char **argv UNUSED;
+hup_init_nhwindows(int *argc_p UNUSED, char **argv UNUSED)
 {
     iflags.window_inited = 1;
 }
 
 /*ARGUSED*/
 static winid
-hup_create_nhwindow(type)
-int type UNUSED;
+hup_create_nhwindow(int type UNUSED)
 {
     return WIN_ERR;
 }
 
 /*ARGSUSED*/
 static int
-hup_select_menu(window, how, menu_list)
-winid window UNUSED;
-int how UNUSED;
-struct mi **menu_list UNUSED;
+hup_select_menu(winid window UNUSED, int how UNUSED, struct mi **menu_list UNUSED)
 {
     return -1;
 }
 
 /*ARGSUSED*/
 static void
-hup_add_menu(window, glyph, identifier, sel, grpsel, attr, txt, preselected)
-winid window UNUSED;
-int glyph UNUSED, attr UNUSED;
-const anything *identifier UNUSED;
-char sel UNUSED, grpsel UNUSED;
-const char *txt UNUSED;
-boolean preselected UNUSED;
+hup_add_menu(winid window UNUSED, int glyph UNUSED, const anything *identifier UNUSED, char sel UNUSED, char grpsel UNUSED, int attr UNUSED, const char *txt UNUSED, boolean preselected UNUSED)
 {
     return;
 }
 
 /*ARGSUSED*/
 static void
-hup_end_menu(window, prompt)
-winid window UNUSED;
-const char *prompt UNUSED;
+hup_end_menu(winid window UNUSED, const char *prompt UNUSED)
 {
     return;
 }
 
 /*ARGSUSED*/
 static void
-hup_putstr(window, attr, text)
-winid window UNUSED;
-int attr UNUSED;
-const char *text UNUSED;
+hup_putstr(winid window UNUSED, int attr UNUSED, const char *text UNUSED)
 {
     return;
 }
 
 /*ARGSUSED*/
 static void
-hup_print_glyph(window, x, y, glyph, bkglyph)
-winid window UNUSED;
-xchar x UNUSED, y UNUSED;
-int glyph UNUSED;
-int bkglyph UNUSED;
+hup_print_glyph(winid window UNUSED, xchar x UNUSED, xchar y UNUSED, int glyph UNUSED, int bkglyph UNUSED)
 {
     return;
 }
 
 /*ARGSUSED*/
 static void
-hup_outrip(tmpwin, how, when)
-winid tmpwin UNUSED;
-int how UNUSED;
-time_t when UNUSED;
+hup_outrip(winid tmpwin UNUSED, int how UNUSED, time_t when UNUSED)
 {
     return;
 }
 
 /*ARGSUSED*/
 static void
-hup_curs(window, x, y)
-winid window UNUSED;
-int x UNUSED, y UNUSED;
+hup_curs(winid window UNUSED, int x UNUSED, int y UNUSED)
 {
     return;
 }
 
 /*ARGSUSED*/
 static void
-hup_display_nhwindow(window, blocking)
-winid window UNUSED;
-boolean blocking UNUSED;
+hup_display_nhwindow(winid window UNUSED, boolean blocking UNUSED)
 {
     return;
 }
 
 /*ARGSUSED*/
 static void
-hup_display_file(fname, complain)
-const char *fname UNUSED;
-boolean complain UNUSED;
+hup_display_file(const char *fname UNUSED, boolean complain UNUSED)
 {
     return;
 }
@@ -712,8 +665,7 @@ boolean complain UNUSED;
 #ifdef CLIPPING
 /*ARGSUSED*/
 static void
-hup_cliparound(x, y)
-int x UNUSED, y UNUSED;
+hup_cliparound(int x UNUSED, int y UNUSED)
 {
     return;
 }
@@ -722,9 +674,7 @@ int x UNUSED, y UNUSED;
 #ifdef CHANGE_COLOR
 /*ARGSUSED*/
 static void
-hup_change_color(color, rgb, reverse)
-int color, reverse;
-long rgb;
+hup_change_color(int color, long rgb, int reverse)
 {
     return;
 }
@@ -732,9 +682,7 @@ long rgb;
 #ifdef MAC
 /*ARGSUSED*/
 static short
-hup_set_font_name(window, fontname)
-winid window;
-char *fontname;
+hup_set_font_name(winid window, char *fontname)
 {
     return 0;
 }
@@ -750,9 +698,7 @@ hup_get_color_string(VOID_ARGS)
 #ifdef STATUS_VIA_WINDOWPORT
 /*ARGSUSED*/
 static void
-hup_status_update(idx, ptr, chg, percent)
-int idx UNUSED, chg UNUSED, percent UNUSED;
-genericptr_t ptr UNUSED;
+hup_status_update(int idx UNUSED, genericptr_t ptr UNUSED, int chg UNUSED, int percent UNUSED)
 {
     return;
 }
@@ -776,24 +722,21 @@ hup_void_ndecl(VOID_ARGS)
 
 /*ARGUSED*/
 static void
-hup_void_fdecl_int(arg)
-int arg UNUSED;
+hup_void_fdecl_int(int arg UNUSED)
 {
     return;
 }
 
 /*ARGUSED*/
 static void
-hup_void_fdecl_winid(window)
-winid window UNUSED;
+hup_void_fdecl_winid(winid window UNUSED)
 {
     return;
 }
 
 /*ARGUSED*/
 static void
-hup_void_fdecl_constchar_p(string)
-const char *string UNUSED;
+hup_void_fdecl_constchar_p(const char *string UNUSED)
 {
     return;
 }
@@ -842,11 +785,7 @@ genl_status_finish()
 }
 
 void
-genl_status_enablefield(fieldidx, nm, fmt, enable)
-int fieldidx;
-const char *nm;
-const char *fmt;
-boolean enable;
+genl_status_enablefield(int fieldidx, const char *nm, const char *fmt, boolean enable)
 {
     status_fieldfmt[fieldidx] = fmt;
     status_fieldnm[fieldidx] = nm;
@@ -854,9 +793,7 @@ boolean enable;
 }
 
 void
-genl_status_update(idx, ptr, chg, percent)
-int idx, chg, percent;
-genericptr_t ptr;
+genl_status_update(int idx, genericptr_t ptr, int chg, int percent)
 {
     char newbot1[MAXCO], newbot2[MAXCO];
     long cond, *condptr = (long *) ptr;
@@ -922,10 +859,7 @@ genericptr_t ptr;
 
 #ifdef STATUS_HILITES
 void
-genl_status_threshold(fldidx, thresholdtype, threshold, behavior, under, over)
-int fldidx, thresholdtype;
-int behavior, under, over;
-anything threshold;
+genl_status_threshold(int fldidx, int thresholdtype, anything threshold, int behavior, int under, int over)
 {
     return;
 }

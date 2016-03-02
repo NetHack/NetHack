@@ -80,8 +80,7 @@ STATIC_DCL int FDECL(ready_weapon, (struct obj *));
  * to print the appropriate messages.
  */
 void
-setuwep(obj)
-register struct obj *obj;
+setuwep(register struct obj *obj)
 {
     struct obj *olduwep = uwep;
 
@@ -111,8 +110,7 @@ register struct obj *obj;
 }
 
 STATIC_OVL boolean
-cant_wield_corpse(obj)
-struct obj *obj;
+cant_wield_corpse(struct obj *obj)
 {
     char kbuf[BUFSZ];
 
@@ -130,8 +128,7 @@ struct obj *obj;
 }
 
 STATIC_OVL int
-ready_weapon(wep)
-struct obj *wep;
+ready_weapon(struct obj *wep)
 {
     /* Separated function so swapping works easily */
     int res = 0;
@@ -215,16 +212,14 @@ struct obj *wep;
 }
 
 void
-setuqwep(obj)
-register struct obj *obj;
+setuqwep(register struct obj *obj)
 {
     setworn(obj, W_QUIVER);
     update_inventory();
 }
 
 void
-setuswapwep(obj)
-register struct obj *obj;
+setuswapwep(register struct obj *obj)
 {
     setworn(obj, W_SWAPWEP);
     update_inventory();
@@ -398,9 +393,8 @@ dowieldquiver()
 
 /* used for #rub and for applying pick-axe, whip, grappling hook or polearm */
 boolean
-wield_tool(obj, verb)
-struct obj *obj;
-const char *verb; /* "rub",&c */
+wield_tool(struct obj *obj,
+           const char *verb) /* "rub",&c */
 {
     const char *what;
     boolean more_than_1;
@@ -596,9 +590,7 @@ untwoweapon()
 }
 
 int
-chwepon(otmp, amount)
-register struct obj *otmp;
-register int amount;
+chwepon(register struct obj *otmp, register int amount)
 {
     const char *color = hcolor((amount < 0) ? NH_BLACK : NH_BLUE);
     const char *xtime, *wepname = "";
@@ -718,8 +710,7 @@ register int amount;
 }
 
 int
-welded(obj)
-register struct obj *obj;
+welded(register struct obj *obj)
 {
     if (obj && obj == uwep && will_weld(obj)) {
         obj->bknown = TRUE;
@@ -729,8 +720,7 @@ register struct obj *obj;
 }
 
 void
-weldmsg(obj)
-register struct obj *obj;
+weldmsg(register struct obj *obj)
 {
     long savewornmask;
 
@@ -743,8 +733,7 @@ register struct obj *obj;
 
 /* test whether monster's wielded weapon is stuck to hand/paw/whatever */
 boolean
-mwelded(obj)
-struct obj *obj;
+mwelded(struct obj *obj)
 {
     /* caller is responsible for making sure this is a monster's item */
     if (obj && (obj->owornmask & W_WEP) && will_weld(obj))
