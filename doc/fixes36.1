@@ -182,6 +182,8 @@ tty: specifying all four of role, race, gender, and alignment still prompted
 	for confirmation with "Is this ok?" before starting play
 tty: responding with <return> or <enter> during role, race, &c selection
 	behaved same as <escape> to quit; now it will pick [random] instead
+tty: rename struct variable 'filter' (role.c) and function 'winch()' (wintty.c)
+	to avoid conflicts with <curses.h>
 unix/X11: in top level Makefile, some commented out definitions of VARDATND
 	misspelled pilemark.xbm (as pilemark.xpm)
 unix: options file with CR+LF line ends and an invalid option line resulted in

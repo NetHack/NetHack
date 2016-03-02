@@ -1,4 +1,4 @@
-/* NetHack 3.6	termcap.c	$NHDT-Date: 1447234979 2015/11/11 09:42:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.23 $ */
+/* NetHack 3.6	termcap.c	$NHDT-Date: 1456907853 2016/03/02 08:37:33 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.24 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1246,6 +1246,7 @@ int color;
     xputs(hilites[color]);
 }
 
+/* not to be confused with has_colors() in unixtty.c */
 int
 has_color(color)
 int color;
@@ -1253,23 +1254,24 @@ int color;
 #ifdef X11_GRAPHICS
     /* XXX has_color() should be added to windowprocs */
     if (windowprocs.name != NULL && !strcmpi(windowprocs.name, "X11"))
-        return TRUE;
+        return 1;
 #endif
 #ifdef GEM_GRAPHICS
     /* XXX has_color() should be added to windowprocs */
     if (windowprocs.name != NULL && !strcmpi(windowprocs.name, "Gem"))
-        return TRUE;
+        return 1;
 #endif
 #ifdef QT_GRAPHICS
     /* XXX has_color() should be added to windowprocs */
     if (windowprocs.name != NULL && !strcmpi(windowprocs.name, "Qt"))
-        return TRUE;
+        return 1;
 #endif
 #ifdef AMII_GRAPHICS
     /* hilites[] not used */
-    return iflags.use_color;
-#endif
+    return iflags.use_color ? 1 : 0;
+#else
     return hilites[color] != (char *) 0;
+#endif
 }
 
 #endif /* TEXTCOLOR */

@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1456354616 2016/02/24 22:56:56 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.195 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1456907837 2016/03/02 08:37:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.196 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1437,7 +1437,7 @@ boolean combo; /* combination menu flag */
 unsigned *resultflags;
 {
     int FDECL((*ckfn), (OBJ_P)) = (int FDECL((*), (OBJ_P))) 0;
-    boolean FDECL((*filter), (OBJ_P)) = (boolean FDECL((*), (OBJ_P))) 0;
+    boolean FDECL((*ofilter), (OBJ_P)) = (boolean FDECL((*), (OBJ_P))) 0;
     boolean takeoff, ident, allflag, m_seen;
     int itemcount;
     int oletct, iletct, unpaid, oc_of_sym;
@@ -1455,13 +1455,13 @@ unsigned *resultflags;
     add_valid_menu_class(0); /* reset */
     if (taking_off(word)) {
         takeoff = TRUE;
-        filter = is_worn;
+        ofilter = is_worn;
     } else if (!strcmp(word, "identify")) {
         ident = TRUE;
-        filter = not_fully_identified;
+        ofilter = not_fully_identified;
     }
 
-    iletct = collect_obj_classes(ilets, invent, FALSE, filter, &itemcount);
+    iletct = collect_obj_classes(ilets, invent, FALSE, ofilter, &itemcount);
     unpaid = count_unpaid(invent);
 
     if (ident && !iletct) {

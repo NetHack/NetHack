@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1453514601 2016/01/23 02:03:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.124 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1456907854 2016/03/02 08:37:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.125 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -31,8 +31,7 @@ extern void msmsg(const char *, ...);
 #include "wintty.h"
 
 #ifdef CLIPPING /* might want SIGWINCH */
-#if defined(BSD) || defined(ULTRIX) || defined(AIX_31) \
-    || defined(_BULL_SOURCE)
+#if defined(BSD) || defined(ULTRIX) || defined(AIX_31) || defined(_BULL_SOURCE)
 #include <signal.h>
 #endif
 #endif
@@ -226,8 +225,21 @@ const char *mesg;
 }
 
 #if defined(SIGWINCH) && defined(CLIPPING)
+STATIC_DCL void FDECL(winch_handler, (int));
+
+    /*
+     * This really ought to just set a flag like the hangup handler does,
+     * then check the flag at "safe" times, in case the signal arrives
+     * while something fragile is executing.  Better to have a brief period
+     * where display updates don't fit the new size than for tty internals
+     * to become corrupted.
+     *
+     * 'winch_seen' has been "notyet" for a long time....
+     */
+/*ARGUSED*/
 STATIC_OVL void
-winch()
+winch_handler(sig_unused) /* signal handler is called with at least 1 arg */
+int sig_unused UNUSED;
 {
     int oldLI = LI, oldCO = CO, i;
     register struct WinDesc *cw;
@@ -345,7 +357,7 @@ char **argv UNUSED;
     ttyDisplay->lastwin = WIN_ERR;
 
 #if defined(SIGWINCH) && defined(CLIPPING) && !defined(NO_SIGNAL)
-    (void) signal(SIGWINCH, winch);
+    (void) signal(SIGWINCH, (SIG_RET_TYPE) winch_handler);
 #endif
 
     /* add one a space forward menu command alias */
