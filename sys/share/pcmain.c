@@ -82,9 +82,7 @@ unsigned _stklen = STKSIZ;
  */
 #ifndef __MINGW32__
 int
-main(argc, argv)
-int argc;
-char *argv[];
+main(int argc, char *argv[])
 {
     boolean resuming;
 
@@ -105,9 +103,7 @@ char *argv[];
 #endif
 
 boolean
-pcmain(argc, argv)
-int argc;
-char *argv[];
+pcmain(int argc, char *argv[])
 {
     register int fd;
     register char *dir;
@@ -558,9 +554,7 @@ attempt_restore:
 }
 
 STATIC_OVL void
-process_options(argc, argv)
-int argc;
-char *argv[];
+process_options(int argc, char *argv[])
 {
     int i;
 
@@ -748,9 +742,7 @@ nhusage()
 
 #ifdef CHDIR
 void
-chdirx(dir, wr)
-char *dir;
-boolean wr;
+chdirx(char *dir, boolean wr)
 {
 #ifdef AMIGA
     static char thisdir[] = "";
@@ -832,8 +824,7 @@ exename()
 char exepathbuf[EXEPATHBUFSZ];
 
 char *
-exepath(str)
-char *str;
+exepath(char *str)
 {
     char *tmp, *tmp2;
     int bsize;

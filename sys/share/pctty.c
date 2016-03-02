@@ -32,8 +32,7 @@ gettty()
 
 /* reset terminal to original state */
 void
-settty(s)
-const char *s;
+settty(const char *s)
 {
 #if defined(MSDOS) && defined(NO_TERMS)
     gr_finish();
@@ -55,8 +54,7 @@ setftty()
 
 #if defined(TIMED_DELAY) && defined(_MSC_VER)
 void
-msleep(mseconds)
-unsigned mseconds;
+msleep(unsigned mseconds)
 {
     /* now uses clock() which is ANSI C */
     clock_t goal;

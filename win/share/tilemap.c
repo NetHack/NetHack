@@ -98,8 +98,7 @@ struct substitute {
  * entry is the position of the tile within the monsters/objects/other set
  */
 const char *
-tilename(set, entry)
-int set, entry;
+tilename(int set, int entry)
 {
     int i, j, condnum, tilenum;
     static char buf[BUFSZ];
@@ -399,8 +398,7 @@ const char *epilog[] = { "}" };
 
 /* write out the substitutions in an easily-used form. */
 void
-process_substitutions(ofp)
-FILE *ofp;
+process_substitutions(FILE *ofp)
 {
     int i, j, k, span, start;
 

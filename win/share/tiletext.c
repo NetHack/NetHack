@@ -37,8 +37,7 @@ static void FDECL(write_txttile, (FILE *, pixel (*)[TILE_X]));
     "(%d, %d, %d) "
 
 static void
-read_text_colormap(txtfile)
-FILE *txtfile;
+read_text_colormap(FILE *txtfile)
 {
     int i, r, g, b;
     char c[2];
@@ -60,8 +59,7 @@ FILE *txtfile;
 #undef FORMAT_STRING
 
 static boolean
-write_text_colormap(txtfile)
-FILE *txtfile;
+write_text_colormap(FILE *txtfile)
 {
     int i;
     char c;
@@ -88,9 +86,7 @@ FILE *txtfile;
 }
 
 static boolean
-read_txttile(txtfile, pixels)
-FILE *txtfile;
-pixel (*pixels)[TILE_X];
+read_txttile(FILE *txtfile, pixel (*pixels)[TILE_X])
 {
     int ph, i, j, k;
     char buf[BUFSZ], ttype[BUFSZ];
@@ -167,9 +163,7 @@ pixel (*pixels)[TILE_X];
 }
 
 static void
-write_txttile(txtfile, pixels)
-FILE *txtfile;
-pixel (*pixels)[TILE_X];
+write_txttile(FILE *txtfile, pixel (*pixels)[TILE_X])
 {
     const char *p;
     const char *type;
@@ -252,9 +246,7 @@ merge_colormap()
 }
 
 boolean
-fopen_text_file(filename, type)
-const char *filename;
-const char *type;
+fopen_text_file(const char *filename, const char *type)
 {
     const char *p;
     int i;
@@ -310,15 +302,13 @@ const char *type;
 }
 
 boolean
-read_text_tile(pixels)
-pixel (*pixels)[TILE_X];
+read_text_tile(pixel (*pixels)[TILE_X])
 {
     return (read_txttile(tile_file, pixels));
 }
 
 boolean
-write_text_tile(pixels)
-pixel (*pixels)[TILE_X];
+write_text_tile(pixel (*pixels)[TILE_X])
 {
     write_txttile(tile_file, pixels);
     return TRUE;

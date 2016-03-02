@@ -141,8 +141,7 @@ struct termstruct inittyb, curttyb;
 
 #ifdef POSIX_TYPES
 static int
-speednum(speed)
-speed_t speed;
+speednum(speed_t speed)
 {
     switch (speed) {
     case B0:
@@ -218,8 +217,7 @@ gettty()
 
 /* reset terminal to original state */
 void
-settty(s)
-const char *s;
+settty(const char *s)
 {
     end_screen();
     if (s)
