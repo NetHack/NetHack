@@ -30,8 +30,7 @@ settrack()
 }
 
 coord *
-gettrack(x, y)
-register int x, y;
+gettrack(register int x, register int y)
 {
     register int cnt, ndist;
     register coord *tc;

@@ -21,16 +21,14 @@ STATIC_DCL void FDECL(insert_rtoptions, (winid,char *,const char *));
 
 /* fill buffer with short version (so caller can avoid including date.h) */
 char *
-version_string(buf)
-char *buf;
+version_string(char *buf)
 {
     return strcpy(buf, VERSION_STRING);
 }
 
 /* fill and return the given buffer with the long nethack version string */
 char *
-getversionstring(buf)
-char *buf;
+getversionstring(char *buf)
 {
     Strcpy(buf, VERSION_ID);
 #if defined(BETA) && defined(BETA_INFO)
@@ -145,10 +143,7 @@ static const char indent[] = "    ";
  * game image, so we insert those options here.
  */
 STATIC_OVL void
-insert_rtoptions(win, buf, finalphrase)
-winid win;
-char *buf;
-const char *finalphrase;
+insert_rtoptions(winid win, char *buf, const char *finalphrase)
 {
     char rtbuf[BUFSZ];
     int l, i;
@@ -200,18 +195,14 @@ const char *finalphrase;
 
 #ifdef MICRO
 boolean
-comp_times(filetime)
-long filetime;
+comp_times(long filetime)
 {
     return (boolean) (filetime < BUILD_TIME);
 }
 #endif
 
 boolean
-check_version(version_data, filename, complain)
-struct version_info *version_data;
-const char *filename;
-boolean complain;
+check_version(struct version_info *version_data, const char *filename, boolean complain)
 {
     if (
 #ifdef VERSION_COMPATIBILITY
@@ -244,9 +235,7 @@ boolean complain;
 /* this used to be based on file date and somewhat OS-dependant,
    but now examines the initial part of the file's contents */
 boolean
-uptodate(fd, name)
-int fd;
-const char *name;
+uptodate(int fd, const char *name)
 {
     int rlen;
     struct version_info vers_info;
@@ -270,8 +259,7 @@ const char *name;
 }
 
 void
-store_version(fd)
-int fd;
+store_version(int fd)
 {
     static const struct version_info version_data = {
         VERSION_NUMBER, VERSION_FEATURES,
@@ -291,8 +279,7 @@ const char amiga_version_string[] = AMIGA_VERSION_STRING;
 #endif
 
 unsigned long
-get_feature_notice_ver(str)
-char *str;
+get_feature_notice_ver(char *str)
 {
     char buf[BUFSZ];
     int ver_maj, ver_min, patch;
@@ -332,8 +319,7 @@ get_current_feature_ver()
 
 /*ARGUSED*/
 const char *
-copyright_banner_line(indx)
-int indx;
+copyright_banner_line(int indx)
 {
 #ifdef COPYRIGHT_BANNER_A
     if (indx == 1)
