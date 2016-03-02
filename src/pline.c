@@ -354,8 +354,7 @@ VA_DECL(const char *, s)
 }
 
 const char *
-align_str(alignment)
-aligntyp alignment;
+align_str(aligntyp alignment)
 {
     switch ((int) alignment) {
     case A_CHAOTIC:
@@ -371,8 +370,7 @@ aligntyp alignment;
 }
 
 void
-mstatusline(mtmp)
-register struct monst *mtmp;
+mstatusline(register struct monst *mtmp)
 {
     aligntyp alignment = mon_aligntyp(mtmp);
     char info[BUFSZ], monnambuf[BUFSZ];
@@ -556,9 +554,7 @@ self_invis_message()
 }
 
 void
-pudding_merge_message(otmp, otmp2)
-struct obj *otmp;
-struct obj *otmp2;
+pudding_merge_message(struct obj *otmp, struct obj *otmp2)
 {
     boolean visible =
         cansee(otmp->ox, otmp->oy) || cansee(otmp2->ox, otmp2->oy);

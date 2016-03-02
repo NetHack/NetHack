@@ -101,8 +101,7 @@ nemdead()
 }
 
 void
-artitouch(obj)
-struct obj *obj;
+artitouch(struct obj *obj)
 {
     if (!Qstat(touched_artifact)) {
         /* in case we haven't seen the item yet (ie, currently blinded),
@@ -130,8 +129,7 @@ not_capable()
 }
 
 STATIC_OVL int
-is_pure(talk)
-boolean talk;
+is_pure(boolean talk)
 {
     int purity;
     aligntyp original_alignment = u.ualignbase[A_ORIGINAL];
@@ -164,8 +162,7 @@ boolean talk;
  * there is a single branch to and from it.
  */
 STATIC_OVL void
-expulsion(seal)
-boolean seal;
+expulsion(boolean seal)
 {
     branch *br;
     d_level *dest;
@@ -201,8 +198,7 @@ boolean seal;
    give another message about the character keeping the artifact
    and using the magic portal to return to the dungeon. */
 void
-finish_quest(obj)
-struct obj *obj; /* quest artifact; possibly null if carrying Amulet */
+finish_quest(struct obj *obj) /* quest artifact; possibly null if carrying Amulet */
 {
     struct obj *otmp;
 
@@ -302,8 +298,7 @@ chat_with_leader()
 }
 
 void
-leader_speaks(mtmp)
-struct monst *mtmp;
+leader_speaks(struct monst *mtmp)
 {
     /* maybe you attacked leader? */
     if (!mtmp->mpeaceful) {
@@ -364,8 +359,7 @@ chat_with_guardian()
 }
 
 STATIC_OVL void
-prisoner_speaks(mtmp)
-struct monst *mtmp;
+prisoner_speaks(struct monst *mtmp)
 {
     if (mtmp->data == &mons[PM_PRISONER]
         && (mtmp->mstrategy & STRAT_WAITMASK)) {
@@ -386,8 +380,7 @@ struct monst *mtmp;
 }
 
 void
-quest_chat(mtmp)
-register struct monst *mtmp;
+quest_chat(register struct monst *mtmp)
 {
     if (mtmp->m_id == Qstat(leader_m_id)) {
         chat_with_leader();
@@ -406,8 +399,7 @@ register struct monst *mtmp;
 }
 
 void
-quest_talk(mtmp)
-struct monst *mtmp;
+quest_talk(struct monst *mtmp)
 {
     if (mtmp->m_id == Qstat(leader_m_id)) {
         leader_speaks(mtmp);
@@ -426,8 +418,7 @@ struct monst *mtmp;
 }
 
 void
-quest_stat_check(mtmp)
-struct monst *mtmp;
+quest_stat_check(struct monst *mtmp)
 {
     if (mtmp->data->msound == MS_NEMESIS)
         Qstat(in_battle) = (mtmp->mcanmove && !mtmp->msleeping

@@ -116,8 +116,7 @@ float_vs_flight()
 
 /* for changing into form that's immune to strangulation */
 STATIC_OVL void
-check_strangling(on)
-boolean on;
+check_strangling(boolean on)
 {
     /* on -- maybe resume strangling */
     if (on) {
@@ -143,8 +142,7 @@ boolean on;
 
 /* make a (new) human out of the player */
 STATIC_OVL void
-polyman(fmt, arg)
-const char *fmt, *arg;
+polyman(const char *fmt, const char *arg)
 {
     boolean sticky = (sticks(youmonst.data) && u.ustuck && !u.uswallow),
             was_mimicking = (youmonst.m_ap_type == M_AP_OBJECT);
@@ -373,8 +371,7 @@ newman()
 }
 
 void
-polyself(psflags)
-int psflags;
+polyself(int psflags)
 {
     char buf[BUFSZ];
     int old_light, new_light, mntmp, class, tryct;
@@ -578,8 +575,7 @@ made_change:
 /* (try to) make a mntmp monster out of the player;
    returns 1 if polymorph successful */
 int
-polymon(mntmp)
-int mntmp;
+polymon(int mntmp)
 {
     boolean sticky = sticks(youmonst.data) && u.ustuck && !u.uswallow,
             was_blind = !!Blind, dochange = FALSE;
@@ -957,8 +953,7 @@ break_armor()
 }
 
 STATIC_OVL void
-drop_weapon(alone)
-int alone;
+drop_weapon(int alone)
 {
     struct obj *otmp;
     const char *what, *which, *whichtoo;
@@ -1514,8 +1509,7 @@ uunstick()
 }
 
 void
-skinback(silently)
-boolean silently;
+skinback(boolean silently)
 {
     if (uskin) {
         if (!silently)
@@ -1528,9 +1522,7 @@ boolean silently;
 }
 
 const char *
-mbodypart(mon, part)
-struct monst *mon;
-int part;
+mbodypart(struct monst *mon, int part)
 {
     static NEARDATA const char
         *humanoid_parts[] = { "arm",       "eye",  "face",         "finger",
@@ -1686,8 +1678,7 @@ int part;
 }
 
 const char *
-body_part(part)
-int part;
+body_part(int part)
 {
     return mbodypart(&youmonst, part);
 }
@@ -1704,8 +1695,7 @@ poly_gender()
 }
 
 void
-ugolemeffects(damtype, dam)
-int damtype, dam;
+ugolemeffects(int damtype, int dam)
 {
     int heal = 0;
 
@@ -1736,8 +1726,7 @@ int damtype, dam;
 }
 
 STATIC_OVL int
-armor_to_dragon(atyp)
-int atyp;
+armor_to_dragon(int atyp)
 {
     switch (atyp) {
     case GRAY_DRAGON_SCALE_MAIL:
@@ -1781,8 +1770,7 @@ int atyp;
  * Some species have awareness of other species
  */
 static boolean
-polysense(mptr)
-struct permonst *mptr;
+polysense(struct permonst *mptr)
 {
     short warnidx = 0;
 

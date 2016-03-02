@@ -99,8 +99,7 @@ static int p_type; /* (-1)-3: (-1)=really naughty, 3=really good */
 
 /* critically low hit points if hp <= 5 or hp <= maxhp/N for some N */
 boolean
-critically_low_hp(only_if_injured)
-boolean only_if_injured; /* determines whether maxhp <= 5 matters */
+critically_low_hp(boolean only_if_injured) /* determines whether maxhp <= 5 matters */
 {
     int divisor, hplim, curhp = Upolyd ? u.mh : u.uhp,
                         maxhp = Upolyd ? u.mhmax : u.uhpmax;
@@ -309,8 +308,7 @@ worst_cursed_item()
 }
 
 STATIC_OVL void
-fix_worst_trouble(trouble)
-int trouble;
+fix_worst_trouble(int trouble)
 {
     int i;
     struct obj *otmp = 0;
@@ -529,8 +527,7 @@ int trouble;
  * Divine wrath, dungeon walls, and armor follow the same principle.
  */
 STATIC_OVL void
-god_zaps_you(resp_god)
-aligntyp resp_god;
+god_zaps_you(aligntyp resp_god)
 {
     if (u.uswallow) {
         pline(
@@ -603,9 +600,7 @@ aligntyp resp_god;
 }
 
 STATIC_OVL void
-fry_by_god(resp_god, via_disintegration)
-aligntyp resp_god;
-boolean via_disintegration;
+fry_by_god(aligntyp resp_god, boolean via_disintegration)
 {
     You("%s!", !via_disintegration ? "fry to a crisp"
                                    : "disintegrate into a pile of dust");
@@ -615,8 +610,7 @@ boolean via_disintegration;
 }
 
 STATIC_OVL void
-angrygods(resp_god)
-aligntyp resp_god;
+angrygods(aligntyp resp_god)
 {
     int maxanger;
 
@@ -691,8 +685,7 @@ aligntyp resp_god;
 
 /* helper to print "str appears at your feet", or appropriate */
 static void
-at_your_feet(str)
-const char *str;
+at_your_feet(const char *str)
 {
     if (Blind)
         str = Something;
@@ -864,8 +857,7 @@ gcrownu()
 }
 
 STATIC_OVL void
-pleased(g_align)
-aligntyp g_align;
+pleased(aligntyp g_align)
 {
     /* don't use p_trouble, worst trouble may get fixed while praying */
     int trouble = in_trouble(); /* what's your worst difficulty? */
@@ -1160,8 +1152,7 @@ aligntyp g_align;
  * returns true if it found any water here.
  */
 STATIC_OVL boolean
-water_prayer(bless_water)
-boolean bless_water;
+water_prayer(boolean bless_water)
 {
     register struct obj *otmp;
     register long changed = 0;
@@ -1189,9 +1180,7 @@ boolean bless_water;
 }
 
 STATIC_OVL void
-godvoice(g_align, words)
-aligntyp g_align;
-const char *words;
+godvoice(aligntyp g_align, const char *words)
 {
     const char *quot = "";
 
@@ -1205,16 +1194,14 @@ const char *words;
 }
 
 STATIC_OVL void
-gods_angry(g_align)
-aligntyp g_align;
+gods_angry(aligntyp g_align)
 {
     godvoice(g_align, "Thou hast angered me.");
 }
 
 /* The g_align god is upset with you. */
 STATIC_OVL void
-gods_upset(g_align)
-aligntyp g_align;
+gods_upset(aligntyp g_align)
 {
     if (g_align == u.ualign.type)
         u.ugangr++;
@@ -1224,8 +1211,7 @@ aligntyp g_align;
 }
 
 STATIC_OVL void
-consume_offering(otmp)
-register struct obj *otmp;
+consume_offering(register struct obj *otmp)
 {
     if (Hallucination)
         switch (rn2(3)) {
@@ -1721,8 +1707,7 @@ dosacrifice()
 
 /* determine prayer results in advance; also used for enlightenment */
 boolean
-can_pray(praying)
-boolean praying; /* false means no messages should be given */
+can_pray(boolean praying) /* false means no messages should be given */
 {
     int alignment;
 
@@ -1979,8 +1964,7 @@ a_gname()
 
 /* returns the name of an altar's deity */
 const char *
-a_gname_at(x, y)
-xchar x, y;
+a_gname_at(xchar x, xchar y)
 {
     if (!IS_ALTAR(levl[x][y].typ))
         return (char *) 0;
@@ -1996,8 +1980,7 @@ u_gname()
 }
 
 const char *
-align_gname(alignment)
-aligntyp alignment;
+align_gname(aligntyp alignment)
 {
     const char *gnam;
 
@@ -2044,8 +2027,7 @@ static const char *hallu_gods[] = {
 /* hallucination handling for priest/minion names: select a random god
    iff character is hallucinating */
 const char *
-halu_gname(alignment)
-aligntyp alignment;
+halu_gname(aligntyp alignment)
 {
     const char *gnam = NULL;
     int which;
@@ -2093,8 +2075,7 @@ aligntyp alignment;
 
 /* deity's title */
 const char *
-align_gtitle(alignment)
-aligntyp alignment;
+align_gtitle(aligntyp alignment)
 {
     const char *gnam, *result = "god";
 
@@ -2118,8 +2099,7 @@ aligntyp alignment;
 }
 
 void
-altar_wrath(x, y)
-register int x, y;
+altar_wrath(register int x, register int y)
 {
     aligntyp altaralign = a_align(x, y);
 
@@ -2135,8 +2115,7 @@ register int x, y;
 
 /* assumes isok() at one space away, but not necessarily at two */
 STATIC_OVL boolean
-blocked_boulder(dx, dy)
-int dx, dy;
+blocked_boulder(int dx, int dy)
 {
     register struct obj *otmp;
     long count = 0L;

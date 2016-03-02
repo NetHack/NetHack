@@ -60,10 +60,7 @@ dump_qtlist()
 }
 
 static void
-Fread(ptr, size, nitems, stream)
-genericptr_t ptr;
-int size, nitems;
-dlb *stream;
+Fread(genericptr_t ptr, int size, int nitems, dlb *stream)
 {
     int cnt;
 
@@ -74,8 +71,7 @@ dlb *stream;
 }
 
 STATIC_OVL struct qtmsg *
-construct_qtlist(hdr_offset)
-long hdr_offset;
+construct_qtlist(long hdr_offset)
 {
     struct qtmsg *msg_list;
     int n_msgs;
@@ -153,8 +149,7 @@ unload_qtlist()
 }
 
 short
-quest_info(typ)
-int typ;
+quest_info(int typ)
 {
     switch (typ) {
     case 0:
@@ -190,8 +185,7 @@ intermed()
 }
 
 boolean
-is_quest_artifact(otmp)
-struct obj *otmp;
+is_quest_artifact(struct obj *otmp)
 {
     return (boolean) (otmp->oartifact == urole.questarti);
 }
@@ -224,9 +218,8 @@ homebase() /* return your role leader's location */
 /* replace deity, leader, nemesis, or artifact name with pronoun;
    overwrites cvt_buf[] */
 STATIC_OVL void
-qtext_pronoun(who, which)
-char who,  /* 'd' => deity, 'l' => leader, 'n' => nemesis, 'o' => artifact */
-    which; /* 'h'|'H'|'i'|'I'|'j'|'J' */
+qtext_pronoun(char who,     /* 'd' => deity, 'l' => leader, 'n' => nemesis, 'o' => artifact */
+              char which)   /* 'h'|'H'|'i'|'I'|'j'|'J' */
 {
     const char *pnoun;
     int g;
@@ -261,9 +254,7 @@ char who,  /* 'd' => deity, 'l' => leader, 'n' => nemesis, 'o' => artifact */
 }
 
 STATIC_OVL struct qtmsg *
-msg_in(qtm_list, msgnum)
-struct qtmsg *qtm_list;
-int msgnum;
+msg_in(struct qtmsg *qtm_list, int msgnum)
 {
     struct qtmsg *qt_msg;
 
@@ -275,8 +266,7 @@ int msgnum;
 }
 
 STATIC_OVL void
-convert_arg(c)
-char c;
+convert_arg(char c)
 {
     register const char *str;
 
@@ -367,8 +357,7 @@ char c;
 }
 
 STATIC_OVL void
-convert_line(in_line, out_line)
-char *in_line, *out_line;
+convert_line(char *in_line, char *out_line)
 {
     char *c, *cc;
     char xbuf[BUFSZ];
@@ -459,8 +448,7 @@ char *in_line, *out_line;
 }
 
 STATIC_OVL void
-deliver_by_pline(qt_msg)
-struct qtmsg *qt_msg;
+deliver_by_pline(struct qtmsg *qt_msg)
 {
     long size;
     char in_line[BUFSZ], out_line[BUFSZ];
@@ -474,9 +462,7 @@ struct qtmsg *qt_msg;
 }
 
 STATIC_OVL void
-deliver_by_window(qt_msg, how)
-struct qtmsg *qt_msg;
-int how;
+deliver_by_window(struct qtmsg *qt_msg, int how)
 {
     long size;
     char in_line[BUFSZ], out_line[BUFSZ];
@@ -524,8 +510,7 @@ int how;
 }
 
 boolean
-skip_pager(common)
-boolean common;
+skip_pager(boolean common)
 {
     /* WIZKIT: suppress plot feedback if starting with quest artifact */
     if (program_state.wizkit_wishing)
@@ -541,8 +526,7 @@ boolean common;
 }
 
 void
-com_pager(msgnum)
-int msgnum;
+com_pager(int msgnum)
 {
     struct qtmsg *qt_msg;
 
@@ -565,8 +549,7 @@ int msgnum;
 }
 
 void
-qt_pager(msgnum)
-int msgnum;
+qt_pager(int msgnum)
 {
     struct qtmsg *qt_msg;
 
