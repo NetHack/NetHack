@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1456528594 2016/02/26 23:16:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.549 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1456992437 2016/03/03 08:07:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.550 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1136,8 +1136,8 @@ E const char *FDECL(mpoisons_subj, (struct monst *, struct attack *));
 E void NDECL(u_slow_down);
 E struct monst *NDECL(cloneu);
 E void FDECL(expels, (struct monst *, struct permonst *, BOOLEAN_P));
-E struct attack *FDECL(getmattk,
-                       (struct permonst *, int, int *, struct attack *));
+E struct attack *FDECL(getmattk, (struct monst *, struct monst *,
+                                  int, int *, struct attack *));
 E int FDECL(mattacku, (struct monst *));
 E int FDECL(magic_negation, (struct monst *));
 E boolean NDECL(gulp_blnd_check);

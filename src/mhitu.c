@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitu.c	$NHDT-Date: 1456618997 2016/02/28 00:23:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.135 $ */
+/* NetHack 3.6	mhitu.c	$NHDT-Date: 1456992469 2016/03/03 08:07:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.136 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -256,12 +256,14 @@ boolean message;
 
 /* select a monster's next attack, possibly substituting for its usual one */
 struct attack *
-getmattk(mptr, indx, prev_result, alt_attk_buf)
-struct permonst *mptr;
+getmattk(magr, mdef, indx, prev_result, alt_attk_buf)
+struct monst *magr, *mdef;
 int indx, prev_result[];
 struct attack *alt_attk_buf;
 {
+    struct permonst *mptr = magr->data;
     struct attack *attk = &mptr->mattk[indx];
+    struct obj *weap = (magr == &youmonst) ? uwep : MON_WEP(magr);
 
     /* prevent a monster with two consecutive disease or hunger attacks
        from hitting with both of them on the same turn; if the first has
@@ -275,7 +277,7 @@ struct attack *alt_attk_buf;
         attk->adtyp = AD_STUN;
 
     /* make drain-energy damage be somewhat in proportion to energy */
-    } else if (attk->adtyp == AD_DREN) {
+    } else if (attk->adtyp == AD_DREN && mdef == &youmonst) {
         int ulev = max(u.ulevel, 6);
 
         *alt_attk_buf = *attk;
@@ -293,6 +295,25 @@ struct attack *alt_attk_buf;
                 attk->damd += 3; /* very high energy: 3d6 -> 3d9 */
             /* note: 3d9 is slightly higher than previous 4d6 */
         }
+
+    /* barrow wight, Nazgul, erinys have weapon attack for non-physical
+       damage; force physical damage if attacker has been cancelled or
+       if weapon is sufficiently interesting; a few unique creatures
+       have two weapon attacks where one does physical damage and other
+       doesn't--avoid forcing physical damage for those */
+    } else if (indx == 0 && magr != &youmonst
+               && attk->aatyp == AT_WEAP && attk->adtyp != AD_PHYS
+               && !(mptr->mattk[1].aatyp == AT_WEAP
+                    && mptr->mattk[1].adtyp == AD_PHYS)
+               && (magr->mcan
+                   || (weap
+                       && ((weap->otyp == CORPSE
+                            && touch_petrifies(&mons[weap->corpsenm]))
+                           || weap->oartifact == ART_STORMBRINGER
+                           || weap->oartifact == ART_VORPAL_BLADE)))) {
+        *alt_attk_buf = *attk;
+        attk = alt_attk_buf;
+        attk->adtyp = AD_PHYS;
     }
     return attk;
 }
@@ -608,7 +629,7 @@ register struct monst *mtmp;
 
     for (i = 0; i < NATTK; i++) {
         sum[i] = 0;
-        mattk = getmattk(mdat, i, sum, &alt_attk);
+        mattk = getmattk(mtmp, &youmonst, i, sum, &alt_attk);
         if ((u.uswallow && mattk->aatyp != AT_ENGL)
             || (skipnonmagc && mattk->aatyp != AT_MAGC))
             continue;
@@ -1373,9 +1394,10 @@ register struct attack *mattk;
             hitmsg(mtmp, mattk);
             break;
         }
-        if (!uwep && !uarmu && !uarm && !uarmh && !uarms && !uarmg && !uarmc
-            && !uarmf) {
+        if (!uwep && !uarmu && !uarm && !uarmc
+            && !uarms && !uarmg && !uarmf && !uarmh) {
             boolean goaway = FALSE;
+
             pline("%s hits!  (I hope you don't mind.)", Monnam(mtmp));
             if (Upolyd) {
                 u.mh += rnd(7);

@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1454664302 2016/02/05 09:25:02 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.154 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1456992470 2016/03/03 08:07:50 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.155 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2085,7 +2085,7 @@ register struct monst *mon;
 
     for (i = 0; i < NATTK; i++) {
         sum[i] = 0;
-        mattk = getmattk(youmonst.data, i, sum, &alt_attk);
+        mattk = getmattk(&youmonst, mon, i, sum, &alt_attk);
         switch (mattk->aatyp) {
         case AT_WEAP:
         use_weapon:
