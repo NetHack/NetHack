@@ -1,4 +1,4 @@
-! $NHDT-Date: 1454977917 2016/02/09 00:31:57 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.10 $
+! $NHDT-Date: 1457079198 2016/03/04 08:13:18 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.11 $
 
 ! The display_file, tombstone, and menu windows are all formatted assuming
 ! a fixed width font.  Text windows may or may not be formatted as above.
@@ -188,6 +188,15 @@ NetHack*extended_commands*help.accelerators: #override\n\
 				:<Key>?:	set() notify() unset()
 NetHack*extended_commands*dismiss.accelerators: #override\n\
 				<Key>Escape:	set() notify() unset()
+!
+! The extended command menu may be too big to fit on the screen so need
+! a vertical scroll bar.  When truncated, its height will be as tall as
+! possible unless height_delta is non-zero, in which case there will be
+! that many pixels of margin left unused.  On OSX, this can be used to
+! avoid overlapping with the desktop docking tray to prevent that from
+! obscuring the bottom of the menu.
+NetHack*extcmd_height_delta: 75
+
 !
 !
 ! The following are the default 15 colors that the nethack map uses.

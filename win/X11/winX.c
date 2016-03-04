@@ -1,4 +1,4 @@
-/* NetHack 3.6	winX.c	$NHDT-Date: 1455389907 2016/02/13 18:58:27 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.40 $ */
+/* NetHack 3.6	winX.c	$NHDT-Date: 1457079197 2016/03/04 08:13:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.41 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1064,6 +1064,9 @@ static XtResource resources[] = {
       XtOffset(AppResources *, icon), XtRString, nhStr("nh72") },
     { nhStr("message_lines"), nhStr("Message_lines"), XtRInt, sizeof(int),
       XtOffset(AppResources *, message_lines), XtRString, nhStr("12") },
+    { nhStr("extcmd_height_delta"), nhStr("Extcmd_height_delta"),
+      XtRInt, sizeof (int),
+      XtOffset(AppResources *, extcmd_height_delta), XtRString, nhStr("0") },
     { nhStr("pet_mark_bitmap"), nhStr("Pet_mark_bitmap"), XtRString,
       sizeof(String), XtOffset(AppResources *, pet_mark_bitmap), XtRString,
       nhStr("pet_mark.xbm") },
