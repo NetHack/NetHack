@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1452660189 2016/01/13 04:43:09 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.219 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1457207033 2016/03/05 19:43:53 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.220 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -355,7 +355,7 @@ doextlist(VOID_ARGS)
     return 0;
 }
 
-#ifdef TTY_GRAPHICS
+#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
 #define MAX_EXT_CMD 50 /* Change if we ever have > 50 ext cmds */
 
 /*

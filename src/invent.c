@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1456907837 2016/03/02 08:37:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.196 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1457207035 2016/03/05 19:43:55 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.197 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1935,7 +1935,9 @@ long quan;       /* if non-0, print this quantity, not obj->quan */
      */
     if (cost != 0 || let == '*') {
         /* if dot is true, we're doing Iu, otherwise Ix */
-        Sprintf(li, "%c - %-45s %6ld %s",
+        Sprintf(li,
+                iflags.menu_tab_sep ? "%c - %s\t%6ld %s"
+                                    : "%c - %-45s %6ld %s",
                 (dot && use_invlet ? obj->invlet : let),
                 (txt ? txt : doname(obj)), cost, currency(cost));
     } else {

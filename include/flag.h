@@ -1,4 +1,4 @@
-/* NetHack 3.6	flag.h	$NHDT-Date: 1451683047 2016/01/01 21:17:27 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.93 $ */
+/* NetHack 3.6	flag.h	$NHDT-Date: 1457207000 2016/03/05 19:43:20 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.101 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -261,6 +261,8 @@ struct instance_flags {
 #ifdef MSDOS
     boolean hasvga; /* has a vga adapter */
     boolean usevga; /* use the vga adapter */
+    boolean hasvesa; /* has a VESA-capable VGA adapter */
+    boolean usevesa; /* use the VESA-capable VGA adapter */
     boolean grmode; /* currently in graphics mode */
 #endif
 #ifdef LAN_FEATURES

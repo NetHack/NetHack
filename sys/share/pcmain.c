@@ -1,4 +1,4 @@
-/* NetHack 3.6	pcmain.c	$NHDT-Date: 1451697809 2016/01/02 01:23:29 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.68 $ */
+/* NetHack 3.6	pcmain.c	$NHDT-Date: 1457207045 2016/03/05 19:44:05 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.69 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -115,9 +115,11 @@ char *argv[];
 {
     register int fd;
     register char *dir;
-#if defined(WIN32)
+#if defined(WIN32) || defined(MSDOS)
     char *envp = NULL;
     char *sptr = NULL;
+#endif
+#if defined(WIN32)
     char fnamebuf[BUFSZ], encodedfnamebuf[BUFSZ];
     boolean save_getreturn_status = getreturn_enabled;
 #endif

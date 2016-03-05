@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1456528594 2016/02/26 23:16:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.222 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1457207021 2016/03/05 19:43:41 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.223 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -395,7 +395,7 @@ register struct obj *obj;
                 break;
             }
             seemimic(mtmp);
-            pline("That %s is really %s", what, mnm);
+            pline("That %s is really %s.", what, mnm);
         } else if (flags.verbose && !canspotmon(mtmp)) {
             There("is %s there.", mnm);
         }

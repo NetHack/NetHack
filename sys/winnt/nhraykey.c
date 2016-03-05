@@ -1,4 +1,4 @@
-/* NetHack 3.6	nhraykey.c	$NHDT-Date: 1432512794 2015/05/25 00:13:14 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
+/* NetHack 3.6	nhraykey.c	$NHDT-Date: 1457207047 2016/03/05 19:44:07 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.16 $ */
 /* Copyright (c) NetHack PC Development Team 2003                      */
 /* NetHack may be freely redistributed.  See license for details.      */
 
@@ -559,19 +559,24 @@ INPUT_RECORD *ir;
                 scan = ir->Event.KeyEvent.wVirtualScanCode;
                 shiftstate = ir->Event.KeyEvent.dwControlKeyState;
                 vk = ir->Event.KeyEvent.wVirtualKeyCode;
-                keycode = MapVirtualKey(vk, 2);
-                if (is_altseq(shiftstate)) {
-                    if (ch || inmap(keycode, vk))
-                        altseq = 1;
-                    else
-                        altseq = -1; /* invalid altseq */
-                }
-                if (ch || iskeypad(scan) || altseq) {
-                    done = 1;   /* Stop looking         */
-                    retval = 1; /* Found what we sought */
+                if (scan == 0 && vk == 0) {
+                    /* It's the bogus_key.  Discard it */
+                    ReadConsoleInput(hConIn,ir,1,&count);
                 } else {
-                    /* Strange Key event; let's purge it to avoid trouble */
-                    ReadConsoleInput(hConIn, ir, 1, &count);
+                    keycode = MapVirtualKey(vk, 2);
+                    if (is_altseq(shiftstate)) {
+                        if (ch || inmap(keycode, vk))
+                            altseq = 1;
+                        else
+                            altseq = -1; /* invalid altseq */
+                    }
+                    if (ch || iskeypad(scan) || altseq) {
+                        done = 1;   /* Stop looking         */
+                        retval = 1; /* Found what we sought */
+                    } else {
+                        /* Strange Key event; let's purge it to avoid trouble */
+                        ReadConsoleInput(hConIn, ir, 1, &count);
+                    }
                 }
 
             } else if ((ir->EventType == MOUSE_EVENT

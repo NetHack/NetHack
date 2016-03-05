@@ -1,4 +1,4 @@
-/* NetHack 3.6	tilemap.c	$NHDT-Date: 1454502429 2016/02/03 12:27:09 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.28 $ */
+/* NetHack 3.6	tilemap.c	$NHDT-Date: 1457207051 2016/03/05 19:44:11 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.29 $ */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -21,7 +21,7 @@ extern void FDECL(exit, (int));
 #endif
 #endif
 
-#if defined(WIN32)
+#if defined(MSDOS) || defined(WIN32)
 #define STATUES_LOOK_LIKE_MONSTERS
 #endif
 

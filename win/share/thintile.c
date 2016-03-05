@@ -1,4 +1,4 @@
-/* NetHack 3.6	thintile.c	$NHDT-Date: 1432512803 2015/05/25 00:13:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
+/* NetHack 3.6	thintile.c	$NHDT-Date: 1457207049 2016/03/05 19:44:09 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.10 $ */
 /*   Copyright (c) NetHack Development Team 1995                    */
 /*   NetHack may be freely redistributed.  See license for details. */
 
@@ -32,7 +32,7 @@ copy_colormap()
     int r, g, b;
     char c[2];
 
-    while (fscanf(infile, "%[A-Za-z0-9] = (%d, %d, %d) ", c, &r, &g, &b)
+    while (fscanf(infile, "%[A-Za-z0-9.] = (%d, %d, %d) ", c, &r, &g, &b)
            == 4) {
         Fprintf(outfile, "%c = (%d, %d, %d)\n", c[0], r, g, b);
     }

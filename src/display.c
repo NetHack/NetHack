@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1446808439 2015/11/06 11:13:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.77 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1457207034 2016/03/05 19:43:54 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.82 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1748,7 +1748,8 @@ xchar x, y;
     int idx, bkglyph = NO_GLYPH;
     struct rm *lev = &levl[x][y];
 
-    if (iflags.use_background_glyph) {
+    if (iflags.use_background_glyph && lev->seenv != 0
+            && gbuf[y][x].glyph != cmap_to_glyph(S_stone)) {
         switch (lev->typ) {
         case SCORR:
         case STONE:
@@ -1769,8 +1770,15 @@ xchar x, y;
         case CLOUD:
            idx = S_cloud;
            break;
+        case POOL:
+        case MOAT:
+           idx = S_pool;
+           break;
         case WATER:
            idx = S_water;
+           break;
+        case LAVAPOOL:
+           idx = S_lava;
            break;
         default:
            idx = S_room;
