@@ -6,7 +6,7 @@
 #include "NH:sys/amiga/winext.h"
 #include "NH:sys/amiga/winproto.h"
 
-amii_nh_poskey(x, y, mod) int *x, *y, *mod;
+amii_nh_poskey(int *x, int *y, int *mod)
 {
     struct amii_WinDesc *cw;
     WETYPE type;

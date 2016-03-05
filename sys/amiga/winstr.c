@@ -9,10 +9,7 @@
 /* Put a string into the indicated window using the indicated attribute */
 
 void
-amii_putstr(window, attr, str)
-winid window;
-int attr;
-const char *str;
+amii_putstr(winid window, int attr, const char *str)
 {
     int fudge;
     int len;
@@ -281,9 +278,7 @@ const char *str;
 }
 
 void
-amii_scrollmsg(w, cw)
-register struct Window *w;
-register struct amii_WinDesc *cw;
+amii_scrollmsg(register struct Window *w, register struct amii_WinDesc *cw)
 {
     int bottom, wheight;
 
@@ -306,8 +301,7 @@ register struct amii_WinDesc *cw;
 }
 
 int
-amii_msgborder(w)
-struct Window *w;
+amii_msgborder(struct Window *w)
 {
     register int bottom;
 
@@ -320,8 +314,7 @@ struct Window *w;
 }
 
 void
-outmore(cw)
-register struct amii_WinDesc *cw;
+outmore(register struct amii_WinDesc *cw)
 {
     struct Window *w = cw->win;
 
@@ -354,11 +347,7 @@ register struct amii_WinDesc *cw;
 }
 
 void
-outsubstr(cw, str, len, fudge)
-register struct amii_WinDesc *cw;
-char *str;
-int len;
-int fudge;
+outsubstr(register struct amii_WinDesc *cw, char *str, int len, int fudge)
 {
     struct Window *w = cw->win;
 
@@ -382,10 +371,7 @@ int fudge;
 /* Put a graphics character onto the screen */
 
 void
-amii_putsym(st, i, y, c)
-winid st;
-int i, y;
-char c;
+amii_putsym(winid st, int i, int y, char c)
 {
     amii_curs(st, i, y);
     Text(amii_wins[st]->win->RPort, &c, 1);
@@ -394,8 +380,7 @@ char c;
 /* Add to the last line in the message window */
 
 void
-amii_addtopl(s)
-const char *s;
+amii_addtopl(const char *s)
 {
     register struct amii_WinDesc *cw = amii_wins[WIN_MESSAGE];
 
@@ -408,9 +393,7 @@ const char *s;
 }
 
 void
-TextSpaces(rp, nr)
-struct RastPort *rp;
-int nr;
+TextSpaces(struct RastPort *rp, int nr)
 {
     if (nr < 1)
         return;

@@ -589,8 +589,7 @@ amii_player_selection()
 #include "NH:sys/amiga/randwin.c"
 
 void
-RandomWindow( name )
-    char *name;
+RandomWindow( char *name )
 {
     struct MsgPort *tport;
     struct timerequest *trq;
@@ -1127,8 +1126,7 @@ amii_get_ext_cmd(void)
         return q;
     }
 
-    void amii_display_file(fn, complain) const char * fn;
-    boolean complain;
+    void amii_display_file(const char * fn, boolean complain)
     {
         register struct amii_WinDesc *cw;
         register int win;
@@ -1183,7 +1181,7 @@ amii_get_ext_cmd(void)
      * are rendered in the up position by default.
      */
 
-    void SetBorder(gd) register struct Gadget * gd;
+    void SetBorder(register struct Gadget * gd)
     {
         register struct Border *bp;
         register short *sp;

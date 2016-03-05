@@ -83,8 +83,7 @@ static enum { NoAction, CloseOver } delayed_key_action = NoAction;
  */
 
 struct Window *
-OpenShWindow(nw)
-struct NewWindow *nw;
+OpenShWindow(struct NewWindow *nw)
 {
     register struct Window *win;
     register ULONG idcmpflags;
@@ -111,8 +110,7 @@ struct NewWindow *nw;
 
 void FDECL(CloseShWindow, (struct Window *));
 void
-CloseShWindow(win)
-struct Window *win;
+CloseShWindow(struct Window *win)
 {
     register struct IntuiMessage *msg;
 
@@ -163,8 +161,7 @@ BufferGetchar()
  */
 
 int
-ConvertKey(message)
-register struct IntuiMessage *message;
+ConvertKey(register struct IntuiMessage *message)
 {
     static struct InputEvent theEvent;
     static char numpad[] = "bjnh.lyku";
@@ -356,8 +353,7 @@ register struct IntuiMessage *message;
  */
 
 static void
-ProcessMessage(message)
-register struct IntuiMessage *message;
+ProcessMessage(register struct IntuiMessage *message)
 {
     int c;
     int cnt;
@@ -696,8 +692,7 @@ amii_cleanup()
 
 #ifndef SHAREDLIB
 void
-Abort(rc)
-long rc;
+Abort(long rc)
 {
     int fault = 1;
 #ifdef CHDIR
@@ -759,8 +754,7 @@ CleanUp()
 #ifdef AMIFLUSH
 /* This routine adapted from AmigaMail IV-37 by Michael Sinz */
 static struct Message *
-GetFMsg(port)
-struct MsgPort *port;
+GetFMsg(struct MsgPort *port)
 {
     struct IntuiMessage *msg, *succ, *succ1;
 
@@ -786,8 +780,7 @@ struct MsgPort *port;
 #endif
 
 struct NewWindow *
-DupNewWindow(win)
-struct NewWindow *win;
+DupNewWindow(struct NewWindow *win)
 {
     struct NewWindow *nwin;
     struct Gadget *ngd, *gd, *pgd = NULL;
@@ -828,8 +821,7 @@ struct NewWindow *win;
 }
 
 void
-FreeNewWindow(win)
-struct NewWindow *win;
+FreeNewWindow(struct NewWindow *win)
 {
     register struct Gadget *gd, *pgd;
     register struct StringInfo *sip;

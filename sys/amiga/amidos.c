@@ -68,8 +68,7 @@ getlogin()
 
 #ifndef AZTEC_50
 int
-abs(x)
-int x;
+abs(int x)
 {
     return x < 0 ? -x : x;
 }
@@ -113,8 +112,7 @@ dosh()
  */
 /* TODO: update this for FFS */
 long
-freediskspace(path)
-char *path;
+freediskspace(char *path)
 {
 #ifdef UNTESTED
     /* these changes from Patric Mueller <bhaak@gmx.net> for AROS to
@@ -183,8 +181,7 @@ char *path;
 }
 
 long
-filesize(file)
-char *file;
+filesize(char *file)
 {
     register BPTR fileLock;
     register struct FileInfoBlock *fileInfoBlock;
@@ -204,8 +201,7 @@ char *file;
 
 #if 0
 void
-eraseall(path, files)
-const char *path, *files;
+eraseall(const char *path, const char *files)
 {
     BPTR dirLock, dirLock2;
     struct FileInfoBlock *fibp;
@@ -240,8 +236,7 @@ const char *path, *files;
 #if 0 /* Unused */
 #define COPYSIZE 4096
 
-char *CopyFile(from, to)
-const char *from, *to;
+char *CopyFile(const char *from, const char *to)
 {
     register BPTR fromFile, toFile;
     register char *buffer;
@@ -355,8 +350,7 @@ gameDiskPrompt()
  * be room for the /.
  */
 void
-append_slash(name)
-char *name;
+append_slash(char *name)
 {
     char *ptr;
 
@@ -371,8 +365,7 @@ char *name;
 }
 
 void
-getreturn(str)
-const char *str;
+getreturn(const char *str)
 {
     int ch;
 
@@ -386,8 +379,7 @@ const char *str;
 #define PATHSEP ';'
 
 FILE *
-fopenp(name, mode)
-register const char *name, *mode;
+fopenp(register const char *name, register const char *mode)
 {
     register char *bp, *pp, lastch;
     register FILE *fp;
@@ -442,7 +434,7 @@ register const char *name, *mode;
 
 static BPTR OrgDirLock = NO_LOCK;
 
-chdir(dir) char *dir;
+chdir(char *dir)
 {
     extern char orgdir[];
 
@@ -496,8 +488,7 @@ nethack_exit(code)
     exit(code);
 }
 
-void regularize(s) /* normalize file name - we don't like :'s or /'s */
-register char *s;
+void regularize(register char *s) /* normalize file name - we don't like :'s or /'s */
 {
     register char *lp;
 

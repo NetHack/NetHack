@@ -80,8 +80,7 @@ long freqtab[] = {
 };
 
 #ifdef TESTING
-main(argc, argv) int argc;
-char **argv;
+main(int argc, char **argv)
 {
     makesound("wooden_flute", "AwBwCwDwEwFwGwawbwcwdwewfwgw", 60);
     makesound("wooden_flute", "AhBhChDhEhFhGhahbhchdhehfhgh", 60);

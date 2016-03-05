@@ -101,10 +101,7 @@ int wh; /* was local in outrip, but needed for SCALE macro */
 int cmap_white, cmap_black;
 
 void
-amii_outrip(tmpwin, how, when)
-winid tmpwin;
-int how;
-time_t when;
+amii_outrip(winid tmpwin, int how, time_t when)
 {
     int just_return = 0;
     int done, rtxth;
@@ -290,8 +287,7 @@ cleanup:
 }
 
 static void
-tomb_text(p)
-char *p;
+tomb_text(char *p)
 {
     char buf[STONE_LINE_LEN * 2];
     int l;
