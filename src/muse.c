@@ -1,4 +1,4 @@
-/* NetHack 3.6	muse.c	$NHDT-Date: 1449799863 2015/12/11 02:11:03 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.69 $ */
+/* NetHack 3.6	muse.c	$NHDT-Date: 1457236628 2016/03/06 03:57:08 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.71 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -34,7 +34,7 @@ STATIC_DCL boolean FDECL(cures_stoning, (struct monst *, struct obj *,
                                          BOOLEAN_P));
 STATIC_DCL boolean FDECL(mcould_eat_tin, (struct monst *));
 STATIC_DCL boolean FDECL(muse_unslime, (struct monst *, struct obj *,
-                                        BOOLEAN_P));
+                                        struct trap *, BOOLEAN_P));
 STATIC_DCL int FDECL(cures_sliming, (struct monst *, struct obj *));
 STATIC_DCL boolean FDECL(green_mon, (struct monst *));
 
@@ -605,7 +605,7 @@ struct monst *mtmp;
     int i, fleetim, how = 0;
     struct obj *otmp = m.defensive;
     boolean vis, vismon, oseen;
-    const char *mcsa = "%s can see again.";
+    const char *Mnam, *mcsa = "%s can see again.";
 
     if ((i = precheck(mtmp, otmp)) != 0)
         return i;
@@ -824,9 +824,10 @@ struct monst *mtmp;
         if (vis) {
             struct trap *t = t_at(trapx, trapy);
 
-            pline("%s %s into a %s!", Monnam(mtmp),
-                  makeplural(locomotion(mtmp->data, "jump")),
-                  t->ttyp == TRAPDOOR ? "trap door" : "hole");
+            Mnam = Monnam(mtmp);
+            pline("%s %s into a %s!", Mnam,
+                  vtense(Mnam, locomotion(mtmp->data, "jump")),
+                  (t->ttyp == TRAPDOOR) ? "trap door" : "hole");
             if (levl[trapx][trapy].typ == SCORR) {
                 levl[trapx][trapy].typ = CORR;
                 unblock_point(trapx, trapy);
@@ -920,8 +921,9 @@ struct monst *mtmp;
     case MUSE_TELEPORT_TRAP:
         m_flee(mtmp);
         if (vis) {
-            pline("%s %s onto a teleport trap!", Monnam(mtmp),
-                  makeplural(locomotion(mtmp->data, "jump")));
+            Mnam = Monnam(mtmp);
+            pline("%s %s onto a teleport trap!", Mnam,
+                  vtense(Mnam, locomotion(mtmp->data, "jump")));
             seetrap(t_at(trapx, trapy));
         }
         /*  don't use rloc_to() because worm tails must "move" */
@@ -1862,9 +1864,12 @@ struct monst *mtmp;
         m_useup(mtmp, otmp);
         return 2;
     case MUSE_POLY_TRAP:
-        if (vismon)
-            pline("%s deliberately %s onto a polymorph trap!", Monnam(mtmp),
-                  makeplural(locomotion(mtmp->data, "jump")));
+        if (vismon) {
+            const char *Mnam = Monnam(mtmp);
+
+            pline("%s deliberately %s onto a polymorph trap!", Mnam,
+                  vtense(Mnam, locomotion(mtmp->data, "jump")));
+        }
         if (vis)
             seetrap(t_at(trapx, trapy));
 
@@ -2322,6 +2327,7 @@ struct monst *mon;
 boolean by_you;
 {
     struct obj *obj, odummy;
+    struct permonst *mptr = mon->data;
 
     /*
      * muse_unslime() gives "mon starts turning green", "mon zaps
@@ -2330,7 +2336,7 @@ boolean by_you;
      * (via our caller) newcham()'s "mon turns into slime" feedback.
      */
 
-    if (slimeproof(mon->data))
+    if (slimeproof(mptr))
         return FALSE;
     if (mon->meating || !mon->mcanmove || mon->msleeping)
         return FALSE;
@@ -2342,27 +2348,61 @@ boolean by_you;
        [possible extension: monst capable of casting high level clerical
        spells could toss pillar of fire at self--probably too suicidal] */
     if (!mon->mcan && !mon->mspec_used
-        && attacktype_fordmg(mon->data, AT_BREA, AD_FIRE)) {
+        && attacktype_fordmg(mptr, AT_BREA, AD_FIRE)) {
         odummy = zeroobj; /* otyp == STRANGE_OBJECT */
-        return muse_unslime(mon, &odummy, by_you);
+        return muse_unslime(mon, &odummy, (struct trap *) 0, by_you);
     }
 
-    for (obj = mon->minvent; obj; obj = obj->nobj)
-        if (cures_sliming(mon, obj))
-            return muse_unslime(mon, obj, by_you);
+    /* same MUSE criteria as use_defensive() */
+    if (!is_animal(mptr) && !mindless(mptr)) {
+        struct trap *t;
 
-    /* TODO: check for and move onto an adjacent fire trap */
+        for (obj = mon->minvent; obj; obj = obj->nobj)
+            if (cures_sliming(mon, obj))
+                return muse_unslime(mon, obj, (struct trap *) 0, by_you);
+
+        if (((t = t_at(mon->mx, mon->my)) == 0 || t->ttyp != FIRE_TRAP)
+            && !mon->mtrapped && !mptr->mmove == 0) {
+            int xy[2][8], x, y, idx, ridx, nxy = 0;
+
+            for (x = mon->mx - 1; x <= mon->mx + 1; ++x)
+                for (y = mon->my - 1; y <= mon->my + 1; ++y)
+                    if (isok(x, y) && accessible(x, y)
+                        && !m_at(x, y) && (x != u.ux || y != u.uy)) {
+                        xy[0][nxy] = x, xy[1][nxy] = y;
+                        ++nxy;
+                    }
+            for (idx = 0; idx < nxy; ++idx) {
+                ridx = rn1(nxy - idx, idx);
+                if (ridx != idx) {
+                    x = xy[0][idx];
+                    xy[0][idx] = xy[0][ridx];
+                    xy[0][ridx] = x;
+                    y = xy[1][idx];
+                    xy[1][idx] = xy[1][ridx];
+                    xy[1][ridx] = y;
+                }
+                if ((t = t_at(xy[0][idx], xy[1][idx])) != 0
+                    && t->ttyp == FIRE_TRAP)
+                    break;
+            }
+        }
+        if (t && t->ttyp == FIRE_TRAP)
+            return muse_unslime(mon, &zeroobj, t, by_you);
+
+    } /* MUSE */
 
     return FALSE;
 }
 
 /* mon uses an item--selected by caller--to burn away incipient slime */
 STATIC_OVL boolean
-muse_unslime(mon, obj, by_you)
+muse_unslime(mon, obj, trap, by_you)
 struct monst *mon;
 struct obj *obj;
+struct trap *trap;
 boolean by_you; /* true: if mon kills itself, hero gets credit/blame */
-{
+{               /* [by_you not honored if 'mon' triggers fire trap]. */
     struct obj *odummyp;
     int otyp = obj->otyp, dmg;
     boolean vis = canseemon(mon), res = TRUE;
@@ -2373,7 +2413,30 @@ boolean by_you; /* true: if mon kills itself, hero gets credit/blame */
     /* -4 => sliming, causes quiet loss of enhanced speed */
     mon_adjust_speed(mon, -4, (struct obj *) 0);
 
-    if (otyp == STRANGE_OBJECT) {
+    if (trap) {
+        const char *Mnam = vis ? Monnam(mon) : 0;
+
+        if (mon->mx == trap->tx && mon->my == trap->ty) {
+            if (vis)
+                pline("%s triggers %s fire trap!", Mnam,
+                      trap->tseen ? "the" : "a");
+        } else {
+            remove_monster(mon->mx, mon->my);
+            newsym(mon->mx, mon->my);
+            place_monster(mon, trap->tx, trap->ty);
+            if (mon->wormno) /* won't happen; worms don't MUSE to unslime */
+                worm_move(mon);
+            newsym(mon->mx, mon->my);
+            if (vis)
+                pline("%s %s %s %s fire trap!", Mnam,
+                      vtense(Mnam, locomotion(mon->data, "move")),
+                      is_floater(mon->data) ? "over" : "onto",
+                      trap->tseen ? "the" : "a");
+        }
+        /* hack to avoid mintrap()'s chance of avoiding known trap */
+        mon->mtrapseen &= ~(1 << (FIRE_TRAP - 1));
+        mintrap(mon);
+    } else if (otyp == STRANGE_OBJECT) {
         /* monster is using fire breath on self */
         if (vis)
             pline("%s breathes fire on %sself.", Monnam(mon), mhim(mon));
