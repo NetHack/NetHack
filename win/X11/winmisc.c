@@ -1,4 +1,4 @@
-/* NetHack 3.6	winmisc.c	$NHDT-Date: 1455526714 2016/02/15 08:58:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.24 $ */
+/* NetHack 3.6	winmisc.c	$NHDT-Date: 1457079197 2016/03/04 08:13:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.25 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1200,35 +1200,19 @@ Widget *formp; /* return */
         free((char *) commands);
 
     /*
-     * We actually want height of topmost background window, which
-     * may or may not be the root window.
-     *
-     * On OSX, screen height includes the space taken up by the
-     * desktop title bar, which isn't accessible to applications
-     * unless the preference settings for X11 are changed to force
-     * full-screen mode (so by default, this 'screen_height' value
-     * ends up being bigger than the available size...).
-     */
-    screen_height = XHeightOfScreen(XtScreen(popup));
-
-    /*
      * If the menu's complete height is too big for the display,
      * forcing the height to be smaller will cause the vertical
      * scroll bar (enabled but not forced above) to be included.
      */
+    screen_height = XHeightOfScreen(XtScreen(popup));
+    screen_height -= appResources.extcmd_height_delta; /* NetHack.ad */
     if (cumulative_height >= screen_height) {
-        /* trial and error:
-           25 is a guesstimate for scrollbar width on width adjustment;
-           75 is for cumulative height of 3 title bars (desktop,
-           application, and popup) on height adjustment; that will be
-           bigger than needed if the popup can overlap the application's
-           title bar or if there is no desktop title bar; this ought to
-           be deriveable on the fly, or at least user-controlled by a
-           resource, but for now it's hardcoded--user can manually
-           resize if sufficiently motivated... */
+        /* 25 is a guesstimate for scrollbar width;
+           window manager might override the request for y==1 */
         num_args = 0;
+        XtSetArg(args[num_args], XtNy, 1); num_args++;
         XtSetArg(args[num_args], XtNwidth, max_width + 25); num_args++;
-        XtSetArg(args[num_args], XtNheight, screen_height - 75); num_args++;
+        XtSetArg(args[num_args], XtNheight, screen_height - 1); num_args++;
         XtSetValues(popup, args, num_args);
     }
     XtRealizeWidget(popup);

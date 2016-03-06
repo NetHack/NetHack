@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1454061993 2016/01/29 10:06:33 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.193 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1457207035 2016/03/05 19:43:55 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.197 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -6,6 +6,7 @@
 
 #define NOINVSYM '#'
 #define CONTAINED_SYM '>' /* designator for inside a container */
+#define HANDS_SYM '-'
 
 STATIC_DCL int FDECL(CFDECLSPEC sortloot_cmp, (struct obj *, struct obj *));
 STATIC_DCL void NDECL(reorder_invent);
@@ -21,7 +22,8 @@ STATIC_PTR int FDECL(ckunpaid, (struct obj *));
 STATIC_PTR int FDECL(ckvalidcat, (struct obj *));
 STATIC_PTR char *FDECL(safeq_xprname, (struct obj *));
 STATIC_PTR char *FDECL(safeq_shortxprname, (struct obj *));
-STATIC_DCL char FDECL(display_pickinv, (const char *, BOOLEAN_P, long *));
+STATIC_DCL char FDECL(display_pickinv, (const char *, const char *,
+                                        BOOLEAN_P, long *));
 STATIC_DCL char FDECL(display_used_invlets, (CHAR_P));
 STATIC_DCL void FDECL(tally_BUCX,
                       (struct obj *, int *, int *, int *, int *, int *));
@@ -1004,9 +1006,7 @@ register const char *let, *word;
         useboulder = TRUE;
 
     if (allownone)
-        *bp++ = '-';
-    if (bp > buf && bp[-1] == '-')
-        *bp++ = ' ';
+        *bp++ = HANDS_SYM, *bp++ = ' '; /* '-' */
     ap = altlets;
 
     if (!flags.invlet_constant)
@@ -1184,6 +1184,7 @@ register const char *let, *word;
             ilet = yn_function(qbuf, (char *) 0, '\0');
         if (digit(ilet)) {
             long tmpcnt = 0;
+
             if (!allowcnt) {
                 pline("No count allowed with this command.");
                 continue;
@@ -1199,7 +1200,7 @@ register const char *let, *word;
                 pline1(Never_mind);
             return (struct obj *) 0;
         }
-        if (ilet == '-') {
+        if (ilet == HANDS_SYM) { /* '-' */
             if (!allownone) {
                 char *suf = (char *) 0;
 
@@ -1225,20 +1226,33 @@ register const char *let, *word;
             char *allowed_choices = (ilet == '?') ? lets : (char *) 0;
             long ctmp = 0;
 
+            qbuf[0] = '\0';
+            if (!strcmp(word, "grease"))
+                Sprintf(qbuf, "your %s", makeplural(body_part(FINGER)));
+            else if (!strcmp(word, "write with"))
+                Sprintf(qbuf, "your %s", body_part(FINGERTIP));
+            else if (!strcmp(word, "wield"))
+                Sprintf(qbuf, "your %s %s", uarmg ? "gloved" : "bare",
+                        makeplural(body_part(HAND)));
+            else if (!strcmp(word, "ready"))
+                Strcpy(qbuf, "empty quiver");
+
             if (ilet == '?' && !*lets && *altlets)
                 allowed_choices = altlets;
-            ilet = display_pickinv(allowed_choices, TRUE,
-                                   allowcnt ? &ctmp : (long *) 0);
+            ilet = display_pickinv(allowed_choices, *qbuf ? qbuf : (char *) 0,
+                                   TRUE, allowcnt ? &ctmp : (long *) 0);
             if (!ilet)
                 continue;
-            if (allowcnt && ctmp >= 0) {
-                cnt = ctmp;
-                cntgiven = TRUE;
-            }
+            if (ilet == HANDS_SYM)
+                return &zeroobj;
             if (ilet == '\033') {
                 if (flags.verbose)
                     pline1(Never_mind);
                 return (struct obj *) 0;
+            }
+            if (allowcnt && ctmp >= 0) {
+                cnt = ctmp;
+                cntgiven = TRUE;
             }
             /* they typed a letter (not a space) at the prompt */
         }
@@ -1423,7 +1437,7 @@ boolean combo; /* combination menu flag */
 unsigned *resultflags;
 {
     int FDECL((*ckfn), (OBJ_P)) = (int FDECL((*), (OBJ_P))) 0;
-    boolean FDECL((*filter), (OBJ_P)) = (boolean FDECL((*), (OBJ_P))) 0;
+    boolean FDECL((*ofilter), (OBJ_P)) = (boolean FDECL((*), (OBJ_P))) 0;
     boolean takeoff, ident, allflag, m_seen;
     int itemcount;
     int oletct, iletct, unpaid, oc_of_sym;
@@ -1441,13 +1455,13 @@ unsigned *resultflags;
     add_valid_menu_class(0); /* reset */
     if (taking_off(word)) {
         takeoff = TRUE;
-        filter = is_worn;
+        ofilter = is_worn;
     } else if (!strcmp(word, "identify")) {
         ident = TRUE;
-        filter = not_fully_identified;
+        ofilter = not_fully_identified;
     }
 
-    iletct = collect_obj_classes(ilets, invent, FALSE, filter, &itemcount);
+    iletct = collect_obj_classes(ilets, invent, FALSE, ofilter, &itemcount);
     unpaid = count_unpaid(invent);
 
     if (ident && !iletct) {
@@ -1905,22 +1919,25 @@ long quan;       /* if non-0, print this quantity, not obj->quan */
 #else
     static char li[BUFSZ];
 #endif
-    boolean use_invlet = flags.invlet_constant && let != CONTAINED_SYM;
+    boolean use_invlet = (flags.invlet_constant
+                          && let != CONTAINED_SYM && let != HANDS_SYM);
     long savequan = 0;
 
     if (quan && obj) {
         savequan = obj->quan;
         obj->quan = quan;
     }
-
     /*
      * If let is:
+     *  -  Then obj == null and 'txt' refers to hands or fingers.
      *  *  Then obj == null and we are printing a total amount.
      *  >  Then the object is contained and doesn't have an inventory letter.
      */
     if (cost != 0 || let == '*') {
         /* if dot is true, we're doing Iu, otherwise Ix */
-        Sprintf(li, "%c - %-45s %6ld %s",
+        Sprintf(li,
+                iflags.menu_tab_sep ? "%c - %s\t%6ld %s"
+                                    : "%c - %-45s %6ld %s",
                 (dot && use_invlet ? obj->invlet : let),
                 (txt ? txt : doname(obj)), cost, currency(cost));
     } else {
@@ -1995,8 +2012,9 @@ free_pickinv_cache()
  * any count returned from the menu selection is placed here.
  */
 STATIC_OVL char
-display_pickinv(lets, want_reply, out_cnt)
+display_pickinv(lets, xtra_choice, want_reply, out_cnt)
 register const char *lets;
+const char *xtra_choice; /* "fingers", pick hands rather than an object */
 boolean want_reply;
 long *out_cnt;
 {
@@ -2009,7 +2027,7 @@ long *out_cnt;
     menu_item *selected;
     struct obj **oarray;
 
-    if (flags.perm_invent && lets && *lets) {
+    if (flags.perm_invent && ((lets && *lets) || xtra_choice)) {
         /* partial inventory in perm_invent setting; don't operate on
            full inventory window, use an alternate one instead; create
            the first time needed and keep it for re-use as needed later */
@@ -2029,8 +2047,21 @@ long *out_cnt;
      * don't know at this level if its up or not.  This may not be
      * an issue if empty checks are done before hand and the call
      * to here is short circuited away.
+     *
+     * 2: our count here is only to distinguish between 0 and 1 and
+     * more than 1; for the last one, we don't need a precise number.
+     * For perm_invent update we force 'more than 1'.
      */
-    if (!invent && !(flags.perm_invent && !lets && !want_reply)) {
+    n = (flags.perm_invent && !lets && !want_reply) ? 2
+        : lets ? (int) strlen(lets)
+               : !invent ? 0 : !invent->nobj ? 1 : 2;
+    /* for xtra_choice, there's another 'item' not included in initial 'n';
+       for !lets (full invent) and for override_ID (wizard mode identify),
+       skip message_menu handling of single item even if item count was 1 */
+    if (xtra_choice || (n == 1 && (!lets || iflags.override_ID)))
+        ++n;
+
+    if (n == 0) {
         pline("Not carrying anything.");
         return 0;
     }
@@ -2039,31 +2070,39 @@ long *out_cnt;
     if (!flags.invlet_constant)
         reassign();
 
-    if (lets && strlen(lets) == 1 && !iflags.override_ID) {
+    if (n == 1) {
         /* when only one item of interest, use pline instead of menus;
            we actually use a fake message-line menu in order to allow
            the user to perform selection at the --More-- prompt for tty */
         ret = '\0';
-        for (otmp = invent; otmp; otmp = otmp->nobj) {
-            if (otmp->invlet == lets[0]) {
-                ret = message_menu(
-                    lets[0], want_reply ? PICK_ONE : PICK_NONE,
-                    xprname(otmp, (char *) 0, lets[0], TRUE, 0L, 0L));
-                if (out_cnt)
-                    *out_cnt = -1L; /* select all */
-                break;
-            }
+        if (xtra_choice) {
+            /* xtra_choice is "bare hands" (wield), "fingertip" (Engrave),
+               "nothing" (ready Quiver), or "fingers" (apply grease) */
+            ret = message_menu(HANDS_SYM, PICK_ONE,
+                               xprname((struct obj *) 0, xtra_choice,
+                                       HANDS_SYM, TRUE, 0L, 0L)); /* '-' */
+        } else {
+            for (otmp = invent; otmp; otmp = otmp->nobj)
+                if (!lets || otmp->invlet == lets[0])
+                    break;
+            if (otmp)
+                ret = message_menu(otmp->invlet,
+                                   want_reply ? PICK_ONE : PICK_NONE,
+                                   xprname(otmp, (char *) 0, lets[0],
+                                           TRUE, 0L, 0L));
         }
+        if (out_cnt)
+            *out_cnt = -1L; /* select all */
         return ret;
     }
 
-    /* count the number of items */
+    /* count the number of items (preliminary count of 0,1,more was 'more'
+       and is now obsolete); we have at least 2 items or want to behave as
+       if we do (full invent and wiz_identify use this even for 1 item) */
     for (n = 0, otmp = invent; otmp; otmp = otmp->nobj)
         if (!lets || !*lets || index(lets, otmp->invlet))
             n++;
-
     oarray = objarr_init(n);
-
     /* Add objects to the array */
     i = 0;
     for (otmp = invent; otmp; otmp = otmp->nobj)
@@ -2074,23 +2113,31 @@ long *out_cnt;
     start_menu(win);
     any = zeroany;
     if (wizard && iflags.override_ID) {
-        char prompt[BUFSZ];
+        char prompt[QBUFSZ];
+
         any.a_char = -1;
-        /* wiz_identify stuffed the wiz_identify cmd character
-           into iflags.override_ID */
+        /* wiz_identify stuffed the wiz_identify command character (^I)
+           into iflags.override_ID for our use as an accelerator */
         Sprintf(prompt, "Debug Identify (%s to permanently identify)",
                 visctrl(iflags.override_ID));
         add_menu(win, NO_GLYPH, &any, '_', iflags.override_ID, ATR_NONE,
                  prompt, MENU_UNSELECTED);
+    } else if (xtra_choice) {
+        /* wizard override ID and xtra_choice are mutually exclusive */
+        if (flags.sortpack)
+            add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+                     "Miscellaneous", MENU_UNSELECTED);
+        any.a_char = HANDS_SYM; /* '-' */
+        add_menu(win, NO_GLYPH, &any, HANDS_SYM, 0, ATR_NONE,
+                 xtra_choice, MENU_UNSELECTED);
     }
 nextclass:
     classcount = 0;
-    any = zeroany; /* set all bits to zero */
     for (i = 0; i < n; i++) {
         otmp = oarray[i];
-        ilet = otmp->invlet;
-        any = zeroany; /* zero */
         if (!flags.sortpack || otmp->oclass == *invlet) {
+            any = zeroany; /* all bits zero */
+            ilet = otmp->invlet;
             if (flags.sortpack && !classcount) {
                 add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
                          let_to_name(*invlet, FALSE,
@@ -2138,7 +2185,7 @@ display_inventory(lets, want_reply)
 const char *lets;
 boolean want_reply;
 {
-    return display_pickinv(lets, want_reply, (long *) 0);
+    return display_pickinv(lets, (char *) 0, want_reply, (long *) 0);
 }
 
 /*

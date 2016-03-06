@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1449669396 2015/12/09 13:56:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.238 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1456528600 2016/02/26 23:16:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.247 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -55,21 +55,21 @@ STATIC_DCL int FDECL(spell_hit_bonus, (int));
 STATIC_VAR const char are_blinded_by_the_flash[] =
     "are blinded by the flash!";
 
-const char *const flash_types[] =
-    {                  /* also used in buzzmu(mcastu.c) */
-      "magic missile", /* Wands must be 0-9 */
-      "bolt of fire", "bolt of cold", "sleep ray", "death ray",
-      "bolt of lightning", "", "", "", "",
+const char *const flash_types[] =       /* also used in buzzmu(mcastu.c) */
+    {
+        "magic missile", /* Wands must be 0-9 */
+        "bolt of fire", "bolt of cold", "sleep ray", "death ray",
+        "bolt of lightning", "", "", "", "",
 
-      "magic missile", /* Spell equivalents must be 10-19 */
-      "fireball", "cone of cold", "sleep ray", "finger of death",
-      "bolt of lightning", /* There is no spell, used for retribution */
-      "", "", "", "",
+        "magic missile", /* Spell equivalents must be 10-19 */
+        "fireball", "cone of cold", "sleep ray", "finger of death",
+        "bolt of lightning", /* there is no spell, used for retribution */
+        "", "", "", "",
 
-      "blast of missiles", /* Dragon breath equivalents 20-29*/
-      "blast of fire", "blast of frost", "blast of sleep gas",
-      "blast of disintegration", "blast of lightning", "blast of poison gas",
-      "blast of acid", "", ""
+        "blast of missiles", /* Dragon breath equivalents 20-29*/
+        "blast of fire", "blast of frost", "blast of sleep gas",
+        "blast of disintegration", "blast of lightning",
+        "blast of poison gas", "blast of acid", "", ""
     };
 
 /*
@@ -140,12 +140,13 @@ struct obj *otmp;
     int dmg, otyp = otmp->otyp;
     const char *zap_type_text = "spell";
     struct obj *obj;
-    boolean disguised_mimic =
-        (mtmp->data->mlet == S_MIMIC && mtmp->m_ap_type != M_AP_NOTHING);
+    boolean disguised_mimic = (mtmp->data->mlet == S_MIMIC
+                               && mtmp->m_ap_type != M_AP_NOTHING);
 
     if (u.uswallow && mtmp == u.ustuck)
         reveal_invis = FALSE;
 
+    notonhead = (mtmp->mx != bhitpos.x || mtmp->my != bhitpos.y);
     switch (otyp) {
     case WAN_STRIKING:
         zap_type_text = "wand";
@@ -2523,6 +2524,8 @@ struct obj *obj; /* wand or spell */
 {
     int steedhit = FALSE;
 
+    bhitpos.x = u.usteed->mx, bhitpos.y = u.usteed->my;
+    notonhead = FALSE;
     switch (obj->otyp) {
     /*
      * Wands that are allowed to hit the steed
@@ -3915,6 +3918,7 @@ register int dx, dy;
             if (type >= 0)
                 mon->mstrategy &= ~STRAT_WAITMASK;
         buzzmonst:
+            notonhead = (mon->mx != bhitpos.x || mon->my != bhitpos.y);
             if (zap_hit(find_mac(mon), spell_type)) {
                 if (mon_reflects(mon, (char *) 0)) {
                     if (cansee(mon->mx, mon->my)) {

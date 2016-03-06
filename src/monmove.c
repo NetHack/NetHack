@@ -1,4 +1,4 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1455402384 2016/02/13 22:26:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.84 $ */
+/* NetHack 3.6	monmove.c	$NHDT-Date: 1456959639 2016/03/02 23:00:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.85 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1218,12 +1218,12 @@ postmov:
             }
             ptr = mtmp->data;
 
-            /* open a door, or crash through it, if you can */
+            /* open a door, or crash through it, if 'mtmp' can */
             if (IS_DOOR(levl[mtmp->mx][mtmp->my].typ)
                 && !passes_walls(ptr) /* doesn't need to open doors */
                 && !can_tunnel) {     /* taken care of below */
                 struct rm *here = &levl[mtmp->mx][mtmp->my];
-                boolean btrapped = (here->doormask & D_TRAPPED),
+                boolean btrapped = (here->doormask & D_TRAPPED) != 0,
                         observeit = canseeit && canspotmon(mtmp);
 
                 if ((here->doormask & (D_LOCKED | D_CLOSED)) != 0
@@ -1296,7 +1296,7 @@ postmov:
                             else if (!Deaf)
                                 You_hear("a door crash open.");
                         }
-                        if (here->doormask & D_LOCKED && !rn2(2))
+                        if ((here->doormask & D_LOCKED) != 0 && !rn2(2))
                             here->doormask = D_NODOOR;
                         else
                             here->doormask = D_BROKEN;

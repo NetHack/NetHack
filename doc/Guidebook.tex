@@ -45,7 +45,7 @@
 %.au
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.6 by Mike Stephenson and others)}
-\date{January 18, 2016}
+\date{February 22, 2016}
 
 \maketitle
 
@@ -346,6 +346,9 @@ do other tasks requiring agility or manipulation of objects.
 \item[\bb{Constitution}]
 Constitution affects your ability to recover from injuries and other
 strains on your stamina.
+When strength is low or modest, consitution also affects how much you
+can carry.  With sufficiently high strength, the contribution to
+carrying capacity from your constitution no longer matters.
 %.lp
 \item[\bb{Intelligence}]
 Intelligence affects your ability to cast spells and read spellbooks.
@@ -1599,7 +1602,8 @@ to your pack and tell you what you just picked up.
 As you add items to your inventory, you also add the weight of that object
 to your load.  The amount that you can carry depends on your strength and
 your constitution.  The
-stronger you are, the less the additional load will affect you.  There comes
+stronger and sturdier
+you are, the less the additional load will affect you.  There comes
 a point, though, when the weight of all of that stuff you are carrying around
 with you through the dungeon will encumber you.  Your reactions
 will get slower and you'll burn calories faster, requiring food more frequently
@@ -1897,10 +1901,10 @@ crystal plate mail     & 3 &                   & bronze plate mail     & 4\\
 splint mail            & 4 &                   & banded mail           & 4\\
 dwarvish mithril-coat  & 4 &                   & elven mithril-coat    & 5\\
 chain mail             & 5 &                   & orcish chain mail     & 6\\
-scale mail             & 6 &                   & studded leather armor & 7\\
-ring mail              & 7 &                   & orcish ring mail      & 8\\
-leather armor          & 8 &                   & leather jacket        & 9\\
-no armor               & 10
+scale mail             & 6 &                   & dragon scales         & 7\\
+studded leather armor  & 7 &                   & ring mail             & 7\\
+orcish ring mail       & 8 &                   & leather armor         & 8\\
+leather jacket         & 9 &                   & no armor              & 10\\
 \end{tabular}
 \end{center}
 
@@ -2015,11 +2019,13 @@ The command to drink a potion is `{\tt q}' (quaff).
 \subsection*{Wands (`{\tt /}')}
 
 %.pg
-Magic wands usually have multiple magical charges.  Some wands are
-directional---you must give a direction in which to zap them.  You can also
+Wands usually have multiple magical charges.
+Some types of wands require a direction in which to zap them.
+You can also
 zap them at yourself (just give a `{\tt .}' or `{\tt s}' for the direction).
-Be warned, however, for this is often unwise.  Other wands are
-nondirectional---they don't require a direction.  The number of charges in a
+Be warned, however, for this is often unwise.
+Other types of wands
+don't require a direction.  The number of charges in a
 wand is random and decreases by one whenever you use it.
 
 %.pg
@@ -2087,17 +2093,19 @@ energy and the time required in casting.
 %.pg
 Casting a spell calls forth magical energies and focuses them with
 your naked mind.  Some of the magical energy released comes from within
-you, and casting several spells in a row may tire you.
+you.
+Casting temporarily drains your magical power, which will slowly be
+recovered, and causes you to need additional food.
 Casting of spells also requires practice.  With practice, your
 skill in each category of spell casting will improve.  Over time, however,
 your memory of each spell will dim, and you will need to relearn it.
 
 %.pg
-Some spells are
-directional---you must give a direction in which to cast them.  You can also
-cast them at yourself (just give a `{\tt .}' or `{\tt s}' for the direction).
-Be warned, however, for this is often unwise.  Other spells are
-nondirectional---they don't require a direction.
+Some spells require a direction in which to cast them, similar to wands.
+To cast one at yourself, just give a `{\tt .}' or `{\tt s}' for the direction.
+A few spells require you to pick a target location rather than just specify
+a particular direction.
+Other spells don't require any direction or target.
 
 %.pg
 Just as weapons are divided into groups in which a character can become
@@ -2192,6 +2200,11 @@ heavy.  It is rumored that some statues are not what they seem.
 %.pg
 Very large humanoids (giants and their ilk) have been known to use boulders
 as weapons.
+
+%.pg
+For some configurations of the program, statues are no longer shown
+as `{\tt `}'
+but by the letter representing the monster they depict instead.
 
 %.hn 2
 \subsection*{Gold (`{\tt \$}')}
@@ -2447,7 +2460,7 @@ Persistent.
 Your starting alignment ({\tt align:lawful}, {\tt align:neutral},
 or {\tt align:chaotic}).  You may specify just the first letter.
 The default is to randomly pick an appropriate alignment.
-If you prefix `{\tt !}' or ``{\tt no}'' to the value, you can 
+If you prefix the value with `{\tt !}' or ``{\tt no}'', you will
 exclude that alignment from being picked randomly.
 Cannot be set with the `{\tt O}' command.  Persistent.
 %.lp
@@ -2487,7 +2500,8 @@ Start the character permanently blind.  Persistent. (default false)
 Allow saving and loading bones files.  Persistent.  (default true)
 %.lp
 \item[\ib{boulder}]
-Set the character used to display boulders (default is rock class symbol).
+Set the character used to display boulders (default is the ``large rock''
+class symbol, `{\tt `}').
 %.lp
 \item[\ib{catname}]
 Name your starting cat (ex.\ ``{\tt catname:Morris}'').
@@ -2495,9 +2509,7 @@ Cannot be set with the `{\tt O}' command.
 %.lp character
 \item[\ib{character}]
 Pick your type of character (ex.\ ``{\tt character:Monk}'');
-synonym for ``{\it role\/}''.  See ``{\it name\/}'' for an alternate method
-of specifying your role.  Normally only the first letter of
-the value is examined; the string ``{\tt random}'' is an exception.
+synonym for ``{\it role\/}''.  See {\it role\/} for more details.
 %.lp
 \item[\ib{checkpoint}]
 Save game state after each level change, for possible recovery after
@@ -2506,7 +2518,9 @@ program crash (default on).  Persistent.
 \item[\ib{checkspace}]
 Check free disk space before writing files to disk (default on).
 You may have to turn this off if you have more than 2 GB free space
-on the partition used for your save and level files.
+on the partition used for your save and level files
+(because too much space might overflow the calculation and end up
+looking like insufficient space).
 Only applies when MFLOPPY was defined during compilation.
 %.lp
 \item[\ib{clicklook}]
@@ -2603,7 +2617,7 @@ You may specify just the first letter.  Although you can
 still denote your gender using the ``{\tt male}'' and ``{\tt female}''
 options, the ``{\tt gender}'' option will take precedence.
 The default is to randomly pick an appropriate gender.
-If you prefix `{\tt !}' or ``{\tt no}'' to the value, you can 
+If you prefix the value with `{\tt !}' or ``{\tt no}'', you will
 exclude that gender from being picked randomly. 
 Cannot be set with the `{\tt O}' command.  Persistent.
 %.lp
@@ -2917,7 +2931,7 @@ become wielded.  Persistent.
 %.Ip
 \item[\ib{race}]
 Selects your race (for example, ``{\tt race:human}'').  Default is random.
-If you prefix `{\tt !}' or ``{\tt no}'' to the value, you can 
+If you prefix the value with `{\tt !}' or ``{\tt no}'', you will
 exclude that race from being picked randomly. 
 Cannot be set with the `{\tt O}' command.  Persistent.
 %.lp
@@ -2930,9 +2944,10 @@ Pick your type of character (ex.\ ``{\tt role:Samurai}'');
 synonym for ``{\it character\/}''.  See ``{\it name\/}'' for an alternate method
 of specifying your role.  Normally only the first letter of the
 value is examined; `r' is an exception with ``{\tt Rogue}'', {\tt Ranger}'',
-and ``{\tt random}'' values. If you prefix `{\tt !}' or ``{\tt no}'' to the 
-value, you can exclude that role from being picked randomly.
-Persistent.
+and ``{\tt random}'' values.
+If you prefix the value with `{\tt !}' or ``{\tt no}'', you will
+exclude that role from being picked randomly.
+Cannot be set with the `{\tt O}' command.  Persistent.
 %.lp
 \item[\ib{roguesymset}]
 This option may be used to select one of the named symbol sets found within
@@ -3885,7 +3900,7 @@ mode (the debugging mode, not the magic-useing role). A value of a single
 asterisk (*) allows anyone to start a game in wizard mode.
 %.lp
 \item[\ib{SHELLERS}]
-A list of users who are allowed to use the shell escape command (!).
+A list of users who are allowed to use the shell escape command (`{\tt !}').
 The syntax is the same as WIZARDS.
 %.lp
 \item[\ib{EXPLORERS}]

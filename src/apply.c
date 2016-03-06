@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1455140802 2016/02/10 21:46:42 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.220 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1457207021 2016/03/05 19:43:41 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.223 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -323,6 +323,8 @@ register struct obj *obj;
     context.stethoscope_move = moves;
     context.stethoscope_movement = youmonst.movement;
 
+    bhitpos.x = u.ux, bhitpos.y = u.uy; /* tentative, reset below */
+    notonhead = u.uswallow;
     if (u.usteed && u.dz > 0) {
         if (interference) {
             pline("%s interferes.", Monnam(u.ustuck));
@@ -369,6 +371,10 @@ register struct obj *obj;
         const char *mnm = x_monnam(mtmp, ARTICLE_A, (const char *) 0,
                                    SUPPRESS_IT | SUPPRESS_INVISIBLE, FALSE);
 
+        /* bhitpos needed by mstatusline() iff mtmp is a long worm */
+        bhitpos.x = rx, bhitpos.y = ry;
+        notonhead = (mtmp->mx != rx || mtmp->my != ry);
+
         if (mtmp->mundetected) {
             if (!canspotmon(mtmp))
                 There("is %s hidden there.", mnm);
@@ -389,10 +395,11 @@ register struct obj *obj;
                 break;
             }
             seemimic(mtmp);
-            pline("That %s is really %s", what, mnm);
+            pline("That %s is really %s.", what, mnm);
         } else if (flags.verbose && !canspotmon(mtmp)) {
             There("is %s there.", mnm);
         }
+
         mstatusline(mtmp);
         if (!canspotmon(mtmp))
             map_invisible(rx, ry);
@@ -403,6 +410,7 @@ register struct obj *obj;
         newsym(rx, ry);
         pline_The("invisible monster must have moved.");
     }
+
     lev = &levl[rx][ry];
     switch (lev->typ) {
     case SDOOR:
@@ -1966,8 +1974,8 @@ long timeout;
     if (mtmp) {
         char and_vanish[BUFSZ];
         struct obj *mshelter = level.objects[mtmp->mx][mtmp->my];
-        Sprintf(monnambuf, "%s", an(m_monnam(mtmp)));
 
+        Sprintf(monnambuf, "%s", an(m_monnam(mtmp)));
         and_vanish[0] = '\0';
         if ((mtmp->minvis && !See_invisible)
             || (mtmp->data->mlet == S_MIMIC
@@ -2009,11 +2017,13 @@ long timeout;
         case OBJ_MINVENT:
             if (cansee_spot && !silent && !suppress_see) {
                 struct monst *mon;
+
                 mon = figurine->ocarry;
                 /* figurine carrying monster might be invisible */
-                if (canseemon(figurine->ocarry)) {
+                if (canseemon(figurine->ocarry)
+                    && (!mon->wormno || cansee(mon->mx, mon->my)))
                     Sprintf(carriedby, "%s pack", s_suffix(a_monnam(mon)));
-                } else if (is_pool(mon->mx, mon->my))
+                else if (is_pool(mon->mx, mon->my))
                     Strcpy(carriedby, "empty water");
                 else
                     Strcpy(carriedby, "thin air");

@@ -1,4 +1,4 @@
-/* NetHack 3.6	pckeys.c	$NHDT-Date: 1432512792 2015/05/25 00:13:12 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
+/* NetHack 3.6	pckeys.c	$NHDT-Date: 1457207039 2016/03/05 19:43:59 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.11 $ */
 /* Copyright (c) NetHack PC Development Team 1996                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -14,6 +14,10 @@
 #include "pcvideo.h"
 
 boolean FDECL(pckeys, (unsigned char, unsigned char));
+static void FDECL(userpan, (BOOLEAN_P));
+static void FDECL(overview, (BOOLEAN_P));
+static void FDECL(traditional, (BOOLEAN_P));
+static void NDECL(refresh);
 
 extern struct WinDesc *wins[MAXWIN]; /* from wintty.c */
 extern boolean inmap;                /* from video.c */
@@ -47,31 +51,86 @@ unsigned char shift;
 #endif
     case 0x74: /* Control-right_arrow = scroll horizontal to right */
         if ((shift & CTRL) && iflags.tile_view && !opening_dialog)
-            vga_userpan(1);
+            userpan(1);
         break;
 
     case 0x73: /* Control-left_arrow = scroll horizontal to left */
         if ((shift & CTRL) && iflags.tile_view && !opening_dialog)
-            vga_userpan(0);
+            userpan(0);
         break;
     case 0x3E: /* F4 = toggle overview mode */
         if (iflags.tile_view && !opening_dialog && !Is_rogue_level(&u.uz)) {
             iflags.traditional_view = FALSE;
-            vga_overview(iflags.over_view ? FALSE : TRUE);
-            vga_refresh();
+            overview(iflags.over_view ? FALSE : TRUE);
+            refresh();
         }
         break;
     case 0x3F: /* F5 = toggle traditional mode */
         if (iflags.tile_view && !opening_dialog && !Is_rogue_level(&u.uz)) {
             iflags.over_view = FALSE;
-            vga_traditional(iflags.traditional_view ? FALSE : TRUE);
-            vga_refresh();
+            traditional(iflags.traditional_view ? FALSE : TRUE);
+            refresh();
         }
         break;
     default:
         return FALSE;
     }
     return TRUE;
+}
+
+static void
+userpan(on)
+boolean on;
+{
+#ifdef SCREEN_VGA
+    if (iflags.usevga)
+        vga_userpan(on);
+#endif
+#ifdef SCREEN_VESA
+    if (iflags.usevesa)
+        vesa_userpan(on);
+#endif
+}
+
+static void
+overview(on)
+boolean on;
+{
+#ifdef SCREEN_VGA
+    if (iflags.usevga)
+        vga_overview(on);
+#endif
+#ifdef SCREEN_VESA
+    if (iflags.usevesa)
+        vesa_overview(on);
+#endif
+}
+
+static void
+traditional(on)
+boolean on;
+{
+#ifdef SCREEN_VGA
+    if (iflags.usevga)
+        vga_traditional(on);
+#endif
+#ifdef SCREEN_VESA
+    if (iflags.usevesa)
+        vesa_traditional(on);
+#endif
+}
+
+static void
+refresh()
+{
+#ifdef SCREEN_VGA
+    if (iflags.usevga)
+        vga_refresh();
+#endif
+#ifdef SCREEN_VESA
+    if (iflags.usevesa)
+        vesa_refresh();
+#endif
 }
 #endif /* USE_TILES */
 #endif /* MSDOS */

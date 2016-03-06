@@ -163,6 +163,20 @@ using 'R' on armor would bypass some restrictions imposed by 'T' (inner layer
 when examining hidden monsters (probing, persistent monster detection), tell
 	how they're hidden (under an object, on the ceiling, etc)
 some quest text corrections
+use a much tighter upper bound when summoning nasties; old method could
+	theoretically create 200 critters at a time
+if a long worm inherited inventory from a previous shape, and if an egg or
+	figurine in that inventory hatched or auto-activated, messages were
+	given when hero could see any tail segment even if head was unseen,
+	making it seem as if worm's inventory was kept in the visible segment
+Wizard will now steal any quest artifact from hero, not just own role's
+prevent a hostile renegade Angel of <lawful god> from delivering taunt
+	messages which mention threats of retribution from that god
+a few types of monster (barrow wight, Nazgul, erinys) have weapon attacks that
+	don't deal physical damage, so special damage like stoning via wielded
+	cockatrice corpse wouldn't be inflicted
+non-item-using monsters who happened to be carrying scroll or wand of fire or
+        a fire horn could use it to cure themselves of being turned into slime
 
 
 Platform- and/or Interface-Specific Fixes
@@ -173,6 +187,8 @@ tty: specifying all four of role, race, gender, and alignment still prompted
 	for confirmation with "Is this ok?" before starting play
 tty: responding with <return> or <enter> during role, race, &c selection
 	behaved same as <escape> to quit; now it will pick [random] instead
+tty: rename struct variable 'filter' (role.c) and function 'winch()' (wintty.c)
+	to avoid conflicts with <curses.h>
 unix/X11: in top level Makefile, some commented out definitions of VARDATND
 	misspelled pilemark.xbm (as pilemark.xpm)
 unix: options file with CR+LF line ends and an invalid option line resulted in
@@ -211,7 +227,8 @@ allow knife and stiletto as possible tin opening tools
 wizard mode #wizintrinsic command
 additional tribute passages for The Colour of Magic, The Light Fantastic,
 	Equal Rites, Mort, Sourcery, Wyrd Sisters, Pyramids, Guards! Guards!,
-	Eric, Moving Pictures, Reaper Man, Snuff, and Raising Steam
+	Eric, Moving Pictures, Reaper Man, Witches Abroad, Snuff, and
+	Raising Steam
 compile-time options SIMPLE_MAIL and SERVER_ADMIN_MSG for public server use
 database entries for Cleaver, Sunsword, Frost and Fire brands, and
 	polymorph trap
@@ -220,6 +237,12 @@ allow showing coordinates when picking a position on the map and
 new status line conditions Stone Strngl Deaf Lev Fly Ride
 allow some extra color name aliases for menucolors and status hilites
 add extended command #kick
+when choosing an inventory item and '-' for bare-hands/fingers/no-ammo is a
+	choice, include that in the inventory menu if player types '?' or '*'
+feedback from probing of long worm now includes number of segments it has
+monk starts with 'shuriken' pre-discovered (despite language issue...)
+item-using monster on or next to a fire trap can use it to be cured of
+	turning into slime
 
 
 Platform- and/or Interface-Specific New Features
@@ -232,11 +255,26 @@ unix: add CHECK_PLNAME-option to sysconf to make WIZARDS, EXPLORERS, and
 X11: new NetHack*highlight_prompt resource to control whether the persistent
 	prompt line between the map and message windows for the NetHack*slow
 	configuration will be highlighted when it's expecting input
+X11: NetHack*extcmd_height_delta resource can be used to adjust initial size
+	of the extended commands menu
+X11: status display split into three columns to accomodate Stone/Deaf/Lev/&c;
+	NetHack*status_condition.foreground, .background, and .showGrip
+	resources replaced by status_condition[1-3].*
 
 
 NetHack Community Patches (or Variation) Included
 -------------------------------------------------
 Malcolm Ryan's improved tin opener
+Ray Chason's keyboard may stop responding after locking or unlocking a door when
+	using altkeyhandler=nhraykey.dll 
+Ray Chason's fix: window interfaces that support transparency may give away unseen
+	parts of the map
+Ray Chason's xprname should honor iflags.menu_tab_sep
+Ray Chason's punctuation for "That foo is really a mimic."
+Ray Chason's proper background tiles for lava and water
+Ray Chason's MS-DOS port restored to functionality with credit to Reddit user 
+	b_helyer for the fix to sys/share/pcmain.c
+Ray Chason's MSDOS port support for some VESA modes
 
 
 Code Cleanup and Reorganization

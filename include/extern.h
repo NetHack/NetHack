@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1455672983 2016/02/17 01:36:23 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.548 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1456992437 2016/03/03 08:07:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.550 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1136,8 +1136,8 @@ E const char *FDECL(mpoisons_subj, (struct monst *, struct attack *));
 E void NDECL(u_slow_down);
 E struct monst *NDECL(cloneu);
 E void FDECL(expels, (struct monst *, struct permonst *, BOOLEAN_P));
-E struct attack *FDECL(getmattk,
-                       (struct permonst *, int, int *, struct attack *));
+E struct attack *FDECL(getmattk, (struct monst *, struct monst *,
+                                  int, int *, struct attack *));
 E int FDECL(mattacku, (struct monst *));
 E int FDECL(magic_negation, (struct monst *));
 E boolean NDECL(gulp_blnd_check);
@@ -2715,6 +2715,7 @@ E void FDECL(place_worm_tail_randomly, (struct monst *, XCHAR_P, XCHAR_P));
 E int FDECL(count_wsegs, (struct monst *));
 E boolean FDECL(worm_known, (struct monst *));
 E boolean FDECL(worm_cross, (int, int, int, int));
+E int FDECL(wseg_at, (struct monst *, int, int));
 
 /* ### worn.c ### */
 

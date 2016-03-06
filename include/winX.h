@@ -1,4 +1,4 @@
-/* NetHack 3.6	winX.h	$NHDT-Date: 1454977916 2016/02/09 00:31:56 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.22 $ */
+/* NetHack 3.6	winX.h	$NHDT-Date: 1457079196 2016/03/04 08:13:16 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.23 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -252,6 +252,7 @@ typedef struct {
     String tile_file;         /* name of file to open for tiles */
     String icon;              /* name of desired icon */
     int message_lines;        /* number of lines to attempt to show */
+    int extcmd_height_delta;  /* bottom margin for extended command menu */
     String pet_mark_bitmap;   /* X11 bitmap file used to mark pets */
     Pixel pet_mark_color;     /* color of pet mark */
     String pilemark_bitmap;   /* X11 bitmap file used to mark item piles */

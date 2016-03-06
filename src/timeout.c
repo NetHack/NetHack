@@ -1,4 +1,4 @@
-/* NetHack 3.6	timeout.c	$NHDT-Date: 1452660198 2016/01/13 04:43:18 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.64 $ */
+/* NetHack 3.6	timeout.c	$NHDT-Date: 1456526165 2016/02/26 22:36:05 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.65 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -614,14 +614,17 @@ long timeout;
         case OBJ_MINVENT:
             if (cansee_hatchspot) {
                 /* egg carrying monster might be invisible */
-                if (canseemon(egg->ocarry)) {
+                mon2 = egg->ocarry;
+                if (canseemon(mon2)
+                    && (!mon2->wormno || cansee(mon2->mx, mon2->my))) {
                     Sprintf(carriedby, "%s pack",
-                            s_suffix(a_monnam(egg->ocarry)));
+                            s_suffix(a_monnam(mon2)));
                     knows_egg = TRUE;
-                } else if (is_pool(mon->mx, mon->my))
+                } else if (is_pool(mon->mx, mon->my)) {
                     Strcpy(carriedby, "empty water");
-                else
+                } else {
                     Strcpy(carriedby, "thin air");
+                }
                 You_see("%s %s out of %s!", monnambuf,
                         locomotion(mon->data, "drop"), carriedby);
             }

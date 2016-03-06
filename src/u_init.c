@@ -701,31 +701,25 @@ u_init()
         ini_inv(Knight);
         knows_class(WEAPON_CLASS);
         knows_class(ARMOR_CLASS);
-        /* give knights chess-like mobility
-         * -- idea from wooledge@skybridge.scl.cwru.edu */
+        /* give knights chess-like mobility--idea from wooledge@..cwru.edu */
         HJumping |= FROMOUTSIDE;
         skill_init(Skill_K);
         break;
-    case PM_MONK:
-        switch (rn2(90) / 30) {
-        case 0:
-            Monk[M_BOOK].trotyp = SPE_HEALING;
-            break;
-        case 1:
-            Monk[M_BOOK].trotyp = SPE_PROTECTION;
-            break;
-        case 2:
-            Monk[M_BOOK].trotyp = SPE_SLEEP;
-            break;
-        }
+    case PM_MONK: {
+        static short M_spell[] = { SPE_HEALING, SPE_PROTECTION, SPE_SLEEP };
+
+        Monk[M_BOOK].trotyp = M_spell[rn2(90) / 30]; /* [0..2] */
         ini_inv(Monk);
         if (!rn2(5))
             ini_inv(Magicmarker);
         else if (!rn2(10))
             ini_inv(Lamp);
         knows_class(ARMOR_CLASS);
+        /* sufficiently martial-arts oriented item to ignore language issue */
+        knows_object(SHURIKEN);
         skill_init(Skill_Mon);
         break;
+    }
     case PM_PRIEST:
         ini_inv(Priest);
         if (!rn2(10))

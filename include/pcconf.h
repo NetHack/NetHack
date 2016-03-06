@@ -1,4 +1,4 @@
-/* NetHack 3.6	pcconf.h	$NHDT-Date: 1432512776 2015/05/25 00:12:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.17 $ */
+/* NetHack 3.6	pcconf.h	$NHDT-Date: 1457207019 2016/03/05 19:43:39 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.19 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -79,6 +79,7 @@
 #if (defined(SCREEN_BIOS) || defined(SCREEN_DJGPPFAST)) && !defined(PC9800)
 #ifdef USE_TILES
 #define SCREEN_VGA /* Include VGA	  graphics routines in the build */
+#define SCREEN_VESA
 #endif
 #endif
 #else
@@ -86,6 +87,7 @@
 #undef SCREEN_BIOS
 #undef SCREEN_DJGPPFAST
 #undef SCREEN_VGA
+#undef SCREEN_VESA
 #undef TERMLIB
 #define ANSI_DEFAULT
 #endif
@@ -310,9 +312,8 @@
 #endif
 /* SCREEN_8514, SCREEN_VESA are only placeholders presently - sub VGA instead
  */
-#if defined(SCREEN_8514) || defined(SCREEN_VESA)
+#if defined(SCREEN_8514)
 #undef SCREEN_8514
-#undef SCREEN_VESA
 #define SCREEN_VGA
 #endif
 /* Graphical tile sanity checks */

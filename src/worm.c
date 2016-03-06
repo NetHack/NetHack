@@ -1,4 +1,4 @@
-/* NetHack 3.6	worm.c	$NHDT-Date: 1446887540 2015/11/07 09:12:20 $  $NHDT-Branch: master $:$NHDT-Revision: 1.19 $ */
+/* NetHack 3.6	worm.c	$NHDT-Date: 1456528599 2016/02/26 23:16:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.20 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -89,11 +89,9 @@ get_wormno()
 
     while (new_wormno < MAX_NUM_WORMS) {
         if (!wheads[new_wormno])
-            return new_wormno; /* found an empty wtails[] slot at new_wormno
-                                  */
+            return new_wormno; /* found empty wtails[] slot at new_wormno */
         new_wormno++;
     }
-
     return 0; /* level infested with worms */
 }
 
@@ -296,11 +294,9 @@ register struct monst *worm;
     /*  if (!wnum) return;  bullet proofing */
 
     /*  This does not work right now because mattacku() thinks that the head
-     * is
-     *  out of range of the player.  We might try to kludge, and bring the
-     * head
-     *  within range for a tiny moment, but this needs a bit more looking at
-     *  before we decide to do this.
+     *  is out of range of the player.  We might try to kludge, and bring
+     *  the head within range for a tiny moment, but this needs a bit more
+     *  looking at before we decide to do this.
      */
     for (seg = wtails[wnum]; seg; seg = seg->nseg)
         if (distu(seg->wx, seg->wy) < 3)
@@ -373,7 +369,6 @@ struct obj *weap;
      *  it's head at "curr" and its tail at "new_tail".  The old worm
      *  must be at least level 3 in order to produce a new worm.
      */
-
     new_worm = 0;
     new_wnum = (worm->m_lev >= 3 && !rn2(3)) ? get_wormno() : 0;
     if (new_wnum) {
@@ -683,22 +678,19 @@ register xchar *nx, *ny;
 }
 
 /*  count_wsegs()
- *  returns the number of visible segments that a worm has.
+ *  returns the number of segments that a worm has.
  */
 int
 count_wsegs(mtmp)
 struct monst *mtmp;
 {
     register int i = 0;
-    register struct wseg *curr = (wtails[mtmp->wormno])->nseg;
+    register struct wseg *curr;
 
-    /*  if (!mtmp->wormno) return 0;  bullet proofing */
-
-    while (curr) {
-        i++;
-        curr = curr->nseg;
+    if (mtmp->wormno) {
+        for (curr = wtails[mtmp->wormno]->nseg; curr; curr = curr->nseg)
+            i++;
     }
-
     return i;
 }
 
@@ -800,6 +792,31 @@ int x1, y1, x2, y2;
     }
     /* should never reach here... */
     return FALSE;
+}
+
+/* construct an index number for a worm tail segment */
+int
+wseg_at(worm, x, y)
+struct monst *worm;
+int x, y;
+{
+    int res = 0;
+
+    if (worm && worm->wormno && m_at(x, y) == worm) {
+        struct wseg *curr;
+        int i, n;
+        xchar wx = (xchar) x, wy = (xchar) y;
+
+        for (i = 0, curr = wtails[worm->wormno]; curr; curr = curr->nseg) {
+            if (curr->wx == wx && curr->wy == wy)
+                break;
+            ++i;
+        }
+        for (n = i; curr; curr = curr->nseg)
+            ++n;
+        res = n - i;
+    }
+    return res;
 }
 
 /*worm.c*/

@@ -1,4 +1,4 @@
-/* NetHack 3.6	engrave.c	$NHDT-Date: 1455491569 2016/02/14 23:12:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.6	engrave.c	$NHDT-Date: 1456304550 2016/02/24 09:02:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.61 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -535,7 +535,7 @@ doengrave()
         return 0;
 
     if (otmp == &zeroobj) {
-        Strcat(strcpy(fbuf, "your "), makeplural(body_part(FINGER)));
+        Strcat(strcpy(fbuf, "your "), body_part(FINGERTIP));
         writer = fbuf;
     } else
         writer = yname(otmp);
@@ -993,8 +993,7 @@ doengrave()
     if (otmp != &zeroobj)
         You("%s the %s with %s.", everb, eloc, doname(otmp));
     else
-        You("%s the %s with your %s.", everb, eloc,
-            makeplural(body_part(FINGER)));
+        You("%s the %s with your %s.", everb, eloc, body_part(FINGERTIP));
 
     /* Prompt for engraving! */
     Sprintf(qbuf, "What do you want to %s the %s here?", everb, eloc);
