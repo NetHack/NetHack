@@ -1,4 +1,4 @@
-/* NetHack 3.6	muse.c	$NHDT-Date: 1457236628 2016/03/06 03:57:08 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.71 $ */
+/* NetHack 3.6	muse.c	$NHDT-Date: 1457254910 2016/03/06 09:01:50 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.72 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -1116,7 +1116,7 @@ struct monst *mtmp;
                 m.has_offense = MUSE_WAN_FIRE;
             }
             nomore(MUSE_FIRE_HORN);
-            if (obj->otyp == FIRE_HORN && obj->spe > 0) {
+            if (obj->otyp == FIRE_HORN && obj->spe > 0 && can_blow(mtmp)) {
                 m.offensive = obj;
                 m.has_offense = MUSE_FIRE_HORN;
             }
@@ -1126,7 +1126,7 @@ struct monst *mtmp;
                 m.has_offense = MUSE_WAN_COLD;
             }
             nomore(MUSE_FROST_HORN);
-            if (obj->otyp == FROST_HORN && obj->spe > 0) {
+            if (obj->otyp == FROST_HORN && obj->spe > 0 && can_blow(mtmp)) {
                 m.offensive = obj;
                 m.has_offense = MUSE_FROST_HORN;
             }
@@ -2074,7 +2074,7 @@ struct obj *obj;
         if (typ == UNICORN_HORN)
             return (boolean) (!obj->cursed && !is_unicorn(mon->data));
         if (typ == FROST_HORN || typ == FIRE_HORN)
-            return (obj->spe > 0);
+            return (obj->spe > 0 && can_blow(mon));
         break;
     case FOOD_CLASS:
         if (typ == CORPSE)
@@ -2492,7 +2492,8 @@ struct obj *obj;
     if (obj->otyp == SCR_FIRE)
         return (haseyes(mon->data) && mon->mcansee);
     /* hero doesn't need hands or even limbs to zap, so mon doesn't either */
-    return ((obj->otyp == WAN_FIRE || obj->otyp == FIRE_HORN)
+    return ((obj->otyp == WAN_FIRE
+             || (obj->otyp == FIRE_HORN && can_blow(mon)))
             && obj->spe > 0);
 }
 
