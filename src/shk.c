@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1455403704 2016/02/13 22:48:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.124 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1457392872 2016/03/07 23:21:12 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.125 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -575,7 +575,8 @@ char *enterstring;
         if (!Deaf && !muteshk(shkp))
             verbalize("Invisible customers are not welcome!");
         else
-            pline("%s stands firm as if he knows you are there.", Shknam(shkp));
+            pline("%s stands firm as if %s knows you are there.",
+                  Shknam(shkp), mhe(shkp));
         return;
     }
 
