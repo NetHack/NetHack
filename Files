@@ -264,9 +264,9 @@ NetHackTerm.applescript         recover.pl
 
 win/share:
 (files for versions using optional tiles)
-gifread.c       monsters.txt    objects.txt     other.txt       ppmwrite.c
-renumtiles.pl   thintile.c      tile.doc        tile.h          tile2bmp.c
-tilemap.c       tiletext.c
+gifread.c       giftiles.c      monsters.txt    objects.txt     other.txt
+ppmwrite.c      renumtiles.pl   thintile.c      tile.doc        tile.h
+tile2bmp.c      tilemap.c       tiletext.c
 
 win/tty:
 (files for tty versions)
