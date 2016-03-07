@@ -1342,11 +1342,13 @@ register struct attack *mattk;
 
     case AD_SAMU:
         hitmsg(mtmp, mattk);
-        /* when the Wizard or quest nemesis hits, there's a 1/20 chance
-           to steal a quest artifact (any, not just the one for the hero's
-           own role) or the Amulet or one of the invocation tools */
-        if (!rn2(20))
-            stealamulet(mtmp);
+        /* when the Wiz hits, 1/20 steals the amulet */
+        /* Quest artifact may be stolen by the quest nemesis. */
+        if (u.uhave.amulet || u.uhave.bell || u.uhave.book || u.uhave.menorah
+            || (u.uhave.questart && mtmp->data->msound == MS_NEMESIS)) {
+            if (!rn2(20))
+                stealamulet(mtmp, mtmp->data->msound == MS_NEMESIS);
+        }
         break;
 
     case AD_TLPT:

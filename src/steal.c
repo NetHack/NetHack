@@ -506,82 +506,51 @@ register struct obj *otmp;
     return freed_otmp;
 }
 
-/* called for AD_SAMU (the Wizard and quest nemeses) */
 void
-stealamulet(mtmp)
+stealamulet(mtmp, allow_quest_artifact)
 struct monst *mtmp;
+boolean allow_quest_artifact;
 {
-    char buf[BUFSZ];
-    struct obj *otmp = 0, *obj = 0;
-    int real = 0, fake = 0, n;
+    struct obj *otmp = (struct obj *) 0;
+    int real = 0, fake = 0;
 
-    /* target every quest artifact, not just current role's;
-       if hero has more than one, choose randomly so that player
-       can't use inventory ordering to influence the theft */
-    for (n = 0, obj = invent; obj; obj = obj->nobj)
-        if (any_quest_artifact(obj))
-            ++n, otmp = obj;
-    if (n > 1) {
-        n = rnd(n);
+    /* select the artifact to steal */
+    if (u.uhave.amulet) {
+        real = AMULET_OF_YENDOR;
+        fake = FAKE_AMULET_OF_YENDOR;
+    } else if (u.uhave.questart && allow_quest_artifact) {
         for (otmp = invent; otmp; otmp = otmp->nobj)
-            if (any_quest_artifact(otmp) && !--n)
+            if (is_quest_artifact(otmp))
+                break;
+        if (!otmp)
+            return; /* should we panic instead? */
+    } else if (u.uhave.bell) {
+        real = BELL_OF_OPENING;
+        fake = BELL;
+    } else if (u.uhave.book) {
+        real = SPE_BOOK_OF_THE_DEAD;
+    } else if (u.uhave.menorah) {
+        real = CANDELABRUM_OF_INVOCATION;
+    } else
+        return; /* you have nothing of special interest */
+
+    if (!otmp) {
+        /* If we get here, real and fake have been set up. */
+        for (otmp = invent; otmp; otmp = otmp->nobj)
+            if (otmp->otyp == real || (otmp->otyp == fake && !mtmp->iswiz))
                 break;
     }
 
-    if (!otmp) {
-        /* if we didn't find any quest arifact, find another valuable item */
-        if (u.uhave.amulet) {
-            real = AMULET_OF_YENDOR;
-            fake = FAKE_AMULET_OF_YENDOR;
-        } else if (u.uhave.bell) {
-            real = BELL_OF_OPENING;
-            fake = BELL;
-        } else if (u.uhave.book) {
-            real = SPE_BOOK_OF_THE_DEAD;
-        } else if (u.uhave.menorah) {
-            real = CANDELABRUM_OF_INVOCATION;
-        } else
-            return; /* you have nothing of special interest */
-
-        /* If we get here, real and fake have been set up. */
-        for (n = 0, obj = invent; obj; obj = obj->nobj)
-            if (obj->otyp == real || (obj->otyp == fake && !mtmp->iswiz))
-                ++n, otmp = obj;
-        if (n > 1) {
-            n = rnd(n);
-            for (otmp = invent; otmp; otmp = otmp->nobj)
-                if ((otmp->otyp == real
-                     || (otmp->otyp == fake && !mtmp->iswiz)) && !--n)
-                    break;
-        }
-    }
-
     if (otmp) { /* we have something to snatch */
-        /* take off outer gear if we're targetting [hypothetical]
-           quest artifact suit, shirt, gloves, or rings */
-        if ((otmp == uarm || otmp == uarmu) && uarmc)
-            (void) Cloak_off();
-        if (otmp == uarmu && uarm)
-            (void) Armor_off();
-        if ((otmp == uarmg || ((otmp == uright || otmp == uleft) && uarmg))
-            && uwep) {
-            /* gloves are about to be unworn; unwield weapon(s) first */
-            if (u.twoweap)
-                uswapwepgone(); /* will clear u.twoweap */
-            uwepgone();
-        }
-        if ((otmp == uright || otmp == uleft) && uarmg)
-            (void) Gloves_off(); /* handles wielded cockatrice corpse */
-
-        /* finally, steal the target item */
         if (otmp->owornmask)
             remove_worn_item(otmp, TRUE);
         if (otmp->unpaid)
             subfrombill(otmp, shop_keeper(*u.ushops));
         freeinv(otmp);
-        Strcpy(buf, doname(otmp));
-        (void) mpickobj(mtmp, otmp); /* could merge and free otmp but won't */
-        pline("%s steals %s!", Monnam(mtmp), buf);
+        /* mpickobj wont merge otmp because none of the above things
+           to steal are mergable */
+        (void) mpickobj(mtmp, otmp); /* may merge and free otmp */
+        pline("%s stole %s!", Monnam(mtmp), doname(otmp));
         if (can_teleport(mtmp->data) && !tele_restrict(mtmp))
             (void) rloc(mtmp, TRUE);
     }
@@ -675,7 +644,7 @@ boolean verbosely;
 
 /* some monsters bypass the normal rules for moving between levels or
    even leaving the game entirely; when that happens, prevent them from
-   taking the Amulet, invocation items, or quest artifact with them */
+   taking the Amulet or invocation tools with them */
 void
 mdrop_special_objs(mon)
 struct monst *mon;
@@ -685,10 +654,8 @@ struct monst *mon;
     for (obj = mon->minvent; obj; obj = otmp) {
         otmp = obj->nobj;
         /* the Amulet, invocation tools, and Rider corpses resist even when
-           artifacts and ordinary objects are given 0% resistance chance;
-           current role's quest artifact is rescued too--quest artifacts
-           for the other roles are not */
-        if (obj_resists(obj, 0, 0) || is_quest_artifact(obj)) {
+           artifacts and ordinary objects are given 0% resistance chance */
+        if (obj_resists(obj, 0, 0)) {
             obj_extract_self(obj);
             mdrop_obj(mon, obj, FALSE);
         }
