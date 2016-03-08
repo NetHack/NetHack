@@ -38,7 +38,8 @@ STATIC_DCL struct monst *FDECL(next_shkp, (struct monst *, BOOLEAN_P));
 STATIC_DCL long FDECL(shop_debt, (struct eshk *));
 STATIC_DCL char *FDECL(shk_owns, (char *, struct obj *));
 STATIC_DCL char *FDECL(mon_owns, (char *, struct obj *));
-STATIC_DCL void FDECL(clear_unpaid, (struct obj *));
+STATIC_DCL void FDECL(clear_unpaid_obj, (struct monst *, struct obj *));
+STATIC_DCL void FDECL(clear_unpaid, (struct monst *, struct obj *));
 STATIC_DCL long FDECL(check_credit, (long, struct monst *));
 STATIC_DCL void FDECL(pay, (long, struct monst *));
 STATIC_DCL long FDECL(get_cost, (struct obj *, struct monst *));
@@ -260,15 +261,26 @@ boolean ghostly;
     }
 }
 
+/* Clear the unpaid bit on a single object and its contents. */
+STATIC_OVL void
+clear_unpaid_obj(shkp, otmp)
+struct monst *shkp;
+struct obj *otmp;
+{
+    if (Has_contents(otmp))
+        clear_unpaid(shkp, otmp->cobj);
+    if (onbill(otmp, shkp, TRUE))
+        otmp->unpaid = 0;
+}
+
 /* Clear the unpaid bit on all of the objects in the list. */
 STATIC_OVL void
-clear_unpaid(list)
-register struct obj *list;
+clear_unpaid(shkp, list)
+struct monst *shkp;
+struct obj *list;
 {
     while (list) {
-        if (Has_contents(list))
-            clear_unpaid(list->cobj);
-        list->unpaid = 0;
+        clear_unpaid_obj(shkp, list);
         list = list->nobj;
     }
 }
@@ -281,20 +293,17 @@ register struct monst *shkp;
     register struct obj *obj;
     register struct monst *mtmp;
 
-    /* FIXME: object handling should be limited to
-       items which are on this particular shk's bill */
-
-    clear_unpaid(invent);
-    clear_unpaid(fobj);
-    clear_unpaid(level.buriedobjlist);
+    clear_unpaid(shkp, invent);
+    clear_unpaid(shkp, fobj);
+    clear_unpaid(shkp, level.buriedobjlist);
     if (thrownobj)
-        thrownobj->unpaid = 0;
+        clear_unpaid_obj(shkp, thrownobj);
     if (kickedobj)
-        kickedobj->unpaid = 0;
+        clear_unpaid_obj(shkp, kickedobj);
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-        clear_unpaid(mtmp->minvent);
+        clear_unpaid(shkp, mtmp->minvent);
     for (mtmp = migrating_mons; mtmp; mtmp = mtmp->nmon)
-        clear_unpaid(mtmp->minvent);
+        clear_unpaid(shkp, mtmp->minvent);
 
     while ((obj = billobjs) != 0) {
         obj_extract_self(obj);
