@@ -859,7 +859,7 @@ boolean silent;
             } else
                 bp++;
     }
-    if (obj->unpaid & !silent)
+    if (obj->unpaid && !silent)
         pline("onbill: unpaid obj not on bill?");
     return (struct bill_x *) 0;
 }
