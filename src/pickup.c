@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1453591408 2016/01/23 23:23:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.169 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1457397478 2016/03/08 00:37:58 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.170 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -33,16 +33,16 @@ STATIC_PTR int FDECL(out_container, (struct obj *));
 STATIC_DCL void FDECL(removed_from_icebox, (struct obj *));
 STATIC_DCL long FDECL(mbag_item_gone, (int, struct obj *));
 STATIC_DCL void FDECL(observe_quantum_cat, (struct obj *));
-STATIC_DCL void NDECL(explain_container_prompt);
+STATIC_DCL void FDECL(explain_container_prompt, (BOOLEAN_P));
 STATIC_DCL int FDECL(traditional_loot, (BOOLEAN_P));
 STATIC_DCL int FDECL(menu_loot, (int, BOOLEAN_P));
 STATIC_DCL char FDECL(in_or_out_menu, (const char *, struct obj *, BOOLEAN_P,
-                                       BOOLEAN_P, BOOLEAN_P));
+                                       BOOLEAN_P, BOOLEAN_P, BOOLEAN_P));
 STATIC_DCL int FDECL(container_at, (int, int, BOOLEAN_P));
 STATIC_DCL boolean FDECL(able_to_loot, (int, int, BOOLEAN_P));
 STATIC_DCL boolean NDECL(reverse_loot);
 STATIC_DCL boolean FDECL(mon_beside, (int, int));
-STATIC_DCL int FDECL(do_loot_cont, (struct obj **));
+STATIC_DCL int FDECL(do_loot_cont, (struct obj **, int, int));
 STATIC_DCL void FDECL(tipcontainer, (struct obj *));
 
 /* define for query_objlist() and autopickup() */
@@ -66,6 +66,7 @@ STATIC_DCL void FDECL(tipcontainer, (struct obj *));
 /* in_container() and out_container() from askchain() and use_container(). */
 /* Also used by menu_loot() and container_gone().                          */
 static NEARDATA struct obj *current_container;
+static NEARDATA boolean abort_looting;
 #define Icebox (current_container->otyp == ICE_BOX)
 
 static const char
@@ -1579,16 +1580,22 @@ int x, y;
 }
 
 int
-do_loot_cont(cobjp)
+do_loot_cont(cobjp, cindex, ccount)
 struct obj **cobjp;
+int cindex, ccount; /* index of this container (1..N), number of them (N) */
 {
     struct obj *cobj = *cobjp;
 
     if (!cobj)
         return 0;
     if (cobj->olocked) {
-        pline("%s locked.",
-              cobj->lknown ? "It is" : "Hmmm, it turns out to be");
+        if (ccount < 2)
+            pline("%s locked.",
+                  cobj->lknown ? "It is" : "Hmmm, it turns out to be");
+        else if (cobj->lknown)
+            pline("%s is locked.", The(xname(cobj)));
+        else
+            pline("Hmmm, %s turns out to be locked.", the(xname(cobj)));
         cobj->lknown = 1;
         return 0;
     }
@@ -1597,17 +1604,18 @@ struct obj **cobjp;
     if (cobj->otyp == BAG_OF_TRICKS) {
         int tmp;
 
-        You("carefully open the bag...");
+        You("carefully open %s...", the(xname(cobj)));
         pline("It develops a huge set of teeth and bites you!");
         tmp = rnd(10);
         losehp(Maybe_Half_Phys(tmp), "carnivorous bag", KILLED_BY_AN);
         makeknown(BAG_OF_TRICKS);
+        abort_looting = TRUE;
         return 1;
     }
 
     You("%sopen %s...", (!cobj->cknown || !cobj->lknown) ? "carefully " : "",
         the(xname(cobj)));
-    return use_container(cobjp, 0);
+    return use_container(cobjp, 0, (boolean) (cindex < ccount));
 }
 
 /* loot a container on the floor or loot saddle from mon. */
@@ -1625,6 +1633,8 @@ doloot()
     int prev_inquiry = 0;
     boolean prev_loot = FALSE;
     int num_conts;
+
+    abort_looting = FALSE;
 
     if (check_capacity((char *) 0)) {
         /* "Can't do that while carrying so much stuff." */
@@ -1676,16 +1686,17 @@ lootcont:
             destroy_nhwindow(win);
 
             if (n > 0) {
-                for (i = 0; i < n; i++) {
-                    timepassed |= do_loot_cont(&pick_list[i].item.a_obj);
-                    if (multi < 0 || !pick_list[i].item.a_obj) {
+                for (i = 1; i <= n; i++) {
+                    cobj = pick_list[i - 1].item.a_obj;
+                    timepassed |= do_loot_cont(&cobj, i, n);
+                    if (abort_looting) {
+                        /* chest trap or magic bag explosion or <esc> */
                         free((genericptr_t) pick_list);
-                        return 1;
+                        return timepassed;
                     }
                 }
-            }
-            if (pick_list)
                 free((genericptr_t) pick_list);
+            }
             if (n != 0)
                 c = 'y';
         } else {
@@ -1702,11 +1713,10 @@ lootcont:
                         continue;
                     anyfound = TRUE;
 
-                    timepassed |= do_loot_cont(&cobj);
-                    /* might have triggered chest trap or magic bag explosion
-                     */
-                    if (multi < 0 || !cobj)
-                        return 1;
+                    timepassed |= do_loot_cont(&cobj, 1, 1);
+                    if (abort_looting)
+                        /* chest trap or magic bag explosion or <esc> */
+                        return timepassed;
                 }
             }
             if (anyfound)
@@ -2234,14 +2244,16 @@ int FDECL((*fn), (OBJ_P));
 }
 
 STATIC_OVL void
-explain_container_prompt()
+explain_container_prompt(more_containers)
+boolean more_containers;
 {
     static const char *const explaintext[] = {
         "Container actions:", "", " : -- Look: examine contents",
         " o -- Out: take things out", " i -- In: put things in",
         " b -- Both: first take things out, then put things in",
         " r -- Reversed: put things in, then take things out",
-        " s -- Stash: put one item in", " q -- Quit: do nothing",
+        " s -- Stash: put one item in", "",
+        " n -- Next: loot next selected container", " q -- Quit: finished",
         " ? -- Help: display this text.", "", 0
     };
     const char *const *txtpp;
@@ -2249,8 +2261,11 @@ explain_container_prompt()
 
     /* "Do what with <container>? [:oibrsq or ?] (q)" */
     if ((win = create_nhwindow(NHW_TEXT)) != WIN_ERR) {
-        for (txtpp = explaintext; *txtpp; ++txtpp)
+        for (txtpp = explaintext; *txtpp; ++txtpp) {
+            if (!more_containers && !strncmp(*txtpp, " n ", 3))
+                continue;
             putstr(win, 0, *txtpp);
+        }
         display_nhwindow(win, FALSE);
         destroy_nhwindow(win);
     }
@@ -2272,9 +2287,10 @@ u_handsy()
 static const char stashable[] = { ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, 0 };
 
 int
-use_container(objp, held)
+use_container(objp, held, more_containers)
 struct obj **objp;
 int held;
+boolean more_containers; /* True iff #loot multiple and this isn't last one */
 {
     struct obj *curr, *otmp, *obj = *objp;
     boolean quantum_cat, cursed_mbag, loot_out, loot_in, loot_in_first,
@@ -2282,6 +2298,7 @@ int held;
     char c, emptymsg[BUFSZ], qbuf[QBUFSZ], pbuf[QBUFSZ], xbuf[QBUFSZ];
     int used = 0;
 
+    abort_looting = FALSE;
     emptymsg[0] = '\0';
 
     if (!u_handsy())
@@ -2304,12 +2321,15 @@ int held;
             multi_reason = "opening a container";
             nomovemsg = "";
         }
+        abort_looting = TRUE;
         return 1;
     }
     obj->lknown = 1;
 
     current_container = obj; /* for use by in/out_container */
-    /* from here on out, all early returns go through containerdone */
+    /*
+     * From here on out, all early returns go through 'containerdone:'.
+     */
 
     /* check for Schroedinger's Cat */
     quantum_cat = SchroedingersBox(current_container);
@@ -2375,14 +2395,15 @@ int held;
             (void) safe_qbuf(qbuf, "Do what with ", "?", current_container,
                              yname, ysimple_name, "it");
         /* ask player about what to do with this container */
-        if (flags.menu_style == MENU_FULL) {
+        if (flags.menu_style == MENU_PARTIAL
+            || flags.menu_style == MENU_FULL) {
             if (!inokay && !outmaybe) {
                 /* nothing to take out, nothing to put in;
                    trying to do both will yield proper feedback */
                 c = 'b';
             } else {
                 c = in_or_out_menu(qbuf, current_container, outmaybe, inokay,
-                                   (used != 0));
+                                   (boolean) (used != 0), more_containers);
             }
         } else {               /* TRADITIONAL, COMBINATION, or PARTIAL */
             xbuf[0] = '\0';    /* list of extra acceptable responses */
@@ -2391,18 +2412,22 @@ int held;
             Strcat(inokay ? pbuf : xbuf, "i");   /* put in */
             Strcat(outmaybe ? pbuf : xbuf, "b"); /* both */
             Strcat(inokay ? pbuf : xbuf, "rs");  /* reversed, stash */
+            Strcat(pbuf, " ");
+            Strcat(more_containers ? pbuf : xbuf, "n");
             Strcat(pbuf, "q");                   /* quit */
             if (iflags.cmdassist)
+                /* this unintentionally allows user to answer with 'o' or
+                   'r'; fortunately, those are already valid choices here */
                 Strcat(pbuf, " or ?"); /* help */
             else
                 Strcat(xbuf, "?");
             if (*xbuf)
                 Strcat(strcat(pbuf, "\033"), xbuf);
-            c = yn_function(qbuf, pbuf, 'q');
-        } /* FULL vs other modes */
+            c = yn_function(qbuf, pbuf, more_containers ? 'n' : 'q');
+        } /* PARTIAL|FULL vs other modes */
 
         if (c == '?') {
-            explain_container_prompt();
+            explain_container_prompt(more_containers);
         } else if (c == ':') { /* note: will set obj->cknown */
             if (!current_container->cknown)
                 used = 1; /* gaining info */
@@ -2411,7 +2436,9 @@ int held;
             break;
     } /* loop until something other than '?' or ':' is picked */
 
-    if (c == 'q') /* [not strictly needed; falling through works] */
+    if (c == 'q')
+        abort_looting = TRUE;
+    if (c == 'n' || c == 'q') /* [not strictly needed; falling thru works] */
         goto containerdone;
     loot_out = (c == 'o' || c == 'b' || c == 'r');
     loot_in = (c == 'i' || c == 'b' || c == 'r');
@@ -2499,7 +2526,10 @@ containerdone:
     }
 
     *objp = current_container; /* might have become null */
-    current_container = 0;     /* avoid hanging on to stale pointer */
+    if (current_container)
+        current_container = 0; /* avoid hanging on to stale pointer */
+    else
+        abort_looting = TRUE;
     return used;
 }
 
@@ -2623,13 +2653,13 @@ boolean put_in;
 }
 
 STATIC_OVL char
-in_or_out_menu(prompt, obj, outokay, inokay, alreadyused)
+in_or_out_menu(prompt, obj, outokay, inokay, alreadyused, more_containers)
 const char *prompt;
 struct obj *obj;
-boolean outokay, inokay, alreadyused;
+boolean outokay, inokay, alreadyused, more_containers;
 {
     /* underscore is not a choice; it's used to skip element [0] */
-    static const char lootchars[] = "_:oibrsq", abc_chars[] = "_:abcdeq";
+    static const char lootchars[] = "_:oibrsnq", abc_chars[] = "_:abcdenq";
     winid win;
     anything any;
     menu_item *pick_list;
@@ -2674,20 +2704,30 @@ boolean outokay, inokay, alreadyused;
         add_menu(win, NO_GLYPH, &any, menuselector[any.a_int], 0, ATR_NONE,
                  buf, MENU_UNSELECTED);
     }
-    any.a_int = 7; /* 'q' */
+    any.a_int = 0;
+    add_menu(win, NO_GLYPH, &any, 0, 0, ATR_NONE, "", MENU_UNSELECTED);
+    if (more_containers) {
+        any.a_int = 7; /* 'n' */
+        add_menu(win, NO_GLYPH, &any, menuselector[any.a_int], 0, ATR_NONE,
+                 "loot next container", MENU_SELECTED);
+    }
+    any.a_int = 8; /* 'q' */
     Strcpy(buf, alreadyused ? "done" : "do nothing");
     add_menu(win, NO_GLYPH, &any, menuselector[any.a_int], 0, ATR_NONE, buf,
-             MENU_SELECTED);
+             more_containers ? MENU_UNSELECTED : MENU_SELECTED);
 
     end_menu(win, prompt);
     n = select_menu(win, PICK_ONE, &pick_list);
     destroy_nhwindow(win);
     if (n > 0) {
-        n = pick_list[0].item.a_int;
+        int k = pick_list[0].item.a_int;
+
+        if (n > 1 && k == (more_containers ? 7 : 8))
+            k = pick_list[1].item.a_int;
         free((genericptr_t) pick_list);
-        return lootchars[n]; /* :,o,i,b,r,s,q */
+        return lootchars[k]; /* :,o,i,b,r,s,n,q */
     }
-    return 'q'; /* quit */
+    return (n == 0 && more_containers) ? 'n' : 'q'; /* next or quit */
 }
 
 static const char tippables[] = { ALL_CLASSES, TOOL_CLASS, 0 };

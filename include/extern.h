@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1456992437 2016/03/03 08:07:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.550 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1457397476 2016/03/08 00:37:56 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.551 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1763,7 +1763,7 @@ E int NDECL(encumber_msg);
 E int NDECL(doloot);
 E boolean FDECL(container_gone, (int (*)(OBJ_P)));
 E boolean NDECL(u_handsy);
-E int FDECL(use_container, (struct obj **, int));
+E int FDECL(use_container, (struct obj **, int, BOOLEAN_P));
 E int FDECL(loot_mon, (struct monst *, int *, boolean *));
 E int NDECL(dotip);
 E boolean FDECL(is_autopickup_exception, (struct obj *, BOOLEAN_P));
