@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1457397478 2016/03/08 00:37:58 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.170 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1457400916 2016/03/08 01:35:16 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.171 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2375,17 +2375,20 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
      * inventory is empty--taking out could alter that;
      * include do-both-reversed when 'i' is available,
      * even if container is empty--for similar reason;
-     * always include the quit choice ('q').
+     * include the next container choice ('n') when
+     * relevant, and make it the default;
+     * always include the quit choice ('q'), and make
+     * it the default if there's no next containter;
      * include the help choice (" or ?") if `cmdassist'
      * run-time option is set;
-     * (Player can pick any of (o,i,b,r,s,?) even when
+     * (Player can pick any of (o,i,b,r,n,s,?) even when
      * they're not listed among the available actions.)
      *
-     * Do what with <the/your/Shk's container>? [:oibrsq or ?] (q)
+     * Do what with <the/your/Shk's container>? [:oibrs nq or ?] (q)
      * or
-     * <The/Your/Shk's container> is empty.  Do what with it? [:irsq or ?]
+     * <The/Your/Shk's container> is empty.  Do what with it? [:irs nq or ?]
      */
-    for (;;) { /* repeats if '?' or ":' gets chosen */
+    for (;;) { /* repeats iff '?' or ":' gets chosen */
         outmaybe = (outokay || !current_container->cknown);
         if (!outmaybe)
             (void) safe_qbuf(qbuf, (char *) 0, " is empty.  Do what with it?",
@@ -2405,7 +2408,7 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
                 c = in_or_out_menu(qbuf, current_container, outmaybe, inokay,
                                    (boolean) (used != 0), more_containers);
             }
-        } else {               /* TRADITIONAL, COMBINATION, or PARTIAL */
+        } else { /* TRADITIONAL or COMBINATION */
             xbuf[0] = '\0';    /* list of extra acceptable responses */
             Strcpy(pbuf, ":"); /* look inside */
             Strcat(outmaybe ? pbuf : xbuf, "o"); /* take out */
