@@ -370,7 +370,6 @@ unsigned corpseflags;
         }
         free_mname(mtmp);
         return obj;
-        break;
     default_1:
     default:
         if (mvitals[mndx].mvflags & G_NOCORPSE) {
