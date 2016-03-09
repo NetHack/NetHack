@@ -2025,15 +2025,14 @@ register struct obj *obj;
         (void) snuff_lit(obj);
 
     if (floor_container && costly_spot(u.ux, u.uy)) {
-        if (obj->oclass == COIN_CLASS) {
-            ; /* defer gold until after put-in message */
-        } else if (current_container->no_charge && !obj->unpaid) {
-            /* don't sell when putting the item into your own container */
-            obj->no_charge = 1;
-        } else {
+        /* defer gold until after put-in message */
+        if (obj->oclass != COIN_CLASS) {
             /* sellobj() will take an unpaid item off the shop bill */
             was_unpaid = obj->unpaid ? TRUE : FALSE;
-            sellobj_state(SELL_DELIBERATE);
+            /* don't sell when putting the item into your own container,
+             * but handle billing correctly */
+            sellobj_state(current_container->no_charge
+                          ? SELL_DONTSELL : SELL_DELIBERATE);
             sellobj(obj, u.ux, u.uy);
             sellobj_state(SELL_NORMAL);
         }
