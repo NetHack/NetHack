@@ -2885,7 +2885,7 @@ xchar x, y;
 
         if (container) {
             dropped_container(obj, shkp, FALSE);
-            if (!obj->unpaid && !saleitem)
+            if (!obj->unpaid)
                 obj->no_charge = 1;
             if (unpaid)
                 subfrombill(obj, shkp);
@@ -2960,7 +2960,7 @@ xchar x, y;
             if (!isgold) {
                 if (container)
                     dropped_container(obj, shkp, FALSE);
-                if (!obj->unpaid && !saleitem)
+                if (!obj->unpaid)
                     obj->no_charge = 1;
                 subfrombill(obj, shkp);
             }
