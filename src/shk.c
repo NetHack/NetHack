@@ -2880,7 +2880,8 @@ xchar x, y;
     offer = ltmp + cltmp;
 
     /* get one case out of the way: nothing to sell, and no gold */
-    if (!isgold && ((offer + gltmp) == 0L || sell_how == SELL_DONTSELL)) {
+    if (!(isgold || cgold)
+        && ((offer + gltmp) == 0L || sell_how == SELL_DONTSELL)) {
         boolean unpaid = is_unpaid(obj);
 
         if (container) {
@@ -2956,7 +2957,7 @@ xchar x, y;
                       currency(eshkp->credit));
         }
 
-        if (!offer) {
+        if (!offer || sell_how == SELL_DONTSELL) {
             if (!isgold) {
                 if (container)
                     dropped_container(obj, shkp, FALSE);
