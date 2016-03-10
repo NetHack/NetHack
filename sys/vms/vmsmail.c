@@ -107,8 +107,8 @@ static char nam_buf[63],     /* maximum onamelth, size of ONAME(object) */
 /* try to decipher and categorize broadcast message text
 */
 static struct mail_info *
-parse_brdcst(buf) /* called by parse_next_broadcast() */
-char *buf;        /* input: filtered broadcast text */
+parse_brdcst(char *buf) /* called by parse_next_broadcast() */
+                        /* input: filtered broadcast text */
 {
     int typ;
     char *txt;
@@ -292,8 +292,8 @@ char *buf;        /* input: filtered broadcast text */
 
 /* filter out non-printable characters and redundant noise
 */
-static void filter_brdcst(buf) /* called by parse_next_broadcast() */
-register char *buf;            /* in: original text; out: filtered text */
+static void filter_brdcst(register char *buf) /* called by parse_next_broadcast() */
+                                              /* in: original text; out: filtered text */
 {
     register char c, *p, *buf_p;
 
@@ -374,8 +374,7 @@ static void flush_broadcasts() /* called from disable_broadcast_trapping() */
 */
 /*ARGSUSED*/
 static void
-broadcast_ast(dummy) /* called asynchronously by terminal driver */
-int dummy;           /* not used */
+broadcast_ast(int dummy /* not used */) /* called asynchronously by terminal driver */
 {
     broadcasts++;
 }
@@ -468,8 +467,7 @@ parse_next_broadcast()
 volatile int broadcasts = 0;
 
 void
-newmail(foo)
-struct mail_info *foo;
+newmail(struct mail_info *foo)
 {
 #define STRING(s) ((s) ? (s) : "<null>")
     printf("\n\
@@ -519,16 +517,14 @@ main()
 }
 
 void
-panic(s)
-char *s;
+panic(char *s)
 {
     raw_print(s);
     exit(EXIT_FAILURE);
 }
 
 void
-raw_print(s)
-char *s;
+raw_print(char *s)
 {
     puts(s);
     fflush(stdout);

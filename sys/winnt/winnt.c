@@ -54,8 +54,7 @@ switchar()
 }
 
 long
-freediskspace(path)
-char *path;
+freediskspace(char *path)
 {
     char tmppath[4];
     DWORD SectorsPerCluster = 0;
@@ -76,8 +75,7 @@ char *path;
  * Functions to get filenames using wildcards
  */
 int
-findfirst(path)
-char *path;
+findfirst(char *path)
 {
     if (ffhandle) {
         FindClose(ffhandle);
@@ -100,8 +98,7 @@ foundfile_buffer()
 }
 
 long
-filesize(file)
-char *file;
+filesize(char *file)
 {
     if (findfirst(file)) {
         return ((long) ffd.nFileSizeLow);
@@ -113,8 +110,7 @@ char *file;
  * Chdrive() changes the default drive.
  */
 void
-chdrive(str)
-char *str;
+chdrive(char *str)
 {
     char *ptr;
     char drive;
@@ -148,8 +144,7 @@ def_kbhit()
  * Strip out troublesome file system characters.
  */
 
-void nt_regularize(s) /* normalize file name */
-register char *s;
+void nt_regularize(register char *s) /* normalize file name */
 {
     register unsigned char *lp;
 
@@ -164,8 +159,7 @@ register char *s;
  * This is used in nhlan.c to implement some of the LAN_FEATURES.
  */
 char *
-get_username(lan_username_size)
-int *lan_username_size;
+get_username(int *lan_username_size)
 {
     static TCHAR username_buffer[BUFSZ];
     unsigned int status;
@@ -260,11 +254,7 @@ static char interjection_buf[INTERJECTION_TYPES][1024];
 static int interjection[INTERJECTION_TYPES];
 
 void
-interject_assistance(num, interjection_type, ptr1, ptr2)
-int num;
-int interjection_type;
-genericptr_t ptr1;
-genericptr_t ptr2;
+interject_assistance(int num, int interjection_type, genericptr_t ptr1, genericptr_t ptr2)
 {
     switch (num) {
     case 1: {
@@ -309,8 +299,7 @@ genericptr_t ptr2;
 }
 
 void
-interject(interjection_type)
-int interjection_type;
+interject(int interjection_type)
 {
     if (interjection_type >= 0 && interjection_type < INTERJECTION_TYPES)
         msmsg(interjection_buf[interjection_type]);
@@ -338,8 +327,7 @@ int interjection_type;
 #endif
 
 void
-append_port_id(buf)
-char *buf;
+append_port_id(char *buf)
 {
     char *portstr = TARGET_PORT;
     Sprintf(eos(buf), " %s", portstr);

@@ -14,9 +14,7 @@
 #ifdef USER_SOUNDS
 
 void
-play_usersound(filename, volume)
-const char *filename;
-int volume;
+play_usersound(const char *filename, int volume)
 {
     TCHAR wbuf[MAX_PATH + 1];
     /*    pline("play_usersound: %s (%d).", filename, volume); */

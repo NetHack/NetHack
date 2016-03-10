@@ -92,16 +92,15 @@ _get_cmd_arg(TCHAR *pCmdLine)
 }
 
 #ifndef STRNCMPI
-char lowc(c) /* force 'c' into lowercase */
-char c;
+char lowc(char c) /* force 'c' into lowercase */
 {
     return ((char) (('A' <= c && c <= 'Z') ? (c | 040) : c));
 }
 
-int strncmpi(s1, s2, n) /* case insensitive counted string comparison */
-register const char *s1, *s2;
-register int n; /*(should probably be size_t, which is usually unsigned)*/
-{               /*{ aka strncasecmp }*/
+/* case insensitive counted string comparison */
+int strncmpi(register const char *s1, register const char *s2,
+             register int n) /*(should probably be size_t, which is usually unsigned)*/
+{                            /*{ aka strncasecmp }*/
     register char t1, t2;
 
     while (n--) {

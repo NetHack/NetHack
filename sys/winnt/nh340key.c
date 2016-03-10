@@ -94,13 +94,8 @@ static const struct pad {
 
 #define inmap(x, vk) (((x) > 'A' && (x) < 'Z') || (vk) == 0xBF || (x) == '2')
 
-int __declspec(dllexport) __stdcall ProcessKeystroke(hConIn, ir, valid,
-                                                     numberpad, portdebug)
-HANDLE hConIn;
-INPUT_RECORD *ir;
-boolean *valid;
-boolean numberpad;
-int portdebug;
+int __declspec(dllexport) __stdcall ProcessKeystroke(HANDLE hConIn, INPUT_RECORD *ir, boolean *valid,
+                                                     boolean numberpad, int portdebug)
 {
     int metaflags = 0, k = 0;
     int keycode, vk;
@@ -169,9 +164,7 @@ int portdebug;
     return ch;
 }
 
-int __declspec(dllexport) __stdcall NHkbhit(hConIn, ir)
-HANDLE hConIn;
-INPUT_RECORD *ir;
+int __declspec(dllexport) __stdcall NHkbhit(HANDLE hConIn, INPUT_RECORD *ir)
 {
     int done = 0; /* true =  "stop searching"        */
     int retval;   /* true =  "we had a match"        */
@@ -223,15 +216,8 @@ INPUT_RECORD *ir;
     return retval;
 }
 
-int __declspec(dllexport) __stdcall CheckInput(hConIn, ir, count, numpad,
-                                               mode, mod, cc)
-HANDLE hConIn;
-INPUT_RECORD *ir;
-DWORD *count;
-boolean numpad;
-int mode;
-int *mod;
-coord *cc;
+int __declspec(dllexport) __stdcall CheckInput(HANDLE hConIn, INPUT_RECORD *ir, DWORD *count, boolean numpad,
+                                               int mode, int *mod, coord *cc)
 {
 #if defined(SAFERHANGUP)
     DWORD dwWait;
@@ -284,8 +270,7 @@ coord *cc;
     return mode ? 0 : ch;
 }
 
-int __declspec(dllexport) __stdcall SourceWhere(buf)
-char **buf;
+int __declspec(dllexport) __stdcall SourceWhere(char **buf)
 {
     if (!buf)
         return 0;
@@ -293,8 +278,7 @@ char **buf;
     return 1;
 }
 
-int __declspec(dllexport) __stdcall SourceAuthor(buf)
-char **buf;
+int __declspec(dllexport) __stdcall SourceAuthor(char **buf)
 {
     if (!buf)
         return 0;
@@ -302,9 +286,7 @@ char **buf;
     return 1;
 }
 
-int __declspec(dllexport) __stdcall KeyHandlerName(buf, full)
-char **buf;
-int full;
+int __declspec(dllexport) __stdcall KeyHandlerName(char **buf, int full)
 {
     if (!buf)
         return 0;

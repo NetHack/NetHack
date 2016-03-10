@@ -27,9 +27,7 @@ static void NDECL(wd_message);
 static boolean wiz_error_flag = FALSE;
 
 int
-main(argc, argv)
-int argc;
-char *argv[];
+main(int argc, char *argv[])
 {
     register int fd;
 #ifdef CHDIR
@@ -229,9 +227,7 @@ attempt_restore:
 }
 
 static void
-process_options(argc, argv)
-int argc;
-char *argv[];
+process_options(int argc, char *argv[])
 {
     int i;
 
@@ -323,9 +319,7 @@ char *argv[];
 
 #ifdef CHDIR
 void
-chdirx(dir, wr)
-const char *dir;
-boolean wr;
+chdirx(const char *dir, boolean wr)
 {
 #ifndef HACKDIR
     static const char *defdir = ".";
@@ -404,9 +398,9 @@ byebye()
 /* Condition handler to prevent byebye's hangup simulation
    from saving the game after a fatal error has occurred.  */
 /*ARGSUSED*/
-static vms_handler_type            /* should be `unsigned long', but the -*/
-    vms_handler(sigargs, mechargs) /*+ prototype in <signal.h> is screwed */
-genericptr_t sigargs, mechargs; /* [0] is argc, [1..argc] are the real args */
+static vms_handler_type                /* should be `unsigned long', but the -*/
+    vms_handler(genericptr_t sigargs,  /*+ prototype in <signal.h> is screwed */
+                genericptr_t mechargs) /* [0] is argc, [1..argc] are the real args */
 {
     unsigned long condition = ((unsigned long *) sigargs)[1];
 
@@ -424,8 +418,7 @@ genericptr_t sigargs, mechargs; /* [0] is argc, [1..argc] are the real args */
 #endif
 
 void
-sethanguphandler(handler)
-void FDECL((*handler), (int));
+sethanguphandler(void FDECL((*handler), (int)))
 {
     (void) signal(SIGHUP, (SIG_RET_TYPE) handler);
 }

@@ -383,8 +383,7 @@ chdrive(char *str)
  * This is used in nhlan.c to implement some of the LAN_FEATURES.
  */
 char *
-get_username(lan_username_size)
-int *lan_username_size;
+get_username(int *lan_username_size)
 {
     static char username_buffer[BUFSZ];
     strcpy(username_buffer, "nhsave");

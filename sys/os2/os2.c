@@ -187,8 +187,7 @@ kbhit()
 }
 
 long
-freediskspace(path)
-char *path;
+freediskspace(char *path)
 {
     FSALLOCATE FSInfoBuf;
 #ifdef OS2_32BITAPI
@@ -229,8 +228,7 @@ static FILEFINDBUF ResultBuf;
 static HDIR DirHandle;
 
 int
-findfirst(path)
-char *path;
+findfirst(char *path)
 {
 #ifdef OS2_32BITAPI
     ULONG
@@ -279,8 +277,7 @@ foundfile_buffer()
 }
 
 long
-filesize(file)
-char *file;
+filesize(char *file)
 {
     if (findfirst(file)) {
         return (*(long *) (ResultBuf.cbFileAlloc));
@@ -292,8 +289,7 @@ char *file;
  * Chdrive() changes the default drive.
  */
 void
-chdrive(str)
-char *str;
+chdrive(char *str)
 {
     char *ptr;
     char drive;
@@ -353,7 +349,7 @@ get_scr_size()
 }
 
 void
-gotoxy(x, y)
+gotoxy(int x, int y)
 int x, y;
 {
     HVIO VideoHandle = 0;
@@ -365,8 +361,7 @@ int x, y;
 }
 
 char *
-get_username(lan_username_size)
-int *lan_username_size;
+get_username(int *lan_username_size)
 {
     return (char *) 0;
 }

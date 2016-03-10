@@ -323,8 +323,7 @@ _get_cmd_arg(TCHAR *pCmdLine)
  * Strip out troublesome file system characters.
  */
 
-void nt_regularize(s) /* normalize file name */
-register char *s;
+void nt_regularize(register char *s) /* normalize file name */
 {
     register unsigned char *lp;
 
@@ -344,8 +343,7 @@ win32_abort()
 }
 
 void
-append_port_id(buf)
-char *buf;
+append_port_id(char *buf)
 {
     char *portstr = PORT_CE_PLATFORM " " PORT_CE_CPU;
     Sprintf(eos(buf), " %s", portstr);

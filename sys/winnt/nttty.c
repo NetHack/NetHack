@@ -158,8 +158,7 @@ gettty()
 
 /* reset terminal to original state */
 void
-settty(s)
-const char *s;
+settty(const char *s)
 {
     cmov(ttyDisplay->curx, ttyDisplay->cury);
     end_screen();
@@ -180,8 +179,7 @@ setftty()
 }
 
 void
-tty_startup(wid, hgt)
-int *wid, *hgt;
+tty_startup(int *wid, int *hgt)
 {
     int twid = origcsbi.srWindow.Right - origcsbi.srWindow.Left + 1;
 
@@ -193,8 +191,7 @@ int *wid, *hgt;
 }
 
 void
-tty_number_pad(state)
-int state;
+tty_number_pad(int state)
 {
 }
 
@@ -226,8 +223,7 @@ tty_end_screen()
 }
 
 static BOOL
-CtrlHandler(ctrltype)
-DWORD ctrltype;
+CtrlHandler(DWORD ctrltype)
 {
     switch (ctrltype) {
     /*	case CTRL_C_EVENT: */
@@ -251,8 +247,7 @@ DWORD ctrltype;
 
 /* called by init_tty in wintty.c for WIN32 port only */
 void
-nttty_open(mode)
-int mode;
+nttty_open(int mode)
 {
     HANDLE hStdOut;
     DWORD cmode;
@@ -335,11 +330,7 @@ int mode;
 }
 
 int
-process_keystroke(ir, valid, numberpad, portdebug)
-INPUT_RECORD *ir;
-boolean *valid;
-boolean numberpad;
-int portdebug;
+process_keystroke(INPUT_RECORD *ir, boolean *valid, boolean numberpad, int portdebug)
 {
     int ch = pProcessKeystroke(hConIn, ir, valid, numberpad, portdebug);
     /* check for override */
@@ -389,8 +380,7 @@ tgetch()
 }
 
 int
-ntposkey(x, y, mod)
-int *x, *y, *mod;
+ntposkey(int *x, int *y, int *mod)
 {
     int ch;
     coord cc;
@@ -429,8 +419,7 @@ really_move_cursor()
 }
 
 void
-cmov(x, y)
-register int x, y;
+cmov(register int x, register int y)
 {
     ttyDisplay->cury = y;
     ttyDisplay->curx = x;
@@ -439,8 +428,7 @@ register int x, y;
 }
 
 void
-nocmov(x, y)
-int x, y;
+nocmov(int x, int y)
 {
     cursor.X = x;
     cursor.Y = y;
@@ -449,8 +437,7 @@ int x, y;
 }
 
 void
-xputc_core(ch)
-char ch;
+xputc_core(char ch)
 {
     switch (ch) {
     case '\n':
@@ -478,8 +465,7 @@ char ch;
 }
 
 void
-xputc(ch)
-char ch;
+xputc(char ch)
 {
     cursor.X = ttyDisplay->curx;
     cursor.Y = ttyDisplay->cury;
@@ -487,8 +473,7 @@ char ch;
 }
 
 void
-xputs(s)
-const char *s;
+xputs(const char *s)
 {
     int k;
     int slen = strlen(s);
@@ -509,8 +494,7 @@ const char *s;
  * for win32. It is used for glyphs only, not text.
  */
 void
-g_putch(in_ch)
-int in_ch;
+g_putch(int in_ch)
 {
     /* CP437 to Unicode mapping according to the Unicode Consortium */
     static const WCHAR cp437[] = {
@@ -830,8 +814,7 @@ toggle_mouse_support()
 
 /* handle tty options updates here */
 void
-nttty_preference_update(pref)
-const char *pref;
+nttty_preference_update(const char *pref)
 {
     if (stricmp(pref, "mouse_support") == 0) {
 #ifndef NO_MOUSE_ALLOWED
@@ -894,8 +877,7 @@ win32con_toggle_cursor_info()
 #endif
 
 void
-map_subkeyvalue(op)
-register char *op;
+map_subkeyvalue(register char *op)
 {
     char digits[] = "0123456789";
     int length, i, idx, val;
@@ -1057,9 +1039,7 @@ synch_cursor()
 
 #ifdef CHANGE_COLOR
 void
-tty_change_color(color_number, rgb, reverse)
-int color_number, reverse;
-long rgb;
+tty_change_color(int color_number, long rgb, int reverse)
 {
     /* Map NetHack color index to NT Console palette index */
     int idx, win32_color_number[] = {
@@ -1104,8 +1084,7 @@ tty_get_color_string()
 }
 
 int
-match_color_name(c)
-const char *c;
+match_color_name(const char *c)
 {
     const struct others {
         int idx;
@@ -1134,8 +1113,7 @@ const char *c;
  * Returns 0 if badoption syntax
  */
 int
-alternative_palette(op)
-char *op;
+alternative_palette(char *op)
 {
     /*
      *	palette:color-R-G-B
