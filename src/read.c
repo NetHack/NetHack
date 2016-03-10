@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1450577673 2015/12/20 02:14:33 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.131 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1457570260 2016/03/10 00:37:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.135 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -60,6 +60,7 @@ struct obj *otmp;
 char *buf;
 {
     int erosion = greatest_erosion(otmp);
+
     if (erosion)
         wipeout_text(buf, (int) (strlen(buf) * erosion / (2 * MAX_ERODE)),
                      otmp->o_id ^ (unsigned) ubirthday);
@@ -1312,8 +1313,11 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
          */
         break;
     case SCR_ENCHANT_WEAPON:
+        /* [What about twoweapon mode?  Proofing/repairing/enchanting both
+           would be too powerful, but shouldn't we choose randomly between
+           primary and secondary instead of always acting on primary?] */
         if (confused && uwep
-            && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep))) {
+            && erosion_matters(uwep) && uwep->oclass != ARMOR_CLASS) {
             old_erodeproof = (uwep->oerodeproof != 0);
             new_erodeproof = !scursed;
             uwep->oerodeproof = 0; /* for messages */

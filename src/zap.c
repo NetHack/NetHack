@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1457482920 2016/03/09 00:22:00 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.248 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1457570259 2016/03/10 00:37:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.249 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1423,14 +1423,15 @@ int id;
 
     otmp->cursed = obj->cursed;
     otmp->blessed = obj->blessed;
-    otmp->oeroded = obj->oeroded;
-    otmp->oeroded2 = obj->oeroded2;
-    if (!is_flammable(otmp) && !is_rustprone(otmp))
-        otmp->oeroded = 0;
-    if (!is_corrodeable(otmp) && !is_rottable(otmp))
-        otmp->oeroded2 = 0;
-    if (is_damageable(otmp))
-        otmp->oerodeproof = obj->oerodeproof;
+
+    if (erosion_matters(otmp)) {
+        if (is_flammable(otmp) || is_rustprone(otmp))
+            otmp->oeroded = obj->oeroded;
+        if (is_corrodeable(otmp) || is_rottable(otmp))
+            otmp->oeroded2 = obj->oeroded2;
+        if (is_damageable(otmp))
+            otmp->oerodeproof = obj->oerodeproof;
+    }
 
     /* Keep chest/box traps and poisoned ammo if we may */
     if (obj->otrapped && Is_box(otmp))

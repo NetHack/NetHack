@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1454528963 2016/02/03 19:49:23 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.261 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1457570259 2016/03/10 00:37:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.262 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -197,6 +197,8 @@ int ef_flags;
     if (check_grease && otmp->greased) {
         grease_protect(otmp, ostr, victim);
         return ER_GREASED;
+    } else if (!erosion_matters(otmp)) {
+        return ER_NOTHING;
     } else if (!vulnerable || (otmp->oerodeproof && otmp->rknown)) {
         if (flags.verbose && print && (uvictim || vismon))
             pline("%s %s %s not affected by %s.",

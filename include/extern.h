@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1457397476 2016/03/08 00:37:56 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.551 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1457570257 2016/03/10 00:37:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.552 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1591,6 +1591,7 @@ E char *FDECL(xname, (struct obj *));
 E char *FDECL(mshot_xname, (struct obj *));
 E boolean FDECL(the_unique_obj, (struct obj *));
 E boolean FDECL(the_unique_pm, (struct permonst *));
+E boolean FDECL(erosion_matters, (struct obj *));
 E char *FDECL(doname, (struct obj *));
 E char *FDECL(doname_with_price, (struct obj *));
 E boolean FDECL(not_fully_identified, (struct obj *));

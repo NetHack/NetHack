@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1455672990 2016/02/17 01:36:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.165 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1457570258 2016/03/10 00:37:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.166 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -730,6 +730,31 @@ char *prefix;
                                    : "");
 }
 
+/* used to prevent rust on items where rust makes no difference */
+boolean
+erosion_matters(obj)
+struct obj *obj;
+{
+    switch (obj->oclass) {
+    case TOOL_CLASS:
+        /* it's possible for a rusty weptool to be polymorphed into some
+           non-weptool iron tool, in which case the rust implicitly goes
+           away, but it's also possible for it to be polymorphed into a
+           non-iron tool, in which case rust also implicitly goes away,
+           so there's no particular reason to try to handle the first
+           instance differently [this comment belongs in poly_obj()...] */
+        return is_weptool(obj) ? TRUE : FALSE;
+    case WEAPON_CLASS:
+    case ARMOR_CLASS:
+    case BALL_CLASS:
+    case CHAIN_CLASS:
+        return TRUE;
+    default:
+        break;
+    }
+    return FALSE;
+}
+
 static char *
 doname_base(obj, with_price)
 register struct obj *obj;
@@ -853,31 +878,27 @@ boolean with_price;
                 plur(itemcount));
     }
 
-    switch (obj->oclass) {
+    switch (is_weptool(obj) ? WEAPON_CLASS : obj->oclass) {
     case AMULET_CLASS:
         if (obj->owornmask & W_AMUL)
             Strcat(bp, " (being worn)");
         break;
+    case ARMOR_CLASS:
+        if (obj->owornmask & W_ARMOR)
+            Strcat(bp, (obj == uskin) ? " (embedded in your skin)"
+                                      : " (being worn)");
+        /*FALLTHRU*/
     case WEAPON_CLASS:
         if (ispoisoned)
             Strcat(prefix, "poisoned ");
-    plus:
         add_erosion_words(obj, prefix);
         if (known) {
             Strcat(prefix, sitoa(obj->spe));
             Strcat(prefix, " ");
         }
         break;
-    case ARMOR_CLASS:
-        if (obj->owornmask & W_ARMOR)
-            Strcat(bp, (obj == uskin) ? " (embedded in your skin)"
-                                      : " (being worn)");
-        goto plus;
     case TOOL_CLASS:
-        /* weptools already get this done when we go to the +n code */
-        if (!is_weptool(obj))
-            add_erosion_words(obj, prefix);
-        if (obj->owornmask & (W_TOOL /* blindfold */ | W_SADDLE)) {
+        if (obj->owornmask & (W_TOOL | W_SADDLE)) { /* blindfold */
             Strcat(bp, " (being worn)");
             break;
         }
@@ -885,8 +906,6 @@ boolean with_price;
             Strcat(bp, " (in use)");
             break;
         }
-        if (is_weptool(obj))
-            goto plus;
         if (obj->otyp == CANDELABRUM_OF_INVOCATION) {
             if (!obj->spe)
                 Strcpy(tmpbuf, "no");
@@ -908,7 +927,6 @@ boolean with_price;
             goto charges;
         break;
     case WAND_CLASS:
-        add_erosion_words(obj, prefix);
     charges:
         if (known)
             Sprintf(eos(bp), " (%d:%d)", (int) obj->recharged, obj->spe);
@@ -918,7 +936,6 @@ boolean with_price;
             Strcat(bp, " (lit)");
         break;
     case RING_CLASS:
-        add_erosion_words(obj, prefix);
     ring:
         if (obj->owornmask & W_RINGR)
             Strcat(bp, " (on right ");
@@ -3443,15 +3460,19 @@ typfnd:
         curse(otmp);
     }
 
-    /* set eroded */
-    if (is_damageable(otmp) || otmp->otyp == CRYSKNIFE) {
+    /* set eroded and erodeproof */
+    if (erosion_matters(otmp)) {
         if (eroded && (is_flammable(otmp) || is_rustprone(otmp)))
             otmp->oeroded = eroded;
         if (eroded2 && (is_corrodeable(otmp) || is_rottable(otmp)))
             otmp->oeroded2 = eroded2;
-
-        /* set erodeproof */
-        if (erodeproof && !eroded && !eroded2)
+        /*
+         * 3.6.1: earlier versions included `&& !eroded && !eroded2' here,
+         * but damageproof combined with damaged is feasible (eroded
+         * armor modified by confused reading of cursed destroy armor)
+         * so don't prevent player from wishing for such a combination.
+         */
+        if (erodeproof && (is_damageable(otmp) || otmp->otyp == CRYSKNIFE))
             otmp->oerodeproof = (Luck >= 0 || wizard);
     }
 
