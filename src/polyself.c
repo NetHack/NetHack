@@ -1,4 +1,4 @@
-/* NetHack 3.6	polyself.c	$NHDT-Date: 1451082254 2015/12/25 22:24:14 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.105 $ */
+/* NetHack 3.6	polyself.c	$NHDT-Date: 1457572516 2016/03/10 01:15:16 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.108 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -592,6 +592,7 @@ int
 polymon(mntmp)
 int mntmp;
 {
+    char buf[BUFSZ];
     boolean sticky = sticks(youmonst.data) && u.ustuck && !u.uswallow,
             was_blind = !!Blind, dochange = FALSE;
     int mlvl;
@@ -643,20 +644,16 @@ int mntmp;
         if (sex_change_ok && !rn2(10))
             dochange = TRUE;
     }
+
+    Strcpy(buf, (u.umonnum != mntmp) ? "" : "new ");
     if (dochange) {
         flags.female = !flags.female;
-        You("%s %s%s!",
-            (u.umonnum != mntmp) ? "turn into a" : "feel like a new",
-            (is_male(&mons[mntmp]) || is_female(&mons[mntmp]))
-                ? ""
-                : flags.female ? "female " : "male ",
-            mons[mntmp].mname);
-    } else {
-        if (u.umonnum != mntmp)
-            You("turn into %s!", an(mons[mntmp].mname));
-        else
-            You_feel("like a new %s!", mons[mntmp].mname);
+        Strcat(buf, (is_male(&mons[mntmp]) || is_female(&mons[mntmp]))
+                       ? "" : flags.female ? "female " : "male ");
     }
+    Strcat(buf, mons[mntmp].mname);
+    You("%s %s!", (u.umonnum != mntmp) ? "turn into" : "feel like", an(buf));
+
     if (Stoned && poly_when_stoned(&mons[mntmp])) {
         /* poly_when_stoned already checked stone golem genocide */
         mntmp = PM_STONE_GOLEM;
@@ -746,8 +743,6 @@ int mntmp;
         uunstick();
     if (u.usteed) {
         if (touch_petrifies(u.usteed->data) && !Stone_resistance && rnl(3)) {
-            char buf[BUFSZ];
-
             pline("%s touch %s.", no_longer_petrify_resistant,
                   mon_nam(u.usteed));
             Sprintf(buf, "riding %s", an(u.usteed->data->mname));
