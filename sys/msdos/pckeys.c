@@ -28,9 +28,7 @@ extern boolean inmap;                /* from video.c */
  *
  */
 boolean
-pckeys(scancode, shift)
-unsigned char scancode;
-unsigned char shift;
+pckeys(unsigned char scancode, unsigned char shift)
 {
     boolean opening_dialog;
 

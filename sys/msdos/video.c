@@ -188,8 +188,7 @@ void cl_eos() /* clear to end of screen */
 }
 
 void
-cmov(col, row)
-register int col, row;
+cmov(register int col, register int row)
 {
     ttyDisplay->cury = (uchar) row;
     ttyDisplay->curx = (uchar) col;
@@ -228,8 +227,7 @@ home()
 }
 
 void
-nocmov(col, row)
-int col, row;
+nocmov(int col, int row)
 {
     if (!iflags.grmode) {
         txt_gotoxy(col, row);
@@ -371,15 +369,13 @@ tty_nhbell()
 }
 
 void
-tty_number_pad(state)
-int state;
+tty_number_pad(int state)
 {
     ++state; /* prevents compiler warning (unref. param) */
 }
 
 void
-tty_startup(wid, hgt)
-int *wid, *hgt;
+tty_startup(int *wid, int *hgt)
 {
     /* code to sense display adapter is required here - MJA */
 
@@ -497,8 +493,7 @@ gr_finish()
  */
 
 void
-xputs(s)
-const char *s;
+xputs(const char *s)
 {
     int col, row;
 
@@ -514,8 +509,7 @@ const char *s;
     }
 }
 
-void xputc(ch) /* write out character (and attribute) */
-char ch;
+void xputc(char ch) /* write out character (and attribute) */
 {
     int i;
     char attribute;
@@ -532,11 +526,9 @@ char ch;
     }
 }
 
-void xputg(glyphnum, ch,
-           special) /* write out a glyph picture at current location */
-int glyphnum;
-int ch;
-unsigned special;
+void xputg(int glyphnum,
+           int ch,
+           unsigned special) /* write out a glyph picture at current location */
 {
     if (!iflags.grmode || !iflags.tile_view) {
         xputc((char) ch);
@@ -549,8 +541,7 @@ unsigned special;
 
 #ifdef POSITIONBAR
 void
-video_update_positionbar(posbar)
-char *posbar;
+video_update_positionbar(char *posbar)
 {
     if (!iflags.grmode)
         return;
@@ -562,8 +553,7 @@ char *posbar;
 #endif
 
 void
-adjust_cursor_flags(cw)
-struct WinDesc *cw;
+adjust_cursor_flags(struct WinDesc *cw)
 {
 #ifdef SIMULATE_CURSOR
 #if 0
@@ -788,10 +778,9 @@ assign_videocolors(char *colorvals)
 }
 
 static int
-convert_uchars(bufp, list, size)
-char *bufp;  /* current pointer */
-uchar *list; /* return list */
-int size;
+convert_uchars(char *bufp,  /* current pointer */
+               uchar *list, /* return list */
+               int size)
 {
     unsigned int num = 0;
     int count = 0;
@@ -844,8 +833,7 @@ int size;
  *    vga	 (use vga adapter code)
  */
 int
-assign_video(sopt)
-char *sopt;
+assign_video(char *sopt)
 {
     /*
      * debug
@@ -907,8 +895,7 @@ char *sopt;
 }
 
 void
-tileview(enable)
-boolean enable;
+tileview(boolean enable)
 {
 #ifdef SCREEN_VGA
     if (iflags.grmode)
@@ -920,8 +907,7 @@ boolean enable;
 #else  /* STUBVIDEO */
 
 void
-tileview(enable)
-boolean enable;
+tileview(boolean enable)
 {
 }
 #endif /* STUBVIDEO */

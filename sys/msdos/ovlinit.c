@@ -17,8 +17,7 @@
  *
  */
 unsigned
-memavail(minovl)
-unsigned minovl; /* minimum size of overlay heap */
+memavail(unsigned minovl) /* minimum size of overlay heap */
 {
     unsigned available;
 
@@ -116,8 +115,7 @@ startup()
 }
 
 void
-show_borlandc_stats(win)
-winid win;
+show_borlandc_stats(winid win)
 {
     char buf[BUFSZ];
 

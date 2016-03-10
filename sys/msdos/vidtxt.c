@@ -178,8 +178,7 @@ txt_clear_screen()
 #endif
 }
 
-void txt_cl_end(col, row) /* clear to end of line */
-int col, row;
+void txt_cl_end(int col, int row) /* clear to end of line */
 {
     union REGS regs;
 #ifndef PC9800
@@ -251,8 +250,7 @@ void txt_cl_eos() /* clear to end of screen */
 }
 
 void
-txt_startup(wid, hgt)
-int *wid, *hgt;
+txt_startup(int *wid, int *hgt)
 {
     txt_get_scr_size();
     *wid = CO;
@@ -288,9 +286,7 @@ int *wid, *hgt;
  */
 
 void
-txt_xputs(s, col, row)
-const char *s;
-int col, row;
+txt_xputs(const char *s, int col, int row)
 {
     char c;
 
@@ -306,9 +302,7 @@ int col, row;
     }
 }
 
-void txt_xputc(ch, attr) /* write out character (and attribute) */
-char ch;
-int attr;
+void txt_xputc(char ch, int attr) /* write out character (and attribute) */
 {
 #ifdef PC9800
     union REGS regs;
@@ -391,8 +385,7 @@ int attr;
 /*
  * This is implemented as a macro under DJGPPFAST.
  */
-void txt_get_cursor(x, y) /* get cursor position */
-int *x, *y;
+void txt_get_cursor(int *x, int *y) /* get cursor position */
 {
     union REGS regs;
 
@@ -407,8 +400,7 @@ int *x, *y;
 #endif /* SCREEN_BIOS && !PC9800 */
 
 void
-txt_gotoxy(x, y)
-int x, y;
+txt_gotoxy(int x, int y)
 {
 #ifdef SCREEN_BIOS
     union REGS regs;

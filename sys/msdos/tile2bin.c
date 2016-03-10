@@ -77,9 +77,7 @@ int filenum;
 int paletteflag;
 
 int
-main(argc, argv)
-int argc;
-char *argv[];
+main(int argc, char *argv[])
 {
     int i;
     struct tm *newtime;
@@ -196,9 +194,7 @@ char *argv[];
 }
 
 static void
-write_tibheader(fileptr, tibhdr)
-FILE *fileptr;
-struct tibhdr_struct *tibhdr;
+write_tibheader(FILE *fileptr, struct tibhdr_struct *tibhdr)
 {
     if (fseek(fileptr, 0L, SEEK_SET)) {
         Fprintf(stderr, "Error writing header to tile file\n");
@@ -207,8 +203,7 @@ struct tibhdr_struct *tibhdr;
 }
 
 static void
-build_tibtile(pixels)
-pixel (*pixels)[TILE_X];
+build_tibtile(pixel (*pixels)[TILE_X])
 {
     int i, j, k, co_off;
     unsigned char co_mask, tmp;
@@ -263,8 +258,7 @@ pixel (*pixels)[TILE_X];
 }
 
 static void
-write_tibtile(recnum)
-int recnum;
+write_tibtile(int recnum)
 {
     long fpos;
 

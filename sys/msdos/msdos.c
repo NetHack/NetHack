@@ -425,8 +425,7 @@ getdta()
 }
 
 long
-filesize_nh(file)
-char *file;
+filesize_nh(char *file)
 {
     char *dta;
 
@@ -443,8 +442,7 @@ char *file;
  * Chdrive() changes the default drive.
  */
 void
-chdrive(str)
-char *str;
+chdrive(char *str)
 {
 #define SELECTDISK 0x0E
     char *ptr;
@@ -504,9 +502,7 @@ enable_ctrlP()
 }
 
 STATIC_OVL unsigned int
-dos_ioctl(handle, mode, setvalue)
-int handle, mode;
-unsigned setvalue;
+dos_ioctl(int handle, int mode, unsigned setvalue)
 {
     union REGS regs;
 

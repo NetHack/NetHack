@@ -170,8 +170,7 @@ DOSgetch()
 }
 
 long
-freediskspace(path)
-char *path;
+freediskspace(char *path)
 {
     int drive = 0;
     struct {
@@ -191,8 +190,7 @@ char *path;
  * Functions to get filenames using wildcards
  */
 int
-findfirst(path)
-char *path;
+findfirst(char *path)
 {
     return (Fsfirst(path, 0) == 0);
 }
@@ -210,8 +208,7 @@ foundfile_buffer()
 }
 
 long
-filesize(file)
-char *file;
+filesize(char *path)
 {
     if (findfirst(file))
         return (*(long *) ((char *) Fgetdta() + 26));
@@ -223,8 +220,7 @@ char *file;
  * Chdrive() changes the default drive.
  */
 void
-chdrive(str)
-char *str;
+chdrive(char *path)
 {
     char *ptr;
     char drive;
@@ -265,8 +261,7 @@ get_scr_size()
 #define BIGBUF 8192
 
 int
-_copyfile(from, to)
-char *from, *to;
+_copyfile(char *from, char *to)
 {
     int fromfd, tofd, r;
     char *buf;
