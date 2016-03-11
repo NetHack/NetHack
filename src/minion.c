@@ -364,7 +364,7 @@ lminion()
     struct permonst *ptr;
 
     for (tryct = 0; tryct < 20; tryct++) {
-        ptr = mkclass(S_ANGEL, 0);
+        ptr = mkclass(S_ANGEL);
         if (ptr && !is_lord(ptr))
             return (monsndx(ptr));
     }
@@ -380,7 +380,7 @@ aligntyp atyp;
     struct permonst *ptr;
 
     for (tryct = 0; tryct < 20; tryct++) {
-        ptr = mkclass(S_DEMON, 0);
+        ptr = mkclass(S_DEMON);
         if (ptr && is_ndemon(ptr)
             && (atyp == A_NONE || sgn(ptr->maligntyp) == sgn(atyp)))
             return (monsndx(ptr));

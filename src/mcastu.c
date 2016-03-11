@@ -567,7 +567,7 @@ int spellnum;
     case CLC_INSECTS: {
         /* Try for insects, and if there are none
            left, go for (sticks to) snakes.  -3. */
-        struct permonst *pm = mkclass(S_ANT, 0);
+        struct permonst *pm = mkclass(S_ANT);
         struct monst *mtmp2 = (struct monst *) 0;
         char let = (pm ? S_ANT : S_SNAKE);
         boolean success = FALSE, seecaster;
@@ -582,7 +582,7 @@ int spellnum;
         for (i = 0; i <= quan; i++) {
             if (!enexto(&bypos, mtmp->mux, mtmp->muy, mtmp->data))
                 break;
-            if ((pm = mkclass(let, 0)) != 0
+            if ((pm = mkclass(let)) != 0
                 && (mtmp2 = makemon(pm, bypos.x, bypos.y, MM_ANGRY)) != 0) {
                 success = TRUE;
                 mtmp2->msleeping = mtmp2->mpeaceful = mtmp2->mtame = 0;

@@ -2441,7 +2441,7 @@ create_particular()
         }
         for (i = 0; i <= multi; i++) {
             if (monclass != MAXMCLASSES)
-                whichpm = mkclass(monclass, 0);
+                whichpm = mkclass(monclass);
             else if (randmonst)
                 whichpm = rndmonst();
             mtmp = makemon(whichpm, u.ux, u.uy, NO_MM_FLAGS);

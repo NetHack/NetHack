@@ -18,6 +18,7 @@ STATIC_VAR NEARDATA struct monst zeromonst;
 STATIC_DCL boolean FDECL(uncommon, (int));
 STATIC_DCL int FDECL(align_shift, (struct permonst *));
 STATIC_DCL boolean FDECL(mk_gen_ok, (int, int, int));
+STATIC_DCL boolean FDECL(monclass_nogen, (CHAR_P));
 STATIC_DCL boolean FDECL(wrong_elem_type, (struct permonst *));
 STATIC_DCL void FDECL(m_initgrp, (struct monst *, int, int, int));
 STATIC_DCL void FDECL(m_initthrow, (struct monst *, int, int));
@@ -1519,6 +1520,28 @@ int mndx; /* particular species that can no longer be created */
     } /* note: safe to ignore extinction of unique monsters */
 }
 
+/* Returns TRUE if all monsters of a class are generated only specially,
+ * i.e. all of them are tagged as G_NOGEN. */
+STATIC_OVL boolean
+monclass_nogen(class)
+char class;
+{
+    int first, i;
+
+    /*  Assumption #1:  monsters of a given class are contiguous in the
+     *                  mons[] array.
+     */
+    for (first = LOW_PM; first < SPECIAL_PM; first++)
+        if (mons[first].mlet == class)
+            break;
+
+    for (i = first; i < SPECIAL_PM && mons[i].mlet == class; i++)
+        if (!(mons[i].geno & G_NOGEN))
+            return FALSE;
+
+    return TRUE;
+}
+
 /* decide whether it's ok to generate a candidate monster by mkclass() */
 STATIC_OVL boolean
 mk_gen_ok(mndx, mvflagsmask, genomask)
@@ -1532,32 +1555,29 @@ int mndx, mvflagsmask, genomask;
         return FALSE;
     if (is_placeholder(ptr))
         return FALSE;
-#ifdef MAIL
-    /* special levels might ask for random demon type; reject this one */
-    if (ptr == &mons[PM_MAIL_DAEMON])
-        return FALSE;
-#endif
     return TRUE;
 }
 
 /* Make one of the multiple types of a given monster class.
- * The second parameter specifies a special casing bit mask
- * to allow the normal genesis masks to be deactivated.
  * Returns Null if no monsters in that class can be made.
  */
 struct permonst *
-mkclass(class, spc)
+mkclass(class)
 char class;
-int spc;
 {
     register int first, last, num = 0;
-    int maxmlev, mask = (G_NOGEN | G_UNIQ) & ~spc;
+    int maxmlev, mask = G_UNIQ;
 
     maxmlev = level_difficulty() >> 1;
     if (class < 1 || class >= MAXMCLASSES) {
         impossible("mkclass called with bad class!");
         return (struct permonst *) 0;
     }
+
+    /* Include G_NOGEN monsters iif the entire class is flagged with it. */
+    if (monclass_nogen(class))
+        mask |= G_NOGEN;
+
     /*  Assumption #1:  monsters of a given class are contiguous in the
      *                  mons[] array.
      */

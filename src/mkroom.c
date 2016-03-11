@@ -438,7 +438,7 @@ morguemon()
 
     if (hd > 10 && i < 10) {
         if (Inhell || In_endgame(&u.uz)) {
-            return mkclass(S_DEMON, 0);
+            return mkclass(S_DEMON);
         } else {
             int ndemon_res = ndemon(A_NONE);
             if (ndemon_res != NON_PM)
@@ -448,11 +448,11 @@ morguemon()
     }
 
     if (hd > 8 && i > 85)
-        return mkclass(S_VAMPIRE, 0);
+        return mkclass(S_VAMPIRE);
 
     return ((i < 20) ? &mons[PM_GHOST]
                      : (i < 40) ? &mons[PM_WRAITH]
-                                : mkclass(S_ZOMBIE, 0));
+                                : mkclass(S_ZOMBIE));
 }
 
 struct permonst *
@@ -514,7 +514,7 @@ mkswamp() /* Michiel Huisjes & Fred de Wilde */
                             eelct++;
                         }
                     } else if (!rn2(4)) /* swamps tend to be moldy */
-                        (void) makemon(mkclass(S_FUNGUS, 0), sx, sy,
+                        (void) makemon(mkclass(S_FUNGUS), sx, sy,
                                        NO_MM_FLAGS);
                 }
         level.flags.has_swamp = 1;
@@ -713,23 +713,23 @@ courtmon()
     int i = rn2(60) + rn2(3 * level_difficulty());
 
     if (i > 100)
-        return mkclass(S_DRAGON, 0);
+        return mkclass(S_DRAGON);
     else if (i > 95)
-        return mkclass(S_GIANT, 0);
+        return mkclass(S_GIANT);
     else if (i > 85)
-        return mkclass(S_TROLL, 0);
+        return mkclass(S_TROLL);
     else if (i > 75)
-        return mkclass(S_CENTAUR, 0);
+        return mkclass(S_CENTAUR);
     else if (i > 60)
-        return mkclass(S_ORC, 0);
+        return mkclass(S_ORC);
     else if (i > 45)
         return &mons[PM_BUGBEAR];
     else if (i > 30)
         return &mons[PM_HOBGOBLIN];
     else if (i > 15)
-        return mkclass(S_GNOME, 0);
+        return mkclass(S_GNOME);
     else
-        return mkclass(S_KOBOLD, 0);
+        return mkclass(S_KOBOLD);
 }
 
 #define NSTYPES (PM_CAPTAIN - PM_SOLDIER + 1)

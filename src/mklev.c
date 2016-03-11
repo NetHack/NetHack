@@ -426,7 +426,7 @@ int type;
                      && (mvitals[PM_GIANT_MIMIC].mvflags & G_GONE))) {
                 /* make a mimic instead */
                 levl[x][y].doormask = D_NODOOR;
-                mtmp = makemon(mkclass(S_MIMIC, 0), x, y, NO_MM_FLAGS);
+                mtmp = makemon(mkclass(S_MIMIC), x, y, NO_MM_FLAGS);
                 if (mtmp)
                     set_mimic_sym(mtmp);
             }
@@ -529,7 +529,7 @@ int trap_type;
                         levl[xx][yy].typ = IRONBARS;
                         if (rn2(3))
                             (void) mkcorpstat(CORPSE, (struct monst *) 0,
-                                              mkclass(S_HUMAN, 0), xx,
+                                              mkclass(S_HUMAN), xx,
                                               yy + dy, TRUE);
                     }
                     if (!level.flags.noteleport)
