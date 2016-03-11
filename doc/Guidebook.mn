@@ -2227,6 +2227,8 @@ Enable mail delivery during the game (default on).  Persistent.
 .lp "male    "
 An obsolete synonym for ``gender:male''.
 Cannot be set with the `O' command.
+.lp map_coloring
+Recolor terrain of special dungeon regions (default on).
 .lp mention_walls
 Give feedback when walking against a wall (default off).
 .lp menucolors

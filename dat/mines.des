@@ -84,6 +84,12 @@ REGION:(00,00,36,16),lit,"ordinary"
 STAIR:levregion(01,03,20,19),(00,00,36,15),up
 STAIR:levregion(61,03,75,19),(00,00,36,15),down
 
+# Define the town area so that it can be colored separately from the
+# surrounding mines.
+#
+# unfilled forces it to be added to the level's rooms list.
+REGION:(02,02,34,16),lit,"ordinary",unfilled
+
 # shame we can't make polluted fountains
 FOUNTAIN:(16,09)
 FOUNTAIN:(25,09)
@@ -576,6 +582,23 @@ REGION:(37,13,39,17),lit,"ordinary"
 REGION:(36,14,40,17),lit,"ordinary"
 REGION:(59,02,72,10),lit,"ordinary"
 
+# Define gnomes' homes so that they can be colored separately from the
+# surrounding mines.
+#
+# unfilled forces them to be added to the level's rooms list.
+REGION:(02,13,03,14),lit,"ordinary",unfilled
+REGION:(01,18,03,19),lit,"ordinary",unfilled
+REGION:(21,12,25,13),lit,"ordinary",unfilled
+REGION:(19,17,21,18),lit,"ordinary",unfilled
+REGION:(38,05,39,07),lit,"ordinary",unfilled
+REGION:(43,08,44,10),lit,"ordinary",unfilled
+REGION:(58,04,59,05),lit,"ordinary",unfilled
+REGION:(61,04,63,04),lit,"ordinary",unfilled
+REGION:(68,04,68,04),lit,"ordinary",unfilled
+REGION:(70,04,71,05),lit,"ordinary",unfilled
+REGION:(66,14,68,15),lit,"ordinary",unfilled
+REGION:(70,17,73,19),lit,"ordinary",unfilled
+
 MONSTER: ('@', "watchman"), random, peaceful
 MONSTER: ('@', "watchman"), random, peaceful
 MONSTER: ('@', "watchman"), random, peaceful
@@ -673,6 +696,22 @@ REGION:(23,1,25,3),lit,"shop"
 REGION:(22,12,24,13),lit,"food shop"
 REGION:(31,12,36,14),lit,"temple"
 ALTAR:(35,13),align[0],shrine
+
+# Define gnomes' homes so that they can be colored separately from the
+# surrounding mines.
+#
+# unfilled forces them to be added to the level's rooms list.
+REGION:(02,01,04,03),lit,"ordinary",unfilled
+REGION:(02,08,03,09),lit,"ordinary",unfilled
+REGION:(09,03,11,05),lit,"ordinary",unfilled
+REGION:(13,05,14,06),lit,"ordinary",unfilled
+REGION:(13,10,14,11),lit,"ordinary",unfilled
+REGION:(19,11,20,13),lit,"ordinary",unfilled
+REGION:(21,09,31,09),lit,"ordinary",unfilled
+REGION:(27,01,28,03),lit,"ordinary",unfilled
+REGION:(27,07,28,08),lit,"ordinary",unfilled
+REGION:(30,01,36,02),lit,"ordinary",unfilled
+REGION:(34,06,36,08),lit,"ordinary",unfilled
 
 DOOR:closed,(5,2)
 DOOR:locked,(4,8)

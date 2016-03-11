@@ -130,7 +130,37 @@ unsigned *ospecial;
             color = CLR_WHITE;
 #endif
         } else {
-            cmap_color(offset);
+            if (iflags.use_color && iflags.map_coloring) {
+                /* Special colors for special dungeon areas. */
+                if (offset >= S_vwall && offset <= S_trwall) {
+                    if (In_W_tower(x, y, &u.uz))
+                        color = CLR_MAGENTA;
+                    else if (In_mines(&u.uz) && !*in_rooms(x, y, 0))
+                        color = CLR_BROWN;
+                    else if (In_sokoban(&u.uz))
+                        color = CLR_BRIGHT_BLUE;
+                    else if (In_hell(&u.uz) && !Is_valley(&u.uz))
+                        color = CLR_RED;
+                    else if (Is_astralevel(&u.uz))
+                        color = CLR_WHITE;
+                } else if (offset == S_altar) {
+                    if (Is_astralevel(&u.uz)) {
+                        color = CLR_BRIGHT_MAGENTA;
+                    } else {
+                        aligntyp a = Amask2align(levl[x][y].altarmask & AM_MASK);
+                        if (a == A_LAWFUL)
+                            color = CLR_BRIGHT_BLUE;
+                        else if (a == A_NEUTRAL)
+                            color = CLR_GRAY;
+                        else if (a == A_CHAOTIC)
+                            color = CLR_BLACK;
+                        else
+                            color = CLR_RED;
+                    }
+                }
+            }
+            if (color == NO_COLOR)
+                cmap_color(offset);
         }
     } else if ((offset = (glyph - GLYPH_OBJ_OFF)) >= 0) { /* object */
         idx = objects[offset].oc_class + SYM_OFF_O;

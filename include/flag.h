@@ -220,6 +220,7 @@ struct instance_flags {
     boolean use_status_hilites;   /* use color in status line */
     boolean use_background_glyph; /* use background glyph when appropriate */
     boolean hilite_pile;          /* mark piles of objects with a hilite */
+    boolean map_coloring;     /* recolor terrain of special dungeon regions */
     boolean autodescribe;     /* autodescribe mode in getpos() */
 #if 0
 	boolean  DECgraphics;	/* use DEC VT-xxx extended character set */

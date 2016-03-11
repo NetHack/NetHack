@@ -144,6 +144,7 @@ static struct Bool_Opt {
 #else
     { "mail", (boolean *) 0, TRUE, SET_IN_FILE },
 #endif
+    { "map_coloring", &iflags.map_coloring, TRUE, SET_IN_GAME },
     { "mention_walls", &iflags.mention_walls, FALSE, SET_IN_GAME },
     { "menucolors", &iflags.use_menu_color, FALSE, SET_IN_GAME },
     /* for menu debugging only*/
@@ -3450,7 +3451,8 @@ boolean tinitial, tfrom_file;
                        || boolopt[i].addr == &flags.showrace
                        || boolopt[i].addr == &iflags.use_inverse
                        || boolopt[i].addr == &iflags.hilite_pile
-                       || boolopt[i].addr == &iflags.hilite_pet) {
+                       || boolopt[i].addr == &iflags.hilite_pet
+                       || boolopt[i].addr == &iflags.map_coloring) {
                 need_redraw = TRUE;
 #ifdef TEXTCOLOR
             } else if (boolopt[i].addr == &iflags.use_color) {
