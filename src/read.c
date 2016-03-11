@@ -1,4 +1,4 @@
-/* NetHack 3.6	read.c	$NHDT-Date: 1457570260 2016/03/10 00:37:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.135 $ */
+/* NetHack 3.6	read.c	$NHDT-Date: 1457660917 2016/03/11 01:48:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.136 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2370,11 +2370,9 @@ create_particular()
     int which, tryct, i, firstchoice = NON_PM;
     struct permonst *whichpm = NULL;
     struct monst *mtmp;
-    boolean madeany = FALSE;
-    boolean maketame, makepeaceful, makehostile;
-    boolean randmonst = FALSE;
-    boolean saddled = FALSE;
-    boolean invisible = FALSE;
+    boolean madeany = FALSE, randmonst = FALSE,
+            maketame, makepeaceful, makehostile, saddled, invisible;
+    int fem;
 
     tryct = 5;
     do {
@@ -2382,18 +2380,29 @@ create_particular()
         which = urole.malenum; /* an arbitrary index into mons[] */
         maketame = makepeaceful = makehostile = FALSE;
         saddled = invisible = FALSE;
+        fem = -1; /* gender not specified */
         getlin("Create what kind of monster? [type the name or symbol]", buf);
         bufp = mungspaces(buf);
         if (*bufp == '\033')
             return FALSE;
         if ((tmpp = strstri(bufp, "saddled ")) != 0) {
             saddled = TRUE;
-            memset(tmpp, ' ', sizeof("saddled ")-1);
+            (void) memset(tmpp, ' ', sizeof "saddled " - 1);
         }
         if ((tmpp = strstri(bufp, "invisible ")) != 0) {
             invisible = TRUE;
-            memset(tmpp, ' ', sizeof("invisible ")-1);
+            (void) memset(tmpp, ' ', sizeof "invisible " - 1);
         }
+        /* check "female" before "male" to avoid false hit mid-word */
+        if ((tmpp = strstri(bufp, "female ")) != 0) {
+            fem = 1;
+            (void) memset(tmpp, ' ', sizeof "female " - 1);
+        }
+        if ((tmpp = strstri(bufp, "male ")) != 0) {
+            fem = 0;
+            (void) memset(tmpp, ' ', sizeof "male " - 1);
+        }
+        bufp = mungspaces(bufp); /* after potential memset(' ') */
         /* allow the initial disposition to be specified */
         if (!strncmpi(bufp, "tame ", 5)) {
             bufp += 5;
@@ -2452,6 +2461,9 @@ create_particular()
                 /* otherwise try again */
                 continue;
             }
+            /* 'is_FOO()' ought to be called 'always_FOO()' */
+            if (fem != -1 && !is_male(mtmp->data) && !is_female(mtmp->data))
+                mtmp->female = fem; /* ignored for is_neuter() */
             if (maketame) {
                 (void) tamedog(mtmp, (struct obj *) 0);
             } else if (makepeaceful || makehostile) {
@@ -2461,6 +2473,7 @@ create_particular()
             }
             if (saddled && can_saddle(mtmp) && !which_armor(mtmp, W_SADDLE)) {
                 struct obj *otmp = mksobj(SADDLE, TRUE, FALSE);
+
                 put_saddle_on_mon(otmp, mtmp);
             }
             if (invisible)
