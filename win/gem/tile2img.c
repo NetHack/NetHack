@@ -50,9 +50,7 @@ char bmpname[128];
 FILE *fp;
 
 int
-main(argc, argv)
-int argc;
-char *argv[];
+main(int argc, char *argv[])
 {
     int i;
 
@@ -135,8 +133,7 @@ get_pixel(int x, int y, unsigned int *colind)
 }
 
 static void
-build_ximgtile(pixels)
-pixel (*pixels)[TILE_X];
+build_ximgtile(pixel (*pixels)[TILE_X])
 {
     int cur_x, cur_y, cur_color;
     int x, y;

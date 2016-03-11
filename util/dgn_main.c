@@ -53,9 +53,7 @@ FILE *FDECL(freopen, (char *, char *, FILE *));
 extern unsigned _stklen = STKSIZ;
 #endif
 int
-main(argc, argv)
-int argc;
-char **argv;
+main(int argc, char **argv)
 {
     char infile[64], outfile[64], basename[64];
     FILE *fin, *fout;
@@ -158,8 +156,7 @@ char **argv;
  */
 
 void
-yyerror(s)
-const char *s;
+yyerror(const char *s)
 {
     (void) fprintf(stderr, "%s : line %d : %s\n", fname, nh_line_number, s);
     if (++fatal_error > MAX_ERRORS) {
@@ -173,8 +170,7 @@ const char *s;
  */
 
 void
-yywarning(s)
-const char *s;
+yywarning(const char *s)
 {
     (void) fprintf(stderr, "%s : line %d : WARNING : %s\n", fname,
                    nh_line_number, s);

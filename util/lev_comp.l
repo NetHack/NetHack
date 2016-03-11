@@ -347,8 +347,7 @@ inaccessibles   { savetoken(yytext); yylval.i=CHECK_INACCESSIBLES; return FLAG_T
 %%
 #ifdef	AMIGA
 long *
-alloc(n)
-    unsigned n;
+alloc(unsigned n)
 {
     return (long *) malloc(n);
 }
@@ -356,8 +355,7 @@ alloc(n)
 
 /* routine to switch to another input file; needed for flex */
 void
-init_yyin( input_f )
-FILE *input_f;
+init_yyin( FILE *input_f )
 {
 #if defined(FLEX_SCANNER) || defined(FLEXHACK_SCANNER)
     if (yyin)
@@ -371,8 +369,7 @@ FILE *input_f;
 }
 /* analogous routine (for completeness) */
 void
-init_yyout( output_f )
-FILE *output_f;
+init_yyout( FILE *output_f )
 {
     yyout = output_f;
 }
@@ -419,16 +416,14 @@ newline()
 }
 
 void
-savetoken(s)
-char *s;
+savetoken(char *s)
 {
     Sprintf(curr_token, "%s", s);
     advancepos(s);
 }
 
 void
-advancepos(s)
-char *s;
+advancepos(char *s)
 {
     token_start_pos += strlen(s);
 }

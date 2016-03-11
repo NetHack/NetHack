@@ -485,8 +485,7 @@ init_branch()
 }
 
 int
-getchain(s)
-	char	*s;
+getchain(char *s)
 {
 	int i;
 

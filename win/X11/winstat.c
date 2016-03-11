@@ -42,10 +42,9 @@ static Widget FDECL(create_fancy_status, (Widget, Widget));
 static void FDECL(destroy_fancy_status, (struct xwindow *));
 
 void
-create_status_window(wp, create_popup, parent)
-struct xwindow *wp; /* window pointer */
-boolean create_popup;
-Widget parent;
+create_status_window(struct xwindow *wp,/* window pointer */
+                     boolean create_popup,
+                     Widget parent)
 {
     XFontStruct *fs;
     Arg args[8];
@@ -133,8 +132,7 @@ Widget parent;
 }
 
 void
-destroy_status_window(wp)
-struct xwindow *wp;
+destroy_status_window(struct xwindow *wp)
 {
     /* If status_information is defined, then it a "text" status window. */
     if (wp->status_information) {
@@ -159,9 +157,7 @@ struct xwindow *wp;
  *	+ We didn't set stringInPlace on the widget.
  */
 void
-adjust_status(wp, str)
-struct xwindow *wp;
-const char *str;
+adjust_status(struct xwindow *wp, const char *str)
 {
     Arg args[2];
     Cardinal num_args;
@@ -319,8 +315,7 @@ null_out_status()
 
 /* This is almost an exact duplicate of hilight_value() */
 static void
-hilight_label(w)
-Widget w; /* label widget */
+hilight_label(Widget w) /* label widget */
 {
     Arg args[2];
     Pixel fg, bg;
@@ -335,9 +330,7 @@ Widget w; /* label widget */
 }
 
 static void
-update_val(attr_rec, new_value)
-struct X_status_value *attr_rec;
-long new_value;
+update_val(struct X_status_value *attr_rec, long new_value)
 {
     char buf[BUFSZ];
     Arg args[4];
@@ -570,8 +563,7 @@ long new_value;
  * [**] HD is shown instead of level and exp if mtimedone is non-zero.
  */
 static void
-update_fancy_status(wp)
-struct xwindow *wp;
+update_fancy_status(struct xwindow *wp)
 {
     struct X_status_value *sv;
     long val;
@@ -724,8 +716,7 @@ check_turn_events()
 
 /* Return a string for the initial width. */
 static const char *
-width_string(sv_index)
-int sv_index;
+width_string(int sv_index)
 {
     switch (sv_index) {
     case F_STR:
@@ -780,10 +771,7 @@ int sv_index;
 }
 
 static void
-create_widget(parent, sv, sv_index)
-Widget parent;
-struct X_status_value *sv;
-int sv_index;
+create_widget(Widget parent, struct X_status_value *sv, int sv_index)
 {
     Arg args[4];
     Cardinal num_args;
@@ -826,9 +814,7 @@ int sv_index;
  * Get current width of value.  width2p is only valid for SV_LABEL types.
  */
 static void
-get_widths(sv, width1p, width2p)
-struct X_status_value *sv;
-int *width1p, *width2p;
+get_widths(struct X_status_value *sv, int *width1p, int *width2p)
 {
     Arg args[1];
     Dimension width;
@@ -851,9 +837,7 @@ int *width1p, *width2p;
 }
 
 static void
-set_widths(sv, width1, width2)
-struct X_status_value *sv;
-int width1, width2;
+set_widths(struct X_status_value *sv, int width1, int width2)
 {
     Arg args[1];
 
@@ -873,10 +857,7 @@ int width1, width2;
 }
 
 static Widget
-init_column(name, parent, top, left, col_indices)
-const char *name;
-Widget parent, top, left;
-int *col_indices;
+init_column(const char *name, Widget parent, Widget top, Widget left, int *col_indices)
 {
     Widget form;
     Arg args[4];
@@ -955,8 +936,7 @@ static int col1_indices[] = { F_HP,    F_AC, F_GOLD, F_LEVEL, F_POWER,
  * col1_indices[n]	col2_indices[n]
  */
 static Widget
-init_info_form(parent, top, left)
-Widget parent, top, left;
+init_info_form(Widget parent, Widget top, Widget left)
 {
     Widget form, col1;
     struct X_status_value *sv_name, *sv_dlevel;
@@ -1019,8 +999,7 @@ Widget parent, top, left;
  * contains everything.
  */
 static Widget
-create_fancy_status(parent, top)
-Widget parent, top;
+create_fancy_status(Widget parent, Widget top)
 {
     Widget form; /* The form that surrounds everything. */
     Widget w;
@@ -1049,8 +1028,7 @@ Widget parent, top;
 }
 
 static void
-destroy_fancy_status(wp)
-struct xwindow *wp;
+destroy_fancy_status(struct xwindow *wp)
 {
     int i;
     struct X_status_value *sv;

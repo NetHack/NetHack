@@ -233,9 +233,7 @@ extern int allow_break_statements;
 extern struct lc_breakdef *break_list;
 
 int
-main(argc, argv)
-int argc;
-char **argv;
+main(int argc, char **argv)
 {
     FILE *fin;
     int i;
@@ -310,8 +308,7 @@ char **argv;
  * the current declaration, instead of the beginning of the next declaration.
  */
 void
-yyerror(s)
-const char *s;
+yyerror(const char *s)
 {
     char *e = ((char *) s + strlen(s) - 1);
 
@@ -483,8 +480,7 @@ decode_parm_chr(char chr)
 }
 
 char *
-decode_parm_str(str)
-char *str;
+decode_parm_str(char *str)
 {
     static char tmpbuf[1024];
     char *p = str;
@@ -500,9 +496,7 @@ char *str;
 }
 
 struct opvar *
-set_opvar_int(ov, val)
-struct opvar *ov;
-long val;
+set_opvar_int(struct opvar *ov, long val)
 {
     if (ov) {
         ov->spovartyp = SPOVAR_INT;
@@ -512,9 +506,7 @@ long val;
 }
 
 struct opvar *
-set_opvar_coord(ov, val)
-struct opvar *ov;
-long val;
+set_opvar_coord(struct opvar *ov, long val)
 {
     if (ov) {
         ov->spovartyp = SPOVAR_COORD;
@@ -524,9 +516,7 @@ long val;
 }
 
 struct opvar *
-set_opvar_region(ov, val)
-struct opvar *ov;
-long val;
+set_opvar_region(struct opvar *ov, long val)
 {
     if (ov) {
         ov->spovartyp = SPOVAR_REGION;
@@ -536,9 +526,7 @@ long val;
 }
 
 struct opvar *
-set_opvar_mapchar(ov, val)
-struct opvar *ov;
-long val;
+set_opvar_mapchar(struct opvar *ov, long val)
 {
     if (ov) {
         ov->spovartyp = SPOVAR_MAPCHAR;
@@ -548,9 +536,7 @@ long val;
 }
 
 struct opvar *
-set_opvar_monst(ov, val)
-struct opvar *ov;
-long val;
+set_opvar_monst(struct opvar *ov, long val)
 {
     if (ov) {
         ov->spovartyp = SPOVAR_MONST;
@@ -560,9 +546,7 @@ long val;
 }
 
 struct opvar *
-set_opvar_obj(ov, val)
-struct opvar *ov;
-long val;
+set_opvar_obj(struct opvar *ov, long val)
 {
     if (ov) {
         ov->spovartyp = SPOVAR_OBJ;
@@ -572,9 +556,7 @@ long val;
 }
 
 struct opvar *
-set_opvar_str(ov, val)
-struct opvar *ov;
-const char *val;
+set_opvar_str(struct opvar *ov, const char *val)
 {
     if (ov) {
         ov->spovartyp = SPOVAR_STRING;
@@ -584,9 +566,7 @@ const char *val;
 }
 
 struct opvar *
-set_opvar_var(ov, val)
-struct opvar *ov;
-const char *val;
+set_opvar_var(struct opvar *ov, const char *val)
 {
     if (ov) {
         ov->spovartyp = SPOVAR_VARIABLE;
@@ -718,8 +698,7 @@ break_stmt_start()
 }
 
 void
-break_stmt_end(splev)
-sp_lev *splev;
+break_stmt_end(sp_lev *splev)
 {
     struct lc_breakdef *tmp = break_list;
     struct lc_breakdef *prv = NULL;
@@ -745,9 +724,7 @@ sp_lev *splev;
 }
 
 void
-break_stmt_new(splev, i)
-sp_lev *splev;
-long i;
+break_stmt_new(sp_lev *splev, long i)
 {
     struct lc_breakdef *tmp = New(struct lc_breakdef);
 
@@ -761,9 +738,7 @@ long i;
 }
 
 struct lc_funcdefs *
-funcdef_new(addr, name)
-long addr;
-char *name;
+funcdef_new(long addr, char *name)
 {
     struct lc_funcdefs *f = New(struct lc_funcdefs);
 
@@ -783,8 +758,7 @@ char *name;
 }
 
 void
-funcdef_free_all(fchain)
-struct lc_funcdefs *fchain;
+funcdef_free_all(struct lc_funcdefs *fchain)
 {
     struct lc_funcdefs *tmp = fchain;
     struct lc_funcdefs *nxt;
@@ -805,8 +779,7 @@ struct lc_funcdefs *fchain;
 }
 
 char *
-funcdef_paramtypes(f)
-struct lc_funcdefs *f;
+funcdef_paramtypes(struct lc_funcdefs *f)
 {
     int i = 0;
     struct lc_funcdefs_parm *fp = f->params;
@@ -823,10 +796,7 @@ struct lc_funcdefs *f;
 }
 
 struct lc_funcdefs *
-funcdef_defined(f, name, casesense)
-struct lc_funcdefs *f;
-char *name;
-int casesense;
+funcdef_defined(struct lc_funcdefs *f, char *name, int casesense)
 {
     while (f) {
         if (casesense) {
@@ -842,9 +812,7 @@ int casesense;
 }
 
 struct lc_vardefs *
-vardef_new(typ, name)
-long typ;
-char *name;
+vardef_new(long typ, char *name)
 {
     struct lc_vardefs *f = New(struct lc_vardefs);
 
@@ -860,8 +828,7 @@ char *name;
 }
 
 void
-vardef_free_all(fchain)
-struct lc_vardefs *fchain;
+vardef_free_all(struct lc_vardefs *fchain)
 {
     struct lc_vardefs *tmp = fchain;
     struct lc_vardefs *nxt;
@@ -877,10 +844,7 @@ struct lc_vardefs *fchain;
 }
 
 struct lc_vardefs *
-vardef_defined(f, name, casesense)
-struct lc_vardefs *f;
-char *name;
-int casesense;
+vardef_defined(struct lc_vardefs *f, char *name, int casesense)
 {
     while (f) {
         if (casesense) {
@@ -896,8 +860,7 @@ int casesense;
 }
 
 const char *
-spovar2str(spovar)
-long spovar;
+spovar2str(long spovar)
 {
     static int togl = 0;
     static char buf[2][128];
@@ -942,9 +905,7 @@ long spovar;
 }
 
 void
-vardef_used(vd, varname)
-struct lc_vardefs *vd;
-char *varname;
+vardef_used(struct lc_vardefs *vd, char *varname)
 {
     struct lc_vardefs *tmp;
 
@@ -1281,10 +1242,7 @@ what_map_char(char c)
 }
 
 void
-add_opcode(sp, opc, dat)
-sp_lev *sp;
-int opc;
-genericptr_t dat;
+add_opcode(sp_lev *sp, int opc, genericptr_t dat)
 {
     long nop = sp->n_opcodes;
     _opcode *tmp;
@@ -1319,9 +1277,7 @@ genericptr_t dat;
  * Just analyze it here.
  */
 void
-scan_map(map, sp)
-char *map;
-sp_lev *sp;
+scan_map(char *map, sp_lev *sp)
 {
     register int i, len;
     register char *s1, *s2;
@@ -1405,8 +1361,7 @@ sp_lev *sp;
  * Output some info common to all special levels.
  */
 static boolean
-write_common_data(fd)
-int fd;
+write_common_data(int fd)
 {
     static struct version_info version_data = {
         VERSION_NUMBER, VERSION_FEATURES, VERSION_SANITY1, VERSION_SANITY2,
@@ -1422,9 +1377,7 @@ int fd;
  * Also, we have to free the memory allocated via alloc().
  */
 static boolean
-write_maze(fd, maze)
-int fd;
-sp_lev *maze;
+write_maze(int fd, sp_lev *maze)
 {
     int i;
 
@@ -1499,9 +1452,7 @@ sp_lev *maze;
  * Return TRUE on success, FALSE on failure.
  */
 boolean
-write_level_file(filename, lvl)
-char *filename;
-sp_lev *lvl;
+write_level_file(char *filename, sp_lev *lvl)
 {
     int fout;
     char lbuf[60];
@@ -1536,9 +1487,7 @@ sp_lev *lvl;
 }
 
 static int
-case_insensitive_comp(s1, s2)
-const char *s1;
-const char *s2;
+case_insensitive_comp(const char *s1, const char *s2)
 {
     uchar u1, u2;
 

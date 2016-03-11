@@ -52,8 +52,7 @@ VA_DECL(char *, str)
  * systems, but they should either use yacc or get a real alloca routine.
  */
 long *
-alloca(cnt)
-unsigned cnt;
+alloca(unsigned cnt)
 {
     return cnt ? alloc(cnt) : (long *) 0;
 }

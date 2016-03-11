@@ -76,9 +76,7 @@ static void FDECL(ps_select, (Widget, XtPointer, XtPointer));
  */
 /* ARGSUSED */
 static void
-ps_quit(w, client_data, call_data)
-Widget w;
-XtPointer client_data, call_data;
+ps_quit(Widget w, XtPointer client_data, XtPointer call_data)
 {
     nhUse(w);
     nhUse(client_data);
@@ -90,9 +88,7 @@ XtPointer client_data, call_data;
 
 /* ARGSUSED */
 static void
-ps_random(w, client_data, call_data)
-Widget w;
-XtPointer client_data, call_data;
+ps_random(Widget w, XtPointer client_data, XtPointer call_data)
 {
     nhUse(w);
     nhUse(client_data);
@@ -104,9 +100,7 @@ XtPointer client_data, call_data;
 
 /* ARGSUSED */
 static void
-ps_select(w, client_data, call_data)
-Widget w;
-XtPointer client_data, call_data;
+ps_select(Widget w, XtPointer client_data, XtPointer call_data)
 {
     nhUse(w);
     nhUse(call_data);
@@ -117,11 +111,7 @@ XtPointer client_data, call_data;
 
 /* ARGSUSED */
 void
-ps_key(w, event, params, num_params)
-Widget w;
-XEvent *event;
-String *params;
-Cardinal *num_params;
+ps_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
     char ch, *mark;
     char rolechars[QBUFSZ];
@@ -167,11 +157,7 @@ Cardinal *num_params;
 
 /* ARGSUSED */
 void
-race_key(w, event, params, num_params)
-Widget w;
-XEvent *event;
-String *params;
-Cardinal *num_params;
+race_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
     char ch, *mark;
     char racechars[QBUFSZ];
@@ -215,11 +201,7 @@ Cardinal *num_params;
 
 /* ARGSUSED */
 void
-gend_key(w, event, params, num_params)
-Widget w;
-XEvent *event;
-String *params;
-Cardinal *num_params;
+gend_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
     char ch, *mark;
     static char gendchars[] = "mf";
@@ -252,11 +234,7 @@ Cardinal *num_params;
 
 /* ARGSUSED */
 void
-algn_key(w, event, params, num_params)
-Widget w;
-XEvent *event;
-String *params;
-Cardinal *num_params;
+algn_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
     char ch, *mark;
     static char algnchars[] = "LNC";
@@ -604,9 +582,7 @@ X11_get_ext_cmd()
  */
 /* ARGSUSED */
 static void
-extend_select(w, client_data, call_data)
-Widget w;
-XtPointer client_data, call_data;
+extend_select(Widget w, XtPointer client_data, XtPointer call_data)
 {
     int selected = (int) client_data;
 
@@ -632,9 +608,7 @@ XtPointer client_data, call_data;
 
 /* ARGSUSED */
 static void
-extend_dismiss(w, client_data, call_data)
-Widget w;
-XtPointer client_data, call_data;
+extend_dismiss(Widget w, XtPointer client_data, XtPointer call_data)
 {
     nhUse(w);
     nhUse(client_data);
@@ -645,9 +619,7 @@ XtPointer client_data, call_data;
 
 /* ARGSUSED */
 static void
-extend_help(w, client_data, call_data)
-Widget w;
-XtPointer client_data, call_data;
+extend_help(Widget w, XtPointer client_data, XtPointer call_data)
 {
     nhUse(w);
     nhUse(client_data);
@@ -659,11 +631,7 @@ XtPointer client_data, call_data;
 
 /* ARGSUSED */
 void
-ec_delete(w, event, params, num_params)
-Widget w;
-XEvent *event;
-String *params;
-Cardinal *num_params;
+ec_delete(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
     if (w == extended_command_popup) {
         ec_dismiss();
@@ -674,11 +642,7 @@ Cardinal *num_params;
 
 /* ARGSUSED */
 static void
-popup_delete(w, event, params, num_params)
-Widget w;
-XEvent *event;
-String *params;
-Cardinal *num_params;
+popup_delete(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
     nhUse(event);
     nhUse(params);
@@ -703,11 +667,7 @@ ec_dismiss()
 
 /* ARGSUSED */
 void
-ec_key(w, event, params, num_params)
-Widget w;
-XEvent *event;
-String *params;
-Cardinal *num_params;
+ec_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
 {
     char ch;
     int i;
@@ -828,21 +788,18 @@ init_extended_commands_popup()
  *		------------------------
  */
 static Widget
-make_menu(popup_name, popup_label, popup_translations, left_name,
-          left_callback, right_name, right_callback, num_names, widget_names,
-          command_widgets, name_callback, formp)
-const char *popup_name;
-const char *popup_label;
-const char *popup_translations;
-const char *left_name;
-XtCallbackProc left_callback;
-const char *right_name;
-XtCallbackProc right_callback;
-int num_names;
-const char **widget_names; /* return array of command widgets */
-Widget **command_widgets;
-XtCallbackProc name_callback;
-Widget *formp; /* return */
+make_menu(const char *popup_name,
+          const char *popup_label,
+          const char *popup_translations,
+          const char *left_name,
+          XtCallbackProc left_callback,
+          const char *right_name,
+          XtCallbackProc right_callback,
+          int num_names,
+          const char **widget_names,
+          Widget **command_widgets, /* return array of command widgets */
+          XtCallbackProc name_callback,
+          Widget *formp) /* return */
 {
     Widget popup, form, label, above, left, right;
     Widget *commands, *curr;

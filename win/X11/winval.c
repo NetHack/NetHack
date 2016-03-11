@@ -32,9 +32,7 @@
 #define WVALUE "value"
 
 Widget
-create_value(parent, name_value)
-Widget parent;
-const char *name_value;
+create_value(Widget parent, const char *name_value)
 {
     Widget form, name;
     Arg args[8];
@@ -75,9 +73,7 @@ const char *name_value;
 }
 
 void
-set_name(w, new_label)
-Widget w;
-const char *new_label;
+set_name(Widget w, const char *new_label)
 {
     Arg args[1];
     Widget name;
@@ -88,9 +84,7 @@ const char *new_label;
 }
 
 void
-set_name_width(w, new_width)
-Widget w;
-int new_width;
+set_name_width(Widget w, int new_width)
 {
     Arg args[1];
     Widget name;
@@ -101,8 +95,7 @@ int new_width;
 }
 
 int
-get_name_width(w)
-Widget w;
+get_name_width(Widget w)
 {
     Arg args[1];
     Dimension width;
@@ -115,9 +108,7 @@ Widget w;
 }
 
 void
-set_value(w, new_value)
-Widget w;
-const char *new_value;
+set_value(Widget w, const char *new_value)
 {
     Arg args[1];
     Widget val;
@@ -128,9 +119,7 @@ const char *new_value;
 }
 
 void
-set_value_width(w, new_width)
-Widget w;
-int new_width;
+set_value_width(Widget w, int new_width)
 {
     Arg args[1];
     Widget val;
@@ -141,8 +130,7 @@ int new_width;
 }
 
 int
-get_value_width(w)
-Widget w;
+get_value_width(Widget w)
 {
     Arg args[1];
     Widget val;
@@ -157,16 +145,14 @@ Widget w;
 /* Swap foreground and background colors (this is the best I can do with */
 /* a label widget, unless I can get some init hook in there).		 */
 void
-hilight_value(w)
-Widget w;
+hilight_value(Widget w)
 {
     swap_fg_bg(XtNameToWidget(w, WVALUE));
 }
 
 /* Swap the foreground and background colors of the given widget */
 void
-swap_fg_bg(w)
-Widget w;
+swap_fg_bg(Widget w)
 {
     Arg args[2];
     Pixel fg, bg;

@@ -13,14 +13,10 @@
 #define E extern
 #endif
 
-#if defined(BOS) || defined(NHSTDC)
+#if defined(BOS)
 #define DIMENSION_P int
 #else
-#ifdef WIDENED_PROTOTYPES
-#define DIMENSION_P unsigned int
-#else
 #define DIMENSION_P Dimension
-#endif
 #endif
 
 /*

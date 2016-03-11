@@ -247,9 +247,7 @@ main(void)
 #else /* ! MAC */
 
 int
-main(argc, argv)
-int argc;
-char *argv[];
+main(int argc, char *argv[])
 {
     if ((argc != 2)
 #ifdef FILE_PREFIX
@@ -292,8 +290,7 @@ link_sanity_check()
 }
 
 void
-do_makedefs(options)
-char *options;
+do_makedefs(char *options)
 {
     boolean more_than_one;
 
@@ -369,28 +366,21 @@ char *options;
 
 static char namebuf[1000];
 static char *
-name_file(template, tag)
-char *template;
-char *tag;
+name_file(char *template, char *tag)
 {
     Sprintf(namebuf, template, tag);
     return namebuf;
 }
 
 static void
-delete_file(template, tag)
-char *template;
-char *tag;
+delete_file(char *template, char *tag)
 {
     char *name = name_file(template, tag);
     Unlink(name);
 }
 
 static FILE *
-getfp(template, tag, mode)
-char *template;
-char *tag;
-char *mode;
+getfp(char *template, char *tag, char *mode)
 {
     char *name = name_file(template, tag);
     FILE *rv = fopen(name, mode);
@@ -625,8 +615,7 @@ do_grep_showvars()
 }
 
 static struct grep_var *
-grepsearch(name)
-char *name;
+grepsearch(char *name)
 {
     /* XXX make into binary search */
     int x = 0;
@@ -639,8 +628,7 @@ char *name;
 }
 
 static int
-grep_check_id(id)
-char *id;
+grep_check_id(char *id)
 {
     struct grep_var *rv;
     while (*id && isspace(*id))
@@ -668,8 +656,7 @@ char *id;
 }
 
 static void
-grep_show_wstack(tag)
-char *tag;
+grep_show_wstack(char *tag)
 {
     int x;
 
@@ -684,8 +671,7 @@ char *tag;
 }
 
 static char *
-do_grep_control(buf)
-char *buf;
+do_grep_control(char *buf)
 {
     int isif = 1;
     char *buf0 = buf;
@@ -759,8 +745,7 @@ char *buf;
 
 #ifdef notyet
 static void
-do_grep_rewrite(buf)
-char *buf;
+do_grep_rewrite(char *buf)
 {
     /* no language features use this yet */
     return;
@@ -786,9 +771,7 @@ do_grep()
 }
 
 static void
-grep0(inputfp0, outputfp0)
-FILE *inputfp0;
-FILE *outputfp0;
+grep0(FILE *inputfp0, FILE *outputfp0)
 {
     char buf[16384]; /* looong, just in case */
 
@@ -844,8 +827,7 @@ FILE *outputfp0;
 
 /* trivial text encryption routine which can't be broken with `tr' */
 static char *
-xcrypt(str)
-const char *str;
+xcrypt(const char *str)
 { /* duplicated in src/hacklib.c */
     static char buf[BUFSZ];
     register const char *p;
@@ -866,11 +848,7 @@ const char *str;
 #define PAD_RUMORS_TO 60
 /* common code for do_rumors().  Return 0 on error. */
 static unsigned long
-read_rumors_file(file_ext, rumor_count, rumor_size, old_rumor_offset)
-const char *file_ext;
-int *rumor_count;
-long *rumor_size;
-unsigned long old_rumor_offset;
+read_rumors_file(const char *file_ext, int *rumor_count, long *rumor_size, unsigned long old_rumor_offset)
 {
     char infile[600];
     char *line;
@@ -927,8 +905,7 @@ unsigned long old_rumor_offset;
 }
 
 void
-do_rnd_access_file(fname)
-const char *fname;
+do_rnd_access_file(const char *fname)
 {
     char *line;
 
@@ -1155,9 +1132,7 @@ make_version()
 }
 
 static char *
-version_string(outbuf, delim)
-char *outbuf;
-const char *delim;
+version_string(char *outbuf, const char *delim)
 {
     Sprintf(outbuf, "%d%s%d%s%d", VERSION_MAJOR, delim, VERSION_MINOR, delim,
             PATCHLEVEL);
@@ -1168,9 +1143,7 @@ const char *delim;
 }
 
 static char *
-version_id_string(outbuf, build_date)
-char *outbuf;
-const char *build_date;
+version_id_string(char *outbuf, const char *build_date)
 {
     char subbuf[64], versbuf[64];
 
@@ -1189,9 +1162,7 @@ const char *build_date;
 }
 
 static char *
-bannerc_string(outbuf, build_date)
-char *outbuf;
-const char *build_date;
+bannerc_string(char *outbuf, const char *build_date)
 {
     char subbuf[64], versbuf[64];
 
@@ -1586,8 +1557,7 @@ do_options()
 
 /* routine to decide whether to discard something from data.base */
 static boolean
-d_filter(line)
-char *line;
+d_filter(char *line)
 {
     if (*line == '#')
         return TRUE; /* ignore comment lines */
@@ -1732,8 +1702,7 @@ do_data()
 
 /* routine to decide whether to discard something from oracles.txt */
 static boolean
-h_filter(line)
-char *line;
+h_filter(char *line)
 {
     static boolean skip = FALSE;
     char *tag;
@@ -1978,8 +1947,7 @@ do_dungeon()
 }
 
 static boolean
-ranged_attk(ptr) /* returns TRUE if monster can attack at range */
-register struct permonst *ptr;
+ranged_attk(register struct permonst *ptr) /* returns TRUE if monster can attack at range */
 {
     register int i, j;
     register int atk_mask = (1 << AT_BREA) | (1 << AT_SPIT) | (1 << AT_GAZE);
@@ -1997,8 +1965,7 @@ register struct permonst *ptr;
  * determination as "experience()" to arrive at the strength.
  */
 static int
-mstrength(ptr)
-struct permonst *ptr;
+mstrength(struct permonst *ptr)
 {
     int i, tmp2, n, tmp = ptr->mlevel;
 
@@ -2150,8 +2117,7 @@ static boolean in_msg;
 #define NO_MSG 1 /* strlen of a null line returned by fgets() */
 
 static boolean
-qt_comment(s)
-char *s;
+qt_comment(char *s)
 {
     if (s[0] == '#')
         return  TRUE;
@@ -2159,15 +2125,13 @@ char *s;
 }
 
 static boolean
-qt_control(s)
-char *s;
+qt_control(char *s)
 {
     return (boolean) (s[0] == '%' && (s[1] == 'C' || s[1] == 'E'));
 }
 
 static int
-get_hdr(code)
-char *code;
+get_hdr(char *code)
 {
     int i;
 
@@ -2179,8 +2143,7 @@ char *code;
 }
 
 static boolean
-new_id(code)
-char *code;
+new_id(char *code)
 {
     if (qt_hdr.n_hdr >= N_HDR) {
         Fprintf(stderr, OUT_OF_HEADERS, qt_line);
@@ -2194,8 +2157,7 @@ char *code;
 }
 
 static boolean
-known_msg(num, id)
-int num, id;
+known_msg(int num, int id)
 {
     int i;
 
@@ -2276,8 +2238,7 @@ valid_qt_summary(char *s, boolean parsing)
 }
 
 static void
-do_qt_control(s)
-char *s;
+do_qt_control(char *s)
 {
     char code[BUFSZ];
     int num, id = 0;
@@ -2324,8 +2285,7 @@ char *s;
 }
 
 static void
-do_qt_text(s)
-char *s;
+do_qt_text(char *s)
 {
     if (!in_msg) {
         Fprintf(stderr, TEXT_NOT_IN_MSG, qt_line);
@@ -2482,9 +2442,7 @@ do_questtxt()
 
 static char temp[32];
 
-static char *limit(name, pref) /* limit a name to 30 characters length */
-char *name;
-int pref;
+static char *limit(char *name, int pref) /* limit a name to 30 characters length */
 {
     (void) strncpy(temp, name, pref ? 26 : 30);
     temp[pref ? 26 : 30] = 0;
@@ -2628,8 +2586,7 @@ do_objs()
  * null pointer if no characters were read.
  */
 static char *
-fgetline(fd)
-FILE *fd;
+fgetline(FILE *fd)
 {
     static const int inc = 256;
     int len = inc;
@@ -2652,8 +2609,7 @@ FILE *fd;
 }
 
 static char *
-tmpdup(str)
-const char *str;
+tmpdup(const char *str)
 {
     static char buf[128];
 
@@ -2664,8 +2620,7 @@ const char *str;
 }
 
 static char *
-eos(str)
-char *str;
+eos(char *str)
 {
     while (*str)
         str++;
@@ -2982,8 +2937,7 @@ C_far_gen()
  *  same row as the hero.
  */
 static int
-clear_path(you_row, you_col, y2, x2)
-int you_row, you_col, y2, x2;
+clear_path(int you_row, int you_col, int y2, int x2)
 {
     int dx, dy, s1, s2;
     register int i, error, x, y, dxs, dys;
