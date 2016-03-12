@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitu.c	$NHDT-Date: 1446854230 2015/11/06 23:57:10 $  $NHDT-Branch: master $:$NHDT-Revision: 1.130 $ */
+/* NetHack 3.6	mhitu.c	$NHDT-Date: 1456992469 2016/03/03 08:07:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.136 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -244,9 +244,12 @@ expels(struct monst *mtmp,
 
 /* select a monster's next attack, possibly substituting for its usual one */
 struct attack *
-getmattk(struct permonst *mptr, int indx, int prev_result[], struct attack *alt_attk_buf)
+getmattk(struct monst *magr, struct monst *mdef,
+         int indx, int prev_result[], struct attack *alt_attk_buf)
 {
+    struct permonst *mptr = magr->data;
     struct attack *attk = &mptr->mattk[indx];
+    struct obj *weap = (magr == &youmonst) ? uwep : MON_WEP(magr);
 
     /* prevent a monster with two consecutive disease or hunger attacks
        from hitting with both of them on the same turn; if the first has
@@ -258,6 +261,45 @@ getmattk(struct permonst *mptr, int indx, int prev_result[], struct attack *alt_
         *alt_attk_buf = *attk;
         attk = alt_attk_buf;
         attk->adtyp = AD_STUN;
+
+    /* make drain-energy damage be somewhat in proportion to energy */
+    } else if (attk->adtyp == AD_DREN && mdef == &youmonst) {
+        int ulev = max(u.ulevel, 6);
+
+        *alt_attk_buf = *attk;
+        attk = alt_attk_buf;
+        /* 3.6.0 used 4d6 but since energy drain came out of max energy
+           once current energy was gone, that tended to have a severe
+           effect on low energy characters; it's now 2d6 with ajustments */
+        if (u.uen <= 5 * ulev && attk->damn > 1) {
+            attk->damn -= 1; /* low energy: 2d6 -> 1d6 */
+            if (u.uenmax <= 2 * ulev && attk->damd > 3)
+                attk->damd -= 3; /* very low energy: 1d6 -> 1d3 */
+        } else if (u.uen > 12 * ulev) {
+            attk->damn += 1; /* high energy: 2d6 -> 3d6 */
+            if (u.uenmax > 20 * ulev)
+                attk->damd += 3; /* very high energy: 3d6 -> 3d9 */
+            /* note: 3d9 is slightly higher than previous 4d6 */
+        }
+
+    /* barrow wight, Nazgul, erinys have weapon attack for non-physical
+       damage; force physical damage if attacker has been cancelled or
+       if weapon is sufficiently interesting; a few unique creatures
+       have two weapon attacks where one does physical damage and other
+       doesn't--avoid forcing physical damage for those */
+    } else if (indx == 0 && magr != &youmonst
+               && attk->aatyp == AT_WEAP && attk->adtyp != AD_PHYS
+               && !(mptr->mattk[1].aatyp == AT_WEAP
+                    && mptr->mattk[1].adtyp == AD_PHYS)
+               && (magr->mcan
+                   || (weap
+                       && ((weap->otyp == CORPSE
+                            && touch_petrifies(&mons[weap->corpsenm]))
+                           || weap->oartifact == ART_STORMBRINGER
+                           || weap->oartifact == ART_VORPAL_BLADE)))) {
+        *alt_attk_buf = *attk;
+        attk = alt_attk_buf;
+        attk->adtyp = AD_PHYS;
     }
     return attk;
 }
@@ -572,7 +614,7 @@ mattacku(register struct monst *mtmp)
 
     for (i = 0; i < NATTK; i++) {
         sum[i] = 0;
-        mattk = getmattk(mdat, i, sum, &alt_attk);
+        mattk = getmattk(mtmp, &youmonst, i, sum, &alt_attk);
         if ((u.uswallow && mattk->aatyp != AT_ENGL)
             || (skipnonmagc && mattk->aatyp != AT_MAGC))
             continue;
@@ -807,7 +849,7 @@ magic_negation(struct monst *mon)
     } else if (mc < 1) {
         /* intrinsic Protection is weaker (play balance; obtaining divine
            protection is too easy); it confers minimum mc 1 instead of 0 */
-        if ((is_you && ((HProtection && u.ublessed) || u.uspellprot))
+        if ((is_you && ((HProtection && u.ublessed > 0) || u.uspellprot))
             /* aligned priests and angels have innate intrinsic Protection */
             || (mon->data == &mons[PM_ALIGNED_PRIEST] || is_minion(mon->data)))
             mc = 1;
@@ -1049,9 +1091,11 @@ hitmu(register struct monst *mtmp, register struct attack *mattk)
                  helm_simple_name(uarmh));
             break;
         }
+        /* negative armor class doesn't reduce this damage */
         if (Half_physical_damage)
             dmg = (dmg + 1) / 2;
         mdamageu(mtmp, dmg);
+        dmg = 0; /* don't inflict a second dose below */
 
         if (!uarmh || uarmh->otyp != DUNCE_CAP) {
             /* eat_brains() will miss if target is mindless (won't
@@ -1206,7 +1250,7 @@ hitmu(register struct monst *mtmp, register struct attack *mattk)
             && !Protection_from_shape_changers && !defends(AD_WERE, uwep)) {
             You_feel("feverish.");
             exercise(A_CON, FALSE);
-            u.ulycn = monsndx(mdat);
+            set_ulycn(monsndx(mdat));
             retouch_equipment(2);
         }
         break;
@@ -1277,11 +1321,11 @@ hitmu(register struct monst *mtmp, register struct attack *mattk)
 
     case AD_SAMU:
         hitmsg(mtmp, mattk);
-        /* when the Wiz hits, 1/20 steals the amulet */
-        if (u.uhave.amulet || u.uhave.bell || u.uhave.book || u.uhave.menorah
-            || u.uhave.questart) /* carrying the Quest Artifact */
-            if (!rn2(20))
-                stealamulet(mtmp);
+        /* when the Wizard or quest nemesis hits, there's a 1/20 chance
+           to steal a quest artifact (any, not just the one for the hero's
+           own role) or the Amulet or one of the invocation tools */
+        if (!rn2(20))
+            stealamulet(mtmp);
         break;
 
     case AD_TLPT:
@@ -1329,9 +1373,10 @@ hitmu(register struct monst *mtmp, register struct attack *mattk)
             hitmsg(mtmp, mattk);
             break;
         }
-        if (!uwep && !uarmu && !uarm && !uarmh && !uarms && !uarmg && !uarmc
-            && !uarmf) {
+        if (!uwep && !uarmu && !uarm && !uarmc
+            && !uarms && !uarmg && !uarmf && !uarmh) {
             boolean goaway = FALSE;
+
             pline("%s hits!  (I hope you don't mind.)", Monnam(mtmp));
             if (Upolyd) {
                 u.mh += rnd(7);
@@ -1428,7 +1473,7 @@ hitmu(register struct monst *mtmp, register struct attack *mattk)
         break;
     case AD_DREN:
         hitmsg(mtmp, mattk);
-        if (uncancelled && !rn2(4))
+        if (uncancelled && !rn2(4)) /* 25% chance */
             drain_en(dmg);
         dmg = 0;
         break;
@@ -1816,7 +1861,7 @@ gulpmu(register struct monst *mtmp, register struct attack *mattk)
         break;
     case AD_DREN:
         /* AC magic cancellation doesn't help when engulfed */
-        if (!mtmp->mcan && rn2(4))
+        if (!mtmp->mcan && rn2(4)) /* 75% chance */
             drain_en(tmp);
         tmp = 0;
         break;

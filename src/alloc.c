@@ -1,12 +1,11 @@
-/* NetHack 3.6	alloc.c	$NHDT-Date: 1446975460 2015/11/08 09:37:40 $  $NHDT-Branch: master $:$NHDT-Revision: 1.14 $ */
+/* NetHack 3.6	alloc.c	$NHDT-Date: 1454376505 2016/02/02 01:28:25 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.16 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* to get the malloc() prototype from system.h */
 #define ALLOC_C /* comment line for pre-compiled headers */
 /* since this file is also used in auxiliary programs, don't include all the
- * function declarations for all of nethack
- */
+   function declarations for all of nethack */
 #define EXTERN_H /* comment line for pre-compiled headers */
 #include "config.h"
 
@@ -23,9 +22,7 @@ static boolean tried_heaplog = FALSE;
 #endif
 
 long *FDECL(alloc, (unsigned int));
-extern void
-VDECL(panic, (const char *, ...))
-PRINTF_F(1, 2);
+extern void VDECL(panic, (const char *, ...)) PRINTF_F(1, 2);
 
 long *
 alloc(lth)

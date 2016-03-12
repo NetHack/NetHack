@@ -9,7 +9,7 @@
 
 #define MSG_WRAP_TEXT
 
-#define MSG_VISIBLE_LINES max(iflags.wc_vary_msgcount, 2)
+#define MSG_VISIBLE_LINES max(iflags.wc_vary_msgcount, 1)
 #define MAX_MSG_LINES 128
 #define MSG_LINES (int) min(iflags.msg_history, MAX_MSG_LINES)
 #define MAXWINDOWTEXT TBUFSZ
@@ -107,6 +107,8 @@ mswin_init_message_window()
 
     /* Set window caption */
     SetWindowText(ret, "Messages");
+
+    mswin_apply_window_style(ret);
 
     return ret;
 }

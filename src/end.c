@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1448241780 2015/11/23 01:23:00 $  $NHDT-Branch: master $:$NHDT-Revision: 1.108 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1454571522 2016/02/04 07:38:42 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.114 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -181,9 +181,9 @@ NH_abort()
         gdb_prio++;
 
     if (gdb_prio > libc_prio) {
-        NH_panictrace_gdb() || (libc_prio && NH_panictrace_libc());
+        (void) (NH_panictrace_gdb() || (libc_prio && NH_panictrace_libc()));
     } else {
-        NH_panictrace_libc() || (gdb_prio && NH_panictrace_gdb());
+        (void) (NH_panictrace_libc() || (gdb_prio && NH_panictrace_gdb()));
     }
 
 #else /* VMS */
@@ -495,6 +495,44 @@ done_in_by(struct monst *mtmp, int how)
 
     done(how);
     return;
+}
+
+/* some special cases for overriding while-helpless reason */
+static const struct {
+    int why, unmulti;
+    const char *exclude, *include;
+} death_fixups[] = {
+    /* "petrified by <foo>, while getting stoned" -- "while getting stoned"
+       prevented any last-second recovery, but it was not the cause of
+       "petrified by <foo>" */
+    { STONING, 1, "getting stoned", (char *) 0 },
+    /* "died of starvation, while fainted from lack of food" is accurate
+       but sounds a fairly silly (and doesn't actually appear unless you
+       splice together death and while-helpless from xlogfile) */
+    { STARVING, 0, "fainted from lack of food", "fainted" },
+};
+
+/* clear away while-helpless when the cause of death caused that
+   helplessness (ie, "petrified by <foo> while getting stoned") */
+STATIC_DCL void
+fixup_death(how)
+int how;
+{
+    int i;
+
+    if (multi_reason) {
+        for (i = 0; i < SIZE(death_fixups); ++i)
+            if (death_fixups[i].why == how
+                && !strcmp(death_fixups[i].exclude, multi_reason)) {
+                if (death_fixups[i].include) /* substitute alternate reason */
+                    multi_reason = death_fixups[i].include;
+                else /* remove the helplessness reason */
+                    multi_reason = (char *) 0;
+                if (death_fixups[i].unmulti) /* possibly hide helplessness */
+                    multi = 0L;
+                break;
+            }
+    }
 }
 
 #if defined(WIN32) && !defined(SYSCF)
@@ -933,8 +971,8 @@ really_done(int how)
     /* remember time of death here instead of having bones, rip, and
        topten figure it out separately and possibly getting different
        time or even day if player is slow responding to --More-- */
-    endtime = getnow();
-    urealtime.realtime += (long) (endtime - urealtime.restored);
+    urealtime.finish_time = endtime = getnow();
+    urealtime.realtime += (long) (endtime - urealtime.start_timing);
 
     /* Sometimes you die on the first move.  Life's not fair.
      * On those rare occasions you get hosed immediately, go out
@@ -984,6 +1022,8 @@ really_done(int how)
     if (how == ESCAPED || how == PANICKED)
         killer.format = NO_KILLER_PREFIX;
 
+    fixup_death(how); /* actually, fixup multi_reason */
+
     if (how != PANICKED) {
         /* these affect score and/or bones, but avoid them during panic */
         taken = paybill((how == ESCAPED) ? -1 : (how != QUIT));
@@ -1021,7 +1061,7 @@ really_done(int how)
         }
         corpse = mk_named_object(CORPSE, &mons[mnum], u.ux, u.uy, plname);
         Sprintf(pbuf, "%s, ", plname);
-        formatkiller(eos(pbuf), sizeof pbuf - strlen(pbuf), how);
+        formatkiller(eos(pbuf), sizeof pbuf - strlen(pbuf), how, TRUE);
         make_grave(u.ux, u.uy, pbuf);
     }
     pbuf[0] = '\0'; /* clear grave text; also lint suppression */

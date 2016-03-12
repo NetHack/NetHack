@@ -1,4 +1,4 @@
-/* NetHack 3.6	bones.c	$NHDT-Date: 1449269914 2015/12/04 22:58:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.66 $ */
+/* NetHack 3.6	bones.c	$NHDT-Date: 1450432756 2015/12/18 09:59:16 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.68 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985,1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -114,15 +114,18 @@ resetobjs(struct obj *ochain, boolean restore)
                 free_oname(otmp);
             }
 
-            if (otmp->otyp == SLIME_MOLD)
+            if (otmp->otyp == SLIME_MOLD) {
                 goodfruit(otmp->spe);
 #ifdef MAIL
-            else if (otmp->otyp == SCR_MAIL)
-                otmp->spe = 1;
+            } else if (otmp->otyp == SCR_MAIL) {
+                /* 0: delivered in-game via external event;
+                   1: from bones or wishing; 2: written with marker */
+                if (otmp->spe == 0)
+                    otmp->spe = 1;
 #endif
-            else if (otmp->otyp == EGG)
+            } else if (otmp->otyp == EGG) {
                 otmp->spe = 0;
-            else if (otmp->otyp == TIN) {
+            } else if (otmp->otyp == TIN) {
                 /* make tins of unique monster's meat be empty */
                 if (otmp->corpsenm >= LOW_PM
                     && unique_corpstat(&mons[otmp->corpsenm]))
@@ -464,7 +467,7 @@ make_bones:
     Sprintf(newbones->who, "%s-%.3s-%.3s-%.3s-%.3s", plname, urole.filecode,
             urace.filecode, genders[flags.female].filecode,
             aligns[1 - u.ualign.type].filecode);
-    formatkiller(newbones->how, sizeof newbones->how, how);
+    formatkiller(newbones->how, sizeof newbones->how, how, TRUE);
     Strcpy(newbones->when, yyyymmddhhmmss(when));
     /* final resting place, used to decide when bones are discovered */
     newbones->frpx = u.ux, newbones->frpy = u.uy;

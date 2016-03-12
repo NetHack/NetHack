@@ -1,4 +1,4 @@
-/* NetHack 3.6	unixconf.h	$NHDT-Date: 1447755973 2015/11/17 10:26:13 $  $NHDT-Branch: master $:$NHDT-Revision: 1.24 $ */
+/* NetHack 3.6	unixconf.h	$NHDT-Date: 1451342112 2015/12/28 22:35:12 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.25 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -130,6 +130,9 @@
  */
 /* #define TIMED_DELAY */ /* usleep() */
 #endif
+#if defined(MACOSX) && !defined(TIMED_DELAY)
+#define TIMED_DELAY
+#endif
 
 /*
  * If you define MAIL, then the player will be notified of new mail
@@ -188,8 +191,29 @@
 #endif
 #endif
 
+/* If SIMPLE_MAIL is defined, the mail spool file format is
+   "sender:message", one mail per line, and mails are
+   read within game, from demon-delivered mail scrolls.
+   The mail spool file will be deleted once the player
+   has read the message. */
+/* #define SIMPLE_MAIL */
+
+#ifndef MAILCKFREQ
+/* How often mail spool file is checked for new messages, in turns */
 #define MAILCKFREQ 50
+#endif
+
 #endif /* MAIL */
+
+/* If SERVER_ADMIN_MSG is defined and the file exists, players get
+   a message from the user defined in the file.  The file format
+   is "sender:message" all in one line. */
+/* #define SERVER_ADMIN_MSG "adminmsg" */
+#ifndef SERVER_ADMIN_MSG_CKFREQ
+/* How often admin message file is checked for new messages, in turns */
+#define SERVER_ADMIN_MSG_CKFREQ 25
+#endif
+
 
 /*
  * Some terminals or terminal emulators send two character sequence "ESC c"

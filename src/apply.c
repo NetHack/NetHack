@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1446808436 2015/11/06 11:13:56 $  $NHDT-Branch: master $:$NHDT-Revision: 1.210 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1457397477 2016/03/08 00:37:57 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.224 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -234,6 +234,13 @@ its_dead(int rx, int ry, int*resp)
     } else if (corpse) {
         boolean here = (rx == u.ux && ry == u.uy),
                 one = (corpse->quan == 1L && !more_corpses), reviver = FALSE;
+        int visglyph, corpseglyph;
+
+        visglyph = glyph_at(rx, ry);
+        corpseglyph = obj_to_glyph(corpse);
+
+        if (Blind && (visglyph != corpseglyph))
+            map_object(corpse, TRUE);
 
         if (Role_if(PM_HEALER)) {
             /* ok to reset `corpse' here; we're done with it */
@@ -312,6 +319,8 @@ use_stethoscope(register struct obj *obj)
     context.stethoscope_move = moves;
     context.stethoscope_movement = youmonst.movement;
 
+    bhitpos.x = u.ux, bhitpos.y = u.uy; /* tentative, reset below */
+    notonhead = u.uswallow;
     if (u.usteed && u.dz > 0) {
         if (interference) {
             pline("%s interferes.", Monnam(u.ustuck));
@@ -358,6 +367,10 @@ use_stethoscope(register struct obj *obj)
         const char *mnm = x_monnam(mtmp, ARTICLE_A, (const char *) 0,
                                    SUPPRESS_IT | SUPPRESS_INVISIBLE, FALSE);
 
+        /* bhitpos needed by mstatusline() iff mtmp is a long worm */
+        bhitpos.x = rx, bhitpos.y = ry;
+        notonhead = (mtmp->mx != rx || mtmp->my != ry);
+
         if (mtmp->mundetected) {
             if (!canspotmon(mtmp))
                 There("is %s hidden there.", mnm);
@@ -378,10 +391,11 @@ use_stethoscope(register struct obj *obj)
                 break;
             }
             seemimic(mtmp);
-            pline("That %s is really %s", what, mnm);
+            pline("That %s is really %s.", what, mnm);
         } else if (flags.verbose && !canspotmon(mtmp)) {
             There("is %s there.", mnm);
         }
+
         mstatusline(mtmp);
         if (!canspotmon(mtmp))
             map_invisible(rx, ry);
@@ -392,6 +406,7 @@ use_stethoscope(register struct obj *obj)
         newsym(rx, ry);
         pline_The("invisible monster must have moved.");
     }
+
     lev = &levl[rx][ry];
     switch (lev->typ) {
     case SDOOR:
@@ -751,8 +766,6 @@ beautiful()
                      : "handsome")
                : "ugly");
 }
-
-#define WEAK 3 /* from eat.c */
 
 static const char look_str[] = "look %s.";
 
@@ -1471,6 +1484,17 @@ jump(int magic)
 {
     coord cc;
 
+    /* attempt "jumping" spell if hero has no innate jumping ability */
+    if (!magic && !Jumping) {
+        int sp_no;
+
+        for (sp_no = 0; sp_no < MAXSPELL; ++sp_no)
+            if (spl_book[sp_no].sp_id == NO_SPELL)
+                break;
+            else if (spl_book[sp_no].sp_id == SPE_JUMPING)
+                return spelleffects(sp_no, FALSE);
+    }
+
     if (!magic && (nolimbs(youmonst.data) || slithy(youmonst.data))) {
         /* normally (nolimbs || slithy) implies !Jumping,
            but that isn't necessarily the case for knights */
@@ -1605,7 +1629,11 @@ jump(int magic)
         if (range < temp)
             range = temp;
         (void) walk_path(&uc, &cc, hurtle_step, (genericptr_t) &range);
-        teleds(cc.x, cc.y, TRUE);
+        /* hurtle_step results in (u.ux, u.uy) == (cc.x, cc.y) and usually
+         * moves the ball if punished, but does not handle all the effects
+         * of landing on the final position.
+         */
+        teleds(cc.x, cc.y, FALSE);
         sokoban_guilt();
         nomul(-1);
         multi_reason = "jumping around";
@@ -1737,6 +1765,7 @@ use_unicorn_horn(struct obj *obj)
             if (Deaf) /* make_deaf() won't give feedback when already deaf */
                 pline("Nothing seems to happen.");
             make_deaf((HDeaf & TIMEOUT) + lcount, TRUE);
+            context.botl = TRUE;
             break;
         }
         return;
@@ -1916,8 +1945,8 @@ fig_transform(anything *arg, long timeout)
     if (mtmp) {
         char and_vanish[BUFSZ];
         struct obj *mshelter = level.objects[mtmp->mx][mtmp->my];
-        Sprintf(monnambuf, "%s", an(m_monnam(mtmp)));
 
+        Sprintf(monnambuf, "%s", an(m_monnam(mtmp)));
         and_vanish[0] = '\0';
         if ((mtmp->minvis && !See_invisible)
             || (mtmp->data->mlet == S_MIMIC
@@ -1959,11 +1988,13 @@ fig_transform(anything *arg, long timeout)
         case OBJ_MINVENT:
             if (cansee_spot && !silent && !suppress_see) {
                 struct monst *mon;
+
                 mon = figurine->ocarry;
                 /* figurine carrying monster might be invisible */
-                if (canseemon(figurine->ocarry)) {
+                if (canseemon(figurine->ocarry)
+                    && (!mon->wormno || cansee(mon->mx, mon->my)))
                     Sprintf(carriedby, "%s pack", s_suffix(a_monnam(mon)));
-                } else if (is_pool(mon->mx, mon->my))
+                else if (is_pool(mon->mx, mon->my))
                     Strcpy(carriedby, "empty water");
                 else
                     Strcpy(carriedby, "thin air");
@@ -3352,7 +3383,7 @@ doapply()
     case SACK:
     case BAG_OF_HOLDING:
     case OILSKIN_SACK:
-        res = use_container(&obj, 1);
+        res = use_container(&obj, 1, FALSE);
         break;
     case BAG_OF_TRICKS:
         (void) bagotricks(obj, FALSE, (int *) 0);
@@ -3440,18 +3471,8 @@ doapply()
         res = dowrite(obj);
         break;
     case TIN_OPENER:
-        if (!carrying(TIN)) {
-            You("have no tin to open.");
-            goto xit;
-        }
-        You("cannot open a tin without eating or discarding its contents.");
-        if (flags.verbose)
-            pline("In order to eat, use the 'e' command.");
-        if (obj != uwep)
-            pline(
-          "Opening the tin will be much easier if you wield the tin opener.");
-        goto xit;
-
+        res = use_tin_opener(obj);
+        break;
     case FIGURINE:
         use_figurine(&obj);
         break;
@@ -3493,7 +3514,6 @@ doapply()
             break;
         }
         pline("Sorry, I don't know how to use that.");
-    xit:
         nomul(0);
         return 0;
     }

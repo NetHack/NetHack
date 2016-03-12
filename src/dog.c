@@ -181,13 +181,8 @@ makedog()
     context.startingpet_mid = mtmp->m_id;
     /* Horses already wear a saddle */
     if (pettype == PM_PONY && !!(otmp = mksobj(SADDLE, TRUE, FALSE))) {
-        if (mpickobj(mtmp, otmp))
-            panic("merged saddle?");
-        mtmp->misc_worn_check |= W_SADDLE;
         otmp->dknown = otmp->bknown = otmp->rknown = 1;
-        otmp->owornmask = W_SADDLE;
-        otmp->leashmon = mtmp->m_id;
-        update_mon_intrinsics(mtmp, otmp, TRUE, TRUE);
+        put_saddle_on_mon(otmp, mtmp);
     }
 
     if (!petname_used++ && *petname)
@@ -317,8 +312,7 @@ mon_arrive(struct monst *mtmp, boolean with_you)
     xyflags = mtmp->mtrack[0].y;
     xlocale = mtmp->mtrack[1].x;
     ylocale = mtmp->mtrack[1].y;
-    mtmp->mtrack[0].x = mtmp->mtrack[0].y = 0;
-    mtmp->mtrack[1].x = mtmp->mtrack[1].y = 0;
+    memset(mtmp->mtrack, 0, sizeof(mtmp->mtrack));
 
     if (mtmp == u.usteed)
         return; /* don't place steed on the map */

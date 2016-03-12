@@ -9,33 +9,39 @@
 #
 #
 #
-%title The Colour of Magic  (2)
+%title The Colour of Magic  (14)
+# p. 67 (Signet edition; 'Morpork':  initially Ankh and Morpork were twin
+#        cities with distinct characteristics on opposite sides of the Ankh
+#        river--they were eventually consolidated into Ankh-Morpork without
+#        regard to which area was where)
 %passage 1
-It has been remarked before that those who are sensitive to radiation in
-the far octarine - the eighth colour, the pigment of the Imagination - can
+It has been remarked before that those who are sensitive to radiations in
+the far octarine--the eighth colour, the pigment of the Imagination--can
 see things that others cannot.
 
 Thus it was that Rincewind, hurrying through the crowded, flare-lit,
-evening bazarrs of Morpork with the Luggage trundling behind him, jostled a
-tall figure, turned to deliver a few suitable curses, and beheld Death.
+evening bazaars of Morpork with the Luggage trundling behind him, jostled
+a tall dark figure, turned to deliver a few suitable curses, and beheld
+Death.
 
-It had to be Death.  No-one else went around with empty eye sockets and, of
-course, the scythe over one shoulder was another clue.
+It had to be Death.  No-one else went around with empty eye sockets and,
+of course, the scythe over one shoulder was another clue.  [...]
 
   [The Colour of Magic, by Terry Pratchett]
 %e passage 1
+# p. 116
 %passage 2
 As he was drawn towards the Eye the terror-struck Rincewind raised the box
-protectively, and at the same time heard the picture imp say, 'They're
-about ripe now, can't hold them any longer.  Every-one smile, please.'
+protectively, and at the same time heard the picture imp say, "They're
+about ripe now, can't hold them any longer.  Everyone smile, please."
 
-There was a -
-- flash of light so white and so bright - 
-- it didn't seem like light at all.
+There was a--
+--flash of light so white and so bright--
+--it didn't seem like light at all.
 
 Bel-Shamharoth screamed, a sound that started in the far ultrasonic and
 finished somewhere in Rincewind's bowels.  The tentacles went momentarily
-as stiff as rods, hurling their various cargos around the room, before
+as stiff as rods, hurling their various cargoes around the room, before
 bunching up protectively in front of the abused Eye.  The whole mass
 dropped into the pit and a moment later the big slab was snatched up by
 several dozen tentacles and slammed into place, leaving a number of
@@ -43,93 +49,1011 @@ thrashing limbs trapped around the edge.
 
   [The Colour of Magic, by Terry Pratchett]
 %e passage 2
+# p. 8 (passage starts mid-paragraph)
+%passage 3
+[...]  In the meantime, they could only speculate about the revealed
+cosmos.
+
+There was, for example, the theory that A'Tuin had come from nowhere and
+would continue at a uniform crawl, or steady gait, into nowhere, for all
+time.  This theory was popular among academics.
+
+An alternative, favoured by those of a religious persuasion, was that
+A'Tuin was crawling from the Birthplace to the Time of Mating, as were
+all the stars in the sky which were, obviously, also carried by giant
+turtles.  When they arrived they would briefly and passionately mate, for
+the first and only time, and from that fiery union new turtles would be
+born to carry a new pattern of worlds.  This was known as the Big Bang
+hypothesis.
+
+  [The Colour of Magic, by Terry Pratchett]
+%e passage
+# p. 13 (end of a long footnote; the initial obsession with 'eight' ended
+#        fairly quickly within the Discworld series)
+%passage 4
+[...]
+
+There are, of course, eight days in a disc week and eight colours in its
+light spectrum.  Eight is a number of some considerable occult
+significance on the disc and must never, ever, be spoken by a wizard.
+
+Precisely why all the above should be so is not clear, but goes some way
+to explain why, on the disc, the Gods are not so much worshipped as blamed.
+
+  [The Colour of Magic, by Terry Pratchett]
+%e passage
+# p. 38 (first speaker is Rincewind, second is a pre-Vetinari Patrician)
+%passage 5
+"I assure you the thought never even crossed my mind, lord."
+
+"Indeed?  Then if I were you I'd sue my face for slander."
+
+  [The Colour of Magic, by Terry Pratchett]
+%e passage
+# p. 41 (title of 5th book is "Sourcery" but it's spelled "sorcery" here;
+#        'organising': British spelling)
+%passage 6
+All the heroes of the Circle Sea passed through the gates of Ankh-Morpork
+sooner or later.  Most of them were from the barbaric tribes nearer the
+frozen Hub, which had a sort of export trade in heroes.  Almost all of
+them had crude magic swords, whose unsuppressed harmonics on the astral
+plane played hell with any delicate experiments in applied sorcery for
+miles around, but Rincewind didn't object to them on that score.  He knew
+himself to be a magical dropout, so it didn't bother him that the mere
+appearance of a hero at the city gates was enough to cause retorts to
+explode and demons to materialize all through the Magical Quarter.  No,
+what he didn't like about heroes was that they were usually suicidally
+gloomy when sober and homicidally insane when drunk.  There were too many
+of them, too.  Some of the most notable questing grounds were a veritable
+hubbub in the season.  There was talk of organising a rota.
+
+  [The Colour of Magic, by Terry Pratchett]
+%e passage
+# pp. 82-83 (passage starts mid-paragraph;
+#            pronouns for deities are not capitalized;
+#            Bravd and the Weasel, obviously a parody of Fritz Leiber's
+#            Fafhrd and the Gray Mouser, appear at the beginning of the 1st
+#            of 4 stories and then are left behind, never to be seen again;
+#            "wenegrade wiffard" is Rincewind and "fome fort of clerk" is
+#            Twoflower the tourist; the seemingly abrupt end of the passage
+#            is the end of the 2nd of the 4 stories that make up the book;
+#            'centre': British spelling; 'billion': British usage gives it a
+#            value of 'million millions', equivalent to American 'trillion';
+#            the second paragraph of this passage is the data.base quote
+#            for "blind io" and the second half of the passage is the
+#            data.base quote for "*lady" and "offler")
+%passage 7
+[...]  The disc gods themselves, despite the splendor of the world below
+them, are seldom satisfied.  It is embarrassing to know that one is a god
+of a world that only exists because every improbability curve must have
+its far end; especially when one can peer into other dimensions at worlds
+whose Creators had more mechanical aptitude than imagination.  No wonder,
+then, that the disc gods spend more time bickering than in omnicognizance.
+
+On this particular day Blind Io, by dint of constant vigilance the chief
+of the gods, sat with his chin on his hand and looked at the gaming board
+on the red marble table in front of him.  Blind Io had got his name
+because, where his eye sockets should have been, there were nothing but
+two areas of blank skin.  His eyes, of which he had an impressively large
+number, led a semi-independent life of their own.  Several were currently
+hovering above the table.
+
+The gaming board was a carefully-carved map of the disc world, overprinted
+with squares.  A number of beautifully modelled playing pieces were now
+occupying some of the squares.  A human onlooker would, for example, have
+recognized in two of them the likenesses of Bravd and the Weasel.  Others
+represented yet more heroes and champions, of which the disc had a more
+than adequate supply.
+
+Still in the game were Io, Offler the Crocodile God, Zephyrus the god of
+slight breezes, Fate, and the Lady.  There was an air of concentration
+around the board now that the lesser players had been removed from the
+Game.  Chance had been an early casualty, running her hero into a full
+house of armed gnolls (the result of a lucky throw by Offler) and shortly
+afterwards Night had cashed his chips, pleading an appointment with
+Destiny.  Several minor deities had drifted up and were kibitzing over
+the shoulders of the players.
+
+Side bets were made that the Lady would be the next to leave the board.
+Her last champion of any standing was now a pinch of potash in the ruins
+of still-smoking Ankh-Morpork, and there were hardly any pieces that she
+could promote to first rank.
+
+Blind Io took up the dice-box, which was a skull whose various orifices
+had been stoppered with rubies, and with several of his eyes on the Lady
+he rolled three fives.
+
+She smiled.  This was the nature of the Lady's eyes:  they were bright
+green, lacking iris or pupil, and they glowed from within.
+
+The room was silent as she scrabbled in her box of pieces and, from the
+very bottom, produced a couple that she set down on the board with two
+decisive clicks.  The rest of the players, as one God, craned forward to
+peer at them.
+
+"A wenegrade wiffard and fome fort of clerk," said Offler the Crocodile
+God, hindered as usual by his tusks.  "Well, weally!"  With one claw he
+pushed a pile of bone-white tokens into the centre of the table.
+
+The Lady nodded slightly.  She picked up the dice-cup and held it as steady
+as a rock, yet all the gods could hear the three cubes rattling about
+inside.  And then she sent them bouncing across the table.
+
+A six.  A three.  A five.
+
+Something was happening to the five, however.  Battered by the chance
+collision of several billion molecules, the die flipped onto a point, spun
+gently and came down a seven.
+
+Blind Io picked up the cube and counted the sides.
+
+"Come /on/," he said wearily.  "Play fair."
+
+  [The Colour of Magic, by Terry Pratchett]
+%e passage
+# p. 84 (Ankh-Morpork was burned soon after Twoflower introduced the concept
+#        of fire insurance; a longer version of this passage is the data.base
+#        quote for "tourist")
+%passage 8
+Picturesque.  That was a new word to Rincewind the wizard (B. Mgc.,
+Unseen University [failed]).  It was one of a number he had picked up
+since leaving the charred ruins of Ankh-Morpork.  Quaint was another one.
+Picturesque meant--he decided after careful observation of the scenery
+that inspired Twoflower to use the word--that the landscape was horribly
+precipitous.  Quaint, when used to describe the occasional village through
+which they passed, meant fever-ridden and tumbledown.
+
+Twoflower was a tourist, the first ever seen on the discworld.  Tourist,
+Rincewind decided, meant "idiot."
+
+  [The Colour of Magic, by Terry Pratchett]
+%e passage
+# p. 85 ('memorising': British spelling)
+%passage 9
+Currently Twoflower was showing a great interest in the theory and practice
+of magic.
+
+"It all seems, well, rather useless to me," he said.  "I always thought
+that, you know, a wizard just said the words and that was that.  Not all
+this tedious memorising."
+
+Rincewind agreed moodily.  He tried to explain that magic had indeed once
+been wild and lawless, but had been tamed back in the mists of time by the
+Olden Ones, who had bound it to obey among other things the Law of
+Conservation of Reality; this demanded that the effort needed to achieve
+a goal should be the same regardless of the means used.  In practical
+terms, this meant that, say, creating the illusion of a glass of wine was
+relatively easy, since it involved merely the subtle shifting of light
+patterns.  On the other hand, lifting a genuine wineglass a few feet in
+the air by sheer mental energy required several hours of systematic
+preparation if the wizard wished to prevent the simple principle of
+leverage flicking his brain out through his ears.
+
+He went on to add that some of the ancient magic could still be found in
+its raw state, recognizable--to the initiated--by the eightfold shape it
+made in the crystalline structure of space-time.  There was the metal
+octiron, for example, and the gas octogen.  Both radiated dangerous
+amounts of raw enchantment.
+
+  [The Colour of Magic, by Terry Pratchett]
+%e passage
+# p. 166 ('Lio!rt' with embedded exclamation point is correct; book's text
+#         is missing the opening quote before ["]You arrogant barbarian--")
+%passage 10
+"I challange you," said Hrun, glaring at the brothers, "both at once."
+
+Lio!rt and Liartes exchanged looks.
+
+"You'll fight us both together?" said Liartes, a tall, wiry man with long
+black hair.
+
+"Yah."
+
+"That's pretty uneven odds, isn't it?"
+
+"Yah.  I outnumber you one to two."
+
+Lio!rt scowled.  "You arrogant barbarian--"
+
+"That just about does it!" growled Hrun.  "I'll--"
+
+The Loremaster put out a blue-veined hand to restrain him.
+
+"It is forebidden to fight on the Killing Ground," he said, and paused
+while he considered the sense of this.  "You know what I mean, anyway," he
+hazarded, giving up, and added, "As the challanged parties my lords Lio!rt
+and Liartes have choice of weapons."
+
+"Dragons," they said together.  Liessa snorted.
+
+"Dragons can be used offensively, therefore they are weapons," said Lio!rt
+firmly.  "If you disagree we can fight over it."
+
+"Yah," said his brother, nodding at Hrun.
+
+  [The Colour of Magic, by Terry Pratchett]
+%e passage
+# p. 196
+%passage 11
+Some pirates achieved immortality by great deeds of cruelty or derring-do.
+Some achieved immortality by amassing great wealth.  But the captain had
+long ago decided that he would, on the whole, prefer to achieve immortality
+by not dying.
+
+  [The Colour of Magic, by Terry Pratchett]
+%e passage
+# p. 201 (entire paragraph is enclosed within parentheses)
+%passage 12
+Plants on the disc, while including the categories known commonly as
+/annuals/, which were sown this year to come up later this year,
+/biennials/, sown this year to grow next year, and /perennials/, sown this
+year to grow until further notice, also included a few rare /re-annuals/
+which, because of an unusual four-dimensional twist in their genes, could
+be planted this year to come up /last year/.  The /vul/ nut vine was
+particularly exceptional in that it could flourish as many as eight years
+prior to its seed actually being sown.  /Vul/ nut wine was reputed to give
+certain drinkers an insight into the future which was, from the nut's
+point of view, the past.  Strange but true.
+
+  [The Colour of Magic, by Terry Pratchett]
+%e passage
+# p. 217 (Rincewind and Twoflower are slated to become ritual sacrifices)
+%passage 13
+"I hope you're not proposing to enslave us," said Twoflower.
+
+Marchesa looked genuinely shocked.  "Certainly not!  Whatever could
+have given you that idea?  Your lives in Krull will be rich, full and
+comfortable--"
+
+"Oh, good," said Rincewind.
+
+"--just not very long."
+
+  [The Colour of Magic, by Terry Pratchett]
+%e passage
+# pp. 228-229 (passage starts mid-paragraph)
+%passage 14
+[...]  She was the Goddess Who Must Not Be Named; those who sought her
+never found her, yet she was known to come to the aid of those in greatest
+need.  And, then again, sometimes she didn't.  She was like that.  She
+didn't like the clicking of rosaries, but was attracted to the sound of
+dice.  No man knew what She looked like, although there were many times
+when a man who was gambling his life on the turn of the cards would pick
+up the hand he had been dealt and stare Her full in the face.  Of course,
+sometimes he didn't.  Among all the gods she was at one and the same time
+the most courted and the most cursed.
+
+  [The Colour of Magic, by Terry Pratchett]
+%e passage
 %e title
 #
 #
 #
-%title The Light Fantastic (2)
+%title The Light Fantastic (12)
+# p. 92 (Signet edition)
 %passage 1
-'Cohen is my name, boy' Belthan's hands stopped moving.
-'Cohen?' she said, 'Cohen the Barbarian?'
+'Cohen ish my name, boy.'  Bethan's hands stopped moving.
+
+'Cohen?' she said.  'Cohen the Barbarian?'
+
 'The very shame.'
-'Hang on, hang on,' said Rincewind, 'Cohen's a great big chap, neck like a
+
+'Hang on, hang on,' said Rincewind.  'Cohen's a great big chap, neck like a
 bull, got chest muscles like a sack of footballs.  I mean, he's the Disc's
 greatest warrior, a legend in his own lifetime.  I remember my grandad
-telling me he saw him ... my grandad telling me he ... my grandad ...'
+telling me he saw him... my grandad telling me he... my grandad...'
+
 He faltered under the gimlit gaze.
-'Oh,' he said, 'Oh. Of course, Sorry.'
-'Yesh,' said Cohen, and sighed, 'Thatsh right boy, I'm a lifetime in my own
-legend.'
+
+'Oh,' he said.  'Oh.  Of course.  Sorry.'
+
+'Yesh,' said Cohen, and sighed.  'That's right boy.  I'm a lifetime in my
+own legend.'
 
   [The Light Fantastic, by Terry Pratchett]
 %e passage 1
+# p. 113 (Twoflower is teaching the Riders how to play bridge;
+#         in /The Light Fantastic/, Death's dialog uses quotation marks
+#         and full uppercase rather than the small capital letters used in
+#         the other books)
 %passage 2
-Death sat at one side of a black baize table in the entre of the room,
+Death sat at one side of a black baize table in the centre of the room,
 arguing with Famine, War and Pestilence.  Twoflower was the only one to
 look up and notice Rincewind.
+
 'Hey, how did you get here?' he said.
-'Well, some say that the creator took a handful - oh, I see, well, it's
-hard to explain but I -'
+
+'Well, some say that the creator took a handful--oh, I see, well, it's
+hard to explain but I--'
+
 'Have you got the Luggage?'
+
 The wooden box pushed past Rincewind and settled down in front of its
 owner, who opened its lid and rummaged around inside until he came up with
 a small, leatherbound book which he handed to War, who was hammering the
 table with a mailed fist.
-'It's "Nosehinger on the Laws of Contract",' he said. 'It's quite good,
-there's a lot in it about double finessing and how to -'
-Death snatched the book with a bony hand and flipped through the pages, 
+
+'It's "Nosehinger on the Laws of Contract",' he said.  'It's quite good,
+there's a lot in it about double finessing and how to--'
+
+Death snatched the book with a bony hand and flipped through the pages,
 quite oblivious to the presence of the two men.
-'RIGHT,' he said, 'PESTILENCE, OPEN ANOTHER PACK OF CARDS. I'M GOING TO GET
-TO THE BOTTOM OF THIS IF IT KILLS ME. FIGURATIVELY SPEAKING OF COURSE.'
+
+'RIGHT,' he said, 'PESTILENCE, OPEN ANOTHER PACK OF CARDS.  I'M GOING TO
+GET TO THE BOTTOM OF THIS IF IT KILLS ME.  FIGURATIVELY SPEAKING OF COURSE.'
 
   [The Light Fantastic, by Terry Pratchett]
 %e passage 2
+# p. 7 (passage starts mid-sentence; the too-long-to-answer question is
+#       "Why have Rincewind and Twoflower fallen off the Disc's rim?",
+#       alluding to the conclusion of /The Colour of Magic/;
+#       in /Sourcery/ and /Interesting Times/ and probably others, the
+#       famous philosohper's name is spelled "Ly Tin Wheedle")
+%passage 3
+[...] such questions take time and could be more trouble than they are
+worth.  For example, it is said that someone at a party once asked the
+famous philosopher Ly Tin Weedle "Why are you here?" and the reply took
+three years.
+
+  [The Light Fantastic, by Terry Pratchett]
+%e passage
+# p. 8 ('libraries': plural is accurate)
+%passage 4
+The only furnishing in the room was a lectern of dark wood, carved into the
+shape of a bird--well, to be frank, into the shape of a winged thing it is
+probably best not to examine too closely--and on the lectern, fastened to
+it by a heavy chain covered in padlocks, was a book.
+
+A large, but not particularly impressive, book.  Other books in the
+University's libraries had covers inlaid with rare jewels and fascinating
+wood, or bound with dragon skin.  This one was just a rather tatty leather.
+It looked the sort of book described in library catalogues as "slightly
+foxed," although it would be more honest to admit that it looked as though
+it had been badgered, wolved and possibly beared as well.
+
+  [The Light Fantastic, by Terry Pratchett]
+%e passage
+# pp. 41-42
+%passage 5
+The barbarian chieftain said:  "What then are the greatest things that a
+man may find in life?"  This is the sort of thing you're supposed to say to
+maintain steppecred in barbarian circles.
+
+The man on his right thoughtfully drank his cocktail of mare's milk and
+snowcat blood, and spoke thus:  "The crisp horizon of the steppe, the wind
+in your hair, a fresh horse under you."
+
+The man on his left said:  "The cry of the white eagle in the heights, the
+fall of snow in the forest, a true arrow in your bow."
+
+The chieftain nodded and said:  "Surely it is the sight of your enemy
+slain, the humiliation of his tribe and the lamentation of his women."
+
+There was a general murmur of whiskery approval at this outrageous display.
+
+Then the chieftain turned respectfully to his guest, a small figure
+carefully warming his chilblains by the fire, and said:  "But our guest,
+whose name is legend, must tell us truly:  what is it that a man may call
+the greatest things in life?"
+
+The guest paused in the middle of another unsuccessful attempt to light up.
+
+"What shay?" he said, toothlessly.
+
+"I said:  what is it that a man may call the greatest things in life?"
+
+The warriors leaned closer.  This should be worth hearing.
+
+The guest thought long and hard and then said, with deliberation:  "Hot
+water, good dentishtry and shoft lavatory paper."
+
+  [The Light Fantastic, by Terry Pratchett]
+%e passage
+# p. 48 (Hanzel and Gretel, obviously...)
+%passage 6
+"Have a bit more table," said Rincewind.
+
+"No thanks, I don't like marzipan," said Twoflower.  "Anyway, I'm sure it's
+not right to eat other people's furniture."
+
+"Don't worry," said Swires.  "The old witch hasn't been seen for years.
+They say she was done up good and proper by a couple of young tearaways."
+
+"Kids of today," said Rincewind.
+
+"I blame the parents," said Twoflower.
+
+  [The Light Fantastic, by Terry Pratchett]
+%e passage
+# p. 103
+%passage 7
+It is a well known fact that warriors and wizards do not get along, because
+one side considers the other side to be a collection of bloodthirsty idiots
+who can't walk and think at the same time, while the other side is naturally
+suspicious of a body of men who mumble a lot and wear long dresses.  Oh, say
+the wizards, if we're going to be like that, then, what about all those
+studded collars and oiled muscles down at the Young Men's Pagan Association?
+To which the heroes reply, that's a pretty good allegation coming from a
+bunch of wimpsoes who won't go near a woman on account, can you believe it,
+of their mystical power being sort of drained out.  Right, say the wizards,
+that just about does it, you and your leather posing pouches.  Oh yeah, say
+the heroes, why don't you...
+
+And so on.  This sort of thing has been going on for centuries, and caused
+a number of major battles which have left large tracts of land uninhabitable
+because of magical harmonics.
+
+  [The Light Fantastic, by Terry Pratchett]
+%e passage
+# p. 128
+%passage 8
+"He'sh mad?"
+
+"Sort of mad.  But mad with lots of money."
+
+"Ah, then he can't be mad.  I've been around; if a man hash lotsh of money
+he'sh just ecshentric."
+
+  [The Light Fantastic, by Terry Pratchett]
+%e passage
+# p. 182 (Cohen is now wearing dentures with teeth made from diamonds)
+%passage 9
+Cohen tapped him on the shoulder.  The man looked around irritably.
+
+"What do you want, grandad?" he snarled.
+
+Cohen paused until he had the man's full attention, and then he smiled.  It
+was a slow, lazy smile, unveiling about 300 carats of mouth jewelry that
+seemed to light up the room.
+
+"I will count to three," he said, in a friendly tone of voice.  "One, Two."
+His bony knee came up in the man's groin with a satisfyingly meaty noise,
+and he half-turned to bring the full force of an elbow into the kidneys as
+the leader collapsed around his private universe of pain.
+
+"Three," to told the ball of agony on the floor.  Cohen had heard of
+fighting fair, and had long ago decided he wanted no part of it.
+
+  [The Light Fantastic, by Terry Pratchett]
+%e passage
+# pp. 193-194 (this passage is the data.base quote for shopkeeper)
+%passage 10
+There have been three general theories put forward to explain the
+phenomenon of the wandering shops, or as they are generically known,
+/tabernae vagantes/.
+
+The first postulates that many thousands of years ago there evolved
+somewhere in the multiverse a race whose single talent was to buy cheap
+and sell dear.  Soon they controlled a vast galactic empire or, as they put
+it, Emporium, and the more advanced members of the species found a way to
+equip their very shops with unique propulsion units that could break the
+dark walls of space itself and open up vast new markets.  And long after
+the worlds of the Emporium perished in the heat death of their particular
+universe, after one last defiant fire sale, the wandering starshops still
+ply their trade, eating their way through the pages of space-time like a
+worm through a three-volume novel.
+
+The second is that they are the creation of a sympathetic Fate, charged
+with the role of supplying exactly the right thing at the right time.
+
+The third is that they are simply a very clever way of getting around the
+various Sunday Closing acts.
+
+All these theories, diverse as they are, have two things in common.  They
+explain the observed facts, and they are completely and utterly wrong.
+
+  [The Light Fantastic, by Terry Pratchett]
+%e passage
+# p. 205
+%passage 11
+"Where to they all come from?" said Twoflower, as they fled yet another mob.
+
+"Inside every sane person there's a madman struggling to get out," said the
+shopkeeper,  "That's what I've always thought.  No one goes mad quicker than
+a totally sane person."
+
+  [The Light Fantastic, by Terry Pratchett]
+%e passage
+# pp. 229-230 ('grey': British spelling is accurate)
+%passage 12
+Trymon was looking at him.  /Something/ was looking at him.  And still the
+others hadn't noticed.  Could he even explain it?  Trymon looked the same
+as he had always done, except for the eyes, and a slight sheen to his skin.
+
+Rincewind stared, and knew that there were far worse things than Evil.  All
+the demons in Hell would torture your very soul, but that was precisely
+because they value souls very highly; evil would always try to steal the
+universe, but at least it considered the universe worth stealing.  But the
+grey world behind those empty eyes would trample and destroy without even
+according its victims the dignity of hatred.  It wouldn't even notice them.
+
+  [The Light Fantastic, by Terry Pratchett]
+%e passage
 %e title
 #
 #
 #
-%title Equal Rites (3)
+%title Equal Rites (10)
+# p. 118 (Signet edition; passage starts mid-sentence and ends mid-paragraph)
 %passage 1
-...it is well known that a vital ingredient of success is not knowing that 
-what you're attempting can't be done.
+[...] it is well known that a vital ingredient of success is not knowing
+that what you're attempting can't be done.  [...]
 
   [Equal Rites, by Terry Pratchett]
 %e passage
+# p. 218 (speaker is Granny Weatherwax)
 %passage 2
-Million-to-one chances...crop up nine times out of ten.
+"Million-to-one chances," she said, "crop up nine times out of ten."
 
   [Equal Rites, by Terry Pratchett]
 %e passage
+# pp. 96-97 ('Tannoy': public address speaker)
 %passage 3
-Animal minds are simple, and therefore sharp. Animals never spend time
-dividing experience into little bits and speculating about all the bits 
-they've missed. The whole panoply of the universe has been neatly 
-expressed to them as things to (a) mate with, (b) eat, (c) run away from, 
-and (d) rocks. This frees the mind from unnecessary thoughts and gives 
-it a cutting edge where it matters. Your normal animal, in fact, never
-tries to walk and chew gum at the same time. 
+Animal minds are simple, and therefore sharp.  Animals never spend time
+dividing experience into little bits and speculating about all the bits
+they've missed.  The whole panoply of the universe has been neatly
+expressed to them as things to (a) mate with, (b) eat, (c) run away from,
+and (d) rocks.  This frees the mind from unnecessary thoughts and gives
+it a cutting edge where it matters.  Your normal animal, in fact, never
+tries to walk and chew gum at the same time.
 
-The average human, on the other hand, thinks about all sorts of things 
+The average human, on the other hand, thinks about all sorts of things
 around the clock, on all sorts of levels, with interruptions from dozens
-of biological calendars and timepieces. There's thoughts about to be said,
-and private thoughts, and real thoughts, and thoughts about thoughts, and 
-a whole gamut of subconscious thoughts. To a telepath the human head is 
-a din. It is a railway terminus with all the Tannoys talking at once. 
-It is a complete FM waveband- and some of those stations aren't reputable,
+of biological calendars and timepieces.  There's thoughts about to be said,
+and private thoughts, and real thoughts, and thoughts about thoughts, and
+a whole gamut of subconscious thoughts.  To a telepath the human head is
+a din.  It is a railway terminus with all the Tannoys talking at once.
+It is a complete FM waveband--and some of those stations aren't reputable,
 they're outlawed pirates on forbidden seas who play late-night records with
 limbic lyrics.
 
   [Equal Rites, by Terry Pratchett]
 %e passage
+# pp. 18-19
+%passage 4
+Smith took a spade from beside the back door and hesitated.
+
+"Granny."
+
+"What?"
+
+"Do you know how wizards like to be buried?"
+
+"Yes!"
+
+"Well, how?"
+
+Granny paused at the bottom of the stairs.
+
+"Reluctantly."
+
+  [Equal Rites, by Terry Pratchett]
+%e passage
+# p. 70
+%passage 5
+Granny sighed.  "You have learned something," she said, and thought it
+was safe to insert a touch of sternness into her voice.  "They say that a
+little knowledge is a dangerous thing, but it is not one half so bad as a
+lot of ignorance."
+
+  [Equal Rites, by Terry Pratchett]
+%e passage
+# pp. 113-114 (Esk is a young girl)
+%passage 6
+The barges stopped at some of the towns.  By tradition only the men went
+ashore, and only Amschat, wearing his ceremonial Lying hat, spoke to
+non-Zoons.  Esk usually went with him.  He tried hinting that she should
+obey the unwritten rules of Zoon life and stay afloat, but a hint was to
+Esk what a mosquito bite was to the average rhino because she was already
+learning that if you ignore the rules people will, half the time, quietly
+rewrite them so that they don't apply to you.
+
+  [Equal Rites, by Terry Pratchett]
+%e passage
+# pp. 119-120 (next passage is a direct continuation of this one)
+%passage 7
+The town was smaller than Ohulan, and very different because it lay on the
+junction of three trade routes quite apart from the river itself.  It was
+built around one enormous square which was a cross between a permanent
+exotic traffic jam and a tent village.  Camels kicked mules, mules kicked
+horses, horses kicked camels and they all kicked humans; there was a riot
+of colours, a din of noise, a nasal orchestration of smells and the steady,
+heady sound of hundreds of people working hard at making money.
+
+One reason for the bustle was that over large parts of the continent other
+people preferred to make money without working at all, and since the Disc
+had yet to develop a music recording industry they were forced to fall back
+on older, more traditional forms of banditry.
+
+Strangely enough these often involved considerable effort.  Rolling heavy
+rocks to the top of cliffs for a decent ambush, cutting down trees to
+block the road, and digging a pit lined with spikes while still keeping a
+wicked edge on a dagger probably involved a much greater expenditure of
+thought and muscle than more socially-acceptable professions but,
+nevertheless, there were still people misguided enough to endure all this,
+plus long nights in uncomfortable surroundings, merely to get their hands
+on perfectly ordinary large boxes of jewels.
+
+  [Equal Rites, by Terry Pratchett]
+%e passage
+# pp. 120-121 (this passage is a direct continuation of preceding one;
+#              "I said, what is happening here?" actually omits "is"
+#              but must be a typo--fixed here to avoid bug reports;
+#              'broomstick' is Esk's disguised wizard's staff)
+%passage 8
+So a town like Zemphis was the place where caravans split, mingled and
+came together again, as dozens of merchants and travellers banded together
+for protection against the socially disadvantaged on the trails ahead.
+Esk, wandering unregarded amidst the bustle, learned all this by the simple
+method of finding someone who looked important and tugging on the hem of
+his coat.
+
+This particular man was counting bales of tobacco and would have succeeded
+but for the interruption.
+
+"What?"
+
+"I said, what is happening here?"
+
+The man meant to say:  "Push off and bother someone else."  He meant to
+give her a light cuff about the head.  So he was astonished to find himself
+bending down and talking seriously to a small, grubby-faced child holding
+a large broomstick (which also, it seemed to him later, was in some
+indefinable way /paying attention/).
+
+He explained about the caravans.  The child nodded.
+
+"People all get together to travel?"
+
+"Precisely."
+
+"Where to?"
+
+"All sorts of places.  Sto Lat, Pseudopolis... Ankh-Morpork, of course...."
+
+"But the river goes there," said Esk, reasonably.  "Barges.  The Zoons."
+
+"Ah, yes," said the merchant, "but they charge high prices and they can't
+carry everything and, anyway, no one trusts them much."
+
+"But they're very honest!"
+
+"Huh, yes," he said.  "But you know what they say:  never trust an honest
+man."  He smiled knowingly.
+
+"Who says that?"
+
+"They do.  You know.  People," he said, a certain uneasiness entering his
+voice.
+
+"Oh," said Esk.  She thought about it.  "They must be very silly," she said
+primly.  "Thank you, anyway."
+
+  [Equal Rites, by Terry Pratchett]
+%e passage
+# pp. 127-128 (this time broomstick is Granny's defective witch's broomstick)
+%passage 9
+The broomstick lay between two trestles.  Granny Weatherwax sat on a rock
+outcrop while a dwarf half her height, wearing an apron that was a mass of
+pockets, walked around the broom and occasionally poked it.
+
+Eventually he kicked the bristles and gave a long intake of breath, a sort
+of reverse whistle, which is the secret sign of craftsman across the
+universe and means that something expensive is about to happen.
+
+"Weellll," he said.  "I could get the apprentices in to look at this, I
+could.  It's an education in itself.  And you say it actually managed to
+get airborne?"
+
+"It flew like a bird," said Granny.
+
+The dwarf lit a pipe.  "I should very much like to see that bird," he said
+reflectively.  "I should imagine it's quite something to watch, a bird like
+that."
+
+"Yes, but can you repair it?" said Granny.  "I'm in a hurry."
+
+The dwarf sat down, slowly and deliberately.
+
+"As for /repair/," he said, "well, I don't know about /repair/.  Rebuild,
+maybe.  Of course, it's hard to get the bristles these days even if you can
+find people to do the proper binding, and the spells need--"
+
+"I don't want it rebuilt, I just want it to work properly," said Granny.
+
+"It's an early model, you see," the dwarf plugged on.  "Very tricky, those
+early models.  You can't get the wood--"
+
+He was picked up bodily until his eyes were level with Granny's.  Dwarves,
+being magical in themselves as it were, are quite resistant to magic but
+her expression looked as though she was trying to weld his eyeballs to the
+back of his skull.
+
+"Just repair it," she hissed.  "Please?"
+
+"What, make a bodge job?" said the dwarf, his pipe clattering to the floor.
+
+"Yes."
+
+"Patch it up, you mean?  Betray my training by doing half a job?"
+
+"Yes," said Granny.  Her pupils were two little black holes.
+
+"Oh," said the dwarf.  "Right, then."
+
+  [Equal Rites, by Terry Pratchett]
+%e passage
+# p. 185 (actually uses four periods to mark a sentence ending in a elipsis)
+%passage 10
+There may be universes where librarianship is considered a peaceful sort of
+occupation, and where the risks are limited to large volumes falling off
+the shelves on to one's head, but the keeper of a /magic/ library is no job
+for the unwary.  Spells have power, and merely writing them down and
+shoving them between covers doesn't do anything to reduce it.  The stuff
+leaks.  Books tend to react with one another, creating randomized magic
+with a mind of its own.  Books of magic are usually chained to their
+shelves, but not to prevent them being stolen....
+
+  [Equal Rites, by Terry Pratchett]
+%e passage
 %e title
 #
 #
 #
-%title Mort (1)
+%title Mort (11)
+# p. 136 (Signet edition; passage is a footnote;
+#         Vetinari doesn't show up as recurring Patrician until /Sourcery/)
 %passage 1
-Ankh-Morpork had dallied with many forms of government and hand ended up
- with that form of democracy known as One Man, One Vote. The Patrician was
-the Man; he had the Vote. 
+Ankh-Morpork had dallied with many forms of government and had ended up
+with that form of democracy known as One Man, One Vote.  The Patrician was
+the Man; he had the Vote.
+
+  [Mort, by Terry Pratchett]
+%e passage
+# p. 11
+%passage 2
+Mort was getting interested in the rock.  It had curly shells in it, relics
+of the early days of the world when the Creator had made creatures out of
+stone, no-one knew why.
+
+Mort was interested in lots of things.  Why people's teeth fitted together
+so neatly, for example.  He'd given that one a lot of thought.  Then there
+was the puzzle of why the sun came out during the day, instead of at night
+when the light would come in useful.  He knew the standard explanation,
+which somehow didn't seem satisfying.
+
+In short, Mort is one of those people who are more dangerous than a bag
+full of rattlesnakes.  He was determined to discover the underlying logic
+behind the universe.
+
+Which was going to be hard, because there wasn't one.  The Creator had a
+lot of remarkably good ideas when he put the world together, but making it
+understandable hadn't been one of them.
+
+  [Mort, by Terry Pratchett]
+%e passage
+# p. 18
+%passage 3
+"But you're Death," said Mort.  "You go around killing people!"
+
+I?  KILL? said Death, obviously offended.  CERTAINLY NOT.  PEOPLE /GET/
+KILLED, BUT THAT'S THEIR BUSINESS.  I JUST TAKE OVER FROM THEN ON.  AFTER
+ALL, IT'D BE A BLOODY STUPID WORLD IF PEOPLE GOT KILLED WITHOUT DYING,
+WOULDN'T IT?
+
+  [Mort, by Terry Pratchett]
+%e passage
+# p. 25
+%passage 4
+"Is it magic?" said Mort.
+
+WHAT DO YOU THINK? said Death.  AM I REALLY HERE, BOY?
+
+"Yes," said Mort slowly.  "I... I've watched people.  They look at you but
+the don't see you, I think.  You do something to their minds."
+
+Death shook his head.
+
+THEY DO IT ALL THEMSELVES, he said.  THERE'S NO MAGIC.  PEOPLE CAN'T SEE ME,
+THEY SIMPLY WON'T ALLOW THEMSELVES TO DO IT.  UNTIL IT'S TIME, OF COURSE.
+WIZARDS CAN SEE ME, AND CATS.  BUT YOUR AVERAGE HUMAN... NO, NEVER.  He blew
+a smoke ring at the sky, and added, STRANGE BUT TRUE.
+
+  [Mort, by Terry Pratchett]
+%e passage
+# pp. 48-49 (Binky is Death's white horse, who was left 'parked' on a
+#            castle's roof; Mort is Death's novice apprentice)
+%passage 5
+They were on the roof before he spoke again.
+
+YOU TRIED TO WARN HIM, he said, removing Binky's nosebag.
+
+"Yes, sir.  Sorry."
+
+YOU CANNOT INTERFERE WITH FATE.  WHO ARE YOU TO JUDGE WHO SHOULD LIVE AND
+WHO SHOULD DIE?
+
+Death watched Mort's expression carefully.
+
+ONLY THE GODS ARE ALLOWED TO DO THAT, he added.  TO TINKER WITH THE FATE OF
+EVEN ONE INDIVIDUAL COULD DESTROY THE WHOLE WORLD.  DO YOU UNDERSTAND?
+
+Mort nodded miserably.
+
+"Are you going to send me home?" he said.
+
+Death reached down and swung him up behind the saddle.
+
+BECAUSE YOU SHOWED COMPASSION?  NO.  I MIGHT HAVE DONE IF YOU HAD SHOWN
+PLEASURE.  BUT YOU MUST LEARN THE COMPASSION PROPER TO YOUR TRADE.
+
+"What's that?"
+
+A /SHARP/ EDGE.
+
+  [Mort, by Terry Pratchett]
+%e passage
+# pp. 59-61 (in Ankh-Morpork, Mort has accidentally walked through a wall
+#            into an immigrant Klatchian family's dining room; 'the creature
+#            who was not there' refers to Death during an earlier event)
+%passage 6
+"I'm no demon!  I'm a human!" he said, and stopped in shock as his words
+emerged in perfect Klatch.
+
+"You're a thief?" said the father.  "A murderer?  To creep in thus, are you
+a /tax-gatherer/?"  His hand slipped under the table and came up holding a
+meat cleaver honed to paper thinness.  His wife screamed and dropped the
+plate and clutched the youngest children to her.
+
+Mort watched the blade weave through the air, and gave in.
+
+"I bring you greetings from the uttermost circles of hell," he hazarded.
+
+The change was remarkable.  The cleaver was lowered and the family broke
+into broad smiles.
+
+"There is much luck to us if a demon visits," beamed the father.  "What is
+your wish, O foul spawn of Offler's loins?"
+
+"Sorry?" said Mort.
+
+"A demon brings blessing and good fortune on the man that helps it," said
+the man.  "How may we be of assistance, O evil dogsbreath of the nether
+pit?"
+
+"Well, I'm not very hungry," said Mort, "but if you know where I can get a
+fast horse, I could be in Sto Lat before sunset."
+
+The man beamed and bowed.  "I know the very place, noxious extrusion of the
+bowels, if you would be so good as to follow me."
+
+Mort hurried out after him.  The ancient ancestor watched them go with a
+critical expression, its jowls rhymically chewing.
+
+"That was what they call a demon around here?" it said.  "Offler rot this
+country of dampness, even their demons are third-rate, not a patch on the
+demons we had in the Old Country."
+
+The wife placed a small bowl of rice in the folded middle pair of hands of
+the Offler statue (it would be gone in the morning) and stood back.
+
+"Husband did say that last month at the /Curry Gardens/ he served a creature
+who was not there," she said.  "He was impressed."
+
+Ten minutes later the man returned and, in solemn silence, placed a small
+heap of gold coins on the table.  They represented enough wealth to
+purchase quite a large part of the city.
+
+"He had a bag of them," he said.
+
+The family stared at the money for some time.  The wife sighed.
+
+"Riches bring many problems," she said.  "What are we to do?"
+
+"We return to Klatch," said the husband firmly, "where our children can grow
+up in a proper country, true to the glorious traditions of our ancient race
+and men do not need to work as waiters for wicked masters but can stand tall
+and proud.  And we must leave right now, fragrant blossom of the date palm."
+
+"Why so soon, O hard-working son of the desert?"
+
+"Because," said the man, "I have just sold the Patrician's champion
+racehorse."
+
+  [Mort, by Terry Pratchett]
+%e passage
+# pp. 139-140 (passage ends mid-sentence)
+%passage 7
+"You don't know much about monarchy, do you?" said Keli.
+
+"Um, no?"
+
+"She means better to be a dead queen in your own castle than a live
+commoner somewhere else," said Cutwell, [...]
+
+  [Mort, by Terry Pratchett]
+%e passage
+# p. 158
+%passage 8
+"You mean you won't help?" said Mort.  "Not even if you can?"
+
+"Give the boy a prize," growled Albert.  "And it's no good thinking you can
+appeal to my better nature under this here crusty exterior," he added,
+"'cos my interior's pretty damn crusty too."
+
+  [Mort, by Terry Pratchett]
+%e passage
+# pp. 159-160 (Death has come to an employment agency--a new concept in
+#              Ankh-Morpork--looking for a job)
+%passage 9
+"And what was your previous position?"
+
+I BEG YOUR PARDON?
+
+"What did you do for a living?" said the thin young man behind the desk.
+
+I USHERED SOULS INTO THE NEXT WORLD.  I WAS THE GRAVE OF ALL HOPE.  I WAS
+THE ULTIMATE REALITY.  I WAS THE ASSASSIN AGAINST WHOM NO LOCK WOULD HOLD.
+
+"Yes, point taken, but do you have any particular skills?"
+
+I SUPPOSE A CERTAIN AMOUNT OF EXPERTISE WITH AGRICULTURAL IMPLEMENTS? he
+ventured after a while.
+
+The young man shook his head firmly.
+
+NO?
+
+  [Mort, by Terry Pratchett]
+%e passage
+# p. 205
+%passage 10
+Death raised his skull and sniffed the air.
+
+The sound cut through all the other noises in the hall and forced them
+into silence.
+
+It is the kind of noise that is heard on the twilight edges of dreams,
+the sort that you wake from in the cold sweat of mortal horror.  It was
+the snuffling under the door of dread.  It was like the snuffling of a
+hedgehog, but if so then it was the kind of hedgehog that crashes out of
+the verges and flattens lorries.  It was the kind of noise you wouldn't
+want to hear twice; you wouldn't want to hear it /once/.
+
+  [Mort, by Terry Pratchett]
+%e passage
+# p. 207
+%passage 11
+"Well, that was a lesson to all of us," the bursar continued, brushing dust
+and candle wax off his robe.  He looked up, expecting to see the statue of
+Alberto Malich back on its pedestal.
+
+"Clearly even statues have feelings," he said.  "I myself recall, when I
+was but a first-year student, writing my name on his... well, never mind.
+The point is, I propose here and now we replace the statue."
+
+Dead silence greeted this suggestion.
+
+"With, say, an exact likeness cast in gold.  Suitably embellished with
+jewels, as befits our great founder," he went on brightly.
+
+"And to make sure no students deface it in any way I suggest we then erect
+it in the deepest cellar," he continued.
+
+"And then lock the door," he added.  Several wizards began to cheer up.
+
+"And throw away the key?" said Rincewind.
+
+"And /weld/ the door," the bursar said.  He had just remembered about The
+Mended Drum.  He thought for a while and remembered about the physical
+fitness regime as well.
+
+"And then brick up the doorway," he said.  There was a round of applause.
+
+"And throw away the brick layer!" chortled Rincewind, who felt he was
+getting the hang of this.
+
+The bursar scowled at him.  "No need to get carried away," he said.
 
   [Mort, by Terry Pratchett]
 %e passage
@@ -137,18 +1061,198 @@ the Man; he had the Vote.
 #
 #
 #
-%title Sourcery (2)
+%title Sourcery (10)
+# p. 9 (Signet edition; passage starts mid-paragraph and ends mid-paragraph)
 %passage 1
-And what would humans be without love?
-RARE, said Death.
+"[...]  And what would humans be without love?"
+
+RARE, said Death.  [...]
 
   [Sourcery, by Terry Pratchett]
 %e passage
 %passage 2
-They suffered from the terrible delusion that something could be done. 
+They suffered from the terrible delusion that something could be done.
 They seemed prepared to make the world the way they wanted it or die in the
-attempt,  and the trouble with dying in the attempt was that you died in
-the attempt. 
+attempt, and the trouble with dying in the attempt was that you died in
+the attempt.
+
+  [Sourcery, by Terry Pratchett]
+%e passage
+# p. 11 ('worth while': two words is accurate, although strange)
+%passage 3
+"I meant," said Ipslore, bitterly, "what is there in this world that makes
+living worth while?"
+
+CATS, he said eventually, CATS ARE NICE.
+
+"Curse you!"
+
+MANY HAVE, said Death evenly.
+
+  [Sourcery, by Terry Pratchett]
+%e passage
+# pp. 40-41 (text has 'the moment and the words' which is obviously a typo;
+#            it might have intended 'that' for 'and'; we just drop 'and')
+%passage 4
+The thief, as will become apparent, was a special type of thief.  This
+thief was an artist of theft.  Other thieves merely stole everything that
+was not nailed down, but this thief stole the nails as well.  This thief
+had scandalised Ankh by taking a particular interest in stealing, with
+astonishing success, things that were in fact not only nailed down but
+also guarded by keen-eyed guards in inaccessible strongrooms.  There are
+artists that will paint an entire chapel ceiling; this was the kind of
+thief that could steal it.
+
+This particular thief was credited with stealing the jeweled disemboweling
+knife from the temple of Offler the Crocodile God during the middle of
+Evensong, and the silver shoes from the Patrician's finest racehorse
+while it was in the process of winning a race.  When Gritoller Mimpsey,
+vice-president of the Thieves' Guild, was jostled in the marketplace and
+then found on returning home that a freshly-stolen handful of diamonds
+had vanished from their place of concealment, he knew who to blame.(1)
+This was the type of thief that could steal the initiative, the moment the
+words were out of your mouth.
+
+(1) This was because Gritoller had swallowed the jewels for safe keeping.
+
+  [Sourcery, by Terry Pratchett]
+%e passage
+# pp. 63-64 ('Compleet', 'Majik', 'enterr', 'physycal', 'hys', 'bodie',
+#            'Destinie', 'Deathe', 'werre', 'nowe', 'menne', 'Ende',
+#            'Worlde', 'hadd', 'bee', 'goddes', 'ould', 'Apocralypse',
+#            'legende', 'thee': all accurate; 'ould' may be a typo...)
+%passage 5
+It was deathly quiet in the Library.  The books were no longer frantic.
+They'd passed through their fear and out into the calm waters of abject
+terror, and they crouched on their shelves like so many mesmerised rabbits.
+
+A long hairy arm reached up and grabbed /Casplock's Compleet Lexicon of
+Majik and Precepts for the Wise/ before it could back away, soothed its
+terror with a long-fingered hand, and opened it under 'S'.  The Librarian
+smoothed the trembling page gently and ran a horny nail down the entries
+until he came to:
+
+    *Sourceror*, /n. (mythical).  A proto-wizard, a doorway through/
+    /which new majik may enterr the world, a wizard not limited by/
+    /the physycal capabilities of hys own bodie, not by Destinie,/
+    /nor by Deathe.  It is written that there once werre sourcerors/
+    /in the youth of the world but not may there by nowe and blessed/
+    /be, for sourcery is not for menne and the return of sourcery/
+    /would mean the Ende of the Worlde...  If the Creator hadd meant/
+    /menne to bee as goddes, he ould have given them wings./
+    /SEE ALSO:  thee Apocralypse, the legende of thee Ice Giants,/
+    /and thee Teatime of the Goddes./
+
+The Librarian read the cross-references, turned back to the first entry,
+and stared at it through deep dark eyes for a long time.  Then he put the
+book back carefully, crept under his desk, and pulled the blanket over
+his head.
+
+  [Sourcery, by Terry Pratchett]
+%e passage
+# pp. 71-72
+%passage 6
+The current Patrician, head of the extremely rich and powerful Vetinari
+family, was thin, tall and apparently as cold-blooded as a dead penguin.
+Just by looking at him you could tell he was the sort of man you'd expect
+to keep a white cat, and caress it idly while sentencing people to death
+in a piranha tank; and you'd hazard for good measure that he probably
+collected rare, thin porcelain, turning it over and over in his blue-white
+fingers while distant screams echoed from the depths of the dungeons.  You
+wouldn't put it past him to use the word "exquisite" and have thin lips.
+He looked the kind of person who, when they blinked, you mark it off on
+the calendar.
+
+Practically none of this was in fact the case, although he did have a small
+and exceedingly elderly wire-haired terrior called Wuffles that smelled
+badly and wheezed at people.  It was said to be the only thing in the
+entire world he truly cared about.  He did of course sometimes have people
+horribly tortured to death, but this was considered to be perfectly
+acceptable behaviour for a civic ruler and generally approved of by the
+overwhelming majority of citizens.(1)  The people of Ankh are of a
+practical persuasion, and felt that the Patrician's edict forebidding all
+street theatre and mime artists made up for a lot of things.  He didn't
+administer a reign of terror, just the occasional light shower.
+
+(1) The overwhelming majority of citizens being defined in this case as
+everyone not currently hanging upside down over a scorpion pit.
+
+  [Sourcery, by Terry Pratchett]
+%e passage
+# p. 75
+%passage 7
+"What exactly /is/ the Aprocralypse?"
+
+Rincewind hesitated.  "Well," he said, "it's the end of the world.  Sort
+of."
+
+"Sort of?  /Sort of/ the end of the world?  You mean we won't be certain?
+We'll all look around and say 'Pardon me, did you hear something?'?"
+
+"It's just that no two seers have ever agreed about it.  There have been
+all kinds of vague predictions.  Quite mad, some of them.  So it was
+called the Apocralypse."  He looked embarrassed.  "It's a sort of
+apocryphal Apocalypse.  A kin of pun, you see."
+
+  [Sourcery, by Terry Pratchett]
+%e passage
+# p. 110
+%passage 8
+"You're very quiet, Spelter.  Do you not agree?"
+
+No.  The world had sourcery once, and gave it up for wizardry.  Wizardry is
+magic for men, not gods.  It's not for us.  There was something wrong with
+it, and we have forgotten what it was.  I liked wizardry.  It didn't upset
+the world.  It fitted.  It was right.  A wizard was all I wanted to be.
+
+He looked down at his feet.
+
+"Yes," he whispered.
+
+  [Sourcery, by Terry Pratchett]
+%e passage
+# pp. 141-142 (Rincewind and Nijel have just entered a harem)
+%passage 9
+Rincewind had eyes for none of this.  [...] they were swamped by the
+considerably bigger flood of panic at the sight of four guards turning
+towards him with scimitars in their hands and the light of murder in their
+eyes.
+
+Without hesitation, Rincewind took a step backwards.
+
+"Over to you, friend," he said.
+
+"Right!"
+
+Nijel drew his sword and held it out in front of him, his arms trembling at
+the effort.
+
+There were a few seconds of total silence as everyone waited to see what
+would happen next.  And then Nijel uttered the battle cry that Rincewind
+would never quite forget to the end of this life.
+
+"Erm," he said, "excuse me...."
+
+  [Sourcery, by Terry Pratchett]
+%e passage
+# pp. 198-199
+%passage 10
+The astro-philosophers of Krull once succeeded in proving conclusively
+that all places are one place and that the distance between them is an
+illusion, and this news was an embarrassment to all thinking philosophers
+because it did not explain, among other things, signposts.  After years of
+wrangling the whole thing was then turned over to Ly Tin Wheedle, arguably
+the Disc's greatest philosopher,(1) who after some thought proclaimed that
+although it was indeed true that all places were one place, that place was
+/very large/.
+
+And so psychic order was restored.  Distance is, however, an entirely
+subjective phenomenon and creatures of magic can adjust it to suit
+themselves.
+
+They are not necessarily very good at it.
+
+(1) He always argued that he was.
 
   [Sourcery, by Terry Pratchett]
 %e passage
@@ -156,42 +1260,293 @@ the attempt.
 #
 #
 #
-%title Wyrd Sisters (2)
+%title Wyrd Sisters (15)
+# p. 318 (ROC edition; passage starts mid-paragraph;
+#         speaker is Granny Weatherwax)
 %passage 1
-
-Destiny is important, see, but people go wrong when they think it controls
-them. It's the other way around. 
+"[...]  Destiny /is/ important, see, but people go wrong when they think it
+controls them.  It's the other way around."
 
   [Wyrd Sisters, by Terry Pratchett]
 %e passage
+# pp. 105-106
 %passage 2
-#submitted by Boudewijn
-Verence tried to avoid walking through walls. A man had his dignity.
+Verence tried to avoid walking through walls.  A man had his dignity.
+
 He became aware that he was being watched.
-He turned his head.
-There was a cat sitting in the doorway, subjecting him to a slow blink.
-It was a mottled grey and extremely fat...
-No. It was extremely /big/. It was covered with so much scar tissue 
-that it looked like a fist with fur on it. Its ears were a couple of
-perforated stubs, its eyes two yellow slits of easy-going malevolence,
-its tail a twitching series of question marks as it stared at him.
-Greebo had heard that Lady Felmet had a small white female cat and had
-strolled up to pay his respects. Verence had never seen an animal with
-so much built-in villainy. He didn't resist as it waddled across the
-floor and dried to rub itself against his legs, purring like a 
-waterfall.
 
-'Well, well,' said the king, vaguely. He reached down and made an 
-effort to scratch it behind the two ragged bits on top of its head. 
-It was a relief to find someone else besides another ghost who could 
-see him, and Greebo, he couldn't help feeling, was a distinctly unusual
-cat. Most of the castle cats were either pampered pets or flat-eared 
-kitchen and stable habitues who generally resembled the very rodents
-they lived on. This cat, on the other hand, was its own animal. All 
-cats give that impression, of course, but instead of the mindless 
-animal self-absorption that passes for secret wisdom in the creatures, 
-Greebo radiated genuime intelligence. He also radiated a smell that 
-would have knocked over a wall and caused sinus trouble in a dead fox. 
+He turned his head.
+
+There was a cat sitting in the doorway, subjecting him to a slow blink.  It
+was a mottled grey and extremely fat...
+
+No.  It was extremely /big/.  It was covered with so much scar tissue that
+it looked like a fist with fur on it.  Its ears were a couple of perforated
+stubs, its eyes two yellow slits of easy-going malevolence, its tail a
+twitching series of question marks as it stared at him.
+
+Greebo had heard that Lady Felmet had a small white female cat and had
+strolled up to pay his respects.
+
+Verence had never seen an animal with so much built-in villainy.  He didn't
+resist as it waddled across the floor and dried to rub itself against his
+legs, purring like a waterfall.
+
+"Well, well," said the king, vaguely.  He reached down and made an effort
+to scratch it behind the two ragged bits on top of its head.   It was a
+relief to find someone else besides another ghost who could see him, and
+Greebo, he couldn't help feeling, was a distinctly unusual cat.  Most of
+the castle cats were either pampered pets or flat-eared kitchen and stable
+habitues who generally resembled the very rodents they lived on.  This cat,
+on the other hand, was its own animal.  All cats give that impression, of
+course, but instead of the mindless animal self-absorption that passes for
+secret wisdom in the creatures, Greebo radiated genuime intelligence.  He
+also radiated a smell that would have knocked over a wall and caused sinus
+trouble in a dead fox.
+
+  [Wyrd Sisters, by Terry Pratchett]
+%e passage
+# pp. 14-15
+%passage 3
+He wondered if ghosts hunted.  Almost certainly not, he imagined.  Or ate,
+or drank either for that matter, and that was really depressing.  He liked
+a big noisy banquet and had quaffed(1) many a pint of good ale.  And bad
+ale, come to that.  He'd never been able to tell the difference till the
+following morning, usually.
+
+(1) Quaffing is like drinking, but you spill more.
+
+  [Wyrd Sisters, by Terry Pratchett]
+%e passage
+# pp. 60-61 (dwarfish mechanics: see /Equal Rites/)
+%passage 4
+Granny Weatherwax milked and fed the goats, banked the fire, and put a
+cloth over the mirror and pulled her broomstick out from behind the door.
+She went out, locked the door behind her, and hung the key on its nail in
+the privy.
+
+This was quite sufficient.  Only once, in the entire history of witchery
+in the Ramtops, had a thief broken into a witch's cottage.  The witch
+concerned visited the most terrible punishment on him.(1)
+
+Granny sat on the broom and muttered a few words, but without much
+conviction.  After a further couple of tries, she got off, fiddled with
+the binding, and had another go.  There was a suspicion of glitter from
+one end of the stick, which quickly died away.
+
+"Drat," she said, under her breath.
+
+She looked around carefully, in case anyone was watching.  In fact it was
+only a hunting badger who, hearing the thumping of running feet, poked its
+head out from the bushes and saw Granny hurtling down the path with the
+broomstick held stiff-armed beside her.  At last the magic caught, and she
+managed to vault clumsily on to it before it trundled into the night sky
+as gracefully as a duck with one wing missing.
+
+From above the trees came a muffled cursd against all dwarfish mechanics.
+
+(1) She did nothing, although sometimes when she saw him in the village
+she'd smile in a faint, puzzled way.  After three weeks of this the
+suspense was too much for him and he took his own life; in fact he took it
+all the way across the continent, where he became a reformed character and
+never went home again.
+
+  [Wyrd Sisters, by Terry Pratchett]
+%e passage
+# p. 76 (passage starts mid-paragraph)
+%passage 5
+And, with alarming suddenness, nothing happened.
+
+  [Wyrd Sisters, by Terry Pratchett]
+%e passage
+# p. 82 ('/Good/ fool': lowercase 'fool' is accurate)
+%passage 6
+"Is this a dagger I see before me?" he mumbled.
+
+"Um.  No, my lord.  It's my hankerchief, you see.  You can sort of tell the
+difference if you look closely.  It doesn't have as many sharp edges."
+
+"/Good/ fool," said the duke, vaguely.
+
+Totally mad, the Fool thought.  Several bricks short of a bundle.  So far
+round the twist you could use him to open wine bottles.
+
+"Kneel beside me," my Fool.
+
+The Fool did so.  The duke laid a soiled bandage on his shoulder.
+
+"Are you loyal, Fool?" he said.  "Are you trustworthy?"
+
+"I swore to follow my lord until death," said the Fool hoarsely.
+
+The duke pressed his mad face close to the Fool, who looked up into a pair
+of bloodshot eyes.
+
+"I didn't want to," he hissed conspiratorially.  "They made me do it.  I
+didn't want--"
+
+The door swung open.  The dutchess filled the doorway.  In fact, she was
+nearly the same shape.
+
+"Leonal!" she barked.
+
+The fool was fascinated by what happened to the duke's eyes.  The mad red
+flame vanished, was sucked backwards, and replaced by the hard blue stare
+he had come to recognize.  It didn't mean, he realized, that the duke was
+any less mad.  Even the coldness of his sanity was madness in a way.  The
+duke had a mind that ticked like a clock and, like a clock, it regularly
+went cuckoo.
+
+  [Wyrd Sisters, by Terry Pratchett]
+%e passage
+# p. 85
+%passage 7
+On the crest of the moor, where in the summer partridges lurked among the
+bushes like small, whirring idiots, was a standing stone.  It stood roughly
+where the witches' territories met, although the boundaries were never
+formally marked out.
+
+The stone was about the same height as a tall man, and made of a bluish
+tinted rock.  It was considered intensely magical because, although there
+was only one of it, /no-one had ever been able to count it/; if it saw
+anyone looking at it speculatively, it shuffled behind them.  It was the
+most self-effacing monolith ever discovered.
+
+  [Wyrd Sisters, by Terry Pratchett]
+%e passage
+# p. 92 (passage starts mid-paragraph)
+%passage 8
+Demons were like genies or philosophy professors--if you didn't word things
+/exactly/ right, they delighted in giving you absolutely accurate and
+completely misleading answers.
+
+  [Wyrd Sisters, by Terry Pratchett]
+%e passage
+# p. 121
+%passage 9
+Nanny Ogg was also out early.  She hadn't been able to get any sleep
+anyway, and besides, she was worried about Greebo.  Greebo was one of her
+few blind spots.  While intellectually she would concede that he was
+indeed a fat, cunning, evil-smelling multiple rapist, she nevertheless
+instinctively pictured him as the small fluffy kitten he had been decades
+before.  The fact that he had once chased a female wolf up a tree and
+seriously surprised a she-bear who had been innocently digging for roots
+didn't stop her worrying that something bad might happen to him.  It was
+generally considered by everyone else in the kingdom that the only thing
+that might slow Greebo down was a direct meteorite strike.
+
+  [Wyrd Sisters, by Terry Pratchett]
+%e passage
+# p. 133 (the duke has locked Nanny Ogg in the castle dungeon)
+%passage 10
+"I really advise you all to return home," said Granny Weatherwax.  "There
+has probably been a misunderstanding.  Everyone knows a witch cannot be
+held against her will."
+
+"It's gone too far this time," said a peasant.  "All this burning and
+taxing and now this.  I blame you witches.  It's got to stop.  I know my
+rights."
+
+"What rights are they?" said Granny.
+
+"Dunnage, cowhage-in-ordinary, badinage, leftovers, scrommidge, clary and
+spunt." said the peasant promptly.  "And acornage, every other year, and
+the right to keep two-thirds of a goat on the common.  Until he set fire to
+it.  It was a bloody good goat, too."
+
+"A man could go far, knowing his rights like you do," said Granny.  "But
+right now he should go home."
+
+  [Wyrd Sisters, by Terry Pratchett]
+%e passage
+# p. 164
+%passage 11
+"Whatever happened to the rule about not meddling in politics?" said Magrat,
+watching her retreating back.
+
+Nanny Ogg massaged some like back into her fingers.
+
+"By Hoki, that woman's got a jaw like an anvil," she said.  "What was that?"
+
+"I said, what about this rule about not meddling?" said Magrat.
+
+"Ah," said Nanny. She took the girl's arm.  "The thing is," she explained,
+"as you advance in the Craft, you'll learn there is another rule.  Esme's
+obeyed it all her life."
+
+"And what's that?"
+
+"When you break rules, break 'em good and hard," said Nanny, and grinned a
+set of gums that were more menacing than teeth.
+
+  [Wyrd Sisters, by Terry Pratchett]
+%e passage
+# p. 238
+%passage 12
+"I mean it.  Look at me.  I wasn't supposed to be writing plays.  Dwarfs
+aren't even supposed to be able to /read/.  I shouldn't worry too much
+about destiny, if I was you.  I was destined to be a miner.  Destiny gets
+it wrong half the time."
+
+"But you said he looks like the Fool person.  I can't see it myself, mark
+you."
+
+"The light's got to be right."
+
+"Could be some destiny at work there."
+
+Hwel shrugged.  Destiny was funny stuff, he knew.  You couldn't trust it.
+Often you couldn't even see it.  Just when you knew you had it cornered, it
+turned out to be something else--coincidence, maybe, or providence.  You
+barred the door against it, and it was standing behind you.  Then just when
+you thought you had it nailed down it walked away with the hammer.
+
+He used destiny a lot.  As a tool for his plays it was even better than a
+ghost.  There was nothing like a bit of destiny to get the old plot rolling.
+But it was a mistake to think you could spot the shape of it.  And as for
+thinking it could be controlled...
+
+  [Wyrd Sisters, by Terry Pratchett]
+%e passage
+# p. 242 (passage starts mid-paragraph; Lancre has recently come out of a
+#         magic-induced 15-year stasis; 'things ... is': 'things' plural is
+#         accurate, though probably a typo)
+%passage 13
+On top of the general suspicion of witches, it was dawning on the few people
+in Lancre who had any dealings with the outside world that a) either more
+things had been happening than they had heard about before or b) time was
+out of joint.  It wasn't easy to prove(1) but the few traders who came along
+the mountain tracks after the winter seemed to be rather older than they
+should have been.  Unexplained happenings were always more or less expected
+in the Ramtops because of the high magical potential, but several years
+disappearing overnight was a bit of a first.
+
+(1) Because of the way time was recorded among the various states, kingdoms
+and cities.  After all, when over an area of a hundred square miles the same
+year is variously the Year of the Small Bat, the Anticipated Monkey, the
+Hunting Cloud, Fat Cows, Three Bright Stallions and at least nine numbers
+recording the time since(2) assorted kings, prohets, and strange events were
+either crowned, born or happened, and each year was a different number of
+months, and some of them don't have weeks, and one of them refuses to accept
+the day as a measure of time, the only things it is possible to be sure of
+is that good sex doesn't last long enough.(3)
+
+(2) The calendar of the Theocracy of Muntab counts /down/, not up.  No-one
+knows why, but it might not be a good idea to hang around and find out.
+
+(3) Except for the Zapingo tribe of the Great Nef, of course.
+
+  [Wyrd Sisters, by Terry Pratchett]
+%e passage
+# p. 250 (passage starts mid-paragraph)
+%passage 14
+It was a land of describable beauty.
+
+  [Wyrd Sisters, by Terry Pratchett]
+%e passage
+# p. 265 (passage starts mid-paragraph)
+%passage 15
+The past used to be a lot better than it is now.
 
   [Wyrd Sisters, by Terry Pratchett]
 %e passage
@@ -199,16 +1554,215 @@ would have knocked over a wall and caused sinus trouble in a dead fox.
 #
 #
 #
-%title Pyramids (2)
-%passage 1
-The trouble with life was that you didn't get a chance to practice before
-doing it for real. 
+%title Pyramids (11)
+# p. 218 (ROC edition)
+%passage 1 (passage ends mid-paragraph)
+What a chap needed at a time like this was a sign, some sort of book of
+instructions.  The trouble with life was that you didn't get a chance to
+practice before doing it for real.
 
   [Pyramids, by Terry Pratchett]
 %e passage
+# p. 128 (passage starts mid-paragraph and ends mid-paragraph)
 %passage 2
-Mere animals couldn't possibly manage to act like this. You need to be a
-human being to be really stupid. 
+Mere animals couldn't possibly manage to act like this.  You need to be a
+human being to be really stupid.
+
+  [Pyramids, by Terry Pratchett]
+%e passage
+# pp. 9-10 ('tlingas' is accurate)
+%passage 3
+It was a full-length mirror.  All assassins had a full-length mirror in
+their rooms, because it would be a terrible insult to anyone to kill them
+when you were badly dressed.
+
+Teppic examined himself critically.  The outfit had cost him his last
+penny, and was heavy on the black silk.  It whispered as he moved.  It was
+pretty good.
+
+At least the headache was going.  It had nearly crippled him all day; he'd
+been in dread of having to start the run with purple spots in front of his
+eyes.
+
+He sighed and opened the black box and took out his rings and slipped them
+on.  Another box held a set of knives of Klatchian steel, their blades
+darkened with lamp black.  Various cunning and intricate devices were taken
+from velvet bags and dropped into pockets.  A couple of long-bladed
+throwing /tlingas/ were slipped into their sheaths inside his boots.  A
+thin silk line and folding grapnel were wound around his waist, over the
+chain-mail shirt.  A blowpipe was attached to its leather thong and dropped
+down his back under his cloak; Teppic pocketed a slim tin container with an
+assortment of darts, their tips corked and their stems braille-coded for
+ease of selection in the dark.
+
+He winced, checked the blade of his rapier and slung the baldric over his
+right shoulder, to balance the bag of lead slingshot ammunition.  As an
+afterthought he opened his sock drawer and took a pistol crossbow, a flask
+of oil, a roll of lockpicks and, after some consideration, a punch dagger,
+a bag of assorted caltraps and a set of brass knuckles.
+
+Teppic picked up his hat and checked its lining for the coil of cheesewire.
+He placed it on his head at a jaunty angle, took a last satisfied look at
+himself in the mirror, turned on his heel and, very slowly, fell over.
+
+  [Pyramids, by Terry Pratchett]
+%e passage
+# p. 30
+%passage 4
+He'd always remember the first night in the dormitory.  It was long enough
+to accommodate all eighteen boys in Viper House, and draughty enough to
+accommodate the great outdoors.  Its designer may have had comfort in mind,
+but only so that he could avoid it whenever possible:  he had contrived a
+room that could actually be colder than the weather outside.
+
+  [Pyramids, by Terry Pratchett]
+%e passage
+# p. 92
+%passage 5
+A few stars had been let out early.  Teppic looked up at them.  Perhaps, he
+thought, there is life somewhere else.  On the stars, maybe.  If it's true
+that there are billions of universes stacked along side one another, the
+thickness of a thought apart, then there must be people elsewhere.
+
+But wherever they are, no matter how mightily they try, no matter how
+magnificent the effort, they surely can't manage to be as godawfully stupid
+as us.  I mean, we work at it.  We were given a spark of it to start with,
+but over hundreds of thousands of years we've really improved on it.
+
+  [Pyramids, by Terry Pratchett]
+%e passage
+# p. 96 (Ptaclusp the pyramid builder, sons Ptaclusp IIa and Ptaclusp IIb)
+%passage 6
+Descendants!  The gods had seen fit to give him one son who charged you for
+the amount of breath expended in saying "Good morning", and another one who
+worshipped geometry and stayed up all night designing aqueducts.  You
+scrimped and saved to send them to the best schools, and then they went and
+paid you back by getting educated.
+
+  [Pyramids, by Terry Pratchett]
+%e passage
+# p. 136
+%passage 7
+It's a fact as immutable as the Third Law of Sod that there is no such
+thing as a good Grand Vizier.  A predilection to cackle and plot is
+apparently part of the job spec.
+
+High priests tend to get put in the same category.  They have to face the
+implied assumption that no sooner do they get the funny hat than they're
+issuing strange orders, e.g., princesses tied to rocks for itinerant sea
+monsters and throwing little babies in the sea.
+
+This is a gross slander.  Throughout the history of the Disc most high
+priests have been serious, pious and conscientious men who have done their
+best to interpret the wishes of the gods, sometimes disembowelling or
+flaying alive hundreds of people in a day in order to make sure they're
+getting it absolutely right.
+
+  [Pyramids, by Terry Pratchett]
+%e passage
+# pp. 206-208 (text has 'that's now it happened'; 'now' changed to 'how' here)
+%passage 8
+Copolymer, the greatest storyteller in the history of the world, sat back
+and beamed at the greatest minds in the world, assembled at the dining
+table.
+
+Teppic had added another iota to his store of new knowledge.  'Symposium'
+meant a knife-and-fork tea.
+
+"Well," said Copolymer, and launched into the story of the Tsortean Wars.
+
+"You see, what happened was, /he'd/ taken /her/ back home, and her
+father--this wasn't the old king, this was the one before, the one with the
+wossname, he married some girl from over Elharib way, she had a squint,
+what was her name now, began with a P.  Or an L.  One of them letters,
+anyway.  Her father owned an island out on the bay there, Papylos I think
+it was.  No, I tell a lie, it was Crinix.  /Anyway/ the king, the other
+king, he raised an army and they....  Elenor, that was her name.  She had
+a squint, you know.  But quite attractive, they say.  When I say married,
+I trust I do not have to spell it out for you.  I mean, it was a bit
+unofficial.  Er.  Anyway, there was this wooden horse and after they'd got
+in...  Did I tell you about this horse?  It was a horse.  I'm pretty sure
+it was a horse.  Or maybe it was a chicken.  Forget my own name next!  It
+was wossname's idea, the one with the limp.  Yes.  The limp in his leg, I
+mean.  Did I mention him?  There'd been this fight.  No, that was the other
+one, I think.  Yes.  Anyway, this wooden pig, damn clever idea, they made
+it out of thing.  Tip of my tongue.  Wood.  But that was later, you know.
+The fight!  Nearly forgot the fight.  Yes.  Damn good fight.  Everyone
+banging on their shields and yelling.  Wossname's armour shone like shining
+armour.  Fight and a half, that fight.  Between thingy, not the one with
+the limp, the other one, wossname, had red hair.  /You/ know.  Tall fellow,
+talked with a lisp.  Hold on, just remembered, he was from some other
+island.  Not him.  The other one, with the limp.  Didn't want to go, he
+said he was mad.  Of course, he /was/ bloody mad, definitely.  I mean, a
+wooden cow!  Like wossname said, the king, no not that king, the other one,
+he saw the goat, he said 'I fear the Ephibeans, especially when they're mad
+enough to leave bloody great wooden livestock on the doorstep, talk about
+nerve, they must think we was born yesterday, set fire to it,' and, of
+course, wossname had nipped in round the back and put everyone to the
+sword, talk about laugh.  Did I say she had a squint?  They said she was
+pretty, but it takes all sorts.  Yes.  Anyway, that's how it happened.
+/Now/, of course, wossname--I think he was called Melycanus, had a limp--he
+wanted to go home, well, you would, they'd been there for /years/, he
+wasn't getting any younger.  That's why he dreamt up the thing about the
+wooden wossname.  Yes.  I tell a lie, Lavaelous was the one with the knee.
+Pretty good fight, that fight, take it from me."
+
+He lapsed into self-satisfied silence.
+
+"Pretty good fight," he mumbled and, smiling faintly, dropped off to sleep.
+
+Teppic was aware that his own mouth was hanging open.  He shut it.  Along
+the table several of the diners were wiping their eyes.
+
+"Magic," said Xeno.  "Sheer magic.  Every word a tassle on the canopy of
+Time."
+
+"It's the way he remembers every tiny detail.  Pin sharp," murmured Ibid.
+
+  [Pyramids, by Terry Pratchett]
+%e passage
+# p. 211
+%passage 9
+"I'd love to stay and listen to you listening to me all day," he said.
+"But there's a man over there I'd like to see."
+
+"That's amazing," said Endos, making a short note and turning his attention
+to a conversation further along the table.  A philosopher had averred that
+although truth was beauty, beauty was not necessarily truth, and a fight was
+breaking out.  Endos listened carefully.(1)
+
+(1) The role of listeners has never been fully appreciated.  However, it is
+well known that most people don't listen.  They use the time when someone
+else is speaking to think of what they're going to say next.  True Listeners
+have always been revered among oral cultures, and prized for their rarity
+value; bards and poets are ten a cow, but a good Listener is hard to find,
+or at least hard to find twice.
+
+  [Pyramids, by Terry Pratchett]
+%e passage
+# p. 278 (perhaps ought to end this one with the first paragraph...)
+%passage 10
+In the middle of the firestorm the Great Pyramid appeared to lift up a few
+inches, on a beam of incandescence, and turn through ninety degrees.  This
+was almost certainly the special type of optical illusion which can take
+place /even though no-one is actually looking at it/.
+
+And then, with deceptive slowness and considerable dignity, it exploded.
+
+It was almost too crass a word.  What it did was this:  it came apart
+ponderously into building-sized chunks which drifted gently away from one
+another, flying serenely out and over the necropolis.  Several of them
+struck other pyramids, badly damaging them in a lazy, unselfconscious way,
+and then bounded on in silence until they ploughed to a halt behind a small
+mountain of rubble.
+
+Only then did the boom come.  It went on for quite a long time.
+
+  [Pyramids, by Terry Pratchett]
+%e passage
+# p. 280 (passage starts mid-paragraph and ends mid-paragraph)
+%passage 11
+Man was never intended to understand things he meddled with.
 
   [Pyramids, by Terry Pratchett]
 %e passage
@@ -216,43 +1770,392 @@ human being to be really stupid.
 #
 #
 #
-%title Guards! Guards! (2)
+%title Guards! Guards! (14)
+# p. 283 (ROC edition)
 %passage 1
-Never build a dungeon you wouldn't be happy to spend the night in yourself.
-The world would be a happier place if more people remembered that. 
+"I see you're very comfortable here," said Vimes weakly.
+
+"Never build a dungeon you wouldn't be happy to spend the night in
+yourself," said the Patrician, laying out the food on the cloth.  "The
+world would be a happier place if more people remembered that."
 
   [Guards! Guards!, by Terry Pratchett]
 %e passage
+# p. 133
 %passage 2
 These weren't encouraged in the city, since the heft and throw of a
-longbow's arrow could send it  through an innocent bystander a hundred
-yards away instead of the innocent bystander at whom it was aimed. 
+longbow's arrow could send it through an innocent bystander a hundred
+yards away rather than the innocent bystander at whom it was aimed.
+
+  [Guards! Guards!, by Terry Pratchett]
+%e passage
+# p. 26 (first and second paragraphs are actually end of one section,
+#        start of next one; first 'Thunder rolled...' had three dot
+#        elipsis, second hand has four, elipsis plus final period--
+#        first changed to four here so that they match)
+%passage 3
+Thunder rolled....
+
+It is said that the gods play games with the lives of men.  But what games,
+and why, and the identities of the actual pawns, and what the game is, and
+what the rules are--who knows?
+
+Best not to speculate.
+
+Thunder rolled....
+
+It rolled a six.
+
+  [Guards! Guards!, by Terry Pratchett]
+%e passage
+# p. 48 (passage is a footnote)
+%passage 4
+One of the remarkable innovations introduced by the Patrician was to make
+the Thieves' Guilde /responsible/ for theft, with annual budgets, forward
+planning and, above all, rigid job protection.  Thus, in return for an
+agreed average level of crime per annum, the thieves themselves saw to it
+that unauthorized crime was met with the full force of Injustice, which was
+generally a stick with nails in it.
+
+  [Guards! Guards!, by Terry Pratchett]
+%e passage
+# p. 87 (passage ends mid-paragraph)
+%passage 5
+"Well, sir," he said, "I know that dragons have been extinct for thousands
+of years, sir--"
+
+"Yes?"  The Patrician's eyes narrowed.
+
+Vimes plunged on.  "But sir, the thing is, do /they/ know?"  [...]
+
+  [Guards! Guards!, by Terry Pratchett]
+%e passage
+# p. 114 (passage is a footnote)
+%passage 6
+The Guild of Fire Fighters had been outlawed by the Patrician the previous
+year after many complaints.  The point was that, if you bought a contract
+from the Guild, your house would be protected against fire.  Unfortunately,
+the general Ankh-Morpork ethos quickly came to the fore and fire fighters
+would tend to go to prospective clients' houses in groups, making loud
+comments like "Very inflammable looking place, this" and "Probably go up
+like a firework with just one carelessly dropped match, know what I mean?"
+
+  [Guards! Guards!, by Terry Pratchett]
+%e passage
+# p. 131 (Sherlock Holmes)
+%passage 7
+Once you've ruled out the impossible then whatever is left, however
+improbable, must be the truth.  The problem lay in working out what was
+impossible, of course.  That was the trick, all right.
+
+There was also the curious incident of the orangutan in the night-time....
+
+  [Guards! Guards!, by Terry Pratchett]
+%e passage
+# p. 150 (Dirty Harry with a small swamp dragon rather than a .45 Magnum...)
+%passage 8
+A streak of green fire blasted out of the back of the shed, passed a foot
+over the heads of the mob, and burned a charred rosette in the woodwork
+over the door.
+
+Then came a voice that was a honeyed purr of shear deadly menace.
+
+"/This is Lord Mountjoy Quickfang Winterforth IV, the hottest dragon in the
+city.  It could burn your head clean off./"
+
+Captain Vimes limped forward from the shadows.
+
+A small and extremely frightened golden dragon was clamped firmly under one
+arm.  His other hand held it by the tail.
+
+The rioters watched it, hypnotised.
+
+"Now I know what you're thinking," Vimes went on, softly.  "You're
+wondering, after all this excitement, has it got enough flame left?  And,
+y'know, I ain't so sure myself..."
+
+He leaned forward, sighting between the dragon's ears, and his voice
+buzzed like a knife blade:
+
+"What you've got to ask yourself is:  Am I feeling lucky?"
+
+They swayed backwards as he advanced.
+
+"Well?" he said.  "/Are/ you feeling lucky?"
+
+  [Guards! Guards!, by Terry Pratchett]
+%e passage
+# p. 154 (passage is a footnote; ten pages later, Sergeant Colon uses the
+#         old version of the proverb)
+%passage 9
+The phrase "Set a thief to catch a thief" had by this time (after strong
+representations from the Thieves' Guilde) replaced a much older and
+quintessentially Ankh-Morpork proverb, which was "Set a deep hole with
+spring-loaded sides, tripwires, whirling knife blades driven by water power,
+broken glass and scorpions, to catch a thief."
+
+  [Guards! Guards!, by Terry Pratchett]
+%e passage
+# p. 174 (passage starts mid-paragraph)
+%passage 10
+[...]  There was no difference at all between the richest man and the
+poorest beggar, apart from the fact that the former had lots of money,
+food, power, fine clothes, and good health.  But at least he wasn't
+any /better/.  Just richer, fatter, more powerful, better dressed and
+healthier.  It had been like that for hundreds of years.
+
+  [Guards! Guards!, by Terry Pratchett]
+%e passage
+# p. 205
+%passage 11
+"Might have been just an innocent bystander, sir," said Carrot.
+
+"What, in Ankh-Morpork?"
+
+"Yes, sir."
+
+"We should have grabbed him, then, just for the rarity value," said Vimes.
+
+  [Guards! Guards!, by Terry Pratchett]
+%e passage
+# pp. 262-263 (passage is a footnote; 'practise', 'practised' are accurate)
+%passage 12
+A number of religions in Ankh-Morpork still practised human sacrifice,
+except that they really didn't need to practise any more because they had
+got so good at it.  City law said that only condemned criminals should be
+used, but that was all right because in most of the religions refusing to
+volunteer for sacrifice was an offense punishable by death.
+
+  [Guards! Guards!, by Terry Pratchett]
+%e passage
+# p. 292
+%passage 13
+There were times when an ape had to do what a man had to do...
+
+The orangutan threw a complex salute and swung away into the darkness.
+
+  [Guards! Guards!, by Terry Pratchett]
+%e passage
+# pp. 299-300 + 325 (final part comes quite a bit later; Carrot is trying to
+#                    alert oblivious Sergeant Colon that the dragon is coming)
+%passage 14
+"This is what it comes to!" muttered Colon.  "Decent women can't walk down
+the street without being eaten!  Right, you bastards, you're... you're
+/geography/--"
+
+"Sergeant!" Carrot repeated urgently.
+
+"It's history, not geography," said Nobby.  "That's what you're supposed to
+say.  History.  'You're history!' you say."
+
+"Well, whatever," snapped Colon.  "Let's see now--"
+
+[...(quite a while later)...]
+
+"You heard the Man," he rasped.  "One false move and you're... you're--" he
+took a desparate stab at it--"you're Home Economics!"
 
   [Guards! Guards!, by Terry Pratchett]
 %e passage
 %e title
 #
 #
+# The original publication of /Eric/ featured extensive illustrations by
+# Josh Kirby but the mass-market paperback edition contains none of them
+# and omits his name.  In the Harper Torch edition, the list of other
+# books by the same auther has "Eric (with Josh Kirby)" even though the
+# copyright and title pages of that very book do not mention him.
 #
-%title Eric (2)
+%title Eric (9)
+# pp. 3-4 (Harper Torch edition)
 %passage 1
-No enemies had ever taken Ankh-Morpork. Well, /technically/ they had, quite
- often; the city welcomed free-spending barbarian invaders, but somehow the
- puzzled raiders always found, after a few days, that they didn't own their
- own horses any more, and within a couple of months they were just another
-minority group with its own graffiti and food shops. 
+No enemies had ever taken Ankh-Morpork.  Well, /technically/ they had,
+quite often; the city welcomed free-spending barbarian invaders, but
+somehow the puzzled raiders always found, after a few days, that they
+didn't own their own horses anymore, and within a couple of months they
+were just another minority group with its own graffiti and food shops.
 
   [Eric, by Terry Pratchett]
 %e passage
+# p. 195
 %passage 2
-Rincewind looked down at the broad steps they were climbing. They were
- something of a novelty; each one was built out of large stone letters. The
- one he was just stepping on to, for example, read: I Meant It For The Best.
+"I can see blue sky!" said Eric.  "Where do you think we'll come out?" he
+added.  "And when?"
+
+"Anywhere," said Rincewind.  "Anytime."
+
+He looked down at the broad steps they were climbing.  They were something
+of a novelty; each one was built out of large stone letters.  The one he
+was just stepping on to, for example, read: I Meant It For The Best.
+
 The next one was: I Thought You'd Like It.
+
 Eric was standing on: For The Sake Of The Children.
-'Weird, isn't it?' he said. 'Why do it like this?'
-'I think they're meant to be good intentions,' said Rincewind. This was a
-road to hell, and demons were, after all, traditionalists. 
+
+'Weird, isn't it?' he said.  'Why do it like this?'
+
+'I think they're meant to be good intentions,' said Rincewind.  This was a
+road to Hell, and demons were, after all, traditionalists.
+
+  [Eric, by Terry Pratchett]
+%e passage
+# pp. 9-10 (passage has an interesting start but not much of a finish...)
+%passage 3
+"It's a haunting," he ventured.  "Some short of ghost, maybe.  A bell, book
+and candle job."
+
+The Bursar sighed.  "We tried that, Archchancellor."
+
+The Archchancellor leaned toward him.
+
+"Eh?" he said.
+
+"I /said/, we tried that, Archchancellor," said the Bursar loudly,
+directing his voice at the old man's ear.  "After dinner, you remember?
+We used Humptemper's /Names of the Ants/ and rang Old Tom."(1)
+
+"Did we, indeed.  Worked, did it?"
+
+"/No/, Archchancellor."
+
+"Eh?"
+
+(1) Old Tom was the single cracked bronze bell in the University bell
+tower.  The clapper dropped out shortly after it was cast, but the bell
+still tolled out some tremendously sonorous silences every hour.
+
+  [Eric, by Terry Pratchett]
+%e passage
+# pp. 14-15 (the top wizards have performed the Rite of AshkEnte)
+%passage 4
+Death pointedly picked invisible particles off the edge of his scythe.
+
+The Archchancellor cupped a gnarled hand over his ear.
+
+"What'd he say?  Who's the fella with the stick?"
+
+"It's Death, Archchancellor," said the Bursar patiently.
+
+"Eh?"
+
+"It's Death, sir.  /You/ know."
+
+"Tell him we don't want any," said the old wizard, waving his stick.
+
+The Bursar sighed.  "We summoned him, Archchancellor."
+
+"Is it?  What'd we go and do that for?  Bloody silly thing to do."
+
+The Bursar gave Death an embarrassed grin.  He was on the point of asking
+him to excuse the Archchancellor on account of age, but realized that this
+would in the circumstances be a complete waste of breath.
+
+"Are we talking about the wizard Rincewind?  The one with the--" the Bursar
+gave a shudder-- "horrible Luggage on legs?  But he got blown up when there
+was all that business with the sourcerer, didn't he?"(1)
+
+INTO THE DUNGEON DIMENSIONS.  AND NOW HE IS TRYING TO GET BACK HOME.
+
+(1) The Bursar was referring obliquely to the difficult occasion when the
+University very nearly caused the end of the world, and would in fact have
+done so had it not been for a chain of events involving Rincewind, a magic
+carpet and a half-brick in a sock.  (See /Sourcery/.)  The whole affair
+was very embarrassing to wizards, as it always is to people who find out
+afterward that they were on the wrong side all along,(2) and it is
+remarkable how many of the University's senior staff were now adamant that
+at the time they had been off sick, visiting their aunt, or doing research
+with the door locked while humming loudly and had had no idea of what was
+going on outside.  There had been some desultory talk about putting up a
+statue to Rincewind but, by the curious alchemy that tends to apply in
+these sensitive issues, this quickly became a plaque, then a note on the
+Role of Honor, and finally a motion of censure for being improperly dressed.
+
+(2) ie, the one that lost.
+
+  [Eric, by Terry Pratchett]
+%e passage
+# p. 34
+%passage 5
+"Not that he was particularly successful.  It was all a bit trial and
+wossname."
+
+"I thought you said great big scaly--"
+
+"Oh, /yes/.  But that wasn't what he was after.  He was trying to conjure
+up a succubus."  It should be impossible to leer when all you've got is a
+beak, but the parrot managed it.  "That's a female demon what comes in the
+night and makes mad passionate wossn--"
+
+"I've heard of them," said Rincewind.  "Bloody dangerous things."
+
+The parrot put its head on one side.  "It never worked.  All he ever got
+was a neuralger."
+
+"What's that?"
+
+"It's a demon that comes and has a headache at you."
+
+  [Eric, by Terry Pratchett]
+%e passage
+# p. 35 (passage is a footnote)
+%passage 6
+Demons and their Hell are quite different from the Dungeon Dimensions,
+those endlass parallel wastelands outside space and time.  The sad, mad
+Things in the Dungeon Dimensions have no understanding of the world but
+simply crave light and shape and try to warm themselves by the fires of
+reality, clustering around it with about the same effect--if they ever
+broke through--as an ocean trying to warm itself around a candle.  Whereas
+demons belong to the same space-time wossname, more or less, as humans,
+and have a deep and abiding interest in humanity's day-to-day affairs.
+Interestingly enough, the gods of the Disc have never bothered much about
+judging the souls of the dead, so people can only go to hell if that's
+where they believe, in their deepest heart, that they deserve to go.
+Which they won't do if they don't know about it.  This explains why it is
+important to shoot missionaries on sight.
+
+  [Eric, by Terry Pratchett]
+%e passage
+# p. 153
+%passage 7
+"Multiple exclamation marks," he went on, shaking his head, "are a sure
+sign of a diseased mind."
+
+  [Eric, by Terry Pratchett]
+%e passage
+# pp. 178-179 (Ponce da Quirm, encoutered in hell)
+%passage 8
+"So you didn't find the Fountain of Youth, then," he said, feeling that he
+should make some conversation.
+
+"Oh, but I did," said da Quirm earnestly.  "A clear spring, deep in the
+jungle.  It was very impressive.  I had a good long drink, too.  Or draft,
+which I think is the more appropriate word.
+
+"And--?" said Rincewind.
+
+"It definitely worked.  Yes.  For a while there I could definitely feel
+myself getting younger.
+
+"But--" Rincewind waved a vague hand to take in da Quirm, the treadmill,
+the towering circles of the Pit.
+
+"Ah," said the old man.  "Of course, that's the really annoying bit.  I'd
+read so much about the Fountain, and you'd have thought someone in all
+those books would have mentioned the really vital thing about the water,
+wouldn't you?"
+
+"Which was--?"
+
+"/Boil it first./  Says it all, doesn't it?  Terrible shame, really."
+
+  [Eric, by Terry Pratchett]
+%e passage
+# p. 179
+%passage 9
+The Luggage trotted down the great spiral road that linked the circles of
+the Pit.  Even if conditions had been normal it probably would not have
+attracted much attention.  If anything, it was rather less astonishing
+than most of the denizens.
 
   [Eric, by Terry Pratchett]
 %e passage
@@ -260,38 +2163,274 @@ road to hell, and demons were, after all, traditionalists.
 #
 #
 #
-%title Moving Pictures (4)
+%title Moving Pictures (16)
+# p. 7 (ROC Edition)
 %passage 1
-This is space. It's sometimes called the final frontier.
+This is space.  It's sometimes called the final frontier.
+
 (Except that of course you can't have a /final/ frontier, because there'd
- be nothing for it to be a frontier /to/, but as frontiers go, it's pretty
-penultimate...) 
+be nothing for it to be a frontier /to/, but as frontiers go, it's pretty
+penultimate...)
 
   [Moving Pictures, by Terry Pratchett]
 %e passage
+# pp. 22-23 (very short but happens to span a page boundary...)
 %passage 2
 By and large, the only skill the alchemists of Ankh-Morpork had discovered
-so far was the ability to turn gold into less gold. 
+so far was the ability to turn gold into less gold.
 
   [Moving Pictures, by Terry Pratchett]
 %e passage
+# pp. 44, 45, 46 (multiple paragraphs skipped in the first two gaps)
 %passage 3
-There was a dog sitting by his feet.
+He looked down.  There was a dog sitting by his feet.
+
 It was small, bow-legged and wiry, and basically grey but with patches of
-brown, white, and black in outlying areas...   It looked up slowly, and
-said 'Woof?'   Victor poked an exploratory finger in his ear. It must have
- been a trick of an echo, or something. It wasn't that the dog had gone
- 'woof!', although that was practically unique in itself; most dogs in the
- universe /never/ went 'woof!', they had complicated barks like 'whuuugh!'
- and 'hwhoouf!'. No, it was that it hadn't in fact /barked/ at all. It had
-/said/ 'woof'.   'Could have bin worse, mister. I could have said "miaow".'
+brown, white, and black in outlying areas, and it was staring.
+
+It was certainly the most penetrating stare Victor had ever seen.  It
+wasn't menacing, or fawning.  It was just very slow and very thorough, as
+though the dog was memorising details so that it could give a full
+description to the authorities later.
+
+[...]
+
+Victor let his gaze slide downwards.  There was nothing there but the little
+dog, industriously scratching itself.  It looked up slowly, and said "Woof?"
+
+[...]
+
+Victor poked an exploratory finger in his ear.  It must have  been a trick
+of an echo, or something.  It wasn't that the dog had gone "woof!?, although
+that was practically unique in itself; most dogs in the universe /never/
+went "woof!", they had complicated barks like "whuuugh!" and "hwhoouf!".
+No, it was that it hadn't in fact /barked/ at all.  It had /said/ "woof".
+
+[...]
+
+One of the last things Victor remembered was a voice beside his knee saying,
+"Could have bin worse, mister.  I could have said 'miaow'."
 
   [Moving Pictures, by Terry Pratchett]
 %e passage
+# p. 322
 %passage 4
-''Twas beauty killed the beast,' said the Dean, who liked to say things
-like that.   'No it wasn't,' said the Chair. 'It was it splatting into the
-ground like that.' 
+"'Twas beauty killed the beast," said the Dean, who liked to say things
+like that.
+
+"No it wasn't," said the Chair.  "It was it splatting into the ground like
+that."
+
+  [Moving Pictures, by Terry Pratchett]
+%e passage
+# p. 12
+%passage 5
+There's a saying that all roads lead to Ankh-Morpork, greatest of Discworld
+cities.
+
+At least, there's a /saying/ that there's a saying that all roads lead to
+Ankh-Morpork.
+
+And it's wrong.  All roads lead /away/ from Ankh-Morpork, but sometimes
+people just walk along them the wrong way.
+
+  [Moving Pictures, by Terry Pratchett]
+%e passage
+# p. 34 (Victor Tugelbend and Ponder Stibbons are students at Unseen Uni.)
+%passage 6
+"Rain's stopped.  Let's go over the wall," he said.  "We deserve a drink."
+
+Victor waggled a finger.  "Just one drink, then.  Got to keep sober," he
+said.  "It's Finals tomorrow.  Got to keep a clear head!"
+
+"Huh!", said Ponder.
+
+Of course, it's very important to be sober when you take an exam.  Many
+worthwhile careers in the street-cleansing, fruit-picking and subway-guitar-
+playing industries have been founded on a lack of understanding of this
+simple fact.
+
+  [Moving Pictures, by Terry Pratchett]
+%e passage
+# p. 37
+%passage 7
+In a sense which his tutors couldn't quite define, much to their annoyance,
+Victor Tugelbend was also the laziest person in the history of the world.
+
+Not simply, ordinarily lazy.  Ordinary laziness was merely the absence of
+effort.  Victor had passed through there a long time ago, had gone straight
+through commonplace idleness and out on the far side.  He put more effort
+into avoiding work than most people put into hard labour.
+
+  [Moving Pictures, by Terry Pratchett]
+%e passage
+# p. 60
+%passage 8
+Cut-me-own-Throat Dibbler was one of those rare people with the ability to
+think in straight lines.
+
+Most people think in curves and zig-zags.  For example, they start with a
+thought like:  I wonder how I can become very rich, and then proceed along
+an uncertain course which includes thoughts like:  I wonder what's for
+supper, and:  I wonder who I know that can lend me five dollars?
+
+Whereas Throat was one of those people who could identify the thought at the
+other end of the process, in this case /I am now very rich/, draw a line
+between the two, and then think his way along it, slowly and patiently,
+until he got to the other end.
+
+Not that it worked.  There was always, he found, some small but vital flaw
+in the process.  It generally involved a strange reluctance on the part of
+people to buy what he had to sell.
+
+  [Moving Pictures, by Terry Pratchett]
+%e passage
+# pp. 71-72
+%passage 9
+"Tell me, Mr Dibbler." said Silverfish, "what exactly is your profession?"
+
+"I sell merchandise," said Dibbler.
+
+"Mostly sausages," Victor volunteered.
+
+"/And/ merchandise," said Dibbler, sharply.  "I only sell sausages when the
+merchandising trade is a bit slow."
+
+"And the sale of sausages leads you to believe you can make better moving
+pictures?" said Silverfish.  "Anyone can sell sausages!  Isn't that so,
+Victor?"
+
+"Well..." said Victor, reluctantly.  No-one except Dibbler could possibly
+sell Dibbler's sausages.
+
+"There you are then," said Silverfish.
+
+"The thing is," said Victor, "that Mr Dibbler can even sell sausages to
+people who have bought them off him /before/."
+
+"That's right!" said Dibbler.  He beamed at Victor.
+
+"And a man who could sell Mr Dibbler's sausages twice could sell anything,"
+said Victor.
+
+  [Moving Pictures, by Terry Pratchett]
+%e passage
+# pp. 111-112 ('dis', 'ort', 'yore', 'finking', 'mayonnaisey', 'specialitay',
+#              'de lar mayson' all accurate)
+%passage 10
+Borgle's commissary had decided to experiment with salads tonight.  The
+nearest salad growing district was thirty slow miles away.
+
+"What dis?" demanded a troll, holding up something limp and brown.
+
+Fruntkin the short-order chef hazarded a guess.
+
+'Celery?" he said.  He peered closer.  "Yeah, celery."
+
+"It /brown/."
+
+"'S'right.  'S'right!  Ripe celery ort to be brown," said Fruntkin, quickly.
+"Shows it's ripe," he added.
+
+"It should be /green/."
+
+"Nah.  Yore finking about the tomatoes," said Fruntkin.
+
+"Yeah, and what's this runny stuff?" said a man in the queue.
+
+Fruntkin drew himself up to his full height.
+
+"That," he said, "is the mayonnaisey.  Made it myself.  Out of a /book/, he
+added proudly.
+
+"Yead, I expect you did," said the man, prodding it.  "Clearly oil, eggs
+and vinegar were not involved, right?"
+
+"Specialitay de lar mayson," said Fruntkin.
+
+"Right, right," said the man.  "Only it's attacking my lettuce."
+
+Fruntkin grasped his ladle angrily.
+
+"Look--" he began.
+
+"No, it's all right," said the prospective diner.  "The slugs have formed a
+defensive ring."
+
+  [Moving Pictures, by Terry Pratchett]
+%e passage
+# p. 137 (CMOT Dibbler has become a director, Rock is a troll actor)
+%passage 11
+"Er, I was just wondering, Mr Dibbler... what is my motivation for this
+scene?"
+
+"Motivation?"
+
+"Yes.  Er.  I got to know, see," said Rock.
+
+"How about:  I'll fire you if you don't do it properly?"
+
+Rock grinned.  "Right you are, Mr Dibbler," he said.
+
+  [Moving Pictures, by Terry Pratchett]
+%e passage
+# p. 189
+%passage 12
+Magic wasn't difficult.  That was the big secret that the whole baroque
+edifice or wizardry had been set up to conceal.  Anyone with a bit of
+intelligence and enough perseverance could do magic, which was why the
+wizards cloaked it with rituals and the whole pointy-hat business.
+
+The trick was to do magic and /get away with it/.
+
+Because it was as if the human race was a field of corn and magic helped
+the users grow just that bit taller, so that they stood out.  That
+attracted the attention of gods and--Victor hesitated--other Things outside
+this world.  People who used magic without knowing what they were doing
+usually came to a sticky end.
+
+All over the entire room, sometimes.
+
+  [Moving Pictures, by Terry Pratchett]
+%e passage
+# p. 204 (passage ends mid-paragraph; musings are by Gaspode the dog)
+%passage 13
+Sunnink dreadful in there, he thought.  Prob'ly tentacled fings that rips
+your face off.  I mean, when you finds mysterious doors in old hills, it
+stands to reason wot comes out ain't going to be pleased to see you.  Evil
+creatures wot Man shouldn't wot of, and here's one dog wot don't want to
+wot of them either.
+
+  [Moving Pictures, by Terry Pratchett]
+%e passage
+# pp. 206-207 (passage starts mid-paragraph; Dibbler now controls Silverfish's
+#              moving pictures studio;  Detritus isn't part of the Watch yet)
+%passage 14
+"[...]  Detritus, throw this bum out!"
+
+"Right you are, Mr Dibbler," rumbled the troll, gripping Silverfish's
+collar.
+
+"You haven't heard the last of this, you--you scheming, devious
+megalomaniac!"
+
+Dibbler removed his cigar.
+
+"That's /Mister/ Megalomanic to you," he said.
+
+  [Moving Pictures, by Terry Pratchett]
+%e passage
+# p. 274 (passage starts mid-sentence; senior wizards of the University are
+#         attending a 'click' and have decided to take their hats off...)
+%passage 15
+[...] inside every old person is a young person wondering what happened.
+
+  [Moving Pictures, by Terry Pratchett]
+%e passage
+# p. 295 (passage starts mid-sentence; the movie theater owner's daughter
+#         is playing a pipe organ to accompany the silent movie)
+%passage 16
+[...] whatever piece of music she was playing, it was definitely losing.
 
   [Moving Pictures, by Terry Pratchett]
 %e passage
@@ -299,31 +2438,215 @@ ground like that.'
 #
 #
 #
-%title Reaper Man (4)
+%title Reaper Man (15)
+# pp. 301-302 (ROC edition)
 %passage 1
-No one is actually dead until the ripples they cause in the world die
-away...
+It was later that the story of Windle Poons really came to an end, if
+"story" means all that he did and caused and set in motion.  In the Ramtop
+villages where they dance the real Morris dance, for example, they believe
+that no one is finally dead until the ripples they cause in the world die
+away--until the clock he wound up winds down, until the wine she made has
+finished its ferment, until the crop they planted is harvested.  The span
+of someone's life, they say, is only the core of their actual existance.
 
   [Reaper Man, by Terry Pratchett]
 %e passage
+# p. 251 (passage starts mid-paragraph)
 %passage 2
 Five exclamation marks, the sure sign of an insane mind.
 
   [Reaper Man, by Terry Pratchett]
 %e passage
+# p. 305 (passage starts mid-paragraph)
 %passage 3
-Light thinks it travels faster than anything but it is wrong. No matter how
- fast light travels, it finds the darkness has always got there first, and
-is waiting for it. 
+Light thinks it travels faster than anything but it is wrong.  No matter
+how fast light travels it finds the darkness has always got there first,
+and is waiting for it.
 
   [Reaper Man, by Terry Pratchett]
 %e passage
+# p. 245
 %passage 4
-"That's not fair, you know. If we knew when we were going to die, people
-would lead better lives." 
+"That's not fair, you know.  If we knew when we were going to die, people
+would lead better lives."
 
 IF PEOPLE KNEW WHEN THEY WERE GOING TO DIE, I THINK THEY PROBABLY WOULDN'T
-LIVE AT ALL. 
+LIVE AT ALL.
+
+  [Reaper Man, by Terry Pratchett]
+%e passage
+# p. 19
+%passage 5
+YOU FEAR TO DIE?
+
+"It's not that I don't want... I mean, I've always... it's just that life
+is a habit that's hard to break..."
+
+  [Reaper Man, by Terry Pratchett]
+%e passage
+# pp. 30-31
+%passage 6
+Wizards don't believe in gods in the same way that most people don't find it
+necessary to believe in, say, tables.  They know they're there, they know
+they're there for a purpose, they'd probably agree that they have a place in
+a well-organized universe, but they wouldn't see the point of /believing/,
+of going around saying, "O great table, without whom we are as naught".
+Anyway, either the gods are there whether you believe or not, or exist only
+as a function of the belief, so either way you might as well ignore the
+whole business and, as it were, eat off your knees.
+
+Nevertheless, there is a small chaple off the University's Great Hall,
+because while the wizards stand right behind the philosophy as outlined
+above, you don't become a successful wizard by getting up gods' noses even
+if those noses only exist in an ethereal or metaphorical sense.  Because
+while wizards don't belive in gods they know for a fact that /gods/ believe
+in gods.
+
+  [Reaper Man, by Terry Pratchett]
+%e passage
+# p. 50 (Dibbler is so low because he's on steps leading down to a cellar)
+%passage 7
+"Sergeant!"
+
+Colon froze.  Then he looked down.  A face was staring up at him from ground
+level.  When he'd got a grip on himself, he made out the sharp features of
+his old friend Cut-Me-Own-Throat Dibbler, the Discworld's walking, talking
+argument in favour of the theory that mankind had descended from a species
+of rodent.  C. M. O. T. Dibbler like to describe himself as a merchant
+adventurer; everyone else liked to describe him as itinerant pedlar whose
+moneymaking schemes were always let down by some small but vital flaw, such
+as trying to sell things he didn't own or which didn't work or, sometimes,
+didn't even exist.  Fairy gold is well known to evaporate by morning, but
+it was a reinforced concrete slab by comparison to some of Dibbler's
+merchandise.
+
+  [Reaper Man, by Terry Pratchett]
+%e passage
+# pp. 58-59
+%passage 8
+Over the fireplace was an ornamental candlestick, fixed to a bracket on the
+wall.  It was such a familiar piece of furniture that Windle hadn't really
+seen it for fifty years.
+
+It was coming unscrewed.  It spun around slowly, squeaking once a turn.
+After half a dozen turns it fell off and clattered to the floor.
+
+Inexplicable phenomena were not in themselves unusual on the Discworld.(1)
+It was just that they normally had more point, or at least were a bit more
+interesting.
+
+(1) Rains of fish, for example, were so common in the little land-locked
+village of Pine Dressers that it had a flourishing smoking, canning and
+kipper filleting industry.  And in the mountain regions of Syrrit many
+sheep, left out in the fields all night, would be found in the morning to
+/be facing the other way/, without the apparent intervention of any human
+agency.
+
+  [Reaper Man, by Terry Pratchett]
+%e passage
+# pp. 68-69 (130 year old wizard Windle Poon has become a zombie after dying)
+%passage 9
+"And now let's put the lid on and go and have some lunch," said Ridcully.
+"Don't worry, Windle.  It's bound to work.  Today is the last day of the
+rest of your life."
+
+Windle lay in the darkness, listening to the hammering.  There was a thump
+and a muffled imprecation against the Dean for not holding the end properly.
+And then the patter of soil on the lid, getting fainter and more distant.
+
+After a while a distant rumbling suggested that the commerce of the city
+was being resumed.  He could even hear muffled voices.
+
+He banged on the coffin lid.
+
+"Can you keep it down?" he demanded.  "There's people down here trying to
+be dead!"
+
+He heard the voices stop.  There was the sound of feet hurrying away.
+
+  [Reaper Man, by Terry Pratchett]
+%e passage
+# pp. 81-82 (things have stopped dying because Death is no longer on the job)
+%passage 10
+Everything that exists, yearns to live.  That's what the cycle of life is
+all about.  That's the engine that drives the great biological pumps of
+evolution.  Everything tries to inch its way up the tree, clawing or
+tentacling or sliming its way up to the next niche until it gets to the
+very top--which, on the whole, never seems to have been worth all the
+effort.
+
+Everything that exists, yearns to live.  Even things that are not alive.
+Things that have a kind of sub-life, a metaphorical life, an /almost/ life.
+And now, in the same way that a sudden hot spell brings forth unnatural and
+exotic blooms...
+
+  [Reaper Man, by Terry Pratchett]
+%e passage
+# p. 101
+%passage 11
+Dead.  That was the point.  All the religions had very strong views about
+talking to the dead.  And so did Mrs Cake.  They held that it was sinful.
+Mrs Cake held that it was only common courtesy.
+
+This usually led to a fierce ecclesiastical debate which resulted in Mrs
+Cake giving the chief priest what she called "a piece of her mind".  There
+were so many pieces of Mrs Cake's mind left around the city now that it
+was quite surprising that there was enough left to power Mrs Cake but,
+strangely enough, the more pieces of her mind she gave away the more there
+seemed to be left.
+
+  [Reaper Man, by Terry Pratchett]
+%e passage
+# p. 222
+%passage 12
+"No--" Ridcully began, and realised that it was hopeless.  And he was losing
+the initiative.  He carefully formulated the most genteel battle cry in the
+history of bowdlerism,
+
+"Darn them to Heck!" he yelled, and ran after the Dean.
+
+  [Reaper Man, by Terry Pratchett]
+%e passage
+# p. 226
+%passage 13
+Miss Flitworth disappeared into the scullery.  There was the creaking of a
+pump.  She returned with a damp flannel and a glass of water.
+
+THERE'S A NEWT IN IT!
+
+"Shows it's fresh," said Miss Flitworth,(1) fishing the amphibian out and
+releasing it on the flagstones, where it scuttled away into a crack.
+
+(1) People have believed for hundreds of years that newts in a well mean
+that the water's fresh and drinkable, and /in all that time/ never asked
+themselves whether the newts got out to go to the lavatory.
+
+  [Reaper Man, by Terry Pratchett]
+%e passage
+# p. 247
+%passage 14
+"Have you got any last words?"
+
+YES.  I DON'T WANT TO GO.
+
+"Well.  Succinct, anyway."
+
+  [Reaper Man, by Terry Pratchett]
+%e passage
+# pp. 249-250
+%passage 15
+"Where's everyone gone, Librarian?"
+
+"Oook oook."
+
+"Just like them.  I'd have done that.  Rush off without thinking.  May the
+gods bless them and help them, if they can find the time from their family
+squabbles."
+
+And then he thought:  well, what now?  I've thought, and what am I going to
+do?
+
+Rush off, or course,  But slowly.
 
   [Reaper Man, by Terry Pratchett]
 %e passage
@@ -331,10 +2654,270 @@ LIVE AT ALL.
 #
 #
 #
-%title Witches Abroad (1)
+%title Witches Abroad (14)
+# p. 92 (ROC edition)
 %passage 1
 Vampires have risen from the dead, the grave and the crypt, but have never
 managed it from the cat.
+
+  [Witches Abroad, by Terry Pratchett]
+%e passage
+# pp. 12-13
+%passage 2
+Desiderata Hollow was making her will.
+
+When Desiderata Hollow was a girl, her grandmother had given her four
+important pieces of advice to guide her young footsteps on the unexpectedly
+twisting pathway of life.
+
+They were:
+
+Never trust a dog with orange eyebrows,
+
+Always get the young man's name and address,
+
+Never get between two mirrors,
+
+And always wear completely clean underwear every day because you never knew
+when you were going to be knocked down and killed by a runaway horse and if
+people found you had unsatisfactory underwear on, you'd die of shame.
+
+And then Desiderata grew up to become a witch.  And one of the minor
+benefits of being a witch is that you know exactly when you're going to die
+and can wear what underwear you like.(1)
+
+That had been eighty years earlier, when the idea of knowing exactly when
+you were going to die had seemed quite attractive because secretly, of
+course, you knew you were going to live forever.
+
+That was then.
+
+And this was now.
+
+Forever didn't seem to last as long these days as once it did.
+
+(1) Which explains a lot about witches.
+
+  [Witches Abroad, by Terry Pratchett]
+%e passage
+# p. 64 (passage ends mid-paragraph)
+%passage 3
+"You know," said Nanny, investigating the recesses of the basket, "whenever
+I deals with dwarfs, the phrase 'Duck's arse' swims across my mind."
+
+"Mean little devils.  You should see the prices they tries to charge me
+when I takes my broom to be repaired," said Granny.
+
+"Yes, but you never pay," said Magrat.
+
+"That's not the point," said Granny Weatherwax.  "They shouldn't be allowed
+to charge that sort of money.  That's thievin', that is."
+
+"I don't see how it can be thieving if you don't pay anyway," said Magrat.
+
+"I never pay for anything," said Granny.  [...]
+
+  [Witches Abroad, by Terry Pratchett]
+%e passage
+# p. 93 (passage is a footnote)
+%passage 4
+Nanny Ogg sent a number of cards home to her family, not a single one of
+which got back before she did.  This is traditional, and happens everywhere
+in the universe.
+
+  [Witches Abroad, by Terry Pratchett]
+%e passage
+# pp. 118-119 (Magrat has been teaching herself martial arts via books)
+%passage 5
+"Lobsang Dibbler says sometimes you have to lose in order to win," said
+Magrat.
+
+"Sounds daft to me," said Nanny.  "That's Yen Buddhism, is it?"
+
+"No.  They're the ones who say you have to have lots of money to win," said
+Magrat.(1)  "In the Path of the Scorpion, the way to win is to lose every
+fight except the last one.  You use the enemy's strength against himself."
+
+"What, you get him to hit himself, sort of thing?" said Nanny.  "Sounds
+daft."
+
+(1) The Yen Buddhists are the richest religious sect in the universe.  They
+hold that the accumulation of money is a great evil and burden to the soul.
+They therefore, regardless of personal hazard, see it as their unpleasant
+duty to acquire as much as possible to reduce the risk to innocent people.
+
+  [Witches Abroad, by Terry Pratchett]
+%e passage
+# p. 131
+%passage 6
+They had breakfast in a forest clearing.  It was grilled pumpkin.  The dwarf
+bread was brought out for inspection.  But it was miraculous, the dwarf
+bread.  No one ever went hungry when they had some dwarf bread to avoid.
+You only had to look at it for a moment, and instantly you could think of
+dozens of things you'd rather eat.  Your boots for example.  Mountains.  Raw
+sheep.  Your own foot.
+
+  [Witches Abroad, by Terry Pratchett]
+%e passage
+# pp. 194-195 ("he just" is accurate; cockerel == adolescent rooster)
+%passage 7
+"This is Legba, a dark and dangerous spirit," said Mrs. Gogol.  She leaned
+closer and spoke out of the corner of her mouth.  "Between you and me, he
+just a big black cockerel.  But you know how it is."
+
+"It pays to advertise," Nanny agreed.  "This is Greebo.  Between you and me,
+he's a fiend from hell."
+
+"Well, he's a cat," said Mrs. Gogol, generously.  "It's only to be expected."
+
+  [Witches Abroad, by Terry Pratchett]
+%e passage
+# p. 218
+%passage 8
+"/And/ still a bit of the wedding cake," said the first coachman.  "Ain't
+you et that up yet?"
+
+"We have it every night," said the undercoachman.
+
+The shed shook with the ensuing laughter.  It is a universal fact that any
+innocent comment made by any recently married young member of any workforce
+is an instant trigger for coarse merriment among his or her older and more
+cynical colleagues.  This happens even if everyone concerned has nine legs
+and lives at the bottom of an ocean of ammonia on a huge cold planet.  It's
+just one of those things.
+
+  [Witches Abroad, by Terry Pratchett]
+%e passage
+# p. 228
+%passage 9
+"You ought to be more adventurous, Granny," said Magrat.
+
+"I ain't against adventure, in moderation," said Granny, "but not when I'm
+eatin'."
+
+  [Witches Abroad, by Terry Pratchett]
+%e passage
+# pp. 263-264 (Nanny is trying to stop an elaborate clock; despite damage
+#              inflicted on it, it goes on to announce midnight [early])
+%passage 10
+Let's see thought Nanny.  This bit is connected to that bit, this one turns,
+that one turns /faster/, this spiky bit wobbles backwards and forwards...
+
+Oh, well.  Just twist the first thing you can grab, as the High Priest said
+to the vestal virgin.(1)
+
+Nanny Ogg spat on her hands, gripped the largest cog-wheel, and twisted.
+
+It carried on turning, pulling her with it.
+
+Blimey.  Oh, well...
+
+Then she did was neither Granny Weatherwax nor Magrat would have dreamed of
+doing in the circumstances.  But Nanny Ogg's voyages on the sea of
+intersexual dalliance had gone rather further than twice around the
+lighthouse, and she saw nothing demeaning in getting a man to help her.
+
+She simpered at Casanunda.
+
+"Things would be a lot more comfortable in our little /pie-de-terre/ if you
+could just push this little wheel around a bit," she said.  "I'm sure /you/
+could manage it," she added.
+
+"Oh, no problem, good lady," said Casanunda.  He reached up with one hand.
+Dwarfs are immensely strong for their size.  The wheel seemed to offer him
+no resistance at all.
+
+Somewhere in the mechanism something resisted for a moment and then went
+/clonk/.  Big wheels turned reluctantly.  Little wheels screamed on their
+axles.  A small important piece flew out and pinged off of Casanunda's
+small bullet head.
+
+And, much faster than nature had ever intended, the hands sped around the
+face.
+
+(1) This is the last line to a Discworld joke lost, alas, to posterity.
+
+  [Witches Abroad, by Terry Pratchett]
+%e passage
+# p. 265 ('pate' has a couple of accent marks which can't be rendered in ascii)
+%passage 11
+There are various forms of voodoo in the multiverse, because it's a
+religion that can be put together from any ingredients that happen to be
+lying around.  And all of them try, in some way, to call a god into the body
+of a human being.
+
+That was stupid, Mrs. Gogol thought.  That was dangerous.
+
+Mrs. Gogol's voodoo worked the other way about.  What was a god?  A focus of
+belief.  If people believed, a god began to grow.  Feebly at first, but if
+the swamp taught anything, it taught patience.  Anything could be the focus
+of a god.  A handful of feathers with a red ribbon around them, a hat and
+coat on a couple of sticks... anything.  Because when all people had was
+practically nothing, then anything could be almost everything.  And then you
+fed it, and lulled it, like a goose heading for pate, and let the power grow
+very slowly, and when the time was ripe you opened the path... backwards.
+A human could ride the god, rather than the other way around.  There would
+be a price to pay later, but there always was.  In Mrs. Gogol's experience,
+everyone ended up dying.
+
+  [Witches Abroad, by Terry Pratchett]
+%e passage
+# p. 270 (Greebo has been temporarily transformed--polymorphed?--into a human)
+%passage 12
+Greebo wasn't a happy cat.  [...]
+
+Then he'd smelled the kitchen.  Cats gravitate to kitchens like rocks
+gravitate to gravity.
+
+  [Witches Abroad, by Terry Pratchett]
+%e passage
+# p. 282 (Casanunda the dwarf is Discworld's Casanova; he appears again in
+#         /Lords and Ladies/)
+%passage 13
+"How come you're in the palace guard, Casanunda?"
+
+"Soldier of fortune takes whatever jobs are going, Mrs. Ogg," said Casanunda
+earestly.
+
+"But all the rest of 'em are six foot tall and you're--of the shorter
+persuasion."
+
+"I lied about my height, Mrs. Ogg.  I'm a world-famous liar."
+
+"Is that true?"
+
+"No."
+
+"What about you being the world's greatest lover?"
+
+There was silence for a while.
+
+"Well, maybe I'm only No. 2," said Casanunda.  "But I try harder."
+
+  [Witches Abroad, by Terry Pratchett]
+%e passage
+# pp. 285-286 (Greebo is still in human form)
+%passage 14
+Greebo leapt.
+
+Cats are like witches.  They don't fight to kill, but to win.  There is a
+difference.  There's no point in killing an opponent.  That way, they won't
+know they've lost, and to be a real winner you have to have an opponent who
+is beaten and knows it.  There's no triumph over a corpse, but a beaten
+opponent, who will remain beaten every day for the remainder of their sad
+and wretched life, is something to treasure.
+
+Cats do not, of course, rationise this far.  They just like to send someone
+limping off minus a tail and a few square inches of fur.
+
+Greebo's technique was unscientific and wouldn't have stood a chance against
+any decent swordsmanship, but on his side was the fact that it is almost
+impossible to develop decent swordsmanship when you seem to have run into a
+food mixer that is biting your ear off.
+
+The witches watched with interest.
+
+"I think we can leave him now," said Nanny.  "I think he's having fun."
 
   [Witches Abroad, by Terry Pratchett]
 %e passage
@@ -2692,8 +5275,8 @@ comp-lic-ated documents."
 
   [Carpe Jugulum, by Terry Pratchett]
 %e passage
-# p. 336-337 (the plot is driven by the actions of a family of vampyres
-#             who do mostly cooperate with each other)
+# pp. 336-337 (the plot is driven by the actions of a family of vampyres
+#              who do mostly cooperate with each other)
 %passage 7
 Vampires are not naturally cooperative creatures.  It's not in their nature.
 Every other vampire is a rival for the next meal.  In fact, the ideal
@@ -3021,8 +5604,8 @@ man!"
 
   [Thief of Time, by Terry Pratchett]
 %e passage
-# p. 74-75 (the novices didn't know that the little old man known as Sweeper
-#    	    is actually Lu-Tze; see passage 3 regarding Rule One)
+# pp. 74-75 (the novices didn't know that the little old man known as Sweeper
+#            is actually Lu-Tze; see passage 3 regarding Rule One)
 %passage 4
 One day a group of senior novices, for mischief, kicked over the little
 shrine that Lu-Tze kept beside his sleeping mat.
@@ -4322,9 +6905,9 @@ Treason than met the eye.
 
   [Wintersmith, by Terry Pratchett]
 %e passage
-# p. 53-54 (in Carpe Jugulum, most of the lore [for humans] about how to kill
-#           vampires had been written by long-lived/long-not-defunct vampires
-#           [meaning that it was deliberately full of inaccuracies...])
+# pp. 53-54 (in Carpe Jugulum, most of the lore [for humans] about how to kill
+#            vampires had been written by long-lived/long-not-defunct vampires
+#            [meaning that it was deliberately full of inaccuracies...])
 %passage 6
 It was in fact Miss Tick who had written /Witch Hunting for Dumb People/,
 and she made sure that copies of it found their way into those areas where
@@ -4340,7 +6923,7 @@ even underwater.
 
   [Wintersmith, by Terry Pratchett]
 %e passage
-# p. 55-56
+# pp. 55-56
 %passage 7
 Working quickly, she emptied her pockets and started a shamble.
 
@@ -4405,8 +6988,8 @@ dark art.  It was just so /hard/.
 
   [Wintersmith, by Terry Pratchett]
 %e passage
-# p. 126-127 (passage starts mid-paragraph;
-#             witches know in advance when they're going to die)
+# pp. 126-127 (passage starts mid-paragraph;
+#              witches know in advance when they're going to die)
 %passage 10
 "[...]  We shall hold the funeral tomorrow afternoon."
 
@@ -4433,8 +7016,8 @@ witches is an "argument."
 
   [Wintersmith, by Terry Pratchett]
 %e passage
-# p. 174-175  (passage starts mid-paragraph; last paragraph continues, but
-#         changes topic so abruptly Tiffany gasps; 'rumbustious' is accurate)
+# pp. 174-175 (passage starts mid-paragraph; last paragraph continues, but
+#          changes topic so abruptly Tiffany gasps; 'rumbustious' is accurate)
 %passage 12
 "[...]  And now I shall tell you something vitally important.  It is the
 secret of my long life."
@@ -4490,7 +7073,7 @@ as good as she ought to be.
 
   [Wintersmith, by Terry Pratchett]
 %e passage
-# p. 360-361 ('wurds' is accurate)
+# pp. 360-361 ('wurds' is accurate)
 %passage 15
 "An heroic effect, Mr. Anybody," said Granny.  "The first thing a hero must
 conquer is his fear, and when it comes to fightin', the Nac Mac Feegle
@@ -4501,7 +7084,7 @@ o' wurds!"
 
   [Wintersmith, by Terry Pratchett]
 %e passage
-# p. 398-399 ("Chumsfanleigh" is pronounced "Chuffley")
+# pp. 398-399 ("Chumsfanleigh" is pronounced "Chuffley")
 %passage 16
 At the back of the Feegles' chalk pit, more chalk had been carved out of
 the wall to make a tunnel about five feet high and perhaps as long.
@@ -4991,7 +7574,7 @@ pp'd at all.  Incidentally, how loud were his screams?"
 
   [Unseen Academicals, by Terry Pratchett]
 %e passage
-# p. 192-193 ('pants': underpants; 'football': soccer ;-)
+# pp. 192-193 ('pants': underpants; 'football': soccer ;-)
 %passage 9
 "You will arrange yourself into two teams, set up goals, and strive to win!
 No man will leave the field of play unless injured!  The hands are not to
@@ -5263,17 +7846,259 @@ ag-rreeeed arr-angement, ye ken!"
 #
 #
 #
-%title Snuff (2)
+%title Snuff (16)
+# p. 168 (Harper edition; 'ax' is spelled without the 'e' there...)
 %passage 1
 They were crude weapons, to be sure, but a flint axe hitting your head does
-not need a degree in physics.  
+not need a degree in physics.
 
   [Snuff, by Terry Pratchett]
 %e passage
 %passage 2
-It is a strange thing to find yourself doing something you 
-have apparently always wanted to do, when in fact up until 
-that moment you had never known that you always wanted to do it...
+It is a strange thing to find yourself doing something you have apparently
+always wanted to do, when in fact up until that moment you had never known
+that you always wanted to do it...
+
+  [Snuff, by Terry Pratchett]
+%e passage
+# p. 2 (the subject is goblins)
+%passage 3
+At this point, Lord Vetinari, Patrician of Ankh-Morpork, stopped reading
+and stared at nothing.  After a few seconds, nothing was eclipsed by the
+form of Drumknott, his secretary (who, it must be said, had spent a career
+turning himself as much like nothing as anything).
+
+Drumknott said, "You look pensive, my lord," to which observation he
+appended a most delicate question mark, which gradually evaporated.
+
+"Awash with tears, Drumknott, awash with tears."
+
+Drumknott stopped dusting the impeccably shiny black lacquered desk.
+"Pastor Oats is a very persuasive writer, isn't he, sir...?"
+
+"Indeed he is, Drumknott, but the basic problem remains and it is this:
+humanity may come to terms with the dwarf, the troll and even the orc,
+terrifying though all these have proved to be at times, and you know why
+this is, Drumknott?"
+
+The secretary carefully folded the duster he had been using and looked at
+the ceiling.  "I would venture to suggest, my lord, that in their violence
+we recognize ourselves?"
+
+"Oh, well done, Drumknott, I shall make a cynic of you yet!  Predators
+respect other predators, do they not?  They may perhaps even respect the
+prey:  the lion may lie down with the lamb, even if only the lion is
+likely to get up again, but the lion will not lie down with the rat.
+Vermin, Drumknott, an entire race reduced to vermin!"
+
+  [Snuff, by Terry Pratchett]
+%e passage
+# p. 6
+%passage 4
+Vimes grunted.  "Where there are policemen there's crime, sergeant,
+remember that."
+
+"Yes, I do, sir, although I think it sounds better with a little reordering
+of the words."
+
+  [Snuff, by Terry Pratchett]
+%e passage
+# pp. 46-47 (passage starts mid-paragraph and ends mid-paragraph; it's a
+#           long slog for a weak punchline...)
+%passage 5
+"[...]  The third earl, 'Mad' Jack Ramkin, had a brother called
+Woolsthorpe, probably for his sins.  He was something of a scholar and
+would have been sent to the university to become a wizard were it not for
+the fact that his brother let it be known that any male sibling of his who
+took up a profession that involved wearing a dress would be disinherited
+with a cleaver.
+
+"Nevertheless, young Woolsthorpe persevered in his studies in natural
+philosophy in the way a gentleman should, by digging into any suspicious-
+looking burial mounds he could find in the neighborhood, filling up his
+lizard press with as many rare species as he could collect, and drying
+samples of any flowers he could find before they became extinct.  The
+story runs that, on one warm summer day, he dozed off under an apple tree
+and was awakened when an apple fell on his head.  A lesser man, as his
+biographer put it, would have seen nothing untoward about this, but
+Woolsthorpe surmised that, since apples and practically everything else
+always fell down, then the world would eventually become dangerously
+unbalanced... unless there was another agency involved that natural
+philosophy had yet to discover.  He lost no time in dragging one of the
+footmen to the orchard and ordering him, on the pain of dismissal, to lie
+under the tree until an apple hit him on the head!  The possibility of
+this happening was increased by another footman who had been told by
+Woolsthorpe to shake the tree vigorously until the required apple fell.
+Woolsthorpe was ready to observe this from a distance.
+
+"Who can imagine his joy when the inevitable apple fell and a second apple
+was seen rising from the tree and disappearing at speed into the vaults of
+heaven, proving the hypothesis that what goes up must come down, provided
+that what goes down must come up, thus safeguarding the equilibrium of the
+Universe.  Regrettably, this only works with apples and, amazingly, only
+the apples on this one tree, /Malus equilibria/!  I hear that someone has
+worked out that the apples at the top of the tree fill with gas and fly up
+when the tree is disturbed so that it can set its seeds some way off.
+Wonderful thing, nature, shame the fruit tastes like dog's business,"
+Willikins added as Young Sam spat some out.  [...]
+
+  [Snuff, by Terry Pratchett]
+%e passage
+# p. 100
+%passage 6
+"Look, Willikins, I don't like to involve you in all this.  It's only a
+hunch, after all."
+
+Willikins waved this away.  "You wouldn't keep me out of it for a big
+clock, sir, because all this is tickling my fancy as well.  I shall lay
+out a selection of cutting edges for you in your dressing room, sir, and I
+myself will go up to the copse half an hour before you're due to be there,
+with my trusty bow and an assortment of favorite playthings.  It's nearly
+full moon, clear skies, there'll be shadows everywhere, and I'll be
+standing in the darkest one of them."
+
+Vimes looked at him for a moment and said, "Could I please amend that
+suggestion?  Could you not be there in the second darkest shadow one hour
+before midnight, to see who steps into the darkest shadow?"
+
+"Ah yes, that's why you command the watch, sir," said Willikins, and to
+Vimes's shock there was a hint of a tear in the man's voice.  "You're
+listening to the street, aren't you, sir, yes?"
+
+Vimes shrugged.  "No streets here, Willikins."
+
+Willikins shook his head.  "Once a street boy, always a street boy, sir.
+It comes with us, in the pinch.  Mothers go, fathers go--if we ever knew
+who they were--but the Street, well, the Street looks after us.  In the
+pinch it keeps us alive."
+
+  [Snuff, by Terry Pratchett]
+%e passage
+# p. 116 (passage ends mid-paragraph)
+%passage 7
+Well, we live and learn, Vimes thought, or perhaps more importantly, we
+learn and live.  [...]
+
+  [Snuff, by Terry Pratchett]
+%e passage
+# p. 153
+%passage 8
+In the country, there is always somebody watching you, he thought as they
+sped along.  Well, there was always somebody watching you in the city, too,
+but that was generally in the hope that you might drop dead and they could
+run off with your wallet.  They were never /interested/.  But here he
+thought he could feel many eyes on him.  Maybe they belonged to squirrels
+or badgers, or whatever the damn things were that Vimes heard at night;
+gorillas, possibly.
+
+  [Snuff, by Terry Pratchett]
+%e passage
+# pp. 169-170
+%passage 9
+"Well, sir, it looks as though they're pleased to see us, yes?"
+
+Feeney's relief and hope should have been bottled and sold to despairing
+people everywhere.  Vimes just nodded, because the ranks were pulling
+apart, leaving a pathway of sorts, at the end of which there was,
+inarguably, a corpse.  It was a mild relief to see that it was a goblin
+corpse, but no corpse is good news, particularly when seen in a grimy low
+light and especially for the corpse.  And yet something inside him exulted
+and cried /Hallelujah!/, because here was a corpse and he was a copper
+and this was a crime and this place was smoky and dirty and full of
+suspicious-looking goblins and here was a /crime/.  His world.  Yes, here
+was /his/ world.
+
+  [Snuff, by Terry Pratchett]
+%e passage
+# p. 211
+%passage 10
+Vimes lay back in the bed, enjoying the wonderful sensation of gradually
+being eaten by the pillows, and said to Sybil, "Do the Rust family have a
+place down here?"
+
+Too late he reflected that this might be a bad move because she might well
+have told him all about it on one of those occasions when, so unusally for
+a married man, he was not paying much attention to what his wife was
+saying, and therefore he might be the cause of grumpiness in those
+precious, warm minutes before sleep.  All he could see of her right now
+was the very tip of her nose, as the pillows claimed her, but she mumbled,
+drowsily, "Oh, they bought Hangnail Manor ten years or so ago, after the
+Marquis of Fantailer murdered his wife with a pruning knife in the
+pineapple house.  Don't you remember?  You spent weeks searching the city
+for him.  In the end everybody seemed to think he'd gone off to Fourecks
+and disguised himself by not calling himself the Marquis of Fantailer."
+
+"Oh yes," said Vimes, "and I remember that a lot of his chums were quite
+indignant about the investigation!  They said he'd only done one murder,
+and it was his wife's fault for having the bad taste to die after just one
+little stab!"
+
+  [Snuff, by Terry Pratchett]
+%e passage
+# p. 212 (passage starts mid-paragraph and ends mid-paragraph)
+%passage 11
+[...] he had heard that writers spent all day in their dressing gowns
+drinking champagne.(1)  [...]
+
+(1) This is, of course, absolutely true.
+
+  [Snuff, by Terry Pratchett]
+%e passage
+# p. 217 (passage starts mid-paragraph and ends mid-paragraph)
+%passage 12
+"[...] and the Summoning Dark is /real/.  It's not all in your head,
+commander:  no matter what you hear, I sometimes hear it too.  Oh dear,
+you of all people must recognize a substition when you're possessed by it?
+It's the opposite of superstition:  it's real even if you don't believe
+in it.  [...]"
+
+  [Snuff, by Terry Pratchett]
+%e passage
+# p. 233
+%passage 13
+Vimes frowned.  He couldn't remember ever going into a church or a temple
+or one of the numerous other places of more or less spirituality for any
+other reason than the occasional requirements of the job.  These days he
+tended to go in for reasons of Sybil, i.e., his wife dragging him along
+so that he could be seen, and, if possible, seen remaining awake.
+
+No, the world of next worlds, afterlives, and purgatorial destinations
+simply did not fit into his head.  Whether you wanted it or not, you were
+born, you did the best you could, and then, whether you really wanted to
+or not, you died.  They were the only certainties, and so the best thing
+for a copper to do was to get on with the job.  And it was about time
+that Sam Vimes got back to doing his.
+
+  [Snuff, by Terry Pratchett]
+%e passage
+# p. 254 (passage starts mid-paragraph)
+%passage 14
+[...]  And maybe if I distinguish myself I can get a job in the city, so
+that my mum can live in a place where you don't lie awake at night
+listening to the mice fighting the cockroaches--hooray!(1)
+
+(1) Regrettably, Constable Upshot was overly hopeful:  in Ankh-Morpork the
+mice and cockroaches had decided to forget their differences and gang up
+on the humans.
+
+  [Snuff, by Terry Pratchett]
+%e passage
+# p. 403 (passage starts mid-paragraph)
+%passage 15
+"[...]  And I remember reading somewhere that you would arrest the gods
+for doing it wrong."
+
+Vimes shook his head.  "I'm sure I never said anything of the sort!  But
+law is order and order is law and it must be the highest thing.  The world
+runs on it, the heavens run on it and without order, lad, one second
+cannot follow another."
+
+  [Snuff, by Terry Pratchett]
+%e passage
+# p. 404 (footnote)
+%passage 16
+The sound of the gentle rattle of china cup on china saucer drives away
+all demons, a little-known fact.
 
   [Snuff, by Terry Pratchett]
 %e passage
@@ -5281,18 +8106,19 @@ that moment you had never known that you always wanted to do it...
 #
 #
 #
-%title Raising Steam (8)
+%title Raising Steam (13)
+# p. 281 (Anchor Books edition; passage starts mid-paragraph)
 %passage 1
-Yesterday you never thought about it and after today you 
-don't know what you would do without it. 
-
-That was what the technology was doing. 
+[...]  And yesterday you never thought about it and after today you don't
+know what you would do without it.  That was what the technology was doing.
 It was your slave but, in a sense, it might be the other way round.
 
   [Raising Steam, by Terry Pratchett]
 %e passage
+# p. 358 (passage starts mid-paragraph and ends mid-paragraph; quote is
+#         attributed to Lord Vetinari but he's not present in the scene)
 %passage 2
-If you take enough precautions, you never need to take precautions.
+"If you take enough precautions, you never need to take precautions."
 
   [Raising Steam, by Terry Pratchett]
 %e passage
@@ -5386,27 +8212,95 @@ looking at.
 
   [Raising Steam, by Terry Pratchett]
 %e passage
+##
+# passages 9..13 added after 3.6.0's release
+##
+# pp. 20-21
+%passage 9
+Moist Von Lipwig had done some heavy work once and couldn't see any future
+in it, but he could look at it for hours, provided other people were doing
+it, of course, and clearly some of them liked what they were doing, and so
+he shrugged and felt happy that Crisp was happy being a handyman whilst
+Moist was happy not picking up anything that was heavier than a glass.
+After all, his work was unseen and depended on words, which were
+fortunately not very heavy and didn't need grease.  In his career as a
+crook they had served him well and now he felt somewhat smug at using them
+to the benefit of the citizenry.
+
+There was a difference between a banker and a crook, there really was, and
+although it was very, very teeny Moist felt that he should point out that
+it did exist and, besides, Lord Vetinari always had his eye on him.
+
+So everybody was happy and Moist went to work in very clean clothes and
+with a very clean conscience.
+
+  [Raising Steam, by Terry Pratchett]
+%e passage
+# p. 22
+%passage 10
+Harry, red-faced and impatient, looked over his desk and said to him, "Lad,
+time is money and I'm a busy man.  You told Nancy down on reception that
+you've got something I might like.  Now stop fidgeting and look me in the
+face square like.  If you're another chancer wanting to bamboozle me I'll
+have you down the Effing stairs(1) before you know it."
+
+(1) The wonderfully colored oak wood of the Effing Forest was much in
+demand for high-class joinery.
+
+  [Raising Steam, by Terry Pratchett]
+%e passage
+# p. 80
+%passage 11
+Moist knew about the zeitgeist, he tasted it in the wind, and sometimes it
+allowed him to play with it.  He understood it, and now it hinted at speed,
+escape, something wonderfully new, the very bones of the land awakening,
+and suddenly it seemed to cry out for motion, new horizons, faraway places,
+/anywhere that is not here/!  No doubt about it, the railway was going to
+turn coal into gold.
+
+  [Raising Steam, by Terry Pratchett]
+%e passage
+# p. 195 (passage starts mid-paragraph and ends mid-paragraph)
+%passage 12
+And the trouble with madness was that the mad didn't know they were mad.
+
+  [Raising Steam, by Terry Pratchett]
+%e passage
+# p. 284 (passage starts mid-paragraph; speaker is Cmdr Vimes of the Watch)
+%passage 13
+"[...]  That's the trouble, you see.  When you've had hatred on your tongue
+for such a long time, you don't know how to spit it out."
+
+  [Raising Steam, by Terry Pratchett]
+%e passage
 %e title
+#
+#
+#
 %title The Shepherd's Crown (1)
 %passage 1
 'It's an inconvenience, true enough, and I don't like it at all, but I
 know that you do it for everyone, Mister Death. Is there any other way?'
 
-NO, THERE ISN'T, I'M AFRAID. WE ARE ALL FLOATING IN THE WINDS OF TIME. 
-BUT YOUR CANDLE, MISTRESS WEATHERWAX, WILL FLICKER FOR SOME TIME BEFORE 
-IT GOES OUT -- A LITTLE REWARD FOR A LIFE WELL LIVED. FOR I CAN SEE THE 
-BALANCE AND YOU HAVE LEFT THE WORLD MUCH BETTER THAN YOU FOUND IT, AND 
-IF YOU ASK ME, said Death, NOBODY COULD DO ANY BETTER THAN THAT. . . 
+NO, THERE ISN'T, I'M AFRAID. WE ARE ALL FLOATING IN THE WINDS OF TIME.
+BUT YOUR CANDLE, MISTRESS WEATHERWAX, WILL FLICKER FOR SOME TIME BEFORE
+IT GOES OUT -- A LITTLE REWARD FOR A LIFE WELL LIVED. FOR I CAN SEE THE
+BALANCE AND YOU HAVE LEFT THE WORLD MUCH BETTER THAN YOU FOUND IT, AND
+IF YOU ASK ME, said Death, NOBODY COULD DO ANY BETTER THAN THAT...
 
   [The Shepherd's Crown, by Terry Pratchett]
 %e passage
 %e title
+#
 %e section
+#
 #-----------------------------------------------------
 # Used for interaction with Death.
 #
+# Death Quotes are always one line, and '%e passage' can be omitted.
+#
 %section Death
-%title Death Quotes (10)
+%title Death Quotes (31)
 %passage 1
 WHERE THE FIRST PRIMAL CELL WAS, THERE WAS I ALSO. WHERE MAN IS, THERE AM I.  WHEN THE LAST LIFE CRAWLS UNDER FREEZING STARS, THERE WILL I BE.
 %e passage
@@ -5446,5 +8340,76 @@ THERE IS ALWAYS TIME FOR ANOTHER LAST MINUTE.
 MUSTARD IS ALWAYS TRICKY.
 %passage 10
 PICKLES OF ALL SORTS DON'T SEEM TO MAKE IT.  I'M SORRY.
+# The Colour of Magic, p. 68 (Signet edition)
+%passage 11
+IT WON'T HURT A BIT.
+# p. 177
+%passage 12
+SHALL WE GO?
+# p. 251 (speaker is actually a demon named 'Scrofula' filling in for Death)
+%passage 13
+I HAVE COME FOR THEE.
+# The Light Fantastic, p. 52 (Signet edition; quote has quotation marks but
+#                             including them here wouldn't fit with the rest;
+#                             Death is addressing an elderly wizard who went
+#                             to extreme measures to hide himself [from Death])
+%passage 14
+DARK IN HERE, ISN'T IT?
+# Equal Rites, p. 14 (Signet edition; second sentence continues
+#                     'said the deep, heavy voice...')
+%passage 15
+THERE IS NO GOING BACK.  THERE IS NO GOING BACK.
+# p. 15 (contradicts later descriptions of Death as existing outside of time;
+#        presumably it's just intended as a colloquial expression)
+%passage 16
+I HAVEN'T GOT ALL DAY, YOU KNOW.
+# p. 15 (same page)
+%passage 17
+LIFE IS FOR THE LIVING.
+# Mort, p. 148 (Signet edition)
+%passage 18
+NO-ONE EVER WANTED TO TALK TO ME BEFORE.
+# p. 149
+%passage 19
+I HAVEN'T GOT A SINGLE FRIEND.  EVEN CATS FIND ME AMUSING.
+# Sourcery, p. 12 (Signet edition)
+%passage 20
+YOU'RE ONLY PUTTING OFF THE INEVITABLE.
+# Wyrd Sisters, p. 11 (ROC edition)
+%passage 21
+I SAID WAS.  IT'S CALLED THE PAST TENSE.  YOU'LL SOON GET USED TO IT.
+# p. 13
+%passage 22
+DON'T LET IT UPSET YOU.
+# Pyramids, p. 57 (ROC edition)
+%passage 23
+I CAN SEE THAT YOU HAVE GOT A LOT TO THINK ABOUT.
+# Eric, p. 134 (Harper Torch edition)
+%passage 24
+PERHAPS IT'S TIME TO CALL IT A DAY.
+# Moving Pictures, p. 260 (ROC edition)
+%passage 25
+I KNOW WHEN EVERYONE'S HAD ENOUGH.
+# Reaper Man, p. 10 (ROC edition)
+%passage 26
+I HAVE ALWAYS DONE MY DUTY AS I SAW FIT.
+# p. 18
+%passage 27
+I AM NOT KNOWN FOR MY SENSE OF FUN.
+# p. 160
+%passage 28
+I MEAN THAT THERE IS A TIME FOR EVERYONE TO DIE.
+# p. 227
+%passage 29
+JUST BECAUSE SOMETHING IS A METAPHORE DOESN'T MEAN IT CAN'T BE REAL.
+# p. 334
+%passage 30
+I AM ALWAYS ALONE.  BUT JUST NOW I WANT TO BE ALONE BY MYSELF.
+# Witches Abroad, p. 298 (Death's explanation why he didn't come for zombie 12
+#                         years earlier:  YOU STOPPED LIVING.  YOU NEVER DIED.)
+%passage 31
+I HAD AN APPOINTMENT WITH YOU TONIGHT.
 %e title
 %e section
+#
+#eof

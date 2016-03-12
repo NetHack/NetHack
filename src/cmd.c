@@ -1,4 +1,4 @@
-/* NetHack 3.6	cmd.c	$NHDT-Date: 1446975462 2015/11/08 09:37:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.206 $ */
+/* NetHack 3.6	cmd.c	$NHDT-Date: 1457207033 2016/03/05 19:43:53 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.220 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -107,7 +107,7 @@ extern int NDECL(dowield);            /**/
 extern int NDECL(dowieldquiver);      /**/
 extern int NDECL(dozap);              /**/
 extern int NDECL(doorganize);         /**/
-#endif                                /* DUMB */
+#endif /* DUMB */
 
 static int NDECL(dosuspend_core); /**/
 
@@ -122,6 +122,7 @@ STATIC_PTR int NDECL(dotravel);
 STATIC_PTR int NDECL(doterrain);
 STATIC_PTR int NDECL(wiz_wish);
 STATIC_PTR int NDECL(wiz_identify);
+STATIC_PTR int NDECL(wiz_intrinsic);
 STATIC_PTR int NDECL(wiz_map);
 STATIC_PTR int NDECL(wiz_genesis);
 STATIC_PTR int NDECL(wiz_where);
@@ -352,7 +353,7 @@ doextlist(VOID_ARGS)
     return 0;
 }
 
-#ifdef TTY_GRAPHICS
+#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
 #define MAX_EXT_CMD 50 /* Change if we ever have > 50 ext cmds */
 
 /*
@@ -1100,6 +1101,51 @@ wiz_smell(VOID_ARGS)
     return 0;
 }
 
+/* #wizinstrinsic command to set some intrinsics for testing */
+STATIC_PTR int
+wiz_intrinsic(VOID_ARGS)
+{
+    if (wizard) {
+        winid win;
+        anything any;
+        int i, n, accelerator;
+        menu_item *pick_list = (menu_item *) 0;
+
+        static const char *const intrinsics[] = {
+            "deafness",
+        };
+
+        win = create_nhwindow(NHW_MENU);
+        start_menu(win);
+        accelerator = 0;
+
+        for (i = 0; i < SIZE(intrinsics); ++i) {
+            accelerator = intrinsics[i][0];
+            any.a_int = i + 1;
+            add_menu(win, NO_GLYPH, &any, accelerator, 0, ATR_NONE, intrinsics[i], FALSE);
+        }
+        end_menu(win, "Which intrinsic?");
+        n = select_menu(win, PICK_ONE, &pick_list);
+        destroy_nhwindow(win);
+
+        if (n >= 1) {
+            i = pick_list[0].item.a_int-1;
+            free((genericptr_t) pick_list);
+        } else {
+            return 0;
+        }
+
+        if (!strcmp(intrinsics[i],"deafness")) {
+            You("go deaf.");
+            incr_itimeout(&HDeaf, 30);
+            context.botl = TRUE;
+        }
+    } else
+        pline("Unavailable command '%s'.",
+              visctrl((int) cmd_from_func(wiz_intrinsic)));
+    return 0;
+}
+
 /* #wizrumorcheck command - verify each rumor access */
 STATIC_PTR int
 wiz_rumor_check(VOID_ARGS)
@@ -1129,6 +1175,7 @@ doterrain(VOID_ARGS)
      *  a legend for the levl[][].typ codes dump
      */
     men = create_nhwindow(NHW_MENU);
+    start_menu(men);
     any = zeroany;
     any.a_int = 1;
     add_menu(men, NO_GLYPH, &any, 0, 0, ATR_NONE,
@@ -1975,7 +2022,7 @@ attributes_enlightenment(int unused_mode UNUSED, int final)
                                             : "certain monsters");
         you_are(buf, "");
     }
-    if (Warn_of_mon && context.warntype.speciesidx) {
+    if (Warn_of_mon && context.warntype.speciesidx >= LOW_PM) {
         Sprintf(buf, "aware of the presence of %s",
                 makeplural(mons[context.warntype.speciesidx].mname));
         you_are(buf, from_what(WARN_OF_MON));
@@ -2225,8 +2272,10 @@ attributes_enlightenment(int unused_mode UNUSED, int final)
         }
     }
 
-    /* named fruit debugging (doesn't really belong here...) */
-    if (wizard) {
+#ifdef DEBUG
+    /* named fruit debugging (doesn't really belong here...); to enable,
+       include 'fruit' in DEBUGFILES list (even though it isn't a file...) */
+    if (wizard && explicitdebug("fruit")) {
         int fcount = 0;
         struct fruit *f;
         char buf2[BUFSZ];
@@ -2240,6 +2289,7 @@ attributes_enlightenment(int unused_mode UNUSED, int final)
         Sprintf(buf, "%d", flags.made_fruit);
         enl_msg("The made fruit flag ", "is ", "was ", buf, "");
     }
+#endif
 
     {
         const char *p;
@@ -2706,6 +2756,7 @@ struct ext_func_tab extcmdlist[] = {
     { "force", "force a lock", doforce, FALSE },
     { "invoke", "invoke an object's powers", doinvoke, TRUE },
     { "jump", "jump to a location", dojump, FALSE },
+    { "kick", "kick something", dokick, FALSE },
     { "loot", "loot a box on the floor", doloot, FALSE },
     { "monster", "use a monster's special ability", domonability, TRUE },
     { "name", "name a monster or an object", docallcmd, TRUE },
@@ -2746,6 +2797,7 @@ struct ext_func_tab extcmdlist[] = {
     { (char *) 0, (char *) 0, donull, TRUE }, /* vanquished */
     { (char *) 0, (char *) 0, donull, TRUE }, /* vision */
     { (char *) 0, (char *) 0, donull, TRUE }, /* wizsmell */
+    { (char *) 0, (char *) 0, donull, TRUE }, /* wizintrinsic */
 #ifdef DEBUG
     { (char *) 0, (char *) 0, donull, TRUE }, /* wizdebug_traveldisplay */
     { (char *) 0, (char *) 0, donull, TRUE }, /* wizdebug_bury */
@@ -2775,6 +2827,7 @@ static const struct ext_func_tab debug_extcmdlist[] = {
     { "vanquished", "list vanquished monsters", dovanquished, TRUE },
     { "vision", "show vision array", wiz_show_vision, TRUE },
     { "wizsmell", "smell monster", wiz_smell, TRUE },
+    { "wizintrinsic", "set intrinsic", wiz_intrinsic, TRUE },
 #ifdef DEBUG
     { "wizdebug_traveldisplay", "wizard debug: toggle travel display",
       wiz_debug_cmd_traveldisplay, TRUE },
@@ -3347,15 +3400,8 @@ rhack(register char *cmd)
         register const struct func_tab *tlist;
         int res, NDECL((*func));
 
-#if 0
-        /* obsolete - scan through the cmdlist array looking for *cmd */
-        for (tlist = cmdlist; tlist->f_char; tlist++) {
-            if ((*cmd & 0xff) != (tlist->f_char & 0xff))
-                continue;
-#else
         /* current - use *cmd to directly index cmdlist array */
         if ((tlist = Cmd.commands[*cmd & 0xff]) != 0) {
-#endif
             if (u.uburied && !tlist->can_if_buried) {
                 You_cant("do that while you are buried!");
                 res = 0;
@@ -3378,23 +3424,13 @@ rhack(register char *cmd)
     }
 
     if (bad_command) {
-        char expcmd[10];
-        register char c, *cp = expcmd;
+        char expcmd[20]; /* we expect 'cmd' to point to 1 or 2 chars */
+        register char c;
 
-        while ((c = *cmd++) != '\0'
-               && (int) (cp - expcmd) < (int) (sizeof expcmd - 3)) {
-            if (c >= 040 && c < 0177) {
-                *cp++ = c;
-            } else if (c & 0200) {
-                *cp++ = 'M';
-                *cp++ = '-';
-                *cp++ = c & ~0200;
-            } else {
-                *cp++ = '^';
-                *cp++ = c ^ 0100;
-            }
-        }
-        *cp = '\0';
+        expcmd[0] = '\0';
+        while ((c = *cmd++) != '\0')
+            Strcat(expcmd, visctrl(c)); /* add 1..4 chars plus terminator */
+
         if (!prefix_seen || !iflags.cmdassist
             || !help_dir(0, "Invalid direction key!"))
             Norep("Unknown command '%s'.", expcmd);
@@ -3523,10 +3559,9 @@ retry:
         if (!index(quitchars, dirsym)) {
             help_requested = (dirsym == '?');
             if (help_requested || iflags.cmdassist) {
-                did_help =
-                    help_dir((s && *s == '^') ? dirsym : 0,
-                             help_requested ? (const char *) 0
-                                            : "Invalid direction key!");
+                did_help = help_dir((s && *s == '^') ? dirsym : 0,
+                                    help_requested ? (const char *) 0
+                                                  : "Invalid direction key!");
                 if (help_requested)
                     goto retry;
             }
@@ -3765,6 +3800,56 @@ click_to_cmd(int x, int y, int mod)
     return cmd;
 }
 
+char
+get_count(char *allowchars, char inkey, long maxcount, long *count)
+{
+    char qbuf[QBUFSZ];
+    int key;
+    long cnt = 0L;
+    boolean backspaced = FALSE;
+    /* this should be done in port code so that we have erase_char
+       and kill_char available; we can at least fake erase_char */
+#define STANDBY_erase_char '\177'
+
+    for (;;) {
+        if (inkey) {
+            key = inkey;
+            inkey = '\0';
+        } else
+            key = readchar();
+
+        if (digit(key)) {
+            cnt = 10L * cnt + (long) (key - '0');
+            if (cnt < 0)
+                cnt = 0;
+            else if (maxcount > 0 && cnt > maxcount)
+                cnt = maxcount;
+        } else if (cnt && (key == '\b' || key == STANDBY_erase_char)) {
+            cnt = cnt / 10;
+            backspaced = TRUE;
+        } else if (key == '\033') {
+            break;
+        } else if (!allowchars || index(allowchars, key)) {
+            *count = cnt;
+            break;
+        }
+
+        if (cnt > 9 || backspaced) {
+            clear_nhwindow(WIN_MESSAGE);
+            if (backspaced && !cnt) {
+                Sprintf(qbuf, "Count: ");
+            } else {
+                Sprintf(qbuf, "Count: %ld", cnt);
+                backspaced = FALSE;
+            }
+            pline1(qbuf);
+            mark_synch();
+        }
+    }
+    return key;
+}
+
+
 STATIC_OVL char *
 parse()
 {
@@ -3783,25 +3868,12 @@ parse()
 #ifdef ALTMETA
     alt_esc = iflags.altmeta; /* readchar() hack */
 #endif
-    if (!Cmd.num_pad || (foo = readchar()) == 'n')
-        for (;;) {
-            foo = readchar();
-            if (foo >= '0' && foo <= '9') {
-                multi = 10 * multi + foo - '0';
-                if (multi < 0 || multi >= LARGEST_INT)
-                    multi = LARGEST_INT;
-                if (multi > 9) {
-                    clear_nhwindow(WIN_MESSAGE);
-                    Sprintf(in_line, "Count: %d", multi);
-                    pline1(in_line);
-                    mark_synch();
-                }
-                last_multi = multi;
-                if (!multi && foo == '0')
-                    prezero = TRUE;
-            } else
-                break; /* not a digit */
-        }
+    if (!Cmd.num_pad || (foo = readchar()) == 'n') {
+        long tmpmulti = multi;
+
+        foo = get_count(NULL, '\0', LARGEST_INT, &tmpmulti);
+        last_multi = multi = tmpmulti;
+    }
 #ifdef ALTMETA
     alt_esc = FALSE; /* readchar() reset */
 #endif
@@ -4049,14 +4121,14 @@ yn_function(const char *query, const char *resp, char def)
     iflags.last_msg = PLNMSG_UNKNOWN; /* most recent pline is clobbered */
 
     /* maximum acceptable length is QBUFSZ-1 */
-    if (strlen(query) < QBUFSZ)
-        return (*windowprocs.win_yn_function)(query, resp, def);
-
-    /* caller shouldn't have passed anything this long */
-    paniclog("Query truncated: ", query);
-    (void) strncpy(qbuf, query, QBUFSZ - 1 - 3);
-    Strcpy(&qbuf[QBUFSZ - 1 - 3], "...");
-    return (*windowprocs.win_yn_function)(qbuf, resp, def);
+    if (strlen(query) >= QBUFSZ) {
+        /* caller shouldn't have passed anything this long */
+        paniclog("Query truncated: ", query);
+        (void) strncpy(qbuf, query, QBUFSZ - 1 - 3);
+        Strcpy(&qbuf[QBUFSZ - 1 - 3], "...");
+        query = qbuf;
+    }
+    return (*windowprocs.win_yn_function)(query, resp, def);
 }
 
 /* for paranoid_confirm:quit,die,attack prompting */

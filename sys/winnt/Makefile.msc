@@ -1,4 +1,4 @@
-# NetHack 3.6	Makefile.msc	$NHDT-Date: 1447992736 2015/11/20 04:12:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.100 $ */
+# NetHack 3.6	Makefile.msc	$NHDT-Date: 1451610993 2016/01/01 01:16:33 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.101 $ */
 #       Copyright (c) NetHack PC Development Team 1993-2015
 #
 #==============================================================================
@@ -192,7 +192,7 @@ ccommon= -c -nologo -D"_CONSOLE" -D"_CRT_NONSTDC_NO_DEPRECATE" -D"_CRT_SECURE_NO
 	-DCRTAPI1=_cdecl -DCRTAPI2=_cdecl -D"NDEBUG" -D"YY_NO_UNISTD_H" -EHsc -fp:precise -Gd -GF -GS -Gy \
 	$(CL2013) -WX- -Zc:forScope -Zc:wchar_t -Zi
 cdebug= -analyze- -D"_DEBUG" -Gm -MTd -RTC1 -Od
-crelease= -analyze- -D"_MBCS" -errorReport:prompt -GL -Gm- -MT -O2 -Ot -Ox -Oy
+crelease= -analyze- -D"_MBCS" -errorReport:prompt -Gm- -MT -O2 -Ot -Ox -Oy
 
 lcommon= /NOLOGO /INCREMENTAL:NO
 
@@ -201,7 +201,7 @@ ldebug = /DEBUG
 cflags1=$(ccommon) $(cdebug)
 lflags1=$(lcommon) $(ldebug)
 !ELSE
-ldebug=
+ldebug= /DEBUG
 cflags1=$(ccommon) $(crelease)
 lflags1=$(lcommon) $(ldebug)
 !ENDIF
@@ -806,14 +806,6 @@ $(INCL)\vis_tab.h: $(U)makedefs.exe
 $(SRC)\vis_tab.c: $(U)makedefs.exe
 	$(U)makedefs -z
 
-$(DAT)\engrave: $(DAT)\engrave.txt $(U)makedefs.exe
-	..\util\makedefs -s
-$(DAT)\epitaph: $(DAT)\epitaph.txt $(U)makedefs.exe
-	..\util\makedefs -s
-$(DAT)\bogusmon: $(DAT)\bogusmon.txt $(U)makedefs.exe
-	..\util\makedefs -s
-
-
 #==========================================
 # uudecode utility and uuencoded targets
 #==========================================
@@ -1268,6 +1260,15 @@ $(DAT)\quest.dat: $(O)utility.tag  $(DAT)\quest.txt
 
 $(DAT)\oracles: $(O)utility.tag    $(DAT)\oracles.txt
 	$(U)makedefs -h
+
+$(DAT)\engrave: $(DAT)\engrave.txt $(U)makedefs.exe
+	$(U)makedefs -s
+
+$(DAT)\epitaph: $(DAT)\epitaph.txt $(U)makedefs.exe
+	$(U)makedefs -s
+
+$(DAT)\bogusmon: $(DAT)\bogusmon.txt $(U)makedefs.exe
+	$(U)makedefs -s
 
 $(DAT)\dungeon: $(O)utility.tag  $(DAT)\dungeon.def
 	$(U)makedefs -e

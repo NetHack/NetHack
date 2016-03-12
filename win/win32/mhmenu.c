@@ -119,15 +119,7 @@ mswin_init_menu_window(int type)
     /* Set window caption */
     SetWindowText(ret, "Menu/Text");
 
-    if (!GetNHApp()->bWindowsLocked) {
-        DWORD style;
-        style = GetWindowLong(ret, GWL_STYLE);
-        style |= WS_CAPTION;
-        SetWindowLong(ret, GWL_STYLE, style);
-        SetWindowPos(ret, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE
-                                                | SWP_NOZORDER
-                                                | SWP_FRAMECHANGED);
-    }
+    mswin_apply_window_style(ret);
 
     SetMenuType(ret, type);
     return ret;
@@ -155,7 +147,7 @@ mswin_menu_window_select_menu(HWND hWnd, int how, MENU_ITEM_P **_selected,
         activate = TRUE;
     }
 
-    data->is_active = activate;
+    data->is_active = activate && !GetNHApp()->regNetHackMode;
 
     /* set menu type */
     SetMenuListType(hWnd, how);
@@ -177,7 +169,7 @@ mswin_menu_window_select_menu(HWND hWnd, int how, MENU_ITEM_P **_selected,
                     if (next_char > 'z')
                         next_char = 'A';
                     else if (next_char > 'Z')
-                        break;
+                        next_char = 'a';
 
                     data->menu.items[i].accelerator = next_char;
                 }
@@ -485,7 +477,12 @@ MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                                  : SYSCLR_TO_BRUSH(DEFAULT_COLOR_BG_TEXT));
         }
     }
-        return FALSE;
+    return FALSE;
+
+    case WM_CTLCOLORDLG:
+        return (INT_PTR)(text_bg_brush
+                            ? text_bg_brush
+                            : SYSCLR_TO_BRUSH(DEFAULT_COLOR_BG_TEXT));
 
     case WM_DESTROY:
         if (data) {
@@ -801,17 +798,17 @@ SetMenuListType(HWND hWnd, int how)
 
     switch (how) {
     case PICK_NONE:
-        dwStyles = WS_VISIBLE | WS_TABSTOP | WS_BORDER | WS_CHILD | WS_VSCROLL
+        dwStyles = WS_VISIBLE | WS_TABSTOP | WS_CHILD | WS_VSCROLL
                    | WS_HSCROLL | LVS_REPORT | LVS_OWNERDRAWFIXED
                    | LVS_SINGLESEL;
         break;
     case PICK_ONE:
-        dwStyles = WS_VISIBLE | WS_TABSTOP | WS_BORDER | WS_CHILD | WS_VSCROLL
+        dwStyles = WS_VISIBLE | WS_TABSTOP | WS_CHILD | WS_VSCROLL
                    | WS_HSCROLL | LVS_REPORT | LVS_OWNERDRAWFIXED
                    | LVS_SINGLESEL;
         break;
     case PICK_ANY:
-        dwStyles = WS_VISIBLE | WS_TABSTOP | WS_BORDER | WS_CHILD | WS_VSCROLL
+        dwStyles = WS_VISIBLE | WS_TABSTOP | WS_CHILD | WS_VSCROLL
                    | WS_HSCROLL | LVS_REPORT | LVS_OWNERDRAWFIXED
                    | LVS_SINGLESEL;
         break;
@@ -1024,7 +1021,8 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
 
             if (iflags.use_menu_color
                 && (menucolr = get_menu_coloring(item->str, &color, &attr))) {
-                /* TODO: use attr too */
+                SelectObject(lpdis->hDC, 
+                             mswin_get_font(NHW_MENU, attr, lpdis->hDC, FALSE));
                 if (color != NO_COLOR)
                     SetTextColor(lpdis->hDC, nhcolor_to_RGB(color));
             }
@@ -1444,7 +1442,11 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
         if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')
             || is_accelerator) {
             if (data->how == PICK_ANY || data->how == PICK_ONE) {
-                for (i = 0; i < data->menu.size; i++) {
+                topIndex = ListView_GetTopIndex(hwndList);
+                if( topIndex < 0 || topIndex > data->menu.size ) break; // impossible?
+                int iter = topIndex;
+                do {
+                    i = iter % data->menu.size;
                     if (data->menu.items[i].accelerator == ch) {
                         if (data->how == PICK_ANY) {
                             SelectMenuItem(
@@ -1462,7 +1464,7 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
                             return -2;
                         }
                     }
-                }
+                } while( (++iter % data->menu.size) != topIndex ); 
             }
         }
         break;

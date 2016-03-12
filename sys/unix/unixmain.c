@@ -612,11 +612,16 @@ check_user_string(char *optstr)
     struct passwd *pw = get_unix_pw();
     int pwlen;
     char *eop, *w;
+    char *pwname;
     if (optstr[0] == '*')
         return TRUE; /* allow any user */
     if (!pw)
         return FALSE;
-    pwlen = strlen(pw->pw_name);
+    if (sysopt.check_plname)
+        pwname = plname;
+    else
+        pwname = pw->pw_name;
+    pwlen = strlen(pwname);
     eop = eos(optstr);
     w = optstr;
     while (w + pwlen <= eop) {
@@ -626,7 +631,7 @@ check_user_string(char *optstr)
             w++;
             continue;
         }
-        if (!strncmp(w, pw->pw_name, pwlen)) {
+        if (!strncmp(w, pwname, pwlen)) {
             if (!w[pwlen] || isspace(w[pwlen]))
                 return TRUE;
         }

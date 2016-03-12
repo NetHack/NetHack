@@ -1,4 +1,4 @@
-/* NetHack 3.6	winmesg.c	$NHDT-Date: 1432512808 2015/05/25 00:13:28 $  $NHDT-Branch: master $:$NHDT-Revision: 1.9 $ */
+/* NetHack 3.6	winmesg.c	$NHDT-Date: 1454811935 2016/02/07 02:25:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.10 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -46,8 +46,11 @@ static void FDECL(get_gc, (Widget, struct mesg_info_t *));
 static void FDECL(mesg_resized, (Widget, XtPointer, XtPointer));
 
 static char mesg_translations[] = "#override\n\
- <Key>:		input()	\
-";
+ <Key>Left:     scroll(4)\n\
+ <Key>Right:    scroll(6)\n\
+ <Key>Up:       scroll(8)\n\
+ <Key>Down:     scroll(2)\n\
+ <Key>:         input()";
 
 /* Move the message window's vertical scrollbar's slider to the bottom. */
 void
@@ -77,7 +80,7 @@ create_message_window(struct xwindow *wp, /* window pointer */
     wp->type = NHW_MESSAGE;
 
     wp->mesg_information = mesg_info =
-        (struct mesg_info_t *) alloc(sizeof(struct mesg_info_t));
+        (struct mesg_info_t *) alloc(sizeof (struct mesg_info_t));
 
     mesg_info->fs = 0;
     mesg_info->num_lines = 0;
@@ -224,6 +227,7 @@ destroy_message_window(struct xwindow *wp)
 void
 display_message_window(struct xwindow *wp)
 {
+    set_message_slider(wp);
     if (wp->mesg_information->dirty)
         redraw_message_window(wp);
 }

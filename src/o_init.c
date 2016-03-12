@@ -1,4 +1,4 @@
-/* NetHack 3.6	o_init.c	$NHDT-Date: 1446892449 2015/11/07 10:34:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.20 $ */
+/* NetHack 3.6	o_init.c	$NHDT-Date: 1450318588 2015/12/17 02:16:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.22 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -425,11 +425,8 @@ dodiscovered() /* free after Robert Viduya */
 
     /* several classes are omitted from packorder; one is of interest here */
     Strcpy(classes, flags.inv_order);
-    if (!index(classes, VENOM_CLASS)) {
-        s = eos(classes);
-        *s++ = VENOM_CLASS;
-        *s = '\0';
-    }
+    if (!index(classes, VENOM_CLASS))
+        (void) strkitten(classes, VENOM_CLASS); /* append char to string */
 
     for (s = classes; *s; s++) {
         oclass = *s;
@@ -484,14 +481,17 @@ doclassdisco()
         discosyms[2 + MAXOCLASSES + 1], buf[BUFSZ];
     int i, ct, dis, xtras;
     boolean traditional;
-    winid tmpwin;
+    winid tmpwin = WIN_ERR;
     anything any;
     menu_item *pick_list = 0;
 
     discosyms[0] = '\0';
     traditional = (flags.menu_style == MENU_TRADITIONAL
                    || flags.menu_style == MENU_COMBINATION);
-    tmpwin = !traditional ? create_nhwindow(NHW_MENU) : WIN_ERR;
+    if (!traditional) {
+        tmpwin = create_nhwindow(NHW_MENU);
+        start_menu(tmpwin);
+    }
     any = zeroany;
     menulet = 'a';
 
@@ -521,7 +521,7 @@ doclassdisco()
        classes are omitted from packorder and one is of interest here */
     Strcpy(allclasses, flags.inv_order);
     if (!index(allclasses, VENOM_CLASS))
-        Sprintf(eos(allclasses), "%c", VENOM_CLASS);
+        (void) strkitten(allclasses, VENOM_CLASS); /* append char to string */
     /* construct discosyms[] */
     for (s = allclasses; *s; ++s) {
         oclass = *s;
@@ -559,8 +559,8 @@ doclassdisco()
             c = def_oc_syms[(int) *s].sym;
             if (!index(discosyms, c)) {
                 if (!xtras++)
-                    Sprintf(eos(discosyms), "%c", '\033');
-                Sprintf(eos(discosyms), "%c", c);
+                    (void) strkitten(discosyms, '\033');
+                (void) strkitten(discosyms, c);
             }
         }
         /* get the class (via its symbol character) */
@@ -675,8 +675,8 @@ rename_disco()
 
             if (oclass != prev_class) {
                 any.a_int = 0;
-                add_menu(tmpwin, NO_GLYPH, &any, ' ', iflags.menu_headings,
-                         ATR_NONE, let_to_name(oclass, FALSE, FALSE),
+                add_menu(tmpwin, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
+                         let_to_name(oclass, FALSE, FALSE),
                          MENU_UNSELECTED);
                 prev_class = oclass;
             }

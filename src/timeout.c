@@ -1,4 +1,4 @@
-/* NetHack 3.6	timeout.c	$NHDT-Date: 1446861771 2015/11/07 02:02:51 $  $NHDT-Branch: master $:$NHDT-Revision: 1.63 $ */
+/* NetHack 3.6	timeout.c	$NHDT-Date: 1456526165 2016/02/26 22:36:05 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.65 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -345,6 +345,7 @@ nh_timeout()
             case DEAF:
                 set_itimeout(&HDeaf, 1L);
                 make_deaf(0L, TRUE);
+                context.botl = TRUE;
                 if (!Deaf)
                     stop_occupation();
                 break;
@@ -441,6 +442,7 @@ fall_asleep(int how_long, boolean wakeup_msg)
         /* caller can follow with a direct call to Hear_again() if
            there's a need to override this when wakeup_msg is true */
         incr_itimeout(&HDeaf, how_long);
+        context.botl = TRUE;
         afternmv = Hear_again; /* this won't give any messages */
     }
     /* early wakeup from combat won't be possible until next monster turn */
@@ -605,14 +607,17 @@ hatch_egg(anything *arg, long timeout)
         case OBJ_MINVENT:
             if (cansee_hatchspot) {
                 /* egg carrying monster might be invisible */
-                if (canseemon(egg->ocarry)) {
+                mon2 = egg->ocarry;
+                if (canseemon(mon2)
+                    && (!mon2->wormno || cansee(mon2->mx, mon2->my))) {
                     Sprintf(carriedby, "%s pack",
-                            s_suffix(a_monnam(egg->ocarry)));
+                            s_suffix(a_monnam(mon2)));
                     knows_egg = TRUE;
-                } else if (is_pool(mon->mx, mon->my))
+                } else if (is_pool(mon->mx, mon->my)) {
                     Strcpy(carriedby, "empty water");
-                else
+                } else {
                     Strcpy(carriedby, "thin air");
+                }
                 You_see("%s %s out of %s!", monnambuf,
                         locomotion(mon->data, "drop"), carriedby);
             }
@@ -1268,6 +1273,7 @@ do_storms()
         /* Even if already deaf, we sense the thunder's vibrations. */
         pline("Kaboom!!!  Boom!!  Boom!!");
         incr_itimeout(&HDeaf, rn1(20, 30));
+        context.botl = TRUE;
         if (!u.uinvulnerable) {
             stop_occupation();
             nomul(-3);

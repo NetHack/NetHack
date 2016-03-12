@@ -1,4 +1,4 @@
-/* NetHack 3.6	dothrow.c	$NHDT-Date: 1446975465 2015/11/08 09:37:45 $  $NHDT-Branch: master $:$NHDT-Revision: 1.113 $ */
+/* NetHack 3.6	dothrow.c	$NHDT-Date: 1455140444 2016/02/10 21:40:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.118 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -16,7 +16,6 @@ STATIC_DCL void FDECL(check_shop_obj, (struct obj *, xchar, xchar,
                                        boolean));
 STATIC_DCL void FDECL(breakmsg, (struct obj *, boolean));
 STATIC_DCL boolean FDECL(toss_up, (struct obj *, boolean));
-STATIC_DCL boolean FDECL(throwing_weapon, (struct obj *));
 STATIC_DCL void FDECL(sho_obj_return_to_u, (struct obj * obj));
 STATIC_DCL boolean FDECL(mhurtle_step, (genericptr_t, int, int));
 
@@ -607,12 +606,30 @@ hurtle_step(genericptr_t arg, int x, int y)
         }
     }
 
+    /* Caller has already determined that dragging the ball is allowed */
+    if (Punished && uball->where == OBJ_FLOOR) {
+        int bc_control;
+        xchar ballx, bally, chainx, chainy;
+        boolean cause_delay;
+
+        if (drag_ball(x, y, &bc_control, &ballx, &bally, &chainx,
+                      &chainy, &cause_delay, TRUE))
+            move_bc(0, bc_control, ballx, bally, chainx, chainy);
+    }
+
     ox = u.ux;
     oy = u.uy;
     u_on_newpos(x, y); /* set u.<ux,uy>, u.usteed-><mx,my>; cliparound(); */
     newsym(ox, oy);    /* update old position */
     vision_recalc(1);  /* update for new position */
     flush_screen(1);
+
+    if (levl[x][y].typ == WATER && Is_waterlevel(&u.uz)) {
+        multi = 0;
+        drown();
+        return FALSE;
+    }
+
     /* FIXME:
      * Each trap should really trigger on the recoil if
      * it would trigger during normal movement. However,
@@ -923,7 +940,7 @@ toss_up(struct obj *obj, boolean hitsroof)
 }
 
 /* return true for weapon meant to be thrown; excludes ammo */
-STATIC_OVL boolean
+boolean
 throwing_weapon(struct obj *obj)
 {
     return (boolean) (is_missile(obj) || is_spear(obj)

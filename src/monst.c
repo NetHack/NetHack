@@ -1,4 +1,4 @@
-/* NetHack 3.6	monst.c	$NHDT-Date: 1445556875 2015/10/22 23:34:35 $  $NHDT-Branch: master $:$NHDT-Revision: 1.53 $ */
+/* NetHack 3.6	monst.c	$NHDT-Date: 1451084423 2015/12/25 23:00:23 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.55 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -28,17 +28,17 @@
 
 void NDECL(monst_init);
 /*
- *	Entry Format:		(from permonst.h)
+ *      Entry Format:   (from permonst.h)
  *
- *	name, symbol (S_* defines),
- *	difficulty level, move rate, armor class, magic resistance,
- *	alignment, creation/geno flags (G_* defines),
- *	6 * attack structs ( type , damage-type, # dice, # sides ),
- *	weight (WT_* defines), nutritional value, extension length,
- *	sounds made (MS_* defines), physical size (MZ_* defines),
- *	resistances, resistances conferred (both MR_* defines),
- *	3 * flag bitmaps (M1_*, M2_*, and M3_* defines respectively)
- *	symbol color (C(x) macro)
+ *      name, symbol (S_* defines),
+ *      difficulty level, move rate, armor class, magic resistance,
+ *      alignment, creation/geno flags (G_* defines),
+ *      6 * attack structs ( type , damage-type, # dice, # sides ),
+ *      weight (WT_* defines), nutritional value, extension length,
+ *      sounds made (MS_* defines), physical size (MZ_* defines),
+ *      resistances, resistances conferred (both MR_* defines),
+ *      3 * flag bitmaps (M1_*, M2_*, and M3_* defines respectively)
+ *      symbol color (C(x) macro)
  */
 #define MON(nam, sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, col) \
     {                                                                      \
@@ -59,37 +59,37 @@ void NDECL(monst_init);
     }
 
 /*
- *	Rule #1:	monsters of a given class are contiguous in the
- *			mons[] array.
+ *      Rule #1:        monsters of a given class are contiguous in the
+ *                      mons[] array.
  *
- *	Rule #2:	monsters of a given class are presented in ascending
- *			order of strength.
+ *      Rule #2:        monsters of a given class are presented in ascending
+ *                      order of strength.
  *
- *	Rule #3:	monster frequency is included in the geno mask;
- *			the frequency can be from 0 to 7.  0's will also
- *			be skipped during generation.
+ *      Rule #3:        monster frequency is included in the geno mask;
+ *                      the frequency can be from 0 to 7.  0's will also
+ *                      be skipped during generation.
  *
- *	Rule #4:	monster subclasses (e.g. giants) should be kept
- *			together, unless it violates Rule 2.  NOGEN monsters
- *			won't violate Rule 2.
+ *      Rule #4:        monster subclasses (e.g. giants) should be kept
+ *                      together, unless it violates Rule 2.  NOGEN monsters
+ *                      won't violate Rule 2.
  *
  * Guidelines for color assignment:
  *
- *	* Use the same color for all `growth stages' of a monster (ex.
- *	  little dog/big dog, baby naga/full-grown naga.
+ *      * Use the same color for all `growth stages' of a monster (ex.
+ *        little dog/big dog, baby naga/full-grown naga.
  *
- *	* Use colors given in names wherever possible. If the class has `real'
- *	  members with strong color associations, use those.
+ *      * Use colors given in names wherever possible. If the class has `real'
+ *        members with strong color associations, use those.
  *
- *	* Favor `cool' colors for cold-resistant monsters, `warm' ones for
- *	  fire-resistant ones.
+ *      * Favor `cool' colors for cold-resistant monsters, `warm' ones for
+ *        fire-resistant ones.
  *
- *	* Try to reserve purple (magenta) for powerful `ruler' monsters (queen
- *	  bee, kobold lord, &c.).
+ *      * Try to reserve purple (magenta) for powerful `ruler' monsters (queen
+ *        bee, kobold lord, &c.).
  *
- *	* Subject to all these constraints, try to use color to make as many
- *	  distinctions as the / command (that is, within a monster letter
- *	  distinct names should map to distinct colors).
+ *      * Subject to all these constraints, try to use color to make as many
+ *        distinctions as the / command (that is, within a monster letter
+ *        distinct names should map to distinct colors).
  *
  * The aim in assigning colors is to be consistent enough so a player can
  * become `intuitive' about them, deducing some or all of these rules
@@ -331,13 +331,13 @@ NEARDATA struct permonst mons[] = {
         M2_HOSTILE | M2_NEUTER, M3_INFRAVISIBLE, HI_ZAP),
 #if 0 /* not yet implemented */
     MON("beholder", S_EYE,
-	LVL(6, 3, 4, 0, -10), (G_GENO | 2),
-	A(ATTK(AT_GAZE, AD_SLOW, 0, 0), ATTK(AT_GAZE, AD_SLEE, 2,25),
-	  ATTK(AT_GAZE, AD_DISN, 0, 0), ATTK(AT_GAZE, AD_STON, 0, 0),
-	  ATTK(AT_GAZE, AD_CNCL, 2, 4), ATTK(AT_BITE, AD_PHYS, 2, 4)),
-	SIZ(10, 10, MS_SILENT, MZ_SMALL), MR_COLD, 0,
-	M1_FLY | M1_BREATHLESS | M1_NOLIMBS | M1_NOHEAD | M1_MINDLESS,
-	M2_NOPOLY | M2_HOSTILE | M2_NEUTER, M3_INFRAVISIBLE, CLR_BROWN),
+        LVL(6, 3, 4, 0, -10), (G_GENO | 2),
+        A(ATTK(AT_GAZE, AD_SLOW, 0, 0), ATTK(AT_GAZE, AD_SLEE, 2,25),
+          ATTK(AT_GAZE, AD_DISN, 0, 0), ATTK(AT_GAZE, AD_STON, 0, 0),
+          ATTK(AT_GAZE, AD_CNCL, 2, 4), ATTK(AT_BITE, AD_PHYS, 2, 4)),
+        SIZ(10, 10, MS_SILENT, MZ_SMALL), MR_COLD, 0,
+        M1_FLY | M1_BREATHLESS | M1_NOLIMBS | M1_NOHEAD | M1_MINDLESS,
+        M2_NOPOLY | M2_HOSTILE | M2_NEUTER, M3_INFRAVISIBLE, CLR_BROWN),
 #endif
     /*
      * felines
@@ -878,7 +878,7 @@ NEARDATA struct permonst mons[] = {
         M2_HOSTILE | M2_NEUTER, M3_INFRAVISIBLE, CLR_CYAN),
     MON("energy vortex", S_VORTEX, LVL(6, 20, 2, 30, 0),
         (G_GENO | G_NOCORPSE | 1),
-        A(ATTK(AT_ENGL, AD_ELEC, 1, 6), ATTK(AT_ENGL, AD_DREN, 4, 6),
+        A(ATTK(AT_ENGL, AD_ELEC, 1, 6), ATTK(AT_ENGL, AD_DREN, 2, 6),
           ATTK(AT_NONE, AD_ELEC, 0, 4), NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(0, 0, MS_SILENT, MZ_HUGE),
         MR_ELEC | MR_SLEEP | MR_DISINT | MR_POISON | MR_STONE, 0,
@@ -1104,12 +1104,12 @@ NEARDATA struct permonst mons[] = {
         M2_HOSTILE | M2_STRONG | M2_GREEDY | M2_JEWELS, 0, DRAGON_SILVER),
 #if 0 /* DEFERRED */
     MON("baby shimmering dragon", S_DRAGON,
-	LVL(12, 9, 2, 10, 0), G_GENO,
-	A(ATTK(AT_BITE, AD_PHYS, 2, 6),
-	  NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
-	SIZ(1500, 500, MS_ROAR, MZ_HUGE), 0, 0,
-	M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_CARNIVORE,
-	M2_HOSTILE | M2_STRONG | M2_GREEDY | M2_JEWELS, 0, CLR_CYAN),
+        LVL(12, 9, 2, 10, 0), G_GENO,
+        A(ATTK(AT_BITE, AD_PHYS, 2, 6),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(1500, 500, MS_ROAR, MZ_HUGE), 0, 0,
+        M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_CARNIVORE,
+        M2_HOSTILE | M2_STRONG | M2_GREEDY | M2_JEWELS, 0, CLR_CYAN),
 #endif
     MON("baby red dragon", S_DRAGON, LVL(12, 9, 2, 10, 0), G_GENO,
         A(ATTK(AT_BITE, AD_PHYS, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
@@ -1174,15 +1174,15 @@ NEARDATA struct permonst mons[] = {
         0, DRAGON_SILVER),
 #if 0 /* DEFERRED */
     MON("shimmering dragon", S_DRAGON,
-	LVL(15, 9, -1, 20, 4), (G_GENO | 1),
-	A(ATTK(AT_BREA, AD_MAGM, 4, 6), ATTK(AT_BITE, AD_PHYS, 3, 8),
-	  ATTK(AT_CLAW, AD_PHYS, 1, 4), ATTK(AT_CLAW, AD_PHYS, 1, 4),
-	  NO_ATTK, NO_ATTK),
-	SIZ(WT_DRAGON, 1500, MS_ROAR, MZ_GIGANTIC), 0, 0,
-	M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_SEE_INVIS | M1_OVIPAROUS
-	  | M1_CARNIVORE,
-	M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
-	0, CLR_CYAN),
+        LVL(15, 9, -1, 20, 4), (G_GENO | 1),
+        A(ATTK(AT_BREA, AD_MAGM, 4, 6), ATTK(AT_BITE, AD_PHYS, 3, 8),
+          ATTK(AT_CLAW, AD_PHYS, 1, 4), ATTK(AT_CLAW, AD_PHYS, 1, 4),
+          NO_ATTK, NO_ATTK),
+        SIZ(WT_DRAGON, 1500, MS_ROAR, MZ_GIGANTIC), 0, 0,
+        M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_SEE_INVIS | M1_OVIPAROUS
+          | M1_CARNIVORE,
+        M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
+        0, CLR_CYAN),
 #endif
     MON("red dragon", S_DRAGON, LVL(15, 9, -1, 20, -4), (G_GENO | 1),
         A(ATTK(AT_BREA, AD_FIRE, 6, 6), ATTK(AT_BITE, AD_PHYS, 3, 8),
@@ -1465,13 +1465,13 @@ struct permonst _mons2[] = {
         CLR_ORANGE),
 #if 0 /* DEFERRED */
     MON("vorpal jabberwock", S_JABBERWOCK,
-	LVL(20, 12, -2, 50, 0), (G_GENO | 1),
-	A(ATTK(AT_BITE, AD_PHYS, 3, 10), ATTK(AT_BITE, AD_PHYS, 3, 10),
-	  ATTK(AT_CLAW, AD_PHYS, 3, 10), ATTK(AT_CLAW, AD_PHYS, 3, 10),
-	  NO_ATTK, NO_ATTK),
-	SIZ(1300, 600, MS_BURBLE, MZ_LARGE), 0, 0,
-	M1_ANIMAL | M1_FLY | M1_CARNIVORE,
-	M2_HOSTILE | M2_STRONG | M2_NASTY | M2_COLLECT, M3_INFRAVISIBLE,
+        LVL(20, 12, -2, 50, 0), (G_GENO | 1),
+        A(ATTK(AT_BITE, AD_PHYS, 3, 10), ATTK(AT_BITE, AD_PHYS, 3, 10),
+          ATTK(AT_CLAW, AD_PHYS, 3, 10), ATTK(AT_CLAW, AD_PHYS, 3, 10),
+          NO_ATTK, NO_ATTK),
+        SIZ(1300, 600, MS_BURBLE, MZ_LARGE), 0, 0,
+        M1_ANIMAL | M1_FLY | M1_CARNIVORE,
+        M2_HOSTILE | M2_STRONG | M2_NASTY | M2_COLLECT, M3_INFRAVISIBLE,
         HI_LORD),
 #endif
     /*
@@ -1857,12 +1857,12 @@ struct permonst _mons2[] = {
         M3_INFRAVISIBLE, CLR_BLUE),
 #if 0 /* DEFERRED */
     MON("vampire mage", S_VAMPIRE,
-	LVL(20, 14, -4, 50, -9), (G_GENO | G_NOCORPSE | 1),
-	A(ATTK(AT_CLAW, AD_DRLI, 2, 8), ATTK(AT_BITE, AD_DRLI, 1, 8),
-	  ATTK(AT_MAGC, AD_SPEL, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK),
-	SIZ(WT_HUMAN, 400, MS_VAMPIRE, MZ_HUMAN), MR_SLEEP | MR_POISON, 0,
-	M1_FLY | M1_BREATHLESS | M1_HUMANOID | M1_POIS | M1_REGEN,
-	M2_UNDEAD | M2_STALK | M2_HOSTILE | M2_STRONG | M2_NASTY | M2_LORD
+        LVL(20, 14, -4, 50, -9), (G_GENO | G_NOCORPSE | 1),
+        A(ATTK(AT_CLAW, AD_DRLI, 2, 8), ATTK(AT_BITE, AD_DRLI, 1, 8),
+          ATTK(AT_MAGC, AD_SPEL, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(WT_HUMAN, 400, MS_VAMPIRE, MZ_HUMAN), MR_SLEEP | MR_POISON, 0,
+        M1_FLY | M1_BREATHLESS | M1_HUMANOID | M1_POIS | M1_REGEN,
+        M2_UNDEAD | M2_STALK | M2_HOSTILE | M2_STRONG | M2_NASTY | M2_LORD
           | M2_MALE | M2_MAGIC | M2_SHAPESHIFTER,
         M3_INFRAVISIBLE, HI_ZAP),
 #endif
@@ -2848,26 +2848,26 @@ struct permonst _mons2[] = {
             | M2_COLLECT | M2_MAGIC,
         M3_CLOSE | M3_INFRAVISIBLE, HI_LORD),
 #if 0 /* OBSOLETE */
-	/* Two for elves - one of each sex.
-	 */
+        /* Two for elves - one of each sex.
+         */
     MON("Earendil", S_HUMAN,
-	LVL(20, 12, 0, 50, -20), (G_NOGEN | G_UNIQ),
-	A(ATTK(AT_WEAP, AD_PHYS, 1, 8),
-	  NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
-	SIZ(WT_ELF, 350, MS_LEADER, MZ_HUMAN), MR_SLEEP, MR_SLEEP,
-	M1_HUMANOID | M1_SEE_INVIS | M1_OMNIVORE,
-	M2_NOPOLY | M2_ELF | M2_HUMAN | M2_PNAME | M2_PEACEFUL | M2_STRONG
+        LVL(20, 12, 0, 50, -20), (G_NOGEN | G_UNIQ),
+        A(ATTK(AT_WEAP, AD_PHYS, 1, 8),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(WT_ELF, 350, MS_LEADER, MZ_HUMAN), MR_SLEEP, MR_SLEEP,
+        M1_HUMANOID | M1_SEE_INVIS | M1_OMNIVORE,
+        M2_NOPOLY | M2_ELF | M2_HUMAN | M2_PNAME | M2_PEACEFUL | M2_STRONG
           | M2_MALE | M2_COLLECT | M2_MAGIC,
-	M3_CLOSE | M3_INFRAVISION | M3_INFRAVISIBLE, HI_LORD),
+        M3_CLOSE | M3_INFRAVISION | M3_INFRAVISIBLE, HI_LORD),
     MON("Elwing", S_HUMAN,
-	LVL(20, 12, 0, 50, -20), (G_NOGEN | G_UNIQ),
-	A(ATTK(AT_WEAP, AD_PHYS, 1, 8),
-	  NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
-	SIZ(WT_ELF, 350, MS_LEADER, MZ_HUMAN), MR_SLEEP, MR_SLEEP,
-	M1_HUMANOID | M1_SEE_INVIS | M1_OMNIVORE,
-	M2_NOPOLY | M2_ELF | M2_HUMAN | M2_PNAME | M2_PEACEFUL | M2_STRONG
+        LVL(20, 12, 0, 50, -20), (G_NOGEN | G_UNIQ),
+        A(ATTK(AT_WEAP, AD_PHYS, 1, 8),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(WT_ELF, 350, MS_LEADER, MZ_HUMAN), MR_SLEEP, MR_SLEEP,
+        M1_HUMANOID | M1_SEE_INVIS | M1_OMNIVORE,
+        M2_NOPOLY | M2_ELF | M2_HUMAN | M2_PNAME | M2_PEACEFUL | M2_STRONG
           | M2_FEMALE | M2_COLLECT | M2_MAGIC,
-	M3_CLOSE | M3_INFRAVISION | M3_INFRAVISIBLE, HI_LORD),
+        M3_CLOSE | M3_INFRAVISION | M3_INFRAVISIBLE, HI_LORD),
 #endif
     MON("Hippocrates", S_HUMAN, LVL(20, 12, 0, 40, 0), (G_NOGEN | G_UNIQ),
         A(ATTK(AT_WEAP, AD_PHYS, 1, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
@@ -3000,14 +3000,14 @@ struct permonst _mons2[] = {
         M3_WANTSARTI | M3_WAITFORU | M3_INFRAVISIBLE, HI_LORD),
 #if 0 /* OBSOLETE */
     MON("Goblin King", S_ORC,
-	LVL(15, 12, 10, 0, -15), (G_NOGEN | G_UNIQ),
-	A(ATTK(AT_WEAP, AD_PHYS, 2, 6), ATTK(AT_WEAP, AD_PHYS, 2, 6),
-	  ATTK(AT_CLAW, AD_SAMU, 1, 6), NO_ATTK, NO_ATTK, NO_ATTK),
-	SIZ(750, 350, MS_NEMESIS, MZ_HUMAN), 0, 0,
-	M1_HUMANOID | M1_OMNIVORE,
-	M2_NOPOLY | M2_ORC | M2_HOSTILE | M2_STRONG | M2_STALK | M2_NASTY
+        LVL(15, 12, 10, 0, -15), (G_NOGEN | G_UNIQ),
+        A(ATTK(AT_WEAP, AD_PHYS, 2, 6), ATTK(AT_WEAP, AD_PHYS, 2, 6),
+          ATTK(AT_CLAW, AD_SAMU, 1, 6), NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(750, 350, MS_NEMESIS, MZ_HUMAN), 0, 0,
+        M1_HUMANOID | M1_OMNIVORE,
+        M2_NOPOLY | M2_ORC | M2_HOSTILE | M2_STRONG | M2_STALK | M2_NASTY
           | M2_MALE | M2_GREEDY | M2_JEWELS | M2_COLLECT | M2_MAGIC,
-	M3_WANTSARTI | M3_WAITFORU | M3_INFRAVISION | M3_INFRAVISIBLE,
+        M3_WANTSARTI | M3_WAITFORU | M3_INFRAVISION | M3_INFRAVISIBLE,
         HI_LORD),
 #endif
     MON("Cyclops", S_GIANT, LVL(18, 12, 0, 0, -15), (G_NOGEN | G_UNIQ),
@@ -3126,13 +3126,13 @@ struct permonst _mons2[] = {
         M3_INFRAVISIBLE, HI_DOMESTIC),
 #if 0 /* OBSOLETE */
     MON("High-elf", S_HUMAN,
-	LVL(5, 12, 10, 10, -7), G_NOGEN,
-	A(ATTK(AT_WEAP, AD_PHYS, 2, 4), ATTK(AT_MAGC, AD_CLRC, 0, 0),
-	  NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
-	SIZ(WT_ELF, 350, MS_GUARDIAN, MZ_HUMAN), MR_SLEEP, MR_SLEEP,
-	M1_HUMANOID | M1_SEE_INVIS | M1_OMNIVORE,
-	M2_NOPOLY | M2_ELF | M2_PEACEFUL | M2_COLLECT,
-	M3_INFRAVISION | M3_INFRAVISIBLE, HI_DOMESTIC),
+        LVL(5, 12, 10, 10, -7), G_NOGEN,
+        A(ATTK(AT_WEAP, AD_PHYS, 2, 4), ATTK(AT_MAGC, AD_CLRC, 0, 0),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(WT_ELF, 350, MS_GUARDIAN, MZ_HUMAN), MR_SLEEP, MR_SLEEP,
+        M1_HUMANOID | M1_SEE_INVIS | M1_OMNIVORE,
+        M2_NOPOLY | M2_ELF | M2_PEACEFUL | M2_COLLECT,
+        M3_INFRAVISION | M3_INFRAVISIBLE, HI_DOMESTIC),
 #endif
     MON("attendant", S_HUMAN, LVL(5, 12, 10, 10, 3), G_NOGEN,
         A(ATTK(AT_WEAP, AD_PHYS, 1, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
@@ -3230,7 +3230,6 @@ monst_init()
 
 struct attack sa_yes[NATTK] = SEDUCTION_ATTACKS_YES;
 struct attack sa_no[NATTK] = SEDUCTION_ATTACKS_NO;
-
 #endif
 
 /*monst.c*/

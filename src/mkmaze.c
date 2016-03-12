@@ -19,7 +19,6 @@ STATIC_DCL void FDECL(maze0xy, (coord *));
 STATIC_DCL boolean FDECL(put_lregion_here, (xchar, xchar, xchar,
                                             xchar, xchar, xchar,
                                             xchar, boolean, d_level *));
-STATIC_DCL void NDECL(fixup_special);
 STATIC_DCL void NDECL(setup_waterlevel);
 STATIC_DCL void NDECL(unsetup_waterlevel);
 
@@ -118,34 +117,19 @@ extend_spine(int locale[3][3], int wall_there, int dx, int dy)
     return spine;
 }
 
-/*
- * Wall cleanup.  This function has two purposes: (1) remove walls that
- * are totally surrounded by stone - they are redundant.  (2) correct
- * the types so that they extend and connect to each other.
- */
+/* Remove walls totally surrounded by stone */
 void
-wallification(int x1, int y1, int x2, int y2)
+wall_cleanup(int x1, int y1, int x2, int y2)
 {
     uchar type;
     register int x, y;
     struct rm *lev;
-    int bits;
-    int locale[3][3]; /* rock or wall status surrounding positions */
-    /*
-     * Value 0 represents a free-standing wall.  It could be anything,
-     * so even though this table says VWALL, we actually leave whatever
-     * typ was there alone.
-     */
-    static xchar spine_array[16] = { VWALL, HWALL,    HWALL,    HWALL,
-                                     VWALL, TRCORNER, TLCORNER, TDWALL,
-                                     VWALL, BRCORNER, BLCORNER, TUWALL,
-                                     VWALL, TLWALL,   TRWALL,   CROSSWALL };
 
     /* sanity check on incoming variables */
     if (x1 < 0 || x2 >= COLNO || x1 > x2 || y1 < 0 || y2 >= ROWNO || y1 > y2)
-        panic("wallification: bad bounds (%d,%d) to (%d,%d)", x1, y1, x2, y2);
+        panic("wall_cleanup: bad bounds (%d,%d) to (%d,%d)", x1, y1, x2, y2);
 
-    /* Step 1: change walls surrounded by rock to rock. */
+    /* change walls surrounded by rock to rock. */
     for (x = x1; x <= x2; x++)
         for (y = y1; y <= y2; y++) {
             lev = &levl[x][y];
@@ -158,12 +142,34 @@ wallification(int x1, int y1, int x2, int y2)
                     lev->typ = STONE;
             }
         }
+}
+
+/* Correct wall types so they extend and connect to each other */
+void
+fix_wall_spines(x1, y1, x2, y2)
+int x1, y1, x2, y2;
+{
+    uchar type;
+    register int x,y;
+    struct rm *lev;
+    int bits;
+    int locale[3][3];	/* rock or wall status surrounding positions */
 
     /*
-     * Step 2: set the correct wall type.  We can't combine steps
-     * 1 and 2 into a single sweep because we depend on knowing if
-     * the surrounding positions are stone.
+     * Value 0 represents a free-standing wall.  It could be anything,
+     * so even though this table says VWALL, we actually leave whatever
+     * typ was there alone.
      */
+    static xchar spine_array[16] = { VWALL, HWALL,    HWALL,    HWALL,
+                                     VWALL, TRCORNER, TLCORNER, TDWALL,
+                                     VWALL, BRCORNER, BLCORNER, TUWALL,
+                                     VWALL, TLWALL,   TRWALL,   CROSSWALL };
+
+    /* sanity check on incoming variables */
+    if (x1<0 || x2>=COLNO || x1>x2 || y1<0 || y2>=ROWNO || y1>y2)
+        panic("wall_extends: bad bounds (%d,%d) to (%d,%d)",x1,y1,x2,y2);
+
+    /* set the correct wall type. */
     for (x = x1; x <= x2; x++)
         for (y = y1; y <= y2; y++) {
             lev = &levl[x][y];
@@ -193,6 +199,14 @@ wallification(int x1, int y1, int x2, int y2)
             if (bits)
                 lev->typ = spine_array[bits];
         }
+}
+
+void
+wallification(x1, y1, x2, y2)
+int x1, y1, x2, y2;
+{
+    wall_cleanup(x1,y1,x2,y2);
+    fix_wall_spines(x1,y1,x2,y2);
 }
 
 STATIC_OVL boolean
@@ -328,7 +342,7 @@ put_lregion_here(xchar x, xchar y, xchar nlx, xchar nly, xchar nhx, xchar nhy, x
 static boolean was_waterlevel; /* ugh... this shouldn't be needed */
 
 /* this is special stuff that the level compiler cannot (yet) handle */
-STATIC_OVL void
+void
 fixup_special()
 {
     register lev_region *r = lregions;
@@ -542,7 +556,6 @@ makemaz(register const char *s)
     if (*protofile) {
         Strcat(protofile, LEV_EXT);
         if (load_special(protofile)) {
-            fixup_special();
             /* some levels can end up with monsters
                on dead mon list, including light source monsters */
             dmonsfree();

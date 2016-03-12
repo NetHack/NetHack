@@ -1,4 +1,4 @@
-/* NetHack 3.6	mswproc.c	$NHDT-Date: 1449116670 2015/12/03 04:24:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.94 $ */
+/* NetHack 3.6	mswproc.c	$NHDT-Date: 1451611595 2016/01/01 01:26:35 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.98 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -12,6 +12,7 @@
 #include "func_tab.h" /* for extended commands */
 #include "winMS.h"
 #include <assert.h>
+#include <mmsystem.h>
 #include "mhmap.h"
 #include "mhstatus.h"
 #include "mhtext.h"
@@ -36,7 +37,9 @@
 static FILE* _s_debugfp = NULL;
 extern void logDebug(const char *fmt, ...);
 # endif
-#else
+#endif
+
+#ifndef _DEBUG
 void
 logDebug(const char *fmt, ...)
 {
@@ -207,7 +210,7 @@ mswin_init_nhwindows(int *argc, char **argv)
      */
     iflags.toptenwin = 1;
     set_option_mod_status("toptenwin", SET_IN_FILE);
-    set_option_mod_status("perm_invent", SET_IN_FILE);
+    //set_option_mod_status("perm_invent", SET_IN_FILE);
 
     /* initialize map tiles bitmap */
     initMapTiles();
@@ -1640,6 +1643,8 @@ mswin_getlin(const char *question, char *input)
                     if (len > 0)
                         len--;
                     input[len] = '\0';
+                } else if (len>=(BUFSZ-1)) {
+                    PlaySound((LPCSTR)SND_ALIAS_SYSTEMEXCLAMATION, NULL, SND_ALIAS_ID|SND_ASYNC);
                 } else {
                     input[len++] = c;
                     input[len] = '\0';
@@ -1842,7 +1847,7 @@ mswin_outrip(winid wid, int how, time_t when)
     putstr(wid, 0, buf);
 
     /* Put together death description */
-    formatkiller(buf, sizeof buf, how);
+    formatkiller(buf, sizeof buf, how, FALSE);
 
     /* Put death type on stone */
     putstr(wid, 0, buf);
@@ -1973,6 +1978,11 @@ mswin_preference_update(const char *pref)
     if (stricmp(pref, "vary_msgcount") == 0) {
         InvalidateRect(mswin_hwnd_from_winid(WIN_MESSAGE), NULL, TRUE);
         mswin_layout_main_window(NULL);
+        return;
+    }
+
+    if (stricmp(pref, "perm_invent") == 0) {
+        mswin_update_inventory();
         return;
     }
 }
@@ -2219,7 +2229,7 @@ logDebug(const char *fmt, ...)
 /* Reading and writing settings from the registry. */
 #define CATEGORYKEY "Software"
 #define COMPANYKEY "NetHack"
-#define PRODUCTKEY "NetHack 3.6.0"
+#define PRODUCTKEY "NetHack 3.6.1"
 #define SETTINGSKEY "Settings"
 #define MAINSHOWSTATEKEY "MainShowState"
 #define MAINMINXKEY "MainMinX"
@@ -2274,7 +2284,7 @@ mswin_read_reg()
        is
        read from the registry, so these defaults apply. */
     GetNHApp()->saveRegistrySettings = 1; /* Normally, we always save */
-    GetNHApp()->regNetHackMode = 0;
+    GetNHApp()->regNetHackMode = TRUE;
 
     if (RegOpenKeyEx(HKEY_CURRENT_USER, keystring, 0, KEY_READ, &key)
         != ERROR_SUCCESS)
@@ -2814,18 +2824,23 @@ status_update(int fldindex, genericptr_t ptr, int chg, int percentage)
                 -- ptr is usually a "char *", unless fldindex is BL_CONDITION.
                    If fldindex is BL_CONDITION, then ptr is a long value with
                    any or none of the following bits set (from botl.h):
-                        BL_MASK_BLIND		0x00000001L
-                        BL_MASK_CONF		0x00000002L
-                        BL_MASK_FOODPOIS	0x00000004L
-                        BL_MASK_ILL		0x00000008L
-                        BL_MASK_HALLU		0x00000010L
-                        BL_MASK_STUNNED		0x00000020L
-                        BL_MASK_SLIMED		0x00000040L
-                -- The value passed for BL_GOLD includes a leading
-                   symbol for GOLD "$:nnn". If the window port needs to use
-                   the textual gold amount without the leading "$:" the port
-                   will have to add 2 to the passed "ptr" for the BL_GOLD
-case.
+                        BL_MASK_STONE           0x00000001L
+                        BL_MASK_SLIME           0x00000002L
+                        BL_MASK_STRNGL          0x00000004L
+                        BL_MASK_FOODPOIS        0x00000008L
+                        BL_MASK_TERMILL         0x00000010L
+                        BL_MASK_BLIND           0x00000020L
+                        BL_MASK_DEAF            0x00000040L
+                        BL_MASK_STUN            0x00000080L
+                        BL_MASK_CONF            0x00000100L
+                        BL_MASK_HALLU           0x00000200L
+                        BL_MASK_LEV             0x00000400L
+                        BL_MASK_FLY             0x00000800L
+                        BL_MASK_RIDE            0x00001000L
+                -- The value passed for BL_GOLD includes an encoded leading
+                   symbol for GOLD "\GXXXXNNNN:nnn". If window port needs
+                   textual gold amount without the leading "$:" the port will
+                   have to skip past ':' in passed "ptr" for the BL_GOLD case.
 */
 void
 mswin_status_update(int idx, genericptr_t ptr, int chg, int percent)
@@ -2846,20 +2861,32 @@ mswin_status_update(int idx, genericptr_t ptr, int chg, int percent)
         case BL_CONDITION: {
             cond = *condptr;
             *_status_vals[idx] = '\0';
-            if (cond & BL_MASK_BLIND)
-                Strcat(_status_vals[idx], " Blind");
-            if (cond & BL_MASK_CONF)
-                Strcat(_status_vals[idx], " Conf");
+            if (cond & BL_MASK_STONE)
+                Strcat(_status_vals[idx], " Stone");
+            if (cond & BL_MASK_SLIME)
+                Strcat(_status_vals[idx], " Slime");
+            if (cond & BL_MASK_STRNGL)
+                Strcat(_status_vals[idx], " Strngl");
             if (cond & BL_MASK_FOODPOIS)
                 Strcat(_status_vals[idx], " FoodPois");
-            if (cond & BL_MASK_ILL)
-                Strcat(_status_vals[idx], " Ill");
-            if (cond & BL_MASK_STUNNED)
+            if (cond & BL_MASK_TERMILL)
+                Strcat(_status_vals[idx], " TermIll");
+            if (cond & BL_MASK_BLIND)
+                Strcat(_status_vals[idx], " Blind");
+            if (cond & BL_MASK_DEAF)
+                Strcat(_status_vals[idx], " Deaf");
+            if (cond & BL_MASK_STUN)
                 Strcat(_status_vals[idx], " Stun");
+            if (cond & BL_MASK_CONF)
+                Strcat(_status_vals[idx], " Conf");
             if (cond & BL_MASK_HALLU)
                 Strcat(_status_vals[idx], " Hallu");
-            if (cond & BL_MASK_SLIMED)
-                Strcat(_status_vals[idx], " Slime");
+            if (cond & BL_MASK_LEV)
+                Strcat(_status_vals[idx], " Lev");
+            if (cond & BL_MASK_FLY)
+                Strcat(_status_vals[idx], " Fly");
+            if (cond & BL_MASK_RIDE)
+                Strcat(_status_vals[idx], " Ride");
             value = cond;
         } break;
         case BL_GOLD: {

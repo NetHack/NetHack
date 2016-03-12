@@ -1,4 +1,4 @@
-/* NetHack 3.6	flag.h	$NHDT-Date: 1435002669 2015/06/22 19:51:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.89 $ */
+/* NetHack 3.6	flag.h	$NHDT-Date: 1457207000 2016/03/05 19:43:20 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.101 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -167,6 +167,12 @@ struct sysflag {
  *
  */
 
+/* values for iflags.getpos_coords */
+#define GPCOORDS_NONE    'n'
+#define GPCOORDS_MAP     'm'
+#define GPCOORDS_COMPASS 'c'
+#define GPCOORDS_SCREEN  's'
+
 struct instance_flags {
     /* stuff that really isn't option or platform related. They are
      * set and cleared during the game to control the internal
@@ -185,6 +191,7 @@ struct instance_flags {
     boolean mon_polycontrol; /* debug: control monster polymorphs */
     /* stuff that is related to options and/or user or platform preferences */
     unsigned msg_history; /* hint: # of top lines to save */
+    int getpos_coords;    /* show coordinates when getting cursor position */
     int menu_headings;    /* ATR for menu headings */
     int *opt_booldup;     /* for duplication of boolean opts in config file */
     int *opt_compdup; /* for duplication of compound opts in config file */
@@ -199,6 +206,7 @@ struct instance_flags {
     boolean mention_walls;    /* give feedback when bumping walls */
     boolean menu_tab_sep;     /* Use tabs to separate option menu fields */
     boolean menu_head_objsym; /* Show obj symbol in menu headings */
+    boolean menu_overlay;     /* Draw menus over the map */
     boolean menu_requested;   /* Flag for overloaded use of 'm' prefix
                                * on some non-move commands */
     boolean renameallowed;    /* can change hero name during role selection */
@@ -212,6 +220,7 @@ struct instance_flags {
     boolean use_status_hilites;   /* use color in status line */
     boolean use_background_glyph; /* use background glyph when appropriate */
     boolean hilite_pile;          /* mark piles of objects with a hilite */
+    boolean autodescribe;     /* autodescribe mode in getpos() */
 #if 0
 	boolean  DECgraphics;	/* use DEC VT-xxx extended character set */
 	boolean  IBMgraphics;	/* use IBM extended character set */
@@ -252,12 +261,18 @@ struct instance_flags {
 #ifdef MSDOS
     boolean hasvga; /* has a vga adapter */
     boolean usevga; /* use the vga adapter */
+    boolean hasvesa; /* has a VESA-capable VGA adapter */
+    boolean usevesa; /* use the VESA-capable VGA adapter */
     boolean grmode; /* currently in graphics mode */
 #endif
 #ifdef LAN_FEATURES
     boolean lan_mail;         /* mail is initialized */
     boolean lan_mail_fetched; /* mail is awaiting display */
 #endif
+#ifdef TTY_TILES_ESCCODES
+    boolean vt_tiledata;     /* output console codes for tile support in TTY */
+#endif
+    boolean wizweight;        /* display weight of everything in wizard mode */
     /*
      * Window capability support.
      */
@@ -350,11 +365,18 @@ extern NEARDATA struct sysflag sysflags;
 extern NEARDATA struct instance_flags iflags;
 
 /* last_msg values */
-#define PLNMSG_UNKNOWN 0             /* arbitrary */
-#define PLNMSG_ONE_ITEM_HERE 1       /* "you see <single item> here" */
-#define PLNMSG_TOWER_OF_FLAME 2      /* scroll of fire */
+#define PLNMSG_UNKNOWN             0 /* arbitrary */
+#define PLNMSG_ONE_ITEM_HERE       1 /* "you see <single item> here" */
+#define PLNMSG_TOWER_OF_FLAME      2 /* scroll of fire */
 #define PLNMSG_CAUGHT_IN_EXPLOSION 3 /* explode() feedback */
-#define PLNMSG_OBJ_GLOWS 4           /* "the <obj> glows <color>" */
+#define PLNMSG_OBJ_GLOWS           4 /* "the <obj> glows <color>" */
+    /* Usage:
+     *  pline("some message");
+     *    pline: vsprintf + putstr + iflags.last_msg = PLNMSG_UNKNOWN;
+     *  iflags.last_msg = PLNMSG_some_message;
+     * and subsequent code can adjust the next message if it is affected
+     * by some_message.  The next message will clear iflags.last_msg.
+     */
 
 /* runmode options */
 #define RUN_TPORT 0 /* don't update display until movement stops */

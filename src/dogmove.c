@@ -1,4 +1,4 @@
-/* NetHack 3.6	dogmove.c	$NHDT-Date: 1446604109 2015/11/04 02:28:29 $  $NHDT-Branch: master $:$NHDT-Revision: 1.56 $ */
+/* NetHack 3.6	dogmove.c	$NHDT-Date: 1450061092 2015/12/14 02:44:52 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.57 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -395,9 +395,10 @@ dog_invent(register struct monst *mtmp, register struct edog *edog, int udist)
     omx = mtmp->mx;
     omy = mtmp->my;
 
-    /* if we are carrying something then we drop it (perhaps near @) */
-    /* Note: if apport == 1 then our behaviour is independent of udist */
-    /* Use udist+1 so steed won't cause divide by zero */
+    /* If we are carrying something then we drop it (perhaps near @).
+     * Note: if apport == 1 then our behaviour is independent of udist.
+     * Use udist+1 so steed won't cause divide by zero.
+     */
     if (droppables(mtmp)) {
         if (!rn2(udist + 1) || !rn2(edog->apport))
             if (rn2(10) < edog->apport) {
@@ -449,7 +450,7 @@ dog_invent(register struct monst *mtmp, register struct edog *edog, int udist)
     return 0;
 }
 
-/* set dog's goal -- gtyp, gx, gy
+/* set dog's goal -- gtyp, gx, gy;
    returns -1/0/1 (dog's desire to approach player) or -2 (abort move) */
 STATIC_OVL int
 dog_goal(register struct monst *mtmp, struct edog *edog, int after, int udist, int whappr)
@@ -599,7 +600,7 @@ dog_goal(register struct monst *mtmp, struct edog *edog, int after, int udist, i
 /* return 0 (no move), 1 (move) or 2 (dead) */
 int
 dog_move(register struct monst *mtmp,
-         register int after) /* this is extra fast monster movement */
+         int after) /* this is extra fast monster movement */
 {
     int omx, omy; /* original mtmp position */
     int appr, whappr, udist;
@@ -780,6 +781,7 @@ dog_move(register struct monst *mtmp,
             && better_with_displacing && !undesirable_disp(mtmp, nx, ny)) {
             int mstatus;
             register struct monst *mtmp2 = m_at(nx, ny);
+
             mstatus = mdisplacem(mtmp, mtmp2, FALSE); /* displace monster */
             if (mstatus & MM_DEF_DIED)
                 return 2;
@@ -800,12 +802,13 @@ dog_move(register struct monst *mtmp,
                 if (mtmp->mleashed) {
                     if (!Deaf)
                         whimper(mtmp);
-                } else
+                } else {
                     /* 1/40 chance of stepping on it anyway, in case
                      * it has to pass one to follow the player...
                      */
                     if (trap->tseen && rn2(40))
-                    continue;
+                        continue;
+                }
             }
         }
 
@@ -813,9 +816,9 @@ dog_move(register struct monst *mtmp,
         /* (minion isn't interested; `cursemsg' stays FALSE) */
         if (has_edog)
             for (obj = level.objects[nx][ny]; obj; obj = obj->nexthere) {
-                if (obj->cursed)
+                if (obj->cursed) {
                     cursemsg[i] = TRUE;
-                else if ((otyp = dogfood(mtmp, obj)) < MANFOOD
+                } else if ((otyp = dogfood(mtmp, obj)) < MANFOOD
                          && (otyp < ACCFOOD
                              || edog->hungrytime <= monstermoves)) {
                     /* Note: our dog likes the food so much that he
@@ -892,13 +895,23 @@ newdogpos:
         wasseen = canseemon(mtmp);
         remove_monster(omx, omy);
         place_monster(mtmp, nix, niy);
-        if (cursemsg[chi] && (wasseen || canseemon(mtmp)))
-            pline("%s moves only reluctantly.", noit_Monnam(mtmp));
+        if (cursemsg[chi] && (wasseen || canseemon(mtmp))) {
+            /* describe top item of pile, not necessarily cursed item itself;
+               don't use glyph_at() here--it would return the pet but we want
+               to know whether an object is remembered at this map location */
+            struct obj *o = (!Hallucination
+                             && glyph_is_object(levl[nix][niy].glyph))
+                               ? vobj_at(nix, niy) : 0;
+            const char *what = o ? distant_name(o, doname) : something;
+
+            pline("%s %s reluctantly over %s.", noit_Monnam(mtmp),
+                  vtense((char *) 0, locomotion(mtmp->data, "step")), what);
+        }
         for (j = MTSZ - 1; j > 0; j--)
             mtmp->mtrack[j] = mtmp->mtrack[j - 1];
         mtmp->mtrack[0].x = omx;
         mtmp->mtrack[0].y = omy;
-        /* We have to know if the pet's gonna do a combined eat and
+        /* We have to know if the pet's going to do a combined eat and
          * move before moving it, but it can't eat until after being
          * moved.  Thus the do_eat flag.
          */
@@ -994,7 +1007,7 @@ can_reach_location(struct monst *mon, xchar mx, xchar my, xchar fx, xchar fy)
     return FALSE;
 }
 
-/*ARGSUSED*/ /* do_clear_area client */
+/* do_clear_area client */
 STATIC_PTR void
 wantdoor(int x, int y, genericptr_t distance)
 {
@@ -1072,8 +1085,8 @@ quickmimic(struct monst *mtmp)
            (on the other hand, perhaps you're sensing a brief glimpse
            of its mind as it changes form) */
         newsym(mtmp->mx, mtmp->my);
-        You("%s %s appear where %s was!",
-            cansee(mtmp->mx, mtmp->my) ? "see" : "sense",
+        You("%s %s %sappear%s where %s was!",
+            cansee(mtmp->mx, mtmp->my) ? "see" : "sense that",
             (mtmp->m_ap_type == M_AP_FURNITURE)
                 ? an(defsyms[mtmp->mappearance].explanation)
                 : (mtmp->m_ap_type == M_AP_OBJECT
@@ -1085,6 +1098,8 @@ quickmimic(struct monst *mtmp)
                             : (mtmp->m_ap_type == M_AP_MONSTER)
                                   ? an(mons[mtmp->mappearance].mname)
                                   : something,
+            cansee(mtmp->mx, mtmp->my) ? "" : "has ",
+            cansee(mtmp->mx, mtmp->my) ? "" : "ed",
             buf);
         display_nhwindow(WIN_MAP, TRUE);
     }

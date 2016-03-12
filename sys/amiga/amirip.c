@@ -1,4 +1,4 @@
-/* NetHack 3.6	amirip.c	$NHDT-Date: 1432512795 2015/05/25 00:13:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $ */
+/* NetHack 3.6	amirip.c	$NHDT-Date: 1450453302 2015/12/18 15:41:42 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.16 $ */
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland 1991,1992,1993,1995,1996.
  */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -158,7 +158,7 @@ amii_outrip(winid tmpwin, int how, time_t when)
               0xc0, 0xff, NULL);
 
     /* Put together death description */
-    formatkiller(buf, sizeof buf, how);
+    formatkiller(buf, sizeof buf, how, FALSE);
 
     tw = TextLength(rp, buf, STONE_LINE_LEN) + 40;
 
@@ -193,7 +193,7 @@ amii_outrip(winid tmpwin, int how, time_t when)
     tomb_text(buf);
 
     /* Put together death description */
-    formatkiller(buf, sizeof buf, how);
+    formatkiller(buf, sizeof buf, how, FALSE);
 
     /* Put death type on stone */
     for (line = DEATH_LINE, dpx = buf; line < YEAR_LINE; line++) {

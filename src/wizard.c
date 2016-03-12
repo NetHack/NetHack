@@ -1,4 +1,4 @@
-/* NetHack 3.6	wizard.c	$NHDT-Date: 1446078768 2015/10/29 00:32:48 $  $NHDT-Branch: master $:$NHDT-Revision: 1.42 $ */
+/* NetHack 3.6	wizard.c	$NHDT-Date: 1456618999 2016/02/28 00:23:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.48 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -20,21 +20,37 @@ STATIC_DCL boolean FDECL(you_have, (int));
 STATIC_DCL unsigned long FDECL(target_on, (int, struct monst *));
 STATIC_DCL unsigned long FDECL(strategy, (struct monst *));
 
+/* adding more neutral creatures will tend to reduce the number of monsters
+   summoned by nasty(); adding more lawful creatures will reduce the number
+   of monsters summoned by lawfuls; adding more chaotic creatures will reduce
+   the number of monsters summoned by chaotics; prior to 3.6.1, there were
+   only four lawful candidates, so lawful summoners tended to summon more
+   (trying to get lawful or neutral but obtaining chaotic instead) than
+   their chaotic counterparts */
 static NEARDATA const int nasties[] = {
-    PM_COCKATRICE, PM_ETTIN, PM_STALKER, PM_MINOTAUR, PM_RED_DRAGON,
-    PM_BLACK_DRAGON, PM_GREEN_DRAGON, PM_OWLBEAR, PM_PURPLE_WORM,
-    PM_ROCK_TROLL, PM_XAN, PM_GREMLIN, PM_UMBER_HULK, PM_VAMPIRE_LORD,
-    PM_XORN, PM_ZRUTY, PM_ELF_LORD, PM_ELVENKING, PM_YELLOW_DRAGON,
-    PM_LEOCROTTA, PM_BALUCHITHERIUM, PM_CARNIVOROUS_APE, PM_FIRE_GIANT,
-    PM_COUATL, PM_CAPTAIN, PM_WINGED_GARGOYLE, PM_MASTER_MIND_FLAYER,
-    PM_FIRE_ELEMENTAL, PM_JABBERWOCK, PM_ARCH_LICH, PM_OGRE_KING, PM_OLOG_HAI,
-    PM_IRON_GOLEM, PM_OCHRE_JELLY, PM_GREEN_SLIME, PM_DISENCHANTER
+    /* neutral */
+    PM_COCKATRICE, PM_ETTIN, PM_STALKER, PM_MINOTAUR,
+    PM_OWLBEAR, PM_PURPLE_WORM, PM_XAN, PM_UMBER_HULK,
+    PM_XORN, PM_ZRUTY, PM_LEOCROTTA, PM_BALUCHITHERIUM,
+    PM_CARNIVOROUS_APE, PM_FIRE_ELEMENTAL, PM_JABBERWOCK,
+    PM_IRON_GOLEM, PM_OCHRE_JELLY, PM_GREEN_SLIME,
+    /* chaotic */
+    PM_BLACK_DRAGON, PM_RED_DRAGON, PM_ARCH_LICH, PM_VAMPIRE_LORD,
+    PM_MASTER_MIND_FLAYER, PM_DISENCHANTER, PM_WINGED_GARGOYLE,
+    PM_STORM_GIANT, PM_OLOG_HAI, PM_ELF_LORD, PM_ELVENKING,
+    PM_OGRE_KING, PM_CAPTAIN, PM_GREMLIN,
+    /* lawful */
+    PM_SILVER_DRAGON, PM_ORANGE_DRAGON, PM_GREEN_DRAGON,
+    PM_YELLOW_DRAGON, PM_GUARDIAN_NAGA, PM_FIRE_GIANT,
+    PM_ALEAX, PM_COUATL, PM_HORNED_DEVIL, PM_BARBED_DEVIL,
+    /* (titans, ki-rin, and golden nagas are suitably nasty, but
+       they're summoners so would aggravate excessive summoning) */
 };
 
 static NEARDATA const unsigned wizapp[] = {
     PM_HUMAN,      PM_WATER_DEMON,  PM_VAMPIRE,       PM_RED_DRAGON,
     PM_TROLL,      PM_UMBER_HULK,   PM_XORN,          PM_XAN,
-    PM_COCKATRICE, PM_FLOATING_EYE, PM_GUARDIAN_NAGA, PM_TRAPPER
+    PM_COCKATRICE, PM_FLOATING_EYE, PM_GUARDIAN_NAGA, PM_TRAPPER,
 };
 
 /* If you've found the Amulet, make the Wizard appear after some time */
@@ -101,7 +117,8 @@ mon_has_special(register struct monst *mtmp)
     register struct obj *otmp;
 
     for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
-        if (otmp->otyp == AMULET_OF_YENDOR || is_quest_artifact(otmp)
+        if (otmp->otyp == AMULET_OF_YENDOR
+            || any_quest_artifact(otmp)
             || otmp->otyp == BELL_OF_OPENING
             || otmp->otyp == CANDELABRUM_OF_INVOCATION
             || otmp->otyp == SPE_BOOK_OF_THE_DEAD)
@@ -154,7 +171,7 @@ mon_has_arti(register struct monst *mtmp, register short otyp)
         if (otyp) {
             if (otmp->otyp == otyp)
                 return 1;
-        } else if (is_quest_artifact(otmp))
+        } else if (any_quest_artifact(otmp))
             return 1;
     }
     return 0;
@@ -183,7 +200,7 @@ on_ground(register short otyp)
         if (otyp) {
             if (otmp->otyp == otyp)
                 return otmp;
-        } else if (is_quest_artifact(otmp))
+        } else if (any_quest_artifact(otmp))
             return otmp;
     return (struct obj *) 0;
 }
@@ -294,10 +311,48 @@ strategy(register struct monst *mtmp)
     return dstrat;
 }
 
+void
+choose_stairs(sx, sy)
+xchar *sx;
+xchar *sy;
+{
+    xchar x = 0, y = 0;
+
+    if (builds_up(&u.uz)) {
+        if (xdnstair) {
+            x = xdnstair;
+            y = ydnstair;
+        } else if (xdnladder) {
+            x = xdnladder;
+            y = ydnladder;
+        }
+    } else {
+        if (xupstair) {
+            x = xupstair;
+            y = yupstair;
+        } else if (xupladder) {
+            x = xupladder;
+            y = yupladder;
+        }
+    }
+
+    if (!x && sstairs.sx) {
+        x = sstairs.sx;
+        y = sstairs.sy;
+    }
+
+    if (x && y) {
+        *sx = x;
+        *sy = y;
+    }
+
+}
+
 int
 tactics(register struct monst *mtmp)
 {
     unsigned long strat = strategy(mtmp);
+    xchar sx = 0, sy = 0;
 
     mtmp->mstrategy =
         (mtmp->mstrategy & (STRAT_WAITMASK | STRAT_APPEARMSG)) | strat;
@@ -305,15 +360,14 @@ tactics(register struct monst *mtmp)
     switch (strat) {
     case STRAT_HEAL: /* hide and recover */
         /* if wounded, hole up on or near the stairs (to block them) */
-        /* unless, of course, there are no stairs (e.g. endlevel) */
+        choose_stairs(&sx, &sy);
         mtmp->mavenge = 1; /* covetous monsters attack while fleeing */
         if (In_W_tower(mtmp->mx, mtmp->my, &u.uz)
-            || (mtmp->iswiz && !xupstair && !mon_has_amulet(mtmp))) {
+            || (mtmp->iswiz && !sx && !mon_has_amulet(mtmp))) {
             if (!rn2(3 + mtmp->mhp / 10))
                 (void) rloc(mtmp, TRUE);
-        } else if (xupstair
-                   && (mtmp->mx != xupstair || mtmp->my != yupstair)) {
-            (void) mnearto(mtmp, xupstair, yupstair, TRUE);
+        } else if (sx && (mtmp->mx != sx || mtmp->my != sy)) {
+            (void) mnearto(mtmp, sx, sy, TRUE);
         }
         /* if you're not around, cast healing spells */
         if (distu(mtmp->mx, mtmp->my) > (BOLT_LIM * BOLT_LIM))
@@ -375,13 +429,39 @@ tactics(register struct monst *mtmp)
     return 0;
 }
 
+/* are there any monsters mon could aggravate? */
+boolean
+has_aggravatables(mon)
+struct monst *mon;
+{
+    struct monst *mtmp;
+    boolean in_w_tower = In_W_tower(mon->mx, mon->my, &u.uz);
+
+    if (in_w_tower != In_W_tower(u.ux, u.uy, &u.uz))
+        return FALSE;
+
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+        if (DEADMONSTER(mtmp))
+            continue;
+        if (in_w_tower != In_W_tower(mtmp->mx, mtmp->my, &u.uz))
+            continue;
+        if ((mtmp->mstrategy & STRAT_WAITFORU) != 0
+            || mtmp->msleeping || !mtmp->mcanmove)
+            return TRUE;
+    }
+    return FALSE;
+}
+
 void
 aggravate()
 {
     register struct monst *mtmp;
+    boolean in_w_tower = In_W_tower(u.ux, u.uy, &u.uz);
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp))
+            continue;
+        if (in_w_tower != In_W_tower(mtmp->mx, mtmp->my, &u.uz))
             continue;
         mtmp->mstrategy &= ~(STRAT_WAITFORU | STRAT_APPEARMSG);
         mtmp->msleeping = 0;
@@ -429,56 +509,87 @@ pick_nasty()
     return res;
 }
 
-/* create some nasty monsters, aligned or neutral with the caster */
-/* a null caster defaults to a chaotic caster (e.g. the wizard) */
+/* create some nasty monsters, aligned with the caster or neutral; chaotic
+   and unaligned are treated as equivalent; if summoner is Null, this is
+   for late-game harassment (after the Wizard has been killed at least once
+   or the invocation ritual has been performed), in which case we treat
+   'summoner' as neutral, since that will produce the greatest number of
+   creatures on average (in 3.6.0 and earlier, Null was treated as chaotic);
+   returns the number of monsters created */
 int
-nasty(struct monst *mcast)
+nasty(struct monst *summoner)
 {
     register struct monst *mtmp;
-    register int i, j, tmp;
-    int castalign = (mcast ? sgn(mcast->data->maligntyp) : -1);
+    register int i, j;
+    int castalign = (summoner ? sgn(summoner->data->maligntyp) : 0);
     coord bypos;
-    int count, census;
+    int count, census, tmp, makeindex, s_cls, m_cls;
+
+#define MAXNASTIES 10 /* more than this can be created */
 
     /* some candidates may be created in groups, so simple count
        of non-null makemon() return is inadequate */
     census = monster_census(FALSE);
 
     if (!rn2(10) && Inhell) {
+        /* this might summon a demon prince or lord */
         count = msummon((struct monst *) 0); /* summons like WoY */
     } else {
         count = 0;
-        tmp = (u.ulevel > 3) ? u.ulevel / 3 : 1; /* just in case -- rph */
-        /* if we don't have a casting monster, the nasties appear around you
-         */
+        s_cls = summoner ? summoner->data->mlet : 0;
+        tmp = (u.ulevel > 3) ? u.ulevel / 3 : 1;
+        /* if we don't have a casting monster, nasties appear around hero,
+           otherwise they'll appear around spot summoner thinks she's at */
         bypos.x = u.ux;
         bypos.y = u.uy;
-        for (i = rnd(tmp); i > 0; --i)
+        for (i = rnd(tmp); i > 0 && count < MAXNASTIES; --i)
+            /* Of the 42 nasties[], 10 are lawful, 14 are chaotic,
+             * and 18 are neutral.
+             *
+             * Neutral caster, used for late-game harrassment,
+             * has 18/42 chance to stop the inner loop on each
+             * critter, 24/42 chance for another iteration.
+             * Lawful caster has 28/42 chance to stop unless the
+             * summoner is an angel or demon, in which case the
+             * chance is 26/42.
+             * Chaotic or unaligned caster has 32/42 chance to
+             * stop, so will summon fewer creatures on average.
+             *
+             * The outer loop potentially gives chaotic/unaligned
+             * a chance to even things up since others will hit
+             * MAXNASTIES sooner, but its number of iterations is
+             * randomized so it won't always do so.
+             */
             for (j = 0; j < 20; j++) {
-                int makeindex;
-
                 /* Don't create more spellcasters of the monsters' level or
                  * higher--avoids chain summoners filling up the level.
                  */
                 do {
                     makeindex = pick_nasty();
-                } while (mcast && attacktype(&mons[makeindex], AT_MAGC)
-                         && monstr[makeindex] >= monstr[mcast->mnum]);
+                    m_cls = mons[makeindex].mlet;
+                } while (summoner
+                         && ((attacktype(&mons[makeindex], AT_MAGC)
+                              && monstr[makeindex] >= monstr[summoner->mnum])
+                             || (s_cls == S_DEMON && m_cls == S_ANGEL)
+                             || (s_cls == S_ANGEL && m_cls == S_DEMON)));
                 /* do this after picking the monster to place */
-                if (mcast
-                    && !enexto(&bypos, mcast->mux, mcast->muy,
-                               &mons[makeindex]))
+                if (summoner && !enexto(&bypos, summoner->mux, summoner->muy,
+                                        &mons[makeindex]))
                     continue;
+                /* this honors genocide but overrides extinction; it ignores
+                   inside-hell-only (G_HELL) & outside-hell-only (G_NOHELL) */
                 if ((mtmp = makemon(&mons[makeindex], bypos.x, bypos.y,
                                     NO_MM_FLAGS)) != 0) {
                     mtmp->msleeping = mtmp->mpeaceful = mtmp->mtame = 0;
                     set_malign(mtmp);
-                } else /* GENOD? */
+                } else /* random monster to substitute for geno'd selection */
                     mtmp = makemon((struct permonst *) 0, bypos.x, bypos.y,
                                    NO_MM_FLAGS);
                 if (mtmp) {
-                    count++;
-                    if (mtmp->data->maligntyp == 0
+                    /* delay first use of spell or breath attack */
+                    mtmp->mspec_used = rnd(4);
+                    if (++count >= MAXNASTIES
+                        || mtmp->data->maligntyp == 0
                         || sgn(mtmp->data->maligntyp) == castalign)
                         break;
                 }
@@ -625,11 +736,12 @@ cuss(register struct monst *mtmp)
             verbalize("%s %s!",
                       random_malediction[rn2(SIZE(random_malediction))],
                       random_insult[rn2(SIZE(random_insult))]);
-    } else if (is_lminion(mtmp)) {
+    } else if (is_lminion(mtmp)
+               && !(mtmp->isminion && EMIN(mtmp)->renegade)) {
         com_pager(rn2(QTN_ANGELIC - 1 + (Hallucination ? 1 : 0))
                   + QT_ANGELIC);
     } else {
-        if (!rn2(5))
+        if (!rn2(is_minion(mtmp->data) ? 100 : 5))
             pline("%s casts aspersions on your ancestry.", Monnam(mtmp));
         else
             com_pager(rn2(QTN_DEMONIC) + QT_DEMONIC);

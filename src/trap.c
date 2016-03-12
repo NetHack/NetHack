@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1448492213 2015/11/25 22:56:53 $  $NHDT-Branch: master $:$NHDT-Revision: 1.249 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1457570259 2016/03/10 00:37:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.262 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -136,24 +136,22 @@ burnarmor(struct monst *victim)
 int
 erode_obj(register struct obj *otmp, const char *ostr, int type, int ef_flags)
 {
-    static NEARDATA const char *const action[] = { "smoulder", "rust", "rot",
-                                                   "corrode" };
-    static NEARDATA const char *const msg[] = { "burnt", "rusted", "rotten",
-                                                "corroded" };
-    boolean vulnerable = FALSE;
-    boolean is_primary = TRUE;
-    boolean check_grease = ef_flags & EF_GREASE;
-    boolean print = ef_flags & EF_VERBOSE;
-    int erosion;
+    static NEARDATA const char
+        *const action[] = { "smoulder", "rust", "rot", "corrode" },
+        *const msg[] = { "burnt", "rusted", "rotten", "corroded" },
+        *const bythe[] = { "heat", "oxidation", "decay", "corrosion" };
+    boolean vulnerable = FALSE, is_primary = TRUE,
+            check_grease = (ef_flags & EF_GREASE) ? TRUE : FALSE,
+            print = (ef_flags & EF_VERBOSE) ? TRUE : FALSE,
+            uvictim, vismon, visobj;
+    int erosion, cost_type;
     struct monst *victim;
-    boolean vismon;
-    boolean visobj;
-    int cost_type;
 
     if (!otmp)
         return ER_NOTHING;
 
     victim = carried(otmp) ? &youmonst : mcarried(otmp) ? otmp->ocarry : NULL;
+    uvictim = (victim == &youmonst);
     vismon = victim && (victim != &youmonst) && canseemon(victim);
     /* Is bhitpos correct here? Ugh. */
     visobj = !victim && cansee(bhitpos.x, bhitpos.y);
@@ -187,35 +185,34 @@ erode_obj(register struct obj *otmp, const char *ostr, int type, int ef_flags)
 
     if (!ostr)
         ostr = cxname(otmp);
+    /* 'visobj' messages insert "the"; probably ought to switch to the() */
+    if (visobj && !(uvictim || vismon) && !strncmpi(ostr, "the ", 4))
+        ostr += 4;
 
     if (check_grease && otmp->greased) {
         grease_protect(otmp, ostr, victim);
         return ER_GREASED;
+    } else if (!erosion_matters(otmp)) {
+        return ER_NOTHING;
     } else if (!vulnerable || (otmp->oerodeproof && otmp->rknown)) {
-        if (print && flags.verbose) {
-            if (victim == &youmonst)
-                Your("%s %s not affected.", ostr, vtense(ostr, "are"));
-            else if (vismon)
-                pline("%s %s %s not affected.", s_suffix(Monnam(victim)),
-                      ostr, vtense(ostr, "are"));
-        }
+        if (flags.verbose && print && (uvictim || vismon))
+            pline("%s %s %s not affected by %s.",
+                  uvictim ? "Your" : s_suffix(Monnam(victim)),
+                  ostr, vtense(ostr, "are"), bythe[type]);
         return ER_NOTHING;
     } else if (otmp->oerodeproof || (otmp->blessed && !rnl(4))) {
-        if (flags.verbose && (print || otmp->oerodeproof)) {
-            if (victim == &youmonst)
-                pline("Somehow, your %s %s not affected.", ostr,
-                      vtense(ostr, "are"));
-            else if (vismon)
-                pline("Somehow, %s %s %s not affected.",
-                      s_suffix(mon_nam(victim)), ostr, vtense(ostr, "are"));
-            else if (visobj)
-                pline("Somehow, the %s %s not affected.", ostr,
-                      vtense(ostr, "are"));
-        }
+        if (flags.verbose && (print || otmp->oerodeproof)
+            && (uvictim || vismon || visobj))
+            pline("Somehow, %s %s %s not affected by the %s.",
+                  uvictim ? "your"
+                          : !vismon ? "the" /* visobj */
+                                    : s_suffix(mon_nam(victim)),
+                  ostr, vtense(ostr, "are"), bythe[type]);
         /* We assume here that if the object is protected because it
          * is blessed, it still shows some minor signs of wear, and
          * the hero can distinguish this from an object that is
-         * actually proof against damage. */
+         * actually proof against damage.
+         */
         if (otmp->oerodeproof) {
             otmp->rknown = TRUE;
             if (victim == &youmonst)
@@ -228,13 +225,12 @@ erode_obj(register struct obj *otmp, const char *ostr, int type, int ef_flags)
                                  ? " completely"
                                  : erosion ? " further" : "";
 
-        if (victim == &youmonst)
-            Your("%s %s%s!", ostr, vtense(ostr, action[type]), adverb);
-        else if (vismon)
-            pline("%s %s %s%s!", s_suffix(Monnam(victim)), ostr,
-                  vtense(ostr, action[type]), adverb);
-        else if (visobj)
-            pline("The %s %s%s!", ostr, vtense(ostr, action[type]), adverb);
+        if (uvictim || vismon || visobj)
+            pline("%s %s %s%s!",
+                  uvictim ? "Your"
+                          : !vismon ? "The" /* visobj */
+                                    : s_suffix(Monnam(victim)),
+                  ostr, vtense(ostr, action[type]), adverb);
 
         if (ef_flags & EF_PAY)
             costly_alteration(otmp, cost_type);
@@ -249,13 +245,12 @@ erode_obj(register struct obj *otmp, const char *ostr, int type, int ef_flags)
 
         return ER_DAMAGED;
     } else if (ef_flags & EF_DESTROY) {
-        if (victim == &youmonst)
-            Your("%s %s away!", ostr, vtense(ostr, action[type]));
-        else if (vismon)
-            pline("%s %s %s away!", s_suffix(Monnam(victim)), ostr,
-                  vtense(ostr, action[type]));
-        else if (visobj)
-            pline("The %s %s away!", ostr, vtense(ostr, action[type]));
+        if (uvictim || vismon || visobj)
+            pline("%s %s %s away!",
+                  uvictim ? "Your"
+                          : !vismon ? "The" /* visobj */
+                                    : s_suffix(Monnam(victim)),
+                  ostr, vtense(ostr, action[type]));
 
         if (ef_flags & EF_PAY)
             costly_alteration(otmp, cost_type);
@@ -265,15 +260,13 @@ erode_obj(register struct obj *otmp, const char *ostr, int type, int ef_flags)
         return ER_DESTROYED;
     } else {
         if (flags.verbose && print) {
-            if (victim == &youmonst)
-                Your("%s %s completely %s.", ostr,
-                     vtense(ostr, Blind ? "feel" : "look"), msg[type]);
-            else if (vismon)
-                pline("%s %s %s completely %s.", s_suffix(Monnam(victim)),
+            if (uvictim)
+                Your("%s %s completely %s.",
+                     ostr, vtense(ostr, Blind ? "feel" : "look"), msg[type]);
+            else if (vismon || visobj)
+                pline("%s %s %s completely %s.",
+                      !vismon ? "The" : s_suffix(Monnam(victim)),
                       ostr, vtense(ostr, "look"), msg[type]);
-            else if (visobj)
-                pline("The %s %s completely %s.", ostr, vtense(ostr, "look"),
-                      msg[type]);
         }
         return ER_NOTHING;
     }
@@ -621,7 +614,7 @@ animate_statue(struct obj *statue, xchar x, xchar y, int cause, int *fail_reason
     else if (statue->spe & STATUE_FEMALE)
         mon->female = TRUE;
     /* if statue has been named, give same name to the monster */
-    if (has_oname(statue))
+    if (has_oname(statue) && !unique_corpstat(mon->data))
         mon = christen_monst(mon, ONAME(statue));
     /* mimic statue becomes seen mimic; other hiders won't be hidden */
     if (mon->m_ap_type)
@@ -1726,7 +1719,8 @@ launch_obj(short otyp, register int x1, register int y1, register int x2, regist
         if ((mtmp = m_at(bhitpos.x, bhitpos.y)) != 0) {
             if (otyp == BOULDER && throws_rocks(mtmp->data)) {
                 if (rn2(3)) {
-                    pline("%s snatches the boulder.", Monnam(mtmp));
+                    if (cansee(bhitpos.x, bhitpos.y))
+                        pline("%s snatches the boulder.", Monnam(mtmp));
                     singleobj->otrapped = 0;
                     (void) mpickobj(mtmp, singleobj);
                     used_up = TRUE;
@@ -1858,7 +1852,9 @@ launch_obj(short otyp, register int x1, register int y1, register int x2, regist
         if (dist > 0 && isok(bhitpos.x + dx, bhitpos.y + dy)
             && levl[bhitpos.x + dx][bhitpos.y + dy].typ == IRONBARS) {
             x2 = bhitpos.x, y2 = bhitpos.y; /* object stops here */
-            if (hits_bars(&singleobj, x2, y2, !rn2(20), 0)) {
+            if (hits_bars(&singleobj,
+                          x2, y2, x2+dx, y2+dy,
+                          !rn2(20), 0)) {
                 if (!singleobj) {
                     used_up = TRUE;
                     launch_drop_spot((struct obj *) 0, 0, 0);
@@ -2377,10 +2373,12 @@ mintrap(register struct monst *mtmp)
                 break;
             if (amorphous(mptr) || is_whirly(mptr) || unsolid(mptr)) {
                 if (acidic(mptr) || mptr == &mons[PM_GELATINOUS_CUBE]
-                    || mptr == &mons[PM_FIRE_ELEMENTAL]) {
+                    || mptr == &mons[PM_FIRE_ELEMENTAL]
+                    || mptr == &mons[PM_FIRE_VORTEX]) {
                     if (in_sight)
                         pline("%s %s %s spider web!", Monnam(mtmp),
-                              (mptr == &mons[PM_FIRE_ELEMENTAL])
+                              (mptr == &mons[PM_FIRE_ELEMENTAL]
+                               || mptr == &mons[PM_FIRE_VORTEX])
                                   ? "burns"
                                   : "dissolves",
                               a_your[trap->madeby_u]);
@@ -2617,6 +2615,8 @@ minstapetrify(struct monst *mon, boolean byplayer)
         mon_to_stone(mon);
         return;
     }
+    if (!vamp_stone(mon))
+        return;
 
     /* give a "<mon> is slowing down" message and also remove
        intrinsic speed (comparable to similar effect on the hero) */
@@ -2681,6 +2681,7 @@ mselftouch(struct monst *mon, const char *arg, boolean byplayer)
 void
 float_up()
 {
+    context.botl = TRUE;
     if (u.utrap) {
         if (u.utraptype == TT_PIT) {
             u.utrap = 0;
@@ -2757,6 +2758,7 @@ float_down(long hmask, long emask) /* might cancel timeout */
         float_vs_flight(); /* before nomul() rather than after */
         return 0;
     }
+    context.botl = TRUE;
     nomul(0); /* stop running or resting */
     if (BFlying) {
         /* controlled flight no longer overridden by levitation */
@@ -2997,6 +2999,7 @@ domagictrap()
         /* Most of the time, it creates some monsters. */
         register int cnt = rnd(4);
 
+        /* blindness effects */
         if (!resists_blnd(&youmonst)) {
             You("are momentarily blinded by a flash of light!");
             make_blinded((long) rn1(5, 10), FALSE);
@@ -3004,9 +3007,19 @@ domagictrap()
                 Your1(vision_clears);
         } else if (!Blind) {
             You_see("a flash of light!");
-        } else
+        }
+
+        /* deafness effects */
+        if (!Deaf) {
             You_hear("a deafening roar!");
-        incr_itimeout(&HDeaf, rn1(20, 30));
+            incr_itimeout(&HDeaf, rn1(20, 30));
+            context.botl = TRUE;
+        } else {
+            /* magic vibrations still hit you */
+            You_feel("rankled.");
+            incr_itimeout(&HDeaf, rn1(5, 15));
+            context.botl = TRUE;
+        }
         while (cnt--)
             (void) makemon((struct permonst *) 0, u.ux, u.uy, NO_MM_FLAGS);
     } else
@@ -3284,10 +3297,11 @@ water_damage(struct obj *obj, const char *ostr, boolean force)
             */
         return ER_NOTHING;
     } else if (obj->oclass == SCROLL_CLASS) {
+        if (obj->otyp == SCR_BLANK_PAPER
 #ifdef MAIL
-        if (obj->otyp == SCR_MAIL)
-            return 0;
+            || obj->otyp == SCR_MAIL
 #endif
+           ) return 0;
         if (carried(obj))
             pline("Your %s %s.", ostr, vtense(ostr, "fade"));
 
@@ -3301,8 +3315,9 @@ water_damage(struct obj *obj, const char *ostr, boolean force)
         if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
             pline("Steam rises from %s.", the(xname(obj)));
             return 0;
+        } else if (obj->otyp == SPE_BLANK_PAPER) {
+            return 0;
         }
-
         if (carried(obj))
             pline("Your %s %s.", ostr, vtense(ostr, "fade"));
 
@@ -4878,13 +4893,13 @@ lava_effects()
                 && objects[obj->otyp].oc_oprop != FIRE_RES
                 && obj->otyp != SCR_FIRE && obj->otyp != SPE_FIREBALL
                 && !obj_resists(obj, 0, 0)) /* for invocation items */
-                obj->in_use = TRUE;
+                obj->in_use = 1;
 
     /* Check whether we should burn away boots *first* so we know whether to
      * make the player sink into the lava. Assumption: water walking only
      * comes from boots.
      */
-    if (Wwalking && uarmf && is_organic(uarmf) && !uarmf->oerodeproof) {
+    if (uarmf && is_organic(uarmf) && !uarmf->oerodeproof) {
         obj = uarmf;
         pline("%s into flame!", Yobjnam2(obj, "burst"));
         iflags.in_lava_effects++; /* (see above) */
@@ -4998,6 +5013,9 @@ sink_into_lava()
             You("sink below the surface and die.");
             burn_away_slime(); /* add insult to injury? */
             done(DISSOLVED);
+            /* can only get here via life-saving; try to get away from lava */
+            u.utrap = 0;
+            (void) safe_teleds(TRUE);
         } else if (!u.umoved) {
             /* can't fully turn into slime while in lava, but might not
                have it be burned away until you've come awfully close */

@@ -1,4 +1,4 @@
-/* NetHack 3.6	engrave.c	$NHDT-Date: 1445388915 2015/10/21 00:55:15 $  $NHDT-Branch: master $:$NHDT-Revision: 1.59 $ */
+/* NetHack 3.6	engrave.c	$NHDT-Date: 1456304550 2016/02/24 09:02:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.61 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -517,7 +517,7 @@ doengrave()
         return 0;
 
     if (otmp == &zeroobj) {
-        Strcat(strcpy(fbuf, "your "), makeplural(body_part(FINGER)));
+        Strcat(strcpy(fbuf, "your "), body_part(FINGERTIP));
         writer = fbuf;
     } else
         writer = yname(otmp);
@@ -714,16 +714,18 @@ doengrave()
                     doknown = TRUE;
                 }
                 Strcpy(post_engr_text,
-                       Blind
+                       (Blind && !Deaf)
                           ? "You hear drilling!"
-                          : IS_GRAVE(levl[u.ux][u.uy].typ)
-                             ? "Chips fly out from the headstone."
-                             : is_ice(u.ux, u.uy)
-                                ? "Ice chips fly up from the ice surface!"
-                                : (level.locations[u.ux][u.uy].typ
-                                   == DRAWBRIDGE_DOWN)
-                                   ? "Splinters fly up from the bridge."
-                                   : "Gravel flies up from the floor.");
+                          : Blind
+                             ? "You feel tremors."
+                             : IS_GRAVE(levl[u.ux][u.uy].typ)
+                                 ? "Chips fly out from the headstone."
+                                 : is_ice(u.ux, u.uy)
+                                    ? "Ice chips fly up from the ice surface!"
+                                    : (level.locations[u.ux][u.uy].typ
+                                       == DRAWBRIDGE_DOWN)
+                                       ? "Splinters fly up from the bridge."
+                                       : "Gravel flies up from the floor.");
                 break;
             /* type = BURN wands */
             case WAN_FIRE:
@@ -749,7 +751,9 @@ doengrave()
                     Strcpy(post_engr_text, "Lightning arcs from the wand.");
                     doblind = TRUE;
                 } else
-                    Strcpy(post_engr_text, "You hear crackling!");
+                    Strcpy(post_engr_text, !Deaf
+                                ? "You hear crackling!"
+                                : "Your hair stands up!");
                 break;
 
             /* type = MARK wands */
@@ -971,8 +975,7 @@ doengrave()
     if (otmp != &zeroobj)
         You("%s the %s with %s.", everb, eloc, doname(otmp));
     else
-        You("%s the %s with your %s.", everb, eloc,
-            makeplural(body_part(FINGER)));
+        You("%s the %s with your %s.", everb, eloc, body_part(FINGERTIP));
 
     /* Prompt for engraving! */
     Sprintf(qbuf, "What do you want to %s the %s here?", everb, eloc);

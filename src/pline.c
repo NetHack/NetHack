@@ -1,4 +1,4 @@
-/* NetHack 3.6	pline.c	$NHDT-Date: 1432512770 2015/05/25 00:12:50 $  $NHDT-Branch: master $:$NHDT-Revision: 1.42 $ */
+/* NetHack 3.6	pline.c	$NHDT-Date: 1456528597 2016/02/26 23:16:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.49 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -10,6 +10,9 @@ static boolean no_repeat = FALSE;
 static char prevmsg[BUFSZ];
 
 static char *FDECL(You_buf, (int));
+#if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
+static void FDECL(execplinehandler, (const char *));
+#endif
 
 /*VARARGS1*/
 /* Note that these declarations rely on knowledge of the internals
@@ -83,22 +86,27 @@ VA_DECL(const char *, line)
         iflags.last_msg = PLNMSG_UNKNOWN;
         return;
     }
-#ifndef MAC
-    if (no_repeat && !strcmp(line, toplines))
+
+    msgtyp = msgtype_type(line, no_repeat);
+    if (msgtyp == MSGTYP_NOSHOW
+        || (msgtyp == MSGTYP_NOREP && !strcmp(line, prevmsg)))
         return;
-#endif /* MAC */
     if (vision_full_recalc)
         vision_recalc(0);
     if (u.ux)
         flush_screen(1); /* %% */
-    msgtyp = msgtype_type(line);
-    if (msgtyp == MSGTYP_NOSHOW) return;
-    if (msgtyp == MSGTYP_NOREP && !strcmp(line, prevmsg)) return;
+
     putstr(WIN_MESSAGE, 0, line);
+
+#if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
+    execplinehandler(line);
+#endif
+
     /* this gets cleared after every pline message */
     iflags.last_msg = PLNMSG_UNKNOWN;
-    strncpy(prevmsg, line, BUFSZ);
-    if (msgtyp == MSGTYP_STOP) display_nhwindow(WIN_MESSAGE, TRUE); /* --more-- */
+    strncpy(prevmsg, line, BUFSZ), prevmsg[BUFSZ - 1] = '\0';
+    if (msgtyp == MSGTYP_STOP)
+        display_nhwindow(WIN_MESSAGE, TRUE); /* --more-- */
 
 #if !(defined(USE_STDARG) || defined(USE_VARARGS))
     /* provide closing brace for the nested block
@@ -387,6 +395,22 @@ mstatusline(register struct monst *mtmp)
         }
     } else if (mtmp->mpeaceful)
         Strcat(info, ", peaceful");
+
+    if (mtmp->data == &mons[PM_LONG_WORM]) {
+        int segndx, nsegs = count_wsegs(mtmp);
+
+        /* the worm code internals don't consider the head of be one of
+           the worm's segments, but we count it as such when presenting
+           worm feedback to the player */
+        if (!nsegs) {
+            Strcat(info, ", single segment");
+        } else {
+            ++nsegs; /* include head in the segment count */
+            segndx = wseg_at(mtmp, bhitpos.x, bhitpos.y);
+            Sprintf(eos(info), ", %d%s of %d segments",
+                    segndx, ordin(segndx), nsegs);
+        }
+    }
     if (mtmp->cham >= LOW_PM && mtmp->data != &mons[mtmp->cham])
         /* don't reveal the innate form (chameleon, vampire, &c),
            just expose the fact that this current form isn't it */
@@ -396,17 +420,8 @@ mstatusline(register struct monst *mtmp)
         Strcat(info, ", eating");
     /* a stethoscope exposes mimic before getting here so this
        won't be relevant for it, but wand of probing doesn't */
-    if (mtmp->m_ap_type)
-        Sprintf(eos(info), ", mimicking %s",
-                (mtmp->m_ap_type == M_AP_FURNITURE)
-                    ? an(defsyms[mtmp->mappearance].explanation)
-                    : (mtmp->m_ap_type == M_AP_OBJECT)
-                          ? ((mtmp->mappearance == GOLD_PIECE)
-                                 ? "gold"
-                                 : an(simple_typename(mtmp->mappearance)))
-                          : (mtmp->m_ap_type == M_AP_MONSTER)
-                                ? an(mons[mtmp->mappearance].mname)
-                                : something); /* impossible... */
+    if (mtmp->mundetected || mtmp->m_ap_type)
+        mhidden_description(mtmp, TRUE, eos(info));
     if (mtmp->mcan)
         Strcat(info, ", cancelled");
     if (mtmp->mconf)
@@ -435,8 +450,6 @@ mstatusline(register struct monst *mtmp)
         Strcat(info, mtmp->mspeed == MFAST ? ", fast" : mtmp->mspeed == MSLOW
                                                             ? ", slow"
                                                             : ", ???? speed");
-    if (mtmp->mundetected)
-        Strcat(info, ", concealed");
     if (mtmp->minvis)
         Strcat(info, ", invisible");
     if (mtmp == u.ustuck)
@@ -580,5 +593,43 @@ pudding_merge_message(struct obj *otmp, struct obj *otmp2)
         You_hear("a faint sloshing sound.");
     }
 }
+
+#if defined(MSGHANDLER) && (defined(POSIX_TYPES) || defined(__GNUC__))
+static boolean use_pline_handler = TRUE;
+static void
+execplinehandler(line)
+const char *line;
+{
+    int f;
+    const char *args[3];
+    char *env;
+
+    if (!use_pline_handler)
+        return;
+
+    if (!(env = nh_getenv("NETHACK_MSGHANDLER"))) {
+        use_pline_handler = FALSE;
+        return;
+    }
+
+    f = fork();
+    if (f == 0) { /* child */
+        args[0] = env;
+        args[1] = line;
+        args[2] = NULL;
+        (void) setgid(getgid());
+        (void) setuid(getuid());
+        (void) execv(args[0], (char *const *) args);
+        perror((char *) 0);
+        (void) fprintf(stderr, "Exec to message handler %s failed.\n",
+                       env);
+        terminate(EXIT_FAILURE);
+    } else if (f == -1) {
+        perror((char *) 0);
+        use_pline_handler = FALSE;
+        pline("Fork to message handler failed.");
+    }
+}
+#endif /* defined(POSIX_TYPES) || defined(__GNUC__) */
 
 /*pline.c*/

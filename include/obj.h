@@ -1,4 +1,4 @@
-/* NetHack 3.6	obj.h	$NHDT-Date: 1445126423 2015/10/18 00:00:23 $  $NHDT-Branch: master $:$NHDT-Revision: 1.50 $ */
+/* NetHack 3.6	obj.h	$NHDT-Date: 1456618994 2016/02/28 00:23:14 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.53 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -95,9 +95,7 @@ struct obj {
     Bitfield(recharged, 3); /* number of times it's been recharged */
 #define on_ice recharged    /* corpse on ice */
     Bitfield(lamplit, 1);   /* a light-source -- can be lit */
-    Bitfield(
-        globby,
-        1); /* globby; will combine with like types on adjacent squares */
+    Bitfield(globby, 1);    /* combines with like types on adjacent squares */
     Bitfield(greased, 1);    /* covered with grease */
     Bitfield(nomerge, 1);    /* set temporarily to prevent merging */
     Bitfield(was_thrown, 1); /* thrown by hero since last picked up */
@@ -111,7 +109,7 @@ struct obj {
     int corpsenm;         /* type of corpse is mons[corpsenm] */
 #define leashmon corpsenm /* gets m_id of attached pet */
 #define fromsink corpsenm /* a potion from a sink */
-#define novelidx corpsenm /* 3.6.0 tribute - the index of the novel title */
+#define novelidx corpsenm /* 3.6 tribute - the index of the novel title */
 #define record_achieve_special corpsenm
     int usecount;           /* overloaded for various things that tally */
 #define spestudied usecount /* # of times a spellbook has been studied */
@@ -202,6 +200,8 @@ struct obj {
      && objects[otmp->otyp].oc_skill >= -P_SHURIKEN \
      && objects[otmp->otyp].oc_skill <= -P_BOW)
 #define uslinging() (uwep && objects[uwep->otyp].oc_skill == P_SLING)
+/* 'is_quest_artifact()' only applies to the current role's artifact */
+#define any_quest_artifact(o) ((o)->oartifact >= ART_ORB_OF_DETECTION)
 
 /* Armor */
 #define is_shield(otmp)          \

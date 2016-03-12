@@ -80,6 +80,9 @@ mswin_init_status_window()
 
     ZeroMemory(data, sizeof(NHStatusWindow));
     SetWindowLongPtr(ret, GWLP_USERDATA, (LONG_PTR) data);
+
+    mswin_apply_window_style(ret);
+
     return ret;
 }
 

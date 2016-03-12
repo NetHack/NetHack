@@ -1,4 +1,4 @@
-/* NetHack 3.6	weapon.c	$NHDT-Date: 1446078767 2015/10/29 00:32:47 $  $NHDT-Branch: master $:$NHDT-Revision: 1.55 $ */
+/* NetHack 3.6	weapon.c	$NHDT-Date: 1454660575 2016/02/05 08:22:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.57 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -298,12 +298,12 @@ dmgval(struct obj *otmp, struct monst *mon)
     if (ptr == &mons[PM_SHADE] && !shade_glare(otmp))
         tmp = 0;
 
-    /* "very heavy iron ball"; weight increase is in increments of 160 */
+    /* "very heavy iron ball"; weight increase is in increments */
     if (otyp == HEAVY_IRON_BALL && tmp > 0) {
         int wt = (int) objects[HEAVY_IRON_BALL].oc_weight;
 
         if ((int) otmp->owt > wt) {
-            wt = ((int) otmp->owt - wt) / 160;
+            wt = ((int) otmp->owt - wt) / IRON_BALL_W_INCR;
             tmp += rnd(4 * wt);
             if (tmp > 25)
                 tmp = 25; /* objects[].oc_wldam */
@@ -1123,7 +1123,7 @@ enhance_weapon_skill()
 
 /*
  * Change from restricted to unrestricted, allowing P_BASIC as max.  This
- * function may be called with with P_NONE.  Used in pray.c.
+ * function may be called with with P_NONE.  Used in pray.c as well as below.
  */
 void
 unrestrict_weapon_skill(int skill)
@@ -1469,6 +1469,10 @@ skill_init(const struct def_skill *class_skill)
             P_ADVANCE(skill) = practice_needed_to_advance(P_SKILL(skill) - 1);
         }
     }
+
+    /* each role has a special spell; allow at least basic for its type
+       (despite the function name, this works for spell skills too) */
+    unrestrict_weapon_skill(spell_skilltype(urole.spelspec));
 }
 
 void

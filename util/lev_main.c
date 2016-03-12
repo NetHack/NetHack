@@ -1,5 +1,5 @@
 /* NetHack 3.6	lev_main.c	$NHDT-Date: 1448074107 2015/11/21 02:48:27 $  $NHDT-Branch: master $:$NHDT-Revision: 1.43 $ */
-/*	Copyright (c) 1989 by Jean-Christophe Collet */
+/*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -900,7 +900,7 @@ spovar2str(long spovar)
 
     togl = ((togl + 1) % 2);
 
-    snprintf(buf[togl], 127, "%s%s", n, (is_array ? " array" : ""));
+    Sprintf(buf[togl], "%s%s", n, (is_array ? " array" : ""));
     return buf[togl];
 }
 
@@ -1283,7 +1283,7 @@ scan_map(char *map, sp_lev *sp)
     register char *s1, *s2;
     int max_len = 0;
     int max_hig = 0;
-    char *tmpmap[ROWNO];
+    char *tmpmap[MAP_Y_LIM+1];
     int dx, dy;
     char *mbuf;
 
@@ -1310,6 +1310,8 @@ scan_map(char *map, sp_lev *sp)
 
     /* Then parse it now */
     while (map && *map) {
+        if (max_hig > MAP_Y_LIM)
+            break;
         tmpmap[max_hig] = (char *) alloc(max_len);
         s1 = index(map, '\n');
         if (s1) {

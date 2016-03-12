@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.h	$NHDT-Date: 1434056948 2015/06/11 21:09:08 $  $NHDT-Branch: master $:$NHDT-Revision: 1.66 $ */
+/* NetHack 3.6	hack.h	$NHDT-Date: 1451683048 2016/01/01 21:17:28 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.68 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -28,6 +28,9 @@
 #define HVY_ENCUMBER 3 /* Strained */
 #define EXT_ENCUMBER 4 /* Overtaxed */
 #define OVERLOADED 5   /* Overloaded */
+
+/* weight increment of heavy iron ball */
+#define IRON_BALL_W_INCR 160
 
 /* hunger states - see hu_stat in eat.c */
 #define SATIATED 0
@@ -277,6 +280,7 @@ NEARDATA extern coord bhitpos; /* place where throw or zap hits or stops */
 #define DO_MOVE 0   /* really doing the move */
 #define TEST_MOVE 1 /* test a normal move (move there next) */
 #define TEST_TRAV 2 /* test a future travel location */
+#define TEST_TRAP 3 /* check if a future travel loc is a trap */
 
 /*** some utility macros ***/
 #define yn(query) yn_function(query, ynchars, 'n')
@@ -373,7 +377,8 @@ NEARDATA extern coord bhitpos; /* place where throw or zap hits or stops */
 #define DISP_IN_GAME 3 /* may be set via extern program, displayed in game \
                           */
 #define SET_IN_GAME 4  /* may be set via extern program or set in the game */
-#define SET__IS_VALUE_VALID(s) ((s < SET_IN_SYS) || (s > SET_IN_GAME))
+#define SET_IN_WIZGAME 5  /* may be set set in the game if wizmode */
+#define SET__IS_VALUE_VALID(s) ((s < SET_IN_SYS) || (s > SET_IN_WIZGAME))
 
 #define FEATURE_NOTICE_VER(major, minor, patch)                    \
     (((unsigned long) major << 24) | ((unsigned long) minor << 16) \

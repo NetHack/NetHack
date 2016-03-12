@@ -72,6 +72,7 @@ sys_early_init()
 #endif
 
     sysopt.check_save_uid = 1;
+    sysopt.check_plname = 0;
     sysopt.seduce = 1; /* if it's compiled in, default to on */
     sysopt_seduce_set(sysopt.seduce);
     return;

@@ -1,4 +1,4 @@
-/* NetHack 3.6	do_wear.c	$NHDT-Date: 1446975698 2015/11/08 09:41:38 $  $NHDT-Branch: master $:$NHDT-Revision: 1.87 $ */
+/* NetHack 3.6	do_wear.c	$NHDT-Date: 1455667557 2016/02/17 00:05:57 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.90 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -725,8 +725,9 @@ Amulet_on()
     case AMULET_OF_STRANGULATION:
         if (can_be_strangled(&youmonst)) {
             makeknown(AMULET_OF_STRANGULATION);
-            pline("It constricts your throat!");
             Strangled = 6L;
+            context.botl = TRUE;
+            pline("It constricts your throat!");
         }
         break;
     case AMULET_OF_RESTFUL_SLEEP: {
@@ -775,11 +776,12 @@ Amulet_off()
         break;
     case AMULET_OF_STRANGULATION:
         if (Strangled) {
+            Strangled = 0L;
+            context.botl = TRUE;
             if (Breathless)
                 Your("%s is no longer constricted!", body_part(NECK));
             else
                 You("can breathe more easily!");
-            Strangled = 0L;
         }
         break;
     case AMULET_OF_RESTFUL_SLEEP:
@@ -1358,6 +1360,27 @@ armor_or_accessory_off(struct obj *obj)
         You("are not wearing that.");
         return 0;
     }
+    if (obj == uskin
+        || ((obj == uarm) && uarmc)
+        || ((obj == uarmu) && (uarmc || uarm))) {
+        char why[QBUFSZ], what[QBUFSZ];
+
+        why[0] = what[0] = '\0';
+        if (obj != uskin) {
+            if (uarmc)
+                Strcat(what, cloak_simple_name(uarmc));
+            if ((obj == uarmu) && uarm) {
+                if (uarmc)
+                    Strcat(what, " and ");
+                Strcat(what, suit_simple_name(uarm));
+            }
+            Sprintf(why, " without taking off your %s first", what);
+        } else {
+            Strcpy(why, "; it's embedded");
+        }
+        You_cant("take that off%s.", why);
+        return 0;
+    }
 
     reset_remarm(); /* clear context.takeoff.mask and context.takeoff.what */
     (void) select_off(obj);
@@ -1412,25 +1435,6 @@ dotakeoff()
         otmp = getobj(clothes, "take off");
     if (!otmp)
         return 0;
-    if (otmp == uskin
-        || ((otmp == uarm) && uarmc)
-        || ((otmp == uarmu) && (uarmc || uarm))) {
-        char why[BUFSZ], what[BUFSZ];
-
-        why[0] = what[0] = '\0';
-        if (otmp != uskin) {
-            if (uarmc)
-                Strcat(what, cloak_simple_name(uarmc));
-            if ((otmp == uarmu) && uarm) {
-                if (uarmc)
-                    Strcat(what, " and ");
-                Strcat(what, suit_simple_name(uarm));
-            }
-            Sprintf(why, " without taking off your %s first", what);
-        }
-        You_cant("take that off%s.", why);
-        return 0;
-    }
 
     return armor_or_accessory_off(otmp);
 }

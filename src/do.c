@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1446975464 2015/11/08 09:37:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.149 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1454033599 2016/01/29 02:13:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.153 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -209,15 +209,13 @@ flooreffects(struct obj *obj, int x, int y, const char *verb)
                   otense(obj, "tumble"), the_your[t->madeby_u]);
     } else if (obj->globby) {
         /* Globby things like puddings might stick together */
-        while (obj
-               && (otmp = obj_nexto_xy(obj->otyp, x, y, obj->o_id))
-                      != (struct obj *) 0) {
+        while (obj && (otmp = obj_nexto_xy(obj, x, y, TRUE)) != 0) {
             pudding_merge_message(obj, otmp);
             /* intentionally not getting the melded object; obj_meld may set
              * obj to null. */
             (void) obj_meld(&obj, &otmp);
         }
-        return (boolean) (obj == NULL);
+        return (boolean) !obj;
     }
     return FALSE;
 }
@@ -262,6 +260,8 @@ trycall(register struct obj *obj)
 STATIC_DCL void
 polymorph_sink()
 {
+    uchar sym = S_sink;
+
     if (levl[u.ux][u.uy].typ != SINK)
         return;
 
@@ -270,24 +270,33 @@ polymorph_sink()
     switch (rn2(4)) {
     default:
     case 0:
+        sym = S_fountain;
         levl[u.ux][u.uy].typ = FOUNTAIN;
         level.flags.nfountains++;
         break;
     case 1:
+        sym = S_throne;
         levl[u.ux][u.uy].typ = THRONE;
         break;
     case 2:
+        sym = S_altar;
         levl[u.ux][u.uy].typ = ALTAR;
         levl[u.ux][u.uy].altarmask = Align2amask(rn2((int) A_LAWFUL + 2) - 1);
         break;
     case 3:
+        sym = S_room;
         levl[u.ux][u.uy].typ = ROOM;
         make_grave(u.ux, u.uy, (char *) 0);
+        if (levl[u.ux][u.uy].typ == GRAVE)
+            sym = S_grave;
         break;
     }
-    pline_The("sink transforms into %s!", (levl[u.ux][u.uy].typ == THRONE)
-                                              ? "a throne"
-                                              : an(surface(u.ux, u.uy)));
+    /* give message even if blind; we know we're not levitating,
+       so can feel the outcome even if we can't directly see it */
+    if (levl[u.ux][u.uy].typ != ROOM)
+        pline_The("sink transforms into %s!", an(defsyms[sym].explanation));
+    else
+        pline_The("sink vanishes.");
     newsym(u.ux, u.uy);
 }
 
@@ -398,11 +407,24 @@ dosinkring(register struct obj *obj)
         /* Not the same as aggravate monster; besides, it's obvious. */
         pline("Several flies buzz around the sink.");
         break;
+    case RIN_TELEPORTATION:
+        nosink = teleport_sink();
+        /* give message even if blind; we know we're not levitating,
+           so can feel the outcome even if we can't directly see it */
+        pline_The("sink %svanishes.", nosink ? "" : "momentarily ");
+        ideed = FALSE;
+        break;
+    case RIN_POLYMORPH:
+        polymorph_sink();
+        nosink = TRUE;
+        /* for S_room case, same message as for teleportation is given */
+        ideed = (levl[u.ux][u.uy].typ != ROOM);
+        break;
     default:
         ideed = FALSE;
         break;
     }
-    if (!Blind && !ideed && obj->otyp != RIN_HUNGER) {
+    if (!Blind && !ideed) {
         ideed = TRUE;
         switch (obj->otyp) { /* effects that need eyes */
         case RIN_ADORNMENT:
@@ -440,20 +462,14 @@ dosinkring(register struct obj *obj)
         case RIN_WARNING:
             pline_The("sink glows %s for a moment.", hcolor(NH_WHITE));
             break;
-        case RIN_TELEPORTATION:
-            nosink = teleport_sink();
-            pline_The("sink %svanishes.", nosink ? "" : "momentarily ");
-            break;
         case RIN_TELEPORT_CONTROL:
             pline_The("sink looks like it is being beamed aboard somewhere.");
             break;
-        case RIN_POLYMORPH:
-            polymorph_sink();
-            nosink = TRUE;
-            break;
         case RIN_POLYMORPH_CONTROL:
             pline_The(
-                "sink momentarily looks like a regularly erupting geyser.");
+                  "sink momentarily looks like a regularly erupting geyser.");
+            break;
+        default:
             break;
         }
     }
@@ -883,7 +899,13 @@ dodown()
                 ladder_down =
                     (glyph_to_cmap(levl[u.ux][u.uy].glyph) == S_dnladder);
         }
-        floating_above(stairs_down ? "stairs" : ladder_down
+        if (Is_airlevel(&u.uz))
+            You("are floating in the %s.", surface(u.ux, u.uy));
+        else if (Is_waterlevel(&u.uz))
+            You("are floating in %s.",
+                is_pool(u.ux, u.uy) ? "the water" : "a bubble of air");
+        else
+            floating_above(stairs_down ? "stairs" : ladder_down
                                                     ? "ladder"
                                                     : surface(u.ux, u.uy));
         return 0; /* didn't move */
@@ -1065,11 +1087,12 @@ goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal
 {
     int fd, l_idx;
     xchar new_ledger;
-    boolean cant_go_back, up = (depth(newlevel) < depth(&u.uz)),
-                          newdungeon = (u.uz.dnum != newlevel->dnum),
-                          was_in_W_tower = In_W_tower(u.ux, u.uy, &u.uz),
-                          familiar = FALSE;
-    boolean new = FALSE; /* made a new level? */
+    boolean cant_go_back, great_effort,
+            up = (depth(newlevel) < depth(&u.uz)),
+            newdungeon = (u.uz.dnum != newlevel->dnum),
+            was_in_W_tower = In_W_tower(u.ux, u.uy, &u.uz),
+            familiar = FALSE,
+            new = FALSE; /* made a new level? */
     struct monst *mtmp;
     char whynot[BUFSZ];
     char *annotation;
@@ -1270,11 +1293,13 @@ goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal
                 u_on_dnstairs();
             /* you climb up the {stairs|ladder};
                fly up the stairs; fly up along the ladder */
-            pline("%s %s up%s the %s.",
-                  (Punished && !Levitation) ? "With great effort you" : "You",
-                  Flying ? "fly" : "climb",
-                  (Flying && at_ladder) ? " along" : "",
-                  at_ladder ? "ladder" : "stairs");
+            great_effort = (Punished && !Levitation);
+            if (flags.verbose || great_effort)
+                pline("%s %s up%s the %s.",
+                      great_effort ? "With great effort, you" : "You",
+                      Flying ? "fly" : "climb",
+                      (Flying && at_ladder) ? " along" : "",
+                      at_ladder ? "ladder" : "stairs");
         } else { /* down */
             if (at_ladder)
                 u_on_newpos(xupladder, yupladder);
@@ -1288,8 +1313,8 @@ goto_level(d_level *newlevel, boolean at_stairs, boolean falling, boolean portal
                 if (flags.verbose)
                     You("fly down %s.",
                         at_ladder ? "along the ladder" : "the stairs");
-            } else if (near_capacity() > UNENCUMBERED || Punished
-                       || Fumbling) {
+            } else if (near_capacity() > UNENCUMBERED
+                       || Punished || Fumbling) {
                 You("fall down the %s.", at_ladder ? "ladder" : "stairs");
                 if (Punished) {
                     drag_down();

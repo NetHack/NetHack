@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1446887537 2015/11/07 09:12:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.151 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1456992470 2016/03/03 08:07:50 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.155 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -345,10 +345,12 @@ attack(register struct monst *mtmp)
                 Strcpy(buf, y_monnam(mtmp));
                 buf[0] = highc(buf[0]);
                 You("stop.  %s is in the way!", buf);
+                context.travel = context.travel1 = context.mv = context.run = 0;
                 return TRUE;
             } else if ((mtmp->mfrozen || (!mtmp->mcanmove)
                         || (mtmp->data->mmove == 0)) && rn2(6)) {
                 pline("%s doesn't seem to move!", Monnam(mtmp));
+                context.travel = context.travel1 = context.mv = context.run = 0;
                 return TRUE;
             } else
                 return FALSE;
@@ -1071,8 +1073,13 @@ hmon_hitmon(struct monst *mon,
     if ((mdat == &mons[PM_BLACK_PUDDING] || mdat == &mons[PM_BROWN_PUDDING])
         /* pudding is alive and healthy enough to split */
         && mon->mhp > 1 && !mon->mcan
-        /* iron weapon using melee or polearm hit */
-        && obj && obj == uwep && objects[obj->otyp].oc_material == IRON
+        /* iron weapon using melee or polearm hit [3.6.1: metal weapon too] */
+        && obj && obj == uwep
+        && ((objects[obj->otyp].oc_material == IRON
+             /* allow scalpel and tsurugi to split puddings */
+             || objects[obj->otyp].oc_material == METAL)
+            /* but not bashing with darts, arrows or ya */
+            && !(is_ammo(obj) || is_missile(obj)))
         && hand_to_hand) {
         if (clone_mon(mon, 0, 0)) {
             pline("%s divides as you hit it!", Monnam(mon));
@@ -2051,7 +2058,7 @@ hmonas(register struct monst *mon)
 
     for (i = 0; i < NATTK; i++) {
         sum[i] = 0;
-        mattk = getmattk(youmonst.data, i, sum, &alt_attk);
+        mattk = getmattk(&youmonst, mon, i, sum, &alt_attk);
         switch (mattk->aatyp) {
         case AT_WEAP:
         use_weapon:
@@ -2499,7 +2506,9 @@ passive_obj(register struct monst *mon,
 
     switch (mattk->adtyp) {
     case AD_FIRE:
-        if (!rn2(6) && !mon->mcan) {
+        if (!rn2(6) && !mon->mcan
+            /* steam vortex: fire resist applies, fire damage doesn't */
+            && mon->data != &mons[PM_STEAM_VORTEX]) {
             (void) erode_obj(obj, NULL, ERODE_BURN, EF_NONE);
         }
         break;

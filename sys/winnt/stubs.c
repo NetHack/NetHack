@@ -7,6 +7,7 @@
 
 int GUILaunched;
 struct window_procs mswin_procs = { "guistubs" };
+
 void
 mswin_destroy_reg()
 {
@@ -36,6 +37,7 @@ char *argv[];
     return 0;
 }
 #endif
+
 #endif /* GUISTUB */
 
 /* =============================================== */
@@ -43,7 +45,10 @@ char *argv[];
 #ifdef TTYSTUB
 
 #include "hack.h"
+#include "win32api.h"
 
+HANDLE hConIn;
+HANDLE hConOut;
 int GUILaunched;
 struct window_procs tty_procs = { "ttystubs" };
 

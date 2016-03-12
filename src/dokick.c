@@ -20,9 +20,9 @@ STATIC_DCL void FDECL(kickdmg, (struct monst *, boolean));
 STATIC_DCL boolean FDECL(maybe_kick_monster, (struct monst *,
                                               xchar, xchar));
 STATIC_DCL void FDECL(kick_monster, (struct monst *, xchar, xchar));
-STATIC_DCL int FDECL(kick_object, (xchar, xchar));
+STATIC_DCL int FDECL(kick_object, (xchar, xchar, char *));
 STATIC_DCL int FDECL(really_kick_object, (xchar, xchar));
-STATIC_DCL char *FDECL(kickstr, (char *));
+STATIC_DCL char *FDECL(kickstr, (char *, const char *));
 STATIC_DCL void FDECL(otransit_msg, (struct obj *, boolean, long));
 STATIC_DCL void FDECL(drop_to, (coord *, schar));
 
@@ -454,14 +454,16 @@ container_impact_dmg(struct obj *obj,
 
 /* jacket around really_kick_object */
 STATIC_OVL int
-kick_object(xchar x, xchar y)
+kick_object(xchar x, xchar y, char *kickobjnam)
 {
     int res = 0;
 
+    *kickobjnam = '\0';
     /* if a pile, the "top" object gets kicked */
     kickedobj = level.objects[x][y];
     if (kickedobj) {
         /* kick object; if doing is fatal, done() will clean up kickedobj */
+        Strcpy(kickobjnam, killer_xname(kickedobj)); /* matters iff res==0 */
         res = really_kick_object(x, y);
         kickedobj = (struct obj *) 0;
     }
@@ -696,12 +698,12 @@ really_kick_object(xchar x, xchar y)
 
 /* cause of death if kicking kills kicker */
 STATIC_OVL char *
-kickstr(char *buf)
+kickstr(char *buf, const char *kickobjnam)
 {
     const char *what;
 
-    if (kickedobj)
-        what = killer_xname(kickedobj);
+    if (*kickobjnam)
+        what = kickobjnam;
     else if (maploc == &nowhere)
         what = "nothing";
     else if (IS_DOOR(maploc->typ))
@@ -743,8 +745,9 @@ dokick()
     int dmg = 0, glyph, oldglyph = -1;
     register struct monst *mtmp;
     boolean no_kick = FALSE;
-    char buf[BUFSZ];
+    char buf[BUFSZ], kickobjnam[BUFSZ];
 
+    kickobjnam[0] = '\0';
     if (nolimbs(youmonst.data) || slithy(youmonst.data)) {
         You("have no legs to kick with.");
         no_kick = TRUE;
@@ -936,7 +939,7 @@ dokick()
 
     if (OBJ_AT(x, y) && (!Levitation || Is_airlevel(&u.uz)
                          || Is_waterlevel(&u.uz) || sobj_at(BOULDER, x, y))) {
-        if (kick_object(x, y)) {
+        if (kick_object(x, y, kickobjnam)) {
             if (Is_airlevel(&u.uz))
                 hurtle(-u.dx, -u.dy, 1, TRUE); /* assume it's light */
             return 1;
@@ -1199,7 +1202,7 @@ dokick()
             if (!rn2(3))
                 set_wounded_legs(RIGHT_SIDE, 5 + rnd(5));
             dmg = rnd(ACURR(A_CON) > 15 ? 3 : 5);
-            losehp(Maybe_Half_Phys(dmg), kickstr(buf), KILLED_BY);
+            losehp(Maybe_Half_Phys(dmg), kickstr(buf, kickobjnam), KILLED_BY);
             if (Is_airlevel(&u.uz) || Levitation)
                 hurtle(-u.dx, -u.dy, rn1(2, 4), TRUE); /* assume it's heavy */
             return 1;

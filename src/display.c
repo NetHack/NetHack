@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1446808439 2015/11/06 11:13:59 $  $NHDT-Branch: master $:$NHDT-Revision: 1.77 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1457207034 2016/03/05 19:43:54 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.82 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -453,16 +453,10 @@ STATIC_OVL void
 display_warning(register struct monst *mon)
 {
     int x = mon->mx, y = mon->my;
-    int wl = (int) (mon->m_lev / 4);
     int glyph;
 
     if (mon_warning(mon)) {
-        if (wl > WARNCOUNT - 1)
-            wl = WARNCOUNT - 1;
-        /* 3.4.1: this really ought to be rn2(WARNCOUNT), but value "0"
-           isn't handled correctly by the what_is routine so avoid it */
-        if (Hallucination)
-            wl = rn1(WARNCOUNT - 1, 1);
+        int wl = Hallucination ? rn1(WARNCOUNT - 1, 1) : warning_of(mon);
         glyph = warning_to_glyph(wl);
     } else if (MATCH_WARN_OF_MON(mon)) {
         glyph = mon_to_glyph(mon);
@@ -471,6 +465,18 @@ display_warning(register struct monst *mon)
         return;
     }
     show_glyph(x, y, glyph);
+}
+
+int
+warning_of(mon)
+struct monst *mon;
+{
+    int wl = 0, tmp = 0;
+    if (mon_warning(mon)) {
+        tmp = (int) (mon->m_lev / 4);    /* match display.h */
+        wl = (tmp > WARNCOUNT - 1) ? WARNCOUNT - 1 : tmp;
+    }
+    return wl;
 }
 
 
@@ -1180,8 +1186,7 @@ set_mimic_blocking()
     for (mon = fmon; mon; mon = mon->nmon) {
         if (DEADMONSTER(mon))
             continue;
-        if (mon->minvis && (is_door_mappear(mon)
-                            || is_obj_mappear(mon,BOULDER))) {
+        if (mon->minvis && is_lightblocker_mappear(mon)) {
             if (See_invisible)
                 block_point(mon->mx, mon->my);
             else
@@ -1297,6 +1302,21 @@ typedef struct {
 static gbuf_entry gbuf[ROWNO][COLNO];
 static char gbuf_start[ROWNO];
 static char gbuf_stop[ROWNO];
+
+/* FIXME: This is a dirty hack, because newsym() doesn't distinguish
+ * between object piles and single objects, it doesn't mark the location
+ * for update. */
+void
+newsym_force(x, y)
+register int x, y;
+{
+    newsym(x,y);
+    gbuf[y][x].new = 1;
+    if (gbuf_start[y] > x)
+        gbuf_start[y] = x;
+    if (gbuf_stop[y] < x)
+        gbuf_stop[y] = x;
+}
 
 /*
  * Store the glyph in the 3rd screen for later flushing.
@@ -1697,7 +1717,8 @@ get_bk_glyph(xchar x, xchar y)
     int idx, bkglyph = NO_GLYPH;
     struct rm *lev = &levl[x][y];
 
-    if (iflags.use_background_glyph) {
+    if (iflags.use_background_glyph && lev->seenv != 0
+            && gbuf[y][x].glyph != cmap_to_glyph(S_stone)) {
         switch (lev->typ) {
         case SCORR:
         case STONE:
@@ -1718,8 +1739,15 @@ get_bk_glyph(xchar x, xchar y)
         case CLOUD:
            idx = S_cloud;
            break;
+        case POOL:
+        case MOAT:
+           idx = S_pool;
+           break;
         case WATER:
            idx = S_water;
+           break;
+        case LAVAPOOL:
+           idx = S_lava;
            break;
         default:
            idx = S_room;

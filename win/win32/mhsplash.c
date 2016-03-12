@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhsplash.c	$NHDT-Date: 1432512813 2015/05/25 00:13:33 $  $NHDT-Branch: master $:$NHDT-Revision: 1.25 $ */
+/* NetHack 3.6	mhsplash.c	$NHDT-Date: 1449751714 2015/12/10 12:48:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.27 $ */
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -94,11 +94,24 @@ mswin_display_splash_window(BOOL show_ver)
     if (show_ver) {
         /* Show complete version information */
         dlb *f;
+        char verbuf[BUFSZ];
+        int verstrsize = 0;
+ 
+        getversionstring(verbuf);
+        verstrsize = strlen(verbuf);
+        if (verstrsize + strlen("\r\n\r\n") + 1  <  BUFSZ - 1)
+            strcat(verbuf, "\r\n\r\n");
+        verstrsize = strlen(verbuf);
 
-        getversionstring(buf + strsize);
-        strcat(buf, "\r\n\r\n");
+        if (strsize + verstrsize + 1 > bufsize) {
+            bufsize += BUFSZ;
+            buf = realloc(buf, bufsize);
+            if (buf == NULL)
+                panic("out of memory");
+        }
+        strcat(buf, verbuf);
         strsize = strlen(buf);
-
+            
         /* Add compile options */
         f = dlb_fopen(OPTIONS_USED, RDTMODE);
         if (f) {

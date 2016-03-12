@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1447490776 2015/11/14 08:46:16 $  $NHDT-Branch: master $:$NHDT-Revision: 1.154 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1457570258 2016/03/10 00:37:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.166 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -116,7 +116,12 @@ obj_typename(register int otyp)
         Strcpy(buf, "wand");
         break;
     case SPBOOK_CLASS:
-        Strcpy(buf, "spellbook");
+        if (otyp != SPE_NOVEL) {
+            Strcpy(buf, "spellbook");
+        } else {
+            Strcpy(buf, !nn ? "book" : "novel");
+            nn = 0;
+        }
         break;
     case RING_CLASS:
         Strcpy(buf, "ring");
@@ -191,22 +196,30 @@ obj_is_pname(struct obj *obj)
     return TRUE;
 }
 
+/* used by distant_name() to pass extra information to xname_flags();
+   it would be much cleaner if this were a parameter, but that would
+   require all of the xname() and doname() calls to be modified */
+static int distantname = 0;
+
 /* Give the name of an object seen at a distance.  Unlike xname/doname,
- * we don't want to set dknown if it's not set already.  The kludge used is
- * to temporarily set Blind so that xname() skips the dknown setting.  This
- * assumes that we don't want to do this too often; if this function becomes
- * frequently used, it'd probably be better to pass a parameter to xname()
- * or doname() instead.
+ * we don't want to set dknown if it's not set already.
  */
 char *
 distant_name(struct obj *obj, char *FDECL((*func), (OBJ_P)))
 {
     char *str;
 
-    long save_Blinded = Blinded;
-    Blinded = 1;
+    /* 3.6.1: this used to save Blind, set it, make the call, then restore
+     * the saved value; but the Eyes of the Overworld override blindness
+     * and let characters wearing them get dknown set for distant items.
+     *
+     * TODO? if the hero is wearing those Eyes, figure out whether the
+     * object is within X-ray radius and only treat it as distant when
+     * beyond that radius.  Logic is iffy but result might be interesting.
+     */
+    ++distantname;
     str = (*func)(obj);
-    Blinded = save_Blinded;
+    --distantname;
     return str;
 }
 
@@ -260,7 +273,7 @@ xname_flags(register struct obj *obj,
      */
     if (!nn && ocl->oc_uses_known && ocl->oc_unique)
         obj->known = 0;
-    if (!Blind)
+    if (!Blind && !distantname)
         obj->dknown = TRUE;
     if (Role_if(PM_PRIEST))
         obj->bknown = TRUE;
@@ -700,6 +713,31 @@ add_erosion_words(struct obj *obj, char *prefix)
                                    : "");
 }
 
+/* used to prevent rust on items where rust makes no difference */
+boolean
+erosion_matters(obj)
+struct obj *obj;
+{
+    switch (obj->oclass) {
+    case TOOL_CLASS:
+        /* it's possible for a rusty weptool to be polymorphed into some
+           non-weptool iron tool, in which case the rust implicitly goes
+           away, but it's also possible for it to be polymorphed into a
+           non-iron tool, in which case rust also implicitly goes away,
+           so there's no particular reason to try to handle the first
+           instance differently [this comment belongs in poly_obj()...] */
+        return is_weptool(obj) ? TRUE : FALSE;
+    case WEAPON_CLASS:
+    case ARMOR_CLASS:
+    case BALL_CLASS:
+    case CHAIN_CLASS:
+        return TRUE;
+    default:
+        break;
+    }
+    return FALSE;
+}
+
 static char *
 doname_base(register struct obj *obj, boolean with_price)
 {
@@ -796,7 +834,10 @@ doname_base(register struct obj *obj, boolean with_price)
 
     if (lknown && Is_box(obj)) {
         if (obj->obroken)
-            Strcat(prefix, "unlockable ");
+            /* 3.6.0 used "unlockable" here but that could be misunderstood
+               to mean "capable of being unlocked" rather than the intended
+               "not capable of being locked" */
+            Strcat(prefix, "broken ");
         else if (obj->olocked)
             Strcat(prefix, "locked ");
         else
@@ -818,31 +859,27 @@ doname_base(register struct obj *obj, boolean with_price)
                 plur(itemcount));
     }
 
-    switch (obj->oclass) {
+    switch (is_weptool(obj) ? WEAPON_CLASS : obj->oclass) {
     case AMULET_CLASS:
         if (obj->owornmask & W_AMUL)
             Strcat(bp, " (being worn)");
         break;
+    case ARMOR_CLASS:
+        if (obj->owornmask & W_ARMOR)
+            Strcat(bp, (obj == uskin) ? " (embedded in your skin)"
+                                      : " (being worn)");
+        /*FALLTHRU*/
     case WEAPON_CLASS:
         if (ispoisoned)
             Strcat(prefix, "poisoned ");
-    plus:
         add_erosion_words(obj, prefix);
         if (known) {
             Strcat(prefix, sitoa(obj->spe));
             Strcat(prefix, " ");
         }
         break;
-    case ARMOR_CLASS:
-        if (obj->owornmask & W_ARMOR)
-            Strcat(bp, (obj == uskin) ? " (embedded in your skin)"
-                                      : " (being worn)");
-        goto plus;
     case TOOL_CLASS:
-        /* weptools already get this done when we go to the +n code */
-        if (!is_weptool(obj))
-            add_erosion_words(obj, prefix);
-        if (obj->owornmask & (W_TOOL /* blindfold */ | W_SADDLE)) {
+        if (obj->owornmask & (W_TOOL | W_SADDLE)) { /* blindfold */
             Strcat(bp, " (being worn)");
             break;
         }
@@ -850,8 +887,6 @@ doname_base(register struct obj *obj, boolean with_price)
             Strcat(bp, " (in use)");
             break;
         }
-        if (is_weptool(obj))
-            goto plus;
         if (obj->otyp == CANDELABRUM_OF_INVOCATION) {
             if (!obj->spe)
                 Strcpy(tmpbuf, "no");
@@ -873,7 +908,6 @@ doname_base(register struct obj *obj, boolean with_price)
             goto charges;
         break;
     case WAND_CLASS:
-        add_erosion_words(obj, prefix);
     charges:
         if (known)
             Sprintf(eos(bp), " (%d:%d)", (int) obj->recharged, obj->spe);
@@ -883,7 +917,6 @@ doname_base(register struct obj *obj, boolean with_price)
             Strcat(bp, " (lit)");
         break;
     case RING_CLASS:
-        add_erosion_words(obj, prefix);
     ring:
         if (obj->owornmask & W_RINGR)
             Strcat(bp, " (on right ");
@@ -1007,7 +1040,7 @@ doname_base(register struct obj *obj, boolean with_price)
 
     /* show weight for items (debug tourist info)
      * aum is stolen from Crawl's "Arbitrary Unit of Measure" */
-    if (wizard) {
+    if (wizard && iflags.wizweight) {
         Sprintf(eos(bp), " (%d aum)", obj->owt);
     }
     bp = strprepend(bp, prefix);
@@ -1064,6 +1097,8 @@ not_fully_identified(register struct obj *otmp)
                           || is_flammable(otmp));
 }
 
+/* format a corpse name (xname() omits monster type; doname() calls us);
+   eatcorpse() also uses us for death reason when eating tainted glob */
 char *
 corpse_xname(struct obj *otmp,
              const char *adjective,
@@ -1079,10 +1114,14 @@ corpse_xname(struct obj *otmp,
             /* include "an" for "an ogre corpse */
         any_prefix = (cxn_flags & CXN_ARTICLE) != 0,
             /* leave off suffix (do_name() appends "corpse" itself) */
-        omit_corpse = (cxn_flags & CXN_NOCORPSE) != 0, possessive = FALSE;
+        omit_corpse = (cxn_flags & CXN_NOCORPSE) != 0,
+        possessive = FALSE,
+        glob = (otmp->otyp != CORPSE && otmp->globby);
     const char *mname;
 
-    if (omndx == NON_PM) { /* paranoia */
+    if (glob) {
+        mname = OBJ_NAME(objects[otmp->otyp]); /* "glob of <monster>" */
+    } else if (omndx == NON_PM) { /* paranoia */
         mname = "thing";
         /* [Possible enhancement:  check whether corpse has monster traits
             attached in order to use priestname() for priests and minions.] */
@@ -1133,7 +1172,9 @@ corpse_xname(struct obj *otmp,
             any_prefix = FALSE;
     }
 
-    if (!omit_corpse) {
+    if (glob) {
+        ; /* omit_corpse doesn't apply; quantity is always 1 */
+    } else if (!omit_corpse) {
         Strcat(nambuf, " corpse");
         /* makeplural(nambuf) => append "s" to "corpse" */
         if (otmp->quan > 1L && !ignore_quan) {
@@ -1811,6 +1852,15 @@ singplur_lookup(char *basestr, char *endstring, /* base string, pointer to eos(s
         }
     }
 
+    /* avoid false hit on one_off[].plur == "lice";
+       if more of these turn up, one_off[] entries will need to flagged
+       as to which are whole words and which are matchable as suffices
+       then matching in the loop below will end up becoming more complex */
+    if (!strcmpi(basestr, "slice")) {
+        if (to_plural)
+            (void) strkitten(basestr, 's');
+        return TRUE;
+    }
     for (sp = one_off; sp->sing; sp++) {
         /* check whether endstring already matches */
         same = to_plural ? sp->plur : sp->sing;
@@ -2305,6 +2355,7 @@ struct alt_spellings {
     { "grappling iron", GRAPPLING_HOOK },
     { "grapnel", GRAPPLING_HOOK },
     { "grapple", GRAPPLING_HOOK },
+    { "protection from shape shifters", RIN_PROTECTION_FROM_SHAPE_CHAN },
     /* normally we wouldn't have to worry about unnecessary <space>, but
        " stone" will get stripped off, preventing a wishymatch; that actually
        lets "flint stone" be a match, so we also accept bogus "flintstone" */
@@ -3266,6 +3317,8 @@ typfnd:
         break;
 #ifdef MAIL
     case SCR_MAIL:
+        /* 0: delivered in-game via external event (or randomly for fake mail);
+           1: from bones or wishing; 2: written with marker */
         otmp->spe = 1;
         break;
 #endif
@@ -3345,15 +3398,19 @@ typfnd:
         curse(otmp);
     }
 
-    /* set eroded */
-    if (is_damageable(otmp) || otmp->otyp == CRYSKNIFE) {
+    /* set eroded and erodeproof */
+    if (erosion_matters(otmp)) {
         if (eroded && (is_flammable(otmp) || is_rustprone(otmp)))
             otmp->oeroded = eroded;
         if (eroded2 && (is_corrodeable(otmp) || is_rottable(otmp)))
             otmp->oeroded2 = eroded2;
-
-        /* set erodeproof */
-        if (erodeproof && !eroded && !eroded2)
+        /*
+         * 3.6.1: earlier versions included `&& !eroded && !eroded2' here,
+         * but damageproof combined with damaged is feasible (eroded
+         * armor modified by confused reading of cursed destroy armor)
+         * so don't prevent player from wishing for such a combination.
+         */
+        if (erodeproof && (is_damageable(otmp) || otmp->otyp == CRYSKNIFE))
             otmp->oerodeproof = (Luck >= 0 || wizard);
     }
 
@@ -3398,7 +3455,7 @@ typfnd:
         if (aname && objtyp == otmp->otyp)
             name = aname;
 
-        /* 3.6.0 tribute - fix up novel */
+        /* 3.6 tribute - fix up novel */
         if (otmp->otyp == SPE_NOVEL) {
             const char *novelname;
 
@@ -3435,7 +3492,7 @@ typfnd:
     }
     otmp->owt = weight(otmp);
     if (very && otmp->otyp == HEAVY_IRON_BALL)
-        otmp->owt += 160;
+        otmp->owt += IRON_BALL_W_INCR;
 
     return otmp;
 }
@@ -3532,12 +3589,11 @@ helm_simple_name(struct obj *helmet)
 const char *
 mimic_obj_name(struct monst *mtmp)
 {
-    if (mtmp->m_ap_type == M_AP_OBJECT
-        && mtmp->mappearance != STRANGE_OBJECT) {
-        int idx = objects[mtmp->mappearance].oc_descr_idx;
+    if (mtmp->m_ap_type == M_AP_OBJECT) {
         if (mtmp->mappearance == GOLD_PIECE)
             return "gold";
-        return obj_descr[idx].oc_name;
+        if (mtmp->mappearance != STRANGE_OBJECT)
+            return simple_typename(mtmp->mappearance);
     }
     return "whatcha-may-callit";
 }

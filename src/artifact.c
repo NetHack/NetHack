@@ -1,4 +1,4 @@
-/* NetHack 3.6	artifact.c	$NHDT-Date: 1446369462 2015/11/01 09:17:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.96 $ */
+/* NetHack 3.6	artifact.c	$NHDT-Date: 1451081581 2015/12/25 22:13:01 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.99 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -18,13 +18,12 @@ extern boolean notonhead; /* for long worms */
 #define get_artifact(o) \
     (((o) && (o)->oartifact) ? &artilist[(int) (o)->oartifact] : 0)
 
-STATIC_DCL boolean
-FDECL(bane_applies, (const struct artifact *, struct monst *));
+STATIC_DCL boolean FDECL(bane_applies, (const struct artifact *,
+                                        struct monst *));
 STATIC_DCL int FDECL(spec_applies, (const struct artifact *, struct monst *));
 STATIC_DCL int FDECL(arti_invoke, (struct obj *));
-STATIC_DCL boolean
-FDECL(Mb_hit, (struct monst * magr, struct monst *mdef, struct obj *, int *,
-               int, boolean, char *));
+STATIC_DCL boolean FDECL(Mb_hit, (struct monst * magr, struct monst *mdef,
+                                struct obj *, int *, int, boolean, char *));
 STATIC_DCL unsigned long FDECL(abil_to_spfx, (long *));
 STATIC_DCL uchar FDECL(abil_to_adtyp, (long *));
 STATIC_DCL boolean FDECL(untouchable, (struct obj *, boolean));
@@ -436,10 +435,11 @@ protects(struct obj *otmp, boolean being_worn)
  * unworn/unwielded/dropped.  Pickup/drop only set/reset the W_ART mask.
  */
 void
-set_artifact_intrinsic(register struct obj *otmp, boolean on, long wp_mask)
+set_artifact_intrinsic(struct obj *otmp, boolean on, long wp_mask)
 {
     long *mask = 0;
-    register const struct artifact *oart = get_artifact(otmp);
+    register const struct artifact *art, *oart = get_artifact(otmp);
+    register struct obj *obj;
     register uchar dtyp;
     register long spfx;
 
@@ -461,19 +461,21 @@ set_artifact_intrinsic(register struct obj *otmp, boolean on, long wp_mask)
         mask = &EDisint_resistance;
     else if (dtyp == AD_DRST)
         mask = &EPoison_resistance;
+    else if (dtyp == AD_DRLI)
+        mask = &EDrain_resistance;
 
     if (mask && wp_mask == W_ART && !on) {
-        /* find out if some other artifact also confers this intrinsic */
-        /* if so, leave the mask alone */
-        register struct obj *obj;
-        for (obj = invent; obj; obj = obj->nobj)
+        /* find out if some other artifact also confers this intrinsic;
+           if so, leave the mask alone */
+        for (obj = invent; obj; obj = obj->nobj) {
             if (obj != otmp && obj->oartifact) {
-                register const struct artifact *art = get_artifact(obj);
+                art = get_artifact(obj);
                 if (art->cary.adtyp == dtyp) {
                     mask = (long *) 0;
                     break;
                 }
             }
+        }
     }
     if (mask) {
         if (on)
@@ -486,10 +488,9 @@ set_artifact_intrinsic(register struct obj *otmp, boolean on, long wp_mask)
     spfx = (wp_mask != W_ART) ? oart->spfx : oart->cspfx;
     if (spfx && wp_mask == W_ART && !on) {
         /* don't change any spfx also conferred by other artifacts */
-        register struct obj *obj;
         for (obj = invent; obj; obj = obj->nobj)
             if (obj != otmp && obj->oartifact) {
-                register const struct artifact *art = get_artifact(obj);
+                art = get_artifact(obj);
                 spfx &= ~art->cspfx;
             }
     }
@@ -1686,6 +1687,7 @@ abil_to_adtyp(long *abil)
         { &EAntimagic, AD_MAGM },
         { &EDisint_resistance, AD_DISN },
         { &EPoison_resistance, AD_DRST },
+        { &EDrain_resistance, AD_DRLI },
     };
     int k;
 
@@ -1738,7 +1740,6 @@ what_gives(long *abil)
     long wornmask = (W_ARM | W_ARMC | W_ARMH | W_ARMS
                      | W_ARMG | W_ARMF | W_ARMU
                      | W_AMUL | W_RINGL | W_RINGR | W_TOOL
-                     /* [do W_ART and W_ARTI actually belong here?] */
                      | W_ART | W_ARTI);
 
     if (u.twoweap)
@@ -1754,7 +1755,9 @@ what_gives(long *abil)
 
             if (art) {
                 if (dtyp) {
-                    if (art->cary.adtyp == dtyp || art->defn.adtyp == dtyp)
+                    if (art->cary.adtyp == dtyp /* carried */
+                        || (art->defn.adtyp == dtyp /* defends while worn */
+                            && (obj->owornmask & ~(W_ART | W_ARTI))))
                         return obj;
                 }
                 if (spfx) {

@@ -1,4 +1,4 @@
-/* NetHack 3.6	pcmain.c	$NHDT-Date: 1449116336 2015/12/03 04:18:56 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.66 $ */
+/* NetHack 3.6	pcmain.c	$NHDT-Date: 1457207045 2016/03/05 19:44:05 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.69 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -55,8 +55,12 @@ extern void FDECL(nethack_exit, (int));
 #ifdef WIN32
 extern boolean getreturn_enabled; /* from sys/share/pcsys.c */
 extern int redirect_stdout;       /* from sys/share/pcsys.c */
+extern int GUILaunched;
+HANDLE hStdOut;
 char *NDECL(exename);
 char default_window_sys[] = "mswin";
+boolean NDECL(fakeconsole);
+void NDECL(freefakeconsole);
 #endif
 
 #if defined(MSWIN_GRAPHICS)
@@ -107,9 +111,11 @@ pcmain(int argc, char *argv[])
 {
     register int fd;
     register char *dir;
-#if defined(WIN32)
+#if defined(WIN32) || defined(MSDOS)
     char *envp = NULL;
     char *sptr = NULL;
+#endif
+#if defined(WIN32)
     char fnamebuf[BUFSZ], encodedfnamebuf[BUFSZ];
     boolean save_getreturn_status = getreturn_enabled;
 #endif
@@ -170,7 +176,33 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     if (dir == (char *) 0)
         dir = exepath(argv[0]);
 #endif
-    if (dir != (char *) 0) {
+#ifdef _MSC_VER
+    if (IsDebuggerPresent()) {
+        static char exepath[_MAX_PATH];
+        /* check if we're running under the debugger so we can get to the right folder anyway */
+        if (dir != (char *)0) {
+            char *top = (char *)0;
+
+            if (strlen(dir) < (_MAX_PATH - 1))
+                strcpy(exepath, dir);
+            top = strstr(exepath, "\\build\\.\\Debug");
+            if (!top) top = strstr(exepath, "\\build\\.\\Release");
+            if (top) {
+                *top = '\0';
+                if (strlen(exepath) < (_MAX_PATH - (strlen("\\binary\\") + 1))) {
+                    Strcat(exepath, "\\binary\\");
+                    if (strlen(exepath) < (PATHLEN - 1)) {
+                        dir = exepath;
+                    }
+                }
+            }
+        }
+    }
+#endif
+    if (dir != (char *)0) {
+        int fd;
+        boolean have_syscf = FALSE;
+
         (void) strncpy(hackdir, dir, PATHLEN - 1);
         hackdir[PATHLEN - 1] = '\0';
 #ifdef NOCWD_ASSUMPTIONS
@@ -195,6 +227,34 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
                     Strcpy(fqn_prefix[SYSCONFPREFIX], envp);
                     append_slash(fqn_prefix[SYSCONFPREFIX]);
                     Strcat(fqn_prefix[SYSCONFPREFIX], "NetHack\\");
+                }
+            }
+
+            /* okay so we have the overriding and definitive locaton
+            for sysconf, but only in the event that there is not a 
+            sysconf file there (for whatever reason), check a secondary
+            location rather than abort. */
+
+            /* Is there a SYSCF_FILE there? */
+            fd = open(fqname(SYSCF_FILE, SYSCONFPREFIX, 0), O_RDONLY);
+            if (fd >= 0) {
+                /* readable */
+                close(fd);
+                have_syscf = TRUE;
+            }
+
+            if (!have_syscf) {
+                /* No SYSCF_FILE where there should be one, and
+                   without an installer, a user may not be able
+                   to place one there. So, let's try somewhere else... */
+                fqn_prefix[SYSCONFPREFIX] = fqn_prefix[0];
+
+                /* Is there a SYSCF_FILE there? */
+                fd = open(fqname(SYSCF_FILE, SYSCONFPREFIX, 0), O_RDONLY);
+                if (fd >= 0) {
+                    /* readable */
+                    close(fd);
+                    have_syscf = TRUE;
                 }
             }
 
@@ -275,16 +335,30 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
             Strcpy(hackdir, dir);
         }
         if (argc > 1) {
+#if defined(WIN32)
+            int sfd = 0;
+            boolean tmpconsole = FALSE;
+            hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+#endif
             /*
              * Now we know the directory containing 'record' and
              * may do a prscore().
              */
             if (!strncmp(argv[1], "-s", 2)) {
 #if defined(WIN32)
-                int sfd = (int) _fileno(stdout);
+
+#if 0
+                if (!hStdOut) {
+                    tmpconsole = fakeconsole();
+                }
+#endif
+                /*
+                 * Check to see if we're redirecting to a file.
+                 */
+                sfd = (int) _fileno(stdout);
                 redirect_stdout = (sfd >= 0) ? !isatty(sfd) : 0;
 
-                if (!redirect_stdout) {
+                if (!redirect_stdout && !hStdOut) {
                     raw_printf(
                         "-s is not supported for the Graphical Interface\n");
                     nethack_exit(EXIT_SUCCESS);
@@ -298,6 +372,13 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
                 initoptions();
 #endif
                 prscore(argc, argv);
+#ifdef WIN32
+                if (tmpconsole) {
+                    getreturn("to exit");
+                    freefakeconsole();
+                    tmpconsole = FALSE;
+                }
+#endif
                 nethack_exit(EXIT_SUCCESS);
             }
 
@@ -309,7 +390,21 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 #endif
             /* Don't initialize the window system just to print usage */
             if (!strncmp(argv[1], "-?", 2) || !strncmp(argv[1], "/?", 2)) {
+#if 0
+                if (!hStdOut) {
+                    GUILaunched = 0;
+                    tmpconsole = fakeconsole();
+                }
+#endif
                 nhusage();
+
+#ifdef WIN32
+                if (tmpconsole) {
+                    getreturn("to exit");
+                    freefakeconsole();
+                    tmpconsole = FALSE;
+                }
+#endif
                 nethack_exit(EXIT_SUCCESS);
             }
         }
@@ -796,6 +891,9 @@ authorize_wizard_mode()
 
 #ifdef WIN32
 static char exenamebuf[PATHLEN];
+extern HANDLE hConIn;
+extern HANDLE hConOut;
+boolean has_fakeconsole;
 
 char *
 exename()
@@ -817,6 +915,42 @@ exename()
         *tmp2 = '\0';
     tmp2++;
     return tmp2;
+}
+
+boolean
+fakeconsole(void)
+{
+    if (!hStdOut) {
+        HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+        HANDLE hStdIn = GetStdHandle(STD_INPUT_HANDLE);
+
+        if (!hStdOut && !hStdIn) {
+            /* Bool rval; */
+            AllocConsole();
+            AttachConsole(GetCurrentProcessId());
+            /* 	rval = SetStdHandle(STD_OUTPUT_HANDLE, hWrite); */
+            freopen("CON", "w", stdout);
+            freopen("CON", "r", stdin);
+        }
+        has_fakeconsole = TRUE;
+    }
+    
+    /* Obtain handles for the standard Console I/O devices */
+    hConIn = GetStdHandle(STD_INPUT_HANDLE);
+    hConOut = GetStdHandle(STD_OUTPUT_HANDLE);
+#if 0
+    if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE) CtrlHandler, TRUE)) {
+        /* Unable to set control handler */
+        cmode = 0; /* just to have a statement to break on for debugger */
+    }
+#endif
+    return has_fakeconsole;
+}
+void freefakeconsole()
+{
+    if (has_fakeconsole) {
+        FreeConsole();
+    }
 }
 #endif
 

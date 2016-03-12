@@ -1,4 +1,4 @@
-/* NetHack 3.6	mhitm.c	$NHDT-Date: 1446854229 2015/11/06 23:57:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.83 $ */
+/* NetHack 3.6	mhitm.c	$NHDT-Date: 1456992461 2016/03/03 08:07:41 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.86 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -341,7 +341,7 @@ mattackm(register struct monst *magr, register struct monst *mdef)
     /* Now perform all attacks for the monster. */
     for (i = 0; i < NATTK; i++) {
         res[i] = MM_MISS;
-        mattk = getmattk(pa, i, res, &alt_attk);
+        mattk = getmattk(magr, mdef, i, res, &alt_attk);
         otmp = (struct obj *) 0;
         attk = 1;
         switch (mattk->aatyp) {
@@ -1354,20 +1354,24 @@ slept_monst(struct monst *mon)
 void
 rustm(struct monst *mdef, struct obj *obj)
 {
-    int dmgtyp;
+    int dmgtyp = -1, chance = 1;
 
     if (!mdef || !obj)
         return; /* just in case */
-    /* AD_ACID is handled in passivemm */
-    if (dmgtype(mdef->data, AD_CORR))
+    /* AD_ACID and AD_ENCH are handled in passivemm() and passiveum() */
+    if (dmgtype(mdef->data, AD_CORR)) {
         dmgtyp = ERODE_CORRODE;
-    else if (dmgtype(mdef->data, AD_RUST))
+    } else if (dmgtype(mdef->data, AD_RUST)) {
         dmgtyp = ERODE_RUST;
-    else if (dmgtype(mdef->data, AD_FIRE))
+    } else if (dmgtype(mdef->data, AD_FIRE)
+               /* steam vortex: fire resist applies, fire damage doesn't */
+               && mdef->data != &mons[PM_STEAM_VORTEX]) {
         dmgtyp = ERODE_BURN;
-    else
-        return;
-    (void) erode_obj(obj, NULL, dmgtyp, EF_GREASE | EF_VERBOSE);
+        chance = 6;
+    }
+
+    if (dmgtyp >= 0 && !rn2(chance))
+        (void) erode_obj(obj, (char *) 0, dmgtyp, EF_GREASE | EF_VERBOSE);
 }
 
 STATIC_OVL void

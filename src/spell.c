@@ -1,4 +1,4 @@
-/* NetHack 3.6	spell.c	$NHDT-Date: 1447653429 2015/11/16 05:57:09 $  $NHDT-Branch: master $:$NHDT-Revision: 1.72 $ */
+/* NetHack 3.6	spell.c	$NHDT-Date: 1450584420 2015/12/20 04:07:00 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.75 $ */
 /*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -118,6 +118,7 @@ spell_let_to_idx(char ilet)
 STATIC_OVL boolean
 cursed_book(struct obj *bp)
 {
+    boolean was_in_use;
     int lev = objects[bp->otyp].oc_level;
     int dmg = 0;
 
@@ -147,11 +148,12 @@ cursed_book(struct obj *bp)
             break;
         }
         /* temp disable in_use; death should not destroy the book */
+        was_in_use = bp->in_use;
         bp->in_use = FALSE;
         losestr(Poison_resistance ? rn1(2, 1) : rn1(4, 3));
         losehp(rnd(Poison_resistance ? 6 : 10), "contact-poisoned spellbook",
                KILLED_BY_AN);
-        bp->in_use = TRUE;
+        bp->in_use = was_in_use;
         break;
     case 6:
         if (Antimagic) {
@@ -318,6 +320,17 @@ deadbook(struct obj *book2)
     return;
 }
 
+/* 'book' has just become cursed; if we're reading it and realize it is
+   now cursed, interrupt */
+void
+book_cursed(book)
+struct obj *book;
+{
+    if (occupation == learn && context.spbook.book == book
+        && book->cursed && book->bknown && multi >= 0)
+        stop_occupation();
+}
+
 STATIC_PTR int
 learn(VOID_ARGS)
 {
@@ -340,9 +353,8 @@ learn(VOID_ARGS)
         context.spbook.delay = 0;
         return 0;
     }
-    if (context
-            .spbook.delay) { /* not if (context.spbook.delay++), so at end
-                                delay == 0 */
+    if (context.spbook.delay) {
+        /* not if (context.spbook.delay++), so at end delay == 0 */
         context.spbook.delay++;
         return 1; /* still busy */
     }
@@ -425,7 +437,7 @@ study_book(register struct obj *spellbook)
     boolean too_hard = FALSE;
 
     /* attempting to read dull book may make hero fall asleep */
-    if (!confused && booktype != SPE_BLANK_PAPER
+    if (!confused && !Sleep_resistance
         && !strcmp(OBJ_DESCR(objects[booktype]), "dull")) {
         const char *eyes;
         int dullbook = rnd(25) - ACURR(A_WIS);
@@ -460,7 +472,7 @@ study_book(register struct obj *spellbook)
             return 1;
         }
 
-        /* 3.6.0 tribute */
+        /* 3.6 tribute */
         if (booktype == SPE_NOVEL) {
             /* Obtain current Terry Pratchett book title */
             const char *tribtitle = noveltitle(&spellbook->novelidx);
@@ -469,6 +481,7 @@ study_book(register struct obj *spellbook)
                              spellbook->o_id)) {
                 u.uconduct.literate++;
                 check_unpaid(spellbook);
+                makeknown(booktype);
                 if (!u.uevent.read_tribute) {
                     /* give bonus of 20 xp and 4*20+0 pts */
                     more_experienced(20, 0);
@@ -510,15 +523,16 @@ study_book(register struct obj *spellbook)
                 too_hard = TRUE;
             } else {
                 /* uncursed - chance to fail */
-                int read_ability =
-                    ACURR(A_INT) + 4 + u.ulevel / 2
-                    - 2 * objects[booktype].oc_level
-                    + ((ublindf && ublindf->otyp == LENSES) ? 2 : 0);
+                int read_ability = ACURR(A_INT) + 4 + u.ulevel / 2
+                                   - 2 * objects[booktype].oc_level
+                             + ((ublindf && ublindf->otyp == LENSES) ? 2 : 0);
+
                 /* only wizards know if a spell is too difficult */
                 if (Role_if(PM_WIZARD) && read_ability < 20 && !confused) {
                     char qbuf[QBUFSZ];
+
                     Sprintf(qbuf,
-                     "This spellbook is %sdifficult to comprehend. Continue?",
+                    "This spellbook is %sdifficult to comprehend.  Continue?",
                             (read_ability < 12 ? "very " : ""));
                     if (yn(qbuf) != 'y') {
                         spellbook->in_use = FALSE;

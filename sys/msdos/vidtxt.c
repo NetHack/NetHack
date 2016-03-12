@@ -1,4 +1,4 @@
-/* NetHack 3.6	vidtxt.c	$NHDT-Date: 1432512791 2015/05/25 00:13:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.10 $ */
+/* NetHack 3.6	vidtxt.c	$NHDT-Date: 1457207043 2016/03/05 19:44:03 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.11 $ */
 /*   Copyright (c) NetHack PC Development Team 1993                 */
 /*   NetHack may be freely redistributed.  See license for details. */
 /*                                                                  */
@@ -234,18 +234,19 @@ void txt_cl_eos() /* clear to end of screen */
 #else
     txt_get_cursor(&col, &row);
     txt_cl_end(col, row); /* clear to end of line */
-    txt_gotoxy(0, (row < (LI - 1) ? row + 1 : (LI - 1)));
-    regs.h.dl = (char) (CO - 1); /* X  of lower right */
-    regs.h.dh = (char) (LI - 1); /* Y  of lower right */
-    regs.h.cl = 0;               /* X  of upper left */
-                                 /* Y (row)  of upper left */
-    regs.h.ch = (char) (row < (LI - 1) ? row + 1 : (LI - 1));
-    regs.x.cx = 0;
-    regs.x.ax = 0;
-    regs.x.bx = 0;
-    regs.h.bh = (char) attrib_text_normal;
-    regs.h.ah = SCROLL;
-    (void) int86(VIDEO_BIOS, &regs, &regs); /* Scroll or initialize window */
+    if (row < LI - 1) {
+        txt_gotoxy(0, (row < (LI - 1) ? row + 1 : (LI - 1)));
+        regs.h.dl = (char) (CO - 1); /* X  of lower right */
+        regs.h.dh = (char) (LI - 1); /* Y  of lower right */
+        regs.h.cl = 0;               /* X  of upper left */
+                                     /* Y (row)  of upper left */
+        regs.h.ch = (char) (row < (LI - 1) ? row + 1 : (LI - 1));
+        regs.x.ax = 0;
+        regs.x.bx = 0;
+        regs.h.bh = (char) attrib_text_normal;
+        regs.h.ah = SCROLL;
+        (void) int86(VIDEO_BIOS, &regs, &regs); /* Scroll or initialize window */
+    }
 #endif
 }
 

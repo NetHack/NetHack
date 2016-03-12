@@ -1,4 +1,4 @@
-/* NetHack 3.6	allmain.c	$NHDT-Date: 1446975459 2015/11/08 09:37:39 $  $NHDT-Branch: master $:$NHDT-Revision: 1.66 $ */
+/* NetHack 3.6	allmain.c	$NHDT-Date: 1451955079 2016/01/05 00:51:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.70 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -295,10 +295,7 @@ moveloop(boolean resuming)
                             change = 2;
                         if (change && !Unchanging) {
                             if (multi >= 0) {
-                                if (occupation)
-                                    stop_occupation();
-                                else
-                                    nomul(0);
+                                stop_occupation();
                                 if (change == 1)
                                     polyself(0);
                                 else
@@ -310,6 +307,8 @@ moveloop(boolean resuming)
 
                     if (Searching && multi >= 0)
                         (void) dosearch0(1);
+                    if (Warning)
+                        warnreveal();
                     dosounds();
                     do_storms();
                     gethungry();
@@ -490,6 +489,8 @@ stop_occupation()
         context.botl = 1; /* in case u.uhs changed */
         nomul(0);
         pushch(0);
+    } else if (multi >= 0) {
+        nomul(0);
     }
 }
 
@@ -586,17 +587,12 @@ newgame()
         com_pager(1);
     }
 
+    urealtime.realtime = 0L;
+    urealtime.start_timing = getnow();
 #ifdef INSURANCE
     save_currentstate();
 #endif
     program_state.something_worth_saving++; /* useful data now exists */
-
-    urealtime.realtime = 0L;
-#if defined(BSD) && !defined(POSIX_TYPES)
-    (void) time((long *) &urealtime.restored);
-#else
-    (void) time(&urealtime.restored);
-#endif
 
     /* Success! */
     welcome(TRUE);

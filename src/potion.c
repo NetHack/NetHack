@@ -1,4 +1,4 @@
-/* NetHack 3.6	potion.c	$NHDT-Date: 1446861768 2015/11/07 02:02:48 $  $NHDT-Branch: master $:$NHDT-Revision: 1.121 $ */
+/* NetHack 3.6	potion.c	$NHDT-Date: 1455407631 2016/02/13 23:53:51 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.129 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -152,12 +152,12 @@ make_slimed(long xtime, const char *msg)
     if (Unaware)
         msg = 0;
 #endif
-    if ((!xtime && old) || (xtime && !old)) {
+    set_itimeout(&Slimed, xtime);
+    if ((xtime != 0L) ^ (old != 0L)) {
+        context.botl = TRUE;
         if (msg)
             pline1(msg);
-        context.botl = 1;
     }
-    set_itimeout(&Slimed, xtime);
     if (!Slimed)
         dealloc_killer(find_delayed_killer(SLIMED));
 }
@@ -172,12 +172,12 @@ make_stoned(long xtime, const char *msg, int killedby, const char *killername)
     if (Unaware)
         msg = 0;
 #endif
-    if ((!xtime && old) || (xtime && !old)) {
+    set_itimeout(&Stoned, xtime);
+    if ((xtime != 0L) ^ (old != 0L)) {
+        context.botl = TRUE;
         if (msg)
             pline1(msg);
-        /* context.botl = 1;   --- Stoned is not a status line item */
     }
-    set_itimeout(&Stoned, xtime);
     if (!Stoned)
         dealloc_killer(find_delayed_killer(STONED));
     else if (!old)
@@ -192,11 +192,11 @@ make_vomiting(long xtime, boolean talk)
     if (Unaware)
         talk = FALSE;
 
+    set_itimeout(&Vomiting, xtime);
+    context.botl = TRUE;
     if (!xtime && old)
         if (talk)
             You_feel("much less nauseated now.");
-
-    set_itimeout(&Vomiting, xtime);
 }
 
 static const char vismsg[] = "vision seems to %s for a moment but is %s now.";
@@ -271,7 +271,7 @@ make_blinded(long xtime, boolean talk)
     set_itimeout(&Blinded, xtime);
 
     if (u_could_see ^ can_see_now) { /* one or the other but not both */
-        context.botl = 1;
+        context.botl = TRUE;
         vision_full_recalc = 1; /* blindness just got toggled */
         /* this vision recalculation used to be deferred until
            moveloop(), but that made it possible for vision
@@ -361,7 +361,7 @@ make_hallucinated(long xtime, /* nonzero if this is an attempt to turn on halluc
         (eg. Qt windowport's equipped items display) */
         update_inventory();
 
-        context.botl = 1;
+        context.botl = TRUE;
         if (talk)
             pline(message, verb);
     }
@@ -372,26 +372,16 @@ void
 make_deaf(long xtime, boolean talk)
 {
     long old = HDeaf;
-    boolean toggled = FALSE;
 
     if (Unaware)
         talk = FALSE;
 
-    if (!xtime && old) {
-        if (talk)
-            You("can hear again.");
-        toggled = TRUE;
-    } else if (xtime && !old) {
-        if (talk)
-            You("are unable to hear anything.");
-        toggled = TRUE;
-    }
-    /* deafness isn't presently shown on status line, but
-       request a status update in case that changes someday */
-    if (toggled)
-        context.botl = TRUE;
-
     set_itimeout(&HDeaf, xtime);
+    if ((xtime != 0L) ^ (old != 0L)) {
+        context.botl = TRUE;
+        if (talk)
+            You(old ? "can hear again." : "are unable to hear anything.");
+    }
 }
 
 STATIC_OVL void
@@ -578,7 +568,7 @@ peffects(register struct obj *otmp)
                          makeplural(mons[u.ulycn].mname));
                     if (youmonst.data == &mons[u.ulycn])
                         you_unwere(FALSE);
-                    u.ulycn = NON_PM; /* cure lycanthropy */
+                    set_ulycn(NON_PM); /* cure lycanthropy */
                 }
                 losehp(Maybe_Half_Phys(d(2, 6)), "potion of holy water",
                        KILLED_BY_AN);
@@ -1692,6 +1682,7 @@ mixtype(register struct obj *o1, register struct obj *o2)
         switch (o2->otyp) {
         case POT_SICKNESS:
             return POT_SICKNESS;
+        case POT_ENLIGHTENMENT:
         case POT_SPEED:
             return POT_BOOZE;
         case POT_GAIN_LEVEL:
@@ -1713,19 +1704,21 @@ mixtype(register struct obj *o1, register struct obj *o2)
         break;
     }
 
-    return 0;
+    return STRANGE_OBJECT;
 }
 
 /* #dip command */
 int
 dodip()
 {
+    static const char Dip_[] = "Dip ";
     register struct obj *potion, *obj;
     struct obj *singlepotion;
     uchar here;
     char allowall[2];
     short mixture;
-    char qbuf[QBUFSZ], qtoo[QBUFSZ];
+    char qbuf[QBUFSZ], obuf[QBUFSZ];
+    const char *shortestname; /* last resort obj name for prompt */
 
     allowall[0] = ALL_CLASSES;
     allowall[1] = '\0';
@@ -1734,22 +1727,38 @@ dodip()
     if (inaccessible_equipment(obj, "dip", FALSE))
         return 0;
 
-    Sprintf(qbuf, "dip %s into", thesimpleoname(obj));
+    shortestname = is_plural(obj) ? "them" : "it";
+    /*
+     * Bypass safe_qbuf() since it doesn't handle varying suffix without
+     * an awful lot of support work.  Format the object once, even though
+     * the fountain and pool prompts offer a lot more room for it.
+     * 3.6.0 used thesimpleoname() unconditionally, which posed no risk
+     * of buffer overflow but drew bug reports because it omits user-
+     * supplied type name.
+     * getobj: "What do you want to dip <the object> into? [xyz or ?*] "
+     */
+    Strcpy(obuf, short_oname(obj, doname, thesimpleoname,
+                             /* 128 - (24 + 54 + 1) leaves 49 for <object> */
+                             QBUFSZ - sizeof "What do you want to dip \
+ into? [abdeghjkmnpqstvwyzBCEFHIKLNOQRTUWXZ#-# or ?*] "));
+
     here = levl[u.ux][u.uy].typ;
     /* Is there a fountain to dip into here? */
     if (IS_FOUNTAIN(here)) {
+        Sprintf(qbuf, "%s%s into the fountain?", Dip_,
+                flags.verbose ? obuf : shortestname);
         /* "Dip <the object> into the fountain?" */
-        Sprintf(qtoo, "%s the fountain?", qbuf);
-        if (yn(upstart(qtoo)) == 'y') {
+        if (yn(qbuf) == 'y') {
             dipfountain(obj);
             return 1;
         }
     } else if (is_pool(u.ux, u.uy)) {
         const char *pooltype = waterbody_name(u.ux, u.uy);
 
+        Sprintf(qbuf, "%s%s into the %s?", Dip_,
+                flags.verbose ? obuf : shortestname, pooltype);
         /* "Dip <the object> into the {pool, moat, &c}?" */
-        Sprintf(qtoo, "%s the %s?", qbuf, pooltype);
-        if (yn(upstart(qtoo)) == 'y') {
+        if (yn(qbuf) == 'y') {
             if (Levitation) {
                 floating_above(pooltype);
             } else if (u.usteed && !is_swimmer(u.usteed->data)
@@ -1765,8 +1774,9 @@ dodip()
         }
     }
 
-    /* "What do you want to dip <the object> into?" */
-    potion = getobj(beverages, qbuf); /* "dip into" */
+    /* "What do you want to dip <the object> into? [xyz or ?*] " */
+    Sprintf(qbuf, "dip %s into", flags.verbose ? obuf : shortestname);
+    potion = getobj(beverages, qbuf);
     if (!potion)
         return 0;
     if (potion == obj && potion->quan == 1L) {
@@ -1821,19 +1831,25 @@ dodip()
         potion->in_use = FALSE; /* didn't go poof */
         return 1;
     } else if (obj->oclass == POTION_CLASS && obj->otyp != potion->otyp) {
-        long amt = obj->quan;
+        int amt = (int) obj->quan;
+        boolean magic;
 
-        Strcpy(qbuf, "The");
-        if (amt > (objects[potion->otyp].oc_magic ? 2L : 9L)) {
+        mixture = mixtype(obj, potion);
+
+        magic = (mixture != STRANGE_OBJECT) ? objects[mixture].oc_magic
+            : (objects[obj->otyp].oc_magic || objects[potion->otyp].oc_magic);
+        Strcpy(qbuf, "The"); /* assume full stack */
+        if (amt > (magic ? 3 : 7)) {
             /* trying to dip multiple potions will usually affect only a
-               subset; pick an amount between 2 and min(N,9), inclusive */
-            amt -= 1L;
-            do {
-                amt = (long) rnd((int) amt);
-            } while (amt >= 9L);
-            amt += 1L;
-            if (amt < obj->quan) {
-                obj = splitobj(obj, amt);
+               subset; pick an amount between 3 and 8, inclusive, for magic
+               potion result, between 7 and N for non-magic */
+            if (magic)
+                amt = rnd(min(amt, 8) - (3 - 1)) + (3 - 1); /* 1..6 + 2 */
+            else
+                amt = rnd(amt - (7 - 1)) + (7 - 1); /* 1..(N-6) + 6 */
+
+            if ((long) amt < obj->quan) {
+                obj = splitobj(obj, (long) amt);
                 Sprintf(qbuf, "%ld of the", obj->quan);
             }
         }
@@ -1856,7 +1872,7 @@ dodip()
                 potionbreathe(obj);
             useupall(obj);
             useup(potion);
-            losehp((int) (amt + rnd(9)), /* not physical damage */
+            losehp(amt + rnd(9), /* not physical damage */
                    "alchemic blast", KILLED_BY_AN);
             return 1;
         }
@@ -1865,7 +1881,7 @@ dodip()
         if (Blind || Hallucination)
             obj->dknown = 0;
 
-        if ((mixture = mixtype(obj, potion)) != 0) {
+        if (mixture != STRANGE_OBJECT) {
             obj->otyp = mixture;
         } else {
             switch (obj->odiluted ? 1 : rnd(8)) {
@@ -2027,7 +2043,7 @@ more_dips:
 
     potion->in_use = FALSE; /* didn't go poof */
     if ((obj->otyp == UNICORN_HORN || obj->otyp == AMETHYST)
-        && (mixture = mixtype(obj, potion)) != 0) {
+        && (mixture = mixtype(obj, potion)) != STRANGE_OBJECT) {
         char oldbuf[BUFSZ], newbuf[BUFSZ];
         short old_otyp = potion->otyp;
         boolean old_dknown = FALSE;

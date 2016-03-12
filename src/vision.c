@@ -173,9 +173,9 @@ does_block(int x, int y, register struct rm *lev)
         if (obj->otyp == BOULDER)
             return 1;
 
-    /* Mimics mimicing a door or boulder block light. */
+    /* Mimics mimicing a door or boulder or ... block light. */
     if ((mon = m_at(x, y)) && (!mon->minvis || See_invisible)
-        && (is_door_mappear(mon) || is_obj_mappear(mon,BOULDER)))
+        && is_lightblocker_mappear(mon))
         return 1;
 
     return 0;

@@ -1,4 +1,4 @@
-/* NetHack 3.6	polyself.c	$NHDT-Date: 1448496566 2015/11/26 00:09:26 $  $NHDT-Branch: master $:$NHDT-Revision: 1.104 $ */
+/* NetHack 3.6	polyself.c	$NHDT-Date: 1457572516 2016/03/10 01:15:16 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.108 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -28,7 +28,7 @@ STATIC_DCL void FDECL(drop_weapon, (int));
 STATIC_DCL void NDECL(uunstick);
 STATIC_DCL int FDECL(armor_to_dragon, (int));
 STATIC_DCL void NDECL(newman);
-STATIC_DCL boolean FDECL(polysense, (struct permonst *));
+STATIC_DCL void NDECL(polysense);
 
 STATIC_VAR const char no_longer_petrify_resistant[] =
     "No longer petrify-resistant, you";
@@ -42,6 +42,7 @@ void
 set_uasmon()
 {
     struct permonst *mdat = &mons[u.umonnum];
+    int new_speed, old_speed = youmonst.data ? youmonst.data->mmove : 0;
 
     set_mon_data(&youmonst, mdat, 0);
 
@@ -92,10 +93,19 @@ set_uasmon()
     PROPSET(PASSES_WALLS, passes_walls(mdat));
     PROPSET(REGENERATION, regenerates(mdat));
     PROPSET(REFLECTING, (mdat == &mons[PM_SILVER_DRAGON]));
+#undef PROPSET
 
     float_vs_flight(); /* maybe toggle (BFlying & I_SPECIAL) */
+    polysense();
 
-#undef PROPSET
+    if (youmonst.movement) {
+        new_speed = mdat->mmove;
+        /* prorate unused movement if new form is slower so that
+           it doesn't get extra moves leftover from previous form;
+           if new form is faster, leave unused movement as is */
+        if (new_speed < old_speed)
+            youmonst.movement = new_speed * youmonst.movement / old_speed;
+    }
 
 #ifdef STATUS_VIA_WINDOWPORT
     status_initialize(REASSESS_ONLY);
@@ -112,6 +122,7 @@ float_vs_flight()
         BFlying |= I_SPECIAL;
     else
         BFlying &= ~I_SPECIAL;
+    context.botl = TRUE;
 }
 
 /* for changing into form that's immune to strangulation */
@@ -124,10 +135,11 @@ check_strangling(boolean on)
            vulnerable form into another causes the counter to be reset */
         if (uamul && uamul->otyp == AMULET_OF_STRANGULATION
             && can_be_strangled(&youmonst)) {
+            Strangled = 6L;
+            context.botl = TRUE;
             Your("%s %s your %s!", simpleonames(uamul),
                  Strangled ? "still constricts" : "begins constricting",
                  body_part(NECK)); /* "throat" */
-            Strangled = 6L;
             makeknown(AMULET_OF_STRANGULATION);
         }
 
@@ -135,6 +147,7 @@ check_strangling(boolean on)
     } else {
         if (Strangled && !can_be_strangled(&youmonst)) {
             Strangled = 0L;
+            context.botl = TRUE;
             You("are no longer being strangled.");
         }
     }
@@ -345,7 +358,6 @@ newman()
             Strcpy(killer.name, "unsuccessful polymorph");
             done(DIED);
             newuhs(FALSE);
-            (void) polysense(youmonst.data);
             return; /* lifesaved */
         }
     }
@@ -360,7 +372,6 @@ newman()
         make_slimed(10L, (const char *) 0);
     }
 
-    (void) polysense(youmonst.data);
     context.botl = 1;
     see_monsters();
     (void) encumber_msg();
@@ -577,6 +588,7 @@ made_change:
 int
 polymon(int mntmp)
 {
+    char buf[BUFSZ];
     boolean sticky = sticks(youmonst.data) && u.ustuck && !u.uswallow,
             was_blind = !!Blind, dochange = FALSE;
     int mlvl;
@@ -628,20 +640,16 @@ polymon(int mntmp)
         if (sex_change_ok && !rn2(10))
             dochange = TRUE;
     }
+
+    Strcpy(buf, (u.umonnum != mntmp) ? "" : "new ");
     if (dochange) {
         flags.female = !flags.female;
-        You("%s %s%s!",
-            (u.umonnum != mntmp) ? "turn into a" : "feel like a new",
-            (is_male(&mons[mntmp]) || is_female(&mons[mntmp]))
-                ? ""
-                : flags.female ? "female " : "male ",
-            mons[mntmp].mname);
-    } else {
-        if (u.umonnum != mntmp)
-            You("turn into %s!", an(mons[mntmp].mname));
-        else
-            You_feel("like a new %s!", mons[mntmp].mname);
+        Strcat(buf, (is_male(&mons[mntmp]) || is_female(&mons[mntmp]))
+                       ? "" : flags.female ? "female " : "male ");
     }
+    Strcat(buf, mons[mntmp].mname);
+    You("%s %s!", (u.umonnum != mntmp) ? "turn into" : "feel like", an(buf));
+
     if (Stoned && poly_when_stoned(&mons[mntmp])) {
         /* poly_when_stoned already checked stone golem genocide */
         mntmp = PM_STONE_GOLEM;
@@ -731,8 +739,6 @@ polymon(int mntmp)
         uunstick();
     if (u.usteed) {
         if (touch_petrifies(u.usteed->data) && !Stone_resistance && rnl(3)) {
-            char buf[BUFSZ];
-
             pline("%s touch %s.", no_longer_petrify_resistant,
                   mon_nam(u.usteed));
             Sprintf(buf, "riding %s", an(u.usteed->data->mname));
@@ -823,7 +829,6 @@ polymon(int mntmp)
         u.utrap = 0;
     }
     check_strangling(TRUE); /* maybe start strangling */
-    (void) polysense(youmonst.data);
 
     context.botl = 1;
     vision_full_recalc = 1;
@@ -1766,19 +1771,18 @@ armor_to_dragon(int atyp)
     }
 }
 
-/*
- * Some species have awareness of other species
- */
-static boolean
-polysense(struct permonst *mptr)
+/* some species have awareness of other species */
+static void
+polysense()
 {
-    short warnidx = 0;
+    short warnidx = NON_PM;
 
-    context.warntype.speciesidx = 0;
+    context.warntype.speciesidx = NON_PM;
     context.warntype.species = 0;
     context.warntype.polyd = 0;
+    HWarn_of_mon &= ~FROMRACE;
 
-    switch (monsndx(mptr)) {
+    switch (u.umonnum) {
     case PM_PURPLE_WORM:
         warnidx = PM_SHRIEKER;
         break;
@@ -1786,18 +1790,13 @@ polysense(struct permonst *mptr)
     case PM_VAMPIRE_LORD:
         context.warntype.polyd = M2_HUMAN | M2_ELF;
         HWarn_of_mon |= FROMRACE;
-        return TRUE;
+        return;
     }
-    if (warnidx) {
+    if (warnidx >= LOW_PM) {
         context.warntype.speciesidx = warnidx;
         context.warntype.species = &mons[warnidx];
         HWarn_of_mon |= FROMRACE;
-        return TRUE;
     }
-    context.warntype.speciesidx = 0;
-    context.warntype.species = 0;
-    HWarn_of_mon &= ~FROMRACE;
-    return FALSE;
 }
 
 /*polyself.c*/

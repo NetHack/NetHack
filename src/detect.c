@@ -20,6 +20,7 @@ STATIC_DCL int FDECL(detect_obj_traps, (struct obj *, boolean, int));
 STATIC_DCL void FDECL(show_map_spot, (int, int));
 STATIC_PTR void FDECL(findone, (int, int, genericptr_t));
 STATIC_PTR void FDECL(openone, (int, int, genericptr_t));
+STATIC_DCL int FDECL(mfind0, (struct monst *, boolean));
 
 /* Recursively search obj for an object in class oclass and return 1st found
  */
@@ -1281,6 +1282,55 @@ find_trap(struct trap *trap)
     }
 }
 
+STATIC_OVL int
+mfind0(struct monst *mtmp, boolean via_warning)
+{
+    xchar x = mtmp->mx,
+          y = mtmp->my;
+
+    if (via_warning && !warning_of(mtmp))
+        return -1;
+
+    if (mtmp->m_ap_type) {
+        seemimic(mtmp);
+    find:
+        exercise(A_WIS, TRUE);
+        if (!canspotmon(mtmp)) {
+            if (glyph_is_invisible(levl[x][y].glyph)) {
+                /* found invisible monster in a square
+                 * which already has an 'I' in it.
+                 * Logically, this should still take
+                 * time and lead to a return(1), but
+                 * if we did that the player would keep
+                 * finding the same monster every turn.
+                 */
+                return -1;
+            } else {
+                You_feel("an unseen monster!");
+                map_invisible(x, y);
+            }
+        } else if (!sensemon(mtmp))
+                You("find %s.", mtmp->mtame
+                                ? y_monnam(mtmp)
+                                : a_monnam(mtmp));
+        return 1;
+    }
+    if (!canspotmon(mtmp)) {
+        if (mtmp->mundetected
+            && (is_hider(mtmp->data)
+                || mtmp->data->mlet == S_EEL))
+            if (via_warning) {
+                Your("warning senses cause you to take a second %s.",
+                        Blind ? "to check nearby" : "look close by");
+                display_nhwindow(WIN_MESSAGE, FALSE); /* flush messages */
+	    }
+            mtmp->mundetected = 0;
+            newsym(x, y);
+            goto find;
+    }
+    return 0;
+}
+
 int
 dosearch0(register int aflag) /* intrinsic autosearch vs explicit searching */
 {
@@ -1332,43 +1382,17 @@ dosearch0(register int aflag) /* intrinsic autosearch vs explicit searching */
                     unblock_point(x, y); /* vision */
                     exercise(A_WIS, TRUE);
                     nomul(0);
-                    feel_location(x, y); /* make sure it shows up */
+                    feel_newsym(x, y); /* make sure it shows up */
                     You("find a hidden passage.");
                 } else {
                     /* Be careful not to find anything in an SCORR or SDOOR */
                     if ((mtmp = m_at(x, y)) != 0 && !aflag) {
-                        if (mtmp->m_ap_type) {
-                            seemimic(mtmp);
-                        find:
-                            exercise(A_WIS, TRUE);
-                            if (!canspotmon(mtmp)) {
-                                if (glyph_is_invisible(levl[x][y].glyph)) {
-                                    /* found invisible monster in a square
-                                     * which already has an 'I' in it.
-                                     * Logically, this should still take
-                                     * time and lead to a return(1), but
-                                     * if we did that the player would keep
-                                     * finding the same monster every turn.
-                                     */
-                                    continue;
-                                } else {
-                                    You_feel("an unseen monster!");
-                                    map_invisible(x, y);
-                                }
-                            } else if (!sensemon(mtmp))
-                                You("find %s.", mtmp->mtame
-                                                   ? y_monnam(mtmp)
-                                                   : a_monnam(mtmp));
-                            return 1;
-                        }
-                        if (!canspotmon(mtmp)) {
-                            if (mtmp->mundetected
-                                && (is_hider(mtmp->data)
-                                    || mtmp->data->mlet == S_EEL))
-                                mtmp->mundetected = 0;
-                            newsym(x, y);
-                            goto find;
-                        }
+                        int mfres = mfind0(mtmp, 0);
+
+                        if (mfres == -1)
+                            continue;
+                        else if (mfres > 0)
+                            return mfres;
                     }
 
                     /* see if an invisible monster has moved--if Blind,
@@ -1401,6 +1425,25 @@ int
 dosearch()
 {
     return dosearch0(0);
+}
+
+void
+warnreveal()
+{
+    xchar x, y;
+    struct monst *mtmp;
+    
+    for (x = u.ux - 1; x < u.ux + 2; x++)
+     for (y = u.uy - 1; y < u.uy + 2; y++) {
+        if (!isok(x, y))
+            continue;
+        if (x == u.ux && y == u.uy)
+            continue;
+
+        if ((mtmp = m_at(x, y)) != 0
+             && warning_of(mtmp) && mtmp->mundetected)
+           (void) mfind0(mtmp, 1); /* via_warning */
+     }
 }
 
 /* Pre-map the sokoban levels */
@@ -1521,6 +1564,8 @@ reveal_terrain(int full,            /* wizard|explore modes allow player to requ
                         }
                     }
                 }
+                if (glyph == cmap_to_glyph(S_darkroom))
+                    glyph = cmap_to_glyph(S_room); /* FIXME: dirty hack */
                 show_glyph(x, y, glyph);
             }
 
