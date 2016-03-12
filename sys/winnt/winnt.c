@@ -189,9 +189,9 @@ return &szFullPath[0];
 
 /* fatal error */
 /*VARARGS1*/
-void error
-VA_DECL(const char *, s)
+void error(const char *s, ...)
 {
+    va_list the_args;
     char buf[BUFSZ];
     VA_START(s);
     VA_INIT(s, const char *);
@@ -208,7 +208,7 @@ VA_DECL(const char *, s)
         Strcat(buf, "\n");
         raw_printf(buf);
     }
-    VA_END();
+    va_end(the_args);
     exit(EXIT_FAILURE);
 }
 

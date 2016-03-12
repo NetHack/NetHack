@@ -19,11 +19,11 @@ extern void NDECL(vms_abort);
 
 /*VARARGS1*/
 boolean panicking;
-void VDECL(panic, (char *, ...));
+void panic(char *, ...);
 
-void panic
-VA_DECL(char *, str)
+void panic(char *str, ...)
 {
+    va_list the_args;
     VA_START(str);
     VA_INIT(str, char *);
     if (panicking++)
@@ -41,7 +41,7 @@ VA_DECL(char *, str)
 #endif
         abort(); /* generate core dump */
 #endif
-    VA_END();
+    va_end(the_args);
     exit(EXIT_FAILURE); /* redundant */
 }
 

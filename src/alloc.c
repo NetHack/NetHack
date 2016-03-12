@@ -16,7 +16,7 @@ char *FDECL(fmt_ptr, (const genericptr));
 #undef alloc
 #undef free
 extern void FDECL(free, (genericptr_t));
-static void NDECL(heapmon_init);
+static void heapmon_init();
 
 static FILE *heaplog = 0;
 static boolean tried_heaplog = FALSE;

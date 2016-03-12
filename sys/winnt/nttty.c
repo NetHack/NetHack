@@ -994,9 +994,9 @@ load_keyboard_handler()
 /* this is used as a printf() replacement when the window
  * system isn't initialized yet
  */
-void msmsg
-VA_DECL(const char *, fmt)
+void msmsg(const char *fmt, ...)
 {
+    va_list the_args;
     char buf[ROWNO * COLNO]; /* worst case scenario */
     VA_START(fmt);
     VA_INIT(fmt, const char *);
@@ -1008,15 +1008,15 @@ VA_DECL(const char *, fmt)
         if (ttyDisplay)
             curs(BASE_WINDOW, cursor.X + 1, cursor.Y);
     }
-    VA_END();
+    va_end(the_args);
     return;
 }
 
 /* fatal error */
 /*VARARGS1*/
-void nttty_error
-VA_DECL(const char *, s)
+void nttty_error(const char *s, ...)
 {
+    va_list the_args;
     char buf[BUFSZ];
     VA_START(s);
     VA_INIT(s, const char *);
@@ -1027,7 +1027,7 @@ VA_DECL(const char *, s)
     (void) vsprintf(&buf[1], s, VA_ARGS);
     msmsg(buf);
     really_move_cursor();
-    VA_END();
+    va_end(the_args);
     exit(EXIT_FAILURE);
 }
 

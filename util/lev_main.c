@@ -355,36 +355,19 @@ yywrap()
 #define LC_PLINE_ERROR 2
 static int lc_pline_mode = LC_PLINE_MESSAGE;
 
-#if defined(USE_STDARG) || defined(USE_VARARGS)
 static void FDECL(lc_vpline, (const char *, va_list));
 
-void lc_pline
-VA_DECL(const char *, line)
+void lc_pline(const char *line, ...)
 {
+    va_list the_args;
     VA_START(line);
     VA_INIT(line, char *);
     lc_vpline(line, VA_ARGS);
-    VA_END();
+    va_end(the_args);
 }
 
-#ifdef USE_STDARG
 static void
 lc_vpline(const char *line, va_list the_args)
-#else
-static void
-lc_vpline(line, the_args)
-const char *line;
-va_list the_args;
-#endif
-
-#else /* USE_STDARG | USE_VARARG */
-
-#define lc_vpline lc_pline
-
-void
-lc_pline
-VA_DECL(const char *, line)
-#endif /* USE_STDARG | USE_VARARG */
 {   /* opening brace for lc_vpline, nested block for USE_OLDARGS lc_pline */
 
     char pbuf[3 * BUFSZ];
@@ -411,34 +394,31 @@ VA_DECL(const char *, line)
     }
     lc_pline_mode = LC_PLINE_MESSAGE; /* reset to default */
     return;
-#if !(defined(USE_STDARG) || defined(USE_VARARGS))
-    VA_END();  /* closing brace ofr USE_OLDARGS's nested block */
-#endif
 }
 
 /*VARARGS1*/
 void
-lc_error
-VA_DECL(const char *, line)
+lc_error(const char *line, ...)
 {
+    va_list the_args;
     VA_START(line);
     VA_INIT(line, const char *);
     lc_pline_mode = LC_PLINE_ERROR;
     lc_vpline(line, VA_ARGS);
-    VA_END();
+    va_end(the_args);
     return;
 }
 
 /*VARARGS1*/
 void
-lc_warning
-VA_DECL(const char *, line)
+lc_warning(const char *line, ...)
 {
+    va_list the_args;
     VA_START(line);
     VA_INIT(line, const char *);
     lc_pline_mode = LC_PLINE_WARNING;
     lc_vpline(line, VA_ARGS);
-    VA_END();
+    va_end(the_args);
     return;
 }
 
@@ -581,13 +561,13 @@ set_opvar_var(struct opvar *ov, const char *val)
 #if defined(USE_STDARG) || defined(USE_VARARGS)
 static void FDECL(vadd_opvars, (sp_lev *, const char *, va_list));
 
-void add_opvars
-VA_DECL2(sp_lev *, sp, const char *, fmt)
+void add_opvars(sp_lev *sp, const char *fmt, ...)
 {
+    va_list the_args;
     VA_START(fmt);
     VA_INIT(fmt, char *);
     vadd_opvars(sp, fmt, VA_ARGS);
-    VA_END();
+    va_end(the_args);
 }
 
 #ifdef USE_STDARG

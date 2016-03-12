@@ -16,35 +16,19 @@ static char *FDECL(You_buf, (int));
  * of the variable argument handling stuff in "tradstdc.h"
  */
 
-#if defined(USE_STDARG) || defined(USE_VARARGS)
 static void FDECL(vpline, (const char *, va_list));
 
 void pline
-VA_DECL(const char *, line)
-{
+(const char *line, ...) {
+    va_list the_args;
     VA_START(line);
     VA_INIT(line, char *);
     vpline(line, VA_ARGS);
-    VA_END();
+    va_end(the_args);
 }
 
-# ifdef USE_STDARG
 static void
 vpline(const char *line, va_list the_args)
-# else
-static void
-vpline(line, the_args)
-const char *line;
-va_list the_args;
-# endif
-
-#else /* USE_STDARG | USE_VARARG */
-
-# define vpline pline
-
-void pline
-VA_DECL(const char *, line)
-#endif /* USE_STDARG | USE_VARARG */
 {       /* start of vpline() or of nested block in USE_OLDARG's pline() */
     char pbuf[3 * BUFSZ];
     int ln;
@@ -99,24 +83,18 @@ VA_DECL(const char *, line)
     iflags.last_msg = PLNMSG_UNKNOWN;
     strncpy(prevmsg, line, BUFSZ);
     if (msgtyp == MSGTYP_STOP) display_nhwindow(WIN_MESSAGE, TRUE); /* --more-- */
-
-#if !(defined(USE_STDARG) || defined(USE_VARARGS))
-    /* provide closing brace for the nested block
-       which immediately follows USE_OLDARGS's VA_DECL() */
-    VA_END();
-#endif
 }
 
 /*VARARGS1*/
-void Norep
-VA_DECL(const char *, line)
+void Norep(const char *line, ...)
 {
+    va_list the_args;
     VA_START(line);
     VA_INIT(line, const char *);
     no_repeat = TRUE;
     vpline(line, VA_ARGS);
     no_repeat = FALSE;
-    VA_END();
+    va_end(the_args);
     return;
 }
 
@@ -125,8 +103,7 @@ static char *you_buf = 0;
 static int you_buf_siz = 0;
 
 static char *
-You_buf(siz)
-int siz;
+You_buf(int siz)
 {
     if (siz > you_buf_siz) {
         if (you_buf)
@@ -153,31 +130,31 @@ free_youbuf()
     strcat((YouPrefix(pointer, prefix, text), pointer), text)
 
 /*VARARGS1*/
-void You
-VA_DECL(const char *, line)
+void You(const char *line, ...)
 {
+    va_list the_args;
     char *tmp;
     VA_START(line);
     VA_INIT(line, const char *);
     vpline(YouMessage(tmp, "You ", line), VA_ARGS);
-    VA_END();
+    va_end(the_args);
 }
 
 /*VARARGS1*/
-void Your
-VA_DECL(const char *, line)
+void Your(const char *line, ...)
 {
+    va_list the_args;
     char *tmp;
     VA_START(line);
     VA_INIT(line, const char *);
     vpline(YouMessage(tmp, "Your ", line), VA_ARGS);
-    VA_END();
+    va_end(the_args);
 }
 
 /*VARARGS1*/
-void You_feel
-VA_DECL(const char *, line)
+void You_feel(const char *line, ...)
 {
+    va_list the_args;
     char *tmp;
     VA_START(line);
     VA_INIT(line, const char *);
@@ -186,46 +163,46 @@ VA_DECL(const char *, line)
     else
         YouPrefix(tmp, "You feel ", line);
     vpline(strcat(tmp, line), VA_ARGS);
-    VA_END();
+    va_end(the_args);
 }
 
 /*VARARGS1*/
-void You_cant
-VA_DECL(const char *, line)
+void You_cant(const char *line, ...)
 {
+    va_list the_args;
     char *tmp;
     VA_START(line);
     VA_INIT(line, const char *);
     vpline(YouMessage(tmp, "You can't ", line), VA_ARGS);
-    VA_END();
+    va_end(the_args);
 }
 
 /*VARARGS1*/
-void pline_The
-VA_DECL(const char *, line)
+void pline_The(const char *line, ...)
 {
+    va_list the_args;
     char *tmp;
     VA_START(line);
     VA_INIT(line, const char *);
     vpline(YouMessage(tmp, "The ", line), VA_ARGS);
-    VA_END();
+    va_end(the_args);
 }
 
 /*VARARGS1*/
-void There
-VA_DECL(const char *, line)
+void There(const char *line, ...)
 {
+    va_list the_args;
     char *tmp;
     VA_START(line);
     VA_INIT(line, const char *);
     vpline(YouMessage(tmp, "There ", line), VA_ARGS);
-    VA_END();
+    va_end(the_args);
 }
 
 /*VARARGS1*/
-void You_hear
-VA_DECL(const char *, line)
+void You_hear(const char *line, ...)
 {
+    va_list the_args;
     char *tmp;
 
     if (Deaf || !flags.acoustics)
@@ -239,13 +216,13 @@ VA_DECL(const char *, line)
     else
         YouPrefix(tmp, "You hear ", line);
     vpline(strcat(tmp, line), VA_ARGS);
-    VA_END();
+    va_end(the_args);
 }
 
 /*VARARGS1*/
-void You_see
-VA_DECL(const char *, line)
+void You_see(const char *line, ...)
 {
+    va_list the_args;
     char *tmp;
 
     VA_START(line);
@@ -257,7 +234,7 @@ VA_DECL(const char *, line)
     else
         YouPrefix(tmp, "You see ", line);
     vpline(strcat(tmp, line), VA_ARGS);
-    VA_END();
+    va_end(the_args);
 }
 
 /* Print a message inside double-quotes.
@@ -265,9 +242,9 @@ VA_DECL(const char *, line)
  * Gods can speak directly to you in spite of deafness.
  */
 /*VARARGS1*/
-void verbalize
-VA_DECL(const char *, line)
+void verbalize(const char *line, ...)
 {
+    va_list the_args;
     char *tmp;
 
     VA_START(line);
@@ -277,7 +254,7 @@ VA_DECL(const char *, line)
     Strcat(tmp, line);
     Strcat(tmp, "\"");
     vpline(tmp, VA_ARGS);
-    VA_END();
+    va_end(the_args);
 }
 
 /*VARARGS1*/
@@ -285,33 +262,19 @@ VA_DECL(const char *, line)
  * of the variable argument handling stuff in "tradstdc.h"
  */
 
-#if defined(USE_STDARG) || defined(USE_VARARGS)
-static void FDECL(vraw_printf, (const char *, va_list));
+static void vraw_printf(const char *, va_list);
 
-void raw_printf
-VA_DECL(const char *, line)
+void raw_printf(const char *line, ...)
 {
+    va_list the_args;
     VA_START(line);
     VA_INIT(line, char *);
     vraw_printf(line, VA_ARGS);
-    VA_END();
+    va_end(the_args);
 }
 
-# ifdef USE_STDARG
 static void
 vraw_printf(const char *line, va_list the_args)
-# else
-static void
-vraw_printf(line, the_args)
-const char *line;
-va_list the_args;
-# endif
-
-#else /* USE_STDARG | USE_VARARG */
-
-void raw_printf
-VA_DECL(const char *, line)
-#endif
 {
     char pbuf[3 * BUFSZ];
     int ln;
@@ -334,9 +297,9 @@ VA_DECL(const char *, line)
 }
 
 /*VARARGS1*/
-void impossible
-VA_DECL(const char *, s)
+void impossible(const char *s, ...)
 {
+    va_list the_args;
     char pbuf[2 * BUFSZ];
     VA_START(s);
     VA_INIT(s, const char *);
@@ -350,7 +313,7 @@ VA_DECL(const char *, s)
     pline("%s", pbuf);
     pline("Program in disorder - perhaps you'd better #quit.");
     program_state.in_impossible = 0;
-    VA_END();
+    va_end(the_args);
 }
 
 const char *

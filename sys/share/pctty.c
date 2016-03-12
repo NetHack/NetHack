@@ -69,9 +69,9 @@ msleep(unsigned mseconds)
 /* fatal error */
 /*VARARGS1*/
 
-void error
-VA_DECL(const char *, s)
+void error(const char *s, ...)
 {
+    va_list the_args;
     VA_START(s);
     VA_INIT(s, const char *);
     /* error() may get called before tty is initialized */
@@ -80,7 +80,7 @@ VA_DECL(const char *, s)
     putchar('\n');
     Vprintf(s, VA_ARGS);
     putchar('\n');
-    VA_END();
+    va_end(the_args);
     exit(EXIT_FAILURE);
 }
 

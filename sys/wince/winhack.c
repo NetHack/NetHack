@@ -237,9 +237,9 @@ gotlock:
 }
 
 /* misc functions */
-void error
-VA_DECL(const char *, s)
+void error(const char *s, ...)
 {
+    va_list the_args;
     TCHAR wbuf[1024];
     char buf[1024];
     DWORD last_error = GetLastError();
@@ -270,7 +270,7 @@ VA_DECL(const char *, s)
         }
     }
     MessageBox(NULL, wbuf, TEXT("Error"), MB_OK | MB_ICONERROR);
-    VA_END();
+    va_end(the_args);
     exit(EXIT_FAILURE);
 }
 

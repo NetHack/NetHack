@@ -67,8 +67,8 @@ typedef struct dlb_handle {
 #define DLB_P dlb *
 #endif
 
-boolean NDECL(dlb_init);
-void NDECL(dlb_cleanup);
+boolean dlb_init(void);
+void dlb_cleanup(void);
 
 dlb *FDECL(dlb_fopen, (const char *, const char *));
 int FDECL(dlb_fclose, (DLB_P));

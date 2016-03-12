@@ -451,16 +451,16 @@ init_linux_cons()
 #ifndef __begui__ /* the Be GUI will define its own error proc */
 /* fatal error */
 /*VARARGS1*/
-void error
-VA_DECL(const char *, s)
+void error(const char *s, ...)
 {
+    va_list the_args;
     VA_START(s);
     VA_INIT(s, const char *);
     if (settty_needed)
         settty((char *) 0);
     Vprintf(s, VA_ARGS);
     (void) putchar('\n');
-    VA_END();
+    va_end(the_args);
     exit(EXIT_FAILURE);
 }
 #endif /* !__begui__ */

@@ -409,9 +409,9 @@ getreturn(const char *str)
 }
 
 #ifndef WIN32
-void msmsg
-VA_DECL(const char *, fmt)
+void msmsg(const char *fmt, ...)
 {
+    va_list the_args;
     VA_START(fmt);
     VA_INIT(fmt, const char *);
 #if defined(MSDOS) && defined(NO_TERMS)
@@ -420,7 +420,7 @@ VA_DECL(const char *, fmt)
 #endif
     Vprintf(fmt, VA_ARGS);
     flushout();
-    VA_END();
+    va_end(the_args);
     return;
 }
 #endif

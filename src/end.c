@@ -502,9 +502,9 @@ done_in_by(struct monst *mtmp, int how)
 #endif
 
 /*VARARGS1*/
-void panic
-VA_DECL(const char *, str)
+void panic(const char *str, ...)
 {
+    va_list the_args;
     VA_START(str);
     VA_INIT(str, char *);
 
@@ -573,7 +573,7 @@ VA_DECL(const char *, str)
     if (wizard)
         NH_abort(); /* generate core dump */
 #endif
-    VA_END();
+    va_end(the_args);
     really_done(PANICKED);
 }
 
