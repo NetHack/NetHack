@@ -28,11 +28,11 @@
 #endif
 
 #if defined(MICRO) || defined(WIN32) || defined(OS2)
-void FDECL(nethack_exit, (int));
+void nethack_exit(int);
 #else
 #define nethack_exit exit
 #endif
-STATIC_DCL void NDECL(msexit);
+STATIC_DCL void msexit(void);
 
 #ifdef MOVERLAY
 extern void __far __cdecl _movepause(void);
@@ -44,9 +44,9 @@ extern unsigned short __far __cdecl _movefpaused;
 #endif                       /* MOVERLAY */
 
 #ifdef MFLOPPY
-STATIC_DCL boolean NDECL(record_exists);
+STATIC_DCL boolean record_exists(void);
 #ifndef TOS
-STATIC_DCL boolean NDECL(comspec_exists);
+STATIC_DCL boolean comspec_exists(void);
 #endif
 #endif
 

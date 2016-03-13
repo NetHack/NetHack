@@ -124,8 +124,8 @@ struct level_ftrack {
 
 #define WIZKIT_MAX 128
 static char wizkit[WIZKIT_MAX];
-STATIC_DCL FILE *NDECL(fopen_wizkit_file);
-STATIC_DCL void FDECL(wizkit_addinv, (struct obj *));
+STATIC_DCL FILE *fopen_wizkit_file(void);
+STATIC_DCL void wizkit_addinv(struct obj *);
 
 #ifdef AMIGA
 extern char PATH[]; /* see sys/amiga/amidos.c */
@@ -136,7 +136,7 @@ static int lockptr;
 #endif
 
 #include <libraries/dos.h>
-extern void FDECL(amii_set_text_font, (char *, int));
+extern void amii_set_text_font(char *, int);
 #endif
 
 #if defined(WIN32) || defined(MSDOS)
@@ -171,37 +171,37 @@ extern int n_dgns; /* from dungeon.c */
 #endif
 
 #ifdef SELECTSAVED
-STATIC_PTR int FDECL(CFDECLSPEC strcmp_wrap, (const void *, const void *));
+STATIC_PTR int CFDECLSPEC strcmp_wrap(const void *, const void *);
 #endif
-STATIC_DCL char *FDECL(set_bonesfile_name, (char *, d_level *));
-STATIC_DCL char *NDECL(set_bonestemp_name);
+STATIC_DCL char *set_bonesfile_name(char *, d_level *);
+STATIC_DCL char *set_bonestemp_name(void);
 #ifdef COMPRESS
-STATIC_DCL void FDECL(redirect, (const char *, const char *, FILE *,
-                                 boolean));
+STATIC_DCL void redirect(const char *, const char *, FILE *,
+                                 boolean);
 #endif
 #if defined(COMPRESS) || defined(ZLIB_COMP)
-STATIC_DCL void FDECL(docompress_file, (const char *, boolean));
+STATIC_DCL void docompress_file(const char *, boolean);
 #endif
 #if defined(ZLIB_COMP)
-STATIC_DCL boolean FDECL(make_compressed_name, (const char *, char *));
+STATIC_DCL boolean make_compressed_name(const char *, char *);
 #endif
 #ifndef USE_FCNTL
-STATIC_DCL char *FDECL(make_lockname, (const char *, char *));
+STATIC_DCL char *make_lockname(const char *, char *);
 #endif
-STATIC_DCL FILE *FDECL(fopen_config_file, (const char *, int));
-STATIC_DCL int FDECL(get_uchars, (FILE *, char *, char *, uchar *, boolean,
-                                  int, const char *));
-int FDECL(parse_config_line, (FILE *, char *, int));
-STATIC_DCL FILE *NDECL(fopen_sym_file);
-STATIC_DCL void FDECL(set_symhandling, (char *, int));
+STATIC_DCL FILE *fopen_config_file(const char *, int);
+STATIC_DCL int get_uchars(FILE *, char *, char *, uchar *, boolean,
+                                  int, const char *);
+int parse_config_line(FILE *, char *, int);
+STATIC_DCL FILE *fopen_sym_file(void);
+STATIC_DCL void set_symhandling(char *, int);
 #ifdef NOCWD_ASSUMPTIONS
-STATIC_DCL void FDECL(adjust_prefix, (char *, int));
+STATIC_DCL void adjust_prefix(char *, int);
 #endif
 #ifdef SELF_RECOVER
-STATIC_DCL boolean FDECL(copy_bytes, (int, int));
+STATIC_DCL boolean copy_bytes(int, int);
 #endif
 #ifdef HOLD_LOCKFILE_OPEN
-STATIC_DCL int FDECL(open_levelfile_exclusively, (const char *, int, int));
+STATIC_DCL int open_levelfile_exclusively(const char *, int, int);
 #endif
 
 /*
@@ -567,7 +567,7 @@ clearlocks()
         (void) signal(SIGINT, SIG_IGN);
 #endif
 #if defined(UNIX) || defined(VMS)
-        sethanguphandler((void FDECL((*), (int) )) SIG_IGN);
+        sethanguphandler((void ((*)(int) )) SIG_IGN);
 #endif
         /* can't access maxledgerno() before dungeons are created -dlc */
         for (x = (n_dgns ? maxledgerno() : 0); x >= 0; x--)
@@ -3373,7 +3373,7 @@ debugcore(const char *filename, boolean wildcards)
 
 #define MAXPASSAGES SIZE(context.novel.pasg) /* 30 */
 
-static int FDECL(choose_passage, (int, unsigned));
+static int choose_passage(int, unsigned);
 
 /* choose a random passage that hasn't been chosen yet; once all have
    been chosen, reset the tracking to make all passages available again */

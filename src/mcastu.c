@@ -30,14 +30,14 @@
 #define CLC_FIRE_PILLAR 8
 #define CLC_GEYSER 9
 
-STATIC_DCL void FDECL(cursetxt, (struct monst *, boolean));
-STATIC_DCL int FDECL(choose_magic_spell, (int));
-STATIC_DCL int FDECL(choose_clerical_spell, (int));
-STATIC_DCL void FDECL(cast_wizard_spell, (struct monst *, int, int));
-STATIC_DCL void FDECL(cast_cleric_spell, (struct monst *, int, int));
-STATIC_DCL boolean FDECL(is_undirected_spell, (unsigned int, int));
+STATIC_DCL void cursetxt(struct monst *, boolean);
+STATIC_DCL int choose_magic_spell(int);
+STATIC_DCL int choose_clerical_spell(int);
+STATIC_DCL void cast_wizard_spell(struct monst *, int, int);
+STATIC_DCL void cast_cleric_spell(struct monst *, int, int);
+STATIC_DCL boolean is_undirected_spell(unsigned int, int);
 STATIC_DCL boolean
-FDECL(spell_would_be_useless, (struct monst *, unsigned int, int));
+spell_would_be_useless(struct monst *, unsigned int, int);
 
 extern const char *const flash_types[]; /* from zap.c */
 

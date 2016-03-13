@@ -92,28 +92,6 @@
     || defined(ULTRIX_PROTO) || defined(__BEOS__)
 
 /*
- * Used for robust ANSI parameter forward declarations:
- * int VDECL(sprintf, (char *, const char *, ...));
- *
- * NDECL() is used for functions with zero arguments;
- * FDECL() is used for functions with a fixed number of arguments;
- * VDECL() is used for functions with a variable number of arguments.
- * Separate macros are needed because ANSI will mix old-style declarations
- * with prototypes, except in the case of varargs, and the OVERLAY-specific
- * trampoli.* mechanism conflicts with the ANSI <<f(void)>> syntax.
- */
-
-#define NDECL(f) f(void) /* overridden later if USE_TRAMPOLI set */
-
-#define FDECL(f, p) f p
-
-#if defined(MSDOS) || defined(USE_STDARG)
-#define VDECL(f, p) f p
-#else
-#define VDECL(f, p) f()
-#endif
-
-/*
  * Used for definitions of functions which take no arguments to force
  * an explicit match with the NDECL prototype.  Needed in some cases
  * (MS Visual C 2005) for functions called through pointers.
@@ -154,7 +132,7 @@
 
 #else /* NHSTDC */ /* a "traditional" C  compiler */
 
-#define NDECL(f) f()
+#define f(void) f()
 #define FDECL(f, p) f()
 #define VDECL(f, p) f()
 
@@ -267,7 +245,7 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #undef NDECL
 #undef FDECL
 #undef VDECL
-#define NDECL(f) f()
+#define f(void) f()
 #define FDECL(f, p) f()
 #define VDECL(f, p) f()
 #undef VOID_ARGS

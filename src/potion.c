@@ -9,12 +9,12 @@ boolean notonhead = FALSE;
 static NEARDATA int nothing, unkn;
 static NEARDATA const char beverages[] = { POTION_CLASS, 0 };
 
-STATIC_DCL long FDECL(itimeout, (long));
-STATIC_DCL long FDECL(itimeout_incr, (long, int));
-STATIC_DCL void NDECL(ghost_from_bottle);
+STATIC_DCL long itimeout(long);
+STATIC_DCL long itimeout_incr(long, int);
+STATIC_DCL void ghost_from_bottle(void);
 STATIC_DCL boolean
-FDECL(H2Opotion_dip, (struct obj *, struct obj *, boolean, const char *));
-STATIC_DCL short FDECL(mixtype, (struct obj *, struct obj *));
+H2Opotion_dip(struct obj *, struct obj *, boolean, const char *);
+STATIC_DCL short mixtype(struct obj *, struct obj *);
 
 /* force `val' to be within valid range for intrinsic timeout value */
 STATIC_OVL long
@@ -1119,7 +1119,7 @@ H2Opotion_dip(struct obj *potion,
               boolean useeit,
               const char *objphrase) /* "Your widget glows" or "Steed's saddle glows" */
 {
-    void FDECL((*func), (OBJ_P)) = 0;
+    void (*func)(OBJ_P) = 0;
     const char *glowcolor = 0;
 #define COST_alter (-2)
 #define COST_none (-1)

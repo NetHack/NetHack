@@ -40,8 +40,8 @@
  * and placed there by 'makedefs'.
  */
 
-STATIC_DCL void FDECL(init_rumors, (dlb *));
-STATIC_DCL void FDECL(init_oracles, (dlb *));
+STATIC_DCL void init_rumors(dlb *);
+STATIC_DCL void init_oracles(dlb *);
 
 /* rumor size variables are signed so that value -1 can be used as a flag */
 static long true_rumor_size = 0L, false_rumor_size;

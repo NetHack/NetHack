@@ -7,31 +7,30 @@
 #define NOINVSYM '#'
 #define CONTAINED_SYM '>' /* designator for inside a container */
 
-STATIC_DCL int FDECL(CFDECLSPEC sortloot_cmp, (struct obj *, struct obj *));
-STATIC_DCL void NDECL(reorder_invent);
-STATIC_DCL boolean FDECL(mergable, (struct obj *, struct obj *));
-STATIC_DCL void FDECL(noarmor, (boolean));
-STATIC_DCL void FDECL(invdisp_nothing, (const char *, const char *));
-STATIC_DCL boolean FDECL(worn_wield_only, (struct obj *));
-STATIC_DCL boolean FDECL(only_here, (struct obj *));
-STATIC_DCL void FDECL(compactify, (char *));
-STATIC_DCL boolean FDECL(splittable, (struct obj *));
-STATIC_DCL boolean FDECL(taking_off, (const char *));
-STATIC_DCL boolean FDECL(putting_on, (const char *));
-STATIC_PTR int FDECL(ckunpaid, (struct obj *));
-STATIC_PTR int FDECL(ckvalidcat, (struct obj *));
-STATIC_PTR char *FDECL(safeq_xprname, (struct obj *));
-STATIC_PTR char *FDECL(safeq_shortxprname, (struct obj *));
-STATIC_DCL char FDECL(display_pickinv, (const char *, boolean, long *));
-STATIC_DCL char FDECL(display_used_invlets, (char));
-STATIC_DCL void FDECL(tally_BUCX,
-                      (struct obj *, int *, int *, int *, int *, int *));
-STATIC_DCL boolean FDECL(this_type_only, (struct obj *));
-STATIC_DCL void NDECL(dounpaid);
-STATIC_DCL struct obj *FDECL(find_unpaid, (struct obj *, struct obj **));
-STATIC_DCL void FDECL(menu_identify, (int));
-STATIC_DCL boolean FDECL(tool_in_use, (struct obj *));
-STATIC_DCL char FDECL(obj_to_let, (struct obj *));
+STATIC_DCL int CFDECLSPEC sortloot_cmp(struct obj *, struct obj *);
+STATIC_DCL void reorder_invent(void);
+STATIC_DCL boolean mergable(struct obj *, struct obj *);
+STATIC_DCL void noarmor(boolean);
+STATIC_DCL void invdisp_nothing(const char *, const char *);
+STATIC_DCL boolean worn_wield_only(struct obj *);
+STATIC_DCL boolean only_here(struct obj *);
+STATIC_DCL void compactify(char *);
+STATIC_DCL boolean splittable(struct obj *);
+STATIC_DCL boolean taking_off(const char *);
+STATIC_DCL boolean putting_on(const char *);
+STATIC_PTR int ckunpaid(struct obj *);
+STATIC_PTR int ckvalidcat(struct obj *);
+STATIC_PTR char *safeq_xprname(struct obj *);
+STATIC_PTR char *safeq_shortxprname(struct obj *);
+STATIC_DCL char display_pickinv(const char *, boolean, long *);
+STATIC_DCL char display_used_invlets(char);
+STATIC_DCL void tally_BUCX(struct obj *, int *, int *, int *, int *, int *);
+STATIC_DCL boolean this_type_only(struct obj *);
+STATIC_DCL void dounpaid(void);
+STATIC_DCL struct obj *find_unpaid(struct obj *, struct obj **);
+STATIC_DCL void menu_identify(int);
+STATIC_DCL boolean tool_in_use(struct obj *);
+STATIC_DCL char obj_to_let(struct obj *);
 
 static int lastinvnr = 51; /* 0 ... 51 (never saved&restored) */
 
@@ -1376,13 +1375,13 @@ static NEARDATA const char removeables[] = { ARMOR_CLASS, WEAPON_CLASS,
 /* If combo is TRUE, we just use this to get a category list */
 int
 ggetobj(const char *word,
-        int FDECL((*fn), (OBJ_P)),
+        int (*fn)(OBJ_P),
         int mx,
         boolean combo, /* combination menu flag */
         unsigned *resultflags)
 {
-    int FDECL((*ckfn), (OBJ_P)) = (int FDECL((*), (OBJ_P))) 0;
-    boolean FDECL((*filter), (OBJ_P)) = (boolean FDECL((*), (OBJ_P))) 0;
+    int (*ckfn)(OBJ_P) = (int (*)(OBJ_P)) 0;
+    boolean (*filter)(OBJ_P) = (boolean (*)(OBJ_P)) 0;
     boolean takeoff, ident, allflag, m_seen;
     int itemcount;
     int oletct, iletct, unpaid, oc_of_sym;
@@ -1557,8 +1556,8 @@ int
 askchain(struct obj **objchn,
          register const char *olets, /* olets is an Obj Class char array */
          register int allflag,
-         register int FDECL((*fn), (OBJ_P)),
-         register int FDECL((*ckfn), (OBJ_P)),
+         register int (*fn)(OBJ_P),
+         register int (*ckfn)(OBJ_P),
          register int mx,
          register const char *word) /* olets is an Obj Class char array */
 {
@@ -2412,7 +2411,7 @@ dotypeinv()
         types[0] = 0;
         class_count =
             collect_obj_classes(types, invent, FALSE,
-                                (boolean FDECL((*), (OBJ_P))) 0, &itemcount);
+                                (boolean (*)(OBJ_P)) 0, &itemcount);
         if (unpaid_count || billx || (bcnt + ccnt + ucnt + xcnt) != 0)
             types[class_count++] = ' ';
         if (unpaid_count)

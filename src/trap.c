@@ -6,36 +6,36 @@
 
 extern const char *const destroy_strings[][3]; /* from zap.c */
 
-STATIC_DCL void FDECL(dofiretrap, (struct obj *));
-STATIC_DCL void NDECL(domagictrap);
-STATIC_DCL boolean FDECL(emergency_disrobe, (boolean *));
-STATIC_DCL int FDECL(untrap_prob, (struct trap *));
-STATIC_DCL void FDECL(move_into_trap, (struct trap *));
-STATIC_DCL int FDECL(try_disarm, (struct trap *, boolean));
-STATIC_DCL void FDECL(reward_untrap, (struct trap *, struct monst *));
-STATIC_DCL int FDECL(disarm_holdingtrap, (struct trap *));
-STATIC_DCL int FDECL(disarm_landmine, (struct trap *));
-STATIC_DCL int FDECL(disarm_squeaky_board, (struct trap *));
-STATIC_DCL int FDECL(disarm_shooting_trap, (struct trap *, int));
-STATIC_DCL int FDECL(try_lift, (struct monst *, struct trap *, int,
-                                boolean));
-STATIC_DCL int FDECL(help_monster_out, (struct monst *, struct trap *));
-STATIC_DCL boolean FDECL(thitm, (int, struct monst *, struct obj *, int,
-                                 boolean));
-STATIC_DCL void FDECL(launch_drop_spot, (struct obj *, xchar, xchar));
-STATIC_DCL int FDECL(mkroll_launch, (struct trap *, xchar, xchar,
-                                     short, long));
-STATIC_DCL boolean FDECL(isclearpath, (coord *, int, schar, schar));
-STATIC_DCL char *FDECL(trapnote, (struct trap *, boolean));
+STATIC_DCL void dofiretrap(struct obj *);
+STATIC_DCL void domagictrap(void);
+STATIC_DCL boolean emergency_disrobe(boolean *);
+STATIC_DCL int untrap_prob(struct trap *);
+STATIC_DCL void move_into_trap(struct trap *);
+STATIC_DCL int try_disarm(struct trap *, boolean);
+STATIC_DCL void reward_untrap(struct trap *, struct monst *);
+STATIC_DCL int disarm_holdingtrap(struct trap *);
+STATIC_DCL int disarm_landmine(struct trap *);
+STATIC_DCL int disarm_squeaky_board(struct trap *);
+STATIC_DCL int disarm_shooting_trap(struct trap *, int);
+STATIC_DCL int try_lift(struct monst *, struct trap *, int,
+                                boolean);
+STATIC_DCL int help_monster_out(struct monst *, struct trap *);
+STATIC_DCL boolean thitm(int, struct monst *, struct obj *, int,
+                                 boolean);
+STATIC_DCL void launch_drop_spot(struct obj *, xchar, xchar);
+STATIC_DCL int mkroll_launch(struct trap *, xchar, xchar,
+                                     short, long);
+STATIC_DCL boolean isclearpath(coord *, int, schar, schar);
+STATIC_DCL char *trapnote(struct trap *, boolean);
 #if 0
-STATIC_DCL void FDECL(join_adjacent_pits, (struct trap *));
+STATIC_DCL void join_adjacent_pits(struct trap *);
 #endif
-STATIC_DCL void FDECL(clear_conjoined_pits, (struct trap *));
-STATIC_DCL int FDECL(steedintrap, (struct trap *, struct obj *));
-STATIC_DCL boolean FDECL(keep_saddle_with_steedcorpse, (unsigned,
-                                                        struct obj *,
-                                                        struct obj *));
-STATIC_DCL void NDECL(maybe_finish_sokoban);
+STATIC_DCL void clear_conjoined_pits(struct trap *);
+STATIC_DCL int steedintrap(struct trap *, struct obj *);
+STATIC_DCL boolean keep_saddle_with_steedcorpse(unsigned,
+                                                struct obj *,
+                                                struct obj *);
+STATIC_DCL void maybe_finish_sokoban(void);
 
 /* mintrap() should take a flags argument, but for time being we use this */
 STATIC_VAR int force_mintrap = 0;

@@ -8,13 +8,13 @@
 
 extern boolean notonhead;
 
-STATIC_DCL void FDECL(watch_on_duty, (struct monst *));
-STATIC_DCL int FDECL(disturb, (struct monst *));
-STATIC_DCL void FDECL(release_hero, (struct monst *));
-STATIC_DCL void FDECL(distfleeck, (struct monst *, int *, int *, int *));
-STATIC_DCL int FDECL(m_arrival, (struct monst *));
-STATIC_DCL boolean FDECL(stuff_prevents_passage, (struct monst *));
-STATIC_DCL int FDECL(vamp_shift, (struct monst *, struct permonst *));
+STATIC_DCL void watch_on_duty(struct monst *);
+STATIC_DCL int disturb(struct monst *);
+STATIC_DCL void release_hero(struct monst *);
+STATIC_DCL void distfleeck(struct monst *, int *, int *, int *);
+STATIC_DCL int m_arrival(struct monst *);
+STATIC_DCL boolean stuff_prevents_passage(struct monst *);
+STATIC_DCL int vamp_shift(struct monst *, struct permonst *);
 
 /* True if mtmp died */
 boolean

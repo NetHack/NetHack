@@ -14,24 +14,24 @@ static NEARDATA struct obj *otmp;
 static const char brief_feeling[] =
     "have a %s feeling for a moment, then it passes.";
 
-STATIC_DCL char *FDECL(mon_nam_too, (char *, struct monst *, struct monst *));
-STATIC_DCL int FDECL(hitmm, (struct monst *, struct monst *,
-                             struct attack *));
-STATIC_DCL int FDECL(gazemm, (struct monst *, struct monst *,
-                              struct attack *));
-STATIC_DCL int FDECL(gulpmm, (struct monst *, struct monst *,
-                              struct attack *));
-STATIC_DCL int FDECL(explmm, (struct monst *, struct monst *,
-                              struct attack *));
-STATIC_DCL int FDECL(mdamagem, (struct monst *, struct monst *,
-                                struct attack *));
-STATIC_DCL void FDECL(mswingsm, (struct monst *, struct monst *,
-                                 struct obj *));
-STATIC_DCL void FDECL(noises, (struct monst *, struct attack *));
-STATIC_DCL void FDECL(missmm, (struct monst *, struct monst *,
-                               struct attack *));
-STATIC_DCL int FDECL(passivemm, (struct monst *, struct monst *,
-                                 boolean, int));
+STATIC_DCL char *mon_nam_too(char *, struct monst *, struct monst *);
+STATIC_DCL int hitmm(struct monst *, struct monst *,
+                             struct attack *);
+STATIC_DCL int gazemm(struct monst *, struct monst *,
+                              struct attack *);
+STATIC_DCL int gulpmm(struct monst *, struct monst *,
+                              struct attack *);
+STATIC_DCL int explmm(struct monst *, struct monst *,
+                              struct attack *);
+STATIC_DCL int mdamagem(struct monst *, struct monst *,
+                                struct attack *);
+STATIC_DCL void mswingsm(struct monst *, struct monst *,
+                                 struct obj *);
+STATIC_DCL void noises(struct monst *, struct attack *);
+STATIC_DCL void missmm(struct monst *, struct monst *,
+                               struct attack *);
+STATIC_DCL int passivemm(struct monst *, struct monst *,
+                                 boolean, int);
 
 /* Needed for the special case of monsters wielding vorpal blades (rare).
  * If we use this a lot it should probably be a parameter to mdamagem()

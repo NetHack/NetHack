@@ -102,19 +102,19 @@
 #include <conio.h>
 #endif
 
-/* STATIC_DCL void FDECL(vga_NoBorder, (int));  */
-void FDECL(vga_gotoloc, (int, int)); /* This should be made a macro */
-void NDECL(vga_backsp);
+/* STATIC_DCL void vga_NoBorder(int);  */
+void vga_gotoloc(int, int); /* This should be made a macro */
+void vga_backsp(void);
 #ifdef SCROLLMAP
-STATIC_DCL void FDECL(vga_scrollmap, (boolean));
+STATIC_DCL void vga_scrollmap(boolean);
 #endif
-STATIC_DCL void FDECL(vga_redrawmap, (boolean));
-void FDECL(vga_cliparound, (int, int));
-STATIC_OVL void FDECL(decal_planar, (struct planar_cell_struct *, unsigned));
+STATIC_DCL void vga_redrawmap(boolean);
+void vga_cliparound(int, int);
+STATIC_OVL void decal_planar(struct planar_cell_struct *, unsigned);
 
 #ifdef POSITIONBAR
-STATIC_DCL void NDECL(positionbar);
-static void FDECL(vga_special, (int, int, int));
+STATIC_DCL void positionbar(void);
+static void vga_special(int, int, int);
 #endif
 
 extern int clipx, clipxmax; /* current clipping column from wintty.c */

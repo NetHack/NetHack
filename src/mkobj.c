@@ -4,19 +4,19 @@
 
 #include "hack.h"
 
-STATIC_DCL void FDECL(mkbox_cnts, (struct obj *));
-STATIC_DCL void FDECL(maybe_adjust_light, (struct obj *, int));
-STATIC_DCL void FDECL(obj_timer_checks, (struct obj *,
-                                         xchar, xchar, int));
-STATIC_DCL void FDECL(container_weight, (struct obj *));
-STATIC_DCL struct obj *FDECL(save_mtraits, (struct obj *, struct monst *));
-STATIC_DCL void FDECL(objlist_sanity, (struct obj *, int, const char *));
-STATIC_DCL void FDECL(mon_obj_sanity, (struct monst *, const char *));
-STATIC_DCL const char *FDECL(where_name, (struct obj *));
-STATIC_DCL void FDECL(insane_object, (struct obj *, const char *,
-                                      const char *, struct monst *));
-STATIC_DCL void FDECL(check_contained, (struct obj *, const char *));
-STATIC_DCL void FDECL(sanity_check_worn, (struct obj *));
+STATIC_DCL void mkbox_cnts(struct obj *);
+STATIC_DCL void maybe_adjust_light(struct obj *, int);
+STATIC_DCL void obj_timer_checks(struct obj *,
+                                         xchar, xchar, int);
+STATIC_DCL void container_weight(struct obj *);
+STATIC_DCL struct obj *save_mtraits(struct obj *, struct monst *);
+STATIC_DCL void objlist_sanity(struct obj *, int, const char *);
+STATIC_DCL void mon_obj_sanity(struct monst *, const char *);
+STATIC_DCL const char *where_name(struct obj *);
+STATIC_DCL void insane_object(struct obj *, const char *,
+                                      const char *, struct monst *);
+STATIC_DCL void check_contained(struct obj *, const char *);
+STATIC_DCL void sanity_check_worn(struct obj *);
 
 struct icp {
     int iprob;   /* probability of an item type */

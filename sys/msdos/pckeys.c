@@ -13,7 +13,7 @@
 #include "wintty.h"
 #include "pcvideo.h"
 
-boolean FDECL(pckeys, (unsigned char, unsigned char));
+boolean pckeys(unsigned char, unsigned char);
 
 extern struct WinDesc *wins[MAXWIN]; /* from wintty.c */
 extern boolean inmap;                /* from video.c */

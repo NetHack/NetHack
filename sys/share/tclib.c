@@ -21,13 +21,13 @@ char *BC, *UP;
 short ospeed;
 
 /* exported routines */
-int FDECL(tgetent, (char *, const char *));
-int FDECL(tgetflag, (const char *));
-int FDECL(tgetnum, (const char *));
-char *FDECL(tgetstr, (const char *, char **));
-char *FDECL(tgoto, (const char *, int, int));
-char *FDECL(tparam, (const char *, char *, int, int, int, int, int));
-void FDECL(tputs, (const char *, int, int (*)()));
+int tgetent(char *, const char *);
+int tgetflag(const char *);
+int tgetnum(const char *);
+char *tgetstr(const char *, char **);
+char *tgoto(const char *, int, int);
+char *tparam(const char *, char *, int, int, int, int, int);
+void tputs(const char *, int, int (*)());
 
 /* local support data */
 static char *tc_entry;
@@ -49,10 +49,10 @@ static short baud_rates[] = {
 #endif /* !NO_DELAY_PADDING */
 
 /* local support code */
-static int FDECL(tc_store, (const char *, const char *));
-static char *FDECL(tc_find, (FILE *, const char *, char *, int));
-static char *FDECL(tc_name, (const char *, char *));
-static const char *FDECL(tc_field, (const char *, const char **));
+static int tc_store(const char *, const char *);
+static char *tc_find(FILE *, const char *, char *, int);
+static char *tc_name(const char *, char *);
+static const char *tc_field(const char *, const char **);
 
 #ifndef min
 #define min(a, b) ((a) < (b) ? (a) : (b))

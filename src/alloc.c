@@ -10,21 +10,21 @@
 #define EXTERN_H /* comment line for pre-compiled headers */
 #include "config.h"
 
-char *FDECL(fmt_ptr, (const genericptr));
+char *fmt_ptr(const genericptr);
 
 #ifdef MONITOR_HEAP
 #undef alloc
 #undef free
-extern void FDECL(free, (genericptr_t));
+extern void free(genericptr_t);
 static void heapmon_init();
 
 static FILE *heaplog = 0;
 static boolean tried_heaplog = FALSE;
 #endif
 
-long *FDECL(alloc, (unsigned int));
+long *alloc(unsigned int);
 extern void
-VDECL(panic, (const char *, ...))
+panic(const char *, ...)
 PRINTF_F(1, 2);
 
 long *

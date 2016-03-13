@@ -6,14 +6,13 @@
 
 static NEARDATA boolean did_dig_msg;
 
-STATIC_DCL boolean NDECL(rm_waslit);
-STATIC_DCL void FDECL(mkcavepos,
-                      (xchar, xchar, int, boolean, boolean));
-STATIC_DCL void FDECL(mkcavearea, (boolean));
-STATIC_DCL int NDECL(dig);
-STATIC_DCL void FDECL(dig_up_grave, (coord *));
-STATIC_DCL int FDECL(adj_pit_checks, (coord *, char *));
-STATIC_DCL void FDECL(pit_flow, (struct trap *, schar));
+STATIC_DCL boolean rm_waslit(void);
+STATIC_DCL void mkcavepos(xchar, xchar, int, boolean, boolean);
+STATIC_DCL void mkcavearea(boolean);
+STATIC_DCL int dig(void);
+STATIC_DCL void dig_up_grave(coord *);
+STATIC_DCL int adj_pit_checks(coord *, char *);
+STATIC_DCL void pit_flow(struct trap *, schar);
 
 /* Indices returned by dig_typ() */
 #define DIGTYP_UNDIGGABLE 0

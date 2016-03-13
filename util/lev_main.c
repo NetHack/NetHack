@@ -77,74 +77,72 @@ extern unsigned _stklen = STKSIZ;
 #endif
 #define MAX_ERRORS 25
 
-extern int NDECL(yyparse);
-extern void FDECL(init_yyin, (FILE *));
-extern void FDECL(init_yyout, (FILE *));
+extern int yyparse(void);
+extern void init_yyin(FILE *);
+extern void init_yyout(FILE *);
 
-int FDECL(main, (int, char **));
-void FDECL(yyerror, (const char *));
-void FDECL(yywarning, (const char *));
-int NDECL(yywrap);
-int FDECL(get_floor_type, (char));
-int FDECL(get_room_type, (char *));
-int FDECL(get_trap_type, (char *));
-int FDECL(get_monster_id, (char *, char));
-int FDECL(get_object_id, (char *, char));
-boolean FDECL(check_monster_char, (char));
-boolean FDECL(check_object_char, (char));
-char FDECL(what_map_char, (char));
-void FDECL(scan_map, (char *, sp_lev *));
-boolean NDECL(check_subrooms);
-boolean FDECL(write_level_file, (char *, sp_lev *));
+int main(int, char **);
+void yyerror(const char *);
+void yywarning(const char *);
+int yywrap(void);
+int get_floor_type(char);
+int get_room_type(char *);
+int get_trap_type(char *);
+int get_monster_id(char *, char);
+int get_object_id(char *, char);
+boolean check_monster_char(char);
+boolean check_object_char(char);
+char what_map_char(char);
+void scan_map(char *, sp_lev *);
+boolean check_subrooms(void);
+boolean write_level_file(char *, sp_lev *);
 
-struct lc_funcdefs *FDECL(funcdef_new, (long, char *));
-void FDECL(funcdef_free_all, (struct lc_funcdefs *));
-struct lc_funcdefs *FDECL(funcdef_defined,
-                          (struct lc_funcdefs *, char *, int));
+struct lc_funcdefs *funcdef_new(long, char *);
+void funcdef_free_all(struct lc_funcdefs *);
+struct lc_funcdefs *funcdef_defined(struct lc_funcdefs *, char *, int);
 
-struct lc_vardefs *FDECL(vardef_new, (long, char *));
-void FDECL(vardef_free_all, (struct lc_vardefs *));
-struct lc_vardefs *FDECL(vardef_defined, (struct lc_vardefs *, char *, int));
+struct lc_vardefs *vardef_new(long, char *);
+void vardef_free_all(struct lc_vardefs *);
+struct lc_vardefs *vardef_defined(struct lc_vardefs *, char *, int);
 
-void FDECL(splev_add_from, (sp_lev *, sp_lev *));
+void splev_add_from(sp_lev *, sp_lev *);
 
-extern void NDECL(monst_init);
-extern void NDECL(objects_init);
-extern void NDECL(decl_init);
+extern void monst_init(void);
+extern void objects_init(void);
+extern void decl_init(void);
 
-void FDECL(add_opcode, (sp_lev *, int, genericptr_t));
+void add_opcode(sp_lev *, int, genericptr_t);
 
-static boolean FDECL(write_common_data, (int));
-static boolean FDECL(write_maze, (int, sp_lev *));
-static void NDECL(init_obj_classes);
-static int FDECL(case_insensitive_comp, (const char *, const char *));
+static boolean write_common_data(int);
+static boolean write_maze(int, sp_lev *);
+static void init_obj_classes(void);
+static int case_insensitive_comp(const char *, const char *);
 
-void VDECL(lc_pline, (const char *, ...));
-void VDECL(lc_error, (const char *, ...));
-void VDECL(lc_warning, (const char *, ...));
-char *FDECL(decode_parm_chr, (char));
-char *FDECL(decode_parm_str, (char *));
-struct opvar *FDECL(set_opvar_int, (struct opvar *, long));
-struct opvar *FDECL(set_opvar_coord, (struct opvar *, long));
-struct opvar *FDECL(set_opvar_region, (struct opvar *, long));
-struct opvar *FDECL(set_opvar_mapchar, (struct opvar *, long));
-struct opvar *FDECL(set_opvar_monst, (struct opvar *, long));
-struct opvar *FDECL(set_opvar_obj, (struct opvar *, long));
-struct opvar *FDECL(set_opvar_str, (struct opvar *, const char *));
-struct opvar *FDECL(set_opvar_var, (struct opvar *, const char *));
-void VDECL(add_opvars, (sp_lev *, const char *, ...));
-void NDECL(break_stmt_start);
-void FDECL(break_stmt_end, (sp_lev *));
-void FDECL(break_stmt_new, (sp_lev *, long));
-char *FDECL(funcdef_paramtypes, (struct lc_funcdefs *));
-const char *FDECL(spovar2str, (long));
-void FDECL(vardef_used, (struct lc_vardefs *, char *));
-void FDECL(check_vardef_type, (struct lc_vardefs *, char *, long));
-struct lc_vardefs *FDECL(add_vardef_type,
-                         (struct lc_vardefs *, char *, long));
-int FDECL(reverse_jmp_opcode, (int));
-struct opvar *FDECL(opvar_clone, (struct opvar *));
-void FDECL(start_level_def, (sp_lev **, char *));
+void lc_pline(const char *, ...);
+void lc_error(const char *, ...);
+void lc_warning(const char *, ...);
+char *decode_parm_chr(char);
+char *decode_parm_str(char *);
+struct opvar *set_opvar_int(struct opvar *, long);
+struct opvar *set_opvar_coord(struct opvar *, long);
+struct opvar *set_opvar_region(struct opvar *, long);
+struct opvar *set_opvar_mapchar(struct opvar *, long);
+struct opvar *set_opvar_monst(struct opvar *, long);
+struct opvar *set_opvar_obj(struct opvar *, long);
+struct opvar *set_opvar_str(struct opvar *, const char *);
+struct opvar *set_opvar_var(struct opvar *, const char *);
+void add_opvars(sp_lev *, const char *, ...);
+void break_stmt_start(void);
+void break_stmt_end(sp_lev *);
+void break_stmt_new(sp_lev *, long);
+char *funcdef_paramtypes(struct lc_funcdefs *);
+const char *spovar2str(long);
+void vardef_used(struct lc_vardefs *, char *);
+void check_vardef_type(struct lc_vardefs *, char *, long);
+struct lc_vardefs *add_vardef_type(struct lc_vardefs *, char *, long);
+int reverse_jmp_opcode(int);
+struct opvar *opvar_clone(struct opvar *);
+void start_level_def(sp_lev **, char *);
 
 static struct {
     const char *name;
@@ -355,7 +353,7 @@ yywrap()
 #define LC_PLINE_ERROR 2
 static int lc_pline_mode = LC_PLINE_MESSAGE;
 
-static void FDECL(lc_vpline, (const char *, va_list));
+static void lc_vpline(const char *, va_list);
 
 void lc_pline(const char *line, ...)
 {
@@ -559,7 +557,7 @@ set_opvar_var(struct opvar *ov, const char *val)
     (type *) memset((genericptr_t) alloc(sizeof(type)), 0, sizeof(type))
 
 #if defined(USE_STDARG) || defined(USE_VARARGS)
-static void FDECL(vadd_opvars, (sp_lev *, const char *, va_list));
+static void vadd_opvars(sp_lev *, const char *, va_list);
 
 void add_opvars(sp_lev *sp, const char *fmt, ...)
 {

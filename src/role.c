@@ -770,10 +770,10 @@ static struct {
     short mask;
 } filter;
 
-STATIC_DCL int NDECL(randrole_filtered);
-STATIC_DCL char *FDECL(promptsep, (char *, int));
-STATIC_DCL int FDECL(role_gendercount, (int));
-STATIC_DCL int FDECL(race_alignmentcount, (int));
+STATIC_DCL int randrole_filtered(void);
+STATIC_DCL char *promptsep(char *, int);
+STATIC_DCL int role_gendercount(int);
+STATIC_DCL int race_alignmentcount(int);
 
 /* used by str2XXX() */
 static char NEARDATA randomstr[] = "random";

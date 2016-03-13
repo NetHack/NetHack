@@ -218,7 +218,7 @@ Delay(int ms)
     (void) Sleep(ms);
 }
 
-extern void NDECL(backsp);
+extern void backsp(void);
 
 void
 win32_abort()

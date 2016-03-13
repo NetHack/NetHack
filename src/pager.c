@@ -8,19 +8,19 @@
 #include "hack.h"
 #include "dlb.h"
 
-STATIC_DCL boolean FDECL(is_swallow_sym, (int));
-STATIC_DCL int FDECL(append_str, (char *, const char *));
-STATIC_DCL void FDECL(look_at_object, (char *, int, int, int));
-STATIC_DCL void FDECL(look_at_monster, (char *, char *,
-                                        struct monst *, int, int));
-STATIC_DCL struct permonst *FDECL(lookat, (int, int, char *, char *));
-STATIC_DCL void FDECL(checkfile, (char *, struct permonst *,
-                                  boolean, boolean));
-STATIC_DCL void FDECL(look_all, (boolean,boolean));
-STATIC_DCL boolean FDECL(help_menu, (int *));
-STATIC_DCL void NDECL(docontact);
+STATIC_DCL boolean is_swallow_sym(int);
+STATIC_DCL int append_str(char *, const char *);
+STATIC_DCL void look_at_object(char *, int, int, int);
+STATIC_DCL void look_at_monster(char *, char *,
+                                        struct monst *, int, int);
+STATIC_DCL struct permonst *lookat(int, int, char *, char *);
+STATIC_DCL void checkfile(char *, struct permonst *,
+                                  boolean, boolean);
+STATIC_DCL void look_all(boolean,boolean);
+STATIC_DCL boolean help_menu(int *);
+STATIC_DCL void docontact(void);
 #ifdef PORT_HELP
-extern void NDECL(port_help);
+extern void port_help(void);
 #endif
 
 /* Returns "true" for characters that could represent a monster's stomach. */

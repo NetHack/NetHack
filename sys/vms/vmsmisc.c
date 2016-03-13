@@ -8,11 +8,11 @@
 
 int debuggable = 0; /* 1 if we can debug or show a call trace */
 
-void FDECL(vms_exit, (int));
-void NDECL(vms_abort);
+void vms_exit(int);
+void vms_abort(void);
 
 /* first arg should be unsigned long but <lib$routines.h> has unsigned int */
-extern void VDECL(lib$signal, (unsigned, ...));
+extern void lib$signal(unsigned, ...);
 
 /* terminate, converting Unix-style exit code into VMS status code */
 void

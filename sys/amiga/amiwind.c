@@ -13,7 +13,7 @@
 #ifdef AMII_GRAPHICS /* too early in the file? too late? */
 
 #ifdef AMIFLUSH
-static struct Message *FDECL(GetFMsg, (struct MsgPort *));
+static struct Message *GetFMsg(struct MsgPort *);
 #endif
 
 static int BufferGetchar(void);
@@ -108,7 +108,7 @@ OpenShWindow(struct NewWindow *nw)
  * Close a window that shared the HackPort IDCMP port.
  */
 
-void FDECL(CloseShWindow, (struct Window *));
+void CloseShWindow(struct Window *);
 void
 CloseShWindow(struct Window *win)
 {

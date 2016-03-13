@@ -27,7 +27,7 @@
 
 #define BITCOUNT 8
 
-extern char *FDECL(tilename, (int, int));
+extern char *tilename(int, int);
 
 #define MAGICTILENO (340 + 440 + 231 + 340)
 
@@ -142,9 +142,9 @@ FILE *tibfile2;
 
 pixel tilepixels[TILE_Y][TILE_X];
 
-static void FDECL(build_bmfh, (BITMAPFILEHEADER *));
-static void FDECL(build_bmih, (BITMAPINFOHEADER *));
-static void FDECL(build_bmptile, (pixel(*) [TILE_X]));
+static void build_bmfh(BITMAPFILEHEADER *);
+static void build_bmih(BITMAPINFOHEADER *);
+static void build_bmptile(pixel(*) [TILE_X]);
 
 char *tilefiles[] = {
 #if (TILE_X == 32)

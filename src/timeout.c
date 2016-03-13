@@ -5,14 +5,14 @@
 #include "hack.h"
 #include "lev.h" /* for checking save modes */
 
-STATIC_DCL void NDECL(stoned_dialogue);
-STATIC_DCL void NDECL(vomiting_dialogue);
-STATIC_DCL void NDECL(choke_dialogue);
-STATIC_DCL void NDECL(slime_dialogue);
-STATIC_DCL void NDECL(slip_or_trip);
-STATIC_DCL void FDECL(see_lamp_flicker, (struct obj *, const char *));
-STATIC_DCL void FDECL(lantern_message, (struct obj *));
-STATIC_DCL void FDECL(cleanup_burn, (ANY_P *, long));
+STATIC_DCL void stoned_dialogue(void);
+STATIC_DCL void vomiting_dialogue(void);
+STATIC_DCL void choke_dialogue(void);
+STATIC_DCL void slime_dialogue(void);
+STATIC_DCL void slip_or_trip(void);
+STATIC_DCL void see_lamp_flicker(struct obj *, const char *);
+STATIC_DCL void lantern_message(struct obj *);
+STATIC_DCL void cleanup_burn(ANY_P *, long);
 
 /* He is being petrified - dialogue by inmet!tower */
 static NEARDATA const char *const stoned_texts[] = {
@@ -1337,15 +1337,14 @@ do_storms()
  *      Check whether object has a timer of type timer_type.
  */
 
-STATIC_DCL const char *FDECL(kind_name, (short));
-STATIC_DCL void FDECL(print_queue, (winid, timer_element *));
-STATIC_DCL void FDECL(insert_timer, (timer_element *));
-STATIC_DCL timer_element *FDECL(remove_timer,
-                                (timer_element **, short, ANY_P *));
-STATIC_DCL void FDECL(write_timer, (int, timer_element *));
-STATIC_DCL boolean FDECL(mon_is_local, (struct monst *));
-STATIC_DCL boolean FDECL(timer_is_local, (timer_element *));
-STATIC_DCL int FDECL(maybe_write_timer, (int, int, boolean));
+STATIC_DCL const char *kind_name(short);
+STATIC_DCL void print_queue(winid, timer_element *);
+STATIC_DCL void insert_timer(timer_element *);
+STATIC_DCL timer_element *remove_timer(timer_element **, short, ANY_P *);
+STATIC_DCL void write_timer(int, timer_element *);
+STATIC_DCL boolean mon_is_local(struct monst *);
+STATIC_DCL boolean timer_is_local(timer_element *);
+STATIC_DCL int maybe_write_timer(int, int, boolean);
 
 /* ordered timer list */
 static timer_element *timer_base; /* "active" */

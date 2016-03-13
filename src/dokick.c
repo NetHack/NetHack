@@ -16,15 +16,15 @@ static NEARDATA const char *gate_str;
 
 extern boolean notonhead; /* for long worms */
 
-STATIC_DCL void FDECL(kickdmg, (struct monst *, boolean));
-STATIC_DCL boolean FDECL(maybe_kick_monster, (struct monst *,
-                                              xchar, xchar));
-STATIC_DCL void FDECL(kick_monster, (struct monst *, xchar, xchar));
-STATIC_DCL int FDECL(kick_object, (xchar, xchar));
-STATIC_DCL int FDECL(really_kick_object, (xchar, xchar));
-STATIC_DCL char *FDECL(kickstr, (char *));
-STATIC_DCL void FDECL(otransit_msg, (struct obj *, boolean, long));
-STATIC_DCL void FDECL(drop_to, (coord *, schar));
+STATIC_DCL void kickdmg(struct monst *, boolean);
+STATIC_DCL boolean maybe_kick_monster(struct monst *,
+                                              xchar, xchar);
+STATIC_DCL void kick_monster(struct monst *, xchar, xchar);
+STATIC_DCL int kick_object(xchar, xchar);
+STATIC_DCL int really_kick_object(xchar, xchar);
+STATIC_DCL char *kickstr(char *);
+STATIC_DCL void otransit_msg(struct obj *, boolean, long);
+STATIC_DCL void drop_to(coord *, schar);
 
 static const char kick_passes_thru[] = "kick passes harmlessly through";
 
@@ -654,8 +654,8 @@ really_kick_object(xchar x, xchar y)
     (void) snuff_candle(kickedobj);
     newsym(x, y);
     mon = bhit(u.dx, u.dy, range, KICKED_WEAPON,
-               (int FDECL((*), (MONST_P, OBJ_P))) 0,
-               (int FDECL((*), (OBJ_P, OBJ_P))) 0, &kickedobj);
+               (int (*)(MONST_P, OBJ_P)) 0,
+               (int (*)(OBJ_P, OBJ_P)) 0, &kickedobj);
     if (!kickedobj)
         return 1; /* object broken */
 

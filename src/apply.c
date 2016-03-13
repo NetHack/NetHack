@@ -6,41 +6,41 @@
 
 extern boolean notonhead; /* for long worms */
 
-STATIC_DCL int FDECL(use_camera, (struct obj *));
-STATIC_DCL int FDECL(use_towel, (struct obj *));
-STATIC_DCL boolean FDECL(its_dead, (int, int, int *));
-STATIC_DCL int FDECL(use_stethoscope, (struct obj *));
-STATIC_DCL void FDECL(use_whistle, (struct obj *));
-STATIC_DCL void FDECL(use_magic_whistle, (struct obj *));
-STATIC_DCL void FDECL(use_leash, (struct obj *));
-STATIC_DCL int FDECL(use_mirror, (struct obj *));
-STATIC_DCL void FDECL(use_bell, (struct obj **));
-STATIC_DCL void FDECL(use_candelabrum, (struct obj *));
-STATIC_DCL void FDECL(use_candle, (struct obj **));
-STATIC_DCL void FDECL(use_lamp, (struct obj *));
-STATIC_DCL void FDECL(light_cocktail, (struct obj *));
-STATIC_PTR void FDECL(display_jump_positions, (int));
-STATIC_DCL void FDECL(use_tinning_kit, (struct obj *));
-STATIC_DCL void FDECL(use_figurine, (struct obj **));
-STATIC_DCL void FDECL(use_grease, (struct obj *));
-STATIC_DCL void FDECL(use_trap, (struct obj *));
-STATIC_DCL void FDECL(use_stone, (struct obj *));
-STATIC_PTR int NDECL(set_trap); /* occupation callback */
-STATIC_DCL int FDECL(use_whip, (struct obj *));
-STATIC_PTR void FDECL(display_polearm_positions, (int));
-STATIC_DCL int FDECL(use_pole, (struct obj *));
-STATIC_DCL int FDECL(use_cream_pie, (struct obj *));
-STATIC_DCL int FDECL(use_grapple, (struct obj *));
-STATIC_DCL int FDECL(do_break_wand, (struct obj *));
-STATIC_DCL boolean FDECL(figurine_location_checks, (struct obj *,
-                                                    coord *, boolean));
-STATIC_DCL void FDECL(add_class, (char *, char));
-STATIC_DCL void FDECL(setapplyclasses, (char *));
-STATIC_DCL boolean FDECL(is_valid_jump_pos, (int, int, int, boolean));
-STATIC_DCL boolean FDECL(find_poleable_mon, (coord *, int, int));
+STATIC_DCL int use_camera(struct obj *);
+STATIC_DCL int use_towel(struct obj *);
+STATIC_DCL boolean its_dead(int, int, int *);
+STATIC_DCL int use_stethoscope(struct obj *);
+STATIC_DCL void use_whistle(struct obj *);
+STATIC_DCL void use_magic_whistle(struct obj *);
+STATIC_DCL void use_leash(struct obj *);
+STATIC_DCL int use_mirror(struct obj *);
+STATIC_DCL void use_bell(struct obj **);
+STATIC_DCL void use_candelabrum(struct obj *);
+STATIC_DCL void use_candle(struct obj **);
+STATIC_DCL void use_lamp(struct obj *);
+STATIC_DCL void light_cocktail(struct obj *);
+STATIC_PTR void display_jump_positions(int);
+STATIC_DCL void use_tinning_kit(struct obj *);
+STATIC_DCL void use_figurine(struct obj **);
+STATIC_DCL void use_grease(struct obj *);
+STATIC_DCL void use_trap(struct obj *);
+STATIC_DCL void use_stone(struct obj *);
+STATIC_PTR int set_trap(void); /* occupation callback */
+STATIC_DCL int use_whip(struct obj *);
+STATIC_PTR void display_polearm_positions(int);
+STATIC_DCL int use_pole(struct obj *);
+STATIC_DCL int use_cream_pie(struct obj *);
+STATIC_DCL int use_grapple(struct obj *);
+STATIC_DCL int do_break_wand(struct obj *);
+STATIC_DCL boolean figurine_location_checks(struct obj *,
+                                                    coord *, boolean);
+STATIC_DCL void add_class(char *, char);
+STATIC_DCL void setapplyclasses(char *);
+STATIC_DCL boolean is_valid_jump_pos(int, int, int, boolean);
+STATIC_DCL boolean find_poleable_mon(coord *, int, int);
 
 #ifdef AMIGA
-void FDECL(amii_speaker, (struct obj *, char *, int));
+void amii_speaker(struct obj *, char *, int);
 #endif
 
 static const char no_elbow_room[] =
@@ -75,8 +75,8 @@ use_camera(struct obj *obj)
     } else if (!u.dx && !u.dy) {
         (void) zapyourself(obj, TRUE);
     } else if ((mtmp = bhit(u.dx, u.dy, COLNO, FLASHED_LIGHT,
-                            (int FDECL((*), (MONST_P, OBJ_P))) 0,
-                            (int FDECL((*), (OBJ_P, OBJ_P))) 0, &obj)) != 0) {
+                            (int (*)(MONST_P, OBJ_P)) 0,
+                            (int (*)(OBJ_P, OBJ_P)) 0, &obj)) != 0) {
         obj->ox = u.ux, obj->oy = u.uy;
         (void) flash_hits_mon(mtmp, obj);
     }
@@ -829,8 +829,8 @@ use_mirror(struct obj *obj)
         return 1;
     }
     mtmp = bhit(u.dx, u.dy, COLNO, INVIS_BEAM,
-                (int FDECL((*), (MONST_P, OBJ_P))) 0,
-                (int FDECL((*), (OBJ_P, OBJ_P))) 0, &obj);
+                (int (*)(MONST_P, OBJ_P)) 0,
+                (int (*)(OBJ_P, OBJ_P)) 0, &obj);
     if (!mtmp || !haseyes(mtmp->data) || notonhead)
         return 1;
 

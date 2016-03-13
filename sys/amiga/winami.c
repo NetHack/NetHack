@@ -10,7 +10,7 @@
 
 #ifdef AMIGA_INTUITION
 
-static int FDECL(put_ext_cmd, (char *, int, struct amii_WinDesc *, int));
+static int put_ext_cmd(char *, int, struct amii_WinDesc *, int);
 
 struct amii_DisplayDesc *amiIDisplay; /* the Amiga Intuition descriptor */
 struct Rectangle lastinvent, lastmsg;

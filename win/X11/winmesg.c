@@ -35,15 +35,15 @@
 #include "hack.h"
 #include "winX.h"
 
-static struct line_element *FDECL(get_previous, (struct line_element *));
-static void FDECL(set_circle_buf, (struct mesg_info_t *, int));
-static char *FDECL(split, (char *, XFontStruct *, DIMENSION_P));
-static void FDECL(add_line, (struct mesg_info_t *, const char *));
-static void FDECL(redraw_message_window, (struct xwindow *));
-static void FDECL(mesg_check_size_change, (struct xwindow *));
-static void FDECL(mesg_exposed, (Widget, XtPointer, XtPointer));
-static void FDECL(get_gc, (Widget, struct mesg_info_t *));
-static void FDECL(mesg_resized, (Widget, XtPointer, XtPointer));
+static struct line_element *get_previous(struct line_element *);
+static void set_circle_buf(struct mesg_info_t *, int);
+static char *split(char *, XFontStruct *, DIMENSION_P);
+static void add_line(struct mesg_info_t *, const char *);
+static void redraw_message_window(struct xwindow *);
+static void mesg_check_size_change(struct xwindow *);
+static void mesg_exposed(Widget, XtPointer, XtPointer);
+static void get_gc(Widget, struct mesg_info_t *);
+static void mesg_resized(Widget, XtPointer, XtPointer);
 
 static char mesg_translations[] = "#override\n\
  <Key>:		input()	\

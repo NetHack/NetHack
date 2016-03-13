@@ -4,14 +4,14 @@
 
 #include "hack.h"
 
-STATIC_DCL struct monst *NDECL(findgd);
+STATIC_DCL struct monst *findgd(void);
 
-STATIC_DCL boolean FDECL(clear_fcorr, (struct monst *, boolean));
-STATIC_DCL void FDECL(blackout, (int, int));
-STATIC_DCL void FDECL(restfakecorr, (struct monst *));
-STATIC_DCL boolean FDECL(in_fcorridor, (struct monst *, int, int));
-STATIC_DCL void FDECL(move_gold, (struct obj *, int));
-STATIC_DCL void FDECL(wallify_vault, (struct monst *));
+STATIC_DCL boolean clear_fcorr(struct monst *, boolean);
+STATIC_DCL void blackout(int, int);
+STATIC_DCL void restfakecorr(struct monst *);
+STATIC_DCL boolean in_fcorridor(struct monst *, int, int);
+STATIC_DCL void move_gold(struct obj *, int);
+STATIC_DCL void wallify_vault(struct monst *);
 
 void
 newegd(struct monst *mtmp)

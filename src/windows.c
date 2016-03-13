@@ -10,7 +10,7 @@
 /* Cannot just blindly include winX.h without including all of X11 stuff
    and must get the order of include files right.  Don't bother. */
 extern struct window_procs X11_procs;
-extern void FDECL(win_X11_init, (int));
+extern void win_X11_init(int);
 #endif
 #ifdef QT_GRAPHICS
 extern struct window_procs Qt_procs;
@@ -23,13 +23,13 @@ extern struct window_procs mac_procs;
 #endif
 #ifdef BEOS_GRAPHICS
 extern struct window_procs beos_procs;
-extern void FDECL(be_win_init, (int));
+extern void be_win_init(int);
 FAIL /* be_win_init doesn't exist? XXX*/
 #endif
 #ifdef AMIGA_INTUITION
 extern struct window_procs amii_procs;
 extern struct window_procs amiv_procs;
-extern void FDECL(ami_wininit_data, (int));
+extern void ami_wininit_data(int);
 #endif
 #ifdef WIN32_GRAPHICS
 extern struct window_procs win32_procs;
@@ -43,19 +43,19 @@ extern struct window_procs mswin_procs;
 #endif
 #ifdef WINCHAIN
 extern struct window_procs chainin_procs;
-extern void FDECL(chainin_procs_init, (int));
-extern void *FDECL(chainin_procs_chain, (int, int, void *, void *, void *));
+extern void chainin_procs_init(int);
+extern void *chainin_procs_chain(int, int, void *, void *, void *);
 
 extern struct chain_procs chainout_procs;
-extern void FDECL(chainout_procs_init, (int));
-extern void *FDECL(chainout_procs_chain, (int, int, void *, void *, void *));
+extern void chainout_procs_init(int);
+extern void *chainout_procs_chain(int, int, void *, void *, void *);
 
 extern struct chain_procs trace_procs;
-extern void FDECL(trace_procs_init, (int));
-extern void *FDECL(trace_procs_chain, (int, int, void *, void *, void *));
+extern void trace_procs_init(int);
+extern void *trace_procs_chain(int, int, void *, void *, void *);
 #endif
 
-STATIC_DCL void FDECL(def_raw_print, (const char *s));
+STATIC_DCL void def_raw_print(const char *s);
 
 #ifdef HANGUPHANDLING
 volatile
@@ -70,9 +70,9 @@ volatile
 
 static struct win_choices {
     struct window_procs *procs;
-    void FDECL((*ini_routine), (int)); /* optional (can be 0) */
+    void (*ini_routine)(int); /* optional (can be 0) */
 #ifdef WINCHAIN
-    void *FDECL((*chain_routine), (int, int, void *, void *, void *));
+    void *(*chain_routine)(int, int, void *, void *, void *);
 #endif
 } winchoices[] = {
 #ifdef TTY_GRAPHICS
@@ -421,42 +421,42 @@ genl_putmsghistory(const char *msg, boolean is_restoring)
  * in order to avoid all terminal I/O after hangup/disconnect.
  */
 
-static int NDECL(hup_nhgetch);
-static char FDECL(hup_yn_function, (const char *, const char *, char));
-static int FDECL(hup_nh_poskey, (int *, int *, int *));
-static void FDECL(hup_getlin, (const char *, char *));
-static void FDECL(hup_init_nhwindows, (int *, char **));
-static void FDECL(hup_exit_nhwindows, (const char *));
-static winid FDECL(hup_create_nhwindow, (int));
-static int FDECL(hup_select_menu, (winid, int, MENU_ITEM_P **));
-static void FDECL(hup_add_menu, (winid, int, const anything *, char, char,
-                                 int, const char *, boolean));
-static void FDECL(hup_end_menu, (winid, const char *));
-static void FDECL(hup_putstr, (winid, int, const char *));
-static void FDECL(hup_print_glyph, (winid, xchar, xchar, int, int));
-static void FDECL(hup_outrip, (winid, int, time_t));
-static void FDECL(hup_curs, (winid, int, int));
-static void FDECL(hup_display_nhwindow, (winid, boolean));
-static void FDECL(hup_display_file, (const char *, boolean));
+static int hup_nhgetch(void);
+static char hup_yn_function(const char *, const char *, char);
+static int hup_nh_poskey(int *, int *, int *);
+static void hup_getlin(const char *, char *);
+static void hup_init_nhwindows(int *, char **);
+static void hup_exit_nhwindows(const char *);
+static winid hup_create_nhwindow(int);
+static int hup_select_menu(winid, int, MENU_ITEM_P **);
+static void hup_add_menu(winid, int, const anything *, char, char,
+                                 int, const char *, boolean);
+static void hup_end_menu(winid, const char *);
+static void hup_putstr(winid, int, const char *);
+static void hup_print_glyph(winid, xchar, xchar, int, int);
+static void hup_outrip(winid, int, time_t);
+static void hup_curs(winid, int, int);
+static void hup_display_nhwindow(winid, boolean);
+static void hup_display_file(const char *, boolean);
 #ifdef CLIPPING
-static void FDECL(hup_cliparound, (int, int));
+static void hup_cliparound(int, int);
 #endif
 #ifdef CHANGE_COLOR
-static void FDECL(hup_change_color, (int, long, int));
+static void hup_change_color(int, long, int);
 #ifdef MAC
-static short FDECL(hup_set_font_name, (winid, char *));
+static short hup_set_font_name(winid, char *);
 #endif
-static char *NDECL(hup_get_color_string);
+static char *hup_get_color_string(void);
 #endif /* CHANGE_COLOR */
 #ifdef STATUS_VIA_WINDOWPORT
-static void FDECL(hup_status_update, (int, genericptr_t, int, int));
+static void hup_status_update(int, genericptr_t, int, int);
 #endif
 
-static int NDECL(hup_int_ndecl);
-static void NDECL(hup_void_ndecl);
-static void FDECL(hup_void_fdecl_int, (int));
-static void FDECL(hup_void_fdecl_winid, (winid));
-static void FDECL(hup_void_fdecl_constchar_p, (const char *));
+static int hup_int_ndecl(void);
+static void hup_void_ndecl(void);
+static void hup_void_fdecl_int(int);
+static void hup_void_fdecl_winid(winid);
+static void hup_void_fdecl_constchar_p(const char *);
 
 static struct window_procs hup_procs = {
     "hup", 0L, 0L, hup_init_nhwindows,
@@ -477,7 +477,7 @@ static struct window_procs hup_procs = {
     hup_cliparound,
 #endif
 #ifdef POSITIONBAR
-    (void FDECL((*), (char *))) hup_void_fdecl_constchar_p,
+    (void (*)(char *)) hup_void_fdecl_constchar_p,
                                                       /* update_positionbar */
 #endif
     hup_print_glyph,
@@ -511,13 +511,13 @@ static struct window_procs hup_procs = {
     genl_can_suspend_no,
 };
 
-static void FDECL((*previnterface_exit_nhwindows), (const char *)) = 0;
+static void (*previnterface_exit_nhwindows)(const char *) = 0;
 
 /* hangup has occurred; switch to no-op user interface */
 void
 nhwindows_hangup()
 {
-    char *FDECL((*previnterface_getmsghistory), (boolean)) = 0;
+    char *(*previnterface_getmsghistory)(boolean) = 0;
 
 #ifdef ALTMETA
     /* command processor shouldn't look for 2nd char after seeing ESC */
@@ -709,13 +709,13 @@ hup_status_update(int idx UNUSED, genericptr_t ptr UNUSED, int chg UNUSED, int p
  */
 
 static int
-hup_int_ndecl(VOID_ARGS)
+hup_int_ndecl(void)
 {
     return -1;
 }
 
 static void
-hup_void_ndecl(VOID_ARGS)
+hup_void_ndecl(void)
 {
     return;
 }

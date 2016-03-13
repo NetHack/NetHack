@@ -21,14 +21,14 @@
 
 #include "hack.h"
 
-STATIC_DCL void FDECL(check_strangling, (boolean));
-STATIC_DCL void FDECL(polyman, (const char *, const char *));
-STATIC_DCL void NDECL(break_armor);
-STATIC_DCL void FDECL(drop_weapon, (int));
-STATIC_DCL void NDECL(uunstick);
-STATIC_DCL int FDECL(armor_to_dragon, (int));
-STATIC_DCL void NDECL(newman);
-STATIC_DCL boolean FDECL(polysense, (struct permonst *));
+STATIC_DCL void check_strangling(boolean);
+STATIC_DCL void polyman(const char *, const char *);
+STATIC_DCL void break_armor(void);
+STATIC_DCL void drop_weapon(int);
+STATIC_DCL void uunstick(void);
+STATIC_DCL int armor_to_dragon(int);
+STATIC_DCL void newman(void);
+STATIC_DCL boolean polysense(struct permonst *);
 
 STATIC_VAR const char no_longer_petrify_resistant[] =
     "No longer petrify-resistant, you";

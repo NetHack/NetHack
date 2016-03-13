@@ -8,9 +8,9 @@
 
 #include <signal.h>
 
-static void NDECL(whoami);
-static void FDECL(process_options, (int, char **));
-static void NDECL(byebye);
+static void whoami(void);
+static void process_options(int, char **);
+static void byebye(void);
 #ifndef SAVE_ON_FATAL_ERROR
 #ifndef __DECC
 #define vms_handler_type int
@@ -19,11 +19,11 @@ static void NDECL(byebye);
 #endif
 extern void FDECL(VAXC$ESTABLISH,
                   (vms_handler_type (*) (genericptr_t, genericptr_t)));
-static vms_handler_type FDECL(vms_handler, (genericptr_t, genericptr_t));
+static vms_handler_type vms_handler(genericptr_t, genericptr_t);
 #include <ssdef.h> /* system service status codes */
 #endif
 
-static void NDECL(wd_message);
+static void wd_message(void);
 static boolean wiz_error_flag = FALSE;
 
 int
@@ -368,7 +368,7 @@ whoami()
 static void
 byebye()
 {
-    void FDECL((*hup), (int) );
+    void (*hup)(int) );
 #ifdef SHELL
     extern unsigned long dosh_pid, mail_pid;
     extern unsigned long FDECL(sys$delprc,
@@ -418,7 +418,7 @@ static vms_handler_type                /* should be `unsigned long', but the -*/
 #endif
 
 void
-sethanguphandler(void FDECL((*handler), (int)))
+sethanguphandler(void (*handler)(int))
 {
     (void) signal(SIGHUP, (SIG_RET_TYPE) handler);
 }

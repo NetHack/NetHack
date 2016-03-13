@@ -18,25 +18,25 @@ boolean m_using = FALSE;
  * are confused don't know not to read scrolls, etc....
  */
 
-STATIC_DCL struct permonst *FDECL(muse_newcham_mon, (struct monst *));
-STATIC_DCL int FDECL(precheck, (struct monst *, struct obj *));
-STATIC_DCL void FDECL(mzapmsg, (struct monst *, struct obj *, boolean));
-STATIC_DCL void FDECL(mreadmsg, (struct monst *, struct obj *));
-STATIC_DCL void FDECL(mquaffmsg, (struct monst *, struct obj *));
-STATIC_PTR int FDECL(mbhitm, (struct monst *, struct obj *));
-STATIC_DCL void FDECL(mbhit, (struct monst *, int,
-                              int FDECL((*), (MONST_P, OBJ_P)),
-                              int FDECL((*), (OBJ_P, OBJ_P)), struct obj *));
-STATIC_DCL void FDECL(you_aggravate, (struct monst *));
-STATIC_DCL void FDECL(mon_consume_unstone, (struct monst *, struct obj *,
-                                            boolean, boolean));
-STATIC_DCL boolean FDECL(cures_stoning, (struct monst *, struct obj *,
-                                         boolean));
-STATIC_DCL boolean FDECL(mcould_eat_tin, (struct monst *));
-STATIC_DCL boolean FDECL(muse_unslime, (struct monst *, struct obj *,
-                                        boolean));
-STATIC_DCL int FDECL(cures_sliming, (struct monst *, struct obj *));
-STATIC_DCL boolean FDECL(green_mon, (struct monst *));
+STATIC_DCL struct permonst *muse_newcham_mon(struct monst *);
+STATIC_DCL int precheck(struct monst *, struct obj *);
+STATIC_DCL void mzapmsg(struct monst *, struct obj *, boolean);
+STATIC_DCL void mreadmsg(struct monst *, struct obj *);
+STATIC_DCL void mquaffmsg(struct monst *, struct obj *);
+STATIC_PTR int mbhitm(struct monst *, struct obj *);
+STATIC_DCL void mbhit(struct monst *, int,
+                              int (*)(MONST_P, OBJ_P),
+                              int (*)(OBJ_P, OBJ_P), struct obj *);
+STATIC_DCL void you_aggravate(struct monst *);
+STATIC_DCL void mon_consume_unstone(struct monst *, struct obj *,
+                                            boolean, boolean);
+STATIC_DCL boolean cures_stoning(struct monst *, struct obj *,
+                                         boolean);
+STATIC_DCL boolean mcould_eat_tin(struct monst *);
+STATIC_DCL boolean muse_unslime(struct monst *, struct obj *,
+                                        boolean);
+STATIC_DCL int cures_sliming(struct monst *, struct obj *);
+STATIC_DCL boolean green_mon(struct monst *);
 
 static struct musable {
     struct obj *offensive;
@@ -1259,8 +1259,8 @@ mbhitm(register struct monst *mtmp, register struct obj *otmp)
 STATIC_OVL void
 mbhit(struct monst *mon,                    /* monster shooting the wand */
       register int range,                   /* direction and range */
-      int FDECL((*fhitm), (MONST_P, OBJ_P)),
-      int FDECL((*fhito), (OBJ_P, OBJ_P)),  /* fns called when mon/obj hit */
+      int (*fhitm)(MONST_P, OBJ_P),
+      int (*fhito)(OBJ_P, OBJ_P),  /* fns called when mon/obj hit */
       struct obj *obj)                      /* 2nd arg to fhitm/fhito */
 {
     register struct monst *mtmp;

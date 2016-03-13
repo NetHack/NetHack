@@ -4,37 +4,37 @@
 
 /* amiwind.c */
 #ifdef	INTUI_NEW_LOOK
-struct Window *FDECL( OpenShWindow, (struct ExtNewWindow *) );
+struct Window *OpenShWindow(struct ExtNewWindow *);
 #else
-struct Window *FDECL( OpenShWindow, (struct NewWindow *) );
+struct Window *OpenShWindow(struct NewWindow *);
 #endif
-void FDECL( CloseShWindow, (struct Window *));
-int NDECL( kbhit );
-int NDECL( amikbhit );
-int NDECL( WindowGetchar );
-WETYPE NDECL( WindowGetevent );
-void NDECL( WindowFlush );
-void FDECL( WindowPutchar, (char ));
-void FDECL( WindowFPuts, (const char *));
-void FDECL( WindowPuts, (const char *));
-void FDECL( WindowPrintf, ( char *,... ));
-void NDECL( CleanUp );
-int FDECL( ConvertKey, ( struct IntuiMessage * ));
+void CloseShWindow(struct Window *);
+int kbhit(void);
+int amikbhit(void);
+int WindowGetchar(void);
+WETYPE WindowGetevent(void);
+void WindowFlush(void);
+void WindowPutchar(char );
+void WindowFPuts(const char *);
+void WindowPuts(const char *);
+void WindowPrintf( char *,... );
+void CleanUp(void);
+int ConvertKey( struct IntuiMessage * );
 #ifndef	SHAREDLIB
-void FDECL( Abort, (long ));
+void Abort(long );
 #endif
-void FDECL( flush_glyph_buffer, (struct Window *));
-void FDECL( amiga_print_glyph, (winid , int , int ));
-void FDECL( start_glyphout, (winid ));
-void FDECL( amii_end_glyphout, (winid ));
+void flush_glyph_buffer(struct Window *);
+void amiga_print_glyph(winid , int , int );
+void start_glyphout(winid );
+void amii_end_glyphout(winid );
 #ifdef	INTUI_NEW_LOOK
-struct ExtNewWindow *FDECL( DupNewWindow, (struct ExtNewWindow *));
-void FDECL( FreeNewWindow, (struct ExtNewWindow *));
+struct ExtNewWindow *DupNewWindow(struct ExtNewWindow *);
+void FreeNewWindow(struct ExtNewWindow *);
 #else
-struct NewWindow *FDECL( DupNewWindow, (struct NewWindow *));
-void FDECL( FreeNewWindow, (struct NewWindow *));
+struct NewWindow *DupNewWindow(struct NewWindow *);
+void FreeNewWindow(struct NewWindow *);
 #endif
-void NDECL( bell );
-void NDECL( amii_delay_output );
-void FDECL( amii_number_pad, (int ));
+void bell(void);
+void amii_delay_output(void);
+void amii_number_pad(int );
 void amii_cleanup( void );

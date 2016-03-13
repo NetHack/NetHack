@@ -6,19 +6,19 @@
 
 #include "hack.h"
 
-STATIC_DCL int FDECL(throw_obj, (struct obj *, int));
-STATIC_DCL boolean FDECL(ok_to_throw, (int *));
-STATIC_DCL void NDECL(autoquiver);
-STATIC_DCL int FDECL(gem_accept, (struct monst *, struct obj *));
-STATIC_DCL void FDECL(tmiss, (struct obj *, struct monst *, boolean));
-STATIC_DCL int FDECL(throw_gold, (struct obj *));
-STATIC_DCL void FDECL(check_shop_obj, (struct obj *, xchar, xchar,
-                                       boolean));
-STATIC_DCL void FDECL(breakmsg, (struct obj *, boolean));
-STATIC_DCL boolean FDECL(toss_up, (struct obj *, boolean));
-STATIC_DCL boolean FDECL(throwing_weapon, (struct obj *));
-STATIC_DCL void FDECL(sho_obj_return_to_u, (struct obj * obj));
-STATIC_DCL boolean FDECL(mhurtle_step, (genericptr_t, int, int));
+STATIC_DCL int throw_obj(struct obj *, int);
+STATIC_DCL boolean ok_to_throw(int *);
+STATIC_DCL void autoquiver(void);
+STATIC_DCL int gem_accept(struct monst *, struct obj *);
+STATIC_DCL void tmiss(struct obj *, struct monst *, boolean);
+STATIC_DCL int throw_gold(struct obj *);
+STATIC_DCL void check_shop_obj(struct obj *, xchar, xchar,
+                                       boolean);
+STATIC_DCL void breakmsg(struct obj *, boolean);
+STATIC_DCL boolean toss_up(struct obj *, boolean);
+STATIC_DCL boolean throwing_weapon(struct obj *);
+STATIC_DCL void sho_obj_return_to_u(struct obj * obj);
+STATIC_DCL boolean mhurtle_step(genericptr_t, int, int);
 
 static NEARDATA const char toss_objs[] = { ALLOW_COUNT, COIN_CLASS,
                                            ALL_CLASSES, WEAPON_CLASS, 0 };
@@ -436,7 +436,7 @@ hitfloor(register struct obj *obj)
  */
 boolean
 walk_path(coord *src_cc, coord *dest_cc,
-          boolean FDECL((*check_proc), (genericptr_t, int, int)),
+          boolean (*check_proc)(genericptr_t, int, int),
           genericptr_t arg)
 {
     int x, y, dx, dy, x_change, y_change, err, i, prev_x, prev_y;
@@ -1098,8 +1098,8 @@ throwit(struct obj *obj,
             range = 1;
 
         mon = bhit(u.dx, u.dy, range, THROWN_WEAPON,
-                   (int FDECL((*), (MONST_P, OBJ_P))) 0,
-                   (int FDECL((*), (OBJ_P, OBJ_P))) 0, &obj);
+                   (int (*)(MONST_P, OBJ_P)) 0,
+                   (int (*)(OBJ_P, OBJ_P)) 0, &obj);
         thrownobj = obj; /* obj may be null now */
 
         /* have to do this after bhit() so u.ux & u.uy are correct */
@@ -1919,8 +1919,8 @@ throw_gold(struct obj *obj)
             bhitpos.y = u.uy;
         } else {
             mon = bhit(u.dx, u.dy, range, THROWN_WEAPON,
-                       (int FDECL((*), (MONST_P, OBJ_P))) 0,
-                       (int FDECL((*), (OBJ_P, OBJ_P))) 0, &obj);
+                       (int (*)(MONST_P, OBJ_P)) 0,
+                       (int (*)(OBJ_P, OBJ_P)) 0, &obj);
             if (!obj)
                 return 1; /* object is gone */
             if (mon) {

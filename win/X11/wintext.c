@@ -48,7 +48,7 @@ static const char rip_translations[] = "#override\n\
      <BtnDown>: rip_dismiss_text()\n\
      <Key>: rip_dismiss_text()";
 
-static Widget FDECL(create_ripout_widget, (Widget));
+static Widget create_ripout_widget(Widget);
 #endif
 
 /*ARGSUSED*/
@@ -442,7 +442,7 @@ free_text_buffer(struct text_buffer *tb)
 
 #ifdef GRAPHIC_TOMBSTONE
 
-static void FDECL(rip_exposed, (Widget, XtPointer, XtPointer));
+static void rip_exposed(Widget, XtPointer, XtPointer);
 
 static XImage *rip_image = 0;
 

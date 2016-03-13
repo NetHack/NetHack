@@ -144,66 +144,65 @@ char *file_prefix = "";
 #endif
 
 #ifdef MACsansMPWTOOL
-int FDECL(main, (void));
+int main(void);
 #else
-int FDECL(main, (int, char **));
+int main(int, char **);
 #endif
-void FDECL(do_makedefs, (char *));
-void NDECL(do_objs);
-void NDECL(do_data);
-void NDECL(do_dungeon);
-void NDECL(do_date);
-void NDECL(do_options);
-void NDECL(do_monstr);
-void NDECL(do_permonst);
-void NDECL(do_questtxt);
-void NDECL(do_rumors);
-void NDECL(do_oracles);
-void NDECL(do_vision);
+void do_makedefs(char *);
+void do_objs(void);
+void do_data(void);
+void do_dungeon(void);
+void do_date(void);
+void do_options(void);
+void do_monstr(void);
+void do_permonst(void);
+void do_questtxt(void);
+void do_rumors(void);
+void do_oracles(void);
+void do_vision(void);
 
-extern void NDECL(monst_init);   /* monst.c */
-extern void NDECL(objects_init); /* objects.c */
+extern void monst_init(void);   /* monst.c */
+extern void objects_init(void); /* objects.c */
 
-static void NDECL(make_version);
-static char *FDECL(version_string, (char *, const char *));
-static char *FDECL(version_id_string, (char *, const char *));
-static char *FDECL(bannerc_string, (char *, const char *));
-static char *FDECL(xcrypt, (const char *));
-static unsigned long FDECL(read_rumors_file,
-                           (const char *, int *, long *, unsigned long));
-static void FDECL(do_rnd_access_file, (const char *));
-static boolean FDECL(d_filter, (char *));
-static boolean FDECL(h_filter, (char *));
-static boolean FDECL(ranged_attk, (struct permonst *));
-static int FDECL(mstrength, (struct permonst *));
-static void NDECL(build_savebones_compat_string);
-static void FDECL(do_ext_makedefs, (int, char **));
-static void NDECL(windowing_sanity);
+static void make_version(void);
+static char *version_string(char *, const char *);
+static char *version_id_string(char *, const char *);
+static char *bannerc_string(char *, const char *);
+static char *xcrypt(const char *);
+static unsigned long read_rumors_file(const char *, int *, long *, unsigned long);
+static void do_rnd_access_file(const char *);
+static boolean d_filter(char *);
+static boolean h_filter(char *);
+static boolean ranged_attk(struct permonst *);
+static int mstrength(struct permonst *);
+static void build_savebones_compat_string(void);
+static void do_ext_makedefs(int, char **);
+static void windowing_sanity(void);
 
-static boolean FDECL(qt_comment, (char *));
-static boolean FDECL(qt_control, (char *));
-static int FDECL(get_hdr, (char *));
-static boolean FDECL(new_id, (char *));
-static boolean FDECL(known_msg, (int, int));
-static void FDECL(new_msg, (char *, int, int));
-static char *FDECL(valid_qt_summary, (char *, boolean));
-static void FDECL(do_qt_control, (char *));
-static void FDECL(do_qt_text, (char *));
-static void NDECL(adjust_qt_hdrs);
-static void NDECL(put_qt_hdrs);
+static boolean qt_comment(char *);
+static boolean qt_control(char *);
+static int get_hdr(char *);
+static boolean new_id(char *);
+static boolean known_msg(int, int);
+static void new_msg(char *, int, int);
+static char *valid_qt_summary(char *, boolean);
+static void do_qt_control(char *);
+static void do_qt_text(char *);
+static void adjust_qt_hdrs(void);
+static void put_qt_hdrs(void);
 
 #ifdef VISION_TABLES
-static void NDECL(H_close_gen);
-static void NDECL(H_far_gen);
-static void NDECL(C_close_gen);
-static void NDECL(C_far_gen);
-static int FDECL(clear_path, (int, int, int, int));
+static void H_close_gen(void);
+static void H_far_gen(void);
+static void C_close_gen(void);
+static void C_far_gen(void);
+static int clear_path(int, int, int, int);
 #endif
 
-static char *FDECL(fgetline, (FILE*));
-static char *FDECL(tmpdup, (const char *));
-static char *FDECL(limit, (char *, int));
-static char *FDECL(eos, (char *));
+static char *fgetline(FILE*);
+static char *tmpdup(const char *);
+static char *limit(char *, int);
+static char *eos(char *);
 
 /* input, output, tmp */
 static FILE *ifp, *ofp, *tfp;
@@ -403,9 +402,9 @@ struct grep_var {
 /* struct grep_var grep_vars[] and TODO_* constants in include file: */
 #include "mdgrep.h"
 
-static void NDECL(do_grep);
-static void NDECL(do_grep_showvars);
-static struct grep_var *FDECL(grepsearch, (char *));
+static void do_grep(void);
+static void do_grep_showvars(void);
+static struct grep_var *grepsearch(char *);
 static int grep_trace = 0;
 
 static void
@@ -2052,7 +2051,7 @@ do_monstr()
     /* might want to insert a final 0 entry here instead of just newline */
     Fprintf(ofp, "%s};\n", (j & 15) ? "\n" : "");
 
-    Fprintf(ofp, "\nvoid NDECL(monstr_init);\n");
+    Fprintf(ofp, "\nvoid monstr_init(void);\n");
     Fprintf(ofp, "\nvoid\n");
     Fprintf(ofp, "monstr_init()\n");
     Fprintf(ofp, "{\n");

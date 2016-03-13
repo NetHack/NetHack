@@ -111,13 +111,13 @@ typedef long clock_t;
 #endif
 
 #ifdef SCREEN_BIOS
-void FDECL(get_cursor, (int *, int *));
+void get_cursor(int *, int *);
 #endif
 
-void FDECL(adjust_cursor_flags, (struct WinDesc *));
-void FDECL(cmov, (int, int));
-void FDECL(nocmov, (int, int));
-STATIC_DCL void NDECL(init_ttycolor);
+void adjust_cursor_flags(struct WinDesc *);
+void cmov(int, int);
+void nocmov(int, int);
+STATIC_DCL void init_ttycolor(void);
 
 int savevmode;               /* store the original video mode in here */
 int curcol, currow;          /* graphics mode current cursor locations */
@@ -669,7 +669,7 @@ init_ttycolor()
 #endif
 }
 
-static int FDECL(convert_uchars, (char *, uchar *, int));
+static int convert_uchars(char *, uchar *, int);
 #ifdef VIDEOSHADES
 int
 assign_videoshades(char *choiceptr)

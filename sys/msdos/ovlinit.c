@@ -65,7 +65,7 @@ signed long tmpbuffer;
 int emsstatus;
 int xmsstatus;
 
-void NDECL(_resizeOvrBuffer);
+void _resizeOvrBuffer(void);
 
 void
 _resizeOvrBuffer()

@@ -64,8 +64,8 @@
 #define Static static
 #endif
 
-static boolean FDECL(pmatch_internal, (const char *, const char *,
-                                       boolean, const char *));
+static boolean pmatch_internal(const char *, const char *,
+                                       boolean, const char *);
 
 /* is 'c' a digit? */
 boolean
@@ -679,9 +679,9 @@ fuzzymatch(const char *s1, const char *s2, const char *ignore_chars, boolean cas
 
 #if defined(AMIGA) && !defined(AZTEC_C) && !defined(__SASC_60) \
     && !defined(_DCC) && !defined(__GNUC__)
-extern struct tm *FDECL(localtime, (time_t *));
+extern struct tm *localtime(time_t *);
 #endif
-STATIC_DCL struct tm *NDECL(getlt);
+STATIC_DCL struct tm *getlt(void);
 
 void
 setrandom()

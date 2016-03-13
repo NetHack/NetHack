@@ -13,20 +13,20 @@
 
 STATIC_VAR boolean vamp_rise_msg;
 
-STATIC_DCL void FDECL(sanity_check_single_mon, (struct monst *, const char *));
-STATIC_DCL boolean FDECL(restrap, (struct monst *));
-STATIC_DCL long FDECL(mm_aggression, (struct monst *, struct monst *));
-STATIC_DCL long FDECL(mm_displacement, (struct monst *, struct monst *));
-STATIC_DCL int NDECL(pick_animal);
-STATIC_DCL void FDECL(kill_eggs, (struct obj *));
-STATIC_DCL int FDECL(pickvampshape, (struct monst *));
-STATIC_DCL boolean FDECL(isspecmon, (struct monst *));
-STATIC_DCL boolean FDECL(validspecmon, (struct monst *, int));
-STATIC_DCL boolean FDECL(validvamp, (struct monst *, int *, int));
-STATIC_DCL struct permonst *FDECL(accept_newcham_form, (int));
-STATIC_DCL struct obj *FDECL(make_corpse, (struct monst *, unsigned));
-STATIC_DCL void FDECL(m_detach, (struct monst *, struct permonst *));
-STATIC_DCL void FDECL(lifesaved_monster, (struct monst *));
+STATIC_DCL void sanity_check_single_mon(struct monst *, const char *);
+STATIC_DCL boolean restrap(struct monst *);
+STATIC_DCL long mm_aggression(struct monst *, struct monst *);
+STATIC_DCL long mm_displacement(struct monst *, struct monst *);
+STATIC_DCL int pick_animal(void);
+STATIC_DCL void kill_eggs(struct obj *);
+STATIC_DCL int pickvampshape(struct monst *);
+STATIC_DCL boolean isspecmon(struct monst *);
+STATIC_DCL boolean validspecmon(struct monst *, int);
+STATIC_DCL boolean validvamp(struct monst *, int *, int);
+STATIC_DCL struct permonst *accept_newcham_form(int);
+STATIC_DCL struct obj *make_corpse(struct monst *, unsigned);
+STATIC_DCL void m_detach(struct monst *, struct permonst *);
+STATIC_DCL void lifesaved_monster(struct monst *);
 
 #define LEVEL_SPECIFIC_NOCORPSE(mdat) \
     (Is_rogue_level(&u.uz)            \

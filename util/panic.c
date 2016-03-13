@@ -14,7 +14,7 @@
 #define abort() exit()
 #endif
 #ifdef VMS
-extern void NDECL(vms_abort);
+extern void vms_abort(void);
 #endif
 
 /*VARARGS1*/

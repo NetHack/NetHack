@@ -30,9 +30,9 @@ extern struct sinfo program_state;
 char dllname[512];
 char *shortdllname;
 
-int FDECL(__declspec(dllexport) __stdcall ProcessKeystroke,
+int __declspec(dllexport) __stdcall ProcessKeystroke
           (HANDLE hConIn, INPUT_RECORD *ir, boolean *valid,
-           boolean numberpad, int portdebug));
+           boolean numberpad, int portdebug);
 
 int WINAPI
 DllMain(HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved)

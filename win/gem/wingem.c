@@ -18,8 +18,8 @@
 static char nullstr[] = "", winpanicstr[] = "Bad window id %d";
 static int curr_status_line;
 
-static char *FDECL(copy_of, (const char *));
-static void FDECL(bail, (const char *)); /* __attribute__((noreturn)) */
+static char *copy_of(const char *);
+static void bail(const char *)); /* __attribute__((noreturn) */
 
 extern int mar_set_tile_mode(int);
 extern void mar_set_font(int, const char *, int);

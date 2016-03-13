@@ -88,10 +88,10 @@ static const struct innate {
 
   orc_abil[] = { { 1, &(HPoison_resistance), "", "" }, { 0, 0, 0, 0 } };
 
-STATIC_DCL void NDECL(exerper);
-STATIC_DCL void FDECL(postadjabil, (long *));
-STATIC_DCL const struct innate *FDECL(check_innate_abil, (long *, long));
-STATIC_DCL int FDECL(innately, (long *));
+STATIC_DCL void exerper(void);
+STATIC_DCL void postadjabil(long *);
+STATIC_DCL const struct innate *check_innate_abil(long *, long);
+STATIC_DCL int innately(long *);
 
 /* adjust an attribute; return TRUE if change is made, FALSE otherwise */
 boolean
@@ -189,7 +189,7 @@ losestr(register int num)
 }
 
 static const struct poison_effect_message {
-    void VDECL((*delivery_func), (const char *, ...));
+    void (*delivery_func)(const char *, ...);
     const char *effect_msg;
 } poiseff[] = {
     { You_feel, "weaker" },             /* A_STR */
@@ -205,7 +205,7 @@ void
 poisontell(int typ,         /* which attribute */
            boolean exclaim) /* emphasis */
 {
-    void VDECL((*func), (const char *, ...)) = poiseff[typ].delivery_func;
+    void (*func)(const char *, ...) = poiseff[typ].delivery_func;
 
     (*func)("%s%c", poiseff[typ].effect_msg, exclaim ? '!' : '.');
 }

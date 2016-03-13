@@ -12,14 +12,14 @@
 
 extern boolean known; /* from read.c */
 
-STATIC_DCL void FDECL(do_dknown_of, (struct obj *));
-STATIC_DCL boolean FDECL(check_map_spot, (int, int, char, unsigned));
-STATIC_DCL boolean FDECL(clear_stale_map, (char, unsigned));
-STATIC_DCL void FDECL(sense_trap, (struct trap *, xchar, xchar, int));
-STATIC_DCL int FDECL(detect_obj_traps, (struct obj *, boolean, int));
-STATIC_DCL void FDECL(show_map_spot, (int, int));
-STATIC_PTR void FDECL(findone, (int, int, genericptr_t));
-STATIC_PTR void FDECL(openone, (int, int, genericptr_t));
+STATIC_DCL void do_dknown_of(struct obj *);
+STATIC_DCL boolean check_map_spot(int, int, char, unsigned);
+STATIC_DCL boolean clear_stale_map(char, unsigned);
+STATIC_DCL void sense_trap(struct trap *, xchar, xchar, int);
+STATIC_DCL int detect_obj_traps(struct obj *, boolean, int);
+STATIC_DCL void show_map_spot(int, int);
+STATIC_PTR void findone(int, int, genericptr_t);
+STATIC_PTR void openone(int, int, genericptr_t);
 
 /* Recursively search obj for an object in class oclass and return 1st found
  */
@@ -1250,7 +1250,7 @@ openit()
 
 /* callback hack for overriding vision in do_clear_area() */
 boolean
-detecting(void FDECL((*func), (int, int, genericptr_t)))
+detecting(void (*func)(int, int, genericptr_t))
 {
     return (func == findone || func == openone);
 }

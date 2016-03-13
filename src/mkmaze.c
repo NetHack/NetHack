@@ -10,18 +10,18 @@
 extern lev_region *lregions;
 extern int num_lregions;
 
-STATIC_DCL boolean FDECL(iswall, (int, int));
-STATIC_DCL boolean FDECL(iswall_or_stone, (int, int));
-STATIC_DCL boolean FDECL(is_solid, (int, int));
-STATIC_DCL int FDECL(extend_spine, (int[3][3], int, int, int));
-STATIC_DCL boolean FDECL(okay, (int, int, int));
-STATIC_DCL void FDECL(maze0xy, (coord *));
-STATIC_DCL boolean FDECL(put_lregion_here, (xchar, xchar, xchar,
-                                            xchar, xchar, xchar,
-                                            xchar, boolean, d_level *));
-STATIC_DCL void NDECL(fixup_special);
-STATIC_DCL void NDECL(setup_waterlevel);
-STATIC_DCL void NDECL(unsetup_waterlevel);
+STATIC_DCL boolean iswall(int, int);
+STATIC_DCL boolean iswall_or_stone(int, int);
+STATIC_DCL boolean is_solid(int, int);
+STATIC_DCL int extend_spine(int[3][3], int, int, int);
+STATIC_DCL boolean okay(int, int, int);
+STATIC_DCL void maze0xy(coord *);
+STATIC_DCL boolean put_lregion_here(xchar, xchar, xchar,
+                                    xchar, xchar, xchar,
+                                    xchar, boolean, d_level *);
+STATIC_DCL void fixup_special(void);
+STATIC_DCL void setup_waterlevel(void);
+STATIC_DCL void unsetup_waterlevel(void);
 
 /* adjust a coordinate one step in the specified direction */
 #define mz_move(X, Y, dir) \
@@ -925,9 +925,9 @@ static int xmin, ymin, xmax, ymax; /* level boundaries */
 #define bxmax (xmax - 1)
 #define bymax (ymax - 1)
 
-STATIC_DCL void NDECL(set_wportal);
-STATIC_DCL void FDECL(mk_bubble, (int, int, int));
-STATIC_DCL void FDECL(mv_bubble, (struct bubble *, int, int, boolean));
+STATIC_DCL void set_wportal(void);
+STATIC_DCL void mk_bubble(int, int, int);
+STATIC_DCL void mv_bubble(struct bubble *, int, int, boolean);
 
 void
 movebubbles()

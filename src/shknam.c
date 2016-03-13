@@ -6,13 +6,13 @@
 
 #include "hack.h"
 
-STATIC_DCL boolean FDECL(veggy_item, (struct obj * obj, int));
-STATIC_DCL int NDECL(shkveg);
-STATIC_DCL void FDECL(mkveggy_at, (int, int));
-STATIC_DCL void FDECL(mkshobj_at, (const struct shclass *, int, int,
-                                   boolean));
-STATIC_DCL void FDECL(nameshk, (struct monst *, const char *const *));
-STATIC_DCL int FDECL(shkinit, (const struct shclass *, struct mkroom *));
+STATIC_DCL boolean veggy_item(struct obj * obj, int);
+STATIC_DCL int shkveg(void);
+STATIC_DCL void mkveggy_at(int, int);
+STATIC_DCL void mkshobj_at(const struct shclass *, int, int,
+                                   boolean);
+STATIC_DCL void nameshk(struct monst *, const char *const *);
+STATIC_DCL int shkinit(const struct shclass *, struct mkroom *);
 
 #define VEGETARIAN_CLASS (MAXOCLASSES + 1)
 

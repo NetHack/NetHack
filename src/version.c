@@ -17,7 +17,7 @@
 
 #define BETA_INFO ""
 
-STATIC_DCL void FDECL(insert_rtoptions, (winid,char *,const char *));
+STATIC_DCL void insert_rtoptions(winid,char *,const char *);
 
 /* fill buffer with short version (so caller can avoid including date.h) */
 char *

@@ -15,11 +15,11 @@
  * yyunput is properly declared in flex.skel.
  */
 #if !defined(FLEX_SCANNER) && !defined(FLEXHACK_SCANNER)
-int FDECL(yyback, (int *,int));
-int NDECL(yylook);
-int NDECL(yyinput);
-int NDECL(yywrap);
-int NDECL(yylex);
+int yyback(int *,int);
+int yylook(void);
+int yyinput(void);
+int yywrap(void);
+int yylex(void);
 	/* Traditional lexes let yyunput() and yyoutput() default to int;
 	 * newer ones may declare them as void since they don't return
 	 * values.  For even more fun, the lex supplied as part of the
@@ -49,11 +49,11 @@ int NDECL(yylex);
 #  undef VOIDYYPUT
 # endif
 # ifdef VOIDYYPUT
-void FDECL(yyunput, (int));
-void FDECL(yyoutput, (int));
+void yyunput(int);
+void yyoutput(int);
 # else
-int FDECL(yyunput, (int));
-int FDECL(yyoutput, (int));
+int yyunput(int);
+int yyoutput(int);
 # endif
 
 #else	/* !FLEX_SCANNER && !FLEXHACK_SCANNER */
@@ -63,14 +63,14 @@ int FDECL(yyoutput, (int));
 
 #if defined(FLEX_SCANNER) || defined(FLEXHACK_SCANNER)
 /* older flex wants this */
-#define YY_MALLOC_DECL  genericptr_t FDECL(malloc, (size_t)); \
-                        genericptr_t FDECL(realloc, (genericptr_t, size_t));
+#define YY_MALLOC_DECL  genericptr_t malloc(size_t); \
+                        genericptr_t realloc(genericptr_t, size_t);
 /* newer flex assumes <stdlib.h> so needs this in case it's been suppressed */
 YY_MALLOC_DECL
 #endif
 
-void FDECL(init_yyin, (FILE *));
-void FDECL(init_yyout, (FILE *));
+void init_yyin(FILE *);
+void init_yyout(FILE *);
 
 /* this doesn't always get put in dgn_comp.h
  * (esp. when using older versions of bison)

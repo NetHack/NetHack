@@ -26,7 +26,7 @@
 #define PN_ESCAPE_SPELL (-13)
 #define PN_MATTER_SPELL (-14)
 
-STATIC_DCL void FDECL(give_may_advance_msg, (int));
+STATIC_DCL void give_may_advance_msg(int);
 
 STATIC_VAR NEARDATA const short skill_names_indices[P_NUM_SKILLS] = {
     0, DAGGER, KNIFE, AXE, PICK_AXE, SHORT_SWORD, BROADSWORD, LONG_SWORD,
@@ -61,12 +61,12 @@ give_may_advance_msg(int skill)
                                               : "fighting ");
 }
 
-STATIC_DCL boolean FDECL(can_advance, (int, boolean));
-STATIC_DCL boolean FDECL(could_advance, (int));
-STATIC_DCL boolean FDECL(peaked_skill, (int));
-STATIC_DCL int FDECL(slots_required, (int));
-STATIC_DCL char *FDECL(skill_level_name, (int, char *));
-STATIC_DCL void FDECL(skill_advance, (int));
+STATIC_DCL boolean can_advance(int, boolean);
+STATIC_DCL boolean could_advance(int);
+STATIC_DCL boolean peaked_skill(int);
+STATIC_DCL int slots_required(int);
+STATIC_DCL char *skill_level_name(int, char *);
+STATIC_DCL void skill_advance(int);
 
 #define P_NAME(type)                                    \
     ((skill_names_indices[type] > 0)                    \
@@ -345,7 +345,7 @@ dmgval(struct obj *otmp, struct monst *mon)
     return  tmp;
 }
 
-STATIC_DCL struct obj *FDECL(oselect, (struct monst *, int));
+STATIC_DCL struct obj *oselect(struct monst *, int);
 #define Oselect(x)                      \
     if ((otmp = oselect(mtmp, x)) != 0) \
         return otmp;

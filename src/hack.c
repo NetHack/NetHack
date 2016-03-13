@@ -6,16 +6,16 @@
 
 /* #define DEBUG */ /* uncomment for debugging */
 
-STATIC_DCL void NDECL(maybe_wail);
-STATIC_DCL int NDECL(moverock);
-STATIC_DCL int FDECL(still_chewing, (xchar, xchar));
-STATIC_DCL void NDECL(dosinkfall);
-STATIC_DCL boolean FDECL(findtravelpath, (boolean));
-STATIC_DCL boolean FDECL(trapmove, (int, int, struct trap *));
-STATIC_DCL void NDECL(switch_terrain);
-STATIC_DCL struct monst *FDECL(monstinroom, (struct permonst *, int));
-STATIC_DCL boolean FDECL(doorless_door, (int, int));
-STATIC_DCL void FDECL(move_update, (boolean));
+STATIC_DCL void maybe_wail(void);
+STATIC_DCL int moverock(void);
+STATIC_DCL int still_chewing(xchar, xchar);
+STATIC_DCL void dosinkfall(void);
+STATIC_DCL boolean findtravelpath(boolean);
+STATIC_DCL boolean trapmove(int, int, struct trap *);
+STATIC_DCL void switch_terrain(void);
+STATIC_DCL struct monst *monstinroom(struct permonst *, int);
+STATIC_DCL boolean doorless_door(int, int);
+STATIC_DCL void move_update(boolean);
 
 #define IS_SHOP(x) (rooms[x].rtype >= SHOPBASE)
 

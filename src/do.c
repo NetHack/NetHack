@@ -7,16 +7,16 @@
 #include "hack.h"
 #include "lev.h"
 
-STATIC_DCL void FDECL(trycall, (struct obj *));
-STATIC_DCL void NDECL(polymorph_sink);
-STATIC_DCL boolean NDECL(teleport_sink);
-STATIC_DCL void FDECL(dosinkring, (struct obj *));
-STATIC_PTR int FDECL(drop, (struct obj *));
-STATIC_PTR int NDECL(wipeoff);
-STATIC_DCL int FDECL(menu_drop, (int));
-STATIC_DCL int NDECL(currentlevel_rewrite);
-STATIC_DCL void NDECL(final_level);
-/* static boolean FDECL(badspot, (xchar,xchar)); */
+STATIC_DCL void trycall(struct obj *);
+STATIC_DCL void polymorph_sink(void);
+STATIC_DCL boolean teleport_sink(void);
+STATIC_DCL void dosinkring(struct obj *);
+STATIC_PTR int drop(struct obj *);
+STATIC_PTR int wipeoff(void);
+STATIC_DCL int menu_drop(int);
+STATIC_DCL int currentlevel_rewrite(void);
+STATIC_DCL void final_level(void);
+/* static boolean badspot(xchar,xchar); */
 
 extern int n_dgns; /* number of dungeons, from dungeon.c */
 

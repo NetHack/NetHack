@@ -70,34 +70,34 @@ typedef long off_t;
 
 /* ### amidos.c ### */
 
-extern void FDECL(nethack_exit, (int));
+extern void nethack_exit(int);
 
 /* ### amiwbench.c ### */
 
-extern void NDECL(ami_wbench_init);
-extern void NDECL(ami_wbench_args);
-extern int FDECL(ami_wbench_getsave, (int));
-extern void FDECL(ami_wbench_unlink, (char *));
-extern int FDECL(ami_wbench_iconsize, (char *));
-extern void FDECL(ami_wbench_iconwrite, (char *));
-extern int FDECL(ami_wbench_badopt, (const char *));
-extern void NDECL(ami_wbench_cleanup);
-extern void FDECL(getlind, (const char *, char *, const char *));
+extern void ami_wbench_init(void);
+extern void ami_wbench_args(void);
+extern int ami_wbench_getsave(int);
+extern void ami_wbench_unlink(char *);
+extern int ami_wbench_iconsize(char *);
+extern void ami_wbench_iconwrite(char *);
+extern int ami_wbench_badopt(const char *);
+extern void ami_wbench_cleanup(void);
+extern void getlind(const char *, char *, const char *);
 
 /* ### winreq.c ### */
 
 extern void amii_setpens(int);
 
-extern void FDECL(exit, (int));
-extern void NDECL(CleanUp);
-extern void FDECL(Abort, (long));
-extern int NDECL(getpid);
-extern char *FDECL(CopyFile, (const char *, const char *));
-extern int NDECL(kbhit);
-extern int NDECL(WindowGetchar);
-extern void FDECL(ami_argset, (int *, char *[]));
-extern void FDECL(ami_mkargline, (int *, char **[]));
-extern void FDECL(ami_wininit_data, (int));
+extern void exit(int);
+extern void CleanUp(void);
+extern void Abort(long);
+extern int getpid(void);
+extern char *CopyFile(const char *, const char *);
+extern int kbhit(void);
+extern int WindowGetchar(void);
+extern void ami_argset(int *, char *[]);
+extern void ami_mkargline(int *, char **[]);
+extern void ami_wininit_data(int);
 
 #define FromWBench 0 /* A hint for compiler ... */
 /* extern boolean FromWBench;	/* how were we run? */
@@ -120,8 +120,8 @@ extern char **ami_argv;
 #endif
 
 #ifdef AZTEC_C
-extern FILE *FDECL(freopen, (const char *, const char *, FILE *));
-extern char *FDECL(gets, (char *));
+extern FILE *freopen(const char *, const char *, FILE *);
+extern char *gets(char *);
 #endif
 
 #define msmsg printf
@@ -179,7 +179,7 @@ extern int amibbs; /* BBS mode? */
 
 #ifdef AMII_GRAPHICS
 extern int amii_numcolors;
-void FDECL(amii_setpens, (int));
+void amii_setpens(int);
 #endif
 
 /* for cmd.c: override version in micro.h */

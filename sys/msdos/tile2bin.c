@@ -38,7 +38,7 @@
 extern unsigned _stklen = STKSIZ;
 #endif
 
-extern char *FDECL(tilename, (int, int));
+extern char *tilename(int, int);
 
 #ifdef PLANAR_FILE
 char masktable[8] = { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 };
@@ -60,9 +60,9 @@ int num_colors;
 pixel pixels[TILE_Y][TILE_X];
 struct tibhdr_struct tibheader;
 
-static void FDECL(write_tibtile, (int));
-static void FDECL(write_tibheader, (FILE *, struct tibhdr_struct *));
-static void FDECL(build_tibtile, (pixel(*) [TILE_X]));
+static void write_tibtile(int);
+static void write_tibheader(FILE *, struct tibhdr_struct *);
+static void build_tibtile(pixel(*) [TILE_X]);
 
 #ifndef OVERVIEW_FILE
 char *tilefiles[] = { "../win/share/monsters.txt", "../win/share/objects.txt",

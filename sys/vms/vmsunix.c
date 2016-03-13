@@ -24,7 +24,7 @@
 
 extern int debuggable; /* defined in vmsmisc.c */
 
-extern void VDECL(lib$signal, (unsigned, ...));
+extern void lib$signal(unsigned, ...);
 extern unsigned long sys$setprv();
 extern unsigned long lib$getdvi(), lib$getjpi(), lib$spawn(), lib$attach();
 extern unsigned long smg$init_term_table_by_type(), smg$del_term_table();
@@ -33,13 +33,13 @@ extern unsigned long smg$init_term_table_by_type(), smg$del_term_table();
 /* this could be static; it's only used within this file;
    it won't be used at all if C_LIB$INTIALIZE gets commented out below,
    so make it global so that compiler won't complain that it's not used */
-int FDECL(vmsexeini, (const void *, const void *, const unsigned char *));
+int vmsexeini(const void *, const void *, const unsigned char *);
 
-static int FDECL(veryold, (int));
-static char *NDECL(verify_term);
+static int veryold(int);
+static char *verify_term(void);
 #if defined(SHELL) || defined(SUSPEND)
-static void FDECL(hack_escape, (boolean, const char *));
-static void FDECL(hack_resume, (boolean));
+static void hack_escape(boolean, const char *);
+static void hack_resume(boolean);
 #endif
 
 static int
@@ -508,7 +508,7 @@ dosuspend()
 /* this would fit better in vmsfiles.c except that that gets linked
    with the utility programs and we don't want this code there */
 
-static void FDECL(savefile, (const char *, int, int *, char ***));
+static void savefile(const char *, int, int *, char ***);
 
 static void
 savefile(const char *name, int indx, int *asize, char ***array)
@@ -536,9 +536,9 @@ struct dsc {
     char *adr;
 };                             /* descriptor */
 typedef unsigned long vmscond; /* vms condition value */
-vmscond FDECL(lib$find_file,
-              (const struct dsc *, struct dsc *, genericptr *));
-vmscond FDECL(lib$find_file_end, (void **));
+vmscond lib$find_file
+              (const struct dsc *, struct dsc *, genericptr *);
+vmscond lib$find_file_end(void **);
 
 /* collect a list of character names from all save files for this player */
 int
@@ -656,16 +656,16 @@ vms_traceback(int how) /* 1: exit after traceback; 2: stay in debugger */
  * It all takes place before nethack even starts, and sets up
  * `debuggable' to control possible use of lib$signal(SS$_DEBUG).
  */
-typedef unsigned FDECL((*condition_handler), (unsigned *, unsigned *));
-extern condition_handler FDECL(lib$establish, (condition_handler));
-extern unsigned FDECL(lib$sig_to_ret, (unsigned *, unsigned *));
+typedef unsigned (*condition_handler)(unsigned *, unsigned *);
+extern condition_handler lib$establish(condition_handler);
+extern unsigned lib$sig_to_ret(unsigned *, unsigned *);
 
 /* SYS$IMGSTA() is not documented:  if called at image startup, it controls
    access to the debugger; fortunately, the linker knows now to find it
    without needing to link against sys.stb (VAX) or use LINK/System (Alpha).
    We won't be calling it, but we indirectly check whether it has already
    been called by checking if nethack.exe has it as a transfer address. */
-extern unsigned FDECL(sys$imgsta, ());
+extern unsigned sys$imgsta();
 
 /*
  * These structures are in header files contained in sys$lib_c.tlb,

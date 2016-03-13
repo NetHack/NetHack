@@ -25,24 +25,24 @@
 #define spellet(spell) \
     ((char) ((spell < 26) ? ('a' + spell) : ('A' + spell - 26)))
 
-STATIC_DCL int FDECL(spell_let_to_idx, (char));
-STATIC_DCL boolean FDECL(cursed_book, (struct obj * bp));
-STATIC_DCL boolean FDECL(confused_book, (struct obj *));
-STATIC_DCL void FDECL(deadbook, (struct obj *));
-STATIC_PTR int NDECL(learn);
-STATIC_DCL boolean NDECL(rejectcasting);
-STATIC_DCL boolean FDECL(getspell, (int *));
-STATIC_PTR int FDECL(CFDECLSPEC spell_cmp, (const genericptr,
-                                            const genericptr));
-STATIC_DCL void NDECL(sortspells);
-STATIC_DCL boolean NDECL(spellsortmenu);
-STATIC_DCL boolean FDECL(dospellmenu, (const char *, int, int *));
-STATIC_DCL int FDECL(percent_success, (int));
-STATIC_DCL char *FDECL(spellretention, (int, char *));
-STATIC_DCL int NDECL(throwspell);
-STATIC_DCL void NDECL(cast_protection);
-STATIC_DCL void FDECL(spell_backfire, (int));
-STATIC_DCL const char *FDECL(spelltypemnemonic, (int));
+STATIC_DCL int spell_let_to_idx(char);
+STATIC_DCL boolean cursed_book(struct obj * bp);
+STATIC_DCL boolean confused_book(struct obj *);
+STATIC_DCL void deadbook(struct obj *);
+STATIC_PTR int learn(void);
+STATIC_DCL boolean rejectcasting(void);
+STATIC_DCL boolean getspell(int *);
+STATIC_PTR int CFDECLSPEC spell_cmp(const genericptr,
+                                    const genericptr);
+STATIC_DCL void sortspells(void);
+STATIC_DCL boolean spellsortmenu(void);
+STATIC_DCL boolean dospellmenu(const char *, int, int *);
+STATIC_DCL int percent_success(int);
+STATIC_DCL char *spellretention(int, char *);
+STATIC_DCL int throwspell(void);
+STATIC_DCL void cast_protection(void);
+STATIC_DCL void spell_backfire(int);
+STATIC_DCL const char *spelltypemnemonic(int);
 
 /* The roles[] table lists the role-specific values for tuning
  * percent_success().

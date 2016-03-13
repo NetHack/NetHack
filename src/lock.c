@@ -4,8 +4,8 @@
 
 #include "hack.h"
 
-STATIC_PTR int NDECL(picklock);
-STATIC_PTR int NDECL(forcelock);
+STATIC_PTR int picklock(void);
+STATIC_PTR int forcelock(void);
 
 /* at most one of `door' and `box' should be non-null at any given time */
 STATIC_VAR NEARDATA struct xlock_s {
@@ -15,9 +15,9 @@ STATIC_VAR NEARDATA struct xlock_s {
         chance, usedtime;
 } xlock;
 
-STATIC_DCL const char *NDECL(lock_action);
-STATIC_DCL boolean FDECL(obstructed, (int, int, boolean));
-STATIC_DCL void FDECL(chest_shatter_msg, (struct obj *));
+STATIC_DCL const char *lock_action(void);
+STATIC_DCL boolean obstructed(int, int, boolean);
+STATIC_DCL void chest_shatter_msg(struct obj *);
 
 boolean
 picking_lock(int *x, int *y)

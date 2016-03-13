@@ -18,20 +18,20 @@
 /* from sp_lev.c, for deliver_splev_message() */
 extern char *lev_message;
 
-static void NDECL(dump_qtlist);
-static void FDECL(Fread, (genericptr_t, int, int, dlb *));
-STATIC_DCL struct qtmsg *FDECL(construct_qtlist, (long));
-STATIC_DCL const char *NDECL(intermed);
-STATIC_DCL const char *NDECL(neminame);
-STATIC_DCL const char *NDECL(guardname);
-STATIC_DCL const char *NDECL(homebase);
-STATIC_DCL void FDECL(qtext_pronoun, (char, char));
-STATIC_DCL struct qtmsg *FDECL(msg_in, (struct qtmsg *, int));
-STATIC_DCL void FDECL(convert_arg, (char));
-STATIC_DCL void FDECL(convert_line, (char *,char *));
-STATIC_DCL void FDECL(deliver_by_pline, (struct qtmsg *));
-STATIC_DCL void FDECL(deliver_by_window, (struct qtmsg *, int));
-STATIC_DCL boolean FDECL(skip_pager, (boolean));
+static void dump_qtlist(void);
+static void Fread(genericptr_t, int, int, dlb *);
+STATIC_DCL struct qtmsg *construct_qtlist(long);
+STATIC_DCL const char *intermed(void);
+STATIC_DCL const char *neminame(void);
+STATIC_DCL const char *guardname(void);
+STATIC_DCL const char *homebase(void);
+STATIC_DCL void qtext_pronoun(char, char);
+STATIC_DCL struct qtmsg *msg_in(struct qtmsg *, int);
+STATIC_DCL void convert_arg(char);
+STATIC_DCL void convert_line(char *,char *);
+STATIC_DCL void deliver_by_pline(struct qtmsg *);
+STATIC_DCL void deliver_by_window(struct qtmsg *, int);
+STATIC_DCL boolean skip_pager(boolean);
 
 static char cvt_buf[64];
 static struct qtlists qt_list;

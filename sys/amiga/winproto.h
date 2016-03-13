@@ -40,10 +40,10 @@ void amii_getret(void);
 
 /* winmenu.c */
 void amii_start_menu(winid window);
-void FDECL(amii_add_menu, (winid, int, const anything *, char, char, int,
-                           const char *, boolean));
-void FDECL(amii_end_menu, (winid, const char *));
-int FDECL(amii_select_menu, (winid, int, menu_item **));
+void amii_add_menu(winid, int, const anything *, char, char, int,
+                           const char *, boolean);
+void amii_end_menu(winid, const char *);
+int amii_select_menu(winid, int, menu_item **);
 int DoMenuScroll(int win, int blocking, int how, menu_item **);
 void ReDisplayData(winid win);
 void DisplayData(winid win, int start);
@@ -142,7 +142,7 @@ void Abort(long rc);
 #endif
 
 /* amirip.c */
-void FDECL(amii_outrip, (winid tmpwin, int how, time_t when));
+void amii_outrip(winid tmpwin, int how, time_t when);
 
 /* winchar.c */
 void SetMazeType(MazeType);

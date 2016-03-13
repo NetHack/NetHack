@@ -20,10 +20,9 @@
 #include <sys\stat.h>
 #include "win32api.h"
 
-void FDECL(cmov, (int, int));
-void FDECL(nocmov, (int, int));
-int FDECL(process_keystroke,
-          (INPUT_RECORD *, boolean *, boolean numberpad, int portdebug));
+void cmov(int, int);
+void nocmov(int, int);
+int process_keystroke(INPUT_RECORD *, boolean *, boolean numberpad, int portdebug);
 
 /*
  * The following WIN32 Console API routines are used in this file.
@@ -59,7 +58,7 @@ INPUT_RECORD ir;
  */
 int GUILaunched;
 extern int redirect_stdout;
-static BOOL FDECL(CtrlHandler, (DWORD));
+static BOOL CtrlHandler(DWORD);
 
 /* Flag for whether unicode is supported */
 static boolean has_unicode;
@@ -94,8 +93,8 @@ SOURCEAUTHOR pSourceAuthor;
 KEYHANDLERNAME pKeyHandlerName;
 
 #ifdef CHANGE_COLOR
-static void NDECL(adjust_palette);
-static int FDECL(match_color_name, (const char *));
+static void adjust_palette(void);
+static int match_color_name(const char *);
 typedef HWND(WINAPI *GETCONSOLEWINDOW)();
 static HWND GetConsoleHandle(void);
 static HWND GetConsoleHwnd(void);
@@ -118,9 +117,9 @@ static COLORREF DefaultColors[CLR_MAX] = {
 #endif
 int ttycolors[CLR_MAX];
 #ifdef TEXTCOLOR
-static void NDECL(init_ttycolor);
+static void init_ttycolor(void);
 #endif
-static void NDECL(really_move_cursor);
+static void really_move_cursor(void);
 
 #define MAX_OVERRIDES 256
 unsigned char key_overrides[MAX_OVERRIDES];

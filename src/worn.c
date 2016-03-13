@@ -4,10 +4,9 @@
 
 #include "hack.h"
 
-STATIC_DCL void FDECL(m_lose_armor, (struct monst *, struct obj *));
-STATIC_DCL void FDECL(m_dowear_type,
-                      (struct monst *, long, boolean, boolean));
-STATIC_DCL int FDECL(extra_pref, (struct monst *, struct obj *));
+STATIC_DCL void m_lose_armor(struct monst *, struct obj *);
+STATIC_DCL void m_dowear_type(struct monst *, long, boolean, boolean);
+STATIC_DCL int extra_pref(struct monst *, struct obj *);
 
 const struct worn {
     long w_mask;

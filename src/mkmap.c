@@ -8,18 +8,17 @@
 #define HEIGHT (ROWNO - 1)
 #define WIDTH (COLNO - 2)
 
-STATIC_DCL void FDECL(init_map, (schar));
-STATIC_DCL void FDECL(init_fill, (schar, schar));
-STATIC_DCL schar FDECL(get_map, (int, int, schar));
-STATIC_DCL void FDECL(pass_one, (schar, schar));
-STATIC_DCL void FDECL(pass_two, (schar, schar));
-STATIC_DCL void FDECL(pass_three, (schar, schar));
-STATIC_DCL void NDECL(wallify_map);
-STATIC_DCL void FDECL(join_map, (schar, schar));
-STATIC_DCL void FDECL(finish_map,
-                      (schar, schar, boolean, boolean, boolean));
-STATIC_DCL void FDECL(remove_room, (unsigned));
-void FDECL(mkmap, (lev_init *));
+STATIC_DCL void init_map(schar);
+STATIC_DCL void init_fill(schar, schar);
+STATIC_DCL schar get_map(int, int, schar);
+STATIC_DCL void pass_one(schar, schar);
+STATIC_DCL void pass_two(schar, schar);
+STATIC_DCL void pass_three(schar, schar);
+STATIC_DCL void wallify_map(void);
+STATIC_DCL void join_map(schar, schar);
+STATIC_DCL void finish_map(schar, schar, boolean, boolean, boolean);
+STATIC_DCL void remove_room(unsigned);
+void mkmap(lev_init *);
 
 static char *new_locations;
 int min_rx, max_rx, min_ry, max_ry; /* rectangle bounds for regions */

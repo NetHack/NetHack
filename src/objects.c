@@ -1152,7 +1152,7 @@ OBJECT(OBJ(None, None),
 /* clang-format on */
 /* *INDENT-ON* */
 
-void NDECL(objects_init);
+void objects_init(void);
 
 /* dummy routine used to force linkage */
 void

@@ -15,15 +15,15 @@ STATIC_VAR NEARDATA struct monst zeromonst;
     (mptr->mlet == S_HUMAN && Role_if(role_pm)   \
      && (mptr->msound == MS_LEADER || mptr->msound == MS_NEMESIS))
 
-STATIC_DCL boolean FDECL(uncommon, (int));
-STATIC_DCL int FDECL(align_shift, (struct permonst *));
-STATIC_DCL boolean FDECL(mk_gen_ok, (int, int, int));
-STATIC_DCL boolean FDECL(wrong_elem_type, (struct permonst *));
-STATIC_DCL void FDECL(m_initgrp, (struct monst *, int, int, int));
-STATIC_DCL void FDECL(m_initthrow, (struct monst *, int, int));
-STATIC_DCL void FDECL(m_initweap, (struct monst *));
-STATIC_DCL void FDECL(m_initinv, (struct monst *));
-STATIC_DCL boolean FDECL(makemon_rnd_goodpos, (struct monst *, unsigned, coord *));
+STATIC_DCL boolean uncommon(int);
+STATIC_DCL int align_shift(struct permonst *);
+STATIC_DCL boolean mk_gen_ok(int, int, int);
+STATIC_DCL boolean wrong_elem_type(struct permonst *);
+STATIC_DCL void m_initgrp(struct monst *, int, int, int);
+STATIC_DCL void m_initthrow(struct monst *, int, int);
+STATIC_DCL void m_initweap(struct monst *);
+STATIC_DCL void m_initinv(struct monst *);
+STATIC_DCL boolean makemon_rnd_goodpos(struct monst *, unsigned, coord *);
 
 extern const int monstr[];
 

@@ -4,9 +4,9 @@
 
 #include "hack.h"
 
-STATIC_PTR int NDECL(stealarm);
+STATIC_PTR int stealarm(void);
 
-STATIC_DCL const char *FDECL(equipname, (struct obj *));
+STATIC_DCL const char *equipname(struct obj *);
 
 STATIC_OVL const char *
 equipname(register struct obj *otmp)

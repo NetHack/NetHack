@@ -40,30 +40,29 @@
 #include "winX.h"
 #include <ctype.h>
 
-static void FDECL(menu_select, (Widget, XtPointer, XtPointer));
-static void FDECL(invert_line,
-                  (struct xwindow *, x11_menu_item *, int, long));
-static void FDECL(menu_ok, (Widget, XtPointer, XtPointer));
-static void FDECL(menu_cancel, (Widget, XtPointer, XtPointer));
-static void FDECL(menu_all, (Widget, XtPointer, XtPointer));
-static void FDECL(menu_none, (Widget, XtPointer, XtPointer));
-static void FDECL(menu_invert, (Widget, XtPointer, XtPointer));
-static void FDECL(menu_search, (Widget, XtPointer, XtPointer));
-static void FDECL(select_all, (struct xwindow *));
-static void FDECL(select_none, (struct xwindow *));
-static void FDECL(select_match, (struct xwindow *, char *));
-static void FDECL(invert_all, (struct xwindow *));
-static void FDECL(invert_match, (struct xwindow *, char *));
-static void FDECL(menu_popdown, (struct xwindow *));
+static void menu_select(Widget, XtPointer, XtPointer);
+static void invert_line(struct xwindow *, x11_menu_item *, int, long);
+static void menu_ok(Widget, XtPointer, XtPointer);
+static void menu_cancel(Widget, XtPointer, XtPointer);
+static void menu_all(Widget, XtPointer, XtPointer);
+static void menu_none(Widget, XtPointer, XtPointer);
+static void menu_invert(Widget, XtPointer, XtPointer);
+static void menu_search(Widget, XtPointer, XtPointer);
+static void select_all(struct xwindow *);
+static void select_none(struct xwindow *);
+static void select_match(struct xwindow *, char *);
+static void invert_all(struct xwindow *);
+static void invert_match(struct xwindow *, char *);
+static void menu_popdown(struct xwindow *);
 #ifdef USE_FWF
-static void FDECL(sync_selected, (struct menu_info_t *, int, int *));
+static void sync_selected(struct menu_info_t *, int, int *);
 #endif
 
-static void FDECL(move_menu, (struct menu *, struct menu *));
-static void FDECL(free_menu, (struct menu *));
-static void FDECL(reset_menu_to_default, (struct menu *));
-static void FDECL(clear_old_menu, (struct xwindow *));
-static char *FDECL(copy_of, (const char *));
+static void move_menu(struct menu *, struct menu *);
+static void free_menu(struct menu *);
+static void reset_menu_to_default(struct menu *);
+static void clear_old_menu(struct xwindow *);
+static char *copy_of(const char *);
 
 #define reset_menu_count(mi) ((mi)->counting = FALSE, (mi)->menu_count = 0L)
 

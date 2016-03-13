@@ -4,7 +4,7 @@
 
 #include "hack.h"
 
-STATIC_DCL void FDECL(center, (int, char *));
+STATIC_DCL void center(int, char *);
 
 #if defined(TTY_GRAPHICS) || defined(X11_GRAPHICS) || defined(GEM_GRAPHICS) \
     || defined(MSWIN_GRAPHICS)

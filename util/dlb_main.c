@@ -14,8 +14,8 @@
 #include <string.h>
 #endif
 
-static void FDECL(grow_ld, (libdir **, int *, int));
-static void FDECL(xexit, (int));
+static void grow_ld(libdir **, int *, int);
+static void xexit(int);
 
 #ifdef DLB
 #ifdef DLBLIB
@@ -24,17 +24,16 @@ static void FDECL(xexit, (int));
 #define LIBLISTFILE "dlb.lst"     /* default list file */
 
 /* library functions (from dlb.c) */
-extern boolean FDECL(open_library, (const char *, library *));
-extern void FDECL(close_library, (library *));
+extern boolean open_library(const char *, library *);
+extern void close_library(library *);
 
-char *FDECL(eos, (char *)); /* also used by dlb.c */
-FILE *FDECL(fopen_datafile, (const char *, const char *));
+char *eos(char *); /* also used by dlb.c */
+FILE *fopen_datafile(const char *, const char *);
 
-static void FDECL(Write, (int, char *, long));
-static void NDECL(usage);
-static void NDECL(verbose_help);
-static void FDECL(write_dlb_directory,
-                  (int, int, libdir *, long, long, long));
+static void Write(int, char *, long);
+static void usage(void);
+static void verbose_help(void);
+static void write_dlb_directory(int, int, libdir *, long, long, long);
 
 static char default_progname[] = "dlb";
 static char *progname = default_progname;
