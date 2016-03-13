@@ -891,8 +891,7 @@ E int NDECL(midnight);
 
 /* ### invent.c ### */
 
-E struct obj **FDECL(objarr_init, (int));
-E void FDECL(objarr_set, (struct obj *, int, struct obj **, BOOLEAN_P));
+E void FDECL(sortloot, (struct obj **, unsigned, BOOLEAN_P));
 E void FDECL(assigninvlet, (struct obj *));
 E struct obj *FDECL(merge_choice, (struct obj *, struct obj *));
 E int FDECL(merged, (struct obj **, struct obj **));
@@ -1755,10 +1754,10 @@ E int FDECL(out_container, (struct obj *));
 #endif
 E int FDECL(pickup, (int));
 E int FDECL(pickup_object, (struct obj *, long, BOOLEAN_P));
-E int FDECL(query_category,
-            (const char *, struct obj *, int, menu_item **, int));
-E int FDECL(query_objlist, (const char *, struct obj *, int, menu_item **,
-                            int, boolean (*)(OBJ_P)));
+E int FDECL(query_category, (const char *, struct obj *, int,
+                             menu_item **, int));
+E int FDECL(query_objlist, (const char *, struct obj **, int,
+                            menu_item **, int, boolean (*)(OBJ_P)));
 E struct obj *FDECL(pick_obj, (struct obj *));
 E int NDECL(encumber_msg);
 E int NDECL(doloot);

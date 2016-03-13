@@ -1329,9 +1329,6 @@ struct obj *list;
 boolean identified, all_containers, reportempty;
 {
     register struct obj *box, *obj;
-    struct obj **oarray;
-    int i, n;
-    char *invlet;
     char buf[BUFSZ];
     boolean cat, deadcat;
 
@@ -1355,43 +1352,24 @@ boolean identified, all_containers, reportempty;
             } else if (box->cobj) {
                 winid tmpwin = create_nhwindow(NHW_MENU);
 
-                /* count the number of items */
-                for (n = 0, obj = box->cobj; obj; obj = obj->nobj)
-                    n++;
-                /* Make a temporary array to store the objects sorted */
-                oarray = objarr_init(n);
-
-                /* Add objects to the array */
-                i = 0;
-                invlet = flags.inv_order;
-            nextclass:
-                for (obj = box->cobj; obj; obj = obj->nobj) {
-                    if (!flags.sortpack || obj->oclass == *invlet) {
-                        objarr_set(
-                            obj, i++, oarray,
-                            (flags.sortloot == 'f' || flags.sortloot == 'l'));
-                    }
-                } /* for loop */
-                if (flags.sortpack) {
-                    if (*++invlet)
-                        goto nextclass;
-                }
-
+                sortloot(&box->cobj,
+                         (((flags.sortloot == 'l' || flags.sortloot == 'f')
+                           ? SORTLOOT_LOOT : 0)
+                          | (flags.sortpack ? SORTLOOT_PACK : 0)),
+                         FALSE);
                 Sprintf(buf, "Contents of %s:", the(xname(box)));
                 putstr(tmpwin, 0, buf);
                 putstr(tmpwin, 0, "");
-                for (i = 0; i < n; i++) {
-                    obj = oarray[i];
+                for (obj = box->cobj; obj; obj = obj->nobj) {
                     if (identified) {
                         makeknown(obj->otyp);
-                        obj->known = obj->bknown = obj->dknown = obj->rknown =
-                            1;
+                        obj->known = obj->bknown = obj->dknown
+                            = obj->rknown = 1;
                         if (Is_container(obj) || obj->otyp == STATUE)
                             obj->cknown = obj->lknown = 1;
                     }
                     putstr(tmpwin, 0, doname(obj));
                 }
-                free(oarray);
                 if (cat)
                     putstr(tmpwin, 0, "Schroedinger's cat");
                 else if (deadcat)

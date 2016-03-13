@@ -11,9 +11,9 @@
 #define CONTAINED_SYM '>' /* from invent.c */
 
 STATIC_DCL void FDECL(simple_look, (struct obj *, BOOLEAN_P));
-STATIC_DCL boolean
-FDECL(query_classes, (char *, boolean *, boolean *, const char *,
-                      struct obj *, BOOLEAN_P, int *));
+STATIC_DCL boolean FDECL(query_classes, (char *, boolean *, boolean *,
+                                         const char *, struct obj *,
+                                         BOOLEAN_P, int *));
 STATIC_DCL boolean FDECL(fatal_corpse_mistake, (struct obj *, BOOLEAN_P));
 STATIC_DCL void FDECL(check_here, (BOOLEAN_P));
 STATIC_DCL boolean FDECL(n_or_more, (struct obj *));
@@ -47,7 +47,7 @@ STATIC_DCL void FDECL(tipcontainer, (struct obj *));
 
 /* define for query_objlist() and autopickup() */
 #define FOLLOW(curr, flags) \
-    (((flags) &BY_NEXTHERE) ? (curr)->nexthere : (curr)->nobj)
+    (((flags) & BY_NEXTHERE) ? (curr)->nexthere : (curr)->nobj)
 
 /*
  *  How much the weight of the given container will change when the given
@@ -62,9 +62,9 @@ STATIC_DCL void FDECL(tipcontainer, (struct obj *));
 /* if you can figure this out, give yourself a hearty pat on the back... */
 #define GOLD_CAPACITY(w, n) (((w) * -100L) - ((n) + 50L) - 1L)
 
-/* A variable set in use_container(), to be used by the callback routines  */
-/* in_container() and out_container() from askchain() and use_container(). */
-/* Also used by menu_loot() and container_gone().                          */
+/* A variable set in use_container(), to be used by the callback routines
+   in_container() and out_container() from askchain() and use_container().
+   Also used by menu_loot() and container_gone(). */
 static NEARDATA struct obj *current_container;
 static NEARDATA boolean abort_looting;
 #define Icebox (current_container->otyp == ICE_BOX)
@@ -221,9 +221,7 @@ int *menu_on_demand;
                     oclasses[oclassct] = '\0';
                 } else {
                     if (!where)
-                        where =
-                            !strcmp(action, "pick up")
-                                ? "here"
+                        where = !strcmp(action, "pick up") ? "here"
                                 : !strcmp(action, "take out") ? "inside" : "";
                     if (*where)
                         There("are no %c's %s.", sym, where);
@@ -384,6 +382,7 @@ struct obj *obj;
 
     if (Role_if(PM_PRIEST))
         obj->bknown = TRUE;
+
     /*
      * There are three types of filters possible and the first and
      * third can have more than one entry:
@@ -400,6 +399,7 @@ struct obj *obj;
      * in accepting all scrolls and potions regardless of bless/curse
      * state plus all blessed non-scroll, non-potion objects.)
      */
+
     /* if class is expected but obj's class is not in the list, reject */
     if (class_filter && !index(valid_menu_classes, obj->oclass))
         return FALSE;
@@ -481,7 +481,8 @@ int what; /* should be a long */
         count = 0;
 
     if (!u.uswallow) {
-        struct trap *ttmp = t_at(u.ux, u.uy);
+        struct trap *ttmp;
+
         /* no auto-pick if no-pick move, nothing there, or in a pool */
         if (autopickup && (context.nopick || !OBJ_AT(u.ux, u.uy)
                            || (is_pool(u.ux, u.uy) && !Underwater)
@@ -489,11 +490,11 @@ int what; /* should be a long */
             read_engr_at(u.ux, u.uy);
             return 0;
         }
-
         /* no pickup if levitating & not on air or water level */
         if (!can_reach_floor(TRUE)) {
             if ((multi && !context.run) || (autopickup && !flags.pickup)
-                || (ttmp && uteetering_at_seen_pit(ttmp)))
+                || ((ttmp = t_at(u.ux, u.uy)) != 0
+                    && uteetering_at_seen_pit(ttmp)))
                 read_engr_at(u.ux, u.uy);
             return 0;
         }
@@ -540,21 +541,20 @@ int what; /* should be a long */
 
     if (flags.menu_style != MENU_TRADITIONAL || iflags.menu_requested) {
         /* use menus exclusively */
+        traverse_how |= AUTOSELECT_SINGLE | INVORDER_SORT;
         if (count) { /* looking for N of something */
             char qbuf[QBUFSZ];
 
             Sprintf(qbuf, "Pick %d of what?", count);
             val_for_n_or_more = count; /* set up callback selector */
-            n = query_objlist(qbuf, objchain, traverse_how | AUTOSELECT_SINGLE
-                                                  | INVORDER_SORT,
+            n = query_objlist(qbuf, &objchain, traverse_how,
                               &pick_list, PICK_ONE, n_or_more);
             /* correct counts, if any given */
             for (i = 0; i < n; i++)
                 pick_list[i].count = count;
         } else {
-            n = query_objlist("Pick up what?", objchain,
-                              traverse_how | AUTOSELECT_SINGLE | INVORDER_SORT
-                                  | FEEL_COCKATRICE,
+            n = query_objlist("Pick up what?", &objchain,
+                              (traverse_how | FEEL_COCKATRICE),
                               &pick_list, PICK_ANY, all_but_uchain);
         }
     menu_pickup:
@@ -582,8 +582,7 @@ int what; /* should be a long */
         selective = FALSE;    /* ask for each item */
 
         /* check for more than one object */
-        for (obj = objchain; obj;
-             obj = (traverse_how == BY_NEXTHERE) ? obj->nexthere : obj->nobj)
+        for (obj = objchain; obj; obj = FOLLOW(obj, traverse_how))
             ct++;
 
         if (ct == 1 && count) {
@@ -601,12 +600,13 @@ int what; /* should be a long */
             There("are %s objects here.", (ct <= 10) ? "several" : "many");
             if (!query_classes(oclasses, &selective, &all_of_a_type,
                                "pick up", objchain,
-                               traverse_how == BY_NEXTHERE, &via_menu)) {
+                               (traverse_how & BY_NEXTHERE) ? TRUE : FALSE,
+                               &via_menu)) {
                 if (!via_menu)
                     return 0;
-                n = query_objlist("Pick up what?", objchain,
-                                  traverse_how
-                                      | (selective ? 0 : INVORDER_SORT),
+                if (selective)
+                    traverse_how |= INVORDER_SORT;
+                n = query_objlist("Pick up what?", &objchain, traverse_how,
                                   &pick_list, PICK_ANY,
                                   (via_menu == -2) ? allow_all
                                                    : allow_category);
@@ -615,15 +615,11 @@ int what; /* should be a long */
         }
 
         for (obj = objchain; obj; obj = obj2) {
-            if (traverse_how == BY_NEXTHERE)
-                obj2 = obj->nexthere; /* perhaps obj will be picked up */
-            else
-                obj2 = obj->nobj;
-            lcount = -1L;
-
+            obj2 = FOLLOW(obj, traverse_how);
             if (!selective && oclasses[0] && !index(oclasses, obj->oclass))
                 continue;
 
+            lcount = -1L;
             if (!all_of_a_type) {
                 char qbuf[BUFSZ];
 
@@ -648,7 +644,7 @@ int what; /* should be a long */
                     lcount = (long) yn_number;
                     if (lcount > obj->quan)
                         lcount = obj->quan;
-                /* fall thru */
+                    /*FALLTHRU*/
                 default: /* 'y' */
                     break;
                 }
@@ -779,11 +775,12 @@ menu_item **pick_list; /* list of objects and counts to pick up */
  *      SIGNAL_NOMENU     - Return -1 rather than 0 if nothing passes "allow".
  *      SIGNAL_ESCAPE     - Return -1 rather than 0 if player uses ESC to
  *                          pick nothing.
+ *      FEEL_COCKATRICE   - touch corpse.
  */
 int
-query_objlist(qstr, olist, qflags, pick_list, how, allow)
+query_objlist(qstr, olist_p, qflags, pick_list, how, allow)
 const char *qstr;                 /* query string */
-struct obj *olist;                /* the list to pick from */
+struct obj **olist_p;             /* the list to pick from */
 int qflags;                       /* options to control the query */
 menu_item **pick_list;            /* return list of items picked */
 int how;                          /* type of query */
@@ -791,12 +788,12 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
 {
     int i, n, actualn;
     winid win;
-    struct obj *curr, *last, fake_hero_object;
-    struct obj **oarray;
+    struct obj *curr, *last, fake_hero_object, *olist = *olist_p;
     char *pack;
     anything any;
-    boolean printed_type_name, sorted = (qflags & INVORDER_SORT) != 0,
-                               engulfer = (qflags & INCLUDE_HERO) != 0;
+    boolean printed_type_name,
+            sorted = (qflags & INVORDER_SORT) != 0,
+            engulfer = (qflags & INCLUDE_HERO) != 0;
 
     *pick_list = (menu_item *) 0;
     if (!olist && !engulfer)
@@ -819,27 +816,26 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
         return (qflags & SIGNAL_NOMENU) ? -1 : 0;
 
     if (n == 1 && (qflags & AUTOSELECT_SINGLE)) {
-        *pick_list = (menu_item *) alloc(sizeof(menu_item));
+        *pick_list = (menu_item *) alloc(sizeof (menu_item));
         (*pick_list)->item.a_obj = last;
         (*pick_list)->count = last->quan;
         return 1;
     }
 
-    oarray = objarr_init(actualn);
-    /* Add objects to the array */
-    i = 0;
-    for (curr = olist; curr; curr = FOLLOW(curr, qflags)) {
-        if ((*allow)(curr)) {
-            objarr_set(curr, i++, oarray, (flags.sortloot == 'f'
-                                           || (flags.sortloot == 'l'
-                                               && !(qflags & USE_INVLET))));
-        }
+    if (sorted) {
+        sortloot(&olist,
+                 (((flags.sortloot == 'f'
+                    || (flags.sortloot == 'l' && !(qflags & USE_INVLET)))
+                   ? SORTLOOT_LOOT
+                   : (qflags & USE_INVLET) ? SORTLOOT_INVLET : 0)
+                  | (flags.sortpack ? SORTLOOT_PACK : 0)),
+                 (qflags & BY_NEXTHERE) ? TRUE : FALSE);
+        *olist_p = olist;
     }
 
     win = create_nhwindow(NHW_MENU);
     start_menu(win);
     any = zeroany;
-
     /*
      * Run through the list and add the objects to the menu.  If
      * INVORDER_SORT is set, we'll run through the list once for
@@ -849,22 +845,23 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
     pack = flags.inv_order;
     do {
         printed_type_name = FALSE;
-        for (i = 0; i < actualn; i++) {
-            curr = oarray[i];
+        for (curr = olist; curr; curr = FOLLOW(curr, qflags)) {
+            if (sorted && curr->oclass != *pack)
+                continue;
             if ((qflags & FEEL_COCKATRICE) && curr->otyp == CORPSE
                 && will_feel_cockatrice(curr, FALSE)) {
                 destroy_nhwindow(win); /* stop the menu and revert */
                 (void) look_here(0, FALSE);
                 return 0;
             }
-            if ((!sorted || curr->oclass == *pack) && (*allow)(curr)) {
+            if ((*allow)(curr)) {
                 /* if sorting, print type name (once only) */
                 if (sorted && !printed_type_name) {
                     any = zeroany;
                     add_menu(win, NO_GLYPH, &any, 0, 0, iflags.menu_headings,
                              let_to_name(*pack, FALSE,
-                                         (how != PICK_NONE)
-                                             && iflags.menu_head_objsym),
+                                         ((how != PICK_NONE)
+                                          && iflags.menu_head_objsym)),
                              MENU_UNSELECTED);
                     printed_type_name = TRUE;
                 }
@@ -878,7 +875,6 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
         }
         pack++;
     } while (sorted && *pack);
-    free(oarray);
 
     if (engulfer) {
         char buf[BUFSZ];
@@ -1656,7 +1652,6 @@ doloot()
     cc.y = u.uy;
 
 lootcont:
-
     if ((num_conts = container_at(cc.x, cc.y, TRUE)) > 0) {
         boolean anyfound = FALSE;
 
@@ -1875,11 +1870,12 @@ boolean *prev_loot;
      */
     if (mtmp && mtmp != u.usteed && (otmp = which_armor(mtmp, W_SADDLE))) {
         long unwornmask;
+
         if (passed_info)
             *passed_info = 1;
-        Sprintf(
-            qbuf, "Do you want to remove the saddle from %s?",
-            x_monnam(mtmp, ARTICLE_THE, (char *) 0, SUPPRESS_SADDLE, FALSE));
+        Sprintf(qbuf, "Do you want to remove the saddle from %s?",
+                x_monnam(mtmp, ARTICLE_THE, (char *) 0,
+                         SUPPRESS_SADDLE, FALSE));
         if ((c = yn_function(qbuf, ynqchars, 'n')) == 'y') {
             if (nolimbs(youmonst.data)) {
                 You_cant("do that without limbs."); /* not body_part(HAND) */
@@ -1887,8 +1883,8 @@ boolean *prev_loot;
             }
             if (otmp->cursed) {
                 You("can't.  The saddle seems to be stuck to %s.",
-                    x_monnam(mtmp, ARTICLE_THE, (char *) 0, SUPPRESS_SADDLE,
-                             FALSE));
+                    x_monnam(mtmp, ARTICLE_THE, (char *) 0,
+                             SUPPRESS_SADDLE, FALSE));
                 /* the attempt costs you time */
                 return 1;
             }
@@ -1907,8 +1903,7 @@ boolean *prev_loot;
             return 0;
         }
     }
-    /* 3.4.0 introduced the ability to pick things up from within
-       swallower's stomach */
+    /* 3.4.0 introduced ability to pick things up from swallower's stomach */
     if (u.uswallow) {
         int count = passed_info ? *passed_info : 0;
 
@@ -2091,7 +2086,7 @@ int
 ck_bag(obj)
 struct obj *obj;
 {
-    return current_container && obj != current_container;
+    return (current_container && obj != current_container);
 }
 
 /* Returns: -1 to stop, 1 item was removed, 0 item was not removed. */
@@ -2218,14 +2213,14 @@ struct obj *box;
             pline("%s inside the box is still alive!", Monnam(livecat));
         (void) christen_monst(livecat, sc);
     } else {
-        deadcat =
-            mk_named_object(CORPSE, &mons[PM_HOUSECAT], box->ox, box->oy, sc);
+        deadcat = mk_named_object(CORPSE, &mons[PM_HOUSECAT],
+                                  box->ox, box->oy, sc);
         if (deadcat) {
             obj_extract_self(deadcat);
             (void) add_to_container(box, deadcat);
         }
         pline_The("%s inside the box is dead!",
-                  Hallucination ? rndmonnam(NULL) : "housecat");
+                  Hallucination ? rndmonnam((char *) 0) : "housecat");
     }
     box->owt = weight(box);
     return;
@@ -2409,14 +2404,14 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
                                    (boolean) (used != 0), more_containers);
             }
         } else { /* TRADITIONAL or COMBINATION */
-            xbuf[0] = '\0';    /* list of extra acceptable responses */
-            Strcpy(pbuf, ":"); /* look inside */
+            xbuf[0] = '\0'; /* list of extra acceptable responses */
+            Strcpy(pbuf, ":");                   /* look inside */
             Strcat(outmaybe ? pbuf : xbuf, "o"); /* take out */
             Strcat(inokay ? pbuf : xbuf, "i");   /* put in */
             Strcat(outmaybe ? pbuf : xbuf, "b"); /* both */
             Strcat(inokay ? pbuf : xbuf, "rs");  /* reversed, stash */
-            Strcat(pbuf, " ");
-            Strcat(more_containers ? pbuf : xbuf, "n");
+            Strcat(pbuf, " ");                   /* separator */
+            Strcat(more_containers ? pbuf : xbuf, "n"); /* next container */
             Strcat(pbuf, "q");                   /* quit */
             if (iflags.cmdassist)
                 /* this unintentionally allows user to answer with 'o' or
@@ -2624,7 +2619,7 @@ boolean put_in;
         if (!put_in)
             current_container->cknown = 1;
         Sprintf(buf, "%s what?", action);
-        n = query_objlist(buf, put_in ? invent : current_container->cobj,
+        n = query_objlist(buf, put_in ? &invent : &(current_container->cobj),
                           mflags, &pick_list, PICK_ANY,
                           all_categories ? allow_all : allow_category);
         if (n) {

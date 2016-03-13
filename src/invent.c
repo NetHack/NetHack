@@ -8,7 +8,8 @@
 #define CONTAINED_SYM '>' /* designator for inside a container */
 #define HANDS_SYM '-'
 
-STATIC_DCL int FDECL(CFDECLSPEC sortloot_cmp, (struct obj *, struct obj *));
+STATIC_DCL int FDECL(CFDECLSPEC sortloot_cmp, (const genericptr,
+                                               const genericptr));
 STATIC_DCL void NDECL(reorder_invent);
 STATIC_DCL void FDECL(noarmor, (BOOLEAN_P));
 STATIC_DCL void FDECL(invdisp_nothing, (const char *, const char *));
@@ -25,8 +26,8 @@ STATIC_PTR char *FDECL(safeq_shortxprname, (struct obj *));
 STATIC_DCL char FDECL(display_pickinv, (const char *, const char *,
                                         BOOLEAN_P, long *));
 STATIC_DCL char FDECL(display_used_invlets, (CHAR_P));
-STATIC_DCL void FDECL(tally_BUCX,
-                      (struct obj *, int *, int *, int *, int *, int *));
+STATIC_DCL void FDECL(tally_BUCX, (struct obj *,
+                                   int *, int *, int *, int *, int *));
 STATIC_DCL boolean FDECL(this_type_only, (struct obj *));
 STATIC_DCL void NDECL(dounpaid);
 STATIC_DCL struct obj *FDECL(find_unpaid, (struct obj *, struct obj **));
@@ -47,96 +48,187 @@ static int lastinvnr = 51; /* 0 ... 51 (never saved&restored) */
  */
 static char venom_inv[] = { VENOM_CLASS, 0 }; /* (constant) */
 
+struct sortloot_item {
+    struct obj *obj;
+    int indx;
+};
+unsigned sortlootmode = 0;
+
+/* qsort comparison routine for sortloot() */
 STATIC_OVL int CFDECLSPEC
-sortloot_cmp(obj1, obj2)
-struct obj *obj1;
-struct obj *obj2;
+sortloot_cmp(vptr1, vptr2)
+const genericptr vptr1;
+const genericptr vptr2;
 {
-    int val1 = 0;
-    int val2 = 0;
+    struct sortloot_item *sli1 = (struct sortloot_item *) vptr1,
+                         *sli2 = (struct sortloot_item *) vptr2;
+    struct obj *obj1 = sli1->obj,
+               *obj2 = sli2->obj;
+    char *cls1, *cls2;
+    int val1, val2, c, namcmp;
+
+    /* order by object class like inventory display */
+    if ((sortlootmode & SORTLOOT_PACK) != 0) {
+        cls1 = index(flags.inv_order, obj1->oclass);
+        cls2 = index(flags.inv_order, obj2->oclass);
+        if (cls1 != cls2)
+            return (int) (cls1 - cls2);
+
+        /* for armor, group by sub-category */
+        if (obj1->oclass == ARMOR_CLASS) {
+            static int armcat[7 + 1];
+
+            if (!armcat[7]) {
+                /* one-time init; we want to control the order */
+                armcat[ARM_HELM]   = 1; /* [2] */
+                armcat[ARM_GLOVES] = 2; /* [3] */
+                armcat[ARM_BOOTS]  = 3; /* [4] */
+                armcat[ARM_SHIELD] = 4; /* [1] */
+                armcat[ARM_CLOAK]  = 5; /* [5] */
+                armcat[ARM_SHIRT]  = 6; /* [6] */
+                armcat[ARM_SUIT]   = 7; /* [0] */
+                armcat[7]          = 8;
+            }
+            val1 = armcat[objects[obj1->otyp].oc_armcat];
+            val2 = armcat[objects[obj2->otyp].oc_armcat];
+            if (val1 != val2)
+                return val1 - val2;
+
+        /* for weapons, group by ammo (arrows, bolts), launcher (bows),
+           missile (dart, boomerang), stackable (daggers, knives, spears),
+           'other' (swords, axes, &c), polearm */
+        } else if (obj1->oclass == WEAPON_CLASS) {
+            val1 = objects[obj1->otyp].oc_skill;
+            val1 = (val1 < 0)
+                    ? (val1 >= -P_CROSSBOW && val1 <= -P_BOW) ? 1 : 3
+                    : (val1 >= P_BOW && val1 <= P_CROSSBOW) ? 2
+                       : (val1 == P_SPEAR || val1 == P_DAGGER
+                          || val1 == P_KNIFE) ? 4 : !is_pole(obj1) ? 5 : 6;
+            val2 = objects[obj2->otyp].oc_skill;
+            val2 = (val2 < 0)
+                    ? (val2 >= -P_CROSSBOW && val2 <= -P_BOW) ? 1 : 3
+                    : (val2 >= P_BOW && val2 <= P_CROSSBOW) ? 2
+                       : (val2 == P_SPEAR || val2 == P_DAGGER
+                          || val2 == P_KNIFE) ? 4 : !is_pole(obj2) ? 5 : 6;
+            if (val1 != val2)
+                return val1 - val2;
+        }
+    }
+
+    /* order by assigned inventory letter */
+    if ((sortlootmode & SORTLOOT_INVLET) != 0) {
+        c = obj1->invlet;
+        val1 = ('a' <= c && c <= 'z') ? (c - 'a' + 2)
+               : ('A' <= c && c <= 'Z') ? (c - 'Z' + 2 + 26)
+                 : (c == '$') ? 1
+                   : (c == '#') ? 1 + 52 + 1
+                     : 1 + 52 + 1 + 1; /* none of the above */
+        c = obj2->invlet;
+        val2 = ('a' <= c <= 'z') ? (c - 'a' + 2)
+               : ('A' <= c <= 'Z') ? (c - 'Z' + 2 + 26)
+                 : (c == '$') ? 1
+                   : (c == '#') ? 1 + 52 + 1
+                     : 1 + 52 + 1 + 1; /* none of the above */
+        if (val1 != val2)
+            return val1 - val2;
+    }
+
+    if ((sortlootmode & SORTLOOT_LOOT) == 0)
+        goto tiebreak;
 
     /* Sort object names in lexicographical order, ignoring quantity. */
-    int name_cmp = strcmpi(cxname_singular(obj1), cxname_singular(obj2));
+    if ((namcmp = strcmpi(cxname_singular(obj1), cxname_singular(obj2))) != 0)
+        return namcmp;
 
-    if (name_cmp != 0) {
-        return name_cmp;
-    }
-
-    /* Sort by BUC. Map blessed to 4, uncursed to 2, cursed to 1, and unknown
-     * to 0. */
+    /* Sort by BUCX.  Map blessed to 4, uncursed to 2, cursed to 1, and
+       unknown to 0. */
     val1 = obj1->bknown
-               ? (obj1->blessed << 2)
-                     + ((!obj1->blessed && !obj1->cursed) << 1) + obj1->cursed
-               : 0;
+              ? (obj1->blessed << 2)
+                   + ((!obj1->blessed && !obj1->cursed) << 1) + obj1->cursed
+              : 0;
     val2 = obj2->bknown
-               ? (obj2->blessed << 2)
-                     + ((!obj2->blessed && !obj2->cursed) << 1) + obj2->cursed
-               : 0;
-    if (val1 != val2) {
-        return val2 - val1; /* Because bigger is better. */
-    }
+              ? (obj2->blessed << 2)
+                   + ((!obj2->blessed && !obj2->cursed) << 1) + obj2->cursed
+              : 0;
+    if (val1 != val2)
+        return val2 - val1; /* bigger is better */
 
-    /* Sort by greasing. This will put the objects in degreasing order. */
+    /* Sort by greasing.  This will put the objects in degreasing order. */
     val1 = obj1->greased;
     val2 = obj2->greased;
-    if (val1 != val2) {
-        return val2 - val1; /* Because bigger is better. */
-    }
+    if (val1 != val2)
+        return val2 - val1; /* bigger is better */
 
-    /* Sort by erosion. The effective amount is what matters. */
+    /* Sort by erosion.  The effective amount is what matters. */
     val1 = greatest_erosion(obj1);
     val2 = greatest_erosion(obj2);
-    if (val1 != val2) {
-        return val1 - val2; /* Because bigger is WORSE. */
-    }
+    if (val1 != val2)
+        return val1 - val2; /* bigger is WORSE */
 
-    /* Sort by erodeproofing. Map known-invulnerable to 1, and both
-     * known-vulnerable and unknown-vulnerability to 0, because that's how
-     * they're displayed. */
+    /* Sort by erodeproofing.  Map known-invulnerable to 1, and both
+       known-vulnerable and unknown-vulnerability to 0, because that's
+       how they're displayed. */
     val1 = obj1->rknown && obj1->oerodeproof;
     val2 = obj2->rknown && obj2->oerodeproof;
-    if (val1 != val2) {
-        return val2 - val1; /* Because bigger is better. */
+    if (val1 != val2)
+        return val2 - val1; /* bigger is better */
+
+    /* Sort by enchantment.  Map unknown to -1000, which is comfortably
+       below the range of obj->spe.  oc_uses_known means that obj->known
+       matters, which usually indirectly means that obj->spe is relevant.
+       Lots of objects use obj->spe for some other purpose (see obj.h). */
+    if (objects[obj1->otyp].oc_uses_known
+        /* exclude eggs (laid by you) and tins (homemade, pureed, &c) */
+        && obj1->oclass != FOOD_CLASS) {
+        val1 = obj1->known ? obj1->spe : -1000;
+        val2 = obj2->known ? obj2->spe : -1000;
+        if (val1 != val2)
+            return val2 - val1; /* bigger is better */
     }
 
-    /* Sort by enchantment. Map unknown to -1000, which is comfortably below
-     * the range of ->spe. */
-    val1 = obj1->known ? obj1->spe : -1000;
-    val2 = obj2->known ? obj2->spe : -1000;
-    if (val1 != val2) {
-        return val2 - val1; /* Because bigger is better. */
-    }
-
-    /* They're identical, as far as we're concerned,
-       but we want to force a determistic order between them. */
-    return (obj1->o_id > obj2->o_id) ? 1 : -1;
-}
-
-struct obj **
-objarr_init(n)
-int n;
-{
-    return (struct obj **) alloc(n * sizeof(struct obj *));
+tiebreak:
+    /* They're identical, as far as we're concerned.  We want
+       to force a deterministic order, and do so by producing a
+       stable sort: maintain the original order of equal items. */
+    return (sli2->indx - sli1->indx);
 }
 
 void
-objarr_set(otmp, idx, oarray, dosort)
-struct obj *otmp;
-int idx;
-struct obj **oarray;
-boolean dosort;
+sortloot(olist, mode, by_nexthere)
+struct obj **olist;
+unsigned mode; /* flags for sortloot_cmp() */
+boolean by_nexthere; /* T: traverse via obj->nexthere, F: via obj->nobj */
 {
-    if (dosort) {
-        int j;
-        for (j = idx; j; j--) {
-            if (sortloot_cmp(otmp, oarray[j - 1]) > 0)
-                break;
-            oarray[j] = oarray[j - 1];
-        }
-        oarray[j] = otmp;
-    } else {
-        oarray[idx] = otmp;
+    struct sortloot_item *sliarray, osli, nsli;
+    struct obj *o, **nxt_p;
+    unsigned n, i;
+    boolean already_sorted = TRUE;
+
+    sortlootmode = mode; /* extra input for sortloot_cmp() */
+    for (n = osli.indx = 0, osli.obj = *olist; (o = osli.obj) != 0;
+         osli = nsli) {
+        nsli.obj = by_nexthere ? o->nexthere : o->nobj;
+        nsli.indx = (int) ++n;
+        if (nsli.obj && already_sorted
+            && sortloot_cmp((genericptr_t) &osli, (genericptr_t) &nsli) > 0)
+            already_sorted = FALSE;
     }
+    if (n > 1 && !already_sorted) {
+        sliarray = (struct sortloot_item *) alloc(n * sizeof *sliarray);
+        for (i = 0, o = *olist; o;
+             ++i, o = by_nexthere ? o->nexthere : o->nobj)
+            sliarray[i].obj = o, sliarray[i].indx = (int) i;
+
+        qsort((genericptr_t) sliarray, n, sizeof *sliarray, sortloot_cmp);
+        for (i = 0; i < n; ++i) {
+            o = sliarray[i].obj;
+            nxt_p = by_nexthere ? &(o->nexthere) : &(o->nobj);
+            *nxt_p = (i < n - 1) ? sliarray[i + 1].obj : (struct obj *) 0;
+        }
+        *olist = sliarray[0].obj;
+        free((genericptr_t) sliarray);
+    }
+    sortlootmode = 0;
 }
 
 void
@@ -1783,8 +1875,8 @@ int id_limit;
     while (id_limit) {
         Sprintf(buf, "What would you like to identify %s?",
                 first ? "first" : "next");
-        n = query_objlist(buf, invent, SIGNAL_NOMENU | SIGNAL_ESCAPE
-                                           | USE_INVLET | INVORDER_SORT,
+        n = query_objlist(buf, &invent, (SIGNAL_NOMENU | SIGNAL_ESCAPE
+                                         | USE_INVLET | INVORDER_SORT),
                           &pick_list, PICK_ANY, not_fully_identified);
 
         if (n > 0) {
@@ -2021,11 +2113,10 @@ long *out_cnt;
     struct obj *otmp;
     char ilet, ret;
     char *invlet = flags.inv_order;
-    int i, n, classcount;
+    int n, classcount;
     winid win;                        /* windows being used */
     anything any;
     menu_item *selected;
-    struct obj **oarray;
 
     if (flags.perm_invent && ((lets && *lets) || xtra_choice)) {
         /* partial inventory in perm_invent setting; don't operate on
@@ -2096,19 +2187,10 @@ long *out_cnt;
         return ret;
     }
 
-    /* count the number of items (preliminary count of 0,1,more was 'more'
-       and is now obsolete); we have at least 2 items or want to behave as
-       if we do (full invent and wiz_identify use this even for 1 item) */
-    for (n = 0, otmp = invent; otmp; otmp = otmp->nobj)
-        if (!lets || !*lets || index(lets, otmp->invlet))
-            n++;
-    oarray = objarr_init(n);
-    /* Add objects to the array */
-    i = 0;
-    for (otmp = invent; otmp; otmp = otmp->nobj)
-        if (!lets || !*lets || index(lets, otmp->invlet)) {
-            objarr_set(otmp, i++, oarray, (flags.sortloot == 'f'));
-        }
+    sortloot(&invent,
+             (((flags.sortloot == 'f') ? SORTLOOT_LOOT : SORTLOOT_INVLET)
+              | (flags.sortpack ? SORTLOOT_PACK : 0)),
+             FALSE);
 
     start_menu(win);
     any = zeroany;
@@ -2133,8 +2215,7 @@ long *out_cnt;
     }
 nextclass:
     classcount = 0;
-    for (i = 0; i < n; i++) {
-        otmp = oarray[i];
+    for (otmp = invent; otmp; otmp = otmp->nobj) {
         if (!flags.sortpack || otmp->oclass == *invlet) {
             any = zeroany; /* all bits zero */
             ilet = otmp->invlet;
@@ -2158,7 +2239,6 @@ nextclass:
             goto nextclass;
         }
     }
-    free(oarray);
     end_menu(win, (char *) 0);
 
     n = select_menu(win, want_reply ? PICK_ONE : PICK_NONE, &selected);
@@ -2627,9 +2707,9 @@ dotypeinv()
         }
         this_type = oclass;
     }
-    if (query_objlist((char *) 0, invent,
-                      (flags.invlet_constant ? USE_INVLET : 0)
-                          | INVORDER_SORT,
+    if (query_objlist((char *) 0, &invent,
+                      ((flags.invlet_constant ? USE_INVLET : 0)
+                       | INVORDER_SORT),
                       &pick_list, PICK_NONE, this_type_only) > 0)
         free((genericptr_t) pick_list);
     return 0;
@@ -3619,8 +3699,8 @@ char *title;
          */
         youmonst.data = mon->data;
 
-        n = query_objlist(title ? title : tmp, mon->minvent,
-                          INVORDER_SORT | (incl_hero ? INCLUDE_HERO : 0),
+        n = query_objlist(title ? title : tmp, &(mon->minvent),
+                          (INVORDER_SORT | (incl_hero ? INCLUDE_HERO : 0)),
                           &selected,
                           (dflags & MINV_NOLET) ? PICK_NONE : PICK_ONE,
                           do_all ? allow_all : worn_wield_only);
@@ -3656,8 +3736,8 @@ register struct obj *obj;
                      "that");
 
     if (obj->cobj) {
-        n = query_objlist(qbuf, obj->cobj, INVORDER_SORT, &selected,
-                          PICK_NONE, allow_all);
+        n = query_objlist(qbuf, &(obj->cobj), INVORDER_SORT,
+                          &selected, PICK_NONE, allow_all);
     } else {
         invdisp_nothing(qbuf, "(empty)");
         n = 0;
@@ -3707,8 +3787,9 @@ boolean as_if_seen;
     if (n) {
         only.x = x;
         only.y = y;
-        if (query_objlist("Things that are buried here:", level.buriedobjlist,
-                          INVORDER_SORT, &selected, PICK_NONE, only_here) > 0)
+        if (query_objlist("Things that are buried here:",
+                          &level.buriedobjlist, INVORDER_SORT,
+                          &selected, PICK_NONE, only_here) > 0)
             free((genericptr_t) selected);
         only.x = only.y = 0;
     }
