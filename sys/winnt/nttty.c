@@ -997,9 +997,8 @@ void msmsg(const char *fmt, ...)
 {
     va_list the_args;
     char buf[ROWNO * COLNO]; /* worst case scenario */
-    VA_START(fmt);
-    VA_INIT(fmt, const char *);
-    Vsprintf(buf, fmt, VA_ARGS);
+    va_start(the_args, fmt);
+    Vsprintf(buf, fmt, the_args);
     if (redirect_stdout)
         fprintf(stdout, "%s", buf);
     else {
@@ -1017,13 +1016,12 @@ void nttty_error(const char *s, ...)
 {
     va_list the_args;
     char buf[BUFSZ];
-    VA_START(s);
-    VA_INIT(s, const char *);
+    va_start(the_args, s);
     /* error() may get called before tty is initialized */
     if (iflags.window_inited)
         end_screen();
     buf[0] = '\n';
-    (void) vsprintf(&buf[1], s, VA_ARGS);
+    (void) vsprintf(&buf[1], s, the_args);
     msmsg(buf);
     really_move_cursor();
     va_end(the_args);

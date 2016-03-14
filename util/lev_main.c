@@ -358,9 +358,8 @@ static void lc_vpline(const char *, va_list);
 void lc_pline(const char *line, ...)
 {
     va_list the_args;
-    VA_START(line);
-    VA_INIT(line, char *);
-    lc_vpline(line, VA_ARGS);
+    va_start(the_args, line);
+    lc_vpline(line, the_args);
     va_end(the_args);
 }
 
@@ -375,7 +374,7 @@ lc_vpline(const char *line, va_list the_args)
     if (!line || !*line)
         line = nomsg; /* shouldn't happen */
     if (index(line, '%')) {
-        Vsprintf(pbuf, line, VA_ARGS);
+        Vsprintf(pbuf, line, the_args);
         pbuf[BUFSZ - 1] = '\0'; /* truncate if long */
         line = pbuf;
     }
@@ -399,10 +398,9 @@ void
 lc_error(const char *line, ...)
 {
     va_list the_args;
-    VA_START(line);
-    VA_INIT(line, const char *);
+    va_start(the_args, line);
     lc_pline_mode = LC_PLINE_ERROR;
-    lc_vpline(line, VA_ARGS);
+    lc_vpline(line, the_args);
     va_end(the_args);
     return;
 }
@@ -412,10 +410,10 @@ void
 lc_warning(const char *line, ...)
 {
     va_list the_args;
-    VA_START(line);
-    VA_INIT(line, const char *);
+    va_start(the_args, line);
+    ;
     lc_pline_mode = LC_PLINE_WARNING;
-    lc_vpline(line, VA_ARGS);
+    lc_vpline(line, the_args);
     va_end(the_args);
     return;
 }
@@ -556,38 +554,19 @@ set_opvar_var(struct opvar *ov, const char *val)
 #define New(type) \
     (type *) memset((genericptr_t) alloc(sizeof(type)), 0, sizeof(type))
 
-#if defined(USE_STDARG) || defined(USE_VARARGS)
 static void vadd_opvars(sp_lev *, const char *, va_list);
 
 void add_opvars(sp_lev *sp, const char *fmt, ...)
 {
     va_list the_args;
-    VA_START(fmt);
-    VA_INIT(fmt, char *);
-    vadd_opvars(sp, fmt, VA_ARGS);
+    va_start(the_args, fmt);
+    vadd_opvars(sp, fmt, the_args);
     va_end(the_args);
 }
 
-#ifdef USE_STDARG
 static void
 vadd_opvars(sp_lev *sp, const char *fmt, va_list the_args)
 {
-#else
-static void
-vadd_opvars(sp, fmt, the_args)
-sp_lev *sp;
-const char *fmt;
-va_list the_args;
-{
-#endif
-
-#else /* USE_STDARG | USE_VARARG */
-
-#define vadd_opvars add_opvars
-
-void add_opvars
-VA_DECL2(sp_lev *, sp, const char *, fmt)
-#endif /* USE_STDARG | USE_VARARG */
 
     const char *p, *lp;
     long la;
@@ -600,62 +579,62 @@ VA_DECL2(sp_lev *, sp, const char *, fmt)
         case 'i': /* integer */
         {
             struct opvar *ov = New(struct opvar);
-            set_opvar_int(ov, VA_NEXT(la, long) );
+            set_opvar_int(ov, la = va_arg(the_args, long) );
             add_opcode(sp, SPO_PUSH, ov);
             break;
         }
         case 'c': /* coordinate */
         {
             struct opvar *ov = New(struct opvar);
-            set_opvar_coord(ov, VA_NEXT(la, long) );
+            set_opvar_coord(ov, la = va_arg(the_args, long) );
             add_opcode(sp, SPO_PUSH, ov);
             break;
         }
         case 'r': /* region */
         {
             struct opvar *ov = New(struct opvar);
-            set_opvar_region(ov, VA_NEXT(la, long) );
+            set_opvar_region(ov, la = va_arg(the_args, long) );
             add_opcode(sp, SPO_PUSH, ov);
             break;
         }
         case 'm': /* mapchar */
         {
             struct opvar *ov = New(struct opvar);
-            set_opvar_mapchar(ov, VA_NEXT(la, long) );
+            set_opvar_mapchar(ov, la = va_arg(the_args, long) );
             add_opcode(sp, SPO_PUSH, ov);
             break;
         }
         case 'M': /* monster */
         {
             struct opvar *ov = New(struct opvar);
-            set_opvar_monst(ov, VA_NEXT(la, long) );
+            set_opvar_monst(ov, la = va_arg(the_args, long) );
             add_opcode(sp, SPO_PUSH, ov);
             break;
         }
         case 'O': /* object */
         {
             struct opvar *ov = New(struct opvar);
-            set_opvar_obj(ov, VA_NEXT(la, long) );
+            set_opvar_obj(ov, la = va_arg(the_args, long) );
             add_opcode(sp, SPO_PUSH, ov);
             break;
         }
         case 's': /* string */
         {
             struct opvar *ov = New(struct opvar);
-            set_opvar_str(ov, VA_NEXT(lp, const char *) );
+            set_opvar_str(ov, lp = va_arg(the_args, const char *) );
             add_opcode(sp, SPO_PUSH, ov);
             break;
         }
         case 'v': /* variable */
         {
             struct opvar *ov = New(struct opvar);
-            set_opvar_var(ov, VA_NEXT(lp, const char *) );
+            set_opvar_var(ov, lp = va_arg(the_args, const char *) );
             add_opcode(sp, SPO_PUSH, ov);
             break;
         }
         case 'o': /* opcode */
         {
-            long i = VA_NEXT(la, int);
+            long i = la = va_arg(the_args, int);
             if (i < 0 || i >= MAX_SP_OPCODES)
                 lc_pline("add_opvars: unknown opcode '%ld'.", i);
             add_opcode(sp, i, NULL);

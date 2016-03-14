@@ -193,18 +193,17 @@ void error(const char *s, ...)
 {
     va_list the_args;
     char buf[BUFSZ];
-    VA_START(s);
-    VA_INIT(s, const char *);
+    va_start(the_args, s);
     /* error() may get called before tty is initialized */
     if (iflags.window_inited)
         end_screen();
     if (!strncmpi(windowprocs.name, "tty", 3)) {
         buf[0] = '\n';
-        (void) vsprintf(&buf[1], s, VA_ARGS);
+        (void) vsprintf(&buf[1], s, the_args);
         Strcat(buf, "\n");
         msmsg(buf);
     } else {
-        (void) vsprintf(buf, s, VA_ARGS);
+        (void) vsprintf(buf, s, the_args);
         Strcat(buf, "\n");
         raw_printf(buf);
     }

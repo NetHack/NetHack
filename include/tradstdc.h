@@ -23,73 +23,9 @@
 #define NHSTDC
 #endif
 
-#if defined(ultrix) && defined(__STDC__) && !defined(__LANGUAGE_C)
-/* Ultrix seems to be in a constant state of flux.  This check attempts to
- * set up ansi compatibility if it wasn't set up correctly by the compiler.
- */
-#ifdef mips
-#define __mips mips
-#endif
-#ifdef LANGUAGE_C
-#define __LANGUAGE_C LANGUAGE_C
-#endif
-#endif
-
-/*
- * ANSI X3J11 detection.
- * Makes substitutes for compatibility with the old C standard.
- */
-
-/* Decide how to handle variable parameter lists:
- * USE_STDARG means use the ANSI <stdarg.h> facilities (only ANSI compilers
- * should do this, and only if the library supports it).
- * USE_VARARGS means use the <varargs.h> facilities.  Again, this should only
- * be done if the library supports it.  ANSI is *not* required for this.
- * Otherwise, the kludgy old methods are used.
- * The defaults are USE_STDARG for ANSI compilers, and USE_OLDARGS for
- * others.
- */
-
-/* #define USE_VARARGS */ /* use <varargs.h> instead of <stdarg.h> */
-/* #define USE_OLDARGS */ /* don't use any variable argument facilities */
-
-#if defined(apollo) /* Apollos have stdarg(3) but not stdarg.h */
-#define USE_VARARGS
-#endif
-
-#if defined(NHSTDC) || defined(ULTRIX_PROTO) || defined(MAC)
-#if !defined(USE_VARARGS) && !defined(USE_OLDARGS) && !defined(USE_STDARG)
-#define USE_STDARG
-#endif
-#endif
-
-/*
- * These have changed since 3.4.3.  VA_END() now provides an explicit
- * closing brace to complement VA_DECL()'s hidden opening brace, so code
- * started with VA_DECL() needs an extra opening brace to complement
- * the explicit final closing brace.  This was done so that the source
- * would look less strange, where VA_DECL() appeared to introduce a
- * function whose opening brace was missing; there are now visible and
- * invisible braces at beginning and end.  Sample usage:
- void foo VA_DECL(int, arg)  --macro expansion has a hidden opening brace
- {  --new, explicit opening brace (actually introduces a nested block)
- VA_START(bar);
- ...code for foo...
- VA_END();  --expansion now provides a closing brace for the nested block
- }  --existing closing brace, still pairs with the hidden one in VA_DECL()
- * Reading the code--or using source browsing tools which match braces--
- * results in seeing a matched set of braces.  Usage of VA_END() is
- * potentially trickier, but nethack uses it in a straightforward manner.
- */
-
 #include <stdarg.h>
-#define VA_INIT(var1, typ1)
-#define VA_NEXT(var1, typ1) var1 = va_arg(the_args, typ1)
-#define VA_ARGS the_args
-#define VA_START(x) va_start(the_args, x)
-
-#if defined(NHSTDC) || defined(MSDOS) || defined(MAC) \
-    || defined(ULTRIX_PROTO) || defined(__BEOS__)
+#define USE_VARARGS
+#define USE_STDARG
 
 /*
  * Used for definitions of functions which take no arguments to force
@@ -109,12 +45,6 @@
  */
 /* And IBM CSet/2.  The redeclaration of free hoses the compile. */
 #define genericptr_t genericptr
-#else
-#if !defined(NHSTDC) && !defined(MAC)
-#define const
-#define signed
-#define volatile
-#endif
 #endif
 
 /*
@@ -129,31 +59,6 @@
 #define const
 #endif
 #endif
-
-#else /* NHSTDC */ /* a "traditional" C  compiler */
-
-#define f(void) f()
-#define FDECL(f, p) f()
-#define VDECL(f, p) f()
-
-#define VOID_ARGS /*empty*/
-
-#if defined(AMIGA) || defined(HPUX) || defined(POSIX_TYPES) \
-    || defined(__DECC) || defined(__BORLANDC__)
-#define genericptr void *
-#endif
-#ifndef genericptr
-#define genericptr char *
-#endif
-
-/*
- * Traditional C compilers don't have "signed", "const", or "volatile".
- */
-#define signed
-#define const
-#define volatile
-
-#endif /* NHSTDC */
 
 #ifndef genericptr_t
 typedef genericptr genericptr_t; /* (void *) or (char *) */

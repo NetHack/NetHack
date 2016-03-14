@@ -225,10 +225,7 @@ reset_occupations()
  * function times out by its own means.
  */
 void
-set_occupation(fn, txt, xtime)
-int (*fn)(void);
-const char *txt;
-int xtime;
+set_occupation(int (*fn)(void), const char *txt, int xtime)
 {
     if (xtime) {
         occupation = timed_occupation;

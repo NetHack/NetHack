@@ -174,7 +174,7 @@ NEARDATA extern coord bhitpos; /* place where throw or zap hits or stops */
 #ifdef USE_TRAMPOLI /* This doesn't belong here, but we have little choice \
                        */
 #undef NDECL
-#define f(void) f()
+#define NDECL(f) f()
 #endif
 
 #include "extern.h"

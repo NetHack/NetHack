@@ -244,13 +244,12 @@ void error(const char *s, ...)
     char buf[1024];
     DWORD last_error = GetLastError();
 
-    VA_START(s);
-    VA_INIT(s, const char *);
+    va_start(the_args, s);
     /* error() may get called before tty is initialized */
     if (iflags.window_inited)
         end_screen();
 
-    vsprintf(buf, s, VA_ARGS);
+    vsprintf(buf, s, the_args);
     NH_A2W(buf, wbuf, sizeof(wbuf) / sizeof(wbuf[0]));
     if (last_error > 0) {
         LPVOID lpMsgBuf;

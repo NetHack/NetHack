@@ -412,13 +412,12 @@ getreturn(const char *str)
 void msmsg(const char *fmt, ...)
 {
     va_list the_args;
-    VA_START(fmt);
-    VA_INIT(fmt, const char *);
+    va_start(the_args, fmt);
 #if defined(MSDOS) && defined(NO_TERMS)
     if (iflags.grmode)
         gr_finish();
 #endif
-    Vprintf(fmt, VA_ARGS);
+    Vprintf(fmt, the_args);
     flushout();
     va_end(the_args);
     return;

@@ -880,11 +880,10 @@ amii_loadlib(void)
 void error(const char *s, ...)
 {
     va_list the_args;
-    VA_START(s);
-    VA_INIT(s, char *);
+    va_start(the_args, s);
 
     putchar('\n');
-    vprintf(s, VA_ARGS);
+    vprintf(s, the_args);
     putchar('\n');
 
     va_end(the_args);

@@ -72,13 +72,12 @@ msleep(unsigned mseconds)
 void error(const char *s, ...)
 {
     va_list the_args;
-    VA_START(s);
-    VA_INIT(s, const char *);
+    va_start(the_args, s);
     /* error() may get called before tty is initialized */
     if (iflags.window_inited)
         end_screen();
     putchar('\n');
-    Vprintf(s, VA_ARGS);
+    Vprintf(s, the_args);
     putchar('\n');
     va_end(the_args);
     exit(EXIT_FAILURE);

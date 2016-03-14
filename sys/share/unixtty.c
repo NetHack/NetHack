@@ -454,11 +454,10 @@ init_linux_cons()
 void error(const char *s, ...)
 {
     va_list the_args;
-    VA_START(s);
-    VA_INIT(s, const char *);
+    va_start(the_args, s);
     if (settty_needed)
         settty((char *) 0);
-    Vprintf(s, VA_ARGS);
+    Vprintf(s, the_args);
     (void) putchar('\n');
     va_end(the_args);
     exit(EXIT_FAILURE);

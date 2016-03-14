@@ -21,9 +21,8 @@ static void vpline(const char *, va_list);
 void pline
 (const char *line, ...) {
     va_list the_args;
-    VA_START(line);
-    VA_INIT(line, char *);
-    vpline(line, VA_ARGS);
+    va_start(the_args, line);
+    vpline(line, the_args);
     va_end(the_args);
 }
 
@@ -45,7 +44,7 @@ vpline(const char *line, va_list the_args)
         return;
 
     if (index(line, '%')) {
-        Vsprintf(pbuf, line, VA_ARGS);
+        Vsprintf(pbuf, line, the_args);
         line = pbuf;
     }
     if ((ln = (int) strlen(line)) > BUFSZ - 1) {
@@ -89,10 +88,9 @@ vpline(const char *line, va_list the_args)
 void Norep(const char *line, ...)
 {
     va_list the_args;
-    VA_START(line);
-    VA_INIT(line, const char *);
+    va_start(the_args, line);
     no_repeat = TRUE;
-    vpline(line, VA_ARGS);
+    vpline(line, the_args);
     no_repeat = FALSE;
     va_end(the_args);
     return;
@@ -134,9 +132,8 @@ void You(const char *line, ...)
 {
     va_list the_args;
     char *tmp;
-    VA_START(line);
-    VA_INIT(line, const char *);
-    vpline(YouMessage(tmp, "You ", line), VA_ARGS);
+    va_start(the_args, line);
+    vpline(YouMessage(tmp, "You ", line), the_args);
     va_end(the_args);
 }
 
@@ -145,9 +142,8 @@ void Your(const char *line, ...)
 {
     va_list the_args;
     char *tmp;
-    VA_START(line);
-    VA_INIT(line, const char *);
-    vpline(YouMessage(tmp, "Your ", line), VA_ARGS);
+    va_start(the_args, line);
+    vpline(YouMessage(tmp, "Your ", line), the_args);
     va_end(the_args);
 }
 
@@ -156,13 +152,12 @@ void You_feel(const char *line, ...)
 {
     va_list the_args;
     char *tmp;
-    VA_START(line);
-    VA_INIT(line, const char *);
+    va_start(the_args, line);
     if (Unaware)
         YouPrefix(tmp, "You dream that you feel ", line);
     else
         YouPrefix(tmp, "You feel ", line);
-    vpline(strcat(tmp, line), VA_ARGS);
+    vpline(strcat(tmp, line), the_args);
     va_end(the_args);
 }
 
@@ -171,9 +166,8 @@ void You_cant(const char *line, ...)
 {
     va_list the_args;
     char *tmp;
-    VA_START(line);
-    VA_INIT(line, const char *);
-    vpline(YouMessage(tmp, "You can't ", line), VA_ARGS);
+    va_start(the_args, line);
+    vpline(YouMessage(tmp, "You can't ", line), the_args);
     va_end(the_args);
 }
 
@@ -182,9 +176,8 @@ void pline_The(const char *line, ...)
 {
     va_list the_args;
     char *tmp;
-    VA_START(line);
-    VA_INIT(line, const char *);
-    vpline(YouMessage(tmp, "The ", line), VA_ARGS);
+    va_start(the_args, line);
+    vpline(YouMessage(tmp, "The ", line), the_args);
     va_end(the_args);
 }
 
@@ -193,9 +186,8 @@ void There(const char *line, ...)
 {
     va_list the_args;
     char *tmp;
-    VA_START(line);
-    VA_INIT(line, const char *);
-    vpline(YouMessage(tmp, "There ", line), VA_ARGS);
+    va_start(the_args, line);
+    vpline(YouMessage(tmp, "There ", line), the_args);
     va_end(the_args);
 }
 
@@ -207,15 +199,14 @@ void You_hear(const char *line, ...)
 
     if (Deaf || !flags.acoustics)
         return;
-    VA_START(line);
-    VA_INIT(line, const char *);
+    va_start(the_args, line);
     if (Underwater)
         YouPrefix(tmp, "You barely hear ", line);
     else if (Unaware)
         YouPrefix(tmp, "You dream that you hear ", line);
     else
         YouPrefix(tmp, "You hear ", line);
-    vpline(strcat(tmp, line), VA_ARGS);
+    vpline(strcat(tmp, line), the_args);
     va_end(the_args);
 }
 
@@ -225,15 +216,14 @@ void You_see(const char *line, ...)
     va_list the_args;
     char *tmp;
 
-    VA_START(line);
-    VA_INIT(line, const char *);
+    va_start(the_args, line);
     if (Unaware)
         YouPrefix(tmp, "You dream that you see ", line);
     else if (Blind) /* caller should have caught this... */
         YouPrefix(tmp, "You sense ", line);
     else
         YouPrefix(tmp, "You see ", line);
-    vpline(strcat(tmp, line), VA_ARGS);
+    vpline(strcat(tmp, line), the_args);
     va_end(the_args);
 }
 
@@ -247,13 +237,12 @@ void verbalize(const char *line, ...)
     va_list the_args;
     char *tmp;
 
-    VA_START(line);
-    VA_INIT(line, const char *);
+    va_start(the_args, line);
     tmp = You_buf((int) strlen(line) + sizeof "\"\"");
     Strcpy(tmp, "\"");
     Strcat(tmp, line);
     Strcat(tmp, "\"");
-    vpline(tmp, VA_ARGS);
+    vpline(tmp, the_args);
     va_end(the_args);
 }
 
@@ -267,9 +256,8 @@ static void vraw_printf(const char *, va_list);
 void raw_printf(const char *line, ...)
 {
     va_list the_args;
-    VA_START(line);
-    VA_INIT(line, char *);
-    vraw_printf(line, VA_ARGS);
+    va_start(the_args, line);
+    vraw_printf(line, the_args);
     va_end(the_args);
 }
 
@@ -281,7 +269,7 @@ vraw_printf(const char *line, va_list the_args)
     /* Do NOT use VA_START and VA_END in here... see above */
 
     if (index(line, '%')) {
-        Vsprintf(pbuf, line, VA_ARGS);
+        Vsprintf(pbuf, line, the_args);
         line = pbuf;
     }
     if ((ln = (int) strlen(line)) > BUFSZ - 1) {
@@ -291,9 +279,6 @@ vraw_printf(const char *line, va_list the_args)
         pbuf[BUFSZ - 1] = '\0'; /* terminate strncpy or truncate vsprintf */
     }
     raw_print(line);
-#if !(defined(USE_STDARG) || defined(USE_VARARGS))
-    VA_END(); /* (see vpline) */
-#endif
 }
 
 /*VARARGS1*/
@@ -301,13 +286,12 @@ void impossible(const char *s, ...)
 {
     va_list the_args;
     char pbuf[2 * BUFSZ];
-    VA_START(s);
-    VA_INIT(s, const char *);
+    va_start(the_args, s);
     if (program_state.in_impossible)
         panic("impossible called impossible");
 
     program_state.in_impossible = 1;
-    Vsprintf(pbuf, s, VA_ARGS);
+    Vsprintf(pbuf, s, the_args);
     pbuf[BUFSZ - 1] = '\0'; /* sanity */
     paniclog("impossible", pbuf);
     pline("%s", pbuf);
