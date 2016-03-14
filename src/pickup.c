@@ -791,7 +791,7 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
     struct obj *curr, *last, fake_hero_object, *olist = *olist_p;
     char *pack;
     anything any;
-    boolean printed_type_name,
+    boolean printed_type_name, first,
             sorted = (qflags & INVORDER_SORT) != 0,
             engulfer = (qflags & INCLUDE_HERO) != 0;
 
@@ -843,6 +843,7 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
      * be called once per object in the list.
      */
     pack = flags.inv_order;
+    first = TRUE;
     do {
         printed_type_name = FALSE;
         for (curr = olist; curr; curr = FOLLOW(curr, qflags)) {
@@ -868,9 +869,11 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
 
                 any.a_obj = curr;
                 add_menu(win, obj_to_glyph(curr), &any,
-                         (qflags & USE_INVLET) ? curr->invlet : 0,
+                         (qflags & USE_INVLET) ? curr->invlet
+                           : (first && curr->oclass == COIN_CLASS) ? '$' : 0,
                          def_oc_syms[(int) objects[curr->otyp].oc_class].sym,
                          ATR_NONE, doname_with_price(curr), MENU_UNSELECTED);
+                first = FALSE;
             }
         }
         pack++;
@@ -2586,9 +2589,9 @@ boolean put_in;
     } else if (flags.menu_style == MENU_FULL) {
         all_categories = FALSE;
         Sprintf(buf, "%s what type of objects?", action);
-        mflags = put_in
-                     ? ALL_TYPES | BUC_ALLBKNOWN | BUC_UNKNOWN
-                     : ALL_TYPES | CHOOSE_ALL | BUC_ALLBKNOWN | BUC_UNKNOWN;
+        mflags = (ALL_TYPES | BUC_ALLBKNOWN | BUC_UNKNOWN);
+        if (put_in)
+            mflags |= CHOOSE_ALL;
         n = query_category(buf, put_in ? invent : current_container->cobj,
                            mflags, &pick_list, PICK_ANY);
         if (!n)
