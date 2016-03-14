@@ -2874,7 +2874,7 @@ struct obj *obj;
     /* Attack the monster there */
     bhitpos = cc;
     if ((mtmp = m_at(bhitpos.x, bhitpos.y)) != (struct monst *) 0) {
-        if (attack_checks(mtmp, uwep))
+        if (attack_checks(mtmp, uwep, 0))
             return res;
         if (overexertion())
             return 1; /* burn nutrition; maybe pass out */
@@ -3053,12 +3053,9 @@ struct obj *obj;
         if ((mtmp = m_at(cc.x, cc.y)) == (struct monst *) 0)
             break;
         notonhead = (bhitpos.x != mtmp->mx || bhitpos.y != mtmp->my);
-        save_confirm = flags.confirm;
         if (verysmall(mtmp->data) && !rn2(4)
             && enexto(&cc, u.ux, u.uy, (struct permonst *) 0)) {
-            flags.confirm = FALSE;
-            (void) attack_checks(mtmp, uwep);
-            flags.confirm = save_confirm;
+            (void) attack_checks(mtmp, uwep, 1);
             check_caitiff(mtmp); /* despite fact there's no damage */
             You("pull in %s!", mon_nam(mtmp));
             mtmp->mundetected = 0;
@@ -3066,9 +3063,7 @@ struct obj *obj;
             return 1;
         } else if ((!bigmonst(mtmp->data) && !strongmonst(mtmp->data))
                    || rn2(4)) {
-            flags.confirm = FALSE;
-            (void) attack_checks(mtmp, uwep);
-            flags.confirm = save_confirm;
+            (void) attack_checks(mtmp, uwep, 1);
             check_caitiff(mtmp);
             (void) thitmonst(mtmp, uwep);
             return 1;

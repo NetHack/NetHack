@@ -2384,7 +2384,7 @@ E void NDECL(u_init);
 /* ### uhitm.c ### */
 
 E void FDECL(erode_armor, (struct monst *, int));
-E boolean FDECL(attack_checks, (struct monst *, struct obj *));
+E boolean FDECL(attack_checks, (struct monst *, struct obj *, int));
 E void FDECL(check_caitiff, (struct monst *));
 E int FDECL(find_roll_to_hit,
             (struct monst *, UCHAR_P, struct obj *, int *, int *));

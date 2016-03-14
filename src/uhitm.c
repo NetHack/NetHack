@@ -96,9 +96,10 @@ int hurt;
 
 /* FALSE means it's OK to attack */
 boolean
-attack_checks(mtmp, wep)
+attack_checks(mtmp, wep, mode)
 register struct monst *mtmp;
 struct obj *wep; /* uwep for attack(), null for kick_monster() */
+int mode; /* 0 = normal checks; 1 = pre-confirmed; 2 = force fight */
 {
     char qbuf[QBUFSZ];
 
@@ -108,7 +109,7 @@ struct obj *wep; /* uwep for attack(), null for kick_monster() */
     if (u.uswallow && mtmp == u.ustuck)
         return FALSE;
 
-    if (context.forcefight) {
+    if (mode == 2 || context.forcefight) {
         /* Do this in the caller, after we checked that the monster
          * didn't die from the blow.  Reason: putting the 'I' there
          * causes the hero to forget the square's contents since
@@ -202,7 +203,7 @@ struct obj *wep; /* uwep for attack(), null for kick_monster() */
         }
         if (canspotmon(mtmp)) {
             Sprintf(qbuf, "Really attack %s?", mon_nam(mtmp));
-            if (!paranoid_query(ParanoidHit, qbuf)) {
+            if (mode == 0 && !paranoid_query(ParanoidHit, qbuf)) {
                 context.move = 0;
                 return TRUE;
             }
@@ -369,7 +370,7 @@ register struct monst *mtmp;
        it uses bhitpos instead; it might map an invisible monster there */
     bhitpos.x = u.ux + u.dx;
     bhitpos.y = u.uy + u.dy;
-    if (attack_checks(mtmp, uwep))
+    if (attack_checks(mtmp, uwep, 0))
         return TRUE;
 
     if (Upolyd && noattacks(youmonst.data)) {

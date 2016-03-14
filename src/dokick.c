@@ -131,18 +131,17 @@ struct monst *mon;
 xchar x, y;
 {
     if (mon) {
-        boolean save_forcefight = context.forcefight;
+        int mode = 0;
 
         bhitpos.x = x;
         bhitpos.y = y;
         if (!mon->mpeaceful || !canspotmon(mon))
-            context.forcefight = TRUE; /* attack even if invisible */
+            mode = 2; /* attack even if invisible */
         /* kicking might be halted by discovery of hidden monster,
            by player declining to attack peaceful monster,
            or by passing out due to encumbrance */
-        if (attack_checks(mon, (struct obj *) 0) || overexertion())
+        if (attack_checks(mon, (struct obj *) 0, mode) || overexertion())
             mon = 0; /* don't kick after all */
-        context.forcefight = save_forcefight;
     }
     return (boolean) (mon != 0);
 }
