@@ -934,9 +934,7 @@ amii_get_ext_cmd(void)
 #endif
     }
 
-    static int put_ext_cmd(obufp, colx, cw, bottom) char * obufp;
-    int colx, bottom;
-    struct amii_WinDesc *cw;
+    static int put_ext_cmd(char * obufp, int colx, struct amii_WinDesc *cw, int bottom)
     {
         struct Window *w = cw->win;
         char *t;
@@ -981,8 +979,7 @@ amii_get_ext_cmd(void)
 
     /* Ask a question and get a response */
 
-    char amii_yn_function(query, resp, def) const char * query, *resp;
-    char def;
+    char amii_yn_function(const char *query, const char *resp, char def)
     /*
      *   Generic yes/no function. 'def' is the default (returned by space or
      *   return; 'esc' returns 'q', or 'n', or the default, depending on

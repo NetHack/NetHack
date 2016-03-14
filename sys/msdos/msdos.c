@@ -353,8 +353,7 @@ switchar()
 }
 
 long
-freediskspace(path)
-char *path;
+freediskspace(char *path)
 {
     union REGS regs;
 
@@ -375,8 +374,7 @@ char *path;
  * Functions to get filenames using wildcards
  */
 int
-findfirst_file(path)
-char *path;
+findfirst_file(char *path)
 {
     union REGS regs;
     struct SREGS sregs;

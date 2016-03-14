@@ -350,7 +350,6 @@ get_scr_size()
 
 void
 gotoxy(int x, int y)
-int x, y;
 {
     HVIO VideoHandle = 0;
 

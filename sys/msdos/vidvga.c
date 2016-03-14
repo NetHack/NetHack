@@ -317,8 +317,6 @@ vga_tty_startup(int *wid, int *hgt)
 
 void
 vga_xputs(const char *s, int col, int row)
-const char *s;
-int col, row;
 {
     if (s != (char *) 0) {
         vga_WriteStr((char *) s, strlen(s), col, row, g_attribute);

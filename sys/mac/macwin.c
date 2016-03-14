@@ -2084,9 +2084,8 @@ mac_select_menu(winid win, int how, menu_item **selected_list)
 #include "dlb.h"
 
 static void
-mac_display_file(name, complain)
-const char *name; /* not ANSI prototype because of boolean parameter */
-boolean complain;
+mac_display_file(const char *name,
+                 boolean complain)
 {
     Ptr buf;
     int win;

@@ -781,8 +781,6 @@ Gem_add_menu(winid window,                  /* window to use, must be of type NH
 void
 Gem_end_menu(winid window,       /* menu to use */
              const char *prompt) /* prompt to for menu */
-;
-;
 {
     if (window == WIN_ERR || mar_hol_win_type(window) != NHW_MENU)
         panic(winpanicstr, window);
