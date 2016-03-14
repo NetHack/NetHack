@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1457207035 2016/03/05 19:43:55 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.197 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1457994703 2016/03/14 22:31:43 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.199 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -74,8 +74,11 @@ const genericptr vptr2;
         if (cls1 != cls2)
             return (int) (cls1 - cls2);
 
+        if ((sortlootmode & SORTLOOT_INVLET) != 0) {
+            ; /* skip sub-classes when sorting by packorder+invlet */
+
         /* for armor, group by sub-category */
-        if (obj1->oclass == ARMOR_CLASS) {
+        } else if (obj1->oclass == ARMOR_CLASS) {
             static int armcat[7 + 1];
 
             if (!armcat[7]) {
@@ -119,13 +122,13 @@ const genericptr vptr2;
     if ((sortlootmode & SORTLOOT_INVLET) != 0) {
         c = obj1->invlet;
         val1 = ('a' <= c && c <= 'z') ? (c - 'a' + 2)
-               : ('A' <= c && c <= 'Z') ? (c - 'Z' + 2 + 26)
+               : ('A' <= c && c <= 'Z') ? (c - 'A' + 2 + 26)
                  : (c == '$') ? 1
                    : (c == '#') ? 1 + 52 + 1
                      : 1 + 52 + 1 + 1; /* none of the above */
         c = obj2->invlet;
-        val2 = ('a' <= c <= 'z') ? (c - 'a' + 2)
-               : ('A' <= c <= 'Z') ? (c - 'Z' + 2 + 26)
+        val2 = ('a' <= c && c <= 'z') ? (c - 'a' + 2)
+               : ('A' <= c && c <= 'Z') ? (c - 'A' + 2 + 26)
                  : (c == '$') ? 1
                    : (c == '#') ? 1 + 52 + 1
                      : 1 + 52 + 1 + 1; /* none of the above */
