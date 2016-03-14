@@ -1049,8 +1049,7 @@ use_bell(struct obj **optr)
 }
 
 STATIC_OVL void
-use_candelabrum(obj)
-register struct obj *obj;
+use_candelabrum(register struct obj *obj)
 {
     const char *s = (obj->spe != 1) ? "candles" : "candle";
 

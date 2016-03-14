@@ -1072,8 +1072,7 @@ ok_role(int rolenum, int racenum, int gendnum, int alignnum)
 /* If pickhow == PICK_RIGID a role is returned only if there is  */
 /* a single possibility */
 int
-pick_role(racenum, gendnum, alignnum, pickhow)
-int racenum, gendnum, alignnum, pickhow;
+pick_role(int racenum, int gendnum, int alignnum, int pickhow)
 {
     int i;
     int roles_ok = 0, set[SIZE(roles)];

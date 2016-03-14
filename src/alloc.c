@@ -28,8 +28,7 @@ panic(const char *, ...)
 PRINTF_F(1, 2);
 
 long *
-alloc(lth)
-register unsigned int lth;
+alloc(register unsigned int lth)
 {
 #ifdef LINT
     /*
@@ -78,8 +77,7 @@ static int ptrbufidx = 0;
 
 /* format a pointer for display purposes; returns a static buffer */
 char *
-fmt_ptr(ptr)
-const genericptr ptr;
+fmt_ptr(const genericptr ptr)
 {
     char *buf;
 
@@ -106,10 +104,7 @@ heapmon_init()
 }
 
 long *
-nhalloc(lth, file, line)
-unsigned int lth;
-const char *file;
-int line;
+nhalloc(unsigned int lth, const char *file, int line)
 {
     long *ptr = alloc(lth);
 
@@ -126,10 +121,7 @@ int line;
 }
 
 void
-nhfree(ptr, file, line)
-genericptr_t ptr;
-const char *file;
-int line;
+nhfree(genericptr_t ptr, const char *file, int line)
 {
     if (!tried_heaplog)
         heapmon_init();
@@ -143,10 +135,7 @@ int line;
 /* strdup() which uses our alloc() rather than libc's malloc(),
    with caller tracking */
 char *
-nhdupstr(string, file, line)
-const char *string;
-const char *file;
-int line;
+nhdupstr(const char *string, const char *file, int line)
 {
     return strcpy((char *) nhalloc(strlen(string) + 1, file, line), string);
 }
@@ -158,8 +147,7 @@ int line;
    not used when MONITOR_HEAP is enabled, but included unconditionally
    in case utility programs get built using a different setting for that */
 char *
-dupstr(string)
-const char *string;
+dupstr(const char *string)
 {
     return strcpy((char *) alloc(strlen(string) + 1), string);
 }

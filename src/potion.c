@@ -1083,9 +1083,7 @@ healup(int nhp, int nxtra, register boolean curesick, register boolean cureblind
 }
 
 void
-strange_feeling(obj, txt)
-struct obj *obj;
-const char *txt;
+strange_feeling(struct obj *obj, const char *txt)
 {
     if (flags.beginner || !txt)
         You("have a %s feeling for a moment, then it passes.",

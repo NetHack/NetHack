@@ -835,9 +835,7 @@ speaker(struct obj *instr, char *buf)
 }
 
 #ifdef VPIX_DEBUG
-main(argc, argv)
-int argc;
-char *argv[];
+main(int argc, char *argv[])
 {
     if (argc == 2) {
         playinit();

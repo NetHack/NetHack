@@ -1050,8 +1050,7 @@ save_currentstate()
 
 /*
 static boolean
-badspot(x, y)
-register xchar x, y;
+badspot(register xchar x, register xchar y)
 {
     return (boolean) ((levl[x][y].typ != ROOM
                        && levl[x][y].typ != AIR

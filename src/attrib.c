@@ -95,10 +95,10 @@ STATIC_DCL int innately(long *);
 
 /* adjust an attribute; return TRUE if change is made, FALSE otherwise */
 boolean
-adjattrib(ndx, incr, msgflg)
-int ndx, incr;
-int msgflg; /* positive => no message, zero => message, and */
-{           /* negative => conditional (msg if change made) */
+adjattrib(int ndx,
+          int incr,
+          int msgflg) /* positive => no message, zero => message, and */
+{                     /* negative => conditional (msg if change made) */
     int old_acurr;
     boolean abonflg;
     const char *attrstr;

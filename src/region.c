@@ -555,7 +555,6 @@ replace_mon_regions(struct monst *monold, struct monst *monnew)
  */
 void
 remove_mon_from_regions(struct monst *mon)
-;
 {
     register int i;
 
