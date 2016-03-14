@@ -13,7 +13,8 @@
 
 STATIC_VAR boolean vamp_rise_msg;
 
-STATIC_DCL void FDECL(sanity_check_single_mon, (struct monst *, const char *));
+STATIC_DCL void FDECL(sanity_check_single_mon, (struct monst *, BOOLEAN_P,
+                                                const char *));
 STATIC_DCL boolean FDECL(restrap, (struct monst *));
 STATIC_DCL long FDECL(mm_aggression, (struct monst *, struct monst *));
 STATIC_DCL long FDECL(mm_displacement, (struct monst *, struct monst *));
@@ -41,35 +42,75 @@ const char *warnings[] = {
 
 
 void
-sanity_check_single_mon(mtmp, msg)
+sanity_check_single_mon(mtmp, chk_geno, msg)
 struct monst *mtmp;
+boolean chk_geno;
 const char *msg;
 {
     if (DEADMONSTER(mtmp))
         return;
-    if (mtmp->data < &mons[LOW_PM] || mtmp->data >= &mons[NUMMONS])
-        impossible("illegal mon data (%s)", msg);
+    if (mtmp->data < &mons[LOW_PM] || mtmp->data >= &mons[NUMMONS]) {
+        impossible("illegal mon data %s; mnum=%d (%s)",
+                   fmt_ptr((genericptr_t) mtmp->data), mtmp->mnum, msg);
+    } else {
+        int mndx = monsndx(mtmp->data);
+
+        if (mtmp->mnum != mndx) {
+            impossible("monster mnum=%d, monsndx=%d (%s)",
+                       mtmp->mnum, mndx, msg);
+            mtmp->mnum = mndx;
+        }
+        if (chk_geno && (mvitals[mndx].mvflags & G_GENOD) != 0)
+            impossible("genocided %s in play (%s)", mons[mndx].mname, msg);
+    }
+    if (mtmp->isshk && !has_eshk(mtmp))
+        impossible("shk without eshk (%s)", msg);
+    if (mtmp->ispriest && !has_epri(mtmp))
+        impossible("priest without epri (%s)", msg);
+    if (mtmp->isgd && !has_egd(mtmp))
+        impossible("guard without egd (%s)", msg);
+    if (mtmp->isminion && !has_emin(mtmp))
+        impossible("minion without emin (%s)", msg);
+    /* guardian angel on astral level is tame but has emin rather than edog */
+    if (mtmp->mtame && !has_edog(mtmp) && !mtmp->isminion)
+        impossible("pet without edog (%s)", msg);
 }
 
 void
 mon_sanity_check()
 {
-    int x,y;
-    struct monst *mtmp = fmon;
+    int x, y;
+    struct monst *mtmp, *m;
 
-    while (mtmp) {
-        sanity_check_single_mon(mtmp, "fmon");
-        mtmp = mtmp->nmon;
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+        sanity_check_single_mon(mtmp, TRUE, "fmon");
+        x = mtmp->mx, y = mtmp->my;
+        if (!isok(x, y) || (x == 0 && !mtmp->isgd))
+            impossible("mon (%s) claims to be at <%d,%d>?",
+                       fmt_ptr((genericptr_t) mtmp), x, y);
+        else if (level.monsters[x][y] != mtmp)
+            impossible("mon (%s) at <%d,%d> is not there!",
+                       fmt_ptr((genericptr_t) mtmp), x, y);
     }
+
     for (x = 0; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++)
-            if ((mtmp = m_at(x,y)) != 0)
-                sanity_check_single_mon(mtmp, "m_at");
+            if ((mtmp = level.monsters[x][y]) != 0) {
+                for (m = fmon; m; m = m->nmon)
+                    if (m == mtmp)
+                        break;
+                if (!m)
+                    impossible("map mon (%s) at <%d,%d> not in fmon list!",
+                               fmt_ptr((genericptr_t) mtmp), x, y);
+                else if ((mtmp->mx != x || mtmp->my != y)
+                         && mtmp->data != &mons[PM_LONG_WORM])
+                    impossible("map mon (%s) at <%d,%d> is found at <%d,%d>?",
+                               fmt_ptr((genericptr_t) mtmp),
+                               mtmp->mx, mtmp->my, x, y);
+            }
 
-    mtmp = migrating_mons;
-    while (mtmp) {
-        sanity_check_single_mon(mtmp, "migr");
-        mtmp = mtmp->nmon;
+    for (mtmp = migrating_mons; mtmp; mtmp = mtmp->nmon) {
+        sanity_check_single_mon(mtmp, FALSE, "migr");
     }
 }
 
