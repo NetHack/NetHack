@@ -885,8 +885,7 @@ E int midnight(void);
 
 /* ### invent.c ### */
 
-E struct obj **objarr_init(int);
-E void objarr_set(struct obj *, int, struct obj **, boolean);
+E void sortloot(struct obj **, unsigned, boolean);
 E void assigninvlet(struct obj *);
 E struct obj *merge_choice(struct obj *, struct obj *);
 E int merged(struct obj **, struct obj **);
@@ -1741,7 +1740,7 @@ E int out_container(struct obj *);
 E int pickup(int);
 E int pickup_object(struct obj *, long, boolean);
 E int query_category(const char *, struct obj *, int, menu_item **, int);
-E int query_objlist(const char *, struct obj *, int, menu_item **,
+E int query_objlist(const char *, struct obj **, int, menu_item **,
                             int, boolean (*)(OBJ_P));
 E struct obj *pick_obj(struct obj *);
 E int encumber_msg(void);
