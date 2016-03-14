@@ -14,13 +14,12 @@
 #include "func_tab.h"
 
 char morc = 0; /* tell the outside world what char you chose */
-STATIC_DCL boolean FDECL(ext_cmd_getlin_hook, (char *));
+STATIC_DCL boolean ext_cmd_getlin_hook(char *);
 
-typedef boolean FDECL((*getlin_hook_proc), (char *));
+typedef boolean (*getlin_hook_proc)(char *);
 
-STATIC_DCL void FDECL(hooked_tty_getlin,
-                      (const char *, char *, getlin_hook_proc));
-extern int NDECL(extcmd_via_menu); /* cmd.c */
+STATIC_DCL void hooked_tty_getlin(const char *, char *, getlin_hook_proc);
+extern int extcmd_via_menu(void); /* cmd.c */
 
 extern char erase_char, kill_char; /* from appropriate tty.c file */
 

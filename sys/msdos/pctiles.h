@@ -45,20 +45,19 @@ struct tibhdr_struct {
  *	char packtile[TILE_Y][TILE_X];
  */
 
-extern void FDECL(CloseTileFile, (boolean));
-extern int FDECL(OpenTileFile, (char *, boolean));
-extern int FDECL(ReadTileFileHeader, (struct tibhdr_struct *, boolean));
+extern void CloseTileFile(boolean);
+extern int OpenTileFile(char *, boolean);
+extern int ReadTileFileHeader(struct tibhdr_struct *, boolean);
 
 #ifdef PLANAR_FILE
 #ifdef SCREEN_VGA
-extern int FDECL(ReadPlanarTileFile, (int, struct planar_cell_struct **));
-extern int FDECL(ReadPlanarTileFile_O,
-                 (int, struct overview_planar_cell_struct **));
+extern int ReadPlanarTileFile(int, struct planar_cell_struct **);
+extern int ReadPlanarTileFile_O(int, struct overview_planar_cell_struct **);
 #endif
 #endif
 
 #ifdef PACKED_FILE
-extern int FDECL(ReadPackedTileFile, (int, char (*)[TILE_X]));
+extern int ReadPackedTileFile(int, char (*)[TILE_X]);
 #endif
 
 extern short glyph2tile[MAX_GLYPH]; /* in tile.c (made from tilemap.c) */

@@ -69,18 +69,17 @@ msleep(unsigned mseconds)
 /* fatal error */
 /*VARARGS1*/
 
-void error
-VA_DECL(const char *, s)
+void error(const char *s, ...)
 {
-    VA_START(s);
-    VA_INIT(s, const char *);
+    va_list the_args;
+    va_start(the_args, s);
     /* error() may get called before tty is initialized */
     if (iflags.window_inited)
         end_screen();
     putchar('\n');
-    Vprintf(s, VA_ARGS);
+    Vprintf(s, the_args);
     putchar('\n');
-    VA_END();
+    va_end(the_args);
     exit(EXIT_FAILURE);
 }
 

@@ -252,9 +252,9 @@ typedef uchar nhsym;
 
 /* primitive memory leak debugging; see alloc.c */
 #ifdef MONITOR_HEAP
-extern long *FDECL(nhalloc, (unsigned int, const char *, int));
-extern void FDECL(nhfree, (genericptr_t, const char *, int));
-extern char *FDECL(nhdupstr, (const char *, const char *, int));
+extern long *nhalloc(unsigned int, const char *, int);
+extern void nhfree(genericptr_t, const char *, int);
+extern char *nhdupstr(const char *, const char *, int);
 #ifndef __FILE__
 #define __FILE__ ""
 #endif
@@ -265,8 +265,8 @@ extern char *FDECL(nhdupstr, (const char *, const char *, int));
 #define free(a) nhfree(a, __FILE__, (int) __LINE__)
 #define dupstr(s) nhdupstr(s, __FILE__, (int) __LINE__)
 #else /* !MONITOR_HEAP */
-extern long *FDECL(alloc, (unsigned int));  /* alloc.c */
-extern char *FDECL(dupstr, (const char *)); /* ditto */
+extern long *alloc(unsigned int);  /* alloc.c */
+extern char *dupstr(const char *); /* ditto */
 #endif
 
 /* Used for consistency checks of various data files; declare it here so

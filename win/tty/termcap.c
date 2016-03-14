@@ -15,19 +15,19 @@
 #define Tgetstr(key) (tgetstr(key, &tbufptr))
 #endif /* MICROPORT_286_BUG **/
 
-static char *FDECL(s_atr2str, (int));
-static char *FDECL(e_atr2str, (int));
+static char *s_atr2str(int);
+static char *e_atr2str(int);
 
-void FDECL(cmov, (int, int));
-void FDECL(nocmov, (int, int));
+void cmov(int, int);
+void nocmov(int, int);
 #if defined(TEXTCOLOR) && defined(TERMLIB)
 #if !defined(UNIX) || !defined(TERMINFO)
 #ifndef TOS
-static void FDECL(analyze_seq, (char *, int *, int *));
+static void analyze_seq(char *, int *, int *);
 #endif
 #endif
-static void NDECL(init_hilite);
-static void NDECL(kill_hilite);
+static void init_hilite(void);
+static void kill_hilite(void);
 #endif
 
 /* (see tcap.h) -- nh_CM, nh_ND, nh_CD, nh_HI,nh_HE, nh_US,nh_UE, ul_hack */
@@ -369,8 +369,8 @@ tty_number_pad(int state)
 }
 
 #ifdef TERMLIB
-extern void NDECL((*decgraphics_mode_callback)); /* defined in drawing.c */
-static void NDECL(tty_decgraphics_termcap_fixup);
+extern void (*decgraphics_mode_callback)(void); /* defined in drawing.c */
+static void tty_decgraphics_termcap_fixup(void);
 
 /*
    We call this routine whenever DECgraphics mode is enabled, even if it
@@ -442,12 +442,12 @@ tty_decgraphics_termcap_fixup()
 #endif /* TERMLIB */
 
 #if defined(ASCIIGRAPH) && defined(PC9800)
-extern void NDECL((*ibmgraphics_mode_callback)); /* defined in drawing.c */
+extern void (*ibmgraphics_mode_callback)(void); /* defined in drawing.c */
 #endif
 
 #ifdef PC9800
-extern void NDECL((*ascgraphics_mode_callback)); /* defined in drawing.c */
-static void NDECL(tty_ascgraphics_hilite_fixup);
+extern void (*ascgraphics_mode_callback)(void); /* defined in drawing.c */
+static void tty_ascgraphics_hilite_fixup(void);
 
 static void
 tty_ascgraphics_hilite_fixup()

@@ -112,8 +112,8 @@ winid BASE_WINDOW;
 struct WinDesc *wins[MAXWIN];
 struct DisplayDesc *ttyDisplay; /* the tty display descriptor */
 
-extern void FDECL(cmov, (int, int));   /* from termcap.c */
-extern void FDECL(nocmov, (int, int)); /* from termcap.c */
+extern void cmov(int, int);   /* from termcap.c */
+extern void nocmov(int, int); /* from termcap.c */
 #if defined(UNIX) || defined(VMS)
 static char obuf[BUFSIZ]; /* BUFSIZ is defined in stdio.h */
 #endif
@@ -133,7 +133,7 @@ static int clipy = 0, clipymax = 0;
 #endif /* CLIPPING */
 
 #if defined(USE_TILES) && defined(MSDOS)
-extern void FDECL(adjust_cursor_flags, (struct WinDesc *));
+extern void adjust_cursor_flags(struct WinDesc *);
 #endif
 
 #if defined(ASCIIGRAPH) && !defined(NO_TERMS)
@@ -145,32 +145,27 @@ boolean HE_resets_AS; /* see termcap.c */
 static const char to_continue[] = "to continue";
 #define getret() getreturn(to_continue)
 #else
-STATIC_DCL void NDECL(getret);
+STATIC_DCL void getret(void);
 #endif
-STATIC_DCL void FDECL(erase_menu_or_text,
-                      (winid, struct WinDesc *, boolean));
-STATIC_DCL void FDECL(free_window_info, (struct WinDesc *, boolean));
-STATIC_DCL void FDECL(dmore, (struct WinDesc *, const char *));
-STATIC_DCL void FDECL(set_item_state, (winid, int, tty_menu_item *));
-STATIC_DCL void FDECL(set_all_on_page,
-                      (winid, tty_menu_item *, tty_menu_item *));
-STATIC_DCL void FDECL(unset_all_on_page,
-                      (winid, tty_menu_item *, tty_menu_item *));
-STATIC_DCL void FDECL(invert_all_on_page,
-                      (winid, tty_menu_item *, tty_menu_item *, char));
-STATIC_DCL void FDECL(invert_all,
-                      (winid, tty_menu_item *, tty_menu_item *, char));
-STATIC_DCL void FDECL(process_menu_window, (winid, struct WinDesc *));
-STATIC_DCL void FDECL(process_text_window, (winid, struct WinDesc *));
-STATIC_DCL tty_menu_item *FDECL(reverse, (tty_menu_item *));
-STATIC_DCL const char *FDECL(compress_str, (const char *));
-STATIC_DCL void FDECL(tty_putsym, (winid, int, int, char));
-STATIC_DCL void FDECL(bail, (const char *)); /* __attribute__((noreturn)) */
-STATIC_DCL void FDECL(setup_rolemenu, (winid, boolean, int, int, int));
-STATIC_DCL void FDECL(setup_racemenu, (winid, boolean, int, int, int));
-STATIC_DCL void FDECL(setup_gendmenu, (winid, boolean, int, int, int));
-STATIC_DCL void FDECL(setup_algnmenu, (winid, boolean, int, int, int));
-STATIC_DCL boolean NDECL(reset_role_filtering);
+STATIC_DCL void erase_menu_or_text(winid, struct WinDesc *, boolean);
+STATIC_DCL void free_window_info(struct WinDesc *, boolean);
+STATIC_DCL void dmore(struct WinDesc *, const char *);
+STATIC_DCL void set_item_state(winid, int, tty_menu_item *);
+STATIC_DCL void set_all_on_page(winid, tty_menu_item *, tty_menu_item *);
+STATIC_DCL void unset_all_on_page(winid, tty_menu_item *, tty_menu_item *);
+STATIC_DCL void invert_all_on_page(winid, tty_menu_item *, tty_menu_item *, char);
+STATIC_DCL void invert_all(winid, tty_menu_item *, tty_menu_item *, char);
+STATIC_DCL void process_menu_window(winid, struct WinDesc *);
+STATIC_DCL void process_text_window(winid, struct WinDesc *);
+STATIC_DCL tty_menu_item *reverse(tty_menu_item *);
+STATIC_DCL const char *compress_str(const char *);
+STATIC_DCL void tty_putsym(winid, int, int, char);
+STATIC_DCL void bail(const char *); /* __attribute__((noreturn) */
+STATIC_DCL void setup_rolemenu(winid, boolean, int, int, int);
+STATIC_DCL void setup_racemenu(winid, boolean, int, int, int);
+STATIC_DCL void setup_gendmenu(winid, boolean, int, int, int);
+STATIC_DCL void setup_algnmenu(winid, boolean, int, int, int);
+STATIC_DCL boolean reset_role_filtering(void);
 
 /*
  * A string containing all the default commands -- to add to a list
@@ -224,7 +219,7 @@ bail(const char *mesg)
 }
 
 #if defined(SIGWINCH) && defined(CLIPPING)
-STATIC_DCL void FDECL(winch_handler, (int));
+STATIC_DCL void winch_handler(int);
 
     /*
      * This really ought to just set a flag like the hangup handler does,
@@ -237,8 +232,7 @@ STATIC_DCL void FDECL(winch_handler, (int));
      */
 /*ARGUSED*/
 STATIC_OVL void
-winch_handler(sig_unused) /* signal handler is called with at least 1 arg */
-int sig_unused UNUSED;
+winch_handler(int sig_unused UNUSED) /* signal handler is called with at least 1 arg */
 {
     int oldLI = LI, oldCO = CO, i;
     register struct WinDesc *cw;
@@ -3311,10 +3305,10 @@ struct color_option {
     int attr_bits;
 };
 
-static void FDECL(start_color_option, (struct color_option));
-static void FDECL(end_color_option, (struct color_option));
-static void FDECL(apply_color_option, (struct color_option, const char *));
-static void FDECL(add_colored_text, (const char *, char *));
+static void start_color_option(struct color_option);
+static void end_color_option(struct color_option);
+static void apply_color_option(struct color_option, const char *);
+static void add_colored_text(const char *, char *);
 #endif
 
 void

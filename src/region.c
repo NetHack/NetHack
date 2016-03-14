@@ -17,33 +17,33 @@ static int max_regions = 0;
 
 #define NO_CALLBACK (-1)
 
-boolean FDECL(inside_gas_cloud, (genericptr, genericptr));
-boolean FDECL(expire_gas_cloud, (genericptr, genericptr));
-boolean FDECL(inside_rect, (NhRect *, int, int));
-boolean FDECL(inside_region, (NhRegion *, int, int));
-NhRegion *FDECL(create_region, (NhRect *, int));
-void FDECL(add_rect_to_reg, (NhRegion *, NhRect *));
-void FDECL(add_mon_to_reg, (NhRegion *, struct monst *));
-void FDECL(remove_mon_from_reg, (NhRegion *, struct monst *));
-boolean FDECL(mon_in_region, (NhRegion *, struct monst *));
+boolean inside_gas_cloud(genericptr, genericptr);
+boolean expire_gas_cloud(genericptr, genericptr);
+boolean inside_rect(NhRect *, int, int);
+boolean inside_region(NhRegion *, int, int);
+NhRegion *create_region(NhRect *, int);
+void add_rect_to_reg(NhRegion *, NhRect *);
+void add_mon_to_reg(NhRegion *, struct monst *);
+void remove_mon_from_reg(NhRegion *, struct monst *);
+boolean mon_in_region(NhRegion *, struct monst *);
 
 #if 0
-NhRegion *FDECL(clone_region, (NhRegion *));
+NhRegion *clone_region(NhRegion *);
 #endif
-void FDECL(free_region, (NhRegion *));
-void FDECL(add_region, (NhRegion *));
-void FDECL(remove_region, (NhRegion *));
+void free_region(NhRegion *);
+void add_region(NhRegion *);
+void remove_region(NhRegion *);
 
 #if 0
-void FDECL(replace_mon_regions, (struct monst *,struct monst *));
-void FDECL(remove_mon_from_regions, (struct monst *));
-NhRegion *FDECL(create_msg_region, (xchar,xchar,xchar,xchar,
-                                    const char *,const char *));
-boolean FDECL(enter_force_field, (genericptr,genericptr));
-NhRegion *FDECL(create_force_field, (xchar,xchar,int,long));
+void replace_mon_regions(struct monst *,struct monst *);
+void remove_mon_from_regions(struct monst *);
+NhRegion *create_msg_region(xchar,xchar,xchar,xchar,
+                                    const char *,const char *);
+boolean enter_force_field(genericptr,genericptr);
+NhRegion *create_force_field(xchar,xchar,int,long);
 #endif
 
-STATIC_DCL void FDECL(reset_region_mids, (NhRegion *));
+STATIC_DCL void reset_region_mids(NhRegion *);
 
 static callback_proc callbacks[] = {
 #define INSIDE_GAS_CLOUD 0
@@ -555,7 +555,6 @@ replace_mon_regions(struct monst *monold, struct monst *monnew)
  */
 void
 remove_mon_from_regions(struct monst *mon)
-;
 {
     register int i;
 

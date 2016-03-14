@@ -37,12 +37,12 @@
 extern const char *hu_stat[];  /* from eat.c */
 extern const char *enc_stat[]; /* from botl.c */
 
-static void FDECL(update_fancy_status, (struct xwindow *));
-static Widget FDECL(create_fancy_status, (Widget, Widget));
-static void FDECL(destroy_fancy_status, (struct xwindow *));
+static void update_fancy_status(struct xwindow *);
+static Widget create_fancy_status(Widget, Widget);
+static void destroy_fancy_status(struct xwindow *);
 
 void
-create_status_window(struct xwindow *wp,/* window pointer */
+create_status_window(struct xwindow *wp, /* window pointer */
                      boolean create_popup,
                      Widget parent)
 {
@@ -201,16 +201,16 @@ struct X_status_value {
 #define SV_LABEL 1 /* displays a changable label */
 #define SV_NAME 2  /* displays an unchangeable name */
 
-static void FDECL(hilight_label, (Widget));
-static void FDECL(update_val, (struct X_status_value *, long));
-static const char *FDECL(width_string, (int));
-static void FDECL(create_widget, (Widget, struct X_status_value *, int));
-static void FDECL(get_widths, (struct X_status_value *, int *, int *));
-static void FDECL(set_widths, (struct X_status_value *, int, int));
-static Widget FDECL(init_column, (const char *, Widget, Widget, Widget,
-                                  int *));
-static void NDECL(fixup_cond_widths);
-static Widget FDECL(init_info_form, (Widget, Widget, Widget));
+static void hilight_label(Widget);
+static void update_val(struct X_status_value *, long);
+static const char *width_string(int);
+static void create_widget(Widget, struct X_status_value *, int);
+static void get_widths(struct X_status_value *, int *, int *);
+static void set_widths(struct X_status_value *, int, int);
+static Widget init_column(const char *, Widget, Widget, Widget,
+                          int *);
+static void fixup_cond_widths(void);
+static Widget init_info_form(Widget, Widget, Widget);
 
 /*
  * Form entry storage indices.

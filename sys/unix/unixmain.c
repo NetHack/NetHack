@@ -18,31 +18,31 @@
 #if !defined(_BULL_SOURCE) && !defined(__sgi) && !defined(_M_UNIX)
 #if !defined(SUNOS4) && !(defined(ULTRIX) && defined(__GNUC__))
 #if defined(POSIX_TYPES) || defined(SVR4) || defined(HPUX)
-extern struct passwd *FDECL(getpwuid, (uid_t));
+extern struct passwd *getpwuid(uid_t);
 #else
-extern struct passwd *FDECL(getpwuid, (int));
+extern struct passwd *getpwuid(int);
 #endif
 #endif
 #endif
-extern struct passwd *FDECL(getpwnam, (const char *));
+extern struct passwd *getpwnam(const char *);
 #ifdef CHDIR
-static void FDECL(chdirx, (const char *, boolean));
+static void chdirx(const char *, boolean);
 #endif /* CHDIR */
-static boolean NDECL(whoami);
-static void FDECL(process_options, (int, char **));
+static boolean whoami(void);
+static void process_options(int, char **);
 
 #ifdef _M_UNIX
-extern void NDECL(check_sco_console);
-extern void NDECL(init_sco_cons);
+extern void check_sco_console(void);
+extern void init_sco_cons(void);
 #endif
 #ifdef __linux__
-extern void NDECL(check_linux_console);
-extern void NDECL(init_linux_cons);
+extern void check_linux_console(void);
+extern void init_linux_cons(void);
 #endif
 
-static void NDECL(wd_message);
+static void wd_message(void);
 static boolean wiz_error_flag = FALSE;
-static struct passwd *NDECL(get_unix_pw);
+static struct passwd *get_unix_pw(void);
 
 int
 main(int argc, char *argv[])
@@ -521,7 +521,7 @@ whoami()
 }
 
 void
-sethanguphandler(void FDECL((*handler), (int)))
+sethanguphandler(void (*handler)(int))
 {
 #ifdef SA_RESTART
     /* don't want reads to restart.  If SA_RESTART is defined, we know

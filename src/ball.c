@@ -7,8 +7,8 @@
 
 #include "hack.h"
 
-STATIC_DCL int NDECL(bc_order);
-STATIC_DCL void NDECL(litter);
+STATIC_DCL int bc_order(void);
+STATIC_DCL void litter(void);
 
 void
 ballrelease(boolean showmsg)

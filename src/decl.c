@@ -4,8 +4,8 @@
 
 #include "hack.h"
 
-int NDECL((*afternmv));
-int NDECL((*occupation));
+int (*afternmv)(void);
+int (*occupation)(void);
 
 /* from xxxmain.c */
 const char *hname = 0; /* name of the game (argv[0] of main) */

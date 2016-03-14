@@ -26,7 +26,7 @@
 #define C(color)
 #endif
 
-void NDECL(monst_init);
+void monst_init(void);
 /*
  *      Entry Format:   (from permonst.h)
  *

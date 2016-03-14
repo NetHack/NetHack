@@ -13,7 +13,7 @@
 #ifdef AMII_GRAPHICS /* too early in the file? too late? */
 
 #ifdef AMIFLUSH
-static struct Message *FDECL(GetFMsg, (struct MsgPort *));
+static struct Message *GetFMsg(struct MsgPort *);
 #endif
 
 static int BufferGetchar(void);
@@ -108,7 +108,7 @@ OpenShWindow(struct NewWindow *nw)
  * Close a window that shared the HackPort IDCMP port.
  */
 
-void FDECL(CloseShWindow, (struct Window *));
+void CloseShWindow(struct Window *);
 void
 CloseShWindow(struct Window *win)
 {
@@ -877,17 +877,16 @@ amii_loadlib(void)
 
 /* fatal error */
 /*VARARGS1*/
-void error
-VA_DECL(const char *, s)
+void error(const char *s, ...)
 {
-    VA_START(s);
-    VA_INIT(s, char *);
+    va_list the_args;
+    va_start(the_args, s);
 
     putchar('\n');
-    vprintf(s, VA_ARGS);
+    vprintf(s, the_args);
     putchar('\n');
 
-    VA_END();
+    va_end(the_args);
     Abort(0L);
 }
 #endif

@@ -4,38 +4,38 @@
 
 #include "hack.h"
 
-STATIC_PTR int NDECL(eatmdone);
-STATIC_PTR int NDECL(eatfood);
-STATIC_PTR void FDECL(costly_tin, (int));
-STATIC_PTR int NDECL(opentin);
-STATIC_PTR int NDECL(unfaint);
+STATIC_PTR int eatmdone(void);
+STATIC_PTR int eatfood(void);
+STATIC_PTR void costly_tin(int);
+STATIC_PTR int opentin(void);
+STATIC_PTR int unfaint(void);
 
-STATIC_DCL const char *FDECL(food_xname, (struct obj *, boolean));
-STATIC_DCL void FDECL(choke, (struct obj *));
-STATIC_DCL void NDECL(recalc_wt);
-STATIC_DCL struct obj *FDECL(touchfood, (struct obj *));
-STATIC_DCL void NDECL(do_reset_eat);
-STATIC_DCL void FDECL(done_eating, (boolean));
-STATIC_DCL void FDECL(cprefx, (int));
-STATIC_DCL int FDECL(intrinsic_possible, (int, struct permonst *));
-STATIC_DCL void FDECL(givit, (int, struct permonst *));
-STATIC_DCL void FDECL(cpostfx, (int));
-STATIC_DCL void FDECL(consume_tin, (const char *));
-STATIC_DCL void FDECL(start_tin, (struct obj *));
-STATIC_DCL int FDECL(eatcorpse, (struct obj *));
-STATIC_DCL void FDECL(start_eating, (struct obj *));
-STATIC_DCL void FDECL(fprefx, (struct obj *));
-STATIC_DCL void FDECL(fpostfx, (struct obj *));
-STATIC_DCL int NDECL(bite);
-STATIC_DCL int FDECL(edibility_prompts, (struct obj *));
-STATIC_DCL int FDECL(rottenfood, (struct obj *));
-STATIC_DCL void NDECL(eatspecial);
-STATIC_DCL int FDECL(bounded_increase, (int, int, int));
-STATIC_DCL void FDECL(accessory_has_effect, (struct obj *));
-STATIC_DCL void FDECL(eataccessory, (struct obj *));
-STATIC_DCL const char *FDECL(foodword, (struct obj *));
-STATIC_DCL int FDECL(tin_variety, (struct obj *, boolean));
-STATIC_DCL boolean FDECL(maybe_cannibal, (int, boolean));
+STATIC_DCL const char *food_xname(struct obj *, boolean);
+STATIC_DCL void choke(struct obj *);
+STATIC_DCL void recalc_wt(void);
+STATIC_DCL struct obj *touchfood(struct obj *);
+STATIC_DCL void do_reset_eat(void);
+STATIC_DCL void done_eating(boolean);
+STATIC_DCL void cprefx(int);
+STATIC_DCL int intrinsic_possible(int, struct permonst *);
+STATIC_DCL void givit(int, struct permonst *);
+STATIC_DCL void cpostfx(int);
+STATIC_DCL void consume_tin(const char *);
+STATIC_DCL void start_tin(struct obj *);
+STATIC_DCL int eatcorpse(struct obj *);
+STATIC_DCL void start_eating(struct obj *);
+STATIC_DCL void fprefx(struct obj *);
+STATIC_DCL void fpostfx(struct obj *);
+STATIC_DCL int bite(void);
+STATIC_DCL int edibility_prompts(struct obj *);
+STATIC_DCL int rottenfood(struct obj *);
+STATIC_DCL void eatspecial(void);
+STATIC_DCL int bounded_increase(int, int, int);
+STATIC_DCL void accessory_has_effect(struct obj *);
+STATIC_DCL void eataccessory(struct obj *);
+STATIC_DCL const char *foodword(struct obj *);
+STATIC_DCL int tin_variety(struct obj *, boolean);
+STATIC_DCL boolean maybe_cannibal(int, boolean);
 
 char msgbuf[BUFSZ];
 
@@ -2125,7 +2125,7 @@ fpostfx(struct obj *otmp)
 /* intended for eating a spellbook while polymorphed, but not used;
    "leather" applied to appearance, not composition, and has been
    changed to "leathery" to reflect that */
-STATIC_DCL boolean FDECL(leather_cover, (struct obj *));
+STATIC_DCL boolean leather_cover(struct obj *);
 
 STATIC_OVL boolean
 leather_cover(struct obj *otmp)

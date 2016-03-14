@@ -77,74 +77,72 @@ extern unsigned _stklen = STKSIZ;
 #endif
 #define MAX_ERRORS 25
 
-extern int NDECL(yyparse);
-extern void FDECL(init_yyin, (FILE *));
-extern void FDECL(init_yyout, (FILE *));
+extern int yyparse(void);
+extern void init_yyin(FILE *);
+extern void init_yyout(FILE *);
 
-int FDECL(main, (int, char **));
-void FDECL(yyerror, (const char *));
-void FDECL(yywarning, (const char *));
-int NDECL(yywrap);
-int FDECL(get_floor_type, (char));
-int FDECL(get_room_type, (char *));
-int FDECL(get_trap_type, (char *));
-int FDECL(get_monster_id, (char *, char));
-int FDECL(get_object_id, (char *, char));
-boolean FDECL(check_monster_char, (char));
-boolean FDECL(check_object_char, (char));
-char FDECL(what_map_char, (char));
-void FDECL(scan_map, (char *, sp_lev *));
-boolean NDECL(check_subrooms);
-boolean FDECL(write_level_file, (char *, sp_lev *));
+int main(int, char **);
+void yyerror(const char *);
+void yywarning(const char *);
+int yywrap(void);
+int get_floor_type(char);
+int get_room_type(char *);
+int get_trap_type(char *);
+int get_monster_id(char *, char);
+int get_object_id(char *, char);
+boolean check_monster_char(char);
+boolean check_object_char(char);
+char what_map_char(char);
+void scan_map(char *, sp_lev *);
+boolean check_subrooms(void);
+boolean write_level_file(char *, sp_lev *);
 
-struct lc_funcdefs *FDECL(funcdef_new, (long, char *));
-void FDECL(funcdef_free_all, (struct lc_funcdefs *));
-struct lc_funcdefs *FDECL(funcdef_defined,
-                          (struct lc_funcdefs *, char *, int));
+struct lc_funcdefs *funcdef_new(long, char *);
+void funcdef_free_all(struct lc_funcdefs *);
+struct lc_funcdefs *funcdef_defined(struct lc_funcdefs *, char *, int);
 
-struct lc_vardefs *FDECL(vardef_new, (long, char *));
-void FDECL(vardef_free_all, (struct lc_vardefs *));
-struct lc_vardefs *FDECL(vardef_defined, (struct lc_vardefs *, char *, int));
+struct lc_vardefs *vardef_new(long, char *);
+void vardef_free_all(struct lc_vardefs *);
+struct lc_vardefs *vardef_defined(struct lc_vardefs *, char *, int);
 
-void FDECL(splev_add_from, (sp_lev *, sp_lev *));
+void splev_add_from(sp_lev *, sp_lev *);
 
-extern void NDECL(monst_init);
-extern void NDECL(objects_init);
-extern void NDECL(decl_init);
+extern void monst_init(void);
+extern void objects_init(void);
+extern void decl_init(void);
 
-void FDECL(add_opcode, (sp_lev *, int, genericptr_t));
+void add_opcode(sp_lev *, int, genericptr_t);
 
-static boolean FDECL(write_common_data, (int));
-static boolean FDECL(write_maze, (int, sp_lev *));
-static void NDECL(init_obj_classes);
-static int FDECL(case_insensitive_comp, (const char *, const char *));
+static boolean write_common_data(int);
+static boolean write_maze(int, sp_lev *);
+static void init_obj_classes(void);
+static int case_insensitive_comp(const char *, const char *);
 
-void VDECL(lc_pline, (const char *, ...));
-void VDECL(lc_error, (const char *, ...));
-void VDECL(lc_warning, (const char *, ...));
-char *FDECL(decode_parm_chr, (char));
-char *FDECL(decode_parm_str, (char *));
-struct opvar *FDECL(set_opvar_int, (struct opvar *, long));
-struct opvar *FDECL(set_opvar_coord, (struct opvar *, long));
-struct opvar *FDECL(set_opvar_region, (struct opvar *, long));
-struct opvar *FDECL(set_opvar_mapchar, (struct opvar *, long));
-struct opvar *FDECL(set_opvar_monst, (struct opvar *, long));
-struct opvar *FDECL(set_opvar_obj, (struct opvar *, long));
-struct opvar *FDECL(set_opvar_str, (struct opvar *, const char *));
-struct opvar *FDECL(set_opvar_var, (struct opvar *, const char *));
-void VDECL(add_opvars, (sp_lev *, const char *, ...));
-void NDECL(break_stmt_start);
-void FDECL(break_stmt_end, (sp_lev *));
-void FDECL(break_stmt_new, (sp_lev *, long));
-char *FDECL(funcdef_paramtypes, (struct lc_funcdefs *));
-const char *FDECL(spovar2str, (long));
-void FDECL(vardef_used, (struct lc_vardefs *, char *));
-void FDECL(check_vardef_type, (struct lc_vardefs *, char *, long));
-struct lc_vardefs *FDECL(add_vardef_type,
-                         (struct lc_vardefs *, char *, long));
-int FDECL(reverse_jmp_opcode, (int));
-struct opvar *FDECL(opvar_clone, (struct opvar *));
-void FDECL(start_level_def, (sp_lev **, char *));
+void lc_pline(const char *, ...);
+void lc_error(const char *, ...);
+void lc_warning(const char *, ...);
+char *decode_parm_chr(char);
+char *decode_parm_str(char *);
+struct opvar *set_opvar_int(struct opvar *, long);
+struct opvar *set_opvar_coord(struct opvar *, long);
+struct opvar *set_opvar_region(struct opvar *, long);
+struct opvar *set_opvar_mapchar(struct opvar *, long);
+struct opvar *set_opvar_monst(struct opvar *, long);
+struct opvar *set_opvar_obj(struct opvar *, long);
+struct opvar *set_opvar_str(struct opvar *, const char *);
+struct opvar *set_opvar_var(struct opvar *, const char *);
+void add_opvars(sp_lev *, const char *, ...);
+void break_stmt_start(void);
+void break_stmt_end(sp_lev *);
+void break_stmt_new(sp_lev *, long);
+char *funcdef_paramtypes(struct lc_funcdefs *);
+const char *spovar2str(long);
+void vardef_used(struct lc_vardefs *, char *);
+void check_vardef_type(struct lc_vardefs *, char *, long);
+struct lc_vardefs *add_vardef_type(struct lc_vardefs *, char *, long);
+int reverse_jmp_opcode(int);
+struct opvar *opvar_clone(struct opvar *);
+void start_level_def(sp_lev **, char *);
 
 static struct {
     const char *name;
@@ -355,36 +353,18 @@ yywrap()
 #define LC_PLINE_ERROR 2
 static int lc_pline_mode = LC_PLINE_MESSAGE;
 
-#if defined(USE_STDARG) || defined(USE_VARARGS)
-static void FDECL(lc_vpline, (const char *, va_list));
+static void lc_vpline(const char *, va_list);
 
-void lc_pline
-VA_DECL(const char *, line)
+void lc_pline(const char *line, ...)
 {
-    VA_START(line);
-    VA_INIT(line, char *);
-    lc_vpline(line, VA_ARGS);
-    VA_END();
+    va_list the_args;
+    va_start(the_args, line);
+    lc_vpline(line, the_args);
+    va_end(the_args);
 }
 
-#ifdef USE_STDARG
 static void
 lc_vpline(const char *line, va_list the_args)
-#else
-static void
-lc_vpline(line, the_args)
-const char *line;
-va_list the_args;
-#endif
-
-#else /* USE_STDARG | USE_VARARG */
-
-#define lc_vpline lc_pline
-
-void
-lc_pline
-VA_DECL(const char *, line)
-#endif /* USE_STDARG | USE_VARARG */
 {   /* opening brace for lc_vpline, nested block for USE_OLDARGS lc_pline */
 
     char pbuf[3 * BUFSZ];
@@ -394,7 +374,7 @@ VA_DECL(const char *, line)
     if (!line || !*line)
         line = nomsg; /* shouldn't happen */
     if (index(line, '%')) {
-        Vsprintf(pbuf, line, VA_ARGS);
+        Vsprintf(pbuf, line, the_args);
         pbuf[BUFSZ - 1] = '\0'; /* truncate if long */
         line = pbuf;
     }
@@ -411,34 +391,30 @@ VA_DECL(const char *, line)
     }
     lc_pline_mode = LC_PLINE_MESSAGE; /* reset to default */
     return;
-#if !(defined(USE_STDARG) || defined(USE_VARARGS))
-    VA_END();  /* closing brace ofr USE_OLDARGS's nested block */
-#endif
 }
 
 /*VARARGS1*/
 void
-lc_error
-VA_DECL(const char *, line)
+lc_error(const char *line, ...)
 {
-    VA_START(line);
-    VA_INIT(line, const char *);
+    va_list the_args;
+    va_start(the_args, line);
     lc_pline_mode = LC_PLINE_ERROR;
-    lc_vpline(line, VA_ARGS);
-    VA_END();
+    lc_vpline(line, the_args);
+    va_end(the_args);
     return;
 }
 
 /*VARARGS1*/
 void
-lc_warning
-VA_DECL(const char *, line)
+lc_warning(const char *line, ...)
 {
-    VA_START(line);
-    VA_INIT(line, const char *);
+    va_list the_args;
+    va_start(the_args, line);
+    ;
     lc_pline_mode = LC_PLINE_WARNING;
-    lc_vpline(line, VA_ARGS);
-    VA_END();
+    lc_vpline(line, the_args);
+    va_end(the_args);
     return;
 }
 
@@ -578,38 +554,19 @@ set_opvar_var(struct opvar *ov, const char *val)
 #define New(type) \
     (type *) memset((genericptr_t) alloc(sizeof(type)), 0, sizeof(type))
 
-#if defined(USE_STDARG) || defined(USE_VARARGS)
-static void FDECL(vadd_opvars, (sp_lev *, const char *, va_list));
+static void vadd_opvars(sp_lev *, const char *, va_list);
 
-void add_opvars
-VA_DECL2(sp_lev *, sp, const char *, fmt)
+void add_opvars(sp_lev *sp, const char *fmt, ...)
 {
-    VA_START(fmt);
-    VA_INIT(fmt, char *);
-    vadd_opvars(sp, fmt, VA_ARGS);
-    VA_END();
+    va_list the_args;
+    va_start(the_args, fmt);
+    vadd_opvars(sp, fmt, the_args);
+    va_end(the_args);
 }
 
-#ifdef USE_STDARG
 static void
 vadd_opvars(sp_lev *sp, const char *fmt, va_list the_args)
 {
-#else
-static void
-vadd_opvars(sp, fmt, the_args)
-sp_lev *sp;
-const char *fmt;
-va_list the_args;
-{
-#endif
-
-#else /* USE_STDARG | USE_VARARG */
-
-#define vadd_opvars add_opvars
-
-void add_opvars
-VA_DECL2(sp_lev *, sp, const char *, fmt)
-#endif /* USE_STDARG | USE_VARARG */
 
     const char *p, *lp;
     long la;
@@ -622,62 +579,62 @@ VA_DECL2(sp_lev *, sp, const char *, fmt)
         case 'i': /* integer */
         {
             struct opvar *ov = New(struct opvar);
-            set_opvar_int(ov, VA_NEXT(la, long) );
+            set_opvar_int(ov, la = va_arg(the_args, long) );
             add_opcode(sp, SPO_PUSH, ov);
             break;
         }
         case 'c': /* coordinate */
         {
             struct opvar *ov = New(struct opvar);
-            set_opvar_coord(ov, VA_NEXT(la, long) );
+            set_opvar_coord(ov, la = va_arg(the_args, long) );
             add_opcode(sp, SPO_PUSH, ov);
             break;
         }
         case 'r': /* region */
         {
             struct opvar *ov = New(struct opvar);
-            set_opvar_region(ov, VA_NEXT(la, long) );
+            set_opvar_region(ov, la = va_arg(the_args, long) );
             add_opcode(sp, SPO_PUSH, ov);
             break;
         }
         case 'm': /* mapchar */
         {
             struct opvar *ov = New(struct opvar);
-            set_opvar_mapchar(ov, VA_NEXT(la, long) );
+            set_opvar_mapchar(ov, la = va_arg(the_args, long) );
             add_opcode(sp, SPO_PUSH, ov);
             break;
         }
         case 'M': /* monster */
         {
             struct opvar *ov = New(struct opvar);
-            set_opvar_monst(ov, VA_NEXT(la, long) );
+            set_opvar_monst(ov, la = va_arg(the_args, long) );
             add_opcode(sp, SPO_PUSH, ov);
             break;
         }
         case 'O': /* object */
         {
             struct opvar *ov = New(struct opvar);
-            set_opvar_obj(ov, VA_NEXT(la, long) );
+            set_opvar_obj(ov, la = va_arg(the_args, long) );
             add_opcode(sp, SPO_PUSH, ov);
             break;
         }
         case 's': /* string */
         {
             struct opvar *ov = New(struct opvar);
-            set_opvar_str(ov, VA_NEXT(lp, const char *) );
+            set_opvar_str(ov, lp = va_arg(the_args, const char *) );
             add_opcode(sp, SPO_PUSH, ov);
             break;
         }
         case 'v': /* variable */
         {
             struct opvar *ov = New(struct opvar);
-            set_opvar_var(ov, VA_NEXT(lp, const char *) );
+            set_opvar_var(ov, lp = va_arg(the_args, const char *) );
             add_opcode(sp, SPO_PUSH, ov);
             break;
         }
         case 'o': /* opcode */
         {
-            long i = VA_NEXT(la, int);
+            long i = la = va_arg(the_args, int);
             if (i < 0 || i >= MAX_SP_OPCODES)
                 lc_pline("add_opvars: unknown opcode '%ld'.", i);
             add_opcode(sp, i, NULL);

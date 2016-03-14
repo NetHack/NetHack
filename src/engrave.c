@@ -8,8 +8,7 @@
 STATIC_VAR NEARDATA struct engr *head_engr;
 
 char *
-random_engraving(outbuf)
-char *outbuf;
+random_engraving(char *outbuf)
 {
     const char *rumor;
 

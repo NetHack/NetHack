@@ -37,10 +37,10 @@ unsigned long sys$assign(), sys$dassgn(), sys$qiow();
 unsigned long smg$create_virtual_keyboard(), smg$delete_virtual_keyboard(),
     smg$read_keystroke(), smg$cancel_input();
 #else
-static short FDECL(parse_function_key, (int));
+static short parse_function_key(int);
 #endif
-static void NDECL(setctty);
-static void NDECL(resettty);
+static void setctty(void);
+static void resettty(void);
 
 #define vms_ok(sts) ((sts) &1)
 #define META(c) ((c) | 0x80) /* 8th bit */
@@ -103,7 +103,7 @@ static unsigned long tt_char_restore = 0, tt_char_active = 0,
 static unsigned long ctrl_mask = 0;
 
 #ifdef DEBUG
-extern int NDECL(nh_vms_getchar);
+extern int nh_vms_getchar(void);
 
 /* rename the real vms_getchar and interpose this one in front of it */
 int
@@ -520,8 +520,8 @@ introff()
 
 #ifdef TIMED_DELAY
 
-extern unsigned long FDECL(lib$emul, (const long *, const long *,
-                                      const long *, long *));
+extern unsigned long lib$emul(const long *, const long *,
+                              const long *, long *);
 extern unsigned long sys$schdwk(), sys$hiber();
 
 #define VMS_UNITS_PER_SECOND 10000000L /* hundreds of nanoseconds, 1e-7 */
@@ -549,20 +549,19 @@ msleep(unsigned mseconds) /* milliseconds */
 
 /* fatal error */
 /*VARARGS1*/
-void error
-VA_DECL(const char *, s)
+void error(const char *s, ...)
 {
-    VA_START(s);
-    VA_INIT(s, const char *);
+    va_list the_args;
+    va_start(the_args, s);
 
     if (settty_needed)
         settty((char *) 0);
-    Vprintf(s, VA_ARGS);
+    Vprintf(s, the_args);
     (void) putchar('\n');
     VA_END();
 #ifndef SAVE_ON_FATAL_ERROR
     /* prevent vmsmain's exit handler byebye() from calling hangup() */
-    sethanguphandler((void FDECL((*), (int) )) SIG_DFL);
+    sethanguphandler((void ((*)(int) )) SIG_DFL);
 #endif
     exit(EXIT_FAILURE);
 }

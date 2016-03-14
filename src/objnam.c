@@ -9,17 +9,17 @@
 #define SCHAR_LIM 127
 #define NUMOBUF 12
 
-STATIC_DCL char *FDECL(strprepend, (char *, const char *));
-STATIC_DCL short FDECL(rnd_otyp_by_wpnskill, (schar));
-STATIC_DCL boolean FDECL(wishymatch, (const char *, const char *, boolean));
-STATIC_DCL char *NDECL(nextobuf);
-STATIC_DCL void FDECL(releaseobuf, (char *));
-STATIC_DCL char *FDECL(minimal_xname, (struct obj *));
-STATIC_DCL void FDECL(add_erosion_words, (struct obj *, char *));
+STATIC_DCL char *strprepend(char *, const char *);
+STATIC_DCL short rnd_otyp_by_wpnskill(schar);
+STATIC_DCL boolean wishymatch(const char *, const char *, boolean);
+STATIC_DCL char *nextobuf(void);
+STATIC_DCL void releaseobuf(char *);
+STATIC_DCL char *minimal_xname(struct obj *);
+STATIC_DCL void add_erosion_words(struct obj *, char *);
 STATIC_DCL boolean
-FDECL(singplur_lookup, (char *, char *, boolean, const char *const *));
-STATIC_DCL char *FDECL(singplur_compound, (char *));
-STATIC_DCL char *FDECL(xname_flags, (struct obj *, unsigned));
+singplur_lookup(char *, char *, boolean, const char *const *);
+STATIC_DCL char *singplur_compound(char *);
+STATIC_DCL char *xname_flags(struct obj *, unsigned);
 
 struct Jitem {
     int item;
@@ -53,7 +53,7 @@ STATIC_OVL struct Jitem Japanese_items[] = { { SHORT_SWORD, "wakizashi" },
                                              { POT_BOOZE, "sake" },
                                              { 0, "" } };
 
-STATIC_DCL const char *FDECL(Japanese_item_name, (int i));
+STATIC_DCL const char *Japanese_item_name(int i);
 
 STATIC_OVL char *
 strprepend(register char *s, register const char *pref)
@@ -205,7 +205,7 @@ static int distantname = 0;
  * we don't want to set dknown if it's not set already.
  */
 char *
-distant_name(struct obj *obj, char *FDECL((*func), (OBJ_P)))
+distant_name(struct obj *obj, char *(*func)(OBJ_P))
 {
     char *str;
 
@@ -1279,8 +1279,8 @@ killer_xname(struct obj *obj)
 /* xname,doname,&c with long results reformatted to omit some stuff */
 char *
 short_oname(struct obj *obj,
-            char *FDECL((*func), (OBJ_P)),      /* main formatting routine */
-            char *FDECL((*altfunc), (OBJ_P)),   /* alternate for shortest result */
+            char *(*func)(OBJ_P),      /* main formatting routine */
+            char *(*altfunc)(OBJ_P),   /* alternate for shortest result */
             unsigned lenlimit)
 {
     struct obj save_obj;
@@ -1359,7 +1359,7 @@ short_oname(struct obj *obj,
  * Used if only one of a collection of objects is named (e.g. in eat.c).
  */
 const char *
-singular(register struct obj *otmp, char *FDECL((*func), (OBJ_P)))
+singular(register struct obj *otmp, char *(*func)(OBJ_P))
 {
     long savequan;
     char *nam;
@@ -3609,8 +3609,8 @@ safe_qbuf(char *qbuf, /* output buffer */
           const char *qprefix,
           const char *qsuffix,
           struct obj *obj,
-          char *FDECL((*func), (OBJ_P)),
-          char *FDECL((*altfunc), (OBJ_P)),
+          char *(*func)(OBJ_P),
+          char *(*altfunc)(OBJ_P),
           const char *lastR)
 {
     char *bufp, *endp;

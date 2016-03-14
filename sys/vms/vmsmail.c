@@ -6,10 +6,10 @@
 #include "mail.h"
 
 /* lint supression due to lack of extern.h */
-unsigned long NDECL(init_broadcast_trapping);
-unsigned long NDECL(enable_broadcast_trapping);
-unsigned long NDECL(disable_broadcast_trapping);
-struct mail_info *NDECL(parse_next_broadcast);
+unsigned long init_broadcast_trapping(void);
+unsigned long enable_broadcast_trapping(void);
+unsigned long disable_broadcast_trapping(void);
+struct mail_info *parse_next_broadcast(void);
 
 #ifdef MAIL
 #include "wintype.h"
@@ -27,17 +27,17 @@ struct mail_info *NDECL(parse_next_broadcast);
 /* #include <string.h> */
 #define vms_ok(sts) ((sts) & 1)
 
-static struct mail_info *FDECL(parse_brdcst, (char *));
-static void FDECL(filter_brdcst, (char *));
-static void NDECL(flush_broadcasts);
-static void FDECL(broadcast_ast, (int));
-extern char *FDECL(eos, (char *));
-extern char *FDECL(strstri, (const char *, const char *));
-extern int FDECL(strncmpi, (const char *, const char *, int));
+static struct mail_info *parse_brdcst(char *);
+static void filter_brdcst(char *);
+static void flush_broadcasts(void);
+static void broadcast_ast(int);
+extern char *eos(char *);
+extern char *strstri(const char *, const char *);
+extern int strncmpi(const char *, const char *, int);
 
-extern size_t FDECL(strspn, (const char *, const char *));
+extern size_t strspn(const char *, const char *);
 #ifndef __DECC
-extern int VDECL(sscanf, (const char *, const char *, ...));
+extern int sscanf(const char *, const char *, ...);
 #endif
 extern unsigned long smg$create_pasteboard(), smg$get_broadcast_message(),
     smg$set_broadcast_trapping(), smg$disable_broadcast_trapping();

@@ -770,10 +770,10 @@ static struct {
     short mask;
 } rfilter;
 
-STATIC_DCL int NDECL(randrole_filtered);
-STATIC_DCL char *FDECL(promptsep, (char *, int));
-STATIC_DCL int FDECL(role_gendercount, (int));
-STATIC_DCL int FDECL(race_alignmentcount, (int));
+STATIC_DCL int randrole_filtered(void);
+STATIC_DCL char *promptsep(char *, int);
+STATIC_DCL int role_gendercount(int);
+STATIC_DCL int race_alignmentcount(int);
 
 /* used by str2XXX() */
 static char NEARDATA randomstr[] = "random";
@@ -1072,8 +1072,7 @@ ok_role(int rolenum, int racenum, int gendnum, int alignnum)
 /* If pickhow == PICK_RIGID a role is returned only if there is  */
 /* a single possibility */
 int
-pick_role(racenum, gendnum, alignnum, pickhow)
-int racenum, gendnum, alignnum, pickhow;
+pick_role(int racenum, int gendnum, int alignnum, int pickhow)
 {
     int i;
     int roles_ok = 0, set[SIZE(roles)];

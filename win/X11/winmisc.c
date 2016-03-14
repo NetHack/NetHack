@@ -68,20 +68,20 @@ static const char gend_select_translations[] = "#override\n\
 static const char algn_select_translations[] = "#override\n\
      <Key>: algn_key()";
 
-static void FDECL(ps_quit, (Widget, XtPointer, XtPointer));
-static void FDECL(ps_random, (Widget, XtPointer, XtPointer));
-static void FDECL(ps_select, (Widget, XtPointer, XtPointer));
-static void FDECL(extend_select, (Widget, XtPointer, XtPointer));
-static void FDECL(extend_dismiss, (Widget, XtPointer, XtPointer));
-static void FDECL(extend_help, (Widget, XtPointer, XtPointer));
-static void FDECL(popup_delete, (Widget, XEvent *, String *, Cardinal *));
-static void NDECL(ec_dismiss);
-static void FDECL(ec_scroll_to_view, (int));
-static void NDECL(init_extended_commands_popup);
-static Widget FDECL(make_menu, (const char *, const char *, const char *,
-                                const char *, XtCallbackProc, const char *,
-                                XtCallbackProc, int, const char **,
-                                Widget **, XtCallbackProc, Widget *));
+static void ps_quit(Widget, XtPointer, XtPointer);
+static void ps_random(Widget, XtPointer, XtPointer);
+static void ps_select(Widget, XtPointer, XtPointer);
+static void extend_select(Widget, XtPointer, XtPointer);
+static void extend_dismiss(Widget, XtPointer, XtPointer);
+static void extend_help(Widget, XtPointer, XtPointer);
+static void popup_delete(Widget, XEvent *, String *, Cardinal *);
+static void ec_dismiss(void);
+static void ec_scroll_to_view(int);
+static void init_extended_commands_popup(void);
+static Widget make_menu(const char *, const char *, const char *,
+                        const char *, XtCallbackProc, const char *,
+                        XtCallbackProc, int, const char **,
+                        Widget **, XtCallbackProc, Widget *);
 
 /* Player Selection --------------------------------------------------------
  */

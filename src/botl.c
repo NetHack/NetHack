@@ -11,12 +11,12 @@ const char *const enc_stat[] = { "",         "Burdened",  "Stressed",
                                  "Strained", "Overtaxed", "Overloaded" };
 
 STATIC_OVL NEARDATA int mrank_sz = 0; /* loaded by max_rank_sz (from u_init) */
-STATIC_DCL const char *NDECL(rank);
+STATIC_DCL const char *rank(void);
 
 #ifndef STATUS_VIA_WINDOWPORT
 
-STATIC_DCL void NDECL(bot1);
-STATIC_DCL void NDECL(bot2);
+STATIC_DCL void bot1(void);
+STATIC_DCL void bot2(void);
 
 STATIC_OVL void
 bot1()
@@ -372,15 +372,15 @@ struct istat_s {
 };
 
 
-STATIC_DCL void NDECL(init_blstats);
-STATIC_DCL char *FDECL(anything_to_s, (char *, anything *, int));
-STATIC_OVL int FDECL(percentage, (struct istat_s *, struct istat_s *));
-STATIC_OVL int FDECL(compare_blstats, (struct istat_s *, struct istat_s *));
+STATIC_DCL void init_blstats(void);
+STATIC_DCL char *anything_to_s(char *, anything *, int);
+STATIC_OVL int percentage(struct istat_s *, struct istat_s *);
+STATIC_OVL int compare_blstats(struct istat_s *, struct istat_s *);
 #ifdef STATUS_HILITES
-STATIC_DCL void FDECL(s_to_anything, (anything *, char *, int));
-STATIC_DCL boolean FDECL(assign_hilite, (char *, char *, char *, char *,
-                                         boolean));
-STATIC_DCL const char *FDECL(clridx_to_s, (char *, int));
+STATIC_DCL void s_to_anything(anything *, char *, int);
+STATIC_DCL boolean assign_hilite(char *, char *, char *, char *,
+                                         boolean);
+STATIC_DCL const char *clridx_to_s(char *, int);
 #endif
 
 /* If entries are added to this, botl.h will require updating too */

@@ -7,7 +7,7 @@
 
 #define MAX_CMDLINE_PARAM 255
 
-extern int FDECL(main, (int, char **));
+extern int main(int, char **);
 static TCHAR *_get_cmd_arg(TCHAR *pCmdLine);
 
 int APIENTRY

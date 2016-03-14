@@ -22,8 +22,8 @@
  *          function in an appropriate new or existing source file and add
  *          a prototype for it to include/extern.h.
  *
- *              void FDECL(newXX, (struct monst *));
- *              void FDECL(free_XX, (struct monst *));
+ *              void newXX(struct monst *);
+ *              void free_XX(struct monst *);
  *
  *              void
  *              newXX(mtmp)

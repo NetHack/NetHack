@@ -7,21 +7,20 @@
 
 STATIC_VAR NEARDATA struct obj *otmp;
 
-STATIC_DCL boolean FDECL(u_slip_free, (struct monst *, struct attack *));
-STATIC_DCL int FDECL(passiveum,
-                     (struct permonst *, struct monst *, struct attack *));
+STATIC_DCL boolean u_slip_free(struct monst *, struct attack *);
+STATIC_DCL int passiveum(struct permonst *, struct monst *, struct attack *);
 
-STATIC_DCL void FDECL(mayberem, (struct obj *, const char *));
+STATIC_DCL void mayberem(struct obj *, const char *);
 
-STATIC_DCL boolean FDECL(diseasemu, (struct permonst *));
-STATIC_DCL int FDECL(hitmu, (struct monst *, struct attack *));
-STATIC_DCL int FDECL(gulpmu, (struct monst *, struct attack *));
-STATIC_DCL int FDECL(explmu, (struct monst *, struct attack *, boolean));
-STATIC_DCL void FDECL(missmu, (struct monst *, boolean, struct attack *));
-STATIC_DCL void FDECL(mswings, (struct monst *, struct obj *));
-STATIC_DCL void FDECL(wildmiss, (struct monst *, struct attack *));
+STATIC_DCL boolean diseasemu(struct permonst *);
+STATIC_DCL int hitmu(struct monst *, struct attack *);
+STATIC_DCL int gulpmu(struct monst *, struct attack *);
+STATIC_DCL int explmu(struct monst *, struct attack *, boolean);
+STATIC_DCL void missmu(struct monst *, boolean, struct attack *);
+STATIC_DCL void mswings(struct monst *, struct obj *);
+STATIC_DCL void wildmiss(struct monst *, struct attack *);
 
-STATIC_DCL void FDECL(hitmsg, (struct monst *, struct attack *));
+STATIC_DCL void hitmsg(struct monst *, struct attack *);
 
 /* See comment in mhitm.c.  If we use this a lot it probably should be */
 /* changed to a parameter to mhitu. */

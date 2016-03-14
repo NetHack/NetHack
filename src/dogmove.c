@@ -8,13 +8,13 @@
 
 extern boolean notonhead;
 
-STATIC_DCL boolean FDECL(dog_hunger, (struct monst *, struct edog *));
-STATIC_DCL int FDECL(dog_invent, (struct monst *, struct edog *, int));
-STATIC_DCL int FDECL(dog_goal, (struct monst *, struct edog *, int, int, int));
-STATIC_DCL boolean FDECL(can_reach_location, (struct monst *, xchar,
-                                              xchar, xchar, xchar));
-STATIC_DCL boolean FDECL(could_reach_item, (struct monst *, xchar, xchar));
-STATIC_DCL void FDECL(quickmimic, (struct monst *));
+STATIC_DCL boolean dog_hunger(struct monst *, struct edog *);
+STATIC_DCL int dog_invent(struct monst *, struct edog *, int);
+STATIC_DCL int dog_goal(struct monst *, struct edog *, int, int, int);
+STATIC_DCL boolean can_reach_location(struct monst *, xchar,
+                                              xchar, xchar, xchar);
+STATIC_DCL boolean could_reach_item(struct monst *, xchar, xchar);
+STATIC_DCL void quickmimic(struct monst *);
 
 /* pick a carried item for pet to drop */
 struct obj *
@@ -118,7 +118,7 @@ static NEARDATA const char nofetch[] = { BALL_CLASS, CHAIN_CLASS, ROCK_CLASS,
 
 STATIC_VAR xchar gtyp, gx, gy; /* type and position of dog's current goal */
 
-STATIC_PTR void FDECL(wantdoor, (int, int, genericptr_t));
+STATIC_PTR void wantdoor(int, int, genericptr_t);
 
 boolean
 cursed_object_at(int x, int y)

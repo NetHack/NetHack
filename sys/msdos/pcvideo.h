@@ -228,85 +228,86 @@ extern int cursor_color;
 /* ### video.c ### */
 
 #ifdef SIMULATE_CURSOR
-E void NDECL(DrawCursor);
-E void NDECL(HideCursor);
+E void DrawCursor(void);
+E void HideCursor(void);
 #endif
 
 /* ### vidtxt.c ### */
 
 #ifdef NO_TERMS
-E void NDECL(txt_backsp);
-E void NDECL(txt_clear_screen);
-E void FDECL(txt_cl_end, (int, int));
-E void NDECL(txt_cl_eos);
-E void NDECL(txt_get_scr_size);
-E void FDECL(txt_gotoxy, (int, int));
-E int NDECL(txt_monoadapt_check);
-E void NDECL(txt_nhbell);
-E void FDECL(txt_startup, (int *, int *));
-E void FDECL(txt_xputs, (const char *, int, int));
-E void FDECL(txt_xputc, (char, int));
+E void txt_backsp(void);
+E void txt_clear_screen(void);
+E void txt_cl_end(int, int);
+E void txt_cl_eos(void);
+E void txt_get_scr_size(void);
+E void txt_gotoxy(int, int);
+E int txt_monoadapt_check(void);
+E void txt_nhbell(void);
+E void txt_startup(int *, int *);
+E void txt_xputs(const char *, int, int);
+E void txt_xputc(char, int);
 
 /* ### vidvga.c ### */
 
 #ifdef SCREEN_VGA
-E void NDECL(vga_backsp);
-E void FDECL(vga_clear_screen, (int));
-E void FDECL(vga_cl_end, (int, int));
-E void FDECL(vga_cl_eos, (int));
-E int NDECL(vga_detect);
+E void vga_backsp(void);
+E void vga_clear_screen(int);
+E void vga_cl_end(int, int);
+E void vga_cl_eos(int);
+E int vga_detect(void);
 #ifdef SIMULATE_CURSOR
-E void NDECL(vga_DrawCursor);
+E void vga_DrawCursor(void);
 #endif
-E void NDECL(vga_Finish);
-E char __far *NDECL(vga_FontPtrs);
-E void NDECL(vga_get_scr_size);
-E void FDECL(vga_gotoloc, (int, int));
+E void vga_Finish(void);
+E char __far *vga_FontPtrs(void);
+E void vga_get_scr_size(void);
+E void vga_gotoloc(int, int);
 #ifdef POSITIONBAR
-E void FDECL(vga_update_positionbar, (char *));
+E void vga_update_positionbar(char *);
 #endif
 #ifdef SIMULATE_CURSOR
-E void NDECL(vga_HideCursor);
+E void vga_HideCursor(void);
 #endif
-E void NDECL(vga_Init);
-E void NDECL(vga_tty_end_screen);
-E void FDECL(vga_tty_startup, (int *, int *));
-E void FDECL(vga_xputs, (const char *, int, int));
-E void FDECL(vga_xputc, (char, int));
-E void FDECL(vga_xputg, (int, int, unsigned));
-E void FDECL(vga_userpan, (boolean));
-E void FDECL(vga_overview, (boolean));
-E void FDECL(vga_traditional, (boolean));
-E void NDECL(vga_refresh);
+E void vga_Init(void);
+E void vga_tty_end_screen(void);
+E void vga_tty_startup(int *, int *);
+E void vga_xputs(const char *, int, int);
+E void vga_xputs(const char *, int, int);
+E void vga_xputc(char, int);
+E void vga_xputg(int, int, unsigned);
+E void vga_userpan(boolean);
+E void vga_overview(boolean);
+E void vga_traditional(boolean);
+E void vga_refresh(void);
 #endif /* SCREEN_VGA */
 #ifdef SCREEN_VESA
-E void NDECL(vesa_backsp);
-E void FDECL(vesa_clear_screen, (int));
-E void FDECL(vesa_cl_end, (int, int));
-E void FDECL(vesa_cl_eos, (int));
-E int NDECL(vesa_detect);
+E void vesa_backsp(void);
+E void vesa_clear_screen(int);
+E void vesa_cl_end(int, int);
+E void vesa_cl_eos(int);
+E int vesa_detect(void);
 #ifdef SIMULATE_CURSOR
-E void NDECL(vesa_DrawCursor);
+E void vesa_DrawCursor(void);
 #endif
-E void NDECL(vesa_Finish);
-E void NDECL(vesa_get_scr_size);
-E void FDECL(vesa_gotoloc, (int, int));
+E void vesa_Finish(void);
+E void vesa_get_scr_size(void);
+E void vesa_gotoloc(int, int);
 #ifdef POSITIONBAR
-E void FDECL(vesa_update_positionbar, (char *));
+E void vesa_update_positionbar(char *);
 #endif
 #ifdef SIMULATE_CURSOR
-E void NDECL(vesa_HideCursor);
+E void vesa_HideCursor(void);
 #endif
-E void NDECL(vesa_Init);
-E void NDECL(vesa_tty_end_screen);
-E void FDECL(vesa_tty_startup, (int *, int *));
-E void FDECL(vesa_xputs, (const char *, int, int));
-E void FDECL(vesa_xputc, (CHAR_P, int));
-E void FDECL(vesa_xputg, (int, int, unsigned));
-E void FDECL(vesa_userpan, (BOOLEAN_P));
-E void FDECL(vesa_overview, (BOOLEAN_P));
-E void FDECL(vesa_traditional, (BOOLEAN_P));
-E void NDECL(vesa_refresh);
+E void vesa_Init(void);
+E void vesa_tty_end_screen(void);
+E void vesa_tty_startup(int *, int *);
+E void vesa_xputs(const char *, int, int);
+E void vesa_xputc(char, int);
+E void vesa_xputg(int, int, unsigned);
+E void vesa_userpan(boolean));
+E void vesa_overview(boolean);
+E void vesa_traditional(boolean);
+E void vesa_refresh(void);
 #endif /* SCREEN_VESA */
 #endif /* NO_TERMS   */
 

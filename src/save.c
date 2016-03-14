@@ -21,40 +21,40 @@ static int count_only;
 int dotcnt, dotrow; /* also used in restore */
 #endif
 
-STATIC_DCL void FDECL(savelevchn, (int, int));
-STATIC_DCL void FDECL(savedamage, (int, int));
-STATIC_DCL void FDECL(saveobj, (int, struct obj *));
-STATIC_DCL void FDECL(saveobjchn, (int, struct obj *, int));
-STATIC_DCL void FDECL(savemon, (int, struct monst *));
-STATIC_DCL void FDECL(savemonchn, (int, struct monst *, int));
-STATIC_DCL void FDECL(savetrapchn, (int, struct trap *, int));
-STATIC_DCL void FDECL(savegamestate, (int, int));
-STATIC_OVL void FDECL(save_msghistory, (int, int));
+STATIC_DCL void savelevchn(int, int);
+STATIC_DCL void savedamage(int, int);
+STATIC_DCL void saveobj(int, struct obj *);
+STATIC_DCL void saveobjchn(int, struct obj *, int);
+STATIC_DCL void savemon(int, struct monst *);
+STATIC_DCL void savemonchn(int, struct monst *, int);
+STATIC_DCL void savetrapchn(int, struct trap *, int);
+STATIC_DCL void savegamestate(int, int);
+STATIC_OVL void save_msghistory(int, int);
 #ifdef MFLOPPY
-STATIC_DCL void FDECL(savelev0, (int, xchar, int));
-STATIC_DCL boolean NDECL(swapout_oldest);
-STATIC_DCL void FDECL(copyfile, (char *, char *));
+STATIC_DCL void savelev0(int, xchar, int);
+STATIC_DCL boolean swapout_oldest(void);
+STATIC_DCL void copyfile(char *, char *);
 #endif /* MFLOPPY */
-STATIC_DCL void FDECL(savelevl, (int fd, boolean));
-STATIC_DCL void FDECL(def_bufon, (int));
-STATIC_DCL void FDECL(def_bufoff, (int));
-STATIC_DCL void FDECL(def_bflush, (int));
-STATIC_DCL void FDECL(def_bwrite, (int, genericptr_t, unsigned int));
+STATIC_DCL void savelevl(int fd, boolean);
+STATIC_DCL void def_bufon(int);
+STATIC_DCL void def_bufoff(int);
+STATIC_DCL void def_bflush(int);
+STATIC_DCL void def_bwrite(int, genericptr_t, unsigned int);
 #ifdef ZEROCOMP
-STATIC_DCL void FDECL(zerocomp_bufon, (int));
-STATIC_DCL void FDECL(zerocomp_bufoff, (int));
-STATIC_DCL void FDECL(zerocomp_bflush, (int));
-STATIC_DCL void FDECL(zerocomp_bwrite, (int, genericptr_t, unsigned int));
-STATIC_DCL void FDECL(zerocomp_bputc, (int));
+STATIC_DCL void zerocomp_bufon(int);
+STATIC_DCL void zerocomp_bufoff(int);
+STATIC_DCL void zerocomp_bflush(int);
+STATIC_DCL void zerocomp_bwrite(int, genericptr_t, unsigned int);
+STATIC_DCL void zerocomp_bputc(int);
 #endif
 
 static struct save_procs {
     const char *name;
-    void FDECL((*save_bufon), (int));
-    void FDECL((*save_bufoff), (int));
-    void FDECL((*save_bflush), (int));
-    void FDECL((*save_bwrite), (int, genericptr_t, unsigned int));
-    void FDECL((*save_bclose), (int));
+    void (*save_bufon)(int);
+    void (*save_bufoff)(int);
+    void (*save_bflush)(int);
+    void (*save_bwrite)(int, genericptr_t, unsigned int);
+    void (*save_bclose)(int);
 } saveprocs = {
 #if !defined(ZEROCOMP) || (defined(COMPRESS) || defined(ZLIB_COMP))
     "externalcomp", def_bufon, def_bufoff, def_bflush, def_bwrite, def_bclose,
@@ -125,7 +125,7 @@ dosave0()
     fq_save = fqname(SAVEF, SAVEPREFIX, 1); /* level files take 0 */
 
 #if defined(UNIX) || defined(VMS)
-    sethanguphandler((void FDECL((*), (int) )) SIG_IGN);
+    sethanguphandler((void ((*)(int) )) SIG_IGN);
 #endif
 #ifndef NO_SIGNAL
     (void) signal(SIGINT, SIG_IGN);

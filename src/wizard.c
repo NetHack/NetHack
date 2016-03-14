@@ -12,13 +12,13 @@
 
 extern const int monstr[];
 
-STATIC_DCL short FDECL(which_arti, (int));
-STATIC_DCL boolean FDECL(mon_has_arti, (struct monst *, short));
-STATIC_DCL struct monst *FDECL(other_mon_has_arti, (struct monst *, short));
-STATIC_DCL struct obj *FDECL(on_ground, (short));
-STATIC_DCL boolean FDECL(you_have, (int));
-STATIC_DCL unsigned long FDECL(target_on, (int, struct monst *));
-STATIC_DCL unsigned long FDECL(strategy, (struct monst *));
+STATIC_DCL short which_arti(int);
+STATIC_DCL boolean mon_has_arti(struct monst *, short);
+STATIC_DCL struct monst *other_mon_has_arti(struct monst *, short);
+STATIC_DCL struct obj *on_ground(short);
+STATIC_DCL boolean you_have(int);
+STATIC_DCL unsigned long target_on(int, struct monst *);
+STATIC_DCL unsigned long strategy(struct monst *);
 
 /* adding more neutral creatures will tend to reduce the number of monsters
    summoned by nasty(); adding more lawful creatures will reduce the number

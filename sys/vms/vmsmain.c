@@ -8,22 +8,22 @@
 
 #include <signal.h>
 
-static void NDECL(whoami);
-static void FDECL(process_options, (int, char **));
-static void NDECL(byebye);
+static void whoami(void);
+static void process_options(int, char **);
+static void byebye(void);
 #ifndef SAVE_ON_FATAL_ERROR
 #ifndef __DECC
 #define vms_handler_type int
 #else
 #define vms_handler_type unsigned int
 #endif
-extern void FDECL(VAXC$ESTABLISH,
-                         (vms_handler_type (*) (genericptr_t, genericptr_t)));
-static vms_handler_type FDECL(vms_handler, (genericptr_t, genericptr_t));
+extern void VAXC$ESTABLISH
+                  (vms_handler_type (*) (genericptr_t, genericptr_t));
+static vms_handler_type vms_handler(genericptr_t, genericptr_t);
 #include <ssdef.h> /* system service status codes */
 #endif
 
-static void NDECL(wd_message);
+static void wd_message(void);
 static boolean wiz_error_flag = FALSE;
 
 int
@@ -368,11 +368,11 @@ whoami()
 static void
 byebye()
 {
-    void FDECL((*hup), (int) );
+    void (*hup)(int) );
 #ifdef SHELL
     extern unsigned long dosh_pid, mail_pid;
-    extern unsigned long FDECL(sys$delprc,
-                               (unsigned long *, const genericptr_t));
+    extern unsigned long sys$delprc
+                               (unsigned long *, const genericptr_t);
 
     /* clean up any subprocess we've spawned that may still be hanging around
      */
@@ -383,9 +383,9 @@ byebye()
 #endif
 
     /* SIGHUP doesn't seem to do anything on VMS, so we fudge it here... */
-    hup = (void FDECL((*), (int) )) signal(SIGHUP, SIG_IGN);
-    if (!program_state.exiting++ && hup != (void FDECL((*), (int) )) SIG_DFL
-        && hup != (void FDECL((*), (int) )) SIG_IGN) {
+    hup = (void ((*)(int) )) signal(SIGHUP, SIG_IGN);
+    if (!program_state.exiting++ && hup != (void ((*)(int) )) SIG_DFL
+        && hup != (void ((*)(int) )) SIG_IGN) {
         (*hup)(SIGHUP);
     }
 
@@ -418,7 +418,7 @@ vms_handler(genericptr_t sigargs,  /*+ prototype in <signal.h> is screwed */
 #endif
 
 void
-sethanguphandler(void FDECL((*handler), (int)))
+sethanguphandler(void (*handler)(int))
 {
     (void) signal(SIGHUP, (SIG_RET_TYPE) handler);
 }

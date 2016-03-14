@@ -12,42 +12,42 @@ extern int dotrow; /* shared with save */
 #endif
 
 #ifdef USE_TILES
-extern void FDECL(substitute_tiles, (d_level *)); /* from tile.c */
+extern void substitute_tiles(d_level *); /* from tile.c */
 #endif
 
 #ifdef ZEROCOMP
-STATIC_DCL void NDECL(zerocomp_minit);
-STATIC_DCL void FDECL(zerocomp_mread, (int, genericptr_t, unsigned int));
-STATIC_DCL int NDECL(zerocomp_mgetc);
+STATIC_DCL void zerocomp_minit(void);
+STATIC_DCL void zerocomp_mread(int, genericptr_t, unsigned int);
+STATIC_DCL int zerocomp_mgetc(void);
 #endif
 
-STATIC_DCL void NDECL(def_minit);
-STATIC_DCL void FDECL(def_mread, (int, genericptr_t, unsigned int));
+STATIC_DCL void def_minit(void);
+STATIC_DCL void def_mread(int, genericptr_t, unsigned int);
 
-STATIC_DCL void NDECL(find_lev_obj);
-STATIC_DCL void FDECL(restlevchn, (int));
-STATIC_DCL void FDECL(restdamage, (int, boolean));
-STATIC_DCL void FDECL(restobj, (int, struct obj *));
-STATIC_DCL struct obj *FDECL(restobjchn, (int, boolean, boolean));
-STATIC_OVL void FDECL(restmon, (int, struct monst *));
-STATIC_DCL struct monst *FDECL(restmonchn, (int, boolean));
-STATIC_DCL struct fruit *FDECL(loadfruitchn, (int));
-STATIC_DCL void FDECL(freefruitchn, (struct fruit *));
-STATIC_DCL void FDECL(ghostfruit, (struct obj *));
+STATIC_DCL void find_lev_obj(void);
+STATIC_DCL void restlevchn(int);
+STATIC_DCL void restdamage(int, boolean);
+STATIC_DCL void restobj(int, struct obj *);
+STATIC_DCL struct obj *restobjchn(int, boolean, boolean);
+STATIC_OVL void restmon(int, struct monst *);
+STATIC_DCL struct monst *restmonchn(int, boolean);
+STATIC_DCL struct fruit *loadfruitchn(int);
+STATIC_DCL void freefruitchn(struct fruit *);
+STATIC_DCL void ghostfruit(struct obj *);
 STATIC_DCL boolean
-FDECL(restgamestate, (int, unsigned int *, unsigned int *));
-STATIC_DCL void FDECL(restlevelstate, (unsigned int, unsigned int));
-STATIC_DCL int FDECL(restlevelfile, (int, xchar));
-STATIC_OVL void FDECL(restore_msghistory, (int));
-STATIC_DCL void FDECL(reset_oattached_mids, (boolean));
-STATIC_DCL void FDECL(rest_levl, (int, boolean));
+restgamestate(int, unsigned int *, unsigned int *);
+STATIC_DCL void restlevelstate(unsigned int, unsigned int);
+STATIC_DCL int restlevelfile(int, xchar);
+STATIC_OVL void restore_msghistory(int);
+STATIC_DCL void reset_oattached_mids(boolean);
+STATIC_DCL void rest_levl(int, boolean);
 
 static struct restore_procs {
     const char *name;
     int mread_flags;
-    void NDECL((*restore_minit));
-    void FDECL((*restore_mread), (int, genericptr_t, unsigned int));
-    void FDECL((*restore_bclose), (int));
+    void (*restore_minit)(void);
+    void (*restore_mread)(int, genericptr_t, unsigned int);
+    void (*restore_bclose)(int);
 } restoreprocs = {
 #if !defined(ZEROCOMP) || (defined(COMPRESS) || defined(ZLIB_COMP))
     "externalcomp", 0, def_minit, def_mread, def_bclose,
@@ -69,14 +69,14 @@ struct bucket {
     } map[N_PER_BUCKET];
 };
 
-STATIC_DCL void NDECL(clear_id_mapping);
-STATIC_DCL void FDECL(add_id_mapping, (unsigned, unsigned));
+STATIC_DCL void clear_id_mapping(void);
+STATIC_DCL void add_id_mapping(unsigned, unsigned);
 
 static int n_ids_mapped = 0;
 static struct bucket *id_map = 0;
 
 #ifdef AMII_GRAPHICS
-void FDECL(amii_setpens, (int)); /* use colors from save file */
+void amii_setpens(int); /* use colors from save file */
 extern int amii_numcolors;
 #endif
 

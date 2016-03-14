@@ -80,7 +80,7 @@ static struct icon_info {
  */
 struct xwindow window_list[MAX_WINDOWS];
 AppResources appResources;
-void FDECL((*input_func), (Widget, XEvent *, String *, Cardinal *));
+void (*input_func)(Widget, XEvent *, String *, Cardinal *);
 int click_x, click_y, click_button; /* Click position on a map window   */
                                     /* (filled by set_button_values()). */
 int updated_inventory;
@@ -138,31 +138,31 @@ struct window_procs X11_procs = {
 /*
  * Local functions.
  */
-static winid NDECL(find_free_window);
-static void FDECL(nhFreePixel, (XtAppContext, XrmValuePtr, XtPointer,
-                                XrmValuePtr, Cardinal *));
-static void NDECL(load_default_resources);
-static void NDECL(release_default_resources);
+static winid find_free_window(void);
+static void nhFreePixel(XtAppContext, XrmValuePtr, XtPointer,
+                        XrmValuePtr, Cardinal *);
+static void load_default_resources(void);
+static void release_default_resources(void);
 #ifdef X11_HANGUP_SIGNAL
-static void FDECL(X11_sig, (int));
-static void FDECL(X11_sig_cb, (XtPointer, XtSignalId *));
+static void X11_sig(int);
+static void X11_sig_cb(XtPointer, XtSignalId *);
 #endif
-static void FDECL(d_timeout, (XtPointer, XtIntervalId *));
-static void FDECL(X11_hangup, (Widget, XEvent *, String *, Cardinal *));
-static void FDECL(askname_delete, (Widget, XEvent *, String *, Cardinal *));
-static void FDECL(askname_done, (Widget, XtPointer, XtPointer));
-static void FDECL(done_button, (Widget, XtPointer, XtPointer));
-static void FDECL(getline_delete, (Widget, XEvent *, String *, Cardinal *));
-static void FDECL(abort_button, (Widget, XtPointer, XtPointer));
-static void NDECL(release_getline_widgets);
-static void FDECL(delete_file, (Widget, XEvent *, String *, Cardinal *));
-static void FDECL(dismiss_file, (Widget, XEvent *, String *, Cardinal *));
-static void FDECL(yn_delete, (Widget, XEvent *, String *, Cardinal *));
-static void FDECL(yn_key, (Widget, XEvent *, String *, Cardinal *));
-static void NDECL(release_yn_widgets);
-static int FDECL(input_event, (int));
-static void FDECL(win_visible, (Widget, XtPointer, XEvent *, Boolean *));
-static void NDECL(init_standard_windows);
+static void d_timeout(XtPointer, XtIntervalId *);
+static void X11_hangup(Widget, XEvent *, String *, Cardinal *);
+static void askname_delete(Widget, XEvent *, String *, Cardinal *);
+static void askname_done(Widget, XtPointer, XtPointer);
+static void done_button(Widget, XtPointer, XtPointer);
+static void getline_delete(Widget, XEvent *, String *, Cardinal *);
+static void abort_button(Widget, XtPointer, XtPointer);
+static void release_getline_widgets(void);
+static void delete_file(Widget, XEvent *, String *, Cardinal *);
+static void dismiss_file(Widget, XEvent *, String *, Cardinal *);
+static void yn_delete(Widget, XEvent *, String *, Cardinal *);
+static void yn_key(Widget, XEvent *, String *, Cardinal *);
+static void release_yn_widgets(void);
+static int input_event(int);
+static void win_visible(Widget, XtPointer, XEvent *, Boolean *);
+static void init_standard_windows(void);
 
 /*
  * Local variables.

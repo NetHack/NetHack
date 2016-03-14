@@ -18,8 +18,8 @@
 static char nullstr[] = "", winpanicstr[] = "Bad window id %d";
 static int curr_status_line;
 
-static char *FDECL(copy_of, (const char *));
-static void FDECL(bail, (const char *)); /* __attribute__((noreturn)) */
+static char *copy_of(const char *);
+static void bail(const char *)); /* __attribute__((noreturn) */
 
 extern int mar_set_tile_mode(int);
 extern void mar_set_font(int, const char *, int);
@@ -781,8 +781,6 @@ Gem_add_menu(winid window,                  /* window to use, must be of type NH
 void
 Gem_end_menu(winid window,       /* menu to use */
              const char *prompt) /* prompt to for menu */
-;
-;
 {
     if (window == WIN_ERR || mar_hol_win_type(window) != NHW_MENU)
         panic(winpanicstr, window);

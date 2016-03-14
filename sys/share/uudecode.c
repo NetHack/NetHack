@@ -88,9 +88,7 @@ static void outdec(char *, FILE *, int);
 #define DEC(c) (((c) - ' ') & 077)
 
 int
-main(argc, argv)
-int argc;
-char **argv;
+main(int argc, char **argv)
 {
     FILE *in, *out;
     int mode;
@@ -179,9 +177,7 @@ char **argv;
  * copy from in to out, decoding as you go along.
  */
 void
-decode(in, out)
-FILE *in;
-FILE *out;
+decode(FILE *in, FILE *out)
 {
     char buf[80];
     char *bp;
@@ -218,10 +214,7 @@ FILE *out;
  * output all of them at the end of the file.
  */
 void
-outdec(p, f, n)
-char *p;
-FILE *f;
-int n;
+outdec(char *p, FILE *f, int n)
 {
     int c1, c2, c3;
 
@@ -247,8 +240,7 @@ int n;
 #endif
 
 char *
-index(sp, c)
-register char *sp, c;
+index(register char *sp, register char c)
 {
     do {
         if (*sp == c)

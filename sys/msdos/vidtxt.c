@@ -31,7 +31,7 @@
 #endif
 #endif
 
-/* void FDECL(txt_xputc,(char, int)); */ /* write out character (and
+/* void txt_xputc(char, int); */ /* write out character (and
                                             attribute) */
 
 extern int attrib_text_normal;  /* text mode normal attribute */
@@ -98,10 +98,10 @@ txt_get_scr_size()
 #include <unistd.h>
 #endif
 
-void FDECL(txt_gotoxy, (int, int));
+void txt_gotoxy(int, int);
 
 #if defined(SCREEN_BIOS) && !defined(PC9800)
-void FDECL(txt_get_cursor, (int *, int *));
+void txt_get_cursor(int *, int *);
 #endif
 
 #ifdef SCREEN_DJGPPFAST

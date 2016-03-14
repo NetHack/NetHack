@@ -495,49 +495,47 @@ static short n_menu_mapped = 0;
 
 static boolean initial, from_file;
 
-STATIC_DCL void FDECL(nmcpy, (char *, const char *, int));
-STATIC_DCL void FDECL(escapes, (const char *, char *));
-STATIC_DCL void FDECL(rejectoption, (const char *));
-STATIC_DCL void FDECL(badoption, (const char *));
-STATIC_DCL char *FDECL(string_for_opt, (char *, boolean));
-STATIC_DCL char *FDECL(string_for_env_opt, (const char *, char *, boolean));
-STATIC_DCL void FDECL(bad_negation, (const char *, boolean));
-STATIC_DCL int FDECL(change_inv_order, (char *));
-STATIC_DCL void FDECL(warning_opts, (char *, const char *));
-STATIC_DCL int FDECL(feature_alert_opts, (char *, const char *));
-STATIC_DCL boolean FDECL(duplicate_opt_detection, (const char *, int));
-STATIC_DCL void FDECL(complain_about_duplicate, (const char *, int));
+STATIC_DCL void nmcpy(char *, const char *, int);
+STATIC_DCL void escapes(const char *, char *);
+STATIC_DCL void rejectoption(const char *);
+STATIC_DCL void badoption(const char *);
+STATIC_DCL char *string_for_opt(char *, boolean);
+STATIC_DCL char *string_for_env_opt(const char *, char *, boolean);
+STATIC_DCL void bad_negation(const char *, boolean);
+STATIC_DCL int change_inv_order(char *);
+STATIC_DCL void warning_opts(char *, const char *);
+STATIC_DCL int feature_alert_opts(char *, const char *);
+STATIC_DCL boolean duplicate_opt_detection(const char *, int);
+STATIC_DCL void complain_about_duplicate(const char *, int);
+STATIC_DCL const char *attr2attrname(int);
+STATIC_DCL int query_color(void);
+STATIC_DCL int query_attr(const char *);
+STATIC_DCL const char * msgtype2name(int);
+STATIC_DCL int query_msgtype(void);
+STATIC_DCL boolean msgtype_add(int, char *);
+STATIC_DCL void free_one_msgtype(int);
+STATIC_DCL int msgtype_count(void);
+STATIC_DCL boolean add_menu_coloring_parsed(char *, int, int);
+STATIC_DCL void free_one_menu_coloring(int);
+STATIC_DCL int count_menucolors(void);
 
-STATIC_DCL const char *FDECL(attr2attrname, (int));
-STATIC_DCL int NDECL(query_color);
-STATIC_DCL int FDECL(query_attr, (const char *));
-STATIC_DCL const char * FDECL(msgtype2name, (int));
-STATIC_DCL int NDECL(query_msgtype);
-STATIC_DCL boolean FDECL(msgtype_add, (int, char *));
-STATIC_DCL void FDECL(free_one_msgtype, (int));
-STATIC_DCL int NDECL(msgtype_count);
-STATIC_DCL boolean FDECL(add_menu_coloring_parsed, (char *, int, int));
-STATIC_DCL void FDECL(free_one_menu_coloring, (int));
-STATIC_DCL int NDECL(count_menucolors);
+STATIC_DCL void oc_to_str(char *, char *);
+STATIC_DCL void doset_add_menu(winid, const char *, int);
+STATIC_DCL void opts_add_others(winid, const char *, int,
+                                        char *, int);
+STATIC_DCL int handle_add_list_remove(const char *, int);
+STATIC_DCL boolean special_handling(const char *,
+                                    boolean, boolean);
+STATIC_DCL const char *get_compopt_value(const char *, char *);
+STATIC_DCL void remove_autopickup_exception(struct autopickup_exception *);
+STATIC_DCL int count_ape_maps(int *, int *);
 
-STATIC_DCL void FDECL(oc_to_str, (char *, char *));
-STATIC_DCL void FDECL(doset_add_menu, (winid, const char *, int));
-STATIC_DCL void FDECL(opts_add_others, (winid, const char *, int,
-                                        char *, int));
-STATIC_DCL int FDECL(handle_add_list_remove, (const char *, int));
-STATIC_DCL boolean FDECL(special_handling, (const char *,
-                                            boolean, boolean));
-STATIC_DCL const char *FDECL(get_compopt_value, (const char *, char *));
-STATIC_DCL void FDECL(remove_autopickup_exception,
-                      (struct autopickup_exception *));
-STATIC_DCL int FDECL(count_ape_maps, (int *, int *));
-
-STATIC_DCL boolean FDECL(is_wc_option, (const char *));
-STATIC_DCL boolean FDECL(wc_supported, (const char *));
-STATIC_DCL boolean FDECL(is_wc2_option, (const char *));
-STATIC_DCL boolean FDECL(wc2_supported, (const char *));
-STATIC_DCL void FDECL(wc_set_font_name, (int, char *));
-STATIC_DCL int FDECL(wc_set_window_colors, (char *));
+STATIC_DCL boolean is_wc_option(const char *);
+STATIC_DCL boolean wc_supported(const char *);
+STATIC_DCL boolean is_wc2_option(const char *);
+STATIC_DCL boolean wc2_supported(const char *);
+STATIC_DCL void wc_set_font_name(int, char *);
+STATIC_DCL int wc_set_window_colors(char *);
 
 void
 reglyph_darkroom()
@@ -3546,12 +3544,7 @@ doset_add_menu(winid win,           /* window to add to */
 }
 
 STATIC_OVL void
-opts_add_others(win, name, id, bufx, nset)
-winid win;
-const char *name;
-int id;
-char *bufx;
-int nset;
+opts_add_others(winid win, const char *name, int id, char *bufx, int nset)
 {
     char buf[BUFSZ], buf2[BUFSZ];
     anything any = zeroany;

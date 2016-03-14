@@ -7,7 +7,7 @@
 #include "tile.h"
 
 #ifndef MONITOR_HEAP
-extern long *FDECL(alloc, (unsigned int));
+extern long *alloc(unsigned int);
 #endif
 
 FILE *ppm_file;
@@ -20,8 +20,8 @@ struct ppmscreen {
 static int tiles_across, tiles_down, curr_tiles_across;
 static pixel **image;
 
-static void NDECL(write_header);
-static void NDECL(WriteTileStrip);
+static void write_header(void);
+static void WriteTileStrip(void);
 
 static void
 write_header()

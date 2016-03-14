@@ -47,7 +47,7 @@ Version     _WIN_32IE   Platform/IE
 /*#define COMCTL_URL
  * "http://www.microsoft.com/msdownload/ieplatform/ie/comctrlx86.asp"*/
 
-extern void FDECL(nethack_exit, (int));
+extern void nethack_exit(int);
 static TCHAR *_get_cmd_arg(TCHAR *pCmdLine);
 static HRESULT GetComCtlVersion(LPDWORD pdwMajor, LPDWORD pdwMinor);
 BOOL WINAPI
@@ -64,7 +64,7 @@ NHWinApp _nethack_app;
 #endif
 
 // Foward declarations of functions included in this code module:
-extern boolean FDECL(pcmain, (int, char **));
+extern boolean pcmain(int, char **);
 static void __cdecl mswin_moveloop(void *);
 
 #define MAX_CMDLINE_PARAM 255

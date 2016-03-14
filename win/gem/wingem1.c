@@ -21,7 +21,7 @@ typedef signed char schar;
 #include "wintype.h"
 #undef genericptr_t
 
-#define NDECL(f) f(void)
+#define NDECL(f) f()
 #define FDECL(f, p) f p
 #define char char
 #define schar schar

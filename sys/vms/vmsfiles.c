@@ -10,11 +10,11 @@
 #include <ctype.h>
 
 /* lint supression due to lack of extern.h */
-int FDECL(vms_link, (const char *, const char *));
-int FDECL(vms_unlink, (const char *));
-int FDECL(vms_creat, (const char *, unsigned int));
-boolean FDECL(same_dir, (const char *, const char *));
-int FDECL(c__translate, (int));
+int vms_link(const char *, const char *);
+int vms_unlink(const char *);
+int vms_creat(const char *, unsigned int);
+boolean same_dir(const char *, const char *);
+int c__translate(int);
 
 #include <rms.h>
 #if 0
@@ -27,7 +27,7 @@ int FDECL(c__translate, (int));
 #define C$$TRANSLATE(status) (errno = EVMSERR, vaxc$errno = (status))
 #endif
 extern unsigned long sys$parse(), sys$search(), sys$enter(), sys$remove();
-extern int VDECL(lib$match_cond, (int, int, ...));
+extern int lib$match_cond(int, int, ...);
 
 #define vms_success(sts) ((sts) & 1)         /* odd, */
 #define vms_failure(sts) (!vms_success(sts)) /* even */

@@ -4,10 +4,10 @@
 
 #include "hack.h"
 
-STATIC_DCL boolean FDECL(mon_is_gecko, (struct monst *));
-STATIC_DCL int FDECL(domonnoise, (struct monst *));
-STATIC_DCL int NDECL(dochat);
-STATIC_DCL int FDECL(mon_in_room, (struct monst *, int));
+STATIC_DCL boolean mon_is_gecko(struct monst *);
+STATIC_DCL int domonnoise(struct monst *);
+STATIC_DCL int dochat(void);
+STATIC_DCL int mon_in_room(struct monst *, int);
 
 /* this easily could be a macro, but it might overtax dumb compilers */
 STATIC_OVL int
@@ -1077,7 +1077,7 @@ dochat()
 
 #ifdef USER_SOUNDS
 
-extern void FDECL(play_usersound, (const char *, int));
+extern void play_usersound(const char *, int);
 
 typedef struct audio_mapping_rec {
     struct nhregex *regex;

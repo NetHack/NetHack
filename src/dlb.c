@@ -27,19 +27,19 @@
  */
 
 typedef struct dlb_procs {
-    boolean NDECL((*dlb_init_proc));
-    void NDECL((*dlb_cleanup_proc));
-    boolean FDECL((*dlb_fopen_proc), (DLB_P, const char *, const char *));
-    int FDECL((*dlb_fclose_proc), (DLB_P));
-    int FDECL((*dlb_fread_proc), (char *, int, int, DLB_P));
-    int FDECL((*dlb_fseek_proc), (DLB_P, long, int));
-    char *FDECL((*dlb_fgets_proc), (char *, int, DLB_P));
-    int FDECL((*dlb_fgetc_proc), (DLB_P));
-    long FDECL((*dlb_ftell_proc), (DLB_P));
+    boolean (*dlb_init_proc)(void);
+    void (*dlb_cleanup_proc)(void);
+    boolean (*dlb_fopen_proc)(DLB_P, const char *, const char *);
+    int (*dlb_fclose_proc)(DLB_P);
+    int (*dlb_fread_proc)(char *, int, int, DLB_P);
+    int (*dlb_fseek_proc)(DLB_P, long, int);
+    char *(*dlb_fgets_proc)(char *, int, DLB_P);
+    int (*dlb_fgetc_proc)(DLB_P);
+    long (*dlb_ftell_proc)(DLB_P);
 } dlb_procs_t;
 
 /* without extern.h via hack.h, these haven't been declared for us */
-extern FILE *FDECL(fopen_datafile, (const char *, const char *, int));
+extern FILE *fopen_datafile(const char *, const char *, int);
 
 #ifdef DLBLIB
 /*
@@ -61,25 +61,25 @@ extern FILE *FDECL(fopen_datafile, (const char *, const char *, int));
 #define MAX_LIBS 4
 static library dlb_libs[MAX_LIBS];
 
-STATIC_DCL boolean FDECL(readlibdir, (library * lp));
-STATIC_DCL boolean FDECL(find_file, (const char *name, library **lib,
-                                     long *startp, long *sizep));
-STATIC_DCL boolean NDECL(lib_dlb_init);
-STATIC_DCL void NDECL(lib_dlb_cleanup);
-STATIC_DCL boolean FDECL(lib_dlb_fopen, (dlb *, const char *, const char *));
-STATIC_DCL int FDECL(lib_dlb_fclose, (dlb *));
-STATIC_DCL int FDECL(lib_dlb_fread, (char *, int, int, dlb *));
-STATIC_DCL int FDECL(lib_dlb_fseek, (dlb *, long, int));
-STATIC_DCL char *FDECL(lib_dlb_fgets, (char *, int, dlb *));
-STATIC_DCL int FDECL(lib_dlb_fgetc, (dlb *));
-STATIC_DCL long FDECL(lib_dlb_ftell, (dlb *));
+STATIC_DCL boolean readlibdir(library * lp);
+STATIC_DCL boolean find_file(const char *name, library **lib,
+                                     long *startp, long *sizep);
+STATIC_DCL boolean lib_dlb_init(void);
+STATIC_DCL void lib_dlb_cleanup(void);
+STATIC_DCL boolean lib_dlb_fopen(dlb *, const char *, const char *);
+STATIC_DCL int lib_dlb_fclose(dlb *);
+STATIC_DCL int lib_dlb_fread(char *, int, int, dlb *);
+STATIC_DCL int lib_dlb_fseek(dlb *, long, int);
+STATIC_DCL char *lib_dlb_fgets(char *, int, dlb *);
+STATIC_DCL int lib_dlb_fgetc(dlb *);
+STATIC_DCL long lib_dlb_ftell(dlb *);
 
 /* not static because shared with dlb_main.c */
-boolean FDECL(open_library, (const char *lib_name, library *lp));
-void FDECL(close_library, (library * lp));
+boolean open_library(const char *lib_name, library *lp);
+void close_library(library * lp);
 
 /* without extern.h via hack.h, these haven't been declared for us */
-extern char *FDECL(eos, (char *));
+extern char *eos(char *);
 
 /*
  * Read the directory out of the library.  Return 1 if successful,

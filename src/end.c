@@ -38,25 +38,25 @@ static struct val_list {
                   { 0, 0 } };
 
 #ifndef NO_SIGNAL
-STATIC_PTR void FDECL(done_intr, (int));
+STATIC_PTR void done_intr(int);
 #if defined(UNIX) || defined(VMS) || defined(__EMX__)
-static void FDECL(done_hangup, (int));
+static void done_hangup(int);
 #endif
 #endif
-STATIC_DCL void FDECL(disclose, (int, boolean));
-STATIC_DCL void FDECL(get_valuables, (struct obj *));
-STATIC_DCL void FDECL(sort_valuables, (struct valuable_data *, int));
-STATIC_DCL void FDECL(artifact_score, (struct obj *, boolean, winid));
-STATIC_DCL void FDECL(really_done, (int)) NORETURN;
-STATIC_DCL boolean FDECL(odds_and_ends, (struct obj *, int));
-STATIC_DCL void FDECL(savelife, (int));
-STATIC_DCL void FDECL(list_vanquished, (char, boolean));
-STATIC_DCL void FDECL(list_genocided, (char, boolean));
-STATIC_DCL boolean FDECL(should_query_disclose_option, (int, char *));
-STATIC_DCL int NDECL(num_extinct);
+STATIC_DCL void disclose(int, boolean);
+STATIC_DCL void get_valuables(struct obj *);
+STATIC_DCL void sort_valuables(struct valuable_data *, int);
+STATIC_DCL void artifact_score(struct obj *, boolean, winid);
+STATIC_DCL void really_done(int) NORETURN;
+STATIC_DCL boolean odds_and_ends(struct obj *, int);
+STATIC_DCL void savelife(int);
+STATIC_DCL void list_vanquished(char, boolean);
+STATIC_DCL void list_genocided(char, boolean);
+STATIC_DCL boolean should_query_disclose_option(int, char *);
+STATIC_DCL int num_extinct(void);
 
 #if defined(__BEOS__) || defined(MICRO) || defined(WIN32) || defined(OS2)
-extern void FDECL(nethack_exit, (int));
+extern void nethack_exit(int);
 #else
 #define nethack_exit exit
 #endif
@@ -111,12 +111,12 @@ extern void FDECL(nethack_exit, (int));
 #endif
 #endif
 
-static void NDECL(NH_abort);
+static void NH_abort(void);
 #ifndef NO_SIGNAL
-static void FDECL(panictrace_handler, (int));
+static void panictrace_handler(int);
 #endif
-static boolean NDECL(NH_panictrace_libc);
-static boolean NDECL(NH_panictrace_gdb);
+static boolean NH_panictrace_libc(void);
+static boolean NH_panictrace_gdb(void);
 
 #ifndef NO_SIGNAL
 /*ARGSUSED*/
@@ -384,7 +384,7 @@ static void
 done_hangup(int sig)
 {
     program_state.done_hup++;
-    sethanguphandler((void FDECL((*), (int) )) SIG_IGN);
+    sethanguphandler((void (*)(int)) SIG_IGN);
     done_intr(sig);
     return;
 }
@@ -540,11 +540,10 @@ int how;
 #endif
 
 /*VARARGS1*/
-void panic
-VA_DECL(const char *, str)
+void panic(const char *str, ...)
 {
-    VA_START(str);
-    VA_INIT(str, char *);
+    va_list the_args;
+    va_start(the_args, str);
 
     if (program_state.panicking++)
         NH_abort(); /* avoid loops - this should never happen*/
@@ -600,7 +599,7 @@ VA_DECL(const char *, str)
     {
         char buf[BUFSZ];
 
-        Vsprintf(buf, str, VA_ARGS);
+        Vsprintf(buf, str, the_args);
         raw_print(buf);
         paniclog("panic", buf);
     }
@@ -611,7 +610,7 @@ VA_DECL(const char *, str)
     if (wizard)
         NH_abort(); /* generate core dump */
 #endif
-    VA_END();
+    va_end(the_args);
     really_done(PANICKED);
 }
 

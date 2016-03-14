@@ -14,18 +14,17 @@
 #define abort() exit()
 #endif
 #ifdef VMS
-extern void NDECL(vms_abort);
+extern void vms_abort(void);
 #endif
 
 /*VARARGS1*/
 boolean panicking;
-void VDECL(panic, (char *, ...));
+void panic(char *, ...);
 
-void panic
-VA_DECL(char *, str)
+void panic(char *str, ...)
 {
-    VA_START(str);
-    VA_INIT(str, char *);
+    va_list the_args;
+    va_start(the_args, str);
     if (panicking++)
 #ifdef SYSV
         (void)
@@ -33,7 +32,7 @@ VA_DECL(char *, str)
             abort(); /* avoid loops - this should never happen*/
 
     (void) fputs(" ERROR:  ", stderr);
-    Vfprintf(stderr, str, VA_ARGS);
+    Vfprintf(stderr, str, the_args);
     (void) fflush(stderr);
 #if defined(UNIX) || defined(VMS)
 #ifdef SYSV
@@ -41,7 +40,7 @@ VA_DECL(char *, str)
 #endif
         abort(); /* generate core dump */
 #endif
-    VA_END();
+    va_end(the_args);
     exit(EXIT_FAILURE); /* redundant */
 }
 

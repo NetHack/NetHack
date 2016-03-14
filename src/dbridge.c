@@ -19,19 +19,19 @@
 
 #include "hack.h"
 
-STATIC_DCL void FDECL(get_wall_for_db, (int *, int *));
-STATIC_DCL struct entity *FDECL(e_at, (int, int));
-STATIC_DCL void FDECL(m_to_e, (struct monst *, int, int, struct entity *));
-STATIC_DCL void FDECL(u_to_e, (struct entity *));
-STATIC_DCL void FDECL(set_entity, (int, int, struct entity *));
-STATIC_DCL const char *FDECL(e_nam, (struct entity *));
-STATIC_DCL const char *FDECL(E_phrase, (struct entity *, const char *));
-STATIC_DCL boolean FDECL(e_survives_at, (struct entity *, int, int));
-STATIC_DCL void FDECL(e_died, (struct entity *, int, int));
-STATIC_DCL boolean FDECL(automiss, (struct entity *));
-STATIC_DCL boolean FDECL(e_missed, (struct entity *, boolean));
-STATIC_DCL boolean FDECL(e_jumps, (struct entity *));
-STATIC_DCL void FDECL(do_entity, (struct entity *));
+STATIC_DCL void get_wall_for_db(int *, int *);
+STATIC_DCL struct entity *e_at(int, int);
+STATIC_DCL void m_to_e(struct monst *, int, int, struct entity *);
+STATIC_DCL void u_to_e(struct entity *);
+STATIC_DCL void set_entity(int, int, struct entity *);
+STATIC_DCL const char *e_nam(struct entity *);
+STATIC_DCL const char *E_phrase(struct entity *, const char *);
+STATIC_DCL boolean e_survives_at(struct entity *, int, int);
+STATIC_DCL void e_died(struct entity *, int, int);
+STATIC_DCL boolean automiss(struct entity *);
+STATIC_DCL boolean e_missed(struct entity *, boolean);
+STATIC_DCL boolean e_jumps(struct entity *);
+STATIC_DCL void do_entity(struct entity *);
 
 boolean
 is_pool(int x, int y)

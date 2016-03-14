@@ -189,26 +189,25 @@ return &szFullPath[0];
 
 /* fatal error */
 /*VARARGS1*/
-void error
-VA_DECL(const char *, s)
+void error(const char *s, ...)
 {
+    va_list the_args;
     char buf[BUFSZ];
-    VA_START(s);
-    VA_INIT(s, const char *);
+    va_start(the_args, s);
     /* error() may get called before tty is initialized */
     if (iflags.window_inited)
         end_screen();
     if (!strncmpi(windowprocs.name, "tty", 3)) {
         buf[0] = '\n';
-        (void) vsprintf(&buf[1], s, VA_ARGS);
+        (void) vsprintf(&buf[1], s, the_args);
         Strcat(buf, "\n");
         msmsg(buf);
     } else {
-        (void) vsprintf(buf, s, VA_ARGS);
+        (void) vsprintf(buf, s, the_args);
         Strcat(buf, "\n");
         raw_printf(buf);
     }
-    VA_END();
+    va_end(the_args);
     exit(EXIT_FAILURE);
 }
 
@@ -218,7 +217,7 @@ Delay(int ms)
     (void) Sleep(ms);
 }
 
-extern void NDECL(backsp);
+extern void backsp(void);
 
 void
 win32_abort()

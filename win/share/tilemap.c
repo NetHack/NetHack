@@ -9,15 +9,15 @@
 
 #include "hack.h"
 
-const char *FDECL(tilename, (int, int));
-void NDECL(init_tilemap);
-void FDECL(process_substitutions, (FILE *));
-boolean FDECL(acceptable_tilename, (int, const char *, const char *));
+const char *tilename(int, int);
+void init_tilemap(void);
+void process_substitutions(FILE *);
+boolean acceptable_tilename(int, const char *, const char *);
 
 #if defined(MICRO) || defined(WIN32)
 #undef exit
 #if !defined(MSDOS) && !defined(WIN32)
-extern void FDECL(exit, (int));
+extern void exit(int);
 #endif
 #endif
 

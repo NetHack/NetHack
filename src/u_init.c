@@ -12,10 +12,10 @@ struct trobj {
     Bitfield(trbless, 2);
 };
 
-STATIC_DCL void FDECL(ini_inv, (struct trobj *));
-STATIC_DCL void FDECL(knows_object, (int));
-STATIC_DCL void FDECL(knows_class, (char));
-STATIC_DCL boolean FDECL(restricted_spell_discipline, (int));
+STATIC_DCL void ini_inv(struct trobj *);
+STATIC_DCL void knows_object(int);
+STATIC_DCL void knows_class(char);
+STATIC_DCL boolean restricted_spell_discipline(int);
 
 #define UNDEF_TYP 0
 #define UNDEF_SPE '\177'

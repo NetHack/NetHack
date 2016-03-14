@@ -4,17 +4,17 @@
 
 #include "hack.h"
 
-STATIC_DCL char *NDECL(nextmbuf);
-STATIC_DCL void FDECL(getpos_help, (boolean, const char *));
-STATIC_DCL int FDECL(CFDECLSPEC cmp_coord_distu, (const void *,
-                                                  const void *));
-STATIC_DCL void FDECL(gather_locs, (coord **, int *, boolean));
-STATIC_DCL void FDECL(auto_describe, (int, int));
-STATIC_DCL void NDECL(do_mname);
-STATIC_DCL boolean FDECL(alreadynamed, (struct monst *, char *, char *));
-STATIC_DCL void FDECL(do_oname, (struct obj *));
-STATIC_DCL void NDECL(namefloorobj);
-STATIC_DCL char *FDECL(bogusmon, (char *,char *));
+STATIC_DCL char *nextmbuf(void);
+STATIC_DCL void getpos_help(boolean, const char *);
+STATIC_DCL int CFDECLSPEC cmp_coord_distu(const void *,
+                                                  const void *);
+STATIC_DCL void gather_locs(coord **, int *, boolean);
+STATIC_DCL void auto_describe(int, int);
+STATIC_DCL void do_mname(void);
+STATIC_DCL boolean alreadynamed(struct monst *, char *, char *);
+STATIC_DCL void do_oname(struct obj *);
+STATIC_DCL void namefloorobj(void);
+STATIC_DCL char *bogusmon(char *,char *);
 
 extern const char what_is_an_unknown_object[]; /* from pager.c */
 
@@ -34,10 +34,10 @@ nextmbuf()
 /* function for getpos() to highlight desired map locations.
  * parameter value 0 = initialize, 1 = highlight, 2 = done
  */
-static void FDECL((*getpos_hilitefunc), (int)) = (void FDECL((*), (int))) 0;
+static void (*getpos_hilitefunc)(int) = (void (*)(int)) 0;
 
 void
-getpos_sethilite(void FDECL((*f), (int)))
+getpos_sethilite(void (*f)(int))
 {
     getpos_hilitefunc = f;
 }
@@ -506,7 +506,7 @@ getpos(coord *ccp, boolean force, const char *goal)
         free((genericptr_t) monarr);
     if (objarr)
         free((genericptr_t) objarr);
-    getpos_hilitefunc = (void FDECL((*), (int))) 0;
+    getpos_hilitefunc = (void ((*)(int))) 0;
     return result;
 }
 

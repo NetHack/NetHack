@@ -19,19 +19,19 @@ extern boolean notonhead; /* for long worms */
 /* kludge to use mondied instead of killed */
 extern boolean m_using;
 
-STATIC_DCL void FDECL(polyuse, (struct obj *, int, int));
-STATIC_DCL void FDECL(create_polymon, (struct obj *, int));
-STATIC_DCL int FDECL(stone_to_flesh_obj, (struct obj *));
-STATIC_DCL boolean FDECL(zap_updown, (struct obj *));
-STATIC_DCL void FDECL(zhitu, (int, int, const char *, xchar, xchar));
-STATIC_DCL void FDECL(revive_egg, (struct obj *));
-STATIC_DCL boolean FDECL(zap_steed, (struct obj *));
-STATIC_DCL void FDECL(skiprange, (int, int *, int *));
+STATIC_DCL void polyuse(struct obj *, int, int);
+STATIC_DCL void create_polymon(struct obj *, int);
+STATIC_DCL int stone_to_flesh_obj(struct obj *);
+STATIC_DCL boolean zap_updown(struct obj *);
+STATIC_DCL void zhitu(int, int, const char *, xchar, xchar);
+STATIC_DCL void revive_egg(struct obj *);
+STATIC_DCL boolean zap_steed(struct obj *);
+STATIC_DCL void skiprange(int, int *, int *);
 
-STATIC_DCL int FDECL(zap_hit, (int, int));
-STATIC_OVL void FDECL(disintegrate_mon, (struct monst *, int, const char *));
-STATIC_DCL void FDECL(backfire, (struct obj *));
-STATIC_DCL int FDECL(spell_hit_bonus, (int));
+STATIC_DCL int zap_hit(int, int);
+STATIC_OVL void disintegrate_mon(struct monst *, int, const char *);
+STATIC_DCL void backfire(struct obj *);
+STATIC_DCL int spell_hit_bonus(int);
 
 #define ZT_MAGIC_MISSILE (AD_MAGM - 1)
 #define ZT_FIRE (AD_FIRE - 1)
@@ -1937,7 +1937,7 @@ bhito(struct obj *obj, struct obj *otmp)
 
 /* returns nonzero if something was hit */
 int
-bhitpile(struct obj *obj, int FDECL((*fhito), (OBJ_P, OBJ_P)), int tx, int ty, schar zz)
+bhitpile(struct obj *obj, int (*fhito)(OBJ_P, OBJ_P), int tx, int ty, schar zz)
 {
     int hitanything = 0;
     register struct obj *otmp, *next_obj;
@@ -3002,8 +3002,8 @@ struct monst *
 bhit(register int ddx, register int ddy,    /* direction */
      register int range,                    /* range */
      int weapon,                            /* see values in hack.h */
-     int FDECL((*fhitm), (MONST_P, OBJ_P)), /* fns called when mon hit */
-     int FDECL((*fhito), (OBJ_P, OBJ_P)),   /* fns called when obj hit */
+     int (*fhitm)(MONST_P, OBJ_P), /* fns called when mon hit */
+     int (*fhito)(OBJ_P, OBJ_P),   /* fns called when obj hit */
      struct obj **pobj)                     /* object tossed/used, set to NULL
                                              * if object is destroyed */
 {

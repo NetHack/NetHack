@@ -117,26 +117,25 @@
  */
 #include "hack.h"
 
-STATIC_DCL void FDECL(display_monster,
-                      (xchar, xchar, struct monst *, int, xchar));
-STATIC_DCL int FDECL(swallow_to_glyph, (int, int));
-STATIC_DCL void FDECL(display_warning, (struct monst *));
+STATIC_DCL void display_monster(xchar, xchar, struct monst *, int, xchar);
+STATIC_DCL int swallow_to_glyph(int, int);
+STATIC_DCL void display_warning(struct monst *);
 
-STATIC_DCL int FDECL(check_pos, (int, int, int));
-STATIC_DCL int FDECL(get_bk_glyph, (xchar, xchar));
+STATIC_DCL int check_pos(int, int, int);
+STATIC_DCL int get_bk_glyph(xchar, xchar);
 
 /*#define WA_VERBOSE*/ /* give (x,y) locations for all "bad" spots */
 #ifdef WA_VERBOSE
-STATIC_DCL boolean FDECL(more_than_one, (int, int, int, int, int));
+STATIC_DCL boolean more_than_one(int, int, int, int, int);
 #endif
 
-STATIC_DCL int FDECL(set_twall, (int, int, int, int, int, int, int, int));
-STATIC_DCL int FDECL(set_wall, (int, int, int));
-STATIC_DCL int FDECL(set_corn, (int, int, int, int, int, int, int, int));
-STATIC_DCL int FDECL(set_crosswall, (int, int));
-STATIC_DCL void FDECL(set_seenv, (struct rm *, int, int, int, int));
-STATIC_DCL void FDECL(t_warn, (struct rm *));
-STATIC_DCL int FDECL(wall_angle, (struct rm *));
+STATIC_DCL int set_twall(int, int, int, int, int, int, int, int);
+STATIC_DCL int set_wall(int, int, int);
+STATIC_DCL int set_corn(int, int, int, int, int, int, int, int);
+STATIC_DCL int set_crosswall(int, int);
+STATIC_DCL void set_seenv(struct rm *, int, int, int, int);
+STATIC_DCL void t_warn(struct rm *);
+STATIC_DCL int wall_angle(struct rm *);
 
 #define remember_topology(x, y) (lastseentyp[x][y] = levl[x][y].typ)
 
@@ -1776,8 +1775,8 @@ get_bk_glyph(xchar x, xchar y)
 
 #ifdef WA_VERBOSE
 
-static const char *FDECL(type_to_name, (int));
-static void FDECL(error4, (int, int, int, int, int, int));
+static const char *type_to_name(int);
+static void error4(int, int, int, int, int, int);
 
 static int bad_count[MAX_TYPE]; /* count of positions flagged as bad */
 static const char *type_names[MAX_TYPE] = {

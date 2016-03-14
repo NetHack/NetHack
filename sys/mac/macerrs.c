@@ -102,9 +102,9 @@ static void vprogerror();
 /* Macro substitute for error() */
 void error VA_DECL(const char *, line)
 {
-	VA_START(line);
-	VA_INIT(line, char *);
-	vprogerror(line, VA_ARGS);
+	va_start(the_args, line);
+	;
+	vprogerror(line, the_args);
 	VA_END();
 }
 
@@ -125,7 +125,7 @@ error VA_DECL(const char *, line)
 	char pbuf[BUFSZ];
 
 	if(index(line, '%')) {
-		Vsprintf(pbuf,line,VA_ARGS);
+		Vsprintf(pbuf,line,the_args);
 		line = pbuf;
 	}
 	showerror("of an internal error",line);

@@ -104,33 +104,33 @@
 
 extern short glyph2tile[];
 
-/* STATIC_DCL void FDECL(vga_NoBorder, (int));  */
-void FDECL(vga_gotoloc, (int, int)); /* This should be made a macro */
-void NDECL(vga_backsp);
+/* STATIC_DCL void vga_NoBorder(int);  */
+void vga_gotoloc(int, int); /* This should be made a macro */
+void vga_backsp(void);
 #ifdef SCROLLMAP
-STATIC_DCL void FDECL(vga_scrollmap, (boolean));
+STATIC_DCL void vga_scrollmap(boolean);
 #endif
-STATIC_DCL void FDECL(vga_redrawmap, (boolean));
-static void FDECL(vga_cliparound, (int, int));
-STATIC_OVL void FDECL(decal_planar, (struct planar_cell_struct *, unsigned));
+STATIC_DCL void vga_redrawmap(boolean);
+static void vga_cliparound(int, int);
+STATIC_OVL void decal_planar(struct planar_cell_struct *, unsigned);
 
 #ifdef POSITIONBAR
-STATIC_DCL void NDECL(positionbar);
-static void FDECL(vga_special, (int, int, int));
+STATIC_DCL void positionbar(void);
+static void vga_special(int, int, int);
 #endif
 
-static void FDECL(vga_DisplayCell, (struct planar_cell_struct *, int, int));
-static void FDECL(vga_DisplayCell_O,
-             (struct overview_planar_cell_struct *, int, int));
-static void FDECL(vga_SwitchMode, (unsigned int));
-static void FDECL(vga_SetPalette, (const struct Pixel *));
-static void FDECL(vga_WriteChar, (int, int, int, int));
-static void FDECL(vga_WriteStr, (char *, int, int, int, int));
+static void vga_DisplayCell(struct planar_cell_struct *, int, int);
+static void vga_DisplayCell_O
+             (struct overview_planar_cell_struct *, int, int);
+static void vga_SwitchMode(unsigned int);
+static void vga_SetPalette(const struct Pixel *);
+static void vga_WriteChar(int, int, int, int);
+static void vga_WriteStr(char *, int, int, int, int);
 
-static void FDECL(read_planar_tile, (unsigned, struct planar_cell_struct *));
-static void FDECL(read_planar_tile_O,
-            (unsigned, struct overview_planar_cell_struct *));
-static void FDECL(read_tile_indexes, (unsigned, unsigned char (*)[TILE_X]));
+static void read_planar_tile(unsigned, struct planar_cell_struct *);
+static void read_planar_tile_O
+            (unsigned, struct overview_planar_cell_struct *);
+static void read_tile_indexes(unsigned, unsigned char (*)[TILE_X]);
 
 extern int clipx, clipxmax; /* current clipping column from wintty.c */
 extern boolean clipping;    /* clipping on? from wintty.c */
@@ -327,8 +327,6 @@ vga_tty_startup(int *wid, int *hgt)
 
 void
 vga_xputs(const char *s, int col, int row)
-const char *s;
-int col, row;
 {
     if (s != (char *) 0) {
         vga_WriteStr((char *) s, strlen(s), col, row, g_attribute);

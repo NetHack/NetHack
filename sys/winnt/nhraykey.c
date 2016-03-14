@@ -169,9 +169,9 @@ extern INPUT_RECORD ir;
 char dllname[512];
 char *shortdllname;
 
-int FDECL(__declspec(dllexport) __stdcall ProcessKeystroke,
+int __declspec(dllexport) __stdcall ProcessKeystroke
           (HANDLE hConIn, INPUT_RECORD *ir, boolean *valid,
-           boolean numberpad, int portdebug));
+           boolean numberpad, int portdebug);
 
 static INPUT_RECORD bogus_key;
 
@@ -255,10 +255,10 @@ static const struct pad {
 #define inmap(x, vk) (((x) > 'A' && (x) < 'Z') || (vk) == 0xBF || (x) == '2')
 
 /* Use process_keystroke for key commands, process_keystroke2 for prompts */
-/* int FDECL(process_keystroke, (INPUT_RECORD *ir, boolean *valid, int
- * portdebug)); */
-int FDECL(process_keystroke2, (HANDLE, INPUT_RECORD *ir, boolean *valid));
-static int FDECL(is_altseq, (unsigned long shiftstate));
+/* int process_keystroke(INPUT_RECORD *ir, boolean *valid, int
+ * portdebug); */
+int process_keystroke2(HANDLE, INPUT_RECORD *ir, boolean *valid);
+static int is_altseq(unsigned long shiftstate);
 
 static int
 is_altseq(unsigned long shiftstate)

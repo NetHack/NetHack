@@ -13,11 +13,11 @@
 #include "wintty.h"
 #include "pcvideo.h"
 
-boolean FDECL(pckeys, (unsigned char, unsigned char));
-static void FDECL(userpan, (BOOLEAN_P));
-static void FDECL(overview, (BOOLEAN_P));
-static void FDECL(traditional, (BOOLEAN_P));
-static void NDECL(refresh);
+boolean pckeys(unsigned char, unsigned char);
+static void userpan(boolean);
+static void overview(boolean);
+static void traditional(boolean);
+static void refresh(void);
 
 extern struct WinDesc *wins[MAXWIN]; /* from wintty.c */
 extern boolean inmap;                /* from video.c */
@@ -77,8 +77,7 @@ pckeys(unsigned char scancode, unsigned char shift)
 }
 
 static void
-userpan(on)
-boolean on;
+userpan(boolean on)
 {
 #ifdef SCREEN_VGA
     if (iflags.usevga)
@@ -91,8 +90,7 @@ boolean on;
 }
 
 static void
-overview(on)
-boolean on;
+overview(boolean on)
 {
 #ifdef SCREEN_VGA
     if (iflags.usevga)
@@ -105,8 +103,7 @@ boolean on;
 }
 
 static void
-traditional(on)
-boolean on;
+traditional(boolean on)
 {
 #ifdef SCREEN_VGA
     if (iflags.usevga)

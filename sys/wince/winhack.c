@@ -11,7 +11,7 @@
 
 extern char orgdir[PATHLEN]; /* also used in pcsys.c, amidos.c */
 
-extern void FDECL(nethack_exit, (int));
+extern void nethack_exit(int);
 static TCHAR *_get_cmd_arg(TCHAR *pCmdLine);
 
 // Global Variables:
@@ -24,7 +24,7 @@ static void win_hack_init(int, char **);
 static void __cdecl mswin_moveloop(void *);
 static BOOL setMapTiles(const char *fname);
 
-extern boolean FDECL(pcmain, (int, char **));
+extern boolean pcmain(int, char **);
 
 #define MAX_CMDLINE_PARAM 255
 
@@ -237,20 +237,19 @@ gotlock:
 }
 
 /* misc functions */
-void error
-VA_DECL(const char *, s)
+void error(const char *s, ...)
 {
+    va_list the_args;
     TCHAR wbuf[1024];
     char buf[1024];
     DWORD last_error = GetLastError();
 
-    VA_START(s);
-    VA_INIT(s, const char *);
+    va_start(the_args, s);
     /* error() may get called before tty is initialized */
     if (iflags.window_inited)
         end_screen();
 
-    vsprintf(buf, s, VA_ARGS);
+    vsprintf(buf, s, the_args);
     NH_A2W(buf, wbuf, sizeof(wbuf) / sizeof(wbuf[0]));
     if (last_error > 0) {
         LPVOID lpMsgBuf;
@@ -270,7 +269,7 @@ VA_DECL(const char *, s)
         }
     }
     MessageBox(NULL, wbuf, TEXT("Error"), MB_OK | MB_ICONERROR);
-    VA_END();
+    va_end(the_args);
     exit(EXIT_FAILURE);
 }
 

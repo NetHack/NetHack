@@ -9,12 +9,11 @@
 #define ALGN_SINNED (-4) /* worse than strayed (-1..-3) */
 #define ALGN_PIOUS 14    /* better than fervent (9..13) */
 
-STATIC_DCL boolean FDECL(histemple_at, (struct monst *, xchar, xchar));
-STATIC_DCL boolean FDECL(has_shrine, (struct monst *));
+STATIC_DCL boolean histemple_at(struct monst *, xchar, xchar);
+STATIC_DCL boolean has_shrine(struct monst *);
 
 void
-newepri(mtmp)
-struct monst *mtmp;
+newepri(struct monst *mtmp)
 {
     if (!mtmp->mextra)
         mtmp->mextra = newmextra();
@@ -25,8 +24,7 @@ struct monst *mtmp;
 }
 
 void
-free_epri(mtmp)
-struct monst *mtmp;
+free_epri(struct monst *mtmp)
 {
     if (mtmp->mextra && EPRI(mtmp)) {
         free((genericptr_t) EPRI(mtmp));
@@ -148,8 +146,7 @@ histemple_at(register struct monst *priest, register xchar x, register xchar y)
 }
 
 boolean
-inhistemple(priest)
-struct monst *priest;
+inhistemple(struct monst *priest)
 {
     /* make sure we have a priest */
     if (!priest || !priest->ispriest)
