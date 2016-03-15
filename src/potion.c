@@ -1090,8 +1090,12 @@ register boolean curesick, cureblind;
                 u.uhp = (u.uhpmax += nxtra);
         }
     }
-    if (cureblind)
+    if (cureblind) {
+        /* 3.6.1: it's debatible whether healing magic should clean off
+           mundane 'dirt', but if it doesn't, blindness isn't cured */
+        u.ucreamed = 0;
         make_blinded(0L, TRUE);
+    }
     if (curesick) {
         make_vomiting(0L, TRUE);
         make_sick(0L, (char *) 0, TRUE, SICK_ALL);

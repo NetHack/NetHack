@@ -184,6 +184,7 @@ dosit()
                 if (u.uhp >= (u.uhpmax - 5))
                     u.uhpmax += 4;
                 u.uhp = u.uhpmax;
+                u.ucreamed = 0;
                 make_blinded(0L, TRUE);
                 make_sick(0L, (char *) 0, FALSE, SICK_ALL);
                 heal_legs();

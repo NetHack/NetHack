@@ -1502,7 +1502,9 @@ struct obj *obj;
         make_confused(HConfusion + d(2, 4), FALSE);
     } else if (!rn2(4) && !Blind) {
         pline("Everything suddenly goes dark.");
-        make_blinded((long) d(2, 10), FALSE);
+        /* hero is not Blind, but Blinded timer might be nonzero if
+           blindness is being overridden by the Eyes of the Overworld */
+        make_blinded((Blinded & TIMEOUT) + (long) d(2, 10), FALSE);
         if (!Blind)
             Your1(vision_clears);
     } else if (!rn2(3)) {
@@ -1785,6 +1787,9 @@ struct obj *otmp;
 #endif
         } else if (otmp->otyp == EGG && stale_egg(otmp)) {
             pline("Ugh.  Rotten egg."); /* perhaps others like it */
+            /* increasing existing nausea means that it will take longer
+               before eventual vomit, but also means that constitution
+               will be abused more times before illness completes */
             make_vomiting((Vomiting & TIMEOUT) + (long) d(10, 4), TRUE);
         } else {
         give_feedback:

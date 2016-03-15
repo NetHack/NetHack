@@ -2147,10 +2147,15 @@ register struct attack *mattk;
                 /* not blind at this point implies you're wearing
                    the Eyes of the Overworld; make them block this
                    particular stun attack too */
-                if (!Blind)
+                if (!Blind) {
                     Your1(vision_clears);
-                else
-                    make_stunned((long) d(1, 3), TRUE);
+                } else {
+                    long oldstun = (HStun & TIMEOUT), newstun = (long) rnd(3);
+
+                    /* we don't want to increment stun duration every time
+                       or sighted hero will become incapacitated */
+                    make_stunned(max(oldstun, newstun), TRUE);
+                }
             }
         }
         break;
