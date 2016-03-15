@@ -271,7 +271,7 @@ u_wipe_engr(int cnt)
 }
 
 void
-wipe_engr_at(xchar x, xchar y, xchar cnt, xchar magical)
+wipe_engr_at(xchar x, xchar y, xchar cnt, boolean magical)
 {
     register struct engr *ep = engr_at(x, y);
 
