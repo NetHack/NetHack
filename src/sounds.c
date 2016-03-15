@@ -5,8 +5,7 @@
 #include "hack.h"
 
 STATIC_DCL boolean FDECL(mon_is_gecko, (struct monst *));
-STATIC_DCL int FDECL(domonnoise, (struct monst *));
-STATIC_DCL int NDECL(dochat);
+STATIC_DCL int FDECL(domonnoise, (struct monst *, BOOLEAN_P));
 STATIC_DCL int FDECL(mon_in_room, (struct monst *, int));
 
 /* this easily could be a macro, but it might overtax dumb compilers */
@@ -459,7 +458,7 @@ register struct monst *mtmp;
 
     /* presumably nearness and soundok checks have already been made */
     if (!is_silent(mtmp->data) && mtmp->data->msound <= MS_ANIMAL)
-        (void) domonnoise(mtmp);
+        (void) domonnoise(mtmp, FALSE);
     else if (mtmp->data->msound >= MS_HUMANOID) {
         if (!canspotmon(mtmp))
             map_invisible(mtmp->mx, mtmp->my);
@@ -488,8 +487,9 @@ struct monst *mon;
 }
 
 STATIC_OVL int
-domonnoise(mtmp)
-register struct monst *mtmp;
+domonnoise(mtmp, chatting)
+struct monst *mtmp;
+boolean chatting;
 {
     char verbuf[BUFSZ];
     register const char *pline_msg = 0, /* Monnam(mtmp) will be prepended */
@@ -501,8 +501,13 @@ register struct monst *mtmp;
     /* presumably nearness and sleep checks have already been made */
     if (Deaf)
         return 0;
-    if (is_silent(ptr))
+    if (is_silent(ptr)) {
+        if (chatting) {
+            pline("%s does not respond.", Monnam(mtmp));
+            return 1;
+        }
         return 0;
+    }
 
     /* leader might be poly'd; if he can still speak, give leader speech */
     if (mtmp->m_id == quest_status.leader_m_id && msound > MS_ANIMAL)
@@ -682,7 +687,7 @@ register struct monst *mtmp;
         if (!mtmp->mpeaceful)
             pline_msg = "hisses!";
         else
-            return 0; /* no sound */
+            pline_msg = "hisses.";
         break;
     case MS_BUZZ:
         pline_msg = mtmp->mpeaceful ? "drones." : "buzzes angrily.";
@@ -935,6 +940,10 @@ register struct monst *mtmp;
             verbl_msg = "Who do you think you are, War?";
         break;
     } /* case MS_RIDER */
+    default:
+        if (chatting)
+            pline_msg = "does not respond.";
+        break;
     } /* switch */
 
     if (pline_msg) {
@@ -960,14 +969,15 @@ register struct monst *mtmp;
 int
 dotalk()
 {
-    int result;
-
-    result = dochat();
-    return result;
+    return dochat(TRUE, 0, 0, 0);
 }
 
-STATIC_OVL int
-dochat()
+int
+dochat(ask_for_dir, dx, dy, dz)
+boolean ask_for_dir;
+int dx;
+int dy;
+int dz;
 {
     struct monst *mtmp;
     int tx, ty;
@@ -1006,7 +1016,11 @@ dochat()
         return 1;
     }
 
-    if (!getdir("Talk to whom? (in what direction)")) {
+    if (!ask_for_dir) {
+        u.dx = dx;
+        u.dy = dy;
+        u.dz = dz;
+    } else if (!getdir("Talk to whom? (in what direction)")) {
         /* decided not to chat */
         return 0;
     }
@@ -1015,8 +1029,9 @@ dochat()
         if (!u.usteed->mcanmove || u.usteed->msleeping) {
             pline("%s seems not to notice you.", Monnam(u.usteed));
             return 1;
-        } else
-            return domonnoise(u.usteed);
+        } else {
+            return domonnoise(u.usteed, TRUE);
+        }
     }
 
     if (u.dz) {
@@ -1081,7 +1096,7 @@ dochat()
         return 0;
     }
 
-    return domonnoise(mtmp);
+    return domonnoise(mtmp, TRUE);
 }
 
 #ifdef USER_SOUNDS

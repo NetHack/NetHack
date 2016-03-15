@@ -4,6 +4,8 @@
 
 #include "hack.h"
 
+STATIC_DCL boolean FDECL(pacifist_attack_checks, (struct monst *,
+                                                  struct obj *));
 STATIC_DCL boolean FDECL(known_hitum, (struct monst *, struct obj *, int *,
                                        int, int, struct attack *));
 STATIC_DCL boolean FDECL(theft_petrifies, (struct obj *));
@@ -94,20 +96,41 @@ int hurt;
     }
 }
 
+/* Extra pacifist attack checks; FALSE means it's OK to attack. */
+STATIC_OVL boolean
+pacifist_attack_checks(mtmp, wep)
+struct monst *mtmp;
+struct obj *wep; /* uwep for attack(), null for kick_monster() */
+{
+    if (Confusion || Hallucination || Stunned)
+        return FALSE;
+
+    /* Intelligent chaotic weapons (Stormbringer) want blood */
+    if (wep && wep->oartifact == ART_STORMBRINGER) {
+        /* Don't show Stormbringer's message unless pacifist. */
+        if (iflags.attack_mode == ATTACK_MODE_PACIFIST)
+            override_confirmation = TRUE;
+        return FALSE;
+    }
+
+    if (iflags.attack_mode == ATTACK_MODE_PACIFIST) {
+        You("stop for %s.", mon_nam(mtmp));
+        context.move = 0;
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
 /* FALSE means it's OK to attack */
 boolean
 attack_checks(mtmp, wep, mode)
-register struct monst *mtmp;
+struct monst *mtmp;
 struct obj *wep; /* uwep for attack(), null for kick_monster() */
 int mode; /* 0 = normal checks; 1 = pre-confirmed; 2 = force fight */
 {
-    char qbuf[QBUFSZ];
-
     /* if you're close enough to attack, alert any waiting monster */
     mtmp->mstrategy &= ~STRAT_WAITMASK;
-
-    if (u.uswallow && mtmp == u.ustuck)
-        return FALSE;
 
     if (mode == 2 || context.forcefight) {
         /* Do this in the caller, after we checked that the monster
@@ -123,6 +146,9 @@ int mode; /* 0 = normal checks; 1 = pre-confirmed; 2 = force fight */
          */
         return FALSE;
     }
+
+    if (u.uswallow && mtmp == u.ustuck)
+        return pacifist_attack_checks(mtmp, wep);
 
     /* Put up an invisible monster marker, but with exceptions for
      * monsters that hide and monsters you've been warned about.
@@ -158,7 +184,7 @@ int mode; /* 0 = normal checks; 1 = pre-confirmed; 2 = force fight */
          */
         if (glyph_is_invisible(levl[mtmp->mx][mtmp->my].glyph)) {
             seemimic(mtmp);
-            return FALSE;
+            return pacifist_attack_checks(mtmp, wep);
         }
         stumble_onto_mimic(mtmp);
         return TRUE;
@@ -171,7 +197,7 @@ int mode; /* 0 = normal checks; 1 = pre-confirmed; 2 = force fight */
         newsym(mtmp->mx, mtmp->my);
         if (glyph_is_invisible(levl[mtmp->mx][mtmp->my].glyph)) {
             seemimic(mtmp);
-            return FALSE;
+            return pacifist_attack_checks(mtmp, wep);
         }
         if (!((Blind ? Blind_telepat : Unblind_telepat) || Detect_monsters)) {
             struct obj *obj;
@@ -194,23 +220,36 @@ int mode; /* 0 = normal checks; 1 = pre-confirmed; 2 = force fight */
         wakeup(mtmp);
     }
 
-    if (flags.confirm && mtmp->mpeaceful && !Confusion && !Hallucination
-        && !Stunned) {
+    if (mtmp->mpeaceful && !Confusion && !Hallucination && !Stunned) {
         /* Intelligent chaotic weapons (Stormbringer) want blood */
         if (wep && wep->oartifact == ART_STORMBRINGER) {
-            override_confirmation = TRUE;
+            /* Don't show Stormbringer's message if attack is intended. */
+            if (iflags.attack_mode != ATTACK_MODE_FIGHT_ALL)
+                override_confirmation = TRUE;
             return FALSE;
         }
         if (canspotmon(mtmp)) {
-            Sprintf(qbuf, "Really attack %s?", mon_nam(mtmp));
-            if (mode == 0 && !paranoid_query(ParanoidHit, qbuf)) {
-                context.move = 0;
+            if (iflags.attack_mode == ATTACK_MODE_CHAT
+                || iflags.attack_mode == ATTACK_MODE_PACIFIST) {
+                if (mtmp->data->msound == MS_PRIEST) {
+                    /* Prevent accidental donation prompt. */
+                    pline("%s mutters a prayer.", Monnam(mtmp));
+                } else if (!dochat(FALSE, u.dx, u.dy, 0)) {
+                    context.move = 0;
+                }
                 return TRUE;
+            } else if (iflags.attack_mode == ATTACK_MODE_ASK) {
+                char qbuf[QBUFSZ];
+                Sprintf(qbuf, "Really attack %s?", mon_nam(mtmp));
+                if (mode == 0 && !paranoid_query(ParanoidHit, qbuf)) {
+                    context.move = 0;
+                    return TRUE;
+                }
             }
         }
     }
 
-    return FALSE;
+    return pacifist_attack_checks(mtmp, wep);
 }
 
 /*

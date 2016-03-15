@@ -104,7 +104,6 @@ static struct Bool_Opt {
 #else /* systems that support multiple terminals, many monochrome */
     { "color", &iflags.wc_color, FALSE, SET_IN_GAME }, /*WC*/
 #endif
-    { "confirm", &flags.confirm, TRUE, SET_IN_GAME },
     { "dark_room", &flags.dark_room, TRUE, SET_IN_GAME },
     { "eight_bit_tty", &iflags.wc_eight_bit_input, FALSE,
       SET_IN_GAME }, /*WC*/
@@ -260,6 +259,8 @@ static struct Comp_Opt {
     { "align_message", "message window alignment", 20, DISP_IN_GAME }, /*WC*/
     { "align_status", "status window alignment", 20, DISP_IN_GAME },   /*WC*/
     { "altkeyhandler", "alternate key handler", 20, DISP_IN_GAME },
+    { "attack_mode", "attack, refrain or ask to attack monsters", 1,
+      SET_IN_GAME },
 #ifdef BACKWARD_COMPAT
     { "boulder", "deprecated (use S_boulder in sym file instead)", 1,
       SET_IN_FILE },
@@ -692,6 +693,7 @@ initoptions_init()
 #endif
     iflags.menu_headings = ATR_INVERSE;
     iflags.getpos_coords = GPCOORDS_NONE;
+    iflags.attack_mode = ATTACK_MODE_CHAT;
 
     /* hero's role, race, &c haven't been chosen yet */
     flags.initrole = flags.initrace = flags.initgend = flags.initalign =
@@ -1922,6 +1924,30 @@ boolean tinitial, tfrom_file;
 
     duplicate =
         duplicate_opt_detection(opts, 1); /* 1 means check compounds */
+
+    fullname = "attack_mode";
+    /* attack_mode:pacifist, chat, ask, or fight */
+    if (match_optname(opts, fullname, 11, TRUE)) {
+        if (duplicate)
+            complain_about_duplicate(opts, 1);
+        if (negated) {
+            bad_negation(fullname, FALSE);
+        } else if ((op = string_for_opt(opts, FALSE))) {
+            int tmp = tolower(*op);
+            switch (tmp) {
+            case ATTACK_MODE_PACIFIST:
+            case ATTACK_MODE_CHAT:
+            case ATTACK_MODE_ASK:
+            case ATTACK_MODE_FIGHT_ALL:
+                iflags.attack_mode = tmp;
+                break;
+            default:
+                badoption(opts);
+                return;
+            }
+        }
+        return;
+    }
 
     fullname = "pettype";
     if (match_optname(opts, fullname, 3, TRUE)) {
@@ -3930,11 +3956,35 @@ boolean setinitial, setfromfile;
     char buf[BUFSZ];
 
     /* Special handling of menustyle, pickup_burden, pickup_types,
-     * disclose, runmode, msg_window, menu_headings, sortloot,
+     * disclose, runmode, msg_window, menu_headings, sortloot, attack_mode,
      * and number_pad options.
      * Also takes care of interactive autopickup_exception_handling changes.
      */
-    if (!strcmp("menustyle", optname)) {
+    if (!strcmp("attack_mode", optname)) {
+        menu_item *pick = (menu_item *) 0;
+        tmpwin = create_nhwindow(NHW_MENU);
+        start_menu(tmpwin);
+        any = zeroany;
+        any.a_char = ATTACK_MODE_PACIFIST;
+        add_menu(tmpwin, NO_GLYPH, &any, ATTACK_MODE_PACIFIST, 0, 0,
+                 "pacifist: don't fight anything", MENU_UNSELECTED);
+        any.a_char = ATTACK_MODE_CHAT;
+        add_menu(tmpwin, NO_GLYPH, &any, ATTACK_MODE_CHAT, 0, 0,
+                 "chat: chat with peacefuls, fight hostiles",
+                 MENU_UNSELECTED);
+        any.a_char = ATTACK_MODE_ASK;
+        add_menu(tmpwin, NO_GLYPH, &any, ATTACK_MODE_ASK, 0, 0,
+                 "ask: ask to fight peacefuls", MENU_UNSELECTED);
+        any.a_char = ATTACK_MODE_FIGHT_ALL;
+        add_menu(tmpwin, NO_GLYPH, &any, ATTACK_MODE_FIGHT_ALL, 0, 0,
+                 "fightall: fight peacefuls and hostiles", MENU_UNSELECTED);
+        end_menu(tmpwin, "Select attack_mode:");
+        if (select_menu(tmpwin, PICK_ONE, &pick) > 0) {
+            iflags.attack_mode = pick->item.a_char;
+            free((genericptr_t) pick);
+        }
+        destroy_nhwindow(tmpwin);
+    } else if (!strcmp("menustyle", optname)) {
         const char *style_name;
         menu_item *style_pick = (menu_item *) 0;
         tmpwin = create_nhwindow(NHW_MENU);
@@ -4690,6 +4740,17 @@ char *buf;
                 iflags.altkeyhandler[0] ? iflags.altkeyhandler : "default");
 #endif
 #ifdef BACKWARD_COMPAT
+    else if (!strcmp(optname, "attack_mode"))
+        Sprintf(buf, "%s",
+                iflags.attack_mode == ATTACK_MODE_PACIFIST
+                    ? "pacifist"
+                    : iflags.attack_mode == ATTACK_MODE_CHAT
+                        ? "chat"
+                        : iflags.attack_mode == ATTACK_MODE_ASK
+                            ? "ask"
+                            : iflags.attack_mode == ATTACK_MODE_FIGHT_ALL
+                                ? "fight"
+                                : none);
     else if (!strcmp(optname, "boulder"))
         Sprintf(buf, "%c",
                 iflags.bouldersym

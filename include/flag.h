@@ -22,7 +22,7 @@ struct flag {
     boolean beginner;
     boolean biff;      /* enable checking for mail */
     boolean bones;     /* allow saving/loading bones */
-    boolean confirm;   /* confirm before hitting tame monsters */
+    boolean confirm;   /* TODO: Unused, remove on next savebreak. */
     boolean dark_room; /* show shadows in lit rooms */
     boolean debug;     /* in debugging mode */
 #define wizard flags.debug
@@ -173,6 +173,12 @@ struct sysflag {
 #define GPCOORDS_COMPASS 'c'
 #define GPCOORDS_SCREEN  's'
 
+/* values for iflags.attack_mode */
+#define ATTACK_MODE_PACIFIST  'p'
+#define ATTACK_MODE_CHAT      'c'
+#define ATTACK_MODE_ASK       'a'
+#define ATTACK_MODE_FIGHT_ALL 'f'
+
 struct instance_flags {
     /* stuff that really isn't option or platform related. They are
      * set and cleared during the game to control the internal
@@ -198,6 +204,7 @@ struct instance_flags {
 #ifdef ALTMETA
     boolean altmeta; /* Alt-c sends ESC c rather than M-c */
 #endif
+    char attack_mode;         /* attack, refrain or ask to attack monsters */
     boolean cbreak;           /* in cbreak mode, rogue format */
     boolean deferred_X;       /* deferred entry into explore mode */
     boolean num_pad;          /* use numbers for movement commands */

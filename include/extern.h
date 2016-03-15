@@ -2171,6 +2171,7 @@ E void FDECL(yelp, (struct monst *));
 E void FDECL(whimper, (struct monst *));
 E void FDECL(beg, (struct monst *));
 E int NDECL(dotalk);
+E int FDECL(dochat, (BOOLEAN_P, int, int, int));
 #ifdef USER_SOUNDS
 E int FDECL(add_sound_mapping, (const char *));
 E void FDECL(play_sound_for_message, (const char *));
