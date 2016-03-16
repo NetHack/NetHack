@@ -1668,6 +1668,7 @@ grow_up(mtmp, victim)
 struct monst *mtmp, *victim;
 {
     int oldtype, newtype, max_increase, cur_increase, lev_limit, hp_threshold;
+    unsigned fem;
     struct permonst *ptr = mtmp->data;
 
     /* monster died after killing enemy but before calling this function */
@@ -1728,6 +1729,9 @@ struct monst *mtmp, *victim;
     else if (lev_limit > 49)
         lev_limit = (ptr->mlevel > 49 ? 50 : 49);
 
+    /* new form might force gender change */
+    fem = is_male(ptr) ? 0 : is_female(ptr) ? 1 : mtmp->female;
+
     if ((int) ++mtmp->m_lev >= mons[newtype].mlevel && newtype != oldtype) {
         ptr = &mons[newtype];
         if (mvitals[newtype].mvflags & G_GENOD) { /* allow G_EXTINCT */
@@ -1739,14 +1743,31 @@ struct monst *mtmp, *victim;
             mondied(mtmp);
             return (struct permonst *) 0;
         } else if (canspotmon(mtmp)) {
+            char buf[BUFSZ];
+
+            /* 3.6.1:
+             * Temporary (?) hack to fix growing into opposite gender.
+             */
+            Sprintf(buf, "%s%s",
+                    /* deal with female gnome becoming a gnome lord */
+                    (mtmp->female && !fem) ? "male "
+                        /* or a male gnome becoming a gnome lady
+                           (can't happen with 3.6.0 mons[], but perhaps
+                           slightly less sexist if prepared for it...) */
+                      : (fem && !mtmp->female) ? "female " : "",
+                    ptr->mname);
             pline("%s %s %s.", Monnam(mtmp),
-                  humanoid(ptr) ? "becomes" : "grows up into",
-                  an(ptr->mname));
+                  (fem != mtmp->female) ? "changes into"
+                                        : humanoid(ptr) ? "becomes"
+                                                        : "grows up into",
+                  an(buf));
         }
         set_mon_data(mtmp, ptr, 1);    /* preserve intrinsics */
         newsym(mtmp->mx, mtmp->my);    /* color may change */
         lev_limit = (int) mtmp->m_lev; /* never undo increment */
     }
+    mtmp->female = fem; /* gender might be changing */
+
     /* sanity checks */
     if ((int) mtmp->m_lev > lev_limit) {
         mtmp->m_lev--; /* undo increment */
