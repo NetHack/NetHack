@@ -360,9 +360,6 @@ char **argv UNUSED;
     (void) signal(SIGWINCH, (SIG_RET_TYPE) winch_handler);
 #endif
 
-    /* add one a space forward menu command alias */
-    add_menu_cmd_alias(' ', MENU_NEXT_PAGE);
-
     tty_clear_nhwindow(BASE_WINDOW);
 
     tty_putstr(BASE_WINDOW, 0, "");
@@ -1863,6 +1860,7 @@ struct WinDesc *cw;
 
             /* set extra chars.. */
             Strcat(resp, default_menu_cmds);
+            Strcat(resp, " ");                  /* next page or end */
             Strcat(resp, "0123456789\033\n\r"); /* counts, quit */
             Strcat(resp, gacc);                 /* group accelerators */
             Strcat(resp, mapped_menu_cmds);
@@ -1946,12 +1944,15 @@ struct WinDesc *cw;
                 break;
             }
         /* else fall through */
+        case ' ':
         case MENU_NEXT_PAGE:
             if (cw->npages > 0 && curr_page != cw->npages - 1) {
                 curr_page++;
                 page_start = 0;
-            } else
-                finished = TRUE; /* questionable behavior */
+            } else if (morc == ' ') {
+                /* ' ' finishes menus here, but stop '>' doing the same. */
+                finished = TRUE;
+            }
             break;
         case MENU_PREVIOUS_PAGE:
             if (cw->npages > 0 && curr_page != 0) {
