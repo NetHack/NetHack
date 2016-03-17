@@ -12,6 +12,9 @@
  * to back out the changes. */
 #define H2344_BROKEN
 
+/* Allow text windows to be scrolled with the menu scrolling keys. */
+#define TTY_FULL_TEXT_SCROLL
+
 #include "hack.h"
 
 #ifdef TTY_GRAPHICS
@@ -161,6 +164,11 @@ STATIC_DCL void FDECL(invert_all_on_page,
 STATIC_DCL void FDECL(invert_all,
                       (winid, tty_menu_item *, tty_menu_item *, CHAR_P));
 STATIC_DCL void FDECL(process_menu_window, (winid, struct WinDesc *));
+#ifdef TTY_FULL_TEXT_SCROLL
+STATIC_DCL void FDECL(append_filtered, (char *, const char *,
+                                        boolean (*)(CHAR_P)));
+STATIC_DCL boolean FDECL(menu_page_keys, (CHAR_P));
+#endif
 STATIC_DCL void FDECL(process_text_window, (winid, struct WinDesc *));
 STATIC_DCL tty_menu_item *FDECL(reverse, (tty_menu_item *));
 STATIC_DCL const char *FDECL(compress_str, (const char *));
@@ -2057,11 +2065,162 @@ struct WinDesc *cw;
     free((genericptr_t) morestr);
 }
 
+#ifdef TTY_FULL_TEXT_SCROLL
+STATIC_OVL void
+append_filtered(dest, unfiltered, filter)
+char *dest;
+const char *unfiltered;
+boolean (*filter)(CHAR_P);
+{
+    char *d = eos(dest);
+    const char *c;
+    for (c = unfiltered; *c; c++) {
+        if ((*filter)(*c)) {
+            *d = *c;
+            d++;
+        }
+    }
+}
+
+STATIC_OVL boolean
+menu_page_keys(c)
+char c;
+{
+    return (c == MENU_FIRST_PAGE
+            || c == MENU_LAST_PAGE
+            || c == MENU_NEXT_PAGE
+            || c == MENU_PREVIOUS_PAGE);
+}
+#endif /* TTY_FULL_TEXT_SCROLL */
+
 STATIC_OVL void
 process_text_window(window, cw)
 winid window;
 struct WinDesc *cw;
 {
+#ifdef TTY_FULL_TEXT_SCROLL
+    boolean done = FALSE;
+    char resp[QBUFSZ];
+    int page_offset = 0;
+    int page_height = ttyDisplay->rows - cw->offy - 1;
+
+    resp[0] = '\0';
+    Strcat(resp, "\033"); /* quit */
+    Strcat(resp, " \r\n"); /* next page or end */
+    append_filtered(resp, mapped_menu_cmds, &menu_page_keys);
+    append_filtered(resp, default_menu_cmds, &menu_page_keys);
+
+    while (!done) {
+        int y;
+        boolean end_of_text;
+
+        /* Draw the text lines. */
+        for (y = 0; page_offset + y < cw->maxrow && y < page_height; y++) {
+            int i = page_offset + y;
+            int attr;
+            char *cp;
+
+            if (!cw->data[i])
+                continue;
+
+            tty_curs(window, 1, y);
+#ifndef H2344_BROKEN
+            if (cw->offx)
+#endif
+                cl_end();
+            attr = cw->data[i][0] - 1;
+            if (cw->offx) {
+                putchar(' ');
+                ++ttyDisplay->curx;
+            }
+            term_start_attr(attr);
+            for (cp = &cw->data[i][1];
+#ifndef WIN32CON
+                 *cp && ++ttyDisplay->curx < ttyDisplay->cols;
+                 cp++
+#else
+                 *cp && ttyDisplay->curx < ttyDisplay->cols;
+                 cp++, ttyDisplay->curx++
+#endif
+                 )
+                putchar(*cp);
+            term_end_attr(attr);
+        }
+
+        /* Figure this out before to emulate old behavior. */
+        end_of_text = (page_offset + y == cw->maxrow);
+
+        if (end_of_text) {
+#ifdef H2344_BROKEN
+            if (cw->type == NHW_TEXT) {
+                tty_curs(BASE_WINDOW, 1, ttyDisplay->cury + 1);
+                cl_eos();
+            }
+#endif
+            tty_curs(BASE_WINDOW, cw->offx + 1,
+                     (cw->type == NHW_TEXT) ? ttyDisplay->rows - 1 : y);
+            cl_end();
+        } else if (!cw->offx) {
+            tty_curs(window, 1, y);
+            cl_end();
+        }
+
+        /* Wait for input. */
+        dmore(cw, resp);
+
+        /* Recalculate in case screen was resized while awaiting input. */
+        page_height = ttyDisplay->rows - cw->offy - 1;
+
+        switch (morc) {
+        case '\033':
+            cw->flags |= WIN_CANCELLED;
+            done = TRUE;
+            break;
+        case ' ':
+        case '\r':
+        /*case '\n':*/
+        case '\0':
+            /*
+             * What's with the '\0' instead of '\n' above, you ask?  dmore()
+             * calls xwaitforspace(), which *specifically* returns '\0' when it
+             * gets a '\n' character.  No other character is treated like this,
+             * and no, it doesn't make any sense.
+             */
+            if (page_offset + page_height < cw->maxrow)
+                page_offset += page_height;
+            else
+                done = TRUE;
+            break;
+        default:
+            switch (map_menu_cmd(morc)) {
+            case MENU_FIRST_PAGE:
+                page_offset = 0;
+                break;
+            case MENU_LAST_PAGE:
+                page_offset = ((cw->maxrow - 1) / page_height) * page_height;
+                break;
+            case MENU_NEXT_PAGE:
+                if (page_offset + page_height < cw->maxrow)
+                    page_offset += page_height;
+                break;
+            case MENU_PREVIOUS_PAGE:
+                page_offset -= page_height;
+                if (page_offset < 0)
+                    page_offset = 0;
+                break;
+            }
+        }
+
+        if (!done && !end_of_text && !cw->offx) {
+            if (cw->offy) {
+                tty_curs(window, 1, 0);
+                cl_eos();
+            } else {
+                clear_screen();
+            }
+        }
+    }
+#else /* !TTY_FULL_TEXT_SCROLL */
     int i, n, attr;
     register char *cp;
 
@@ -2121,6 +2280,7 @@ struct WinDesc *cw;
         if (morc == '\033')
             cw->flags |= WIN_CANCELLED;
     }
+#endif /* !TTY_FULL_TEXT_SCROLL */
 }
 
 /*ARGSUSED*/
@@ -2542,8 +2702,9 @@ const char *str;
         if (cw->type == NHW_TEXT && cw->cury == ttyDisplay->rows - 1)
 #endif
         {
-            /* not a menu, so save memory and output 1 page at a time */
             cw->maxcol = ttyDisplay->cols; /* force full-screen mode */
+#ifndef TTY_FULL_TEXT_SCROLL
+            /* not a menu, so save memory and output 1 page at a time */
             tty_display_nhwindow(window, TRUE);
             for (i = 0; i < cw->maxrow; i++)
                 if (cw->data[i]) {
@@ -2551,6 +2712,7 @@ const char *str;
                     cw->data[i] = 0;
                 }
             cw->maxrow = cw->cury = 0;
+#endif
         }
         /* always grows one at a time, but alloc 12 at a time */
         if (cw->cury >= cw->rows) {
