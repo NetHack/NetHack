@@ -288,7 +288,7 @@ worst_cursed_item()
     } else if (uright && uright->cursed) { /* right ring */
         otmp = uright;
     } else if (ublindf && ublindf->cursed) { /* eyewear */
-        otmp = ublindf;                      /* must be non-blinding lenses */
+        otmp = ublindf; /* must be non-blinding lenses */
         /* if weapon wasn't handled above, do it now */
     } else if (welded(uwep)) { /* weapon */
         otmp = uwep;
@@ -1040,8 +1040,15 @@ pleased(aligntyp g_align)
             ABASE(A_STR) = AMAX(A_STR);
             if (u.uhunger < 900)
                 init_uhunger();
+            /* luck couldn't have been negative at start of prayer because
+               the prayer would have failed, but might have been decremented
+               due to a timed event (delayed death of peaceful monster hit
+               by hero-created stinking cloud) during the praying interval */
             if (u.uluck < 0)
                 u.uluck = 0;
+            /* superfluous; if hero was blinded we'd be handling trouble
+               rather than issuing a pat-on-head */
+            u.ucreamed = 0;
             make_blinded(0L, TRUE);
             context.botl = 1;
             break;
