@@ -2555,18 +2555,19 @@ register struct monst *mtmp;
                 }
             } else if (in_sight) {
                 newsym(mtmp->mx, mtmp->my);
-                pline("KAABLAMM!!!  %s triggers %s land mine!", Monnam(mtmp),
+                pline("%s%s triggers %s land mine!",
+                      !Deaf ? "KAABLAMM!!!  " : "", Monnam(mtmp),
                       a_your[trap->madeby_u]);
             }
-            if (!in_sight)
+            if (!in_sight && !Deaf)
                 pline("Kaablamm!  You hear an explosion in the distance!");
             blow_up_landmine(trap);
             /* explosion might have destroyed a drawbridge; don't
                dish out more damage if monster is already dead */
             if (mtmp->mhp <= 0
-                || thitm(0, mtmp, (struct obj *) 0, rnd(16), FALSE))
+                || thitm(0, mtmp, (struct obj *) 0, rnd(16), FALSE)) {
                 trapkilled = TRUE;
-            else {
+            } else {
                 /* monsters recursively fall into new pit */
                 if (mintrap(mtmp) == 2)
                     trapkilled = TRUE;

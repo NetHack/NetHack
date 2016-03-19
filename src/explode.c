@@ -576,7 +576,10 @@ struct obj *obj; /* only scatter this obj        */
             && ((otmp->otyp == BOULDER) || (otmp->otyp == STATUE))
             && rn2(10)) {
             if (otmp->otyp == BOULDER) {
-                pline("%s apart.", Tobjnam(otmp, "break"));
+                if (cansee(sx, sy))
+                    pline("%s apart.", Tobjnam(otmp, "break"));
+                else
+                    You_hear("stone breaking.");
                 fracture_rock(otmp);
                 place_object(otmp, sx, sy);
                 if ((otmp = sobj_at(BOULDER, sx, sy)) != 0) {
@@ -589,7 +592,10 @@ struct obj *obj; /* only scatter this obj        */
 
                 if ((trap = t_at(sx, sy)) && trap->ttyp == STATUE_TRAP)
                     deltrap(trap);
-                pline("%s.", Tobjnam(otmp, "crumble"));
+                if (cansee(sx, sy))
+                    pline("%s.", Tobjnam(otmp, "crumble"));
+                else
+                    You_hear("stone crumbling.");
                 (void) break_statue(otmp);
                 place_object(otmp, sx, sy); /* put fragments on floor */
             }
@@ -604,8 +610,8 @@ struct obj *obj; /* only scatter this obj        */
         }
 
         if (!used_up) {
-            stmp =
-                (struct scatter_chain *) alloc(sizeof(struct scatter_chain));
+            stmp = (struct scatter_chain *)
+                                         alloc(sizeof (struct scatter_chain));
             stmp->next = (struct scatter_chain *) 0;
             stmp->obj = otmp;
             stmp->ox = sx;
