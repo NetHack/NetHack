@@ -464,7 +464,7 @@ int what; /* should be a long */
     int i, n, res, count, n_tried = 0, n_picked = 0;
     menu_item *pick_list = (menu_item *) 0;
     boolean autopickup = what > 0;
-    struct obj *objchain;
+    struct obj **objchain_p;
     int traverse_how;
 
     /* we might have arrived here while fainted or sleeping, via
@@ -522,10 +522,10 @@ int what; /* should be a long */
 
     add_valid_menu_class(0); /* reset */
     if (!u.uswallow) {
-        objchain = level.objects[u.ux][u.uy];
+        objchain_p = &level.objects[u.ux][u.uy];
         traverse_how = BY_NEXTHERE;
     } else {
-        objchain = u.ustuck->minvent;
+        objchain_p = &u.ustuck->minvent;
         traverse_how = 0; /* nobj */
     }
     /*
@@ -535,7 +535,7 @@ int what; /* should be a long */
      * to make things less confusing.
      */
     if (autopickup) {
-        n = autopick(objchain, traverse_how, &pick_list);
+        n = autopick(*objchain_p, traverse_how, &pick_list);
         goto menu_pickup;
     }
 
@@ -547,16 +547,17 @@ int what; /* should be a long */
 
             Sprintf(qbuf, "Pick %d of what?", count);
             val_for_n_or_more = count; /* set up callback selector */
-            n = query_objlist(qbuf, &objchain, traverse_how,
+            n = query_objlist(qbuf, objchain_p, traverse_how,
                               &pick_list, PICK_ONE, n_or_more);
             /* correct counts, if any given */
             for (i = 0; i < n; i++)
                 pick_list[i].count = count;
         } else {
-            n = query_objlist("Pick up what?", &objchain,
+            n = query_objlist("Pick up what?", objchain_p,
                               (traverse_how | FEEL_COCKATRICE),
                               &pick_list, PICK_ANY, all_but_uchain);
         }
+
     menu_pickup:
         n_tried = n;
         for (n_picked = i = 0; i < n; i++) {
@@ -582,12 +583,12 @@ int what; /* should be a long */
         selective = FALSE;    /* ask for each item */
 
         /* check for more than one object */
-        for (obj = objchain; obj; obj = FOLLOW(obj, traverse_how))
+        for (obj = *objchain_p; obj; obj = FOLLOW(obj, traverse_how))
             ct++;
 
         if (ct == 1 && count) {
             /* if only one thing, then pick it */
-            obj = objchain;
+            obj = *objchain_p;
             lcount = min(obj->quan, (long) count);
             n_tried++;
             if (pickup_object(obj, lcount, FALSE) > 0)
@@ -599,14 +600,14 @@ int what; /* should be a long */
 
             There("are %s objects here.", (ct <= 10) ? "several" : "many");
             if (!query_classes(oclasses, &selective, &all_of_a_type,
-                               "pick up", objchain,
+                               "pick up", *objchain_p,
                                (traverse_how & BY_NEXTHERE) ? TRUE : FALSE,
                                &via_menu)) {
                 if (!via_menu)
                     return 0;
                 if (selective)
                     traverse_how |= INVORDER_SORT;
-                n = query_objlist("Pick up what?", &objchain, traverse_how,
+                n = query_objlist("Pick up what?", objchain_p, traverse_how,
                                   &pick_list, PICK_ANY,
                                   (via_menu == -2) ? allow_all
                                                    : allow_category);
@@ -614,7 +615,7 @@ int what; /* should be a long */
             }
         }
 
-        for (obj = objchain; obj; obj = obj2) {
+        for (obj = *objchain_p; obj; obj = obj2) {
             obj2 = FOLLOW(obj, traverse_how);
             if (!selective && oclasses[0] && !index(oclasses, obj->oclass))
                 continue;
