@@ -464,7 +464,7 @@ int what; /* should be a long */
     int i, n, res, count, n_tried = 0, n_picked = 0;
     menu_item *pick_list = (menu_item *) 0;
     boolean autopickup = what > 0;
-    struct obj *objchain;
+    struct obj *objchain,**objchainptr;
     int traverse_how;
 
     /* we might have arrived here while fainted or sleeping, via
@@ -523,9 +523,11 @@ int what; /* should be a long */
     add_valid_menu_class(0); /* reset */
     if (!u.uswallow) {
         objchain = level.objects[u.ux][u.uy];
+        objchainptr = &(level.objects[u.ux][u.uy]);
         traverse_how = BY_NEXTHERE;
     } else {
         objchain = u.ustuck->minvent;
+        objchainptr = &(u.ustuck->minvent);
         traverse_how = 0; /* nobj */
     }
     /*
@@ -547,13 +549,13 @@ int what; /* should be a long */
 
             Sprintf(qbuf, "Pick %d of what?", count);
             val_for_n_or_more = count; /* set up callback selector */
-            n = query_objlist(qbuf, &objchain, traverse_how,
+            n = query_objlist(qbuf, objchainptr, traverse_how,
                               &pick_list, PICK_ONE, n_or_more);
             /* correct counts, if any given */
             for (i = 0; i < n; i++)
                 pick_list[i].count = count;
         } else {
-            n = query_objlist("Pick up what?", &objchain,
+            n = query_objlist("Pick up what?", objchainptr,
                               (traverse_how | FEEL_COCKATRICE),
                               &pick_list, PICK_ANY, all_but_uchain);
         }
@@ -606,7 +608,7 @@ int what; /* should be a long */
                     return 0;
                 if (selective)
                     traverse_how |= INVORDER_SORT;
-                n = query_objlist("Pick up what?", &objchain, traverse_how,
+                n = query_objlist("Pick up what?", objchainptr, traverse_how,
                                   &pick_list, PICK_ANY,
                                   (via_menu == -2) ? allow_all
                                                    : allow_category);
