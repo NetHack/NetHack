@@ -823,7 +823,7 @@ boolean FDECL((*allow), (OBJ_P)); /* allow function */
         return 1;
     }
 
-    if (sorted) {
+    if (sorted || flags.sortloot != 'n') {
         sortloot(&olist,
                  (((flags.sortloot == 'f'
                     || (flags.sortloot == 'l' && !(qflags & USE_INVLET)))
