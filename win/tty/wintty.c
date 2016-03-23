@@ -1774,15 +1774,6 @@ struct WinDesc *cw;
                      page_lines++, curr = curr->next) {
                     int color = NO_COLOR, attr = ATR_NONE;
                     boolean menucolr = FALSE;
-                    int select_pos = -1; /* -/+/# position for selectables */
-                    int format_start_pos = 0; /* menu color/attr start pos */
-
-                    if (curr->identifier.a_void != 0) {
-                        /* "a - whatever" */
-                        select_pos = 2; /* '-' */
-                        format_start_pos = 4; /* start of "whatever" */
-                    }
-
                     if (curr->selector)
                         *rp++ = curr->selector;
 
@@ -1799,31 +1790,27 @@ struct WinDesc *cw;
                      * actually output the character.  We're faster doing
                      * this.
                      */
+                    if (iflags.use_menu_color
+                        && (menucolr = get_menu_coloring(curr->str, &color,
+                                                         &attr))) {
+                        term_start_attr(attr);
+#ifdef TEXTCOLOR
+                        if (color != NO_COLOR)
+                            term_start_color(color);
+#endif
+                    } else
+                        term_start_attr(curr->attr);
                     for (n = 0, cp = curr->str;
 #ifndef WIN32CON
                          *cp
                          && (int) ++ttyDisplay->curx < (int) ttyDisplay->cols;
-                         cp++, n++
+                         cp++, n++)
 #else
                          *cp
                          && (int) ttyDisplay->curx < (int) ttyDisplay->cols;
-                         cp++, n++, ttyDisplay->curx++
+                         cp++, n++, ttyDisplay->curx++)
 #endif
-                        ) {
-                        if (n == format_start_pos) {
-                            if (iflags.use_menu_color
-                                && (menucolr = get_menu_coloring(curr->str,
-                                                                 &color,
-                                                                 &attr))) {
-                                term_start_attr(attr);
-#ifdef TEXTCOLOR
-                                if (color != NO_COLOR)
-                                    term_start_color(color);
-#endif
-                            } else
-                                term_start_attr(curr->attr);
-                        }
-                        if (n == select_pos && curr->identifier.a_void != 0
+                        if (n == 2 && curr->identifier.a_void != 0
                             && curr->selected) {
                             if (curr->count == -1L)
                                 (void) putchar('+'); /* all selected */
@@ -1831,7 +1818,6 @@ struct WinDesc *cw;
                                 (void) putchar('#'); /* count selected */
                         } else
                             (void) putchar(*cp);
-                    }
                     if (iflags.use_menu_color && menucolr) {
 #ifdef TEXTCOLOR
                         if (color != NO_COLOR)
