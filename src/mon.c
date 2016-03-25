@@ -3209,7 +3209,7 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
     int hpn, hpd;
     int mndx, tryct;
     struct permonst *olddata = mtmp->data;
-    char oldname[BUFSZ], l_oldname[BUFSZ], newname[BUFSZ];
+    char *p, oldname[BUFSZ], l_oldname[BUFSZ], newname[BUFSZ];
 
     /* Riders are immune to polymorph and green slime
        (but apparent Rider might actually be a doppelganger) */
@@ -3224,7 +3224,7 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
     }
     /* we need this one whether msg is true or not */
     Strcpy(l_oldname, x_monnam(mtmp, ARTICLE_THE, (char *) 0,
-                (has_mname(mtmp)) ? SUPPRESS_SADDLE : 0, FALSE));
+                               has_mname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE));
 
     /* mdat = 0 -> caller wants a random monster shape */
     if (mdat == 0) {
@@ -3247,23 +3247,18 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
     } else if (mvitals[monsndx(mdat)].mvflags & G_GENOD)
         return 0; /* passed in mdat is genocided */
 
-    if (mdat == mtmp->data)
+    if (mdat == olddata)
         return 0; /* still the same monster */
 
     mgender_from_permonst(mtmp, mdat);
-
-    if (In_endgame(&u.uz) && is_mplayer(olddata) && has_mname(mtmp)) {
-        /* mplayers start out as "Foo the Bar", but some of the
-         * titles are inappropriate when polymorphed, particularly
-         * into the opposite sex.  players don't use ranks when
-         * polymorphed, so dropping the rank for mplayers seems
-         * reasonable.
-         */
-        char *p = index(MNAME(mtmp), ' ');
-
-        if (p)
-            *p = '\0';
-    }
+    /* Endgame mplayers start out as "Foo the Bar", but some of the
+     * titles are inappropriate when polymorphed, particularly into
+     * the opposite sex.  Player characters don't use ranks when
+     * polymorphed, so dropping rank for mplayers seems reasonable.
+     */
+    if (In_endgame(&u.uz) && is_mplayer(olddata)
+        && has_mname(mtmp) && (p = strstr(MNAME(mtmp), " the ")) != 0)
+        *p = '\0';
 
     if (mtmp->wormno) { /* throw tail away */
         wormgone(mtmp);

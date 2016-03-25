@@ -221,11 +221,17 @@ struct obj *otmp;
                it guard against involuntary polymorph attacks too... */
             shieldeff(mtmp->mx, mtmp->my);
         } else if (!resist(mtmp, otmp->oclass, 0, NOTELL)) {
+            boolean polyspot = (otyp != POT_POLYMORPH),
+                    give_msg = (!Hallucination
+                                && (canseemon(mtmp)
+                                    || (u.uswallow && mtmp == u.ustuck)));
+
             /* dropped inventory (due to death by system shock,
                or loss of wielded weapon and/or worn armor due to
                limitations of new shape) won't be hit by this zap */
-            for (obj = mtmp->minvent; obj; obj = obj->nobj)
-                bypass_obj(obj);
+            if (polyspot)
+                for (obj = mtmp->minvent; obj; obj = obj->nobj)
+                    bypass_obj(obj);
             /* natural shapechangers aren't affected by system shock
                (unless protection from shapechangers is interfering
                with their metabolism...) */
@@ -238,8 +244,15 @@ struct obj *otmp;
                 /* no corpse after system shock */
                 xkilled(mtmp, 3);
             } else if (newcham(mtmp, (struct permonst *) 0,
-                               (otyp != POT_POLYMORPH), FALSE)) {
-                if (!Hallucination && canspotmon(mtmp))
+                               polyspot, give_msg) != 0
+                       /* if shapechange failed because there aren't
+                          enough eligible candidates (most likely for
+                          vampshifter), try reverting to original form */
+                       || (mtmp->cham >= LOW_PM
+                           && newcham(mtmp, &mons[mtmp->cham],
+                                      polyspot, give_msg) != 0)) {
+                if (give_msg && (canspotmon(mtmp)
+                                 || (u.uswallow && mtmp == u.ustuck)))
                     learn_it = TRUE;
             }
         }
