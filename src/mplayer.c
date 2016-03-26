@@ -331,12 +331,13 @@ boolean special;
     int pm, x, y;
     struct monst fakemon;
 
+    fakemon = zeromonst;
     while (num) {
         int tryct = 0;
 
         /* roll for character class */
         pm = PM_ARCHEOLOGIST + rn2(PM_WIZARD - PM_ARCHEOLOGIST + 1);
-        fakemon.data = &mons[pm];
+        set_mon_data(&fakemon, &mons[pm], -1);
 
         /* roll for an available location */
         do {

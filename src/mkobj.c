@@ -107,13 +107,11 @@ struct obj *otmp;
 {
     if (!otmp->oextra)
         otmp->oextra = newoextra();
+
     if (!OMONST(otmp)) {
         struct monst *m = newmonst();
 
-        /* newmonst() allocates memory but doesn't initialize anything */
-        (void) memset((genericptr_t) m, 0, sizeof (struct monst));
-        m->mextra = (struct mextra *) 0;
-        m->nmon = (struct monst *) 0;
+        *m = zeromonst;
         OMONST(otmp) = m;
     }
 }
