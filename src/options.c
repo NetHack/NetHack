@@ -4226,23 +4226,23 @@ special_handling(const char *optname, boolean setinitial, boolean setfromfile)
     msgtypes_again:
         nmt = msgtype_count();
         opt_idx = handle_add_list_remove("message type", nmt);
-        if (opt_idx == 3) {
-            ; /* done--fall through to function exit */
+        if (opt_idx == 3) { /* done */
+            return TRUE;
         } else if (opt_idx == 0) { /* add new */
             getlin("What new message pattern?", mtbuf);
-            if (*mtbuf == '\033' || !*mtbuf)
-                goto msgtypes_again;
-            mttyp = query_msgtype();
-            if (mttyp == -1)
-                goto msgtypes_again;
-            if (!msgtype_add(mttyp, mtbuf)) {
+            if (*mtbuf == '\033')
+                return TRUE;
+            if (*mtbuf
+                && (mttyp = query_msgtype()) != -1
+                && !msgtype_add(mttyp, mtbuf)) {
                 pline("Error adding the message type.");
                 wait_synch();
-                goto msgtypes_again;
             }
-        } else { /* list or remove */
+            goto msgtypes_again;
+        } else { /* list (1) or remove (2) */
             int pick_idx, pick_cnt;
             int mt_idx;
+            const char *mtype;
             menu_item *pick_list = (menu_item *) 0;
             struct plinemsg_type *tmp = plinemsg_types;
 
@@ -4251,8 +4251,7 @@ special_handling(const char *optname, boolean setinitial, boolean setfromfile)
             any = zeroany;
             mt_idx = 0;
             while (tmp) {
-                const char *mtype = msgtype2name(tmp->msgtype);
-
+                mtype = msgtype2name(tmp->msgtype);
                 any.a_int = ++mt_idx;
                 Sprintf(mtbuf, "%-5s \"%s\"", mtype, tmp->pattern);
                 add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, mtbuf,
@@ -4282,26 +4281,24 @@ special_handling(const char *optname, boolean setinitial, boolean setfromfile)
     menucolors_again:
         nmc = count_menucolors();
         opt_idx = handle_add_list_remove("menucolor", nmc);
-        if (opt_idx == 3) {
-            ;                      /* done--fall through to function exit */
+        if (opt_idx == 3) { /* done */
+            return TRUE;
         } else if (opt_idx == 0) { /* add new */
             getlin("What new menucolor pattern?", mcbuf);
-            if (*mcbuf == '\033' || !*mcbuf)
-                goto menucolors_again;
-            mcclr = query_color();
-            if (mcclr == -1)
-                goto menucolors_again;
-            mcattr = query_attr(NULL);
-            if (mcattr == -1)
-                goto menucolors_again;
-            if (!add_menu_coloring_parsed(mcbuf, mcclr, mcattr)) {
+            if (*mcbuf == '\033')
+                return TRUE;
+            if (*mcbuf
+                && (mcclr = query_color()) != -1
+                && (mcattr = query_attr((char *) 0)) != -1
+                && !add_menu_coloring_parsed(mcbuf, mcclr, mcattr)) {
                 pline("Error adding the menu color.");
                 wait_synch();
-                goto menucolors_again;
             }
-        } else { /* list or remove */
+            goto menucolors_again;
+        } else { /* list (1) or remove (2) */
             int pick_idx, pick_cnt;
             int mc_idx;
+            const char *sattr, *sclr;
             menu_item *pick_list = (menu_item *) 0;
             struct menucoloring *tmp = menu_colorings;
 
@@ -4310,10 +4307,9 @@ special_handling(const char *optname, boolean setinitial, boolean setfromfile)
             any = zeroany;
             mc_idx = 0;
             while (tmp) {
-                const char *sattr = attr2attrname(tmp->attr);
-                const char *sclr = clr2colorname(tmp->color);
-
-                any.a_int = (++mc_idx);
+                sattr = attr2attrname(tmp->attr);
+                sclr = clr2colorname(tmp->color);
+                any.a_int = ++mc_idx;
                 Sprintf(mcbuf, "\"%s\"=%s%s%s", tmp->origstr, sclr,
                         (tmp->attr != ATR_NONE) ? " & " : "",
                         (tmp->attr != ATR_NONE) ? sattr : "");
@@ -4345,26 +4341,24 @@ special_handling(const char *optname, boolean setinitial, boolean setfromfile)
     ape_again:
         totalapes = count_ape_maps(&numapes[AP_LEAVE], &numapes[AP_GRAB]);
         opt_idx = handle_add_list_remove("autopickup exception", totalapes);
-        if (opt_idx == 3) {
-            ;                      /* done--fall through to function exit */
+        if (opt_idx == 3) { /* done */
+            return TRUE;
         } else if (opt_idx == 0) { /* add new */
             getlin("What new autopickup exception pattern?", &apebuf[1]);
             mungspaces(&apebuf[1]); /* regularize whitespace */
-            if (apebuf[1] == '\033') {
-                ; /* fall through to function exit */
-            } else {
-                if (apebuf[1]) {
-                    apebuf[0] = '\"';
-                    /* guarantee room for \" prefix and \"\0 suffix;
-                       -2 is good enough for apebuf[] but -3 makes
-                       sure the whole thing fits within normal BUFSZ */
-                    apebuf[sizeof apebuf - 3] = '\0';
-                    Strcat(apebuf, "\"");
-                    add_autopickup_exception(apebuf);
-                }
-                goto ape_again;
+            if (apebuf[1] == '\033')
+                return TRUE;
+            if (apebuf[1]) {
+                apebuf[0] = '\"';
+                /* guarantee room for \" prefix and \"\0 suffix;
+                   -2 is good enough for apebuf[] but -3 makes
+                   sure the whole thing fits within normal BUFSZ */
+                apebuf[sizeof apebuf - 3] = '\0';
+                Strcat(apebuf, "\"");
+                add_autopickup_exception(apebuf);
             }
-        } else { /* list or remove */
+            goto ape_again;
+        } else { /* list (1) or remove (2) */
             int pick_idx, pick_cnt;
             menu_item *pick_list = (menu_item *) 0;
 

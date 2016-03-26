@@ -190,6 +190,16 @@ some instances of stun or confusion timers were being overridden rather than
 	incremented when new stun or confusion damage was suffered
 female gnome who gains level can grow up into male-only gnome lord; give an
 	an alternate message instead of prohibiting the promotion
+kicked weapon which successfully hits monster vanishes from play
+unseen landmine explosion could result in "The <monst-type> statue crumbles."
+when using the 'O' command for regexp options (autopickup exceptions,
+	menucolors, message types), provide opportunity to add more than one
+	at a time [after 'add', return to add/list/remove menu]
+commands invoked by uppercase meta characters: M-A, M-C, M-N, M-O, M-R, M-T
+	were missing from '? c' list of game commands (dat/hh)
+
+post-3.6.0: fix "object lost" panic during pickup caused by sortloot revamp
+post-3.6.0: more sortloot revisions
 
 
 Platform- and/or Interface-Specific Fixes
@@ -202,6 +212,7 @@ tty: responding with <return> or <enter> during role, race, &c selection
 	behaved same as <escape> to quit; now it will pick [random] instead
 tty: rename struct variable 'filter' (role.c) and function 'winch()' (wintty.c)
 	to avoid conflicts with <curses.h>
+tty: skip selector letter and selection indicator (-,+,#) during menu coloring
 unix/X11: in top level Makefile, some commented out definitions of VARDATND
 	misspelled pilemark.xbm (as pilemark.xpm)
 unix: options file with CR+LF line ends and an invalid option line resulted in

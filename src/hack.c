@@ -2169,6 +2169,7 @@ move_update(register boolean newlev)
     *ptr2 = '\0';
 }
 
+/* possibly deliver a one-time room entry message */
 void
 check_special_room(register boolean newlev)
 {
@@ -2298,11 +2299,13 @@ check_special_room(register boolean newlev)
     return;
 }
 
+/* the ',' command */
 int
 dopickup()
 {
     int count;
     struct trap *traphere = t_at(u.ux, u.uy);
+
     /* awful kludge to work around parse()'s pre-decrement */
     count = (multi || (save_cm && *save_cm == ',')) ? multi + 1 : 0;
     multi = 0; /* always reset */
@@ -2343,6 +2346,7 @@ dopickup()
     }
     if (!OBJ_AT(u.ux, u.uy)) {
         register struct rm *lev = &levl[u.ux][u.uy];
+
         if (IS_THRONE(lev->typ))
             pline("It must weigh%s a ton!", lev->looted ? " almost" : "");
         else if (IS_SINK(lev->typ))

@@ -1069,6 +1069,13 @@ getobj(register const char *let, register const char *word)
 
     if (!flags.invlet_constant)
         reassign();
+    else
+        /* in case invent is in packorder, force it to be in invlet
+           order before collecing candidate inventory letters;
+           if player responds with '?' or '*' it will be changed
+           back by display_pickinv(), but by then we'll have 'lets'
+           and so won't have to re-sort in the for(;;) loop below */
+        sortloot(&invent, SORTLOOT_INVLET, FALSE);
 
     for (otmp = firstobj; otmp; otmp = otmp->nobj) {
         if (&bp[foo] == &buf[sizeof buf - 1]
@@ -1082,8 +1089,8 @@ getobj(register const char *let, register const char *word)
             || (usegold && otmp->invlet == GOLD_SYM)
             || (useboulder && otmp->otyp == BOULDER)) {
             register int otyp = otmp->otyp;
-            bp[foo++] = otmp->invlet;
 
+            bp[foo++] = otmp->invlet;
 /* clang-format off */
 /* *INDENT-OFF* */
             /* ugly check: remove inappropriate things */
@@ -1478,9 +1485,9 @@ static NEARDATA const char removeables[] = { ARMOR_CLASS, WEAPON_CLASS,
                                              RING_CLASS,  AMULET_CLASS,
                                              TOOL_CLASS,  0 };
 
-/* interactive version of getobj - used for Drop, Identify and */
-/* Takeoff (A). Return the number of times fn was called successfully */
-/* If combo is TRUE, we just use this to get a category list */
+/* Interactive version of getobj - used for Drop, Identify, and Takeoff (A).
+   Return the number of times fn was called successfully.
+   If combo is TRUE, we just use this to get a category list. */
 int
 ggetobj(const char *word,
         int (*fn)(OBJ_P),
@@ -1657,17 +1664,17 @@ ggetobj(const char *word,
  * Walk through the chain starting at objchn and ask for all objects
  * with olet in olets (if nonNULL) and satisfying ckfn (if nonnull)
  * whether the action in question (i.e., fn) has to be performed.
- * If allflag then no questions are asked. Max gives the max nr of
- * objects to be treated. Return the number of objects treated.
+ * If allflag then no questions are asked.  Mx gives the max number
+ * of objects to be treated.  Return the number of objects treated.
  */
 int
 askchain(struct obj **objchn,
-         register const char *olets, /* olets is an Obj Class char array */
-         register int allflag,
-         register int (*fn)(OBJ_P),
-         register int (*ckfn)(OBJ_P),
-         register int mx,
-         register const char *word) /* olets is an Obj Class char array */
+         const char *olets, /* olets is an Obj Class char array */
+         int allflag,
+         int (*fn)(OBJ_P),
+         int (*ckfn)(OBJ_P),
+         int mx,
+         const char *word) /* olets is an Obj Class char array */
 {
     struct obj *otmp, *otmpo;
     register char sym, ilet;
@@ -1682,11 +1689,17 @@ askchain(struct obj **objchn,
     nodot = (!strcmp(word, "nodot") || !strcmp(word, "drop") || ident
              || takeoff || take_out || put_in);
     ininv = (*objchn == invent);
+
+    /* someday maybe we'll sort by 'olets' too (temporarily replace
+       flags.packorder and pass SORTLOOT_PACK), but not yet... */
+    sortloot(objchn, SORTLOOT_INVLET, FALSE);
+
     first = TRUE;
-/* Changed so the askchain is interrogated in the order specified.
- * For example, if a person specifies =/ then first all rings will be
- * asked about followed by all wands -dgk
- */
+    /*
+     * Interrogate in the object class order specified.
+     * For example, if a person specifies =/ then first all rings
+     * will be asked about followed by all wands.  -dgk
+     */
 nextclass:
     ilet = 'a' - 1;
     if (*objchn && (*objchn)->oclass == COIN_CLASS)
@@ -1729,9 +1742,10 @@ nextclass:
                     Sprintf(qpfx, "%s: ", word), *qpfx = highc(*qpfx);
                 first = FALSE;
             }
-            (void) safe_qbuf(
-                qbuf, qpfx, "?", otmp, ininv ? safeq_xprname : doname,
-                ininv ? safeq_shortxprname : ansimpleoname, "item");
+            (void) safe_qbuf(qbuf, qpfx, "?", otmp,
+                             ininv ? safeq_xprname : doname,
+                             ininv ? safeq_shortxprname : ansimpleoname,
+                             "item");
             sym = (takeoff || ident || otmp->quan < 2L) ? nyaq(qbuf)
                                                         : nyNaq(qbuf);
         } else
@@ -1743,11 +1757,10 @@ nextclass:
                to 'none' or 'all'.  2 special cases: cursed loadstones and
                welded weapons (eg, multiple daggers) will remain as merged
                unit; done to avoid splitting an object that won't be
-               droppable (even if we're picking up rather than dropping).
-             */
-            if (!yn_number)
+               droppable (even if we're picking up rather than dropping). */
+            if (!yn_number) {
                 sym = 'n';
-            else {
+            } else {
                 sym = 'y';
                 if (yn_number < otmp->quan && splittable(otmp))
                     otmp = splitobj(otmp, yn_number);
