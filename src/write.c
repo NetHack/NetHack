@@ -128,12 +128,12 @@ register struct obj *pen;
     if (Blind) {
         if (!paper->dknown) {
             You("don't know if that %s is blank or not.", typeword);
-            return 1;
+            return 0;
         } else if (paper->oclass == SPBOOK_CLASS) {
             /* can't write a magic book while blind */
             pline("%s can't create braille text.",
                   upstart(ysimple_name(pen)));
-            return 1;
+            return 0;
         }
     }
     paper->dknown = 1;

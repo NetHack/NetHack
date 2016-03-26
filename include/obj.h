@@ -337,7 +337,7 @@ struct obj {
 
 /* helpers, simple enough to be macros */
 #define is_plural(o) \
-    ((o)->quan > 1 || (o)->oartifact == ART_EYES_OF_THE_OVERWORLD)
+    ((o)->quan != 1L || (o)->otyp == LENSES || is_gloves(o) || is_boots(o))
 
 /* Flags for get_obj_location(). */
 #define CONTAINED_TOO 0x1

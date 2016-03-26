@@ -646,10 +646,11 @@ boolean verbosely;
         if (mon->mhp > 0) {
             mon->misc_worn_check &= ~obj->owornmask;
             update_mon = TRUE;
-            /* don't charge for an owned saddle on dead steed (provided
-               that the hero is within the same shop at the time) */
-        } else if (mon->mtame && (obj->owornmask & W_SADDLE) && !obj->unpaid
-                   && costly_spot(omx, omy)
+
+        /* don't charge for an owned saddle on dead steed (provided
+           that the hero is within the same shop at the time) */
+        } else if (mon->mtame && (obj->owornmask & W_SADDLE) != 0L
+                   && !obj->unpaid && costly_spot(omx, omy)
                    /* being at costly_spot guarantees lev->roomno is not 0 */
                    && index(in_rooms(u.ux, u.uy, SHOPBASE),
                             levl[omx][omy].roomno)) {
