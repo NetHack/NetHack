@@ -1,4 +1,4 @@
-/* NetHack 3.6  makedefs.c  $NHDT-Date: 1455357861 2016/02/13 10:04:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.109 $ */
+/* NetHack 3.6  makedefs.c  $NHDT-Date: 1459208813 2016/03/28 23:46:53 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.110 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
 /* Copyright (c) Dean Luick, 1990.                                */
@@ -578,36 +578,35 @@ do_ext_makedefs(int argc, char **argv)
 #undef CONSUME
 
 /*
- Filtering syntax:
- Any line NOT starting with a caret is either suppressed or passed through
- unchanged depending on the current conditional state.
-
- The default conditional state is printing on.
-
- Conditionals may be nested.
-
- makedefs will exit with a EXIT_FAILURE if any errors are detected; as many
- errors as possible are detected before giving up.
-
- Unknown identifiers are treated as TRUE and also as an error to allow
- processing to continue past the unknown identifier (note that "#undef" is
- different than unknown).
-
- Any line starting with a caret is a control line; as in C, zero or more
- spaces
- may be embedded in the line almost anywhere; the caret MUST be in column 1.
- (XXX for the moment, no white space is allowed after the caret because
-  existing lines in the docs look like that)
-
- Control lines:
- ^^     a line starting with a (single) literal caret
- ^#     a comment - the line is ignored
- ^?ID   if defined(ID)
- ^!ID   if !defined(ID)
- ^:     else
- ^.     endif
-
-*/
+ * Filtering syntax:
+ * Any line NOT starting with a caret is either suppressed or passed
+ * through unchanged depending on the current conditional state.
+ *
+ * The default conditional state is printing on.
+ *
+ * Conditionals may be nested.
+ *
+ * makedefs will exit with a EXIT_FAILURE if any errors are detected;
+ * as many errors as possible are detected before giving up.
+ *
+ * Unknown identifiers are treated as TRUE and also as an error to
+ * allow processing to continue past the unknown identifier (note
+ * that "#undef" is different than unknown).
+ *
+ * Any line starting with a caret is a control line; as in C, zero or
+ * more spaces may be embedded in the line almost anywhere; the caret
+ * MUST be in column 1.
+ * (XXX for the moment, no white space is allowed after the caret because
+ * existing lines in the docs look like that.)
+ *
+ * Control lines:
+ *      ^^      a line starting with a (single) literal caret
+ *      ^#      a comment - the line is ignored
+ *      ^?ID    if defined(ID)
+ *      ^!ID    if !defined(ID)
+ *      ^:      else
+ *      ^.      endif
+ */
 #define GREP_MAGIC '^'
 #define GREP_STACK_SIZE 100
 #ifdef notyet
@@ -616,9 +615,9 @@ static int grep_rewrite = 0; /* need to (possibly) rewrite lines */
 static int grep_writing = 1; /* need to copy lines to output */
 static int grep_errors = 0;
 static int grep_sp = 0;
-#define ST_LD(old, opp) (!!(old) | (!!(opp) << 1))
-#define ST_OLD(v) ((v) &1)
-#define ST_OPP(v) !!((v) &2)
+#define ST_LD(old, opp) (((old) ? 1 : 0) | ((opp) ? 2 : 0))
+#define ST_OLD(v) (((v) & 1) != 0)
+#define ST_OPP(v) (((v) & 2) != 0)
 #define ST_ELSE 4
 static int grep_stack[GREP_STACK_SIZE] = { ST_LD(1, 0) };
 static int grep_lineno = 0;
