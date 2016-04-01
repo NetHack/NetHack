@@ -1165,6 +1165,9 @@ make_version()
     return;
 }
 
+/* REPRODUCIBLE_BUILD will change this to TRUE */
+static boolean date_via_env = FALSE;
+
 static char *
 version_string(outbuf, delim)
 char *outbuf;
@@ -1194,8 +1197,9 @@ const char *build_date;
     Strcat(subbuf, " Beta");
 #endif
 
-    Sprintf(outbuf, "%s NetHack%s Version %s - last build %s.", PORT_ID,
-            subbuf, version_string(versbuf, "."), build_date);
+    Sprintf(outbuf, "%s NetHack%s Version %s - last %s %s.", PORT_ID,
+            subbuf, version_string(versbuf, "."),
+            date_via_env ? "revision" : "build", build_date);
     return outbuf;
 }
 
@@ -1215,8 +1219,9 @@ const char *build_date;
     Strcat(subbuf, " Beta");
 #endif
 
-    Sprintf(outbuf, "         Version %s %s%s, built %s.",
-            version_string(versbuf, "."), PORT_ID, subbuf, &build_date[4]);
+    Sprintf(outbuf, "         Version %s %s%s, %s %s.",
+            version_string(versbuf, "."), PORT_ID, subbuf,
+            date_via_env ? "revised" : "built", &build_date[4]);
 #if 0
     Sprintf(outbuf, "%s NetHack%s %s Copyright 1985-%s (built %s)",
             PORT_ID, subbuf, version_string(versbuf,"."), RELEASE_YEAR,
@@ -1255,20 +1260,96 @@ do_date()
     Fprintf(ofp, "%s", Dont_Edit_Code);
 
     (void) time(&clocktim);
-    Strcpy(cbuf, ctime(&clocktim));
+#ifdef REPRODUCIBLE_BUILD
+    {
+        /*
+         * Use date+time of latest source file revision (set up in
+         * our environment rather than derived by scanning sources)
+         * instead of current date+time, so that later rebuilds of
+         * the same sources specifying the same configuration will
+         * produce the same result.
+         *
+         * Changing the configuration should be done by modifying
+         * config.h or <port>conf.h and setting SOURCE_DATE_EPOCH
+         * based on whichever changed most recently, not by using
+         *   make CFLAGS='-Dthis -Dthat'
+         * to make alterations on the fly.
+         *
+         * Limited validation is performed to prevent dates in the
+         * future (beyond a leeway of 24 hours) or distant past.
+         *
+         * Assumes the value of time_t is in seconds, which is
+         * fundamental for Unix and mandated by POSIX.  For any ports
+         * where that isn't true, leaving REPRODUCIBLE_BUILD disabled
+         * is probably preferrable to hacking this code....
+         */
+        static struct tm nh360; /* static init should yield UTC timezone */
+        unsigned long sd_num, sd_earliest, sd_latest;
+        const char *sd_str = getenv("SOURCE_DATE_EPOCH");
 
-    for (c = cbuf; *c; c++)
-        if (*c == '\n')
-            break;
-    *c = '\0'; /* strip off the '\n' */
-    Fprintf(ofp, "#define BUILD_DATE \"%s\"\n", cbuf);
-    Fprintf(ofp, "#define BUILD_TIME (%ldL)\n", (long) clocktim);
-    Fprintf(ofp, "\n");
+        if (sd_str) {
+            sd_num = strtoul(sd_str, (char **) 0, 10);
+            /*
+             * Note:  this does not need to be updated for future
+             * releases.  It serves as a sanity check for potentially
+             * mis-set environment, not a hard baseline for when the
+             * current version could have first been built.
+             */
+            /* oldest date we'll accept: 7-Dec-2015 (release of 3.6.0) */
+            nh360.tm_mday = 7;
+            nh360.tm_mon  = 12 - 1;
+            nh360.tm_year = 2015 - 1900;
+            sd_earliest = (unsigned long) mktime(&nh360);
+            /* 'youngest' date we'll accept: 24 hours in the future */
+            sd_latest = (unsigned long) clocktim + 24L * 60L * 60L;
+
+            if (sd_num >= sd_earliest && sd_num <= sd_latest) {
+                /* use SOURCE_DATE_EPOCH value */
+                clocktim = (time_t) sd_num;
+                date_via_env = TRUE;
+            } else {
+                Fprintf(stderr, "? Invalid value for SOURCE_DATE_EPOCH (%lu)",
+                        sd_num);
+                if (sd_num > 0L && sd_num < sd_earliest)
+                    Fprintf(stderr, ", older than %lu", sd_earliest);
+                else if (sd_num > sd_latest)
+                    Fprintf(stderr, ", newer than %lu", sd_latest);
+                Fprintf(stderr, ".\n");
+                Fprintf(stderr, ": Reverting to current date+time (%lu).\n",
+                        (unsigned long) clocktim);
+                (void) fflush(stderr);
+            }
+        } else {
+            /* REPRODUCIBLE_BUILD enabled but SOURCE_DATE_EPOCH is missing */
+            Fprintf(stderr, "? No value for SOURCE_DATE_EPOCH.\n");
+            Fprintf(stderr, ": Using current date+time (%lu).\n",
+                    (unsigned long) clocktim);
+            (void) fflush(stderr);
+        }
+        Strcpy(cbuf, asctime(gmtime(&clocktim)));
+    }
+#else
+    /* ordinary build: use current date+time */
+    Strcpy(cbuf, ctime(&clocktim));
+#endif
+
+    if ((c = index(cbuf, '\n')) != 0)
+        *c = '\0'; /* strip off the '\n' */
 #ifdef NHSTDC
     ul_sfx = "UL";
 #else
     ul_sfx = "L";
 #endif
+    if (date_via_env)
+        Fprintf(ofp, "#define SOURCE_DATE_EPOCH (%lu%s) /* via getenv() */\n",
+                (unsigned long) clocktim, ul_sfx);
+    Fprintf(ofp, "#define BUILD_DATE \"%s\"\n", cbuf);
+    if (date_via_env)
+        Fprintf(ofp, "#define BUILD_TIME SOURCE_DATE_EPOCH\n");
+    else
+        Fprintf(ofp, "#define BUILD_TIME (%lu%s)\n",
+                (unsigned long) clocktim, ul_sfx);
+    Fprintf(ofp, "\n");
     Fprintf(ofp, "#define VERSION_NUMBER 0x%08lx%s\n", version.incarnation,
             ul_sfx);
     Fprintf(ofp, "#define VERSION_FEATURES 0x%08lx%s\n", version.feature_set,
@@ -1293,10 +1374,11 @@ do_date()
 #ifdef AMIGA
     {
         struct tm *tm = localtime((time_t *) &clocktim);
+
         Fprintf(ofp, "#define AMIGA_VERSION_STRING ");
         Fprintf(ofp, "\"\\0$VER: NetHack %d.%d.%d (%d.%d.%d)\"\n",
-                VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL, tm->tm_mday,
-                tm->tm_mon + 1, tm->tm_year + 1900);
+                VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL,
+                tm->tm_mday, tm->tm_mon + 1, tm->tm_year + 1900);
     }
 #endif
     Fclose(ofp);
