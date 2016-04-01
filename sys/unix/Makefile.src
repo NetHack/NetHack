@@ -167,6 +167,11 @@ CXX=g++
 #CXX=arm-linux-g++
 #LINK=arm-linux-gcc
 
+# we specify C preprocessor flags via CFLAGS; files built with default rules
+# might include $(CPPFLAGS) which could get a value from user's environment;
+# we avoid that by forcing it empty rather than by overriding default rules
+CPPFLAGS =
+
 # file for regular expression matching
 REGEXOBJ = posixregex.o
 #REGEXOBJ = pmatchregex.o
@@ -333,11 +338,11 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   mkmaze.c mkobj.c mkroom.c mon.c mondata.c monmove.c monst.c \
 	   mplayer.c mthrowu.c muse.c music.c o_init.c objects.c objnam.c \
 	   options.c pager.c pickup.c pline.c polyself.c potion.c pray.c \
-	   priest.c quest.c questpgr.c read.c rect.c region.c restore.c rip.c \
-	   rnd.c role.c rumors.c save.c shk.c shknam.c sit.c sounds.c sp_lev.c \
-	   spell.c steal.c steed.c sys.c teleport.c timeout.c topten.c track.c \
-	   trap.c \
-	   u_init.c uhitm.c vault.c version.c vision.c weapon.c were.c wield.c \
+	   priest.c quest.c questpgr.c read.c rect.c region.c restore.c \
+	   rip.c rnd.c role.c rumors.c save.c shk.c shknam.c sit.c sounds.c \
+	   sp_lev.c spell.c steal.c steed.c sys.c teleport.c timeout.c \
+	   topten.c track.c trap.c u_init.c \
+	   uhitm.c vault.c version.c vision.c weapon.c were.c wield.c \
 	   windows.c wizard.c worm.c worn.c write.c zap.c
 
 # all operating-system-dependent .c (for dependencies and such)
@@ -347,6 +352,7 @@ SYSCSRC = ../sys/atari/tos.c ../sys/share/pcmain.c ../sys/share/pcsys.c \
 	../sys/share/random.c \
 	../sys/share/ioctl.c ../sys/share/unixtty.c ../sys/unix/unixmain.c \
 	../sys/unix/unixunix.c ../sys/unix/unixres.c ../sys/be/bemain.c
+SYSCXXSRC = ../sys/share/cppregex.cpp
 
 # generated source files (tile.c is handled separately via WINxxxSRC)
 GENCSRC = monstr.c vis_tab.c	#tile.c
@@ -501,8 +507,10 @@ $(MAKEDEFS): $(FIRSTOBJ) \
 
 #	Source files created by 'makedefs' at build time.
 #	Each is given an artificial dependency upon the one before
-#	so that parallel makes will have to build them sequentially and
-#	not clobber makedefs by attempting simultaneous builds of it.
+#	so that parallel makes will have to build them sequentially.
+#	(More for documentation than effect; 'make' should know not
+#	to try to build $(MAKEDEFS) for bar.h while it is in the
+#	process of building it for foo.h.)
 ../include/onames.h: $(MAKEDEFS)
 	@( cd ../util ; $(MAKE) ../include/onames.h )
 ../include/pm.h: $(MAKEDEFS) ../include/onames.h
@@ -559,11 +567,11 @@ spotless: clean
 
 
 depend: ../sys/unix/depend.awk \
-		$(SYSCSRC) $(WINCSRC) $(WINCXXSRC) $(CHAINSRC) $(GENCSRC) \
-		$(HACKCSRC)
+		$(SYSCSRC) $(WINCSRC) $(SYSCXXSRC) $(WINCXXSRC) \
+		$(CHAINSRC) $(GENCSRC) $(HACKCSRC)
 	$(AWK) -f ../sys/unix/depend.awk ../include/*.h \
-		$(SYSCSRC) $(WINCSRC) $(WINCXXSRC) $(CHAINSRC) $(GENCSRC) \
-		$(HACKCSRC) >makedep
+		$(SYSCSRC) $(WINCSRC) $(SYSCXXSRC) $(WINCXXSRC) \
+		$(CHAINSRC) $(GENCSRC) $(HACKCSRC) >makedep
 	@echo '/^# DO NOT DELETE THIS LINE OR CHANGE ANYTHING BEYOND IT/+2,$$d' >eddep
 	@echo '$$r makedep' >>eddep
 	@echo 'w' >>eddep
@@ -718,6 +726,8 @@ load_img.o: ../win/gem/load_img.c ../include/load_img.h
 gr_rect.o: ../win/gem/gr_rect.c ../include/gr_rect.h
 	$(CC) $(CFLAGS) -c ../win/gem/gr_rect.c
 tile.o: tile.c $(HACK_H)
+cppregex.o: ../sys/share/cppregex.cpp
+	$(CXX) $(CXXFLAGS) -c ../sys/share/cppregex.cpp
 qt_win.o: ../win/Qt/qt_win.cpp $(HACK_H) ../include/func_tab.h \
 		../include/dlb.h ../include/patchlevel.h ../include/tile2x11.h \
 		../include/qt_win.h ../include/qt_clust.h ../include/qt_kde0.h \
