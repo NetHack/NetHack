@@ -218,6 +218,9 @@ unix/X11: in top level Makefile, some commented out definitions of VARDATND
 unix: options file with CR+LF line ends and an invalid option line resulted in
 	"ad option line: "whatever-the-line-was
 	because embedded carriage return character changed cursor's position
+unix: race condition with parallel make: src/Makefile might start building
+	makedefs before finishing monst.o and objects.o; if so, util/Makefile
+	can build them too, and they might be clobbered by simultaneous write
 win32gui: getversionstring() was overflowing the provided Help About buffer
 win32gui: guard against buffer overflow in in mswin_getlin()
 win32gui: handle menu_color attribute
@@ -268,6 +271,9 @@ monk starts with 'shuriken' pre-discovered (despite language issue...)
 item-using monster on or next to a fire trap can use it to be cured of
 	turning into slime
 wizard mode ^G can now specify "male" or "female" when creating a monster
+REPRODUCIBLE_BUILD is new config.h setting to fetch build date+time from
+	environment instead of using current date+time, so that later rebuild
+	could duplicate the original (disabled by default; tested for Unix)
 
 
 Platform- and/or Interface-Specific New Features
