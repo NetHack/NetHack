@@ -194,7 +194,9 @@ insert_rtoptions(winid win, char *buf, const char *finalphrase)
 boolean
 comp_times(long filetime)
 {
-    return (boolean) (filetime < BUILD_TIME);
+    /* BUILD_TIME is constant but might have L suffix rather than UL;
+       'filetime' is historically signed but ought to have been unsigned */
+    return (boolean) ((unsigned long) filetime < (unsigned long) BUILD_TIME);
 }
 #endif
 

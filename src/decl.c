@@ -194,8 +194,9 @@ NEARDATA struct obj *migrating_objs = (struct obj *) 0;
 /* objects not yet paid for */
 NEARDATA struct obj *billobjs = (struct obj *) 0;
 
-/* used to zero all elements of a struct obj */
+/* used to zero all elements of a struct obj and a struct monst */
 NEARDATA struct obj zeroobj = DUMMY;
+NEARDATA struct monst zeromonst = DUMMY;
 /* used to zero out union any; initializer deliberately omitted */
 NEARDATA anything zeroany;
 
