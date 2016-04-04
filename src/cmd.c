@@ -1124,7 +1124,8 @@ wiz_intrinsic(VOID_ARGS)
         for (i = 0; i < SIZE(intrinsics); ++i) {
             accelerator = intrinsics[i][0];
             any.a_int = i + 1;
-            add_menu(win, NO_GLYPH, &any, accelerator, 0, ATR_NONE, intrinsics[i], FALSE);
+            add_menu(win, NO_GLYPH, &any, accelerator, 0,
+                     ATR_NONE, intrinsics[i], FALSE);
         }
         end_menu(win, "Which intrinsic?");
         n = select_menu(win, PICK_ONE, &pick_list);
@@ -1137,7 +1138,7 @@ wiz_intrinsic(VOID_ARGS)
             return 0;
         }
 
-        if (!strcmp(intrinsics[i],"deafness")) {
+        if (!strcmp(intrinsics[i], "deafness")) {
             You("go deaf.");
             incr_itimeout(&HDeaf, 30);
             context.botl = TRUE;

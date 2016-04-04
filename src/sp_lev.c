@@ -611,8 +611,8 @@ schar filling;
             if (level.flags.corrmaze)
                 levl[x][y].typ = STONE;
             else
-                levl[x][y].typ =
-                    (y < 2 || ((x % 2) && (y % 2))) ? STONE : filling;
+                levl[x][y].typ = (y < 2 || ((x % 2) && (y % 2))) ? STONE
+                                                                 : filling;
         }
 }
 
@@ -4747,7 +4747,8 @@ struct sp_coder *coder;
         dy1 = (xchar) SP_REGION_Y1(OV_i(r));
         dx2 = (xchar) SP_REGION_X2(OV_i(r));
         dy2 = (xchar) SP_REGION_Y2(OV_i(r));
-        wallify_map(dx1 < 0 ? (xstart-1) : dx1, dy1 < 0 ? (ystart-1) : dy1,
+        wallify_map(dx1 < 0 ? (xstart - 1) : dx1,
+                    dy1 < 0 ? (ystart - 1) : dy1,
                     dx2 < 0 ? (xstart + xsize + 1) : dx2,
                     dy2 < 0 ? (ystart + ysize + 1) : dy2);
         break;
@@ -4846,7 +4847,7 @@ struct sp_coder *coder;
         ystart = valign;
         break;
     }
-    if ((ystart < 0) || (ystart + ysize > ROWNO)) {
+    if (ystart < 0 || ystart + ysize > ROWNO) {
         /* try to move the start a bit */
         ystart += (ystart > 0) ? -2 : 2;
         if (ysize == ROWNO)
@@ -4860,13 +4861,13 @@ struct sp_coder *coder;
         xsize = COLNO - 1;
         ysize = ROWNO;
     } else {
-        xchar x, y;
+        xchar x, y, mptyp;
+
         /* Load the map */
         for (y = ystart; y < ystart + ysize; y++)
             for (x = xstart; x < xstart + xsize; x++) {
-                xchar mptyp =
-                    (mpmap->vardata.str[(y - ystart) * xsize + (x - xstart)]
-                     - 1);
+                mptyp = (mpmap->vardata.str[(y - ystart) * xsize
+                                                  + (x - xstart)] - 1);
                 if (mptyp >= MAX_TYPE)
                     continue;
                 levl[x][y].typ = mptyp;
@@ -5907,7 +5908,8 @@ const char *name;
         (void) dlb_fclose(fd);
         goto give_up;
     }
-    lvl = (sp_lev *) alloc(sizeof(sp_lev));
+
+    lvl = (sp_lev *) alloc(sizeof (sp_lev));
     result = sp_level_loader(fd, lvl);
     (void) dlb_fclose(fd);
     if (result)
