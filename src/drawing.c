@@ -1,4 +1,4 @@
-/* NetHack 3.6	drawing.c	$NHDT-Date: 1447124657 2015/11/10 03:04:17 $  $NHDT-Branch: master $:$NHDT-Revision: 1.49 $ */
+/* NetHack 3.6	drawing.c	$NHDT-Date: 1459986719 2016/04/06 23:51:59 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.50 $ */
 /* Copyright (c) NetHack Development Team 1992.                   */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -202,7 +202,7 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '^', "magic trap", C(HI_ZAP) },               /* trap */
        { '^', "anti-magic field", C(HI_ZAP) },         /* trap */
        { '^', "polymorph trap", C(CLR_BRIGHT_GREEN) }, /* trap */
-       { '^', "vibrating square", C(CLR_YELLOW) },     /* trap */
+       { '~', "vibrating square", C(CLR_MAGENTA) },    /* "trap" */
        { '|', "wall", C(CLR_GRAY) },            /* vbeam */
        { '-', "wall", C(CLR_GRAY) },            /* hbeam */
        { '\\', "wall", C(CLR_GRAY) },           /* lslant */
@@ -592,6 +592,7 @@ struct symparse loadsyms[] = {
     { SYM_PCHAR, S_bars, "S_bars" },
     { SYM_PCHAR, S_tree, "S_tree" },
     { SYM_PCHAR, S_room, "S_room" },
+    { SYM_PCHAR, S_darkroom, "S_darkroom" },
     { SYM_PCHAR, S_corr, "S_corr" },
     { SYM_PCHAR, S_litcorr, "S_litcorr" },
     { SYM_PCHAR, S_upstair, "S_upstair" },
@@ -636,6 +637,7 @@ struct symparse loadsyms[] = {
     { SYM_PCHAR, S_magic_trap, "S_magic_trap" },
     { SYM_PCHAR, S_anti_magic_trap, "S_anti_magic_trap" },
     { SYM_PCHAR, S_polymorph_trap, "S_polymorph_trap" },
+    { SYM_PCHAR, S_vibrating_square, "S_vibrating_square" },
     { SYM_PCHAR, S_vbeam, "S_vbeam" },
     { SYM_PCHAR, S_hbeam, "S_hbeam" },
     { SYM_PCHAR, S_lslant, "S_lslant" },
