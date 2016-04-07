@@ -198,7 +198,7 @@ start: RogueEpyx
 	S_armor: \x0a			# Vert rect with o
 	S_ring: \x09			# circle with arrow
 	S_amulet: \x0c			# "female" symbol
-	S_food: \x05			# club (as in cards)			
+	S_food: \x05			# club (as in cards)
 	S_potion: \xad			# upside down '!'
 	S_scroll: \x0e			# musical note
 	S_wand: \xe7			# greek tau
@@ -394,3 +394,15 @@ start: NHAccess
 	S_explode9: \047
 finish
 
+start: plain
+	Description: Same as Default symbols, except '+' for corner walls
+	S_tlcorn: '+'
+	S_trcorn: '+'
+	S_blcorn: '+'
+	S_brcorn: '+'
+	S_crwall: '+'
+	S_tuwall: '+'
+	S_tdwall: '+'
+	S_tlwall: '+'
+	S_trwall: '+'
+finish #plain -- other symbols implicitly retain their default values
