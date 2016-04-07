@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1457570257 2016/03/10 00:37:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.552 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1459987582 2016/04/07 00:06:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.554 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1661,7 +1661,7 @@ E void NDECL(free_symsets);
 E boolean FDECL(parsesymbols, (char *));
 E struct symparse *FDECL(match_sym, (char *));
 E void NDECL(set_playmode);
-E int FDECL(sym_val, (char *));
+E int FDECL(sym_val, (const char *));
 E const char *FDECL(clr2colorname, (int));
 E int FDECL(match_str2clr, (char *));
 E boolean FDECL(add_menu_coloring, (char *));

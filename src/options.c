@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1455357588 2016/02/13 09:59:48 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.264 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1459987581 2016/04/07 00:06:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.267 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -858,8 +858,8 @@ char *tp;
         } else if (*cp == '^') { /* expand control-character syntax */
             cval = (*++cp & 0x1f);
             ++cp;
-            /* remaining cases are all for backslash and we know cp[1] is not
-             * \0 */
+
+        /* remaining cases are all for backslash; we know cp[1] is not \0 */
         } else if (index(dec, cp[1])) {
             ++cp; /* move past backslash to first digit */
             do {
@@ -5218,11 +5218,41 @@ char *buf;
 
 int
 sym_val(strval)
-char *strval;
+const char *strval;
 {
     char buf[QBUFSZ];
+
     buf[0] = '\0';
-    escapes(strval, buf);
+    if (!strval[0] || !strval[1]) { /* empty, or single character */
+        /* if single char is space or tab, leave buf[0]=='\0' */
+        if (!isspace(strval[0]))
+            buf[0] = strval[0];
+    } else if (strval[0] == '\'') { /* single quote */
+        /* simple matching single quote; we know strval[1] isn't '\0' */
+        if (strval[2] == '\'' && !strval[3]) {
+            /* accepts '\' as backslash and ''' as single quote */
+            buf[0] = strval[1];
+
+        /* if backslash, handle single or double quote or second backslash */
+        } else if (strval[1] == '\\' && strval[2] && strval[3] == '\''
+            && index("'\"\\", strval[2]) && !strval[4]) {
+            buf[0] = strval[2];
+
+        /* not simple quote or basic backslash;
+           strip closing quote and let escapes() deal with it */
+        } else {
+            char *p, tmp[QBUFSZ];
+
+            (void) strncpy(tmp, strval + 1, sizeof tmp - 1);
+            tmp[sizeof tmp - 1] = '\0';
+            if ((p = rindex(tmp, '\'')) != 0) {
+                *p = '\0';
+                escapes(tmp, buf);
+            } /* else buf[0] stays '\0' */
+        }
+    } else /* not lone char nor single quote */
+        escapes(strval, buf);
+
     return (int) *buf;
 }
 
