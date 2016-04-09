@@ -758,6 +758,8 @@ int propidx;
     /* innately() would report FROM_FORM for this; caller wants specificity */
     if (propidx == DRAIN_RES && u.ulycn >= LOW_PM)
         return FROM_LYCN;
+    if (propidx == FAST && Very_fast)
+        return FROM_NONE; /* can't become very fast innately */
     if ((innateness = innately(&u.uprops[propidx].intrinsic)) != FROM_NONE)
         return innateness;
     if (propidx == JUMPING && Role_if(PM_KNIGHT)
@@ -796,6 +798,14 @@ int propidx; /* special cases can have negative values */
                 Strcpy(buf, " from current creature form");
             else if (innateness == FROM_ROLE || innateness == FROM_RACE)
                 Strcpy(buf, " innately");
+            else if (propidx == FAST && Very_fast)
+                Sprintf(buf, because_of,
+                        ((HFast & TIMEOUT) != 0L) ? "a potion or spell"
+                          : ((EFast & W_ARMF) != 0L && uarmf->dknown
+                             && objects[uarmf->otyp].oc_name_known)
+                              ? ysimple_name(uarmf) /* speed boots */
+                                : EFast ? "worn equipment"
+                                  : something);
             else if (wizard
                      && (obj = what_gives(&u.uprops[propidx].extrinsic)) != 0)
                 Sprintf(buf, because_of, obj->oartifact
