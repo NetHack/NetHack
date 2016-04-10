@@ -2550,17 +2550,17 @@ struct attack *mattk;     /* null means we find one internally */
         break;
     case AD_ACID:
         if (!rn2(6)) {
-            (void) erode_obj(obj, NULL, ERODE_CORRODE, EF_NONE);
+            (void) erode_obj(obj, NULL, ERODE_CORRODE, EF_GREASE);
         }
         break;
     case AD_RUST:
         if (!mon->mcan) {
-            (void) erode_obj(obj, NULL, ERODE_RUST, EF_NONE);
+            (void) erode_obj(obj, (char *) 0, ERODE_RUST, EF_GREASE);
         }
         break;
     case AD_CORR:
         if (!mon->mcan) {
-            (void) erode_obj(obj, NULL, ERODE_CORRODE, EF_NONE);
+            (void) erode_obj(obj, (char *) 0, ERODE_CORRODE, EF_GREASE);
         }
         break;
     case AD_ENCH:
