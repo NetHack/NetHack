@@ -1334,10 +1334,12 @@ register const char *let, *word;
             else if (!strcmp(word, "write with"))
                 Sprintf(qbuf, "your %s", body_part(FINGERTIP));
             else if (!strcmp(word, "wield"))
-                Sprintf(qbuf, "your %s %s", uarmg ? "gloved" : "bare",
-                        makeplural(body_part(HAND)));
+                Sprintf(qbuf, "your %s %s%s", uarmg ? "gloved" : "bare",
+                        makeplural(body_part(HAND)),
+                        !uwep ? " (wielded)" : "");
             else if (!strcmp(word, "ready"))
-                Strcpy(qbuf, "empty quiver");
+                Sprintf(qbuf, "empty quiver%s",
+                        !uquiver ? " (nothing readied)" : "");
 
             if (ilet == '?' && !*lets && *altlets)
                 allowed_choices = altlets;
@@ -2232,6 +2234,8 @@ long *out_cnt;
 nextclass:
     classcount = 0;
     for (otmp = invent; otmp; otmp = otmp->nobj) {
+        if (lets && !index(lets, otmp->invlet))
+            continue;
         if (!flags.sortpack || otmp->oclass == *invlet) {
             any = zeroany; /* all bits zero */
             ilet = otmp->invlet;
