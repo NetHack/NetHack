@@ -4089,8 +4089,8 @@ struct opvar *ov;
         my = ((y1 + y2) / 2);
     } else {
         do {
-            dx = (Rand() % rough) - (rough / 2);
-            dy = (Rand() % rough) - (rough / 2);
+            dx = rn2(rough) - (rough / 2);
+            dy = rn2(rough) - (rough / 2);
             mx = ((x1 + x2) / 2) + dx;
             my = ((y1 + y2) / 2) + dy;
         } while ((mx > COLNO - 1 || mx < 0 || my < 0 || my > ROWNO - 1));
