@@ -205,6 +205,9 @@ when attacking a monster with a rust or corrosion or acid passive
 	counter-attack, grease wasn't protecting the attacker's weapon
 the Bell of Opening now correctly reports when it opens a trapdoor/hole
 knocking can no longer send a monster through a trapdoor/hole and desaddle it
+the game no longer gets confused when you break an item while in a different
+    shop
+shopkeepers now correctly handle nested containers and gold in containers
 
 post-3.6.0: fix "object lost" panic during pickup caused by sortloot revamp
 post-3.6.0: more sortloot revisions
@@ -223,6 +226,7 @@ tty: responding with <return> or <enter> during role, race, &c selection
 tty: rename struct variable 'filter' (role.c) and function 'winch()' (wintty.c)
 	to avoid conflicts with <curses.h>
 tty: skip selector letter and selection indicator (-,+,#) during menu coloring
+tty: '>' no longer closes a menu window
 unix/X11: in top level Makefile, some commented out definitions of VARDATND
 	misspelled pilemark.xbm (as pilemark.xpm)
 unix: options file with CR+LF line ends and an invalid option line resulted in
@@ -326,3 +330,5 @@ Ray Chason's MSDOS port support for some VESA modes
 
 Code Cleanup and Reorganization
 -------------------------------
+removed some unused variables and dead code
+the level generator no longer uses the native pRNG
