@@ -115,16 +115,12 @@ int mask;
     switch (mask & DB_UNDER) {
     case DB_ICE:
         return ICE;
-        break;
     case DB_LAVA:
         return LAVAPOOL;
-        break;
     case DB_MOAT:
         return MOAT;
-        break;
     default:
         return STONE;
-        break;
     }
 }
 
