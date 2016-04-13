@@ -2044,7 +2044,6 @@ do_oracles()
 void
 do_dungeon()
 {
-    int rcnt = 0;
     char *line;
 
     Sprintf(filename, DATA_IN_TEMPLATE, DGN_I_FILE);
@@ -2070,7 +2069,6 @@ do_dungeon()
     while ((line = fgetline(ifp)) != 0) {
         SpinCursor(3);
 
-        rcnt++;
         if (line[0] == '#') {
             free(line);
             continue; /* discard comments */
