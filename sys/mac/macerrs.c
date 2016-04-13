@@ -92,35 +92,19 @@ void mustwork(short errcode)
 	else ExitToShell();
 }
 
-#if defined(USE_STDARG) || defined(USE_VARARGS)
-#ifdef USE_STDARG
 static void vprogerror(const char *line, va_list the_args);
-#else
-static void vprogerror();
-#endif
 
 /* Macro substitute for error() */
 void error VA_DECL(const char *, line)
 {
+    va_list the_args;
 	va_start(the_args, line);
-	;
 	vprogerror(line, the_args);
-	VA_END();
+	va_end(the_args);
 }
 
-#ifdef USE_STDARG
 static void
 vprogerror(const char *line, va_list the_args)
-#else
-static void
-vprogerror(line, the_args) const char *line; va_list the_args;
-#endif
-
-#else /* USE_STDARG | USE_VARARG */
-
-void
-error VA_DECL(const char *, line)
-#endif
 {  /* opening brace for vprogerror(), nested block for USE_OLDARG error() */
 	char pbuf[BUFSZ];
 
@@ -129,10 +113,6 @@ error VA_DECL(const char *, line)
 		line = pbuf;
 	}
 	showerror("of an internal error",line);
-
-#if !(defined(USE_STDARG) || defined(USE_VARARGS))
-        VA_END();  /* provides closing brace for USE_OLDARGS's nested block */
-#endif
 }
 
 

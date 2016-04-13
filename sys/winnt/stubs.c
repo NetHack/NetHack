@@ -22,9 +22,7 @@ mswin_destroy_reg()
 extern char default_window_sys[];
 
 int
-main(argc, argv)
-int argc;
-char *argv[];
+main(int argc, char *argv[])
 {
     boolean resuming;
 
@@ -53,29 +51,25 @@ int GUILaunched;
 struct window_procs tty_procs = { "ttystubs" };
 
 void
-win_tty_init(dir)
-int dir;
+win_tty_init(int dir)
 {
     return;
 }
 
 void
-nttty_open(mode)
-int mode;
+nttty_open(int mode)
 {
     return;
 }
 
 void
-xputc(ch)
-char ch;
+xputc(char ch)
 {
     return;
 }
 
 void
-xputs(s)
-const char *s;
+xputs(const char *s)
 {
     return;
 }
@@ -142,21 +136,21 @@ load_keyboard_handler()
  * system isn't initialized yet
  */
 void msmsg
-VA_DECL(const char *, fmt)
+(const char *fmt, ...)
 {
-    VA_START(fmt);
-    VA_INIT(fmt, const char *);
-    VA_END();
+    va_list the_args;
+    va_start(the_args, fmt);
+    va_end(the_args);
     return;
 }
 
 /*VARARGS1*/
 void nttty_error
-VA_DECL(const char *, s)
+(const char *s, ...)
 {
-    VA_START(s);
-    VA_INIT(s, const char *);
-    VA_END();
+    va_list the_args;
+    va_start(the_args, s);
+    va_end(the_args);
     return;
 }
 

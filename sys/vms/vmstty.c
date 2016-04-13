@@ -558,7 +558,7 @@ void error(const char *s, ...)
         settty((char *) 0);
     Vprintf(s, the_args);
     (void) putchar('\n');
-    VA_END();
+    va_end(the_args);
 #ifndef SAVE_ON_FATAL_ERROR
     /* prevent vmsmain's exit handler byebye() from calling hangup() */
     sethanguphandler((void ((*)(int) )) SIG_DFL);
