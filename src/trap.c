@@ -4527,7 +4527,7 @@ boolean *noticed; /* set to true iff hero notices the effect; */
         --force_mintrap;
         /* mon might now be on the migrating monsters list */
     }
-    return TRUE;
+    return result;
 }
 
 /* only called when the player is doing something to the chest directly */
