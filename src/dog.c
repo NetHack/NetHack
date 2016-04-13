@@ -551,7 +551,6 @@ mon_catchup_elapsed_time(struct monst *mtmp,
 }
 
 /* called when you move to another level */
-/* true for ascension or final escape */
 void
 keepdogs(boolean pets_only)
 {
