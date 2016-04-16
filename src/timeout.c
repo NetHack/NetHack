@@ -1998,6 +1998,23 @@ long adjust;     /* how much to adjust timeout */
     }
 }
 
+/* to support '#stats' wizard-mode command */
+void
+timer_stats(hdrfmt, hdrbuf, count, size)
+const char *hdrfmt;
+char *hdrbuf;
+long *count, *size;
+{
+    timer_element *te;
+
+    Sprintf(hdrbuf, hdrfmt, (long) sizeof (timer_element));
+    *count = *size = 0L;
+    for (te = timer_base; te; te = te->next) {
+        ++*count;
+        *size += (long) sizeof *te;
+    }
+}
+
 /* reset all timers that are marked for reseting */
 void
 relink_timers(ghostly)

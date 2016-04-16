@@ -1201,6 +1201,23 @@ int fd;
     }
 }
 
+/* to support '#stats' wizard-mode command */
+void
+engr_stats(hdrfmt, hdrbuf, count, size)
+const char *hdrfmt;
+char *hdrbuf;
+long *count, *size;
+{
+    struct engr *ep;
+
+    Sprintf(hdrbuf, hdrfmt, (long) sizeof (struct engr));
+    *count = *size = 0L;
+    for (ep = head_engr; ep; ep = ep->nxt_engr) {
+        ++*count;
+        *size += (long) sizeof *ep + (long) ep->engr_lth;
+    }
+}
+
 void
 del_engr(ep)
 register struct engr *ep;
