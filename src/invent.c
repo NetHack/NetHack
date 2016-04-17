@@ -1236,7 +1236,8 @@ register const char *let, *word;
              /* worn armor (shirt, suit) covered by worn armor (suit, cloak)
                 or accessory (ring) covered by cursed worn armor (gloves) */
              || (taking_off(word)
-                 && inaccessible_equipment(otmp, (const char *) 0, FALSE))
+                 && inaccessible_equipment(otmp, (const char *) 0,
+                                      (boolean) (otmp->oclass == RING_CLASS)))
              || (!strcmp(word, "write on")
                  && (!(otyp == SCR_BLANK_PAPER || otyp == SPE_BLANK_PAPER)
                      || !otmp->dknown || !objects[otyp].oc_name_known))
