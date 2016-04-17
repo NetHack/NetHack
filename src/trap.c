@@ -793,6 +793,52 @@ struct obj *objchn, *saddle;
     return FALSE;
 }
 
+/* monster or you go through and possibly destroy a web.
+   mtmp == NULL == you.
+   return TRUE if could go through. */
+boolean
+mu_maybe_destroy_web(mtmp, domsg, trap)
+struct monst *mtmp;
+boolean domsg;
+struct trap *trap;
+{
+    boolean isyou = !mtmp;
+    struct permonst *mptr = isyou ? youmonst.data : mtmp->data;
+    boolean gelcube = isyou ? (u.umonnum == PM_GELATINOUS_CUBE)
+        : (mptr == &mons[PM_GELATINOUS_CUBE]);
+    if (amorphous(mptr) || is_whirly(mptr) || flaming(mptr)
+        || unsolid(mptr) || gelcube) {
+        xchar x = trap->tx;
+        xchar y = trap->ty;
+        if (flaming(mptr) || acidic(mptr)) {
+            if (domsg) {
+                if (isyou)
+                    You("%s %s spider web!",
+                        (flaming(mptr)) ? "burn" : "dissolve",
+                        a_your[trap->madeby_u]);
+                else
+                    pline("%s %s %s spider web!", Monnam(mtmp),
+                          (flaming(mptr)) ? "burns" : "dissolves",
+                          a_your[trap->madeby_u]);
+            }
+            deltrap(trap);
+            newsym(x, y);
+            return TRUE;
+        }
+        if (domsg) {
+            if (isyou)
+                You("flow through %s spider web.", a_your[trap->madeby_u]);
+            else {
+                pline("%s flows through %s spider web.", Monnam(mtmp),
+                      a_your[trap->madeby_u]);
+                seetrap(trap);
+            }
+        }
+        return TRUE;
+    }
+    return FALSE;
+}
+
 void
 dotrap(trap, trflags)
 register struct trap *trap;
@@ -1197,23 +1243,8 @@ unsigned trflags;
 
     case WEB: /* Our luckless player has stumbled into a web. */
         feeltrap(trap);
-        if (amorphous(youmonst.data) || is_whirly(youmonst.data)
-            || unsolid(youmonst.data)) {
-            if (acidic(youmonst.data) || u.umonnum == PM_GELATINOUS_CUBE
-                || u.umonnum == PM_FIRE_ELEMENTAL) {
-                if (webmsgok)
-                    You("%s %s spider web!",
-                        (u.umonnum == PM_FIRE_ELEMENTAL) ? "burn"
-                                                         : "dissolve",
-                        a_your[trap->madeby_u]);
-                deltrap(trap);
-                newsym(u.ux, u.uy);
-                break;
-            }
-            if (webmsgok)
-                You("flow through %s spider web.", a_your[trap->madeby_u]);
+        if (mu_maybe_destroy_web(NULL, webmsgok, trap))
             break;
-        }
         if (webmaker(youmonst.data)) {
             if (webmsgok)
                 pline(trap->madeby_u ? "You take a walk on your web."
@@ -2412,28 +2443,8 @@ register struct monst *mtmp;
             /* Monster in a web. */
             if (webmaker(mptr))
                 break;
-            if (amorphous(mptr) || is_whirly(mptr) || unsolid(mptr)) {
-                if (acidic(mptr) || mptr == &mons[PM_GELATINOUS_CUBE]
-                    || mptr == &mons[PM_FIRE_ELEMENTAL]
-                    || mptr == &mons[PM_FIRE_VORTEX]) {
-                    if (in_sight)
-                        pline("%s %s %s spider web!", Monnam(mtmp),
-                              (mptr == &mons[PM_FIRE_ELEMENTAL]
-                               || mptr == &mons[PM_FIRE_VORTEX])
-                                  ? "burns"
-                                  : "dissolves",
-                              a_your[trap->madeby_u]);
-                    deltrap(trap);
-                    newsym(mtmp->mx, mtmp->my);
-                    break;
-                }
-                if (in_sight) {
-                    pline("%s flows through %s spider web.", Monnam(mtmp),
-                          a_your[trap->madeby_u]);
-                    seetrap(trap);
-                }
+            if (mu_maybe_destroy_web(mtmp, in_sight, trap))
                 break;
-            }
             tear_web = FALSE;
             switch (monsndx(mptr)) {
             case PM_OWLBEAR: /* Eric Backus */
