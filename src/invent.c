@@ -1594,13 +1594,23 @@ unsigned *resultflags;
     ilets[iletct] = '\0';
 
     for (;;) {
-        Sprintf(qbuf, "What kinds of thing do you want to %s? [%s]", word,
-                ilets);
+        Sprintf(qbuf, "What kinds of thing do you want to %s? [%s]",
+                word, ilets);
         getlin(qbuf, buf);
         if (buf[0] == '\033')
             return 0;
         if (index(buf, 'i')) {
-            if (display_inventory((char *) 0, TRUE) == '\033')
+            char ailets[1+26+26+1+5+1]; /* $ + a-z + A-Z + # + slop + \0 */
+            struct obj *otmp;
+
+            /* applicable inventory letters; if empty, show entire invent */
+            ailets[0] = '\0';
+            if (ofilter)
+                for (otmp = invent; otmp; otmp = otmp->nobj)
+                    /* index() check: limit overflow items to one '#' */
+                    if ((*ofilter)(otmp) && !index(ailets, otmp->invlet))
+                        (void) strkitten(ailets, otmp->invlet);
+            if (display_inventory(ailets, TRUE) == '\033')
                 return 0;
         } else
             break;
@@ -1684,7 +1694,9 @@ unsigned *resultflags;
     }
 
     if (m_seen) {
-        return (allflag || (!oletct && ckfn != ckunpaid)) ? -2 : -3;
+        return (allflag
+                || (!oletct && ckfn != ckunpaid && ckfn != ckvalidcat))
+               ? -2 : -3;
     } else if (flags.menu_style != MENU_TRADITIONAL && combo && !allflag) {
         return 0;
 #if 0
@@ -2137,7 +2149,10 @@ long *out_cnt;
     anything any;
     menu_item *selected;
 
-    if (flags.perm_invent && ((lets && *lets) || xtra_choice)) {
+    if (lets && !*lets)
+        lets = 0; /* simplify tests: (lets) instead of (lets && *lets) */
+
+    if (flags.perm_invent && (lets || xtra_choice)) {
         /* partial inventory in perm_invent setting; don't operate on
            full inventory window, use an alternate one instead; create
            the first time needed and keep it for re-use as needed later */

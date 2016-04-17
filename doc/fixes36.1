@@ -205,9 +205,14 @@ when attacking a monster with a rust or corrosion or acid passive
 	counter-attack, grease wasn't protecting the attacker's weapon
 the Bell of Opening now correctly reports when it opens a trapdoor/hole
 knocking can no longer send a monster through a trapdoor/hole and desaddle it
-the game no longer gets confused when you break an item while in a different
-    shop
+game no longer gets confused when you break an unpaid shop item while inside
+	a different shop
 shopkeepers now correctly handle nested containers and gold in containers
+for menustyle traditional, 'D' followed by (B|U|C|X)&m presented a menu of
+	everything, not just invent subset matching specified BUCX categories
+for menustyles traditional or combination, 'A' (or object ID) followed by i
+	displayed an inventory of everything rather than just worn items (or
+	not fully identified items)
 
 post-3.6.0: fix "object lost" panic during pickup caused by sortloot revamp
 post-3.6.0: more sortloot revisions
