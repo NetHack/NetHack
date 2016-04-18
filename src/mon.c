@@ -84,8 +84,10 @@ mon_sanity_check()
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         sanity_check_single_mon(mtmp, TRUE, "fmon");
+        if (DEADMONSTER(mtmp))
+            continue;
         x = mtmp->mx, y = mtmp->my;
-        if (!isok(x, y) || (x == 0 && !mtmp->isgd))
+        if (!isok(x, y) && !(mtmp->isgd && x == 0 && y == 0))
             impossible("mon (%s) claims to be at <%d,%d>?",
                        fmt_ptr((genericptr_t) mtmp), x, y);
         else if (level.monsters[x][y] != mtmp)
