@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1457570259 2016/03/10 00:37:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.262 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1461090580 2016/04/19 18:29:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.266 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -4619,16 +4619,11 @@ boolean disarm;
                 loss += stolen_value(obj, ox, oy, (boolean) shkp->mpeaceful,
                                      TRUE);
             delete_contents(obj);
-            /* we're about to delete all things at this location,
-             * which could include the ball & chain.
-             * If we attempt to call unpunish() in the
-             * for-loop below we can end up with otmp2
-             * being invalid once the chain is gone.
-             * Deal with ball & chain right now instead.
-             */
-            if (Punished && !carried(uball)
-                && ((uchain->ox == u.ux && uchain->oy == u.uy)
-                    || (uball->ox == u.ux && uball->oy == u.uy)))
+            /* unpunish() in advance if either ball or chain (or both)
+               is going to be destroyed */
+            if (Punished && ((uchain->ox == u.ux && uchain->oy == u.uy)
+                             || (uball->where == OBJ_FLOOR
+                                 && uball->ox == u.ux && uball->oy == u.uy)))
                 unpunish();
 
             for (otmp = level.objects[u.ux][u.uy]; otmp; otmp = otmp2) {
