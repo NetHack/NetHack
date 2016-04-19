@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1457570259 2016/03/10 00:37:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.249 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1461028544 2016/04/19 01:15:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.251 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -466,7 +466,8 @@ struct monst *mtmp;
                     otmp->cknown = 1;
             }
         }
-        (void) display_minventory(mtmp, MINV_ALL | MINV_NOLET, (char *) 0);
+        (void) display_minventory(mtmp, MINV_ALL | MINV_NOLET | PICK_NONE,
+                                  (char *) 0);
     } else {
         pline("%s is not carrying anything%s.", noit_Monnam(mtmp),
               (u.uswallow && mtmp == u.ustuck) ? " besides you" : "");

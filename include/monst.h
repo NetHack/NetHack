@@ -1,4 +1,4 @@
-/* NetHack 3.6	monst.h	$NHDT-Date: 1457995142 2016/03/14 22:39:02 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.23 $ */
+/* NetHack 3.6	monst.h	$NHDT-Date: 1461028522 2016/04/19 01:15:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.24 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -30,12 +30,14 @@
 /* The following flags are used for the second argument to display_minventory
  * in invent.c:
  *
+ * PICK_NONE, PICK_ONE, PICK_ANY (wintype.h)  0, 1, 2
  * MINV_NOLET  If set, don't display inventory letters on monster's inventory.
  * MINV_ALL    If set, display all items in monster's inventory, otherwise
  *	       just display wielded weapons and worn items.
  */
-#define MINV_NOLET 0x01
-#define MINV_ALL   0x02
+#define MINV_PICKMASK 0x03 /* 1|2 */
+#define MINV_NOLET    0x04
+#define MINV_ALL      0x08
 
 struct monst {
     struct monst *nmon;

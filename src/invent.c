@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1457994703 2016/03/14 22:31:43 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.199 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1461028538 2016/04/19 01:15:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.204 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2867,7 +2867,7 @@ boolean picked_some;
             if (Blind)
                 Strcpy(fbuf, "You feel");
             Strcat(fbuf, ":");
-            (void) display_minventory(mtmp, MINV_ALL, fbuf);
+            (void) display_minventory(mtmp, MINV_ALL | PICK_NONE, fbuf);
         } else {
             You("%s no objects here.", verb);
         }
@@ -3709,8 +3709,10 @@ struct obj *obj;
  * By default, only worn and wielded items are displayed.  The caller
  * can pick one.  Modifier flags are:
  *
- *      MINV_NOLET      - nothing selectable
- *      MINV_ALL        - display all inventory
+ *      PICK_NONE, PICK_ONE - standard menu control
+ *      PICK_ANY            - allowed, but we only return a single object
+ *      MINV_NOLET          - nothing selectable
+ *      MINV_ALL            - display all inventory
  */
 struct obj *
 display_minventory(mon, dflags, title)
@@ -3724,7 +3726,8 @@ char *title;
     menu_item *selected = 0;
     int do_all = (dflags & MINV_ALL) != 0,
         incl_hero = (do_all && u.uswallow && mon == u.ustuck),
-        have_inv = (mon->minvent != 0), have_any = (have_inv || incl_hero);
+        have_inv = (mon->minvent != 0), have_any = (have_inv || incl_hero),
+        pickings = (dflags & MINV_PICKMASK);
 
     Sprintf(tmp, "%s %s:", s_suffix(noit_Monnam(mon)),
             do_all ? "possessions" : "armament");
@@ -3737,10 +3740,8 @@ char *title;
 
         n = query_objlist(title ? title : tmp, &(mon->minvent),
                           (INVORDER_SORT | (incl_hero ? INCLUDE_HERO : 0)),
-                          &selected,
-                          (dflags & MINV_NOLET) ? PICK_NONE : PICK_ONE,
+                          &selected, pickings,
                           do_all ? allow_all : worn_wield_only);
-
         set_uasmon();
     } else {
         invdisp_nothing(title ? title : tmp, "(none)");
