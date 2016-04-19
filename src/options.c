@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1459987581 2016/04/07 00:06:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.267 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1461102048 2016/04/19 21:40:48 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.268 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3926,7 +3926,7 @@ boolean setinitial, setfromfile;
 {
     winid tmpwin;
     anything any;
-    int i;
+    int i, n;
     char buf[BUFSZ];
 
     /* Special handling of menustyle, pickup_burden, pickup_types,
@@ -4185,11 +4185,17 @@ boolean setinitial, setfromfile;
             sortl_name = sortltype[i];
             any.a_char = *sortl_name;
             add_menu(tmpwin, NO_GLYPH, &any, *sortl_name, 0, ATR_NONE,
-                     sortl_name, MENU_UNSELECTED);
+                     sortl_name, (flags.sortloot == *sortl_name)
+                                    ? MENU_SELECTED : MENU_UNSELECTED);
         }
         end_menu(tmpwin, "Select loot sorting type:");
-        if (select_menu(tmpwin, PICK_ONE, &sortl_pick) > 0) {
-            flags.sortloot = sortl_pick->item.a_char;
+        n = select_menu(tmpwin, PICK_ONE, &sortl_pick);
+        if (n > 0) {
+            char c = sortl_pick[0].item.a_char;
+
+            if (n > 1 && c == flags.sortloot)
+                c = sortl_pick[1].item.a_char;
+            flags.sortloot = c;
             free((genericptr_t) sortl_pick);
         }
         destroy_nhwindow(tmpwin);
