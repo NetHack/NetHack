@@ -81,7 +81,7 @@ STATIC_DCL const char *FDECL(cad, (BOOLEAN_P));
                     obj->quan <= bp->bquan
  */
 
-static const char *angrytexts[] = {"quite upset", "ticked off", "furious"};
+static const char *angrytexts[] = { "quite upset", "ticked off", "furious" };
 
 /*
  *  Transfer money from inventory to monster when paying
@@ -597,13 +597,14 @@ char *enterstring;
                   s_suffix(shkname(shkp)), shtypes[rt - SHOPBASE].name);
         else
             pline("%s seems %s over your return to %s %s!",
-                Shknam(shkp),
-                angrytexts[rn2(SIZE(angrytexts))],
-                mhis(shkp),
-                shtypes[rt - SHOPBASE].name);
+                  Shknam(shkp),
+                  angrytexts[rn2(SIZE(angrytexts))],
+                  mhis(shkp),
+                  shtypes[rt - SHOPBASE].name);
     } else if (eshkp->robbed) {
         if (!Deaf)
-            pline("%s mutters imprecations against shoplifters.", shkname(shkp));
+            pline("%s mutters imprecations against shoplifters.",
+                  shkname(shkp));
         else
             pline("%s is combing through %s inventory list.",
                   Shknam(shkp),
@@ -611,8 +612,8 @@ char *enterstring;
     } else {
         if (!Deaf && !muteshk(shkp))
             verbalize("%s, %s!  Welcome%s to %s %s!", Hello(shkp), plname,
-                      eshkp->visitct++ ? " again" : "", s_suffix(shkname(shkp)),
-                      shtypes[rt - SHOPBASE].name);
+                      eshkp->visitct++ ? " again" : "",
+                      s_suffix(shkname(shkp)), shtypes[rt - SHOPBASE].name);
         else
             You("enter %s %s%s!",
                 s_suffix(shkname(shkp)),
@@ -701,10 +702,10 @@ struct obj *obj;
                       cad(FALSE));
             else
                 pline("%s %s your pick!",
-                       Shknam(shkp),
-                       haseyes(shkp->data) ? "glares at"
-                                           : "is dismayed because of");                      
-	}
+                      Shknam(shkp),
+                      haseyes(shkp->data) ? "glares at"
+                                          : "is dismayed because of");
+        }
         pickmovetime = moves;
     }
 }
@@ -836,7 +837,7 @@ register char rmno;
             /* not sure if this is appropriate, because it does nothing to
                correct the underlying rooms[].resident issue but... */
             return (struct monst *)0;
-	}
+        }
     }
     return shkp;
 }
@@ -1609,13 +1610,13 @@ boolean itemize;
                       ANGRY(shkp) ? "Pay" : "Please pay",
                       simpleonames(obj), /* short name suffices */
                       save_quan > 1L ? "these" : "this one");
-	    } else {
-	        pline("%s %s%s your bill for the other %s first.",
-	              Shknam(shkp),
+            } else {
+                pline("%s %s%s your bill for the other %s first.",
+                      Shknam(shkp),
                       ANGRY(shkp) ? "angrily " : "",
-	              nolimbs(shkp->data) ? "motions to" : "points out",
-	              simpleonames(obj));
-	    }
+                      nolimbs(shkp->data) ? "motions to" : "points out",
+                      simpleonames(obj));
+            }
             buy = PAY_SKIP; /* shk won't sell */
         }
     }
@@ -2199,12 +2200,12 @@ boolean quietly;
                     pline("%s seems %s that you want to sell that.",
                           Shknam(shkp),
                           (obj->spe < 7) ? "horrified" : "concerned");
-		} else {
+                } else {
                     verbalize("No thanks, I'd hang onto that if I were you.");
                     if (obj->spe < 7)
                         verbalize(
-                                 "You'll need %d%s candle%s to go along with it.",
-                                  (7 - obj->spe), (obj->spe > 0) ? " more" : "",
+                             "You'll need %d%s candle%s to go along with it.",
+                                (7 - obj->spe), (obj->spe > 0) ? " more" : "",
                                   plur(7 - obj->spe));
                     /* [what if hero is already carrying enough candles?
                        should Izchak explain how to attach them instead?] */
@@ -3945,7 +3946,7 @@ boolean cant_mollify;
                 if (!Deaf && !muteshk(shkp)) {
                     You_hear("an angry voice:");
                     verbalize("Out of my way, scum!");
-		}
+                }
                 wait_synch();
 #if defined(UNIX) || defined(VMS)
 #if defined(SYSV) || defined(ULTRIX) || defined(VMS)
@@ -3970,26 +3971,21 @@ boolean cant_mollify;
         } else if (pursue || uinshp || !um_dist(x, y, 1)) {
             if (!Deaf)
                 verbalize("How dare you %s my %s?", dmgstr,
-                      dugwall ? "shop" : "door");
+                          dugwall ? "shop" : "door");
             else
                 pline("%s is %s that you decided to %s %s %s!",
-                        Shknam(shkp),
-                        angrytexts[rn2(SIZE(angrytexts))],
-                        dmgstr, mhis(shkp),
-                        dugwall ? "shop" : "door");
+                      Shknam(shkp), angrytexts[rn2(SIZE(angrytexts))],
+                      dmgstr, mhis(shkp), dugwall ? "shop" : "door");
         } else {
             if (!Deaf) {
                 pline("%s shouts:", shkname(shkp));
                 verbalize("Who dared %s my %s?", dmgstr,
                           dugwall ? "shop" : "door");
-	    } else {
+            } else {
                 pline("%s is %s that someone decided to %s %s %s!",
-                        Shknam(shkp),
-                        angrytexts[rn2(SIZE(angrytexts))],
-                        dmgstr,
-                        mhis(shkp),
-                        dugwall ? "shop" : "door");                
-	    }
+                      Shknam(shkp), angrytexts[rn2(SIZE(angrytexts))],
+                      dmgstr, mhis(shkp), dugwall ? "shop" : "door");
+            }
         }
         hot_pursuit(shkp);
         return;
@@ -4127,6 +4123,7 @@ long cost;
 {
     if (!rn2(3)) {
         register int o, choice = rn2(5);
+
         if (choice == 0)
             choice = (cost < 100L ? 1 : cost < 500L ? 2 : 3);
         switch (choice) {
@@ -4211,7 +4208,6 @@ struct monst *shkp;
             else
                 pline("%s taps you on the %s.",
                       Shknam(shkp), body_part(ARM));
-                      
         }
     } else if (eshk->billct) {
         register long total = addupbill(shkp) + eshk->debit;
@@ -4229,10 +4225,10 @@ struct monst *shkp;
         pline("%s encourages you to use your %ld %s of credit.",
               shkname(shkp), eshk->credit, currency(eshk->credit));
     } else if (eshk->robbed) {
-        pline("%s %s about a recent robbery.", 
-                Shknam(shkp),
-                (!Deaf && !muteshk(shkp)) ? "complains" : "indicates concern");
-    } else if ((shkmoney = money_cnt(shkp->minvent)) < 50) {
+        pline("%s %s about a recent robbery.",
+              Shknam(shkp),
+              (!Deaf && !muteshk(shkp)) ? "complains" : "indicates concern");
+    } else if ((shkmoney = money_cnt(shkp->minvent)) < 50L) {
         pline("%s %s that business is bad.",
               shkname(shkp),
               (!Deaf && !muteshk(shkp)) ? "complains" : "indicates");

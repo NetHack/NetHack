@@ -1463,20 +1463,17 @@ dosearch()
 void
 warnreveal()
 {
-    xchar x, y;
+    int x, y;
     struct monst *mtmp;
-    
-    for (x = u.ux - 1; x < u.ux + 2; x++)
-     for (y = u.uy - 1; y < u.uy + 2; y++) {
-        if (!isok(x, y))
-            continue;
-        if (x == u.ux && y == u.uy)
-            continue;
 
-        if ((mtmp = m_at(x, y)) != 0
-             && warning_of(mtmp) && mtmp->mundetected)
-           (void) mfind0(mtmp, 1); /* via_warning */
-     }
+    for (x = u.ux - 1; x <= u.ux + 1; x++)
+        for (y = u.uy - 1; y <= u.uy + 1; y++) {
+            if (!isok(x, y) || (x == u.ux && y == u.uy))
+                continue;
+            if ((mtmp = m_at(x, y)) != 0
+                && warning_of(mtmp) && mtmp->mundetected)
+                (void) mfind0(mtmp, 1); /* via_warning */
+        }
 }
 
 /* Pre-map the sokoban levels */
