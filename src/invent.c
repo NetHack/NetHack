@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1461028538 2016/04/19 01:15:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.204 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1461110442 2016/04/20 00:00:42 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.205 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1061,7 +1061,6 @@ register const char *let, *word;
     register int foo = 0;
     register char *bp = buf;
     xchar allowcnt = 0; /* 0, 1 or 2 */
-    struct obj *firstobj = invent;
     boolean usegold = FALSE; /* can't use gold because its illegal */
     boolean allowall = FALSE;
     boolean allownone = FALSE;
@@ -1114,7 +1113,7 @@ register const char *let, *word;
            and so won't have to re-sort in the for(;;) loop below */
         sortloot(&invent, SORTLOOT_INVLET, FALSE);
 
-    for (otmp = firstobj; otmp; otmp = otmp->nobj) {
+    for (otmp = invent; otmp; otmp = otmp->nobj) {
         if (&bp[foo] == &buf[sizeof buf - 1]
             || ap == &altlets[sizeof altlets - 1]) {
             /* we must have a huge number of NOINVSYM items somehow */
