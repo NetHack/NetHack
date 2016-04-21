@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1454528962 2016/02/03 19:49:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.210 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1461282107 2016/04/21 23:41:47 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.215 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2421,7 +2421,7 @@ struct monst *mtmp;
             }
             newsym(mtmp->mx, mtmp->my);
             return FALSE;   /* didn't petrify */
-   	}
+        }
     }
     return TRUE;
 }
@@ -3367,10 +3367,17 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
                             ? "slime"
                             : x_monnam(mtmp, ARTICLE_A, (char *) 0,
                                        SUPPRESS_SADDLE, FALSE));
-        if (!strcmpi(oldname, "it") && !strcmpi(newname, "it"))
+        /* oldname was capitalized above; newname will be lower case */
+        if (!strcmpi(newname, "it")) { /* can't see or sense it now */
+            if (!!strcmpi(oldname, "it")) /* could see or sense it before */
+                pline("%s disappears!", oldname);
             (void) usmellmon(mdat);
-        else
-            pline("%s turns into %s!", oldname, newname);
+        } else { /* can see or sense it now */
+            if (!strcmpi(oldname, "it")) /* couldn't see or sense it before */
+                pline("%s appears!", upstart(newname));
+            else
+                pline("%s turns into %s!", oldname, newname);
+        }
         if (save_mname)
             MNAME(mtmp) = save_mname;
     }
