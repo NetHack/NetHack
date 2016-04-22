@@ -794,7 +794,6 @@ struct obj *objchn, *saddle;
 }
 
 /* monster or you go through and possibly destroy a web.
-   mtmp == NULL == you.
    return TRUE if could go through. */
 boolean
 mu_maybe_destroy_web(mtmp, domsg, trap)
@@ -802,12 +801,10 @@ struct monst *mtmp;
 boolean domsg;
 struct trap *trap;
 {
-    boolean isyou = !mtmp;
-    struct permonst *mptr = isyou ? youmonst.data : mtmp->data;
-    boolean gelcube = isyou ? (u.umonnum == PM_GELATINOUS_CUBE)
-        : (mptr == &mons[PM_GELATINOUS_CUBE]);
+    boolean isyou = (mtmp == &youmonst);
+    struct permonst *mptr = mtmp->data;
     if (amorphous(mptr) || is_whirly(mptr) || flaming(mptr)
-        || unsolid(mptr) || gelcube) {
+        || unsolid(mptr) || mptr == &mons[PM_GELATINOUS_CUBE]) {
         xchar x = trap->tx;
         xchar y = trap->ty;
         if (flaming(mptr) || acidic(mptr)) {
@@ -1243,7 +1240,7 @@ unsigned trflags;
 
     case WEB: /* Our luckless player has stumbled into a web. */
         feeltrap(trap);
-        if (mu_maybe_destroy_web(NULL, webmsgok, trap))
+        if (mu_maybe_destroy_web(&youmonst, webmsgok, trap))
             break;
         if (webmaker(youmonst.data)) {
             if (webmsgok)
