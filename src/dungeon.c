@@ -2465,6 +2465,9 @@ recalc_mapseen()
             /*  An automatic annotation is added to the Castle and
              *  to Fort Ludios once their structure's main entrance
              *  has been seen (in person or via magic mapping).
+             *  For the Fort, that entrance is just a secret door
+             *  which will be converted into a regular one when
+             *  located (or destroyed).
              * DOOR: possibly a lowered drawbridge's open portcullis;
              * DBWALL: a raised drawbridge's "closed door";
              * DRAWBRIDGE_DOWN: the span provided by lowered bridge,
@@ -2474,6 +2477,26 @@ recalc_mapseen()
              *  the adjacent DBWALL has been seen.
              */
             case DOOR:
+                if (Is_knox(&u.uz)) {
+                    int ty, tx = x - 4;
+
+                    /* Throne is four columns left, either directly in
+                     * line or one row higher or lower, and doesn't have
+                     * to have been seen yet.
+                     *   ......|}}}.
+                     *   ..\...S}...
+                     *   ..\...S}...
+                     *   ......|}}}.
+                     * For 3.6.0 and earlier, it was always in direct line:
+                     * both throne and door on the lower of the two rows.
+                     */
+                    for (ty = y - 1; ty <= y + 1; ++ty)
+                        if (isok(tx, ty) && IS_THRONE(levl[tx][ty].typ)) {
+                            mptr->flags.ludios = 1;
+                            break;
+                        }
+                    break;
+                }
                 if (is_drawbridge_wall(x, y) < 0)
                     break;
             /* else FALLTHRU */
@@ -2481,8 +2504,6 @@ recalc_mapseen()
             case DRAWBRIDGE_DOWN:
                 if (Is_stronghold(&u.uz))
                     mptr->flags.castle = 1, mptr->flags.castletune = 1;
-                else if (Is_knox(&u.uz))
-                    mptr->flags.ludios = 1;
                 break;
             default:
                 break;
