@@ -11,6 +11,7 @@
 
 STATIC_DCL char *FDECL(strprepend, (char *, const char *));
 STATIC_DCL short FDECL(rnd_otyp_by_wpnskill, (SCHAR_P));
+STATIC_DCL short FDECL(rnd_otyp_by_namedesc, (char *, char));
 STATIC_DCL boolean FDECL(wishymatch, (const char *, const char *, BOOLEAN_P));
 STATIC_DCL char *NDECL(nextobuf);
 STATIC_DCL void FDECL(releaseobuf, (char *));
@@ -2448,6 +2449,51 @@ schar skill;
     return otyp;
 }
 
+short
+rnd_otyp_by_namedesc(name, oclass)
+char *name;
+char oclass;
+{
+    int i = oclass ? bases[(int)oclass] : 1;
+    int n = 0;
+    short otyp = STRANGE_OBJECT;
+    short validobjs[NUM_OBJECTS];
+    register const char *zn;
+    long maxprob = 0;
+
+    if (!name) return STRANGE_OBJECT;
+
+    memset((genericptr_t) validobjs, 0, sizeof(validobjs));
+
+    while (i < NUM_OBJECTS && (!oclass || objects[i].oc_class == oclass)) {
+        if ((zn = OBJ_NAME(objects[i])) != 0 && wishymatch(name, zn, TRUE)) {
+            otyp = i;
+        } else if ((zn = OBJ_DESCR(objects[i])) != 0 && wishymatch(name, zn, FALSE) &&
+            /* don't match extra descriptions (w/o real name) */
+		   OBJ_NAME(objects[i])) {
+	    otyp = i;
+        } else if ((zn = objects[i].oc_uname) != 0 && wishymatch(name, zn, FALSE)) {
+            otyp = i;
+        }
+        if (otyp != STRANGE_OBJECT) {
+            validobjs[n++] = otyp;
+            maxprob += objects[otyp].oc_prob;
+            otyp = STRANGE_OBJECT;
+        }
+        i++;
+    }
+
+    if (n > 0 && maxprob) {
+        long prob = rn2(maxprob);
+        i = 0;
+        while ((i < (n-1)) && (prob -= objects[validobjs[i]].oc_prob) > 0)
+            i++;
+        return validobjs[i];
+    }
+    return STRANGE_OBJECT;
+}
+
+
 /*
  * Return something wished for.  Specifying a null pointer for
  * the user request string results in a random object.  Otherwise,
@@ -2488,7 +2534,7 @@ struct obj *no_wish;
      * automatically sticks 'candied' in front of such names.
      */
     char oclass;
-    char *un, *dn, *actualn;
+    char *un, *dn, *actualn, *origbp = bp;
     const char *name = 0;
 
     cnt = spe = spesgn = typ = very = rechrg = blessed = uncursed = iscursed =
@@ -3008,30 +3054,14 @@ srch:
             }
         }
     }
-    i = oclass ? bases[(int) oclass] : 1;
-    while (i < NUM_OBJECTS && (!oclass || objects[i].oc_class == oclass)) {
-        register const char *zn;
 
-        if (actualn && (zn = OBJ_NAME(objects[i])) != 0
-            && wishymatch(actualn, zn, TRUE)) {
-            typ = i;
-            goto typfnd;
-        }
-        if (dn && (zn = OBJ_DESCR(objects[i])) != 0
-            && wishymatch(dn, zn, FALSE)) {
-            /* don't match extra descriptions (w/o real name) */
-            if (!OBJ_NAME(objects[i]))
-                return (struct obj *) 0;
-            typ = i;
-            goto typfnd;
-        }
-        if (un && (zn = objects[i].oc_uname) != 0
-            && wishymatch(un, zn, FALSE)) {
-            typ = i;
-            goto typfnd;
-        }
-        i++;
-    }
+    if (((typ = rnd_otyp_by_namedesc(actualn, oclass)) != STRANGE_OBJECT)
+        || ((typ = rnd_otyp_by_namedesc(dn, oclass)) != STRANGE_OBJECT)
+        || ((typ = rnd_otyp_by_namedesc(un, oclass)) != STRANGE_OBJECT)
+        || ((typ = rnd_otyp_by_namedesc(origbp, oclass)) != STRANGE_OBJECT))
+        goto typfnd;
+    typ = 0;
+
     if (actualn) {
         struct Jitem *j = Japanese_items;
 
