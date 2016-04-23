@@ -1,4 +1,4 @@
-/* NetHack 3.6	pline.c	$NHDT-Date: 1456528597 2016/02/26 23:16:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.49 $ */
+/* NetHack 3.6	pline.c	$NHDT-Date: 1461437814 2016/04/23 18:56:54 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.51 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -558,8 +558,9 @@ piousness(showneg, suffix)
 boolean showneg;
 const char *suffix;
 {
-    static char buf[BUFSZ];
-    char *pio;
+    static char buf[32]; /* bigger than "insufficiently neutral" */
+    const char *pio;
+
     /* note: piousness 20 matches MIN_QUEST_ALIGN (quest.h) */
     if (u.ualign.record >= 20)
         pio = "piously";

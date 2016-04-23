@@ -1,4 +1,4 @@
-/* NetHack 3.6	extern.h	$NHDT-Date: 1459987582 2016/04/07 00:06:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.554 $ */
+/* NetHack 3.6	extern.h	$NHDT-Date: 1461437800 2016/04/23 18:56:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.557 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1791,7 +1791,7 @@ E const char *FDECL(align_str, (ALIGNTYP_P));
 E void FDECL(mstatusline, (struct monst *));
 E void NDECL(ustatusline);
 E void NDECL(self_invis_message);
-E char *FDECL(piousness, (boolean, const char *));
+E char *FDECL(piousness, (BOOLEAN_P, const char *));
 E void FDECL(pudding_merge_message, (struct obj *, struct obj *));
 
 /* ### polyself.c ### */
