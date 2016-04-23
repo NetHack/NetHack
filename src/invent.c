@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1461110442 2016/04/20 00:00:42 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.205 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1461451444 2016/04/23 22:44:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.206 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -64,7 +64,7 @@ const genericptr vptr2;
                          *sli2 = (struct sortloot_item *) vptr2;
     struct obj *obj1 = sli1->obj,
                *obj2 = sli2->obj;
-    char *cls1, *cls2;
+    char *cls1, *cls2, nam1[BUFSZ], nam2[BUFSZ];
     int val1, val2, c, namcmp;
 
     /* order by object class like inventory display */
@@ -139,8 +139,18 @@ const genericptr vptr2;
     if ((sortlootmode & SORTLOOT_LOOT) == 0)
         goto tiebreak;
 
-    /* Sort object names in lexicographical order, ignoring quantity. */
-    if ((namcmp = strcmpi(cxname_singular(obj1), cxname_singular(obj2))) != 0)
+    /* Sort object names in lexicographical order, ignoring quantity.
+       [Force holy and unholy water to sort adjacent to water rather
+       than among 'h's and 'u's.  BUCX order will keep them distinct.] */
+    Strcpy(nam1, cxname_singular(obj1));
+    if (obj1->otyp == POT_WATER && obj1->bknown
+        && (obj1->blessed || obj1->cursed))
+        (void) strsubst(nam1, obj1->blessed ? "holy " : "unholy ", "");
+    Strcpy(nam2, cxname_singular(obj2));
+    if (obj2->otyp == POT_WATER && obj2->bknown
+        && (obj2->blessed || obj2->cursed))
+        (void) strsubst(nam2, obj2->blessed ? "holy " : "unholy ", "");
+    if ((namcmp = strcmpi(nam1, nam2)) != 0)
         return namcmp;
 
     /* Sort by BUCX.  Map blessed to 4, uncursed to 2, cursed to 1, and
