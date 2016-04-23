@@ -1950,27 +1950,12 @@ int final;
         you_are(hofe_titles[u.uevent.uhand_of_elbereth - 1], "");
     }
 
-    /* note: piousness 20 matches MIN_QUEST_ALIGN (quest.h) */
-    if (u.ualign.record >= 20)
-        you_are("piously aligned", "");
-    else if (u.ualign.record > 13)
-        you_are("devoutly aligned", "");
-    else if (u.ualign.record > 8)
-        you_are("fervently aligned", "");
-    else if (u.ualign.record > 3)
-        you_are("stridently aligned", "");
-    else if (u.ualign.record == 3)
-        you_are("aligned", "");
-    else if (u.ualign.record > 0)
-        you_are("haltingly aligned", "");
-    else if (u.ualign.record == 0)
-        you_are("nominally aligned", "");
-    else if (u.ualign.record >= -3)
-        you_have("strayed", "");
-    else if (u.ualign.record >= -8)
-        you_have("sinned", "");
+    Sprintf(buf, "%s", piousness(TRUE, "aligned"));
+    if (u.ualign.record >= 0)
+        you_are(buf, "");
     else
-        you_have("transgressed", "");
+        you_have(buf, "");
+
     if (wizard) {
         Sprintf(buf, " %d", u.ualign.record);
         enl_msg("Your alignment ", "is", "was", buf, "");
