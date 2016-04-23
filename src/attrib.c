@@ -728,10 +728,10 @@ long frommask;
 #define FROM_NONE 0
 #define FROM_ROLE 1 /* from experience at level 1 */
 #define FROM_RACE 2
-#define FROM_EXP  3 /* from experience for some level > 1 */
-#define FROM_FORM 4
-#define FROM_LYCN 5
-
+#define FROM_INTR 3 /* intrinsically (eating some corpse or prayer reward) */
+#define FROM_EXP  4 /* from experience for some level > 1 */
+#define FROM_FORM 5
+#define FROM_LYCN 6
 
 /* check whether particular ability has been obtained via innate attribute */
 STATIC_OVL int
@@ -744,6 +744,8 @@ long *ability;
         return (iptr->ulevel == 1) ? FROM_ROLE : FROM_EXP;
     if ((iptr = check_innate_abil(ability, FROMRACE)) != 0)
         return FROM_RACE;
+    if ((*ability & FROMOUTSIDE) != 0L)
+        return FROM_INTR;
     if ((*ability & FROMFORM) != 0L)
         return FROM_FORM;
     return FROM_NONE;
@@ -790,14 +792,32 @@ int propidx; /* special cases can have negative values */
             struct obj *obj = (struct obj *) 0;
             int innateness = is_innate(propidx);
 
-            if (innateness == FROM_EXP)
+            /*
+             * Properties can be obtained from multiple sources and we
+             * try to pick the most significant one.  Classification
+             * priority is not set in stone; current precedence is:
+             * "from the start" (from role or race at level 1),
+             * "from outside" (eating corpse, divine reward, blessed potion),
+             * "from experience" (from role or race at level 2+),
+             * "from current form" (while polymorphed),
+             * "from timed effect" (potion or spell),
+             * "from worn/wielded equipment" (Firebrand, elven boots, &c),
+             * "from carried equipment" (mainly quest artifacts).
+             * There are exceptions.  Versatile jumping from spell or boots
+             * takes priority over knight's innate but limited jumping.
+             */
+            if (propidx == BLINDED && u.uroleplay.blind)
+                Sprintf(buf, " from birth");
+            else if (innateness == FROM_ROLE || innateness == FROM_RACE)
+                Strcpy(buf, " innately");
+            else if (innateness == FROM_INTR) /* [].intrinsic & FROMOUTSIDE */
+                Strcpy(buf, " intrinsically");
+            else if (innateness == FROM_EXP)
                 Strcpy(buf, " because of your experience");
             else if (innateness == FROM_LYCN)
                 Strcpy(buf, " due to your lycanthropy");
             else if (innateness == FROM_FORM)
                 Strcpy(buf, " from current creature form");
-            else if (innateness == FROM_ROLE || innateness == FROM_RACE)
-                Strcpy(buf, " innately");
             else if (propidx == FAST && Very_fast)
                 Sprintf(buf, because_of,
                         ((HFast & TIMEOUT) != 0L) ? "a potion or spell"
@@ -811,8 +831,6 @@ int propidx; /* special cases can have negative values */
                 Sprintf(buf, because_of, obj->oartifact
                                              ? bare_artifactname(obj)
                                              : ysimple_name(obj));
-            else if (propidx == BLINDED && u.uroleplay.blind)
-                Sprintf(buf, " from birth");
             else if (propidx == BLINDED && Blindfolded_only)
                 Sprintf(buf, because_of, ysimple_name(ublindf));
 
