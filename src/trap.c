@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1461090580 2016/04/19 18:29:40 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.266 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1461568321 2016/04/25 07:12:01 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.268 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -311,12 +311,12 @@ struct monst *victim;
 
 struct trap *
 maketrap(x, y, typ)
-register int x, y, typ;
+int x, y, typ;
 {
     static union vlaunchinfo zero_vl;
-    register struct trap *ttmp;
-    register struct rm *lev;
     boolean oldplace;
+    struct trap *ttmp;
+    struct rm *lev = &levl[x][y];
 
     if ((ttmp = t_at(x, y)) != 0) {
         if (ttmp->ttyp == MAGIC_PORTAL || ttmp->ttyp == VIBRATING_SQUARE)
@@ -329,7 +329,8 @@ register int x, y, typ;
                     && typ != SPIKED_PIT)))
             u.utrap = 0;
         /* old <tx,ty> remain valid */
-    } else if (IS_FURNITURE(levl[x][y].typ)) {
+    } else if (IS_FURNITURE(lev->typ)
+               && (!IS_GRAVE(lev->typ) || (typ != PIT && typ != HOLE))) {
         /* no trap on top of furniture (caller usually screens the
            location to inhibit this, but wizard mode wishing doesn't) */
         return (struct trap *) 0;
@@ -401,7 +402,6 @@ register int x, y, typ;
         /*FALLTHRU*/
     case HOLE:
     case TRAPDOOR:
-        lev = &levl[x][y];
         if (*in_rooms(x, y, SHOPBASE)
             && (typ == HOLE || typ == TRAPDOOR
                 || IS_DOOR(lev->typ) || IS_WALL(lev->typ)))
