@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1456907854 2016/03/02 08:37:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.125 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1461619522 2016/04/25 21:25:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.130 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1820,9 +1820,11 @@ struct WinDesc *cw;
                        lines (including fake ones that simulate grayed-out
                        entries, so we don't rely on curr->identifier here) */
                     attr_n = 0; /* whole line */
-                    if (curr->str[0] && curr->str[1] && curr->str[2]
-                        && curr->str[1] == ' ' && index("-+#", curr->str[2]))
-                        attr_n = 2 + 1; /* after selection indicator */
+                    if (curr->str[0] && curr->str[1] == ' '
+                        && curr->str[2] && index("-+#", curr->str[2])
+                        && curr->str[3] == ' ')
+                        /* [0]=letter, [1]==space, [2]=[-+#], [3]=space */
+                        attr_n = 4; /* [4:N]=entry description */
 
                     /*
                      * Don't use xputs() because (1) under unix it calls
