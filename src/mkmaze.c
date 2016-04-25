@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1449269918 2015/12/04 22:58:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.42 $ */
+/* NetHack 3.6	mkmaze.c	$NHDT-Date: 1461571093 2016/04/25 07:58:13 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.47 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -372,6 +372,7 @@ d_level *lev;
 STATIC_OVL void
 baalz_fixup()
 {
+    struct monst *mtmp;
     int x, y, lastx, lasty;
 
     /*
@@ -381,8 +382,8 @@ baalz_fixup()
      * 'lastx - 1' and 'lasty - 1' for ending don't-clean column and row)
      * and the interior is protected against that (in wall_cleanup()).
      *
-     * Assumes level.flags.corrmaze, otherwise the bug legs will have
-     * already been "cleaned" away by general wallification.
+     * Assumes level.flags.corrmaze is True, otherwise the bug legs will
+     * have already been "cleaned" away by general wallification.
      */
 
     /* find low and high x for to-be-wallified portion of level */
@@ -432,12 +433,16 @@ baalz_fixup()
         && isok(x, y + 1) && levl[x][y + 1].typ == TUWALL) {
         levl[x][y].typ = BRCORNER;
         levl[x][y + 1].typ = HWALL;
+        if ((mtmp = m_at(x, y)) != 0) /* something at temporary pool... */
+            (void) rloc(mtmp, FALSE);
     }
     x = bughack.delarea.x2, y = bughack.delarea.y2;
     if (isok(x, y) && levl[x][y].typ == TLWALL
         && isok(x, y - 1) && levl[x][y - 1].typ == TDWALL) {
         levl[x][y].typ = TRCORNER;
         levl[x][y - 1].typ = HWALL;
+        if ((mtmp = m_at(x, y)) != 0) /* something at temporary pool... */
+            (void) rloc(mtmp, FALSE);
     }
 
     /* reset bughack region; set low end to <COLNO,ROWNO> so that
