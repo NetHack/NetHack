@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1461451444 2016/04/23 22:44:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.206 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1461629196 2016/04/26 00:06:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.207 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -63,7 +63,8 @@ const genericptr vptr2;
     struct sortloot_item *sli1 = (struct sortloot_item *) vptr1,
                          *sli2 = (struct sortloot_item *) vptr2;
     struct obj *obj1 = sli1->obj,
-               *obj2 = sli2->obj;
+               *obj2 = sli2->obj,
+               sav1, sav2;
     char *cls1, *cls2, nam1[BUFSZ], nam2[BUFSZ];
     int val1, val2, c, namcmp;
 
@@ -139,9 +140,19 @@ const genericptr vptr2;
     if ((sortlootmode & SORTLOOT_LOOT) == 0)
         goto tiebreak;
 
-    /* Sort object names in lexicographical order, ignoring quantity.
-       [Force holy and unholy water to sort adjacent to water rather
-       than among 'h's and 'u's.  BUCX order will keep them distinct.] */
+    /*
+     * Sort object names in lexicographical order, ignoring quantity.
+     */
+    /* Force diluted potions to come out after undiluted of same type;
+       obj->odiluted overloads obj->oeroded. */
+    sav1.odiluted = obj1->odiluted;
+    sav2.odiluted = obj2->odiluted;
+    if (obj1->oclass == POTION_CLASS)
+        obj1->odiluted = 0;
+    if (obj1->oclass == POTION_CLASS)
+        obj2->odiluted = 0;
+    /* Force holy and unholy water to sort adjacent to water rather
+       than among 'h's and 'u's.  BUCX order will keep them distinct. */
     Strcpy(nam1, cxname_singular(obj1));
     if (obj1->otyp == POT_WATER && obj1->bknown
         && (obj1->blessed || obj1->cursed))
@@ -150,6 +161,9 @@ const genericptr vptr2;
     if (obj2->otyp == POT_WATER && obj2->bknown
         && (obj2->blessed || obj2->cursed))
         (void) strsubst(nam2, obj2->blessed ? "holy " : "unholy ", "");
+    obj1->odiluted = sav1.odiluted;
+    obj2->odiluted = sav2.odiluted;
+
     if ((namcmp = strcmpi(nam1, nam2)) != 0)
         return namcmp;
 
