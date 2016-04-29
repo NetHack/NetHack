@@ -1,4 +1,4 @@
-/* NetHack 3.6	end.c	$NHDT-Date: 1454571522 2016/02/04 07:38:42 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.114 $ */
+/* NetHack 3.6	end.c	$NHDT-Date: 1461919723 2016/04/29 08:48:43 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.116 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1438,11 +1438,11 @@ char defquery;
 boolean ask;
 {
     register int i, lev;
-    int ntypes = 0, max_lev = 0, nkilled;
+    int ntypes = 0, max_lev = 0, pfx, nkilled;
     long total_killed = 0L;
     char c;
     winid klwin;
-    char buf[BUFSZ];
+    char buf[BUFSZ], buftoo[BUFSZ];
 
     /* get totals first */
     for (i = LOW_PM; i < NUMMONS; i++) {
@@ -1475,7 +1475,7 @@ boolean ask;
                         && (nkilled = mvitals[i].died) > 0) {
                         if ((mons[i].geno & G_UNIQ) && i != PM_HIGH_PRIEST) {
                             Sprintf(buf, "%s%s",
-                                    !type_is_pname(&mons[i]) ? "The " : "",
+                                    !type_is_pname(&mons[i]) ? "the " : "",
                                     mons[i].mname);
                             if (nkilled > 1) {
                                 switch (nkilled) {
@@ -1496,10 +1496,16 @@ boolean ask;
                             if (nkilled == 1)
                                 Strcpy(buf, an(mons[i].mname));
                             else
-                                Sprintf(buf, "%d %s", nkilled,
+                                Sprintf(buf, "%3d %s", nkilled,
                                         makeplural(mons[i].mname));
                         }
-                        putstr(klwin, 0, buf);
+                        /* number of leading spaces to match 3 digit prefix */
+                        pfx = !strncmpi(buf, "the ", 3) ? 0
+                              : !strncmpi(buf, "an ", 3) ? 1
+                                : !strncmpi(buf, "a ", 2) ? 2
+                                  : !isdigit(buf[2]) ? 4 : 0;
+                        Sprintf(buftoo, "%*s%s", pfx, "", buf);
+                        putstr(klwin, 0, buftoo);
                     }
             /*
              * if (Hallucination)
