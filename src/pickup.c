@@ -1,4 +1,4 @@
-/* NetHack 3.6	pickup.c	$NHDT-Date: 1457400916 2016/03/08 01:35:16 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.171 $ */
+/* NetHack 3.6	pickup.c	$NHDT-Date: 1461919368 2016/04/29 08:42:48 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.177 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2487,11 +2487,7 @@ boolean more_containers; /* True iff #loot multiple and this isn't last one */
             } else {
                 /* couldn't put selected item into container for some
                    reason; might need to undo splitobj() */
-                for (curr = invent; curr; curr = curr->nobj)
-                    if (curr->nobj == otmp)
-                        break;
-                if (curr && curr->invlet == otmp->invlet)
-                    (void) merged(&curr, &otmp);
+                (void) unsplitobj(otmp);
             }
         }
     }
