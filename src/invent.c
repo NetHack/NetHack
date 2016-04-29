@@ -1,4 +1,4 @@
-/* NetHack 3.6	invent.c	$NHDT-Date: 1461629196 2016/04/26 00:06:36 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.207 $ */
+/* NetHack 3.6	invent.c	$NHDT-Date: 1461967848 2016/04/29 22:10:48 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.208 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -16,7 +16,6 @@ STATIC_DCL void FDECL(invdisp_nothing, (const char *, const char *));
 STATIC_DCL boolean FDECL(worn_wield_only, (struct obj *));
 STATIC_DCL boolean FDECL(only_here, (struct obj *));
 STATIC_DCL void FDECL(compactify, (char *));
-STATIC_DCL boolean FDECL(splittable, (struct obj *));
 STATIC_DCL boolean FDECL(taking_off, (const char *));
 STATIC_DCL boolean FDECL(putting_on, (const char *));
 STATIC_PTR int FDECL(ckunpaid, (struct obj *));
@@ -1042,7 +1041,7 @@ register char *buf;
 }
 
 /* some objects shouldn't be split when count given to getobj or askchain */
-STATIC_OVL boolean
+boolean
 splittable(obj)
 struct obj *obj;
 {
@@ -1163,8 +1162,9 @@ register const char *let, *word;
              || (!strcmp(word, "wield")
                  && (otmp->owornmask & W_WEP))
 #endif
-             || (!strcmp(word, "ready") /* exclude if wielded */
-                 && (otmp == uwep || (otmp == uswapwep && u.twoweap)))
+             || (!strcmp(word, "ready")    /* exclude when wielded... */
+                 && ((otmp == uwep || (otmp == uswapwep && u.twoweap))
+                     && otmp->quan == 1L)) /* ...unless more than one */
              || ((!strcmp(word, "dip") || !strcmp(word, "grease"))
                  && inaccessible_equipment(otmp, (const char *) 0, FALSE))
              ) {
