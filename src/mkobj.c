@@ -2587,9 +2587,10 @@ struct obj *
 obj_nexto(otmp)
 struct obj *otmp;
 {
-    if (!otmp)
+    if (!otmp) {
         impossible("obj_nexto: wasn't given an object to check");
-
+        return (struct obj *) 0;
+    }
     return obj_nexto_xy(otmp, otmp->ox, otmp->oy, TRUE);
 }
 
