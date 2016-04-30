@@ -2477,7 +2477,7 @@ char oclass;
         }
         if (otyp != STRANGE_OBJECT) {
             validobjs[n++] = otyp;
-            maxprob += objects[otyp].oc_prob;
+            maxprob += (objects[otyp].oc_prob + 1);
             otyp = STRANGE_OBJECT;
         }
         i++;
@@ -2486,7 +2486,7 @@ char oclass;
     if (n > 0 && maxprob) {
         long prob = rn2(maxprob);
         i = 0;
-        while ((i < (n-1)) && (prob -= objects[validobjs[i]].oc_prob) > 0)
+        while ((i < (n-1)) && (prob -= (objects[validobjs[i]].oc_prob + 1)) > 0)
             i++;
         return validobjs[i];
     }
