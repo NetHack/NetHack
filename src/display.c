@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1457207034 2016/03/05 19:43:54 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.82 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1461979957 2016/04/30 01:32:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.83 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -572,6 +572,8 @@ xchar x, y;
         } else if (IS_DOOR(lev->typ)) {
             map_background(x, y, 1);
         } else if (IS_ROOM(lev->typ) || IS_POOL(lev->typ)) {
+            boolean do_room_glyph;
+
             /*
              * An open room or water location.  Normally we wouldn't touch
              * this, but we have to get rid of remembered boulder symbols.
@@ -597,20 +599,18 @@ xchar x, y;
              * We could also just display what is currently on the top of the
              * object stack (if anything).
              */
-            if (lev->glyph == objnum_to_glyph(BOULDER)) {
-                if (lev->typ != ROOM && lev->seenv) {
+            do_room_glyph = FALSE;
+            if (lev->glyph == objnum_to_glyph(BOULDER)
+                || glyph_is_invisible(lev->glyph)) {
+                if (lev->typ != ROOM && lev->seenv)
                     map_background(x, y, 1);
-                } else {
-                    lev->glyph = (flags.dark_room && iflags.use_color
-                                  && !Is_rogue_level(&u.uz))
-                                     ? cmap_to_glyph(S_darkroom)
-                                     : (lev->waslit ? cmap_to_glyph(S_room)
-                                                    : cmap_to_glyph(S_stone));
-                    show_glyph(x, y, lev->glyph);
-                }
-            } else if ((lev->glyph >= cmap_to_glyph(S_stone)
-                        && lev->glyph < cmap_to_glyph(S_darkroom))
-                       || glyph_is_invisible(levl[x][y].glyph)) {
+                else
+                    do_room_glyph = TRUE;
+            } else if (lev->glyph >= cmap_to_glyph(S_stone)
+                       && lev->glyph < cmap_to_glyph(S_darkroom)) {
+                do_room_glyph = TRUE;
+            }
+            if (do_room_glyph) {
                 lev->glyph = (flags.dark_room && iflags.use_color
                               && !Is_rogue_level(&u.uz))
                                  ? cmap_to_glyph(S_darkroom)

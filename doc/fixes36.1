@@ -224,6 +224,9 @@ sortloot changed to place diluted potion of foo after potion of foo instead
 	of listing all diluted potions followed by all non-diluted ones
 digging down on a grave converted the terrain to floor but did not create a
 	pit and uncover the grave's contents; digging again--on floor--did
+when feel_location removed a remembered-unseen-monster glyph from a known
+	water location while hero was levitating, the map was redrawn showing
+	floor instead of water at that spot
 
 post-3.6.0: fix "object lost" panic during pickup caused by sortloot revamp
 post-3.6.0: more sortloot revisions
