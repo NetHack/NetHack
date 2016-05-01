@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1457570258 2016/03/10 00:37:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.166 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1462067746 2016/05/01 01:55:46 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.169 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -762,7 +762,7 @@ register struct obj *obj;
 boolean with_price;
 {
     boolean ispoisoned = FALSE;
-    boolean known, cknown, bknown, lknown;
+    boolean known, dknown, cknown, bknown, lknown;
     int omndx = obj->corpsenm;
     char prefix[PREFIX];
     char tmpbuf[PREFIX + 1]; /* for when we have to add something at
@@ -771,9 +771,10 @@ boolean with_price;
     register char *bp = xname(obj);
 
     if (iflags.override_ID) {
-        known = cknown = bknown = lknown = TRUE;
+        known = dknown = cknown = bknown = lknown = TRUE;
     } else {
         known = obj->known;
+        dknown = obj->dknown;
         cknown = obj->cknown;
         bknown = obj->bknown;
         lknown = obj->lknown;
@@ -791,7 +792,10 @@ boolean with_price;
     }
 
     if (obj->quan != 1L) {
-        Sprintf(prefix, "%ld ", obj->quan);
+        if (dknown)
+            Sprintf(prefix, "%ld ", obj->quan);
+        else
+            Strcpy(prefix, "some ");
     } else if (obj->otyp == CORPSE) {
         /* skip article prefix for corpses [else corpse_xname()
            would have to be taught how to strip it off again] */

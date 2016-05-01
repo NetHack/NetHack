@@ -1,28 +1,28 @@
-/* NetHack 3.6	objclass.h	$NHDT-Date: 1447755971 2015/11/17 10:26:11 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
+/* NetHack 3.6	objclass.h	$NHDT-Date: 1462067744 2016/05/01 01:55:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.16 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef OBJCLASS_H
 #define OBJCLASS_H
 
-/* definition of a class of objects */
+/* [misnamed] definition of a type of object */
 
 struct objclass {
-    short oc_name_idx;  /* index of actual name */
-    short oc_descr_idx; /* description when name unknown */
-    char *oc_uname;     /* called by user */
+    short oc_name_idx;              /* index of actual name */
+    short oc_descr_idx;             /* description when name unknown */
+    char *oc_uname;                 /* called by user */
     Bitfield(oc_name_known, 1);
-    Bitfield(oc_merge, 1);      /* merge otherwise equal objects */
-    Bitfield(oc_uses_known, 1); /* obj->known affects full description */
-                                /* otherwise, obj->dknown and obj->bknown */
-                                /* tell all, and obj->known should always */
-                                /* be set for proper merging behavior */
-    Bitfield(oc_pre_discovered, 1); /* Already known at start of game; */
-    /* won't be listed as a discovery. */
-    Bitfield(oc_magic, 1);   /* inherently magical object */
-    Bitfield(oc_charged, 1); /* may have +n or (n) charges */
-    Bitfield(oc_unique, 1);  /* special one-of-a-kind object */
-    Bitfield(oc_nowish, 1);  /* cannot wish for this object */
+    Bitfield(oc_merge, 1);          /* merge otherwise equal objects */
+    Bitfield(oc_uses_known, 1);     /* obj->known affects full description;
+                                       otherwise, obj->dknown and obj->bknown
+                                       tell all, and obj->known should always
+                                       be set for proper merging behavior. */
+    Bitfield(oc_pre_discovered, 1); /* Already known at start of game;
+                                       won't be listed as a discovery. */
+    Bitfield(oc_magic, 1);          /* inherently magical object */
+    Bitfield(oc_charged, 1);        /* may have +n or (n) charges */
+    Bitfield(oc_unique, 1);         /* special one-of-a-kind object */
+    Bitfield(oc_nowish, 1);         /* cannot wish for this object */
 
     Bitfield(oc_big, 1);
 #define oc_bimanual oc_big /* for weapons & tools used as weapons */
