@@ -144,7 +144,7 @@ extern void FDECL(show_borlandc_stats, (winid));
 #ifdef DEBUG_MIGRATING_MONS
 STATIC_PTR int NDECL(wiz_migrate_mons);
 #endif
-STATIC_DCL int FDECL(size_monst, (struct monst *));
+STATIC_DCL int FDECL(size_monst, (struct monst *, BOOLEAN_P));
 STATIC_DCL int FDECL(size_obj, (struct obj *));
 STATIC_DCL void FDECL(count_obj, (struct obj *, long *, long *,
                                   BOOLEAN_P, BOOLEAN_P));
@@ -3016,25 +3016,29 @@ long *total_size;
 }
 
 STATIC_OVL int
-size_monst(mtmp)
+size_monst(mtmp, incl_wsegs)
 struct monst *mtmp;
+boolean incl_wsegs;
 {
-    int sz = (int) sizeof(struct monst);
+    int sz = (int) sizeof (struct monst);
+
+    if (mtmp->wormno && incl_wsegs)
+        sz += size_wseg(mtmp);
 
     if (mtmp->mextra) {
-        sz += (int) sizeof(struct mextra);
+        sz += (int) sizeof (struct mextra);
         if (MNAME(mtmp))
             sz += (int) strlen(MNAME(mtmp)) + 1;
         if (EGD(mtmp))
-            sz += (int) sizeof(struct egd);
+            sz += (int) sizeof (struct egd);
         if (EPRI(mtmp))
-            sz += (int) sizeof(struct epri);
+            sz += (int) sizeof (struct epri);
         if (ESHK(mtmp))
-            sz += (int) sizeof(struct eshk);
+            sz += (int) sizeof (struct eshk);
         if (EMIN(mtmp))
-            sz += (int) sizeof(struct emin);
+            sz += (int) sizeof (struct emin);
         if (EDOG(mtmp))
-            sz += (int) sizeof(struct edog);
+            sz += (int) sizeof (struct edog);
         /* mextra->mcorpsenm doesn't point to more memory */
     }
     return sz;
@@ -3052,11 +3056,13 @@ long *total_size;
     char buf[BUFSZ];
     long count, size;
     struct monst *mon;
+    /* mon->wormno means something different for migrating_mons and mydogs */
+    boolean incl_wsegs = !strcmpi(src, "fmon");
 
     count = size = 0L;
     for (mon = chain; mon; mon = mon->nmon) {
         count++;
-        size += size_monst(mon);
+        size += size_monst(mon, incl_wsegs);
     }
     if (count || size || force) {
         *total_count += count;

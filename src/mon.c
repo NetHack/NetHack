@@ -1580,7 +1580,10 @@ struct monst **monst_list; /* &migrating_mons or &mydogs or null */
             seemimic(mon);
     }
 
-    remove_monster(mx, my);
+    if (mon->wormno)
+        remove_worm(mon);
+    else
+        remove_monster(mx, my);
 
     if (mon == fmon) {
         fmon = fmon->nmon;
