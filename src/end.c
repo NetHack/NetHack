@@ -50,6 +50,8 @@ STATIC_DCL void FDECL(artifact_score, (struct obj *, BOOLEAN_P, winid));
 STATIC_DCL void FDECL(really_done, (int)) NORETURN;
 STATIC_DCL boolean FDECL(odds_and_ends, (struct obj *, int));
 STATIC_DCL void FDECL(savelife, (int));
+STATIC_PTR int FDECL(CFDECLSPEC vanqsort_cmp, (const genericptr,
+                                               const genericptr));
 STATIC_DCL void FDECL(list_vanquished, (CHAR_P, BOOLEAN_P));
 STATIC_DCL void FDECL(list_genocided, (CHAR_P, BOOLEAN_P));
 STATIC_DCL boolean FDECL(should_query_disclose_option, (int, char *));
@@ -1424,6 +1426,23 @@ int status;
     nethack_exit(status);
 }
 
+STATIC_PTR int CFDECLSPEC
+vanqsort_cmp(vptr1, vptr2)
+const genericptr vptr1;
+const genericptr vptr2;
+{
+    int indx1 = *(short *) vptr1, indx2 = *(short *) vptr2,
+        mlev1 = mons[indx1].mlevel, mlev2 = mons[indx2].mlevel,
+        res;
+
+    /* sort by monster level */
+    res = mlev2 - mlev1; /* mlevel high to low */
+    if (res == 0)
+        res = indx1 - indx2; /* tiebreaker, mons[] index low to high */
+
+    return res;
+}
+
 /* #vanquished command */
 int
 dovanquished()
@@ -1437,20 +1456,21 @@ list_vanquished(defquery, ask)
 char defquery;
 boolean ask;
 {
-    register int i, lev;
-    int ntypes = 0, max_lev = 0, pfx, nkilled;
+    register int i;
+    int pfx, nkilled;
+    unsigned ntypes, ni;
     long total_killed = 0L;
-    char c;
     winid klwin;
-    char buf[BUFSZ], buftoo[BUFSZ];
+    short mindx[NUMMONS];
+    char c, buf[BUFSZ], buftoo[BUFSZ];
 
     /* get totals first */
+    ntypes = 0;
     for (i = LOW_PM; i < NUMMONS; i++) {
-        if (mvitals[i].died)
-            ntypes++;
-        total_killed += (long) mvitals[i].died;
-        if (mons[i].mlevel > max_lev)
-            max_lev = mons[i].mlevel;
+        if ((nkilled = (int) mvitals[i].died) == 0)
+            continue;
+        mindx[ntypes++] = i;
+        total_killed += (long) nkilled;
     }
 
     /* vanquished creatures list;
@@ -1468,45 +1488,44 @@ boolean ask;
             putstr(klwin, 0, "Vanquished creatures:");
             putstr(klwin, 0, "");
 
-            /* countdown by monster "toughness" */
-            for (lev = max_lev; lev >= 0; lev--)
-                for (i = LOW_PM; i < NUMMONS; i++)
-                    if (mons[i].mlevel == lev
-                        && (nkilled = mvitals[i].died) > 0) {
-                        if ((mons[i].geno & G_UNIQ) && i != PM_HIGH_PRIEST) {
-                            Sprintf(buf, "%s%s",
-                                    !type_is_pname(&mons[i]) ? "the " : "",
-                                    mons[i].mname);
-                            if (nkilled > 1) {
-                                switch (nkilled) {
-                                case 2:
-                                    Sprintf(eos(buf), " (twice)");
-                                    break;
-                                case 3:
-                                    Sprintf(eos(buf), " (thrice)");
-                                    break;
-                                default:
-                                    Sprintf(eos(buf), " (%d times)", nkilled);
-                                    break;
-                                }
-                            }
-                        } else {
-                            /* trolls or undead might have come back,
-                               but we don't keep track of that */
-                            if (nkilled == 1)
-                                Strcpy(buf, an(mons[i].mname));
-                            else
-                                Sprintf(buf, "%3d %s", nkilled,
-                                        makeplural(mons[i].mname));
+            qsort((genericptr_t) mindx, ntypes, sizeof *mindx, vanqsort_cmp);
+            for (ni = 0; ni < ntypes; ni++) {
+                i = mindx[ni];
+                nkilled = mvitals[i].died;
+                if ((mons[i].geno & G_UNIQ) && i != PM_HIGH_PRIEST) {
+                    Sprintf(buf, "%s%s",
+                            !type_is_pname(&mons[i]) ? "the " : "",
+                            mons[i].mname);
+                    if (nkilled > 1) {
+                        switch (nkilled) {
+                        case 2:
+                            Sprintf(eos(buf), " (twice)");
+                            break;
+                        case 3:
+                            Sprintf(eos(buf), " (thrice)");
+                            break;
+                        default:
+                            Sprintf(eos(buf), " (%d times)", nkilled);
+                            break;
                         }
-                        /* number of leading spaces to match 3 digit prefix */
-                        pfx = !strncmpi(buf, "the ", 3) ? 0
-                              : !strncmpi(buf, "an ", 3) ? 1
-                                : !strncmpi(buf, "a ", 2) ? 2
-                                  : !isdigit(buf[2]) ? 4 : 0;
-                        Sprintf(buftoo, "%*s%s", pfx, "", buf);
-                        putstr(klwin, 0, buftoo);
                     }
+                } else {
+                    /* trolls or undead might have come back,
+                       but we don't keep track of that */
+                    if (nkilled == 1)
+                        Strcpy(buf, an(mons[i].mname));
+                    else
+                        Sprintf(buf, "%3d %s", nkilled,
+                                makeplural(mons[i].mname));
+                }
+                /* number of leading spaces to match 3 digit prefix */
+                pfx = !strncmpi(buf, "the ", 3) ? 0
+                      : !strncmpi(buf, "an ", 3) ? 1
+                        : !strncmpi(buf, "a ", 2) ? 2
+                          : !isdigit(buf[2]) ? 4 : 0;
+                Sprintf(buftoo, "%*s%s", pfx, "", buf);
+                putstr(klwin, 0, buftoo);
+            }
             /*
              * if (Hallucination)
              *     putstr(klwin, 0, "and a partridge in a pear tree");
