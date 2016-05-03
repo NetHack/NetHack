@@ -52,7 +52,7 @@ STATIC_DCL boolean FDECL(odds_and_ends, (struct obj *, int));
 STATIC_DCL void FDECL(savelife, (int));
 STATIC_PTR int FDECL(CFDECLSPEC vanqsort_cmp, (const genericptr,
                                                const genericptr));
-STATIC_DCL void NDECL(set_vanq_order);
+STATIC_DCL int NDECL(set_vanq_order);
 STATIC_DCL void FDECL(list_vanquished, (CHAR_P, BOOLEAN_P));
 STATIC_DCL void FDECL(list_genocided, (CHAR_P, BOOLEAN_P));
 STATIC_DCL boolean FDECL(should_query_disclose_option, (int, char *));
@@ -1536,7 +1536,8 @@ const genericptr vptr2;
     return res;
 }
 
-STATIC_OVL void
+/* returns -1 if cancelled via ESC */
+STATIC_OVL int
 set_vanq_order()
 {
     winid tmpwin;
@@ -1566,6 +1567,7 @@ set_vanq_order()
         free((genericptr_t) selected);
         vanq_sortmode = choice;
     }
+    return (n < 0) ? -1 : vanq_sortmode;
 }
 
 /* #vanquished command */
@@ -1612,15 +1614,19 @@ boolean ask;
         if (c == 'q')
             done_stopprint++;
         if (c == 'y' || c == 'a') {
-            klwin = create_nhwindow(NHW_MENU);
-            putstr(klwin, 0, "Vanquished creatures:");
-            putstr(klwin, 0, "");
-
-            if (c == 'a')
-                set_vanq_order(); /* menu to choose value for vanq_sortmode */
+            if (c == 'a') { /* ask player to choose sort order */
+                /* choose value for vanq_sortmode via menu; ESC cancels list
+                   of vanquished monsters but does not set 'done_stopprint' */
+                if (set_vanq_order() < 0)
+                    return;
+            }
             uniq_header = (vanq_sortmode == VANQ_ALPHA_SEP);
             class_header = (vanq_sortmode == VANQ_MCLS_LTOH
                             || vanq_sortmode == VANQ_MCLS_HTOL);
+
+            klwin = create_nhwindow(NHW_MENU);
+            putstr(klwin, 0, "Vanquished creatures:");
+            putstr(klwin, 0, "");
 
             qsort((genericptr_t) mindx, ntypes, sizeof *mindx, vanqsort_cmp);
             for (ni = 0; ni < ntypes; ni++) {
