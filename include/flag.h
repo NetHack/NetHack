@@ -76,8 +76,10 @@ struct flag {
 #define NUM_DISCLOSURE_OPTIONS 6 /* i,a,v,g,c,o (decl.c) */
 #define DISCLOSE_PROMPT_DEFAULT_YES 'y'
 #define DISCLOSE_PROMPT_DEFAULT_NO 'n'
+#define DISCLOSE_PROMPT_DEFAULT_SPECIAL '?' /* v, default a */
 #define DISCLOSE_YES_WITHOUT_PROMPT '+'
 #define DISCLOSE_NO_WITHOUT_PROMPT '-'
+#define DISCLOSE_SPECIAL_WITHOUT_PROMPT '#' /* v, use a */
     char end_disclose[NUM_DISCLOSURE_OPTIONS + 1]; /* disclose various
                                                       info upon exit */
     char menu_style;    /* User interface style setting */

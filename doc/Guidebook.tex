@@ -636,7 +636,7 @@ will give a brief reminder about how it works.
 If the
 {\it autodescribe\/}
 option is on, a short description of what you see at each location is
-shown as you move the cursor.  Typing `{\tt #}' while picking a location will
+shown as you move the cursor.  Typing `{\tt \#}' while picking a location will
 toggle that option on or off.
 The
 {\it whatis\verb+_+coord\/}
@@ -953,10 +953,11 @@ the exchange still takes place.
 \item[\tb{X}]
 Toggle two-weapon combat, if your character can do it.  Also available
 via the ``{\tt \#twoweapon}'' extended command.\\
-+.lp ""
-+(In versions prior to 3.6 this was the command to switch from normal
-+play to ``explore mode'', also known as ``discovery mode'', which has now
-+been moved to ``{\tt \#explore}''.)
+%.lp ""
+
+(In versions prior to 3.6 this was the command to switch from normal
+play to ``explore mode'', also known as ``discovery mode'', which has now
+been moved to ``{\tt \#explore}''.)
 %.lp
 \item[\tb{\^{}X}]
 Display basic information about your character.\\
@@ -2569,6 +2570,22 @@ lets you refine how it behaves.  Here are the valid prefixes:
 %.ei
 %.ed
 
+The listing of vanquished monsters can be sorted,
+so there are two additional choices for `{\tt v}':
+%.sd
+%.si
+{\tt ?} --- prompt you and default to ask on the prompt;\\
+{\tt\#} --- disclose it without prompting, ask for sort order.
+%.ei
+%.ed
+
+Asking refers to picking one of the orderings from a menu.
+The `{\tt +}' disclose without prompting choice,
+or being prompted and answering `{\tt y}' rather than `{\tt a}',
+will default to showing monsters in the traditional order,
+from high level to low level.
+.lp ""
+
 %.lp ""
 (ex.\ ``{\tt disclose:yi na +v -g o}'')
 The example sets
@@ -3083,15 +3100,15 @@ The possibile settings are:
 
 %.sd
 %.si
-{\tt c} --- \verb#compass ('east' or '3s' or '2n,4w')#;
-{\tt m} --- \verb#map <x,y> (map column x=0 is not used)#;
-{\tt s} --- \verb#screen [row,column] (row is offset to match tty usage)#;
+{\tt c} --- \verb#compass ('east' or '3s' or '2n,4w')#;\\
+{\tt m} --- \verb#map <x,y> (map column x=0 is not used)#;\\
+{\tt s} --- \verb#screen [row,column] (row is offset to match tty usage)#;\\
 {\tt n} --- \verb#none (no coordinates shown) [default]#.
 %.ei
 %.ed
 
 %.lp ""
-+The
+The
 {\it whatis\verb+_+coord\/}
 option is also used with
 the `{\tt /m}', `{\tt /M}', `{\tt /o}', and `{\tt /O}' sub-commands

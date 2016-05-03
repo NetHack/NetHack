@@ -2815,7 +2815,9 @@ boolean tinitial, tfrom_file;
         while (*op && num < sizeof flags.end_disclose - 1) {
             static char valid_settings[] = {
                 DISCLOSE_PROMPT_DEFAULT_YES, DISCLOSE_PROMPT_DEFAULT_NO,
-                DISCLOSE_YES_WITHOUT_PROMPT, DISCLOSE_NO_WITHOUT_PROMPT, '\0'
+                DISCLOSE_PROMPT_DEFAULT_SPECIAL,
+                DISCLOSE_YES_WITHOUT_PROMPT, DISCLOSE_NO_WITHOUT_PROMPT,
+                DISCLOSE_SPECIAL_WITHOUT_PROMPT, '\0'
             };
             register char c, *dop;
 
@@ -2832,6 +2834,12 @@ boolean tinitial, tfrom_file;
                     continue;
                 }
                 if (prefix_val != -1) {
+                    if (*dop != 'v') {
+                        if (prefix_val == DISCLOSE_PROMPT_DEFAULT_SPECIAL)
+                            prefix_val = DISCLOSE_PROMPT_DEFAULT_YES;
+                        if (prefix_val == DISCLOSE_SPECIAL_WITHOUT_PROMPT)
+                            prefix_val = DISCLOSE_YES_WITHOUT_PROMPT;
+                    }
                     flags.end_disclose[idx] = prefix_val;
                     prefix_val = -1;
                 } else
@@ -4016,6 +4024,7 @@ boolean setinitial, setfromfile;
         };
         int disc_cat[NUM_DISCLOSURE_OPTIONS];
         int pick_cnt, pick_idx, opt_idx;
+        char c;
         menu_item *disclosure_pick = (menu_item *) 0;
 
         tmpwin = create_nhwindow(NHW_MENU);
@@ -4043,6 +4052,7 @@ boolean setinitial, setfromfile;
 
         for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++) {
             if (disc_cat[i]) {
+                c = flags.end_disclose[i];
                 Sprintf(buf, "Disclosure options for %s:",
                         disclosure_names[i]);
                 tmpwin = create_nhwindow(NHW_MENU);
@@ -4050,24 +4060,41 @@ boolean setinitial, setfromfile;
                 any = zeroany;
                 /* 'y','n',and '+' work as alternate selectors; '-' doesn't */
                 any.a_char = DISCLOSE_NO_WITHOUT_PROMPT;
-                add_menu(tmpwin, NO_GLYPH, &any, 'a', any.a_char, ATR_NONE,
+                add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
                          "Never disclose, without prompting",
-                         MENU_UNSELECTED);
+                         (c == any.a_char) ? MENU_SELECTED : MENU_UNSELECTED);
                 any.a_char = DISCLOSE_YES_WITHOUT_PROMPT;
-                add_menu(tmpwin, NO_GLYPH, &any, 'b', any.a_char, ATR_NONE,
+                add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
                          "Always disclose, without prompting",
-                         MENU_UNSELECTED);
+                         (c == any.a_char) ? MENU_SELECTED : MENU_UNSELECTED);
+                if (*disclosure_names[i] == 'v') {
+                    any.a_char = DISCLOSE_SPECIAL_WITHOUT_PROMPT; /* '#' */
+                    add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
+                             "Always disclose, pick sort order from menu",
+                             (c == any.a_char) ? MENU_SELECTED
+                                               : MENU_UNSELECTED);
+                }
                 any.a_char = DISCLOSE_PROMPT_DEFAULT_NO;
-                add_menu(tmpwin, NO_GLYPH, &any, 'c', any.a_char, ATR_NONE,
+                add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
                          "Prompt, with default answer of \"No\"",
-                         MENU_UNSELECTED);
+                         (c == any.a_char) ? MENU_SELECTED : MENU_UNSELECTED);
                 any.a_char = DISCLOSE_PROMPT_DEFAULT_YES;
-                add_menu(tmpwin, NO_GLYPH, &any, 'd', any.a_char, ATR_NONE,
+                add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
                          "Prompt, with default answer of \"Yes\"",
-                         MENU_UNSELECTED);
+                         (c == any.a_char) ? MENU_SELECTED : MENU_UNSELECTED);
+                if (*disclosure_names[i] == 'v') {
+                    any.a_char = DISCLOSE_PROMPT_DEFAULT_SPECIAL; /* '?' */
+                    add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
+                "Prompt, with default answer of \"Ask\" to request sort menu",
+                             (c == any.a_char) ? MENU_SELECTED
+                                               : MENU_UNSELECTED);
+                }
                 end_menu(tmpwin, buf);
-                if (select_menu(tmpwin, PICK_ONE, &disclosure_pick) > 0) {
-                    flags.end_disclose[i] = disclosure_pick->item.a_char;
+                n = select_menu(tmpwin, PICK_ONE, &disclosure_pick);
+                if (n > 0) {
+                    flags.end_disclose[i] = disclosure_pick[0].item.a_char;
+                    if (n > 1 && flags.end_disclose[i] == c)
+                        flags.end_disclose[i] = disclosure_pick[1].item.a_char;
                     free((genericptr_t) disclosure_pick);
                 }
                 destroy_nhwindow(tmpwin);

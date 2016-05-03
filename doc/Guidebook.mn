@@ -2140,6 +2140,20 @@ lets you refine how it behaves.  Here are the valid prefixes:
 .CC - "do not disclose it and do not prompt."
 .ei
 .ed
+The listing of vanquished monsters can be sorted,
+so there are two additional choices for `v':
+.sd
+.si
+.CC ? "prompt you and default to ask on the prompt;"
+.CC # "disclose it without prompting, ask for sort order."
+.ei
+.ed
+Asking refers to picking one of the orderings from a menu.
+The `+' disclose without prompting choice,
+or being prompted and answering `y' rather than `a',
+will default to showing monsters in the traditional order,
+from high level to low level.
+.lp ""
 Omitted categories are implicitly added with `n' prefix.
 Specified categories with omitted prefix implicitly use `+' prefix.
 Order of the disclosure categories does not matter, program display for

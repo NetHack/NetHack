@@ -52,6 +52,7 @@ STATIC_DCL boolean FDECL(odds_and_ends, (struct obj *, int));
 STATIC_DCL void FDECL(savelife, (int));
 STATIC_PTR int FDECL(CFDECLSPEC vanqsort_cmp, (const genericptr,
                                                const genericptr));
+STATIC_DCL void NDECL(set_vanq_order);
 STATIC_DCL void FDECL(list_vanquished, (CHAR_P, BOOLEAN_P));
 STATIC_DCL void FDECL(list_genocided, (CHAR_P, BOOLEAN_P));
 STATIC_DCL boolean FDECL(should_query_disclose_option, (int, char *));
@@ -629,7 +630,7 @@ int category;
 char *defquery;
 {
     int idx;
-    char *dop;
+    char disclose, *dop;
 
     *defquery = 'n';
     if ((dop = index(disclosure_options, category)) != 0) {
@@ -641,14 +642,21 @@ char *defquery;
             *defquery = DISCLOSE_PROMPT_DEFAULT_YES;
             return TRUE;
         }
-        if (flags.end_disclose[idx] == DISCLOSE_YES_WITHOUT_PROMPT) {
+        disclose = flags.end_disclose[idx];
+        if (disclose == DISCLOSE_YES_WITHOUT_PROMPT) {
             *defquery = 'y';
             return FALSE;
-        } else if (flags.end_disclose[idx] == DISCLOSE_NO_WITHOUT_PROMPT) {
+        } else if (disclose == DISCLOSE_SPECIAL_WITHOUT_PROMPT) {
+            *defquery = 'a';
+            return FALSE;
+        } else if (disclose == DISCLOSE_NO_WITHOUT_PROMPT) {
             *defquery = 'n';
             return FALSE;
-        } else if (flags.end_disclose[idx] == DISCLOSE_PROMPT_DEFAULT_YES) {
+        } else if (disclose == DISCLOSE_PROMPT_DEFAULT_YES) {
             *defquery = 'y';
+            return TRUE;
+        } else if (disclose == DISCLOSE_PROMPT_DEFAULT_SPECIAL) {
+            *defquery = 'a';
             return TRUE;
         } else {
             *defquery = 'n';
@@ -1426,21 +1434,138 @@ int status;
     nethack_exit(status);
 }
 
+extern const int monstr[];
+
+static const char *vanqorders[] = {
+    "traditional: by monster level, by internal monster index",
+#define VANQ_MLVL_MNDX 0
+    "by monster toughness, by internal monster index",
+#define VANQ_MSTR_MNDX 1
+    "alphabetically, first unique monsters, then others",
+#define VANQ_ALPHA_SEP 2
+    "alphabetically, unique monsters and others intermixed",
+#define VANQ_ALPHA_MIX 3
+    "by monster class, high to low level within class",
+#define VANQ_MCLS_HTOL 4
+    "by monster class, low to high level within class",
+#define VANQ_MCLS_LTOH 5
+    "by count, high to low, by internal index within tied count",
+#define VANQ_COUNT_H_L 6
+    "by count, low to high, by internal index within tied count",
+#define VANQ_COUNT_L_H 7
+};
+static int vanq_sortmode = VANQ_MLVL_MNDX;
+
 STATIC_PTR int CFDECLSPEC
 vanqsort_cmp(vptr1, vptr2)
 const genericptr vptr1;
 const genericptr vptr2;
 {
     int indx1 = *(short *) vptr1, indx2 = *(short *) vptr2,
-        mlev1 = mons[indx1].mlevel, mlev2 = mons[indx2].mlevel,
-        res;
+        mlev1, mlev2, mstr1, mstr2, uniq1, uniq2, died1, died2, res;
+    const char *name1, *name2, *punct;
+    schar mcls1, mcls2;
 
-    /* sort by monster level */
-    res = mlev2 - mlev1; /* mlevel high to low */
+    switch (vanq_sortmode) {
+    default:
+    case VANQ_MLVL_MNDX:
+        /* sort by monster level */
+        mlev1 = mons[indx1].mlevel, mlev2 = mons[indx2].mlevel;
+        res = mlev2 - mlev1; /* mlevel high to low */
+        break;
+    case VANQ_MSTR_MNDX:
+        /* sort by monster toughness */
+        mstr1 = monstr[indx1], mstr2 = monstr[indx2];
+        res = mstr2 - mstr1; /* monstr high to low */
+        break;
+    case VANQ_ALPHA_SEP:
+        uniq1 = ((mons[indx1].geno & G_UNIQ) && indx1 != PM_HIGH_PRIEST);
+        uniq2 = ((mons[indx2].geno & G_UNIQ) && indx2 != PM_HIGH_PRIEST);
+        if (uniq1 ^ uniq2) { /* one or other uniq, but not both */
+            res = uniq2 - uniq1;
+            break;
+        } /* else both unique or neither unique */
+        /*FALLTHRU*/
+    case VANQ_ALPHA_MIX:
+        name1 = mons[indx1].mname, name2 = mons[indx2].mname;
+        res = strcmpi(name1, name2); /* caseblind alhpa, low to high */
+        break;
+    case VANQ_MCLS_HTOL:
+    case VANQ_MCLS_LTOH:
+        /* mons[].mlet is a small integer, 1..N, of type plain char;
+           if 'char' happens to be unsigned, (mlet1 - mlet2) would yield
+           an inappropriate result when mlet2 is greater than mlet1,
+           so force our copies (mcls1, mcls2) to be signed */
+        mcls1 = (schar) mons[indx1].mlet, mcls2 = (schar) mons[indx2].mlet;
+        /* S_ANT through S_ZRUTY correspond to lowercase monster classes,
+           S_ANGEL through S_ZOMBIE correspond to uppercase, and various
+           punctuation characters are used for classes beyond those */
+        if (mcls1 > S_ZOMBIE && mcls2 > S_ZOMBIE) {
+            /* force a specific order to the punctuation classes that's
+               different from the internal order;
+               internal order is ok if neither or just one is punctuation
+               since letters have lower values so come out before punct */
+            static const char punctclasses[] = {
+                S_LIZARD, S_EEL, S_GOLEM, S_GHOST, S_DEMON, S_HUMAN, '\0'
+            };
+
+            if ((punct = index(punctclasses, mcls1)) != 0)
+                mcls1 = (schar) (S_ZOMBIE + 1 + (int) (punct - punctclasses));
+            if ((punct = index(punctclasses, mcls2)) != 0)
+                mcls2 = (schar) (S_ZOMBIE + 1 + (int) (punct - punctclasses));
+        }
+        res = mcls1 - mcls2; /* class */
+        if (res == 0) {
+            mlev1 = mons[indx1].mlevel, mlev2 = mons[indx2].mlevel;
+            res = mlev1 - mlev2; /* mlevel low to high */
+            if (vanq_sortmode == VANQ_MCLS_HTOL)
+                res = -res; /* mlevel high to low */
+        }
+        break;
+    case VANQ_COUNT_H_L:
+    case VANQ_COUNT_L_H:
+        died1 = mvitals[indx1].died, died2 = mvitals[indx2].died;
+        res = died2 - died1; /* dead count high to low */
+        if (vanq_sortmode == VANQ_COUNT_L_H)
+            res = -res; /* dead count low to high */
+        break;
+    }
+    /* tiebreaker: internal mons[] index */
     if (res == 0)
-        res = indx1 - indx2; /* tiebreaker, mons[] index low to high */
-
+        res = indx1 - indx2; /* mndx low to high */
     return res;
+}
+
+STATIC_OVL void
+set_vanq_order()
+{
+    winid tmpwin;
+    menu_item *selected;
+    anything any;
+    int i, n, choice;
+
+    tmpwin = create_nhwindow(NHW_MENU);
+    start_menu(tmpwin);
+    any = zeroany; /* zero out all bits */
+    for (i = 0; i < SIZE(vanqorders); i++) {
+        if (i == VANQ_ALPHA_MIX || i == VANQ_MCLS_HTOL) /* skip these */
+            continue;
+        any.a_int = i + 1;
+        add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, vanqorders[i],
+                 (i == vanq_sortmode) ? MENU_SELECTED : MENU_UNSELECTED);
+    }
+    end_menu(tmpwin, "Sort order for vanquished monster counts");
+
+    n = select_menu(tmpwin, PICK_ONE, &selected);
+    destroy_nhwindow(tmpwin);
+    if (n > 0) {
+        choice = selected[0].item.a_int - 1;
+        /* skip preselected entry if we have more than one item chosen */
+        if (n > 1 && choice == vanq_sortmode)
+            choice = selected[1].item.a_int - 1;
+        free((genericptr_t) selected);
+        vanq_sortmode = choice;
+    }
 }
 
 /* #vanquished command */
@@ -1477,9 +1602,12 @@ boolean ask;
      * includes all dead monsters, not just those killed by the player
      */
     if (ntypes != 0) {
+        char mlet, prev_mlet = 0; /* used as small integer, not character */
+        boolean class_header, uniq_header, was_uniq = FALSE;
+
         c = ask ? yn_function(
                             "Do you want an account of creatures vanquished?",
-                              ynqchars, defquery)
+                              ynaqchars, defquery)
                 : defquery;
         if (c == 'q')
             done_stopprint++;
@@ -1488,10 +1616,23 @@ boolean ask;
             putstr(klwin, 0, "Vanquished creatures:");
             putstr(klwin, 0, "");
 
+            if (c == 'a')
+                set_vanq_order(); /* menu to choose value for vanq_sortmode */
+            uniq_header = (vanq_sortmode == VANQ_ALPHA_SEP);
+            class_header = (vanq_sortmode == VANQ_MCLS_LTOH
+                            || vanq_sortmode == VANQ_MCLS_HTOL);
+
             qsort((genericptr_t) mindx, ntypes, sizeof *mindx, vanqsort_cmp);
             for (ni = 0; ni < ntypes; ni++) {
                 i = mindx[ni];
                 nkilled = mvitals[i].died;
+                mlet = mons[i].mlet;
+                if (class_header && mlet != prev_mlet) {
+                    Strcpy(buf, def_monsyms[(int) mlet].explain);
+                    putstr(klwin, ask ? 0 : iflags.menu_headings,
+                           upstart(buf));
+                    prev_mlet = mlet;
+                }
                 if ((mons[i].geno & G_UNIQ) && i != PM_HIGH_PRIEST) {
                     Sprintf(buf, "%s%s",
                             !type_is_pname(&mons[i]) ? "the " : "",
@@ -1509,7 +1650,12 @@ boolean ask;
                             break;
                         }
                     }
+                    was_uniq = TRUE;
                 } else {
+                    if (uniq_header && was_uniq) {
+                        putstr(klwin, 0, "");
+                        was_uniq = FALSE;
+                    }
                     /* trolls or undead might have come back,
                        but we don't keep track of that */
                     if (nkilled == 1)
@@ -1523,6 +1669,8 @@ boolean ask;
                       : !strncmpi(buf, "an ", 3) ? 1
                         : !strncmpi(buf, "a ", 2) ? 2
                           : !isdigit(buf[2]) ? 4 : 0;
+                if (class_header)
+                    ++pfx;
                 Sprintf(buftoo, "%*s%s", pfx, "", buf);
                 putstr(klwin, 0, buftoo);
             }
