@@ -3292,7 +3292,7 @@ static char** rip_line=0;
     Sprintf(rip_line[GOLD_LINE], "%ld Au", done_money);
 
     /* Put together death description */
-    formatkiller(buf, sizeof buf, how);
+    formatkiller(buf, sizeof buf, how, FALSE);
 
     /* Put death type on stone */
     for (line=DEATH_LINE, dpx = buf; line<YEAR_LINE; line++) {
