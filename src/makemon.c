@@ -1326,6 +1326,11 @@ int
 mbirth_limit(mndx)
 int mndx;
 {
+    /* There is an implicit limit of 4 for "high priest of <deity>",
+     * but aligned priests can grow into high priests, thus they aren't
+     * really limited to 4, so leave the default amount in place for them.
+     */
+
     /* assert(MAXMONNO < 255); */
     return (mndx == PM_NAZGUL ? 9 : mndx == PM_ERINYS ? 3 : MAXMONNO);
 }

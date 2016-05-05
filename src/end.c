@@ -1578,6 +1578,10 @@ dovanquished()
     return 0;
 }
 
+/* high priests aren't unique but are flagged as such to simplify something */
+#define UniqCritterIndx(mndx) ((mons[mndx].geno & G_UNIQ) \
+                             && mndx != PM_HIGH_PRIEST)
+
 STATIC_OVL void
 list_vanquished(defquery, ask)
 char defquery;
@@ -1639,7 +1643,7 @@ boolean ask;
                            upstart(buf));
                     prev_mlet = mlet;
                 }
-                if ((mons[i].geno & G_UNIQ) && i != PM_HIGH_PRIEST) {
+                if (UniqCritterIndx(i)) {
                     Sprintf(buf, "%s%s",
                             !type_is_pname(&mons[i]) ? "the " : "",
                             mons[i].mname);
@@ -1704,10 +1708,14 @@ num_genocides()
 {
     int i, n = 0;
 
-    for (i = LOW_PM; i < NUMMONS; ++i)
-        if (mvitals[i].mvflags & G_GENOD)
+    for (i = LOW_PM; i < NUMMONS; ++i) {
+        if (mvitals[i].mvflags & G_GENOD) {
             ++n;
-
+            if (UniqCritterIndx(i))
+                impossible("unique creature '%d: %s' genocided?",
+                           i, mons[i].mname);
+        }
+    }
     return n;
 }
 
@@ -1716,11 +1724,12 @@ num_extinct()
 {
     int i, n = 0;
 
-    for (i = LOW_PM; i < NUMMONS; ++i)
-        if (!(mvitals[i].mvflags & G_GENOD) && (mvitals[i].mvflags & G_GONE)
-            && !(mons[i].geno & G_UNIQ))
+    for (i = LOW_PM; i < NUMMONS; ++i) {
+        if (UniqCritterIndx(i))
+            continue;
+        if ((mvitals[i].mvflags & G_GONE) == G_EXTINCT)
             ++n;
-
+    }
     return n;
 }
 
@@ -1755,19 +1764,24 @@ boolean ask;
             putstr(klwin, 0, buf);
             putstr(klwin, 0, "");
 
-            for (i = LOW_PM; i < NUMMONS; i++)
-                if (mvitals[i].mvflags & G_GONE && !(mons[i].geno & G_UNIQ)) {
-                    if ((mons[i].geno & G_UNIQ) && i != PM_HIGH_PRIEST)
-                        Sprintf(buf, "%s%s",
-                                !type_is_pname(&mons[i]) ? "" : "the ",
-                                mons[i].mname);
-                    else
-                        Strcpy(buf, makeplural(mons[i].mname));
-                    if (!(mvitals[i].mvflags & G_GENOD))
+            for (i = LOW_PM; i < NUMMONS; i++) {
+                /* uniques can't be genocided but can become extinct;
+                   however, they're never reported as extinct, so skip them */
+                if (UniqCritterIndx(i))
+                    continue;
+                if (mvitals[i].mvflags & G_GONE) {
+                    Strcpy(buf, makeplural(mons[i].mname));
+                    /*
+                     * "Extinct" is unfortunate terminology.  A species
+                     * is marked extinct when its birth limit is reached,
+                     * but there might be members of the species still
+                     * alive, contradicting the meaning of the word.
+                     */
+                    if ((mvitals[i].mvflags & G_GONE) == G_EXTINCT)
                         Strcat(buf, " (extinct)");
                     putstr(klwin, 0, buf);
                 }
-
+            }
             putstr(klwin, 0, "");
             if (ngenocided > 0) {
                 Sprintf(buf, "%d species genocided.", ngenocided);

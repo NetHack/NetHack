@@ -3217,8 +3217,14 @@ boolean msg;      /* "The oldmon turns into a newmon!" */
 
     /* Riders are immune to polymorph and green slime
        (but apparent Rider might actually be a doppelganger) */
-    if (is_rider(mtmp->data) && mtmp->cham == NON_PM)
-        return 0;
+    if (mtmp->cham == NON_PM) { /* not a shapechanger */
+        if (is_rider(olddata))
+            return 0;
+        /* make Nazgul and erinyes immune too, to reduce chance of
+           anomalous extinction feedback during final disclsoure */
+        if (mbirth_limit(monsndx(olddata)) < MAXMONNO)
+            return 0;
+    }
 
     if (msg) {
         /* like Monnam() but never mention saddle */
