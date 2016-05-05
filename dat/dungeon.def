@@ -1,4 +1,4 @@
-# NetHack 3.6	dungeon.def	$NHDT-Date: 1432512783 2015/05/25 00:13:03 $  $NHDT-Branch: master $:$NHDT-Revision: 1.13 $
+# NetHack 3.6	dungeon.def	$NHDT-Date: 1462486876 2016/05/05 22:21:16 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.14 $
 #	Copyright (c) 1990-95 by M. Stephenson
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -119,6 +119,10 @@ DESCRIPTION:	mazelike
 ALIGNMENT:	chaotic
 ENTRY:		-1
 LEVEL:		"tower1" "none" @ (1, 0)
+# it isn't necessary to list these last two, but doing so makes them
+# show up in ^O output and in the level teleport menu
+LEVEL:		"tower2" "none" @ (2, 0)
+LEVEL:		"tower3" "none" @ (3, 0)
 
 #
 #	The Endgame levels
