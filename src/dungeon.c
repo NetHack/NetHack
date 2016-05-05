@@ -1,4 +1,4 @@
-/* NetHack 3.6	dungeon.c	$NHDT-Date: 1450432757 2015/12/18 09:59:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.70 $ */
+/* NetHack 3.6	dungeon.c	$NHDT-Date: 1462486971 2016/05/05 22:22:51 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.73 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2829,10 +2829,6 @@ boolean printdun;
     if (In_endgame(&mptr->lev))
         Sprintf(buf, "%s%s:", TAB, endgamelevelname(tmpbuf, i));
     else
-        /* FIXME: when this branch has only one level (Ft.Ludios),
-         * listing "Level 1:" for it might confuse inexperienced
-         * players into thinking there's more than one.
-         */
         Sprintf(buf, "%sLevel %d:", TAB, i);
 
     /* wizmode prints out proto dungeon names for clarity */
@@ -2844,7 +2840,7 @@ boolean printdun;
     }
     /* [perhaps print custom annotation on its own line when it's long] */
     if (mptr->custom)
-        Sprintf(eos(buf), " (%s)", mptr->custom);
+        Sprintf(eos(buf), " \"%s\"", mptr->custom);
     if (on_level(&u.uz, &mptr->lev))
         Sprintf(eos(buf), " <- You %s here.",
                 (!final || (final == 1 && how == ASCENDED)) ? "are" : "were");
