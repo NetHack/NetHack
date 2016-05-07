@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1446604111 2015/11/04 02:28:31 $  $NHDT-Branch: master $:$NHDT-Revision: 1.155 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1462663937 2016/05/07 23:32:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.165 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -149,9 +149,9 @@ moverock()
                                   || (ttmp->ttyp == SPIKED_PIT))))) {
                 if (Blind)
                     feel_location(sx, sy);
-                if (canspotmon(mtmp))
+                if (canspotmon(mtmp)) {
                     pline("There's %s on the other side.", a_monnam(mtmp));
-                else {
+                } else {
                     You_hear("a monster behind %s.", the(xname(otmp)));
                     map_invisible(rx, ry);
                 }
@@ -356,7 +356,7 @@ xchar x, y;
 
     if (context.digging.down) /* not continuing previous dig (w/ pick-axe) */
         (void) memset((genericptr_t) &context.digging, 0,
-                      sizeof(struct dig_info));
+                      sizeof (struct dig_info));
 
     if (!boulder && IS_ROCK(lev->typ) && !may_dig(x, y)) {
         You("hurt your teeth on the %s.",
@@ -388,7 +388,7 @@ xchar x, y;
                     ? "tree"
                     : IS_ROCK(lev->typ)
                         ? "rock"
-                        : lev->typ == IRONBARS
+                        : (lev->typ == IRONBARS)
                             ? "bar"
                             : "door");
         watch_dig((struct monst *) 0, x, y, FALSE);
@@ -431,7 +431,7 @@ xchar x, y;
             block_point(x, y); /* delobj will unblock the point */
             /* reset dig state */
             (void) memset((genericptr_t) &context.digging, 0,
-                          sizeof(struct dig_info));
+                          sizeof (struct dig_info));
             return 1;
         }
 
@@ -490,7 +490,7 @@ xchar x, y;
     if (dmgtxt)
         pay_for_damage(dmgtxt, FALSE);
     (void) memset((genericptr_t) &context.digging, 0,
-                  sizeof(struct dig_info));
+                  sizeof (struct dig_info));
     return 0;
 }
 
@@ -636,8 +636,8 @@ struct monst *mon;
         return 1;
 
     /* lugging too much junk? */
-    amt =
-        (mon == &youmonst) ? inv_weight() + weight_cap() : curr_mon_load(mon);
+    amt = (mon == &youmonst) ? inv_weight() + weight_cap()
+                             : curr_mon_load(mon);
     if (amt > 600)
         return 2;
 
@@ -717,9 +717,9 @@ int mode;
         if (closed_door(x, y)) {
             if (Blind && mode == DO_MOVE)
                 feel_location(x, y);
-            if (Passes_walls)
+            if (Passes_walls) {
                 ; /* do nothing */
-            else if (can_ooze(&youmonst)) {
+            } else if (can_ooze(&youmonst)) {
                 if (mode == DO_MOVE)
                     You("ooze under the door.");
             } else if (tunnels(youmonst.data) && !needspick(youmonst.data)) {
@@ -802,7 +802,8 @@ int mode;
             return (mode == TEST_TRAP);
     }
 
-    if (mode == TEST_TRAP) return FALSE; /* do not move through traps */
+    if (mode == TEST_TRAP)
+        return FALSE; /* do not move through traps */
 
     ust = &levl[ux][uy];
 
@@ -829,7 +830,8 @@ int mode;
             struct obj *obj;
 
             /* never travel through boulders in Sokoban */
-            if (Sokoban) return FALSE;
+            if (Sokoban)
+                return FALSE;
 
             /* don't pick two boulders in a row, unless there's a way thru */
             if (sobj_at(BOULDER, ux, uy) && !Sokoban) {
@@ -1273,13 +1275,14 @@ domove()
         on_ice = !Levitation && is_ice(u.ux, u.uy);
         if (on_ice) {
             static int skates = 0;
+
             if (!skates)
                 skates = find_skates();
             if ((uarmf && uarmf->otyp == skates) || resists_cold(&youmonst)
                 || Flying || is_floater(youmonst.data)
-                || is_clinger(youmonst.data) || is_whirly(youmonst.data))
+                || is_clinger(youmonst.data) || is_whirly(youmonst.data)) {
                 on_ice = FALSE;
-            else if (!rn2(Cold_resistance ? 3 : 2)) {
+            } else if (!rn2(Cold_resistance ? 3 : 2)) {
                 HFumbling |= FROMOUTSIDE;
                 HFumbling &= ~TIMEOUT;
                 HFumbling += 1; /* slip on next move */
@@ -1401,7 +1404,8 @@ domove()
         /* don't stop travel when displacing pets; if the
            displace fails for some reason, attack() in uhitm.c
            will stop travel rather than domove */
-        if (!is_safepet(mtmp) || context.forcefight) nomul(0);
+        if (!is_safepet(mtmp) || context.forcefight)
+            nomul(0);
         /* only attack if we know it's there */
         /* or if we used the 'F' command to fight blindly */
         /* or if it hides_under, in which case we call attack() to print
@@ -1440,6 +1444,7 @@ domove()
 
     if (context.forcefight && levl[x][y].typ == IRONBARS && uwep) {
         struct obj *obj = uwep;
+
         if (breaktest(obj)) {
             if (obj->quan > 1L)
                 obj = splitobj(obj, 1L);
@@ -1687,8 +1692,8 @@ domove()
                 nomul(0);
     }
 
-    if (hides_under(youmonst.data) || (youmonst.data->mlet == S_EEL) || u.dx
-        || u.dy)
+    if (hides_under(youmonst.data) || youmonst.data->mlet == S_EEL
+        || u.dx || u.dy)
         (void) hideunder(&youmonst);
 
     /*
@@ -1824,8 +1829,7 @@ switch_terrain()
 }
 
 /* extracted from spoteffects; called by spoteffects to check for entering or
-   leaving a pool of water/lava, and by moveloop to check for staying on one
-
+   leaving a pool of water/lava, and by moveloop to check for staying on one;
    returns true to skip rest of spoteffects */
 boolean
 pooleffects(newspot)
@@ -1911,8 +1915,9 @@ boolean pick;
     static int spotterrain;
     static struct trap *spottrap = (struct trap *) 0;
     static unsigned spottraptyp = NO_TRAP;
+
+    struct monst *mtmp;
     struct trap *trap = t_at(u.ux, u.uy);
-    register struct monst *mtmp;
 
     /* prevent recursion from affecting the hero all over again
        [hero poly'd to iron golem enters water here, drown() inflicts
@@ -1959,22 +1964,22 @@ boolean pick;
             }
         }
         /*
-     * If not a pit, pickup before triggering trap.
-     * If pit, trigger trap before pickup.
-     */
+         * If not a pit, pickup before triggering trap.
+         * If pit, trigger trap before pickup.
+         */
         pit = (trap && (trap->ttyp == PIT || trap->ttyp == SPIKED_PIT));
         if (pick && !pit)
             (void) pickup(1);
 
         if (trap) {
             /*
-         * dotrap on a fire trap calls melt_ice() which triggers
-         * spoteffects() (again) which can trigger the same fire
-         * trap (again). Use static spottrap to prevent that.
-         * We track spottraptyp because some traps morph
-         * (landmine to pit) and any new trap type
-         * should get triggered.
-         */
+             * dotrap on a fire trap calls melt_ice() which triggers
+             * spoteffects() (again) which can trigger the same fire
+             * trap (again). Use static spottrap to prevent that.
+             * We track spottraptyp because some traps morph
+             * (landmine to pit) and any new trap type
+             * should get triggered.
+             */
             if (!spottrap || spottraptyp != trap->ttyp) {
                 spottrap = trap;
                 spottraptyp = trap->ttyp;
@@ -1994,10 +1999,11 @@ boolean pick;
             "The ice, is gonna BREAK!", /* The Dead Zone */
         };
         long time_left = spot_time_left(u.ux, u.uy, MELT_ICE_AWAY);
+
         if (time_left && time_left < 15L)
-            pline1((time_left < 5L) ? icewarnings[2] : (time_left < 10L)
-                                                           ? icewarnings[1]
-                                                           : icewarnings[0]);
+            pline("%s", icewarnings[(time_left < 5L) ? 2
+                                    : (time_left < 10L) ? 1
+                                      : 0]);
     }
     if ((mtmp = m_at(u.ux, u.uy)) && !u.uswallow) {
         mtmp->mundetected = mtmp->msleeping = 0;
@@ -2005,16 +2011,17 @@ boolean pick;
         case S_PIERCER:
             pline("%s suddenly drops from the %s!", Amonnam(mtmp),
                   ceiling(u.ux, u.uy));
-            if (mtmp->mtame) /* jumps to greet you, not attack */
+            if (mtmp->mtame) { /* jumps to greet you, not attack */
                 ;
-            else if (uarmh && is_metallic(uarmh))
+            } else if (uarmh && is_metallic(uarmh)) {
                 pline("Its blow glances off your %s.",
                       helm_simple_name(uarmh));
-            else if (u.uac + 3 <= rnd(20))
+            } else if (u.uac + 3 <= rnd(20)) {
                 You("are almost hit by %s!",
                     x_monnam(mtmp, ARTICLE_A, "falling", 0, TRUE));
-            else {
+            } else {
                 int dmg;
+
                 You("are hit by %s!",
                     x_monnam(mtmp, ARTICLE_A, "falling", 0, TRUE));
                 dmg = d(4, 6);
@@ -2073,10 +2080,10 @@ register int typewanted;
     int typefound, min_x, min_y, max_x, max_y_offset, step;
     register struct rm *lev;
 
-#define goodtype(rno)                                               \
+#define goodtype(rno)   \
     (!typewanted                                                    \
-     || ((typefound = rooms[rno - ROOMOFFSET].rtype) == typewanted) \
-     || ((typewanted == SHOPBASE) && (typefound > SHOPBASE)))
+     || (typefound = rooms[rno - ROOMOFFSET].rtype) == typewanted   \
+     || (typewanted == SHOPBASE && typefound > SHOPBASE))
 
     switch (rno = levl[x][y].roomno) {
     case NO_ROOM:
@@ -2111,19 +2118,19 @@ register int typewanted;
     for (x = min_x; x <= max_x; x += step) {
         lev = &levl[x][min_y];
         y = 0;
-        if (((rno = lev[y].roomno) >= ROOMOFFSET) && !index(ptr, rno)
+        if ((rno = lev[y].roomno) >= ROOMOFFSET && !index(ptr, rno)
             && goodtype(rno))
             *(--ptr) = rno;
         y += step;
         if (y > max_y_offset)
             continue;
-        if (((rno = lev[y].roomno) >= ROOMOFFSET) && !index(ptr, rno)
+        if ((rno = lev[y].roomno) >= ROOMOFFSET && !index(ptr, rno)
             && goodtype(rno))
             *(--ptr) = rno;
         y += step;
         if (y > max_y_offset)
             continue;
-        if (((rno = lev[y].roomno) >= ROOMOFFSET) && !index(ptr, rno)
+        if ((rno = lev[y].roomno) >= ROOMOFFSET && !index(ptr, rno)
             && goodtype(rno))
             *(--ptr) = rno;
     }
@@ -2176,7 +2183,7 @@ register boolean newlev;
     Strcpy(u.urooms, in_rooms(u.ux, u.uy, 0));
 
     for (ptr1 = &u.urooms[0], ptr2 = &u.uentered[0], ptr3 = &u.ushops[0],
-        ptr4 = &u.ushops_entered[0];
+         ptr4 = &u.ushops_entered[0];
          *ptr1; ptr1++) {
         if (!index(u.urooms0, *ptr1))
             *(ptr2++) = *ptr1;
@@ -2332,7 +2339,7 @@ register boolean newlev;
 int
 dopickup()
 {
-    int count;
+    int count, tmpcount;
     struct trap *traphere = t_at(u.ux, u.uy);
 
     /* awful kludge to work around parse()'s pre-decrement */
@@ -2349,7 +2356,7 @@ dopickup()
                     Blind ? "feel" : "see");
             return 1;
         } else {
-            int tmpcount = -count;
+            tmpcount = -count;
             return loot_mon(u.ustuck, &tmpcount, (boolean *) 0);
         }
     }
@@ -2411,10 +2418,11 @@ dopickup()
 void
 lookaround()
 {
-    register int x, y, i, x0 = 0, y0 = 0, m0 = 1, i0 = 9;
-    register int corrct = 0, noturn = 0;
-    register struct monst *mtmp;
-    register struct trap *trap;
+    register int x, y;
+    int i, x0 = 0, y0 = 0, m0 = 1, i0 = 9;
+    int corrct = 0, noturn = 0;
+    struct monst *mtmp;
+    struct trap *trap;
 
     /* Grid bugs stop if trying to move diagonal, even if blind.  Maybe */
     /* they polymorphed while in the middle of a long move. */
@@ -2427,20 +2435,18 @@ lookaround()
         return;
     for (x = u.ux - 1; x <= u.ux + 1; x++)
         for (y = u.uy - 1; y <= u.uy + 1; y++) {
-            if (!isok(x, y))
+            if (!isok(x, y) || (x == u.ux && y == u.uy))
+                continue;
+            if (NODIAG(u.umonnum) && x != u.ux && y != u.uy)
                 continue;
 
-            if (u.umonnum == PM_GRID_BUG && x != u.ux && y != u.uy)
-                continue;
-
-            if (x == u.ux && y == u.uy)
-                continue;
-
-            if ((mtmp = m_at(x, y)) && mtmp->m_ap_type != M_AP_FURNITURE
+            if ((mtmp = m_at(x, y)) != 0
+                && mtmp->m_ap_type != M_AP_FURNITURE
                 && mtmp->m_ap_type != M_AP_OBJECT
                 && (!mtmp->minvis || See_invisible) && !mtmp->mundetected) {
                 if ((context.run != 1 && !mtmp->mtame)
-                    || (x == u.ux + u.dx && y == u.uy + u.dy && !context.travel))
+                    || (x == u.ux + u.dx && y == u.uy + u.dy
+                        && !context.travel))
                     goto stop;
             }
 
@@ -2449,11 +2455,10 @@ lookaround()
             if (x == u.ux - u.dx && y == u.uy - u.dy)
                 continue;
 
-            if (IS_ROCK(levl[x][y].typ) || (levl[x][y].typ == ROOM)
-                || IS_AIR(levl[x][y].typ))
+            if (IS_ROCK(levl[x][y].typ) || levl[x][y].typ == ROOM
+                || IS_AIR(levl[x][y].typ)) {
                 continue;
-            else if (closed_door(x, y)
-                     || (mtmp && is_door_mappear(mtmp))) {
+            } else if (closed_door(x, y) || (mtmp && is_door_mappear(mtmp))) {
                 if (x != u.ux && y != u.uy)
                     continue;
                 if (context.run != 1)
@@ -2598,9 +2603,7 @@ monster_nearby()
     /* Also see the similar check in dochugw() in monmove.c */
     for (x = u.ux - 1; x <= u.ux + 1; x++)
         for (y = u.uy - 1; y <= u.uy + 1; y++) {
-            if (!isok(x, y))
-                continue;
-            if (x == u.ux && y == u.uy)
+            if (!isok(x, y) || (x == u.ux && y == u.uy))
                 continue;
             if ((mtmp = m_at(x, y)) && mtmp->m_ap_type != M_AP_FURNITURE
                 && mtmp->m_ap_type != M_AP_OBJECT
@@ -2672,8 +2675,8 @@ maybe_wail()
                 if (u.uprops[powers[i]].intrinsic & INTRINSIC)
                     ++powercnt;
 
-            pline(powercnt >= 4 ? "%s, all your powers will be lost..."
-                                : "%s, your life force is running out.",
+            pline((powercnt >= 4) ? "%s, all your powers will be lost..."
+                                  : "%s, your life force is running out.",
                   who);
         }
     } else {
@@ -2736,9 +2739,9 @@ weight_cap()
     }
 
     if (Levitation || Is_airlevel(&u.uz) /* pugh@cornell */
-        || (u.usteed && strongmonst(u.usteed->data)))
+        || (u.usteed && strongmonst(u.usteed->data))) {
         carrcap = MAX_CARR_CAP;
-    else {
+    } else {
         if (carrcap > MAX_CARR_CAP)
             carrcap = MAX_CARR_CAP;
         if (!Flying) {
@@ -2836,7 +2839,7 @@ boolean incl_gold;
 }
 
 /* Counts the money in an object chain. */
-/* Intended use is for your or some monsters inventory, */
+/* Intended use is for your or some monster's inventory, */
 /* now that u.gold/m.gold is gone.*/
 /* Counting money in a container might be possible too. */
 long
