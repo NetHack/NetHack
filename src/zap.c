@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1461028544 2016/04/19 01:15:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.251 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1462663451 2016/05/07 23:24:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.252 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -4706,9 +4706,12 @@ register int osym, dmgtyp;
 
             if (!cnt)
                 continue;
-            mult = (cnt == quan)
-                       ? (quan > 1) ? "All of your " : "Your"
-                       : (cnt == 1L) ? "One of your" : "Some of your";
+            mult = (cnt == 1L)
+                   ? (quan == 1L) ? "Your"                        /* 1 of 1 */
+                                  : "One of your"                 /* 1 of N */
+                   : (cnt < quan) ? "Some of your"                /* n of N */
+                                  : (quan == 2L) ? "Both of your" /* 2 of 2 */
+                                                 : "All of your"; /* N of N */
             pline("%s %s %s!", mult, xname(obj),
                   destroy_strings[dindx][(cnt > 1L)]);
             if (osym == POTION_CLASS && dmgtyp != AD_COLD) {
