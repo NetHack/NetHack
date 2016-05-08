@@ -1317,7 +1317,7 @@ boolean at_stairs, falling, portal;
             if (flags.verbose || great_effort)
                 pline("%s %s up%s the %s.",
                       great_effort ? "With great effort, you" : "You",
-                      Flying ? "fly" : "climb",
+                      Levitation ? "float" : Flying ? "fly" : "climb",
                       (Flying && at_ladder) ? " along" : "",
                       at_ladder ? "ladder" : "stairs");
         } else { /* down */

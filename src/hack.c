@@ -1950,8 +1950,8 @@ boolean pick;
            turn, allowing it to do so could give the perception
            that a trap here is being triggered twice, so adjust
            the timeout to prevent that */
-        if (trap && (HLevitation & TIMEOUT) == 1L && !ELevitation
-            && !(HLevitation & ~TIMEOUT)) {
+        if (trap && (HLevitation & TIMEOUT) == 1L
+            && !(ELevitation || (HLevitation & ~(I_SPECIAL | TIMEOUT)))) {
             if (rn2(2)) { /* defer timeout */
                 incr_itimeout(&HLevitation, 1L);
             } else { /* timeout early */

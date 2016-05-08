@@ -957,39 +957,59 @@ register struct obj *otmp;
         break;
     case POT_LEVITATION:
     case SPE_LEVITATION:
-        if (otmp->cursed)
-            HLevitation &= ~I_SPECIAL;
+        /*
+         * BLevitation will be set if levitation is blocked due to being
+         * inside rock (currently or formerly in phazing xorn form, perhaps)
+         * but it doesn't prevent setting or incrementing Levitation timeout
+         * (which will take effect after escaping from the rock if it hasn't
+         * expired by then).
+         */
         if (!Levitation && !BLevitation) {
             /* kludge to ensure proper operation of float_up() */
             set_itimeout(&HLevitation, 1L);
             float_up();
-            /* reverse kludge */
-            set_itimeout(&HLevitation, 0L);
-            if (otmp->cursed) {
-                if ((u.ux == xupstair && u.uy == yupstair)
-                    || (sstairs.up && u.ux == sstairs.sx
-                        && u.uy == sstairs.sy)
-                    || (xupladder && u.ux == xupladder
-                        && u.uy == yupladder)) {
-                    (void) doup();
-                } else if (has_ceiling(&u.uz)) {
-                    int dmg = uarmh ? 1 : rnd(10);
-
-                    You("hit your %s on the %s.", body_part(HEAD),
-                        ceiling(u.ux, u.uy));
-                    losehp(Maybe_Half_Phys(dmg), "colliding with the ceiling",
-                           KILLED_BY);
-                }
-            } /*cursed*/
-        } else
+            /* This used to set timeout back to 0, then increment it below
+               for blessed and uncursed effects.  But now we leave it so
+               that cursed effect yields "you float down" on next turn.
+               Blessed and uncursed get one extra turn duration. */
+        } else /* already levitating, or can't levitate */
             nothing++;
-        if (otmp->blessed) {
+
+        if (otmp->cursed) {
+            /* 'already levitating' used to block the cursed effect(s)
+               aside from ~I_SPECIAL; it was not clear whether that was
+               intentional; either way, it no longer does (as of 3.6.1) */
+            HLevitation &= ~I_SPECIAL; /* can't descend upon demand */
+            if (BLevitation) {
+                ; /* rising via levitation is blocked */
+            } else if ((u.ux == xupstair && u.uy == yupstair)
+                    || (sstairs.up && u.ux == sstairs.sx && u.uy == sstairs.sy)
+                    || (xupladder && u.ux == xupladder && u.uy == yupladder)) {
+                (void) doup();
+                /* in case we're already Levitating, which would have
+                   resulted in incrementing 'nothing' */
+                nothing = 0; /* not nothing after all */
+            } else if (has_ceiling(&u.uz)) {
+                int dmg = rnd(!uarmh ? 10 : !is_metallic(uarmh) ? 6 : 3);
+
+                You("hit your %s on the %s.", body_part(HEAD),
+                    ceiling(u.ux, u.uy));
+                losehp(Maybe_Half_Phys(dmg), "colliding with the ceiling",
+                       KILLED_BY);
+                nothing = 0; /* not nothing after all */
+            }
+        } else if (otmp->blessed) {
+            /* at this point, timeout is already at least 1 */
             incr_itimeout(&HLevitation, rn1(50, 250));
+            /* can descend at will (stop levitating via '>') provided timeout
+               is the only factor (ie, not also wearing Lev ring or boots) */
             HLevitation |= I_SPECIAL;
-        } else
+        } else /* timeout is already at least 1 */
             incr_itimeout(&HLevitation, rn1(140, 10));
-        if (Levitation)
-            spoteffects(FALSE); /* for sinks */
+
+        if (Levitation && IS_SINK(levl[u.ux][u.uy].typ))
+            spoteffects(FALSE);
+        /* levitating blocks flying */
         float_vs_flight();
         break;
     case POT_GAIN_ENERGY: { /* M. Stephenson */
