@@ -2546,7 +2546,9 @@ boolean tinitial, tfrom_file;
         } else if ((op = string_for_opt(opts, TRUE)) != 0) {
             char *pp, buf[BUFSZ];
 
-            op = mungspaces(strcpy(buf, op));
+            strncpy(buf, op, sizeof buf - 1);
+            buf[sizeof buf - 1] = '\0';
+            op = mungspaces(buf);
             for (;;) {
                 /* We're looking to parse
                    "paranoid_confirm:whichone wheretwo whothree"
@@ -3106,8 +3108,7 @@ boolean tinitial, tfrom_file;
         if ((op = string_for_opt(opts, FALSE)) != 0) {
             if (iflags.wc_tile_file)
                 free(iflags.wc_tile_file);
-            iflags.wc_tile_file = (char *) alloc(strlen(op) + 1);
-            Strcpy(iflags.wc_tile_file, op);
+            iflags.wc_tile_file = dupstr(op);
         }
         return;
     }
