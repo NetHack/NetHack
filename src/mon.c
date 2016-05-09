@@ -2158,47 +2158,36 @@ struct monst *mtmp;
 
 /* the player has killed the monster mtmp */
 void
-xkilled(mtmp, dest)
+xkilled(mtmp, dflags)
 struct monst *mtmp;
-int dest; /* dest==1, normal; dest==0, don't print message; dest==2, don't
-             drop corpse either; dest==3, message but no corpse */
+int dflags; /* disposition flags:  1 => give message, 2 => suppress corpse */
 {
     int tmp, mndx, x = mtmp->mx, y = mtmp->my;
     struct permonst *mdat;
     struct obj *otmp;
     struct trap *t;
-    boolean wasinside = u.uswallow && (u.ustuck == mtmp);
-    boolean burycorpse = FALSE;
+    boolean wasinside = u.uswallow && (u.ustuck == mtmp), burycorpse = FALSE,
+            givemsg = (dflags & 1) != 0, nocorpse = (dflags & 2) != 0;
 
     /* KMH, conduct */
     u.uconduct.killer++;
 
-    if (dest & 1) {
-        const char *verb = nonliving(mtmp->data) ? "destroy" : "kill";
-
-        if (!wasinside && !canspotmon(mtmp))
-            You("%s it!", verb);
-        else {
-            You("%s %s!", verb,
-                !mtmp->mtame
-                    ? mon_nam(mtmp)
-                    : x_monnam(mtmp,
-                               (has_mname(mtmp)) ? ARTICLE_NONE : ARTICLE_THE,
-                               "poor",
-                               (has_mname(mtmp)) ? SUPPRESS_SADDLE : 0,
-                               FALSE));
-        }
-    }
+    if (givemsg)
+        You("%s %s!",
+            nonliving(mtmp->data) ? "destroy" : "kill",
+            !(wasinside || canspotmon(mtmp)) ? "it"
+              : !mtmp->mtame ? mon_nam(mtmp)
+                : x_monnam(mtmp, has_mname(mtmp) ? ARTICLE_NONE : ARTICLE_THE,
+                           "poor", has_mname(mtmp) ? SUPPRESS_SADDLE : 0,
+                           FALSE));
 
     if (mtmp->mtrapped && (t = t_at(x, y)) != 0
         && (t->ttyp == PIT || t->ttyp == SPIKED_PIT)) {
         if (sobj_at(BOULDER, x, y))
-            dest |= 2; /*
-        * Prevent corpses/treasure being created "on top"
-        * of the boulder that is about to fall in. This is
-        * out of order, but cannot be helped unless this
-        * whole routine is rearranged.
-        */
+            nocorpse = TRUE; /* Prevent corpses/treasure being created
+                                "on top" of boulder that is about to fall in.
+                                This is out of order, but cannot be helped
+                                unless this whole routine is rearranged. */
         if (m_carrying(mtmp, BOULDER))
             burycorpse = TRUE;
     }
@@ -2228,8 +2217,7 @@ int dest; /* dest==1, normal; dest==0, don't print message; dest==2, don't
     if (mtmp->mhp > 0) { /* monster lifesaved */
         /* Cannot put the non-visible lifesaving message in
          * lifesaved_monster() since the message appears only when you
-         * kill it (as opposed to visible lifesaving which always
-         * appears).
+         * kill it (as opposed to visible lifesaving which always appears).
          */
         stoned = FALSE;
         if (!cansee(x, y) && !vamp_rise_msg)
@@ -2245,7 +2233,7 @@ int dest; /* dest==1, normal; dest==0, don't print message; dest==2, don't
         goto cleanup;
     }
 
-    if ((dest & 2) || LEVEL_SPECIFIC_NOCORPSE(mdat))
+    if (nocorpse || LEVEL_SPECIFIC_NOCORPSE(mdat))
         goto cleanup;
 
 #ifdef MAIL
@@ -2272,7 +2260,7 @@ int dest; /* dest==1, normal; dest==0, don't print message; dest==2, don't
                 /* oc_big is also oc_bimanual and oc_bulky */
                 && (otmp->owt > 30 || objects[otyp].oc_big)) {
                 delobj(otmp);
-            } else if (!flooreffects(otmp, x, y, (dest & 1) ? "fall" : "")) {
+            } else if (!flooreffects(otmp, x, y, givemsg ? "fall" : "")) {
                 place_object(otmp, x, y);
                 stackobj(otmp);
             }
@@ -2282,7 +2270,7 @@ int dest; /* dest==1, normal; dest==0, don't print message; dest==2, don't
             cadaver = make_corpse(mtmp, burycorpse ? CORPSTAT_BURIED
                                                    : CORPSTAT_NONE);
             if (burycorpse && cadaver && cansee(x, y) && !mtmp->minvis
-                && cadaver->where == OBJ_BURIED && (dest & 1)) {
+                && cadaver->where == OBJ_BURIED && givemsg) {
                 pline("%s corpse ends up buried.", s_suffix(Monnam(mtmp)));
             }
         }
@@ -2294,7 +2282,8 @@ int dest; /* dest==1, normal; dest==0, don't print message; dest==2, don't
 
 cleanup:
     /* punish bad behaviour */
-    if (is_human(mdat) && (!always_hostile(mdat) && mtmp->malign <= 0)
+    if (is_human(mdat)
+        && (!always_hostile(mdat) && mtmp->malign <= 0)
         && (mndx < PM_ARCHEOLOGIST || mndx > PM_WIZARD)
         && u.ualign.type != A_CHAOTIC) {
         HTelepat &= ~INTRINSIC;

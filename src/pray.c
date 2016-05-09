@@ -520,9 +520,8 @@ int trouble;
     }
 }
 
-/* "I am sometimes shocked by...  the nuns who never take a bath without
- * wearing a bathrobe all the time.  When asked why, since no man can see
- * them,
+/* "I am sometimes shocked by... the nuns who never take a bath without
+ * wearing a bathrobe all the time.  When asked why, since no man can see them,
  * they reply 'Oh, but you forget the good God'.  Apparently they conceive of
  * the Deity as a Peeping Tom, whose omnipotence enables Him to see through
  * bathroom walls, but who is foiled by bathrobes." --Bertrand Russell, 1943
@@ -532,6 +531,8 @@ STATIC_OVL void
 god_zaps_you(resp_god)
 aligntyp resp_god;
 {
+    long oldkillcount = u.uconduct.killer;
+
     if (u.uswallow) {
         pline(
           "Suddenly a bolt of lightning comes down at you from the heavens!");
@@ -540,8 +541,11 @@ aligntyp resp_god;
             pline("%s fries to a crisp!", Monnam(u.ustuck));
             /* Yup, you get experience.  It takes guts to successfully
              * pull off this trick on your god, anyway.
+             * Other credit/blame applies (luck or alignment adjustments),
+             * but not direct kill count (pacifist conduct).
              */
             xkilled(u.ustuck, 0);
+            u.uconduct.killer = oldkillcount;
         } else
             pline("%s seems unaffected.", Monnam(u.ustuck));
     } else {
@@ -566,6 +570,7 @@ aligntyp resp_god;
         if (!resists_disint(u.ustuck)) {
             pline("%s disintegrates into a pile of dust!", Monnam(u.ustuck));
             xkilled(u.ustuck, 2); /* no corpse */
+            u.uconduct.killer = oldkillcount;
         } else
             pline("%s seems unaffected.", Monnam(u.ustuck));
     } else {
@@ -585,9 +590,9 @@ aligntyp resp_god;
             (void) destroy_arm(uarm);
         if (uarmu && !uarm && !uarmc)
             (void) destroy_arm(uarmu);
-        if (!Disint_resistance)
+        if (!Disint_resistance) {
             fry_by_god(resp_god, TRUE);
-        else {
+        } else {
             You("bask in its %s glow for a minute...", NH_BLACK);
             godvoice(resp_god, "I believe it not!");
         }
