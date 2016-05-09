@@ -3879,7 +3879,7 @@ int numtotal;
 {
     winid tmpwin;
     anything any;
-    int i, pick_cnt, pick_idx, opt_idx;
+    int i, pick_cnt, opt_idx;
     menu_item *pick_list = (menu_item *) 0;
     static const struct action {
         char letr;
@@ -3897,6 +3897,7 @@ int numtotal;
     any = zeroany;
     for (i = 0; i < SIZE(action_titles); i++) {
         char tmpbuf[BUFSZ];
+
         any.a_int++;
         /* omit list and remove if there aren't any yet */
         if (!numtotal && (i == 1 || i == 2))
@@ -3904,24 +3905,17 @@ int numtotal;
         Sprintf(tmpbuf, action_titles[i].desc,
                 (i == 1) ? makeplural(optname) : optname);
         add_menu(tmpwin, NO_GLYPH, &any, action_titles[i].letr, 0, ATR_NONE,
-                 tmpbuf,
-#if 0 /* this ought to work but doesn't... */
-                 (action_titles[i].letr == 'x') ? MENU_SELECTED :
-#endif
-                 MENU_UNSELECTED);
+                 tmpbuf, (i == 3) ? MENU_SELECTED : MENU_UNSELECTED);
     }
     end_menu(tmpwin, "Do what?");
     if ((pick_cnt = select_menu(tmpwin, PICK_ONE, &pick_list)) > 0) {
-        for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx) {
-            opt_idx = pick_list[pick_idx].item.a_int - 1;
-        }
+        opt_idx = pick_list[0].item.a_int - 1;
+        if (pick_cnt > 1 && opt_idx == 3)
+            opt_idx = pick_list[1].item.a_int - 1;
         free((genericptr_t) pick_list);
-        pick_list = (menu_item *) 0;
-    }
-    destroy_nhwindow(tmpwin);
-
-    if (pick_cnt < 1)
+    } else
         opt_idx = 3; /* none selected, exit menu */
+    destroy_nhwindow(tmpwin);
     return opt_idx;
 }
 
@@ -4338,6 +4332,7 @@ boolean setinitial, setfromfile;
         } else { /* list (1) or remove (2) */
             int pick_idx, pick_cnt;
             int mt_idx;
+            unsigned ln;
             const char *mtype;
             menu_item *pick_list = (menu_item *) 0;
             struct plinemsg_type *tmp = plinemsg_types;
@@ -4349,7 +4344,12 @@ boolean setinitial, setfromfile;
             while (tmp) {
                 mtype = msgtype2name(tmp->msgtype);
                 any.a_int = ++mt_idx;
-                Sprintf(mtbuf, "%-5s \"%s\"", mtype, tmp->pattern);
+                Sprintf(mtbuf, "%-5s \"", mtype);
+                ln = sizeof mtbuf - strlen(mtbuf) - sizeof "\"";
+                if (strlen(tmp->pattern) > ln)
+                    Strcat(strncat(mtbuf, tmp->pattern, ln - 3), "...\"");
+                else
+                    Strcat(mtbuf, "\"");
                 add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, mtbuf,
                          MENU_UNSELECTED);
                 tmp = tmp->next;
@@ -4394,6 +4394,7 @@ boolean setinitial, setfromfile;
         } else { /* list (1) or remove (2) */
             int pick_idx, pick_cnt;
             int mc_idx;
+            unsigned ln;
             const char *sattr, *sclr;
             menu_item *pick_list = (menu_item *) 0;
             struct menucoloring *tmp = menu_colorings;
@@ -4406,9 +4407,19 @@ boolean setinitial, setfromfile;
                 sattr = attr2attrname(tmp->attr);
                 sclr = clr2colorname(tmp->color);
                 any.a_int = ++mc_idx;
-                Sprintf(mcbuf, "\"%s\"=%s%s%s", tmp->origstr, sclr,
+                /* construct suffix */
+                Sprintf(buf, "\"\"=%s%s%s", sclr,
                         (tmp->attr != ATR_NONE) ? " & " : "",
                         (tmp->attr != ATR_NONE) ? sattr : "");
+                /* now main string */
+                ln = sizeof buf - strlen(buf) - 1; /* length available */
+                Strcpy(mcbuf, "\"");
+                if (strlen(tmp->origstr) > ln)
+                    Strcat(strncat(mcbuf, tmp->origstr, ln - 3), "...");
+                else
+                    Strcat(mcbuf, tmp->origstr);
+                /* combine main string and suffix */
+                Strcat(mcbuf, &buf[1]); /* skip buf[]'s initial quote */
                 add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, mcbuf,
                          MENU_UNSELECTED);
                 tmp = tmp->next;
@@ -4470,6 +4481,7 @@ boolean setinitial, setfromfile;
                          MENU_UNSELECTED);
                 for (i = 0; i < numapes[pass] && ape; i++) {
                     any.a_void = (opt_idx == 1) ? 0 : ape;
+                    /* length of pattern plus quotes is less than BUFSZ */
                     Sprintf(apebuf, "\"%s\"", ape->pattern);
                     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, apebuf,
                              MENU_UNSELECTED);
@@ -5055,39 +5067,54 @@ int
 add_autopickup_exception(mapping)
 const char *mapping;
 {
+    static const char
+        APE_regex_error[] = "regex error in AUTOPICKUP_EXCEPTION",
+        APE_syntax_error[] = "syntax error in AUTOPICKUP_EXCEPTION";
+
     struct autopickup_exception *ape, **apehead;
-    char text[256], *text2;
+    char text[256], end;
+    int n;
     boolean grab = FALSE;
 
-    if (sscanf(mapping, "\"%255[^\"]\"", text) == 1) {
-        text2 = &text[0];
-        if (*text2 == '<') { /* force autopickup */
-            grab = TRUE;
-            ++text2;
-        } else if (*text2 == '>') { /* default - Do not pickup */
-            grab = FALSE;
-            ++text2;
-        }
-        apehead = (grab) ? &iflags.autopickup_exceptions[AP_GRAB]
-                         : &iflags.autopickup_exceptions[AP_LEAVE];
-        ape = (struct autopickup_exception *) alloc(
-                                        sizeof (struct autopickup_exception));
-        ape->regex = regex_init();
-        if (!regex_compile(text2, ape->regex)) {
-            raw_print("regex error in AUTOPICKUP_EXCEPTION");
-            regex_free(ape->regex);
-            free((genericptr_t) ape);
-            return 0;
-        }
-        ape->pattern = (char *) alloc(strlen(text2) + 1);
-        strcpy(ape->pattern, text2);
-        ape->grab = grab;
-        ape->next = *apehead;
-        *apehead = ape;
+    /* scan length limit used to be 255, but smaller size allows the
+       quoted value to fit within BUFSZ, simplifying formatting elsewhere;
+       this used to ignore the possibility of trailing junk but now checks
+       for it, accepting whitespace but rejecting anything else unless it
+       starts with '#" for a comment */
+    end = '\0';
+    if ((n = sscanf(mapping, "\"<%253[^\"]\" %c", text, &end)) == 1
+        || (n == 2 && end == '#')) {
+        grab = TRUE;
+    } else if ((n = sscanf(mapping, "\">%253[^\"]\" %c", text, &end)) == 1
+               || (n = sscanf(mapping, "\"%253[^\"]\" %c", text, &end)) == 1
+               || (n == 2 && end == '#')) {
+        grab = FALSE;
     } else {
-        raw_print("syntax error in AUTOPICKUP_EXCEPTION");
+        if (!iflags.window_inited)
+            raw_print(APE_syntax_error); /* from options file */
+        else
+            pline("%s", APE_syntax_error); /* via 'O' command */
         return 0;
     }
+
+    ape = (struct autopickup_exception *) alloc(sizeof *ape);
+    ape->regex = regex_init();
+    if (!regex_compile(text, ape->regex)) {
+        if (!iflags.window_inited)
+            raw_print(APE_regex_error);
+        else
+            pline("%s", APE_regex_error);
+        regex_free(ape->regex);
+        free((genericptr_t) ape);
+        return 0;
+    }
+    apehead = (grab) ? &iflags.autopickup_exceptions[AP_GRAB]
+                     : &iflags.autopickup_exceptions[AP_LEAVE];
+
+    ape->pattern = dupstr(text);
+    ape->grab = grab;
+    ape->next = *apehead;
+    *apehead = ape;
     return 1;
 }
 
