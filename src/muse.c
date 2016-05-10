@@ -2240,7 +2240,7 @@ boolean stoning;
         if (mon->mhp <= 0) {
             pline("%s dies!", Monnam(mon));
             if (by_you)
-                xkilled(mon, 0);
+                xkilled(mon, XKILL_NOMSG);
             else
                 mondead(mon);
             return;

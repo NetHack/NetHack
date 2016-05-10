@@ -2679,7 +2679,7 @@ boolean byplayer;
         pline("%s turns to stone.", Monnam(mon));
     if (byplayer) {
         stoned = TRUE;
-        xkilled(mon, 0);
+        xkilled(mon, XKILL_NOMSG);
     } else
         monstone(mon);
 }

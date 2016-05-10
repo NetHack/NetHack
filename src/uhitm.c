@@ -1152,7 +1152,7 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
     if (poiskilled) {
         pline_The("poison was deadly...");
         if (!already_killed)
-            xkilled(mon, 0);
+            xkilled(mon, XKILL_NOMSG);
         destroyed = TRUE; /* return FALSE; */
     } else if (destroyed) {
         if (!already_killed)
@@ -1471,7 +1471,7 @@ register struct attack *mattk;
         if (pd == &mons[PM_STRAW_GOLEM] || pd == &mons[PM_PAPER_GOLEM]) {
             if (!Blind)
                 pline("%s burns completely!", Monnam(mdef));
-            xkilled(mdef, 2);
+            xkilled(mdef, XKILL_NOMSG | XKILL_NOCORPSE);
             tmp = 0;
             break;
             /* Don't return yet; keep hp<1 and tmp=0 for pet msg */
@@ -1589,7 +1589,7 @@ register struct attack *mattk;
                 if (!Blind)
                     pline("Some writing vanishes from %s head!",
                           s_suffix(mon_nam(mdef)));
-                xkilled(mdef, 0);
+                xkilled(mdef, XKILL_NOMSG);
                 /* Don't return yet; keep hp<1 and tmp=0 for pet msg */
             } else {
                 mdef->mcan = 1;
@@ -1601,11 +1601,12 @@ register struct attack *mattk;
     case AD_DRLI:
         if (!negated && !rn2(3) && !resists_drli(mdef)) {
             int xtmp = d(2, 6);
+
             pline("%s suddenly seems weaker!", Monnam(mdef));
             mdef->mhpmax -= xtmp;
             if ((mdef->mhp -= xtmp) <= 0 || !mdef->m_lev) {
                 pline("%s dies!", Monnam(mdef));
-                xkilled(mdef, 0);
+                xkilled(mdef, XKILL_NOMSG);
             } else
                 mdef->m_lev--;
             tmp = 0;
@@ -1614,7 +1615,7 @@ register struct attack *mattk;
     case AD_RUST:
         if (pd == &mons[PM_IRON_GOLEM]) {
             pline("%s falls to pieces!", Monnam(mdef));
-            xkilled(mdef, 0);
+            xkilled(mdef, XKILL_NOMSG);
         }
         erode_armor(mdef, ERODE_RUST);
         tmp = 0;
@@ -1626,7 +1627,7 @@ register struct attack *mattk;
     case AD_DCAY:
         if (pd == &mons[PM_WOOD_GOLEM] || pd == &mons[PM_LEATHER_GOLEM]) {
             pline("%s falls to pieces!", Monnam(mdef));
-            xkilled(mdef, 0);
+            xkilled(mdef, XKILL_NOMSG);
         }
         erode_armor(mdef, ERODE_ROT);
         tmp = 0;
@@ -1770,11 +1771,11 @@ register struct attack *mattk;
         if (mdef->mtame && !cansee(mdef->mx, mdef->my)) {
             You_feel("embarrassed for a moment.");
             if (tmp)
-                xkilled(mdef, 0); /* !tmp but hp<1: already killed */
+                xkilled(mdef, XKILL_NOMSG); /* !tmp but hp<1: already killed */
         } else if (!flags.verbose) {
             You("destroy it!");
             if (tmp)
-                xkilled(mdef, 0);
+                xkilled(mdef, XKILL_NOMSG);
         } else if (tmp)
             killed(mdef);
         return 2;
@@ -1933,7 +1934,7 @@ register struct attack *mattk;
                     m_useup(mdef, otmp);
 
                 newuhs(FALSE);
-                xkilled(mdef, 2);
+                xkilled(mdef, XKILL_NOMSG | XKILL_NOCORPSE);
                 if (mdef->mhp > 0) { /* monster lifesaved */
                     You("hurriedly regurgitate the sizzling in your %s.",
                         body_part(STOMACH));

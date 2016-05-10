@@ -326,6 +326,13 @@ NEARDATA extern coord bhitpos; /* place where throw or zap hits or stops */
 #define SORTLOOT_INVLET 0x02
 #define SORTLOOT_LOOT   0x04
 
+/* flags for xkilled() [note: meaning of first bit used to be reversed,
+   1 to give message and 0 to suppress] */
+#define XKILL_GIVEMSG   0
+#define XKILL_NOMSG     1
+#define XKILL_NOCORPSE  2
+#define XKILL_NOCONDUCT 4
+
 /* Macros for messages referring to hands, eyes, feet, etc... */
 #define ARM 0
 #define EYE 1

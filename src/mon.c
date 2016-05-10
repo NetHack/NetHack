@@ -2153,26 +2153,29 @@ void
 killed(mtmp)
 struct monst *mtmp;
 {
-    xkilled(mtmp, 1);
+    xkilled(mtmp, XKILL_GIVEMSG);
 }
 
 /* the player has killed the monster mtmp */
 void
-xkilled(mtmp, dflags)
+xkilled(mtmp, xkill_flags)
 struct monst *mtmp;
-int dflags; /* disposition flags:  1 => give message, 2 => suppress corpse */
+int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
 {
     int tmp, mndx, x = mtmp->mx, y = mtmp->my;
     struct permonst *mdat;
     struct obj *otmp;
     struct trap *t;
-    boolean wasinside = u.uswallow && (u.ustuck == mtmp), burycorpse = FALSE,
-            givemsg = (dflags & 1) != 0, nocorpse = (dflags & 2) != 0;
+    boolean wasinside = u.uswallow && (u.ustuck == mtmp),
+            burycorpse = FALSE,
+            nomsg = (xkill_flags & XKILL_NOMSG) != 0,
+            nocorpse = (xkill_flags & XKILL_NOCORPSE) != 0,
+            noconduct = (xkill_flags & XKILL_NOCONDUCT) != 0;
 
-    /* KMH, conduct */
-    u.uconduct.killer++;
+    if (!noconduct) /* KMH, conduct */
+        u.uconduct.killer++;
 
-    if (givemsg)
+    if (!nomsg)
         You("%s %s!",
             nonliving(mtmp->data) ? "destroy" : "kill",
             !(wasinside || canspotmon(mtmp)) ? "it"
@@ -2260,7 +2263,7 @@ int dflags; /* disposition flags:  1 => give message, 2 => suppress corpse */
                 /* oc_big is also oc_bimanual and oc_bulky */
                 && (otmp->owt > 30 || objects[otyp].oc_big)) {
                 delobj(otmp);
-            } else if (!flooreffects(otmp, x, y, givemsg ? "fall" : "")) {
+            } else if (!flooreffects(otmp, x, y, nomsg ? "" : "fall")) {
                 place_object(otmp, x, y);
                 stackobj(otmp);
             }
@@ -2270,7 +2273,7 @@ int dflags; /* disposition flags:  1 => give message, 2 => suppress corpse */
             cadaver = make_corpse(mtmp, burycorpse ? CORPSTAT_BURIED
                                                    : CORPSTAT_NONE);
             if (burycorpse && cadaver && cansee(x, y) && !mtmp->minvis
-                && cadaver->where == OBJ_BURIED && givemsg) {
+                && cadaver->where == OBJ_BURIED && !nomsg) {
                 pline("%s corpse ends up buried.", s_suffix(Monnam(mtmp)));
             }
         }

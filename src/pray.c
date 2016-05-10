@@ -531,8 +531,6 @@ STATIC_OVL void
 god_zaps_you(resp_god)
 aligntyp resp_god;
 {
-    long oldkillcount = u.uconduct.killer;
-
     if (u.uswallow) {
         pline(
           "Suddenly a bolt of lightning comes down at you from the heavens!");
@@ -544,8 +542,7 @@ aligntyp resp_god;
              * Other credit/blame applies (luck or alignment adjustments),
              * but not direct kill count (pacifist conduct).
              */
-            xkilled(u.ustuck, 0);
-            u.uconduct.killer = oldkillcount;
+            xkilled(u.ustuck, XKILL_NOMSG | XKILL_NOCONDUCT);
         } else
             pline("%s seems unaffected.", Monnam(u.ustuck));
     } else {
@@ -569,8 +566,7 @@ aligntyp resp_god;
               mon_nam(u.ustuck));
         if (!resists_disint(u.ustuck)) {
             pline("%s disintegrates into a pile of dust!", Monnam(u.ustuck));
-            xkilled(u.ustuck, 2); /* no corpse */
-            u.uconduct.killer = oldkillcount;
+            xkilled(u.ustuck, XKILL_NOMSG | XKILL_NOCORPSE | XKILL_NOCONDUCT);
         } else
             pline("%s seems unaffected.", Monnam(u.ustuck));
     } else {

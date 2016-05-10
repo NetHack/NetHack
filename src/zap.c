@@ -242,7 +242,7 @@ struct obj *otmp;
                 }
                 /* context.bypasses = TRUE; ## for make_corpse() */
                 /* no corpse after system shock */
-                xkilled(mtmp, 3);
+                xkilled(mtmp, XKILL_GIVEMSG | XKILL_NOCORPSE);
             } else if (newcham(mtmp, (struct permonst *) 0,
                                polyspot, give_msg) != 0
                        /* if shapechange failed because there aren't
@@ -401,14 +401,15 @@ struct obj *otmp;
             dmg *= 2;
         if (otyp == SPE_DRAIN_LIFE)
             dmg = spell_damage_bonus(dmg);
-        if (resists_drli(mtmp))
+        if (resists_drli(mtmp)) {
             shieldeff(mtmp->mx, mtmp->my);
-        else if (!resist(mtmp, otmp->oclass, dmg, NOTELL) && mtmp->mhp > 0) {
+        } else if (!resist(mtmp, otmp->oclass, dmg, NOTELL) && mtmp->mhp > 0) {
             mtmp->mhp -= dmg;
             mtmp->mhpmax -= dmg;
-            if (mtmp->mhp <= 0 || mtmp->mhpmax <= 0 || mtmp->m_lev < 1)
-                xkilled(mtmp, 1);
-            else {
+            /* die if already level 0, regardless of hit points */
+            if (mtmp->mhp <= 0 || mtmp->mhpmax <= 0 || mtmp->m_lev < 1) {
+                killed(mtmp);
+            } else {
                 mtmp->m_lev--;
                 if (canseemon(mtmp))
                     pline("%s suddenly seems weaker!", Monnam(mtmp));
@@ -3843,7 +3844,7 @@ const char *fltxt;
     if (type < 0)
         monkilled(mon, (char *) 0, -AD_RBRE);
     else
-        xkilled(mon, 2);
+        xkilled(mon, XKILL_NOMSG | XKILL_NOCORPSE);
 }
 
 /*

@@ -2664,7 +2664,7 @@ register struct attack *mattk;
             }
             pline("%s turns to stone!", Monnam(mtmp));
             stoned = 1;
-            xkilled(mtmp, 0);
+            xkilled(mtmp, XKILL_NOMSG);
             if (mtmp->mhp > 0)
                 return 1;
             return 2;
@@ -2773,7 +2773,7 @@ register struct attack *mattk;
 assess_dmg:
     if ((mtmp->mhp -= tmp) <= 0) {
         pline("%s dies!", Monnam(mtmp));
-        xkilled(mtmp, 0);
+        xkilled(mtmp, XKILL_NOMSG);
         if (mtmp->mhp > 0)
             return 1;
         return 2;

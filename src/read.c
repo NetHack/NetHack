@@ -1744,9 +1744,9 @@ boolean confused, byu;
         }
         mtmp->mhp -= mdmg;
         if (mtmp->mhp <= 0) {
-            if (byu)
-                xkilled(mtmp, 1);
-            else {
+            if (byu) {
+                killed(mtmp);
+            } else {
                 pline("%s is killed.", Monnam(mtmp));
                 mondied(mtmp);
             }
