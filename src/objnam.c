@@ -11,14 +11,14 @@
 
 STATIC_DCL char *FDECL(strprepend, (char *, const char *));
 STATIC_DCL short FDECL(rnd_otyp_by_wpnskill, (SCHAR_P));
-STATIC_DCL short FDECL(rnd_otyp_by_namedesc, (char *, char));
+STATIC_DCL short FDECL(rnd_otyp_by_namedesc, (char *, CHAR_P));
 STATIC_DCL boolean FDECL(wishymatch, (const char *, const char *, BOOLEAN_P));
 STATIC_DCL char *NDECL(nextobuf);
 STATIC_DCL void FDECL(releaseobuf, (char *));
 STATIC_DCL char *FDECL(minimal_xname, (struct obj *));
 STATIC_DCL void FDECL(add_erosion_words, (struct obj *, char *));
-STATIC_DCL boolean
-FDECL(singplur_lookup, (char *, char *, BOOLEAN_P, const char *const *));
+STATIC_DCL boolean FDECL(singplur_lookup, (char *, char *, BOOLEAN_P,
+                                           const char *const *));
 STATIC_DCL char *FDECL(singplur_compound, (char *));
 STATIC_DCL char *FDECL(xname_flags, (struct obj *, unsigned));
 
@@ -407,9 +407,9 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
             }
             break;
         }
-        if (Is_pudding(obj)) {
+        if (obj->globby) {
             Sprintf(buf, "%s%s",
-                    (obj->owt < 100)
+                    (obj->owt <= 100)
                        ? "small "
                        : (obj->owt > 500)
                           ? "very large "
@@ -2430,7 +2430,7 @@ struct alt_spellings {
     { (const char *) 0, 0 },
 };
 
-short
+STATIC_OVL short
 rnd_otyp_by_wpnskill(skill)
 schar skill;
 {
@@ -2453,50 +2453,47 @@ schar skill;
     return otyp;
 }
 
-short
+STATIC_OVL short
 rnd_otyp_by_namedesc(name, oclass)
 char *name;
 char oclass;
 {
-    int i = oclass ? bases[(int)oclass] : 1;
-    int n = 0;
-    short otyp = STRANGE_OBJECT;
+    int i, n = 0;
     short validobjs[NUM_OBJECTS];
     register const char *zn;
     long maxprob = 0;
 
-    if (!name) return STRANGE_OBJECT;
+    if (!name)
+        return STRANGE_OBJECT;
 
     memset((genericptr_t) validobjs, 0, sizeof(validobjs));
 
-    while (i < NUM_OBJECTS && (!oclass || objects[i].oc_class == oclass)) {
-        if ((zn = OBJ_NAME(objects[i])) != 0 && wishymatch(name, zn, TRUE)) {
-            otyp = i;
-        } else if ((zn = OBJ_DESCR(objects[i])) != 0 && wishymatch(name, zn, FALSE) &&
-            /* don't match extra descriptions (w/o real name) */
-		   OBJ_NAME(objects[i])) {
-	    otyp = i;
-        } else if ((zn = objects[i].oc_uname) != 0 && wishymatch(name, zn, FALSE)) {
-            otyp = i;
+    for (i = oclass ? bases[(int)oclass] : STRANGE_OBJECT + 1;
+         i < NUM_OBJECTS && (!oclass || objects[i].oc_class == oclass);
+         ++i) {
+        /* don't match extra descriptions (w/o real name) */
+	if ((zn = OBJ_NAME(objects[i])) == 0)
+            continue;
+        if (wishymatch(name, zn, TRUE)
+            || ((zn = OBJ_DESCR(objects[i])) != 0
+                && wishymatch(name, zn, FALSE))
+            || ((zn = objects[i].oc_uname) != 0
+                && wishymatch(name, zn, FALSE))) {
+            validobjs[n++] = (short) i;
+            maxprob += (objects[i].oc_prob + 1);
         }
-        if (otyp != STRANGE_OBJECT) {
-            validobjs[n++] = otyp;
-            maxprob += (objects[otyp].oc_prob + 1);
-            otyp = STRANGE_OBJECT;
-        }
-        i++;
     }
 
     if (n > 0 && maxprob) {
         long prob = rn2(maxprob);
+
         i = 0;
-        while ((i < (n-1)) && (prob -= (objects[validobjs[i]].oc_prob + 1)) > 0)
+        while (i < n - 1 && (prob -= (objects[validobjs[i]].oc_prob + 1)) > 0)
             i++;
         return validobjs[i];
     }
     return STRANGE_OBJECT;
 }
-
 
 /*
  * Return something wished for.  Specifying a null pointer for
@@ -2519,7 +2516,7 @@ struct obj *no_wish;
     int halfeaten, mntmp, contents;
     int islit, unlabeled, ishistoric, isdiluted, trapped;
     int tmp, tinv, tvariety;
-    int wetness;
+    int wetness, gsize;
     struct fruit *f;
     int ftype = context.current_fruit;
     char fruitbuf[BUFSZ];
@@ -2657,6 +2654,15 @@ struct obj *no_wish;
             isdiluted = 1;
         } else if (!strncmpi(bp, "empty ", l = 6)) {
             contents = EMPTY;
+        } else if (!strncmpi(bp, "small ", l = 6)) { /* glob sizes */
+            gsize = 1;
+        } else if (!strncmpi(bp, "medium ", l = 7)) {
+            /* xname() doesn't display "medium" but without this
+               there'd be no way to ask for the intermediate size */
+            gsize = 2;
+        } else if (!strncmpi(bp, "large ", l = 6)) {
+            /* "very large " had "very " peeled off on previous iteration */
+            gsize = (very != 1) ? 3 : 4;
         } else
             break;
         bp += l;
@@ -2787,6 +2793,7 @@ struct obj *no_wish;
     if ((p = strstri(bp, "glob of ")) != 0
         || (p = strstri(bp, "globs of ")) != 0) {
         int globoffset = (*(p + 4) == 's') ? 9 : 8;
+
         if ((mntmp = name_to_mon(p + globoffset)) >= PM_GRAY_OOZE
             && mntmp <= PM_BLACK_PUDDING) {
             mntmp = NON_PM; /* lie to ourselves */
@@ -3452,6 +3459,11 @@ typfnd:
                 set_corpsenm(otmp, mntmp);
             }
             break;
+        case EGG:
+            mntmp = can_be_hatched(mntmp);
+            /* this also sets hatch timer if appropriate */
+            set_corpsenm(otmp, mntmp);
+            break;
         case FIGURINE:
             if (!(mons[mntmp].geno & G_UNIQ) && !is_human(&mons[mntmp])
 #ifdef MAIL
@@ -3459,11 +3471,6 @@ typfnd:
 #endif
                 )
                 otmp->corpsenm = mntmp;
-            break;
-        case EGG:
-            mntmp = can_be_hatched(mntmp);
-            /* this also sets hatch timer if appropriate */
-            set_corpsenm(otmp, mntmp);
             break;
         case STATUE:
             otmp->corpsenm = mntmp;
@@ -3589,6 +3596,10 @@ typfnd:
     otmp->owt = weight(otmp);
     if (very && otmp->otyp == HEAVY_IRON_BALL)
         otmp->owt += IRON_BALL_W_INCR;
+    else if (gsize > 1 && otmp->globby)
+        /* 0: unspecified => small; 1: small => keep default owt of 20;
+           2: medium => 120; 3: large => 320; 4: very large => 520 */
+        otmp->owt += 100 + (gsize - 2) * 200;
 
     return otmp;
 }
