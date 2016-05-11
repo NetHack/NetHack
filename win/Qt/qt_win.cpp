@@ -1379,6 +1379,7 @@ void NetHackQtStringRequestor::SetDefault(const char* d)
 {
     input.setText(d);
 }
+
 bool NetHackQtStringRequestor::Get(char* buffer, int maxchar)
 {
     input.setMaxLength(maxchar);
@@ -1432,6 +1433,7 @@ void NetHackQtStringRequestor::done(int i)
 NetHackQtWindow::NetHackQtWindow()
 {
 }
+
 NetHackQtWindow::~NetHackQtWindow()
 {
 }
@@ -1514,7 +1516,10 @@ void NetHackQtMapWindow::putMessage(int attr, const char* text)
 	messages += "\n";
     messages += text;
     QFontMetrics fm = fontMetrics();
-    messages_rect = fm.boundingRect(viewport.contentsX(),viewport.contentsY(),viewport.width(),0, WordBreak|AlignTop|AlignLeft|DontClip, messages);
+    messages_rect = fm.boundingRect(viewport.contentsX(), viewport.contentsY(),
+                                    viewport.width(), 0,
+                                    WordBreak|AlignTop|AlignLeft|DontClip,
+                                    messages);
     update(messages_rect);
 }
 
@@ -1701,7 +1706,9 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 		    && ::iflags.hilite_pet
 #endif
 		) {
-		    painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(), j*qt_settings->glyphs().height()), pet_annotation);
+		    painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(),
+                                              j*qt_settings->glyphs().height()),
+                                       pet_annotation);
 		}
 	    }
 	}
@@ -1717,7 +1724,9 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 		    && ::iflags.hilite_pet
 #endif
 		) {
-		    painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(), j*qt_settings->glyphs().height()), pet_annotation);
+		    painter.drawPixmap(QPoint(i*qt_settings->glyphs().width(),
+                                              j*qt_settings->glyphs().height()),
+                                       pet_annotation);
 		}
 	    }
 	}
@@ -2827,6 +2836,7 @@ void NetHackQtMenuWindow::Layout()
     invert->setGeometry(x,0,butw,buth); x+=butw; butw=(dialog->width()-x)/1;
     search->setGeometry(x,0,butw,buth);
 }
+
 int NetHackQtMenuWindow::SelectMenu(int h, MENU_ITEM_P **menu_list)
 {
     setFont(str_fixed ?
@@ -2947,6 +2957,7 @@ int NetHackQtMenuWindow::SelectMenu(int h, MENU_ITEM_P **menu_list)
 	return -1;
     }
 }
+
 void NetHackQtMenuWindow::keyPressEvent(QKeyEvent* event)
 {
     if (viewHeight() < totalHeight() && !(event->state()&ShiftButton)) {
@@ -2974,12 +2985,14 @@ void NetHackQtMenuWindow::ChooseNone()
 	if (item[i].selected) ToggleSelect(i);
     }
 }
+
 void NetHackQtMenuWindow::Invert()
 {
     for (int i=0; i<itemcount; i++) {
 	ToggleSelect(i);
     }
 }
+
 void NetHackQtMenuWindow::Search()
 {
     NetHackQtStringRequestor requestor(keysource,"Search for:");
@@ -2991,6 +3004,7 @@ void NetHackQtMenuWindow::Search()
 	}
     }
 }
+
 void NetHackQtMenuWindow::ToggleSelect(int i)
 {
     if (item[i].Selectable()) {
@@ -3115,6 +3129,7 @@ void NetHackQtMenuWindow::mousePressEvent(QMouseEvent* event)
 	}
     }
 }
+
 void NetHackQtMenuWindow::mouseReleaseEvent(QMouseEvent* event)
 {
     if (pressed>=0) {
@@ -3123,6 +3138,7 @@ void NetHackQtMenuWindow::mouseReleaseEvent(QMouseEvent* event)
 	updateCell(p,3);
     }
 }
+
 void NetHackQtMenuWindow::mouseMoveEvent(QMouseEvent* event)
 {
     if (pressed>=0) {
@@ -4274,8 +4290,9 @@ NetHackQtGlyphs::NetHackQtGlyphs()
 	} else {
 	    tiles_per_row = TILES_PER_ROW;
 	    if (img.width()%tiles_per_row) {
-		impossible("Tile file \"%s\" has %d columns, not multiple of row count (%d)",
-		   tile_file, img.width(), tiles_per_row);
+		impossible(
+            "Tile file \"%s\" has %d columns, not multiple of row count (%d)",
+                           tile_file, img.width(), tiles_per_row);
 	    }
 	}
     } else {
@@ -4368,18 +4385,31 @@ QWidget* NetHackQtMenuOrTextWindow::Widget()
 // Text
 void NetHackQtMenuOrTextWindow::Clear()
 {
-    if (!actual) impossible("Clear called before we know if Menu or Text");
-    actual->Clear();
+    if (!actual)
+        impossible("Clear called before we know if Menu or Text");
+    else
+        actual->Clear();
 }
+
 void NetHackQtMenuOrTextWindow::Display(bool block)
 {
-    if (!actual) impossible("Display called before we know if Menu or Text");
-    actual->Display(block);
+    if (!actual)
+        impossible("Display called before we know if Menu or Text");
+    else
+        actual->Display(block);
 }
+
 bool NetHackQtMenuOrTextWindow::Destroy()
 {
-    if (!actual) impossible("Destroy called before we know if Menu or Text");
-    return actual->Destroy();
+    bool res;
+
+    if (!actual) {
+        /* impossible("Destroy called before we know if Menu or Text"); */
+        res = FALSE; // early Destroy is not impossible
+    } else
+        res = actual->Destroy();
+
+    return res;
 }
 
 void NetHackQtMenuOrTextWindow::PutStr(int attr, const char* text)
@@ -4394,17 +4424,20 @@ void NetHackQtMenuOrTextWindow::StartMenu()
     if (!actual) actual=new NetHackQtMenuWindow(keysource);
     actual->StartMenu();
 }
+
 void NetHackQtMenuOrTextWindow::AddMenu(int glyph, const ANY_P* identifier, char ch, char gch, int attr,
 	const char* str, bool presel)
 {
     if (!actual) impossible("AddMenu called before we know if Menu or Text");
     actual->AddMenu(glyph,identifier,ch,gch,attr,str,presel);
 }
+
 void NetHackQtMenuOrTextWindow::EndMenu(const char* prompt)
 {
     if (!actual) impossible("EndMenu called before we know if Menu or Text");
     actual->EndMenu(prompt);
 }
+
 int NetHackQtMenuOrTextWindow::SelectMenu(int how, MENU_ITEM_P **menu_list)
 {
     if (!actual) impossible("SelectMenu called before we know if Menu or Text");
