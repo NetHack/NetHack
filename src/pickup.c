@@ -21,6 +21,7 @@ STATIC_DCL boolean FDECL(all_but_uchain, (struct obj *));
 #if 0 /* not used */
 STATIC_DCL boolean FDECL(allow_cat_no_uchain, (struct obj *));
 #endif
+STATIC_DCL boolean FDECL(autopick_testobj, (struct obj *));
 STATIC_DCL int FDECL(autopick, (struct obj *, int, menu_item **));
 STATIC_DCL int FDECL(count_categories, (struct obj *, int));
 STATIC_DCL long FDECL(carry_count, (struct obj *, struct obj *, long,
@@ -698,6 +699,29 @@ boolean grab; /* forced pickup, rather than forced leave behind? */
     return FALSE;
 }
 
+boolean
+autopick_testobj(otmp)
+struct obj *otmp;
+{
+    const char *otypes = flags.pickup_types;
+    /* pick if in pickup_types and not unpaid item in shop */
+    boolean pickit = ((!*otypes || index(otypes, otmp->oclass))
+                      && !(otmp->where == OBJ_FLOOR
+                           && !otmp->no_charge
+                           && isok(otmp->ox, otmp->oy)
+                           && costly_spot(otmp->ox, otmp->oy)));
+    /* check for "always pick up */
+    if (!pickit)
+        pickit = is_autopickup_exception(otmp, TRUE);
+    /* then for "never pick up */
+    if (pickit)
+        pickit = !is_autopickup_exception(otmp, FALSE);
+    /* pickup_thrown overrides pickup_types and exceptions */
+    if (!pickit)
+        pickit = (flags.pickup_thrown && otmp->was_thrown);
+    return pickit;
+}
+
 /*
  * Pick from the given list using flags.pickup_types.  Return the number
  * of items picked (not counts).  Create an array that returns pointers
@@ -714,42 +738,17 @@ menu_item **pick_list; /* list of objects and counts to pick up */
     menu_item *pi; /* pick item */
     struct obj *curr;
     int n;
-    boolean pickit;
-    const char *otypes = flags.pickup_types;
 
     /* first count the number of eligible items */
     for (n = 0, curr = olist; curr; curr = FOLLOW(curr, follow)) {
-        /* pick if in pickup_types and not unpaid item in shop */
-        pickit = ((!*otypes || index(otypes, curr->oclass))
-                  && !(curr->where == OBJ_FLOOR
-                       && !curr->no_charge
-                       && isok(curr->ox, curr->oy)
-                       && costly_spot(curr->ox, curr->oy)));
-        /* check for "always pick up */
-        if (!pickit)
-            pickit = is_autopickup_exception(curr, TRUE);
-        /* then for "never pick up */
-        if (pickit)
-            pickit = !is_autopickup_exception(curr, FALSE);
-        /* pickup_thrown overrides pickup_types and exceptions */
-        if (!pickit)
-            pickit = (flags.pickup_thrown && curr->was_thrown);
-        /* finally, do we count this object? */
-        if (pickit)
+        if (autopick_testobj(curr))
             ++n;
     }
 
     if (n) {
         *pick_list = pi = (menu_item *) alloc(sizeof (menu_item) * n);
         for (n = 0, curr = olist; curr; curr = FOLLOW(curr, follow)) {
-            pickit = (!*otypes || index(otypes, curr->oclass));
-            if (!pickit)
-                pickit = is_autopickup_exception(curr, TRUE);
-            if (pickit)
-                pickit = !is_autopickup_exception(curr, FALSE);
-            if (!pickit)
-                pickit = (flags.pickup_thrown && curr->was_thrown);
-            if (pickit) {
+            if (autopick_testobj(curr)) {
                 pi[n].item.a_obj = curr;
                 pi[n].count = curr->quan;
                 n++;
