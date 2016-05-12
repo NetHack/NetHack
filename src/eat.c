@@ -2657,15 +2657,21 @@ bite()
     return 0;
 }
 
-/* as time goes by - called by moveloop() and domove() */
+/* as time goes by - called by moveloop(every move) & domove(melee attack) */
 void
 gethungry()
 {
     if (u.uinvulnerable)
         return; /* you don't feel hungrier */
 
-    if ((!u.usleep || !rn2(10)) /* slow metabolic rate while asleep */
-        && (carnivorous(youmonst.data) || herbivorous(youmonst.data))
+    /* being polymorphed into a creature which doesn't eat prevents
+       this first uhunger decrement, but to stay in such form the hero
+       will need to wear an Amulet of Unchanging so still burn a small
+       amount of nutrition in the 'moves % 20' ring/amulet check below */
+    if ((!Unaware || !rn2(10)) /* slow metabolic rate while asleep */
+        && (carnivorous(youmonst.data)
+            || herbivorous(youmonst.data)
+            || metallivorous(youmonst.data))
         && !Slow_digestion)
         u.uhunger--; /* ordinary food consumption */
 
@@ -2682,8 +2688,8 @@ gethungry()
         /* Conflict uses up food too */
         if (HConflict || (EConflict & (~W_ARTI)))
             u.uhunger--;
-        /* +0 charged rings don't do anything, so don't affect hunger */
-        /* Slow digestion still uses ring hunger */
+        /* +0 charged rings don't do anything, so don't affect hunger.
+           Slow digestion cancels move hunger but still causes ring hunger. */
         switch ((int) (moves % 20)) { /* note: use even cases only */
         case 4:
             if (uleft && (uleft->spe || !objects[uleft->otyp].oc_charged))
@@ -2844,11 +2850,14 @@ boolean incr;
     }
 
     if (newhs == FAINTING) {
+        /* u,uhunger is likely to be negative at this point */
+        int uhunger_div_by_10 = sgn(u.uhunger) * ((abs(u.uhunger) + 5) / 10);
+
         if (is_fainted())
             newhs = FAINTED;
-        if (u.uhs <= WEAK || rn2(20 - u.uhunger / 10) >= 19) {
+        if (u.uhs <= WEAK || rn2(20 - uhunger_div_by_10) >= 19) {
             if (!is_fainted() && multi >= 0 /* %% */) {
-                int duration = 10 - (u.uhunger / 10);
+                int duration = 10 - uhunger_div_by_10;
 
                 /* stop what you're doing, then faint */
                 stop_occupation();
@@ -2863,7 +2872,11 @@ boolean incr;
                 if (!Levitation)
                     selftouch("Falling, you");
             }
-        } else if (u.uhunger < -(int) (200 + 20 * ACURR(A_CON))) {
+
+        /* this used to be -(200 + 20 * Con) but that was when being asleep
+           suppressed per-turn uhunger decrement but being fainted didn't;
+           now uhunger becomes more negative at a slower rate */
+        } else if (u.uhunger < -(100 + 10 * (int) ACURR(A_CON))) {
             u.uhs = STARVED;
             context.botl = 1;
             bot();
