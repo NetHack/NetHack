@@ -272,6 +272,7 @@ outgoldmap:
     }
     newsym(u.ux, u.uy);
     u.uinwater = iflags.save_uinwater, u.uburied = iflags.save_uburied;
+    iflags.save_uinwater = iflags.save_uburied = 0;
     You_feel("very greedy, and sense gold!");
     exercise(A_WIS, TRUE);
     display_nhwindow(WIN_MAP, TRUE);
@@ -376,6 +377,7 @@ register struct obj *sobj;
                 }
         newsym(u.ux, u.uy);
         u.uinwater = iflags.save_uinwater, u.uburied = iflags.save_uburied;
+        iflags.save_uinwater = iflags.save_uburied = 0;
         if (sobj) {
             if (sobj->blessed) {
                 Your("%s %s to tingle and you smell %s.", body_part(NOSE),
@@ -575,6 +577,7 @@ int class;            /* an object class, 0 for all */
 
     newsym(u.ux, u.uy);
     u.uinwater = iflags.save_uinwater, u.uburied = iflags.save_uburied;
+    iflags.save_uinwater = iflags.save_uburied = 0;
     You("detect the %s of %s.", ct ? "presence" : "absence", stuff);
     display_nhwindow(WIN_MAP, TRUE);
     /*
@@ -826,6 +829,7 @@ outtrapmap:
     if (!(glyph_is_trap(glyph) || glyph_is_object(glyph)))
         newsym(u.ux, u.uy);
     u.uinwater = iflags.save_uinwater, u.uburied = iflags.save_uburied;
+    iflags.save_uinwater = iflags.save_uburied = 0;
 
     You_feel("%s.", cursed_src ? "very greedy" : "entrapped");
     /* wait for user to respond, then reset map display to normal */
@@ -1090,6 +1094,7 @@ do_mapping()
         for (zy = 0; zy < ROWNO; zy++)
             show_map_spot(zx, zy);
     u.uinwater = iflags.save_uinwater, u.uburied = iflags.save_uburied;
+    iflags.save_uinwater = iflags.save_uburied = 0;
     if (!level.flags.hero_memory || Underwater) {
         flush_screen(1);                 /* flush temp screen */
         display_nhwindow(WIN_MAP, TRUE); /* wait */
@@ -1602,6 +1607,7 @@ int which_subset; /* when not full, whether to suppress objs and/or traps */
 
         /* [TODO: highlight hero's location somehow] */
         u.uinwater = iflags.save_uinwater, u.uburied = iflags.save_uburied;
+        iflags.save_uinwater = iflags.save_uburied = 0;
         if (save_swallowed)
             u.uswallow = 1;
         flush_screen(1);
