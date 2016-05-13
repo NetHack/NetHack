@@ -1524,10 +1524,12 @@ int which_subset; /* when not full, whether to suppress objs and/or traps */
         unsigned save_swallowed;
         struct monst *mtmp;
         struct trap *t;
+        coord pos;
         char buf[BUFSZ];
-        boolean keep_traps = (which_subset & 1) !=0,
-                keep_objs = (which_subset & 2) != 0,
-                keep_mons = (which_subset & 4) != 0; /* actually always 0 */
+        /* there is a TER_MAP bit too; we always show map regardless of it */
+        boolean keep_traps = (which_subset & TER_TRP) !=0,
+                keep_objs = (which_subset & TER_OBJ) != 0,
+                keep_mons = (which_subset & TER_MON) != 0; /* not used */
 
         save_swallowed = u.uswallow;
         iflags.save_uinwater = u.uinwater, iflags.save_uburied = u.uburied;
@@ -1605,11 +1607,8 @@ int which_subset; /* when not full, whether to suppress objs and/or traps */
                 show_glyph(x, y, glyph);
             }
 
-        /* [TODO: highlight hero's location somehow] */
-        u.uinwater = iflags.save_uinwater, u.uburied = iflags.save_uburied;
-        iflags.save_uinwater = iflags.save_uburied = 0;
-        if (save_swallowed)
-            u.uswallow = 1;
+        /* hero's location is not highlighted, but getpos() starts with
+           cursor there, and after moving it anywhere '@' moves it back */
         flush_screen(1);
         if (full) {
             Strcpy(buf, "underlying terrain");
@@ -1627,7 +1626,20 @@ int which_subset; /* when not full, whether to suppress objs and/or traps */
                         (keep_traps || keep_objs) ? "," : "");
         }
         pline("Showing %s only...", buf);
-        display_nhwindow(WIN_MAP, TRUE); /* give "--More--" prompt */
+
+        /* allow player to move cursor around and get autodescribe feedback
+           based on what is visible now rather than what is on 'real' map */
+        pos.x = u.ux, pos.y = u.uy;
+        iflags.autodescribe = TRUE;
+        iflags.terrainmode = which_subset | TER_MAP; /* guaranteed non-zero */
+        getpos(&pos, FALSE, "anything of interest");
+        iflags.terrainmode = 0;
+        /* leave iflags.autodescribe 'on' even if it was previously 'off' */
+
+        u.uinwater = iflags.save_uinwater, u.uburied = iflags.save_uburied;
+        iflags.save_uinwater = iflags.save_uburied = 0;
+        if (save_swallowed)
+            u.uswallow = 1;
         docrt(); /* redraw the screen, restoring regular map */
         if (Underwater)
             under_water(2);

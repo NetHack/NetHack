@@ -1226,13 +1226,26 @@ doterrain(VOID_ARGS)
         free((genericptr_t) sel);
 
     switch (which) {
-    case 1: reveal_terrain(0, 0);   break; /* known map */
-    case 2: reveal_terrain(0, 1);   break; /* known map with traps */
-    case 3: reveal_terrain(0, 1|2); break; /* known map w/ traps & objs */
-    case 4: reveal_terrain(1, 0);   break; /* full map */
-    case 5: wiz_map_levltyp();      break; /* map internals */
-    case 6: wiz_levltyp_legend();   break; /* internal details */
-    default: break;
+    case 1: /* known map */
+        reveal_terrain(0, TER_MAP);
+        break;
+    case 2: /* known map with known traps */
+        reveal_terrain(0, TER_MAP | TER_TRP);
+        break;
+    case 3: /* known map with known traps and objects */
+        reveal_terrain(0, TER_MAP | TER_TRP | TER_OBJ);
+        break;
+    case 4: /* full map */
+        reveal_terrain(1, TER_MAP);
+        break;
+    case 5: /* map internals */
+        wiz_map_levltyp();
+        break;
+    case 6: /* internal details */
+        wiz_levltyp_legend();
+        break;
+    default:
+        break;
     }
     return 0; /* no time elapses */
 }

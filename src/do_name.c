@@ -59,30 +59,37 @@ const char *goal;
     putstr(tmpwin, 0, "Use [HJKL] to move the cursor 8 units at a time.");
     putstr(tmpwin, 0, "Or enter a background symbol (ex. <).");
     putstr(tmpwin, 0, "Use @ to move the cursor on yourself.");
-    putstr(tmpwin, 0, "Use m or M to move the cursor to next monster.");
-    putstr(tmpwin, 0, "Use o or O to move the cursor to next object.");
-    if (getpos_hilitefunc)
-        putstr(tmpwin, 0, "Use $ to display valid locations.");
-    putstr(tmpwin, 0, "Use # to toggle automatic description.");
-    if (iflags.cmdassist) /* assisting the '/' command, I suppose... */
-        putstr(tmpwin, 0, (iflags.getpos_coords == GPCOORDS_NONE)
-        ? "(Set 'whatis_coord' option to include coordinates with '#' text.)"
+    if (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0)
+        putstr(tmpwin, 0, "Use m or M to move the cursor to next monster.");
+    if (!iflags.terrainmode || (iflags.terrainmode & TER_OBJ) != 0)
+        putstr(tmpwin, 0, "Use o or O to move the cursor to next object.");
+    if (!iflags.terrainmode) {
+        if (getpos_hilitefunc)
+            putstr(tmpwin, 0, "Use $ to display valid locations.");
+        putstr(tmpwin, 0, "Use # to toggle automatic description.");
+        if (iflags.cmdassist) /* assisting the '/' command, I suppose... */
+            putstr(tmpwin, 0,
+                   (iflags.getpos_coords == GPCOORDS_NONE)
+         ? "(Set 'whatis_coord' option to include coordinates with '#' text.)"
         : "(Reset 'whatis_coord' option to omit coordinates from '#' text.)");
-    /* disgusting hack; the alternate selection characters work for any
-       getpos call, but they only matter for dowhatis (and doquickwhatis) */
-    doing_what_is = (goal == what_is_an_unknown_object);
-    Sprintf(sbuf, "Type a .%s when you are at the right place.",
-            doing_what_is ? " or , or ; or :" : "");
-    putstr(tmpwin, 0, sbuf);
-    if (doing_what_is) {
-        putstr(tmpwin, 0,
-        "  : describe current spot, show 'more info', move to another spot.");
-        Sprintf(sbuf, "  . describe current spot,%s move to another spot;",
-                flags.help ? " prompt if 'more info'," : "");
+        /* disgusting hack; the alternate selection characters work for any
+           getpos call, but only matter for dowhatis (and doquickwhatis) */
+        doing_what_is = (goal == what_is_an_unknown_object);
+        Sprintf(sbuf, "Type a .%s when you are at the right place.",
+                doing_what_is ? " or , or ; or :" : "");
         putstr(tmpwin, 0, sbuf);
-        putstr(tmpwin, 0, "  , describe current spot, move to another spot;");
-        putstr(tmpwin, 0,
-               "  ; describe current spot, stop looking at things;");
+        if (doing_what_is) {
+            putstr(tmpwin, 0,
+        "  : describe current spot, show 'more info', move to another spot.");
+            Sprintf(sbuf,
+                    "  . describe current spot,%s move to another spot;",
+                    flags.help ? " prompt if 'more info'," : "");
+            putstr(tmpwin, 0, sbuf);
+            putstr(tmpwin, 0,
+                   "  , describe current spot, move to another spot;");
+            putstr(tmpwin, 0,
+                   "  ; describe current spot, stop looking at things;");
+        }
     }
     if (!force)
         putstr(tmpwin, 0, "Type Space or Escape when you're done.");
@@ -446,7 +453,7 @@ const char *goal;
                             hi_x = (pass == 1 && ty == hi_y) ? cx : COLNO - 1;
                             for (tx = lo_x; tx <= hi_x; tx++) {
                                 /* look at dungeon feature, not at
-                                 * user-visible glyph */
+                                   user-visible glyph */
                                 k = back_to_glyph(tx, ty);
                                 /* uninteresting background glyph */
                                 if (glyph_is_cmap(k)
@@ -460,9 +467,10 @@ const char *goal;
                                 }
                                 if (glyph_is_cmap(k)
                                     && matching[glyph_to_cmap(k)]
-                                    && levl[tx][ty].seenv
-                                    && (!IS_WALL(levl[tx][ty].typ))
-                                    && (levl[tx][ty].typ != SDOOR)
+                                    && (levl[tx][ty].seenv
+                                        || iflags.terrainmode)
+                                    && !IS_WALL(levl[tx][ty].typ)
+                                    && levl[tx][ty].typ != SDOOR
                                     && glyph_to_cmap(k) != S_room
                                     && glyph_to_cmap(k) != S_corr
                                     && glyph_to_cmap(k) != S_litcorr) {
@@ -495,8 +503,10 @@ const char *goal;
             }     /* !quitchars */
             if (force)
                 goto nxtc;
-            pline("Done.");
-            msg_given = FALSE; /* suppress clear */
+            if (!iflags.terrainmode) {
+                pline("Done.");
+                msg_given = FALSE; /* suppress clear */
+            }
             cx = -1;
             cy = 0;
             result = 0; /* not -1 */

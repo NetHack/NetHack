@@ -166,7 +166,8 @@ struct obj **obj_p;
             otmp->corpsenm = MCORPSENM(mtmp);
     }
     /* if located at adjacent spot, mark it as having been seen up close */
-    if (otmp && distu(x, y) <= 2 && !Blind && !Hallucination)
+    if (otmp && distu(x, y) <= 2 && !Blind && !Hallucination
+        && !iflags.terrainmode)
         otmp->dknown = 1;
 
     *obj_p = otmp;
@@ -323,7 +324,8 @@ char *buf, *monbuf;
 
     buf[0] = monbuf[0] = '\0';
     glyph = glyph_at(x, y);
-    if (u.ux == x && u.uy == y && canspotself()) {
+    if (u.ux == x && u.uy == y && canspotself()
+        && (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0)) {
         /* fill in buf[] */
         (void) self_lookat(buf);
 
@@ -348,14 +350,14 @@ char *buf, *monbuf;
                 how |= 4;
 
             if (how)
-                Sprintf(
-                    eos(buf), " [seen: %s%s%s%s%s]",
-                    (how & 1) ? "infravision" : "",
-                    /* add comma if telep and infrav */
-                    ((how & 3) > 2) ? ", " : "", (how & 2) ? "telepathy" : "",
-                    /* add comma if detect and (infrav or telep or both) */
-                    ((how & 7) > 4) ? ", " : "",
-                    (how & 4) ? "monster detection" : "");
+                Sprintf(eos(buf), " [seen: %s%s%s%s%s]",
+                        (how & 1) ? "infravision" : "",
+                        /* add comma if telep and infrav */
+                        ((how & 3) > 2) ? ", " : "",
+                        (how & 2) ? "telepathy" : "",
+                        /* add comma if detect and (infrav or telep or both) */
+                        ((how & 7) > 4) ? ", " : "",
+                        (how & 4) ? "monster detection" : "");
         }
     } else if (u.uswallow) {
         /* all locations when swallowed other than the hero are the monster */
@@ -682,42 +684,50 @@ const char **firstmatch;
     }
 
     /* Check for monsters */
-    for (i = 0; i < MAXMCLASSES; i++) {
-        if (sym == (looked ? showsyms[i + SYM_OFF_M] : def_monsyms[i].sym)
-            && def_monsyms[i].explain) {
-            need_to_look = TRUE;
-            if (!found) {
-                Sprintf(out_str, "%s%s", prefix, an(def_monsyms[i].explain));
-                *firstmatch = def_monsyms[i].explain;
-                found++;
-            } else {
-                found += append_str(out_str, an(def_monsyms[i].explain));
+    if (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0) {
+        for (i = 0; i < MAXMCLASSES; i++) {
+            if (sym == (looked ? showsyms[i + SYM_OFF_M] : def_monsyms[i].sym)
+                && def_monsyms[i].explain) {
+                need_to_look = TRUE;
+                if (!found) {
+                    Sprintf(out_str, "%s%s",
+                            prefix, an(def_monsyms[i].explain));
+                    *firstmatch = def_monsyms[i].explain;
+                    found++;
+                } else {
+                    found += append_str(out_str, an(def_monsyms[i].explain));
+                }
             }
         }
+        /* handle '@' as a special case if it refers to you and you're
+           playing a character which isn't normally displayed by that
+           symbol; firstmatch is assumed to already be set for '@' */
+        if ((looked ? (sym == showsyms[S_HUMAN + SYM_OFF_M]
+                       && cc.x == u.ux && cc.y == u.uy)
+                    : (sym == def_monsyms[S_HUMAN].sym && !flags.showrace))
+            && !(Race_if(PM_HUMAN) || Race_if(PM_ELF)) && !Upolyd)
+            found += append_str(out_str, "you"); /* tack on "or you" */
     }
-    /* handle '@' as a special case if it refers to you and you're
-       playing a character which isn't normally displayed by that
-       symbol; firstmatch is assumed to already be set for '@' */
-    if ((looked ? (sym == showsyms[S_HUMAN + SYM_OFF_M]
-                   && cc.x == u.ux && cc.y == u.uy)
-                : (sym == def_monsyms[S_HUMAN].sym && !flags.showrace))
-        && !(Race_if(PM_HUMAN) || Race_if(PM_ELF)) && !Upolyd)
-        found += append_str(out_str, "you"); /* tack on "or you" */
 
     /* Now check for objects */
-    for (i = 1; i < MAXOCLASSES; i++) {
-        if (sym == (looked ? showsyms[i + SYM_OFF_O] : def_oc_syms[i].sym)) {
-            need_to_look = TRUE;
-            if (looked && i == VENOM_CLASS) {
-                skipped_venom++;
-                continue;
-            }
-            if (!found) {
-                Sprintf(out_str, "%s%s", prefix, an(def_oc_syms[i].explain));
-                *firstmatch = def_oc_syms[i].explain;
-                found++;
-            } else {
-                found += append_str(out_str, an(def_oc_syms[i].explain));
+    if (!iflags.terrainmode || (iflags.terrainmode & TER_OBJ) != 0) {
+        for (i = 1; i < MAXOCLASSES; i++) {
+            if (sym == (looked ? showsyms[i + SYM_OFF_O]
+                               : def_oc_syms[i].sym)
+                || (looked && i == ROCK_CLASS && glyph_is_statue(glyph))) {
+                need_to_look = TRUE;
+                if (looked && i == VENOM_CLASS) {
+                    skipped_venom++;
+                    continue;
+                }
+                if (!found) {
+                    Sprintf(out_str, "%s%s",
+                            prefix, an(def_oc_syms[i].explain));
+                    *firstmatch = def_oc_syms[i].explain;
+                    found++;
+                } else {
+                    found += append_str(out_str, an(def_oc_syms[i].explain));
+                }
             }
         }
     }
