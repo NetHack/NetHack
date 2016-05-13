@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1461979957 2016/04/30 01:32:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.83 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1463154502 2016/05/13 15:48:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.85 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -530,8 +530,7 @@ xchar x, y;
     if (!isok(x, y))
         return;
     lev = &(levl[x][y]);
-    /* If the hero's memory of an invisible monster is accurate, we want to
-     * keep
+    /* If hero's memory of an invisible monster is accurate, we want to keep
      * him from detecting the same monster over and over again on each turn.
      * We must return (so we don't erase the monster).  (We must also, in the
      * search function, be sure to skip over previously detected 'I's.)
@@ -539,8 +538,10 @@ xchar x, y;
     if (glyph_is_invisible(lev->glyph) && m_at(x, y))
         return;
 
-    /* The hero can't feel non pool locations while under water. */
-    if (Underwater && !Is_waterlevel(&u.uz) && !is_pool_or_lava(x, y))
+    /* The hero can't feel non pool locations while under water
+       except for lava and ice. */
+    if (Underwater && !Is_waterlevel(&u.uz)
+        && !is_pool_or_lava(x, y) && !is_ice(x, y))
         return;
 
     /* Set the seen vector as if the hero had seen it.
@@ -702,8 +703,8 @@ register int x, y;
     }
     if (Underwater && !Is_waterlevel(&u.uz)) {
         /* when underwater, don't do anything unless <x,y> is an
-           adjacent underwater or lava position */
-        if (!is_pool_or_lava(x, y) || distu(x, y) > 2)
+           adjacent water or lava or ice position */
+        if (!(is_pool_or_lava(x, y) || is_ice(x, y)) || distu(x, y) > 2)
             return;
     }
 
@@ -1100,7 +1101,7 @@ int mode;
 
     for (x = u.ux - 1; x <= u.ux + 1; x++)
         for (y = u.uy - 1; y <= u.uy + 1; y++)
-            if (isok(x, y) && is_pool_or_lava(x, y)) {
+            if (isok(x, y) && (is_pool_or_lava(x, y) || is_ice(x, y))) {
                 if (Blind && !(x == u.ux && y == u.uy))
                     show_glyph(x, y, cmap_to_glyph(S_stone));
                 else
