@@ -242,6 +242,7 @@ after using detection magic or #terrain while underwater, then leaving water
 	and saving while on land, save would flag you as underwater again and
 	then restore would limit the map display accordingly; next move would
 	notice, retify things, and report "you are on solid land again"
+can see or feel adjacent lava when underwater
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Respository
@@ -271,6 +272,8 @@ tty: rename struct variable 'filter' (role.c) and function 'winch()' (wintty.c)
 	to avoid conflicts with <curses.h>
 tty: skip selector letter and selection indicator (-,+,#) during menu coloring
 tty: '>' no longer closes a menu window
+tty: if color is disabled and use_inverse is enabled, display lava in inverse
+	video so that it is visually distinguishable from water
 unix/X11: in top level Makefile, some commented out definitions of VARDATND
 	misspelled pilemark.xbm (as pilemark.xpm)
 unix: options file with CR+LF line ends and an invalid option line resulted in

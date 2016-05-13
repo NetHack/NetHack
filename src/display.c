@@ -540,7 +540,7 @@ xchar x, y;
         return;
 
     /* The hero can't feel non pool locations while under water. */
-    if (Underwater && !Is_waterlevel(&u.uz) && !is_pool(x, y))
+    if (Underwater && !Is_waterlevel(&u.uz) && !is_pool_or_lava(x, y))
         return;
 
     /* Set the seen vector as if the hero had seen it.
@@ -701,18 +701,9 @@ register int x, y;
         return;
     }
     if (Underwater && !Is_waterlevel(&u.uz)) {
-        /* don't do anything unless (x,y) is an adjacent underwater position
-         */
-        int dx, dy;
-        if (!is_pool(x, y))
-            return;
-        dx = x - u.ux;
-        if (dx < 0)
-            dx = -dx;
-        dy = y - u.uy;
-        if (dy < 0)
-            dy = -dy;
-        if (dx > 1 || dy > 1)
+        /* when underwater, don't do anything unless <x,y> is an
+           adjacent underwater or lava position */
+        if (!is_pool_or_lava(x, y) || distu(x, y) > 2)
             return;
     }
 
@@ -1103,9 +1094,13 @@ int mode;
                     show_glyph(x, y, cmap_to_glyph(S_stone));
     }
 
+    /*
+     * TODO?  Should this honor Xray radius rather than force radius 1?
+     */
+
     for (x = u.ux - 1; x <= u.ux + 1; x++)
         for (y = u.uy - 1; y <= u.uy + 1; y++)
-            if (isok(x, y) && is_pool(x, y)) {
+            if (isok(x, y) && is_pool_or_lava(x, y)) {
                 if (Blind && !(x == u.ux && y == u.uy))
                     show_glyph(x, y, cmap_to_glyph(S_stone));
                 else
