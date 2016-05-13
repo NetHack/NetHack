@@ -1723,12 +1723,44 @@ count_menucolors()
     return count;
 }
 
+boolean
+parse_role_opts(negated, fullname, opts, opp)
+boolean negated;
+char *fullname;
+char *opts;
+char **opp;
+{
+    char *op = *opp;
+    if (negated) {
+        bad_negation(fullname, FALSE);
+    } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
+        boolean val_negated = FALSE;
+        while ((*op == '!') || !strncmpi(op, "no", 2)) {
+            if (*op == '!')
+                op++;
+            else
+                op += 2;
+            val_negated = !val_negated;
+        }
+        if (val_negated) {
+            if (!setrolefilter(op))
+                badoption(opts);
+        } else {
+            if (duplicate_opt_detection(opts, 1))
+                complain_about_duplicate(opts, 1);
+            *opp = op;
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
 void
 parseoptions(opts, tinitial, tfrom_file)
 register char *opts;
 boolean tinitial, tfrom_file;
 {
-    register char *op;
+    char *op;
     unsigned num;
     boolean negated, val_negated, duplicate;
     int i;
@@ -1805,26 +1837,9 @@ boolean tinitial, tfrom_file;
     /* align:string */
     fullname = "align";
     if (match_optname(opts, fullname, sizeof("align") - 1, TRUE)) {
-        if (negated) {
-            bad_negation(fullname, FALSE);
-        } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
-            val_negated = FALSE;
-            while ((*op == '!') || !strncmpi(op, "no", 2)) {
-                if (*op == '!')
-                    op++;
-                else
-                    op += 2;
-                val_negated = !val_negated;
-            }
-            if (val_negated) {
-                if (!setrolefilter(op))
-                    badoption(opts);
-            } else {
-                if (duplicate_opt_detection(opts, 1))
-                    complain_about_duplicate(opts, 1);
-                if ((flags.initalign = str2align(op)) == ROLE_NONE)
-                    badoption(opts);
-            }
+        if (parse_role_opts(negated, fullname, opts, &op)) {
+            if ((flags.initalign = str2align(op)) == ROLE_NONE)
+                badoption(opts);
         }
         return;
     }
@@ -1833,28 +1848,11 @@ boolean tinitial, tfrom_file;
     fullname = "role";
     if (match_optname(opts, fullname, 4, TRUE)
         || match_optname(opts, (fullname = "character"), 4, TRUE)) {
-        if (negated) {
-            bad_negation(fullname, FALSE);
-        } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
-            val_negated = FALSE;
-            while ((*op == '!') || !strncmpi(op, "no", 2)) {
-                if (*op == '!')
-                    op++;
-                else
-                    op += 2;
-                val_negated = !val_negated;
-            }
-            if (val_negated) {
-                if (!setrolefilter(op))
-                    badoption(opts);
-            } else {
-                if (duplicate_opt_detection(opts, 1))
-                    complain_about_duplicate(opts, 1);
-                if ((flags.initrole = str2role(op)) == ROLE_NONE)
-                    badoption(opts);
-                else /* Backwards compatibility */
-                    nmcpy(pl_character, op, PL_NSIZ);
-            }
+        if (parse_role_opts(negated, fullname, opts, &op)) {
+            if ((flags.initrole = str2role(op)) == ROLE_NONE)
+                badoption(opts);
+            else /* Backwards compatibility */
+                nmcpy(pl_character, op, PL_NSIZ);
         }
         return;
     }
@@ -1862,28 +1860,11 @@ boolean tinitial, tfrom_file;
     /* race:string */
     fullname = "race";
     if (match_optname(opts, fullname, 4, TRUE)) {
-        if (negated) {
-            bad_negation(fullname, FALSE);
-        } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
-            val_negated = FALSE;
-            while ((*op == '!') || !strncmpi(op, "no", 2)) {
-                if (*op == '!')
-                    op++;
-                else
-                    op += 2;
-                val_negated = !val_negated;
-            }
-            if (val_negated) {
-                if (!setrolefilter(op))
-                    badoption(opts);
-            } else {
-                if (duplicate_opt_detection(opts, 1))
-                    complain_about_duplicate(opts, 1);
-                if ((flags.initrace = str2race(op)) == ROLE_NONE)
-                    badoption(opts);
-                else /* Backwards compatibility */
-                    pl_race = *op;
-            }
+        if (parse_role_opts(negated, fullname, opts, &op)) {
+            if ((flags.initrace = str2race(op)) == ROLE_NONE)
+                badoption(opts);
+            else /* Backwards compatibility */
+                pl_race = *op;
         }
         return;
     }
@@ -1891,28 +1872,11 @@ boolean tinitial, tfrom_file;
     /* gender:string */
     fullname = "gender";
     if (match_optname(opts, fullname, 4, TRUE)) {
-        if (negated) {
-            bad_negation(fullname, FALSE);
-        } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
-            val_negated = FALSE;
-            while ((*op == '!') || !strncmpi(op, "no", 2)) {
-                if (*op == '!')
-                    op++;
-                else
-                    op += 2;
-                val_negated = !val_negated;
-            }
-            if (val_negated) {
-                if (!setrolefilter(op))
-                    badoption(opts);
-            } else {
-                if (duplicate_opt_detection(opts, 1))
-                    complain_about_duplicate(opts, 1);
-                if ((flags.initgend = str2gend(op)) == ROLE_NONE)
-                    badoption(opts);
-                else
-                    flags.female = flags.initgend;
-            }
+        if (parse_role_opts(negated, fullname, opts, &op)) {
+            if ((flags.initgend = str2gend(op)) == ROLE_NONE)
+                badoption(opts);
+            else
+                flags.female = flags.initgend;
         }
         return;
     }
