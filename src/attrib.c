@@ -101,6 +101,7 @@ static const struct innate {
 
 STATIC_DCL void NDECL(exerper);
 STATIC_DCL void FDECL(postadjabil, (long *));
+STATIC_DCL const struct innate *FDECL(role_abil, (int));
 STATIC_DCL const struct innate *FDECL(check_innate_abil, (long *, long));
 STATIC_DCL int FDECL(innately, (long *));
 
@@ -645,6 +646,34 @@ long *ability;
 }
 
 STATIC_OVL const struct innate *
+role_abil(r)
+int r;
+{
+    const struct {
+        short role;
+        const struct innate *abil;
+    } roleabils[] = {
+        { PM_ARCHEOLOGIST, arc_abil },
+        { PM_BARBARIAN, bar_abil },
+        { PM_CAVEMAN, cav_abil },
+        { PM_HEALER, hea_abil },
+        { PM_KNIGHT, kni_abil },
+        { PM_MONK, mon_abil },
+        { PM_PRIEST, pri_abil },
+        { PM_RANGER, ran_abil },
+        { PM_ROGUE, rog_abil },
+        { PM_SAMURAI, sam_abil },
+        { PM_TOURIST, tou_abil },
+        { PM_VALKYRIE, val_abil },
+        { PM_WIZARD, wiz_abil },
+        { 0, 0 }
+    };
+    int i;
+    for (i = 0; roleabils[i].abil && roleabils[i].role != r; i++);
+    return roleabils[i].abil;
+}
+
+STATIC_OVL const struct innate *
 check_innate_abil(ability, frommask)
 long *ability;
 long frommask;
@@ -652,49 +681,7 @@ long frommask;
     const struct innate *abil = 0;
 
     if (frommask == FROMEXPER)
-        switch (Role_switch) {
-        case PM_ARCHEOLOGIST:
-            abil = arc_abil;
-            break;
-        case PM_BARBARIAN:
-            abil = bar_abil;
-            break;
-        case PM_CAVEMAN:
-            abil = cav_abil;
-            break;
-        case PM_HEALER:
-            abil = hea_abil;
-            break;
-        case PM_KNIGHT:
-            abil = kni_abil;
-            break;
-        case PM_MONK:
-            abil = mon_abil;
-            break;
-        case PM_PRIEST:
-            abil = pri_abil;
-            break;
-        case PM_RANGER:
-            abil = ran_abil;
-            break;
-        case PM_ROGUE:
-            abil = rog_abil;
-            break;
-        case PM_SAMURAI:
-            abil = sam_abil;
-            break;
-        case PM_TOURIST:
-            abil = tou_abil;
-            break;
-        case PM_VALKYRIE:
-            abil = val_abil;
-            break;
-        case PM_WIZARD:
-            abil = wiz_abil;
-            break;
-        default:
-            break;
-        }
+        abil = role_abil(Role_switch);
     else if (frommask == FROMRACE)
         switch (Race_switch) {
         case PM_DWARF:
@@ -874,50 +861,7 @@ int oldlevel, newlevel;
     register const struct innate *abil, *rabil;
     long prevabil, mask = FROMEXPER;
 
-    switch (Role_switch) {
-    case PM_ARCHEOLOGIST:
-        abil = arc_abil;
-        break;
-    case PM_BARBARIAN:
-        abil = bar_abil;
-        break;
-    case PM_CAVEMAN:
-        abil = cav_abil;
-        break;
-    case PM_HEALER:
-        abil = hea_abil;
-        break;
-    case PM_KNIGHT:
-        abil = kni_abil;
-        break;
-    case PM_MONK:
-        abil = mon_abil;
-        break;
-    case PM_PRIEST:
-        abil = pri_abil;
-        break;
-    case PM_RANGER:
-        abil = ran_abil;
-        break;
-    case PM_ROGUE:
-        abil = rog_abil;
-        break;
-    case PM_SAMURAI:
-        abil = sam_abil;
-        break;
-    case PM_TOURIST:
-        abil = tou_abil;
-        break;
-    case PM_VALKYRIE:
-        abil = val_abil;
-        break;
-    case PM_WIZARD:
-        abil = wiz_abil;
-        break;
-    default:
-        abil = 0;
-        break;
-    }
+    abil = role_abil(Role_switch);
 
     switch (Race_switch) {
     case PM_ELF:
