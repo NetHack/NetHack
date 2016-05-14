@@ -1,4 +1,4 @@
-/* NetHack 3.6	detect.c	$NHDT-Date: 1446369464 2015/11/01 09:17:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.61 $ */
+/* NetHack 3.6	detect.c	$NHDT-Date: 1463191981 2016/05/14 02:13:01 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.70 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1535,6 +1535,8 @@ int which_subset; /* when not full, whether to suppress objs and/or traps */
         iflags.save_uinwater = u.uinwater, iflags.save_uburied = u.uburied;
         u.uinwater = u.uburied = 0;
         u.uswallow = 0;
+        if (iflags.save_uinwater || iflags.save_uburied)
+            docrt();
         default_glyph = cmap_to_glyph(level.flags.arboreal ? S_tree : S_stone);
         /* for 'full', show the actual terrain for the entire level,
            otherwise what the hero remembers for seen locations with
