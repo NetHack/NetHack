@@ -165,10 +165,13 @@ struct obj **obj_p;
         if (mtmp && has_mcorpsenm(mtmp)) /* mimic as corpse/statue */
             otmp->corpsenm = MCORPSENM(mtmp);
     }
-    /* if located at adjacent spot, mark it as having been seen up close */
+    /* if located at adjacent spot, mark it as having been seen up close
+       (corpse type will be known even if dknown is 0, so we don't need a
+       touch check for cockatrice corpse--we're looking without touching) */
     if (otmp && distu(x, y) <= 2 && !Blind && !Hallucination
-        && !iflags.terrainmode)
-        otmp->dknown = 1;
+        /* terrain mode views what's already known, doesn't learn new stuff */
+        && !iflags.terrainmode) /* so don't set dknown when in terrain mode */
+        otmp->dknown = 1; /* if a pile, clearly see the top item only */
 
     *obj_p = otmp;
     return fakeobj; /* when True, caller needs to dealloc *obj_p */
@@ -360,9 +363,9 @@ char *buf, *monbuf;
                         (how & 4) ? "monster detection" : "");
         }
     } else if (u.uswallow) {
-        /* all locations when swallowed other than the hero are the monster */
-        Sprintf(buf, "interior of %s",
-                Blind ? "a monster" : a_monnam(u.ustuck));
+        /* when swallowed, all locations other than the hero are the monster,
+           and blindness doesn't prevent hero from feeling what holds him */
+        Sprintf(buf, "interior of %s", a_monnam(u.ustuck));
         pm = u.ustuck->data;
     } else if (glyph_is_monster(glyph)) {
         bhitpos.x = x;
@@ -379,6 +382,7 @@ char *buf, *monbuf;
         Strcpy(buf, defsyms[trap_to_defsym(tnum)].explanation);
     } else if (glyph_is_warning(glyph)) {
         int warnindx = glyph_to_warning(glyph);
+
         Strcpy(buf, def_warnsyms[warnindx].explanation);
     } else if (!glyph_is_cmap(glyph)) {
         Strcpy(buf, "unexplored area");
@@ -412,6 +416,11 @@ char *buf, *monbuf;
         case S_stone:
             if (!levl[x][y].seenv) {
                 Strcpy(buf, "unexplored");
+                break;
+            } else if (Underwater && !Is_waterlevel(&u.uz)) {
+                /* "unknown" == previously mapped but not visible when
+                   submerged; better terminology appreciated... */
+                Strcpy(buf, (distu(x, y) <= 2) ? "land" : "unknown");
                 break;
             } else if (levl[x][y].typ == STONE || levl[x][y].typ == SCORR) {
                 Strcpy(buf, "stone");
@@ -645,9 +654,8 @@ const char **firstmatch;
     int found = 0; /* count of matching syms found */
     int i, alt_i;
     int skipped_venom = 0;
-    boolean hit_trap;
+    boolean hit_trap, submerged = (Underwater && !Is_waterlevel(&u.uz));
     const char *x_str;
-    static const char *mon_interior = "the interior of a monster";
 
     if (looked) {
         int oc;
@@ -667,19 +675,36 @@ const char **firstmatch;
      */
 
     /*
-     * Special case: if identifying from the screen, and we're swallowed,
-     * and looking at something other than our own symbol, then just say
-     * "the interior of a monster".
+     * Special case: identifying from the screen and we're swallowed
+     * or underwater and looking at something beyond radius 1 (vision
+     * limit in those circumstances) or we're swallowed and looking at
+     * swallower's animation.  (Note: 'self' will always be visible when
+     * swallowed so we don't need special swallow handling for <ux,uy>.
+     * Another note: for '#terrain' without monsters, u.uswallow and
+     * submerged will always both be False and skip this special case.)
      */
-    if (u.uswallow && looked
-        && (is_swallow_sym(sym) || (int) showsyms[S_stone] == sym)) {
-        if (!found) {
-            Sprintf(out_str, "%s%s", prefix, mon_interior);
-            *firstmatch = mon_interior;
+    if (looked && (((u.uswallow || submerged) && distu(cc.x, cc.y) > 2)
+                   || (u.uswallow && is_swallow_sym(sym)))) {
+        static const char mon_interior[] = "the interior of a monster",
+                          unreconnoitered[] = "unreconnoitered";
+
+        if (u.uswallow) {
+            x_str = mon_interior;
+            need_to_look = TRUE;
         } else {
-            found += append_str(out_str, mon_interior);
+            /* either not yet explored or suppressed due to extreme vision
+               limitation from being underwater; better terminology desired */
+            x_str = unreconnoitered;
         }
-        need_to_look = TRUE;
+        /* we know 'found' is zero here, but guard against some other
+           special case being inserted ahead of us someday */
+        if (!found) {
+            Sprintf(out_str, "%s%s", prefix, x_str);
+            *firstmatch = x_str;
+            found++;
+        } else {
+            found += append_str(out_str, x_str); /* not 'an(x_str)' */
+        }
         goto didlook;
     }
 
@@ -751,13 +776,15 @@ const char **firstmatch;
         /* when sym is the default background character, we process
            i == 0 three times: unexplored, stone, dark part of a room */
         if (alt_i < 2) {
-            x_str = !alt_i++ ? "unexplored" : "stone";
+            x_str = !alt_i++ ? "unexplored" : submerged ? "unknown" : "stone";
             i = 0; /* for second iteration, undo loop increment */
             /* alt_i is now 1 or 2 */
         } else {
             if (alt_i++ == 2)
                 i = 0; /* undo loop increment */
             x_str = defsyms[i].explanation;
+            if (submerged && !strcmp(x_str, defsyms[0].explanation))
+                x_str = "land"; /* replace "dark part of a room" */
             /* alt_i is now 3 or more and no longer of interest */
         }
         if (sym == (looked ? showsyms[i] : defsyms[i].sym) && *x_str) {
@@ -767,6 +794,7 @@ const char **firstmatch;
             int article = strstri(x_str, " of a room") ? 2
                           : !(alt_i <= 2
                               || strcmp(x_str, "air") == 0
+                              || strcmp(x_str, "land") == 0
                               || strcmp(x_str, "water") == 0);
 
             if (!found) {

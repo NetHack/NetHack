@@ -245,6 +245,10 @@ after using detection magic or #terrain while underwater, then leaving water
 change #terrain used while underwater to view the regular map rather than the
 	crippled underwater one
 can see or feel adjacent lava or ice when underwater
+farlook when underwater now reports "land" for adjacent non-{water,lava,ice}
+	and "unreconnoitered" for non-adjacent anything, instead of "dark part
+	of a room" for the former and either dark-room or "unexplored" for the
+	latter depending upon whether the spot had previously been scouted
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Respository
