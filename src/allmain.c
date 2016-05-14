@@ -1,4 +1,4 @@
-/* NetHack 3.6	allmain.c	$NHDT-Date: 1451955079 2016/01/05 00:51:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.70 $ */
+/* NetHack 3.6	allmain.c	$NHDT-Date: 1463217182 2016/05/14 09:13:02 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.72 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -506,6 +506,9 @@ display_gamewindows()
 #endif
     WIN_MAP = create_nhwindow(NHW_MAP);
     WIN_INVEN = create_nhwindow(NHW_MENU);
+    /* in case of early quit where WIN_INVEN could be destroyed before
+       ever having been used, use it here to pacify the Qt interface */
+    start_menu(WIN_INVEN), end_menu(WIN_INVEN, (char *) 0);
 
 #ifdef MAC
     /* This _is_ the right place for this - maybe we will

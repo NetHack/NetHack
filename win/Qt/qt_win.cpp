@@ -4401,12 +4401,11 @@ void NetHackQtMenuOrTextWindow::Display(bool block)
 
 bool NetHackQtMenuOrTextWindow::Destroy()
 {
-    bool res;
+    bool res = FALSE;
 
-    if (!actual) {
-        /* impossible("Destroy called before we know if Menu or Text"); */
-        res = FALSE; // early Destroy is not impossible
-    } else
+    if (!actual)
+        impossible("Destroy called before we know if Menu or Text");
+    else
         res = actual->Destroy();
 
     return res;
