@@ -234,6 +234,8 @@ effects of cursed potion of levitation were skipped if already levitating
 when engulfed, having swallower be killed by angry deity trying to zap hero
 	no longer violates pacifist conduct (other penalties--reduced luck or
 	alignment--still apply if target is something you shouldn't kill)
+likewise when a monster kills inself trying to prevent turning to stone or
+	into slime that's been caused by the player, pacifism is not affected
 metabolism adjustments: hero poly'd into metallivore form still needs to eat;
 	being fainted or unconscious from other than sleep now consumes
 	nutrition at lower rate, like being asleep already did;
@@ -249,6 +251,10 @@ farlook when underwater now reports "land" for adjacent non-{water,lava,ice}
 	and "unreconnoitered" for non-adjacent anything, instead of "dark part
 	of a room" for the former and either dark-room or "unexplored" for the
 	latter depending upon whether the spot had previously been scouted
+monster who accidentally killed itself by zapping wand of fire or fire horn
+	at self to prevent turning into slime was not properly killed off;
+	it wouldn't benefit from an amulet of life saving and would trigger
+	impossible "dmonsfree: N removed doesn't match M pending"
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Respository

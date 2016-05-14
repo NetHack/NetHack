@@ -40,8 +40,7 @@ int expltype;
     int idamres, idamnonres;
     struct monst *mtmp, *mdef = 0;
     uchar adtyp;
-    int explmask[3][3];
-    /* 0=normal explosion, 1=do shieldeff, 2=do nothing */
+    int explmask[3][3]; /* 0=normal explosion, 1=do shieldeff, 2=do nothing */
     boolean shopdamage = FALSE, generic = FALSE, physical_dmg = FALSE,
             do_hallu = FALSE, inside_engulfer;
     char hallu_buf[BUFSZ];
@@ -414,9 +413,23 @@ int expltype;
                     mtmp->mhp -= (idamres + idamnonres);
                 }
                 if (mtmp->mhp <= 0) {
-                    if (mdef ? (mtmp == mdef) : !context.mon_moving)
+                    if (!context.mon_moving) {
                         killed(mtmp);
-                    else
+                    } else if (mdef && mtmp == mdef) {
+                        /* 'mdef' killed self trying to cure being turned
+                         * into slime due to some action by the player.
+                         * Hero gets the credit (experience) and most of
+                         * the blame (possible loss of alignment and/or
+                         * luck and/or telepathy depending on mtmp) but
+                         * doesn't break pacifism.  xkilled()'s message
+                         * would be "you killed <mdef>" so give our own.
+                         */
+                        if (cansee(mtmp->mx, mtmp->my) || canspotmon(mtmp))
+                            pline("%s is %s!", Monnam(mtmp),
+                                  nonliving(mtmp->data) ? "destroyed"
+                                                        : "killed");
+                        xkilled(mtmp, XKILL_NOMSG | XKILL_NOCONDUCT);
+                    } else
                         monkilled(mtmp, "", (int) adtyp);
                 } else if (!context.mon_moving) {
                     /* all affected monsters, even if mdef is set */
