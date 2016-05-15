@@ -2383,8 +2383,9 @@ struct monst *mtmp;
                              SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION
                                  | SUPPRESS_INVISIBLE | SUPPRESS_IT,
                              FALSE),
-                    amorphous(mtmp->data) ? "coalesces on the" :
-                     is_flyer(mtmp->data) ? "drops to the" : "writhes on the",
+                    amorphous(mtmp->data) ? "coalesces on the"
+                       : is_flyer(mtmp->data) ? "drops to the"
+                          : "writhes on the",
                     surface(x,y));
             mtmp->mcanmove = 1;
             mtmp->mfrozen = 0;

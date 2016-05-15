@@ -577,9 +577,9 @@ coord *cc;
         if (mtmp->m_id) {
             mtmp2->m_id = mtmp->m_id;
             /* might be bringing quest leader back to life */
-            if (quest_status.leader_is_dead &&
+            if (quest_status.leader_is_dead
                 /* leader_is_dead implies leader_m_id is valid */
-                mtmp2->m_id == quest_status.leader_m_id)
+                && mtmp2->m_id == quest_status.leader_m_id)
                 quest_status.leader_is_dead = FALSE;
         }
         mtmp2->mx = mtmp->mx;
@@ -708,16 +708,16 @@ boolean by_hero;
             break; /* x,y are 0 */
         }
     }
-    if (!x || !y ||
+    if (!x || !y
         /* Rules for revival from containers:
-           - the container cannot be locked
-           - the container cannot be heavily nested (>2 is arbitrary)
-           - the container cannot be a statue or bag of holding
-           (except in very rare cases for the latter)
-        */
-        (container && (container->olocked || container_nesting > 2
-                       || container->otyp == STATUE
-                       || (container->otyp == BAG_OF_HOLDING && rn2(40)))))
+         *  - the container cannot be locked
+         *  - the container cannot be heavily nested (>2 is arbitrary)
+         *  - the container cannot be a statue or bag of holding
+         *    (except in very rare cases for the latter)
+         */
+        || (container && (container->olocked || container_nesting > 2
+                          || container->otyp == STATUE
+                          || (container->otyp == BAG_OF_HOLDING && rn2(40)))))
         return (struct monst *) 0;
 
     /* record the object's location now that we're sure where it is */
@@ -2695,10 +2695,10 @@ struct obj *obj; /* wand or spell */
         if (is_db_wall(x, y) && find_drawbridge(&xx, &yy)) {
             open_drawbridge(xx, yy);
             disclose = TRUE;
-        } else if (u.dz > 0 && (x == xdnstair && y == ydnstair) &&
+        } else if (u.dz > 0 && (x == xdnstair && y == ydnstair)
                    /* can't use the stairs down to quest level 2 until
                       leader "unlocks" them; give feedback if you try */
-                   on_level(&u.uz, &qstart_level) && !ok_to_quest()) {
+                   && on_level(&u.uz, &qstart_level) && !ok_to_quest()) {
             pline_The("stairs seem to ripple momentarily.");
             disclose = TRUE;
         }

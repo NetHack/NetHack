@@ -952,8 +952,8 @@ int how;
             return;
         }
     }
-    if ((wizard || discover) && (how <= GENOCIDED) &&
-        !paranoid_query(ParanoidDie, "Die?")) {
+    if ((wizard || discover) && (how <= GENOCIDED)
+        && !paranoid_query(ParanoidDie, "Die?")) {
         pline("OK, so you don't %s.", (how == CHOKING) ? "choke" : "die");
         savelife(how);
         killer.name[0] = 0;

@@ -526,10 +526,9 @@ boolean user_typed_name, without_asking;
         /*
          * If the object is named, then the name is the alternate description;
          * otherwise, the result of makesingular() applied to the name is.
-         * This
-         * isn't strictly optimal, but named objects of interest to the user
-         * will usually be found under their name, rather than under their
-         * object type, so looking for a singular form is pointless.
+         * This isn't strictly optimal, but named objects of interest to the
+         * user will usually be found under their name, rather than under
+         * their object type, so looking for a singular form is pointless.
          */
         if (!alt)
             alt = makesingular(dbase_str);
@@ -565,10 +564,11 @@ boolean user_typed_name, without_asking;
                     if (!(ep = index(buf, '\n')))
                         goto bad_data_file;
                     (void) strip_newline((ep > buf) ? ep - 1 : ep);
-                    /* if we match a key that begins with "~", skip this entry */
+                    /* if we match a key that begins with "~", skip
+                       this entry */
                     chk_skip = (*buf == '~') ? 1 : 0;
-                    if ((pass == 0 && pmatch(&buf[chk_skip], dbase_str)) ||
-                        (pass == 1 && alt && pmatch(&buf[chk_skip], alt))) {
+                    if ((pass == 0 && pmatch(&buf[chk_skip], dbase_str))
+                        || (pass == 1 && alt && pmatch(&buf[chk_skip], alt))) {
                         if (chk_skip) {
                             skipping_entry = TRUE;
                             continue;
@@ -592,7 +592,7 @@ boolean user_typed_name, without_asking;
                 if (sscanf(buf, "%ld,%d\n", &entry_offset, &entry_count) < 2) {
                 bad_data_file:
                     impossible("'data' file in wrong format or corrupted");
-                    /* window will exist if we came here from below via 'goto' */
+                    /* window will exist if came here from below via 'goto' */
                     if (datawin != WIN_ERR)
                         destroy_nhwindow(datawin);
                     (void) dlb_fclose(fp);
@@ -604,6 +604,7 @@ boolean user_typed_name, without_asking;
                     unsigned maxt = strlen("More info about \"\"?");
                     char *entrytext = pass ? alt : dbase_str;
                     char question[BUFSZ];
+
                     if (strlen(entrytext) < BUFSZ - maxt) {
                         Strcpy(question, "More info about \"");
                         Strcat(question, entrytext);
@@ -614,8 +615,8 @@ boolean user_typed_name, without_asking;
 		}
 
                 if (user_typed_name || without_asking || yes_to_moreinfo) {
-                    if (dlb_fseek(fp,
-                        (long) txt_offset + entry_offset, SEEK_SET) < 0) {
+                    if (dlb_fseek(fp, (long) txt_offset + entry_offset,
+                                  SEEK_SET) < 0) {
                         pline("? Seek error on 'data' file!");
                         (void) dlb_fclose(fp);
                         return;
