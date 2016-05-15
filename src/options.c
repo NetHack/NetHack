@@ -519,6 +519,8 @@ STATIC_DCL int NDECL(msgtype_count);
 STATIC_DCL boolean FDECL(add_menu_coloring_parsed, (char *, int, int));
 STATIC_DCL void FDECL(free_one_menu_coloring, (int));
 STATIC_DCL int NDECL(count_menucolors);
+STATIC_DCL boolean FDECL(parse_role_opts, (BOOLEAN_P, const char *,
+                                           char *, char **));
 
 STATIC_DCL void FDECL(oc_to_str, (char *, char *));
 STATIC_DCL void FDECL(doset_add_menu, (winid, const char *, int));
@@ -1723,18 +1725,20 @@ count_menucolors()
     return count;
 }
 
-boolean
+STATIC_OVL boolean
 parse_role_opts(negated, fullname, opts, opp)
 boolean negated;
-char *fullname;
+const char *fullname;
 char *opts;
 char **opp;
 {
     char *op = *opp;
+
     if (negated) {
         bad_negation(fullname, FALSE);
     } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
         boolean val_negated = FALSE;
+
         while ((*op == '!') || !strncmpi(op, "no", 2)) {
             if (*op == '!')
                 op++;
@@ -1762,7 +1766,7 @@ boolean tinitial, tfrom_file;
 {
     char *op;
     unsigned num;
-    boolean negated, val_negated, duplicate;
+    boolean negated, duplicate;
     int i;
     const char *fullname;
 
