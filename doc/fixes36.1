@@ -257,6 +257,12 @@ monster who accidentally killed itself by zapping wand of fire or fire horn
 	impossible "dmonsfree: N removed doesn't match M pending"
 resurrecting a shopkeeper corpse caused crash (replmon -> replshk -> inhishop
 	-> no eshk data for temporary monster being replaced with revived shk)
+new character with OPTIONS=role:Valk,race:!human,align:!lawful yielded
+	"Shall I pick your Dwarven Valkyrie's for you?" where !human forces
+	dwarf and dwarf forces lawful, contradicting align:!lawful
+new character with OPTIONS=role:Valk,race:random yielded
+	"Shall I pick your Valkyrie's race and alignment for you?" instead
+	of honoring race:random without asking
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Respository
