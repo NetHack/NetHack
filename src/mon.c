@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1461282107 2016/04/21 23:41:47 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.215 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1463534459 2016/05/18 01:20:59 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.221 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1625,32 +1625,27 @@ struct monst *mtmp2, *mtmp1;
     if (EGD(mtmp1)) {
         if (!EGD(mtmp2))
             newegd(mtmp2);
-        (void) memcpy((genericptr_t) EGD(mtmp2), (genericptr_t) EGD(mtmp1),
-                      sizeof (struct egd));
+        *EGD(mtmp2) = *EGD(mtmp1);
     }
     if (EPRI(mtmp1)) {
         if (!EPRI(mtmp2))
             newepri(mtmp2);
-        (void) memcpy((genericptr_t) EPRI(mtmp2), (genericptr_t) EPRI(mtmp1),
-                      sizeof (struct epri));
+        *EPRI(mtmp2) = *EPRI(mtmp1);
     }
     if (ESHK(mtmp1)) {
         if (!ESHK(mtmp2))
             neweshk(mtmp2);
-        (void) memcpy((genericptr_t) ESHK(mtmp2), (genericptr_t) ESHK(mtmp1),
-                      sizeof (struct eshk));
+        *ESHK(mtmp2) = *ESHK(mtmp1);
     }
     if (EMIN(mtmp1)) {
         if (!EMIN(mtmp2))
             newemin(mtmp2);
-        (void) memcpy((genericptr_t) EMIN(mtmp2), (genericptr_t) EMIN(mtmp1),
-                      sizeof (struct emin));
+        *EMIN(mtmp2) = *EMIN(mtmp1);
     }
     if (EDOG(mtmp1)) {
         if (!EDOG(mtmp2))
             newedog(mtmp2);
-        (void) memcpy((genericptr_t) EDOG(mtmp2), (genericptr_t) EDOG(mtmp1),
-                      sizeof (struct edog));
+        *EDOG(mtmp2) = *EDOG(mtmp1);
     }
     if (has_mcorpsenm(mtmp1))
         MCORPSENM(mtmp2) = MCORPSENM(mtmp1);
@@ -1978,7 +1973,7 @@ boolean was_swallowed; /* digestion */
         return FALSE;
 
     if (((bigmonst(mdat) || mdat == &mons[PM_LIZARD]) && !mon->mcloned)
-        || is_golem(mdat) || is_mplayer(mdat) || is_rider(mdat))
+        || is_golem(mdat) || is_mplayer(mdat) || is_rider(mdat) || mon->isshk)
         return TRUE;
     tmp = 2 + ((mdat->geno & G_FREQ) < 2) + verysmall(mdat);
     return (boolean) !rn2(tmp);
