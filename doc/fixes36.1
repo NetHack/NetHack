@@ -255,6 +255,8 @@ monster who accidentally killed itself by zapping wand of fire or fire horn
 	at self to prevent turning into slime was not properly killed off;
 	it wouldn't benefit from an amulet of life saving and would trigger
 	impossible "dmonsfree: N removed doesn't match M pending"
+resurrecting a shopkeeper corpse caused crash (replmon -> replshk -> inhishop
+	-> no eshk data for temporary monster being replaced with revived shk)
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Respository

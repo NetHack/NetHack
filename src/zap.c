@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1462663451 2016/05/07 23:24:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.252 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1463533826 2016/05/18 01:10:26 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.255 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -615,6 +615,16 @@ coord *cc;
         mtmp2->mblinded = 0;
         mtmp2->mstun = 0;
         mtmp2->mconf = 0;
+        /* when traits are for a shopeekper, dummy monster 'mtmp' won't
+           have necessary eshk data for replmon() -> replshk() */
+        if (mtmp2->isshk) {
+            neweshk(mtmp);
+            *ESHK(mtmp) = *ESHK(mtmp2);
+            if (ESHK(mtmp2)->bill_p != 0
+                && ESHK(mtmp2)->bill_p != (struct bill_x *) -1000)
+                ESHK(mtmp)->bill_p = &(ESHK(mtmp)->bill[0]);
+            mtmp->isshk = 1;
+        }
         replmon(mtmp, mtmp2);
         newsym(mtmp2->mx, mtmp2->my); /* Might now be invisible */
 
