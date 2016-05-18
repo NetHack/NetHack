@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1461619522 2016/04/25 21:25:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.130 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1463614572 2016/05/18 23:36:12 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.131 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3027,10 +3027,17 @@ register int xmin, ymax;
     register int y;
     register struct WinDesc *cw = wins[WIN_MAP];
 
+#if 0   /* this optimization is not valuable enough to justify
+           abusing core internals... */
     if (u.uswallow) { /* Can be done more efficiently */
         swallowed(1);
+        /* without this flush, if we happen to follow --More-- displayed in
+           leftmost column, the cursor gets left in the wrong place after
+           <docorner<more<update_topl<tty_putstr calls unwind back to core */
+        flush_screen(0);
         return;
     }
+#endif /*0*/
 
 #if defined(SIGWINCH) && defined(CLIPPING)
     if (ymax > LI)

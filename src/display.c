@@ -1,4 +1,4 @@
-/* NetHack 3.6	display.c	$NHDT-Date: 1463154502 2016/05/13 15:48:22 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.85 $ */
+/* NetHack 3.6	display.c	$NHDT-Date: 1463614572 2016/05/18 23:36:12 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.86 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1009,9 +1009,10 @@ int first;
     static xchar lastx, lasty; /* last swallowed position */
     int swallower, left_ok, rght_ok;
 
-    if (first)
+    if (first) {
         cls();
-    else {
+        bot();
+    } else {
         register int x, y;
 
         /* Clear old location */

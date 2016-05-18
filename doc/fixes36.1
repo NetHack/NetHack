@@ -294,6 +294,9 @@ tty: skip selector letter and selection indicator (-,+,#) during menu coloring
 tty: '>' no longer closes a menu window
 tty: if color is disabled and use_inverse is enabled, display lava in inverse
 	video so that it is visually distinguishable from water
+tty: if "--More--" was written to leftmost column (beginning of second line)
+	while hero was swallowed, cursor would end up in wrong place (at end
+	of status line instead back on map) after message line was cleared
 unix/X11: in top level Makefile, some commented out definitions of VARDATND
 	misspelled pilemark.xbm (as pilemark.xpm)
 unix: options file with CR+LF line ends and an invalid option line resulted in
