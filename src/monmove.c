@@ -705,6 +705,38 @@ xchar gx, gy;
     return FALSE;
 }
 
+boolean
+m_digweapon_check(mtmp, nix, niy)
+struct monst *mtmp;
+xchar nix,niy;
+{
+    boolean can_tunnel = 0;
+    struct obj *mw_tmp;
+
+    if (!Is_rogue_level(&u.uz))
+        can_tunnel = tunnels(mtmp->data);
+
+    if (can_tunnel && needspick(mtmp->data)
+        && mtmp->weapon_check != NO_WEAPON_WANTED
+        && ((IS_ROCK(levl[nix][niy].typ) && may_dig(nix, niy))
+            || closed_door(nix, niy))) {
+        if (closed_door(nix, niy)) {
+            if (!(mw_tmp = MON_WEP(mtmp))
+                || !is_pick(mw_tmp)
+                || !is_axe(mw_tmp))
+                mtmp->weapon_check = NEED_PICK_OR_AXE;
+        } else if (IS_TREE(levl[nix][niy].typ)) {
+            if (!(mw_tmp = MON_WEP(mtmp)) || !is_axe(mw_tmp))
+                mtmp->weapon_check = NEED_AXE;
+        } else if (!(mw_tmp = MON_WEP(mtmp)) || !is_pick(mw_tmp)) {
+            mtmp->weapon_check = NEED_PICK_AXE;
+        }
+        if (mtmp->weapon_check >= NEED_PICK_AXE && mon_wield_item(mtmp))
+            return TRUE;
+    }
+    return FALSE;
+}
+
 /* Return values:
  * 0: did not move, but can still attack and do other stuff.
  * 1: moved, possibly can attack.
@@ -1108,22 +1140,9 @@ not_special:
         if (mmoved == 1 && (u.ux != nix || u.uy != niy) && itsstuck(mtmp))
             return 3;
 
-        if (mmoved == 1 && can_tunnel && needspick(ptr)
-            && ((IS_ROCK(levl[nix][niy].typ) && may_dig(nix, niy))
-                || closed_door(nix, niy))) {
-            if (closed_door(nix, niy)) {
-                if (!(mw_tmp = MON_WEP(mtmp)) || !is_pick(mw_tmp)
-                    || !is_axe(mw_tmp))
-                    mtmp->weapon_check = NEED_PICK_OR_AXE;
-            } else if (IS_TREE(levl[nix][niy].typ)) {
-                if (!(mw_tmp = MON_WEP(mtmp)) || !is_axe(mw_tmp))
-                    mtmp->weapon_check = NEED_AXE;
-            } else if (!(mw_tmp = MON_WEP(mtmp)) || !is_pick(mw_tmp)) {
-                mtmp->weapon_check = NEED_PICK_AXE;
-            }
-            if (mtmp->weapon_check >= NEED_PICK_AXE && mon_wield_item(mtmp))
-                return 3;
-        }
+        if (mmoved == 1 && m_digweapon_check(mtmp, nix,niy))
+            return 3;
+
         /* If ALLOW_U is set, either it's trying to attack you, or it
          * thinks it is.  In either case, attack this spot in preference to
          * all others.
