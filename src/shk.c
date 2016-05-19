@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1457392872 2016/03/07 23:21:12 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.125 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1463620377 2016/05/19 01:12:57 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.131 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -812,11 +812,11 @@ register struct monst *mtmp;
 
 struct monst *
 shop_keeper(rmno)
-register char rmno;
+char rmno;
 {
-    struct monst *shkp =
-        rmno >= ROOMOFFSET ? rooms[rmno - ROOMOFFSET].resident : 0;
+    struct monst *shkp;
 
+    shkp = (rmno >= ROOMOFFSET) ? rooms[rmno - ROOMOFFSET].resident : 0;
     if (shkp) {
         if (has_eshk(shkp)) {
             if (NOTANGRY(shkp)) {
@@ -828,15 +828,17 @@ register char rmno;
             }
         } else {
             /* would have segfaulted on ESHK dereference previously */
-            impossible(
-             "shopkeeper career change? (rmno=%d, ROOMOFFSET=%d, mnum=%d, %s)",
-                (int)rmno, ROOMOFFSET, shkp->mnum,
-                has_mname(shkp) ? MNAME(shkp) : "anonymous"
-            );
-
+            impossible("%s? (rmno=%d, rtype=%d, mnum=%d, \"%s\")",
+                       shkp->isshk ? "shopkeeper career change"
+                                   : "shop resident not shopkeeper",
+                       (int) rmno,
+                       (int) rooms[rmno - ROOMOFFSET].rtype,
+                       shkp->mnum,
+                       /* [real shopkeeper name is kept in ESHK, not MNAME] */
+                       has_mname(shkp) ? MNAME(shkp) : "anonymous");
             /* not sure if this is appropriate, because it does nothing to
                correct the underlying rooms[].resident issue but... */
-            return (struct monst *)0;
+            return (struct monst *) 0;
         }
     }
     return shkp;
