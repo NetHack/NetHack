@@ -13,6 +13,7 @@
 #ifdef POSITIONBAR
 STATIC_DCL void NDECL(do_positionbar);
 #endif
+STATIC_DCL void FDECL(interrupt_multi, (const char *));
 
 void
 moveloop(resuming)
@@ -216,6 +217,8 @@ boolean resuming;
                                  || (wtcap < MOD_ENCUMBER && !(moves % 20))) {
                             context.botl = 1;
                             u.mh++;
+                            if (u.mh >= u.mhmax)
+                                interrupt_multi("You are in full health.");
                         }
                     } else if (u.uhp < u.uhpmax
                                && (wtcap < MOD_ENCUMBER || !u.umoved
@@ -234,6 +237,8 @@ boolean resuming;
                             u.uhp += heal;
                             if (u.uhp > u.uhpmax)
                                 u.uhp = u.uhpmax;
+                            if (u.uhp >= u.uhpmax)
+                                interrupt_multi("You are in full health.");
                         } else if (Regeneration
                                    || (u.ulevel <= 9
                                        && !(moves
@@ -241,6 +246,8 @@ boolean resuming;
                                                + 1)))) {
                             context.botl = 1;
                             u.uhp++;
+                            if (u.uhp >= u.uhpmax)
+                                interrupt_multi("You are in full health.");
                         }
                     }
 
@@ -270,6 +277,8 @@ boolean resuming;
                         if (u.uen > u.uenmax)
                             u.uen = u.uenmax;
                         context.botl = 1;
+                        if (u.uen >= u.uenmax)
+                            interrupt_multi("You feel full of energy.");
                     }
 
                     if (!u.uinvulnerable) {
@@ -689,5 +698,17 @@ do_positionbar()
     update_positionbar(pbar);
 }
 #endif
+
+STATIC_DCL void
+interrupt_multi(msg)
+const char *msg;
+{
+    if (multi > 0 && !context.travel) {
+        nomul(0);
+        if (flags.verbose && msg)
+            Norep("%s", msg);
+    }
+}
+
 
 /*allmain.c*/
