@@ -23,6 +23,7 @@ STATIC_DCL int FDECL(precheck, (struct monst *, struct obj *));
 STATIC_DCL void FDECL(mzapmsg, (struct monst *, struct obj *, BOOLEAN_P));
 STATIC_DCL void FDECL(mreadmsg, (struct monst *, struct obj *));
 STATIC_DCL void FDECL(mquaffmsg, (struct monst *, struct obj *));
+STATIC_DCL boolean FDECL(m_use_healing, (struct monst *));
 STATIC_PTR int FDECL(mbhitm, (struct monst *, struct obj *));
 STATIC_DCL void FDECL(mbhit, (struct monst *, int,
                               int FDECL((*), (MONST_P, OBJ_P)),
@@ -269,6 +270,29 @@ struct obj *otmp;
  * that if you polymorph into one you teleport at will.
  */
 
+STATIC_OVL boolean
+m_use_healing(mtmp)
+struct monst *mtmp;
+{
+    struct obj *obj = 0;
+    if ((obj = m_carrying(mtmp, POT_FULL_HEALING)) != 0) {
+        m.defensive = obj;
+        m.has_defense = MUSE_POT_FULL_HEALING;
+        return TRUE;
+    }
+    if ((obj = m_carrying(mtmp, POT_EXTRA_HEALING)) != 0) {
+        m.defensive = obj;
+        m.has_defense = MUSE_POT_EXTRA_HEALING;
+        return TRUE;
+    }
+    if ((obj = m_carrying(mtmp, POT_HEALING)) != 0) {
+        m.defensive = obj;
+        m.has_defense = MUSE_POT_HEALING;
+        return TRUE;
+    }
+    return FALSE;
+}
+
 /* Select a defensive item/action for a monster.  Returns TRUE iff one is
    found. */
 boolean
@@ -339,21 +363,8 @@ struct monst *mtmp;
      */
     if (!mtmp->mcansee && !nohands(mtmp->data)
         && mtmp->data != &mons[PM_PESTILENCE]) {
-        if ((obj = m_carrying(mtmp, POT_FULL_HEALING)) != 0) {
-            m.defensive = obj;
-            m.has_defense = MUSE_POT_FULL_HEALING;
+        if (m_use_healing(mtmp))
             return TRUE;
-        }
-        if ((obj = m_carrying(mtmp, POT_EXTRA_HEALING)) != 0) {
-            m.defensive = obj;
-            m.has_defense = MUSE_POT_EXTRA_HEALING;
-            return TRUE;
-        }
-        if ((obj = m_carrying(mtmp, POT_HEALING)) != 0) {
-            m.defensive = obj;
-            m.has_defense = MUSE_POT_HEALING;
-            return TRUE;
-        }
     }
 
     fraction = u.ulevel < 10 ? 5 : u.ulevel < 14 ? 4 : 3;
@@ -363,21 +374,8 @@ struct monst *mtmp;
 
     if (mtmp->mpeaceful) {
         if (!nohands(mtmp->data)) {
-            if ((obj = m_carrying(mtmp, POT_FULL_HEALING)) != 0) {
-                m.defensive = obj;
-                m.has_defense = MUSE_POT_FULL_HEALING;
+            if (m_use_healing(mtmp))
                 return TRUE;
-            }
-            if ((obj = m_carrying(mtmp, POT_EXTRA_HEALING)) != 0) {
-                m.defensive = obj;
-                m.has_defense = MUSE_POT_EXTRA_HEALING;
-                return TRUE;
-            }
-            if ((obj = m_carrying(mtmp, POT_HEALING)) != 0) {
-                m.defensive = obj;
-                m.has_defense = MUSE_POT_HEALING;
-                return TRUE;
-            }
         }
         return FALSE;
     }
