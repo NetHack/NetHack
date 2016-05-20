@@ -1,4 +1,4 @@
-/* NetHack 3.6	monmove.c	$NHDT-Date: 1456959639 2016/03/02 23:00:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.85 $ */
+/* NetHack 3.6	monmove.c	$NHDT-Date: 1463704424 2016/05/20 00:33:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.87 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -764,10 +764,10 @@ register int after;
     long info[9];
     long flag;
     int omx = mtmp->mx, omy = mtmp->my;
-    struct obj *mw_tmp;
 
     if (mtmp->mtrapped) {
         int i = mintrap(mtmp);
+
         if (i >= 2) {
             newsym(mtmp->mx, mtmp->my);
             return 2;

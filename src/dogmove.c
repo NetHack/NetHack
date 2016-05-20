@@ -1,4 +1,4 @@
-/* NetHack 3.6	dogmove.c	$NHDT-Date: 1450061092 2015/12/14 02:44:52 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.57 $ */
+/* NetHack 3.6	dogmove.c	$NHDT-Date: 1463704424 2016/05/20 00:33:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.60 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -874,7 +874,6 @@ int after; /* this is extra fast monster movement */
     }
 newdogpos:
     if (nix != omx || niy != omy) {
-        struct obj *mw_tmp;
         boolean wasseen;
 
         if (info[chi] & ALLOW_U) {
