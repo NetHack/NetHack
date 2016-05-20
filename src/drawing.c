@@ -1,4 +1,4 @@
-/* NetHack 3.6	drawing.c	$NHDT-Date: 1459986719 2016/04/06 23:51:59 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.50 $ */
+/* NetHack 3.6	drawing.c	$NHDT-Date: 1463706747 2016/05/20 01:12:27 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.51 $ */
 /* Copyright (c) NetHack Development Team 1992.                   */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -203,10 +203,11 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '^', "anti-magic field", C(HI_ZAP) },         /* trap */
        { '^', "polymorph trap", C(CLR_BRIGHT_GREEN) }, /* trap */
        { '~', "vibrating square", C(CLR_MAGENTA) },    /* "trap" */
-       { '|', "wall", C(CLR_GRAY) },            /* vbeam */
-       { '-', "wall", C(CLR_GRAY) },            /* hbeam */
-       { '\\', "wall", C(CLR_GRAY) },           /* lslant */
-       { '/', "wall", C(CLR_GRAY) },            /* rslant */
+       /* zap colors are changed by mapglyph() to match type of beam */
+       { '|', "", C(CLR_GRAY) },                /* vbeam */
+       { '-', "", C(CLR_GRAY) },                /* hbeam */
+       { '\\', "", C(CLR_GRAY) },               /* lslant */
+       { '/', "", C(CLR_GRAY) },                /* rslant */
        { '*', "", C(CLR_WHITE) },               /* dig beam */
        { '!', "", C(CLR_WHITE) },               /* camera flash beam */
        { ')', "", C(HI_WOOD) },                 /* boomerang open left */
@@ -217,6 +218,7 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '*', "", C(HI_ZAP) },
        { '#', "poison cloud", C(CLR_BRIGHT_GREEN) },   /* part of a cloud */
        { '?', "valid position", C(CLR_BRIGHT_GREEN) }, /*  target position */
+       /* swallow colors are changed by mapglyph() to match engulfing monst */
        { '/', "", C(CLR_GREEN) },         /* swallow top left      */
        { '-', "", C(CLR_GREEN) },         /* swallow top center    */
        { '\\', "", C(CLR_GREEN) },        /* swallow top right     */
@@ -225,6 +227,7 @@ const struct symdef defsyms[MAXPCHARS] = {
        { '\\', "", C(CLR_GREEN) },        /* swallow bottom left   */
        { '-', "", C(CLR_GREEN) },         /* swallow bottom center */
        { '/', "", C(CLR_GREEN) },         /* swallow bottom right  */
+       /* explosion colors are changed by mapglyph() to match type of expl. */
        { '/', "", C(CLR_ORANGE) },        /* explosion top left     */
        { '-', "", C(CLR_ORANGE) },        /* explosion top center   */
        { '\\', "", C(CLR_ORANGE) },       /* explosion top right    */
