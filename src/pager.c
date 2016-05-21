@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1455674291 2016/02/17 01:58:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.93 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1463790247 2016/05/21 00:24:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.98 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -363,7 +363,7 @@ char *buf, *monbuf;
                         (how & 4) ? "monster detection" : "");
         }
     } else if (u.uswallow) {
-        /* when swallowed, all locations other than the hero are the monster,
+        /* when swallowed, we're only called for spots adjacent to hero,
            and blindness doesn't prevent hero from feeling what holds him */
         Sprintf(buf, "interior of %s", a_monnam(u.ustuck));
         pm = u.ustuck->data;
@@ -648,14 +648,14 @@ int sym;
 char *out_str;
 const char **firstmatch;
 {
-    boolean need_to_look = FALSE;
-    int glyph = NO_GLYPH;
+    static const char mon_interior[] = "the interior of a monster",
+                      unreconnoitered[] = "unreconnoitered";
     static char look_buf[BUFSZ];
     char prefix[BUFSZ];
-    int found = 0; /* count of matching syms found */
-    int i, alt_i;
-    int skipped_venom = 0;
-    boolean hit_trap, submerged = (Underwater && !Is_waterlevel(&u.uz));
+    int i, alt_i, glyph = NO_GLYPH,
+        skipped_venom = 0, found = 0; /* count of matching syms found */
+    boolean hit_trap, need_to_look = FALSE,
+            submerged = (Underwater && !Is_waterlevel(&u.uz));
     const char *x_str;
 
     if (looked) {
@@ -676,27 +676,30 @@ const char **firstmatch;
      */
 
     /*
-     * Special case: identifying from the screen and we're swallowed
-     * or underwater and looking at something beyond radius 1 (vision
-     * limit in those circumstances) or we're swallowed and looking at
-     * swallower's animation.  (Note: 'self' will always be visible when
-     * swallowed so we don't need special swallow handling for <ux,uy>.
+     * Handle restricted vision range (limited to adjacent spots when
+     * swallowed or underwater) cases first.
+     *
+     * 3.6.0 listed anywhere on map, other than self, as "interior
+     * of a monster" when swallowed, and non-adjacent water or
+     * non-water anywhere as "dark part of a room" when underwater.
+     * "unreconnoitered" is an attempt to convey "even if you knew
+     * what was there earlier, you don't know what is there in the
+     * current circumstance".
+     *
+     * (Note: 'self' will always be visible when swallowed so we don't
+     * need special swallow handling for <ux,uy>.
      * Another note: for '#terrain' without monsters, u.uswallow and
-     * submerged will always both be False and skip this special case.)
+     * submerged will always both be False and skip this code.)
      */
-    if (looked && (((u.uswallow || submerged) && distu(cc.x, cc.y) > 2)
-                   || (u.uswallow && is_swallow_sym(sym)))) {
-        static const char mon_interior[] = "the interior of a monster",
-                          unreconnoitered[] = "unreconnoitered";
-
-        if (u.uswallow) {
-            x_str = mon_interior;
-            need_to_look = TRUE;
-        } else {
-            /* either not yet explored or suppressed due to extreme vision
-               limitation from being underwater; better terminology desired */
-            x_str = unreconnoitered;
-        }
+    x_str = 0;
+    if (looked && (u.uswallow || submerged) && distu(cc.x, cc.y) > 2) {
+        x_str = unreconnoitered;
+        need_to_look = FALSE;
+    } else if (looked && u.uswallow && is_swallow_sym(sym)) {
+        x_str = mon_interior;
+        need_to_look = TRUE; /* for specific monster type */
+    }
+    if (x_str) {
         /* we know 'found' is zero here, but guard against some other
            special case being inserted ahead of us someday */
         if (!found) {
@@ -706,7 +709,11 @@ const char **firstmatch;
         } else {
             found += append_str(out_str, x_str); /* not 'an(x_str)' */
         }
-        goto didlook;
+        /* for is_swallow_sym(), we want to list the current symbol's
+           other possibilities (wand for '/', throne for '\\', &c) so
+           don't jump to the end for the x_str==mon_interior case */
+        if (x_str == unreconnoitered)
+            goto didlook;
     }
 
     /* Check for monsters */
@@ -809,7 +816,7 @@ const char **firstmatch;
                 }
                 *firstmatch = x_str;
                 found++;
-            } else if (!u.uswallow && !(hit_trap && is_cmap_trap(i))
+            } else if (!(hit_trap && is_cmap_trap(i))
                        && !(found >= 3 && is_cmap_drawbridge(i))
                        /* don't mention vibrating square outside of Gehennom
                           unless this happens to be one (hallucination?) */
