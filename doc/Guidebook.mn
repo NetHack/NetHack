@@ -345,7 +345,7 @@ show only your experience level here.
 The number of turns elapsed so far, displayed if you have the
 .op time
 option set.
-.lp Status
+.lp "Status  "
 Hunger:
 your current hunger status.
 Values are \fBSatiated\fP, \fBNot Hungry\fP (or \fBNormal\fP),
@@ -354,7 +354,7 @@ Values are \fBSatiated\fP, \fBNot Hungry\fP (or \fBNormal\fP),
 Not shown when \fBNormal\fP.
 .lp ""
 Encumbrance:
-an indication of how what your are carrying affects your ability to move.
+an indication of how what you are carrying affects your ability to move.
 Values are \fBUnencumbered\fP, \fBEncumbered\fP, \fBStressed\fP,
 \fBStrained\fP, \fBOvertaxed\fP, and \fBOverloaded\fP.
 Not shown when \fBUnencumbered\fP.
@@ -368,7 +368,7 @@ Fatal conditions:
 .lp ""
 Non-fatal conditions:
 \fBBlind\fP (can't see), \fBDeaf\fP (can't hear),
-\fBStun\fB (stunned), \fBConf\fP (confused), \fBHallu\fP (hallucinating).
+\fBStun\fP (stunned), \fBConf\fP (confused), \fBHallu\fP (hallucinating).
 .lp ""
 Movement modifiers:
 \fBLev\fP (levitating), \fBFly\fP (flying), \fBRide\fP (riding).
@@ -876,6 +876,7 @@ Escape to a shell.
 .lp #
 Perform an extended command.
 .lp ""
+.pg
 As you can see, the authors of NetHack
 used up all the letters, so this is a way to introduce the less frequently
 used commands.
@@ -982,6 +983,7 @@ Print compile time options for this version of NetHack.
 Wipe off your face.
 .lp "#?   "
 Help menu:  get the list of available extended commands.
+.lp ""
 .pg
 If your keyboard has a meta key (which, when pressed in combination
 with another key, modifies it by setting the `meta' [8th, or `high']
@@ -1049,6 +1051,7 @@ option to have nethack combine them into meta+key.
 #version
 .lp M-w
 #wipe
+.lp ""
 .pg
 If the
 .op number_pad
