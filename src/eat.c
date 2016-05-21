@@ -2615,7 +2615,7 @@ struct obj *obj;
                               obj, doname, thesimpleoname, "that")) != 'y')
                 return 0;
         }
-	if (!wield_tool(obj, "use"))
+        if (!wield_tool(obj, "use"))
             return 0;
         res = 1;
     }

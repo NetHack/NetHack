@@ -268,8 +268,8 @@ boolean foundyou;
     }
 
     /*
-     *	As these are spells, the damage is related to the level
-     *	of the monster casting the spell.
+     * As these are spells, the damage is related to the level
+     * of the monster casting the spell.
      */
     if (!foundyou) {
         dmg = 0;

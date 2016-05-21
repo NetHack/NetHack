@@ -2472,7 +2472,7 @@ char oclass;
          i < NUM_OBJECTS && (!oclass || objects[i].oc_class == oclass);
          ++i) {
         /* don't match extra descriptions (w/o real name) */
-	if ((zn = OBJ_NAME(objects[i])) == 0)
+        if ((zn = OBJ_NAME(objects[i])) == 0)
             continue;
         if (wishymatch(name, zn, TRUE)
             || ((zn = OBJ_DESCR(objects[i])) != 0

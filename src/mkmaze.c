@@ -162,7 +162,7 @@ int x1, y1, x2, y2;
     struct rm *lev;
     int FDECL((*loc_f), (int, int));
     int bits;
-    int locale[3][3];	/* rock or wall status surrounding positions */
+    int locale[3][3]; /* rock or wall status surrounding positions */
 
     /*
      * Value 0 represents a free-standing wall.  It could be anything,

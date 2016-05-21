@@ -414,7 +414,7 @@ int x, y;
 }
 
 /*
- *	freehand - returns true if player has a free hand
+ * freehand - returns true if player has a free hand
  */
 int
 freehand()
@@ -429,30 +429,30 @@ static NEARDATA const char styluses[] = { ALL_CLASSES, ALLOW_NONE,
                                           RING_CLASS,  0 };
 
 /* Mohs' Hardness Scale:
- *  1 - Talc		 6 - Orthoclase
- *  2 - Gypsum		 7 - Quartz
- *  3 - Calcite		 8 - Topaz
- *  4 - Fluorite	 9 - Corundum
- *  5 - Apatite		10 - Diamond
+ *  1 - Talc             6 - Orthoclase
+ *  2 - Gypsum           7 - Quartz
+ *  3 - Calcite          8 - Topaz
+ *  4 - Fluorite         9 - Corundum
+ *  5 - Apatite         10 - Diamond
  *
  * Since granite is an igneous rock hardness ~ 7, anything >= 8 should
  * probably be able to scratch the rock.
  * Devaluation of less hard gems is not easily possible because obj struct
  * does not contain individual oc_cost currently. 7/91
  *
- * steel     -	5-8.5	(usu. weapon)
- * diamond    - 10			* jade	     -	5-6	 (nephrite)
- * ruby       -  9	(corundum)	* turquoise  -	5-6
- * sapphire   -  9	(corundum)	* opal	     -	5-6
- * topaz      -  8			* glass      - ~5.5
- * emerald    -  7.5-8	(beryl)		* dilithium  -	4-5??
- * aquamarine -  7.5-8	(beryl)		* iron	     -	4-5
- * garnet     -  7.25	(var. 6.5-8)	* fluorite   -	4
- * agate      -  7	(quartz)	* brass      -	3-4
- * amethyst   -  7	(quartz)	* gold	     -	2.5-3
- * jasper     -  7	(quartz)	* silver     -	2.5-3
- * onyx       -  7	(quartz)	* copper     -	2.5-3
- * moonstone  -  6	(orthoclase)	* amber      -	2-2.5
+ * steel      - 5-8.5   (usu. weapon)
+ * diamond    - 10                      * jade       -  5-6      (nephrite)
+ * ruby       -  9      (corundum)      * turquoise  -  5-6
+ * sapphire   -  9      (corundum)      * opal       -  5-6
+ * topaz      -  8                      * glass      - ~5.5
+ * emerald    -  7.5-8  (beryl)         * dilithium  -  4-5??
+ * aquamarine -  7.5-8  (beryl)         * iron       -  4-5
+ * garnet     -  7.25   (var. 6.5-8)    * fluorite   -  4
+ * agate      -  7      (quartz)        * brass      -  3-4
+ * amethyst   -  7      (quartz)        * gold       -  2.5-3
+ * jasper     -  7      (quartz)        * silver     -  2.5-3
+ * onyx       -  7      (quartz)        * copper     -  2.5-3
+ * moonstone  -  6      (orthoclase)    * amber      -  2-2.5
  */
 
 /* return 1 if action took 1 (or more) moves, 0 if error or aborted */

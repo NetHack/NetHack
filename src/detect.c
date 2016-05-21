@@ -1360,7 +1360,7 @@ boolean via_warning;
                 Your("warning senses cause you to take a second %s.",
                         Blind ? "to check nearby" : "look close by");
                 display_nhwindow(WIN_MESSAGE, FALSE); /* flush messages */
-	    }
+            }
             mtmp->mundetected = 0;
             newsym(x, y);
             goto find;

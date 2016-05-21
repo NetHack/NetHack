@@ -612,7 +612,7 @@ boolean user_typed_name, without_asking;
                     }
                     if (yn(question) == 'y')
                         yes_to_moreinfo = TRUE;
-		}
+                }
 
                 if (user_typed_name || without_asking || yes_to_moreinfo) {
                     if (dlb_fseek(fp, (long) txt_offset + entry_offset,
