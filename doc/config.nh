@@ -21,6 +21,8 @@
 # For compound options, the option name and value are separated by a colon.
 #
 # Some options are persistent, and apply only to new games.
+#
+# For more information about the options, see the Guidebook.
 
 
 # Set your character's name.
@@ -43,7 +45,7 @@
 # When you pick up an item that would exceed this encumbrance
 # level (Unencumbered, Burdened, streSsed, straiNed, overTaxed,
 # or overLoaded), you will be asked if you want to continue. Persistent.
-#OPTIONS=pickup_burden:S
+#OPTIONS=pickup_burden:u
 
 
 # Enable messages about what your character hears
@@ -100,7 +102,7 @@
 # peaceable creatures (default on).
 #OPTIONS=confirm
 
-# Highlight out-of-sight room floors with different glyph
+# Highlight out-of-sight room floors with different color or glyph
 #OPTIONS=dark_room
 
 # Controls what information the program reveals when the game ends.
@@ -179,7 +181,7 @@
 #OPTIONS=menu_overlay
 
 # Set the number of messages saved into message history (^P -command)
-#OPTIONS=msghistory:20
+#OPTIONS=msghistory:50
 
 # Allows you to change the way recalled messages are displayed.
 # The possible values are:
@@ -239,7 +241,7 @@
 # Controls the amount of screen updating for the map window when engaged
 # in multi-turn movement. Possible values are 'teleport', 'run', 'walk',
 # or 'crawl'.  Default is 'run'.
-#OPTIONS=runmode:teleport
+#OPTIONS=runmode:run
 
 # Ask if you really want to hit your pet
 #OPTIONS=safe_pet
@@ -446,7 +448,7 @@
 #AUTOPICKUP_EXCEPTION="<arrow"
 #  Never autopickup any corpse
 #AUTOPICKUP_EXCEPTION=">corpse"
-#  Never autopickup any cursed items
+#  Never autopickup any known cursed items
 #AUTOPICKUP_EXCEPTION="> cursed"
 
 
