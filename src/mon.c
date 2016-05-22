@@ -514,14 +514,19 @@ register struct monst *mtmp;
          */
         if (!is_clinger(mtmp->data) && !likes_lava(mtmp->data)) {
             if (!resists_fire(mtmp)) {
-                if (cansee(mtmp->mx, mtmp->my))
+                if (cansee(mtmp->mx, mtmp->my)) {
+                    struct attack *dummy = &mtmp->data->mattk[0];
+                    const char *how = on_fire(mtmp->data, dummy);
+
                     pline("%s %s.", Monnam(mtmp),
-                          mtmp->data == &mons[PM_WATER_ELEMENTAL]
-                              ? "boils away"
-                              : "burns to a crisp");
+                          !strcmp(how, "boiling") ? "boils away"
+                             : !strcmp(how, "melting") ? "melts away"
+                                : "burns to a crisp");
+                }
                 mondead(mtmp);
             } else {
-                if (--mtmp->mhp < 1) {
+                mtmp->mhp -= 1;
+                if (mtmp->mhp < 1) {
                     if (cansee(mtmp->mx, mtmp->my))
                         pline("%s surrenders to the fire.", Monnam(mtmp));
                     mondead(mtmp);
@@ -1775,8 +1780,8 @@ struct monst *mtmp;
         /* genocided monster can't be life-saved */
         if (cansee(mtmp->mx, mtmp->my))
             pline("Unfortunately, %s is still genocided...", mon_nam(mtmp));
+        mtmp->mhp = 0;
     }
-    mtmp->mhp = 0;
 }
 
 void
@@ -1786,6 +1791,7 @@ register struct monst *mtmp;
     struct permonst *mptr;
     int tmp;
 
+    mtmp->mhp = 0; /* in case caller hasn't done this */
     lifesaved_monster(mtmp);
     if (mtmp->mhp > 0)
         return;
@@ -2028,6 +2034,7 @@ struct monst *mdef;
      * put inventory in it, and we have to check for lifesaving before
      * making the statue....
      */
+    mdef->mhp = 0; /* in case caller hasn't done this */
     lifesaved_monster(mdef);
     if (mdef->mhp > 0)
         return;
@@ -2167,6 +2174,7 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
             nocorpse = (xkill_flags & XKILL_NOCORPSE) != 0,
             noconduct = (xkill_flags & XKILL_NOCONDUCT) != 0;
 
+    mtmp->mhp = 0; /* caller will usually have already done this */
     if (!noconduct) /* KMH, conduct */
         u.uconduct.killer++;
 

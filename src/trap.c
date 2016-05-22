@@ -2531,7 +2531,8 @@ register struct monst *mtmp;
 
                 if (in_sight)
                     seetrap(trap);
-                if ((mtmp->mhp -= dmgval2) <= 0)
+                mtmp->mhp -= dmgval2;
+                if (mtmp->mhp <= 0)
                     monkilled(mtmp,
                               in_sight
                                   ? "compression from an anti-magic field"
@@ -3885,7 +3886,8 @@ boolean force_failure;
                 if (ttype == BEAR_TRAP) {
                     if (mtmp->mtame)
                         abuse_dog(mtmp);
-                    if ((mtmp->mhp -= rnd(4)) <= 0)
+                    mtmp->mhp -= rnd(4);
+                    if (mtmp->mhp <= 0)
                         killed(mtmp);
                 } else if (ttype == WEB) {
                     if (!webmaker(youmonst.data)) {
@@ -4941,9 +4943,9 @@ boolean nocorpse;
             if (dam < 1)
                 dam = 1;
         }
-        if ((mon->mhp -= dam) <= 0) {
-            int xx = mon->mx;
-            int yy = mon->my;
+        mon->mhp -= dam;
+        if (mon->mhp <= 0) {
+            int xx = mon->mx, yy = mon->my;
 
             monkilled(mon, "", nocorpse ? -AD_RBRE : AD_PHYS);
             if (mon->mhp <= 0) {

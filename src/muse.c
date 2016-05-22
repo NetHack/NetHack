@@ -140,7 +140,7 @@ struct obj *obj;
         int dam = d(obj->spe + 2, 6);
 
         /* 3.6.1: no Deaf filter; 'if' message doesn't warrant it, 'else'
-           message doesn't need it since Your_hear() has one of its own */
+           message doesn't need it since You_hear() has one of its own */
         if (vis) {
             pline("%s zaps %s, which suddenly explodes!", Monnam(mon),
                   an(xname(obj)));
@@ -154,11 +154,11 @@ struct obj *obj;
                         ? "nearby" : "in the distance");
         }
         m_useup(mon, obj);
-        if (mon->mhp <= dam) {
+        mon->mhp -= dam;
+        if (mon->mhp <= 0) {
             monkilled(mon, "", AD_RBRE);
             return 1;
-        } else
-            mon->mhp -= dam;
+        }
         m.has_defense = m.has_offense = m.has_misc = 0;
         /* Only one needed to be set to 0 but the others are harmless */
     }
@@ -1498,10 +1498,13 @@ struct monst *mtmp;
             else
                 losehp(num, "scroll of fire", KILLED_BY_AN);
             for (mtmp2 = fmon; mtmp2; mtmp2 = mtmp2->nmon) {
-                if (DEADMONSTER(mtmp2)) continue;
-                if (mtmp == mtmp2) continue;
+                if (DEADMONSTER(mtmp2))
+                    continue;
+                if (mtmp == mtmp2)
+                    continue;
                 if (dist2(mtmp2->mx, mtmp2->my, mtmp->mx, mtmp->my) < 3) {
-                    if (resists_fire(mtmp2)) continue;
+                    if (resists_fire(mtmp2))
+                        continue;
                     mtmp2->mhp -= num;
                     if (resists_cold(mtmp2))
                         mtmp2->mhp -= 3 * num;

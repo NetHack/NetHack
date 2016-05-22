@@ -770,6 +770,7 @@ xchar x, y; /* clone's preferred location or 0 (near mon) */
     /* Max HP the same, but current HP halved for both.  The caller
      * might want to override this by halving the max HP also.
      * When current HP is odd, the original keeps the extra point.
+     * We know original has more than 1 HP, so both end up with at least 1.
      */
     m2->mhpmax = mon->mhpmax;
     m2->mhp = mon->mhp / 2;

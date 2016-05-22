@@ -1604,7 +1604,9 @@ register struct attack *mattk;
 
             pline("%s suddenly seems weaker!", Monnam(mdef));
             mdef->mhpmax -= xtmp;
-            if ((mdef->mhp -= xtmp) <= 0 || !mdef->m_lev) {
+            mdef->mhp -= xtmp;
+            /* !m_lev: level 0 monster is killed rather than drop to -1 */
+            if (mdef->mhp <= 0 && !mdef->m_lev) {
                 pline("%s dies!", Monnam(mdef));
                 xkilled(mdef, XKILL_NOMSG);
             } else
@@ -1767,7 +1769,8 @@ register struct attack *mattk;
     }
 
     mdef->mstrategy &= ~STRAT_WAITFORU; /* in case player is very fast */
-    if ((mdef->mhp -= tmp) < 1) {
+    mdef->mhp -= tmp;
+    if (mdef->mhp < 1) {
         if (mdef->mtame && !cansee(mdef->mx, mdef->my)) {
             You_feel("embarrassed for a moment.");
             if (tmp)
@@ -2043,7 +2046,8 @@ register struct attack *mattk;
                 break;
             }
             end_engulf();
-            if ((mdef->mhp -= dam) <= 0) {
+            mdef->mhp -= dam;
+            if (mdef->mhp <= 0) {
                 killed(mdef);
                 if (mdef->mhp <= 0) /* not lifesaved */
                     return 2;
@@ -2690,7 +2694,8 @@ int dmg;
 {
     pline("%s %s!", Monnam(mon),
           (dmg > mon->mhp / 2) ? "wails in agony" : "cries out in pain");
-    if ((mon->mhp -= dmg) <= 0) {
+    mon->mhp -= dmg;
+    if (mon->mhp <= 0) {
         if (context.mon_moving)
             monkilled(mon, (char *) 0, AD_BLND);
         else

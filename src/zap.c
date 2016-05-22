@@ -3432,7 +3432,8 @@ int dx, dy;
     return (struct monst *) 0;
 }
 
-/* used by buzz(); also used by munslime(muse.c); returns damage to mon */
+/* used by buzz(); also used by munslime(muse.c); returns damage applied
+   to mon; note: caller is responsible for killing mon if damage is fatal */
 int
 zhitm(mon, type, nd, ootmp)
 register struct monst *mon;
