@@ -81,6 +81,13 @@ static long laststattime;
 #endif
 
 void
+free_maildata()
+{
+    if (mailbox)
+        free(mailbox);
+}
+
+void
 getmailstatus()
 {
     if (!mailbox && !(mailbox = nh_getenv("MAIL"))) {

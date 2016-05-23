@@ -1070,6 +1070,7 @@ E void FDECL(nocmov, (int x, int y));
 
 #ifdef MAIL
 #ifdef UNIX
+E void NDECL(free_maildata);
 E void NDECL(getmailstatus);
 E void NDECL(ck_server_admin_msg);
 #endif

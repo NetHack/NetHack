@@ -1329,6 +1329,9 @@ free_dungeons()
 void
 freedynamicdata()
 {
+#if defined(UNIX) && defined(MAIL)
+    free_maildata();
+#endif
     unload_qtlist();
     free_menu_coloring();
     free_invbuf();           /* let_to_name (invent.c) */
