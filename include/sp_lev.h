@@ -218,12 +218,13 @@ enum opcode_defs {
 #define SP_COORD_IS_RANDOM 0x01000000
 /* Humidity flags for get_location() and friends, used with
  * SP_COORD_PACK_RANDOM() */
-#define DRY 0x1
-#define WET 0x2
-#define HOT 0x4
-#define SOLID 0x8
-#define ANY_LOC 0x10     /* even outside the level */
+#define DRY         0x01
+#define WET         0x02
+#define HOT         0x04
+#define SOLID       0x08
+#define ANY_LOC     0x10 /* even outside the level */
 #define NO_LOC_WARN 0x20 /* no complaints and set x & y to -1, if no loc */
+#define SPACELOC    0x40 /* like DRY, but accepts furniture too */
 
 #define SP_COORD_X(l) (l & 0xff)
 #define SP_COORD_Y(l) ((l >> 16) & 0xff)

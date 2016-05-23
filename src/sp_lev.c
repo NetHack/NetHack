@@ -72,6 +72,7 @@ STATIC_DCL void FDECL(create_door, (room_door *, struct mkroom *));
 STATIC_DCL void FDECL(create_trap, (trap *, struct mkroom *));
 STATIC_DCL int FDECL(noncoalignment, (ALIGNTYP_P));
 STATIC_DCL boolean FDECL(m_bad_boulder_spot, (int, int));
+STATIC_DCL int FDECL(pm_to_humidity, (struct permonst *));
 STATIC_DCL void FDECL(create_monster, (monster *, struct mkroom *));
 STATIC_DCL void FDECL(create_object, (object *, struct mkroom *));
 STATIC_DCL void FDECL(create_altar, (altar *, struct mkroom *));
@@ -895,6 +896,8 @@ register int humidity;
             || typ == CORR)
             return TRUE;
     }
+    if ((humidity & SPACELOC) && SPACE_POS(levl[x][y].typ))
+        return TRUE;
     if ((humidity & WET) && is_pool(x, y))
         return TRUE;
     if ((humidity & HOT) && is_lava(x, y))
@@ -1495,6 +1498,24 @@ int x, y;
     return FALSE;
 }
 
+STATIC_OVL int
+pm_to_humidity(pm)
+struct permonst *pm;
+{
+    int loc = DRY;
+    if (!pm)
+        return loc;
+    if (pm->mlet == S_EEL || amphibious(pm) || is_swimmer(pm))
+        loc = WET;
+    if (is_flyer(pm) || is_floater(pm))
+        loc |= (HOT | WET);
+    if (passes_walls(pm) || noncorporeal(pm))
+        loc |= SOLID;
+    if (flaming(pm))
+        loc |= HOT;
+    return loc;
+}
+
 STATIC_OVL void
 create_monster(m, croom)
 monster *m;
@@ -1543,15 +1564,7 @@ struct mkroom *croom;
         pm = (struct permonst *) 0;
 
     if (pm) {
-        int loc = DRY;
-        if (pm->mlet == S_EEL || amphibious(pm) || is_swimmer(pm))
-            loc = WET;
-        if (is_flyer(pm) || is_floater(pm))
-            loc |= (HOT | WET);
-        if (passes_walls(pm) || noncorporeal(pm))
-            loc |= SOLID;
-        if (flaming(pm))
-            loc |= HOT;
+        int loc = pm_to_humidity(pm);
         /* If water-liking monster, first try is without DRY */
         get_location_coord(&x, &y, loc | NO_LOC_WARN, croom, m->coord);
         if (x == -1 && y == -1) {
