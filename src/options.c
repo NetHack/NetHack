@@ -587,10 +587,13 @@ boolean val_allowed;
 
         if (!p || (q && q < p))
             p = q;
-        while (p && p > user_string && isspace((uchar) * (p - 1)))
-            p--;
-        if (p)
+        if (p) {
+            /* 'user_string' hasn't necessarily been through mungspaces()
+               so might have tabs or consecutive spaces */
+            while (p > user_string && isspace((uchar) *(p - 1)))
+                p--;
             len = (int) (p - user_string);
+        }
     }
 
     return (boolean) (len >= min_length
@@ -2110,7 +2113,7 @@ boolean tinitial, tfrom_file;
                 bad_negation(fullname, TRUE);
                 return;
             }
-            tmp = tolower(*op);
+            tmp = lowc(*op);
         }
         switch (tmp) {
         case 's': /* single message history cycle (default if negated) */
@@ -2576,30 +2579,24 @@ boolean tinitial, tfrom_file;
             bad_negation(fullname, FALSE);
             return;
         } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
-            switch (tolower(*op)) {
-            /* Unencumbered */
-            case 'u':
+            switch (lowc(*op)) {
+            case 'u': /* Unencumbered */
                 flags.pickup_burden = UNENCUMBERED;
                 break;
-            /* Burdened (slight encumbrance) */
-            case 'b':
+            case 'b': /* Burdened (slight encumbrance) */
                 flags.pickup_burden = SLT_ENCUMBER;
                 break;
-            /* streSsed (moderate encumbrance) */
-            case 's':
+            case 's': /* streSsed (moderate encumbrance) */
                 flags.pickup_burden = MOD_ENCUMBER;
                 break;
-            /* straiNed (heavy encumbrance) */
-            case 'n':
+            case 'n': /* straiNed (heavy encumbrance) */
                 flags.pickup_burden = HVY_ENCUMBER;
                 break;
-            /* OverTaxed (extreme encumbrance) */
-            case 'o':
+            case 'o': /* OverTaxed (extreme encumbrance) */
             case 't':
                 flags.pickup_burden = EXT_ENCUMBER;
                 break;
-            /* overLoaded */
-            case 'l':
+            case 'l': /* overLoaded */
                 flags.pickup_burden = OVERLOADED;
                 break;
             default:
@@ -2881,11 +2878,13 @@ boolean tinitial, tfrom_file;
     if (match_optname(opts, fullname, 4, TRUE)) {
         op = string_for_env_opt(fullname, opts, FALSE);
         if (op) {
-            switch (tolower(*op)) {
-            case 'n':
-            case 'l':
-            case 'f':
-                flags.sortloot = tolower(*op);
+            char c = lowc(*op);
+
+            switch (c) {
+            case 'n': /* none */
+            case 'l': /* loot (pickup) */
+            case 'f': /* full (pickup + invent) */
+                flags.sortloot = c;
                 break;
             default:
                 badoption(opts);
@@ -3163,21 +3162,25 @@ boolean tinitial, tfrom_file;
                 return; /* string_for_opt gave feedback */
             tmp = negated ? 'n' : 'f';
         } else {
-            tmp = tolower(*op);
+            tmp = lowc(*op);
         }
         switch (tmp) {
         case 'n': /* none */
-        case 't': /* traditional */
+        case 't': /* traditional: prompt for class(es) by symbol,
+                     prompt for each item within class(es) one at a time */
             flags.menu_style = MENU_TRADITIONAL;
             break;
-        case 'c': /* combo: trad.class sel+menu */
+        case 'c': /* combination: prompt for class(es) by symbol,
+                     choose items within selected class(es) by menu */
             flags.menu_style = MENU_COMBINATION;
             break;
-        case 'p': /* partial: no class menu */
-            flags.menu_style = MENU_PARTIAL;
-            break;
-        case 'f': /* full: class menu + menu */
+        case 'f': /* full: choose class(es) by first menu,
+                     choose items within selected class(es) by second menu */
             flags.menu_style = MENU_FULL;
+            break;
+        case 'p': /* partial: skip class filtering,
+                     choose items among all classes by menu */
+            flags.menu_style = MENU_PARTIAL;
             break;
         default:
             badoption(opts);
@@ -5254,7 +5257,7 @@ const char *strval;
     buf[0] = '\0';
     if (!strval[0] || !strval[1]) { /* empty, or single character */
         /* if single char is space or tab, leave buf[0]=='\0' */
-        if (!isspace(strval[0]))
+        if (!isspace((uchar) strval[0]))
             buf[0] = strval[0];
     } else if (strval[0] == '\'') { /* single quote */
         /* simple matching single quote; we know strval[1] isn't '\0' */

@@ -1468,7 +1468,7 @@ rndmonst()
             rndmonst_state.mchoices[mndx] = 0;
             if (tooweak(mndx, minmlev) || toostrong(mndx, maxmlev))
                 continue;
-            if (upper && !isupper(def_monsyms[(int) (ptr->mlet)].sym))
+            if (upper && !isupper((uchar) def_monsyms[(int) ptr->mlet].sym))
                 continue;
             if (elemlevel && wrong_elem_type(ptr))
                 continue;
