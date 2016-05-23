@@ -8,7 +8,7 @@ STATIC_DCL char *NDECL(nextmbuf);
 STATIC_DCL void FDECL(getpos_help, (BOOLEAN_P, const char *));
 STATIC_DCL int FDECL(CFDECLSPEC cmp_coord_distu, (const void *,
                                                   const void *));
-STATIC_DCL void FDECL(gather_locs, (coord **, int *, BOOLEAN_P));
+STATIC_DCL void FDECL(gather_locs, (coord **, int *, int));
 STATIC_DCL void FDECL(auto_describe, (int, int));
 STATIC_DCL void NDECL(do_mname);
 STATIC_DCL boolean FDECL(alreadynamed, (struct monst *, char *, char *));
@@ -64,6 +64,7 @@ const char *goal;
     if (!iflags.terrainmode || (iflags.terrainmode & TER_OBJ) != 0)
         putstr(tmpwin, 0, "Use o or O to move the cursor to next object.");
     if (!iflags.terrainmode) {
+        putstr(tmpwin, 0, "Use d or D to move the cursor to next door or doorway.");
         if (getpos_hilitefunc)
             putstr(tmpwin, 0, "Use $ to display valid locations.");
         putstr(tmpwin, 0, "Use # to toggle automatic description.");
@@ -120,17 +121,38 @@ const void *b;
     return dist_1 - dist_2;
 }
 
+#define GLOC_MONS 0
+#define GLOC_OBJS 1
+#define GLOC_DOOR 2
+
+boolean
+gather_locs_glyphmatch(glyph, gloc)
+int glyph, gloc;
+{
+    switch (gloc) {
+    default:
+    case GLOC_MONS: return (glyph_is_monster(glyph)
+                            && glyph != monnum_to_glyph(PM_LONG_WORM_TAIL));
+    case GLOC_OBJS: return (glyph_is_object(glyph)
+                            && glyph != objnum_to_glyph(BOULDER)
+                            && glyph != objnum_to_glyph(ROCK));
+    case GLOC_DOOR: return (glyph_is_cmap(glyph)
+                            && ((glyph_to_cmap(glyph) == S_hcdoor)
+                                || (glyph_to_cmap(glyph) == S_vcdoor)
+                                || (glyph_to_cmap(glyph) == S_hodoor)
+                                || (glyph_to_cmap(glyph) == S_vodoor)
+                                || (glyph_to_cmap(glyph) == S_ndoor)));
+    }
+}
+
 /* gather locations for monsters or objects shown on the map */
 STATIC_OVL void
-gather_locs(arr_p, cnt_p, do_mons)
+gather_locs(arr_p, cnt_p, gloc)
 coord **arr_p;
 int *cnt_p;
-boolean do_mons;
+int gloc;
 {
-    int x, y, pass, glyph, idx,
-        tail = (do_mons ? monnum_to_glyph(PM_LONG_WORM_TAIL) : 0),
-        boulder = (!do_mons ? objnum_to_glyph(BOULDER) : 0),
-        rock = (!do_mons ? objnum_to_glyph(ROCK) : 0);
+    int x, y, pass, glyph, idx;
 
     /*
      * We always include the hero's location even if there is no monster
@@ -154,9 +176,7 @@ boolean do_mons;
                 /* unlike '/M', this skips monsters revealed by
                    warning glyphs and remembered invisible ones */
                 if ((x == u.ux && y == u.uy)
-                    || (do_mons ? (glyph_is_monster(glyph) && glyph != tail)
-                                : (glyph_is_object(glyph)
-                                   && glyph != boulder && glyph != rock))) {
+                    || gather_locs_glyphmatch(glyph, gloc)) {
                     if (!pass) {
                         ++*cnt_p;
                     } else {
@@ -279,8 +299,10 @@ const char *goal;
     static const char pick_chars[] = ".,;:";
     const char *cp;
     boolean hilite_state = FALSE;
-    coord *monarr = (coord *) 0, *objarr = (coord *) 0;
-    int moncount = 0, monidx = 0, objcount = 0, objidx = 0;
+    coord *monarr = (coord *) 0, *objarr = (coord *) 0,
+        *doorarr = (coord *) 0;
+    int moncount = 0, monidx = 0, objcount = 0, objidx = 0,
+        doorcount = 0, dooridx = 0;
 
     if (!goal)
         goal = "desired location";
@@ -407,7 +429,7 @@ const char *goal;
             goto nxtc;
         } else if (c == 'm' || c == 'M') { /* nearest or farthest monster */
             if (!monarr) {
-                gather_locs(&monarr, &moncount, TRUE);
+                gather_locs(&monarr, &moncount, GLOC_MONS);
                 monidx = 0; /* monarr[0] is hero's spot */
             }
             if (c == 'm') {
@@ -421,7 +443,7 @@ const char *goal;
             goto nxtc;
         } else if (c == 'o' || c == 'O') { /* nearest or farthest object */
             if (!objarr) {
-                gather_locs(&objarr, &objcount, FALSE);
+                gather_locs(&objarr, &objcount, GLOC_OBJS);
                 objidx = 0; /* objarr[0] is hero's spot */
             }
             if (c == 'o') {
@@ -432,6 +454,20 @@ const char *goal;
             }
             cx = objarr[objidx].x;
             cy = objarr[objidx].y;
+            goto nxtc;
+        } else if (c == 'd' || c == 'D') {  /* door/doorway */
+            if (!doorarr) {
+                gather_locs(&doorarr, &doorcount, GLOC_DOOR);
+                dooridx = 0; /* objarr[0] is hero's spot */
+            }
+            if (c == 'd') {
+                dooridx = (dooridx + 1) % doorcount;
+            } else {
+                if (--dooridx < 0)
+                    dooridx = doorcount - 1;
+            }
+            cx = doorarr[dooridx].x;
+            cy = doorarr[dooridx].y;
             goto nxtc;
         } else {
             if (!index(quitchars, c)) {
