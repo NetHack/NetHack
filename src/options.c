@@ -5496,6 +5496,7 @@ struct fruit *replace_fruit;
         return rnd(127);
 
     f = newfruit();
+    (void) memset((genericptr_t)f, 0, sizeof(struct fruit));
     copynchars(f->fname, *altname ? altname : str, PL_FSIZ - 1);
     f->fid = ++highest_fruit_id;
     /* we used to go out of our way to add it at the end of the list,

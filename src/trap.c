@@ -337,6 +337,7 @@ int x, y, typ;
     } else {
         oldplace = FALSE;
         ttmp = newtrap();
+        (void) memset((genericptr_t)ttmp, 0, sizeof(struct trap));
         ttmp->ntrap = 0;
         ttmp->tx = x;
         ttmp->ty = y;

@@ -2516,7 +2516,7 @@ struct obj *no_wish;
     int halfeaten, mntmp, contents;
     int islit, unlabeled, ishistoric, isdiluted, trapped;
     int tmp, tinv, tvariety;
-    int wetness, gsize;
+    int wetness, gsize = 0;
     struct fruit *f;
     int ftype = context.current_fruit;
     char fruitbuf[BUFSZ];

@@ -388,6 +388,7 @@ xchar e_type;
     if ((ep = engr_at(x, y)) != 0)
         del_engr(ep);
     ep = newengr(strlen(s) + 1);
+    (void) memset((genericptr_t)ep, 0, sizeof(struct engr));
     ep->nxt_engr = head_engr;
     head_engr = ep;
     ep->engr_x = x;

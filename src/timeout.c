@@ -1533,6 +1533,7 @@ anything *arg;
         panic("start_timer");
 
     gnu = (timer_element *) alloc(sizeof(timer_element));
+    (void) memset((genericptr_t)gnu, 0, sizeof(timer_element));
     gnu->next = 0;
     gnu->tid = timer_id++;
     gnu->timeout = monstermoves + when;

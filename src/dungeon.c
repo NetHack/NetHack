@@ -490,6 +490,7 @@ struct proto_dungeon *pd;
 
     branch_num = find_branch(dungeons[dgn].dname, pd);
     new_branch = (branch *) alloc(sizeof(branch));
+    (void) memset((genericptr_t)new_branch, 0, sizeof(branch));
     new_branch->next = (branch *) 0;
     new_branch->id = branch_id++;
     new_branch->type = correct_branch_type(&pd->tmpbranch[branch_num]);
@@ -545,6 +546,7 @@ struct proto_dungeon *pd;
 
     pd->final_lev[proto_index] = new_level =
         (s_level *) alloc(sizeof(s_level));
+    (void) memset((genericptr_t)new_level, 0, sizeof(s_level));
     /* load new level with data */
     Strcpy(new_level->proto, tlevel->name);
     new_level->boneid = tlevel->boneschar;
