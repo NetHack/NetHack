@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1463620377 2016/05/19 01:12:57 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.131 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1464138042 2016/05/25 01:00:42 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.132 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2559,9 +2559,10 @@ boolean ininv, dummy, silent;
             }
             obj->quan = 1L; /* fool xname() into giving singular */
             pline("%s %ld %s %s %s%s.\"", buf, ltmp, currency(ltmp),
-                  (save_quan > 1L) ? "per" : (contentscount && !obj->unpaid)
-                                                 ? "for the contents of this"
-                                                 : "for this",
+                  (save_quan > 1L) ? "per"
+                                   : (contentscount && !obj->unpaid)
+                                       ? "for the contents of this"
+                                       : "for this",
                   xname(obj),
                   (contentscount && obj->unpaid) ? and_its_contents : "");
             obj->quan = save_quan;

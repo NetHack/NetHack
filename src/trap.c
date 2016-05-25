@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1461568321 2016/04/25 07:12:01 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.268 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1464138044 2016/05/25 01:00:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.272 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -690,6 +690,7 @@ int *fail_reason;
            which refers to "it" so needs to follow a message describing
            the object ("the statue comes to life" one above) */
         if (cause != ANIMATE_NORMAL && costly_spot(x, y)
+            && (carried(statue) ? statue->unpaid : !statue->no_charge)
             && (shkp = shop_keeper(*in_rooms(x, y, SHOPBASE))) != 0
             /* avoid charging for Manlobbi's statue of Manlobbi
                if stone-to-flesh is used on petrified shopkeep */

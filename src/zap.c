@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1463533826 2016/05/18 01:10:26 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.255 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1464138044 2016/05/25 01:00:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.257 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -795,7 +795,8 @@ boolean by_hero;
         struct monst *shkp = 0;
 
         x = corpse->ox, y = corpse->oy;
-        if (costly_spot(x, y))
+        if (costly_spot(x, y)
+            && (carried(corpse) ? corpse->unpaid : !corpse->no_charge))
             shkp = shop_keeper(*in_rooms(x, y, SHOPBASE));
 
         if (cansee(x, y)) {
@@ -1612,9 +1613,9 @@ int id;
                 if (*u.ushops
                     && *in_rooms(u.ux, u.uy, 0)
                            == *in_rooms(shkp->mx, shkp->my, 0)
-                    && !costly_spot(u.ux, u.uy))
+                    && !costly_spot(u.ux, u.uy)) {
                     make_angry_shk(shkp, ox, oy);
-                else {
+                } else {
                     pline("%s gets angry!", Monnam(shkp));
                     hot_pursuit(shkp);
                 }
@@ -1633,7 +1634,7 @@ struct obj *obj;
 {
     int res = 1; /* affected object by default */
     struct permonst *ptr;
-    struct monst *mon;
+    struct monst *mon, *shkp;
     struct obj *item;
     xchar oox, ooy;
     boolean smell = FALSE, golem_xform = FALSE;
@@ -1664,19 +1665,18 @@ struct obj *obj;
                 break;
             }
             if (obj->otyp == STATUE) {
-                /* animate_statue() forces all golems to become flesh golems
-                 */
+                /* animate_statue() forces all golems to become flesh golems */
                 mon = animate_statue(obj, oox, ooy, ANIMATE_SPELL, (int *) 0);
             } else { /* (obj->otyp == FIGURINE) */
                 if (golem_xform)
                     ptr = &mons[PM_FLESH_GOLEM];
                 mon = makemon(ptr, oox, ooy, NO_MINVENT);
                 if (mon) {
-                    if (costly_spot(oox, ooy) && !obj->no_charge) {
-                        if (costly_spot(u.ux, u.uy))
-                            addtobill(obj, carried(obj), FALSE, FALSE);
-                        else
-                            stolen_value(obj, oox, ooy, TRUE, FALSE);
+                    if (costly_spot(oox, ooy)
+                        && (carried(obj) ? obj->unpaid : !obj->no_charge)) {
+                        shkp = shop_keeper(*in_rooms(oox, ooy, SHOPBASE));
+                        stolen_value(obj, oox, ooy,
+                                     (shkp && shkp->mpeaceful), FALSE);
                     }
                     if (obj->timed)
                         obj_stop_timers(obj);
