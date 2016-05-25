@@ -1,4 +1,4 @@
-/* NetHack 3.6	zap.c	$NHDT-Date: 1464138044 2016/05/25 01:00:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.257 $ */
+/* NetHack 3.6	zap.c	$NHDT-Date: 1464163779 2016/05/25 08:09:39 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.258 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -673,6 +673,8 @@ int *container_nesting;
 /*
  * Attempt to revive the given corpse, return the revived monster if
  * successful.  Note: this does NOT use up the corpse if it fails.
+ * If corpse->quan is more than 1, only one corpse will be affected
+ * and only one monster will be resurrected.
  */
 struct monst *
 revive(corpse, by_hero)
@@ -684,6 +686,7 @@ boolean by_hero;
     struct obj *container;
     coord xy;
     xchar x, y;
+    boolean one_of;
     int montype, container_nesting = 0;
 
     if (corpse->otyp != CORPSE) {
@@ -790,6 +793,10 @@ boolean by_hero;
     if (mtmp->m_ap_type)
         seemimic(mtmp);
 
+    one_of = (corpse->quan > 1L);
+    if (one_of)
+        corpse = splitobj(corpse, 1L);
+
     /* if this is caused by the hero there might be a shop charge */
     if (by_hero) {
         struct monst *shkp = 0;
@@ -803,12 +810,16 @@ boolean by_hero;
             char buf[BUFSZ];
             unsigned pfx = CXN_PFX_THE;
 
-            Strcpy(buf, (corpse->quan > 1L) ? "one of " : "");
+            Strcpy(buf, one_of ? "one of " : "");
             if (carried(corpse) && !corpse->unpaid) {
                 Strcat(buf, "your ");
                 pfx = CXN_NO_PFX;
             }
+            if (one_of)
+                corpse->quan++; /* force plural */
             Strcat(buf, corpse_xname(corpse, (const char *) 0, pfx));
+            if (one_of) /* could be simplified to ''corpse->quan = 1L;'' */
+                corpse->quan--;
             pline("%s glows iridescently.", upstart(buf));
         } else if (shkp) {
             /* need some prior description of the corpse since
@@ -916,10 +927,11 @@ struct monst *mon;
     struct monst *mtmp2;
     char owner[BUFSZ], corpse[BUFSZ];
     boolean youseeit;
-    int once = 0, res = 0;
+    int res = 0;
 
     youseeit = (mon == &youmonst) ? TRUE : canseemon(mon);
     otmp2 = (mon == &youmonst) ? invent : mon->minvent;
+    owner[0] = corpse[0] = '\0'; /* lint suppression */
 
     while ((otmp = otmp2) != 0) {
         otmp2 = otmp->nobj;
@@ -928,19 +940,18 @@ struct monst *mon;
         if (otmp->otyp != CORPSE)
             continue;
         /* save the name; the object is liable to go away */
-        if (youseeit)
+        if (youseeit) {
             Strcpy(corpse,
                    corpse_xname(otmp, (const char *) 0, CXN_SINGULAR));
+            Shk_Your(owner, otmp); /* includes a trailing space */
+        }
 
-        /* for a merged group, only one is revived; should this be fixed? */
+        /* for a stack, only one is revived */
         if ((mtmp2 = revive(otmp, !context.mon_moving)) != 0) {
             ++res;
-            if (youseeit) {
-                if (!once++)
-                    Strcpy(owner, (mon == &youmonst) ? "Your"
-                                                     : s_suffix(Monnam(mon)));
-                pline("%s %s suddenly comes alive!", owner, corpse);
-            } else if (canseemon(mtmp2))
+            if (youseeit)
+                pline("%s%s suddenly comes alive!", owner, corpse);
+            else if (canseemon(mtmp2))
                 pline("%s suddenly appears!", Amonnam(mtmp2));
         }
     }
