@@ -854,7 +854,7 @@ init_dungeons()
              * its branch.  First, the depth of the entry point:
              *
              *  depth of branch from "parent" dungeon
-             *  + -1 or 1 depending on a up or down stair or
+             *  + -1 or 1 depending on an up or down stair or
              *    0 if portal
              *
              * Followed by the depth of the top of the dungeon:
@@ -1606,6 +1606,25 @@ level_difficulty()
              * The same applies to Vlad's Tower, although the increment
              * there is inconsequential compared to overall depth.
              */
+#if 0
+        /*
+         * The inside of the Wizard's Tower is also effectively a
+         * builds-up area, reached from a portal an arbitrary distance
+         * below rather than stairs 1 level beneath the entry level.
+         */
+        else if (On_W_tower_level(&u.uz) && In_W_tower(some_X, some_Y, &u.uz))
+            res += (fakewiz1.dlev - u.uz.dlev);
+            /*
+             * Handling this properly would need more information here:
+             * an inside/outside flag, or coordinates to calculate it.
+             * Unfortunately level difficulty may be wanted before
+             * coordinates have been chosen so simply extending this
+             * routine to take extra arguments is not sufficient to cope.
+             * The difference beyond naive depth-from-surface is small
+             * relative to the overall depth, so just ignore complications
+             * posed by W_tower.
+             */
+#endif /*0*/
     }
     return (xchar) res;
 }
