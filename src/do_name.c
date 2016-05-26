@@ -423,7 +423,7 @@ const char *goal;
         } else if (c == '@') { /* return to hero's spot */
             /* reset 'm','M' and 'o','O'; otherwise, there's no way for player
                to achieve that except by manually cycling through all spots */
-            monidx = objidx = 0;
+            monidx = objidx = dooridx = 0;
             cx = u.ux;
             cy = u.uy;
             goto nxtc;
