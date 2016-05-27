@@ -63,8 +63,9 @@ const char *goal;
         putstr(tmpwin, 0, "Use m or M to move the cursor to next monster.");
     if (!iflags.terrainmode || (iflags.terrainmode & TER_OBJ) != 0)
         putstr(tmpwin, 0, "Use o or O to move the cursor to next object.");
+    putstr(tmpwin, 0, /* d,D are useful regardless of terrainmode */
+           "Use d or D to move the cursor to next door or doorway.");
     if (!iflags.terrainmode) {
-        putstr(tmpwin, 0, "Use d or D to move the cursor to next door or doorway.");
         if (getpos_hilitefunc)
             putstr(tmpwin, 0, "Use $ to display valid locations.");
         putstr(tmpwin, 0, "Use # to toggle automatic description.");
