@@ -1,5 +1,5 @@
 ^       Show the type of a trap
-^[      Cancel command
+^[      Cancel command (same as ESCape key)
 ^A      Redo the previous command
 ^C      Quit the game
 ^D      Kick something (usually a door, chest, or box)
@@ -7,7 +7,7 @@
 ^F      Map the level (available in debug mode only)
 ^G      Create a monster (available in debug mode only)
 ^I      Identify all items (available in debug mode only)
-^O      Show location of special levels (available in debug mode only)
+^O      Show dungeon overview (normal play) or special levels (debug mode)
 ^P      Toggle through previously displayed game messages
 ^R      Redraw screen
 ^T      Teleport around level

@@ -3794,9 +3794,9 @@ help_dir(sym, msg)
 char sym;
 const char *msg;
 {
+    static const char wiz_only_list[] = "EFGIVW";
     char ctrl;
     winid win;
-    static const char wiz_only_list[] = "EFGIOVW";
     char buf[BUFSZ], buf2[BUFSZ], *explain;
 
     win = create_nhwindow(NHW_TEXT);
@@ -3807,10 +3807,10 @@ const char *msg;
         putstr(win, 0, buf);
         putstr(win, 0, "");
     }
-    if (letter(sym)) {
-        sym = highc(sym);
-        ctrl = (sym - 'A') + 1;
-        if ((explain = dowhatdoes_core(ctrl, buf2))
+    if (letter(sym) || sym == '[') { /* 'dat/cmdhelp' shows ESC as ^[ */
+        sym = highc(sym); /* @A-Z[ (note: letter() accepts '@') */
+        ctrl = (sym - 'A') + 1; /* 0-27 (note: 28-31 aren't applicable) */
+        if ((explain = dowhatdoes_core(ctrl, buf2)) != 0
             && (!index(wiz_only_list, sym) || wizard)) {
             Sprintf(buf, "Are you trying to use ^%c%s?", sym,
                     index(wiz_only_list, sym)
@@ -3820,9 +3820,9 @@ const char *msg;
             putstr(win, 0, "");
             putstr(win, 0, explain);
             putstr(win, 0, "");
-            putstr(win, 0, "To use that command, you press");
-            Sprintf(buf, "the <Ctrl> key, and the <%c> key at the same time.",
-                    sym);
+            putstr(win, 0,
+                  "To use that command, hold down the <Ctrl> key as a shift");
+            Sprintf(buf, "and press the <%c> key.", sym);
             putstr(win, 0, buf);
             putstr(win, 0, "");
         }

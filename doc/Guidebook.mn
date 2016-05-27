@@ -691,6 +691,14 @@ a further menu or prompt will appear once you've closed this menu.
 The available options
 are listed later in this Guidebook.  Options are usually set before the
 game rather than with the `O' command; see the section on options below.
+.lp ^O
+Show overview or show dungeon layout
+.lp ""
+In normal play and in explore mode, a shortcut for the ``#overview''
+extended command to list interesting dungeon levels visited.
+.lp ""
+In debug mode, an extra command which lists the placement of all special
+levels.
 .lp p
 Pay your shopping bill.
 .lp P
