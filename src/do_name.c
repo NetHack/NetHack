@@ -137,11 +137,9 @@ int glyph, gloc;
                             && glyph != objnum_to_glyph(BOULDER)
                             && glyph != objnum_to_glyph(ROCK));
     case GLOC_DOOR: return (glyph_is_cmap(glyph)
-                            && ((glyph_to_cmap(glyph) == S_hcdoor)
-                                || (glyph_to_cmap(glyph) == S_vcdoor)
-                                || (glyph_to_cmap(glyph) == S_hodoor)
-                                || (glyph_to_cmap(glyph) == S_vodoor)
-                                || (glyph_to_cmap(glyph) == S_ndoor)));
+                            && (is_cmap_door(glyph_to_cmap(glyph))
+                                || is_cmap_drawbridge(glyph_to_cmap(glyph))
+                                || glyph_to_cmap(glyph) == S_ndoor));
     }
 }
 

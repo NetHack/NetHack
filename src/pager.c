@@ -775,9 +775,6 @@ const char **firstmatch;
         }
     }
 
-#define is_cmap_trap(i) ((i) >= S_arrow_trap && (i) <= S_polymorph_trap)
-#define is_cmap_drawbridge(i) ((i) >= S_vodbridge && (i) <= S_hcdbridge)
-
     /* Now check for graphics symbols */
     alt_i = (sym == (looked ? showsyms[0] : defsyms[0].sym)) ? 0 : (2 + 1);
     for (hit_trap = FALSE, i = 0; i < MAXPCHARS; i++) {
