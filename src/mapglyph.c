@@ -134,9 +134,7 @@ unsigned *ospecial;
         } else if (!iflags.use_color && offset == S_lava
                    && (showsyms[idx] == showsyms[S_pool + SYM_OFF_P]
                        || showsyms[idx] == showsyms[S_water + SYM_OFF_P])) {
-            /* temporary? hack; makes tty use inverse video if the
-               corresponding boolean option is enabled */
-            special |= MG_DETECT;
+            special |= MG_BW_LAVA;
         } else {
             cmap_color(offset);
         }

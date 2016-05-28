@@ -124,8 +124,9 @@ int bkglyph UNUSED;
         }
 #ifdef TEXTCOLOR
         co_ptr = &map_info->text_map.colors[y][x];
-        colordif = (((special & MG_PET) && iflags.hilite_pet)
-                    || ((special & MG_OBJPILE) && iflags.hilite_pile))
+        colordif = (((special & MG_PET) != 0 && iflags.hilite_pet)
+                    || ((special & MG_OBJPILE) != 0 && iflags.hilite_pile)
+                    || ((special & (MG_DETECT | MG_BW_LAVA)) != 0))
                       ? CLR_MAX : 0;
         if (*co_ptr != (uchar) (color + colordif)) {
             *co_ptr = (uchar) (color + colordif);
@@ -1223,7 +1224,7 @@ XtPointer widget_data; /* expose event from Window widget */
 /*
  * Do the actual work of the putting characters onto our X window.  This
  * is called from the expose event routine, the display window (flush)
- * routine, and the display cursor routine.  The later involves inverting
+ * routine, and the display cursor routine.  The last involves inverting
  * the foreground and background colors, which are also inverted when the
  * position's color is above CLR_MAX.
  *
@@ -1332,7 +1333,7 @@ boolean inverted;
         struct text_map_info_t *text_map = &map_info->text_map;
 
 #ifdef TEXTCOLOR
-        if (iflags.use_color) {
+        {
             register char *c_ptr;
             char *t_ptr;
             int cur_col, color, win_ystart;
@@ -1359,8 +1360,13 @@ boolean inverted;
                     }
 
                     XDrawImageString(XtDisplay(wp->w), XtWindow(wp->w),
-                                     cur_inv ? text_map->inv_color_gcs[color]
-                                             : text_map->color_gcs[color],
+                                     iflags.use_color
+                                        ? (cur_inv
+                                           ? text_map->inv_color_gcs[color]
+                                           : text_map->color_gcs[color])
+                                        : (cur_inv
+                                           ? text_map->inv_copy_gc
+                                           : text_map->copy_gc),
                                      text_map->square_lbearing
                                          + (text_map->square_width * cur_col),
                                      win_ystart, t_ptr, count);
@@ -1370,8 +1376,8 @@ boolean inverted;
                     cur_col += count;
                 } /* col loop */
             }     /* row loop */
-        } else
-#endif /* TEXTCOLOR */
+        }
+#else   /* !TEXTCOLOR */
         {
             int win_row, win_xstart;
 
@@ -1393,6 +1399,7 @@ boolean inverted;
                                  count);
             }
         }
+#endif  /* ?TEXTCOLOR */
     }
 }
 
