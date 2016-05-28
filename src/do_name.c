@@ -123,9 +123,13 @@ const void *b;
     return dist_1 - dist_2;
 }
 
-#define GLOC_MONS 0
-#define GLOC_OBJS 1
-#define GLOC_DOOR 2
+enum gloctypes {
+    GLOC_MONS = 0,
+    GLOC_OBJS,
+    GLOC_DOOR,
+
+    NUM_GLOCS
+};
 
 STATIC_OVL boolean
 gather_locs_interesting(x,y, gloc)
@@ -300,10 +304,9 @@ const char *goal;
     static const char pick_chars[] = ".,;:";
     const char *cp;
     boolean hilite_state = FALSE;
-    coord *monarr = (coord *) 0, *objarr = (coord *) 0,
-        *doorarr = (coord *) 0;
-    int moncount = 0, monidx = 0, objcount = 0, objidx = 0,
-        doorcount = 0, dooridx = 0;
+    coord *garr[NUM_GLOCS] = DUMMY;
+    int gcount[NUM_GLOCS] = DUMMY;
+    int gidx[NUM_GLOCS] = DUMMY;
 
     if (!goal)
         goal = "desired location";
@@ -424,51 +427,30 @@ const char *goal;
         } else if (c == '@') { /* return to hero's spot */
             /* reset 'm','M' and 'o','O'; otherwise, there's no way for player
                to achieve that except by manually cycling through all spots */
-            monidx = objidx = dooridx = 0;
+            for (i = 0; i < NUM_GLOCS; i++)
+                gidx[i] = 0;
             cx = u.ux;
             cy = u.uy;
             goto nxtc;
-        } else if (c == 'm' || c == 'M') { /* nearest or farthest monster */
-            if (!monarr) {
-                gather_locs(&monarr, &moncount, GLOC_MONS);
-                monidx = 0; /* monarr[0] is hero's spot */
+        } else if (c == 'm' || c == 'M' /* nearest or farthest monster */
+                   || c == 'o' || c == 'O'  /* nearest or farthest object */
+                   || c == 'd' || c == 'D') { /* door/doorway */
+            int gloc = (c == 'o' || c == 'O') ? GLOC_OBJS
+                : (c == 'd' || c == 'D') ? GLOC_DOOR
+                : GLOC_MONS;
+
+            if (!garr[gloc]) {
+                gather_locs(&garr[gloc], &gcount[gloc], gloc);
+                gidx[gloc] = 0; /* garr[][0] is hero's spot */
             }
-            if (c == 'm') {
-                monidx = (monidx + 1) % moncount;
+            if (c == 'm' || c == 'o' || c == 'd') {
+                gidx[gloc] = (gidx[gloc] + 1) % gcount[gloc];
             } else {
-                if (--monidx < 0)
-                    monidx = moncount - 1;
+                if (--gidx[gloc] < 0)
+                    gidx[gloc] = gcount[gloc] - 1;
             }
-            cx = monarr[monidx].x;
-            cy = monarr[monidx].y;
-            goto nxtc;
-        } else if (c == 'o' || c == 'O') { /* nearest or farthest object */
-            if (!objarr) {
-                gather_locs(&objarr, &objcount, GLOC_OBJS);
-                objidx = 0; /* objarr[0] is hero's spot */
-            }
-            if (c == 'o') {
-                objidx = (objidx + 1) % objcount;
-            } else {
-                if (--objidx < 0)
-                    objidx = objcount - 1;
-            }
-            cx = objarr[objidx].x;
-            cy = objarr[objidx].y;
-            goto nxtc;
-        } else if (c == 'd' || c == 'D') {  /* door/doorway */
-            if (!doorarr) {
-                gather_locs(&doorarr, &doorcount, GLOC_DOOR);
-                dooridx = 0; /* objarr[0] is hero's spot */
-            }
-            if (c == 'd') {
-                dooridx = (dooridx + 1) % doorcount;
-            } else {
-                if (--dooridx < 0)
-                    dooridx = doorcount - 1;
-            }
-            cx = doorarr[dooridx].x;
-            cy = doorarr[dooridx].y;
+            cx = garr[gloc][gidx[gloc]].x;
+            cy = garr[gloc][gidx[gloc]].y;
             goto nxtc;
         } else {
             if (!index(quitchars, c)) {
@@ -564,10 +546,9 @@ const char *goal;
         clear_nhwindow(WIN_MESSAGE);
     ccp->x = cx;
     ccp->y = cy;
-    if (monarr)
-        free((genericptr_t) monarr);
-    if (objarr)
-        free((genericptr_t) objarr);
+    for (i = 0; i < NUM_GLOCS; i++)
+        if (garr[i])
+            free((genericptr_t) garr[i]);
     getpos_hilitefunc = (void FDECL((*), (int))) 0;
     return result;
 }
