@@ -67,6 +67,7 @@ const char *goal;
     putstr(tmpwin, 0, /* d,D are useful regardless of terrainmode */
            "Use d or D to move the cursor to next door or doorway.");
     if (!iflags.terrainmode) {
+        putstr(tmpwin, 0, "Use x or X to move the cursor to unexplored location.");
         if (getpos_hilitefunc)
             putstr(tmpwin, 0, "Use $ to display valid locations.");
         putstr(tmpwin, 0, "Use # to toggle automatic description.");
@@ -127,9 +128,16 @@ enum gloctypes {
     GLOC_MONS = 0,
     GLOC_OBJS,
     GLOC_DOOR,
+    GLOC_EXPLORE,
 
     NUM_GLOCS
 };
+
+
+#define IS_UNEXPLORED_LOC(x,y) (isok((x), (y))                          \
+                                && glyph_is_cmap(levl[(x)][(y)].glyph)  \
+                                && glyph_to_cmap(levl[(x)][(y)].glyph) == S_stone \
+                                && !levl[(x)][(y)].seenv)
 
 STATIC_OVL boolean
 gather_locs_interesting(x,y, gloc)
@@ -151,7 +159,20 @@ int x,y, gloc;
                             && (is_cmap_door(glyph_to_cmap(glyph))
                                 || is_cmap_drawbridge(glyph_to_cmap(glyph))
                                 || glyph_to_cmap(glyph) == S_ndoor));
+    case GLOC_EXPLORE: return (glyph_is_cmap(glyph)
+                               && (is_cmap_door(glyph_to_cmap(glyph))
+                                   || is_cmap_drawbridge(glyph_to_cmap(glyph))
+                                   || glyph_to_cmap(glyph) == S_ndoor
+                                   || glyph_to_cmap(glyph) == S_room
+                                   || glyph_to_cmap(glyph) == S_darkroom
+                                   || glyph_to_cmap(glyph) == S_corr
+                                   || glyph_to_cmap(glyph) == S_litcorr)
+                               && (IS_UNEXPLORED_LOC(x+1,y)
+                                   || IS_UNEXPLORED_LOC(x-1,y)
+                                   || IS_UNEXPLORED_LOC(x,y+1)
+                                   || IS_UNEXPLORED_LOC(x,y-1)));
     }
+    return FALSE;
 }
 
 /* gather locations for monsters or objects shown on the map */
@@ -434,16 +455,18 @@ const char *goal;
             goto nxtc;
         } else if (c == 'm' || c == 'M' /* nearest or farthest monster */
                    || c == 'o' || c == 'O'  /* nearest or farthest object */
+                   || c == 'x' || c == 'X' /* unexplored area */
                    || c == 'd' || c == 'D') { /* door/doorway */
             int gloc = (c == 'o' || c == 'O') ? GLOC_OBJS
                 : (c == 'd' || c == 'D') ? GLOC_DOOR
+                : (c == 'x' || c == 'X') ? GLOC_EXPLORE
                 : GLOC_MONS;
 
             if (!garr[gloc]) {
                 gather_locs(&garr[gloc], &gcount[gloc], gloc);
                 gidx[gloc] = 0; /* garr[][0] is hero's spot */
             }
-            if (c == 'm' || c == 'o' || c == 'd') {
+            if (c == 'm' || c == 'o' || c == 'd' || c == 'x') {
                 gidx[gloc] = (gidx[gloc] + 1) % gcount[gloc];
             } else {
                 if (--gidx[gloc] < 0)
