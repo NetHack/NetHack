@@ -2388,7 +2388,7 @@ is the same as specifying 0.
 (Settings 2 and 4 are for compatibility with MSDOS or old PC Hack;
 in addition to the different behavior for `5', `Alt-5' acts as `G'
 and `Alt-0' acts as `I'.
-Setting -1 is to accommodate some German keyboards which have the
+Setting -1 is to accommodate some QWERTZ keyboards which have the
 location of the `y' and `z' keys swapped.)
 When moving by numbers, to enter a count prefix for those commands
 which accept one (such as ``12s'' to search twelve times), precede it
