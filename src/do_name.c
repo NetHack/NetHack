@@ -8,6 +8,7 @@ STATIC_DCL char *NDECL(nextmbuf);
 STATIC_DCL void FDECL(getpos_help, (BOOLEAN_P, const char *));
 STATIC_DCL int FDECL(CFDECLSPEC cmp_coord_distu, (const void *,
                                                   const void *));
+STATIC_DCL boolean FDECL(gather_locs_interesting, (int, int, int));
 STATIC_DCL void FDECL(gather_locs, (coord **, int *, int));
 STATIC_DCL void FDECL(auto_describe, (int, int));
 STATIC_DCL void NDECL(do_mname);
@@ -126,10 +127,15 @@ const void *b;
 #define GLOC_OBJS 1
 #define GLOC_DOOR 2
 
-boolean
-gather_locs_glyphmatch(glyph, gloc)
-int glyph, gloc;
+STATIC_OVL boolean
+gather_locs_interesting(x,y, gloc)
+int x,y, gloc;
 {
+    /* TODO: if glyph is a pile glyph, convert to ordinary one
+     *       in order to keep tail/boulder/rock check simple.
+     */
+    int glyph = glyph_at(x, y);
+
     switch (gloc) {
     default:
     case GLOC_MONS: return (glyph_is_monster(glyph)
@@ -151,7 +157,7 @@ coord **arr_p;
 int *cnt_p;
 int gloc;
 {
-    int x, y, pass, glyph, idx;
+    int x, y, pass, idx;
 
     /*
      * We always include the hero's location even if there is no monster
@@ -168,14 +174,10 @@ int gloc;
     for (pass = 0; pass < 2; pass++) {
         for (x = 1; x < COLNO; x++)
             for (y = 0; y < ROWNO; y++) {
-                /* TODO: if glyph is a pile glyph, convert to ordinary one
-                 *       in order to keep tail/boulder/rock check simple.
-                 */
-                glyph = glyph_at(x, y);
                 /* unlike '/M', this skips monsters revealed by
                    warning glyphs and remembered invisible ones */
                 if ((x == u.ux && y == u.uy)
-                    || gather_locs_glyphmatch(glyph, gloc)) {
+                    || gather_locs_interesting(x,y, gloc)) {
                     if (!pass) {
                         ++*cnt_p;
                     } else {
