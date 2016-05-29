@@ -2207,12 +2207,13 @@ boolean tinitial, tfrom_file;
             bad_negation(fullname, TRUE);
         return;
     }
+
 #ifdef CHANGE_COLOR
     if (match_optname(opts, "palette", 3, TRUE)
 #ifdef MAC
         || match_optname(opts, "hicolor", 3, TRUE)
 #endif
-            ) {
+        ) {
         int color_number, color_incr;
 
 #ifndef WIN32
@@ -2227,17 +2228,16 @@ boolean tinitial, tfrom_file;
             }
             color_number = CLR_MAX + 4; /* HARDCODED inverse number */
             color_incr = -1;
-        } else {
+        } else
 #endif
+        {
             if (negated) {
                 bad_negation("palette", FALSE);
                 return;
             }
             color_number = 0;
             color_incr = 1;
-#ifdef MAC
         }
-#endif
 #ifdef WIN32
         op = string_for_opt(opts, TRUE);
         if (!alternative_palette(op))
@@ -2264,8 +2264,8 @@ boolean tinitial, tfrom_file;
 #else
                         rgb <<= 8;
 #endif
-                        tmp = *(pt++);
-                        if (isalpha(tmp)) {
+                        tmp = *pt++;
+                        if (isalpha((uchar) tmp)) {
                             tmp = (tmp + 9) & 0xf; /* Assumes ASCII... */
                         } else {
                             tmp &= 0xf; /* Digits in ASCII too... */
@@ -2277,9 +2277,8 @@ boolean tinitial, tfrom_file;
                         rgb += tmp;
                     }
                 }
-                if (*pt == '/') {
+                if (*pt == '/')
                     pt++;
-                }
                 change_color(color_number, rgb, reverse);
                 color_number += color_incr;
             }
