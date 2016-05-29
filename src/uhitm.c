@@ -2695,6 +2695,7 @@ int dmg;
     pline("%s %s!", Monnam(mon),
           (dmg > mon->mhp / 2) ? "wails in agony" : "cries out in pain");
     mon->mhp -= dmg;
+    wake_nearto(mon->mx, mon->my, 30);
     if (mon->mhp <= 0) {
         if (context.mon_moving)
             monkilled(mon, (char *) 0, AD_BLND);

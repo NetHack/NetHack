@@ -2371,7 +2371,8 @@ create_particular()
     struct permonst *whichpm = NULL;
     struct monst *mtmp;
     boolean madeany = FALSE, randmonst = FALSE,
-            maketame, makepeaceful, makehostile, saddled, invisible;
+        maketame, makepeaceful, makehostile, saddled, invisible,
+        sleeping;
     int fem;
 
     tryct = 5;
@@ -2379,7 +2380,7 @@ create_particular()
         monclass = MAXMCLASSES;
         which = urole.malenum; /* an arbitrary index into mons[] */
         maketame = makepeaceful = makehostile = FALSE;
-        saddled = invisible = FALSE;
+        sleeping = saddled = invisible = FALSE;
         fem = -1; /* gender not specified */
         getlin("Create what kind of monster? [type the name or symbol]", buf);
         bufp = mungspaces(buf);
@@ -2388,6 +2389,10 @@ create_particular()
         if ((tmpp = strstri(bufp, "saddled ")) != 0) {
             saddled = TRUE;
             (void) memset(tmpp, ' ', sizeof "saddled " - 1);
+        }
+        if ((tmpp = strstri(bufp, "sleeping ")) != 0) {
+            sleeping = TRUE;
+            (void) memset(tmpp, ' ', sizeof "sleeping " - 1);
         }
         if ((tmpp = strstri(bufp, "invisible ")) != 0) {
             invisible = TRUE;
@@ -2478,6 +2483,8 @@ create_particular()
             }
             if (invisible)
                 mon_set_minvis(mtmp);
+            if (sleeping)
+                mtmp->msleeping = 1;
             madeany = TRUE;
             /* in case we got a doppelganger instead of what was asked
                for, make it start out looking like what was asked for */
