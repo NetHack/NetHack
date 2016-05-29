@@ -1,4 +1,4 @@
-/* NetHack 3.6	hack.c	$NHDT-Date: 1462663937 2016/05/07 23:32:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.165 $ */
+/* NetHack 3.6	hack.c	$NHDT-Date: 1464485934 2016/05/29 01:38:54 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.168 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -935,36 +935,38 @@ boolean guess;
                      * When guessing and trying to travel as close as possible
                      * to an unreachable target space, don't include spaces
                      * that would never be picked as a guessed target in the
-                     * travel matrix describing player-reachable spaces.
-                     * This stops travel from getting confused and moving the
-                     * player back and forth in certain degenerate configurations
-                     * of sight-blocking obstacles, e.g.
+                     * travel matrix describing hero-reachable spaces.
+                     * This stops travel from getting confused and moving
+                     * the hero back and forth in certain degenerate
+                     * configurations of sight-blocking obstacles, e.g.
                      *
-                     *    T         1. Dig this out and carry enough to not be
-                     *      ####       able to squeeze through diagonal gaps.
-                     *      #--.---    Stand at @ and target travel at space T.
-                     *       @.....
-                     *       |.....
+                     *  T         1. Dig this out and carry enough to not be
+                     *   ####       able to squeeze through diagonal gaps.
+                     *   #--.---    Stand at @ and target travel at space T.
+                     *    @.....
+                     *    |.....
                      *
-                     *    T         2. couldsee() marks spaces marked a and x as
-                     *      ####       eligible guess spaces to move the player
-                     *      a--.---    towards.  Space a is closest to T, so it gets
-                     *       @xxxxx    chosen.  Travel system moves @ right to travel
-                     *       |xxxxx    to space a.
+                     *  T         2. couldsee() marks spaces marked a and x
+                     *   ####       as eligible guess spaces to move the hero
+                     *   a--.---    towards.  Space a is closest to T, so it
+                     *    @xxxxx    gets chosen.  Travel system moves @ right
+                     *    |xxxxx    to travel to space a.
                      *
-                     *    T         3. couldsee() marks spaces marked b, c and x
-                     *      ####       as eligible guess spaces to move the player
-                     *      a--c---    towards.  Since findtravelpath() is called
-                     *       b@xxxx    repeatedly during travel, it doesn't remember
-                     *       |xxxxx    that it wanted to go to space a, so in
-                     *                 comparing spaces b and c, b is chosen, since
-                     *                 it seems like the closest eligible space to T.
-                     *                 Travel system moves @ left to go to space b.
+                     *  T         3. couldsee() marks spaces marked b, c and x
+                     *   ####       as eligible guess spaces to move the hero
+                     *   a--c---    towards.  Since findtravelpath() is called
+                     *    b@xxxx    repeatedly during travel, it doesn't
+                     *    |xxxxx    remember that it wanted to go to space a,
+                     *              so in comparing spaces b and c, b is
+                     *              chosen, since it seems like the closest
+                     *              eligible space to T. Travel system moves @
+                     *              left to go to space b.
                      *
-                     *              4. Go to 2.
+                     *            4. Go to 2.
                      *
-                     * By limiting the travel matrix here, space a in the example
-                     * above is never included in it, preventing the cycle.
+                     * By limiting the travel matrix here, space a in the
+                     * example above is never included in it, preventing
+                     * the cycle.
                      */
                     if (!isok(nx, ny) || (guess && !couldsee(nx, ny)))
                         continue;
@@ -995,8 +997,7 @@ boolean guess;
                                     nomul(0);
                                     /* reset run so domove run checks work */
                                     context.run = 8;
-                                    iflags.travelcc.x = iflags.travelcc.y =
-                                        -1;
+                                    iflags.travelcc.x = iflags.travelcc.y = -1;
                                 }
                                 return TRUE;
                             }
