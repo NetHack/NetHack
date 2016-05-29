@@ -2179,20 +2179,6 @@ struct obj *obj;
     update_inventory();
 }
 
-static struct trapinfo {
-    struct obj *tobj;
-    xchar tx, ty;
-    int time_needed;
-    boolean force_bungle;
-} trapinfo;
-
-void
-reset_trapset()
-{
-    trapinfo.tobj = 0;
-    trapinfo.force_bungle = 0;
-}
-
 /* touchstones - by Ken Arnold */
 STATIC_OVL void
 use_stone(tstone)
@@ -2320,6 +2306,20 @@ struct obj *tstone;
     else
         pline(scritch);
     return;
+}
+
+static struct trapinfo {
+    struct obj *tobj;
+    xchar tx, ty;
+    int time_needed;
+    boolean force_bungle;
+} trapinfo;
+
+void
+reset_trapset()
+{
+    trapinfo.tobj = 0;
+    trapinfo.force_bungle = 0;
 }
 
 /* Place a landmine/bear trap.  Helge Hafting */

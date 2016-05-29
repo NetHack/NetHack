@@ -75,7 +75,8 @@ STATIC_PTR int
 picklock(VOID_ARGS)
 {
     if (xlock.box) {
-        if ((xlock.box->ox != u.ux) || (xlock.box->oy != u.uy)) {
+        if (xlock.box->where != OBJ_FLOOR
+            || xlock.box->ox != u.ux || xlock.box->oy != u.uy) {
             return ((xlock.usedtime = 0)); /* you or it moved */
         }
     } else { /* door */
@@ -226,6 +227,14 @@ reset_pick()
     xlock.usedtime = xlock.chance = xlock.picktyp = 0;
     xlock.door = 0;
     xlock.box = 0;
+}
+
+/* level change; don't reset if hero is carrying xlock.box with him/her */
+void
+maybe_reset_pick()
+{
+    if (!xlock.box || !carried(xlock.box))
+        reset_pick();
 }
 
 /* for doapply(); if player gives a direction or resumes an interrupted

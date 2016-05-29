@@ -1,4 +1,4 @@
-/* NetHack 3.6	do.c	$NHDT-Date: 1454033599 2016/01/29 02:13:19 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.153 $ */
+/* NetHack 3.6	do.c	$NHDT-Date: 1464487100 2016/05/29 01:58:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.156 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1523,13 +1523,20 @@ boolean at_stairs, falling, portal;
     save_currentstate();
 #endif
 
-    if ((annotation = get_annotation(&u.uz)))
+    if ((annotation = get_annotation(&u.uz)) != 0)
         You("remember this level as %s.", annotation);
 
     /* assume this will always return TRUE when changing level */
     (void) in_out_region(u.ux, u.uy);
     (void) pickup(1);
-    context.polearm.hitmon = NULL;
+
+    /* discard context which applied to previous level */
+    maybe_reset_pick(); /* for door or for box not accompanying hero */
+    reset_trapset(); /* even if to-be-armed trap obj is accompanying hero */
+    iflags.travelcc.x = iflags.travelcc.y = -1; /* travel destination cache */
+    context.polearm.hitmon = (struct monst *) 0; /* polearm target */
+    /* digging context is level-aware and can actually be resumed if
+       hero returns to the previous level without any intervening dig */
 }
 
 STATIC_OVL void
