@@ -1241,16 +1241,18 @@ boolean your_fault;
 {
     const char *botlnam = bottlename();
     boolean isyou = (mon == &youmonst);
-    int distance;
+    int distance, tx, ty;
     struct obj *saddle = (struct obj *) 0;
     boolean hit_saddle = FALSE;
 
     if (isyou) {
+        tx = u.ux, ty = u.uy;
         distance = 0;
         pline_The("%s crashes on your %s and breaks into shards.", botlnam,
                   body_part(HEAD));
         losehp(Maybe_Half_Phys(rnd(2)), "thrown potion", KILLED_BY_AN);
     } else {
+        tx = mon->mx, ty = mon->my;
         /* sometimes it hits the saddle */
         if (((mon->misc_worn_check & W_SADDLE)
              && (saddle = which_armor(mon, W_SADDLE)))
@@ -1259,10 +1261,10 @@ boolean your_fault;
                     && ((rnl(10) > 7 && obj->cursed)
                         || (rnl(10) < 4 && obj->blessed) || !rn2(3)))))
             hit_saddle = TRUE;
-        distance = distu(mon->mx, mon->my);
-        if (!cansee(mon->mx, mon->my))
+        distance = distu(tx, ty);
+        if (!cansee(tx, ty)) {
             pline("Crash!");
-        else {
+        } else {
             char *mnam = mon_nam(mon);
             char buf[BUFSZ];
 
@@ -1285,7 +1287,7 @@ boolean your_fault;
     }
 
     /* oil doesn't instantly evaporate; Neither does a saddle hit */
-    if (obj->otyp != POT_OIL && !hit_saddle && cansee(mon->mx, mon->my))
+    if (obj->otyp != POT_OIL && !hit_saddle && cansee(tx, ty))
         pline("%s.", Tobjnam(obj, "evaporate"));
 
     if (isyou) {
@@ -1313,7 +1315,7 @@ boolean your_fault;
     } else if (hit_saddle && saddle) {
         char *mnam, buf[BUFSZ], saddle_glows[BUFSZ];
         boolean affected = FALSE;
-        boolean useeit = !Blind && canseemon(mon) && cansee(mon->mx, mon->my);
+        boolean useeit = !Blind && canseemon(mon) && cansee(tx, ty);
 
         mnam = x_monnam(mon, ARTICLE_THE, (char *) 0,
                         (SUPPRESS_IT | SUPPRESS_SADDLE), FALSE);
@@ -1331,10 +1333,8 @@ boolean your_fault;
         if (useeit && !affected)
             pline("%s %s wet.", buf, aobjnam(saddle, "get"));
     } else {
-        boolean angermon = TRUE;
+        boolean angermon = your_fault;
 
-        if (!your_fault)
-            angermon = FALSE;
         switch (obj->otyp) {
         case POT_HEALING:
         case POT_EXTRA_HEALING:
@@ -1419,7 +1419,7 @@ boolean your_fault;
                     pline("%s %s in pain!", Monnam(mon),
                           is_silent(mon->data) ? "writhes" : "shrieks");
                     if (!is_silent(mon->data))
-                        wake_nearto(mon->mx, mon->my, mon->data->mlevel * 10);
+                        wake_nearto(tx, ty, mon->data->mlevel * 10);
                     mon->mhp -= d(2, 6);
                     /* should only be by you */
                     if (mon->mhp < 1)
@@ -1451,14 +1451,14 @@ boolean your_fault;
             break;
         case POT_OIL:
             if (obj->lamplit)
-                explode_oil(obj, mon->mx, mon->my);
+                explode_oil(obj, tx, ty);
             break;
         case POT_ACID:
             if (!resists_acid(mon) && !resist(mon, POTION_CLASS, 0, NOTELL)) {
                 pline("%s %s in pain!", Monnam(mon),
                       is_silent(mon->data) ? "writhes" : "shrieks");
                 if (!is_silent(mon->data))
-                    wake_nearto(mon->mx, mon->my, mon->data->mlevel * 10);
+                    wake_nearto(tx, ty, mon->data->mlevel * 10);
                 mon->mhp -= d(obj->cursed ? 2 : 1, obj->blessed ? 4 : 8);
                 if (mon->mhp < 1) {
                     if (your_fault)
@@ -1480,27 +1480,36 @@ boolean your_fault;
             break;
         */
         }
-        if (angermon)
-            wakeup(mon);
-        else
-            mon->msleeping = 0;
+        /* target might have been killed */
+        if (mon->mhp > 0) {
+            if (angermon)
+                wakeup(mon);
+            else
+                mon->msleeping = 0;
+        }
     }
 
     /* Note: potionbreathe() does its own docall() */
-    if ((distance == 0 || ((distance < 3) && rn2(5)))
+    if ((distance == 0 || (distance < 3 && rn2(5)))
         && (!breathless(youmonst.data) || haseyes(youmonst.data)))
         potionbreathe(obj);
     else if (obj->dknown && !objects[obj->otyp].oc_name_known
-             && !objects[obj->otyp].oc_uname && cansee(mon->mx, mon->my))
+             && !objects[obj->otyp].oc_uname && cansee(tx, ty))
         docall(obj);
+
     if (*u.ushops && obj->unpaid) {
         struct monst *shkp = shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE));
 
-        if (shkp)
+        /* neither of the first two cases should be able to happen;
+           only the hero should ever have an unpaid item, and only
+           when inside a tended shop */
+        if (!shkp) /* if shkp was killed, unpaid ought to cleared already */
+            obj->unpaid = 0;
+        else if (context.mon_moving) /* obj thrown by monster */
+            subfrombill(obj, shkp);
+        else /* obj thrown by hero */
             (void) stolen_value(obj, u.ux, u.uy, (boolean) shkp->mpeaceful,
                                 FALSE);
-        else
-            obj->unpaid = 0;
     }
     obfree(obj, (struct obj *) 0);
 }
