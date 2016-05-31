@@ -379,7 +379,17 @@ char *buf, *monbuf;
     } else if (glyph_is_trap(glyph)) {
         int tnum = what_trap(glyph_to_trap(glyph));
 
-        Strcpy(buf, defsyms[trap_to_defsym(tnum)].explanation);
+        /* Trap detection displays a bear trap at locations having
+         * a trapped door or trapped container or both.
+         * TODO: we should create actual trap types for doors and
+         * chests so that they can have their own glyphs and tiles.
+         */
+        if (trapped_chest_at(tnum, x, y))
+            Strcpy(buf, "trapped chest"); /* might actually be a large box */
+        else if (trapped_door_at(tnum, x, y))
+            Strcpy(buf, "trapped door"); /* not "trap door"... */
+        else
+            Strcpy(buf, defsyms[trap_to_defsym(tnum)].explanation);
     } else if (glyph_is_warning(glyph)) {
         int warnindx = glyph_to_warning(glyph);
 

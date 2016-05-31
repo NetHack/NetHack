@@ -236,6 +236,8 @@ E void NDECL(decl_init);
 
 /* ### detect.c ### */
 
+E boolean FDECL(trapped_chest_at, (int, int, int));
+E boolean FDECL(trapped_door_at, (int, int, int));
 E struct obj *FDECL(o_in, (struct obj *, CHAR_P));
 E struct obj *FDECL(o_material, (struct obj *, unsigned));
 E int FDECL(gold_detect, (struct obj *));

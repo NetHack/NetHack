@@ -22,8 +22,44 @@ STATIC_PTR void FDECL(findone, (int, int, genericptr_t));
 STATIC_PTR void FDECL(openone, (int, int, genericptr_t));
 STATIC_DCL int FDECL(mfind0, (struct monst *, BOOLEAN_P));
 
-/* Recursively search obj for an object in class oclass and return 1st found
- */
+/* this is checking whether a trap symbol represents a trapped chest,
+   not whether a trapped chest is actually present */
+boolean
+trapped_chest_at(ttyp, x, y)
+int ttyp;
+int x, y;
+{
+    if (!glyph_is_trap(glyph_at(x, y)))
+        return FALSE;
+    if (ttyp != BEAR_TRAP || (Hallucination && rn2(20)))
+        return FALSE;
+    /* presence of any trappable container will do */
+    return (sobj_at(CHEST, x, y) || sobj_at(LARGE_BOX, x, y)) ? TRUE : FALSE;
+}
+
+/* this is checking whether a trap symbol represents a trapped door,
+   not whether the door here is actually trapped */
+boolean
+trapped_door_at(ttyp, x, y)
+int ttyp;
+int x, y;
+{
+    struct rm *lev;
+
+    if (!glyph_is_trap(glyph_at(x, y)))
+        return FALSE;
+    if (ttyp != BEAR_TRAP || (Hallucination && rn2(20)))
+        return FALSE;
+    lev = &levl[x][y];
+    if (!IS_DOOR(lev->typ))
+        return FALSE;
+    if ((lev->doormask & (D_NODOOR | D_BROKEN | D_ISOPEN)) != 0
+         && trapped_chest_at(ttyp, x, y))
+        return FALSE;
+    return TRUE;
+}
+
+/* recursively search obj for an object in class oclass, return 1st found */
 struct obj *
 o_in(obj, oclass)
 struct obj *obj;
@@ -39,7 +75,7 @@ char oclass;
         for (otmp = obj->cobj; otmp; otmp = otmp->nobj)
             if (otmp->oclass == oclass)
                 return otmp;
-            else if (Has_contents(otmp) && (temp = o_in(otmp, oclass)))
+            else if (Has_contents(otmp) && (temp = o_in(otmp, oclass)) != 0)
                 return temp;
     }
     return (struct obj *) 0;
@@ -64,7 +100,7 @@ unsigned material;
             if (objects[otmp->otyp].oc_material == material)
                 return otmp;
             else if (Has_contents(otmp)
-                     && (temp = o_material(otmp, material)))
+                     && (temp = o_material(otmp, material)) != 0)
                 return temp;
     }
     return (struct obj *) 0;
@@ -179,7 +215,7 @@ register struct obj *sobj;
         if (findgold(mtmp->minvent) || monsndx(mtmp->data) == PM_GOLD_GOLEM) {
             known = TRUE;
             goto outgoldmap; /* skip further searching */
-        } else
+        } else {
             for (obj = mtmp->minvent; obj; obj = obj->nobj)
                 if (sobj->blessed && o_material(obj, GOLD)) {
                     known = TRUE;
@@ -188,6 +224,7 @@ register struct obj *sobj;
                     known = TRUE;
                     goto outgoldmap; /* skip further searching */
                 }
+        }
     }
 
     /* look for gold objects */
@@ -208,6 +245,7 @@ register struct obj *sobj;
            adjust message if you have gold in your inventory */
         if (sobj) {
             char buf[BUFSZ];
+
             if (youmonst.data == &mons[PM_GOLD_GOLEM]) {
                 Sprintf(buf, "You feel like a million %s!", currency(2L));
             } else if (hidden_gold() || money_cnt(invent))
@@ -232,13 +270,13 @@ outgoldmap:
     u.uinwater = u.uburied = 0;
     /* Discover gold locations. */
     for (obj = fobj; obj; obj = obj->nobj) {
-        if (sobj->blessed && (temp = o_material(obj, GOLD))) {
+        if (sobj->blessed && (temp = o_material(obj, GOLD)) != 0) {
             if (temp != obj) {
                 temp->ox = obj->ox;
                 temp->oy = obj->oy;
             }
             map_object(temp, 1);
-        } else if ((temp = o_in(obj, COIN_CLASS))) {
+        } else if ((temp = o_in(obj, COIN_CLASS)) != 0) {
             if (temp != obj) {
                 temp->ox = obj->ox;
                 temp->oy = obj->oy;
@@ -251,24 +289,27 @@ outgoldmap:
             continue; /* probably overkill here */
         if (findgold(mtmp->minvent) || monsndx(mtmp->data) == PM_GOLD_GOLEM) {
             struct obj gold;
+
             gold = zeroobj; /* ensure oextra is cleared too */
             gold.otyp = GOLD_PIECE;
+            gold.quan = (long) rnd(10); /* usually more than 1 */
             gold.ox = mtmp->mx;
             gold.oy = mtmp->my;
             map_object(&gold, 1);
-        } else
+        } else {
             for (obj = mtmp->minvent; obj; obj = obj->nobj)
-                if (sobj->blessed && (temp = o_material(obj, GOLD))) {
+                if (sobj->blessed && (temp = o_material(obj, GOLD)) != 0) {
                     temp->ox = mtmp->mx;
                     temp->oy = mtmp->my;
                     map_object(temp, 1);
                     break;
-                } else if ((temp = o_in(obj, COIN_CLASS))) {
+                } else if ((temp = o_in(obj, COIN_CLASS)) != 0) {
                     temp->ox = mtmp->mx;
                     temp->oy = mtmp->my;
                     map_object(temp, 1);
                     break;
                 }
+        }
     }
     newsym(u.ux, u.uy);
     u.uinwater = iflags.save_uinwater, u.uburied = iflags.save_uburied;
@@ -505,7 +546,7 @@ int class;            /* an object class, 0 for all */
      *  Map all buried objects first.
      */
     for (obj = level.buriedobjlist; obj; obj = obj->nobj)
-        if (!class || (otmp = o_in(obj, class))) {
+        if (!class || (otmp = o_in(obj, class)) != 0) {
             if (class) {
                 if (otmp != obj) {
                     otmp->ox = obj->ox;
@@ -526,8 +567,8 @@ int class;            /* an object class, 0 for all */
     for (x = 1; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++)
             for (obj = level.objects[x][y]; obj; obj = obj->nexthere)
-                if ((!class && !boulder) || (otmp = o_in(obj, class))
-                    || (otmp = o_in(obj, boulder))) {
+                if ((!class && !boulder) || (otmp = o_in(obj, class)) != 0
+                    || (otmp = o_in(obj, boulder)) != 0) {
                     if (class || boulder) {
                         if (otmp != obj) {
                             otmp->ox = obj->ox;
@@ -544,8 +585,8 @@ int class;            /* an object class, 0 for all */
         if (DEADMONSTER(mtmp))
             continue;
         for (obj = mtmp->minvent; obj; obj = obj->nobj)
-            if ((!class && !boulder) || (otmp = o_in(obj, class))
-                || (otmp = o_in(obj, boulder))) {
+            if ((!class && !boulder) || (otmp = o_in(obj, class)) != 0
+                || (otmp = o_in(obj, boulder)) != 0) {
                 if (!class && !boulder)
                     otmp = obj;
                 otmp->ox = mtmp->mx; /* at monster location */
@@ -558,8 +599,9 @@ int class;            /* an object class, 0 for all */
             && (!class || class == objects[mtmp->mappearance].oc_class)) {
             struct obj temp;
 
-            temp.oextra = (struct oextra *) 0;
+            temp = zeroobj;
             temp.otyp = mtmp->mappearance; /* needed for obj_to_glyph() */
+            temp.quan = 1L;
             temp.ox = mtmp->mx;
             temp.oy = mtmp->my;
             temp.corpsenm = PM_TENGU; /* if mimicing a corpse */
@@ -567,8 +609,10 @@ int class;            /* an object class, 0 for all */
         } else if (findgold(mtmp->minvent)
                    && (!class || class == COIN_CLASS)) {
             struct obj gold;
+
             gold = zeroobj; /* ensure oextra is cleared too */
             gold.otyp = GOLD_PIECE;
+            gold.quan = (long) rnd(10); /* usually more than 1 */
             gold.ox = mtmp->mx;
             gold.oy = mtmp->my;
             map_object(&gold, 1);
@@ -585,7 +629,6 @@ int class;            /* an object class, 0 for all */
      * and the detected object covers a known pool?
      */
     docrt(); /* this will correctly reset vision */
-
     if (Underwater)
         under_water(2);
     if (u.uburied)
@@ -675,7 +718,7 @@ int src_cursed;
     if (Hallucination || src_cursed) {
         struct obj obj; /* fake object */
 
-        obj.oextra = (struct oextra *) 0;
+        obj = zeroobj;
         if (trap) {
             obj.ox = trap->tx;
             obj.oy = trap->ty;
@@ -683,7 +726,9 @@ int src_cursed;
             obj.ox = x;
             obj.oy = y;
         }
-        obj.otyp = (src_cursed) ? GOLD_PIECE : random_object();
+        obj.otyp = !Hallucination ? GOLD_PIECE : random_object();
+        obj.quan = (long) ((obj.otyp == GOLD_PIECE) ? rnd(10)
+                           : objects[obj.otyp].oc_merge ? rnd(2) : 1);
         obj.corpsenm = random_monster(); /* if otyp == CORPSE */
         map_object(&obj, 1);
     } else if (trap) {
@@ -691,6 +736,8 @@ int src_cursed;
         trap->tseen = 1;
     } else {
         struct trap temp_trap; /* fake trap */
+
+        (void) memset((genericptr_t) &temp_trap, 0, sizeof temp_trap);
         temp_trap.tx = x;
         temp_trap.ty = y;
         temp_trap.ttyp = BEAR_TRAP; /* some kind of trap */
@@ -735,8 +782,7 @@ int how; /* 1 for misleading map feedback */
  */
 int
 trap_detect(sobj)
-register struct obj *sobj;
-/* sobj is null if crystal ball, *scroll if gold detection scroll */
+struct obj *sobj; /* null if crystal ball, *scroll if gold detection scroll */
 {
     register struct trap *ttmp;
     struct monst *mon;
@@ -759,8 +805,7 @@ register struct obj *sobj;
         else
             found = TRUE;
     }
-    if ((tr = detect_obj_traps(level.buriedobjlist, FALSE, 0))
-        != OTRAP_NONE) {
+    if ((tr = detect_obj_traps(level.buriedobjlist, FALSE, 0)) != OTRAP_NONE) {
         if (tr & OTRAP_THERE)
             goto outtrapmap;
         else
@@ -798,6 +843,7 @@ register struct obj *sobj;
     /* traps exist, but only under me - no separate display required */
     Your("%s itch.", makeplural(body_part(TOE)));
     return 0;
+
 outtrapmap:
     cls();
 
@@ -993,10 +1039,10 @@ struct obj **optr;
     nomul(-rnd(10));
     multi_reason = "gazing into a crystal ball";
     nomovemsg = "";
-    if (obj->spe <= 0)
+    if (obj->spe <= 0) {
         pline_The("vision is unclear.");
-    else {
-        int class;
+    } else {
+        int class, i;
         int ret = 0;
 
         makeknown(CRYSTAL_BALL);
@@ -1019,11 +1065,10 @@ struct obj **optr;
             case '^':
                 ret = trap_detect((struct obj *) 0);
                 break;
-            default: {
-                int i = rn2(SIZE(level_detects));
+            default:
+                i = rn2(SIZE(level_detects));
                 You_see("%s, %s.", level_detects[i].what,
                         level_distance(level_detects[i].where));
-            }
                 ret = 0;
                 break;
             }
