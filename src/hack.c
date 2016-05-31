@@ -791,8 +791,7 @@ int mode;
     /* Pick travel path that does not require crossing a trap.
      * Avoid water and lava using the usual running rules.
      * (but not u.ux/u.uy because findtravelpath walks toward u.ux/u.uy) */
-    if (context.run == 8
-        && (mode == TEST_MOVE || mode == TEST_TRAP)
+    if (context.run == 8 && (mode != DO_MOVE)
         && (x != u.ux || y != u.uy)) {
         struct trap *t = t_at(x, y);
 
