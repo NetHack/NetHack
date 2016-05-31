@@ -1227,12 +1227,24 @@ int
 doidtrap()
 {
     register struct trap *trap;
-    int x, y, tt;
+    int x, y, tt, glyph;
 
     if (!getdir("^"))
         return 0;
     x = u.ux + u.dx;
     y = u.uy + u.dy;
+
+    /* check fake bear trap from confused gold detection */
+    glyph = glyph_at(x, y);
+    if (glyph_is_trap(glyph) && (tt = glyph_to_trap(glyph)) == BEAR_TRAP) {
+        boolean chesttrap = trapped_chest_at(tt, x, y);
+
+        if (chesttrap || trapped_door_at(tt, x, y)) {
+            pline("That is a trapped %s.", chesttrap ? "chest" : "door");
+            return 0; /* trap ID'd, but no time elapses */
+        }
+    }
+
     for (trap = ftrap; trap; trap = trap->ntrap)
         if (trap->tx == x && trap->ty == y) {
             if (!trap->tseen)
