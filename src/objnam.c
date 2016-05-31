@@ -2488,7 +2488,8 @@ char oclass;
         long prob = rn2(maxprob);
 
         i = 0;
-        while (i < n - 1 && (prob -= (objects[validobjs[i]].oc_prob + 1)) > 0)
+        while (i < n - 1
+               && (prob -= (objects[validobjs[i]].oc_prob + 1)) >= 0)
             i++;
         return validobjs[i];
     }
