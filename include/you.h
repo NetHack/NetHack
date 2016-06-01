@@ -27,9 +27,9 @@ struct RoleAdvance {
 };
 
 struct u_have {
-    Bitfield(amulet, 1);   /* carrying Amulet	*/
-    Bitfield(bell, 1);     /* carrying Bell	*/
-    Bitfield(book, 1);     /* carrying Book	*/
+    Bitfield(amulet, 1);   /* carrying Amulet   */
+    Bitfield(bell, 1);     /* carrying Bell     */
+    Bitfield(book, 1);     /* carrying Book     */
     Bitfield(menorah, 1);  /* carrying Candelabrum */
     Bitfield(questart, 1); /* carrying the Quest Artifact */
     Bitfield(unused, 3);
@@ -124,16 +124,16 @@ struct Role {
     short questarti; /* index (ART_) of quest artifact (questpgr.c) */
 
     /*** Bitmasks ***/
-    short allow;             /* bit mask of allowed variations */
-#define ROLE_RACEMASK 0x0ff8 /* allowable races */
-#define ROLE_GENDMASK 0xf000 /* allowable genders */
-#define ROLE_MALE 0x1000
-#define ROLE_FEMALE 0x2000
-#define ROLE_NEUTER 0x4000
-#define ROLE_ALIGNMASK AM_MASK /* allowable alignments */
-#define ROLE_LAWFUL AM_LAWFUL
-#define ROLE_NEUTRAL AM_NEUTRAL
-#define ROLE_CHAOTIC AM_CHAOTIC
+    short allow;                  /* bit mask of allowed variations */
+#define ROLE_RACEMASK  0x0ff8     /* allowable races */
+#define ROLE_GENDMASK  0xf000     /* allowable genders */
+#define ROLE_MALE      0x1000
+#define ROLE_FEMALE    0x2000
+#define ROLE_NEUTER    0x4000
+#define ROLE_ALIGNMASK AM_MASK    /* allowable alignments */
+#define ROLE_LAWFUL    AM_LAWFUL
+#define ROLE_NEUTRAL   AM_NEUTRAL
+#define ROLE_CHAOTIC   AM_CHAOTIC
 
     /*** Attributes (from attrib.c and exper.c) ***/
     xchar attrbase[A_MAX];    /* lowest initial attributes */
@@ -202,9 +202,9 @@ struct Race {
     xchar attrmax[A_MAX];     /* maximum allowable attribute */
     struct RoleAdvance hpadv; /* hit point advancement */
     struct RoleAdvance enadv; /* energy advancement */
-#if 0                         /* DEFERRED */
-	int   nv_range;		/* night vision range */
-	int   xray_range;	/* X-ray vision range */
+#if 0 /* DEFERRED */
+    int   nv_range;           /* night vision range */
+    int   xray_range;         /* X-ray vision range */
 #endif
 
     /*** Properties in variable-length arrays ***/
@@ -231,14 +231,14 @@ struct Gender {
     const char *filecode; /* file code */
     short allow;          /* equivalent ROLE_ mask */
 };
-#define ROLE_GENDERS 2 /* number of permitted player genders */
-/* increment to 3 if you allow neuter roles */
+#define ROLE_GENDERS 2    /* number of permitted player genders
+                             increment to 3 if you allow neuter roles */
 
 extern const struct Gender genders[]; /* table of available genders */
-#define uhe() (genders[flags.female ? 1 : 0].he)
-#define uhim() (genders[flags.female ? 1 : 0].him)
-#define uhis() (genders[flags.female ? 1 : 0].his)
-#define mhe(mtmp) (genders[pronoun_gender(mtmp)].he)
+#define uhe()      (genders[flags.female ? 1 : 0].he)
+#define uhim()     (genders[flags.female ? 1 : 0].him)
+#define uhis()     (genders[flags.female ? 1 : 0].his)
+#define mhe(mtmp)  (genders[pronoun_gender(mtmp)].he)
 #define mhim(mtmp) (genders[pronoun_gender(mtmp)].him)
 #define mhis(mtmp) (genders[pronoun_gender(mtmp)].his)
 
@@ -250,32 +250,32 @@ struct Align {
     short allow;          /* equivalent ROLE_ mask */
     aligntyp value;       /* equivalent A_ value */
 };
-#define ROLE_ALIGNS 3 /* number of permitted player alignments */
+#define ROLE_ALIGNS 3     /* number of permitted player alignments */
 
 extern const struct Align aligns[]; /* table of available alignments */
 
 /*** Information about the player ***/
 struct you {
-    xchar ux, uy;
-    schar dx, dy, dz;  /* direction of move (or zap or ... ) */
-    schar di;          /* direction of FF */
-    xchar tx, ty;      /* destination of travel */
-    xchar ux0, uy0;    /* initial position FF */
-    d_level uz, uz0;   /* your level on this and the previous turn */
-    d_level utolev;    /* level monster teleported you to, or uz */
-    uchar utotype;     /* bitmask of goto_level() flags for utolev */
-    boolean umoved;    /* changed map location (post-move) */
-    int last_str_turn; /* 0: none, 1: half turn, 2: full turn */
-                       /* +: turn right, -: turn left */
-    int ulevel;        /* 1 to MAXULEV */
+    xchar ux, uy;       /* current map coordinates */
+    schar dx, dy, dz;   /* direction of move (or zap or ... ) */
+    schar di;           /* direction of FF */
+    xchar tx, ty;       /* destination of travel */
+    xchar ux0, uy0;     /* initial position FF */
+    d_level uz, uz0;    /* your level on this and the previous turn */
+    d_level utolev;     /* level monster teleported you to, or uz */
+    uchar utotype;      /* bitmask of goto_level() flags for utolev */
+    boolean umoved;     /* changed map location (post-move) */
+    int last_str_turn;  /* 0: none, 1: half turn, 2: full turn
+                           +: turn right, -: turn left */
+    int ulevel;         /* 1 to MAXULEV */
     int ulevelmax;
     unsigned utrap;     /* trap timeout */
     unsigned utraptype; /* defined if utrap nonzero */
-#define TT_BEARTRAP 0
-#define TT_PIT 1
-#define TT_WEB 2
-#define TT_LAVA 3
-#define TT_INFLOOR 4
+#define TT_BEARTRAP   0
+#define TT_PIT        1
+#define TT_WEB        2
+#define TT_LAVA       3
+#define TT_INFLOOR    4
 #define TT_BURIEDBALL 5
     char urooms[5];         /* rooms (roomno + 3) occupied now */
     char urooms0[5];        /* ditto, for previous position */
@@ -310,16 +310,16 @@ struct you {
     int bc_order;     /* ball & chain order [see bc_order() in ball.c] */
     int bc_felt;      /* mask for ball/chain being felt */
 
-    int umonster; /* hero's "real" monster num */
-    int umonnum;  /* current monster number */
+    int umonster;               /* hero's "real" monster num */
+    int umonnum;                /* current monster number */
 
-    int mh, mhmax, mtimedone; /* for polymorph-self */
-    struct attribs macurr,    /* for monster attribs */
-        mamax;                /* for monster attribs */
-    int ulycn;                /* lycanthrope type */
+    int mh, mhmax, mtimedone;   /* for polymorph-self */
+    struct attribs macurr,      /* for monster attribs */
+                   mamax;       /* for monster attribs */
+    int ulycn;                  /* lycanthrope type */
 
     unsigned ucreamed;
-    unsigned uswldtim; /* time you have been swallowed */
+    unsigned uswldtim;          /* time you have been swallowed */
 
     Bitfield(uswallow, 1);      /* true if swallowed */
     Bitfield(uinwater, 1);      /* if you're currently in water (only
@@ -328,60 +328,62 @@ struct you {
     Bitfield(mfemale, 1);       /* saved human value of flags.female */
     Bitfield(uinvulnerable, 1); /* you're invulnerable (praying) */
     Bitfield(uburied, 1);       /* you're buried */
-    Bitfield(uedibility, 1); /* blessed food detection; sense unsafe food */
+    Bitfield(uedibility, 1);    /* blessed food detect; sense unsafe food */
     /* 1 free bit! */
 
-    unsigned udg_cnt;          /* how long you have been demigod */
-    struct u_achieve uachieve; /* achievements */
-    struct u_event uevent;     /* certain events have happened */
-    struct u_have uhave;       /* you're carrying special objects */
-    struct u_conduct uconduct; /* KMH, conduct */
+    unsigned udg_cnt;           /* how long you have been demigod */
+    struct u_achieve uachieve;  /* achievements */
+    struct u_event uevent;      /* certain events have happened */
+    struct u_have uhave;        /* you're carrying special objects */
+    struct u_conduct uconduct;  /* KMH, conduct */
     struct u_roleplay uroleplay;
-    struct attribs acurr, /* your current attributes (eg. str)*/
-        aexe,             /* for gain/loss via "exercise" */
-        abon,             /* your bonus attributes (eg. str) */
-        amax,             /* your max attributes (eg. str) */
-        atemp,            /* used for temporary loss/gain */
-        atime;            /* used for loss/gain countdown */
-    align ualign;         /* character alignment */
-#define CONVERT 2
+    struct attribs acurr,       /* your current attributes (eg. str)*/
+                    aexe,       /* for gain/loss via "exercise" */
+                    abon,       /* your bonus attributes (eg. str) */
+                    amax,       /* your max attributes (eg. str) */
+                   atemp,       /* used for temporary loss/gain */
+                   atime;       /* used for loss/gain countdown */
+    align ualign;               /* character alignment */
+#define CONVERT    2
 #define A_ORIGINAL 1
-#define A_CURRENT 0
+#define A_CURRENT  0
     aligntyp ualignbase[CONVERT]; /* for ualign conversion record */
     schar uluck, moreluck;        /* luck and luck bonus */
 #define Luck (u.uluck + u.moreluck)
-#define LUCKADD 3 /* added value when carrying luck stone */
-#define LUCKMAX 10
-#define LUCKMIN (-10)
+#define LUCKADD    3  /* value of u.moreluck when carrying luck stone;
+                         + when blessed or uncursed, - when cursed */
+#define LUCKMAX   10  /* maximum value of u.ulUck */
+#define LUCKMIN (-10) /* minimum value of u.uluck */
     schar uhitinc;
     schar udaminc;
     schar uac;
-    uchar uspellprot; /* protection by SPE_PROTECTION */
-    uchar usptime;    /* #moves until uspellprot-- */
-    uchar uspmtime;   /* #moves between uspellprot-- */
-    int uhp, uhpmax;
-    int uen, uenmax; /* magical energy - M. Stephenson */
-    xchar uhpinc[MAXULEV], ueninc[MAXULEV]; /* increases from level gain */
-    int ugangr;                             /* if the gods are angry at you */
-    int ugifts;                             /* number of artifacts bestowed */
-    int ublessed, ublesscnt;                /* blessing/duration from #pray */
+    uchar uspellprot;        /* protection by SPE_PROTECTION */
+    uchar usptime;           /* #moves until uspellprot-- */
+    uchar uspmtime;          /* #moves between uspellprot-- */
+    int uhp, uhpmax;         /* hit points, aka health */
+    int uen, uenmax;         /* magical energy - M. Stephenson */
+    xchar uhpinc[MAXULEV],   /* increases to uhpmax for each level gain */
+          ueninc[MAXULEV];   /* increases to uenmax for each level gain */
+    int ugangr;              /* if the gods are angry at you */
+    int ugifts;              /* number of artifacts bestowed */
+    int ublessed, ublesscnt; /* blessing/duration from #pray */
     long umoney0;
     long uspare1;
     long uexp, urexp;
-    long ucleansed; /* to record moves when player was cleansed */
-    long usleep;    /* sleeping; monstermove you last started */
+    long ucleansed;          /* to record moves when player was cleansed */
+    long usleep;             /* sleeping; monstermove you last started */
     int uinvault;
-    struct monst *ustuck;
-    struct monst *usteed;
-    long ugallop;
-    int urideturns;
-    int umortality;      /* how many times you died */
+    struct monst *ustuck;    /* engulfer or grabber, maybe grabbee if Upolyd */
+    struct monst *usteed;    /* mount when riding */
+    long ugallop;            /* turns steed will run after being kicked */
+    int urideturns;          /* time spent riding, for skill advancement */
+    int umortality;          /* how many times you died */
     int ugrave_arise;    /* you die and become something aside from a ghost */
-    int weapon_slots;    /* unused skill slots */
-    int skills_advanced; /* # of advances made so far */
+    int weapon_slots;        /* unused skill slots */
+    int skills_advanced;     /* # of advances made so far */
     xchar skill_record[P_SKILL_LIMIT]; /* skill advancements */
     struct skills weapon_skills[P_NUM_SKILLS];
-    boolean twoweap; /* KMH -- Using two-weapon combat */
+    boolean twoweap;         /* KMH -- Using two-weapon combat */
 
 }; /* end of `struct you' */
 

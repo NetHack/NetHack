@@ -347,6 +347,7 @@ struct instance_flags {
     /* copies of values in struct u, used during detection when the
        originals are temporarily cleared; kept here rather than
        locally so that they can be restored during a hangup save */
+    Bitfield(save_uswallow, 1);
     Bitfield(save_uinwater, 1);
     Bitfield(save_uburied, 1);
 };
