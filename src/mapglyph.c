@@ -54,6 +54,9 @@ static int explcolors[] = {
     (currentgraphics == ROGUESET && SYMHANDLING(H_IBM))
 #endif
 
+#define is_objpile(x,y) (!Hallucination && level.objects[(x)][(y)] \
+                         && level.objects[(x)][(y)]->nexthere)
+
 /*ARGSUSED*/
 int
 mapglyph(glyph, ochar, ocolor, ospecial, x, y)
@@ -83,7 +86,7 @@ unsigned *ospecial;
         else
             obj_color(STATUE);
         special |= MG_STATUE;
-        if (level.objects[x][y] && level.objects[x][y]->nexthere)
+        if (is_objpile(x,y))
             special |= MG_OBJPILE;
     } else if ((offset = (glyph - GLYPH_WARNING_OFF)) >= 0) { /* warn flash */
         idx = offset + SYM_OFF_W;
@@ -156,8 +159,7 @@ unsigned *ospecial;
             }
         } else
             obj_color(offset);
-        if (offset != BOULDER && level.objects[x][y]
-            && level.objects[x][y]->nexthere)
+        if (offset != BOULDER && is_objpile(x,y))
             special |= MG_OBJPILE;
     } else if ((offset = (glyph - GLYPH_RIDDEN_OFF)) >= 0) { /* mon ridden */
         idx = mons[offset].mlet + SYM_OFF_M;
@@ -176,7 +178,7 @@ unsigned *ospecial;
         else
             mon_color(offset);
         special |= MG_CORPSE;
-        if (level.objects[x][y] && level.objects[x][y]->nexthere)
+        if (is_objpile(x,y))
             special |= MG_OBJPILE;
     } else if ((offset = (glyph - GLYPH_DETECT_OFF)) >= 0) { /* mon detect */
         idx = mons[offset].mlet + SYM_OFF_M;
