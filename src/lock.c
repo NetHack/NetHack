@@ -618,6 +618,9 @@ int x, y;
             There("is no obvious way to open the drawbridge.");
         else if (portcullis || door->typ == DRAWBRIDGE_DOWN)
             pline_The("drawbridge is already open.");
+        else if (container_at(cc.x, cc.y, TRUE))
+            pline("%s like something lootable over there.",
+                  Blind ? "Feels" : "Seems");
         else
             You("%s no door there.", Blind ? "feel" : "see");
         return res;

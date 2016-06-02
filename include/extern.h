@@ -1769,6 +1769,7 @@ E int FDECL(query_objlist, (const char *, struct obj **, int,
                             menu_item **, int, boolean (*)(OBJ_P)));
 E struct obj *FDECL(pick_obj, (struct obj *));
 E int NDECL(encumber_msg);
+E int FDECL(container_at, (int, int, BOOLEAN_P));
 E int NDECL(doloot);
 E boolean FDECL(container_gone, (int (*)(OBJ_P)));
 E boolean NDECL(u_handsy);

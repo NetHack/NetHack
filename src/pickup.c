@@ -39,7 +39,6 @@ STATIC_DCL int FDECL(traditional_loot, (BOOLEAN_P));
 STATIC_DCL int FDECL(menu_loot, (int, BOOLEAN_P));
 STATIC_DCL char FDECL(in_or_out_menu, (const char *, struct obj *, BOOLEAN_P,
                                        BOOLEAN_P, BOOLEAN_P, BOOLEAN_P));
-STATIC_DCL int FDECL(container_at, (int, int, BOOLEAN_P));
 STATIC_DCL boolean FDECL(able_to_loot, (int, int, BOOLEAN_P));
 STATIC_DCL boolean NDECL(reverse_loot);
 STATIC_DCL boolean FDECL(mon_beside, (int, int));
@@ -1513,7 +1512,7 @@ encumber_msg()
 }
 
 /* Is there a container at x,y. Optional: return count of containers at x,y */
-STATIC_OVL int
+int
 container_at(x, y, countem)
 int x, y;
 boolean countem;
