@@ -248,7 +248,7 @@ E int FDECL(trap_detect, (struct obj *));
 E const char *FDECL(level_distance, (d_level *));
 E void FDECL(use_crystal_ball, (struct obj **));
 E void NDECL(do_mapping);
-E void NDECL(do_vicinity_map);
+E void FDECL(do_vicinity_map, (struct obj *));
 E void FDECL(cvt_sdoor_to_door, (struct rm *));
 #ifdef USE_TRAMPOLI
 E void FDECL(findone, (int, int, genericptr_t));

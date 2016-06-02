@@ -74,11 +74,13 @@ char *outbuf;
             mons[u.umonnum].mname, plname);
     if (u.usteed)
         Sprintf(eos(outbuf), ", mounted on %s", y_monnam(u.usteed));
+    if (u.uundetected || (Upolyd && youmonst.m_ap_type))
+        mhidden_description(&youmonst, FALSE, eos(outbuf));
     return outbuf;
 }
 
 /* describe a hidden monster; used for look_at during extended monster
-   detection and for probing */
+   detection and for probing; also when looking at self */
 void
 mhidden_description(mon, altmon, outbuf)
 struct monst *mon;
@@ -86,8 +88,10 @@ boolean altmon; /* for probing: if mimicking a monster, say so */
 char *outbuf;
 {
     struct obj *otmp;
-    boolean fakeobj;
-    int x = mon->mx, y = mon->my, glyph = levl[x][y].glyph;
+    boolean fakeobj, isyou = (mon == &youmonst);
+    int x = isyou ? u.ux : mon->mx, y = isyou ? u.uy : mon->my,
+        glyph = (level.flags.hero_memory && !isyou) ? levl[x][y].glyph
+                                                    : glyph_at(x, y);
 
     *outbuf = '\0';
     if (mon->m_ap_type == M_AP_FURNITURE
@@ -113,7 +117,7 @@ char *outbuf;
         if (altmon)
             Sprintf(outbuf, ", masquerading as %s",
                     an(mons[mon->mappearance].mname));
-    } else if (mon->mundetected) {
+    } else if (isyou ? u.uundetected : mon->mundetected) {
         Strcpy(outbuf, ", hiding");
         if (hides_under(mon->data)) {
             Strcat(outbuf, " under ");
@@ -141,10 +145,16 @@ struct obj **obj_p;
 {
     boolean fakeobj = FALSE;
     struct monst *mtmp;
-    struct obj *otmp = vobj_at(x, y);
+    struct obj *otmp;
     int glyphotyp = glyph_to_obj(glyph);
 
     *obj_p = (struct obj *) 0;
+    /* TODO: check inside containers in case glyph came from detection */
+    if ((otmp = sobj_at(glyphotyp, x, y)) == 0)
+        for (otmp = level.buriedobjlist; otmp; otmp = otmp->nobj)
+            if (otmp->ox == x && otmp->oy == y && otmp->otyp == glyphotyp)
+                break;
+
     /* there might be a mimic here posing as an object */
     mtmp = m_at(x, y);
     if (mtmp && is_obj_mappear(mtmp, (unsigned) glyphotyp))
@@ -194,7 +204,9 @@ int x, y, glyph;
     } else
         Strcpy(buf, something); /* sanity precaution */
 
-    if (levl[x][y].typ == STONE || levl[x][y].typ == SCORR)
+    if (otmp && otmp->where == OBJ_BURIED)
+        Strcat(buf, " (buried)");
+    else if (levl[x][y].typ == STONE || levl[x][y].typ == SCORR)
         Strcat(buf, " embedded in stone");
     else if (IS_WALL(levl[x][y].typ) || levl[x][y].typ == SDOOR)
         Strcat(buf, " embedded in a wall");
@@ -229,9 +241,14 @@ int x, y;
                     ? "peaceful "
                     : "",
             name);
-    if (u.ustuck == mtmp)
-        Strcat(buf, (Upolyd && sticks(youmonst.data))
-                     ? ", being held" : ", holding you");
+    if (u.ustuck == mtmp) {
+        if (u.uswallow || iflags.save_uswallow) /* monster detection */
+            Strcat(buf, is_animal(mtmp->data)
+                          ? ", swallowing you" : ", engulfing you");
+        else
+            Strcat(buf, (Upolyd && sticks(youmonst.data))
+                          ? ", being held" : ", holding you");
+    }
     if (mtmp->mleashed)
         Strcat(buf, ", leashed to you");
 
@@ -328,6 +345,7 @@ char *buf, *monbuf;
     buf[0] = monbuf[0] = '\0';
     glyph = glyph_at(x, y);
     if (u.ux == x && u.uy == y && canspotself()
+        && !(iflags.save_uswallow && glyph == mon_to_glyph(u.ustuck))
         && (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0)) {
         /* fill in buf[] */
         (void) self_lookat(buf);
@@ -342,7 +360,8 @@ char *buf, *monbuf;
            (even if you could also see yourself via other means).
            Sensing self while blind or swallowed is treated as if it
            were by normal vision (cf canseeself()). */
-        if ((Invisible || u.uundetected) && !Blind && !u.uswallow) {
+        if ((Invisible || u.uundetected) && !Blind
+            && !(u.uswallow || iflags.save_uswallow)) {
             unsigned how = 0;
 
             if (Infravision)
@@ -702,10 +721,15 @@ const char **firstmatch;
      * submerged will always both be False and skip this code.)
      */
     x_str = 0;
-    if (looked && (u.uswallow || submerged) && distu(cc.x, cc.y) > 2) {
+    if (!looked) {
+        ; /* skip special handling */
+    } else if (((u.uswallow || submerged) && distu(cc.x, cc.y) > 2)
+               /* detection showing some category, so mostly background */
+               || ((iflags.terrainmode & (TER_DETECT | TER_MAP)) == TER_DETECT
+                   && glyph == cmap_to_glyph(S_stone))) {
         x_str = unreconnoitered;
         need_to_look = FALSE;
-    } else if (looked && u.uswallow && is_swallow_sym(sym)) {
+    } else if (is_swallow_sym(sym)) {
         x_str = mon_interior;
         need_to_look = TRUE; /* for specific monster type */
     }
@@ -943,9 +967,7 @@ coord *click_cc;
         if (quick) {
             from_screen = TRUE; /* yes, we want to use the cursor */
             i = 'y';
-        }
-
-        if (i != 'y') {
+        } else {
             menu_item *pick_list = (menu_item *) 0;
             winid win;
             anything any;

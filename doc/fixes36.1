@@ -280,6 +280,8 @@ thrown potion that killed peaceful monster would cause "the <mon> gets argry"
 	after the message about it being killed
 when poly'd into a hider and engulfed, attempt to hide via #monster was blocked
 	but feedback said "can't hide while held" rather than "while engulfed"
+various monster/object/food/gold/trap detections were inconsistent in how they
+	behaved if performed while engulfed or underwater
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository
@@ -395,9 +397,12 @@ during end of game disclosure, the vanquished monsters list can be sorted in
 	one of several ways by answering 'a' to "disclose vanquished monsters?"
 when #terrain is displaying a censored version of the map (no monsters, &c),
 	moving the cursor will display farlook's brief autodescribe feedback
+when monster/object/trap detection temporarily clears the map to highlight the
+	results of such detection, farlook autodescibe can be used to view it
 interrupt a multi turn action if hp or pw is restored to maximum
 pressing d or D when cursor positioning targets doors and doorways
 pressing x or X when cursor positioning targets possibly unexplored location
+	(potentially useful when using '_' [not mouse] to invoke travel)
 
 
 Platform- and/or Interface-Specific New Features
@@ -420,10 +425,10 @@ X11: status display split into three columns to accomodate Stone/Deaf/Lev/&c;
 NetHack Community Patches (or Variation) Included
 -------------------------------------------------
 Malcolm Ryan's improved tin opener
-Ray Chason's keyboard may stop responding after locking or unlocking a door when
-	using altkeyhandler=nhraykey.dll 
-Ray Chason's fix: window interfaces that support transparency may give away unseen
-	parts of the map
+Ray Chason's keyboard may stop responding after locking or unlocking a door
+	when using altkeyhandler=nhraykey.dll
+Ray Chason's fix: window interfaces that support transparency may give away
+	unseen parts of the map
 Ray Chason's xprname should honor iflags.menu_tab_sep
 Ray Chason's punctuation for "That foo is really a mimic."
 Ray Chason's proper background tiles for lava and water

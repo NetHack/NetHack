@@ -1136,6 +1136,7 @@ boolean atme;
     case SPE_INVISIBILITY:
         (void) peffects(pseudo);
         break;
+    /* end of potion-like spells */
 
     case SPE_CURE_BLINDNESS:
         healup(0, 0, FALSE, TRUE);
@@ -1151,10 +1152,12 @@ boolean atme;
         (void) make_familiar((struct obj *) 0, u.ux, u.uy, FALSE);
         break;
     case SPE_CLAIRVOYANCE:
-        if (!BClairvoyant)
-            do_vicinity_map();
+        if (!BClairvoyant) {
+            if (role_skill >= P_SKILLED)
+                pseudo->blessed = 1; /* detect monsters as well as map */
+            do_vicinity_map(pseudo);
         /* at present, only one thing blocks clairvoyance */
-        else if (uarmh && uarmh->otyp == CORNUTHAUM)
+        } else if (uarmh && uarmh->otyp == CORNUTHAUM)
             You("sense a pointy hat on top of your %s.", body_part(HEAD));
         break;
     case SPE_PROTECTION:
