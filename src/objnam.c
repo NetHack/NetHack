@@ -908,7 +908,8 @@ boolean with_price;
             break;
         }
         if (obj->otyp == LEASH && obj->leashmon != 0) {
-            Strcat(bp, " (in use)");
+            Sprintf(eos(bp), " (attached to %s)",
+                    a_monnam(find_mid(obj->leashmon, FM_FMON)));
             break;
         }
         if (obj->otyp == CANDELABRUM_OF_INVOCATION) {
