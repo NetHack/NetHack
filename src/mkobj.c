@@ -872,9 +872,6 @@ boolean artif;
             case BAG_OF_HOLDING:
                 mkbox_cnts(otmp);
                 break;
-            case LEASH:
-                otmp->leashmon = 0;
-                break;
             case EXPENSIVE_CAMERA:
             case TINNING_KIT:
             case MAGIC_MARKER:
@@ -1033,6 +1030,9 @@ boolean artif;
     case EGG:
         /* case TIN: */
         set_corpsenm(otmp, otmp->corpsenm);
+        break;
+    case LEASH:
+        otmp->leashmon = 0;
         break;
     case SPE_NOVEL:
         otmp->novelidx = -1; /* "none of the above"; will be changed */
