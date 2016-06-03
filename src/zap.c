@@ -3869,6 +3869,15 @@ const char *fltxt;
         xkilled(mon, XKILL_NOMSG | XKILL_NOCORPSE);
 }
 
+void
+buzz(type,nd,sx,sy,dx,dy)
+int type, nd;
+xchar sx,sy;
+int dx,dy;
+{
+    dobuzz(type, nd, sx, sy, dx, dy, TRUE);
+}
+
 /*
  * type ==   0 to   9 : you shooting a wand
  * type ==  10 to  19 : you casting a spell
@@ -3879,10 +3888,11 @@ const char *fltxt;
  * called with dx = dy = 0 with vertical bolts
  */
 void
-buzz(type, nd, sx, sy, dx, dy)
+dobuzz(type, nd, sx, sy, dx, dy,say)
 register int type, nd;
 register xchar sx, sy;
 register int dx, dy;
+boolean say; /* Announce out of sight hit/miss events if true */
 {
     int range, abstype = abs(type) % 10;
     register xchar lsx, lsy;
@@ -4009,7 +4019,8 @@ register int dx, dy;
                     } else {
                         if (!otmp) {
                             /* normal non-fatal hit */
-                            hit(fltxt, mon, exclam(tmp));
+                            if (say || canseemon(mon))
+                                hit(fltxt, mon, exclam(tmp));
                         } else {
                             /* some armor was destroyed; no damage done */
                             if (canseemon(mon))
@@ -4024,7 +4035,8 @@ register int dx, dy;
                 }
                 range -= 2;
             } else {
-                miss(fltxt, mon);
+                if (say || canseemon(mon))
+                    miss(fltxt, mon);
             }
         } else if (sx == u.ux && sy == u.uy && range >= 0) {
             nomul(0);
