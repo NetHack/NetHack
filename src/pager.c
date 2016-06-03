@@ -179,6 +179,11 @@ struct obj **obj_p;
        (corpse type will be known even if dknown is 0, so we don't need a
        touch check for cockatrice corpse--we're looking without touching) */
     if (otmp && distu(x, y) <= 2 && !Blind && !Hallucination
+        /* redundant: we only look for an object which matches current
+           glyph among floor and buried objects; when !Blind, any buried
+           object's glyph will have been replaced by whatever is present
+           on the surface as soon as we moved next to its spot */
+        && otmp->where == OBJ_FLOOR /* not buried */
         /* terrain mode views what's already known, doesn't learn new stuff */
         && !iflags.terrainmode) /* so don't set dknown when in terrain mode */
         otmp->dknown = 1; /* if a pile, clearly see the top item only */
