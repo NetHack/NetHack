@@ -3385,12 +3385,12 @@ boolean initial;
             ++updated;
             /* phone_layout has been toggled */
             for (i = 0; i < 3; i++) {
-                c = '1' + i;                           /* 1,2,3 <-> 7,8,9 */
+                c = '1' + i;             /* 1,2,3 <-> 7,8,9 */
                 cmdtmp = Cmd.commands[c];              /* tmp = [1] */
                 Cmd.commands[c] = Cmd.commands[c + 6]; /* [1] = [7] */
                 Cmd.commands[c + 6] = cmdtmp;          /* [7] = tmp */
-                c = (M('1') & 0xff) + i;  /* M-1,M-2,M-3 <-> M-7,M-8,M-9 */
-                cmdtmp = Cmd.commands[c]; /* tmp = [M-1] */
+                c = (M('1') & 0xff) + i; /* M-1,M-2,M-3 <-> M-7,M-8,M-9 */
+                cmdtmp = Cmd.commands[c];              /* tmp = [M-1] */
                 Cmd.commands[c] = Cmd.commands[c + 6]; /* [M-1] = [M-7] */
                 Cmd.commands[c + 6] = cmdtmp;          /* [M-7] = tmp */
             }
