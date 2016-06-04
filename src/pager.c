@@ -1060,6 +1060,7 @@ coord *click_cc;
         case '?':
             from_screen = FALSE;
             getlin("Specify what? (type the word)", out_str);
+            mungspaces(out_str);
             if (out_str[0] == '\0' || out_str[0] == '\033')
                 return 0;
 
