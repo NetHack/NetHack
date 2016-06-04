@@ -1060,9 +1060,10 @@ coord *click_cc;
         case '?':
             from_screen = FALSE;
             getlin("Specify what? (type the word)", out_str);
-            /* mungspaces prevents querying for a space glyph (eg. a ghost),
-               but players almost always use '/' instead to look up glyphs */
-            mungspaces(out_str);
+            if (strcmp(out_str, " ")) /* keep single space as-is */
+                /* remove leading and trailing whitespace and
+                   condense consecutive internal whitespace */
+                mungspaces(out_str);
             if (out_str[0] == '\0' || out_str[0] == '\033')
                 return 0;
 
