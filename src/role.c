@@ -1,4 +1,4 @@
-/* NetHack 3.6	role.c	$NHDT-Date: 1456907852 2016/03/02 08:37:32 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.37 $ */
+/* NetHack 3.6	role.c	$NHDT-Date: 1463561393 2016/05/18 08:49:53 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.38 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1148,9 +1148,9 @@ int rolenum, racenum, gendnum, alignnum;
     }
 }
 
-/* pick a random race subject to any rolenum/gendnum/alignnum constraints */
-/* If pickhow == PICK_RIGID a race is returned only if there is  */
-/* a single possibility */
+/* Pick a random race subject to any rolenum/gendnum/alignnum constraints.
+   If pickhow == PICK_RIGID a race is returned only if there is
+   a single possibility. */
 int
 pick_race(rolenum, gendnum, alignnum, pickhow)
 int rolenum, gendnum, alignnum, pickhow;
@@ -1284,11 +1284,10 @@ int alignnum;
     }
 }
 
-/* pick a random alignment subject to any rolenum/racenum/gendnum constraints
- */
-/* alignment and gender are not comparable (and also not constrainable) */
-/* If pickhow == PICK_RIGID an alignment is returned only if there is  */
-/* a single possibility */
+/* Pick a random alignment subject to any rolenum/racenum/gendnum constraints;
+   alignment and gender are not comparable (and also not constrainable).
+   If pickhow == PICK_RIGID an alignment is returned only if there is
+   a single possibility. */
 int
 pick_align(rolenum, racenum, gendnum, pickhow)
 int rolenum, racenum, gendnum, pickhow;
@@ -1317,6 +1316,8 @@ int rolenum, racenum, gendnum, pickhow;
 void
 rigid_role_checks()
 {
+    int tmp;
+
     /* Some roles are limited to a single race, alignment, or gender and
      * calling this routine prior to XXX_player_selection() will help
      * prevent an extraneous prompt that actually doesn't allow
@@ -1327,14 +1328,27 @@ rigid_role_checks()
      */
     if (flags.initrole == ROLE_RANDOM) {
         /* If the role was explicitly specified as ROLE_RANDOM
-         * via -uXXXX-@ then choose the role in here to narrow down
-         * later choices. Pick a random role in this case.
+         * via -uXXXX-@ or OPTIONS=role:random then choose the role
+         * in here to narrow down later choices.
          */
         flags.initrole = pick_role(flags.initrace, flags.initgend,
                                    flags.initalign, PICK_RANDOM);
         if (flags.initrole < 0)
             flags.initrole = randrole_filtered();
     }
+    if (flags.initrace == ROLE_RANDOM
+        && (tmp = pick_race(flags.initrole, flags.initgend,
+                            flags.initalign, PICK_RANDOM)) != ROLE_NONE)
+        flags.initrace = tmp;
+    if (flags.initalign == ROLE_RANDOM
+        && (tmp = pick_align(flags.initrole, flags.initrace,
+                             flags.initgend, PICK_RANDOM)) != ROLE_NONE)
+        flags.initalign = tmp;
+    if (flags.initgend == ROLE_RANDOM
+        && (tmp = pick_gend(flags.initrole, flags.initrace,
+                            flags.initalign, PICK_RANDOM)) != ROLE_NONE)
+        flags.initgend = tmp;
+
     if (flags.initrole != ROLE_NONE) {
         if (flags.initrace == ROLE_NONE)
             flags.initrace = pick_race(flags.initrole, flags.initgend,
@@ -1639,7 +1653,20 @@ int buflen, rolenum, racenum, gendnum, alignnum;
      * Now append the post attributes to it
      */
     num_post_attribs = post_attribs;
-    if (post_attribs) {
+    if (!num_post_attribs) {
+        /* some constraints might have been mutually exclusive, in which case
+           some prompting that would have been omitted is needed after all */
+        if (flags.initrole == ROLE_NONE && !pa[BP_ROLE])
+            pa[BP_ROLE] = ++post_attribs;
+        if (flags.initrace == ROLE_NONE && !pa[BP_RACE])
+            pa[BP_RACE] = ++post_attribs;
+        if (flags.initalign == ROLE_NONE && !pa[BP_ALIGN])
+            pa[BP_ALIGN] = ++post_attribs;
+        if (flags.initgend == ROLE_NONE && !pa[BP_GEND])
+            pa[BP_GEND] = ++post_attribs;
+        num_post_attribs = post_attribs;
+    }
+    if (num_post_attribs) {
         if (pa[BP_RACE]) {
             (void) promptsep(eos(buf), num_post_attribs);
             Strcat(buf, "race");

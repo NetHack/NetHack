@@ -813,8 +813,8 @@ int retry;
         bypass_objlist(invent, FALSE);
     } else {
         /* should coordinate with perm invent, maybe not show worn items */
-        n = query_objlist("What would you like to drop?", invent,
-                          USE_INVLET | INVORDER_SORT, &pick_list, PICK_ANY,
+        n = query_objlist("What would you like to drop?", &invent,
+                          (USE_INVLET | INVORDER_SORT), &pick_list, PICK_ANY,
                           all_categories ? allow_all : allow_category);
         if (n > 0) {
             /*
@@ -1317,7 +1317,7 @@ boolean at_stairs, falling, portal;
             if (flags.verbose || great_effort)
                 pline("%s %s up%s the %s.",
                       great_effort ? "With great effort, you" : "You",
-                      Flying ? "fly" : "climb",
+                      Levitation ? "float" : Flying ? "fly" : "climb",
                       (Flying && at_ladder) ? " along" : "",
                       at_ladder ? "ladder" : "stairs");
         } else { /* down */

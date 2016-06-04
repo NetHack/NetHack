@@ -1,5 +1,5 @@
-/* NetHack 3.6	mplayer.c	$NHDT-Date: 1432512774 2015/05/25 00:12:54 $  $NHDT-Branch: master $:$NHDT-Revision: 1.19 $ */
-/*	Copyright (c) Izchak Miller, 1992.			  */
+/* NetHack 3.6	mplayer.c	$NHDT-Date: 1458949461 2016/03/25 23:44:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.21 $ */
+/*      Copyright (c) Izchak Miller, 1992.                        */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -134,23 +134,13 @@ register boolean special;
         special = FALSE;
 
     if ((mtmp = makemon(ptr, x, y, NO_MM_FLAGS)) != 0) {
-        short weapon = rn2(2) ? LONG_SWORD : rnd_class(SPEAR, BULLWHIP);
-        short armor =
-            rnd_class(GRAY_DRAGON_SCALE_MAIL, YELLOW_DRAGON_SCALE_MAIL);
-        short cloak = !rn2(8)
-                          ? STRANGE_OBJECT
-                          : rnd_class(OILSKIN_CLOAK, CLOAK_OF_DISPLACEMENT);
-        short helm = !rn2(8) ? STRANGE_OBJECT : rnd_class(ELVEN_LEATHER_HELM,
-                                                          HELM_OF_TELEPATHY);
-        short shield = !rn2(8)
-                           ? STRANGE_OBJECT
-                           : rnd_class(ELVEN_SHIELD, SHIELD_OF_REFLECTION);
+        short weapon, armor, cloak, helm, shield;
         int quan;
         struct obj *otmp;
 
         mtmp->m_lev = (special ? rn1(16, 15) : rnd(16));
-        mtmp->mhp = mtmp->mhpmax =
-            d((int) mtmp->m_lev, 10) + (special ? (30 + rnd(30)) : 30);
+        mtmp->mhp = mtmp->mhpmax = d((int) mtmp->m_lev, 10)
+                                   + (special ? (30 + rnd(30)) : 30);
         if (special) {
             get_mplname(mtmp, nam);
             mtmp = christen_monst(mtmp, nam);
@@ -159,6 +149,16 @@ register boolean special;
         }
         mtmp->mpeaceful = 0;
         set_malign(mtmp); /* peaceful may have changed again */
+
+        /* default equipment; much of it will be overridden below */
+        weapon = !rn2(2) ? LONG_SWORD : rnd_class(SPEAR, BULLWHIP);
+        armor  = rnd_class(GRAY_DRAGON_SCALE_MAIL, YELLOW_DRAGON_SCALE_MAIL);
+        cloak  = !rn2(8) ? STRANGE_OBJECT
+                         : rnd_class(OILSKIN_CLOAK, CLOAK_OF_DISPLACEMENT);
+        helm   = !rn2(8) ? STRANGE_OBJECT
+                         : rnd_class(ELVEN_LEATHER_HELM, HELM_OF_TELEPATHY);
+        shield = !rn2(8) ? STRANGE_OBJECT
+                         : rnd_class(ELVEN_SHIELD, SHIELD_OF_REFLECTION);
 
         switch (monsndx(ptr)) {
         case PM_ARCHEOLOGIST:
@@ -285,18 +285,18 @@ register boolean special;
             mk_mplayer_armor(mtmp, helm);
             mk_mplayer_armor(mtmp, shield);
             if (rn2(8))
-                mk_mplayer_armor(
-                    mtmp, rnd_class(LEATHER_GLOVES, GAUNTLETS_OF_DEXTERITY));
+                mk_mplayer_armor(mtmp, rnd_class(LEATHER_GLOVES,
+                                                 GAUNTLETS_OF_DEXTERITY));
             if (rn2(8))
-                mk_mplayer_armor(mtmp,
-                                 rnd_class(LOW_BOOTS, LEVITATION_BOOTS));
+                mk_mplayer_armor(mtmp, rnd_class(LOW_BOOTS,
+                                                 LEVITATION_BOOTS));
             m_dowear(mtmp, TRUE);
 
             quan = rn2(3) ? rn2(3) : rn2(16);
             while (quan--)
                 (void) mongets(mtmp, rnd_class(DILITHIUM_CRYSTAL, JADE));
-            /* To get the gold "right" would mean a player can double his */
-            /* gold supply by killing one mplayer.  Not good. */
+            /* To get the gold "right" would mean a player can double his
+               gold supply by killing one mplayer.  Not good. */
             mkmonmoney(mtmp, rn2(1000));
             quan = rn2(10);
             while (quan--)
@@ -331,12 +331,13 @@ boolean special;
     int pm, x, y;
     struct monst fakemon;
 
+    fakemon = zeromonst;
     while (num) {
         int tryct = 0;
 
         /* roll for character class */
         pm = PM_ARCHEOLOGIST + rn2(PM_WIZARD - PM_ARCHEOLOGIST + 1);
-        fakemon.data = &mons[pm];
+        set_mon_data(&fakemon, &mons[pm], -1);
 
         /* roll for an available location */
         do {
@@ -357,15 +358,17 @@ void
 mplayer_talk(mtmp)
 register struct monst *mtmp;
 {
-    static const char *same_class_msg[3] =
-        {
-          "I can't win, and neither will you!", "You don't deserve to win!",
-          "Mine should be the honor, not yours!",
+    static const char
+        *same_class_msg[3] = {
+            "I can't win, and neither will you!",
+            "You don't deserve to win!",
+            "Mine should be the honor, not yours!",
         },
-                      *other_class_msg[3] = {
-                          "The low-life wants to talk, eh?", "Fight, scum!",
-                          "Here is what I have to say!",
-                      };
+        *other_class_msg[3] = {
+            "The low-life wants to talk, eh?",
+            "Fight, scum!",
+            "Here is what I have to say!",
+        };
 
     if (mtmp->mpeaceful)
         return; /* will drop to humanoid talk */

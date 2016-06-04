@@ -128,7 +128,9 @@ unsigned entflags;
         /* default to player's original monster type */
         mdat = &mons[u.umonster];
     }
-    fakemon.data = mdat; /* set up for goodpos */
+    fakemon = zeromonst;
+    set_mon_data(&fakemon, mdat, -1); /* set up for goodpos */
+
     good_ptr = good;
     range = 1;
     /*

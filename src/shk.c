@@ -1,4 +1,4 @@
-/* NetHack 3.6	shk.c	$NHDT-Date: 1455403704 2016/02/13 22:48:24 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.124 $ */
+/* NetHack 3.6	shk.c	$NHDT-Date: 1464138042 2016/05/25 01:00:42 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.132 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -38,7 +38,8 @@ STATIC_DCL struct monst *FDECL(next_shkp, (struct monst *, BOOLEAN_P));
 STATIC_DCL long FDECL(shop_debt, (struct eshk *));
 STATIC_DCL char *FDECL(shk_owns, (char *, struct obj *));
 STATIC_DCL char *FDECL(mon_owns, (char *, struct obj *));
-STATIC_DCL void FDECL(clear_unpaid, (struct obj *));
+STATIC_DCL void FDECL(clear_unpaid_obj, (struct monst *, struct obj *));
+STATIC_DCL void FDECL(clear_unpaid, (struct monst *, struct obj *));
 STATIC_DCL long FDECL(check_credit, (long, struct monst *));
 STATIC_DCL void FDECL(pay, (long, struct monst *));
 STATIC_DCL long FDECL(get_cost, (struct obj *, struct monst *));
@@ -80,7 +81,7 @@ STATIC_DCL const char *FDECL(cad, (BOOLEAN_P));
                     obj->quan <= bp->bquan
  */
 
-static const char *angrytexts[] = {"quite upset", "ticked off", "furious"};
+static const char *angrytexts[] = { "quite upset", "ticked off", "furious" };
 
 /*
  *  Transfer money from inventory to monster when paying
@@ -260,15 +261,26 @@ boolean ghostly;
     }
 }
 
+/* Clear the unpaid bit on a single object and its contents. */
+STATIC_OVL void
+clear_unpaid_obj(shkp, otmp)
+struct monst *shkp;
+struct obj *otmp;
+{
+    if (Has_contents(otmp))
+        clear_unpaid(shkp, otmp->cobj);
+    if (onbill(otmp, shkp, TRUE))
+        otmp->unpaid = 0;
+}
+
 /* Clear the unpaid bit on all of the objects in the list. */
 STATIC_OVL void
-clear_unpaid(list)
-register struct obj *list;
+clear_unpaid(shkp, list)
+struct monst *shkp;
+struct obj *list;
 {
     while (list) {
-        if (Has_contents(list))
-            clear_unpaid(list->cobj);
-        list->unpaid = 0;
+        clear_unpaid_obj(shkp, list);
         list = list->nobj;
     }
 }
@@ -281,20 +293,17 @@ register struct monst *shkp;
     register struct obj *obj;
     register struct monst *mtmp;
 
-    /* FIXME: object handling should be limited to
-       items which are on this particular shk's bill */
-
-    clear_unpaid(invent);
-    clear_unpaid(fobj);
-    clear_unpaid(level.buriedobjlist);
+    clear_unpaid(shkp, invent);
+    clear_unpaid(shkp, fobj);
+    clear_unpaid(shkp, level.buriedobjlist);
     if (thrownobj)
-        thrownobj->unpaid = 0;
+        clear_unpaid_obj(shkp, thrownobj);
     if (kickedobj)
-        kickedobj->unpaid = 0;
+        clear_unpaid_obj(shkp, kickedobj);
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-        clear_unpaid(mtmp->minvent);
+        clear_unpaid(shkp, mtmp->minvent);
     for (mtmp = migrating_mons; mtmp; mtmp = mtmp->nmon)
-        clear_unpaid(mtmp->minvent);
+        clear_unpaid(shkp, mtmp->minvent);
 
     while ((obj = billobjs) != 0) {
         obj_extract_self(obj);
@@ -575,7 +584,8 @@ char *enterstring;
         if (!Deaf && !muteshk(shkp))
             verbalize("Invisible customers are not welcome!");
         else
-            pline("%s stands firm as if he knows you are there.", Shknam(shkp));
+            pline("%s stands firm as if %s knows you are there.",
+                  Shknam(shkp), mhe(shkp));
         return;
     }
 
@@ -587,13 +597,14 @@ char *enterstring;
                   s_suffix(shkname(shkp)), shtypes[rt - SHOPBASE].name);
         else
             pline("%s seems %s over your return to %s %s!",
-                Shknam(shkp),
-                angrytexts[rn2(SIZE(angrytexts))],
-                mhis(shkp),
-                shtypes[rt - SHOPBASE].name);
+                  Shknam(shkp),
+                  angrytexts[rn2(SIZE(angrytexts))],
+                  mhis(shkp),
+                  shtypes[rt - SHOPBASE].name);
     } else if (eshkp->robbed) {
         if (!Deaf)
-            pline("%s mutters imprecations against shoplifters.", shkname(shkp));
+            pline("%s mutters imprecations against shoplifters.",
+                  shkname(shkp));
         else
             pline("%s is combing through %s inventory list.",
                   Shknam(shkp),
@@ -601,8 +612,8 @@ char *enterstring;
     } else {
         if (!Deaf && !muteshk(shkp))
             verbalize("%s, %s!  Welcome%s to %s %s!", Hello(shkp), plname,
-                      eshkp->visitct++ ? " again" : "", s_suffix(shkname(shkp)),
-                      shtypes[rt - SHOPBASE].name);
+                      eshkp->visitct++ ? " again" : "",
+                      s_suffix(shkname(shkp)), shtypes[rt - SHOPBASE].name);
         else
             You("enter %s %s%s!",
                 s_suffix(shkname(shkp)),
@@ -691,10 +702,10 @@ struct obj *obj;
                       cad(FALSE));
             else
                 pline("%s %s your pick!",
-                       Shknam(shkp),
-                       haseyes(shkp->data) ? "glares at"
-                                           : "is dismayed because of");                      
-	}
+                      Shknam(shkp),
+                      haseyes(shkp->data) ? "glares at"
+                                          : "is dismayed because of");
+        }
         pickmovetime = moves;
     }
 }
@@ -801,11 +812,11 @@ register struct monst *mtmp;
 
 struct monst *
 shop_keeper(rmno)
-register char rmno;
+char rmno;
 {
-    struct monst *shkp =
-        rmno >= ROOMOFFSET ? rooms[rmno - ROOMOFFSET].resident : 0;
+    struct monst *shkp;
 
+    shkp = (rmno >= ROOMOFFSET) ? rooms[rmno - ROOMOFFSET].resident : 0;
     if (shkp) {
         if (has_eshk(shkp)) {
             if (NOTANGRY(shkp)) {
@@ -817,16 +828,18 @@ register char rmno;
             }
         } else {
             /* would have segfaulted on ESHK dereference previously */
-            impossible(
-             "shopkeeper career change? (rmno=%d, ROOMOFFSET=%d, mnum=%d, %s)",
-                (int)rmno, ROOMOFFSET, shkp->mnum,
-                has_mname(shkp) ? MNAME(shkp) : "anonymous"
-            );
-
+            impossible("%s? (rmno=%d, rtype=%d, mnum=%d, \"%s\")",
+                       shkp->isshk ? "shopkeeper career change"
+                                   : "shop resident not shopkeeper",
+                       (int) rmno,
+                       (int) rooms[rmno - ROOMOFFSET].rtype,
+                       shkp->mnum,
+                       /* [real shopkeeper name is kept in ESHK, not MNAME] */
+                       has_mname(shkp) ? MNAME(shkp) : "anonymous");
             /* not sure if this is appropriate, because it does nothing to
                correct the underlying rooms[].resident issue but... */
-            return (struct monst *)0;
-	}
+            return (struct monst *) 0;
+        }
     }
     return shkp;
 }
@@ -858,7 +871,7 @@ boolean silent;
             } else
                 bp++;
     }
-    if (obj->unpaid & !silent)
+    if (obj->unpaid && !silent)
         pline("onbill: unpaid obj not on bill?");
     return (struct bill_x *) 0;
 }
@@ -1599,13 +1612,13 @@ boolean itemize;
                       ANGRY(shkp) ? "Pay" : "Please pay",
                       simpleonames(obj), /* short name suffices */
                       save_quan > 1L ? "these" : "this one");
-	    } else {
-	        pline("%s %s%s your bill for the other %s first.",
-	              Shknam(shkp),
+            } else {
+                pline("%s %s%s your bill for the other %s first.",
+                      Shknam(shkp),
                       ANGRY(shkp) ? "angrily " : "",
-	              nolimbs(shkp->data) ? "motions to" : "points out",
-	              simpleonames(obj));
-	    }
+                      nolimbs(shkp->data) ? "motions to" : "points out",
+                      simpleonames(obj));
+            }
             buy = PAY_SKIP; /* shk won't sell */
         }
     }
@@ -2189,12 +2202,12 @@ boolean quietly;
                     pline("%s seems %s that you want to sell that.",
                           Shknam(shkp),
                           (obj->spe < 7) ? "horrified" : "concerned");
-		} else {
+                } else {
                     verbalize("No thanks, I'd hang onto that if I were you.");
                     if (obj->spe < 7)
                         verbalize(
-                                 "You'll need %d%s candle%s to go along with it.",
-                                  (7 - obj->spe), (obj->spe > 0) ? " more" : "",
+                             "You'll need %d%s candle%s to go along with it.",
+                                (7 - obj->spe), (obj->spe > 0) ? " more" : "",
                                   plur(7 - obj->spe));
                     /* [what if hero is already carrying enough candles?
                        should Izchak explain how to attach them instead?] */
@@ -2546,9 +2559,10 @@ boolean ininv, dummy, silent;
             }
             obj->quan = 1L; /* fool xname() into giving singular */
             pline("%s %ld %s %s %s%s.\"", buf, ltmp, currency(ltmp),
-                  (save_quan > 1L) ? "per" : (contentscount && !obj->unpaid)
-                                                 ? "for the contents of this"
-                                                 : "for this",
+                  (save_quan > 1L) ? "per"
+                                   : (contentscount && !obj->unpaid)
+                                       ? "for the contents of this"
+                                       : "for this",
                   xname(obj),
                   (contentscount && obj->unpaid) ? and_its_contents : "");
             obj->quan = save_quan;
@@ -2879,12 +2893,13 @@ xchar x, y;
     offer = ltmp + cltmp;
 
     /* get one case out of the way: nothing to sell, and no gold */
-    if (!isgold && ((offer + gltmp) == 0L || sell_how == SELL_DONTSELL)) {
+    if (!(isgold || cgold)
+        && ((offer + gltmp) == 0L || sell_how == SELL_DONTSELL)) {
         boolean unpaid = is_unpaid(obj);
 
         if (container) {
             dropped_container(obj, shkp, FALSE);
-            if (!obj->unpaid && !saleitem)
+            if (!obj->unpaid)
                 obj->no_charge = 1;
             if (unpaid)
                 subfrombill(obj, shkp);
@@ -2955,11 +2970,11 @@ xchar x, y;
                       currency(eshkp->credit));
         }
 
-        if (!offer) {
+        if (!offer || sell_how == SELL_DONTSELL) {
             if (!isgold) {
                 if (container)
                     dropped_container(obj, shkp, FALSE);
-                if (!obj->unpaid && !saleitem)
+                if (!obj->unpaid)
                     obj->no_charge = 1;
                 subfrombill(obj, shkp);
             }
@@ -3934,7 +3949,7 @@ boolean cant_mollify;
                 if (!Deaf && !muteshk(shkp)) {
                     You_hear("an angry voice:");
                     verbalize("Out of my way, scum!");
-		}
+                }
                 wait_synch();
 #if defined(UNIX) || defined(VMS)
 #if defined(SYSV) || defined(ULTRIX) || defined(VMS)
@@ -3959,26 +3974,21 @@ boolean cant_mollify;
         } else if (pursue || uinshp || !um_dist(x, y, 1)) {
             if (!Deaf)
                 verbalize("How dare you %s my %s?", dmgstr,
-                      dugwall ? "shop" : "door");
+                          dugwall ? "shop" : "door");
             else
                 pline("%s is %s that you decided to %s %s %s!",
-                        Shknam(shkp),
-                        angrytexts[rn2(SIZE(angrytexts))],
-                        dmgstr, mhis(shkp),
-                        dugwall ? "shop" : "door");
+                      Shknam(shkp), angrytexts[rn2(SIZE(angrytexts))],
+                      dmgstr, mhis(shkp), dugwall ? "shop" : "door");
         } else {
             if (!Deaf) {
                 pline("%s shouts:", shkname(shkp));
                 verbalize("Who dared %s my %s?", dmgstr,
                           dugwall ? "shop" : "door");
-	    } else {
+            } else {
                 pline("%s is %s that someone decided to %s %s %s!",
-                        Shknam(shkp),
-                        angrytexts[rn2(SIZE(angrytexts))],
-                        dmgstr,
-                        mhis(shkp),
-                        dugwall ? "shop" : "door");                
-	    }
+                      Shknam(shkp), angrytexts[rn2(SIZE(angrytexts))],
+                      dmgstr, mhis(shkp), dugwall ? "shop" : "door");
+            }
         }
         hot_pursuit(shkp);
         return;
@@ -4116,6 +4126,7 @@ long cost;
 {
     if (!rn2(3)) {
         register int o, choice = rn2(5);
+
         if (choice == 0)
             choice = (cost < 100L ? 1 : cost < 500L ? 2 : 3);
         switch (choice) {
@@ -4200,7 +4211,6 @@ struct monst *shkp;
             else
                 pline("%s taps you on the %s.",
                       Shknam(shkp), body_part(ARM));
-                      
         }
     } else if (eshk->billct) {
         register long total = addupbill(shkp) + eshk->debit;
@@ -4218,10 +4228,10 @@ struct monst *shkp;
         pline("%s encourages you to use your %ld %s of credit.",
               shkname(shkp), eshk->credit, currency(eshk->credit));
     } else if (eshk->robbed) {
-        pline("%s %s about a recent robbery.", 
-                Shknam(shkp),
-                (!Deaf && !muteshk(shkp)) ? "complains" : "indicates concern");
-    } else if ((shkmoney = money_cnt(shkp->minvent)) < 50) {
+        pline("%s %s about a recent robbery.",
+              Shknam(shkp),
+              (!Deaf && !muteshk(shkp)) ? "complains" : "indicates concern");
+    } else if ((shkmoney = money_cnt(shkp->minvent)) < 50L) {
         pline("%s %s that business is bad.",
               shkname(shkp),
               (!Deaf && !muteshk(shkp)) ? "complains" : "indicates");

@@ -1,4 +1,4 @@
-/* NetHack 3.6	sit.c	$NHDT-Date: 1445906863 2015/10/27 00:47:43 $  $NHDT-Branch: master $:$NHDT-Revision: 1.51 $ */
+/* NetHack 3.6	sit.c	$NHDT-Date: 1458341129 2016/03/18 22:45:29 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.53 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -184,6 +184,7 @@ dosit()
                 if (u.uhp >= (u.uhpmax - 5))
                     u.uhpmax += 4;
                 u.uhp = u.uhpmax;
+                u.ucreamed = 0;
                 make_blinded(0L, TRUE);
                 make_sick(0L, (char *) 0, FALSE, SICK_ALL);
                 heal_legs();
@@ -225,6 +226,7 @@ dosit()
                  "A curse upon thee for sitting upon this most holy throne!");
                 if (Luck > 0) {
                     make_blinded(Blinded + rn1(100, 250), TRUE);
+                    change_luck((Luck > 1) ? -rnd(2) : -1);
                 } else
                     rndcurse();
                 break;

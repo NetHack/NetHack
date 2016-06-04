@@ -72,6 +72,7 @@ STATIC_DCL void FDECL(create_door, (room_door *, struct mkroom *));
 STATIC_DCL void FDECL(create_trap, (trap *, struct mkroom *));
 STATIC_DCL int FDECL(noncoalignment, (ALIGNTYP_P));
 STATIC_DCL boolean FDECL(m_bad_boulder_spot, (int, int));
+STATIC_DCL int FDECL(pm_to_humidity, (struct permonst *));
 STATIC_DCL void FDECL(create_monster, (monster *, struct mkroom *));
 STATIC_DCL void FDECL(create_object, (object *, struct mkroom *));
 STATIC_DCL void FDECL(create_altar, (altar *, struct mkroom *));
@@ -611,8 +612,8 @@ schar filling;
             if (level.flags.corrmaze)
                 levl[x][y].typ = STONE;
             else
-                levl[x][y].typ =
-                    (y < 2 || ((x % 2) && (y % 2))) ? STONE : filling;
+                levl[x][y].typ = (y < 2 || ((x % 2) && (y % 2))) ? STONE
+                                                                 : filling;
         }
 }
 
@@ -895,6 +896,8 @@ register int humidity;
             || typ == CORR)
             return TRUE;
     }
+    if ((humidity & SPACELOC) && SPACE_POS(levl[x][y].typ))
+        return TRUE;
     if ((humidity & WET) && is_pool(x, y))
         return TRUE;
     if ((humidity & HOT) && is_lava(x, y))
@@ -1495,6 +1498,24 @@ int x, y;
     return FALSE;
 }
 
+STATIC_OVL int
+pm_to_humidity(pm)
+struct permonst *pm;
+{
+    int loc = DRY;
+    if (!pm)
+        return loc;
+    if (pm->mlet == S_EEL || amphibious(pm) || is_swimmer(pm))
+        loc = WET;
+    if (is_flyer(pm) || is_floater(pm))
+        loc |= (HOT | WET);
+    if (passes_walls(pm) || noncorporeal(pm))
+        loc |= SOLID;
+    if (flaming(pm))
+        loc |= HOT;
+    return loc;
+}
+
 STATIC_OVL void
 create_monster(m, croom)
 monster *m;
@@ -1543,15 +1564,7 @@ struct mkroom *croom;
         pm = (struct permonst *) 0;
 
     if (pm) {
-        int loc = DRY;
-        if (pm->mlet == S_EEL || amphibious(pm) || is_swimmer(pm))
-            loc = WET;
-        if (is_flyer(pm) || is_floater(pm))
-            loc |= (HOT | WET);
-        if (passes_walls(pm) || noncorporeal(pm))
-            loc |= SOLID;
-        if (flaming(pm))
-            loc |= HOT;
+        int loc = pm_to_humidity(pm);
         /* If water-liking monster, first try is without DRY */
         get_location_coord(&x, &y, loc | NO_LOC_WARN, croom, m->coord);
         if (x == -1 && y == -1) {
@@ -4089,8 +4102,8 @@ struct opvar *ov;
         my = ((y1 + y2) / 2);
     } else {
         do {
-            dx = (Rand() % rough) - (rough / 2);
-            dy = (Rand() % rough) - (rough / 2);
+            dx = rn2(rough) - (rough / 2);
+            dy = rn2(rough) - (rough / 2);
             mx = ((x1 + x2) / 2) + dx;
             my = ((y1 + y2) / 2) + dy;
         } while ((mx > COLNO - 1 || mx < 0 || my < 0 || my > ROWNO - 1));
@@ -4747,7 +4760,8 @@ struct sp_coder *coder;
         dy1 = (xchar) SP_REGION_Y1(OV_i(r));
         dx2 = (xchar) SP_REGION_X2(OV_i(r));
         dy2 = (xchar) SP_REGION_Y2(OV_i(r));
-        wallify_map(dx1 < 0 ? (xstart-1) : dx1, dy1 < 0 ? (ystart-1) : dy1,
+        wallify_map(dx1 < 0 ? (xstart - 1) : dx1,
+                    dy1 < 0 ? (ystart - 1) : dy1,
                     dx2 < 0 ? (xstart + xsize + 1) : dx2,
                     dy2 < 0 ? (ystart + ysize + 1) : dy2);
         break;
@@ -4846,7 +4860,7 @@ struct sp_coder *coder;
         ystart = valign;
         break;
     }
-    if ((ystart < 0) || (ystart + ysize > ROWNO)) {
+    if (ystart < 0 || ystart + ysize > ROWNO) {
         /* try to move the start a bit */
         ystart += (ystart > 0) ? -2 : 2;
         if (ysize == ROWNO)
@@ -4860,13 +4874,13 @@ struct sp_coder *coder;
         xsize = COLNO - 1;
         ysize = ROWNO;
     } else {
-        xchar x, y;
+        xchar x, y, mptyp;
+
         /* Load the map */
         for (y = ystart; y < ystart + ysize; y++)
             for (x = xstart; x < xstart + xsize; x++) {
-                xchar mptyp =
-                    (mpmap->vardata.str[(y - ystart) * xsize + (x - xstart)]
-                     - 1);
+                mptyp = (mpmap->vardata.str[(y - ystart) * xsize
+                                                  + (x - xstart)] - 1);
                 if (mptyp >= MAX_TYPE)
                     continue;
                 levl[x][y].typ = mptyp;
@@ -5907,7 +5921,8 @@ const char *name;
         (void) dlb_fclose(fd);
         goto give_up;
     }
-    lvl = (sp_lev *) alloc(sizeof(sp_lev));
+
+    lvl = (sp_lev *) alloc(sizeof (sp_lev));
     result = sp_level_loader(fd, lvl);
     (void) dlb_fclose(fd);
     if (result)

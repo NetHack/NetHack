@@ -1,4 +1,4 @@
-/* NetHack 3.6	files.c	$NHDT-Date: 1455835581 2016/02/18 22:46:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.204 $ */
+/* NetHack 3.6	files.c	$NHDT-Date: 1459987580 2016/04/07 00:06:20 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.205 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2820,14 +2820,13 @@ int which_set;
     mungspaces(buf);
     if (!*buf || *buf == '#' || !strcmp(buf, " "))
         return 1;
-    /* remove trailing comment, if any */
-    if ((commentp = rindex(buf, '#')) != 0) {
-        *commentp = '\0';
-        /* remove space preceding the stripped comment, if any;
-           we know 'commentp > buf' because *buf=='#' was caught above */
-        if (commentp[-1] == ' ')
-            *--commentp = '\0';
-    }
+    /* remove trailing comment, if any (this isn't strictly needed for
+       individual symbols, and it won't matter if "X#comment" without
+       separating space slips through; for handling or set description,
+       symbol set creator is responsible for preceding '#' with a space
+       and that comment itself doesn't contain " #") */
+    if ((commentp = rindex(buf, '#')) != 0 && commentp[-1] == ' ')
+        commentp[-1] = '\0';
 
     /* find the '=' or ':' */
     bufp = index(buf, '=');

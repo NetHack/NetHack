@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.6  Makefile.src	$NHDT-Date: 1447313972 2015/11/12 07:39:32 $  $NHDT-Branch: master $:$NHDT-Revision: 1.45 $
+# NetHack 3.6  Makefile.src	$NHDT-Date: 1459122529 2016/03/27 23:48:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.46 $
 
 # Root of source tree:
 NHSROOT=..
@@ -167,6 +167,11 @@ CXX=g++
 #CXX=arm-linux-g++
 #LINK=arm-linux-gcc
 
+# we specify C preprocessor flags via CFLAGS; files built with default rules
+# might include $(CPPFLAGS) which could get a value from user's environment;
+# we avoid that by forcing it empty rather than by overriding default rules
+CPPFLAGS =
+
 # file for regular expression matching
 REGEXOBJ = posixregex.o
 #REGEXOBJ = pmatchregex.o
@@ -333,11 +338,11 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   mkmaze.c mkobj.c mkroom.c mon.c mondata.c monmove.c monst.c \
 	   mplayer.c mthrowu.c muse.c music.c o_init.c objects.c objnam.c \
 	   options.c pager.c pickup.c pline.c polyself.c potion.c pray.c \
-	   priest.c quest.c questpgr.c read.c rect.c region.c restore.c rip.c \
-	   rnd.c role.c rumors.c save.c shk.c shknam.c sit.c sounds.c sp_lev.c \
-	   spell.c steal.c steed.c sys.c teleport.c timeout.c topten.c track.c \
-	   trap.c \
-	   u_init.c uhitm.c vault.c version.c vision.c weapon.c were.c wield.c \
+	   priest.c quest.c questpgr.c read.c rect.c region.c restore.c \
+	   rip.c rnd.c role.c rumors.c save.c shk.c shknam.c sit.c sounds.c \
+	   sp_lev.c spell.c steal.c steed.c sys.c teleport.c timeout.c \
+	   topten.c track.c trap.c u_init.c \
+	   uhitm.c vault.c version.c vision.c weapon.c were.c wield.c \
 	   windows.c wizard.c worm.c worn.c write.c zap.c
 
 # all operating-system-dependent .c (for dependencies and such)
@@ -347,6 +352,7 @@ SYSCSRC = ../sys/atari/tos.c ../sys/share/pcmain.c ../sys/share/pcsys.c \
 	../sys/share/random.c \
 	../sys/share/ioctl.c ../sys/share/unixtty.c ../sys/unix/unixmain.c \
 	../sys/unix/unixunix.c ../sys/unix/unixres.c ../sys/be/bemain.c
+SYSCXXSRC = ../sys/share/cppregex.cpp
 
 # generated source files (tile.c is handled separately via WINxxxSRC)
 GENCSRC = monstr.c vis_tab.c	#tile.c
@@ -357,9 +363,9 @@ WINCSRC = $(WINTTYSRC) $(WINX11SRC) $(WINGNOMESRC) $(WINGEMSRC)
 WINCXXSRC = $(WINQTSRC) $(WINBESRC)
 
 # Files for window system chaining.  Requires SYSCF; include via HINTSRC/HINTOBJ
-CHAINSRC=../win/chain/wc_chainin.c ../win/chain/wc_chainout.c \
-	../win/chain/wc_trace.c
-CHAINOBJ=wc_chainin.o wc_chainout.o wc_trace.o
+CHAINSRC = ../win/chain/wc_chainin.c ../win/chain/wc_chainout.c \
+	   ../win/chain/wc_trace.c
+CHAINOBJ = wc_chainin.o wc_chainout.o wc_trace.o
 
 # .c files for this version (for date.h)
 VERSOURCES = $(HACKCSRC) $(SYSSRC) $(WINSRC) $(CHAINSRC) $(GENCSRC)
@@ -378,9 +384,9 @@ HACKINCL = align.h amiconf.h artifact.h artilist.h attrib.h beconf.h botl.h \
 	global.h hack.h lev.h lint.h macconf.h mextra.h mfndpos.h micro.h \
 	mkroom.h \
 	monattk.h mondata.h monflag.h monst.h monsym.h obj.h objclass.h \
-	os2conf.h patchlevel.h pcconf.h permonst.h prop.h rect.h region.h rm.h \
-	sp_lev.h spell.h sys.h system.h tcap.h timeout.h tosconf.h tradstdc.h \
-	trampoli.h trap.h unixconf.h vision.h vmsconf.h wintty.h \
+	os2conf.h patchlevel.h pcconf.h permonst.h prop.h rect.h region.h \
+	rm.h sp_lev.h spell.h sys.h system.h tcap.h timeout.h tosconf.h \
+	tradstdc.h trampoli.h trap.h unixconf.h vision.h vmsconf.h wintty.h \
 	winX.h winprocs.h wintype.h you.h youprop.h
 
 HSOURCES = $(HACKINCL) date.h onames.h pm.h vis_tab.h\
@@ -490,23 +496,33 @@ qt_win.moc: ../include/qt_win.h
 qttableview.moc: ../include/qttableview.h
 	$(QTDIR)/bin/moc -o qttableview.moc ../include/qttableview.h
 
-$(MAKEDEFS): ../util/makedefs.c  $(CONFIG_H) ../include/permonst.h \
+#	build monst.o and objects.o before executing '$(MAKE) makedefs'
+$(MAKEDEFS): $(FIRSTOBJ) \
+		../util/makedefs.c $(CONFIG_H) ../include/permonst.h \
 		../include/objclass.h ../include/monsym.h \
 		../include/artilist.h ../include/dungeon.h ../include/obj.h \
 		../include/monst.h ../include/you.h ../include/flag.h \
 		../include/dlb.h ../include/patchlevel.h ../include/qtext.h
-	@( cd ../util ; $(MAKE) makedefs)
+	@( cd ../util ; $(MAKE) makedefs )
 
+#	Source files created by 'makedefs' at build time.
+#	Each is given an artificial dependency upon the one before
+#	so that parallel makes will have to build them sequentially.
+#	(More for documentation than effect; 'make' should know not
+#	to try to build $(MAKEDEFS) for bar.h while it is in the
+#	process of building it for foo.h.)
 ../include/onames.h: $(MAKEDEFS)
 	@( cd ../util ; $(MAKE) ../include/onames.h )
-../include/pm.h: $(MAKEDEFS)
+../include/pm.h: $(MAKEDEFS) ../include/onames.h
 	@( cd ../util ; $(MAKE) ../include/pm.h )
-monstr.c: $(MAKEDEFS)
+monstr.c: $(MAKEDEFS) ../include/pm.h
 	@( cd ../util ; $(MAKE) ../src/monstr.c )
-../include/vis_tab.h: $(MAKEDEFS)
+../include/vis_tab.h: $(MAKEDEFS) monstr.c
 	@( cd ../util ; $(MAKE) ../include/vis_tab.h )
 # makedefs -z makes both vis_tab.h and vis_tab.c, but writes the .h first
 vis_tab.c: ../include/vis_tab.h
+#	Created at build time for configurations which support tiles,
+#	but not by makedefs so not connected to the others.
 tile.c: ../win/share/tilemap.c $(HACK_H)
 	@( cd ../util ; $(MAKE) ../src/tile.c )
 
@@ -551,11 +567,11 @@ spotless: clean
 
 
 depend: ../sys/unix/depend.awk \
-		$(SYSCSRC) $(WINCSRC) $(WINCXXSRC) $(CHAINSRC) $(GENCSRC) \
-		$(HACKCSRC)
+		$(SYSCSRC) $(WINCSRC) $(SYSCXXSRC) $(WINCXXSRC) \
+		$(CHAINSRC) $(GENCSRC) $(HACKCSRC)
 	$(AWK) -f ../sys/unix/depend.awk ../include/*.h \
-		$(SYSCSRC) $(WINCSRC) $(WINCXXSRC) $(CHAINSRC) $(GENCSRC) \
-		$(HACKCSRC) >makedep
+		$(SYSCSRC) $(WINCSRC) $(SYSCXXSRC) $(WINCXXSRC) \
+		$(CHAINSRC) $(GENCSRC) $(HACKCSRC) >makedep
 	@echo '/^# DO NOT DELETE THIS LINE OR CHANGE ANYTHING BEYOND IT/+2,$$d' >eddep
 	@echo '$$r makedep' >>eddep
 	@echo 'w' >>eddep
@@ -710,6 +726,8 @@ load_img.o: ../win/gem/load_img.c ../include/load_img.h
 gr_rect.o: ../win/gem/gr_rect.c ../include/gr_rect.h
 	$(CC) $(CFLAGS) -c ../win/gem/gr_rect.c
 tile.o: tile.c $(HACK_H)
+cppregex.o: ../sys/share/cppregex.cpp
+	$(CXX) $(CXXFLAGS) -c ../sys/share/cppregex.cpp
 qt_win.o: ../win/Qt/qt_win.cpp $(HACK_H) ../include/func_tab.h \
 		../include/dlb.h ../include/patchlevel.h ../include/tile2x11.h \
 		../include/qt_win.h ../include/qt_clust.h ../include/qt_kde0.h \

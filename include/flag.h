@@ -1,10 +1,10 @@
-/* NetHack 3.6	flag.h	$NHDT-Date: 1457207000 2016/03/05 19:43:20 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.101 $ */
+/* NetHack 3.6	flag.h	$NHDT-Date: 1461102045 2016/04/19 21:40:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.103 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* If you change the flag structure make sure you increment EDITLEVEL in   */
-/* patchlevel.h if needed.  Changing the instance_flags structure does	   */
-/* not require incrementing EDITLEVEL.					   */
+/* patchlevel.h if needed.  Changing the instance_flags structure does     */
+/* not require incrementing EDITLEVEL.                                     */
 
 #ifndef FLAG_H
 #define FLAG_H
@@ -48,7 +48,7 @@ struct flag {
     boolean showexp;         /* show experience points */
     boolean showscore;       /* show score */
     boolean silent;          /* whether the bell rings or not */
-    boolean sortloot;        /* sort items alphabetically when looting */
+    char    sortloot; /* 'n'=none, 'l'=loot (pickup), 'f'=full ('l'+invent) */
     boolean sortpack;        /* sorted inventory */
     boolean sparkle;         /* show "resisting" special FX (Scott Bigham) */
     boolean standout;        /* use standout for --More-- */
@@ -76,8 +76,10 @@ struct flag {
 #define NUM_DISCLOSURE_OPTIONS 6 /* i,a,v,g,c,o (decl.c) */
 #define DISCLOSE_PROMPT_DEFAULT_YES 'y'
 #define DISCLOSE_PROMPT_DEFAULT_NO 'n'
+#define DISCLOSE_PROMPT_DEFAULT_SPECIAL '?' /* v, default a */
 #define DISCLOSE_YES_WITHOUT_PROMPT '+'
 #define DISCLOSE_NO_WITHOUT_PROMPT '-'
+#define DISCLOSE_SPECIAL_WITHOUT_PROMPT '#' /* v, use a */
     char end_disclose[NUM_DISCLOSURE_OPTIONS + 1]; /* disclose various
                                                       info upon exit */
     char menu_style;    /* User interface style setting */
@@ -95,7 +97,7 @@ struct flag {
      * characters or letters, because that limits us to 26 roles.
      * They are not booleans, because someday someone may need a neuter
      * gender.  Negative values are used to indicate that the user
-     * hasn't yet specified that particular value.	If you determine
+     * hasn't yet specified that particular value.  If you determine
      * that the user wants a random choice, then you should set an
      * appropriate random value; if you just left the negative value,
      * the user would be asked again!
@@ -184,17 +186,24 @@ struct instance_flags {
     int purge_monsters;    /* # of dead monsters still on fmon list */
     int override_ID;       /* true to force full identification of objects */
     int suppress_price;    /* controls doname() for unpaid objects */
+    int terrainmode; /* for getpos()'s autodescribe when #terrain is active */
+#define TER_MAP 0x01
+#define TER_TRP 0x02
+#define TER_OBJ 0x04
+#define TER_MON 0x08
     coord travelcc;        /* coordinates for travel_cache */
     boolean window_inited; /* true if init_nhwindows() completed */
     boolean vision_inited; /* true if vision is ready */
     boolean sanity_check;  /* run sanity checks */
     boolean mon_polycontrol; /* debug: control monster polymorphs */
-    /* stuff that is related to options and/or user or platform preferences */
+
+    /* stuff that is related to options and/or user or platform preferences
+     */
     unsigned msg_history; /* hint: # of top lines to save */
     int getpos_coords;    /* show coordinates when getting cursor position */
     int menu_headings;    /* ATR for menu headings */
     int *opt_booldup;     /* for duplication of boolean opts in config file */
-    int *opt_compdup; /* for duplication of compound opts in config file */
+    int *opt_compdup;     /* for duplication of compound opts in conf file */
 #ifdef ALTMETA
     boolean altmeta; /* Alt-c sends ESC c rather than M-c */
 #endif
@@ -222,11 +231,11 @@ struct instance_flags {
     boolean hilite_pile;          /* mark piles of objects with a hilite */
     boolean autodescribe;     /* autodescribe mode in getpos() */
 #if 0
-	boolean  DECgraphics;	/* use DEC VT-xxx extended character set */
-	boolean  IBMgraphics;	/* use IBM extended character set */
+    boolean  DECgraphics;       /* use DEC VT-xxx extended character set */
+    boolean  IBMgraphics;       /* use IBM extended character set */
 #ifdef MAC_GRAPHICS_ENV
-	boolean  MACgraphics;	/* use Macintosh extended character set, as
-				   as defined in the special font HackFont */
+    boolean  MACgraphics;       /* use Macintosh extended character set, as
+                                   as defined in the special font HackFont */
 #endif
 #endif
     uchar bouldersym; /* symbol for boulder display */
@@ -273,6 +282,7 @@ struct instance_flags {
     boolean vt_tiledata;     /* output console codes for tile support in TTY */
 #endif
     boolean wizweight;        /* display weight of everything in wizard mode */
+
     /*
      * Window capability support.
      */

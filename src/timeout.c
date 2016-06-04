@@ -1533,6 +1533,7 @@ anything *arg;
         panic("start_timer");
 
     gnu = (timer_element *) alloc(sizeof(timer_element));
+    (void) memset((genericptr_t)gnu, 0, sizeof(timer_element));
     gnu->next = 0;
     gnu->tid = timer_id++;
     gnu->timeout = monstermoves + when;
@@ -1995,6 +1996,23 @@ long adjust;     /* how much to adjust timeout */
         if (ghostly)
             curr->timeout += adjust;
         insert_timer(curr);
+    }
+}
+
+/* to support '#stats' wizard-mode command */
+void
+timer_stats(hdrfmt, hdrbuf, count, size)
+const char *hdrfmt;
+char *hdrbuf;
+long *count, *size;
+{
+    timer_element *te;
+
+    Sprintf(hdrbuf, hdrfmt, (long) sizeof (timer_element));
+    *count = *size = 0L;
+    for (te = timer_base; te; te = te->next) {
+        ++*count;
+        *size += (long) sizeof *te;
     }
 }
 

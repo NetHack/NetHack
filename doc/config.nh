@@ -1,0 +1,527 @@
+# Sample config file for NetHack 3.6
+#
+# A '#' at the beginning of a line means the rest of the line is a comment.
+#
+# Some options must be set in this file, other options can be toggled while
+# playing.
+#
+# Copy the contents of this file into
+# * defaults.nh, same folder as nethack.exe or nethackW.exe (DOS, Windows)
+# * ~/.nethackrc (Unix, linux, Mac OS X)
+# * "NetHack Defaults" on pre-OSX Mac and BeOS
+# * NetHack.cnf on Amiga, Atari, OS/2, and VMS
+#
+# To change the configuration, comment out the unwanted lines, and
+# uncomment the configuration you want.
+#
+# There are two types of options, boolean and compound options.
+# Boolean options toggle a setting on or off, while compound options
+# take more diverse values.
+# Prefix a boolean option with 'no' or '!' to turn it off.
+# For compound options, the option name and value are separated by a colon.
+#
+# Some options are persistent, and apply only to new games.
+#
+# For more information about the options, see the Guidebook.
+
+
+# Set your character's name.
+#OPTIONS=name:Janet
+
+# Set your character's role, race, gender, and alignment
+#OPTIONS=role:Valkyrie, race:Human, gender:female, align:lawful
+
+# Set the default dog, cat, and horse names, and your fruit
+#OPTIONS=dogname:Fido
+#OPTIONS=catname:Morris
+#OPTIONS=horsename:Silver
+#OPTIONS=fruit:guava
+
+# Turn on autopickup, and set object types which are picked up automatically
+# Both are persistent.
+#OPTIONS=autopickup,pickup_types:$"=/!?+
+# Automatically pick up items you threw. Persistent.
+#OPTIONS=pickup_thrown
+# When you pick up an item that would exceed this encumbrance
+# level (Unencumbered, Burdened, streSsed, straiNed, overTaxed,
+# or overLoaded), you will be asked if you want to continue. Persistent.
+#OPTIONS=pickup_burden:u
+
+
+# Enable messages about what your character hears
+#OPTIONS=acoustics
+
+# Causes NetHack's top level command loop to treat two character sequence
+# "ESC c" as M-c, for terminals or emulators which send "ESC c" when Alt+c
+# is pressed.
+#OPTIONS=altmeta
+
+# NetHack should display an ascii character map if it can.
+#OPTIONS=ascii_map
+
+# Automatically describe the terrain under cursor when asked to
+# get a location on the map.
+#OPTIONS=autodescribe
+
+# Automatically dig if walking into a wall and you're wielding a digging
+# implement or can otherwise dig through the wall.
+#OPTIONS=autodig
+
+# Automatically try to open doors when walking into them
+#OPTIONS=autoopen
+
+# Let NetHack fill your quiver or make ready some suitable weapon,
+# when firing with empty quiver or nothing at the ready.
+#OPTIONS=autoquiver
+
+# Conduct/Role-playing: blind from birth or "zen"
+#OPTIONS=blind
+# Conduct/Role-playing: starts with no worn armor.
+# Wearing any armor will make you lose this conduct
+#OPTIONS=nudist
+
+# Disable loading and saving of bones files
+#OPTIONS=!bones
+
+# Save game state after each level change, for possible recovery
+# after program crash
+#OPTIONS=checkpoint
+
+# Allows looking at things on the screen by navigating the mouse
+# over them and clicking the right mouse button
+#OPTIONS=clicklook
+
+# Show assistance when you mistype a command
+#OPTIONS=cmdassist
+
+# Display color if possible for different monsters, objects,
+# and dungeon features
+#OPTIONS=color
+
+# Have user confirm attacks on pets, shopkeepers, and other
+# peaceable creatures (default on).
+#OPTIONS=confirm
+
+# Highlight out-of-sight room floors with different color or glyph
+#OPTIONS=dark_room
+
+# Controls what information the program reveals when the game ends.
+#OPTIONS=disclose:+i +a +v +g +c +o
+
+# NetHack should pass eight-bit character values straight through
+# to your terminal (default off).
+#OPTIONS=eight_bit_tty
+
+# Change the extended commands interface to pop-up a menu of
+# available commands.
+#OPTIONS=extmenu
+
+# Objects will try to keep their inventory letters
+#OPTIONS=fixinv
+
+# Try and display on the entire screen rather than in a window.
+#OPTIONS=fullscreen
+
+# If more information is available for an object looked at with
+# the '/' command, ask if you want to see it (default on).
+#OPTIONS=help
+
+# Hilight pets with a heart symbol (Windows, X11), or inverse attribute (TTY)
+#OPTIONS=hilite_pet
+
+# Visually distinguish piles of objects from individual objects
+#OPTIONS=hilite_pile
+
+# Always show the "uncursed" for inventory objects. Useful for MENUCOLORs
+#OPTIONS=implicit_uncursed
+
+# Do not show the legacy intro text at game start
+#OPTIONS=!legacy
+
+# Show lit corridors differently
+#OPTIONS=lit_corridor
+
+# Use the old 'a', 'b', and 'c' keyboard shortcuts when looting,
+# rather than the mnemonics 'o', 'i', and 'b' (default off).
+#OPTIONS=lootabc
+
+# Don't deliver email in-game
+#OPTIONS=!mail
+
+# Mention in the message line when walking at a wall. Useful for blind players.
+#OPTIONS=mention_walls
+
+# How menus are shown. Values are 'traditional', 'combination',
+# 'full', or 'partial'
+#OPTIONS=menustyle:full
+
+# Set menu accelerator keys
+#OPTIONS=menu_deselect_all:-
+#OPTIONS=menu_deselect_page:\
+#OPTIONS=menu_first_page:^
+#OPTIONS=menu_invert_all:@
+#OPTIONS=menu_invert_page:~
+#OPTIONS=menu_last_page:|
+#OPTIONS=menu_next_page:>
+#OPTIONS=menu_previous_page:<
+#OPTIONS=menu_search::
+#OPTIONS=menu_select_all:.
+#OPTIONS=menu_select_page:,
+
+# Controls how the headings in a menu are highlighted.
+# Values are 'none', 'bold', 'dim', 'underline', 'blink', or 'inverse'.
+# Default is 'inverse'
+#OPTIONS=menu_headings:inverse
+
+# Show object symbols in menus in the item class lines where that object symbol
+# acts as an accelerator key to select items of that class.
+#OPTIONS=menu_objsyms
+
+# Do not clear the screen before drawing menus, and align menus to right
+#OPTIONS=menu_overlay
+
+# Set the number of messages saved into message history (^P -command)
+#OPTIONS=msghistory:50
+
+# Allows you to change the way recalled messages are displayed.
+# The possible values are:
+# 's'  single message (default; only choice prior to 3.4.0)
+# 'c'  combination, two messages as `single', then as `full'
+# 'f'  full window, oldest message first
+# 'r'  full window reversed, newest message first
+# Default is 's'. TTY only.
+#OPTIONS=msg_window:s
+
+# Allow use of the mouse for input and travel.
+#OPTIONS=mouse_support
+
+# Read the NetHack news file, if present (default on).
+#OPTIONS=news
+
+# Send padding nulls to the terminal (default on).
+#OPTIONS=null
+
+# Use number pad or vi-keys for movement?
+# number_pad option can have an optional value of 0 (off), 1 (on),
+# or 2 (on,legacy-mode) which causes 5='g', alt-5='G', alt-0='I'
+# -1 (use vi-keys, but swap z and y, for qwertz keyboards)
+#OPTIONS=number_pad:2
+
+# Set the order in which item classes appear in your inventory
+#OPTIONS=packorder:")[%?+/=!(*0_`
+
+# A space separated list of specific situations where alternate
+# prompting is desired.  The default is paranoid_confirmation:pray.
+#OPTIONS=paranoid_confirmation:confirm quit die bones attack pray remove
+
+# Always show the inventory window? X11 and Windows GUI only.
+#OPTIONS=perm_invent
+
+# Specify the type of your initial pet, if you are playing a character class
+# that uses multiple types of pets; or choose to have no initial pet at all.
+# Possible values are "cat", "dog", "horse", and "none".
+#OPTIONS=pettype:cat
+
+# Threshold when item pile under you is shown in a popup list. Persistent.
+#OPTIONS=pile_limit:5
+
+# Game mode
+# Values are 'normal', 'explore', or 'debug'.
+#OPTIONS=playmode:normal
+
+# Preload tiles into memory. MSDOS only.
+#OPTIONS=preload_tiles
+
+# When wielding a weapon, move your previous weapon to other hand
+#OPTIONS=pushweapon
+
+# Space key acts as a wait.
+#OPTIONS=rest_on_space
+
+# Controls the amount of screen updating for the map window when engaged
+# in multi-turn movement. Possible values are 'teleport', 'run', 'walk',
+# or 'crawl'.  Default is 'run'.
+#OPTIONS=runmode:run
+
+# Ask if you really want to hit your pet
+#OPTIONS=safe_pet
+
+# Perform extra data checking.  Wizard-mode only.
+#OPTIONS=sanity_check
+
+# Display a menu of existing saved games for the player to choose from
+# at game startup, if it can. Not all ports support this option.
+#OPTIONS=selectsaved
+
+# Which parts of the score file to show at end of game
+#OPTIONS=scores:10 top/2 around/own
+
+# Do not show experience points in the status line
+#OPTIONS=!showexp
+
+# Show your own symbol with the symbol of your race
+# eg. 'G' if you're a gnome, 'h' if dwarf, etc.
+#OPTIONS=showrace
+
+# Show score on the status line
+#OPTIONS=showscore
+
+# Suppress terminal beeps.  Default on.
+#OPTIONS=silent
+
+# Controls the sorting behavior of the pickup lists for inventory.
+# Possible values are 'full', 'loot', and 'none'.
+#OPTIONS=sortloot:full
+
+# Sort the pack contents by type when displaying inventory (default on).
+#OPTIONS=sortpack
+
+# Disable sparkly magic resistance animation effect
+#OPTIONS=!sparkle
+
+# Boldface monsters and --More-- (default off).
+#OPTIONS=standout
+
+# NetHack version level to suppress alert notification messages
+# about feature changes for that and prior versions.
+#OPTIONS=suppress_alert:3.6.0
+
+# Show current turn in the status line
+#OPTIONS=time
+
+# When pausing momentarily for display effect, such as with explosions and
+# moving objects, use a timer rather than sending extra characters to the
+# screen.  TTY only.
+#OPTIONS=timed_delay
+
+# Draw a tombstone graphic upon your death (default on).
+#OPTIONS=tombstone
+
+# Do not show top ten list in a separate window. Windows GUI only.
+#OPTIONS=!toptenwin
+
+# Enable travel (_) command.
+#OPTIONS=travel
+
+# Use the dark gray color
+#OPTIONS=use_darkgray
+
+# Use inverse text attribute in eg. menu titles
+#OPTIONS=use_inverse
+
+# Display this number of messages at a time in the message window.
+# WinCE, Windows GUI, and GEM only.
+#OPTIONS=vary_msgcount:3
+
+# Be less verbose with the messages
+#OPTIONS=!verbose
+
+# Set the color palette for PC systems using NO_TERMS (MS-DOS only).
+# The order of colors is red, green, brown, blue, magenta, cyan,
+# bright.white, bright.red, bright.green, yellow, bright.blue,
+# bright.magenta, and bright.cyan.
+#OPTIONS=videocolors:4-2-6-1-5-3-15-12-10-14-9-13-11
+
+# Gray shades to map to black-gray-white. possible values are 'dark',
+# 'normal', and 'light'.  MS-DOS only.
+#OPTIONS=videoshades:normal-normal-normal
+
+# When using '/' or ';' commands with autodescribe-option on, display
+# coordinates after the description. Possible values are 'compass',
+# 'map', 'screen', or 'none'
+#OPTIONS=whatis_coord:map
+
+# Windowing system to use, such as 'tty' or 'x11'.
+#OPTIONS=windowtype:tty
+
+# NetHack port should wrap long lines of text if they don't fit in
+# the visible area of the window.
+# WinCE only.
+#OPTIONS=wraptext
+
+
+
+# How the map window is shown?  Windows GUI only.
+# possible map_mode options include: tiles, ascii4x6,
+# ascii6x8, ascii8x8, ascii16x8, ascii7x12, ascii8x12, ascii16x12,
+# ascii12x16, ascii10x18, fit_to_screen
+#OPTIONS=map_mode:tiles
+
+# Define alternative file for the files, and the tile size
+#OPTIONS=tile_file:C:\absurd64.bmp
+#OPTIONS=tile_width:64,tile_height:64
+
+# When does the map window scroll? Windows GUI only.
+#OPTIONS=scroll_margin:5
+
+# Message window settings. Windows GUI only.
+#OPTIONS=font_message:Arial,font_size_message:9,align_message:top
+
+# Menu settings. Windows GUI only.
+#OPTIONS=font_menu:Arial,font_size_menu:9
+
+# Text settings. Windows GUI only.
+#OPTIONS=font_text:Courier New,font_size_text:9
+
+# Status window settings. Windows GUI only.
+#OPTIONS=font_status:Courier New,font_size_status:9
+
+# No startup splash screen. Windows GUI only.
+#OPTIONS=!splash_screen
+
+# How does NetHack prompt for character creation. Windows GUI only.
+#OPTIONS=player_selection:prompts
+
+# NetHack should pop up dialog boxes for input.
+# Windows GUI only.
+#OPTIONS=popup_dialog
+
+# Status/message window colors. Windows GUI only.
+# Possible color options include:
+# six digit hexadecimal RGB color value ("#8F8F8F"), black, red, green, brown,
+# blue, magenta, cyan, gray (or grey), orange, brightgreen, yellow, brightblue,
+# brightmagenta, brightcyan, white, trueblack, purple, silver, maroon, fuchsia,
+# lime, olive, navy, teal, aqua, activeborder, activecaption, appworkspace,
+# background, btnface, btnshadow, btntext, captiontext, graytext, highlight,
+# highlighttext, inactiveborder, inactivecaption, menu, menutext, scrollbar,
+# window, windowframe, windowtext.
+# windowcolors:<window> <text_color>/<background_color>
+#OPTIONS=windowcolors:status windowtext/window message windowtext/window
+
+# HACKDIR is the default location for everything.
+# Note: On Windows HACKDIR defaults to the location of the NetHack.exe or
+# NetHackw.exe file so setting HACKDIR below to override that is not usually
+# necessary or recommended.
+#HACKDIR=c:\games\nethack
+
+# The location that level files in progress are stored
+# (default=HACKDIR, writeable)
+#LEVELDIR=c:\nethack\levels
+
+# The location where saved games are kept (default=HACKDIR, writeable)
+#SAVEDIR=c:\nethack\save
+
+# The location that bones files are kept (default=HACKDIR, writeable)
+#BONESDIR=c:\nethack\save
+
+# The location that file synchronization locks are stored
+# (default=HACKDIR, writeable)
+#LOCKDIR=c:\nethack\levels
+
+# The location that a record of game aborts and self-diagnosed game problems
+# is kept (default=HACKDIR, writeable)
+#TROUBLEDIR=c:\nethack\trouble
+
+# Finnish keyboards might need these modifications uncommented. Windows GUI.
+# For  \, @, $, [, |
+#OPTIONS=subkeyvalue:171/92
+#OPTIONS=subkeyvalue:178/64
+#OPTIONS=subkeyvalue:180/36
+#OPTIONS=subkeyvalue:184/91
+#OPTIONS=subkeyvalue:188/124
+
+# Some versions of Windows allow you to adjust the win32 console port
+# colors using R-G-B settings.
+#OPTIONS=palette:black-0-0-0
+#OPTIONS=palette:red-210-0-0
+#OPTIONS=palette:green-80-200-0
+#OPTIONS=palette:brown-180-100-0
+#OPTIONS=palette:blue-0-0-200
+#OPTIONS=palette:magenta-128-0-128
+#OPTIONS=palette:cyan-50-180-180
+#OPTIONS=palette:gray-192-192-192
+#OPTIONS=palette:dark gray-100-100-100
+#OPTIONS=palette:orange-255-128-0
+#OPTIONS=palette:bright green-0-255-0
+#OPTIONS=palette:yellow-255-255-0
+#OPTIONS=palette:bright blue-100-100-240
+#OPTIONS=palette:bright magenta-255-0-255
+#OPTIONS=palette:bright cyan-0-255-255
+#OPTIONS=palette:white-255-255-255
+
+
+
+# Set exceptions to the pickup_types option. You can use multiple exceptions.
+# First character must be '<' (autopick) or '>' (don't autopick), followed
+# by a regular expression.
+#  Always autopickup any type of arrow
+#AUTOPICKUP_EXCEPTION="<arrow"
+#  Never autopickup any corpse
+#AUTOPICKUP_EXCEPTION=">corpse"
+#  Never autopickup any known cursed items
+#AUTOPICKUP_EXCEPTION="> cursed"
+
+
+# Change the way messages are shown in the top status line.
+# You can use multiple MSGTYPE lines.
+# Format is MSGTYPE=type "regular expression"
+# Where type is one of 'show', 'hide', 'stop', or 'norep'
+#  Always prompt for more after becoming hungry.
+#MSGTYPE=stop "You feel hungry."
+#  Never show any displacing your pet messages.
+#MSGTYPE=hide "You displaced .*"
+#  Don't repeat message when seeing same items on the floor
+#MSGTYPE=norep  "You see here a *"
+#MSGTYPE=norep  "You see here an *"
+
+
+# Highlight menu lines with different colors. You need to define the colors
+# with MENUCOLOR lines. Only for TTY and Windows GUI.
+#  Toggle menucolor use on or off
+#OPTIONS=menucolors
+# Define color used for a certain menu line. Format is
+# MENUCOLOR="regular expression"=color
+# or
+# MENUCOLOR="regular expression"=color&attribute
+#  Show all blessed items in green
+#MENUCOLOR=" blessed " = green
+#  Show all holy water in green
+#MENUCOLOR=" holy " = green
+#  Show all cursed items in red
+#MENUCOLOR=" cursed " = red
+#  Show all unholy water in red
+#MENUCOLOR=" unholy " = red
+#  Show all cursed worn items in orange and underlined
+#MENUCOLOR=" cursed .* (being worn)" = orange&underline
+
+
+# Use the IBM character set rather than just plain ascii characters
+# for tty window-port.
+#OPTIONS=symset:IBMGraphics_2
+# Use RogueEpyx character set for the rogue level
+#OPTIONS=roguesymset:RogueEpyx
+
+# Override one or more symbols in the symbols files.
+# See the Guidebook for the symbol names.
+#  Set boulder symbol to '0'
+#SYMBOLS=S_boulder:0
+# or
+#OPTIONS=S_boulder:0
+
+# Load DEC text characters display symbols. Deprecated.
+#OPTIONS=DECgraphics
+# Load IBM text characters display symbols. Deprecated.
+#OPTIONS=IBMgraphics
+# Set the character symbol used for boulders. Deprecated.
+#OPTION=boulder:0
+
+
+# Wizard-mode extra items, in a text file containing item names,
+# one per line, up to a maximum of 128 lines. Each line is processed
+# by the function that handles wishing.
+#WIZKIT=~/wizkit.txt
+
+
+# User sounds
+# Define the directory that contains the sound files
+#SOUNDDIR=C:\nethack\sounds\
+# Define a sound mapping
+# SOUND=MESG "pattern" file volume
+#SOUND=MESG "KAABLAMM" explosion.wav 100
+
+
+# Turn on all status hilites.
+#OPTIONS=statushilites
+# Use highlighting in the status lines when it changes?
+#OPTIONS=hilite_status:hitpoints/30%/bright-magenta/normal
+

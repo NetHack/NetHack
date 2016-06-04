@@ -684,9 +684,9 @@ coord *c;
 
 /*
  * Search for a special room given its type (zoo, court, etc...)
- *	Special values :
- *		- ANY_SHOP
- *		- ANY_TYPE
+ *      Special values :
+ *              - ANY_SHOP
+ *              - ANY_TYPE
  */
 struct mkroom *
 search_special(type)

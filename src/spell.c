@@ -866,8 +866,8 @@ int spell;
         break;
     case 7:
     case 8:
-        make_stunned(old_conf + 2L * duration / 3L, FALSE); /* 20% */
-        make_confused(old_stun + duration / 3L, FALSE);
+        make_stunned(old_stun + 2L * duration / 3L, FALSE); /* 20% */
+        make_confused(old_conf + duration / 3L, FALSE);
         break;
     case 9:
         make_stunned(old_stun + duration, FALSE); /* 10% */

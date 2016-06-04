@@ -2520,9 +2520,9 @@ int retry;
             all_worn_categories = TRUE;
     }
 
-    n = query_objlist("What do you want to take off?", invent,
-                      SIGNAL_NOMENU | USE_INVLET | INVORDER_SORT, &pick_list,
-                      PICK_ANY,
+    n = query_objlist("What do you want to take off?", &invent,
+                      (SIGNAL_NOMENU | USE_INVLET | INVORDER_SORT),
+                      &pick_list, PICK_ANY,
                       all_worn_categories ? is_worn : is_worn_by_type);
     if (n > 0) {
         for (i = 0; i < n; i++)

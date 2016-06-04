@@ -352,25 +352,25 @@ int force;
                             /* Falling is okay for falling down
                                 within a pit from jostling too */
                             mselftouch(mtmp, "Falling, ", TRUE);
-                            if (mtmp->mhp > 0)
-                                if ((mtmp->mhp -=
-                                     rnd(m_already_trapped ? 4 : 6)) <= 0) {
-                                    if (!cansee(x, y))
+                            if (mtmp->mhp > 0) {
+                                mtmp->mhp -= rnd(m_already_trapped ? 4 : 6);
+                                if (mtmp->mhp <= 0) {
+                                    if (!cansee(x, y)) {
                                         pline("It is destroyed!");
-                                    else {
+                                    } else {
                                         You("destroy %s!",
                                             mtmp->mtame
-                                                ? x_monnam(
-                                                      mtmp, ARTICLE_THE,
-                                                      "poor",
-                                                      (has_mname(mtmp))
-                                                          ? SUPPRESS_SADDLE
-                                                          : 0,
-                                                      FALSE)
-                                                : mon_nam(mtmp));
+                                              ? x_monnam(mtmp, ARTICLE_THE,
+                                                         "poor",
+                                                         has_mname(mtmp)
+                                                           ? SUPPRESS_SADDLE
+                                                           : 0,
+                                                         FALSE)
+                                              : mon_nam(mtmp));
                                     }
-                                    xkilled(mtmp, 0);
+                                    xkilled(mtmp, XKILL_NOMSG);
                                 }
+                            }
                         }
                     } else if (x == u.ux && y == u.uy) {
                         if (Levitation || Flying

@@ -1,4 +1,4 @@
-/* NetHack 3.6  makedefs.c  $NHDT-Date: 1455357861 2016/02/13 10:04:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.109 $ */
+/* NetHack 3.6  makedefs.c  $NHDT-Date: 1459208813 2016/03/28 23:46:53 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.110 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
 /* Copyright (c) Dean Luick, 1990.                                */
@@ -578,36 +578,35 @@ do_ext_makedefs(int argc, char **argv)
 #undef CONSUME
 
 /*
- Filtering syntax:
- Any line NOT starting with a caret is either suppressed or passed through
- unchanged depending on the current conditional state.
-
- The default conditional state is printing on.
-
- Conditionals may be nested.
-
- makedefs will exit with a EXIT_FAILURE if any errors are detected; as many
- errors as possible are detected before giving up.
-
- Unknown identifiers are treated as TRUE and also as an error to allow
- processing to continue past the unknown identifier (note that "#undef" is
- different than unknown).
-
- Any line starting with a caret is a control line; as in C, zero or more
- spaces
- may be embedded in the line almost anywhere; the caret MUST be in column 1.
- (XXX for the moment, no white space is allowed after the caret because
-  existing lines in the docs look like that)
-
- Control lines:
- ^^     a line starting with a (single) literal caret
- ^#     a comment - the line is ignored
- ^?ID   if defined(ID)
- ^!ID   if !defined(ID)
- ^:     else
- ^.     endif
-
-*/
+ * Filtering syntax:
+ * Any line NOT starting with a caret is either suppressed or passed
+ * through unchanged depending on the current conditional state.
+ *
+ * The default conditional state is printing on.
+ *
+ * Conditionals may be nested.
+ *
+ * makedefs will exit with a EXIT_FAILURE if any errors are detected;
+ * as many errors as possible are detected before giving up.
+ *
+ * Unknown identifiers are treated as TRUE and also as an error to
+ * allow processing to continue past the unknown identifier (note
+ * that "#undef" is different than unknown).
+ *
+ * Any line starting with a caret is a control line; as in C, zero or
+ * more spaces may be embedded in the line almost anywhere; the caret
+ * MUST be in column 1.
+ * (XXX for the moment, no white space is allowed after the caret because
+ * existing lines in the docs look like that.)
+ *
+ * Control lines:
+ *      ^^      a line starting with a (single) literal caret
+ *      ^#      a comment - the line is ignored
+ *      ^?ID    if defined(ID)
+ *      ^!ID    if !defined(ID)
+ *      ^:      else
+ *      ^.      endif
+ */
 #define GREP_MAGIC '^'
 #define GREP_STACK_SIZE 100
 #ifdef notyet
@@ -616,9 +615,9 @@ static int grep_rewrite = 0; /* need to (possibly) rewrite lines */
 static int grep_writing = 1; /* need to copy lines to output */
 static int grep_errors = 0;
 static int grep_sp = 0;
-#define ST_LD(old, opp) (!!(old) | (!!(opp) << 1))
-#define ST_OLD(v) ((v) &1)
-#define ST_OPP(v) !!((v) &2)
+#define ST_LD(old, opp) (((old) ? 1 : 0) | ((opp) ? 2 : 0))
+#define ST_OLD(v) (((v) & 1) != 0)
+#define ST_OPP(v) (((v) & 2) != 0)
 #define ST_ELSE 4
 static int grep_stack[GREP_STACK_SIZE] = { ST_LD(1, 0) };
 static int grep_lineno = 0;
@@ -1166,6 +1165,9 @@ make_version()
     return;
 }
 
+/* REPRODUCIBLE_BUILD will change this to TRUE */
+static boolean date_via_env = FALSE;
+
 static char *
 version_string(outbuf, delim)
 char *outbuf;
@@ -1195,8 +1197,9 @@ const char *build_date;
     Strcat(subbuf, " Beta");
 #endif
 
-    Sprintf(outbuf, "%s NetHack%s Version %s - last build %s.", PORT_ID,
-            subbuf, version_string(versbuf, "."), build_date);
+    Sprintf(outbuf, "%s NetHack%s Version %s - last %s %s.", PORT_ID,
+            subbuf, version_string(versbuf, "."),
+            date_via_env ? "revision" : "build", build_date);
     return outbuf;
 }
 
@@ -1216,8 +1219,9 @@ const char *build_date;
     Strcat(subbuf, " Beta");
 #endif
 
-    Sprintf(outbuf, "         Version %s %s%s, built %s.",
-            version_string(versbuf, "."), PORT_ID, subbuf, &build_date[4]);
+    Sprintf(outbuf, "         Version %s %s%s, %s %s.",
+            version_string(versbuf, "."), PORT_ID, subbuf,
+            date_via_env ? "revised" : "built", &build_date[4]);
 #if 0
     Sprintf(outbuf, "%s NetHack%s %s Copyright 1985-%s (built %s)",
             PORT_ID, subbuf, version_string(versbuf,"."), RELEASE_YEAR,
@@ -1256,20 +1260,96 @@ do_date()
     Fprintf(ofp, "%s", Dont_Edit_Code);
 
     (void) time(&clocktim);
-    Strcpy(cbuf, ctime(&clocktim));
+#ifdef REPRODUCIBLE_BUILD
+    {
+        /*
+         * Use date+time of latest source file revision (set up in
+         * our environment rather than derived by scanning sources)
+         * instead of current date+time, so that later rebuilds of
+         * the same sources specifying the same configuration will
+         * produce the same result.
+         *
+         * Changing the configuration should be done by modifying
+         * config.h or <port>conf.h and setting SOURCE_DATE_EPOCH
+         * based on whichever changed most recently, not by using
+         *   make CFLAGS='-Dthis -Dthat'
+         * to make alterations on the fly.
+         *
+         * Limited validation is performed to prevent dates in the
+         * future (beyond a leeway of 24 hours) or distant past.
+         *
+         * Assumes the value of time_t is in seconds, which is
+         * fundamental for Unix and mandated by POSIX.  For any ports
+         * where that isn't true, leaving REPRODUCIBLE_BUILD disabled
+         * is probably preferrable to hacking this code....
+         */
+        static struct tm nh360; /* static init should yield UTC timezone */
+        unsigned long sd_num, sd_earliest, sd_latest;
+        const char *sd_str = getenv("SOURCE_DATE_EPOCH");
 
-    for (c = cbuf; *c; c++)
-        if (*c == '\n')
-            break;
-    *c = '\0'; /* strip off the '\n' */
-    Fprintf(ofp, "#define BUILD_DATE \"%s\"\n", cbuf);
-    Fprintf(ofp, "#define BUILD_TIME (%ldL)\n", (long) clocktim);
-    Fprintf(ofp, "\n");
+        if (sd_str) {
+            sd_num = strtoul(sd_str, (char **) 0, 10);
+            /*
+             * Note:  this does not need to be updated for future
+             * releases.  It serves as a sanity check for potentially
+             * mis-set environment, not a hard baseline for when the
+             * current version could have first been built.
+             */
+            /* oldest date we'll accept: 7-Dec-2015 (release of 3.6.0) */
+            nh360.tm_mday = 7;
+            nh360.tm_mon  = 12 - 1;
+            nh360.tm_year = 2015 - 1900;
+            sd_earliest = (unsigned long) mktime(&nh360);
+            /* 'youngest' date we'll accept: 24 hours in the future */
+            sd_latest = (unsigned long) clocktim + 24L * 60L * 60L;
+
+            if (sd_num >= sd_earliest && sd_num <= sd_latest) {
+                /* use SOURCE_DATE_EPOCH value */
+                clocktim = (time_t) sd_num;
+                date_via_env = TRUE;
+            } else {
+                Fprintf(stderr, "? Invalid value for SOURCE_DATE_EPOCH (%lu)",
+                        sd_num);
+                if (sd_num > 0L && sd_num < sd_earliest)
+                    Fprintf(stderr, ", older than %lu", sd_earliest);
+                else if (sd_num > sd_latest)
+                    Fprintf(stderr, ", newer than %lu", sd_latest);
+                Fprintf(stderr, ".\n");
+                Fprintf(stderr, ": Reverting to current date+time (%lu).\n",
+                        (unsigned long) clocktim);
+                (void) fflush(stderr);
+            }
+        } else {
+            /* REPRODUCIBLE_BUILD enabled but SOURCE_DATE_EPOCH is missing */
+            Fprintf(stderr, "? No value for SOURCE_DATE_EPOCH.\n");
+            Fprintf(stderr, ": Using current date+time (%lu).\n",
+                    (unsigned long) clocktim);
+            (void) fflush(stderr);
+        }
+        Strcpy(cbuf, asctime(gmtime(&clocktim)));
+    }
+#else
+    /* ordinary build: use current date+time */
+    Strcpy(cbuf, ctime(&clocktim));
+#endif
+
+    if ((c = index(cbuf, '\n')) != 0)
+        *c = '\0'; /* strip off the '\n' */
 #ifdef NHSTDC
     ul_sfx = "UL";
 #else
     ul_sfx = "L";
 #endif
+    if (date_via_env)
+        Fprintf(ofp, "#define SOURCE_DATE_EPOCH (%lu%s) /* via getenv() */\n",
+                (unsigned long) clocktim, ul_sfx);
+    Fprintf(ofp, "#define BUILD_DATE \"%s\"\n", cbuf);
+    if (date_via_env)
+        Fprintf(ofp, "#define BUILD_TIME SOURCE_DATE_EPOCH\n");
+    else
+        Fprintf(ofp, "#define BUILD_TIME (%lu%s)\n",
+                (unsigned long) clocktim, ul_sfx);
+    Fprintf(ofp, "\n");
     Fprintf(ofp, "#define VERSION_NUMBER 0x%08lx%s\n", version.incarnation,
             ul_sfx);
     Fprintf(ofp, "#define VERSION_FEATURES 0x%08lx%s\n", version.feature_set,
@@ -1294,10 +1374,11 @@ do_date()
 #ifdef AMIGA
     {
         struct tm *tm = localtime((time_t *) &clocktim);
+
         Fprintf(ofp, "#define AMIGA_VERSION_STRING ");
         Fprintf(ofp, "\"\\0$VER: NetHack %d.%d.%d (%d.%d.%d)\"\n",
-                VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL, tm->tm_mday,
-                tm->tm_mon + 1, tm->tm_year + 1900);
+                VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL,
+                tm->tm_mday, tm->tm_mon + 1, tm->tm_year + 1900);
     }
 #endif
     Fclose(ofp);
@@ -1963,7 +2044,6 @@ do_oracles()
 void
 do_dungeon()
 {
-    int rcnt = 0;
     char *line;
 
     Sprintf(filename, DATA_IN_TEMPLATE, DGN_I_FILE);
@@ -1989,7 +2069,6 @@ do_dungeon()
     while ((line = fgetline(ifp)) != 0) {
         SpinCursor(3);
 
-        rcnt++;
         if (line[0] == '#') {
             free(line);
             continue; /* discard comments */

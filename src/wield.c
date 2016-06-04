@@ -1,4 +1,4 @@
-/* NetHack 3.6	wield.c	$NHDT-Date: 1450577672 2015/12/20 02:14:32 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.48 $ */
+/* NetHack 3.6	wield.c	$NHDT-Date: 1461967849 2016/04/29 22:10:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.49 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -174,6 +174,10 @@ struct obj *wep;
              * and the message must be before the death message and
              * Lifesaved rewielding.  Yet we want the message to
              * say "weapon in hand", thus this kludge.
+             * [That comment is obsolete.  It dates from the days (3.0)
+             * when unwielding Firebrand could cause hero to be burned
+             * to death in Hell due to loss of fire resistance.
+             * "Lifesaved re-wielding or re-wearing" is ancient history.]
              */
             long dummy = wep->owornmask;
 
@@ -232,12 +236,16 @@ register struct obj *obj;
 
 /*** Commands to change particular slot(s) ***/
 
-static NEARDATA const char wield_objs[] = { ALL_CLASSES, ALLOW_NONE,
-                                            WEAPON_CLASS, TOOL_CLASS, 0 };
-static NEARDATA const char ready_objs[] = { COIN_CLASS, ALL_CLASSES,
-                                            ALLOW_NONE, WEAPON_CLASS, 0 };
-static NEARDATA const char bullets[] = /* (note: different from dothrow.c) */
-    { COIN_CLASS, ALL_CLASSES, ALLOW_NONE, GEM_CLASS, WEAPON_CLASS, 0 };
+static NEARDATA const char wield_objs[] = {
+    ALL_CLASSES, ALLOW_NONE, WEAPON_CLASS, TOOL_CLASS, 0
+};
+static NEARDATA const char ready_objs[] = {
+    ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, ALLOW_NONE, WEAPON_CLASS, 0
+};
+static NEARDATA const char bullets[] = { /* (note: different from dothrow.c) */
+    ALLOW_COUNT, COIN_CLASS, ALL_CLASSES, ALLOW_NONE,
+    GEM_CLASS, WEAPON_CLASS, 0
+};
 
 int
 dowield()
@@ -316,10 +324,10 @@ doswapweapon()
     result = ready_weapon(oldswap);
 
     /* Set your new secondary weapon */
-    if (uwep == oldwep)
+    if (uwep == oldwep) {
         /* Wield failed for some reason */
         setuswapwep(oldswap);
-    else {
+    } else {
         setuswapwep(oldwep);
         if (uswapwep)
             prinv((char *) 0, uswapwep, 0L);
@@ -336,64 +344,165 @@ doswapweapon()
 int
 dowieldquiver()
 {
-    register struct obj *newquiver;
-    const char *quivee_types =
-        (uslinging()
-         || (uswapwep && objects[uswapwep->otyp].oc_skill == P_SLING))
-            ? bullets
-            : ready_objs;
+    char qbuf[QBUFSZ];
+    struct obj *newquiver;
+    const char *quivee_types;
+    int res;
+    boolean finish_splitting = FALSE,
+            was_uwep = FALSE, was_twoweap = u.twoweap;
 
     /* Since the quiver isn't in your hands, don't check cantwield(), */
     /* will_weld(), touch_petrifies(), etc. */
     multi = 0;
+    /* forget last splitobj() before calling getobj() with ALLOW_COUNT */
+    context.objsplit.child_oid = context.objsplit.parent_oid = 0;
 
-    /* Prompt for a new quiver */
-    if (!(newquiver = getobj(quivee_types, "ready")))
+    /* Prompt for a new quiver: "What do you want to ready?"
+       (Include gems/stones as likely candidates if either primary
+       or secondary weapon is a sling.) */
+    quivee_types = (uslinging()
+                    || (uswapwep
+                        && objects[uswapwep->otyp].oc_skill == P_SLING))
+                   ? bullets
+                   : ready_objs;
+    newquiver = getobj(quivee_types, "ready");
+
+    if (!newquiver) {
         /* Cancelled */
         return 0;
-
-    /* Handle no object, or object in other slot */
-    /* Any type is okay, since we give no intrinsics anyways */
-    if (newquiver == &zeroobj) {
+    } else if (newquiver == &zeroobj) { /* no object */
         /* Explicitly nothing */
         if (uquiver) {
             You("now have no ammunition readied.");
-            setuqwep(newquiver = (struct obj *) 0);
+            /* skip 'quivering: prinv()' */
+            setuqwep((struct obj *) 0);
         } else {
             You("already have no ammunition readied!");
-            return 0;
         }
-    } else if (newquiver == uquiver) {
-        pline("That ammunition is already readied!");
         return 0;
-    } else if (newquiver == uwep) {
-        /* Prevent accidentally readying the main weapon */
-        pline("%s already being used as a weapon!",
-              !is_plural(uwep) ? "That is" : "They are");
+    } else if (newquiver->o_id == context.objsplit.child_oid) {
+        /* if newquiver is the result of supplying a count to getobj()
+           we don't want to split something already in the quiver;
+           for any other item, we need to give it its own inventory slot */
+        if (uquiver && uquiver->o_id == context.objsplit.parent_oid) {
+            unsplitobj(newquiver);
+            goto already_quivered;
+        }
+        finish_splitting = TRUE;
+    } else if (newquiver == uquiver) {
+    already_quivered:
+        pline("That ammunition is already readied!");
         return 0;
     } else if (newquiver->owornmask & (W_ARMOR | W_ACCESSORY | W_SADDLE)) {
         You("cannot ready that!");
         return 0;
-    } else {
-        long dummy;
+    } else if (newquiver == uwep) {
+        int weld_res = !uwep->bknown;
 
-        /* Check if it's the secondary weapon */
-        if (newquiver == uswapwep) {
-            setuswapwep((struct obj *) 0);
-            untwoweapon();
+        if (welded(uwep)) {
+            weldmsg(uwep);
+            reset_remarm(); /* same as dowield() */
+            return weld_res;
         }
-
-        /* Okay to put in quiver; print it */
-        dummy = newquiver->owornmask;
-        newquiver->owornmask |= W_QUIVER;
-        prinv((char *) 0, newquiver, 0L);
-        newquiver->owornmask = dummy;
+        /* offer to split stack if wielding more than 1 */
+        if (uwep->quan > 1L && inv_cnt(FALSE) < 52 && splittable(uwep)) {
+            Sprintf(qbuf, "You are wielding %ld %s.  Ready %ld of them?",
+                    uwep->quan, simpleonames(uwep), uwep->quan - 1L);
+            switch (ynq(qbuf)) {
+            case 'q':
+                return 0;
+            case 'y':
+                /* leave 1 wielded, split rest off and put into quiver */
+                newquiver = splitobj(uwep, uwep->quan - 1L);
+                finish_splitting = TRUE;
+                goto quivering;
+            default:
+                break;
+            }
+            Strcpy(qbuf, "Ready all of them instead?");
+        } else {
+            Sprintf(qbuf, "You are wielding %s.  Ready %s instead?",
+                    /* uwep->quan is 1, but name might be plural ('boots') */
+                    !is_plural(uwep) ? "that" : "those",
+                    !is_plural(uwep) ? "it" : "them");
+        }
+        /* require confirmation to ready the main weapon */
+        if (ynq(qbuf) != 'y') {
+            (void) Shk_Your(qbuf, uwep); /* replace qbuf[] contents */
+            pline("%s%s %s wielded.", qbuf,
+                  simpleonames(uwep), otense(uwep, "remain"));
+            return 0;
+        }
+        /* quivering main weapon, so no longer wielding it */
+        setuwep((struct obj *) 0);
+        untwoweapon();
+        was_uwep = TRUE;
+    } else if (newquiver == uswapwep) {
+        if (uswapwep->quan > 1L && inv_cnt(FALSE) < 52
+            && splittable(uswapwep)) {
+            Sprintf(qbuf, "%s %ld %s.  Ready %ld of them?",
+                    u.twoweap ? "You are dual wielding"
+                              : "Your alternate weapon is",
+                    uswapwep->quan, simpleonames(uswapwep),
+                    uswapwep->quan - 1L);
+            switch (ynq(qbuf)) {
+            case 'q':
+                return 0;
+            case 'y':
+                /* leave 1 alt-wielded, split rest off and put into quiver */
+                newquiver = splitobj(uswapwep, uswapwep->quan - 1L);
+                finish_splitting = TRUE;
+                goto quivering;
+            default:
+                break;
+            }
+            Strcpy(qbuf, "Ready all of them instead?");
+        } else {
+            Sprintf(qbuf, "%s your %s weapon.  Ready %s instead?",
+                    !is_plural(uswapwep) ? "That is" : "Those are",
+                    u.twoweap ? "second" : "alternate",
+                    /* uswapwep->quan is 1, but name might be plural */
+                    !is_plural(uswapwep) ? "it" : "them");
+        }
+        /* require confirmation to ready the alternate weapon */
+        if (ynq(qbuf) != 'y') {
+            (void) Shk_Your(qbuf, uswapwep); /* replace qbuf[] contents */
+            pline("%s%s %s %s.", qbuf,
+                  simpleonames(uswapwep), otense(uswapwep, "remain"),
+                  u.twoweap ? "wielded" : "as secondary weapon");
+            return 0;
+        }
+        /* quivering alternate weapon, so no more uswapwep */
+        setuswapwep((struct obj *) 0);
+        untwoweapon();
     }
 
-    /* Finally, place it in the quiver */
+ quivering:
+    if (finish_splitting) {
+        freeinv(newquiver);
+        newquiver->nomerge = 1;
+        addinv(newquiver);
+        newquiver->nomerge = 0;
+    }
+    /* place item in quiver before printing so that inventory feedback
+       includes "(at the ready)" */
     setuqwep(newquiver);
-    /* Take no time since this is a convenience slot */
-    return 0;
+    prinv((char *) 0, newquiver, 0L);
+
+    /* quiver is a convenience slot and manipulating it ordinarily
+       consumes no time, but unwielding primary or secondary weapon
+       should take time (perhaps we're adjacent to a rust monster
+       or disenchanter and want to hit it immediately, but not with
+       something we're wielding that's vulnerable to its damage) */
+    res = 0;
+    if (was_uwep) {
+        You("are now empty %s.", body_part(HANDED));
+        res = 1;
+    } else if (was_twoweap && !u.twoweap) {
+        You("are no longer wielding two weapons at once.");
+        res = 1;
+    }
+    return res;
 }
 
 /* used for #rub and for applying pick-axe, whip, grappling hook or polearm */

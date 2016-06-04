@@ -124,11 +124,19 @@ unsigned *ospecial;
                 color = NO_COLOR;
 #ifdef TEXTCOLOR
         /* provide a visible difference if normal and lit corridor
-         * use the same symbol */
+           use the same symbol */
         } else if (iflags.use_color && offset == S_litcorr
                    && showsyms[idx] == showsyms[S_corr + SYM_OFF_P]) {
             color = CLR_WHITE;
 #endif
+        /* try to provide a visible difference between water and lava
+           if they use the same symbol and color is disabled */
+        } else if (!iflags.use_color && offset == S_lava
+                   && (showsyms[idx] == showsyms[S_pool + SYM_OFF_P]
+                       || showsyms[idx] == showsyms[S_water + SYM_OFF_P])) {
+            /* temporary? hack; makes tty use inverse video if the
+               corresponding boolean option is enabled */
+            special |= MG_DETECT;
         } else {
             cmap_color(offset);
         }

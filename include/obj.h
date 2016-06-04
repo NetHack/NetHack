@@ -40,12 +40,13 @@ struct obj {
     unsigned owt;
     long quan; /* number of items */
 
-    schar spe; /* quality of weapon, armor or ring (+ or -)
-                  number of charges for wand ( >= -1 )
-                  marks your eggs, tin variety and spinach tins
-                  royal coffers for a court ( == 2)
-                  tells which fruit a fruit is
-                  special for uball and amulet
+    schar spe; /* quality of weapon, armor or ring (+ or -);
+                  number of charges for wand or charged tool ( >= -1 );
+                  marks your eggs, tin variety and spinach tins;
+                  Schroedinger's Box (1) or royal coffers for a court (2);
+                  tells which fruit a fruit is;
+                  special for uball and amulet;
+                  scroll of mail (normal==0, bones or wishing==1, written==2);
                   historic and gender for statues */
 #define STATUE_HISTORIC 0x01
 #define STATUE_MALE 0x02
@@ -336,7 +337,7 @@ struct obj {
 
 /* helpers, simple enough to be macros */
 #define is_plural(o) \
-    ((o)->quan > 1 || (o)->oartifact == ART_EYES_OF_THE_OVERWORLD)
+    ((o)->quan != 1L || (o)->otyp == LENSES || is_gloves(o) || is_boots(o))
 
 /* Flags for get_obj_location(). */
 #define CONTAINED_TOO 0x1

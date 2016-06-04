@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1455674291 2016/02/17 01:58:11 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.93 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1463790247 2016/05/21 00:24:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.98 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -165,9 +165,13 @@ struct obj **obj_p;
         if (mtmp && has_mcorpsenm(mtmp)) /* mimic as corpse/statue */
             otmp->corpsenm = MCORPSENM(mtmp);
     }
-    /* if located at adjacent spot, mark it as having been seen up close */
-    if (otmp && distu(x, y) <= 2 && !Blind && !Hallucination)
-        otmp->dknown = 1;
+    /* if located at adjacent spot, mark it as having been seen up close
+       (corpse type will be known even if dknown is 0, so we don't need a
+       touch check for cockatrice corpse--we're looking without touching) */
+    if (otmp && distu(x, y) <= 2 && !Blind && !Hallucination
+        /* terrain mode views what's already known, doesn't learn new stuff */
+        && !iflags.terrainmode) /* so don't set dknown when in terrain mode */
+        otmp->dknown = 1; /* if a pile, clearly see the top item only */
 
     *obj_p = otmp;
     return fakeobj; /* when True, caller needs to dealloc *obj_p */
@@ -323,7 +327,8 @@ char *buf, *monbuf;
 
     buf[0] = monbuf[0] = '\0';
     glyph = glyph_at(x, y);
-    if (u.ux == x && u.uy == y && canspotself()) {
+    if (u.ux == x && u.uy == y && canspotself()
+        && (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0)) {
         /* fill in buf[] */
         (void) self_lookat(buf);
 
@@ -348,19 +353,19 @@ char *buf, *monbuf;
                 how |= 4;
 
             if (how)
-                Sprintf(
-                    eos(buf), " [seen: %s%s%s%s%s]",
-                    (how & 1) ? "infravision" : "",
-                    /* add comma if telep and infrav */
-                    ((how & 3) > 2) ? ", " : "", (how & 2) ? "telepathy" : "",
-                    /* add comma if detect and (infrav or telep or both) */
-                    ((how & 7) > 4) ? ", " : "",
-                    (how & 4) ? "monster detection" : "");
+                Sprintf(eos(buf), " [seen: %s%s%s%s%s]",
+                        (how & 1) ? "infravision" : "",
+                        /* add comma if telep and infrav */
+                        ((how & 3) > 2) ? ", " : "",
+                        (how & 2) ? "telepathy" : "",
+                        /* add comma if detect and (infrav or telep or both) */
+                        ((how & 7) > 4) ? ", " : "",
+                        (how & 4) ? "monster detection" : "");
         }
     } else if (u.uswallow) {
-        /* all locations when swallowed other than the hero are the monster */
-        Sprintf(buf, "interior of %s",
-                Blind ? "a monster" : a_monnam(u.ustuck));
+        /* when swallowed, we're only called for spots adjacent to hero,
+           and blindness doesn't prevent hero from feeling what holds him */
+        Sprintf(buf, "interior of %s", a_monnam(u.ustuck));
         pm = u.ustuck->data;
     } else if (glyph_is_monster(glyph)) {
         bhitpos.x = x;
@@ -377,6 +382,7 @@ char *buf, *monbuf;
         Strcpy(buf, defsyms[trap_to_defsym(tnum)].explanation);
     } else if (glyph_is_warning(glyph)) {
         int warnindx = glyph_to_warning(glyph);
+
         Strcpy(buf, def_warnsyms[warnindx].explanation);
     } else if (!glyph_is_cmap(glyph)) {
         Strcpy(buf, "unexplored area");
@@ -410,6 +416,11 @@ char *buf, *monbuf;
         case S_stone:
             if (!levl[x][y].seenv) {
                 Strcpy(buf, "unexplored");
+                break;
+            } else if (Underwater && !Is_waterlevel(&u.uz)) {
+                /* "unknown" == previously mapped but not visible when
+                   submerged; better terminology appreciated... */
+                Strcpy(buf, (distu(x, y) <= 2) ? "land" : "unknown");
                 break;
             } else if (levl[x][y].typ == STONE || levl[x][y].typ == SCORR) {
                 Strcpy(buf, "stone");
@@ -515,10 +526,9 @@ boolean user_typed_name, without_asking;
         /*
          * If the object is named, then the name is the alternate description;
          * otherwise, the result of makesingular() applied to the name is.
-         * This
-         * isn't strictly optimal, but named objects of interest to the user
-         * will usually be found under their name, rather than under their
-         * object type, so looking for a singular form is pointless.
+         * This isn't strictly optimal, but named objects of interest to the
+         * user will usually be found under their name, rather than under
+         * their object type, so looking for a singular form is pointless.
          */
         if (!alt)
             alt = makesingular(dbase_str);
@@ -554,10 +564,11 @@ boolean user_typed_name, without_asking;
                     if (!(ep = index(buf, '\n')))
                         goto bad_data_file;
                     (void) strip_newline((ep > buf) ? ep - 1 : ep);
-                    /* if we match a key that begins with "~", skip this entry */
+                    /* if we match a key that begins with "~", skip
+                       this entry */
                     chk_skip = (*buf == '~') ? 1 : 0;
-                    if ((pass == 0 && pmatch(&buf[chk_skip], dbase_str)) ||
-                        (pass == 1 && alt && pmatch(&buf[chk_skip], alt))) {
+                    if ((pass == 0 && pmatch(&buf[chk_skip], dbase_str))
+                        || (pass == 1 && alt && pmatch(&buf[chk_skip], alt))) {
                         if (chk_skip) {
                             skipping_entry = TRUE;
                             continue;
@@ -581,7 +592,7 @@ boolean user_typed_name, without_asking;
                 if (sscanf(buf, "%ld,%d\n", &entry_offset, &entry_count) < 2) {
                 bad_data_file:
                     impossible("'data' file in wrong format or corrupted");
-                    /* window will exist if we came here from below via 'goto' */
+                    /* window will exist if came here from below via 'goto' */
                     if (datawin != WIN_ERR)
                         destroy_nhwindow(datawin);
                     (void) dlb_fclose(fp);
@@ -593,6 +604,7 @@ boolean user_typed_name, without_asking;
                     unsigned maxt = strlen("More info about \"\"?");
                     char *entrytext = pass ? alt : dbase_str;
                     char question[BUFSZ];
+
                     if (strlen(entrytext) < BUFSZ - maxt) {
                         Strcpy(question, "More info about \"");
                         Strcat(question, entrytext);
@@ -600,11 +612,11 @@ boolean user_typed_name, without_asking;
                     }
                     if (yn(question) == 'y')
                         yes_to_moreinfo = TRUE;
-		}
+                }
 
                 if (user_typed_name || without_asking || yes_to_moreinfo) {
-                    if (dlb_fseek(fp,
-                        (long) txt_offset + entry_offset, SEEK_SET) < 0) {
+                    if (dlb_fseek(fp, (long) txt_offset + entry_offset,
+                                  SEEK_SET) < 0) {
                         pline("? Seek error on 'data' file!");
                         (void) dlb_fclose(fp);
                         return;
@@ -636,16 +648,15 @@ int sym;
 char *out_str;
 const char **firstmatch;
 {
-    boolean need_to_look = FALSE;
-    int glyph = NO_GLYPH;
+    static const char mon_interior[] = "the interior of a monster",
+                      unreconnoitered[] = "unreconnoitered";
     static char look_buf[BUFSZ];
     char prefix[BUFSZ];
-    int found = 0; /* count of matching syms found */
-    int i, alt_i;
-    int skipped_venom = 0;
-    boolean hit_trap;
+    int i, alt_i, glyph = NO_GLYPH,
+        skipped_venom = 0, found = 0; /* count of matching syms found */
+    boolean hit_trap, need_to_look = FALSE,
+            submerged = (Underwater && !Is_waterlevel(&u.uz));
     const char *x_str;
-    static const char *mon_interior = "the interior of a monster";
 
     if (looked) {
         int oc;
@@ -665,59 +676,91 @@ const char **firstmatch;
      */
 
     /*
-     * Special case: if identifying from the screen, and we're swallowed,
-     * and looking at something other than our own symbol, then just say
-     * "the interior of a monster".
+     * Handle restricted vision range (limited to adjacent spots when
+     * swallowed or underwater) cases first.
+     *
+     * 3.6.0 listed anywhere on map, other than self, as "interior
+     * of a monster" when swallowed, and non-adjacent water or
+     * non-water anywhere as "dark part of a room" when underwater.
+     * "unreconnoitered" is an attempt to convey "even if you knew
+     * what was there earlier, you don't know what is there in the
+     * current circumstance".
+     *
+     * (Note: 'self' will always be visible when swallowed so we don't
+     * need special swallow handling for <ux,uy>.
+     * Another note: for '#terrain' without monsters, u.uswallow and
+     * submerged will always both be False and skip this code.)
      */
-    if (u.uswallow && looked
-        && (is_swallow_sym(sym) || (int) showsyms[S_stone] == sym)) {
+    x_str = 0;
+    if (looked && (u.uswallow || submerged) && distu(cc.x, cc.y) > 2) {
+        x_str = unreconnoitered;
+        need_to_look = FALSE;
+    } else if (looked && u.uswallow && is_swallow_sym(sym)) {
+        x_str = mon_interior;
+        need_to_look = TRUE; /* for specific monster type */
+    }
+    if (x_str) {
+        /* we know 'found' is zero here, but guard against some other
+           special case being inserted ahead of us someday */
         if (!found) {
-            Sprintf(out_str, "%s%s", prefix, mon_interior);
-            *firstmatch = mon_interior;
+            Sprintf(out_str, "%s%s", prefix, x_str);
+            *firstmatch = x_str;
+            found++;
         } else {
-            found += append_str(out_str, mon_interior);
+            found += append_str(out_str, x_str); /* not 'an(x_str)' */
         }
-        need_to_look = TRUE;
-        goto didlook;
+        /* for is_swallow_sym(), we want to list the current symbol's
+           other possibilities (wand for '/', throne for '\\', &c) so
+           don't jump to the end for the x_str==mon_interior case */
+        if (x_str == unreconnoitered)
+            goto didlook;
     }
 
     /* Check for monsters */
-    for (i = 0; i < MAXMCLASSES; i++) {
-        if (sym == (looked ? showsyms[i + SYM_OFF_M] : def_monsyms[i].sym)
-            && def_monsyms[i].explain) {
-            need_to_look = TRUE;
-            if (!found) {
-                Sprintf(out_str, "%s%s", prefix, an(def_monsyms[i].explain));
-                *firstmatch = def_monsyms[i].explain;
-                found++;
-            } else {
-                found += append_str(out_str, an(def_monsyms[i].explain));
+    if (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0) {
+        for (i = 0; i < MAXMCLASSES; i++) {
+            if (sym == (looked ? showsyms[i + SYM_OFF_M] : def_monsyms[i].sym)
+                && def_monsyms[i].explain) {
+                need_to_look = TRUE;
+                if (!found) {
+                    Sprintf(out_str, "%s%s",
+                            prefix, an(def_monsyms[i].explain));
+                    *firstmatch = def_monsyms[i].explain;
+                    found++;
+                } else {
+                    found += append_str(out_str, an(def_monsyms[i].explain));
+                }
             }
         }
+        /* handle '@' as a special case if it refers to you and you're
+           playing a character which isn't normally displayed by that
+           symbol; firstmatch is assumed to already be set for '@' */
+        if ((looked ? (sym == showsyms[S_HUMAN + SYM_OFF_M]
+                       && cc.x == u.ux && cc.y == u.uy)
+                    : (sym == def_monsyms[S_HUMAN].sym && !flags.showrace))
+            && !(Race_if(PM_HUMAN) || Race_if(PM_ELF)) && !Upolyd)
+            found += append_str(out_str, "you"); /* tack on "or you" */
     }
-    /* handle '@' as a special case if it refers to you and you're
-       playing a character which isn't normally displayed by that
-       symbol; firstmatch is assumed to already be set for '@' */
-    if ((looked ? (sym == showsyms[S_HUMAN + SYM_OFF_M]
-                   && cc.x == u.ux && cc.y == u.uy)
-                : (sym == def_monsyms[S_HUMAN].sym && !flags.showrace))
-        && !(Race_if(PM_HUMAN) || Race_if(PM_ELF)) && !Upolyd)
-        found += append_str(out_str, "you"); /* tack on "or you" */
 
     /* Now check for objects */
-    for (i = 1; i < MAXOCLASSES; i++) {
-        if (sym == (looked ? showsyms[i + SYM_OFF_O] : def_oc_syms[i].sym)) {
-            need_to_look = TRUE;
-            if (looked && i == VENOM_CLASS) {
-                skipped_venom++;
-                continue;
-            }
-            if (!found) {
-                Sprintf(out_str, "%s%s", prefix, an(def_oc_syms[i].explain));
-                *firstmatch = def_oc_syms[i].explain;
-                found++;
-            } else {
-                found += append_str(out_str, an(def_oc_syms[i].explain));
+    if (!iflags.terrainmode || (iflags.terrainmode & TER_OBJ) != 0) {
+        for (i = 1; i < MAXOCLASSES; i++) {
+            if (sym == (looked ? showsyms[i + SYM_OFF_O]
+                               : def_oc_syms[i].sym)
+                || (looked && i == ROCK_CLASS && glyph_is_statue(glyph))) {
+                need_to_look = TRUE;
+                if (looked && i == VENOM_CLASS) {
+                    skipped_venom++;
+                    continue;
+                }
+                if (!found) {
+                    Sprintf(out_str, "%s%s",
+                            prefix, an(def_oc_syms[i].explain));
+                    *firstmatch = def_oc_syms[i].explain;
+                    found++;
+                } else {
+                    found += append_str(out_str, an(def_oc_syms[i].explain));
+                }
             }
         }
     }
@@ -741,13 +784,15 @@ const char **firstmatch;
         /* when sym is the default background character, we process
            i == 0 three times: unexplored, stone, dark part of a room */
         if (alt_i < 2) {
-            x_str = !alt_i++ ? "unexplored" : "stone";
+            x_str = !alt_i++ ? "unexplored" : submerged ? "unknown" : "stone";
             i = 0; /* for second iteration, undo loop increment */
             /* alt_i is now 1 or 2 */
         } else {
             if (alt_i++ == 2)
                 i = 0; /* undo loop increment */
             x_str = defsyms[i].explanation;
+            if (submerged && !strcmp(x_str, defsyms[0].explanation))
+                x_str = "land"; /* replace "dark part of a room" */
             /* alt_i is now 3 or more and no longer of interest */
         }
         if (sym == (looked ? showsyms[i] : defsyms[i].sym) && *x_str) {
@@ -757,6 +802,7 @@ const char **firstmatch;
             int article = strstri(x_str, " of a room") ? 2
                           : !(alt_i <= 2
                               || strcmp(x_str, "air") == 0
+                              || strcmp(x_str, "land") == 0
                               || strcmp(x_str, "water") == 0);
 
             if (!found) {
@@ -770,7 +816,7 @@ const char **firstmatch;
                 }
                 *firstmatch = x_str;
                 found++;
-            } else if (!u.uswallow && !(hit_trap && is_cmap_trap(i))
+            } else if (!(hit_trap && is_cmap_trap(i))
                        && !(found >= 3 && is_cmap_drawbridge(i))
                        /* don't mention vibrating square outside of Gehennom
                           unless this happens to be one (hallucination?) */

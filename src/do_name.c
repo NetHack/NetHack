@@ -8,7 +8,7 @@ STATIC_DCL char *NDECL(nextmbuf);
 STATIC_DCL void FDECL(getpos_help, (BOOLEAN_P, const char *));
 STATIC_DCL int FDECL(CFDECLSPEC cmp_coord_distu, (const void *,
                                                   const void *));
-STATIC_DCL void FDECL(gather_locs, (coord **, int *, BOOLEAN_P));
+STATIC_DCL void FDECL(gather_locs, (coord **, int *, int));
 STATIC_DCL void FDECL(auto_describe, (int, int));
 STATIC_DCL void NDECL(do_mname);
 STATIC_DCL boolean FDECL(alreadynamed, (struct monst *, char *, char *));
@@ -59,30 +59,38 @@ const char *goal;
     putstr(tmpwin, 0, "Use [HJKL] to move the cursor 8 units at a time.");
     putstr(tmpwin, 0, "Or enter a background symbol (ex. <).");
     putstr(tmpwin, 0, "Use @ to move the cursor on yourself.");
-    putstr(tmpwin, 0, "Use m or M to move the cursor to next monster.");
-    putstr(tmpwin, 0, "Use o or O to move the cursor to next object.");
-    if (getpos_hilitefunc)
-        putstr(tmpwin, 0, "Use $ to display valid locations.");
-    putstr(tmpwin, 0, "Use # to toggle automatic description.");
-    if (iflags.cmdassist) /* assisting the '/' command, I suppose... */
-        putstr(tmpwin, 0, (iflags.getpos_coords == GPCOORDS_NONE)
-        ? "(Set 'whatis_coord' option to include coordinates with '#' text.)"
+    if (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0)
+        putstr(tmpwin, 0, "Use m or M to move the cursor to next monster.");
+    if (!iflags.terrainmode || (iflags.terrainmode & TER_OBJ) != 0)
+        putstr(tmpwin, 0, "Use o or O to move the cursor to next object.");
+    if (!iflags.terrainmode) {
+        putstr(tmpwin, 0, "Use d or D to move the cursor to next door or doorway.");
+        if (getpos_hilitefunc)
+            putstr(tmpwin, 0, "Use $ to display valid locations.");
+        putstr(tmpwin, 0, "Use # to toggle automatic description.");
+        if (iflags.cmdassist) /* assisting the '/' command, I suppose... */
+            putstr(tmpwin, 0,
+                   (iflags.getpos_coords == GPCOORDS_NONE)
+         ? "(Set 'whatis_coord' option to include coordinates with '#' text.)"
         : "(Reset 'whatis_coord' option to omit coordinates from '#' text.)");
-    /* disgusting hack; the alternate selection characters work for any
-       getpos call, but they only matter for dowhatis (and doquickwhatis) */
-    doing_what_is = (goal == what_is_an_unknown_object);
-    Sprintf(sbuf, "Type a .%s when you are at the right place.",
-            doing_what_is ? " or , or ; or :" : "");
-    putstr(tmpwin, 0, sbuf);
-    if (doing_what_is) {
-        putstr(tmpwin, 0,
-        "  : describe current spot, show 'more info', move to another spot.");
-        Sprintf(sbuf, "  . describe current spot,%s move to another spot;",
-                flags.help ? " prompt if 'more info'," : "");
+        /* disgusting hack; the alternate selection characters work for any
+           getpos call, but only matter for dowhatis (and doquickwhatis) */
+        doing_what_is = (goal == what_is_an_unknown_object);
+        Sprintf(sbuf, "Type a .%s when you are at the right place.",
+                doing_what_is ? " or , or ; or :" : "");
         putstr(tmpwin, 0, sbuf);
-        putstr(tmpwin, 0, "  , describe current spot, move to another spot;");
-        putstr(tmpwin, 0,
-               "  ; describe current spot, stop looking at things;");
+        if (doing_what_is) {
+            putstr(tmpwin, 0,
+        "  : describe current spot, show 'more info', move to another spot.");
+            Sprintf(sbuf,
+                    "  . describe current spot,%s move to another spot;",
+                    flags.help ? " prompt if 'more info'," : "");
+            putstr(tmpwin, 0, sbuf);
+            putstr(tmpwin, 0,
+                   "  , describe current spot, move to another spot;");
+            putstr(tmpwin, 0,
+                   "  ; describe current spot, stop looking at things;");
+        }
     }
     if (!force)
         putstr(tmpwin, 0, "Type Space or Escape when you're done.");
@@ -113,17 +121,38 @@ const void *b;
     return dist_1 - dist_2;
 }
 
+#define GLOC_MONS 0
+#define GLOC_OBJS 1
+#define GLOC_DOOR 2
+
+boolean
+gather_locs_glyphmatch(glyph, gloc)
+int glyph, gloc;
+{
+    switch (gloc) {
+    default:
+    case GLOC_MONS: return (glyph_is_monster(glyph)
+                            && glyph != monnum_to_glyph(PM_LONG_WORM_TAIL));
+    case GLOC_OBJS: return (glyph_is_object(glyph)
+                            && glyph != objnum_to_glyph(BOULDER)
+                            && glyph != objnum_to_glyph(ROCK));
+    case GLOC_DOOR: return (glyph_is_cmap(glyph)
+                            && ((glyph_to_cmap(glyph) == S_hcdoor)
+                                || (glyph_to_cmap(glyph) == S_vcdoor)
+                                || (glyph_to_cmap(glyph) == S_hodoor)
+                                || (glyph_to_cmap(glyph) == S_vodoor)
+                                || (glyph_to_cmap(glyph) == S_ndoor)));
+    }
+}
+
 /* gather locations for monsters or objects shown on the map */
 STATIC_OVL void
-gather_locs(arr_p, cnt_p, do_mons)
+gather_locs(arr_p, cnt_p, gloc)
 coord **arr_p;
 int *cnt_p;
-boolean do_mons;
+int gloc;
 {
-    int x, y, pass, glyph, idx,
-        tail = (do_mons ? monnum_to_glyph(PM_LONG_WORM_TAIL) : 0),
-        boulder = (!do_mons ? objnum_to_glyph(BOULDER) : 0),
-        rock = (!do_mons ? objnum_to_glyph(ROCK) : 0);
+    int x, y, pass, glyph, idx;
 
     /*
      * We always include the hero's location even if there is no monster
@@ -147,9 +176,7 @@ boolean do_mons;
                 /* unlike '/M', this skips monsters revealed by
                    warning glyphs and remembered invisible ones */
                 if ((x == u.ux && y == u.uy)
-                    || (do_mons ? (glyph_is_monster(glyph) && glyph != tail)
-                                : (glyph_is_object(glyph)
-                                   && glyph != boulder && glyph != rock))) {
+                    || gather_locs_glyphmatch(glyph, gloc)) {
                     if (!pass) {
                         ++*cnt_p;
                     } else {
@@ -272,8 +299,10 @@ const char *goal;
     static const char pick_chars[] = ".,;:";
     const char *cp;
     boolean hilite_state = FALSE;
-    coord *monarr = (coord *) 0, *objarr = (coord *) 0;
-    int moncount = 0, monidx = 0, objcount = 0, objidx = 0;
+    coord *monarr = (coord *) 0, *objarr = (coord *) 0,
+        *doorarr = (coord *) 0;
+    int moncount = 0, monidx = 0, objcount = 0, objidx = 0,
+        doorcount = 0, dooridx = 0;
 
     if (!goal)
         goal = "desired location";
@@ -394,13 +423,13 @@ const char *goal;
         } else if (c == '@') { /* return to hero's spot */
             /* reset 'm','M' and 'o','O'; otherwise, there's no way for player
                to achieve that except by manually cycling through all spots */
-            monidx = objidx = 0;
+            monidx = objidx = dooridx = 0;
             cx = u.ux;
             cy = u.uy;
             goto nxtc;
         } else if (c == 'm' || c == 'M') { /* nearest or farthest monster */
             if (!monarr) {
-                gather_locs(&monarr, &moncount, TRUE);
+                gather_locs(&monarr, &moncount, GLOC_MONS);
                 monidx = 0; /* monarr[0] is hero's spot */
             }
             if (c == 'm') {
@@ -414,7 +443,7 @@ const char *goal;
             goto nxtc;
         } else if (c == 'o' || c == 'O') { /* nearest or farthest object */
             if (!objarr) {
-                gather_locs(&objarr, &objcount, FALSE);
+                gather_locs(&objarr, &objcount, GLOC_OBJS);
                 objidx = 0; /* objarr[0] is hero's spot */
             }
             if (c == 'o') {
@@ -425,6 +454,20 @@ const char *goal;
             }
             cx = objarr[objidx].x;
             cy = objarr[objidx].y;
+            goto nxtc;
+        } else if (c == 'd' || c == 'D') {  /* door/doorway */
+            if (!doorarr) {
+                gather_locs(&doorarr, &doorcount, GLOC_DOOR);
+                dooridx = 0; /* objarr[0] is hero's spot */
+            }
+            if (c == 'd') {
+                dooridx = (dooridx + 1) % doorcount;
+            } else {
+                if (--dooridx < 0)
+                    dooridx = doorcount - 1;
+            }
+            cx = doorarr[dooridx].x;
+            cy = doorarr[dooridx].y;
             goto nxtc;
         } else {
             if (!index(quitchars, c)) {
@@ -446,7 +489,7 @@ const char *goal;
                             hi_x = (pass == 1 && ty == hi_y) ? cx : COLNO - 1;
                             for (tx = lo_x; tx <= hi_x; tx++) {
                                 /* look at dungeon feature, not at
-                                 * user-visible glyph */
+                                   user-visible glyph */
                                 k = back_to_glyph(tx, ty);
                                 /* uninteresting background glyph */
                                 if (glyph_is_cmap(k)
@@ -460,9 +503,10 @@ const char *goal;
                                 }
                                 if (glyph_is_cmap(k)
                                     && matching[glyph_to_cmap(k)]
-                                    && levl[tx][ty].seenv
-                                    && (!IS_WALL(levl[tx][ty].typ))
-                                    && (levl[tx][ty].typ != SDOOR)
+                                    && (levl[tx][ty].seenv
+                                        || iflags.terrainmode)
+                                    && !IS_WALL(levl[tx][ty].typ)
+                                    && levl[tx][ty].typ != SDOOR
                                     && glyph_to_cmap(k) != S_room
                                     && glyph_to_cmap(k) != S_corr
                                     && glyph_to_cmap(k) != S_litcorr) {
@@ -495,8 +539,10 @@ const char *goal;
             }     /* !quitchars */
             if (force)
                 goto nxtc;
-            pline("Done.");
-            msg_given = FALSE; /* suppress clear */
+            if (!iflags.terrainmode) {
+                pline("Done.");
+                msg_given = FALSE; /* suppress clear */
+            }
             cx = -1;
             cy = 0;
             result = 0; /* not -1 */

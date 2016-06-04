@@ -23,6 +23,7 @@ STATIC_DCL int FDECL(precheck, (struct monst *, struct obj *));
 STATIC_DCL void FDECL(mzapmsg, (struct monst *, struct obj *, BOOLEAN_P));
 STATIC_DCL void FDECL(mreadmsg, (struct monst *, struct obj *));
 STATIC_DCL void FDECL(mquaffmsg, (struct monst *, struct obj *));
+STATIC_DCL boolean FDECL(m_use_healing, (struct monst *));
 STATIC_PTR int FDECL(mbhitm, (struct monst *, struct obj *));
 STATIC_DCL void FDECL(mbhit, (struct monst *, int,
                               int FDECL((*), (MONST_P, OBJ_P)),
@@ -139,7 +140,7 @@ struct obj *obj;
         int dam = d(obj->spe + 2, 6);
 
         /* 3.6.1: no Deaf filter; 'if' message doesn't warrant it, 'else'
-           message doesn't need it since Your_hear() has one of its own */
+           message doesn't need it since You_hear() has one of its own */
         if (vis) {
             pline("%s zaps %s, which suddenly explodes!", Monnam(mon),
                   an(xname(obj)));
@@ -153,11 +154,11 @@ struct obj *obj;
                         ? "nearby" : "in the distance");
         }
         m_useup(mon, obj);
-        if (mon->mhp <= dam) {
+        mon->mhp -= dam;
+        if (mon->mhp <= 0) {
             monkilled(mon, "", AD_RBRE);
             return 1;
-        } else
-            mon->mhp -= dam;
+        }
         m.has_defense = m.has_offense = m.has_misc = 0;
         /* Only one needed to be set to 0 but the others are harmless */
     }
@@ -269,6 +270,29 @@ struct obj *otmp;
  * that if you polymorph into one you teleport at will.
  */
 
+STATIC_OVL boolean
+m_use_healing(mtmp)
+struct monst *mtmp;
+{
+    struct obj *obj = 0;
+    if ((obj = m_carrying(mtmp, POT_FULL_HEALING)) != 0) {
+        m.defensive = obj;
+        m.has_defense = MUSE_POT_FULL_HEALING;
+        return TRUE;
+    }
+    if ((obj = m_carrying(mtmp, POT_EXTRA_HEALING)) != 0) {
+        m.defensive = obj;
+        m.has_defense = MUSE_POT_EXTRA_HEALING;
+        return TRUE;
+    }
+    if ((obj = m_carrying(mtmp, POT_HEALING)) != 0) {
+        m.defensive = obj;
+        m.has_defense = MUSE_POT_HEALING;
+        return TRUE;
+    }
+    return FALSE;
+}
+
 /* Select a defensive item/action for a monster.  Returns TRUE iff one is
    found. */
 boolean
@@ -339,21 +363,8 @@ struct monst *mtmp;
      */
     if (!mtmp->mcansee && !nohands(mtmp->data)
         && mtmp->data != &mons[PM_PESTILENCE]) {
-        if ((obj = m_carrying(mtmp, POT_FULL_HEALING)) != 0) {
-            m.defensive = obj;
-            m.has_defense = MUSE_POT_FULL_HEALING;
+        if (m_use_healing(mtmp))
             return TRUE;
-        }
-        if ((obj = m_carrying(mtmp, POT_EXTRA_HEALING)) != 0) {
-            m.defensive = obj;
-            m.has_defense = MUSE_POT_EXTRA_HEALING;
-            return TRUE;
-        }
-        if ((obj = m_carrying(mtmp, POT_HEALING)) != 0) {
-            m.defensive = obj;
-            m.has_defense = MUSE_POT_HEALING;
-            return TRUE;
-        }
     }
 
     fraction = u.ulevel < 10 ? 5 : u.ulevel < 14 ? 4 : 3;
@@ -363,21 +374,8 @@ struct monst *mtmp;
 
     if (mtmp->mpeaceful) {
         if (!nohands(mtmp->data)) {
-            if ((obj = m_carrying(mtmp, POT_FULL_HEALING)) != 0) {
-                m.defensive = obj;
-                m.has_defense = MUSE_POT_FULL_HEALING;
+            if (m_use_healing(mtmp))
                 return TRUE;
-            }
-            if ((obj = m_carrying(mtmp, POT_EXTRA_HEALING)) != 0) {
-                m.defensive = obj;
-                m.has_defense = MUSE_POT_EXTRA_HEALING;
-                return TRUE;
-            }
-            if ((obj = m_carrying(mtmp, POT_HEALING)) != 0) {
-                m.defensive = obj;
-                m.has_defense = MUSE_POT_HEALING;
-                return TRUE;
-            }
         }
         return FALSE;
     }
@@ -1500,10 +1498,13 @@ struct monst *mtmp;
             else
                 losehp(num, "scroll of fire", KILLED_BY_AN);
             for (mtmp2 = fmon; mtmp2; mtmp2 = mtmp2->nmon) {
-                if (DEADMONSTER(mtmp2)) continue;
-                if (mtmp == mtmp2) continue;
+                if (DEADMONSTER(mtmp2))
+                    continue;
+                if (mtmp == mtmp2)
+                    continue;
                 if (dist2(mtmp2->mx, mtmp2->my, mtmp->mx, mtmp->my) < 3) {
-                    if (resists_fire(mtmp2)) continue;
+                    if (resists_fire(mtmp2))
+                        continue;
                     mtmp2->mhp -= num;
                     if (resists_cold(mtmp2))
                         mtmp2->mhp -= 3 * num;
@@ -2201,7 +2202,7 @@ mon_consume_unstone(mon, obj, by_you, stoning)
 struct monst *mon;
 struct obj *obj;
 boolean by_you;
-boolean stoning;
+boolean stoning; /* True: stop petrification, False: cure stun && confusion */
 {
     boolean vis = canseemon(mon), tinned = obj->otyp == TIN,
             food = obj->otyp == CORPSE || tinned,
@@ -2240,7 +2241,10 @@ boolean stoning;
         if (mon->mhp <= 0) {
             pline("%s dies!", Monnam(mon));
             if (by_you)
-                xkilled(mon, 0);
+                /* hero gets credit (experience) and blame (possible loss
+                   of alignment and/or luck and/or telepathy depending on
+                   mon) for the kill but does not break pacifism conduct */
+                xkilled(mon, XKILL_NOMSG | XKILL_NOCONDUCT);
             else
                 mondead(mon);
             return;
@@ -2404,7 +2408,7 @@ struct trap *trap;
 boolean by_you; /* true: if mon kills itself, hero gets credit/blame */
 {               /* [by_you not honored if 'mon' triggers fire trap]. */
     struct obj *odummyp;
-    int otyp = obj->otyp, dmg;
+    int otyp = obj->otyp, dmg = 0;
     boolean vis = canseemon(mon), res = TRUE;
 
     if (vis)
@@ -2443,7 +2447,7 @@ boolean by_you; /* true: if mon kills itself, hero gets credit/blame */
         if (!rn2(3))
             mon->mspec_used = rn1(10, 5);
         /* -21 => monster's fire breath; 1 => # of damage dice */
-        (void) zhitm(mon, by_you ? 21 : -21, 1, &odummyp);
+        dmg = zhitm(mon, by_you ? 21 : -21, 1, &odummyp);
     } else if (otyp == SCR_FIRE) {
         mreadmsg(mon, obj);
         if (mon->mconf) {
@@ -2462,14 +2466,37 @@ boolean by_you; /* true: if mon kills itself, hero gets credit/blame */
             explode(mon->mx, mon->my, -11, dmg, SCROLL_CLASS,
                     /* by_you: override -11 for mon but not others */
                     by_you ? -EXPL_FIERY : EXPL_FIERY);
+            dmg = 0; /* damage has been applied by explode() */
         }
     } else { /* wand/horn of fire w/ positive charge count */
         mzapmsg(mon, obj, TRUE);
         obj->spe--;
         /* -1 => monster's wand of fire; 2 => # of damage dice */
-        (void) zhitm(mon, by_you ? 1 : -1, 2, &odummyp);
+        dmg = zhitm(mon, by_you ? 1 : -1, 2, &odummyp);
     }
 
+    if (dmg) {
+        /* zhitm() applies damage but doesn't kill creature off;
+           for fire breath, dmg is going to be 0 (fire breathers are
+           immune to fire damage) but for wand of fire or fire horn,
+           'mon' could have taken damage so might die */
+        if (mon->mhp <= 0) {
+            if (by_you) {
+                /* mon killed self but hero gets credit and blame (except
+                   for pacifist conduct); xkilled()'s message would say
+                   "You killed/destroyed <mon>" so give our own message */
+                if (vis)
+                    pline("%s is %s by the fire!", Monnam(mon),
+                          nonliving(mon->data) ? "destroyed" : "killed");
+                xkilled(mon, XKILL_NOMSG | XKILL_NOCONDUCT);
+            } else
+                monkilled(mon, "fire", AD_FIRE);
+        } else {
+            /* non-fatal damage occurred */
+            if (vis)
+                pline("%s is burned%s", Monnam(mon), exclam(dmg));
+        }
+    }
     if (vis) {
         if (res && mon->mhp > 0)
             pline("%s slime is burned away!", s_suffix(Monnam(mon)));

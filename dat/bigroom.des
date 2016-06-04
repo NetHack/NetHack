@@ -139,15 +139,22 @@ MAP
 ---------------------------------------------------------------------------
 ENDMAP
 # Dungeon Description
-REGION:(01,01,23,06),lit,"ordinary"
-REGION:(01,07,23,10),unlit,"ordinary"
-REGION:(01,11,23,16),lit,"ordinary"
-REGION:(24,01,50,06),unlit,"ordinary"
-REGION:(24,07,50,10),lit,"ordinary"
-REGION:(24,11,50,16),unlit,"ordinary"
-REGION:(51,01,73,06),lit,"ordinary"
-REGION:(51,07,73,10),unlit,"ordinary"
-REGION:(51,11,73,16),lit,"ordinary"
+REGION:(01,01,73,16),lit,"ordinary"
+SWITCH [ 3 ] {
+  CASE 0:
+    REGION:(01,07,22,09),unlit,"ordinary"
+    REGION:(24,01,50,05),unlit,"ordinary"
+    REGION:(24,11,50,16),unlit,"ordinary"
+    REGION:(52,07,73,09),unlit,"ordinary"
+    BREAK
+  CASE 1:
+    REGION:(24,01,50,16),unlit,"ordinary"
+    BREAK
+  CASE 2:
+    REGION:(01,01,22,16),unlit,"ordinary"
+    REGION:(52,01,73,16),unlit,"ordinary"
+    BREAK
+}
 # Stairs
 STAIR:random,up
 STAIR:random,down

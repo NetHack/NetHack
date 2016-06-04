@@ -6,8 +6,6 @@
 
 #include <ctype.h>
 
-STATIC_VAR NEARDATA struct monst zeromonst;
-
 /* this assumes that a human quest leader or nemesis is an archetype
    of the corresponding role; that isn't so for some roles (tourist
    for instance) but is for the priests and monks we use it for... */
@@ -23,7 +21,8 @@ STATIC_DCL void FDECL(m_initgrp, (struct monst *, int, int, int));
 STATIC_DCL void FDECL(m_initthrow, (struct monst *, int, int));
 STATIC_DCL void FDECL(m_initweap, (struct monst *));
 STATIC_DCL void FDECL(m_initinv, (struct monst *));
-STATIC_DCL boolean FDECL(makemon_rnd_goodpos, (struct monst *, unsigned, coord *));
+STATIC_DCL boolean FDECL(makemon_rnd_goodpos, (struct monst *,
+                                               unsigned, coord *));
 
 extern const int monstr[];
 
@@ -771,6 +770,7 @@ xchar x, y; /* clone's preferred location or 0 (near mon) */
     /* Max HP the same, but current HP halved for both.  The caller
      * might want to override this by halving the max HP also.
      * When current HP is odd, the original keeps the extra point.
+     * We know original has more than 1 HP, so both end up with at least 1.
      */
     m2->mhpmax = mon->mhpmax;
     m2->mhp = mon->mhp / 2;
@@ -1327,6 +1327,11 @@ int
 mbirth_limit(mndx)
 int mndx;
 {
+    /* There is an implicit limit of 4 for "high priest of <deity>",
+     * but aligned priests can grow into high priests, thus they aren't
+     * really limited to 4, so leave the default amount in place for them.
+     */
+
     /* assert(MAXMONNO < 255); */
     return (mndx == PM_NAZGUL ? 9 : mndx == PM_ERINYS ? 3 : MAXMONNO);
 }
@@ -1463,7 +1468,7 @@ rndmonst()
             rndmonst_state.mchoices[mndx] = 0;
             if (tooweak(mndx, minmlev) || toostrong(mndx, maxmlev))
                 continue;
-            if (upper && !isupper(def_monsyms[(int) (ptr->mlet)].sym))
+            if (upper && !isupper((uchar) def_monsyms[(int) ptr->mlet].sym))
                 continue;
             if (elemlevel && wrong_elem_type(ptr))
                 continue;
@@ -1668,6 +1673,7 @@ grow_up(mtmp, victim)
 struct monst *mtmp, *victim;
 {
     int oldtype, newtype, max_increase, cur_increase, lev_limit, hp_threshold;
+    unsigned fem;
     struct permonst *ptr = mtmp->data;
 
     /* monster died after killing enemy but before calling this function */
@@ -1728,6 +1734,9 @@ struct monst *mtmp, *victim;
     else if (lev_limit > 49)
         lev_limit = (ptr->mlevel > 49 ? 50 : 49);
 
+    /* new form might force gender change */
+    fem = is_male(ptr) ? 0 : is_female(ptr) ? 1 : mtmp->female;
+
     if ((int) ++mtmp->m_lev >= mons[newtype].mlevel && newtype != oldtype) {
         ptr = &mons[newtype];
         if (mvitals[newtype].mvflags & G_GENOD) { /* allow G_EXTINCT */
@@ -1739,14 +1748,31 @@ struct monst *mtmp, *victim;
             mondied(mtmp);
             return (struct permonst *) 0;
         } else if (canspotmon(mtmp)) {
+            char buf[BUFSZ];
+
+            /* 3.6.1:
+             * Temporary (?) hack to fix growing into opposite gender.
+             */
+            Sprintf(buf, "%s%s",
+                    /* deal with female gnome becoming a gnome lord */
+                    (mtmp->female && !fem) ? "male "
+                        /* or a male gnome becoming a gnome lady
+                           (can't happen with 3.6.0 mons[], but perhaps
+                           slightly less sexist if prepared for it...) */
+                      : (fem && !mtmp->female) ? "female " : "",
+                    ptr->mname);
             pline("%s %s %s.", Monnam(mtmp),
-                  humanoid(ptr) ? "becomes" : "grows up into",
-                  an(ptr->mname));
+                  (fem != mtmp->female) ? "changes into"
+                                        : humanoid(ptr) ? "becomes"
+                                                        : "grows up into",
+                  an(buf));
         }
         set_mon_data(mtmp, ptr, 1);    /* preserve intrinsics */
         newsym(mtmp->mx, mtmp->my);    /* color may change */
         lev_limit = (int) mtmp->m_lev; /* never undo increment */
     }
+    mtmp->female = fem; /* gender might be changing */
+
     /* sanity checks */
     if ((int) mtmp->m_lev > lev_limit) {
         mtmp->m_lev--; /* undo increment */

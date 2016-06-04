@@ -11,6 +11,7 @@
  *              For "UNIX" select BSD, ULTRIX, SYSV, or HPUX in unixconf.h.
  *              A "VMS" option is not needed since the VMS C-compilers
  *              provide it (no need to change sec#1, vmsconf.h handles it).
+ *              MacOSX uses the UNIX configruation, not the old MAC one.
  */
 
 #define UNIX /* delete if no fork(), exec() available */
@@ -303,6 +304,28 @@
  *      for detailed configuration.
  */
 /* #define DLB */ /* not supported on all platforms */
+
+/*
+ *      Defining REPRODUCIBLE_BUILD causes 'util/makedefs -v' to construct
+ *      date+time in include/date.h (to be shown by nethack's 'v' command)
+ *      from SOURCE_DATE_EPOCH in the build environment rather than use
+ *      current date+time when makedefs is run.
+ *
+ *      [The version string will show "last revision <date><time>" instead
+ *      of "last build <date><time>" if SOURCE_DATE_EPOCH has a value
+ *      which seems valid at the time date.h is generated.  The person
+ *      building the program is responsible for setting it correctly,
+ *      and the value should be in UTC rather than local time.  NetHack
+ *      normally uses local time and doesn't display timezone so toggling
+ *      REPRODUCIBLE_BUILD on or off might yield a date+time that appears
+ *      to be incorrect relative to what the other setting produced.]
+ *
+ *      Intent is to be able to rebuild the program with the same value
+ *      and obtain an identical copy as was produced by a previous build.
+ *      Not necessary for normal game play....
+ */
+/* #define REPRODUCIBLE_BUILD */ /* use getenv("SOURCE_DATE_EPOCH") instead
+                                    of current time when creating date.h */
 
 /*
  *      Defining INSURANCE slows down level changes, but allows games that

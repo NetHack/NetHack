@@ -1,4 +1,4 @@
-/* NetHack 3.6	trap.c	$NHDT-Date: 1454528963 2016/02/03 19:49:23 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.261 $ */
+/* NetHack 3.6	trap.c	$NHDT-Date: 1464138044 2016/05/25 01:00:44 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.272 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -197,6 +197,8 @@ int ef_flags;
     if (check_grease && otmp->greased) {
         grease_protect(otmp, ostr, victim);
         return ER_GREASED;
+    } else if (!erosion_matters(otmp)) {
+        return ER_NOTHING;
     } else if (!vulnerable || (otmp->oerodeproof && otmp->rknown)) {
         if (flags.verbose && print && (uvictim || vismon))
             pline("%s %s %s not affected by %s.",
@@ -309,12 +311,12 @@ struct monst *victim;
 
 struct trap *
 maketrap(x, y, typ)
-register int x, y, typ;
+int x, y, typ;
 {
     static union vlaunchinfo zero_vl;
-    register struct trap *ttmp;
-    register struct rm *lev;
     boolean oldplace;
+    struct trap *ttmp;
+    struct rm *lev = &levl[x][y];
 
     if ((ttmp = t_at(x, y)) != 0) {
         if (ttmp->ttyp == MAGIC_PORTAL || ttmp->ttyp == VIBRATING_SQUARE)
@@ -327,13 +329,15 @@ register int x, y, typ;
                     && typ != SPIKED_PIT)))
             u.utrap = 0;
         /* old <tx,ty> remain valid */
-    } else if (IS_FURNITURE(levl[x][y].typ)) {
+    } else if (IS_FURNITURE(lev->typ)
+               && (!IS_GRAVE(lev->typ) || (typ != PIT && typ != HOLE))) {
         /* no trap on top of furniture (caller usually screens the
            location to inhibit this, but wizard mode wishing doesn't) */
         return (struct trap *) 0;
     } else {
         oldplace = FALSE;
         ttmp = newtrap();
+        (void) memset((genericptr_t)ttmp, 0, sizeof(struct trap));
         ttmp->ntrap = 0;
         ttmp->tx = x;
         ttmp->ty = y;
@@ -399,7 +403,6 @@ register int x, y, typ;
         /*FALLTHRU*/
     case HOLE:
     case TRAPDOOR:
-        lev = &levl[x][y];
         if (*in_rooms(x, y, SHOPBASE)
             && (typ == HOLE || typ == TRAPDOOR
                 || IS_DOOR(lev->typ) || IS_WALL(lev->typ)))
@@ -687,6 +690,7 @@ int *fail_reason;
            which refers to "it" so needs to follow a message describing
            the object ("the statue comes to life" one above) */
         if (cause != ANIMATE_NORMAL && costly_spot(x, y)
+            && (carried(statue) ? statue->unpaid : !statue->no_charge)
             && (shkp = shop_keeper(*in_rooms(x, y, SHOPBASE))) != 0
             /* avoid charging for Manlobbi's statue of Manlobbi
                if stone-to-flesh is used on petrified shopkeep */
@@ -787,6 +791,49 @@ struct obj *objchn, *saddle;
             && keep_saddle_with_steedcorpse(steed_mid, objchn->cobj, saddle))
             return TRUE;
         objchn = objchn->nobj;
+    }
+    return FALSE;
+}
+
+/* monster or you go through and possibly destroy a web.
+   return TRUE if could go through. */
+boolean
+mu_maybe_destroy_web(mtmp, domsg, trap)
+struct monst *mtmp;
+boolean domsg;
+struct trap *trap;
+{
+    boolean isyou = (mtmp == &youmonst);
+    struct permonst *mptr = mtmp->data;
+    if (amorphous(mptr) || is_whirly(mptr) || flaming(mptr)
+        || unsolid(mptr) || mptr == &mons[PM_GELATINOUS_CUBE]) {
+        xchar x = trap->tx;
+        xchar y = trap->ty;
+        if (flaming(mptr) || acidic(mptr)) {
+            if (domsg) {
+                if (isyou)
+                    You("%s %s spider web!",
+                        (flaming(mptr)) ? "burn" : "dissolve",
+                        a_your[trap->madeby_u]);
+                else
+                    pline("%s %s %s spider web!", Monnam(mtmp),
+                          (flaming(mptr)) ? "burns" : "dissolves",
+                          a_your[trap->madeby_u]);
+            }
+            deltrap(trap);
+            newsym(x, y);
+            return TRUE;
+        }
+        if (domsg) {
+            if (isyou)
+                You("flow through %s spider web.", a_your[trap->madeby_u]);
+            else {
+                pline("%s flows through %s spider web.", Monnam(mtmp),
+                      a_your[trap->madeby_u]);
+                seetrap(trap);
+            }
+        }
+        return TRUE;
     }
     return FALSE;
 }
@@ -1195,23 +1242,8 @@ unsigned trflags;
 
     case WEB: /* Our luckless player has stumbled into a web. */
         feeltrap(trap);
-        if (amorphous(youmonst.data) || is_whirly(youmonst.data)
-            || unsolid(youmonst.data)) {
-            if (acidic(youmonst.data) || u.umonnum == PM_GELATINOUS_CUBE
-                || u.umonnum == PM_FIRE_ELEMENTAL) {
-                if (webmsgok)
-                    You("%s %s spider web!",
-                        (u.umonnum == PM_FIRE_ELEMENTAL) ? "burn"
-                                                         : "dissolve",
-                        a_your[trap->madeby_u]);
-                deltrap(trap);
-                newsym(u.ux, u.uy);
-                break;
-            }
-            if (webmsgok)
-                You("flow through %s spider web.", a_your[trap->madeby_u]);
+        if (mu_maybe_destroy_web(&youmonst, webmsgok, trap))
             break;
-        }
         if (webmaker(youmonst.data)) {
             if (webmsgok)
                 pline(trap->madeby_u ? "You take a walk on your web."
@@ -2410,28 +2442,8 @@ register struct monst *mtmp;
             /* Monster in a web. */
             if (webmaker(mptr))
                 break;
-            if (amorphous(mptr) || is_whirly(mptr) || unsolid(mptr)) {
-                if (acidic(mptr) || mptr == &mons[PM_GELATINOUS_CUBE]
-                    || mptr == &mons[PM_FIRE_ELEMENTAL]
-                    || mptr == &mons[PM_FIRE_VORTEX]) {
-                    if (in_sight)
-                        pline("%s %s %s spider web!", Monnam(mtmp),
-                              (mptr == &mons[PM_FIRE_ELEMENTAL]
-                               || mptr == &mons[PM_FIRE_VORTEX])
-                                  ? "burns"
-                                  : "dissolves",
-                              a_your[trap->madeby_u]);
-                    deltrap(trap);
-                    newsym(mtmp->mx, mtmp->my);
-                    break;
-                }
-                if (in_sight) {
-                    pline("%s flows through %s spider web.", Monnam(mtmp),
-                          a_your[trap->madeby_u]);
-                    seetrap(trap);
-                }
+            if (mu_maybe_destroy_web(mtmp, in_sight, trap))
                 break;
-            }
             tear_web = FALSE;
             switch (monsndx(mptr)) {
             case PM_OWLBEAR: /* Eric Backus */
@@ -2521,7 +2533,8 @@ register struct monst *mtmp;
 
                 if (in_sight)
                     seetrap(trap);
-                if ((mtmp->mhp -= dmgval2) <= 0)
+                mtmp->mhp -= dmgval2;
+                if (mtmp->mhp <= 0)
                     monkilled(mtmp,
                               in_sight
                                   ? "compression from an anti-magic field"
@@ -2553,18 +2566,19 @@ register struct monst *mtmp;
                 }
             } else if (in_sight) {
                 newsym(mtmp->mx, mtmp->my);
-                pline("KAABLAMM!!!  %s triggers %s land mine!", Monnam(mtmp),
+                pline("%s%s triggers %s land mine!",
+                      !Deaf ? "KAABLAMM!!!  " : "", Monnam(mtmp),
                       a_your[trap->madeby_u]);
             }
-            if (!in_sight)
+            if (!in_sight && !Deaf)
                 pline("Kaablamm!  You hear an explosion in the distance!");
             blow_up_landmine(trap);
             /* explosion might have destroyed a drawbridge; don't
                dish out more damage if monster is already dead */
             if (mtmp->mhp <= 0
-                || thitm(0, mtmp, (struct obj *) 0, rnd(16), FALSE))
+                || thitm(0, mtmp, (struct obj *) 0, rnd(16), FALSE)) {
                 trapkilled = TRUE;
-            else {
+            } else {
                 /* monsters recursively fall into new pit */
                 if (mintrap(mtmp) == 2)
                     trapkilled = TRUE;
@@ -2668,7 +2682,7 @@ boolean byplayer;
         pline("%s turns to stone.", Monnam(mon));
     if (byplayer) {
         stoned = TRUE;
-        xkilled(mon, 0);
+        xkilled(mon, XKILL_NOMSG);
     } else
         monstone(mon);
 }
@@ -3874,7 +3888,8 @@ boolean force_failure;
                 if (ttype == BEAR_TRAP) {
                     if (mtmp->mtame)
                         abuse_dog(mtmp);
-                    if ((mtmp->mhp -= rnd(4)) <= 0)
+                    mtmp->mhp -= rnd(4);
+                    if (mtmp->mhp <= 0)
                         killed(mtmp);
                 } else if (ttype == WEB) {
                     if (!webmaker(youmonst.data)) {
@@ -4524,7 +4539,7 @@ boolean *noticed; /* set to true iff hero notices the effect; */
         --force_mintrap;
         /* mon might now be on the migrating monsters list */
     }
-    return TRUE;
+    return result;
 }
 
 /* only called when the player is doing something to the chest directly */
@@ -4605,16 +4620,11 @@ boolean disarm;
                 loss += stolen_value(obj, ox, oy, (boolean) shkp->mpeaceful,
                                      TRUE);
             delete_contents(obj);
-            /* we're about to delete all things at this location,
-             * which could include the ball & chain.
-             * If we attempt to call unpunish() in the
-             * for-loop below we can end up with otmp2
-             * being invalid once the chain is gone.
-             * Deal with ball & chain right now instead.
-             */
-            if (Punished && !carried(uball)
-                && ((uchain->ox == u.ux && uchain->oy == u.uy)
-                    || (uball->ox == u.ux && uball->oy == u.uy)))
+            /* unpunish() in advance if either ball or chain (or both)
+               is going to be destroyed */
+            if (Punished && ((uchain->ox == u.ux && uchain->oy == u.uy)
+                             || (uball->where == OBJ_FLOOR
+                                 && uball->ox == u.ux && uball->oy == u.uy)))
                 unpunish();
 
             for (otmp = level.objects[u.ux][u.uy]; otmp; otmp = otmp2) {
@@ -4935,9 +4945,9 @@ boolean nocorpse;
             if (dam < 1)
                 dam = 1;
         }
-        if ((mon->mhp -= dam) <= 0) {
-            int xx = mon->mx;
-            int yy = mon->my;
+        mon->mhp -= dam;
+        if (mon->mhp <= 0) {
+            int xx = mon->mx, yy = mon->my;
 
             monkilled(mon, "", nocorpse ? -AD_RBRE : AD_PHYS);
             if (mon->mhp <= 0) {

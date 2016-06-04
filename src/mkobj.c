@@ -1,4 +1,4 @@
-/* NetHack 3.6	mkobj.c	$NHDT-Date: 1454715975 2016/02/05 23:46:15 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.119 $ */
+/* NetHack 3.6	mkobj.c	$NHDT-Date: 1462067745 2016/05/01 01:55:45 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.122 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -107,13 +107,11 @@ struct obj *otmp;
 {
     if (!otmp->oextra)
         otmp->oextra = newoextra();
+
     if (!OMONST(otmp)) {
         struct monst *m = newmonst();
 
-        /* newmonst() allocates memory but doesn't initialize anything */
-        (void) memset((genericptr_t) m, 0, sizeof (struct monst));
-        m->mextra = (struct mextra *) 0;
-        m->nmon = (struct monst *) 0;
+        *m = zeromonst;
         OMONST(otmp) = m;
     }
 }
@@ -736,7 +734,8 @@ boolean artif;
     otmp->where = OBJ_FREE;
     otmp->dknown = index(dknowns, let) ? 0 : 1;
     if ((otmp->otyp >= ELVEN_SHIELD && otmp->otyp <= ORCISH_SHIELD)
-        || otmp->otyp == SHIELD_OF_REFLECTION)
+        || otmp->otyp == SHIELD_OF_REFLECTION
+        || objects[otmp->otyp].oc_merge)
         otmp->dknown = 0;
     if (!objects[otmp->otyp].oc_uses_known)
         otmp->known = 1;
@@ -2589,9 +2588,10 @@ struct obj *
 obj_nexto(otmp)
 struct obj *otmp;
 {
-    if (!otmp)
+    if (!otmp) {
         impossible("obj_nexto: wasn't given an object to check");
-
+        return (struct obj *) 0;
+    }
     return obj_nexto_xy(otmp, otmp->ox, otmp->oy, TRUE);
 }
 

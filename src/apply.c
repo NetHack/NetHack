@@ -1,4 +1,4 @@
-/* NetHack 3.6	apply.c	$NHDT-Date: 1457207021 2016/03/05 19:43:41 $  $NHDT-Branch: chasonr $:$NHDT-Revision: 1.223 $ */
+/* NetHack 3.6	apply.c	$NHDT-Date: 1457397477 2016/03/08 00:37:57 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.224 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -737,7 +737,7 @@ register xchar x, y;
                        that's the result of his actions; gain experience,
                        lose pacifism, take alignment and luck hit, make
                        corpse less likely to remain tame after revival */
-                    xkilled(mtmp, 0); /* no "you kill it" message */
+                    xkilled(mtmp, XKILL_NOMSG);
                     /* life-saving doesn't ordinarily reset this */
                     if (mtmp->mhp > 0)
                         u.uconduct.killer = save_pacifism;
@@ -3430,7 +3430,7 @@ doapply()
     case SACK:
     case BAG_OF_HOLDING:
     case OILSKIN_SACK:
-        res = use_container(&obj, 1);
+        res = use_container(&obj, 1, FALSE);
         break;
     case BAG_OF_TRICKS:
         (void) bagotricks(obj, FALSE, (int *) 0);

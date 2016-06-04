@@ -1,4 +1,4 @@
-/* NetHack 3.6	pline.c	$NHDT-Date: 1456528597 2016/02/26 23:16:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.49 $ */
+/* NetHack 3.6	pline.c	$NHDT-Date: 1461437814 2016/04/23 18:56:54 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.51 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -436,7 +436,8 @@ register struct monst *mtmp;
         Strcat(info, ", asleep");
 #if 0 /* unfortunately mfrozen covers temporary sleep and being busy \
          (donning armor, for instance) as well as paralysis */
-	else if (mtmp->mfrozen)	  Strcat(info, ", paralyzed");
+    else if (mtmp->mfrozen)
+        Strcat(info, ", paralyzed");
 #else
     else if (mtmp->mfrozen || !mtmp->mcanmove)
         Strcat(info, ", can't move");
@@ -538,23 +539,8 @@ ustatusline()
         Strcat(info, mon_nam(u.ustuck));
     }
 
-    pline("Status of %s (%s%s):  Level %d  HP %d(%d)  AC %d%s.", plname,
-          (u.ualign.record >= 20)
-              ? "piously "
-              : (u.ualign.record > 13)
-                    ? "devoutly "
-                    : (u.ualign.record > 8)
-                          ? "fervently "
-                          : (u.ualign.record > 3)
-                                ? "stridently "
-                                : (u.ualign.record == 3)
-                                      ? ""
-                                      : (u.ualign.record >= 1)
-                                            ? "haltingly "
-                                            : (u.ualign.record == 0)
-                                                  ? "nominally "
-                                                  : "insufficiently ",
-          align_str(u.ualign.type),
+    pline("Status of %s (%s):  Level %d  HP %d(%d)  AC %d%s.", plname,
+          piousness(FALSE, align_str(u.ualign.type)),
           Upolyd ? mons[u.umonnum].mlevel : u.ulevel, Upolyd ? u.mh : u.uhp,
           Upolyd ? u.mhmax : u.uhpmax, u.uac, info);
 }
@@ -566,6 +552,47 @@ self_invis_message()
           Hallucination ? "Far out, man!  You" : "Gee!  All of a sudden, you",
           See_invisible ? "can see right through yourself"
                         : "can't see yourself");
+}
+
+char *
+piousness(showneg, suffix)
+boolean showneg;
+const char *suffix;
+{
+    static char buf[32]; /* bigger than "insufficiently neutral" */
+    const char *pio;
+
+    /* note: piousness 20 matches MIN_QUEST_ALIGN (quest.h) */
+    if (u.ualign.record >= 20)
+        pio = "piously";
+    else if (u.ualign.record > 13)
+        pio = "devoutly";
+    else if (u.ualign.record > 8)
+        pio = "fervently";
+    else if (u.ualign.record > 3)
+        pio = "stridently";
+    else if (u.ualign.record == 3)
+        pio = "";
+    else if (u.ualign.record > 0)
+        pio = "haltingly";
+    else if (u.ualign.record == 0)
+        pio = "nominally";
+    else if (!showneg)
+        pio = "insufficiently";
+    else if (u.ualign.record >= -3)
+        pio = "strayed";
+    else if (u.ualign.record >= -8)
+        pio = "sinned";
+    else
+        pio = "transgressed";
+
+    Sprintf(buf, "%s", pio);
+    if (suffix && (!showneg || u.ualign.record >= 0)) {
+        if (u.ualign.record != 3)
+            Strcat(buf, " ");
+        Strcat(buf, suffix);
+    }
+    return buf;
 }
 
 void

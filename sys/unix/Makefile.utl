@@ -95,6 +95,11 @@ NHSROOT=..
 #CFLAGS = -O -I../include
 #LFLAGS =
 
+# we specify C preprocessor flags via CFLAGS; files built with default rules
+# might include $(CPPFLAGS) which could get a value from user's environment;
+# we avoid that by forcing it empty rather than by overriding default rules
+CPPFLAGS =
+
 LIBS =
 
 # If you are cross-compiling, you must use this:

@@ -318,8 +318,20 @@ NEARDATA extern coord bhitpos; /* place where throw or zap hits or stops */
 #define BASICENLIGHTENMENT 1 /* show mundane stuff */
 #define MAGICENLIGHTENMENT 2 /* show intrinsics and such */
 #define ENL_GAMEINPROGRESS 0
-#define ENL_GAMEOVERALIVE 1 /* ascension, escape, quit, trickery */
-#define ENL_GAMEOVERDEAD 2
+#define ENL_GAMEOVERALIVE  1 /* ascension, escape, quit, trickery */
+#define ENL_GAMEOVERDEAD   2
+
+/* control flags for sortloot() */
+#define SORTLOOT_PACK   0x01
+#define SORTLOOT_INVLET 0x02
+#define SORTLOOT_LOOT   0x04
+
+/* flags for xkilled() [note: meaning of first bit used to be reversed,
+   1 to give message and 0 to suppress] */
+#define XKILL_GIVEMSG   0
+#define XKILL_NOMSG     1
+#define XKILL_NOCORPSE  2
+#define XKILL_NOCONDUCT 4
 
 /* Macros for messages referring to hands, eyes, feet, etc... */
 #define ARM 0

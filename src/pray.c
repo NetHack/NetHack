@@ -289,7 +289,7 @@ worst_cursed_item()
     } else if (uright && uright->cursed) { /* right ring */
         otmp = uright;
     } else if (ublindf && ublindf->cursed) { /* eyewear */
-        otmp = ublindf;                      /* must be non-blinding lenses */
+        otmp = ublindf; /* must be non-blinding lenses */
         /* if weapon wasn't handled above, do it now */
     } else if (welded(uwep)) { /* weapon */
         otmp = uwep;
@@ -520,9 +520,8 @@ int trouble;
     }
 }
 
-/* "I am sometimes shocked by...  the nuns who never take a bath without
- * wearing a bathrobe all the time.  When asked why, since no man can see
- * them,
+/* "I am sometimes shocked by... the nuns who never take a bath without
+ * wearing a bathrobe all the time.  When asked why, since no man can see them,
  * they reply 'Oh, but you forget the good God'.  Apparently they conceive of
  * the Deity as a Peeping Tom, whose omnipotence enables Him to see through
  * bathroom walls, but who is foiled by bathrobes." --Bertrand Russell, 1943
@@ -540,8 +539,10 @@ aligntyp resp_god;
             pline("%s fries to a crisp!", Monnam(u.ustuck));
             /* Yup, you get experience.  It takes guts to successfully
              * pull off this trick on your god, anyway.
+             * Other credit/blame applies (luck or alignment adjustments),
+             * but not direct kill count (pacifist conduct).
              */
-            xkilled(u.ustuck, 0);
+            xkilled(u.ustuck, XKILL_NOMSG | XKILL_NOCONDUCT);
         } else
             pline("%s seems unaffected.", Monnam(u.ustuck));
     } else {
@@ -565,7 +566,7 @@ aligntyp resp_god;
               mon_nam(u.ustuck));
         if (!resists_disint(u.ustuck)) {
             pline("%s disintegrates into a pile of dust!", Monnam(u.ustuck));
-            xkilled(u.ustuck, 2); /* no corpse */
+            xkilled(u.ustuck, XKILL_NOMSG | XKILL_NOCORPSE | XKILL_NOCONDUCT);
         } else
             pline("%s seems unaffected.", Monnam(u.ustuck));
     } else {
@@ -585,9 +586,9 @@ aligntyp resp_god;
             (void) destroy_arm(uarm);
         if (uarmu && !uarm && !uarmc)
             (void) destroy_arm(uarmu);
-        if (!Disint_resistance)
+        if (!Disint_resistance) {
             fry_by_god(resp_god, TRUE);
-        else {
+        } else {
             You("bask in its %s glow for a minute...", NH_BLACK);
             godvoice(resp_god, "I believe it not!");
         }
@@ -1048,8 +1049,15 @@ aligntyp g_align;
             ABASE(A_STR) = AMAX(A_STR);
             if (u.uhunger < 900)
                 init_uhunger();
+            /* luck couldn't have been negative at start of prayer because
+               the prayer would have failed, but might have been decremented
+               due to a timed event (delayed death of peaceful monster hit
+               by hero-created stinking cloud) during the praying interval */
             if (u.uluck < 0)
                 u.uluck = 0;
+            /* superfluous; if hero was blinded we'd be handling trouble
+               rather than issuing a pat-on-head */
+            u.ucreamed = 0;
             make_blinded(0L, TRUE);
             context.botl = 1;
             break;

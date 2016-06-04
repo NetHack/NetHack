@@ -1,4 +1,4 @@
-/* NetHack 3.6	topl.c	$NHDT-Date: 1431192777 2015/05/09 17:32:57 $  $NHDT-Branch: master $:$NHDT-Revision: 1.32 $ */
+/* NetHack 3.6	topl.c	$NHDT-Date: 1463787697 2016/05/20 23:41:37 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.33 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -231,8 +231,8 @@ register const char *bp;
     /* But messages like "You die..." deserve their own line */
     n0 = strlen(bp);
     if ((ttyDisplay->toplin == 1 || (cw->flags & WIN_STOP)) && cw->cury == 0
-        && n0 + (int) strlen(toplines) + 3 < CO - 8 && /* room for --More-- */
-        (notdied = strncmp(bp, "You die", 7))) {
+        && n0 + (int) strlen(toplines) + 3 < CO - 8 /* room for --More-- */
+        && (notdied = strncmp(bp, "You die", 7)) != 0) {
         Strcat(toplines, "  ");
         Strcat(toplines, bp);
         cw->curx += 2;
@@ -240,9 +240,9 @@ register const char *bp;
             addtopl(bp);
         return;
     } else if (!(cw->flags & WIN_STOP)) {
-        if (ttyDisplay->toplin == 1)
+        if (ttyDisplay->toplin == 1) {
             more();
-        else if (cw->cury) { /* for when flags.toplin == 2 && cury > 1 */
+        } else if (cw->cury) { /* for when flags.toplin == 2 && cury > 1 */
             docorner(1, cw->cury + 1); /* reset cury = 0 if redraw screen */
             cw->curx = cw->cury = 0;   /* from home--cls() & docorner(1,n) */
         }

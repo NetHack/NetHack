@@ -1364,8 +1364,9 @@ register struct obj *obj; /* thrownobj or kickedobj or uwep */
     int otyp = obj->otyp, hmode;
     boolean guaranteed_hit = (u.uswallow && mon == u.ustuck);
 
-    hmode = (obj == uwep) ? HMON_APPLIED : (obj == kickedobj) ? HMON_KICKED
-                                                              : HMON_THROWN;
+    hmode = (obj == uwep) ? HMON_APPLIED
+              : (obj == kickedobj) ? HMON_KICKED
+                : HMON_THROWN;
 
     /* Differences from melee weapons:
      *
@@ -1509,18 +1510,22 @@ register struct obj *obj; /* thrownobj or kickedobj or uwep */
         }
 
         if (tmp >= rnd(20)) {
+            boolean wasthrown = (thrownobj != 0);
+
+            /* attack hits mon */
             if (hmode == HMON_APPLIED)
                 u.uconduct.weaphit++;
             if (hmon(mon, obj, hmode)) { /* mon still alive */
                 cutworm(mon, bhitpos.x, bhitpos.y, obj);
             }
             exercise(A_DEX, TRUE);
-            /* if hero is swallowed and projectile kills the engulfer,
-               obj gets added to engulfer's inventory and then dropped,
+            /* if hero was swallowed and projectile killed the engulfer,
+               'obj' got added to engulfer's inventory and then dropped,
                so we can't safely use that pointer anymore; it escapes
                the chance to be used up here... */
-            if (!thrownobj)
+            if (wasthrown && !thrownobj)
                 return 1;
+
             /* projectiles other than magic stones
                sometimes disappear when thrown */
             if (objects[otyp].oc_skill < P_NONE
@@ -1531,6 +1536,7 @@ register struct obj *obj; /* thrownobj or kickedobj or uwep */
                  * but we need ammo to stay around longer on average.
                  */
                 int broken, chance;
+
                 chance = 3 + greatest_erosion(obj) - obj->spe;
                 if (chance > 1)
                     broken = rn2(chance);

@@ -3,8 +3,9 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-
-/*      These routines provide basic data for any type of monster. */
+/*
+ *      These routines provide basic data for any type of monster.
+ */
 
 /* set up an individual monster's base type (initial creation, shapechange) */
 void
@@ -16,6 +17,7 @@ int flag;
     int new_speed, old_speed = mon->data ? mon->data->mmove : 0;
 
     mon->data = ptr;
+    mon->mnum = (short) monsndx(ptr);
     if (flag == -1)
         return; /* "don't care" */
 

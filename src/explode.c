@@ -40,8 +40,7 @@ int expltype;
     int idamres, idamnonres;
     struct monst *mtmp, *mdef = 0;
     uchar adtyp;
-    int explmask[3][3];
-    /* 0=normal explosion, 1=do shieldeff, 2=do nothing */
+    int explmask[3][3]; /* 0=normal explosion, 1=do shieldeff, 2=do nothing */
     boolean shopdamage = FALSE, generic = FALSE, physical_dmg = FALSE,
             do_hallu = FALSE, inside_engulfer;
     char hallu_buf[BUFSZ];
@@ -414,9 +413,23 @@ int expltype;
                     mtmp->mhp -= (idamres + idamnonres);
                 }
                 if (mtmp->mhp <= 0) {
-                    if (mdef ? (mtmp == mdef) : !context.mon_moving)
+                    if (!context.mon_moving) {
                         killed(mtmp);
-                    else
+                    } else if (mdef && mtmp == mdef) {
+                        /* 'mdef' killed self trying to cure being turned
+                         * into slime due to some action by the player.
+                         * Hero gets the credit (experience) and most of
+                         * the blame (possible loss of alignment and/or
+                         * luck and/or telepathy depending on mtmp) but
+                         * doesn't break pacifism.  xkilled()'s message
+                         * would be "you killed <mdef>" so give our own.
+                         */
+                        if (cansee(mtmp->mx, mtmp->my) || canspotmon(mtmp))
+                            pline("%s is %s!", Monnam(mtmp),
+                                  nonliving(mtmp->data) ? "destroyed"
+                                                        : "killed");
+                        xkilled(mtmp, XKILL_NOMSG | XKILL_NOCONDUCT);
+                    } else
                         monkilled(mtmp, "", (int) adtyp);
                 } else if (!context.mon_moving) {
                     /* all affected monsters, even if mdef is set */
@@ -576,7 +589,10 @@ struct obj *obj; /* only scatter this obj        */
             && ((otmp->otyp == BOULDER) || (otmp->otyp == STATUE))
             && rn2(10)) {
             if (otmp->otyp == BOULDER) {
-                pline("%s apart.", Tobjnam(otmp, "break"));
+                if (cansee(sx, sy))
+                    pline("%s apart.", Tobjnam(otmp, "break"));
+                else
+                    You_hear("stone breaking.");
                 fracture_rock(otmp);
                 place_object(otmp, sx, sy);
                 if ((otmp = sobj_at(BOULDER, sx, sy)) != 0) {
@@ -589,7 +605,10 @@ struct obj *obj; /* only scatter this obj        */
 
                 if ((trap = t_at(sx, sy)) && trap->ttyp == STATUE_TRAP)
                     deltrap(trap);
-                pline("%s.", Tobjnam(otmp, "crumble"));
+                if (cansee(sx, sy))
+                    pline("%s.", Tobjnam(otmp, "crumble"));
+                else
+                    You_hear("stone crumbling.");
                 (void) break_statue(otmp);
                 place_object(otmp, sx, sy); /* put fragments on floor */
             }
@@ -604,8 +623,8 @@ struct obj *obj; /* only scatter this obj        */
         }
 
         if (!used_up) {
-            stmp =
-                (struct scatter_chain *) alloc(sizeof(struct scatter_chain));
+            stmp = (struct scatter_chain *)
+                                         alloc(sizeof (struct scatter_chain));
             stmp->next = (struct scatter_chain *) 0;
             stmp->obj = otmp;
             stmp->ox = sx;

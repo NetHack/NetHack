@@ -1,5 +1,5 @@
 /* NetHack 3.6	fountain.c	$NHDT-Date: 1455402364 2016/02/13 22:26:04 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.56 $ */
-/*	Copyright Scott R. Turner, srt@ucla, 10/27/86 */
+/*      Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* Code for drinking from fountains. */
@@ -481,7 +481,7 @@ register struct obj *obj;
     case 29: /* You see coins */
         /* We make fountains have more coins the closer you are to the
          * surface.  After all, there will have been more people going
-         * by.	Just like a shopping mall!  Chris Woodbury  */
+         * by.  Just like a shopping mall!  Chris Woodbury  */
 
         if (FOUNTAIN_IS_LOOTED(u.ux, u.uy))
             break;

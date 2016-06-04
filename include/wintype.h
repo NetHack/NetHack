@@ -1,4 +1,4 @@
-/* NetHack 3.6  wintype.h       $NHDT-Date: 1433207914 2015/06/02 01:18:34 $  $NHDT-Branch: master $:$NHDT-Revision: 1.15 $ */
+/* NetHack 3.6  wintype.h       $NHDT-Date: 1461028538 2016/04/19 01:15:38 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.16 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -56,6 +56,7 @@ typedef struct mi {
 #define MENU_ITEM_P struct mi
 
 /* select_menu() "how" argument types */
+/* [MINV_PICKMASK in monst.h assumes these have values of 0, 1, 2] */
 #define PICK_NONE 0 /* user picks nothing (display only) */
 #define PICK_ONE 1  /* only pick one */
 #define PICK_ANY 2  /* can pick any amount */

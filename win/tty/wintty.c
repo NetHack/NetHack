@@ -1,4 +1,4 @@
-/* NetHack 3.6	wintty.c	$NHDT-Date: 1456907854 2016/03/02 08:37:34 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.125 $ */
+/* NetHack 3.6	wintty.c	$NHDT-Date: 1463614572 2016/05/18 23:36:12 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.131 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -152,14 +152,15 @@ STATIC_DCL void FDECL(erase_menu_or_text,
 STATIC_DCL void FDECL(free_window_info, (struct WinDesc *, BOOLEAN_P));
 STATIC_DCL void FDECL(dmore, (struct WinDesc *, const char *));
 STATIC_DCL void FDECL(set_item_state, (winid, int, tty_menu_item *));
-STATIC_DCL void FDECL(set_all_on_page,
-                      (winid, tty_menu_item *, tty_menu_item *));
-STATIC_DCL void FDECL(unset_all_on_page,
-                      (winid, tty_menu_item *, tty_menu_item *));
-STATIC_DCL void FDECL(invert_all_on_page,
-                      (winid, tty_menu_item *, tty_menu_item *, CHAR_P));
-STATIC_DCL void FDECL(invert_all,
-                      (winid, tty_menu_item *, tty_menu_item *, CHAR_P));
+STATIC_DCL void FDECL(set_all_on_page, (winid, tty_menu_item *,
+                                        tty_menu_item *));
+STATIC_DCL void FDECL(unset_all_on_page, (winid, tty_menu_item *,
+                                          tty_menu_item *));
+STATIC_DCL void FDECL(invert_all_on_page, (winid, tty_menu_item *,
+                                           tty_menu_item *, CHAR_P));
+STATIC_DCL void FDECL(invert_all, (winid, tty_menu_item *,
+                                   tty_menu_item *, CHAR_P));
+STATIC_DCL void FDECL(toggle_menu_attr, (BOOLEAN_P, int, int));
 STATIC_DCL void FDECL(process_menu_window, (winid, struct WinDesc *));
 STATIC_DCL void FDECL(process_text_window, (winid, struct WinDesc *));
 STATIC_DCL tty_menu_item *FDECL(reverse, (tty_menu_item *));
@@ -359,9 +360,6 @@ char **argv UNUSED;
 #if defined(SIGWINCH) && defined(CLIPPING) && !defined(NO_SIGNAL)
     (void) signal(SIGWINCH, (SIG_RET_TYPE) winch_handler);
 #endif
-
-    /* add one a space forward menu command alias */
-    add_menu_cmd_alias(' ', MENU_NEXT_PAGE);
 
     tty_clear_nhwindow(BASE_WINDOW);
 
@@ -1697,6 +1695,31 @@ char acc; /* group accelerator, 0 => all */
     }
 }
 
+/* support menucolor in addition to caller-supplied attribute */
+STATIC_OVL void
+toggle_menu_attr(on, color, attr)
+boolean on;
+int color, attr;
+{
+    if (on) {
+        term_start_attr(attr);
+#ifdef TEXTCOLOR
+        if (color != NO_COLOR)
+            term_start_color(color);
+#endif
+    } else {
+#ifdef TEXTCOLOR
+        if (color != NO_COLOR)
+            term_end_color();
+#endif
+        term_end_attr(attr);
+    }
+
+#ifndef TEXTCOLOR
+    nhUse(color);
+#endif
+}
+
 STATIC_OVL void
 process_menu_window(window, cw)
 winid window;
@@ -1704,7 +1727,7 @@ struct WinDesc *cw;
 {
     tty_menu_item *page_start, *page_end, *curr;
     long count;
-    int n, curr_page, page_lines, resp_len;
+    int n, attr_n, curr_page, page_lines, resp_len;
     boolean finished, counting, reset_count;
     char *cp, *rp, resp[QBUFSZ], gacc[QBUFSZ], *msave, *morestr, really_morc;
 #define MENU_EXPLICIT_CHOICE 0x7f /* pseudo menu manipulation char */
@@ -1775,8 +1798,8 @@ struct WinDesc *cw;
                 page_end = cw->plist[curr_page + 1];
                 for (page_lines = 0, curr = page_start; curr != page_end;
                      page_lines++, curr = curr->next) {
-                    int color = NO_COLOR, attr = ATR_NONE;
-                    boolean menucolr = FALSE;
+                    int attr, color = NO_COLOR;
+
                     if (curr->selector)
                         *rp++ = curr->selector;
 
@@ -1786,6 +1809,23 @@ struct WinDesc *cw;
 
                     (void) putchar(' ');
                     ++ttyDisplay->curx;
+
+                    if (!iflags.use_menu_color
+                        || !get_menu_coloring(curr->str, &color, &attr))
+                        attr = curr->attr;
+
+                    /* which character to start attribute highlighting;
+                       whole line for headers and such, after the selector
+                       character and space and selection indicator for menu
+                       lines (including fake ones that simulate grayed-out
+                       entries, so we don't rely on curr->identifier here) */
+                    attr_n = 0; /* whole line */
+                    if (curr->str[0] && curr->str[1] == ' '
+                        && curr->str[2] && index("-+#", curr->str[2])
+                        && curr->str[3] == ' ')
+                        /* [0]=letter, [1]==space, [2]=[-+#], [3]=space */
+                        attr_n = 4; /* [4:N]=entry description */
+
                     /*
                      * Don't use xputs() because (1) under unix it calls
                      * tputstr() which will interpret a '*' as some kind
@@ -1793,27 +1833,20 @@ struct WinDesc *cw;
                      * actually output the character.  We're faster doing
                      * this.
                      */
-                    if (iflags.use_menu_color
-                        && (menucolr = get_menu_coloring(curr->str, &color,
-                                                         &attr))) {
-                        term_start_attr(attr);
-#ifdef TEXTCOLOR
-                        if (color != NO_COLOR)
-                            term_start_color(color);
-#endif
-                    } else
-                        term_start_attr(curr->attr);
                     for (n = 0, cp = curr->str;
+                         *cp &&
 #ifndef WIN32CON
-                         *cp
-                         && (int) ++ttyDisplay->curx < (int) ttyDisplay->cols;
-                         cp++, n++)
+                            (int) ++ttyDisplay->curx < (int) ttyDisplay->cols;
 #else
-                         *cp
-                         && (int) ttyDisplay->curx < (int) ttyDisplay->cols;
-                         cp++, n++, ttyDisplay->curx++)
+                            (int) ttyDisplay->curx < (int) ttyDisplay->cols;
+                         ttyDisplay->curx++,
 #endif
-                        if (n == 2 && curr->identifier.a_void != 0
+                         cp++, n++) {
+                        if (n == attr_n && (color != NO_COLOR
+                                            || attr != ATR_NONE))
+                            toggle_menu_attr(TRUE, color, attr);
+                        if (n == 2
+                            && curr->identifier.a_void != 0
                             && curr->selected) {
                             if (curr->count == -1L)
                                 (void) putchar('+'); /* all selected */
@@ -1821,15 +1854,10 @@ struct WinDesc *cw;
                                 (void) putchar('#'); /* count selected */
                         } else
                             (void) putchar(*cp);
-                    if (iflags.use_menu_color && menucolr) {
-#ifdef TEXTCOLOR
-                        if (color != NO_COLOR)
-                            term_end_color();
-#endif
-                        term_end_attr(attr);
-                    } else
-                        term_end_attr(curr->attr);
-                }
+                    } /* for *cp */
+                    if (n > attr_n && (color != NO_COLOR || attr != ATR_NONE))
+                        toggle_menu_attr(FALSE, color, attr);
+                } /* if npages > 0 */
             } else {
                 page_start = 0;
                 page_end = 0;
@@ -1849,6 +1877,7 @@ struct WinDesc *cw;
 
             /* set extra chars.. */
             Strcat(resp, default_menu_cmds);
+            Strcat(resp, " ");                  /* next page or end */
             Strcat(resp, "0123456789\033\n\r"); /* counts, quit */
             Strcat(resp, gacc);                 /* group accelerators */
             Strcat(resp, mapped_menu_cmds);
@@ -1932,12 +1961,15 @@ struct WinDesc *cw;
                 break;
             }
         /* else fall through */
+        case ' ':
         case MENU_NEXT_PAGE:
             if (cw->npages > 0 && curr_page != cw->npages - 1) {
                 curr_page++;
                 page_start = 0;
-            } else
-                finished = TRUE; /* questionable behavior */
+            } else if (morc == ' ') {
+                /* ' ' finishes menus here, but stop '>' doing the same. */
+                finished = TRUE;
+            }
             break;
         case MENU_PREVIOUS_PAGE:
             if (cw->npages > 0 && curr_page != 0) {
@@ -2995,10 +3027,17 @@ register int xmin, ymax;
     register int y;
     register struct WinDesc *cw = wins[WIN_MAP];
 
+#if 0   /* this optimization is not valuable enough to justify
+           abusing core internals... */
     if (u.uswallow) { /* Can be done more efficiently */
         swallowed(1);
+        /* without this flush, if we happen to follow --More-- displayed in
+           leftmost column, the cursor gets left in the wrong place after
+           <docorner<more<update_topl<tty_putstr calls unwind back to core */
+        flush_screen(0);
         return;
     }
+#endif /*0*/
 
 #if defined(SIGWINCH) && defined(CLIPPING)
     if (ymax > LI)

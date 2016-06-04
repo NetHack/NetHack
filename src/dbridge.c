@@ -115,16 +115,12 @@ int mask;
     switch (mask & DB_UNDER) {
     case DB_ICE:
         return ICE;
-        break;
     case DB_LAVA:
         return LAVAPOOL;
-        break;
     case DB_MOAT:
         return MOAT;
-        break;
     default:
         return STONE;
-        break;
     }
 }
 
@@ -427,9 +423,9 @@ int x, y;
 }
 
 STATIC_OVL void
-e_died(etmp, dest, how)
+e_died(etmp, xkill_flags, how)
 struct entity *etmp;
-int dest, how;
+int xkill_flags, how;
 {
     if (is_u(etmp)) {
         if (how == DROWNING) {
@@ -466,13 +462,14 @@ int dest, how;
 
         killer.name[0] = 0;
 /* fake "digested to death" damage-type suppresses corpse */
-#define mk_message(dest) ((dest & 1) ? "" : (char *) 0)
-#define mk_corpse(dest) ((dest & 2) ? AD_DGST : AD_PHYS)
+#define mk_message(dest) (((dest & XKILL_NOMSG) != 0) ? (char *) 0 : "")
+#define mk_corpse(dest) (((dest & XKILL_NOCORPSE) != 0) ? AD_DGST : AD_PHYS)
         /* if monsters are moving, one of them caused the destruction */
         if (context.mon_moving)
-            monkilled(etmp->emon, mk_message(dest), mk_corpse(dest));
+            monkilled(etmp->emon,
+                      mk_message(xkill_flags), mk_corpse(xkill_flags));
         else /* you caused it */
-            xkilled(etmp->emon, dest);
+            xkilled(etmp->emon, xkill_flags);
         etmp->edata = (struct permonst *) 0;
 
         /* dead long worm handling */
@@ -609,7 +606,9 @@ struct entity *etmp;
         if (crm->typ == DRAWBRIDGE_DOWN) {
             pline("%s crushed underneath the drawbridge.",
                   E_phrase(etmp, "are"));             /* no jump */
-            e_died(etmp, e_inview ? 3 : 2, CRUSHING); /* no corpse */
+            e_died(etmp,
+                   XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG),
+                   CRUSHING); /* no corpse */
             return;       /* Note: Beyond this point, we know we're  */
         }                 /* not at an opened drawbridge, since all  */
         must_jump = TRUE; /* *missable* creatures survive on the     */
@@ -625,7 +624,10 @@ struct entity *etmp;
                           E_phrase(etmp, "are"));
                 else if (!Deaf)
                     You_hear("a crushing sound.");
-                e_died(etmp, e_inview ? 3 : 2, CRUSHING);
+                e_died(etmp,
+                       XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG
+                                                  : XKILL_NOMSG),
+                       CRUSHING);
                 /* no corpse */
                 return;
             }
@@ -721,7 +723,7 @@ struct entity *etmp;
         if (!e_survives_at(etmp, etmp->ex, etmp->ey)) {
             killer.format = KILLED_BY_AN;
             Strcpy(killer.name, "closing drawbridge");
-            e_died(etmp, 0, CRUSHING); /* no message */
+            e_died(etmp, XKILL_NOMSG, CRUSHING);
             return;
         }
         debugpline1("%s in here", E_phrase(etmp, "survive"));
@@ -752,11 +754,11 @@ struct entity *etmp;
             }
         killer.format = NO_KILLER_PREFIX;
         Strcpy(killer.name, "fell from a drawbridge");
-        e_died(etmp, e_inview ? 3 : 2, /* CRUSHING is arbitrary */
-               (is_pool(etmp->ex, etmp->ey))
-                   ? DROWNING
-                   : (is_lava(etmp->ex, etmp->ey)) ? BURNING
-                                                   : CRUSHING); /*no corpse*/
+        e_died(etmp, /* CRUSHING is arbitrary */
+               XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG),
+               is_pool(etmp->ex, etmp->ey) ? DROWNING
+                 : is_lava(etmp->ex, etmp->ey) ? BURNING
+                   : CRUSHING); /*no corpse*/
         return;
     }
 }
@@ -958,7 +960,9 @@ int x, y;
                       E_phrase(etmp2, "are"));
             killer.format = KILLED_BY_AN;
             Strcpy(killer.name, "exploding drawbridge");
-            e_died(etmp2, e_inview ? 3 : 2, CRUSHING); /*no corpse*/
+            e_died(etmp2,
+                   XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG),
+                   CRUSHING); /*no corpse*/
         } /* nothing which is vulnerable can survive this */
     }
     set_entity(x, y, etmp1);
@@ -988,7 +992,9 @@ int x, y;
             }
             killer.format = KILLED_BY_AN;
             Strcpy(killer.name, "collapsing drawbridge");
-            e_died(etmp1, e_inview ? 3 : 2, CRUSHING); /*no corpse*/
+            e_died(etmp1,
+                   XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG),
+                   CRUSHING); /*no corpse*/
             if (levl[etmp1->ex][etmp1->ey].typ == MOAT)
                 do_entity(etmp1);
         }

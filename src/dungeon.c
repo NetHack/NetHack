@@ -1,4 +1,4 @@
-/* NetHack 3.6	dungeon.c	$NHDT-Date: 1450432757 2015/12/18 09:59:17 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.70 $ */
+/* NetHack 3.6	dungeon.c	$NHDT-Date: 1462486971 2016/05/05 22:22:51 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.73 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -490,6 +490,7 @@ struct proto_dungeon *pd;
 
     branch_num = find_branch(dungeons[dgn].dname, pd);
     new_branch = (branch *) alloc(sizeof(branch));
+    (void) memset((genericptr_t)new_branch, 0, sizeof(branch));
     new_branch->next = (branch *) 0;
     new_branch->id = branch_id++;
     new_branch->type = correct_branch_type(&pd->tmpbranch[branch_num]);
@@ -545,6 +546,7 @@ struct proto_dungeon *pd;
 
     pd->final_lev[proto_index] = new_level =
         (s_level *) alloc(sizeof(s_level));
+    (void) memset((genericptr_t)new_level, 0, sizeof(s_level));
     /* load new level with data */
     Strcpy(new_level->proto, tlevel->name);
     new_level->boneid = tlevel->boneschar;
@@ -852,7 +854,7 @@ init_dungeons()
              * its branch.  First, the depth of the entry point:
              *
              *  depth of branch from "parent" dungeon
-             *  + -1 or 1 depending on a up or down stair or
+             *  + -1 or 1 depending on an up or down stair or
              *    0 if portal
              *
              * Followed by the depth of the top of the dungeon:
@@ -1604,6 +1606,25 @@ level_difficulty()
              * The same applies to Vlad's Tower, although the increment
              * there is inconsequential compared to overall depth.
              */
+#if 0
+        /*
+         * The inside of the Wizard's Tower is also effectively a
+         * builds-up area, reached from a portal an arbitrary distance
+         * below rather than stairs 1 level beneath the entry level.
+         */
+        else if (On_W_tower_level(&u.uz) && In_W_tower(some_X, some_Y, &u.uz))
+            res += (fakewiz1.dlev - u.uz.dlev);
+            /*
+             * Handling this properly would need more information here:
+             * an inside/outside flag, or coordinates to calculate it.
+             * Unfortunately level difficulty may be wanted before
+             * coordinates have been chosen so simply extending this
+             * routine to take extra arguments is not sufficient to cope.
+             * The difference beyond naive depth-from-surface is small
+             * relative to the overall depth, so just ignore complications
+             * posed by W_tower.
+             */
+#endif /*0*/
     }
     return (xchar) res;
 }
@@ -2119,6 +2140,50 @@ int fd;
     return load;
 }
 
+/* to support '#stats' wizard-mode command */
+void
+overview_stats(win, statsfmt, total_count, total_size)
+winid win;
+const char *statsfmt;
+long *total_count, *total_size;
+{
+    char buf[BUFSZ], hdrbuf[QBUFSZ];
+    long ocount, osize, bcount, bsize, acount, asize;
+    struct cemetery *ce;
+    mapseen *mptr = find_mapseen(&u.uz);
+
+    ocount = bcount = acount = osize = bsize = asize = 0L;
+    for (mptr = mapseenchn; mptr; mptr = mptr->next) {
+        ++ocount;
+        osize += (long) sizeof *mptr;
+        for (ce = mptr->final_resting_place; ce; ce = ce->next) {
+            ++bcount;
+            bsize += (long) sizeof *ce;
+        }
+        if (mptr->custom_lth) {
+            ++acount;
+            asize += (long) (mptr->custom_lth + 1);
+        }
+    }
+
+    Sprintf(hdrbuf, "general, size %ld", (long) sizeof (mapseen));
+    Sprintf(buf, statsfmt, hdrbuf, ocount, osize);
+    putstr(win, 0, buf);
+    if (bcount) {
+        Sprintf(hdrbuf, "cemetery, size %ld",
+                (long) sizeof (struct cemetery));
+        Sprintf(buf, statsfmt, hdrbuf, bcount, bsize);
+        putstr(win, 0, buf);
+    }
+    if (acount) {
+        Sprintf(hdrbuf, "annotations, text");
+        Sprintf(buf, statsfmt, hdrbuf, acount, asize);
+        putstr(win, 0, buf);
+    }
+    *total_count += ocount + bcount + acount;
+    *total_size += osize + bsize + asize;
+}
+
 /* Remove all mapseen objects for a particular dnum.
  * Useful during quest expulsion to remove quest levels.
  * [No longer deleted, just marked as unreachable.  #overview will
@@ -2421,6 +2486,9 @@ recalc_mapseen()
             /*  An automatic annotation is added to the Castle and
              *  to Fort Ludios once their structure's main entrance
              *  has been seen (in person or via magic mapping).
+             *  For the Fort, that entrance is just a secret door
+             *  which will be converted into a regular one when
+             *  located (or destroyed).
              * DOOR: possibly a lowered drawbridge's open portcullis;
              * DBWALL: a raised drawbridge's "closed door";
              * DRAWBRIDGE_DOWN: the span provided by lowered bridge,
@@ -2430,6 +2498,26 @@ recalc_mapseen()
              *  the adjacent DBWALL has been seen.
              */
             case DOOR:
+                if (Is_knox(&u.uz)) {
+                    int ty, tx = x - 4;
+
+                    /* Throne is four columns left, either directly in
+                     * line or one row higher or lower, and doesn't have
+                     * to have been seen yet.
+                     *   ......|}}}.
+                     *   ..\...S}...
+                     *   ..\...S}...
+                     *   ......|}}}.
+                     * For 3.6.0 and earlier, it was always in direct line:
+                     * both throne and door on the lower of the two rows.
+                     */
+                    for (ty = y - 1; ty <= y + 1; ++ty)
+                        if (isok(tx, ty) && IS_THRONE(levl[tx][ty].typ)) {
+                            mptr->flags.ludios = 1;
+                            break;
+                        }
+                    break;
+                }
                 if (is_drawbridge_wall(x, y) < 0)
                     break;
             /* else FALLTHRU */
@@ -2437,8 +2525,6 @@ recalc_mapseen()
             case DRAWBRIDGE_DOWN:
                 if (Is_stronghold(&u.uz))
                     mptr->flags.castle = 1, mptr->flags.castletune = 1;
-                else if (Is_knox(&u.uz))
-                    mptr->flags.ludios = 1;
                 break;
             default:
                 break;
@@ -2764,10 +2850,6 @@ boolean printdun;
     if (In_endgame(&mptr->lev))
         Sprintf(buf, "%s%s:", TAB, endgamelevelname(tmpbuf, i));
     else
-        /* FIXME: when this branch has only one level (Ft.Ludios),
-         * listing "Level 1:" for it might confuse inexperienced
-         * players into thinking there's more than one.
-         */
         Sprintf(buf, "%sLevel %d:", TAB, i);
 
     /* wizmode prints out proto dungeon names for clarity */
@@ -2779,7 +2861,7 @@ boolean printdun;
     }
     /* [perhaps print custom annotation on its own line when it's long] */
     if (mptr->custom)
-        Sprintf(eos(buf), " (%s)", mptr->custom);
+        Sprintf(eos(buf), " \"%s\"", mptr->custom);
     if (on_level(&u.uz, &mptr->lev))
         Sprintf(eos(buf), " <- You %s here.",
                 (!final || (final == 1 && how == ASCENDED)) ? "are" : "were");

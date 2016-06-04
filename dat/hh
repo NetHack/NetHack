@@ -80,7 +80,7 @@ Z       Zap     cast a spell  (use Y instead of Z if number_pad is -1)
 $       gold    count your gold
 +       spells  list the spells you know; also rearrange them if desired
 `       classkn display known items for one class of objects
-_       travel  move via a shortest-path algorithm to a point on the map 
+_       travel  move via a shortest-path algorithm to a point on the map
 .       rest    wait a moment
 ,       pickup  pick up all you can carry
 @               toggle "pickup" (auto pickup) option on and off
@@ -93,7 +93,9 @@ via the meta modifier instead of the # prefix:
 M-?             display extended command help (if the platform allows this)
 M-2     twoweapon toggle two-weapon combat (unless number_pad is enabled)
 M-a     adjust  adjust inventory letters
+M-A     annotate add a one-line note to the current dungeon level (see M-O)
 M-c     chat    talk to someone
+M-C     conduct view optional challanges
 M-d     dip     dip an object into something
 M-e     enhance advance or check weapon and spell skills
 M-f     force   force a lock
@@ -102,12 +104,16 @@ M-j     jump    jump to another location
 M-l     loot    loot a box on the floor
 M-m     monster use a monster's special ability
 M-n     name    name a monster, an individual object, or a type of object
+M-N     name    synonym for M-n
 M-o     offer   offer a sacrifice to the gods
+M-O     overview display information about visited levels and annotations
 M-p     pray    pray to the gods for help
 M-q     quit    stop playing
 M-r     rub     rub a lamp or a stone
+M-R     ride    mount or dismount saddled steed
 M-s     sit     sit down
 M-t     turn    turn undead
+M-T     tip     upend a container to dump out its contents
 M-u     untrap  untrap something
 M-v     version print compile time options for this version
 M-w     wipe    wipe off your face

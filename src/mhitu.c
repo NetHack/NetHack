@@ -2147,10 +2147,15 @@ register struct attack *mattk;
                 /* not blind at this point implies you're wearing
                    the Eyes of the Overworld; make them block this
                    particular stun attack too */
-                if (!Blind)
+                if (!Blind) {
                     Your1(vision_clears);
-                else
-                    make_stunned((long) d(1, 3), TRUE);
+                } else {
+                    long oldstun = (HStun & TIMEOUT), newstun = (long) rnd(3);
+
+                    /* we don't want to increment stun duration every time
+                       or sighted hero will become incapacitated */
+                    make_stunned(max(oldstun, newstun), TRUE);
+                }
             }
         }
         break;
@@ -2297,7 +2302,7 @@ register struct monst *mon;
 {
     register struct obj *ring, *nring;
     boolean fem = (mon->data == &mons[PM_SUCCUBUS]); /* otherwise incubus */
-    int tried_gloves = 0;
+    int attr_tot, tried_gloves = 0;
     char qbuf[QBUFSZ];
 
     if (mon->mcan || mon->mspec_used) {
@@ -2438,7 +2443,12 @@ register struct monst *mon;
     /* by this point you have discovered mon's identity, blind or not... */
     pline("Time stands still while you and %s lie in each other's arms...",
           noit_mon_nam(mon));
-    if (rn2(35) > ACURR(A_CHA) + ACURR(A_INT)) {
+    /* 3.6.1: a combined total for charisma plus intelligence of 35-1
+       used to guarantee successful outcome; now total maxes out at 32
+       as far as deciding what will happen; chance for bad outcome when
+       Cha+Int is 32 or more is 2/35, a bit over 5.7% */
+    attr_tot = ACURR(A_CHA) + ACURR(A_INT);
+    if (rn2(35) > min(attr_tot, 32)) {
         /* Don't bother with mspec_used here... it didn't get tired! */
         pline("%s seems to have enjoyed it more than you...",
               noit_Monnam(mon));
@@ -2470,16 +2480,20 @@ register struct monst *mon;
             } else {
                 You("have a curious feeling...");
             }
+            exercise(A_CON, FALSE);
+            exercise(A_DEX, FALSE);
+            exercise(A_WIS, FALSE);
             break;
         case 4: {
             int tmp;
+
             You_feel("exhausted.");
             exercise(A_STR, FALSE);
             tmp = rn1(10, 6);
             losehp(Maybe_Half_Phys(tmp), "exhaustion", KILLED_BY);
             break;
-        }
-        }
+        } /* case 4 */
+        } /* switch */
     } else {
         mon->mspec_used = rnd(100); /* monster is worn out */
         You("seem to have enjoyed it more than %s...", noit_mon_nam(mon));
@@ -2517,14 +2531,14 @@ register struct monst *mon;
         }
     }
 
-    if (mon->mtame) /* don't charge */
+    if (mon->mtame) { /* don't charge */
         ;
-    else if (rn2(20) < ACURR(A_CHA)) {
+    } else if (rn2(20) < ACURR(A_CHA)) {
         pline("%s demands that you pay %s, but you refuse...",
               noit_Monnam(mon), Blind ? (fem ? "her" : "him") : mhim(mon));
-    } else if (u.umonnum == PM_LEPRECHAUN)
+    } else if (u.umonnum == PM_LEPRECHAUN) {
         pline("%s tries to take your money, but fails...", noit_Monnam(mon));
-    else {
+    } else {
         long cost;
         long umoney = money_cnt(invent);
 
@@ -2539,9 +2553,9 @@ register struct monst *mon;
         }
         if (cost > umoney)
             cost = umoney;
-        if (!cost)
+        if (!cost) {
             verbalize("It's on the house!");
-        else {
+        } else {
             pline("%s takes %ld %s for services rendered!", noit_Monnam(mon),
                   cost, currency(cost));
             money2mon(mon, cost);
@@ -2650,7 +2664,7 @@ register struct attack *mattk;
             }
             pline("%s turns to stone!", Monnam(mtmp));
             stoned = 1;
-            xkilled(mtmp, 0);
+            xkilled(mtmp, XKILL_NOMSG);
             if (mtmp->mhp > 0)
                 return 1;
             return 2;
@@ -2759,7 +2773,7 @@ register struct attack *mattk;
 assess_dmg:
     if ((mtmp->mhp -= tmp) <= 0) {
         pline("%s dies!", Monnam(mtmp));
-        xkilled(mtmp, 0);
+        xkilled(mtmp, XKILL_NOMSG);
         if (mtmp->mhp > 0)
             return 1;
         return 2;

@@ -1,4 +1,4 @@
-/* NetHack 3.6	options.c	$NHDT-Date: 1455357588 2016/02/13 09:59:48 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.264 $ */
+/* NetHack 3.6	options.c	$NHDT-Date: 1461102048 2016/04/19 21:40:48 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.268 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -519,6 +519,8 @@ STATIC_DCL int NDECL(msgtype_count);
 STATIC_DCL boolean FDECL(add_menu_coloring_parsed, (char *, int, int));
 STATIC_DCL void FDECL(free_one_menu_coloring, (int));
 STATIC_DCL int NDECL(count_menucolors);
+STATIC_DCL boolean FDECL(parse_role_opts, (BOOLEAN_P, const char *,
+                                           char *, char **));
 
 STATIC_DCL void FDECL(oc_to_str, (char *, char *));
 STATIC_DCL void FDECL(doset_add_menu, (winid, const char *, int));
@@ -585,10 +587,13 @@ boolean val_allowed;
 
         if (!p || (q && q < p))
             p = q;
-        while (p && p > user_string && isspace((uchar) * (p - 1)))
-            p--;
-        if (p)
+        if (p) {
+            /* 'user_string' hasn't necessarily been through mungspaces()
+               so might have tabs or consecutive spaces */
+            while (p > user_string && isspace((uchar) *(p - 1)))
+                p--;
             len = (int) (p - user_string);
+        }
     }
 
     return (boolean) (len >= min_length
@@ -858,8 +863,8 @@ char *tp;
         } else if (*cp == '^') { /* expand control-character syntax */
             cval = (*++cp & 0x1f);
             ++cp;
-            /* remaining cases are all for backslash and we know cp[1] is not
-             * \0 */
+
+        /* remaining cases are all for backslash; we know cp[1] is not \0 */
         } else if (index(dec, cp[1])) {
             ++cp; /* move past backslash to first digit */
             do {
@@ -1010,17 +1015,20 @@ change_inv_order(op)
 char *op;
 {
     int oc_sym, num;
-    char *sp, buf[BUFSZ];
+    char *sp, buf[QBUFSZ];
 
     num = 0;
-    /*  !!!! probably unnecessary with gold as normal inventory */
+    if (!index(op, GOLD_SYM))
+        buf[num++] = COIN_CLASS;
 
     for (sp = op; *sp; sp++) {
         oc_sym = def_char_to_objclass(*sp);
         /* reject bad or duplicate entries */
-        if (oc_sym == MAXOCLASSES || oc_sym == RANDOM_CLASS
-            || oc_sym == ILLOBJ_CLASS || !index(flags.inv_order, oc_sym)
-            || index(sp + 1, *sp))
+        if (oc_sym == MAXOCLASSES /* not an object class char */
+            /* VENOM_CLASS, RANDOM_CLASS, and ILLOBJ_CLASS are excluded
+               because they aren't in def_inv_order[] so don't make it
+               into flags.inv_order, hence always fail this index() test */
+            || !index(flags.inv_order, oc_sym) || index(sp + 1, *sp))
             return 0;
         /* retain good ones */
         buf[num++] = (char) oc_sym;
@@ -1029,10 +1037,9 @@ char *op;
 
     /* fill in any omitted classes, using previous ordering */
     for (sp = flags.inv_order; *sp; sp++)
-        if (!index(buf, *sp)) {
-            buf[num++] = *sp;
-            buf[num] = '\0'; /* explicitly terminate for next index() */
-        }
+        if (!index(buf, *sp))
+            (void) strkitten(&buf[num++], *sp);
+    buf[MAXOCLASSES - 1] = '\0';
 
     Strcpy(flags.inv_order, buf);
     return 1;
@@ -1721,14 +1728,48 @@ count_menucolors()
     return count;
 }
 
+STATIC_OVL boolean
+parse_role_opts(negated, fullname, opts, opp)
+boolean negated;
+const char *fullname;
+char *opts;
+char **opp;
+{
+    char *op = *opp;
+
+    if (negated) {
+        bad_negation(fullname, FALSE);
+    } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
+        boolean val_negated = FALSE;
+
+        while ((*op == '!') || !strncmpi(op, "no", 2)) {
+            if (*op == '!')
+                op++;
+            else
+                op += 2;
+            val_negated = !val_negated;
+        }
+        if (val_negated) {
+            if (!setrolefilter(op))
+                badoption(opts);
+        } else {
+            if (duplicate_opt_detection(opts, 1))
+                complain_about_duplicate(opts, 1);
+            *opp = op;
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
 void
 parseoptions(opts, tinitial, tfrom_file)
 register char *opts;
 boolean tinitial, tfrom_file;
 {
-    register char *op;
+    char *op;
     unsigned num;
-    boolean negated, val_negated, duplicate;
+    boolean negated, duplicate;
     int i;
     const char *fullname;
 
@@ -1803,26 +1844,9 @@ boolean tinitial, tfrom_file;
     /* align:string */
     fullname = "align";
     if (match_optname(opts, fullname, sizeof("align") - 1, TRUE)) {
-        if (negated) {
-            bad_negation(fullname, FALSE);
-        } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
-            val_negated = FALSE;
-            while ((*op == '!') || !strncmpi(op, "no", 2)) {
-                if (*op == '!')
-                    op++;
-                else
-                    op += 2;
-                val_negated = !val_negated;
-            }
-            if (val_negated) {
-                if (!setrolefilter(op))
-                    badoption(opts);
-            } else {
-                if (duplicate_opt_detection(opts, 1))
-                    complain_about_duplicate(opts, 1);
-                if ((flags.initalign = str2align(op)) == ROLE_NONE)
-                    badoption(opts);
-            }
+        if (parse_role_opts(negated, fullname, opts, &op)) {
+            if ((flags.initalign = str2align(op)) == ROLE_NONE)
+                badoption(opts);
         }
         return;
     }
@@ -1831,28 +1855,11 @@ boolean tinitial, tfrom_file;
     fullname = "role";
     if (match_optname(opts, fullname, 4, TRUE)
         || match_optname(opts, (fullname = "character"), 4, TRUE)) {
-        if (negated) {
-            bad_negation(fullname, FALSE);
-        } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
-            val_negated = FALSE;
-            while ((*op == '!') || !strncmpi(op, "no", 2)) {
-                if (*op == '!')
-                    op++;
-                else
-                    op += 2;
-                val_negated = !val_negated;
-            }
-            if (val_negated) {
-                if (!setrolefilter(op))
-                    badoption(opts);
-            } else {
-                if (duplicate_opt_detection(opts, 1))
-                    complain_about_duplicate(opts, 1);
-                if ((flags.initrole = str2role(op)) == ROLE_NONE)
-                    badoption(opts);
-                else /* Backwards compatibility */
-                    nmcpy(pl_character, op, PL_NSIZ);
-            }
+        if (parse_role_opts(negated, fullname, opts, &op)) {
+            if ((flags.initrole = str2role(op)) == ROLE_NONE)
+                badoption(opts);
+            else /* Backwards compatibility */
+                nmcpy(pl_character, op, PL_NSIZ);
         }
         return;
     }
@@ -1860,28 +1867,11 @@ boolean tinitial, tfrom_file;
     /* race:string */
     fullname = "race";
     if (match_optname(opts, fullname, 4, TRUE)) {
-        if (negated) {
-            bad_negation(fullname, FALSE);
-        } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
-            val_negated = FALSE;
-            while ((*op == '!') || !strncmpi(op, "no", 2)) {
-                if (*op == '!')
-                    op++;
-                else
-                    op += 2;
-                val_negated = !val_negated;
-            }
-            if (val_negated) {
-                if (!setrolefilter(op))
-                    badoption(opts);
-            } else {
-                if (duplicate_opt_detection(opts, 1))
-                    complain_about_duplicate(opts, 1);
-                if ((flags.initrace = str2race(op)) == ROLE_NONE)
-                    badoption(opts);
-                else /* Backwards compatibility */
-                    pl_race = *op;
-            }
+        if (parse_role_opts(negated, fullname, opts, &op)) {
+            if ((flags.initrace = str2race(op)) == ROLE_NONE)
+                badoption(opts);
+            else /* Backwards compatibility */
+                pl_race = *op;
         }
         return;
     }
@@ -1889,28 +1879,11 @@ boolean tinitial, tfrom_file;
     /* gender:string */
     fullname = "gender";
     if (match_optname(opts, fullname, 4, TRUE)) {
-        if (negated) {
-            bad_negation(fullname, FALSE);
-        } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
-            val_negated = FALSE;
-            while ((*op == '!') || !strncmpi(op, "no", 2)) {
-                if (*op == '!')
-                    op++;
-                else
-                    op += 2;
-                val_negated = !val_negated;
-            }
-            if (val_negated) {
-                if (!setrolefilter(op))
-                    badoption(opts);
-            } else {
-                if (duplicate_opt_detection(opts, 1))
-                    complain_about_duplicate(opts, 1);
-                if ((flags.initgend = str2gend(op)) == ROLE_NONE)
-                    badoption(opts);
-                else
-                    flags.female = flags.initgend;
-            }
+        if (parse_role_opts(negated, fullname, opts, &op)) {
+            if ((flags.initgend = str2gend(op)) == ROLE_NONE)
+                badoption(opts);
+            else
+                flags.female = flags.initgend;
         }
         return;
     }
@@ -2140,7 +2113,7 @@ boolean tinitial, tfrom_file;
                 bad_negation(fullname, TRUE);
                 return;
             }
-            tmp = tolower(*op);
+            tmp = lowc(*op);
         }
         switch (tmp) {
         case 's': /* single message history cycle (default if negated) */
@@ -2544,7 +2517,9 @@ boolean tinitial, tfrom_file;
         } else if ((op = string_for_opt(opts, TRUE)) != 0) {
             char *pp, buf[BUFSZ];
 
-            op = mungspaces(strcpy(buf, op));
+            strncpy(buf, op, sizeof buf - 1);
+            buf[sizeof buf - 1] = '\0';
+            op = mungspaces(buf);
             for (;;) {
                 /* We're looking to parse
                    "paranoid_confirm:whichone wheretwo whothree"
@@ -2604,30 +2579,24 @@ boolean tinitial, tfrom_file;
             bad_negation(fullname, FALSE);
             return;
         } else if ((op = string_for_env_opt(fullname, opts, FALSE)) != 0) {
-            switch (tolower(*op)) {
-            /* Unencumbered */
-            case 'u':
+            switch (lowc(*op)) {
+            case 'u': /* Unencumbered */
                 flags.pickup_burden = UNENCUMBERED;
                 break;
-            /* Burdened (slight encumbrance) */
-            case 'b':
+            case 'b': /* Burdened (slight encumbrance) */
                 flags.pickup_burden = SLT_ENCUMBER;
                 break;
-            /* streSsed (moderate encumbrance) */
-            case 's':
+            case 's': /* streSsed (moderate encumbrance) */
                 flags.pickup_burden = MOD_ENCUMBER;
                 break;
-            /* straiNed (heavy encumbrance) */
-            case 'n':
+            case 'n': /* straiNed (heavy encumbrance) */
                 flags.pickup_burden = HVY_ENCUMBER;
                 break;
-            /* OverTaxed (extreme encumbrance) */
-            case 'o':
+            case 'o': /* OverTaxed (extreme encumbrance) */
             case 't':
                 flags.pickup_burden = EXT_ENCUMBER;
                 break;
-            /* overLoaded */
-            case 'l':
+            case 'l': /* overLoaded */
                 flags.pickup_burden = OVERLOADED;
                 break;
             default:
@@ -2813,7 +2782,9 @@ boolean tinitial, tfrom_file;
         while (*op && num < sizeof flags.end_disclose - 1) {
             static char valid_settings[] = {
                 DISCLOSE_PROMPT_DEFAULT_YES, DISCLOSE_PROMPT_DEFAULT_NO,
-                DISCLOSE_YES_WITHOUT_PROMPT, DISCLOSE_NO_WITHOUT_PROMPT, '\0'
+                DISCLOSE_PROMPT_DEFAULT_SPECIAL,
+                DISCLOSE_YES_WITHOUT_PROMPT, DISCLOSE_NO_WITHOUT_PROMPT,
+                DISCLOSE_SPECIAL_WITHOUT_PROMPT, '\0'
             };
             register char c, *dop;
 
@@ -2830,6 +2801,12 @@ boolean tinitial, tfrom_file;
                     continue;
                 }
                 if (prefix_val != -1) {
+                    if (*dop != 'v') {
+                        if (prefix_val == DISCLOSE_PROMPT_DEFAULT_SPECIAL)
+                            prefix_val = DISCLOSE_PROMPT_DEFAULT_YES;
+                        if (prefix_val == DISCLOSE_SPECIAL_WITHOUT_PROMPT)
+                            prefix_val = DISCLOSE_YES_WITHOUT_PROMPT;
+                    }
                     flags.end_disclose[idx] = prefix_val;
                     prefix_val = -1;
                 } else
@@ -2901,11 +2878,13 @@ boolean tinitial, tfrom_file;
     if (match_optname(opts, fullname, 4, TRUE)) {
         op = string_for_env_opt(fullname, opts, FALSE);
         if (op) {
-            switch (tolower(*op)) {
-            case 'n':
-            case 'l':
-            case 'f':
-                flags.sortloot = tolower(*op);
+            char c = lowc(*op);
+
+            switch (c) {
+            case 'n': /* none */
+            case 'l': /* loot (pickup) */
+            case 'f': /* full (pickup + invent) */
+                flags.sortloot = c;
                 break;
             default:
                 badoption(opts);
@@ -3096,8 +3075,7 @@ boolean tinitial, tfrom_file;
         if ((op = string_for_opt(opts, FALSE)) != 0) {
             if (iflags.wc_tile_file)
                 free(iflags.wc_tile_file);
-            iflags.wc_tile_file = (char *) alloc(strlen(op) + 1);
-            Strcpy(iflags.wc_tile_file, op);
+            iflags.wc_tile_file = dupstr(op);
         }
         return;
     }
@@ -3184,21 +3162,25 @@ boolean tinitial, tfrom_file;
                 return; /* string_for_opt gave feedback */
             tmp = negated ? 'n' : 'f';
         } else {
-            tmp = tolower(*op);
+            tmp = lowc(*op);
         }
         switch (tmp) {
         case 'n': /* none */
-        case 't': /* traditional */
+        case 't': /* traditional: prompt for class(es) by symbol,
+                     prompt for each item within class(es) one at a time */
             flags.menu_style = MENU_TRADITIONAL;
             break;
-        case 'c': /* combo: trad.class sel+menu */
+        case 'c': /* combination: prompt for class(es) by symbol,
+                     choose items within selected class(es) by menu */
             flags.menu_style = MENU_COMBINATION;
             break;
-        case 'p': /* partial: no class menu */
-            flags.menu_style = MENU_PARTIAL;
-            break;
-        case 'f': /* full: class menu + menu */
+        case 'f': /* full: choose class(es) by first menu,
+                     choose items within selected class(es) by second menu */
             flags.menu_style = MENU_FULL;
+            break;
+        case 'p': /* partial: skip class filtering,
+                     choose items among all classes by menu */
+            flags.menu_style = MENU_PARTIAL;
             break;
         default:
             badoption(opts);
@@ -3868,7 +3850,7 @@ int numtotal;
 {
     winid tmpwin;
     anything any;
-    int i, pick_cnt, pick_idx, opt_idx;
+    int i, pick_cnt, opt_idx;
     menu_item *pick_list = (menu_item *) 0;
     static const struct action {
         char letr;
@@ -3886,6 +3868,7 @@ int numtotal;
     any = zeroany;
     for (i = 0; i < SIZE(action_titles); i++) {
         char tmpbuf[BUFSZ];
+
         any.a_int++;
         /* omit list and remove if there aren't any yet */
         if (!numtotal && (i == 1 || i == 2))
@@ -3893,24 +3876,17 @@ int numtotal;
         Sprintf(tmpbuf, action_titles[i].desc,
                 (i == 1) ? makeplural(optname) : optname);
         add_menu(tmpwin, NO_GLYPH, &any, action_titles[i].letr, 0, ATR_NONE,
-                 tmpbuf,
-#if 0 /* this ought to work but doesn't... */
-                 (action_titles[i].letr == 'x') ? MENU_SELECTED :
-#endif
-                 MENU_UNSELECTED);
+                 tmpbuf, (i == 3) ? MENU_SELECTED : MENU_UNSELECTED);
     }
     end_menu(tmpwin, "Do what?");
     if ((pick_cnt = select_menu(tmpwin, PICK_ONE, &pick_list)) > 0) {
-        for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx) {
-            opt_idx = pick_list[pick_idx].item.a_int - 1;
-        }
+        opt_idx = pick_list[0].item.a_int - 1;
+        if (pick_cnt > 1 && opt_idx == 3)
+            opt_idx = pick_list[1].item.a_int - 1;
         free((genericptr_t) pick_list);
-        pick_list = (menu_item *) 0;
-    }
-    destroy_nhwindow(tmpwin);
-
-    if (pick_cnt < 1)
+    } else
         opt_idx = 3; /* none selected, exit menu */
+    destroy_nhwindow(tmpwin);
     return opt_idx;
 }
 
@@ -3924,7 +3900,7 @@ boolean setinitial, setfromfile;
 {
     winid tmpwin;
     anything any;
-    int i;
+    int i, n;
     char buf[BUFSZ];
 
     /* Special handling of menustyle, pickup_burden, pickup_types,
@@ -4014,6 +3990,7 @@ boolean setinitial, setfromfile;
         };
         int disc_cat[NUM_DISCLOSURE_OPTIONS];
         int pick_cnt, pick_idx, opt_idx;
+        char c;
         menu_item *disclosure_pick = (menu_item *) 0;
 
         tmpwin = create_nhwindow(NHW_MENU);
@@ -4041,6 +4018,7 @@ boolean setinitial, setfromfile;
 
         for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++) {
             if (disc_cat[i]) {
+                c = flags.end_disclose[i];
                 Sprintf(buf, "Disclosure options for %s:",
                         disclosure_names[i]);
                 tmpwin = create_nhwindow(NHW_MENU);
@@ -4048,24 +4026,41 @@ boolean setinitial, setfromfile;
                 any = zeroany;
                 /* 'y','n',and '+' work as alternate selectors; '-' doesn't */
                 any.a_char = DISCLOSE_NO_WITHOUT_PROMPT;
-                add_menu(tmpwin, NO_GLYPH, &any, 'a', any.a_char, ATR_NONE,
+                add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
                          "Never disclose, without prompting",
-                         MENU_UNSELECTED);
+                         (c == any.a_char) ? MENU_SELECTED : MENU_UNSELECTED);
                 any.a_char = DISCLOSE_YES_WITHOUT_PROMPT;
-                add_menu(tmpwin, NO_GLYPH, &any, 'b', any.a_char, ATR_NONE,
+                add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
                          "Always disclose, without prompting",
-                         MENU_UNSELECTED);
+                         (c == any.a_char) ? MENU_SELECTED : MENU_UNSELECTED);
+                if (*disclosure_names[i] == 'v') {
+                    any.a_char = DISCLOSE_SPECIAL_WITHOUT_PROMPT; /* '#' */
+                    add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
+                             "Always disclose, pick sort order from menu",
+                             (c == any.a_char) ? MENU_SELECTED
+                                               : MENU_UNSELECTED);
+                }
                 any.a_char = DISCLOSE_PROMPT_DEFAULT_NO;
-                add_menu(tmpwin, NO_GLYPH, &any, 'c', any.a_char, ATR_NONE,
+                add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
                          "Prompt, with default answer of \"No\"",
-                         MENU_UNSELECTED);
+                         (c == any.a_char) ? MENU_SELECTED : MENU_UNSELECTED);
                 any.a_char = DISCLOSE_PROMPT_DEFAULT_YES;
-                add_menu(tmpwin, NO_GLYPH, &any, 'd', any.a_char, ATR_NONE,
+                add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
                          "Prompt, with default answer of \"Yes\"",
-                         MENU_UNSELECTED);
+                         (c == any.a_char) ? MENU_SELECTED : MENU_UNSELECTED);
+                if (*disclosure_names[i] == 'v') {
+                    any.a_char = DISCLOSE_PROMPT_DEFAULT_SPECIAL; /* '?' */
+                    add_menu(tmpwin, NO_GLYPH, &any, 0, any.a_char, ATR_NONE,
+                "Prompt, with default answer of \"Ask\" to request sort menu",
+                             (c == any.a_char) ? MENU_SELECTED
+                                               : MENU_UNSELECTED);
+                }
                 end_menu(tmpwin, buf);
-                if (select_menu(tmpwin, PICK_ONE, &disclosure_pick) > 0) {
-                    flags.end_disclose[i] = disclosure_pick->item.a_char;
+                n = select_menu(tmpwin, PICK_ONE, &disclosure_pick);
+                if (n > 0) {
+                    flags.end_disclose[i] = disclosure_pick[0].item.a_char;
+                    if (n > 1 && flags.end_disclose[i] == c)
+                        flags.end_disclose[i] = disclosure_pick[1].item.a_char;
                     free((genericptr_t) disclosure_pick);
                 }
                 destroy_nhwindow(tmpwin);
@@ -4183,11 +4178,17 @@ boolean setinitial, setfromfile;
             sortl_name = sortltype[i];
             any.a_char = *sortl_name;
             add_menu(tmpwin, NO_GLYPH, &any, *sortl_name, 0, ATR_NONE,
-                     sortl_name, MENU_UNSELECTED);
+                     sortl_name, (flags.sortloot == *sortl_name)
+                                    ? MENU_SELECTED : MENU_UNSELECTED);
         }
         end_menu(tmpwin, "Select loot sorting type:");
-        if (select_menu(tmpwin, PICK_ONE, &sortl_pick) > 0) {
-            flags.sortloot = sortl_pick->item.a_char;
+        n = select_menu(tmpwin, PICK_ONE, &sortl_pick);
+        if (n > 0) {
+            char c = sortl_pick[0].item.a_char;
+
+            if (n > 1 && c == flags.sortloot)
+                c = sortl_pick[1].item.a_char;
+            flags.sortloot = c;
             free((genericptr_t) sortl_pick);
         }
         destroy_nhwindow(tmpwin);
@@ -4286,23 +4287,24 @@ boolean setinitial, setfromfile;
     msgtypes_again:
         nmt = msgtype_count();
         opt_idx = handle_add_list_remove("message type", nmt);
-        if (opt_idx == 3) {
-            ; /* done--fall through to function exit */
+        if (opt_idx == 3) { /* done */
+            return TRUE;
         } else if (opt_idx == 0) { /* add new */
             getlin("What new message pattern?", mtbuf);
-            if (*mtbuf == '\033' || !*mtbuf)
-                goto msgtypes_again;
-            mttyp = query_msgtype();
-            if (mttyp == -1)
-                goto msgtypes_again;
-            if (!msgtype_add(mttyp, mtbuf)) {
+            if (*mtbuf == '\033')
+                return TRUE;
+            if (*mtbuf
+                && (mttyp = query_msgtype()) != -1
+                && !msgtype_add(mttyp, mtbuf)) {
                 pline("Error adding the message type.");
                 wait_synch();
-                goto msgtypes_again;
             }
-        } else { /* list or remove */
+            goto msgtypes_again;
+        } else { /* list (1) or remove (2) */
             int pick_idx, pick_cnt;
             int mt_idx;
+            unsigned ln;
+            const char *mtype;
             menu_item *pick_list = (menu_item *) 0;
             struct plinemsg_type *tmp = plinemsg_types;
 
@@ -4311,10 +4313,14 @@ boolean setinitial, setfromfile;
             any = zeroany;
             mt_idx = 0;
             while (tmp) {
-                const char *mtype = msgtype2name(tmp->msgtype);
-
+                mtype = msgtype2name(tmp->msgtype);
                 any.a_int = ++mt_idx;
-                Sprintf(mtbuf, "%-5s \"%s\"", mtype, tmp->pattern);
+                Sprintf(mtbuf, "%-5s \"", mtype);
+                ln = sizeof mtbuf - strlen(mtbuf) - sizeof "\"";
+                if (strlen(tmp->pattern) > ln)
+                    Strcat(strncat(mtbuf, tmp->pattern, ln - 3), "...\"");
+                else
+                    Strcat(mtbuf, "\"");
                 add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, mtbuf,
                          MENU_UNSELECTED);
                 tmp = tmp->next;
@@ -4342,26 +4348,25 @@ boolean setinitial, setfromfile;
     menucolors_again:
         nmc = count_menucolors();
         opt_idx = handle_add_list_remove("menucolor", nmc);
-        if (opt_idx == 3) {
-            ;                      /* done--fall through to function exit */
+        if (opt_idx == 3) { /* done */
+            return TRUE;
         } else if (opt_idx == 0) { /* add new */
             getlin("What new menucolor pattern?", mcbuf);
-            if (*mcbuf == '\033' || !*mcbuf)
-                goto menucolors_again;
-            mcclr = query_color();
-            if (mcclr == -1)
-                goto menucolors_again;
-            mcattr = query_attr(NULL);
-            if (mcattr == -1)
-                goto menucolors_again;
-            if (!add_menu_coloring_parsed(mcbuf, mcclr, mcattr)) {
+            if (*mcbuf == '\033')
+                return TRUE;
+            if (*mcbuf
+                && (mcclr = query_color()) != -1
+                && (mcattr = query_attr((char *) 0)) != -1
+                && !add_menu_coloring_parsed(mcbuf, mcclr, mcattr)) {
                 pline("Error adding the menu color.");
                 wait_synch();
-                goto menucolors_again;
             }
-        } else { /* list or remove */
+            goto menucolors_again;
+        } else { /* list (1) or remove (2) */
             int pick_idx, pick_cnt;
             int mc_idx;
+            unsigned ln;
+            const char *sattr, *sclr;
             menu_item *pick_list = (menu_item *) 0;
             struct menucoloring *tmp = menu_colorings;
 
@@ -4370,13 +4375,22 @@ boolean setinitial, setfromfile;
             any = zeroany;
             mc_idx = 0;
             while (tmp) {
-                const char *sattr = attr2attrname(tmp->attr);
-                const char *sclr = clr2colorname(tmp->color);
-
-                any.a_int = (++mc_idx);
-                Sprintf(mcbuf, "\"%s\"=%s%s%s", tmp->origstr, sclr,
+                sattr = attr2attrname(tmp->attr);
+                sclr = clr2colorname(tmp->color);
+                any.a_int = ++mc_idx;
+                /* construct suffix */
+                Sprintf(buf, "\"\"=%s%s%s", sclr,
                         (tmp->attr != ATR_NONE) ? " & " : "",
                         (tmp->attr != ATR_NONE) ? sattr : "");
+                /* now main string */
+                ln = sizeof buf - strlen(buf) - 1; /* length available */
+                Strcpy(mcbuf, "\"");
+                if (strlen(tmp->origstr) > ln)
+                    Strcat(strncat(mcbuf, tmp->origstr, ln - 3), "...");
+                else
+                    Strcat(mcbuf, tmp->origstr);
+                /* combine main string and suffix */
+                Strcat(mcbuf, &buf[1]); /* skip buf[]'s initial quote */
                 add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, mcbuf,
                          MENU_UNSELECTED);
                 tmp = tmp->next;
@@ -4405,26 +4419,24 @@ boolean setinitial, setfromfile;
     ape_again:
         totalapes = count_ape_maps(&numapes[AP_LEAVE], &numapes[AP_GRAB]);
         opt_idx = handle_add_list_remove("autopickup exception", totalapes);
-        if (opt_idx == 3) {
-            ;                      /* done--fall through to function exit */
+        if (opt_idx == 3) { /* done */
+            return TRUE;
         } else if (opt_idx == 0) { /* add new */
             getlin("What new autopickup exception pattern?", &apebuf[1]);
             mungspaces(&apebuf[1]); /* regularize whitespace */
-            if (apebuf[1] == '\033') {
-                ; /* fall through to function exit */
-            } else {
-                if (apebuf[1]) {
-                    apebuf[0] = '\"';
-                    /* guarantee room for \" prefix and \"\0 suffix;
-                       -2 is good enough for apebuf[] but -3 makes
-                       sure the whole thing fits within normal BUFSZ */
-                    apebuf[sizeof apebuf - 3] = '\0';
-                    Strcat(apebuf, "\"");
-                    add_autopickup_exception(apebuf);
-                }
-                goto ape_again;
+            if (apebuf[1] == '\033')
+                return TRUE;
+            if (apebuf[1]) {
+                apebuf[0] = '\"';
+                /* guarantee room for \" prefix and \"\0 suffix;
+                   -2 is good enough for apebuf[] but -3 makes
+                   sure the whole thing fits within normal BUFSZ */
+                apebuf[sizeof apebuf - 3] = '\0';
+                Strcat(apebuf, "\"");
+                add_autopickup_exception(apebuf);
             }
-        } else { /* list or remove */
+            goto ape_again;
+        } else { /* list (1) or remove (2) */
             int pick_idx, pick_cnt;
             menu_item *pick_list = (menu_item *) 0;
 
@@ -4440,6 +4452,7 @@ boolean setinitial, setfromfile;
                          MENU_UNSELECTED);
                 for (i = 0; i < numapes[pass] && ape; i++) {
                     any.a_void = (opt_idx == 1) ? 0 : ape;
+                    /* length of pattern plus quotes is less than BUFSZ */
                     Sprintf(apebuf, "\"%s\"", ape->pattern);
                     add_menu(tmpwin, NO_GLYPH, &any, 0, 0, ATR_NONE, apebuf,
                              MENU_UNSELECTED);
@@ -5025,39 +5038,54 @@ int
 add_autopickup_exception(mapping)
 const char *mapping;
 {
+    static const char
+        APE_regex_error[] = "regex error in AUTOPICKUP_EXCEPTION",
+        APE_syntax_error[] = "syntax error in AUTOPICKUP_EXCEPTION";
+
     struct autopickup_exception *ape, **apehead;
-    char text[256], *text2;
+    char text[256], end;
+    int n;
     boolean grab = FALSE;
 
-    if (sscanf(mapping, "\"%255[^\"]\"", text) == 1) {
-        text2 = &text[0];
-        if (*text2 == '<') { /* force autopickup */
-            grab = TRUE;
-            ++text2;
-        } else if (*text2 == '>') { /* default - Do not pickup */
-            grab = FALSE;
-            ++text2;
-        }
-        apehead = (grab) ? &iflags.autopickup_exceptions[AP_GRAB]
-                         : &iflags.autopickup_exceptions[AP_LEAVE];
-        ape = (struct autopickup_exception *) alloc(
-                                        sizeof (struct autopickup_exception));
-        ape->regex = regex_init();
-        if (!regex_compile(text2, ape->regex)) {
-            raw_print("regex error in AUTOPICKUP_EXCEPTION");
-            regex_free(ape->regex);
-            free((genericptr_t) ape);
-            return 0;
-        }
-        ape->pattern = (char *) alloc(strlen(text2) + 1);
-        strcpy(ape->pattern, text2);
-        ape->grab = grab;
-        ape->next = *apehead;
-        *apehead = ape;
+    /* scan length limit used to be 255, but smaller size allows the
+       quoted value to fit within BUFSZ, simplifying formatting elsewhere;
+       this used to ignore the possibility of trailing junk but now checks
+       for it, accepting whitespace but rejecting anything else unless it
+       starts with '#" for a comment */
+    end = '\0';
+    if ((n = sscanf(mapping, "\"<%253[^\"]\" %c", text, &end)) == 1
+        || (n == 2 && end == '#')) {
+        grab = TRUE;
+    } else if ((n = sscanf(mapping, "\">%253[^\"]\" %c", text, &end)) == 1
+               || (n = sscanf(mapping, "\"%253[^\"]\" %c", text, &end)) == 1
+               || (n == 2 && end == '#')) {
+        grab = FALSE;
     } else {
-        raw_print("syntax error in AUTOPICKUP_EXCEPTION");
+        if (!iflags.window_inited)
+            raw_print(APE_syntax_error); /* from options file */
+        else
+            pline("%s", APE_syntax_error); /* via 'O' command */
         return 0;
     }
+
+    ape = (struct autopickup_exception *) alloc(sizeof *ape);
+    ape->regex = regex_init();
+    if (!regex_compile(text, ape->regex)) {
+        if (!iflags.window_inited)
+            raw_print(APE_regex_error);
+        else
+            pline("%s", APE_regex_error);
+        regex_free(ape->regex);
+        free((genericptr_t) ape);
+        return 0;
+    }
+    apehead = (grab) ? &iflags.autopickup_exceptions[AP_GRAB]
+                     : &iflags.autopickup_exceptions[AP_LEAVE];
+
+    ape->pattern = dupstr(text);
+    ape->grab = grab;
+    ape->next = *apehead;
+    *apehead = ape;
     return 1;
 }
 
@@ -5222,11 +5250,41 @@ char *buf;
 
 int
 sym_val(strval)
-char *strval;
+const char *strval;
 {
     char buf[QBUFSZ];
+
     buf[0] = '\0';
-    escapes(strval, buf);
+    if (!strval[0] || !strval[1]) { /* empty, or single character */
+        /* if single char is space or tab, leave buf[0]=='\0' */
+        if (!isspace((uchar) strval[0]))
+            buf[0] = strval[0];
+    } else if (strval[0] == '\'') { /* single quote */
+        /* simple matching single quote; we know strval[1] isn't '\0' */
+        if (strval[2] == '\'' && !strval[3]) {
+            /* accepts '\' as backslash and ''' as single quote */
+            buf[0] = strval[1];
+
+        /* if backslash, handle single or double quote or second backslash */
+        } else if (strval[1] == '\\' && strval[2] && strval[3] == '\''
+            && index("'\"\\", strval[2]) && !strval[4]) {
+            buf[0] = strval[2];
+
+        /* not simple quote or basic backslash;
+           strip closing quote and let escapes() deal with it */
+        } else {
+            char *p, tmp[QBUFSZ];
+
+            (void) strncpy(tmp, strval + 1, sizeof tmp - 1);
+            tmp[sizeof tmp - 1] = '\0';
+            if ((p = rindex(tmp, '\'')) != 0) {
+                *p = '\0';
+                escapes(tmp, buf);
+            } /* else buf[0] stays '\0' */
+        }
+    } else /* not lone char nor single quote */
+        escapes(strval, buf);
+
     return (int) *buf;
 }
 
@@ -5438,6 +5496,7 @@ struct fruit *replace_fruit;
         return rnd(127);
 
     f = newfruit();
+    (void) memset((genericptr_t)f, 0, sizeof(struct fruit));
     copynchars(f->fname, *altname ? altname : str, PL_FSIZ - 1);
     f->fid = ++highest_fruit_id;
     /* we used to go out of our way to add it at the end of the list,

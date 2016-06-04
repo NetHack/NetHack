@@ -6,6 +6,7 @@
 
 #include "hack.h"
 
+STATIC_DCL boolean FDECL(stock_room_goodpos, (struct mkroom *, int, int, int, int));
 STATIC_DCL boolean FDECL(veggy_item, (struct obj * obj, int));
 STATIC_DCL int NDECL(shkveg);
 STATIC_DCL void FDECL(mkveggy_at, (int, int));
@@ -676,6 +677,24 @@ struct mkroom *sroom;
     return sh;
 }
 
+STATIC_OVL boolean
+stock_room_goodpos(sroom, rmno, sh, sx, sy)
+struct mkroom *sroom;
+int rmno, sh, sx,sy;
+{
+    if (sroom->irregular) {
+        if (levl[sx][sy].edge
+            || (int) levl[sx][sy].roomno != rmno
+            || distmin(sx, sy, doors[sh].x, doors[sh].y) <= 1)
+            return FALSE;
+    } else if ((sx == sroom->lx && doors[sh].x == sx - 1)
+               || (sx == sroom->hx && doors[sh].x == sx + 1)
+               || (sy == sroom->ly && doors[sh].y == sy - 1)
+               || (sy == sroom->hy && doors[sh].y == sy + 1))
+        return FALSE;
+    return TRUE;
+}
+
 /* stock a newly-created room with objects */
 void
 stock_room(shp_indx, sroom)
@@ -733,39 +752,20 @@ register struct mkroom *sroom;
          * going to put stuff, randomly single out one in particular.
          */
         for (sx = sroom->lx; sx <= sroom->hx; sx++)
-            for (sy = sroom->ly; sy <= sroom->hy; sy++) {
-                if (sroom->irregular) {
-                    if (levl[sx][sy].edge
-                        || (int) levl[sx][sy].roomno != rmno
-                        || distmin(sx, sy, doors[sh].x, doors[sh].y) <= 1)
-                        continue;
-                } else if ((sx == sroom->lx && doors[sh].x == sx - 1)
-                           || (sx == sroom->hx && doors[sh].x == sx + 1)
-                           || (sy == sroom->ly && doors[sh].y == sy - 1)
-                           || (sy == sroom->hy && doors[sh].y == sy + 1))
-                    continue;
-                stockcount++;
-            }
+            for (sy = sroom->ly; sy <= sroom->hy; sy++)
+                if (stock_room_goodpos(sroom, rmno, sh, sx,sy))
+                    stockcount++;
         specialspot = rnd(stockcount);
         stockcount = 0;
     }
 
     for (sx = sroom->lx; sx <= sroom->hx; sx++)
-        for (sy = sroom->ly; sy <= sroom->hy; sy++) {
-            if (sroom->irregular) {
-                if (levl[sx][sy].edge
-                    || (int) levl[sx][sy].roomno != rmno
-                    || distmin(sx, sy, doors[sh].x, doors[sh].y) <= 1)
-                    continue;
-            } else if ((sx == sroom->lx && doors[sh].x == sx - 1)
-                       || (sx == sroom->hx && doors[sh].x == sx + 1)
-                       || (sy == sroom->ly && doors[sh].y == sy - 1)
-                       || (sy == sroom->hy && doors[sh].y == sy + 1))
-                continue;
-            stockcount++;
-            mkshobj_at(shp, sx, sy,
-                       ((stockcount) && (stockcount == specialspot)));
-        }
+        for (sy = sroom->ly; sy <= sroom->hy; sy++)
+            if (stock_room_goodpos(sroom, rmno, sh, sx,sy)) {
+                stockcount++;
+                mkshobj_at(shp, sx, sy,
+                           ((stockcount) && (stockcount == specialspot)));
+            }
 
     /*
      * Special monster placements (if any) should go here: that way,

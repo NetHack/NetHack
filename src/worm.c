@@ -677,6 +677,14 @@ register xchar *nx, *ny;
               : (y > 1 ? (y < ROWNO ? (rn2(3) - 1) : -rn2(2)) : rn2(2)));
 }
 
+/* for size_monst(cmd.c) to support #stats */
+int
+size_wseg(worm)
+struct monst *worm;
+{
+    return (int) (count_wsegs(worm) * sizeof (struct wseg));
+}
+
 /*  count_wsegs()
  *  returns the number of segments that a worm has.
  */

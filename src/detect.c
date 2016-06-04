@@ -1,4 +1,4 @@
-/* NetHack 3.6	detect.c	$NHDT-Date: 1446369464 2015/11/01 09:17:44 $  $NHDT-Branch: master $:$NHDT-Revision: 1.61 $ */
+/* NetHack 3.6	detect.c	$NHDT-Date: 1463191981 2016/05/14 02:13:01 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.70 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -272,6 +272,7 @@ outgoldmap:
     }
     newsym(u.ux, u.uy);
     u.uinwater = iflags.save_uinwater, u.uburied = iflags.save_uburied;
+    iflags.save_uinwater = iflags.save_uburied = 0;
     You_feel("very greedy, and sense gold!");
     exercise(A_WIS, TRUE);
     display_nhwindow(WIN_MAP, TRUE);
@@ -376,6 +377,7 @@ register struct obj *sobj;
                 }
         newsym(u.ux, u.uy);
         u.uinwater = iflags.save_uinwater, u.uburied = iflags.save_uburied;
+        iflags.save_uinwater = iflags.save_uburied = 0;
         if (sobj) {
             if (sobj->blessed) {
                 Your("%s %s to tingle and you smell %s.", body_part(NOSE),
@@ -575,6 +577,7 @@ int class;            /* an object class, 0 for all */
 
     newsym(u.ux, u.uy);
     u.uinwater = iflags.save_uinwater, u.uburied = iflags.save_uburied;
+    iflags.save_uinwater = iflags.save_uburied = 0;
     You("detect the %s of %s.", ct ? "presence" : "absence", stuff);
     display_nhwindow(WIN_MAP, TRUE);
     /*
@@ -826,6 +829,7 @@ outtrapmap:
     if (!(glyph_is_trap(glyph) || glyph_is_object(glyph)))
         newsym(u.ux, u.uy);
     u.uinwater = iflags.save_uinwater, u.uburied = iflags.save_uburied;
+    iflags.save_uinwater = iflags.save_uburied = 0;
 
     You_feel("%s.", cursed_src ? "very greedy" : "entrapped");
     /* wait for user to respond, then reset map display to normal */
@@ -1090,6 +1094,7 @@ do_mapping()
         for (zy = 0; zy < ROWNO; zy++)
             show_map_spot(zx, zy);
     u.uinwater = iflags.save_uinwater, u.uburied = iflags.save_uburied;
+    iflags.save_uinwater = iflags.save_uburied = 0;
     if (!level.flags.hero_memory || Underwater) {
         flush_screen(1);                 /* flush temp screen */
         display_nhwindow(WIN_MAP, TRUE); /* wait */
@@ -1355,7 +1360,7 @@ boolean via_warning;
                 Your("warning senses cause you to take a second %s.",
                         Blind ? "to check nearby" : "look close by");
                 display_nhwindow(WIN_MESSAGE, FALSE); /* flush messages */
-	    }
+            }
             mtmp->mundetected = 0;
             newsym(x, y);
             goto find;
@@ -1463,20 +1468,17 @@ dosearch()
 void
 warnreveal()
 {
-    xchar x, y;
+    int x, y;
     struct monst *mtmp;
-    
-    for (x = u.ux - 1; x < u.ux + 2; x++)
-     for (y = u.uy - 1; y < u.uy + 2; y++) {
-        if (!isok(x, y))
-            continue;
-        if (x == u.ux && y == u.uy)
-            continue;
 
-        if ((mtmp = m_at(x, y)) != 0
-             && warning_of(mtmp) && mtmp->mundetected)
-           (void) mfind0(mtmp, 1); /* via_warning */
-     }
+    for (x = u.ux - 1; x <= u.ux + 1; x++)
+        for (y = u.uy - 1; y <= u.uy + 1; y++) {
+            if (!isok(x, y) || (x == u.ux && y == u.uy))
+                continue;
+            if ((mtmp = m_at(x, y)) != 0
+                && warning_of(mtmp) && mtmp->mundetected)
+                (void) mfind0(mtmp, 1); /* via_warning */
+        }
 }
 
 /* Pre-map the sokoban levels */
@@ -1522,15 +1524,19 @@ int which_subset; /* when not full, whether to suppress objs and/or traps */
         unsigned save_swallowed;
         struct monst *mtmp;
         struct trap *t;
+        coord pos;
         char buf[BUFSZ];
-        boolean keep_traps = (which_subset & 1) !=0,
-                keep_objs = (which_subset & 2) != 0,
-                keep_mons = (which_subset & 4) != 0; /* actually always 0 */
+        /* there is a TER_MAP bit too; we always show map regardless of it */
+        boolean keep_traps = (which_subset & TER_TRP) !=0,
+                keep_objs = (which_subset & TER_OBJ) != 0,
+                keep_mons = (which_subset & TER_MON) != 0; /* not used */
 
         save_swallowed = u.uswallow;
         iflags.save_uinwater = u.uinwater, iflags.save_uburied = u.uburied;
         u.uinwater = u.uburied = 0;
         u.uswallow = 0;
+        if (iflags.save_uinwater || iflags.save_uburied)
+            docrt();
         default_glyph = cmap_to_glyph(level.flags.arboreal ? S_tree : S_stone);
         /* for 'full', show the actual terrain for the entire level,
            otherwise what the hero remembers for seen locations with
@@ -1603,10 +1609,8 @@ int which_subset; /* when not full, whether to suppress objs and/or traps */
                 show_glyph(x, y, glyph);
             }
 
-        /* [TODO: highlight hero's location somehow] */
-        u.uinwater = iflags.save_uinwater, u.uburied = iflags.save_uburied;
-        if (save_swallowed)
-            u.uswallow = 1;
+        /* hero's location is not highlighted, but getpos() starts with
+           cursor there, and after moving it anywhere '@' moves it back */
         flush_screen(1);
         if (full) {
             Strcpy(buf, "underlying terrain");
@@ -1624,7 +1628,20 @@ int which_subset; /* when not full, whether to suppress objs and/or traps */
                         (keep_traps || keep_objs) ? "," : "");
         }
         pline("Showing %s only...", buf);
-        display_nhwindow(WIN_MAP, TRUE); /* give "--More--" prompt */
+
+        /* allow player to move cursor around and get autodescribe feedback
+           based on what is visible now rather than what is on 'real' map */
+        pos.x = u.ux, pos.y = u.uy;
+        iflags.autodescribe = TRUE;
+        iflags.terrainmode = which_subset | TER_MAP; /* guaranteed non-zero */
+        getpos(&pos, FALSE, "anything of interest");
+        iflags.terrainmode = 0;
+        /* leave iflags.autodescribe 'on' even if it was previously 'off' */
+
+        u.uinwater = iflags.save_uinwater, u.uburied = iflags.save_uburied;
+        iflags.save_uinwater = iflags.save_uburied = 0;
+        if (save_swallowed)
+            u.uswallow = 1;
         docrt(); /* redraw the screen, restoring regular map */
         if (Underwater)
             under_water(2);

@@ -6,6 +6,8 @@
 MAZE:"knox",' '
 FLAGS: noteleport
 GEOMETRY:center,center
+# Fort's entry is via a secret door rather than a drawbridge;
+# the moat must be manually circumvented.
 MAP
 ----------------------------------------------------------------------------
 | |........|...............................................................|
@@ -37,11 +39,27 @@ TELEPORT_REGION:(06,16,09,17),(0,0,0,0),up
 TELEPORT_REGION:(06,16,09,17),(0,0,0,0),down
 #   Throne room, with Croesus on the throne
 REGION:(37,08,46,11),lit,"throne"
-MONSTER:('@',"Croesus"),(43,10),hostile
+#   50% chance each to move throne and/or fort's entry secret door up one row
+IF [50%] {
+   MONSTER:('@',"Croesus"),(43,10),hostile
+} ELSE {
+   MONSTER:('@',"Croesus"),(43,09),hostile
+   TERRAIN:(43,09), '\'
+   TERRAIN:(43,10), '.'
+}
+IF [50%] {
+   TERRAIN:(47,09), 'S'
+   TERRAIN:(47,10), '|'
+}
 #   The Vault
 #   Using unfilled morgue for
 #   identification in mkmaze.c
 REGION:(21,08,35,11),lit,"morgue",unfilled
+#   Vault entrance also varies
+IF [50%] {
+   TERRAIN:(36,09), '|'
+   TERRAIN:(36,10), 'S'
+}
 #   Corner towers
 REGION:(19,06,21,06),lit,"ordinary"
 REGION:(46,06,48,06),lit,"ordinary"

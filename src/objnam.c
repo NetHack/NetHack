@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1455672990 2016/02/17 01:36:30 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.165 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1462067746 2016/05/01 01:55:46 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.169 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -11,13 +11,14 @@
 
 STATIC_DCL char *FDECL(strprepend, (char *, const char *));
 STATIC_DCL short FDECL(rnd_otyp_by_wpnskill, (SCHAR_P));
+STATIC_DCL short FDECL(rnd_otyp_by_namedesc, (char *, CHAR_P));
 STATIC_DCL boolean FDECL(wishymatch, (const char *, const char *, BOOLEAN_P));
 STATIC_DCL char *NDECL(nextobuf);
 STATIC_DCL void FDECL(releaseobuf, (char *));
 STATIC_DCL char *FDECL(minimal_xname, (struct obj *));
 STATIC_DCL void FDECL(add_erosion_words, (struct obj *, char *));
-STATIC_DCL boolean
-FDECL(singplur_lookup, (char *, char *, BOOLEAN_P, const char *const *));
+STATIC_DCL boolean FDECL(singplur_lookup, (char *, char *, BOOLEAN_P,
+                                           const char *const *));
 STATIC_DCL char *FDECL(singplur_compound, (char *));
 STATIC_DCL char *FDECL(xname_flags, (struct obj *, unsigned));
 
@@ -406,9 +407,9 @@ unsigned cxn_flags; /* bitmask of CXN_xxx values */
             }
             break;
         }
-        if (Is_pudding(obj)) {
+        if (obj->globby) {
             Sprintf(buf, "%s%s",
-                    (obj->owt < 100)
+                    (obj->owt <= 100)
                        ? "small "
                        : (obj->owt > 500)
                           ? "very large "
@@ -730,13 +731,38 @@ char *prefix;
                                    : "");
 }
 
+/* used to prevent rust on items where rust makes no difference */
+boolean
+erosion_matters(obj)
+struct obj *obj;
+{
+    switch (obj->oclass) {
+    case TOOL_CLASS:
+        /* it's possible for a rusty weptool to be polymorphed into some
+           non-weptool iron tool, in which case the rust implicitly goes
+           away, but it's also possible for it to be polymorphed into a
+           non-iron tool, in which case rust also implicitly goes away,
+           so there's no particular reason to try to handle the first
+           instance differently [this comment belongs in poly_obj()...] */
+        return is_weptool(obj) ? TRUE : FALSE;
+    case WEAPON_CLASS:
+    case ARMOR_CLASS:
+    case BALL_CLASS:
+    case CHAIN_CLASS:
+        return TRUE;
+    default:
+        break;
+    }
+    return FALSE;
+}
+
 static char *
 doname_base(obj, with_price)
 register struct obj *obj;
 boolean with_price;
 {
     boolean ispoisoned = FALSE;
-    boolean known, cknown, bknown, lknown;
+    boolean known, dknown, cknown, bknown, lknown;
     int omndx = obj->corpsenm;
     char prefix[PREFIX];
     char tmpbuf[PREFIX + 1]; /* for when we have to add something at
@@ -745,9 +771,10 @@ boolean with_price;
     register char *bp = xname(obj);
 
     if (iflags.override_ID) {
-        known = cknown = bknown = lknown = TRUE;
+        known = dknown = cknown = bknown = lknown = TRUE;
     } else {
         known = obj->known;
+        dknown = obj->dknown;
         cknown = obj->cknown;
         bknown = obj->bknown;
         lknown = obj->lknown;
@@ -765,7 +792,10 @@ boolean with_price;
     }
 
     if (obj->quan != 1L) {
-        Sprintf(prefix, "%ld ", obj->quan);
+        if (dknown)
+            Sprintf(prefix, "%ld ", obj->quan);
+        else
+            Strcpy(prefix, "some ");
     } else if (obj->otyp == CORPSE) {
         /* skip article prefix for corpses [else corpse_xname()
            would have to be taught how to strip it off again] */
@@ -853,31 +883,27 @@ boolean with_price;
                 plur(itemcount));
     }
 
-    switch (obj->oclass) {
+    switch (is_weptool(obj) ? WEAPON_CLASS : obj->oclass) {
     case AMULET_CLASS:
         if (obj->owornmask & W_AMUL)
             Strcat(bp, " (being worn)");
         break;
+    case ARMOR_CLASS:
+        if (obj->owornmask & W_ARMOR)
+            Strcat(bp, (obj == uskin) ? " (embedded in your skin)"
+                                      : " (being worn)");
+        /*FALLTHRU*/
     case WEAPON_CLASS:
         if (ispoisoned)
             Strcat(prefix, "poisoned ");
-    plus:
         add_erosion_words(obj, prefix);
         if (known) {
             Strcat(prefix, sitoa(obj->spe));
             Strcat(prefix, " ");
         }
         break;
-    case ARMOR_CLASS:
-        if (obj->owornmask & W_ARMOR)
-            Strcat(bp, (obj == uskin) ? " (embedded in your skin)"
-                                      : " (being worn)");
-        goto plus;
     case TOOL_CLASS:
-        /* weptools already get this done when we go to the +n code */
-        if (!is_weptool(obj))
-            add_erosion_words(obj, prefix);
-        if (obj->owornmask & (W_TOOL /* blindfold */ | W_SADDLE)) {
+        if (obj->owornmask & (W_TOOL | W_SADDLE)) { /* blindfold */
             Strcat(bp, " (being worn)");
             break;
         }
@@ -885,8 +911,6 @@ boolean with_price;
             Strcat(bp, " (in use)");
             break;
         }
-        if (is_weptool(obj))
-            goto plus;
         if (obj->otyp == CANDELABRUM_OF_INVOCATION) {
             if (!obj->spe)
                 Strcpy(tmpbuf, "no");
@@ -908,7 +932,6 @@ boolean with_price;
             goto charges;
         break;
     case WAND_CLASS:
-        add_erosion_words(obj, prefix);
     charges:
         if (known)
             Sprintf(eos(bp), " (%d:%d)", (int) obj->recharged, obj->spe);
@@ -918,7 +941,6 @@ boolean with_price;
             Strcat(bp, " (lit)");
         break;
     case RING_CLASS:
-        add_erosion_words(obj, prefix);
     ring:
         if (obj->owornmask & W_RINGR)
             Strcat(bp, " (on right ");
@@ -2408,7 +2430,7 @@ struct alt_spellings {
     { (const char *) 0, 0 },
 };
 
-short
+STATIC_OVL short
 rnd_otyp_by_wpnskill(skill)
 schar skill;
 {
@@ -2429,6 +2451,48 @@ schar skill;
                     return i;
     }
     return otyp;
+}
+
+STATIC_OVL short
+rnd_otyp_by_namedesc(name, oclass)
+char *name;
+char oclass;
+{
+    int i, n = 0;
+    short validobjs[NUM_OBJECTS];
+    register const char *zn;
+    long maxprob = 0;
+
+    if (!name)
+        return STRANGE_OBJECT;
+
+    memset((genericptr_t) validobjs, 0, sizeof(validobjs));
+
+    for (i = oclass ? bases[(int)oclass] : STRANGE_OBJECT + 1;
+         i < NUM_OBJECTS && (!oclass || objects[i].oc_class == oclass);
+         ++i) {
+        /* don't match extra descriptions (w/o real name) */
+        if ((zn = OBJ_NAME(objects[i])) == 0)
+            continue;
+        if (wishymatch(name, zn, TRUE)
+            || ((zn = OBJ_DESCR(objects[i])) != 0
+                && wishymatch(name, zn, FALSE))
+            || ((zn = objects[i].oc_uname) != 0
+                && wishymatch(name, zn, FALSE))) {
+            validobjs[n++] = (short) i;
+            maxprob += (objects[i].oc_prob + 1);
+        }
+    }
+
+    if (n > 0 && maxprob) {
+        long prob = rn2(maxprob);
+
+        i = 0;
+        while (i < n - 1 && (prob -= (objects[validobjs[i]].oc_prob + 1)) > 0)
+            i++;
+        return validobjs[i];
+    }
+    return STRANGE_OBJECT;
 }
 
 /*
@@ -2452,7 +2516,7 @@ struct obj *no_wish;
     int halfeaten, mntmp, contents;
     int islit, unlabeled, ishistoric, isdiluted, trapped;
     int tmp, tinv, tvariety;
-    int wetness;
+    int wetness, gsize = 0;
     struct fruit *f;
     int ftype = context.current_fruit;
     char fruitbuf[BUFSZ];
@@ -2471,7 +2535,7 @@ struct obj *no_wish;
      * automatically sticks 'candied' in front of such names.
      */
     char oclass;
-    char *un, *dn, *actualn;
+    char *un, *dn, *actualn, *origbp = bp;
     const char *name = 0;
 
     cnt = spe = spesgn = typ = very = rechrg = blessed = uncursed = iscursed =
@@ -2590,6 +2654,15 @@ struct obj *no_wish;
             isdiluted = 1;
         } else if (!strncmpi(bp, "empty ", l = 6)) {
             contents = EMPTY;
+        } else if (!strncmpi(bp, "small ", l = 6)) { /* glob sizes */
+            gsize = 1;
+        } else if (!strncmpi(bp, "medium ", l = 7)) {
+            /* xname() doesn't display "medium" but without this
+               there'd be no way to ask for the intermediate size */
+            gsize = 2;
+        } else if (!strncmpi(bp, "large ", l = 6)) {
+            /* "very large " had "very " peeled off on previous iteration */
+            gsize = (very != 1) ? 3 : 4;
         } else
             break;
         bp += l;
@@ -2720,6 +2793,7 @@ struct obj *no_wish;
     if ((p = strstri(bp, "glob of ")) != 0
         || (p = strstri(bp, "globs of ")) != 0) {
         int globoffset = (*(p + 4) == 's') ? 9 : 8;
+
         if ((mntmp = name_to_mon(p + globoffset)) >= PM_GRAY_OOZE
             && mntmp <= PM_BLACK_PUDDING) {
             mntmp = NON_PM; /* lie to ourselves */
@@ -2991,30 +3065,14 @@ srch:
             }
         }
     }
-    i = oclass ? bases[(int) oclass] : 1;
-    while (i < NUM_OBJECTS && (!oclass || objects[i].oc_class == oclass)) {
-        register const char *zn;
 
-        if (actualn && (zn = OBJ_NAME(objects[i])) != 0
-            && wishymatch(actualn, zn, TRUE)) {
-            typ = i;
-            goto typfnd;
-        }
-        if (dn && (zn = OBJ_DESCR(objects[i])) != 0
-            && wishymatch(dn, zn, FALSE)) {
-            /* don't match extra descriptions (w/o real name) */
-            if (!OBJ_NAME(objects[i]))
-                return (struct obj *) 0;
-            typ = i;
-            goto typfnd;
-        }
-        if (un && (zn = objects[i].oc_uname) != 0
-            && wishymatch(un, zn, FALSE)) {
-            typ = i;
-            goto typfnd;
-        }
-        i++;
-    }
+    if (((typ = rnd_otyp_by_namedesc(actualn, oclass)) != STRANGE_OBJECT)
+        || ((typ = rnd_otyp_by_namedesc(dn, oclass)) != STRANGE_OBJECT)
+        || ((typ = rnd_otyp_by_namedesc(un, oclass)) != STRANGE_OBJECT)
+        || ((typ = rnd_otyp_by_namedesc(origbp, oclass)) != STRANGE_OBJECT))
+        goto typfnd;
+    typ = 0;
+
     if (actualn) {
         struct Jitem *j = Japanese_items;
 
@@ -3401,6 +3459,11 @@ typfnd:
                 set_corpsenm(otmp, mntmp);
             }
             break;
+        case EGG:
+            mntmp = can_be_hatched(mntmp);
+            /* this also sets hatch timer if appropriate */
+            set_corpsenm(otmp, mntmp);
+            break;
         case FIGURINE:
             if (!(mons[mntmp].geno & G_UNIQ) && !is_human(&mons[mntmp])
 #ifdef MAIL
@@ -3408,11 +3471,6 @@ typfnd:
 #endif
                 )
                 otmp->corpsenm = mntmp;
-            break;
-        case EGG:
-            mntmp = can_be_hatched(mntmp);
-            /* this also sets hatch timer if appropriate */
-            set_corpsenm(otmp, mntmp);
             break;
         case STATUE:
             otmp->corpsenm = mntmp;
@@ -3443,15 +3501,19 @@ typfnd:
         curse(otmp);
     }
 
-    /* set eroded */
-    if (is_damageable(otmp) || otmp->otyp == CRYSKNIFE) {
+    /* set eroded and erodeproof */
+    if (erosion_matters(otmp)) {
         if (eroded && (is_flammable(otmp) || is_rustprone(otmp)))
             otmp->oeroded = eroded;
         if (eroded2 && (is_corrodeable(otmp) || is_rottable(otmp)))
             otmp->oeroded2 = eroded2;
-
-        /* set erodeproof */
-        if (erodeproof && !eroded && !eroded2)
+        /*
+         * 3.6.1: earlier versions included `&& !eroded && !eroded2' here,
+         * but damageproof combined with damaged is feasible (eroded
+         * armor modified by confused reading of cursed destroy armor)
+         * so don't prevent player from wishing for such a combination.
+         */
+        if (erodeproof && (is_damageable(otmp) || otmp->otyp == CRYSKNIFE))
             otmp->oerodeproof = (Luck >= 0 || wizard);
     }
 
@@ -3534,6 +3596,10 @@ typfnd:
     otmp->owt = weight(otmp);
     if (very && otmp->otyp == HEAVY_IRON_BALL)
         otmp->owt += IRON_BALL_W_INCR;
+    else if (gsize > 1 && otmp->globby)
+        /* 0: unspecified => small; 1: small => keep default owt of 20;
+           2: medium => 120; 3: large => 320; 4: very large => 520 */
+        otmp->owt += 100 + (gsize - 2) * 200;
 
     return otmp;
 }

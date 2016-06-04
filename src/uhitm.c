@@ -1,4 +1,4 @@
-/* NetHack 3.6	uhitm.c	$NHDT-Date: 1456992470 2016/03/03 08:07:50 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.155 $ */
+/* NetHack 3.6	uhitm.c	$NHDT-Date: 1460103141 2016/04/08 08:12:21 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.156 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -662,15 +662,19 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
                                && P_SKILL(wtype) >= P_SKILLED)
                            && ((monwep = MON_WEP(mon)) != 0
                                && !is_flimsy(monwep)
-                               && !obj_resists(
-                                      monwep, 50 + 15 * greatest_erosion(obj),
-                                      100))) {
+                               && !obj_resists(monwep,
+                                       50 + 15 * (greatest_erosion(obj)
+                                                  - greatest_erosion(monwep)),
+                                               100))) {
                     /*
                      * 2.5% chance of shattering defender's weapon when
                      * using a two-handed weapon; less if uwep is rusted.
                      * [dieroll == 2 is most successful non-beheading or
                      * -bisecting hit, in case of special artifact damage;
                      * the percentage chance is (1/20)*(50/100).]
+                     * If attacker's weapon is rustier than defender's,
+                     * the obj_resists chance is increased so the shatter
+                     * chance is decreased; if less rusty, then vice versa.
                      */
                     setmnotwielded(mon, monwep);
                     mon->weapon_check = NEED_WEAPON;
@@ -1148,7 +1152,7 @@ int thrown; /* HMON_xxx (0 => hand-to-hand, other => ranged) */
     if (poiskilled) {
         pline_The("poison was deadly...");
         if (!already_killed)
-            xkilled(mon, 0);
+            xkilled(mon, XKILL_NOMSG);
         destroyed = TRUE; /* return FALSE; */
     } else if (destroyed) {
         if (!already_killed)
@@ -1467,7 +1471,7 @@ register struct attack *mattk;
         if (pd == &mons[PM_STRAW_GOLEM] || pd == &mons[PM_PAPER_GOLEM]) {
             if (!Blind)
                 pline("%s burns completely!", Monnam(mdef));
-            xkilled(mdef, 2);
+            xkilled(mdef, XKILL_NOMSG | XKILL_NOCORPSE);
             tmp = 0;
             break;
             /* Don't return yet; keep hp<1 and tmp=0 for pet msg */
@@ -1585,7 +1589,7 @@ register struct attack *mattk;
                 if (!Blind)
                     pline("Some writing vanishes from %s head!",
                           s_suffix(mon_nam(mdef)));
-                xkilled(mdef, 0);
+                xkilled(mdef, XKILL_NOMSG);
                 /* Don't return yet; keep hp<1 and tmp=0 for pet msg */
             } else {
                 mdef->mcan = 1;
@@ -1597,11 +1601,14 @@ register struct attack *mattk;
     case AD_DRLI:
         if (!negated && !rn2(3) && !resists_drli(mdef)) {
             int xtmp = d(2, 6);
+
             pline("%s suddenly seems weaker!", Monnam(mdef));
             mdef->mhpmax -= xtmp;
-            if ((mdef->mhp -= xtmp) <= 0 || !mdef->m_lev) {
+            mdef->mhp -= xtmp;
+            /* !m_lev: level 0 monster is killed rather than drop to -1 */
+            if (mdef->mhp <= 0 && !mdef->m_lev) {
                 pline("%s dies!", Monnam(mdef));
-                xkilled(mdef, 0);
+                xkilled(mdef, XKILL_NOMSG);
             } else
                 mdef->m_lev--;
             tmp = 0;
@@ -1610,7 +1617,7 @@ register struct attack *mattk;
     case AD_RUST:
         if (pd == &mons[PM_IRON_GOLEM]) {
             pline("%s falls to pieces!", Monnam(mdef));
-            xkilled(mdef, 0);
+            xkilled(mdef, XKILL_NOMSG);
         }
         erode_armor(mdef, ERODE_RUST);
         tmp = 0;
@@ -1622,7 +1629,7 @@ register struct attack *mattk;
     case AD_DCAY:
         if (pd == &mons[PM_WOOD_GOLEM] || pd == &mons[PM_LEATHER_GOLEM]) {
             pline("%s falls to pieces!", Monnam(mdef));
-            xkilled(mdef, 0);
+            xkilled(mdef, XKILL_NOMSG);
         }
         erode_armor(mdef, ERODE_ROT);
         tmp = 0;
@@ -1762,15 +1769,16 @@ register struct attack *mattk;
     }
 
     mdef->mstrategy &= ~STRAT_WAITFORU; /* in case player is very fast */
-    if ((mdef->mhp -= tmp) < 1) {
+    mdef->mhp -= tmp;
+    if (mdef->mhp < 1) {
         if (mdef->mtame && !cansee(mdef->mx, mdef->my)) {
             You_feel("embarrassed for a moment.");
             if (tmp)
-                xkilled(mdef, 0); /* !tmp but hp<1: already killed */
+                xkilled(mdef, XKILL_NOMSG); /* !tmp but hp<1: already killed */
         } else if (!flags.verbose) {
             You("destroy it!");
             if (tmp)
-                xkilled(mdef, 0);
+                xkilled(mdef, XKILL_NOMSG);
         } else if (tmp)
             killed(mdef);
         return 2;
@@ -1929,7 +1937,7 @@ register struct attack *mattk;
                     m_useup(mdef, otmp);
 
                 newuhs(FALSE);
-                xkilled(mdef, 2);
+                xkilled(mdef, XKILL_NOMSG | XKILL_NOCORPSE);
                 if (mdef->mhp > 0) { /* monster lifesaved */
                     You("hurriedly regurgitate the sizzling in your %s.",
                         body_part(STOMACH));
@@ -2038,7 +2046,8 @@ register struct attack *mattk;
                 break;
             }
             end_engulf();
-            if ((mdef->mhp -= dam) <= 0) {
+            mdef->mhp -= dam;
+            if (mdef->mhp <= 0) {
                 killed(mdef);
                 if (mdef->mhp <= 0) /* not lifesaved */
                     return 2;
@@ -2546,17 +2555,17 @@ struct attack *mattk;     /* null means we find one internally */
         break;
     case AD_ACID:
         if (!rn2(6)) {
-            (void) erode_obj(obj, NULL, ERODE_CORRODE, EF_NONE);
+            (void) erode_obj(obj, NULL, ERODE_CORRODE, EF_GREASE);
         }
         break;
     case AD_RUST:
         if (!mon->mcan) {
-            (void) erode_obj(obj, NULL, ERODE_RUST, EF_NONE);
+            (void) erode_obj(obj, (char *) 0, ERODE_RUST, EF_GREASE);
         }
         break;
     case AD_CORR:
         if (!mon->mcan) {
-            (void) erode_obj(obj, NULL, ERODE_CORRODE, EF_NONE);
+            (void) erode_obj(obj, (char *) 0, ERODE_CORRODE, EF_GREASE);
         }
         break;
     case AD_ENCH:
@@ -2685,7 +2694,8 @@ int dmg;
 {
     pline("%s %s!", Monnam(mon),
           (dmg > mon->mhp / 2) ? "wails in agony" : "cries out in pain");
-    if ((mon->mhp -= dmg) <= 0) {
+    mon->mhp -= dmg;
+    if (mon->mhp <= 0) {
         if (context.mon_moving)
             monkilled(mon, (char *) 0, AD_BLND);
         else

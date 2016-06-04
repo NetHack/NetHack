@@ -186,7 +186,7 @@ check-dlb: options
 
 dlb:
 	( cd util ; $(MAKE) dlb )
-	( cd dat ; ../util/dlb cf nhdat $(DATDLB) )
+	( cd dat ; LC_ALL=C ; ../util/dlb cf nhdat $(DATDLB) )
 
 # recover can be used when INSURANCE is defined in include/config.h
 # and the checkpoint option is true

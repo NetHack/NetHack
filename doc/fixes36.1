@@ -177,6 +177,113 @@ a few types of monster (barrow wight, Nazgul, erinys) have weapon attacks that
 	cockatrice corpse wouldn't be inflicted
 non-item-using monsters who happened to be carrying scroll or wand of fire or
         a fire horn could use it to cure themselves of being turned into slime
+when looting multiple containers, add 'n' for "loot next container", change
+	'q' and ESC from "done with this container" to "done looting"
+change looting to choose ":iobrs nq" action from a menu for menustyle:Partial
+wand/spell/breath zaps that reached the edge of the level on the Plane of Air
+	and "vanished into the aether" left temporary display effects on screen
+stop amulets and other items which aren't affected by erosion damage from
+	being subjected to erosion damage
+grammar bit: polyself w/ gender change yielded "you turn into a Elvenking"
+some blindness cures ignored u.ucreamed
+some instances of stun or confusion timers were being overridden rather than
+	incremented when new stun or confusion damage was suffered
+female gnome who gains level can grow up into male-only gnome lord; give an
+	an alternate message instead of prohibiting the promotion
+kicked weapon which successfully hits monster vanishes from play
+unseen landmine explosion could result in "The <monst-type> statue crumbles."
+when using the 'O' command for regexp options (autopickup exceptions,
+	menucolors, message types), provide opportunity to add more than one
+	at a time [after 'add', return to add/list/remove menu]
+commands invoked by uppercase meta characters: M-A, M-C, M-N, M-O, M-R, M-T
+	were missing from '? c' list of game commands (dat/hh)
+tweak Baalzebub's lair and clean up the map display for it
+symbol set definitions didn't recognize S_darkroom and S_vibrating_square
+wizard mode enlightenment was reporting "very fast innately" (which is not
+	possible) for very fast hero who was innately fast
+when attacking a monster with a rust or corrosion or acid passive
+	counter-attack, grease wasn't protecting the attacker's weapon
+the Bell of Opening now correctly reports when it opens a trapdoor/hole
+knocking can no longer send a monster through a trapdoor/hole and desaddle it
+game no longer gets confused when you break an unpaid shop item while inside
+	a different shop
+shopkeepers now correctly handle nested containers and gold in containers
+for menustyle traditional, 'D' followed by (B|U|C|X)&m presented a menu of
+	everything, not just invent subset matching specified BUCX categories
+for menustyles traditional or combination, 'A' (or object ID) followed by i
+	displayed an inventory of everything rather than just worn items (or
+	not fully identified items)
+exploding chest trap would destroy uchain while still worn if uball carried
+if monster shapechange message "<foo> turns into <bar>!" was given, <bar>
+	could be "it" (if <foo> sensed telepathically and <bar> is mindless)
+automatic annotation for Ft.Ludios level got applied when a drawbridge became
+	mapped, but entry there is a secret door rather than a drawbridge
+sortloot changed to group holy water and unholy water with water instead of
+	placing them among the h- and u-named items
+sortloot changed to place diluted potion of foo after potion of foo instead
+	of listing all diluted potions followed by all non-diluted ones
+digging down on a grave converted the terrain to floor but did not create a
+	pit and uncover the grave's contents; digging again--on floor--did
+when feel_location removed a remembered-unseen-monster glyph from a known
+	water location while hero was levitating, the map was redrawn showing
+	floor instead of water at that spot
+Vlad's tower2 and tower3 didn't show up in wizard-mode ^O output or ^V? menu
+remove extra space from "All of your  <stack-of-potions> boil and explode."
+	(also applies to potions freezing and to scrolls burning)
+effects of cursed potion of levitation were skipped if already levitating
+when engulfed, having swallower be killed by angry deity trying to zap hero
+	no longer violates pacifist conduct (other penalties--reduced luck or
+	alignment--still apply if target is something you shouldn't kill)
+likewise when a monster kills inself trying to prevent turning to stone or
+	into slime that's been caused by the player, pacifism is not affected
+metabolism adjustments: hero poly'd into metallivore form still needs to eat;
+	being fainted or unconscious from other than sleep now consumes
+	nutrition at lower rate, like being asleep already did;
+	starvation threshold shortened due to slower food use while fainting
+after using detection magic or #terrain while underwater, then leaving water
+	and saving while on land, save would flag you as underwater again and
+	then restore would limit the map display accordingly; next move would
+	notice, retify things, and report "you are on solid land again"
+change #terrain used while underwater to view the regular map rather than the
+	crippled underwater one
+can see or feel adjacent lava or ice when underwater
+farlook when underwater now reports "land" for adjacent non-{water,lava,ice}
+	and "unreconnoitered" for non-adjacent anything, instead of "dark part
+	of a room" for the former and either dark-room or "unexplored" for the
+	latter depending upon whether the spot had previously been scouted
+monster who accidentally killed itself by zapping wand of fire or fire horn
+	at self to prevent turning into slime was not properly killed off;
+	it wouldn't benefit from an amulet of life saving and would trigger
+	impossible "dmonsfree: N removed doesn't match M pending"
+resurrecting a shopkeeper corpse caused crash (replmon -> replshk -> inhishop
+	-> no eshk data for temporary monster being replaced with revived shk)
+new character with OPTIONS=role:Valk,race:!human,align:!lawful yielded
+	"Shall I pick your Dwarven Valkyrie's for you?" where !human forces
+	dwarf and dwarf forces lawful, contradicting align:!lawful
+new character with OPTIONS=role:Valk,race:random yielded
+	"Shall I pick your Valkyrie's race and alignment for you?" instead
+	of honoring race:random without asking
+while in shop, undead turning at self causing carried, hero owned corpse to
+	resurrect claimed it belonged to shopkeeper
+while in shop, stone-to-flesh at self causing carried, hero owned figurine
+	or statue to animate claimed it belonged to shopkeeper
+reviving one of a stack of N corpses in a shop charged a usage fee for all N;
+	remaining N-1 were owned by hero if carried but by shop if on floor
+
+
+Fixes to Post-3.6.0 Problems that Were Exposed Via git Respository
+------------------------------------------------------------------
+fix "object lost" panic during pickup caused by sortloot revamp
+more sortloot revisions
+fix inventory menu for response of '?' to getobj (more sortloot revamp fallout)
+rings covered by non-cursed gloves not listed as 'R' candidates
+in baalz_fixup, move any monster away from the two fake pool spots
+switching farlook from xname to doname was giving away information for items
+	located via object detection (quantity of detected gold)
+catch up win/Qt/qt_win.cpp on 18-Dec-2015 change to formatkiller()
+fix for long lines in config file (28-Jan-2016) made 'O' command's 'list' and
+	'remove' menu choices in interactive handling for menu colorings,
+	message types, and autopickup exceptions subject to buffer overflow
 
 
 Platform- and/or Interface-Specific Fixes
@@ -189,11 +296,24 @@ tty: responding with <return> or <enter> during role, race, &c selection
 	behaved same as <escape> to quit; now it will pick [random] instead
 tty: rename struct variable 'filter' (role.c) and function 'winch()' (wintty.c)
 	to avoid conflicts with <curses.h>
+tty: skip selector letter and selection indicator (-,+,#) during menu coloring
+tty: '>' no longer closes a menu window
+tty: if color is disabled and use_inverse is enabled, display lava in inverse
+	video so that it is visually distinguishable from water
+tty: if "--More--" was written to leftmost column (beginning of second line)
+	while hero was swallowed, cursor would end up in wrong place (at end
+	of status line instead back on map) after message line was cleared
 unix/X11: in top level Makefile, some commented out definitions of VARDATND
 	misspelled pilemark.xbm (as pilemark.xpm)
 unix: options file with CR+LF line ends and an invalid option line resulted in
 	"ad option line: "whatever-the-line-was
 	because embedded carriage return character changed cursor's position
+unix: race condition with parallel make: src/Makefile might start building
+	makedefs before finishing monst.o and objects.o; if so, util/Makefile
+	can build them too, and they might be clobbered by simultaneous write
+unix: Makefile.{src,utl} ignored CPPFLAGS which is expanded by the default .c
+	rule by GNU make so if user had a value for that in the environment,
+	it would apply to some files but not others; explicitly override it
 win32gui: getversionstring() was overflowing the provided Help About buffer
 win32gui: guard against buffer overflow in in mswin_getlin()
 win32gui: handle menu_color attribute
@@ -201,6 +321,9 @@ MacOSX: initial binary release was built from out of date source code that
 	had 'BETA' and 'DEBUG' inappropriately enabled
 MacOSX: force TIMED_DELAY build option on so that 'runmode' run-time option
 	is functional
+Qt: could issue impossible "Destroy called before we know if Menu or Text"
+	followed by crash caused by deferencing a Null pointer if player quit
+	immediately after creating character and declined to disclose anything
 X11: core bug for '`' (backtick) and #terrain commands was only noticed by
 	X11 interface: impossible "add_menu: called before start_menu"
 X11: enable a scroll bar in menu windows
@@ -243,6 +366,25 @@ feedback from probing of long worm now includes number of segments it has
 monk starts with 'shuriken' pre-discovered (despite language issue...)
 item-using monster on or next to a fire trap can use it to be cured of
 	turning into slime
+wizard mode ^G can now specify "male" or "female" when creating a monster
+REPRODUCIBLE_BUILD is new config.h setting to fetch build date+time from
+	environment instead of using current date+time, so that later rebuild
+	could duplicate the original (disabled by default; tested for Unix)
+default value for vibrating square symbol changed from yellow '^' to purple '~'
+allow symbol set values to be specified via char within single quotes
+add symbols set "plain", same as default except it uses '+' for corner walls
+extend wizard-mode '#stats' command
+'Q' to ready an item for quick-throwing ('f') now allows the wielded weapon to
+	be moved to quiver; if quantity is more than 1, it offers to split the
+	stack and leave 1 wielded, otherwise it requires confirmation
+'Q' will accept an item count to manually split a stack as part of it being
+	quivered, provided the stack isn't already in the quiver slot
+during end of game disclosure, the vanquished monsters list can be sorted in
+	one of several ways by answering 'a' to "disclose vanquished monsters?"
+when #terrain is displaying a censored version of the map (no monsters, &c),
+	moving the cursor will display farlook's brief autodescribe feedback
+interrupt a multi turn action if hp or pw is restored to maximum
+pressing d or D when cursor positioning targets doors and doorways
 
 
 Platform- and/or Interface-Specific New Features
@@ -279,3 +421,5 @@ Ray Chason's MSDOS port support for some VESA modes
 
 Code Cleanup and Reorganization
 -------------------------------
+removed some unused variables and dead code
+the level generator no longer uses the native pRNG
