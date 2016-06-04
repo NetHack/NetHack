@@ -1969,11 +1969,110 @@ Setting the options
 .pg
 Options may be set in a number of ways.  Within the game, the `O'
 command allows you to view all options and change most of them.
-You can also set options automatically by placing them in the
-NETHACKOPTIONS environment variable or in a configuration file.
+You can also set options automatically by placing them in a configuration
+file, or in the NETHACKOPTIONS environment variable.
 Some versions of NetHack also have front-end programs that allow
 you to set options before starting the game or a global configuration
 for system administrators.
+.hn 2
+Using a configuration file
+.pg
+The default name of the configuration file varies on different
+operating systems. On DOS and Windows, it is ``defaults.nh''
+in the same folder as nethack.exe or nethackW.exe. On Unix, Linux
+and Mac OS X it is ``.nethackrc'' in the user's home directory.
+The file may not exist, but it is a normal ASCII text file and
+can be created with any text editor.
+.pg
+Any line in the configuration file starting with `#' is treated as a comment.
+Empty lines are ignored.
+.pg
+You can use different configuration statements in the file, some
+of which can be used multiple times. In general, the statements are
+written in capital letters, followed by an equals sign, followed by
+settings particular to that statement. Here is a list of allowed statements:
+.lp OPTIONS
+There are two types of options, boolean and compound options.
+Boolean options toggle a setting on or off, while compound options
+take more diverse values.
+Prefix a boolean option with `no' or `!' to turn it off.
+For compound options, the option name and value are separated by a colon.
+Some options are persistent, and apply only to new games.
+You can specify multiple OPTIONS statements, and multiple options
+in a single OPTIONS statement.
+.pg
+Example:
+.sd
+\fBOPTIONS=dogname:Fido\fP
+\fBOPTIONS=!legacy,autopickup,pickup_types:$"=/!?+\fP
+.ed
+.lp HACKDIR
+Default location of files NetHack needs. On Windows HACKDIR
+defaults to the location of the NetHack.exe or NetHackw.exe file
+so setting HACKDIR to override that is not usually necessary or recommended.
+.lp LEVELDIR
+The location that in-progress level files are stored. Defaults to HACKDIR,
+must be writeable.
+.lp SAVEDIR
+The location where saved games are kept. Defaults to HACKDIR, must be
+writeable.
+.lp BONESDIR
+The location that bones files are kept. Defaults to HACKDIR, must be
+writeable.
+.lp LOCKDIR
+The location that file synchronization locks are stored. Defaults to
+HACKDIR, must be writeable.
+.lp TROUBLEDIR
+The location that a record of game aborts and self-diagnosed game problems
+is kept. Defaults to HACKDIR, must be writeable.
+.lp AUTOPICKUP_EXCEPTION
+Set exceptions to the
+.op pickup_types
+option. See the ``Configuring Autopickup Exceptions'' section.
+.lp MSGTYPE
+Change the way messages are shown in the top status line.
+See the ``Configuring Message Types`` section.
+.lp MENUCOLOR
+Highlight menu lines with different colors.
+See the ``Configuring Menu Colors`` section.
+.lp SYMBOLS
+Override one or more symbols in the symbols files.
+See the ``Modifying NetHack Symbols'' section.
+.pg
+Example:
+.sd
+\fBSYMBOLS=S_boulder:0\fP
+.ed
+.lp WIZKIT
+Wizard-mode extra items, in a text file containing item names,
+one per line, up to a maximum of 128 lines. Each line is processed
+by the function that handles wishing.
+.pg
+Example:
+.sd
+\fBWIZKIT=~/wizkit.txt\fP
+.ed
+.lp SOUNDDIR
+Define the directory that contains the sound files.
+See the ``Configuring User Sounds'' section.
+.lp SOUND
+Define a sound mapping. See the ``Configuring User Sounds'' section.
+.pg
+Here is a short example of config file contents:
+.sd
+\fB# Set your character's role, race, gender, and alignment.\fP
+\fBOPTIONS=role:Valkyrie, race:Human, gender:female, align:lawful\fP
+
+\fB# Turn on autopickup, and set automatically picked up object types\fP
+\fBOPTIONS=autopickup,pickup_types:$"=/!?+\fP
+\fB# Show colored text if possible\fP
+\fBOPTIONS=color\fP
+\fB# Show lit corridors differently\fP
+\fBOPTIONS=lit_corridor\fP
+
+\fB# No startup splash screen. Windows GUI only.\fP
+\fBOPTIONS=!splash_screen\fP
+.ed
 .hn 2
 Using the NETHACKOPTIONS environment variable
 .pg
@@ -1997,48 +2096,9 @@ $ \fBNETHACKOPTIONS="autoquiver,!autopickup,name:Blue Meanie,fruit:papaya"\fP
 $ \fBexport NETHACKOPTIONS\fP
 .ed
 in \fIsh\fP or \fIksh\fP.
-.hn 2
-Using a configuration file
 .pg
-Any line in the configuration file starting with `#' is treated as a comment.
-Any line in the configuration file starting with ``OPTIONS='' may be
-filled out with options in the same syntax as in NETHACKOPTIONS.
-Any line starting with ``SYMBOLS=''
-is taken as defining the corresponding symbol
-in a different syntax, a sequence of decimal numbers giving
-the character position in the current font to be used in displaying
-each entry. Such a sequence can be continued to multiple lines by
-putting a `\e'
-at the end of each line to be continued.
-.pg
-Any line starting with ``AUTOPICKUP_EXCEPTION='' is taken
-as defining an exception to the
-.op pickup_types
-option.
-There is a section of this Guidebook that discusses that.
-.pg
-The default name of the configuration file varies on different
-operating systems. On DOS and Windows, it is ``defaults.nh''
-in the same folder as nethack.exe or nethackW.exe. On Unix, Linux
-and Mac OS X it is ``.nethackrc'' in the user's home directory.
-NETHACKOPTIONS can also be set to the full name of a file you
+NETHACKOPTIONS can also be set to the full name of a configuration file you
 want to use (possibly preceded by an `@').
-.pg
-Here is a short example of config file contents:
-.sd
-\fB# Set your character's role, race, gender, and alignment.\fP
-\fBOPTIONS=role:Valkyrie, race:Human, gender:female, align:lawful\fP
-
-\fB# Turn on autopickup, and set automatically picked up object types\fP
-\fBOPTIONS=autopickup,pickup_types:$"=/!?+\fP
-\fB# Show colored text if possible\fP
-\fBOPTIONS=color\fP
-\fB# Show lit corridors differently\fP
-\fBOPTIONS=lit_corridor\fP
-
-\fB# No startup splash screen. Windows GUI only.\fP
-\fBOPTIONS=!splash_screen\fP
-.ed
 .hn 2
 Customization options
 .pg
