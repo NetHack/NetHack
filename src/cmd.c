@@ -183,7 +183,7 @@ static const char *readchar_queue = "";
 static coord clicklook_cc;
 
 STATIC_DCL char *NDECL(parse);
-STATIC_DCL void FDECL(show_direction_keys, (winid, boolean));
+STATIC_DCL void FDECL(show_direction_keys, (winid, BOOLEAN_P));
 STATIC_DCL boolean FDECL(help_dir, (CHAR_P, const char *));
 
 STATIC_PTR int
