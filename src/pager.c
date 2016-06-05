@@ -1,4 +1,4 @@
-/* NetHack 3.6	pager.c	$NHDT-Date: 1463790247 2016/05/21 00:24:07 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.98 $ */
+/* NetHack 3.6	pager.c	$NHDT-Date: 1465114189 2016/06/05 08:09:49 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.107 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1306,6 +1306,32 @@ doidtrap()
     return 0;
 }
 
+STATIC_DCL void
+dowhatdoes_help()
+{
+    dlb *fp;
+    char *p, buf[BUFSZ];
+    winid tmpwin = create_nhwindow(NHW_TEXT);
+
+    fp = dlb_fopen(KEYHELP, "r");
+    if (!fp) {
+        pline("Cannot open \"%s\" data file!", KEYHELP);
+        display_nhwindow(WIN_MESSAGE, TRUE);
+        return;
+    }
+    while (dlb_fgets(buf, (int) sizeof buf, fp)) {
+        if (*buf == '#')
+            continue;
+        for (p = buf; *p; p++)
+            if (*p != ' ' && *p != '\t')
+                break;
+        putstr(tmpwin, 0, p);
+    }
+    (void) dlb_fclose(fp);
+    display_nhwindow(tmpwin, TRUE);
+    destroy_nhwindow(tmpwin);
+}
+
 char *
 dowhatdoes_core(q, cbuf)
 char q;
@@ -1317,7 +1343,7 @@ char *cbuf;
 
     fp = dlb_fopen(CMDHELPFILE, "r");
     if (!fp) {
-        pline("Cannot open data file!");
+        pline("Cannot open \"%s\" data file!", CMDHELPFILE);
         return 0;
     }
 
@@ -1353,21 +1379,40 @@ char *cbuf;
 int
 dowhatdoes()
 {
+    static boolean once = FALSE;
     char bufr[BUFSZ];
     char q, *reslt;
 
+    if (!once) {
+        pline("Ask about '&' or '?' to get more info.%s",
+              iflags.altmeta ? "  (For ESC, type it twice.)" : "");
+        once = TRUE;
+    }
 #if defined(UNIX) || defined(VMS)
-    introff();
+    introff(); /* disables ^C but not ^\ */
 #endif
     q = yn_function("What command?", (char *) 0, '\0');
+    if (q == '\033' && iflags.altmeta) {
+        /* in an ideal world, we would know whether another keystroke
+           was already pending, but this is not an ideal world...
+           if user types ESC, we'll essentially hang until another
+           character is typed */
+        q = yn_function("", (char *) 0, '\0');
+        if (q != '\033')
+            q = (char) ((uchar) q | 0200);
+    }
 #if defined(UNIX) || defined(VMS)
-    intron();
+    intron(); /* reenables ^C */
 #endif
     reslt = dowhatdoes_core(q, bufr);
-    if (reslt)
-        pline1(reslt);
-    else
-        pline("I've never heard of such commands.");
+    if (reslt) {
+        if (q == '&' || q == '?')
+            dowhatdoes_help();
+        pline("%s", reslt);
+    } else {
+        pline("No such command '%s', char code %d (0%03o or 0x%02x).",
+              visctrl(q), (uchar) q, (uchar) q, (uchar) q);
+    }
     return 0;
 }
 
