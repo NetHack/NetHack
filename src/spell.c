@@ -816,7 +816,7 @@ cast_protection()
                                    : (rmtyp == CLOUD)
                                       ? "cloud"
                                       : IS_TREE(rmtyp)
-                                         ? "vegitation"
+                                         ? "vegetation"
                                          : IS_STWALL(rmtyp)
                                             ? "stone"
                                             : "air");
