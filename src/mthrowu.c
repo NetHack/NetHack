@@ -606,7 +606,7 @@ struct obj *obj;         /* missile (or stack providing it) */
             }
             stop_occupation();
             if (hitu) {
-                range = 0;
+                (void) drop_throw(singleobj, hitu, u.ux, u.uy);
                 break;
             }
         }
