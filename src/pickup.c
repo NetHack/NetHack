@@ -1548,7 +1548,7 @@ boolean looting; /* loot vs tip */
         /* at present, can't loot in water even when Underwater;
            can tip underwater, but not when over--or stuck in--lava */
         You("cannot %s things that are deep in the %s.", verb,
-            is_lava(x, y) ? "lava" : "water");
+            hliquid(is_lava(x, y) ? "lava" : "water"));
         return FALSE;
     } else if (nolimbs(youmonst.data)) {
         pline("Without limbs, you cannot %s anything.", verb);

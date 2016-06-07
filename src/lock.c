@@ -315,7 +315,7 @@ struct obj *pick;
             pline("Doing that would probably melt %s.", yname(pick));
             return PICKLOCK_LEARNED_SOMETHING;
         } else if (is_pool(u.ux, u.uy) && !Underwater) {
-            pline_The("water has no lock.");
+            pline_The("%s has no lock.", hliquid("water"));
             return PICKLOCK_LEARNED_SOMETHING;
         }
 

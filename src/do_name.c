@@ -1591,6 +1591,23 @@ rndcolor()
                                            : c_obj_colors[k];
 }
 
+static NEARDATA const char *const hliquids[] = {
+    "yoghurt", "oobleck", "clotted blood", "diluted water", "purified water",
+    "instant coffee", "tea", "herbal infusion", "liquid rainbow",
+    "creamy foam", "mulled wine", "bouillon", "nectar", "grog", "flubber",
+    "ketchup", "slow light", "oil", "vinaigrette", "liquid crystal", "honey",
+    "caramel sauce", "ink", "aqueous humour", "milk substitute", "fruit juice",
+    "glowing lava",
+};
+
+const char *
+hliquid(liquidpref)
+const char *liquidpref;
+{
+    return (Hallucination || !liquidpref) ? hliquids[rn2(SIZE(hliquids))]
+                                         : liquidpref;
+}
+
 /* Aliases for road-runner nemesis
  */
 static const char *const coynames[] = {

@@ -1169,9 +1169,11 @@ struct trap *desttrap; /* nonnull if another trap at <x,y> */
             if ((u.utrap & 0xff) == 0) {
                 u.utrap = 0;
                 if (u.usteed)
-                    You("lead %s to the edge of the lava.", steedname);
+                    You("lead %s to the edge of the %s.", steedname,
+                        hliquid("lava"));
                 else
-                    You("pull yourself to the edge of the lava.");
+                    You("pull yourself to the edge of the %s.",
+                        hliquid("lava"));
             }
         }
         u.umoved = TRUE;
@@ -1878,16 +1880,16 @@ boolean newspot;             /* true if called by spoteffects */
             if (Is_waterlevel(&u.uz))
                 You("pop into an air bubble.");
             else if (is_lava(u.ux, u.uy))
-                You("leave the water..."); /* oops! */
+                You("leave the %s...", hliquid("water")); /* oops! */
             else
                 You("are on solid %s again.",
                     is_ice(u.ux, u.uy) ? "ice" : "land");
         } else if (Is_waterlevel(&u.uz)) {
             still_inwater = TRUE;
         } else if (Levitation) {
-            You("pop out of the water like a cork!");
+            You("pop out of the %s like a cork!", hliquid("water"));
         } else if (Flying) {
-            You("fly out of the water.");
+            You("fly out of the %s.", hliquid("water"));
         } else if (Wwalking) {
             You("slowly rise above the surface.");
         } else {
@@ -2398,7 +2400,8 @@ dopickup()
     if (is_pool(u.ux, u.uy)) {
         if (Wwalking || is_floater(youmonst.data) || is_clinger(youmonst.data)
             || (Flying && !Breathless)) {
-            You("cannot dive into the water to pick things up.");
+            You("cannot dive into the %s to pick things up.",
+                hliquid("water"));
             return 0;
         } else if (!Underwater) {
             You_cant("even see the bottom, let alone pick up %s.", something);
@@ -2425,7 +2428,7 @@ dopickup()
         else if (IS_GRAVE(lev->typ))
             You("don't need a gravestone.  Yet.");
         else if (IS_FOUNTAIN(lev->typ))
-            You("could drink the water...");
+            You("could drink the %s...", hliquid("water"));
         else if (IS_DOOR(lev->typ) && (lev->doormask & D_ISOPEN))
             pline("It won't come off the hinges.");
         else

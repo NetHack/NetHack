@@ -578,7 +578,7 @@ register struct obj *otmp;
         break;
     case POT_WATER:
         if (!otmp->blessed && !otmp->cursed) {
-            pline("This tastes like water.");
+            pline("This tastes like %s.", hliquid("water"));
             u.uhunger += rnd(10);
             newuhs(FALSE);
             break;
@@ -587,7 +587,7 @@ register struct obj *otmp;
         if (is_undead(youmonst.data) || is_demon(youmonst.data)
             || u.ualign.type == A_CHAOTIC) {
             if (otmp->blessed) {
-                pline("This burns like acid!");
+                pline("This burns like %s!", hliquid("acid"));
                 exercise(A_CON, FALSE);
                 if (u.ulycn >= LOW_PM) {
                     Your("affinity to %s disappears!",
@@ -616,7 +616,7 @@ register struct obj *otmp;
                 /* make_confused(0L, TRUE); */
             } else {
                 if (u.ualign.type == A_LAWFUL) {
-                    pline("This burns like acid!");
+                    pline("This burns like %s!", hliquid("acid"));
                     losehp(Maybe_Half_Phys(d(2, 6)), "potion of unholy water",
                            KILLED_BY_AN);
                 } else

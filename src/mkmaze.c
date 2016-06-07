@@ -1316,7 +1316,7 @@ xchar x, y;
         ltyp = db_under_typ(lev->drawbridgemask);
 
     if (ltyp == LAVAPOOL)
-        return "lava";
+        return hliquid("lava");
     else if (ltyp == ICE)
         return "ice";
     else if (ltyp == POOL)
@@ -1328,7 +1328,7 @@ xchar x, y;
     else if (ltyp == MOAT && !Is_medusa_level(&u.uz))
         return "moat";
 
-    return "water";
+    return hliquid("water");
 }
 
 STATIC_OVL void

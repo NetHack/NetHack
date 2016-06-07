@@ -554,7 +554,8 @@ register struct monst *mtmp;
             if (u.ustuck && u.uswallow && u.ustuck == mtmp) {
                 /* This can happen after a purple worm plucks you off a
                 flying steed while you are over water. */
-                pline("%s sinks as water rushes in and flushes you out.",
+                pline("%s sinks as %s rushes in and flushes you out.",
+                      hliquid("water"),
                       Monnam(mtmp));
             }
             mondead(mtmp);

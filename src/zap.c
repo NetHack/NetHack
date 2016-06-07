@@ -3719,10 +3719,10 @@ xchar sx, sy;
         break;
     case ZT_ACID:
         if (Acid_resistance) {
-            pline_The("acid doesn't hurt.");
+            pline_The("%s doesn't hurt.", hliquid("acid"));
             dam = 0;
         } else {
-            pline_The("acid burns!");
+            pline_The("%s burns!", hliquid("acid"));
             dam = d(nd, 6);
             exercise(A_STR, FALSE);
         }
@@ -4303,7 +4303,7 @@ short exploding_wand_typ;
             if (lev->typ == WATER) {
                 /* For now, don't let WATER freeze. */
                 if (see_it)
-                    pline_The("water freezes for a moment.");
+                    pline_The("%s freezes for a moment.", hliquid("water"));
                 else
                     You_hear("a soft crackling.");
                 rangemod -= 1000; /* stop */
@@ -4324,11 +4324,11 @@ short exploding_wand_typ;
                 bury_objs(x, y);
                 if (see_it) {
                     if (lava)
-                        Norep("The lava cools and solidifies.");
+                        Norep("The %s cools and solidifies.", hliquid("lava"));
                     else if (moat)
                         Norep("The %s is bridged with ice!", buf);
                     else
-                        Norep("The water freezes.");
+                        Norep("The %s freezes.", hliquid("water"));
                     newsym(x, y);
                 } else if (!lava)
                     You_hear("a crackling sound.");

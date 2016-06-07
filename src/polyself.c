@@ -807,7 +807,7 @@ int mntmp;
     } else if (likes_lava(youmonst.data) && u.utrap
                && u.utraptype == TT_LAVA) {
         u.utrap = 0;
-        pline_The("lava now feels soothing.");
+        pline_The("%s now feels soothing.", hliquid("lava"));
     }
     if (amorphous(youmonst.data) || is_whirly(youmonst.data)
         || unsolid(youmonst.data)) {
@@ -1419,7 +1419,7 @@ dohide()
         if (IS_FOUNTAIN(levl[u.ux][u.uy].typ))
             The("fountain is not deep enough to hide in.");
         else
-            There("is no water to hide in here.");
+            There("is no %s to hide in here.", hliquid("water"));
         u.uundetected = 0;
         return 0;
     }

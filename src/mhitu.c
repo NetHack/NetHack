@@ -1480,10 +1480,11 @@ register struct attack *mattk;
         hitmsg(mtmp, mattk);
         if (!mtmp->mcan && !rn2(3))
             if (Acid_resistance) {
-                pline("You're covered in acid, but it seems harmless.");
+                pline("You're covered in %s, but it seems harmless.",
+                      hliquid("acid"));
                 dmg = 0;
             } else {
-                pline("You're covered in acid!  It burns!");
+                pline("You're covered in %s!  It burns!", hliquid("acid"));
                 exercise(A_STR, FALSE);
             }
         else
@@ -2636,7 +2637,7 @@ register struct attack *mattk;
     switch (olduasmon->mattk[i].adtyp) {
     case AD_ACID:
         if (!rn2(2)) {
-            pline("%s is splashed by your acid!", Monnam(mtmp));
+            pline("%s is splashed by your %s!", Monnam(mtmp), hliquid("acid"));
             if (resists_acid(mtmp)) {
                 pline("%s is not affected.", Monnam(mtmp));
                 tmp = 0;

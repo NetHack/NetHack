@@ -401,6 +401,7 @@ E char *FDECL(distant_monnam, (struct monst *, int, char *));
 E char *FDECL(rndmonnam, (char *));
 E const char *FDECL(hcolor, (const char *));
 E const char *NDECL(rndcolor);
+E const char *FDECL(hliquid, (const char *));
 E const char *NDECL(roguename);
 E struct obj *FDECL(realloc_obj,
                     (struct obj *, int, genericptr_t, int, const char *));

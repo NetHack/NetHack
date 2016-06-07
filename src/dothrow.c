@@ -729,7 +729,7 @@ boolean verbose;
             u.utraptype == TT_WEB
                 ? "web"
                 : u.utraptype == TT_LAVA
-                      ? "lava"
+                      ? hliquid("lava")
                       : u.utraptype == TT_INFLOOR
                             ? surface(u.ux, u.uy)
                             : u.utraptype == TT_BURIEDBALL ? "buried ball"

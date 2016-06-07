@@ -1621,7 +1621,7 @@ int magic; /* 0=Physical, otherwise skill level */
                 deltrap(t_at(u.ux, u.uy));
                 break;
             case TT_LAVA:
-                You("pull yourself above the lava!");
+                You("pull yourself above the %s!", hliquid("lava"));
                 u.utrap = 0;
                 return 1;
             case TT_BURIEDBALL:

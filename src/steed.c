@@ -289,7 +289,8 @@ boolean force;      /* Quietly force this animal */
         return (FALSE);
     }
     if (!force && Underwater && !is_swimmer(ptr)) {
-        You_cant("ride that creature while under water.");
+        You_cant("ride that creature while under %s.",
+                 hliquid("water"));
         return (FALSE);
     }
     if (!can_saddle(mtmp) || !can_ride(mtmp)) {
@@ -565,7 +566,8 @@ int reason; /* Player was thrown off etc. */
                         adjalign(-1);
                     }
                 } else if (is_lava(u.ux, u.uy)) {
-                    pline("%s is pulled into the lava!", Monnam(mtmp));
+                    pline("%s is pulled into the %s!", Monnam(mtmp),
+                          hliquid("lava"));
                     if (!likes_lava(mdat)) {
                         killed(mtmp);
                         adjalign(-1);

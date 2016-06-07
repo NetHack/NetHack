@@ -372,7 +372,7 @@ boolean verbose;    /* give message(s) even when you can't see what happened */
                 damage = 0;
             } else {
                 if (vis)
-                    pline_The("acid burns %s!", mon_nam(mtmp));
+                    pline_The("%s burns %s!", hliquid("acid"), mon_nam(mtmp));
                 else if (verbose && !target)
                     pline("It is burned!");
             }

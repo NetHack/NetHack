@@ -974,11 +974,12 @@ register struct attack *mattk;
         }
         if (resists_acid(mdef)) {
             if (vis)
-                pline("%s is covered in acid, but it seems harmless.",
+                pline("%s is covered in %s, but it seems harmless.",
+                      hliquid("acid"),
                       Monnam(mdef));
             tmp = 0;
         } else if (vis) {
-            pline("%s is covered in acid!", Monnam(mdef));
+            pline("%s is covered in %s!", hliquid("acid"), Monnam(mdef));
             pline("It burns %s!", mon_nam(mdef));
         }
         if (!rn2(30))
@@ -1492,7 +1493,8 @@ int mdead;
         if (mhit && !rn2(2)) {
             Strcpy(buf, Monnam(magr));
             if (canseemon(magr))
-                pline("%s is splashed by %s acid!", buf,
+                pline("%s is splashed by %s %s!", buf,
+                      hliquid("acid"),
                       s_suffix(mon_nam(mdef)));
             if (resists_acid(magr)) {
                 if (canseemon(magr))

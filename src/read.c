@@ -1571,7 +1571,7 @@ struct obj *sobj; /* scroll, or fake spellbook object for scroll-like spell */
             break;
         }
         if (Underwater) {
-            pline_The("water around you vaporizes violently!");
+            pline_The("%s around you vaporizes violently!", hliquid("water"));
         } else {
             pline_The("scroll erupts in a tower of flame!");
             iflags.last_msg = PLNMSG_TOWER_OF_FLAME; /* for explode() */
