@@ -356,15 +356,13 @@ register struct monst *magr, *mdef;
         attk = 1;
         switch (mattk->aatyp) {
         case AT_WEAP: /* "hand to hand" attacks */
-            if (distmin(magr->mx,magr->my,mdef->mx,mdef->my) > 1) {
+            if (distmin(magr->mx, magr->my, mdef->mx, mdef->my) > 1) {
                 /* D: Do a ranged attack here! */
                 strike = thrwmm(magr, mdef);
                 if (DEADMONSTER(mdef))
                     res[i] = MM_DEF_DIED;
-
                 if (DEADMONSTER(magr))
                     res[i] |= MM_AGR_DIED;
-
                 break;
             }
             if (magr->weapon_check == NEED_WEAPON || !MON_WEP(magr)) {
@@ -390,8 +388,7 @@ register struct monst *magr, *mdef;
         case AT_TENT:
             /* Nymph that teleported away on first attack? */
             if (distmin(magr->mx, magr->my, mdef->mx, mdef->my) > 1)
-                /* Continue because the monster may have a ranged
-                 * attack */
+                /* Continue because the monster may have a ranged attack. */
                 continue;
             /* Monsters won't attack cockatrices physically if they
              * have a weapon instead.  This instinct doesn't work for
@@ -454,50 +451,52 @@ register struct monst *magr, *mdef;
             break;
 
         case AT_ENGL:
-            if (u.usteed && (mdef == u.usteed)) {
+            if (u.usteed && mdef == u.usteed) {
                 strike = 0;
                 break;
             }
             /* D: Prevent engulf from a distance */
-            if (distmin(magr->mx,magr->my,mdef->mx,mdef->my) > 1)
+            if (distmin(magr->mx, magr->my, mdef->mx, mdef->my) > 1)
                 continue;
-            /* Engulfing attacks are directed at the hero if
-             * possible. -dlc
-             */
+            /* Engulfing attacks are directed at the hero if possible. -dlc */
             if (u.uswallow && magr == u.ustuck)
                 strike = 0;
-            else {
-                if ((strike = (tmp > rnd(20 + i))))
-                    res[i] = gulpmm(magr, mdef, mattk);
-                else
-                    missmm(magr, mdef, mattk);
-            }
+            else if ((strike = (tmp > rnd(20 + i))) != 0)
+                res[i] = gulpmm(magr, mdef, mattk);
+            else
+                missmm(magr, mdef, mattk);
             break;
 
         case AT_BREA:
             if (!monnear(magr, mdef->mx, mdef->my)) {
                 strike = breamm(magr, mattk, mdef);
 
-                /* We don't really know if we hit or not, but pretend
-                 * we did */
-                if (strike) res[i] |= MM_HIT;
-                if (DEADMONSTER(mdef)) res[i] = MM_DEF_DIED;
-                if (DEADMONSTER(magr)) res[i] |= MM_AGR_DIED;
+                /* We don't really know if we hit or not; pretend we did. */
+                if (strike)
+                    res[i] |= MM_HIT;
+                if (DEADMONSTER(mdef))
+                    res[i] = MM_DEF_DIED;
+                if (DEADMONSTER(magr))
+                    res[i] |= MM_AGR_DIED;
             }
             else
                 strike = 0;
             break;
+
         case AT_SPIT:
             if (!monnear(magr, mdef->mx, mdef->my)) {
                 strike = spitmm(magr, mattk, mdef);
 
-                /* We don't really know if we hit or not, but pretend
-                 * we did */
-                if (strike) res[i] |= MM_HIT;
-                if (DEADMONSTER(mdef)) res[i] = MM_DEF_DIED;
-                if (DEADMONSTER(magr)) res[i] |= MM_AGR_DIED;
+                /* We don't really know if we hit or not; pretend we did. */
+                if (strike)
+                    res[i] |= MM_HIT;
+                if (DEADMONSTER(mdef))
+                    res[i] = MM_DEF_DIED;
+                if (DEADMONSTER(magr))
+                    res[i] |= MM_AGR_DIED;
             }
             break;
+
         default: /* no attack */
             strike = 0;
             attk = 0;
@@ -505,12 +504,11 @@ register struct monst *magr, *mdef;
         }
 
         if (attk && !(res[i] & MM_AGR_DIED)
-            && distmin(magr->mx,magr->my,mdef->mx,mdef->my) <= 1)
+            && distmin(magr->mx, magr->my, mdef->mx, mdef->my) <= 1)
             res[i] = passivemm(magr, mdef, strike, res[i] & MM_DEF_DIED);
 
         if (res[i] & MM_DEF_DIED)
             return res[i];
-
         if (res[i] & MM_AGR_DIED)
             return res[i];
         /* return if aggressor can no longer attack */
@@ -595,9 +593,8 @@ struct attack *mattk;
         pline("%s %s...", buf, mon_nam(mdef));
     }
 
-    if (magr->mcan || !magr->mcansee
-        || (magr->minvis && !perceives(mdef->data)) || !mdef->mcansee
-        || mdef->msleeping) {
+    if (magr->mcan || !magr->mcansee || !mdef->mcansee
+        || (magr->minvis && !perceives(mdef->data)) || mdef->msleeping) {
         if (vis)
             pline("but nothing happens.");
         return MM_MISS;
@@ -609,8 +606,8 @@ struct attack *mattk;
         if (mdef->mcansee) {
             if (mon_reflects(magr, (char *) 0)) {
                 if (canseemon(magr))
-                    (void) mon_reflects(
-                        magr, "The gaze is reflected away by %s %s.");
+                    (void) mon_reflects(magr,
+                                      "The gaze is reflected away by %s %s.");
                 return MM_MISS;
             }
             if (mdef->minvis && !perceives(magr->data)) {
@@ -723,7 +720,7 @@ register struct attack *mattk;
     } else if (status & MM_AGR_DIED) { /* aggressor died */
         place_monster(mdef, dx, dy);
         newsym(dx, dy);
-    } else { /* both alive, put them back */
+    } else {                           /* both alive, put them back */
         if (cansee(dx, dy))
             pline("%s is regurgitated!", Monnam(mdef));
 
@@ -1174,6 +1171,7 @@ register struct attack *mattk;
          */
         {
             struct obj *gold = findgold(mdef->minvent);
+
             if (!gold)
                 break;
             obj_extract_self(gold);

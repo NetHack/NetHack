@@ -11,9 +11,9 @@ extern boolean notonhead;
 STATIC_DCL boolean FDECL(dog_hunger, (struct monst *, struct edog *));
 STATIC_DCL int FDECL(dog_invent, (struct monst *, struct edog *, int));
 STATIC_DCL int FDECL(dog_goal, (struct monst *, struct edog *, int, int, int));
-STATIC_DCL struct monst* FDECL(find_targ, (struct monst *, int, int, int));
+STATIC_DCL struct monst *FDECL(find_targ, (struct monst *, int, int, int));
 STATIC_OVL int FDECL(find_friends, (struct monst *, struct monst *, int));
-STATIC_DCL struct monst* FDECL(best_target, (struct monst *));
+STATIC_DCL struct monst *FDECL(best_target, (struct monst *));
 STATIC_DCL long FDECL(score_targ, (struct monst *, struct monst *));
 STATIC_DCL boolean FDECL(can_reach_location, (struct monst *, XCHAR_P,
                                               XCHAR_P, XCHAR_P, XCHAR_P));
@@ -284,8 +284,8 @@ boolean devour;
         Strcpy(objnambuf, xname(obj));
         iflags.suppress_price--;
     }
-    /* It's a reward if it's DOGFOOD and the player dropped/threw it. */
-    /* We know the player had it if invlet is set -dlc */
+    /* It's a reward if it's DOGFOOD and the player dropped/threw it.
+       We know the player had it if invlet is set. -dlc */
     if (dogfood(mtmp, obj) == DOGFOOD && obj->invlet)
 #ifdef LINT
         edog->apport = 0;
@@ -351,8 +351,8 @@ boolean devour;
 /* hunger effects -- returns TRUE on starvation */
 STATIC_OVL boolean
 dog_hunger(mtmp, edog)
-register struct monst *mtmp;
-register struct edog *edog;
+struct monst *mtmp;
+struct edog *edog;
 {
     if (monstermoves > edog->hungrytime + 500) {
         if (!carnivorous(mtmp->data) && !herbivorous(mtmp->data)) {
@@ -423,7 +423,8 @@ int udist;
                 edog->droptime = monstermoves;
             }
     } else {
-        if ((obj = level.objects[omx][omy]) && !index(nofetch, obj->oclass)
+        if ((obj = level.objects[omx][omy]) != 0
+            && !index(nofetch, obj->oclass)
 #ifdef MAIL
             && obj->otyp != SCR_MAIL
 #endif
@@ -561,16 +562,12 @@ int after, udist, whappr;
                 appr = 1;
         }
         /* if you have dog food it'll follow you more closely */
-        if (appr == 0) {
-            obj = invent;
-            while (obj) {
+        if (appr == 0)
+            for (obj = invent; obj; obj = obj->nobj)
                 if (dogfood(mtmp, obj) == DOGFOOD) {
                     appr = 1;
                     break;
                 }
-                obj = obj->nobj;
-            }
-        }
     } else
         appr = 1; /* gtyp != UNDEF */
     if (mtmp->mconf)
@@ -589,7 +586,7 @@ int after, udist, whappr;
         } else {
             /* assume master hasn't moved far, and reuse previous goal */
             if (edog && edog->ogoal.x
-                && ((edog->ogoal.x != omx) || (edog->ogoal.y != omy))) {
+                && (edog->ogoal.x != omx || edog->ogoal.y != omy)) {
                 gx = edog->ogoal.x;
                 gy = edog->ogoal.y;
                 edog->ogoal.x = 0;
@@ -707,7 +704,6 @@ int    maxdist;
     return 0;
 }
 
-
 STATIC_OVL long
 score_targ(mtmp, mtarg)
 struct monst *mtmp, *mtarg;
@@ -721,86 +717,74 @@ struct monst *mtmp, *mtarg;
     /* Give 1 in 3 chance of safe breathing even if pet is confused or
      * if you're on the quest start level */
     if (!mtmp->mconf || !rn2(3) || Is_qstart(&u.uz)) {
-        aligntyp align1, align2; /* For priests, minions */
+        aligntyp align1 = A_NONE, align2 = A_NONE; /* For priests, minions */
         boolean faith1 = TRUE,  faith2 = TRUE;
 
-        if (mtmp->isminion) align1 = EMIN(mtmp)->min_align;
-        else if (mtmp->ispriest) align1 = EPRI(mtmp)->shralign;
-        else faith1 = FALSE;
-        if (mtarg->isminion) align2 = EMIN(mtarg)->min_align; /* MAR */
-        else if (mtarg->ispriest) align2 = EPRI(mtarg)->shralign; /* MAR */
-        else faith2 = FALSE;
+        if (mtmp->isminion)
+            align1 = EMIN(mtmp)->min_align;
+        else if (mtmp->ispriest)
+            align1 = EPRI(mtmp)->shralign;
+        else
+            faith1 = FALSE;
+        if (mtarg->isminion)
+            align2 = EMIN(mtarg)->min_align; /* MAR */
+        else if (mtarg->ispriest)
+            align2 = EPRI(mtarg)->shralign; /* MAR */
+        else
+            faith2 = FALSE;
 
         /* Never target quest friendlies */
         if (mtarg->data->msound == MS_LEADER
             || mtarg->data->msound == MS_GUARDIAN)
             return -5000L;
-
         /* D: Fixed angelic beings using gaze attacks on coaligned priests */
         if (faith1 && faith2 && align1 == align2 && mtarg->mpeaceful) {
             score -= 5000L;
             return score;
         }
-
         /* Is monster adjacent? */
         if (distmin(mtmp->mx, mtmp->my, mtarg->mx, mtarg->my) <= 1) {
             score -= 3000L;
             return score;
         }
-
         /* Is the monster peaceful or tame? */
         if (/*mtarg->mpeaceful ||*/ mtarg->mtame || mtarg == &youmonst) {
             /* Pets will never be targeted */
             score -= 3000L;
             return score;
         }
-
-        /* Is master/pet behind monster? Check up to 15 squares beyond
-         * pet.
-         */
+        /* Is master/pet behind monster? Check up to 15 squares beyond pet. */
         if (find_friends(mtmp, mtarg, 15)) {
             score -= 3000L;
             return score;
         }
-
         /* Target hostile monsters in preference to peaceful ones */
         if (!mtarg->mpeaceful)
             score += 10;
-
         /* Is the monster passive? Don't waste energy on it, if so */
         if (mtarg->data->mattk[0].aatyp == AT_NONE)
             score -= 1000;
-
         /* Even weak pets with breath attacks shouldn't take on very
-         * low-level monsters. Wasting breath on lichens is ridiculous.
-         */
+           low-level monsters. Wasting breath on lichens is ridiculous. */
         if ((mtarg->m_lev < 2 && mtmp->m_lev > 5)
             || (mtmp->m_lev > 12 && mtarg->m_lev < mtmp->m_lev - 9
                 && u.ulevel > 8 && mtarg->m_lev < u.ulevel - 7))
             score -= 25;
-
         /* And pets will hesitate to attack vastly stronger foes.
-         * This penalty will be discarded if master's in trouble.
-         */
+           This penalty will be discarded if master's in trouble. */
         if (mtarg->m_lev > mtmp->m_lev + 4L)
             score -= (mtarg->m_lev - mtmp->m_lev) * 20L;
-
         /* All things being the same, go for the beefiest monster. This
-         * bonus should not be large enough to override the pet's aversion
-         * to attacking much stronger monsters.
-         */
+           bonus should not be large enough to override the pet's aversion
+           to attacking much stronger monsters. */
         score += mtarg->m_lev * 2 + mtarg->mhp / 3;
     }
-
     /* Fuzz factor to make things less predictable when very
-     * similar targets are abundant
-     */
+       similar targets are abundant. */
     score += rnd(5);
-
     /* Pet may decide not to use ranged attack when confused */
     if (mtmp->mconf && !rn2(3))
         score -= 1000;
-
     return score;
 }
 
@@ -1121,9 +1105,8 @@ int after; /* this is extra fast monster movement */
     }
 
     /* Pet hasn't attacked anything but is considering moving -
-     * now's the time for ranged attacks. Note that the pet can
-     * move after it performs its ranged attack. Should this be
-     * changed?
+     * now's the time for ranged attacks. Note that the pet can move
+     * after it performs its ranged attack. Should this be changed?
      */
     {
         struct monst *mtarg;
@@ -1152,7 +1135,8 @@ int after; /* this is extra fast monster movement */
                 mstatus = mattackm(mtmp, mtarg);
 
                 /* Shouldn't happen, really */
-                if (mstatus & MM_AGR_DIED) return 2;
+                if (mstatus & MM_AGR_DIED)
+                    return 2;
 
                 /* Allow the targeted nasty to strike back - if
                  * the targeted beast doesn't have a ranged attack,
@@ -1168,7 +1152,8 @@ int after; /* this is extra fast monster movement */
                      */
                     if (mtarg->mcansee && haseyes(mtarg->data)) {
                         mstatus = mattackm(mtarg, mtmp);
-                        if (mstatus & MM_DEF_DIED) return 2;
+                        if (mstatus & MM_DEF_DIED)
+                            return 2;
                     }
                 }
             }
@@ -1201,7 +1186,7 @@ newdogpos:
             /* describe top item of pile, not necessarily cursed item itself;
                don't use glyph_at() here--it would return the pet but we want
                to know whether an object is remembered at this map location */
-            struct obj *o = (!Hallucination
+            struct obj *o = (!Hallucination && level.flags.hero_memory
                              && glyph_is_object(levl[nix][niy].glyph))
                                ? vobj_at(nix, niy) : 0;
             const char *what = o ? distant_name(o, doname) : something;
@@ -1319,12 +1304,12 @@ wantdoor(x, y, distance)
 int x, y;
 genericptr_t distance;
 {
-    int ndist;
+    int ndist, *dist_ptr = (int *) distance;
 
-    if (*(int *) distance > (ndist = distu(x, y))) {
+    if (*dist_ptr > (ndist = distu(x, y))) {
         gx = x;
         gy = y;
-        *(int *) distance = ndist;
+        *dist_ptr = ndist;
     }
 }
 
