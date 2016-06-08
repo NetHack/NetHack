@@ -17,6 +17,8 @@ STATIC_DCL struct permonst *FDECL(lookat, (int, int, char *, char *));
 STATIC_DCL void FDECL(checkfile, (char *, struct permonst *,
                                   BOOLEAN_P, BOOLEAN_P));
 STATIC_DCL void FDECL(look_all, (BOOLEAN_P,BOOLEAN_P));
+STATIC_DCL void NDECL(whatdoes_help);
+STATIC_DCL boolean FDECL(whatdoes_cond, (char *, boolean *, int *, int));
 STATIC_DCL boolean FDECL(help_menu, (int *));
 STATIC_DCL void NDECL(docontact);
 #ifdef PORT_HELP
@@ -1307,7 +1309,7 @@ doidtrap()
 }
 
 STATIC_DCL void
-dowhatdoes_help()
+whatdoes_help()
 {
     dlb *fp;
     char *p, buf[BUFSZ];
@@ -1332,14 +1334,131 @@ dowhatdoes_help()
     destroy_nhwindow(tmpwin);
 }
 
+#define WD_STACKLIMIT 5
+
+STATIC_OVL boolean
+whatdoes_cond(buf, stack, depth, lnum)
+char *buf;
+boolean *stack;
+int *depth, lnum;
+{
+    const char badstackfmt[] = "cmdhlp: too many &%c directives at line %d.";
+    boolean newcond, neg;
+    char *p, *q, act = buf[1];
+    int np = 0;
+
+    buf += 2;
+    mungspaces(buf);
+    if (act == '#' || *buf == '#') {
+        *buf = '\0';
+        neg = FALSE; /* lint suppression */
+        p = q = (char *) 0;
+    } else {
+        if ((neg = (*buf == '!')) != 0)
+            if (*++buf == ' ')
+                ++buf;
+        p = index(buf, '='), q = index(buf, ':');
+        if (!p || (q && q < p))
+            p = q;
+        if (p) { /* we have a value specified */
+            /* handle a space before or after (or both) '=' (or ':') */
+            if (p > buf && p[-1] == ' ')
+                p[-1] = '\0'; /* end of keyword in buf[] */
+            *p++ = '\0'; /* terminate keyword, advance to start of value */
+            if (*p == ' ')
+                p++;
+        }
+    }
+    newcond = TRUE;
+    if (*buf && (act == '?' || act == ':')) {
+        if (!strcmpi(buf, "number_pad")) {
+            if (!p) {
+                newcond = iflags.num_pad;
+            } else {
+                /* convert internal encoding (separate yes/no and 0..3)
+                   back to user-visible one (-1..4) */
+                np = iflags.num_pad ? (1 + iflags.num_pad_mode) /* 1..4 */
+                                    : (-1 * iflags.num_pad_mode); /* -1..0 */
+                newcond = FALSE;
+                for (; p; p = q) {
+                    q = index(p, ',');
+                    if (q)
+                        *q++ = '\0';
+                    if (atoi(p) == np) {
+                        newcond = TRUE;
+                        break;
+                    }
+                }
+            }
+        } else if (!strcmpi(buf, "rest_on_space")) {
+            newcond = flags.rest_on_space;
+        } else if (!strcmpi(buf, "debug") || !strcmpi(buf, "wizard")) {
+            newcond = flags.debug; /* == wizard */
+        } else if (!strcmpi(buf, "shell")) {
+#ifdef SHELL
+            /* should we also check sysopt.shellers? */
+            newcond = TRUE;
+#else
+            newcond = FALSE;
+#endif
+        } else if (!strcmpi(buf, "suspend")) {
+#ifdef SUSPEND
+            /* sysopt.shellers is also used for dosuspend()... */
+            newcond = TRUE;
+#else
+            newcond = FALSE;
+#endif
+        } else {
+            impossible(
+                "cmdhelp: unrecognized &%c conditional at line %d: \"%.20s\"",
+                       act, lnum, buf);
+            neg = FALSE;
+        }
+        /* this works for number_pad too: &? !number_pad:-1,0
+           would be true for 1..4 after negation */
+        if (neg)
+            newcond = !newcond;
+    }
+    switch (act) {
+    default:
+    case '#': /* comment */
+        break;
+    case '.': /* endif */
+        if (--*depth < 0) {
+            impossible(badstackfmt, '.', lnum);
+            *depth = 0;
+        }
+        break;
+    case ':': /* else or elif */
+        if (*depth == 0) {
+            impossible(badstackfmt, ':', lnum);
+            *depth = 1; /* so that stack[*depth - 1] is a valid access */
+        }
+        if (stack[*depth] || !stack[*depth - 1])
+            stack[*depth] = FALSE;
+        else if (newcond)
+            stack[*depth] = TRUE;
+        break;
+    case '?': /* if */
+        if (++*depth >= WD_STACKLIMIT) {
+            impossible(badstackfmt, '?', lnum);
+            *depth = WD_STACKLIMIT - 1;
+        }
+        stack[*depth] = newcond && stack[*depth - 1];
+        break;
+    }
+    return stack[*depth];
+}
+
 char *
 dowhatdoes_core(q, cbuf)
 char q;
 char *cbuf;
 {
     dlb *fp;
-    char bufr[BUFSZ];
-    register char *buf = &bufr[6], ctrl, meta;
+    char buf[BUFSZ];
+    boolean cond, stack[WD_STACKLIMIT];
+    int ctrl, meta, depth = 0, lnum = 0;
 
     fp = dlb_fopen(CMDHELPFILE, "r");
     if (!fp) {
@@ -1347,25 +1466,44 @@ char *cbuf;
         return 0;
     }
 
-    ctrl = ((q <= '\033') ? (q - 1 + 'A') : 0);
-    meta = ((0x80 & q) ? (0x7f & q) : 0);
-    while (dlb_fgets(buf, BUFSZ - 6, fp)) {
-        if ((ctrl && *buf == '^' && *(buf + 1) == ctrl)
-            || (meta && *buf == 'M' && *(buf + 1) == '-'
-                && *(buf + 2) == meta) || *buf == q) {
+    meta = (0x80 & (uchar) q) != 0;
+    if (meta)
+        q &= 0x7f;
+    ctrl = (0x1f & (uchar) q) == (uchar) q;
+    if (ctrl)
+        q |= 0x40; /* NUL -> '@', ^A -> 'A', ... ^Z -> 'Z', ^[ -> '[', ... */
+    else if (q == 0x7f)
+        ctrl = 1, q = '?';
+
+    cond = stack[0] = TRUE, stack[1] = FALSE;
+    while (dlb_fgets(buf, sizeof buf, fp)) {
+        ++lnum;
+        if (buf[0] == '&' && buf[1] && index("?:.#", buf[1])) {
+            cond = whatdoes_cond(buf, stack, &depth, lnum);
+            continue;
+        }
+        if (!cond)
+            continue;
+        if (meta ? (buf[0] == 'M' && buf[1] == '-'
+                    && (ctrl ? buf[2] == '^' && highc(buf[3]) == q
+                             : buf[2] == q))
+                 : (ctrl ? buf[0] == '^' && highc(buf[1]) == q
+                         : buf[0] == q)) {
             (void) strip_newline(buf);
-            if (ctrl && buf[2] == '\t') {
-                buf = bufr + 1;
-                (void) strncpy(buf, "^?      ", 8);
-                buf[1] = ctrl;
-            } else if (meta && buf[3] == '\t') {
-                buf = bufr + 2;
+            if (index(buf, '\t'))
+                (void) tabexpand(buf);
+            if (meta && ctrl && buf[4] == ' ') {
+                (void) strncpy(buf, "M-^?    ", 8);
+                buf[3] = q;
+            } else if (meta && buf[3] == ' ') {
                 (void) strncpy(buf, "M-?     ", 8);
-                buf[2] = meta;
-            } else if (buf[1] == '\t') {
-                buf = bufr;
+                buf[2] = q;
+            } else if (ctrl && buf[2] == ' ') {
+                (void) strncpy(buf, "^?      ", 8);
+                buf[1] = q;
+            } else if (buf[1] == ' ') {
+                (void) strncpy(buf, "?       ", 8);
                 buf[0] = q;
-                (void) strncpy(buf + 1, "       ", 7);
             }
             (void) dlb_fclose(fp);
             Strcpy(cbuf, buf);
@@ -1373,6 +1511,8 @@ char *cbuf;
         }
     }
     (void) dlb_fclose(fp);
+    if (depth != 0)
+        impossible("cmdhelp: mismatched &? &: &. conditionals.");
     return (char *) 0;
 }
 
@@ -1395,9 +1535,9 @@ dowhatdoes()
     if (q == '\033' && iflags.altmeta) {
         /* in an ideal world, we would know whether another keystroke
            was already pending, but this is not an ideal world...
-           if user types ESC, we'll essentially hang until another
+           if user typed ESC, we'll essentially hang until another
            character is typed */
-        q = yn_function("", (char *) 0, '\0');
+        q = yn_function("]", (char *) 0, '\0');
         if (q != '\033')
             q = (char) ((uchar) q | 0200);
     }
@@ -1407,7 +1547,7 @@ dowhatdoes()
     reslt = dowhatdoes_core(q, bufr);
     if (reslt) {
         if (q == '&' || q == '?')
-            dowhatdoes_help();
+            whatdoes_help();
         pline("%s", reslt);
     } else {
         pline("No such command '%s', char code %d (0%03o or 0x%02x).",
@@ -1416,7 +1556,7 @@ dowhatdoes()
     return 0;
 }
 
-void
+STATIC_OVL void
 docontact()
 {
     winid cwin = create_nhwindow(NHW_TEXT);
