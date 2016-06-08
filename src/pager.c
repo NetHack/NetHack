@@ -18,7 +18,6 @@ STATIC_DCL void FDECL(checkfile, (char *, struct permonst *,
                                   BOOLEAN_P, BOOLEAN_P));
 STATIC_DCL void FDECL(look_all, (BOOLEAN_P,BOOLEAN_P));
 STATIC_DCL void NDECL(whatdoes_help);
-STATIC_DCL boolean FDECL(whatdoes_cond, (char *, boolean *, int *, int));
 STATIC_DCL boolean FDECL(help_menu, (int *));
 STATIC_DCL void NDECL(docontact);
 #ifdef PORT_HELP
@@ -1335,25 +1334,36 @@ whatdoes_help()
 }
 
 #define WD_STACKLIMIT 5
+struct wd_stack_frame {
+    Bitfield(active, 1);
+    Bitfield(been_true, 1);
+    Bitfield(else_seen, 1);
+};
+
+STATIC_DCL boolean FDECL(whatdoes_cond, (char *, struct wd_stack_frame *,
+                                         int *, int));
 
 STATIC_OVL boolean
 whatdoes_cond(buf, stack, depth, lnum)
 char *buf;
-boolean *stack;
+struct wd_stack_frame *stack;
 int *depth, lnum;
 {
     const char badstackfmt[] = "cmdhlp: too many &%c directives at line %d.";
-    boolean newcond, neg;
+    boolean newcond, neg, gotopt;
     char *p, *q, act = buf[1];
     int np = 0;
 
+    newcond = (act == '?' || !stack[*depth].been_true);
     buf += 2;
     mungspaces(buf);
-    if (act == '#' || *buf == '#') {
+    if (act == '#' || *buf == '#' || !*buf || !newcond) {
+        gotopt = (*buf && *buf != '#');
         *buf = '\0';
         neg = FALSE; /* lint suppression */
         p = q = (char *) 0;
     } else {
+        gotopt = TRUE;
         if ((neg = (*buf == '!')) != 0)
             if (*++buf == ' ')
                 ++buf;
@@ -1369,7 +1379,6 @@ int *depth, lnum;
                 p++;
         }
     }
-    newcond = TRUE;
     if (*buf && (act == '?' || act == ':')) {
         if (!strcmpi(buf, "number_pad")) {
             if (!p) {
@@ -1430,24 +1439,29 @@ int *depth, lnum;
         }
         break;
     case ':': /* else or elif */
-        if (*depth == 0) {
+        if (*depth == 0 || stack[*depth].else_seen) {
             impossible(badstackfmt, ':', lnum);
             *depth = 1; /* so that stack[*depth - 1] is a valid access */
         }
-        if (stack[*depth] || !stack[*depth - 1])
-            stack[*depth] = FALSE;
+        if (stack[*depth].active || stack[*depth].been_true
+            || !stack[*depth - 1].active)
+            stack[*depth].active = 0;
         else if (newcond)
-            stack[*depth] = TRUE;
+            stack[*depth].active = stack[*depth].been_true = 1;
+        if (!gotopt)
+            stack[*depth].else_seen = 1;
         break;
     case '?': /* if */
         if (++*depth >= WD_STACKLIMIT) {
             impossible(badstackfmt, '?', lnum);
             *depth = WD_STACKLIMIT - 1;
         }
-        stack[*depth] = newcond && stack[*depth - 1];
+        stack[*depth].active = (newcond && stack[*depth - 1].active) ? 1 : 0;
+        stack[*depth].been_true = stack[*depth].active;
+        stack[*depth].else_seen = 0;
         break;
     }
-    return stack[*depth];
+    return stack[*depth].active ? TRUE : FALSE;
 }
 
 char *
@@ -1457,7 +1471,8 @@ char *cbuf;
 {
     dlb *fp;
     char buf[BUFSZ];
-    boolean cond, stack[WD_STACKLIMIT];
+    struct wd_stack_frame stack[WD_STACKLIMIT];
+    boolean cond;
     int ctrl, meta, depth = 0, lnum = 0;
 
     fp = dlb_fopen(CMDHELPFILE, "r");
@@ -1475,7 +1490,8 @@ char *cbuf;
     else if (q == 0x7f)
         ctrl = 1, q = '?';
 
-    cond = stack[0] = TRUE, stack[1] = FALSE;
+    (void) memset((genericptr_t) stack, 0, sizeof stack);
+    cond = stack[0].active = 1;
     while (dlb_fgets(buf, sizeof buf, fp)) {
         ++lnum;
         if (buf[0] == '&' && buf[1] && index("?:.#", buf[1])) {
