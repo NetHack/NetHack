@@ -36,6 +36,7 @@ V       history display game history
 ^R      redraw  redraw the screen
 ^P      prevmsg repeat previous message (subsequent ^P's repeat earlier ones)
 #               introduces an extended command (#? for a list of them)
+&       what-does describe the command a keystroke invokes
 
 Game commands:
 ^D      kick    kick (a door, or something else)
@@ -60,7 +61,7 @@ o       open    open a door
 p       pay     pay your bill (in a shop)
 P       puton   put on an accessory (ring, amulet, etc)
 q       quaff   drink something (potion, water, etc)
-Q       quiver  select ammunition for quiver
+Q       quiver  select ammunition for quiver (use '#quit' to quit)
 r       read    read a scroll or spellbook
 R       remove  remove an accessory (ring, amulet, etc)
 s       search  search for secret doors, hidden traps and monsters
@@ -69,7 +70,7 @@ T       takeoff take off some armor
 w       wield   wield a weapon  (w-  wield nothing)
 W       wear    put on some armor
 x       xchange swap wielded and secondary weapons
-X       twoweapon toggle two-weapon combat
+X       twoweapon toggle two-weapon combat (use '#explore' for explore mode)
 z       zap     zap a wand  (use y instead of z if number_pad is -1)
 Z       Zap     cast a spell  (use Y instead of Z if number_pad is -1)
 <       up      go up the stairs
