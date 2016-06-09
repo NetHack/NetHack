@@ -1888,7 +1888,7 @@ boolean loseit;    /* whether to drop it if hero can longer touch it */
                 bane = bane_applies(get_artifact(obj), &youmonst);
 
         /* nothing else to do if hero can successfully handle this object */
-        if (!ag && !bane)
+        if (!ag && !bane && !touch_blasted)
             return 1;
 
         /* hero can't handle this object, but didn't get touch_artifact()'s
