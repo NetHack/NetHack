@@ -1492,16 +1492,26 @@ int final;
     }
     you_are(buf, "");
 
-    /* report alignment (bypass you_are() in order to omit ending period) */
+    /* report alignment (bypass you_are() in order to omit ending period);
+       adverb is used to distinguish between temporary change (helm of opp.
+       alignment), permanent change (one-time conversion), and original */
     Sprintf(buf, " %s%s%s, %son a mission for %s",
             You_, !final ? are : were,
             align_str(u.ualign.type),
             /* helm of opposite alignment (might hide conversion) */
-            (u.ualign.type != u.ualignbase[A_CURRENT]) ? "temporarily "
+            (u.ualign.type != u.ualignbase[A_CURRENT])
+               /* what's the past tense of "currently"? if we used "formerly"
+                  it would sound like a reference to the original alignment */
+               ? (!final ? "currently " : "temporarily ")
                /* permanent conversion */
-               : (u.ualign.type != u.ualignbase[A_ORIGINAL]) ? "now "
+               : (u.ualign.type != u.ualignbase[A_ORIGINAL])
+                  /* and what's the past tense of "now"? certainly not "then"
+                     in a context like this...; "belatedly" == weren't that
+                     way sooner (in other words, didn't start that way) */
+                  ? (!final ? "now " : "belatedly ")
                   /* atheist (ignored in very early game) */
-                  : (!u.uconduct.gnostic && moves > 1000L) ? "nominally "
+                  : (!u.uconduct.gnostic && moves > 1000L)
+                     ? "nominally "
                      /* lastly, normal case */
                      : "",
             u_gname());
