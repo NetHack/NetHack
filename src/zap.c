@@ -4071,11 +4071,14 @@ boolean say; /* Announce out of sight hit/miss events if true */
 
         if (!ZAP_POS(levl[sx][sy].typ)
             || (closed_door(sx, sy) && range >= 0)) {
-            int bounce;
+            int bounce, bchance;
             uchar rmn;
             boolean fireball;
 
         make_bounce:
+            bchance = (levl[sx][sy].typ == STONE) ? 10
+                : (In_mines(&u.uz) && IS_WALL(levl[sx][sy].typ)) ? 20
+                : 75;
             bounce = 0;
             fireball = (type == ZT_SPELL(ZT_FIRE));
             if ((--range > 0 && isok(lsx, lsy) && cansee(lsx, lsy))
@@ -4092,7 +4095,7 @@ boolean say; /* Announce out of sight hit/miss events if true */
                 } else
                     pline_The("%s bounces!", fltxt);
             }
-            if (!dx || !dy || !rn2(20)) {
+            if (!dx || !dy || !rn2(bchance)) {
                 dx = -dx;
                 dy = -dy;
             } else {
