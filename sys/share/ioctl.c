@@ -65,7 +65,8 @@ struct termio termio;
 
 #if defined(TIOCGWINSZ)                                    \
     && (defined(BSD) || defined(ULTRIX) || defined(AIX_31) \
-        || defined(_BULL_SOURCE) || defined(SVR4))
+        || defined(_BULL_SOURCE) || defined(SVR4) ||       \
+        defined(LINUX))
 #define USE_WIN_IOCTL
 #include "tcap.h" /* for LI and CO */
 #endif
