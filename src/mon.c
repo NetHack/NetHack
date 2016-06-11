@@ -2611,6 +2611,52 @@ struct monst *mtmp;
                                    : makeplural(q_guardian->mname),
                       got_mad == 1 ? "s" : "");
     }
+
+    /* make other peaceful monsters react */
+    if (!context.mon_moving) {
+        struct monst *mon;
+        int got_mad = 0;
+
+        for (mon = fmon; mon; mon = mon->nmon)
+            if (!DEADMONSTER(mon) && !mindless(mon->data) && mon->mpeaceful
+                && couldsee(mon->mx, mon->my) && !mon->msleeping
+                && mon->mcansee && m_canseeu(mon)) {
+                boolean exclaimed = FALSE;
+
+                if (humanoid(mon->data) || mon->isshk || mon->ispriest) {
+                    if (is_watch(mon->data)) {
+                        verbalize("Halt!  You're under arrest!");
+                        (void) angry_guards(!!Deaf);
+                    } else {
+                        const char *exclam[] = {
+                            "Gasp!", "Uh-oh.", "Oh my!", "What?", "Why?"
+                        };
+                        if (!rn2(5)) {
+                            verbalize("%s", exclam[mon->m_id % SIZE(exclam)]);
+                            exclaimed = TRUE;
+                        }
+                        if (!mon->isshk && !mon->ispriest && (mon->data->mlevel < rn2(10))) {
+                            monflee(mon, rn2(50)+25, TRUE, !exclaimed);
+                            exclaimed = TRUE;
+                        }
+                        if (!mon->isshk && !mon->ispriest) {
+                            mon->mpeaceful = 0;
+                            adjalign(-1);
+                            if (!exclaimed)
+                                pline("%s gets angry!", Monnam(mon));
+                        }
+                    }
+                } else if ((mtmp->data == mon->data) && !rn2(3)) {
+                    if (!rn2(4)) {
+                        growl(mon);
+                        exclaimed = TRUE;
+                    }
+                    if (rn2(6))
+                        monflee(mon, rn2(25)+15, TRUE, !exclaimed);
+                }
+            }
+    }
+
 }
 
 /* wake up a monster, usually making it angry in the process */
