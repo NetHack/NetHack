@@ -288,6 +288,8 @@ using /? to look up something by name, supplying multiple spaces (with no
 add support for the 'altmeta' option to the 'what-does' command ('&' or '?f')
 when wielded weapon becomes untouchable (after alignment change or polymorph)
 	hero could be 'blasted by its power' twice in succession
+at startup, if sysconf had been read but user's own config file couldn't be
+	read, sysconf got processed again as if it contained user's options
 
 
 Fixes to Post-3.6.0 Problems that Were Exposed Via git Repository

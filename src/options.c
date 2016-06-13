@@ -420,6 +420,8 @@ static struct Comp_Opt {
 
 #else /* use rest of file */
 
+extern char configfile[]; /* for messages */
+
 extern struct symparse loadsyms[];
 static boolean need_redraw; /* for doset() */
 
@@ -917,10 +919,10 @@ rejectoption(optname)
 const char *optname;
 {
 #ifdef MICRO
-    pline("\"%s\" settable only from %s.", optname, lastconfigfile);
+    pline("\"%s\" settable only from %s.", optname, configfile);
 #else
     pline("%s can be set only from NETHACKOPTIONS or %s.", optname,
-          lastconfigfile);
+          configfile);
 #endif
 }
 
@@ -941,7 +943,7 @@ const char *opts;
 #endif
 
     if (from_file)
-        raw_printf("Bad syntax in OPTIONS in %s: %s%s.\n", lastconfigfile,
+        raw_printf("Bad syntax in OPTIONS in %s: %s%s.\n", configfile,
 #ifdef WIN32
                     "\n",
 #else
@@ -5318,7 +5320,7 @@ option_help()
     winid datawin;
 
     datawin = create_nhwindow(NHW_TEXT);
-    Sprintf(buf, "Set options as OPTIONS=<options> in %s", lastconfigfile);
+    Sprintf(buf, "Set options as OPTIONS=<options> in %s", configfile);
     opt_intro[CONFIG_SLOT] = (const char *) buf;
     for (i = 0; opt_intro[i]; i++)
         putstr(datawin, 0, opt_intro[i]);
