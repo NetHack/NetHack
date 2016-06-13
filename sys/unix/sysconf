@@ -30,6 +30,11 @@ EXPLORERS=*
 # Uses the same syntax as the WIZARDS and EXPLORERS options above.
 #SHELLERS=
 
+# If the user name is found in this list, prompt for username instead.
+# Uses the same syntax as the WIZARDS option above.
+# A public server should probably disable this.
+GENERICUSERS=play player game games nethack nethacker
+
 # Use the player name for matching WIZARDS, EXPLORERS and SHELLERS,
 # instead of the user's login name.
 #CHECK_PLNAME=1

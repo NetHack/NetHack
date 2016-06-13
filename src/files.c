@@ -2263,6 +2263,9 @@ int src;
                 free((genericptr_t) sysopt.debugfiles);
             sysopt.debugfiles = dupstr(bufp);
         }
+    } else if (src == SET_IN_SYS && match_varname(buf, "GENERICUSERS", 12)) {
+        if (sysopt.genericusers) free(sysopt.genericusers);
+        sysopt.genericusers = dupstr(bufp);
     } else if (src == SET_IN_SYS && match_varname(buf, "SUPPORT", 7)) {
         if (sysopt.support)
             free((genericptr_t) sysopt.support);
