@@ -3009,6 +3009,16 @@ int corpsecheck; /* 0, no check, 1, corpses, 2, tinnable corpses */
             char qsfx[QBUFSZ];
             boolean one = (otmp->quan == 1L);
 
+            /* if blind and without gloves, attempting to eat (or tin or
+               offer) a cockatrice corpse is fatal before asking whether
+               or not to use it; otherwise, 'm<dir>' followed by 'e' could
+               be used to locate cockatrice corpses without touching them */
+            if (otmp->otyp == CORPSE && will_feel_cockatrice(otmp, FALSE)) {
+                feel_cockatrice(otmp, FALSE);
+                /* if life-saved (or poly'd into stone golem), terminate
+                   attempt to eat off floor */
+                return (struct obj *) 0;
+            }
             /* "There is <an object> here; <verb> it?" or
                "There are <N objects> here; <verb> one?" */
             Sprintf(qbuf, "There %s ", otense(otmp, "are"));
@@ -3026,8 +3036,8 @@ skipfloor:
     /* We cannot use ALL_CLASSES since that causes getobj() to skip its
      * "ugly checks" and we need to check for inedible items.
      */
-    otmp =
-        getobj(feeding ? allobj : offering ? offerfodder : comestibles, verb);
+    otmp = getobj(feeding ? allobj : offering ? offerfodder : comestibles,
+                  verb);
     if (corpsecheck && otmp && !(offering && otmp->oclass == AMULET_CLASS))
         if (otmp->otyp != CORPSE || (corpsecheck == 2 && !tinnable(otmp))) {
             You_cant("%s that!", verb);
