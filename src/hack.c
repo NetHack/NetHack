@@ -679,6 +679,14 @@ int mode;
             feel_location(x, y);
         if (Passes_walls && may_passwall(x, y)) {
             ; /* do nothing */
+        } else if (Underwater) {
+            /* note: if water_friction() changes direction due to
+               turbulence, new target destination will always be water,
+               so we won't get here, hence don't need to worry about
+               "there" being somewhere the player isn't sure of */
+            if (mode == DO_MOVE)
+                pline("There is an obstacle there.");
+            return FALSE;
         } else if (tmpr->typ == IRONBARS) {
             if ((dmgtype(youmonst.data, AD_RUST)
                  || dmgtype(youmonst.data, AD_CORR)) && mode == DO_MOVE
@@ -686,7 +694,7 @@ int mode;
                 return FALSE;
             }
             if (!(Passes_walls || passes_bars(youmonst.data))) {
-                if (iflags.mention_walls)
+                if (mode == DO_MOVE && iflags.mention_walls)
                     You("cannot pass through the bars.");
                 return FALSE;
             }
@@ -702,14 +710,16 @@ int mode;
             return FALSE;
         } else {
             if (mode == DO_MOVE) {
-                if (Is_stronghold(&u.uz) && is_db_wall(x, y))
-                    pline_The("drawbridge is up!");
+                if (is_db_wall(x, y))
+                    pline("That drawbridge is up!");
                 /* sokoban restriction stays even after puzzle is solved */
                 else if (Passes_walls && !may_passwall(x, y)
                          && In_sokoban(&u.uz))
                     pline_The("Sokoban walls resist your ability.");
                 else if (iflags.mention_walls)
-                    pline("It's a wall.");
+                    pline("It's %s.", IS_WALL(tmpr->typ) ? "a wall"
+                                        : IS_TREE(tmpr->typ) ? "a tree"
+                                          : "solid stone");
             }
             return FALSE;
         }
@@ -722,6 +732,10 @@ int mode;
             } else if (can_ooze(&youmonst)) {
                 if (mode == DO_MOVE)
                     You("ooze under the door.");
+            } else if (Underwater) {
+                if (mode == DO_MOVE)
+                    pline("There is an obstacle there.");
+                return FALSE;
             } else if (tunnels(youmonst.data) && !needspick(youmonst.data)) {
                 /* Eat the door. */
                 if (mode == DO_MOVE && still_chewing(x, y))
@@ -757,8 +771,12 @@ int mode;
             if (dx && dy && !Passes_walls
                 && (!doorless_door(x, y) || block_door(x, y))) {
                 /* Diagonal moves into a door are not allowed. */
-                if (Blind && mode == DO_MOVE)
-                    feel_location(x, y);
+                if (mode == DO_MOVE) {
+                    if (Blind)
+                        feel_location(x, y);
+                    if (Underwater || iflags.mention_walls)
+                        You_cant("move diagonally into an intact doorway.");
+                }
                 return FALSE;
             }
         }
@@ -810,6 +828,8 @@ int mode;
     if (dx && dy && !Passes_walls && IS_DOOR(ust->typ)
         && (!doorless_door(ux, uy) || block_entry(x, y))) {
         /* Can't move at a diagonal out of a doorway with door. */
+        if (mode == DO_MOVE && iflags.mention_walls)
+            You_cant("move diagonally out of an intact doorway.");
         return FALSE;
     }
 
