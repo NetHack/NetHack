@@ -300,6 +300,20 @@ struct attack *alt_attk_buf;
             /* note: 3d9 is slightly higher than previous 4d6 */
         }
 
+    } else if (attk->aatyp == AT_ENGL && magr->mspec_used) {
+        /* can't re-engulf yet; switch to simpler attack */
+        *alt_attk_buf = *attk;
+        attk = alt_attk_buf;
+        if (attk->adtyp == AD_ACID || attk->adtyp == AD_ELEC
+            || attk->adtyp == AD_COLD || attk->adtyp == AD_FIRE) {
+            attk->aatyp = AT_TUCH;
+        } else {
+            attk->aatyp = AT_CLAW; /* attack message will be "<foo> hits" */
+            attk->adtyp = AD_PHYS;
+        }
+        attk->damn = 1; /* relatively weak: 1d6 */
+        attk->damd = 6;
+
     /* barrow wight, Nazgul, erinys have weapon attack for non-physical
        damage; force physical damage if attacker has been cancelled or
        if weapon is sufficiently interesting; a few unique creatures
@@ -684,10 +698,10 @@ register struct monst *mtmp;
         case AT_ENGL:
             if (!range2) {
                 if (foundyou) {
-                    if (u.uswallow || tmp > (j = rnd(20 + i))) {
-                        /* Force swallowing monster to be
-                         * displayed even when player is
-                         * moving away */
+                    if (u.uswallow
+                        || (!mtmp->mspec_used && tmp > (j = rnd(20 + i)))) {
+                        /* force swallowing monster to be displayed
+                           even when hero is moving away */
                         flush_screen(1);
                         sum[i] = gulpmu(mtmp, mattk);
                     } else {

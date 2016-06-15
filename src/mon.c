@@ -2147,6 +2147,10 @@ struct monst *mtmp;
                 placebc();
             vision_full_recalc = 1;
             docrt();
+            /* prevent swallower (mtmp might have just poly'd into something
+               without an engulf attack) from immediately re-engulfing */
+            if (attacktype(mtmp->data, AT_ENGL) && !mtmp->mspec_used)
+                mtmp->mspec_used = rnd(2);
         }
         u.ustuck = 0;
     }
@@ -2615,10 +2619,11 @@ struct monst *mtmp;
     /* make other peaceful monsters react */
     if (!context.mon_moving) {
         struct monst *mon;
-        int got_mad = 0;
 
-        for (mon = fmon; mon; mon = mon->nmon)
-            if (!DEADMONSTER(mon) && !mindless(mon->data) && mon->mpeaceful
+        for (mon = fmon; mon; mon = mon->nmon) {
+            if (DEADMONSTER(mon))
+                continue;
+            if (!mindless(mon->data) && mon->mpeaceful
                 && couldsee(mon->mx, mon->my) && !mon->msleeping
                 && mon->mcansee && m_canseeu(mon)) {
                 boolean exclaimed = FALSE;
@@ -2635,7 +2640,8 @@ struct monst *mtmp;
                             verbalize("%s", exclam[mon->m_id % SIZE(exclam)]);
                             exclaimed = TRUE;
                         }
-                        if (!mon->isshk && !mon->ispriest && (mon->data->mlevel < rn2(10))) {
+                        if (!mon->isshk && !mon->ispriest
+                            && (mon->data->mlevel < rn2(10))) {
                             monflee(mon, rn2(50)+25, TRUE, !exclaimed);
                             exclaimed = TRUE;
                         }
@@ -2655,6 +2661,7 @@ struct monst *mtmp;
                         monflee(mon, rn2(25)+15, TRUE, !exclaimed);
                 }
             }
+        }
     }
 
 }
