@@ -1541,13 +1541,17 @@ dowhatdoes()
 
     if (!once) {
         pline("Ask about '&' or '?' to get more info.%s",
-              iflags.altmeta ? "  (For ESC, type it twice.)" : "");
+#ifdef ALTMETA
+              iflags.altmeta ? "  (For ESC, type it twice.)" :
+#endif
+              "");
         once = TRUE;
     }
 #if defined(UNIX) || defined(VMS)
     introff(); /* disables ^C but not ^\ */
 #endif
     q = yn_function("What command?", (char *) 0, '\0');
+#ifdef ALTMETA
     if (q == '\033' && iflags.altmeta) {
         /* in an ideal world, we would know whether another keystroke
            was already pending, but this is not an ideal world...
@@ -1557,6 +1561,7 @@ dowhatdoes()
         if (q != '\033')
             q = (char) ((uchar) q | 0200);
     }
+#endif /*ALTMETA*/
 #if defined(UNIX) || defined(VMS)
     intron(); /* reenables ^C */
 #endif
