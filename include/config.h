@@ -513,6 +513,8 @@ typedef unsigned char uchar;
    but it isn't necessary for successful operation of the program */
 #define FREE_ALL_MEMORY             /* free all memory at exit */
 
+#define CONWAY                        /* Conway's Life level */
+
 /* End of Section 4 */
 
 #ifdef TTY_TILES_ESCCODES

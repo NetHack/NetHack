@@ -545,6 +545,9 @@ skip_lots:
     save_regions(fd, mode);
     if (mode != FREE_SAVE)
         bflush(fd);
+#ifdef DROPLEVEL
+    if(dropleveltempsfn) (*dropleveltempsfn)();
+#endif
 }
 
 STATIC_OVL void

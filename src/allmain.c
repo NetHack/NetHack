@@ -338,6 +338,9 @@ boolean resuming;
                         }
                     }
                     restore_attrib();
+/* XXX This should be recoded to use something like regions - a list of
+ * things that are active and need to be handled that is dynamically
+ * maintained and not a list of special cases. */
                     /* underwater and waterlevel vision are done here */
                     if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
                         movebubbles();
@@ -348,6 +351,11 @@ boolean resuming;
                     /* vision while buried done here */
                     else if (u.uburied)
                         under_ground(0);
+#ifdef CONWAY
+                    if (level.flags.conway){
+                        conway_update();
+                    }
+#endif
 
                     /* when immobile, count is in turns */
                     if (multi < 0) {

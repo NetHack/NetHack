@@ -19,7 +19,7 @@ STATIC_OVL boolean
 no_bones_level(lev)
 d_level *lev;
 {
-    extern d_level save_dlevel; /* in do.c */
+    extern d_level save_dlevel; /* in do.c XXX */
     s_level *sptr;
 
     if (ledger_no(&save_dlevel))
@@ -31,6 +31,9 @@ d_level *lev;
                          in any dungeon (level 1 isn't multiway) */
                       || Is_botlevel(lev)
                       || (Is_branchlev(lev) && lev->dlevel > 1)
+#ifdef CONWAY
+		      || level.flags.conway
+#endif
                       /* no bones in the invocation level */
                       || (In_hell(lev)
                           && lev->dlevel == dunlevs_in_dungeon(lev) - 1));

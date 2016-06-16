@@ -1284,6 +1284,11 @@ boolean at_stairs, falling, portal;
         getlev(fd, hackpid, new_ledger, FALSE);
         (void) nhclose(fd);
         oinit(); /* reassign level dependent obj probabilities */
+#ifdef CONWAY
+        if(level.flags.conway){
+		conway_restore();
+        }
+#endif
     }
     reglyph_darkroom();
     /* do this prior to level-change pline messages */
@@ -1505,6 +1510,10 @@ boolean at_stairs, falling, portal;
     } else {
         if (new && Is_rogue_level(&u.uz))
             You("enter what seems to be an older, more primitive world.");
+#ifdef CONWAY
+        if (level.flags.conway)
+            You("feel the rules of Life are different here.");
+#endif
         /* main dungeon message from your quest leader */
         if (!In_quest(&u.uz0) && at_dgn_entrance("The Quest")
             && !(u.uevent.qcompleted || u.uevent.qexpelled

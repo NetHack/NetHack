@@ -548,6 +548,18 @@ do_ext_makedefs(int argc, char **argv)
             }
             CONTINUE;
         }
+        IS_OPTION("grep-test"){
+            struct grep_var *p;
+            CONSUME;
+            p = grepsearch(argv[0]);
+            if(p && p->is_defined){
+                exit(EXIT_SUCCESS);
+            } else {
+                exit(EXIT_FAILURE);
+            }
+            CONTINUE;   /* NOTREACHED */
+        }
+
 #ifdef notyet
         IS_OPTION("help") {
         }
@@ -611,6 +623,7 @@ do_ext_makedefs(int argc, char **argv)
 #define GREP_STACK_SIZE 100
 #ifdef notyet
 static int grep_rewrite = 0; /* need to (possibly) rewrite lines */
+static char rewrite_stack[GREP_STACK_SIZE] = {GREP_MAGIC};
 #endif
 static int grep_writing = 1; /* need to copy lines to output */
 static int grep_errors = 0;
@@ -748,6 +761,7 @@ char *buf;
         break;
 #if defined(notyet)
     case '(': /* start of expression */
+    case '@': /* substitution facility: @[ @] */
 #endif
     case GREP_MAGIC: /* ^^ -> ^ */
         return buf0;
@@ -1422,7 +1436,7 @@ static const char *build_opts[] = {
 #ifdef COM_COMPL
     "command line completion",
 #endif
-#ifdef LIFE
+#ifdef CONWAY
     "Conway's Game of Life",
 #endif
 #ifdef COMPRESS

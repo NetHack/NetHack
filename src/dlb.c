@@ -9,7 +9,7 @@
 #include <string.h>
 #endif
 
-#define DATAPREFIX 4
+#define DATAPREFIX 4		/* see decl.h */
 
 #if defined(OVERLAY)
 #define STATIC_DCL extern

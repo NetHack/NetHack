@@ -721,3 +721,89 @@ MAZEWALK:(4, 2), south, false
 STAIR:(00,00,70,18),(02,03,68,15),up
 STAIR:random,down
 
+^?CONWAY
+# same as bigrm-1, but inhabited by Life (see compile option CONWAY)
+
+MAZE:"bigrm-11",' '
+FLAGS: conway
+GEOMETRY:center,center
+MAP
+---------------------------------------------------------------------------
+|.........................................................................|
+|.........................................................................|
+|.........................................................................|
+|.........................................................................|
+|.........................................................................|
+|.........................................................................|
+|.........................................................................|
+|.........................................................................|
+|.........................................................................|
+|.........................................................................|
+|.........................................................................|
+|.........................................................................|
+|.........................................................................|
+|.........................................................................|
+|.........................................................................|
+|.........................................................................|
+---------------------------------------------------------------------------
+ENDMAP
+# Dungeon Description
+REGION:(01,01,73,16),lit,"ordinary"
+# Stairs
+STAIR:random,up
+STAIR:random,down
+# Non diggable walls
+NON_DIGGABLE:(00,00,74,17)
+# Objects
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+OBJECT:random,random
+# Random traps
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+TRAP:random,random
+# Life in random places.
+MONSTER:"mildew",random
+MONSTER:"mildew",random
+MONSTER:"mildew",random
+MONSTER:"mildew",random
+MONSTER:"mildew",random
+MONSTER:"mildew",random
+MONSTER:"mildew",random
+MONSTER:"mildew",random
+MONSTER:"mildew",random
+MONSTER:"mildew",random
+MONSTER:"mildew",random
+MONSTER:"mildew",random
+MONSTER:"mildew",random
+MONSTER:"mildew",random
+MONSTER:"mildew",random
+MONSTER:"mildew",random
+MONSTER:"mildew",random
+MONSTER:"mildew",random
+MONSTER:"mildew",random
+MONSTER:"mildew",random
+MONSTER:"mildew",random
+MONSTER:"mildew",random
+MONSTER:"mildew",random
+MONSTER:"mildew",random
+MONSTER:"mildew",random
+MONSTER:"mildew",random
+MONSTER:"mildew",random
+MONSTER:"mildew",random
+^.

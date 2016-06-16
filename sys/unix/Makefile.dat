@@ -120,7 +120,8 @@ options:	../util/makedefs
 spec_levs: ../util/lev_comp \
 	bigroom.des castle.des endgame.des gehennom.des knox.des medusa.des \
 	mines.des oracle.des sokoban.des tower.des yendor.des
-	../util/lev_comp bigroom.des
+	# This is the only file that needs preprocessing at the moment:
+	../util/makedefs --input bigroom.des --output - --grep | ../util/lev_comp
 	../util/lev_comp castle.des
 	../util/lev_comp endgame.des
 	../util/lev_comp gehennom.des

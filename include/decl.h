@@ -360,17 +360,17 @@ E const char *const monexplain[], invisexplain[], *const oclass_names[];
  * provides all the subclasses that seem reasonable, and sets up for all
  * prefixes being null.  Port code can set those that it wants.
  */
-#define HACKPREFIX 0
-#define LEVELPREFIX 1
-#define SAVEPREFIX 2
-#define BONESPREFIX 3
-#define DATAPREFIX 4 /* this one must match hardcoded value in dlb.c */
-#define SCOREPREFIX 5
-#define LOCKPREFIX 6
-#define SYSCONFPREFIX 7
-#define CONFIGPREFIX 8
-#define TROUBLEPREFIX 9
-#define PREFIX_COUNT 10
+#define HACKPREFIX	0	/* shared, RO */
+#define LEVELPREFIX	1	/* per-user, RW */
+#define SAVEPREFIX	2	/* per-user, RW */
+#define BONESPREFIX	3	/* shared, RW */
+#define DATAPREFIX	4	/* dungeon/dlb; must match value in dlb.c */
+#define SCOREPREFIX	5	/* shared, RW */
+#define LOCKPREFIX	6	/* shared, RW */
+#define SYSCONFPREFIX	7	/* shared, RO */
+#define CONFIGPREFIX	8
+#define TROUBLEPREFIX	9	/* shared or per-user, RW (append-only) */
+#define PREFIX_COUNT	10
 /* used in files.c; xxconf.h can override if needed */
 #ifndef FQN_MAX_FILENAME
 #define FQN_MAX_FILENAME 512
@@ -415,6 +415,10 @@ E struct plinemsg_type *plinemsg_types;
 
 #ifdef PANICTRACE
 E char *ARGV0;
+#endif
+
+#ifdef DROPLEVEL
+E void NDECL((*dropleveltempsfn));
 #endif
 
 #undef E

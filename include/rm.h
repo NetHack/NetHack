@@ -560,6 +560,9 @@ struct levelflags {
                                   normal mode descendant of such) */
     Bitfield(corrmaze, 1);     /* Whether corridors are used for the maze
                                   rather than ROOM */
+#ifdef CONWAY
+    Bitfield(conway, 1);
+#endif
 };
 
 typedef struct {

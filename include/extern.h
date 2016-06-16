@@ -1132,6 +1132,7 @@ E int FDECL(sleep_monst, (struct monst *, int, int));
 E void FDECL(slept_monst, (struct monst *));
 E void FDECL(xdrainenergym, (struct monst *, BOOLEAN_P));
 E long FDECL(attk_protection, (int));
+E int FDECL(mdamagem, (struct monst *, struct monst *, struct attack *));
 E void FDECL(rustm, (struct monst *, struct obj *));
 
 /* ### mhitu.c ### */
@@ -1219,6 +1220,8 @@ E void NDECL(water_friction);
 E void FDECL(save_waterlevel, (int, int));
 E void FDECL(restore_waterlevel, (int));
 E const char *FDECL(waterbody_name, (XCHAR_P, XCHAR_P));
+E void NDECL(conway_update);  
+E void NDECL(conway_restore);
 
 /* ### mkobj.c ### */
 

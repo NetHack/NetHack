@@ -350,4 +350,15 @@ struct savefile_info {
 #define PANICTRACE_GDB
 #endif
 
+/* Only CONWAY requires this at the moment, but it should be generally useful. */
+#ifdef CONWAY
+# define DROPLEVEL
+#endif
+
+#ifdef DROPLEVEL
+# define DROPLEVEL_WINDUP(fn) dropleveltempsfn = &fn;
+# define DROPLEVEL_UNWIND(held) \
+    dropleveltempsfn = held; held=0; if(dropleveltempsfn)(*dropleveltempsfn)();
+#endif
+
 #endif /* GLOBAL_H */

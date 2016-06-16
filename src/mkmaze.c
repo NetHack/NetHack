@@ -25,6 +25,10 @@ STATIC_DCL void NDECL(baalz_fixup);
 STATIC_DCL void NDECL(setup_waterlevel);
 STATIC_DCL void NDECL(unsetup_waterlevel);
 
+#ifdef CONWAY
+STATIC_DCL void NDECL(conway_setup);
+#endif
+
 /* adjust a coordinate one step in the specified direction */
 #define mz_move(X, Y, dir) \
     do {                                                         \
@@ -612,6 +616,11 @@ fixup_special()
         /* custom wallify the "beetle" potion of the level */
         baalz_fixup();
     }
+#ifdef CONWAY
+    if(level.flags.conway){
+        conway_setup();
+    }
+#endif
 
     if (lregions)
         free((genericptr_t) lregions), lregions = 0;
@@ -1605,5 +1614,383 @@ register boolean ini;
         }
     }
 }
+
+#ifdef CONWAY
+/* Hero has just stumbled into Conway's game of Life - which in NH is a
+ * rather dangerous place.  I hope. */
+
+/* Temp storage for the next generation.  The normal game state is always used
+ * for the current generation since it changes outside of life's control. */
+static char (*ls)[COLNO][ROWNO];	/* life state */
+static int (*lslev)[COLNO][ROWNO];	/* total level of surrounding life */
+
+/* Conway's Life was binary: alive or dead.  Here it's a little more complex. */
+static int
+conway_islive(lvlp, x, y)
+    int *lvlp;
+    int x,y;
+{
+    struct monst *mhere;
+	    /* Hero's levels don't count here since it's likely to be
+	     * much larger than the surrounding life. */
+    if(u.ux == x && u.uy == y){
+	if(Upolyd && nonliving(youmonst.data)) return 0;
+	return 1;
+    }
+	
+    mhere = m_at(x,y);
+    if(!mhere) return 0;
+    if(nonliving(mhere->data)) return 0;
+    if(lvlp) *lvlp += mhere->m_lev;
+    return 1;
+}
+
+static struct lifelimits {
+    int xmin,xmax;
+    int ymin,ymax;
+} lls;
+
+/* Find the bounds of the rectangular area where we will play life. */
+static void
+conway_findactive(){
+    lls.xmin = 0;
+    lls.ymin = 0;
+    lls.xmax = COLNO-1;
+    lls.ymax = ROWNO-1;
+/* XXX is this test correct? */
+/* #define CONWAY_WALL(x,y) IS_ROCK(levl[x][y].typ) */
+#define CONWAY_WALL(x,y) (levl[x][y].wall_info & W_NONDIGGABLE)
+    while(CONWAY_WALL(lls.xmin, ROWNO/2) && lls.xmin < COLNO/2)
+	lls.xmin++;
+    while(CONWAY_WALL(COLNO/2, lls.ymin) && lls.ymin < ROWNO/2)
+	lls.ymin++;
+    while(CONWAY_WALL(lls.xmax, ROWNO/2) && lls.xmax > COLNO/2)
+	lls.xmax--;
+    while(CONWAY_WALL(COLNO/2, lls.ymax) && lls.ymax > ROWNO/2)
+	lls.ymax--;
+#undef CONWAY_WALL
+    if(lls.xmin > COLNO/2 || lls.ymin > ROWNO/2 ||
+       lls.xmax < COLNO/2 || lls.ymax < ROWNO/2)
+	    panic("can't find active area in level");
+}
+
+static void NDECL((*helddroplevel)) = 0;
+
+/* Leaving the level - get rid of our scratchpad. */
+static void
+conway_cleanup(){
+    if(ls){
+	free(ls);
+    }
+    if(lslev){
+	free(lslev);
+    }
+    DROPLEVEL_UNWIND(helddroplevel);
+}
+
+/* Entering / reentering the level. */
+void
+conway_restore(){
+    DROPLEVEL_WINDUP(conway_cleanup);
+    ls = (char(*)[COLNO][ROWNO])alloc(sizeof(char[COLNO][ROWNO]));
+    lslev = (int(*)[COLNO][ROWNO])alloc(sizeof(int[COLNO][ROWNO]));
+    conway_findactive();
+}
+
+/* First entry into the level. */
+void
+conway_setup(){
+    int cnt;
+    int subtype = rn2(3);
+    char *force = nh_getenv("SPLEVTYPE2");
+    conway_restore();
+    if(force){
+	int tmp = atoi(force);
+	if(tmp>=0 && tmp <=2) subtype = tmp;
+    }
+    switch(subtype){
+    case 0:		/* just the normal bigroom population */
+	break;
+    case 1:		/* extra mildews to start */
+		    /* TUNE ME! */
+	cnt = (lls.xmax-lls.xmin+1) * (lls.ymax-lls.ymin+1) / 32;
+
+	while(cnt--){
+		    /* XXX is flags correct? */
+	    (void) makemon(&mons[PM_MILDEW], 0, 0, MM_NOCOUNTBIRTH);
+	}
+	break;
+    case 2:		/* a glider */
+		/* XXX need to add to this - pick multiple of multiple known
+		 * configurations in multiple orientations - later */
+	{
+	    int x = 3 + rn2(lls.xmax-lls.xmin - 5); /* prevent wrapping */
+	    int y = 3 + rn2(lls.ymax-lls.ymin - 5);
+	    (void)makemon(&mons[PM_MILDEW], x,  y+2, MM_NOCOUNTBIRTH);
+	    (void)makemon(&mons[PM_MILDEW], x+1,y+2, MM_NOCOUNTBIRTH);
+	    (void)makemon(&mons[PM_MILDEW], x+2,y+2, MM_NOCOUNTBIRTH);
+	    (void)makemon(&mons[PM_MILDEW], x+1,  y, MM_NOCOUNTBIRTH);
+	    (void)makemon(&mons[PM_MILDEW], x+2,y+1, MM_NOCOUNTBIRTH);
+	}
+	break;
+    }
+}
+
+static int
+LIMIT(n, lbound, ubound)
+    int n;
+    int lbound, ubound;
+{
+    int rv;
+    if(n<lbound){
+	rv = ubound;
+    } else {
+	if(n>ubound){
+	    rv = lbound;
+	} else {
+	    rv = n;
+	}
+    }
+    return rv;
+}
+
+static int
+conway_islive_wrap(lvlp, x, y)
+    int *lvlp;
+    int x;
+    int y;
+{
+    return conway_islive(lvlp,
+	    LIMIT(x, lls.xmin, lls.xmax),
+	    LIMIT(y, lls.ymin, lls.ymax));
+}
+
+static struct monst *
+conway_random_neighbor(x,y)
+    int x,y;
+{
+#define LRN(a,b)	if(conway_islive_wrap(NULL, a, b))return m_at(a,b);
+    int mutation[8];
+    int ndx;
+    int last=8;
+    for(ndx=0;ndx<8;ndx++)mutation[ndx] = ndx;
+    for(ndx=0;ndx<8;ndx++){
+	int entry = rn2(last);
+	int pick = mutation[entry];
+	last--;
+	mutation[entry] = mutation[last];
+	switch(pick){
+	    case 0: LRN(x-1, y-1); break;
+	    case 1: LRN(x,   y-1); break;
+	    case 2: LRN(x+1, y-1); break;
+	    case 3: LRN(x-1, y  ); break;
+	    case 4: LRN(x+1, y  ); break;
+	    case 5: LRN(x-1, y+1); break;
+	    case 6: LRN(x,   y+1); break;
+	    case 7: LRN(x+1, y+1); break;
+	    default: impossible("no neighbor in a crowd");
+	}
+    }
+    return NULL;
+#undef LRN
+}
+
+/*
+Implement the normal Conway algorithm.  Undead are not alive.  Anything lower
+level than the sum of the life monsters around it is absorbed (ala The Borg/The
+Blob) and not just continued into the next generation.  This of course includes
+the hero.
+*/
+void
+conway_update(){
+    int x, y;
+
+	/* Be unpredictable: Life updates about half of the time, but not on
+	alternate moves. */
+    if(monstermoves % 16 < 5) return;
+    if(rn2(11) < 3) return;
+	/* first, figure out what changes are needed for the next generation */
+    for(x=lls.xmin; x<=lls.xmax; x++){
+	for(y=lls.ymin; y<=lls.ymax; y++){
+	    *lslev[x][y] = 0;	/* total levels of live neighbors */
+#ifdef notyet
+/*
+This isn't needed unless there are interior wall features or other places
+we don't want to put a monster.
+	    if( this is not a legal position for a monster){
+		ls[x][y] = 99;	/* flag for no action */
+		continue;
+	    }
+*/
+#endif
+
+		    /* count neighbors (and their levels) */
+	    *ls[x][y] =
+		    conway_islive_wrap(&*lslev[x][y], x-1, y-1) +
+		    conway_islive_wrap(&*lslev[x][y], x,   y-1) +
+		    conway_islive_wrap(&*lslev[x][y], x+1, y-1) +
+		    conway_islive_wrap(&*lslev[x][y], x-1, y  ) +
+		    conway_islive_wrap(&*lslev[x][y], x+1, y  ) +
+		    conway_islive_wrap(&*lslev[x][y], x-1, y+1) +
+		    conway_islive_wrap(&*lslev[x][y], x,   y+1) +
+		    conway_islive_wrap(&*lslev[x][y], x+1, y+1);
+		    /*pline("R(%d %d)=%d(%d) ",x,y,ls[x][y],lslev[x][y]);*/
+	}
+    }
+
+	/* now apply the changes to the game state */
+/*#define LDEBUG*/
+#ifdef LDEBUG
+    int counts[10]={0,0,0,0,0,0,0,0,0};
+    /*pline("bounds: (%d,%d)-(%d,%d)", lls.xmin,lls.ymin,lls.xmax,lls.ymax);
+    (void) makemon(&mons[PM_GRID_BUG], lls.xmin, lls.ymin, MM_NOCOUNTBIRTH);
+    (void) makemon(&mons[PM_GRID_BUG], lls.xmax, lls.ymax, MM_NOCOUNTBIRTH);*/
+#endif
+
+#define DO_DIE_NOTHING 0
+#define DO_DIE_LONELY 1
+#define DO_DIE_CROWD 2
+#define DO_LIVE 3
+
+    for(x=lls.xmin; x<=lls.xmax; x++){
+	for(y=lls.ymin; y<=lls.ymax; y++){
+	    struct monst *mhere;
+	    int action = DO_DIE_NOTHING;
+#ifdef LDEBUG
+	    counts[ls[x][y]]++;
+#endif
+	    switch(*ls[x][y]){
+#ifdef notyet
+	    case 99:	/* special case: forced no action */
+		    break;
+#endif
+			    /* die of loneliness */
+	    case 0:
+	    case 1:
+		    action = DO_DIE_LONELY;
+		    break;
+			    /* make/continue life */
+	    case 2:
+	    case 3:
+		    action = DO_LIVE;
+		    break;
+			    /* die of overcrowding */
+	    case 4:
+	    case 5:
+	    case 6:
+	    case 7:
+	    case 8:
+		    action = DO_DIE_CROWD;
+		    break;
+	    default:
+		    panic("bad neighbor count");
+	    }
+
+	    switch(action){
+	    case DO_DIE_NOTHING:
+		break;
+	    case DO_DIE_LONELY:
+	    case DO_DIE_CROWD:
+		if(MON_AT(x,y)){
+		    struct monst *mp = m_at(x,y);
+		    if(mp->data == &mons[PM_MILDEW]){
+			    /* mildew: just play life */
+			monkilled(mp, NULL, AD_ANY);
+		    } else {
+			    /* others get drained first */
+			struct monst *dummy_m;
+			struct attack dummy_a = { AT_ANY, AD_DRLI, 0, 0 };
+			if(action == DO_DIE_CROWD){
+			    dummy_m = conway_random_neighbor(x,y);
+			} else {
+			    dummy_m = newmonst();
+			    (void) memset( (genericptr_t)dummy_m, 0, sizeof(*dummy_m));
+			    dummy_m->data = &mons[PM_MILDEW];
+			}
+			(void)mdamagem(dummy_m, mp, &dummy_a);
+			if(action != DO_DIE_CROWD){
+			    free(dummy_m);
+			}
+		    }
+		} else {
+		    if(HERO_AT(x,y)){
+			    /* hero takes damage - modified drain level
+			     * from mhitu.c:hitmu(): */
+			if (rn2(100) < 10 && !Drain_resistance) {
+			    if(action == DO_DIE_CROWD){
+/* XXX these messages could be expanded */
+				if(Hallucination){
+				    if(Role_if(PM_SAMURAI))
+					pline("This is just like the Tokyo subway.");
+				    else
+					pline("You are too near the madding crowd.");
+				} else {
+				    pline("You feel crowded here.");
+				}
+			    } else {
+				if(Hallucination){
+				    pline("I feel so lonely, I could die."); /* Elvis */
+				} else {
+				    pline("It seems lonely here.");
+				}
+			    }
+			    losexp("Life drainage");
+			}
+		    }
+		}
+		break;
+	    case DO_LIVE:
+		    /* continue(2/3) or create(3) */
+		mhere = m_at(x,y);
+		if(mhere){
+/*
+Check the level of the surrounding monsters that are life vs the level
+of the monster at this point (which may be the hero).  If the current
+monster is lower level, get absorbed by the borg else (maybe) gain level.
+*/
+		    if(mhere->data != &mons[PM_MILDEW]){
+			    /* The only justification for this intrinsic
+			     * polymorph resistance is to avoid
+			     * insta-death for pets. */
+			if(*lslev[x][y] > mhere->m_lev && rn2(100) < 20){
+			    newcham(mhere, &mons[PM_MILDEW], FALSE, TRUE);
+			}
+		    } else {
+				/* Use rn2() instead of keeping track of
+				 * the age of each mildew. */
+			if(rn2(100) < 40) grow_up(mhere, NULL);
+		    }
+		} else {
+		    if(HERO_AT(x,y) && !Upolyd && (u.umonnum != PM_MILDEW)){
+			if(*lslev[x][y] > u.ulevel){
+			    if( (Unchanging && rn2(3)) || (rn2(100) < 50)
+			    ){
+				pline("You resist the urge to regress.");
+			    } else {
+				polymon(PM_MILDEW);
+				/* polymorph will always time out so hero
+				 * isn't stuck if sitting in a stable life
+				 * configuration */
+			    }
+			}
+		    } else {
+				/* Nothing is here - birth. */
+			if(*ls[x][y] == 3)
+			    (void) makemon(&mons[PM_MILDEW], x, y, MM_NOCOUNTBIRTH);
+		    }
+		}
+		break;
+	    default:
+		impossible("conway action");
+	    }
+	}
+    }
+#ifdef LDEBUG
+    pline("[%d %d %d %d %d %d %d %d %d %d] ",
+	counts[0], counts[1], counts[2], counts[3], counts[4],
+	counts[5], counts[6], counts[7], counts[8], counts[9]);
+#endif
+}
+#endif
 
 /*mkmaze.c*/

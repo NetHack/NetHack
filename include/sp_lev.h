@@ -32,6 +32,7 @@
 #define CORRMAZE 0x00000800L  /* for maze levels only */
 #define CHECK_INACCESSIBLES 0x00001000L /* check for inaccessible areas and
    generate ways to escape from them */
+#define FLAG_CONWAY 0x00002000L  /* avoid confusion with the value of CONWAY */
 
 /* different level layout initializers */
 #define LVLINIT_NONE 0

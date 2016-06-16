@@ -297,6 +297,7 @@ hardfloor	{ savetoken(yytext); yylval.i=HARDFLOOR; return FLAG_TYPE; }
 nommap		{ savetoken(yytext); yylval.i=NOMMAP; return FLAG_TYPE; }
 arboreal	{ savetoken(yytext); yylval.i=ARBOREAL; return FLAG_TYPE; } /* KMH */
 shortsighted	{ savetoken(yytext); yylval.i=SHORTSIGHTED; return FLAG_TYPE; }
+conway		{ savetoken(yytext); yylval.i=FLAG_CONWAY; return FLAG_TYPE; }
 mazelevel	{ savetoken(yytext); yylval.i=MAZELEVEL; return FLAG_TYPE; }
 premapped	{ savetoken(yytext); yylval.i=PREMAPPED; return FLAG_TYPE; }
 shroud		{ savetoken(yytext); yylval.i=SHROUD; return FLAG_TYPE; }
