@@ -47,17 +47,17 @@ int pm;
 {
     switch (pm) {
     case PM_WEREWOLF:
-        return (PM_HUMAN_WEREWOLF);
+        return PM_HUMAN_WEREWOLF;
     case PM_HUMAN_WEREWOLF:
-        return (PM_WEREWOLF);
+        return PM_WEREWOLF;
     case PM_WEREJACKAL:
-        return (PM_HUMAN_WEREJACKAL);
+        return PM_HUMAN_WEREJACKAL;
     case PM_HUMAN_WEREJACKAL:
-        return (PM_WEREJACKAL);
+        return PM_WEREJACKAL;
     case PM_WERERAT:
-        return (PM_HUMAN_WERERAT);
+        return PM_HUMAN_WERERAT;
     case PM_HUMAN_WERERAT:
-        return (PM_WERERAT);
+        return PM_WERERAT;
     default:
         return NON_PM;
     }
@@ -121,7 +121,8 @@ register struct monst *mon;
 }
 
 /* were-creature (even you) summons a horde */
-int were_summon(ptr, yours, visible, genbuf)
+int
+were_summon(ptr, yours, visible, genbuf)
 struct permonst *ptr;
 boolean yours;
 int *visible; /* number of visible helpers created */
@@ -138,20 +139,20 @@ char *genbuf;
         switch (pm) {
         case PM_WERERAT:
         case PM_HUMAN_WERERAT:
-            typ =
-                rn2(3) ? PM_SEWER_RAT : rn2(3) ? PM_GIANT_RAT : PM_RABID_RAT;
+            typ = rn2(3) ? PM_SEWER_RAT
+                         : rn2(3) ? PM_GIANT_RAT : PM_RABID_RAT;
             if (genbuf)
                 Strcpy(genbuf, "rat");
             break;
         case PM_WEREJACKAL:
         case PM_HUMAN_WEREJACKAL:
-            typ = PM_JACKAL;
+            typ = rn2(7) ? PM_JACKAL : rn2(3) ? PM_COYOTE : PM_FOX;
             if (genbuf)
                 Strcpy(genbuf, "jackal");
             break;
         case PM_WEREWOLF:
         case PM_HUMAN_WEREWOLF:
-            typ = rn2(5) ? PM_WOLF : PM_WINTER_WOLF;
+            typ = rn2(5) ? PM_WOLF : rn2(2) ? PM_WARG : PM_WINTER_WOLF;
             if (genbuf)
                 Strcpy(genbuf, "wolf");
             break;
@@ -176,7 +177,7 @@ you_were()
     char qbuf[QBUFSZ];
     boolean controllable_poly = Polymorph_control && !(Stunned || Unaware);
 
-    if (Unchanging || (u.umonnum == u.ulycn))
+    if (Unchanging || u.umonnum == u.ulycn)
         return;
     if (controllable_poly) {
         /* `+4' => skip "were" prefix to get name of beast */

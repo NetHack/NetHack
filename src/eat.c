@@ -619,7 +619,9 @@ boolean allowmsg;
            and also shouldn't eat current species when polymorphed
            (even if having the form of something which doesn't care
            about cannibalism--hero's innate traits aren't altered) */
-        && (your_race(fptr) || (Upolyd && same_race(youmonst.data, fptr)))) {
+        && (your_race(fptr)
+            || (Upolyd && same_race(youmonst.data, fptr))
+            || (u.ulycn >= LOW_PM && were_beastie(pm) == u.ulycn))) {
         if (allowmsg) {
             if (Upolyd && your_race(fptr))
                 You("have a bad feeling deep inside.");
