@@ -2634,6 +2634,26 @@ int final;
     } else {
         Sprintf(buf, "used %ld wish%s", u.uconduct.wishes,
                 (u.uconduct.wishes > 1L) ? "es" : "");
+        if (u.uconduct.wisharti) {
+            /* if wisharti == wishes
+             *  1 wish (for an artifact)
+             *  2 wishes (both for artifacts)
+             *  N wishes (all for artifacts)
+             * else (N is at least 2 in order to get here; M < N)
+             *  N wishes (1 for an artifact)
+             *  N wishes (M for artifacts)
+             */
+            if (u.uconduct.wisharti == u.uconduct.wishes)
+                Sprintf(eos(buf), " (%s",
+                        (u.uconduct.wisharti > 2L) ? "all "
+                          : (u.uconduct.wisharti == 2L) ? "both " : "");
+            else
+                Sprintf(eos(buf), " (%ld ", u.uconduct.wisharti);
+
+            Sprintf(eos(buf), "for %s)",
+                    (u.uconduct.wisharti == 1L) ? "an artifact"
+                                                : "artifacts");
+        }
         you_have_X(buf);
 
         if (!u.uconduct.wisharti)
