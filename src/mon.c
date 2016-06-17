@@ -2183,14 +2183,16 @@ int xkill_flags; /* 1: suppress message, 2: suppress corpse, 4: pacifist */
     if (!noconduct) /* KMH, conduct */
         u.uconduct.killer++;
 
-    if (!nomsg)
+    if (!nomsg) {
+        boolean namedpet = has_mname(mtmp) && !Hallucination;
+
         You("%s %s!",
             nonliving(mtmp->data) ? "destroy" : "kill",
             !(wasinside || canspotmon(mtmp)) ? "it"
               : !mtmp->mtame ? mon_nam(mtmp)
-                : x_monnam(mtmp, has_mname(mtmp) ? ARTICLE_NONE : ARTICLE_THE,
-                           "poor", has_mname(mtmp) ? SUPPRESS_SADDLE : 0,
-                           FALSE));
+                : x_monnam(mtmp, namedpet ? ARTICLE_NONE : ARTICLE_THE,
+                           "poor", namedpet ? SUPPRESS_SADDLE : 0, FALSE));
+    }
 
     if (mtmp->mtrapped && (t = t_at(x, y)) != 0
         && (t->ttyp == PIT || t->ttyp == SPIKED_PIT)) {
