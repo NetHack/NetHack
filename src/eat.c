@@ -1,4 +1,4 @@
-/* NetHack 3.6	eat.c	$NHDT-Date: 1454715969 2016/02/05 23:46:09 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.163 $ */
+/* NetHack 3.6	eat.c	$NHDT-Date: 1466289475 2016/06/18 22:37:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.169 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2014,12 +2014,23 @@ eatspecial()
         vault_gd_watching(GD_EATGOLD);
         return;
     }
+    if (objects[otmp->otyp].oc_material == PAPER) {
 #ifdef MAIL
-    if (otmp->otyp == SCR_MAIL) {
-        /* no nutrition */
-        pline("This junk mail is less than satisfying.");
-    }
+        if (otmp->otyp == SCR_MAIL)
+            /* no nutrition */
+            pline("This junk mail is less than satisfying.");
+        else
 #endif
+        if (otmp->otyp == SCR_SCARE_MONSTER)
+            /* to eat scroll, hero is currently polymorphed into a monster */
+            pline("Yuck%c", otmp->blessed ? '!' : '.');
+        else if (otmp->oclass == SCROLL_CLASS
+                 /* check description after checking for specific scrolls */
+                 && !strcmpi(OBJ_DESCR(objects[otmp->otyp]), "YUM YUM"))
+            pline("Yum%c", otmp->blessed ? '!' : '.');
+        else
+            pline("Needs salt...");
+    }
     if (otmp->oclass == POTION_CLASS) {
         otmp->quan++; /* dopotion() does a useup() */
         (void) dopotion(otmp);
@@ -2453,8 +2464,11 @@ doeat()
             u.uconduct.unvegan++;
         u.uconduct.food++;
 
-        if (otmp->cursed)
+        if (otmp->cursed) {
             (void) rottenfood(otmp);
+            nodelicious = TRUE;
+        } else if (objects[otmp->otyp].oc_material == PAPER)
+            nodelicious = TRUE;
 
         if (otmp->oclass == WEAPON_CLASS && otmp->opoisoned) {
             pline("Ecch - that must have been poisonous!");
@@ -2463,7 +2477,7 @@ doeat()
                 losehp(rnd(15), xname(otmp), KILLED_BY_AN);
             } else
                 You("seem unaffected by the poison.");
-        } else if (!otmp->cursed && !nodelicious) {
+        } else if (!nodelicious) {
             pline("%s%s is delicious!",
                   (obj_is_pname(otmp)
                    && otmp->oartifact < ART_ORB_OF_DETECTION)

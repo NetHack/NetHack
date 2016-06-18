@@ -1,4 +1,4 @@
-/* NetHack 3.6	mon.c	$NHDT-Date: 1463534459 2016/05/18 01:20:59 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.221 $ */
+/* NetHack 3.6	mon.c	$NHDT-Date: 1466289475 2016/06/18 22:37:55 $  $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.227 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -908,7 +908,12 @@ struct monst *mtmp;
                     && !resists_ston(mtmp))
                    /* don't engulf boulders and statues or ball&chain */
                    || otmp->oclass == ROCK_CLASS
-                   || otmp == uball || otmp == uchain) {
+                   || otmp == uball || otmp == uchain
+                   /* normally mtmp won't have stepped onto scare monster
+                      scroll, but if it does, don't eat or engulf that
+                      (note: scrolls inside eaten containers will still
+                      become engulfed) */
+                   || otmp->otyp == SCR_SCARE_MONSTER) {
             /* do nothing--neither eaten nor engulfed */
             continue;
 
@@ -940,11 +945,18 @@ struct monst *mtmp;
         } else {
             /* devour */
             ++count;
-            if (cansee(mtmp->mx, mtmp->my) && flags.verbose)
-                pline("%s eats %s!", Monnam(mtmp),
-                      distant_name(otmp, doname));
-            else if (flags.verbose)
-                You_hear("a slurping sound.");
+            if (cansee(mtmp->mx, mtmp->my)) {
+                if (flags.verbose)
+                    pline("%s eats %s!", Monnam(mtmp),
+                          distant_name(otmp, doname));
+                /* give this one even if !verbose */
+                if (otmp->oclass == SCROLL_CLASS
+                    && !strcmpi(OBJ_DESCR(objects[otmp->otyp]), "YUM YUM"))
+                    pline("Yum%c", otmp->blessed ? '!' : '.');
+            } else {
+                if (flags.verbose)
+                    You_hear("a slurping sound.");
+            }
             /* Heal up to the object's weight in hp */
             if (mtmp->mhp < mtmp->mhpmax) {
                 mtmp->mhp += objects[otmp->otyp].oc_weight;
