@@ -6,6 +6,8 @@
 #include "sp_lev.h"
 #include "lev.h" /* save & restore info */
 
+#define CONWAY_DEBUG
+
 /* from sp_lev.c, for fixup_special() */
 extern lev_region *lregions;
 extern int num_lregions;
@@ -1672,6 +1674,13 @@ conway_findactive(){
     if(lls.xmin > COLNO/2 || lls.ymin > ROWNO/2 ||
        lls.xmax < COLNO/2 || lls.ymax < ROWNO/2)
 	    panic("can't find active area in level");
+#ifdef CONWAY_DEBUG
+    {
+    char b[100];
+    sprintf(b, "lls.x(%d-%d) .y(%d-%d)",lls.xmin,lls.xmax,lls.ymin,lls.ymax);
+    paniclog("trace",b);
+    }
+#endif
 }
 
 static void NDECL((*helddroplevel)) = 0;
@@ -1679,6 +1688,9 @@ static void NDECL((*helddroplevel)) = 0;
 /* Leaving the level - get rid of our scratchpad. */
 static void
 conway_cleanup(){
+#ifdef CONWAY_DEBUG
+    paniclog("trace","conway_cleanup()");
+#endif
     if(ls){
 	free(ls);
     }
@@ -1691,6 +1703,9 @@ conway_cleanup(){
 /* Entering / reentering the level. */
 void
 conway_restore(){
+#ifdef CONWAY_DEBUG
+    paniclog("trace","conway_restore()");
+#endif
     DROPLEVEL_WINDUP(conway_cleanup);
     ls = (char(*)[COLNO][ROWNO])alloc(sizeof(char[COLNO][ROWNO]));
     lslev = (int(*)[COLNO][ROWNO])alloc(sizeof(int[COLNO][ROWNO]));
@@ -1698,11 +1713,14 @@ conway_restore(){
 }
 
 /* First entry into the level. */
-void
+static void
 conway_setup(){
     int cnt;
     int subtype = rn2(3);
     char *force = nh_getenv("SPLEVTYPE2");
+#ifdef CONWAY_DEBUG
+    paniclog("trace","conway_setup()");
+#endif
     conway_restore();
     if(force){
 	int tmp = atoi(force);
@@ -1804,6 +1822,8 @@ the hero.
 void
 conway_update(){
     int x, y;
+
+    if(!lslev) panic("conway_update: lslev=null");
 
 	/* Be unpredictable: Life updates about half of the time, but not on
 	alternate moves. */
