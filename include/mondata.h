@@ -194,6 +194,10 @@
      || ((ptr)->mlet == S_PUDDING && (ptr) != &mons[PM_BLACK_PUDDING]))
 
 #define befriend_with_obj(ptr, obj) \
-    ((obj)->oclass == FOOD_CLASS && is_domestic(ptr))
+    ((obj)->oclass == FOOD_CLASS && is_domestic(ptr)                    \
+     || ((obj)->otyp == BANANA &&                                       \
+         ((ptr) == &mons[PM_MONKEY]                                     \
+          || (ptr) == &mons[PM_APE]                                     \
+          || (ptr) == &mons[PM_CARNIVOROUS_APE])))
 
 #endif /* MONDATA_H */
