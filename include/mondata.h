@@ -197,7 +197,6 @@
     ((obj)->oclass == FOOD_CLASS && is_domestic(ptr)                    \
      || ((obj)->otyp == BANANA &&                                       \
          ((ptr) == &mons[PM_MONKEY]                                     \
-          || (ptr) == &mons[PM_APE]                                     \
-          || (ptr) == &mons[PM_CARNIVOROUS_APE])))
+          || (ptr) == &mons[PM_APE])))
 
 #endif /* MONDATA_H */
