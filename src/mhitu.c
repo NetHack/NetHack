@@ -349,7 +349,7 @@ mattacku(mtmp)
 register struct monst *mtmp;
 {
     struct attack *mattk, alt_attk;
-    int i, j, tmp, sum[NATTK];
+    int i, j = 0, tmp, sum[NATTK];
     struct permonst *mdat = mtmp->data;
     boolean ranged = (distu(mtmp->mx, mtmp->my) > 3);
     /* Is it near you?  Affects your actions */

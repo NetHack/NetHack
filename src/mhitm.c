@@ -293,7 +293,7 @@ register struct monst *magr, *mdef;
 {
     int i,          /* loop counter */
         tmp,        /* amour class difference */
-        strike,     /* hit this attack */
+        strike = 0, /* hit this attack */
         attk,       /* attack attempted this time */
         struck = 0, /* hit at least once */
         res[NATTK]; /* results of all attacks */
